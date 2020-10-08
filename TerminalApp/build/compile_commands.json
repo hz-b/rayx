@@ -1,7 +1,0 @@
-[
-{
-  "directory": "C:/Users/Work/Documents/Semesterprojekt/RAYReworked/TerminalApp/build",
-  "command": "C:/msys64/mingw32/bin/g++.exe   -g -o CMakeFiles/TerminalApp.dir/src/TerminalApp.cpp.obj -c C:/Users/Work/Documents/Semesterprojekt/RAYReworked/TerminalApp/src/TerminalApp.cpp",
-  "file": "C:/Users/Work/Documents/Semesterprojekt/RAYReworked/TerminalApp/src/TerminalApp.cpp"
-}
-]

@@ -1,7 +1,0 @@
-[
-{
-  "directory": "C:/Users/Work/Documents/Semesterprojekt/RAYReworked/GUIApp/build",
-  "command": "C:/msys64/mingw32/bin/g++.exe   -g -o CMakeFiles/GUIApp.dir/src/GUIApp.cpp.obj -c C:/Users/Work/Documents/Semesterprojekt/RAYReworked/GUIApp/src/GUIApp.cpp",
-  "file": "C:/Users/Work/Documents/Semesterprojekt/RAYReworked/GUIApp/src/GUIApp.cpp"
-}
-]

@@ -1,7 +1,10 @@
 # Directories
 .vs/
+.vscode/
 bin/
 bin-int/
+build/
 
 # Files
 *.user
+*.code-workspace

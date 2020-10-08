@@ -1,3 +1,0 @@
-C:/Users/Work/Documents/Semesterprojekt/RAYReworked/TerminalApp/build/CMakeFiles/edit_cache.dir
-C:/Users/Work/Documents/Semesterprojekt/RAYReworked/TerminalApp/build/CMakeFiles/TerminalApp.dir
-C:/Users/Work/Documents/Semesterprojekt/RAYReworked/TerminalApp/build/CMakeFiles/rebuild_cache.dir
