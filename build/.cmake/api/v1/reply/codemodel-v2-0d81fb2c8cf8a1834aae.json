@@ -1,0 +1,155 @@
+{
+	"configurations" : 
+	[
+		{
+			"directories" : 
+			[
+				{
+					"build" : ".",
+					"childIndexes" : 
+					[
+						1,
+						2,
+						3
+					],
+					"minimumCMakeVersion" : 
+					{
+						"string" : "3.18.3"
+					},
+					"projectIndex" : 0,
+					"source" : "."
+				},
+				{
+					"build" : "RayCore",
+					"minimumCMakeVersion" : 
+					{
+						"string" : "3.18.3"
+					},
+					"parentIndex" : 0,
+					"projectIndex" : 1,
+					"source" : "RayCore",
+					"targetIndexes" : 
+					[
+						1
+					]
+				},
+				{
+					"build" : "GUIApp",
+					"minimumCMakeVersion" : 
+					{
+						"string" : "3.18.3"
+					},
+					"parentIndex" : 0,
+					"projectIndex" : 2,
+					"source" : "GUIApp",
+					"targetIndexes" : 
+					[
+						0
+					]
+				},
+				{
+					"build" : "TerminalApp",
+					"minimumCMakeVersion" : 
+					{
+						"string" : "3.18.3"
+					},
+					"parentIndex" : 0,
+					"projectIndex" : 3,
+					"source" : "TerminalApp",
+					"targetIndexes" : 
+					[
+						2
+					]
+				}
+			],
+			"name" : "Debug",
+			"projects" : 
+			[
+				{
+					"childIndexes" : 
+					[
+						1,
+						2,
+						3
+					],
+					"directoryIndexes" : 
+					[
+						0
+					],
+					"name" : "RayReworked"
+				},
+				{
+					"directoryIndexes" : 
+					[
+						1
+					],
+					"name" : "RayCore",
+					"parentIndex" : 0,
+					"targetIndexes" : 
+					[
+						1
+					]
+				},
+				{
+					"directoryIndexes" : 
+					[
+						2
+					],
+					"name" : "GUIApp",
+					"parentIndex" : 0,
+					"targetIndexes" : 
+					[
+						0
+					]
+				},
+				{
+					"directoryIndexes" : 
+					[
+						3
+					],
+					"name" : "TerminalApp",
+					"parentIndex" : 0,
+					"targetIndexes" : 
+					[
+						2
+					]
+				}
+			],
+			"targets" : 
+			[
+				{
+					"directoryIndex" : 2,
+					"id" : "GUIApp::@b52d245768d4c5f6db33",
+					"jsonFile" : "target-GUIApp-Debug-849a2259f8c0fba28658.json",
+					"name" : "GUIApp",
+					"projectIndex" : 2
+				},
+				{
+					"directoryIndex" : 1,
+					"id" : "RayCore::@351df6065e4d2b556131",
+					"jsonFile" : "target-RayCore-Debug-e9c499821a49a1dda4bf.json",
+					"name" : "RayCore",
+					"projectIndex" : 1
+				},
+				{
+					"directoryIndex" : 3,
+					"id" : "TerminalApp::@f92657485d60f9096f15",
+					"jsonFile" : "target-TerminalApp-Debug-14b89b63f8653c14f209.json",
+					"name" : "TerminalApp",
+					"projectIndex" : 3
+				}
+			]
+		}
+	],
+	"kind" : "codemodel",
+	"paths" : 
+	{
+		"build" : "C:/Users/Work/Documents/Semesterprojekt/RAYReworked/build",
+		"source" : "C:/Users/Work/Documents/Semesterprojekt/RAYReworked"
+	},
+	"version" : 
+	{
+		"major" : 2,
+		"minor" : 1
+	}
+}

@@ -1,0 +1,7 @@
+[
+{
+  "directory": "C:/Users/Work/Documents/Semesterprojekt/RAYReworked/RayCore/build",
+  "command": "C:/msys64/mingw32/bin/g++.exe -DRAY_BUILD_DLL -DRAY_PLATFORM_WINDOWS -DRayCore_EXPORTS  -g -o CMakeFiles/RayCore.dir/src/RayCore/Application.cpp.obj -c C:/Users/Work/Documents/Semesterprojekt/RAYReworked/RayCore/src/RayCore/Application.cpp",
+  "file": "C:/Users/Work/Documents/Semesterprojekt/RAYReworked/RayCore/src/RayCore/Application.cpp"
+}
+]

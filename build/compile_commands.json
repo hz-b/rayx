@@ -1,0 +1,17 @@
+[
+{
+  "directory": "C:/Users/Work/Documents/Semesterprojekt/RAYReworked/build/RayCore",
+  "command": "C:/msys64/mingw32/bin/g++.exe -DRAY_BUILD_DLL -DRAY_PLATFORM_WINDOWS -DRayCore_EXPORTS  -g -Wall -Wextra -Wpedantic -o CMakeFiles/RayCore.dir/src/RayCore/Application.cpp.obj -c C:/Users/Work/Documents/Semesterprojekt/RAYReworked/RayCore/src/RayCore/Application.cpp",
+  "file": "C:/Users/Work/Documents/Semesterprojekt/RAYReworked/RayCore/src/RayCore/Application.cpp"
+},
+{
+  "directory": "C:/Users/Work/Documents/Semesterprojekt/RAYReworked/build/GUIApp",
+  "command": "C:/msys64/mingw32/bin/g++.exe -DRAY_PLATFORM_WINDOWS @CMakeFiles/GUIApp.dir/includes_CXX.rsp -g   RAY_PLATFORM_WINDOWS -Wall -Wextra -Wpedantic -o CMakeFiles/GUIApp.dir/src/GUIApp.cpp.obj -c C:/Users/Work/Documents/Semesterprojekt/RAYReworked/GUIApp/src/GUIApp.cpp",
+  "file": "C:/Users/Work/Documents/Semesterprojekt/RAYReworked/GUIApp/src/GUIApp.cpp"
+},
+{
+  "directory": "C:/Users/Work/Documents/Semesterprojekt/RAYReworked/build/TerminalApp",
+  "command": "C:/msys64/mingw32/bin/g++.exe -DRAY_PLATFORM_WINDOWS @CMakeFiles/TerminalApp.dir/includes_CXX.rsp -g   RAY_PLATFORM_WINDOWS -Wall -Wextra -Wpedantic -o CMakeFiles/TerminalApp.dir/src/TerminalApp.cpp.obj -c C:/Users/Work/Documents/Semesterprojekt/RAYReworked/TerminalApp/src/TerminalApp.cpp",
+  "file": "C:/Users/Work/Documents/Semesterprojekt/RAYReworked/TerminalApp/src/TerminalApp.cpp"
+}
+]

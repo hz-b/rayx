@@ -1,0 +1,3 @@
+C:/Users/Work/Documents/Semesterprojekt/RAYReworked/RayCore/build/CMakeFiles/RayCore.dir
+C:/Users/Work/Documents/Semesterprojekt/RAYReworked/RayCore/build/CMakeFiles/edit_cache.dir
+C:/Users/Work/Documents/Semesterprojekt/RAYReworked/RayCore/build/CMakeFiles/rebuild_cache.dir

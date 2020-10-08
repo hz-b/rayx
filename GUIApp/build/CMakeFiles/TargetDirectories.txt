@@ -1,0 +1,3 @@
+C:/Users/Work/Documents/Semesterprojekt/RAYReworked/GUIApp/build/CMakeFiles/GUIApp.dir
+C:/Users/Work/Documents/Semesterprojekt/RAYReworked/GUIApp/build/CMakeFiles/edit_cache.dir
+C:/Users/Work/Documents/Semesterprojekt/RAYReworked/GUIApp/build/CMakeFiles/rebuild_cache.dir
