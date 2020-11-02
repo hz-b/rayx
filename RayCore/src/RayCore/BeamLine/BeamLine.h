@@ -12,12 +12,23 @@ namespace RAY {
     class RAY_API BeamLine
     {
     public:
-        static BeamLine* getInstance();
+        BeamLine();
+        ~BeamLine();
 
+        void addObject();
+        
+        int numObjects() const { return m_Objects.size(); }
+        int numLightSources() const;
+
+        
+        BeamLineObject* getObject(int i);
+        int getObjectIndex(const BeamLineObject &obj);
+
+        std::vector<BeamLineObject*> getObjects() { return m_Objects; } // necessary?
+
+        int appendObject(BeamLineObject& object);
 
     private:
-        BeamLine();
-        virtual ~BeamLine();
         // controller instance (singleton)
         static BeamLine* m_Instance;
 

@@ -7,7 +7,6 @@ extern RAY::Application* RAY::CreateApplication();
 
 int main(/*int argc, char** argv*/)
 {
-	std::cout << "Hello World!" << std::endl;
 	auto app = RAY::CreateApplication();
 	app->Run();
 	delete app;
