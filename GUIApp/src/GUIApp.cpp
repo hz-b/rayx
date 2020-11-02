@@ -1,15 +1,15 @@
 #include <iostream>
 #include <RayCore.h>
 
-class Sandbox : public RAY::Application // rename Sandbox -> GUIApp (also with TerminalApp)
+class GUIApp : public RAY::Application // rename Sandbox -> GUIApp (also with TerminalApp)
 {
 public:
-	Sandbox()
+	GUIApp()
 	{
 
 	}
 
-	~Sandbox()
+	~GUIApp()
 	{
 
 	}
@@ -18,5 +18,5 @@ public:
 
 RAY::Application* RAY::CreateApplication()
 {
-	return new Sandbox();
+	return new GUIApp();
 }

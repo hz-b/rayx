@@ -1,14 +1,14 @@
 #include <RayCore.h>
 
-class Sandbox : public RAY::Application
+class TerminalApp : public RAY::Application
 {
 public:
-	Sandbox()
+	TerminalApp()
 	{
 
 	}
 
-	~Sandbox()
+	~TerminalApp()
 	{
 
 	}
@@ -17,5 +17,5 @@ public:
 
 RAY::Application* RAY::CreateApplication()
 {
-	return new Sandbox();
+	return new TerminalApp();
 }
