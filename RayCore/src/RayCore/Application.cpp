@@ -1,19 +1,23 @@
 #include "Application.h"
+#include "BeamLine/BeamLine.h"
+
+#include <iostream>
 
 namespace RAY {
 
-	Application::Application()
-	{
-	}
+    Application::Application() {
+        std::cout << "Application created" << std::endl;
+    }
 
-
-	Application::~Application()
-	{
-	}
+    Application::~Application() {
+        std::cout << "Application deleted" << std::endl;
+    }
+    
 
 	void Application::Run()
 	{
-		while (true);
+        std::cout << "Application running..." << std::endl;
+        BeamLine();
 	}
 
 }

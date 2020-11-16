@@ -1,9 +1,13 @@
-cmake_minimum_required(VERSION 3.18.3)
-project(TerminalApp VERSION 0.1.0)
+cmake_minimum_required(VERSION 3.0 FATAL_ERROR)
+project(TerminalApp)
 
+set(CMAKE_VERBOSE_MAKEFILE ON)
+set(CMAKE_COLOR_MAKEFILE   ON)
 
-include_directories(${RayCore_INCLUDE_DIRS})
+add_executable(${PROJECT_NAME} TerminalApp.cpp)
 
-add_executable(${PROJECT_NAME} src/TerminalApp.cpp)
+target_compile_definitions(${PROJECT_NAME} PUBLIC RAY_PLATFORM_WINDOWS)
+
+target_include_directories(${PROJECT_NAME} PRIVATE ${RayCore_SOURCE_DIR}/src)
 
 target_link_libraries(${PROJECT_NAME} RayCore)
