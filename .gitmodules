@@ -1,0 +1,4 @@
+[submodule "RayCore/vendor/glm"]
+	path = RayCore/vendor/glm
+	url = https://github.com/g-truc/glm.git
+	branch = master
