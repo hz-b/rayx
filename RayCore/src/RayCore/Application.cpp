@@ -6,6 +6,8 @@
 namespace RAY {
 
     Application::Application() {
+        // std::vector<Ray*> rayList;
+        // m_tracerInterface = TracerInterface(rayList);
         std::cout << "Application created" << std::endl;
     }
 

@@ -1,13 +1,19 @@
 #pragma once
 
+#include <vector>
+
+class Ray;
+
 namespace RAY
 {
     class TracerInterface
     {
     public:
-        TracerInterface(/* args */);
+        TracerInterface();
+        TracerInterface(const std::vector<Ray *> &m_rayList);
         ~TracerInterface();
+
     private:
-        /* data */
+        std::vector<Ray *> m_rayList;
     };
 } // namespace RAY

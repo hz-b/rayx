@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Core.h"
+#include "Tracer/TracerInterface.h"
 
 namespace RAY {
 
@@ -11,6 +12,9 @@ namespace RAY {
 		virtual ~Application();
 
 		void Run();
+
+	private:
+		TracerInterface m_tracerInterface;
 	};
 
 	// To be defined in CLIENT
