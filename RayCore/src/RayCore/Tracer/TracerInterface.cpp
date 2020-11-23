@@ -1,4 +1,5 @@
 #include "TracerInterface.h"
+#include "Ray.h"
 
 namespace RAY
 {
@@ -6,12 +7,12 @@ namespace RAY
     {
     }
 
-    TracerInterface::TracerInterface(const std::vector<Ray *> &rayList) : m_rayList(rayList)
-    {
-    }
-
     TracerInterface::~TracerInterface()
     {
     }
 
+    bool RAY::TracerInterface::run(const std::vector<Ray *> &rayList /*, BeamLine */)
+    {
+        return false;
+    }
 } // namespace RAY

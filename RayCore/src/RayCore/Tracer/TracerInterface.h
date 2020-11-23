@@ -10,9 +10,10 @@ namespace RAY
     {
     public:
         TracerInterface();
-        TracerInterface(const std::vector<Ray *> &m_rayList);
         ~TracerInterface();
 
+        bool run(const std::vector<Ray *> &m_rayList /*, BeamLine */ );
+        
     private:
         std::vector<Ray *> m_rayList;
     };
