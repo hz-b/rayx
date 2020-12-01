@@ -1,78 +1,45 @@
-#include VULKANSDKPATH
+#include "Tracer.h"
 
-#include <iostream>
-#include <stdexcept>
-#include <cstdlib>
-#include <vector>
-#include <map>
-#include <optional>
-#include "Ray.h"
-#include <assert.h>
+namespace Tracer{
 
-//set debug generation information
-const std::vector<const char*> validationLayers = {
-	"VK_LAYER_KHRONOS_validation"
-		};
 
-#ifdef NDEBUG
-	const bool enableValidationLayers = false;
-#else
-	const bool enableValidationLayers = true;
-#endif
+	VkResult CreateDebugUtilsMessengerEXT(VkInstance instance, const VkDebugUtilsMessengerCreateInfoEXT* pCreateInfo, const VkAllocationCallbacks* pAllocator, VkDebugUtilsMessengerEXT* pDebugMessenger) {
+		auto func = (PFN_vkCreateDebugUtilsMessengerEXT)vkGetInstanceProcAddr(instance, "vkCreateDebugUtilsMessengerEXT");
+		if (func != nullptr) {
+			return func(instance, pCreateInfo, pAllocator, pDebugMessenger);
+		}
+		else {
+			return VK_ERROR_EXTENSION_NOT_PRESENT;
+		}
+	}
 
-// Used for validating return values of Vulkan API calls.
-#define VK_CHECK_RESULT(f) 																				\
-{																										\
-    VkResult res = (f);																					\
-    if (res != VK_SUCCESS)																				\
-    {																									\
-        printf("Fatal : VkResult is %d in %s at line %d\n", res,  __FILE__, __LINE__); \
-        assert(res == VK_SUCCESS);																		\
-    }																									\
-}
+	void DestroyDebugUtilsMessengerEXT(VkInstance instance, VkDebugUtilsMessengerEXT debugMessenger, const VkAllocationCallbacks* pAllocator) {
+		auto func = (PFN_vkDestroyDebugUtilsMessengerEXT)vkGetInstanceProcAddr(instance, "vkDestroyDebugUtilsMessengerEXT");
+		if (func != nullptr) {
+			func(instance, debugMessenger, pAllocator);
+		}
+	}
 
-const int WORKGROUP_SIZE = 32; // Workgroup size in compute shader.
+	const int WORKGROUP_SIZE = 32; // Workgroup size in compute shader.
 
-class vkComputeApplication {
 
-public:
 	void run() {
-		Ray ray;
 		setRayAmount(16384);
 		generateRays();
-		outputBufferSize = rayAmount * 6*sizeof(double);
+		inputBufferSize = rayAmount * 8*sizeof(double);
+		outputBufferSize = rayAmount*8;//  * sizeof(double);
 		initVulkan();
 		mainLoop();
 		cleanup();
-	
+
 	}
 
- private:
-	VkInstance instance;
-	VkPhysicalDevice physicalDevice = VK_NULL_HANDLE;
-	VkDevice device;
-	uint32_t outputBufferSize;
-	VkBuffer outputBuffer;
-	VkDeviceMemory outputBufferMemory;
-	uint32_t inputBufferSize;
-	VkBuffer inputBuffer;
-	VkDeviceMemory inputBufferMemory;
-	VkPipeline pipeline;
-	VkPipelineLayout pipelineLayout;
-	VkShaderModule computeShaderModule;
-	VkCommandPool commandPool;
-	VkCommandBuffer commandBuffer;
-	VkDescriptorPool descriptorPool;
-	VkDescriptorSet descriptorSet;
-	VkDescriptorSetLayout descriptorSetLayout;
-	VkQueue computeQueue;
-	uint32_t queueFamilyIndex;
-	uint32_t rayAmount;
-	std::vector<Ray> rayVector;
+
 
 
 	void initVulkan() {
 		createInstance();
+		setupDebugMessenger();
 		pickPhysicalDevice();
 		createLogicalDevice();
 		createInputBuffer();
@@ -83,14 +50,17 @@ public:
 		createComputePipeline();
 		createCommandBuffer();
 	}
-	
+
 	void mainLoop() {
 		runCommandBuffer();
 		readDataFromOutputBuffer();
 			
 	}
-	
+
 	void cleanup() {
+		if (enableValidationLayers) {
+			//DestroyDebugUtilsMessengerEXT(instance, debugMessenger, nullptr);
+		}
 		vkDestroyDevice(device, nullptr);
 		vkDestroyInstance(instance, nullptr);
 		vkDestroyBuffer(device, inputBuffer, nullptr);
@@ -119,11 +89,29 @@ public:
 		createInfo.pApplicationInfo = &appInfo;
 		createInfo.enabledLayerCount = 0;
 
+		auto extensions = getRequiredExtensions();
+		createInfo.enabledExtensionCount = static_cast<uint32_t>(extensions.size());
+		createInfo.ppEnabledExtensionNames = extensions.data();
+		
+		VkDebugUtilsMessengerCreateInfoEXT debugCreateInfo;
+		if (enableValidationLayers) {
+			createInfo.enabledLayerCount = static_cast<uint32_t>(validationLayers.size());
+			createInfo.ppEnabledLayerNames = validationLayers.data();
+
+			populateDebugMessengerCreateInfo(debugCreateInfo);
+			createInfo.pNext = (VkDebugUtilsMessengerCreateInfoEXT*)&debugCreateInfo;
+		}
+		else {
+			createInfo.enabledLayerCount = 0;
+
+			createInfo.pNext = nullptr;
+		}
+
 		//create instance
 		VkResult result = vkCreateInstance(&createInfo, nullptr, &instance);
 		if (result != VK_SUCCESS)
 			throw std::runtime_error("failed to create instance!");
-
+		/*
 		//get extensions
 		uint32_t extensionCount = 0;
 		vkEnumerateInstanceExtensionProperties(nullptr, &extensionCount, nullptr);
@@ -135,20 +123,39 @@ public:
 		for (const auto& extension : extensions) {
 			std::cout << '\t' << extension.extensionName << '\n';
 		}
-
-
+		*/
 	}
+	void populateDebugMessengerCreateInfo(VkDebugUtilsMessengerCreateInfoEXT& createInfo) {
+		createInfo = {};
+		createInfo.sType = VK_STRUCTURE_TYPE_DEBUG_UTILS_MESSENGER_CREATE_INFO_EXT;
+		createInfo.messageSeverity = VK_DEBUG_UTILS_MESSAGE_SEVERITY_VERBOSE_BIT_EXT | VK_DEBUG_UTILS_MESSAGE_SEVERITY_WARNING_BIT_EXT | VK_DEBUG_UTILS_MESSAGE_SEVERITY_ERROR_BIT_EXT;
+		createInfo.messageType = VK_DEBUG_UTILS_MESSAGE_TYPE_GENERAL_BIT_EXT | VK_DEBUG_UTILS_MESSAGE_TYPE_VALIDATION_BIT_EXT | VK_DEBUG_UTILS_MESSAGE_TYPE_PERFORMANCE_BIT_EXT;
+		createInfo.pfnUserCallback = debugCallback;
+	}
+	void setupDebugMessenger() {
+		if (!enableValidationLayers) return;
 
-	//modify vkCreateInstance to add validation layers
-	/*
-	VkResult vkCreateInstance(const VkInstanceCreateInfo* pCreateInfo, const VkAllocationCallbacks* pAllocator, VkInstance* instance) {
-		if (pCreateInfo == nullptr || instance == nullptr) {
-			log("Null pointer passed to required parameter!");
-			return VK_ERROR_INITIALIZATION_FAILED;
+		VkDebugUtilsMessengerCreateInfoEXT createInfo;
+		populateDebugMessengerCreateInfo(createInfo);
+
+		if (CreateDebugUtilsMessengerEXT(instance, &createInfo, nullptr, &debugMessenger) != VK_SUCCESS) {
+			throw std::runtime_error("failed to set up debug messenger!");
 		}
-		return real_vkCreateInstance(pCreateInfo, pAllocator, instance);
 	}
-	*/
+	std::vector<const char*> getRequiredExtensions() {
+		std::vector<const char*> extensions;
+
+		if (enableValidationLayers) {
+			extensions.push_back(VK_EXT_DEBUG_UTILS_EXTENSION_NAME);
+		}
+
+		return extensions;
+	}
+	static VKAPI_ATTR VkBool32 VKAPI_CALL debugCallback(VkDebugUtilsMessageSeverityFlagBitsEXT messageSeverity, VkDebugUtilsMessageTypeFlagsEXT messageType, const VkDebugUtilsMessengerCallbackDataEXT* pCallbackData, void* pUserData) {
+		std::cerr << "validation layer: " << pCallbackData->pMessage << std::endl;
+
+		return VK_FALSE;
+	}
 
 	//get vector with available layers
 	bool checkValidationLayerSupport() {
@@ -222,15 +229,6 @@ public:
 		return score;
 	}
 
-	struct QueueFamilyIndices {
-		uint32_t computeFamily;
-		bool hasvalue;
-
-		bool isComplete() {
-			return hasvalue;
-		}
-	};
-	QueueFamilyIndices QueueFamily;
 
 	QueueFamilyIndices findQueueFamilies(VkPhysicalDevice device) {
 		QueueFamilyIndices indices;
@@ -333,7 +331,7 @@ public:
 		bufferCreateInfo.sType = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO;
 		bufferCreateInfo.size = inputBufferSize;
 		bufferCreateInfo.usage = VK_BUFFER_USAGE_STORAGE_BUFFER_BIT; // buffer is used as a storage buffer.
-		bufferCreateInfo.sharingMode = VK_SHARING_MODE_EXCLUSIVE; // buffer is exclusive to a single queue family at a time.
+		bufferCreateInfo.sharingMode = VK_SHARING_MODE_CONCURRENT; // buffer is exclusive to a single queue family at a time.
 		VK_CHECK_RESULT(vkCreateBuffer(device, &bufferCreateInfo, NULL, &inputBuffer));
 		VkMemoryRequirements memoryRequirements;
 		vkGetBufferMemoryRequirements(device, inputBuffer, &memoryRequirements);
@@ -350,18 +348,20 @@ public:
 	}
 	void fillInputBuffer() {
 		std::vector<double> rayInfo;
-		rayInfo.reserve(rayAmount * 6);
+		rayInfo.reserve((uint64_t)rayAmount * 8);
 		for (int i = 0; i < rayAmount; i++) {
 			rayInfo.push_back(rayVector[i].getxPos());
 			rayInfo.push_back(rayVector[i].getyPos());
 			rayInfo.push_back(rayVector[i].getzPos());
+			rayInfo.push_back(0);
 			rayInfo.push_back(rayVector[i].getxDir());
 			rayInfo.push_back(rayVector[i].getyDir());
 			rayInfo.push_back(rayVector[i].getzDir());
+			rayInfo.push_back(0);
 		}
 		void* data;
 		vkMapMemory(device, inputBufferMemory, 0, inputBufferSize, 0, &data);
-		memcpy(data, rayInfo.data(), (size_t)inputBufferSize);
+		memcpy(data, rayInfo.data(), inputBufferSize);
 		vkUnmapMemory(device, inputBufferMemory);
 	}
 	void createDescriptorSetLayout() {
@@ -373,19 +373,23 @@ public:
 		/*
 		Here we specify a binding of type VK_DESCRIPTOR_TYPE_STORAGE_BUFFER to the binding point
 		0. This binds to
-		  layout(std140, binding = 0) buffer buf
+			layout(std140, binding = 0) buffer buf
 		in the compute shader.
 		*/
-		VkDescriptorSetLayoutBinding descriptorSetLayoutBinding = {};
+		VkDescriptorSetLayoutBinding descriptorSetLayoutBinding[] = {
+			{0, VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, 1, VK_SHADER_STAGE_COMPUTE_BIT, NULL},
+			{1, VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, 1, VK_SHADER_STAGE_COMPUTE_BIT, NULL}
+		};
+		/*
 		descriptorSetLayoutBinding.binding = 0; // binding = 0
 		descriptorSetLayoutBinding.descriptorType = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER;
 		descriptorSetLayoutBinding.descriptorCount = 2;
 		descriptorSetLayoutBinding.stageFlags = VK_SHADER_STAGE_COMPUTE_BIT;
-
+		*/
 		VkDescriptorSetLayoutCreateInfo descriptorSetLayoutCreateInfo = {};
 		descriptorSetLayoutCreateInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO;
 		descriptorSetLayoutCreateInfo.bindingCount = 2; // only a single binding in this descriptor set layout. 
-		descriptorSetLayoutCreateInfo.pBindings = &descriptorSetLayoutBinding;
+		descriptorSetLayoutCreateInfo.pBindings = descriptorSetLayoutBinding; //TODO
 
 		// Create the descriptor set layout. 
 		VK_CHECK_RESULT(vkCreateDescriptorSetLayout(device, &descriptorSetLayoutCreateInfo, NULL, &descriptorSetLayout));
@@ -402,11 +406,11 @@ public:
 		*/
 		VkDescriptorPoolSize descriptorPoolSize = {};
 		descriptorPoolSize.type = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER;
-		descriptorPoolSize.descriptorCount = 1;
+		descriptorPoolSize.descriptorCount = 2;
 
 		VkDescriptorPoolCreateInfo descriptorPoolCreateInfo = {};
 		descriptorPoolCreateInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_POOL_CREATE_INFO;
-		descriptorPoolCreateInfo.maxSets = 2; // we only need to allocate one descriptor set from the pool.
+		descriptorPoolCreateInfo.maxSets = 1; // we need to allocate one descriptor sets from the pool.
 		descriptorPoolCreateInfo.poolSizeCount = 1;
 		descriptorPoolCreateInfo.pPoolSizes = &descriptorPoolSize;
 
@@ -416,6 +420,8 @@ public:
 		/*
 		With the pool allocated, we can now allocate the descriptor set.
 		*/
+
+		//std::vector<VkDescriptorSetLayout> layouts(2,descriptorSetLayout);
 		VkDescriptorSetAllocateInfo descriptorSetAllocateInfo = {};
 		descriptorSetAllocateInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO;
 		descriptorSetAllocateInfo.descriptorPool = descriptorPool; // pool to allocate from.
@@ -424,28 +430,51 @@ public:
 
 		// allocate descriptor set.
 		VK_CHECK_RESULT(vkAllocateDescriptorSets(device, &descriptorSetAllocateInfo, &descriptorSet));
-
 		/*
 		Next, we need to connect our actual storage buffer with the descrptor.
 		We use vkUpdateDescriptorSets() to update the descriptor set.
 		*/
 
-		// Specify the buffer to bind to the descriptor.
-		VkDescriptorBufferInfo descriptorBufferInfo = {};
-		descriptorBufferInfo.buffer = outputBuffer;
-		descriptorBufferInfo.offset = 0;
-		descriptorBufferInfo.range = outputBufferSize;
+		//Descriptor for Input Buffer
+		{
+			// Specify the buffer to bind to the descriptor.
+			VkDescriptorBufferInfo descriptorBufferInfo = {};
+			descriptorBufferInfo.buffer = inputBuffer;
+			descriptorBufferInfo.offset = 0;
+			descriptorBufferInfo.range = inputBufferSize;
 
-		VkWriteDescriptorSet writeDescriptorSet = {};
-		writeDescriptorSet.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
-		writeDescriptorSet.dstSet = descriptorSet; // write to this descriptor set.
-		writeDescriptorSet.dstBinding = 0; // write to the first, and only binding.
-		writeDescriptorSet.descriptorCount = 1; // update a single descriptor.
-		writeDescriptorSet.descriptorType = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER; // storage buffer.
-		writeDescriptorSet.pBufferInfo = &descriptorBufferInfo;
+			VkWriteDescriptorSet writeDescriptorSet = {};
+			writeDescriptorSet.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
+			writeDescriptorSet.dstSet = descriptorSet; // write to this descriptor set.
+			writeDescriptorSet.dstBinding = 0; // write to the first binding.
+			writeDescriptorSet.descriptorCount = 1; // update a single descriptor.
+			writeDescriptorSet.descriptorType = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER; // storage buffer.
+			writeDescriptorSet.pBufferInfo = &descriptorBufferInfo;
 
-		// perform the update of the descriptor set.
-		vkUpdateDescriptorSets(device, 1, &writeDescriptorSet, 0, NULL);
+
+			// perform the update of the descriptor set.
+			vkUpdateDescriptorSets(device, 1, &writeDescriptorSet, 0, NULL);
+		}
+		//Descriptor for Output Buffer
+		{
+			// Specify the buffer to bind to the descriptor.
+			VkDescriptorBufferInfo descriptorBufferInfo = {};
+			descriptorBufferInfo.buffer = outputBuffer;
+			descriptorBufferInfo.offset = 0;
+			descriptorBufferInfo.range = outputBufferSize;
+
+			VkWriteDescriptorSet writeDescriptorSet = {};
+			writeDescriptorSet.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
+			writeDescriptorSet.dstSet = descriptorSet; // write to this descriptor set.
+			writeDescriptorSet.dstBinding = 1; // write to the first, and only binding.
+			writeDescriptorSet.descriptorCount = 1; // update a single descriptor.
+			writeDescriptorSet.descriptorType = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER; // storage buffer.
+			writeDescriptorSet.pBufferInfo = &descriptorBufferInfo;
+
+
+			// perform the update of the descriptor set.
+			vkUpdateDescriptorSets(device, 1, &writeDescriptorSet, 0, NULL);
+		}
 	}
 
 	// Read file into array of bytes, and cast to uint32_t*, then return.
@@ -575,6 +604,7 @@ public:
 		*/
 		vkCmdBindPipeline(commandBuffer, VK_PIPELINE_BIND_POINT_COMPUTE, pipeline);
 		vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_COMPUTE, pipelineLayout, 0, 1, &descriptorSet, 0, NULL);
+		//vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_COMPUTE, pipelineLayout, 0, 1, &descriptorSets[1], 0, NULL);
 		/*
 		Calling vkCmdDispatch basically starts the compute pipeline, and executes the compute shader.
 		The number of workgroups is specified in the arguments.
@@ -596,7 +626,7 @@ public:
 		submitInfo.pCommandBuffers = &commandBuffer; // the command buffer to submit.
 
 		/*
-		  We create a fence.
+			We create a fence.
 		*/
 		VkFence fence;
 		VkFenceCreateInfo fenceCreateInfo = {};
@@ -626,10 +656,10 @@ public:
 		void* mappedMemory = NULL;
 		// Map the buffer memory, so that we can read from it on the CPU.
 		vkMapMemory(device, outputBufferMemory, 0, outputBufferSize, 0, &mappedMemory);
-		uint32_t* pMappedMemory = (uint32_t*)mappedMemory;
-		std::vector<uint32_t> data;
-		data.reserve(rayAmount*sizeof(Ray));
-		for (int i = 0; i < 16384*sizeof(Ray); i++) {
+		double* pMappedMemory = (double*)mappedMemory;
+		std::vector<double> data;
+		data.reserve((uint64_t)rayAmount*8);
+		for (int i = 0; i < rayAmount; i++) {
 			data.push_back(pMappedMemory[i]);
 		}
 
@@ -638,8 +668,27 @@ public:
 		rayVector.reserve(rayAmount);
 		for (int i = 0; i < rayAmount; i++) {
 			Ray tempRay;
-			tempRay.initRay(0, 0, 0, 1, 0, 0);
-			rayVector.push_back(tempRay);
+			tempRay.initRay(6*i+1, 6*i+2, 6 * i+3, 6 * i + 4, 6 * i + 5, 6 * i + 6);
+			rayVector.emplace_back(tempRay);
 		}
 	}
-};
+
+
+
+	int main() {
+		vkComputeApplication app;
+		
+		try {
+		app.run();
+
+		}
+		catch (const std::exception& e) {
+			std::cerr << e.what() << std::endl;
+			return EXIT_FAILURE;
+			
+		}
+		
+		return EXIT_SUCCESS;
+		
+	}
+}
