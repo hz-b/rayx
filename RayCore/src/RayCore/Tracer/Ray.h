@@ -1,10 +1,12 @@
 #pragma once
 
+#include "Core.h"
+
 #include <glm.hpp>
 
 namespace RAY
 {
-    class Ray
+    class RAY_API Ray
     {
     public:
         Ray(glm::vec3 position, glm::vec3 direction);

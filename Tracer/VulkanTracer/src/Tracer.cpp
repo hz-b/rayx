@@ -1,13 +1,15 @@
-#include VULKANSDKPATH
-
-#include <iostream>
-#include <stdexcept>
-#include <cstdlib>
-#include <vector>
-#include <map>
-#include <optional>
+#include "vulkan/vulkan.hpp"
 #include "Ray.h"
+
 #include <assert.h>
+#include <cstdlib>
+#include <iostream>
+#include <map>
+#include <math.h>
+#include <optional>
+#include <stdexcept>
+#include <stdio.h>
+#include <vector>
 
 //set debug generation information
 const std::vector<const char*> validationLayers = {
@@ -47,7 +49,7 @@ public:
 	
 	}
 
- private:
+private:
 	VkInstance instance;
 	VkPhysicalDevice physicalDevice = VK_NULL_HANDLE;
 	VkDevice device;

@@ -13,3 +13,5 @@ target_compile_definitions(${PROJECT_NAME} PUBLIC RAY_PLATFORM_WINDOWS)
 
 target_include_directories(${PROJECT_NAME}  PRIVATE ${RayCore_SOURCE_DIR}/src/RayCore/
                                             PRIVATE ${RayCore_SOURCE_DIR}/vendor/glm/glm/)
+                                            
+target_link_libraries(${PROJECT_NAME} VulkanTracer)
