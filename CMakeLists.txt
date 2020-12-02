@@ -4,6 +4,7 @@ project(RayReworked)
 
 add_subdirectory(RayCore)
 add_subdirectory(TerminalApp)
+add_subdirectory(Tracer)
 
 
 
