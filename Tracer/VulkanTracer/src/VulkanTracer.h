@@ -8,6 +8,7 @@
 #include <optional>
 #include "Ray.h"
 #include <assert.h>
+#include <cmath>
 
 #ifdef NDEBUG
 	const bool enableValidationLayers = false;
@@ -30,13 +31,12 @@ const std::vector<const char*> validationLayers = {
         assert(res == VK_SUCCESS);																		\
     }																									\
 }
-
 VkResult CreateDebugUtilsMessengerEXT(VkInstance instance, const VkDebugUtilsMessengerCreateInfoEXT* pCreateInfo, const VkAllocationCallbacks* pAllocator, VkDebugUtilsMessengerEXT* pDebugMessenger);
 void DestroyDebugUtilsMessengerEXT(VkInstance instance, VkDebugUtilsMessengerEXT debugMessenger, const VkAllocationCallbacks* pAllocator);
 
 const int WORKGROUP_SIZE = 32;
 
-class vkComputeApplication {
+class VulkanTracer {
     public:
         void run();
 
@@ -103,4 +103,4 @@ class vkComputeApplication {
 
         int main();
 
-}
+};
