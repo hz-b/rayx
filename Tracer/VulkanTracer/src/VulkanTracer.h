@@ -38,6 +38,8 @@ const int WORKGROUP_SIZE = 32;
 
 class VulkanTracer {
     public:
+        VulkanTracer();
+        ~VulkanTracer();
         void run();
 
     private:

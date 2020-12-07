@@ -14,4 +14,10 @@ namespace RAY
     {
     }
 
+    bool TracerInterface::run()
+    {
+        VulkanTracer tracer;
+        tracer.run();
+        return true;
+    }
 } // namespace RAY
