@@ -9,4 +9,5 @@ add_library(${PROJECT_NAME} STATIC
                         src/VulkanTracer.cpp
 )
 
-target_include_directories(${PROJECT_NAME} PUBLIC ${Vulkan_INCLUDE_DIRS})
+target_include_directories(${PROJECT_NAME}  PUBLIC ${Vulkan_INCLUDE_DIRS}
+                                            PUBLIC ${VulkanTracer_SOURCE_DIR}/src/)

@@ -1,4 +1,5 @@
 #include "TracerInterface.h"
+#include "VulkanTracer.h"
 
 namespace RAY
 {
