@@ -4,16 +4,27 @@
 #define WORKGROUP_SIZE 32
 layout (local_size_x = WORKGROUP_SIZE, local_size_y = 1, local_size_z = 1 ) in;
 
-layout(std140, binding = 0) buffer obuf
-{
-   uint outputData[];
+struct Ray{
+	dvec4 position;
+	dvec4 direction;
 };
-layout(std140, binding = 1) buffer ibuf
+
+
+layout(std140, binding = 0) buffer ibuf
 {
-   uint rayData[];
+   Ray rayData[];
 };
+
+layout(std140, binding = 1) buffer obuf
+{
+   Ray outputData[];
+};
+
 
 
 void main(){
-	//outputData[uint(gl_GlobalInvocationID)] = gl_GlobalInvocationID[0];
+	outputData[uint(gl_GlobalInvocationID)].position = rayData[uint(gl_GlobalInvocationID)].position;
+	outputData[uint(gl_GlobalInvocationID)].direction = rayData[uint(gl_GlobalInvocationID)].direction;
+	//outputData[uint(gl_GlobalInvocationID)].position = dvec4(0.0, 1.0, 2.0, 0.0);
+	//outputData[uint(gl_GlobalInvocationID)].direction = dvec4(3.0, 4.0, 5.0, 0.0);
 }
