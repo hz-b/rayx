@@ -11,6 +11,6 @@ namespace RAY {
     }
 
     Beamline::~Beamline() {
-        std::cout << "Creating Beamline..." << std::endl;
+        std::cout << "Deleting Beamline..." << std::endl;
     }
 }
