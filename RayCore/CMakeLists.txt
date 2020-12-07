@@ -15,3 +15,9 @@ target_include_directories(${PROJECT_NAME}  PUBLIC ${RayCore_SOURCE_DIR}/src/Ray
                                             PUBLIC ${RayCore_SOURCE_DIR}/vendor/glm/glm/)
                                             
 target_link_libraries(${PROJECT_NAME} VulkanTracer)
+
+
+set_target_properties(${PROJECT_NAME} PROPERTIES
+                      RUNTIME_OUTPUT_DIRECTORY_DEBUG ${TerminalApp_BINARY_DIR}/
+                      RUNTIME_OUTPUT_DIRECTORY_RELEASE ${TerminalApp_BINARY_DIR}/
+)
