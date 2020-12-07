@@ -1,7 +1,7 @@
 #include "VulkanTracer.h"
 
 
-
+//	This function creates a debug messenger
 VkResult CreateDebugUtilsMessengerEXT(VkInstance instance, const VkDebugUtilsMessengerCreateInfoEXT* pCreateInfo, const VkAllocationCallbacks* pAllocator, VkDebugUtilsMessengerEXT* pDebugMessenger) {
 	auto func = (PFN_vkCreateDebugUtilsMessengerEXT)vkGetInstanceProcAddr(instance, "vkCreateDebugUtilsMessengerEXT");
 	if (func != nullptr) {
@@ -12,6 +12,7 @@ VkResult CreateDebugUtilsMessengerEXT(VkInstance instance, const VkDebugUtilsMes
 	}
 }
 
+//	This function destroys the debug messenger
 void DestroyDebugUtilsMessengerEXT(VkInstance instance, VkDebugUtilsMessengerEXT debugMessenger, const VkAllocationCallbacks* pAllocator) {
 	auto func = (PFN_vkDestroyDebugUtilsMessengerEXT)vkGetInstanceProcAddr(instance, "vkDestroyDebugUtilsMessengerEXT");
 	if (func != nullptr) {
@@ -19,29 +20,49 @@ void DestroyDebugUtilsMessengerEXT(VkInstance instance, VkDebugUtilsMessengerEXT
 	}
 }
 
-
+/*	this function is used to start the tracer
+*/
 void VulkanTracer::run() {
+	// At first, the amount of rays is set. This is a placeholder, as the rays won't be generated in this tracer in the future
 	setRayAmount(16384);
+	// generate the rays used by the tracer
 	generateRays();
+	//the sizes of the input and output buffers are set. The buffers need to be the size rayamount * 8* the size of a double
+	//(a ray consists of 6 values in double precision, x,y,z for the position and x*, y*, z* for the direction. 8 values instead of 6 are used, because the shader size of the buffer needs to be multiples of 16 bit)
 	inputBufferSize = rayAmount * 8*sizeof(double);
 	outputBufferSize = rayAmount*8;//  * sizeof(double);
+	//vulkan is initialized
 	initVulkan();
 	mainLoop();
 	cleanup();
 
 }
 
-
+//function for initializing vulkan
 void VulkanTracer::initVulkan() {
+	//a vulkan instance is created
 	createInstance();
+
 	setupDebugMessenger();
+
+	//physical device for computation is chosen
 	pickPhysicalDevice();
+
+	//a logical device is created
+	//it is needed to communicate with the physical device
 	createLogicalDevice();
+
+	//creates buffers to transfer data to and from the shader
 	createInputBuffer();
 	createOutputBuffer();
 	fillInputBuffer();
+
+	//creates the descriptors used to bind the buffer to shader access points (bindings)
 	createDescriptorSetLayout();
 	createDescriptorSet();
+
+	//a compute pipeline needs to be created
+	//the descriptors created earlier will be submitted here
 	createComputePipeline();
 	createCommandBuffer();
 }
@@ -63,6 +84,7 @@ void VulkanTracer::cleanup() {
 }
 void VulkanTracer::createInstance() {
 
+	//validation layers are used for debugging
 	if (enableValidationLayers && !checkValidationLayerSupport()) {
 		throw std::runtime_error("validation layers requested, but not available!");
 	}
@@ -105,19 +127,6 @@ void VulkanTracer::createInstance() {
 	VkResult result = vkCreateInstance(&createInfo, nullptr, &instance);
 	if (result != VK_SUCCESS)
 		throw std::runtime_error("failed to create instance!");
-	/*
-	//get extensions
-	uint32_t extensionCount = 0;
-	vkEnumerateInstanceExtensionProperties(nullptr, &extensionCount, nullptr);
-	std::vector<VkExtensionProperties> extensions(extensionCount);
-	vkEnumerateInstanceExtensionProperties(nullptr, &extensionCount, extensions.data());
-
-	//print extensions
-	std::cout << "available extensions:\n";
-	for (const auto& extension : extensions) {
-		std::cout << '\t' << extension.extensionName << '\n';
-	}
-	*/
 }
 void VulkanTracer::populateDebugMessengerCreateInfo(VkDebugUtilsMessengerCreateInfoEXT& createInfo) {
 	createInfo = {};
@@ -176,31 +185,44 @@ bool VulkanTracer::checkValidationLayerSupport() {
 	return true;
 
 }
+
+//physical device for computation is chosen
 void VulkanTracer::pickPhysicalDevice() {
+
+	//search for devices
 	uint32_t deviceCount = 0;
 	vkEnumeratePhysicalDevices(instance, &deviceCount, nullptr);
 	if (deviceCount == 0)
 		throw std::runtime_error("failed to find GPUs with Vulkan Support!");
+
+	//create vector of devices
 	std::vector<VkPhysicalDevice> devices(deviceCount);
 	vkEnumeratePhysicalDevices(instance, &deviceCount, devices.data());
 
+	//search for suitable device for computation task
 	for (const auto& device : devices) {
 		if (isDeviceSuitable(device)) {
 			physicalDevice = device;
 			break;
 		}
 	}
+	//error if no device is found
 	if (physicalDevice == VK_NULL_HANDLE) {
 		throw std::runtime_error("failed to find suitable GPU!");
 	}
 
+	//pick fastest device
 	std::multimap<int, VkPhysicalDevice> candidates;
 	for (const auto& device : devices) {
 		candidates.insert(std::make_pair(rateDevice(device), device));
 	}
 	candidates.rbegin()->first > 0 ? physicalDevice = candidates.rbegin()->second : throw std::runtime_error("failed to find a suitable GPU!");
 }
+
+//checks if given device is suitable for computation
+//can be extended later if more specific features are needed
 bool VulkanTracer::isDeviceSuitable(VkPhysicalDevice device) {
+
 	//get device properties
 	VkPhysicalDeviceProperties deviceProperties;
 	vkGetPhysicalDeviceProperties(device, &deviceProperties);
@@ -213,11 +235,15 @@ bool VulkanTracer::isDeviceSuitable(VkPhysicalDevice device) {
 	QueueFamilyIndices indices = findQueueFamilies(device);
 	return indices.hasvalue;
 }
+
+//rates devices
 int VulkanTracer::rateDevice(VkPhysicalDevice device) {
 	VkPhysicalDeviceProperties deviceProperties;
 	vkGetPhysicalDeviceProperties(device, &deviceProperties);
 
 	int score = 0;
+	//discrete GPUs are usually faster and get a bonus
+	//can be extended to choose the best discrete gpu if multiple are available
 	if (deviceProperties.deviceType == VK_PHYSICAL_DEVICE_TYPE_DISCRETE_GPU)
 		score += 1000;
 	return score;
@@ -246,9 +272,11 @@ VulkanTracer::QueueFamilyIndices VulkanTracer::findQueueFamilies(VkPhysicalDevic
 	return indices;
 }
 
+//creates a logical device to communicate with the physical device
 void VulkanTracer::createLogicalDevice() {
 	QueueFamilyIndices indices = findQueueFamilies(physicalDevice);
 
+	//create info about the device queues
 	VkDeviceQueueCreateInfo queueCreateInfo{};
 	queueCreateInfo.sType = VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO;
 	queueCreateInfo.queueFamilyIndex = indices.computeFamily;
@@ -257,6 +285,7 @@ void VulkanTracer::createLogicalDevice() {
 	float queuePriority = 1.0f;
 	queueCreateInfo.pQueuePriorities = &queuePriority;
 
+	//create info about the device features
 	VkPhysicalDeviceFeatures deviceFeatures{};
 	VkDeviceCreateInfo createInfo{};
 	createInfo.sType = VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO;
@@ -266,6 +295,7 @@ void VulkanTracer::createLogicalDevice() {
 
 	createInfo.enabledExtensionCount = 0;
 
+	//enable validation layers if possible
 	if (enableValidationLayers) {
 		createInfo.enabledLayerCount = static_cast<uint32_t>(validationLayers.size());
 		createInfo.ppEnabledLayerNames = validationLayers.data();
@@ -300,6 +330,7 @@ uint32_t VulkanTracer::findMemoryType(uint32_t memoryTypeBits, VkMemoryPropertyF
 	return -1;
 }
 
+//creates the buffer which holds the output rays
 void VulkanTracer::createOutputBuffer() {
 	VkBufferCreateInfo bufferCreateInfo = {};
 	bufferCreateInfo.sType = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO;
@@ -320,9 +351,13 @@ void VulkanTracer::createOutputBuffer() {
 	// Now associate that allocated memory with the buffer. With that, the buffer is backed by actual memory. 
 	VK_CHECK_RESULT(vkBindBufferMemory(device, outputBuffer, outputBufferMemory, 0));
 }
+
+//creates the buffer which holds the input rays
 void VulkanTracer::createInputBuffer() {
+	//create info about the buffer
 	VkBufferCreateInfo bufferCreateInfo = {};
 	bufferCreateInfo.sType = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO;
+	//the inputBufferSize defined earlier is used
 	bufferCreateInfo.size = inputBufferSize;
 	bufferCreateInfo.usage = VK_BUFFER_USAGE_STORAGE_BUFFER_BIT; // buffer is used as a storage buffer.
 	bufferCreateInfo.sharingMode = VK_SHARING_MODE_CONCURRENT; // buffer is exclusive to a single queue family at a time.
@@ -340,9 +375,12 @@ void VulkanTracer::createInputBuffer() {
 	// Now associate that allocated memory with the buffer. With that, the buffer is backed by actual memory. 
 	VK_CHECK_RESULT(vkBindBufferMemory(device, inputBuffer, inputBufferMemory, 0));
 }
+
+//the input buffer is filled with the ray data
 void VulkanTracer::fillInputBuffer() {
 	std::vector<double> rayInfo;
 	rayInfo.reserve((uint64_t)rayAmount * 8);
+	//transformation from ray class to double vector
 	for (int i = 0; i < rayAmount; i++) {
 		rayInfo.push_back(rayVector[i].getxPos());
 		rayInfo.push_back(rayVector[i].getyPos());
@@ -353,6 +391,7 @@ void VulkanTracer::fillInputBuffer() {
 		rayInfo.push_back(rayVector[i].getzDir());
 		rayInfo.push_back(0);
 	}
+	//data is copied to the buffer
 	void* data;
 	vkMapMemory(device, inputBufferMemory, 0, inputBufferSize, 0, &data);
 	memcpy(data, rayInfo.data(), inputBufferSize);
@@ -367,22 +406,21 @@ void VulkanTracer::createDescriptorSetLayout() {
 	/*
 	Here we specify a binding of type VK_DESCRIPTOR_TYPE_STORAGE_BUFFER to the binding point
 	0. This binds to
-		layout(std140, binding = 0) buffer buf
+		layout(std140, binding = 0) buffer ibuf (input)
+	and
+		layout(std140, binding = 1) buffer obuf (output)
 	in the compute shader.
 	*/
+	//bindings 0 and 1 are used right now
 	VkDescriptorSetLayoutBinding descriptorSetLayoutBinding[] = {
 		{0, VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, 1, VK_SHADER_STAGE_COMPUTE_BIT, NULL},
 		{1, VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, 1, VK_SHADER_STAGE_COMPUTE_BIT, NULL}
 	};
-	/*
-	descriptorSetLayoutBinding.binding = 0; // binding = 0
-	descriptorSetLayoutBinding.descriptorType = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER;
-	descriptorSetLayoutBinding.descriptorCount = 2;
-	descriptorSetLayoutBinding.stageFlags = VK_SHADER_STAGE_COMPUTE_BIT;
-	*/
+	
 	VkDescriptorSetLayoutCreateInfo descriptorSetLayoutCreateInfo = {};
 	descriptorSetLayoutCreateInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO;
-	descriptorSetLayoutCreateInfo.bindingCount = 2; // only a single binding in this descriptor set layout. 
+	//2 bindings are used in this layout
+	descriptorSetLayoutCreateInfo.bindingCount = 2; 
 	descriptorSetLayoutCreateInfo.pBindings = descriptorSetLayoutBinding; //TODO
 
 	// Create the descriptor set layout. 
@@ -396,7 +434,7 @@ void VulkanTracer::createDescriptorSet() {
 	*/
 
 	/*
-	Our descriptor pool can only allocate a single storage buffer.
+	We use a descriptor set with 2 descriptors: one descriptor for each buffer
 	*/
 	VkDescriptorPoolSize descriptorPoolSize = {};
 	descriptorPoolSize.type = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER;
@@ -414,8 +452,6 @@ void VulkanTracer::createDescriptorSet() {
 	/*
 	With the pool allocated, we can now allocate the descriptor set.
 	*/
-
-	//std::vector<VkDescriptorSetLayout> layouts(2,descriptorSetLayout);
 	VkDescriptorSetAllocateInfo descriptorSetAllocateInfo = {};
 	descriptorSetAllocateInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO;
 	descriptorSetAllocateInfo.descriptorPool = descriptorPool; // pool to allocate from.
@@ -424,14 +460,10 @@ void VulkanTracer::createDescriptorSet() {
 
 	// allocate descriptor set.
 	VK_CHECK_RESULT(vkAllocateDescriptorSets(device, &descriptorSetAllocateInfo, &descriptorSet));
-	/*
-	Next, we need to connect our actual storage buffer with the descrptor.
-	We use vkUpdateDescriptorSets() to update the descriptor set.
-	*/
-
+	
 	//Descriptor for Input Buffer
 	{
-		// Specify the buffer to bind to the descriptor.
+		//specify which buffer to use: input buffer
 		VkDescriptorBufferInfo descriptorBufferInfo = {};
 		descriptorBufferInfo.buffer = inputBuffer;
 		descriptorBufferInfo.offset = 0;
@@ -451,7 +483,7 @@ void VulkanTracer::createDescriptorSet() {
 	}
 	//Descriptor for Output Buffer
 	{
-		// Specify the buffer to bind to the descriptor.
+		//specify which buffer to use: output buffer
 		VkDescriptorBufferInfo descriptorBufferInfo = {};
 		descriptorBufferInfo.buffer = outputBuffer;
 		descriptorBufferInfo.offset = 0;
@@ -523,7 +555,6 @@ void VulkanTracer::createComputePipeline() {
 
 	/*
 	Now let us actually create the compute pipeline.
-	A compute pipeline is very simple compared to a graphics pipeline.
 	It only consists of a single stage with a compute shader.
 	So first we specify the compute shader stage, and it's entry point(main).
 	*/
@@ -646,18 +677,22 @@ void VulkanTracer::runCommandBuffer() {
 void VulkanTracer::setRayAmount(uint32_t inputRayAmount){
 	rayAmount = inputRayAmount;
 }
+
+//this function reads the data from the output buffer after the shader has finished the computation
 void VulkanTracer::readDataFromOutputBuffer(){
 	void* mappedMemory = NULL;
 	// Map the buffer memory, so that we can read from it on the CPU.
 	vkMapMemory(device, outputBufferMemory, 0, outputBufferSize, 0, &mappedMemory);
 	double* pMappedMemory = (double*)mappedMemory;
 	std::vector<double> data;
+	//reserve enough data for all the rays
 	data.reserve((uint64_t)rayAmount*8);
 	for (int i = 0; i < rayAmount; i++) {
 		data.push_back(pMappedMemory[i]);
 	}
 
 }
+//placeholder function to generate simple rays to test the data transfer
 void VulkanTracer::generateRays() {
 	rayVector.reserve(rayAmount);
 	for (int i = 0; i < rayAmount; i++) {
