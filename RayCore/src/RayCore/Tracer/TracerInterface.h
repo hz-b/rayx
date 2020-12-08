@@ -9,7 +9,7 @@
 
 namespace RAY
 {
-    class TracerInterface
+    class RAY_API TracerInterface
     {
     public:
         TracerInterface();

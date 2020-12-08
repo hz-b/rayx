@@ -2,9 +2,11 @@
 #include <iostream>
 #include <vector>
 
-class Ray {
+class Ray
+{
 private:
-	struct vec3 {
+	struct vec3
+	{
 		double x, y, z;
 	};
 	vec3 position, direction;
@@ -18,6 +20,4 @@ public:
 	double getxPos();
 	double getyPos();
 	double getzPos();
-
-
 };
