@@ -135,5 +135,5 @@ void main(){
 	//outputData[uint(gl_GlobalInvocationID)].position = dvec4(0.0, 20.0, -20.0, 0.0); // starts at (0,20,-20)
 	//outputData[uint(gl_GlobalInvocationID)].direction = dvec4(0.0, -1.0, 1.0, 0.0); // hits the surface in 45 degree angle at (0,0,0) -> the normal should be (0,-1,0)
 	
-	dvec4 normal = intersectionPoint(outputData[uint(gl_GlobalInvocationID)], 1.0,1.0,1.0,0.0, 0.0,0.0,0.0,-3.0, 0.0,0.0, 1); // sphere with r = 3
+	dvec4 normal = intersectionPoint(rayData[uint(gl_GlobalInvocationID)], 1.0,1.0,1.0,0.0, 0.0,0.0,0.0,-3.0, 0.0,0.0, 1); // sphere with r = 3
 }
