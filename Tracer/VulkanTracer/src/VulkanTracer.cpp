@@ -46,8 +46,9 @@ void VulkanTracer::run()
 	//generateRays();
 	//the sizes of the input and output buffers are set. The buffers need to be the size rayamount * 8* the size of a double
 	//(a ray consists of 6 values in double precision, x,y,z for the position and x*, y*, z* for the direction. 8 values instead of 6 are used, because the shader size of the buffer needs to be multiples of 16 bit)
-	inputBufferSize = rayAmount * RAY_DOUBLE_AMOUNT * sizeof(double);
-	outputBufferSize = rayAmount * RAY_DOUBLE_AMOUNT* sizeof(double);
+	inputBufferSize = (uint64_t)rayAmount * RAY_DOUBLE_AMOUNT * sizeof(double);
+	outputBufferSize = (uint64_t)rayAmount * RAY_DOUBLE_AMOUNT* sizeof(double);
+	std::cout << "Size of Buffers: " << outputBufferSize << std::endl;
 	//vulkan is initialized
 	initVulkan();
 	mainLoop();
@@ -439,16 +440,14 @@ void VulkanTracer::fillInputBuffer()
 	//transformation from ray class to double vector
 	for (int i = 0; i < rayAmount; i++)
 	{
-		rayInfo.push_back(rayVector[i].getxPos());
-		rayInfo.push_back(rayVector[i].getyPos());
-		rayInfo.push_back(rayVector[i].getzPos());
-		rayInfo.push_back(0);
-		rayInfo.push_back(rayVector[i].getxDir());
-		rayInfo.push_back(rayVector[i].getyDir());
-		rayInfo.push_back(rayVector[i].getzDir());
-		rayInfo.push_back(0);
-		rayInfo.push_back(rayVector[i].getWeight());
-		rayInfo.push_back(0);
+		rayInfo.emplace_back(rayVector[i].getxPos());
+		rayInfo.emplace_back(rayVector[i].getyPos());
+		rayInfo.emplace_back(rayVector[i].getzPos());
+		rayInfo.emplace_back(rayVector[i].getWeight());
+		rayInfo.emplace_back(rayVector[i].getxDir());
+		rayInfo.emplace_back(rayVector[i].getyDir());
+		rayInfo.emplace_back(rayVector[i].getzDir());
+		rayInfo.emplace_back(0);
 	}
     std::cout << "fillInputBuffer: rayInfo[0]: "<< rayInfo[0]  << std::endl;
 	//data is copied to the buffer
@@ -760,7 +759,7 @@ void VulkanTracer::readDataFromOutputBuffer()
 	data.reserve((uint64_t)rayAmount * RAY_DOUBLE_AMOUNT);
 	for (int i = 0; i < rayAmount; i++)
 	{
-		data.push_back(pMappedMemory[i]);
+		data.emplace_back(pMappedMemory[i]);
 	}
 }
 std::vector<double> VulkanTracer::getRays(){
@@ -779,7 +778,7 @@ std::vector<double> VulkanTracer::getRays(){
     std::cout << "testing"  << std::endl;
 	for (int i = 0; i < rayAmount*RAY_DOUBLE_AMOUNT; i++)
 	{
-		data.push_back(pMappedMemory[i]);
+		data.emplace_back(pMappedMemory[i]);
 	}
 	return data;
 }
@@ -795,7 +794,7 @@ void VulkanTracer::generateRays()
 }
 void VulkanTracer::addRay(double xpos, double ypos, double zpos, double xdir, double ydir, double zdir, double weight){
 	Ray newRay(xpos, ypos, zpos, xdir, ydir, zdir, weight);
-	rayVector.push_back(newRay);
+	rayVector.emplace_back(newRay);
 }
 
 //is not used anymore

@@ -33,8 +33,8 @@ const std::vector<const char *> validationLayers = {
 VkResult CreateDebugUtilsMessengerEXT(VkInstance instance, const VkDebugUtilsMessengerCreateInfoEXT *pCreateInfo, const VkAllocationCallbacks *pAllocator, VkDebugUtilsMessengerEXT *pDebugMessenger);
 void DestroyDebugUtilsMessengerEXT(VkInstance instance, VkDebugUtilsMessengerEXT debugMessenger, const VkAllocationCallbacks *pAllocator);
 
-const int WORKGROUP_SIZE = 1;
-const int RAY_DOUBLE_AMOUNT = 12;
+const int WORKGROUP_SIZE = 32;
+const int RAY_DOUBLE_AMOUNT = 8;
 
 class VulkanTracer
 {
@@ -51,10 +51,10 @@ private:
     VkDebugUtilsMessengerEXT debugMessenger;
     VkPhysicalDevice physicalDevice = VK_NULL_HANDLE;
     VkDevice device;
-    uint32_t outputBufferSize;
+    uint64_t outputBufferSize;
     VkBuffer outputBuffer;
     VkDeviceMemory outputBufferMemory;
-    uint32_t inputBufferSize;
+    uint64_t inputBufferSize;
     VkBuffer inputBuffer;
     VkDeviceMemory inputBufferMemory;
     VkPipeline pipeline;

@@ -1,13 +1,13 @@
 #version 450
 #extension GL_ARB_separate_shader_objects : enable
 
-#define WORKGROUP_SIZE 1
+#define WORKGROUP_SIZE 32
 layout (local_size_x = WORKGROUP_SIZE, local_size_y = 1, local_size_z = 1 ) in;
 
 struct Ray{
-	dvec4 position;
-	dvec4 direction;
+	dvec3 position;
 	double weight; // status of the ray (e.g if element missed -> 0)
+	dvec4 direction;
 };
 
 
@@ -130,10 +130,9 @@ dvec4 intersectionPoint(Ray r, double a_11, double a_22, double a_33, double a_1
 
 
 void main(){
-	dvec4 normal = intersectionPoint(rayData[uint(gl_GlobalInvocationID)], 1.0,1.0,1.0,0.0, 0.0,0.0,0.0,-3.0, 0.0,0.0, 1); // sphere with r = 3
-	outputData[uint(gl_GlobalInvocationID)].position = normal;
-	outputData[uint(gl_GlobalInvocationID)].direction = rayData[0].direction;
-	outputData[uint(gl_GlobalInvocationID)].weight = 1;
+	outputData[uint(gl_GlobalInvocationID)].position = intersectionPoint(rayData[uint(gl_GlobalInvocationID)], 1.0,1.0,1.0,0.0, 0.0,0.0,0.0,-3.0, 0.0,0.0, 1); // sphere with r = 3
+	outputData[uint(gl_GlobalInvocationID)].direction = rayData[uint(gl_GlobalInvocationID)].direction;
+	outputData[uint(gl_GlobalInvocationID)].weight = rayData[uint(gl_GlobalInvocationID)].weight;
 	//outputData[uint(gl_GlobalInvocationID)].position = dvec4(0.0, 20.0, -20.0, 0.0); // starts at (0,20,-20)
 	//outputData[uint(gl_GlobalInvocationID)].direction = dvec4(0.0, -1.0, 1.0, 0.0); // hits the surface in 45 degree angle at (0,0,0) -> the normal should be (0,-1,0)
 	
