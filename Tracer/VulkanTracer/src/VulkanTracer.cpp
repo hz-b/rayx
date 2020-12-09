@@ -90,14 +90,24 @@ void VulkanTracer::mainLoop()
 
 void VulkanTracer::cleanup()
 {
+	
+	vkFreeCommandBuffers(device, commandPool, 1, &commandBuffer);
+	vkDestroyPipeline(device, pipeline, nullptr);
+	vkDestroyPipelineLayout(device, pipelineLayout, nullptr);
+	vkDestroyDescriptorPool(device, descriptorPool, nullptr);
+	vkDestroyDescriptorSetLayout(device, descriptorSetLayout, nullptr);
+	vkDestroyBuffer(device, inputBuffer, nullptr);
+	vkFreeMemory(device, inputBufferMemory, nullptr);
+	vkDestroyBuffer(device, outputBuffer, nullptr);
+	vkFreeMemory(device, outputBufferMemory, nullptr);
+	vkDestroyShaderModule(device, computeShaderModule, nullptr);
+	vkDestroyCommandPool(device, commandPool, nullptr);
+	vkDestroyDevice(device, nullptr);
 	if (enableValidationLayers)
 	{
-		//DestroyDebugUtilsMessengerEXT(instance, debugMessenger, nullptr);
+		DestroyDebugUtilsMessengerEXT(instance, debugMessenger, nullptr);
 	}
-	vkDestroyDevice(device, nullptr);
 	vkDestroyInstance(instance, nullptr);
-	vkDestroyBuffer(device, inputBuffer, nullptr);
-	vkDestroyBuffer(device, outputBuffer, nullptr);
 }
 void VulkanTracer::createInstance()
 {
@@ -326,6 +336,7 @@ void VulkanTracer::createLogicalDevice()
 
 	//create info about the device features
 	VkPhysicalDeviceFeatures deviceFeatures{};
+	deviceFeatures.shaderFloat64 = true;
 	VkDeviceCreateInfo createInfo{};
 	createInfo.sType = VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO;
 	createInfo.pQueueCreateInfos = &queueCreateInfo;
@@ -405,7 +416,7 @@ void VulkanTracer::createInputBuffer()
 	//the inputBufferSize defined earlier is used
 	bufferCreateInfo.size = inputBufferSize;
 	bufferCreateInfo.usage = VK_BUFFER_USAGE_STORAGE_BUFFER_BIT; // buffer is used as a storage buffer.
-	bufferCreateInfo.sharingMode = VK_SHARING_MODE_CONCURRENT;	 // buffer is exclusive to a single queue family at a time.
+	bufferCreateInfo.sharingMode = VK_SHARING_MODE_EXCLUSIVE;	 // buffer is exclusive to a single queue family at a time.
 	VK_CHECK_RESULT(vkCreateBuffer(device, &bufferCreateInfo, NULL, &inputBuffer));
 	VkMemoryRequirements memoryRequirements;
 	vkGetBufferMemoryRequirements(device, inputBuffer, &memoryRequirements);
@@ -769,8 +780,9 @@ int VulkanTracer::main()
 	catch (const std::exception &e)
 	{
 		std::cerr << e.what() << std::endl;
+		std::cout << "finished VulkanTracer failure" << std::endl;
 		return EXIT_FAILURE;
 	}
-
+	std::cout << "finished VulkanTracer" << std::endl;
 	return EXIT_SUCCESS;
 }
