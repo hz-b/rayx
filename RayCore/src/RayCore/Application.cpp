@@ -20,7 +20,7 @@ namespace RAY {
 	{
         std::cout << "Application running..." << std::endl;
         // create BeamLine and BeamLineObjects
-        Beamline();
+        //Beamline();
         TracerInterface tInt = TracerInterface();
         tInt.run();
 

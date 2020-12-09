@@ -40,17 +40,17 @@ void DestroyDebugUtilsMessengerEXT(VkInstance instance, VkDebugUtilsMessengerEXT
 void VulkanTracer::run()
 {
 	// At first, the amount of rays is set. This is a placeholder, as the rays won't be generated in this tracer in the future
-	setRayAmount(16384);
+	setRayAmount();
+	std::cout << "Amount of Rays: " << rayAmount << std::endl;
 	// generate the rays used by the tracer
-	generateRays();
+	//generateRays();
 	//the sizes of the input and output buffers are set. The buffers need to be the size rayamount * 8* the size of a double
 	//(a ray consists of 6 values in double precision, x,y,z for the position and x*, y*, z* for the direction. 8 values instead of 6 are used, because the shader size of the buffer needs to be multiples of 16 bit)
-	inputBufferSize = rayAmount * 8 * sizeof(double);
-	outputBufferSize = rayAmount * 8; //  * sizeof(double);
+	inputBufferSize = rayAmount * RAY_DOUBLE_AMOUNT * sizeof(double);
+	outputBufferSize = rayAmount * RAY_DOUBLE_AMOUNT* sizeof(double);
 	//vulkan is initialized
 	initVulkan();
 	mainLoop();
-	cleanup();
 }
 
 //function for initializing vulkan
@@ -72,7 +72,6 @@ void VulkanTracer::initVulkan()
 	createInputBuffer();
 	createOutputBuffer();
 	fillInputBuffer();
-
 	//creates the descriptors used to bind the buffer to shader access points (bindings)
 	createDescriptorSetLayout();
 	createDescriptorSet();
@@ -85,7 +84,7 @@ void VulkanTracer::initVulkan()
 void VulkanTracer::mainLoop()
 {
 	runCommandBuffer();
-	readDataFromOutputBuffer();
+	//readDataFromOutputBuffer();
 }
 
 void VulkanTracer::cleanup()
@@ -436,7 +435,7 @@ void VulkanTracer::createInputBuffer()
 void VulkanTracer::fillInputBuffer()
 {
 	std::vector<double> rayInfo;
-	rayInfo.reserve((uint64_t)rayAmount * 8);
+	rayInfo.reserve((uint64_t)rayAmount * RAY_DOUBLE_AMOUNT);
 	//transformation from ray class to double vector
 	for (int i = 0; i < rayAmount; i++)
 	{
@@ -448,7 +447,10 @@ void VulkanTracer::fillInputBuffer()
 		rayInfo.push_back(rayVector[i].getyDir());
 		rayInfo.push_back(rayVector[i].getzDir());
 		rayInfo.push_back(0);
+		rayInfo.push_back(rayVector[i].getWeight());
+		rayInfo.push_back(0);
 	}
+    std::cout << "fillInputBuffer: rayInfo[0]: "<< rayInfo[0]  << std::endl;
 	//data is copied to the buffer
 	void *data;
 	vkMapMemory(device, inputBufferMemory, 0, inputBufferSize, 0, &data);
@@ -741,6 +743,10 @@ void VulkanTracer::setRayAmount(uint32_t inputRayAmount)
 {
 	rayAmount = inputRayAmount;
 }
+void VulkanTracer::setRayAmount()
+{
+	rayAmount = rayVector.size();
+}
 
 //this function reads the data from the output buffer after the shader has finished the computation
 void VulkanTracer::readDataFromOutputBuffer()
@@ -751,11 +757,31 @@ void VulkanTracer::readDataFromOutputBuffer()
 	double *pMappedMemory = (double *)mappedMemory;
 	std::vector<double> data;
 	//reserve enough data for all the rays
-	data.reserve((uint64_t)rayAmount * 8);
+	data.reserve((uint64_t)rayAmount * RAY_DOUBLE_AMOUNT);
 	for (int i = 0; i < rayAmount; i++)
 	{
 		data.push_back(pMappedMemory[i]);
 	}
+}
+std::vector<double> VulkanTracer::getRays(){
+	
+    std::cout << "getRays: rayAmount: "<< rayAmount  << std::endl;
+    std::cout << "getRays: outputBufferSize: "<< outputBufferSize  << std::endl;
+	void *mappedMemory = NULL;
+	// Map the buffer memory, so that we can read from it on the CPU.
+	vkMapMemory(device, outputBufferMemory, 0, outputBufferSize, 0, &mappedMemory);
+    std::cout << "mapping memory done"  << std::endl;
+	double *pMappedMemory = (double *)mappedMemory;
+	std::vector<double> data;
+	//reserve enough data for all the rays
+    std::cout << "reserving memory"  << std::endl;
+	data.reserve((uint64_t)rayAmount * RAY_DOUBLE_AMOUNT);
+    std::cout << "testing"  << std::endl;
+	for (int i = 0; i < rayAmount*RAY_DOUBLE_AMOUNT; i++)
+	{
+		data.push_back(pMappedMemory[i]);
+	}
+	return data;
 }
 //placeholder function to generate simple rays to test the data transfer
 void VulkanTracer::generateRays()
@@ -763,12 +789,16 @@ void VulkanTracer::generateRays()
 	rayVector.reserve(rayAmount);
 	for (int i = 0; i < rayAmount; i++)
 	{
-		Ray tempRay;
-		tempRay.initRay(6 * i + 1, 6 * i + 2, 6 * i + 3, 6 * i + 4, 6 * i + 5, 6 * i + 6);
+		Ray tempRay(6 * i + 1, 6 * i + 2, 6 * i + 3, 6 * i + 4, 6 * i + 5, 6 * i + 6, 1);
 		rayVector.emplace_back(tempRay);
 	}
 }
+void VulkanTracer::addRay(double xpos, double ypos, double zpos, double xdir, double ydir, double zdir, double weight){
+	Ray newRay(xpos, ypos, zpos, xdir, ydir, zdir, weight);
+	rayVector.push_back(newRay);
+}
 
+//is not used anymore
 int VulkanTracer::main()
 {
 	VulkanTracer app;
@@ -783,6 +813,6 @@ int VulkanTracer::main()
 		std::cout << "finished VulkanTracer failure" << std::endl;
 		return EXIT_FAILURE;
 	}
-	std::cout << "finished VulkanTracer" << std::endl;
+	std::cout << "finished VulkanTracer2" << std::endl;
 	return EXIT_SUCCESS;
 }

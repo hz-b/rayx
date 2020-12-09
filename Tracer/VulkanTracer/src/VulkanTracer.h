@@ -33,7 +33,8 @@ const std::vector<const char *> validationLayers = {
 VkResult CreateDebugUtilsMessengerEXT(VkInstance instance, const VkDebugUtilsMessengerCreateInfoEXT *pCreateInfo, const VkAllocationCallbacks *pAllocator, VkDebugUtilsMessengerEXT *pDebugMessenger);
 void DestroyDebugUtilsMessengerEXT(VkInstance instance, VkDebugUtilsMessengerEXT debugMessenger, const VkAllocationCallbacks *pAllocator);
 
-const int WORKGROUP_SIZE = 32;
+const int WORKGROUP_SIZE = 1;
+const int RAY_DOUBLE_AMOUNT = 12;
 
 class VulkanTracer
 {
@@ -41,6 +42,9 @@ public:
     VulkanTracer();
     ~VulkanTracer();
     void run();
+    void addRay(double xpos, double ypos, double zpos, double xdir, double ydir, double zdir, double weight);
+    std::vector<double> getRays();
+    void cleanup();
 
 private:
     VkInstance instance;
@@ -79,7 +83,6 @@ private:
 
     void initVulkan();
     void mainLoop();
-    void cleanup();
     void createInstance();
     void populateDebugMessengerCreateInfo(VkDebugUtilsMessengerCreateInfoEXT &createInfo);
     void setupDebugMessenger();
@@ -102,6 +105,7 @@ private:
     void createCommandBuffer();
     void runCommandBuffer();
     void setRayAmount(uint32_t inputRayAmount);
+    void setRayAmount();
     void readDataFromOutputBuffer();
     void generateRays();
 

@@ -10,9 +10,11 @@ private:
 		double x, y, z;
 	};
 	vec3 position, direction;
+	double weight;
 
 public:
-	void initRay(double xpos, double ypos, double zpos, double xdir, double ydir, double zdir);
+	Ray(double xpos, double ypos, double zpos, double xdir, double ydir, double zdir, double w);
+	~Ray();
 	std::vector<double> getRayInformation();
 	double getxDir();
 	double getyDir();
@@ -20,4 +22,5 @@ public:
 	double getxPos();
 	double getyPos();
 	double getzPos();
+	double getWeight();
 };
