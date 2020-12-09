@@ -24,19 +24,23 @@ layout(std140, binding = 1) buffer obuf
 dvec4 intersectionPoint(Ray r, double a_11, double a_22, double a_33, double a_12, double a_13, double a_23, double a_14, double a_24,  double a_34,  double a_44, int icurv)
 {
 	double w = r.weight;
-	int case = 1;
+	int c = 1;
 	int sign = icurv;
 	if (abs(r.direction[1]) >= abs(r.direction[0]) && abs(r.direction[1]) >= abs(r.direction[2])) {
-		case = 2;
+		c = 2;
 	}else if (abs(r.direction[2]) >= abs(r.direction[0]) && abs(r.direction[2]) >= abs(r.direction[1])) {
-		case = 3;
+		c = 3;
 	}
 	
-	if (case == 1) {
+	double x;
+	double y;
+	double z;
+		
+	if (c == 1) {
 		double aml = r.direction[1] / r.direction[0];
 		double anl = r.direction[2] / r.direction[0];
-		double y = r.position[1] - aml * r.position[0];
-		double z = r.position[2] - anl * r.position[0];
+		y = r.position[1] - aml * r.position[0];
+		z = r.position[2] - anl * r.position[0];
 		if (r.direction[0] < 0) {
 			sign = -icurv;
 		}
@@ -59,11 +63,11 @@ dvec4 intersectionPoint(Ray r, double a_11, double a_22, double a_33, double a_1
 		y = y + aml*x;
 		z = z + anl*x;
 		
-	}else if (case == 2) {
+	}else if (c == 2) {
 		double alm = r.direction[0] / r.direction[1];
 		double anm = r.direction[2] / r.direction[1];
-		double x = r.position[0] - alm * r.position[1];
-		double z = r.position[2] - anm * r.position[1];
+		x = r.position[0] - alm * r.position[1];
+		z = r.position[2] - anm * r.position[1];
 		if(r.direction[1] < 0) {
 			sign = -icurv;
 		}
@@ -88,8 +92,8 @@ dvec4 intersectionPoint(Ray r, double a_11, double a_22, double a_33, double a_1
 	}else{
 		double aln = r.direction[0] / r.direction[2];
 		double amn = r.direction[1] / r.direction[2];
-		double x = r.position[0] - aln * r.position[2];
-		double y = r.position[1] - amm * r.position[2];
+		x = r.position[0] - aln * r.position[2];
+		y = r.position[1] - amn * r.position[2];
 		if(r.direction[2] < 0) {
 			sign = -icurv;
 		}
@@ -131,5 +135,5 @@ void main(){
 	//outputData[uint(gl_GlobalInvocationID)].position = dvec4(0.0, 20.0, -20.0, 0.0); // starts at (0,20,-20)
 	//outputData[uint(gl_GlobalInvocationID)].direction = dvec4(0.0, -1.0, 1.0, 0.0); // hits the surface in 45 degree angle at (0,0,0) -> the normal should be (0,-1,0)
 	
-	dvec4 normal = intersectionPoint(outputData[uint(gl_GlobalInvocationID)], 1.0,1.0,1.0,0.0, 0.0,0.0,0.0,-3.0, 0.0,0.0, 1) // sphere with r = 3
+	dvec4 normal = intersectionPoint(outputData[uint(gl_GlobalInvocationID)], 1.0,1.0,1.0,0.0, 0.0,0.0,0.0,-3.0, 0.0,0.0, 1); // sphere with r = 3
 }
