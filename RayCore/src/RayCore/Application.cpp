@@ -22,6 +22,7 @@ namespace RAY {
         // create BeamLine and BeamLineObjects
         Beamline();
         TracerInterface tInt = TracerInterface();
+        tInt.run();
 
         // TODO: Create a beamlineobject (plane) which can be used to test tracing.
 

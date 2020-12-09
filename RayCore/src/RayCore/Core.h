@@ -1,6 +1,6 @@
 #pragma once
 
-#ifdef RAY_PLATFORM_WINDOWS //  Microsoft 
+#if defined(RAY_PLATFORM_WINDOWS) //  Microsoft 
 	#ifdef RAY_BUILD_DLL
 		#define RAY_API __declspec(dllexport)
 	#else
