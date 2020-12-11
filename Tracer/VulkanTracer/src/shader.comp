@@ -21,7 +21,7 @@ layout(std140, binding = 1) buffer obuf
    Ray outputData[];
 };
 
-dvec4 intersectionPoint(Ray r, double a_11, double a_22, double a_33, double a_12, double a_13, double a_23, double a_14, double a_24,  double a_34,  double a_44, int icurv)
+dvec3 intersectionPoint(Ray r, double a_11, double a_22, double a_33, double a_12, double a_13, double a_23, double a_14, double a_24,  double a_34,  double a_44, int icurv)
 {
 	double w = r.weight;
 	int c = 1;
@@ -54,7 +54,7 @@ dvec4 intersectionPoint(Ray r, double a_11, double a_22, double a_33, double a_1
 			w = 0.0; 	// oder -4?
 			x = - y/aml; 	// x such that y=0
 		}else{
-			if (abs(a) > pow(abs(c)*10, -10)) {
+			if (abs(a) > pow(float(abs(c)*10), float(-10))) {
 				x = (-b + sign*sqrt(bbac)) / a;
 			}else{
 				x = (-c/2)/b;
@@ -81,7 +81,7 @@ dvec4 intersectionPoint(Ray r, double a_11, double a_22, double a_33, double a_1
 			w = 0.0;
 			y = 0;
 		}else{
-			if (abs(a) > pow(abs(c)*10, -10)) {
+			if (abs(a) > pow(float(abs(c)*10), float(-10))) {
 				y = (-b + sign*sqrt(bbac)) / a;
 			}else{
 				y = (-c/2)/b;
@@ -107,7 +107,7 @@ dvec4 intersectionPoint(Ray r, double a_11, double a_22, double a_33, double a_1
 			w = 0.0;
 			z = -y / amn;
 		}else{
-			if (abs(a) > pow(abs(c)*10, -10)) {
+			if (abs(a) > pow(float(abs(c)*10), float(-10))) {
 				z = (-b + sign*sqrt(bbac)) / a;
 			}else{
 				z = (-c/2)/b;
@@ -121,8 +121,8 @@ dvec4 intersectionPoint(Ray r, double a_11, double a_22, double a_33, double a_1
 	double fy = 2*a_24 + 2*a_12*x + 2*a_22*y + 2*a_23*z;
     double fz = 2*a_34 + 2*a_13*x + 2*a_23*y + 2*a_33*z;
 
-	dvec4 normal = normalize(dvec4(fx,fy,fz,0));
-	r.position = dvec4(x,y,z,0); // new position = intersection point
+	dvec3 normal = normalize(dvec3(fx,fy,fz));
+	r.position = dvec3(x,y,z); // new position = intersection point
 	r.weight = w; // unchanged, if ray did not miss surface, else 0
 	
 	return normal;
