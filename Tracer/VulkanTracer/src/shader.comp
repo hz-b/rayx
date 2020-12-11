@@ -9,7 +9,12 @@ struct Ray{
 	double weight; // status of the ray (e.g if element missed -> 0)
 	dvec4 direction;
 };
-
+struct Quad{
+	dvec4 one;
+	dvec4 two;
+	dvec4 three;
+	dvec4 four;
+};
 
 layout(std140, binding = 0) buffer ibuf
 {
@@ -20,7 +25,10 @@ layout(std140, binding = 1) buffer obuf
 {
    dvec3 outputData[];
 };
-
+layout(std140, binding = 2) buffer qbuf
+{
+	Quad quadData[];
+};
 dvec3 intersectionPoint(Ray r, double a_11, double a_22, double a_33, double a_12, double a_13, double a_23, double a_14, double a_24,  double a_34,  double a_44, int icurv)
 {
 	double w = r.weight;

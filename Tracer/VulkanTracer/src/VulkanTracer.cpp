@@ -3,6 +3,9 @@
 
 
 VulkanTracer::VulkanTracer() {
+	bufferSizes.resize(3);
+	buffers.resize(3);
+	bufferMemories.resize(3);
 
 }
 
@@ -46,9 +49,10 @@ void VulkanTracer::run()
 	//generateRays();
 	//the sizes of the input and output buffers are set. The buffers need to be the size rayamount * 8* the size of a double
 	//(a ray consists of 6 values in double precision, x,y,z for the position and x*, y*, z* for the direction. 8 values instead of 6 are used, because the shader size of the buffer needs to be multiples of 16 bit)
-	inputBufferSize = (uint64_t)rayAmount * RAY_DOUBLE_AMOUNT * sizeof(double);
-	outputBufferSize = (uint64_t)rayAmount * 4* sizeof(double);
-	std::cout << "Size of Buffers: " << outputBufferSize << std::endl;
+	bufferSizes[0] = (uint64_t)rayAmount * RAY_DOUBLE_AMOUNT * sizeof(double);
+	bufferSizes[1] = (uint64_t)rayAmount * 4* sizeof(double);
+	bufferSizes[2] = quadVector.size() * 16 * sizeof(double);
+	std::cout << "Size of Buffers: " << bufferSizes[1] << std::endl;
 	//vulkan is initialized
 	initVulkan();
 	mainLoop();
@@ -70,11 +74,12 @@ void VulkanTracer::initVulkan()
 	createLogicalDevice();
 
 	//creates buffers to transfer data to and from the shader
-	createInputBuffer();
-	createOutputBuffer();
+	createBuffers();
 	fillInputBuffer();
+	fillQuadBuffer();
 	//creates the descriptors used to bind the buffer to shader access points (bindings)
 	createDescriptorSetLayout();
+	
 	createDescriptorSet();
 
 	//a compute pipeline needs to be created
@@ -96,10 +101,10 @@ void VulkanTracer::cleanup()
 	vkDestroyPipelineLayout(device, pipelineLayout, nullptr);
 	vkDestroyDescriptorPool(device, descriptorPool, nullptr);
 	vkDestroyDescriptorSetLayout(device, descriptorSetLayout, nullptr);
-	vkDestroyBuffer(device, inputBuffer, nullptr);
-	vkFreeMemory(device, inputBufferMemory, nullptr);
-	vkDestroyBuffer(device, outputBuffer, nullptr);
-	vkFreeMemory(device, outputBufferMemory, nullptr);
+	for(int i=0; i<buffers.size();i++){
+		vkDestroyBuffer(device, buffers[i], nullptr);
+		vkFreeMemory(device, bufferMemories[i], nullptr);
+	}
 	vkDestroyShaderModule(device, computeShaderModule, nullptr);
 	vkDestroyCommandPool(device, commandPool, nullptr);
 	vkDestroyDevice(device, nullptr);
@@ -384,52 +389,29 @@ uint32_t VulkanTracer::findMemoryType(uint32_t memoryTypeBits, VkMemoryPropertyF
 	return -1;
 }
 
-//creates the buffer which holds the output rays
-void VulkanTracer::createOutputBuffer()
-{
-	VkBufferCreateInfo bufferCreateInfo = {};
-	bufferCreateInfo.sType = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO;
-	bufferCreateInfo.size = outputBufferSize;
-	bufferCreateInfo.usage = VK_BUFFER_USAGE_STORAGE_BUFFER_BIT; // buffer is used as a storage buffer.
-	bufferCreateInfo.sharingMode = VK_SHARING_MODE_EXCLUSIVE;	 // buffer is exclusive to a single queue family at a time.
-	VK_CHECK_RESULT(vkCreateBuffer(device, &bufferCreateInfo, NULL, &outputBuffer));
-	VkMemoryRequirements memoryRequirements;
-	vkGetBufferMemoryRequirements(device, outputBuffer, &memoryRequirements);
+void VulkanTracer::createBuffers(){
+	for(int i=0; i<buffers.size();i++){
+		VkBufferCreateInfo bufferCreateInfo = {};
+		bufferCreateInfo.sType = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO;
+		bufferCreateInfo.size = bufferSizes[i];
+		bufferCreateInfo.usage = VK_BUFFER_USAGE_STORAGE_BUFFER_BIT; // buffer is used as a storage buffer.
+		bufferCreateInfo.sharingMode = VK_SHARING_MODE_EXCLUSIVE;	 // buffer is exclusive to a single queue family at a time.
+		VK_CHECK_RESULT(vkCreateBuffer(device, &bufferCreateInfo, NULL, &buffers[i]));
+		VkMemoryRequirements memoryRequirements;
+		vkGetBufferMemoryRequirements(device, buffers[i], &memoryRequirements);
 
-	VkMemoryAllocateInfo allocateInfo = {};
-	allocateInfo.sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO;
-	allocateInfo.allocationSize = memoryRequirements.size; // specify required memory.
-	allocateInfo.memoryTypeIndex = findMemoryType(
-		memoryRequirements.memoryTypeBits, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT);
-	VK_CHECK_RESULT(vkAllocateMemory(device, &allocateInfo, NULL, &outputBufferMemory)); // allocate memory on device.
-
-	// Now associate that allocated memory with the buffer. With that, the buffer is backed by actual memory.
-	VK_CHECK_RESULT(vkBindBufferMemory(device, outputBuffer, outputBufferMemory, 0));
-}
-
-//creates the buffer which holds the input rays
-void VulkanTracer::createInputBuffer()
-{
-	//create info about the buffer
-	VkBufferCreateInfo bufferCreateInfo = {};
-	bufferCreateInfo.sType = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO;
-	//the inputBufferSize defined earlier is used
-	bufferCreateInfo.size = inputBufferSize;
-	bufferCreateInfo.usage = VK_BUFFER_USAGE_STORAGE_BUFFER_BIT; // buffer is used as a storage buffer.
-	bufferCreateInfo.sharingMode = VK_SHARING_MODE_EXCLUSIVE;	 // buffer is exclusive to a single queue family at a time.
-	VK_CHECK_RESULT(vkCreateBuffer(device, &bufferCreateInfo, NULL, &inputBuffer));
-	VkMemoryRequirements memoryRequirements;
-	vkGetBufferMemoryRequirements(device, inputBuffer, &memoryRequirements);
-
-	VkMemoryAllocateInfo allocateInfo = {};
-	allocateInfo.sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO;
-	allocateInfo.allocationSize = memoryRequirements.size; // specify required memory.
-	allocateInfo.memoryTypeIndex = findMemoryType(
-		memoryRequirements.memoryTypeBits, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT);
-	VK_CHECK_RESULT(vkAllocateMemory(device, &allocateInfo, NULL, &inputBufferMemory)); // allocate memory on device.
-
-	// Now associate that allocated memory with the buffer. With that, the buffer is backed by actual memory.
-	VK_CHECK_RESULT(vkBindBufferMemory(device, inputBuffer, inputBufferMemory, 0));
+		VkMemoryAllocateInfo allocateInfo = {};
+		allocateInfo.sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO;
+		allocateInfo.allocationSize = memoryRequirements.size; // specify required memory.
+		allocateInfo.memoryTypeIndex = findMemoryType(
+			memoryRequirements.memoryTypeBits, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT);
+		VK_CHECK_RESULT(vkAllocateMemory(device, &allocateInfo, NULL, &(bufferMemories[i]))); // allocate memory on device.
+		
+		// Now associate that allocated memory with the buffer. With that, the buffer is backed by actual memory.
+		VK_CHECK_RESULT(vkBindBufferMemory(device, buffers[i], bufferMemories[i], 0));
+	}
+	
+    std::cout << "Buffers created!" << std::endl;
 }
 
 //the input buffer is filled with the ray data
@@ -437,9 +419,18 @@ void VulkanTracer::fillInputBuffer()
 {
 	//data is copied to the buffer
 	void *data;
-	vkMapMemory(device, inputBufferMemory, 0, inputBufferSize, 0, &data);
-	memcpy(data, rayVector.data(), inputBufferSize);
-	vkUnmapMemory(device, inputBufferMemory);
+	vkMapMemory(device, bufferMemories[0], 0, bufferSizes[0], 0, &data);
+	memcpy(data, rayVector.data(), bufferSizes[0]);
+	vkUnmapMemory(device, bufferMemories[0]);
+}
+//the quad buffer is filled with the quad data
+void VulkanTracer::fillQuadBuffer()
+{
+	//data is copied to the buffer
+	void *data;
+	vkMapMemory(device, bufferMemories[2], 0, bufferSizes[2], 0, &data);
+	memcpy(data, quadVector.data(), bufferSizes[2]);
+	vkUnmapMemory(device, bufferMemories[2]);
 }
 void VulkanTracer::createDescriptorSetLayout()
 {
@@ -459,12 +450,13 @@ void VulkanTracer::createDescriptorSetLayout()
 	//bindings 0 and 1 are used right now
 	VkDescriptorSetLayoutBinding descriptorSetLayoutBinding[] = {
 		{0, VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, 1, VK_SHADER_STAGE_COMPUTE_BIT, NULL},
-		{1, VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, 1, VK_SHADER_STAGE_COMPUTE_BIT, NULL}};
+		{1, VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, 1, VK_SHADER_STAGE_COMPUTE_BIT, NULL},
+		{2, VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, 1, VK_SHADER_STAGE_COMPUTE_BIT, NULL}};
 
 	VkDescriptorSetLayoutCreateInfo descriptorSetLayoutCreateInfo = {};
 	descriptorSetLayoutCreateInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO;
 	//2 bindings are used in this layout
-	descriptorSetLayoutCreateInfo.bindingCount = 2;
+	descriptorSetLayoutCreateInfo.bindingCount = 3;
 	descriptorSetLayoutCreateInfo.pBindings = descriptorSetLayoutBinding; //TODO
 
 	// Create the descriptor set layout.
@@ -483,7 +475,7 @@ void VulkanTracer::createDescriptorSet()
 	*/
 	VkDescriptorPoolSize descriptorPoolSize = {};
 	descriptorPoolSize.type = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER;
-	descriptorPoolSize.descriptorCount = 2;
+	descriptorPoolSize.descriptorCount = 3;
 
 	VkDescriptorPoolCreateInfo descriptorPoolCreateInfo = {};
 	descriptorPoolCreateInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_POOL_CREATE_INFO;
@@ -506,37 +498,19 @@ void VulkanTracer::createDescriptorSet()
 	// allocate descriptor set.
 	VK_CHECK_RESULT(vkAllocateDescriptorSets(device, &descriptorSetAllocateInfo, &descriptorSet));
 
-	//Descriptor for Input Buffer
-	{
+	
+	for(int i=0; i<buffers.size();i++){
+	
 		//specify which buffer to use: input buffer
 		VkDescriptorBufferInfo descriptorBufferInfo = {};
-		descriptorBufferInfo.buffer = inputBuffer;
+		descriptorBufferInfo.buffer = buffers[i];
 		descriptorBufferInfo.offset = 0;
-		descriptorBufferInfo.range = inputBufferSize;
+		descriptorBufferInfo.range = bufferSizes[i];
 
 		VkWriteDescriptorSet writeDescriptorSet = {};
 		writeDescriptorSet.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
 		writeDescriptorSet.dstSet = descriptorSet;							   // write to this descriptor set.
-		writeDescriptorSet.dstBinding = 0;									   // write to the first binding.
-		writeDescriptorSet.descriptorCount = 1;								   // update a single descriptor.
-		writeDescriptorSet.descriptorType = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER; // storage buffer.
-		writeDescriptorSet.pBufferInfo = &descriptorBufferInfo;
-
-		// perform the update of the descriptor set.
-		vkUpdateDescriptorSets(device, 1, &writeDescriptorSet, 0, NULL);
-	}
-	//Descriptor for Output Buffer
-	{
-		//specify which buffer to use: output buffer
-		VkDescriptorBufferInfo descriptorBufferInfo = {};
-		descriptorBufferInfo.buffer = outputBuffer;
-		descriptorBufferInfo.offset = 0;
-		descriptorBufferInfo.range = outputBufferSize;
-
-		VkWriteDescriptorSet writeDescriptorSet = {};
-		writeDescriptorSet.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
-		writeDescriptorSet.dstSet = descriptorSet;							   // write to this descriptor set.
-		writeDescriptorSet.dstBinding = 1;									   // write to the first, and only binding.
+		writeDescriptorSet.dstBinding = i;									   // write to the ist binding.
 		writeDescriptorSet.descriptorCount = 1;								   // update a single descriptor.
 		writeDescriptorSet.descriptorType = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER; // storage buffer.
 		writeDescriptorSet.pBufferInfo = &descriptorBufferInfo;
@@ -737,7 +711,7 @@ void VulkanTracer::readDataFromOutputBuffer()
 {
 	void *mappedMemory = NULL;
 	// Map the buffer memory, so that we can read from it on the CPU.
-	vkMapMemory(device, outputBufferMemory, 0, outputBufferSize, 0, &mappedMemory);
+	vkMapMemory(device, bufferMemories[1], 0, bufferSizes[1], 0, &mappedMemory);
 	double *pMappedMemory = (double *)mappedMemory;
 	std::vector<double> data;
 	//reserve enough data for all the rays
@@ -750,10 +724,10 @@ void VulkanTracer::readDataFromOutputBuffer()
 std::vector<double> VulkanTracer::getRays(){
 	
     std::cout << "getRays: rayAmount: "<< rayAmount  << std::endl;
-    std::cout << "getRays: outputBufferSize: "<< outputBufferSize  << std::endl;
+    std::cout << "getRays: bufferSizes[1]: "<< bufferSizes[1]  << std::endl;
 	void *mappedMemory = NULL;
 	// Map the buffer memory, so that we can read from it on the CPU.
-	vkMapMemory(device, outputBufferMemory, 0, outputBufferSize, 0, &mappedMemory);
+	vkMapMemory(device, bufferMemories[1], 0, bufferSizes[1], 0, &mappedMemory);
     std::cout << "mapping memory done"  << std::endl;
 	double *pMappedMemory = (double *)mappedMemory;
 	std::vector<double> data;
@@ -779,6 +753,12 @@ void VulkanTracer::generateRays()
 void VulkanTracer::addRay(double xpos, double ypos, double zpos, double xdir, double ydir, double zdir, double weight){
 	Ray newRay(xpos, ypos, zpos, xdir, ydir, zdir, weight);
 	rayVector.emplace_back(newRay);
+}
+
+//adds quad to quadVector
+void VulkanTracer::addQuad(std::vector<double> inQuad){
+	assert(inQuad.size() == 16);
+	quadVector.emplace_back(inQuad);
 }
 
 //is not used anymore

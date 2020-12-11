@@ -43,20 +43,38 @@ public:
     ~VulkanTracer();
     void run();
     void addRay(double xpos, double ypos, double zpos, double xdir, double ydir, double zdir, double weight);
+    void addQuad(std::vector<double> inQuad);
     std::vector<double> getRays();
     void cleanup();
 
 private:
+    //Member structs:
+    struct Quad{
+        Quad() : points(16) {}
+        Quad(std::vector<double> inQuad){
+            assert(inQuad.size() == 16);
+            points = inQuad;
+        }
+        std::vector<double> points;
+    };
+    struct QueueFamilyIndices
+    {
+        uint32_t computeFamily;
+        bool hasvalue;
+
+        bool isComplete()
+        {
+            return hasvalue;
+        }
+    };
+    //Member variables:
     VkInstance instance;
     VkDebugUtilsMessengerEXT debugMessenger;
     VkPhysicalDevice physicalDevice = VK_NULL_HANDLE;
     VkDevice device;
-    uint64_t outputBufferSize;
-    VkBuffer outputBuffer;
-    VkDeviceMemory outputBufferMemory;
-    uint64_t inputBufferSize;
-    VkBuffer inputBuffer;
-    VkDeviceMemory inputBufferMemory;
+    std::vector<uint64_t> bufferSizes;
+    std::vector<VkBuffer> buffers;
+    std::vector<VkDeviceMemory> bufferMemories;
     VkPipeline pipeline;
     VkPipelineLayout pipelineLayout;
     VkShaderModule computeShaderModule;
@@ -69,18 +87,10 @@ private:
     uint32_t queueFamilyIndex;
     uint32_t rayAmount;
     std::vector<Ray> rayVector;
-    struct QueueFamilyIndices
-    {
-        uint32_t computeFamily;
-        bool hasvalue;
-
-        bool isComplete()
-        {
-            return hasvalue;
-        }
-    };
+    std::vector<Quad> quadVector;
     QueueFamilyIndices QueueFamily;
-
+    
+    //Member functions:
     void initVulkan();
     void mainLoop();
     void createInstance();
@@ -95,9 +105,11 @@ private:
     QueueFamilyIndices findQueueFamilies(VkPhysicalDevice device);
     void createLogicalDevice();
     uint32_t findMemoryType(uint32_t memoryTypeBits, VkMemoryPropertyFlags properties);
+    void createBuffers();
     void createOutputBuffer();
     void createInputBuffer();
     void fillInputBuffer();
+    void fillQuadBuffer();
     void createDescriptorSetLayout();
     void createDescriptorSet();
     uint32_t *readFile(uint32_t &length, const char *filename);
