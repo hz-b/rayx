@@ -47,7 +47,7 @@ void VulkanTracer::run()
 	//the sizes of the input and output buffers are set. The buffers need to be the size rayamount * 8* the size of a double
 	//(a ray consists of 6 values in double precision, x,y,z for the position and x*, y*, z* for the direction. 8 values instead of 6 are used, because the shader size of the buffer needs to be multiples of 16 bit)
 	inputBufferSize = (uint64_t)rayAmount * RAY_DOUBLE_AMOUNT * sizeof(double);
-	outputBufferSize = (uint64_t)rayAmount * RAY_DOUBLE_AMOUNT* sizeof(double);
+	outputBufferSize = (uint64_t)rayAmount * 4* sizeof(double);
 	std::cout << "Size of Buffers: " << outputBufferSize << std::endl;
 	//vulkan is initialized
 	initVulkan();
@@ -400,7 +400,7 @@ void VulkanTracer::createOutputBuffer()
 	allocateInfo.sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO;
 	allocateInfo.allocationSize = memoryRequirements.size; // specify required memory.
 	allocateInfo.memoryTypeIndex = findMemoryType(
-		memoryRequirements.memoryTypeBits, VK_MEMORY_PROPERTY_HOST_COHERENT_BIT | VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT);
+		memoryRequirements.memoryTypeBits, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT);
 	VK_CHECK_RESULT(vkAllocateMemory(device, &allocateInfo, NULL, &outputBufferMemory)); // allocate memory on device.
 
 	// Now associate that allocated memory with the buffer. With that, the buffer is backed by actual memory.
@@ -425,7 +425,7 @@ void VulkanTracer::createInputBuffer()
 	allocateInfo.sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO;
 	allocateInfo.allocationSize = memoryRequirements.size; // specify required memory.
 	allocateInfo.memoryTypeIndex = findMemoryType(
-		memoryRequirements.memoryTypeBits, VK_MEMORY_PROPERTY_HOST_COHERENT_BIT | VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT);
+		memoryRequirements.memoryTypeBits, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT);
 	VK_CHECK_RESULT(vkAllocateMemory(device, &allocateInfo, NULL, &inputBufferMemory)); // allocate memory on device.
 
 	// Now associate that allocated memory with the buffer. With that, the buffer is backed by actual memory.
@@ -435,25 +435,10 @@ void VulkanTracer::createInputBuffer()
 //the input buffer is filled with the ray data
 void VulkanTracer::fillInputBuffer()
 {
-	std::vector<double> rayInfo;
-	rayInfo.reserve((uint64_t)rayAmount * RAY_DOUBLE_AMOUNT);
-	//transformation from ray class to double vector
-	for (int i = 0; i < rayAmount; i++)
-	{
-		rayInfo.emplace_back(rayVector[i].getxPos());
-		rayInfo.emplace_back(rayVector[i].getyPos());
-		rayInfo.emplace_back(rayVector[i].getzPos());
-		rayInfo.emplace_back(rayVector[i].getWeight());
-		rayInfo.emplace_back(rayVector[i].getxDir());
-		rayInfo.emplace_back(rayVector[i].getyDir());
-		rayInfo.emplace_back(rayVector[i].getzDir());
-		rayInfo.emplace_back(0);
-	}
-    std::cout << "fillInputBuffer: rayInfo[0]: "<< rayInfo[0]  << std::endl;
 	//data is copied to the buffer
 	void *data;
 	vkMapMemory(device, inputBufferMemory, 0, inputBufferSize, 0, &data);
-	memcpy(data, rayInfo.data(), inputBufferSize);
+	memcpy(data, rayVector.data(), inputBufferSize);
 	vkUnmapMemory(device, inputBufferMemory);
 }
 void VulkanTracer::createDescriptorSetLayout()
@@ -774,9 +759,8 @@ std::vector<double> VulkanTracer::getRays(){
 	std::vector<double> data;
 	//reserve enough data for all the rays
     std::cout << "reserving memory"  << std::endl;
-	data.reserve((uint64_t)rayAmount * RAY_DOUBLE_AMOUNT);
-    std::cout << "testing"  << std::endl;
-	for (int i = 0; i < rayAmount*RAY_DOUBLE_AMOUNT; i++)
+	data.reserve((uint64_t)rayAmount * 4);
+	for (int i = 0; i < rayAmount*4; i++)
 	{
 		data.emplace_back(pMappedMemory[i]);
 	}

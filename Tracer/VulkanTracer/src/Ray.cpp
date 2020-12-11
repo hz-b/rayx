@@ -9,6 +9,7 @@ Ray::Ray(double xpos, double ypos, double zpos, double xdir, double ydir, double
 	direction.y = ydir;
 	direction.z = zdir;
 	weight = w;
+	placeholder = 0;
 }
 Ray::~Ray(){
 
