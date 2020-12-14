@@ -35,6 +35,7 @@ void DestroyDebugUtilsMessengerEXT(VkInstance instance, VkDebugUtilsMessengerEXT
 
 const int WORKGROUP_SIZE = 32;
 const int RAY_DOUBLE_AMOUNT = 8;
+const int QUADRIC_DOUBLE_AMOUNT = 24;
 
 class VulkanTracer
 {
@@ -43,19 +44,23 @@ public:
     ~VulkanTracer();
     void run();
     void addRay(double xpos, double ypos, double zpos, double xdir, double ydir, double zdir, double weight);
-    void addBeamLineObject(std::vector<double> inQuadric);
+    void addBeamLineObject(std::vector<double> inQuadric, std::vector<double> inputInMatrix, std::vector<double> inputOutMatrix);
     std::vector<double> getRays();
     void cleanup();
 
 private:
     //Member structs:
     struct Quadric{
-        Quadric() : points(16) {}
-        Quadric(std::vector<double> inQuadric){
-            assert(inQuadric.size() == 16);
+        Quadric() : points(16), inMatrix(16), outMatrix(16) {}
+        Quadric(std::vector<double> inQuadric, std::vector<double> inputInMatrix, std::vector<double> inputOutMatrix){
+            assert(inQuadric.size() == 16 && inputInMatrix.size() == 16 && inputOutMatrix.size() == 16);
             points = inQuadric;
+            inMatrix = inputInMatrix;
+            outMatrix = inputOutMatrix;
         }
         std::vector<double> points;
+        std::vector<double> inMatrix;
+        std::vector<double> outMatrix;
     };
     struct QueueFamilyIndices
     {

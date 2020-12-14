@@ -51,7 +51,7 @@ void VulkanTracer::run()
 	//(a ray consists of 6 values in double precision, x,y,z for the position and x*, y*, z* for the direction. 8 values instead of 6 are used, because the shader size of the buffer needs to be multiples of 16 bit)
 	bufferSizes[0] = (uint64_t)rayAmount * RAY_DOUBLE_AMOUNT * sizeof(double);
 	bufferSizes[1] = (uint64_t)rayAmount * 4* sizeof(double);
-	bufferSizes[2] = beamline.size() * 16 * sizeof(double);
+	bufferSizes[2] = beamline.size() * QUADRIC_DOUBLE_AMOUNT * sizeof(double);
 	std::cout << "Size of Buffers: " << bufferSizes[1] << std::endl;
 	//vulkan is initialized
 	initVulkan();
@@ -756,9 +756,9 @@ void VulkanTracer::addRay(double xpos, double ypos, double zpos, double xdir, do
 }
 
 //adds quad to beamline
-void VulkanTracer::addBeamLineObject(std::vector<double> inQuadric){
-	assert(inQuadric.size() == 16);
-	beamline.emplace_back(inQuadric);
+void VulkanTracer::addBeamLineObject(std::vector<double> inQuadric, std::vector<double> inputInMatrix, std::vector<double> inputOutMatrix){
+	assert(inQuadric.size() == 16 && inputInMatrix.size() == 16 && inputOutMatrix.size() == 16);
+	beamline.emplace_back(inQuadric, inputInMatrix, inputOutMatrix);
 }
 
 //is not used anymore

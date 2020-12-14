@@ -24,7 +24,7 @@ namespace RAY {
         assert(inputPoints.size() == 16);
         anchorPoints = inputPoints;
     }
-    std::vector<double> BeamLineObject::getData(){
+    std::vector<double> BeamLineObject::getAnchorPoints(){
         return anchorPoints;
     }
     void BeamLineObject::setInMatrix(std::vector<double> inputMatrix){
