@@ -10,10 +10,12 @@ namespace RAY
             m_RayList.emplace_back(new Ray(glm::vec3(0,20,-20), glm::vec3(0,-1,1), 1));
             m_RayList.emplace_back(new Ray(glm::vec3(10,5,10), glm::vec3(-1,1,1), 1));
         }
+        std::cout << "Creating TracerInterface..." << std::endl;
     }
 
     TracerInterface::~TracerInterface()
     {
+        std::cout << "Deleting TracerInterface..." << std::endl;
     }
 
     bool TracerInterface::run()

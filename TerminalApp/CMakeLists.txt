@@ -4,7 +4,7 @@ project(TerminalApp)
 set(CMAKE_VERBOSE_MAKEFILE ON)
 set(CMAKE_COLOR_MAKEFILE   ON)
 
-add_executable(${PROJECT_NAME} TerminalApp.cpp)
+add_executable(${PROJECT_NAME} TerminalApp.cpp TerminalApp.h)
 
 target_compile_definitions(${PROJECT_NAME} PUBLIC RAY_PLATFORM_WINDOWS)
 
