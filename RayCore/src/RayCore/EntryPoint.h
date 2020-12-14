@@ -1,8 +1,6 @@
 #pragma once
 #include <iostream>
 
-#ifdef RAY_PLATFORM_WINDOWS
-
 extern RAY::Application* RAY::CreateApplication();
 
 int main(/*int argc, char** argv*/)
@@ -11,5 +9,3 @@ int main(/*int argc, char** argv*/)
 	app->Run();
 	delete app;
 }
-
-#endif

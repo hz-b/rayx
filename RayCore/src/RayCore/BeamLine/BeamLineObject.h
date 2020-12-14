@@ -25,5 +25,5 @@ namespace RAY {
         std::vector<double> inMatrix;
         std::vector<double> outMatrix;
     };
-    
+
 }
