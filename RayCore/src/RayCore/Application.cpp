@@ -19,10 +19,7 @@ namespace RAY {
 	void Application::Run()
 	{
         std::cout << "Application running..." << std::endl;
-        // create BeamLine and BeamLineObjects
-        //Beamline();
-        TracerInterface tInt = TracerInterface();
-        tInt.run();
+        m_tracerInterface.run();
 
         // TODO: Create a beamlineobject (plane) which can be used to test tracing.
 

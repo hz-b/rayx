@@ -10,10 +10,9 @@ struct Ray{
 	dvec4 direction;
 };
 struct Quad{
-	dvec4 one;
-	dvec4 two;
-	dvec4 three;
-	dvec4 four;
+	dmat4 anchorPoints;
+	dmat4 inTrans;
+	dmat4 outTrans;
 };
 
 layout(std140, binding = 0) buffer ibuf
