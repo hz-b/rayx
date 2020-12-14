@@ -7,6 +7,7 @@ add_library(${PROJECT_NAME}
     SHARED 
         src/RayCore/Application.cpp
         src/RayCore/BeamLine/BeamLine.cpp
+        src/RayCore/BeamLine/BeamLineObject.cpp
         src/RayCore/Tracer/Ray.cpp
         src/RayCore/Tracer/TracerInterface.cpp
 )
