@@ -34,6 +34,6 @@ target_include_directories(${PROJECT_NAME}
 )
 
 
-set_target_properties(${PROJECT_NAME} PROPERTIES
-                      RUNTIME_OUTPUT_DIRECTORY ${TerminalApp_BINARY_DIR}
-)
+# set_target_properties(${PROJECT_NAME} PROPERTIES
+#                       RUNTIME_OUTPUT_DIRECTORY ${TerminalApp_BINARY_DIR}
+# )
