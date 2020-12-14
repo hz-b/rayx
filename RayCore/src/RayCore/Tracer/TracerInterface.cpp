@@ -22,8 +22,12 @@ namespace RAY
         for(int i=0; i<m_RayList.size(); i++){
             tracer.addRay(m_RayList[i]->m_position.x,m_RayList[i]->m_position.y,m_RayList[i]->m_position.z,m_RayList[i]->m_direction.x,m_RayList[i]->m_direction.y,m_RayList[i]->m_direction.z, 1);
         }
-        std::vector<double> quad(16, 1);
-        tracer.addQuad(quad);
+        std::vector<double> beamlineObjectPlaceholder(16, 1);
+        m_Beamline.addBeamlineObject(*(new BeamLineObject(beamlineObjectPlaceholder, beamlineObjectPlaceholder, beamlineObjectPlaceholder)));
+        auto beamLineObjects = m_Beamline.getObjects();
+        for(auto object = beamLineObjects.begin(); object != beamLineObjects.end(); object++){
+            tracer.addBeamLineObject((*object).getData());   
+        }
         tracer.run();
 	    std::cout << "run succeeded" << std::endl;
         std::vector<double> outputRays = tracer.getRays();

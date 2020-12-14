@@ -2,6 +2,7 @@
 
 #include "Core.h"
 #include "glm.hpp"
+#include "BeamLineObject.h"
 
 #include <vector>
 
@@ -10,23 +11,13 @@ namespace RAY {
     class RAY_API Beamline {
 
     public:
-        // struct Disk {
-        //     glm::vec3 position;
-        //     glm::vec3 normal;
-        //     double radius;
-        // };
-        struct Quad {
-            Quad(glm::vec3 pos, glm::vec3 norm, double sideLen) : position(pos), normal(norm), sideLength(sideLen) { };
-            glm::vec3 position;
-            glm::vec3 normal;
-            double sideLength;
-        };
-
         Beamline();
         ~Beamline();
-
+        void addBeamlineObject(BeamLineObject newObject);
+        void replaceNthObject(uint32_t index, BeamLineObject newObject);
+        std::vector<BeamLineObject> getObjects();
     private:
-        std::vector<Quad*> m_objects;
+        std::vector<BeamLineObject> m_objects;
 
     };
 

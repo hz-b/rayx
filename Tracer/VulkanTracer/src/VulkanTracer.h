@@ -43,17 +43,17 @@ public:
     ~VulkanTracer();
     void run();
     void addRay(double xpos, double ypos, double zpos, double xdir, double ydir, double zdir, double weight);
-    void addQuad(std::vector<double> inQuad);
+    void addBeamLineObject(std::vector<double> inQuadric);
     std::vector<double> getRays();
     void cleanup();
 
 private:
     //Member structs:
-    struct Quad{
-        Quad() : points(16) {}
-        Quad(std::vector<double> inQuad){
-            assert(inQuad.size() == 16);
-            points = inQuad;
+    struct Quadric{
+        Quadric() : points(16) {}
+        Quadric(std::vector<double> inQuadric){
+            assert(inQuadric.size() == 16);
+            points = inQuadric;
         }
         std::vector<double> points;
     };
@@ -87,7 +87,7 @@ private:
     uint32_t queueFamilyIndex;
     uint32_t rayAmount;
     std::vector<Ray> rayVector;
-    std::vector<Quad> quadVector;
+    std::vector<Quadric> beamline;
     QueueFamilyIndices QueueFamily;
     
     //Member functions:
@@ -109,7 +109,7 @@ private:
     void createOutputBuffer();
     void createInputBuffer();
     void fillInputBuffer();
-    void fillQuadBuffer();
+    void fillQuadricBuffer();
     void createDescriptorSetLayout();
     void createDescriptorSet();
     uint32_t *readFile(uint32_t &length, const char *filename);

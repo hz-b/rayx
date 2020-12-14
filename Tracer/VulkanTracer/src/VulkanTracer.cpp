@@ -51,7 +51,7 @@ void VulkanTracer::run()
 	//(a ray consists of 6 values in double precision, x,y,z for the position and x*, y*, z* for the direction. 8 values instead of 6 are used, because the shader size of the buffer needs to be multiples of 16 bit)
 	bufferSizes[0] = (uint64_t)rayAmount * RAY_DOUBLE_AMOUNT * sizeof(double);
 	bufferSizes[1] = (uint64_t)rayAmount * 4* sizeof(double);
-	bufferSizes[2] = quadVector.size() * 16 * sizeof(double);
+	bufferSizes[2] = beamline.size() * 16 * sizeof(double);
 	std::cout << "Size of Buffers: " << bufferSizes[1] << std::endl;
 	//vulkan is initialized
 	initVulkan();
@@ -76,7 +76,7 @@ void VulkanTracer::initVulkan()
 	//creates buffers to transfer data to and from the shader
 	createBuffers();
 	fillInputBuffer();
-	fillQuadBuffer();
+	fillQuadricBuffer();
 	//creates the descriptors used to bind the buffer to shader access points (bindings)
 	createDescriptorSetLayout();
 	
@@ -423,13 +423,13 @@ void VulkanTracer::fillInputBuffer()
 	memcpy(data, rayVector.data(), bufferSizes[0]);
 	vkUnmapMemory(device, bufferMemories[0]);
 }
-//the quad buffer is filled with the quad data
-void VulkanTracer::fillQuadBuffer()
+//the quad buffer is filled with the quadric data
+void VulkanTracer::fillQuadricBuffer()
 {
 	//data is copied to the buffer
 	void *data;
 	vkMapMemory(device, bufferMemories[2], 0, bufferSizes[2], 0, &data);
-	memcpy(data, quadVector.data(), bufferSizes[2]);
+	memcpy(data, beamline.data(), bufferSizes[2]);
 	vkUnmapMemory(device, bufferMemories[2]);
 }
 void VulkanTracer::createDescriptorSetLayout()
@@ -755,10 +755,10 @@ void VulkanTracer::addRay(double xpos, double ypos, double zpos, double xdir, do
 	rayVector.emplace_back(newRay);
 }
 
-//adds quad to quadVector
-void VulkanTracer::addQuad(std::vector<double> inQuad){
-	assert(inQuad.size() == 16);
-	quadVector.emplace_back(inQuad);
+//adds quad to beamline
+void VulkanTracer::addBeamLineObject(std::vector<double> inQuadric){
+	assert(inQuadric.size() == 16);
+	beamline.emplace_back(inQuadric);
 }
 
 //is not used anymore

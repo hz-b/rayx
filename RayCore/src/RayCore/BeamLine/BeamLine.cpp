@@ -5,12 +5,23 @@
 namespace RAY {
 
     Beamline::Beamline() {
-        Quad* quad = new Quad(glm::vec3(0,0,0), glm::vec3(1,1,1),1.0);
-        m_objects.push_back(quad);
         std::cout << "Creating Beamline..." << std::endl;
+        //std::vector<double> temp(16, 1);
+        //BeamLineObject firstQuadric(temp);
+        //m_objects.push_back(firstQuadric);
     }
 
     Beamline::~Beamline() {
         std::cout << "Deleting Beamline..." << std::endl;
+    }
+    void Beamline::addBeamlineObject(BeamLineObject newObject){
+        m_objects.push_back(newObject);
+    }
+    void Beamline::replaceNthObject(uint32_t index, BeamLineObject newObject){
+        assert(m_objects.size() >= index);
+        m_objects[index] = newObject;
+    }
+    std::vector<BeamLineObject> Beamline::getObjects(){
+        return m_objects;
     }
 }
