@@ -29,14 +29,8 @@ namespace RAY
         std::vector<double> beamlineObjectPlaceholder(16, 1);
         m_Beamline.addBeamlineObject(*(new BeamLineObject(beamlineObjectPlaceholder, beamlineObjectPlaceholder, beamlineObjectPlaceholder)));
         auto beamLineObjects = m_Beamline.getObjects();
-<<<<<<< HEAD
         for(auto object = beamLineObjects.begin(); object != beamLineObjects.end(); object++){
             tracer.addBeamLineObject((*object).getAnchorPoints(), (*object).getInMatrix(), (*object).getOutMatrix());   
-=======
-        for (auto object = beamLineObjects.begin(); object != beamLineObjects.end(); object++)
-        {
-            tracer.addBeamLineObject((*object).getData());
->>>>>>> 0c62a75eccaa5e61cd8cd7ef9c990b0aa59860f5
         }
         tracer.run();
         std::cout << "run succeeded" << std::endl;

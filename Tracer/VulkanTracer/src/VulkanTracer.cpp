@@ -426,10 +426,13 @@ void VulkanTracer::fillInputBuffer()
 //the quad buffer is filled with the quadric data
 void VulkanTracer::fillQuadricBuffer()
 {
+    std::cout << "fill quadric buffer" << std::endl;
 	//data is copied to the buffer
 	void *data;
 	vkMapMemory(device, bufferMemories[2], 0, bufferSizes[2], 0, &data);
+    std::cout << "map memory done" << std::endl;
 	memcpy(data, beamline.data(), bufferSizes[2]);
+    std::cout << "memory copy done" << std::endl;
 	vkUnmapMemory(device, bufferMemories[2]);
 }
 void VulkanTracer::createDescriptorSetLayout()
