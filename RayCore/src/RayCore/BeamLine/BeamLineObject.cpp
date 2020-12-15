@@ -1,4 +1,4 @@
-#include "BeamLineObject.h"
+#include "BeamlineObject.h"
 #include <cassert>
 
 namespace RAY

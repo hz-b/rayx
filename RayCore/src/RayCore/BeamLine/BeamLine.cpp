@@ -21,18 +21,18 @@ namespace RAY
 
     void Beamline::addBeamlineObject(BeamLineObject newObject)
     {
-        m_objects.push_back(newObject);
+        m_Objects.push_back(newObject);
     }
 
     void Beamline::replaceNthObject(uint32_t index, BeamLineObject newObject)
     {
-        assert(m_objects.size() >= index);
-        m_objects[index] = newObject;
+        assert(m_Objects.size() >= index);
+        m_Objects[index] = newObject;
     }
 
     std::vector<BeamLineObject> Beamline::getObjects()
     {
-        return m_objects;
+        return m_Objects;
     }
 
 } // namespace RAY

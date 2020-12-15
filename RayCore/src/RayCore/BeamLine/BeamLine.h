@@ -2,7 +2,7 @@
 
 #include "Core.h"
 #include "glm.hpp"
-#include "BeamLineObject.h"
+#include "BeamlineObject.h"
 
 #include <vector>
 
@@ -20,7 +20,7 @@ namespace RAY
         std::vector<BeamLineObject> getObjects();
 
     private:
-        std::vector<BeamLineObject> m_objects;
+        std::vector<BeamLineObject> m_Objects;
     };
 
 } // namespace RAY
