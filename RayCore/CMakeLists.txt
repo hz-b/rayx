@@ -11,6 +11,7 @@ SET(SOURCE
 
 SET(HEADERS
     src/RayCore/Application.h
+    src/RayCore/Debug.h
     src/RayCore/BeamLine/BeamLine.h
     src/RayCore/BeamLine/BeamLineObject.h
     src/RayCore/Tracer/Ray.h

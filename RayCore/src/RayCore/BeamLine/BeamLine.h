@@ -6,9 +6,11 @@
 
 #include <vector>
 
-namespace RAY {
+namespace RAY
+{
 
-    class RAY_API Beamline {
+    class RAY_API Beamline
+    {
 
     public:
         Beamline();
@@ -16,10 +18,9 @@ namespace RAY {
         void addBeamlineObject(BeamLineObject newObject);
         void replaceNthObject(uint32_t index, BeamLineObject newObject);
         std::vector<BeamLineObject> getObjects();
+
     private:
         std::vector<BeamLineObject> m_objects;
-
     };
 
-
-}
+} // namespace RAY

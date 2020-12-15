@@ -1,3 +1,4 @@
+#include "Debug.h"
 #include "TracerInterface.h"
 #include "VulkanTracer.h"
 
@@ -10,12 +11,12 @@ namespace RAY
             m_RayList.emplace_back(new Ray(glm::vec3(0, 20, -20), glm::vec3(0, -1, 1), 1));
             m_RayList.emplace_back(new Ray(glm::vec3(10, 5, 10), glm::vec3(-1, 1, 1), 1));
         }
-        std::cout << "Creating TracerInterface..." << std::endl;
+        DEBUG(std::cout << "Creating TracerInterface..." << std::endl);
     }
 
     TracerInterface::~TracerInterface()
     {
-        std::cout << "Deleting TracerInterface..." << std::endl;
+        DEBUG(std::cout << "Deleting TracerInterface..." << std::endl);
     }
 
     bool TracerInterface::run()
@@ -28,8 +29,9 @@ namespace RAY
         std::vector<double> beamlineObjectPlaceholder(16, 1);
         m_Beamline.addBeamlineObject(*(new BeamLineObject(beamlineObjectPlaceholder, beamlineObjectPlaceholder, beamlineObjectPlaceholder)));
         auto beamLineObjects = m_Beamline.getObjects();
-        for(auto object = beamLineObjects.begin(); object != beamLineObjects.end(); object++){
-            tracer.addBeamLineObject((*object).getAnchorPoints(), (*object).getInMatrix(), (*object).getOutMatrix());   
+        for (auto object = beamLineObjects.begin(); object != beamLineObjects.end(); object++)
+        {
+            tracer.addBeamLineObject((*object).getAnchorPoints(), (*object).getInMatrix(), (*object).getOutMatrix());
         }
         tracer.run();
         std::cout << "run succeeded" << std::endl;
