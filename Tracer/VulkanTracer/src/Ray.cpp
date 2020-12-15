@@ -1,6 +1,6 @@
 #include "Ray.h"
 
-void Ray::initRay(double xpos, double ypos, double zpos, double xdir, double ydir, double zdir)
+Ray::Ray(double xpos, double ypos, double zpos, double xdir, double ydir, double zdir, double w)
 {
 	position.x = xpos;
 	position.y = ypos;
@@ -8,6 +8,11 @@ void Ray::initRay(double xpos, double ypos, double zpos, double xdir, double ydi
 	direction.x = xdir;
 	direction.y = ydir;
 	direction.z = zdir;
+	weight = w;
+	placeholder = 0;
+}
+Ray::~Ray(){
+
 }
 
 std::vector<double> Ray::getRayInformation()
@@ -49,4 +54,8 @@ double Ray::getyPos()
 double Ray::getzPos()
 {
 	return position.z;
+}
+double Ray::getWeight()
+{
+	return weight;
 }

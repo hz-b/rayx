@@ -34,6 +34,8 @@ VkResult CreateDebugUtilsMessengerEXT(VkInstance instance, const VkDebugUtilsMes
 void DestroyDebugUtilsMessengerEXT(VkInstance instance, VkDebugUtilsMessengerEXT debugMessenger, const VkAllocationCallbacks *pAllocator);
 
 const int WORKGROUP_SIZE = 32;
+const int RAY_DOUBLE_AMOUNT = 8;
+const int QUADRIC_DOUBLE_AMOUNT = 24;
 
 class VulkanTracer
 {
@@ -41,18 +43,43 @@ public:
     VulkanTracer();
     ~VulkanTracer();
     void run();
+    void addRay(double xpos, double ypos, double zpos, double xdir, double ydir, double zdir, double weight);
+    void addBeamLineObject(std::vector<double> inQuadric, std::vector<double> inputInMatrix, std::vector<double> inputOutMatrix);
+    std::vector<double> getRays();
+    void cleanup();
 
 private:
+    //Member structs:
+    struct Quadric{
+        Quadric() : points(16), inMatrix(16), outMatrix(16) {}
+        Quadric(std::vector<double> inQuadric, std::vector<double> inputInMatrix, std::vector<double> inputOutMatrix){
+            assert(inQuadric.size() == 16 && inputInMatrix.size() == 16 && inputOutMatrix.size() == 16);
+            points = inQuadric;
+            inMatrix = inputInMatrix;
+            outMatrix = inputOutMatrix;
+        }
+        std::vector<double> points;
+        std::vector<double> inMatrix;
+        std::vector<double> outMatrix;
+    };
+    struct QueueFamilyIndices
+    {
+        uint32_t computeFamily;
+        bool hasvalue;
+
+        bool isComplete()
+        {
+            return hasvalue;
+        }
+    };
+    //Member variables:
     VkInstance instance;
     VkDebugUtilsMessengerEXT debugMessenger;
     VkPhysicalDevice physicalDevice = VK_NULL_HANDLE;
     VkDevice device;
-    uint32_t outputBufferSize;
-    VkBuffer outputBuffer;
-    VkDeviceMemory outputBufferMemory;
-    uint32_t inputBufferSize;
-    VkBuffer inputBuffer;
-    VkDeviceMemory inputBufferMemory;
+    std::vector<uint64_t> bufferSizes;
+    std::vector<VkBuffer> buffers;
+    std::vector<VkDeviceMemory> bufferMemories;
     VkPipeline pipeline;
     VkPipelineLayout pipelineLayout;
     VkShaderModule computeShaderModule;
@@ -65,21 +92,12 @@ private:
     uint32_t queueFamilyIndex;
     uint32_t rayAmount;
     std::vector<Ray> rayVector;
-    struct QueueFamilyIndices
-    {
-        uint32_t computeFamily;
-        bool hasvalue;
-
-        bool isComplete()
-        {
-            return hasvalue;
-        }
-    };
+    std::vector<Quadric> beamline;
     QueueFamilyIndices QueueFamily;
-
+    
+    //Member functions:
     void initVulkan();
     void mainLoop();
-    void cleanup();
     void createInstance();
     void populateDebugMessengerCreateInfo(VkDebugUtilsMessengerCreateInfoEXT &createInfo);
     void setupDebugMessenger();
@@ -92,9 +110,11 @@ private:
     QueueFamilyIndices findQueueFamilies(VkPhysicalDevice device);
     void createLogicalDevice();
     uint32_t findMemoryType(uint32_t memoryTypeBits, VkMemoryPropertyFlags properties);
+    void createBuffers();
     void createOutputBuffer();
     void createInputBuffer();
     void fillInputBuffer();
+    void fillQuadricBuffer();
     void createDescriptorSetLayout();
     void createDescriptorSet();
     uint32_t *readFile(uint32_t &length, const char *filename);
@@ -102,6 +122,7 @@ private:
     void createCommandBuffer();
     void runCommandBuffer();
     void setRayAmount(uint32_t inputRayAmount);
+    void setRayAmount();
     void readDataFromOutputBuffer();
     void generateRays();
 

@@ -1,24 +1,41 @@
 cmake_minimum_required(VERSION 3.0 FATAL_ERROR)
 project(RayCore)
 
-
-
-add_library(${PROJECT_NAME} 
-    SHARED 
-        src/RayCore/Application.cpp
-        src/RayCore/BeamLine/BeamLine.cpp
-        src/RayCore/Tracer/Ray.cpp
-        src/RayCore/Tracer/TracerInterface.cpp
+SET(SOURCE
+    src/RayCore/Application.cpp
+    src/RayCore/BeamLine/BeamLine.cpp
+    src/RayCore/BeamLine/BeamLineObject.cpp
+    src/RayCore/Tracer/Ray.cpp
+    src/RayCore/Tracer/TracerInterface.cpp
 )
+
+SET(HEADERS
+    src/RayCore/Application.h
+    src/RayCore/Debug.h
+    src/RayCore/BeamLine/BeamLine.h
+    src/RayCore/BeamLine/BeamLineObject.h
+    src/RayCore/Tracer/Ray.h
+    src/RayCore/Tracer/TracerInterface.h
+)
+
+
+add_library(${PROJECT_NAME} SHARED ${SOURCE} ${HEADERS} )
 
 target_link_libraries(${PROJECT_NAME} 
     PUBLIC VulkanTracer
 )
 
+if (${CMAKE_CXX_COMPILER_ID} STREQUAL "GNU")
+    set(COMPILE_PLATFORM RAY_PLATFORM_GCC)
+elseif (${CMAKE_CXX_COMPILER_ID} STREQUAL "MSVC")
+    set(COMPILE_PLATFORM RAY_PLATFORM_WINDOWS)
+else() 
+    set(COMPILE_PLATFORM UNKNOWN)
+endif()
 
 target_compile_definitions(${PROJECT_NAME} 
     PRIVATE RAY_BUILD_DLL
-    PUBLIC RAY_PLATFORM_WINDOWS
+    PUBLIC ${COMPILE_PLATFORM}
 )
 
 target_include_directories(${PROJECT_NAME}  
@@ -27,6 +44,6 @@ target_include_directories(${PROJECT_NAME}
 )
 
 
-set_target_properties(${PROJECT_NAME} PROPERTIES
-                      RUNTIME_OUTPUT_DIRECTORY ${TerminalApp_BINARY_DIR}
-)
+# set_target_properties(${PROJECT_NAME} PROPERTIES
+#                       RUNTIME_OUTPUT_DIRECTORY ${TerminalApp_BINARY_DIR}
+# )

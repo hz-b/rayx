@@ -1,6 +1,6 @@
 #pragma once
 
-#include "BeamLine/Beamline.h"
+#include "Beamline/Beamline.h"
 
 #include "Core.h"
 #include "Ray.h"
@@ -16,10 +16,9 @@ namespace RAY
         ~TracerInterface();
 
         bool run();
-        
+
     private:
         Beamline m_Beamline;
-        std::vector<Ray*> m_RayList;
-         
+        std::vector<Ray *> m_RayList;
     };
 } // namespace RAY

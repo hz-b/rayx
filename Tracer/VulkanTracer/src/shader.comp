@@ -5,10 +5,15 @@
 layout (local_size_x = WORKGROUP_SIZE, local_size_y = 1, local_size_z = 1 ) in;
 
 struct Ray{
-	dvec4 position;
+	dvec3 position;
+	double weight; // status of the ray (e.g if element missed -> 0)
 	dvec4 direction;
 };
-
+struct Quad{
+	dmat4 anchorPoints;
+	dmat4 inTrans;
+	dmat4 outTrans;
+};
 
 layout(std140, binding = 0) buffer ibuf
 {
@@ -17,14 +22,136 @@ layout(std140, binding = 0) buffer ibuf
 
 layout(std140, binding = 1) buffer obuf
 {
-   Ray outputData[];
+   dvec3 outputData[];
+};
+layout(std140, binding = 2) buffer qbuf
+{
+	Quad quadData[];
 };
 
+/**
+* calculates the intersection of a ray with a quadric surface defined by a_11..a_44
+* @param r				ray for which the intersection is fount
+* @param a_11..a_44		define the quadric surface
+* @param icurv 			defines whether the first or the second intersection is used (1=first, -1=second)
+*
+* inout = allow modifying the object within the function ("call-by-reference")
+*/
+dvec3 intersectionPoint(inout Ray r, double a_11, double a_22, double a_33, double a_12, double a_13, double a_23, double a_14, double a_24,  double a_34,  double a_44, int icurv)
+{
+	double w = r.weight;
+	int cs = 1;
+	int sign = icurv;
+	if (abs(r.direction[1]) >= abs(r.direction[0]) && abs(r.direction[1]) >= abs(r.direction[2])) {
+		cs = 2;
+	}else if (abs(r.direction[2]) >= abs(r.direction[0]) && abs(r.direction[2]) >= abs(r.direction[1])) {
+		cs = 3;
+	}
+	
+	double x;
+	double y;
+	double z;
+		
+	if (cs == 1) {
+		double aml = r.direction[1] / r.direction[0];
+		double anl = r.direction[2] / r.direction[0];
+		y = r.position[1] - aml * r.position[0];
+		z = r.position[2] - anl * r.position[0];
+		if (r.direction[0] < 0) {
+			sign = -icurv;
+		}
+		
+		double a = a_11 + 2*a_12*aml + a_22*aml*aml + 2*a_13*anl + 2*a_23*aml*anl + a_33*anl*anl;
+        double b = a_14 + a_24*aml + a_34*anl + (a_12 + a_22*aml + a_23*anl)*y + (a_13 + a_23*aml + a_33*anl)*z;
+        double c = a_44 + a_22*y*y + 2*a_34*z + a_33*z*z + 2*y*(a_24 + a_23*z);
+		
+		double bbac = b*b - a*c;
+		if (bbac < 0) {
+			w = 0.0; 	// oder -4?
+			x = - y/aml; 	// x such that y=0
+		}else{
+			if (abs(a) > pow(float(abs(c)*10), float(-10))) {
+				x = (-b + sign*sqrt(bbac)) / a;
+			}else{
+				x = (-c/2)/b;
+			}
+		}
+		y = y + aml*x;
+		z = z + anl*x;
+		
+	}else if (cs == 2) {
+		double alm = r.direction[0] / r.direction[1];
+		double anm = r.direction[2] / r.direction[1];
+		x = r.position[0] - alm * r.position[1];
+		z = r.position[2] - anm * r.position[1];
+		if(r.direction[1] < 0) {
+			sign = -icurv;
+		}
+		
+		double a = a_22 + 2*a_12*alm + a_11*alm*alm + 2*a_23*anm + 2*a_13*alm*anm + a_33*anm*anm;
+        double b = a_24 + a_14*alm + a_34*anm + (a_12 + a_11*alm + a_13*anm)*x + (a_23 + a_13*alm + a_33*anm)*z;
+        double c = a_44 + a_11*x*x + 2*a_34*z + a_33*z*z + x*(2*a_14 + 2*a_13*z);
+		
+		double bbac = b*b - a*c;
+		if (bbac < 0) {
+			w = 0.0;
+			y = 0;
+		}else{
+			if (abs(a) > pow(float(abs(c)*10), float(-10))) {
+				y = (-b + sign*sqrt(bbac)) / a;
+			}else{
+				y = (-c/2)/b;
+			}
+		}
+		x = x + alm*y;
+		z = z + anm*y;
+	}else{
+		double aln = r.direction[0] / r.direction[2];
+		double amn = r.direction[1] / r.direction[2];
+		x = r.position[0] - aln * r.position[2];
+		y = r.position[1] - amn * r.position[2];
+		if(r.direction[2] < 0) {
+			sign = -icurv;
+		}
+		
+		double a = a_33 + 2*a_13*aln + a_11*aln*aln + 2*a_23*amn + 2*a_12*aln*amn + a_22*amn*amn;
+        double b = a_34 + a_14*aln + a_24*amn + (a_13 + a_11*aln + a_12*amn)*x + (a_23 + a_12*aln + a_22*amn)*y;
+        double c = a_44 + a_11*x*x + 2*a_24*y + a_22*y*y + x*(2*a_14 + 2*a_12*y);
+	
+		double bbac = b*b - a*c;
+		if (bbac < 0) {
+			w = 0.0;
+			z = -y / amn;
+		}else{
+			if (abs(a) > pow(float(abs(c)*10), float(-10))) {
+				z = (-b + sign*sqrt(bbac)) / a;
+			}else{
+				z = (-c/2)/b;
+			}
+		}
+		x = x + amn*z;
+		y = y + amn*z;
+	}
+	
+	double fx = 2*a_14 + 2*a_11*x + 2*a_12*y + 2*a_13*z;
+	double fy = 2*a_24 + 2*a_12*x + 2*a_22*y + 2*a_23*z;
+    double fz = 2*a_34 + 2*a_13*x + 2*a_23*y + 2*a_33*z;
+
+	dvec3 normal = normalize(dvec3(fx,fy,fz));
+	r.position = dvec3(x,y,z); // new position = intersection point
+	r.weight = w; // unchanged, if ray did not miss surface, else 0
+	
+	return normal;
+}
 
 
 void main(){
-	outputData[uint(gl_GlobalInvocationID)].position = rayData[uint(gl_GlobalInvocationID)].position;
-	outputData[uint(gl_GlobalInvocationID)].direction = rayData[uint(gl_GlobalInvocationID)].direction;
-	//outputData[uint(gl_GlobalInvocationID)].position = dvec4(0.0, 1.0, 2.0, 0.0);
-	//outputData[uint(gl_GlobalInvocationID)].direction = dvec4(3.0, 4.0, 5.0, 0.0);
+	Ray r = rayData[uint(gl_GlobalInvocationID)];
+	dvec3 normal = intersectionPoint(r, 1.0,1.0,1.0,0.0, 0.0,0.0,0.0,-3.0, 0.0,0.0, 1); // sphere with r = 3
+	dvec4 reflected = reflect(r.direction, dvec4(normal,0));
+	outputData[uint(gl_GlobalInvocationID)] = dvec3(reflected);
+	//outputData[uint(gl_GlobalInvocationID)] = rayData[uint(gl_GlobalInvocationID)].position; // sphere with r = 3
+	//outputData[uint(gl_GlobalInvocationID)].position = dvec4(0.0, 20.0, -20.0, 0.0); // starts at (0,20,-20)
+	//outputData[uint(gl_GlobalInvocationID)].direction = dvec4(0.0, -1.0, 1.0, 0.0); // hits the surface in 45 degree angle at (0,0,0) -> the normal should be (0,-1,0)
+	
 }

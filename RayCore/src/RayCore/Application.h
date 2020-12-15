@@ -3,7 +3,8 @@
 #include "Core.h"
 #include "Tracer/TracerInterface.h"
 
-namespace RAY {
+namespace RAY
+{
 
 	class RAY_API Application
 	{
@@ -18,6 +19,6 @@ namespace RAY {
 	};
 
 	// To be defined in CLIENT
-	Application* CreateApplication();
+	Application *CreateApplication();
 
-}
+} // namespace RAY

@@ -1,34 +1,26 @@
 #include "Application.h"
 #include "BeamLine/BeamLine.h"
+#include "Debug.h"
 
 #include <iostream>
 
-namespace RAY {
+namespace RAY
+{
 
-    Application::Application() {
-        // std::vector<Ray*> rayList;
-        // m_tracerInterface = TracerInterface(rayList);
-        std::cout << "Application created" << std::endl;
+    Application::Application()
+    {
+        DEBUG(std::cout << "Creating Application..." << std::endl);
     }
 
-    Application::~Application() {
-        std::cout << "Application deleted" << std::endl;
+    Application::~Application()
+    {
+        DEBUG(std::cout << "Deleting Application..." << std::endl);
     }
-    
 
-	void Application::Run()
-	{
-        std::cout << "Application running..." << std::endl;
-        // create BeamLine and BeamLineObjects
-        Beamline();
-        TracerInterface tInt = TracerInterface();
+    void Application::Run()
+    {
+        DEBUG(std::cout << "Application running..." << std::endl);
+        m_tracerInterface.run();
+    }
 
-        // TODO: Create a beamlineobject (plane) which can be used to test tracing.
-
-        // create Rays and run tracer over TracerInterface
-        // TODO: Does RayCore need a raylist and rays? How is the data transferred between Tracer and RayCore?
-        //std::vector<Ray *> m_rayList;
-        //m_tracerInterface.run(m_rayList);
-	}
-
-}
+} // namespace RAY
