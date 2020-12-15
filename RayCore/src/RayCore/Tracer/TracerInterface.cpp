@@ -5,7 +5,6 @@ namespace RAY
 {
     TracerInterface::TracerInterface()
     {
-        m_Beamline = Beamline();
         for (int i = 0; i < 1048576; i++)
         {
             m_RayList.emplace_back(new Ray(glm::vec3(0, 20, -20), glm::vec3(0, -1, 1), 1));
