@@ -6,6 +6,7 @@ VulkanTracer::VulkanTracer() {
 	bufferSizes.resize(3);
 	buffers.resize(3);
 	bufferMemories.resize(3);
+	//beamline.resize(0);
 
 }
 
@@ -52,7 +53,9 @@ void VulkanTracer::run()
 	bufferSizes[0] = (uint64_t)rayAmount * RAY_DOUBLE_AMOUNT * sizeof(double);
 	bufferSizes[1] = (uint64_t)rayAmount * 4* sizeof(double);
 	bufferSizes[2] = beamline.size() * QUADRIC_DOUBLE_AMOUNT * sizeof(double);
-	std::cout << "Size of Buffers: " << bufferSizes[1] << std::endl;
+	for (int i = 0; i<bufferSizes.size(); i++){
+		std::cout << "bufferSizes["<<i<<"]: " << bufferSizes[i] << std::endl;
+	}
 	//vulkan is initialized
 	initVulkan();
 	mainLoop();
@@ -292,7 +295,7 @@ int VulkanTracer::rateDevice(VkPhysicalDevice device)
 	VkPhysicalDeviceProperties deviceProperties;
 	vkGetPhysicalDeviceProperties(device, &deviceProperties);
 
-	int score = 0;
+	int score = 1;
 	//discrete GPUs are usually faster and get a bonus
 	//can be extended to choose the best discrete gpu if multiple are available
 	if (deviceProperties.deviceType == VK_PHYSICAL_DEVICE_TYPE_DISCRETE_GPU)
@@ -390,9 +393,11 @@ uint32_t VulkanTracer::findMemoryType(uint32_t memoryTypeBits, VkMemoryPropertyF
 }
 
 void VulkanTracer::createBuffers(){
+    std::cout << "number of buffers: " << buffers.size() << std::endl;
 	for(int i=0; i<buffers.size();i++){
 		VkBufferCreateInfo bufferCreateInfo = {};
 		bufferCreateInfo.sType = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO;
+    	std::cout << "size of buffer: " << bufferSizes[i] << std::endl;
 		bufferCreateInfo.size = bufferSizes[i];
 		bufferCreateInfo.usage = VK_BUFFER_USAGE_STORAGE_BUFFER_BIT; // buffer is used as a storage buffer.
 		bufferCreateInfo.sharingMode = VK_SHARING_MODE_EXCLUSIVE;	 // buffer is exclusive to a single queue family at a time.
@@ -404,7 +409,7 @@ void VulkanTracer::createBuffers(){
 		allocateInfo.sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO;
 		allocateInfo.allocationSize = memoryRequirements.size; // specify required memory.
 		allocateInfo.memoryTypeIndex = findMemoryType(
-			memoryRequirements.memoryTypeBits, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT);
+			memoryRequirements.memoryTypeBits,VK_MEMORY_PROPERTY_HOST_COHERENT_BIT | VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT);
 		VK_CHECK_RESULT(vkAllocateMemory(device, &allocateInfo, NULL, &(bufferMemories[i]))); // allocate memory on device.
 		
 		// Now associate that allocated memory with the buffer. With that, the buffer is backed by actual memory.
@@ -431,9 +436,12 @@ void VulkanTracer::fillQuadricBuffer()
 	void *data;
 	vkMapMemory(device, bufferMemories[2], 0, bufferSizes[2], 0, &data);
     std::cout << "map memory done" << std::endl;
-	memcpy(data, beamline.data(), bufferSizes[2]);
+    std::cout << "number of quadrics: " << beamline.size() << std::endl;
+    std::cout << "size of quadric buffer: " << bufferSizes[2] << std::endl;
+	memcpy(data, beamline.data(), bufferMemories[2]);
     std::cout << "memory copy done" << std::endl;
 	vkUnmapMemory(device, bufferMemories[2]);
+
 }
 void VulkanTracer::createDescriptorSetLayout()
 {
@@ -761,7 +769,10 @@ void VulkanTracer::addRay(double xpos, double ypos, double zpos, double xdir, do
 //adds quad to beamline
 void VulkanTracer::addBeamLineObject(std::vector<double> inQuadric, std::vector<double> inputInMatrix, std::vector<double> inputOutMatrix){
 	assert(inQuadric.size() == 16 && inputInMatrix.size() == 16 && inputOutMatrix.size() == 16);
-	beamline.emplace_back(inQuadric, inputInMatrix, inputOutMatrix);
+	//beamline.resize(beamline.size()+1);
+	Quadric newQuadric(inQuadric, inputInMatrix, inputOutMatrix);
+	beamline.push_back(newQuadric);
+    std::cout << "beamline size: "<< beamline.size()  << std::endl;
 }
 
 //is not used anymore

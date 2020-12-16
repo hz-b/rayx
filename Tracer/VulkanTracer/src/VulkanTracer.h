@@ -35,7 +35,7 @@ void DestroyDebugUtilsMessengerEXT(VkInstance instance, VkDebugUtilsMessengerEXT
 
 const int WORKGROUP_SIZE = 32;
 const int RAY_DOUBLE_AMOUNT = 8;
-const int QUADRIC_DOUBLE_AMOUNT = 24;
+const int QUADRIC_DOUBLE_AMOUNT = 48;
 
 class VulkanTracer
 {
