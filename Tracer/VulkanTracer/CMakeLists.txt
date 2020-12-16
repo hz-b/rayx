@@ -4,7 +4,8 @@ project(VulkanTracer)
 
 # OS specific
 if (WIN32)
-    execute_process(COMMAND $ENV{VULKAN_SDK}/Bin/glslc.exe ${VulkanTracer_SOURCE_DIR}/src/shader.comp -o ${CMAKE_BINARY_DIR}/bin/comp.spv)
+    execute_process(COMMAND $ENV{VULKAN_SDK}/Bin/glslc.exe ${VulkanTracer_SOURCE_DIR}/src/shader.comp -o ${CMAKE_BINARY_DIR}/bin/comp.spv RESULT_VARIABLE rv)
+    message("Shader compile return:'${rv}'")
 elseif (UNIX)
     set_property(TARGET lib1 PROPERTY POSITION_INDEPENDENT_CODE ON)
 endif ()
