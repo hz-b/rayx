@@ -6,7 +6,7 @@ namespace RAY
 {
     TracerInterface::TracerInterface()
     {
-        for (int i = 0; i < 1048576; i++)
+        for (int i = 0; i < 1048576/16; i++)
         {
             m_RayList.emplace_back(new Ray(glm::vec3(0, 20, -20), glm::vec3(0, -1, 1), 1));
             m_RayList.emplace_back(new Ray(glm::vec3(10, 5, 10), glm::vec3(-1, 1, 1), 1));
@@ -32,7 +32,7 @@ namespace RAY
 
         //fill beamline (this is a placeholder)
         std::vector<double> beamlineObjectPlaceholder(16, 1);
-        for(int i=0; i<128; i++){
+        for(int i=0; i<2; i++){
             m_Beamline.addBeamlineObject(*(new BeamLineObject(beamlineObjectPlaceholder, beamlineObjectPlaceholder, beamlineObjectPlaceholder)));
         }
 

@@ -38,9 +38,9 @@ layout(std140, binding = 2) buffer qbuf
 * @param a_11..a_44		define the quadric surface
 * @param icurv 			defines whether the first or the second intersection is used (1=first, -1=second)
 *
-* inout = allow modifying the object within the function ("call-by-reference")
+* output: reflected Ray with hitpoint as position and reflection as direction
 */
-dvec3 intersectionPoint(inout Ray r, double a_11, double a_22, double a_33, double a_12, double a_13, double a_23, double a_14, double a_24,  double a_34,  double a_44, int icurv)
+Ray intersectionPoint(Ray r, double a_11, double a_22, double a_33, double a_12, double a_13, double a_23, double a_14, double a_24,  double a_34,  double a_44, int icurv)
 {
 	double w = r.weight;
 	int cs = 1;
@@ -139,21 +139,21 @@ dvec3 intersectionPoint(inout Ray r, double a_11, double a_22, double a_33, doub
 	double fx = 2*a_14 + 2*a_11*x + 2*a_12*y + 2*a_13*z;
 	double fy = 2*a_24 + 2*a_12*x + 2*a_22*y + 2*a_23*z;
     double fz = 2*a_34 + 2*a_13*x + 2*a_23*y + 2*a_33*z;
-
+	Ray outputRay;
 	dvec3 normal = normalize(dvec3(fx,fy,fz));
-	r.position = dvec3(x,y,z); // new position = intersection point
-	r.weight = w; // unchanged, if ray did not miss surface, else 0
+	outputRay.position = dvec3(x,y,z); // new position = intersection point
+	outputRay.weight = w; // unchanged, if ray did not miss surface, else 0
+	outputRay.direction = reflect(r.direction, dvec4(normal,0));
 	
-	return normal;
+	return outputRay;
 }
-void iterateQuadrics(){
+void iterateQuadrics(uint quadricIndex){
 	const int numberOfRays = rayData.length();
 	const int numberOfQuadrics = quadricData.length();
 	//Ray temporaryRays[numberOfRays];
 	if(numberOfQuadrics <2){
 		//only one quadric: store directly in output buffer
-		outputData[uint(gl_GlobalInvocationID)].position = intersectionPoint(rayData[uint(gl_GlobalInvocationID)], 1.0,1.0,1.0,0.0, 0.0,0.0,0.0,-3.0, 0.0,0.0, 1); // sphere with r = 3
-		outputData[uint(gl_GlobalInvocationID)].weight = 1;
+		outputData[uint(gl_GlobalInvocationID)] = intersectionPoint(rayData[rayIndex], 1.0,1.0,1.0,0.0, 0.0,0.0,0.0,-3.0, 0.0,0.0, 1); // sphere with r = 3
 	}
 	else{
 		//at least 2 quadrics
@@ -165,27 +165,16 @@ void iterateQuadrics(){
 		//quadrics between first and last
 		for(int i=0; i<numberOfQuadrics-1; i++){
 			//first quadric
-			rayData[uint(gl_GlobalInvocationID)].position = intersectionPoint(rayData[uint(gl_GlobalInvocationID)], 1.0,1.0,1.0,0.0, 0.0,0.0,0.0,-3.0, 0.0,0.0, 1); // sphere with r = 3
-			
-			//placeholder, weight and direction should be calculated later
-			//rayData[uint(gl_GlobalInvocationID)].weight = 1;
-			//temporaryRays[uint(gl_GlobalInvocationID)].direction = rayData[uint(gl_GlobalInvocationID)].direction;
-			//temporaryRays[uint(gl_GlobalInvocationID)].position = intersectionPoint(temporaryRays[uint(gl_GlobalInvocationID)], 1.0,1.0,1.0,0.0, 0.0,0.0,0.0,-3.0, 0.0,0.0, 1);
-			outputData[uint(gl_GlobalInvocationID)].weight = outputData[uint(gl_GlobalInvocationID)].weight + 1;
+			rayData[uint(gl_GlobalInvocationID)] = intersectionPoint(rayData[uint(gl_GlobalInvocationID)], 1.0,1.0,1.0,0.0, 0.0,0.0,0.0,-3.0, 0.0,0.0, 1); // sphere with r = 3
 		}
 		//last quadric
-		outputData[uint(gl_GlobalInvocationID)].position = intersectionPoint(rayData[uint(gl_GlobalInvocationID)], 1.0,1.0,1.0,0.0, 0.0,0.0,0.0,-3.0, 0.0,0.0, 1); // sphere with r = 3
-		outputData[uint(gl_GlobalInvocationID)].weight = outputData[uint(gl_GlobalInvocationID)].weight + 1;
+		outputData[uint(gl_GlobalInvocationID)] = intersectionPoint(rayData[uint(gl_GlobalInvocationID)], 1.0,1.0,1.0,0.0, 0.0,0.0,0.0,-3.0, 0.0,0.0, 1); // sphere with r = 3
 	}
 
 }
 
 void main(){
 	iterateQuadrics();
-	Ray r = rayData[uint(gl_GlobalInvocationID)];
-	dvec3 normal = intersectionPoint(r, 1.0,1.0,1.0,0.0, 0.0,0.0,0.0,-3.0, 0.0,0.0, 1); // sphere with r = 3
-	dvec4 reflected = reflect(r.direction, dvec4(normal,0));
-	outputData[uint(gl_GlobalInvocationID)] = dvec3(reflected);
 	//outputData[uint(gl_GlobalInvocationID)] = rayData[uint(gl_GlobalInvocationID)].position; // sphere with r = 3
 	//outputData[uint(gl_GlobalInvocationID)].position = dvec4(0.0, 20.0, -20.0, 0.0); // starts at (0,20,-20)
 	//outputData[uint(gl_GlobalInvocationID)].direction = dvec4(0.0, -1.0, 1.0, 0.0); // hits the surface in 45 degree angle at (0,0,0) -> the normal should be (0,-1,0)
