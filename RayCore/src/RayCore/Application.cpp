@@ -1,22 +1,26 @@
 #include "Application.h"
 #include "BeamLine/BeamLine.h"
+#include "Debug.h"
 
 #include <iostream>
 
-namespace RAY {
+namespace RAY
+{
 
-    Application::Application() {
-        std::cout << "Application created" << std::endl;
+    Application::Application()
+    {
+        DEBUG(std::cout << "Creating Application..." << std::endl);
     }
 
-    Application::~Application() {
-        std::cout << "Application deleted" << std::endl;
+    Application::~Application()
+    {
+        DEBUG(std::cout << "Deleting Application..." << std::endl);
     }
 
-	void Application::Run()
-	{
-        std::cout << "Application running..." << std::endl;
+    void Application::Run()
+    {
+        DEBUG(std::cout << "Application running..." << std::endl);
         m_tracerInterface.run();
-	}
+    }
 
-}
+} // namespace RAY

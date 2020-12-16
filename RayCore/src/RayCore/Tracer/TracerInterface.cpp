@@ -1,3 +1,4 @@
+#include "Debug.h"
 #include "TracerInterface.h"
 #include "VulkanTracer.h"
 
@@ -5,18 +6,17 @@ namespace RAY
 {
     TracerInterface::TracerInterface()
     {
-        m_Beamline = Beamline();
-        for (int i = 0; i < 1048576/2; i++)
+        for (int i = 0; i < 1048576; i++)
         {
             m_RayList.emplace_back(new Ray(glm::vec3(0, 20, -20), glm::vec3(0, -1, 1), 1));
             m_RayList.emplace_back(new Ray(glm::vec3(10, 5, 10), glm::vec3(-1, 1, 1), 1));
         }
-        std::cout << "Creating TracerInterface..." << std::endl;
+        DEBUG(std::cout << "Creating TracerInterface..." << std::endl);
     }
 
     TracerInterface::~TracerInterface()
     {
-        std::cout << "Deleting TracerInterface..." << std::endl;
+        DEBUG(std::cout << "Deleting TracerInterface..." << std::endl);
     }
 
     bool TracerInterface::run()

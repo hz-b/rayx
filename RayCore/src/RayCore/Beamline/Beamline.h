@@ -2,13 +2,15 @@
 
 #include "Core.h"
 #include "glm.hpp"
-#include "BeamLineObject.h"
+#include "BeamlineObject.h"
 
 #include <vector>
 
-namespace RAY {
+namespace RAY
+{
 
-    class RAY_API Beamline {
+    class RAY_API Beamline
+    {
 
     public:
         Beamline();
@@ -16,10 +18,9 @@ namespace RAY {
         void addBeamlineObject(BeamLineObject newObject);
         void replaceNthObject(uint32_t index, BeamLineObject newObject);
         std::vector<BeamLineObject> getObjects();
-    private:
-        std::vector<BeamLineObject> m_objects;
 
+    private:
+        std::vector<BeamLineObject> m_Objects;
     };
 
-
-}
+} // namespace RAY

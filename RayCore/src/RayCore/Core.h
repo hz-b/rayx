@@ -1,6 +1,6 @@
 #pragma once
 
-#if defined(RAY_PLATFORM_WINDOWS) //  Microsoft 
+#if defined(RAY_PLATFORM_WINDOWS) //  Microsoft
 	#ifdef RAY_BUILD_DLL
 		#define RAY_API __declspec(dllexport)
 	#else
@@ -14,9 +14,9 @@
 	#endif
 #else //  do nothing and hope for the best?
 	#ifdef RAY_BUILD_DLL
-    	#define RAY_API
+		#define RAY_API
 	#else
-    	#define RAY_API
+		#define RAY_API
 	#endif
-    #pragma warning Unknown dynamic link import/export semantics.
+	#pragma warning Unknown dynamic link import / export semantics.
 #endif

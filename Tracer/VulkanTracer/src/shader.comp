@@ -31,22 +31,31 @@ layout(std140, binding = 2) buffer qbuf
 {
 	Quadric quadricData[];
 };
-dvec3 intersectionPoint(Ray r, double a_11, double a_22, double a_33, double a_12, double a_13, double a_23, double a_14, double a_24,  double a_34,  double a_44, int icurv)
+
+/**
+* calculates the intersection of a ray with a quadric surface defined by a_11..a_44
+* @param r				ray for which the intersection is fount
+* @param a_11..a_44		define the quadric surface
+* @param icurv 			defines whether the first or the second intersection is used (1=first, -1=second)
+*
+* inout = allow modifying the object within the function ("call-by-reference")
+*/
+dvec3 intersectionPoint(inout Ray r, double a_11, double a_22, double a_33, double a_12, double a_13, double a_23, double a_14, double a_24,  double a_34,  double a_44, int icurv)
 {
 	double w = r.weight;
-	int c = 1;
+	int cs = 1;
 	int sign = icurv;
 	if (abs(r.direction[1]) >= abs(r.direction[0]) && abs(r.direction[1]) >= abs(r.direction[2])) {
-		c = 2;
+		cs = 2;
 	}else if (abs(r.direction[2]) >= abs(r.direction[0]) && abs(r.direction[2]) >= abs(r.direction[1])) {
-		c = 3;
+		cs = 3;
 	}
 	
 	double x;
 	double y;
 	double z;
 		
-	if (c == 1) {
+	if (cs == 1) {
 		double aml = r.direction[1] / r.direction[0];
 		double anl = r.direction[2] / r.direction[0];
 		y = r.position[1] - aml * r.position[0];
@@ -73,7 +82,7 @@ dvec3 intersectionPoint(Ray r, double a_11, double a_22, double a_33, double a_1
 		y = y + aml*x;
 		z = z + anl*x;
 		
-	}else if (c == 2) {
+	}else if (cs == 2) {
 		double alm = r.direction[0] / r.direction[1];
 		double anm = r.direction[2] / r.direction[1];
 		x = r.position[0] - alm * r.position[1];
@@ -111,7 +120,7 @@ dvec3 intersectionPoint(Ray r, double a_11, double a_22, double a_33, double a_1
 		double a = a_33 + 2*a_13*aln + a_11*aln*aln + 2*a_23*amn + 2*a_12*aln*amn + a_22*amn*amn;
         double b = a_34 + a_14*aln + a_24*amn + (a_13 + a_11*aln + a_12*amn)*x + (a_23 + a_12*aln + a_22*amn)*y;
         double c = a_44 + a_11*x*x + 2*a_24*y + a_22*y*y + x*(2*a_14 + 2*a_12*y);
-		
+	
 		double bbac = b*b - a*c;
 		if (bbac < 0) {
 			w = 0.0;
@@ -127,7 +136,7 @@ dvec3 intersectionPoint(Ray r, double a_11, double a_22, double a_33, double a_1
 		y = y + amn*z;
 	}
 	
-	double fx = 2*a_14 + 2*a_11 + 2*a_12*x + 2*a_12*y + 2*a_13*z;
+	double fx = 2*a_14 + 2*a_11*x + 2*a_12*y + 2*a_13*z;
 	double fy = 2*a_24 + 2*a_12*x + 2*a_22*y + 2*a_23*z;
     double fz = 2*a_34 + 2*a_13*x + 2*a_23*y + 2*a_33*z;
 
@@ -173,6 +182,10 @@ void iterateQuadrics(){
 
 void main(){
 	iterateQuadrics();
+	Ray r = rayData[uint(gl_GlobalInvocationID)];
+	dvec3 normal = intersectionPoint(r, 1.0,1.0,1.0,0.0, 0.0,0.0,0.0,-3.0, 0.0,0.0, 1); // sphere with r = 3
+	dvec4 reflected = reflect(r.direction, dvec4(normal,0));
+	outputData[uint(gl_GlobalInvocationID)] = dvec3(reflected);
 	//outputData[uint(gl_GlobalInvocationID)] = rayData[uint(gl_GlobalInvocationID)].position; // sphere with r = 3
 	//outputData[uint(gl_GlobalInvocationID)].position = dvec4(0.0, 20.0, -20.0, 0.0); // starts at (0,20,-20)
 	//outputData[uint(gl_GlobalInvocationID)].direction = dvec4(0.0, -1.0, 1.0, 0.0); // hits the surface in 45 degree angle at (0,0,0) -> the normal should be (0,-1,0)
