@@ -6,7 +6,9 @@ project(VulkanTracer)
 if (WIN32)
     set(COMPILED_SHADER ${CMAKE_BINARY_DIR}/bin/comp.spv)
     add_custom_command(
-        OUTPUT ${COMPILED_SHADER}
+        OUTPUT 
+            ${COMPILED_SHADER}
+            ${COMPILED_SHADER}fake  # this exists so file cannot be found -> always execute command
         COMMAND "$ENV{VULKAN_SDK}/Bin/glslc.exe"
         ARGS ${VulkanTracer_SOURCE_DIR}/src/shader.comp -o ${COMPILED_SHADER}
     )
