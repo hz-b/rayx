@@ -25,7 +25,7 @@ layout(std140, binding = 0) buffer ibuf
 
 layout(std140, binding = 1) buffer obuf
 {
-   RayOutput outputData[];
+   Ray outputData[];
 };
 layout(std140, binding = 2) buffer qbuf
 {
@@ -147,13 +147,13 @@ Ray intersectionPoint(Ray r, double a_11, double a_22, double a_33, double a_12,
 	
 	return outputRay;
 }
-void iterateQuadrics(uint quadricIndex){
+void iterateQuadrics(){
 	const int numberOfRays = rayData.length();
 	const int numberOfQuadrics = quadricData.length();
 	//Ray temporaryRays[numberOfRays];
 	if(numberOfQuadrics <2){
 		//only one quadric: store directly in output buffer
-		outputData[uint(gl_GlobalInvocationID)] = intersectionPoint(rayData[rayIndex], 1.0,1.0,1.0,0.0, 0.0,0.0,0.0,-3.0, 0.0,0.0, 1); // sphere with r = 3
+		outputData[uint(gl_GlobalInvocationID)] = intersectionPoint(rayData[uint(gl_GlobalInvocationID)], 1.0,1.0,1.0,0.0, 0.0,0.0,0.0,-3.0, 0.0,0.0, 1); // sphere with r = 3
 	}
 	else{
 		//at least 2 quadrics

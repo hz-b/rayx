@@ -51,7 +51,7 @@ void VulkanTracer::run()
 	//the sizes of the input and output buffers are set. The buffers need to be the size rayamount * 8* the size of a double
 	//(a ray consists of 6 values in double precision, x,y,z for the position and x*, y*, z* for the direction. 8 values instead of 6 are used, because the shader size of the buffer needs to be multiples of 16 bit)
 	bufferSizes[0] = (uint64_t)rayAmount * RAY_DOUBLE_AMOUNT * sizeof(double);
-	bufferSizes[1] = (uint64_t)rayAmount * 4* sizeof(double);
+	bufferSizes[1] = (uint64_t)rayAmount * RAY_DOUBLE_AMOUNT * sizeof(double);
 	bufferSizes[2] = beamline.size() * QUADRIC_DOUBLE_AMOUNT * sizeof(double);
 	for (int i = 0; i<bufferSizes.size(); i++){
 		std::cout << "bufferSizes["<<i<<"]: " << bufferSizes[i] << std::endl;
