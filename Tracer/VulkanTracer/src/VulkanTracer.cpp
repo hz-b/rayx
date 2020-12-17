@@ -438,7 +438,7 @@ void VulkanTracer::fillQuadricBuffer()
     std::cout << "map memory done" << std::endl;
     std::cout << "number of quadrics: " << beamline.size() << std::endl;
     std::cout << "size of quadric buffer: " << bufferSizes[2] << std::endl;
-	memcpy(data, beamline.data(), bufferMemories[2]);
+	memcpy(data, beamline.data(), bufferSizes[2]);
     std::cout << "memory copy done" << std::endl;
 	vkUnmapMemory(device, bufferMemories[2]);
 
