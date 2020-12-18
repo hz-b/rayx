@@ -52,7 +52,7 @@ void VulkanTracer::run()
 	//(a ray consists of 6 values in double precision, x,y,z for the position and x*, y*, z* for the direction. 8 values instead of 6 are used, because the shader size of the buffer needs to be multiples of 16 bit)
 	bufferSizes[0] = (uint64_t)rayAmount * RAY_DOUBLE_AMOUNT * sizeof(double);
 	bufferSizes[1] = (uint64_t)rayAmount * RAY_DOUBLE_AMOUNT * sizeof(double);
-	bufferSizes[2] = beamline.size() * QUADRIC_DOUBLE_AMOUNT * sizeof(double);
+	bufferSizes[2] = beamline.size() * sizeof(double);
 	for (int i = 0; i<bufferSizes.size(); i++){
 		std::cout << "bufferSizes["<<i<<"]: " << bufferSizes[i] << std::endl;
 	}
@@ -393,11 +393,9 @@ uint32_t VulkanTracer::findMemoryType(uint32_t memoryTypeBits, VkMemoryPropertyF
 }
 
 void VulkanTracer::createBuffers(){
-    std::cout << "number of buffers: " << buffers.size() << std::endl;
 	for(int i=0; i<buffers.size();i++){
 		VkBufferCreateInfo bufferCreateInfo = {};
 		bufferCreateInfo.sType = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO;
-    	std::cout << "size of buffer: " << bufferSizes[i] << std::endl;
 		bufferCreateInfo.size = bufferSizes[i];
 		bufferCreateInfo.usage = VK_BUFFER_USAGE_STORAGE_BUFFER_BIT; // buffer is used as a storage buffer.
 		bufferCreateInfo.sharingMode = VK_SHARING_MODE_EXCLUSIVE;	 // buffer is exclusive to a single queue family at a time.
@@ -436,7 +434,7 @@ void VulkanTracer::fillQuadricBuffer()
 	void *data;
 	vkMapMemory(device, bufferMemories[2], 0, bufferSizes[2], 0, &data);
     std::cout << "map memory done" << std::endl;
-    std::cout << "number of quadrics: " << beamline.size() << std::endl;
+    std::cout << "number of quadrics: " << beamline.size()/QUADRIC_DOUBLE_AMOUNT << std::endl;
     std::cout << "size of quadric buffer: " << bufferSizes[2] << std::endl;
 	memcpy(data, beamline.data(), bufferSizes[2]);
     std::cout << "memory copy done" << std::endl;
@@ -763,16 +761,16 @@ void VulkanTracer::generateRays()
 }
 void VulkanTracer::addRay(double xpos, double ypos, double zpos, double xdir, double ydir, double zdir, double weight){
 	Ray newRay(xpos, ypos, zpos, xdir, ydir, zdir, weight);
-	rayVector.emplace_back(newRay);
+	rayVector.push_back(newRay);
 }
 
 //adds quad to beamline
 void VulkanTracer::addBeamLineObject(std::vector<double> inQuadric, std::vector<double> inputInMatrix, std::vector<double> inputOutMatrix){
 	assert(inQuadric.size() == 16 && inputInMatrix.size() == 16 && inputOutMatrix.size() == 16);
 	//beamline.resize(beamline.size()+1);
-	Quadric newQuadric(inQuadric, inputInMatrix, inputOutMatrix);
-	beamline.push_back(newQuadric);
-    std::cout << "beamline size: "<< beamline.size()  << std::endl;
+	beamline.insert(beamline.end(), inQuadric.begin(), inQuadric.end());
+	beamline.insert(beamline.end(), inputInMatrix.begin(), inputInMatrix.end());
+	beamline.insert(beamline.end(), inputOutMatrix.begin(), inputOutMatrix.end());
 }
 
 //is not used anymore

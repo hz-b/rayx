@@ -19,9 +19,15 @@ namespace RAY
         DEBUG(std::cout << "Deleting Beamline..." << std::endl);
     }
 
+    /* Somehow results in wrong values. Should be fixed later
     void Beamline::addBeamlineObject(BeamLineObject newObject)
     {
         m_Objects.push_back(newObject);
+    }
+    */
+    void Beamline::addBeamlineObject(std::vector<double> inputPoints, std::vector<double> inputInMatrix, std::vector<double> inputOutMatrix)
+    {
+        m_Objects.emplace_back(inputPoints, inputInMatrix, inputOutMatrix);
     }
 
     void Beamline::replaceNthObject(uint32_t index, BeamLineObject newObject)

@@ -50,6 +50,7 @@ public:
 
 private:
     //Member structs:
+    /* not contiduous in memory, shouldn't be used
     struct Quadric{
         Quadric() : points(16), inMatrix(16), outMatrix(16) {}
         Quadric(std::vector<double> inQuadric, std::vector<double> inputInMatrix, std::vector<double> inputOutMatrix){
@@ -62,6 +63,7 @@ private:
         std::vector<double> inMatrix;
         std::vector<double> outMatrix;
     };
+    */
     struct QueueFamilyIndices
     {
         uint32_t computeFamily;
@@ -92,7 +94,7 @@ private:
     uint32_t queueFamilyIndex;
     uint32_t rayAmount;
     std::vector<Ray> rayVector;
-    std::vector<Quadric> beamline;
+    std::vector<double> beamline;
     QueueFamilyIndices QueueFamily;
     
     //Member functions:
