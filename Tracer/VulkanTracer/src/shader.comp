@@ -40,8 +40,19 @@ layout(std140, binding = 2) buffer qbuf
 *
 * output: reflected Ray with hitpoint as position and reflection as direction
 */
-Ray intersectionPoint(Ray r, double a_11, double a_22, double a_33, double a_12, double a_13, double a_23, double a_14, double a_24,  double a_34,  double a_44, int icurv)
+Ray intersectionPoint(Ray r, dmat4 quadric, int icurv)
 {
+	double a_11 = quadric[0][0];
+	double a_22 = quadric[1][1];
+	double a_33 = quadric[2][2];
+	double a_12 = quadric[0][1];
+	double a_13 = quadric[0][2];
+	double a_23 = quadric[1][2];
+	double a_14 = quadric[0][3];
+	double a_24 = quadric[1][3];
+	double a_34 = quadric[2][3];
+	double a_44 = quadric[3][3];
+	
 	double w = r.weight;
 	int cs = 1;
 	int sign = icurv;
@@ -147,13 +158,29 @@ Ray intersectionPoint(Ray r, double a_11, double a_22, double a_33, double a_12,
 	
 	return outputRay;
 }
+
+/**
+* transforms ray to object coordinate system, traces it and transforms back
+* @param r				ray to trace
+* @param q				quadric surface
+*
+* output: reflected Ray with hitpoint as position and reflection as direction in ray coordinate system
+*/
+Ray traceRay(Ray r, Quadric q) {
+	r.position = dvec3(q.inTrans *  dvec4(r.position,1));
+	r.direction = q.inTrans * r.direction;
+	Ray refl_r = intersectionPoint(r, q.anchorPoints, 1); // sphere with r = 3
+	refl_r.position = dvec3(q.outTrans * dvec4(refl_r.position,1));
+	refl_r.direction = q.outTrans * refl_r.direction;
+	return refl_r;
+}
+
 void iterateQuadrics(){
 	const int numberOfRays = rayData.length();
 	const int numberOfQuadrics = quadricData.length();
-	//Ray temporaryRays[numberOfRays];
 	if(numberOfQuadrics <2){
 		//only one quadric: store directly in output buffer
-		outputData[uint(gl_GlobalInvocationID)] = intersectionPoint(rayData[uint(gl_GlobalInvocationID)], 1.0,1.0,1.0,0.0, 0.0,0.0,0.0,-3.0, 0.0,0.0, 1); // sphere with r = 3
+		outputData[uint(gl_GlobalInvocationID)] = traceRay(rayData[uint(gl_GlobalInvocationID)], quadricData[numberOfQuadrics-1]);
 	}
 	else{
 		//at least 2 quadrics
@@ -161,25 +188,25 @@ void iterateQuadrics(){
 		//for last quadric, read data from temporary storage and write to output buffer
 		//between read and write from/to temporary storage
 
-
 		//quadrics between first and last
 		for(int i=0; i<numberOfQuadrics-1; i++){
 			//first quadric
-			rayData[uint(gl_GlobalInvocationID)] = intersectionPoint(rayData[uint(gl_GlobalInvocationID)], 1.0,1.0,1.0,0.0, 0.0,0.0,0.0,-3.0, 0.0,0.0, 1); // sphere with r = 3
+			rayData[uint(gl_GlobalInvocationID)] = traceRay(rayData[uint(gl_GlobalInvocationID)], quadricData[i]);
 		}
 		//last quadric
-		outputData[uint(gl_GlobalInvocationID)] = intersectionPoint(rayData[uint(gl_GlobalInvocationID)], 1.0,1.0,1.0,0.0, 0.0,0.0,0.0,-3.0, 0.0,0.0, 1); // sphere with r = 3
+		outputData[uint(gl_GlobalInvocationID)] = traceRay(rayData[uint(gl_GlobalInvocationID)], quadricData[numberOfQuadrics-1]);//intersectionPoint(rayData[uint(gl_GlobalInvocationID)], q.anchorPoints, 1); // sphere with r = 3
 	}
 
 }
 
 void main(){
-	//iterateQuadrics();
+	iterateQuadrics();
 	Ray r;
-	r.position = dvec3(quadricData[0].anchorPoints[1]);
-	r.direction = dvec4(quadricData[0].anchorPoints[2]);
+	dmat4 inMat = quadricData[0].inTrans;
+	r.position = dvec3(inMat[0]);
+	r.direction = dvec4(inMat[1]);
 	r.weight = 0;
-    outputData[uint(gl_GlobalInvocationID)] = r;
+    //outputData[uint(gl_GlobalInvocationID)] = r;
 	//outputData[uint(gl_GlobalInvocationID)].position = dvec4(0.0, 20.0, -20.0, 0.0); // starts at (0,20,-20)
 	//outputData[uint(gl_GlobalInvocationID)].direction = dvec4(0.0, -1.0, 1.0, 0.0); // hits the surface in 45 degree angle at (0,0,0) -> the normal should be (0,-1,0)
 	

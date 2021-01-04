@@ -9,7 +9,7 @@ namespace RAY
         for (int i = 0; i < 64; i++)
         {
             m_RayList.emplace_back(new Ray(glm::vec3(0, 20, -20), glm::vec3(0, -1, 1), 1));
-            m_RayList.emplace_back(new Ray(glm::vec3(10, 5, 10), glm::vec3(-1, 1, 1), 1));
+            // m_RayList.emplace_back(new Ray(glm::vec3(10, 5, 10), glm::vec3(-1, 1, 1), 1));
         }
         DEBUG(std::cout << "Creating TracerInterface..." << std::endl);
     }
@@ -31,14 +31,20 @@ namespace RAY
         }
 
         //fill beamline (this is a placeholder)
-        std::vector<double> beamlineObjectPlaceholder{1,2,3,4, 1,2,3,4, 1,2,3,4, 1,2,3,4};
-        for(int i=0; i<128; i++){
-            m_Beamline.addBeamlineObject(beamlineObjectPlaceholder, beamlineObjectPlaceholder, beamlineObjectPlaceholder);
+        // this defines the sphere that was previously hardcoded in the shader. 
+        std::vector<double> sphere{1,0,0,0, 0,1,0,-3, 0,0,1,0, 0,0,0,0};
+        BeamLineObject b = BeamLineObject(sphere, 10, 0, 10, 0);
+        
+        for(int i=0; i<1; i++){
+            m_Beamline.addBeamlineObject(b.getAnchorPoints(), b.getInMatrix(), b.getOutMatrix());
+            // m_Beamline.addBeamlineObject(beamlineObjectPlaceholder, beamlineObjectPlaceholder, beamlineObjectPlaceholder);
         }
 
         //add beamline to tracer
         auto beamLineObjects = m_Beamline.getObjects();
         for(int i = 0; i<beamLineObjects.size(); i++){
+            //for(int j=0; j<beamLineObjects[i].getAnchorPoints().size(); j++)
+            //    std::cout << beamLineObjects[i].getAnchorPoints()[j] << std::endl;
             tracer.addBeamLineObject(beamLineObjects[i].getAnchorPoints(), beamLineObjects[i].getInMatrix(), beamLineObjects[i].getOutMatrix());   
         }
 
