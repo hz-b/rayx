@@ -1,5 +1,6 @@
 #include "BeamlineObject.h"
 #include <cassert>
+#include <cmath>
 
 namespace RAY
 {
