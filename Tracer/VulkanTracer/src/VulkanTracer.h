@@ -50,7 +50,7 @@ public:
 
 private:
     //Member structs:
-    /* not contiduous in memory, shouldn't be used
+    /* not contiguous in memory, shouldn't be used
     struct Quadric{
         Quadric() : points(16), inMatrix(16), outMatrix(16) {}
         Quadric(std::vector<double> inQuadric, std::vector<double> inputInMatrix, std::vector<double> inputOutMatrix){
