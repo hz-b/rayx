@@ -12,6 +12,7 @@ namespace RAY
     {
     public:
         BeamLineObject(std::vector<double> inputPoints, std::vector<double> inputInMatrix, std::vector<double> inputOutMatrix);
+        BeamLineObject(std::vector<double> inputPoints, double alpha, double chi, double beta, double distanceToPreceedingElement);
         std::vector<double> getQuadric();
         void editQuadric(std::vector<double> inputPoints);
         std::vector<double> getAnchorPoints();
