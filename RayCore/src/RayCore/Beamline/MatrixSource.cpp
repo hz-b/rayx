@@ -5,8 +5,6 @@
 namespace RAY
 {
 
-    MatrixSource::MatrixSource(int id, int numberOfRays, char* name) : LightSource(id, numberOfRays, name) {}
-
     // angles given and stored in rad
     MatrixSource::MatrixSource(int id, char* name, int numberOfRays, double sourceWidth, double sourceHeight, double sourceDepth, double horDivergence, double verDivergence) 
     : LightSource(id, numberOfRays, name), m_sourceDepth(sourceDepth), m_sourceHeight(sourceHeight), m_sourceWidth(sourceWidth), m_horDivergence(horDivergence), m_verDivergence(verDivergence) {}
@@ -23,7 +21,7 @@ namespace RAY
     std::vector<Ray *> MatrixSource::getRays() {
         int rmat1 = int(sqrt(this->getNumberOfRays()));
         std::vector<Ray *> rayList;
-        std::cout << "create " << rmat1 << " times " << rmat1 << " Rays with Matrix Source..." << std::endl;
+        std::cout << "create " << rmat1 << " times " << rmat1 << " matrix with Matrix Source..." << std::endl;
         // fill the square with rmat1xrmat1 rays
         for(int row = 0; row<rmat1; row++) {
             for(int col = 0; col<rmat1; col++) {

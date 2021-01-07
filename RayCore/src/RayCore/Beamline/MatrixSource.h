@@ -11,8 +11,7 @@ namespace RAY
         
         MatrixSource(int id, char* name, int numberOfRays, double sourceWidth, double sourceHeight,
     double sourceDepth, double horDivergence, double verDivergence);
-        MatrixSource(int id, int numberOfRays, char* name);
-
+        
         MatrixSource();
         ~MatrixSource();
 
@@ -24,7 +23,6 @@ namespace RAY
         double getHorDivergence();
         
     private:
-        int m_numberOfRays;
         double m_sourceWidth;
         double m_sourceHeight;
         double m_sourceDepth;
