@@ -3,6 +3,7 @@
 #include "Core.h"
 #include "glm.hpp"
 #include "BeamlineObject.h"
+#include "MatrixSource.h"
 
 #include <vector>
 

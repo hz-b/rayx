@@ -1,0 +1,36 @@
+#pragma once
+
+#include "LightSource.h"
+
+namespace RAY
+{
+
+    class RAY_API MatrixSource : public LightSource
+    {
+    public:
+        
+        MatrixSource(int id, char* name, int numberOfRays, double sourceWidth, double sourceHeight,
+    double sourceDepth, double horDivergence, double verDivergence);
+        MatrixSource(int id, int numberOfRays, char* name);
+
+        MatrixSource();
+        ~MatrixSource();
+
+        std::vector<Ray *> getRays();
+        double getSourceDepth();
+        double getSourceHeight();
+        double getSourceWidth();
+        double getVerDivergence();
+        double getHorDivergence();
+        
+    private:
+        int m_numberOfRays;
+        double m_sourceWidth;
+        double m_sourceHeight;
+        double m_sourceDepth;
+        double m_verDivergence;
+        double m_horDivergence;
+        
+    };
+
+} // namespace RAY

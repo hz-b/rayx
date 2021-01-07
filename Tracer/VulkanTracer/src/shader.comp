@@ -201,12 +201,7 @@ void iterateQuadrics(){
 
 void main(){
 	iterateQuadrics();
-	Ray r;
-	dmat4 inMat = quadricData[0].inTrans;
-	r.position = dvec3(inMat[0]);
-	r.direction = dvec4(inMat[1]);
-	r.weight = 0;
-    //outputData[uint(gl_GlobalInvocationID)] = r;
+	//outputData[uint(gl_GlobalInvocationID)] = rayData[uint(gl_GlobalInvocationID)];
 	//outputData[uint(gl_GlobalInvocationID)].position = dvec4(0.0, 20.0, -20.0, 0.0); // starts at (0,20,-20)
 	//outputData[uint(gl_GlobalInvocationID)].direction = dvec4(0.0, -1.0, 1.0, 0.0); // hits the surface in 45 degree angle at (0,0,0) -> the normal should be (0,-1,0)
 	
