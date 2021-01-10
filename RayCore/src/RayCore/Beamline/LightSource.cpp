@@ -6,7 +6,7 @@ namespace RAY
 {
     LightSource::LightSource(int id, int numberOfRays, char* name) : m_id(id), m_numberOfRays(numberOfRays), m_name(name) {}
 
-    char* LightSource::getName() { return m_name; }
+    char* const LightSource::getName() { return m_name; }
     int LightSource::getNumberOfRays() { return m_numberOfRays; }
     void LightSource::setNumberOfRays(int numberOfRays) {m_numberOfRays = numberOfRays; }
     int LightSource::getId() { return m_id; }

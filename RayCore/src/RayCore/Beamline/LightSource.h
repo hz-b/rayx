@@ -16,13 +16,13 @@ namespace RAY
     public:
         
         LightSource(int id, int numberOfRays, char* name);
-        char* getName();
+        char* const getName();
         int getNumberOfRays();
         void setNumberOfRays(int numberOfRays);
         int getId();
         glm::dvec3 getDirectionFromAngles(double phi, double psi);
         // get the rays according to specific light source, has to be implemented in each class that inherits from LightSource
-        virtual std::vector<Ray *> LightSource::getRays() = 0;
+        virtual std::vector<Ray *> getRays() = 0;
 
         LightSource();
         virtual ~LightSource();
