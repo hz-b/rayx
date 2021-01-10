@@ -1,10 +1,6 @@
 #include "BeamlineObject.h"
 #include <cassert>
-<<<<<<< HEAD
-#include <cmath>
-=======
 #include <math.h>
->>>>>>> 8e2dff95cee9e433c5e6383c3034120cf51d75c1
 
 namespace RAY
 {
