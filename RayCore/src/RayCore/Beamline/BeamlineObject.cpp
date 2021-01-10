@@ -1,6 +1,10 @@
 #include "BeamlineObject.h"
 #include <cassert>
+<<<<<<< HEAD
 #include <cmath>
+=======
+#include <math.h>
+>>>>>>> 8e2dff95cee9e433c5e6383c3034120cf51d75c1
 
 namespace RAY
 {
@@ -19,13 +23,13 @@ namespace RAY
     BeamLineObject::BeamLineObject(std::vector<double> inputPoints, double alpha, double chi, double beta, double distanceToPreceedingElement) 
     {
         anchorPoints = inputPoints;
-        double pi = 2*std::acos(0.0); // not exact enough yet
-        double cos_c = std::cos(chi * pi/180);
-        double sin_c = std::sin(chi * pi/180);
-        double cos_a = std::cos(alpha * pi/180);
-        double sin_a = std::sin(alpha * pi/180);
-        double sin_b = std::sin(beta * pi/180);
-        double cos_b = std::cos(beta * pi/180);
+        double pi = 3.14159265358979323; // DEFAULT wo?
+        double cos_c = cos(chi * pi/180);
+        double sin_c = sin(chi * pi/180);
+        double cos_a = cos(alpha * pi/180);
+        double sin_a = sin(alpha * pi/180);
+        double sin_b = sin(beta * pi/180);
+        double cos_b = cos(beta * pi/180);
         // transposes of the actual matrices since they seem to be transposed in the process of transferring to the shader
         inMatrix = {cos_c, -sin_c*cos_a, -sin_c*sin_a, 0,
                 sin_c, cos_c*cos_a, sin_a*cos_c, 0,

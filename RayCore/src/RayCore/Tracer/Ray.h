@@ -9,10 +9,10 @@ namespace RAY
     class RAY_API Ray
     {
     public:
-        Ray(glm::vec3 position, glm::vec3 direction, double weight);
+        Ray(glm::dvec3 position, glm::dvec3 direction, double weight);
         ~Ray();
-        glm::vec3 m_position;
-        glm::vec3 m_direction;
+        glm::dvec3 m_position;
+        glm::dvec3 m_direction;
         double m_weight;
 
     private:

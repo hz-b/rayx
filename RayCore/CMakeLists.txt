@@ -5,6 +5,8 @@ SET(SOURCE
     src/RayCore/Application.cpp
     src/RayCore/BeamLine/BeamLine.cpp
     src/RayCore/BeamLine/BeamLineObject.cpp
+    src/RayCore/BeamLine/LightSource.cpp
+    src/RayCore/BeamLine/MatrixSource.cpp
     src/RayCore/Tracer/Ray.cpp
     src/RayCore/Tracer/TracerInterface.cpp
 )
@@ -14,6 +16,8 @@ SET(HEADERS
     src/RayCore/Debug.h
     src/RayCore/BeamLine/BeamLine.h
     src/RayCore/BeamLine/BeamLineObject.h
+    src/RayCore/BeamLine/LightSource.h
+    src/RayCore/BeamLine/MatrixSource.h
     src/RayCore/Tracer/Ray.h
     src/RayCore/Tracer/TracerInterface.h
 )
