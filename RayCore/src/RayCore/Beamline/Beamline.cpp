@@ -25,18 +25,18 @@ namespace RAY
         m_Objects.push_back(newObject);
     }
     */
-    void Beamline::addBeamlineObject(std::vector<double> inputPoints, std::vector<double> inputInMatrix, std::vector<double> inputOutMatrix)
+    void Beamline::addQuadric(std::vector<double> inputPoints, std::vector<double> inputInMatrix, std::vector<double> inputOutMatrix)
     {
         m_Objects.emplace_back(inputPoints, inputInMatrix, inputOutMatrix);
     }
 
-    void Beamline::replaceNthObject(uint32_t index, BeamLineObject newObject)
+    void Beamline::replaceNthObject(uint32_t index, Quadric newObject)
     {
         assert(m_Objects.size() >= index);
         m_Objects[index] = newObject;
     }
 
-    std::vector<BeamLineObject> Beamline::getObjects()
+    std::vector<Quadric> Beamline::getObjects()
     {
         return m_Objects;
     }

@@ -45,7 +45,7 @@ namespace RAY
         //fill beamline (this is a placeholder)
         // this defines the sphere that was previously hardcoded in the shader. 
         std::vector<double> sphere{1,0,0,0, 0,1,0,-3, 0,0,1,0, 0,0,0,0};
-        BeamLineObject b = BeamLineObject(sphere, 10, 5, 10, 0);
+        BeamlineObject b = BeamlineObject(sphere, 10, 5, 10, 0);
         
         for(int i=0; i<1; i++){
             m_Beamline.addBeamlineObject(b.getAnchorPoints(), b.getInMatrix(), b.getOutMatrix());
