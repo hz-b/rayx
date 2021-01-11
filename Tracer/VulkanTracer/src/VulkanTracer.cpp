@@ -765,7 +765,7 @@ void VulkanTracer::addRay(double xpos, double ypos, double zpos, double xdir, do
 }
 
 //adds quad to beamline
-void VulkanTracer::addBeamLineObject(std::vector<double> inQuadric, std::vector<double> inputInMatrix, std::vector<double> inputOutMatrix){
+void VulkanTracer::addQuadric(std::vector<double> inQuadric, std::vector<double> inputInMatrix, std::vector<double> inputOutMatrix){
 	assert(inQuadric.size() == 16 && inputInMatrix.size() == 16 && inputOutMatrix.size() == 16);
 	//beamline.resize(beamline.size()+1);
 	beamline.insert(beamline.end(), inQuadric.begin(), inQuadric.end());

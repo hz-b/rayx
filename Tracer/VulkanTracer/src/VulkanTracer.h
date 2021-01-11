@@ -44,7 +44,7 @@ public:
     ~VulkanTracer();
     void run();
     void addRay(double xpos, double ypos, double zpos, double xdir, double ydir, double zdir, double weight);
-    void addBeamLineObject(std::vector<double> inQuadric, std::vector<double> inputInMatrix, std::vector<double> inputOutMatrix);
+    void addQuadric(std::vector<double> inQuadric, std::vector<double> inputInMatrix, std::vector<double> inputOutMatrix);
     std::vector<double> getRays();
     void cleanup();
 

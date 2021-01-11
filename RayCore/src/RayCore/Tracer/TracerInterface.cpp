@@ -45,19 +45,19 @@ namespace RAY
         //fill beamline (this is a placeholder)
         // this defines the sphere that was previously hardcoded in the shader. 
         std::vector<double> sphere{1,0,0,0, 0,1,0,-3, 0,0,1,0, 0,0,0,0};
-        BeamlineObject b = BeamlineObject(sphere, 10, 5, 10, 0);
+        Quadric b = Quadric(sphere, 10, 5, 10, 0);
         
         for(int i=0; i<1; i++){
-            m_Beamline.addBeamlineObject(b.getAnchorPoints(), b.getInMatrix(), b.getOutMatrix());
-            // m_Beamline.addBeamlineObject(beamlineObjectPlaceholder, beamlineObjectPlaceholder, beamlineObjectPlaceholder);
+            m_Beamline.addQuadric(b.getAnchorPoints(), b.getInMatrix(), b.getOutMatrix());
+            // m_Beamline.addQuadric(QuadricPlaceholder, QuadricPlaceholder, QuadricPlaceholder);
         }
 
         //add beamline to tracer
-        auto beamLineObjects = m_Beamline.getObjects();
-        for(int i = 0; i<beamLineObjects.size(); i++){
-            //for(int j=0; j<beamLineObjects[i].getAnchorPoints().size(); j++)
-            //    std::cout << beamLineObjects[i].getAnchorPoints()[j] << std::endl;
-            tracer.addBeamLineObject(beamLineObjects[i].getAnchorPoints(), beamLineObjects[i].getInMatrix(), beamLineObjects[i].getOutMatrix());   
+        auto Quadrics = m_Beamline.getObjects();
+        for(int i = 0; i<Quadrics.size(); i++){
+            //for(int j=0; j<Quadrics[i].getAnchorPoints().size(); j++)
+            //    std::cout << Quadrics[i].getAnchorPoints()[j] << std::endl;
+            tracer.addQuadric(Quadrics[i].getAnchorPoints(), Quadrics[i].getInMatrix(), Quadrics[i].getOutMatrix());   
         }
 
         //run tracer

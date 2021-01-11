@@ -10,7 +10,7 @@ namespace RAY
     {
         DEBUG(std::cout << "Creating Beamline..." << std::endl);
         //std::vector<double> temp(16, 1);
-        //BeamLineObject firstQuadric(temp);
+        //Quadric firstQuadric(temp);
         //m_objects.push_back(firstQuadric);
     }
 
@@ -20,7 +20,7 @@ namespace RAY
     }
 
     /* Somehow results in wrong values. Should be fixed later
-    void Beamline::addBeamlineObject(BeamLineObject newObject)
+    void Beamline::addQuadric(Quadric newObject)
     {
         m_Objects.push_back(newObject);
     }

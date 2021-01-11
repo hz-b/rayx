@@ -7,6 +7,7 @@
 #include <stdexcept>
 #include <cmath>
 #include "Tracer/Ray.h"
+#include <string>
 
 namespace RAY
 {
@@ -15,8 +16,8 @@ namespace RAY
     {
     public:
         
-        LightSource(int id, int numberOfRays, char* name);
-        char* const getName();
+        LightSource(int id, int numberOfRays, const char* name);
+        const char* getName();
         int getNumberOfRays();
         void setNumberOfRays(int numberOfRays);
         int getId();
@@ -28,7 +29,7 @@ namespace RAY
         virtual ~LightSource();
 
     private:
-        char* m_name;
+        const char* m_name;
         int m_numberOfRays;
         int m_id;
         // std::vector<Ray *> m_rayList; ?
