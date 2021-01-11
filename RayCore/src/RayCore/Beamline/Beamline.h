@@ -2,7 +2,7 @@
 
 #include "Core.h"
 #include "glm.hpp"
-#include "BeamlineObject.h"
+#include "Quadric.h"
 #include "MatrixSource.h"
 
 #include <vector>
@@ -18,14 +18,14 @@ namespace RAY
         ~Beamline();
 
         //Somehow results in wrong values. Should be fixed later
-        //void addBeamlineObject(BeamLineObject newObject);
+        //void addQuadric(Quadric newObject);
         
-        void addBeamlineObject(std::vector<double> inputPoints, std::vector<double> inputInMatrix, std::vector<double> inputOutMatrix);
-        void replaceNthObject(uint32_t index, BeamLineObject newObject);
-        std::vector<BeamLineObject> getObjects();
+        void addQuadric(std::vector<double> inputPoints, std::vector<double> inputInMatrix, std::vector<double> inputOutMatrix);
+        void replaceNthObject(uint32_t index, Quadric newObject);
+        std::vector<Quadric> getObjects();
 
     private:
-        std::vector<BeamLineObject> m_Objects;
+        std::vector<Quadric> m_Objects;
     };
 
 } // namespace RAY
