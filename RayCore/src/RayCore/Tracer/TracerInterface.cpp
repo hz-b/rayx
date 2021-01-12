@@ -1,6 +1,7 @@
 #include "Debug.h"
 #include "TracerInterface.h"
 #include "VulkanTracer.h"
+#include <fstream>
 
 namespace RAY
 {
@@ -31,15 +32,18 @@ namespace RAY
 
         //add source to tracer
         //initialize matrix light source
-        MatrixSource m = MatrixSource(0, "Matrix source 1", 20, 0.65, 0.4, 0.0, 0.01, 0.02);
+        MatrixSource m = MatrixSource(0, "Matrix source 1", 20000, 0.65, 0.4, 0.0, 0.01, 0.02);
         std::cout << m.getName() << " with " << m.getNumberOfRays() << " Rays." << std::endl;std::cout.precision(15); // show 16 decimals
 
         addLightSource(&m);
+        generateRays();
+
         // same rays as with old RAY-UI
+        /*
         for(int i = 0; i<m.getNumberOfRays(); i++) {
             std::cout << "weight: " << m_RayList[i]->m_weight << " pos: (" << m_RayList[i]->m_position[0] << "," << m_RayList[i]->m_position[1] << "," << m_RayList[i]->m_position[2] << ") dir: (" << m_RayList[i]->m_direction[0] << "," << m_RayList[i]->m_direction[1] << "," << m_RayList[i]->m_direction[2]  << ")" << std::endl;
         }
-
+        */
         //add rays to tracer
         for (int i = 0; i < m_RayList.size(); i++)
         {
@@ -70,14 +74,24 @@ namespace RAY
 
         //get rays from tracer
         std::vector<double> outputRays = tracer.getRays();
-        for (int i = 0; i < 32; i++)
-        {
-            std::cout << "output: " << outputRays[i] << std::endl;
-        }
         std::cout << "read data succeeded" << std::endl;
+        std::cout << "writing to file..." << std::endl;
+        writeToFile(outputRays);
+        std::cout << "done!" << std::endl;
 
         //clean up tracer to avoid memory leaks
         tracer.cleanup();
         return true;
+    }
+
+    void TracerInterface::writeToFile(std::vector<double> outputRays){
+        std::ofstream outputFile;
+        outputFile.open("../../output/output.csv");
+        outputFile << "Index,X,Y,Z,Weight" << std::endl;
+        for (int i=0; i<outputRays.size(); i+=4){
+            outputFile << i/4 << "," << outputRays[i] << "," << outputRays[i+1] << "," << outputRays[i+2] << "," << outputRays[i+3] << std::endl;
+
+        }
+        outputFile.close();
     }
 } // namespace RAY

@@ -16,6 +16,7 @@ namespace RAY
         ~TracerInterface();
         void addLightSource(LightSource* newSource);
         void generateRays();
+        void writeToFile(std::vector<double> outputRays);
 
         bool run();
 
