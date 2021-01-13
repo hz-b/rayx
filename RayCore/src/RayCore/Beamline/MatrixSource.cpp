@@ -1,6 +1,7 @@
 #include "MatrixSource.h"
 #include <cassert>
 #include <cmath>
+#include <random>
 
 namespace RAY
 {
@@ -14,18 +15,23 @@ namespace RAY
     }
 
     /**
-     * creates floor(sqrt(numberOfRays)) **2 rays (a grid with as many rows as columns, eg amountOfRays=20 -> 4*4=16 rays)
+     * creates floor(sqrt(numberOfRays)) **2 rays (a grid with as many rows as columns, eg amountOfRays=20 -> 4*4=16, rest (4 rays) same as first 4)
      * distributed evenly across width & height of source 
      * returns list of rays
      */
     std::vector<Ray *> MatrixSource::getRays() {
+        double lower_bound = 0;
+        double upper_bound = 1;
+        std::uniform_real_distribution<double> unif(lower_bound,upper_bound);
+        std::default_random_engine re;
+        
         int rmat1 = int(sqrt(this->getNumberOfRays()));
         std::vector<Ray *> rayList;
         std::cout << "create " << rmat1 << " times " << rmat1 << " matrix with Matrix Source..." << std::endl;
         // fill the square with rmat1xrmat1 rays
         for(int row = 0; row<rmat1; row++) {
             for(int col = 0; col<rmat1; col++) {
-                double rn = 0.5; // random in [0,1]
+                double rn = unif(re); // uniform random in [0,1)
                 double x = -0.5*m_sourceWidth + (m_sourceWidth/(rmat1-1)) * row;
                 double y = -0.5*m_sourceHeight + (m_sourceHeight/(rmat1-1)) * col;
                 double z = (rn - 0.5) * m_sourceDepth;
@@ -41,7 +47,10 @@ namespace RAY
         }
         // afterwards start from the beginning again
         for(int i = 0; i<this->getNumberOfRays()-rmat1*rmat1; i++) {
-            rayList.emplace_back(rayList.at(i));
+            Ray* r = rayList.at(i);
+            glm::dvec3 position = glm::dvec3(r->m_position[0],r->m_position[1],r->m_position[2]);
+            glm::dvec3 direction = glm::dvec3(r->m_direction[0],r->m_direction[1],r->m_direction[2]);
+            rayList.emplace_back(new Ray(position,direction,1.0));
         }
         return rayList;
     }
