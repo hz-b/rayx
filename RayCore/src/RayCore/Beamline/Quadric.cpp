@@ -14,7 +14,8 @@ namespace RAY
     }
 
     /**
-     * defince transformation matrices based on grazing incidence (alpha) and exit (beta) angle, azimuthal angle (chi) and distance to preceeding element
+     * angles given in degree
+     * define transformation matrices based on grazing incidence (alpha) and exit (beta) angle, azimuthal angle (chi) and distance to preceeding element
     */
     Quadric::Quadric(std::vector<double> inputPoints, double alpha, double chi, double beta, double distanceToPreceedingElement) 
     {
@@ -35,14 +36,38 @@ namespace RAY
                 -sin_c*cos_b,cos_c*cos_b,  sin_b, 0,
                 sin_c*sin_b, -cos_c*sin_b, cos_b, 0,
                 0, 0, 0, 1};
-        //inMatrix = {cos_c, sin_c, 0, 0,
-        //    -sin_c*cos_a, cos_c*cos_a, -sin_a, distanceToPreceedingElement*sin_a,
-        //    -sin_c*sin_a, sin_a*cos_c, cos_a, -distanceToPreceedingElement*cos_a,
-        //    0,0,0,1};
-        //outMatrix = {cos_c, -sin_c*cos_b, sin_c*sin_b, 0,
-        //    sin_c, cos_c*cos_b,-cos_c*sin_b, 0,
-        //    0,sin_b, cos_b, 0, 
-        //    0, 0, 0, 1};
+        /*inMatrix = {cos_c, sin_c, 0, 0,
+            -sin_c*cos_a, cos_c*cos_a, -sin_a, distanceToPreceedingElement*sin_a,
+            -sin_c*sin_a, sin_a*cos_c, cos_a, -distanceToPreceedingElement*cos_a,
+            0,0,0,1};
+        outMatrix = {cos_c, -sin_c*cos_b, sin_c*sin_b, 0,
+            sin_c, cos_c*cos_b,-cos_c*sin_b, 0,
+            0,sin_b, cos_b, 0, 
+            0, 0, 0, 1};*/
+    }
+
+    /**
+     * set misalignment of optical element: dx, dy, dz, dphi, psi, dchi
+     * angles given in rad 
+     *  @params: vector with 6 values
+     * 
+     * we can calculate the misalignment with a matrix multiplication in the shader
+     * -> store the matrix derived from the 6 input values in m_misalignmentMatrix
+     */
+    void Quadric::setMisalignment(std::vector<double> misalignment) {
+        double dx = misalignment[0];
+        double dy = misalignment[1];
+        double dz = misalignment[2];
+        double dchi = misalignment[3]; // rotation around z-axis
+        double dphi = misalignment[4]; // rotation around y-axis
+        double dpsi = -misalignment[5]; // rotation around x-axis (has to be negative)
+        
+        m_misalignmentParams = misalignment;
+        // transpose
+        m_misalignmentMatrix = {cos(dphi)*cos(dchi), -cos(dpsi)*sin(dchi)-sin(dpsi)*sin(dphi)*cos(dchi), -sin(dpsi)*sin(dchi)+cos(dpsi)*sin(dphi)*sin(dchi), 0,
+                                sin(dchi)*cos(dphi), cos(dpsi)*cos(dchi)-sin(dpsi)*sin(dphi)*sin(dchi), sin(dpsi)*cos(dchi)+cos(dpsi)*sin(dphi)*sin(dchi), 0,
+                                -sin(dphi), -sin(dpsi)*cos(dphi), cos(dpsi)*cos(dphi), 0,
+                                -dx, -dy, -dz, 1};
     }
 
     Quadric::~Quadric()

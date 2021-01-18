@@ -32,28 +32,24 @@ namespace RAY
 
         //add source to tracer
         //initialize matrix light source
-        MatrixSource m = MatrixSource(0, "Matrix source 1", 20000, 0.65, 0.4, 0.0, 0.01, 0.02);
+        MatrixSource m = MatrixSource(0, "Matrix source 1", 20, 0.065, 0.04, 0.0, 0.001, 0.001);
         std::cout << m.getName() << " with " << m.getNumberOfRays() << " Rays." << std::endl;std::cout.precision(15); // show 16 decimals
 
         addLightSource(&m);
         generateRays();
 
-        // same rays as with old RAY-UI
-        /*
-        for(int i = 0; i<m.getNumberOfRays(); i++) {
-            std::cout << "weight: " << m_RayList[i]->m_weight << " pos: (" << m_RayList[i]->m_position[0] << "," << m_RayList[i]->m_position[1] << "," << m_RayList[i]->m_position[2] << ") dir: (" << m_RayList[i]->m_direction[0] << "," << m_RayList[i]->m_direction[1] << "," << m_RayList[i]->m_direction[2]  << ")" << std::endl;
-        }
-        */
         //add rays to tracer
         for (int i = 0; i < m_RayList.size(); i++)
         {
             tracer.addRay(m_RayList[i]->m_position.x, m_RayList[i]->m_position.y, m_RayList[i]->m_position.z, m_RayList[i]->m_direction.x, m_RayList[i]->m_direction.y, m_RayList[i]->m_direction.z, 1);
         }
 
-        //fill beamline (this is a placeholder)
+        // simple plane
+        std::vector<double> plane{0,0,0,0, 0,0,0,-1, 0,0,0,0, 0,0,0,0};
         // this defines the sphere that was previously hardcoded in the shader. 
         std::vector<double> sphere{1,0,0,0, 0,1,0,-3, 0,0,1,0, 0,0,0,0};
-        Quadric b = Quadric(sphere, 10, 5, 10, 0);
+        // Quadric b = Quadric(sphere, 0, 0, 0, 10000);
+        Quadric b = Quadric(plane, 10, 0, 10, 10000);
         
         for(int i=0; i<1; i++){
             m_Beamline.addQuadric(b.getAnchorPoints(), b.getInMatrix(), b.getOutMatrix());
@@ -63,8 +59,6 @@ namespace RAY
         //add beamline to tracer
         auto Quadrics = m_Beamline.getObjects();
         for(int i = 0; i<Quadrics.size(); i++){
-            //for(int j=0; j<Quadrics[i].getAnchorPoints().size(); j++)
-            //    std::cout << Quadrics[i].getAnchorPoints()[j] << std::endl;
             tracer.addQuadric(Quadrics[i].getAnchorPoints(), Quadrics[i].getInMatrix(), Quadrics[i].getOutMatrix());   
         }
 
@@ -86,6 +80,7 @@ namespace RAY
 
     void TracerInterface::writeToFile(std::vector<double> outputRays){
         std::ofstream outputFile;
+        outputFile.precision(16);
         outputFile.open("../../output/output.csv");
         outputFile << "Index,X,Y,Z,Weight" << std::endl;
         for (int i=0; i<outputRays.size(); i+=4){

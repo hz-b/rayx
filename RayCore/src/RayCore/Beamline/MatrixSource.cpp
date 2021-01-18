@@ -25,20 +25,20 @@ namespace RAY
         std::uniform_real_distribution<double> unif(lower_bound,upper_bound);
         std::default_random_engine re;
         
-        int rmat1 = int(sqrt(this->getNumberOfRays()));
+        int rmat = int(sqrt(this->getNumberOfRays()));
         std::vector<Ray *> rayList;
-        std::cout << "create " << rmat1 << " times " << rmat1 << " matrix with Matrix Source..." << std::endl;
+        std::cout << "create " << rmat << " times " << rmat << " matrix with Matrix Source..." << std::endl;
         // fill the square with rmat1xrmat1 rays
-        for(int row = 0; row<rmat1; row++) {
-            for(int col = 0; col<rmat1; col++) {
+        for(int col = 0; col<rmat; col++) {
+            for(int row = 0; row<rmat; row++) {
                 double rn = unif(re); // uniform random in [0,1)
-                double x = -0.5*m_sourceWidth + (m_sourceWidth/(rmat1-1)) * row;
-                double y = -0.5*m_sourceHeight + (m_sourceHeight/(rmat1-1)) * col;
+                double x = -0.5*m_sourceWidth + (m_sourceWidth/(rmat-1)) * row;
+                double y = -0.5*m_sourceHeight + (m_sourceHeight/(rmat-1)) * col;
                 double z = (rn - 0.5) * m_sourceDepth;
                 glm::dvec3 position = glm::dvec3(x, y, z);
                 
-                double phi = -0.5*m_horDivergence + (m_horDivergence/(rmat1-1)) * row;
-                double psi = -0.5*m_verDivergence + (m_verDivergence/(rmat1-1)) * col;
+                double phi = -0.5*m_horDivergence + (m_horDivergence/(rmat-1)) * row;
+                double psi = -0.5*m_verDivergence + (m_verDivergence/(rmat-1)) * col;
                 glm::dvec3 direction = getDirectionFromAngles(phi,psi);
 
                 Ray* r = new Ray(position, direction, 1.0);
@@ -46,7 +46,7 @@ namespace RAY
             }
         }
         // afterwards start from the beginning again
-        for(int i = 0; i<this->getNumberOfRays()-rmat1*rmat1; i++) {
+        for(int i = 0; i<this->getNumberOfRays()-rmat*rmat; i++) {
             Ray* r = rayList.at(i);
             glm::dvec3 position = glm::dvec3(r->m_position[0],r->m_position[1],r->m_position[2]);
             glm::dvec3 direction = glm::dvec3(r->m_direction[0],r->m_direction[1],r->m_direction[2]);

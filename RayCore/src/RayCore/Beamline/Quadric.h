@@ -13,11 +13,14 @@ namespace RAY {
             void setOutMatrix(std::vector<double> inputMatrix);
             std::vector<double> getInMatrix();
             std::vector<double> getOutMatrix();
+            void setMisalignment(std::vector<double> misalignment);
 
             Quadric();
             ~Quadric();
         private:
             std::vector<double> anchorPoints;
+            std::vector<double> m_misalignmentParams;
+            std::vector<double> m_misalignmentMatrix;
             std::vector<double> inMatrix;
             std::vector<double> outMatrix;
     };
