@@ -87,9 +87,9 @@ namespace RAY
     void TracerInterface::writeToFile(std::vector<double> outputRays){
         std::ofstream outputFile;
         outputFile.open("../../output/output.csv");
-        outputFile << "Index,X,Y,Z,Weight" << std::endl;
-        for (int i=0; i<outputRays.size(); i+=4){
-            outputFile << i/4 << "," << outputRays[i] << "," << outputRays[i+1] << "," << outputRays[i+2] << "," << outputRays[i+3] << std::endl;
+        outputFile << "Index,Xloc,Yloc,Zloc,Weight, Xdir, Ydir, Zdir" << std::endl;
+        for (int i=0; i<outputRays.size(); i+=8){
+            outputFile << i/4 << "," << outputRays[i] << "," << outputRays[i+1] << "," << outputRays[i+2] << "," << outputRays[i+3] << outputRays[i+4] << "," << outputRays[i+5] << "," << outputRays[i+6] << "," << outputRays[i+7] << std::endl;
 
         }
         outputFile.close();
