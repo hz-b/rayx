@@ -53,6 +53,11 @@ Ray intersectionPoint(Ray r, dmat4 quadric, int icurv)
 	double a_34 = quadric[2][3];
 	double a_44 = quadric[3][3];
 	
+	Ray outputR;
+	outputR.position = r.position;
+	outputR.direction =  dvec4(a_11,a_22,a_33,a_24);
+	outputR.weight = 0;
+
 	double w = r.weight;
 	int cs = 1;
 	int sign = icurv;
@@ -131,19 +136,19 @@ Ray intersectionPoint(Ray r, dmat4 quadric, int icurv)
 		double a = a_33 + 2*a_13*aln + a_11*aln*aln + 2*a_23*amn + 2*a_12*aln*amn + a_22*amn*amn;
         double b = a_34 + a_14*aln + a_24*amn + (a_13 + a_11*aln + a_12*amn)*x + (a_23 + a_12*aln + a_22*amn)*y;
         double c = a_44 + a_11*x*x + 2*a_24*y + a_22*y*y + x*(2*a_14 + 2*a_12*y);
-	
+		
 		double bbac = b*b - a*c;
 		if (bbac < 0) {
 			w = 0.0;
 			z = -y / amn;
 		}else{
-			if (abs(a) > pow(float(abs(c)*10), float(-10))) {
+			if (abs(a) > abs(c)*pow(10, double(-10))) {
 				z = (-b + sign*sqrt(bbac)) / a;
 			}else{
-				z = (-c/2)/b;
+				z = (-c/b)/2; // b & 2 switched compared to other 2 cases
 			}
 		}
-		x = x + amn*z;
+		x = x + aln*z;
 		y = y + amn*z;
 	}
 	
@@ -151,6 +156,7 @@ Ray intersectionPoint(Ray r, dmat4 quadric, int icurv)
 	double fy = 2*a_24 + 2*a_12*x + 2*a_22*y + 2*a_23*z;
     double fz = 2*a_34 + 2*a_13*x + 2*a_23*y + 2*a_33*z;
 	Ray outputRay;
+	
 	dvec3 normal = normalize(dvec3(fx,fy,fz));
 	outputRay.position = dvec3(x,y,z); // new position = intersection point
 	outputRay.weight = w; // unchanged, if ray did not miss surface, else 0
@@ -168,8 +174,8 @@ Ray intersectionPoint(Ray r, dmat4 quadric, int icurv)
 */
 Ray traceRay(Ray r, Quadric q) {
 	r.position = dvec3(q.inTrans *  dvec4(r.position,1));
-	r.direction = q.inTrans * r.direction;
-	Ray refl_r = intersectionPoint(r, q.anchorPoints, 1); // sphere with r = 3
+	r.direction = dvec4(q.inTrans * r.direction);
+	Ray refl_r = intersectionPoint(r, q.anchorPoints, 1);
 	refl_r.position = dvec3(q.outTrans * dvec4(refl_r.position,1));
 	refl_r.direction = q.outTrans * refl_r.direction;
 	return refl_r;
@@ -201,8 +207,8 @@ void iterateQuadrics(){
 
 void main(){
 	iterateQuadrics();
-	//outputData[uint(gl_GlobalInvocationID)] = rayData[uint(gl_GlobalInvocationID)];
-	//outputData[uint(gl_GlobalInvocationID)].position = dvec4(0.0, 20.0, -20.0, 0.0); // starts at (0,20,-20)
-	//outputData[uint(gl_GlobalInvocationID)].direction = dvec4(0.0, -1.0, 1.0, 0.0); // hits the surface in 45 degree angle at (0,0,0) -> the normal should be (0,-1,0)
+	// outputData[uint(gl_GlobalInvocationID)] = rayData[uint(gl_GlobalInvocationID)];
+	// outputData[uint(gl_GlobalInvocationID)].position = rayData[uint(gl_GlobalInvocationID)].position; // starts at (0,20,-20)
+	// outputData[uint(gl_GlobalInvocationID)].direction = dvec4(0.0, 0.0, 0.0, 0.0); // hits the surface in 45 degree angle at (0,0,0) -> the normal should be (0,-1,0)
 	
 }
