@@ -25,9 +25,9 @@ namespace RAY
         m_Objects.push_back(newObject);
     }
     */
-    void Beamline::addQuadric(std::vector<double> inputPoints, std::vector<double> inputInMatrix, std::vector<double> inputOutMatrix)
+    void Beamline::addQuadric(std::vector<double> inputPoints, std::vector<double> inputInMatrix, std::vector<double> inputOutMatrix, std::vector<double> misalignmentMatrix)
     {
-        m_Objects.emplace_back(inputPoints, inputInMatrix, inputOutMatrix);
+        m_Objects.emplace_back(inputPoints, inputInMatrix, inputOutMatrix, misalignmentMatrix);
     }
 
     void Beamline::replaceNthObject(uint32_t index, Quadric newObject)

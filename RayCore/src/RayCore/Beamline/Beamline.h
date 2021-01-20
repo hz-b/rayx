@@ -2,7 +2,7 @@
 
 #include "Core.h"
 #include "glm.hpp"
-#include "Quadric.h"
+#include "PlaneMirror.h"
 #include "MatrixSource.h"
 
 #include <vector>
@@ -20,7 +20,7 @@ namespace RAY
         //Somehow results in wrong values. Should be fixed later
         //void addQuadric(Quadric newObject);
         
-        void addQuadric(std::vector<double> inputPoints, std::vector<double> inputInMatrix, std::vector<double> inputOutMatrix);
+        void addQuadric(std::vector<double> inputPoints, std::vector<double> inputInMatrix, std::vector<double> inputOutMatrix, std::vector<double> misalignmentMatrix);
         void replaceNthObject(uint32_t index, Quadric newObject);
         std::vector<Quadric> getObjects();
 
