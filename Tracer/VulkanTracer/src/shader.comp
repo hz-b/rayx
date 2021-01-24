@@ -204,7 +204,11 @@ void iterateQuadrics(){
 	}
 
 }
-
+/*
+void cameraPlaneIntersection(outputData, cameraPlane){
+	//todo
+}
+*/
 void main(){
 	iterateQuadrics();
 	// outputData[uint(gl_GlobalInvocationID)] = rayData[uint(gl_GlobalInvocationID)];

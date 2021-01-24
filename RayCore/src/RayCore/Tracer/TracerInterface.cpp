@@ -2,6 +2,7 @@
 #include "TracerInterface.h"
 #include "VulkanTracer.h"
 #include <fstream>
+#include <sstream>
 
 namespace RAY
 {
@@ -29,7 +30,8 @@ namespace RAY
     {
         //create tracer instance
         VulkanTracer tracer;
-
+        void* pointerToRays;
+        readFromFile("../../io/input.csv", RayType, pointerToRays);
         //add source to tracer
         //initialize matrix light source
         MatrixSource m = MatrixSource(0, "Matrix source 1", 20, 0.065, 0.04, 0.0, 0.001, 0.001);
@@ -78,15 +80,63 @@ namespace RAY
         return true;
     }
 
-    void TracerInterface::writeToFile(std::vector<double> outputRays){
+    //writes rays to file
+    void TracerInterface::writeToFile(std::vector<double> outputRays)
+    {
         std::ofstream outputFile;
         outputFile.precision(16);
-        outputFile.open("../../output/output.csv");
+        outputFile.open("../../io/output.csv");
         outputFile << "Index,Xloc,Yloc,Zloc,Weight, Xdir, Ydir, Zdir" << std::endl;
         for (int i=0; i<outputRays.size(); i+=8){
-            outputFile << i/4 << "," << outputRays[i] << "," << outputRays[i+1] << "," << outputRays[i+2] << "," << outputRays[i+3] << outputRays[i+4] << "," << outputRays[i+5] << "," << outputRays[i+6] << "," << outputRays[i+7] << std::endl;
+            outputFile << i/VULKANTRACER_RAY_DOUBLE_AMOUNT << "," << outputRays[i] << "," << outputRays[i+1] << "," << outputRays[i+2] << "," << outputRays[i+3] << outputRays[i+4] << "," << outputRays[i+5] << "," << outputRays[i+6] << "," << outputRays[i+7] << std::endl;
 
         }
         outputFile.close();
     }
-} // namespace RAY
+    //reads from file. datatype (RayType, QuadricType) needs to be set
+    //pretty ugly, should be rewritten later
+    void TracerInterface::readFromFile(std::string path, m_dataType dataType, void* data)
+    {
+        std::ifstream inputFile;
+        inputFile.open(path);
+        switch(1){
+            case TracerInterface::RayType: {
+                std::vector<Ray *> newRayList;
+                std::string line;
+                std::getline(inputFile, line);
+                std::cout<<line<<std::endl;
+                while(!inputFile.eof()){
+                    std::getline(inputFile, line);
+                    int i=0;
+                    char currentNumber[128];
+                    Ray newRay(glm::dvec3(0,0,0),glm::dvec3(0,0,0),0);
+                    std::vector<double> newDoubles;
+                    for(int k=0; k<VULKANTRACER_RAY_DOUBLE_AMOUNT; k++){
+                        int j=0;
+                        while((line[i] != ',') && (line[i] != '\n')){
+                            currentNumber[j] = line[i];
+                            j++;
+                            i++;
+                        }
+                        newDoubles.emplace_back(std::stoi(currentNumber));
+                    }
+                    newRay.m_position.x = newDoubles[1];
+                    newRay.m_position.y = newDoubles[2];
+                    newRay.m_position.z = newDoubles[3];
+                    newRay.m_weight = newDoubles[4];
+                    newRay.m_direction.x = newDoubles[5];
+                    newRay.m_direction.y = newDoubles[6];
+                    newRay.m_direction.z = newDoubles[7];
+                    newRayList.push_back(&newRay);
+
+                }
+            }
+            case TracerInterface::QuadricType:{
+                int i=1;
+            }
+        }
+
+    } 
+
+}    
+    // namespace RAY

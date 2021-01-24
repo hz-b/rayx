@@ -50,8 +50,8 @@ void VulkanTracer::run()
 	//generateRays();
 	//the sizes of the input and output buffers are set. The buffers need to be the size rayamount * 8* the size of a double
 	//(a ray consists of 6 values in double precision, x,y,z for the position and x*, y*, z* for the direction. 8 values instead of 6 are used, because the shader size of the buffer needs to be multiples of 16 bit)
-	bufferSizes[0] = (uint64_t)rayAmount * RAY_DOUBLE_AMOUNT * sizeof(double);
-	bufferSizes[1] = (uint64_t)rayAmount * RAY_DOUBLE_AMOUNT * sizeof(double);
+	bufferSizes[0] = (uint64_t)rayAmount * VULKANTRACER_RAY_DOUBLE_AMOUNT * sizeof(double);
+	bufferSizes[1] = (uint64_t)rayAmount * VULKANTRACER_RAY_DOUBLE_AMOUNT * sizeof(double);
 	bufferSizes[2] = beamline.size() * sizeof(double);
 	for (int i = 0; i<bufferSizes.size(); i++){
 		std::cout << "bufferSizes["<<i<<"]: " << bufferSizes[i] << std::endl;
@@ -434,7 +434,7 @@ void VulkanTracer::fillQuadricBuffer()
 	void *data;
 	vkMapMemory(device, bufferMemories[2], 0, bufferSizes[2], 0, &data);
     std::cout << "map memory done" << std::endl;
-    std::cout << "number of quadrics: " << beamline.size()/QUADRIC_DOUBLE_AMOUNT << std::endl;
+    std::cout << "number of quadrics: " << beamline.size()/VULKANTRACER_QUADRIC_DOUBLE_AMOUNT << std::endl;
     std::cout << "size of quadric buffer: " << bufferSizes[2] << std::endl;
 	memcpy(data, beamline.data(), bufferSizes[2]);
     std::cout << "memory copy done" << std::endl;
@@ -456,7 +456,7 @@ void VulkanTracer::createDescriptorSetLayout()
 		layout(std140, binding = 1) buffer obuf (output)
 	in the compute shader.
 	*/
-	//bindings 0 and 1 are used right now
+	//bindings 0, 1 and 2 are used right now
 	VkDescriptorSetLayoutBinding descriptorSetLayoutBinding[] = {
 		{0, VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, 1, VK_SHADER_STAGE_COMPUTE_BIT, NULL},
 		{1, VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, 1, VK_SHADER_STAGE_COMPUTE_BIT, NULL},
@@ -724,7 +724,7 @@ void VulkanTracer::readDataFromOutputBuffer()
 	double *pMappedMemory = (double *)mappedMemory;
 	std::vector<double> data;
 	//reserve enough data for all the rays
-	data.reserve((uint64_t)rayAmount * RAY_DOUBLE_AMOUNT);
+	data.reserve((uint64_t)rayAmount * VULKANTRACER_RAY_DOUBLE_AMOUNT);
 	for (int i = 0; i < rayAmount; i++)
 	{
 		data.emplace_back(pMappedMemory[i]);
@@ -742,8 +742,8 @@ std::vector<double> VulkanTracer::getRays(){
 	std::vector<double> data;
 	//reserve enough data for all the rays
     std::cout << "reserving memory"  << std::endl;
-	data.reserve((uint64_t)rayAmount * 4);
-	for (int i = 0; i < rayAmount*4; i++)
+	data.reserve((uint64_t)rayAmount * VULKANTRACER_RAY_DOUBLE_AMOUNT);
+	for (int i = 0; i < rayAmount*VULKANTRACER_RAY_DOUBLE_AMOUNT; i++)
 	{
 		data.emplace_back(pMappedMemory[i]);
 	}
