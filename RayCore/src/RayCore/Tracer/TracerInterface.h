@@ -20,7 +20,7 @@ namespace RAY
         void addLightSource(LightSource* newSource);
         void generateRays();
         void writeToFile(std::vector<double> outputRays);
-        void readFromFile(std::string path, m_dataType dataType, void* data);
+        void readFromFile(std::string path, m_dataType dataType);
 
         bool run();
     private:

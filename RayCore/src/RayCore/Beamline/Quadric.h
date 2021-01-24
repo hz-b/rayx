@@ -10,7 +10,7 @@ const double PI = 3.14159265358979323;
 namespace RAY {
     class RAY_API Quadric {
         public:
-            Quadric(std::vector<double> inputPoints, std::vector<double> inputInMatrix, std::vector<double> inputOutMatrix, std::vector<double> misalignmentMatrix);
+            Quadric(std::vector<double> inputPoints, std::vector<double> inputInMatrix, std::vector<double> inputOutMatrix, std::vector<double> misalignmentMatrix, std::vector<double> inverseMisalignmentMatrix);
             Quadric(std::vector<double> inputPoints, double alpha, double chi, double beta, double distanceToPreceedingElement);
             
             std::vector<double> getQuadric();

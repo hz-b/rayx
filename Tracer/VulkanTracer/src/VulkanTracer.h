@@ -35,7 +35,7 @@ void DestroyDebugUtilsMessengerEXT(VkInstance instance, VkDebugUtilsMessengerEXT
 
 const int WORKGROUP_SIZE = 32;
 #define VULKANTRACER_RAY_DOUBLE_AMOUNT 8
-#define VULKANTRACER_QUADRIC_DOUBLE_AMOUNT 48
+#define VULKANTRACER_QUADRIC_DOUBLE_AMOUNT 64
 
 class VulkanTracer
 {
@@ -44,7 +44,7 @@ public:
     ~VulkanTracer();
     void run();
     void addRay(double xpos, double ypos, double zpos, double xdir, double ydir, double zdir, double weight);
-    void addQuadric(std::vector<double> inQuadric, std::vector<double> inputInMatrix, std::vector<double> inputOutMatrix, std::vector<double> misalignmentMatrix);
+    void addQuadric(std::vector<double> inQuadric, std::vector<double> inputInMatrix, std::vector<double> inputOutMatrix, std::vector<double> misalignmentMatrix, std::vector<double> inverseMisalignmentMatrix);
     std::vector<double> getRays();
     void cleanup();
 

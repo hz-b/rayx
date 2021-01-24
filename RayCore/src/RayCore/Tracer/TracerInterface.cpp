@@ -30,21 +30,26 @@ namespace RAY
     {
         //create tracer instance
         VulkanTracer tracer;
-        void* pointerToRays;
-        readFromFile("../../io/input.csv", RayType, pointerToRays);
+        readFromFile("../../io/input.csv", RayType);
+
+
         //add source to tracer
         //initialize matrix light source with default params
+        /*
         MatrixSource m = MatrixSource(0, "Matrix source 1", 20, 0.065, 0.04, 0.0, 0.001, 0.001);
         std::cout << m.getName() << " with " << m.getNumberOfRays() << " Rays." << std::endl;std::cout.precision(15); // show 16 decimals
 
         addLightSource(&m);
         generateRays();
+        */
 
         //add rays to tracer
         for (int i = 0; i < m_RayList.size(); i++)
         {
             tracer.addRay(m_RayList[i]->m_position.x, m_RayList[i]->m_position.y, m_RayList[i]->m_position.z, m_RayList[i]->m_direction.x, m_RayList[i]->m_direction.y, m_RayList[i]->m_direction.z, 1);
         }
+
+
 
         // simple plane
         //std::vector<double> plane{0,0,0,0, 0,0,0,-1, 0,0,0,0, 0,0,0,0};
@@ -57,14 +62,14 @@ namespace RAY
         
         
         for(int i=0; i<1; i++){
-            m_Beamline.addQuadric(b.getAnchorPoints(), b.getInMatrix(), b.getOutMatrix(), b.getMisalignmentMatrix());//,b.getInverseMisalignmentMatrix()
+            m_Beamline.addQuadric(b.getAnchorPoints(), b.getInMatrix(), b.getOutMatrix(), b.getMisalignmentMatrix(), b.getInverseMisalignmentMatrix());
             // m_Beamline.addQuadric(QuadricPlaceholder, QuadricPlaceholder, QuadricPlaceholder);
         }
 
         //add beamline to tracer
         auto Quadrics = m_Beamline.getObjects();
         for(int i = 0; i<Quadrics.size(); i++){
-            tracer.addQuadric(Quadrics[i].getAnchorPoints(), Quadrics[i].getInMatrix(), Quadrics[i].getOutMatrix(), Quadrics[i].getMisalignmentMatrix());//, Quadrics[i].getInverseMisalignmentMatrix()
+            tracer.addQuadric(Quadrics[i].getAnchorPoints(), Quadrics[i].getInMatrix(), Quadrics[i].getOutMatrix(), Quadrics[i].getMisalignmentMatrix(), Quadrics[i].getInverseMisalignmentMatrix());//, Quadrics[i].getInverseMisalignmentMatrix()
         }
 
         //run tracer
@@ -101,30 +106,35 @@ namespace RAY
     }
     //reads from file. datatype (RayType, QuadricType) needs to be set
     //pretty ugly, should be rewritten later
-    void TracerInterface::readFromFile(std::string path, m_dataType dataType, void* data)
+    void TracerInterface::readFromFile(std::string path, m_dataType dataType)
     {
         std::ifstream inputFile;
         inputFile.open(path);
-        switch(1){
+        switch(dataType){
             case TracerInterface::RayType: {
                 std::vector<Ray *> newRayList;
                 std::string line;
                 std::getline(inputFile, line);
-                std::cout<<line<<std::endl;
+                //std::cout<<line<<std::endl;
                 while(!inputFile.eof()){
                     std::getline(inputFile, line);
+                    if(line[0] == '\0'){
+                        break;
+                    }
                     int i=0;
-                    char currentNumber[128];
+                    char currentNumber[32];
                     Ray newRay(glm::dvec3(0,0,0),glm::dvec3(0,0,0),0);
                     std::vector<double> newDoubles;
                     for(int k=0; k<VULKANTRACER_RAY_DOUBLE_AMOUNT; k++){
                         int j=0;
-                        while((line[i] != ',') && (line[i] != '\n')){
+                        while((line[i] != ',') && (line[i] != '\0')){
                             currentNumber[j] = line[i];
                             j++;
                             i++;
                         }
-                        newDoubles.emplace_back(std::stoi(currentNumber));
+                        i++;
+                        currentNumber[j] = '\0';
+                        newDoubles.emplace_back(std::stof(currentNumber));
                     }
                     newRay.m_position.x = newDoubles[1];
                     newRay.m_position.y = newDoubles[2];
@@ -133,7 +143,8 @@ namespace RAY
                     newRay.m_direction.x = newDoubles[5];
                     newRay.m_direction.y = newDoubles[6];
                     newRay.m_direction.z = newDoubles[7];
-                    newRayList.push_back(&newRay);
+                    //std::cout<<newDoubles[0]<<newDoubles[1]<<newDoubles[2]<<newDoubles[3]<<newDoubles[4]<<newDoubles[5]<<newRay.m_direction.y<<newRay.m_direction.z<<"test"<<std::endl;
+                    m_RayList.push_back(&newRay);
 
                 }
             }

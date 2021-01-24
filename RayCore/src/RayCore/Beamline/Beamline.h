@@ -20,7 +20,7 @@ namespace RAY
         //Somehow results in wrong values. Should be fixed later
         //void addQuadric(Quadric newObject);
         
-        void addQuadric(std::vector<double> inputPoints, std::vector<double> inputInMatrix, std::vector<double> inputOutMatrix, std::vector<double> misalignmentMatrix);
+        void addQuadric(std::vector<double> inputPoints, std::vector<double> inputInMatrix, std::vector<double> inputOutMatrix, std::vector<double> misalignmentMatrix, std::vector<double> inverseMisalignmentMatrix);
         void replaceNthObject(uint32_t index, Quadric newObject);
         std::vector<Quadric> getObjects();
 

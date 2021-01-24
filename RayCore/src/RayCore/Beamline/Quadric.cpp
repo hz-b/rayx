@@ -5,13 +5,14 @@
 namespace RAY
 {
 
-    Quadric::Quadric(std::vector<double> inputPoints, std::vector<double> inputInMatrix, std::vector<double> inputOutMatrix, std::vector<double> misalignmentMatrix)
+    Quadric::Quadric(std::vector<double> inputPoints, std::vector<double> inputInMatrix, std::vector<double> inputOutMatrix, std::vector<double> misalignmentMatrix, std::vector<double> inverseMisalignmentMatrix)
     {
         assert(inputPoints.size() == 16 && inputInMatrix.size() == 16 && inputOutMatrix.size() == 16);
         m_anchorPoints = inputPoints;
         m_inMatrix = inputInMatrix;
         m_outMatrix = inputOutMatrix;
         m_misalignmentMatrix = misalignmentMatrix;
+        m_inverseMisalignmentMatrix = inverseMisalignmentMatrix;
     }
 
     /**
