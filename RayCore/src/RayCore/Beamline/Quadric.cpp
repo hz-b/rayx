@@ -24,7 +24,7 @@ namespace RAY
     */
     Quadric::Quadric(std::vector<double> inputPoints, double alpha, double chi, double beta, double distanceToPreceedingElement) 
     {
-        anchorPoints = inputPoints;
+        m_anchorPoints = inputPoints;
         double cos_c = cos(chi);
         double sin_c = sin(chi);
         double cos_a = cos(alpha);
