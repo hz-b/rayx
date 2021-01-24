@@ -1,6 +1,6 @@
 #include "BeamlineObject.h"
 #include "Core.h"
-
+#define RAYCORE_QUADRIC_DOUBLE_AMOUNT 48;
 namespace RAY {
     class RAY_API Quadric : public BeamlineObject {
         public:
@@ -18,10 +18,10 @@ namespace RAY {
             Quadric();
             ~Quadric();
         private:
-            std::vector<double> anchorPoints;
+            std::vector<double> m_anchorPoints;
             std::vector<double> m_misalignmentParams;
             std::vector<double> m_misalignmentMatrix;
-            std::vector<double> inMatrix;
-            std::vector<double> outMatrix;
+            std::vector<double> m_inMatrix;
+            std::vector<double> m_outMatrix;
     };
 }
