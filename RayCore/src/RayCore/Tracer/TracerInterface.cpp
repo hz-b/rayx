@@ -33,7 +33,7 @@ namespace RAY
         void* pointerToRays;
         readFromFile("../../io/input.csv", RayType, pointerToRays);
         //add source to tracer
-        //initialize matrix light source
+        //initialize matrix light source with default params
         MatrixSource m = MatrixSource(0, "Matrix source 1", 20, 0.065, 0.04, 0.0, 0.001, 0.001);
         std::cout << m.getName() << " with " << m.getNumberOfRays() << " Rays." << std::endl;std::cout.precision(15); // show 16 decimals
 
@@ -47,21 +47,24 @@ namespace RAY
         }
 
         // simple plane
-        std::vector<double> plane{0,0,0,0, 0,0,0,-1, 0,0,0,0, 0,0,0,0};
+        //std::vector<double> plane{0,0,0,0, 0,0,0,-1, 0,0,0,0, 0,0,0,0};
         // this defines the sphere that was previously hardcoded in the shader. 
-        std::vector<double> sphere{1,0,0,0, 0,1,0,-3, 0,0,1,0, 0,0,0,0};
+        //std::vector<double> sphere{1,0,0,0, 0,1,0,-3, 0,0,1,0, 0,0,0,0};
         // Quadric b = Quadric(sphere, 0, 0, 0, 10000);
-        Quadric b = Quadric(plane, 10, 0, 10, 10000);
+        // Quadric b = Quadric(plane, 10, 0, 10, 10000);// 
+        // default values of a plane mirror:
+        PlaneMirror b = PlaneMirror(50, 200, 10, 0, 10000, {0,0,0,0,0,0}); // {1,2,3,0.01,0.02,0.03}
+        
         
         for(int i=0; i<1; i++){
-            m_Beamline.addQuadric(b.getAnchorPoints(), b.getInMatrix(), b.getOutMatrix());
+            m_Beamline.addQuadric(b.getAnchorPoints(), b.getInMatrix(), b.getOutMatrix(), b.getMisalignmentMatrix());//,b.getInverseMisalignmentMatrix()
             // m_Beamline.addQuadric(QuadricPlaceholder, QuadricPlaceholder, QuadricPlaceholder);
         }
 
         //add beamline to tracer
         auto Quadrics = m_Beamline.getObjects();
         for(int i = 0; i<Quadrics.size(); i++){
-            tracer.addQuadric(Quadrics[i].getAnchorPoints(), Quadrics[i].getInMatrix(), Quadrics[i].getOutMatrix());   
+            tracer.addQuadric(Quadrics[i].getAnchorPoints(), Quadrics[i].getInMatrix(), Quadrics[i].getOutMatrix(), Quadrics[i].getMisalignmentMatrix());//, Quadrics[i].getInverseMisalignmentMatrix()
         }
 
         //run tracer
@@ -72,6 +75,7 @@ namespace RAY
         std::vector<double> outputRays = tracer.getRays();
         std::cout << "read data succeeded" << std::endl;
         std::cout << "writing to file..." << std::endl;
+        std::cout << outputRays.size() << std::endl;
         writeToFile(outputRays);
         std::cout << "done!" << std::endl;
 
@@ -84,11 +88,13 @@ namespace RAY
     void TracerInterface::writeToFile(std::vector<double> outputRays)
     {
         std::ofstream outputFile;
-        outputFile.precision(16);
+        outputFile.precision(8);
         outputFile.open("../../io/output.csv");
-        outputFile << "Index,Xloc,Yloc,Zloc,Weight, Xdir, Ydir, Zdir" << std::endl;
+        char sep = ','; // brauche semikolon um mit excel öffnen zu können
+        outputFile << "Index" << sep << "Xloc" << sep << "Yloc" << sep<<"Zloc"<<sep<<"Weight"<<sep<<"Xdir"<<sep<<"Ydir"<<sep<<"Zdir" << std::endl;
+        // outputFile << "Index,Xloc,Yloc,Zloc,Weight,Xdir,Ydir,Zdir" << std::endl;
         for (int i=0; i<outputRays.size(); i+=8){
-            outputFile << i/VULKANTRACER_RAY_DOUBLE_AMOUNT << "," << outputRays[i] << "," << outputRays[i+1] << "," << outputRays[i+2] << "," << outputRays[i+3] << outputRays[i+4] << "," << outputRays[i+5] << "," << outputRays[i+6] << "," << outputRays[i+7] << std::endl;
+            outputFile << i/VULKANTRACER_RAY_DOUBLE_AMOUNT << sep << outputRays[i] << sep << outputRays[i+1] << sep << outputRays[i+2] << sep << outputRays[i+3] << sep << outputRays[i+4] << sep << outputRays[i+5] << sep << outputRays[i+6] << std::endl;
 
         }
         outputFile.close();
