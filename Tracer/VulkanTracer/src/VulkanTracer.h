@@ -34,8 +34,8 @@ VkResult CreateDebugUtilsMessengerEXT(VkInstance instance, const VkDebugUtilsMes
 void DestroyDebugUtilsMessengerEXT(VkInstance instance, VkDebugUtilsMessengerEXT debugMessenger, const VkAllocationCallbacks *pAllocator);
 
 const int WORKGROUP_SIZE = 32;
-const int RAY_DOUBLE_AMOUNT = 8;
-const int QUADRIC_DOUBLE_AMOUNT = 48;
+#define VULKANTRACER_RAY_DOUBLE_AMOUNT 8
+#define VULKANTRACER_QUADRIC_DOUBLE_AMOUNT 48
 
 class VulkanTracer
 {

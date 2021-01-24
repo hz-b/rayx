@@ -4,6 +4,8 @@
 
 #include <glm.hpp>
 
+#define RAYCORE_RAY_DOUBLE_AMOUNT 8
+
 namespace RAY
 {
     class RAY_API Ray
