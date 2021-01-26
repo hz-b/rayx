@@ -23,8 +23,9 @@ namespace RAY
      *                      a_21,a_31,a_32,a_41,a_42,a_43 are never used for quadric surfaces because the matrix is symmetrial, 
      *                      we use a_21,a_31 for x and z dimensions of the surface (xlength, zlength)
     */
-    Quadric::Quadric(std::vector<double> inputPoints, double alpha, double chi, double beta, double distanceToPreceedingElement) 
-    {
+    Quadric::Quadric(std::vector<double> inputPoints, std::vector<double> parameters, double alpha, double chi, double beta, double distanceToPreceedingElement) 
+    {   
+        m_parameters = parameters;
         m_anchorPoints = inputPoints;
         double cos_c = cos(chi);
         double sin_c = sin(chi);
@@ -52,13 +53,32 @@ namespace RAY
             0, 0, 0, 1};*/
     }
 
+    void Quadric::calcTransformationMatrices(double alpha, double chi, double beta, double distanceToPreceedingElement) {
+        double cos_c = cos(chi);
+        double sin_c = sin(chi);
+        double cos_a = cos(alpha);
+        double sin_a = sin(alpha);
+        double sin_b = sin(beta);
+        double cos_b = cos(beta);
+        // transposes of the actual matrices since they seem to be transposed in the process of transferring to the shader
+        m_inMatrix = {cos_c, -sin_c*cos_a, -sin_c*sin_a, 0,
+                sin_c, cos_c*cos_a, sin_a*cos_c, 0,
+                0, -sin_a, cos_a, 0,
+                0, distanceToPreceedingElement*sin_a, -distanceToPreceedingElement*cos_a, 1};
+        m_outMatrix = {cos_c, sin_c, 0, 0,
+                -sin_c*cos_b,cos_c*cos_b,  sin_b, 0,
+                sin_c*sin_b, -cos_c*sin_b, cos_b, 0,
+                0, 0, 0, 1};
+    }
+
     /**
      * set misalignment of optical element: dx, dy, dz, dphi, psi, dchi
      * angles given in rad 
-     *  @params: vector with 6 values
+     *  @params: vector with 6 values: dx, dy, dz, dphi, psi, dchi
      * 
      * we can calculate the misalignment with a matrix multiplication in the shader
      * -> store the matrix derived from the 6 input values in m_misalignmentMatrix
+     * we calculate the inverse misalignment matrix as well
      */
     void Quadric::setMisalignment(std::vector<double> misalignment) {
         double dx = misalignment[0];

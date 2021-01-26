@@ -772,6 +772,7 @@ void VulkanTracer::addQuadric(std::vector<double> inQuadric, std::vector<double>
 	beamline.insert(beamline.end(), inputInMatrix.begin(), inputInMatrix.end());
 	beamline.insert(beamline.end(), inputOutMatrix.begin(), inputOutMatrix.end());
 	beamline.insert(beamline.end(), misalignmentMatrix.begin(), misalignmentMatrix.end());
+	beamline.insert(beamline.end(), inverseMisalignmentMatrix.begin(), inverseMisalignmentMatrix.end());
 }
 
 //is not used anymore

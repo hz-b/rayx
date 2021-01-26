@@ -2,21 +2,28 @@
 
 namespace RAY
 {
+    
+    /**
+     * angles given in degree and stored in rad
+     * initializes transformation matrices, and parameters for the quadric in super class (quadric)
+     * sets mirror-specific parameters in this class
+     * @params: 
+     *          width, height = total width, height of the mirror (x- and z- dimensions)
+     *          grazingIncidence = desired incidence angle of the main ray
+     *          azimuthal = rotation of mirror around z-axis
+     *          distanceToPreceedingElement
+     * 
+    */
     PlaneMirror::PlaneMirror(double width, double height, double grazingIncidence, double azimuthal, double distanceToPreceedingElement, std::vector<double> misalignmentParams) 
-    : PlaneMirror(width, height, grazingIncidence, azimuthal, distanceToPreceedingElement) {
-        setMisalignment(misalignmentParams);
-    }
-    // angles given in degree and stored in rad
-    PlaneMirror::PlaneMirror(double width, double height, double grazingIncidence, double azimuthal, double distanceToPreceedingElement) 
-    : Quadric({0,0,0,0, width,0,0,-1, height,0,0,0, 0,0,0,0}, grazingIncidence * PI/180, azimuthal * PI/180, grazingIncidence * PI/180, distanceToPreceedingElement) {
+    : Quadric({0,0,0,0, 0,0,0,-1, 0,0,0,0, 0.0,0,0,0}, {width, height,0,0, 0,0,0,0, 0,0,0,0, 0,0,0,0},grazingIncidence * PI/180, azimuthal * PI/180, grazingIncidence * PI/180, distanceToPreceedingElement) {
         // std::vector<double> inputPoints = {0,0,0,0, 0,0,0,-1, 0,0,0,0, 0,0,0,0};
         m_totalWidth = width;
         m_totalHeight = height;
         m_chi = azimuthal * PI/180;
         m_alpha = grazingIncidence * PI/180;
-        m_beta = m_alpha;
+        m_beta = m_alpha; // mirror -> exit angle = incidence angle
         m_distanceToPreceedingElement = distanceToPreceedingElement;
-        // Quadric(inputPoints, m_alpha, m_chi, m_beta, m_distanceToPreceedingElement);
+        setMisalignment(misalignmentParams);
     }
 
     PlaneMirror::~PlaneMirror()

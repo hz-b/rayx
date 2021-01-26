@@ -11,7 +11,7 @@ namespace RAY {
     class RAY_API Quadric {
         public:
             Quadric(std::vector<double> inputPoints, std::vector<double> inputInMatrix, std::vector<double> inputOutMatrix, std::vector<double> misalignmentMatrix, std::vector<double> inverseMisalignmentMatrix);
-            Quadric(std::vector<double> inputPoints, double alpha, double chi, double beta, double distanceToPreceedingElement);
+            Quadric(std::vector<double> inputPoints, std::vector<double> parameters, double alpha, double chi, double beta, double distanceToPreceedingElement);
             
             std::vector<double> getQuadric();
             void editQuadric(std::vector<double> inputPoints);
@@ -21,6 +21,7 @@ namespace RAY {
             std::vector<double> getInMatrix();
             std::vector<double> getOutMatrix();
             std::vector<double> getMisalignmentMatrix();
+            void calcTransformationMatrices(double alpha, double chi, double beta, double distanceToPreceedingElement);
             void setMisalignment(std::vector<double> misalignment);
             std::vector<double> getMatrixProduct(Matrix A, Matrix B);
             std::vector<double> getInverseMisalignmentMatrix();
@@ -34,5 +35,6 @@ namespace RAY {
             std::vector<double> m_inverseMisalignmentMatrix;
             std::vector<double> m_inMatrix;
             std::vector<double> m_outMatrix;
+            std::vector<double> m_parameters;
     };
 }

@@ -35,13 +35,13 @@ namespace RAY
 
         //add source to tracer
         //initialize matrix light source with default params
-        /*
+        
         MatrixSource m = MatrixSource(0, "Matrix source 1", 20, 0.065, 0.04, 0.0, 0.001, 0.001);
         std::cout << m.getName() << " with " << m.getNumberOfRays() << " Rays." << std::endl;std::cout.precision(15); // show 16 decimals
 
         addLightSource(&m);
         generateRays();
-        */
+        
 
         //add rays to tracer
         for (int i = 0; i < m_RayList.size(); i++)
@@ -58,8 +58,9 @@ namespace RAY
         // Quadric b = Quadric(sphere, 0, 0, 0, 10000);
         // Quadric b = Quadric(plane, 10, 0, 10, 10000);// 
         // default values of a plane mirror:
-        PlaneMirror b = PlaneMirror(50, 200, 10, 0, 10000, {0,0,0,0,0,0}); // {1,2,3,0.01,0.02,0.03}
-        
+        PlaneMirror b = PlaneMirror(50, 200, 10, 0, 10000, {1,0,0,0,0,0}); // {1,2,3,0.01,0.02,0.03}
+        // Grating not working yet
+        //PlaneGrating g = PlaneGrating(1, 50, 200, 10, 0.0, 0, 10000, {0,0,0,0,0,0});
         
         for(int i=0; i<1; i++){
             m_Beamline.addQuadric(b.getAnchorPoints(), b.getInMatrix(), b.getOutMatrix(), b.getMisalignmentMatrix(), b.getInverseMisalignmentMatrix());
