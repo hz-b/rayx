@@ -34,6 +34,110 @@ layout(std140, binding = 2) buffer qbuf
 	Quadric quadricData[];
 };
 
+// DOUBLE PREC TRIGONOMETRIC FUNCTIONS USING MINIMAX APPROXIMATION
+
+/**
+* sin approximation
+* error < 2e-11
+* source: https://outerra.blogspot.com/2017/06/fp64-approximations-for-sincos-for.html
+*/
+double sina_11(double x)
+{
+    //minimax coefs for sin for 0..pi/2 range
+    const double a3 = -1.666666660646699151540776973346659104119e-1LF;
+    const double a5 =  8.333330495671426021718370503012583606364e-3LF;
+    const double a7 = -1.984080403919620610590106573736892971297e-4LF;
+    const double a9 =  2.752261885409148183683678902130857814965e-6LF;
+    const double ab = -2.384669400943475552559273983214582409441e-8LF;
+
+    const double m_2_pi = 0.636619772367581343076LF;
+    const double m_pi_2 = 1.57079632679489661923LF;
+
+    double y = abs(x * m_2_pi);
+    double q = floor(y);
+    int quadrant = int(q);
+
+    double t = (quadrant & 1) != 0 ? 1 - y + q : y - q;
+    t *= m_pi_2;
+
+    double t2 = t * t;
+    double r = fma(fma(fma(fma(fma(ab, t2, a9), t2, a7), t2, a5), t2, a3),
+        t2*t, t);
+
+    r = x < 0 ? -r : r;
+
+    return (quadrant & 2) != 0 ? -r : r;
+}
+
+/** cos approximation, error < 2e-11
+* uses sina_11 with shifted input (+pi/2)
+*/
+double cosa_11(double x)
+{
+    //sin(x + PI/2) = cos(x)
+    return sina_11(x + 1.57079632679489661923LF);
+}
+
+/**
+* atan2 approximation
+* error < 5e-9
+* source: 
+* https://outerra.blogspot.com/2014/05/double-precision-approximations-for-map.html
+*/
+double arctan2(double y, double x)
+{
+    const double atan_tbl[] = {
+    -3.333333333333333333333333333303396520128e-1LF,
+     1.999999117496509842004185053319506031014e-1LF,
+    -1.428514132711481940637283859690014415584e-1LF,
+     1.110012236849539584126568416131750076191e-1LF,
+    -8.993611617787817334566922323958104463948e-2LF,
+     7.212338962134411520637759523226823838487e-2LF,
+    -5.205055255952184339031830383744136009889e-2LF,
+     2.938542391751121307313459297120064977888e-2LF,
+    -1.079891788348568421355096111489189625479e-2LF,
+     1.858552116405489677124095112269935093498e-3LF
+    };
+
+    /* argument reduction: 
+       arctan (-x) = -arctan(x); 
+       arctan (1/x) = 1/2 * pi - arctan (x), when x > 0
+    */
+
+    double ax = abs(x);
+    double ay = abs(y);
+    double t0 = max(ax, ay);
+    double t1 = min(ax, ay);
+    
+    double a = 1 / t0;
+    a *= t1;
+
+    double s = a * a;
+    double p = atan_tbl[9];
+
+    p = fma( fma( fma( fma( fma( fma( fma( fma( fma( fma(p, s,
+        atan_tbl[8]), s,
+        atan_tbl[7]), s, 
+        atan_tbl[6]), s,
+        atan_tbl[5]), s,
+        atan_tbl[4]), s,
+        atan_tbl[3]), s,
+        atan_tbl[2]), s,
+        atan_tbl[1]), s,
+        atan_tbl[0]), s*a, a);
+
+    double r = ay > ax ? (1.57079632679489661923LF - p) : p;
+
+    r = x < 0 ?  3.14159265358979323846LF - r : r;
+    r = y < 0 ? -r : r;
+
+    return r;
+}
+
+/* HERE STARTS RAY TRACING CODE */
+
+
+
 /**
 * checks whether the intersection point is within the extent of the surface
 * @param x, z			 	x- and z-coordinates of the intersection point
@@ -196,30 +300,82 @@ dvec4 intersectionPoint(inout Ray r, dmat4 quadric, int icurv)
 Ray refrac(Ray r, dvec4 normal, double a){
 	double xy = normal[0] / normal[1];
 	double zy = normal[2] / normal[1];
-	double sqq = sqrt(1 + xy*xy + zy*zy);
+	double sqq = sqrt(1 + zy*zy + xy*xy);
 	double an_x = xy/sqq;
 	double an_y = -1.0/sqq;
 	double an_z = zy/sqq;
-
-	/*double eps1 = an_x/an_y; // -atan() around z, chi
-	double del1 = an_z; // -asin around x, psi
-    double a1 = a*(del1); // cos
-
-	dmat4 rot = dmat4(cos(del1), cos(eps1)*sin(del1), sin(eps1)*sin(del1), 0,
-				-sin(del1), cos(eps1)*cos(del1), sin(eps1)*cos(del1), 0,
-				0, -sin(eps1), cos(eps1), 0,
+	
+	// oft 0, mit if bed. checken?
+	double eps1 = arctan2(an_x, an_y); //-atan(an_x/an_z) around z, chi
+	double del1 = 2 * arctan2(an_z, 1+sqrt(1-an_z*an_z)); // -asin(an_z); // -asin around x, psi
+	
+	double cos_d = cosa_11(del1);
+	double sin_d = sina_11(del1);
+	double cos_e = cosa_11(eps1);
+	double sin_e = sina_11(eps1);
+	double a1;
+	if(eps1 == 0) {
+		a1 = 1.0;
+	}else{
+		a1  = a*cos_e; // cos
+	}
+	dmat4 rot = dmat4(cos_d, cos_e*sin_d, sin_e*sin_d, 0,
+				-sin_d, cos_e*cos_d, sin_e*cos_d, 0,
+				0, -sin_e, cos_e, 0,
+				0,0,0,1);
+	dmat4 inv_rot = dmat4(cos_d, -sin_d, 0, 0, 
+				cos_e*sin_d, cos_e*cos_d, -sin_e, 0,
+				sin_e*sin_d, sin_e*cos_d, cos_e, 0,
 				0,0,0,1);
 	r.position = dvec3(rot * dvec4(r.position,1));
-	r.direction = rot * r.direction;
+	r.direction = dvec4(rot * r.direction);
 	
-	double y1 = pow(r.position[1]*r.position[1]+r.position[2]*r.position[2]-(r.position[2]-a1), 2);
+	double y1 = (r.position[1]*r.position[1]+r.position[2]*r.position[2]-(r.position[2]-a1));
+	y1 = y1*y1;
 	if (y1 > 0){
 		y1 = sqrt(y1);
 		r.direction[1] = y1;
 		r.direction[2] -= a1;
 	}else{
 	   r.weight = 0.0;
-	}*/
+	}
+	r.position = dvec3(inv_rot * dvec4(r.position,1));
+	r.direction = dvec4(inv_rot * r.direction);
+	return r;
+}
+
+// refraction function used for plane gratings
+// normal is always the same (0,1,0) -> no trigonometric functions necessary
+Ray refrac_plane(Ray r, dvec4 normal, double a){
+	double eps1 = 0.0; //-atan(an_x/an_z) around z, chi
+	double del1 = 0.0; // -asin(an_z); // -asin around x, psi
+	
+	double cos_d = 1.0;
+	double sin_d = 0.0;
+	double cos_e = 1.0;
+	double sin_e = 0.0;
+	double a1 = a*cos_d; // cos
+	dmat4 rot = dmat4(cos_d, 	cos_e*sin_d, 	sin_e*sin_d, 	0,
+				-sin_d, 		cos_e*cos_d, 	sin_e*cos_d, 	0,
+				0, 				-sin_e, 		cos_e, 			0,
+				0,				0,				0,				1);
+	dmat4 inv_rot = dmat4(cos_d,  		-sin_d,			0, 		0, 
+						cos_e*sin_d, 	cos_e*cos_d, 	-sin_e, 0,
+						sin_e*sin_d, 	sin_e*cos_d, 	cos_e,	0,
+						0,				0,				0,		1);
+	r.position = dvec3(rot * dvec4(r.position,1));
+	r.direction = dvec4(rot * r.direction);
+	
+	double y1 = r.direction[1]*r.direction[1] + r.direction[2]*r.direction[2] - (r.direction[2]-a1)*(r.direction[2]-a1);
+	if (y1 > 0){
+		y1 = sqrt(y1);
+		r.direction[1] = y1;
+		r.direction[2] = r.direction[2] - a1;
+	}else{
+	   r.weight = 0.0;
+	}
+	r.position = dvec3(inv_rot * dvec4(r.position,1));
+	r.direction = dvec4(inv_rot * r.direction);
 	return r;
 }
 
@@ -231,12 +387,12 @@ Ray refrac(Ray r, dvec4 normal, double a){
 *
 * output: reflected Ray with intersection point as position, reflection as direction in beam coordinates and possibly modified weight
 */
-Ray traceGrating(Ray r, Quadric q) {
+Ray tracePlaneGrating(Ray r, Quadric q) {
 	r.position = dvec3(q.misalignment * (q.inTrans *  dvec4(r.position,1)) );
 	r.direction = dvec4(q.misalignment * (q.inTrans * r.direction));
 	
 	dvec4 normal = intersectionPoint(r, q.anchorPoints, 1);
-	r = refrac(r, normal, 0.2);
+	r = refrac_plane(r, normal, 0.01239852);
 	
 	double xLength = q.anchorPoints[1][0]; // only 10 of the 16 anchorpoints are important for the intersection point function ("quad function"), since the matrix A is symmetric
 	double zLength = q.anchorPoints[2][0]; // therefore we can use 6 values in the lower left part (without the diagonal) to transfer other values to the shader (eg dimensions of a mirror/grating), we use a_21,a_31 for xlength and zlength
@@ -298,12 +454,17 @@ Ray traceRay(Ray r, Quadric q) {
 void iterateQuadrics(){
 	const int numberOfRays = rayData.length();
 	const int numberOfQuadrics = quadricData.length();
+	double type;
 	if(numberOfQuadrics <2){
+		type = quadricData[numberOfQuadrics-1].anchorPoints[3][0];
 		//only one quadric: store directly in output buffer
-		if(quadricData[numberOfQuadrics-1].anchorPoints[3][0] == 0.0) { // mirror
+		// info if element is grating/mirror/... will later be stored in separate "parameter" dmat4
+		if (type == 0) { // mirror
 			outputData[uint(gl_GlobalInvocationID)] = traceMirror(rayData[uint(gl_GlobalInvocationID)], quadricData[numberOfQuadrics-1]);
-		}else{ // grating
-			outputData[uint(gl_GlobalInvocationID)] = traceGrating(rayData[uint(gl_GlobalInvocationID)], quadricData[numberOfQuadrics-1]);
+		}else if(type == 1) { // plane grating
+			outputData[uint(gl_GlobalInvocationID)] = tracePlaneGrating(rayData[uint(gl_GlobalInvocationID)], quadricData[numberOfQuadrics-1]);
+		}else{ // undefined
+			outputData[uint(gl_GlobalInvocationID)] = rayData[uint(gl_GlobalInvocationID)];
 		}
 
 	}
@@ -315,11 +476,25 @@ void iterateQuadrics(){
 
 		//quadrics between first and last
 		for(int i=0; i<numberOfQuadrics-1; i++){
+			type = quadricData[i].anchorPoints[3][0];
 			//first quadric
-			rayData[uint(gl_GlobalInvocationID)] = traceRay(rayData[uint(gl_GlobalInvocationID)], quadricData[i]);
+			if (type == 0) { // mirror
+				rayData[uint(gl_GlobalInvocationID)] = traceMirror(rayData[uint(gl_GlobalInvocationID)], quadricData[i]);
+			}else if(type == 1){ // plane grating
+				rayData[uint(gl_GlobalInvocationID)] = tracePlaneGrating(rayData[uint(gl_GlobalInvocationID)], quadricData[i]);	
+			}else{ // undefined
+				rayData[uint(gl_GlobalInvocationID)] = rayData[uint(gl_GlobalInvocationID)];
+			}
 		}
 		//last quadric
-		outputData[uint(gl_GlobalInvocationID)] = traceRay(rayData[uint(gl_GlobalInvocationID)], quadricData[numberOfQuadrics-1]);//intersectionPoint(rayData[uint(gl_GlobalInvocationID)], q.anchorPoints, 1); // sphere with r = 3
+		type = quadricData[numberOfQuadrics-1].anchorPoints[3][0];
+		if(type==0){ // mirror
+			outputData[uint(gl_GlobalInvocationID)] = traceMirror(rayData[uint(gl_GlobalInvocationID)], quadricData[numberOfQuadrics-1]);
+		}else if(type==1) { // plane grating
+			outputData[uint(gl_GlobalInvocationID)] = tracePlaneGrating(rayData[uint(gl_GlobalInvocationID)], quadricData[numberOfQuadrics-1]);
+		}else{
+			outputData[uint(gl_GlobalInvocationID)] = rayData[uint(gl_GlobalInvocationID)];
+		}
 	}
 
 }

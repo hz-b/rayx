@@ -16,7 +16,7 @@ namespace RAY
     }
 
     /**
-     * angles given in degree
+     * angles given in rad
      * define transformation matrices based on grazing incidence (alpha) and exit (beta) angle, azimuthal angle (chi) and distance to preceeding element
      * @params: 
      *          inputPoints: Matrix A for quadric surfaces with a_11,a_12,a_13,a_14, a_21,a_22,a_23,a_24, a_31,a_32,a_33,a_34, a_41,a_42,a_43,a_44
@@ -53,6 +53,10 @@ namespace RAY
             0, 0, 0, 1};*/
     }
 
+    /**
+     * calculates in and out transformation matrices from grazing incidence, exit angles, azimuthal angle and distance to preceeding element
+     * angles are given in rad
+    */
     void Quadric::calcTransformationMatrices(double alpha, double chi, double beta, double distanceToPreceedingElement) {
         double cos_c = cos(chi);
         double sin_c = sin(chi);
@@ -123,12 +127,18 @@ namespace RAY
         return result;
     }
 
+    Quadric::Quadric() {}
+
     Quadric::~Quadric()
     {
     }
     std::vector<double> Quadric::getQuadric()
     {
         return m_anchorPoints;
+    }
+    void Quadric::setParameters(std::vector<double> params) {
+        assert(params.size() == 16);
+        m_parameters = params;
     }
     void Quadric::editQuadric(std::vector<double> inputPoints)
     {

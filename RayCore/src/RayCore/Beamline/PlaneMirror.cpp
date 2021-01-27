@@ -15,12 +15,12 @@ namespace RAY
      * 
     */
     PlaneMirror::PlaneMirror(double width, double height, double grazingIncidence, double azimuthal, double distanceToPreceedingElement, std::vector<double> misalignmentParams) 
-    : Quadric({0,0,0,0, 0,0,0,-1, 0,0,0,0, 0.0,0,0,0}, {width, height,0,0, 0,0,0,0, 0,0,0,0, 0,0,0,0},grazingIncidence * PI/180, azimuthal * PI/180, grazingIncidence * PI/180, distanceToPreceedingElement) {
+    : Quadric({0,0,0,0, 0,0,0,-1, 0,0,0,0, 0,0,0,0}, {width, height,0,0, 0,0,0,0, 0,0,0,0, 0,0,0,0},rad(grazingIncidence), rad(azimuthal), rad(grazingIncidence), distanceToPreceedingElement) {
         // std::vector<double> inputPoints = {0,0,0,0, 0,0,0,-1, 0,0,0,0, 0,0,0,0};
         m_totalWidth = width;
         m_totalHeight = height;
-        m_chi = azimuthal * PI/180;
-        m_alpha = grazingIncidence * PI/180;
+        m_chi = rad(azimuthal);
+        m_alpha = rad(grazingIncidence);
         m_beta = m_alpha; // mirror -> exit angle = incidence angle
         m_distanceToPreceedingElement = distanceToPreceedingElement;
         setMisalignment(misalignmentParams);
