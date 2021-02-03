@@ -7,7 +7,11 @@
 #include "glm.hpp"
 #include "PlaneGrating.h"
 #include "PlaneMirror.h"
+#include "SphereGrating.h"
 #include "MatrixSource.h"
+// #include "PointSource.h"
+#include "SphereMirror.h"
+#include "RandomRays.h"
 
 #include <vector>
 

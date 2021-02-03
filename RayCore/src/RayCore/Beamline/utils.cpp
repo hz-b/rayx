@@ -3,6 +3,7 @@
 /**
  * calculates photon wavelength (nm) from its energy (eV) or vice verse
  * taken from RAYLIB.FOR
+ * used for eg gratings
 */
 double hvlam(double x) {
     if(x==0) {
