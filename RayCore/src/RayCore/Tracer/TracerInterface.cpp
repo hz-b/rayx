@@ -30,18 +30,18 @@ namespace RAY
     {
         //create tracer instance
         VulkanTracer tracer;
-        readFromFile("../../io/input.csv", RayType);
+        // readFromFile("../../io/input.csv", RayType);
 
 
         //add source to tracer
         //initialize matrix light source with default params
-        /*
+        
         MatrixSource m = MatrixSource(0, "Matrix source 1", 20, 0.065, 0.04, 0.0, 0.001, 0.001);
         std::cout << m.getName() << " with " << m.getNumberOfRays() << " Rays." << std::endl;std::cout.precision(15); // show 16 decimals
 
         addLightSource(&m);
         generateRays();
-        */
+        
 
         //add rays to tracer
         for (int i = 0; i < m_RayList.size(); i++)
@@ -58,16 +58,18 @@ namespace RAY
         // Quadric b = Quadric(sphere, 0, 0, 0, 10000);
         // Quadric b = Quadric(plane, 10, 0, 10, 10000);// 
         // default values of a plane mirror:
-        PlaneMirror b = PlaneMirror(50, 200, 10, 0, 10000, {0,0,0,0,0,0}); // {1,2,3,0.01,0.02,0.03}
-        
+        PlaneMirror plM = PlaneMirror(50, 200, 10, 0, 10000, {0,0,0,0,0,0}); // {1,2,3,0.01,0.02,0.03}
+        // plane grating with default values
+        PlaneGrating plG = PlaneGrating(0, 50, 200, 10, 0.0, 0.0, 10000, 100, 1000, 1, {0,0,0,0,0,0});
         
         for(int i=0; i<1; i++){
-            m_Beamline.addQuadric(b.getAnchorPoints(), b.getInMatrix(), b.getOutMatrix(), b.getMisalignmentMatrix(), b.getInverseMisalignmentMatrix());
+            m_Beamline.addQuadric(plM.getAnchorPoints(), plM.getInMatrix(), plM.getOutMatrix(), plM.getMisalignmentMatrix(), plM.getInverseMisalignmentMatrix());
+            m_Beamline.addQuadric(plG.getAnchorPoints(), plG.getInMatrix(), plG.getOutMatrix(), plG.getMisalignmentMatrix(), plG.getInverseMisalignmentMatrix());
             // m_Beamline.addQuadric(QuadricPlaceholder, QuadricPlaceholder, QuadricPlaceholder);
         }
 
         //add beamline to tracer
-        auto Quadrics = m_Beamline.getObjects();
+        std::vector<RAY::Quadric> Quadrics = m_Beamline.getObjects();
         for(int i = 0; i<Quadrics.size(); i++){
             tracer.addQuadric(Quadrics[i].getAnchorPoints(), Quadrics[i].getInMatrix(), Quadrics[i].getOutMatrix(), Quadrics[i].getMisalignmentMatrix(), Quadrics[i].getInverseMisalignmentMatrix());//, Quadrics[i].getInverseMisalignmentMatrix()
         }
@@ -94,8 +96,8 @@ namespace RAY
     {
         std::ofstream outputFile;
         outputFile.precision(8);
-        outputFile.open("../../io/output.csv");
-        char sep = ','; // brauche semikolon um mit excel öffnen zu können
+        outputFile.open("../../../output/output.csv");
+        char sep = ';'; // brauche semikolon um mit excel öffnen zu können
         outputFile << "Index" << sep << "Xloc" << sep << "Yloc" << sep<<"Zloc"<<sep<<"Weight"<<sep<<"Xdir"<<sep<<"Ydir"<<sep<<"Zdir" << std::endl;
         // outputFile << "Index,Xloc,Yloc,Zloc,Weight,Xdir,Ydir,Zdir" << std::endl;
         for (int i=0; i<outputRays.size(); i+=8){

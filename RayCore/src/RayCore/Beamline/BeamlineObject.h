@@ -1,4 +1,6 @@
 #pragma once
+#ifndef BEAMLINEOBJECT_H
+#define BEAMLINEOBJECT_H
 
 #include "Core.h"
 #include <vector>
@@ -18,3 +20,4 @@ namespace RAY
     };
 
 } // namespace RAY
+#endif

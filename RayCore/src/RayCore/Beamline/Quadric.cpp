@@ -16,15 +16,16 @@ namespace RAY
     }
 
     /**
-     * angles given in degree
+     * angles given in rad
      * define transformation matrices based on grazing incidence (alpha) and exit (beta) angle, azimuthal angle (chi) and distance to preceeding element
      * @params: 
      *          inputPoints: Matrix A for quadric surfaces with a_11,a_12,a_13,a_14, a_21,a_22,a_23,a_24, a_31,a_32,a_33,a_34, a_41,a_42,a_43,a_44
      *                      a_21,a_31,a_32,a_41,a_42,a_43 are never used for quadric surfaces because the matrix is symmetrial, 
      *                      we use a_21,a_31 for x and z dimensions of the surface (xlength, zlength)
     */
-    Quadric::Quadric(std::vector<double> inputPoints, double alpha, double chi, double beta, double distanceToPreceedingElement) 
-    {
+    Quadric::Quadric(std::vector<double> inputPoints, std::vector<double> parameters, double alpha, double chi, double beta, double distanceToPreceedingElement) 
+    {   
+        m_parameters = parameters;
         m_anchorPoints = inputPoints;
         double cos_c = cos(chi);
         double sin_c = sin(chi);
@@ -53,12 +54,35 @@ namespace RAY
     }
 
     /**
+     * calculates in and out transformation matrices from grazing incidence, exit angles, azimuthal angle and distance to preceeding element
+     * angles are given in rad
+    */
+    void Quadric::calcTransformationMatrices(double alpha, double chi, double beta, double distanceToPreceedingElement) {
+        double cos_c = cos(chi);
+        double sin_c = sin(chi);
+        double cos_a = cos(alpha);
+        double sin_a = sin(alpha);
+        double sin_b = sin(beta);
+        double cos_b = cos(beta);
+        // transposes of the actual matrices since they seem to be transposed in the process of transferring to the shader
+        m_inMatrix = {cos_c, -sin_c*cos_a, -sin_c*sin_a, 0,
+                sin_c, cos_c*cos_a, sin_a*cos_c, 0,
+                0, -sin_a, cos_a, 0,
+                0, distanceToPreceedingElement*sin_a, -distanceToPreceedingElement*cos_a, 1};
+        m_outMatrix = {cos_c, sin_c, 0, 0,
+                -sin_c*cos_b,cos_c*cos_b,  sin_b, 0,
+                sin_c*sin_b, -cos_c*sin_b, cos_b, 0,
+                0, 0, 0, 1};
+    }
+
+    /**
      * set misalignment of optical element: dx, dy, dz, dphi, psi, dchi
      * angles given in rad 
-     *  @params: vector with 6 values
+     *  @params: vector with 6 values: dx, dy, dz, dphi, psi, dchi
      * 
      * we can calculate the misalignment with a matrix multiplication in the shader
      * -> store the matrix derived from the 6 input values in m_misalignmentMatrix
+     * we calculate the inverse misalignment matrix as well
      */
     void Quadric::setMisalignment(std::vector<double> misalignment) {
         double dx = misalignment[0];
@@ -103,12 +127,18 @@ namespace RAY
         return result;
     }
 
+    Quadric::Quadric() {}
+
     Quadric::~Quadric()
     {
     }
     std::vector<double> Quadric::getQuadric()
     {
         return m_anchorPoints;
+    }
+    void Quadric::setParameters(std::vector<double> params) {
+        assert(params.size() == 16);
+        m_parameters = params;
     }
     void Quadric::editQuadric(std::vector<double> inputPoints)
     {

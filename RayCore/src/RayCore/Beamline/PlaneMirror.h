@@ -1,3 +1,5 @@
+#ifndef PLANEMIRROR_H
+#define PLANEMIRROR_H
 #include "Quadric.h"
 
 namespace RAY
@@ -8,7 +10,6 @@ namespace RAY
     public:
         
         PlaneMirror(double width, double height, double grazingIncidence, double azimuthal, double distanceToPreceedingElement, std::vector<double> misalignmentParams);
-        PlaneMirror(double width, double height, double grazingIncidence, double azimuthal, double distanceToPreceedingElement); 
         PlaneMirror();
         ~PlaneMirror();
 
@@ -18,6 +19,7 @@ namespace RAY
     private:
         double m_totalWidth;
         double m_totalHeight;
+        // grazing incidence, in rad
         double m_alpha;
         double m_beta;
         double m_chi;
@@ -29,3 +31,4 @@ namespace RAY
     };
 
 } // namespace RAY
+#endif
