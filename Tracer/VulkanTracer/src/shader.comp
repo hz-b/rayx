@@ -217,7 +217,7 @@ Ray traceRay(Ray r, Quadric q) {
 
 void iterateQuadrics(){
 	const int numberOfRays = rayData.length();
-	const int numberOfQuadrics = quadricData.length();
+	const int numberOfQuadrics = quadricData.length()-1;
 	if(numberOfQuadrics <2){
 		//only one quadric: store directly in output buffer
 		outputData[uint(gl_GlobalInvocationID)] = traceRay(rayData[uint(gl_GlobalInvocationID)], quadricData[numberOfQuadrics-1]);
@@ -238,11 +238,12 @@ void iterateQuadrics(){
 	}
 
 }
-/*
-void cameraPlaneIntersection(outputData, cameraPlane){
-	//todo
+void cameraPlaneIntersection(outputData, cameraPlane){	
+	const int numberOfQuadrics = quadricData.length()
+	Ray temporaryOutputVector;
+	temporaryOutputVector = traceRay(outputData[uint(gl_GlobalInvocationID)], quadricData[numberOfQuadrics-1]);
+	outputData[uint(gl_GlobalInvocationID)].position = temporaryOutputVector.position;
 }
-*/
 void main(){
 	iterateQuadrics();
 	// outputData[uint(gl_GlobalInvocationID)] = rayData[uint(gl_GlobalInvocationID)];
