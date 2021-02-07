@@ -16,10 +16,6 @@ struct Quadric{
 	dmat4 misalignment;
 	dmat4 inverseMisalignment;
 };
-struct RayOutput{
-	dvec3 position;
-	double weight;
-};
 layout(std140, binding = 0) buffer ibuf
 {
    Ray rayData[];
@@ -498,12 +494,14 @@ void iterateQuadrics(){
 	}
 
 }
+/*
 void cameraPlaneIntersection(outputData, cameraPlane){	
 	const int numberOfQuadrics = quadricData.length()
 	Ray temporaryOutputVector;
 	temporaryOutputVector = traceRay(outputData[uint(gl_GlobalInvocationID)], quadricData[numberOfQuadrics-1]);
 	outputData[uint(gl_GlobalInvocationID)].position = temporaryOutputVector.position;
 }
+*/
 void main(){
 	iterateQuadrics();
 	// outputData[uint(gl_GlobalInvocationID)] = rayData[uint(gl_GlobalInvocationID)];

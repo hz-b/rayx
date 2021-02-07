@@ -36,7 +36,7 @@ namespace RAY
         //add source to tracer
         //initialize matrix light source with default params
         
-        MatrixSource m = MatrixSource(0, "Matrix source 1", 20, 0.065, 0.04, 0.0, 0.001, 0.001);
+        MatrixSource m = MatrixSource(0, "Matrix source 1", 1<<4, 0.065, 0.04, 0.0, 0.001, 0.001);
         std::cout << m.getName() << " with " << m.getNumberOfRays() << " Rays." << std::endl;std::cout.precision(15); // show 16 decimals
 
         addLightSource(&m);
@@ -79,11 +79,11 @@ namespace RAY
         std::cout << "run succeeded" << std::endl;
 
         //get rays from tracer
-        std::vector<double> outputRays = tracer.getRays();
+        std::unordered_set<double> outputRays = tracer.getRays();
         std::cout << "read data succeeded" << std::endl;
         std::cout << "writing to file..." << std::endl;
         std::cout << outputRays.size() << std::endl;
-        writeToFile(outputRays);
+        //writeToFile(outputRays);
         std::cout << "done!" << std::endl;
 
         //clean up tracer to avoid memory leaks
@@ -96,8 +96,8 @@ namespace RAY
     {
         std::ofstream outputFile;
         outputFile.precision(8);
-        outputFile.open("../../../output/output.csv");
-        char sep = ';'; // brauche semikolon um mit excel öffnen zu können
+        outputFile.open("../../io/output.csv");
+        char sep = ','; // file is saved in .csv (comma seperated value), excel compatibility is manual right now
         outputFile << "Index" << sep << "Xloc" << sep << "Yloc" << sep<<"Zloc"<<sep<<"Weight"<<sep<<"Xdir"<<sep<<"Ydir"<<sep<<"Zdir" << std::endl;
         // outputFile << "Index,Xloc,Yloc,Zloc,Weight,Xdir,Ydir,Zdir" << std::endl;
         for (int i=0; i<outputRays.size(); i+=8){
