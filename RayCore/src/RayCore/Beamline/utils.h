@@ -1,8 +1,4 @@
-<<<<<<< HEAD
-#include <cmath>
-=======
 #include <math.h>
->>>>>>> 7ecbb035a1870960b8571e6a6fd6b49d75755c0a
 
 // useful constants
 const double inm2eV = 1.239852e3;
