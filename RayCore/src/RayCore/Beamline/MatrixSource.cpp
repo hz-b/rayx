@@ -1,6 +1,5 @@
 #include "MatrixSource.h"
 #include <cassert>
-#include <cmath>
 #include <random>
 
 namespace RAY
