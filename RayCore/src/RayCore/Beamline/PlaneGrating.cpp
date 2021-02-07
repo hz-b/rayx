@@ -81,7 +81,7 @@ namespace RAY
                 m_alpha = 2 * theta + m_beta;
             }
         }
-        std::cout << "alpha, beta: " << m_alpha << ', '<< m_beta << std::endl;
+        std::cout << "alpha, beta: " << m_alpha << ", "<< m_beta << std::endl;
     }
 
     double PlaneGrating::getWidth() {
