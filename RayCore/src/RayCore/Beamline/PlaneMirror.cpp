@@ -15,7 +15,7 @@ namespace RAY
      * 
     */
     PlaneMirror::PlaneMirror(double width, double height, double grazingIncidence, double azimuthal, double distanceToPreceedingElement, std::vector<double> misalignmentParams) 
-    : Quadric({0,0,0,0, 0,0,0,-1, 0,0,0,0, 0,0,0,0}, {width, height,0,0, 0,0,0,0, 0,0,0,0, 0,0,0,0},rad(grazingIncidence), rad(azimuthal), rad(grazingIncidence), distanceToPreceedingElement) {
+    : Quadric({0,0,0,0, width,0,0,-1, height,0,0,0, 0,0,0,0}, {width, height,0,0, 0,0,0,0, 0,0,0,0, 0,0,0,0},rad(grazingIncidence), rad(azimuthal), rad(grazingIncidence), distanceToPreceedingElement) {
         // std::vector<double> inputPoints = {0,0,0,0, 0,0,0,-1, 0,0,0,0, 0,0,0,0};
         m_totalWidth = width;
         m_totalHeight = height;

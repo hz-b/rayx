@@ -1,4 +1,4 @@
-#include "PlaneGrating.h"
+#include "SphereGrating.h"
 
 namespace RAY
 {
@@ -18,7 +18,7 @@ namespace RAY
      *          lineDensity = line density of the grating
      *          orderOfDefraction = 
     */
-    PlaneGrating::PlaneGrating(int mount, double width, double height, double deviation, double normalIncidence, double azimuthal, double distanceToPreceedingElement, double designEnergyMounting, double lineDensity, double orderOfDiffraction, std::vector<double> misalignmentParams) 
+    SphereGrating::SphereGrating(int mount, double width, double height, double deviation, double normalIncidence, double azimuthal, double distanceToPreceedingElement, double entranceArmLength, double exitArmLength, double designEnergyMounting, double lineDensity, double orderOfDiffraction, std::vector<double> misalignmentParams) 
     : Quadric() {
         // parameters in array 
         // std::vector<double> inputPoints = {0,0,0,0, 0,0,0,-1, 0,0,0,0, 0,0,0,0};
@@ -28,27 +28,42 @@ namespace RAY
         m_lineDensity = lineDensity;
         m_orderOfDiffraction = orderOfDiffraction;
         m_a = abs(hvlam(m_designEnergyMounting)) * m_lineDensity * m_orderOfDiffraction * 1e-6;
+        m_entranceArmLength = entranceArmLength;
+        m_exitArmLength = exitArmLength;
         
         m_gratingMount = mount==0 ? GM_DEVIATION : GM_INCIDENCE;
         m_chi = rad(azimuthal);
+        m_deviation = deviation;
         m_distanceToPreceedingElement = distanceToPreceedingElement;
-        calcAlpha(deviation, normalIncidence);
-        std::cout << "alpha: " << (PI/2-m_alpha) << ", beta: " << PI/2-abs(m_beta) << std::endl;
         
+        calcAlpha(deviation, normalIncidence);
+        calcRadius();
+
         // set parameters in Quadric class
-        editQuadric({0,0,0,0, m_totalWidth,0,0,-1, m_totalHeight,m_a,0,0, 1,0,0,0});
-        calcTransformationMatrices(PI/2-m_alpha, m_chi, PI/2-abs(m_beta), m_distanceToPreceedingElement);
+        editQuadric({1,0,0,0, m_totalWidth,1,0,-1825.1269773500001, m_totalHeight,m_a,1,0, 2,0,0,0});
+        calcTransformationMatrices((PI/2)-m_alpha, m_chi, (PI/2)-abs(m_beta), m_distanceToPreceedingElement);
         setMisalignment(misalignmentParams);
         setParameters({m_totalWidth, m_totalHeight, m_lineDensity, m_orderOfDiffraction, m_designEnergyMounting,m_a,0,0, 0,0,0,0, 0,0,0,0});
         // setMisalignment(misalignmentParams);
         // Quadric(inputPoints, m_alpha, m_chi, m_beta, m_distanceToPreceedingElement);
     }
 
-    PlaneGrating::~PlaneGrating()
+    SphereGrating::~SphereGrating()
     {
     }
 
-    void PlaneGrating::calcAlpha(double deviation, double normalIncidence) {
+    void SphereGrating::calcRadius() {
+        if(m_gratingMount == GM_DEVIATION) {
+            double theta = m_deviation > 0 ? rad((180-m_deviation)/2) : rad(90 + m_deviation);
+            m_radius = 2.0 / sin(theta) / (1.0 / m_entranceArmLength + 1.0 / m_exitArmLength);
+        }else if(m_gratingMount == GM_INCIDENCE) {
+            double ca = cos(m_alpha);
+            double cb = cos(m_beta);
+            m_radius = (ca + cb) / ((ca*ca) / m_entranceArmLength + (cb*cb) / m_exitArmLength);
+        }
+    }
+
+    void SphereGrating::calcAlpha(double deviation, double normalIncidence) {
         double angle;
         if (m_gratingMount == GM_DEVIATION) {
             angle = deviation;
@@ -58,7 +73,7 @@ namespace RAY
         focus(angle);
     }
 
-    void PlaneGrating::focus(double angle) {
+    void SphereGrating::focus(double angle) {
         // from routine "focus" in RAY.FOR
         double theta = rad(abs(angle));
         if (angle <= 0) { // constant alpha mounting
@@ -81,17 +96,18 @@ namespace RAY
                 m_alpha = 2 * theta + m_beta;
             }
         }
-<<<<<<< HEAD
-        std::cout << "alpha, beta: " << m_alpha << ", "<< m_beta << std::endl;
-=======
->>>>>>> 7ecbb035a1870960b8571e6a6fd6b49d75755c0a
+        std::cout << "alpha, beta: " << m_alpha << ', '<< m_beta << std::endl;
     }
 
-    double PlaneGrating::getWidth() {
+    double SphereGrating::getWidth() {
         return m_totalWidth;
     }
 
-    double PlaneGrating::getHeight() {
+    double SphereGrating::getHeight() {
         return m_totalHeight;
+    }
+
+    double SphereGrating::getRadius() {
+        return m_radius;
     }
 }
