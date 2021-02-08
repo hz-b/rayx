@@ -10,7 +10,7 @@ namespace RAY
     {
         DEBUG(std::cout << "Creating Beamline..." << std::endl);
         //std::vector<double> temp(16, 1);
-        //BeamLineObject firstQuadric(temp);
+        //Quadric firstQuadric(temp);
         //m_objects.push_back(firstQuadric);
     }
 
@@ -19,18 +19,24 @@ namespace RAY
         DEBUG(std::cout << "Deleting Beamline..." << std::endl);
     }
 
-    void Beamline::addBeamlineObject(BeamLineObject newObject)
+    /* Somehow results in wrong values. Should be fixed later
+    void Beamline::addQuadric(Quadric newObject)
     {
         m_Objects.push_back(newObject);
     }
+    */
+    void Beamline::addQuadric(std::vector<double> inputPoints, std::vector<double> inputInMatrix, std::vector<double> inputOutMatrix, std::vector<double> misalignmentMatrix, std::vector<double> inverseMisalignmentMatrix)
+    {
+        m_Objects.emplace_back(inputPoints, inputInMatrix, inputOutMatrix, misalignmentMatrix, inverseMisalignmentMatrix);
+    }
 
-    void Beamline::replaceNthObject(uint32_t index, BeamLineObject newObject)
+    void Beamline::replaceNthObject(uint32_t index, Quadric newObject)
     {
         assert(m_Objects.size() >= index);
         m_Objects[index] = newObject;
     }
 
-    std::vector<BeamLineObject> Beamline::getObjects()
+    std::vector<Quadric> Beamline::getObjects()
     {
         return m_Objects;
     }

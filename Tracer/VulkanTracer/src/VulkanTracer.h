@@ -9,6 +9,7 @@
 #include "Ray.h"
 #include <assert.h>
 #include <cmath>
+#include <unordered_set>
 
 #ifdef NDEBUG
 const bool enableValidationLayers = false;
@@ -34,8 +35,9 @@ VkResult CreateDebugUtilsMessengerEXT(VkInstance instance, const VkDebugUtilsMes
 void DestroyDebugUtilsMessengerEXT(VkInstance instance, VkDebugUtilsMessengerEXT debugMessenger, const VkAllocationCallbacks *pAllocator);
 
 const int WORKGROUP_SIZE = 32;
-const int RAY_DOUBLE_AMOUNT = 8;
-const int QUADRIC_DOUBLE_AMOUNT = 24;
+#define VULKANTRACER_RAY_DOUBLE_AMOUNT 8
+#define VULKANTRACER_QUADRIC_DOUBLE_AMOUNT 64
+#define GPU_MAX_STAGING_SIZE 268435392 //256MB - 64: needs to be smaller than 256MB and multiple of 64, as one ray is 64 bytes
 
 class VulkanTracer
 {
@@ -44,12 +46,13 @@ public:
     ~VulkanTracer();
     void run();
     void addRay(double xpos, double ypos, double zpos, double xdir, double ydir, double zdir, double weight);
-    void addBeamLineObject(std::vector<double> inQuadric, std::vector<double> inputInMatrix, std::vector<double> inputOutMatrix);
-    std::vector<double> getRays();
+    void addQuadric(std::vector<double> inQuadric, std::vector<double> inputInMatrix, std::vector<double> inputOutMatrix, std::vector<double> misalignmentMatrix, std::vector<double> inverseMisalignmentMatrix);
+    std::unordered_set<double> getRays();
     void cleanup();
 
 private:
     //Member structs:
+    /* not contiguous in memory, shouldn't be used
     struct Quadric{
         Quadric() : points(16), inMatrix(16), outMatrix(16) {}
         Quadric(std::vector<double> inQuadric, std::vector<double> inputInMatrix, std::vector<double> inputOutMatrix){
@@ -62,6 +65,7 @@ private:
         std::vector<double> inMatrix;
         std::vector<double> outMatrix;
     };
+    */
     struct QueueFamilyIndices
     {
         uint32_t computeFamily;
@@ -92,7 +96,7 @@ private:
     uint32_t queueFamilyIndex;
     uint32_t rayAmount;
     std::vector<Ray> rayVector;
-    std::vector<Quadric> beamline;
+    std::vector<double> beamline;
     QueueFamilyIndices QueueFamily;
     
     //Member functions:
@@ -110,20 +114,22 @@ private:
     QueueFamilyIndices findQueueFamilies(VkPhysicalDevice device);
     void createLogicalDevice();
     uint32_t findMemoryType(uint32_t memoryTypeBits, VkMemoryPropertyFlags properties);
+    void createBuffer(VkDeviceSize size, VkBufferUsageFlags usage, VkMemoryPropertyFlags properties, VkBuffer& buffer, VkDeviceMemory& bufferMemory);
     void createBuffers();
-    void createOutputBuffer();
-    void createInputBuffer();
-    void fillInputBuffer();
+    void fillRayBuffer();
+    void fillStagingBuffer(uint32_t offset, uint32_t numberOfBytesToCopy);
+    void copyToRayBuffer(uint32_t offset, uint32_t numberOfBytesToCopy);
+    void copyToOutputBuffer(uint32_t offset, uint32_t numberOfBytesToCopy);
     void fillQuadricBuffer();
     void createDescriptorSetLayout();
     void createDescriptorSet();
     uint32_t *readFile(uint32_t &length, const char *filename);
+    void createCommandPool();
     void createComputePipeline();
     void createCommandBuffer();
     void runCommandBuffer();
     void setRayAmount(uint32_t inputRayAmount);
     void setRayAmount();
-    void readDataFromOutputBuffer();
     void generateRays();
 
     int main();

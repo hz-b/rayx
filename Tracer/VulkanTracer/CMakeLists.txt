@@ -4,7 +4,21 @@ project(VulkanTracer)
 
 # OS specific
 if (WIN32)
-    execute_process(COMMAND $ENV{VULKAN_SDK}/Bin/glslc.exe ${VulkanTracer_SOURCE_DIR}/src/shader.comp -o ${CMAKE_BINARY_DIR}/bin/comp.spv)
+    # The following code is used to always compile the shader.
+    # This is most likely not an optimal solution, but it will work
+    # until we find a better one.
+    set(COMPILED_SHADER ${CMAKE_BINARY_DIR}/bin/comp.spv)
+    set(COMPILED_SHADER_FAKE ${CMAKE_BINARY_DIR}/bin/___comp.spv) # this exists so file cannot be found -> always execute command
+    add_custom_command(
+        OUTPUT 
+            ${COMPILED_SHADER}
+            ${COMPILED_SHADER_FAKE}
+        COMMAND "$ENV{VULKAN_SDK}/Bin/glslc.exe"
+        ARGS ${VulkanTracer_SOURCE_DIR}/src/shader.comp -o ${COMPILED_SHADER}
+    )
+    add_custom_target(COMPILE_SHADER ALL
+        DEPENDS ${COMPILED_SHADER}
+    )
 elseif (UNIX)
     set_property(TARGET lib1 PROPERTY POSITION_INDEPENDENT_CODE ON)
 endif ()
