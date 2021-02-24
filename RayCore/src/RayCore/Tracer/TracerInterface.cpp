@@ -61,7 +61,7 @@ namespace RAY
         //initialize matrix light source with default params
         
         //RandomRays m = RandomRays(1000000); // produces random values for position, direction and weight to test cosinus and atan implementation
-        int number_of_rays = 1<<4;
+        int number_of_rays = 1<<5;
         MatrixSource m = MatrixSource(0, "Matrix source 1", number_of_rays, 0.065, 0.04, 0.0, 0.001, 0.001);
         //PointSource m = PointSource(0, "Point source 1", number_of_rays, 0.065, 0.04, 1.0, 0.001, 0.001);
         //std::cout << m.getName() << " with " << m.getNumberOfRays() << " Rays." << std::endl;std::cout.precision(15); // show 16 decimals
@@ -71,10 +71,14 @@ namespace RAY
         
 
         //add rays to tracer
+        std::cout<<"start add rays to tracer"<<std::endl;
         for (auto i = m_RayList.begin(); i != m_RayList.end(); i++)
         {
-            tracer.addRayVector(&(*i));
+            std::cout<<(*i).size()<<std::endl;
+            std::cout<<&((*i)[0])<<std::endl;
+            tracer.addRayVector(&((*i)[0]));
         }
+        std::cout<<"add rays to tracer done"<<std::endl;
 
 
 
@@ -82,7 +86,7 @@ namespace RAY
         // plane mirror with RAY-UI default values
         PlaneMirror plM = PlaneMirror(50, 200, 10, 0, 10000, {0,0,0,0,0,0}); // {1,2,3,0.01,0.02,0.03}
         // plane grating with default values
-        PlaneGrating plG = PlaneGrating(0, 50, 200, 10, 0.0, 0.0, 10000, 100, 1000, 1, 2, {1,2,3,0.001,0.002,0.003}); // dx,dy,dz, dpsi,dphi,dchi // {1,2,3,0.001,0.002,0.003}
+        PlaneGrating plG = PlaneGrating(50, 200, 10, 0.0, 0.0, 10000, 100, 1000, 1, 2, {1,2,3,0.001,0.002,0.003}); // dx,dy,dz, dpsi,dphi,dchi // {1,2,3,0.001,0.002,0.003}
         // spherical grating with defalult values. SphereGrating(int mount, double width, double height, double deviation, double normalIncidence, double azimuthal, double distanceToPreceedingElement, double entranceArmLength, double exitArmLength, double designEnergyMounting, double lineDensity, double orderOfDiffraction, std::vector<double> misalignmentParams);
         SphereGrating s = SphereGrating(0, 50, 200, 10, 0.0, 0.0, 10000, 10000, 1000,  100, 1000, 1, {0,0,0,0,0,0});
         // std::cout << s.getRadius() << std::endl;
@@ -107,7 +111,7 @@ namespace RAY
         std::cout << "run succeeded" << std::endl;
 
         //get rays from tracer
-        std::set<double> outputRays = tracer.getRays();
+        std::list<double> outputRays = tracer.getRays();
         
         std::cout << "tracer run incl load rays time: " << float( clock () - begin_time ) << " ms" << std::endl;
         
@@ -150,10 +154,12 @@ namespace RAY
         inputFile.open(path);
         switch(dataType){
             case TracerInterface::RayType: {
-                std::vector<Ray *> newRayList;
+                std::vector<Ray> newRayVector;
+                newRayVector.resize(1048576);
                 std::string line;
                 std::getline(inputFile, line);
                 //std::cout<<line<<std::endl;
+                uint32_t numberOfRays = 0;
                 while(!inputFile.eof()){
                     std::getline(inputFile, line);
                     if(line[0] == '\0'){
@@ -182,7 +188,14 @@ namespace RAY
                     newRay.m_direction.y = newDoubles[6];
                     newRay.m_direction.z = newDoubles[7];
                     //std::cout<<newDoubles[0]<<newDoubles[1]<<newDoubles[2]<<newDoubles[3]<<newDoubles[4]<<newDoubles[5]<<newRay.m_direction.y<<newRay.m_direction.z<<"test"<<std::endl;
-                    m_RayList.push_back(newRay);
+                    newRayVector.push_back(newRay);
+                    numberOfRays++;
+                    if(numberOfRays>1048576){
+                        m_RayList.push_back(newRayVector);
+                        numberOfRays = 0;
+                        newRayVector.clear();
+                        newRayVector.resize(1048576);
+                    }
 
                 }
             }

@@ -307,6 +307,7 @@ int VulkanTracer::rateDevice(VkPhysicalDevice device)
 	//can be extended to choose the best discrete gpu if multiple are available
 	if (deviceProperties.deviceType == VK_PHYSICAL_DEVICE_TYPE_DISCRETE_GPU)
 		score += 1000;
+	score += deviceProperties.limits.maxComputeSharedMemorySize;
 	return score;
 }
 
@@ -859,7 +860,7 @@ void VulkanTracer::setRayAmount(uint32_t inputRayAmount)
 }
 void VulkanTracer::setRayAmount()
 {
-	rayAmount = rayList.size() * RAY_VECTOR_SIZE;
+	rayAmount = rayList.size() * RAY_VECTOR_SIZE /(VULKANTRACER_RAY_DOUBLE_AMOUNT*sizeof(double));
 }
 /*
 void VulkanTracer::addRay(double xpos, double ypos, double zpos, double xdir, double ydir, double zdir, double weight){
@@ -888,9 +889,14 @@ void VulkanTracer::addRay(double* location){
 */
 void VulkanTracer::addRayVector(void* location){
 	std::vector<Ray> newRayVector;
+    std::cout<<"1"<<std::endl;
 	newRayVector.reserve(1048576);
+    std::cout<<"2"<<std::endl;
 	memcpy(&newRayVector[0], location, 1048576 * VULKANTRACER_RAY_DOUBLE_AMOUNT * sizeof(double));
+    std::cout<<"3"<<std::endl;
 	rayList.push_back(newRayVector);
+    std::cout<<"4"<<std::endl;
+
 }
 //adds quad to beamline
 void VulkanTracer::addQuadric(std::vector<double> inQuadric, std::vector<double> inputInMatrix, std::vector<double> inputOutMatrix, std::vector<double> misalignmentMatrix, std::vector<double> inverseMisalignmentMatrix){

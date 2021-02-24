@@ -25,7 +25,8 @@ namespace RAY
         std::default_random_engine re;
         
         int rmat = int(sqrt(this->getNumberOfRays()));
-        std::vector<Ray> rayList;
+        std::vector<Ray> rayVector;
+        rayVector.reserve(1048576);
         std::cout << "create " << rmat << " times " << rmat << " matrix with Matrix Source..." << std::endl;
         // fill the square with rmat1xrmat1 rays
         for(int col = 0; col<rmat; col++) {
@@ -41,18 +42,20 @@ namespace RAY
                 glm::dvec3 direction = getDirectionFromAngles(phi,psi);
 
                 Ray r = Ray(position, direction, 1.0);
-                rayList.emplace_back(r);
+                rayVector.push_back(r);
             }
         }
         // afterwards start from the beginning again
         for(int i = 0; i<this->getNumberOfRays()-rmat*rmat; i++) {
-            Ray r = rayList.at(i);
+            Ray r = rayVector.at(i);
             glm::dvec3 position = glm::dvec3(r.m_position[0],r.m_position[1],r.m_position[2]);
             glm::dvec3 direction = glm::dvec3(r.m_direction[0],r.m_direction[1],r.m_direction[2]);
             Ray r_copy(position,direction,1.0);
-            rayList.emplace_back(r_copy);
+            rayVector.push_back(r_copy);
         }
-        return rayList;
+        std::cout<<&(rayVector[0])<<std::endl;
+        rayVector.resize(1048576);
+        return rayVector;
     }
 
     double MatrixSource::getSourceDepth(){ return m_sourceDepth; }
