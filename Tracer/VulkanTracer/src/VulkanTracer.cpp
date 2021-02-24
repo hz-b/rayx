@@ -436,26 +436,35 @@ void VulkanTracer::createBuffer(VkDeviceSize size, VkBufferUsageFlags usage, VkM
 }
 void VulkanTracer::fillRayBuffer(){
 	uint32_t bytesNeeded = rayAmount * VULKANTRACER_RAY_DOUBLE_AMOUNT * sizeof(double);
-	uint32_t numberOfStagingBuffers = std::ceil((double)bytesNeeded/ (double)bufferSizes[3]);
+	uint32_t numberOfStagingBuffers = std::ceil((double)bytesNeeded/ (double)bufferSizes[3]); // bufferSizes[3] = 256MB
+	std::list<std::vector<Ray>>::iterator raySetIterator;
+	raySetIterator = rayList.begin();
+	size_t vectorsPerStagingBuffer = std::floor(GPU_MAX_STAGING_SIZE/RAY_VECTOR_SIZE);
 	for (int i = 0; i<numberOfStagingBuffers-1; i++){
-		fillStagingBuffer(i, GPU_MAX_STAGING_SIZE);
+		fillStagingBuffer(i, raySetIterator, vectorsPerStagingBuffer);
 		copyToRayBuffer(i, GPU_MAX_STAGING_SIZE);
 		std::cout << "Debug Info: more than 256MB of rays" << std::endl;
 	}
+	/*
 	std::cout << "numberOfStagingBuffers: "<< numberOfStagingBuffers << ", bytesNeeded: "<<bytesNeeded << std::endl;
 	fillStagingBuffer((numberOfStagingBuffers-1)*GPU_MAX_STAGING_SIZE, bytesNeeded % GPU_MAX_STAGING_SIZE);
+	*/
 	std::cout << "Debug Info: fill staging done" << std::endl;
 	copyToRayBuffer((numberOfStagingBuffers-1)*GPU_MAX_STAGING_SIZE, bytesNeeded % GPU_MAX_STAGING_SIZE);
 
 }
 //the input buffer is filled with the ray data
-void VulkanTracer::fillStagingBuffer(uint32_t offset, uint32_t numberOfBytesToCopy)
+void VulkanTracer::fillStagingBuffer(uint32_t offset, std::list<std::vector<Ray>>::iterator raySetIterator, size_t vectorsPerStagingBuffer)
 {
-	std::cout << "offset: "<<offset<<", numberOfBytesToCopy: "<<numberOfBytesToCopy << std::endl;
+	std::cout << "offset: "<<offset<< std::endl;
+
 	//data is copied to the buffer
 	void *data;
-	vkMapMemory(device, bufferMemories[3], 0, numberOfBytesToCopy, 0, &data);
-	memcpy(data, rayVector.data()+(offset/(VULKANTRACER_RAY_DOUBLE_AMOUNT*sizeof(double))), numberOfBytesToCopy);
+	vkMapMemory(device, bufferMemories[3], 0, GPU_MAX_STAGING_SIZE, 0, &data);
+	for(int i = 0; i<vectorsPerStagingBuffer; i++){
+		memcpy((char*)data+i*RAY_VECTOR_SIZE, (*raySetIterator).data(), RAY_VECTOR_SIZE);
+		raySetIterator++;
+	}
 	vkUnmapMemory(device, bufferMemories[3]);
 }
 void VulkanTracer::copyToRayBuffer(uint32_t offset, uint32_t numberOfBytesToCopy){
@@ -528,9 +537,9 @@ VkCommandBufferAllocateInfo allocInfo{};
 
 
 }
-std::unordered_set<double> VulkanTracer::getRays(){
-	std::cout << "rayVector.size(): "<<rayVector.size()<< std::endl;
-	std::unordered_set<double> data;
+std::list<double> VulkanTracer::getRays(){
+	std::cout << "rayList.size(): "<<rayList.size()<< std::endl;
+	std::list<double> data;
 	//reserve enough data for all the rays
 	/*
     std::cout << "reserving memory"  << std::endl;
@@ -548,7 +557,7 @@ std::unordered_set<double> VulkanTracer::getRays(){
 		double *pMappedMemory = (double *)mappedMemory;
 		for (int j = 0; j < GPU_MAX_STAGING_SIZE/sizeof(double); j++)
 		{
-			data.insert(pMappedMemory[j]);
+			data.push_back(pMappedMemory[j]);
 		}
 	}
 	std::cout << "numberOfStagingBuffers: "<< numberOfStagingBuffers << ", bytesNeeded: "<<bytesNeeded << std::endl;
@@ -559,7 +568,7 @@ std::unordered_set<double> VulkanTracer::getRays(){
 	double *pMappedMemory = (double *)mappedMemory;
 	for (int j = 0; j < (bytesNeeded % GPU_MAX_STAGING_SIZE)/sizeof(double); j++)
 	{
-		data.insert(pMappedMemory[j]);
+		data.push_back(pMappedMemory[j]);
 	}
 	
     std::cout << "mapping memory done"  << std::endl;
@@ -850,25 +859,39 @@ void VulkanTracer::setRayAmount(uint32_t inputRayAmount)
 }
 void VulkanTracer::setRayAmount()
 {
-	rayAmount = rayVector.size();
+	rayAmount = rayList.size() * RAY_VECTOR_SIZE;
 }
-
-
-//placeholder function to generate simple rays to test the data transfer
-void VulkanTracer::generateRays()
-{
-	rayVector.reserve(rayAmount);
-	for (int i = 0; i < rayAmount; i++)
-	{
-		Ray tempRay(6 * i + 1, 6 * i + 2, 6 * i + 3, 6 * i + 4, 6 * i + 5, 6 * i + 6, 1);
-		rayVector.emplace_back(tempRay);
-	}
-}
+/*
 void VulkanTracer::addRay(double xpos, double ypos, double zpos, double xdir, double ydir, double zdir, double weight){
 	Ray newRay(xpos, ypos, zpos, xdir, ydir, zdir, weight);
 	rayVector.push_back(newRay);
 }
+void VulkanTracer::addRay(double* location){
 
+	int lastSetIndex = rayList.size()-1;
+	if(lastSetIndex == -1){
+		std::vector<Ray> newRayVector;
+		newRayVector.resize(1048576); //1048576 Rays = 64 MB
+		rayList.insert(newRayVector);
+	}
+	int vectorIndex = rayList[lastSetIndex].size()-1;
+	if(vectorIndex < 1048575){
+		memcpy(&(rayList[lastSetIndex][vectorIndex]), location, 64);
+	}
+	else{
+		std::vector<Ray> newRayVector;
+		newRayVector.resize(1048576);
+		memcpy(&newRayVector[0], location, 64);
+		rayList.insert(newRayVector);
+	}
+}
+*/
+void VulkanTracer::addRayVector(void* location){
+	std::vector<Ray> newRayVector;
+	newRayVector.reserve(1048576);
+	memcpy(&newRayVector[0], location, 1048576 * VULKANTRACER_RAY_DOUBLE_AMOUNT * sizeof(double));
+	rayList.push_back(newRayVector);
+}
 //adds quad to beamline
 void VulkanTracer::addQuadric(std::vector<double> inQuadric, std::vector<double> inputInMatrix, std::vector<double> inputOutMatrix, std::vector<double> misalignmentMatrix, std::vector<double> inverseMisalignmentMatrix){
 	assert(inQuadric.size() == 16 && inputInMatrix.size() == 16 && inputOutMatrix.size() == 16 && misalignmentMatrix.size() == 16);
