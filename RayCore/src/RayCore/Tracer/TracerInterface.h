@@ -7,11 +7,15 @@
 
 #include <string>
 #include <vector>
+#include <set>
 
 namespace RAY
 {
     class RAY_API TracerInterface
     {
+    struct RayVector{
+        std::vector<Ray> rayVector;
+    };
     public:
         enum m_dataType {RayType, QuadricType};
 
@@ -21,11 +25,14 @@ namespace RAY
         void generateRays();
         void writeToFile(std::vector<double> outputRays);
         void readFromFile(std::string path, m_dataType dataType);
+        //void addRayToRayList(Ray inputRay);
+        void addRayVector(void* location);
+
 
         bool run();
     private:
         std::vector<LightSource *> m_LightSources;
         Beamline m_Beamline;
-        std::vector<Ray *> m_RayList;
+        std::list<std::vector<Ray>> m_RayList;
     };
 } // namespace RAY

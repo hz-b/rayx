@@ -16,6 +16,8 @@ private:
 
 public:
 	Ray(double xpos, double ypos, double zpos, double xdir, double ydir, double zdir, double w);
+	Ray(double* location);
+	Ray();
 	~Ray();
 	std::vector<double> getRayInformation();
 	double getxDir();
