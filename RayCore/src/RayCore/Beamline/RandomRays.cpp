@@ -19,14 +19,14 @@ namespace RAY
      * distributed evenly across width & height of source 
      * returns list of rays
      */
-    std::vector<Ray *> RandomRays::getRays() {
+    std::vector<Ray> RandomRays::getRays() {
         double lower_bound = 0;
         double upper_bound = 10;
         std::uniform_real_distribution<double> unif(lower_bound,upper_bound);
         std::default_random_engine re;
         
         int n = this->getNumberOfRays();
-        std::vector<Ray *> rayList;
+        std::vector<Ray> rayList;
         std::cout << "create " << n << " random rays " << std::endl;
         // fill the square with rmat1xrmat1 rays
         for(int i = 0; i<n; i++) {
@@ -34,7 +34,7 @@ namespace RAY
             
             glm::dvec3 direction = glm::dvec4(-unif(re), -unif(re), -unif(re), -unif(re));
             double weight = -unif(re);
-            Ray* r = new Ray(position, direction, weight);
+            Ray r = Ray(position, direction, weight);
             rayList.emplace_back(r);
         }
         return rayList;

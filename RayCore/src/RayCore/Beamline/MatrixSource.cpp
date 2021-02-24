@@ -18,14 +18,14 @@ namespace RAY
      * distributed evenly across width & height of source 
      * returns list of rays
      */
-    std::vector<Ray *> MatrixSource::getRays() {
+    std::vector<Ray> MatrixSource::getRays() {
         double lower_bound = 0;
         double upper_bound = 1;
         std::uniform_real_distribution<double> unif(lower_bound,upper_bound);
         std::default_random_engine re;
         
         int rmat = int(sqrt(this->getNumberOfRays()));
-        std::vector<Ray *> rayList;
+        std::vector<Ray> rayList;
         std::cout << "create " << rmat << " times " << rmat << " matrix with Matrix Source..." << std::endl;
         // fill the square with rmat1xrmat1 rays
         for(int col = 0; col<rmat; col++) {
@@ -40,16 +40,17 @@ namespace RAY
                 double psi = -0.5*m_verDivergence + (m_verDivergence/(rmat-1)) * col;
                 glm::dvec3 direction = getDirectionFromAngles(phi,psi);
 
-                Ray* r = new Ray(position, direction, 1.0);
+                Ray r = Ray(position, direction, 1.0);
                 rayList.emplace_back(r);
             }
         }
         // afterwards start from the beginning again
         for(int i = 0; i<this->getNumberOfRays()-rmat*rmat; i++) {
-            Ray* r = rayList.at(i);
-            glm::dvec3 position = glm::dvec3(r->m_position[0],r->m_position[1],r->m_position[2]);
-            glm::dvec3 direction = glm::dvec3(r->m_direction[0],r->m_direction[1],r->m_direction[2]);
-            rayList.emplace_back(new Ray(position,direction,1.0));
+            Ray r = rayList.at(i);
+            glm::dvec3 position = glm::dvec3(r.m_position[0],r.m_position[1],r.m_position[2]);
+            glm::dvec3 direction = glm::dvec3(r.m_direction[0],r.m_direction[1],r.m_direction[2]);
+            Ray r_copy(position,direction,1.0);
+            rayList.emplace_back(r_copy);
         }
         return rayList;
     }
