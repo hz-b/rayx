@@ -23,7 +23,7 @@ namespace RAY
         int getId();
         glm::dvec3 getDirectionFromAngles(double phi, double psi);
         // get the rays according to specific light source, has to be implemented in each class that inherits from LightSource
-        virtual std::vector<Ray *> getRays() = 0;
+        virtual std::vector<Ray> getRays() = 0;
 
         LightSource();
         virtual ~LightSource();

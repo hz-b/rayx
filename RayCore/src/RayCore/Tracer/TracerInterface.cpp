@@ -82,7 +82,7 @@ namespace RAY
         // plane mirror with RAY-UI default values
         PlaneMirror plM = PlaneMirror(50, 200, 10, 0, 10000, {0,0,0,0,0,0}); // {1,2,3,0.01,0.02,0.03}
         // plane grating with default values
-        PlaneGrating plG = PlaneGrating(0, 50, 200, 10, 0.0, 0.0, 10000, 100, 1000, 1, {0,0,0,0,0,0});
+        PlaneGrating plG = PlaneGrating(0, 50, 200, 10, 0.0, 0.0, 10000, 100, 1000, 1, 2, {1,2,3,0.001,0.002,0.003}); // dx,dy,dz, dpsi,dphi,dchi // {1,2,3,0.001,0.002,0.003}
         // spherical grating with defalult values. SphereGrating(int mount, double width, double height, double deviation, double normalIncidence, double azimuthal, double distanceToPreceedingElement, double entranceArmLength, double exitArmLength, double designEnergyMounting, double lineDensity, double orderOfDiffraction, std::vector<double> misalignmentParams);
         SphereGrating s = SphereGrating(0, 50, 200, 10, 0.0, 0.0, 10000, 10000, 1000,  100, 1000, 1, {0,0,0,0,0,0});
         // std::cout << s.getRadius() << std::endl;
@@ -117,7 +117,10 @@ namespace RAY
         std::cout << outputRays.size() << std::endl;
         //writeToFile(outputRays);
         std::cout << "done!" << std::endl;
-
+        //for(auto iter = outputRays.begin(); iter != outputRays.end(); ++iter){
+            //std::cout << *iter << ", ";
+        //}
+        std::cout << std::endl;
         //clean up tracer to avoid memory leaks
         tracer.cleanup();
         return true;
@@ -179,7 +182,7 @@ namespace RAY
                     newRay.m_direction.y = newDoubles[6];
                     newRay.m_direction.z = newDoubles[7];
                     //std::cout<<newDoubles[0]<<newDoubles[1]<<newDoubles[2]<<newDoubles[3]<<newDoubles[4]<<newDoubles[5]<<newRay.m_direction.y<<newRay.m_direction.z<<"test"<<std::endl;
-                    m_RayList.push_back(&newRay);
+                    m_RayList.push_back(newRay);
 
                 }
             }

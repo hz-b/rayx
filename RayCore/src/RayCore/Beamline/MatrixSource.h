@@ -15,7 +15,7 @@ namespace RAY
         MatrixSource();
         ~MatrixSource();
 
-        std::vector<Ray *> getRays();
+        std::vector<Ray> getRays();
         double getSourceDepth();
         double getSourceHeight();
         double getSourceWidth();

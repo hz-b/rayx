@@ -15,7 +15,7 @@ namespace RAY
         RandomRays();
         ~RandomRays();
 
-        std::vector<Ray *> getRays();
+        std::vector<Ray> getRays();
         void compareRays(std::vector<Ray *> input, std::vector<double> output);
         
     private:
