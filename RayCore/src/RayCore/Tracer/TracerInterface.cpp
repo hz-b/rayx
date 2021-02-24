@@ -23,10 +23,33 @@ namespace RAY
     }
     void TracerInterface::generateRays(){
         //only one Source for now
-        m_RayList = (*m_LightSources[0]).getRays();
+        m_RayList.push_back((*m_LightSources[0]).getRays());
     }
-
-
+    /*
+    void TracerInterface::addRayToRayList(Ray inputRay){
+        size_t lastSetIndex = m_RayList.size()-1;
+        if(lastSetIndex == -1){
+            std::vector<Ray> newRayVector;
+            newRayVector.resize(67108864);
+            m_RayList.insert(newRayVector);
+        }
+        size_t vectorIndex = m_RayList[lastSetIndex].size();
+        if(vectorIndex < 67108863){
+            m_RayList[lastSetIndex].push_back(inputRay);
+        }
+        else{
+            std::vector<Ray> newRayVector;
+            newRayVector.resize(67108864);
+            m_RayList.insert(newRayVector);
+        }
+    }
+    */
+    void TracerInterface::addRayVector(void* location){
+        std::vector<Ray> newRayVector;
+        newRayVector.resize(1048576);
+        memcpy(&newRayVector[0], location, 1048576 * VULKANTRACER_RAY_DOUBLE_AMOUNT * sizeof(double));
+        m_RayList.push_back(newRayVector);
+    }
     bool TracerInterface::run()
     {
         //create tracer instance
@@ -48,9 +71,9 @@ namespace RAY
         
 
         //add rays to tracer
-        for (int i = 0; i < m_RayList.size(); i++)
+        for (auto i = m_RayList.begin(); i != m_RayList.end(); i++)
         {
-            tracer.addRay(m_RayList[i]->m_position.x, m_RayList[i]->m_position.y, m_RayList[i]->m_position.z, m_RayList[i]->m_direction.x, m_RayList[i]->m_direction.y, m_RayList[i]->m_direction.z, 1);
+            tracer.addRayVector(&(*i));
         }
 
 
@@ -84,7 +107,7 @@ namespace RAY
         std::cout << "run succeeded" << std::endl;
 
         //get rays from tracer
-        std::unordered_set<double> outputRays = tracer.getRays();
+        std::set<double> outputRays = tracer.getRays();
         
         std::cout << "tracer run incl load rays time: " << float( clock () - begin_time ) << " ms" << std::endl;
         

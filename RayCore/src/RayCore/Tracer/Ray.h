@@ -14,8 +14,8 @@ namespace RAY
         Ray(glm::dvec3 position, glm::dvec3 direction, double weight);
         ~Ray();
         glm::dvec3 m_position;
-        glm::dvec3 m_direction;
         double m_weight;
+        glm::dvec3 m_direction;
 
     private:
     };
