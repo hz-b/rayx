@@ -1,6 +1,4 @@
-#ifndef QUADRIC_H
-#define QUADRIC_H
-
+#pragma once
 #include "Core.h"
 #include <vector>
 #include <iostream>
@@ -41,4 +39,3 @@ namespace RAY {
             std::vector<double> m_parameters;
     };
 }
-#endif

@@ -1,8 +1,4 @@
 #pragma once
-
-#ifndef BEAMLINE_H
-#define BEAMLINE_H
-
 #include "Core.h"
 #include "glm.hpp"
 #include "PlaneGrating.h"
@@ -37,4 +33,3 @@ namespace RAY
     };
 
 } // namespace RAY
-#endif

@@ -1,5 +1,4 @@
-#ifndef PLANEGRATING_H
-#define PLANEGRATING_H
+#pragma once
 #include "Quadric.h"
 
 namespace RAY
@@ -41,5 +40,3 @@ namespace RAY
     };
 
 } // namespace RAY
-
-#endif

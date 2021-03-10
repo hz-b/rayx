@@ -1,5 +1,4 @@
 #pragma once
-
 #include "Core.h"
 #include "glm.hpp"
 #include <vector>
