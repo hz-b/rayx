@@ -11,8 +11,3 @@ TerminalApp::~TerminalApp()
 {
 
 }
-
-RAY::Application* RAY::CreateApplication()
-{
-	return new TerminalApp();
-}

@@ -19,6 +19,6 @@ namespace RAY
 	};
 
 	// To be defined in CLIENT
-	Application *CreateApplication();
+	// Application *CreateApplication();
 
 } // namespace RAY

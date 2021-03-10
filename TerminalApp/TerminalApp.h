@@ -11,11 +11,5 @@ public:
 	~TerminalApp();
 
 private:
-	// int executeCommand(char** argv);
-	// char** argumentParser(char* argv);
-
-	// int loadCMD(char** argv);
-	// int runCMD(char** argv);
-	// int exitCMD(char** argv);
 
 };
