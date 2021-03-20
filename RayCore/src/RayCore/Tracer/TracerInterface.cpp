@@ -111,10 +111,8 @@ namespace RAY
         
         // m.compareRays(m_RayList, outputRays); // for comparing accuracy of cos and atan approximation with "source" RandomRays
         std::cout << "read data succeeded" << std::endl;
-        std::cout << "writing to file..." << std::endl;
         std::cout << outputRays.size() << std::endl;
-        //writeToFile(outputRays);
-        std::cout << "done!" << std::endl;
+        writeToFile(outputRays);
         //for(auto iter = outputRays.begin(); iter != outputRays.end(); ++iter){
             //std::cout << *iter << ", ";
         //}
@@ -125,8 +123,9 @@ namespace RAY
     }
 
     //writes rays to file
-    void TracerInterface::writeToFile(std::vector<double> outputRays)
+    void TracerInterface::writeToFile(std::list<double> outputRays)
     {
+        std::cout << "writing to file..." << std::endl;
         std::ofstream outputFile;
         outputFile.precision(17);
         std::cout.precision (17);
@@ -134,11 +133,20 @@ namespace RAY
         char sep = ','; // file is saved in .csv (comma seperated value), excel compatibility is manual right now
         outputFile << "Index" << sep << "Xloc" << sep << "Yloc" << sep<<"Zloc"<<sep<<"Weight"<<sep<<"Xdir"<<sep<<"Ydir"<<sep<<"Zdir" << std::endl;
         // outputFile << "Index,Xloc,Yloc,Zloc,Weight,Xdir,Ydir,Zdir" << std::endl;
-        for (int i=0; i<outputRays.size(); i+=8){
-            outputFile << i/VULKANTRACER_RAY_DOUBLE_AMOUNT << sep << outputRays[i] << sep << outputRays[i+1] << sep << outputRays[i+2] << sep << outputRays[i+3] << sep << outputRays[i+4] << sep << outputRays[i+5] << sep << outputRays[i+6] << std::endl;
-            std::cout << "(" << outputRays[i] << sep << outputRays[i+1] << sep << outputRays[i+2] << "), weight= " << outputRays[i+3] << " (" << outputRays[i+4] << sep << outputRays[i+5] << sep << outputRays[i+6] << ")" << std::endl;
+        size_t counter = 0;
+        for (std::list<double>::iterator i=outputRays.begin(); i != outputRays.end(); i++){
+            if(counter%8 == 0){
+                outputFile << counter/VULKANTRACER_RAY_DOUBLE_AMOUNT;
+            }
+            outputFile << sep << *i ;
+            if(counter%8 == 7){
+                outputFile << std::endl;
+            }
+            counter++;
+            std::cout << *i<< std::endl;
         }
         outputFile.close();
+        std::cout << "done!" << std::endl;
     }
     //reads from file. datatype (RayType, QuadricType) needs to be set
     //pretty ugly, should be rewritten later

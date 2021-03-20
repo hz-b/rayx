@@ -23,7 +23,7 @@ namespace RAY
         ~TracerInterface();
         void addLightSource(LightSource* newSource);
         void generateRays();
-        void writeToFile(std::vector<double> outputRays);
+        void writeToFile(std::list<double> outputRays);
         void readFromFile(std::string path, m_dataType dataType);
         //void addRayToRayList(Ray inputRay);
         void addRayVector(void* location);
