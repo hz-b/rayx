@@ -1,15 +1,15 @@
+#pragma once
+
 #include "vulkan/vulkan.hpp"
 
 #include <iostream>
 #include <stdexcept>
 #include <cstdlib>
-#include <vector>
+#include "RayList.h"
 #include <map>
 #include <optional>
-#include "Ray.h"
 #include <assert.h>
 #include <cmath>
-#include <list>
 
 #ifdef NDEBUG
 const bool enableValidationLayers = false;
@@ -48,7 +48,7 @@ public:
     void run();
     //void addRay(double xpos, double ypos, double zpos, double xdir, double ydir, double zdir, double weight);
     //void addRay(double* location);
-    void addRayVector(void* location);
+    void addRayVector(void* location, size_t size);
     void addQuadric(std::vector<double> inQuadric, std::vector<double> inputInMatrix, std::vector<double> inputOutMatrix, std::vector<double> misalignmentMatrix, std::vector<double> inverseMisalignmentMatrix);
     std::list<double> getRays();
     void cleanup();
@@ -79,6 +79,7 @@ private:
             return hasvalue;
         }
     };
+    
     //Member variables:
     VkInstance instance;
     VkDebugUtilsMessengerEXT debugMessenger;
@@ -98,7 +99,7 @@ private:
     VkQueue computeQueue;
     uint32_t queueFamilyIndex;
     uint32_t rayAmount;
-    std::list<std::vector<Ray>> rayList;
+    RayList rayList;
     std::vector<double> beamline;
     QueueFamilyIndices QueueFamily;
     
@@ -133,6 +134,7 @@ private:
     void runCommandBuffer();
     void setRayAmount(uint32_t inputRayAmount);
     void setRayAmount();
+    void divideAndSortRays();
 
     int main();
 };

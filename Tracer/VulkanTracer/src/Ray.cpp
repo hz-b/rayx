@@ -16,6 +16,7 @@ Ray::Ray(double xpos, double ypos, double zpos, double xdir, double ydir, double
 Ray::Ray(double* location){
 	memcpy(&position.x, location, 64);
 }
+Ray::Ray(){}
 Ray::~Ray(){
 
 }
