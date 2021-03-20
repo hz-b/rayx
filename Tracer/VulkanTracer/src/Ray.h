@@ -1,6 +1,10 @@
+#pragma once
+
 #include <stdexcept>
 #include <iostream>
 #include <vector>
+
+
 
 class Ray
 {

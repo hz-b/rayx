@@ -860,7 +860,7 @@ void VulkanTracer::setRayAmount(uint32_t inputRayAmount)
 }
 void VulkanTracer::setRayAmount()
 {
-	rayAmount = rayList.size() * RAY_VECTOR_SIZE /(VULKANTRACER_RAY_DOUBLE_AMOUNT*sizeof(double));
+	rayAmount = rayList.rayAmount();;
 }
 /*
 void VulkanTracer::addRay(double xpos, double ypos, double zpos, double xdir, double ydir, double zdir, double weight){
@@ -887,14 +887,15 @@ void VulkanTracer::addRay(double* location){
 	}
 }
 */
-void VulkanTracer::addRayVector(void* location){
+void VulkanTracer::addRayVector(void* location, size_t size){
 	std::vector<Ray> newRayVector;
     std::cout<<"1"<<std::endl;
-	newRayVector.reserve(1048576);
+	newRayVector.reserve(size);
     std::cout<<"2"<<std::endl;
-	memcpy(&newRayVector[0], location, 1048576 * VULKANTRACER_RAY_DOUBLE_AMOUNT * sizeof(double));
-    std::cout<<"3"<<std::endl;
-	rayList.push_back(newRayVector);
+	memcpy(&newRayVector[0], location, size * VULKANTRACER_RAY_DOUBLE_AMOUNT * sizeof(double));
+	newRayVector.resize(size);
+    std::cout<<"3 "<< newRayVector.size() << std::endl;
+	rayList.insertVector(newRayVector);
     std::cout<<"4"<<std::endl;
 
 }
@@ -907,6 +908,11 @@ void VulkanTracer::addQuadric(std::vector<double> inQuadric, std::vector<double>
 	beamline.insert(beamline.end(), inputOutMatrix.begin(), inputOutMatrix.end());
 	beamline.insert(beamline.end(), misalignmentMatrix.begin(), misalignmentMatrix.end());
 	beamline.insert(beamline.end(), inverseMisalignmentMatrix.begin(), inverseMisalignmentMatrix.end());
+}
+void VulkanTracer::divideAndSortRays(){
+	for(auto i = rayList.begin(); i!=rayList.end(); i++){
+		
+	}
 }
 
 //is not used anymore

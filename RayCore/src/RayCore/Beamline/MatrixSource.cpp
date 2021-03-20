@@ -54,7 +54,7 @@ namespace RAY
             rayVector.push_back(r_copy);
         }
         std::cout<<&(rayVector[0])<<std::endl;
-        rayVector.resize(1048576);
+        //rayVector.resize(1048576);
         return rayVector;
     }
 

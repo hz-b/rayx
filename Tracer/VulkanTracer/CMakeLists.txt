@@ -29,6 +29,8 @@ add_library(${PROJECT_NAME}
     STATIC 
         src/Ray.cpp 
         src/Ray.h 
+        src/RayList.h
+        src/RayList.cpp
         src/VulkanTracer.cpp
         src/VulkanTracer.h
 )

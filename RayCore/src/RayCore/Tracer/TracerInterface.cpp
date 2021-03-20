@@ -44,12 +44,6 @@ namespace RAY
         }
     }
     */
-    void TracerInterface::addRayVector(void* location){
-        std::vector<Ray> newRayVector;
-        newRayVector.resize(1048576);
-        memcpy(&newRayVector[0], location, 1048576 * VULKANTRACER_RAY_DOUBLE_AMOUNT * sizeof(double));
-        m_RayList.push_back(newRayVector);
-    }
     bool TracerInterface::run()
     {
         //create tracer instance
@@ -61,7 +55,7 @@ namespace RAY
         //initialize matrix light source with default params
         
         //RandomRays m = RandomRays(1000000); // produces random values for position, direction and weight to test cosinus and atan implementation
-        int number_of_rays = 1<<5;
+        int number_of_rays = 25;
         MatrixSource m = MatrixSource(0, "Matrix source 1", number_of_rays, 0.065, 0.04, 0.0, 0.001, 0.001);
         //PointSource m = PointSource(0, "Point source 1", number_of_rays, 0.065, 0.04, 1.0, 0.001, 0.001);
         //std::cout << m.getName() << " with " << m.getNumberOfRays() << " Rays." << std::endl;std::cout.precision(15); // show 16 decimals
@@ -74,9 +68,9 @@ namespace RAY
         std::cout<<"start add rays to tracer"<<std::endl;
         for (auto i = m_RayList.begin(); i != m_RayList.end(); i++)
         {
-            std::cout<<(*i).size()<<std::endl;
+            std::cout<<"i.size= " << (*i).size()<<std::endl;
             std::cout<<&((*i)[0])<<std::endl;
-            tracer.addRayVector(&((*i)[0]));
+            tracer.addRayVector(&((*i)[0]), (*i).size());
         }
         std::cout<<"add rays to tracer done"<<std::endl;
 
