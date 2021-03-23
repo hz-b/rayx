@@ -37,8 +37,8 @@ void DestroyDebugUtilsMessengerEXT(VkInstance instance, VkDebugUtilsMessengerEXT
 const int WORKGROUP_SIZE = 32;
 #define VULKANTRACER_RAY_DOUBLE_AMOUNT 8
 #define VULKANTRACER_QUADRIC_DOUBLE_AMOUNT 64
-#define GPU_MAX_STAGING_SIZE 268435456 //256MB
-#define RAY_VECTOR_SIZE 67108864
+#define GPU_MAX_STAGING_SIZE 134217728 //128MB
+#define RAY_VECTOR_SIZE 16777216
 
 class VulkanTracer
 {
@@ -50,8 +50,9 @@ public:
     //void addRay(double* location);
     void addRayVector(void* location, size_t size);
     void addQuadric(std::vector<double> inQuadric, std::vector<double> inputInMatrix, std::vector<double> inputOutMatrix, std::vector<double> misalignmentMatrix, std::vector<double> inverseMisalignmentMatrix);
-    std::list<double> getRays();
+    void* getRays();
     void cleanup();
+	RayList outputData;
 
 private:
     //Member structs:

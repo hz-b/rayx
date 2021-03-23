@@ -56,8 +56,8 @@ void VulkanTracer::run()
 	bufferSizes[0] = (uint64_t)rayAmount * VULKANTRACER_RAY_DOUBLE_AMOUNT * sizeof(double);
 	bufferSizes[1] = (uint64_t)rayAmount * VULKANTRACER_RAY_DOUBLE_AMOUNT * sizeof(double);
 	bufferSizes[2] = beamline.size() * sizeof(double);
-	bufferSizes[3] = std::min((uint64_t) GPU_MAX_STAGING_SIZE, (uint64_t)rayAmount * VULKANTRACER_RAY_DOUBLE_AMOUNT * sizeof(double)); //maximum of 256MB
-	bufferSizes[4] = std::min((uint64_t) GPU_MAX_STAGING_SIZE, (uint64_t)rayAmount * VULKANTRACER_RAY_DOUBLE_AMOUNT * sizeof(double)); //maximum of 256MB
+	bufferSizes[3] = std::min((uint64_t) GPU_MAX_STAGING_SIZE, (uint64_t)rayAmount * VULKANTRACER_RAY_DOUBLE_AMOUNT * sizeof(double)); //maximum of 128MB
+	bufferSizes[4] = std::min((uint64_t) GPU_MAX_STAGING_SIZE, (uint64_t)rayAmount * VULKANTRACER_RAY_DOUBLE_AMOUNT * sizeof(double)); //maximum of 128MB
 	for (int i = 0; i<bufferSizes.size(); i++){
 		std::cout << "bufferSizes["<<i<<"]: " << bufferSizes[i] << std::endl;
 	}
@@ -409,9 +409,9 @@ void VulkanTracer::createBuffers(){
 	//Quadric Buffer
 	createBuffer(bufferSizes[2], VK_BUFFER_USAGE_STORAGE_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_COHERENT_BIT | VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT, buffers[2], bufferMemories[2]);
 	//staging buffer for rays
-	createBuffer(bufferSizes[3], VK_BUFFER_USAGE_TRANSFER_SRC_BIT | VK_BUFFER_USAGE_STORAGE_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_COHERENT_BIT | VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT, buffers[3], bufferMemories[3]);
+	createBuffer(bufferSizes[3], VK_BUFFER_USAGE_TRANSFER_DST_BIT | VK_BUFFER_USAGE_TRANSFER_SRC_BIT | VK_BUFFER_USAGE_STORAGE_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_COHERENT_BIT | VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT, buffers[3], bufferMemories[3]);
 	//staging buffer for output
-	createBuffer(bufferSizes[3], VK_BUFFER_USAGE_TRANSFER_DST_BIT | VK_BUFFER_USAGE_STORAGE_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_COHERENT_BIT | VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT, buffers[4], bufferMemories[4]);
+	//createBuffer(bufferSizes[3], VK_BUFFER_USAGE_TRANSFER_DST_BIT | VK_BUFFER_USAGE_STORAGE_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_COHERENT_BIT | VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT, buffers[4], bufferMemories[4]);
     std::cout << "all buffers created!" << std::endl;
 }
 void VulkanTracer::createBuffer(VkDeviceSize size, VkBufferUsageFlags usage, VkMemoryPropertyFlags properties, VkBuffer& buffer, VkDeviceMemory& bufferMemory){
@@ -429,6 +429,7 @@ void VulkanTracer::createBuffer(VkDeviceSize size, VkBufferUsageFlags usage, VkM
 	allocateInfo.allocationSize = memoryRequirements.size; // specify required memory.
 	allocateInfo.memoryTypeIndex = findMemoryType(
 		memoryRequirements.memoryTypeBits,properties);
+	std::cout << "buffer size: "<<size << std::endl;
 	VK_CHECK_RESULT(vkAllocateMemory(device, &allocateInfo, NULL, &bufferMemory)); // allocate memory on device.
 	
 	// Now associate that allocated memory with the buffer. With that, the buffer is backed by actual memory.
@@ -438,7 +439,7 @@ void VulkanTracer::createBuffer(VkDeviceSize size, VkBufferUsageFlags usage, VkM
 }
 void VulkanTracer::fillRayBuffer(){
 	uint32_t bytesNeeded = rayAmount * VULKANTRACER_RAY_DOUBLE_AMOUNT * sizeof(double);
-	uint32_t numberOfStagingBuffers = std::ceil((double)bytesNeeded/ (double)bufferSizes[3]); // bufferSizes[3] = 256MB
+	uint32_t numberOfStagingBuffers = std::ceil((double)bytesNeeded/ (double)bufferSizes[3]); // bufferSizes[3] = 128MB
 	std::cout << "Debug Info: number of staging buffers: "<<numberOfStagingBuffers << std::endl;
 	std::list<std::vector<Ray>>::iterator raySetIterator;
 	raySetIterator = rayList.begin();
@@ -446,37 +447,33 @@ void VulkanTracer::fillRayBuffer(){
 	for (int i = 0; i<numberOfStagingBuffers-1; i++){
 		fillStagingBuffer(i, raySetIterator, vectorsPerStagingBuffer);
 		copyToRayBuffer(i, GPU_MAX_STAGING_SIZE);
-		std::cout << "Debug Info: more than 256MB of rays" << std::endl;
+		std::cout << "Debug Info: more than 128MB of rays" << std::endl;
 	}
 	
 	std::cout << "numberOfStagingBuffers: "<< numberOfStagingBuffers << ", bytesNeeded: "<<bytesNeeded << std::endl;
 	fillStagingBuffer((numberOfStagingBuffers-1)*GPU_MAX_STAGING_SIZE, raySetIterator, vectorsPerStagingBuffer);
 	
 	std::cout << "Debug Info: fill staging done" << std::endl;
-	copyToRayBuffer((numberOfStagingBuffers-1)*GPU_MAX_STAGING_SIZE, bytesNeeded % GPU_MAX_STAGING_SIZE);
+	copyToRayBuffer((numberOfStagingBuffers-1)*GPU_MAX_STAGING_SIZE, ((bytesNeeded-1) % GPU_MAX_STAGING_SIZE)+1);
 
 }
 //the input buffer is filled with the ray data
 void VulkanTracer::fillStagingBuffer(uint32_t offset, std::list<std::vector<Ray>>::iterator raySetIterator, size_t vectorsPerStagingBuffer)
 {
-
+	
 	//data is copied to the buffer
 	void *data;
 	vkMapMemory(device, bufferMemories[3], 0, bufferSizes[3], 0, &data);
 	assert((*raySetIterator).size() <= GPU_MAX_STAGING_SIZE);
-	//std::cout << "std::ceil((*raySetIterator).size()/GPU_MAX_STAGING_SIZE): "<<std::ceil((double)(*raySetIterator).size()/GPU_MAX_STAGING_SIZE)<< std::endl;
-	vectorsPerStagingBuffer = std::min((size_t)std::ceil((double)(*raySetIterator).size()/GPU_MAX_STAGING_SIZE), vectorsPerStagingBuffer);
-	std::cout << "vectorsPerStagingBuffer: "<<std::min((*raySetIterator).size()*VULKANTRACER_RAY_DOUBLE_AMOUNT*sizeof(double), (size_t)GPU_MAX_STAGING_SIZE)<< std::endl;
-	for(auto i = (*raySetIterator).begin(); i != (*raySetIterator).end(); i++){
-
-		std::cout << "value: "<<(*i).getxPos()<< std::endl;
-	}
+	//std::cout << "((double)(*raySetIterator).size(): "<<(double)(*raySetIterator).size()<< std::endl;
+	vectorsPerStagingBuffer = std::min((size_t)std::ceil(((double)(*raySetIterator).size()*VULKANTRACER_RAY_DOUBLE_AMOUNT*sizeof(double))*rayList.size()*4/GPU_MAX_STAGING_SIZE), vectorsPerStagingBuffer);
+	std::cout << "vectorsPerStagingBuffer: "<<vectorsPerStagingBuffer<< std::endl;
 	for(int i = 0; i<vectorsPerStagingBuffer; i++){
 		memcpy(((char*)data)+i*RAY_VECTOR_SIZE, (*raySetIterator).data(), std::min((*raySetIterator).size()*VULKANTRACER_RAY_DOUBLE_AMOUNT*sizeof(double), (size_t)GPU_MAX_STAGING_SIZE));
 		raySetIterator++;
 	}
 	double* temp = (double*)data;
-	std::cout << "value: "<<temp[0]<< std::endl;
+	//std::cout << "value: "<<temp[0]<< std::endl;
 	vkUnmapMemory(device, bufferMemories[3]);
 }
 void VulkanTracer::copyToRayBuffer(uint32_t offset, uint32_t numberOfBytesToCopy){
@@ -533,7 +530,7 @@ VkCommandBufferAllocateInfo allocInfo{};
 	VkBufferCopy copyRegion{};
 	copyRegion.srcOffset = offset;
 	copyRegion.size = numberOfBytesToCopy;
-	vkCmdCopyBuffer(commandBuffer, buffers[1], buffers[4], 1, &copyRegion);
+	vkCmdCopyBuffer(commandBuffer, buffers[1], buffers[3], 1, &copyRegion);
 
 	vkEndCommandBuffer(commandBuffer);
 
@@ -549,9 +546,9 @@ VkCommandBufferAllocateInfo allocInfo{};
 
 
 }
-std::list<double> VulkanTracer::getRays(){
+void* VulkanTracer::getRays(){
 	std::cout << "rayList.size(): "<<rayList.size()<< std::endl;
-	std::list<double> data;
+	std::vector<Ray> data;
 	//reserve enough data for all the rays
 	/*
     std::cout << "reserving memory"  << std::endl;
@@ -560,32 +557,45 @@ std::list<double> VulkanTracer::getRays(){
 	*/
 	uint32_t bytesNeeded = rayAmount * VULKANTRACER_RAY_DOUBLE_AMOUNT * sizeof(double);
 	uint32_t numberOfStagingBuffers = std::ceil((double)bytesNeeded/ (double)bufferSizes[3]);
+	std::cout << "getRays: numberOfStagingBuffers: "<<numberOfStagingBuffers << std::endl;
+
+	//TODO: ONLY FIRST STAGING BUFFER IS TRANSFERED
+	numberOfStagingBuffers = 1;
+
 	for (int i = 0; i<numberOfStagingBuffers-1; i++){
 		copyToOutputBuffer(i, GPU_MAX_STAGING_SIZE);
-		std::cout << "Debug Info: more than 256MB of rays" << std::endl;
+		std::cout << "Debug Info: more than 128MB of rays" << std::endl;
 		void *mappedMemory = NULL;
 		// Map the buffer memory, so that we can read from it on the CPU.
-		vkMapMemory(device, bufferMemories[4], 0, GPU_MAX_STAGING_SIZE, 0, &mappedMemory);
+		vkMapMemory(device, bufferMemories[3], 0, GPU_MAX_STAGING_SIZE, 0, &mappedMemory);
 		double *pMappedMemory = (double *)mappedMemory;
-		for (int j = 0; j < GPU_MAX_STAGING_SIZE/sizeof(double); j++)
+		// TODO : Currently only the first 16 MB will be transfered to outputData
+		for (int j = 0; j < GPU_MAX_STAGING_SIZE/(sizeof(double)*8); j=j+8)
 		{
-			data.push_back(pMappedMemory[j]);
+			data.push_back(Ray(pMappedMemory[j],pMappedMemory[j+1],pMappedMemory[j+2],pMappedMemory[j+3],pMappedMemory[j+4],pMappedMemory[j+5], pMappedMemory[j+6]));
 		}
+		outputData.insertVector(data);
+		data.empty();
+		vkUnmapMemory(device, bufferMemories[3]);
 	}
 	std::cout << "numberOfStagingBuffers: "<< numberOfStagingBuffers << ", bytesNeeded: "<<bytesNeeded << std::endl;
-	copyToOutputBuffer((numberOfStagingBuffers-1)*GPU_MAX_STAGING_SIZE, bytesNeeded % GPU_MAX_STAGING_SIZE);
+	copyToOutputBuffer((numberOfStagingBuffers-1)*GPU_MAX_STAGING_SIZE, ((bytesNeeded-1) % GPU_MAX_STAGING_SIZE)+1);
 	void *mappedMemory = NULL;
 	// Map the buffer memory, so that we can read from it on the CPU.
-	vkMapMemory(device, bufferMemories[4], 0, bytesNeeded % GPU_MAX_STAGING_SIZE, 0, &mappedMemory);
+	vkMapMemory(device, bufferMemories[3], 0, ((bytesNeeded-1) % GPU_MAX_STAGING_SIZE)+1, 0, &mappedMemory);
 	double *pMappedMemory = (double *)mappedMemory;
-	for (int j = 0; j < (bytesNeeded % GPU_MAX_STAGING_SIZE)/sizeof(double); j++)
+	// TODO : Currently only the first 16 MB will be transfered to outputData
+	for (int j = 0; j < (((bytesNeeded-1) % GPU_MAX_STAGING_SIZE)+1)/(sizeof(double)*8); j=j+8)
 	{
-		data.push_back(pMappedMemory[j]);
+		data.push_back(Ray(pMappedMemory[j],pMappedMemory[j+1],pMappedMemory[j+2],pMappedMemory[j+3],pMappedMemory[j+4],pMappedMemory[j+5], pMappedMemory[j+6]));
 	}
-	vkUnmapMemory(device, bufferMemories[4]);
-    std::cout << "data[0]: "<<data.front()  << std::endl;
+	std::cout<<"data size= "<< data.size() <<std::endl;
+	outputData.insertVector(data);
+	data.empty();
+	vkUnmapMemory(device, bufferMemories[3]);
     std::cout << "mapping memory done"  << std::endl;
-	return data;
+    std::cout << "output size in bytes: "<< (*(outputData.begin())).size() * RAY_DOUBLE_COUNT*sizeof(double)  << std::endl;
+	return (*(outputData.begin())).data();
 	
 }
 
@@ -874,39 +884,16 @@ void VulkanTracer::setRayAmount()
 {
 	rayAmount = rayList.rayAmount();;
 }
-/*
-void VulkanTracer::addRay(double xpos, double ypos, double zpos, double xdir, double ydir, double zdir, double weight){
-	Ray newRay(xpos, ypos, zpos, xdir, ydir, zdir, weight);
-	rayVector.push_back(newRay);
-}
-void VulkanTracer::addRay(double* location){
 
-	int lastSetIndex = rayList.size()-1;
-	if(lastSetIndex == -1){
-		std::vector<Ray> newRayVector;
-		newRayVector.resize(1048576); //1048576 Rays = 64 MB
-		rayList.insert(newRayVector);
-	}
-	int vectorIndex = rayList[lastSetIndex].size()-1;
-	if(vectorIndex < 1048575){
-		memcpy(&(rayList[lastSetIndex][vectorIndex]), location, 64);
-	}
-	else{
-		std::vector<Ray> newRayVector;
-		newRayVector.resize(1048576);
-		memcpy(&newRayVector[0], location, 64);
-		rayList.insert(newRayVector);
-	}
-}
-*/
 void VulkanTracer::addRayVector(void* location, size_t size){
 	std::vector<Ray> newRayVector;
     std::cout<<"1"<<std::endl;
 	newRayVector.reserve(size);
-    std::cout<<"2"<<std::endl;
+    //std::cout<<"2"<<std::endl;	
+    //std::cout<<"addRayVector: size= "<<size<<std::endl;
 	memcpy(&newRayVector[0], location, size * VULKANTRACER_RAY_DOUBLE_AMOUNT * sizeof(double));
 	newRayVector.resize(size);
-    std::cout<<"3 "<< newRayVector.size() << std::endl;
+    //std::cout<<"3 "<< newRayVector.size() << std::endl;
 	rayList.insertVector(newRayVector);
     std::cout<<"4"<<std::endl;
 

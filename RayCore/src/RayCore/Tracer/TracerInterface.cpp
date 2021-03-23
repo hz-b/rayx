@@ -4,6 +4,7 @@
 #include <fstream>
 #include <chrono>
 #include <sstream>
+#include <cmath>
 
 namespace RAY
 {
@@ -70,7 +71,9 @@ namespace RAY
         {
             std::cout<<"i.size= " << (*i).size()<<std::endl;
             std::cout<<&((*i)[0])<<std::endl;
-            tracer.addRayVector(&((*i)[0]), (*i).size());
+            for (int j=0; j<1; j++){
+                tracer.addRayVector(&((*i)[0]), (*i).size());
+            }
         }
         std::cout<<"add rays to tracer done"<<std::endl;
 
@@ -105,14 +108,25 @@ namespace RAY
         std::cout << "run succeeded" << std::endl;
 
         //get rays from tracer
-        std::list<double> outputRays = tracer.getRays();
+        void* outputRaysLocation = tracer.getRays();
+
+        std::vector<Ray> outputRays;
+
+        size_t bytesToCopy = std::min((size_t) 2048*RAY_DOUBLE_COUNT*sizeof(double), (size_t) number_of_rays*RAY_DOUBLE_COUNT*sizeof(double));
         
+        outputRays.resize(bytesToCopy);
+        std::cout << "bytesToCopy: "<< bytesToCopy << std::endl;
+        try{
+            memcpy(outputRays.data(), outputRaysLocation, 1);
+        }
+        catch (const std::exception& e) { std::cout<<e.what()<<std::endl;}
+
         std::cout << "tracer run incl load rays time: " << float( clock () - begin_time ) << " ms" << std::endl;
         
         // m.compareRays(m_RayList, outputRays); // for comparing accuracy of cos and atan approximation with "source" RandomRays
         std::cout << "read data succeeded" << std::endl;
         std::cout << outputRays.size() << std::endl;
-        writeToFile(outputRays);
+        //writeToFile(outputRays);
         //for(auto iter = outputRays.begin(); iter != outputRays.end(); ++iter){
             //std::cout << *iter << ", ";
         //}
@@ -143,7 +157,7 @@ namespace RAY
                 outputFile << std::endl;
             }
             counter++;
-            std::cout << *i<< std::endl;
+            //std::cout << *i<< std::endl;
         }
         outputFile.close();
         std::cout << "done!" << std::endl;
@@ -157,7 +171,7 @@ namespace RAY
         switch(dataType){
             case TracerInterface::RayType: {
                 std::vector<Ray> newRayVector;
-                newRayVector.resize(1048576);
+                newRayVector.resize(RAY_MAX_ELEMENTS_IN_VECTOR);
                 std::string line;
                 std::getline(inputFile, line);
                 //std::cout<<line<<std::endl;
@@ -192,11 +206,11 @@ namespace RAY
                     //std::cout<<newDoubles[0]<<newDoubles[1]<<newDoubles[2]<<newDoubles[3]<<newDoubles[4]<<newDoubles[5]<<newRay.m_direction.y<<newRay.m_direction.z<<"test"<<std::endl;
                     newRayVector.push_back(newRay);
                     numberOfRays++;
-                    if(numberOfRays>1048576){
+                    if(numberOfRays>RAY_MAX_ELEMENTS_IN_VECTOR){
                         m_RayList.push_back(newRayVector);
                         numberOfRays = 0;
                         newRayVector.clear();
-                        newRayVector.resize(1048576);
+                        newRayVector.resize(RAY_MAX_ELEMENTS_IN_VECTOR);
                     }
 
                 }
