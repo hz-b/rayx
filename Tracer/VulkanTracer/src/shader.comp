@@ -1028,8 +1028,8 @@ void cameraPlaneIntersection(outputData, cameraPlane){
 }
 */
 void main(){
-	outputData[uint(gl_GlobalInvocationID)] = rayData[uint(gl_GlobalInvocationID)];
-	//iterateQuadrics();
+	//outputData[uint(gl_GlobalInvocationID)] = rayData[uint(gl_GlobalInvocationID)];
+	iterateQuadrics();
 	/*Ray r = rayData[uint(gl_GlobalInvocationID)];
 	r.position = dvec3(r8_atan(r.position[0]), r8_atan(r.position[1]), r8_atan(r.position[2]));
 	r.direction = dvec4(r8_atan(r.direction[0]), r8_atan(r.direction[1]), r8_atan(r.direction[2]), r8_atan(r.direction[3]));

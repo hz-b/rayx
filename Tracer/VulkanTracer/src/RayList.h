@@ -1,10 +1,11 @@
 #pragma once
+#pragma pack(16)
 
 #include <list>
 #include "Ray.h"
 
-#define RAY_MAX_ELEMENTS_IN_VECTOR 1048576
-#define RAY_VECTOR_SIZE 67108864
+#define RAY_MAX_ELEMENTS_IN_VECTOR 262144
+#define RAY_VECTOR_SIZE 16777216
 #define RAY_DOUBLE_COUNT 8
 
 class RayList{
