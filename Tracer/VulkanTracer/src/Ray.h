@@ -1,4 +1,5 @@
 #pragma once
+#pragma pack(16)
 
 #include <stdexcept>
 #include <iostream>
