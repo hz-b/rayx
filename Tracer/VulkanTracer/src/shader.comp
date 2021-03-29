@@ -983,7 +983,6 @@ dvec4 intersectionPoint(inout Ray r, dmat4 quadric, int icurv)
 		}
 		y = y + aml*x;
 		z = z + anl*x;
-		w = 3;
 	}else if (cs == 2) {
 		double alm = r.direction[0] / r.direction[1];
 		double anm = r.direction[2] / r.direction[1];
