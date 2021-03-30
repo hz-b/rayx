@@ -40,6 +40,12 @@ SET(HEADERS
 
 add_library(${PROJECT_NAME} SHARED ${SOURCE} ${HEADERS} )
 
+if(MSVC)
+  target_compile_options(${PROJECT_NAME} PRIVATE /W4) # /WX
+else()
+  target_compile_options(${PROJECT_NAME} PRIVATE -Wall -Wextra -pedantic) # -Werror
+endif()
+
 target_link_libraries(${PROJECT_NAME} 
     PUBLIC VulkanTracer
 )
