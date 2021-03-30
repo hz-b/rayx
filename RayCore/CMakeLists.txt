@@ -15,6 +15,7 @@ SET(SOURCE
     src/RayCore/Beamline/utils.cpp
     src/RayCore/Tracer/Ray.cpp
     src/RayCore/Tracer/TracerInterface.cpp
+    src/RayCore/Data/Exporter.cpp
 )
 
 SET(HEADERS
@@ -33,6 +34,7 @@ SET(HEADERS
     src/RayCore/Beamline/utils.h
     src/RayCore/Tracer/Ray.h
     src/RayCore/Tracer/TracerInterface.h
+    src/RayCore/Data/Exporter.h
 )
 
 
@@ -58,6 +60,7 @@ target_compile_definitions(${PROJECT_NAME}
 target_include_directories(${PROJECT_NAME}  
     PUBLIC ${RayCore_SOURCE_DIR}/src/RayCore/
     PUBLIC ${RayCore_SOURCE_DIR}/vendor/glm/glm/
+    PUBLIC ${RayCore_SOURCE_DIR}/vendor/rapidxml-1.13/
 )
 
 
