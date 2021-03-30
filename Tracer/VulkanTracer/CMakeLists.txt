@@ -35,6 +35,12 @@ add_library(${PROJECT_NAME}
         src/VulkanTracer.h
 )
 
+if(MSVC)
+  target_compile_options(${PROJECT_NAME} PRIVATE /W4) # /WX
+else()
+  target_compile_options(${PROJECT_NAME} PRIVATE -Wall -Wextra -pedantic) # -Werror
+endif()
+
 target_include_directories(${PROJECT_NAME}  
     PUBLIC $ENV{VULKAN_SDK}/include
     PUBLIC ${VulkanTracer_SOURCE_DIR}/src/
