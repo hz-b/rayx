@@ -12,13 +12,11 @@ namespace RAY
 		Application();
 		virtual ~Application();
 
-		void Run();
+		void run();
+		void run(const std::string& file);
 
 	private:
 		TracerInterface m_tracerInterface;
 	};
-
-	// To be defined in CLIENT
-	// Application *CreateApplication();
 
 } // namespace RAY

@@ -1,6 +1,7 @@
 #include "Application.h"
 #include "BeamLine/BeamLine.h"
 #include "Debug.h"
+#include "Data/Exporter.h"
 
 #include <iostream>
 
@@ -17,9 +18,20 @@ namespace RAY
         DEBUG(std::cout << "Deleting Application..." << std::endl);
     }
 
-    void Application::Run()
+    void Application::run()
     {
         DEBUG(std::cout << "Application running..." << std::endl);
+        m_tracerInterface.run();
+    }
+
+    void Application::run(const std::string& filename)
+    {
+        DEBUG(std::cout << "Application running on given file..." << std::endl);
+
+        // TODO: read file here
+        //Exporter exp;
+        //exp.exportToXML();
+
         m_tracerInterface.run();
     }
 
