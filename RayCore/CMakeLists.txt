@@ -7,6 +7,9 @@ SET(SOURCE
     src/RayCore/BeamLine/LightSource.cpp
     src/RayCore/BeamLine/MatrixSource.cpp
     src/RayCore/BeamLine/RandomRays.cpp
+    src/RayCore/BeamLine/Ellipsoid.cpp
+    src/RayCore/BeamLine/ReflectionZonePlate.cpp
+    src/RayCore/BeamLine/Slit.cpp
     src/RayCore/Beamline/Quadric.cpp
     src/RayCore/Beamline/SphereGrating.cpp
     src/RayCore/Beamline/PlaneGrating.cpp
@@ -26,6 +29,9 @@ SET(HEADERS
     src/RayCore/BeamLine/LightSource.h
     src/RayCore/BeamLine/MatrixSource.h
     src/RayCore/BeamLine/RandomRays.h
+    src/RayCore/BeamLine/Ellipsoid.h
+    src/RayCore/BeamLine/ReflectionZonePlate.h
+    src/RayCore/BeamLine/Slit.h
     src/RayCore/Beamline/Quadric.h
     src/RayCore/Beamline/SphereGrating.h
     src/RayCore/Beamline/PlaneGrating.h
