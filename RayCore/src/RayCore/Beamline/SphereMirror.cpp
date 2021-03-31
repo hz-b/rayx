@@ -14,8 +14,8 @@ namespace RAY
      *          distanceToPreceedingElement
      * 
     */
-    SphereMirror::SphereMirror(double width, double height, double grazingIncidence, double azimuthal, double distanceToPreceedingElement, double entranceArmLength, double exitArmLength, std::vector<double> misalignmentParams) 
-    : Quadric({1,0,0,0, width,1,0,-1, height,0,1,0, 0,0,0,0}, {width, height,0,0, 0,0,0,0, 0,0,0,0, 0,0,0,0},rad(grazingIncidence), rad(azimuthal), rad(grazingIncidence), distanceToPreceedingElement) {
+    SphereMirror::SphereMirror(const char* name, double width, double height, double grazingIncidence, double azimuthal, double distanceToPreceedingElement, double entranceArmLength, double exitArmLength, std::vector<double> misalignmentParams) 
+    : Quadric(name,{1,0,0,0, width,1,0,-1, height,0,1,0, 0,0,0,0}, {width, height,0,0, 0,0,0,0, 0,0,0,0, 0,0,0,0},rad(grazingIncidence), rad(azimuthal), rad(grazingIncidence), distanceToPreceedingElement, misalignmentParams, {0,0,0,0,0,0}) {
         // std::vector<double> inputPoints = {0,0,0,0, 0,0,0,-1, 0,0,0,0, 0,0,0,0};
         m_totalWidth = width;
         m_totalHeight = height;
@@ -28,7 +28,6 @@ namespace RAY
         
         calcRadius(); // berechnen
         editQuadric({1,0,0,0, 0,1,0,-m_radius, 0,0,1,0, 0,0,0,0});
-        setMisalignment(misalignmentParams);
     }
 
     SphereMirror::~SphereMirror()
@@ -51,5 +50,28 @@ namespace RAY
 
     double SphereMirror::getRadius() {
         return m_radius;
+    }
+
+    double SphereMirror::getBeta() {
+        return m_beta;
+    }
+
+    double SphereMirror::getAlpha() {
+        return m_alpha;
+    }
+    
+    double SphereMirror::getChi() {
+        return m_chi;
+    }
+    double SphereMirror::getDist() {
+        return m_distanceToPreceedingElement;
+    }
+
+    double SphereMirror::getExitArmLength() {
+        return m_exitArmLength;
+    }
+
+    double SphereMirror::getEntranceArmLength() {
+        return m_entranceArmLength;
     }
 }

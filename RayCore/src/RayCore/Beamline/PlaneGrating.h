@@ -8,7 +8,7 @@ namespace RAY
 
     public:
         
-        PlaneGrating(int mount, double width, double height, double deviation, double normalIncidence, double azimuthal, double distanceToPreceedingElement, double designEnergyMounting, double lineDensity, double orderOfDiffraction, std::vector<double> misalignmentParams);
+        PlaneGrating(const char* name, int mount, double width, double height, double deviation, double normalIncidence, double azimuthal, double distanceToPreceedingElement, double designEnergyMounting, double lineDensity, double orderOfDiffraction, double fixFocusConstantCFF, std::vector<double> misalignmentParams, std::vector<double> vls);
         PlaneGrating();
         ~PlaneGrating();
 
@@ -17,6 +17,19 @@ namespace RAY
 
         double getWidth();
         double getHeight();
+        double getAlpha();
+        double getBeta();
+        // in rad as well
+        double getChi();
+        double getDistanceToPreceedingElement();
+        int getGratingMount();
+        double getFixFocusConstantCFF();
+
+        double getDesignEnergyMounting();
+        double getLineDensity();
+        double getOrderOfDiffraction();
+        double getA(); // calculated from line density, order of diffracion and design energy mounting
+        std::vector<double> getVls();
         
     private:
         double m_totalWidth;
@@ -27,15 +40,15 @@ namespace RAY
         // in rad as well
         double m_chi;
         double m_distanceToPreceedingElement;
-        enum GRATING_MOUNT  { GM_DEVIATION, GM_INCIDENCE};
+        enum GRATING_MOUNT  { GM_DEVIATION, GM_INCIDENCE, GM_CCF, GM_CCF_NO_PREMIRROR};
         GRATING_MOUNT m_gratingMount;
+        double m_fixFocusConstantCFF;
+
         double m_designEnergyMounting;
         double m_lineDensity;
         double m_orderOfDiffraction;
         double m_a; // calculated from line density, order of diffracion and design energy mounting
-        //double m_Depth;
-        //double m_verDivergence;
-        //double m_horDivergence;
+        std::vector<double> m_vls;
         
     };
 
