@@ -56,8 +56,8 @@ namespace RAY
         //initialize matrix light source with default params
         
         //RandomRays m = RandomRays(1000000); // produces random values for position, direction and weight to test cosinus and atan implementation
-        int number_of_rays = 25;
-        MatrixSource m = MatrixSource(0, "Matrix source 1", number_of_rays, 0.065, 0.04, 0.0, 0.001, 0.001);
+        int number_of_rays = 20;
+        MatrixSource m = MatrixSource(0, "Matrix20", number_of_rays, 0.065, 0.04, 0.0, 0.001, 0.001);
         //PointSource m = PointSource(0, "Point source 1", number_of_rays, 0.065, 0.04, 1.0, 0.001, 0.001);
         //std::cout << m.getName() << " with " << m.getNumberOfRays() << " Rays." << std::endl;std::cout.precision(15); // show 16 decimals
 
@@ -74,6 +74,7 @@ namespace RAY
             for (int j=0; j<1; j++){
                 tracer.addRayVector(&((*i)[0]), (*i).size());
             }
+            //tracer.addRayVector(&((*i)[0]), (*i).size());
         }
         std::cout<<"add rays to tracer done"<<std::endl;
 
@@ -81,24 +82,24 @@ namespace RAY
 
         std::cout.precision (17);
         // plane mirror with RAY-UI default values
-        PlaneMirror plM = PlaneMirror(50, 200, 10, 0, 10000, {0,0,0,0,0,0}); // {1,2,3,0.01,0.02,0.03}
+        //PlaneMirror plM = PlaneMirror("PlaneMirrorMis",50, 200, 10, 0, 10000, {1,2,3,0.001,0.002,0.003}); // {1,2,3,0.01,0.02,0.03}
         // plane grating with default values
-        PlaneGrating plG = PlaneGrating(50, 200, 10, 0.0, 0.0, 10000, 100, 1000, 1, 2, {1,2,3,0.001,0.002,0.003}); // dx,dy,dz, dpsi,dphi,dchi // {1,2,3,0.001,0.002,0.003}
+        PlaneGrating plG = PlaneGrating("PlaneGratingDeviationDefault", 1, 50, 200, 0, 10, 7.5, 10000, 100, 1000, 1, 2, {1,2,3,0.001,0.002,0.003}, {0,0,0,0,0,0}); // dx,dy,dz, dpsi,dphi,dchi // {1,2,3,0.001,0.002,0.003}
         // spherical grating with defalult values. SphereGrating(int mount, double width, double height, double deviation, double normalIncidence, double azimuthal, double distanceToPreceedingElement, double entranceArmLength, double exitArmLength, double designEnergyMounting, double lineDensity, double orderOfDiffraction, std::vector<double> misalignmentParams);
-        SphereGrating s = SphereGrating(0, 50, 200, 10, 0.0, 0.0, 10000, 10000, 1000,  100, 1000, 1, {0,0,0,0,0,0});
+        //SphereGrating s = SphereGrating("SphereGrating", 0, 50, 200, 10, 0.0, 0.0, 10000, 10000, 1000,  100, 1000, 1, {0,0,0,0,0,0});
         // std::cout << s.getRadius() << std::endl;
-        // SphereMirror sM = SphereMirror(50, 200, 10, 0.0, 10000, 10000, 1000, {0,0,0,0,0,0});
+        // SphereMirror s = SphereMirror("SphereMirror", 50, 200, 10, 0.0, 10000, 10000, 1000, {0,0,0,0,0,0});
         
         for(int i=0; i<1; i++){
-            //m_Beamline.addQuadric(s.getAnchorPoints(), s.getInMatrix(), s.getOutMatrix(), s.getMisalignmentMatrix(), s.getInverseMisalignmentMatrix());
-            m_Beamline.addQuadric(plM.getAnchorPoints(), plM.getInMatrix(), plM.getOutMatrix(), plM.getMisalignmentMatrix(), plM.getInverseMisalignmentMatrix());
-            //m_Beamline.addQuadric(plG.getAnchorPoints(), plG.getInMatrix(), plG.getOutMatrix(), plG.getMisalignmentMatrix(), plG.getInverseMisalignmentMatrix());
+            //m_Beamline.addQuadric(s.getName(), s.getAnchorPoints(), s.getInMatrix(), s.getOutMatrix(), s.getTempMisalignmentMatrix(), s.getInverseTempMisalignmentMatrix());
+            //m_Beamline.addQuadric(plM.getName(), plM.getAnchorPoints(), plM.getInMatrix(), plM.getOutMatrix(), plM.getTempMisalignmentMatrix(), plM.getInverseTempMisalignmentMatrix());
+            m_Beamline.addQuadric(plG.getName(), plG.getAnchorPoints(), plG.getInMatrix(), plG.getOutMatrix(), plG.getTempMisalignmentMatrix(), plG.getInverseTempMisalignmentMatrix());
         }
 
         //add beamline to tracer
         std::vector<RAY::Quadric> Quadrics = m_Beamline.getObjects();
         for(int i = 0; i<Quadrics.size(); i++){
-            tracer.addQuadric(Quadrics[i].getAnchorPoints(), Quadrics[i].getInMatrix(), Quadrics[i].getOutMatrix(), Quadrics[i].getMisalignmentMatrix(), Quadrics[i].getInverseMisalignmentMatrix());//, Quadrics[i].getInverseMisalignmentMatrix()
+            tracer.addQuadric(Quadrics[i].getAnchorPoints(), Quadrics[i].getInMatrix(), Quadrics[i].getOutMatrix(), Quadrics[i].getTempMisalignmentMatrix(), Quadrics[i].getInverseTempMisalignmentMatrix());//, Quadrics[i].getInverseMisalignmentMatrix()
         }
 
         const clock_t begin_time = clock();
@@ -121,6 +122,8 @@ namespace RAY
         }
         catch (const std::exception& e) { std::cout<<e.what()<<std::endl;}
 
+        //std::list<double> outputRays = tracer.getRays();
+        
         std::cout << "tracer run incl load rays time: " << float( clock () - begin_time ) << " ms" << std::endl;
         
         // m.compareRays(m_RayList, outputRays); // for comparing accuracy of cos and atan approximation with "source" RandomRays
@@ -143,22 +146,37 @@ namespace RAY
         std::ofstream outputFile;
         outputFile.precision(17);
         std::cout.precision (17);
-        outputFile.open("../../io/output.csv");
-        char sep = ','; // file is saved in .csv (comma seperated value), excel compatibility is manual right now
+        std::string filename = "../../output/output.csv";
+        outputFile.open(filename);
+        char sep = ';'; // file is saved in .csv (comma seperated value), excel compatibility is manual right now
         outputFile << "Index" << sep << "Xloc" << sep << "Yloc" << sep<<"Zloc"<<sep<<"Weight"<<sep<<"Xdir"<<sep<<"Ydir"<<sep<<"Zdir" << std::endl;
         // outputFile << "Index,Xloc,Yloc,Zloc,Weight,Xdir,Ydir,Zdir" << std::endl;
+        
         size_t counter = 0;
+        int print = 1;
         for (std::list<double>::iterator i=outputRays.begin(); i != outputRays.end(); i++){
             if(counter%8 == 0){
                 outputFile << counter/VULKANTRACER_RAY_DOUBLE_AMOUNT;
+                if(print==1) std::cout << ")" << std::endl;
+                if(print==1) std::cout << "(";
             }
-            outputFile << sep << *i ;
             if(counter%8 == 7){
                 outputFile << std::endl;
+                counter++;
+                continue;
             }
+            outputFile << sep << *i ;
+            if(counter%8 == 3) {
+                if(print==1) std::cout << ") ";
+            }else if(counter%8 == 4) {
+                if(print==1) std::cout << " (";
+            }else if(counter %8 != 0){
+                if(print==1) std::cout <<", ";
+            }
+            if(print==1) std::cout << *i;
             counter++;
-            //std::cout << *i<< std::endl;
         }
+        if(print==1) std::cout << ")" << std::endl;
         outputFile.close();
         std::cout << "done!" << std::endl;
     }

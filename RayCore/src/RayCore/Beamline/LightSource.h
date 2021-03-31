@@ -8,6 +8,7 @@
 #include <cmath>
 #include "Tracer/Ray.h"
 #include <string>
+#include <random>
 
 namespace RAY
 {
@@ -19,8 +20,8 @@ namespace RAY
         LightSource(int id, int numberOfRays, const char* name);
         const char* getName();
         int getNumberOfRays();
-        void setNumberOfRays(int numberOfRays);
         int getId();
+        void setNumberOfRays(int numberOfRays);
         glm::dvec3 getDirectionFromAngles(double phi, double psi);
         // get the rays according to specific light source, has to be implemented in each class that inherits from LightSource
         virtual std::vector<Ray> getRays() = 0;
