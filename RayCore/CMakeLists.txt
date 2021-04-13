@@ -14,6 +14,7 @@ SET(SOURCE
     src/RayCore/Beamline/SphereGrating.cpp
     src/RayCore/Beamline/PlaneGrating.cpp
     src/RayCore/Beamline/PlaneMirror.cpp
+    src/RayCore/Beamline/PointSource.cpp
     src/RayCore/Beamline/SphereMirror.cpp
     src/RayCore/Beamline/utils.cpp
     src/RayCore/Tracer/Ray.cpp
@@ -36,6 +37,7 @@ SET(HEADERS
     src/RayCore/Beamline/SphereGrating.h
     src/RayCore/Beamline/PlaneGrating.h
     src/RayCore/Beamline/PlaneMirror.h
+    src/RayCore/Beamline/PointSource.h
     src/RayCore/Beamline/SphereMirror.h
     src/RayCore/Beamline/utils.h
     src/RayCore/Tracer/Ray.h
