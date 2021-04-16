@@ -2,6 +2,8 @@
 #extension GL_ARB_separate_shader_objects : enable
 
 #define WORKGROUP_SIZE 32
+#define infinity = 1. / 0.
+
 layout (local_size_x = WORKGROUP_SIZE, local_size_y = 1, local_size_z = 1 ) in;
 
 /* STRUCTS */
@@ -31,6 +33,11 @@ layout(std140, binding = 2) buffer qbuf
 {
 	Quadric quadricData[];
 };
+layout(std140, binding = 3) buffer xyzbuf
+{
+	dvec4 xyznull[];
+};
+
 
 // TRIGONOMETRIC FUNCTIONS USING MINIMAX APPROXIMATION
 
@@ -698,55 +705,54 @@ double wasteBox(double x, double z, double xLength, double zLength, double w)
 *
 * output: reflected Ray with intersection point as position and reflection as direction
 */
-dvec4 intersectionPoint(inout Ray r, dmat4 quadric, int icurv)
+dvec4 intersectionPoint(inout Ray inputRay, dmat4 quadric, int icurv)
 {	
-		double w = r.weight;
+	double w = rayData[uint(gl_GlobalInvocationID)].weight;
 	int cs = 1;
-	int d_sign = icurv;
-	if (abs(r.direction[1]) >= abs(r.direction[0]) && abs(r.direction[1]) >= abs(r.direction[2])) {
+	if (abs(rayData[uint(gl_GlobalInvocationID)].direction[1]) >= abs(rayData[uint(gl_GlobalInvocationID)].direction[0]) && abs(rayData[uint(gl_GlobalInvocationID)].direction[1]) >= abs(rayData[uint(gl_GlobalInvocationID)].direction[2])) {
 		cs = 2;
-	}else if (abs(r.direction[2]) >= abs(r.direction[0]) && abs(r.direction[2]) >= abs(r.direction[1])) {
+	}else if (abs(rayData[uint(gl_GlobalInvocationID)].direction[2]) >= abs(rayData[uint(gl_GlobalInvocationID)].direction[0]) && abs(rayData[uint(gl_GlobalInvocationID)].direction[2]) >= abs(rayData[uint(gl_GlobalInvocationID)].direction[1])) {
 		cs = 3;
 	}
-
     //Formula: ((x+1)%3)/(x-1) and (x%3)/(x-1)
-	double firstParam = r.direction[(cs+1)%3] / r.direction[cs-1];
-	double secondParam = r.direction[cs%3] / r.direction[cs-1];
-	double params = [firstParam, secondParam];
+	double firstParam = rayData[uint(gl_GlobalInvocationID)].direction[(cs+1)%3] / rayData[uint(gl_GlobalInvocationID)].direction[cs-1];
+	double secondParam = rayData[uint(gl_GlobalInvocationID)].direction[cs%3] / rayData[uint(gl_GlobalInvocationID)].direction[cs-1];
+	double params[2] = {firstParam, secondParam};
+	//dvec4 normal;
+	xyznull[uint(gl_GlobalInvocationID)][(cs+1)%3] = rayData[uint(gl_GlobalInvocationID)].position[(cs+1)%3] - firstParam * rayData[uint(gl_GlobalInvocationID)].position[cs-1];
+	xyznull[uint(gl_GlobalInvocationID)][cs%3] = rayData[uint(gl_GlobalInvocationID)].position[cs%3] - secondParam * rayData[uint(gl_GlobalInvocationID)].position[cs-1];
+	xyznull[uint(gl_GlobalInvocationID)][3] = 0;
 
-	double xyznull[4];
-	xyznull[(cs+1)%3] = r.position[(cs+1)%3] - firstParam * r.position[cs-1];
-	xyznull[cs%3] = r.position[cs%3] - secondParam * r.position[cs-1];
-	xyznull[3] = 0;
-	d_sign = int(sign(r.direction[cs-1]) * icurv);
+	const int d_sign = int(sign(rayData[uint(gl_GlobalInvocationID)].direction[cs-1]) * icurv);
 
-	double a = quadric[cs-1][cs-1] + 2*quadric[0][int(cs/3)+1]*params[1] + quadric[(int(cs/2)+1)%2][(int(cs/2)+1)%2]*pow(params[cs%2], 2) + 2*quadric[int(cs/2)][2]*params[(cs+1)%2)] + Q[((int(cs/3)+1)%2)+1][((int(cs/3)+1)%2)+1]*pow(params[(cs-1)%2], 1);
-	double b = quadric[cs-1][3] + quadric[(int(cs/2)+1)%2][3]*params[int(cs/3)] + quadric[((int(cs/3)+1)%2)+1][3]*params[(int(cs/3)+1)%2]+(quadric[0][int(cs/3)+1] + quadric(int(cs/2)+1)%2][(int(cs/2)+1)%2]*params[int(cs/3)] + quadric[(int(cs/2)+1)%2][((int(cs/3)+1)%2)+1]*params[(int(cs/3)+1)%2])*xyznull[(int(cs/2)+1)%2] + (quadric[int(cs/2)][2] + quadric[(int(cs/2)+1)%2][((int(cs/3)+1)%2)+1]*params[int(cs/3)] + quadric[((int(cs/3)+1)%2)+1][((int(cs/3)+1)%2)+1]*params[(int(cs/3)+1)%2)])*xyznull[((int(cs/3)+1)%2)+1];
-	double c = quadric[3][3] + quadric[(int(x/2)+1)%2][(int(x/2)+1)%2]*pow(xyznull[(int(x/2)+1)%2], 2) + 2*quadric[((int(x/3)+1)%2)+1][3]*xyznull[((int(x/3)+1)%2)+1] + quadric[((int(x/3)+1)%2)+1][((int(x/3)+1)%2)+1]*pow(xyznull[((int(x/3)+1)%2)+1], 2) + 2*xyznull[(int(x/2)+1)%2]*(quadric[(int(x/2)+1)%2][4] +quadric[(int(x/2)+1)%2][((int(x/3)+1)%2)+1]*xyznull[((int(x/3)+1)%2)+1]);
+	double a = quadric[cs-1][cs-1] + 2*quadric[0][int(cs/3)+1]*params[1] + quadric[(int(cs/2)+1)%2][(int(cs/2)+1)%2]*params[cs%2]*params[cs%2] + 2*quadric[int(cs/2)][2]*params[(cs+1)%2] + quadric[((int(cs/3)+1)%2)+1][((int(cs/3)+1)%2)+1]*params[(cs-1)%2]*params[(cs-1)%2];
+	double b = quadric[cs-1][3] + quadric[(int(cs/2)+1)%2][3]*params[int(cs/3)] + quadric[((int(cs/3)+1)%2)+1][3]*params[(int(cs/3)+1)%2] + (quadric[0][int(cs/3)+1] + quadric[(int(cs/2)+1)%2][(int(cs/2)+1)%2]*params[int(cs/3)] + quadric[(int(cs/2)+1)%2][((int(cs/3)+1)%2)+1]*params[(int(cs/3)+1)%2])*xyznull[uint(gl_GlobalInvocationID)][(int(cs/2)+1)%2] + (quadric[int(cs/2)][2] + quadric[(int(cs/2)+1)%2][((int(cs/3)+1)%2)+1]*params[int(cs/3)] + quadric[((int(cs/3)+1)%2)+1][((int(cs/3)+1)%2)+1]*params[(int(cs/3)+1)%2])*xyznull[uint(gl_GlobalInvocationID)][((int(cs/3)+1)%2)+1];
+	double c = quadric[3][3] + quadric[(int(cs/2)+1)%2][(int(cs/2)+1)%2]*xyznull[uint(gl_GlobalInvocationID)][(int(cs/2)+1)%2]*xyznull[uint(gl_GlobalInvocationID)][(int(cs/2)+1)%2] + 2*quadric[((int(cs/3)+1)%2)+1][3]*xyznull[uint(gl_GlobalInvocationID)][((int(cs/3)+1)%2)+1] + quadric[((int(cs/3)+1)%2)+1][((int(cs/3)+1)%2)+1]*xyznull[uint(gl_GlobalInvocationID)][((int(cs/3)+1)%2)+1]*xyznull[uint(gl_GlobalInvocationID)][((int(cs/3)+1)%2)+1] + 2*xyznull[uint(gl_GlobalInvocationID)][(int(cs/2)+1)%2]*(quadric[(int(cs/2)+1)%2][3] +quadric[(int(cs/2)+1)%2][((int(cs/3)+1)%2)+1]*xyznull[uint(gl_GlobalInvocationID)][((int(cs/3)+1)%2)+1]);
 
-	double bbac = pow(b, 2.0) - a*c;
+	double bbac = b*b - a*c;
 	if (bbac < 0) {
 		w = -4;
-		xyznull[cs-1] = - xyznull[(((cs%2)+2)%3)+1]/params[cs%3]; 	// x such that y=0
+		xyznull[uint(gl_GlobalInvocationID)][cs-1] = - xyznull[uint(gl_GlobalInvocationID)][(((cs%2)+2)%3)+1]/params[cs%3]; 	// x such that y=0
 	}
 	else{
 		if (abs(a) > abs(c)*1e-10) {
-			xyznull[cs-1] = (-b + d_sign*sqrt(bbac)) / a;
+			xyznull[uint(gl_GlobalInvocationID)][cs-1] = (-b + d_sign*sqrt(bbac)) / a;
 		}else{
-			xyznull[cs-1] = (-c/2)/b;
+			xyznull[uint(gl_GlobalInvocationID)][cs-1] = (-c/2)/b;
 		}
 	}
-	xyznull[(cs+1)%3] = xyznull[(cs+1)%3] + firstParam * xyznull[cs-1];
-	xyznull[cs%3] = xyznull[cs%3] + secondParam*xyznull[cs-1];
+	xyznull[uint(gl_GlobalInvocationID)][(cs+1)%3] = xyznull[uint(gl_GlobalInvocationID)][(cs+1)%3] + firstParam * xyznull[uint(gl_GlobalInvocationID)][cs-1];
+	xyznull[uint(gl_GlobalInvocationID)][cs%3] = xyznull[uint(gl_GlobalInvocationID)][cs%3] + secondParam*xyznull[uint(gl_GlobalInvocationID)][cs-1];
 	
 	
-	double fx = 2*quadric[0][3] + 2*quadric[0][0]*xyznull[0] + 2*quadric[0][1]*xyznull[1] + 2*quadric[0][2]*xyznull[2];
-	double fy = 2*quadric[1][3] + 2*quadric[0][1]*xyznull[0] + 2*quadric[1][1]*xyznull[1] + 2*quadric[1][2]*xyznull[2];
-    double fz = 2*quadric[2][3] + 2*quadric[0][2]*xyznull[0] + 2*quadric[1][2]*xyznull[1] + 2*quadric[2][2]*xyznull[2];
+	const double fx = 2*quadric[0][3] + 2*quadric[0][0]*xyznull[uint(gl_GlobalInvocationID)][0] + 2*quadric[0][1]*xyznull[uint(gl_GlobalInvocationID)][1] + 2*quadric[0][2]*xyznull[uint(gl_GlobalInvocationID)][2];
+	const double fy = 2*quadric[1][3] + 2*quadric[0][1]*xyznull[uint(gl_GlobalInvocationID)][0] + 2*quadric[1][1]*xyznull[uint(gl_GlobalInvocationID)][1] + 2*quadric[1][2]*xyznull[uint(gl_GlobalInvocationID)][2];
+    const double fz = 2*quadric[2][3] + 2*quadric[0][2]*xyznull[uint(gl_GlobalInvocationID)][0] + 2*quadric[1][2]*xyznull[uint(gl_GlobalInvocationID)][1] + 2*quadric[2][2]*xyznull[uint(gl_GlobalInvocationID)][2];
 	
 	dvec4 normal = normalize(dvec4(fx,fy,fz,0));
-	r.position = dvec3(x,y,z); // new position = intersection point
-	r.weight = w; // unchanged, if ray did not miss surface, else 0
+	rayData[uint(gl_GlobalInvocationID)].position = dvec3(xyznull[uint(gl_GlobalInvocationID)][0],xyznull[uint(gl_GlobalInvocationID)][1],xyznull[uint(gl_GlobalInvocationID)][2]); // new position = intersection point
+	rayData[uint(gl_GlobalInvocationID)].weight = w; // unchanged, if ray did not miss surface, else 0
+	
 	return normal;
 }
 
@@ -816,10 +822,9 @@ Ray refrac_plane(Ray r, dvec4 normal, double a){
 *
 * output: reflected Ray with intersection point as position, reflection as direction in beam coordinates and possibly modified weight
 */
-Ray tracePlaneGrating(Ray r, Quadric q) {
+Ray tracePlaneGrating(Ray r, Quadric q, dvec4 normal) {
 	inTransformation(r, q.misalignment, q.inTrans);
 	
-	dvec4 normal = intersectionPoint(r, q.anchorPoints, 1);
 	r = refrac_plane(r, normal, q.anchorPoints[2][1]); // 
 	
 	double xLength = q.anchorPoints[1][0]; // width; only 10 of the 16 anchorpoints are important for the intersection point function ("quad function"), since the matrix A is symmetric
@@ -865,10 +870,9 @@ Ray traceGeneralGrating(Ray r, Quadric q) {
 *
 * output: reflected Ray with intersection point as position, reflection as direction in beam coordinates and possibly modified weight
 */
-Ray traceMirror(Ray r, Quadric q) {
+Ray traceMirror(Ray r, Quadric q, dvec4 normal) {
 	inTransformation(r, q.misalignment, q.inTrans);
 	
-	dvec4 normal = intersectionPoint(r, q.anchorPoints, 1);
 	r.direction = reflect(r.direction, normal);
 	
 	// will be changed, when width & heigth in "parameters"
@@ -880,84 +884,48 @@ Ray traceMirror(Ray r, Quadric q) {
 	return r;
 }
 
-/**
-* OLD 
-* transforms ray to object coordinate system, takes misalignment into account, traces the ray and transforms ray resulting of interaction with opt. element back to beam coordinates
-* @param r				ray to trace
-* @param q				quadric surface
-*
-* output: reflected Ray with intersection point as position, reflection as direction in beam coordinates and possibly modified weight
-*/
-/*Ray traceRay(Ray r, Quadric q) {
-	inTransformation(r, q.misalignment, q.inTrans);
+
+void dynamicQuadrics(){
 	
-	dvec4 normal = intersectionPoint(r, q.anchorPoints, 1);
-	double xLength = q.anchorPoints[1][0]; // only 10 of the 16 anchorpoints are important for the intersection point function ("quad function"), since the matrix A is symmetric
-	double zLength = q.anchorPoints[2][0]; // therefore we can use 6 values in the lower left part (without the diagonal) to transfer other values to the shader (eg dimensions of a mirror/grating), we use a_21,a_31 for xlength and zlength
-	//refl_r.weight = zLength;
-	r.weight = wasteBox(r.position[0],r.position[2],xLength,zLength, r.weight);
-	
-	outTransformation(r, q.inverseMisalignment, q.outTrans);
-	return r;
-}*/
+	const int numberOfQuadrics = quadricData.length();
+	//placeholder, info should later be transfered to shader
+	const int maxBounces = 16;
+	bool hitHitplane = false;
+	Ray ray = rayData[uint(gl_GlobalInvocationID)];
 
+	//iterate bounces
+	if(!hitHitplane){
+		for(int i = 0; i<maxBounces; i++){
 
-/*
-* iterate through all quadrics (sequentially) and trace rays quadric by quadric
-* quadric = optical element whose surface can be represented by a quadric equation
-*/
-void iterateQuadrics(){
-	const int numberOfRays = rayData.length();
-	const int numberOfQuadrics = quadricData.length()-1;
-	double type;
-	if(numberOfQuadrics <2){
-		type = quadricData[numberOfQuadrics-1].anchorPoints[3][0];
-		//only one quadric: store directly in output buffer
-		// info if element is grating/mirror/... will later be stored in separate "parameter" dmat4
-		if (type == 0) { // mirror
-			outputData[uint(gl_GlobalInvocationID)] = traceMirror(rayData[uint(gl_GlobalInvocationID)], quadricData[numberOfQuadrics-1]);
-		}else if(type == 1) { // plane grating
-			outputData[uint(gl_GlobalInvocationID)] = tracePlaneGrating(rayData[uint(gl_GlobalInvocationID)], quadricData[numberOfQuadrics-1]);
-		}else if(type == 2) { // other gratings (eg spherical)
-			outputData[uint(gl_GlobalInvocationID)] = traceGeneralGrating(rayData[uint(gl_GlobalInvocationID)], quadricData[numberOfQuadrics-1]);
-		}else{ // undefined, return input rays
-			outputData[uint(gl_GlobalInvocationID)] = rayData[uint(gl_GlobalInvocationID)];
-		}
+			dvec4 closestHitpoint = dvec4(1.0/0.0, 1.0/0.0, 1.0/0.0, 1.0/0.0);
+			uint closestQuadricIndex;
+			//find intersection points with all quadrics
 
-	}
-	else{
-		//at least 2 quadrics
-		//for first quadric, read data from the input buffer RayData[] and write to the temporary storage temporaryRays[]
-		//for last quadric, read data from temporary storage and write to output buffer
-		//between read and write from/to temporary storage
+			for(int quadricIndex = 0; quadricIndex<numberOfQuadrics; quadricIndex++){
+				dvec4 currentIntersection = intersectionPoint(ray, quadricData[quadricIndex].anchorPoints, 1);
+				if(length(ray.position - dvec3(closestHitpoint))>length(ray.position-dvec3(currentIntersection))){
+					closestHitpoint = currentIntersection;
+					closestQuadricIndex = quadricIndex;
+				}
+			}
+			if(closestQuadricIndex == numberOfQuadrics-1){
+				hitHitplane = true;
+			}
 
-		//quadrics between first and last
-		for(int i=0; i<numberOfQuadrics-1; i++){
-			type = quadricData[i].anchorPoints[3][0];
+			double type = quadricData[closestQuadricIndex].anchorPoints[3][0];
 			//first quadric
 			if (type == 0) { // mirror
-				rayData[uint(gl_GlobalInvocationID)] = traceMirror(rayData[uint(gl_GlobalInvocationID)], quadricData[i]);
+				rayData[uint(gl_GlobalInvocationID)] = traceMirror(ray, quadricData[closestQuadricIndex], closestHitpoint);
 			}else if(type == 1){ // plane grating
-				rayData[uint(gl_GlobalInvocationID)] = tracePlaneGrating(rayData[uint(gl_GlobalInvocationID)], quadricData[i]);	
+				rayData[uint(gl_GlobalInvocationID)] = tracePlaneGrating(ray, quadricData[closestQuadricIndex], closestHitpoint);	
 			}else if(type == 2){ // general grating
-				rayData[uint(gl_GlobalInvocationID)] = traceGeneralGrating(rayData[uint(gl_GlobalInvocationID)], quadricData[i]);	
+				rayData[uint(gl_GlobalInvocationID)] = traceGeneralGrating(ray, quadricData[closestQuadricIndex]);	
 			}else{ // undefined
-				rayData[uint(gl_GlobalInvocationID)] = rayData[uint(gl_GlobalInvocationID)];
+				rayData[uint(gl_GlobalInvocationID)] = ray;
 			}
-		}
-		//last quadric
-		type = quadricData[numberOfQuadrics-1].anchorPoints[3][0];
-		if(type==0){ // mirror
-			outputData[uint(gl_GlobalInvocationID)] = traceMirror(rayData[uint(gl_GlobalInvocationID)], quadricData[numberOfQuadrics-1]);
-		}else if(type==1) { // plane grating
-			outputData[uint(gl_GlobalInvocationID)] = tracePlaneGrating(rayData[uint(gl_GlobalInvocationID)], quadricData[numberOfQuadrics-1]);
-		}else if(type == 2){ // general grating
-			rayData[uint(gl_GlobalInvocationID)] = traceGeneralGrating(rayData[uint(gl_GlobalInvocationID)], quadricData[numberOfQuadrics-1]);	
-		}else{
-			outputData[uint(gl_GlobalInvocationID)] = rayData[uint(gl_GlobalInvocationID)];
+
 		}
 	}
-
 }
 /*
 void cameraPlaneIntersection(outputData, cameraPlane){	
@@ -969,7 +937,7 @@ void cameraPlaneIntersection(outputData, cameraPlane){
 */
 void main(){
 	//outputData[uint(gl_GlobalInvocationID)] = rayData[uint(gl_GlobalInvocationID)];
-	iterateQuadrics();
+	dynamicQuadrics();
 	/*Ray r = rayData[uint(gl_GlobalInvocationID)];
 	r.position = dvec3(r8_atan(r.position[0]), r8_atan(r.position[1]), r8_atan(r.position[2]));
 	r.direction = dvec4(r8_atan(r.direction[0]), r8_atan(r.direction[1]), r8_atan(r.direction[2]), r8_atan(r.direction[3]));
