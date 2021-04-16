@@ -111,6 +111,7 @@ private:
     void populateDebugMessengerCreateInfo(VkDebugUtilsMessengerCreateInfoEXT &createInfo);
     void setupDebugMessenger();
     std::vector<const char *> getRequiredExtensions();
+    std::vector<const char *> getRequiredDeviceExtensions();
     static VKAPI_ATTR VkBool32 VKAPI_CALL debugCallback(VkDebugUtilsMessageSeverityFlagBitsEXT messageSeverity, VkDebugUtilsMessageTypeFlagsEXT messageType, const VkDebugUtilsMessengerCallbackDataEXT *pCallbackData, void *pUserData);
     bool checkValidationLayerSupport();
     void pickPhysicalDevice();
