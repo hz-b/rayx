@@ -22,12 +22,12 @@ struct Quadric{
 };
 layout(std140, binding = 0) buffer ibuf
 {
-   Ray rayData[];
+	Ray rayData[];
 };
 
 layout(std140, binding = 1) buffer obuf
 {
-   Ray outputData[];
+	Ray outputData[];
 };
 layout(std140, binding = 2) buffer qbuf
 {

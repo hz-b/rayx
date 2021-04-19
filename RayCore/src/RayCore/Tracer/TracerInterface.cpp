@@ -47,6 +47,8 @@ namespace RAY
     */
     bool TracerInterface::run()
     {
+
+        const clock_t all_begin_time = clock();
         //create tracer instance
         VulkanTracer tracer;
         // readFromFile("../../io/input.csv", RayType);
@@ -54,9 +56,9 @@ namespace RAY
 
         //add source to tracer
         //initialize matrix light source with default params
-
+        int beamlinesSimultaneously = 1;
         //RandomRays m = RandomRays(1000000); // produces random values for position, direction and weight to test cosinus and atan implementation
-        int number_of_rays = 1 << 22;
+        int number_of_rays = 1 << 17;
         MatrixSource m = MatrixSource(0, "Matrix20", number_of_rays, 0.065, 0.04, 0.0, 0.001, 0.001);
         //PointSource m = PointSource(0, "Point source 1", number_of_rays, 0.065, 0.04, 1.0, 0.001, 0.001);
         //std::cout << m.getName() << " with " << m.getNumberOfRays() << " Rays." << std::endl;std::cout.precision(15); // show 16 decimals
@@ -71,7 +73,7 @@ namespace RAY
         {
             std::cout << "i.size= " << (*i).size() << std::endl;
             std::cout << &((*i)[0]) << std::endl;
-            for (int j = 0; j < 2; j++) {
+            for (int j = 0; j < beamlinesSimultaneously; j++) {
                 tracer.addRayVector(&((*i)[0]), (*i).size());
             }
             //tracer.addRayVector(&((*i)[0]), (*i).size());
@@ -95,18 +97,21 @@ namespace RAY
             //m_Beamline.addQuadric(plM.getName(), plM.getAnchorPoints(), plM.getInMatrix(), plM.getOutMatrix(), plM.getTempMisalignmentMatrix(), plM.getInverseTempMisalignmentMatrix());
             m_Beamline.addQuadric(plG.getName(), plG.getAnchorPoints(), plG.getInMatrix(), plG.getOutMatrix(), plG.getTempMisalignmentMatrix(), plG.getInverseTempMisalignmentMatrix());
         }
-
         //add beamline to tracer
         std::vector<RAY::Quadric> Quadrics = m_Beamline.getObjects();
-        for (int i = 0; i < Quadrics.size(); i++) {
-            tracer.addQuadric(Quadrics[i].getAnchorPoints(), Quadrics[i].getInMatrix(), Quadrics[i].getOutMatrix(), Quadrics[i].getTempMisalignmentMatrix(), Quadrics[i].getInverseTempMisalignmentMatrix());//, Quadrics[i].getInverseMisalignmentMatrix()
+        tracer.setBeamlineParameters(beamlinesSimultaneously, Quadrics.size(), number_of_rays * beamlinesSimultaneously);
+        for (int j = 0; j < beamlinesSimultaneously; j++) {
+            for (uint32_t i = 0; i < Quadrics.size(); i++) {
+                tracer.addQuadric(Quadrics[i].getAnchorPoints(), Quadrics[i].getInMatrix(), Quadrics[i].getOutMatrix(), Quadrics[i].getTempMisalignmentMatrix(), Quadrics[i].getInverseTempMisalignmentMatrix());//, Quadrics[i].getInverseMisalignmentMatrix()
+            }
         }
-
         const clock_t begin_time = clock();
         tracer.run(); //run tracer
         std::cout << "tracer run time: " << float(clock() - begin_time) << " ms" << std::endl;
 
         std::cout << "run succeeded" << std::endl;
+
+        std::cout << "tracerInterface run without output: " << float(clock() - all_begin_time) << " ms" << std::endl;
 
         //get rays from tracer
         void* outputRaysLocation = tracer.getRays();

@@ -31,10 +31,6 @@ layout(std140, binding = 1) buffer obuf
 };
 layout(std140, binding = 2) buffer qbuf
 {
-	double numberOfBeamlines;
-	double numberOfQuadricsPerBeamline;
-	double numberOfRays;
-	double numberOfRaysPerBeamLine;
 	Quadric quadricData[];
 };
 layout(std140, binding = 3) buffer xyzbuf
@@ -709,71 +705,114 @@ double wasteBox(double x, double z, double xLength, double zLength, double w)
 *
 * output: reflected Ray with intersection point as position and reflection as direction
 */
-dvec4 intersectionPoint(dmat4 inputQuadric, int icurv)
+dvec4 intersectionPoint(inout Ray r, dmat4 quadric, int icurv)
 {	
-	const dmat4 quadric = inputQuadric;
-	double w = rayData[uint(gl_GlobalInvocationID)].weight;
-	int cs = 0;
-	if (abs(rayData[uint(gl_GlobalInvocationID)].direction[1]) >= abs(rayData[uint(gl_GlobalInvocationID)].direction[0]) && abs(rayData[uint(gl_GlobalInvocationID)].direction[1]) >= abs(rayData[uint(gl_GlobalInvocationID)].direction[2])) {
-		cs = 1;
-	}else if (abs(rayData[uint(gl_GlobalInvocationID)].direction[2]) >= abs(rayData[uint(gl_GlobalInvocationID)].direction[0]) && abs(rayData[uint(gl_GlobalInvocationID)].direction[2]) >= abs(rayData[uint(gl_GlobalInvocationID)].direction[1])) {
+	double a_11 = quadric[0][0];
+	double a_12 = quadric[0][1];
+	double a_13 = quadric[0][2];
+	double a_14 = quadric[0][3];
+	double a_22 = quadric[1][1];
+	double a_23 = quadric[1][2];
+	double a_24 = quadric[1][3];
+	double a_33 = quadric[2][2];
+	double a_34 = quadric[2][3];
+	double a_44 = quadric[3][3];
+	
+	double w = r.weight;
+	int cs = 1;
+	int d_sign = icurv;
+	if (abs(r.direction[1]) >= abs(r.direction[0]) && abs(r.direction[1]) >= abs(r.direction[2])) {
 		cs = 2;
+	}else if (abs(r.direction[2]) >= abs(r.direction[0]) && abs(r.direction[2]) >= abs(r.direction[1])) {
+		cs = 3;
 	}
-	uint f_001 = uint(cs/2);
-	uint f_010 = cs%2;
-	uint f_011 = uint(cs/cs);
-	uint f_012 = cs;
-	uint f_100 = (uint(cs/cs)+1)%2;
-	uint f_101 = ((cs%2)+1)%2;
-	uint f_110 = (uint(cs/2)+1)%2;
-	uint f_112 = int(cs/2)+1;
-	uint f_1x0 = (cs+1)%3;
-	uint f_131 = ((cs%2)*2)+1;
-	uint f_220 = (uint(cs/2)+2)%3;
-	uint f_221 = ((uint(cs/2)+1)%2)+1;
-
-    //Formula: ((x+1)%3)/(x-1) and (x%3)/(x-1)
-	double firstParam = rayData[uint(gl_GlobalInvocationID)].direction[f_100] / rayData[uint(gl_GlobalInvocationID)].direction[cs];
-	double secondParam = rayData[uint(gl_GlobalInvocationID)].direction[f_221] / rayData[uint(gl_GlobalInvocationID)].direction[cs];
-	double params[2] = {firstParam, secondParam};
-	//dvec4 normal;
-
-	xyznull[uint(gl_GlobalInvocationID)][f_100] = rayData[uint(gl_GlobalInvocationID)].position[f_100] - firstParam * rayData[uint(gl_GlobalInvocationID)].position[cs];
-	xyznull[uint(gl_GlobalInvocationID)][f_221] = rayData[uint(gl_GlobalInvocationID)].position[f_221] - secondParam * rayData[uint(gl_GlobalInvocationID)].position[cs];
-	xyznull[uint(gl_GlobalInvocationID)][3] = 0;
-
-	const int d_sign = int(sign(rayData[uint(gl_GlobalInvocationID)].direction[cs]) * icurv);
-
-	double a = quadric[cs][cs] + 2*quadric[0][f_112]*params[f_101] + quadric[f_100][f_100]*params[f_101]*params[f_101] + 2*quadric[f_011][2]*params[f_010] + quadric[f_100][f_221]*params[f_101]*params[f_101];
-	double b = quadric[cs][3] + quadric[f_100][3]*params[f_001] + quadric[f_221][3]*params[f_110] + (quadric[0][f_112] + quadric[f_100][f_100]*params[f_001] + quadric[f_100][f_221]*params[f_110])*xyznull[uint(gl_GlobalInvocationID)][f_100] + (quadric[f_011][2] + quadric[f_100][f_221]*params[f_001] + quadric[f_221][f_221]*params[f_110])*xyznull[uint(gl_GlobalInvocationID)][f_221];
-	double c = quadric[3][3] + quadric[f_100][f_100]*xyznull[uint(gl_GlobalInvocationID)][f_100]*xyznull[uint(gl_GlobalInvocationID)][f_100] + 2*quadric[f_221][3]*xyznull[uint(gl_GlobalInvocationID)][f_221] + quadric[f_221][f_221]*xyznull[uint(gl_GlobalInvocationID)][f_221]*xyznull[uint(gl_GlobalInvocationID)][f_220] + 2*xyznull[uint(gl_GlobalInvocationID)][f_100]*(quadric[f_100][3] +quadric[f_100][f_221]*xyznull[uint(gl_GlobalInvocationID)][f_221]);
-
-
 	
-	double bbac = b*b - a*c;
-	if (bbac < 0) {
-		w = -4;
-		xyznull[uint(gl_GlobalInvocationID)][cs] = - xyznull[uint(gl_GlobalInvocationID)][f_131]/params[f_1x0]; 	// x such that y=0
-	}
-	else{
-		if (abs(a) > abs(c)*1e-10) {
-			xyznull[uint(gl_GlobalInvocationID)][cs] = (-b + d_sign*sqrt(bbac)) / a;
+	double x;
+	double y;
+	double z;
+		
+	if (cs == 1) {
+		double aml = r.direction[1] / r.direction[0];
+		double anl = r.direction[2] / r.direction[0];
+		y = r.position[1] - aml * r.position[0];
+		z = r.position[2] - anl * r.position[0];
+		d_sign = int(sign(r.direction[0]) * icurv);
+		
+		double a = a_11 + 2*a_12*aml + a_22*aml*aml + 2*a_13*anl + 2*a_23*aml*anl + a_33*anl*anl;
+        double b = a_14 + a_24*aml + a_34*anl + (a_12 + a_22*aml + a_23*anl)*y + (a_13 + a_23*aml + a_33*anl)*z;
+        double c = a_44 + a_22*y*y + 2*a_34*z + a_33*z*z + 2*y*(a_24 + a_23*z);
+		
+		double bbac = b*b - a*c;
+		if (bbac < 0) {
+			w = -4;
+			x = - y/aml; 	// x such that y=0
 		}else{
-			xyznull[uint(gl_GlobalInvocationID)][cs] = (-c/2)/b;
+			if (abs(a) > abs(c)*1e-10) {
+				x = (-b + d_sign*sqrt(bbac)) / a;
+			}else{
+				x = (-c/2)/b;
+			}
 		}
+		y = y + aml*x;
+		z = z + anl*x;
+	}else if (cs == 2) {
+		double alm = r.direction[0] / r.direction[1];
+		double anm = r.direction[2] / r.direction[1];
+		x = r.position[0] - alm * r.position[1];
+		z = r.position[2] - anm * r.position[1];
+		d_sign = int(sign(r.direction[1]) * icurv);
+		
+		double a = a_22 + 2*a_12*alm + a_11*alm*alm + 2*a_23*anm + 2*a_13*alm*anm + a_33*anm*anm;
+        double b = a_24 + a_14*alm + a_34*anm + (a_12 + a_11*alm + a_13*anm)*x + (a_23 + a_13*alm + a_33*anm)*z;
+        double c = a_44 + a_11*x*x + 2*a_34*z + a_33*z*z + 2*x*(a_14 + a_13*z);
+		
+		double bbac = b*b - a*c;
+		if (bbac < 0) {
+			w = -4;
+			y = 0;
+		}else{
+			if (abs(a) > abs(c)*1e-10) {
+				y = (-b + d_sign*sqrt(bbac)) / a;
+			}else{
+				y = (-c/2)/b;
+			}
+		}
+		x = x + alm*y;
+		z = z + anm*y;
+
+	}else{
+		double aln = r.direction[0] / r.direction[2];
+		double amn = r.direction[1] / r.direction[2];
+		x = r.position[0] - aln * r.position[2];
+		y = r.position[1] - amn * r.position[2];
+		d_sign = int(sign(r.direction[2]) * icurv);
+		
+		double a = a_33 + 2*a_13*aln + a_11*aln*aln + 2*a_23*amn + 2*a_12*aln*amn + a_22*amn*amn;
+        double b = a_34 + a_14*aln + a_24*amn + (a_13 + a_11*aln + a_12*amn)*x + (a_23 + a_12*aln + a_22*amn)*y;
+        double c = a_44 + a_11*x*x + 2*a_24*y + a_22*y*y + 2*x*(a_14 + a_12*y);
+		
+		double bbac = b*b - a*c;
+		if (bbac < 0) {
+			w = -4;
+			z = -y / amn;
+		}else{
+			if (abs(a) > abs(c)*1e-10) {//pow(10, double(-10))) {
+				z = (-b + d_sign*sqrt(bbac)) / a;
+			}else{
+				z = (-c/2)/b;
+			}
+		}
+		x = x + aln*z;
+		y = y + amn*z;
 	}
-	xyznull[uint(gl_GlobalInvocationID)][f_100] = xyznull[uint(gl_GlobalInvocationID)][f_100] + firstParam * xyznull[uint(gl_GlobalInvocationID)][cs];
-	xyznull[uint(gl_GlobalInvocationID)][f_221] = xyznull[uint(gl_GlobalInvocationID)][f_221] + secondParam*xyznull[uint(gl_GlobalInvocationID)][cs];
 	
-	
-	const double fx = 2*quadric[0][3] + 2*quadric[0][0]*xyznull[uint(gl_GlobalInvocationID)][0] + 2*quadric[0][1]*xyznull[uint(gl_GlobalInvocationID)][1] + 2*quadric[0][2]*xyznull[uint(gl_GlobalInvocationID)][2];
-	const double fy = 2*quadric[1][3] + 2*quadric[0][1]*xyznull[uint(gl_GlobalInvocationID)][0] + 2*quadric[1][1]*xyznull[uint(gl_GlobalInvocationID)][1] + 2*quadric[1][2]*xyznull[uint(gl_GlobalInvocationID)][2];
-    const double fz = 2*quadric[2][3] + 2*quadric[0][2]*xyznull[uint(gl_GlobalInvocationID)][0] + 2*quadric[1][2]*xyznull[uint(gl_GlobalInvocationID)][1] + 2*quadric[2][2]*xyznull[uint(gl_GlobalInvocationID)][2];
+	double fx = 2*a_14 + 2*a_11*x + 2*a_12*y + 2*a_13*z;
+	double fy = 2*a_24 + 2*a_12*x + 2*a_22*y + 2*a_23*z;
+    double fz = 2*a_34 + 2*a_13*x + 2*a_23*y + 2*a_33*z;
 	
 	dvec4 normal = normalize(dvec4(fx,fy,fz,0));
-	rayData[uint(gl_GlobalInvocationID)].position = dvec3(xyznull[uint(gl_GlobalInvocationID)][0],xyznull[uint(gl_GlobalInvocationID)][1],xyznull[uint(gl_GlobalInvocationID)][2]); // new position = intersection point
-	rayData[uint(gl_GlobalInvocationID)].weight = w; // unchanged, if ray did not miss surface, else 0
-	
+	r.position = dvec3(x,y,z); // new position = intersection point
+	r.weight = w; // unchanged, if ray did not miss surface, else 0
 	return normal;
 }
 
@@ -871,7 +910,7 @@ Ray traceGeneralGrating(Ray r, Quadric q) {
 	if(-q.anchorPoints[1][3] < 0) {
 		ISIG = -1;
 	}
-	dvec4 normal = intersectionPoint(q.anchorPoints, ISIG);
+	dvec4 normal = intersectionPoint(r, q.anchorPoints, ISIG);
 	normal = normalize(dvec4(-r.position[0], -q.anchorPoints[1][3] - r.position[1]*ISIG, -r.position[2], 0));
 	r = refrac(r, normal, q.anchorPoints[2][1]);
 	
@@ -908,27 +947,28 @@ Ray traceMirror(Ray r, Quadric q, dvec4 normal) {
 
 void dynamicQuadrics(){
 	
+	const int numberOfQuadrics = quadricData.length();
 	//placeholder, info should later be transfered to shader
 	const int maxBounces = 16;
 	bool hitHitplane = false;
-	uint beamlineIndex = uint(double(gl_GlobalInvocationID)/numberOfRaysPerBeamLine);
 	Ray ray = rayData[uint(gl_GlobalInvocationID)];
 
 	//iterate bounces
 	if(!hitHitplane){
 		for(int i = 0; i<maxBounces; i++){
-			dvec4 closestHitpoint = dvec4(1.0/0.0, 1.0/0.0, 1.0/0.0, 1.0/0.0); //infinity
+
+			dvec4 closestHitpoint = dvec4(1.0/0.0, 1.0/0.0, 1.0/0.0, 1.0/0.0);
 			uint closestQuadricIndex;
 			//find intersection points with all quadrics
 
-			for(uint quadricIndex = uint(beamlineIndex)*uint(numberOfQuadricsPerBeamline); quadricIndex<numberOfQuadricsPerBeamline; quadricIndex++){
-				dvec4 currentIntersection = intersectionPoint(quadricData[quadricIndex].anchorPoints, 1);
+			for(int quadricIndex = 0; quadricIndex<numberOfQuadrics; quadricIndex++){
+				dvec4 currentIntersection = intersectionPoint(ray, quadricData[quadricIndex].anchorPoints, 1);
 				if(length(ray.position - dvec3(closestHitpoint))>length(ray.position-dvec3(currentIntersection))){
 					closestHitpoint = currentIntersection;
 					closestQuadricIndex = quadricIndex;
 				}
 			}
-			if(closestQuadricIndex == (beamlineIndex*numberOfQuadricsPerBeamline)-1){
+			if(closestQuadricIndex == numberOfQuadrics-1){
 				hitHitplane = true;
 			}
 
