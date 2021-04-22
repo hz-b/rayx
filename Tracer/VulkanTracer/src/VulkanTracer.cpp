@@ -882,17 +882,16 @@ void VulkanTracer::setRayAmount(uint32_t inputRayAmount)
 }
 void VulkanTracer::setRayAmount()
 {
-	rayAmount = rayList.rayAmount();;
+	rayAmount = rayList.rayAmount();
 }
 
 void VulkanTracer::addRayVector(void* location, size_t size){
 	std::vector<Ray> newRayVector;
     std::cout<<"1"<<std::endl;
-	newRayVector.reserve(size);
+	newRayVector.resize(size);
     //std::cout<<"2"<<std::endl;	
     //std::cout<<"addRayVector: size= "<<size<<std::endl;
 	memcpy(&newRayVector[0], location, size * VULKANTRACER_RAY_DOUBLE_AMOUNT * sizeof(double));
-	newRayVector.resize(size);
     //std::cout<<"3 "<< newRayVector.size() << std::endl;
 	rayList.insertVector(newRayVector);
     std::cout<<"4"<<std::endl;
