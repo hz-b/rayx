@@ -20,17 +20,22 @@ namespace RAY
     {
 
     public:
-        Beamline();
-        ~Beamline();
+        static Beamline& get() {
+            static Beamline m_Instance;
+            return m_Instance;
+        }
 
+        ~Beamline();
         //Somehow results in wrong values. Should be fixed later
         //void addQuadric(Quadric newObject);
-        
+
         void addQuadric(const char* name, std::vector<double> inputPoints, std::vector<double> inputInMatrix, std::vector<double> inputOutMatrix, std::vector<double> misalignmentMatrix, std::vector<double> inverseMisalignmentMatrix);
         void replaceNthObject(uint32_t index, Quadric newObject);
         std::vector<Quadric> getObjects();
 
     private:
+        Beamline();
+        Beamline(const Beamline&) = delete;
         std::vector<Quadric> m_Objects;
     };
 

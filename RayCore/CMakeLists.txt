@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.0 FATAL_ERROR)
+cmake_minimum_required(VERSION 3.15 FATAL_ERROR)
 project(RayCore)
 
 SET(SOURCE
@@ -51,16 +51,16 @@ add_library(${PROJECT_NAME} SHARED ${SOURCE} ${HEADERS} )
 if(MSVC)
   target_compile_options(${PROJECT_NAME} PRIVATE /W4) # /WX
 else()
-  target_compile_options(${PROJECT_NAME} PRIVATE -Wall -Wextra -pedantic) # -Werror
+  target_compile_options(${PROJECT_NAME} PRIVATE -Wall)# -Wextra)# -pedantic) # -Werror
 endif()
 
 target_link_libraries(${PROJECT_NAME} 
     PUBLIC VulkanTracer
 )
 
-if (${CMAKE_CXX_COMPILER_ID} STREQUAL "GNU")
+if (CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
     set(COMPILE_PLATFORM RAY_PLATFORM_GCC)
-elseif (${CMAKE_CXX_COMPILER_ID} STREQUAL "MSVC")
+elseif (CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
     set(COMPILE_PLATFORM RAY_PLATFORM_WINDOWS)
 else() 
     set(COMPILE_PLATFORM UNKNOWN)

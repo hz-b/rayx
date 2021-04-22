@@ -1,6 +1,9 @@
+#include "Beamline/MatrixSource.h"
+#include "Beamline/ReflectionZonePlate.h"
 #include "Debug.h"
 #include "TracerInterface.h"
 #include "VulkanTracer.h"
+
 #include <fstream>
 #include <chrono>
 #include <sstream>
@@ -8,9 +11,10 @@
 
 namespace RAY
 {
-    TracerInterface::TracerInterface()
+    TracerInterface::TracerInterface() :
+        m_Beamline(Beamline::get())
     {
-           
+
         DEBUG(std::cout << "Creating TracerInterface..." << std::endl);
     }
 
@@ -19,10 +23,11 @@ namespace RAY
         DEBUG(std::cout << "Deleting TracerInterface..." << std::endl);
     }
 
-    void TracerInterface::addLightSource(LightSource* newSource){
+    void TracerInterface::addLightSource(LightSource* newSource) {
         m_LightSources.push_back(newSource);
     }
-    void TracerInterface::generateRays(){
+
+    void TracerInterface::generateRays() {
         //only one Source for now
         m_RayList.push_back((*m_LightSources[0]).getRays());
     }
@@ -54,7 +59,7 @@ namespace RAY
 
         //add source to tracer
         //initialize matrix light source with default params
-        
+
         //RandomRays m = RandomRays(1000000); // produces random values for position, direction and weight to test cosinus and atan implementation
         int number_of_rays = 20;
         MatrixSource m = MatrixSource(0, "Matrix20", number_of_rays, 0.065, 0.04, 0.0, 0.001, 0.001);
@@ -63,34 +68,36 @@ namespace RAY
 
         addLightSource(&m);
         generateRays();
-        
+
 
         //add rays to tracer
-        std::cout<<"start add rays to tracer"<<std::endl;
+        std::cout << "start add rays to tracer" << std::endl;
         for (auto i = m_RayList.begin(); i != m_RayList.end(); i++)
         {
-            std::cout<<"i.size= " << (*i).size()<<std::endl;
-            std::cout<<&((*i)[0])<<std::endl;
-            for (int j=0; j<1; j++){
+            std::cout << "i.size= " << (*i).size() << std::endl;
+            std::cout << &((*i)[0]) << std::endl;
+            for (int j = 0; j < 1; j++) {
                 tracer.addRayVector(&((*i)[0]), (*i).size());
             }
             //tracer.addRayVector(&((*i)[0]), (*i).size());
         }
-        std::cout<<"add rays to tracer done"<<std::endl;
+        std::cout << "add rays to tracer done" << std::endl;
 
 
 
-        std::cout.precision (17);
+        std::cout.precision(17);
         // plane mirror with RAY-UI default values
         //PlaneMirror plM = PlaneMirror("PlaneMirrorMis",50, 200, 10, 0, 10000, {1,2,3,0.001,0.002,0.003}); // {1,2,3,0.01,0.02,0.03}
         // plane grating with default values
-        PlaneGrating plG = PlaneGrating("PlaneGratingDeviationDefault", 1, 50, 200, 0, 10, 7.5, 10000, 100, 1000, 1, 2, {1,2,3,0.001,0.002,0.003}, {0,0,0,0,0,0}); // dx,dy,dz, dpsi,dphi,dchi // {1,2,3,0.001,0.002,0.003}
+        PlaneGrating plG = PlaneGrating("PlaneGratingDeviationDefault", 1, 50, 200, 0, 10, 7.5, 10000, 100, 1000, 1, 2, { 1,2,3,0.001,0.002,0.003 }, { 0,0,0,0,0,0 }); // dx,dy,dz, dpsi,dphi,dchi // {1,2,3,0.001,0.002,0.003}
+
+        ReflectionZonePlate reflZonePlate("Reflection Zoneplate", 1, ReflectionZonePlate::CURVATURE_TYPE::CT_PLANE, 4, 60, 170, 0, 0, 90, 640, 0, -1, { });
         // spherical grating with defalult values. SphereGrating(int mount, double width, double height, double deviation, double normalIncidence, double azimuthal, double distanceToPreceedingElement, double entranceArmLength, double exitArmLength, double designEnergyMounting, double lineDensity, double orderOfDiffraction, std::vector<double> misalignmentParams);
         //SphereGrating s = SphereGrating("SphereGrating", 0, 50, 200, 10, 0.0, 0.0, 10000, 10000, 1000,  100, 1000, 1, {0,0,0,0,0,0});
         // std::cout << s.getRadius() << std::endl;
         // SphereMirror s = SphereMirror("SphereMirror", 50, 200, 10, 0.0, 10000, 10000, 1000, {0,0,0,0,0,0});
-        
-        for(int i=0; i<1; i++){
+
+        for (int i = 0; i < 1; i++) {
             //m_Beamline.addQuadric(s.getName(), s.getAnchorPoints(), s.getInMatrix(), s.getOutMatrix(), s.getTempMisalignmentMatrix(), s.getInverseTempMisalignmentMatrix());
             //m_Beamline.addQuadric(plM.getName(), plM.getAnchorPoints(), plM.getInMatrix(), plM.getOutMatrix(), plM.getTempMisalignmentMatrix(), plM.getInverseTempMisalignmentMatrix());
             m_Beamline.addQuadric(plG.getName(), plG.getAnchorPoints(), plG.getInMatrix(), plG.getOutMatrix(), plG.getTempMisalignmentMatrix(), plG.getInverseTempMisalignmentMatrix());
@@ -98,14 +105,15 @@ namespace RAY
 
         //add beamline to tracer
         std::vector<RAY::Quadric> Quadrics = m_Beamline.getObjects();
-        for(int i = 0; i<Quadrics.size(); i++){
+        size_t size = Quadrics.size();
+        for (unsigned int i = 0; i < size; i++) {
             tracer.addQuadric(Quadrics[i].getAnchorPoints(), Quadrics[i].getInMatrix(), Quadrics[i].getOutMatrix(), Quadrics[i].getTempMisalignmentMatrix(), Quadrics[i].getInverseTempMisalignmentMatrix());//, Quadrics[i].getInverseMisalignmentMatrix()
         }
 
         const clock_t begin_time = clock();
         tracer.run(); //run tracer
-        std::cout << "tracer run time: " << float( clock () - begin_time ) << " ms" << std::endl;
-        
+        std::cout << "tracer run time: " << float(clock() - begin_time) << " ms" << std::endl;
+
         std::cout << "run succeeded" << std::endl;
 
         //get rays from tracer
@@ -113,19 +121,19 @@ namespace RAY
 
         std::vector<Ray> outputRays;
 
-        size_t bytesToCopy = std::min((size_t) 2048*RAY_DOUBLE_COUNT*sizeof(double), (size_t) number_of_rays*RAY_DOUBLE_COUNT*sizeof(double));
-        
+        size_t bytesToCopy = std::min((size_t)2048 * RAY_DOUBLE_COUNT * sizeof(double), (size_t)number_of_rays * RAY_DOUBLE_COUNT * sizeof(double));
+
         outputRays.resize(bytesToCopy);
-        std::cout << "bytesToCopy: "<< bytesToCopy << std::endl;
-        try{
+        std::cout << "bytesToCopy: " << bytesToCopy << std::endl;
+        try {
             memcpy(outputRays.data(), outputRaysLocation, 1);
         }
-        catch (const std::exception& e) { std::cout<<e.what()<<std::endl;}
+        catch (const std::exception& e) { std::cout << e.what() << std::endl; }
 
         //std::list<double> outputRays = tracer.getRays();
-        
-        std::cout << "tracer run incl load rays time: " << float( clock () - begin_time ) << " ms" << std::endl;
-        
+
+        std::cout << "tracer run incl load rays time: " << float(clock() - begin_time) << " ms" << std::endl;
+
         // m.compareRays(m_RayList, outputRays); // for comparing accuracy of cos and atan approximation with "source" RandomRays
         std::cout << "read data succeeded" << std::endl;
         std::cout << outputRays.size() << std::endl;
@@ -145,100 +153,104 @@ namespace RAY
         std::cout << "writing to file..." << std::endl;
         std::ofstream outputFile;
         outputFile.precision(17);
-        std::cout.precision (17);
+        std::cout.precision(17);
         std::string filename = "../../output/output.csv";
         outputFile.open(filename);
         char sep = ';'; // file is saved in .csv (comma seperated value), excel compatibility is manual right now
-        outputFile << "Index" << sep << "Xloc" << sep << "Yloc" << sep<<"Zloc"<<sep<<"Weight"<<sep<<"Xdir"<<sep<<"Ydir"<<sep<<"Zdir" << std::endl;
+        outputFile << "Index" << sep << "Xloc" << sep << "Yloc" << sep << "Zloc" << sep << "Weight" << sep << "Xdir" << sep << "Ydir" << sep << "Zdir" << std::endl;
         // outputFile << "Index,Xloc,Yloc,Zloc,Weight,Xdir,Ydir,Zdir" << std::endl;
-        
+
         size_t counter = 0;
         int print = 1;
-        for (std::list<double>::iterator i=outputRays.begin(); i != outputRays.end(); i++){
-            if(counter%8 == 0){
-                outputFile << counter/VULKANTRACER_RAY_DOUBLE_AMOUNT;
-                if(print==1) std::cout << ")" << std::endl;
-                if(print==1) std::cout << "(";
+        for (std::list<double>::iterator i = outputRays.begin(); i != outputRays.end(); i++) {
+            if (counter % 8 == 0) {
+                outputFile << counter / VULKANTRACER_RAY_DOUBLE_AMOUNT;
+                if (print == 1) std::cout << ")" << std::endl;
+                if (print == 1) std::cout << "(";
             }
-            if(counter%8 == 7){
+            if (counter % 8 == 7) {
                 outputFile << std::endl;
                 counter++;
                 continue;
             }
-            outputFile << sep << *i ;
-            if(counter%8 == 3) {
-                if(print==1) std::cout << ") ";
-            }else if(counter%8 == 4) {
-                if(print==1) std::cout << " (";
-            }else if(counter %8 != 0){
-                if(print==1) std::cout <<", ";
+            outputFile << sep << *i;
+            if (counter % 8 == 3) {
+                if (print == 1) std::cout << ") ";
             }
-            if(print==1) std::cout << *i;
+            else if (counter % 8 == 4) {
+                if (print == 1) std::cout << " (";
+            }
+            else if (counter % 8 != 0) {
+                if (print == 1) std::cout << ", ";
+            }
+            if (print == 1) std::cout << *i;
             counter++;
         }
-        if(print==1) std::cout << ")" << std::endl;
+        if (print == 1) std::cout << ")" << std::endl;
         outputFile.close();
         std::cout << "done!" << std::endl;
     }
     //reads from file. datatype (RayType, QuadricType) needs to be set
     //pretty ugly, should be rewritten later
-    void TracerInterface::readFromFile(std::string path, m_dataType dataType)
-    {
-        std::ifstream inputFile;
-        inputFile.open(path);
-        switch(dataType){
-            case TracerInterface::RayType: {
-                std::vector<Ray> newRayVector;
-                newRayVector.resize(RAY_MAX_ELEMENTS_IN_VECTOR);
-                std::string line;
-                std::getline(inputFile, line);
-                //std::cout<<line<<std::endl;
-                uint32_t numberOfRays = 0;
-                while(!inputFile.eof()){
-                    std::getline(inputFile, line);
-                    if(line[0] == '\0'){
-                        break;
-                    }
-                    int i=0;
-                    char currentNumber[32];
-                    Ray newRay(glm::dvec3(0,0,0),glm::dvec3(0,0,0),0);
-                    std::vector<double> newDoubles;
-                    for(int k=0; k<VULKANTRACER_RAY_DOUBLE_AMOUNT; k++){
-                        int j=0;
-                        while((line[i] != ',') && (line[i] != '\0')){
-                            currentNumber[j] = line[i];
-                            j++;
-                            i++;
-                        }
-                        i++;
-                        currentNumber[j] = '\0';
-                        newDoubles.emplace_back(std::stof(currentNumber));
-                    }
-                    newRay.m_position.x = newDoubles[1];
-                    newRay.m_position.y = newDoubles[2];
-                    newRay.m_position.z = newDoubles[3];
-                    newRay.m_weight = newDoubles[4];
-                    newRay.m_direction.x = newDoubles[5];
-                    newRay.m_direction.y = newDoubles[6];
-                    newRay.m_direction.z = newDoubles[7];
-                    //std::cout<<newDoubles[0]<<newDoubles[1]<<newDoubles[2]<<newDoubles[3]<<newDoubles[4]<<newDoubles[5]<<newRay.m_direction.y<<newRay.m_direction.z<<"test"<<std::endl;
-                    newRayVector.push_back(newRay);
-                    numberOfRays++;
-                    if(numberOfRays>RAY_MAX_ELEMENTS_IN_VECTOR){
-                        m_RayList.push_back(newRayVector);
-                        numberOfRays = 0;
-                        newRayVector.clear();
-                        newRayVector.resize(RAY_MAX_ELEMENTS_IN_VECTOR);
-                    }
+    // void TracerInterface::readFromFile(std::string path, m_dataType dataType)
+    // {
+    //     std::ifstream inputFile;
+    //     inputFile.open(path);
+    //     switch (dataType) {
+    //     case TracerInterface::RayType: {
+    //         std::vector<Ray> newRayVector;
+    //         newRayVector.resize(RAY_MAX_ELEMENTS_IN_VECTOR);
+    //         std::string line;
+    //         std::getline(inputFile, line);
+    //         //std::cout<<line<<std::endl;
+    //         uint32_t numberOfRays = 0;
+    //         while (!inputFile.eof()) {
+    //             std::getline(inputFile, line);
+    //             if (line[0] == '\0') {
+    //                 break;
+    //             }
+    //             int i = 0;
+    //             char currentNumber[32];
+    //             Ray newRay(glm::dvec3(0, 0, 0), glm::dvec3(0, 0, 0), 0);
+    //             std::vector<double> newDoubles;
+    //             for (int k = 0; k < VULKANTRACER_RAY_DOUBLE_AMOUNT; k++) {
+    //                 int j = 0;
+    //                 while ((line[i] != ',') && (line[i] != '\0')) {
+    //                     currentNumber[j] = line[i];
+    //                     j++;
+    //                     i++;
+    //                 }
+    //                 i++;
+    //                 currentNumber[j] = '\0';
+    //                 newDoubles.emplace_back(std::stof(currentNumber));
+    //             }
+    //             newRay.m_position.x = newDoubles[1];
+    //             newRay.m_position.y = newDoubles[2];
+    //             newRay.m_position.z = newDoubles[3];
+    //             newRay.m_weight = newDoubles[4];
+    //             newRay.m_direction.x = newDoubles[5];
+    //             newRay.m_direction.y = newDoubles[6];
+    //             newRay.m_direction.z = newDoubles[7];
+    //             //std::cout<<newDoubles[0]<<newDoubles[1]<<newDoubles[2]<<newDoubles[3]<<newDoubles[4]<<newDoubles[5]<<newRay.m_direction.y<<newRay.m_direction.z<<"test"<<std::endl;
+    //             newRayVector.push_back(newRay);
+    //             numberOfRays++;
+    //             if (numberOfRays > RAY_MAX_ELEMENTS_IN_VECTOR) {
+    //                 m_RayList.push_back(newRayVector);
+    //                 numberOfRays = 0;
+    //                 newRayVector.clear();
+    //                 newRayVector.resize(RAY_MAX_ELEMENTS_IN_VECTOR);
+    //             }
 
-                }
-            }
-            case TracerInterface::QuadricType:{
-                int i=1;
-            }
-        }
+    //         }
+    //         break;
+    //     }
+    //     case TracerInterface::QuadricType: {
+    //         //int i = 1;
+    //         break;
+    //     }
+    //     }
 
-    } 
+    // }
 
-}    
-    // namespace RAY
+}
+// namespace RAY
