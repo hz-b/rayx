@@ -17,7 +17,7 @@ namespace RAY
         enum DERIVATION_METHOD { DM_FORMULA, DM_PLOYNOM };
         DERIVATION_METHOD m_derivationMethod;
 
-        ReflectionZonePlate(const char* name, int mount, int curvatureType, double width, double height, double deviation, double normalIncidence, double azimuthal, double distanceToPreceedingElement, double designEnergyMounting, double lineDensity, double orderOfDiffraction, std::vector<double> misalignmentParams);
+        ReflectionZonePlate(const char* name, int mount, int curvatureType, double width, double height, double deviation, double grazingIncidence, double azimuthal, double distanceToPreceedingElement, double designEnergy, double orderOfDiffraction, std::vector<double> misalignmentParams);
         ReflectionZonePlate();
         ~ReflectionZonePlate();
 

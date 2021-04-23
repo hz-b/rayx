@@ -18,7 +18,7 @@ namespace RAY
      *          lineDensity = line density of the grating
      *          orderOfDefraction =
     */
-    ReflectionZonePlate::ReflectionZonePlate(const char* name, int mount, int curvatureType, double width, double height, double deviation, double normalIncidence, double azimuthal, double distanceToPreceedingElement, double designEnergy, double lineDensity, double orderOfDiffraction, std::vector<double> misalignmentParams)
+    ReflectionZonePlate::ReflectionZonePlate(const char* name, int mount, int curvatureType, double width, double height, double deviation, double grazingIncidence, double azimuthal, double distanceToPreceedingElement, double designEnergy, double orderOfDiffraction, std::vector<double> misalignmentParams)
         : Quadric(name) {
         // parameters in array 
         // std::vector<double> inputPoints = {0,0,0,0, 0,0,0,-1, 0,0,0,0, 0,0,0,0};
@@ -44,7 +44,7 @@ namespace RAY
         m_gratingMount = mount == 0 ? GM_DEVIATION : GM_INCIDENCE;
         m_chi = rad(azimuthal);
         m_distanceToPreceedingElement = distanceToPreceedingElement;
-        calcAlpha(deviation, normalIncidence);
+        calcAlpha(deviation, grazingIncidence);
         std::cout << "alpha: " << (PI / 2 - m_alpha) << ", beta: " << PI / 2 - abs(m_beta) << std::endl;
 
         // set parameters in Quadric class
