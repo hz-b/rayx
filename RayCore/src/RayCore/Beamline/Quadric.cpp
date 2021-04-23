@@ -4,15 +4,16 @@
 
 namespace RAY
 {
-    Quadric::Quadric(const char* name, std::vector<double> inputPoints, std::vector<double> inputInMatrix, std::vector<double> inputOutMatrix, std::vector<double> misalignmentMatrix, std::vector<double> inverseMisalignmentMatrix)
+    Quadric::Quadric(const char* name, std::vector<double> inputPoints, std::vector<double> inputInMatrix, std::vector<double> inputOutMatrix, std::vector<double> misalignmentMatrix, std::vector<double> inverseMisalignmentMatrix, std::vector<double> parameters)
     {   
         m_name = name;
-        assert(inputPoints.size() == 16 && inputInMatrix.size() == 16 && inputOutMatrix.size() == 16);
+        assert(inputPoints.size() == 16 && inputInMatrix.size() == 16 && inputOutMatrix.size() == 16 && misalignmentMatrix.size() == 16 && inverseMisalignmentMatrix.size() == 16 && parameters.size() == 16);
         m_anchorPoints = inputPoints;
         m_inMatrix = inputInMatrix;
         m_outMatrix = inputOutMatrix;
         m_temporaryMisalignmentMatrix = misalignmentMatrix;
         m_inverseTemporaryMisalignmentMatrix = inverseMisalignmentMatrix;
+        m_parameters = parameters;
     }
 
     /**
@@ -129,14 +130,20 @@ namespace RAY
         // inv(rot) * inv(tran) * ray
         d_inverseMisalignmentMatrix = getMatrixProductAsVector(inverseRotation, inverseTranslation);
 
-        /*
+        
         std::vector<double> ident = getMatrixProductAsVector(d_misalignmentMatrix, d_inverseMisalignmentMatrix);
         for(int i = 0; i<16; i++) {
             std::cout << ident[i] << ", " ;
         }
-        std::cout << std::endl;*/
+        std::cout << std::endl;
         m_inMatrix = getMatrixProductAsVector(d_misalignmentMatrix, d_inTrans);
         m_outMatrix = getMatrixProductAsVector(d_outTrans, d_inverseMisalignmentMatrix);
+        std::cout << "inTrans: " << std::endl;
+        for(int i = 0; i<16; i++) {
+            std::cout << m_inMatrix[i] << ", " ;
+        }
+        std::cout << std::endl;
+        
     }
 
     /**
@@ -264,6 +271,10 @@ namespace RAY
     std::vector<double> Quadric::getInverseTempMisalignmentMatrix()
     {
         return m_inverseTemporaryMisalignmentMatrix;
+    }
+
+    std::vector<double> Quadric::getParameters() {
+        return m_parameters;
     }
 
     const char* Quadric::getName() {
