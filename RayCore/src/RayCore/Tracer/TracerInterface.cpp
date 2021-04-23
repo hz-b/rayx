@@ -91,7 +91,7 @@ namespace RAY
         // plane grating with default values
         PlaneGrating plG = PlaneGrating("PlaneGratingDeviationDefault", 1, 50, 200, 0, 10, 7.5, 10000, 100, 1000, 1, 2, { 1,2,3,0.001,0.002,0.003 }, { 0,0,0,0,0,0 }); // dx,dy,dz, dpsi,dphi,dchi // {1,2,3,0.001,0.002,0.003}
 
-        ReflectionZonePlate reflZonePlate("Reflection Zoneplate", 1, ReflectionZonePlate::CURVATURE_TYPE::CT_PLANE, 4, 60, 170, 2.2, 0, 90, 640, -1, { 0, 0, 0, 0, 0, 0 });
+        ReflectionZonePlate reflZonePlate("Reflection Zoneplate", 1, ReflectionZonePlate::CURVATURE_TYPE::CT_PLANE, 4, 60, 170, 2.2, 0, 90, 640, 640, -1, -1, 2.2, 1, 90, 400, 90, 400, 0, 0, { 0,0,0,0,0,0 });
         // spherical grating with defalult values. SphereGrating(int mount, double width, double height, double deviation, double normalIncidence, double azimuthal, double distanceToPreceedingElement, double entranceArmLength, double exitArmLength, double designEnergyMounting, double lineDensity, double orderOfDiffraction, std::vector<double> misalignmentParams);
         //SphereGrating s = SphereGrating("SphereGrating", 0, 50, 200, 10, 0.0, 0.0, 10000, 10000, 1000,  100, 1000, 1, {0,0,0,0,0,0});
         // std::cout << s.getRadius() << std::endl;
@@ -100,14 +100,14 @@ namespace RAY
         for (int i = 0; i < 1; i++) {
             //m_Beamline.addQuadric(s.getName(), s.getAnchorPoints(), s.getInMatrix(), s.getOutMatrix(), s.getTempMisalignmentMatrix(), s.getInverseTempMisalignmentMatrix());
             //m_Beamline.addQuadric(plM.getName(), plM.getAnchorPoints(), plM.getInMatrix(), plM.getOutMatrix(), plM.getTempMisalignmentMatrix(), plM.getInverseTempMisalignmentMatrix());
-            m_Beamline.addQuadric(plG.getName(), plG.getAnchorPoints(), plG.getInMatrix(), plG.getOutMatrix(), plG.getTempMisalignmentMatrix(), plG.getInverseTempMisalignmentMatrix());
+            m_Beamline.addQuadric(plG.getName(), plG.getAnchorPoints(), plG.getInMatrix(), plG.getOutMatrix(), plG.getTempMisalignmentMatrix(), plG.getInverseTempMisalignmentMatrix(), { 0,0,0,0,0,0 });
         }
 
         //add beamline to tracer
         std::vector<RAY::Quadric> Quadrics = m_Beamline.getObjects();
         size_t size = Quadrics.size();
         for (unsigned int i = 0; i < size; i++) {
-            tracer.addQuadric(Quadrics[i].getAnchorPoints(), Quadrics[i].getInMatrix(), Quadrics[i].getOutMatrix(), Quadrics[i].getTempMisalignmentMatrix(), Quadrics[i].getInverseTempMisalignmentMatrix());//, Quadrics[i].getInverseMisalignmentMatrix()
+            tracer.addQuadric(Quadrics[i].getAnchorPoints(), Quadrics[i].getInMatrix(), Quadrics[i].getOutMatrix(), Quadrics[i].getTempMisalignmentMatrix(), Quadrics[i].getInverseTempMisalignmentMatrix(), { 0,0,0,0,0,0 });//, Quadrics[i].getInverseMisalignmentMatrix()
         }
 
         const clock_t begin_time = clock();
