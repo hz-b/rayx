@@ -190,6 +190,33 @@ namespace RAY
         outputFile.close();
         std::cout << "done!" << std::endl;
     }
+
+    //writes rays to file
+    // void TracerInterface::writeToFile(std::vector<Ray> outputRays)
+    // {
+    //     std::cout << "writing to file..." << std::endl;
+    //     std::ofstream outputFile;
+    //     outputFile.precision(17);
+    //     std::cout.precision(17);
+    //     std::string filename = "../../output/output.csv";
+    //     outputFile.open(filename);
+    //     char sep = ';'; // file is saved in .csv (comma seperated value), excel compatibility is manual right now
+    //     outputFile << "Index" << sep << "Xloc" << sep << "Yloc" << sep << "Zloc" << sep << "Weight" << sep << "Xdir" << sep << "Ydir" << sep << "Zdir" << std::endl;
+    //     // outputFile << "Index,Xloc,Yloc,Zloc,Weight,Xdir,Ydir,Zdir" << std::endl;
+
+    //     size_t counter = 0;
+    //     int print = 1;
+    //     for (Ray ray : outputRays) {
+
+    //         auto pos = ray.position;
+    //         auto weight = ray.weight;
+    //         auto dir = ray.direction;
+
+    //         printf("Ray position: %d%d%d, weight: %d, dir: %d%d%d \n", pos.x, pos.y, pos.z, weight, dir.x, dir.y, dir.z);
+
+    //     }
+    //     std::cout << "done!" << std::endl;
+    // }
     //reads from file. datatype (RayType, QuadricType) needs to be set
     //pretty ugly, should be rewritten later
     // void TracerInterface::readFromFile(std::string path, m_dataType dataType)
