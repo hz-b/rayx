@@ -7,11 +7,11 @@ namespace RAY
     
 
     PointSource::PointSource(int id, std::string name, int numberOfRays, double sourceWidth, double sourceHeight,
-    double sourceDepth, double horDivergence, double verDivergence, int widthLength, int heightLength, int horLength, int verLength) : LightSource(id, numberOfRays, name.c_str()), m_sourceDepth(sourceDepth), m_sourceHeight(sourceHeight), m_sourceWidth(sourceWidth), m_horDivergence(horDivergence), m_verDivergence(verDivergence) {
-        m_widthLength = widthLength == 0 ? SL_GAUSSIAN : SL_HARDEDGE;
-        m_heightLength = heightLength == 0 ? SL_GAUSSIAN : SL_HARDEDGE;
-        m_horLength = horLength == 0 ? SL_GAUSSIAN : SL_HARDEDGE;
-        m_verLength = verLength == 0 ? SL_GAUSSIAN : SL_HARDEDGE;
+    double sourceDepth, double horDivergence, double verDivergence, int widthDist, int heightDist, int horDist, int verDist, std::vector<double> misalignment) : LightSource(id, numberOfRays, name.c_str(), misalignment), m_sourceDepth(sourceDepth), m_sourceHeight(sourceHeight), m_sourceWidth(sourceWidth), m_horDivergence(horDivergence), m_verDivergence(verDivergence) {
+        m_widthDist = widthDist == 0 ? SD_HARDEDGE : SD_GAUSSIAN;
+        m_heightDist = heightDist == 0 ? SD_HARDEDGE : SD_GAUSSIAN;
+        m_horDist = horDist == 0 ? SD_HARDEDGE : SD_GAUSSIAN;
+        m_verDist = verDist == 0 ? SD_HARDEDGE : SD_GAUSSIAN;
         std::normal_distribution<double> m_stdnorm(0,1);
         std::uniform_real_distribution<double> m_uniform(0,1);
         std::default_random_engine m_re;
@@ -37,16 +37,17 @@ namespace RAY
         std::vector<Ray> rayVector;
         rayVector.reserve(1048576);
         std::cout << "create " << n << " rays with standard normal deviation..." << std::endl;
+
         // create n rays with random position and divergence within the given span for width, height, ..
         for(int i = 0; i<n; i++) {
-            x = getCoord(m_widthLength, m_sourceWidth);
-            y = getCoord(m_heightLength, m_sourceHeight);
+            x = getCoord(m_widthDist, m_sourceWidth) + getMisalignmentParams()[0];
+            y = getCoord(m_heightDist, m_sourceHeight) + getMisalignmentParams()[1];
             z = (m_uniform(m_re) - 0.5) * m_sourceDepth;
             //double z = (rn[2] - 0.5) * m_sourceDepth;
             glm::dvec3 position = glm::dvec3(x, y, z);
             
-            phi = getCoord(m_horLength, m_horDivergence);
-            psi = getCoord(m_verLength, m_verDivergence);
+            phi = getCoord(m_horDist, m_horDivergence) + getMisalignmentParams()[2];
+            psi = getCoord(m_verDist, m_verDivergence) + getMisalignmentParams()[3];
             //std::cout << phi <<" "<<psi << std::endl;
             // double phi = (rn[3] - 0.5) * m_horDivergence;
             // double psi = (rn[4] - 0.5) * m_verDivergence;
@@ -56,15 +57,15 @@ namespace RAY
             rayVector.emplace_back(r);
         }
         std::cout<<&(rayVector[0])<<std::endl;
-        rayVector.resize(1048576);
+        //rayVector.resize(1048576);
         return rayVector;
     }
 
-    double PointSource::getCoord(PointSource::SOURCE_LENGTH l, double extent) {
-        if(l == SL_HARDEDGE)
+    double PointSource::getCoord(PointSource::SOURCE_DIST l, double extent) {
+        if(l == SD_HARDEDGE)
             return (m_uniform(m_re) - 0.5) * extent;
         else
-            return (m_stdnorm(m_re));
+            return (m_stdnorm(m_re) * extent);
 
     }
 

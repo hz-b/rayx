@@ -16,10 +16,11 @@ namespace RAY
     {
     public:
         
-        LightSource(int id, int numberOfRays, const char* name);
+        LightSource(int id, int numberOfRays, const char* name, std::vector<double> misalignment);
         const char* getName();
         int getNumberOfRays();
         int getId();
+        std::vector<double> getMisalignmentParams();
         void setNumberOfRays(int numberOfRays);
         glm::dvec3 getDirectionFromAngles(double phi, double psi);
         // get the rays according to specific light source, has to be implemented in each class that inherits from LightSource
@@ -32,6 +33,7 @@ namespace RAY
         const char* m_name;
         int m_numberOfRays;
         int m_id;
+        std::vector<double> m_misalignmentParams;
         // std::vector<Ray *> m_rayList; ?
 
     };
