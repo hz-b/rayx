@@ -802,7 +802,7 @@ Ray rayMatrixMult(Ray r, dmat4 m) {
 * uses given transformation matrix to transform ray position and direction into Object coordinates
 * also takes misalignment of the object into account
 * @param r				input ray in Ray-coordinates
-* @param misaligment	4x4 homogeneous matrix that contains the misalignemnt of the element (dx, dy, dz, dphi, dpsi, dchi)
+* @param misalignment	4x4 homogeneous matrix that contains the misalignment of the element (dx, dy, dz, dphi, dpsi, dchi)
 * @param inTrans		4x4 homogeneous matrix that contains the transformation of ray-coordinates to object coordinates (distance to previous element, grazing incidence angle, azimuthal angle)
 * 
 * output: nothing. changes r in situ
@@ -816,7 +816,7 @@ void inTransformation(inout Ray r, dmat4 misalignment, dmat4 inTrans) {
 * uses given transformation matrix to transform ray position and direction back into Ray coordinates
 * also takes misalignment of the object into account. Note that the order of the transformations is reversed and we use the inverse of the misalignment matrix
 * @param r				input ray in Ray-coordinates
-* @param invMisaligment	4x4 homogeneous matrix that contains the misalignemnt of the element (dx, dy, dz, dphi, dpsi, dchi)
+* @param invMisalignment	4x4 homogeneous matrix that contains the misalignment of the element (dx, dy, dz, dphi, dpsi, dchi)
 * @param outTrans		3x3 homogeneous matrix (in 4x4 matrix for standardization) that contains the transformation of object coordinates to ray-coordinates (rotations only: grazing exit angle, neg. azimuthal angle)
 * 
 * output: nothing. changes r in situ
@@ -974,7 +974,7 @@ dvec4 intersectionPoint(inout Ray r, dmat4 quadric, int icurv)
 		
 		double bbac = b*b - a*c;
 		if (bbac < 0) {
-			w = -0.0;
+			w = 0.0;
 			x = - y/aml; 	// x such that y=0
 		}else{
 			if (abs(a) > abs(c)*1e-10) {
@@ -1530,10 +1530,11 @@ Ray traceSlit(Ray r, Quadric q) {
 
 
 Ray traceRZP(Ray r, Quadric q) {
+	double element_offset_z = q.parameters[3][2];
 	r = rayMatrixMult(r, q.inTrans);
+	//r.position.z = r.position.z - element_offset_z;
+	r = rayMatrixMult(r, q.misalignment); // misalignment not stored in intrans because it needs to be removed later
 	
-	double element_offset_z = 0; // given by parameters.
-
 	// RZP can be plane, toroidal or spherical curvature type. Use intersectionPoint for all except toroidal
 	// if !toroidal:
 	dvec4 normal = intersectionPoint(r, q.anchorPoints, 1); // check if normal is correct
@@ -1547,14 +1548,13 @@ Ray traceRZP(Ray r, Quadric q) {
 	
 	// remove misalignment to calculate line density
 	r = rayMatrixMult(r, q.inverseMisalignment);
-
-	double zOffsetCenter = q.parameters[1][3];; // fresnel center z offset
 	
-	/*{
-	double(m_imageType), double(m_rzpType), double(m_derivationMethod), m_wavelength, 
-	m_designEnergy, m_designOrderOfDiffraction,m_orderOfDiffraction,zOffsetCenter, 
-	m_sagittalEntranceArmLength,m_sagittalExitArmLength,m_meridionalEntranceArmLength,m_meridionalExitArmLength, 
-	m_designAlphaAngle,m_designBetaAngle,0,0}*/
+	if(r.weight < 1.0) {
+		//r.position.z -= element_offset_z;
+		r = rayMatrixMult(r, q.outTrans);
+		return r;
+	}
+	
 	double DX, DZ;
 	//RZPLineDensity(...DX,DZ);
 	int IMAGE_TYPE = int(q.parameters[0][0]); 
@@ -1567,6 +1567,7 @@ Ray traceRZP(Ray r, Quadric q) {
 	double d_alpha = q.parameters[3][0];
 	double d_beta = q.parameters[3][1];
 	double d_ord = q.parameters[1][1];
+	double zOffsetCenter = q.parameters[1][3];; // fresnel center z offset
 	double WL = q.parameters[0][3];//12.39852;
 	double WL0 = WL*1e-06;
 	double Ord = q.parameters[1][2];
@@ -1581,6 +1582,7 @@ Ray traceRZP(Ray r, Quadric q) {
 	double ax = WL*DX*Ord*1e-6;
  	r = refrac2D(r, normal, az, ax);
 
+	r = rayMatrixMult(r, q.inverseMisalignment);
 	r = rayMatrixMult(r, q.outTrans);
 	return r;
 }
@@ -1654,7 +1656,6 @@ Ray traceGeneralGrating(Ray r, Quadric q) {
 */
 Ray traceMirror(Ray r, Quadric q) {
 	r = rayMatrixMult(r, q.inTrans);
-	//inTransformation(r, q.misalignment, q.inTrans);
 	
 	dvec4 normal = intersectionPoint(r, q.anchorPoints, 1);
 	r.direction = reflect(r.direction, normal);
@@ -1665,7 +1666,6 @@ Ray traceMirror(Ray r, Quadric q) {
 	r.weight = wasteBox(r.position[0],r.position[2],xLength,zLength, r.weight);
 	
 	r = rayMatrixMult(r, q.outTrans);
-	//outTransformation(r, q.inverseMisalignment, q.outTrans);
 	return r;
 }
 
