@@ -182,7 +182,7 @@ namespace RAY
                             0,0,1,0, 
                             dx, dy, dz, 1};
         // inverseTranslation * inverseRotation = inverseMisalignmentMatrix 
-        m_inverseTemporaryMisalignmentMatrix = getMatrixProductAsVector(inverseTranslation, inverseRotation);
+        m_inverseTemporaryMisalignmentMatrix = getMatrixProductAsVector(inverseRotation, inverseTranslation);
     }
 
     std::vector<double> Quadric::getQuadric()

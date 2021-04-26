@@ -8,11 +8,11 @@ namespace RAY
 
     public:
         
-        ReflectionZonePlate(const char* name, int mount, int curvatureType, double width, double height, double deviation, double incidenceAngle, double azimuthal, double distanceToPreceedingElement, double designEnergy, double sourceEnergy, double orderOfDiffraction, double designOrderOfDiffraction, double dAlpha, double dBeta, double mEntrance, double mExit, double sEntrance, double sExit, double shortRadius, double longRadius, std::vector<double> misalignmentParams);
+        ReflectionZonePlate(const char* name, int mount, int curvatureType, double width, double height, double deviation, double incidenceAngle, double azimuthal, double distanceToPreceedingElement, double designEnergy, double sourceEnergy, double orderOfDiffraction, double designOrderOfDiffraction, double dAlpha, double dBeta, double mEntrance, double mExit, double sEntrance, double sExit, double shortRadius, double longRadius, double elementOffsetZ, std::vector<double> misalignmentParams);
         ReflectionZonePlate();
         ~ReflectionZonePlate();
 
-        void calcAlpha(double deviation, double normalIncidence);
+        void calcDesignAlphaAngle(double deviation, double normalIncidence);
         void calcAlpha2();
         void calcBeta2();
         void Illumination();
