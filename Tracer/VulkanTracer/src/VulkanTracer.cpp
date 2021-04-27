@@ -584,7 +584,7 @@ void* VulkanTracer::getRays() {
 		{
 			data.push_back(Ray(pMappedMemory[j], pMappedMemory[j + 1], pMappedMemory[j + 2], pMappedMemory[j + 3], pMappedMemory[j + 4], pMappedMemory[j + 5], pMappedMemory[j + 6]));
 		}
-		outputData.insertVector(data);
+		outputData.insertVector(data.data(), data.size());
 		data.empty();
 		vkUnmapMemory(device, bufferMemories[3]);
 	}
@@ -600,7 +600,7 @@ void* VulkanTracer::getRays() {
 		data.push_back(Ray(pMappedMemory[j], pMappedMemory[j + 1], pMappedMemory[j + 2], pMappedMemory[j + 3], pMappedMemory[j + 4], pMappedMemory[j + 5], pMappedMemory[j + 6]));
 	}
 	std::cout << "data size= " << data.size() << std::endl;
-	outputData.insertVector(data);
+	outputData.insertVector(data.data(), data.size());
 	data.empty();
 	vkUnmapMemory(device, bufferMemories[3]);
 	std::cout << "mapping memory done" << std::endl;
@@ -924,14 +924,14 @@ void VulkanTracer::setBeamlineParameters(uint32_t inNumberOfBeamlines, uint32_t 
 }
 
 void VulkanTracer::addRayVector(void* location, size_t size) {
-	std::vector<Ray> newRayVector;
+	//std::vector<Ray> newRayVector;
 	std::cout << "1" << std::endl;
-	newRayVector.resize(size);
-	std::cout << "2" << std::endl;
-	//std::cout<<"addRayVector: size= "<<size<<std::endl;
-	memcpy(&newRayVector[0], location, size * VULKANTRACER_RAY_DOUBLE_AMOUNT * sizeof(double));
-	std::cout << "3 " << newRayVector.size() << std::endl;
-	rayList.insertVector(newRayVector);
+	//newRayVector.resize(size);
+	//std::cout << "2" << std::endl;
+	//std::cout << "addRayVector: size= " << size << std::endl;
+	//memcpy(&newRayVector[0], location, size * VULKANTRACER_RAY_DOUBLE_AMOUNT * sizeof(double));
+	//std::cout << "3 " << newRayVector.size() << std::endl;
+	rayList.insertVector(location, size);
 	std::cout << "4" << std::endl;
 
 }
