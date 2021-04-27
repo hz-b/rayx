@@ -484,6 +484,8 @@ void VulkanTracer::fillStagingBuffer(uint32_t offset, std::list<std::vector<Ray>
 		memcpy(((char*)data) + i * RAY_VECTOR_SIZE, (*raySetIterator).data(), std::min((*raySetIterator).size() * VULKANTRACER_RAY_DOUBLE_AMOUNT * sizeof(double), (size_t)GPU_MAX_STAGING_SIZE));
 		raySetIterator++;
 	}
+	double* temp = (double*)data;
+	//std::cout << "value: "<<temp[0]<< std::endl;
 	vkUnmapMemory(device, bufferMemories[3]);
 }
 void VulkanTracer::copyToRayBuffer(uint32_t offset, uint32_t numberOfBytesToCopy) {
@@ -936,15 +938,20 @@ void VulkanTracer::addRayVector(void* location, size_t size) {
 
 }
 //adds quad to beamline
-void VulkanTracer::addQuadric(std::vector<double> inQuadric, std::vector<double> inputInMatrix, std::vector<double> inputOutMatrix, std::vector<double> misalignmentMatrix, std::vector<double> inverseMisalignmentMatrix) {
-	assert(beamline.size() >= 4);
-	assert(inQuadric.size() == 16 && inputInMatrix.size() == 16 && inputOutMatrix.size() == 16 && misalignmentMatrix.size() == 16);
+void VulkanTracer::addQuadric(std::vector<double> inQuadric, std::vector<double> inputInMatrix, std::vector<double> inputOutMatrix, std::vector<double> misalignmentMatrix, std::vector<double> inverseMisalignmentMatrix, std::vector<double> parameters) {
+	assert(inQuadric.size() == 16 && inputInMatrix.size() == 16 && inputOutMatrix.size() == 16 && misalignmentMatrix.size() == 16 && parameters.size() == 6);
 	//beamline.resize(beamline.size()+1);
 	beamline.insert(beamline.end(), inQuadric.begin(), inQuadric.end());
 	beamline.insert(beamline.end(), inputInMatrix.begin(), inputInMatrix.end());
 	beamline.insert(beamline.end(), inputOutMatrix.begin(), inputOutMatrix.end());
 	beamline.insert(beamline.end(), misalignmentMatrix.begin(), misalignmentMatrix.end());
 	beamline.insert(beamline.end(), inverseMisalignmentMatrix.begin(), inverseMisalignmentMatrix.end());
+	beamline.insert(beamline.end(), parameters.begin(), parameters.end());
+}
+void VulkanTracer::divideAndSortRays() {
+	for (auto i = rayList.begin(); i != rayList.end(); i++) {
+
+	}
 }
 
 //is not used anymore

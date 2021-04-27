@@ -138,6 +138,7 @@ private:
     void createComputePipeline();
     void createCommandBuffer();
     void runCommandBuffer();
+    void divideAndSortRays();
 
     int main();
 };

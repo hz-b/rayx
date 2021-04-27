@@ -1,5 +1,4 @@
-#ifndef SPHEREGRATING_H
-#define SPHEREGRATING_H
+#pragma once
 #include "Quadric.h"
 
 namespace RAY
@@ -64,5 +63,3 @@ namespace RAY
     };
 
 } // namespace RAY
-
-#endif

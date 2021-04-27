@@ -1,5 +1,4 @@
 #pragma once
-
 #include "Core.h"
 #include "glm.hpp"
 #include <vector>
@@ -16,7 +15,7 @@ namespace RAY
     class RAY_API LightSource
     {
     public:
-        
+
         LightSource(int id, int numberOfRays, const char* name);
         const char* getName();
         int getNumberOfRays();
@@ -30,9 +29,9 @@ namespace RAY
         virtual ~LightSource();
 
     private:
-        const char* m_name;
-        int m_numberOfRays;
         int m_id;
+        int m_numberOfRays;
+        const char* m_name;
         // std::vector<Ray *> m_rayList; ?
 
     };

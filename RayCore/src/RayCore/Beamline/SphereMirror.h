@@ -1,5 +1,4 @@
-#ifndef SPHEREMIRROR_H
-#define SPHEREMIRROR_H
+#pragma once
 #include "Quadric.h"
 
 namespace RAY
@@ -42,4 +41,3 @@ namespace RAY
     };
 
 } // namespace RAY
-#endif

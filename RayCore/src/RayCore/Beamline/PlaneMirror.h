@@ -1,5 +1,4 @@
-#ifndef PLANEMIRROR_H
-#define PLANEMIRROR_H
+#pragma once
 #include "Quadric.h"
 
 namespace RAY
@@ -35,4 +34,3 @@ namespace RAY
     };
 
 } // namespace RAY
-#endif

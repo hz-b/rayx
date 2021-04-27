@@ -1,6 +1,4 @@
-#ifndef QUADRIC_H
-#define QUADRIC_H
-
+#pragma once
 #include "Core.h"
 #define RAYCORE_QUADRIC_DOUBLE_AMOUNT 48;
 #include "utils.h"
@@ -8,7 +6,7 @@
 namespace RAY {
     class RAY_API Quadric {
         public:
-            Quadric(const char* name, std::vector<double> inputPoints, std::vector<double> inputInMatrix, std::vector<double> inputOutMatrix, std::vector<double> misalignmentMatrix, std::vector<double> inverseMisalignmentMatrix);
+            Quadric(const char* name, std::vector<double> inputPoints, std::vector<double> inputInMatrix, std::vector<double> inputOutMatrix, std::vector<double> misalignmentMatrix, std::vector<double> inverseMisalignmentMatrix, std::vector<double> parameters);
             Quadric(const char* name, std::vector<double> inputPoints, std::vector<double> parameters, double alpha, double chi, double beta, double distanceToPreceedingElement, std::vector<double> misalignment, std::vector<double> tempMisalignment);
             Quadric(const char* name);
 
@@ -30,6 +28,7 @@ namespace RAY {
             std::vector<double> getTempMisalignmentParams();
             std::vector<double> getTempMisalignmentMatrix();
             std::vector<double> getInverseTempMisalignmentMatrix();
+            std::vector<double> getParameters();
             const char* getName();
 
             void calcTransformationMatrices(double alpha, double chi, double beta, double dist, std::vector<double> misalignment);
@@ -61,4 +60,3 @@ namespace RAY {
             std::vector<double> m_parameters;
     };
 }
-#endif
