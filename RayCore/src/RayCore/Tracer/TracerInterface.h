@@ -3,6 +3,7 @@
 #include "Beamline/Beamline.h"
 #include "Core.h"
 #include "Ray.h"
+#include "VulkanTracer.h"
 
 #include <string>
 #include <vector>
@@ -21,7 +22,7 @@ namespace RAY
         TracerInterface();
         ~TracerInterface();
         void addLightSource(LightSource* newSource);
-        void generateRays();
+        void generateRays(VulkanTracer tracer, LightSource* source);
         void writeToFile(std::list<double> outputRays);
         //void writeToFile(std::vector<Ray> outputRays);
         //void readFromFile(std::string path, m_dataType dataType);
@@ -33,6 +34,5 @@ namespace RAY
     private:
         std::vector<LightSource*> m_LightSources;
         Beamline& m_Beamline;
-        std::list<std::vector<Ray>> m_RayList;
     };
 } // namespace RAY

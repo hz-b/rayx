@@ -55,7 +55,7 @@ void VulkanTracer::run()
 	bufferSizes[1] = (uint64_t)numberOfRays * VULKANTRACER_RAY_DOUBLE_AMOUNT * sizeof(double);
 	bufferSizes[2] = beamline.size() * sizeof(double);
 	bufferSizes[3] = std::min((uint64_t)GPU_MAX_STAGING_SIZE, (uint64_t)numberOfRays * VULKANTRACER_RAY_DOUBLE_AMOUNT * sizeof(double)); //maximum of 128MB
-	bufferSizes[4] = (uint64_t)numberOfRays * 4 * sizeof(double); //maximum of 128MB
+	bufferSizes[4] = (uint64_t)numberOfRays * 4 * sizeof(double);
 	for (uint32_t i = 0; i < bufferSizes.size(); i++) {
 		std::cout << "bufferSizes[" << i << "]: " << bufferSizes[i] << std::endl;
 	}
@@ -100,6 +100,7 @@ void VulkanTracer::mainLoop()
 {
 	runCommandBuffer();
 	//readDataFromOutputBuffer();
+	getRays();
 }
 
 void VulkanTracer::cleanup()
@@ -558,7 +559,7 @@ void VulkanTracer::copyToOutputBuffer(uint32_t offset, uint32_t numberOfBytesToC
 
 
 }
-void* VulkanTracer::getRays() {
+void VulkanTracer::getRays() {
 	std::cout << "rayList.size(): " << rayList.size() << std::endl;
 	std::vector<Ray> data;
 	//reserve enough data for all the rays
@@ -597,17 +598,16 @@ void* VulkanTracer::getRays() {
 	vkMapMemory(device, bufferMemories[3], 0, ((bytesNeeded - 1) % GPU_MAX_STAGING_SIZE) + 1, 0, &mappedMemory);
 	double* pMappedMemory = (double*)mappedMemory;
 	// TODO : Currently only the first 16 MB will be transfered to outputData
-	for (uint32_t j = 0; j < (((bytesNeeded - 1) % GPU_MAX_STAGING_SIZE) + 1) / (sizeof(double) * 8); j = j + 8)
+	for (uint32_t j = 0; j < (((bytesNeeded - 1) % GPU_MAX_STAGING_SIZE) + 1) / (sizeof(double)); j = j + 8)
 	{
-		data.push_back(Ray(pMappedMemory[j], pMappedMemory[j + 1], pMappedMemory[j + 2], pMappedMemory[j + 3], pMappedMemory[j + 4], pMappedMemory[j + 5], pMappedMemory[j + 6]));
+		data.push_back(Ray(pMappedMemory[j], pMappedMemory[j + 1], pMappedMemory[j + 2], pMappedMemory[j + 6], pMappedMemory[j + 4], pMappedMemory[j + 5], pMappedMemory[j + 3]));
 	}
 	std::cout << "data size= " << data.size() << std::endl;
 	outputData.insertVector(data.data(), data.size());
-	data.empty();
 	vkUnmapMemory(device, bufferMemories[3]);
 	std::cout << "mapping memory done" << std::endl;
+	std::cout << "outputVectorCount: " << outputData.size() << std::endl;
 	std::cout << "output size in bytes: " << (*(outputData.begin())).size() * RAY_DOUBLE_COUNT * sizeof(double) << std::endl;
-	return (*(outputData.begin())).data();
 
 }
 
@@ -952,6 +952,9 @@ void VulkanTracer::divideAndSortRays() {
 	for (auto i = rayList.begin(); i != rayList.end(); i++) {
 
 	}
+}
+std::list<std::vector<Ray>>::iterator VulkanTracer::getOutputIterator() {
+	return outputData.begin();
 }
 
 //is not used anymore
