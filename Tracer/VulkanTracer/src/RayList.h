@@ -16,6 +16,7 @@ private:
 
 
 public:
+    //list of vectors
     RayList();
     ~RayList();
 

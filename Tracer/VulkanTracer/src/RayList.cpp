@@ -41,6 +41,7 @@ void RayList::insertVector(void* location, size_t inputSize) {
         if (inputSize <= RAY_MAX_ELEMENTS_IN_VECTOR) {
             input.reserve(RAY_MAX_ELEMENTS_IN_VECTOR);
             m_rayList.push_back(input);
+            m_rayList.back().resize(RAY_MAX_ELEMENTS_IN_VECTOR);
         }
         //if input is larger, we need to split it
         else {
