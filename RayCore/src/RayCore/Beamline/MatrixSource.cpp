@@ -6,8 +6,8 @@ namespace RAY
 {
 
     // angles given and stored in rad
-    MatrixSource::MatrixSource(int id, std::string name, int numberOfRays, double sourceWidth, double sourceHeight, double sourceDepth, double horDivergence, double verDivergence) 
-    : LightSource(id, numberOfRays, name.c_str()), m_sourceDepth(sourceDepth), m_sourceHeight(sourceHeight), m_sourceWidth(sourceWidth), m_horDivergence(horDivergence), m_verDivergence(verDivergence) {}
+    MatrixSource::MatrixSource(int id, std::string name, int numberOfRays, double sourceWidth, double sourceHeight, double sourceDepth, double horDivergence, double verDivergence, std::vector<double> misalignment) 
+    : LightSource(id, numberOfRays, name.c_str(), misalignment), m_sourceDepth(sourceDepth), m_sourceHeight(sourceHeight), m_sourceWidth(sourceWidth), m_horDivergence(horDivergence), m_verDivergence(verDivergence) {}
 
     MatrixSource::~MatrixSource()
     {

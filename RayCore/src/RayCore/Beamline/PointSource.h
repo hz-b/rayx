@@ -10,14 +10,14 @@ namespace RAY
     public:
         
         PointSource(int id, std::string name, int numberOfRays, double sourceWidth, double sourceHeight,
-    double sourceDepth, double horDivergence, double verDivergence, int widthLength, int heightLength, int horLength, int verLength);
+    double sourceDepth, double horDivergence, double verDivergence, int widthDist, int heightDist, int horDist, int verDist, std::vector<double> misalignment);
         
         PointSource();
         ~PointSource();
 
-        enum SOURCE_LENGTH { SL_HARDEDGE, SL_GAUSSIAN };
+        enum SOURCE_DIST { SD_HARDEDGE, SD_GAUSSIAN };
         std::vector<Ray> getRays();
-        double getCoord(SOURCE_LENGTH l, double extent);
+        double getCoord(SOURCE_DIST l, double extent);
         double getSourceDepth();
         double getSourceHeight();
         double getSourceWidth();
@@ -34,10 +34,10 @@ namespace RAY
         std::uniform_real_distribution<double> m_uniform;
         std::normal_distribution<double> m_stdnorm;
         std::default_random_engine m_re;   
-        SOURCE_LENGTH m_widthLength;
-        SOURCE_LENGTH m_heightLength;
-        SOURCE_LENGTH m_horLength;
-        SOURCE_LENGTH m_verLength;
+        SOURCE_DIST m_widthDist;
+        SOURCE_DIST m_heightDist;
+        SOURCE_DIST m_horDist;
+        SOURCE_DIST m_verDist;
         //std::vector<SOURCE_LENGTH> m_source_lengths;
     };
 

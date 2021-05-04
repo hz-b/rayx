@@ -19,7 +19,7 @@ namespace RAY
      *          lineDensity = line density of the grating
      *          orderOfDiffraction = 
     */
-    ReflectionZonePlate::ReflectionZonePlate(const char* name, int mount, int curvatureType, double width, double height, double deviation, double incidenceAngle, double azimuthal, double distanceToPreceedingElement, double designEnergy, double sourceEnergy, double orderOfDiffraction, double designOrderOfDiffraction, double dAlpha, double dBeta, double mEntrance, double mExit, double sEntrance, double sExit, double shortRadius, double longRadius, std::vector<double> misalignmentParams) 
+    ReflectionZonePlate::ReflectionZonePlate(const char* name, int mount, int curvatureType, double width, double height, double deviation, double incidenceAngle, double azimuthal, double distanceToPreceedingElement, double designEnergy, double sourceEnergy, double orderOfDiffraction, double designOrderOfDiffraction, double dAlpha, double dBeta, double mEntrance, double mExit, double sEntrance, double sExit, double shortRadius, double longRadius, double elementOffsetZ, std::vector<double> misalignmentParams) 
     : Quadric(name) {
         m_totalWidth = width;
         m_totalHeight = height;
@@ -39,6 +39,7 @@ namespace RAY
         m_rzpType = RT_ELLIPTICAL; // default (0)
         m_imageType = IT_POINT2POINT; // default (0)
         m_elementOffsetType = EZ_MANUAL; // default (0)
+        m_elementOffsetZ = elementOffsetZ;
 
         calcDesignOrderOfDiffraction(designOrderOfDiffraction);
         m_sagittalEntranceArmLength = sEntrance; //mm
@@ -46,11 +47,10 @@ namespace RAY
         m_sagittalExitArmLength = sExit;
         m_meridionalExitArmLength = mExit;
 
-        // m_lineDensity = lineDensity;
-        // m_a = abs(hvlam(m_designEnergyMounting)) * m_lineDensity * m_orderOfDiffraction * 1e-6;
         m_chi = rad(azimuthal);
         m_distanceToPreceedingElement = distanceToPreceedingElement;
         m_grazingIncidenceAngle = rad(incidenceAngle);
+        // m_derivationAngle = derivation; // not used in RAY-UI, does grating mount even matter?
         m_meridionalDistance = 0;
         m_meridionalDivergence = 0;
 
@@ -72,14 +72,14 @@ namespace RAY
             editQuadric({1,0,0,0, m_totalWidth,1,0,-m_longRadius, m_totalHeight,0,1,0, 4,0,0,0});
         }
         
-        calcTransformationMatrices(m_alpha, m_chi, m_beta, m_distanceToPreceedingElement, {0,0,0,0,0,0}); 
+        calcTransformationMatrices(m_alpha, m_chi, m_beta, m_distanceToPreceedingElement, {0,0,0, 0,0,0}); 
         // the whole misalignment is stored in temporaryMisalignment because it needs to be temporarily removed during tracing (-> store in separate matrix, not inMatrix/outMatrix)
         setTemporaryMisalignment(misalignmentParams);
         setParameters({
             double(m_imageType), double(m_rzpType), double(m_derivationMethod), m_wavelength, 
             m_designEnergy, m_designOrderOfDiffraction,m_orderOfDiffraction,m_frenselZOffset, 
             m_sagittalEntranceArmLength,m_sagittalExitArmLength,m_meridionalEntranceArmLength,m_meridionalExitArmLength, 
-            m_designAlphaAngle,m_designBetaAngle,0,0}
+            m_designAlphaAngle,m_designBetaAngle,m_elementOffsetZ,0}
         );
     }
 
@@ -93,16 +93,15 @@ namespace RAY
      * @params: deviation:      deviation angle between incoming and outgoing ray
      *          incidenceAngle: grazing incidence angle
     */
-    void ReflectionZonePlate::calcAlpha(double deviation, double incidenceAngle) { //  grazing or normal?
-        /*double angle;
+   // never called??
+    void ReflectionZonePlate::calcDesignAlphaAngle(double deviation, double incidenceAngle) {
+        double angle;
         if (m_gratingMount == GM_DEVIATION) {
-            angle = deviation;
-            double d0 = calcDz00(); // calc
-            m_a = abs(hvlam(m_designEnergy)) * d0 * m_orderOfDiffraction * 1e-6;
-            focus(angle);
+            focus(deviation); // focus(hv=beamline->getPhotonEnergy, angle, d0=calcDz00, ord=orderofdiff, alpha, beta)
+            m_grazingIncidenceAngle = PI/2-m_grazingIncidenceAngle;
         }else if (m_gratingMount == GM_INCIDENCE) {
-            angle = incidenceAngle;
-        }*/
+            m_grazingIncidenceAngle = incidenceAngle; // m_designAlphaAngle
+        }
     }
 
     // VectorIncidenceMainBeam
@@ -111,7 +110,7 @@ namespace RAY
         double alphaMtest;
         double distance = m_meridionalDistance; 
         if(m_elementOffsetType == EZ_MANUAL) {
-            m_zOff = m_elementOffsetType;
+            m_zOff = m_elementOffsetZ;
         }else if(m_elementOffsetType == EZ_BEAMDIVERGENCE) {
             m_zOff = calcZOffset();
         }
@@ -260,30 +259,32 @@ namespace RAY
         m_designOrderOfDiffraction = abs(designOrderOfDiffraction) * presign;
     }
 
+    // never called??
     void ReflectionZonePlate::focus(double angle) {
         // from routine "focus" in RAY.FOR
+        // focus(hv=beamline->getPhotonEnergy, angle, d0=calcDz00, ord=orderofdiff, alpha, beta)
+        double a = m_designEnergy * abs(calcDz00() * m_orderOfDiffraction * 1.e-06);
         double theta = rad(abs(angle));
         if (angle <= 0) { // constant alpha mounting
-            double arg = m_a - sin(theta);
+            double arg = a - sin(theta);
             if(abs(arg) >= 1) { // cannot calculate alpha & beta
-                m_alpha = 0;
+                m_grazingIncidenceAngle = 0;
                 m_beta = 0;
             }else{
-                m_alpha = theta;
+                m_grazingIncidenceAngle = theta;
                 m_beta = asin(arg);
             }
         }else{  // constant alpha & beta mounting
             theta = theta / 2;
-            double arg = m_a/2/cos(theta);
+            double arg = a/2/cos(theta);
             if(abs(arg) >= 1) {
-                m_alpha = 0;
+                m_grazingIncidenceAngle = 0;
                 m_beta = 0;
             }else{
                 m_beta = asin(arg) - theta;
-                m_alpha = 2 * theta + m_beta;
+                m_grazingIncidenceAngle = 2 * theta + m_beta;
             }
         }
-        m_alpha = PI/2-m_alpha;
         m_beta = PI/2-abs(m_beta);
     }
 

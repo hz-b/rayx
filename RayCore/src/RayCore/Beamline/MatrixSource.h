@@ -9,7 +9,7 @@ namespace RAY
     public:
         
         MatrixSource(int id, std::string name, int numberOfRays, double sourceWidth, double sourceHeight,
-    double sourceDepth, double horDivergence, double verDivergence);
+    double sourceDepth, double horDivergence, double verDivergence, std::vector<double> misalignment);
         
         MatrixSource();
         ~MatrixSource();
