@@ -15,7 +15,7 @@ namespace RAY
     class RAY_API LightSource
     {
     public:
-        
+
         LightSource(int id, int numberOfRays, const char* name, std::vector<double> misalignment);
         const char* getName();
         int getNumberOfRays();
@@ -33,7 +33,6 @@ namespace RAY
         int m_id;
         const char* m_name;
         int m_numberOfRays;
-        int m_id;
         std::vector<double> m_misalignmentParams;
         // std::vector<Ray *> m_rayList; ?
 
