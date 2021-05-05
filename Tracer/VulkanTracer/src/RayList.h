@@ -9,22 +9,22 @@
 #define RAY_DOUBLE_COUNT 8
 
 class RayList {
-
-
-public:
-    RayList();
-    ~RayList();
-
-    //appends vector of Rays to the ray list
-    void insertVector(std::vector<Ray> input);
-    std::list<std::vector<Ray>>::iterator begin();
-    std::list<std::vector<Ray>>::iterator end();
-    std::size_t size();
-    int rayAmount();
-
 private:
     //adds empty vector to the list
     std::list<std::vector<Ray>> m_rayList;
     void addVector();
+
+
+public:
+    //list of vectors
+    RayList();
+    ~RayList();
+
+    //appends vector of Rays to the ray list
+    void insertVector(void* location, size_t size);
+    std::list<std::vector<Ray>>::iterator begin();
+    std::list<std::vector<Ray>>::iterator end();
+    std::size_t size();
+    int rayAmount();
 
 };
