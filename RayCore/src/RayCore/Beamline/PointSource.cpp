@@ -21,8 +21,12 @@ namespace RAY
     PointSource::~PointSource(){}
 
     /**
-     * creates floor(sqrt(numberOfRays)) **2 rays (a grid with as many rows as columns, eg amountOfRays=20 -> 4*4=16, rest (4 rays) same as first 4)
-     * distributed evenly across width & height of source 
+     * creates random rays from point source with specified width and height
+     * distributed according to either uniform or gaussian distribution across width & height of source 
+     * the deviation of the direction of each ray from the main ray (0,0,1, phi=psi=0) can also be specified to be
+     * uniform or gaussian within a given range (m_verDivergence, m_horDivergence)
+     * z-position of ray is always from uniform distribution
+     * 
      * returns list of rays
      */
     std::vector<Ray> PointSource::getRays() {
@@ -38,7 +42,7 @@ namespace RAY
         rayVector.reserve(1048576);
         std::cout << "create " << n << " rays with standard normal deviation..." << std::endl;
 
-        // create n rays with random position and divergence within the given span for width, height, ..
+        // create n rays with random position and divergence within the given span for width, height, depth, horizontal and vertical divergence
         for(int i = 0; i<n; i++) {
             x = getCoord(m_widthDist, m_sourceWidth) + getMisalignmentParams()[0];
             y = getCoord(m_heightDist, m_sourceHeight) + getMisalignmentParams()[1];
@@ -46,13 +50,11 @@ namespace RAY
             //double z = (rn[2] - 0.5) * m_sourceDepth;
             glm::dvec3 position = glm::dvec3(x, y, z);
             
-            phi = getCoord(m_horDist, m_horDivergence) + getMisalignmentParams()[2];
-            psi = getCoord(m_verDist, m_verDivergence) + getMisalignmentParams()[3];
-            //std::cout << phi <<" "<<psi << std::endl;
-            // double phi = (rn[3] - 0.5) * m_horDivergence;
-            // double psi = (rn[4] - 0.5) * m_verDivergence;
+            // get random deviation from main ray based on distribution
+            psi = getCoord(m_verDist, m_verDivergence) + getMisalignmentParams()[2];
+            phi = getCoord(m_horDist, m_horDivergence) + getMisalignmentParams()[3];
+            // get corresponding angles based on distribution and deviation from main ray (main ray: x=0,y=0,z=1 if phi=psi=0)
             glm::dvec3 direction = getDirectionFromAngles(phi,psi);
-            //std::cout << direction.x << " " << direction.y << " " << direction.z << std::endl;
             Ray r = Ray(position, direction, 1.0);
             rayVector.emplace_back(r);
         }
@@ -61,6 +63,9 @@ namespace RAY
         return rayVector;
     }
 
+    /**
+     * get deviation from main ray according to specified distribution (uniform if hard edge, gaussian if soft edge)) and extent (eg specified width/height of source)
+     */
     double PointSource::getCoord(PointSource::SOURCE_DIST l, double extent) {
         if(l == SD_HARDEDGE)
             return (m_uniform(m_re) - 0.5) * extent;
