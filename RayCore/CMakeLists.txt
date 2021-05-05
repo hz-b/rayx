@@ -4,9 +4,11 @@ project(RayCore)
 SET(SOURCE
     src/RayCore/Application.cpp
     src/RayCore/BeamLine/BeamLine.cpp
+    src/RayCore/BeamLine/ImagePlane.cpp
     src/RayCore/BeamLine/LightSource.cpp
     src/RayCore/BeamLine/MatrixSource.cpp
     src/RayCore/BeamLine/RandomRays.cpp
+    src/RayCore/BeamLine/PointSource.cpp
     src/RayCore/BeamLine/Ellipsoid.cpp
     src/RayCore/BeamLine/ReflectionZonePlate.cpp
     src/RayCore/BeamLine/Slit.cpp
@@ -26,10 +28,12 @@ SET(HEADERS
     src/RayCore/Application.h
     src/RayCore/Debug.h
     src/RayCore/BeamLine/BeamLine.h
+    src/RayCore/BeamLine/ImagePlane.h
     src/RayCore/BeamLine/BeamLineObject.h
     src/RayCore/BeamLine/LightSource.h
     src/RayCore/BeamLine/MatrixSource.h
     src/RayCore/BeamLine/RandomRays.h
+    src/RayCore/BeamLine/PointSource.h
     src/RayCore/BeamLine/Ellipsoid.h
     src/RayCore/BeamLine/ReflectionZonePlate.h
     src/RayCore/BeamLine/Slit.h
