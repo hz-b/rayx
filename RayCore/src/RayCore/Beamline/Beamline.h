@@ -5,6 +5,7 @@
 #include "PlaneGrating.h"
 #include "PlaneMirror.h"
 #include "SphereGrating.h"
+#include "ImagePlane.h"
 #include "MatrixSource.h"
 #include "Ellipsoid.h"
 #include "PointSource.h"

@@ -33,7 +33,7 @@ namespace RAY
         int m_id;
         const char* m_name;
         int m_numberOfRays;
-        std::vector<double> m_misalignmentParams;
+        std::vector<double> m_misalignmentParams; // x, y, psi, phi
         // std::vector<Ray *> m_rayList; ?
 
     };

@@ -1698,6 +1698,19 @@ Ray traceEllipsoidMirror(Ray r, Quadric q) {
 }
 
 
+/*
+the image plane is always parallel to x-y-plane of ray coordinate system in which the rays are when they leave the previous element
+-> defined by distance to that element
+*/
+Ray traceImagePlane(Ray r, Quadric q) {
+	double dist = q.parameters[0][0];
+	double offset = dist - r.position.z; // length between ray origin (intersection point of previous element) and image plane
+	r.position.x = r.position.x + r.direction.x / r.direction.z * offset; // scale x-slope of ray (l/n) by z-length between origin and image plane
+	r.position.y = r.position.y + r.direction.y / r.direction.z * offset;
+	r.position.z = 0;
+	return r;
+}
+
 
 /**
 * OLD 
@@ -1742,6 +1755,8 @@ void iterateQuadrics(){
 			outputData[uint(gl_GlobalInvocationID)] = traceSlit(rayData[uint(gl_GlobalInvocationID)], quadricData[numberOfQuadrics-1]);	
 		}else if(type == 4) { // rzp
 			outputData[uint(gl_GlobalInvocationID)] = traceRZP(rayData[uint(gl_GlobalInvocationID)], quadricData[numberOfQuadrics-1]);	
+		}else if(type == 5) { // image plane
+			outputData[uint(gl_GlobalInvocationID)] = traceImagePlane(rayData[uint(gl_GlobalInvocationID)], quadricData[numberOfQuadrics-1]);	
 		}else{ // undefined, return input rays
 			outputData[uint(gl_GlobalInvocationID)] = rayData[uint(gl_GlobalInvocationID)];
 		}
@@ -1767,6 +1782,8 @@ void iterateQuadrics(){
 				rayData[uint(gl_GlobalInvocationID)] = traceSlit(rayData[uint(gl_GlobalInvocationID)], quadricData[i]);	
 			}else if(type == 4) { // rzp
 				rayData[uint(gl_GlobalInvocationID)] = traceRZP(rayData[uint(gl_GlobalInvocationID)], quadricData[i]);	
+			}else if(type == 5) { // image plane
+				rayData[uint(gl_GlobalInvocationID)] = traceImagePlane(rayData[uint(gl_GlobalInvocationID)], quadricData[i]);	
 			}else{ // undefined
 				rayData[uint(gl_GlobalInvocationID)] = rayData[uint(gl_GlobalInvocationID)];
 			}
@@ -1783,6 +1800,8 @@ void iterateQuadrics(){
 			outputData[uint(gl_GlobalInvocationID)] = traceSlit(rayData[uint(gl_GlobalInvocationID)], quadricData[numberOfQuadrics-1]);	
 		}else if(type == 4) { // rzp
 			outputData[uint(gl_GlobalInvocationID)] = traceRZP(rayData[uint(gl_GlobalInvocationID)], quadricData[numberOfQuadrics-1]);	
+		}else if(type == 5) { // image plane
+			outputData[uint(gl_GlobalInvocationID)] = traceImagePlane(rayData[uint(gl_GlobalInvocationID)], quadricData[numberOfQuadrics-1]);	
 		}else{
 			outputData[uint(gl_GlobalInvocationID)] = rayData[uint(gl_GlobalInvocationID)];
 		}
