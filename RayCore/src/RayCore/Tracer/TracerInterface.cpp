@@ -26,10 +26,10 @@ namespace RAY
         m_LightSources.push_back(newSource);
     }
 
-    void TracerInterface::generateRays(VulkanTracer tracer, LightSource* source) {
+    void TracerInterface::generateRays(VulkanTracer* tracer, LightSource* source) {
         //only one Source for now
         std::vector<RAY::Ray> rays = (*source).getRays();
-        tracer.addRayVector(&rays, rays.size());
+        (*tracer).addRayVector(&rays, rays.size());
     }
     bool TracerInterface::run()
     {
@@ -44,13 +44,13 @@ namespace RAY
         //initialize matrix light source with default params
         int beamlinesSimultaneously = 1;
         //RandomRays m = RandomRays(1000000); // produces random values for position, direction and weight to test cosinus and atan implementation
-        int number_of_rays = 1 << 17;
+        int number_of_rays = 1 << 19;
         MatrixSource m = MatrixSource(0, "Matrix20", number_of_rays, 0.065, 0.04, 0.0, 0.001, 0.001);
         //PointSource m = PointSource(0, "Point source 1", number_of_rays, 0.065, 0.04, 1.0, 0.001, 0.001);
         //std::cout << m.getName() << " with " << m.getNumberOfRays() << " Rays." << std::endl;std::cout.precision(15); // show 16 decimals
 
         addLightSource(&m);
-        generateRays(tracer, m_LightSources[0]);
+        generateRays(&tracer, m_LightSources[0]);
 
         std::cout << "add rays to tracer done" << std::endl;
 
@@ -97,11 +97,16 @@ namespace RAY
 
         //get rays from tracer
         auto outputRayIterator = tracer.getOutputIterator();
+        std::cout << "ray count from output iterator: " << (*outputRayIterator).size() << std::endl;
+
         std::cout << "tracer run incl load rays time: " << float(clock() - begin_time) << " ms" << std::endl;
 
         std::cout << std::endl;
         //clean up tracer to avoid memory leaks
         tracer.cleanup();
+        while (true) {
+            int i = 1;
+        }
         return true;
     }
 
