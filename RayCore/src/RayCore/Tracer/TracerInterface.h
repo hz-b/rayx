@@ -23,8 +23,9 @@ namespace RAY
         ~TracerInterface();
         void addLightSource(LightSource* newSource);
         void generateRays(VulkanTracer tracer, LightSource* source);
-        void writeToFile(std::list<double> outputRays);
-        //void writeToFile(std::vector<Ray> outputRays);
+        const void writeToFile(std::list<double> outputRays);
+        const void writeToFile(VulkanTracer tracer, std::list<std::vector<Ray>>::iterator it);
+        void writeToFile(std::vector<double> outputRays);
         //void readFromFile(std::string path, m_dataType dataType);
         //void addRayToRayList(Ray inputRay);
         void addRayVector(void* location);

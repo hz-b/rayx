@@ -56,6 +56,9 @@ public:
     std::list<std::vector<Ray>>::iterator getOutputIterator();
     RayList outputData;
 
+    // getter 
+    const RayList& getRayList() { return m_RayList; }
+
 private:
     //Member structs:
     /* not contiguous in memory, shouldn't be used
@@ -105,7 +108,7 @@ private:
     uint32_t numberOfQuadricsPerBeamline;
     uint32_t numberOfRays;
     uint32_t numberOfRaysPerBeamline;
-    RayList rayList;
+    RayList m_RayList;
     std::vector<double> beamline;
     QueueFamilyIndices QueueFamily;
 

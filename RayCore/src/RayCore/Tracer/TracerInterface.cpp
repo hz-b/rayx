@@ -98,7 +98,17 @@ namespace RAY
 
         //get rays from tracer
         auto outputRayIterator = tracer.getOutputIterator();
+        // transform in to usable data
+        auto rayAmount = tracer.getRayList().rayAmount();
+        auto listEntries = std::ceil(rayAmount / RAY_VECTOR_SIZE);
+        auto doubleVecSize = rayAmount * RAY_DOUBLE_COUNT * sizeof(double);
+        std::vector<double> doubleVec(doubleVecSize);
+        for (int i = 0; i < listEntries; i++) {
+            memcpy(&doubleVec[i * RAY_VECTOR_SIZE], &*outputRayIterator, RAY_VECTOR_SIZE * RAY_DOUBLE_COUNT * sizeof(double));
+        }
         std::cout << "tracer run incl load rays time: " << float(clock() - begin_time) << " ms" << std::endl;
+        writeToFile(doubleVec);
+
 
         std::cout << std::endl;
         //clean up tracer to avoid memory leaks
@@ -107,7 +117,7 @@ namespace RAY
     }
 
     //writes rays to file
-    void TracerInterface::writeToFile(std::list<double> outputRays)
+    const void TracerInterface::writeToFile(std::list<double> outputRays)
     {
         std::cout << "writing to file..." << std::endl;
         std::ofstream outputFile;
@@ -150,32 +160,32 @@ namespace RAY
         std::cout << "done!" << std::endl;
     }
 
+    const void TracerInterface::writeToFile(VulkanTracer tracer, std::list<std::vector<Ray>>::iterator it) {
+
+    }
+
     //writes rays to file
-    // void TracerInterface::writeToFile(std::vector<Ray> outputRays)
-    // {
-    //     std::cout << "writing to file..." << std::endl;
-    //     std::ofstream outputFile;
-    //     outputFile.precision(17);
-    //     std::cout.precision(17);
-    //     std::string filename = "../../output/output.csv";
-    //     outputFile.open(filename);
-    //     char sep = ';'; // file is saved in .csv (comma seperated value), excel compatibility is manual right now
-    //     outputFile << "Index" << sep << "Xloc" << sep << "Yloc" << sep << "Zloc" << sep << "Weight" << sep << "Xdir" << sep << "Ydir" << sep << "Zdir" << std::endl;
-    //     // outputFile << "Index,Xloc,Yloc,Zloc,Weight,Xdir,Ydir,Zdir" << std::endl;
+    void TracerInterface::writeToFile(std::vector<double> outputRays)
+    {
+        std::cout << "writing to file..." << std::endl;
+        std::ofstream outputFile;
+        outputFile.precision(17);
+        std::cout.precision(17);
+        std::string filename = "../../output/output.csv";
+        outputFile.open(filename);
+        char sep = ';'; // file is saved in .csv (comma seperated value), excel compatibility is manual right now
+        outputFile << "Index" << sep << "Xloc" << sep << "Yloc" << sep << "Zloc" << sep << "Weight" << sep << "Xdir" << sep << "Ydir" << sep << "Zdir" << std::endl;
+        // outputFile << "Index,Xloc,Yloc,Zloc,Weight,Xdir,Ydir,Zdir" << std::endl;
 
-    //     size_t counter = 0;
-    //     int print = 1;
-    //     for (Ray ray : outputRays) {
+        size_t counter = 0;
+        int print = 1;
+        for (int i = 0; i < outputRays.size(); i++) {
+            printf("Ray position: %2.2f;%2.2f;%2.2f;%2.2f;%2.2f;%2.2f;%2.2f; \n", outputRays[i++], outputRays[i++], outputRays[i++], outputRays[i++], outputRays[i++], outputRays[i++], outputRays[i++]);
+        }
 
-    //         auto pos = ray.position;
-    //         auto weight = ray.weight;
-    //         auto dir = ray.direction;
+        std::cout << "done!" << std::endl;
+    }
 
-    //         printf("Ray position: %d%d%d, weight: %d, dir: %d%d%d \n", pos.x, pos.y, pos.z, weight, dir.x, dir.y, dir.z);
-
-    //     }
-    //     std::cout << "done!" << std::endl;
-    // }
     //reads from file. datatype (RayType, QuadricType) needs to be set
     //pretty ugly, should be rewritten later
     // void TracerInterface::readFromFile(std::string path, m_dataType dataType)

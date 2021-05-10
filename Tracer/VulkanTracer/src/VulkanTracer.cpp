@@ -427,6 +427,7 @@ void VulkanTracer::createBuffers() {
 	createBuffer(bufferSizes[4], VK_BUFFER_USAGE_STORAGE_BUFFER_BIT, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, buffers[4], bufferMemories[4]);
 	std::cout << "all buffers created!" << std::endl;
 }
+
 void VulkanTracer::createBuffer(VkDeviceSize size, VkBufferUsageFlags usage, VkMemoryPropertyFlags properties, VkBuffer& buffer, VkDeviceMemory& bufferMemory) {
 	VkBufferCreateInfo bufferCreateInfo = {};
 	bufferCreateInfo.sType = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO;
@@ -450,12 +451,13 @@ void VulkanTracer::createBuffer(VkDeviceSize size, VkBufferUsageFlags usage, VkM
 
 	std::cout << "buffer created!" << std::endl;
 }
+
 void VulkanTracer::fillRayBuffer() {
 	uint32_t bytesNeeded = numberOfRays * VULKANTRACER_RAY_DOUBLE_AMOUNT * sizeof(double);
 	uint32_t numberOfStagingBuffers = std::ceil((double)bytesNeeded / (double)bufferSizes[3]); // bufferSizes[3] = 128MB
 	std::cout << "Debug Info: number of staging buffers: " << numberOfStagingBuffers << std::endl;
 	std::list<std::vector<Ray>>::iterator raySetIterator;
-	raySetIterator = rayList.begin();
+	raySetIterator = m_RayList.begin();
 	size_t vectorsPerStagingBuffer = std::floor(GPU_MAX_STAGING_SIZE / RAY_VECTOR_SIZE);
 	for (uint32_t i = 0; i < numberOfStagingBuffers - 1; i++) {
 		fillStagingBuffer(i, raySetIterator, vectorsPerStagingBuffer);
@@ -470,6 +472,7 @@ void VulkanTracer::fillRayBuffer() {
 	copyToRayBuffer((numberOfStagingBuffers - 1) * GPU_MAX_STAGING_SIZE, ((bytesNeeded - 1) % GPU_MAX_STAGING_SIZE) + 1);
 
 }
+
 //the input buffer is filled with the ray data
 void VulkanTracer::fillStagingBuffer(uint32_t offset, std::list<std::vector<Ray>>::iterator raySetIterator, size_t vectorsPerStagingBuffer)
 {
@@ -479,7 +482,7 @@ void VulkanTracer::fillStagingBuffer(uint32_t offset, std::list<std::vector<Ray>
 	vkMapMemory(device, bufferMemories[3], 0, bufferSizes[3], 0, &data);
 	assert((*raySetIterator).size() <= GPU_MAX_STAGING_SIZE);
 	//std::cout << "((double)(*raySetIterator).size(): "<<(double)(*raySetIterator).size()<< std::endl;
-	vectorsPerStagingBuffer = std::min((size_t)std::ceil(((double)(*raySetIterator).size() * VULKANTRACER_RAY_DOUBLE_AMOUNT * sizeof(double)) * rayList.size() * 4 / GPU_MAX_STAGING_SIZE), vectorsPerStagingBuffer);
+	vectorsPerStagingBuffer = std::min((size_t)std::ceil(((double)(*raySetIterator).size() * VULKANTRACER_RAY_DOUBLE_AMOUNT * sizeof(double)) * m_RayList.size() * 4 / GPU_MAX_STAGING_SIZE), vectorsPerStagingBuffer);
 	std::cout << "vectorsPerStagingBuffer: " << vectorsPerStagingBuffer << std::endl;
 	for (uint32_t i = 0; i < vectorsPerStagingBuffer; i++) {
 		memcpy(((char*)data) + i * RAY_VECTOR_SIZE, (*raySetIterator).data(), std::min((*raySetIterator).size() * VULKANTRACER_RAY_DOUBLE_AMOUNT * sizeof(double), (size_t)GPU_MAX_STAGING_SIZE));
@@ -489,6 +492,7 @@ void VulkanTracer::fillStagingBuffer(uint32_t offset, std::list<std::vector<Ray>
 	//std::cout << "value: "<<temp[0]<< std::endl;
 	vkUnmapMemory(device, bufferMemories[3]);
 }
+
 void VulkanTracer::copyToRayBuffer(uint32_t offset, uint32_t numberOfBytesToCopy) {
 
 	VkCommandBufferAllocateInfo allocInfo{};
@@ -560,7 +564,7 @@ void VulkanTracer::copyToOutputBuffer(uint32_t offset, uint32_t numberOfBytesToC
 
 }
 void VulkanTracer::getRays() {
-	std::cout << "rayList.size(): " << rayList.size() << std::endl;
+	std::cout << "m_RayList.size(): " << m_RayList.size() << std::endl;
 	std::vector<Ray> data;
 	//reserve enough data for all the rays
 	/*
@@ -933,7 +937,7 @@ void VulkanTracer::addRayVector(void* location, size_t size) {
 	//std::cout << "addRayVector: size= " << size << std::endl;
 	//memcpy(&newRayVector[0], location, size * VULKANTRACER_RAY_DOUBLE_AMOUNT * sizeof(double));
 	//std::cout << "3 " << newRayVector.size() << std::endl;
-	rayList.insertVector(location, size);
+	m_RayList.insertVector(location, size);
 	std::cout << "4" << std::endl;
 
 }
@@ -949,7 +953,7 @@ void VulkanTracer::addQuadric(std::vector<double> inQuadric, std::vector<double>
 	beamline.insert(beamline.end(), parameters.begin(), parameters.end());
 }
 void VulkanTracer::divideAndSortRays() {
-	for (auto i = rayList.begin(); i != rayList.end(); i++) {
+	for (auto i = m_RayList.begin(); i != m_RayList.end(); i++) {
 
 	}
 }

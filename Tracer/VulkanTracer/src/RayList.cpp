@@ -99,17 +99,21 @@ void RayList::insertVector(void* location, size_t inputSize) {
         throw std::runtime_error("last vector larger than RAY_VECTOR_SIZE");
     }
 
-};
+}
+
 std::list<std::vector<Ray>>::iterator RayList::begin() {
     return m_rayList.begin();
-};
+}
+
 std::list<std::vector<Ray>>::iterator RayList::end() {
     return m_rayList.end();
-};
+}
+
 std::size_t RayList::size() {
     return m_rayList.size();
-};
-int RayList::rayAmount() {
+}
+
+int RayList::rayAmount() const {
     //std::cout<<"raylist back size= "<< (m_rayList.back()).size() <<std::endl; 
     //std::cout<<"raylist size= "<< m_rayList.size() <<std::endl; 
     int amount = (m_rayList.size() - 1) * RAY_MAX_ELEMENTS_IN_VECTOR + (m_rayList.back()).size();
