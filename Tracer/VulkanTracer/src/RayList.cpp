@@ -27,21 +27,25 @@ void RayList::addVector() {
 
 void RayList::insertVector(void* location, size_t inputSize) {
     //std::cout<<"insert vector: start"<<std::endl;
-    size_t lastVectorSize = (m_rayList.back()).size();
     std::vector<Ray> input;
+    size_t lastVectorSize = 0;
     //if the last vector of the list is full, we can just append
     //std::cout<<"RayList size= "<< m_rayList.size() <<std::endl;
     std::cout << "input size= " << inputSize << std::endl;
     if (m_rayList.size() == 0) {
         lastVectorSize = 0;
     }
+    else {
+        lastVectorSize = (m_rayList.back()).size();
+    }
     std::cout << "last vector size= " << lastVectorSize << std::endl;
     if (lastVectorSize == RAY_MAX_ELEMENTS_IN_VECTOR || lastVectorSize == 0) {
         //if input is smaller than the max allowed size, we can resize and append
         if (inputSize <= RAY_MAX_ELEMENTS_IN_VECTOR) {
-            input.reserve(RAY_MAX_ELEMENTS_IN_VECTOR);
+            input.reserve(inputSize);
             m_rayList.push_back(input);
-            m_rayList.back().resize(RAY_MAX_ELEMENTS_IN_VECTOR);
+            m_rayList.back().resize(inputSize);
+            memcpy(&((m_rayList.back())[0]), location, RAY_VECTOR_SIZE);
         }
         //if input is larger, we need to split it
         else {
@@ -49,17 +53,22 @@ void RayList::insertVector(void* location, size_t inputSize) {
             for (; i < inputSize - RAY_MAX_ELEMENTS_IN_VECTOR; i = i + RAY_MAX_ELEMENTS_IN_VECTOR) {
                 std::cout << "size= " << m_rayList.size() << std::endl;
                 addVector();
-                //std::cout<<"size= "<< m_rayList.size() <<std::endl;        
-                //std::cout<<"capacity= "<< m_rayList.front().capacity() <<std::endl;        
-                memcpy(&(m_rayList.back().front()), location + (i * RAY_DOUBLE_COUNT * sizeof(double)), RAY_VECTOR_SIZE);
+                std::cout << "size= " << m_rayList.size() << std::endl;
+                //std::cout<<"capacity= "<< m_rayList.front().capacity() <<std::endl;
+                m_rayList.back().resize(RAY_MAX_ELEMENTS_IN_VECTOR);
+                std::cout << &(m_rayList.back()[0]) << std::endl;
+                std::cout << &(m_rayList.back().front()) << std::endl;
+                std::cout << m_rayList.back().data() << std::endl;
+                memcpy(&(m_rayList.back()[0]), location, 1024 * 16);
                 m_rayList.back().resize(RAY_MAX_ELEMENTS_IN_VECTOR);
             }
             std::cout << "test2" << std::endl;
             addVector();
             size_t remainingBytes = (inputSize * RAY_DOUBLE_COUNT * sizeof(double)) - (i * RAY_DOUBLE_COUNT * sizeof(double));
-            //std::cout<<"insertVector: remainingBytes= "<<remainingBytes<<std::endl;
-            memcpy(&((m_rayList.back())[0]), location + (i * RAY_DOUBLE_COUNT * sizeof(double)), remainingBytes);
-            //std::cout<<"insertVector: memcpy done"<<std::endl;
+            std::cout << "insertVector: remainingBytes= " << remainingBytes << std::endl;
+            m_rayList.back().resize(RAY_MAX_ELEMENTS_IN_VECTOR);
+            memcpy(&((m_rayList.back())[0]), (char*)location + (i * RAY_DOUBLE_COUNT * sizeof(double)), remainingBytes);
+            std::cout << "insertVector: memcpy done" << std::endl;
             m_rayList.back().resize(remainingBytes / (RAY_DOUBLE_COUNT * sizeof(double)));
         }
     }
@@ -82,7 +91,7 @@ void RayList::insertVector(void* location, size_t inputSize) {
             addVector();
 
             std::cout << "insert vector: reserved" << std::endl;
-            memcpy(&((m_rayList.back())[0]), location + (i * RAY_DOUBLE_COUNT * sizeof(double)), RAY_VECTOR_SIZE);
+            memcpy(&((m_rayList.back())[0]), (char*)location + (i * RAY_DOUBLE_COUNT * sizeof(double)), RAY_VECTOR_SIZE);
             m_rayList.back().resize(RAY_MAX_ELEMENTS_IN_VECTOR);
         }
         int remainingElements = int(inputSize) - (i);

@@ -1,5 +1,6 @@
 #include "VulkanTracer.h"
 #include <cmath>
+#include "GFSDK_Aftermath.h"
 
 
 
@@ -457,7 +458,8 @@ void VulkanTracer::fillRayBuffer() {
 	uint32_t numberOfStagingBuffers = std::ceil((double)bytesNeeded / (double)bufferSizes[3]); // bufferSizes[3] = 128MB
 	std::cout << "Debug Info: number of staging buffers: " << numberOfStagingBuffers << std::endl;
 	std::list<std::vector<Ray>>::iterator raySetIterator;
-	raySetIterator = m_RayList.begin();
+	std::cout << "rayList.size()=" << rayList.size() << std::endl;
+	raySetIterator = rayList.begin();
 	size_t vectorsPerStagingBuffer = std::floor(GPU_MAX_STAGING_SIZE / RAY_VECTOR_SIZE);
 	for (uint32_t i = 0; i < numberOfStagingBuffers - 1; i++) {
 		fillStagingBuffer(i, raySetIterator, vectorsPerStagingBuffer);
@@ -480,12 +482,16 @@ void VulkanTracer::fillStagingBuffer(uint32_t offset, std::list<std::vector<Ray>
 	//data is copied to the buffer
 	void* data;
 	vkMapMemory(device, bufferMemories[3], 0, bufferSizes[3], 0, &data);
+	std::cout << "bufferSizes[3]: " << bufferSizes[3] << std::endl;
 	assert((*raySetIterator).size() <= GPU_MAX_STAGING_SIZE);
-	//std::cout << "((double)(*raySetIterator).size(): "<<(double)(*raySetIterator).size()<< std::endl;
-	vectorsPerStagingBuffer = std::min((size_t)std::ceil(((double)(*raySetIterator).size() * VULKANTRACER_RAY_DOUBLE_AMOUNT * sizeof(double)) * m_RayList.size() * 4 / GPU_MAX_STAGING_SIZE), vectorsPerStagingBuffer);
+	vectorsPerStagingBuffer = std::min((size_t)std::ceil(((double)(*raySetIterator).size() * VULKANTRACER_RAY_DOUBLE_AMOUNT * sizeof(double)) * rayList.size() * 4 / GPU_MAX_STAGING_SIZE), vectorsPerStagingBuffer);
 	std::cout << "vectorsPerStagingBuffer: " << vectorsPerStagingBuffer << std::endl;
 	for (uint32_t i = 0; i < vectorsPerStagingBuffer; i++) {
+		std::cout << "(*raySetIterator).size(): " << (*raySetIterator).size() << std::endl;
+		std::cout << "size: " << std::min((*raySetIterator).size() * VULKANTRACER_RAY_DOUBLE_AMOUNT * sizeof(double), (size_t)GPU_MAX_STAGING_SIZE) << std::endl;
+
 		memcpy(((char*)data) + i * RAY_VECTOR_SIZE, (*raySetIterator).data(), std::min((*raySetIterator).size() * VULKANTRACER_RAY_DOUBLE_AMOUNT * sizeof(double), (size_t)GPU_MAX_STAGING_SIZE));
+		std::cout << "huh2" << std::endl;
 		raySetIterator++;
 	}
 	double* temp = (double*)data;
@@ -936,9 +942,10 @@ void VulkanTracer::addRayVector(void* location, size_t size) {
 	//std::cout << "2" << std::endl;
 	//std::cout << "addRayVector: size= " << size << std::endl;
 	//memcpy(&newRayVector[0], location, size * VULKANTRACER_RAY_DOUBLE_AMOUNT * sizeof(double));
-	//std::cout << "3 " << newRayVector.size() << std::endl;
-	m_RayList.insertVector(location, size);
-	std::cout << "4" << std::endl;
+	std::cout << "Inserting into rayList. rayList.size() before: " << rayList.size() << std::endl;
+	std::cout << "sent size: " << size << std::endl;
+	rayList.insertVector(location, size);
+	std::cout << "rayList ray count: " << (*(rayList.begin())).size() << std::endl;
 
 }
 //adds quad to beamline

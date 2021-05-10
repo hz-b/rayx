@@ -1,6 +1,7 @@
 cmake_minimum_required(VERSION 3.0 FATAL_ERROR)
 
 project(VulkanTracer)
+set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 
 # OS specific
 if (WIN32)
@@ -24,6 +25,8 @@ elseif (UNIX)
 endif ()
 
 find_package(Vulkan REQUIRED FATAL_ERROR)
+find_package(NsightAftermath REQUIRED FATAL_ERROR)
+get_filename_component(NsightAftermath_LIBRARY_DIR ${NsightAftermath_LIBRARY} DIRECTORY)
 
 add_library(${PROJECT_NAME} 
     STATIC 
@@ -48,4 +51,5 @@ target_include_directories(${PROJECT_NAME}
 
 target_link_libraries(${PROJECT_NAME}
     Vulkan::Vulkan
+    NsightAftermath::NsightAftermath
 )

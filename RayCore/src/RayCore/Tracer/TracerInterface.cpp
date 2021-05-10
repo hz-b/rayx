@@ -27,10 +27,10 @@ namespace RAY
         m_LightSources.push_back(newSource);
     }
 
-    void TracerInterface::generateRays(VulkanTracer tracer, LightSource* source) {
+    void TracerInterface::generateRays(VulkanTracer* tracer, LightSource* source) {
         //only one Source for now
         std::vector<RAY::Ray> rays = (*source).getRays();
-        tracer.addRayVector(&rays, rays.size());
+        (*tracer).addRayVector(&rays, rays.size());
     }
     bool TracerInterface::run()
     {
@@ -51,7 +51,7 @@ namespace RAY
         //std::cout << m.getName() << " with " << m.getNumberOfRays() << " Rays." << std::endl;std::cout.precision(15); // show 16 decimals
 
         addLightSource(&m);
-        generateRays(tracer, m_LightSources[0]);
+        generateRays(&tracer, m_LightSources[0]);
 
         std::cout << "add rays to tracer done" << std::endl;
 
@@ -113,6 +113,9 @@ namespace RAY
         std::cout << std::endl;
         //clean up tracer to avoid memory leaks
         tracer.cleanup();
+        while (true) {
+            int i = 1;
+        }
         return true;
     }
 
