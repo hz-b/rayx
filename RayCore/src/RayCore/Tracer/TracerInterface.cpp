@@ -101,13 +101,13 @@ namespace RAY
         // transform in to usable data
         auto rayAmount = tracer.getRayList().rayAmount();
         auto listEntries = std::ceil(rayAmount / RAY_VECTOR_SIZE);
-        auto doubleVecSize = rayAmount * RAY_DOUBLE_COUNT * sizeof(double);
+        auto doubleVecSize = RAY_VECTOR_SIZE * sizeof(double);
         std::vector<double> doubleVec(doubleVecSize);
         for (int i = 0; i < listEntries; i++) {
-            memcpy(&doubleVec[i * RAY_VECTOR_SIZE], &*outputRayIterator, RAY_VECTOR_SIZE * RAY_DOUBLE_COUNT * sizeof(double));
+            memcpy(&doubleVec, &*outputRayIterator, RAY_VECTOR_SIZE * RAY_DOUBLE_COUNT * sizeof(double));
+            writeToFile(doubleVec);
         }
         std::cout << "tracer run incl load rays time: " << float(clock() - begin_time) << " ms" << std::endl;
-        writeToFile(doubleVec);
 
 
         std::cout << std::endl;
