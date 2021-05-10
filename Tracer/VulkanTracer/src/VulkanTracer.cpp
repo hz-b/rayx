@@ -570,7 +570,7 @@ void VulkanTracer::copyToOutputBuffer(uint32_t offset, uint32_t numberOfBytesToC
 
 }
 void VulkanTracer::getRays() {
-	std::cout << "m_RayList.size(): " << m_RayList.size() << std::endl;
+	std::cout << "m_RayList.size(): " << rayList.size() << std::endl;
 	std::vector<Ray> data;
 	//reserve enough data for all the rays
 	/*
@@ -960,7 +960,7 @@ void VulkanTracer::addQuadric(std::vector<double> inQuadric, std::vector<double>
 	beamline.insert(beamline.end(), parameters.begin(), parameters.end());
 }
 void VulkanTracer::divideAndSortRays() {
-	for (auto i = m_RayList.begin(); i != m_RayList.end(); i++) {
+	for (auto i = rayList.begin(); i != rayList.end(); i++) {
 
 	}
 }

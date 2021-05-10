@@ -29,6 +29,8 @@ namespace RAY
 
     void TracerInterface::generateRays(VulkanTracer* tracer, LightSource* source) {
         //only one Source for now
+        if (!tracer) return;
+        if (!source) return;
         std::vector<RAY::Ray> rays = (*source).getRays();
         (*tracer).addRayVector(&rays, rays.size());
     }
@@ -120,7 +122,7 @@ namespace RAY
     }
 
     //writes rays to file
-    const void TracerInterface::writeToFile(std::list<double> outputRays)
+    void TracerInterface::writeToFile(std::list<double> outputRays) const
     {
         std::cout << "writing to file..." << std::endl;
         std::ofstream outputFile;
@@ -163,12 +165,8 @@ namespace RAY
         std::cout << "done!" << std::endl;
     }
 
-    const void TracerInterface::writeToFile(VulkanTracer tracer, std::list<std::vector<Ray>>::iterator it) {
-
-    }
-
     //writes rays to file
-    void TracerInterface::writeToFile(std::vector<double> outputRays)
+    void TracerInterface::writeToFile(std::vector<double> outputRays) const
     {
         std::cout << "writing to file..." << std::endl;
         std::ofstream outputFile;

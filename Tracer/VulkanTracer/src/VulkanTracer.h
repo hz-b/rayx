@@ -57,7 +57,7 @@ public:
     RayList outputData;
 
     // getter 
-    const RayList& getRayList() { return m_RayList; }
+    const RayList& getRayList() { return rayList; }
 
 private:
     //Member structs:
@@ -108,7 +108,7 @@ private:
     uint32_t numberOfQuadricsPerBeamline;
     uint32_t numberOfRays;
     uint32_t numberOfRaysPerBeamline;
-    RayList m_RayList;
+    RayList rayList;
     std::vector<double> beamline;
     QueueFamilyIndices QueueFamily;
 
