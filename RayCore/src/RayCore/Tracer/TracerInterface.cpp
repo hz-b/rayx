@@ -34,6 +34,7 @@ namespace RAY
         std::vector<RAY::Ray> rays = (*source).getRays();
         (*tracer).addRayVector(&rays, rays.size());
     }
+
     bool TracerInterface::run()
     {
 
@@ -102,11 +103,12 @@ namespace RAY
         auto outputRayIterator = tracer.getOutputIterator();
         // transform in to usable data
         auto rayAmount = tracer.getRayList().rayAmount();
-        auto listEntries = std::ceil(rayAmount / RAY_VECTOR_SIZE);
-        auto doubleVecSize = RAY_VECTOR_SIZE * sizeof(double);
+        size_t listEntries = (size_t)std::ceil((double)rayAmount / (double)RAY_MAX_ELEMENTS_IN_VECTOR);
+        auto doubleVecSize = RAY_MAX_ELEMENTS_IN_VECTOR;
         std::vector<double> doubleVec(doubleVecSize);
+        doubleVec.resize(doubleVecSize);
         for (int i = 0; i < listEntries; i++) {
-            memcpy(&doubleVec, &*outputRayIterator, RAY_VECTOR_SIZE * RAY_DOUBLE_COUNT * sizeof(double));
+            memcpy(&doubleVec, &*outputRayIterator, (*outputRayIterator).size() / 2);
             writeToFile(doubleVec);
         }
         std::cout << "tracer run incl load rays time: " << float(clock() - begin_time) << " ms" << std::endl;
@@ -115,9 +117,9 @@ namespace RAY
         std::cout << std::endl;
         //clean up tracer to avoid memory leaks
         tracer.cleanup();
-        while (true) {
+        /*while (true) {
             int i = 1;
-        }
+        }*/
         return true;
     }
 

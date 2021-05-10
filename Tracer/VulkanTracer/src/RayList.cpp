@@ -42,10 +42,10 @@ void RayList::insertVector(void* location, size_t inputSize) {
     if (lastVectorSize == RAY_MAX_ELEMENTS_IN_VECTOR || lastVectorSize == 0) {
         //if input is smaller than the max allowed size, we can resize and append
         if (inputSize <= RAY_MAX_ELEMENTS_IN_VECTOR) {
-            input.reserve(inputSize);
             m_rayList.push_back(input);
-            m_rayList.back().resize(inputSize);
-            memcpy(&((m_rayList.back())[0]), location, RAY_VECTOR_SIZE);
+            auto& currList = m_rayList.back();
+            currList.resize(inputSize);
+            memcpy(&(currList[0]), location, 200);
         }
         //if input is larger, we need to split it
         else {

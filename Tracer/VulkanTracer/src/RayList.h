@@ -13,7 +13,6 @@ public:
     //list of vectors
     RayList();
     ~RayList();
-
     //appends vector of Rays to the ray list
     void insertVector(void* location, size_t size);
     std::list<std::vector<Ray>>::iterator begin();
