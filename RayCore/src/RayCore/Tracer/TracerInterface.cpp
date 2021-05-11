@@ -32,7 +32,7 @@ namespace RAY
         if (!tracer) return;
         if (!source) return;
         std::vector<RAY::Ray> rays = (*source).getRays();
-        (*tracer).addRayVector(&rays, rays.size());
+        (*tracer).addRayVector(rays.data(), rays.size());
     }
 
     bool TracerInterface::run()
@@ -107,9 +107,10 @@ namespace RAY
         auto doubleVecSize = RAY_MAX_ELEMENTS_IN_VECTOR;
         std::vector<double> doubleVec(doubleVecSize);
         doubleVec.resize(doubleVecSize);
-        for (int i = 0; i < listEntries; i++) {
-            memcpy(&doubleVec, &*outputRayIterator, (*outputRayIterator).size() / 2);
+        for (unsigned int i = 0; i < listEntries; i++) {
+            memcpy(doubleVec.data(), (*outputRayIterator).data(), (*outputRayIterator).size() / 2);
             writeToFile(doubleVec);
+            outputRayIterator++;
         }
         std::cout << "tracer run incl load rays time: " << float(clock() - begin_time) << " ms" << std::endl;
 
@@ -174,16 +175,18 @@ namespace RAY
         std::ofstream outputFile;
         outputFile.precision(17);
         std::cout.precision(17);
-        std::string filename = "../../output/output.csv";
+        std::string filename = "output.csv";
         outputFile.open(filename);
         char sep = ';'; // file is saved in .csv (comma seperated value), excel compatibility is manual right now
-        outputFile << "Index" << sep << "Xloc" << sep << "Yloc" << sep << "Zloc" << sep << "Weight" << sep << "Xdir" << sep << "Ydir" << sep << "Zdir" << std::endl;
+        outputFile /*<< "Index" << sep*/ << "Xloc" << sep << "Yloc" << sep << "Zloc" << sep << "Weight" << sep << "Xdir" << sep << "Ydir" << sep << "Zdir" << sep << "Placeholder" << std::endl;
         // outputFile << "Index,Xloc,Yloc,Zloc,Weight,Xdir,Ydir,Zdir" << std::endl;
 
         size_t counter = 0;
         int print = 1;
         for (int i = 0; i < outputRays.size(); i++) {
-            printf("Ray position: %2.2f;%2.2f;%2.2f;%2.2f;%2.2f;%2.2f;%2.2f; \n", outputRays[i++], outputRays[i++], outputRays[i++], outputRays[i++], outputRays[i++], outputRays[i++], outputRays[i++]);
+            outputFile << outputRays[i] << ";";
+            //printf("Ray position: %2.6f;%2.6f;%2.6f;%2.6f;%2.6f;%2.6f;%2.6f; \n", outputRays[i++], outputRays[i++], outputRays[i++], outputRays[i++], outputRays[i++], outputRays[i++], outputRays[i++]);
+            if ((i + 1) % 8 == 0) outputFile << std::endl;
         }
 
         std::cout << "done!" << std::endl;
