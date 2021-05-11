@@ -2007,7 +2007,7 @@ void cameraPlaneIntersection(outputData, cameraPlane){
 }
 */
 void main(){
-    //testFunctions();
+    testFunctions();
     //outputData[uint(gl_GlobalInvocationID)] = rayData[uint(gl_GlobalInvocationID)];
     //iterateQuadrics();
     /*Ray r = rayData[uint(gl_GlobalInvocationID)];
@@ -2017,9 +2017,9 @@ void main(){
     */
     // outputData[uint(gl_GlobalInvocationID)] = iterateQuadrics(rayData[uint(gl_GlobalInvocationID)]);
     // outputData[uint(gl_GlobalInvocationID)] = rayData[uint(gl_GlobalInvocationID)];
-    outputData[uint(gl_GlobalInvocationID)].position = rayData[uint(gl_GlobalInvocationID)].position;
-    outputData[uint(gl_GlobalInvocationID)].direction = rayData[uint(gl_GlobalInvocationID)].direction;
-    outputData[uint(gl_GlobalInvocationID)].weight = rayData[uint(gl_GlobalInvocationID)].weight; // starts at (0,20,-20)
+    //outputData[uint(gl_GlobalInvocationID)].position = rayData[uint(gl_GlobalInvocationID)].position;
+    //outputData[uint(gl_GlobalInvocationID)].direction = rayData[uint(gl_GlobalInvocationID)].direction;
+    //outputData[uint(gl_GlobalInvocationID)].weight = rayData[uint(gl_GlobalInvocationID)].weight; // starts at (0,20,-20)
     // outputData[uint(gl_GlobalInvocationID)].direction = dvec4(0.0, 0.0, 0.0, 0.0); // hits the surface in 45 degree angle at (0,0,0) -> the normal should be (0,-1,0)
     
 }
