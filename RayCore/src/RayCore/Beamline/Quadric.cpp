@@ -8,7 +8,7 @@ namespace RAY
     {
         m_name = name;
         std::cout << inputPoints.size() << inputInMatrix.size() << inputOutMatrix.size() << misalignmentMatrix.size() << inverseMisalignmentMatrix.size() << parameters.size() << std::endl;
-        assert(inputPoints.size() == 16 && inputInMatrix.size() == 16 && inputOutMatrix.size() == 16 && misalignmentMatrix.size() == 16 && inverseMisalignmentMatrix.size() == 16 && parameters.size() == 6); //parameter size ==6?
+        assert(inputPoints.size() == 16 && inputInMatrix.size() == 16 && inputOutMatrix.size() == 16 && misalignmentMatrix.size() == 16 && inverseMisalignmentMatrix.size() == 16 && parameters.size() == 16); //parameter size ==6?
         m_anchorPoints = inputPoints;
         m_inMatrix = inputInMatrix;
         m_outMatrix = inputOutMatrix;
