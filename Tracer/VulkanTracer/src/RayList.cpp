@@ -44,7 +44,7 @@ void RayList::insertVector(void* location, size_t inputSize) {
         if (inputSize <= RAY_MAX_ELEMENTS_IN_VECTOR) {
             m_rayList.push_back(input);
             m_rayList.back().resize(inputSize);
-            memcpy(&(m_rayList.back()[0]), location, inputSize);
+            memcpy(&(m_rayList.back()[0]), location, inputSize * RAY_DOUBLE_COUNT * sizeof(double));
         }
         //if input is larger, we need to split it
         else {
@@ -58,7 +58,7 @@ void RayList::insertVector(void* location, size_t inputSize) {
                 std::cout << &(m_rayList.back()[0]) << std::endl;
                 std::cout << &(m_rayList.back().front()) << std::endl;
                 std::cout << m_rayList.back().data() << std::endl;
-                memcpy(&(m_rayList.back()[0]), location, 1024 * 16);
+                memcpy(&(m_rayList.back()[0]), location, inputSize * RAY_DOUBLE_COUNT * sizeof(double));
                 m_rayList.back().resize(RAY_MAX_ELEMENTS_IN_VECTOR);
             }
             std::cout << "test2" << std::endl;

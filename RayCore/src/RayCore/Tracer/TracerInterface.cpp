@@ -47,9 +47,9 @@ namespace RAY
         //add source to tracer
         //initialize matrix light source with default params
         int beamlinesSimultaneously = 1;
-        int number_of_rays = 1 << 17; 
+        int number_of_rays = 1 << 17;
         MatrixSource m = MatrixSource(0, "Matrix20", number_of_rays, 0.065, 0.04, 0.0, 0.001, 0.001, { 0,0,0,0 }); // source misalignment only 4 dimensional (x,y, phi, psi)
-        
+
         addLightSource(&m);
         generateRays(&tracer, m_LightSources[0]);
 
@@ -71,9 +71,9 @@ namespace RAY
         tracer.setBeamlineParameters(beamlinesSimultaneously, Quadrics.size(), number_of_rays * beamlinesSimultaneously);
         for (int j = 0; j < beamlinesSimultaneously; j++) {
             for (uint32_t i = 0; i < Quadrics.size(); i++) {
-                for(int k = 0; k<16; k++) {
+                for (int k = 0; k < 16; k++) {
                     std::cout << Quadrics[i].getAnchorPoints()[k] << ", ";
-                    if(k%4==3) std::cout << std::endl;
+                    if (k % 4 == 3) std::cout << std::endl;
                 }
                 tracer.addQuadric(Quadrics[i].getAnchorPoints(), Quadrics[i].getInMatrix(), Quadrics[i].getOutMatrix(), Quadrics[i].getTempMisalignmentMatrix(), Quadrics[i].getInverseTempMisalignmentMatrix(), Quadrics[i].getParameters());
             }
@@ -87,17 +87,16 @@ namespace RAY
         std::cout << "tracerInterface run without output: " << float(clock() - all_begin_time) << " ms" << std::endl;
 
         //get rays from tracer
-        auto outputRayIterator = tracer.getOutputIterator();
+        auto outputRayIterator = tracer.getOutputIteratorBegin();
         // transform in to usable data
         auto rayAmount = tracer.getRayList().rayAmount();
-        size_t listEntries = (size_t)std::ceil((double)rayAmount / (double)RAY_MAX_ELEMENTS_IN_VECTOR);
-        auto doubleVecSize = RAY_MAX_ELEMENTS_IN_VECTOR;
+        auto doubleVecSize = RAY_MAX_ELEMENTS_IN_VECTOR * 8;
         std::vector<double> doubleVec(doubleVecSize);
-        doubleVec.resize(doubleVecSize);
-        for (unsigned int i = 0; i < listEntries; i++) {
-            memcpy(doubleVec.data(), (*outputRayIterator).data(), (*outputRayIterator).size() / 2);
+        for (; outputRayIterator != tracer.getOutputIteratorEnd(); outputRayIterator++) {
+            std::cout << "(*outputRayIterator).size(): " << (*outputRayIterator).size() << std::endl;
+            memcpy(doubleVec.data(), (*outputRayIterator).data(), (*outputRayIterator).size() * VULKANTRACER_RAY_DOUBLE_AMOUNT * sizeof(double));
+            doubleVec.resize((*outputRayIterator).size() * VULKANTRACER_RAY_DOUBLE_AMOUNT);
             writeToFile(doubleVec);
-            outputRayIterator++;
         }
         std::cout << "tracer run incl load rays time: " << float(clock() - begin_time) << " ms" << std::endl;
 
@@ -158,7 +157,7 @@ namespace RAY
     //writes rays to file
     void TracerInterface::writeToFile(std::vector<double> outputRays) const
     {
-        std::cout << "writing to file..." << std::endl;
+        std::cout << "writing " << outputRays.size() / 8 << " rays to file..." << std::endl;
         std::ofstream outputFile;
         outputFile.precision(17);
         std::cout.precision(17);

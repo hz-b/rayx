@@ -53,7 +53,8 @@ public:
     void getRays();
     void cleanup();
     void setBeamlineParameters(uint32_t inNumberOfBeamlines, uint32_t inNumberOfQuadricsPerBeamline, uint32_t inNumberOfRays);
-    std::list<std::vector<Ray>>::iterator getOutputIterator();
+    std::list<std::vector<Ray>>::iterator getOutputIteratorBegin();
+    std::list<std::vector<Ray>>::iterator getOutputIteratorEnd();
     RayList outputData;
 
     // getter 
