@@ -15,8 +15,8 @@ namespace RAY
      * @param misalignmentParams angles and distances for the mirror's misalignment
      * 
     */
-    Slit::Slit(const char* name, int beamstop, double width, double height, double azimuthal, double dist, double beamstopWidth, double beamstopHeight, double waveLength, std::vector<double> misalignmentParams) 
-    : Quadric(name) {
+    Slit::Slit(const char* name, int beamstop, double width, double height, double azimuthal, double dist, double beamstopWidth, double beamstopHeight, double waveLength, std::vector<double> misalignmentParams, Quadric* previous) 
+    : Quadric(name, previous) {
         // std::vector<double> inputPoints = {0,0,0,0, 0,0,0,-1, 0,0,0,0, 0,0,0,0};
         m_centralBeamstop = beamstop == 0 ? CS_NONE : (beamstop==1 ? CS_RECTANGLE : CS_ELLIPTICAL );
         m_totalWidth = m_centralBeamstop == CS_ELLIPTICAL ? -abs(width) : abs(width);

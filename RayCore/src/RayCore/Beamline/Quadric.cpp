@@ -34,9 +34,10 @@ namespace RAY
      * @param misalignmentParams        angles and distances for the object's misalignment
      * @param tempMisalignmentParams    parameters for temporary misalignment that can be removed midtracing.
     */
-    Quadric::Quadric(const char* name, std::vector<double> inputPoints, std::vector<double> parameters, double alpha, double chi, double beta, double dist, std::vector<double> misalignmentParams, std::vector<double> tempMisalignmentParams) 
+    Quadric::Quadric(const char* name, std::vector<double> inputPoints, std::vector<double> parameters, double alpha, double chi, double beta, double dist, std::vector<double> misalignmentParams, std::vector<double> tempMisalignmentParams, Quadric* previous) 
     {   
         m_name = name;
+        m_previous = previous;
         m_parameters = parameters;
         m_anchorPoints = inputPoints;
         m_misalignmentParams = misalignmentParams;
@@ -68,7 +69,7 @@ namespace RAY
             0, 0, 0, 1};*/
     }
 
-    Quadric::Quadric(const char* name): m_name(name) {}
+    Quadric::Quadric(const char* name, Quadric* previous): m_name(name), m_previous(previous) {}
 
     Quadric::Quadric() {}
 
@@ -84,6 +85,7 @@ namespace RAY
      * @param chi           azimuthal angle
      * @param beta          grazing exit angle
      * @param dist          distance to preceeding element
+     * @param misalignment  misalignment x,y,z,psi,phi,chi
      * @return void
     */
     void Quadric::calcTransformationMatrices(double alpha, double chi, double beta, double dist, std::vector<double> misalignment) {
@@ -93,15 +95,32 @@ namespace RAY
         double sin_a = sin(alpha);
         double sin_b = sin(beta);
         double cos_b = cos(beta);
+
         // transposes of the actual matrices since they are transposed in the process of transferring to the shader
-        d_inTrans = {cos_c, -sin_c*cos_a, -sin_c*sin_a, 0,
+        /*std::vector<double> d_inRotation = {cos_c, -sin_c*cos_a, -sin_c*sin_a, 0,
                 sin_c, cos_c*cos_a, sin_a*cos_c, 0,
                 0, -sin_a, cos_a, 0,
-                0, dist*sin_a, -dist*cos_a, 1};
-        d_outTrans = {cos_c, sin_c, 0, 0,
-                -sin_c*cos_b,cos_c*cos_b,  sin_b, 0,
+                0, 0, 0, 1};
+        std::vector<double> d_inTranslation = {1,0,0,0, 0,1,0,0, 0,0,1,0, 0,0,-dist,1};*/
+        d_b2e = {cos_c, -sin_c*cos_a, -sin_c*sin_a, 0, // M_b2e
+                sin_c, cos_c*cos_a, sin_a*cos_c, 0,
+                0, -sin_a, cos_a, 0,
+                0, dist*sin_a, -dist*cos_a, 1}; 
+        
+        d_inv_b2e = {cos_c, sin_c, 0, 0,            // (M_b2e)^-1
+                -sin_c*cos_a, cos_c*cos_a, -sin_a, 0,
+                -sin_c*sin_a, sin_a*cos_c, cos_a, 0,
+                0, 0, dist, 1};
+
+        d_e2b = {cos_c, sin_c, 0, 0, // M_e2b
+                -sin_c*cos_b, cos_c*cos_b,  sin_b, 0,
                 sin_c*sin_b, -cos_c*sin_b, cos_b, 0,
                 0, 0, 0, 1};
+        d_inv_e2b = {cos_c, -sin_c*cos_b, sin_c*sin_b, 0, // rotation -> orthogonal -> inverse = transpose
+                        sin_c, cos_c*cos_b, -cos_c*sin_b, 0,
+                        0, sin_b, cos_b, 0,
+                        0, 0, 0, 1};
+        
 
         double dchi = misalignment[5]; // rotation around z-axis
         double dphi = misalignment[4]; // rotation around y-axis
@@ -130,17 +149,37 @@ namespace RAY
         // inv(rot) * inv(tran) * ray
         d_inverseMisalignmentMatrix = getMatrixProductAsVector(inverseRotation, inverseTranslation);
 
+        // add misalignment to beam<->element transformations
+        d_b2e = getMatrixProductAsVector(d_misalignmentMatrix, d_b2e);
+        d_inv_b2e = getMatrixProductAsVector(d_inv_b2e, d_inverseMisalignmentMatrix);  
+        d_inv_e2b = getMatrixProductAsVector(d_misalignmentMatrix, d_inv_e2b);
+        d_e2b = getMatrixProductAsVector(d_e2b, d_inverseMisalignmentMatrix);  
         
-        std::vector<double> ident = getMatrixProductAsVector(d_misalignmentMatrix, d_inverseMisalignmentMatrix);
-        for(int i = 0; i<16; i++) {
-            std::cout << ident[i] << ", " ;
+        
+        // world coordinates = world coord of previous element * transformation from previous element to this one
+        if(m_previous != NULL) { //Mi_g2e = Mi_b2e * M(i-1))_e2b * M_(i-1)_g2e
+            d_g2e = getMatrixProductAsVector(m_previous->getE2B(), m_previous->getG2E());
+            d_g2e = getMatrixProductAsVector(d_b2e, d_g2e);
+            // Mi_e2g = M_(i-1)_e2g * M(i-1)_e2b^-1 * Mi_b2e^-1
+            d_e2g = getMatrixProductAsVector(m_previous->getInvE2B(), d_inv_b2e);
+            d_e2g = getMatrixProductAsVector(m_previous->getE2G(), d_e2g);
+        }else{
+            d_g2e = d_b2e;
+            d_e2g = d_inv_b2e;
+            std::cout << "first element" << std::endl;
         }
-        std::cout << std::endl;
-        m_inMatrix = getMatrixProductAsVector(d_misalignmentMatrix, d_inTrans);
-        m_outMatrix = getMatrixProductAsVector(d_outTrans, d_inverseMisalignmentMatrix);
-        std::cout << "inTrans: " << std::endl;
+        //d_g2e = getMatrixProductAsVector(d_misalignmentMatrix, d_g2e);
+        //d_e2g = getMatrixProductAsVector(d_e2g, d_inverseMisalignmentMatrix);
+        
+        // combine in and out transformation (global <-> element coordinates) with misalignment
+        m_inMatrix = d_g2e;
+        m_outMatrix = d_e2g;
+        //m_inMatrix = getMatrixProductAsVector(d_misalignmentMatrix, d_g2e);
+        //m_outMatrix = getMatrixProductAsVector(d_e2g, d_inverseMisalignmentMatrix);
+        std::cout << "inMatrix: " << m_inMatrix.size() << std::endl;
         for(int i = 0; i<16; i++) {
             std::cout << m_inMatrix[i] << ", " ;
+            if(i%4 == 3) std::cout << std::endl;
         }
         std::cout << std::endl;
         
@@ -149,7 +188,7 @@ namespace RAY
     /**
      * set some additional misalignment that needs to be removed in the process of tracing the ray (eg RZP and Ellipsoid),
      * therefore it is stored in a separate matrix and not in the InTrans and OutTrans that are 
-     * used in the beginning and in the end of the tracing only
+     * used in the beginning and in the end of the tracing only (from Ray-coord to object-coord. and back)
      * angles given in rad 
      * we can calculate the misalignment with a matrix multiplication in the shader
      * -> store the matrix derived from the 6 input values in m_misalignmentMatrix
@@ -249,14 +288,32 @@ namespace RAY
         return d_inverseMisalignmentMatrix;
     }
 
-    std::vector<double> Quadric::getInTrans() 
+    std::vector<double> Quadric::getB2E() 
     {
-        return d_inTrans;
+        return d_b2e;
     }
 
-    std::vector<double> Quadric::getOutTrans() 
+    std::vector<double> Quadric::getE2B() 
     {
-        return d_outTrans;
+        return d_e2b;
+    }
+
+    std::vector<double> Quadric::getInvB2E() {
+        return d_inv_b2e;
+    }
+
+    std::vector<double> Quadric::getInvE2B() {
+        return d_inv_e2b;
+    }
+
+    std::vector<double> Quadric::getE2G() 
+    {
+        return d_e2g;
+    }
+
+    std::vector<double> Quadric::getG2E() 
+    {
+        return d_g2e;
     }
 
     std::vector<double> Quadric::getTempMisalignmentParams(){

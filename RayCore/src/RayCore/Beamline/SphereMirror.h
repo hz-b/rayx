@@ -8,7 +8,7 @@ namespace RAY
 
     public:
         
-        SphereMirror(const char* name, double width, double height, double grazingIncidence, double azimuthal, double distanceToPreceedingElement, double entranceArmLength, double exitArmLength, std::vector<double> misalignmentParams);
+        SphereMirror(const char* name, double width, double height, double grazingIncidence, double azimuthal, double distanceToPreceedingElement, double entranceArmLength, double exitArmLength, std::vector<double> misalignmentParams, Quadric* previous);
         SphereMirror();
         ~SphereMirror();
 

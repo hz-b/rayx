@@ -15,8 +15,8 @@ namespace RAY
      * @param misalignmentParams angles and distances for the mirror's misalignment
      * 
     */
-    ImagePlane::ImagePlane(const char* name, double distance) 
-    : Quadric(name) {
+    ImagePlane::ImagePlane(const char* name, double distance, Quadric* previous) 
+    : Quadric(name, previous) {
         m_distance = distance;
         // std::vector<double> inputPoints = {0,0,0,0, 0,0,0,-1, 0,0,0,0, 0,0,0,0};
         calcTransformationMatrices(0, 0, 0, 0, {0,0,0, 0,0,0});

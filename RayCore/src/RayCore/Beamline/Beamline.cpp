@@ -19,6 +19,10 @@ namespace RAY
         DEBUG(std::cout << "Deleting Beamline..." << std::endl);
     }
 
+    void Beamline::addQuadric(Quadric q) {
+        addQuadric(q.getName(), q.getAnchorPoints(), q.getInMatrix(), q.getOutMatrix(), q.getTempMisalignmentMatrix(), q.getInverseTempMisalignmentMatrix(), q.getParameters());
+    }
+
     /* Somehow results in wrong values. Should be fixed later
     void Beamline::addQuadric(Quadric newObject)
     {

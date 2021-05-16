@@ -49,8 +49,8 @@ public:
     //void addRay(double xpos, double ypos, double zpos, double xdir, double ydir, double zdir, double weight);
     //void addRay(double* location);
     void addRayVector(void* location, size_t size);
-    void addQuadric(std::vector<double> inQuadric, std::vector<double> inputInMatrix, std::vector<double> inputOutMatrix, std::vector<double> misalignmentMatrix, std::vector<double> inverseMisalignmentMatrix,, std::vector<double> parameters);
-    void* getRays();
+    void addQuadric(std::vector<double> inQuadric, std::vector<double> inputInMatrix, std::vector<double> inputOutMatrix, std::vector<double> misalignmentMatrix, std::vector<double> inverseMisalignmentMatrix, std::vector<double> parameters);
+    std::list<double> getRays();
     void cleanup();
 	RayList outputData;
 

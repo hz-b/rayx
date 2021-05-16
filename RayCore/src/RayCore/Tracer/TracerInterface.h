@@ -1,7 +1,6 @@
 #pragma once
 
 #include "Beamline/Beamline.h"
-#include "Beamline/MatrixSource.h"
 #include "Core.h"
 #include "Ray.h"
 

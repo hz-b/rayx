@@ -56,9 +56,10 @@ namespace RAY
         //initialize matrix light source with default params
         
         //RandomRays m = RandomRays(1000000); // produces random values for position, direction and weight to test cosinus and atan implementation
-        int number_of_rays = 20;
-        MatrixSource m = MatrixSource(0, "Matrix20", number_of_rays, 0.065, 0.04, 0.0, 0.001, 0.001);
-        //PointSource m = PointSource(0, "Point source 1", number_of_rays, 0.065, 0.04, 1.0, 0.001, 0.001);
+        int number_of_rays = 20000;
+        //PointSource p = PointSource(0, "name", number_of_rays, 10.0, 20, 10, 0.01, 0.01, 1, 1, 1, 1);
+        MatrixSource m = MatrixSource(0, "Matrix20", number_of_rays, 0.065, 0.04, 0.0, 0.001, 0.001, {0,0,0,0});
+        //PointSource m = PointSource(0, "Point source 1", number_of_rays, 0.065, 0.04, 1.0, 0.001, 0.001, 0, 0, 0, 0, {0,0,0,0});
         //std::cout << m.getName() << " with " << m.getNumberOfRays() << " Rays." << std::endl;std::cout.precision(15); // show 16 decimals
 
         addLightSource(&m);
@@ -71,35 +72,40 @@ namespace RAY
         {
             std::cout<<"i.size= " << (*i).size()<<std::endl;
             std::cout<<&((*i)[0])<<std::endl;
-            for (int j=0; j<1; j++){
-                tracer.addRayVector(&((*i)[0]), (*i).size());
-            }
-            //tracer.addRayVector(&((*i)[0]), (*i).size());
+            tracer.addRayVector(&((*i)[0]), (*i).size());
         }
         std::cout<<"add rays to tracer done"<<std::endl;
 
 
 
         std::cout.precision (17);
+        ReflectionZonePlate p1 = ReflectionZonePlate("ReflectionZonePlate1", 1, 0, 50, 200, 170, 1, 10, 1000, 100, 100, -1, -1, 1, 1, 100, 500,100,500, 0, 0, 0, {0,0,0, 0,0,0}, NULL); // dx,dy,dz, dpsi,dphi,dchi // {1,2,3,0.001,0.002,0.003}
+        ReflectionZonePlate p2 = ReflectionZonePlate("ReflectionZonePlate2", 1, 0, 50, 200, 170, 3, 20, 2000, 100, 100, -1, -1, 1, 1, 100, 500,100,500, 0, 0, 0, {0,0,0, 0,0,0}, &p1); 
+        ReflectionZonePlate p3 = ReflectionZonePlate("ReflectionZonePlate3", 1, 0, 50, 200, 170, 5, 15, 1000, 100, 100, -1, -1, 1, 1, 100, 500,100,500, 0, 0, 0, {0,0,0, 0,0,0}, &p2); 
+        ReflectionZonePlate p4 = ReflectionZonePlate("ReflectionZonePlate4", 1, 0, 50, 200, 170, 7, 7, 2000, 100, 100, -1, -1, 1, 1, 100, 500,100,500, 0, 0, 0, {0,0,0, 0,0,0}, &p3);
+        // RAY::ReflectionZonePlate p = RAY::ReflectionZonePlate("ReflectionZonePlateMis", 1, 0, 50, 200, 170, 0, 20, 0, 100, 100, -1, -1, 1, 1, 100, 500,100,500, 0, 0, 0, {0,0,0, 0,0,0}); // dx,dy,dz, dpsi,dphi,dchi // 
         // plane mirror with RAY-UI default values
-        //PlaneMirror plM = PlaneMirror("PlaneMirrorMis",50, 200, 10, 0, 10000, {1,2,3,0.001,0.002,0.003}); // {1,2,3,0.01,0.02,0.03}
-        // plane grating with default values
-        PlaneGrating plG = PlaneGrating("PlaneGratingDeviationDefault", 1, 50, 200, 0, 10, 7.5, 10000, 100, 1000, 1, 2, {1,2,3,0.001,0.002,0.003}, {0,0,0,0,0,0}); // dx,dy,dz, dpsi,dphi,dchi // {1,2,3,0.001,0.002,0.003}
-        // spherical grating with defalult values. SphereGrating(int mount, double width, double height, double deviation, double normalIncidence, double azimuthal, double distanceToPreceedingElement, double entranceArmLength, double exitArmLength, double designEnergyMounting, double lineDensity, double orderOfDiffraction, std::vector<double> misalignmentParams);
-        //SphereGrating s = SphereGrating("SphereGrating", 0, 50, 200, 10, 0.0, 0.0, 10000, 10000, 1000,  100, 1000, 1, {0,0,0,0,0,0});
-        // std::cout << s.getRadius() << std::endl;
-        // SphereMirror s = SphereMirror("SphereMirror", 50, 200, 10, 0.0, 10000, 10000, 1000, {0,0,0,0,0,0});
-        
+        /*PlaneMirror p1 = PlaneMirror("PlaneMirror1", 50, 200, 10, 7, 10000, {0,0,0, 0,0,0}, NULL); // {1,2,3,0.01,0.02,0.03}
+        PlaneMirror p2 = PlaneMirror("PlaneMirror2", 50, 200, 15, 4, 10000, {1,2,3, 0.001,0.002,0.003}, &p1); // {1,2,3,0.01,0.02,0.03}
+        PlaneMirror p3 = PlaneMirror("PlaneMirror3", 50, 200, 7, 10, 10000, {0,0,0, 0,0,0}, &p2); // {1,2,3,0.01,0.02,0.03}
+        PlaneMirror p4 = PlaneMirror("PlaneMirror4", 50, 200, 22, 17, 10000, {0,0,0, 0,0,0}, &p3); // {1,2,3,0.01,0.02,0.03}
+        */
+
+        p4.setOutMatrix({1,0,0,0, 0,1,0,0, 0,0,1,0, 0,0,0,1}); // for testing, compare resulting rays in object coordinate system of last object
+         
         for(int i=0; i<1; i++){
-            //m_Beamline.addQuadric(s.getName(), s.getAnchorPoints(), s.getInMatrix(), s.getOutMatrix(), s.getTempMisalignmentMatrix(), s.getInverseTempMisalignmentMatrix());
-            //m_Beamline.addQuadric(plM.getName(), plM.getAnchorPoints(), plM.getInMatrix(), plM.getOutMatrix(), plM.getTempMisalignmentMatrix(), plM.getInverseTempMisalignmentMatrix());
-            m_Beamline.addQuadric(plG.getName(), plG.getAnchorPoints(), plG.getInMatrix(), plG.getOutMatrix(), plG.getTempMisalignmentMatrix(), plG.getInverseTempMisalignmentMatrix());
+            //m_Beamline.addQuadric(s.getName(), s.getAnchorPoints(), s.getInMatrix(), s.getOutMatrix(), s.getTempMisalignmentMatrix(), s.getInverseTempMisalignmentMatrix(), p.getParameters());
+            //m_Beamline.addQuadric(plM.getName(), plM.getAnchorPoints(), plM.getInMatrix(), plM.getOutMatrix(), plM.getTempMisalignmentMatrix(), plM.getInverseTempMisalignmentMatrix(), p.getParameters());
+            m_Beamline.addQuadric(p1);
+            m_Beamline.addQuadric(p2);
+            m_Beamline.addQuadric(p3);
+            m_Beamline.addQuadric(p4);
         }
 
         //add beamline to tracer
         std::vector<RAY::Quadric> Quadrics = m_Beamline.getObjects();
-        for(int i = 0; i<Quadrics.size(); i++){
-            tracer.addQuadric(Quadrics[i].getAnchorPoints(), Quadrics[i].getInMatrix(), Quadrics[i].getOutMatrix(), Quadrics[i].getTempMisalignmentMatrix(), Quadrics[i].getInverseTempMisalignmentMatrix());//, Quadrics[i].getInverseMisalignmentMatrix()
+        for(int i = 0; i<int(Quadrics.size()); i++){
+            tracer.addQuadric(Quadrics[i].getAnchorPoints(), Quadrics[i].getInMatrix(), Quadrics[i].getOutMatrix(), Quadrics[i].getTempMisalignmentMatrix(), Quadrics[i].getInverseTempMisalignmentMatrix(), Quadrics[i].getParameters());//, Quadrics[i].getInverseMisalignmentMatrix()
         }
 
         const clock_t begin_time = clock();
@@ -109,27 +115,14 @@ namespace RAY
         std::cout << "run succeeded" << std::endl;
 
         //get rays from tracer
-        void* outputRaysLocation = tracer.getRays();
-
-        std::vector<Ray> outputRays;
-
-        size_t bytesToCopy = std::min((size_t) 2048*RAY_DOUBLE_COUNT*sizeof(double), (size_t) number_of_rays*RAY_DOUBLE_COUNT*sizeof(double));
-        
-        outputRays.resize(bytesToCopy);
-        std::cout << "bytesToCopy: "<< bytesToCopy << std::endl;
-        try{
-            memcpy(outputRays.data(), outputRaysLocation, 1);
-        }
-        catch (const std::exception& e) { std::cout<<e.what()<<std::endl;}
-
-        //std::list<double> outputRays = tracer.getRays();
+        std::list<double> outputRays = tracer.getRays();
         
         std::cout << "tracer run incl load rays time: " << float( clock () - begin_time ) << " ms" << std::endl;
         
         // m.compareRays(m_RayList, outputRays); // for comparing accuracy of cos and atan approximation with "source" RandomRays
         std::cout << "read data succeeded" << std::endl;
         std::cout << outputRays.size() << std::endl;
-        //writeToFile(outputRays);
+        writeToFile(outputRays);
         //for(auto iter = outputRays.begin(); iter != outputRays.end(); ++iter){
             //std::cout << *iter << ", ";
         //}
@@ -153,7 +146,7 @@ namespace RAY
         // outputFile << "Index,Xloc,Yloc,Zloc,Weight,Xdir,Ydir,Zdir" << std::endl;
         
         size_t counter = 0;
-        int print = 1;
+        int print = 0;
         for (std::list<double>::iterator i=outputRays.begin(); i != outputRays.end(); i++){
             if(counter%8 == 0){
                 outputFile << counter/VULKANTRACER_RAY_DOUBLE_AMOUNT;
@@ -189,11 +182,11 @@ namespace RAY
         switch(dataType){
             case TracerInterface::RayType: {
                 std::vector<Ray> newRayVector;
-                newRayVector.resize(RAY_MAX_ELEMENTS_IN_VECTOR);
+                newRayVector.resize(1048576);
                 std::string line;
                 std::getline(inputFile, line);
                 //std::cout<<line<<std::endl;
-                uint32_t numberOfRays = 0;
+                uint32_t numberOfRays = 1;
                 while(!inputFile.eof()){
                     std::getline(inputFile, line);
                     if(line[0] == '\0'){
@@ -224,18 +217,18 @@ namespace RAY
                     //std::cout<<newDoubles[0]<<newDoubles[1]<<newDoubles[2]<<newDoubles[3]<<newDoubles[4]<<newDoubles[5]<<newRay.m_direction.y<<newRay.m_direction.z<<"test"<<std::endl;
                     newRayVector.push_back(newRay);
                     numberOfRays++;
-                    if(numberOfRays>RAY_MAX_ELEMENTS_IN_VECTOR){
+                    if(numberOfRays>1048576){
                         m_RayList.push_back(newRayVector);
                         numberOfRays = 0;
                         newRayVector.clear();
-                        newRayVector.resize(RAY_MAX_ELEMENTS_IN_VECTOR);
+                        newRayVector.resize(1048576);
                     }
 
                 }
             }
-            case TracerInterface::QuadricType:{
+            /*case TracerInterface::QuadricType:{
                 int i=1;
-            }
+            }*/
         }
 
     } 

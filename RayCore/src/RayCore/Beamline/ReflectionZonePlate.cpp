@@ -19,8 +19,8 @@ namespace RAY
      *          lineDensity = line density of the grating
      *          orderOfDiffraction = 
     */
-    ReflectionZonePlate::ReflectionZonePlate(const char* name, int mount, int curvatureType, double width, double height, double deviation, double incidenceAngle, double azimuthal, double distanceToPreceedingElement, double designEnergy, double sourceEnergy, double orderOfDiffraction, double designOrderOfDiffraction, double dAlpha, double dBeta, double mEntrance, double mExit, double sEntrance, double sExit, double shortRadius, double longRadius, double elementOffsetZ, std::vector<double> misalignmentParams) 
-    : Quadric(name) {
+    ReflectionZonePlate::ReflectionZonePlate(const char* name, int mount, int curvatureType, double width, double height, double deviation, double incidenceAngle, double azimuthal, double distanceToPreceedingElement, double designEnergy, double sourceEnergy, double orderOfDiffraction, double designOrderOfDiffraction, double dAlpha, double dBeta, double mEntrance, double mExit, double sEntrance, double sExit, double shortRadius, double longRadius, double elementOffsetZ, std::vector<double> misalignmentParams, Quadric* previous) 
+    : Quadric(name, previous) {
         m_totalWidth = width;
         m_totalHeight = height;
         m_designEnergy = sourceEnergy; // eV, if auto == true, else designEnergy
@@ -72,8 +72,8 @@ namespace RAY
             editQuadric({1,0,0,0, m_totalWidth,1,0,-m_longRadius, m_totalHeight,0,1,0, 4,0,0,0});
         }
         
-        calcTransformationMatrices(m_alpha, m_chi, m_beta, m_distanceToPreceedingElement, {0,0,0, 0,0,0}); 
-        // the whole misalignment is stored in temporaryMisalignment because it needs to be temporarily removed during tracing (-> store in separate matrix, not inMatrix/outMatrix)
+        calcTransformationMatrices(m_alpha, m_chi, m_beta, m_distanceToPreceedingElement, misalignmentParams); 
+        // the whole misalignment is also stored in temporaryMisalignment because it needs to be temporarily removed during tracing
         setTemporaryMisalignment(misalignmentParams);
         setParameters({
             double(m_imageType), double(m_rzpType), double(m_derivationMethod), m_wavelength, 
