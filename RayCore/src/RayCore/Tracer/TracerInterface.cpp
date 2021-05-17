@@ -64,26 +64,26 @@ namespace RAY
 
         //add source to tracer
         //initialize matrix light source with default params
-        
+
         //RandomRays m = RandomRays(1000000); // produces random values for position, direction and weight to test cosinus and atan implementation
         int number_of_rays = 20000;
         //PointSource p = PointSource(0, "name", number_of_rays, 10.0, 20, 10, 0.01, 0.01, 1, 1, 1, 1);
-        MatrixSource m = MatrixSource(0, "Matrix20", number_of_rays, 0.065, 0.04, 0.0, 0.001, 0.001, {0,0,0,0});
+        MatrixSource m = MatrixSource(0, "Matrix20", number_of_rays, 0.065, 0.04, 0.0, 0.001, 0.001, { 0,0,0,0 });
         //PointSource m = PointSource(0, "Point source 1", number_of_rays, 0.065, 0.04, 1.0, 0.001, 0.001, 0, 0, 0, 0, {0,0,0,0});
         //std::cout << m.getName() << " with " << m.getNumberOfRays() << " Rays." << std::endl;std::cout.precision(15); // show 16 decimals
 
         addLightSource(&m);
-        generateRays();
-   
-        std::cout<<"add rays to tracer done"<<std::endl;
+        generateRays(&tracer, &m);
+
+        std::cout << "add rays to tracer done" << std::endl;
 
 
 
-        std::cout.precision (17);
-        ReflectionZonePlate p1 = ReflectionZonePlate("ReflectionZonePlate1", 1, 0, 50, 200, 170, 1, 10, 1000, 100, 100, -1, -1, 1, 1, 100, 500,100,500, 0, 0, 0, {0,0,0, 0,0,0}, NULL); // dx,dy,dz, dpsi,dphi,dchi // {1,2,3,0.001,0.002,0.003}
-        ReflectionZonePlate p2 = ReflectionZonePlate("ReflectionZonePlate2", 1, 0, 50, 200, 170, 3, 20, 2000, 100, 100, -1, -1, 1, 1, 100, 500,100,500, 0, 0, 0, {0,0,0, 0,0,0}, &p1); 
-        ReflectionZonePlate p3 = ReflectionZonePlate("ReflectionZonePlate3", 1, 0, 50, 200, 170, 5, 15, 1000, 100, 100, -1, -1, 1, 1, 100, 500,100,500, 0, 0, 0, {0,0,0, 0,0,0}, &p2); 
-        ReflectionZonePlate p4 = ReflectionZonePlate("ReflectionZonePlate4", 1, 0, 50, 200, 170, 7, 7, 2000, 100, 100, -1, -1, 1, 1, 100, 500,100,500, 0, 0, 0, {0,0,0, 0,0,0}, &p3);
+        std::cout.precision(17);
+        ReflectionZonePlate p1 = ReflectionZonePlate("ReflectionZonePlate1", 1, 0, 50, 200, 170, 1, 10, 1000, 100, 100, -1, -1, 1, 1, 100, 500, 100, 500, 0, 0, 0, { 0,0,0, 0,0,0 }, NULL); // dx,dy,dz, dpsi,dphi,dchi // {1,2,3,0.001,0.002,0.003}
+        ReflectionZonePlate p2 = ReflectionZonePlate("ReflectionZonePlate2", 1, 0, 50, 200, 170, 3, 20, 2000, 100, 100, -1, -1, 1, 1, 100, 500, 100, 500, 0, 0, 0, { 0,0,0, 0,0,0 }, &p1);
+        ReflectionZonePlate p3 = ReflectionZonePlate("ReflectionZonePlate3", 1, 0, 50, 200, 170, 5, 15, 1000, 100, 100, -1, -1, 1, 1, 100, 500, 100, 500, 0, 0, 0, { 0,0,0, 0,0,0 }, &p2);
+        ReflectionZonePlate p4 = ReflectionZonePlate("ReflectionZonePlate4", 1, 0, 50, 200, 170, 7, 7, 2000, 100, 100, -1, -1, 1, 1, 100, 500, 100, 500, 0, 0, 0, { 0,0,0, 0,0,0 }, &p3);
         // RAY::ReflectionZonePlate p = RAY::ReflectionZonePlate("ReflectionZonePlateMis", 1, 0, 50, 200, 170, 0, 20, 0, 100, 100, -1, -1, 1, 1, 100, 500,100,500, 0, 0, 0, {0,0,0, 0,0,0}); // dx,dy,dz, dpsi,dphi,dchi // 
         // plane mirror with RAY-UI default values
         /*PlaneMirror p1 = PlaneMirror("PlaneMirror1", 50, 200, 10, 7, 10000, {0,0,0, 0,0,0}, NULL); // {1,2,3,0.01,0.02,0.03}
@@ -92,9 +92,9 @@ namespace RAY
         PlaneMirror p4 = PlaneMirror("PlaneMirror4", 50, 200, 22, 17, 10000, {0,0,0, 0,0,0}, &p3); // {1,2,3,0.01,0.02,0.03}
         */
 
-        p4.setOutMatrix({1,0,0,0, 0,1,0,0, 0,0,1,0, 0,0,0,1}); // for testing, compare resulting rays in object coordinate system of last object
-         
-        for(int i=0; i<1; i++){
+        p4.setOutMatrix({ 1,0,0,0, 0,1,0,0, 0,0,1,0, 0,0,0,1 }); // for testing, compare resulting rays in object coordinate system of last object
+
+        for (int i = 0; i < 1; i++) {
             //m_Beamline.addQuadric(s.getName(), s.getAnchorPoints(), s.getInMatrix(), s.getOutMatrix(), s.getTempMisalignmentMatrix(), s.getInverseTempMisalignmentMatrix(), p.getParameters());
             //m_Beamline.addQuadric(plM.getName(), plM.getAnchorPoints(), plM.getInMatrix(), plM.getOutMatrix(), plM.getTempMisalignmentMatrix(), plM.getInverseTempMisalignmentMatrix(), p.getParameters());
             m_Beamline.addQuadric(p1);
@@ -105,10 +105,10 @@ namespace RAY
 
         //add beamline to tracer
         std::vector<RAY::Quadric> Quadrics = m_Beamline.getObjects();
-        for(int i = 0; i<int(Quadrics.size()); i++){
+        for (int i = 0; i<int(Quadrics.size()); i++) {
             tracer.addQuadric(Quadrics[i].getAnchorPoints(), Quadrics[i].getInMatrix(), Quadrics[i].getOutMatrix(), Quadrics[i].getTempMisalignmentMatrix(), Quadrics[i].getInverseTempMisalignmentMatrix(), Quadrics[i].getParameters());//, Quadrics[i].getInverseMisalignmentMatrix()
         }
-        }
+
         const clock_t begin_time = clock();
         tracer.run(); //run tracer
         std::cout << "tracer run time: " << float(clock() - begin_time) << " ms" << std::endl;
@@ -161,11 +161,11 @@ namespace RAY
 
         size_t counter = 0;
         int print = 0;
-        for (std::list<double>::iterator i=outputRays.begin(); i != outputRays.end(); i++){
-            if(counter%8 == 0){
-                outputFile << counter/VULKANTRACER_RAY_DOUBLE_AMOUNT;
-                if(print==1) std::cout << ")" << std::endl;
-                if(print==1) std::cout << "(";
+        for (std::list<double>::iterator i = outputRays.begin(); i != outputRays.end(); i++) {
+            if (counter % 8 == 0) {
+                outputFile << counter / VULKANTRACER_RAY_DOUBLE_AMOUNT;
+                if (print == 1) std::cout << ")" << std::endl;
+                if (print == 1) std::cout << "(";
             }
             if (counter % 8 == 7) {
                 outputFile << std::endl;
