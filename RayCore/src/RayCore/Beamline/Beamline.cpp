@@ -5,7 +5,6 @@
 
 namespace RAY
 {
-
     Beamline::Beamline()
     {
         DEBUG(std::cout << "Creating Beamline..." << std::endl);

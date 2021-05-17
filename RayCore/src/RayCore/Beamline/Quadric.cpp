@@ -5,9 +5,10 @@
 namespace RAY
 {
     Quadric::Quadric(const char* name, std::vector<double> inputPoints, std::vector<double> inputInMatrix, std::vector<double> inputOutMatrix, std::vector<double> misalignmentMatrix, std::vector<double> inverseMisalignmentMatrix, std::vector<double> parameters)
-    {   
+    {
         m_name = name;
-        assert(inputPoints.size() == 16 && inputInMatrix.size() == 16 && inputOutMatrix.size() == 16 && misalignmentMatrix.size() == 16 && inverseMisalignmentMatrix.size() == 16 && parameters.size() == 16);
+        std::cout << inputPoints.size() << inputInMatrix.size() << inputOutMatrix.size() << misalignmentMatrix.size() << inverseMisalignmentMatrix.size() << parameters.size() << std::endl;
+        assert(inputPoints.size() == 16 && inputInMatrix.size() == 16 && inputOutMatrix.size() == 16 && misalignmentMatrix.size() == 16 && inverseMisalignmentMatrix.size() == 16 && parameters.size() == 16); //parameter size ==6?
         m_anchorPoints = inputPoints;
         m_inMatrix = inputInMatrix;
         m_outMatrix = inputOutMatrix;
@@ -20,11 +21,11 @@ namespace RAY
      * standard constructor
      * this class calculates and stores transformation matrices (beam to element and element to beam system),
      * misalignment matrices and the parameters for the quadric equation!
-     * 
+     *
      * angles given in rad
      * define transformation matrices based on grazing incidence (alpha) and exit (beta) angle, azimuthal angle (chi) and distance to preceeding element
      * @param: inputPoints      Matrix A for quadric surfaces with a_11,a_12,a_13,a_14, a_21,a_22,a_23,a_24, a_31,a_32,a_33,a_34, a_41,a_42,a_43,a_44
-     *                      a_21,a_31,a_32,a_41,a_42,a_43 are never used for quadric surfaces because the matrix is symmetrial, 
+     *                      a_21,a_31,a_32,a_41,a_42,a_43 are never used for quadric surfaces because the matrix is symmetrial,
      *                      we use a_21,a_31 for x and z dimensions of the surface (xlength, zlength)
      * @param parameters                vector with 16 entries that contain further element specific parameters that are needed on the shader
      * @param alpha                     grazing incidence angle
@@ -65,7 +66,7 @@ namespace RAY
             0,0,0,1};
         m_outMatrix = {cos_c, -sin_c*cos_b, sin_c*sin_b, 0,
             sin_c, cos_c*cos_b,-cos_c*sin_b, 0,
-            0,sin_b, cos_b, 0, 
+            0,sin_b, cos_b, 0,
             0, 0, 0, 1};*/
     }
 
@@ -132,20 +133,20 @@ namespace RAY
         m_misalignmentParams = misalignment;
         // transpose of original matrix, multiplication order: 1.chi(z) 2.phi(y) 3.psi(x), 4.dx, 5.dy, 6.dz
         // ray = tran * rot * ray
-        d_misalignmentMatrix = {cos(dphi)*cos(dchi), -cos(dpsi)*sin(dchi)-sin(dpsi)*sin(dphi)*cos(dchi), -sin(dpsi)*sin(dchi)+cos(dpsi)*sin(dphi)*cos(dchi), 0,
-                                sin(dchi)*cos(dphi), cos(dpsi)*cos(dchi)-sin(dpsi)*sin(dphi)*sin(dchi), sin(dpsi)*cos(dchi)+cos(dpsi)*sin(dphi)*sin(dchi), 0,
-                                -sin(dphi), -sin(dpsi)*cos(dphi), cos(dpsi)*cos(dphi), 0,
-                                -dx, -dy, -dz, 1};
+        d_misalignmentMatrix = { cos(dphi) * cos(dchi), -cos(dpsi) * sin(dchi) - sin(dpsi) * sin(dphi) * cos(dchi), -sin(dpsi) * sin(dchi) + cos(dpsi) * sin(dphi) * cos(dchi), 0,
+                                sin(dchi) * cos(dphi), cos(dpsi) * cos(dchi) - sin(dpsi) * sin(dphi) * sin(dchi), sin(dpsi) * cos(dchi) + cos(dpsi) * sin(dphi) * sin(dchi), 0,
+                                -sin(dphi), -sin(dpsi) * cos(dphi), cos(dpsi) * cos(dphi), 0,
+                                -dx, -dy, -dz, 1 };
         // inverse of rotation part of misalignment matrix equals the transpose (orthogonal matrix)
-        std::vector<double> inverseRotation = {cos(dphi)*cos(dchi), sin(dchi)*cos(dphi), -sin(dphi), 0,
-                            -cos(dpsi)*sin(dchi)-sin(dpsi)*sin(dphi)*cos(dchi), cos(dpsi)*cos(dchi)-sin(dpsi)*sin(dphi)*sin(dchi), -sin(dpsi)*cos(dphi), 0,
-                            -sin(dpsi)*sin(dchi)+cos(dpsi)*sin(dphi)*cos(dchi), sin(dpsi)*cos(dchi)+cos(dpsi)*sin(dphi)*sin(dchi), cos(dpsi)*cos(dphi), 0,
-                            0,0,0,1};
+        std::vector<double> inverseRotation = { cos(dphi) * cos(dchi), sin(dchi) * cos(dphi), -sin(dphi), 0,
+                            -cos(dpsi) * sin(dchi) - sin(dpsi) * sin(dphi) * cos(dchi), cos(dpsi) * cos(dchi) - sin(dpsi) * sin(dphi) * sin(dchi), -sin(dpsi) * cos(dphi), 0,
+                            -sin(dpsi) * sin(dchi) + cos(dpsi) * sin(dphi) * cos(dchi), sin(dpsi) * cos(dchi) + cos(dpsi) * sin(dphi) * sin(dchi), cos(dpsi) * cos(dphi), 0,
+                            0,0,0,1 };
         // inverse of translation part is negative of offsets
-        std::vector<double> inverseTranslation = {1,0,0,0, 
-                            0,1,0,0, 
-                            0,0,1,0, 
-                            dx, dy, dz, 1};
+        std::vector<double> inverseTranslation = { 1,0,0,0,
+                            0,1,0,0,
+                            0,0,1,0,
+                            dx, dy, dz, 1 };
         // inv(rot) * inv(tran) * ray
         d_inverseMisalignmentMatrix = getMatrixProductAsVector(inverseRotation, inverseTranslation);
 
@@ -182,7 +183,7 @@ namespace RAY
             if(i%4 == 3) std::cout << std::endl;
         }
         std::cout << std::endl;
-        
+
     }
 
     /**
@@ -203,23 +204,23 @@ namespace RAY
         double dpsi = -misalignment[3]; // rotation around x-axis
         double dphi = misalignment[4]; // rotation around y-axis
         double dchi = misalignment[5]; // rotation around z-axis (has to be negative)
-        
+
         m_temporaryMisalignmentParams = misalignment;
         // transpose of original matrix, multiplication order: chi phi psi, dx, dy, dz
-        m_temporaryMisalignmentMatrix = {cos(dphi)*cos(dchi), -cos(dpsi)*sin(dchi)-sin(dpsi)*sin(dphi)*cos(dchi), -sin(dpsi)*sin(dchi)+cos(dpsi)*sin(dphi)*cos(dchi), 0,
-                                sin(dchi)*cos(dphi), cos(dpsi)*cos(dchi)-sin(dpsi)*sin(dphi)*sin(dchi), sin(dpsi)*cos(dchi)+cos(dpsi)*sin(dphi)*sin(dchi), 0,
-                                -sin(dphi), -sin(dpsi)*cos(dphi), cos(dpsi)*cos(dphi), 0,
-                                -dx, -dy, -dz, 1};
+        m_temporaryMisalignmentMatrix = { cos(dphi) * cos(dchi), -cos(dpsi) * sin(dchi) - sin(dpsi) * sin(dphi) * cos(dchi), -sin(dpsi) * sin(dchi) + cos(dpsi) * sin(dphi) * cos(dchi), 0,
+                                sin(dchi) * cos(dphi), cos(dpsi) * cos(dchi) - sin(dpsi) * sin(dphi) * sin(dchi), sin(dpsi) * cos(dchi) + cos(dpsi) * sin(dphi) * sin(dchi), 0,
+                                -sin(dphi), -sin(dpsi) * cos(dphi), cos(dpsi) * cos(dphi), 0,
+                                -dx, -dy, -dz, 1 };
         // inverse of rotation part of misalignment matrix equals the transpose (orthogonal matrix)
-        std::vector<double> inverseRotation = {cos(dphi)*cos(dchi), sin(dchi)*cos(dphi), -sin(dphi), 0,
-                            -cos(dpsi)*sin(dchi)-sin(dpsi)*sin(dphi)*cos(dchi), cos(dpsi)*cos(dchi)-sin(dpsi)*sin(dphi)*sin(dchi), -sin(dpsi)*cos(dphi), 0,
-                            -sin(dpsi)*sin(dchi)+cos(dpsi)*sin(dphi)*cos(dchi), sin(dpsi)*cos(dchi)+cos(dpsi)*sin(dphi)*sin(dchi), cos(dpsi)*cos(dphi), 0,
-                            0,0,0,1};
+        std::vector<double> inverseRotation = { cos(dphi) * cos(dchi), sin(dchi) * cos(dphi), -sin(dphi), 0,
+                            -cos(dpsi) * sin(dchi) - sin(dpsi) * sin(dphi) * cos(dchi), cos(dpsi) * cos(dchi) - sin(dpsi) * sin(dphi) * sin(dchi), -sin(dpsi) * cos(dphi), 0,
+                            -sin(dpsi) * sin(dchi) + cos(dpsi) * sin(dphi) * cos(dchi), sin(dpsi) * cos(dchi) + cos(dpsi) * sin(dphi) * sin(dchi), cos(dpsi) * cos(dphi), 0,
+                            0,0,0,1 };
         // inverse of translation part is negative of offsets
-        std::vector<double> inverseTranslation = {1,0,0,0, 
-                            0,1,0,0, 
-                            0,0,1,0, 
-                            dx, dy, dz, 1};
+        std::vector<double> inverseTranslation = { 1,0,0,0,
+                            0,1,0,0,
+                            0,0,1,0,
+                            dx, dy, dz, 1 };
         // inverseTranslation * inverseRotation = inverseMisalignmentMatrix 
         m_inverseTemporaryMisalignmentMatrix = getMatrixProductAsVector(inverseRotation, inverseTranslation);
     }
@@ -228,17 +229,17 @@ namespace RAY
     {
         return m_anchorPoints;
     }
-    
-    std::vector<double> Quadric::getParams() 
+
+    std::vector<double> Quadric::getParams()
     {
         return m_parameters;
     }
-    
+
     void Quadric::setParameters(std::vector<double> params) {
         assert(params.size() == 16);
         m_parameters = params;
     }
-    
+
     /**
      * set a new set of paramters a_11 to a_44 for the quadric function
      * order: a_11,a_12,a_13,a_14, a_21,a_22,a_23,a_24, a_31,a_32,a_33,a_34, a_41,a_42,a_43,a_44
@@ -250,7 +251,7 @@ namespace RAY
         assert(inputPoints.size() == 16);
         m_anchorPoints = inputPoints;
     }
-    
+
     std::vector<double> Quadric::getAnchorPoints()
     {
         return m_anchorPoints;
@@ -316,7 +317,7 @@ namespace RAY
         return d_g2e;
     }
 
-    std::vector<double> Quadric::getTempMisalignmentParams(){
+    std::vector<double> Quadric::getTempMisalignmentParams() {
         return m_temporaryMisalignmentParams;
     }
 

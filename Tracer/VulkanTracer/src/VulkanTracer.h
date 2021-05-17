@@ -18,8 +18,8 @@ const bool enableValidationLayers = true;
 #endif
 
 //set debug generation information
-const std::vector<const char *> validationLayers = {
-    "VK_LAYER_KHRONOS_validation"};
+const std::vector<const char*> validationLayers = {
+    "VK_LAYER_KHRONOS_validation" };
 
 // Used for validating return values of Vulkan API calls.
 #define VK_CHECK_RESULT(f)                                                                \
@@ -31,8 +31,8 @@ const std::vector<const char *> validationLayers = {
             assert(res == VK_SUCCESS);                                                    \
         }                                                                                 \
     }
-VkResult CreateDebugUtilsMessengerEXT(VkInstance instance, const VkDebugUtilsMessengerCreateInfoEXT *pCreateInfo, const VkAllocationCallbacks *pAllocator, VkDebugUtilsMessengerEXT *pDebugMessenger);
-void DestroyDebugUtilsMessengerEXT(VkInstance instance, VkDebugUtilsMessengerEXT debugMessenger, const VkAllocationCallbacks *pAllocator);
+VkResult CreateDebugUtilsMessengerEXT(VkInstance instance, const VkDebugUtilsMessengerCreateInfoEXT* pCreateInfo, const VkAllocationCallbacks* pAllocator, VkDebugUtilsMessengerEXT* pDebugMessenger);
+void DestroyDebugUtilsMessengerEXT(VkInstance instance, VkDebugUtilsMessengerEXT debugMessenger, const VkAllocationCallbacks* pAllocator);
 
 const int WORKGROUP_SIZE = 32;
 #define VULKANTRACER_RAY_DOUBLE_AMOUNT 8
@@ -50,9 +50,15 @@ public:
     //void addRay(double* location);
     void addRayVector(void* location, size_t size);
     void addQuadric(std::vector<double> inQuadric, std::vector<double> inputInMatrix, std::vector<double> inputOutMatrix, std::vector<double> misalignmentMatrix, std::vector<double> inverseMisalignmentMatrix, std::vector<double> parameters);
-    std::list<double> getRays();
+    void getRays();
     void cleanup();
-	RayList outputData;
+    void setBeamlineParameters(uint32_t inNumberOfBeamlines, uint32_t inNumberOfQuadricsPerBeamline, uint32_t inNumberOfRays);
+    std::list<std::vector<Ray>>::iterator getOutputIteratorBegin();
+    std::list<std::vector<Ray>>::iterator getOutputIteratorEnd();
+    RayList outputData;
+
+    // getter 
+    const RayList& getRayList() { return rayList; }
 
 private:
     //Member structs:
@@ -80,7 +86,7 @@ private:
             return hasvalue;
         }
     };
-    
+
     //Member variables:
     VkInstance instance;
     VkDebugUtilsMessengerEXT debugMessenger;
@@ -99,19 +105,23 @@ private:
     VkDescriptorSetLayout descriptorSetLayout;
     VkQueue computeQueue;
     uint32_t queueFamilyIndex;
-    uint32_t rayAmount;
+    uint32_t numberOfBeamlines;
+    uint32_t numberOfQuadricsPerBeamline;
+    uint32_t numberOfRays;
+    uint32_t numberOfRaysPerBeamline;
     RayList rayList;
     std::vector<double> beamline;
     QueueFamilyIndices QueueFamily;
-    
+
     //Member functions:
     void initVulkan();
     void mainLoop();
     void createInstance();
-    void populateDebugMessengerCreateInfo(VkDebugUtilsMessengerCreateInfoEXT &createInfo);
+    void populateDebugMessengerCreateInfo(VkDebugUtilsMessengerCreateInfoEXT& createInfo);
     void setupDebugMessenger();
-    std::vector<const char *> getRequiredExtensions();
-    static VKAPI_ATTR VkBool32 VKAPI_CALL debugCallback(VkDebugUtilsMessageSeverityFlagBitsEXT messageSeverity, VkDebugUtilsMessageTypeFlagsEXT messageType, const VkDebugUtilsMessengerCallbackDataEXT *pCallbackData, void *pUserData);
+    std::vector<const char*> getRequiredExtensions();
+    std::vector<const char*> getRequiredDeviceExtensions();
+    static VKAPI_ATTR VkBool32 VKAPI_CALL debugCallback(VkDebugUtilsMessageSeverityFlagBitsEXT messageSeverity, VkDebugUtilsMessageTypeFlagsEXT messageType, const VkDebugUtilsMessengerCallbackDataEXT* pCallbackData, void* pUserData);
     bool checkValidationLayerSupport();
     void pickPhysicalDevice();
     bool isDeviceSuitable(VkPhysicalDevice device);
@@ -128,13 +138,11 @@ private:
     void fillQuadricBuffer();
     void createDescriptorSetLayout();
     void createDescriptorSet();
-    uint32_t *readFile(uint32_t &length, const char *filename);
+    uint32_t* readFile(uint32_t& length, const char* filename);
     void createCommandPool();
     void createComputePipeline();
     void createCommandBuffer();
     void runCommandBuffer();
-    void setRayAmount(uint32_t inputRayAmount);
-    void setRayAmount();
     void divideAndSortRays();
 
     int main();

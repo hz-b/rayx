@@ -13,11 +13,11 @@ Ray::Ray(double xpos, double ypos, double zpos, double xdir, double ydir, double
 	placeholder = 0;
 }
 //copies 64 byts of data in the following format: xloc, yloc, zloc, weight, xdir, ydir, zdir, placeholder
-Ray::Ray(double* location){
+Ray::Ray(double* location) {
 	memcpy(&position.x, location, 64);
 }
-Ray::Ray(){}
-Ray::~Ray(){
+Ray::Ray() {}
+Ray::~Ray() {
 
 }
 

@@ -24,15 +24,15 @@ namespace RAY
         m_tracerInterface.run();
     }
 
-    void Application::run(const std::string& filename)
-    {
-        DEBUG(std::cout << "Application running on given file..." << std::endl);
+    // void Application::run(const std::string& filename)
+    // {
+    //     DEBUG(std::cout << "Application running on given file..." << std::endl);
 
-        // TODO: read file here
-        //Exporter exp;
-        //exp.exportToXML();
+    //     // TODO: read file here
+    //     //Exporter exp;
+    //     //exp.exportToXML();
 
-        m_tracerInterface.run();
-    }
+    //     m_tracerInterface.run();
+    // }
 
 } // namespace RAY

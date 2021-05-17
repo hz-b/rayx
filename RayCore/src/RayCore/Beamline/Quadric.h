@@ -70,7 +70,7 @@ namespace RAY {
             std::vector<double> m_inMatrix;
             // stores d_e2g / d_e2b and m_inverseMisalignmentMatrix
             std::vector<double> m_outMatrix;
-            // additional element-specific parameters that are used for tracing
+            // additional element-specific parameters that are used for tracing (16 entries -> one dmat4x4 in shader)
             std::vector<double> m_parameters;
     };
 }

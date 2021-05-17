@@ -13,7 +13,7 @@ namespace RAY
 		virtual ~Application();
 
 		void run();
-		void run(const std::string& file);
+		/*void run(const std::string& file);*/
 
 	private:
 		TracerInterface m_tracerInterface;

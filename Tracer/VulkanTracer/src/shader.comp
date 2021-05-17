@@ -1741,7 +1741,15 @@ void iterateQuadrics(){
 	const int numberOfRays = rayData.length();
 	const int numberOfQuadrics = quadricData.length();
 	double type;
+	
+	/*dmat4 ap = quadricData[numberOfQuadrics-1].anchorPoints;
+	rayData[uint(gl_GlobalInvocationID)].position = dvec3(ap[1][0], ap[2][0], ap[3][0]);
+	rayData[uint(gl_GlobalInvocationID)].weight = ap[0][0];
+	rayData[uint(gl_GlobalInvocationID)].direction = dvec4(ap[0][1], ap[0][2], ap[0][3], ap[1][1]);*/
+
 	if(numberOfQuadrics == 1){
+		//outputData[uint(gl_GlobalInvocationID)] = rayData[uint(gl_GlobalInvocationID)];
+		//return;
 		type = quadricData[numberOfQuadrics-1].anchorPoints[3][0];
 		//only one quadric: store directly in output buffer
 		// info if element is grating/mirror/... will later be stored in separate "parameter" dmat4
@@ -2007,17 +2015,19 @@ void cameraPlaneIntersection(outputData, cameraPlane){
 }
 */
 void main(){
-	testFunctions();
-	//outputData[uint(gl_GlobalInvocationID)] = rayData[uint(gl_GlobalInvocationID)];
-	//iterateQuadrics();
-	/*Ray r = rayData[uint(gl_GlobalInvocationID)];
-	r.position = dvec3(r8_atan(r.position[0]), r8_atan(r.position[1]), r8_atan(r.position[2]));
-	r.direction = dvec4(r8_atan(r.direction[0]), r8_atan(r.direction[1]), r8_atan(r.direction[2]), r8_atan(r.direction[3]));
-	outputData[uint(gl_GlobalInvocationID)] =  r;
-	*/
-	// outputData[uint(gl_GlobalInvocationID)] = iterateQuadrics(rayData[uint(gl_GlobalInvocationID)]);
-	// outputData[uint(gl_GlobalInvocationID)] = rayData[uint(gl_GlobalInvocationID)];
-	// outputData[uint(gl_GlobalInvocationID)].position = rayData[uint(gl_GlobalInvocationID)].position; // starts at (0,20,-20)
-	// outputData[uint(gl_GlobalInvocationID)].direction = dvec4(0.0, 0.0, 0.0, 0.0); // hits the surface in 45 degree angle at (0,0,0) -> the normal should be (0,-1,0)
-	
+    //testFunctions();
+    //outputData[uint(gl_GlobalInvocationID)] = rayData[uint(gl_GlobalInvocationID)];
+    iterateQuadrics();
+    /*Ray r = rayData[uint(gl_GlobalInvocationID)];
+    r.position = dvec3(1,2,3);
+    r.direction = dvec4(3,4,5,6);
+    outputData[uint(gl_GlobalInvocationID)] =  r;
+    */
+    // outputData[uint(gl_GlobalInvocationID)] = iterateQuadrics(rayData[uint(gl_GlobalInvocationID)]);
+    // outputData[uint(gl_GlobalInvocationID)] = rayData[uint(gl_GlobalInvocationID)];
+    //outputData[uint(gl_GlobalInvocationID)].position = rayData[uint(gl_GlobalInvocationID)].position;
+    //outputData[uint(gl_GlobalInvocationID)].direction = rayData[uint(gl_GlobalInvocationID)].direction;
+    //outputData[uint(gl_GlobalInvocationID)].weight = rayData[uint(gl_GlobalInvocationID)].weight; // starts at (0,20,-20)
+    // outputData[uint(gl_GlobalInvocationID)].direction = dvec4(0.0, 0.0, 0.0, 0.0); // hits the surface in 45 degree angle at (0,0,0) -> the normal should be (0,-1,0)
+    
 }
