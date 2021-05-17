@@ -28,12 +28,12 @@ namespace RAY
         void calcDesignOrderOfDiffraction(double designOrderOfDiffraction);
         void focus(double angle);
         double rzpLineDensityDZ(double X, double Y, double Z, double FX, double FY, double FZ, double WL);
-
+    
         double getWidth();
         double getHeight();
         double getAlpha();
         double getBeta();
-        double getDesignAlphaAngle();
+        double getDesignAlphaAngle(); 
         double getDesignBetaAngle();
 
         double getGratingMount();
@@ -57,7 +57,7 @@ namespace RAY
         double getOrderOfDiffraction();
         double getDesignOrderOfDiffraction();
         double getDesignEnergyMounting(); // derived from source?
-
+        
     private:
         double m_totalWidth;
         double m_totalHeight;
@@ -68,7 +68,7 @@ namespace RAY
         double m_incidenceMainBeamLength;
         double m_meridionalDistance;
         double m_meridionalDivergence;
-        double m_designAlphaAngle;
+        double m_designAlphaAngle; 
         double m_designBetaAngle; // what is this?
 
         double m_beta0Angle;
@@ -78,6 +78,21 @@ namespace RAY
         double m_chi;
         double m_grazingIncidenceAngle;
         double m_distanceToPreceedingElement;
+
+        enum GRATING_MOUNT  { GM_DEVIATION, GM_INCIDENCE};
+        GRATING_MOUNT m_gratingMount;
+        enum CURVATURE_TYPE { CT_PLANE, CT_TOROIDAL, CT_SPHERICAL };
+        CURVATURE_TYPE m_curvatureType;
+        enum DESIGN_TYPE { DT_ZOFFSET, DT_BETA }; // use Fresnel Center offset or use beta angle, todo
+        DESIGN_TYPE m_designType;
+        enum DERIVATION_METHOD { DM_FORMULA, DM_PLOYNOM };
+        DERIVATION_METHOD m_derivationMethod;
+        enum IMAGE_TYPE {IT_POINT2POINT, IT_ASTIGMATIC2ASTIGMATIC};
+        IMAGE_TYPE m_imageType;
+        enum RZP_TYPE {RT_ELLIPTICAL, RT_MERIODIONAL};
+        RZP_TYPE m_rzpType;
+        enum ELEMENTOFFSET_TYPE {EZ_MANUAL, EZ_BEAMDIVERGENCE};
+        ELEMENTOFFSET_TYPE m_elementOffsetType;
 
         double m_longRadius;
         double m_shortRadius;
@@ -102,11 +117,11 @@ namespace RAY
         double m_designOrderOfDiffraction;
         double m_designEnergyMounting; // derived from source?
         double m_a; // calculated from line density, order of diffracion and design energy mounting
-
-
-        enum FULL_EFFICIENCY { FE_OFF, FE_ON };
+        
+        
+        enum FULL_EFFICIENCY {FE_OFF, FE_ON};
         FULL_EFFICIENCY m_fullEfficiency; // todo
-        enum DIFFRACTION_METHOD { DM_TWOGRATINGS, DM_2D };
+        enum DIFFRACTION_METHOD {DM_TWOGRATINGS, DM_2D};
         DIFFRACTION_METHOD m_diffractionMethod; // todo
         double m_elementOffsetZ; // if given manually
         double m_elementOffsetZCalc; // if not given but has to be calculated by beam divergence
