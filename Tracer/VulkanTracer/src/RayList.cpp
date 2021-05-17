@@ -58,7 +58,7 @@ void RayList::insertVector(void* location, size_t inputSize) {
                 std::cout << &(m_rayList.back()[0]) << std::endl;
                 std::cout << &(m_rayList.back().front()) << std::endl;
                 std::cout << m_rayList.back().data() << std::endl;
-                memcpy(&(m_rayList.back()[0]), location, inputSize * RAY_DOUBLE_COUNT * sizeof(double));
+                memcpy(&(m_rayList.back()[0]), location, RAY_VECTOR_SIZE);
                 m_rayList.back().resize(RAY_MAX_ELEMENTS_IN_VECTOR);
             }
             std::cout << "test2" << std::endl;
@@ -66,7 +66,11 @@ void RayList::insertVector(void* location, size_t inputSize) {
             size_t remainingBytes = (inputSize * RAY_DOUBLE_COUNT * sizeof(double)) - (i * RAY_DOUBLE_COUNT * sizeof(double));
             std::cout << "insertVector: remainingBytes= " << remainingBytes << std::endl;
             m_rayList.back().resize(RAY_MAX_ELEMENTS_IN_VECTOR);
-            memcpy(&((m_rayList.back())[0]), (char*)location + (i * RAY_DOUBLE_COUNT * sizeof(double)), remainingBytes);
+            memcpy((m_rayList.back().data()), (char*)location + (i * RAY_DOUBLE_COUNT * sizeof(double)), remainingBytes);
+            // std::cout << "ray 16384 xpos: " << (m_rayList.back())[16384].getxPos() << std::endl;
+            // std::cout << "ray 16383 xpos: " << (m_rayList.back())[16383].getxPos() << std::endl;
+            // std::cout << "ray 16385 xpos: " << (m_rayList.back())[16385].getxPos() << std::endl;
+            // std::cout << "ray 16386 xpos: " << (m_rayList.back())[16386].getxPos() << std::endl;
             std::cout << "insertVector: memcpy done" << std::endl;
             m_rayList.back().resize(remainingBytes / (RAY_DOUBLE_COUNT * sizeof(double)));
         }
@@ -78,7 +82,7 @@ void RayList::insertVector(void* location, size_t inputSize) {
         std::cout << "bytesNeededToFillLastVector= " << bytesNeededToFillLastVector << std::endl;
         std::cout << "capacity= " << (m_rayList.back()).capacity() << std::endl;
         std::cout << "size= " << (m_rayList.back()).size() << std::endl;
-        std::cout << "inputsize= " << inputSize << std::endl;
+        std::cout << "inputSize= " << inputSize << std::endl;
         (m_rayList.back()).reserve((m_rayList.back()).size() + (bytesNeededToFillLastVector / (RAY_DOUBLE_COUNT * sizeof(double))));
         std::cout << "capacity= " << (m_rayList.back()).capacity() << std::endl;
         memcpy(&((m_rayList.back()).back()) + 1, location, bytesNeededToFillLastVector);

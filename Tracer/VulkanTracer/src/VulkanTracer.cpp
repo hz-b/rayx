@@ -588,7 +588,7 @@ void VulkanTracer::getRays() {
 	std::cout << "getRays: numberOfStagingBuffers: " << numberOfStagingBuffers << std::endl;
 
 	//TODO: ONLY FIRST STAGING BUFFER IS TRANSFERED
-	numberOfStagingBuffers = 1;
+	//numberOfStagingBuffers = 1;
 
 	for (uint32_t i = 0; i < numberOfStagingBuffers - 1; i++) {
 		copyToOutputBuffer(i, GPU_MAX_STAGING_SIZE);
@@ -613,13 +613,21 @@ void VulkanTracer::getRays() {
 	vkMapMemory(device, bufferMemories[3], 0, ((bytesNeeded - 1) % GPU_MAX_STAGING_SIZE) + 1, 0, &mappedMemory);
 	double* pMappedMemory = (double*)mappedMemory;
 	// TODO : Currently only the first 16 MB will be transfered to outputData
-	for (uint32_t j = 0; j < (((bytesNeeded - 1) % GPU_MAX_STAGING_SIZE) + 1) / (sizeof(double)); j = j + 8)
+	for (uint32_t j = 0; j < (((bytesNeeded - 1) % GPU_MAX_STAGING_SIZE) + 1) / VULKANTRACER_RAY_DOUBLE_AMOUNT; j = j + 8)
 	{
 		data.push_back(Ray(pMappedMemory[j], pMappedMemory[j + 1], pMappedMemory[j + 2], pMappedMemory[j + 6], pMappedMemory[j + 4], pMappedMemory[j + 5], pMappedMemory[j + 3]));
 	}
 	std::cout << "data size= " << data.size() << std::endl;
+	// std::cout << "pmappedmem: " << (pMappedMemory)[2097150] << std::endl;
+	// std::cout << "ray 16383 xpos: " << (data)[16383].getxPos() << std::endl;
+	// std::cout << "ray 16385 xpos: " << (data)[16385].getxPos() << std::endl;
+	// std::cout << "ray 16386 xpos: " << (data)[16386].getxPos() << std::endl;
 	outputData.insertVector(data.data(), data.size());
 	vkUnmapMemory(device, bufferMemories[3]);
+	// auto testymctestface = outputData.begin();
+	// std::cout << "ray 16384 xpos: " << (*(testymctestface))[16384].getxPos() << std::endl;
+	// std::cout << "ray 16383 xpos: " << (*(testymctestface++))[16383].getxPos() << std::endl;
+	// std::cout << "ray 16385 xpos: " << (*(testymctestface++))[16385].getxPos() << std::endl;
 	std::cout << "mapping memory done" << std::endl;
 	std::cout << "outputVectorCount: " << outputData.size() << std::endl;
 	std::cout << "output size in bytes: " << (*(outputData.begin())).size() * RAY_DOUBLE_COUNT * sizeof(double) << std::endl;

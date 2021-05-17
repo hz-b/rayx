@@ -89,14 +89,19 @@ namespace RAY
         //get rays from tracer
         auto outputRayIterator = tracer.getOutputIteratorBegin();
         // transform in to usable data
-        auto rayAmount = tracer.getRayList().rayAmount();
         auto doubleVecSize = RAY_MAX_ELEMENTS_IN_VECTOR * 8;
         std::vector<double> doubleVec(doubleVecSize);
+        bool append = false;
         for (; outputRayIterator != tracer.getOutputIteratorEnd(); outputRayIterator++) {
+            // std::cout << "ray 16384 xpos: " << (*outputRayIterator)[16384].getxPos() << std::endl;
+            // std::cout << "ray 16383 xpos: " << (*outputRayIterator)[16383].getxPos() << std::endl;
+            // std::cout << "ray 16385 xpos: " << (*outputRayIterator)[16385].getxPos() << std::endl;
+            // std::cout << "ray 16386 xpos: " << (*outputRayIterator)[16386].getxPos() << std::endl;
             std::cout << "(*outputRayIterator).size(): " << (*outputRayIterator).size() << std::endl;
             memcpy(doubleVec.data(), (*outputRayIterator).data(), (*outputRayIterator).size() * VULKANTRACER_RAY_DOUBLE_AMOUNT * sizeof(double));
             doubleVec.resize((*outputRayIterator).size() * VULKANTRACER_RAY_DOUBLE_AMOUNT);
-            writeToFile(doubleVec);
+            writeToFile(doubleVec, append);
+            append = true;
         }
         std::cout << "tracer run incl load rays time: " << float(clock() - begin_time) << " ms" << std::endl;
 
@@ -155,14 +160,19 @@ namespace RAY
     }
 
     //writes rays to file
-    void TracerInterface::writeToFile(std::vector<double> outputRays) const
+    void TracerInterface::writeToFile(std::vector<double> outputRays, bool append) const
     {
         std::cout << "writing " << outputRays.size() / 8 << " rays to file..." << std::endl;
         std::ofstream outputFile;
         outputFile.precision(17);
         std::cout.precision(17);
         std::string filename = "output.csv";
-        outputFile.open(filename);
+        if (append) {
+            outputFile.open(filename, std::ios::app);
+        }
+        else {
+            outputFile.open(filename);
+        }
         char sep = ';'; // file is saved in .csv (comma seperated value), excel compatibility is manual right now
         outputFile /*<< "Index" << sep*/ << "Xloc" << sep << "Yloc" << sep << "Zloc" << sep << "Weight" << sep << "Xdir" << sep << "Ydir" << sep << "Zdir" << sep << "Placeholder" << std::endl;
         // outputFile << "Index,Xloc,Yloc,Zloc,Weight,Xdir,Ydir,Zdir" << std::endl;
