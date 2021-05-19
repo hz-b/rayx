@@ -25,7 +25,9 @@ namespace RAY
             m_tracerInterface.run(std::stod(std::string(m_argv[1])),
                 std::stod(std::string(m_argv[2])), std::stod(std::string(m_argv[3])));
         }
-        m_tracerInterface.run(0.0, 0.0, 0.0);
+        else {
+            m_tracerInterface.run(0.0, 0.0, 0.0);
+        }
     }
 
     // void Application::run(const std::string& filename)
