@@ -30,7 +30,7 @@ namespace RAY
         void addRayVector(void* location);
 
 
-        bool run();
+        bool run(double translationXerror, double translationYerror, double translationZerror);
     private:
         std::vector<LightSource*> m_LightSources;
         Beamline& m_Beamline;

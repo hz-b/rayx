@@ -35,7 +35,8 @@ namespace RAY
         (*tracer).addRayVector(rays.data(), rays.size());
     }
 
-    bool TracerInterface::run()
+    // ! parameters are temporary and need to be removed again
+    bool TracerInterface::run(double translationXerror, double translationYerror, double translationZerror)
     {
 
         const clock_t all_begin_time = clock();
@@ -59,9 +60,9 @@ namespace RAY
 
         std::cout.precision(17);
 
-        PointSource ptSource(0, "Point Source", 2000000, 0.005, 0.005, 0, 20, 60, 0, 0, 0, 0, { 0,0,0,0 }); // TODO: widthlength, heighlength, horLength, verLength
+        PointSource ptSource(0, "Point Source", 2000000, 0.005, 0.005, 0, 20, 60, 0, 0, 0, 0, { 0,0,0,0 });
 
-        ReflectionZonePlate reflZonePlate("Reflection Zoneplate", 1, ReflectionZonePlate::CURVATURE_TYPE::CT_PLANE, 4, 60, 170, 2.2, 0, 90, 640, 640, -1, -1, 2.2, 1, 90, 400, 90, 400, 0, 0, 0, { 0,0,0,0,0,0 });
+        ReflectionZonePlate reflZonePlate("Reflection Zoneplate", 1, ReflectionZonePlate::CURVATURE_TYPE::CT_PLANE, 4, 60, 170, 2.2, 0, 90, 640, 640, -1, -1, 2.2, 1, 90, 400, 90, 400, 0, 0, 0, { translationXerror,translationYerror,translationZerror,0,0,0 });
 
         m_Beamline.addQuadric(reflZonePlate.getName(), reflZonePlate.getAnchorPoints(), reflZonePlate.getInMatrix(), reflZonePlate.getOutMatrix(), reflZonePlate.getTempMisalignmentMatrix(), reflZonePlate.getInverseTempMisalignmentMatrix(), reflZonePlate.getParameters());
 

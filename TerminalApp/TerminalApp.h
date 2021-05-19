@@ -11,8 +11,5 @@ public:
 	const std::string& getProvidedFilePath() const { return providedFile; };
 
 private:
-	int m_argc;
-	char** m_argv;
-
 	std::string providedFile;
 };
