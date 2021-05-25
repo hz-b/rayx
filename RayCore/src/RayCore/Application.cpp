@@ -21,7 +21,13 @@ namespace RAY
     void Application::run()
     {
         DEBUG(std::cout << "Application running..." << std::endl);
-        m_tracerInterface.run();
+        if (m_argc >= 4) {
+            m_tracerInterface.run(std::stod(std::string(m_argv[1])),
+                std::stod(std::string(m_argv[2])), std::stod(std::string(m_argv[3])));
+        }
+        else {
+            m_tracerInterface.run(0.0, 0.0, 0.0);
+        }
     }
 
     // void Application::run(const std::string& filename)

@@ -35,7 +35,8 @@ namespace RAY
         (*tracer).addRayVector(rays.data(), rays.size());
     }
 
-    bool TracerInterface::run()
+    // ! parameters are temporary and need to be removed again
+    bool TracerInterface::run(double translationXerror, double translationYerror, double translationZerror)
     {
 
         const clock_t all_begin_time = clock();

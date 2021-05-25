@@ -15,8 +15,13 @@ namespace RAY
 		void run();
 		/*void run(const std::string& file);*/
 
+	protected:
+		char** m_argv;
+		int m_argc;
+
 	private:
 		TracerInterface m_tracerInterface;
+
 	};
 
 } // namespace RAY
