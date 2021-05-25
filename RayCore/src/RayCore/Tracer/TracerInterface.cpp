@@ -48,7 +48,7 @@ namespace RAY
         //add source to tracer
         //initialize matrix light source with default params
         int beamlinesSimultaneously = 1;
-        int number_of_rays = 1 << 22;
+        int number_of_rays = 1 << 18;
         PointSource p = PointSource(0, "name", number_of_rays, 0.005, 0.005, 0, 20, 60, 1, 1, 0, 0, { 0,0,0,0 });
         //MatrixSource m = MatrixSource(0, "Matrix20", number_of_rays, 0.065, 0.04, 0.0, 0.001, 0.001, { 0,0,0,0 });
         //PointSource m = PointSource(0, "Point source 1", number_of_rays, 0.065, 0.04, 1.0, 0.001, 0.001, 0, 0, 0, 0, {0,0,0,0});
