@@ -1,7 +1,9 @@
 #include "VulkanTracer.h"
 #include <cmath>
-#include "GFSDK_Aftermath.h"
 
+#ifdef RAY_PLATFORM_WINDOWS
+#include "GFSDK_Aftermath.h"
+#endif
 
 
 VulkanTracer::VulkanTracer() {
