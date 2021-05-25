@@ -48,7 +48,7 @@ namespace RAY
         //add source to tracer
         //initialize matrix light source with default params
         int beamlinesSimultaneously = 1;
-        int number_of_rays = 1 << 18;
+        int number_of_rays = 1 << 17;
         PointSource p = PointSource(0, "name", number_of_rays, 0.005, 0.005, 0, 20, 60, 1, 1, 0, 0, { 0,0,0,0 });
         //MatrixSource m = MatrixSource(0, "Matrix20", number_of_rays, 0.065, 0.04, 0.0, 0.001, 0.001, { 0,0,0,0 });
         //PointSource m = PointSource(0, "Point source 1", number_of_rays, 0.065, 0.04, 1.0, 0.001, 0.001, 0, 0, 0, 0, {0,0,0,0});
@@ -98,7 +98,7 @@ namespace RAY
         // transform in to usable data
         auto doubleVecSize = RAY_MAX_ELEMENTS_IN_VECTOR * 8;
         std::vector<double> doubleVec(doubleVecSize);
-        bool append = false;
+        int index = 0;
         for (; outputRayIterator != tracer.getOutputIteratorEnd(); outputRayIterator++) {
             // std::cout << "ray 16384 xpos: " << (*outputRayIterator)[16384].getxPos() << std::endl;
             // std::cout << "ray 16383 xpos: " << (*outputRayIterator)[16383].getxPos() << std::endl;
@@ -107,8 +107,8 @@ namespace RAY
             std::cout << "(*outputRayIterator).size(): " << (*outputRayIterator).size() << std::endl;
             memcpy(doubleVec.data(), (*outputRayIterator).data(), (*outputRayIterator).size() * VULKANTRACER_RAY_DOUBLE_AMOUNT * sizeof(double));
             doubleVec.resize((*outputRayIterator).size() * VULKANTRACER_RAY_DOUBLE_AMOUNT);
-            writeToFile(doubleVec, append);
-            append = true;
+            writeToFile(doubleVec, index);
+            index = index + (*outputRayIterator).size();
         }
         std::cout << "tracer run incl load rays time: " << float(clock() - begin_time) << " ms" << std::endl;
 
@@ -167,29 +167,29 @@ namespace RAY
     }
 
     //writes rays to file
-    void TracerInterface::writeToFile(std::vector<double> outputRays, bool append) const
+    void TracerInterface::writeToFile(std::vector<double> outputRays, int index) const
     {
         std::cout << "writing " << outputRays.size() / 8 << " rays to file..." << std::endl;
         std::ofstream outputFile;
         outputFile.precision(17);
         std::cout.precision(17);
         std::string filename = "output.csv";
-        if (append) {
+        char sep = ';'; // file is saved in .csv (comma seperated value), excel compatibility is manual right now
+        if (index > 0) {
             outputFile.open(filename, std::ios::app);
         }
         else {
             outputFile.open(filename);
+            outputFile << "Index" << sep << "Xloc" << sep << "Yloc" << std::endl;
         }
-        char sep = ';'; // file is saved in .csv (comma seperated value), excel compatibility is manual right now
-        outputFile /*<< "Index" << sep*/ << "Xloc" << sep << "Yloc" << sep << "Zloc" << sep << "Weight" << sep << "Xdir" << sep << "Ydir" << sep << "Zdir" << sep << "Placeholder" << std::endl;
         // outputFile << "Index,Xloc,Yloc,Zloc,Weight,Xdir,Ydir,Zdir" << std::endl;
 
-        size_t counter = 0;
-        int print = 1;
-        for (int i = 0; i < outputRays.size(); i++) {
-            outputFile << outputRays[i] << ";";
+        for (std::vector<double>::const_iterator i = outputRays.begin(); i != outputRays.end();) {
+            if (*(i + 3) > 0)
+                outputFile << index << ";" << *i << ";" << *(i + 1) << std::endl;
             //printf("Ray position: %2.6f;%2.6f;%2.6f;%2.6f;%2.6f;%2.6f;%2.6f; \n", outputRays[i++], outputRays[i++], outputRays[i++], outputRays[i++], outputRays[i++], outputRays[i++], outputRays[i++]);
-            if ((i + 1) % 8 == 0) outputFile << std::endl;
+            i = i + 8;
+            index++;
         }
 
         std::cout << "done!" << std::endl;
