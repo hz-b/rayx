@@ -483,10 +483,10 @@ void VulkanTracer::fillStagingBuffer(uint32_t offset, std::list<std::vector<Ray>
 	void* data;
 	vkMapMemory(device, bufferMemories[3], 0, bufferSizes[3], 0, &data);
 	std::cout << "bufferSizes[3]: " << bufferSizes[3] << std::endl;
-	std::cout << "ray 16384 xpos: " << (*raySetIterator)[16384].getxPos() << std::endl;
-	std::cout << "ray 16383 xpos: " << (*raySetIterator)[16383].getxPos() << std::endl;
-	std::cout << "ray 16385 xpos: " << (*raySetIterator)[16385].getxPos() << std::endl;
-	std::cout << "ray 16386 xpos: " << (*raySetIterator)[16386].getxPos() << std::endl;
+	// std::cout << "ray 16384 xpos: " << (*raySetIterator)[16384].getxPos() << std::endl;
+	// std::cout << "ray 16383 xpos: " << (*raySetIterator)[16383].getxPos() << std::endl;
+	// std::cout << "ray 16385 xpos: " << (*raySetIterator)[16385].getxPos() << std::endl;
+	// std::cout << "ray 16386 xpos: " << (*raySetIterator)[16386].getxPos() << std::endl;
 
 	assert((*raySetIterator).size() <= GPU_MAX_STAGING_SIZE);
 	vectorsPerStagingBuffer = std::min((size_t)std::ceil(((double)(*raySetIterator).size() * VULKANTRACER_RAY_DOUBLE_AMOUNT * sizeof(double)) * rayList.size() * 4 / GPU_MAX_STAGING_SIZE), vectorsPerStagingBuffer);

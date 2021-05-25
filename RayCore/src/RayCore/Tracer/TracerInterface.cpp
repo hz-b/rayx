@@ -47,25 +47,31 @@ namespace RAY
         //add source to tracer
         //initialize matrix light source with default params
         int beamlinesSimultaneously = 1;
-        int number_of_rays = 1 << 17;
-        MatrixSource m = MatrixSource(0, "Matrix20", number_of_rays, 0.065, 0.04, 0.0, 0.001, 0.001, { 0,0,0,0 }); // source misalignment only 4 dimensional (x,y, phi, psi)
+        int number_of_rays = 1 << 22;
+        PointSource p = PointSource(0, "name", number_of_rays, 0.005, 0.005, 0, 20, 60, 1, 1, 0, 0, { 0,0,0,0 });
+        //MatrixSource m = MatrixSource(0, "Matrix20", number_of_rays, 0.065, 0.04, 0.0, 0.001, 0.001, { 0,0,0,0 });
+        //PointSource m = PointSource(0, "Point source 1", number_of_rays, 0.065, 0.04, 1.0, 0.001, 0.001, 0, 0, 0, 0, {0,0,0,0});
+        //std::cout << m.getName() << " with " << m.getNumberOfRays() << " Rays." << std::endl;std::cout.precision(15); // show 16 decimals
 
-        addLightSource(&m);
-        generateRays(&tracer, m_LightSources[0]);
+        addLightSource(&p);
+        generateRays(&tracer, &p);
 
         std::cout << "add rays to tracer done" << std::endl;
 
 
 
         std::cout.precision(17);
+        //ReflectionZonePlate p1 = ReflectionZonePlate("ReflectionZonePlate1", 1, 0, 50, 200, 170, 1, 10, 1000, 100, 100, -1, -1, 1, 1, 100, 500, 100, 500, 0, 0, 0, { 0,0,0, 0,0,0 }, NULL); // dx,dy,dz, dpsi,dphi,dchi // {1,2,3,0.001,0.002,0.003}
+        RAY::ReflectionZonePlate reflZonePlate = RAY::ReflectionZonePlate("ReflectionZonePlate", 1, 0, 4, 60, 170, 2.2, 0, 90, 640, 640, -1, -1, 2.2, 1, 90, 400, 90, 400, 0, 0, 0, { 0,0,0,0,0,0 }); // dx,dy,dz, dpsi,dphi,dchi // 
+        // plane mirror with RAY-UI default values
+        /*PlaneMirror p1 = PlaneMirror("PlaneMirror1", 50, 200, 10, 7, 10000, {0,0,0, 0,0,0}, NULL); // {1,2,3,0.01,0.02,0.03}
+        PlaneMirror p2 = PlaneMirror("PlaneMirror2", 50, 200, 15, 4, 10000, {1,2,3, 0.001,0.002,0.003}, &p1); // {1,2,3,0.01,0.02,0.03}
+        PlaneMirror p3 = PlaneMirror("PlaneMirror3", 50, 200, 7, 10, 10000, {0,0,0, 0,0,0}, &p2); // {1,2,3,0.01,0.02,0.03}
+        PlaneMirror p4 = PlaneMirror("PlaneMirror4", 50, 200, 22, 17, 10000, {0,0,0, 0,0,0}, &p3); // {1,2,3,0.01,0.02,0.03}
+        */
 
-        PointSource ptSource(0, "Point Source", 2000000, 0.005, 0.005, 0, 20, 60, 0, 0, 0, 0, { 0,0,0,0 }); // TODO: widthlength, heighlength, horLength, verLength
-
-        ReflectionZonePlate reflZonePlate("Reflection Zoneplate", 1, ReflectionZonePlate::CURVATURE_TYPE::CT_PLANE, 4, 60, 170, 2.2, 0, 90, 640, 640, -1, -1, 2.2, 1, 90, 400, 90, 400, 0, 0, 0, { 0,0,0,0,0,0 });
 
         m_Beamline.addQuadric(reflZonePlate.getName(), reflZonePlate.getAnchorPoints(), reflZonePlate.getInMatrix(), reflZonePlate.getOutMatrix(), reflZonePlate.getTempMisalignmentMatrix(), reflZonePlate.getInverseTempMisalignmentMatrix(), reflZonePlate.getParameters());
-
-
         //add beamline to tracer
         std::vector<RAY::Quadric> Quadrics = m_Beamline.getObjects();
         tracer.setBeamlineParameters(beamlinesSimultaneously, Quadrics.size(), number_of_rays * beamlinesSimultaneously);
@@ -106,12 +112,12 @@ namespace RAY
         std::cout << "tracer run incl load rays time: " << float(clock() - begin_time) << " ms" << std::endl;
 
 
+        // while (true) {
+        //     int i = 1;
+        // }
         std::cout << std::endl;
         //clean up tracer to avoid memory leaks
         tracer.cleanup();
-        /*while (true) {
-            int i = 1;
-        }*/
         return true;
     }
 
