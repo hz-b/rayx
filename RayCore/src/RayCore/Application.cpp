@@ -1,5 +1,5 @@
 #include "Application.h"
-#include "BeamLine/BeamLine.h"
+#include "Beamline/Beamline.h"
 #include "Debug.h"
 #include "Data/Exporter.h"
 

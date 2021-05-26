@@ -3,15 +3,15 @@ project(RayCore)
 
 SET(SOURCE
     src/RayCore/Application.cpp
-    src/RayCore/BeamLine/BeamLine.cpp
-    src/RayCore/BeamLine/ImagePlane.cpp
-    src/RayCore/BeamLine/LightSource.cpp
-    src/RayCore/BeamLine/MatrixSource.cpp
-    src/RayCore/BeamLine/RandomRays.cpp
-    src/RayCore/BeamLine/PointSource.cpp
-    src/RayCore/BeamLine/Ellipsoid.cpp
-    src/RayCore/BeamLine/ReflectionZonePlate.cpp
-    src/RayCore/BeamLine/Slit.cpp
+    src/RayCore/Beamline/Beamline.cpp
+    src/RayCore/Beamline/ImagePlane.cpp
+    src/RayCore/Beamline/LightSource.cpp
+    src/RayCore/Beamline/MatrixSource.cpp
+    src/RayCore/Beamline/RandomRays.cpp
+    src/RayCore/Beamline/PointSource.cpp
+    src/RayCore/Beamline/Ellipsoid.cpp
+    src/RayCore/Beamline/ReflectionZonePlate.cpp
+    src/RayCore/Beamline/Slit.cpp
     src/RayCore/Beamline/Quadric.cpp
     src/RayCore/Beamline/SphereGrating.cpp
     src/RayCore/Beamline/PlaneGrating.cpp
@@ -27,16 +27,16 @@ SET(SOURCE
 SET(HEADERS
     src/RayCore/Application.h
     src/RayCore/Debug.h
-    src/RayCore/BeamLine/BeamLine.h
-    src/RayCore/BeamLine/ImagePlane.h
-    src/RayCore/BeamLine/BeamLineObject.h
-    src/RayCore/BeamLine/LightSource.h
-    src/RayCore/BeamLine/MatrixSource.h
-    src/RayCore/BeamLine/RandomRays.h
-    src/RayCore/BeamLine/PointSource.h
-    src/RayCore/BeamLine/Ellipsoid.h
-    src/RayCore/BeamLine/ReflectionZonePlate.h
-    src/RayCore/BeamLine/Slit.h
+    src/RayCore/Beamline/Beamline.h
+    src/RayCore/Beamline/ImagePlane.h
+    src/RayCore/Beamline/BeamlineObject.h
+    src/RayCore/Beamline/LightSource.h
+    src/RayCore/Beamline/MatrixSource.h
+    src/RayCore/Beamline/RandomRays.h
+    src/RayCore/Beamline/PointSource.h
+    src/RayCore/Beamline/Ellipsoid.h
+    src/RayCore/Beamline/ReflectionZonePlate.h
+    src/RayCore/Beamline/Slit.h
     src/RayCore/Beamline/Quadric.h
     src/RayCore/Beamline/SphereGrating.h
     src/RayCore/Beamline/PlaneGrating.h

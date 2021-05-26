@@ -6,7 +6,9 @@ set(CMAKE_COLOR_MAKEFILE   ON)
 
 add_executable(${PROJECT_NAME} main.cpp TerminalApp.cpp TerminalApp.h NotInUse/InputParser.cpp NotInUse/InputParser.h)
 
-target_compile_definitions(${PROJECT_NAME} PUBLIC RAY_PLATFORM_WINDOWS)
+if (WIN32)
+    target_compile_definitions(${PROJECT_NAME} PUBLIC RAY_PLATFORM_WINDOWS)
+endif ()
 
 
 target_include_directories(${PROJECT_NAME} PRIVATE ${RayCore_SOURCE_DIR}/src)

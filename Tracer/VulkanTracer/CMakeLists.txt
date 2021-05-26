@@ -21,12 +21,14 @@ if (WIN32)
         DEPENDS ${COMPILED_SHADER}
     )
 elseif (UNIX)
-    set_property(TARGET lib1 PROPERTY POSITION_INDEPENDENT_CODE ON)
+    # set_property(TARGET ${PROJECT_NAME} PROPERTY POSITION_INDEPENDENT_CODE ON)
 endif ()
 
 find_package(Vulkan REQUIRED FATAL_ERROR)
-find_package(NsightAftermath REQUIRED FATAL_ERROR)
-get_filename_component(NsightAftermath_LIBRARY_DIR ${NsightAftermath_LIBRARY} DIRECTORY)
+if (WIN32)
+    find_package(NsightAftermath REQUIRED FATAL_ERROR)
+    get_filename_component(NsightAftermath_LIBRARY_DIR ${NsightAftermath_LIBRARY} DIRECTORY)
+endif ()
 
 add_library(${PROJECT_NAME} 
     STATIC 
@@ -51,5 +53,10 @@ target_include_directories(${PROJECT_NAME}
 
 target_link_libraries(${PROJECT_NAME}
     Vulkan::Vulkan
-    NsightAftermath::NsightAftermath
 )
+
+if (WIN32)
+    target_link_libraries(${PROJECT_NAME}
+        NsightAftermath::NsightAftermath
+    )
+endif ()
