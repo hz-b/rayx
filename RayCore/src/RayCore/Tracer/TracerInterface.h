@@ -1,31 +1,38 @@
 #pragma once
 
 #include "Beamline/Beamline.h"
-#include "Beamline/MatrixSource.h"
 #include "Core.h"
 #include "Ray.h"
+#include "VulkanTracer.h"
 
 #include <string>
 #include <vector>
+#include <set>
 
 namespace RAY
 {
     class RAY_API TracerInterface
     {
+        struct RayVector {
+            std::vector<Ray> rayVector;
+        };
     public:
-        enum m_dataType {RayType, QuadricType};
+        enum m_dataType { RayType, QuadricType };
 
         TracerInterface();
         ~TracerInterface();
         void addLightSource(LightSource* newSource);
-        void generateRays();
-        void writeToFile(std::vector<double> outputRays);
-        void readFromFile(std::string path, m_dataType dataType);
+        void generateRays(VulkanTracer* tracer, LightSource* source);
+        void writeToFile(std::list<double> outputRays) const;
+        void writeToFile(std::vector<double> outputRays, int index) const;
+        //void readFromFile(std::string path, m_dataType dataType);
+        //void addRayToRayList(Ray inputRay);
+        void addRayVector(void* location);
 
-        bool run();
+
+        bool run(double translationXerror, double translationYerror, double translationZerror);
     private:
-        std::vector<LightSource *> m_LightSources;
-        Beamline m_Beamline;
-        std::vector<Ray *> m_RayList;
+        std::vector<LightSource*> m_LightSources;
+        Beamline& m_Beamline;
     };
 } // namespace RAY

@@ -6,8 +6,8 @@ namespace RAY
 {
 
     // angles given and stored in rad
-    MatrixSource::MatrixSource(int id, std::string name, int numberOfRays, double sourceWidth, double sourceHeight, double sourceDepth, double horDivergence, double verDivergence) 
-    : LightSource(id, numberOfRays, name.c_str()), m_sourceDepth(sourceDepth), m_sourceHeight(sourceHeight), m_sourceWidth(sourceWidth), m_horDivergence(horDivergence), m_verDivergence(verDivergence) {}
+    MatrixSource::MatrixSource(int id, std::string name, int numberOfRays, double sourceWidth, double sourceHeight, double sourceDepth, double horDivergence, double verDivergence, std::vector<double> misalignment) 
+    : LightSource(id, numberOfRays, name.c_str(), misalignment), m_sourceDepth(sourceDepth), m_sourceHeight(sourceHeight), m_sourceWidth(sourceWidth), m_horDivergence(horDivergence), m_verDivergence(verDivergence) {}
 
     MatrixSource::~MatrixSource()
     {
@@ -18,40 +18,44 @@ namespace RAY
      * distributed evenly across width & height of source 
      * returns list of rays
      */
-    std::vector<Ray *> MatrixSource::getRays() {
+    std::vector<Ray> MatrixSource::getRays() {
         double lower_bound = 0;
         double upper_bound = 1;
         std::uniform_real_distribution<double> unif(lower_bound,upper_bound);
         std::default_random_engine re;
         
         int rmat = int(sqrt(this->getNumberOfRays()));
-        std::vector<Ray *> rayList;
+        std::vector<Ray> rayVector;
+        rayVector.reserve(1048576);
         std::cout << "create " << rmat << " times " << rmat << " matrix with Matrix Source..." << std::endl;
         // fill the square with rmat1xrmat1 rays
         for(int col = 0; col<rmat; col++) {
             for(int row = 0; row<rmat; row++) {
                 double rn = unif(re); // uniform random in [0,1)
-                double x = -0.5*m_sourceWidth + (m_sourceWidth/(rmat-1)) * row;
-                double y = -0.5*m_sourceHeight + (m_sourceHeight/(rmat-1)) * col;
+                double x = -0.5*m_sourceWidth + (m_sourceWidth/(rmat-1)) * row + getMisalignmentParams()[0];;
+                double y = -0.5*m_sourceHeight + (m_sourceHeight/(rmat-1)) * col + getMisalignmentParams()[1];;
                 double z = (rn - 0.5) * m_sourceDepth;
                 glm::dvec3 position = glm::dvec3(x, y, z);
                 
-                double phi = -0.5*m_horDivergence + (m_horDivergence/(rmat-1)) * row;
-                double psi = -0.5*m_verDivergence + (m_verDivergence/(rmat-1)) * col;
+                double phi = -0.5*m_horDivergence + (m_horDivergence/(rmat-1)) * row + getMisalignmentParams()[2];;
+                double psi = -0.5*m_verDivergence + (m_verDivergence/(rmat-1)) * col + getMisalignmentParams()[3];;
                 glm::dvec3 direction = getDirectionFromAngles(phi,psi);
 
-                Ray* r = new Ray(position, direction, 1.0);
-                rayList.emplace_back(r);
+                Ray r = Ray(position, direction, 1.0);
+                rayVector.push_back(r);
             }
         }
         // afterwards start from the beginning again
         for(int i = 0; i<this->getNumberOfRays()-rmat*rmat; i++) {
-            Ray* r = rayList.at(i);
-            glm::dvec3 position = glm::dvec3(r->m_position[0],r->m_position[1],r->m_position[2]);
-            glm::dvec3 direction = glm::dvec3(r->m_direction[0],r->m_direction[1],r->m_direction[2]);
-            rayList.emplace_back(new Ray(position,direction,1.0));
+            Ray r = rayVector.at(i);
+            glm::dvec3 position = glm::dvec3(r.m_position[0],r.m_position[1],r.m_position[2]);
+            glm::dvec3 direction = glm::dvec3(r.m_direction[0],r.m_direction[1],r.m_direction[2]);
+            Ray r_copy(position,direction,1.0);
+            rayVector.push_back(r_copy);
         }
-        return rayList;
+        std::cout<<&(rayVector[0])<<std::endl;
+        //rayVector.resize(1048576);
+        return rayVector;
     }
 
     double MatrixSource::getSourceDepth(){ return m_sourceDepth; }

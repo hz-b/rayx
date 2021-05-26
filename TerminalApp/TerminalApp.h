@@ -1,21 +1,15 @@
 #pragma once 
 #include "RayCore.h"
-using namespace std;
-
-
 
 class TerminalApp : public RAY::Application
 {
 public:
 	TerminalApp();
+	TerminalApp(int argc, char** argv);
 	~TerminalApp();
 
+	const std::string& getProvidedFilePath() const { return providedFile; };
+
 private:
-	// int executeCommand(char** argv);
-	// char** argumentParser(char* argv);
-
-	// int loadCMD(char** argv);
-	// int runCMD(char** argv);
-	// int exitCMD(char** argv);
-
+	std::string providedFile;
 };

@@ -1,6 +1,7 @@
 cmake_minimum_required(VERSION 3.0 FATAL_ERROR)
 
 project(VulkanTracer)
+set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 
 # OS specific
 if (WIN32)
@@ -20,18 +21,30 @@ if (WIN32)
         DEPENDS ${COMPILED_SHADER}
     )
 elseif (UNIX)
-    set_property(TARGET lib1 PROPERTY POSITION_INDEPENDENT_CODE ON)
+    # set_property(TARGET ${PROJECT_NAME} PROPERTY POSITION_INDEPENDENT_CODE ON)
 endif ()
 
 find_package(Vulkan REQUIRED FATAL_ERROR)
+if (WIN32)
+    find_package(NsightAftermath REQUIRED FATAL_ERROR)
+    get_filename_component(NsightAftermath_LIBRARY_DIR ${NsightAftermath_LIBRARY} DIRECTORY)
+endif ()
 
 add_library(${PROJECT_NAME} 
     STATIC 
         src/Ray.cpp 
         src/Ray.h 
+        src/RayList.h
+        src/RayList.cpp
         src/VulkanTracer.cpp
         src/VulkanTracer.h
 )
+
+if(MSVC)
+  target_compile_options(${PROJECT_NAME} PRIVATE /W4) # /WX
+else()
+  target_compile_options(${PROJECT_NAME} PRIVATE -Wall -Wextra -pedantic) # -Werror
+endif()
 
 target_include_directories(${PROJECT_NAME}  
     PUBLIC $ENV{VULKAN_SDK}/include
@@ -41,3 +54,9 @@ target_include_directories(${PROJECT_NAME}
 target_link_libraries(${PROJECT_NAME}
     Vulkan::Vulkan
 )
+
+if (WIN32)
+    target_link_libraries(${PROJECT_NAME}
+        NsightAftermath::NsightAftermath
+    )
+endif ()

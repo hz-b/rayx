@@ -1,4 +1,5 @@
 #include "Ray.h"
+#include <cstring>
 
 Ray::Ray(double xpos, double ypos, double zpos, double xdir, double ydir, double zdir, double w)
 {
@@ -11,7 +12,12 @@ Ray::Ray(double xpos, double ypos, double zpos, double xdir, double ydir, double
 	weight = w;
 	placeholder = 0;
 }
-Ray::~Ray(){
+//copies 64 byts of data in the following format: xloc, yloc, zloc, weight, xdir, ydir, zdir, placeholder
+Ray::Ray(double* location) {
+	memcpy(&position.x, location, 64);
+}
+Ray::Ray() {}
+Ray::~Ray() {
 
 }
 

@@ -1,3 +1,9 @@
+image: gcc
+before_script:
+  - apt-get update --yes
+  - apt-get install --yes cmake
+  - echo "Before-script successful"
+
 build-job:
   stage: build
   script:

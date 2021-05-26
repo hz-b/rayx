@@ -1,5 +1,4 @@
-#ifndef SPHEREMIRROR_H
-#define SPHEREMIRROR_H
+#pragma once
 #include "Quadric.h"
 
 namespace RAY
@@ -9,7 +8,7 @@ namespace RAY
 
     public:
         
-        SphereMirror(double width, double height, double grazingIncidence, double azimuthal, double distanceToPreceedingElement, double entranceArmLength, double exitArmLength, std::vector<double> misalignmentParams);
+        SphereMirror(const char* name, double width, double height, double grazingIncidence, double azimuthal, double distanceToPreceedingElement, double entranceArmLength, double exitArmLength, std::vector<double> misalignmentParams);
         SphereMirror();
         ~SphereMirror();
 
@@ -17,7 +16,13 @@ namespace RAY
         double getWidth();
         double getHeight();
         double getRadius();
-        
+        double getBeta();
+        double getAlpha();
+        double getChi();
+        double getDist();
+        double getEntranceArmLength();
+        double getExitArmLength();
+
     private:
         double m_totalWidth;
         double m_totalHeight;
@@ -36,4 +41,3 @@ namespace RAY
     };
 
 } // namespace RAY
-#endif

@@ -1,16 +1,16 @@
 #pragma once
 
-#ifndef BEAMLINE_H
-#define BEAMLINE_H
-
 #include "Core.h"
 #include "glm.hpp"
 #include "PlaneGrating.h"
 #include "PlaneMirror.h"
 #include "SphereGrating.h"
+#include "ImagePlane.h"
 #include "MatrixSource.h"
-// #include "PointSource.h"
+#include "Ellipsoid.h"
+#include "PointSource.h"
 #include "SphereMirror.h"
+#include "ReflectionZonePlate.h"
 #include "RandomRays.h"
 
 #include <vector>
@@ -22,19 +22,23 @@ namespace RAY
     {
 
     public:
-        Beamline();
-        ~Beamline();
+        static Beamline& get() {
+            static Beamline m_Instance;
+            return m_Instance;
+        }
 
+        ~Beamline();
         //Somehow results in wrong values. Should be fixed later
         //void addQuadric(Quadric newObject);
         
-        void addQuadric(std::vector<double> inputPoints, std::vector<double> inputInMatrix, std::vector<double> inputOutMatrix, std::vector<double> misalignmentMatrix, std::vector<double> inverseMisalignmentMatrix);
+        void addQuadric(const char* name, std::vector<double> inputPoints, std::vector<double> inputInMatrix, std::vector<double> inputOutMatrix, std::vector<double> misalignmentMatrix, std::vector<double> inverseMisalignmentMatrix, std::vector<double> parameters);
         void replaceNthObject(uint32_t index, Quadric newObject);
         std::vector<Quadric> getObjects();
 
     private:
+        Beamline();
+        Beamline(const Beamline&) = delete;
         std::vector<Quadric> m_Objects;
     };
 
 } // namespace RAY
-#endif
