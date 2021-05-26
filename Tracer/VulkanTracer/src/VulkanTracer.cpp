@@ -465,6 +465,7 @@ void VulkanTracer::fillRayBuffer() {
 		fillStagingBuffer(i, raySetIterator, vectorsPerStagingBuffer);
 		copyToRayBuffer(i, GPU_MAX_STAGING_SIZE);
 		std::cout << "Debug Info: more than 128MB of rays" << std::endl;
+		bytesNeeded = bytesNeeded - GPU_MAX_STAGING_SIZE;
 	}
 
 	std::cout << "numberOfStagingBuffers: " << numberOfStagingBuffers << ", bytesNeeded: " << bytesNeeded << std::endl;
@@ -576,7 +577,6 @@ void VulkanTracer::copyToOutputBuffer(uint32_t offset, uint32_t numberOfBytesToC
 }
 void VulkanTracer::getRays() {
 	std::cout << "m_RayList.size(): " << rayList.size() << std::endl;
-	std::vector<Ray> data;
 	//reserve enough data for all the rays
 	/*
 	std::cout << "reserving memory"  << std::endl;
@@ -591,6 +591,7 @@ void VulkanTracer::getRays() {
 	//numberOfStagingBuffers = 1;
 
 	for (uint32_t i = 0; i < numberOfStagingBuffers - 1; i++) {
+		std::vector<Ray> data;
 		copyToOutputBuffer(i, GPU_MAX_STAGING_SIZE);
 		std::cout << "Debug Info: more than 128MB of rays" << std::endl;
 		void* mappedMemory = NULL;
@@ -603,9 +604,11 @@ void VulkanTracer::getRays() {
 			data.push_back(Ray(pMappedMemory[j], pMappedMemory[j + 1], pMappedMemory[j + 2], pMappedMemory[j + 3], pMappedMemory[j + 4], pMappedMemory[j + 5], pMappedMemory[j + 6]));
 		}
 		outputData.insertVector(data.data(), data.size());
-		data.empty();
 		vkUnmapMemory(device, bufferMemories[3]);
+		bytesNeeded = bytesNeeded - GPU_MAX_STAGING_SIZE;
 	}
+	std::vector<Ray> data;
+	std::cout << "outputdata size: " << outputData.size() << std::endl;
 	std::cout << "numberOfStagingBuffers: " << numberOfStagingBuffers << ", bytesNeeded: " << bytesNeeded << std::endl;
 	copyToOutputBuffer((numberOfStagingBuffers - 1) * GPU_MAX_STAGING_SIZE, ((bytesNeeded - 1) % GPU_MAX_STAGING_SIZE) + 1);
 	void* mappedMemory = NULL;
@@ -616,6 +619,7 @@ void VulkanTracer::getRays() {
 	{
 		data.push_back(Ray(pMappedMemory[j], pMappedMemory[j + 1], pMappedMemory[j + 2], pMappedMemory[j + 6], pMappedMemory[j + 4], pMappedMemory[j + 5], pMappedMemory[j + 3]));
 	}
+	std::cout << "data size: " << data.size() << std::endl;
 	// std::cout << "data[262000]= " << data[263000].getxDir() << std::endl;
 	// std::cout << "pmappedmem: " << (pMappedMemory)[2097150] << std::endl;
 	// std::cout << "ray 16383 xpos: " << (data)[16383].getxPos() << std::endl;
