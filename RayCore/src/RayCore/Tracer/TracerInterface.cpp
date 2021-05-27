@@ -49,13 +49,13 @@ namespace RAY
         //initialize matrix light source with default params
         int beamlinesSimultaneously = 1;
         int number_of_rays = 1 << 17;
-        PointSource p = PointSource(0, "name", number_of_rays, 0.005, 0.005, 0, 20, 60, 1, 1, 0, 0, { 0,0,0,0 });
-        //MatrixSource m = MatrixSource(0, "Matrix20", number_of_rays, 0.065, 0.04, 0.0, 0.001, 0.001, { 0,0,0,0 });
+        //PointSource p = PointSource(0, "name", number_of_rays, 0.005, 0.005, 0, 20, 60, 1, 1, 0, 0, { 0,0,0,0 });
+        MatrixSource m = MatrixSource(0, "Matrix20", number_of_rays, 0.065, 0.04, 0.0, 0.001, 0.001, { 0,0,0,0 });
         //PointSource m = PointSource(0, "Point source 1", number_of_rays, 0.065, 0.04, 1.0, 0.001, 0.001, 0, 0, 0, 0, {0,0,0,0});
         //std::cout << m.getName() << " with " << m.getNumberOfRays() << " Rays." << std::endl;std::cout.precision(15); // show 16 decimals
 
-        addLightSource(&p);
-        generateRays(&tracer, &p);
+        addLightSource(&m);
+        generateRays(&tracer, &m);
 
         std::cout << "add rays to tracer done" << std::endl;
 
@@ -63,16 +63,18 @@ namespace RAY
 
         std::cout.precision(17);
         //ReflectionZonePlate p1 = ReflectionZonePlate("ReflectionZonePlate1", 1, 0, 50, 200, 170, 1, 10, 1000, 100, 100, -1, -1, 1, 1, 100, 500, 100, 500, 0, 0, 0, { 0,0,0, 0,0,0 }, NULL); // dx,dy,dz, dpsi,dphi,dchi // {1,2,3,0.001,0.002,0.003}
-        RAY::ReflectionZonePlate reflZonePlate = RAY::ReflectionZonePlate("ReflectionZonePlate", 1, 0, 4, 60, 170, 2.2, 0, 90, 640, 640, -1, -1, 2.2, 1, 90, 400, 90, 400, 0, 0, 0, { 0,0,0,0,0,0 }); // dx,dy,dz, dpsi,dphi,dchi // 
+        //RAY::ReflectionZonePlate reflZonePlate = ReflectionZonePlate("ReflectionZonePlate", 1, 0, 4, 60, 170, 2.2, 0, 90, 640, 640, -1, -1, 2.2, 1, 90, 400, 90, 400, 0, 0, 0, { 0,0,0,0,0,0 }); // dx,dy,dz, dpsi,dphi,dchi // 
         // plane mirror with RAY-UI default values
-        /*PlaneMirror p1 = PlaneMirror("PlaneMirror1", 50, 200, 10, 7, 10000, {0,0,0, 0,0,0}, NULL); // {1,2,3,0.01,0.02,0.03}
+        PlaneMirror p1 = PlaneMirror("PlaneMirror1", 50, 200, 10, 7, 10000, { 0,0,0, 0,0,0 }); // {1,2,3,0.01,0.02,0.03}
+        /*
         PlaneMirror p2 = PlaneMirror("PlaneMirror2", 50, 200, 15, 4, 10000, {1,2,3, 0.001,0.002,0.003}, &p1); // {1,2,3,0.01,0.02,0.03}
         PlaneMirror p3 = PlaneMirror("PlaneMirror3", 50, 200, 7, 10, 10000, {0,0,0, 0,0,0}, &p2); // {1,2,3,0.01,0.02,0.03}
         PlaneMirror p4 = PlaneMirror("PlaneMirror4", 50, 200, 22, 17, 10000, {0,0,0, 0,0,0}, &p3); // {1,2,3,0.01,0.02,0.03}
         */
 
 
-        m_Beamline.addQuadric(reflZonePlate.getName(), reflZonePlate.getAnchorPoints(), reflZonePlate.getInMatrix(), reflZonePlate.getOutMatrix(), reflZonePlate.getTempMisalignmentMatrix(), reflZonePlate.getInverseTempMisalignmentMatrix(), reflZonePlate.getParameters());
+        //m_Beamline.addQuadric(reflZonePlate.getName(), reflZonePlate.getAnchorPoints(), reflZonePlate.getInMatrix(), reflZonePlate.getOutMatrix(), reflZonePlate.getTempMisalignmentMatrix(), reflZonePlate.getInverseTempMisalignmentMatrix(), reflZonePlate.getParameters());
+        m_Beamline.addQuadric(p1.getName(), p1.getAnchorPoints(), p1.getInMatrix(), p1.getOutMatrix(), p1.getTempMisalignmentMatrix(), p1.getInverseTempMisalignmentMatrix(), p1.getParameters());
         //add beamline to tracer
         std::vector<RAY::Quadric> Quadrics = m_Beamline.getObjects();
         tracer.setBeamlineParameters(beamlinesSimultaneously, Quadrics.size(), number_of_rays * beamlinesSimultaneously);
@@ -169,6 +171,8 @@ namespace RAY
     //writes rays to file
     void TracerInterface::writeToFile(std::vector<double> outputRays, int index) const
     {
+        bool shortOutput = false;
+
         std::cout << "writing " << outputRays.size() / 8 << " rays to file..." << std::endl;
         std::ofstream outputFile;
         outputFile.precision(17);
@@ -180,16 +184,31 @@ namespace RAY
         }
         else {
             outputFile.open(filename);
-            outputFile << "Index" << sep << "Xloc" << sep << "Yloc" << std::endl;
+            if (shortOutput) {
+                outputFile << "Index" << sep << "Xloc" << std::endl;
+            }
+            else {
+                outputFile << "Index" << sep << "Xloc" << sep << "Yloc" << sep << "Zloc" << sep << "Weight" << sep << "Xdir" << sep << "Ydir" << sep << "Zdir" << std::endl;
+            }
         }
         // outputFile << "Index,Xloc,Yloc,Zloc,Weight,Xdir,Ydir,Zdir" << std::endl;
-
-        for (std::vector<double>::const_iterator i = outputRays.begin(); i != outputRays.end();) {
-            if (*(i + 3) > 0)
-                outputFile << index << ";" << *i << ";" << *(i + 1) << std::endl;
-            //printf("Ray position: %2.6f;%2.6f;%2.6f;%2.6f;%2.6f;%2.6f;%2.6f; \n", outputRays[i++], outputRays[i++], outputRays[i++], outputRays[i++], outputRays[i++], outputRays[i++], outputRays[i++]);
-            i = i + 8;
-            index++;
+        if (shortOutput) {
+            for (std::vector<double>::const_iterator i = outputRays.begin(); i != outputRays.end();) {
+                if (*(i + 3) > 0)
+                    outputFile << index << sep << *i << sep << *(i + 1) << std::endl;
+                //printf("Ray position: %2.6f;%2.6f;%2.6f;%2.6f;%2.6f;%2.6f;%2.6f; \n", outputRays[i++], outputRays[i++], outputRays[i++], outputRays[i++], outputRays[i++], outputRays[i++], outputRays[i++]);
+                i = i + 8;
+                index++;
+            }
+        }
+        else {
+            for (std::vector<double>::const_iterator i = outputRays.begin(); i != outputRays.end();) {
+                if (*(i + 3) > 0)
+                    outputFile << index << sep << *i << sep << *(i + 1) << sep << *(i + 2) << sep << *(i + 3) << sep << *(i + 4) << sep << *(i + 5) << sep << *(i + 6) << std::endl;
+                //printf("Ray position: %2.6f;%2.6f;%2.6f;%2.6f;%2.6f;%2.6f;%2.6f; \n", outputRays[i++], outputRays[i++], outputRays[i++], outputRays[i++], outputRays[i++], outputRays[i++], outputRays[i++]);
+                i = i + 8;
+                index++;
+            }
         }
 
         std::cout << "done!" << std::endl;
