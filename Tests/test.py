@@ -144,7 +144,7 @@ class Tests(unittest.TestCase):
         result = open_new_file('pointSourceHE.csv')
         self.assertTrue(correct.shape == result.shape)
         self.assertTrue(np.isclose(np.mean(correct[5]), np.mean(result[5])))
-        plot_comparison('Hard Edge', result, correct)
+        #plot_comparison('Hard Edge', result, correct)
 
     def test_pointSourceSoftEdge(self):
         correct = open_old_file(
@@ -152,7 +152,7 @@ class Tests(unittest.TestCase):
         result = open_new_file('pointSourceSE.csv')
         self.assertTrue(correct.shape == result.shape)
         self.assertTrue(np.isclose(np.mean(correct[5]), np.mean(result[5])))
-        plot_comparison('Soft Edge', result, correct)
+        #plot_comparison('Soft Edge', result, correct)
 
     def test_pointSourceSoftEdgeMis(self):
         correct = open_old_file(
@@ -160,7 +160,7 @@ class Tests(unittest.TestCase):
         result = open_new_file('pointSourceSE_mis.csv')
         self.assertTrue(correct.shape == result.shape)
         self.assertTrue(np.isclose(np.mean(correct[5]), np.mean(result[5])))
-        plot_comparison('Soft Edge Mis', result, correct)
+        #plot_comparison('Soft Edge Mis', result, correct)
 
     def test_pointSourceHardEdgeMis(self):
         correct = open_old_file(
@@ -168,8 +168,16 @@ class Tests(unittest.TestCase):
         result = open_new_file('pointSourceHE_mis.csv')
         self.assertTrue(correct.shape == result.shape)
         self.assertTrue(np.isclose(np.mean(correct[5]), np.mean(result[5])))
-        plot_comparison('Hard Edge Mis', result, correct)
-
+        #plot_comparison('Hard Edge Mis', result, correct)
+    
+    def test_matrixSource20000(self):
+        correct = open_old_file(
+            'Matrix Source-RawRaysBeam_20000.csv', 'Matrix Source_')
+        result = open_new_file('matrixsource20000.csv')
+        self.assertTrue(correct.shape == result.shape)
+        self.assertTrue(np.isclose(np.mean(correct[5]), np.mean(result[5])))
+        #plot_comparison('Hard Edge Mis', result, correct)
+    
     """
     def test_globalCoord_9rays(self):
         correct = open_old_file('Plane Mirror 3-RawRaysOutgoing_9rays.csv', 'Plane Mirror 3_')
