@@ -132,6 +132,25 @@ TEST (PointSource, testParams) {
     EXPECT_EQ (rays.size(), number_of_rays);
 }
 
+TEST (LightSource, MatrixSource) {
+    int number_of_rays = 1 << 17;
+    RAY::MatrixSource p = RAY::MatrixSource(0, "Matrix20", number_of_rays, 0.065, 0.04, 0.0, 0.001, 0.001, { 0,0,0,0 });
+            
+    std::vector<RAY::Ray> rays = p.getRays();
+    std::list<double> rayList;
+    for (RAY::Ray r : rays) {
+        rayList.push_back(r.m_position.x);
+        rayList.push_back(r.m_position.y);
+        rayList.push_back(r.m_position.z);
+        rayList.push_back(r.m_weight);
+        rayList.push_back(r.m_direction.x);
+        rayList.push_back(r.m_direction.y);
+        rayList.push_back(r.m_direction.z);
+        rayList.push_back(100); // placeholder
+    }
+    std::cout << rayList.size() << std::endl;
+    writeRaysToFile(rayList, "MatrixSource");
+}
 
 TEST (LightSource, PointSourceHardEdge) {
     int number_of_rays = 10000;

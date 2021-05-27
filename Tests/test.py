@@ -17,10 +17,13 @@ RAY_REWORKED = p_join(path, 'output')
 print(RAY_REWORKED)
 
 # where the results from old ray are
-RAY_UI = os.path.split(os.path.split(path)[0])[0]
-RAY_UI = p_join(RAY_UI, 'python')
-RAY_UI = p_join(RAY_UI, 'test_output')
+#RAY_UI = os.path.split(os.path.split(path)[0])[0]
+#RAY_UI = p_join(RAY_UI, 'python')
+#RAY_UI = p_join(RAY_UI, 'test_output')
+#RAY_UI = p_join(RAY_UI, 'unittestData')
+RAY_UI = p_join(RAY_REWORKED, 'oldray_files')
 RAY_UI = p_join(RAY_UI, 'unittestData')
+
 scatterplot_size = 0.5
 
 def open_new_file(name, valid = 0):
@@ -66,7 +69,7 @@ def plot_comparison(name, result, correct):
     
 
 class Tests(unittest.TestCase):
-    
+    """
     def test_planeMirrorDefault(self):
         correct = open_old_file('Plane Mirror-RawRaysBeam_default.csv', 'Plane Mirror_')
         result = open_new_file('testFile_PlaneMirrorDef.csv')
@@ -102,7 +105,7 @@ class Tests(unittest.TestCase):
         result = open_new_file('testFile_PlaneGratingIncAzMis.csv')
         self.assertTrue(np.allclose(correct, result))
         
-    """
+    
     def test_planeGratingVLSnoMIS(self):
         correct = open_old_file('Plane Grating_default_azimuthal.csv', 'Plane Grating_')
         result = open_new_file('output.csv')
@@ -128,7 +131,7 @@ class Tests(unittest.TestCase):
         correct = open_old_file('Reflection Zoneplate-RawRaysBeam_mis200_s.csv', 'Reflection Zoneplate_')
         result = open_new_file('testFile_ReflectionZonePlateMis.csv', valid=1)
         self.assertTrue(np.allclose(correct, result))
-        
+    """
     def test_pointSourceHardEdge(self):
         correct = open_old_file('Point Source-RawRaysBeam_HE_s.csv', 'Point Source_')
         result = open_new_file('pointSourceHE.csv')
@@ -167,7 +170,7 @@ class Tests(unittest.TestCase):
         correct = open_old_file('Plane Mirror 3-RawRaysOutgoing_20Rays_mis.csv', 'Plane Mirror 3_')
         result = open_new_file('output.csv', valid=1)
         self.assertTrue(np.allclose(correct, result))
-        
+    """
     
 if __name__ == '__main__':
     unittest.main()
