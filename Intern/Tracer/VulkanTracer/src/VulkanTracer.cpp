@@ -619,7 +619,7 @@ void VulkanTracer::getRays() {
 	double* pMappedMemory = (double*)mappedMemory;
 	for (uint32_t j = 0; j < (((bytesNeeded - 1) % GPU_MAX_STAGING_SIZE) + 1) / VULKANTRACER_RAY_DOUBLE_AMOUNT; j = j + 8)
 	{
-		data.push_back(Ray(pMappedMemory[j], pMappedMemory[j + 1], pMappedMemory[j + 2], pMappedMemory[j + 6], pMappedMemory[j + 4], pMappedMemory[j + 5], pMappedMemory[j + 3]));
+		data.push_back(Ray(pMappedMemory[j], pMappedMemory[j + 1], pMappedMemory[j + 2], pMappedMemory[j + 3], pMappedMemory[j + 4], pMappedMemory[j + 5], pMappedMemory[j + 6]));
 	}
 	std::cout << "data size: " << data.size() << std::endl;
 	// std::cout << "data[262000]= " << data[263000].getxDir() << std::endl;
