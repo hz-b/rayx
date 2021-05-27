@@ -102,17 +102,29 @@ namespace RAY
         auto doubleVecSize = RAY_MAX_ELEMENTS_IN_VECTOR * 8;
         std::vector<double> doubleVec(doubleVecSize);
         int index = 0;
+
+        //auto myfile = std::fstream("file.csv", std::ios::out | std::ios::binary);
+
         for (; outputRayIterator != tracer.getOutputIteratorEnd(); outputRayIterator++) {
             // std::cout << "ray 16384 xpos: " << (*outputRayIterator)[16384].getxPos() << std::endl;
             // std::cout << "ray 16383 xpos: " << (*outputRayIterator)[16383].getxPos() << std::endl;
             // std::cout << "ray 16385 xpos: " << (*outputRayIterator)[16385].getxPos() << std::endl;
             // std::cout << "ray 16386 xpos: " << (*outputRayIterator)[16386].getxPos() << std::endl;
+
+
             std::cout << "(*outputRayIterator).size(): " << (*outputRayIterator).size() << std::endl;
             memcpy(doubleVec.data(), (*outputRayIterator).data(), (*outputRayIterator).size() * VULKANTRACER_RAY_DOUBLE_AMOUNT * sizeof(double));
             doubleVec.resize((*outputRayIterator).size() * VULKANTRACER_RAY_DOUBLE_AMOUNT);
             writeToFile(doubleVec, index);
             index = index + (*outputRayIterator).size();
+
+            /*std::cout << "(*outputRayIterator).size(): " << (*outputRayIterator).size() << std::endl;
+            memcpy(doubleVec.data(), (*outputRayIterator).data(), (*outputRayIterator).size() * VULKANTRACER_RAY_DOUBLE_AMOUNT * sizeof(double));
+            doubleVec.resize((*outputRayIterator).size() * VULKANTRACER_RAY_DOUBLE_AMOUNT);
+            writeToFile(doubleVec, myfile);*/
+
         }
+        //myfile.close();
         std::cout << "tracer run incl load rays time: " << float(clock() - begin_time) << " ms" << std::endl;
 
 
@@ -131,7 +143,6 @@ namespace RAY
         std::cout << "writing to file..." << std::endl;
         std::ofstream outputFile;
         outputFile.precision(17);
-        std::cout.precision(17);
         std::string filename = "../../output/output.csv";
         outputFile.open(filename);
         char sep = ';'; // file is saved in .csv (comma seperated value), excel compatibility is manual right now
@@ -169,15 +180,21 @@ namespace RAY
         std::cout << "done!" << std::endl;
     }
 
+    void TracerInterface::writeToFile(const std::vector<double>& outputRays, std::fstream& file) const
+    {
+        file.write((char*)&outputRays[0], outputRays.size() * sizeof(double));
+    }
+
     //writes rays to file
-    void TracerInterface::writeToFile(std::vector<double> outputRays, int index) const
+    void TracerInterface::writeToFile(const std::vector<double>& outputRays, int index) const
     {
         bool shortOutput = false; // TODO
+
+        size_t size = outputRays.size();
 
         DEBUG(std::cout << "writing " << outputRays.size() / 8 << " rays to file..." << std::endl);
         std::ofstream outputFile;
         outputFile.precision(17);
-        std::cout.precision(17);
         std::string filename = "output.csv";
         char sep = ';'; // file is saved in .csv (comma seperated value), excel compatibility is manual right now
         if (index > 0) {
@@ -186,28 +203,28 @@ namespace RAY
         else {
             outputFile.open(filename);
             if (shortOutput) {
-                outputFile << "Index" << sep << "Xloc" << sep << "Yloc" << std::endl;
+                outputFile << "Index;Xloc;Yloc\n";
             }
             else {
-                outputFile << "Index" << sep << "Xloc" << sep << "Yloc" << sep << "Zloc" << sep << "Weight" << sep << "Xdir" << sep << "Ydir" << sep << "Zdir" << std::endl;
+                outputFile << "Index;Xloc;Yloc;Zloc;Weight;Xdir;Ydir;Zdir\n";
             }
         }
         // outputFile << "Index,Xloc,Yloc,Zloc,Weight,Xdir,Ydir,Zdir" << std::endl;
         if (shortOutput) {
-            for (std::vector<double>::const_iterator i = outputRays.begin(); i != outputRays.end();) {
-                if (*(i + 3) > 0)
-                    outputFile << index << sep << *i << sep << *(i + 1) << std::endl;
-                //printf("Ray position: %2.6f;%2.6f;%2.6f;%2.6f;%2.6f;%2.6f;%2.6f; \n", outputRays[i++], outputRays[i++], outputRays[i++], outputRays[i++], outputRays[i++], outputRays[i++], outputRays[i++]);
-                i = i + 8;
+            char buff[64];
+            for (size_t i = 0; i < size;) {
+                sprintf_s(buff, "%d;%.17f;%.17f\n", index, outputRays[i++], outputRays[i++]);
+                outputFile << buff;
                 index++;
             }
         }
         else {
-            for (std::vector<double>::const_iterator i = outputRays.begin(); i != outputRays.end();) {
-                if (*(i + 3) > 0)
-                    outputFile << std::setprecision(17) << std::fixed << index << sep << *(i++) << sep << *(i++) << sep << *(i++) << sep << *(i++) << sep << *(i++) << sep << *(i++) << sep << *(i++) << std::endl;
-                //printf("Ray position: %2.6f;%2.6f;%2.6f;%2.6f;%2.6f;%2.6f;%2.6f; \n", outputRays[i++], outputRays[i++], outputRays[i++], outputRays[i++], outputRays[i++], outputRays[i++], outputRays[i++]);
-                i++;
+            char buff[256];
+            for (size_t i = 0; i < size;) {
+                sprintf_s(buff, "%d;%.17f;%.17f;%.17f;%.17f;%.17f;%.17f;%.17f\n", index,
+                    outputRays[i++], outputRays[i++], outputRays[i++], outputRays[i++],
+                    outputRays[i++], outputRays[i++], outputRays[i++], outputRays[i++]);
+                outputFile << buff;
                 index++;
             }
         }
