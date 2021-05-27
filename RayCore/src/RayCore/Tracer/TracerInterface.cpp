@@ -185,7 +185,7 @@ namespace RAY
         else {
             outputFile.open(filename);
             if (shortOutput) {
-                outputFile << "Index" << sep << "Xloc" << std::endl;
+                outputFile << "Index" << sep << "Xloc" << sep << "Yloc" << std::endl;
             }
             else {
                 outputFile << "Index" << sep << "Xloc" << sep << "Yloc" << sep << "Zloc" << sep << "Weight" << sep << "Xdir" << sep << "Ydir" << sep << "Zdir" << std::endl;
