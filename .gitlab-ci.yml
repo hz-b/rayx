@@ -5,15 +5,15 @@ before_script:
   - echo "Before-script successful"
 
 build-job:
-  mkdir build && cd build
-  cmake ..
-  cmake --build .
   stage: build
   script:
-    - echo "Hello, $GITLAB_USER_LOGIN!"
+    - mkdir build && cd build
+    - cmake ..
+    - cmake --build .
+    - echo "Build completed without errors" # TODO: respect output of cmake
 
 test-job1:
-  #ctest .
+  #- ctest .
   stage: test
   script:
     - echo "This job tests something"
