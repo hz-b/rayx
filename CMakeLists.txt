@@ -16,4 +16,6 @@ project(RayReworked)
 
 add_subdirectory(Tracer)
 add_subdirectory(RayCore)
+add_subdirectory(Tests)
 add_subdirectory(TerminalApp)
+add_subdirectory(googletest)
