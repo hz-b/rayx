@@ -1,4 +1,5 @@
 #include "TerminalApp.h"
+#include "Debug.h"
 
 TerminalApp::TerminalApp()
 {
@@ -20,4 +21,5 @@ TerminalApp::TerminalApp(int argc, char** argv)
 
 TerminalApp::~TerminalApp()
 {
+    DEBUG(std::cout << "TerminalApp deleted!" << std::endl);
 }

@@ -174,7 +174,7 @@ namespace RAY
     {
         bool shortOutput = false; // TODO
 
-        std::cout << "writing " << outputRays.size() / 8 << " rays to file..." << std::endl;
+        DEBUG(std::cout << "writing " << outputRays.size() / 8 << " rays to file..." << std::endl);
         std::ofstream outputFile;
         outputFile.precision(17);
         std::cout.precision(17);
@@ -212,7 +212,7 @@ namespace RAY
             }
         }
 
-        std::cout << "done!" << std::endl;
+        DEBUG(std::cout << "done!" << std::endl);
     }
 
     //reads from file. datatype (RayType, QuadricType) needs to be set

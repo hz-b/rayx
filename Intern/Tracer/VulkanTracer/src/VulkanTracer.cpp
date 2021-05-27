@@ -499,7 +499,6 @@ void VulkanTracer::fillStagingBuffer(uint32_t offset, std::list<std::vector<Ray>
 		std::cout << "size: " << std::min((*raySetIterator).size() * VULKANTRACER_RAY_DOUBLE_AMOUNT * sizeof(double), (size_t)GPU_MAX_STAGING_SIZE) << std::endl;
 
 		memcpy(((char*)data) + i * RAY_VECTOR_SIZE, (*raySetIterator).data(), std::min((*raySetIterator).size() * VULKANTRACER_RAY_DOUBLE_AMOUNT * sizeof(double), (size_t)GPU_MAX_STAGING_SIZE));
-		std::cout << "huh2" << std::endl;
 		raySetIterator++;
 	}
 	double* temp = (double*)data;
@@ -955,7 +954,7 @@ void VulkanTracer::setBeamlineParameters(uint32_t inNumberOfBeamlines, uint32_t 
 
 void VulkanTracer::addRayVector(void* location, size_t size) {
 	//std::vector<Ray> newRayVector;
-	std::cout << "1" << std::endl;
+	//std::cout << "1" << std::endl;
 	//newRayVector.resize(size);
 	//std::cout << "2" << std::endl;
 	//std::cout << "addRayVector: size= " << size << std::endl;
