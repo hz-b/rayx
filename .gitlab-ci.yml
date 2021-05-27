@@ -1,8 +1,15 @@
 image: gcc
 before_script:
+  # install cmake
   - apt-get update --yes
   - apt-get install --yes cmake
-  - echo "Before-script successful"
+  - echo "CMake installation ended"
+  # install vulkan
+  - wget -qO - https://packages.lunarg.com/lunarg-signing-key-pub.asc | sudo apt-key add -
+  - sudo wget -qO /etc/apt/sources.list.d/lunarg-vulkan-1.2.176-focal.list https://packages.lunarg.com/vulkan/1.2.176/lunarg-vulkan-1.2.176-focal.list
+  - sudo apt update
+  - sudo apt install vulkan-sdk
+  - echo "Vulkan installation ended"
 
 build-job:
   stage: build
@@ -10,7 +17,7 @@ build-job:
     - mkdir build && cd build
     - cmake ..
     - cmake --build .
-    - echo "Build completed without errors" # TODO: respect output of cmake
+    - echo "Build done" # TODO: respect output of cmake
 
 test-job1:
   #- ctest .
