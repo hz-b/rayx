@@ -4,10 +4,11 @@
 #include "Debug.h"
 #include "TracerInterface.h"
 
-#include <fstream>
 #include <chrono>
-#include <sstream>
 #include <cmath>
+#include <fstream>
+#include <iomanip> 
+#include <sstream>
 
 namespace RAY
 {
@@ -171,7 +172,7 @@ namespace RAY
     //writes rays to file
     void TracerInterface::writeToFile(std::vector<double> outputRays, int index) const
     {
-        bool shortOutput = false;
+        bool shortOutput = false; // TODO
 
         std::cout << "writing " << outputRays.size() / 8 << " rays to file..." << std::endl;
         std::ofstream outputFile;
@@ -204,9 +205,9 @@ namespace RAY
         else {
             for (std::vector<double>::const_iterator i = outputRays.begin(); i != outputRays.end();) {
                 if (*(i + 3) > 0)
-                    outputFile << index << sep << *i << sep << *(i + 1) << sep << *(i + 2) << sep << *(i + 3) << sep << *(i + 4) << sep << *(i + 5) << sep << *(i + 6) << std::endl;
+                    outputFile << std::setprecision(17) << std::fixed << index << sep << *(i++) << sep << *(i++) << sep << *(i++) << sep << *(i++) << sep << *(i++) << sep << *(i++) << sep << *(i++) << std::endl;
                 //printf("Ray position: %2.6f;%2.6f;%2.6f;%2.6f;%2.6f;%2.6f;%2.6f; \n", outputRays[i++], outputRays[i++], outputRays[i++], outputRays[i++], outputRays[i++], outputRays[i++], outputRays[i++]);
-                i = i + 8;
+                i++;
                 index++;
             }
         }
