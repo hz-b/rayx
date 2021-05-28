@@ -599,10 +599,9 @@ void VulkanTracer::getRays() {
 		// Map the buffer memory, so that we can read from it on the CPU.
 		vkMapMemory(device, bufferMemories[3], 0, GPU_MAX_STAGING_SIZE, 0, &mappedMemory);
 		double* pMappedMemory = (double*)mappedMemory;
-		// TODO : Currently only the first 16 MB will be transfered to outputData
 		for (uint32_t j = 0; j < GPU_MAX_STAGING_SIZE / RAY_DOUBLE_COUNT; j = j + RAY_DOUBLE_COUNT)
 		{
-			data.push_back(Ray(pMappedMemory[j], pMappedMemory[j + 1], pMappedMemory[j + 2], pMappedMemory[j + 3], pMappedMemory[j + 4], pMappedMemory[j + 5], pMappedMemory[j + 6]));
+			data.push_back(Ray(pMappedMemory[j], pMappedMemory[j + 1], pMappedMemory[j + 2], pMappedMemory[j + 4], pMappedMemory[j + 5], pMappedMemory[j + 6], pMappedMemory[j + 3]));
 		}
 		outputData.insertVector(data.data(), data.size());
 		vkUnmapMemory(device, bufferMemories[3]);
@@ -618,9 +617,9 @@ void VulkanTracer::getRays() {
 	double* pMappedMemory = (double*)mappedMemory;
 	for (uint32_t j = 0; j < (((bytesNeeded - 1) % GPU_MAX_STAGING_SIZE) + 1) / VULKANTRACER_RAY_DOUBLE_AMOUNT; j = j + 8)
 	{
-		data.push_back(Ray(pMappedMemory[j], pMappedMemory[j + 1], pMappedMemory[j + 2], pMappedMemory[j + 3], pMappedMemory[j + 4], pMappedMemory[j + 5], pMappedMemory[j + 6]));
+		data.push_back(Ray(pMappedMemory[j], pMappedMemory[j + 1], pMappedMemory[j + 2], pMappedMemory[j + 4], pMappedMemory[j + 5], pMappedMemory[j + 6], pMappedMemory[j + 3]));
 	}
-	std::cout << "data size: " << data.size() << std::endl;
+	std::cout << "sample ray: " << pMappedMemory[0] << ", " << pMappedMemory[1] << ", " << pMappedMemory[2] << ", " << pMappedMemory[3] << ", " << pMappedMemory[4] << ", " << pMappedMemory[5] << ", " << pMappedMemory[6] << ", " << pMappedMemory[7] << ", " << std::endl;
 	// std::cout << "data[262000]= " << data[263000].getxDir() << std::endl;
 	// std::cout << "pmappedmem: " << (pMappedMemory)[2097150] << std::endl;
 	// std::cout << "ray 16383 xpos: " << (data)[16383].getxPos() << std::endl;
@@ -628,6 +627,7 @@ void VulkanTracer::getRays() {
 	// std::cout << "ray 16386 xpos: " << (data)[16386].getxPos() << std::endl;
 	outputData.insertVector(data.data(), data.size());
 	vkUnmapMemory(device, bufferMemories[3]);
+	std::cout << "sample ray: " << ((*(outputData.begin()))[0]).getxPos() << ", " << ((*(outputData.begin()))[0]).getyPos() << ", " << ((*(outputData.begin()))[0]).getzPos() << ", " << ((*(outputData.begin()))[0]).getWeight() << ", " << ((*(outputData.begin()))[0]).getxDir() << ", " << ((*(outputData.begin()))[0]).getyDir() << ", " << ((*(outputData.begin()))[0]).getzDir() << std::endl;
 	// auto testymctestface = outputData.begin();
 	// std::cout << "ray 16384 xpos: " << (*(testymctestface))[16384].getxPos() << std::endl;
 	// std::cout << "ray 16383 xpos: " << (*(testymctestface++))[16383].getxPos() << std::endl;
@@ -648,6 +648,11 @@ void VulkanTracer::fillQuadricBuffer()
 	std::cout << "map memory done" << std::endl;
 	std::cout << "number of quadrics: " << beamline.size() / VULKANTRACER_QUADRIC_DOUBLE_AMOUNT << std::endl;
 	std::cout << "size of quadric buffer: " << bufferSizes[2] << std::endl;
+	std::cout << "sample quadric: ";
+	for (auto i = beamline.begin();i != beamline.end();i++) {
+		std::cout << *i << ", ";
+	}
+	std::cout << std::endl;
 	memcpy(data, beamline.data(), bufferSizes[2]);
 	std::cout << "memory copy done" << std::endl;
 	vkUnmapMemory(device, bufferMemories[2]);
