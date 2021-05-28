@@ -31,6 +31,10 @@ layout(std140, binding = 1) buffer obuf
 };
 layout(std140, binding = 2) buffer qbuf
 {
+	double numberOfBeamlines;
+	double numberOfQuadricsPerBeamline;
+	double numberOfRays;
+	double numberOfRaysPerBeamLine;
 	Quadric quadricData[];
 };
 
@@ -1705,8 +1709,8 @@ the image plane is always parallel to x-y-plane of ray coordinate system in whic
 Ray traceImagePlane(Ray r, Quadric q) {
 	double dist = q.parameters[0][0];
 	double offset = dist - r.position.z; // length between ray origin (intersection point of previous element) and image plane
-	r.position.x = r.position.x + r.direction.x / r.direction.z * offset; // scale x-slope of ray (l/n) by z-length between origin and image plane
-	r.position.y = r.position.y + r.direction.y / r.direction.z * offset;
+	r.position.x = r.position.x + ((r.direction.x / r.direction.z) * offset); // scale x-slope of ray (l/n) by z-length between origin and image plane
+	r.position.y = r.position.y + ((r.direction.y / r.direction.z) * offset);
 	r.position.z = 0;
 	return r;
 }
@@ -1742,11 +1746,12 @@ void iterateQuadrics(){
 	const int numberOfQuadrics = quadricData.length();
 	double type;
 	
-	/*dmat4 ap = quadricData[numberOfQuadrics-1].anchorPoints;
-	rayData[uint(gl_GlobalInvocationID)].position = dvec3(ap[1][0], ap[2][0], ap[3][0]);
-	rayData[uint(gl_GlobalInvocationID)].weight = ap[0][0];
-	rayData[uint(gl_GlobalInvocationID)].direction = dvec4(ap[0][1], ap[0][2], ap[0][3], ap[1][1]);*/
-
+    /*
+	dmat4 ap = quadricData[numberOfQuadrics-1].anchorPoints;
+	outputData[uint(gl_GlobalInvocationID)].position = dvec3(ap[1][0], ap[2][0], ap[3][0]);
+	outputData[uint(gl_GlobalInvocationID)].weight = quadricData[numberOfQuadrics-1].parameters[0][0];
+	outputData[uint(gl_GlobalInvocationID)].direction = dvec4(ap[0][1], ap[0][2], ap[0][3], ap[1][1]);
+	*/
 	if(numberOfQuadrics == 1){
 		//outputData[uint(gl_GlobalInvocationID)] = rayData[uint(gl_GlobalInvocationID)];
 		//return;
@@ -1814,6 +1819,7 @@ void iterateQuadrics(){
 			outputData[uint(gl_GlobalInvocationID)] = rayData[uint(gl_GlobalInvocationID)];
 		}
 	}
+	
 
 }
 
@@ -2024,8 +2030,10 @@ void main(){
     outputData[uint(gl_GlobalInvocationID)] =  r;
     */
     // outputData[uint(gl_GlobalInvocationID)] = iterateQuadrics(rayData[uint(gl_GlobalInvocationID)]);
-    // outputData[uint(gl_GlobalInvocationID)] = rayData[uint(gl_GlobalInvocationID)];
-    //outputData[uint(gl_GlobalInvocationID)].position = rayData[uint(gl_GlobalInvocationID)].position;
+    //outputData[uint(gl_GlobalInvocationID)] = rayData[uint(gl_GlobalInvocationID)];
+    //outputData[uint(gl_GlobalInvocationID)].position = dvec3(117.0, 225.0,534.0);
+    //outputData[uint(gl_GlobalInvocationID)].direction = dvec4(1887.0, 2285.0,5394.0, 876.0);
+    //[uint(gl_GlobalInvocationID)].weight = 1337.0;
     //outputData[uint(gl_GlobalInvocationID)].direction = rayData[uint(gl_GlobalInvocationID)].direction;
     //outputData[uint(gl_GlobalInvocationID)].weight = rayData[uint(gl_GlobalInvocationID)].weight; // starts at (0,20,-20)
     // outputData[uint(gl_GlobalInvocationID)].direction = dvec4(0.0, 0.0, 0.0, 0.0); // hits the surface in 45 degree angle at (0,0,0) -> the normal should be (0,-1,0)
