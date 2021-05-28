@@ -81,6 +81,8 @@ target_include_directories(${PROJECT_NAME}
     PUBLIC ${RayCore_SOURCE_DIR}/vendor/rapidxml-1.13/
 )
 
+add_dependencies(${PROJECT_NAME} COMPILE_SHADER)
+
 
 # set_target_properties(${PROJECT_NAME} PROPERTIES
 #                       RUNTIME_OUTPUT_DIRECTORY ${TerminalApp_BINARY_DIR}
