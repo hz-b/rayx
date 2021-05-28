@@ -194,7 +194,7 @@ namespace RAY
         if (SHORTOUTPUT) {
             char buff[64];
             for (size_t i = 0; i < size; i = i + 8) {
-                sprintf_s(buff, "%d;%.17f;%.17f\n", index, outputRays[i], outputRays[i + 1]);
+                sprintf(buff, "%d;%.17f;%.17f\n", index, outputRays[i], outputRays[i + 1]);
                 file << buff;
                 index++;
             }
@@ -202,7 +202,7 @@ namespace RAY
         else {
             char buff[256];
             for (size_t i = 0; i < size;) {
-                sprintf_s(buff, "%d;%.17f;%.17f;%.17f;%.17f;%.17f;%.17f;%.17f\n", index,
+                sprintf(buff, "%d;%.17f;%.17f;%.17f;%.17f;%.17f;%.17f;%.17f\n", index,
                     outputRays[i++], outputRays[i++], outputRays[i++], outputRays[i++],
                     outputRays[i++], outputRays[i++], outputRays[i++], outputRays[i++]);
                 file << buff;
