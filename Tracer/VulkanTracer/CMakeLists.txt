@@ -25,8 +25,8 @@ elseif (UNIX)
 endif ()
 
 find_package(Vulkan REQUIRED FATAL_ERROR)
-find_package(NsightAftermath REQUIRED FATAL_ERROR)
-get_filename_component(NsightAftermath_LIBRARY_DIR ${NsightAftermath_LIBRARY} DIRECTORY)
+#find_package(NsightAftermath REQUIRED FATAL_ERROR)
+#get_filename_component(NsightAftermath_LIBRARY_DIR ${NsightAftermath_LIBRARY} DIRECTORY)
 
 add_library(${PROJECT_NAME} 
     STATIC 
@@ -51,5 +51,5 @@ target_include_directories(${PROJECT_NAME}
 
 target_link_libraries(${PROJECT_NAME}
     Vulkan::Vulkan
-    NsightAftermath::NsightAftermath
+    #NsightAftermath::NsightAftermath
 )

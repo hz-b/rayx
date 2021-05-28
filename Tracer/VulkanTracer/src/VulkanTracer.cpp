@@ -1,6 +1,6 @@
 #include "VulkanTracer.h"
 #include <cmath>
-#include "GFSDK_Aftermath.h"
+//#include "GFSDK_Aftermath.h"
 
 
 
