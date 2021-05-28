@@ -32,6 +32,7 @@ namespace RAY
         if (!tracer) return;
         if (!source) return;
         std::vector<RAY::Ray> rays = (*source).getRays();
+        std::cout << "add rays" << std::endl;
         (*tracer).addRayVector(rays.data(), rays.size());
     }
     /*
@@ -91,7 +92,6 @@ namespace RAY
         PlaneMirror p3 = PlaneMirror("PlaneMirror3", 50, 200, 7, 10, 10000, {0,0,0, 0,0,0}, &p2); // {1,2,3,0.01,0.02,0.03}
         PlaneMirror p4 = PlaneMirror("PlaneMirror4", 50, 200, 22, 17, 10000, {0,0,0, 0,0,0}, &p3); // {1,2,3,0.01,0.02,0.03}
         */
-
         p4.setOutMatrix({ 1,0,0,0, 0,1,0,0, 0,0,1,0, 0,0,0,1 }); // for testing, compare resulting rays in object coordinate system of last object
 
         for (int i = 0; i < 1; i++) {
@@ -108,7 +108,8 @@ namespace RAY
         for (int i = 0; i<int(Quadrics.size()); i++) {
             tracer.addQuadric(Quadrics[i].getAnchorPoints(), Quadrics[i].getInMatrix(), Quadrics[i].getOutMatrix(), Quadrics[i].getTempMisalignmentMatrix(), Quadrics[i].getInverseTempMisalignmentMatrix(), Quadrics[i].getParameters());//, Quadrics[i].getInverseMisalignmentMatrix()
         }
-
+        tracer.setBeamlineParameters(1, Quadrics.size(), number_of_rays);
+        
         const clock_t begin_time = clock();
         tracer.run(); //run tracer
         std::cout << "tracer run time: " << float(clock() - begin_time) << " ms" << std::endl;
