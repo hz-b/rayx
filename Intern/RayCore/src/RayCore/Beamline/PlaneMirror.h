@@ -8,7 +8,7 @@ namespace RAY
 
     public:
         
-        PlaneMirror(const char* name, double width, double height, double grazingIncidence, double azimuthal, double distanceToPreceedingElement, std::vector<double> misalignmentParams);
+        PlaneMirror(const char* name, double width, double height, double grazingIncidence, double azimuthal, double distanceToPreceedingElement, std::vector<double> misalignmentParams, Quadric* previous);
         PlaneMirror();
         ~PlaneMirror();
 

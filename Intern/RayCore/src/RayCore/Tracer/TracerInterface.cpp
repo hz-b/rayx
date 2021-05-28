@@ -10,7 +10,7 @@
 #include <iomanip> 
 #include <sstream>
 
-#define SHORTOUTPUT true
+#define SHORTOUTPUT false
 
 namespace RAY
 {
@@ -35,6 +35,7 @@ namespace RAY
         if (!tracer) return;
         if (!source) return;
         std::vector<RAY::Ray> rays = (*source).getRays();
+        std::cout << "add rays" << std::endl;
         (*tracer).addRayVector(rays.data(), rays.size());
     }
 
@@ -74,23 +75,18 @@ namespace RAY
         PlaneMirror p3 = PlaneMirror("PlaneMirror3", 50, 200, 7, 10, 10000, {0,0,0, 0,0,0}, &p2); // {1,2,3,0.01,0.02,0.03}
         PlaneMirror p4 = PlaneMirror("PlaneMirror4", 50, 200, 22, 17, 10000, {0,0,0, 0,0,0}, &p3); // {1,2,3,0.01,0.02,0.03}
         */
-        ImagePlane ip1 = ImagePlane("ImagePlane1", 350);
+        ImagePlane ip1 = ImagePlane("ImagePlane1", 350.0, nullptr);
 
         //m_Beamline.addQuadric(reflZonePlate.getName(), reflZonePlate.getAnchorPoints(), reflZonePlate.getInMatrix(), reflZonePlate.getOutMatrix(), reflZonePlate.getTempMisalignmentMatrix(), reflZonePlate.getInverseTempMisalignmentMatrix(), reflZonePlate.getParameters());
         //m_Beamline.addQuadric(p1.getName(), p1.getAnchorPoints(), p1.getInMatrix(), p1.getOutMatrix(), p1.getTempMisalignmentMatrix(), p1.getInverseTempMisalignmentMatrix(), p1.getParameters());
         m_Beamline.addQuadric(ip1.getName(), ip1.getAnchorPoints(), ip1.getInMatrix(), ip1.getOutMatrix(), ip1.getTempMisalignmentMatrix(), ip1.getInverseTempMisalignmentMatrix(), ip1.getParameters());
         //add beamline to tracer
         std::vector<RAY::Quadric> Quadrics = m_Beamline.getObjects();
-        tracer.setBeamlineParameters(beamlinesSimultaneously, Quadrics.size(), number_of_rays * beamlinesSimultaneously);
-        for (int j = 0; j < beamlinesSimultaneously; j++) {
-            for (uint32_t i = 0; i < Quadrics.size(); i++) {
-                for (int k = 0; k < 16; k++) {
-                    std::cout << Quadrics[i].getAnchorPoints()[k] << ", ";
-                    if (k % 4 == 3) std::cout << std::endl;
-                }
-                tracer.addQuadric(Quadrics[i].getAnchorPoints(), Quadrics[i].getInMatrix(), Quadrics[i].getOutMatrix(), Quadrics[i].getTempMisalignmentMatrix(), Quadrics[i].getInverseTempMisalignmentMatrix(), Quadrics[i].getParameters());
-            }
+        for (int i = 0; i<int(Quadrics.size()); i++) {
+            tracer.addQuadric(Quadrics[i].getAnchorPoints(), Quadrics[i].getInMatrix(), Quadrics[i].getOutMatrix(), Quadrics[i].getTempMisalignmentMatrix(), Quadrics[i].getInverseTempMisalignmentMatrix(), Quadrics[i].getParameters());//, Quadrics[i].getInverseMisalignmentMatrix()
         }
+        tracer.setBeamlineParameters(1, Quadrics.size(), number_of_rays);
+
         const clock_t begin_time = clock();
         tracer.run(); //run tracer
         std::cout << "tracer run time: " << float(clock() - begin_time) << " ms" << std::endl;
@@ -157,7 +153,7 @@ namespace RAY
         // outputFile << "Index,Xloc,Yloc,Zloc,Weight,Xdir,Ydir,Zdir" << std::endl;
 
         size_t counter = 0;
-        int print = 1;
+        int print = 0;
         for (std::list<double>::iterator i = outputRays.begin(); i != outputRays.end(); i++) {
             if (counter % 8 == 0) {
                 outputFile << counter / VULKANTRACER_RAY_DOUBLE_AMOUNT;
@@ -196,7 +192,7 @@ namespace RAY
 
         if (SHORTOUTPUT) {
             char buff[64];
-            for (size_t i = 0; i < size; i = i + 8) {
+            for (size_t i = 0; i < size; i = i + 8) { // ! + 8 because of placeholder
                 sprintf(buff, "%d;%.17f;%.17f\n", index, outputRays[i], outputRays[i + 1]);
                 file << buff;
                 index++;
@@ -204,11 +200,10 @@ namespace RAY
         }
         else {
             char buff[256];
-            for (size_t i = 0; i < size;) {
+            for (size_t i = 0; i < size; i = i + 8) { // ! + 8 because of placeholder 
                 sprintf(buff, "%d;%.17f;%.17f;%.17f;%.17f;%.17f;%.17f;%.17f\n", index,
-                    outputRays[i++], outputRays[i++], outputRays[i++], outputRays[i++],
-                    outputRays[i++], outputRays[i++], outputRays[i++]);
-                i++;
+                    outputRays[i], outputRays[i + 1], outputRays[i + 2], outputRays[i + 3],
+                    outputRays[i + 4], outputRays[i + 5], outputRays[i + 6]);
                 file << buff;
                 index++;
             }

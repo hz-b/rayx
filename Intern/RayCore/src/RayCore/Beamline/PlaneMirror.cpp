@@ -15,8 +15,8 @@ namespace RAY
      * @param misalignmentParams angles and distances for the mirror's misalignment
      * 
     */
-    PlaneMirror::PlaneMirror(const char* name, double width, double height, double grazingIncidence, double azimuthal, double dist, std::vector<double> misalignmentParams) 
-    : Quadric(name, {0,0,0,0, width,0,0,-1, height,0,0,0, 0,0,0,0}, {width, height,0,0, 0,0,0,0, 0,0,0,0, 0,0,0,0},rad(grazingIncidence), rad(azimuthal), rad(grazingIncidence), dist, misalignmentParams, {0,0,0,0,0,0}) {
+    PlaneMirror::PlaneMirror(const char* name, double width, double height, double grazingIncidence, double azimuthal, double dist, std::vector<double> misalignmentParams, Quadric* previous) 
+    : Quadric(name, {0,0,0,0, width,0,0,-1, height,0,0,0, 0,0,0,0}, {width, height,0,0, 0,0,0,0, 0,0,0,0, 0,0,0,0},rad(grazingIncidence), rad(azimuthal), rad(grazingIncidence), dist, misalignmentParams, {0,0,0,0,0,0}, previous) {
         // std::vector<double> inputPoints = {0,0,0,0, 0,0,0,-1, 0,0,0,0, 0,0,0,0};
         m_totalWidth = width;
         m_totalHeight = height;

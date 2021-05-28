@@ -2,7 +2,7 @@
 
 namespace RAY
 {
-    
+
     /**
      * angles given in degree and stored in rad
      * initializes transformation matrices, and parameters for the quadric in super class (quadric)
@@ -13,16 +13,16 @@ namespace RAY
      * @param azimuthal          rotation of mirror around z-axis
      * @param dist               distance to preceeding element
      * @param misalignmentParams angles and distances for the mirror's misalignment
-     * 
+     *
     */
-    ImagePlane::ImagePlane(const char* name, double distance) 
-    : Quadric(name) {
+    ImagePlane::ImagePlane(const char* name, double distance, Quadric* previous)
+        : Quadric(name, previous) {
         m_distance = distance;
         // std::vector<double> inputPoints = {0,0,0,0, 0,0,0,-1, 0,0,0,0, 0,0,0,0};
-        calcTransformationMatrices(0, 0, 0, 0, {0,0,0, 0,0,0});
-        setParameters({distance,0,0,0, 0,0,0,0, 0,0,0,0, 0,0,0,0});
-        setTemporaryMisalignment({0,0,0, 0,0,0}); 
-        editQuadric({0,0,0,0, 0,0,0,0, 0,0,0,0, 5,0,0,0});
+        calcTransformationMatrices(0, 0, 0, 0, { 0,0,0, 0,0,0 });
+        setParameters({ distance,0,0,0, 0,0,0,0, 0,0,0,0, 0,0,0,0 });
+        setTemporaryMisalignment({ 0,0,0, 0,0,0 });
+        editQuadric({ 0,0,0,0, 0,0,0,0, 0,0,0,0, 5,0,0,0 });
     }
 
     ImagePlane::~ImagePlane()
@@ -32,5 +32,5 @@ namespace RAY
     double ImagePlane::getDistance() {
         return m_distance;
     }
- 
+
 }

@@ -15,8 +15,8 @@ namespace RAY
      * 
     */
     Ellipsoid::Ellipsoid(const char* name, double width, double height, double grazingIncidence, double azimuthal, double distanceToPreceedingElement, 
-        double entranceArmLength, double exitArmLength, int coordSys, int figRot, double a_11, std::vector<double> misalignmentParams) 
-    : Quadric(name) {
+        double entranceArmLength, double exitArmLength, int coordSys, int figRot, double a_11, std::vector<double> misalignmentParams, Quadric* previous) 
+    : Quadric(name, previous) {
         std::cout << "ellipsoid" << std::endl;
         m_totalWidth = width;
         m_totalHeight = height;
@@ -47,8 +47,8 @@ namespace RAY
         // if m_misalignmentCoordSys == 1 rotate through d_tangentangle before misalignment and back after (-d_tangentangle)
         if (m_misalignmentCoordSys == CS_MIRROR){
             setTemporaryMisalignment({0,0,0,0,0,d_tangentAngle});
-            std::vector<double> inTrans = getInTrans();
-            std::vector<double> outTrans = getOutTrans();
+            std::vector<double> inTrans = getB2E();
+            std::vector<double> outTrans = getE2B();
             std::vector<double> mis = getMisalignmentMatrix();
             std::vector<double> invMis = getInverseMisalignmentMatrix();
             std::vector<double> tempMis = getTempMisalignmentMatrix();
