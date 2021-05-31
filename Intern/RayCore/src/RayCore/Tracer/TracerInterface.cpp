@@ -69,7 +69,7 @@ namespace RAY
         //ReflectionZonePlate p1 = ReflectionZonePlate("ReflectionZonePlate1", 1, 0, 50, 200, 170, 1, 10, 1000, 100, 100, -1, -1, 1, 1, 100, 500, 100, 500, 0, 0, 0, { 0,0,0, 0,0,0 }, NULL); // dx,dy,dz, dpsi,dphi,dchi // {1,2,3,0.001,0.002,0.003}
         //RAY::ReflectionZonePlate reflZonePlate = ReflectionZonePlate("ReflectionZonePlate", 1, 0, 4, 60, 170, 2.2, 0, 90, 640, 640, -1, -1, 2.2, 1, 90, 400, 90, 400, 0, 0, 0, { 0,0,0,0,0,0 }); // dx,dy,dz, dpsi,dphi,dchi // 
         // plane mirror with RAY-UI default values
-        //PlaneMirror p1 = PlaneMirror("PlaneMirror1", 50, 200, 10, 0, 10000, { 0,0,0, 0,0,0 }); // {1,2,3,0.01,0.02,0.03}
+        PlaneMirror p1 = PlaneMirror("PlaneMirror1", 50, 200, 10, 0, 10000, { 0,0,0, 0,0,0 }, nullptr); // {1,2,3,0.01,0.02,0.03}
         /*
         PlaneMirror p2 = PlaneMirror("PlaneMirror2", 50, 200, 15, 4, 10000, {1,2,3, 0.001,0.002,0.003}, &p1); // {1,2,3,0.01,0.02,0.03}
         PlaneMirror p3 = PlaneMirror("PlaneMirror3", 50, 200, 7, 10, 10000, {0,0,0, 0,0,0}, &p2); // {1,2,3,0.01,0.02,0.03}
@@ -78,14 +78,14 @@ namespace RAY
         ImagePlane ip1 = ImagePlane("ImagePlane1", 350.0, nullptr);
 
         //m_Beamline.addQuadric(reflZonePlate.getName(), reflZonePlate.getAnchorPoints(), reflZonePlate.getInMatrix(), reflZonePlate.getOutMatrix(), reflZonePlate.getTempMisalignmentMatrix(), reflZonePlate.getInverseTempMisalignmentMatrix(), reflZonePlate.getParameters());
-        //m_Beamline.addQuadric(p1.getName(), p1.getAnchorPoints(), p1.getInMatrix(), p1.getOutMatrix(), p1.getTempMisalignmentMatrix(), p1.getInverseTempMisalignmentMatrix(), p1.getParameters());
+        m_Beamline.addQuadric(p1.getName(), p1.getAnchorPoints(), p1.getInMatrix(), p1.getOutMatrix(), p1.getTempMisalignmentMatrix(), p1.getInverseTempMisalignmentMatrix(), p1.getParameters());
         m_Beamline.addQuadric(ip1.getName(), ip1.getAnchorPoints(), ip1.getInMatrix(), ip1.getOutMatrix(), ip1.getTempMisalignmentMatrix(), ip1.getInverseTempMisalignmentMatrix(), ip1.getParameters());
         //add beamline to tracer
         std::vector<RAY::Quadric> Quadrics = m_Beamline.getObjects();
+        tracer.setBeamlineParameters(1, Quadrics.size(), number_of_rays);
         for (int i = 0; i<int(Quadrics.size()); i++) {
             tracer.addQuadric(Quadrics[i].getAnchorPoints(), Quadrics[i].getInMatrix(), Quadrics[i].getOutMatrix(), Quadrics[i].getTempMisalignmentMatrix(), Quadrics[i].getInverseTempMisalignmentMatrix(), Quadrics[i].getParameters());//, Quadrics[i].getInverseMisalignmentMatrix()
         }
-        tracer.setBeamlineParameters(1, Quadrics.size(), number_of_rays);
 
         const clock_t begin_time = clock();
         tracer.run(); //run tracer

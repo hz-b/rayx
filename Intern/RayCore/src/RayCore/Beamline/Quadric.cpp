@@ -164,21 +164,21 @@ namespace RAY
             // Mi_e2g = M_(i-1)_e2g * M(i-1)_e2b^-1 * Mi_b2e^-1
             d_e2g = getMatrixProductAsVector(m_previous->getInvE2B(), d_inv_b2e);
             d_e2g = getMatrixProductAsVector(m_previous->getE2G(), d_e2g);
-        }        
-else {
+        }
+        else {
             d_g2e = d_b2e;
             d_e2g = d_inv_b2e;
             std::cout << "first element" << std::endl;
         }
-        
+
         // combine in and out transformation (global <-> element coordinates) with misalignment
         m_inMatrix = d_g2e;
         m_outMatrix = d_e2g;
-        
+
         // to use usual ray coordinatesystem, also contains misalignment
         //m_inMatrix = d_b2e;
         //m_outMatrix = d_e2b;
-        
+
         std::cout << "inMatrix: " << m_inMatrix.size() << std::endl;
         for (int i = 0; i < 16; i++) {
             std::cout << m_inMatrix[i] << ", ";
