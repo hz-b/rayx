@@ -74,14 +74,16 @@ def plot_comparison(name, result, correct):
 
 
 class Tests(unittest.TestCase):
-    """
+
     def test_planeMirrorDefault(self):
-        correct = open_old_file('Plane Mirror-RawRaysBeam_default.csv', 'Plane Mirror_')
+        correct = open_old_file(
+            'Plane Mirror-RawRaysBeam_default.csv', 'Plane Mirror_')
         result = open_new_file('testFile_PlaneMirrorDef.csv')
         self.assertTrue(np.allclose(correct, result))
 
     def test_planeMirrorMis(self):
-        correct = open_old_file('Plane Mirror-RawRaysBeam_20mis.csv', 'Plane Mirror_')
+        correct = open_old_file(
+            'Plane Mirror-RawRaysBeam_20mis.csv', 'Plane Mirror_')
         result = open_new_file('testFile_PlaneMirrorMis.csv')
         self.assertTrue(np.allclose(correct, result))
 
@@ -91,7 +93,8 @@ class Tests(unittest.TestCase):
         self.assertTrue(np.allclose(correct, result))
 
     def test_planeGratingDevDefault(self):
-        correct = open_old_file('Plane Grating_div_default.csv', 'Plane Grating_')
+        correct = open_old_file(
+            'Plane Grating_div_default.csv', 'Plane Grating_')
         result = open_new_file('testFile_PlaneGratingDeviationDefault.csv')
         self.assertTrue(np.allclose(correct, result))
 
@@ -101,42 +104,48 @@ class Tests(unittest.TestCase):
         self.assertTrue(np.allclose(correct, result))
 
     def test_planeGratingDevMis(self):
-        correct = open_old_file('Plane Grating_div_az_mis.csv', 'Plane Grating_')
+        correct = open_old_file(
+            'Plane Grating_div_az_mis.csv', 'Plane Grating_')
         result = open_new_file('testFile_PlaneGratingDeviationMis.csv')
         self.assertTrue(np.allclose(correct, result))
 
     def test_planeGratingIncAzMis(self):
-        correct = open_old_file('Plane Grating_inc_az_mis.csv', 'Plane Grating_')
+        correct = open_old_file(
+            'Plane Grating_inc_az_mis.csv', 'Plane Grating_')
         result = open_new_file('testFile_PlaneGratingIncAzMis.csv')
         self.assertTrue(np.allclose(correct, result))
 
-
     def test_planeGratingVLSnoMIS(self):
-        correct = open_old_file('Plane Grating_default_azimuthal.csv', 'Plane Grating_')
+        correct = open_old_file(
+            'Plane Grating_default_azimuthal.csv', 'Plane Grating_')
         result = open_new_file('output.csv')
         self.assertTrue(np.allclose(correct, result))
 
-
     def test_RZPdefault(self):
-        correct = open_old_file('Reflection Zoneplate-RawRaysBeam_def20_s.csv', 'Reflection Zoneplate_')
-        result = open_new_file('testFile_ReflectionZonePlateDefault.csv', valid=1)
+        correct = open_old_file(
+            'Reflection Zoneplate-RawRaysBeam_def20_s.csv', 'Reflection Zoneplate_')
+        result = open_new_file(
+            'testFile_ReflectionZonePlateDefault.csv', valid=1)
         self.assertTrue(np.allclose(correct, result))
 
     def test_RZPazimuthal(self):
-        correct = open_old_file('Reflection Zoneplate-RawRaysBeam_azim200.csv', 'Reflection Zoneplate_')
-        result = open_new_file('testFile_ReflectionZonePlateAzim200.csv', valid=1)
+        correct = open_old_file(
+            'Reflection Zoneplate-RawRaysBeam_azim200.csv', 'Reflection Zoneplate_')
+        result = open_new_file(
+            'testFile_ReflectionZonePlateAzim200.csv', valid=1)
         self.assertTrue(np.allclose(correct, result))
 
     def test_ImagePlaneMatrixSource(self):
-        correct = open_old_file('ImagePlane-RawRaysOutgoing.csv', 'ImagePlane_')
+        correct = open_old_file(
+            'ImagePlane-RawRaysOutgoing.csv', 'ImagePlane_')
         result = open_new_file('testFile_PlaneMirror_ImagePlane.csv', valid=1)
         self.assertTrue(np.allclose(correct, result))
 
     def test_RZPmis(self):
-        correct = open_old_file('Reflection Zoneplate-RawRaysBeam_mis200_s.csv', 'Reflection Zoneplate_')
+        correct = open_old_file(
+            'Reflection Zoneplate-RawRaysBeam_mis200_s.csv', 'Reflection Zoneplate_')
         result = open_new_file('testFile_ReflectionZonePlateMis.csv', valid=1)
         self.assertTrue(np.allclose(correct, result))
-    """
 
     def test_pointSourceHardEdge(self):
         correct = open_old_file(
@@ -169,7 +178,7 @@ class Tests(unittest.TestCase):
         self.assertTrue(correct.shape == result.shape)
         self.assertTrue(np.isclose(np.mean(correct[5]), np.mean(result[5])))
         #plot_comparison('Hard Edge Mis', result, correct)
-    
+
     def test_matrixSource20000(self):
         correct = open_old_file(
             'Matrix Source-RawRaysBeam_20000.csv', 'Matrix Source_')
@@ -177,18 +186,18 @@ class Tests(unittest.TestCase):
         self.assertTrue(correct.shape == result.shape)
         self.assertTrue(np.isclose(np.mean(correct[5]), np.mean(result[5])))
         #plot_comparison('Hard Edge Mis', result, correct)
-    
-    """
+
     def test_globalCoord_9rays(self):
-        correct = open_old_file('Plane Mirror 3-RawRaysOutgoing_9rays.csv', 'Plane Mirror 3_')
+        correct = open_old_file(
+            'Plane Mirror 3-RawRaysOutgoing_9rays.csv', 'Plane Mirror 3_')
         result = open_new_file('testFile_globalCoordinates_9rays.csv', valid=1)
         self.assertTrue(np.allclose(correct, result))
-    
+
     def test_globalCoord_20rays(self):
-        correct = open_old_file('Plane Mirror 3-RawRaysOutgoing_20Rays_mis.csv', 'Plane Mirror 3_')
+        correct = open_old_file(
+            'Plane Mirror 3-RawRaysOutgoing_20Rays_mis.csv', 'Plane Mirror 3_')
         result = open_new_file('output.csv', valid=1)
         self.assertTrue(np.allclose(correct, result))
-    """
 
 
 if __name__ == '__main__':
