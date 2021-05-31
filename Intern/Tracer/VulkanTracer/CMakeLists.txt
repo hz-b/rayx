@@ -60,3 +60,5 @@ if (WIN32)
         NsightAftermath::NsightAftermath
     )
 endif ()
+
+add_dependencies(${PROJECT_NAME} COMPILE_SHADER)
