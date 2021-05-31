@@ -1,5 +1,7 @@
+cmake_minimum_required(VERSION 3.0 FATAL_ERROR)
 include(CTest)
-
+project(RayTests)
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 enable_testing()
 set(BINARY ${CMAKE_PROJECT_NAME}_tst)
 
