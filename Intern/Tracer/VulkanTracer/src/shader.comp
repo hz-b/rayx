@@ -1750,7 +1750,7 @@ void iterateQuadrics(){
 	dmat4 ap = quadricData[numberOfQuadrics-1].anchorPoints;
 	outputData[uint(gl_GlobalInvocationID)].position = dvec3(ap[1][0], ap[2][0], ap[3][0]);
 	outputData[uint(gl_GlobalInvocationID)].weight = quadricData[numberOfQuadrics-1].parameters[0][0];
-	outputData[uint(gl_GlobalInvocationID)].direction = dvec4(ap[0][1], ap[0][2], ap[0][3], ap[1][1]);
+	outputData[uint(gl_GlobalInvocationID)].direction = dvec4(numberOfBeamlines, numberOfQuadrics, ap[3][1], numberOfRays);
 	*/
 	if(numberOfQuadrics == 1){
 		//outputData[uint(gl_GlobalInvocationID)] = rayData[uint(gl_GlobalInvocationID)];
@@ -1819,7 +1819,6 @@ void iterateQuadrics(){
 			outputData[uint(gl_GlobalInvocationID)] = rayData[uint(gl_GlobalInvocationID)];
 		}
 	}
-	
 
 }
 
@@ -2021,9 +2020,9 @@ void cameraPlaneIntersection(outputData, cameraPlane){
 }
 */
 void main(){
-    //testFunctions();
+    testFunctions();
     //outputData[uint(gl_GlobalInvocationID)] = rayData[uint(gl_GlobalInvocationID)];
-    iterateQuadrics();
+    //iterateQuadrics();
     /*Ray r = rayData[uint(gl_GlobalInvocationID)];
     r.position = dvec3(1,2,3);
     r.direction = dvec4(3,4,5,6);

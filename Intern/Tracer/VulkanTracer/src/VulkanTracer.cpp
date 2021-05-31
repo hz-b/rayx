@@ -56,7 +56,7 @@ void VulkanTracer::run()
 	//staging buffers need to be at the end of the buffer vector!
 	bufferSizes[0] = (uint64_t)numberOfRays * VULKANTRACER_RAY_DOUBLE_AMOUNT * sizeof(double);
 	bufferSizes[1] = (uint64_t)numberOfRays * VULKANTRACER_RAY_DOUBLE_AMOUNT * sizeof(double);
-	bufferSizes[2] = beamline.size() * sizeof(double);
+	bufferSizes[2] = (VULKANTRACER_QUADRIC_PARAM_DOUBLE_AMOUNT * sizeof(double)) + (beamline.size() * sizeof(double));//4 doubles for parameters
 	bufferSizes[3] = std::min((uint64_t)GPU_MAX_STAGING_SIZE, (uint64_t)numberOfRays * VULKANTRACER_RAY_DOUBLE_AMOUNT * sizeof(double)); //maximum of 128MB
 	bufferSizes[4] = (uint64_t)numberOfRays * 4 * sizeof(double);
 	for (uint32_t i = 0; i < bufferSizes.size(); i++) {
@@ -646,7 +646,8 @@ void VulkanTracer::fillQuadricBuffer()
 	void* data;
 	vkMapMemory(device, bufferMemories[2], 0, bufferSizes[2], 0, &data);
 	std::cout << "map memory done" << std::endl;
-	std::cout << "number of quadrics: " << beamline.size() / VULKANTRACER_QUADRIC_DOUBLE_AMOUNT << std::endl;
+	std::cout << "beamline.size(): " << beamline.size() << std::endl;
+	std::cout << "number of quadrics: " << (beamline.size() - VULKANTRACER_QUADRIC_PARAM_DOUBLE_AMOUNT) / VULKANTRACER_QUADRIC_DOUBLE_AMOUNT << std::endl;
 	std::cout << "size of quadric buffer: " << bufferSizes[2] << std::endl;
 	std::cout << "sample quadric: ";
 	for (auto i = beamline.begin();i != beamline.end();i++) {
@@ -943,6 +944,7 @@ void VulkanTracer::runCommandBuffer()
 	vkDestroyFence(device, fence, NULL);
 }
 void VulkanTracer::setBeamlineParameters(uint32_t inNumberOfBeamlines, uint32_t inNumberOfQuadricsPerBeamline, uint32_t inNumberOfRays) {
+	std::cout << "setBeamlineParameters:numberOfRays: " << inNumberOfRays << std::endl;
 	numberOfBeamlines = inNumberOfBeamlines;
 	numberOfQuadricsPerBeamline = inNumberOfQuadricsPerBeamline;
 	numberOfRays = inNumberOfRays;
