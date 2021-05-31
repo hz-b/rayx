@@ -560,7 +560,7 @@ void VulkanTracer::copyToOutputBuffer(uint32_t offset, uint32_t numberOfBytesToC
 	VkBufferCopy copyRegion{};
 	copyRegion.srcOffset = offset;
 	copyRegion.size = numberOfBytesToCopy;
-	vkCmdCopyBuffer(commandBuffer, buffers[1], buffers[4], 1, &copyRegion);
+	vkCmdCopyBuffer(commandBuffer, buffers[1], buffers[3], 1, &copyRegion);
 
 	vkEndCommandBuffer(commandBuffer);
 
