@@ -170,14 +170,15 @@ else {
             d_e2g = d_inv_b2e;
             std::cout << "first element" << std::endl;
         }
-        //d_g2e = getMatrixProductAsVector(d_misalignmentMatrix, d_g2e);
-        //d_e2g = getMatrixProductAsVector(d_e2g, d_inverseMisalignmentMatrix);
-
+        
         // combine in and out transformation (global <-> element coordinates) with misalignment
         m_inMatrix = d_g2e;
         m_outMatrix = d_e2g;
-        //m_inMatrix = getMatrixProductAsVector(d_misalignmentMatrix, d_g2e);
-        //m_outMatrix = getMatrixProductAsVector(d_e2g, d_inverseMisalignmentMatrix);
+        
+        // to use usual ray coordinatesystem, also contains misalignment
+        //m_inMatrix = d_b2e;
+        //m_outMatrix = d_e2b;
+        
         std::cout << "inMatrix: " << m_inMatrix.size() << std::endl;
         for (int i = 0; i < 16; i++) {
             std::cout << m_inMatrix[i] << ", ";

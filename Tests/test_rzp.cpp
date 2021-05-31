@@ -66,7 +66,7 @@ TEST(RZP, testdefaultParams) {
     double longRadius = 0;
     double elementOffsetZ = 2;
     std::vector<double> mis = {1,2,3, 0.001,0.002,0.003};
-    RAY::ReflectionZonePlate rzp = RAY::ReflectionZonePlate ("RZP", mount, curvatureType, width, height, deviation, grazingIncidence, azimuthal, dist, designEnergy, sourceEnergy, orderOfDiffraction, designOrderOfDiffraction, dAlpha, dBeta, sEntrance, sExit, mEntrance, mExit, shortRadius, longRadius, elementOffsetZ, mis);
+    RAY::ReflectionZonePlate rzp = RAY::ReflectionZonePlate ("RZP", mount, curvatureType, width, height, deviation, grazingIncidence, azimuthal, dist, designEnergy, sourceEnergy, orderOfDiffraction, designOrderOfDiffraction, dAlpha, dBeta, sEntrance, sExit, mEntrance, mExit, shortRadius, longRadius, elementOffsetZ, mis, NULL);
     
     double alpha = 0.017453292519943295;
     double beta = 0.017453292519941554;
@@ -79,8 +79,8 @@ TEST(RZP, testdefaultParams) {
 
     EXPECT_ITERABLE_DOUBLE_EQ(std::vector<double>, rzp.getQuadric(), quad);
     EXPECT_ITERABLE_DOUBLE_EQ(std::vector<double>, rzp.getTempMisalignmentParams(), mis);
-    std::vector<double> correctMis = {0,0,0, 0,0,0};
-    EXPECT_ITERABLE_DOUBLE_EQ(std::vector<double>, rzp.getMisalignmentParams(), correctMis); // rzp stores misalignment ONLY in tempMisalignment, because it has to be removed and therefore cannot be multiplied with the transformationMatrix
+    std::vector<double> zeros = {0,0,0, 0,0,0};
+    EXPECT_ITERABLE_DOUBLE_EQ(std::vector<double>, rzp.getMisalignmentParams(), mis); // rzp stores misalignment in m_misalignment (to add to the m_inMatrix/m_outMatrix) AND tempMisalignment, because it has to be removed separated from the coordinate transformation matrices
     ASSERT_DOUBLE_EQ (rzp.getWidth(),  width);
     ASSERT_DOUBLE_EQ (rzp.getHeight(),  height);
     ASSERT_DOUBLE_EQ (rzp.getGratingMount(), mount);
@@ -119,7 +119,7 @@ TEST(RZP, testParams) {
     double longRadius = 0;
     double elementOffsetZ = 0;
     std::vector<double> mis = {0,0,0, 0,0,0};
-    RAY::ReflectionZonePlate rzp = RAY::ReflectionZonePlate ("RZP", mount, curvatureType, width, height, deviation, normalIncidence, azimuthal, dist, designEnergy, sourceEnergy, orderOfDiffraction, designOrderOfDiffraction, dAlpha, dBeta, sEntrance, sExit, mEntrance, mExit, shortRadius, longRadius, elementOffsetZ, mis);
+    RAY::ReflectionZonePlate rzp = RAY::ReflectionZonePlate ("RZP", mount, curvatureType, width, height, deviation, normalIncidence, azimuthal, dist, designEnergy, sourceEnergy, orderOfDiffraction, designOrderOfDiffraction, dAlpha, dBeta, sEntrance, sExit, mEntrance, mExit, shortRadius, longRadius, elementOffsetZ, mis, NULL);
     std::vector<double> correctMis = {1,0,0,0, 0,1,0,0, 0,0,1,0, 0,0,0,1};
     EXPECT_ITERABLE_DOUBLE_EQ(std::vector<double>, rzp.getMisalignmentMatrix(), correctMis); // rzp stores misalignment ONLY in tempMisalignment, because it has to be removed and therefore cannot be multiplied with the transformationMatrix
     EXPECT_ITERABLE_DOUBLE_EQ(std::vector<double>, rzp.getTempMisalignmentMatrix(), correctMis); // rzp stores misalignment ONLY in tempMisalignment, because it has to be removed and therefore cannot be multiplied with the transformationMatrix

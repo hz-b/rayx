@@ -58,7 +58,7 @@ TEST (Quadric, testMisalignment) {
     double azimuthalAngle = 0.0;
     double dist = 12005;
     std::vector<double> mis = {1,2,3,0.03,0.02,0.01}; // psi, phi, chi
-    RAY::PlaneMirror plM = RAY::PlaneMirror("planemirror", width, height, incidenceAngle, azimuthalAngle, dist, mis); // {1,2,3,0.01,0.02,0.03}
+    RAY::PlaneMirror plM = RAY::PlaneMirror("planemirror", width, height, incidenceAngle, azimuthalAngle, dist, mis, NULL); // {1,2,3,0.01,0.02,0.03}
 
     //std::vector<double> Mis_out = plM.d_misalignmentMatrix();
     std::vector<double> Mis_in = plM.getMisalignmentMatrix();
@@ -77,7 +77,7 @@ TEST(Quadric, testInMat) {
     double azimuthalAngle = 0.0;
     double dist = 12005;
     std::vector<double> mis = {0,0,0,0,0,0};
-    RAY::PlaneMirror plM = RAY::PlaneMirror("planemirror",width, height, incidenceAngle, azimuthalAngle, dist, mis); // {1,2,3,0.01,0.02,0.03}
+    RAY::PlaneMirror plM = RAY::PlaneMirror("planemirror",width, height, incidenceAngle, azimuthalAngle, dist, mis, NULL); // {1,2,3,0.01,0.02,0.03}
 
     std::vector<double> Mis_out = plM.getInverseTempMisalignmentMatrix();
     std::vector<double> Mis_in = plM.getTempMisalignmentMatrix();
@@ -92,7 +92,7 @@ TEST(Quadric, testInMat) {
 
     EXPECT_ITERABLE_DOUBLE_EQ(std::vector<double>, inMat, correctInMat);
 }
-/*
+
 TEST(Quadric, testGlobalCoordinates) {
     RAY::PlaneMirror p1 = RAY::PlaneMirror("PlaneMirror1", 50, 200, 10, 7, 0, {0,0,0, 0,0,0}, NULL); // {1,2,3,0.01,0.02,0.03}
     RAY::PlaneMirror p2 = RAY::PlaneMirror("PlaneMirror2", 50, 200, 15, 4, 0, {0,0,0, 0,0,0}, &p1); // {1,2,3,0.01,0.02,0.03}
@@ -135,4 +135,4 @@ TEST(Quadric, testGlobalCoordinates) {
     for(int i = 0; i<16; i++) {
         EXPECT_NEAR(worldCoord[i], result[i], 0.001);
     }
-}*/
+}
