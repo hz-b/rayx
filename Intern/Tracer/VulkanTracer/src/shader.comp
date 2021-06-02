@@ -1,3 +1,5 @@
+//working (old) shader
+
 #version 450
 #extension GL_ARB_separate_shader_objects : enable
 
@@ -1038,6 +1040,7 @@ dvec4 intersectionPoint(inout Ray r, dmat4 quadric, int icurv)
 		}
 		x = x + aln*z;
 		y = y + amn*z;
+		//r.position = dvec3(a, b, c);
 	}
 	
 	double fx = 2*a_14 + 2*a_11*x + 2*a_12*y + 2*a_13*z;
@@ -1660,8 +1663,9 @@ Ray traceGeneralGrating(Ray r, Quadric q) {
 */
 Ray traceMirror(Ray r, Quadric q) {
 	r = rayMatrixMult(r, q.inTrans);
-	
 	dvec4 normal = intersectionPoint(r, q.anchorPoints, 1);
+	//r.direction = normal;
+	
 	r.direction = reflect(r.direction, normal);
 	
 	// will be changed, when width & heigth in "parameters"
@@ -1670,6 +1674,7 @@ Ray traceMirror(Ray r, Quadric q) {
 	r.weight = wasteBox(r.position[0],r.position[2],xLength,zLength, r.weight);
 	
 	r = rayMatrixMult(r, q.outTrans);
+	
 	return r;
 }
 
