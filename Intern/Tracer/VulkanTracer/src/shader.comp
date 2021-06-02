@@ -1537,7 +1537,7 @@ Ray traceRZP(Ray r, Quadric q) {
 	double element_offset_z = q.parameters[3][2];
 	r = rayMatrixMult(r, q.inTrans);
 	//r.position.z = r.position.z - element_offset_z;
-	r = rayMatrixMult(r, q.misalignment); // misalignment not stored in intrans because it needs to be removed later
+	//r = rayMatrixMult(r, q.misalignment); // misalignment not stored in intrans because it needs to be removed later
 	
 	// RZP can be plane, toroidal or spherical curvature type. Use intersectionPoint for all except toroidal
 	// if !toroidal:
@@ -1550,14 +1550,15 @@ Ray traceRZP(Ray r, Quadric q) {
 	double zLength = q.anchorPoints[2][0]; // therefore we can use 6 values in the lower left part (without the diagonal) to transfer other values to the shader (eg dimensions of a mirror/grating), we use a_21,a_31 for xlength and zlength
 	r.weight = wasteBox(r.position[0],r.position[2],xLength,zLength, r.weight);
 	
-	// remove misalignment to calculate line density
-	r = rayMatrixMult(r, q.inverseMisalignment);
 	
 	if(r.weight < 1.0) {
 		//r.position.z -= element_offset_z;
-		r = rayMatrixMult(r, q.outTrans);
+		r = rayMatrixMult(r, q.outTrans); // inv mis & out trans
 		return r;
 	}
+	
+	// remove misalignment to calculate line density
+	r = rayMatrixMult(r, q.inverseMisalignment);
 	
 	double DX, DZ;
 	//RZPLineDensity(...DX,DZ);
@@ -1586,7 +1587,6 @@ Ray traceRZP(Ray r, Quadric q) {
 	double ax = WL*DX*Ord*1e-6;
  	r = refrac2D(r, normal, az, ax);
 
-	r = rayMatrixMult(r, q.inverseMisalignment);
 	r = rayMatrixMult(r, q.outTrans);
 	return r;
 }

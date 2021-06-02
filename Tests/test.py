@@ -114,13 +114,13 @@ class Tests(unittest.TestCase):
             'Plane Grating_inc_az_mis.csv', 'Plane Grating_')
         result = open_new_file('testFile_PlaneGratingIncAzMis.csv')
         self.assertTrue(np.allclose(correct, result))
-
+    """
     def test_planeGratingVLSnoMIS(self):
         correct = open_old_file(
             'Plane Grating_default_azimuthal.csv', 'Plane Grating_')
         result = open_new_file('output.csv')
         self.assertTrue(np.allclose(correct, result))
-
+    """
     def test_RZPdefault(self):
         correct = open_old_file(
             'Reflection Zoneplate-RawRaysBeam_def20_s.csv', 'Reflection Zoneplate_')
@@ -192,13 +192,13 @@ class Tests(unittest.TestCase):
             'Plane Mirror 3-RawRaysOutgoing_9rays.csv', 'Plane Mirror 3_')
         result = open_new_file('testFile_globalCoordinates_9rays.csv', valid=1)
         self.assertTrue(np.allclose(correct, result))
-
+    """
     def test_globalCoord_20rays(self):
         correct = open_old_file(
             'Plane Mirror 3-RawRaysOutgoing_20Rays_mis.csv', 'Plane Mirror 3_')
         result = open_new_file('output.csv', valid=1)
         self.assertTrue(np.allclose(correct, result))
-
+    """
 
 if __name__ == '__main__':
     unittest.main()
