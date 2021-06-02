@@ -5,6 +5,10 @@
 #include "GFSDK_Aftermath.h"
 #endif
 
+#define SHADERPATH "comp.spv"
+#ifndef SHADERPATH
+#define SHADERPATH "comp_inter.spv"
+#endif
 
 VulkanTracer::VulkanTracer() {
 	bufferSizes.resize(5);
