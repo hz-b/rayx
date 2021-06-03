@@ -2,11 +2,13 @@
 
 #version 450
 #extension GL_ARB_separate_shader_objects : enable
+#extension GL_ARB_gpu_shader_int64 : enable
 
 #define WORKGROUP_SIZE 32
 layout (local_size_x = WORKGROUP_SIZE, local_size_y = 1, local_size_z = 1 ) in;
 // 3.14159265358979323846264338327950
 const double PI = 3.14159265358979323846264338327950;
+const uint64_t rngKey = 0;
 /* STRUCTS */
 
 struct Ray{
@@ -40,13 +42,14 @@ layout(std140, binding = 2) buffer qbuf
 	Quadric quadricData[];
 };
 
+
+
 /**
 * DOUBLE PRECISION APPROXIMATION FOR ARCTAN AND COSINUS
 * source: https://people.sc.fsu.edu/~jburkardt/c_src/fn/fn.html
 */
 
 int r8_inits ( double dos[16], int nos, double eta )
-
 /******************************************************************************/
 /*
   Purpose:
@@ -349,7 +352,6 @@ double r8_csevl ( double x, double a[16], int n )
 }
 
 double r8_cos ( double x )
-
 /******************************************************************************/
 /*
   Purpose:
@@ -468,7 +470,6 @@ double r8_cos ( double x )
 }
 
 double r8_atan ( double x )
-
 /******************************************************************************/
 /*
   Purpose:
@@ -786,10 +787,60 @@ double r8_asin ( double x ) {
 
 
 
+// ------------ Random Numbers --------------
+/*
+* Title: "Squares: A Fast Counter-Based RNG"
+* Author: Bernard Widynski
+* Date: November 24, 2020
+* URL: https://arxiv.org/pdf/2004.06278.pdf
+*/
+uint squares (inout uint64_t ctr, uint64_t key ) 
+{
+	uint64_t x, y, z;
+	y = x = ctr * key; z = y + key;
+	ctr++;
 
+	x = x*x + y; x = (x>>32) | (x<<32);       	/* round 1 */
+	x = x*x + z; x = (x>>32) | (x<<32);       	/* round 2 */
+	x = x*x + y; x = (x>>32) | (x<<32);       	/* round 3 */
+	x = (x*x + z) >> 32;					 	/* round 4 */
 
+	return uint(x);                   
+}
 
+// generates 64-Bit random integers from two 32-Bit random integers
+uint64_t squares64RNG(inout uint64_t ctr)
+{
+	return uint64_t((squares(ctr, rngKey) << 32) | squares(ctr, rngKey));
+}
 
+// generates uniformly distributed doubles between 0 and 1 from one 64-Bit random integer
+double squaresDoubleRNG(inout uint64_t ctr)
+{
+	return fract(double(squares64RNG(ctr)));
+}
+
+// creates (via the Box-Muller transform) a normal distributed double with mean mu and standard deviation sigma
+double squaresNormalRNG(inout uint64_t ctr, double mu, double sigma)
+{
+	double U, V, R, Z;
+	double two_pi = 2.0 * PI;
+	
+	U = squaresDoubleRNG(ctr);
+	V = squaresDoubleRNG(ctr);
+	R = squaresDoubleRNG(ctr);
+	Z = sqrt(-2.0 * r8_log(U));
+
+	if(R < 0.5)
+		Z *= r8_sin(two_pi * V);
+	else
+		Z *= r8_cos(two_pi * V);
+		
+	Z = Z * sigma + mu;
+
+	return Z;
+}
+// -------------			   --------------
 
 
 
