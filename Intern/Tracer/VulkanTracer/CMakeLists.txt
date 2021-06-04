@@ -1,7 +1,12 @@
 cmake_minimum_required(VERSION 3.0 FATAL_ERROR)
 
 project(VulkanTracer)
+
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
+
+set(CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} -fPIC" )
+set(CMAKE_C_FLAGS  "${CMAKE_C_FLAGS} -fPIC" )
+
 
 set(COMPILED_SHADER ${CMAKE_BINARY_DIR}/bin/comp.spv)
 set(COMPILED_SHADER_FAKE ${CMAKE_BINARY_DIR}/bin/___comp.spv) # this exists so file cannot be found -> always execute command
