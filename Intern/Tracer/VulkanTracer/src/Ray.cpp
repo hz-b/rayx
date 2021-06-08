@@ -1,7 +1,7 @@
 #include "Ray.h"
 #include <cstring>
 
-Ray::Ray(double xpos, double ypos, double zpos, double xdir, double ydir, double zdir, double w)
+Ray::Ray(double xpos, double ypos, double zpos, double xdir, double ydir, double zdir, double en, double w)
 {
 	position.x = xpos;
 	position.y = ypos;
@@ -10,7 +10,7 @@ Ray::Ray(double xpos, double ypos, double zpos, double xdir, double ydir, double
 	direction.y = ydir;
 	direction.z = zdir;
 	weight = w;
-	placeholder = 0;
+	energy = en;
 }
 //copies 64 byts of data in the following format: xloc, yloc, zloc, weight, xdir, ydir, zdir, placeholder
 Ray::Ray(double* location) {
@@ -60,6 +60,10 @@ double Ray::getyPos()
 double Ray::getzPos()
 {
 	return position.z;
+}
+double Ray::getEnergy()
+{
+	return energy;
 }
 double Ray::getWeight()
 {

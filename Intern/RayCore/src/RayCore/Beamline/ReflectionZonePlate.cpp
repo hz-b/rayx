@@ -19,7 +19,7 @@ namespace RAY
      *          lineDensity = line density of the grating
      *          orderOfDiffraction = 
     */
-    ReflectionZonePlate::ReflectionZonePlate(const char* name, int mount, int curvatureType, double width, double height, double deviation, double incidenceAngle, double azimuthal, double distanceToPreceedingElement, double designEnergy, double sourceEnergy, double orderOfDiffraction, double designOrderOfDiffraction, double dAlpha, double dBeta, double mEntrance, double mExit, double sEntrance, double sExit, double shortRadius, double longRadius, double elementOffsetZ, std::vector<double> misalignmentParams, Quadric* previous) 
+    ReflectionZonePlate::ReflectionZonePlate(const char* name, int mount, int curvatureType, int designType, int elementOffsetType, double width, double height, double deviation, double incidenceAngle, double azimuthal, double distanceToPreceedingElement, double designEnergy, double sourceEnergy, double orderOfDiffraction, double designOrderOfDiffraction, double dAlpha, double dBeta, double mEntrance, double mExit, double sEntrance, double sExit, double shortRadius, double longRadius, double elementOffsetZ, double beta, std::vector<double> misalignmentParams, Quadric* previous) 
     : Quadric(name, previous) {
         m_totalWidth = width;
         m_totalHeight = height;
@@ -34,11 +34,13 @@ namespace RAY
 
         m_curvatureType = curvatureType == 0 ? CT_PLANE : (curvatureType == 1 ? CT_TOROIDAL : CT_SPHERICAL);
         m_gratingMount = mount==0 ? GM_DEVIATION : GM_INCIDENCE;
-        m_designType = DT_ZOFFSET; // default (0)
+        m_designType = designType==0 ? DT_ZOFFSET : DT_BETA; // default (0)
         m_derivationMethod = DM_FORMULA; // default (0)
         m_rzpType = RT_ELLIPTICAL; // default (0)
         m_imageType = IT_POINT2POINT; // default (0)
-        m_elementOffsetType = EZ_MANUAL; // default (0)
+        m_diffractionMethod = DM_2D; // 2D default
+        m_fullEfficiency = FE_OFF; // default (1)
+        m_elementOffsetType = elementOffsetType==0 ? EZ_MANUAL : EZ_BEAMDIVERGENCE; //EZ_BEAMDIVERGENCE; // EZ_MANUAL; // default (0)
         m_elementOffsetZ = elementOffsetZ;
 
         calcDesignOrderOfDiffraction(designOrderOfDiffraction);
@@ -56,9 +58,13 @@ namespace RAY
 
         m_frenselZOffset = 0; // default
         calcAlpha2();
-        calcBeta2();
+        if (beta == 0) { // calculate from other parameters
+            calcBeta2();
+        }else{ // auto == true
+            setBeta(beta);
+        }
         std::cout << "alpha: " << m_alpha << ", beta: " << m_beta << std::endl;
-        
+        printInfo();
         // set parameters in Quadric class
         if (m_curvatureType == CT_PLANE) {
             editQuadric({0,0,0,0, m_totalWidth,0,0,-1, m_totalHeight,0,0,0, 4,0,0,0});
@@ -85,6 +91,94 @@ namespace RAY
 
     ReflectionZonePlate::~ReflectionZonePlate()
     {
+    }
+
+    void ReflectionZonePlate::printInfo(){
+        std::cout.precision(17);
+        
+        std::cout << m_elementOffsetType;
+        if(m_elementOffsetType == EZ_MANUAL) {
+            std::cout << " elementoffsettype: MANUAL" << std::endl;
+        }else if(m_elementOffsetType == EZ_BEAMDIVERGENCE) {
+            std::cout << " elementoffsettype: BEAMDIVERGENCE" << std::endl;
+        }
+
+        std::cout << m_gratingMount;
+        if(m_gratingMount == GM_INCIDENCE) {
+            std::cout << " m_gratingMount: INCIDENCE" << std::endl;
+        }else if(m_gratingMount == GM_DEVIATION) {
+            std::cout << " m_gratingMount: DEVIATION" << std::endl;
+        }
+        
+        std::cout << m_rzpType;
+        if(m_rzpType == RT_ELLIPTICAL) {
+                std::cout << " rzp type: ELLIPTICAL" << std::endl;
+        }else if(m_rzpType == RT_MERIODIONAL) {
+                std::cout << " rzp type: MERIDIONAL" << std::endl;
+        }
+
+        std::cout << m_designType;
+        if(m_designType == DT_ZOFFSET) {
+                std::cout << " design type: OFFSET" << std::endl;
+        }else if(m_designType == DT_BETA) {
+                std::cout << " design type: BETA" << std::endl;
+        }
+
+        std::cout << m_curvatureType;
+        if(m_curvatureType == CT_PLANE) {
+                std::cout << " curvature type: PLANE" << std::endl;
+        }else if(m_curvatureType == CT_SPHERICAL) {
+                std::cout << " curvature type: SPHERICAL" << std::endl;
+        }else if(m_curvatureType == CT_TOROIDAL) {
+                std::cout << " curvature type: TOROIDAL" << std::endl;
+        }
+
+        std::cout << m_diffractionMethod;
+        if(m_diffractionMethod == DM_TWOGRATINGS) {
+                std::cout << " diffraction method: TWO GRATINGS" << std::endl;
+        }else if(m_diffractionMethod == DM_2D) {
+                std::cout << " diffraction method: 2D" << std::endl;
+        }
+
+        std::cout << m_derivationMethod;
+        if(m_derivationMethod == DM_FORMULA) {
+                std::cout << " derivation method: FORMULA" << std::endl;
+        }else if(m_derivationMethod == DM_PLOYNOM) {
+                std::cout << " derivation method POLYNOM" << std::endl;
+        }
+
+        std::cout << m_fullEfficiency;
+        if(m_fullEfficiency == FE_OFF) {
+                std::cout << " m_fullEfficiency: OFF" << std::endl;
+        }else if(m_fullEfficiency == FE_ON) {
+                std::cout << " m_fullEfficiency: ON" << std::endl;
+        }
+
+        std::cout << m_imageType;
+        if(m_imageType == IT_POINT2POINT) {
+                std::cout << " m_imageType: POINT2POINT" << std::endl;
+        }else if(m_imageType == IT_ASTIGMATIC2ASTIGMATIC) {
+                std::cout << " m_imageType: ASTIGMATIC2ASTIGMATIC" << std::endl;
+        }
+
+        std::cout << "VALUES" << std::endl;
+        std::cout << "m_alpha0Angle: " << m_alpha0Angle << std::endl;
+        std::cout << "m_beta0Angle: " << m_beta0Angle << std::endl;
+        std::cout << "m_designAlphaAngle: " << m_designAlphaAngle << std::endl;
+        std::cout << "m_designBetaAngle: " << m_designBetaAngle << std::endl;
+        std::cout << "m_zOff: " << m_zOff << std::endl;
+        std::cout << "m_wavelength: " << m_wavelength << std::endl;
+        std::cout << "m_lineDensity: " << m_lineDensity << std::endl;
+        std::cout << "m_designOrderOfDiffraction: " << m_designOrderOfDiffraction << std::endl;
+        std::cout << "m_orderOfDiffraction: " << m_orderOfDiffraction << std::endl;
+        std::cout << "m_designEnergyMounting: " << m_designEnergyMounting << std::endl;
+        std::cout << "m_a: " << m_a << std::endl;
+        std::cout << "m_elementOffsetZ: " << m_elementOffsetZ << std::endl;
+        std::cout << "m_elementOffsetZCalc: " << m_elementOffsetZCalc << std::endl;
+        std::cout << "m_calcFresnelZOffset: " << m_calcFresnelZOffset << std::endl;
+        std::cout << "m_frenselZOffset: " << m_frenselZOffset << std::endl;
+        
+        
     }
 
     /**
@@ -130,6 +224,7 @@ namespace RAY
 
     void ReflectionZonePlate::calcBeta2() {
         double DZ = (m_designOrderOfDiffraction == 0) ? 0 : calcDz00();
+        std::cout << "DZ calcBeta2 " << DZ << std::endl;
         m_beta = acos(cos(m_grazingIncidenceAngle) - m_orderOfDiffraction * m_wavelength  * 1e-6 * DZ);
     }
 
@@ -385,6 +480,10 @@ namespace RAY
         
         return DZ;
 
+    }
+
+    void ReflectionZonePlate::setBeta(double beta){ // in degree
+        m_beta = rad(beta);
     }
 
     double ReflectionZonePlate::getWidth() {

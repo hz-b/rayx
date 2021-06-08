@@ -23,7 +23,7 @@ void writeRaysToFile(std::list<double> outputRays, std::string name)
     filename.append(".csv");
     outputFile.open(filename);
     char sep = ';'; // file is saved in .csv (comma seperated value), excel compatibility is manual right now
-    outputFile << "Index" << sep << "Xloc" << sep << "Yloc" << sep<<"Zloc"<<sep<<"Weight"<<sep<<"Xdir"<<sep<<"Ydir"<<sep<<"Zdir" << std::endl;
+    outputFile << "Index" << sep << "Xloc" << sep << "Yloc" << sep<<"Zloc"<<sep<<"Weight"<<sep<<"Xdir"<<sep<<"Ydir"<<sep<<"Zdir" << sep<<"Energy"<< std::endl;
     // outputFile << "Index,Xloc,Yloc,Zloc,Weight,Xdir,Ydir,Zdir" << std::endl;
     
     size_t counter = 0;
@@ -34,12 +34,12 @@ void writeRaysToFile(std::list<double> outputRays, std::string name)
             if(print==1) std::cout << ")" << std::endl;
             if(print==1) std::cout << "(";
         }
+        outputFile << sep << *i ;
         if(counter%8 == 7){
             outputFile << std::endl;
             counter++;
             continue;
         }
-        outputFile << sep << *i ;
         if(counter%8 == 3) {
             if(print==1) std::cout << ") ";
         }else if(counter%8 == 4) {
@@ -67,7 +67,8 @@ TEST(RayTest, test1) {
     double ydir = 0.05;
     double zdir = 0.99;
     double weight = 1.0;
-    Ray r = Ray(x,y,z,xdir,ydir,zdir,weight);
+    double energy = 120.0;
+    Ray r = Ray(x,y,z,xdir,ydir,zdir,energy,weight);
     EXPECT_EQ (r.getxPos(),  x);
     EXPECT_EQ (r.getyPos(),  y);
     EXPECT_EQ (r.getzPos(),  z);
@@ -75,6 +76,7 @@ TEST(RayTest, test1) {
     EXPECT_EQ (r.getyDir(),  ydir);
     EXPECT_EQ (r.getzDir(),  zdir);
     EXPECT_EQ (r.getWeight(),  weight);
+    EXPECT_EQ (r.getEnergy(),  energy);
 }
 
 
@@ -85,9 +87,12 @@ TEST(MatrixTest, testParams) {
     double depth = 0.0;
     double verdiv = 0.001;
     double hordiv = 0.001;
+    double photonEnergy = 100;
+    double energySpread = 10;
     int id = 3;
+    int spreadType = 0;
     std::vector<double> mis = {0,0,0,0};
-    RAY::MatrixSource m = RAY::MatrixSource(id, "Matrix source 1", n, width, height, depth, hordiv, verdiv, mis);
+    RAY::MatrixSource m = RAY::MatrixSource(id, "Matrix source 1", n, spreadType, width, height, depth, hordiv, verdiv, photonEnergy, energySpread, mis);
     
     ASSERT_DOUBLE_EQ (m.getId(), id);
     ASSERT_DOUBLE_EQ (m.getNumberOfRays(), n);
@@ -96,6 +101,9 @@ TEST(MatrixTest, testParams) {
     ASSERT_DOUBLE_EQ (m.getSourceHeight(), height);
     ASSERT_DOUBLE_EQ (m.getHorDivergence(), hordiv);
     ASSERT_DOUBLE_EQ (m.getVerDivergence(), verdiv);
+    ASSERT_DOUBLE_EQ (m.getEnergySpread(), energySpread);
+    ASSERT_DOUBLE_EQ (m.getPhotonEnergy(), photonEnergy);
+    ASSERT_EQ (m.getSpreadType(), spreadType);
 }
 
 TEST (MatrixTest, testGetRays) {
@@ -106,10 +114,13 @@ TEST (MatrixTest, testGetRays) {
     double verdiv = 0.001;
     double hordiv = 0.001;
     int id = 3;
-    RAY::MatrixSource m = RAY::MatrixSource(id, "Matrix source 1", n, width, height, depth, hordiv, verdiv, {0,0,0,0});
+    double photonEnergy = 200;
+    double energySpread = 10;
+    int spreadType = 0;
+    RAY::MatrixSource m = RAY::MatrixSource(id, "Matrix source 1", n, spreadType, width, height, depth, hordiv, verdiv, photonEnergy, energySpread, {0,0,0,0});
     std::vector<RAY::Ray> rays = m.getRays();
 
-    EXPECT_EQ (rays.size(), n);
+    ASSERT_EQ (rays.size(), n);
 }
 
 TEST (PointSource, testParams) {
@@ -119,17 +130,23 @@ TEST (PointSource, testParams) {
     double depth = 1.0;
     double hor = 0.001;
     double ver = 0.001;
+    double photonEnergy = 120;
+    double energySpread = 20;
+    int spreadType = 1;
     std::vector<double> misalignment = {0,0,0,0};
-    RAY::PointSource p = RAY::PointSource(0, "Point source 1", number_of_rays, width, height, depth, hor, ver, 0,0,0,0, misalignment); // 0 = hard edge (uniform)
+    RAY::PointSource p = RAY::PointSource(0, "Point source 1", number_of_rays, spreadType,  width, height, depth, hor, ver, 0,0,0,0, photonEnergy, energySpread, misalignment); // 0 = hard edge (uniform)
         
     ASSERT_DOUBLE_EQ (p.getSourceDepth(), depth);
     ASSERT_DOUBLE_EQ (p.getSourceWidth(), width);
     ASSERT_DOUBLE_EQ (p.getSourceHeight(), height);
     ASSERT_DOUBLE_EQ (p.getHorDivergence(), hor);
     ASSERT_DOUBLE_EQ (p.getVerDivergence(), ver);
+    ASSERT_DOUBLE_EQ (p.getPhotonEnergy(), photonEnergy);
+    ASSERT_DOUBLE_EQ (p.getEnergySpread(), energySpread);
+    ASSERT_EQ (p.getSpreadType(), spreadType);
 
     std::vector<RAY::Ray> rays = p.getRays();
-    EXPECT_EQ (rays.size(), number_of_rays);
+    ASSERT_EQ (rays.size(), number_of_rays);
 }
 
 
@@ -140,8 +157,11 @@ TEST (LightSource, PointSourceHardEdge) {
     double depth = 1.0;
     double hor = 0.001;
     double ver = 0.001;
+    double photonEnergy = 120.97;
+    double energySpread = 12.1;
+    int spreadType = 0;
     std::vector<double> mis = {0,0,0,0};
-    RAY::PointSource p = RAY::PointSource(0, "Point source 1", number_of_rays, width, height, depth, hor, ver, 0,0,0,0, mis); // 0 = hard edge (uniform)
+    RAY::PointSource p = RAY::PointSource(0, "Point source 1", number_of_rays, spreadType, width, height, depth, hor, ver, 0,0,0,0, photonEnergy, energySpread, mis); // 0 = hard edge (uniform)
         
     ASSERT_DOUBLE_EQ (p.getSourceDepth(), depth);
     ASSERT_DOUBLE_EQ (p.getSourceWidth(), width);
@@ -158,7 +178,9 @@ TEST (LightSource, PointSourceHardEdge) {
         rayList.push_back(r.m_direction.x);
         rayList.push_back(r.m_direction.y);
         rayList.push_back(r.m_direction.z);
-        rayList.push_back(100);
+        rayList.push_back(r.m_energy);
+        ASSERT_TRUE(r.m_energy >= photonEnergy - (energySpread/2));
+        ASSERT_TRUE(r.m_energy <= photonEnergy + (energySpread/2));
     }
     std::cout << rayList.size() << std::endl;
     writeRaysToFile(rayList, "pointSourceHE");
@@ -171,8 +193,11 @@ TEST (LightSource, PointSourceSoftEdge) {
     double depth = 1.0;
     double hor = 0.001;
     double ver = 0.001;
+    double photonEnergy = 120;
+    double energySpread = 0;
+    int spreadType = 0;
     std::vector<double> mis = {0,0,0,0};
-    RAY::PointSource p = RAY::PointSource(0, "Point source 1", number_of_rays, width, height, depth, hor, ver, 1,1,1,1, mis); // 1 = soft edge (gaussian)
+    RAY::PointSource p = RAY::PointSource(0, "Point source 1", number_of_rays, spreadType, width, height, depth, hor, ver, 1,1,1,1, photonEnergy, energySpread, mis); // 1 = soft edge (gaussian)
         
     ASSERT_DOUBLE_EQ (p.getSourceDepth(), depth);
     ASSERT_DOUBLE_EQ (p.getSourceWidth(), width);
@@ -189,7 +214,9 @@ TEST (LightSource, PointSourceSoftEdge) {
         rayList.push_back(r.m_direction.x);
         rayList.push_back(r.m_direction.y);
         rayList.push_back(r.m_direction.z);
-        rayList.push_back(100);
+        rayList.push_back(r.m_energy);
+        ASSERT_TRUE(r.m_energy >= photonEnergy - (energySpread/2));
+        ASSERT_TRUE(r.m_energy <= photonEnergy + (energySpread/2));
     }
     std::cout << rayList.size() << std::endl;
     writeRaysToFile(rayList, "pointSourceSE");
@@ -203,8 +230,11 @@ TEST (LightSource, PointSourceHardEdgeMis) {
     double depth = 1.0;
     double hor = 0.001;
     double ver = 0.001;
+    double photonEnergy = 151;
+    double energySpread = 6;
+    int spreadType = 1;
     std::vector<double> mis = {2,3,0.005,0.006}; // x, y, psi, phi
-    RAY::PointSource p = RAY::PointSource(0, "Point source 1", number_of_rays, width, height, depth, hor, ver, 0,0,0,0, mis); // 0 = hard edge (uniform)
+    RAY::PointSource p = RAY::PointSource(0, "Point source 1", number_of_rays, spreadType, width, height, depth, hor, ver, 0,0,0,0, photonEnergy, energySpread, mis); // 0 = hard edge (uniform)
     
     std::vector<RAY::Ray> rays = p.getRays();
     std::list<double> rayList;
@@ -216,7 +246,9 @@ TEST (LightSource, PointSourceHardEdgeMis) {
         rayList.push_back(r.m_direction.x);
         rayList.push_back(r.m_direction.y);
         rayList.push_back(r.m_direction.z);
-        rayList.push_back(100);
+        rayList.push_back(r.m_energy);
+        ASSERT_TRUE(r.m_energy >= photonEnergy - (energySpread/2));
+        ASSERT_TRUE(r.m_energy <= photonEnergy + (energySpread/2));
     }
     std::cout << rayList.size() << std::endl;
     writeRaysToFile(rayList, "pointSourceHE_mis");
@@ -229,8 +261,11 @@ TEST (LightSource, PointSourceSoftEdgeMis) {
     double depth = 1.0;
     double hor = 0.001;
     double ver = 0.001;
+    double photonEnergy = 130;
+    double energySpread = 10;
+    int spreadType = 1;
     std::vector<double> mis = {2,3,0.005,0.006}; // x,y,psi,phi in rad
-    RAY::PointSource p = RAY::PointSource(0, "Point source 1", number_of_rays, width, height, depth, hor, ver, 1,1,1,1, mis); // 1 = soft edge (gaussian)
+    RAY::PointSource p = RAY::PointSource(0, "Point source 1", number_of_rays, spreadType, width, height, depth, hor, ver, 1,1,1,1, photonEnergy, energySpread, mis); // 1 = soft edge (gaussian)
     
     std::vector<RAY::Ray> rays = p.getRays();
     std::list<double> rayList;
@@ -242,7 +277,9 @@ TEST (LightSource, PointSourceSoftEdgeMis) {
         rayList.push_back(r.m_direction.x);
         rayList.push_back(r.m_direction.y);
         rayList.push_back(r.m_direction.z);
-        rayList.push_back(100);
+        rayList.push_back(r.m_energy);
+        ASSERT_TRUE(r.m_energy >= photonEnergy - (energySpread/2));
+        ASSERT_TRUE(r.m_energy <= photonEnergy + (energySpread/2));
     }
     std::cout << rayList.size() << std::endl;
     writeRaysToFile(rayList, "pointSourceSE_mis");
@@ -250,7 +287,10 @@ TEST (LightSource, PointSourceSoftEdgeMis) {
 
 TEST (LightSource, MatrixSource20000) {
     int number_of_rays = 20000;
-    RAY::MatrixSource p = RAY::MatrixSource(0, "Matrix20", number_of_rays, 0.065, 0.04, 0.0, 0.001, 0.001, { 0,0,0,0 });
+    double photonEnergy = 120;
+    double energySpread = 20;
+    int spreadType = 1;
+    RAY::MatrixSource p = RAY::MatrixSource(0, "Matrix20", number_of_rays, spreadType, 0.065, 0.04, 0.0, 0.001, 0.001, photonEnergy, energySpread, { 0,0,0,0 });
             
     std::vector<RAY::Ray> rays = p.getRays();
     std::list<double> rayList;
@@ -262,8 +302,34 @@ TEST (LightSource, MatrixSource20000) {
         rayList.push_back(r.m_direction.x);
         rayList.push_back(r.m_direction.y);
         rayList.push_back(r.m_direction.z);
-        rayList.push_back(100); // placeholder
+        ASSERT_TRUE(r.m_energy >= photonEnergy - (energySpread/2));
+        ASSERT_TRUE(r.m_energy <= photonEnergy + (energySpread/2));
+        rayList.push_back(r.m_energy);
     }
     std::cout << rayList.size() << std::endl;
     writeRaysToFile(rayList, "matrixsource20000");
 }
+
+TEST (LightSource, PointSource20000) {
+    int number_of_rays = 20000;
+    double photonEnergy = 120;
+    double energySpread = 20;
+    int spreadType = 1;
+    RAY::PointSource p = RAY::PointSource(0, "spec1_first_rzp4",number_of_rays , 1, 0.005,0.005,0, 0.02,0.06, 1,1,0,0, 640, 120, {0,0,0,0});
+   
+    std::vector<RAY::Ray> rays = p.getRays();
+    std::list<double> rayList;
+    for (RAY::Ray r : rays) {
+        rayList.push_back(r.m_position.x);
+        rayList.push_back(r.m_position.y);
+        rayList.push_back(r.m_position.z);
+        rayList.push_back(r.m_weight);
+        rayList.push_back(r.m_direction.x);
+        rayList.push_back(r.m_direction.y);
+        rayList.push_back(r.m_direction.z);
+        rayList.push_back(r.m_energy);
+    }
+    std::cout << rayList.size() << std::endl;
+    writeRaysToFile(rayList, "pointsource20000");
+}
+        

@@ -52,14 +52,19 @@ namespace RAY
         //add source to tracer
         //initialize matrix light source with default params
         int beamlinesSimultaneously = 1;
-        int number_of_rays = 1 << 17;
-        //PointSource p = PointSource(0, "name", number_of_rays, 0.005, 0.005, 0, 20, 60, 1, 1, 0, 0, { 0,0,0,0 });
-        MatrixSource m = MatrixSource(0, "Matrix20", number_of_rays, 0.065, 0.04, 0.0, 0.001, 0.001, { 0,0,0,0 });
-        //PointSource m = PointSource(0, "Point source 1", number_of_rays, 0.065, 0.04, 1.0, 0.001, 0.001, 0, 0, 0, 0, {0,0,0,0});
+        int number_of_rays = 20000;
+        //PointSource p = PointSource(0, "name", number_of_rays, 0.005, 0.005, 0, 20, 60, 1, 1, 0, 0, 100, 10, { 0,0,0,0 });
+        // petes setup
+        PointSource p = PointSource(0, "spec1_first_rzp4",number_of_rays , 1, 0.005,0.005,0, 0.02,0.06, 1,1,0,0, 640, 120, {0,0,0,0});
+        ReflectionZonePlate rzp = ReflectionZonePlate("ReflectionZonePlateMis", 1, 0, 1, 1, 4, 60, 170, 2.2, 0, 90, p.getPhotonEnergy(), p.getPhotonEnergy(), -1, -1, 2.2, 1, 90, 400, 90, 400, 0, 0, 0, 1, { 0,0,0, 0,0,0 }, nullptr); // dx,dy,dz, dpsi,dphi,dchi //
+        PlaneGrating plG = PlaneGrating("PlaneGratingDeviationAzMis", 0, 50, 200, 10, 0.0, 7.5, 10000, 100, 1000, 1, 2, {0,0,0, 0,0,0}, { 0,0,0,0,0,0 }, nullptr); // dx,dy,dz, dpsi,dphi,dchi // {1,2,3,0.001,0.002,0.003}
+    
+        //ImagePlane ip = ImagePlane("Image Plane", 385, nullptr); // one out of the bunch
+        //PointSource m = PointSource(0, "Point source 1", number_of_rays, 0.065, 0.04, 1.0, 0.001, 0.001, 0, 0, 0, 0, 100, 10, {0,0,0,0});
         //std::cout << m.getName() << " with " << m.getNumberOfRays() << " Rays." << std::endl;std::cout.precision(15); // show 16 decimals
 
-        addLightSource(&m);
-        generateRays(&tracer, &m);
+        addLightSource(&p);
+        generateRays(&tracer, &p);
 
         std::cout << "add rays to tracer done" << std::endl;
 
@@ -69,7 +74,7 @@ namespace RAY
         //ReflectionZonePlate p1 = ReflectionZonePlate("ReflectionZonePlate1", 1, 0, 50, 200, 170, 1, 10, 1000, 100, 100, -1, -1, 1, 1, 100, 500, 100, 500, 0, 0, 0, { 0,0,0, 0,0,0 }, NULL); // dx,dy,dz, dpsi,dphi,dchi // {1,2,3,0.001,0.002,0.003}
         //RAY::ReflectionZonePlate reflZonePlate = ReflectionZonePlate("ReflectionZonePlate", 1, 0, 4, 60, 170, 2.2, 0, 90, 640, 640, -1, -1, 2.2, 1, 90, 400, 90, 400, 0, 0, 0, { 0,0,0,0,0,0 }); // dx,dy,dz, dpsi,dphi,dchi // 
         // plane mirror with RAY-UI default values
-        PlaneMirror p1 = PlaneMirror("PlaneMirror1", 50, 200, 10, 0, 10000, { 0,0,0, 0,0,0 }, nullptr); // {1,2,3,0.01,0.02,0.03}
+        //PlaneMirror p1 = PlaneMirror("PlaneMirror1", 50, 200, 10, 0, 10000, { 0,0,0, 0,0,0 }, nullptr); // {1,2,3,0.01,0.02,0.03}
         /*
         PlaneMirror p2 = PlaneMirror("PlaneMirror2", 50, 200, 15, 4, 10000, {1,2,3, 0.001,0.002,0.003}, &p1); // {1,2,3,0.01,0.02,0.03}
         PlaneMirror p3 = PlaneMirror("PlaneMirror3", 50, 200, 7, 10, 10000, {0,0,0, 0,0,0}, &p2); // {1,2,3,0.01,0.02,0.03}
@@ -78,11 +83,11 @@ namespace RAY
         ImagePlane ip1 = ImagePlane("ImagePlane1", 350.0, nullptr);
 
         //m_Beamline.addQuadric(reflZonePlate.getName(), reflZonePlate.getAnchorPoints(), reflZonePlate.getInMatrix(), reflZonePlate.getOutMatrix(), reflZonePlate.getTempMisalignmentMatrix(), reflZonePlate.getInverseTempMisalignmentMatrix(), reflZonePlate.getParameters());
-        m_Beamline.addQuadric(p1.getName(), p1.getAnchorPoints(), p1.getInMatrix(), p1.getOutMatrix(), p1.getTempMisalignmentMatrix(), p1.getInverseTempMisalignmentMatrix(), p1.getParameters());
-        m_Beamline.addQuadric(ip1.getName(), ip1.getAnchorPoints(), ip1.getInMatrix(), ip1.getOutMatrix(), ip1.getTempMisalignmentMatrix(), ip1.getInverseTempMisalignmentMatrix(), ip1.getParameters());
+        m_Beamline.addQuadric(rzp); //rzp.getName(), rzp.getAnchorPoints(), rzp.getInMatrix(), rzp.getOutMatrix(), rzp.getTempMisalignmentMatrix(), rzp.getInverseTempMisalignmentMatrix(), rzp.getParameters());
+        //m_Beamline.addQuadric(ip); //ip.getName(), ip.getAnchorPoints(), ip.getInMatrix(), ip.getOutMatrix(), ip.getTempMisalignmentMatrix(), ip.getInverseTempMisalignmentMatrix(), ip.getParameters());
         //add beamline to tracer
         std::vector<RAY::Quadric> Quadrics = m_Beamline.getObjects();
-        tracer.setBeamlineParameters(1, Quadrics.size(), number_of_rays);
+        tracer.setBeamlineParameters(beamlinesSimultaneously, Quadrics.size(), number_of_rays);
         for (int i = 0; i<int(Quadrics.size()); i++) {
             tracer.addQuadric(Quadrics[i].getAnchorPoints(), Quadrics[i].getInMatrix(), Quadrics[i].getOutMatrix(), Quadrics[i].getTempMisalignmentMatrix(), Quadrics[i].getInverseTempMisalignmentMatrix(), Quadrics[i].getParameters());//, Quadrics[i].getInverseMisalignmentMatrix()
         }
@@ -108,7 +113,7 @@ namespace RAY
             outputFile << "Index;Xloc;Yloc\n";
         }
         else {
-            outputFile << "Index;Xloc;Yloc;Zloc;Weight;Xdir;Ydir;Zdir\n";
+            outputFile << "Index;Xloc;Yloc;Zloc;Weight;Xdir;Ydir;Zdir;Energy\n";
         }
 
         for (; outputRayIterator != tracer.getOutputIteratorEnd(); outputRayIterator++) {
@@ -122,7 +127,7 @@ namespace RAY
             memcpy(doubleVec.data(), (*outputRayIterator).data(), (*outputRayIterator).size() * VULKANTRACER_RAY_DOUBLE_AMOUNT * sizeof(double));
 
             doubleVec.resize((*outputRayIterator).size() * VULKANTRACER_RAY_DOUBLE_AMOUNT);
-            std::cout << "tracerInterface: sample ray: " << doubleVec[0] << ", " << doubleVec[1] << ", " << doubleVec[2] << ", " << doubleVec[3] << ", " << doubleVec[4] << ", " << doubleVec[5] << ", " << doubleVec[6] << std::endl;
+            std::cout << "tracerInterface: sample ray: " << doubleVec[0] << ", " << doubleVec[1] << ", " << doubleVec[2] << ", " << doubleVec[3] << ", " << doubleVec[4] << ", " << doubleVec[5] << ", " << doubleVec[6] << ", energy: " << doubleVec[7] << std::endl;
             writeToFile(doubleVec, outputFile, index);
             index = index + (*outputRayIterator).size();
 
@@ -149,7 +154,7 @@ namespace RAY
         std::string filename = "../../output/output.csv";
         outputFile.open(filename);
         char sep = ';'; // file is saved in .csv (comma seperated value), excel compatibility is manual right now
-        outputFile << "Index" << sep << "Xloc" << sep << "Yloc" << sep << "Zloc" << sep << "Weight" << sep << "Xdir" << sep << "Ydir" << sep << "Zdir" << std::endl;
+        outputFile << "Index" << sep << "Xloc" << sep << "Yloc" << sep << "Zloc" << sep << "Weight" << sep << "Xdir" << sep << "Ydir" << sep << "Zdir" << "Energy" << std::endl;
         // outputFile << "Index,Xloc,Yloc,Zloc,Weight,Xdir,Ydir,Zdir" << std::endl;
 
         size_t counter = 0;
@@ -201,9 +206,9 @@ namespace RAY
         else {
             char buff[256];
             for (size_t i = 0; i < size; i = i + 8) { // ! + 8 because of placeholder 
-                sprintf(buff, "%d;%.17f;%.17f;%.17f;%.17f;%.17f;%.17f;%.17f\n", index,
+                sprintf(buff, "%d;%.17f;%.17f;%.17f;%.17f;%.17f;%.17f;%.17f;%.17f\n", index,
                     outputRays[i], outputRays[i + 1], outputRays[i + 2], outputRays[i + 3],
-                    outputRays[i + 4], outputRays[i + 5], outputRays[i + 6]);
+                    outputRays[i + 4], outputRays[i + 5], outputRays[i + 6], outputRays[i + 7]);
                 file << buff;
                 index++;
             }

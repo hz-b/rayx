@@ -9,8 +9,8 @@ namespace RAY
     {
     public:
         
-        PointSource(int id, std::string name, int numberOfRays, double sourceWidth, double sourceHeight,
-    double sourceDepth, double horDivergence, double verDivergence, int widthDist, int heightDist, int horDist, int verDist, std::vector<double> misalignment);
+        PointSource(int id, std::string name, int numberOfRays, int spreadType, double sourceWidth, double sourceHeight,
+    double sourceDepth, double horDivergence, double verDivergence, int widthDist, int heightDist, int horDist, int verDist, double photonEnergy, double energySpread, std::vector<double> misalignment);
         
         PointSource();
         ~PointSource();

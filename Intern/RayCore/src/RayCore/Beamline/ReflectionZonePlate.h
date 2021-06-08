@@ -8,7 +8,7 @@ namespace RAY
 
     public:
         
-        ReflectionZonePlate(const char* name, int mount, int curvatureType, double width, double height, double deviation, double incidenceAngle, double azimuthal, double distanceToPreceedingElement, double designEnergy, double sourceEnergy, double orderOfDiffraction, double designOrderOfDiffraction, double dAlpha, double dBeta, double mEntrance, double mExit, double sEntrance, double sExit, double shortRadius, double longRadius, double elementOffsetZ, std::vector<double> misalignmentParams, Quadric* previous);
+        ReflectionZonePlate(const char* name, int mount, int curvatureType, int designType, int elementOffsetType, double width, double height, double deviation, double incidenceAngle, double azimuthal, double distanceToPreceedingElement, double designEnergy, double sourceEnergy, double orderOfDiffraction, double designOrderOfDiffraction, double dAlpha, double dBeta, double mEntrance, double mExit, double sEntrance, double sExit, double shortRadius, double longRadius, double elementOffsetZ, double beta, std::vector<double> misalignmentParams, Quadric* previous);
         ReflectionZonePlate();
         ~ReflectionZonePlate();
 
@@ -29,6 +29,8 @@ namespace RAY
         void focus(double angle);
         double rzpLineDensityDZ(double X, double Y, double Z, double FX, double FY, double FZ, double WL);
     
+        void setBeta(double beta); // in degree
+
         double getWidth();
         double getHeight();
         double getAlpha();
@@ -57,6 +59,7 @@ namespace RAY
         double getOrderOfDiffraction();
         double getDesignOrderOfDiffraction();
         double getDesignEnergyMounting(); // derived from source?
+        void printInfo();
         
     private:
         double m_totalWidth;
@@ -122,7 +125,7 @@ namespace RAY
         enum FULL_EFFICIENCY {FE_OFF, FE_ON};
         FULL_EFFICIENCY m_fullEfficiency; // todo
         enum DIFFRACTION_METHOD {DM_TWOGRATINGS, DM_2D};
-        DIFFRACTION_METHOD m_diffractionMethod; // todo
+        DIFFRACTION_METHOD m_diffractionMethod; // only use 2D
         double m_elementOffsetZ; // if given manually
         double m_elementOffsetZCalc; // if not given but has to be calculated by beam divergence
     };

@@ -9,12 +9,15 @@ layout (local_size_x = WORKGROUP_SIZE, local_size_y = 1, local_size_z = 1 ) in;
 // 3.14159265358979323846264338327950
 const double PI = 3.14159265358979323846264338327950;
 const uint64_t rngKey = 0;
+const double inm2eV = 1.239852e3;
+
 /* STRUCTS */
 
 struct Ray{
 	dvec3 position;
 	double weight; // status of the ray (e.g if element missed -> 0)
-	dvec4 direction;
+	dvec3 direction;
+	double energy;
 };
 struct Quadric{
 	dmat4 anchorPoints;
@@ -846,11 +849,18 @@ double squaresNormalRNG(inout uint64_t ctr, double mu, double sigma)
 
 /* HERE STARTS RAY TRACING CODE */
 
+double hvlam(double x) {
+    if(x==0) {
+        return 0.0;
+    }
+    return inm2eV / x;
+}
+
 // multiplies position and direction of ray r with transformation matrix m
 // r = dot(m, r)
 Ray rayMatrixMult(Ray r, dmat4 m) {
-	r.position = dvec3(m *  dvec4(r.position,1));
-	r.direction = dvec4(m * r.direction);
+	r.position = dvec3(m * dvec4(r.position,1));
+	r.direction = dvec3(m * dvec4(r.direction,0));
 	return r;
 }
 
@@ -866,7 +876,7 @@ Ray rayMatrixMult(Ray r, dmat4 m) {
 */
 void inTransformation(inout Ray r, dmat4 misalignment, dmat4 inTrans) {
 	r.position = dvec3(misalignment * (inTrans *  dvec4(r.position,1)) );
-	r.direction = dvec4(misalignment * (inTrans * r.direction));
+	r.direction = dvec3(misalignment * (inTrans * dvec4(r.direction,0)));
 }
 
 /**
@@ -880,7 +890,7 @@ void inTransformation(inout Ray r, dmat4 misalignment, dmat4 inTrans) {
 */
 void outTransformation(inout Ray r, dmat4 invMisalignment, dmat4 outTrans) {
 	r.position = dvec3(outTrans * (invMisalignment * dvec4(r.position,1)));
-	r.direction = outTrans * (invMisalignment * r.direction);
+	r.direction = dvec3(outTrans * (invMisalignment * dvec4(r.direction,0)));
 }
 
 
@@ -1193,7 +1203,7 @@ calculates DX and DZ (line spacing in x and z direction) at a given point for a 
 @params: lots
 @returns: (inplace) DX, DZ
 */
-void RZPLineDensity(inout Ray r, dvec4 normal, int IMAGE_TYPE, int RZP_TYPE, int DERIVATION_METHOD, double zOffsetCenter, 
+void RZPLineDensity(Ray r, dvec4 normal, int IMAGE_TYPE, int RZP_TYPE, int DERIVATION_METHOD, double zOffsetCenter, 
 double risag, double rosag, double rimer, double romer, double alpha, double beta, double Ord, double WL, 
 inout double DX, inout double DZ) {
 
@@ -1304,20 +1314,17 @@ Ray refrac2D(Ray r, dvec4 normal, double az, double ax) {
 	double eps1 = -r8_atan(normal.x/normal.y);
     double del1 = r8_asin(normal.z);
 
-	// maybe better not with matrix but like in old RAY?
-	double cos_d = r8_cos(del1);
+	double cos_d = r8_cos(-del1);
 	double sin_d = r8_sin(-del1);
 	double cos_e = r8_cos(-eps1);
 	double sin_e = r8_sin(-eps1);
-	dmat4 rot = dmat4(cos_e, cos_d*sin_e, sin_d*sin_e, 0,
-				-sin_e, cos_d*cos_e, sin_d*cos_e, 0,
-				0, -sin_d, cos_d, 0,
-				0,0,0,1);
-	dmat4 inv_rot = dmat4(cos_e, -sin_e, 0, 0, 
-				cos_d*sin_e, cos_d*cos_e, -sin_d, 0,
-				sin_d*sin_e, sin_d*cos_e, cos_d, 0,
-				0,0,0,1);
-	r.direction = dvec4(rot * r.direction);
+	dmat3 rot = dmat3(cos_e, cos_d*sin_e, sin_d*sin_e,
+				-sin_e, cos_d*cos_e, sin_d*cos_e,
+				0, -sin_d, cos_d);
+	dmat3 inv_rot = dmat3(cos_e, -sin_e, 0,
+				cos_d*sin_e, cos_d*cos_e, -sin_d,
+				sin_d*sin_e, sin_d*cos_e, cos_d);
+	r.direction = rot * r.direction;
 
 	double x1 = r.direction.x - ax;
 	double z1 = r.direction.z - az; 
@@ -1332,7 +1339,7 @@ Ray refrac2D(Ray r, dvec4 normal, double az, double ax) {
 	}else{ // beyond horizon - when divergence too large
 	   r.weight = 0.0;
 	}
-	r.direction = dvec4(inv_rot * r.direction);
+	r.direction = inv_rot * r.direction;
 	return r;
 }
 
@@ -1360,7 +1367,7 @@ Ray refrac(Ray r, dvec4 normal, double a){
 				cos_d*sin_e, cos_d*cos_e, -sin_d, 0,
 				sin_d*sin_e, sin_d*cos_e, cos_d, 0,
 				0,0,0,1);
-	r.direction = dvec4(rot * r.direction);
+	r.direction = dvec3(rot * dvec4(r.direction,0));
 	
 	double y1 = (r.direction[1]*r.direction[1]+r.direction[2]*r.direction[2]-((r.direction[2]-a1)*(r.direction[2]-a1)));
 	if (y1 > 0){
@@ -1370,7 +1377,7 @@ Ray refrac(Ray r, dvec4 normal, double a){
 	}else{
 	   r.weight = 0.0;
 	}
-	r.direction = dvec4(inv_rot * r.direction);
+	r.direction = dvec3(inv_rot * dvec4(r.direction,0));
 	return r;
 }
 
@@ -1588,9 +1595,9 @@ Ray traceSlit(Ray r, Quadric q) {
 
 
 Ray traceRZP(Ray r, Quadric q) {
-	double element_offset_z = q.parameters[3][2];
 	r = rayMatrixMult(r, q.inTrans);
-	//r.position.z = r.position.z - element_offset_z;
+	double element_offset_z = q.parameters[3][2];
+	r.position.z = r.position.z - element_offset_z;
 	//r = rayMatrixMult(r, q.misalignment); // misalignment not stored in intrans because it needs to be removed later
 	
 	// RZP can be plane, toroidal or spherical curvature type. Use intersectionPoint for all except toroidal
@@ -1606,7 +1613,7 @@ Ray traceRZP(Ray r, Quadric q) {
 	
 	
 	if(r.weight < 1.0) {
-		//r.position.z -= element_offset_z;
+		r.position.z += element_offset_z;
 		r = rayMatrixMult(r, q.outTrans); // inv mis & out trans
 		return r;
 	}
@@ -1627,8 +1634,8 @@ Ray traceRZP(Ray r, Quadric q) {
 	double d_beta = q.parameters[3][1];
 	double d_ord = q.parameters[1][1];
 	double zOffsetCenter = q.parameters[1][3];; // fresnel center z offset
-	double WL = q.parameters[0][3];//12.39852;
-	double WL0 = WL*1e-06;
+	double WL = hvlam(r.energy);//12.39852;
+	double WL0 = 1e-06*q.parameters[0][3]; // source energy/design energy
 	double Ord = q.parameters[1][2];
 	
 	RZPLineDensity(r, normal, IMAGE_TYPE, RZP_TYPE, DERIVATION_METHOD, zOffsetCenter, risag, rosag, rimer, romer, d_alpha, d_beta, d_ord, WL0, DX, DZ);
@@ -1641,6 +1648,7 @@ Ray traceRZP(Ray r, Quadric q) {
 	double ax = WL*DX*Ord*1e-6;
  	r = refrac2D(r, normal, az, ax);
 
+	r.position.z += element_offset_z;
 	r = rayMatrixMult(r, q.outTrans);
 	return r;
 }
@@ -1714,10 +1722,9 @@ Ray traceGeneralGrating(Ray r, Quadric q) {
 */
 Ray traceMirror(Ray r, Quadric q) {
 	r = rayMatrixMult(r, q.inTrans);
-	dvec4 normal = intersectionPoint(r, q.anchorPoints, 1);
-	//r.direction = normal;
 	
-	r.direction = reflect(r.direction, normal);
+	dvec4 normal = intersectionPoint(r, q.anchorPoints, 1);
+	r.direction = dvec3(reflect(dvec4(r.direction,0), normal));
 	
 	// will be changed, when width & heigth in "parameters"
 	double xLength = q.anchorPoints[1][0]; // only 10 of the 16 anchorpoints are important for the intersection point function ("quad function"), since the matrix A is symmetric
@@ -1725,7 +1732,7 @@ Ray traceMirror(Ray r, Quadric q) {
 	r.weight = wasteBox(r.position[0],r.position[2],xLength,zLength, r.weight);
 	
 	r = rayMatrixMult(r, q.outTrans);
-	
+
 	return r;
 }
 
@@ -1750,7 +1757,7 @@ Ray traceEllipsoidMirror(Ray r, Quadric q) {
 	*/
 	//normal = dvec4(-a_11*r.position.x*b_sign, );
 
-	r.direction = reflect(r.direction, normal);
+	r.direction = dvec3(reflect(dvec4(r.direction,0), normal));
 	
 	r = rayMatrixMult(r, q.outTrans); // 0: T-1*M-1 1: T-1*A-1*M-1*A
 	//outTransformation(r, q.inverseMisalignment, q.outTrans);
@@ -1763,6 +1770,7 @@ the image plane is always parallel to x-y-plane of ray coordinate system in whic
 -> defined by distance to that element
 */
 Ray traceImagePlane(Ray r, Quadric q) {
+	r = rayMatrixMult(r, q.inTrans); 
 	double dist = q.parameters[0][0];
 	double offset = dist - r.position.z; // length between ray origin (intersection point of previous element) and image plane
 	r.position.x = r.position.x + ((r.direction.x / r.direction.z) * offset); // scale x-slope of ray (l/n) by z-length between origin and image plane
@@ -1880,23 +1888,24 @@ void iterateQuadrics(){
 
 
 void testFunctions() {
-	const int numberOfRays = rayData.length();
-	const int numberOfQuadrics = quadricData.length()-1;
 	// flag to decide how to interpret the input
 	double settings = quadricData[0].anchorPoints[3][1];
 	// default: 0 -> iterate through quadrics
 	if(settings == 0) {
 		iterateQuadrics();
+		return;
 	}
+	const int numberOfRays = rayData.length();
+	const int numberOfQuadrics = quadricData.length()-1;
 	// settings != 0 -> unit test cases in test_shader.cpp
 	// input rays and quadrics are interpreted depending on the test case
 	if(settings == 1) { // TEST TRIG FUNCTIONS
 		for (int i = 0; i<numberOfRays; i++) {
 			Ray r = rayData[i];
-			Ray res;
+			Ray res = r;
 			res.position = dvec3(r8_cos(r.position.x), r8_cos(r.position.y),r8_sin(r.position.z));
 			res.weight = r8_sin(r.weight);
-			res.direction = dvec4(r8_atan(r.direction.x), r8_atan(r.direction.y), r8_asin(r.direction.z), r8_asin(r.direction[3]));
+			res.direction = dvec3(r8_atan(r.direction.x), r8_atan(r.direction.y), r8_asin(r.direction.z));
 			outputData[i] = res;
 		} 
 	}else if(settings == 2) { // test refrac
@@ -1921,6 +1930,7 @@ void testFunctions() {
 			Ray res;
 			double b_params[6] = double[6] (r.position.x,r.position.y,r.position.z, r.direction.x,r.direction.y,r.direction.z);//(0.1,0.1,0.1,0.01,0.02,0.03);
 			res.weight = vlsGrating(r.weight, quadricData[0].anchorPoints[2][1], b_params);
+			res.energy = 0;
 			outputData[i] = res;
 		}
 	}else if(settings == 5) { // diffraction
@@ -1941,6 +1951,7 @@ void testFunctions() {
 			res.position.x = dPhi;
 			res.position.y = dPsi;
 			res.weight = 100;
+			res.energy = 0;
 			outputData[i] = res;
 		}
 	}else if(settings == 6) { // bessel1 function
@@ -1948,8 +1959,9 @@ void testFunctions() {
 			Ray r = rayData[i];
 			Ray res;
 			res.position = dvec3(bessel1(r.position.x),bessel1(r.position.y),bessel1(r.position.z));
-			res.direction = dvec4(bessel1(r.direction.x),bessel1(r.direction.y),bessel1(r.direction.z),0);
+			res.direction = dvec3(bessel1(r.direction.x),bessel1(r.direction.y),bessel1(r.direction.z));
 			res.weight = bessel1(r.weight);
+			res.energy = 0;
 			outputData[i] = res;
 		}
 	}else if(settings == 7) { // double pow test
@@ -1964,7 +1976,7 @@ void testFunctions() {
 		for(int i = 0; i<numberOfRays; i++) {
 			Ray r = rayData[i];
 			r.position = dvec3(fact(int(r.position.x)), fact(int(r.position.y)), fact(int(r.position.z)));
-			r.direction = dvec4(fact(int(r.direction.x)), fact(int(r.direction.y)), fact(int(r.direction.z)), 0);
+			r.direction = dvec3(fact(int(r.direction.x)), fact(int(r.direction.y)), fact(int(r.direction.z)));
 			r.weight = fact(int(r.weight));
 			outputData[i] = r;
 		}
@@ -2020,24 +2032,24 @@ void testFunctions() {
 	}else if(settings == 13) {
 		for (int i = 0; i<numberOfRays; i++) {
 			Ray r = rayData[i];
-			dvec4 normal = r.direction;
+			dvec4 normal = dvec4(r.direction,0);
 			double slopeX = r.position.x;
 			double slopeZ = r.position.z;
 			dvec4 new_normal = normal_cartesian(normal, slopeX, slopeZ);
 			// normal is in homogeneous coordinates but ray direction and position are only interpreted as dvec3 on C++ side -> store fourth value in weight
-			r.direction = new_normal;
+			r.direction = dvec3(new_normal);
 			r.weight = new_normal[3];
 			outputData[i] = r;
 		}
 	}else if(settings == 14) {
 		for(int i = 0; i<numberOfRays; i++) {
 			Ray r = rayData[i];
-			dvec4 normal = r.direction;
+			dvec4 normal = dvec4(r.direction,0);
 			double slopeX = r.position.x;
 			double slopeZ = r.position.z;
 			dvec4 new_normal = normal_cylindrical(normal, slopeX, slopeZ);
 			// normal is in homogeneous coordinates but ray direction and position are only interpreted as dvec3 on C++ side -> store fourth value in weight
-			r.direction = new_normal;
+			r.direction = dvec3(new_normal);
 			r.weight = new_normal[3];
 			outputData[i] = r;
 		}

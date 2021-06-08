@@ -10,7 +10,7 @@
 class Ray
 {
 public:
-	Ray(double xpos, double ypos, double zpos, double xdir, double ydir, double zdir, double w);
+	Ray(double xpos, double ypos, double zpos, double xdir, double ydir, double zdir, double en, double w);
 	Ray(double* location);
 	Ray();
 	~Ray();
@@ -21,6 +21,7 @@ public:
 	double getxPos();
 	double getyPos();
 	double getzPos();
+	double getEnergy();
 	double getWeight();
 
 private:
@@ -31,5 +32,5 @@ private:
 	vec3 position;
 	double weight;
 	vec3 direction;
-	double placeholder;
+	double energy;
 };

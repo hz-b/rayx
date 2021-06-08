@@ -6,8 +6,8 @@ namespace RAY
 {
     
 
-    PointSource::PointSource(int id, std::string name, int numberOfRays, double sourceWidth, double sourceHeight,
-    double sourceDepth, double horDivergence, double verDivergence, int widthDist, int heightDist, int horDist, int verDist, std::vector<double> misalignment) : LightSource(id, numberOfRays, name.c_str(), misalignment), m_sourceDepth(sourceDepth), m_sourceHeight(sourceHeight), m_sourceWidth(sourceWidth), m_horDivergence(horDivergence), m_verDivergence(verDivergence) {
+    PointSource::PointSource(int id, std::string name, int numberOfRays, int spreadType, double sourceWidth, double sourceHeight,
+    double sourceDepth, double horDivergence, double verDivergence, int widthDist, int heightDist, int horDist, int verDist, double photonEnergy, double energySpread, std::vector<double> misalignment) : LightSource(id, numberOfRays, name.c_str(), spreadType, photonEnergy, energySpread, misalignment), m_sourceDepth(sourceDepth), m_sourceHeight(sourceHeight), m_sourceWidth(sourceWidth), m_horDivergence(horDivergence), m_verDivergence(verDivergence) {
         m_widthDist = widthDist == 0 ? SD_HARDEDGE : SD_GAUSSIAN;
         m_heightDist = heightDist == 0 ? SD_HARDEDGE : SD_GAUSSIAN;
         m_horDist = horDist == 0 ? SD_HARDEDGE : SD_GAUSSIAN;
@@ -35,7 +35,7 @@ namespace RAY
         // std::normal_distribution<double> stdnorm (mean,stddev); 
         // std::uniform_real_distribution<double> uniform (0,1);
         
-        double x,y,z,psi,phi;
+        double x,y,z,psi,phi,en; //x,y,z pos, psi,phi direction cosines, en=energy
         
         int n = this->getNumberOfRays();
         std::vector<Ray> rayVector;
@@ -47,6 +47,7 @@ namespace RAY
             x = getCoord(m_widthDist, m_sourceWidth) + getMisalignmentParams()[0];
             y = getCoord(m_heightDist, m_sourceHeight) + getMisalignmentParams()[1];
             z = (m_uniform(m_re) - 0.5) * m_sourceDepth;
+            en = selectEnergy();
             //double z = (rn[2] - 0.5) * m_sourceDepth;
             glm::dvec3 position = glm::dvec3(x, y, z);
             
@@ -55,7 +56,7 @@ namespace RAY
             phi = getCoord(m_horDist, m_horDivergence) + getMisalignmentParams()[3];
             // get corresponding angles based on distribution and deviation from main ray (main ray: x=0,y=0,z=1 if phi=psi=0)
             glm::dvec3 direction = getDirectionFromAngles(phi,psi);
-            Ray r = Ray(position, direction, 1.0);
+            Ray r = Ray(position, direction, en, 1.0);
             rayVector.emplace_back(r);
         }
         std::cout<<&(rayVector[0])<<std::endl;
@@ -67,11 +68,11 @@ namespace RAY
      * get deviation from main ray according to specified distribution (uniform if hard edge, gaussian if soft edge)) and extent (eg specified width/height of source)
      */
     double PointSource::getCoord(PointSource::SOURCE_DIST l, double extent) {
-        if(l == SD_HARDEDGE)
+        if(l == SD_HARDEDGE){
             return (m_uniform(m_re) - 0.5) * extent;
-        else
+        }else{
             return (m_stdnorm(m_re) * extent);
-
+        }
     }
 
     double PointSource::getSourceDepth(){ return m_sourceDepth; }

@@ -39,8 +39,8 @@ add_custom_target(COMPILE_SHADER ALL
 
 find_package(Vulkan REQUIRED FATAL_ERROR)
 if (WIN32)
-    find_package(NsightAftermath REQUIRED FATAL_ERROR)
-    get_filename_component(NsightAftermath_LIBRARY_DIR ${NsightAftermath_LIBRARY} DIRECTORY)
+    #find_package(NsightAftermath REQUIRED FATAL_ERROR)
+    #get_filename_component(NsightAftermath_LIBRARY_DIR ${NsightAftermath_LIBRARY} DIRECTORY)
 endif ()
 
 add_library(${PROJECT_NAME} 
@@ -70,7 +70,7 @@ target_link_libraries(${PROJECT_NAME}
 
 if (WIN32)
     target_link_libraries(${PROJECT_NAME}
-        NsightAftermath::NsightAftermath
+        #NsightAftermath::NsightAftermath
     )
 endif ()
 

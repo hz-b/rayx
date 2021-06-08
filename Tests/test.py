@@ -27,60 +27,83 @@ RAY_UI = p_join(RAY_UI, 'unittestData')
 scatterplot_size = 0.5
 
 
-def open_new_file(name, valid=0):
+def open_new_file(name, valid=0, energy=0):
     df = pd.read_csv(p_join(RAY_REWORKED, name), sep=';')
     m_o = np.array([df['Xloc'].values, df['Yloc'].values, df['Zloc'].values,
                    df['Xdir'].values, df['Ydir'].values, df['Zdir'].values], dtype=np.double)
     weights = np.array(df['Weight'].values)
     # ignore rays that would have been thrown away in old ray (weight = 0)
+    if energy == 1:
+        m_o = np.append(m_o, df['Energy'].values[None], axis=0)
     if valid == 1:
         valid_weights = np.where([weights == 1])[1]
         m_o = m_o[:, valid_weights]
         return m_o
     return m_o
 
-
-def open_old_file(name, prefix):
+# returns 2d array with 6 or 7 rows [origin, direction(, energy)]
+def open_old_file(name, prefix, energy=0):
     df = pd.read_csv(p_join(RAY_UI, name), decimal=',', sep=';')
     m = np.array([df[prefix+'OX'].values, df[prefix+'OY'].values, df[prefix+'OZ'].values,
                  df[prefix+'DX'].values, df[prefix+'DY'].values, df[prefix+'DZ'].values], dtype=np.double)
+    if energy == 1:
+        m = np.append(m, df[prefix+'EN'].values[None],axis=0)
+        print(m.shape)
     return m
 
 
-def plot_comparison(name, result, correct):
+def plot_comparison(name, result, correct, mean=0):
     fig, ax = plt.subplots(2, 3, figsize=(10, 6))
     ax[0][0].set_ylabel('New - y')
-    ax[0][0].scatter(result[0], result[1], s=scatterplot_size)
     ax[0][0].set_xlabel("x")
-    ax[0][1].scatter(result[0], result[2], s=scatterplot_size)
+    if mean == 1:
+        ax[0][0].axhline(np.mean(result[1]), ls='--', c='r', alpha=0.7) 
+        ax[0][0].axvline(np.mean(result[0]), ls='--', c='r', alpha=0.7) 
+    ax[0][0].scatter(result[0], result[1], s=scatterplot_size)
     ax[0][1].set_xlabel('x')
     ax[0][1].set_ylabel('z')
-    ax[0][2].scatter(result[3], result[4], s=scatterplot_size)
+    ax[0][1].scatter(result[0], result[2], s=scatterplot_size)
     ax[0][2].set_xlabel('x-dir')
     ax[0][2].set_ylabel('y-dir')
-
+    ax[0][2].scatter(result[3], result[4], s=scatterplot_size)
+    if mean == 1:
+        ax[0][2].axhline(np.mean(result[4]), ls='--', c='r', alpha=0.7) 
+        ax[0][2].axvline(np.mean(result[3]), ls='--', c='r', alpha=0.7) 
+        
     ax[1][0].set_ylabel('Old - y')
     ax[1][0].set_xlabel('x')
+    if mean == 1:
+        ax[1][0].axhline(np.mean(correct[1]), ls='--', c='r', alpha=0.7) 
+        ax[1][0].axvline(np.mean(correct[0]), ls='--', c='r', alpha=0.7) 
     ax[1][0].scatter(correct[0], correct[1], s=scatterplot_size)
     ax[1][1].set_xlabel('x')
-    ax[1][1].set_ylabel('y')
+    ax[1][1].set_ylabel('z')
     ax[1][1].scatter(correct[0], correct[2], s=scatterplot_size)
     ax[1][2].set_xlabel('x-dir')
     ax[1][2].set_ylabel('y-ddir')
     ax[1][2].scatter(correct[3], correct[4], s=scatterplot_size)
+    if mean == 1:
+        ax[1][2].axhline(np.mean(correct[4]), ls='--', c='r', alpha=0.7) 
+        ax[1][2].axvline(np.mean(correct[3]), ls='--', c='r', alpha=0.7) 
     fig.suptitle(name)
     fig.tight_layout()
     plt.show()
 
+photonEnergy_def = 260
+energySpread_def = 80
 
 class Tests(unittest.TestCase):
-
+    
     def test_planeMirrorDefault(self):
         correct = open_old_file(
             'Plane Mirror-RawRaysBeam_default.csv', 'Plane Mirror_')
-        result = open_new_file('testFile_PlaneMirrorDef.csv')
-        self.assertTrue(np.allclose(correct, result))
-
+        result = open_new_file('testFile_PlaneMirrorDef.csv', energy=1)
+        self.assertTrue(correct.shape == (result.shape[0]-1,result.shape[1]))
+        self.assertTrue(np.allclose(correct, result[:6]))
+        self.assertTrue(np.all(result[6] <= photonEnergy_def+energySpread_def))
+        self.assertTrue(np.all(result[6] >= photonEnergy_def-energySpread_def))
+        
+    
     def test_planeMirrorMis(self):
         correct = open_old_file(
             'Plane Mirror-RawRaysBeam_20mis.csv', 'Plane Mirror_')
@@ -90,6 +113,7 @@ class Tests(unittest.TestCase):
     def test_sphereMirrorDefault(self):
         correct = open_old_file('Sphere-RawRaysBeam_default.csv', 'Sphere_')
         result = open_new_file('testFile_SphereMirrorDefault.csv')
+        self.assertTrue(correct.shape == result.shape)
         self.assertTrue(np.allclose(correct, result))
 
     def test_planeGratingDevDefault(self):
@@ -101,19 +125,23 @@ class Tests(unittest.TestCase):
     def test_planeGratingDevAzimuthal(self):
         correct = open_old_file('Plane Grating_div_az.csv', 'Plane Grating_')
         result = open_new_file('testFile_PlaneGratingDeviationAz.csv')
+        self.assertTrue(correct.shape == result.shape)
         self.assertTrue(np.allclose(correct, result))
 
     def test_planeGratingDevMis(self):
         correct = open_old_file(
             'Plane Grating_div_az_mis.csv', 'Plane Grating_')
         result = open_new_file('testFile_PlaneGratingDeviationMis.csv')
+        self.assertTrue(correct.shape == result.shape)
         self.assertTrue(np.allclose(correct, result))
 
     def test_planeGratingIncAzMis(self):
         correct = open_old_file(
             'Plane Grating_inc_az_mis.csv', 'Plane Grating_')
         result = open_new_file('testFile_PlaneGratingIncAzMis.csv')
+        self.assertTrue(correct.shape == result.shape)
         self.assertTrue(np.allclose(correct, result))
+    
     """
     def test_planeGratingVLSnoMIS(self):
         correct = open_old_file(
@@ -121,11 +149,13 @@ class Tests(unittest.TestCase):
         result = open_new_file('output.csv')
         self.assertTrue(np.allclose(correct, result))
     """
+    
     def test_RZPdefault(self):
         correct = open_old_file(
             'Reflection Zoneplate-RawRaysBeam_def20_s.csv', 'Reflection Zoneplate_')
         result = open_new_file(
             'testFile_ReflectionZonePlateDefault.csv', valid=1)
+        self.assertTrue(correct.shape == result.shape)
         self.assertTrue(np.allclose(correct, result))
 
     def test_RZPazimuthal(self):
@@ -133,72 +163,97 @@ class Tests(unittest.TestCase):
             'Reflection Zoneplate-RawRaysBeam_azim200.csv', 'Reflection Zoneplate_')
         result = open_new_file(
             'testFile_ReflectionZonePlateAzim200.csv', valid=1)
+        self.assertTrue(correct.shape == result.shape)
         self.assertTrue(np.allclose(correct, result))
 
     def test_ImagePlaneMatrixSource(self):
         correct = open_old_file(
             'ImagePlane-RawRaysOutgoing.csv', 'ImagePlane_')
         result = open_new_file('testFile_PlaneMirror_ImagePlane.csv', valid=1)
+        self.assertTrue(correct.shape == result.shape)
         self.assertTrue(np.allclose(correct, result))
 
     def test_RZPmis(self):
         correct = open_old_file(
             'Reflection Zoneplate-RawRaysBeam_mis200_s.csv', 'Reflection Zoneplate_')
         result = open_new_file('testFile_ReflectionZonePlateMis.csv', valid=1)
+        self.assertTrue(correct.shape == result.shape)
         self.assertTrue(np.allclose(correct, result))
-
+    
     def test_pointSourceHardEdge(self):
+        sourceEnergy = 120.97
+        energySpread = 12.1
         correct = open_old_file(
             'Point Source-RawRaysBeam_HE_s.csv', 'Point Source_')
-        result = open_new_file('pointSourceHE.csv')
-        self.assertTrue(correct.shape == result.shape)
+        result = open_new_file('pointSourceHE.csv', energy=1)
+        # check that same amount of rays
+        self.assertTrue(correct.shape[1] == result.shape[1])
         self.assertTrue(np.isclose(np.mean(correct[5]), np.mean(result[5])))
+        self.assertTrue(np.all(result[6] <= sourceEnergy+energySpread))
+        self.assertTrue(np.all(result[6] >= sourceEnergy-energySpread))
         #plot_comparison('Hard Edge', result, correct)
 
     def test_pointSourceSoftEdge(self):
+        sourceEnergy = 120
+        energySpread = 0
         correct = open_old_file(
-            'Point Source-RawRaysBeam_SE_s.csv', 'Point Source_')
-        result = open_new_file('pointSourceSE.csv')
-        self.assertTrue(correct.shape == result.shape)
+            'Point Source-RawRaysBeam_SE_s.csv', 'Point Source_', energy=1)
+        result = open_new_file('pointSourceSE.csv',energy=1)
+        self.assertTrue(correct.shape[1] == result.shape[1])
         self.assertTrue(np.isclose(np.mean(correct[5]), np.mean(result[5])))
-        #plot_comparison('Soft Edge', result, correct)
+        self.assertTrue(np.all(result[6] <= sourceEnergy+energySpread))
+        self.assertTrue(np.all(result[6] >= sourceEnergy-energySpread))
+        plot_comparison('Soft Edge', result, correct, mean=1)
 
     def test_pointSourceSoftEdgeMis(self):
+        sourceEnergy = 130
+        energySpread = 10
         correct = open_old_file(
             'Point Source-RawRaysBeam_SE_mis_s.csv', 'Point Source_')
-        result = open_new_file('pointSourceSE_mis.csv')
-        self.assertTrue(correct.shape == result.shape)
+        result = open_new_file('pointSourceSE_mis.csv', energy=1)
+        self.assertTrue(correct.shape[1] == result.shape[1])
         self.assertTrue(np.isclose(np.mean(correct[5]), np.mean(result[5])))
-        #plot_comparison('Soft Edge Mis', result, correct)
+        self.assertTrue(np.all(result[6] <= sourceEnergy+energySpread))
+        self.assertTrue(np.all(result[6] >= sourceEnergy-energySpread))
+        #plot_comparison('Soft Edge Mis', result, correct, mean=1)
 
     def test_pointSourceHardEdgeMis(self):
+        sourceEnergy = 151
+        energySpread = 6
         correct = open_old_file(
             'Point Source-RawRaysBeam_HE_mis_s.csv', 'Point Source_')
-        result = open_new_file('pointSourceHE_mis.csv')
-        self.assertTrue(correct.shape == result.shape)
+        result = open_new_file('pointSourceHE_mis.csv', energy=1)
+        self.assertTrue(correct.shape[1] == result.shape[1])
         self.assertTrue(np.isclose(np.mean(correct[5]), np.mean(result[5])))
+        self.assertTrue(np.all(result[6] <= sourceEnergy+energySpread))
+        self.assertTrue(np.all(result[6] >= sourceEnergy-energySpread))
         #plot_comparison('Hard Edge Mis', result, correct)
 
     def test_matrixSource20000(self):
+        sourceEnergy = 120
+        energySpread = 20
         correct = open_old_file(
             'Matrix Source-RawRaysBeam_20000.csv', 'Matrix Source_')
-        result = open_new_file('matrixsource20000.csv')
-        self.assertTrue(correct.shape == result.shape)
+        result = open_new_file('matrixsource20000.csv', energy=1)
+        self.assertTrue(correct.shape[1] == result.shape[1])
         self.assertTrue(np.isclose(np.mean(correct[5]), np.mean(result[5])))
+        self.assertTrue(np.all(result[6] <= sourceEnergy+energySpread))
+        self.assertTrue(np.all(result[6] >= sourceEnergy-energySpread))
         #plot_comparison('Hard Edge Mis', result, correct)
-
+    
     def test_globalCoord_9rays(self):
         correct = open_old_file(
             'Plane Mirror 3-RawRaysOutgoing_9rays.csv', 'Plane Mirror 3_')
         result = open_new_file('testFile_globalCoordinates_9rays.csv', valid=1)
+        self.assertTrue(correct.shape == result.shape)
         self.assertTrue(np.allclose(correct, result))
-    """
+    
     def test_globalCoord_20rays(self):
         correct = open_old_file(
             'Plane Mirror 3-RawRaysOutgoing_20Rays_mis.csv', 'Plane Mirror 3_')
         result = open_new_file('output.csv', valid=1)
         self.assertTrue(np.allclose(correct, result))
-    """
+    
 
 if __name__ == '__main__':
     unittest.main()

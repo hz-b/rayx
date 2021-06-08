@@ -605,7 +605,7 @@ void VulkanTracer::getRays() {
 		double* pMappedMemory = (double*)mappedMemory;
 		for (uint32_t j = 0; j < GPU_MAX_STAGING_SIZE / RAY_DOUBLE_COUNT; j = j + RAY_DOUBLE_COUNT)
 		{
-			data.push_back(Ray(pMappedMemory[j], pMappedMemory[j + 1], pMappedMemory[j + 2], pMappedMemory[j + 4], pMappedMemory[j + 5], pMappedMemory[j + 6], pMappedMemory[j + 3]));
+			data.push_back(Ray(pMappedMemory[j], pMappedMemory[j + 1], pMappedMemory[j + 2], pMappedMemory[j + 4], pMappedMemory[j + 5], pMappedMemory[j + 6],pMappedMemory[j + 7], pMappedMemory[j + 3]));
 		}
 		outputData.insertVector(data.data(), data.size());
 		vkUnmapMemory(device, bufferMemories[3]);
@@ -621,7 +621,7 @@ void VulkanTracer::getRays() {
 	double* pMappedMemory = (double*)mappedMemory;
 	for (uint32_t j = 0; j < (((bytesNeeded - 1) % GPU_MAX_STAGING_SIZE) + 1) / VULKANTRACER_RAY_DOUBLE_AMOUNT; j = j + 8)
 	{
-		data.push_back(Ray(pMappedMemory[j], pMappedMemory[j + 1], pMappedMemory[j + 2], pMappedMemory[j + 4], pMappedMemory[j + 5], pMappedMemory[j + 6], pMappedMemory[j + 3]));
+		data.push_back(Ray(pMappedMemory[j], pMappedMemory[j + 1], pMappedMemory[j + 2], pMappedMemory[j + 4], pMappedMemory[j + 5], pMappedMemory[j + 6], pMappedMemory[j + 7], pMappedMemory[j + 3]));
 	}
 	std::cout << "sample ray: " << pMappedMemory[0] << ", " << pMappedMemory[1] << ", " << pMappedMemory[2] << ", " << pMappedMemory[3] << ", " << pMappedMemory[4] << ", " << pMappedMemory[5] << ", " << pMappedMemory[6] << ", " << pMappedMemory[7] << ", " << std::endl;
 	// std::cout << "data[262000]= " << data[263000].getxDir() << std::endl;

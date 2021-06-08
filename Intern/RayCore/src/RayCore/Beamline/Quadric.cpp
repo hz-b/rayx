@@ -44,30 +44,6 @@ namespace RAY
         m_misalignmentParams = misalignmentParams;
         calcTransformationMatrices(alpha, chi, beta, dist, misalignmentParams);
         setTemporaryMisalignment(tempMisalignmentParams);
-        /*double cos_c = cos(chi);
-        double sin_c = sin(chi);
-        double cos_a = cos(alpha);
-        double sin_a = sin(alpha);
-        double sin_b = sin(beta);
-        double cos_b = cos(beta);
-        // transposes of the actual matrices since they seem to be transposed in the process of transferring to the shader
-        m_inMatrix = {cos_c, -sin_c*cos_a, -sin_c*sin_a, 0,
-                sin_c, cos_c*cos_a, sin_a*cos_c, 0,
-                0, -sin_a, cos_a, 0,
-                0, dist*sin_a, -dist*cos_a, 1};
-        m_outMatrix = {cos_c, sin_c, 0, 0,
-                -sin_c*cos_b,cos_c*cos_b,  sin_b, 0,
-                sin_c*sin_b, -cos_c*sin_b, cos_b, 0,
-                0, 0, 0, 1};
-        m_misalignmentMatrix = {1,0,0,0, 0,1,0,0, 0,0,1,0, 0,0,0,1};*/
-        /*inMatrix = {cos_c, sin_c, 0, 0,
-            -sin_c*cos_a, cos_c*cos_a, -sin_a, distanceToPreceedingElement*sin_a,
-            -sin_c*sin_a, sin_a*cos_c, cos_a, -distanceToPreceedingElement*cos_a,
-            0,0,0,1};
-        m_outMatrix = {cos_c, -sin_c*cos_b, sin_c*sin_b, 0,
-            sin_c, cos_c*cos_b,-cos_c*sin_b, 0,
-            0,sin_b, cos_b, 0,
-            0, 0, 0, 1};*/
     }
 
     Quadric::Quadric(const char* name, Quadric* previous) : m_name(name), m_previous(previous) {}

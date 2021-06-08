@@ -8,8 +8,8 @@ namespace RAY
     {
     public:
         
-        MatrixSource(int id, std::string name, int numberOfRays, double sourceWidth, double sourceHeight,
-    double sourceDepth, double horDivergence, double verDivergence, std::vector<double> misalignment);
+        MatrixSource(int id, std::string name, int numberOfRays, int spreadType, double sourceWidth, double sourceHeight,
+    double sourceDepth, double horDivergence, double verDivergence, double photonEnergy, double energySpread, std::vector<double> misalignment);
         
         MatrixSource();
         ~MatrixSource();
@@ -27,6 +27,7 @@ namespace RAY
         double m_sourceDepth;
         double m_verDivergence;
         double m_horDivergence;
+
         
     };
 

@@ -8,7 +8,7 @@ namespace RAY
 
     // angles given and stored in rad
     RandomRays::RandomRays(int n, int low, int high) 
-    : LightSource(0, n, "Random rays", {0,0,0,0}), m_low(low), m_high(high) {}
+    : LightSource(0, n, "Random rays", 0, 100, 0, {0,0,0,0}), m_low(low), m_high(high) {}
 
     RandomRays::~RandomRays()
     {
@@ -32,7 +32,8 @@ namespace RAY
 
             glm::dvec3 direction = glm::dvec4(-unif(re), -unif(re), -unif(re), -unif(re));
             double weight = -unif(re);
-            Ray r = Ray(position, direction, weight);
+            double en = 0;
+            Ray r = Ray(position, direction, en, weight);
             rayList.emplace_back(r);
         }
         return rayList;
