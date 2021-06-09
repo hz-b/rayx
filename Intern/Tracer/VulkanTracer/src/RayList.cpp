@@ -48,8 +48,8 @@ void RayList::insertVector(void* location, size_t inputSize) {
         }
         //if input is larger, we need to split it
         else {
-            int i = 0;
-            for (; i < inputSize - RAY_MAX_ELEMENTS_IN_VECTOR; i = i + RAY_MAX_ELEMENTS_IN_VECTOR) {
+            size_t i = 0;
+            for (; i < (inputSize - RAY_MAX_ELEMENTS_IN_VECTOR); i = i + RAY_MAX_ELEMENTS_IN_VECTOR) {
                 //std::cout << "size= " << m_rayList.size() << std::endl;
                 addVector();
                 //std::cout << "size= " << m_rayList.size() << std::endl;

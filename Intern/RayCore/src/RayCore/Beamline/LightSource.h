@@ -16,8 +16,8 @@ namespace RAY
     {
     public:
 
-        LightSource(int id, int numberOfRays, const char* name, int spreadType, double photonEnergy, double energySpread, std::vector<double> misalignment);
-        const char* getName();
+        LightSource(int id, int numberOfRays, std::string name, int spreadType, double photonEnergy, double energySpread, std::vector<double> misalignment);
+        std::string getName();
         int getNumberOfRays();
         int getId();
         std::vector<double> getMisalignmentParams();
@@ -36,23 +36,23 @@ namespace RAY
 
     private:
         int m_id;
-        const char* m_name;
         int m_numberOfRays;
+        std::string m_name;
         std::vector<double> m_misalignmentParams; // x, y, psi, phi
         // std::vector<Ray *> m_rayList; ?
 
         // point source & matrix source
-        enum SPREAD_TYPE {ES_WHITE_BAND, ES_THREE_ENERGIES}; // default ES_WHITE_BAND
+        enum SPREAD_TYPE { ES_WHITE_BAND, ES_THREE_ENERGIES }; // default ES_WHITE_BAND
         SPREAD_TYPE m_energySpreadType;
-        enum ENERGY_DISTRIBUTION_TYPE {ET_FILE, ET_VALUES, ET_TOTAL, ET_PARAM}; // default ET_VALUES
+        enum ENERGY_DISTRIBUTION_TYPE { ET_FILE, ET_VALUES, ET_TOTAL, ET_PARAM }; // default ET_VALUES
         ENERGY_DISTRIBUTION_TYPE m_energyDistributionType;
-        enum SOURCE_DISTRIBUTION_TYPE {ST_SIMULTANEOUS, ST_HARD_EDGE, ST_GAUSS}; // default simultaneously
+        enum SOURCE_DISTRIBUTION_TYPE { ST_SIMULTANEOUS, ST_HARD_EDGE, ST_GAUSS }; // default simultaneously
         SOURCE_DISTRIBUTION_TYPE m_sourceDistributionType;
         double m_energySpread;
         double m_photonEnergy;
         std::uniform_real_distribution<double> m_unif;
         std::default_random_engine re;
-        
+
     };
 
 } // namespace RAY
