@@ -217,10 +217,10 @@ std::vector<const char*> VulkanTracer::getRequiredDeviceExtensions()
 {
 	std::vector<const char*> extensions;
 
-	if (enableValidationLayers)
-	{
-		extensions.push_back("VK_EXT_descriptor_indexing");
-	}
+	// if (enableValidationLayers)
+	// {
+	// 	extensions.push_back("VK_EXT_descriptor_indexing");
+	// }
 
 	return extensions;
 }
@@ -605,7 +605,7 @@ void VulkanTracer::getRays() {
 		double* pMappedMemory = (double*)mappedMemory;
 		for (uint32_t j = 0; j < GPU_MAX_STAGING_SIZE / RAY_DOUBLE_COUNT; j = j + RAY_DOUBLE_COUNT)
 		{
-			data.push_back(Ray(pMappedMemory[j], pMappedMemory[j + 1], pMappedMemory[j + 2], pMappedMemory[j + 4], pMappedMemory[j + 5], pMappedMemory[j + 6],pMappedMemory[j + 7], pMappedMemory[j + 3]));
+			data.push_back(Ray(pMappedMemory[j], pMappedMemory[j + 1], pMappedMemory[j + 2], pMappedMemory[j + 4], pMappedMemory[j + 5], pMappedMemory[j + 6], pMappedMemory[j + 7], pMappedMemory[j + 3]));
 		}
 		outputData.insertVector(data.data(), data.size());
 		vkUnmapMemory(device, bufferMemories[3]);

@@ -1,32 +1,39 @@
-image: gcc
-before_script:
-  # install cmake
-  - apt-get update --yes
-  - apt-get install --yes cmake
-  - echo "CMake installation ended"
-  # install vulkan
-  - wget -qO - https://packages.lunarg.com/lunarg-signing-key-pub.asc | apt-key add -
-  - wget -qO /etc/apt/sources.list.d/lunarg-vulkan-1.2.176-focal.list https://packages.lunarg.com/vulkan/1.2.176/lunarg-vulkan-1.2.176-focal.list
-  - apt update --yes
-  - apt install --yes vulkan-sdk
-  - echo "Vulkan installation ended"
-  - git submodule update --init --recursive
+default:
+  image: gcc
+  before_script:
+    # install cmake
+    - apt-get update --yes
+    - apt-get install --yes cmake
+    - echo "CMake installation ended"
+    # install vulkan
+    - wget -qO - https://packages.lunarg.com/lunarg-signing-key-pub.asc | apt-key add -
+    - wget -qO /etc/apt/sources.list.d/lunarg-vulkan-1.2.176-focal.list https://packages.lunarg.com/vulkan/1.2.176/lunarg-vulkan-1.2.176-focal.list
+    - apt update --yes
+    - apt install --yes vulkan-sdk
+    - echo "Vulkan installation ended"
 
 build-job:
   stage: build
   script:
+    - git submodule update --init --recursive
     - mkdir build && cd build
-    - cmake ..
+    - cmake .. -B .
     - cmake --build .
-    - echo "Build done" # TODO: respect output of cmake
+    - ls
+  artifacts:
+    paths:
+      - ./build
 
-test-job1:
+run-job:
   #- ctest .
   stage: test
   script:
+    - pwd # to know where we are
+    - ls
     - echo "This job tests something"
+    - ./build/bin/TerminalApp
 
-test-job2:
+test-job:
   stage: test
   script:
     - echo "This job tests something, but takes more time than test-job1."
