@@ -43,7 +43,7 @@ namespace RAY
     bool TracerInterface::run(double translationXerror, double translationYerror, double translationZerror)
     {
 
-        // const clock_t all_begin_time = clock();
+        const clock_t all_begin_time = clock();
         //create tracer instance
         VulkanTracer tracer;
         // readFromFile("../../io/input.csv", RayType);
