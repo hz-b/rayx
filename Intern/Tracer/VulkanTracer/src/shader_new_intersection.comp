@@ -959,9 +959,9 @@ dvec4 setIntersectionPoint(dmat4 inputQuadric, int icurv)
 	}
 	uint f_001 = uint(cs/2);
 	uint f_010 = cs%2;
-	uint f_011 = uint(cs/cs);
+	uint f_011 = uint(cs+1/2);
 	uint f_012 = cs;
-	uint f_100 = (uint(cs/cs)+1)%2;
+	uint f_100 = (uint(cs+1/2)+1)%2;
 	uint f_101 = ((cs%2)+1)%2;
 	uint f_110 = (uint(cs/2)+1)%2;
 	uint f_112 = int(cs/2)+1;
