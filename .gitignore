@@ -4,7 +4,8 @@
 bin/
 bin-int/
 build/
-RayCore/doc/html/
+Intern/RayCore/doc/*/
+out/
 
 # Files
 *.user
