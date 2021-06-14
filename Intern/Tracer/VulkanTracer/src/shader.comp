@@ -8,7 +8,7 @@
 layout (local_size_x = WORKGROUP_SIZE, local_size_y = 1, local_size_z = 1 ) in;
 // 3.14159265358979323846264338327950
 const double PI = 3.14159265358979323846264338327950;
-const uint64_t rngKey = 0;
+const uint64_t rngKey = (0xc8e4fd15 << 32) | 0x4ce32f6d;
 const double inm2eV = 1.239852e3;
 
 /* STRUCTS */
@@ -820,7 +820,7 @@ uint64_t squares64RNG(inout uint64_t ctr)
 // generates uniformly distributed doubles between 0 and 1 from one 64-Bit random integer
 double squaresDoubleRNG(inout uint64_t ctr)
 {
-	return fract(double(squares64RNG(ctr)));
+	return fract(uint64BitsToDouble(squares64RNG(ctr)));
 }
 
 // creates (via the Box-Muller transform) a normal distributed double with mean mu and standard deviation sigma
