@@ -31,7 +31,7 @@ run-job:
     - pwd # to know where we are
     - ls
     - echo "This job tests something"
-    - ./build/bin/TerminalApp
+    #- ./build/bin/TerminalApp
 
 test-job:
   stage: test

@@ -11,3 +11,4 @@ out/
 *.user
 *.code-workspace
 /CMakeSettings.json
+/Tests/output/*
