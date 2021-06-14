@@ -9,4 +9,4 @@ Following goals are set for this project:
 
 
 Here is our Wiki, where you can find most information about the project:
-- [RayReworked Wiki](https://gitlab.helmholtz-berlin.de/RAY/rayreworked/-/wikis/home)
+[RayReworked Wiki](https://gitlab.helmholtz-berlin.de/RAY/rayreworked/-/wikis/home)
