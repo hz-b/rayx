@@ -54,9 +54,8 @@ public:
     void getRays();
     void cleanup();
     void setBeamlineParameters(uint32_t inNumberOfBeamlines, uint32_t inNumberOfQuadricsPerBeamline, uint32_t inNumberOfRays);
-    std::list<std::vector<Ray>>::iterator getOutputIteratorBegin();
-    std::list<std::vector<Ray>>::iterator getOutputIteratorEnd();
-    RayList outputData;
+    std::list<std::vector<Ray>>::const_iterator getOutputIteratorBegin();
+    std::list<std::vector<Ray>>::const_iterator getOutputIteratorEnd();
 
     // getter 
     const RayList& getRayList() { return rayList; }
@@ -77,6 +76,8 @@ private:
         std::vector<double> outMatrix;
     };
     */
+    RayList m_outputData;
+
     struct QueueFamilyIndices
     {
         uint32_t computeFamily;

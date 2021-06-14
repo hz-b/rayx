@@ -15,14 +15,6 @@ namespace RAY
 
     }
 
-    Ray::Ray()
-    {
-        m_position = { 0,0,0 };
-        m_direction = { 0,0,0 };
-        m_weight = 0;
-        m_energy = 0;
-    }
-
     Ray::~Ray()
     {
 

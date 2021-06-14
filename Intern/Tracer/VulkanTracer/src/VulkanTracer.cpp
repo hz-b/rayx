@@ -607,12 +607,12 @@ void VulkanTracer::getRays() {
 		{
 			data.push_back(Ray(pMappedMemory[j], pMappedMemory[j + 1], pMappedMemory[j + 2], pMappedMemory[j + 4], pMappedMemory[j + 5], pMappedMemory[j + 6], pMappedMemory[j + 7], pMappedMemory[j + 3]));
 		}
-		outputData.insertVector(data.data(), data.size());
+		m_outputData.insertVector(data.data(), data.size());
 		vkUnmapMemory(device, bufferMemories[3]);
 		bytesNeeded = bytesNeeded - GPU_MAX_STAGING_SIZE;
 	}
 	std::vector<Ray> data;
-	std::cout << "outputdata size: " << outputData.size() << std::endl;
+	std::cout << "m_outputData size: " << m_outputData.size() << std::endl;
 	std::cout << "numberOfStagingBuffers: " << numberOfStagingBuffers << ", bytesNeeded: " << bytesNeeded << std::endl;
 	copyToOutputBuffer((numberOfStagingBuffers - 1) * GPU_MAX_STAGING_SIZE, ((bytesNeeded - 1) % GPU_MAX_STAGING_SIZE) + 1);
 	void* mappedMemory = NULL;
@@ -629,16 +629,16 @@ void VulkanTracer::getRays() {
 	// std::cout << "ray 16383 xpos: " << (data)[16383].getxPos() << std::endl;
 	// std::cout << "ray 16385 xpos: " << (data)[16385].getxPos() << std::endl;
 	// std::cout << "ray 16386 xpos: " << (data)[16386].getxPos() << std::endl;
-	outputData.insertVector(data.data(), data.size());
+	m_outputData.insertVector(data.data(), data.size());
 	vkUnmapMemory(device, bufferMemories[3]);
-	std::cout << "sample ray: " << ((*(outputData.begin()))[0]).getxPos() << ", " << ((*(outputData.begin()))[0]).getyPos() << ", " << ((*(outputData.begin()))[0]).getzPos() << ", " << ((*(outputData.begin()))[0]).getWeight() << ", " << ((*(outputData.begin()))[0]).getxDir() << ", " << ((*(outputData.begin()))[0]).getyDir() << ", " << ((*(outputData.begin()))[0]).getzDir() << std::endl;
-	// auto testymctestface = outputData.begin();
+	std::cout << "sample ray: " << ((*(m_outputData.begin()))[0]).getxPos() << ", " << ((*(m_outputData.begin()))[0]).getyPos() << ", " << ((*(m_outputData.begin()))[0]).getzPos() << ", " << ((*(m_outputData.begin()))[0]).getWeight() << ", " << ((*(m_outputData.begin()))[0]).getxDir() << ", " << ((*(m_outputData.begin()))[0]).getyDir() << ", " << ((*(m_outputData.begin()))[0]).getzDir() << std::endl;
+	// auto testymctestface = m_outputData.begin();
 	// std::cout << "ray 16384 xpos: " << (*(testymctestface))[16384].getxPos() << std::endl;
 	// std::cout << "ray 16383 xpos: " << (*(testymctestface++))[16383].getxPos() << std::endl;
 	// std::cout << "ray 16385 xpos: " << (*(testymctestface++))[16385].getxPos() << std::endl;
 	std::cout << "mapping memory done" << std::endl;
-	std::cout << "outputVectorCount: " << outputData.size() << std::endl;
-	std::cout << "output size in bytes: " << (*(outputData.begin())).size() * RAY_DOUBLE_COUNT * sizeof(double) << std::endl;
+	std::cout << "outputVectorCount: " << m_outputData.size() << std::endl;
+	std::cout << "output size in bytes: " << (*(m_outputData.begin())).size() * RAY_DOUBLE_COUNT * sizeof(double) << std::endl;
 
 }
 
@@ -992,11 +992,11 @@ void VulkanTracer::divideAndSortRays() {
 
 	}
 }
-std::list<std::vector<Ray>>::iterator VulkanTracer::getOutputIteratorBegin() {
-	return outputData.begin();
+std::list<std::vector<Ray>>::const_iterator VulkanTracer::getOutputIteratorBegin() {
+	return m_outputData.begin();
 }
-std::list<std::vector<Ray>>::iterator VulkanTracer::getOutputIteratorEnd() {
-	return outputData.end();
+std::list<std::vector<Ray>>::const_iterator VulkanTracer::getOutputIteratorEnd() {
+	return m_outputData.end();
 }
 //is not used anymore
 int VulkanTracer::main()
