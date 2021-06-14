@@ -9,7 +9,7 @@ namespace RAY
     public:
         
         Ellipsoid(const char* name, double width, double height, double grazingIncidence, double azimuthal, double distanceToPreceedingElement, 
-            double entranceArmLength, double exitArmLength, int coordSys, int figRot, double a11, std::vector<double> misalignmentParams,  Quadric* previous);
+            double entranceArmLength, double exitArmLength, int coordSys, int figRot, double a11, std::vector<double> misalignmentParams, std::vector<double> slopeError, Quadric* previous);
         Ellipsoid();
         ~Ellipsoid();
 

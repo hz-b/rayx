@@ -53,7 +53,8 @@ TEST(PlaneMirror, testSimpleParams) {
     double azimuthalAngle = 0.0;
     double dist = 12005;
     std::vector<double> mis = {0,0,0,0,0,0};
-    RAY::PlaneMirror plM = RAY::PlaneMirror("planemirror",width, height, incidenceAngle, azimuthalAngle, dist, mis, NULL); // {1,2,3,0.01,0.02,0.03}
+    std::vector<double> sE = {0,0,0,0,0, 0,0};
+    RAY::PlaneMirror plM = RAY::PlaneMirror("planemirror",width, height, incidenceAngle, azimuthalAngle, dist, mis, sE, NULL); // {1,2,3,0.01,0.02,0.03}
 
     ASSERT_DOUBLE_EQ (plM.getWidth(),  width);
     ASSERT_DOUBLE_EQ (plM.getHeight(),  height);
@@ -62,6 +63,7 @@ TEST(PlaneMirror, testSimpleParams) {
     ASSERT_DOUBLE_EQ (plM.getChi(),  rad(azimuthalAngle));
     ASSERT_DOUBLE_EQ (plM.getDist(),  dist);
     EXPECT_ITERABLE_DOUBLE_EQ(std::vector<double>, mis, plM.getMisalignmentParams());
+    EXPECT_ITERABLE_DOUBLE_EQ(std::vector<double>, sE, plM.getSlopeError());
 }
 
 TEST(PlaneMirror, testAdvancedParams) {
@@ -71,7 +73,8 @@ TEST(PlaneMirror, testAdvancedParams) {
     double azimuthalAngle = 8.2;
     double dist = 12005;
     std::vector<double> mis = {1,2,3,0.01,0.02,0.03};
-    RAY::PlaneMirror plM = RAY::PlaneMirror("planemirror",width, height, incidenceAngle, azimuthalAngle, dist, mis, NULL); // {1,2,3,0.01,0.02,0.03}
+    std::vector<double> sE = {0.1,0.2,0.3,0.4,0.5, 0.6,0.7};
+    RAY::PlaneMirror plM = RAY::PlaneMirror("planemirror",width, height, incidenceAngle, azimuthalAngle, dist, mis, sE, NULL); // {1,2,3,0.01,0.02,0.03}
 
     ASSERT_DOUBLE_EQ (plM.getWidth(),  width);
     ASSERT_DOUBLE_EQ (plM.getHeight(),  height);
@@ -80,6 +83,7 @@ TEST(PlaneMirror, testAdvancedParams) {
     ASSERT_DOUBLE_EQ (plM.getChi(),  rad(azimuthalAngle));
     ASSERT_DOUBLE_EQ (plM.getDist(),  dist);
     EXPECT_ITERABLE_DOUBLE_EQ(std::vector<double>, mis, plM.getMisalignmentParams());
+    EXPECT_ITERABLE_DOUBLE_EQ(std::vector<double>, sE, plM.getSlopeError());
 }
 
 TEST(Sphere, testParams) {
@@ -91,7 +95,8 @@ TEST(Sphere, testParams) {
     double entranceArmLength = 12.7;
     double exitArmLength = 123.1;
     std::vector<double> misalignmentParams = {10,51,2,0.1,5,0.241};
-    RAY::SphereMirror sM = RAY::SphereMirror("spheremirror", width, height, incidence, azimuthal, dist, entranceArmLength, exitArmLength, misalignmentParams, NULL); 
+    std::vector<double> sE = {0.7,0.5,0.3,0.7,0.3, 3,2};
+    RAY::SphereMirror sM = RAY::SphereMirror("spheremirror", width, height, incidence, azimuthal, dist, entranceArmLength, exitArmLength, misalignmentParams, sE, NULL); 
     
     double radius = 104.326518296; // from old RAY, rounded to 9 digits
     ASSERT_DOUBLE_EQ (sM.getWidth(),  width);
@@ -104,6 +109,7 @@ TEST(Sphere, testParams) {
     ASSERT_DOUBLE_EQ (sM.getExitArmLength(),  exitArmLength);
     ASSERT_DOUBLE_EQ (sM.getEntranceArmLength(),  entranceArmLength);
     EXPECT_ITERABLE_DOUBLE_EQ(std::vector<double>, misalignmentParams, sM.getMisalignmentParams());
+    EXPECT_ITERABLE_DOUBLE_EQ(std::vector<double>, sE, sM.getSlopeError());
 }
 
 TEST(Ellips, testParamsCSCurvature) {
@@ -118,7 +124,8 @@ TEST(Ellips, testParamsCSCurvature) {
     int figRot = 0; // { FR_YES, FR_PLANE, FR_A11};
     double a_11 = 12.62;
     std::vector<double>  mis  = {12,72,1.12, 0.1,0.7341,2.5};
-    RAY::Ellipsoid e = RAY::Ellipsoid("ellipsoid", width, height, incidence, azimuthal, dist, entranceArmLength, exitArmLength, coordSys, figRot, a_11, mis, NULL); 
+    std::vector<double> sE = {1,2,3,4,5,6,7};
+    RAY::Ellipsoid e = RAY::Ellipsoid("ellipsoid", width, height, incidence, azimuthal, dist, entranceArmLength, exitArmLength, coordSys, figRot, a_11, mis, sE, NULL); 
 
     // in old RAY
     double shortHalfAxis = 1758.53601375;
@@ -153,9 +160,10 @@ TEST(Ellips, testParamsCSCurvature) {
     EXPECT_NEAR(e.getHalfAxisC(), halfAxisC, 0.0000001);
     EXPECT_NEAR(e.getAlpha1(), alphaE, 0.000001);
     EXPECT_ITERABLE_DOUBLE_EQ(std::vector<double>, correctTempMis, e.getTempMisalignmentParams());
+    EXPECT_ITERABLE_DOUBLE_EQ(std::vector<double>, sE, e.getSlopeError());
 
     figRot = 1;
-    e = RAY::Ellipsoid("ellipsoid", width, height, incidence, azimuthal, dist, entranceArmLength, exitArmLength, coordSys, figRot, a_11, mis, NULL); 
+    e = RAY::Ellipsoid("ellipsoid", width, height, incidence, azimuthal, dist, entranceArmLength, exitArmLength, coordSys, figRot, a_11, mis, sE, NULL); 
     halfAxisC = INFINITY;
 
     ASSERT_DOUBLE_EQ (e.getWidth(),  width);
@@ -175,9 +183,10 @@ TEST(Ellips, testParamsCSCurvature) {
     ASSERT_DOUBLE_EQ(e.getHalfAxisC(), halfAxisC);
     EXPECT_NEAR(e.getAlpha1(), alphaE, 0.000001);
     EXPECT_ITERABLE_DOUBLE_EQ(std::vector<double>, correctTempMis, e.getTempMisalignmentParams());
+    EXPECT_ITERABLE_DOUBLE_EQ(std::vector<double>, sE, e.getSlopeError());
 
     figRot = 2;
-    e = RAY::Ellipsoid("ellipsoid", width, height, incidence, azimuthal, dist, entranceArmLength, exitArmLength, coordSys, figRot, a_11, mis, NULL); 
+    e = RAY::Ellipsoid("ellipsoid", width, height, incidence, azimuthal, dist, entranceArmLength, exitArmLength, coordSys, figRot, a_11, mis, sE, NULL); 
     halfAxisC = 495.0186818473859;
 
     ASSERT_DOUBLE_EQ (e.getWidth(),  width);
@@ -197,6 +206,7 @@ TEST(Ellips, testParamsCSCurvature) {
     EXPECT_NEAR(e.getHalfAxisC(), halfAxisC, 0.00000001);
     EXPECT_NEAR(e.getAlpha1(), alphaE, 0.000001);
     EXPECT_ITERABLE_DOUBLE_EQ(std::vector<double>, correctTempMis, e.getTempMisalignmentParams());
+    EXPECT_ITERABLE_DOUBLE_EQ(std::vector<double>, sE, e.getSlopeError());
 
 }
 
@@ -212,7 +222,8 @@ TEST(Ellips, testParamsCSMirror) {
     int figRot = 0; // { FR_YES, FR_PLANE, FR_A11};
     double a_11 = 12.62;
     std::vector<double>  mis  = {12,72,1.12, 0.1,0.7341,2.5};
-    RAY::Ellipsoid e = RAY::Ellipsoid("ellipsoid", width, height, incidence, azimuthal, dist, entranceArmLength, exitArmLength, coordSys, figRot, a_11, mis, NULL); 
+    std::vector<double> sE = {7,6,5,4,3,2,1};
+    RAY::Ellipsoid e = RAY::Ellipsoid("ellipsoid", width, height, incidence, azimuthal, dist, entranceArmLength, exitArmLength, coordSys, figRot, a_11, mis, sE, NULL); 
 
     // in old RAY
     double shortHalfAxis = 1758.53601375;
@@ -247,9 +258,10 @@ TEST(Ellips, testParamsCSMirror) {
     EXPECT_NEAR(e.getHalfAxisC(), halfAxisC, 0.0000001);
     EXPECT_NEAR(e.getAlpha1(), alphaE, 0.000001);
     EXPECT_ITERABLE_DOUBLE_EQ(std::vector<double>, correctTempMis, e.getTempMisalignmentParams());
+    EXPECT_ITERABLE_DOUBLE_EQ(std::vector<double>, sE, e.getSlopeError());
 
     figRot = 1;
-    e = RAY::Ellipsoid("ellipsoid", width, height, incidence, azimuthal, dist, entranceArmLength, exitArmLength, coordSys, figRot, a_11, mis, NULL); 
+    e = RAY::Ellipsoid("ellipsoid", width, height, incidence, azimuthal, dist, entranceArmLength, exitArmLength, coordSys, figRot, a_11, mis, sE, NULL); 
     halfAxisC = INFINITY;
 
     ASSERT_DOUBLE_EQ (e.getWidth(),  width);
@@ -269,9 +281,10 @@ TEST(Ellips, testParamsCSMirror) {
     ASSERT_DOUBLE_EQ(e.getHalfAxisC(), halfAxisC);
     EXPECT_NEAR(e.getAlpha1(), alphaE, 0.000001);
     EXPECT_ITERABLE_DOUBLE_EQ(std::vector<double>, correctTempMis, e.getTempMisalignmentParams());
+    EXPECT_ITERABLE_DOUBLE_EQ(std::vector<double>, sE, e.getSlopeError());
 
     figRot = 2;
-    e = RAY::Ellipsoid("ellipsoid", width, height, incidence, azimuthal, dist, entranceArmLength, exitArmLength, coordSys, figRot, a_11, mis, NULL); 
+    e = RAY::Ellipsoid("ellipsoid", width, height, incidence, azimuthal, dist, entranceArmLength, exitArmLength, coordSys, figRot, a_11, mis, sE, NULL); 
     halfAxisC = 495.0186818473859;
 
     ASSERT_DOUBLE_EQ (e.getWidth(),  width);
@@ -291,5 +304,6 @@ TEST(Ellips, testParamsCSMirror) {
     EXPECT_NEAR(e.getHalfAxisC(), halfAxisC, 0.00000001);
     EXPECT_NEAR(e.getAlpha1(), alphaE, 0.000001);
     EXPECT_ITERABLE_DOUBLE_EQ(std::vector<double>, correctTempMis, e.getTempMisalignmentParams());
+    EXPECT_ITERABLE_DOUBLE_EQ(std::vector<double>, sE, e.getSlopeError());
 
 }

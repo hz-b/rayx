@@ -19,8 +19,8 @@ namespace RAY
      *          lineDensity = line density of the grating
      *          orderOfDiffraction =
     */
-    ReflectionZonePlate::ReflectionZonePlate(const char* name, int mount, int curvatureType, int designType, int elementOffsetType, double width, double height, double deviation, double incidenceAngle, double azimuthal, double distanceToPreceedingElement, double designEnergy, double sourceEnergy, double orderOfDiffraction, double designOrderOfDiffraction, double dAlpha, double dBeta, double mEntrance, double mExit, double sEntrance, double sExit, double shortRadius, double longRadius, double elementOffsetZ, double beta, std::vector<double> misalignmentParams, Quadric* previous)
-        : Quadric(name, previous) {
+    ReflectionZonePlate::ReflectionZonePlate(const char* name, int mount, int curvatureType, int designType, int elementOffsetType, double width, double height, double deviation, double incidenceAngle, double azimuthal, double distanceToPreceedingElement, double designEnergy, double sourceEnergy, double orderOfDiffraction, double designOrderOfDiffraction, double dAlpha, double dBeta, double mEntrance, double mExit, double sEntrance, double sExit, double shortRadius, double longRadius, double elementOffsetZ, double beta, std::vector<double> misalignmentParams, std::vector<double> slopeError, Quadric* previous) 
+       : Quadric(name, width, height, slopeError, previous) {
         m_totalWidth = width;
         m_totalHeight = height;
         m_designEnergy = sourceEnergy; // eV, if auto == true, else designEnergy
@@ -44,8 +44,8 @@ namespace RAY
         m_elementOffsetZ = elementOffsetZ;
 
         calcDesignOrderOfDiffraction(designOrderOfDiffraction);
-        m_sagittalEntranceArmLength = sEntrance; //mm
-        m_meridionalEntranceArmLength = mEntrance; // hard coded (will be a parameter later)
+        m_sagittalEntranceArmLength = sEntrance; //in mm
+        m_meridionalEntranceArmLength = mEntrance; 
         m_sagittalExitArmLength = sExit;
         m_meridionalExitArmLength = mExit;
 
@@ -84,7 +84,7 @@ namespace RAY
         calcTransformationMatrices(m_alpha, m_chi, m_beta, m_distanceToPreceedingElement, misalignmentParams);
         // the whole misalignment is also stored in temporaryMisalignment because it needs to be temporarily removed during tracing
         setTemporaryMisalignment(misalignmentParams);
-        setParameters({
+        setElementParameters({
             double(m_imageType), double(m_rzpType), double(m_derivationMethod), m_wavelength,
             m_designEnergy, m_designOrderOfDiffraction,m_orderOfDiffraction,m_frenselZOffset,
             m_sagittalEntranceArmLength,m_sagittalExitArmLength,m_meridionalEntranceArmLength,m_meridionalExitArmLength,
@@ -283,10 +283,10 @@ namespace RAY
             //beta = m_designBetaAngle;
             calcFresnelZOffset(); // overwrite given Fresneloffset 
         }
-        else if (m_designType == DT_ZOFFSET) {
+        //else { // if(m_designType == DT_ZOFFSET) {
             //beta = m_betaAngle; // what is this beta angle
             // use given fresnelOffset
-        }
+        //}
         // if imageType == point2pointXstretched ..
 
         // RAY-UI calls rzpLineDensity function in fortran

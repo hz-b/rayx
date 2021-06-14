@@ -14,8 +14,8 @@ namespace RAY
      *          distanceToPreceedingElement
      * 
     */
-    SphereMirror::SphereMirror(const char* name, double width, double height, double grazingIncidence, double azimuthal, double distanceToPreceedingElement, double entranceArmLength, double exitArmLength, std::vector<double> misalignmentParams, Quadric* previous) 
-    : Quadric(name,{1,0,0,0, width,1,0,-1, height,0,1,0, 0,0,0,0}, {width, height,0,0, 0,0,0,0, 0,0,0,0, 0,0,0,0},rad(grazingIncidence), rad(azimuthal), rad(grazingIncidence), distanceToPreceedingElement, misalignmentParams, {0,0,0,0,0,0}, previous) {
+    SphereMirror::SphereMirror(const char* name, double width, double height, double grazingIncidence, double azimuthal, double distanceToPreceedingElement, double entranceArmLength, double exitArmLength, std::vector<double> misalignmentParams,std::vector<double> slopeError, Quadric* previous) 
+    : Quadric(name,{1,0,0,0, width,1,0,-1, height,0,1,0, 0,0,0,0}, {0,0,0,0, 0,0,0,0, 0,0,0,0, 0,0,0,0}, width, height, rad(grazingIncidence), rad(azimuthal), rad(grazingIncidence), distanceToPreceedingElement, misalignmentParams, {0,0,0,0,0,0}, slopeError, previous) {
         // std::vector<double> inputPoints = {0,0,0,0, 0,0,0,-1, 0,0,0,0, 0,0,0,0};
         m_totalWidth = width;
         m_totalHeight = height;
@@ -26,7 +26,7 @@ namespace RAY
         m_beta = m_alpha; // mirror -> exit angle = incidence angle
         m_distanceToPreceedingElement = distanceToPreceedingElement;
         
-        calcRadius(); // berechnen
+        calcRadius(); // calculate the radius
         editQuadric({1,0,0,0, 0,1,0,-m_radius, 0,0,1,0, 0,0,0,0});
     }
 

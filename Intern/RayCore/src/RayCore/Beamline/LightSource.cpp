@@ -27,7 +27,7 @@ namespace RAY
     int LightSource::getId() { return m_id; }
     std::vector<double> LightSource::getMisalignmentParams() { return m_misalignmentParams; }
 
-    // needed for many of the light sources
+    // needed for many of the light sources, from two angles to one direction vector
     glm::dvec3 LightSource::getDirectionFromAngles(double phi, double psi) {
         double al = cos(psi) * sin(phi);
         double am = -sin(psi);

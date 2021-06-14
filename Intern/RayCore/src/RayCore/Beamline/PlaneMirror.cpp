@@ -12,11 +12,12 @@ namespace RAY
      * @param grazingIncidence   desired incidence angle of the main ray
      * @param azimuthal          rotation of mirror around z-axis
      * @param dist               distance to preceeding element
+     * @param slopeError         7 slope error parameters: x-y sagittal (0), y-z meridional (1), thermal distortion x (2),y (3),z (4), cylindrical bowing amplitude y(5) and radius (6)
      * @param misalignmentParams angles and distances for the mirror's misalignment
      * 
     */
-    PlaneMirror::PlaneMirror(const char* name, double width, double height, double grazingIncidence, double azimuthal, double dist, std::vector<double> misalignmentParams, Quadric* previous) 
-    : Quadric(name, {0,0,0,0, width,0,0,-1, height,0,0,0, 0,0,0,0}, {width, height,0,0, 0,0,0,0, 0,0,0,0, 0,0,0,0},rad(grazingIncidence), rad(azimuthal), rad(grazingIncidence), dist, misalignmentParams, {0,0,0,0,0,0}, previous) {
+    PlaneMirror::PlaneMirror(const char* name, double width, double height, double grazingIncidence, double azimuthal, double dist, std::vector<double> misalignmentParams, std::vector<double> slopeError, Quadric* previous) 
+    : Quadric(name, {0,0,0,0, width,0,0,-1, height,0,0,0, 0,0,0,0}, {0,0,0,0, 0,0,0,0, 0,0,0,0, 0,0,0,0}, width, height, rad(grazingIncidence), rad(azimuthal), rad(grazingIncidence), dist, misalignmentParams, {0,0,0,0,0,0}, slopeError, previous) {
         // std::vector<double> inputPoints = {0,0,0,0, 0,0,0,-1, 0,0,0,0, 0,0,0,0};
         m_totalWidth = width;
         m_totalHeight = height;

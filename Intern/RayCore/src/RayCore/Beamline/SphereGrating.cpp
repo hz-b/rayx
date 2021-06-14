@@ -18,8 +18,8 @@ namespace RAY
      *          lineDensity = line density of the grating
      *          orderOfDefraction = 
     */
-    SphereGrating::SphereGrating(const char* name, int mount, double width, double height, double deviation, double normalIncidence, double azimuthal, double distanceToPreceedingElement, double entranceArmLength, double exitArmLength, double designEnergyMounting, double lineDensity, double orderOfDiffraction, std::vector<double> misalignmentParams, std::vector<double> vls, Quadric* previous) 
-    : Quadric(name, previous) {
+    SphereGrating::SphereGrating(const char* name, int mount, double width, double height, double deviation, double normalIncidence, double azimuthal, double distanceToPreceedingElement, double entranceArmLength, double exitArmLength, double designEnergyMounting, double lineDensity, double orderOfDiffraction, std::vector<double> misalignmentParams, std::vector<double> vls, std::vector<double> slopeError, Quadric* previous) 
+    : Quadric(name, width, height, slopeError, previous) {
         // parameters in array 
         // std::vector<double> inputPoints = {0,0,0,0, 0,0,0,-1, 0,0,0,0, 0,0,0,0};
         m_totalWidth = width;
@@ -43,7 +43,7 @@ namespace RAY
         // set parameters in Quadric class
         editQuadric({1,0,0,0, m_totalWidth,1,0,-m_radius, m_totalHeight,m_a,1,0, 2,0,0,0});
         calcTransformationMatrices(m_alpha, m_chi, m_beta, m_distanceToPreceedingElement, misalignmentParams);
-        setParameters({m_totalWidth, m_totalHeight, m_lineDensity, m_orderOfDiffraction, m_designEnergyMounting,m_a,m_vls[0],m_vls[1], m_vls[2],m_vls[3],m_vls[4],m_vls[5], 0,0,0,0});
+        setElementParameters({m_totalWidth,m_totalHeight,m_lineDensity,m_orderOfDiffraction, m_designEnergyMounting,m_a,m_vls[0],m_vls[1], m_vls[2],m_vls[3],m_vls[4],m_vls[5], 0,0,0,0});
         // Quadric(inputPoints, m_alpha, m_chi, m_beta, m_distanceToPreceedingElement);
     }
 
