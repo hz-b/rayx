@@ -1175,6 +1175,7 @@ returns new normal if there is a slope error in either x or z direction or the u
 dvec4 tanger(dvec4 normal, double slopeX, double slopeZ, int O_type) {
 	// only calculate the random number if at least one slope error is not 0, since the calculation is costly (sin, cos, log involved)
 	if(slopeX != 0 || slopeZ != 0) {
+		uint64_t ctr = 0;
 		double random_values[2] = double[2] (squaresDoubleRNG(ctr), squaresDoubleRNG(ctr));
 
 		double x = random_values[0] * slopeX; // to get normal distribution from std.-norm. multiply by sigma (=slopeX) -> mu + x * sigma but mu=0 here
