@@ -148,12 +148,12 @@ namespace RAY
         }
 
         // combine in and out transformation (global <-> element coordinates) with misalignment
-        //m_inMatrix = d_g2e;
-        //m_outMatrix = d_e2g;
+        m_inMatrix = d_g2e;
+        m_outMatrix = d_e2g;
 
         // to use usual ray coordinatesystem, also contains misalignment
-        m_inMatrix = d_b2e;
-        m_outMatrix = d_e2b;
+        // m_inMatrix = d_b2e;
+        // m_outMatrix = d_e2b;
 
         std::cout << "inMatrix: " << m_inMatrix.size() << std::endl;
         for (int i = 0; i < 16; i++) {

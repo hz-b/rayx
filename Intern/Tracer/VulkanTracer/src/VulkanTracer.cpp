@@ -6,10 +6,12 @@
 #endif
 
 #define SHADERPATH "comp.spv"
-#ifndef SHADERPATH
-#define SHADERPATH "comp_inter.spv"
+#ifndef SHADERPATH	
+//#define SHADERPATH "comp_inter.spv"
 #endif
-
+#ifndef SHADERPATH
+#define SHADERPATH "comp_dyn.spv"
+#endif
 VulkanTracer::VulkanTracer() {
 	bufferSizes.resize(5);
 	buffers.resize(5);
@@ -372,6 +374,7 @@ void VulkanTracer::createLogicalDevice()
 	//create info about the device features
 	VkPhysicalDeviceFeatures deviceFeatures{};
 	deviceFeatures.shaderFloat64 = true;
+	deviceFeatures.shaderInt64 = true;
 	VkDeviceCreateInfo createInfo{};
 	createInfo.sType = VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO;
 	createInfo.pQueueCreateInfos = &queueCreateInfo;
@@ -808,7 +811,7 @@ void VulkanTracer::createComputePipeline()
 	uint32_t filelength;
 	// the code in comp.spv was created by running the command:
 	// glslangValidator.exe -V shader.comp
-	uint32_t* code = readFile(filelength, "comp.spv");
+	uint32_t* code = readFile(filelength, SHADERPATH);
 	VkShaderModuleCreateInfo createInfo = {};
 	createInfo.sType = VK_STRUCTURE_TYPE_SHADER_MODULE_CREATE_INFO;
 	createInfo.pCode = code;
