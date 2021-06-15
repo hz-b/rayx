@@ -87,7 +87,7 @@ namespace RAY
         m_Beamline.addQuadric(rzp); //rzp.getName(), rzp.getAnchorPoints(), rzp.getInMatrix(), rzp.getOutMatrix(), rzp.getTempMisalignmentMatrix(), rzp.getInverseTempMisalignmentMatrix(), rzp.getParameters());
         m_Beamline.addQuadric(ip1); //ip.getName(), ip.getAnchorPoints(), ip.getInMatrix(), ip.getOutMatrix(), ip.getTempMisalignmentMatrix(), ip.getInverseTempMisalignmentMatrix(), ip.getParameters());
         //add beamline to tracer
-        std::vector<RAY::Quadric> Quadrics = m_Beamline.getObjects();
+        std::vector<RAY::Quadric>& Quadrics = m_Beamline.getObjects();
         tracer.setBeamlineParameters(beamlinesSimultaneously, Quadrics.size(), number_of_rays);
         for (int i = 0; i<int(Quadrics.size()); i++) {
             tracer.addQuadric(Quadrics[i].getAnchorPoints(), Quadrics[i].getInMatrix(), Quadrics[i].getOutMatrix(), Quadrics[i].getTempMisalignmentMatrix(), Quadrics[i].getInverseTempMisalignmentMatrix(), Quadrics[i].getObjectParameters(), Quadrics[i].getElementParameters());//, Quadrics[i].getInverseMisalignmentMatrix()

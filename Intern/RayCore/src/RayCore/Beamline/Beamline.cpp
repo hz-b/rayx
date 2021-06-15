@@ -6,7 +6,7 @@
 namespace RAY
 {
 
-    void Beamline::addQuadric(Quadric q) {
+    void Beamline::addQuadric(const Quadric& q) {
         addQuadric(q.getName(), q.getAnchorPoints(), q.getInMatrix(), q.getOutMatrix(), q.getTempMisalignmentMatrix(), q.getInverseTempMisalignmentMatrix(), q.getObjectParameters(), q.getElementParameters());
     }
 
@@ -16,9 +16,14 @@ namespace RAY
         m_Objects.push_back(newObject);
     }
     */
-    void Beamline::addQuadric(const char* name, std::vector<double> inputPoints, std::vector<double> inputInMatrix, std::vector<double> inputOutMatrix, std::vector<double> misalignmentMatrix, std::vector<double> inverseMisalignmentMatrix, std::vector<double> OParameters, std::vector<double> EParameters)
+    void Beamline::addQuadric(const char* name, const std::vector<double>& inputPoints, std::vector<double> inputInMatrix, std::vector<double> inputOutMatrix, std::vector<double> misalignmentMatrix, std::vector<double> inverseMisalignmentMatrix, std::vector<double> OParameters, std::vector<double> EParameters)
     {
         m_Objects.emplace_back(name, inputPoints, inputInMatrix, inputOutMatrix, misalignmentMatrix, inverseMisalignmentMatrix, OParameters, EParameters);
+    }
+
+    void Beamline::addQuadric(const char* name, std::vector<double>&& inputPoints, std::vector<double>&& inputInMatrix, std::vector<double>&& inputOutMatrix, std::vector<double>&& misalignmentMatrix, std::vector<double>&& inverseMisalignmentMatrix, std::vector<double>&& OParameters, std::vector<double>&& EParameters)
+    {
+        m_Objects.emplace_back(name, std::move(inputPoints), std::move(inputInMatrix), std::move(inputOutMatrix), std::move(misalignmentMatrix), std::move(inverseMisalignmentMatrix), std::move(OParameters), std::move(EParameters));
     }
 
     void Beamline::replaceNthObject(uint32_t index, Quadric newObject)
@@ -27,7 +32,7 @@ namespace RAY
         m_Objects[index] = newObject;
     }
 
-    std::vector<Quadric> Beamline::getObjects()
+    std::vector<Quadric> Beamline::getObjects() const
     {
         return m_Objects;
     }

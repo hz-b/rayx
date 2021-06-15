@@ -247,7 +247,7 @@ namespace RAY
         m_anchorPoints = inputPoints;
     }
 
-    std::vector<double> Quadric::getAnchorPoints()
+    std::vector<double> Quadric::getAnchorPoints() const
     {
         return m_anchorPoints;
     }
@@ -261,84 +261,92 @@ namespace RAY
         assert(inputMatrix.size() == 16);
         m_outMatrix = inputMatrix;
     }
-    std::vector<double> Quadric::getInMatrix()
+    std::vector<double> Quadric::getInMatrix() const
     {
         return m_inMatrix;
     }
-    std::vector<double> Quadric::getOutMatrix()
+    std::vector<double> Quadric::getOutMatrix() const
     {
         return m_outMatrix;
     }
 
-    std::vector<double> Quadric::getMisalignmentParams() {
+    std::vector<double> Quadric::getMisalignmentParams() const
+    {
         return m_misalignmentParams;
     }
 
-    std::vector<double> Quadric::getMisalignmentMatrix()
+    std::vector<double> Quadric::getMisalignmentMatrix() const
     {
         return d_misalignmentMatrix;
     }
 
-    std::vector<double> Quadric::getInverseMisalignmentMatrix()
+    std::vector<double> Quadric::getInverseMisalignmentMatrix() const
     {
         return d_inverseMisalignmentMatrix;
     }
 
-    std::vector<double> Quadric::getB2E()
+    std::vector<double> Quadric::getB2E() const
     {
         return d_b2e;
     }
 
-    std::vector<double> Quadric::getE2B()
+    std::vector<double> Quadric::getE2B() const
     {
         return d_e2b;
     }
 
-    std::vector<double> Quadric::getInvB2E() {
+    std::vector<double> Quadric::getInvB2E() const 
+    {
         return d_inv_b2e;
     }
 
-    std::vector<double> Quadric::getInvE2B() {
+    std::vector<double> Quadric::getInvE2B() const
+    {
         return d_inv_e2b;
     }
 
-    std::vector<double> Quadric::getE2G()
+    std::vector<double> Quadric::getE2G() const
     {
         return d_e2g;
     }
 
-    std::vector<double> Quadric::getG2E()
+    std::vector<double> Quadric::getG2E() const
     {
         return d_g2e;
     }
 
-    std::vector<double> Quadric::getTempMisalignmentParams() {
+    std::vector<double> Quadric::getTempMisalignmentParams() const
+    {
         return m_temporaryMisalignmentParams;
     }
 
-    std::vector<double> Quadric::getTempMisalignmentMatrix()
+    std::vector<double> Quadric::getTempMisalignmentMatrix() const
     {
         return m_temporaryMisalignmentMatrix;
     }
 
-    std::vector<double> Quadric::getInverseTempMisalignmentMatrix()
+    std::vector<double> Quadric::getInverseTempMisalignmentMatrix() const
     {
         return m_inverseTemporaryMisalignmentMatrix;
     }
 
-    std::vector<double> Quadric::getObjectParameters() {
+    std::vector<double> Quadric::getObjectParameters() const
+    {
         return m_objectParameters;
     }
 
-    std::vector<double> Quadric::getElementParameters() {
+    std::vector<double> Quadric::getElementParameters() const
+    {
         return m_elementParameters;
     }
 
-    std::vector<double> Quadric::getSlopeError() {
+    std::vector<double> Quadric::getSlopeError() const
+    {
         return m_slopeError;
     }
 
-    const char* Quadric::getName() {
+    const char* Quadric::getName() const
+    {
         return m_name;
     }
 } // namespace RAY
