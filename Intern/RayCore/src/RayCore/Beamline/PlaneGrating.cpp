@@ -7,19 +7,23 @@ namespace RAY
      * angles given in degree and stored in rad
      * initializes transformation matrices, and parameters for the quadric in super class (quadric)
      * sets mirror-specific parameters in this class
-     * @params: 
-     *          mount = how angles of reflection are calculated: constant deviation, constant incidence,...
-     *          width, height = total width, height of the mirror (x- and z- dimensions)
-     *          deviation = angle between incoming and outgoing main ray
-     *       or grazingIncidence = desired incidence angle of the main ray
-     *          azimuthal = rotation of mirror around z-axis
-     *          distanceToPreceedingElement
-     *          designEnergyMounting = energy, taken from source
-     *          lineDensity = line density of the grating
-     *          orderOfDefraction = 
+     * @param mount                 how angles of reflection are calculated: constant deviation, constant incidence,...
+     * @param width, height         total width, height of the mirror (x- and z- dimensions)
+     * @param deviation             angle between incoming and outgoing main ray
+     * @param grazingIncidence      desired incidence angle of the main ray
+     * @param azimuthal             rotation of mirror around z-axis
+     * @param distanceToPreceedingElement
+     * @param designEnergyMounting  energy, taken from source
+     * @param lineDensity           line density of the grating
+     * @param orderOfDefraction
+     * @param fixFocusConstantCFF
+     * @param misalignmentParams    misalignmen parameters (x,y,z position and x,y,z direction)
+     * @param vls                   vls grating paramters (6)
+     * @param slopeError            7 slope error parameters: x-y sagittal (0), y-z meridional (1), thermal distortion x (2),y (3),z (4), cylindrical bowing amplitude y(5) and radius (6)
+     * @param previous              pointer to previous element in beamline, needed for caclultation transformation matrices in global coordinate system
     */
-    PlaneGrating::PlaneGrating(const char* name, int mount, double width, double height, double deviation, double normalIncidence, double azimuthal, double distanceToPreceedingElement, double designEnergyMounting, double lineDensity, double orderOfDiffraction, double fixFocusConstantCFF, std::vector<double> misalignmentParams, std::vector<double> vls, Quadric* previous) 
-    : Quadric(name, previous) {
+    PlaneGrating::PlaneGrating(const char* name, int mount, double width, double height, double deviation, double normalIncidence, double azimuthal, double distanceToPreceedingElement, double designEnergyMounting, double lineDensity, double orderOfDiffraction, double fixFocusConstantCFF, std::vector<double> misalignmentParams, std::vector<double> vls, std::vector<double> slopeError, Quadric* previous) 
+    : Quadric(name, width, height, slopeError, previous) {
         // parameters in array 
         // std::vector<double> inputPoints = {0,0,0,0, 0,0,0,-1, 0,0,0,0, 0,0,0,0};
         m_totalWidth = width;
@@ -28,7 +32,7 @@ namespace RAY
         m_lineDensity = lineDensity; // 1/d d = linespacing
         m_orderOfDiffraction = orderOfDiffraction;
         m_a = abs(hvlam(m_designEnergyMounting)) * abs(m_lineDensity) * m_orderOfDiffraction * 1e-6; // wavelength * linedensity * order of diffraction * 10^-6
-        
+        std::cout<< "wavelength" << abs(hvlam(m_designEnergyMounting)) << std::endl;
         m_gratingMount = mount==0 ? GM_DEVIATION : (mount==1 ? GM_INCIDENCE : (mount==2 ? GM_CCF : GM_CCF_NO_PREMIRROR));
         m_fixFocusConstantCFF = fixFocusConstantCFF;
         m_chi = rad(azimuthal);
@@ -37,10 +41,14 @@ namespace RAY
         std::cout << "alpha: " << m_alpha << ", beta: " << m_beta << " a: " << m_a << std::endl;
         
         // set parameters in Quadric class
-        editQuadric({0,0,0,0, m_totalWidth,0,0,-1, m_totalHeight,m_a,0,0, 1,0,0,0});
-        m_vls = vls; // into parameters
+        editQuadric({0,0,0,0, m_totalWidth,0,0,-1, m_totalHeight,0,0,0, 1,0,0,0});
+        m_vls = vls; // into element parameters
         calcTransformationMatrices(m_alpha, m_chi, m_beta, m_distanceToPreceedingElement, misalignmentParams);
-        setParameters({m_totalWidth, m_totalHeight, m_lineDensity, m_orderOfDiffraction, m_designEnergyMounting,m_a,m_vls[0],m_vls[1], m_vls[2],m_vls[3],m_vls[4],m_vls[5], 0,0,0,0});
+        setElementParameters({
+            m_totalWidth, m_totalHeight, m_lineDensity, m_orderOfDiffraction, 
+            abs(hvlam(m_designEnergyMounting)),0,m_vls[0],m_vls[1],  
+            m_vls[2],m_vls[3],m_vls[4],m_vls[5],  
+            0,0,0,0});
         setTemporaryMisalignment({0,0,0,0,0,0});
         // Quadric(inputPoints, m_alpha, m_chi, m_beta, m_distanceToPreceedingElement);
     }

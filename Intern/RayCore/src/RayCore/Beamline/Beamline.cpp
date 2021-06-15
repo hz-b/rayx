@@ -19,7 +19,7 @@ namespace RAY
     }
 
     void Beamline::addQuadric(Quadric q) {
-        addQuadric(q.getName(), q.getAnchorPoints(), q.getInMatrix(), q.getOutMatrix(), q.getTempMisalignmentMatrix(), q.getInverseTempMisalignmentMatrix(), q.getParameters());
+        addQuadric(q.getName(), q.getAnchorPoints(), q.getInMatrix(), q.getOutMatrix(), q.getTempMisalignmentMatrix(), q.getInverseTempMisalignmentMatrix(), q.getObjectParameters(), q.getElementParameters());
     }
 
     /* Somehow results in wrong values. Should be fixed later
@@ -28,9 +28,9 @@ namespace RAY
         m_Objects.push_back(newObject);
     }
     */
-    void Beamline::addQuadric(const char* name, std::vector<double> inputPoints, std::vector<double> inputInMatrix, std::vector<double> inputOutMatrix, std::vector<double> misalignmentMatrix, std::vector<double> inverseMisalignmentMatrix, std::vector<double> parameters)
+    void Beamline::addQuadric(const char* name, std::vector<double> inputPoints, std::vector<double> inputInMatrix, std::vector<double> inputOutMatrix, std::vector<double> misalignmentMatrix, std::vector<double> inverseMisalignmentMatrix, std::vector<double> OParameters, std::vector<double> EParameters)
     {
-        m_Objects.emplace_back(name, inputPoints, inputInMatrix, inputOutMatrix, misalignmentMatrix, inverseMisalignmentMatrix, parameters);
+        m_Objects.emplace_back(name, inputPoints, inputInMatrix, inputOutMatrix, misalignmentMatrix, inverseMisalignmentMatrix, OParameters, EParameters);
     }
 
     void Beamline::replaceNthObject(uint32_t index, Quadric newObject)

@@ -15,7 +15,7 @@ namespace RAY
         // ctor
         Ray(glm::dvec3 position, glm::dvec3 direction, double energy, double weight);
         // default ctor
-        Ray();
+        Ray() = default;
         // dtor
         ~Ray();
 

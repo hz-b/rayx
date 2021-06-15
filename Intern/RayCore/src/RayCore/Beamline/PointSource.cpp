@@ -39,11 +39,6 @@ namespace RAY
      * returns list of rays
      */
     std::vector<Ray> PointSource::getRays() {
-        // double mean = 0;
-        // double stddev = 1;
-        // std::normal_distribution<double> stdnorm (mean,stddev); 
-        // std::uniform_real_distribution<double> uniform (0,1);
-
         double x, y, z, psi, phi, en; //x,y,z pos, psi,phi direction cosines, en=energy
 
         int n = this->getNumberOfRays();
@@ -56,14 +51,14 @@ namespace RAY
             x = getCoord(m_widthDist, m_sourceWidth) + getMisalignmentParams()[0];
             y = getCoord(m_heightDist, m_sourceHeight) + getMisalignmentParams()[1];
             z = (m_uniform(m_re) - 0.5) * m_sourceDepth;
-            en = selectEnergy();
+            en = selectEnergy(); // LightSource.cpp
             //double z = (rn[2] - 0.5) * m_sourceDepth;
             glm::dvec3 position = glm::dvec3(x, y, z);
 
             // get random deviation from main ray based on distribution
             psi = getCoord(m_verDist, m_verDivergence) + getMisalignmentParams()[2];
             phi = getCoord(m_horDist, m_horDivergence) + getMisalignmentParams()[3];
-            // get corresponding angles based on distribution and deviation from main ray (main ray: x=0,y=0,z=1 if phi=psi=0)
+            // get corresponding angles based on distribution and deviation from main ray (main ray: xDir=0,yDir=0,zDir=1 for phi=psi=0)
             glm::dvec3 direction = getDirectionFromAngles(phi, psi);
             Ray r = Ray(position, direction, en, 1.0);
             rayVector.emplace_back(r);

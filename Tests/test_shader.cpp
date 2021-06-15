@@ -16,6 +16,7 @@
 
 using ::testing::ElementsAre;
 std::vector<double> zeros = { 0,0,0,0, 0,0,0,0, 0,0,0,0, 0,0,0,0 };
+std::vector<double> zeros7 =  {0,0,0,0,0, 0,0}; // for slope error
 
 //! Using the google test framework, check all elements of two containers
 #define EXPECT_ITERABLE_BASE( PREDICATE, REFTYPE, TARTYPE, ref, target) \
@@ -65,7 +66,7 @@ std::list<double> runTracer(std::vector<RAY::Ray> testValues, std::vector<RAY::Q
     std::cout << "add rays to tracer done" << std::endl;
 
     for (RAY::Quadric quad : q) {
-        tracer.addQuadric(quad.getAnchorPoints(), quad.getInMatrix(), quad.getOutMatrix(), quad.getTempMisalignmentMatrix(), quad.getInverseTempMisalignmentMatrix(), quad.getParameters());
+        tracer.addQuadric(quad.getAnchorPoints(), quad.getInMatrix(), quad.getOutMatrix(), quad.getTempMisalignmentMatrix(), quad.getInverseTempMisalignmentMatrix(), quad.getObjectParameters(), quad.getElementParameters());
     }
     tracer.run(); //run tracer
     std::list<double> outputRays;
@@ -84,7 +85,69 @@ std::list<double> runTracer(std::vector<RAY::Ray> testValues, std::vector<RAY::Q
     tracer.cleanup();
     return outputRays;
 }
+
+void writeToFile(std::list<double> outputRays, std::string name)
+{
+    std::cout << "writing to file..." << std::endl;
+    std::ofstream outputFile;
+    outputFile.precision(17);
+    std::cout.precision(17);
+    std::string filename = "../../Tests/output/";
+    filename.append(name);
+    filename.append(".csv");
+    outputFile.open(filename);
+    char sep = ';'; // file is saved in .csv (comma seperated value), excel compatibility is manual right now
+    outputFile << "Index" << sep << "Xloc" << sep << "Yloc" << sep << "Zloc" << sep << "Weight" << sep << "Xdir" << sep << "Ydir" << sep << "Zdir" << sep << "Energy" << std::endl;
+    // outputFile << "Index,Xloc,Yloc,Zloc,Weight,Xdir,Ydir,Zdir" << std::endl;
+
+    size_t counter = 0;
+    int print = 0; // whether to print on std::out (0=no, 1=yes)
+    for (std::list<double>::iterator i = outputRays.begin(); i != outputRays.end(); i++) {
+        if (counter % 8 == 0) {
+            outputFile << counter / VULKANTRACER_RAY_DOUBLE_AMOUNT;
+            if (print == 1) std::cout << ")" << std::endl;
+            if (print == 1) std::cout << "(";
+        }
+        outputFile << sep << *i;
+        if (counter % 8 == 7) {
+            outputFile << std::endl;
+            counter++;
+            continue;
+        }
+        if (counter % 8 == 3) {
+            if (print == 1) std::cout << ") ";
+        }
+        else if (counter % 8 == 4) {
+            if (print == 1) std::cout << " (";
+        }
+        else if (counter % 8 != 0) {
+            if (print == 1) std::cout << ", ";
+        }
+        if (print == 1) std::cout << *i;
+        counter++;
+    }
+    if (print == 1) std::cout << ")" << std::endl;
+    outputFile.close();
+    std::cout << "done!" << std::endl;
+}
 /*
+TEST(Tracer, testUniformRandom) {
+    double settings = 17;
+
+    RAY::MatrixSource m = RAY::MatrixSource(0, "Matrix source 1", 2000, 0, 0.065, 0.04, 0.0, 0.001, 0.001, 100, 0, { 0,0,0,0 });
+    std::vector<RAY::Ray> testValues = m.getRays();
+    RAY::Quadric q = RAY::Quadric("testRandomNumbers", {0,0,0,0, 0,0,0,0, 0,0,0,0, 0,settings,0,0}, zeros, zeros, zeros, zeros, zeros, zeros);
+    std::list<double> outputRays = runTracer(testValues, {q});
+
+    for (std::list<double>::iterator i = outputRays.begin(); i != outputRays.end();) {
+        ASSERT_TRUE(*i <= 1.0);
+        ASSERT_TRUE(*i >= 0.0);
+    }
+    std::string filename = "testFile_randomUniform";
+    writeToFile(outputRays, filename);
+}*/
+
+
 TEST(Tracer, testRefrac2D) {
     std::vector<RAY::Ray> testValues;
     std::vector<RAY::Ray> correct;
@@ -99,7 +162,7 @@ TEST(Tracer, testRefrac2D) {
     // one quadric for each ray to transport ax and az for that test ray to the shader
     double az = 0.00016514977645243345;
     double ax = 0.012830838024391771;
-    RAY::Quadric q = RAY::Quadric("testRefrac2D", { 0,0,0,0, 0,0,0,0, 0,0,0,0, 0,settings,0,0 }, { az, ax,0,0, 0,0,0,0, 0,0,0,0, 0,0,0,0 }, zeros, zeros, zeros, zeros);
+    RAY::Quadric q = RAY::Quadric("testRefrac2D", { 0,0,0,0, 0,0,0,0, 0,0,0,0, 0,settings,0,0 }, { az, ax,0,0, 0,0,0,0, 0,0,0,0, 0,0,0,0 }, zeros, zeros, zeros, zeros, zeros);
     quadrics.push_back(q);
 
     r = RAY::Ray(glm::dvec3(0, 1, 0), glm::dvec3(0.00049999999722222275, -0.017285762731583675, 0.99985046502305308),0, 1.0);
@@ -108,7 +171,7 @@ TEST(Tracer, testRefrac2D) {
     correct.push_back(c);
     az = -6.2949352042540596e-05;
     ax = 0.038483898782123105;
-    q = RAY::Quadric("testRefrac2D", { 0,0,0,0, 0,0,0,0, 0,0,0,0, 0,settings,0,0 }, { az, ax,0,0, 0,0,0,0, 0,0,0,0, 0,0,0,0 }, zeros, zeros, zeros, zeros);
+    q = RAY::Quadric("testRefrac2D", { 0,0,0,0, 0,0,0,0, 0,0,0,0, 0,settings,0,0 }, { az, ax,0,0, 0,0,0,0, 0,0,0,0, 0,0,0,0 }, zeros, zeros, zeros, zeros, zeros);
     quadrics.push_back(q);
 
     r = RAY::Ray(glm::dvec3(0, 1, 0), glm::dvec3(0.0001666666635802469, -0.017619047234249029, 0.99984475864845179),0, 1.0);
@@ -117,7 +180,7 @@ TEST(Tracer, testRefrac2D) {
     correct.push_back(c);
     az = -0.077169530850327184;
     ax = 0.2686127340088395;
-    q = RAY::Quadric("testRefrac2D", { 0,0,0,0, 0,0,0,0, 0,0,0,0, 0,settings,0,0 }, { az, ax,0,0, 0,0,0,0, 0,0,0,0, 0,0,0,0 }, zeros, zeros, zeros, zeros);
+    q = RAY::Quadric("testRefrac2D", { 0,0,0,0, 0,0,0,0, 0,0,0,0, 0,settings,0,0 }, { az, ax,0,0, 0,0,0,0, 0,0,0,0, 0,0,0,0 }, zeros, zeros, zeros, zeros, zeros);
     quadrics.push_back(q);
 
     // normal != 0 (spherical RZP)
@@ -127,7 +190,7 @@ TEST(Tracer, testRefrac2D) {
     correct.push_back(c);
     az = 0.0021599283476277926;
     ax = -0.050153240660177005;
-    q = RAY::Quadric("testRefrac2D", { 0,0,0,0, 0,0,0,0, 0,0,0,0, 0,settings,0,0 }, { az, ax,0,0, 0,0,0,0, 0,0,0,0, 0,0,0,0 }, zeros, zeros, zeros, zeros);
+    q = RAY::Quadric("testRefrac2D", { 0,0,0,0, 0,0,0,0, 0,0,0,0, 0,settings,0,0 }, { az, ax,0,0, 0,0,0,0, 0,0,0,0, 0,0,0,0 }, zeros, zeros, zeros, zeros, zeros);
     quadrics.push_back(q);
 
     std::list<double> outputRays = runTracer(testValues, quadrics);
@@ -152,9 +215,7 @@ TEST(Tracer, testRefrac2D) {
         counter++;
         i++;
     }
-
 }
-
 
 TEST(Tracer, testNormalCartesian) {
     VulkanTracer tracer;
@@ -188,7 +249,7 @@ TEST(Tracer, testNormalCartesian) {
     correct.push_back(c);
 
     double settings = 13;
-    RAY::Quadric q1 = RAY::Quadric("testNormalCartesian", { 0,0,0,0, 0,0,0,0, 0,0,0,0, 0,settings,0,0 }, zeros, zeros, zeros, zeros, zeros);
+    RAY::Quadric q1 = RAY::Quadric("testNormalCartesian", { 0,0,0,0, 0,0,0,0, 0,0,0,0, 0,settings,0,0 }, zeros, zeros, zeros, zeros, zeros, zeros);
 
     std::list<double> outputRays = runTracer(testValues, { q1 });
     std::cout << "got " << outputRays.size() << " values from shader" << std::endl;
@@ -250,7 +311,7 @@ TEST(Tracer, testNormalCylindrical) {
     correct.push_back(c);
 
     double settings = 14;
-    RAY::Quadric q1 = RAY::Quadric("testNormalCylindrical", { 0,0,0,0, 0,0,0,0, 0,0,0,0, 0,settings,0,0 }, zeros, zeros, zeros, zeros, zeros);
+    RAY::Quadric q1 = RAY::Quadric("testNormalCylindrical", { 0,0,0,0, 0,0,0,0, 0,0,0,0, 0,settings,0,0 }, zeros, zeros, zeros, zeros, zeros, zeros);
 
     std::list<double> outputRays = runTracer(testValues, { q1 });
     std::cout << "got " << outputRays.size() << " values from shader" << std::endl;
@@ -307,7 +368,7 @@ TEST(Tracer, testRefrac) {
 
 
     double settings = 15;
-    RAY::Quadric q1 = RAY::Quadric("testRefrac", { 0,0,0,0, 0,0,0,0, 0,0,0,0, 0,settings,0,0 }, { a,0,0,0, 0,0,0,0, 0,0,0,0, 0,0,0,0 }, zeros, zeros, zeros, zeros);
+    RAY::Quadric q1 = RAY::Quadric("testRefrac", { 0,0,0,0, 0,0,0,0, 0,0,0,0, 0,settings,0,0 }, { a,0,0,0, 0,0,0,0, 0,0,0,0, 0,0,0,0 }, zeros, zeros, zeros, zeros, zeros);
 
     std::list<double> outputRays = runTracer(testValues, { q1 });
     std::cout << "got " << outputRays.size() << " values from shader" << std::endl;
@@ -355,7 +416,7 @@ TEST(Tracer, testRefracBeyondHor) {
 
 
     double settings = 15;
-    RAY::Quadric q1 = RAY::Quadric("testRefrac", { 0,0,0,0, 0,0,0,0, 0,0,0,0, 0,settings,0,0 }, { a,0,0,0, 0,0,0,0, 0,0,0,0, 0,0,0,0 }, zeros, zeros, zeros, zeros);
+    RAY::Quadric q1 = RAY::Quadric("testRefrac", { 0,0,0,0, 0,0,0,0, 0,0,0,0, 0,settings,0,0 }, { a,0,0,0, 0,0,0,0, 0,0,0,0, 0,0,0,0 }, zeros, zeros, zeros, zeros, zeros);
 
     std::list<double> outputRays = runTracer(testValues, { q1 });
     std::cout << "got " << outputRays.size() << " values from shader" << std::endl;
@@ -419,7 +480,7 @@ TEST(Tracer, testWasteBox) {
     correct.push_back(c);
 
     double settings = 11;
-    RAY::Quadric q1 = RAY::Quadric("testWasteBox", { 0,0,0,0, 0,0,0,0, 0,0,0,0, 0,settings,0,0 }, zeros, zeros, zeros, zeros, zeros);
+    RAY::Quadric q1 = RAY::Quadric("testWasteBox", { 0,0,0,0, 0,0,0,0, 0,0,0,0, 0,settings,0,0 }, zeros, zeros, zeros, zeros, zeros, zeros);
 
     std::list<double> outputRays = runTracer(testValues, { q1 });
     std::cout << "got " << outputRays.size() << " values from shader" << std::endl;
@@ -472,7 +533,7 @@ TEST(Tracer, testRZPLineDensityDefaulParams) { // point to point
     correct.push_back(c);
 
     double settings = 12;
-    RAY::Quadric q1 = RAY::Quadric("testRZPpoint2point", { 0,0,0,0, 0,0,0,0, 0,0,0,0, 0,settings,0,0 }, inputValues, zeros, zeros, zeros, zeros);
+    RAY::Quadric q1 = RAY::Quadric("testRZPpoint2point", { 0,0,0,0, 0,0,0,0, 0,0,0,0, 0,settings,0,0 }, inputValues, zeros, zeros, zeros, zeros, zeros);
 
     std::list<double> outputRays = runTracer(testValues, { q1 });
     std::cout << "got " << outputRays.size() << " values from shader" << std::endl;
@@ -525,7 +586,7 @@ TEST(Tracer, testRZPLineDensityAstigmatic) { // astigmatic 2 astigmatic
     correct.push_back(c);
 
     double settings = 12;
-    RAY::Quadric q1 = RAY::Quadric("testRZPAstigmatic", { 0,0,0,0, 0,0,0,0, 0,0,0,0, 0,settings,0,0 }, inputValues, zeros, zeros, zeros, zeros);
+    RAY::Quadric q1 = RAY::Quadric("testRZPAstigmatic", { 0,0,0,0, 0,0,0,0, 0,0,0,0, 0,settings,0,0 }, inputValues, zeros, zeros, zeros, zeros, zeros);
 
     std::list<double> outputRays = runTracer(testValues, { q1 });
     std::cout << "got " << outputRays.size() << " values from shader" << std::endl;
@@ -574,7 +635,7 @@ TEST(Tracer, testRayMatrixMult) {
     correct.push_back(c);
 
     double settings = 10;
-    RAY::Quadric q1 = RAY::Quadric("testRayMatrixMult", { 0,0,0,0, 0,0,0,0, 0,0,0,0, 0,settings,0,0 }, matrix, zeros, zeros, zeros, zeros);
+    RAY::Quadric q1 = RAY::Quadric("testRayMatrixMult", { 0,0,0,0, 0,0,0,0, 0,0,0,0, 0,settings,0,0 }, matrix, zeros, zeros, zeros, zeros, zeros);
 
     std::list<double> outputRays = runTracer(testValues, { q1 });
     std::cout << "got " << outputRays.size() << " values from shader" << std::endl;
@@ -634,7 +695,7 @@ TEST(Tracer, testDPow) {
     1, -1, 1 };
 
     double settings = 7;
-    RAY::Quadric q = RAY::Quadric("testDoublePow", { 0,0,0,0, 0,0,0,0, 0,0,0,0, 0,settings,0,0 }, zeros, zeros, zeros, zeros, zeros);
+    RAY::Quadric q = RAY::Quadric("testDoublePow", { 0,0,0,0, 0,0,0,0, 0,0,0,0, 0,settings,0,0 }, zeros, zeros, zeros, zeros, zeros, zeros);
 
     std::list<double> outputRays = runTracer(testValues, { q });
     std::cout << "got " << outputRays.size() << " values from shader" << std::endl;
@@ -671,7 +732,7 @@ TEST(Tracer, testCosini) {
 
 
     double settings = 9;
-    RAY::Quadric q = RAY::Quadric("testCosini", { 0,0,0,0, 0,0,0,0, 0,0,0,0, 0,settings,0,0 }, zeros, zeros, zeros, zeros, zeros);
+    RAY::Quadric q = RAY::Quadric("testCosini", { 0,0,0,0, 0,0,0,0, 0,0,0,0, 0,settings,0,0 }, zeros, zeros, zeros, zeros, zeros, zeros);
 
     std::list<double> outputRays = runTracer(testValues, { q });
     std::cout << "got " << outputRays.size() << " values from shader" << std::endl;
@@ -712,7 +773,7 @@ TEST(Tracer, factTest) {
     std::vector<double> correct = { 1,1,2, -2, -1,24,355687428096000 };
 
     double settings = 8;
-    RAY::Quadric q = RAY::Quadric("testPow", { 0,0,0,0, 0,0,0,0, 0,0,0,0, 0,settings,0,0 }, zeros, zeros, zeros, zeros, zeros);
+    RAY::Quadric q = RAY::Quadric("testPow", { 0,0,0,0, 0,0,0,0, 0,0,0,0, 0,settings,0,0 }, zeros, zeros, zeros, zeros, zeros, zeros);
 
     std::list<double> outputRays = runTracer(testValues, { q });
     std::cout << "got " << outputRays.size() << " values from shader" << std::endl;
@@ -740,7 +801,7 @@ TEST(Tracer, bessel1Test) {
     ,-0.21368198451302897,0.57672480775687363,5e-09, -0.06604332802354923, 0.065192988349741882,-0.0066157432977083167,0.28461534317975273,0 };
 
     double settings = 6;
-    RAY::Quadric q = RAY::Quadric("TestBessel1", { 0,0,0,0, 0,0,0,0, 0,0,0,0, 0,settings,0,0 }, zeros, zeros, zeros, zeros, zeros);
+    RAY::Quadric q = RAY::Quadric("TestBessel1", { 0,0,0,0, 0,0,0,0, 0,0,0,0, 0,settings,0,0 }, zeros, zeros, zeros, zeros, zeros, zeros);
 
     std::list<double> outputRays = runTracer(testValues, { q });
     std::cout << "got " << outputRays.size() << " values from shader" << std::endl;
@@ -774,7 +835,7 @@ TEST(Tracer, diffractionTest) {
     double upperDpsi = 1e-05;
 
     double settings = 5;
-    RAY::Quadric q = RAY::Quadric("TestDiffraction", { 0,0,0,0, 0,0,0,0, 0,0,0,0, 0,settings,0,0 }, zeros, zeros, zeros, zeros, zeros);
+    RAY::Quadric q = RAY::Quadric("TestDiffraction", { 0,0,0,0, 0,0,0,0, 0,0,0,0, 0,settings,0,0 }, zeros, zeros, zeros, zeros, zeros, zeros);
 
     std::list<double> outputRays = runTracer(testValues, { q });
     std::cout << "got " << outputRays.size() << " values from shader" << std::endl;
@@ -809,7 +870,7 @@ TEST(Tracer, TrigTest) {
     r = RAY::Ray(glm::dvec3(PI, PI, PI), glm::dvec3(PI, PI, PI),0, PI);
     testValues.push_back(r);
 
-    RAY::Quadric q = RAY::Quadric("qq", { 0,0,0,0, 0,0,0,0, 0,0,0,0, 0,1,0,0 }, zeros, zeros, zeros, zeros, zeros);
+    RAY::Quadric q = RAY::Quadric("qq", { 0,0,0,0, 0,0,0,0, 0,0,0,0, 0,1,0,0 }, zeros, zeros, zeros, zeros, zeros, zeros);
 
     std::list<double> outputRays = runTracer(testValues, { q });
     std::cout << "got " << outputRays.size() << " values from shader" << std::endl;
@@ -867,7 +928,7 @@ TEST(Tracer, vlsGratingTest) {
     correct.push_back(c);
 
     // give z position and setting=4 to start vls test on shader
-    RAY::Quadric q = RAY::Quadric("TestVLS", { 0,0,0,0, 0,0,0,0, 0,z,0,0, 0,4,0,0 }, zeros, zeros, zeros, zeros, zeros);
+    RAY::Quadric q = RAY::Quadric("TestVLS", { 0,0,0,0, 0,0,0,0, 0,z,0,0, 0,4,0,0 }, zeros, zeros, zeros, zeros, zeros, zeros);
 
     std::list<double> outputRays = runTracer(testValues, { q });
 
@@ -921,7 +982,7 @@ TEST(Tracer, planeRefracTest) {
     c = RAY::Ray(glm::dvec3(0, 1, 0), glm::dvec3(0, 0.9966772027014974, 0.081452598714515267),0, 0.01239852);
     testValues.push_back(r);
     correct.push_back(c);
-    RAY::Quadric q = RAY::Quadric("TestPlaneRefrac", { 0,0,0,0, 0,0,0,0, 0,0,0,0, 0,3,0,0 }, zeros, zeros, zeros, zeros, zeros);
+    RAY::Quadric q = RAY::Quadric("TestPlaneRefrac", { 0,0,0,0, 0,0,0,0, 0,0,0,0, 0,3,0,0 }, zeros, zeros, zeros, zeros, zeros, zeros);
 
     std::list<double> outputRays = runTracer(testValues, { q });
     std::cout << "got " << outputRays.size() << " values from shader" << std::endl;
@@ -938,52 +999,8 @@ TEST(Tracer, planeRefracTest) {
         counter++;
         i++;
     }
-}*/
-
-void writeToFile(std::list<double> outputRays, std::string name)
-{
-    std::cout << "writing to file..." << std::endl;
-    std::ofstream outputFile;
-    outputFile.precision(17);
-    std::cout.precision(17);
-    std::string filename = "../../Tests/output/";
-    filename.append(name);
-    filename.append(".csv");
-    outputFile.open(filename);
-    char sep = ';'; // file is saved in .csv (comma seperated value), excel compatibility is manual right now
-    outputFile << "Index" << sep << "Xloc" << sep << "Yloc" << sep << "Zloc" << sep << "Weight" << sep << "Xdir" << sep << "Ydir" << sep << "Zdir" << sep << "Energy" << std::endl;
-    // outputFile << "Index,Xloc,Yloc,Zloc,Weight,Xdir,Ydir,Zdir" << std::endl;
-
-    size_t counter = 0;
-    int print = 0; // whether to print on std::out (0=no, 1=yes)
-    for (std::list<double>::iterator i = outputRays.begin(); i != outputRays.end(); i++) {
-        if (counter % 8 == 0) {
-            outputFile << counter / VULKANTRACER_RAY_DOUBLE_AMOUNT;
-            if (print == 1) std::cout << ")" << std::endl;
-            if (print == 1) std::cout << "(";
-        }
-        outputFile << sep << *i;
-        if (counter % 8 == 7) {
-            outputFile << std::endl;
-            counter++;
-            continue;
-        }
-        if (counter % 8 == 3) {
-            if (print == 1) std::cout << ") ";
-        }
-        else if (counter % 8 == 4) {
-            if (print == 1) std::cout << " (";
-        }
-        else if (counter % 8 != 0) {
-            if (print == 1) std::cout << ", ";
-        }
-        if (print == 1) std::cout << *i;
-        counter++;
-    }
-    if (print == 1) std::cout << ")" << std::endl;
-    outputFile.close();
-    std::cout << "done!" << std::endl;
 }
+
 
 void testOpticalElement(std::vector<RAY::Quadric> quadrics, int n) {
 
@@ -999,116 +1016,125 @@ void testOpticalElement(std::vector<RAY::Quadric> quadrics, int n) {
 // test complete optical elements instead of single functions
 // uses deterministic source (matrix source with source depth = 0)
 // use name of optical element as file name
-/*
+
 TEST(opticalElements, planeMirrorDefault) {
-    RAY::PlaneMirror plM = RAY::PlaneMirror("PlaneMirrorDef", 50, 200, 10, 7.5, 10000, { 0,0,0, 0,0,0 }, nullptr); // {1,2,3,0.01,0.02,0.03}
+    RAY::PlaneMirror plM = RAY::PlaneMirror("PlaneMirrorDef", 50, 200, 10, 7.5, 10000, { 0,0,0, 0,0,0 }, zeros7, nullptr); // {1,2,3,0.01,0.02,0.03}
     testOpticalElement({ plM }, 20);
     ASSERT_TRUE(true);
 }
 
 TEST(opticalElements, planeMirrorMis) {
-    RAY::PlaneMirror plM = RAY::PlaneMirror("PlaneMirrorMis", 50, 200, 10, 0, 10000, { 1,2,3,0.001,0.002,0.003 }, nullptr); // {1,2,3,0.01,0.02,0.03}
+    RAY::PlaneMirror plM = RAY::PlaneMirror("PlaneMirrorMis", 50, 200, 10, 0, 10000, { 1,2,3,0.001,0.002,0.003 }, zeros7, nullptr); // {1,2,3,0.01,0.02,0.03}
     testOpticalElement({ plM }, 20);
     ASSERT_TRUE(true);
 }
 
 TEST(opticalElements, sphereMirror) {
-    RAY::SphereMirror s = RAY::SphereMirror("SphereMirrorDefault", 50, 200, 10, 0.0, 10000, 10000, 1000, { 0,0,0,0,0,0 }, nullptr);
+    RAY::SphereMirror s = RAY::SphereMirror("SphereMirrorDefault", 50, 200, 10, 0.0, 10000, 10000, 1000, { 0,0,0,0,0,0 }, zeros7, nullptr);
     testOpticalElement({ s }, 20);
     ASSERT_TRUE(true);
 }
 
 TEST(opticalElements, planeGratingDevDefault) {
-    RAY::PlaneGrating plG = RAY::PlaneGrating("PlaneGratingDeviationDefault", 0, 50, 200, 10, 0.0, 0.0, 10000, 100, 1000, 1, 2, { 0,0,0,0,0,0 }, { 0,0,0,0,0,0 }, nullptr); // dx,dy,dz, dpsi,dphi,dchi // {1,2,3,0.001,0.002,0.003}
+    RAY::PlaneGrating plG = RAY::PlaneGrating("PlaneGratingDeviationDefault", 0, 50, 200, 10, 0.0, 0.0, 10000, 100, 1000, 1, 2, { 0,0,0,0,0,0 }, { 0,0,0,0,0,0 }, zeros7, nullptr); // dx,dy,dz, dpsi,dphi,dchi // {1,2,3,0.001,0.002,0.003}
     testOpticalElement({ plG }, 20);
     ASSERT_TRUE(true);
 }
 
 TEST(opticalElements, planeGratingDevAzimuthal) {
-    RAY::PlaneGrating plG = RAY::PlaneGrating("PlaneGratingDeviationAz", 0, 50, 200, 10, 0.0, 7.5, 10000, 100, 1000, 1, 2, { 0,0,0,0,0,0 }, { 0,0,0,0,0,0 }, nullptr); // dx,dy,dz, dpsi,dphi,dchi // {1,2,3,0.001,0.002,0.003}
+    RAY::PlaneGrating plG = RAY::PlaneGrating("PlaneGratingDeviationAz", 0, 50, 200, 10, 0.0, 7.5, 10000, 100, 1000, 1, 2, { 0,0,0,0,0,0 }, { 0,0,0,0,0,0 }, zeros7, nullptr); // dx,dy,dz, dpsi,dphi,dchi // {1,2,3,0.001,0.002,0.003}
     testOpticalElement({ plG }, 20);
     ASSERT_TRUE(true);
 }
 
 TEST(opticalElements, planeGratingDevMis) {
-    RAY::PlaneGrating plG = RAY::PlaneGrating("PlaneGratingDeviationAzMis", 0, 50, 200, 10, 0.0, 7.5, 10000, 100, 1000, 1, 2, { 1,2,3,0.001,0.002,0.003 }, { 0,0,0,0,0,0 }, nullptr); // dx,dy,dz, dpsi,dphi,dchi // {1,2,3,0.001,0.002,0.003}
+    RAY::PlaneGrating plG = RAY::PlaneGrating("PlaneGratingDeviationAzMis", 0, 50, 200, 10, 0.0, 7.5, 10000, 100, 1000, 1, 2, { 1,2,3,0.001,0.002,0.003 }, { 0,0,0,0,0,0 }, zeros7, nullptr); // dx,dy,dz, dpsi,dphi,dchi // {1,2,3,0.001,0.002,0.003}
     testOpticalElement({ plG }, 20);
     ASSERT_TRUE(true);
 }
 
 // constant incidence angle mode, azimuthal angle and misalignment
 TEST(opticalElements, planeGratingIncAzMis) {
-    RAY::PlaneGrating plG = RAY::PlaneGrating("PlaneGratingIncAzMis", 1, 50, 200, 0.0, 10, 7.5, 10000, 100, 1000, 1, 2, { 1,2,3,0.001,0.002,0.003 }, { 0,0,0,0,0,0 }, nullptr); // dx,dy,dz, dpsi,dphi,dchi // {1,2,3,0.001,0.002,0.003}
+    RAY::PlaneGrating plG = RAY::PlaneGrating("PlaneGratingIncAzMis", 1, 50, 200, 0.0, 10, 7.5, 10000, 100, 1000, 1, 2, { 1,2,3,0.001,0.002,0.003 }, { 0,0,0,0,0,0 }, zeros7, nullptr); // dx,dy,dz, dpsi,dphi,dchi // {1,2,3,0.001,0.002,0.003}
     testOpticalElement({ plG }, 20);
     ASSERT_TRUE(true);
 }
 
 TEST(opticalElements, planeGratingDevMisVLS) {
-    RAY::PlaneGrating plG = RAY::PlaneGrating("PlaneGratingDeviationMis", 0, 50, 200, 10, 0.0, 7.5, 10000, 100, 1000, 1, 2, { 1,2,3,0.001,0.002,0.003 }, { 1,2,3,4,5,6 }, nullptr); // dx,dy,dz, dpsi,dphi,dchi // {1,2,3,0.001,0.002,0.003}
+    RAY::PlaneGrating plG = RAY::PlaneGrating("PlaneGratingDeviationMis", 0, 50, 200, 10, 0.0, 7.5, 10000, 100, 1000, 1, 2, { 1,2,3,0.001,0.002,0.003 }, { 1,2,3,4,5,6 }, zeros7, nullptr); // dx,dy,dz, dpsi,dphi,dchi // {1,2,3,0.001,0.002,0.003}
     testOpticalElement({ plG }, 20);
     ASSERT_TRUE(true);
 }
-*/
+
 TEST(opticalElements, RZPDefaultParams) {
-    RAY::ReflectionZonePlate rzp = RAY::ReflectionZonePlate("ReflectionZonePlateDefault", 1, 0, 0, 0, 50, 200, 170, 1, 0, 10000, 100, 100, 1, -1, 1, 1, 100, 500, 100, 500, 0, 0, 0, 0, { 0,0,0, 0,0,0 }, nullptr); // dx,dy,dz, dpsi,dphi,dchi // {1,2,3,0.001,0.002,0.003}
+    RAY::ReflectionZonePlate rzp = RAY::ReflectionZonePlate("ReflectionZonePlateDefault", 1, 0, 0, 0, 50, 200, 170, 1, 0, 10000, 100, 100, 1, -1, 1, 1, 100, 500, 100, 500, 0, 0, 0, 0, { 0,0,0, 0,0,0 }, zeros7, nullptr); // dx,dy,dz, dpsi,dphi,dchi // {1,2,3,0.001,0.002,0.003}
     testOpticalElement({ rzp }, 20);
     ASSERT_TRUE(true);
 }
 
 TEST(opticalElements, RZPDefaultParams200) {
-    RAY::ReflectionZonePlate rzp = RAY::ReflectionZonePlate("ReflectionZonePlateDefault200", 1, 0, 0, 0, 50, 200, 170, 1, 0, 10000, 100, 100, 1, -1, 1, 1, 100, 500, 100, 500, 0, 0, 0, 0, { 0,0,0, 0,0,0 }, nullptr); // dx,dy,dz, dpsi,dphi,dchi // {1,2,3,0.001,0.002,0.003}
+    RAY::ReflectionZonePlate rzp = RAY::ReflectionZonePlate("ReflectionZonePlateDefault200", 1, 0, 0, 0, 50, 200, 170, 1, 0, 10000, 100, 100, 1, -1, 1, 1, 100, 500, 100, 500, 0, 0, 0, 0, { 0,0,0, 0,0,0 }, zeros7, nullptr); // dx,dy,dz, dpsi,dphi,dchi // {1,2,3,0.001,0.002,0.003}
     testOpticalElement({ rzp }, 200);
     ASSERT_TRUE(true);
 }
 
 TEST(opticalElements, RZPAzimuthal200) {
-    RAY::ReflectionZonePlate rzp = RAY::ReflectionZonePlate("ReflectionZonePlateAzim200", 1, 0, 0, 0, 50, 200, 170, 1, 10, 10000, 100, 100, -1, -1, 1, 1, 100, 500, 100, 500, 0, 0, 0, 0,{ 0,0,0, 0,0,0 }, nullptr); // dx,dy,dz, dpsi,dphi,dchi // {1,2,3,0.001,0.002,0.003}
+    RAY::ReflectionZonePlate rzp = RAY::ReflectionZonePlate("ReflectionZonePlateAzim200", 1, 0, 0, 0, 50, 200, 170, 1, 10, 10000, 100, 100, -1, -1, 1, 1, 100, 500, 100, 500, 0, 0, 0, 0,{ 0,0,0, 0,0,0 }, zeros7, nullptr); // dx,dy,dz, dpsi,dphi,dchi // {1,2,3,0.001,0.002,0.003}
     testOpticalElement({ rzp }, 200);
     ASSERT_TRUE(true);
 }
 
 
 TEST(opticalElements, RZPMis) {
-    RAY::ReflectionZonePlate rzp = RAY::ReflectionZonePlate("ReflectionZonePlateMis", 1, 0, 0, 0, 50, 200, 170, 1, 0, 10000, 100, 100, 1, -1, 1, 1, 100, 500, 100, 500, 0, 0, 0, 0, { 1,2,3,0.001,0.002,0.003 }, nullptr); // dx,dy,dz, dpsi,dphi,dchi //
+    RAY::ReflectionZonePlate rzp = RAY::ReflectionZonePlate("ReflectionZonePlateMis", 1, 0, 0, 0, 50, 200, 170, 1, 0, 10000, 100, 100, 1, -1, 1, 1, 100, 500, 100, 500, 0, 0, 0, 0, { 1,2,3,0.001,0.002,0.003 }, zeros7, nullptr); // dx,dy,dz, dpsi,dphi,dchi //
     testOpticalElement({ rzp }, 200);
     ASSERT_TRUE(true);
 }
 
 TEST(opticalElements, ImagePlane) {
-    RAY::PlaneMirror plM = RAY::PlaneMirror("PlaneMirror_ImagePlane", 50, 200, 10, 0, 10000, { 0,0,0, 0,0,0 }, nullptr); // {1,2,3,0.01,0.02,0.03}
-    RAY::ImagePlane i = RAY::ImagePlane("ImagePlane", 1000, nullptr);
+    RAY::PlaneMirror plM = RAY::PlaneMirror("PlaneMirror_ImagePlane", 50, 200, 10, 0, 10000, { 0,0,0, 0,0,0 }, zeros7, nullptr); // {1,2,3,0.01,0.02,0.03}
+    RAY::ImagePlane i = RAY::ImagePlane("ImagePlane", 1000, &plM);
     testOpticalElement({ plM, i }, 200);
     ASSERT_TRUE(true);
 }
 
-/*
+
 TEST(globalCoordinates, FourMirrors_9Rays) {
-    RAY::PlaneMirror p1 = RAY::PlaneMirror("globalCoordinates_9rays", 50, 200, 10, 7, 10000, { 0,0,0, 0,0,0 }, NULL); // {1,2,3,0.01,0.02,0.03}
-    RAY::PlaneMirror p2 = RAY::PlaneMirror("PlaneMirror2", 50, 200, 15, 4, 10000, { 0,0,0, 0,0,0 }, &p1); // {1,2,3,0.01,0.02,0.03}
-    RAY::PlaneMirror p3 = RAY::PlaneMirror("PlaneMirror3", 50, 200, 7, 10, 10000, { 0,0,0, 0,0,0 }, &p2); // {1,2,3,0.01,0.02,0.03}
-    RAY::PlaneMirror p4 = RAY::PlaneMirror("PlaneMirror4", 50, 200, 22, 17, 10000, { 0,0,0, 0,0,0 }, &p3); // {1,2,3,0.01,0.02,0.03}
+    RAY::PlaneMirror p1 = RAY::PlaneMirror("globalCoordinates_9rays", 50, 200, 10, 7, 10000, { 0,0,0, 0,0,0 }, zeros7, NULL); // {1,2,3,0.01,0.02,0.03}
+    RAY::PlaneMirror p2 = RAY::PlaneMirror("PlaneMirror2", 50, 200, 15, 4, 10000, { 0,0,0, 0,0,0 }, zeros7, &p1); // {1,2,3,0.01,0.02,0.03}
+    RAY::PlaneMirror p3 = RAY::PlaneMirror("PlaneMirror3", 50, 200, 7, 10, 10000, { 0,0,0, 0,0,0 }, zeros7, &p2); // {1,2,3,0.01,0.02,0.03}
+    RAY::PlaneMirror p4 = RAY::PlaneMirror("PlaneMirror4", 50, 200, 22, 17, 10000, { 0,0,0, 0,0,0 }, zeros7, &p3); // {1,2,3,0.01,0.02,0.03}
     p4.setOutMatrix({ 1,0,0,0, 0,1,0,0, 0,0,1,0, 0,0,0,1 });
     testOpticalElement({ p1, p2, p3, p4 }, 9);
     ASSERT_TRUE(true);
 }
 
 TEST(globalCoordinates, FourMirrors_20Rays) {
-    RAY::PlaneMirror p1 = RAY::PlaneMirror("globalCoordinates_20rays", 50, 200, 10, 7, 10000, { 0,0,0, 0,0,0 }, NULL); // {1,2,3,0.01,0.02,0.03}
-    RAY::PlaneMirror p2 = RAY::PlaneMirror("PlaneMirror2", 50, 200, 15, 4, 10000, { 0,0,0, 0,0,0 }, &p1); // {1,2,3,0.01,0.02,0.03}
-    RAY::PlaneMirror p3 = RAY::PlaneMirror("PlaneMirror3", 50, 200, 7, 10, 10000, { 0,0,0, 0,0,0 }, &p2); // {1,2,3,0.01,0.02,0.03}
-    RAY::PlaneMirror p4 = RAY::PlaneMirror("PlaneMirror4", 50, 200, 22, 17, 10000, { 0,0,0, 0,0,0 }, &p3); // {1,2,3,0.01,0.02,0.03}
+    RAY::PlaneMirror p1 = RAY::PlaneMirror("globalCoordinates_20rays", 50, 200, 10, 7, 10000, { 0,0,0, 0,0,0 }, zeros7, NULL); // {1,2,3,0.01,0.02,0.03}
+    RAY::PlaneMirror p2 = RAY::PlaneMirror("PlaneMirror2", 50, 200, 15, 4, 10000, { 0,0,0, 0,0,0 }, zeros7, &p1); // {1,2,3,0.01,0.02,0.03}
+    RAY::PlaneMirror p3 = RAY::PlaneMirror("PlaneMirror3", 50, 200, 7, 10, 10000, { 0,0,0, 0,0,0 }, zeros7, &p2); // {1,2,3,0.01,0.02,0.03}
+    RAY::PlaneMirror p4 = RAY::PlaneMirror("PlaneMirror4", 50, 200, 22, 17, 10000, { 0,0,0, 0,0,0 }, zeros7, &p3); // {1,2,3,0.01,0.02,0.03}
     p4.setOutMatrix({ 1,0,0,0, 0,1,0,0, 0,0,1,0, 0,0,0,1 });
     testOpticalElement({ p1, p2, p3, p4 }, 20);
     ASSERT_TRUE(true);
 }
 
-TEST(PeteRZP, spec1_first_rzp4) {
-    RAY::PointSource p = RAY::PointSource(0, "spec1_first_rzp4", 2000000, 1, 0.005,0.005,0, 0.002,0.006, 1,1,0,0, 640, 120, {0,0,0,0});
-    RAY::ReflectionZonePlate rzp = RAY::ReflectionZonePlate("ReflectionZonePlateMis", 1, 0, 1, 1, 4, 60, 170, 2.2, 0, 90, p.getPhotonEnergy(), p.getPhotonEnergy(), -1, -1, 2.2, 1, 90, 400, 90, 400, 0, 0, 0, 1, { 0,0,0, 0,0,0 }, nullptr); // dx,dy,dz, dpsi,dphi,dchi //
-    RAY::ImagePlane ip = RAY::ImagePlane("Image Plane", 385, nullptr);
-    std::list<double> outputRays = runTracer(p.getRays(), {rzp, ip});
-    std::string filename = "testFile_";
-    filename.append(p.getName());
+TEST(PeteRZP, spec1_first_rzp) {
+    RAY::PointSource p = RAY::PointSource(0, "spec1_first_rzp",20000 , 1, 0.005,0.005,0, 0.02,0.06, 1,1,0,0, 640, 120, {0,0,0,0});
+    RAY::ReflectionZonePlate rzp = RAY::ReflectionZonePlate("ReflectionZonePlateMis", 1, 0, 1, 1, 4, 60, 170, 2.2, 0, 90, p.getPhotonEnergy(), p.getPhotonEnergy(), -1, -1, 2.2, 1, 90, 400, 90, 400, 0, 0, 0, 1, { 0,0,0, 0,0,0 }, zeros7, nullptr); // dx,dy,dz, dpsi,dphi,dchi //
+    std::list<double> outputRays = runTracer(p.getRays(), {rzp});
+    std::cout << outputRays.size()/(64) << std::endl;
+    std::string filename = "testFile_spec1_first_rzp";
     writeToFile(outputRays, filename);
 }
-*/
+
+TEST(PeteRZP, spec1_first_ip) {
+    RAY::PointSource p = RAY::PointSource(0, "spec1_first_rzp4",20000 , 1, 0.005,0.005,0, 0.02,0.06, 1,1,0,0, 640, 120, {0,0,0,0});
+    RAY::ReflectionZonePlate rzp = RAY::ReflectionZonePlate("ReflectionZonePlateMis", 1, 0, 1, 1, 4, 60, 170, 2.2, 0, 90, p.getPhotonEnergy(), p.getPhotonEnergy(), -1, -1, 2.2, 1, 90, 400, 90, 400, 0, 0, 0, 1, { 0,0,0, 0,0,0 }, zeros7, nullptr);  // dx,dy,dz, dpsi,dphi,dchi //
+    RAY::ImagePlane ip1 = RAY::ImagePlane("ImagePlane1", 400.0, &rzp);
+    std::vector<RAY::Ray> input = p.getRays();
+    std::list<double> outputRays = runTracer(input, {rzp, ip1});
+    std::cout << outputRays.size()/(64) << std::endl;
+    std::string filename = "testFile_spec1_first_rzp_ip";
+    writeToFile(outputRays, filename);
+}

@@ -57,8 +57,9 @@ TEST (Quadric, testMisalignment) {
     double incidenceAngle = 13.2;
     double azimuthalAngle = 0.0;
     double dist = 12005;
+    std::vector<double> sE = {1,2,3,4,5,6,7};
     std::vector<double> mis = {1,2,3,0.03,0.02,0.01}; // psi, phi, chi
-    RAY::PlaneMirror plM = RAY::PlaneMirror("planemirror", width, height, incidenceAngle, azimuthalAngle, dist, mis, NULL); // {1,2,3,0.01,0.02,0.03}
+    RAY::PlaneMirror plM = RAY::PlaneMirror("planemirror", width, height, incidenceAngle, azimuthalAngle, dist, mis, sE, NULL); // {1,2,3,0.01,0.02,0.03}
 
     //std::vector<double> Mis_out = plM.d_misalignmentMatrix();
     std::vector<double> Mis_in = plM.getMisalignmentMatrix();
@@ -77,7 +78,8 @@ TEST(Quadric, testInMat) {
     double azimuthalAngle = 0.0;
     double dist = 12005;
     std::vector<double> mis = {0,0,0,0,0,0};
-    RAY::PlaneMirror plM = RAY::PlaneMirror("planemirror",width, height, incidenceAngle, azimuthalAngle, dist, mis, NULL); // {1,2,3,0.01,0.02,0.03}
+    std::vector<double> sE = {1,2,8,2,4, 6,3};
+    RAY::PlaneMirror plM = RAY::PlaneMirror("planemirror",width, height, incidenceAngle, azimuthalAngle, dist, mis, sE, NULL); // {1,2,3,0.01,0.02,0.03}
 
     std::vector<double> Mis_out = plM.getInverseTempMisalignmentMatrix();
     std::vector<double> Mis_in = plM.getTempMisalignmentMatrix();
@@ -94,10 +96,11 @@ TEST(Quadric, testInMat) {
 }
 
 TEST(Quadric, testGlobalCoordinates) {
-    RAY::PlaneMirror p1 = RAY::PlaneMirror("PlaneMirror1", 50, 200, 10, 7, 0, {0,0,0, 0,0,0}, NULL); // {1,2,3,0.01,0.02,0.03}
-    RAY::PlaneMirror p2 = RAY::PlaneMirror("PlaneMirror2", 50, 200, 15, 4, 0, {0,0,0, 0,0,0}, &p1); // {1,2,3,0.01,0.02,0.03}
-    RAY::PlaneMirror p3 = RAY::PlaneMirror("PlaneMirror3", 50, 200, 7, 10, 0, {0,0,0, 0,0,0}, &p2); // {1,2,3,0.01,0.02,0.03}
-    RAY::PlaneMirror p4 = RAY::PlaneMirror("PlaneMirror4", 50, 200, 22, 17, 0, {0,0,0, 0,0,0}, &p3); // {1,2,3,0.01,0.02,0.03}
+    std::vector<double> sE = {0,0,0,0,0, 0,0};
+    RAY::PlaneMirror p1 = RAY::PlaneMirror("PlaneMirror1", 50, 200, 10, 7, 0, {0,0,0, 0,0,0}, sE, NULL); // {1,2,3,0.01,0.02,0.03}
+    RAY::PlaneMirror p2 = RAY::PlaneMirror("PlaneMirror2", 50, 200, 15, 4, 0, {0,0,0, 0,0,0}, sE, &p1); // {1,2,3,0.01,0.02,0.03}
+    RAY::PlaneMirror p3 = RAY::PlaneMirror("PlaneMirror3", 50, 200, 7, 10, 0, {0,0,0, 0,0,0}, sE, &p2); // {1,2,3,0.01,0.02,0.03}
+    RAY::PlaneMirror p4 = RAY::PlaneMirror("PlaneMirror4", 50, 200, 22, 17, 0, {0,0,0, 0,0,0}, sE, &p3); // {1,2,3,0.01,0.02,0.03}
     
     std::vector<double> worldCoord = {0.993, -0.120, -0.021, 0,
                                         0.122, 0.977, 0.172, 0,

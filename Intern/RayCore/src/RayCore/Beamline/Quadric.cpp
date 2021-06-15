@@ -4,17 +4,18 @@
 
 namespace RAY
 {
-    Quadric::Quadric(const char* name, std::vector<double> inputPoints, std::vector<double> inputInMatrix, std::vector<double> inputOutMatrix, std::vector<double> misalignmentMatrix, std::vector<double> inverseMisalignmentMatrix, std::vector<double> parameters)
+    Quadric::Quadric(const char* name, std::vector<double> inputPoints, std::vector<double> inputInMatrix, std::vector<double> inputOutMatrix, std::vector<double> misalignmentMatrix, std::vector<double> inverseMisalignmentMatrix, std::vector<double> OParameters, std::vector<double> EParameters)
     {
         m_name = name;
-        std::cout << inputPoints.size() << inputInMatrix.size() << inputOutMatrix.size() << misalignmentMatrix.size() << inverseMisalignmentMatrix.size() << parameters.size() << std::endl;
-        assert(inputPoints.size() == 16 && inputInMatrix.size() == 16 && inputOutMatrix.size() == 16 && misalignmentMatrix.size() == 16 && inverseMisalignmentMatrix.size() == 16 && parameters.size() == 16); //parameter size ==6?
+        std::cout << inputPoints.size() << inputInMatrix.size() << inputOutMatrix.size() << misalignmentMatrix.size() << inverseMisalignmentMatrix.size() << EParameters.size() << OParameters.size() << std::endl;
+        assert(inputPoints.size() == 16 && inputInMatrix.size() == 16 && inputOutMatrix.size() == 16 && misalignmentMatrix.size() == 16 && inverseMisalignmentMatrix.size() == 16 && EParameters.size() == 16 && OParameters.size() == 16); //parameter size ==6?
         m_anchorPoints = inputPoints;
         m_inMatrix = inputInMatrix;
         m_outMatrix = inputOutMatrix;
         m_temporaryMisalignmentMatrix = misalignmentMatrix;
         m_inverseTemporaryMisalignmentMatrix = inverseMisalignmentMatrix;
-        m_parameters = parameters;
+        m_objectParameters = OParameters;
+        m_elementParameters = EParameters;
     }
 
     /**
@@ -27,7 +28,7 @@ namespace RAY
      * @param: inputPoints      Matrix A for quadric surfaces with a_11,a_12,a_13,a_14, a_21,a_22,a_23,a_24, a_31,a_32,a_33,a_34, a_41,a_42,a_43,a_44
      *                      a_21,a_31,a_32,a_41,a_42,a_43 are never used for quadric surfaces because the matrix is symmetrial,
      *                      we use a_21,a_31 for x and z dimensions of the surface (xlength, zlength)
-     * @param parameters                vector with 16 entries that contain further element specific parameters that are needed on the shader
+     * @param EParameters               vector with 16 entries that contain further element specific parameters that are needed on the shader
      * @param alpha                     grazing incidence angle
      * @param chi                       azimuthal angle
      * @param beta                      grazing exit angle
@@ -35,18 +36,34 @@ namespace RAY
      * @param misalignmentParams        angles and distances for the object's misalignment
      * @param tempMisalignmentParams    parameters for temporary misalignment that can be removed midtracing.
     */
-    Quadric::Quadric(const char* name, std::vector<double> inputPoints, std::vector<double> parameters, double alpha, double chi, double beta, double dist, std::vector<double> misalignmentParams, std::vector<double> tempMisalignmentParams, Quadric* previous)
+    Quadric::Quadric(const char* name, std::vector<double> inputPoints, std::vector<double> EParameters, double width, double height, double alpha, double chi, double beta, double dist, std::vector<double> misalignmentParams, std::vector<double> tempMisalignmentParams, std::vector<double> slopeError, Quadric* previous)
     {
         m_name = name;
         m_previous = previous;
-        m_parameters = parameters;
+        m_objectParameters = {
+            width, height, slopeError[0], slopeError[1],
+            slopeError[2], slopeError[3], slopeError[4], slopeError[5],
+            slopeError[6],0,0,0,
+            0,0,0,0
+        };
+        m_slopeError = slopeError;
+        m_elementParameters = EParameters;
         m_anchorPoints = inputPoints;
         m_misalignmentParams = misalignmentParams;
         calcTransformationMatrices(alpha, chi, beta, dist, misalignmentParams);
         setTemporaryMisalignment(tempMisalignmentParams);
     }
 
-    Quadric::Quadric(const char* name, Quadric* previous) : m_name(name), m_previous(previous) {}
+    Quadric::Quadric(const char* name, double width, double height, std::vector<double> slopeError, Quadric* previous) : m_name(name), m_previous(previous) {
+        m_slopeError = slopeError;
+        setObjectParameters({
+            width, height, slopeError[0], slopeError[1],
+            slopeError[2], slopeError[3], slopeError[4], slopeError[5],
+            slopeError[6],0,0,0,
+            0,0,0,0
+        });
+        
+    }
 
     Quadric::Quadric() {} // TODO
 
@@ -208,18 +225,18 @@ namespace RAY
         return m_anchorPoints;
     }
 
-    std::vector<double> Quadric::getParams()
-    {
-        return m_parameters;
+    void Quadric::setObjectParameters(std::vector<double> params) {
+        assert(params.size() == 16);
+        m_objectParameters = params;
     }
 
-    void Quadric::setParameters(std::vector<double> params) {
+    void Quadric::setElementParameters(std::vector<double> params) {
         assert(params.size() == 16);
-        m_parameters = params;
+        m_elementParameters = params;
     }
 
     /**
-     * set a new set of paramters a_11 to a_44 for the quadric function
+     * set a new set of parameters a_11 to a_44 for the quadric function
      * order: a_11,a_12,a_13,a_14, a_21,a_22,a_23,a_24, a_31,a_32,a_33,a_34, a_41,a_42,a_43,a_44
      * @param inputPoints   16 entry vector a_11 to a_44
      * @return void
@@ -309,8 +326,16 @@ namespace RAY
         return m_inverseTemporaryMisalignmentMatrix;
     }
 
-    std::vector<double> Quadric::getParameters() {
-        return m_parameters;
+    std::vector<double> Quadric::getObjectParameters() {
+        return m_objectParameters;
+    }
+
+    std::vector<double> Quadric::getElementParameters() {
+        return m_elementParameters;
+    }
+
+    std::vector<double> Quadric::getSlopeError() {
+        return m_slopeError;
     }
 
     const char* Quadric::getName() {

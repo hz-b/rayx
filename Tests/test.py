@@ -100,8 +100,6 @@ class Tests(unittest.TestCase):
         result = open_new_file('testFile_PlaneMirrorDef.csv', energy=1)
         self.assertTrue(correct.shape == (result.shape[0]-1,result.shape[1]))
         self.assertTrue(np.allclose(correct, result[:6]))
-        self.assertTrue(np.all(result[6] <= photonEnergy_def+energySpread_def))
-        self.assertTrue(np.all(result[6] >= photonEnergy_def-energySpread_def))
         
     
     def test_planeMirrorMis(self):
@@ -130,10 +128,20 @@ class Tests(unittest.TestCase):
 
     def test_planeGratingDevMis(self):
         correct = open_old_file(
-            'Plane Grating_div_az_mis.csv', 'Plane Grating_')
-        result = open_new_file('testFile_PlaneGratingDeviationMis.csv')
+            'Plane Grating-RawRaysBeam_dev_mis_az.csv', 'Plane Grating_')
+        result = open_new_file('testFile_PlaneGratingDeviationAzMis.csv',valid=1)
         self.assertTrue(correct.shape == result.shape)
         self.assertTrue(np.allclose(correct, result))
+
+    
+    #difference between ray-ui and ray-ui code??
+    """
+    def test_planeGratingDevMisVLS(self):
+        correct = open_old_file(
+            'Plane Grating-RawRaysBeam_dev_az_mis_vls.csv', 'Plane Grating_')
+        result = open_new_file('testFile_PlaneGratingDeviationMis.csv',valid=1)
+        self.assertTrue(np.allclose(correct, result))
+    """
 
     def test_planeGratingIncAzMis(self):
         correct = open_old_file(
@@ -203,7 +211,7 @@ class Tests(unittest.TestCase):
         self.assertTrue(np.isclose(np.mean(correct[5]), np.mean(result[5])))
         self.assertTrue(np.all(result[6] <= sourceEnergy+energySpread))
         self.assertTrue(np.all(result[6] >= sourceEnergy-energySpread))
-        plot_comparison('Soft Edge', result, correct, mean=1)
+        #plot_comparison('Soft Edge', result, correct, mean=1)
 
     def test_pointSourceSoftEdgeMis(self):
         sourceEnergy = 130

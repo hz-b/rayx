@@ -56,9 +56,10 @@ TEST(planeGrating, testParams) {
     double lineDensity = 812.2;
     int orderOfDiffraction = 1; // use others
     double fixFocusConstantCFF = 12.1;
+    std::vector<double> sE = {0,0,0,0,0, 0,0};
     std::vector<double> mis = {5.212,7.3,0.35, 0.23,0.011,0.0006};
     std::vector<double> vls = {2.1, 0.12, 12.2, 8.3, 5.1, 7.23};
-    RAY::PlaneGrating p = RAY::PlaneGrating("planegrating", mount, width, height, deviation, normalIncidence, azimuthal, dist, designEnergyMounting, lineDensity, orderOfDiffraction, fixFocusConstantCFF, mis, vls, NULL); 
+    RAY::PlaneGrating p = RAY::PlaneGrating("planegrating", mount, width, height, deviation, normalIncidence, azimuthal, dist, designEnergyMounting, lineDensity, orderOfDiffraction, fixFocusConstantCFF, mis, vls, sE, NULL); 
     
     double beta = 1.467650597188248;
     double alpha = 1.457521229154248;
@@ -73,12 +74,12 @@ TEST(planeGrating, testParams) {
     ASSERT_DOUBLE_EQ (p.getBeta(), beta);
     EXPECT_NEAR (p.getA(), a, 0.00000000001);
     EXPECT_ITERABLE_DOUBLE_EQ(std::vector<double>, p.getQuadric(), quad);
-    EXPECT_ITERABLE_DOUBLE_EQ(std::vector<double>, p.getParams(), params);
+    EXPECT_ITERABLE_DOUBLE_EQ(std::vector<double>, p.getElementParameters(), params);
     //EXPECT_NEAR (e.getRadius(),  radius, 0.00000001);
     
     // mount = 1, use incidence Angle
     mount = 1; // { GM_DEVIATION, GM_INCIDENCE, GM_CCF, GM_CCF_NO_PREMIRROR}
-    p = RAY::PlaneGrating("planegrating", mount, width, height, deviation, normalIncidence, azimuthal, dist, designEnergyMounting, lineDensity, orderOfDiffraction, fixFocusConstantCFF, mis, vls, NULL); 
+    p = RAY::PlaneGrating("planegrating", mount, width, height, deviation, normalIncidence, azimuthal, dist, designEnergyMounting, lineDensity, orderOfDiffraction, fixFocusConstantCFF, mis, vls, sE, NULL); 
     alpha = 1.3069025438933539;
     beta = 1.317319261832787;
 
@@ -92,7 +93,7 @@ TEST(planeGrating, testParams) {
     quad = {0,0,0,0, width,0,0,-1, height,a,0,0, 1,0,0,0};
     params = {width,height,lineDensity,double(orderOfDiffraction), designEnergyMounting,a,vls[0],vls[1], vls[2],vls[3],vls[4],vls[5], 0,0,0,0};
     
-    p = RAY::PlaneGrating("planegrating", mount, width, height, deviation, normalIncidence, azimuthal, dist, designEnergyMounting, lineDensity, orderOfDiffraction, fixFocusConstantCFF, mis, vls, NULL); 
+    p = RAY::PlaneGrating("planegrating", mount, width, height, deviation, normalIncidence, azimuthal, dist, designEnergyMounting, lineDensity, orderOfDiffraction, fixFocusConstantCFF, mis, vls, sE, NULL); 
     
     ASSERT_DOUBLE_EQ (p.getWidth(),  width);
     ASSERT_DOUBLE_EQ (p.getHeight(),  height);
@@ -102,7 +103,7 @@ TEST(planeGrating, testParams) {
     ASSERT_DOUBLE_EQ (p.getBeta(), beta);
     EXPECT_NEAR (p.getA(), a, 0.00000000001);
     EXPECT_ITERABLE_DOUBLE_EQ(std::vector<double>, p.getQuadric(), quad);
-    EXPECT_ITERABLE_DOUBLE_EQ(std::vector<double>, p.getParams(), params);
+    EXPECT_ITERABLE_DOUBLE_EQ(std::vector<double>, p.getElementParameters(), params);
     
     // mount = 0, use deviation angle, with higher order of diffraction
     mount = 0;
@@ -112,7 +113,7 @@ TEST(planeGrating, testParams) {
     quad = {0,0,0,0, width,0,0,-1, height,a,0,0, 1,0,0,0};
     params = {width,height,lineDensity,double(orderOfDiffraction), designEnergyMounting,a,vls[0],vls[1], vls[2],vls[3],vls[4],vls[5], 0,0,0,0};
     
-    p = RAY::PlaneGrating("planegrating", mount, width, height, deviation, normalIncidence, azimuthal, dist, designEnergyMounting, lineDensity, orderOfDiffraction, fixFocusConstantCFF, mis, vls, NULL); 
+    p = RAY::PlaneGrating("planegrating", mount, width, height, deviation, normalIncidence, azimuthal, dist, designEnergyMounting, lineDensity, orderOfDiffraction, fixFocusConstantCFF, mis, vls, sE, NULL); 
     
     ASSERT_DOUBLE_EQ (p.getWidth(),  width);
     ASSERT_DOUBLE_EQ (p.getHeight(),  height);
@@ -122,7 +123,7 @@ TEST(planeGrating, testParams) {
     ASSERT_DOUBLE_EQ (p.getBeta(), beta);
     EXPECT_NEAR (p.getA(), a, 0.00000000001);
     EXPECT_ITERABLE_DOUBLE_EQ(std::vector<double>, p.getQuadric(), quad);
-    EXPECT_ITERABLE_DOUBLE_EQ(std::vector<double>, p.getParams(), params);
+    EXPECT_ITERABLE_DOUBLE_EQ(std::vector<double>, p.getElementParameters(), params);
     
 }
 
@@ -149,8 +150,9 @@ TEST(SphereGrating, testParams) {
     int order = 1;
     std::vector<double> mis = {1.41,5.3,1.5, 0.2,1.0,1.4}; 
     std::vector<double> vls = {2.1, 0.12, 12.2, 8.3, 5.1, 7.23};
+    std::vector<double> sE = {0.1,0.5,0.1,0.2,0.5, 1,3};
     
-    RAY::SphereGrating s = RAY::SphereGrating("spheregrating", mount, width, height, deviation, incidence, azimuthal, distance, entranceArm, exitArm, designEnergy, linedensity, double(order), mis,vls, NULL);
+    RAY::SphereGrating s = RAY::SphereGrating("spheregrating", mount, width, height, deviation, incidence, azimuthal, distance, entranceArm, exitArm, designEnergy, linedensity, double(order), mis,vls,sE, NULL);
     double alpha = 1.4892226555787231;
     double beta = 1.4915379074397925;
     double chi = 2.1502456384570143;
@@ -175,10 +177,10 @@ TEST(SphereGrating, testParams) {
     EXPECT_NEAR(radius, s.getRadius(), 0.0000001);
     EXPECT_NEAR (s.getA(), a, 0.000000001);
     EXPECT_ITERABLE_DOUBLE_EQ(std::vector<double>, s.getQuadric(), quad);
-    EXPECT_ITERABLE_DOUBLE_EQ(std::vector<double>, s.getParams(), params);
+    EXPECT_ITERABLE_DOUBLE_EQ(std::vector<double>, s.getElementParameters(), params);
 
     mount = 1;
-    s = RAY::SphereGrating("spheregrating", mount, width, height, deviation, incidence, azimuthal, distance, entranceArm, exitArm, designEnergy, linedensity, double(order), mis,vls, NULL);
+    s = RAY::SphereGrating("spheregrating", mount, width, height, deviation, incidence, azimuthal, distance, entranceArm, exitArm, designEnergy, linedensity, double(order), mis,vls, sE,NULL);
     /*double alpha = 1.4892226555787231;
     double beta = 1.4915379074397925;
     double chi = 2.1502456384570143;

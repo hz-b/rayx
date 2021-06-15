@@ -15,8 +15,8 @@ namespace RAY
      * @param misalignmentParams angles and distances for the mirror's misalignment
      * 
     */
-    Slit::Slit(const char* name, int beamstop, double width, double height, double azimuthal, double dist, double beamstopWidth, double beamstopHeight, double waveLength, std::vector<double> misalignmentParams, Quadric* previous) 
-    : Quadric(name, previous) {
+    Slit::Slit(const char* name, int beamstop, double width, double height, double azimuthal, double dist, double beamstopWidth, double beamstopHeight, double waveLength, std::vector<double> misalignmentParams, std::vector<double> slopeError, Quadric* previous) 
+    : Quadric(name, width, height, slopeError, previous) {
         // std::vector<double> inputPoints = {0,0,0,0, 0,0,0,-1, 0,0,0,0, 0,0,0,0};
         m_centralBeamstop = beamstop == 0 ? CS_NONE : (beamstop==1 ? CS_RECTANGLE : CS_ELLIPTICAL );
         m_totalWidth = m_centralBeamstop == CS_ELLIPTICAL ? -abs(width) : abs(width);
@@ -28,8 +28,8 @@ namespace RAY
         m_distanceToPreceedingElement = dist;
         
         calcTransformationMatrices(0, m_chi, 0, m_distanceToPreceedingElement, misalignmentParams);
-        setParameters({m_totalWidth,m_totalHeight,m_beamstopWidth,m_beamstopHeight, m_waveLength,0,0,0, 0,0,0,0, 0,0,0,0});
-        editQuadric({0,0,0,0, width,0,0,0, height,0,0,-1, 3,0,0,0});
+        setElementParameters({m_beamstopWidth,m_beamstopHeight,0,0, m_waveLength,0,0,0, 0,0,0,0, 0,0,0,0});
+        editQuadric({0,0,0,0, 0,0,0,0, 0,0,0,-1, 3,0,0,0});
     }
 
     Slit::~Slit()

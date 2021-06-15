@@ -36,7 +36,7 @@ void DestroyDebugUtilsMessengerEXT(VkInstance instance, VkDebugUtilsMessengerEXT
 
 const int WORKGROUP_SIZE = 32;
 #define VULKANTRACER_RAY_DOUBLE_AMOUNT 8
-#define VULKANTRACER_QUADRIC_DOUBLE_AMOUNT 96 //6* dmat4 (16)
+#define VULKANTRACER_QUADRIC_DOUBLE_AMOUNT 112 //7* dmat4 (16)
 #define VULKANTRACER_QUADRIC_PARAM_DOUBLE_AMOUNT 4
 #define GPU_MAX_STAGING_SIZE 134217728 //128MB
 #define RAY_VECTOR_SIZE 16777216
@@ -50,13 +50,12 @@ public:
     //void addRay(double xpos, double ypos, double zpos, double xdir, double ydir, double zdir, double weight);
     //void addRay(double* location);
     void addRayVector(void* location, size_t size);
-    void addQuadric(std::vector<double> inQuadric, std::vector<double> inputInMatrix, std::vector<double> inputOutMatrix, std::vector<double> misalignmentMatrix, std::vector<double> inverseMisalignmentMatrix, std::vector<double> parameters);
+    void addQuadric(std::vector<double> inQuadric, std::vector<double> inputInMatrix, std::vector<double> inputOutMatrix, std::vector<double> misalignmentMatrix, std::vector<double> inverseMisalignmentMatrix, std::vector<double> objectParameters, std::vector<double> elementParameters);
     void getRays();
     void cleanup();
     void setBeamlineParameters(uint32_t inNumberOfBeamlines, uint32_t inNumberOfQuadricsPerBeamline, uint32_t inNumberOfRays);
-    std::list<std::vector<Ray>>::iterator getOutputIteratorBegin();
-    std::list<std::vector<Ray>>::iterator getOutputIteratorEnd();
-    RayList outputData;
+    std::list<std::vector<Ray>>::const_iterator getOutputIteratorBegin();
+    std::list<std::vector<Ray>>::const_iterator getOutputIteratorEnd();
 
     // getter 
     const RayList& getRayList() { return rayList; }
@@ -77,6 +76,8 @@ private:
         std::vector<double> outMatrix;
     };
     */
+    RayList m_outputData;
+
     struct QueueFamilyIndices
     {
         uint32_t computeFamily;

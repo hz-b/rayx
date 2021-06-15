@@ -15,8 +15,8 @@ namespace RAY
      * 
     */
     Ellipsoid::Ellipsoid(const char* name, double width, double height, double grazingIncidence, double azimuthal, double distanceToPreceedingElement, 
-        double entranceArmLength, double exitArmLength, int coordSys, int figRot, double a_11, std::vector<double> misalignmentParams, Quadric* previous) 
-    : Quadric(name, previous) {
+        double entranceArmLength, double exitArmLength, int coordSys, int figRot, double a_11, std::vector<double> misalignmentParams, std::vector<double> slopeError, Quadric* previous) 
+    : Quadric(name, width, height, slopeError, previous) {
         std::cout << "ellipsoid" << std::endl;
         m_totalWidth = width;
         m_totalHeight = height;
@@ -42,7 +42,7 @@ namespace RAY
 
         editQuadric({m_a11,0,0,0, 0,1,0,m_radius, 0,0,d_a33,d_a34, 0,0,0,d_a44});
         calcTransformationMatrices(m_alpha1, m_chi, m_beta, m_distanceToPreceedingElement, {0,0,0,0,0,0});
-        setParameters({m_totalWidth,m_totalHeight,m_a11,m_y0, d_a33,d_a34,d_a44,0, 0,0,0,0, 0,0,0,0});
+        setElementParameters({m_totalWidth,m_totalHeight,m_a11,m_y0, d_a33,d_a34,d_a44,0, 0,0,0,0, 0,0,0,0});
 
         // if m_misalignmentCoordSys == 1 rotate through d_tangentangle before misalignment and back after (-d_tangentangle)
         if (m_misalignmentCoordSys == CS_MIRROR){
