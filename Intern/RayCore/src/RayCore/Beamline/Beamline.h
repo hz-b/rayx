@@ -27,7 +27,6 @@ namespace RAY
             return m_Instance;
         }
 
-        ~Beamline();
         //Somehow results in wrong values. Should be fixed later
         //void addQuadric(Quadric newObject);
         
@@ -37,9 +36,12 @@ namespace RAY
         std::vector<Quadric> getObjects();
 
     private:
-        Beamline();
-        Beamline(const Beamline&) = delete;
+        Beamline() = default;
         std::vector<Quadric> m_Objects;
+
+    public: 
+        Beamline(Beamline const&) = delete;
+        void operator=(Beamline const&) = delete;
     };
 
 } // namespace RAY

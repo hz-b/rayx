@@ -5,18 +5,6 @@
 
 namespace RAY
 {
-    Beamline::Beamline()
-    {
-        DEBUG(std::cout << "Creating Beamline..." << std::endl);
-        //std::vector<double> temp(16, 1);
-        //Quadric firstQuadric(temp);
-        //m_objects.push_back(firstQuadric);
-    }
-
-    Beamline::~Beamline()
-    {
-        DEBUG(std::cout << "Deleting Beamline..." << std::endl);
-    }
 
     void Beamline::addQuadric(Quadric q) {
         addQuadric(q.getName(), q.getAnchorPoints(), q.getInMatrix(), q.getOutMatrix(), q.getTempMisalignmentMatrix(), q.getInverseTempMisalignmentMatrix(), q.getObjectParameters(), q.getElementParameters());

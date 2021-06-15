@@ -12,6 +12,7 @@
 
 #define SHORTOUTPUT false
 
+
 namespace RAY
 {
     TracerInterface::TracerInterface() :
@@ -34,9 +35,9 @@ namespace RAY
         //only one Source for now
         if (!tracer) return;
         if (!source) return;
-        std::vector<RAY::Ray> rays = (*source).getRays();
+        std::vector<RAY::Ray> rays = source->getRays();
         DEBUG(std::cout << "add rays" << std::endl);
-        (*tracer).addRayVector(rays.data(), rays.size());
+        tracer->addRayVector(rays.data(), rays.size());
     }
 
     // ! parameters are temporary and need to be removed again
@@ -44,6 +45,7 @@ namespace RAY
     {
 
         const clock_t all_begin_time = clock();
+
         //create tracer instance
         VulkanTracer tracer;
         // readFromFile("../../io/input.csv", RayType);
