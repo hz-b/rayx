@@ -10,22 +10,22 @@ namespace RAY
 
     Application::Application()
     {
-        DEBUG(std::cout << "Creating Application..." << std::endl);
+        RAY_DEBUG(std::cout << "Creating Application..." << std::endl);
     }
 
     Application::~Application()
     {
-        DEBUG(std::cout << "Deleting Application..." << std::endl);
+        RAY_DEBUG(std::cout << "Deleting Application..." << std::endl);
     }
 
     void Application::run()
     {
-        DEBUG(std::cout << "Application running..." << std::endl);
+        RAY_DEBUG(std::cout << "Application running..." << std::endl);
     }
 
     // void Application::run(const std::string& filename)
     // {
-    //     DEBUG(std::cout << "Application running on given file..." << std::endl);
+    //     RAY_DEBUG(std::cout << "Application running on given file..." << std::endl);
 
     //     // TODO: read file here
     //     //Exporter exp;

@@ -2,15 +2,17 @@
 
 #include "Beamline/Beamline.h"
 #include "Core.h"
-#include "Ray.h"
-#include "VulkanTracer.h"
 
 #include <string>
 #include <vector>
-#include <set>
+#include <set>,
+
+class VulkanTracer;
 
 namespace RAY
 {
+    class Ray;
+
     class RAY_API TracerInterface
     {
         struct RayVector {

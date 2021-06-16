@@ -1,14 +1,17 @@
-#include "Beamline/MatrixSource.h"
-#include "Beamline/PointSource.h"
-#include "Beamline/ReflectionZonePlate.h"
-#include "Debug.h"
-#include "TracerInterface.h"
-
 #include <chrono>
 #include <cmath>
 #include <fstream>
 #include <iomanip> 
 #include <sstream>
+
+#include "TracerInterface.h"
+
+#include "Beamline/MatrixSource.h"
+#include "Beamline/PointSource.h"
+#include "Beamline/ReflectionZonePlate.h"
+#include "Debug.h"
+#include "Ray.h"
+#include "VulkanTracer.h"
 
 #define SHORTOUTPUT false
 
@@ -19,12 +22,12 @@ namespace RAY
         m_Beamline(Beamline::get())
     {
 
-        DEBUG(std::cout << "Creating TracerInterface..." << std::endl);
+        RAY_DEBUG(std::cout << "Creating TracerInterface..." << std::endl);
     }
 
     TracerInterface::~TracerInterface()
     {
-        DEBUG(std::cout << "Deleting TracerInterface..." << std::endl);
+        RAY_DEBUG(std::cout << "Deleting TracerInterface..." << std::endl);
     }
 
     void TracerInterface::addLightSource(LightSource* newSource) {
@@ -36,7 +39,7 @@ namespace RAY
         if (!tracer) return;
         if (!source) return;
         std::vector<RAY::Ray> rays = source->getRays();
-        DEBUG(std::cout << "add rays" << std::endl);
+        RAY_DEBUG(std::cout << "add rays" << std::endl);
         tracer->addRayVector(rays.data(), rays.size());
     }
 
@@ -68,7 +71,7 @@ namespace RAY
         addLightSource(&p);
         generateRays(&tracer, &p);
 
-        DEBUG(std::cout << "add rays to tracer done" << std::endl);
+        RAY_DEBUG(std::cout << "add rays to tracer done" << std::endl);
 
 
 
@@ -95,11 +98,11 @@ namespace RAY
 
         const clock_t begin_time = clock();
         tracer.run(); //run tracer
-        DEBUG(std::cout << "tracer run time: " << float(clock() - begin_time) << " ms" << std::endl);
+        RAY_DEBUG(std::cout << "tracer run time: " << float(clock() - begin_time) << " ms" << std::endl);
 
-        DEBUG(std::cout << "run succeeded" << std::endl);
+        RAY_DEBUG(std::cout << "run succeeded" << std::endl);
 
-        DEBUG(std::cout << "tracerInterface run without output: " << float(clock() - all_begin_time) << " ms" << std::endl);
+        RAY_DEBUG(std::cout << "tracerInterface run without output: " << float(clock() - all_begin_time) << " ms" << std::endl);
 
         // transform in to usable data
         auto doubleVecSize = RAY_MAX_ELEMENTS_IN_VECTOR * 8;
@@ -118,19 +121,19 @@ namespace RAY
         for (auto outputRayIterator = tracer.getOutputIteratorBegin(), outputIteratorEnd = tracer.getOutputIteratorEnd();
             outputRayIterator != outputIteratorEnd; outputRayIterator++)
         {
-            DEBUG(std::cout << "(*outputRayIterator).size(): " << (*outputRayIterator).size() << std::endl);
+            RAY_DEBUG(std::cout << "(*outputRayIterator).size(): " << (*outputRayIterator).size() << std::endl);
 
             memcpy(doubleVec.data(), (*outputRayIterator).data(), (*outputRayIterator).size() * VULKANTRACER_RAY_DOUBLE_AMOUNT * sizeof(double));
             doubleVec.resize((*outputRayIterator).size() * VULKANTRACER_RAY_DOUBLE_AMOUNT);
 
-            DEBUG(std::cout << "tracerInterface: sample ray: " << doubleVec[0] << ", " << doubleVec[1] << ", " << doubleVec[2] << ", " << doubleVec[3] << ", " << doubleVec[4] << ", " << doubleVec[5] << ", " << doubleVec[6] << ", energy: " << doubleVec[7] << std::endl);
+            RAY_DEBUG(std::cout << "tracerInterface: sample ray: " << doubleVec[0] << ", " << doubleVec[1] << ", " << doubleVec[2] << ", " << doubleVec[3] << ", " << doubleVec[4] << ", " << doubleVec[5] << ", " << doubleVec[6] << ", energy: " << doubleVec[7] << std::endl);
 
             writeToFile(doubleVec, outputFile, index);
             index = index + (*outputRayIterator).size();
         }
         outputFile.close();
 
-        DEBUG(std::cout << "tracer run incl load rays time: " << float(clock() - begin_time) << " ms" << std::endl);
+        RAY_DEBUG(std::cout << "tracer run incl load rays time: " << float(clock() - begin_time) << " ms" << std::endl);
 
         //clean up tracer to avoid memory leaks
         tracer.cleanup();
@@ -142,7 +145,7 @@ namespace RAY
     {
         size_t size = outputRays.size();
 
-        DEBUG(std::cout << "writing " << outputRays.size() / 8 << " rays to file..." << std::endl);
+        RAY_DEBUG(std::cout << "writing " << outputRays.size() / 8 << " rays to file..." << std::endl);
 
         if (SHORTOUTPUT) {
             char buff[64];
@@ -163,7 +166,7 @@ namespace RAY
             }
         }
 
-        DEBUG(std::cout << "done!" << std::endl);
+        RAY_DEBUG(std::cout << "done!" << std::endl);
     }
 }
 // namespace RAY
