@@ -17,7 +17,7 @@ build-job:
   script:
     - git submodule update --init --recursive
     - mkdir build && cd build
-    - cmake .. -B .
+    - cmake ..
     - cmake --build .
     - ls
   artifacts:
