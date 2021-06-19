@@ -821,7 +821,7 @@ uint64_t squares64RNG(inout uint64_t ctr)
 // generates uniformly distributed doubles between 0 and 1 from one 64-Bit random integer
 double squaresDoubleRNG(inout uint64_t ctr)
 {
-	return fract(uint64BitsToDouble(squares64RNG(ctr)));
+	return double(squares64RNG(ctr)) / double(uint64_t(0) - 1);
 }
 
 // creates (via the Box-Muller transform) a normal distributed double with mean mu and standard deviation sigma
@@ -2071,11 +2071,14 @@ void testFunctions() {
 			outputData[i] = res;
 		}
 	}else if(settings == 17) { // test uniform distribution
-		uint64_t ctr = 2;
+		//uint64_t ctr = 2;
+		uint64_t workerCounterNum = (~(uint64_t(0)) / numberOfRays);
+		uint64_t ctr = uint(gl_GlobalInvocationID) * workerCounterNum;
+
 		for(int i = 0; i<numberOfRays; i++) {
 			Ray r = rayData[i];
-			r.weight = double(squares64RNG(ctr)) / (uint64_t(1) << 63);
-			r.energy = double(squares64RNG(ctr)) / (uint64_t(1) << 63);
+			r.weight = double(squares64RNG(ctr)) / double(uint64_t(0) - 1);
+			r.energy = double(squares64RNG(ctr)) / double(uint64_t(0) - 1);
 			r.position = dvec3(squaresDoubleRNG(ctr), squaresDoubleRNG(ctr),squaresDoubleRNG(ctr));
 			r.direction = dvec3(squaresDoubleRNG(ctr), squaresDoubleRNG(ctr), squaresDoubleRNG(ctr));
 			outputData[i] = r;
