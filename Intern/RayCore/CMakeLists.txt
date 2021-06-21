@@ -18,7 +18,7 @@ SET(SOURCE
     src/RayCore/Beamline/PlaneMirror.cpp
     src/RayCore/Beamline/PointSource.cpp
     src/RayCore/Beamline/SphereMirror.cpp
-    src/RayCore/Beamline/utils.cpp
+    src/RayCore/utils.cpp
     src/RayCore/Tracer/Ray.cpp
     src/RayCore/Tracer/TracerInterface.cpp
     src/RayCore/Data/Exporter.cpp
@@ -43,7 +43,7 @@ SET(HEADERS
     src/RayCore/Beamline/PlaneMirror.h
     src/RayCore/Beamline/PointSource.h
     src/RayCore/Beamline/SphereMirror.h
-    src/RayCore/Beamline/utils.h
+    src/RayCore/utils.h
     src/RayCore/Tracer/Ray.h
     src/RayCore/Tracer/TracerInterface.h
     src/RayCore/Data/Exporter.h
