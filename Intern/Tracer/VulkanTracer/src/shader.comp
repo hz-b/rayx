@@ -2500,6 +2500,26 @@ void testFunctions() {
 			r.direction = dvec3(squaresDoubleRNG(ctr), squaresDoubleRNG(ctr), squaresDoubleRNG(ctr));
 			outputData[i] = r;
 		}
+	}else if(settings == 18) { // test exponential function
+		for(int i = 0; i<numberOfRays; i++) {
+			Ray r = rayData[i];
+			Ray res;
+			res.weight = r8_exp(r.weight);//double(squares64RNG(ctr)) / (uint64_t(1) << 63);
+			res.energy = r8_exp(r.energy);
+			res.position = dvec3(r8_exp(r.position.x), r8_exp(r.position.y), r8_exp(r.position.z));
+			res.direction = dvec3(r8_exp(r.direction.x), r8_exp(r.direction.y), r8_exp(r.direction.z));
+			outputData[i] = res;
+		}
+	}else if(settings == 19) { // test logarithm function (natural logarithm)
+		for(int i = 0; i<numberOfRays; i++) {
+			Ray r = rayData[i];
+			Ray res;
+			res.weight = r8_log(r.weight);//double(squares64RNG(ctr)) / (uint64_t(1) << 63);
+			res.energy = r8_log(r.energy);
+			res.position = dvec3(r8_log(r.position.x), r8_log(r.position.y), r8_log(r.position.z));
+			res.direction = dvec3(r8_log(r.direction.x), r8_log(r.direction.y), r8_log(r.direction.z));
+			outputData[i] = res;
+		}
 	}
 	
 	
@@ -2515,16 +2535,6 @@ void cameraPlaneIntersection(outputData, cameraPlane){
 }
 */
 void main(){
-    /*uint64_t ctr = 87;
-	const int numberOfRays = rayData.length();
-	for(int i = 0; i<numberOfRays; i++) {
-		Ray r = rayData[i];
-		r.weight = double(squares64RNG(ctr)) / ((uint64_t(1) << 63));
-		r.energy = double(squares64RNG(ctr)) / (uint64_t(1) << 63);
-		r.position = dvec3( squaresDoubleRNG(ctr), squaresDoubleRNG(ctr), squaresDoubleRNG(ctr));
-		r.direction = dvec3(squaresNormalRNG(ctr,0,1), squaresNormalRNG(ctr,0,1), squaresNormalRNG(ctr,0,1));
-		outputData[i] =  r;
-	}*/
     testFunctions();
 	/*
 	Ray r = rayData[uint(gl_GlobalInvocationID)];

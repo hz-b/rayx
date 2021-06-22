@@ -148,10 +148,10 @@ TEST(Tracer, testUniformRandom) {
 }
 
 
-/*
+
 TEST(Tracer, ExpTest) {
     std::list<std::vector<RAY::Ray>> rayList;
-    int n = 0;
+    int n = 10;
     int low = -4;
     int high = 4;
     RAY::RandomRays random = RAY::RandomRays(n, low, high);
@@ -166,28 +166,31 @@ TEST(Tracer, ExpTest) {
     std::cout << "got " << outputRays.size() << " values from shader" << std::endl;
 
     int counter = 0;
-    double tolerance = 1e-11;
+    double tolerance = 1e-13;
     for (std::list<double>::iterator i = outputRays.begin(); i != outputRays.end();) {
         if (counter % 8 == 0) {
-            EXPECT_NEAR(*i, 1.0, tolerance);
+            EXPECT_NEAR(*i, exp(testValues[int(counter / 8)].m_position.x), tolerance);
         }
         else if (counter % 8 == 1) {
-            EXPECT_NEAR(*i, 2.718281828459045, tolerance);
+            EXPECT_NEAR(*i, exp(testValues[int(counter / 8)].m_position.y), tolerance);
         }
         else if (counter % 8 == 2) {
-            EXPECT_NEAR(*i, 0.049787068367863944, tolerance);
+            EXPECT_NEAR(*i, exp(testValues[int(counter / 8)].m_position.z), tolerance);
         }
         else if (counter % 8 == 3) {
-            EXPECT_NEAR(*i, 148.4131591025766, tolerance);
+            EXPECT_NEAR(*i, exp(testValues[int(counter / 8)].m_weight), tolerance);
         }
         else if (counter % 8 == 4) {
-            EXPECT_NEAR(*i, 23.140692632779267, tolerance);
+            EXPECT_NEAR(*i, exp(testValues[int(counter / 8)].m_direction.x), tolerance);
         }
         else if (counter % 8 == 5) {
-            EXPECT_NEAR(*i, 7.38905609893065, tolerance);
+            EXPECT_NEAR(*i, exp(testValues[int(counter / 8)].m_direction.y), tolerance);
         }
         else if (counter % 8 == 6) {
-            EXPECT_NEAR(*i, 20.085536923187668, tolerance);
+            EXPECT_NEAR(*i, exp(testValues[int(counter / 8)].m_direction.z), tolerance);
+        }
+        else if (counter % 8 == 7) {
+            EXPECT_NEAR(*i, exp(testValues[int(counter / 8)].m_energy), tolerance);
         }
         counter++;
         i++;
@@ -196,8 +199,8 @@ TEST(Tracer, ExpTest) {
 
 TEST(Tracer, LogTest) {
     std::list<std::vector<RAY::Ray>> rayList;
-    int n = 0;
-    int low = -4;
+    int n = 10;
+    int low = 1;
     int high = 4;
     RAY::RandomRays random = RAY::RandomRays(n, low, high);
 
@@ -211,35 +214,36 @@ TEST(Tracer, LogTest) {
     std::cout << "got " << outputRays.size() << " values from shader" << std::endl;
 
     int counter = 0;
-    double tolerance = 1e-11;
+    double tolerance = 1e-13;
     for (std::list<double>::iterator i = outputRays.begin(); i != outputRays.end();) {
         if (counter % 8 == 0) {
-            EXPECT_NEAR(log(0.1), -2.3025850929940455, tolerance);
+            EXPECT_NEAR(*i, log(testValues[int(counter / 8)].m_position.x), tolerance);
         }
         else if (counter % 8 == 1) {
-            EXPECT_NEAR(log(1.0), 0.0, tolerance);
+            EXPECT_NEAR(*i, log(testValues[int(counter / 8)].m_position.y), tolerance);
         }
         else if (counter % 8 == 2) {
-            EXPECT_NEAR(log(0.3), -1.2039728043259361, tolerance);
+            EXPECT_NEAR(*i,  log(testValues[int(counter / 8)].m_position.z), tolerance);
         }
         else if (counter % 8 == 3) {
-            EXPECT_NEAR(log(5), 1.6094379124341003, tolerance);
+            EXPECT_NEAR(*i,  log(testValues[int(counter / 8)].m_weight), tolerance);
         }
         else if (counter % 8 == 4) {
-            EXPECT_NEAR(log(PI), 1.1447298858494002, tolerance);
+            EXPECT_NEAR(*i,  log(testValues[int(counter / 8)].m_direction.x), tolerance);
         }
         else if (counter % 8 == 5) {
-            EXPECT_NEAR(log(2), 0.6931471805599453, tolerance);
+            EXPECT_NEAR(*i, log(testValues[int(counter / 8)].m_direction.y), tolerance);
         }
         else if (counter % 8 == 6) {
-            EXPECT_NEAR(log(3), 1.0986122886681098, tolerance);
+            EXPECT_NEAR(*i, log(testValues[int(counter / 8)].m_direction.z), tolerance);
+        }
+        else if (counter % 8 == 7) {
+            EXPECT_NEAR(*i, log(testValues[int(counter / 8)].m_energy), tolerance);
         }
         counter++;
         i++;
     }
 }
-
-*/
 
 
 TEST(Tracer, testRefrac2D) {
