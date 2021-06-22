@@ -61,7 +61,7 @@ namespace RAY
         //PointSource p = PointSource(0, "name", number_of_rays, 0.005, 0.005, 0, 20, 60, 1, 1, 0, 0, 100, 10, { 0,0,0,0 });
         // petes setup
         PointSource p = PointSource(0, "spec1_first_rzp4", number_of_rays, 1, 0.005, 0.005, 0, 0.02, 0.06, 1, 1, 0, 0, 640, 120, { 0,0,0,0 });
-        ReflectionZonePlate rzp = ReflectionZonePlate("ReflectionZonePlateMis", 1, 0, 1, 1, 4, 60, 170, 2.2, 0, 90, p.getPhotonEnergy(), p.getPhotonEnergy(), -1, -1, 2.2, 1, 90, 400, 90, 400, 0, 0, 0, 1, { 0,0,0, 0,0,0 }, { 0,0,0,0,0, 0,0 }, nullptr); // dx,dy,dz, dpsi,dphi,dchi //
+        ReflectionZonePlate rzp = ReflectionZonePlate("ReflectionZonePete", 1, 0, 1, 1, 4, 60, 170, 2.2, 0, 90, p.getPhotonEnergy(), p.getPhotonEnergy(), 1, 1, 2.2, 4.75, 90, 400, 90, 400, 0, 0, 1, 0, -24.35, 4.75, { 0,0,0, 0,0,0 },  {0,0,0,0, 0,0,0}, nullptr);  // dx,dy,dz, dpsi,dphi,dchi //
         //PlaneGrating plG = PlaneGrating("PlaneGratingDeviationAzMis", 0, 50, 200, 10, 0.0, 7.5, 10000, 100, 1000, 1, 2, {0,0,0, 0,0,0}, { 0,0,0,0,0,0 }, {0,0,0,0,0, 0,0}, nullptr); // dx,dy,dz, dpsi,dphi,dchi // {1,2,3,0.001,0.002,0.003}
 
         //ImagePlane ip = ImagePlane("Image Plane", 385, nullptr); // one out of the bunch
@@ -88,7 +88,7 @@ namespace RAY
 
         //m_Beamline.addQuadric(reflZonePlate.getName(), reflZonePlate.getAnchorPoints(), reflZonePlate.getInMatrix(), reflZonePlate.getOutMatrix(), reflZonePlate.getTempMisalignmentMatrix(), reflZonePlate.getInverseTempMisalignmentMatrix(), reflZonePlate.getParameters());
         m_Beamline.addQuadric(rzp); //rzp.getName(), rzp.getAnchorPoints(), rzp.getInMatrix(), rzp.getOutMatrix(), rzp.getTempMisalignmentMatrix(), rzp.getInverseTempMisalignmentMatrix(), rzp.getParameters());
-        m_Beamline.addQuadric(ip1); //ip.getName(), ip.getAnchorPoints(), ip.getInMatrix(), ip.getOutMatrix(), ip.getTempMisalignmentMatrix(), ip.getInverseTempMisalignmentMatrix(), ip.getParameters());
+        //m_Beamline.addQuadric(ip1); //ip.getName(), ip.getAnchorPoints(), ip.getInMatrix(), ip.getOutMatrix(), ip.getTempMisalignmentMatrix(), ip.getInverseTempMisalignmentMatrix(), ip.getParameters());
         //add beamline to tracer
         const std::vector<RAY::Quadric>& Quadrics = m_Beamline.getObjects();
         tracer.setBeamlineParameters(beamlinesSimultaneously, Quadrics.size(), number_of_rays);

@@ -139,15 +139,109 @@ TEST(Tracer, testUniformRandom) {
     RAY::Quadric q = RAY::Quadric("testRandomNumbers", { 0,0,0,0, 0,0,0,0, 0,0,0,0, 0,settings,0,0 }, zeros, zeros, zeros, zeros, zeros, zeros);
     std::list<double> outputRays = runTracer(testValues, { q });
 
-    // for (std::list<double>::iterator i = outputRays.begin(); i != outputRays.end();) {
-    //     ASSERT_TRUE(*i <= 1.0);
-    //     ASSERT_TRUE(*i >= 0.0);
-    // }
+    for (std::list<double>::iterator i = outputRays.begin(); i != outputRays.end(); i++) {
+        ASSERT_TRUE(*i <= 1.0);
+        ASSERT_TRUE(*i >= 0.0);
+    }
     std::string filename = "testFile_randomUniform";
     writeToFile(outputRays, filename);
 }
 
+
 /*
+TEST(Tracer, ExpTest) {
+    std::list<std::vector<RAY::Ray>> rayList;
+    int n = 0;
+    int low = -4;
+    int high = 4;
+    RAY::RandomRays random = RAY::RandomRays(n, low, high);
+
+    std::vector<RAY::Ray> testValues = random.getRays();
+    RAY::Ray r = RAY::Ray(glm::dvec3(0, 1, -3), glm::dvec3(PI, 2, 3),4, 5);
+    testValues.push_back(r);
+    
+    RAY::Quadric q = RAY::Quadric("ExpTest", { 0,0,0,0, 0,0,0,0, 0,0,0,0, 0,18,0,0 }, zeros, zeros, zeros, zeros, zeros, zeros);
+
+    std::list<double> outputRays = runTracer(testValues, { q });
+    std::cout << "got " << outputRays.size() << " values from shader" << std::endl;
+
+    int counter = 0;
+    double tolerance = 1e-11;
+    for (std::list<double>::iterator i = outputRays.begin(); i != outputRays.end();) {
+        if (counter % 8 == 0) {
+            EXPECT_NEAR(*i, 1.0, tolerance);
+        }
+        else if (counter % 8 == 1) {
+            EXPECT_NEAR(*i, 2.718281828459045, tolerance);
+        }
+        else if (counter % 8 == 2) {
+            EXPECT_NEAR(*i, 0.049787068367863944, tolerance);
+        }
+        else if (counter % 8 == 3) {
+            EXPECT_NEAR(*i, 148.4131591025766, tolerance);
+        }
+        else if (counter % 8 == 4) {
+            EXPECT_NEAR(*i, 23.140692632779267, tolerance);
+        }
+        else if (counter % 8 == 5) {
+            EXPECT_NEAR(*i, 7.38905609893065, tolerance);
+        }
+        else if (counter % 8 == 6) {
+            EXPECT_NEAR(*i, 20.085536923187668, tolerance);
+        }
+        counter++;
+        i++;
+    }
+}
+
+TEST(Tracer, LogTest) {
+    std::list<std::vector<RAY::Ray>> rayList;
+    int n = 0;
+    int low = -4;
+    int high = 4;
+    RAY::RandomRays random = RAY::RandomRays(n, low, high);
+
+    std::vector<RAY::Ray> testValues = random.getRays();
+    RAY::Ray r = RAY::Ray(glm::dvec3(0.1, 1, 0.3), glm::dvec3(PI, 2, 3),4, 5);
+    testValues.push_back(r);
+    
+    RAY::Quadric q = RAY::Quadric("LogTest", { 0,0,0,0, 0,0,0,0, 0,0,0,0, 0,19,0,0 }, zeros, zeros, zeros, zeros, zeros, zeros);
+
+    std::list<double> outputRays = runTracer(testValues, { q });
+    std::cout << "got " << outputRays.size() << " values from shader" << std::endl;
+
+    int counter = 0;
+    double tolerance = 1e-11;
+    for (std::list<double>::iterator i = outputRays.begin(); i != outputRays.end();) {
+        if (counter % 8 == 0) {
+            EXPECT_NEAR(log(0.1), -2.3025850929940455, tolerance);
+        }
+        else if (counter % 8 == 1) {
+            EXPECT_NEAR(log(1.0), 0.0, tolerance);
+        }
+        else if (counter % 8 == 2) {
+            EXPECT_NEAR(log(0.3), -1.2039728043259361, tolerance);
+        }
+        else if (counter % 8 == 3) {
+            EXPECT_NEAR(log(5), 1.6094379124341003, tolerance);
+        }
+        else if (counter % 8 == 4) {
+            EXPECT_NEAR(log(PI), 1.1447298858494002, tolerance);
+        }
+        else if (counter % 8 == 5) {
+            EXPECT_NEAR(log(2), 0.6931471805599453, tolerance);
+        }
+        else if (counter % 8 == 6) {
+            EXPECT_NEAR(log(3), 1.0986122886681098, tolerance);
+        }
+        counter++;
+        i++;
+    }
+}
+
+*/
+
+
 TEST(Tracer, testRefrac2D) {
     std::vector<RAY::Ray> testValues;
     std::vector<RAY::Ray> correct;
@@ -215,7 +309,7 @@ TEST(Tracer, testRefrac2D) {
         counter++;
         i++;
     }
-}*/
+}
 
 TEST(Tracer, testNormalCartesian) {
     VulkanTracer tracer;
@@ -1067,26 +1161,26 @@ TEST(opticalElements, planeGratingDevMisVLS) {
 }
 
 TEST(opticalElements, RZPDefaultParams) {
-    RAY::ReflectionZonePlate rzp = RAY::ReflectionZonePlate("ReflectionZonePlateDefault", 1, 0, 0, 0, 50, 200, 170, 1, 0, 10000, 100, 100, 1, -1, 1, 1, 100, 500, 100, 500, 0, 0, 0, 0, { 0,0,0, 0,0,0 }, zeros7, nullptr); // dx,dy,dz, dpsi,dphi,dchi // {1,2,3,0.001,0.002,0.003}
+    RAY::ReflectionZonePlate rzp = RAY::ReflectionZonePlate("ReflectionZonePlateDefault", 1, 0, 0, 0, 50, 200, 170, 1, 0, 10000, 100, 100, -1, -1, 1, 1, 100, 500, 100, 500, 0, 0, 0, 0, 0, 0, { 0,0,0, 0,0,0 }, zeros7, nullptr); // dx,dy,dz, dpsi,dphi,dchi // {1,2,3,0.001,0.002,0.003}
     testOpticalElement({ rzp }, 20);
     ASSERT_TRUE(true);
 }
 
 TEST(opticalElements, RZPDefaultParams200) {
-    RAY::ReflectionZonePlate rzp = RAY::ReflectionZonePlate("ReflectionZonePlateDefault200", 1, 0, 0, 0, 50, 200, 170, 1, 0, 10000, 100, 100, 1, -1, 1, 1, 100, 500, 100, 500, 0, 0, 0, 0, { 0,0,0, 0,0,0 }, zeros7, nullptr); // dx,dy,dz, dpsi,dphi,dchi // {1,2,3,0.001,0.002,0.003}
+    RAY::ReflectionZonePlate rzp = RAY::ReflectionZonePlate("ReflectionZonePlateDefault200", 1, 0, 0, 0, 50, 200, 170, 1, 0, 10000, 100, 100, -1, -1, 1, 1, 100, 500, 100, 500, 0, 0, 0, 0, 0, 0, { 0,0,0, 0,0,0 }, zeros7, nullptr); // dx,dy,dz, dpsi,dphi,dchi // {1,2,3,0.001,0.002,0.003}
     testOpticalElement({ rzp }, 200);
     ASSERT_TRUE(true);
 }
 
 TEST(opticalElements, RZPAzimuthal200) {
-    RAY::ReflectionZonePlate rzp = RAY::ReflectionZonePlate("ReflectionZonePlateAzim200", 1, 0, 0, 0, 50, 200, 170, 1, 10, 10000, 100, 100, -1, -1, 1, 1, 100, 500, 100, 500, 0, 0, 0, 0, { 0,0,0, 0,0,0 }, zeros7, nullptr); // dx,dy,dz, dpsi,dphi,dchi // {1,2,3,0.001,0.002,0.003}
+    RAY::ReflectionZonePlate rzp = RAY::ReflectionZonePlate("ReflectionZonePlateAzim200", 1, 0, 0, 0, 50, 200, 170, 1, 10, 10000, 100, 100, -1, -1, 1, 1, 100, 500, 100, 500, 0, 0, 0, 0, 0, 0, { 0,0,0, 0,0,0 }, zeros7, nullptr); // dx,dy,dz, dpsi,dphi,dchi // {1,2,3,0.001,0.002,0.003}
     testOpticalElement({ rzp }, 200);
     ASSERT_TRUE(true);
 }
 
 
 TEST(opticalElements, RZPMis) {
-    RAY::ReflectionZonePlate rzp = RAY::ReflectionZonePlate("ReflectionZonePlateMis", 1, 0, 0, 0, 50, 200, 170, 1, 0, 10000, 100, 100, 1, -1, 1, 1, 100, 500, 100, 500, 0, 0, 0, 0, { 1,2,3,0.001,0.002,0.003 }, zeros7, nullptr); // dx,dy,dz, dpsi,dphi,dchi //
+    RAY::ReflectionZonePlate rzp = RAY::ReflectionZonePlate("ReflectionZonePlateMis", 1, 0, 0, 0, 50, 200, 170, 1, 0, 10000, 100, 100, -1, -1, 1, 1, 100, 500, 100, 500, 0, 0, 0, 0, 0, 0, { 1,2,3,0.001,0.002,0.003 }, zeros7, nullptr); // dx,dy,dz, dpsi,dphi,dchi //
     testOpticalElement({ rzp }, 200);
     ASSERT_TRUE(true);
 }
@@ -1119,22 +1213,57 @@ TEST(globalCoordinates, FourMirrors_20Rays) {
     ASSERT_TRUE(true);
 }
 
+
 TEST(PeteRZP, spec1_first_rzp) {
-    RAY::PointSource p = RAY::PointSource(0, "spec1_first_rzp", 20000, 1, 0.005, 0.005, 0, 0.02, 0.06, 1, 1, 0, 0, 640, 120, { 0,0,0,0 });
-    RAY::ReflectionZonePlate rzp = RAY::ReflectionZonePlate("ReflectionZonePlateMis", 1, 0, 1, 1, 4, 60, 170, 2.2, 0, 90, p.getPhotonEnergy(), p.getPhotonEnergy(), -1, -1, 2.2, 1, 90, 400, 90, 400, 0, 0, 0, 1, { 0,0,0, 0,0,0 }, zeros7, nullptr); // dx,dy,dz, dpsi,dphi,dchi //
-    std::list<double> outputRays = runTracer(p.getRays(), { rzp });
-    std::cout << outputRays.size() / (64) << std::endl;
+    RAY::PointSource p = RAY::PointSource(0, "spec1_first_rzp",20000 , 1, 0.005,0.005,0, 0.02,0.06, 1,1,0,0, 640, 120, {0,0,0,0});
+    RAY::ReflectionZonePlate rzp = RAY::ReflectionZonePlate("ReflectionZonePete", 1, 0, 1, 1, 4, 60, 170, 2.2, 0, 90, p.getPhotonEnergy(), p.getPhotonEnergy(), -1, -1, 2.2, 1, 90, 400, 90, 400, 0, 0, 1, 0, 0, 1, { 0,0,0, 0,0,0 }, zeros7, nullptr); // dx,dy,dz, dpsi,dphi,dchi //
+    std::list<double> outputRays = runTracer(p.getRays(), {rzp});
     std::string filename = "testFile_spec1_first_rzp";
     writeToFile(outputRays, filename);
 }
 
 TEST(PeteRZP, spec1_first_ip) {
-    RAY::PointSource p = RAY::PointSource(0, "spec1_first_rzp4", 20000, 1, 0.005, 0.005, 0, 0.02, 0.06, 1, 1, 0, 0, 640, 120, { 0,0,0,0 });
-    RAY::ReflectionZonePlate rzp = RAY::ReflectionZonePlate("ReflectionZonePlateMis", 1, 0, 1, 1, 4, 60, 170, 2.2, 0, 90, p.getPhotonEnergy(), p.getPhotonEnergy(), -1, -1, 2.2, 1, 90, 400, 90, 400, 0, 0, 0, 1, { 0,0,0, 0,0,0 }, zeros7, nullptr);  // dx,dy,dz, dpsi,dphi,dchi //
+    RAY::PointSource p = RAY::PointSource(0, "spec1_first_rzp4",20000 , 1, 0.005,0.005,0, 0.02,0.06, 1,1,0,0, 640, 120, {0,0,0,0});
+    RAY::ReflectionZonePlate rzp = RAY::ReflectionZonePlate("ReflectionZonePete", 1, 0, 1, 1, 4, 60, 170, 2.2, 0, 90, p.getPhotonEnergy(), p.getPhotonEnergy(), -1, -1, 2.2, 1, 90, 400, 90, 400, 0, 0, 1, 0, 0, 1, { 0,0,0, 0,0,0 }, zeros7, nullptr);  // dx,dy,dz, dpsi,dphi,dchi //
+    RAY::ImagePlane ip1 = RAY::ImagePlane("ImagePlane1", 385.0, &rzp);
+    std::vector<RAY::Ray> input = p.getRays();
+    std::list<double> outputRays = runTracer(input, {rzp, ip1});
+    std::string filename = "testFile_spec1_first_rzp_ip";
+    writeToFile(outputRays, filename);
+}
+
+TEST(PeteRZP, spec1_first_plus_rzp) {
+    RAY::PointSource p = RAY::PointSource(0, "spec1_first_plus_rzp",20000 , 1, 0.005,0.005,0, 0.02,0.06, 1,1,0,0, 640, 120, {0,0,0,0});
+    RAY::ReflectionZonePlate rzp = RAY::ReflectionZonePlate("ReflectionZonePete", 1, 0, 1, 1, 4, 60, 170, 2.2, 0, 90, p.getPhotonEnergy(), p.getPhotonEnergy(), 1, 1, 2.2, 4.75, 90, 400, 90, 400, 0, 0, 1, 0, -24.35, 4.75, { 0,0,0, 0,0,0 },  {0,0,0,0, 0,0,0}, nullptr);  // dx,dy,dz, dpsi,dphi,dchi //
+    std::list<double> outputRays = runTracer(p.getRays(), {rzp});
+    std::string filename = "testFile_spec1_first_plus_rzp";
+    writeToFile(outputRays, filename);
+}
+
+TEST(PeteRZP, spec1_first_plus_ip) {
+    RAY::PointSource p = RAY::PointSource(0, "spec1_first_plus_rzp_ip",20000 , 1, 0.005,0.005,0, 0.02,0.06, 1,1,0,0, 640, 120, {0,0,0,0});
+    RAY::ReflectionZonePlate rzp = RAY::ReflectionZonePlate("ReflectionZonePete", 1, 0, 1, 1, 4, 60, 170, 2.2, 0, 90, p.getPhotonEnergy(), p.getPhotonEnergy(), 1, 1, 2.2, 4.75, 90, 400, 90, 400, 0, 0, 1, 0, -24.35, 4.75, { 0,0,0, 0,0,0 },  {0,0,0,0, 0,0,0}, nullptr);  // dx,dy,dz, dpsi,dphi,dchi //
     RAY::ImagePlane ip1 = RAY::ImagePlane("ImagePlane1", 400.0, &rzp);
     std::vector<RAY::Ray> input = p.getRays();
-    std::list<double> outputRays = runTracer(input, { rzp, ip1 });
-    std::cout << outputRays.size() / (64) << std::endl;
-    std::string filename = "testFile_spec1_first_rzp_ip";
+    std::list<double> outputRays = runTracer(input, {rzp, ip1});
+    std::string filename = "testFile_spec1_first_plus_rzp_ip";
+    writeToFile(outputRays, filename);
+}
+
+TEST(PeteRZP, spec1_first_minus_rzp2) {
+    RAY::PointSource p = RAY::PointSource(0, "spec1_first_minus_rzp2",20000 , 1, 0.005,0.005,0, 0.001,0.06, 1,1,0,0, 640, 120, {0,0,0,0});
+    RAY::ReflectionZonePlate rzp = RAY::ReflectionZonePlate("ReflectionZonePete", 1, 0, 1, 1, 2, 60, 170, 2.2, 0, 90, p.getPhotonEnergy(), p.getPhotonEnergy(), -1, -1, 2.2, 1, 90, 400, 90, 400, 0, 0, 1, 0, 0, 1, { 0,0,0, 0,0,0 },  {0,0,0,0, 0,0,0}, nullptr);  // dx,dy,dz, dpsi,dphi,dchi //
+    std::list<double> outputRays = runTracer(p.getRays(), {rzp});
+    std::string filename = "testFile_spec1_first_minus_rzp2";
+    writeToFile(outputRays, filename);
+}
+
+TEST(PeteRZP, spec1_first_minus_ip2) {
+    RAY::PointSource p = RAY::PointSource(0, "spec1_first_minus_rzp_ip2",20000 , 1, 0.005,0.005,0, 0.001,0.06, 1,1,0,0, 640, 120, {0,0,0,0});
+    RAY::ReflectionZonePlate rzp = RAY::ReflectionZonePlate("ReflectionZonePete", 1, 0, 1, 1, 2, 60, 170, 2.2, 0, 90, p.getPhotonEnergy(), p.getPhotonEnergy(), -1, -1, 2.2, 1, 90, 400, 90, 400, 0, 0, 1, 0, 0, 1, { 0,0,0, 0,0,0 },  {0,0,0,0, 0,0,0}, nullptr);  // dx,dy,dz, dpsi,dphi,dchi //
+    RAY::ImagePlane ip1 = RAY::ImagePlane("ImagePlane1", 400.0, &rzp);
+    std::vector<RAY::Ray> input = p.getRays();
+    std::list<double> outputRays = runTracer(input, {rzp, ip1});
+    std::string filename = "testFile_spec1_first_minus_rzp_ip2";
     writeToFile(outputRays, filename);
 }
