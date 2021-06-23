@@ -22,7 +22,7 @@ namespace RAY
      * @param slopeError            7 slope error parameters: x-y sagittal (0), y-z meridional (1), thermal distortion x (2),y (3),z (4), cylindrical bowing amplitude y(5) and radius (6)
      * @param previous              pointer to previous element in beamline, needed for caclultation transformation matrices in global coordinate system
     */
-    PlaneGrating::PlaneGrating(const char* name, int mount, double width, double height, double deviation, double normalIncidence, double azimuthal, double distanceToPreceedingElement, double designEnergyMounting, double lineDensity, double orderOfDiffraction, double fixFocusConstantCFF, std::vector<double> misalignmentParams, std::vector<double> vls, std::vector<double> slopeError, Quadric* previous) 
+    PlaneGrating::PlaneGrating(const char* name, int mount, double width, double height, double deviation, double normalIncidence, double azimuthal, double distanceToPreceedingElement, double designEnergyMounting, double lineDensity, double orderOfDiffraction, double fixFocusConstantCFF, int additional_zero_order, std::vector<double> misalignmentParams, std::vector<double> vls, std::vector<double> slopeError, Quadric* previous) 
     : Quadric(name, width, height, slopeError, previous) {
         // parameters in array 
         // std::vector<double> inputPoints = {0,0,0,0, 0,0,0,-1, 0,0,0,0, 0,0,0,0};
@@ -33,6 +33,7 @@ namespace RAY
         m_orderOfDiffraction = orderOfDiffraction;
         m_a = abs(hvlam(m_designEnergyMounting)) * abs(m_lineDensity) * m_orderOfDiffraction * 1e-6; // wavelength * linedensity * order of diffraction * 10^-6
         std::cout<< "wavelength" << abs(hvlam(m_designEnergyMounting)) << std::endl;
+        m_additionalOrder = additional_zero_order == 0 ? AO_OFF : AO_ON;
         m_gratingMount = mount==0 ? GM_DEVIATION : (mount==1 ? GM_INCIDENCE : (mount==2 ? GM_CCF : GM_CCF_NO_PREMIRROR));
         m_fixFocusConstantCFF = fixFocusConstantCFF;
         m_chi = rad(azimuthal);
@@ -41,14 +42,14 @@ namespace RAY
         std::cout << "alpha: " << m_alpha << ", beta: " << m_beta << " a: " << m_a << std::endl;
         
         // set parameters in Quadric class
-        editQuadric({0,0,0,0, m_totalWidth,0,0,-1, m_totalHeight,0,0,0, 1,0,0,0});
+        editQuadric({0,0,0,0, 0,0,0,-1, 0,0,0,0, 1,0,0,0});
         m_vls = vls; // into element parameters
         calcTransformationMatrices(m_alpha, m_chi, m_beta, m_distanceToPreceedingElement, misalignmentParams);
         setElementParameters({
             m_totalWidth, m_totalHeight, m_lineDensity, m_orderOfDiffraction, 
-            abs(hvlam(m_designEnergyMounting)),0,m_vls[0],m_vls[1],  
-            m_vls[2],m_vls[3],m_vls[4],m_vls[5],  
-            0,0,0,0});
+            abs(hvlam(m_designEnergyMounting)), 0, m_vls[0], m_vls[1],  
+            m_vls[2], m_vls[3], m_vls[4], m_vls[5],  
+            0, 0, 0, double(m_additionalOrder)});
         setTemporaryMisalignment({0,0,0,0,0,0});
         // Quadric(inputPoints, m_alpha, m_chi, m_beta, m_distanceToPreceedingElement);
     }

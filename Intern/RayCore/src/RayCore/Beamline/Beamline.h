@@ -12,6 +12,7 @@
 #include "SphereMirror.h"
 #include "ReflectionZonePlate.h"
 #include "RandomRays.h"
+#include "Slit.h"
 
 #include <vector>
 

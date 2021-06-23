@@ -57,19 +57,23 @@ namespace RAY
         //add source to tracer
         //initialize matrix light source with default params
         int beamlinesSimultaneously = 1;
-        int number_of_rays = 20000;
-        //PointSource p = PointSource(0, "name", number_of_rays, 0.005, 0.005, 0, 20, 60, 1, 1, 0, 0, 100, 10, { 0,0,0,0 });
+        int number_of_rays = 200;
+        
         // petes setup
-        PointSource p = PointSource(0, "spec1_first_rzp4", number_of_rays, 1, 0.005, 0.005, 0, 0.02, 0.06, 1, 1, 0, 0, 640, 120, { 0,0,0,0 });
-        ReflectionZonePlate rzp = ReflectionZonePlate("ReflectionZonePete", 1, 0, 1, 1, 4, 60, 170, 2.2, 0, 90, p.getPhotonEnergy(), p.getPhotonEnergy(), 1, 1, 2.2, 4.75, 90, 400, 90, 400, 0, 0, 1, 0, -24.35, 4.75, { 0,0,0, 0,0,0 },  {0,0,0,0, 0,0,0}, nullptr);  // dx,dy,dz, dpsi,dphi,dchi //
+        //PointSource p = PointSource(0, "spec1_first_rzp4", number_of_rays, 1, 0.005, 0.005, 0, 0.02, 0.06, 1, 1, 0, 0, 640, 120, { 0,0,0,0 });
+        //ReflectionZonePlate rzp = ReflectionZonePlate("ReflectionZonePete", 1, 0, 1, 1, 4, 60, 170, 2.2, 0, 90, p.getPhotonEnergy(), p.getPhotonEnergy(), 1, 1, 2.2, 4.75, 90, 400, 90, 400, 0, 0, 1, 0, -24.35, 4.75, { 0,0,0, 0,0,0 },  {0,0,0,0, 0,0,0}, nullptr);  // dx,dy,dz, dpsi,dphi,dchi //
         //PlaneGrating plG = PlaneGrating("PlaneGratingDeviationAzMis", 0, 50, 200, 10, 0.0, 7.5, 10000, 100, 1000, 1, 2, {0,0,0, 0,0,0}, { 0,0,0,0,0,0 }, {0,0,0,0,0, 0,0}, nullptr); // dx,dy,dz, dpsi,dphi,dchi // {1,2,3,0.001,0.002,0.003}
-
         //ImagePlane ip = ImagePlane("Image Plane", 385, nullptr); // one out of the bunch
+        
+        MatrixSource m = MatrixSource(0, "matrix source", number_of_rays, 0, 0.065, 0.04, 0, 0.001, 0.001, 100, 0, {0,0,0,0});
+        PlaneMirror p = PlaneMirror("plane Mirror", 50, 200, 10, 0, 10000, {0,0,0, 0,0,0}, {10,10, 0,0,0, 0,0}, nullptr);
+        Slit s = Slit("slit", 0, 20, 2, 0, 10000, 20, 1, m.getPhotonEnergy(), {0,0,0, 0,0,0}, {0,0, 0,0,0, 0,0}, nullptr);
+        ImagePlane i = ImagePlane("Image plane", 1000, nullptr);
         //PointSource m = PointSource(0, "Point source 1", number_of_rays, 0.065, 0.04, 1.0, 0.001, 0.001, 0, 0, 0, 0, 100, 10, {0,0,0,0});
         //std::cout << m.getName() << " with " << m.getNumberOfRays() << " Rays." << std::endl;std::cout.precision(15); // show 16 decimals
 
-        addLightSource(&p);
-        generateRays(&tracer, &p);
+        addLightSource(&m);
+        generateRays(&tracer, &m);
 
         RAY_DEBUG(std::cout << "add rays to tracer done" << std::endl);
 
@@ -84,15 +88,15 @@ namespace RAY
         PlaneMirror p3 = PlaneMirror("PlaneMirror3", 50, 200, 7, 10, 10000, {0,0,0, 0,0,0}, &p2); // {1,2,3,0.01,0.02,0.03}
         PlaneMirror p4 = PlaneMirror("PlaneMirror4", 50, 200, 22, 17, 10000, {0,0,0, 0,0,0}, &p3); // {1,2,3,0.01,0.02,0.03}
         */
-        ImagePlane ip1 = ImagePlane("ImagePlane1", 400.0, &rzp);
-
+        
         //m_Beamline.addQuadric(reflZonePlate.getName(), reflZonePlate.getAnchorPoints(), reflZonePlate.getInMatrix(), reflZonePlate.getOutMatrix(), reflZonePlate.getTempMisalignmentMatrix(), reflZonePlate.getInverseTempMisalignmentMatrix(), reflZonePlate.getParameters());
-        m_Beamline.addQuadric(rzp); //rzp.getName(), rzp.getAnchorPoints(), rzp.getInMatrix(), rzp.getOutMatrix(), rzp.getTempMisalignmentMatrix(), rzp.getInverseTempMisalignmentMatrix(), rzp.getParameters());
-        //m_Beamline.addQuadric(ip1); //ip.getName(), ip.getAnchorPoints(), ip.getInMatrix(), ip.getOutMatrix(), ip.getTempMisalignmentMatrix(), ip.getInverseTempMisalignmentMatrix(), ip.getParameters());
+        m_Beamline.addQuadric(s); //rzp.getName(), rzp.getAnchorPoints(), rzp.getInMatrix(), rzp.getOutMatrix(), rzp.getTempMisalignmentMatrix(), rzp.getInverseTempMisalignmentMatrix(), rzp.getParameters());
+        //m_Beamline.addQuadric(i); //ip.getName(), ip.getAnchorPoints(), ip.getInMatrix(), ip.getOutMatrix(), ip.getTempMisalignmentMatrix(), ip.getInverseTempMisalignmentMatrix(), ip.getParameters());
         //add beamline to tracer
         const std::vector<RAY::Quadric>& Quadrics = m_Beamline.getObjects();
         tracer.setBeamlineParameters(beamlinesSimultaneously, Quadrics.size(), number_of_rays);
         for (int i = 0; i<int(Quadrics.size()); i++) {
+            std::cout << "add " << Quadrics[i].getName() << std::endl;
             tracer.addQuadric(Quadrics[i].getAnchorPoints(), Quadrics[i].getInMatrix(), Quadrics[i].getOutMatrix(), Quadrics[i].getTempMisalignmentMatrix(), Quadrics[i].getInverseTempMisalignmentMatrix(), Quadrics[i].getObjectParameters(), Quadrics[i].getElementParameters());//, Quadrics[i].getInverseMisalignmentMatrix()
         }
 

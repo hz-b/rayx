@@ -8,7 +8,7 @@ namespace RAY
 
     public:
         
-        Slit(const char* name, int beamstop, double width, double height, double azimuthal, double dist, double beamstopWidth, double beamstopHeight, double waveLength, std::vector<double> misalignmentParams,std::vector<double> slopeError, Quadric* previous); 
+        Slit(const char* name, int beamstop, double width, double height, double azimuthal, double dist, double beamstopWidth, double beamstopHeight, double sourceEnergy, std::vector<double> misalignmentParams,std::vector<double> slopeError, Quadric* previous); 
         Slit();
         ~Slit();
 

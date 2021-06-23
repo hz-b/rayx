@@ -41,9 +41,14 @@ namespace RAY
         calcRadius();
         // std::cout << m_a << std::endl;
         // set parameters in Quadric class
-        editQuadric({1,0,0,0, m_totalWidth,1,0,-m_radius, m_totalHeight,m_a,1,0, 2,0,0,0});
+        editQuadric({1,0,0,0, 0,1,0,-m_radius, 0,m_a,1,0, 2,0,0,0});
         calcTransformationMatrices(m_alpha, m_chi, m_beta, m_distanceToPreceedingElement, misalignmentParams);
-        setElementParameters({m_totalWidth,m_totalHeight,m_lineDensity,m_orderOfDiffraction, m_designEnergyMounting,m_a,m_vls[0],m_vls[1], m_vls[2],m_vls[3],m_vls[4],m_vls[5], 0,0,0,0});
+        setElementParameters({
+            m_totalWidth, m_totalHeight, m_lineDensity, m_orderOfDiffraction, 
+            abs(hvlam(m_designEnergyMounting)), 0, m_vls[0], m_vls[1], 
+            m_vls[2], m_vls[3], m_vls[4], m_vls[5], 
+            0, 0, 0, 0
+        });
         // Quadric(inputPoints, m_alpha, m_chi, m_beta, m_distanceToPreceedingElement);
     }
 

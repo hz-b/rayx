@@ -41,6 +41,7 @@ namespace RAY {
             const char* getName() const;
 
             void calcTransformationMatrices(double alpha, double chi, double beta, double dist, std::vector<double> misalignment);
+            // set misalignment that needs to be removed separated from the transformation matrices during tracing
             void setTemporaryMisalignment(std::vector<double> misalignment);
             
             Quadric();

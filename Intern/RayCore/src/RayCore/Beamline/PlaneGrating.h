@@ -8,7 +8,7 @@ namespace RAY
 
     public:
         
-        PlaneGrating(const char* name, int mount, double width, double height, double deviation, double normalIncidence, double azimuthal, double distanceToPreceedingElement, double designEnergyMounting, double lineDensity, double orderOfDiffraction, double fixFocusConstantCFF, std::vector<double> misalignmentParams, std::vector<double> vls, std::vector<double> slopeError, Quadric* previous);
+        PlaneGrating(const char* name, int mount, double width, double height, double deviation, double normalIncidence, double azimuthal, double distanceToPreceedingElement, double designEnergyMounting, double lineDensity, double orderOfDiffraction, double fixFocusConstantCFF, int additional_zero_order, std::vector<double> misalignmentParams, std::vector<double> vls, std::vector<double> slopeError, Quadric* previous);
         PlaneGrating();
         ~PlaneGrating();
 
@@ -43,6 +43,8 @@ namespace RAY
         enum GRATING_MOUNT  { GM_DEVIATION, GM_INCIDENCE, GM_CCF, GM_CCF_NO_PREMIRROR};
         GRATING_MOUNT m_gratingMount;
         double m_fixFocusConstantCFF;
+        enum ADDITIONAL_ZERO_ORDER {AO_OFF, AO_ON};
+        ADDITIONAL_ZERO_ORDER m_additionalOrder;
 
         double m_designEnergyMounting;
         double m_lineDensity;
