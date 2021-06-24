@@ -5,7 +5,7 @@
 
 #include <string>
 #include <vector>
-#include <set>,
+#include <set>
 
 class VulkanTracer;
 
