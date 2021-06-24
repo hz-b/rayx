@@ -8,15 +8,15 @@
 
 
 // Memory leak detection
-#ifdef RAY_DEBUG_MODE
-	#define _CRTDBG_MAP_ALLOC
-	#include <crtdbg.h>
-	#define RAY_NEW new ( _NORMAL_BLOCK , __FILE__ , __LINE__ )
-// Replace _NORMAL_BLOCK with _CLIENT_BLOCK if you want the
-// allocations to be of _CLIENT_BLOCK type
-#else
-	#define RAY_NEW new
-#endif
+#	ifdef RAY_DEBUG_MODE
+#       ifdef RAY_PLATFORM_WINDOWS
+#		    define _CRTDBG_MAP_ALLOC
+#		    include <crtdbg.h>
+#       endif
+#		    define RAY_NEW new ( _NORMAL_BLOCK , __FILE__ , __LINE__ )
+#	else
+#		define RAY_NEW new
+#	endif
 
 // Debug only code; just use it as: DEBUG(<statement>);
 #ifdef RAY_DEBUG_MODE
