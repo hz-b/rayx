@@ -12,6 +12,19 @@
 #ifndef SHADERPATH
 #define SHADERPATH "comp_dyn.spv"
 #endif
+
+// Memory leak detection in debug mode
+#ifdef RAY_PLATFORM_WINDOWS
+#define _CRTDBG_MAP_ALLOC
+#include <stdlib.h>
+#include <crtdbg.h>
+#ifndef NDEBUG
+#define DBG_NEW new ( _NORMAL_BLOCK , __FILE__ , __LINE__ )
+#endif
+#else
+#define DBG_NEW new
+#endif
+
 VulkanTracer::VulkanTracer() {
 	bufferSizes.resize(5);
 	buffers.resize(5);
@@ -785,7 +798,7 @@ uint32_t* VulkanTracer::readFile(uint32_t& length, const char* filename)
 	long filesizepadded = long(ceil(filesize / 4.0)) * 4;
 
 	// read file contents.
-	char* str = new char[filesizepadded];
+	char* str = DBG_NEW char[filesizepadded];
 	fread(str, filesize, sizeof(char), fp);
 	fclose(fp);
 

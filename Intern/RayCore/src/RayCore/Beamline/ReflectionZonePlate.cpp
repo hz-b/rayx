@@ -19,7 +19,7 @@ namespace RAY
      *          lineDensity = line density of the grating
      *          orderOfDiffraction =
     */
-    ReflectionZonePlate::ReflectionZonePlate(const char* name, int mount, int curvatureType, int designType, int elementOffsetType, double width, double height, double deviation, double incidenceAngle, double azimuthal, double distanceToPreceedingElement, double designEnergy, double sourceEnergy, double orderOfDiffraction, double designOrderOfDiffraction, double dAlpha, double dBeta, double mEntrance, double mExit, double sEntrance, double sExit, double shortRadius, double longRadius, double elementOffsetZ, double beta, std::vector<double> misalignmentParams, std::vector<double> slopeError, Quadric* previous) 
+    ReflectionZonePlate::ReflectionZonePlate(const char* name, int mount, int curvatureType, int designType, int elementOffsetType, double width, double height, double deviation, double incidenceAngle, double azimuthal, double distanceToPreceedingElement, double designEnergy, double sourceEnergy, double orderOfDiffraction, double designOrderOfDiffraction, double dAlpha, double dBeta, double mEntrance, double mExit, double sEntrance, double sExit, double shortRadius, double longRadius, int additional_zero_order, double elementOffsetZ, double fresnelZOffset, double beta, std::vector<double> misalignmentParams, std::vector<double> slopeError, Quadric* previous) 
        : Quadric(name, width, height, slopeError, previous) {
         m_totalWidth = width;
         m_totalHeight = height;
@@ -27,7 +27,8 @@ namespace RAY
         // m_designEnergy = designEnergy; // if Auto == true, take energy of Source (param sourceEnergy), else m_designEnergy = designEnergy
         m_wavelength = m_designEnergy == 0 ? 0 : inm2eV / m_designEnergy;
         m_designOrderOfDiffraction = designOrderOfDiffraction;
-        m_orderOfDiffraction = m_designOrderOfDiffraction; // auto = m_designOrderOfDiffraction, else given param
+        m_orderOfDiffraction = orderOfDiffraction; // auto = m_designOrderOfDiffraction, else given param
+        m_additionalOrder = additional_zero_order == 0 ? AO_OFF : AO_ON;
 
         m_designAlphaAngle = rad(dAlpha);
         m_designBetaAngle = rad(dBeta);
@@ -42,8 +43,8 @@ namespace RAY
         m_fullEfficiency = FE_OFF; // default (1)
         m_elementOffsetType = elementOffsetType == 0 ? EZ_MANUAL : EZ_BEAMDIVERGENCE; //EZ_BEAMDIVERGENCE; // EZ_MANUAL; // default (0)
         m_elementOffsetZ = elementOffsetZ;
-
-        calcDesignOrderOfDiffraction(designOrderOfDiffraction);
+        m_frenselZOffset = fresnelZOffset; // default
+        
         m_sagittalEntranceArmLength = sEntrance; //in mm
         m_meridionalEntranceArmLength = mEntrance; 
         m_sagittalExitArmLength = sExit;
@@ -56,7 +57,7 @@ namespace RAY
         m_meridionalDistance = 0;
         m_meridionalDivergence = 0;
 
-        m_frenselZOffset = 0; // default
+        calcDesignOrderOfDiffraction(designOrderOfDiffraction);
         calcAlpha2();
         if (beta == 0) { // calculate from other parameters
             calcBeta2();
@@ -88,7 +89,7 @@ namespace RAY
             double(m_imageType), double(m_rzpType), double(m_derivationMethod), m_wavelength,
             m_designEnergy, m_designOrderOfDiffraction,m_orderOfDiffraction,m_frenselZOffset,
             m_sagittalEntranceArmLength,m_sagittalExitArmLength,m_meridionalEntranceArmLength,m_meridionalExitArmLength,
-            m_designAlphaAngle,m_designBetaAngle,m_elementOffsetZ,0 }
+            m_designAlphaAngle,m_designBetaAngle,m_elementOffsetZ, double(m_additionalOrder)}
         );
     }
 
@@ -373,6 +374,7 @@ namespace RAY
         else if (m_designType == DT_BETA) {
             presign = (m_frenselZOffset >= 0) ? -1 : 1;
         }
+        std::cout << "presign: " << presign << std::endl;
         m_designOrderOfDiffraction = abs(designOrderOfDiffraction) * presign;
     }
 

@@ -56,16 +56,17 @@ TEST(planeGrating, testParams) {
     double lineDensity = 812.2;
     int orderOfDiffraction = 1; // use others
     double fixFocusConstantCFF = 12.1;
+    int add_order = 0;
     std::vector<double> sE = {0,0,0,0,0, 0,0};
     std::vector<double> mis = {5.212,7.3,0.35, 0.23,0.011,0.0006};
     std::vector<double> vls = {2.1, 0.12, 12.2, 8.3, 5.1, 7.23};
-    RAY::PlaneGrating p = RAY::PlaneGrating("planegrating", mount, width, height, deviation, normalIncidence, azimuthal, dist, designEnergyMounting, lineDensity, orderOfDiffraction, fixFocusConstantCFF, mis, vls, sE, NULL); 
+    RAY::PlaneGrating p = RAY::PlaneGrating("planegrating", mount, width, height, deviation, normalIncidence, azimuthal, dist, designEnergyMounting, lineDensity, orderOfDiffraction, fixFocusConstantCFF, add_order, mis, vls, sE, NULL); 
     
     double beta = 1.467650597188248;
     double alpha = 1.457521229154248;
     double a = 0.010070077944000002;
-    std::vector<double> quad = {0,0,0,0, width,0,0,-1, height,a,0,0, 1,0,0,0};
-    std::vector<double> params = {width,height,lineDensity,double(orderOfDiffraction), designEnergyMounting,a,vls[0],vls[1], vls[2],vls[3],vls[4],vls[5], 0,0,0,0};
+    std::vector<double> quad = {0,0,0,0, width,0,0,-1, height,0,0,0, 1,0,0,0};
+    std::vector<double> params = {width,height,lineDensity,double(orderOfDiffraction), abs(hvlam(designEnergyMounting)),0,vls[0],vls[1], vls[2],vls[3],vls[4],vls[5], 0,0,0,double(add_order)};
     ASSERT_DOUBLE_EQ (p.getWidth(),  width);
     ASSERT_DOUBLE_EQ (p.getHeight(),  height);
     ASSERT_DOUBLE_EQ (p.getAlpha(),  alpha);
@@ -79,7 +80,8 @@ TEST(planeGrating, testParams) {
     
     // mount = 1, use incidence Angle
     mount = 1; // { GM_DEVIATION, GM_INCIDENCE, GM_CCF, GM_CCF_NO_PREMIRROR}
-    p = RAY::PlaneGrating("planegrating", mount, width, height, deviation, normalIncidence, azimuthal, dist, designEnergyMounting, lineDensity, orderOfDiffraction, fixFocusConstantCFF, mis, vls, sE, NULL); 
+    add_order = 1;
+    p = RAY::PlaneGrating("planegrating", mount, width, height, deviation, normalIncidence, azimuthal, dist, designEnergyMounting, lineDensity, orderOfDiffraction, fixFocusConstantCFF, add_order, mis, vls, sE, NULL); 
     alpha = 1.3069025438933539;
     beta = 1.317319261832787;
 
@@ -90,10 +92,10 @@ TEST(planeGrating, testParams) {
     orderOfDiffraction = 3;
     a = 0.030210233832000003;
     beta = 1.3380699314613769;
-    quad = {0,0,0,0, width,0,0,-1, height,a,0,0, 1,0,0,0};
-    params = {width,height,lineDensity,double(orderOfDiffraction), designEnergyMounting,a,vls[0],vls[1], vls[2],vls[3],vls[4],vls[5], 0,0,0,0};
+    quad = {0,0,0,0, width,0,0,-1, height,0,0,0, 1,0,0,0};
+    params = {width,height,lineDensity,double(orderOfDiffraction), abs(hvlam(designEnergyMounting)),0,vls[0],vls[1], vls[2],vls[3],vls[4],vls[5], 0,0,0,double(add_order)};
     
-    p = RAY::PlaneGrating("planegrating", mount, width, height, deviation, normalIncidence, azimuthal, dist, designEnergyMounting, lineDensity, orderOfDiffraction, fixFocusConstantCFF, mis, vls, sE, NULL); 
+    p = RAY::PlaneGrating("planegrating", mount, width, height, deviation, normalIncidence, azimuthal, dist, designEnergyMounting, lineDensity, orderOfDiffraction, fixFocusConstantCFF, add_order, mis, vls, sE, NULL); 
     
     ASSERT_DOUBLE_EQ (p.getWidth(),  width);
     ASSERT_DOUBLE_EQ (p.getHeight(),  height);
@@ -110,10 +112,10 @@ TEST(planeGrating, testParams) {
     a = 0.030210233832000003;
     alpha = 1.4473913414095938;
     beta = 1.4777804849329026;
-    quad = {0,0,0,0, width,0,0,-1, height,a,0,0, 1,0,0,0};
-    params = {width,height,lineDensity,double(orderOfDiffraction), designEnergyMounting,a,vls[0],vls[1], vls[2],vls[3],vls[4],vls[5], 0,0,0,0};
+    quad = {0,0,0,0, width,0,0,-1, height,0,0,0, 1,0,0,0};
+    params = {width,height,lineDensity,double(orderOfDiffraction), abs(hvlam(designEnergyMounting)),0,vls[0],vls[1], vls[2],vls[3],vls[4],vls[5], 0,0,0,double(add_order)};
     
-    p = RAY::PlaneGrating("planegrating", mount, width, height, deviation, normalIncidence, azimuthal, dist, designEnergyMounting, lineDensity, orderOfDiffraction, fixFocusConstantCFF, mis, vls, sE, NULL); 
+    p = RAY::PlaneGrating("planegrating", mount, width, height, deviation, normalIncidence, azimuthal, dist, designEnergyMounting, lineDensity, orderOfDiffraction, fixFocusConstantCFF, add_order, mis, vls, sE, NULL); 
     
     ASSERT_DOUBLE_EQ (p.getWidth(),  width);
     ASSERT_DOUBLE_EQ (p.getHeight(),  height);
@@ -147,6 +149,7 @@ TEST(SphereGrating, testParams) {
     double exitArm = 623.12;
     double designEnergy = 232.2;
     double linedensity = 432.2;
+    int add_order = 0;
     int order = 1;
     std::vector<double> mis = {1.41,5.3,1.5, 0.2,1.0,1.4}; 
     std::vector<double> vls = {2.1, 0.12, 12.2, 8.3, 5.1, 7.23};
@@ -160,7 +163,7 @@ TEST(SphereGrating, testParams) {
     double radius = 1134.9852832410934;
     double a = 0.002307769312661499;
     std::vector<double> quad = {1,0,0,0, width,1,0,-radius, height,a,1,0, 2,0,0,0};
-    std::vector<double> params = {width,height,linedensity,double(order), designEnergy,a,vls[0],vls[1], vls[2],vls[3],vls[4],vls[5], 0,0,0,0};
+    std::vector<double> params = {width,height,linedensity,double(order), abs(hvlam(designEnergy)),0,vls[0],vls[1], vls[2],vls[3],vls[4],vls[5], 0,0,0,0};
 
     ASSERT_DOUBLE_EQ (s.getWidth(),  width);
     ASSERT_DOUBLE_EQ (s.getHeight(),  height);

@@ -28,11 +28,11 @@ namespace RAY
         std::cout << "create " << n << " random rays " << std::endl;
         // fill the square with rmat1xrmat1 rays
         for (int i = 0; i < n; i++) {
-            glm::dvec3 position = glm::dvec3(-unif(re), -unif(re), -unif(re));
+            glm::dvec3 position = glm::dvec3(unif(re), unif(re), unif(re));
 
-            glm::dvec3 direction = glm::dvec4(-unif(re), -unif(re), -unif(re), -unif(re));
-            double weight = -unif(re);
-            double en = 0;
+            glm::dvec3 direction = glm::dvec4(unif(re), unif(re), unif(re), unif(re));
+            double weight = unif(re);
+            double en = unif(re);
             Ray r = Ray(position, direction, en, weight);
             rayList.emplace_back(r);
         }

@@ -14,33 +14,34 @@ namespace RAY {
             void setElementParameters(std::vector<double> params);
             void setObjectParameters(std::vector<double> params);
             void editQuadric(std::vector<double> inputPoints);
-            std::vector<double> getAnchorPoints();
             void setInMatrix(std::vector<double> inputMatrix);
             void setOutMatrix(std::vector<double> inputMatrix);
 
-            std::vector<double> getInMatrix();
-            std::vector<double> getOutMatrix();
-            std::vector<double> getMisalignmentMatrix();
-            std::vector<double> getInverseMisalignmentMatrix();
-            std::vector<double> getMisalignmentParams();
-            std::vector<double> getB2E();
-            std::vector<double> getE2B();
-            std::vector<double> getInvB2E();
-            std::vector<double> getInvE2B();
-            std::vector<double> getG2E();
-            std::vector<double> getE2G();
-            
-            std::vector<double> getInTransMis();
-            std::vector<double> getOutTransMis();
-            std::vector<double> getTempMisalignmentParams();
-            std::vector<double> getTempMisalignmentMatrix();
-            std::vector<double> getInverseTempMisalignmentMatrix();
-            std::vector<double> getObjectParameters();
-            std::vector<double> getElementParameters();
-            std::vector<double> getSlopeError();
-            const char* getName();
+            std::vector<double> getAnchorPoints() const;
+            std::vector<double> getInMatrix() const;
+            std::vector<double> getOutMatrix() const;
+            std::vector<double> getMisalignmentMatrix() const;
+            std::vector<double> getInverseMisalignmentMatrix() const;
+            std::vector<double> getMisalignmentParams() const;
+            std::vector<double> getB2E() const;
+            std::vector<double> getE2B() const;
+            std::vector<double> getInvB2E() const;
+            std::vector<double> getInvE2B() const;
+            std::vector<double> getG2E() const;
+            std::vector<double> getE2G() const;
+
+            std::vector<double> getInTransMis() const;
+            std::vector<double> getOutTransMis() const;
+            std::vector<double> getTempMisalignmentParams() const;
+            std::vector<double> getTempMisalignmentMatrix() const;
+            std::vector<double> getInverseTempMisalignmentMatrix() const;
+            std::vector<double> getObjectParameters() const;
+            std::vector<double> getElementParameters() const;
+            std::vector<double> getSlopeError() const;
+            const char* getName() const;
 
             void calcTransformationMatrices(double alpha, double chi, double beta, double dist, std::vector<double> misalignment);
+            // set misalignment that needs to be removed separated from the transformation matrices during tracing
             void setTemporaryMisalignment(std::vector<double> misalignment);
             
             Quadric();
