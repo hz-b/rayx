@@ -77,21 +77,22 @@ void RayList::insertVector(void* location, size_t inputSize) {
         auto bytesNeededToFillLastVector = std::min(inputSize * RAY_DOUBLE_COUNT * sizeof(double), RAY_VECTOR_SIZE - (lastVectorSize * RAY_DOUBLE_COUNT * sizeof(double)));
         std::cout << "bytesNeededToFillLastVector= " << bytesNeededToFillLastVector << std::endl;
         std::cout << "capacity= " << (m_rayList.back()).capacity() << std::endl;
-        std::cout << "size= " << (m_rayList.back()).size() << std::endl;
         std::cout << "inputSize= " << inputSize << std::endl;
         (m_rayList.back()).reserve((m_rayList.back()).size() + (bytesNeededToFillLastVector / (RAY_DOUBLE_COUNT * sizeof(double))));
         std::cout << "capacity= " << (m_rayList.back()).capacity() << std::endl;
         memcpy(&((m_rayList.back()).back()) + 1, location, bytesNeededToFillLastVector);
         m_rayList.back().resize(m_rayList.back().size() + (bytesNeededToFillLastVector / (RAY_DOUBLE_COUNT * sizeof(double))));
+        std::cout << "size after resize= " << (m_rayList.back()).size() << std::endl;
         int i = bytesNeededToFillLastVector;
-        for (;i < (int(inputSize) * RAY_DOUBLE_COUNT) - RAY_VECTOR_SIZE; i = i + RAY_VECTOR_SIZE) {
+        for (;i < (int(inputSize) * RAY_DOUBLE_COUNT * sizeof(double)) - RAY_VECTOR_SIZE; i = i + RAY_VECTOR_SIZE) {
             addVector();
 
             std::cout << "insert vector: reserved" << std::endl;
-            memcpy(&((m_rayList.back())[0]), (char*)location + (i * RAY_DOUBLE_COUNT * sizeof(double)), RAY_VECTOR_SIZE);
+            memcpy(&((m_rayList.back())[0]), (char*)location + (i), RAY_VECTOR_SIZE);
             m_rayList.back().resize(RAY_MAX_ELEMENTS_IN_VECTOR);
         }
-        int remainingElements = int(inputSize) - (i);
+        int remainingElements = int(inputSize) - (i / (RAY_DOUBLE_COUNT * sizeof(double)));
+        std::cout << "remaining elements: " << remainingElements << std::endl;
         if (remainingElements > 0) {
             std::cout << remainingElements << std::endl;
             std::cout << "test4" << std::endl;
