@@ -5,12 +5,18 @@
 #include "GFSDK_Aftermath.h"
 #endif
 
-#define SHADERPATH "comp.spv"
+//#define SHADERPATH "comp.spv"
 #ifndef SHADERPATH	
-//#define SHADERPATH "comp_inter.spv"
+// #define SHADERPATH "comp_inter.spv"
 #endif
 #ifndef SHADERPATH
-#define SHADERPATH "comp_dyn.spv"
+//#define SHADERPATH "comp_dyn.spv"
+#endif
+#ifndef SHADERPATH
+#define SHADERPATH "comp_dyn_inter.spv"
+#endif
+#ifndef SHADERPATH
+#define SHADERPATH "comp_dyn_multi.spv"
 #endif
 
 // Memory leak detection in debug mode
@@ -515,10 +521,11 @@ void VulkanTracer::fillStagingBuffer(uint32_t offset, std::list<std::vector<Ray>
 	vectorsPerStagingBuffer = std::min(rayList.size(), vectorsPerStagingBuffer);
 	std::cout << "vectorsPerStagingBuffer: " << vectorsPerStagingBuffer << std::endl;
 	for (uint32_t i = 0; i < vectorsPerStagingBuffer; i++) {
-		std::cout << "(*raySetIterator).size(): " << (*raySetIterator).size() << std::endl;
-		std::cout << "size: " << std::min((*raySetIterator).size() * VULKANTRACER_RAY_DOUBLE_AMOUNT * sizeof(double), (size_t)GPU_MAX_STAGING_SIZE) << std::endl;
+		std::cout << "(*raySetIterator).size()*sizeof(Ray): " << (*raySetIterator).size() * sizeof(Ray) << std::endl;
+		std::cout << "size: " << std::min((*raySetIterator).size() * VULKANTRACER_RAY_DOUBLE_AMOUNT * sizeof(double), (size_t)GPU_MAX_STAGING_SIZE) << " i: " << i << std::endl;
 
 		memcpy(((char*)data) + i * RAY_VECTOR_SIZE, (*raySetIterator).data(), std::min((*raySetIterator).size() * VULKANTRACER_RAY_DOUBLE_AMOUNT * sizeof(double), (size_t)GPU_MAX_STAGING_SIZE));
+		std::cout << "memcpy done" << std::endl;
 		raySetIterator++;
 	}
 	double* temp = (double*)data;
@@ -967,8 +974,8 @@ void VulkanTracer::setBeamlineParameters(uint32_t inNumberOfBeamlines, uint32_t 
 	std::cout << "setBeamlineParameters:numberOfRays: " << inNumberOfRays << std::endl;
 	numberOfBeamlines = inNumberOfBeamlines;
 	numberOfQuadricsPerBeamline = inNumberOfQuadricsPerBeamline;
-	numberOfRays = inNumberOfRays;
-	numberOfRaysPerBeamline = inNumberOfRays / inNumberOfBeamlines;
+	numberOfRays = inNumberOfRays * inNumberOfBeamlines;
+	numberOfRaysPerBeamline = inNumberOfRays;
 	if (beamline.size() < 4) {
 		beamline.resize(4);
 	}
