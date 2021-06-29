@@ -17,6 +17,7 @@ public:
     void insertVector(void* location, size_t size);
     std::list<std::vector<Ray>>::iterator begin();
     std::list<std::vector<Ray>>::iterator end();
+    std::vector<Ray> back();
     std::size_t size();
     int rayAmount() const;
 

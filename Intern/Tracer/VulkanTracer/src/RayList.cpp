@@ -115,6 +115,9 @@ std::list<std::vector<Ray>>::iterator RayList::begin() {
 std::list<std::vector<Ray>>::iterator RayList::end() {
     return m_rayList.end();
 }
+std::vector<Ray> RayList::back() {
+    return m_rayList.back();
+}
 
 std::size_t RayList::size() {
     return m_rayList.size();
