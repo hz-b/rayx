@@ -1,4 +1,3 @@
-#include <chrono>
 #include <cmath>
 #include <fstream>
 #include <iomanip> 
@@ -59,10 +58,10 @@ namespace RAY
         int number_of_rays = 2000000;
 
         // petes setup
-        PointSource p = PointSource(0, "spec1_first_rzp4", number_of_rays, 1, 0.005, 0.005, 0, 0.02, 0.06, 1, 1, 0, 0, 640, 120, { 0,0,0,0 });
+        PointSource p = PointSource(0, "spec1_first_rzp4", number_of_rays, 1, 0.005, 0.005, 0, 3.142, 3.142, 1, 1, 0, 0, 640, 120, { 0,0,0,0 });
         ReflectionZonePlate rzp = ReflectionZonePlate("ReflectionZonePete", 1, 0, 1, 1, 4, 60, 170, 2.2, 0, 90, p.getPhotonEnergy(), p.getPhotonEnergy(), 1, 1, 2.2, 4.75, 90, 400, 90, 400, 0, 0, 1, 0, -24.35, 4.75, { 0,0,0, 0,0,0 }, { 0,0,0,0, 0,0,0 }, nullptr);  // dx,dy,dz, dpsi,dphi,dchi //
         PlaneGrating plG = PlaneGrating("PeteGratingDeviationAzMis", 0, 50, 200, 10, 0.0, 7.5, 10000, 100, 1000, 1, 2, 0, { 0,0,0, 0,0,0 }, { 0,0,0,0,0,0 }, { 0,0,0,0,0, 0,0 }, nullptr); // dx,dy,dz, dpsi,dphi,dchi // {1,2,3,0.001,0.002,0.003}
-        ImagePlane ip = ImagePlane("Image Plane", 385, nullptr); // one out of the bunch
+        ImagePlane ip = ImagePlane("Image Plane", 385, &rzp); // one out of the bunch
 
         addLightSource(&p);
         for (int j = 0; j < beamlinesSimultaneously; j++) {
@@ -118,38 +117,40 @@ namespace RAY
         RAY_DEBUG(std::cout << "run succeeded" << std::endl);
 
         RAY_DEBUG(std::cout << "tracerInterface run without output: " << float(clock() - all_begin_time) << " ms" << std::endl);
+        if (true) {
 
-        // transform in to usable data
-        auto doubleVecSize = RAY_MAX_ELEMENTS_IN_VECTOR * 8;
-        std::vector<double> doubleVec(doubleVecSize);
-        size_t index = 0;
+            // transform in to usable data
+            auto doubleVecSize = RAY_MAX_ELEMENTS_IN_VECTOR * RAY_DOUBLE_COUNT;
+            std::vector<double> doubleVec(doubleVecSize);
+            size_t index = 0;
 
-        // Print ray footprint into file
-        std::ofstream outputFile("output.csv");
-        outputFile.precision(17);
-        if (SHORTOUTPUT)
-            outputFile << "Index;Xloc;Yloc\n";
-        else
-            outputFile << "Index;Xloc;Yloc;Zloc;Weight;Xdir;Ydir;Zdir;Energy\n";
+            // Print ray footprint into file
+            std::ofstream outputFile("output.csv");
+            outputFile.precision(17);
+            if (SHORTOUTPUT)
+                outputFile << "Index;Xloc;Yloc\n";
+            else
+                outputFile << "Index;Xloc;Yloc;Zloc;Weight;Xdir;Ydir;Zdir;Energy\n";
 
-        //get rays from tracer
-        for (auto outputRayIterator = tracer.getOutputIteratorBegin(), outputIteratorEnd = tracer.getOutputIteratorEnd();
-            outputRayIterator != outputIteratorEnd; outputRayIterator++)
-        {
-            RAY_DEBUG(std::cout << "(*outputRayIterator).size(): " << (*outputRayIterator).size() << std::endl);
+            //get rays from tracer
+            for (auto outputRayIterator = tracer.getOutputIteratorBegin(), outputIteratorEnd = tracer.getOutputIteratorEnd();
+                outputRayIterator != outputIteratorEnd; outputRayIterator++)
+            {
+                RAY_DEBUG(std::cout << "(*outputRayIterator).size(): " << (*outputRayIterator).size() << std::endl);
 
-            memcpy(doubleVec.data(), (*outputRayIterator).data(), (*outputRayIterator).size() * VULKANTRACER_RAY_DOUBLE_AMOUNT * sizeof(double));
-            doubleVec.resize((*outputRayIterator).size() * VULKANTRACER_RAY_DOUBLE_AMOUNT);
+                memcpy(doubleVec.data(), (*outputRayIterator).data(), (*outputRayIterator).size() * VULKANTRACER_RAY_DOUBLE_AMOUNT * sizeof(double));
+                doubleVec.resize((*outputRayIterator).size() * VULKANTRACER_RAY_DOUBLE_AMOUNT);
 
-            RAY_DEBUG(std::cout << "tracerInterface: sample ray: " << doubleVec[0] << ", " << doubleVec[1] << ", " << doubleVec[2] << ", " << doubleVec[3] << ", " << doubleVec[4] << ", " << doubleVec[5] << ", " << doubleVec[6] << ", energy: " << doubleVec[7] << std::endl);
+                RAY_DEBUG(std::cout << "tracerInterface: sample ray: " << doubleVec[0] << ", " << doubleVec[1] << ", " << doubleVec[2] << ", " << doubleVec[3] << ", " << doubleVec[4] << ", " << doubleVec[5] << ", " << doubleVec[6] << ", energy: " << doubleVec[7] << std::endl);
 
-            writeToFile(doubleVec, outputFile, index);
-            index = index + (*outputRayIterator).size();
+                writeToFile(doubleVec, outputFile, index);
+                index = index + (*outputRayIterator).size();
+            }
+            outputFile.close();
+
+            RAY_DEBUG(std::cout << "tracer run incl load rays time: " << float(clock() - begin_time) << " ms" << std::endl);
+
         }
-        outputFile.close();
-
-        RAY_DEBUG(std::cout << "tracer run incl load rays time: " << float(clock() - begin_time) << " ms" << std::endl);
-
         //clean up tracer to avoid memory leaks
         tracer.cleanup();
         //intentionally not RAY_DEBUG()
