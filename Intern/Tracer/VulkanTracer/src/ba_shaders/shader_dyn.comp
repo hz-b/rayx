@@ -2691,7 +2691,7 @@ void testFunctions() {
 
 
 }
-dvec3 getOpticalElementIntersection(Ray r, uint quadricIndex){
+dvec3 getOpticalElementIntersection(Ray r, uint quadricIndex, int whichIntersection){
 
 	double type = quadricData[quadricIndex].anchorPoints[3][0];
 	Quadric q = quadricData[quadricIndex];
@@ -2699,14 +2699,14 @@ dvec3 getOpticalElementIntersection(Ray r, uint quadricIndex){
 
 	if (type == 0 || type == 1 || type == 2 || type == 3) { // mirror
 		r = rayMatrixMult(r, q.inTrans);
-		currentIntersection = getIntersectionPoint(r, q.anchorPoints, 1);
+		currentIntersection = getIntersectionPoint(r, q.anchorPoints, whichIntersection);
 		currentIntersection = dvec3(q.outTrans *  dvec4(currentIntersection,1));
 	}
 	else if(type == 4) { // rzp
 		double element_offset_z = q.elementParameters[3][2];
 		r.position.z = r.position.z - element_offset_z;
 		r = rayMatrixMult(r, q.inTrans);
-		currentIntersection = getIntersectionPoint(r, q.anchorPoints, 1);
+		currentIntersection = getIntersectionPoint(r, q.anchorPoints, whichIntersection);
 		currentIntersection = dvec3(q.outTrans *  dvec4(currentIntersection,1));
 	}
 	else if(type == 5) { // image plane
@@ -2731,6 +2731,7 @@ void dynamicQuadrics(){
 	const int maxBounces = 4;
 	bool hitHitplane = false;
 	Ray ray = rayData[uint(gl_GlobalInvocationID)];
+	int whichIntersection = 1;
 
 	// ray specific "seed" for random numbers -> every ray has a different starting value for the counter that creates the random numbter
 	uint64_t workerCounterNum = (~(uint64_t(0)) / int(numberOfRays));
@@ -2746,14 +2747,19 @@ void dynamicQuadrics(){
 			//find intersection points with all quadrics
 
 			for(int quadricIndex = 0; quadricIndex<numberOfQuadrics; quadricIndex++){
-				if(quadricIndex != lastClosestQuadricIndex){
-					dvec3 currentIntersection = dvec3(1.0/0.0,1.0/0.0,1.0/0.0);
-					currentIntersection = getOpticalElementIntersection(ray, quadricIndex);
-					if(length(ray.position - closestHitpoint)>length(ray.position-currentIntersection)){
-						closestHitpoint = currentIntersection;
-						closestQuadricIndex = quadricIndex;
-					}
+				if(quadricIndex == lastClosestQuadricIndex){
+					whichIntersection = -1;
 				}
+				else{
+					whichIntersection = 1;
+				}
+				dvec3 currentIntersection = dvec3(1.0/0.0,1.0/0.0,1.0/0.0);
+				currentIntersection = getOpticalElementIntersection(ray, quadricIndex, whichIntersection);
+				if(length(ray.position - closestHitpoint)>length(ray.position-currentIntersection)){
+					closestHitpoint = currentIntersection;
+					closestQuadricIndex = quadricIndex;
+				}
+				
 			}
 			//todo: no intersection at all
 			
@@ -2799,7 +2805,7 @@ void dynamicQuadrics(){
 				}else{ // undefined
 					outputData[uint(gl_GlobalInvocationID)] = rayData[uint(gl_GlobalInvocationID)];
 				}
-				Ray r = rayMatrixMult(ray, quadricData[0].inTrans);
+				//Ray r = rayMatrixMult(ray, quadricData[0].inTrans);
 				//outputData[uint(gl_GlobalInvocationID)].direction = getOpticalElementIntersection(ray, 0);
 			}
 		}

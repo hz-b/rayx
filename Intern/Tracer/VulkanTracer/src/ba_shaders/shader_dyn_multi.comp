@@ -1638,7 +1638,7 @@ dvec3 getIntersectionPoint(inout Ray r, dmat4 quadric, int icurv)
 		//r.position = dvec3(a, b, c);
 	}
 	if(w > 0.0){
-		return dvec3(w,y,z);
+		return dvec3(x,y,z);
 	}
 	else{
 		return dvec3(1.0/0.0,1.0/0.0,1.0/0.0);
@@ -2697,7 +2697,7 @@ dvec3 getOpticalElementIntersection(Ray r, uint quadricIndex){
 	Quadric q = quadricData[quadricIndex];
 	dvec3 currentIntersection;
 
-	if (type == 0 || type == 1 || type == 2 || type == 3) { // mirror
+	if (type == 0 || type == 1 || type == 2 || type == 3) { // mirror & ...
 		r = rayMatrixMult(r, q.inTrans);
 		currentIntersection = getIntersectionPoint(r, q.anchorPoints, 1);
 		currentIntersection = dvec3(q.outTrans *  dvec4(currentIntersection,1));

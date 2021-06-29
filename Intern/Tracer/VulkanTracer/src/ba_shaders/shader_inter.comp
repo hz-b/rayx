@@ -1415,7 +1415,7 @@ double wasteBox(double x, double z, double xLength, double zLength, double w)
 *
 * output: reflected Ray with intersection point as position and reflection as direction
 */
-dvec4 setIntersectionPoint(inout Ray r, const dmat4 quadric, int icurv)
+dvec4 setIntersectionPoint(inout Ray r, dmat4 quadric, int icurv)
 {	
 	//transformation into quadric coordinate system
 	rayData[uint(gl_GlobalInvocationID)] = r;
@@ -1489,7 +1489,68 @@ dvec4 setIntersectionPoint(inout Ray r, const dmat4 quadric, int icurv)
 	
 	return normal;
 }
+dvec3 getIntersectionPoint(inout Ray r, dmat4 quadric, int icurv)
+{	
+	//transformation into quadric coordinate system
+	rayData[uint(gl_GlobalInvocationID)] = r;
 
+	double w = r.weight;
+	int cs = 0;
+	if (abs(rayData[uint(gl_GlobalInvocationID)].direction[1]) >= abs(rayData[uint(gl_GlobalInvocationID)].direction[0]) && abs(rayData[uint(gl_GlobalInvocationID)].direction[1]) >= abs(rayData[uint(gl_GlobalInvocationID)].direction[2])) {
+		cs = 1;
+	}else if (abs(rayData[uint(gl_GlobalInvocationID)].direction[2]) >= abs(rayData[uint(gl_GlobalInvocationID)].direction[0]) && abs(rayData[uint(gl_GlobalInvocationID)].direction[2]) >= abs(rayData[uint(gl_GlobalInvocationID)].direction[1])) {
+		cs = 2;
+	}
+	uint f_001 = uint(cs/2);
+	uint f_010 = cs%2;
+	uint f_011 = uint(cs+1/2);
+	uint f_012 = cs;
+	uint f_0x1 = uint(cs/2);
+	uint f_100 = (uint((cs+1)/2)+1)%2;
+	uint f_101 = ((cs%2)+1)%2;
+	uint f_110 = (uint(cs/2)+1)%2;
+	uint f_112 = int(cs/2)+1;
+	uint f_1x0 = (cs+1)%3;
+	uint f_131 = ((cs%2)*2)+1;
+	uint f_220 = (uint(cs/2)+2)%3;
+	uint f_221 = ((uint(cs/2)+1)%2)+1;
+
+    //Formula: ((x+1)%3)/(x-1) and (x%3)/(x-1)
+	double firstParam = rayData[uint(gl_GlobalInvocationID)].direction[f_100] / rayData[uint(gl_GlobalInvocationID)].direction[cs];
+	double secondParam = rayData[uint(gl_GlobalInvocationID)].direction[f_221] / rayData[uint(gl_GlobalInvocationID)].direction[cs];
+	double params[2] = {firstParam, secondParam};
+	//dvec4 normal;
+
+	xyznull[uint(gl_GlobalInvocationID)][f_100] = rayData[uint(gl_GlobalInvocationID)].position[f_100] - firstParam * rayData[uint(gl_GlobalInvocationID)].position[cs];
+	xyznull[uint(gl_GlobalInvocationID)][f_221] = rayData[uint(gl_GlobalInvocationID)].position[f_221] - secondParam * rayData[uint(gl_GlobalInvocationID)].position[cs];
+	xyznull[uint(gl_GlobalInvocationID)][3] = 0;
+
+	const int d_sign = int(sign(rayData[uint(gl_GlobalInvocationID)].direction[cs]) * icurv);
+
+	double a = quadric[cs][cs] + 2*quadric[0][f_112]*firstParam + quadric[f_100][f_100]*firstParam*firstParam + 2*quadric[f_011][2]*secondParam + 2*quadric[f_100][f_221]*firstParam*secondParam + quadric[f_221][f_221]*secondParam*secondParam;
+	double b = quadric[cs][3] + quadric[f_100][3]*firstParam + quadric[f_221][3]*secondParam + (quadric[0][f_112] + quadric[f_100][f_100]*firstParam + quadric[f_100][f_221]*secondParam)*xyznull[uint(gl_GlobalInvocationID)][f_100] + (quadric[f_011][2] + quadric[f_100][f_221]*firstParam + quadric[f_221][f_221]*secondParam)*xyznull[uint(gl_GlobalInvocationID)][f_221];
+	double c = quadric[3][3] + quadric[f_100][f_100]*xyznull[uint(gl_GlobalInvocationID)][f_100]*xyznull[uint(gl_GlobalInvocationID)][f_100] + 2*quadric[f_221][3]*xyznull[uint(gl_GlobalInvocationID)][f_221] + quadric[f_221][f_221]*xyznull[uint(gl_GlobalInvocationID)][f_221]*xyznull[uint(gl_GlobalInvocationID)][f_220] + 2*xyznull[uint(gl_GlobalInvocationID)][f_100]*(quadric[f_100][3] +quadric[f_100][f_221]*xyznull[uint(gl_GlobalInvocationID)][f_221]);
+
+	
+	double bbac = b*b - a*c;
+	if (bbac < 0) {
+		w = 0.0;
+		xyznull[uint(gl_GlobalInvocationID)][cs] = - xyznull[uint(gl_GlobalInvocationID)][f_131]/params[f_0x1]; 	// x such that y=0
+		return dvec3(1.0/0.0,1.0/0.0,1.0/0.0);
+	}
+	else{
+		if (abs(a) > abs(c)*1e-10) {
+			xyznull[uint(gl_GlobalInvocationID)][cs] = (-b + d_sign*sqrt(bbac)) / a;
+		}else{
+			xyznull[uint(gl_GlobalInvocationID)][cs] = (-c/2)/b;
+		}
+	}
+	xyznull[uint(gl_GlobalInvocationID)][f_100] = xyznull[uint(gl_GlobalInvocationID)][f_100] + firstParam * xyznull[uint(gl_GlobalInvocationID)][cs];
+	xyznull[uint(gl_GlobalInvocationID)][f_221] = xyznull[uint(gl_GlobalInvocationID)][f_221] + secondParam*xyznull[uint(gl_GlobalInvocationID)][cs];
+	
+	
+	return dvec3(xyznull[uint(gl_GlobalInvocationID)][0],xyznull[uint(gl_GlobalInvocationID)][1],xyznull[uint(gl_GlobalInvocationID)][2]);
+}
 
 /**
 turn the normal vector through x_rad and z_rad 
@@ -2563,8 +2624,9 @@ void main(){
 	// uint64_t workerCounterNum = (~(uint64_t(0)) / int(numberOfRays));
 	// uint64_t ctr = uint(gl_GlobalInvocationID) * workerCounterNum;
 	// Ray r = rayData[uint(gl_GlobalInvocationID)];
-    // outputData[uint(gl_GlobalInvocationID)] = traceRZP(r, quadricData[0], ctr);
-	//outputData[uint(gl_GlobalInvocationID)] = r;
+	// outputData[uint(gl_GlobalInvocationID)].direction.x = setIntersectionPoint(r, quadricData[0].anchorPoints ,1).x;
+    // //outputData[uint(gl_GlobalInvocationID)] = traceRZP(r, quadricData[0], ctr);
+	// outputData[uint(gl_GlobalInvocationID)] = r;
 
 
     //outputData[uint(gl_GlobalInvocationID)] = rayData[uint(gl_GlobalInvocationID)];
