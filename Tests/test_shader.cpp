@@ -147,7 +147,7 @@ TEST(Tracer, testUniformRandom) {
     writeToFile(outputRays, filename);
 }
 
-/*
+
 
 TEST(Tracer, ExpTest) {
     std::list<std::vector<RAY::Ray>> rayList;
@@ -1097,7 +1097,7 @@ TEST(Tracer, planeRefracTest) {
         counter++;
         i++;
     }
-}*/
+}
 
 
 void testOpticalElement(std::vector<RAY::Quadric> quadrics, int n) {
@@ -1114,7 +1114,7 @@ void testOpticalElement(std::vector<RAY::Quadric> quadrics, int n) {
 // test complete optical elements instead of single functions
 // uses deterministic source (matrix source with source depth = 0)
 // use name of optical element as file name
-/*
+
 TEST(opticalElements, planeMirrorDefault) {
     RAY::PlaneMirror plM = RAY::PlaneMirror("PlaneMirrorDef", 50, 200, 10, 7.5, 10000, { 0,0,0, 0,0,0 }, zeros7, nullptr); // {1,2,3,0.01,0.02,0.03}
     testOpticalElement({ plM }, 20);
@@ -1131,7 +1131,7 @@ TEST(opticalElements, sphereMirror) {
     RAY::SphereMirror s = RAY::SphereMirror("SphereMirrorDefault", 50, 200, 10, 0.0, 10000, 10000, 1000, { 0,0,0,0,0,0 }, zeros7, nullptr);
     testOpticalElement({ s }, 20);
     ASSERT_TRUE(true);
-}*/
+}
 
 TEST(opticalElements, planeGratingDevDefault) {
     RAY::PlaneGrating plG = RAY::PlaneGrating("PlaneGratingDeviationDefault", 0, 50, 200, 10, 0.0, 0.0, 10000, 100, 1000, 1, 2, 0, { 0,0,0,0,0,0 }, { 0,0,0,0,0,0 }, zeros7, nullptr); // dx,dy,dz, dpsi,dphi,dchi // {1,2,3,0.001,0.002,0.003}
@@ -1163,7 +1163,7 @@ TEST(opticalElements, planeGratingDevMisVLS) {
     testOpticalElement({ plG }, 20);
     ASSERT_TRUE(true);
 }
-/*
+
 TEST(opticalElements, RZPDefaultParams) {
     RAY::ReflectionZonePlate rzp = RAY::ReflectionZonePlate("ReflectionZonePlateDefault", 1, 0, 0, 0, 50, 200, 170, 1, 0, 10000, 100, 100, -1, -1, 1, 1, 100, 500, 100, 500, 0, 0, 0, 0, 0, 0, { 0,0,0, 0,0,0 }, zeros7, nullptr); // dx,dy,dz, dpsi,dphi,dchi // {1,2,3,0.001,0.002,0.003}
     testOpticalElement({ rzp }, 20);
@@ -1272,4 +1272,3 @@ TEST(PeteRZP, spec1_first_minus_ip2) {
     writeToFile(outputRays, filename);
 }
 
-*/

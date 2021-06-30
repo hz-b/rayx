@@ -65,7 +65,7 @@ TEST(planeGrating, testParams) {
     double beta = 1.467650597188248;
     double alpha = 1.457521229154248;
     double a = 0.010070077944000002;
-    std::vector<double> quad = {0,0,0,0, width,0,0,-1, height,0,0,0, 1,0,0,0};
+    std::vector<double> quad = {0,0,0,0, 0,0,0,-1, 0,0,0,0, 1,0,0,0};
     std::vector<double> params = {width,height,lineDensity,double(orderOfDiffraction), abs(hvlam(designEnergyMounting)),0,vls[0],vls[1], vls[2],vls[3],vls[4],vls[5], 0,0,0,double(add_order)};
     ASSERT_DOUBLE_EQ (p.getWidth(),  width);
     ASSERT_DOUBLE_EQ (p.getHeight(),  height);
@@ -92,7 +92,7 @@ TEST(planeGrating, testParams) {
     orderOfDiffraction = 3;
     a = 0.030210233832000003;
     beta = 1.3380699314613769;
-    quad = {0,0,0,0, width,0,0,-1, height,0,0,0, 1,0,0,0};
+    quad = {0,0,0,0, 0,0,0,-1, 0,0,0,0, 1,0,0,0};
     params = {width,height,lineDensity,double(orderOfDiffraction), abs(hvlam(designEnergyMounting)),0,vls[0],vls[1], vls[2],vls[3],vls[4],vls[5], 0,0,0,double(add_order)};
     
     p = RAY::PlaneGrating("planegrating", mount, width, height, deviation, normalIncidence, azimuthal, dist, designEnergyMounting, lineDensity, orderOfDiffraction, fixFocusConstantCFF, add_order, mis, vls, sE, NULL); 
@@ -112,7 +112,7 @@ TEST(planeGrating, testParams) {
     a = 0.030210233832000003;
     alpha = 1.4473913414095938;
     beta = 1.4777804849329026;
-    quad = {0,0,0,0, width,0,0,-1, height,0,0,0, 1,0,0,0};
+    quad = {0,0,0,0, 0,0,0,-1, 0,0,0,0, 1,0,0,0};
     params = {width,height,lineDensity,double(orderOfDiffraction), abs(hvlam(designEnergyMounting)),0,vls[0],vls[1], vls[2],vls[3],vls[4],vls[5], 0,0,0,double(add_order)};
     
     p = RAY::PlaneGrating("planegrating", mount, width, height, deviation, normalIncidence, azimuthal, dist, designEnergyMounting, lineDensity, orderOfDiffraction, fixFocusConstantCFF, add_order, mis, vls, sE, NULL); 
@@ -162,7 +162,7 @@ TEST(SphereGrating, testParams) {
     double theta = 4.6738270800745312;
     double radius = 1134.9852832410934;
     double a = 0.002307769312661499;
-    std::vector<double> quad = {1,0,0,0, width,1,0,-radius, height,a,1,0, 2,0,0,0};
+    std::vector<double> quad = {1,0,0,0, 0,1,0,-radius, 0,0,1,0, 2,0,0,0};
     std::vector<double> params = {width,height,linedensity,double(order), abs(hvlam(designEnergy)),0,vls[0],vls[1], vls[2],vls[3],vls[4],vls[5], 0,0,0,0};
 
     ASSERT_DOUBLE_EQ (s.getWidth(),  width);

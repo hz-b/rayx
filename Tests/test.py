@@ -13,8 +13,10 @@ import matplotlib.pyplot as plt
 
 PROJDIR = os.path.dirname(__file__)
 path = os.path.split(PROJDIR)[0]
-RAY_REWORKED = p_join(path, 'Tests\output')
-print(RAY_REWORKED)
+OUTPUT_FILE = p_join(path, 'build/bin/output.csv')
+RAY_REWORKED = p_join(path, 'Tests')
+RAY_REWORKED = p_join(RAY_REWORKED, 'output')
+print("new ray files in folder:",RAY_REWORKED)
 
 # where the results from old ray are
 #RAY_UI = os.path.split(os.path.split(path)[0])[0]
@@ -23,7 +25,7 @@ print(RAY_REWORKED)
 #RAY_UI = p_join(RAY_UI, 'unittestData')
 RAY_UI = p_join(RAY_REWORKED, 'oldray_files')
 RAY_UI = p_join(RAY_UI, 'unittestData')
-
+print("old ray files in folder:",RAY_UI)
 scatterplot_size = 0.5
 
 
@@ -259,7 +261,7 @@ class Tests(unittest.TestCase):
     def test_globalCoord_20rays(self):
         correct = open_old_file(
             'Plane Mirror 3-RawRaysOutgoing_20Rays_mis.csv', 'Plane Mirror 3_')
-        result = open_new_file('output.csv', valid=1)
+        result = open_new_file('testFile_globalCoordinates_20rays.csv', valid=1)
         self.assertTrue(np.allclose(correct, result))
     
 
