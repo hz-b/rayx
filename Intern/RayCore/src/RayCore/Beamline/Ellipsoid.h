@@ -1,5 +1,5 @@
 #pragma once
-#include "Quadric.h"
+#include "Surface/Quadric.h"
 
 namespace RAY
 {
@@ -7,8 +7,8 @@ namespace RAY
     class RAY_API Ellipsoid : public Quadric {
 
     public:
-        
-        Ellipsoid(const char* name, const double width, const double height, const double grazingIncidence, const double azimuthal, const double distanceToPreceedingElement, 
+
+        Ellipsoid(const char* name, const double width, const double height, const double grazingIncidence, const double azimuthal, const double distanceToPreceedingElement,
             const double entranceArmLength, const double exitArmLength, const int coordSys, const int figRot, const double a11, const std::vector<double> misalignmentParams, const std::vector<double> slopeError, const Quadric* const previous);
         Ellipsoid();
         ~Ellipsoid();
@@ -38,7 +38,7 @@ namespace RAY
         double getA33();
         double getA44();
         double getHalfAxisC();
-        
+
     private:
         double m_totalWidth;
         double m_totalHeight;
@@ -61,18 +61,18 @@ namespace RAY
         double d_a34;
         double d_a33;
         double d_a44;
-        
-        enum FIGURE_ROTATION  { FR_YES, FR_PLANE, FR_A11};
+
+        enum FIGURE_ROTATION { FR_YES, FR_PLANE, FR_A11 };
         FIGURE_ROTATION m_figureRotation;
-        enum COORDINATESYSTEM_TYPE {CS_CURVATURE, CS_MIRROR};
+        enum COORDINATESYSTEM_TYPE { CS_CURVATURE, CS_MIRROR };
         COORDINATESYSTEM_TYPE m_misalignmentCoordSys;
         double m_a11; // param for quadric funciton, given by user
-        
+
         double d_halfAxisC; // derived from figure_rotation, a_11 and half axes a, b
         //double m_Depth;
         //double m_verDivergence;
         //double m_horDivergence;
-        
+
     };
 
 } // namespace RAY

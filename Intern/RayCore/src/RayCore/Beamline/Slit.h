@@ -1,5 +1,5 @@
 #pragma once
-#include "Quadric.h"
+#include "Surface/Quadric.h"
 
 namespace RAY
 {
@@ -7,8 +7,8 @@ namespace RAY
     class RAY_API Slit : public Quadric {
 
     public:
-        
-        Slit(const char* name, int beamstop, double width, double height, double azimuthal, double dist, double beamstopWidth, double beamstopHeight, double sourceEnergy, std::vector<double> misalignmentParams, Quadric* previous); 
+
+        Slit(const char* name, int beamstop, double width, double height, double azimuthal, double dist, double beamstopWidth, double beamstopHeight, double sourceEnergy, std::vector<double> misalignmentParams, Quadric* previous);
         Slit();
         ~Slit();
 
@@ -25,7 +25,7 @@ namespace RAY
         double m_totalWidth;
         double m_totalHeight;
         // grazing incidence, in rad
-        enum CENTRAL_BEAMSTOP {CS_NONE, CS_RECTANGLE, CS_ELLIPTICAL}; // central beamstop shape
+        enum CENTRAL_BEAMSTOP { CS_NONE, CS_RECTANGLE, CS_ELLIPTICAL }; // central beamstop shape
         CENTRAL_BEAMSTOP m_centralBeamstop;
         double m_beamstopWidth;
         double m_beamstopHeight;
@@ -35,7 +35,7 @@ namespace RAY
         //double m_Depth;
         //double m_verDivergence;
         //double m_horDivergence;
-        
+
     };
 
 } // namespace RAY

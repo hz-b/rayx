@@ -1,5 +1,5 @@
 #pragma once
-#include "Quadric.h"
+#include "Surface/Quadric.h"
 
 namespace RAY
 {
@@ -7,7 +7,7 @@ namespace RAY
     class RAY_API SphereGrating : public Quadric {
 
     public:
-        
+
         SphereGrating(const char* name, int mount, double width, double height, double deviation, double normalIncidence, double azimuthal, double distanceToPreceedingElement, double entranceArmLength, double exitArmLength, double designEnergyMounting, double lineDensity, double orderOfDiffraction, std::vector<double> misalignmentParams, std::vector<double> vls, std::vector<double> slopeError, Quadric* previous);
         SphereGrating();
         ~SphereGrating();
@@ -34,11 +34,11 @@ namespace RAY
         double getOrderOfDiffraction() const;
         double getA() const;
         std::vector<double> getVls() const;
-        
+
     private:
         double m_totalWidth;
         double m_totalHeight;
-        
+
         double m_radius;
         double m_exitArmLength;
         double m_entranceArmLength;
@@ -49,7 +49,7 @@ namespace RAY
         // in rad as well
         double m_chi;
         double m_distanceToPreceedingElement;
-        enum GRATING_MOUNT  { GM_DEVIATION, GM_INCIDENCE};
+        enum GRATING_MOUNT { GM_DEVIATION, GM_INCIDENCE };
         GRATING_MOUNT m_gratingMount;
         double m_designEnergyMounting;
         double m_lineDensity;
@@ -59,7 +59,7 @@ namespace RAY
         //double m_Depth;
         //double m_verDivergence;
         //double m_horDivergence;
-        
+
     };
 
 } // namespace RAY

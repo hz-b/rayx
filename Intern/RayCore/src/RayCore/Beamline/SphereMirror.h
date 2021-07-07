@@ -1,5 +1,5 @@
 #pragma once
-#include "Quadric.h"
+#include "Surface/Quadric.h"
 
 namespace RAY
 {
@@ -7,7 +7,7 @@ namespace RAY
     class RAY_API SphereMirror : public Quadric {
 
     public:
-        
+
         SphereMirror(const char* name, const double width, const double height, const double grazingIncidence, const double azimuthal, const double distanceToPreceedingElement, const double entranceArmLength, const double exitArmLength, const std::vector<double> misalignmentParams, const std::vector<double> slopeError, const Quadric* const previous);
         SphereMirror();
         ~SphereMirror();
@@ -37,7 +37,7 @@ namespace RAY
         //double m_Depth;
         //double m_verDivergence;
         //double m_horDivergence;
-        
+
     };
 
 } // namespace RAY

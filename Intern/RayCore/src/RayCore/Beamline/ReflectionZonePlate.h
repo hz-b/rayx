@@ -1,5 +1,5 @@
 #pragma once
-#include "Quadric.h"
+#include "Surface/Quadric.h"
 
 namespace RAY
 {
@@ -7,7 +7,7 @@ namespace RAY
     class RAY_API ReflectionZonePlate : public Quadric {
 
     public:
-        
+
         ReflectionZonePlate(const char* name, const int mount, const int curvatureType, const int designType, const int elementOffsetType, const double width, const double height, const double deviation, const double incidenceAngle, const double azimuthal, const double distanceToPreceedingElement, const double designEnergy, const double sourceEnergy, const double orderOfDiffraction, const double designOrderOfDiffraction, const double dAlpha, const double dBeta, const double mEntrance, const double mExit, const double sEntrance, const double sExit, const double shortRadius, const double longRadius, const int additional_zero_order, const double elementOffsetZ, const double fresnelZOffset, const double beta, const std::vector<double> misalignmentParams, const std::vector<double> slopeError, const Quadric* const previous);
         ReflectionZonePlate();
         ~ReflectionZonePlate();
@@ -28,14 +28,14 @@ namespace RAY
         void calcDesignOrderOfDiffraction(const double designOrderOfDiffraction);
         void focus(double angle);
         double rzpLineDensityDZ(const double X, const double Y, const double Z, const double FX, const double FY, const double FZ, const double WL);
-    
+
         void setBeta(const double beta); // in degree
 
         double getWidth() const;
         double getHeight() const;
         double getAlpha() const;
         double getBeta() const;
-        double getDesignAlphaAngle() const; 
+        double getDesignAlphaAngle() const;
         double getDesignBetaAngle() const;
 
         double getGratingMount() const;
@@ -60,7 +60,7 @@ namespace RAY
         double getDesignOrderOfDiffraction() const;
         double getDesignEnergyMounting() const; // derived from source?
         void printInfo() const;
-        
+
     private:
         double m_totalWidth;
         double m_totalHeight;
@@ -71,7 +71,7 @@ namespace RAY
         double m_incidenceMainBeamLength;
         double m_meridionalDistance;
         double m_meridionalDivergence;
-        double m_designAlphaAngle; 
+        double m_designAlphaAngle;
         double m_designBetaAngle; // what is this?
 
         double m_beta0Angle;
@@ -82,7 +82,7 @@ namespace RAY
         double m_grazingIncidenceAngle;
         double m_distanceToPreceedingElement;
 
-        enum GRATING_MOUNT  { GM_DEVIATION, GM_INCIDENCE};
+        enum GRATING_MOUNT { GM_DEVIATION, GM_INCIDENCE };
         GRATING_MOUNT m_gratingMount;
         enum CURVATURE_TYPE { CT_PLANE, CT_TOROIDAL, CT_SPHERICAL };
         CURVATURE_TYPE m_curvatureType;
@@ -90,13 +90,13 @@ namespace RAY
         DESIGN_TYPE m_designType;
         enum DERIVATION_METHOD { DM_FORMULA, DM_PLOYNOM };
         DERIVATION_METHOD m_derivationMethod;
-        enum IMAGE_TYPE {IT_POINT2POINT, IT_ASTIGMATIC2ASTIGMATIC};
+        enum IMAGE_TYPE { IT_POINT2POINT, IT_ASTIGMATIC2ASTIGMATIC };
         IMAGE_TYPE m_imageType;
-        enum RZP_TYPE {RT_ELLIPTICAL, RT_MERIODIONAL};
+        enum RZP_TYPE { RT_ELLIPTICAL, RT_MERIODIONAL };
         RZP_TYPE m_rzpType;
-        enum ELEMENTOFFSET_TYPE {EZ_MANUAL, EZ_BEAMDIVERGENCE};
+        enum ELEMENTOFFSET_TYPE { EZ_MANUAL, EZ_BEAMDIVERGENCE };
         ELEMENTOFFSET_TYPE m_elementOffsetType;
-        enum ADDITIONAL_ZERO_ORDER {AO_OFF, AO_ON};
+        enum ADDITIONAL_ZERO_ORDER { AO_OFF, AO_ON };
         ADDITIONAL_ZERO_ORDER m_additionalOrder;
 
         double m_longRadius;
@@ -122,11 +122,11 @@ namespace RAY
         double m_designOrderOfDiffraction;
         double m_designEnergyMounting; // derived from source?
         double m_a; // calculated from line density, order of diffracion and design energy mounting
-        
-        
-        enum FULL_EFFICIENCY {FE_OFF, FE_ON};
+
+
+        enum FULL_EFFICIENCY { FE_OFF, FE_ON };
         FULL_EFFICIENCY m_fullEfficiency; // todo
-        enum DIFFRACTION_METHOD {DM_TWOGRATINGS, DM_2D};
+        enum DIFFRACTION_METHOD { DM_TWOGRATINGS, DM_2D };
         DIFFRACTION_METHOD m_diffractionMethod; // only use 2D
         double m_elementOffsetZ; // if given manually
         double m_elementOffsetZCalc; // if not given but has to be calculated by beam divergence

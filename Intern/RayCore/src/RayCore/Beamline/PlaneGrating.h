@@ -1,5 +1,5 @@
 #pragma once
-#include "Quadric.h"
+#include "Surface/Quadric.h"
 
 namespace RAY
 {
@@ -7,7 +7,7 @@ namespace RAY
     class RAY_API PlaneGrating : public Quadric {
 
     public:
-        
+
         PlaneGrating(const char* name, const int mount, const double width, const double height, const double deviation, const double normalIncidence, const double azimuthal, const double distanceToPreceedingElement, const double designEnergyMounting, const double lineDensity, const double orderOfDiffraction, const double fixFocusConstantCFF, const int additional_zero_order, const std::vector<double> misalignmentParams, const std::vector<double> vls, const std::vector<double> slopeError, const Quadric* const previous);
         PlaneGrating();
         ~PlaneGrating();
@@ -30,7 +30,7 @@ namespace RAY
         double getOrderOfDiffraction();
         double getA(); // calculated from line density, order of diffracion and design energy mounting
         std::vector<double> getVls();
-        
+
     private:
         double m_totalWidth;
         double m_totalHeight;
@@ -40,10 +40,10 @@ namespace RAY
         // in rad as well
         double m_chi;
         double m_distanceToPreceedingElement;
-        enum GRATING_MOUNT  { GM_DEVIATION, GM_INCIDENCE, GM_CCF, GM_CCF_NO_PREMIRROR};
+        enum GRATING_MOUNT { GM_DEVIATION, GM_INCIDENCE, GM_CCF, GM_CCF_NO_PREMIRROR };
         GRATING_MOUNT m_gratingMount;
         double m_fixFocusConstantCFF;
-        enum ADDITIONAL_ZERO_ORDER {AO_OFF, AO_ON};
+        enum ADDITIONAL_ZERO_ORDER { AO_OFF, AO_ON };
         ADDITIONAL_ZERO_ORDER m_additionalOrder;
 
         double m_designEnergyMounting;
@@ -51,7 +51,7 @@ namespace RAY
         double m_orderOfDiffraction;
         double m_a; // calculated from line density, order of diffracion and design energy mounting
         std::vector<double> m_vls;
-        
+
     };
 
 } // namespace RAY

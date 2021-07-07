@@ -12,12 +12,13 @@ SET(SOURCE
     src/RayCore/Beamline/Ellipsoid.cpp
     src/RayCore/Beamline/ReflectionZonePlate.cpp
     src/RayCore/Beamline/Slit.cpp
-    src/RayCore/Beamline/Quadric.cpp
     src/RayCore/Beamline/SphereGrating.cpp
     src/RayCore/Beamline/PlaneGrating.cpp
     src/RayCore/Beamline/PlaneMirror.cpp
     src/RayCore/Beamline/PointSource.cpp
     src/RayCore/Beamline/SphereMirror.cpp
+    src/RayCore/Surface/Quadric.cpp
+    src/RayCore/Surface/Surface.cpp
     src/RayCore/utils.cpp
     src/RayCore/Tracer/Ray.cpp
     src/RayCore/Tracer/TracerInterface.cpp
@@ -37,12 +38,13 @@ SET(HEADERS
     src/RayCore/Beamline/Ellipsoid.h
     src/RayCore/Beamline/ReflectionZonePlate.h
     src/RayCore/Beamline/Slit.h
-    src/RayCore/Beamline/Quadric.h
     src/RayCore/Beamline/SphereGrating.h
     src/RayCore/Beamline/PlaneGrating.h
     src/RayCore/Beamline/PlaneMirror.h
     src/RayCore/Beamline/PointSource.h
     src/RayCore/Beamline/SphereMirror.h
+    src/RayCore/Surface/Quadric.h
+    src/RayCore/Surface/Surface.h
     src/RayCore/utils.h
     src/RayCore/Tracer/Ray.h
     src/RayCore/Tracer/TracerInterface.h
