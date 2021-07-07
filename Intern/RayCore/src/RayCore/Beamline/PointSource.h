@@ -9,20 +9,20 @@ namespace RAY
     {
     public:
 
-        PointSource(int id, std::string name, int numberOfRays, int spreadType, double sourceWidth, double sourceHeight,
-            double sourceDepth, double horDivergence, double verDivergence, int widthDist, int heightDist, int horDist, int verDist, double photonEnergy, double energySpread, std::vector<double> misalignment);
+        PointSource(const int id, const std::string name, const int numberOfRays, const int spreadType, const double sourceWidth, const double sourceHeight,
+            const double sourceDepth, const double horDivergence, const double verDivergence, const int widthDist, const int heightDist, const int horDist, const int verDist, const double photonEnergy, const double energySpread, const std::vector<double> misalignment);
 
         PointSource();
         ~PointSource();
 
         enum SOURCE_DIST { SD_HARDEDGE, SD_GAUSSIAN };
         std::vector<Ray> getRays();
-        double getCoord(SOURCE_DIST l, double extent);
-        double getSourceDepth();
-        double getSourceHeight();
-        double getSourceWidth();
-        double getVerDivergence();
-        double getHorDivergence();
+        double getCoord(const SOURCE_DIST l, const double extent);
+        double getSourceDepth() const;
+        double getSourceHeight() const;
+        double getSourceWidth() const;
+        double getVerDivergence() const;
+        double getHorDivergence() const;
 
     private:
         double m_sourceDepth;

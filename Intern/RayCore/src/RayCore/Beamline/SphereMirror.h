@@ -8,20 +8,20 @@ namespace RAY
 
     public:
         
-        SphereMirror(const char* name, double width, double height, double grazingIncidence, double azimuthal, double distanceToPreceedingElement, double entranceArmLength, double exitArmLength, std::vector<double> misalignmentParams, std::vector<double> slopeError,Quadric* previous);
+        SphereMirror(const char* name, const double width, const double height, const double grazingIncidence, const double azimuthal, const double distanceToPreceedingElement, const double entranceArmLength, const double exitArmLength, const std::vector<double> misalignmentParams, const std::vector<double> slopeError, const Quadric* const previous);
         SphereMirror();
         ~SphereMirror();
 
         void calcRadius();
-        double getWidth();
-        double getHeight();
-        double getRadius();
-        double getBeta();
-        double getAlpha();
-        double getChi();
-        double getDist();
-        double getEntranceArmLength();
-        double getExitArmLength();
+        double getWidth() const;
+        double getHeight() const;
+        double getRadius() const;
+        double getBeta() const;
+        double getAlpha() const;
+        double getChi() const;
+        double getDist() const;
+        double getEntranceArmLength() const;
+        double getExitArmLength() const;
 
     private:
         double m_totalWidth;

@@ -4,8 +4,8 @@
 
 namespace RAY
 {
-    LightSource::LightSource(int id, int numberOfRays, std::string name, int spreadType,
-        double photonEnergy, double energySpread, std::vector<double> misalignment)
+    LightSource::LightSource(const int id, const int numberOfRays, const std::string name, const int spreadType,
+        const double photonEnergy, const double energySpread, const std::vector<double> misalignment)
         : m_id(id),
         m_numberOfRays(numberOfRays),
         m_name(name),
@@ -23,12 +23,12 @@ namespace RAY
     double LightSource::getEnergySpread() { return m_energySpread; }
     int LightSource::getSpreadType() { return m_energySpreadType; }
 
-    void LightSource::setNumberOfRays(int numberOfRays) { m_numberOfRays = numberOfRays; }
+    void LightSource::setNumberOfRays(const int numberOfRays) { m_numberOfRays = numberOfRays; }
     int LightSource::getId() { return m_id; }
     std::vector<double> LightSource::getMisalignmentParams() { return m_misalignmentParams; }
 
     // needed for many of the light sources, from two angles to one direction vector
-    glm::dvec3 LightSource::getDirectionFromAngles(double phi, double psi) {
+    glm::dvec3 LightSource::getDirectionFromAngles(const double phi, const double psi) {
         double al = cos(psi) * sin(phi);
         double am = -sin(psi);
         double an = cos(psi) * cos(phi);

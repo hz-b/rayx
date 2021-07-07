@@ -4,7 +4,7 @@
 
 namespace RAY
 {
-    Quadric::Quadric(const char* name, std::vector<double> inputPoints, std::vector<double> inputInMatrix, std::vector<double> inputOutMatrix, std::vector<double> misalignmentMatrix, std::vector<double> inverseMisalignmentMatrix, std::vector<double> OParameters, std::vector<double> EParameters)
+    Quadric::Quadric(const char* name, const std::vector<double> inputPoints, const std::vector<double> inputInMatrix, const std::vector<double> inputOutMatrix, const std::vector<double> misalignmentMatrix, const std::vector<double> inverseMisalignmentMatrix, const std::vector<double> OParameters, const std::vector<double> EParameters)
     {
         m_name = name;
         std::cout << inputPoints.size() << inputInMatrix.size() << inputOutMatrix.size() << misalignmentMatrix.size() << inverseMisalignmentMatrix.size() << EParameters.size() << OParameters.size() << std::endl;
@@ -36,7 +36,7 @@ namespace RAY
      * @param misalignmentParams        angles and distances for the object's misalignment
      * @param tempMisalignmentParams    parameters for temporary misalignment that can be removed midtracing.
     */
-    Quadric::Quadric(const char* name, std::vector<double> inputPoints, std::vector<double> EParameters, double width, double height, double alpha, double chi, double beta, double dist, std::vector<double> misalignmentParams, std::vector<double> tempMisalignmentParams, std::vector<double> slopeError, Quadric* previous)
+    Quadric::Quadric(const char* name, const std::vector<double> inputPoints, const std::vector<double> EParameters, const double width, const double height, const double alpha, const double chi, const double beta, const double dist, const std::vector<double> misalignmentParams, const std::vector<double> tempMisalignmentParams, const std::vector<double> slopeError, const Quadric* const previous)
     {
         m_name = name;
         m_previous = previous;
@@ -54,7 +54,7 @@ namespace RAY
         setTemporaryMisalignment(tempMisalignmentParams);
     }
 
-    Quadric::Quadric(const char* name, double width, double height, std::vector<double> slopeError, Quadric* previous) : m_name(name), m_previous(previous) {
+    Quadric::Quadric(const char* name, const double width, const double height, const std::vector<double> slopeError, const Quadric* const previous) : m_name(name), m_previous(previous) {
         m_slopeError = slopeError;
         setObjectParameters({
             width, height, slopeError[0], slopeError[1],
@@ -82,7 +82,7 @@ namespace RAY
      * @param misalignment  misalignment x,y,z,psi,phi,chi
      * @return void
     */
-    void Quadric::calcTransformationMatrices(double alpha, double chi, double beta, double dist, std::vector<double> misalignment) {
+    void Quadric::calcTransformationMatrices(const double alpha, const double chi, const double beta, const double dist, const std::vector<double> misalignment) {
         double cos_c = cos(chi);
         double sin_c = sin(chi);
         double cos_a = cos(alpha);
@@ -169,8 +169,8 @@ namespace RAY
         m_outMatrix = d_e2g;
 
         // to use usual ray coordinatesystem, also contains misalignment
-        // m_inMatrix = d_b2e;
-        // m_outMatrix = d_e2b;
+        //m_inMatrix = d_b2e;
+        //m_outMatrix = d_e2b;
 
         std::cout << "inMatrix: " << m_inMatrix.size() << std::endl;
         for (int i = 0; i < 16; i++) {

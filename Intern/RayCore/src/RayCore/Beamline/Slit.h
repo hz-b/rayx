@@ -8,18 +8,18 @@ namespace RAY
 
     public:
         
-        Slit(const char* name, int beamstop, double width, double height, double azimuthal, double dist, double beamstopWidth, double beamstopHeight, double sourceEnergy, std::vector<double> misalignmentParams,std::vector<double> slopeError, Quadric* previous); 
+        Slit(const char* name, int beamstop, double width, double height, double azimuthal, double dist, double beamstopWidth, double beamstopHeight, double sourceEnergy, std::vector<double> misalignmentParams, Quadric* previous); 
         Slit();
         ~Slit();
 
-        double getWidth();
-        double getHeight();
-        double getChi();
-        double getDist();
-        int getCentralBeamstop();
-        double getBeamstopWidth();
-        double getBeamstopHeight();
-        double getWaveLength();
+        double getWidth() const;
+        double getHeight() const;
+        double getChi() const;
+        double getDist() const;
+        int getCentralBeamstop() const;
+        double getBeamstopWidth() const;
+        double getBeamstopHeight() const;
+        double getWaveLength() const;
 
     private:
         double m_totalWidth;

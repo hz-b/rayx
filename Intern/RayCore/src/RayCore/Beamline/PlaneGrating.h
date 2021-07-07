@@ -8,11 +8,11 @@ namespace RAY
 
     public:
         
-        PlaneGrating(const char* name, int mount, double width, double height, double deviation, double normalIncidence, double azimuthal, double distanceToPreceedingElement, double designEnergyMounting, double lineDensity, double orderOfDiffraction, double fixFocusConstantCFF, int additional_zero_order, std::vector<double> misalignmentParams, std::vector<double> vls, std::vector<double> slopeError, Quadric* previous);
+        PlaneGrating(const char* name, const int mount, const double width, const double height, const double deviation, const double normalIncidence, const double azimuthal, const double distanceToPreceedingElement, const double designEnergyMounting, const double lineDensity, const double orderOfDiffraction, const double fixFocusConstantCFF, const int additional_zero_order, const std::vector<double> misalignmentParams, const std::vector<double> vls, const std::vector<double> slopeError, const Quadric* const previous);
         PlaneGrating();
         ~PlaneGrating();
 
-        void calcAlpha(double deviation, double normalIncidence);
+        void calcAlpha(const double deviation, const double normalIncidence);
         void focus(double angle);
 
         double getWidth();

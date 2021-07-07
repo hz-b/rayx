@@ -1218,6 +1218,28 @@ TEST(globalCoordinates, FourMirrors_20Rays) {
 }
 
 
+
+TEST(opticalElements, slit1) {
+    RAY::MatrixSource m = RAY::MatrixSource(0, "matrix source", 20000, 0, 0.065, 0.04, 0, 0.001, 0.001, 100, 0, { 0,0,0,0 });
+    RAY::Slit s = RAY::Slit("slit", 1, 20, 2, 0, 10000, 20, 1, m.getPhotonEnergy(), { 0,0,0, 0,0,0 }, nullptr);
+    RAY::ImagePlane ip = RAY::ImagePlane("Image plane", 1000, &s);
+    std::list<double> outputRays = runTracer(m.getRays(), {s,ip});
+    int counter = 0;
+    for (std::list<double>::iterator i = outputRays.begin(); i != outputRays.end();) {
+        if (counter % 8 == 1) { // y loc
+            ASSERT_TRUE(abs(*i) >= 0.6);
+            ASSERT_TRUE(abs(*i) <= 1.2);
+        }else if(counter & 8 == 0) {
+            ASSERT_TRUE(abs(*i) <= 5.6);
+        }
+        counter++;
+        i++;
+    }
+}
+
+
+// PETES SETUP
+// spec1-first_rzp4mm
 TEST(PeteRZP, spec1_first_rzp) {
     RAY::PointSource p = RAY::PointSource(0, "spec1_first_rzp",20000 , 1, 0.005,0.005,0, 0.02,0.06, 1,1,0,0, 640, 120, {0,0,0,0});
     RAY::ReflectionZonePlate rzp = RAY::ReflectionZonePlate("ReflectionZonePete", 1, 0, 1, 1, 4, 60, 170, 2.2, 0, 90, p.getPhotonEnergy(), p.getPhotonEnergy(), -1, -1, 2.2, 1, 90, 400, 90, 400, 0, 0, 1, 0, 0, 1, { 0,0,0, 0,0,0 }, zeros7, nullptr); // dx,dy,dz, dpsi,dphi,dchi //

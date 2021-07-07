@@ -104,53 +104,53 @@ namespace RAY
         }
     }
 
-    double SphereGrating::getWidth() {
+    double SphereGrating::getWidth() const {
         return m_totalWidth;
     }
 
-    double SphereGrating::getHeight() {
+    double SphereGrating::getHeight() const {
         return m_totalHeight;
     }
 
-    double SphereGrating::getRadius() {
+    double SphereGrating::getRadius() const {
         return m_radius;
     }
 
-    double SphereGrating::getExitArmLength() {
+    double SphereGrating::getExitArmLength() const {
         return m_exitArmLength;
     }
-    double SphereGrating::getEntranceArmLength(){
+    double SphereGrating::getEntranceArmLength() const {
         return m_entranceArmLength;
     }
     // angles in rad and normal angles (measured from normal! not incidence!!)
-    double SphereGrating::getAlpha(){
+    double SphereGrating::getAlpha() const {
         return m_alpha;
     }
-    double SphereGrating::getBeta(){
+    double SphereGrating::getBeta() const {
         return m_beta;
     }
-    double SphereGrating::getDeviation(){
+    double SphereGrating::getDeviation() const {
         return m_deviation;
     }
-    double SphereGrating::getChi() {
+    double SphereGrating::getChi() const {
         return m_chi;
     }
-    double SphereGrating::getDistanceToPreceedingElement(){
+    double SphereGrating::getDistanceToPreceedingElement() const {
         return m_distanceToPreceedingElement;
     }
-    int SphereGrating::getGratingMount(){
+    int SphereGrating::getGratingMount() const {
         return m_gratingMount;
     }
-    double SphereGrating::getDesignEnergyMounting(){
+    double SphereGrating::getDesignEnergyMounting() const {
         return m_designEnergyMounting;
     }
-    double SphereGrating::getLineDensity(){
+    double SphereGrating::getLineDensity() const {
         return m_lineDensity;
     }
-    double SphereGrating::getOrderOfDiffraction(){
+    double SphereGrating::getOrderOfDiffraction() const {
         return m_orderOfDiffraction;
     }
-    double SphereGrating::getA(){
+    double SphereGrating::getA() const {
         return m_a;
     }
     

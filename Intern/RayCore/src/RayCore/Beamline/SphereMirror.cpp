@@ -14,7 +14,7 @@ namespace RAY
      *          distanceToPreceedingElement
      * 
     */
-    SphereMirror::SphereMirror(const char* name, double width, double height, double grazingIncidence, double azimuthal, double distanceToPreceedingElement, double entranceArmLength, double exitArmLength, std::vector<double> misalignmentParams,std::vector<double> slopeError, Quadric* previous) 
+    SphereMirror::SphereMirror(const char* name, const double width, const double height, const double grazingIncidence, const double azimuthal, const double distanceToPreceedingElement, const double entranceArmLength, const double exitArmLength, const std::vector<double> misalignmentParams, const std::vector<double> slopeError, const Quadric* const previous) 
     : Quadric(name,{1,0,0,0, width,1,0,-1, height,0,1,0, 0,0,0,0}, {0,0,0,0, 0,0,0,0, 0,0,0,0, 0,0,0,0}, width, height, rad(grazingIncidence), rad(azimuthal), rad(grazingIncidence), distanceToPreceedingElement, misalignmentParams, {0,0,0,0,0,0}, slopeError, previous) {
         // std::vector<double> inputPoints = {0,0,0,0, 0,0,0,-1, 0,0,0,0, 0,0,0,0};
         m_totalWidth = width;
@@ -40,38 +40,38 @@ namespace RAY
     }
 
 
-    double SphereMirror::getWidth() {
+    double SphereMirror::getWidth() const {
         return m_totalWidth;
     }
 
-    double SphereMirror::getHeight() {
+    double SphereMirror::getHeight() const {
         return m_totalHeight;
     }
 
-    double SphereMirror::getRadius() {
+    double SphereMirror::getRadius() const {
         return m_radius;
     }
 
-    double SphereMirror::getBeta() {
+    double SphereMirror::getBeta() const {
         return m_beta;
     }
 
-    double SphereMirror::getAlpha() {
+    double SphereMirror::getAlpha() const {
         return m_alpha;
     }
     
-    double SphereMirror::getChi() {
+    double SphereMirror::getChi() const {
         return m_chi;
     }
-    double SphereMirror::getDist() {
+    double SphereMirror::getDist() const {
         return m_distanceToPreceedingElement;
     }
 
-    double SphereMirror::getExitArmLength() {
+    double SphereMirror::getExitArmLength() const {
         return m_exitArmLength;
     }
 
-    double SphereMirror::getEntranceArmLength() {
+    double SphereMirror::getEntranceArmLength() const {
         return m_entranceArmLength;
     }
 }

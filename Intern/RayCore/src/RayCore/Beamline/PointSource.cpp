@@ -6,10 +6,10 @@ namespace RAY
 {
 
 
-    PointSource::PointSource(int id, std::string name, int numberOfRays, int spreadType,
-        double sourceWidth, double sourceHeight, double sourceDepth, double horDivergence,
-        double verDivergence, int widthDist, int heightDist, int horDist, int verDist,
-        double photonEnergy, double energySpread, std::vector<double> misalignment)
+    PointSource::PointSource(const int id, const std::string name, const int numberOfRays, const int spreadType,
+        const double sourceWidth, const double sourceHeight, const double sourceDepth, const double horDivergence,
+        const double verDivergence, const int widthDist, const int heightDist, const int horDist, const int verDist,
+        const double photonEnergy, const double energySpread, const std::vector<double> misalignment)
         : LightSource(id, numberOfRays, name.c_str(), spreadType, photonEnergy, energySpread, misalignment),
         m_sourceDepth(sourceDepth),
         m_sourceHeight(sourceHeight),
@@ -71,7 +71,7 @@ namespace RAY
     /**
      * get deviation from main ray according to specified distribution (uniform if hard edge, gaussian if soft edge)) and extent (eg specified width/height of source)
      */
-    double PointSource::getCoord(PointSource::SOURCE_DIST l, double extent) {
+    double PointSource::getCoord(const PointSource::SOURCE_DIST l, const double extent) {
         if (l == SD_HARDEDGE) {
             return (m_uniform(m_re) - 0.5) * extent;
         }
@@ -80,9 +80,9 @@ namespace RAY
         }
     }
 
-    double PointSource::getSourceDepth() { return m_sourceDepth; }
-    double PointSource::getSourceHeight() { return m_sourceHeight; }
-    double PointSource::getSourceWidth() { return m_sourceWidth; }
-    double PointSource::getVerDivergence() { return m_verDivergence; }
-    double PointSource::getHorDivergence() { return m_horDivergence; }
+    double PointSource::getSourceDepth() const { return m_sourceDepth; }
+    double PointSource::getSourceHeight() const { return m_sourceHeight; }
+    double PointSource::getSourceWidth() const { return m_sourceWidth; }
+    double PointSource::getVerDivergence() const { return m_verDivergence; }
+    double PointSource::getHorDivergence() const { return m_horDivergence; }
 } // namespace RAY

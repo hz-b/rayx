@@ -22,7 +22,7 @@ namespace RAY
      * @param slopeError            7 slope error parameters: x-y sagittal (0), y-z meridional (1), thermal distortion x (2),y (3),z (4), cylindrical bowing amplitude y(5) and radius (6)
      * @param previous              pointer to previous element in beamline, needed for caclultation transformation matrices in global coordinate system
     */
-    PlaneGrating::PlaneGrating(const char* name, int mount, double width, double height, double deviation, double normalIncidence, double azimuthal, double distanceToPreceedingElement, double designEnergyMounting, double lineDensity, double orderOfDiffraction, double fixFocusConstantCFF, int additional_zero_order, std::vector<double> misalignmentParams, std::vector<double> vls, std::vector<double> slopeError, Quadric* previous) 
+    PlaneGrating::PlaneGrating(const char* name, const int mount, const double width, const double height, const double deviation, const double normalIncidence, const double azimuthal, const double distanceToPreceedingElement, const double designEnergyMounting, const double lineDensity, const double orderOfDiffraction, const double fixFocusConstantCFF, const int additional_zero_order, const std::vector<double> misalignmentParams, const std::vector<double> vls, const std::vector<double> slopeError, const Quadric* const previous) 
     : Quadric(name, width, height, slopeError, previous) {
         // parameters in array 
         // std::vector<double> inputPoints = {0,0,0,0, 0,0,0,-1, 0,0,0,0, 0,0,0,0};
@@ -58,7 +58,7 @@ namespace RAY
     {
     }
 
-    void PlaneGrating::calcAlpha(double deviation, double normalIncidence) {
+    void PlaneGrating::calcAlpha(const double deviation, const double normalIncidence) {
         double angle;
         if (m_gratingMount == GM_DEVIATION) {
             angle = deviation;

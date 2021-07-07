@@ -8,11 +8,11 @@ namespace RAY
 
     public:
         
-        ReflectionZonePlate(const char* name, int mount, int curvatureType, int designType, int elementOffsetType, double width, double height, double deviation, double incidenceAngle, double azimuthal, double distanceToPreceedingElement, double designEnergy, double sourceEnergy, double orderOfDiffraction, double designOrderOfDiffraction, double dAlpha, double dBeta, double mEntrance, double mExit, double sEntrance, double sExit, double shortRadius, double longRadius, int additional_zero_order, double elementOffsetZ, double fresnelZOffset, double beta, std::vector<double> misalignmentParams, std::vector<double> slopeError, Quadric* previous);
+        ReflectionZonePlate(const char* name, const int mount, const int curvatureType, const int designType, const int elementOffsetType, const double width, const double height, const double deviation, const double incidenceAngle, const double azimuthal, const double distanceToPreceedingElement, const double designEnergy, const double sourceEnergy, const double orderOfDiffraction, const double designOrderOfDiffraction, const double dAlpha, const double dBeta, const double mEntrance, const double mExit, const double sEntrance, const double sExit, const double shortRadius, const double longRadius, const int additional_zero_order, const double elementOffsetZ, const double fresnelZOffset, const double beta, const std::vector<double> misalignmentParams, const std::vector<double> slopeError, const Quadric* const previous);
         ReflectionZonePlate();
         ~ReflectionZonePlate();
 
-        void calcDesignAlphaAngle(double deviation, double normalIncidence);
+        void calcDesignAlphaAngle(const double deviation, const double normalIncidence);
         void calcAlpha2();
         void calcBeta2();
         void Illumination();
@@ -25,41 +25,41 @@ namespace RAY
         void VectorR1Center();
         void VectorR2Center();
 
-        void calcDesignOrderOfDiffraction(double designOrderOfDiffraction);
+        void calcDesignOrderOfDiffraction(const double designOrderOfDiffraction);
         void focus(double angle);
-        double rzpLineDensityDZ(double X, double Y, double Z, double FX, double FY, double FZ, double WL);
+        double rzpLineDensityDZ(const double X, const double Y, const double Z, const double FX, const double FY, const double FZ, const double WL);
     
-        void setBeta(double beta); // in degree
+        void setBeta(const double beta); // in degree
 
-        double getWidth();
-        double getHeight();
-        double getAlpha();
-        double getBeta();
-        double getDesignAlphaAngle(); 
-        double getDesignBetaAngle();
+        double getWidth() const;
+        double getHeight() const;
+        double getAlpha() const;
+        double getBeta() const;
+        double getDesignAlphaAngle() const; 
+        double getDesignBetaAngle() const;
 
-        double getGratingMount();
+        double getGratingMount() const;
 
-        double getLongRadius();
-        double getShortRadius();
+        double getLongRadius() const;
+        double getShortRadius() const;
 
-        double getFresnelZOffset();
-        double getCalcFresnelZOffset();
+        double getFresnelZOffset() const;
+        double getCalcFresnelZOffset() const;
         // input and exit vector lengths
-        double getSagittalEntranceArmLength();
-        double getSagittalExitArmLength();
-        double getMeridionalEntranceArmLength();
-        double getMeridionalExitArmLength();
-        double getR1ArmLength();
-        double getR2ArmLength(); // what is this now??
+        double getSagittalEntranceArmLength() const;
+        double getSagittalExitArmLength() const;
+        double getMeridionalEntranceArmLength() const;
+        double getMeridionalExitArmLength() const;
+        double getR1ArmLength() const;
+        double getR2ArmLength() const; // what is this now??
 
-        double getDesignEnergy();//Mounting;
-        double getWaveLength();
-        double getLineDensity();
-        double getOrderOfDiffraction();
-        double getDesignOrderOfDiffraction();
-        double getDesignEnergyMounting(); // derived from source?
-        void printInfo();
+        double getDesignEnergy() const;//Mounting;
+        double getWaveLength() const;
+        double getLineDensity() const;
+        double getOrderOfDiffraction() const;
+        double getDesignOrderOfDiffraction() const;
+        double getDesignEnergyMounting() const; // derived from source?
+        void printInfo() const;
         
     private:
         double m_totalWidth;

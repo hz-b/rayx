@@ -8,7 +8,7 @@ namespace RAY
 
     public:
         
-        ImagePlane(const char* name, double distance, Quadric* previous); 
+        ImagePlane(const char* name, const double distance, const Quadric* const previous); 
         ImagePlane();
         ~ImagePlane();
 

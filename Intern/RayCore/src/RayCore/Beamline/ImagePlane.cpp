@@ -9,7 +9,7 @@ namespace RAY
      * @param previous           pointer to previous element in beamline, needed for calculating world coordinates
      *
     */
-    ImagePlane::ImagePlane(const char* name, double distance, Quadric* previous)
+    ImagePlane::ImagePlane(const char* name, const double distance, const Quadric* const previous)
         : Quadric(name, 0, 0, {0,0,0,0,0, 0,0}, previous) {
         m_distance = distance;
         // std::vector<double> inputPoints = {0,0,0,0, 0,0,0,-1, 0,0,0,0, 0,0,0,0};

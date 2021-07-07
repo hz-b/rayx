@@ -6,9 +6,9 @@
 namespace RAY {
     class RAY_API Quadric {
         public:
-            Quadric(const char* name, std::vector<double> inputPoints, std::vector<double> inputInMatrix, std::vector<double> inputOutMatrix, std::vector<double> misalignmentMatrix, std::vector<double> inverseMisalignmentMatrix, std::vector<double> OParameters, std::vector<double> EParameters);
-            Quadric(const char* name, std::vector<double> inputPoints, std::vector<double> EParameters, double width, double height, double alpha, double chi, double beta, double dist, std::vector<double> misalignmentParams, std::vector<double> tempMisalignmentParams, std::vector<double> slopeError, Quadric* previous);
-            Quadric(const char* name, double width, double height, std::vector<double> slopeError, Quadric* previous);
+            Quadric(const char* name, const std::vector<double> inputPoints, const std::vector<double> inputInMatrix, const std::vector<double> inputOutMatrix, const std::vector<double> misalignmentMatrix, const std::vector<double> inverseMisalignmentMatrix, const std::vector<double> OParameters, const std::vector<double> EParameters);
+            Quadric(const char* name, const std::vector<double> inputPoints, const std::vector<double> EParameters, const double width, const double height, const double alpha, const double chi, const double beta, const double dist, const std::vector<double> misalignmentParams, const std::vector<double> tempMisalignmentParams, const std::vector<double> slopeError, const Quadric* const previous);
+            Quadric(const char* name, const double width, const double height, const std::vector<double> slopeError, const Quadric* const previous);
 
             std::vector<double> getQuadric();
             void setElementParameters(std::vector<double> params);
@@ -40,7 +40,7 @@ namespace RAY {
             std::vector<double> getSlopeError() const;
             const char* getName() const;
 
-            void calcTransformationMatrices(double alpha, double chi, double beta, double dist, std::vector<double> misalignment);
+            void calcTransformationMatrices(const double alpha, const double chi, const double beta, const double dist, const std::vector<double> misalignment);
             // set misalignment that needs to be removed separated from the transformation matrices during tracing
             void setTemporaryMisalignment(std::vector<double> misalignment);
             
@@ -48,7 +48,7 @@ namespace RAY {
             ~Quadric();
         private:
             const char* m_name;
-            Quadric* m_previous;
+            const Quadric* m_previous;
             std::vector<double> m_anchorPoints;
             // dx,dy,dz,psi(x-axis),dphi(y-axis),dchi(z-axis) angles in rad, the order is fixed. This is added to the ray together with the InTrans and OutTrans in the beginning and end of the tracing process.
             std::vector<double> m_misalignmentParams; 

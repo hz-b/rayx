@@ -19,7 +19,7 @@ namespace RAY
      *          lineDensity = line density of the grating
      *          orderOfDiffraction =
     */
-    ReflectionZonePlate::ReflectionZonePlate(const char* name, int mount, int curvatureType, int designType, int elementOffsetType, double width, double height, double deviation, double incidenceAngle, double azimuthal, double distanceToPreceedingElement, double designEnergy, double sourceEnergy, double orderOfDiffraction, double designOrderOfDiffraction, double dAlpha, double dBeta, double mEntrance, double mExit, double sEntrance, double sExit, double shortRadius, double longRadius, int additional_zero_order, double elementOffsetZ, double fresnelZOffset, double beta, std::vector<double> misalignmentParams, std::vector<double> slopeError, Quadric* previous) 
+    ReflectionZonePlate::ReflectionZonePlate(const char* name, const int mount, const int curvatureType, const int designType, const int elementOffsetType, const double width, const double height, const double deviation, const double incidenceAngle, const double azimuthal, const double distanceToPreceedingElement, const double designEnergy, const double sourceEnergy, const double orderOfDiffraction, const double designOrderOfDiffraction, const double dAlpha, const double dBeta, const double mEntrance, const double mExit, const double sEntrance, const double sExit, const double shortRadius, const double longRadius, const int additional_zero_order, const double elementOffsetZ, const double fresnelZOffset, const double beta, const std::vector<double> misalignmentParams, const std::vector<double> slopeError, const Quadric* const previous) 
        : Quadric(name, width, height, slopeError, previous) {
         m_totalWidth = width;
         m_totalHeight = height;
@@ -97,7 +97,8 @@ namespace RAY
     {
     }
 
-    void ReflectionZonePlate::printInfo() {
+    void ReflectionZonePlate::printInfo() const
+    {
         std::cout.precision(17);
 
         std::cout << m_elementOffsetType;
@@ -202,7 +203,7 @@ namespace RAY
      *          incidenceAngle: grazing incidence angle
     */
     // never called??
-    void ReflectionZonePlate::calcDesignAlphaAngle(double deviation, double incidenceAngle) {
+    void ReflectionZonePlate::calcDesignAlphaAngle(const double deviation, const double incidenceAngle) {
         //double angle;
         if (m_gratingMount == GM_DEVIATION) {
             focus(deviation); // focus(hv=beamline->getPhotonEnergy, angle, d0=calcDz00, ord=orderofdiff, alpha, beta)
@@ -366,7 +367,7 @@ namespace RAY
      *
      * @params: designOrderOfDiffraction: parameter given by user
     */
-    void ReflectionZonePlate::calcDesignOrderOfDiffraction(double designOrderOfDiffraction) {
+    void ReflectionZonePlate::calcDesignOrderOfDiffraction(const double designOrderOfDiffraction) {
         int presign;
         if (m_designType == DT_ZOFFSET) {
             presign = (m_designAlphaAngle >= m_designBetaAngle) ? -1 : 1;
@@ -379,7 +380,7 @@ namespace RAY
     }
 
     // never called??
-    void ReflectionZonePlate::focus(double angle) {
+    void ReflectionZonePlate::focus(const double angle) {
         // from routine "focus" in RAY.FOR
         // focus(hv=beamline->getPhotonEnergy, angle, d0=calcDz00, ord=orderofdiff, alpha, beta)
         double a = m_designEnergy * abs(calcDz00() * m_orderOfDiffraction * 1.e-06);
@@ -410,7 +411,7 @@ namespace RAY
         m_beta = PI / 2 - abs(m_beta);
     }
 
-    double ReflectionZonePlate::rzpLineDensityDZ(double X, double Y, double Z, double FX, double FY, double FZ, double WL) {
+    double ReflectionZonePlate::rzpLineDensityDZ(const double X, const double Y, const double Z, const double FX, const double FY, const double FZ, const double WL) {
         double s_beta = sin(m_designAlphaAngle);
         double c_beta = cos(m_designBetaAngle);
         double s_alpha = sin(m_designAlphaAngle);
@@ -512,94 +513,94 @@ namespace RAY
 
     }
 
-    void ReflectionZonePlate::setBeta(double beta) { // in degree
+    void ReflectionZonePlate::setBeta(const double beta) { // in degree
         m_beta = rad(beta);
     }
 
-    double ReflectionZonePlate::getWidth() {
+    double ReflectionZonePlate::getWidth() const {
         return m_totalWidth;
     }
 
-    double ReflectionZonePlate::getHeight() {
+    double ReflectionZonePlate::getHeight() const {
         return m_totalHeight;
     }
 
-    double ReflectionZonePlate::getAlpha() {
+    double ReflectionZonePlate::getAlpha() const {
         return m_alpha;
     }
-    double ReflectionZonePlate::getBeta() {
+    double ReflectionZonePlate::getBeta() const {
         return m_beta;
     }
-    double ReflectionZonePlate::getDesignAlphaAngle() {
+    double ReflectionZonePlate::getDesignAlphaAngle() const {
         return m_designAlphaAngle;
     }
-    double ReflectionZonePlate::getDesignBetaAngle() {
+    double ReflectionZonePlate::getDesignBetaAngle() const {
         return m_designBetaAngle;
     }
 
-    double ReflectionZonePlate::getGratingMount() {
+    double ReflectionZonePlate::getGratingMount() const {
         return m_gratingMount;
     }
 
-    double ReflectionZonePlate::getLongRadius() {
+    double ReflectionZonePlate::getLongRadius() const {
         return m_longRadius;
     }
 
 
-    double ReflectionZonePlate::getShortRadius() {
+    double ReflectionZonePlate::getShortRadius() const {
         return m_shortRadius;
     }
 
-    double ReflectionZonePlate::getFresnelZOffset() {
+    double ReflectionZonePlate::getFresnelZOffset() const {
         return m_frenselZOffset;
     }
 
-    double ReflectionZonePlate::getCalcFresnelZOffset() {
+    double ReflectionZonePlate::getCalcFresnelZOffset() const {
         return m_calcFresnelZOffset; // calculated if DESIGN_TYPE==DT_BETA
     }
 
     // input and exit vector lengths
-    double ReflectionZonePlate::getSagittalEntranceArmLength() {
+    double ReflectionZonePlate::getSagittalEntranceArmLength() const {
         return m_sagittalEntranceArmLength;
     }
 
-    double ReflectionZonePlate::getSagittalExitArmLength() {
+    double ReflectionZonePlate::getSagittalExitArmLength() const {
         return m_sagittalExitArmLength;
     }
 
-    double ReflectionZonePlate::getMeridionalEntranceArmLength() {
+    double ReflectionZonePlate::getMeridionalEntranceArmLength() const {
         return m_meridionalEntranceArmLength;
     }
 
-    double ReflectionZonePlate::getMeridionalExitArmLength() {
+    double ReflectionZonePlate::getMeridionalExitArmLength() const {
         return m_meridionalExitArmLength;
     }
 
-    double ReflectionZonePlate::getR1ArmLength() {
+    double ReflectionZonePlate::getR1ArmLength() const {
         return m_R1ArmLength;
     }
 
-    double ReflectionZonePlate::getR2ArmLength() {
+    double ReflectionZonePlate::getR2ArmLength() const {
         return m_R2ArmLength; // what is this now??
     }
 
-    double ReflectionZonePlate::getWaveLength() {
+    double ReflectionZonePlate::getWaveLength() const {
         return m_wavelength;
     }
-    double ReflectionZonePlate::getDesignEnergy() {
+    double ReflectionZonePlate::getDesignEnergy() const {
         return m_designEnergy;
     }
 
 
-    double ReflectionZonePlate::getOrderOfDiffraction() {
+    double ReflectionZonePlate::getOrderOfDiffraction() const {
         return m_orderOfDiffraction;
     }
 
-    double ReflectionZonePlate::getDesignOrderOfDiffraction() {
+    double ReflectionZonePlate::getDesignOrderOfDiffraction() const {
         return m_designOrderOfDiffraction;
     }
 
-    double ReflectionZonePlate::getDesignEnergyMounting() {
+    double ReflectionZonePlate::getDesignEnergyMounting() const {
         return m_designEnergyMounting; // derived from source?
     }
 

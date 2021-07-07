@@ -2016,8 +2016,7 @@ Ray traceSlit(Ray r, const Quadric q, inout uint64_t ctr) {
 	diffraction(iopt, xLength, yLength, wavelength, delPhi, delPsi, ctr);
 	phi = phi + delPhi;
 	psi = psi + delPsi;
-	r.direction.x = delPhi;
-	r.direction.y = delPsi;
+	
 	// new direction form angles
 	cosini(r, phi,psi);
 

@@ -15,8 +15,8 @@ namespace RAY
      * @param misalignmentParams angles and distances for the mirror's misalignment
      * 
     */
-    Slit::Slit(const char* name, int beamstop, double width, double height, double azimuthal, double dist, double beamstopWidth, double beamstopHeight, double sourceEnergy, std::vector<double> misalignmentParams, std::vector<double> slopeError, Quadric* previous) 
-    : Quadric(name, width, height, slopeError, previous) {
+    Slit::Slit(const char* name, int beamstop, double width, double height, double azimuthal, double dist, double beamstopWidth, double beamstopHeight, double sourceEnergy, std::vector<double> misalignmentParams, Quadric* previous) 
+    : Quadric(name, width, height, {0,0,0,0,0,0,0}, previous) {
         // std::vector<double> inputPoints = {0,0,0,0, 0,0,0,-1, 0,0,0,0, 0,0,0,0};
         m_centralBeamstop = beamstop == 0 ? CS_NONE : (beamstop==1 ? CS_RECTANGLE : CS_ELLIPTICAL );
         m_totalWidth = m_centralBeamstop == CS_ELLIPTICAL ? -abs(width) : abs(width);
@@ -28,7 +28,7 @@ namespace RAY
         m_distanceToPreceedingElement = dist;
         
         calcTransformationMatrices(0, m_chi, 0, m_distanceToPreceedingElement, misalignmentParams);
-        setElementParameters({m_beamstopWidth,m_beamstopHeight,0,0, m_waveLength,0,0,0, 0,0,0,0, 0,0,0,0});
+        setElementParameters({m_beamstopWidth/2,m_beamstopHeight/2,0,0, m_waveLength,0,0,0, 0,0,0,0, 0,0,0,0});
         editQuadric({0,0,0,0, 0,0,0,0, 0,0,0,-1, 3,0,0,0});
         setTemporaryMisalignment({0,0,0, 0,0,0});
     }
@@ -37,32 +37,32 @@ namespace RAY
     {
     }
 
-    double Slit::getWidth() {
+    double Slit::getWidth() const {
         return m_totalWidth;
     }
 
-    double Slit::getHeight() {
+    double Slit::getHeight() const {
         return m_totalHeight;
     }
     
-    double Slit::getChi() {
+    double Slit::getChi() const {
         return m_chi;
     }
 
-    double Slit::getDist() {
+    double Slit::getDist() const {
         return m_distanceToPreceedingElement;
     }
     
-    int Slit::getCentralBeamstop() {
+    int Slit::getCentralBeamstop() const {
         return m_centralBeamstop;
     }
-    double Slit::getBeamstopWidth() {
+    double Slit::getBeamstopWidth() const {
         return m_beamstopWidth;
     }
-    double Slit::getBeamstopHeight() {
+    double Slit::getBeamstopHeight() const {
         return m_beamstopHeight;
     }
-    double Slit::getWaveLength() {
+    double Slit::getWaveLength() const {
         return m_waveLength;
     }
         

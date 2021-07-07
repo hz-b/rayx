@@ -16,24 +16,24 @@ namespace RAY
         void calcAlpha(double deviation, double normalIncidence);
         void focus(double angle);
 
-        double getWidth();
-        double getHeight();
-        double getRadius();
-        double getExitArmLength();
-        double getEntranceArmLength();
+        double getWidth() const;
+        double getHeight() const;
+        double getRadius() const;
+        double getExitArmLength() const;
+        double getEntranceArmLength() const;
         // angles in rad and normal angles (measured from normal! not incidence!!)
-        double getAlpha();
-        double getBeta();
-        double getDeviation(); // not always calculated
+        double getAlpha() const;
+        double getBeta() const;
+        double getDeviation() const; // not always calculated
         // in rad as well
-        double getChi();
-        double getDistanceToPreceedingElement();
-        int getGratingMount();
-        double getDesignEnergyMounting();
-        double getLineDensity();
-        double getOrderOfDiffraction();
-        double getA();
-        std::vector<double> getVls();
+        double getChi() const;
+        double getDistanceToPreceedingElement() const;
+        int getGratingMount() const;
+        double getDesignEnergyMounting() const;
+        double getLineDensity() const;
+        double getOrderOfDiffraction() const;
+        double getA() const;
+        std::vector<double> getVls() const;
         
     private:
         double m_totalWidth;
