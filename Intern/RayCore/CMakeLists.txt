@@ -80,8 +80,8 @@ target_compile_definitions(${PROJECT_NAME}
 
 target_include_directories(${PROJECT_NAME}  
     PUBLIC ${RayCore_SOURCE_DIR}/src/RayCore/
-    PUBLIC ${RayCore_SOURCE_DIR}/vendor/glm/glm/
-    PUBLIC ${RayCore_SOURCE_DIR}/vendor/rapidxml-1.13/
+    PUBLIC ${RayCore_SOURCE_DIR}/../../Extern/glm/glm/
+    PUBLIC ${RayCore_SOURCE_DIR}/../../Extern/rapidxml-1.13/
 )
 
 
