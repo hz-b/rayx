@@ -6,14 +6,23 @@
 
 namespace RAY
 {
-
+    /*
+    * Brief: Abstract parent class for all beamline objects used in Ray-X.
+    *
+    */
     class RAY_API BeamlineObject
     {
     public:
-        
+        BeamlineObject(const char* name);
+        ~BeamlineObject();
 
-    private:
-        
+
+        virtual const char* getName() = 0;
+
+    protected:
+        const char* m_name;
+
+
     };
 
 } // namespace RAY

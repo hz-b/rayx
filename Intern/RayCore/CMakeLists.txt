@@ -4,19 +4,20 @@ project(RayCore)
 SET(SOURCE
     src/RayCore/Application.cpp
     src/RayCore/Beamline/Beamline.cpp
-    src/RayCore/Beamline/ImagePlane.cpp
+    src/RayCore/Beamline/BeamlineObject.cpp
+    src/RayCore/Beamline/Objects/ImagePlane.cpp
     src/RayCore/Beamline/LightSource.cpp
-    src/RayCore/Beamline/MatrixSource.cpp
-    src/RayCore/Beamline/RandomRays.cpp
-    src/RayCore/Beamline/PointSource.cpp
-    src/RayCore/Beamline/Ellipsoid.cpp
-    src/RayCore/Beamline/ReflectionZonePlate.cpp
-    src/RayCore/Beamline/Slit.cpp
-    src/RayCore/Beamline/SphereGrating.cpp
-    src/RayCore/Beamline/PlaneGrating.cpp
-    src/RayCore/Beamline/PlaneMirror.cpp
-    src/RayCore/Beamline/PointSource.cpp
-    src/RayCore/Beamline/SphereMirror.cpp
+    src/RayCore/Beamline/Objects/MatrixSource.cpp
+    src/RayCore/Beamline/Objects/RandomRays.cpp
+    src/RayCore/Beamline/Objects/PointSource.cpp
+    src/RayCore/Beamline/Objects/Ellipsoid.cpp
+    src/RayCore/Beamline/Objects/ReflectionZonePlate.cpp
+    src/RayCore/Beamline/Objects/Slit.cpp
+    src/RayCore/Beamline/Objects/SphereGrating.cpp
+    src/RayCore/Beamline/Objects/PlaneGrating.cpp
+    src/RayCore/Beamline/Objects/PlaneMirror.cpp
+    src/RayCore/Beamline/Objects/PointSource.cpp
+    src/RayCore/Beamline/Objects/SphereMirror.cpp
     src/RayCore/Surface/Quadric.cpp
     src/RayCore/Surface/Surface.cpp
     src/RayCore/utils.cpp
@@ -29,20 +30,20 @@ SET(HEADERS
     src/RayCore/Application.h
     src/RayCore/Debug.h
     src/RayCore/Beamline/Beamline.h
-    src/RayCore/Beamline/ImagePlane.h
+    src/RayCore/Beamline/Objects/ImagePlane.h
     src/RayCore/Beamline/BeamlineObject.h
     src/RayCore/Beamline/LightSource.h
-    src/RayCore/Beamline/MatrixSource.h
-    src/RayCore/Beamline/RandomRays.h
-    src/RayCore/Beamline/PointSource.h
-    src/RayCore/Beamline/Ellipsoid.h
-    src/RayCore/Beamline/ReflectionZonePlate.h
-    src/RayCore/Beamline/Slit.h
-    src/RayCore/Beamline/SphereGrating.h
-    src/RayCore/Beamline/PlaneGrating.h
-    src/RayCore/Beamline/PlaneMirror.h
-    src/RayCore/Beamline/PointSource.h
-    src/RayCore/Beamline/SphereMirror.h
+    src/RayCore/Beamline/Objects/MatrixSource.h
+    src/RayCore/Beamline/Objects/RandomRays.h
+    src/RayCore/Beamline/Objects/PointSource.h
+    src/RayCore/Beamline/Objects/Ellipsoid.h
+    src/RayCore/Beamline/Objects/ReflectionZonePlate.h
+    src/RayCore/Beamline/Objects/Slit.h
+    src/RayCore/Beamline/Objects/SphereGrating.h
+    src/RayCore/Beamline/Objects/PlaneGrating.h
+    src/RayCore/Beamline/Objects/PlaneMirror.h
+    src/RayCore/Beamline/Objects/PointSource.h
+    src/RayCore/Beamline/Objects/SphereMirror.h
     src/RayCore/Surface/Quadric.h
     src/RayCore/Surface/Surface.h
     src/RayCore/utils.h

@@ -5,9 +5,9 @@
 
 #include "TracerInterface.h"
 
-#include "Beamline/MatrixSource.h"
-#include "Beamline/PointSource.h"
-#include "Beamline/ReflectionZonePlate.h"
+#include "Beamline/Objects/MatrixSource.h"
+#include "Beamline/Objects/PointSource.h"
+#include "Beamline/Objects/ReflectionZonePlate.h"
 #include "Debug.h"
 #include "Ray.h"
 #include "VulkanTracer.h"

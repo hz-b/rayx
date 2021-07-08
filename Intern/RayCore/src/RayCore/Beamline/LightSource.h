@@ -1,23 +1,26 @@
 #pragma once
-#include "Core.h"
-#include "glm.hpp"
 #include <vector>
 #include <iostream>
 #include <stdexcept>
 #include <cmath>
-#include "Tracer/Ray.h"
 #include <string>
 #include <random>
+
+#include "glm.hpp"
+
+#include "Core.h"
+#include "Tracer/Ray.h"
+#include "BeamlineObject.h"
 
 namespace RAY
 {
 
-    class RAY_API LightSource
+    class RAY_API LightSource : public BeamlineObject
     {
     public:
 
-        LightSource(const int id, const int numberOfRays, const std::string name, const int spreadType, const double photonEnergy, const double energySpread, const std::vector<double> misalignment);
-        std::string getName();
+        LightSource(const int id, const int numberOfRays, const char* name, const int spreadType, const double photonEnergy, const double energySpread, const std::vector<double> misalignment);
+        const char* getName();
         int getNumberOfRays();
         int getId();
         std::vector<double> getMisalignmentParams();
@@ -37,7 +40,7 @@ namespace RAY
     private:
         int m_id;
         int m_numberOfRays;
-        std::string m_name;
+        // std::string m_name;
         std::vector<double> m_misalignmentParams; // x, y, psi, phi
         // std::vector<Ray *> m_rayList; ?
 
