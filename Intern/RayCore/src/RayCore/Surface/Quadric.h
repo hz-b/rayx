@@ -15,6 +15,7 @@ namespace RAY {
         void setAnchorPoints(std::vector<double> inputPoints);
 
         std::vector<double> getAnchorPoints() const;
+        std::vector<double> getParams();
 
         Quadric();
         ~Quadric();

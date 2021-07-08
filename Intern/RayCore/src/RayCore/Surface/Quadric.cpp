@@ -43,5 +43,9 @@ namespace RAY
     {
         return m_anchorPoints;
     }
+
+    std::vector<double> Quadric::getParams() {
+        return m_anchorPoints;
+    }
     
 } // namespace RAY
