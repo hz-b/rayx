@@ -2,8 +2,8 @@
 #include "gmock/gmock.h"
 
 #include "Beamline/Beamline.h"
-#include "Beamline/MatrixSource.h"
-#include "Beamline/PointSource.h"
+#include "Beamline/Objects/MatrixSource.h"
+#include "Beamline/Objects/PointSource.h"
 
 #include "Core.h"
 #include "Ray.h"

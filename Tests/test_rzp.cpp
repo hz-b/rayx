@@ -1,7 +1,7 @@
 #include "gtest/gtest.h"
 #include "gmock/gmock.h"
 #include "Beamline/Beamline.h"
-#include "Beamline/ReflectionZonePlate.h"
+#include "Beamline/Objects/ReflectionZonePlate.h"
 #include "Core.h"
 #include "Ray.h"
 
@@ -86,7 +86,7 @@ TEST(RZP, testdefaultParams) {
                         rad(dAlpha), rad(dBeta), elementOffsetZ, double(additionalOrder)};
     
     EXPECT_ITERABLE_DOUBLE_EQ(std::vector<double>, rzp.getElementParameters(), correctElementParams);
-    EXPECT_ITERABLE_DOUBLE_EQ(std::vector<double>, rzp.getQuadric(), quad);
+    EXPECT_ITERABLE_DOUBLE_EQ(std::vector<double>, rzp.getSurfaceParams(), quad);
     EXPECT_ITERABLE_DOUBLE_EQ(std::vector<double>, rzp.getTempMisalignmentParams(), mis);
     EXPECT_ITERABLE_DOUBLE_EQ(std::vector<double>, rzp.getSlopeError(), sE);
     std::vector<double> zeros = {0,0,0, 0,0,0};

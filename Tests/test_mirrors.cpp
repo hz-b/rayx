@@ -1,9 +1,9 @@
 #include "gtest/gtest.h"
 #include "gmock/gmock.h"
 #include "Beamline/Beamline.h"
-#include "Beamline/PlaneMirror.h"
-#include "Beamline/SphereMirror.h"
-#include "Beamline/Ellipsoid.h"
+#include "Beamline/Objects/PlaneMirror.h"
+#include "Beamline/Objects/SphereMirror.h"
+#include "Beamline/Objects/Ellipsoid.h"
 #include "Core.h"
 #include "Ray.h"
 
@@ -163,7 +163,7 @@ TEST(Ellips, testParamsCSCurvature) {
     EXPECT_ITERABLE_DOUBLE_EQ(std::vector<double>, sE, e.getSlopeError());
 
     figRot = 1;
-    e = RAY::Ellipsoid("ellipsoid", width, height, incidence, azimuthal, dist, entranceArmLength, exitArmLength, coordSys, figRot, a_11, mis, sE, NULL); 
+    RAY::Ellipsoid e2 = RAY::Ellipsoid("ellipsoid", width, height, incidence, azimuthal, dist, entranceArmLength, exitArmLength, coordSys, figRot, a_11, mis, sE, NULL); 
     halfAxisC = INFINITY;
 
     ASSERT_DOUBLE_EQ (e.getWidth(),  width);
@@ -186,7 +186,7 @@ TEST(Ellips, testParamsCSCurvature) {
     EXPECT_ITERABLE_DOUBLE_EQ(std::vector<double>, sE, e.getSlopeError());
 
     figRot = 2;
-    e = RAY::Ellipsoid("ellipsoid", width, height, incidence, azimuthal, dist, entranceArmLength, exitArmLength, coordSys, figRot, a_11, mis, sE, NULL); 
+    RAY::Ellipsoid e3 = RAY::Ellipsoid("ellipsoid", width, height, incidence, azimuthal, dist, entranceArmLength, exitArmLength, coordSys, figRot, a_11, mis, sE, NULL); 
     halfAxisC = 495.0186818473859;
 
     ASSERT_DOUBLE_EQ (e.getWidth(),  width);
@@ -261,7 +261,7 @@ TEST(Ellips, testParamsCSMirror) {
     EXPECT_ITERABLE_DOUBLE_EQ(std::vector<double>, sE, e.getSlopeError());
 
     figRot = 1;
-    e = RAY::Ellipsoid("ellipsoid", width, height, incidence, azimuthal, dist, entranceArmLength, exitArmLength, coordSys, figRot, a_11, mis, sE, NULL); 
+    RAY::Ellipsoid e2 = RAY::Ellipsoid("ellipsoid", width, height, incidence, azimuthal, dist, entranceArmLength, exitArmLength, coordSys, figRot, a_11, mis, sE, NULL); 
     halfAxisC = INFINITY;
 
     ASSERT_DOUBLE_EQ (e.getWidth(),  width);
@@ -284,7 +284,7 @@ TEST(Ellips, testParamsCSMirror) {
     EXPECT_ITERABLE_DOUBLE_EQ(std::vector<double>, sE, e.getSlopeError());
 
     figRot = 2;
-    e = RAY::Ellipsoid("ellipsoid", width, height, incidence, azimuthal, dist, entranceArmLength, exitArmLength, coordSys, figRot, a_11, mis, sE, NULL); 
+    RAY::Ellipsoid e3 = RAY::Ellipsoid("ellipsoid", width, height, incidence, azimuthal, dist, entranceArmLength, exitArmLength, coordSys, figRot, a_11, mis, sE, NULL); 
     halfAxisC = 495.0186818473859;
 
     ASSERT_DOUBLE_EQ (e.getWidth(),  width);

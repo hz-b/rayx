@@ -7,7 +7,8 @@ namespace RAY
 {
 
     void Beamline::addOpticalElement(const std::shared_ptr<OpticalElement> q) {
-        addOpticalElement(q->getName(), q->getSurfaceParams(), q->getInMatrix(), q->getOutMatrix(), q->getTempMisalignmentMatrix(), q->getInverseTempMisalignmentMatrix(), q->getObjectParameters(), q->getElementParameters());
+        m_Objects.push_back(q);
+        //addOpticalElement(q->getName(), q->getSurfaceParams(), q->getInMatrix(), q->getOutMatrix(), q->getTempMisalignmentMatrix(), q->getInverseTempMisalignmentMatrix(), q->getObjectParameters(), q->getElementParameters());
     }
 
     /* Somehow results in wrong values. Should be fixed later

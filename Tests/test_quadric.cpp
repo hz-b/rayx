@@ -1,9 +1,9 @@
 #include "gtest/gtest.h"
 #include "gmock/gmock.h"
 #include "Beamline/Beamline.h"
-#include "Beamline/PlaneMirror.h"
-#include "Beamline/SphereMirror.h"
-#include "Beamline/Ellipsoid.h"
+#include "Beamline/Objects/PlaneMirror.h"
+#include "Beamline/Objects/SphereMirror.h"
+#include "Beamline/Objects/Ellipsoid.h"
 #include "Core.h"
 #include "Ray.h"
 
@@ -97,10 +97,10 @@ TEST(Quadric, testInMat) {
 
 TEST(Quadric, testGlobalCoordinates) {
     std::vector<double> sE = {0,0,0,0,0, 0,0};
-    RAY::PlaneMirror p1 = RAY::PlaneMirror("PlaneMirror1", 50, 200, 10, 7, 0, {0,0,0, 0,0,0}, sE, NULL); // {1,2,3,0.01,0.02,0.03}
-    RAY::PlaneMirror p2 = RAY::PlaneMirror("PlaneMirror2", 50, 200, 15, 4, 0, {0,0,0, 0,0,0}, sE, &p1); // {1,2,3,0.01,0.02,0.03}
-    RAY::PlaneMirror p3 = RAY::PlaneMirror("PlaneMirror3", 50, 200, 7, 10, 0, {0,0,0, 0,0,0}, sE, &p2); // {1,2,3,0.01,0.02,0.03}
-    RAY::PlaneMirror p4 = RAY::PlaneMirror("PlaneMirror4", 50, 200, 22, 17, 0, {0,0,0, 0,0,0}, sE, &p3); // {1,2,3,0.01,0.02,0.03}
+    std::shared_ptr<RAY::PlaneMirror> p1 = std::make_shared<RAY::PlaneMirror>("PlaneMirror1", 50, 200, 10, 7, 0, std::vector<double>{0,0,0, 0,0,0}, sE, nullptr); // {1,2,3,0.01,0.02,0.03}
+    std::shared_ptr<RAY::PlaneMirror> p2 = std::make_shared<RAY::PlaneMirror>("PlaneMirror2", 50, 200, 15, 4, 0, std::vector<double>{0,0,0, 0,0,0}, sE, p1); // {1,2,3,0.01,0.02,0.03}
+    std::shared_ptr<RAY::PlaneMirror> p3 = std::make_shared<RAY::PlaneMirror>("PlaneMirror3", 50, 200, 7, 10, 0, std::vector<double>{0,0,0, 0,0,0}, sE, p2); // {1,2,3,0.01,0.02,0.03}
+    std::shared_ptr<RAY::PlaneMirror> p4 = std::make_shared<RAY::PlaneMirror>("PlaneMirror4", 50, 200, 22, 17, 0, std::vector<double>{0,0,0, 0,0,0}, sE, p3); // {1,2,3,0.01,0.02,0.03}
     
     /*std::vector<double> worldCoord = {0.993, -0.120, -0.021, 0,
                                         0.122, 0.977, 0.172, 0,

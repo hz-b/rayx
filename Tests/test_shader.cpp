@@ -2,10 +2,10 @@
 #include "gmock/gmock.h"
 #include "Beamline/Beamline.h"
 #include "Surface/Quadric.h"
-#include "Beamline/ReflectionZonePlate.h"
-#include "Beamline/PlaneMirror.h"
-#include "Beamline/SphereMirror.h"
-#include "Beamline/MatrixSource.h"
+#include "Beamline/Objects/ReflectionZonePlate.h"
+#include "Beamline/Objects/PlaneMirror.h"
+#include "Beamline/Objects/SphereMirror.h"
+#include "Beamline/Objects/MatrixSource.h"
 #include "Core.h"
 #include "Ray.h"
 // #include "Tracer/TracerInterface.h"
@@ -53,20 +53,20 @@ std::vector<double> zeros7 = { 0,0,0,0,0, 0,0 }; // for slope error
     EXPECT_ITERABLE_BASE( EXPECT_DOUBLE_EQ, TYPE, TYPE, ref, target )
 
 
-std::list<double> runTracer(std::vector<RAY::Ray> testValues, std::vector<RAY::Quadric> q) {
+std::list<double> runTracer(std::vector<RAY::Ray> testValues, std::vector<std::shared_ptr<RAY::OpticalElement>> elements) {
     for (int i = 0;i < 16;i++) {
-        std::cout << "q[0]: " << q[0].getAnchorPoints()[i] << std::endl;
+        std::cout << "elements[0]: " << elements[0]->getSurfaceParams()[i] << std::endl;
     }
 
     VulkanTracer tracer;
     std::list<std::vector<RAY::Ray>> rayList;
-    tracer.setBeamlineParameters(1, q.size(), testValues.size());
+    tracer.setBeamlineParameters(1, elements.size(), testValues.size());
     std::cout << "testValues.size(): " << testValues.size() << std::endl;
     (tracer).addRayVector(testValues.data(), testValues.size());
     std::cout << "add rays to tracer done" << std::endl;
 
-    for (RAY::Quadric quad : q) {
-        tracer.addQuadric(quad.getAnchorPoints(), quad.getInMatrix(), quad.getOutMatrix(), quad.getTempMisalignmentMatrix(), quad.getInverseTempMisalignmentMatrix(), quad.getObjectParameters(), quad.getElementParameters());
+    for (std::shared_ptr<RAY::OpticalElement> e : elements) {
+        tracer.addQuadric(e->getSurfaceParams(), e->getInMatrix(), e->getOutMatrix(), e->getTempMisalignmentMatrix(), e->getInverseTempMisalignmentMatrix(), e->getObjectParameters(), e->getElementParameters());
     }
     tracer.run(); //run tracer
     std::list<double> outputRays;
@@ -1105,15 +1105,15 @@ TEST(Tracer, planeRefracTest) {
 }
 
 */
-void testOpticalElement(std::vector<RAY::Quadric> quadrics, int n) {
+void testOpticalElement(std::vector<std::shared_ptr<RAY::OpticalElement>> elements, int n) {
 
 
-    RAY::MatrixSource m = RAY::MatrixSource(0, "Matrix source 1", n, 0, 0.065, 0.04, 0.0, 0.001, 0.001, 100, 0, { 0,0,0,0 });
+    std::shared_ptr<RAY::MatrixSource> m = std::make_shared<RAY::MatrixSource>(0, "Matrix source 1", n, 0, 0.065, 0.04, 0.0, 0.001, 0.001, 100, 0, std::vector<double>{ 0,0,0,0 });
 
 
-    std::list<double> outputRays = runTracer(m.getRays(), quadrics);
+    std::list<double> outputRays = runTracer(m->getRays(), elements);
     std::string filename = "testFile_";
-    filename.append(quadrics[0].getName());
+    //filename.append();
     writeToFile(outputRays, filename);
 }
 // test complete optical elements instead of single functions
@@ -1225,10 +1225,10 @@ TEST(globalCoordinates, FourMirrors_20Rays) {
 */
 
 TEST(opticalElements, slit1) {
-    RAY::MatrixSource m = RAY::MatrixSource(0, "matrix source", 200, 0, 0.065, 0.04, 0, 0.001, 0.001, 100, 0, { 0,0,0,0 });
-    RAY::Slit s = RAY::Slit("slit", 1, 20, 2, 0, 10000, 20, 1, m.getPhotonEnergy(), { 0,0,0, 0,0,0 }, nullptr);
-    RAY::ImagePlane ip = RAY::ImagePlane("Image plane", 1000, &s);
-    std::list<double> outputRays = runTracer(m.getRays(), {s,ip});
+    std::shared_ptr<RAY::MatrixSource> m = std::make_shared<RAY::MatrixSource>(0, "matrix source", 200, 0, 0.065, 0.04, 0, 0.001, 0.001, 100, 0, std::vector<double>{ 0,0,0,0 });
+    std::shared_ptr<RAY::Slit> s = std::make_shared<RAY::Slit>("slit", 1, 20, 2, 0, 10000, 20, 1, m->getPhotonEnergy(), std::vector<double>{ 0,0,0, 0,0,0 }, nullptr);
+    std::shared_ptr<RAY::ImagePlane> ip = std::make_shared<RAY::ImagePlane>("Image plane", 1000, s);
+    std::list<double> outputRays = runTracer(m->getRays(), {s,ip});
     int counter = 0;
     for (std::list<double>::iterator i = outputRays.begin(); i != outputRays.end();) {
         std::cout << counter << "; " << *i << std::endl;

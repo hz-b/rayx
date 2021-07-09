@@ -337,7 +337,7 @@ namespace RAY
     std::vector<double> OpticalElement::getSurfaceParams() const
     {   
         std::cout << "return anchor points" << std::endl;
-        assert(m_surface!=nullptr);
+        //assert(m_surface!=nullptr);
         return m_surface->getParams();
     }
 
