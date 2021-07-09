@@ -17,9 +17,6 @@ namespace RAY
         m_energySpreadType = spreadType == 0 ? ES_WHITE_BAND : ES_THREE_ENERGIES;
     }
 
-    const char* LightSource::getName() {
-        return m_name;
-    }
     int LightSource::getNumberOfRays() {
         return m_numberOfRays;
     }

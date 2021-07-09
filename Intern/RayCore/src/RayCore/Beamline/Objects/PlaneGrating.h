@@ -1,6 +1,6 @@
 #pragma once
 #include "Surface/Quadric.h"
-#include "OpticalElement.h"
+#include "Beamline/OpticalElement.h"
 
 namespace RAY
 {

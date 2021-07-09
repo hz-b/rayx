@@ -20,7 +20,6 @@ namespace RAY
     public:
 
         LightSource(const int id, const int numberOfRays, const char* name, const int spreadType, const double photonEnergy, const double energySpread, const std::vector<double> misalignment);
-        const char* getName();
         int getNumberOfRays();
         int getId();
         std::vector<double> getMisalignmentParams();
