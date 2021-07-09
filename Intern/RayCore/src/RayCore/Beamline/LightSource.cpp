@@ -4,11 +4,11 @@
 
 namespace RAY
 {
-    LightSource::LightSource(const int id, const int numberOfRays, const std::string name, const int spreadType,
+    LightSource::LightSource(const int id, const int numberOfRays, const char* name, const int spreadType,
         const double photonEnergy, const double energySpread, const std::vector<double> misalignment)
-        : m_id(id),
+        : BeamlineObject(name),
+        m_id(id),
         m_numberOfRays(numberOfRays),
-        m_name(name),
         m_misalignmentParams(misalignment),
         m_energySpread(energySpread),
         m_photonEnergy(photonEnergy)
@@ -17,15 +17,30 @@ namespace RAY
         m_energySpreadType = spreadType == 0 ? ES_WHITE_BAND : ES_THREE_ENERGIES;
     }
 
-    std::string LightSource::getName() { return m_name; }
-    int LightSource::getNumberOfRays() { return m_numberOfRays; }
-    double LightSource::getPhotonEnergy() { return m_photonEnergy; }
-    double LightSource::getEnergySpread() { return m_energySpread; }
-    int LightSource::getSpreadType() { return m_energySpreadType; }
-
-    void LightSource::setNumberOfRays(const int numberOfRays) { m_numberOfRays = numberOfRays; }
-    int LightSource::getId() { return m_id; }
-    std::vector<double> LightSource::getMisalignmentParams() { return m_misalignmentParams; }
+    const char* LightSource::getName() {
+        return m_name;
+    }
+    int LightSource::getNumberOfRays() {
+        return m_numberOfRays;
+    }
+    double LightSource::getPhotonEnergy() {
+        return m_photonEnergy;
+    }
+    double LightSource::getEnergySpread() {
+        return m_energySpread;
+    }
+    int LightSource::getSpreadType() {
+        return m_energySpreadType;
+    }
+    void LightSource::setNumberOfRays(const int numberOfRays) {
+        m_numberOfRays = numberOfRays;
+    }
+    int LightSource::getId() {
+        return m_id;
+    }
+    std::vector<double> LightSource::getMisalignmentParams() {
+        return m_misalignmentParams;
+    }
 
     // needed for many of the light sources, from two angles to one direction vector
     glm::dvec3 LightSource::getDirectionFromAngles(const double phi, const double psi) {

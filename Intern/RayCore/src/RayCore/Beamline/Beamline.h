@@ -2,17 +2,19 @@
 
 #include "Core.h"
 #include "glm.hpp"
-#include "PlaneGrating.h"
-#include "PlaneMirror.h"
-#include "SphereGrating.h"
-#include "ImagePlane.h"
-#include "MatrixSource.h"
-#include "Ellipsoid.h"
-#include "PointSource.h"
-#include "SphereMirror.h"
-#include "ReflectionZonePlate.h"
-#include "RandomRays.h"
-#include "Slit.h"
+
+// TODO:
+#include "Objects/PlaneGrating.h"
+#include "Objects/PlaneMirror.h"
+#include "Objects/SphereGrating.h"
+#include "Objects/ImagePlane.h"
+#include "Objects/MatrixSource.h"
+#include "Objects/Ellipsoid.h"
+#include "Objects/PointSource.h"
+#include "Objects/SphereMirror.h"
+#include "Objects/ReflectionZonePlate.h"
+#include "Objects/RandomRays.h"
+#include "Objects/Slit.h"
 
 #include <vector>
 

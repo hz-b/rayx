@@ -1,5 +1,5 @@
 #pragma once
-#include "LightSource.h"
+#include "Beamline/LightSource.h"
 
 namespace RAY
 {
