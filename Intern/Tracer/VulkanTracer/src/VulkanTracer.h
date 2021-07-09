@@ -50,7 +50,7 @@ public:
     //void addRay(double xpos, double ypos, double zpos, double xdir, double ydir, double zdir, double weight);
     //void addRay(double* location);
     void addRayVector(void* location, size_t size);
-    void addQuadric(std::vector<double> surfaceParams, std::vector<double> inputInMatrix, std::vector<double> inputOutMatrix, std::vector<double> misalignmentMatrix, std::vector<double> inverseMisalignmentMatrix, std::vector<double> objectParameters, std::vector<double> elementParameters);
+    void addVectors(std::vector<double> surfaceParams, std::vector<double> inputInMatrix, std::vector<double> inputOutMatrix, std::vector<double> misalignmentMatrix, std::vector<double> inverseMisalignmentMatrix, std::vector<double> objectParameters, std::vector<double> elementParameters);
     void getRays();
     void cleanup();
     void setBeamlineParameters(uint32_t inNumberOfBeamlines, uint32_t inNumberOfQuadricsPerBeamline, uint32_t inNumberOfRays);

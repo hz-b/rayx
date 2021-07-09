@@ -1027,8 +1027,9 @@ void VulkanTracer::addRayVector(void* location, size_t size) {
 	std::cout << "rayList ray count: " << (*(rayList.begin())).size() << std::endl;
 
 }
+
 //adds quad to beamline
-void VulkanTracer::addQuadric(std::vector<double> surfaceParams, std::vector<double> inputInMatrix, std::vector<double> inputOutMatrix, std::vector<double> misalignmentMatrix, std::vector<double> inverseMisalignmentMatrix, std::vector<double> objectParameters, std::vector<double> elementParameters) {
+void VulkanTracer::addVectors(std::vector<double> surfaceParams, std::vector<double> inputInMatrix, std::vector<double> inputOutMatrix, std::vector<double> misalignmentMatrix, std::vector<double> inverseMisalignmentMatrix, std::vector<double> objectParameters, std::vector<double> elementParameters) {
 	assert(surfaceParams.size() == 16 && inputInMatrix.size() == 16 && inputOutMatrix.size() == 16 && misalignmentMatrix.size() == 16 && objectParameters.size() == 16 && elementParameters.size() == 16);
 	//beamline.resize(beamline.size()+1);
 	beamline.insert(beamline.end(), surfaceParams.begin(), surfaceParams.end());

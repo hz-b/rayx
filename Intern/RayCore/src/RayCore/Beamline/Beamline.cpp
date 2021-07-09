@@ -5,18 +5,11 @@
 
 namespace RAY
 {
-
+    // push copy of shared pointer to m_objects vector
     void Beamline::addOpticalElement(const std::shared_ptr<OpticalElement> q) {
         m_Objects.push_back(q);
-        //addOpticalElement(q->getName(), q->getSurfaceParams(), q->getInMatrix(), q->getOutMatrix(), q->getTempMisalignmentMatrix(), q->getInverseTempMisalignmentMatrix(), q->getObjectParameters(), q->getElementParameters());
     }
 
-    /* Somehow results in wrong values. Should be fixed later
-    void Beamline::addQuadric(Quadric newObject)
-    {
-        m_Objects.push_back(newObject);
-    }
-    */
     void Beamline::addOpticalElement(const char* name, const std::vector<double>& inputPoints, std::vector<double> inputInMatrix, std::vector<double> inputOutMatrix, std::vector<double> misalignmentMatrix, std::vector<double> inverseMisalignmentMatrix, std::vector<double> OParameters, std::vector<double> EParameters)
     {
         m_Objects.emplace_back(std::make_shared<OpticalElement>(name, inputPoints, inputInMatrix, inputOutMatrix, misalignmentMatrix, inverseMisalignmentMatrix, OParameters, EParameters));

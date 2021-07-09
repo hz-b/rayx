@@ -26,6 +26,7 @@ namespace RAY
         ~TracerInterface();
         void addLightSource(std::shared_ptr<LightSource> newSource);
         void generateRays(VulkanTracer* tracer, std::shared_ptr<LightSource> source);
+        void addOpticalElementToTracer(VulkanTracer* tracer, std::shared_ptr<OpticalElement> element);
         void writeToFile(const std::vector<double>& outputRays, std::ofstream& file, int index) const;
 
 

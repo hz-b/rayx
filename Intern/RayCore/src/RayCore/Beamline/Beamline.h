@@ -30,9 +30,6 @@ namespace RAY
             return m_Instance;
         }
 
-        //Somehow results in wrong values. Should be fixed later
-        //void addQuadric(Quadric newObject);
-
         void addOpticalElement(const std::shared_ptr<OpticalElement> q);
         void addOpticalElement(const char* name, const std::vector<double>& inputPoints, std::vector<double> inputInMatrix, std::vector<double> inputOutMatrix, std::vector<double> misalignmentMatrix, std::vector<double> inverseMisalignmentMatrix, std::vector<double> OParameters, std::vector<double> EParameters);
         void addOpticalElement(const char* name, std::vector<double>&& inputPoints, std::vector<double>&& inputInMatrix, std::vector<double>&& inputOutMatrix, std::vector<double>&& misalignmentMatrix, std::vector<double>&& inverseMisalignmentMatrix, std::vector<double>&& OParameters, std::vector<double>&& EParameters);

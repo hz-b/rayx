@@ -28,6 +28,10 @@ RAY_UI = p_join(RAY_UI, 'unittestData')
 print("old ray files in folder:",RAY_UI)
 scatterplot_size = 0.5
 
+def load_output():
+    data = pd.read_csv(OUTPUT_FILE, sep=';', header=0)
+    filtered = data[data['Weight']==1]
+    plt.scatter(filtered['Xloc'], filtered['Yloc'], s =0.2)
 
 def open_new_file(name, valid=0, energy=0):
     df = pd.read_csv(p_join(RAY_REWORKED, name), sep=';')

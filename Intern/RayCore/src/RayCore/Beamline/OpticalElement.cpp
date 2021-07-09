@@ -338,7 +338,10 @@ namespace RAY
     {   
         std::cout << "return anchor points" << std::endl;
         //assert(m_surface!=nullptr);
-        return m_surface->getParams();
+        if(m_surface != nullptr)
+            return m_surface->getParams();
+        else
+            return m_surfaceParams;
     }
 
     std::vector<double> OpticalElement::getSlopeError() const

@@ -42,6 +42,10 @@ namespace RAY
         tracer->addRayVector(rays.data(), rays.size());
     }
 
+    void TracerInterface::addOpticalElementToTracer(VulkanTracer* tracer, std::shared_ptr<OpticalElement> element) {
+        tracer->addVectors(element->getSurfaceParams(), element->getInMatrix(), element->getOutMatrix(), element->getTempMisalignmentMatrix(), element->getInverseTempMisalignmentMatrix(), element->getObjectParameters(), element->getElementParameters());
+    }
+
     // ! parameters are temporary and need to be removed again
     bool TracerInterface::run(double translationXerror, double translationYerror, double translationZerror)
     {
@@ -59,8 +63,8 @@ namespace RAY
 
 
         std::shared_ptr<MatrixSource> m = std::make_shared<MatrixSource>( 0, "matrix source", 20000, 0, 0.065, 0.04, 0, 0.001, 0.001, 100, 0, std::vector<double>{ 0,0,0,0 } );
-        std::shared_ptr<Slit> s = std::make_shared<Slit>("slit", 1, 20, 2, 0, 10000, 20, 1, m->getPhotonEnergy(), std::vector<double>{ 0,0,0, 0,0,0 }, nullptr);
-        std::shared_ptr<ImagePlane> i = std::make_shared<ImagePlane>("Image plane", 1000, nullptr );
+        std::shared_ptr<Slit> s = std::make_shared<Slit>("slit", 1, 20, 2, 7.5, 10000, 20, 1, m->getPhotonEnergy(), std::vector<double>{ 0,0,0, 0,0,0 }, nullptr);
+        std::shared_ptr<ImagePlane> i = std::make_shared<ImagePlane>("Image plane", 1000, s );
 
         // petes setup
         //PointSource p = PointSource(0, "spec1_first_rzp4", number_of_rays, 1, 0.005, 0.005, 0, 0.02, 0.06, 1, 1, 0, 0, 640, 120, { 0,0,0,0 });
@@ -112,7 +116,7 @@ namespace RAY
         for (int j = 0; j < beamlinesSimultaneously; j++) {
             for (int i = 0; i<int(Elements.size()); i++) {
                 std::cout << "add " << Elements[i]->getName() << std::endl;
-                tracer.addQuadric(Elements[i]->getSurfaceParams(), Elements[i]->getInMatrix(), Elements[i]->getOutMatrix(), Elements[i]->getTempMisalignmentMatrix(), Elements[i]->getInverseTempMisalignmentMatrix(), Elements[i]->getObjectParameters(), Elements[i]->getElementParameters());//, Quadrics[i].getInverseMisalignmentMatrix()
+                addOpticalElementToTracer(&tracer, Elements[i]);//, Quadrics[i].getInverseMisalignmentMatrix()
             }
         }
 
