@@ -1115,7 +1115,8 @@ void testOpticalElement(std::vector<std::shared_ptr<RAY::OpticalElement>> elemen
 
     std::list<double> outputRays = runTracer(m->getRays(), elements);
     std::string filename = "testFile_";
-    //filename.append();
+    std::cout << elements[0]->getName();
+    filename.append(elements[0]->getName());
     writeToFile(outputRays, filename);
 }
 // test complete optical elements instead of single functions
