@@ -5,6 +5,8 @@ SET(SOURCE
     src/RayCore/Application.cpp
     src/RayCore/Beamline/Beamline.cpp
     src/RayCore/Beamline/ImagePlane.cpp
+    src/RayCore/Beamline/BeamlineObject.cpp
+    src/RayCore/Beamline/OpticalElement.cpp
     src/RayCore/Beamline/LightSource.cpp
     src/RayCore/Beamline/MatrixSource.cpp
     src/RayCore/Beamline/RandomRays.cpp
@@ -31,6 +33,7 @@ SET(HEADERS
     src/RayCore/Beamline/Beamline.h
     src/RayCore/Beamline/ImagePlane.h
     src/RayCore/Beamline/BeamlineObject.h
+    src/RayCore/Beamline/OpticalElement.h
     src/RayCore/Beamline/LightSource.h
     src/RayCore/Beamline/MatrixSource.h
     src/RayCore/Beamline/RandomRays.h
