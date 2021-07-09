@@ -39,12 +39,8 @@ namespace RAY
         m_anchorPoints = inputPoints;
     }
 
-    std::vector<double> Quadric::getAnchorPoints() const
-    {
-        return m_anchorPoints;
-    }
-
-    std::vector<double> Quadric::getParams() {
+    std::vector<double> Quadric::getParams() const {
+        std::cout << "return anchor points" << std::endl;
         return m_anchorPoints;
     }
     

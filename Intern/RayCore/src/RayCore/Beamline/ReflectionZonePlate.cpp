@@ -19,19 +19,31 @@ namespace RAY
      *          lineDensity = line density of the grating
      *          orderOfDiffraction =
     */
-    ReflectionZonePlate::ReflectionZonePlate(const char* name, const int mount, const int curvatureType, const int designType, const int elementOffsetType, const double width, const double height, const double deviation, const double incidenceAngle, const double azimuthal, const double distanceToPreceedingElement, const double designEnergy, const double sourceEnergy, const double orderOfDiffraction, const double designOrderOfDiffraction, const double dAlpha, const double dBeta, const double mEntrance, const double mExit, const double sEntrance, const double sExit, const double shortRadius, const double longRadius, const int additional_zero_order, const double elementOffsetZ, const double fresnelZOffset, const double beta, const std::vector<double> misalignmentParams, const std::vector<double> slopeError, const Quadric* const previous) 
-       : Quadric(name, width, height, slopeError, previous) {
-        m_totalWidth = width;
-        m_totalHeight = height;
-        m_designEnergy = sourceEnergy; // eV, if auto == true, else designEnergy
+    ReflectionZonePlate::ReflectionZonePlate(const char* name, const int mount, const int curvatureType, const int designType, const int elementOffsetType, const double width, const double height, const double deviation, const double incidenceAngle, const double azimuthal, const double distanceToPreceedingElement, const double designEnergy, const double sourceEnergy, const double orderOfDiffraction, const double designOrderOfDiffraction, const double dAlpha, const double dBeta, const double mEntrance, const double mExit, const double sEntrance, const double sExit, const double shortRadius, const double longRadius, const int additional_zero_order, const double elementOffsetZ, const double fresnelZOffset, const double beta, const std::vector<double> misalignmentParams, const std::vector<double> slopeError, const std::shared_ptr<OpticalElement> previous) 
+       : OpticalElement(name, width, height, slopeError, previous),
+        m_totalWidth(width), 
+        m_totalHeight(height),
+        m_designAlphaAngle(rad(dAlpha)),
+        m_designBetaAngle(rad(dBeta)),
+        
+        m_chi(rad(azimuthal)),
+        m_grazingIncidenceAngle(rad(incidenceAngle)),
+        m_distanceToPreceedingElement(distanceToPreceedingElement),
+        
+        m_frenselZOffset(fresnelZOffset),
+        m_sagittalEntranceArmLength(sEntrance), //in mm
+        m_sagittalExitArmLength(sExit),
+        m_meridionalEntranceArmLength(mEntrance),
+        m_meridionalExitArmLength(mExit),
+        m_designEnergy(sourceEnergy), // eV, if auto == true, else designEnergy
+        m_orderOfDiffraction(orderOfDiffraction),
+        m_designOrderOfDiffraction(designOrderOfDiffraction),
+        m_elementOffsetZ(elementOffsetZ)
+        
+        {
         // m_designEnergy = designEnergy; // if Auto == true, take energy of Source (param sourceEnergy), else m_designEnergy = designEnergy
         m_wavelength = m_designEnergy == 0 ? 0 : inm2eV / m_designEnergy;
-        m_designOrderOfDiffraction = designOrderOfDiffraction;
-        m_orderOfDiffraction = orderOfDiffraction; // auto = m_designOrderOfDiffraction, else given param
         m_additionalOrder = additional_zero_order == 0 ? AO_OFF : AO_ON;
-
-        m_designAlphaAngle = rad(dAlpha);
-        m_designBetaAngle = rad(dBeta);
 
         m_curvatureType = curvatureType == 0 ? CT_PLANE : (curvatureType == 1 ? CT_TOROIDAL : CT_SPHERICAL);
         m_gratingMount = mount == 0 ? GM_DEVIATION : GM_INCIDENCE;
@@ -42,17 +54,7 @@ namespace RAY
         m_diffractionMethod = DM_2D; // 2D default
         m_fullEfficiency = FE_OFF; // default (1)
         m_elementOffsetType = elementOffsetType == 0 ? EZ_MANUAL : EZ_BEAMDIVERGENCE; //EZ_BEAMDIVERGENCE; // EZ_MANUAL; // default (0)
-        m_elementOffsetZ = elementOffsetZ;
-        m_frenselZOffset = fresnelZOffset; // default
         
-        m_sagittalEntranceArmLength = sEntrance; //in mm
-        m_meridionalEntranceArmLength = mEntrance; 
-        m_sagittalExitArmLength = sExit;
-        m_meridionalExitArmLength = mExit;
-
-        m_chi = rad(azimuthal);
-        m_distanceToPreceedingElement = distanceToPreceedingElement;
-        m_grazingIncidenceAngle = rad(incidenceAngle);
         // m_derivationAngle = derivation; // not used in RAY-UI, does grating mount even matter?
         m_meridionalDistance = 0;
         m_meridionalDivergence = 0;
@@ -69,17 +71,17 @@ namespace RAY
         printInfo();
         // set parameters in Quadric class
         if (m_curvatureType == CT_PLANE) {
-            editQuadric({ 0,0,0,0, m_totalWidth,0,0,-1, m_totalHeight,0,0,0, 4,0,0,0 });
+            setSurface(std::make_unique<Quadric>(std::vector<double>{ 0,0,0,0, m_totalWidth,0,0,-1, m_totalHeight,0,0,0, 4,0,0,0 }) );
         }
         else if (m_curvatureType == CT_SPHERICAL) {
             m_longRadius = longRadius; // for sphere and toroidal
-            editQuadric({ 1,0,0,0, m_totalWidth,1,0,-m_longRadius, m_totalHeight,0,1,0, 4,0,0,0 });
+            setSurface(std::make_unique<Quadric>(std::vector<double>{ 1,0,0,0, m_totalWidth,1,0,-m_longRadius, m_totalHeight,0,1,0, 4,0,0,0 }) );
         }
         else {
             // no structure for non-quadric elements yet
             m_longRadius = longRadius; // for sphere and toroidal
             m_shortRadius = shortRadius; // only for Toroidal
-            editQuadric({ 1,0,0,0, m_totalWidth,1,0,-m_longRadius, m_totalHeight,0,1,0, 4,0,0,0 });
+            setSurface(std::make_unique<Quadric>(std::vector<double>{ 1,0,0,0, m_totalWidth,1,0,-m_longRadius, m_totalHeight,0,1,0, 4,0,0,0 }) );
         }
 
         calcTransformationMatrices(m_alpha, m_chi, m_beta, m_distanceToPreceedingElement, misalignmentParams);

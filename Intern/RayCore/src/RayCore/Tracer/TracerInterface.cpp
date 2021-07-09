@@ -7,7 +7,6 @@
 
 #include "Beamline/MatrixSource.h"
 #include "Beamline/PointSource.h"
-#include "Beamline/ReflectionZonePlate.h"
 #include "Debug.h"
 #include "Ray.h"
 #include "VulkanTracer.h"
@@ -29,11 +28,11 @@ namespace RAY
         RAY_DEBUG(std::cout << "Deleting TracerInterface..." << std::endl);
     }
 
-    void TracerInterface::addLightSource(LightSource* newSource) {
+    void TracerInterface::addLightSource(std::shared_ptr<LightSource> newSource) {
         m_LightSources.push_back(newSource);
     }
 
-    void TracerInterface::generateRays(VulkanTracer* tracer, LightSource* source) {
+    void TracerInterface::generateRays(VulkanTracer* tracer, std::shared_ptr<LightSource> source) {
         //only one Source for now
         if (!tracer) return;
         if (!source) return;
@@ -55,22 +54,29 @@ namespace RAY
 
         //add source to tracer
         int beamlinesSimultaneously = 1;
-        int number_of_rays = 2000000;
+        int number_of_rays = 20000;
+
+
+        std::shared_ptr<MatrixSource> m = std::make_shared<MatrixSource>( 0, "matrix source", 20000, 0, 0.065, 0.04, 0, 0.001, 0.001, 100, 0, std::vector<double>{ 0,0,0,0 } );
+        std::shared_ptr<Slit> s = std::make_shared<Slit>("slit", 1, 20, 2, 0, 10000, 20, 1, m->getPhotonEnergy(), std::vector<double>{ 0,0,0, 0,0,0 }, nullptr);
+        std::shared_ptr<ImagePlane> i = std::make_shared<ImagePlane>("Image plane", 1000, nullptr );
 
         // petes setup
-        PointSource p = PointSource(0, "spec1_first_rzp4", number_of_rays, 1, 0.005, 0.005, 0, 3.142, 3.142, 1, 1, 0, 0, 640, 120, { 0,0,0,0 });
-        ReflectionZonePlate rzp = ReflectionZonePlate("ReflectionZonePete", 1, 0, 1, 1, 4, 60, 170, 2.2, 0, 90, p.getPhotonEnergy(), p.getPhotonEnergy(), 1, 1, 2.2, 4.75, 90, 400, 90, 400, 0, 0, 1, 0, -24.35, 4.75, { 0,0,0, 0,0,0 }, { 0,0,0,0, 0,0,0 }, nullptr);  // dx,dy,dz, dpsi,dphi,dchi //
-        PlaneGrating plG = PlaneGrating("PeteGratingDeviationAzMis", 0, 50, 200, 10, 0.0, 7.5, 10000, 100, 1000, 1, 2, 0, { 0,0,0, 0,0,0 }, { 0,0,0,0,0,0 }, { 0,0,0,0,0, 0,0 }, nullptr); // dx,dy,dz, dpsi,dphi,dchi // {1,2,3,0.001,0.002,0.003}
-        ImagePlane ip = ImagePlane("Image Plane", 385, &rzp); // one out of the bunch
+        //PointSource p = PointSource(0, "spec1_first_rzp4", number_of_rays, 1, 0.005, 0.005, 0, 0.02, 0.06, 1, 1, 0, 0, 640, 120, { 0,0,0,0 });
+        //ReflectionZonePlate rzp = ReflectionZonePlate("ReflectionZonePete", 1, 0, 1, 1, 4, 60, 170, 2.2, 0, 90, p.getPhotonEnergy(), p.getPhotonEnergy(), 1, 1, 2.2, 4.75, 90, 400, 90, 400, 0, 0, 1, 0, -24.35, 4.75, { 0,0,0, 0,0,0 }, { 0,0,0,0, 0,0,0 }, nullptr);  // dx,dy,dz, dpsi,dphi,dchi //
+        //PlaneGrating plG = PlaneGrating("PeteGratingDeviationAzMis", 0, 50, 200, 10, 0.0, 7.5, 10000, 100, 1000, 1, 2, 0, { 0,0,0, 0,0,0 }, { 0,0,0,0,0,0 }, { 0,0,0,0,0, 0,0 }, nullptr); // dx,dy,dz, dpsi,dphi,dchi // {1,2,3,0.001,0.002,0.003}
+        //ImagePlane ip = ImagePlane("Image Plane", 385, &rzp); // one out of the bunch
+        //PlaneMirror pl = PlaneMirror("plane Mirror", 50, 200, 10, 0, 10000, { 0,0,0, 0,0,0 }, { 10,10, 0,0,0, 0,0 }, nullptr);
 
-        addLightSource(&p);
+        addLightSource(m);
         for (int j = 0; j < beamlinesSimultaneously; j++) {
-            generateRays(&tracer, &p);
+            generateRays(&tracer, m);
         }
-        m_Beamline.addQuadric(rzp);
-        //m_Beamline.addQuadric(plG);
-        m_Beamline.addQuadric(ip);
+        m_Beamline.addOpticalElement(s);
+        //m_Beamline.addQuadric(pl);
+        m_Beamline.addOpticalElement(i);
 
+        
 
         // MatrixSource m = MatrixSource(0, "matrix source", number_of_rays, 0, 0.065, 0.04, 0, 0.001, 0.001, 100, 0, { 0,0,0,0 });
         // PlaneMirror p = PlaneMirror("plane Mirror", 50, 200, 10, 0, 10000, { 0,0,0, 0,0,0 }, { 10,10, 0,0,0, 0,0 }, nullptr);
@@ -96,17 +102,16 @@ namespace RAY
         PlaneMirror p4 = PlaneMirror("PlaneMirror4", 50, 200, 22, 17, 10000, {0,0,0, 0,0,0}, &p3); // {1,2,3,0.01,0.02,0.03}
         */
 
-        //m_Beamline.addQuadric(reflZonePlate.getName(), reflZonePlate.getAnchorPoints(), reflZonePlate.getInMatrix(), reflZonePlate.getOutMatrix(), reflZonePlate.getTempMisalignmentMatrix(), reflZonePlate.getInverseTempMisalignmentMatrix(), reflZonePlate.getParameters());
-        //m_Beamline.addQuadric(s); //rzp.getName(), rzp.getAnchorPoints(), rzp.getInMatrix(), rzp.getOutMatrix(), rzp.getTempMisalignmentMatrix(), rzp.getInverseTempMisalignmentMatrix(), rzp.getParameters());
-        //m_Beamline.addQuadric(i); //ip.getName(), ip.getAnchorPoints(), ip.getInMatrix(), ip.getOutMatrix(), ip.getTempMisalignmentMatrix(), ip.getInverseTempMisalignmentMatrix(), ip.getParameters());
         //add beamline to tracer
-        const std::vector<RAY::Quadric>& Quadrics = m_Beamline.getObjects();
-        tracer.setBeamlineParameters(beamlinesSimultaneously, Quadrics.size(), number_of_rays);
+        const std::vector<std::shared_ptr<OpticalElement>> Elements = m_Beamline.getObjects();
+        tracer.setBeamlineParameters(beamlinesSimultaneously, Elements.size(), number_of_rays);
+
+
 
         for (int j = 0; j < beamlinesSimultaneously; j++) {
-            for (int i = 0; i<int(Quadrics.size()); i++) {
-                std::cout << "add " << Quadrics[i].getName() << std::endl;
-                tracer.addQuadric(Quadrics[i].getAnchorPoints(), Quadrics[i].getInMatrix(), Quadrics[i].getOutMatrix(), Quadrics[i].getTempMisalignmentMatrix(), Quadrics[i].getInverseTempMisalignmentMatrix(), Quadrics[i].getObjectParameters(), Quadrics[i].getElementParameters());//, Quadrics[i].getInverseMisalignmentMatrix()
+            for (int i = 0; i<int(Elements.size()); i++) {
+                std::cout << "add " << Elements[i]->getName() << std::endl;
+                tracer.addQuadric(Elements[i]->getSurfaceParams(), Elements[i]->getInMatrix(), Elements[i]->getOutMatrix(), Elements[i]->getTempMisalignmentMatrix(), Elements[i]->getInverseTempMisalignmentMatrix(), Elements[i]->getObjectParameters(), Elements[i]->getElementParameters());//, Quadrics[i].getInverseMisalignmentMatrix()
             }
         }
 

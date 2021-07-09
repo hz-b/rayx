@@ -6,6 +6,7 @@
 #include <string>
 #include <vector>
 #include <set>
+#include <memory>
 
 class VulkanTracer;
 
@@ -23,14 +24,14 @@ namespace RAY
 
         TracerInterface();
         ~TracerInterface();
-        void addLightSource(LightSource* newSource);
-        void generateRays(VulkanTracer* tracer, LightSource* source);
+        void addLightSource(std::shared_ptr<LightSource> newSource);
+        void generateRays(VulkanTracer* tracer, std::shared_ptr<LightSource> source);
         void writeToFile(const std::vector<double>& outputRays, std::ofstream& file, int index) const;
 
 
         bool run(double translationXerror, double translationYerror, double translationZerror);
     private:
-        std::vector<LightSource*> m_LightSources;
+        std::vector<std::shared_ptr<LightSource>> m_LightSources;
         Beamline& m_Beamline;
     };
 } // namespace RAY

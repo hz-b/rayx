@@ -1,14 +1,15 @@
 #pragma once
 #include "Surface/Quadric.h"
+#include "OpticalElement.h"
 
 namespace RAY
 {
 
-    class RAY_API SphereMirror : public Quadric {
+    class RAY_API SphereMirror : public OpticalElement {
 
     public:
 
-        SphereMirror(const char* name, const double width, const double height, const double grazingIncidence, const double azimuthal, const double distanceToPreceedingElement, const double entranceArmLength, const double exitArmLength, const std::vector<double> misalignmentParams, const std::vector<double> slopeError, const Quadric* const previous);
+        SphereMirror(const char* name, const double width, const double height, const double grazingIncidence, const double azimuthal, const double distanceToPreceedingElement, const double entranceArmLength, const double exitArmLength, const std::vector<double> misalignmentParams, const std::vector<double> slopeError, const std::shared_ptr<OpticalElement> previous);
         SphereMirror();
         ~SphereMirror();
 
@@ -27,8 +28,8 @@ namespace RAY
         double m_totalWidth;
         double m_totalHeight;
         double m_radius;
-        double m_exitArmLength;
         double m_entranceArmLength;
+        double m_exitArmLength;
         // grazing incidence, in rad
         double m_alpha;
         double m_beta;

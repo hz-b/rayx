@@ -14,20 +14,22 @@ namespace RAY
      *          distanceToPreceedingElement
      * 
     */
-    SphereMirror::SphereMirror(const char* name, const double width, const double height, const double grazingIncidence, const double azimuthal, const double distanceToPreceedingElement, const double entranceArmLength, const double exitArmLength, const std::vector<double> misalignmentParams, const std::vector<double> slopeError, const Quadric* const previous) 
-    : Quadric(name,{1,0,0,0, width,1,0,-1, height,0,1,0, 0,0,0,0}, {0,0,0,0, 0,0,0,0, 0,0,0,0, 0,0,0,0}, width, height, rad(grazingIncidence), rad(azimuthal), rad(grazingIncidence), distanceToPreceedingElement, misalignmentParams, {0,0,0,0,0,0}, slopeError, previous) {
+    SphereMirror::SphereMirror(const char* name, const double width, const double height, const double grazingIncidence, const double azimuthal, const double distanceToPreceedingElement, const double entranceArmLength, const double exitArmLength, const std::vector<double> misalignmentParams, const std::vector<double> slopeError, const std::shared_ptr<OpticalElement> previous) 
+    : OpticalElement(name, {0,0,0,0, 0,0,0,0, 0,0,0,0, 0,0,0,0}, width, height, rad(grazingIncidence), rad(azimuthal), rad(grazingIncidence), distanceToPreceedingElement, misalignmentParams, {0,0,0,0,0,0}, slopeError, previous),
+        m_totalWidth (width),
+        m_totalHeight (height),
+        m_entranceArmLength (entranceArmLength),
+        m_exitArmLength (exitArmLength),
+        m_alpha (rad(grazingIncidence)),
+        m_beta(m_alpha), // mirror -> exit angle = incidence angle
+        m_chi (rad(azimuthal)),
+        m_distanceToPreceedingElement (distanceToPreceedingElement)
+    {
         // std::vector<double> inputPoints = {0,0,0,0, 0,0,0,-1, 0,0,0,0, 0,0,0,0};
-        m_totalWidth = width;
-        m_totalHeight = height;
-        m_entranceArmLength = entranceArmLength;
-        m_exitArmLength = exitArmLength;
-        m_chi = rad(azimuthal);
-        m_alpha = rad(grazingIncidence);
-        m_beta = m_alpha; // mirror -> exit angle = incidence angle
-        m_distanceToPreceedingElement = distanceToPreceedingElement;
+        
         
         calcRadius(); // calculate the radius
-        editQuadric({1,0,0,0, 0,1,0,-m_radius, 0,0,1,0, 0,0,0,0});
+        setSurface(std::make_unique<Quadric>(std::vector<double>{1,0,0,0, 0,1,0,-m_radius, 0,0,1,0, 0,0,0,0}) );
     }
 
     SphereMirror::~SphereMirror()

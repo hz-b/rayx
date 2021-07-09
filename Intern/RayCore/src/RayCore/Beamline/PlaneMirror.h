@@ -1,14 +1,15 @@
 #pragma once
 #include "Surface/Quadric.h"
+#include "OpticalElement.h"
 
 namespace RAY
 {
 
-    class RAY_API PlaneMirror : public Quadric {
+    class RAY_API PlaneMirror : public OpticalElement {
 
     public:
 
-        PlaneMirror(const char* name, const double width, const double height, const double grazingIncidence, const double azimuthal, const double distanceToPreceedingElement, const std::vector<double> misalignmentParams, const std::vector<double> slopeError, const Quadric* const previous);
+        PlaneMirror(const char* name, const double width, const double height, const double grazingIncidence, const double azimuthal, const double distanceToPreceedingElement, const std::vector<double> misalignmentParams, const std::vector<double> slopeError, const std::shared_ptr<OpticalElement> previous);
         PlaneMirror();
         ~PlaneMirror();
 

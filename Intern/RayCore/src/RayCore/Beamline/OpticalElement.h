@@ -4,25 +4,27 @@
 #include "utils.h"
 #include <iostream>
 #include <stdexcept>
+#include <memory>
 #include "Surface/Surface.h"
 #include "BeamlineObject.h"
 
 namespace RAY
 {
 
-    class RAY_API OpticalElement : BeamlineObject
+    class RAY_API OpticalElement : public BeamlineObject
     {
     public:
 
-        OpticalElement(const char* name, const Surface* surface, const std::vector<double> inputInMatrix, const std::vector<double> inputOutMatrix, const std::vector<double> misalignmentMatrix, const std::vector<double> inverseMisalignmentMatrix, const std::vector<double> OParameters, const std::vector<double> EParameters);
-        OpticalElement(const char* name, const Surface* surface, const std::vector<double> EParameters, const double width, const double height, const double alpha, const double chi, const double beta, const double dist, const std::vector<double> misalignmentParams, const std::vector<double> tempMisalignmentParams, const std::vector<double> slopeError, const OpticalElement* const previous);
-        OpticalElement(const char* name, const double width, const double height, const std::vector<double> slopeError, const OpticalElement* const previous);
+        OpticalElement(const char* name, const std::vector<double> surfacePoints, const std::vector<double> inputInMatrix, const std::vector<double> inputOutMatrix, const std::vector<double> misalignmentMatrix, const std::vector<double> inverseMisalignmentMatrix, const std::vector<double> OParameters, const std::vector<double> EParameters);
+        OpticalElement(const char* name, const std::vector<double> EParameters, const double width, const double height, const double alpha, const double chi, const double beta, const double dist, const std::vector<double> misalignmentParams, const std::vector<double> tempMisalignmentParams, const std::vector<double> slopeError, const std::shared_ptr<OpticalElement> previous);
+        OpticalElement(const char* name, const double width, const double height, const std::vector<double> slopeError, const std::shared_ptr<OpticalElement> previous);
 
         void setObjectParameters(std::vector<double> params);
         void setElementParameters(std::vector<double> params);
         void setInMatrix(std::vector<double> inputMatrix);
         void setOutMatrix(std::vector<double> inputMatrix);
-
+        void setSurface(std::unique_ptr<Surface> surface);
+        
         std::vector<double> getInMatrix() const;
         std::vector<double> getOutMatrix() const;
         std::vector<double> getMisalignmentMatrix() const;
@@ -42,9 +44,9 @@ namespace RAY
         std::vector<double> getInverseTempMisalignmentMatrix() const;
         std::vector<double> getObjectParameters() const;
         std::vector<double> getElementParameters() const;
+        std::vector<double> getSurfaceParams() const;
         std::vector<double> getSlopeError() const;
-        const char* getName() const;
-
+        
         void calcTransformationMatrices(const double alpha, const double chi, const double beta, const double dist, const std::vector<double> misalignment);
         // set misalignment that needs to be removed separated from the transformation matrices during tracing
         void setTemporaryMisalignment(std::vector<double> misalignment);
@@ -57,10 +59,11 @@ namespace RAY
         
         // name 
         // surface (eg Quadric or if eg torus something else)
-        const Surface* m_surface;
+        std::unique_ptr<Surface> m_surface;
+        std::vector<double> m_surfaceParams; // used to be anchor points
         
         // previous optical element (needed for read access of the transformation matrices to derive global coordinates for this element)
-        const OpticalElement* m_previous; 
+        std::shared_ptr<OpticalElement> m_previous; 
 
         // transformation matrices:
 

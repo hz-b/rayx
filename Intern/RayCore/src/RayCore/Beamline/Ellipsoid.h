@@ -1,15 +1,16 @@
 #pragma once
 #include "Surface/Quadric.h"
+#include "OpticalElement.h"
 
 namespace RAY
 {
 
-    class RAY_API Ellipsoid : public Quadric {
+    class RAY_API Ellipsoid : public OpticalElement {
 
     public:
 
         Ellipsoid(const char* name, const double width, const double height, const double grazingIncidence, const double azimuthal, const double distanceToPreceedingElement,
-            const double entranceArmLength, const double exitArmLength, const int coordSys, const int figRot, const double a11, const std::vector<double> misalignmentParams, const std::vector<double> slopeError, const Quadric* const previous);
+            const double entranceArmLength, const double exitArmLength, const int coordSys, const int figRot, const double a11, const std::vector<double> misalignmentParams, const std::vector<double> slopeError, const std::shared_ptr<OpticalElement> previous);
         Ellipsoid();
         ~Ellipsoid();
 
@@ -43,8 +44,8 @@ namespace RAY
         double m_totalWidth;
         double m_totalHeight;
         double m_radius;
-        double m_exitArmLength;
         double m_entranceArmLength;
+        double m_exitArmLength;
         double m_y0; // center of ellipsoid
         double m_z0; // -"-
         // grazing incidence, in rad

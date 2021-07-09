@@ -1,15 +1,17 @@
 #include "OpticalElement.h"
 #include <cassert>
+#include <assert.h>
 #include <math.h>
 
 namespace RAY
 {
-    OpticalElement::OpticalElement(const char* name, const Surface* surface, const std::vector<double> inputInMatrix, const std::vector<double> inputOutMatrix, const std::vector<double> misalignmentMatrix, const std::vector<double> inverseMisalignmentMatrix, const std::vector<double> OParameters, const std::vector<double> EParameters)
+    OpticalElement::OpticalElement(const char* name, const std::vector<double> surfacePoints, const std::vector<double> inputInMatrix, const std::vector<double> inputOutMatrix, const std::vector<double> misalignmentMatrix, const std::vector<double> inverseMisalignmentMatrix, const std::vector<double> OParameters, const std::vector<double> EParameters)
      : BeamlineObject(name)
     {   
-        std::cout << surface.getParams().size() << inputInMatrix.size() << inputOutMatrix.size() << misalignmentMatrix.size() << inverseMisalignmentMatrix.size() << EParameters.size() << OParameters.size() << std::endl;
+        std::cout << surfacePoints.size() <<  inputInMatrix.size() << inputOutMatrix.size() << misalignmentMatrix.size() << inverseMisalignmentMatrix.size() << EParameters.size() << OParameters.size() << std::endl;
         // surface.getParams() to shader/buffer
-        assert(inputInMatrix.size() == 16 && inputOutMatrix.size() == 16 && misalignmentMatrix.size() == 16 && inverseMisalignmentMatrix.size() == 16 && EParameters.size() == 16 && OParameters.size() == 16); //parameter size ==6?
+        assert(surfacePoints.size() == 16 && inputInMatrix.size() == 16 && inputOutMatrix.size() == 16 && misalignmentMatrix.size() == 16 && inverseMisalignmentMatrix.size() == 16 && EParameters.size() == 16 && OParameters.size() == 16); //parameter size ==6?
+        m_surfaceParams = surfacePoints;
         m_inMatrix = inputInMatrix;
         m_outMatrix = inputOutMatrix;
         m_temporaryMisalignmentMatrix = misalignmentMatrix;
@@ -36,28 +38,29 @@ namespace RAY
      * @param misalignmentParams        angles and distances for the object's misalignment
      * @param tempMisalignmentParams    parameters for temporary misalignment that can be removed midtracing.
     */
-    OpticalElement::OpticalElement(const char* name, const Surface* surface, const std::vector<double> EParameters, const double width, const double height, const double alpha, const double chi, const double beta, const double dist, const std::vector<double> misalignmentParams, const std::vector<double> tempMisalignmentParams, const std::vector<double> slopeError, const OpticalElement* const previous)
-     : BeamlineObject(name)
+    OpticalElement::OpticalElement(const char* name, const std::vector<double> EParameters, const double width, const double height, const double alpha, const double chi, const double beta, const double dist, const std::vector<double> misalignmentParams, const std::vector<double> tempMisalignmentParams, const std::vector<double> slopeError, const std::shared_ptr<OpticalElement> previous)
+     : BeamlineObject(name), 
+        //m_surface(std::move(surface)), 
+        m_previous(previous),
+        m_misalignmentParams(misalignmentParams),
+        m_slopeError(slopeError),
+        m_elementParameters(EParameters)
     {
-        // todo: make surface? or give as parameter
-        m_surface = surface;
-        m_previous = previous;
         m_objectParameters = {
             width, height, slopeError[0], slopeError[1],
             slopeError[2], slopeError[3], slopeError[4], slopeError[5],
             slopeError[6],0,0,0,
             0,0,0,0
         };
-        m_slopeError = slopeError;
-        m_elementParameters = EParameters;
-        //m_anchorPoints = inputPoints;
-        m_misalignmentParams = misalignmentParams;
         calcTransformationMatrices(alpha, chi, beta, dist, misalignmentParams);
         setTemporaryMisalignment(tempMisalignmentParams);
     }
 
-    OpticalElement::OpticalElement(const char* name, const double width, const double height, const std::vector<double> slopeError, const OpticalElement* const previous)
-     : BeamlineObject(name), m_previous(previous) {
+    OpticalElement::OpticalElement(const char* name, const double width, const double height, const std::vector<double> slopeError, const std::shared_ptr<OpticalElement> previous)
+     : BeamlineObject(name), 
+        //m_surface(std::move(surface)), 
+        m_previous(previous) 
+    {
         m_slopeError = slopeError;
         setObjectParameters({
             width, height, slopeError[0], slopeError[1],
@@ -244,6 +247,14 @@ namespace RAY
         assert(inputMatrix.size() == 16);
         m_outMatrix = inputMatrix;
     }
+
+    void OpticalElement::setSurface(std::unique_ptr<Surface> surface) {
+        m_surface = std::move(surface);
+        assert(surface==nullptr);
+        assert(m_surface!=nullptr);
+        
+    }
+
     std::vector<double> OpticalElement::getInMatrix() const
     {
         return m_inMatrix;
@@ -321,6 +332,13 @@ namespace RAY
     std::vector<double> OpticalElement::getElementParameters() const
     {
         return m_elementParameters;
+    }
+
+    std::vector<double> OpticalElement::getSurfaceParams() const
+    {   
+        std::cout << "return anchor points" << std::endl;
+        assert(m_surface!=nullptr);
+        return m_surface->getParams();
     }
 
     std::vector<double> OpticalElement::getSlopeError() const

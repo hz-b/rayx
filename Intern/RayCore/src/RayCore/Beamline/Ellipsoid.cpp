@@ -15,17 +15,19 @@ namespace RAY
      * 
     */
     Ellipsoid::Ellipsoid(const char* name, const double width, const double height, const double grazingIncidence, const double azimuthal, const double distanceToPreceedingElement, 
-        const double entranceArmLength, const double exitArmLength, const int coordSys, const int figRot, const double a_11, const std::vector<double> misalignmentParams, const std::vector<double> slopeError, const Quadric* const previous) 
-    : Quadric(name, width, height, slopeError, previous) {
+        const double entranceArmLength, const double exitArmLength, const int coordSys, const int figRot, const double a_11, const std::vector<double> misalignmentParams, const std::vector<double> slopeError, const std::shared_ptr<OpticalElement> previous) 
+        : OpticalElement(name , width, height, slopeError, previous),
+        m_totalWidth(width),
+        m_totalHeight(height),
+        m_entranceArmLength(entranceArmLength),
+        m_exitArmLength(exitArmLength),
+        m_alpha(rad(grazingIncidence)),
+        m_chi(rad(azimuthal)),
+        m_distanceToPreceedingElement(distanceToPreceedingElement),
+        m_a11(a_11)
+    {
+
         std::cout << "ellipsoid" << std::endl;
-        m_totalWidth = width;
-        m_totalHeight = height;
-        m_entranceArmLength = entranceArmLength;
-        m_exitArmLength = exitArmLength;
-        m_a11 = a_11;
-        m_alpha = rad(grazingIncidence);
-        m_chi = rad(azimuthal);
-        m_distanceToPreceedingElement = distanceToPreceedingElement;
         m_offsetY0 = 0;// what is this for? RAY.FOR: "only !=0 in case of Monocapillary"
 
         m_misalignmentCoordSys = (coordSys == 0 ? CS_CURVATURE : CS_MIRROR);
@@ -40,7 +42,8 @@ namespace RAY
         d_a44 = -pow(m_shortHalfAxisB,2) + pow(m_y0,2) + pow(m_z0*m_shortHalfAxisB/m_longHalfAxisA,2);
         m_radius = -m_y0;
 
-        editQuadric({m_a11,0,0,0, 0,1,0,m_radius, 0,0,d_a33,d_a34, 0,0,0,d_a44});
+        setSurface(std::make_unique<Quadric>( std::vector<double>{m_a11,0,0,0, 0,1,0,m_radius, 0,0,d_a33,d_a34, 0,0,0,d_a44}));
+        // setSurface(surface);
         calcTransformationMatrices(m_alpha1, m_chi, m_beta, m_distanceToPreceedingElement, {0,0,0,0,0,0});
         setElementParameters({m_totalWidth,m_totalHeight,m_a11,m_y0, d_a33,d_a34,d_a44,0, 0,0,0,0, 0,0,0,0});
 
