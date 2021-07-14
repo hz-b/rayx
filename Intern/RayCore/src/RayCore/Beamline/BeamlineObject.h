@@ -23,8 +23,8 @@ namespace RAY
 
     private:
         const char* m_name;
-        
-        
+
+
     };
 
 

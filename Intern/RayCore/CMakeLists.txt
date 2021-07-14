@@ -3,11 +3,13 @@ project(RayCore)
 
 SET(SOURCE
     src/RayCore/Application.cpp
+    src/RayCore/utils.cpp
     src/RayCore/Beamline/Beamline.cpp
     src/RayCore/Beamline/BeamlineObject.cpp
     src/RayCore/Beamline/OpticalElement.cpp
-    src/RayCore/Beamline/Objects/ImagePlane.cpp
     src/RayCore/Beamline/LightSource.cpp
+    src/RayCore/Beamline/BeamlineObjectFactory.cpp
+    src/RayCore/Beamline/Objects/ImagePlane.cpp
     src/RayCore/Beamline/Objects/MatrixSource.cpp
     src/RayCore/Beamline/Objects/RandomRays.cpp
     src/RayCore/Beamline/Objects/PointSource.cpp
@@ -19,22 +21,23 @@ SET(SOURCE
     src/RayCore/Beamline/Objects/PlaneMirror.cpp
     src/RayCore/Beamline/Objects/PointSource.cpp
     src/RayCore/Beamline/Objects/SphereMirror.cpp
+    src/RayCore/Data/Exporter.cpp
     src/RayCore/Surface/Quadric.cpp
     src/RayCore/Surface/Surface.cpp
-    src/RayCore/utils.cpp
     src/RayCore/Tracer/Ray.cpp
     src/RayCore/Tracer/TracerInterface.cpp
-    src/RayCore/Data/Exporter.cpp
 )
 
 SET(HEADERS
     src/RayCore/Application.h
     src/RayCore/Debug.h
+    src/RayCore/utils.h
     src/RayCore/Beamline/Beamline.h
-    src/RayCore/Beamline/Objects/ImagePlane.h
     src/RayCore/Beamline/BeamlineObject.h
     src/RayCore/Beamline/OpticalElement.h
     src/RayCore/Beamline/LightSource.h
+    src/RayCore/Beamline/BeamlineObjectFactory.h
+    src/RayCore/Beamline/Objects/ImagePlane.h
     src/RayCore/Beamline/Objects/MatrixSource.h
     src/RayCore/Beamline/Objects/RandomRays.h
     src/RayCore/Beamline/Objects/PointSource.h
@@ -46,12 +49,11 @@ SET(HEADERS
     src/RayCore/Beamline/Objects/PlaneMirror.h
     src/RayCore/Beamline/Objects/PointSource.h
     src/RayCore/Beamline/Objects/SphereMirror.h
+    src/RayCore/Data/Exporter.h
     src/RayCore/Surface/Quadric.h
     src/RayCore/Surface/Surface.h
-    src/RayCore/utils.h
     src/RayCore/Tracer/Ray.h
     src/RayCore/Tracer/TracerInterface.h
-    src/RayCore/Data/Exporter.h
 )
 
 
