@@ -110,6 +110,7 @@ namespace RAY
         if(m_figureRotation == FR_YES) {
             d_halfAxisC = sqrt(pow(m_shortHalfAxisB,2)/1); // devided by 1??
         }else if(m_figureRotation == FR_PLANE) {
+            std::cout << "FR PLane"<< std::endl;
             d_halfAxisC = INFINITY;
         }else{
             d_halfAxisC = sqrt(pow(m_shortHalfAxisB,2)/m_a11);
