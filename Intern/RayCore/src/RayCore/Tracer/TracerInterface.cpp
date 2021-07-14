@@ -63,7 +63,7 @@ namespace RAY
 
 
         std::shared_ptr<MatrixSource> m = std::make_shared<MatrixSource>( 0, "matrix source", 20000, 0, 0.065, 0.04, 0, 0.001, 0.001, 100, 0, std::vector<double>{ 0,0,0,0 } );
-        std::shared_ptr<Slit> s = std::make_shared<Slit>("slit", 1, 20, 2, 7.5, 10000, 20, 1, m->getPhotonEnergy(), std::vector<double>{ 0,0,0, 0,0,0 }, nullptr);
+        std::shared_ptr<Slit> s = std::make_shared<Slit>("slit", 1, 2, 20, 2, 7.5, 10000, 20, 1, m->getPhotonEnergy(), std::vector<double>{ 0,0,0, 0,0,0 }, nullptr);
         std::shared_ptr<ImagePlane> i = std::make_shared<ImagePlane>("Image plane", 1000, s );
 
         // petes setup

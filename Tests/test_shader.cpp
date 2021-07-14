@@ -132,7 +132,7 @@ void writeToFile(std::list<double> outputRays, std::string name)
     outputFile.close();
     std::cout << "done!" << std::endl;
 }
-
+/*
 TEST(Tracer, testUniformRandom) {
     double settings = 17;
 
@@ -1230,12 +1230,12 @@ TEST(globalCoordinates, FourMirrors_20Rays) {
 
 TEST(opticalElements, slit1) {
     std::shared_ptr<RAY::MatrixSource> m = std::make_shared<RAY::MatrixSource>(0, "matrix source", 200, 0, 0.065, 0.04, 0, 0.001, 0.001, 100, 0, std::vector<double>{ 0,0,0,0 });
-    std::shared_ptr<RAY::Slit> s = std::make_shared<RAY::Slit>("slit", 1, 20, 2, 0, 10000, 20, 1, m->getPhotonEnergy(), std::vector<double>{ 0,0,0, 0,0,0 }, nullptr);
+    std::shared_ptr<RAY::Slit> s = std::make_shared<RAY::Slit>("slit", 0, 1, 20, 2, 0, 10000, 20, 1, m->getPhotonEnergy(), std::vector<double>{ 0,0,0, 0,0,0 }, nullptr);
     std::shared_ptr<RAY::ImagePlane> ip = std::make_shared<RAY::ImagePlane>("Image plane", 1000, s);
     std::list<double> outputRays = runTracer(m->getRays(), {s,ip});
     int counter = 0;
     for (std::list<double>::iterator i = outputRays.begin(); i != outputRays.end();) {
-        std::cout << counter << "; " << *i << std::endl;
+        // only if weight == 1
         if (counter % 8 == 1) { // y loc
             EXPECT_TRUE(abs(*i) >= 0.5);
             EXPECT_TRUE(abs(*i) <= 1.3);
@@ -1245,7 +1245,7 @@ TEST(opticalElements, slit1) {
         counter++;
         i++;
     }
-}
+}*/
 /*
 
 // PETES SETUP
