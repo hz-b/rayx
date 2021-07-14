@@ -1,12 +1,14 @@
 #pragma once
-#include "Core.h"
+
 #include <vector>
-#include "utils.h"
 #include <iostream>
 #include <stdexcept>
 #include <memory>
-#include "Surface/Surface.h"
+
 #include "BeamlineObject.h"
+#include "Core.h"
+#include "Surface/Surface.h"
+#include "utils.h"
 
 namespace RAY
 {
@@ -26,7 +28,7 @@ namespace RAY
         void setInMatrix(std::vector<double> inputMatrix);
         void setOutMatrix(std::vector<double> inputMatrix);
         void setSurface(std::unique_ptr<Surface> surface);
-        
+
         std::vector<double> getInMatrix() const;
         std::vector<double> getOutMatrix() const;
         std::vector<double> getMisalignmentMatrix() const;
@@ -48,24 +50,24 @@ namespace RAY
         std::vector<double> getElementParameters() const;
         std::vector<double> getSurfaceParams() const;
         std::vector<double> getSlopeError() const;
-        
+
         void calcTransformationMatrices(const double alpha, const double chi, const double beta, const double dist, const std::vector<double> misalignment);
         // set misalignment that needs to be removed separated from the transformation matrices during tracing
         void setTemporaryMisalignment(std::vector<double> misalignment);
-        
+
         OpticalElement();
         ~OpticalElement();
 
     private:
-        
-        
+
+
         // name 
         // surface (eg Quadric or if eg torus something else)
         std::unique_ptr<Surface> m_surface;
         std::vector<double> m_surfaceParams; // used to be anchor points
-        
+
         // previous optical element (needed for read access of the transformation matrices to derive global coordinates for this element)
-        std::shared_ptr<OpticalElement> m_previous; 
+        std::shared_ptr<OpticalElement> m_previous;
 
         // transformation matrices:
 

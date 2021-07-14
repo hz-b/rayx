@@ -14,7 +14,7 @@ void RayList::addVector() {
     if (m_rayList.size() > 0) {
 
         //std::cout<<"addVector: last vector size= "<< m_rayList.back().size() <<std::endl;    
-        assert(("Size of last Ray vector is not equal to RAY_VECTOR_SIZE", (m_rayList.back()).size() == RAY_MAX_ELEMENTS_IN_VECTOR));
+        assert(m_rayList.back().size() == RAY_MAX_ELEMENTS_IN_VECTOR);
 
     }
     std::vector<Ray> newRayVector;
@@ -84,7 +84,7 @@ void RayList::insertVector(void* location, size_t inputSize) {
         m_rayList.back().resize(m_rayList.back().size() + (bytesNeededToFillLastVector / (RAY_DOUBLE_COUNT * sizeof(double))));
         std::cout << "size after resize= " << (m_rayList.back()).size() << std::endl;
         int i = bytesNeededToFillLastVector;
-        for (;i < (int(inputSize) * RAY_DOUBLE_COUNT * sizeof(double)) - RAY_VECTOR_SIZE; i = i + RAY_VECTOR_SIZE) {
+        for (;i < (int(inputSize * RAY_DOUBLE_COUNT * sizeof(double)) - RAY_VECTOR_SIZE); i = i + RAY_VECTOR_SIZE) {
             addVector();
 
             std::cout << "insert vector: reserved" << std::endl;
