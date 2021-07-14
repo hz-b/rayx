@@ -16,15 +16,20 @@ namespace RAY
      * @param misalignmentParams angles and distances for the mirror's misalignment
      * 
     */
-    Slit::Slit(const char* name, int beamstop, double width, double height, double azimuthal, double dist, double beamstopWidth, double beamstopHeight, double sourceEnergy, std::vector<double> misalignmentParams, std::shared_ptr<OpticalElement> previous) 
-    : OpticalElement(name, width, height, {0,0,0,0,0,0,0}, previous),
+    Slit::Slit(const char* name, int shape, int beamstop, double width, double height, double azimuthal, double dist, double beamstopWidth, double beamstopHeight, double sourceEnergy, std::vector<double> misalignmentParams, std::shared_ptr<OpticalElement> previous) 
+    : OpticalElement(name, {0,0,0,0,0,0,0}, previous),
     m_waveLength(abs(hvlam(sourceEnergy))),
     m_chi(rad(azimuthal)),
     m_distanceToPreceedingElement(dist)
-    {
+    {   
+        m_shape = shape == 0 ? GS_RECTANGLE : GS_ELLIPTICAL;
         m_centralBeamstop = beamstop == 0 ? CS_NONE : (beamstop==1 ? CS_RECTANGLE : CS_ELLIPTICAL );
-        m_totalWidth = m_centralBeamstop == CS_ELLIPTICAL ? -abs(width) : abs(width);
-        m_totalHeight = m_centralBeamstop == CS_ELLIPTICAL ? -abs(height) : abs(height);
+        // if elliptical encode width and height with negative sign, if rectangle -> positive sign
+        m_totalWidth = m_shape == GS_ELLIPTICAL ? -abs(width) : abs(width);
+        m_totalHeight = m_shape == GS_ELLIPTICAL ? -abs(height) : abs(height);
+        setDimensions(m_totalWidth, m_totalHeight);
+        // if no beamstop -> set to zero
+        // if elliptical set width (xStop) to negative value to encode the shape (xStop < 0 -> Elliptical, xStop > 0 -> rectangle, xStop = yStop = 0 -> none)
         m_beamstopWidth = m_centralBeamstop == CS_NONE ? 0 : (m_centralBeamstop == CS_ELLIPTICAL ? -abs(beamstopWidth) : abs(beamstopWidth));
         m_beamstopHeight = m_centralBeamstop == CS_NONE ? 0 : (m_centralBeamstop == CS_ELLIPTICAL ? abs(beamstopHeight) : abs(beamstopHeight));
         
@@ -56,6 +61,11 @@ namespace RAY
     int Slit::getCentralBeamstop() const {
         return m_centralBeamstop;
     }
+    
+    int Slit::getShape() const {
+        return m_shape;
+    }
+
     double Slit::getBeamstopWidth() const {
         return m_beamstopWidth;
     }

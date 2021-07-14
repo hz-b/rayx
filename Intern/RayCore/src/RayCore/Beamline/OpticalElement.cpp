@@ -71,6 +71,10 @@ namespace RAY
         
     }
 
+    OpticalElement::OpticalElement(const char* name, const std::vector<double> slopeError, const std::shared_ptr<OpticalElement> previous)
+     : BeamlineObject(name), m_previous(previous), m_slopeError(slopeError) {}
+
+
     OpticalElement::OpticalElement() {} 
 
     OpticalElement::~OpticalElement()
@@ -236,6 +240,14 @@ namespace RAY
         m_elementParameters = params;
     }
 
+    void OpticalElement::setDimensions(double width, double height) {
+        setObjectParameters({
+            width, height, m_slopeError[0], m_slopeError[1],
+            m_slopeError[2], m_slopeError[3], m_slopeError[4], m_slopeError[5],
+            m_slopeError[6],0,0,0,
+            0,0,0,0
+        });
+    }
     
     void OpticalElement::setInMatrix(std::vector<double> inputMatrix)
     {

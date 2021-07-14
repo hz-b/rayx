@@ -18,9 +18,11 @@ namespace RAY
         OpticalElement(const char* name, const std::vector<double> surfacePoints, const std::vector<double> inputInMatrix, const std::vector<double> inputOutMatrix, const std::vector<double> misalignmentMatrix, const std::vector<double> inverseMisalignmentMatrix, const std::vector<double> OParameters, const std::vector<double> EParameters);
         OpticalElement(const char* name, const std::vector<double> EParameters, const double width, const double height, const double alpha, const double chi, const double beta, const double dist, const std::vector<double> misalignmentParams, const std::vector<double> tempMisalignmentParams, const std::vector<double> slopeError, const std::shared_ptr<OpticalElement> previous);
         OpticalElement(const char* name, const double width, const double height, const std::vector<double> slopeError, const std::shared_ptr<OpticalElement> previous);
+        OpticalElement(const char* name, const std::vector<double> slopeError, const std::shared_ptr<OpticalElement> previous);
 
         void setObjectParameters(std::vector<double> params);
         void setElementParameters(std::vector<double> params);
+        void setDimensions(double width, double height);
         void setInMatrix(std::vector<double> inputMatrix);
         void setOutMatrix(std::vector<double> inputMatrix);
         void setSurface(std::unique_ptr<Surface> surface);

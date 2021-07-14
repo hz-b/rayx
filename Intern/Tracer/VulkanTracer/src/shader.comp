@@ -1850,7 +1850,7 @@ Ray refrac_plane(Ray r, dvec4 normal, double a){
 checks whether the ray is hit by a central beam stopper which may be rectangular (width: xStop/yStop)
 or circular.
 if so the ray is thrown away.
-if xStop is negative, then a circular shape of radius xStop is assumed and yStop is not used (from RAY.FOR)
+if xStop is negative, then a circular shape of radius xStop is assumed (from RAY.FOR)
 @params		x,y				x/y-coord. of ray direction
 			xStop, yStop	shape of beam stopper
 			weight			current weight of the ray, is changed if ray is stopped
@@ -1867,7 +1867,7 @@ double stopBox(double x, double y, double xStop, double yStop, double weight) {
 			}
 		}else{
 			double radius = sqrt((x/xStop)*(x/xStop) + (y/yStop)*(y/yStop));
-			if(radius < 0) w = 0;
+			if(radius < 1) w = 0;
 		}
 	}
 	return w;
@@ -1996,8 +1996,8 @@ Ray traceSlit(Ray r, const Quadric q, inout uint64_t ctr) {
 
 	double xLength = q.objectParameters[0][0]; // width
 	double yLength = q.objectParameters[0][1]; // height
-	double xStop = q.elementParameters[0][0];
-	double yStop = q.elementParameters[0][1];
+	double xStop = q.elementParameters[0][0]; // beamstop width
+	double yStop = q.elementParameters[0][1]; // beamstop heigth
 	// slit lies in x-y plane instead of x-z plane as other elements
 	r.weight = wasteBox(r.position[0],r.position[1],xLength,yLength, r.weight);
 	r.weight = stopBox(r.position[0],r.position[1], xStop, yStop, r.weight);
@@ -2072,7 +2072,7 @@ Ray traceRZP(Ray r, const Quadric q, inout uint64_t ctr) {
 
 	RZPLineDensity(r, normal, IMAGE_TYPE, RZP_TYPE, DERIVATION_METHOD, zOffsetCenter, risag, rosag, rimer, romer, d_alpha, d_beta, d_ord, WL0, DX, DZ);
 
-	// tanger
+	// tanger/slope Error
 	double slopeX = q.objectParameters[0][2];
 	double slopeZ = q.objectParameters[0][3];
 	normal = tanger(normal, slopeX, slopeZ, 0, ctr);

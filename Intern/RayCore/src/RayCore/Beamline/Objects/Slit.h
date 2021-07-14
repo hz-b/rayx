@@ -9,7 +9,7 @@ namespace RAY
 
     public:
 
-        Slit(const char* name, int beamstop, double width, double height, double azimuthal, double dist, double beamstopWidth, double beamstopHeight, double sourceEnergy, std::vector<double> misalignmentParams, const std::shared_ptr<OpticalElement> previous);
+        Slit(const char* name, int shape, int beamstop, double width, double height, double azimuthal, double dist, double beamstopWidth, double beamstopHeight, double sourceEnergy, std::vector<double> misalignmentParams, const std::shared_ptr<OpticalElement> previous);
         Slit();
         ~Slit();
 
@@ -17,6 +17,7 @@ namespace RAY
         double getHeight() const;
         double getChi() const;
         double getDist() const;
+        int getShape() const;
         int getCentralBeamstop() const;
         double getBeamstopWidth() const;
         double getBeamstopHeight() const;
@@ -25,7 +26,8 @@ namespace RAY
     private:
         double m_totalWidth;
         double m_totalHeight;
-        // grazing incidence, in rad
+        enum GEOMETRICAL_SHAPE  { GS_RECTANGLE, GS_ELLIPTICAL };
+        GEOMETRICAL_SHAPE m_shape;
         enum CENTRAL_BEAMSTOP { CS_NONE, CS_RECTANGLE, CS_ELLIPTICAL }; // central beamstop shape
         CENTRAL_BEAMSTOP m_centralBeamstop;
         double m_beamstopWidth;
