@@ -5,7 +5,7 @@
 namespace RAYX
 {
 
-    class RAY_API ImagePlane : public OpticalElement {
+    class RAYX_API ImagePlane : public OpticalElement {
 
     public:
 

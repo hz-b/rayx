@@ -16,7 +16,7 @@
 
 namespace RAYX
 {
-    class RAY_API BeamlineObjectFactory {
+    class RAYX_API BeamlineObjectFactory {
     public:
         typedef std::map<std::string, BeamlineObject* (*)()> TypeMap;
 

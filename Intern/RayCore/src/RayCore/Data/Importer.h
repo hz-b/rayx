@@ -8,7 +8,7 @@
 namespace RAYX
 {
 
-	class RAY_API Importer
+	class RAYX_API Importer
 	{
 	public:
 		Importer(std::shared_ptr<Beamline> Bl);

@@ -5,7 +5,7 @@
 namespace RAYX
 {
 
-    class RAY_API PointSource : public LightSource
+    class RAYX_API PointSource : public LightSource
     {
     public:
 

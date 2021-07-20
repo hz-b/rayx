@@ -4,7 +4,7 @@
 namespace RAYX
 {
 
-    class RAY_API Exporter
+    class RAYX_API Exporter
     {
     public:
         Exporter();

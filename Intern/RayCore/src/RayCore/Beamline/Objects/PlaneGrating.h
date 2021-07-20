@@ -5,7 +5,7 @@
 namespace RAYX
 {
 
-    class RAY_API PlaneGrating : public OpticalElement {
+    class RAYX_API PlaneGrating : public OpticalElement {
 
     public:
 

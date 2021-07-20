@@ -5,7 +5,7 @@
 namespace RAYX
 {
 
-    class RAY_API Slit : public OpticalElement {
+    class RAYX_API Slit : public OpticalElement {
 
     public:
 

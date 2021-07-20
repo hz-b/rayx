@@ -7,7 +7,7 @@
 #define RAYCORE_QUADRIC_DOUBLE_AMOUNT 48;
 
 namespace RAYX {
-    class RAY_API Quadric : public Surface {
+    class RAYX_API Quadric : public Surface {
     public:
         Quadric(const std::vector<double> inputPoints);
 

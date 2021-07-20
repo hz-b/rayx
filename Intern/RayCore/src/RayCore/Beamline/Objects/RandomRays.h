@@ -5,7 +5,7 @@
 namespace RAYX
 {
 
-    class RAY_API RandomRays : public LightSource
+    class RAYX_API RandomRays : public LightSource
     {
     public:
 

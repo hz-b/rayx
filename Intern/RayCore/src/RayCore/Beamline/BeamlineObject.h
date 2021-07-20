@@ -10,7 +10,7 @@ namespace RAYX
     * Brief: Abstract parent class for all beamline objects used in Ray-X.
     *
     */
-    class RAY_API BeamlineObject
+    class RAYX_API BeamlineObject
     {
     public:
         ~BeamlineObject();

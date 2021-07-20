@@ -14,7 +14,7 @@ namespace RAYX
 {
     class Ray;
 
-    class RAY_API TracerInterface
+    class RAYX_API TracerInterface
     {
         struct RayVector {
             std::vector<Ray> rayVector;

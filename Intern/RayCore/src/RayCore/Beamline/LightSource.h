@@ -15,7 +15,7 @@
 namespace RAYX
 {
 
-    class RAY_API LightSource : public BeamlineObject
+    class RAYX_API LightSource : public BeamlineObject
     {
     public:
 

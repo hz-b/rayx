@@ -4,7 +4,7 @@
 namespace RAYX
 {
 
-    class RAY_API MatrixSource : public LightSource
+    class RAYX_API MatrixSource : public LightSource
     {
     public:
 

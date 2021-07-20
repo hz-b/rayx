@@ -5,7 +5,7 @@
 namespace RAYX
 {
 
-    class RAY_API SphereGrating : public OpticalElement {
+    class RAYX_API SphereGrating : public OpticalElement {
 
     public:
 

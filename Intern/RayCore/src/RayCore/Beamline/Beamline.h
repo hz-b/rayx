@@ -21,7 +21,7 @@
 namespace RAYX
 {
 
-    class RAY_API Beamline
+    class RAYX_API Beamline
     {
 
     public:

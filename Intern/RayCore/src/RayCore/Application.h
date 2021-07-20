@@ -6,7 +6,7 @@
 namespace RAYX
 {
 
-	class RAY_API Application
+	class RAYX_API Application
 	{
 	public:
 		Application();

@@ -5,7 +5,7 @@
 namespace RAYX
 {
 
-    class RAY_API Ellipsoid : public OpticalElement {
+    class RAYX_API Ellipsoid : public OpticalElement {
 
     public:
 

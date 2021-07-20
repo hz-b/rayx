@@ -5,7 +5,7 @@
 namespace RAYX
 {
 
-    class RAY_API ReflectionZonePlate : public OpticalElement {
+    class RAYX_API ReflectionZonePlate : public OpticalElement {
 
     public:
 

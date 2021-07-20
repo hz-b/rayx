@@ -5,7 +5,7 @@
 
 namespace RAYX
 {
-    class RAY_API Surface {
+    class RAYX_API Surface {
     public:
         virtual std::vector<double> getParams() const = 0;
 

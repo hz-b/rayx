@@ -2,7 +2,7 @@
 #include <cmath>
 #include <chrono>
 
-#ifdef RAY_PLATFORM_WINDOWS
+#ifdef RAYX_PLATFORM_WINDOWS
 #include "GFSDK_Aftermath.h"
 #endif
 
@@ -24,7 +24,7 @@
 #endif
 
 // Memory leak detection in debug mode
-#ifdef RAY_PLATFORM_WINDOWS
+#ifdef RAYX_PLATFORM_WINDOWS
 #define _CRTDBG_MAP_ALLOC
 #include <stdlib.h>
 #include <crtdbg.h>

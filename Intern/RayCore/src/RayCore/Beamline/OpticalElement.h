@@ -13,7 +13,7 @@
 namespace RAYX
 {
 
-    class RAY_API OpticalElement : public BeamlineObject
+    class RAYX_API OpticalElement : public BeamlineObject
     {
     public:
 

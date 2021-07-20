@@ -5,7 +5,7 @@
 namespace RAYX
 {
 
-    class RAY_API SphereMirror : public OpticalElement {
+    class RAYX_API SphereMirror : public OpticalElement {
 
     public:
 

@@ -9,7 +9,7 @@
 
 namespace RAYX
 {
-    class RAY_API Ray
+    class RAYX_API Ray
     {
     public:
         // ctor
