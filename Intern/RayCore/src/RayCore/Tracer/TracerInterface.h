@@ -33,6 +33,7 @@ namespace RAYX
         bool run(double translationXerror, double translationYerror, double translationZerror);
     private:
         std::vector<std::shared_ptr<LightSource>> m_LightSources;
-        Beamline& m_Beamline;
+        // TODO: remove
+        std::shared_ptr<Beamline> m_Beamline;
     };
 } // namespace RAYX

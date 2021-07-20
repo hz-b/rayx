@@ -23,12 +23,9 @@ namespace RAYX
 
     class RAYX_API Beamline
     {
-
     public:
-        static Beamline& get() {
-            static Beamline m_Instance;
-            return m_Instance;
-        }
+        Beamline();
+        ~Beamline();
 
         void addOpticalElement(const std::shared_ptr<OpticalElement> q);
         void addOpticalElement(const char* name, const std::vector<double>& inputPoints, std::vector<double> inputInMatrix, std::vector<double> inputOutMatrix, std::vector<double> misalignmentMatrix, std::vector<double> inverseMisalignmentMatrix, std::vector<double> OParameters, std::vector<double> EParameters);
@@ -37,12 +34,8 @@ namespace RAYX
         std::vector<std::shared_ptr<OpticalElement>> getObjects() const;
 
     private:
-        Beamline() = default;
         std::vector<std::shared_ptr<OpticalElement>> m_Objects;
 
-    public:
-        Beamline(Beamline const&) = delete;
-        void operator=(Beamline const&) = delete;
     };
 
 } // namespace RAYX

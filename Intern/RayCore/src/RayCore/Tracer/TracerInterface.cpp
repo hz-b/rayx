@@ -17,16 +17,15 @@
 
 namespace RAYX
 {
-    TracerInterface::TracerInterface() :
-        m_Beamline(Beamline::get())
+    TracerInterface::TracerInterface()
     {
 
-        RAY_DEBUG(std::cout << "Creating TracerInterface..." << std::endl);
+        RAYX_DEBUG(std::cout << "Creating TracerInterface..." << std::endl);
     }
 
     TracerInterface::~TracerInterface()
     {
-        RAY_DEBUG(std::cout << "Deleting TracerInterface..." << std::endl);
+        RAYX_DEBUG(std::cout << "Deleting TracerInterface..." << std::endl);
     }
 
     void TracerInterface::addLightSource(std::shared_ptr<LightSource> newSource) {
@@ -38,7 +37,7 @@ namespace RAYX
         if (!tracer) return;
         if (!source) return;
         std::vector<RAYX::Ray> rays = source->getRays();
-        RAY_DEBUG(std::cout << "add rays" << std::endl);
+        RAYX_DEBUG(std::cout << "add rays" << std::endl);
         tracer->addRayVector(rays.data(), rays.size());
     }
 
@@ -77,9 +76,9 @@ namespace RAYX
         for (int j = 0; j < beamlinesSimultaneously; j++) {
             generateRays(&tracer, m);
         }
-        m_Beamline.addOpticalElement(s);
+        m_Beamline->addOpticalElement(s);
         //m_Beamline.addQuadric(pl);
-        m_Beamline.addOpticalElement(i);
+        m_Beamline->addOpticalElement(i);
 
 
 
@@ -93,7 +92,7 @@ namespace RAYX
         // addLightSource(&m);
         // generateRays(&tracer, &m);
 
-        RAY_DEBUG(std::cout << "add rays to tracer done" << std::endl);
+        RAYX_DEBUG(std::cout << "add rays to tracer done" << std::endl);
 
 
 
@@ -108,7 +107,7 @@ namespace RAYX
         */
 
         //add beamline to tracer
-        const std::vector<std::shared_ptr<OpticalElement>> Elements = m_Beamline.getObjects();
+        const std::vector<std::shared_ptr<OpticalElement>> Elements = m_Beamline->getObjects();
         tracer.setBeamlineParameters(beamlinesSimultaneously, Elements.size(), number_of_rays);
 
 
@@ -124,9 +123,9 @@ namespace RAYX
         tracer.run(); //run tracer
         std::cout << "tracer run time: " << float(clock() - begin_time) << " ms" << std::endl;
 
-        RAY_DEBUG(std::cout << "run succeeded" << std::endl);
+        RAYX_DEBUG(std::cout << "run succeeded" << std::endl);
 
-        RAY_DEBUG(std::cout << "tracerInterface run without output: " << float(clock() - all_begin_time) << " ms" << std::endl);
+        RAYX_DEBUG(std::cout << "tracerInterface run without output: " << float(clock() - all_begin_time) << " ms" << std::endl);
         if (true) {
 
             // transform in to usable data
@@ -146,24 +145,24 @@ namespace RAYX
             for (auto outputRayIterator = tracer.getOutputIteratorBegin(), outputIteratorEnd = tracer.getOutputIteratorEnd();
                 outputRayIterator != outputIteratorEnd; outputRayIterator++)
             {
-                RAY_DEBUG(std::cout << "(*outputRayIterator).size(): " << (*outputRayIterator).size() << std::endl);
+                RAYX_DEBUG(std::cout << "(*outputRayIterator).size(): " << (*outputRayIterator).size() << std::endl);
 
                 memcpy(doubleVec.data(), (*outputRayIterator).data(), (*outputRayIterator).size() * VULKANTRACER_RAY_DOUBLE_AMOUNT * sizeof(double));
                 doubleVec.resize((*outputRayIterator).size() * VULKANTRACER_RAY_DOUBLE_AMOUNT);
 
-                RAY_DEBUG(std::cout << "tracerInterface: sample ray: " << doubleVec[0] << ", " << doubleVec[1] << ", " << doubleVec[2] << ", " << doubleVec[3] << ", " << doubleVec[4] << ", " << doubleVec[5] << ", " << doubleVec[6] << ", energy: " << doubleVec[7] << std::endl);
+                RAYX_DEBUG(std::cout << "tracerInterface: sample ray: " << doubleVec[0] << ", " << doubleVec[1] << ", " << doubleVec[2] << ", " << doubleVec[3] << ", " << doubleVec[4] << ", " << doubleVec[5] << ", " << doubleVec[6] << ", energy: " << doubleVec[7] << std::endl);
 
                 writeToFile(doubleVec, outputFile, index);
                 index = index + (*outputRayIterator).size();
             }
             outputFile.close();
 
-            RAY_DEBUG(std::cout << "tracer run incl load rays time: " << float(clock() - begin_time) << " ms" << std::endl);
+            RAYX_DEBUG(std::cout << "tracer run incl load rays time: " << float(clock() - begin_time) << " ms" << std::endl);
 
         }
         //clean up tracer to avoid memory leaks
         tracer.cleanup();
-        //intentionally not RAY_DEBUG()
+        //intentionally not RAYX_DEBUG()
         std::cout << "all done" << std::endl;
         return true;
     }
@@ -173,7 +172,7 @@ namespace RAYX
     {
         size_t size = outputRays.size();
 
-        RAY_DEBUG(std::cout << "writing " << outputRays.size() / 8 << " rays to file..." << std::endl);
+        RAYX_DEBUG(std::cout << "writing " << outputRays.size() / 8 << " rays to file..." << std::endl);
 
         if (SHORTOUTPUT) {
             char buff[64];
@@ -194,7 +193,7 @@ namespace RAYX
             }
         }
 
-        RAY_DEBUG(std::cout << "done!" << std::endl);
+        RAYX_DEBUG(std::cout << "done!" << std::endl);
     }
 }
 // namespace RAYX

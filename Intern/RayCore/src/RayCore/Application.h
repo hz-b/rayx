@@ -1,11 +1,11 @@
 #pragma once
 
+#include "Beamline/Beamline.h"
 #include "Core.h"
 #include "Tracer/TracerInterface.h"
 
 namespace RAYX
 {
-
 	class RAYX_API Application
 	{
 	public:
@@ -13,10 +13,10 @@ namespace RAYX
 		virtual ~Application();
 
 		virtual void run() = 0;
-		/*void run(const std::string& file);*/
 
 	protected:
-		TracerInterface m_tracerInterface;
+		TracerInterface m_TracerInterface;
+		std::shared_ptr<Beamline> m_Beamline;
 
 	};
 

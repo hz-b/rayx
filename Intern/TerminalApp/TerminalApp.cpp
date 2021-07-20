@@ -1,5 +1,9 @@
-#include "TerminalApp.h"
+#include <memory>
+
+#include "Beamline/Beamline.h"
 #include "Debug.h"
+#include "Data/Importer.h"
+#include "TerminalApp.h"
 
 TerminalApp::TerminalApp()
 {
@@ -9,22 +13,31 @@ TerminalApp::TerminalApp(int argc, char** argv)
 {
     m_argc = argc;
     m_argv = argv;
-    RAY_DEBUG(std::cout << "TerminalApp erstellt!" << std::endl);
+    RAYX_DEBUG(std::cout << "TerminalApp erstellt!" << std::endl);
 }
 
 TerminalApp::~TerminalApp()
 {
-    RAY_DEBUG(std::cout << "TerminalApp deleted!" << std::endl);
+    RAYX_DEBUG(std::cout << "TerminalApp deleted!" << std::endl);
 }
 
 void TerminalApp::run()
 {
-    RAY_DEBUG(std::cout << "TerminalApp running..." << std::endl);
-    if (m_argc >= 4) {
-        m_tracerInterface.run(std::stod(std::string(m_argv[1])),
-            std::stod(std::string(m_argv[2])), std::stod(std::string(m_argv[3])));
+    RAYX_DEBUG(std::cout << "TerminalApp running..." << std::endl);
+
+    if (m_argc <= 2) {
+        if (m_argc == 2) {
+            // load rml file
+            m_Beamline = std::make_shared<RAYX::Beamline>(RAYX::Importer::importBeamline());
+        }
+        m_TracerInterface.run(0.0, 0.0, 0.0);
     }
-    else {
-        m_tracerInterface.run(0.0, 0.0, 0.0);
+    // rzp params
+    else if (m_argc >= 4) {
+        if (m_argc == 5) {
+            // load rml
+        }
+        m_TracerInterface.run(std::stod(std::string(m_argv[1])),
+            std::stod(std::string(m_argv[2])), std::stod(std::string(m_argv[3])));
     }
 }

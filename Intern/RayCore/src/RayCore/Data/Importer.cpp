@@ -7,8 +7,7 @@
 
 namespace RAYX
 {
-    Importer::Importer(std::shared_ptr<Beamline> Bl)
-        : m_Beamline(Bl)
+    Importer::Importer()
     {
 
     }
@@ -18,7 +17,7 @@ namespace RAYX
 
     }
 
-    void Importer::importBeamline() {
+    Beamline Importer::importBeamline() {
         // first implementation: stringstreams are slow; this might need optimization
         std::ifstream t("test.rml");
         std::stringstream buffer;

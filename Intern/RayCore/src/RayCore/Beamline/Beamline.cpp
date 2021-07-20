@@ -5,6 +5,16 @@
 
 namespace RAYX
 {
+    Beamline::Beamline()
+    {
+
+    }
+
+    Beamline::~Beamline()
+    {
+
+    }
+
     // push copy of shared pointer to m_objects vector
     void Beamline::addOpticalElement(const std::shared_ptr<OpticalElement> q) {
         m_Objects.push_back(q);

@@ -11,14 +11,10 @@ namespace RAYX
 	class RAYX_API Importer
 	{
 	public:
-		Importer(std::shared_ptr<Beamline> Bl);
+		Importer();
 		~Importer();
 
-		void importBeamline();
-
-	private:
-		std::shared_ptr<Beamline> m_Beamline;
-
+		static Beamline importBeamline();
 
 	};
 
