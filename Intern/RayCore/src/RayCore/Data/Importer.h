@@ -1,17 +1,25 @@
 #pragma once
+
+#include <memory>
+
+#include "Beamline/Beamline.h"
 #include "Core.h"
 
-namespace RAY
+namespace RAYX
 {
 
 	class RAY_API Importer
 	{
 	public:
-		Importer();
+		Importer(std::shared_ptr<Beamline> Bl);
 		~Importer();
 
+		void importBeamline();
+
 	private:
+		std::shared_ptr<Beamline> m_Beamline;
+
 
 	};
 
-} // namespace RAY
+} // namespace RAYX
