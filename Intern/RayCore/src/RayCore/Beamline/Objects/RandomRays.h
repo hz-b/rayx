@@ -2,7 +2,7 @@
 #include <list>
 #include "Beamline/LightSource.h"
 
-namespace RAY
+namespace RAYX
 {
 
     class RAY_API RandomRays : public LightSource
@@ -22,4 +22,4 @@ namespace RAY
         int m_high;
     };
 
-} // namespace RAY
+} // namespace RAYX

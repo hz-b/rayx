@@ -6,12 +6,12 @@
 
 #define RAYCORE_QUADRIC_DOUBLE_AMOUNT 48;
 
-namespace RAY {
+namespace RAYX {
     class RAY_API Quadric : public Surface {
     public:
         Quadric(const std::vector<double> inputPoints);
-        
-        
+
+
         void setAnchorPoints(std::vector<double> inputPoints);
 
         std::vector<double> getParams() const;
@@ -19,9 +19,9 @@ namespace RAY {
         Quadric();
         ~Quadric();
     private:
-        
+
         std::vector<double> m_anchorPoints;
-        
+
 
     };
 }

@@ -14,7 +14,7 @@
     BeamlineObjectRegister<NAME> NAME::reg(#NAME)
 
 
-namespace RAY
+namespace RAYX
 {
     class RAY_API BeamlineObjectFactory {
     public:
@@ -48,4 +48,4 @@ namespace RAY
         }
     };
 
-} // namespace RAY
+} // namespace RAYX

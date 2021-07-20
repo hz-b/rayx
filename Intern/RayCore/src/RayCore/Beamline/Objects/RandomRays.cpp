@@ -3,12 +3,12 @@
 #include <cmath>
 #include <random>
 
-namespace RAY
+namespace RAYX
 {
 
     // angles given and stored in rad
-    RandomRays::RandomRays(int n, int low, int high) 
-    : LightSource(0, n, "Random rays", 0, 100, 0, {0,0,0,0}), m_low(low), m_high(high) {}
+    RandomRays::RandomRays(int n, int low, int high)
+        : LightSource(0, n, "Random rays", 0, 100, 0, { 0,0,0,0 }), m_low(low), m_high(high) {}
 
     RandomRays::~RandomRays()
     {
@@ -20,7 +20,7 @@ namespace RAY
      * returns list of rays
      */
     std::vector<Ray> RandomRays::getRays() {
-        std::uniform_real_distribution<double> unif(m_low,m_high);
+        std::uniform_real_distribution<double> unif(m_low, m_high);
         std::default_random_engine re;
 
         int n = this->getNumberOfRays();
@@ -63,4 +63,4 @@ namespace RAY
     }
 
 
-} // namespace RAY
+} // namespace RAYX

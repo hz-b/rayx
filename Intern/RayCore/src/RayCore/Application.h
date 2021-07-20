@@ -3,7 +3,7 @@
 #include "Core.h"
 #include "Tracer/TracerInterface.h"
 
-namespace RAY
+namespace RAYX
 {
 
 	class RAY_API Application
@@ -20,4 +20,4 @@ namespace RAY
 
 	};
 
-} // namespace RAY
+} // namespace RAYX

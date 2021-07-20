@@ -2,7 +2,7 @@
 #include "Surface/Quadric.h"
 #include "Beamline/OpticalElement.h"
 
-namespace RAY
+namespace RAYX
 {
 
     class RAY_API SphereMirror : public OpticalElement {
@@ -41,4 +41,4 @@ namespace RAY
 
     };
 
-} // namespace RAY
+} // namespace RAYX

@@ -15,7 +15,7 @@
 #define SHORTOUTPUT false
 
 
-namespace RAY
+namespace RAYX
 {
     TracerInterface::TracerInterface() :
         m_Beamline(Beamline::get())
@@ -37,7 +37,7 @@ namespace RAY
         //only one Source for now
         if (!tracer) return;
         if (!source) return;
-        std::vector<RAY::Ray> rays = source->getRays();
+        std::vector<RAYX::Ray> rays = source->getRays();
         RAY_DEBUG(std::cout << "add rays" << std::endl);
         tracer->addRayVector(rays.data(), rays.size());
     }
@@ -62,9 +62,9 @@ namespace RAY
         int number_of_rays = 20000;
 
 
-        std::shared_ptr<MatrixSource> m = std::make_shared<MatrixSource>( 0, "matrix source", 20000, 0, 0.065, 0.04, 0, 0.001, 0.001, 100, 0, std::vector<double>{ 0,0,0,0 } );
-        std::shared_ptr<Slit> s = std::make_shared<Slit>("slit", 1, 2, 20, 2, 7.5, 10000, 20, 1, m->getPhotonEnergy(), std::vector<double>{ 0,0,0, 0,0,0 }, nullptr);
-        std::shared_ptr<ImagePlane> i = std::make_shared<ImagePlane>("Image plane", 1000, s );
+        std::shared_ptr<MatrixSource> m = std::make_shared<MatrixSource>(0, "matrix source", 20000, 0, 0.065, 0.04, 0, 0.001, 0.001, 100, 0, std::vector<double>{ 0, 0, 0, 0 });
+        std::shared_ptr<Slit> s = std::make_shared<Slit>("slit", 1, 2, 20, 2, 7.5, 10000, 20, 1, m->getPhotonEnergy(), std::vector<double>{ 0, 0, 0, 0, 0, 0 }, nullptr);
+        std::shared_ptr<ImagePlane> i = std::make_shared<ImagePlane>("Image plane", 1000, s);
 
         // petes setup
         //PointSource p = PointSource(0, "spec1_first_rzp4", number_of_rays, 1, 0.005, 0.005, 0, 0.02, 0.06, 1, 1, 0, 0, 640, 120, { 0,0,0,0 });
@@ -81,7 +81,7 @@ namespace RAY
         //m_Beamline.addQuadric(pl);
         m_Beamline.addOpticalElement(i);
 
-        
+
 
         // MatrixSource m = MatrixSource(0, "matrix source", number_of_rays, 0, 0.065, 0.04, 0, 0.001, 0.001, 100, 0, { 0,0,0,0 });
         // PlaneMirror p = PlaneMirror("plane Mirror", 50, 200, 10, 0, 10000, { 0,0,0, 0,0,0 }, { 10,10, 0,0,0, 0,0 }, nullptr);
@@ -98,8 +98,8 @@ namespace RAY
 
 
         //ReflectionZonePlate p1 = ReflectionZonePlate("ReflectionZonePlate1", 1, 0, 50, 200, 170, 1, 10, 1000, 100, 100, -1, -1, 1, 1, 100, 500, 100, 500, 0, 0, 0, { 0,0,0, 0,0,0 }, NULL); // dx,dy,dz, dpsi,dphi,dchi // {1,2,3,0.001,0.002,0.003}
-        //RAY::ReflectionZonePlate reflZonePlate = ReflectionZonePlate("ReflectionZonePlate", 1, 0, 4, 60, 170, 2.2, 0, 90, 640, 640, -1, -1, 2.2, 1, 90, 400, 90, 400, 0, 0, 0, { 0,0,0,0,0,0 }); // dx,dy,dz, dpsi,dphi,dchi // 
-        // plane mirror with RAY-UI default values
+        //RAYX::ReflectionZonePlate reflZonePlate = ReflectionZonePlate("ReflectionZonePlate", 1, 0, 4, 60, 170, 2.2, 0, 90, 640, 640, -1, -1, 2.2, 1, 90, 400, 90, 400, 0, 0, 0, { 0,0,0,0,0,0 }); // dx,dy,dz, dpsi,dphi,dchi // 
+        // plane mirror with RAYX-UI default values
         //PlaneMirror p1 = PlaneMirror("PlaneMirror1", 50, 200, 10, 0, 10000, { 0,0,0, 0,0,0 }, nullptr); // {1,2,3,0.01,0.02,0.03}
         /*
         PlaneMirror p2 = PlaneMirror("PlaneMirror2", 50, 200, 15, 4, 10000, {1,2,3, 0.001,0.002,0.003}, &p1); // {1,2,3,0.01,0.02,0.03}
@@ -197,4 +197,4 @@ namespace RAY
         RAY_DEBUG(std::cout << "done!" << std::endl);
     }
 }
-// namespace RAY
+// namespace RAYX

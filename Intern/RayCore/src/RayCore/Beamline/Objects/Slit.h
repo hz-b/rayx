@@ -2,7 +2,7 @@
 #include "Surface/Quadric.h"
 #include "Beamline/OpticalElement.h"
 
-namespace RAY
+namespace RAYX
 {
 
     class RAY_API Slit : public OpticalElement {
@@ -26,7 +26,7 @@ namespace RAY
     private:
         double m_totalWidth;
         double m_totalHeight;
-        enum GEOMETRICAL_SHAPE  { GS_RECTANGLE, GS_ELLIPTICAL };
+        enum GEOMETRICAL_SHAPE { GS_RECTANGLE, GS_ELLIPTICAL };
         GEOMETRICAL_SHAPE m_shape;
         enum CENTRAL_BEAMSTOP { CS_NONE, CS_RECTANGLE, CS_ELLIPTICAL }; // central beamstop shape
         CENTRAL_BEAMSTOP m_centralBeamstop;
@@ -41,4 +41,4 @@ namespace RAY
 
     };
 
-} // namespace RAY
+} // namespace RAYX

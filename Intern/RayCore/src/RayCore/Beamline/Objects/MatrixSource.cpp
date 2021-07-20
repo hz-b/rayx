@@ -2,7 +2,7 @@
 #include <cassert>
 #include <random>
 
-namespace RAY
+namespace RAYX
 {
 
     // angles given and stored in rad
@@ -72,4 +72,4 @@ namespace RAY
         return rayVector;
     }
 
-} // namespace RAY
+} // namespace RAYX

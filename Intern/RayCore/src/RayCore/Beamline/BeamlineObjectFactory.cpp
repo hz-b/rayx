@@ -1,7 +1,7 @@
 #include "BeamlineObjectFactory.h"
 
 
-namespace RAY
+namespace RAYX
 {
     std::shared_ptr<BeamlineObjectFactory::TypeMap> BeamlineObjectFactory::m_TypeMap = std::shared_ptr<TypeMap>();
 
@@ -21,4 +21,4 @@ namespace RAY
         return it->second();
     }
 
-} // namespace RAY
+} // namespace RAYX

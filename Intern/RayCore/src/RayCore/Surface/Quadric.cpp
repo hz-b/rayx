@@ -2,7 +2,7 @@
 #include <cassert>
 #include <math.h>
 
-namespace RAY
+namespace RAYX
 {
     /**
      * standard constructor
@@ -19,14 +19,14 @@ namespace RAY
         m_anchorPoints = inputPoints;
     }
 
-    
-    
+
+
     Quadric::Quadric() {} // TODO
 
     Quadric::~Quadric()
     {
     }
-    
+
     /**
      * set a new set of parameters a_11 to a_44 for the quadric function
      * order: a_11,a_12,a_13,a_14, a_21,a_22,a_23,a_24, a_31,a_32,a_33,a_34, a_41,a_42,a_43,a_44
@@ -43,5 +43,5 @@ namespace RAY
         std::cout << "return anchor points" << std::endl;
         return m_anchorPoints;
     }
-    
-} // namespace RAY
+
+} // namespace RAYX

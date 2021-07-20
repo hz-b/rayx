@@ -1,7 +1,7 @@
 #pragma once
 #include "Beamline/LightSource.h"
 
-namespace RAY
+namespace RAYX
 {
 
     class RAY_API MatrixSource : public LightSource
@@ -31,4 +31,4 @@ namespace RAY
 
     };
 
-} // namespace RAY
+} // namespace RAYX

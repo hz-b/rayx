@@ -2,7 +2,7 @@
 #include <cassert>
 #include <math.h>
 
-namespace RAY
+namespace RAYX
 {
     /**
      * standard constructor
@@ -13,10 +13,10 @@ namespace RAY
      * @param: inputPoints      Matrix A for quadric surfaces with a_11,a_12,a_13,a_14, a_21,a_22,a_23,a_24, a_31,a_32,a_33,a_34, a_41,a_42,a_43,a_44
      *                      a_21,a_31,a_32,a_41,a_42,a_43 are never used for quadric surfaces because the matrix is symmetrial,
     */
-    Surface::Surface(){}
+    Surface::Surface() {}
 
     Surface::~Surface()
     {
     }
-    
-} // namespace RAY
+
+} // namespace RAYX

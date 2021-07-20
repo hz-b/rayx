@@ -2,7 +2,7 @@
 #include "Surface/Quadric.h"
 #include "Beamline/OpticalElement.h"
 
-namespace RAY
+namespace RAYX
 {
 
     class RAY_API ImagePlane : public OpticalElement {

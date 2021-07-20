@@ -3,7 +3,7 @@
 
 #include <iostream>
 
-namespace RAY
+namespace RAYX
 {
     // push copy of shared pointer to m_objects vector
     void Beamline::addOpticalElement(const std::shared_ptr<OpticalElement> q) {
@@ -31,4 +31,4 @@ namespace RAY
         return m_Objects;
     }
 
-} // namespace RAY
+} // namespace RAYX

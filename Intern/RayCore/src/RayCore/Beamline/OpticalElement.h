@@ -10,7 +10,7 @@
 #include "Surface/Surface.h"
 #include "utils.h"
 
-namespace RAY
+namespace RAYX
 {
 
     class RAY_API OpticalElement : public BeamlineObject
@@ -111,5 +111,5 @@ namespace RAY
     };
 
 
-} // namespace RAY
+} // namespace RAYX
 

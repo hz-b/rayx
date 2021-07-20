@@ -1,5 +1,5 @@
 #pragma once
 
-// For use by RAY applications
+// For use by RAYX applications
 
 #include "RayCore/Application.h"

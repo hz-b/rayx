@@ -1,13 +1,13 @@
 #include "SphereGrating.h"
 
-namespace RAY
+namespace RAYX
 {
 
     /**
      * angles given in degree and stored in rad
      * initializes transformation matrices, and parameters for the quadric in super class (quadric)
      * sets mirror-specific parameters in this class
-     * @params: 
+     * @params:
      *          mount = how angles of reflection are calculated: constant deviation, constant incidence,...
      *          width, height = total width, height of the mirror (x- and z- dimensions)
      *          deviation = angle between incoming and outgoing main ray
@@ -16,10 +16,10 @@ namespace RAY
      *          distanceToPreceedingElement
      *          designEnergyMounting = energy, taken from source
      *          lineDensity = line density of the grating
-     *          orderOfDefraction = 
+     *          orderOfDefraction =
     */
-    SphereGrating::SphereGrating(const char* name, int mount, double width, double height, double deviation, double normalIncidence, double azimuthal, double distanceToPreceedingElement, double entranceArmLength, double exitArmLength, double designEnergyMounting, double lineDensity, double orderOfDiffraction, std::vector<double> misalignmentParams, std::vector<double> vls, std::vector<double> slopeError, std::shared_ptr<OpticalElement> previous) 
-    : OpticalElement(name, width, height, slopeError, previous),
+    SphereGrating::SphereGrating(const char* name, int mount, double width, double height, double deviation, double normalIncidence, double azimuthal, double distanceToPreceedingElement, double entranceArmLength, double exitArmLength, double designEnergyMounting, double lineDensity, double orderOfDiffraction, std::vector<double> misalignmentParams, std::vector<double> vls, std::vector<double> slopeError, std::shared_ptr<OpticalElement> previous)
+        : OpticalElement(name, width, height, slopeError, previous),
         m_totalWidth(width),
         m_totalHeight(height),
         m_entranceArmLength(entranceArmLength),
@@ -34,22 +34,22 @@ namespace RAY
     {
         // parameters in array 
         // std::vector<double> inputPoints = {0,0,0,0, 0,0,0,-1, 0,0,0,0, 0,0,0,0};
-        
-        m_a = abs(hvlam(m_designEnergyMounting)) * abs(m_lineDensity) * m_orderOfDiffraction * 1e-6;        
-        m_gratingMount = mount==0 ? GM_DEVIATION : GM_INCIDENCE;
-        
+
+        m_a = abs(hvlam(m_designEnergyMounting)) * abs(m_lineDensity) * m_orderOfDiffraction * 1e-6;
+        m_gratingMount = mount == 0 ? GM_DEVIATION : GM_INCIDENCE;
+
         calcAlpha(deviation, normalIncidence);
         calcRadius();
         // std::cout << m_a << std::endl;
         // set parameters in Quadric class
-        setSurface(std::make_unique<Quadric>(std::vector<double>{1,0,0,0, 0,1,0,-m_radius, 0,0,1,0, 2,0,0,0}) );
+        setSurface(std::make_unique<Quadric>(std::vector<double>{1, 0, 0, 0, 0, 1, 0, -m_radius, 0, 0, 1, 0, 2, 0, 0, 0}));
         calcTransformationMatrices(m_alpha, m_chi, m_beta, m_distanceToPreceedingElement, misalignmentParams);
         setElementParameters({
-            m_totalWidth, m_totalHeight, m_lineDensity, m_orderOfDiffraction, 
-            abs(hvlam(m_designEnergyMounting)), 0, m_vls[0], m_vls[1], 
-            m_vls[2], m_vls[3], m_vls[4], m_vls[5], 
+            m_totalWidth, m_totalHeight, m_lineDensity, m_orderOfDiffraction,
+            abs(hvlam(m_designEnergyMounting)), 0, m_vls[0], m_vls[1],
+            m_vls[2], m_vls[3], m_vls[4], m_vls[5],
             0, 0, 0, 0
-        });
+            });
     }
 
     SphereGrating::~SphereGrating()
@@ -57,13 +57,14 @@ namespace RAY
     }
 
     void SphereGrating::calcRadius() {
-        if(m_gratingMount == GM_DEVIATION) {
-            double theta = m_deviation > 0 ? (PI-m_deviation)/2 : PI/2 + m_deviation;
+        if (m_gratingMount == GM_DEVIATION) {
+            double theta = m_deviation > 0 ? (PI - m_deviation) / 2 : PI / 2 + m_deviation;
             m_radius = 2.0 / sin(theta) / (1.0 / m_entranceArmLength + 1.0 / m_exitArmLength);
-        }else if(m_gratingMount == GM_INCIDENCE) {
+        }        
+else if (m_gratingMount == GM_INCIDENCE) {
             double ca = cos(m_alpha);
             double cb = cos(m_beta);
-            m_radius = (ca + cb) / ((ca*ca) / m_entranceArmLength + (cb*cb) / m_exitArmLength);
+            m_radius = (ca + cb) / ((ca * ca) / m_entranceArmLength + (cb * cb) / m_exitArmLength);
         }
     }
 
@@ -71,33 +72,37 @@ namespace RAY
         double angle;
         if (m_gratingMount == GM_DEVIATION) {
             angle = deviation;
-        }else if (m_gratingMount == GM_INCIDENCE) {
+        }        
+else if (m_gratingMount == GM_INCIDENCE) {
             angle = -normalIncidence;
         }
         focus(angle);
-        m_alpha = (PI/2)-m_alpha;
-        m_beta = (PI/2)-abs(m_beta);
+        m_alpha = (PI / 2) - m_alpha;
+        m_beta = (PI / 2) - abs(m_beta);
     }
 
     void SphereGrating::focus(double angle) {
-        // from routine "focus" in RAY.FOR
+        // from routine "focus" in RAYX.FOR
         double theta = rad(abs(angle));
         if (angle <= 0) { // constant alpha mounting
             double arg = m_a - sin(theta);
-            if(abs(arg) >= 1) { // cannot calculate alpha & beta
+            if (abs(arg) >= 1) { // cannot calculate alpha & beta
                 m_alpha = 0;
                 m_beta = 0;
-            }else{
+            }            
+else {
                 m_alpha = theta;
                 m_beta = asin(arg);
             }
-        }else{  // constant alpha & beta mounting
+        }        
+else {  // constant alpha & beta mounting
             theta = theta / 2;
-            double arg = m_a/2/cos(theta);
-            if(abs(arg) >= 1) {
+            double arg = m_a / 2 / cos(theta);
+            if (abs(arg) >= 1) {
                 m_alpha = 0;
                 m_beta = 0;
-            }else{
+            }            
+else {
                 m_beta = asin(arg) - theta;
                 m_alpha = 2 * theta + m_beta;
             }
@@ -153,5 +158,5 @@ namespace RAY
     double SphereGrating::getA() const {
         return m_a;
     }
-    
+
 }

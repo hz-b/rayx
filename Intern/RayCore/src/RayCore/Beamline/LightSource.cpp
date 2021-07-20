@@ -2,7 +2,7 @@
 #include <cassert>
 #include <cmath>
 
-namespace RAY
+namespace RAYX
 {
     LightSource::LightSource(const int id, const int numberOfRays, const char* name, const int spreadType,
         const double photonEnergy, const double energySpread, const std::vector<double> misalignment)
@@ -47,7 +47,7 @@ namespace RAY
         return glm::dvec3(al, am, an);
     }
 
-    //  (see RAY.FOR select_energy)
+    //  (see RAYX.FOR select_energy)
     double LightSource::selectEnergy() {
         double en;
         if (m_energySpread == 0) { // if there is no spread specified use photonenergy directly
@@ -69,4 +69,4 @@ namespace RAY
     {
     }
 
-} // namespace RAY
+} // namespace RAYX

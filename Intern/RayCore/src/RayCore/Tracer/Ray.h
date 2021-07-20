@@ -7,7 +7,7 @@
 
 #define RAYCORE_RAY_DOUBLE_AMOUNT 8
 
-namespace RAY
+namespace RAYX
 {
     class RAY_API Ray
     {
@@ -26,4 +26,4 @@ namespace RAY
 
     private:
     };
-} // namespace RAY
+} // namespace RAYX

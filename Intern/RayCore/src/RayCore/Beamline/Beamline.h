@@ -18,7 +18,7 @@
 
 #include <vector>
 
-namespace RAY
+namespace RAYX
 {
 
     class RAY_API Beamline
@@ -45,4 +45,4 @@ namespace RAY
         void operator=(Beamline const&) = delete;
     };
 
-} // namespace RAY
+} // namespace RAYX

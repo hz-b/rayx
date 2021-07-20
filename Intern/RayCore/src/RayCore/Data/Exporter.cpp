@@ -5,7 +5,7 @@
 #include "rapidxml.hpp"
 
 
-namespace RAY
+namespace RAYX
 {
     Exporter::Exporter()
     {

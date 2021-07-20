@@ -1,7 +1,7 @@
 #pragma once 
 #include "RayCore.h"
 
-class TerminalApp : public RAY::Application
+class TerminalApp : public RAYX::Application
 {
 public:
 	TerminalApp();

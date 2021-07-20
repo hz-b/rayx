@@ -2,7 +2,7 @@
 #include <cassert>
 #include <cmath>
 
-namespace RAY
+namespace RAYX
 {
 
 
@@ -85,4 +85,4 @@ namespace RAY
     double PointSource::getSourceWidth() const { return m_sourceWidth; }
     double PointSource::getVerDivergence() const { return m_verDivergence; }
     double PointSource::getHorDivergence() const { return m_horDivergence; }
-} // namespace RAY
+} // namespace RAYX

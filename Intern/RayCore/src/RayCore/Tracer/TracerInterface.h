@@ -10,7 +10,7 @@
 
 class VulkanTracer;
 
-namespace RAY
+namespace RAYX
 {
     class Ray;
 
@@ -35,4 +35,4 @@ namespace RAY
         std::vector<std::shared_ptr<LightSource>> m_LightSources;
         Beamline& m_Beamline;
     };
-} // namespace RAY
+} // namespace RAYX

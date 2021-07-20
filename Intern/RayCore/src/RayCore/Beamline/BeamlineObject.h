@@ -4,7 +4,7 @@
 #include <iostream>
 #include <stdexcept>
 
-namespace RAY
+namespace RAYX
 {
     /*
     * Brief: Abstract parent class for all beamline objects used in Ray-X.
@@ -28,4 +28,4 @@ namespace RAY
     };
 
 
-} // namespace RAY
+} // namespace RAYX

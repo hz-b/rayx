@@ -1,7 +1,7 @@
 #pragma once
 #include "Core.h"
 
-namespace RAY
+namespace RAYX
 {
 
     class RAY_API Exporter
@@ -16,4 +16,4 @@ namespace RAY
 
     };
 
-} // namespace RAY
+} // namespace RAYX

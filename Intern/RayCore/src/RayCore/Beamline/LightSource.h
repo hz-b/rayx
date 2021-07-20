@@ -12,7 +12,7 @@
 #include "Tracer/Ray.h"
 #include "BeamlineObject.h"
 
-namespace RAY
+namespace RAYX
 {
 
     class RAY_API LightSource : public BeamlineObject
@@ -57,4 +57,4 @@ namespace RAY
 
     };
 
-} // namespace RAY
+} // namespace RAYX

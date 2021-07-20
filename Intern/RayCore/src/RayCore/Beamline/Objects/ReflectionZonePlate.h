@@ -2,7 +2,7 @@
 #include "Surface/Quadric.h"
 #include "Beamline/OpticalElement.h"
 
-namespace RAY
+namespace RAYX
 {
 
     class RAY_API ReflectionZonePlate : public OpticalElement {
@@ -133,4 +133,4 @@ namespace RAY
         double m_elementOffsetZCalc; // if not given but has to be calculated by beam divergence
     };
 
-} // namespace RAY
+} // namespace RAYX

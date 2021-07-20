@@ -3,7 +3,7 @@
 #include "Core.h"
 #include <vector>
 
-namespace RAY
+namespace RAYX
 {
     class RAY_API Surface {
     public:
@@ -14,4 +14,4 @@ namespace RAY
     private:
 
     };
-} // namespace RAY
+} // namespace RAYX

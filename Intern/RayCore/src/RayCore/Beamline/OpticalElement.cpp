@@ -3,12 +3,12 @@
 #include <assert.h>
 #include <math.h>
 
-namespace RAY
+namespace RAYX
 {
     OpticalElement::OpticalElement(const char* name, const std::vector<double> surfacePoints, const std::vector<double> inputInMatrix, const std::vector<double> inputOutMatrix, const std::vector<double> misalignmentMatrix, const std::vector<double> inverseMisalignmentMatrix, const std::vector<double> OParameters, const std::vector<double> EParameters)
-     : BeamlineObject(name)
-    {   
-        std::cout << surfacePoints.size() <<  inputInMatrix.size() << inputOutMatrix.size() << misalignmentMatrix.size() << inverseMisalignmentMatrix.size() << EParameters.size() << OParameters.size() << std::endl;
+        : BeamlineObject(name)
+    {
+        std::cout << surfacePoints.size() << inputInMatrix.size() << inputOutMatrix.size() << misalignmentMatrix.size() << inverseMisalignmentMatrix.size() << EParameters.size() << OParameters.size() << std::endl;
         // surface.getParams() to shader/buffer
         assert(surfacePoints.size() == 16 && inputInMatrix.size() == 16 && inputOutMatrix.size() == 16 && misalignmentMatrix.size() == 16 && inverseMisalignmentMatrix.size() == 16 && EParameters.size() == 16 && OParameters.size() == 16); //parameter size ==6?
         m_surfaceParams = surfacePoints;
@@ -39,7 +39,7 @@ namespace RAY
      * @param tempMisalignmentParams    parameters for temporary misalignment that can be removed midtracing.
     */
     OpticalElement::OpticalElement(const char* name, const std::vector<double> EParameters, const double width, const double height, const double alpha, const double chi, const double beta, const double dist, const std::vector<double> misalignmentParams, const std::vector<double> tempMisalignmentParams, const std::vector<double> slopeError, const std::shared_ptr<OpticalElement> previous)
-     : BeamlineObject(name), 
+        : BeamlineObject(name),
         //m_surface(std::move(surface)), 
         m_previous(previous),
         m_misalignmentParams(misalignmentParams),
@@ -57,9 +57,9 @@ namespace RAY
     }
 
     OpticalElement::OpticalElement(const char* name, const double width, const double height, const std::vector<double> slopeError, const std::shared_ptr<OpticalElement> previous)
-     : BeamlineObject(name), 
+        : BeamlineObject(name),
         //m_surface(std::move(surface)), 
-        m_previous(previous) 
+        m_previous(previous)
     {
         m_slopeError = slopeError;
         setObjectParameters({
@@ -67,15 +67,15 @@ namespace RAY
             slopeError[2], slopeError[3], slopeError[4], slopeError[5],
             slopeError[6],0,0,0,
             0,0,0,0
-        });
-        
+            });
+
     }
 
     OpticalElement::OpticalElement(const char* name, const std::vector<double> slopeError, const std::shared_ptr<OpticalElement> previous)
-     : BeamlineObject(name), m_previous(previous), m_slopeError(slopeError) {}
+        : BeamlineObject(name), m_previous(previous), m_slopeError(slopeError) {}
 
 
-    OpticalElement::OpticalElement() {} 
+    OpticalElement::OpticalElement() {}
 
     OpticalElement::~OpticalElement()
     {
@@ -246,9 +246,9 @@ namespace RAY
             m_slopeError[2], m_slopeError[3], m_slopeError[4], m_slopeError[5],
             m_slopeError[6],0,0,0,
             0,0,0,0
-        });
+            });
     }
-    
+
     void OpticalElement::setInMatrix(std::vector<double> inputMatrix)
     {
         assert(inputMatrix.size() == 16);
@@ -262,9 +262,9 @@ namespace RAY
 
     void OpticalElement::setSurface(std::unique_ptr<Surface> surface) {
         m_surface = std::move(surface);
-        assert(surface==nullptr);
-        assert(m_surface!=nullptr);
-        
+        assert(surface == nullptr);
+        assert(m_surface != nullptr);
+
     }
 
     std::vector<double> OpticalElement::getInMatrix() const
@@ -301,7 +301,7 @@ namespace RAY
         return d_e2b;
     }
 
-    std::vector<double> OpticalElement::getInvB2E() const 
+    std::vector<double> OpticalElement::getInvB2E() const
     {
         return d_inv_b2e;
     }
@@ -347,10 +347,10 @@ namespace RAY
     }
 
     std::vector<double> OpticalElement::getSurfaceParams() const
-    {   
+    {
         std::cout << "return anchor points" << std::endl;
         //assert(m_surface!=nullptr);
-        if(m_surface != nullptr)
+        if (m_surface != nullptr)
             return m_surface->getParams();
         else
             return m_surfaceParams;
@@ -361,4 +361,4 @@ namespace RAY
         return m_slopeError;
     }
 
-} // namespace RAY
+} // namespace RAYX

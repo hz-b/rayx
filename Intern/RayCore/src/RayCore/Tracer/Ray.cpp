@@ -2,7 +2,7 @@
 
 #include <iostream>
 
-namespace RAY
+namespace RAYX
 {
     Ray::Ray(glm::dvec3 position, glm::dvec3 direction,
         double energy, double weight)
@@ -17,4 +17,4 @@ namespace RAY
     {
     }
 
-} // namespace RAY
+} // namespace RAYX

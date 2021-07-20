@@ -2,7 +2,7 @@
 
 #include "Beamline/LightSource.h"
 
-namespace RAY
+namespace RAYX
 {
 
     class RAY_API PointSource : public LightSource
@@ -41,4 +41,4 @@ namespace RAY
         //std::vector<SOURCE_LENGTH> m_source_lengths;
     };
 
-} // namespace RAY
+} // namespace RAYX

@@ -2,10 +2,10 @@
 #include <cassert>
 #include <math.h>
 
-namespace RAY
+namespace RAYX
 {
     BeamlineObject::BeamlineObject(const char* name) : m_name(name) {}
-    BeamlineObject::BeamlineObject(){}
+    BeamlineObject::BeamlineObject() {}
 
     BeamlineObject::~BeamlineObject()
     {
@@ -14,5 +14,5 @@ namespace RAY
     const char* BeamlineObject::getName() const {
         return m_name;
     }
-    
-} // namespace RAY
+
+} // namespace RAYX

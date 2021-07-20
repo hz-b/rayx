@@ -5,7 +5,7 @@
 
 #include <iostream>
 
-namespace RAY
+namespace RAYX
 {
 
     Application::Application()
@@ -34,4 +34,4 @@ namespace RAY
     //     m_tracerInterface.run();
     // }
 
-} // namespace RAY
+} // namespace RAYX

@@ -2,7 +2,7 @@
 #include "Surface/Quadric.h"
 #include "Beamline/OpticalElement.h"
 
-namespace RAY
+namespace RAYX
 {
 
     class RAY_API Ellipsoid : public OpticalElement {
@@ -76,4 +76,4 @@ namespace RAY
 
     };
 
-} // namespace RAY
+} // namespace RAYX
