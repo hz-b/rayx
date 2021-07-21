@@ -34,6 +34,6 @@ namespace RAYX
     private:
         std::vector<std::shared_ptr<LightSource>> m_LightSources;
         // TODO: remove
-        std::shared_ptr<Beamline> m_Beamline;
+        Beamline m_Beamline;
     };
 } // namespace RAYX

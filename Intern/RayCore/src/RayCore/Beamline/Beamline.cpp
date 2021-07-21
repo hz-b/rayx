@@ -7,7 +7,6 @@ namespace RAYX
 {
     Beamline::Beamline()
     {
-
     }
 
     Beamline::~Beamline()

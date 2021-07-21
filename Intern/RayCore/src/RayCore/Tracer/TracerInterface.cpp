@@ -19,7 +19,6 @@ namespace RAYX
 {
     TracerInterface::TracerInterface()
     {
-
         RAYX_DEBUG(std::cout << "Creating TracerInterface..." << std::endl);
     }
 
@@ -76,9 +75,9 @@ namespace RAYX
         for (int j = 0; j < beamlinesSimultaneously; j++) {
             generateRays(&tracer, m);
         }
-        m_Beamline->addOpticalElement(s);
+        m_Beamline.addOpticalElement(s);
         //m_Beamline.addQuadric(pl);
-        m_Beamline->addOpticalElement(i);
+        m_Beamline.addOpticalElement(i);
 
 
 
@@ -107,7 +106,7 @@ namespace RAYX
         */
 
         //add beamline to tracer
-        const std::vector<std::shared_ptr<OpticalElement>> Elements = m_Beamline->getObjects();
+        const std::vector<std::shared_ptr<OpticalElement>> Elements = m_Beamline.getObjects();
         tracer.setBeamlineParameters(beamlinesSimultaneously, Elements.size(), number_of_rays);
 
 
