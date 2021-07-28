@@ -59,10 +59,10 @@ namespace RAYX
         int beamlinesSimultaneously = 1;
         int number_of_rays = 20000;
 
-
+        bool GLOBAL = true;
         std::shared_ptr<MatrixSource> m = std::make_shared<MatrixSource>(0, "matrix source", 20000, 0, 0.065, 0.04, 0, 0.001, 0.001, 100, 0, std::vector<double>{ 0, 0, 0, 0 });
-        std::shared_ptr<Slit> s = std::make_shared<Slit>("slit", 1, 2, 20, 2, 7.5, 10000, 20, 1, m->getPhotonEnergy(), std::vector<double>{ 0, 0, 0, 0, 0, 0 }, nullptr);
-        std::shared_ptr<ImagePlane> i = std::make_shared<ImagePlane>("Image plane", 1000, s);
+        std::shared_ptr<Slit> s = std::make_shared<Slit>("slit", 1, 2, 20, 2, 7.5, 10000, 20, 1, m->getPhotonEnergy(), std::vector<double>{ 0, 0, 0, 0, 0, 0 }, nullptr, GLOBAL);
+        std::shared_ptr<ImagePlane> i = std::make_shared<ImagePlane>("Image plane", 1000, s, GLOBAL);
 
         // petes setup
         //PointSource p = PointSource(0, "spec1_first_rzp4", number_of_rays, 1, 0.005, 0.005, 0, 0.02, 0.06, 1, 1, 0, 0, 640, 120, { 0,0,0,0 });

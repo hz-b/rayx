@@ -9,7 +9,7 @@ namespace RAYX
 
     public:
 
-        ImagePlane(const char* name, const double distance, const std::shared_ptr<OpticalElement> previous);
+        ImagePlane(const char* name, const double distance, const std::shared_ptr<OpticalElement> previous, bool global);
         ImagePlane();
         ~ImagePlane();
 

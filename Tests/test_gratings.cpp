@@ -60,7 +60,7 @@ TEST(planeGrating, testParams) {
     std::vector<double> sE = { 0,0,0,0,0, 0,0 };
     std::vector<double> mis = { 5.212,7.3,0.35, 0.23,0.011,0.0006 };
     std::vector<double> vls = { 2.1, 0.12, 12.2, 8.3, 5.1, 7.23 };
-    RAYX::PlaneGrating p1 = RAYX::PlaneGrating("planegrating", mount, width, height, deviation, normalIncidence, azimuthal, dist, designEnergyMounting, lineDensity, orderOfDiffraction, fixFocusConstantCFF, add_order, mis, vls, sE, NULL);
+    RAYX::PlaneGrating p1 = RAYX::PlaneGrating("planegrating", mount, width, height, deviation, normalIncidence, azimuthal, dist, designEnergyMounting, lineDensity, orderOfDiffraction, fixFocusConstantCFF, add_order, mis, vls, sE, NULL, false); 
 
     double beta = 1.467650597188248;
     double alpha = 1.457521229154248;
@@ -81,7 +81,7 @@ TEST(planeGrating, testParams) {
     // mount = 1, use incidence Angle
     mount = 1; // { GM_DEVIATION, GM_INCIDENCE, GM_CCF, GM_CCF_NO_PREMIRROR}
     add_order = 1;
-    RAYX::PlaneGrating p2 = RAYX::PlaneGrating("planegrating", mount, width, height, deviation, normalIncidence, azimuthal, dist, designEnergyMounting, lineDensity, orderOfDiffraction, fixFocusConstantCFF, add_order, mis, vls, sE, NULL);
+    RAYX::PlaneGrating p2 = RAYX::PlaneGrating("planegrating", mount, width, height, deviation, normalIncidence, azimuthal, dist, designEnergyMounting, lineDensity, orderOfDiffraction, fixFocusConstantCFF, add_order, mis, vls, sE, NULL, false); 
     alpha = 1.3069025438933539;
     beta = 1.317319261832787;
 
@@ -95,7 +95,7 @@ TEST(planeGrating, testParams) {
     quad = { 0,0,0,0, 0,0,0,-1, 0,0,0,0, 1,0,0,0 };
     params = { width,height,lineDensity,double(orderOfDiffraction), abs(hvlam(designEnergyMounting)),0,vls[0],vls[1], vls[2],vls[3],vls[4],vls[5], 0,0,0,double(add_order) };
 
-    RAYX::PlaneGrating p3 = RAYX::PlaneGrating("planegrating", mount, width, height, deviation, normalIncidence, azimuthal, dist, designEnergyMounting, lineDensity, orderOfDiffraction, fixFocusConstantCFF, add_order, mis, vls, sE, NULL);
+    RAYX::PlaneGrating p3 = RAYX::PlaneGrating("planegrating", mount, width, height, deviation, normalIncidence, azimuthal, dist, designEnergyMounting, lineDensity, orderOfDiffraction, fixFocusConstantCFF, add_order, mis, vls, sE, NULL, false); 
 
     ASSERT_DOUBLE_EQ(p3.getWidth(), width);
     ASSERT_DOUBLE_EQ(p3.getHeight(), height);
@@ -115,7 +115,7 @@ TEST(planeGrating, testParams) {
     quad = { 0,0,0,0, 0,0,0,-1, 0,0,0,0, 1,0,0,0 };
     params = { width,height,lineDensity,double(orderOfDiffraction), abs(hvlam(designEnergyMounting)),0,vls[0],vls[1], vls[2],vls[3],vls[4],vls[5], 0,0,0,double(add_order) };
 
-    RAYX::PlaneGrating p4 = RAYX::PlaneGrating("planegrating", mount, width, height, deviation, normalIncidence, azimuthal, dist, designEnergyMounting, lineDensity, orderOfDiffraction, fixFocusConstantCFF, add_order, mis, vls, sE, nullptr);
+    RAYX::PlaneGrating p4 = RAYX::PlaneGrating("planegrating", mount, width, height, deviation, normalIncidence, azimuthal, dist, designEnergyMounting, lineDensity, orderOfDiffraction, fixFocusConstantCFF, add_order, mis, vls, sE, nullptr, false); 
 
     ASSERT_DOUBLE_EQ(p4.getWidth(), width);
     ASSERT_DOUBLE_EQ(p4.getHeight(), height);
@@ -155,7 +155,7 @@ TEST(SphereGrating, testParams) {
     std::vector<double> vls = { 2.1, 0.12, 12.2, 8.3, 5.1, 7.23 };
     std::vector<double> sE = { 0.1,0.5,0.1,0.2,0.5, 1,3 };
 
-    RAYX::SphereGrating s1 = RAYX::SphereGrating("spheregrating", mount, width, height, deviation, incidence, azimuthal, distance, entranceArm, exitArm, designEnergy, linedensity, double(order), mis, vls, sE, NULL);
+    RAYX::SphereGrating s1 = RAYX::SphereGrating("spheregrating", mount, width, height, deviation, incidence, azimuthal, distance, entranceArm, exitArm, designEnergy, linedensity, double(order), mis,vls,sE, NULL, false);
     double alpha = 1.4892226555787231;
     double beta = 1.4915379074397925;
     double chi = 2.1502456384570143;
@@ -183,7 +183,7 @@ TEST(SphereGrating, testParams) {
     EXPECT_ITERABLE_DOUBLE_EQ(std::vector<double>, s1.getElementParameters(), params);
 
     mount = 1;
-    RAYX::SphereGrating s2 = RAYX::SphereGrating("spheregrating", mount, width, height, deviation, incidence, azimuthal, distance, entranceArm, exitArm, designEnergy, linedensity, double(order), mis, vls, sE, NULL);
+    RAYX::SphereGrating s2 = RAYX::SphereGrating("spheregrating", mount, width, height, deviation, incidence, azimuthal, distance, entranceArm, exitArm, designEnergy, linedensity, double(order), mis,vls, sE,NULL, false);
     /*double alpha = 1.4892226555787231;
     double beta = 1.4915379074397925;
     double chi = 2.1502456384570143;

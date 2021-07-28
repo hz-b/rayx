@@ -15,7 +15,7 @@ namespace RAYX
      *
     */
     Ellipsoid::Ellipsoid(const char* name, const double width, const double height, const double grazingIncidence, const double azimuthal, const double distanceToPreceedingElement,
-        const double entranceArmLength, const double exitArmLength, const int coordSys, const int figRot, const double a_11, const std::vector<double> misalignmentParams, const std::vector<double> slopeError, const std::shared_ptr<OpticalElement> previous)
+        const double entranceArmLength, const double exitArmLength, const int coordSys, const int figRot, const double a_11, const std::vector<double> misalignmentParams, const std::vector<double> slopeError, const std::shared_ptr<OpticalElement> previous, bool global)
         : OpticalElement(name, width, height, slopeError, previous),
         m_totalWidth(width),
         m_totalHeight(height),
@@ -44,7 +44,7 @@ namespace RAYX
 
         setSurface(std::make_unique<Quadric>(std::vector<double>{m_a11, 0, 0, 0, 0, 1, 0, m_radius, 0, 0, d_a33, d_a34, 0, 0, 0, d_a44}));
         // setSurface(surface);
-        calcTransformationMatrices(m_alpha1, m_chi, m_beta, m_distanceToPreceedingElement, { 0,0,0,0,0,0 });
+        calcTransformationMatrices(m_alpha1, m_chi, m_beta, m_distanceToPreceedingElement, { 0,0,0,0,0,0 }, global);
         setElementParameters({ m_totalWidth,m_totalHeight,m_a11,m_y0, d_a33,d_a34,d_a44,0, 0,0,0,0, 0,0,0,0 });
 
         // if m_misalignmentCoordSys == 1 rotate through d_tangentangle before misalignment and back after (-d_tangentangle)

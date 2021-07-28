@@ -38,7 +38,7 @@ namespace RAYX
      * @param misalignmentParams        angles and distances for the object's misalignment
      * @param tempMisalignmentParams    parameters for temporary misalignment that can be removed midtracing.
     */
-    OpticalElement::OpticalElement(const char* name, const std::vector<double> EParameters, const double width, const double height, const double alpha, const double chi, const double beta, const double dist, const std::vector<double> misalignmentParams, const std::vector<double> tempMisalignmentParams, const std::vector<double> slopeError, const std::shared_ptr<OpticalElement> previous)
+    OpticalElement::OpticalElement(const char* name, const std::vector<double> EParameters, const double width, const double height, const double alpha, const double chi, const double beta, const double dist, const std::vector<double> misalignmentParams, const std::vector<double> tempMisalignmentParams, const std::vector<double> slopeError, const std::shared_ptr<OpticalElement> previous, bool global)
         : BeamlineObject(name),
         //m_surface(std::move(surface)), 
         m_previous(previous),
@@ -52,7 +52,7 @@ namespace RAYX
             slopeError[6],0,0,0,
             0,0,0,0
         };
-        calcTransformationMatrices(alpha, chi, beta, dist, misalignmentParams);
+        calcTransformationMatrices(alpha, chi, beta, dist, misalignmentParams, global);
         setTemporaryMisalignment(tempMisalignmentParams);
     }
 
@@ -92,7 +92,7 @@ namespace RAYX
      * @param misalignment  misalignment x,y,z,psi,phi,chi
      * @return void
     */
-    void OpticalElement::calcTransformationMatrices(const double alpha, const double chi, const double beta, const double dist, const std::vector<double> misalignment) {
+    void OpticalElement::calcTransformationMatrices(const double alpha, const double chi, const double beta, const double dist, const std::vector<double> misalignment, bool global) {
         double cos_c = cos(chi);
         double sin_c = sin(chi);
         double cos_a = cos(alpha);
@@ -161,10 +161,11 @@ namespace RAYX
 
 
         // world coordinates = world coord of previous element * transformation from previous element to this one
-        if (m_previous != NULL) { //Mi_g2e = Mi_b2e * M(i-1))_e2b * M_(i-1)_g2e
+        if (m_previous != NULL) { //Mi_g2e = M_i_b2e * M_(i-1))_e2b * M_(i-1)_g2e
+            std::cout << "calc world coordinates" << std::endl;
             d_g2e = getMatrixProductAsVector(m_previous->getE2B(), m_previous->getG2E());
             d_g2e = getMatrixProductAsVector(d_b2e, d_g2e);
-            // Mi_e2g = M_(i-1)_e2g * M(i-1)_e2b^-1 * Mi_b2e^-1
+            // Mi_e2g = M_(i-1)_e2g * M_(i-1)_e2b^-1 * M_i_b2e^-1
             d_e2g = getMatrixProductAsVector(m_previous->getInvE2B(), d_inv_b2e);
             d_e2g = getMatrixProductAsVector(m_previous->getE2G(), d_e2g);
         }
@@ -174,13 +175,15 @@ namespace RAYX
             std::cout << "first element" << std::endl;
         }
 
-        // combine in and out transformation (global <-> element coordinates) with misalignment
-        //m_inMatrix = d_g2e;
-        //m_outMatrix = d_e2g;
-
-        // to use usual ray coordinatesystem, also contains misalignment
-        m_inMatrix = d_b2e;
-        m_outMatrix = d_e2b;
+        if(global) {  // combine in and out transformation (global <-> element coordinates) with misalignment
+            std::cout << "global" << std::endl;
+            m_inMatrix = d_g2e;
+            m_outMatrix = d_e2g;
+        }else{  // to use usual ray coordinatesystem, also contains misalignment
+            std::cout << "RAY-UI beam coordinates" << std::endl;
+            m_inMatrix = d_b2e;
+            m_outMatrix = d_e2b;
+        }
 
         std::cout << "inMatrix: " << m_inMatrix.size() << std::endl;
         for (int i = 0; i < 16; i++) {

@@ -16,10 +16,10 @@ namespace RAYX
      * @param misalignmentParams angles and distances for the mirror's misalignment
      *
     */
-    PlaneMirror::PlaneMirror(const char* name, const double width, const double height, const double grazingIncidence, const double azimuthal, const double dist, const std::vector<double> misalignmentParams, const std::vector<double> slopeError, const std::shared_ptr<OpticalElement> previous)
-        : OpticalElement(name, { 0,0,0,0, 0,0,0,0, 0,0,0,0, 0,0,0,0 }, width, height, rad(grazingIncidence), rad(azimuthal), rad(grazingIncidence), dist, misalignmentParams, { 0,0,0,0,0,0 }, slopeError, previous),
-        m_totalWidth(width), m_totalHeight(height), m_alpha(rad(grazingIncidence)), m_beta(m_alpha), m_chi(rad(azimuthal)), m_distanceToPreceedingElement(dist) {
-        setSurface(std::make_unique<Quadric>(std::vector<double>{0, 0, 0, 0, 0, 0, 0, -1, 0, 0, 0, 0, 0, 0, 0, 0}));
+    PlaneMirror::PlaneMirror(const char* name, const double width, const double height, const double grazingIncidence, const double azimuthal, const double dist, const std::vector<double> misalignmentParams, const std::vector<double> slopeError, const std::shared_ptr<OpticalElement> previous, bool global) 
+    : OpticalElement(name, {0,0,0,0, 0,0,0,0, 0,0,0,0, 0,0,0,0}, width, height, rad(grazingIncidence), rad(azimuthal), rad(grazingIncidence), dist, misalignmentParams, {0,0,0,0,0,0}, slopeError, previous, global),
+    m_totalWidth(width), m_totalHeight(height), m_alpha(rad(grazingIncidence)), m_beta(m_alpha), m_chi(rad(azimuthal)), m_distanceToPreceedingElement(dist) {
+        setSurface(std::make_unique<Quadric>( std::vector<double>{0,0,0,0, 0,0,0,-1, 0,0,0,0, 0,0,0,0} ));
     }
 
     PlaneMirror::~PlaneMirror()

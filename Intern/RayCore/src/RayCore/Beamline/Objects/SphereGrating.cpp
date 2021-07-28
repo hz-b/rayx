@@ -18,7 +18,7 @@ namespace RAYX
      *          lineDensity = line density of the grating
      *          orderOfDefraction =
     */
-    SphereGrating::SphereGrating(const char* name, int mount, double width, double height, double deviation, double normalIncidence, double azimuthal, double distanceToPreceedingElement, double entranceArmLength, double exitArmLength, double designEnergyMounting, double lineDensity, double orderOfDiffraction, std::vector<double> misalignmentParams, std::vector<double> vls, std::vector<double> slopeError, std::shared_ptr<OpticalElement> previous)
+    SphereGrating::SphereGrating(const char* name, int mount, double width, double height, double deviation, double normalIncidence, double azimuthal, double distanceToPreceedingElement, double entranceArmLength, double exitArmLength, double designEnergyMounting, double lineDensity, double orderOfDiffraction, std::vector<double> misalignmentParams, std::vector<double> vls, std::vector<double> slopeError, std::shared_ptr<OpticalElement> previous, bool global)
         : OpticalElement(name, width, height, slopeError, previous),
         m_totalWidth(width),
         m_totalHeight(height),
@@ -43,7 +43,7 @@ namespace RAYX
         // std::cout << m_a << std::endl;
         // set parameters in Quadric class
         setSurface(std::make_unique<Quadric>(std::vector<double>{1, 0, 0, 0, 0, 1, 0, -m_radius, 0, 0, 1, 0, 2, 0, 0, 0}));
-        calcTransformationMatrices(m_alpha, m_chi, m_beta, m_distanceToPreceedingElement, misalignmentParams);
+        calcTransformationMatrices(m_alpha, m_chi, m_beta, m_distanceToPreceedingElement, misalignmentParams, global);
         setElementParameters({
             m_totalWidth, m_totalHeight, m_lineDensity, m_orderOfDiffraction,
             abs(hvlam(m_designEnergyMounting)), 0, m_vls[0], m_vls[1],

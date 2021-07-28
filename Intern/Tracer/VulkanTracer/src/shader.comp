@@ -1867,7 +1867,7 @@ double stopBox(double x, double y, double xStop, double yStop, double weight) {
 			}
 		}else{
 			double radius = sqrt((x/xStop)*(x/xStop) + (y/yStop)*(y/yStop));
-			if(radius < 1) w = 0;
+			if(radius <= 1) w = 0;
 		}
 	}
 	return w;

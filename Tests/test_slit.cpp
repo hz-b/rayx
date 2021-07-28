@@ -52,7 +52,7 @@ TEST(Slit, defaultParams) {
     double beamstopHeight = 1;
     double energy = 100;
     std::vector<double> misalignment = { 0,0,0, 0,0,0 };
-    RAYX::Slit s = RAYX::Slit("slit", shape, beamstop, width, height, chi, dist, beamstopWidth, beamstopHeight, energy, misalignment, nullptr);
+    RAYX::Slit s = RAYX::Slit("slit", shape, beamstop, width, height, chi, dist, beamstopWidth, beamstopHeight, energy, misalignment, nullptr, false);
 
     double wavelength = 12.39852;
     std::vector<double> correctElementParams = { 0,0,0,0, wavelength,0,0,0, 0,0,0,0, 0,0,0,0 };
@@ -83,7 +83,7 @@ TEST(Slit, rectangleBeamstop) {
     double beamstopHeight = 1;
     double energy = 100;
     std::vector<double> misalignment = { 0,0,0, 0,0,0 };
-    RAYX::Slit s = RAYX::Slit("slit", shape, beamstop, width, height, chi, dist, beamstopWidth, beamstopHeight, energy, misalignment, nullptr);
+    RAYX::Slit s = RAYX::Slit("slit", shape, beamstop, width, height, chi, dist, beamstopWidth, beamstopHeight, energy, misalignment, nullptr, false);
 
     double wavelength = 12.39852;
     std::vector<double> correctElementParams = { beamstopWidth / 2, beamstopHeight / 2,0,0, wavelength,0,0,0, 0,0,0,0, 0,0,0,0 };
@@ -113,7 +113,7 @@ TEST(Slit, ellipticalBeamstop) {
     double beamstopHeight = 1;
     double energy = 100;
     std::vector<double> misalignment = { 0,0,0, 0,0,0 };
-    RAYX::Slit s = RAYX::Slit("slit", shape, beamstop, width, height, chi, dist, beamstopWidth, beamstopHeight, energy, misalignment, nullptr);
+    RAYX::Slit s = RAYX::Slit("slit", shape, beamstop, width, height, chi, dist, beamstopWidth, beamstopHeight, energy, misalignment, nullptr, false);
 
     double wavelength = 12.39852;
     std::vector<double> correctElementParams = { -beamstopWidth / 2, beamstopHeight / 2,0,0, wavelength,0,0,0, 0,0,0,0, 0,0,0,0 };
@@ -144,7 +144,7 @@ TEST(Slit, ellipticalSlitellipticalBeamstop) {
     double beamstopHeight = 1;
     double energy = 100;
     std::vector<double> misalignment = { 0,0,0, 0,0,0 };
-    RAYX::Slit s = RAYX::Slit("slit", shape, beamstop, width, height, chi, dist, beamstopWidth, beamstopHeight, energy, misalignment, nullptr);
+    RAYX::Slit s = RAYX::Slit("slit", shape, beamstop, width, height, chi, dist, beamstopWidth, beamstopHeight, energy, misalignment, nullptr, false);
 
     double wavelength = 12.39852;
     std::vector<double> correctElementParams = { -beamstopWidth / 2, beamstopHeight / 2,0,0, wavelength,0,0,0, 0,0,0,0, 0,0,0,0 };
@@ -175,7 +175,7 @@ TEST(Slit, ellipticalSlitrectangleBeamstop) {
     double beamstopHeight = 1;
     double energy = 100;
     std::vector<double> misalignment = { 0,0,0, 0,0,0 };
-    RAYX::Slit s = RAYX::Slit("slit", shape, beamstop, width, height, chi, dist, beamstopWidth, beamstopHeight, energy, misalignment, nullptr);
+    RAYX::Slit s = RAYX::Slit("slit", shape, beamstop, width, height, chi, dist, beamstopWidth, beamstopHeight, energy, misalignment, nullptr, false);
 
     double wavelength = 12.39852;
     std::vector<double> correctElementParams = { beamstopWidth / 2, beamstopHeight / 2,0,0, wavelength,0,0,0, 0,0,0,0, 0,0,0,0 };
@@ -206,7 +206,7 @@ TEST(Slit, ellipticalSlitNoBeamstop) {
     double beamstopHeight = 1;
     double energy = 100;
     std::vector<double> misalignment = { 0,0,0, 0,0,0 };
-    RAYX::Slit s = RAYX::Slit("slit", shape, beamstop, width, height, chi, dist, beamstopWidth, beamstopHeight, energy, misalignment, nullptr);
+    RAYX::Slit s = RAYX::Slit("slit", shape, beamstop, width, height, chi, dist, beamstopWidth, beamstopHeight, energy, misalignment, nullptr, false);
 
     double wavelength = 12.39852;
     std::vector<double> correctElementParams = { 0,0,0,0, wavelength,0,0,0, 0,0,0,0, 0,0,0,0 };

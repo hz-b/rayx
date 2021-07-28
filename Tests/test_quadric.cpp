@@ -59,7 +59,7 @@ TEST(Quadric, testMisalignment) {
     double dist = 12005;
     std::vector<double> sE = { 1,2,3,4,5,6,7 };
     std::vector<double> mis = { 1,2,3,0.03,0.02,0.01 }; // psi, phi, chi
-    RAYX::PlaneMirror plM = RAYX::PlaneMirror("planemirror", width, height, incidenceAngle, azimuthalAngle, dist, mis, sE, NULL); // {1,2,3,0.01,0.02,0.03}
+    RAYX::PlaneMirror plM = RAYX::PlaneMirror("planemirror", width, height, incidenceAngle, azimuthalAngle, dist, mis, sE, NULL, false); // {1,2,3,0.01,0.02,0.03}
 
     //std::vector<double> Mis_out = plM.d_misalignmentMatrix();
     std::vector<double> Mis_in = plM.getMisalignmentMatrix();
@@ -79,7 +79,7 @@ TEST(Quadric, testInMat) {
     double dist = 12005;
     std::vector<double> mis = { 0,0,0,0,0,0 };
     std::vector<double> sE = { 1,2,8,2,4, 6,3 };
-    RAYX::PlaneMirror plM = RAYX::PlaneMirror("planemirror", width, height, incidenceAngle, azimuthalAngle, dist, mis, sE, NULL); // {1,2,3,0.01,0.02,0.03}
+    RAYX::PlaneMirror plM = RAYX::PlaneMirror("planemirror",width, height, incidenceAngle, azimuthalAngle, dist, mis, sE, NULL, false); // {1,2,3,0.01,0.02,0.03}
 
     std::vector<double> Mis_out = plM.getInverseTempMisalignmentMatrix();
     std::vector<double> Mis_in = plM.getTempMisalignmentMatrix();
@@ -97,26 +97,26 @@ TEST(Quadric, testInMat) {
 
 TEST(Quadric, testGlobalCoordinates) {
     std::vector<double> sE = { 0,0,0,0,0, 0,0 };
-    std::shared_ptr<RAYX::PlaneMirror> p1 = std::make_shared<RAYX::PlaneMirror>("PlaneMirror1", 50, 200, 10, 7, 0, std::vector<double>{0, 0, 0, 0, 0, 0}, sE, nullptr); // {1,2,3,0.01,0.02,0.03}
-    std::shared_ptr<RAYX::PlaneMirror> p2 = std::make_shared<RAYX::PlaneMirror>("PlaneMirror2", 50, 200, 15, 4, 0, std::vector<double>{0, 0, 0, 0, 0, 0}, sE, p1); // {1,2,3,0.01,0.02,0.03}
-    std::shared_ptr<RAYX::PlaneMirror> p3 = std::make_shared<RAYX::PlaneMirror>("PlaneMirror3", 50, 200, 7, 10, 0, std::vector<double>{0, 0, 0, 0, 0, 0}, sE, p2); // {1,2,3,0.01,0.02,0.03}
-    std::shared_ptr<RAYX::PlaneMirror> p4 = std::make_shared<RAYX::PlaneMirror>("PlaneMirror4", 50, 200, 22, 17, 0, std::vector<double>{0, 0, 0, 0, 0, 0}, sE, p3); // {1,2,3,0.01,0.02,0.03}
+    std::shared_ptr<RAYX::PlaneMirror> p1 = std::make_shared<RAYX::PlaneMirror>("PlaneMirror1", 50, 200, 10, 7, 0, std::vector<double>{0,0,0, 0,0,0}, sE, nullptr, true); // {1,2,3,0.01,0.02,0.03}
+    std::shared_ptr<RAYX::PlaneMirror> p2 = std::make_shared<RAYX::PlaneMirror>("PlaneMirror2", 50, 200, 15, 4, 0, std::vector<double>{0,0,0, 0,0,0}, sE, p1, true); // {1,2,3,0.01,0.02,0.03}
+    std::shared_ptr<RAYX::PlaneMirror> p3 = std::make_shared<RAYX::PlaneMirror>("PlaneMirror3", 50, 200, 7, 10, 0, std::vector<double>{0,0,0, 0,0,0}, sE, p2, true); // {1,2,3,0.01,0.02,0.03}
+    std::shared_ptr<RAYX::PlaneMirror> p4 = std::make_shared<RAYX::PlaneMirror>("PlaneMirror4", 50, 200, 22, 17, 0, std::vector<double>{0,0,0, 0,0,0}, sE, p3, true); // {1,2,3,0.01,0.02,0.03}
 
-    /*std::vector<double> worldCoord = {0.993, -0.120, -0.021, 0,
+    std::vector<double> worldCoord = {0.993, -0.120, -0.021, 0,
                                         0.122, 0.977, 0.172, 0,
                                         0.000, -0.174, 0.985, 0,
                                         0, 0, 0, 1};
-    std::vector<double> result = p1.getInMatrix();
+    std::vector<double> result = p1->getInMatrix();
     for(int i = 0; i<16; i++) {
         EXPECT_NEAR(worldCoord[i], result[i], 0.001);
     }
 
-    // values from RAYX-UI interface
+    // values from RAY-UI interface
     worldCoord = {0.997, -0.050, -0.056, 0,
                                         0.073, 0.818, 0.571, 0,
                                         0.018, -0.573, 0.819, 0,
                                         0, 0, 0, 1};
-    result = p2.getInMatrix();
+    result = p2->getInMatrix();
     for(int i = 0; i<16; i++) {
         EXPECT_NEAR(worldCoord[i], result[i], 0.001);
     }
@@ -125,7 +125,7 @@ TEST(Quadric, testGlobalCoordinates) {
                                         0.140, 0.534, 0.834, 0,
                                         -0.062, -0.836, 0.545, 0,
                                         0, 0, 0, 1};
-    result = p3.getInMatrix();
+    result = p3->getInMatrix();
     for(int i = 0; i<16; i++) {
         EXPECT_NEAR(worldCoord[i], result[i], 0.001);
     }
@@ -134,8 +134,8 @@ TEST(Quadric, testGlobalCoordinates) {
                                         0.191, 0.044, 0.981, 0,
                                         -0.171, -0.982, 0.077, 0,
                                         0, 0, 0, 1};
-    result = p4.getInMatrix();
+    result = p4->getInMatrix();
     for(int i = 0; i<16; i++) {
         EXPECT_NEAR(worldCoord[i], result[i], 0.001);
-    }*/
+    }
 }

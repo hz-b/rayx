@@ -72,7 +72,7 @@ TEST(RZP, testdefaultParams) {
     double fresnelOffset = 0;
     std::vector<double> mis = { 1,2,3, 0.001,0.002,0.003 };
     std::vector<double> sE = { 1,2,3,4,5,6,7 };
-    RAYX::ReflectionZonePlate rzp = RAYX::ReflectionZonePlate("RZP", mount, curvatureType, designType, elementOffsetType, width, height, deviation, grazingIncidence, azimuthal, dist, designEnergy, sourceEnergy, orderOfDiffraction, designOrderOfDiffraction, dAlpha, dBeta, sEntrance, sExit, mEntrance, mExit, shortRadius, longRadius, additionalOrder, elementOffsetZ, fresnelOffset, beta_in, mis, sE, NULL);
+    RAYX::ReflectionZonePlate rzp = RAYX::ReflectionZonePlate("RZP", mount, curvatureType, designType, elementOffsetType, width, height, deviation, grazingIncidence, azimuthal, dist, designEnergy, sourceEnergy, orderOfDiffraction, designOrderOfDiffraction, dAlpha, dBeta, sEntrance, sExit, mEntrance, mExit, shortRadius, longRadius, additionalOrder, elementOffsetZ, fresnelOffset, beta_in, mis, sE, NULL, false);
 
     double alpha = 0.017453292519943295;
     double beta = 0.017453292519941554;
@@ -135,7 +135,7 @@ TEST(RZP, testParams) {
     double fresnelOffset = 12;
     std::vector<double> mis = { 0,0,0, 0,0,0 };
     std::vector<double> sE = { 1,3,4,5,6,7,9 };
-    RAYX::ReflectionZonePlate rzp = RAYX::ReflectionZonePlate("RZP", mount, curvatureType, designType, elementOffsetType, width, height, deviation, grazingIncidence, azimuthal, dist, designEnergy, sourceEnergy, orderOfDiffraction, designOrderOfDiffraction, dAlpha, dBeta, sEntrance, sExit, mEntrance, mExit, shortRadius, longRadius, additionalOrder, elementOffsetZ, fresnelOffset, beta, mis, sE, NULL);
+    RAYX::ReflectionZonePlate rzp = RAYX::ReflectionZonePlate("RZP", mount, curvatureType, designType, elementOffsetType, width, height, deviation, grazingIncidence, azimuthal, dist, designEnergy, sourceEnergy, orderOfDiffraction, designOrderOfDiffraction, dAlpha, dBeta, sEntrance, sExit, mEntrance, mExit, shortRadius, longRadius, additionalOrder, elementOffsetZ, fresnelOffset, beta, mis, sE, NULL, false);
     std::vector<double> correctMis = { 1,0,0,0, 0,1,0,0, 0,0,1,0, 0,0,0,1 };
     std::vector<double> correctElementParams = { 0, 0, 0, inm2eV / sourceEnergy,
                         sourceEnergy, designOrderOfDiffraction, orderOfDiffraction, fresnelOffset,

@@ -54,7 +54,7 @@ TEST(PlaneMirror, testSimpleParams) {
     double dist = 12005;
     std::vector<double> mis = { 0,0,0,0,0,0 };
     std::vector<double> sE = { 0,0,0,0,0, 0,0 };
-    RAYX::PlaneMirror plM = RAYX::PlaneMirror("planemirror", width, height, incidenceAngle, azimuthalAngle, dist, mis, sE, NULL); // {1,2,3,0.01,0.02,0.03}
+    RAYX::PlaneMirror plM = RAYX::PlaneMirror("planemirror",width, height, incidenceAngle, azimuthalAngle, dist, mis, sE, NULL, false); // {1,2,3,0.01,0.02,0.03}
 
     ASSERT_DOUBLE_EQ(plM.getWidth(), width);
     ASSERT_DOUBLE_EQ(plM.getHeight(), height);
@@ -74,7 +74,7 @@ TEST(PlaneMirror, testAdvancedParams) {
     double dist = 12005;
     std::vector<double> mis = { 1,2,3,0.01,0.02,0.03 };
     std::vector<double> sE = { 0.1,0.2,0.3,0.4,0.5, 0.6,0.7 };
-    RAYX::PlaneMirror plM = RAYX::PlaneMirror("planemirror", width, height, incidenceAngle, azimuthalAngle, dist, mis, sE, NULL); // {1,2,3,0.01,0.02,0.03}
+    RAYX::PlaneMirror plM = RAYX::PlaneMirror("planemirror",width, height, incidenceAngle, azimuthalAngle, dist, mis, sE, NULL, false); // {1,2,3,0.01,0.02,0.03}
 
     ASSERT_DOUBLE_EQ(plM.getWidth(), width);
     ASSERT_DOUBLE_EQ(plM.getHeight(), height);
@@ -96,9 +96,9 @@ TEST(Sphere, testParams) {
     double exitArmLength = 123.1;
     std::vector<double> misalignmentParams = { 10,51,2,0.1,5,0.241 };
     std::vector<double> sE = { 0.7,0.5,0.3,0.7,0.3, 3,2 };
-    RAYX::SphereMirror sM = RAYX::SphereMirror("spheremirror", width, height, incidence, azimuthal, dist, entranceArmLength, exitArmLength, misalignmentParams, sE, NULL);
+    RAYX::SphereMirror sM = RAYX::SphereMirror("spheremirror", width, height, incidence, azimuthal, dist, entranceArmLength, exitArmLength, misalignmentParams, sE, NULL, false); 
 
-    double radius = 104.326518296; // from old RAYX, rounded to 9 digits
+    double radius = 104.326518296; // from old RAY, rounded to 9 digits
     ASSERT_DOUBLE_EQ(sM.getWidth(), width);
     ASSERT_DOUBLE_EQ(sM.getHeight(), height);
     EXPECT_NEAR(sM.getRadius(), radius, 0.00000001);
@@ -125,12 +125,12 @@ TEST(Ellips, testParamsCSCurvature) {
     double a_11 = 12.62;
     std::vector<double>  mis = { 12,72,1.12, 0.1,0.7341,2.5 };
     std::vector<double> sE = { 1,2,3,4,5,6,7 };
-    RAYX::Ellipsoid e = RAYX::Ellipsoid("ellipsoid", width, height, incidence, azimuthal, dist, entranceArmLength, exitArmLength, coordSys, figRot, a_11, mis, sE, NULL);
+    RAYX::Ellipsoid e = RAYX::Ellipsoid("ellipsoid", width, height, incidence, azimuthal, dist, entranceArmLength, exitArmLength, coordSys, figRot, a_11, mis, sE, NULL, false); 
 
-    // in old RAYX
+    // in old RAY
     double shortHalfAxis = 1758.53601375;
     double longHalfAxis = 4092.1727615;
-    double surfaceCenterY0 = 1365.026842783936; // actually neg. depending on which calc in old RAYX is used
+    double surfaceCenterY0 = 1365.026842783936; // actually neg. depending on which calc in old RAY is used
     double surfaceCenterZ0 = 2579.914108547892;
     double tangentAngle = 0.3358074867515476;
     double halfAxisC = 1758.536013753882;
@@ -163,7 +163,7 @@ TEST(Ellips, testParamsCSCurvature) {
     EXPECT_ITERABLE_DOUBLE_EQ(std::vector<double>, sE, e.getSlopeError());
 
     figRot = 1;
-    RAYX::Ellipsoid e2 = RAYX::Ellipsoid("ellipsoid", width, height, incidence, azimuthal, dist, entranceArmLength, exitArmLength, coordSys, figRot, a_11, mis, sE, NULL);
+    RAYX::Ellipsoid e2 = RAYX::Ellipsoid("ellipsoid", width, height, incidence, azimuthal, dist, entranceArmLength, exitArmLength, coordSys, figRot, a_11, mis, sE, NULL, false); 
     halfAxisC = INFINITY;
 
     ASSERT_DOUBLE_EQ(e2.getWidth(), width);
@@ -186,7 +186,7 @@ TEST(Ellips, testParamsCSCurvature) {
     EXPECT_ITERABLE_DOUBLE_EQ(std::vector<double>, sE, e2.getSlopeError());
 
     figRot = 2;
-    RAYX::Ellipsoid e3 = RAYX::Ellipsoid("ellipsoid", width, height, incidence, azimuthal, dist, entranceArmLength, exitArmLength, coordSys, figRot, a_11, mis, sE, NULL);
+    RAYX::Ellipsoid e3 = RAYX::Ellipsoid("ellipsoid", width, height, incidence, azimuthal, dist, entranceArmLength, exitArmLength, coordSys, figRot, a_11, mis, sE, NULL, false); 
     halfAxisC = 495.0186818473859;
 
     ASSERT_DOUBLE_EQ(e3.getWidth(), width);
@@ -223,12 +223,12 @@ TEST(Ellips, testParamsCSMirror) {
     double a_11 = 12.62;
     std::vector<double>  mis = { 12,72,1.12, 0.1,0.7341,2.5 };
     std::vector<double> sE = { 7,6,5,4,3,2,1 };
-    RAYX::Ellipsoid e = RAYX::Ellipsoid("ellipsoid", width, height, incidence, azimuthal, dist, entranceArmLength, exitArmLength, coordSys, figRot, a_11, mis, sE, NULL);
+    RAYX::Ellipsoid e = RAYX::Ellipsoid("ellipsoid", width, height, incidence, azimuthal, dist, entranceArmLength, exitArmLength, coordSys, figRot, a_11, mis, sE, NULL, false); 
 
-    // in old RAYX
+    // in old RAY
     double shortHalfAxis = 1758.53601375;
     double longHalfAxis = 4092.1727615;
-    double surfaceCenterY0 = 1365.026842783936; // actually neg. depending on which calc in old RAYX is used
+    double surfaceCenterY0 = 1365.026842783936; // actually neg. depending on which calc in old RAY is used
     double surfaceCenterZ0 = 2579.914108547892;
     double tangentAngle = 0.3358074867515476;
     double halfAxisC = 1758.536013753882;
@@ -261,7 +261,7 @@ TEST(Ellips, testParamsCSMirror) {
     EXPECT_ITERABLE_DOUBLE_EQ(std::vector<double>, sE, e.getSlopeError());
 
     figRot = 1;
-    RAYX::Ellipsoid e2 = RAYX::Ellipsoid("ellipsoid", width, height, incidence, azimuthal, dist, entranceArmLength, exitArmLength, coordSys, figRot, a_11, mis, sE, NULL);
+    RAYX::Ellipsoid e2 = RAYX::Ellipsoid("ellipsoid", width, height, incidence, azimuthal, dist, entranceArmLength, exitArmLength, coordSys, figRot, a_11, mis, sE, NULL, false); 
     halfAxisC = INFINITY;
 
     ASSERT_DOUBLE_EQ(e2.getWidth(), width);
@@ -284,7 +284,7 @@ TEST(Ellips, testParamsCSMirror) {
     EXPECT_ITERABLE_DOUBLE_EQ(std::vector<double>, sE, e2.getSlopeError());
 
     figRot = 2;
-    RAYX::Ellipsoid e3 = RAYX::Ellipsoid("ellipsoid", width, height, incidence, azimuthal, dist, entranceArmLength, exitArmLength, coordSys, figRot, a_11, mis, sE, NULL);
+    RAYX::Ellipsoid e3 = RAYX::Ellipsoid("ellipsoid", width, height, incidence, azimuthal, dist, entranceArmLength, exitArmLength, coordSys, figRot, a_11, mis, sE, NULL, false); 
     halfAxisC = 495.0186818473859;
 
     ASSERT_DOUBLE_EQ(e3.getWidth(), width);

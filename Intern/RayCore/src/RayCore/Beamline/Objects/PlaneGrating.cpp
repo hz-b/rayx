@@ -23,11 +23,15 @@ namespace RAYX
      * @param slopeError            7 slope error parameters: x-y sagittal (0), y-z meridional (1), thermal distortion x (2),y (3),z (4), cylindrical bowing amplitude y(5) and radius (6)
      * @param previous              pointer to previous element in beamline, needed for caclultation transformation matrices in global coordinate system
     */
-    PlaneGrating::PlaneGrating(const char* name, const int mount, const double width, const double height, const double deviation, const double normalIncidence, const double azimuthal, const double distanceToPreceedingElement, const double designEnergyMounting, const double lineDensity, const double orderOfDiffraction, const double fixFocusConstantCFF, const int additional_zero_order, const std::vector<double> misalignmentParams, const std::vector<double> vls, const std::vector<double> slopeError, const std::shared_ptr<OpticalElement> previous)
-        : OpticalElement(name, width, height, slopeError, previous),
-        m_totalWidth(width), m_totalHeight(height), m_fixFocusConstantCFF(fixFocusConstantCFF), m_designEnergyMounting(designEnergyMounting), m_lineDensity(lineDensity),
-        m_orderOfDiffraction(orderOfDiffraction)
-    {
+    PlaneGrating::PlaneGrating(const char* name, const int mount, const double width, const double height, const double deviation, const double normalIncidence, const double azimuthal, const double distanceToPreceedingElement, const double designEnergyMounting, const double lineDensity, const double orderOfDiffraction, const double fixFocusConstantCFF, const int additional_zero_order, const std::vector<double> misalignmentParams, const std::vector<double> vls, const std::vector<double> slopeError, const std::shared_ptr<OpticalElement> previous, bool global) 
+    : OpticalElement(name, width, height, slopeError, previous),
+        m_totalWidth(width), 
+        m_totalHeight(height), 
+        m_fixFocusConstantCFF(fixFocusConstantCFF), 
+        m_designEnergyMounting(designEnergyMounting), 
+        m_lineDensity(lineDensity),
+        m_orderOfDiffraction(orderOfDiffraction) 
+     {
         // parameters in array 
         // std::vector<double> inputPoints = {0,0,0,0, 0,0,0,-1, 0,0,0,0, 0,0,0,0};
         m_a = abs(hvlam(m_designEnergyMounting)) * abs(m_lineDensity) * m_orderOfDiffraction * 1e-6; // wavelength * linedensity * order of diffraction * 10^-6
@@ -41,7 +45,7 @@ namespace RAYX
 
         // set parameters in Optical Element class
         m_vls = vls; // into element parameters
-        calcTransformationMatrices(m_alpha, m_chi, m_beta, m_distanceToPreceedingElement, misalignmentParams);
+        calcTransformationMatrices(m_alpha, m_chi, m_beta, m_distanceToPreceedingElement, misalignmentParams, global);
         setElementParameters({
             m_totalWidth, m_totalHeight, m_lineDensity, m_orderOfDiffraction,
             abs(hvlam(m_designEnergyMounting)), 0, m_vls[0], m_vls[1],
