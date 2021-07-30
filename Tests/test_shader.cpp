@@ -132,7 +132,9 @@ void writeToFile(std::list<double> outputRays, std::string name)
     outputFile.close();
     std::cout << "done!" << std::endl;
 }
+
 /*
+
 TEST(Tracer, testUniformRandom) {
     double settings = 17;
 
@@ -1106,6 +1108,56 @@ TEST(Tracer, planeRefracTest) {
     }
 }
 
+TEST(Tracer, iteratToTest) {
+    VulkanTracer tracer;
+    std::list<std::vector<RAYX::Ray>> rayList;
+
+    std::vector<RAYX::Ray> testValues;
+    std::vector<RAYX::Ray> correct;
+    double settings = 20;
+
+    // normal (always 0,1,0) encoded in ray position, a encoded in direction.x, direction.y and direction.z are actual ray directions
+    RAYX::Ray r = RAYX::Ray(glm::dvec3(-0.0175, 1736.4751598838836, -9848.1551798768887), glm::dvec3(-0.00026923073232438285, -0.17315574581145807, 0.984894418304465), 1.0, 100);
+    RAYX::Ray c = RAYX::Ray(glm::dvec3(-2.7173752216893443, 0.050407875158271054, 28.473736158432885), glm::dvec3(-0.00026923073232438285, -0.17315574581145807, 0.984894418304465), 1.0, 100);
+    testValues.push_back(r);
+    correct.push_back(c);
+
+    double longRadius = 10470.491787499999;
+    double shortRadius = 315.72395939400002;
+    std::shared_ptr<RAYX::OpticalElement> q = std::make_shared<RAYX::OpticalElement>("TestPlaneRefrac", std::vector<double>{ longRadius,shortRadius,0,0, 0,0,0,0, 0,0,0,0, 0,settings,0,0 }, zeros, zeros, zeros, zeros, zeros, zeros);
+
+    std::list<double> outputRays = runTracer(testValues, { q });
+    std::cout << "got " << outputRays.size() << " values from shader" << std::endl;
+
+    int counter = 0;
+    double tolerance = 1e-09;
+    for (std::list<double>::iterator i = outputRays.begin(); i != outputRays.end();) {
+        if (counter % 8 == 0) {
+            EXPECT_NEAR(*i, correct[int(counter / 8)].m_position.x, tolerance);
+        }
+        else if (counter % 8 == 1) {
+            EXPECT_NEAR(*i, correct[int(counter / 8)].m_position.y, tolerance);
+        }
+        else if (counter % 8 == 2) {
+            EXPECT_NEAR(*i, correct[int(counter / 8)].m_position.z, tolerance);
+        }
+        else if (counter % 8 == 3) {
+            EXPECT_NEAR(*i, correct[int(counter / 8)].m_weight, tolerance);
+        }
+        else if (counter % 8 == 4) {
+            EXPECT_NEAR(*i, correct[int(counter / 8)].m_direction.x, tolerance);
+        }
+        else if (counter % 8 == 5) {
+            EXPECT_NEAR(*i, correct[int(counter / 8)].m_direction.y, tolerance);
+        }
+        else if (counter % 8 == 6) {
+            EXPECT_NEAR(*i, correct[int(counter / 8)].m_direction.z, tolerance);
+        }
+        counter++;
+        i++;
+    }
+}
+
 
 void testOpticalElement(std::vector<std::shared_ptr<RAYX::OpticalElement>> elements, int n) {
 
@@ -1173,26 +1225,26 @@ TEST(opticalElements, planeGratingDevMisVLS) {
 }
 
 TEST(opticalElements, RZPDefaultParams) {
-    std::shared_ptr<RAYX::ReflectionZonePlate> rzp = std::make_shared<RAYX::ReflectionZonePlate>("ReflectionZonePlateDefault", 1, 0, 0, 0, 50, 200, 170, 1, 0, 10000, 100, 100, -1, -1, 1, 1, 100, 500, 100, 500, 0, 0, 0, 0, 0, 0, std::vector<double>{ 0,0,0, 0,0,0 }, zeros7, nullptr, false); // dx,dy,dz, dpsi,dphi,dchi // {1,2,3,0.001,0.002,0.003}
+    std::shared_ptr<RAYX::ReflectionZonePlate> rzp = std::make_shared<RAYX::ReflectionZonePlate>("ReflectionZonePlateDefault", 0, 1, 0, 0, 0, 50, 200, 170, 1, 0, 10000, 100, 100, -1, -1, 1, 1, 100, 500, 100, 500, 0, 0, 0, 0, 0, 0, std::vector<double>{ 0,0,0, 0,0,0 }, zeros7, nullptr, false); // dx,dy,dz, dpsi,dphi,dchi // {1,2,3,0.001,0.002,0.003}
     testOpticalElement({ rzp }, 20);
     ASSERT_TRUE(true);
 }
 
 TEST(opticalElements, RZPDefaultParams200) {
-    std::shared_ptr<RAYX::ReflectionZonePlate> rzp = std::make_shared<RAYX::ReflectionZonePlate>("ReflectionZonePlateDefault200", 1, 0, 0, 0, 50, 200, 170, 1, 0, 10000, 100, 100, -1, -1, 1, 1, 100, 500, 100, 500, 0, 0, 0, 0, 0, 0, std::vector<double>{ 0,0,0, 0,0,0 }, zeros7, nullptr, false); // dx,dy,dz, dpsi,dphi,dchi // {1,2,3,0.001,0.002,0.003}
+    std::shared_ptr<RAYX::ReflectionZonePlate> rzp = std::make_shared<RAYX::ReflectionZonePlate>("ReflectionZonePlateDefault200", 0, 1, 0, 0, 0, 50, 200, 170, 1, 0, 10000, 100, 100, -1, -1, 1, 1, 100, 500, 100, 500, 0, 0, 0, 0, 0, 0, std::vector<double>{ 0,0,0, 0,0,0 }, zeros7, nullptr, false); // dx,dy,dz, dpsi,dphi,dchi // {1,2,3,0.001,0.002,0.003}
     testOpticalElement({ rzp }, 200);
     ASSERT_TRUE(true);
 }
 
 TEST(opticalElements, RZPAzimuthal200) {
-    std::shared_ptr<RAYX::ReflectionZonePlate> rzp = std::make_shared<RAYX::ReflectionZonePlate>("ReflectionZonePlateAzim200", 1, 0, 0, 0, 50, 200, 170, 1, 10, 10000, 100, 100, -1, -1, 1, 1, 100, 500, 100, 500, 0, 0, 0, 0, 0, 0, std::vector<double>{ 0,0,0, 0,0,0 }, zeros7, nullptr, false); // dx,dy,dz, dpsi,dphi,dchi // {1,2,3,0.001,0.002,0.003}
+    std::shared_ptr<RAYX::ReflectionZonePlate> rzp = std::make_shared<RAYX::ReflectionZonePlate>("ReflectionZonePlateAzim200", 0, 1, 0, 0, 0, 50, 200, 170, 1, 10, 10000, 100, 100, -1, -1, 1, 1, 100, 500, 100, 500, 0, 0, 0, 0, 0, 0, std::vector<double>{ 0,0,0, 0,0,0 }, zeros7, nullptr, false); // dx,dy,dz, dpsi,dphi,dchi // {1,2,3,0.001,0.002,0.003}
     testOpticalElement({ rzp }, 200);
     ASSERT_TRUE(true);
 }
 
 
 TEST(opticalElements, RZPMis) {
-    std::shared_ptr<RAYX::ReflectionZonePlate> rzp = std::make_shared<RAYX::ReflectionZonePlate>("ReflectionZonePlateMis", 1, 0, 0, 0, 50, 200, 170, 1, 0, 10000, 100, 100, -1, -1, 1, 1, 100, 500, 100, 500, 0, 0, 0, 0, 0, 0, std::vector<double>{ 1,2,3,0.001,0.002,0.003 }, zeros7, nullptr, false); // dx,dy,dz, dpsi,dphi,dchi //
+    std::shared_ptr<RAYX::ReflectionZonePlate> rzp = std::make_shared<RAYX::ReflectionZonePlate>("ReflectionZonePlateMis", 0, 1, 0, 0, 0, 50, 200, 170, 1, 0, 10000, 100, 100, -1, -1, 1, 1, 100, 500, 100, 500, 0, 0, 0, 0, 0, 0, std::vector<double>{ 1,2,3,0.001,0.002,0.003 }, zeros7, nullptr, false); // dx,dy,dz, dpsi,dphi,dchi //
     testOpticalElement({ rzp }, 200);
     ASSERT_TRUE(true);
 }
@@ -1256,13 +1308,12 @@ TEST(opticalElements, slit1) {
     }
 }
 
-
 bool global = false;
 // PETES SETUP
 // spec1-first_rzp4mm
 TEST(PeteRZP, spec1_first_rzp) {
-    std::shared_ptr<RAYX::PointSource> p = std::make_shared<RAYX::PointSource>(0, "spec1_first_rzp",20000 , 1, 0.005,0.005,0, 0.02,0.06, 1,1,0,0, 640, 120, std::vector<double>{0,0,0,0});
-    std::shared_ptr<RAYX::ReflectionZonePlate> rzp = std::make_shared<RAYX::ReflectionZonePlate>("ReflectionZonePete", 1, 0, 1, 1, 4, 60, 170, 2.2, 0, 90, p->getPhotonEnergy(), p->getPhotonEnergy(), -1, -1, 2.2, 1, 90, 400, 90, 400, 0, 0, 1, 0, 0, 1, std::vector<double>{ 0,0,0, 0,0,0 }, zeros7, nullptr, global); // dx,dy,dz, dpsi,dphi,dchi //
+    std::shared_ptr<RAYX::PointSource> p = std::make_shared<RAYX::PointSource>(0, "spec1_first_rzp", 20000 , 1, 0.005,0.005,0, 0.02,0.06, 1,1,0,0, 640, 120, std::vector<double>{0,0,0,0});
+    std::shared_ptr<RAYX::ReflectionZonePlate> rzp = std::make_shared<RAYX::ReflectionZonePlate>("ReflectionZonePete", 0, 1, 0, 1, 1, 4, 60, 170, 2.2, 0, 90, p->getPhotonEnergy(), p->getPhotonEnergy(), -1, -1, 2.2, 1, 90, 400, 90, 400, 0, 0, 1, 0, 0, 1, std::vector<double>{ 0,0,0, 0,0,0 }, zeros7, nullptr, global); // dx,dy,dz, dpsi,dphi,dchi //
     std::list<double> outputRays = runTracer(p->getRays(), {rzp});
     std::string filename = "testFile_spec1_first_rzp";
     writeToFile(outputRays, filename);
@@ -1270,7 +1321,7 @@ TEST(PeteRZP, spec1_first_rzp) {
 
 TEST(PeteRZP, spec1_first_ip) {
     std::shared_ptr<RAYX::PointSource> p = std::make_shared<RAYX::PointSource>(0, "spec1_first_rzp4",20000 , 1, 0.005,0.005,0, 0.02,0.06, 1,1,0,0, 640, 120, std::vector<double>{0,0,0,0});
-    std::shared_ptr<RAYX::ReflectionZonePlate> rzp = std::make_shared<RAYX::ReflectionZonePlate>("ReflectionZonePete", 1, 0, 1, 1, 4, 60, 170, 2.2, 0, 90, p->getPhotonEnergy(), p->getPhotonEnergy(), -1, -1, 2.2, 1, 90, 400, 90, 400, 0, 0, 1, 0, 0, 1, std::vector<double>{ 0,0,0, 0,0,0 }, zeros7, nullptr, global);  // dx,dy,dz, dpsi,dphi,dchi //
+    std::shared_ptr<RAYX::ReflectionZonePlate> rzp = std::make_shared<RAYX::ReflectionZonePlate>("ReflectionZonePete", 0, 1, 0, 1, 1, 4, 60, 170, 2.2, 0, 90, p->getPhotonEnergy(), p->getPhotonEnergy(), -1, -1, 2.2, 1, 90, 400, 90, 400, 0, 0, 1, 0, 0, 1, std::vector<double>{ 0,0,0, 0,0,0 }, zeros7, nullptr, global);  // dx,dy,dz, dpsi,dphi,dchi //
     std::shared_ptr<RAYX::ImagePlane> ip1 = std::make_shared<RAYX::ImagePlane>("ImagePlane1", 385.0, rzp, global);
     std::vector<RAYX::Ray> input = p->getRays();
     std::list<double> outputRays = runTracer(input, {rzp, ip1});
@@ -1280,7 +1331,7 @@ TEST(PeteRZP, spec1_first_ip) {
 
 TEST(PeteRZP, spec1_first_plus_rzp) {
     std::shared_ptr<RAYX::PointSource> p = std::make_shared<RAYX::PointSource>(0, "spec1_first_plus_rzp",20000 , 1, 0.005,0.005,0, 0.02,0.06, 1,1,0,0, 640, 120, std::vector<double>{0,0,0,0});
-    std::shared_ptr<RAYX::ReflectionZonePlate> rzp = std::make_shared<RAYX::ReflectionZonePlate>("ReflectionZonePete", 1, 0, 1, 1, 4, 60, 170, 2.2, 0, 90, p->getPhotonEnergy(), p->getPhotonEnergy(), 1, 1, 2.2, 4.75, 90, 400, 90, 400, 0, 0, 1, 0, -24.35, 4.75, std::vector<double>{ 0,0,0, 0,0,0 },  std::vector<double>{0,0,0,0, 0,0,0}, nullptr, global);  // dx,dy,dz, dpsi,dphi,dchi //
+    std::shared_ptr<RAYX::ReflectionZonePlate> rzp = std::make_shared<RAYX::ReflectionZonePlate>("ReflectionZonePete", 0, 1, 0, 1, 1, 4, 60, 170, 2.2, 0, 90, p->getPhotonEnergy(), p->getPhotonEnergy(), 1, 1, 2.2, 4.75, 90, 400, 90, 400, 0, 0, 1, 0, -24.35, 4.75, std::vector<double>{ 0,0,0, 0,0,0 },  std::vector<double>{0,0,0,0, 0,0,0}, nullptr, global);  // dx,dy,dz, dpsi,dphi,dchi //
     std::list<double> outputRays = runTracer(p->getRays(), {rzp});
     std::string filename = "testFile_spec1_first_plus_rzp";
     writeToFile(outputRays, filename);
@@ -1288,7 +1339,7 @@ TEST(PeteRZP, spec1_first_plus_rzp) {
 
 TEST(PeteRZP, spec1_first_plus_ip) {
     std::shared_ptr<RAYX::PointSource> p = std::make_shared<RAYX::PointSource>(0, "spec1_first_plus_rzp_ip",20000 , 1, 0.005,0.005,0, 0.02,0.06, 1,1,0,0, 640, 120, std::vector<double>{0,0,0,0});
-    std::shared_ptr<RAYX::ReflectionZonePlate> rzp = std::make_shared<RAYX::ReflectionZonePlate>("ReflectionZonePete", 1, 0, 1, 1, 4, 60, 170, 2.2, 0, 90, p->getPhotonEnergy(), p->getPhotonEnergy(), 1, 1, 2.2, 4.75, 90, 400, 90, 400, 0, 0, 1, 0, -24.35, 4.75, std::vector<double>{ 0,0,0, 0,0,0 }, std::vector<double>{0,0,0,0, 0,0,0}, nullptr, global);  // dx,dy,dz, dpsi,dphi,dchi //
+    std::shared_ptr<RAYX::ReflectionZonePlate> rzp = std::make_shared<RAYX::ReflectionZonePlate>("ReflectionZonePete", 0, 1, 0, 1, 1, 4, 60, 170, 2.2, 0, 90, p->getPhotonEnergy(), p->getPhotonEnergy(), 1, 1, 2.2, 4.75, 90, 400, 90, 400, 0, 0, 1, 0, -24.35, 4.75, std::vector<double>{ 0,0,0, 0,0,0 }, std::vector<double>{0,0,0,0, 0,0,0}, nullptr, global);  // dx,dy,dz, dpsi,dphi,dchi //
     std::shared_ptr<RAYX::ImagePlane> ip1 = std::make_shared<RAYX::ImagePlane>("ImagePlane1", 400.0, rzp, global);
     std::vector<RAYX::Ray> input = p->getRays();
     std::list<double> outputRays = runTracer(input, {rzp, ip1});
@@ -1298,7 +1349,7 @@ TEST(PeteRZP, spec1_first_plus_ip) {
 
 TEST(PeteRZP, spec1_first_minus_rzp2) {
     std::shared_ptr<RAYX::PointSource> p = std::make_shared<RAYX::PointSource>(0, "spec1_first_minus_rzp2",20000 , 1, 0.005,0.005,0, 0.001,0.06, 1,1,0,0, 640, 120, std::vector<double>{0,0,0,0});
-    std::shared_ptr<RAYX::ReflectionZonePlate> rzp = std::make_shared<RAYX::ReflectionZonePlate>("ReflectionZonePete", 1, 0, 1, 1, 2, 60, 170, 2.2, 0, 90, p->getPhotonEnergy(), p->getPhotonEnergy(), -1, -1, 2.2, 1, 90, 400, 90, 400, 0, 0, 1, 0, 0, 1, std::vector<double>{ 0,0,0, 0,0,0 },  std::vector<double>{0,0,0,0, 0,0,0}, nullptr, global);  // dx,dy,dz, dpsi,dphi,dchi //
+    std::shared_ptr<RAYX::ReflectionZonePlate> rzp = std::make_shared<RAYX::ReflectionZonePlate>("ReflectionZonePete", 0, 1, 0, 1, 1, 2, 60, 170, 2.2, 0, 90, p->getPhotonEnergy(), p->getPhotonEnergy(), -1, -1, 2.2, 1, 90, 400, 90, 400, 0, 0, 1, 0, 0, 1, std::vector<double>{ 0,0,0, 0,0,0 },  std::vector<double>{0,0,0,0, 0,0,0}, nullptr, global);  // dx,dy,dz, dpsi,dphi,dchi //
     std::list<double> outputRays = runTracer(p->getRays(), {rzp});
     std::string filename = "testFile_spec1_first_minus_rzp2";
     writeToFile(outputRays, filename);
@@ -1306,7 +1357,7 @@ TEST(PeteRZP, spec1_first_minus_rzp2) {
 
 TEST(PeteRZP, spec1_first_minus_ip2) {
     std::shared_ptr<RAYX::PointSource> p = std::make_shared<RAYX::PointSource>(0, "spec1_first_minus_rzp_ip2",20000 , 1, 0.005,0.005,0, 0.001,0.06, 1,1,0,0, 640, 120, std::vector<double>{0,0,0,0});
-    std::shared_ptr<RAYX::ReflectionZonePlate> rzp = std::make_shared<RAYX::ReflectionZonePlate>("ReflectionZonePete", 1, 0, 1, 1, 2, 60, 170, 2.2, 0, 90, p->getPhotonEnergy(), p->getPhotonEnergy(), -1, -1, 2.2, 1, 90, 400, 90, 400, 0, 0, 1, 0, 0, 1, std::vector<double>{ 0,0,0, 0,0,0 },  std::vector<double>{0,0,0,0, 0,0,0}, nullptr, global);  // dx,dy,dz, dpsi,dphi,dchi //
+    std::shared_ptr<RAYX::ReflectionZonePlate> rzp = std::make_shared<RAYX::ReflectionZonePlate>("ReflectionZonePete", 0, 1, 0, 1, 1, 2, 60, 170, 2.2, 0, 90, p->getPhotonEnergy(), p->getPhotonEnergy(), -1, -1, 2.2, 1, 90, 400, 90, 400, 0, 0, 1, 0, 0, 1, std::vector<double>{ 0,0,0, 0,0,0 },  std::vector<double>{0,0,0,0, 0,0,0}, nullptr, global);  // dx,dy,dz, dpsi,dphi,dchi //
     std::shared_ptr<RAYX::ImagePlane> ip1 = std::make_shared<RAYX::ImagePlane>("ImagePlane1", 400.0, rzp, global);
     std::vector<RAYX::Ray> input = p->getRays();
     std::list<double> outputRays = runTracer(input, {rzp, ip1});

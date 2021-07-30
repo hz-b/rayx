@@ -21,6 +21,7 @@ SET(SOURCE
     src/RayCore/Beamline/Objects/PlaneMirror.cpp
     src/RayCore/Beamline/Objects/PointSource.cpp
     src/RayCore/Beamline/Objects/SphereMirror.cpp
+    src/RayCore/Beamline/Objects/Toroid.cpp
     src/RayCore/Data/Exporter.cpp
     src/RayCore/Data/Importer.cpp
     src/RayCore/Surface/Quadric.cpp
@@ -50,6 +51,7 @@ SET(HEADERS
     src/RayCore/Beamline/Objects/PlaneMirror.h
     src/RayCore/Beamline/Objects/PointSource.h
     src/RayCore/Beamline/Objects/SphereMirror.h
+    src/RayCore/Beamline/Objects/Toroid.h
     src/RayCore/Data/Exporter.h
     src/RayCore/Data/Importer.h
     src/RayCore/Surface/Quadric.h

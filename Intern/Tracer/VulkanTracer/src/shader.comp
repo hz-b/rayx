@@ -1537,6 +1537,51 @@ dvec4 intersectionPoint(inout Ray r, const dmat4 quadric, int icurv)
 	return normal;
 }
 
+dvec4 iteratTo(inout Ray r, double longRadius, double shortRadius) {
+	double isigro = sign(shortRadius);
+	// sign radius: +1 = concave, -1 = convex
+	
+	int n = 0;
+	//double aln = r.direction.x / r.direction.z;
+	//double amn = r.direction.y / r.direction.z;
+
+	dvec4 normal = dvec4(0,0,0,0);
+	double zz = 0.0;
+	double xx, yy;
+	double dz = 0.0;
+	dvec3 normalized_dir = dvec3(r.direction) / r.direction.z;
+	
+	// while not converted
+	do {
+		zz = zz + dz;
+		xx = r.position.x + normalized_dir.x*(zz - r.position.z);
+		if(xx*xx > shortRadius*shortRadius) {
+			xx = xx / abs(xx) * 0.95*shortRadius;
+		}
+		yy = r.position.y + normalized_dir.y*(zz - r.position.z);
+		double sq = sqrt(shortRadius*shortRadius - xx*xx);
+		double rx = (longRadius - shortRadius + isigro*sq);
+
+		normal.x = (-2*xx*isigro / sq) * rx;
+		normal.y = -2*(yy - longRadius);
+		normal.z = -2*zz;
+
+		double func = -rx*rx + (yy - longRadius)*(yy-longRadius) + zz*zz;
+		double df = normalized_dir.x*normal.x + normalized_dir.y*normal.y + normal.z;//dot(normalized_dir, dvec3(normal));
+		dz = func / df;
+		n += 1;
+		if (n >= 1000) {
+			normal = intersectionPoint(r, dmat4(0,0,0,0, 0,0,0,0, 0,0,0,-1, 0,0,0,0), 1);
+			r.weight = 7; // -4 in old ray. thrown away or still in use?
+			return normal;
+		}
+		
+	} while (abs(dz) > 0.0001);
+
+	r.position = dvec3(xx,yy,zz);
+	return normalize(normal);
+
+}
 
 /**
 turn the normal vector through x_rad and z_rad
@@ -2024,6 +2069,33 @@ Ray traceSlit(Ray r, const Quadric q, inout uint64_t ctr) {
 	return r;
 }
 
+Ray traceToroid(Ray r, Quadric q, inout uint64_t ctr) {
+	r = rayMatrixMult(r, q.inTrans);
+
+	double longRadius = q.elementParameters[0][0];
+	double shortRadius = q.elementParameters[0][1];
+	dvec4 normal = iteratTo(r, longRadius, shortRadius);
+
+	double xLength = q.objectParameters[0][0]; // width
+	double zLength = q.objectParameters[0][1]; // height
+	r.weight = wasteBox(r.position[0],r.position[2],xLength,zLength, r.weight);
+
+	// element missed
+	if(r.weight < 1.0) {
+		r = rayMatrixMult(r, q.outTrans); // inv mis & out trans
+		return r;
+	}
+
+	// tanger/slope Error
+	double slopeX = q.objectParameters[0][2];
+	double slopeZ = q.objectParameters[0][3];
+	normal = tanger(normal, slopeX, slopeZ, 0, ctr);
+
+	r.direction = dvec3(reflect(dvec4(r.direction,0), normal));
+	r = rayMatrixMult(r, q.outTrans);
+
+	return r;
+}
 
 Ray traceRZP(Ray r, const Quadric q, inout uint64_t ctr) {
 	r = rayMatrixMult(r, q.inTrans);
@@ -2386,9 +2458,10 @@ void testFunctions() {
 			rayData[uint(gl_GlobalInvocationID)] = traceRZP(rayData[uint(gl_GlobalInvocationID)], quadricData[i], ctr);
 		}else if(type == 5) { // image plane
 			rayData[uint(gl_GlobalInvocationID)] = traceImagePlane(rayData[uint(gl_GlobalInvocationID)], quadricData[i]);
+		}else if(type == 6) { // toroid
+			rayData[uint(gl_GlobalInvocationID)] = traceToroid(rayData[uint(gl_GlobalInvocationID)], quadricData[i], ctr);
 		}
 	}
-	//const int numberOfRays = rayData.length();
 	// settings != 0 -> unit test cases in test_shader.cpp
 	// input rays and quadrics are interpreted depending on the test case
 	if(settings == 1) { // TEST TRIG FUNCTIONS
@@ -2550,6 +2623,10 @@ void testFunctions() {
 		res.position = dvec3(r8_log(r.position.x), r8_log(r.position.y), r8_log(r.position.z));
 		res.direction = dvec3(r8_log(r.direction.x), r8_log(r.direction.y), r8_log(r.direction.z));
 		rayData[uint(gl_GlobalInvocationID)] = res;
+	}
+	else if(settings == 20) { // test iteratTo (method for finding intersection and normal for non-quadric surfaces like the torus)
+		dvec4 normal = iteratTo(r, quadricData[0].anchorPoints[0][0], quadricData[0].anchorPoints[0][1]);
+		rayData[uint(gl_GlobalInvocationID)] = r;
 	}
 	outputData[uint(gl_GlobalInvocationID)] = rayData[uint(gl_GlobalInvocationID)];
 }

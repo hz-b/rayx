@@ -19,7 +19,7 @@ namespace RAYX
      *          lineDensity = line density of the grating
      *          orderOfDiffraction =
     */
-    ReflectionZonePlate::ReflectionZonePlate(const char* name, const int mount, const int curvatureType, const int designType, const int elementOffsetType, const double width, const double height, const double deviation, const double incidenceAngle, const double azimuthal, const double distanceToPreceedingElement, const double designEnergy, const double sourceEnergy, const double orderOfDiffraction, const double designOrderOfDiffraction, const double dAlpha, const double dBeta, const double mEntrance, const double mExit, const double sEntrance, const double sExit, const double shortRadius, const double longRadius, const int additional_zero_order, const double elementOffsetZ, const double fresnelZOffset, const double beta, const std::vector<double> misalignmentParams, const std::vector<double> slopeError, const std::shared_ptr<OpticalElement> previous, bool global)
+    ReflectionZonePlate::ReflectionZonePlate(const char* name, const int geometricShape, const int mount, const int curvatureType, const int designType, const int elementOffsetType, const double width, const double height, const double deviation, const double incidenceAngle, const double azimuthal, const double distanceToPreceedingElement, const double designEnergy, const double sourceEnergy, const double orderOfDiffraction, const double designOrderOfDiffraction, const double dAlpha, const double dBeta, const double mEntrance, const double mExit, const double sEntrance, const double sExit, const double shortRadius, const double longRadius, const int additional_zero_order, const double elementOffsetZ, const double fresnelZOffset, const double beta, const std::vector<double> misalignmentParams, const std::vector<double> slopeError, const std::shared_ptr<OpticalElement> previous, bool global)
         : OpticalElement(name, width, height, slopeError, previous),
         m_totalWidth(width),
         m_totalHeight(height),
@@ -45,6 +45,10 @@ namespace RAYX
         m_wavelength = m_designEnergy == 0 ? 0 : inm2eV / m_designEnergy;
         m_additionalOrder = additional_zero_order == 0 ? AO_OFF : AO_ON;
 
+        m_geometricalShape = geometricShape == 0 ? GS_RECTANGLE : GS_ELLIPTICAL;
+        if(m_geometricalShape == GS_ELLIPTICAL) {
+            setDimensions(-m_totalWidth, -m_totalHeight);
+        }
         m_curvatureType = curvatureType == 0 ? CT_PLANE : (curvatureType == 1 ? CT_TOROIDAL : CT_SPHERICAL);
         m_gratingMount = mount == 0 ? GM_DEVIATION : GM_INCIDENCE;
         m_designType = designType == 0 ? DT_ZOFFSET : DT_BETA; // default (0)
@@ -71,17 +75,17 @@ namespace RAYX
         printInfo();
         // set parameters in Quadric class
         if (m_curvatureType == CT_PLANE) {
-            setSurface(std::make_unique<Quadric>(std::vector<double>{ 0, 0, 0, 0, m_totalWidth, 0, 0, -1, m_totalHeight, 0, 0, 0, 4, 0, 0, 0 }));
+            setSurface(std::make_unique<Quadric>(std::vector<double>{ 0, 0, 0, 0, 0, 0, 0, -1, 0, 0, 0, 0, 4, 0, 0, 0 }));
         }
         else if (m_curvatureType == CT_SPHERICAL) {
             m_longRadius = longRadius; // for sphere and toroidal
-            setSurface(std::make_unique<Quadric>(std::vector<double>{ 1, 0, 0, 0, m_totalWidth, 1, 0, -m_longRadius, m_totalHeight, 0, 1, 0, 4, 0, 0, 0 }));
+            setSurface(std::make_unique<Quadric>(std::vector<double>{ 1, 0, 0, 0, 0, 1, 0, -m_longRadius, 0, 0, 1, 0, 4, 0, 0, 0 }));
         }
         else {
             // no structure for non-quadric elements yet
             m_longRadius = longRadius; // for sphere and toroidal
             m_shortRadius = shortRadius; // only for Toroidal
-            setSurface(std::make_unique<Quadric>(std::vector<double>{ 1, 0, 0, 0, m_totalWidth, 1, 0, -m_longRadius, m_totalHeight, 0, 1, 0, 4, 0, 0, 0 }));
+            setSurface(std::make_unique<Quadric>(std::vector<double>{ 1, 0, 0, 0, 0, 1, 0, -m_longRadius, 0, 0, 1, 0, 4, 0, 0, 0 }));
         }
 
         calcTransformationMatrices(m_alpha, m_chi, m_beta, m_distanceToPreceedingElement, misalignmentParams, global);

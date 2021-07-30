@@ -9,7 +9,7 @@ namespace RAYX
 
     public:
 
-        ReflectionZonePlate(const char* name, const int mount, const int curvatureType, const int designType, const int elementOffsetType, const double width, const double height, const double deviation, const double incidenceAngle, const double azimuthal, const double distanceToPreceedingElement, const double designEnergy, const double sourceEnergy, const double orderOfDiffraction, const double designOrderOfDiffraction, const double dAlpha, const double dBeta, const double mEntrance, const double mExit, const double sEntrance, const double sExit, const double shortRadius, const double longRadius, const int additional_zero_order, const double elementOffsetZ, const double fresnelZOffset, const double beta, const std::vector<double> misalignmentParams, const std::vector<double> slopeError, const std::shared_ptr<OpticalElement> previous, bool global);
+        ReflectionZonePlate(const char* name, const int geometricShape, const int mount, const int curvatureType, const int designType, const int elementOffsetType, const double width, const double height, const double deviation, const double incidenceAngle, const double azimuthal, const double distanceToPreceedingElement, const double designEnergy, const double sourceEnergy, const double orderOfDiffraction, const double designOrderOfDiffraction, const double dAlpha, const double dBeta, const double mEntrance, const double mExit, const double sEntrance, const double sExit, const double shortRadius, const double longRadius, const int additional_zero_order, const double elementOffsetZ, const double fresnelZOffset, const double beta, const std::vector<double> misalignmentParams, const std::vector<double> slopeError, const std::shared_ptr<OpticalElement> previous, bool global);
         ReflectionZonePlate();
         ~ReflectionZonePlate();
 
@@ -83,6 +83,8 @@ namespace RAYX
         double m_grazingIncidenceAngle;
         double m_distanceToPreceedingElement;
 
+        enum GEOMETRICAL_SHAPE {GS_RECTANGLE, GS_ELLIPTICAL};
+        GEOMETRICAL_SHAPE m_geometricalShape;
         enum GRATING_MOUNT { GM_DEVIATION, GM_INCIDENCE };
         GRATING_MOUNT m_gratingMount;
         enum CURVATURE_TYPE { CT_PLANE, CT_TOROIDAL, CT_SPHERICAL };
