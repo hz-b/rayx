@@ -34,7 +34,7 @@ run-job:
     - cd build
     - cd bin
     - ls
-    - vulkaninfo
+    - vulkaninfo | grep GPU
 
 test-job:
   stage: test
