@@ -78,7 +78,7 @@ TEST(RZP, testdefaultParams) {
     double beta = 0.017453292519941554;
     double d_alpha = 0.017453292519943295;
     double d_beta = 0.017453292519943295;
-    double wl = 112.39852;
+    double wl = 12.39852;
     std::vector<double> quad = { 0,0,0,0, width,0,0,-1, height,0,0,0, 4,0,0,0 }; // plane
     std::vector<double> correctElementParams = { 0, 0, 0, inm2eV / sourceEnergy,
                         sourceEnergy, designOrderOfDiffraction, orderOfDiffraction, fresnelOffset,
