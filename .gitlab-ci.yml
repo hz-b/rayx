@@ -34,7 +34,7 @@ run-job:
     - cd build
     - cd bin
     - ls
-    - ./TerminalApp
+    - vulkaninfo
 
 test-job:
   stage: test
