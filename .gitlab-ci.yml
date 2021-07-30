@@ -31,7 +31,8 @@ run-job:
     - pwd # to know where we are
     - ls
     - echo "This job tests something"
-    - ./build/bin/RayReworked_tst.exe
+    - cd build
+    - ls
 
 test-job:
   stage: test
