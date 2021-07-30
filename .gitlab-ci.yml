@@ -34,7 +34,7 @@ run-job:
     - cd build
     - cd bin
     - ls
-    - TerminalApp
+    - ./TerminalApp
 
 test-job:
   stage: test
