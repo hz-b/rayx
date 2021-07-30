@@ -34,7 +34,7 @@ run-job:
     - cd build
     - cd bin
     - ls
-    - RayReworked_tst
+    - ./RayReworked_tst
 
 test-job:
   stage: test
