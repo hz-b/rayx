@@ -32,6 +32,7 @@ run-job:
     - ls
     - echo "This job tests something"
     - cd build
+    - cd bin
     - ls
 
 test-job:
