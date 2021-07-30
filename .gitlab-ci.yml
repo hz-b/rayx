@@ -35,6 +35,7 @@ run-job:
     - cd bin
     - ls
     - vulkaninfo | grep GPU
+    - RayReworked_tst
 
 test-job:
   stage: test

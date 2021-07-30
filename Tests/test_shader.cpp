@@ -132,7 +132,7 @@ void writeToFile(std::list<double> outputRays, std::string name)
     outputFile.close();
     std::cout << "done!" << std::endl;
 }
-
+/*
 TEST(Tracer, testUniformRandom) {
     double settings = 17;
 
@@ -1313,3 +1313,4 @@ TEST(PeteRZP, spec1_first_minus_ip2) {
     std::string filename = "testFile_spec1_first_minus_rzp_ip2";
     writeToFile(outputRays, filename);
 }
+*/
