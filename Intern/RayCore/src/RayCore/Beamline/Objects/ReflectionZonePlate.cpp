@@ -20,16 +20,12 @@ namespace RAYX
      *          orderOfDiffraction =
     */
     ReflectionZonePlate::ReflectionZonePlate(const char* name, const int geometricShape, const int mount, const int curvatureType, const int designType, const int elementOffsetType, const double width, const double height, const double deviation, const double incidenceAngle, const double azimuthal, const double distanceToPreceedingElement, const double designEnergy, const double sourceEnergy, const double orderOfDiffraction, const double designOrderOfDiffraction, const double dAlpha, const double dBeta, const double mEntrance, const double mExit, const double sEntrance, const double sExit, const double shortRadius, const double longRadius, const int additional_zero_order, const double elementOffsetZ, const double fresnelZOffset, const double beta, const std::vector<double> misalignmentParams, const std::vector<double> slopeError, const std::shared_ptr<OpticalElement> previous, bool global)
-        : OpticalElement(name, width, height, slopeError, previous),
-        m_totalWidth(width),
-        m_totalHeight(height),
+        : OpticalElement(name, width, height, rad(azimuthal), distanceToPreceedingElement, slopeError, previous),
         m_designAlphaAngle(rad(dAlpha)),
         m_designBetaAngle(rad(dBeta)),
 
-        m_chi(rad(azimuthal)),
         m_grazingIncidenceAngle(rad(incidenceAngle)),
-        m_distanceToPreceedingElement(distanceToPreceedingElement),
-
+        
         m_frenselZOffset(fresnelZOffset),
         m_sagittalEntranceArmLength(sEntrance), //in mm
         m_sagittalExitArmLength(sExit),
@@ -47,7 +43,7 @@ namespace RAYX
 
         m_geometricalShape = geometricShape == 0 ? GS_RECTANGLE : GS_ELLIPTICAL;
         if(m_geometricalShape == GS_ELLIPTICAL) {
-            setDimensions(-m_totalWidth, -m_totalHeight);
+            setDimensions(-width, -height);
         }
         m_curvatureType = curvatureType == 0 ? CT_PLANE : (curvatureType == 1 ? CT_TOROIDAL : CT_SPHERICAL);
         m_gratingMount = mount == 0 ? GM_DEVIATION : GM_INCIDENCE;
@@ -71,7 +67,7 @@ namespace RAYX
         else { // auto == true
             setBeta(beta);
         }
-        std::cout << "alpha: " << m_alpha << ", beta: " << m_beta << std::endl;
+        std::cout << "alpha: " << getAlpha() << ", beta: " << getBeta() << std::endl;
         printInfo();
         // set parameters in Quadric class
         if (m_curvatureType == CT_PLANE) {
@@ -88,7 +84,7 @@ namespace RAYX
             setSurface(std::make_unique<Quadric>(std::vector<double>{ 1, 0, 0, 0, 0, 1, 0, -m_longRadius, 0, 0, 1, 0, 4, 0, 0, 0 }));
         }
 
-        calcTransformationMatrices(m_alpha, m_chi, m_beta, m_distanceToPreceedingElement, misalignmentParams, global);
+        calcTransformationMatrices(misalignmentParams, global);
         // the whole misalignment is also stored in temporaryMisalignment because it needs to be temporarily removed during tracing
         setTemporaryMisalignment(misalignmentParams);
         setElementParameters({
@@ -235,22 +231,22 @@ namespace RAYX
             m_incidenceMainBeamLength = sqrt(pow(distance, 2) + pow(m_zOff, 2) - 2 * distance * m_zOff * cos(m_grazingIncidenceAngle)); // kosinussatz
             alphaMtest = asin(sin(m_grazingIncidenceAngle) * distance / m_incidenceMainBeamLength); // sinussatz
             if (fabs(distance / sin(alphaMtest) - m_zOff / sin(PI - alphaMtest - m_grazingIncidenceAngle)) <= 1e-05) {
-                m_alpha = PI - alphaMtest;
+                setAlpha(PI - alphaMtest);
             }
             else {
-                m_alpha = alphaMtest;
+                setAlpha(alphaMtest);
             }
         }
         else {
             m_incidenceMainBeamLength = 0;
-            m_alpha = m_grazingIncidenceAngle;
+            setAlpha(m_grazingIncidenceAngle);
         }
     }
 
     void ReflectionZonePlate::calcBeta2() {
         double DZ = (m_designOrderOfDiffraction == 0) ? 0 : calcDz00();
         std::cout << "DZ calcBeta2 " << DZ << std::endl;
-        m_beta = acos(cos(m_grazingIncidenceAngle) - m_orderOfDiffraction * m_wavelength * 1e-6 * DZ);
+        setBeta(acos(cos(m_grazingIncidenceAngle) - m_orderOfDiffraction * m_wavelength * 1e-6 * DZ));
     }
 
     void ReflectionZonePlate::Illumination() {
@@ -391,15 +387,16 @@ namespace RAYX
         // focus(hv=beamline->getPhotonEnergy, angle, d0=calcDz00, ord=orderofdiff, alpha, beta)
         double a = m_designEnergy * abs(calcDz00() * m_orderOfDiffraction * 1.e-06);
         double theta = rad(abs(angle));
+        double bet;
         if (angle <= 0) { // constant alpha mounting
             double arg = a - sin(theta);
             if (abs(arg) >= 1) { // cannot calculate alpha & beta
                 m_grazingIncidenceAngle = 0;
-                m_beta = 0;
+                bet = 0;
             }
             else {
                 m_grazingIncidenceAngle = theta;
-                m_beta = asin(arg);
+                bet = asin(arg);
             }
         }
         else {  // constant alpha & beta mounting
@@ -407,14 +404,14 @@ namespace RAYX
             double arg = a / 2 / cos(theta);
             if (abs(arg) >= 1) {
                 m_grazingIncidenceAngle = 0;
-                m_beta = 0;
+                bet = 0;
             }
             else {
-                m_beta = asin(arg) - theta;
-                m_grazingIncidenceAngle = 2 * theta + m_beta;
+                bet = asin(arg) - theta;
+                m_grazingIncidenceAngle = 2 * theta + bet;
             }
         }
-        m_beta = PI / 2 - abs(m_beta);
+        setBeta(PI / 2 - abs(bet));
     }
 
     double ReflectionZonePlate::rzpLineDensityDZ(const double X, const double Y, const double Z, const double FX, const double FY, const double FZ, const double WL) {
@@ -519,24 +516,6 @@ namespace RAYX
 
     }
 
-    void ReflectionZonePlate::setBeta(const double beta) { // in degree
-        m_beta = rad(beta);
-    }
-
-    double ReflectionZonePlate::getWidth() const {
-        return m_totalWidth;
-    }
-
-    double ReflectionZonePlate::getHeight() const {
-        return m_totalHeight;
-    }
-
-    double ReflectionZonePlate::getAlpha() const {
-        return m_alpha;
-    }
-    double ReflectionZonePlate::getBeta() const {
-        return m_beta;
-    }
     double ReflectionZonePlate::getDesignAlphaAngle() const {
         return m_designAlphaAngle;
     }

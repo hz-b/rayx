@@ -16,14 +16,10 @@ namespace RAYX
     */
     Ellipsoid::Ellipsoid(const char* name, const double width, const double height, const double grazingIncidence, const double azimuthal, const double distanceToPreceedingElement,
         const double entranceArmLength, const double exitArmLength, const int coordSys, const int figRot, const double a_11, const std::vector<double> misalignmentParams, const std::vector<double> slopeError, const std::shared_ptr<OpticalElement> previous, bool global)
-        : OpticalElement(name, width, height, slopeError, previous),
-        m_totalWidth(width),
-        m_totalHeight(height),
+        : OpticalElement(name, width, height, rad(azimuthal), distanceToPreceedingElement, slopeError, previous),
+        m_incidence(rad(grazingIncidence)),
         m_entranceArmLength(entranceArmLength),
         m_exitArmLength(exitArmLength),
-        m_alpha(rad(grazingIncidence)),
-        m_chi(rad(azimuthal)),
-        m_distanceToPreceedingElement(distanceToPreceedingElement),
         m_a11(a_11)
     {
 
@@ -35,7 +31,7 @@ namespace RAYX
 
         calcHalfAxes();
         // grazingIncidence = m_alpha = m_alpha1 + d_tangentAngle
-        calcAlphaBeta(grazingIncidence);
+        calcAlphaBeta();
         // a33, 34, 44
         d_a33 = pow(m_shortHalfAxisB / m_longHalfAxisA, 2);
         d_a34 = m_z0 * d_a33;
@@ -44,8 +40,8 @@ namespace RAYX
 
         setSurface(std::make_unique<Quadric>(std::vector<double>{m_a11, 0, 0, 0, 0, 1, 0, m_radius, 0, 0, d_a33, d_a34, 0, 0, 0, d_a44}));
         // setSurface(surface);
-        calcTransformationMatrices(m_alpha1, m_chi, m_beta, m_distanceToPreceedingElement, { 0,0,0,0,0,0 }, global);
-        setElementParameters({ m_totalWidth,m_totalHeight,m_a11,m_y0, d_a33,d_a34,d_a44,0, 0,0,0,0, 0,0,0,0 });
+        calcTransformationMatrices({ 0,0,0,0,0,0 }, global);
+        setElementParameters({ 0,0,m_a11,m_y0, d_a33,d_a34,d_a44,0, 0,0,0,0, 0,0,0,0 });
 
         // if m_misalignmentCoordSys == 1 rotate through d_tangentangle before misalignment and back after (-d_tangentangle)
         if (m_misalignmentCoordSys == CS_MIRROR) {
@@ -76,10 +72,10 @@ else {
     {
     }
 
-    void Ellipsoid::calcAlphaBeta(double grazingIncidence) {
-        m_alpha1 = m_alpha - d_tangentAngle;
-        m_beta = m_alpha; // mirror -> exit angle = incidence angle
-        std::cout << "alpha= " << m_alpha << " m_alpha1= " << m_alpha1 << " beta= " << m_beta << std::endl;
+    void Ellipsoid::calcAlphaBeta() {
+        setAlpha(m_incidence - d_tangentAngle);
+        setBeta(m_incidence); // mirror -> exit angle = incidence angle
+        std::cout << "alpha= " << m_incidence << " m_alpha1= " << getAlpha() << " beta= " << getBeta() << std::endl;
     }
 
     /*
@@ -90,7 +86,7 @@ else {
 
     // caclulates the half axes from the entrance and exit arm lengths, see ELLPARAM in RAYX.FOR
     void Ellipsoid::calcHalfAxes() {
-        double theta = m_alpha; // designGrazingIncidenceAngle always equal to alpha (grazingIncidenceAngle)??
+        double theta = m_incidence; // designGrazingIncidenceAngle always equal to alpha (grazingIncidenceAngle)??
         if (theta > PI / 2) {
             theta = PI / 2;
         }
@@ -122,14 +118,6 @@ else {
         std::cout << "A= " << m_longHalfAxisA << ", B= " << m_shortHalfAxisB << ", C= " << d_halfAxisC << ", angle = " << d_tangentAngle << ", Z0 = " << m_z0 << ", Y0= " << m_y0 << std::endl;
     }
 
-    double Ellipsoid::getWidth() {
-        return m_totalWidth;
-    }
-
-    double Ellipsoid::getHeight() {
-        return m_totalHeight;
-    }
-
     double Ellipsoid::getRadius() {
         return m_radius;
     }
@@ -149,18 +137,10 @@ else {
     double Ellipsoid::getMz0() {
         return m_z0;
     }
-    double Ellipsoid::getAlpha() {
-        return m_alpha;
+    double Ellipsoid::getIncidenceAngle() const {
+        return m_incidence;
     }
-    double Ellipsoid::getBeta() {
-        return m_beta;
-    }
-    double Ellipsoid::getChi() {
-        return m_chi;
-    }
-    double Ellipsoid::getDistanceToPreceedingElement() {
-        return m_distanceToPreceedingElement;
-    }
+    
     double Ellipsoid::getShortHalfAxisB() {
         return m_shortHalfAxisB;
     }
@@ -169,9 +149,6 @@ else {
     }
     double Ellipsoid::getOffsetY0() {
         return m_offsetY0;
-    }
-    double Ellipsoid::getAlpha1() { // from tangent angle and grazing incidence???
-        return m_alpha1;
     }
     double Ellipsoid::getTangentAngle() {
         return d_tangentAngle;

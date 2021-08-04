@@ -9,7 +9,7 @@ namespace RAYX
     public:
 
         MatrixSource(const int id, const std::string name, const int numberOfRays, const int spreadType, const double sourceWidth, const double sourceHeight,
-            const double sourceDepth, const double horDivergence, const double verDivergence, const double photonEnergy, const double energySpread, const std::vector<double> misalignment);
+            const double sourceDepth, const double horDivergence, const double verDivergence, const double photonEnergy, const double energySpread, const double linPol0, const double linPol45, const double circPol, const std::vector<double> misalignment);
 
         MatrixSource();
         ~MatrixSource();

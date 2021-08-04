@@ -19,12 +19,15 @@ namespace RAYX
     {
     public:
 
-        LightSource(const int id, const int numberOfRays, const char* name, const int spreadType, const double photonEnergy, const double energySpread, const std::vector<double> misalignment);
+        LightSource(const int id, const int numberOfRays, const char* name, const int spreadType, const double photonEnergy, const double energySpread, const double linPol0, const double linPol45, const double circPol, const std::vector<double> misalignment);
         int getNumberOfRays();
         int getId();
         std::vector<double> getMisalignmentParams();
         double getPhotonEnergy();
         double getEnergySpread();
+        double getLinear0();
+        double getLinear45();
+        double getCircular();
         int getSpreadType();
 
         double selectEnergy();
@@ -52,6 +55,9 @@ namespace RAYX
         SOURCE_DISTRIBUTION_TYPE m_sourceDistributionType;
         double m_energySpread;
         double m_photonEnergy;
+        double m_linearPol_0;
+        double m_linearPol_45;
+        double m_circularPol;
         std::uniform_real_distribution<double> m_unif;
         std::default_random_engine re;
 

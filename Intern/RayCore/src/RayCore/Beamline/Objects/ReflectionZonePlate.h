@@ -30,12 +30,8 @@ namespace RAYX
         void focus(double angle);
         double rzpLineDensityDZ(const double X, const double Y, const double Z, const double FX, const double FY, const double FZ, const double WL);
 
-        void setBeta(const double beta); // in degree
-
-        double getWidth() const;
-        double getHeight() const;
-        double getAlpha() const;
-        double getBeta() const;
+        double getIncidenceAngle() const;
+        double getDiffractionAngle() const;
         double getDesignAlphaAngle() const;
         double getDesignBetaAngle() const;
 
@@ -63,12 +59,6 @@ namespace RAYX
         void printInfo() const;
 
     private:
-        double m_totalWidth;
-        double m_totalHeight;
-        // angles in rad and normal angles incidence
-        double m_alpha; // grazing incidence angle
-        double m_beta; // == alpha? grazing exit angle
-
         double m_incidenceMainBeamLength;
         double m_meridionalDistance;
         double m_meridionalDivergence;
@@ -79,10 +69,9 @@ namespace RAYX
         double m_alpha0Angle; // and what are these? equivalent to designAlphaAngle when calculated from other values?
         double m_betaAngle; // calculated if DESIGN_TYPE == DT_ZOFFSET. design beta angle when m_fresnelZOffset is by user
         // in rad as well
-        double m_chi;
+        //double m_chi;
         double m_grazingIncidenceAngle;
-        double m_distanceToPreceedingElement;
-
+        
         enum GEOMETRICAL_SHAPE {GS_RECTANGLE, GS_ELLIPTICAL};
         GEOMETRICAL_SHAPE m_geometricalShape;
         enum GRATING_MOUNT { GM_DEVIATION, GM_INCIDENCE };

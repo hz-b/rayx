@@ -19,14 +19,10 @@ namespace RAYX
      *          orderOfDefraction =
     */
     SphereGrating::SphereGrating(const char* name, int mount, double width, double height, double deviation, double normalIncidence, double azimuthal, double distanceToPreceedingElement, double entranceArmLength, double exitArmLength, double designEnergyMounting, double lineDensity, double orderOfDiffraction, std::vector<double> misalignmentParams, std::vector<double> vls, std::vector<double> slopeError, std::shared_ptr<OpticalElement> previous, bool global)
-        : OpticalElement(name, width, height, slopeError, previous),
-        m_totalWidth(width),
-        m_totalHeight(height),
+        : OpticalElement(name, width, height, rad(azimuthal), distanceToPreceedingElement, slopeError, previous),
         m_entranceArmLength(entranceArmLength),
         m_exitArmLength(exitArmLength),
         m_deviation(rad(deviation)),
-        m_chi(rad(azimuthal)),
-        m_distanceToPreceedingElement(distanceToPreceedingElement),
         m_designEnergyMounting(designEnergyMounting),
         m_lineDensity(lineDensity),
         m_orderOfDiffraction(orderOfDiffraction),
@@ -43,9 +39,9 @@ namespace RAYX
         // std::cout << m_a << std::endl;
         // set parameters in Quadric class
         setSurface(std::make_unique<Quadric>(std::vector<double>{1, 0, 0, 0, 0, 1, 0, -m_radius, 0, 0, 1, 0, 2, 0, 0, 0}));
-        calcTransformationMatrices(m_alpha, m_chi, m_beta, m_distanceToPreceedingElement, misalignmentParams, global);
+        calcTransformationMatrices(misalignmentParams, global);
         setElementParameters({
-            m_totalWidth, m_totalHeight, m_lineDensity, m_orderOfDiffraction,
+            0, 0, m_lineDensity, m_orderOfDiffraction,
             abs(hvlam(m_designEnergyMounting)), 0, m_vls[0], m_vls[1],
             m_vls[2], m_vls[3], m_vls[4], m_vls[5],
             0, 0, 0, 0
@@ -61,9 +57,9 @@ namespace RAYX
             double theta = m_deviation > 0 ? (PI - m_deviation) / 2 : PI / 2 + m_deviation;
             m_radius = 2.0 / sin(theta) / (1.0 / m_entranceArmLength + 1.0 / m_exitArmLength);
         }        
-else if (m_gratingMount == GM_INCIDENCE) {
-            double ca = cos(m_alpha);
-            double cb = cos(m_beta);
+        else if (m_gratingMount == GM_INCIDENCE) {
+            double ca = cos(getAlpha());
+            double cb = cos(getBeta());
             m_radius = (ca + cb) / ((ca * ca) / m_entranceArmLength + (cb * cb) / m_exitArmLength);
         }
     }
@@ -73,48 +69,41 @@ else if (m_gratingMount == GM_INCIDENCE) {
         if (m_gratingMount == GM_DEVIATION) {
             angle = deviation;
         }        
-else if (m_gratingMount == GM_INCIDENCE) {
+        else if (m_gratingMount == GM_INCIDENCE) {
             angle = -normalIncidence;
         }
         focus(angle);
-        m_alpha = (PI / 2) - m_alpha;
-        m_beta = (PI / 2) - abs(m_beta);
     }
 
     void SphereGrating::focus(double angle) {
         // from routine "focus" in RAYX.FOR
         double theta = rad(abs(angle));
+        double alph, bet;
         if (angle <= 0) { // constant alpha mounting
             double arg = m_a - sin(theta);
             if (abs(arg) >= 1) { // cannot calculate alpha & beta
-                m_alpha = 0;
-                m_beta = 0;
+                alph = 0;
+                bet = 0;
             }            
-else {
-                m_alpha = theta;
-                m_beta = asin(arg);
+            else {
+                alph = theta;
+                bet = asin(arg);
             }
         }        
-else {  // constant alpha & beta mounting
+        else {  // constant alpha & beta mounting
             theta = theta / 2;
             double arg = m_a / 2 / cos(theta);
             if (abs(arg) >= 1) {
-                m_alpha = 0;
-                m_beta = 0;
+                alph = 0;
+                bet = 0;
             }            
-else {
-                m_beta = asin(arg) - theta;
-                m_alpha = 2 * theta + m_beta;
+            else {
+                bet = asin(arg) - theta;
+                alph = 2 * theta + bet;
             }
         }
-    }
-
-    double SphereGrating::getWidth() const {
-        return m_totalWidth;
-    }
-
-    double SphereGrating::getHeight() const {
-        return m_totalHeight;
+        setAlpha((PI / 2) - alph);
+        setBeta((PI / 2) - abs(bet));
     }
 
     double SphereGrating::getRadius() const {
@@ -127,21 +116,9 @@ else {
     double SphereGrating::getEntranceArmLength() const {
         return m_entranceArmLength;
     }
-    // angles in rad and normal angles (measured from normal! not incidence!!)
-    double SphereGrating::getAlpha() const {
-        return m_alpha;
-    }
-    double SphereGrating::getBeta() const {
-        return m_beta;
-    }
+    
     double SphereGrating::getDeviation() const {
         return m_deviation;
-    }
-    double SphereGrating::getChi() const {
-        return m_chi;
-    }
-    double SphereGrating::getDistanceToPreceedingElement() const {
-        return m_distanceToPreceedingElement;
     }
     int SphereGrating::getGratingMount() const {
         return m_gratingMount;

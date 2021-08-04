@@ -8,8 +8,8 @@ namespace RAYX
     // angles given and stored in rad
     MatrixSource::MatrixSource(const int id, const std::string name, const int numberOfRays, const int spreadType, const double sourceWidth,
         const double sourceHeight, const double sourceDepth, const double horDivergence, const double verDivergence,
-        const double photonEnergy, const double energySpread, const std::vector<double> misalignment)
-        : LightSource(id, numberOfRays, name.c_str(), spreadType, photonEnergy, energySpread, misalignment),
+        const double photonEnergy, const double energySpread, const double linPol0, const double linPol45, const double circPol, const std::vector<double> misalignment)
+        : LightSource(id, numberOfRays, name.c_str(), spreadType, photonEnergy, energySpread, linPol0, linPol45, circPol, misalignment),
         m_sourceDepth(sourceDepth),
         m_sourceHeight(sourceHeight),
         m_sourceWidth(sourceWidth),
@@ -53,8 +53,9 @@ namespace RAYX
                 phi = -0.5 * m_horDivergence + (m_horDivergence / (rmat - 1)) * row + getMisalignmentParams()[2];;
                 psi = -0.5 * m_verDivergence + (m_verDivergence / (rmat - 1)) * col + getMisalignmentParams()[3];;
                 glm::dvec3 direction = getDirectionFromAngles(phi, psi);
+                glm::dvec4 stokes = glm::dvec4(1, getLinear0(), getLinear45(), getCircular());
 
-                Ray r = Ray(position, direction, en, 1.0);
+                Ray r = Ray(position, direction /*, stokes*/, en, 1.0);
                 rayVector.push_back(r);
             }
         }
@@ -64,7 +65,9 @@ namespace RAYX
             glm::dvec3 position = glm::dvec3(r.m_position[0], r.m_position[1], r.m_position[2]);
             glm::dvec3 direction = glm::dvec3(r.m_direction[0], r.m_direction[1], r.m_direction[2]);
             en = selectEnergy();
-            Ray r_copy(position, direction, en, 1.0);
+            glm::dvec4 stokes = glm::dvec4(1, getLinear0(), getLinear45(), getCircular());
+            
+            Ray r_copy(position, direction /*, stokes*/, en, 1.0);
             rayVector.push_back(r_copy);
         }
         std::cout << &(rayVector[0]) << std::endl;

@@ -64,7 +64,7 @@ TEST(Slit, defaultParams) {
     ASSERT_DOUBLE_EQ(s.getHeight(), height);
     ASSERT_DOUBLE_EQ(s.getWidth(), width);
     ASSERT_DOUBLE_EQ(s.getChi(), chi);
-    ASSERT_DOUBLE_EQ(s.getDist(), dist);
+    ASSERT_DOUBLE_EQ(s.getDistanceToPreceedingElement(), dist);
     ASSERT_DOUBLE_EQ(s.getWaveLength(), wavelength);
     EXPECT_ITERABLE_DOUBLE_EQ(std::vector<double>, s.getElementParameters(), correctElementParams);
     EXPECT_ITERABLE_DOUBLE_EQ(std::vector<double>, s.getSurfaceParams(), quadric);
@@ -95,7 +95,7 @@ TEST(Slit, rectangleBeamstop) {
     ASSERT_DOUBLE_EQ(s.getHeight(), height);
     ASSERT_DOUBLE_EQ(s.getWidth(), width);
     ASSERT_DOUBLE_EQ(s.getChi(), chi);
-    ASSERT_DOUBLE_EQ(s.getDist(), dist);
+    ASSERT_DOUBLE_EQ(s.getDistanceToPreceedingElement(), dist);
     ASSERT_DOUBLE_EQ(s.getWaveLength(), wavelength);
     EXPECT_ITERABLE_DOUBLE_EQ(std::vector<double>, s.getElementParameters(), correctElementParams);
     EXPECT_ITERABLE_DOUBLE_EQ(std::vector<double>, s.getSurfaceParams(), quadric);
@@ -125,7 +125,7 @@ TEST(Slit, ellipticalBeamstop) {
     ASSERT_DOUBLE_EQ(s.getHeight(), height);
     ASSERT_DOUBLE_EQ(s.getWidth(), width);
     ASSERT_DOUBLE_EQ(s.getChi(), chi);
-    ASSERT_DOUBLE_EQ(s.getDist(), dist);
+    ASSERT_DOUBLE_EQ(s.getDistanceToPreceedingElement(), dist);
     ASSERT_DOUBLE_EQ(s.getWaveLength(), wavelength);
     EXPECT_ITERABLE_DOUBLE_EQ(std::vector<double>, s.getElementParameters(), correctElementParams);
     EXPECT_ITERABLE_DOUBLE_EQ(std::vector<double>, s.getSurfaceParams(), quadric);
@@ -153,10 +153,10 @@ TEST(Slit, ellipticalSlitellipticalBeamstop) {
     ASSERT_DOUBLE_EQ(s.getCentralBeamstop(), beamstop);
     ASSERT_DOUBLE_EQ(s.getBeamstopHeight(), beamstopHeight);
     ASSERT_DOUBLE_EQ(s.getBeamstopWidth(), -beamstopWidth);
-    ASSERT_DOUBLE_EQ(s.getHeight(), -height);
-    ASSERT_DOUBLE_EQ(s.getWidth(), -width);
+    ASSERT_DOUBLE_EQ(s.getHeight(), height);
+    ASSERT_DOUBLE_EQ(s.getWidth(), width);
     ASSERT_DOUBLE_EQ(s.getChi(), chi);
-    ASSERT_DOUBLE_EQ(s.getDist(), dist);
+    ASSERT_DOUBLE_EQ(s.getDistanceToPreceedingElement(), dist);
     ASSERT_DOUBLE_EQ(s.getWaveLength(), wavelength);
     EXPECT_ITERABLE_DOUBLE_EQ(std::vector<double>, s.getElementParameters(), correctElementParams);
     EXPECT_ITERABLE_DOUBLE_EQ(std::vector<double>, s.getSurfaceParams(), quadric);
@@ -184,10 +184,10 @@ TEST(Slit, ellipticalSlitrectangleBeamstop) {
     ASSERT_DOUBLE_EQ(s.getCentralBeamstop(), beamstop);
     ASSERT_DOUBLE_EQ(s.getBeamstopHeight(), beamstopHeight);
     ASSERT_DOUBLE_EQ(s.getBeamstopWidth(), beamstopWidth);
-    ASSERT_DOUBLE_EQ(s.getHeight(), -height);
-    ASSERT_DOUBLE_EQ(s.getWidth(), -width);
+    ASSERT_DOUBLE_EQ(s.getHeight(), height);
+    ASSERT_DOUBLE_EQ(s.getWidth(), width);
     ASSERT_DOUBLE_EQ(s.getChi(), chi);
-    ASSERT_DOUBLE_EQ(s.getDist(), dist);
+    ASSERT_DOUBLE_EQ(s.getDistanceToPreceedingElement(), dist);
     ASSERT_DOUBLE_EQ(s.getWaveLength(), wavelength);
     EXPECT_ITERABLE_DOUBLE_EQ(std::vector<double>, s.getElementParameters(), correctElementParams);
     EXPECT_ITERABLE_DOUBLE_EQ(std::vector<double>, s.getSurfaceParams(), quadric);
@@ -215,10 +215,10 @@ TEST(Slit, ellipticalSlitNoBeamstop) {
     ASSERT_DOUBLE_EQ(s.getCentralBeamstop(), beamstop);
     ASSERT_DOUBLE_EQ(s.getBeamstopHeight(), 0);
     ASSERT_DOUBLE_EQ(s.getBeamstopWidth(), 0);
-    ASSERT_DOUBLE_EQ(s.getHeight(), -height);
-    ASSERT_DOUBLE_EQ(s.getWidth(), -width);
+    ASSERT_DOUBLE_EQ(s.getHeight(), height);
+    ASSERT_DOUBLE_EQ(s.getWidth(), width);
     ASSERT_DOUBLE_EQ(s.getChi(), chi);
-    ASSERT_DOUBLE_EQ(s.getDist(), dist);
+    ASSERT_DOUBLE_EQ(s.getDistanceToPreceedingElement(), dist);
     ASSERT_DOUBLE_EQ(s.getWaveLength(), wavelength);
     EXPECT_ITERABLE_DOUBLE_EQ(std::vector<double>, s.getElementParameters(), correctElementParams);
     EXPECT_ITERABLE_DOUBLE_EQ(std::vector<double>, s.getSurfaceParams(), quadric);

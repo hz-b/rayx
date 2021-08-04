@@ -9,8 +9,8 @@ namespace RAYX
     PointSource::PointSource(const int id, const std::string name, const int numberOfRays, const int spreadType,
         const double sourceWidth, const double sourceHeight, const double sourceDepth, const double horDivergence,
         const double verDivergence, const int widthDist, const int heightDist, const int horDist, const int verDist,
-        const double photonEnergy, const double energySpread, const std::vector<double> misalignment)
-        : LightSource(id, numberOfRays, name.c_str(), spreadType, photonEnergy, energySpread, misalignment),
+        const double photonEnergy, const double energySpread, const double linPol0, const double linPol45, const double circPol, const std::vector<double> misalignment)
+        : LightSource(id, numberOfRays, name.c_str(), spreadType, photonEnergy, energySpread, linPol0, linPol45, circPol, misalignment),
         m_sourceDepth(sourceDepth),
         m_sourceHeight(sourceHeight),
         m_sourceWidth(sourceWidth),
@@ -60,7 +60,9 @@ namespace RAYX
             phi = getCoord(m_horDist, m_horDivergence) + getMisalignmentParams()[3];
             // get corresponding angles based on distribution and deviation from main ray (main ray: xDir=0,yDir=0,zDir=1 for phi=psi=0)
             glm::dvec3 direction = getDirectionFromAngles(phi, psi);
-            Ray r = Ray(position, direction, en, 1.0);
+            glm::dvec4 stokes = glm::dvec4(1, getLinear0(), getLinear45(), getCircular());
+
+            Ray r = Ray(position, direction, /*stokes,*/ en, 1.0);
             rayVector.emplace_back(r);
         }
         std::cout << &(rayVector[0]) << std::endl;

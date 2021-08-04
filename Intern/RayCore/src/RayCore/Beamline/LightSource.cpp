@@ -5,13 +5,16 @@
 namespace RAYX
 {
     LightSource::LightSource(const int id, const int numberOfRays, const char* name, const int spreadType,
-        const double photonEnergy, const double energySpread, const std::vector<double> misalignment)
+        const double photonEnergy, const double energySpread, const double linPol0, const double linPol45, const double circPol, const std::vector<double> misalignment)
         : BeamlineObject(name),
         m_id(id),
         m_numberOfRays(numberOfRays),
         m_misalignmentParams(misalignment),
         m_energySpread(energySpread),
-        m_photonEnergy(photonEnergy)
+        m_photonEnergy(photonEnergy),
+        m_linearPol_0(linPol0),
+        m_linearPol_45(linPol45),
+        m_circularPol(circPol)
     {
         std::uniform_real_distribution<double> m_unif(0, 1);
         m_energySpreadType = spreadType == 0 ? ES_WHITE_BAND : ES_THREE_ENERGIES;
@@ -28,6 +31,15 @@ namespace RAYX
     }
     int LightSource::getSpreadType() {
         return m_energySpreadType;
+    }
+    double LightSource::getLinear0() {
+        return m_linearPol_0;
+    }
+    double LightSource::getLinear45(){
+        return m_linearPol_45;
+    }
+    double LightSource::getCircular(){
+        return m_circularPol;
     }
     void LightSource::setNumberOfRays(const int numberOfRays) {
         m_numberOfRays = numberOfRays;

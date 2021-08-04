@@ -138,7 +138,7 @@ void writeToFile(std::list<double> outputRays, std::string name)
 TEST(Tracer, testUniformRandom) {
     double settings = 17;
 
-    RAYX::MatrixSource m = RAYX::MatrixSource(0, "Matrix source 1", 2000, 0, 0.065, 0.04, 0.0, 0.001, 0.001, 100, 0, { 0,0,0,0 });
+    RAYX::MatrixSource m = RAYX::MatrixSource(0, "Matrix source 1", 2000, 0, 0.065, 0.04, 0.0, 0.001, 0.001, 100, 0, 1, 0, 0, { 0,0,0,0 });
     std::vector<RAYX::Ray> testValues = m.getRays();
 
     std::shared_ptr<RAYX::OpticalElement> q = std::make_shared<RAYX::OpticalElement>("testRandomNumbers", std::vector<double>{ 0,0,0,0, 0,0,0,0, 0,0,0,0, 0,settings,0,0 }, zeros, zeros, zeros, zeros, zeros, zeros);
@@ -1162,7 +1162,7 @@ TEST(Tracer, iteratToTest) {
 void testOpticalElement(std::vector<std::shared_ptr<RAYX::OpticalElement>> elements, int n) {
 
 
-    std::shared_ptr<RAYX::MatrixSource> m = std::make_shared<RAYX::MatrixSource>(0, "Matrix source 1", n, 0, 0.065, 0.04, 0.0, 0.001, 0.001, 100, 0, std::vector<double>{ 0,0,0,0 });
+    std::shared_ptr<RAYX::MatrixSource> m = std::make_shared<RAYX::MatrixSource>(0, "Matrix source 1", n, 0, 0.065, 0.04, 0.0, 0.001, 0.001, 100, 0, 1, 0, 0, std::vector<double>{ 0,0,0,0 });
 
 
     std::list<double> outputRays = runTracer(m->getRays(), elements);
@@ -1268,10 +1268,10 @@ TEST(globalCoordinates, FourMirrors_9Rays) {
 }
 
 TEST(globalCoordinates, FourMirrors_20Rays) {
-    std::shared_ptr<RAYX::PlaneMirror> p1 = std::make_shared<RAYX::PlaneMirror>("globalCoordinates_20rays", 50, 200, 10, 7, 10000, std::vector<double>{ 0,0,0, 0,0,0 }, zeros7, nullptr, true); // {1,2,3,0.01,0.02,0.03}
-    std::shared_ptr<RAYX::PlaneMirror> p2 = std::make_shared<RAYX::PlaneMirror>("PlaneMirror2", 50, 200, 15, 4, 10000, std::vector<double>{ 0,0,0, 0,0,0 }, zeros7, p1, true); // {1,2,3,0.01,0.02,0.03}
-    std::shared_ptr<RAYX::PlaneMirror> p3 = std::make_shared<RAYX::PlaneMirror>("PlaneMirror3", 50, 200, 7, 10, 10000, std::vector<double>{ 0,0,0, 0,0,0 }, zeros7, p2, true); // {1,2,3,0.01,0.02,0.03}
-    std::shared_ptr<RAYX::PlaneMirror> p4 = std::make_shared<RAYX::PlaneMirror>("PlaneMirror4", 50, 200, 22, 17, 10000, std::vector<double>{ 0,0,0, 0,0,0 }, zeros7, p3, true); // {1,2,3,0.01,0.02,0.03}
+    std::shared_ptr<RAYX::PlaneMirror> p1 = std::make_shared<RAYX::PlaneMirror>("globalCoordinates_20rays", 50, 200, 10, 7, 10000, std::vector<double>{ 0,0,0, 0,0,0 }, zeros7, nullptr, false); // {1,2,3,0.01,0.02,0.03}
+    std::shared_ptr<RAYX::PlaneMirror> p2 = std::make_shared<RAYX::PlaneMirror>("PlaneMirror2", 50, 200, 15, 4, 10000, std::vector<double>{ 0,0,0, 0,0,0 }, zeros7, p1, false); // {1,2,3,0.01,0.02,0.03}
+    std::shared_ptr<RAYX::PlaneMirror> p3 = std::make_shared<RAYX::PlaneMirror>("PlaneMirror3", 50, 200, 7, 10, 10000, std::vector<double>{ 0,0,0, 0,0,0 }, zeros7, p2, false); // {1,2,3,0.01,0.02,0.03}
+    std::shared_ptr<RAYX::PlaneMirror> p4 = std::make_shared<RAYX::PlaneMirror>("PlaneMirror4", 50, 200, 22, 17, 10000, std::vector<double>{ 0,0,0, 0,0,0 }, zeros7, p3, false); // {1,2,3,0.01,0.02,0.03}
     // to stay in element coordinates and make a comparison with old RAY possible
     p4->setOutMatrix({ 1,0,0,0, 0,1,0,0, 0,0,1,0, 0,0,0,1 });
     testOpticalElement({ p1, p2, p3, p4 }, 20);
@@ -1280,7 +1280,7 @@ TEST(globalCoordinates, FourMirrors_20Rays) {
 
 
 TEST(opticalElements, slit1) {
-    std::shared_ptr<RAYX::MatrixSource> m = std::make_shared<RAYX::MatrixSource>(0, "matrix source", 200, 0, 0.065, 0.04, 0, 0.001, 0.001, 100, 0, std::vector<double>{ 0,0,0,0 });
+    std::shared_ptr<RAYX::MatrixSource> m = std::make_shared<RAYX::MatrixSource>(0, "matrix source", 200, 0, 0.065, 0.04, 0, 0.001, 0.001, 100, 0, 1, 0, 0, std::vector<double>{ 0,0,0,0 });
     std::shared_ptr<RAYX::Slit> s = std::make_shared<RAYX::Slit>("slit", 0, 1, 20, 2, 0, 10000, 20, 1, m->getPhotonEnergy(), std::vector<double>{ 0,0,0, 0,0,0 }, nullptr, true);
     std::shared_ptr<RAYX::ImagePlane> ip = std::make_shared<RAYX::ImagePlane>("Image plane", 1000, s, true);
     std::list<double> outputRays = runTracer(m->getRays(), {s,ip});
@@ -1312,7 +1312,7 @@ bool global = false;
 // PETES SETUP
 // spec1-first_rzp4mm
 TEST(PeteRZP, spec1_first_rzp) {
-    std::shared_ptr<RAYX::PointSource> p = std::make_shared<RAYX::PointSource>(0, "spec1_first_rzp", 20000 , 1, 0.005,0.005,0, 0.02,0.06, 1,1,0,0, 640, 120, std::vector<double>{0,0,0,0});
+    std::shared_ptr<RAYX::PointSource> p = std::make_shared<RAYX::PointSource>(0, "spec1_first_rzp", 20000 , 1, 0.005,0.005,0, 0.02,0.06, 1,1,0,0, 640, 120, 1, 0, 0, std::vector<double>{0,0,0,0});
     std::shared_ptr<RAYX::ReflectionZonePlate> rzp = std::make_shared<RAYX::ReflectionZonePlate>("ReflectionZonePete", 0, 1, 0, 1, 1, 4, 60, 170, 2.2, 0, 90, p->getPhotonEnergy(), p->getPhotonEnergy(), -1, -1, 2.2, 1, 90, 400, 90, 400, 0, 0, 1, 0, 0, 1, std::vector<double>{ 0,0,0, 0,0,0 }, zeros7, nullptr, global); // dx,dy,dz, dpsi,dphi,dchi //
     std::list<double> outputRays = runTracer(p->getRays(), {rzp});
     std::string filename = "testFile_spec1_first_rzp";
@@ -1320,7 +1320,7 @@ TEST(PeteRZP, spec1_first_rzp) {
 }
 
 TEST(PeteRZP, spec1_first_ip) {
-    std::shared_ptr<RAYX::PointSource> p = std::make_shared<RAYX::PointSource>(0, "spec1_first_rzp4",20000 , 1, 0.005,0.005,0, 0.02,0.06, 1,1,0,0, 640, 120, std::vector<double>{0,0,0,0});
+    std::shared_ptr<RAYX::PointSource> p = std::make_shared<RAYX::PointSource>(0, "spec1_first_rzp4",20000 , 1, 0.005,0.005,0, 0.02,0.06, 1,1,0,0, 640, 120, 1, 0, 0, std::vector<double>{0,0,0,0});
     std::shared_ptr<RAYX::ReflectionZonePlate> rzp = std::make_shared<RAYX::ReflectionZonePlate>("ReflectionZonePete", 0, 1, 0, 1, 1, 4, 60, 170, 2.2, 0, 90, p->getPhotonEnergy(), p->getPhotonEnergy(), -1, -1, 2.2, 1, 90, 400, 90, 400, 0, 0, 1, 0, 0, 1, std::vector<double>{ 0,0,0, 0,0,0 }, zeros7, nullptr, global);  // dx,dy,dz, dpsi,dphi,dchi //
     std::shared_ptr<RAYX::ImagePlane> ip1 = std::make_shared<RAYX::ImagePlane>("ImagePlane1", 385.0, rzp, global);
     std::vector<RAYX::Ray> input = p->getRays();
@@ -1330,7 +1330,7 @@ TEST(PeteRZP, spec1_first_ip) {
 }
 
 TEST(PeteRZP, spec1_first_plus_rzp) {
-    std::shared_ptr<RAYX::PointSource> p = std::make_shared<RAYX::PointSource>(0, "spec1_first_plus_rzp",20000 , 1, 0.005,0.005,0, 0.02,0.06, 1,1,0,0, 640, 120, std::vector<double>{0,0,0,0});
+    std::shared_ptr<RAYX::PointSource> p = std::make_shared<RAYX::PointSource>(0, "spec1_first_plus_rzp",20000 , 1, 0.005,0.005,0, 0.02,0.06, 1,1,0,0, 640, 120, 1, 0, 0, std::vector<double>{0,0,0,0});
     std::shared_ptr<RAYX::ReflectionZonePlate> rzp = std::make_shared<RAYX::ReflectionZonePlate>("ReflectionZonePete", 0, 1, 0, 1, 1, 4, 60, 170, 2.2, 0, 90, p->getPhotonEnergy(), p->getPhotonEnergy(), 1, 1, 2.2, 4.75, 90, 400, 90, 400, 0, 0, 1, 0, -24.35, 4.75, std::vector<double>{ 0,0,0, 0,0,0 },  std::vector<double>{0,0,0,0, 0,0,0}, nullptr, global);  // dx,dy,dz, dpsi,dphi,dchi //
     std::list<double> outputRays = runTracer(p->getRays(), {rzp});
     std::string filename = "testFile_spec1_first_plus_rzp";
@@ -1338,7 +1338,7 @@ TEST(PeteRZP, spec1_first_plus_rzp) {
 }
 
 TEST(PeteRZP, spec1_first_plus_ip) {
-    std::shared_ptr<RAYX::PointSource> p = std::make_shared<RAYX::PointSource>(0, "spec1_first_plus_rzp_ip",20000 , 1, 0.005,0.005,0, 0.02,0.06, 1,1,0,0, 640, 120, std::vector<double>{0,0,0,0});
+    std::shared_ptr<RAYX::PointSource> p = std::make_shared<RAYX::PointSource>(0, "spec1_first_plus_rzp_ip",20000 , 1, 0.005,0.005,0, 0.02,0.06, 1,1,0,0, 640, 120, 1, 0, 0, std::vector<double>{0,0,0,0});
     std::shared_ptr<RAYX::ReflectionZonePlate> rzp = std::make_shared<RAYX::ReflectionZonePlate>("ReflectionZonePete", 0, 1, 0, 1, 1, 4, 60, 170, 2.2, 0, 90, p->getPhotonEnergy(), p->getPhotonEnergy(), 1, 1, 2.2, 4.75, 90, 400, 90, 400, 0, 0, 1, 0, -24.35, 4.75, std::vector<double>{ 0,0,0, 0,0,0 }, std::vector<double>{0,0,0,0, 0,0,0}, nullptr, global);  // dx,dy,dz, dpsi,dphi,dchi //
     std::shared_ptr<RAYX::ImagePlane> ip1 = std::make_shared<RAYX::ImagePlane>("ImagePlane1", 400.0, rzp, global);
     std::vector<RAYX::Ray> input = p->getRays();
@@ -1348,7 +1348,7 @@ TEST(PeteRZP, spec1_first_plus_ip) {
 }
 
 TEST(PeteRZP, spec1_first_minus_rzp2) {
-    std::shared_ptr<RAYX::PointSource> p = std::make_shared<RAYX::PointSource>(0, "spec1_first_minus_rzp2",20000 , 1, 0.005,0.005,0, 0.001,0.06, 1,1,0,0, 640, 120, std::vector<double>{0,0,0,0});
+    std::shared_ptr<RAYX::PointSource> p = std::make_shared<RAYX::PointSource>(0, "spec1_first_minus_rzp2",20000 , 1, 0.005,0.005,0, 0.001,0.06, 1,1,0,0, 640, 120, 1, 0, 0, std::vector<double>{0,0,0,0});
     std::shared_ptr<RAYX::ReflectionZonePlate> rzp = std::make_shared<RAYX::ReflectionZonePlate>("ReflectionZonePete", 0, 1, 0, 1, 1, 2, 60, 170, 2.2, 0, 90, p->getPhotonEnergy(), p->getPhotonEnergy(), -1, -1, 2.2, 1, 90, 400, 90, 400, 0, 0, 1, 0, 0, 1, std::vector<double>{ 0,0,0, 0,0,0 },  std::vector<double>{0,0,0,0, 0,0,0}, nullptr, global);  // dx,dy,dz, dpsi,dphi,dchi //
     std::list<double> outputRays = runTracer(p->getRays(), {rzp});
     std::string filename = "testFile_spec1_first_minus_rzp2";
@@ -1356,7 +1356,7 @@ TEST(PeteRZP, spec1_first_minus_rzp2) {
 }
 
 TEST(PeteRZP, spec1_first_minus_ip2) {
-    std::shared_ptr<RAYX::PointSource> p = std::make_shared<RAYX::PointSource>(0, "spec1_first_minus_rzp_ip2",20000 , 1, 0.005,0.005,0, 0.001,0.06, 1,1,0,0, 640, 120, std::vector<double>{0,0,0,0});
+    std::shared_ptr<RAYX::PointSource> p = std::make_shared<RAYX::PointSource>(0, "spec1_first_minus_rzp_ip2",20000 , 1, 0.005,0.005,0, 0.001,0.06, 1,1,0,0, 640, 120, 1, 0, 0, std::vector<double>{0,0,0,0});
     std::shared_ptr<RAYX::ReflectionZonePlate> rzp = std::make_shared<RAYX::ReflectionZonePlate>("ReflectionZonePete", 0, 1, 0, 1, 1, 2, 60, 170, 2.2, 0, 90, p->getPhotonEnergy(), p->getPhotonEnergy(), -1, -1, 2.2, 1, 90, 400, 90, 400, 0, 0, 1, 0, 0, 1, std::vector<double>{ 0,0,0, 0,0,0 },  std::vector<double>{0,0,0,0, 0,0,0}, nullptr, global);  // dx,dy,dz, dpsi,dphi,dchi //
     std::shared_ptr<RAYX::ImagePlane> ip1 = std::make_shared<RAYX::ImagePlane>("ImagePlane1", 400.0, rzp, global);
     std::vector<RAYX::Ray> input = p->getRays();

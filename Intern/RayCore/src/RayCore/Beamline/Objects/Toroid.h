@@ -14,21 +14,13 @@ namespace RAYX
         ~Toroid();
 
         void calcRadius();
-        double getWidth() const;
-        double getHeight() const;
         double getRadius() const;
-        double getBeta() const;
-        double getAlpha() const;
-        double getChi() const;
-        double getDist() const;
         double getSagittalEntranceArmLength() const;
         double getSagittalExitArmLength() const;
         double getMeridionalEntranceArmLength() const;
         double getMeridionalExitArmLength() const;
 
     private:
-        double m_totalWidth;
-        double m_totalHeight;
         double m_sagittalEntranceArmLength;
         double m_sagittalExitArmLength;
         double m_meridionalEntranceArmLength;
@@ -37,14 +29,6 @@ namespace RAYX
         double m_shortRadius;
         enum GEOMETRICAL_SHAPE {GS_RECTANGLE, GS_ELLIPTICAL};
         GEOMETRICAL_SHAPE m_geometricalShape;
-        // grazing incidence, in rad
-        double m_alpha;
-        double m_beta;
-        double m_chi;
-        double m_distanceToPreceedingElement;
-        //double m_Depth;
-        //double m_verDivergence;
-        //double m_horDivergence;
 
     };
 

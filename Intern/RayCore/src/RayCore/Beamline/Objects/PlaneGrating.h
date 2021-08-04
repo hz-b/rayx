@@ -16,13 +16,6 @@ namespace RAYX
         void calcAlpha(const double deviation, const double normalIncidence);
         void focus(double angle);
 
-        double getWidth();
-        double getHeight();
-        double getAlpha();
-        double getBeta();
-        // in rad as well
-        double getChi();
-        double getDistanceToPreceedingElement();
         int getGratingMount();
         double getFixFocusConstantCFF();
 
@@ -33,14 +26,7 @@ namespace RAYX
         std::vector<double> getVls();
 
     private:
-        double m_totalWidth;
-        double m_totalHeight;
-        // angles in rad and normal angles (measured from normal! not incidence!!)
-        double m_alpha;
-        double m_beta;
-        // in rad as well
-        double m_chi;
-        double m_distanceToPreceedingElement;
+        
         enum GRATING_MOUNT { GM_DEVIATION, GM_INCIDENCE, GM_CCF, GM_CCF_NO_PREMIRROR };
         GRATING_MOUNT m_gratingMount;
         double m_fixFocusConstantCFF;

@@ -10,7 +10,7 @@ namespace RAYX
     {
         std::cout << surfacePoints.size() << inputInMatrix.size() << inputOutMatrix.size() << misalignmentMatrix.size() << inverseMisalignmentMatrix.size() << EParameters.size() << OParameters.size() << std::endl;
         // surface.getParams() to shader/buffer
-        assert(surfacePoints.size() == 16 && inputInMatrix.size() == 16 && inputOutMatrix.size() == 16 && misalignmentMatrix.size() == 16 && inverseMisalignmentMatrix.size() == 16 && EParameters.size() == 16 && OParameters.size() == 16); //parameter size ==6?
+        assert(surfacePoints.size() == 16 && inputInMatrix.size() == 16 && inputOutMatrix.size() == 16 && misalignmentMatrix.size() == 16 && inverseMisalignmentMatrix.size() == 16 && EParameters.size() == 16 && OParameters.size() == 16);
         m_surfaceParams = surfacePoints;
         m_inMatrix = inputInMatrix;
         m_outMatrix = inputOutMatrix;
@@ -41,38 +41,46 @@ namespace RAYX
     OpticalElement::OpticalElement(const char* name, const std::vector<double> EParameters, const double width, const double height, const double alpha, const double chi, const double beta, const double dist, const std::vector<double> misalignmentParams, const std::vector<double> tempMisalignmentParams, const std::vector<double> slopeError, const std::shared_ptr<OpticalElement> previous, bool global)
         : BeamlineObject(name),
         //m_surface(std::move(surface)), 
+        m_width(width),
+        m_height(height),
+        m_alpha (alpha),
+        m_beta(beta), // mirror -> exit angle = incidence angle
+        m_chi (chi),
+        m_distanceToPreceedingElement (dist),
         m_previous(previous),
         m_misalignmentParams(misalignmentParams),
         m_slopeError(slopeError),
         m_elementParameters(EParameters)
     {
         m_objectParameters = {
-            width, height, slopeError[0], slopeError[1],
-            slopeError[2], slopeError[3], slopeError[4], slopeError[5],
-            slopeError[6],0,0,0,
-            0,0,0,0
-        };
-        calcTransformationMatrices(alpha, chi, beta, dist, misalignmentParams, global);
+                m_width, m_height, m_slopeError[0], m_slopeError[1],
+                m_slopeError[2], m_slopeError[3], m_slopeError[4], m_slopeError[5],
+                m_slopeError[6],0,0,0,
+                0,0,0,0
+            };
+        calcTransformationMatrices(misalignmentParams, global);
         setTemporaryMisalignment(tempMisalignmentParams);
     }
 
-    OpticalElement::OpticalElement(const char* name, const double width, const double height, const std::vector<double> slopeError, const std::shared_ptr<OpticalElement> previous)
+    OpticalElement::OpticalElement(const char* name, const double width, const double height, const double chi, const double dist, const std::vector<double> slopeError, const std::shared_ptr<OpticalElement> previous)
         : BeamlineObject(name),
-        //m_surface(std::move(surface)), 
-        m_previous(previous)
+        m_width(width),
+        m_height(height),
+        m_chi(chi),
+        m_distanceToPreceedingElement(dist),
+        m_previous(previous),
+        m_slopeError(slopeError) 
     {
-        m_slopeError = slopeError;
-        setObjectParameters({
-            width, height, slopeError[0], slopeError[1],
-            slopeError[2], slopeError[3], slopeError[4], slopeError[5],
-            slopeError[6],0,0,0,
-            0,0,0,0
-            });
-
+        m_objectParameters = {
+                m_width, m_height, m_slopeError[0], m_slopeError[1],
+                m_slopeError[2], m_slopeError[3], m_slopeError[4], m_slopeError[5],
+                m_slopeError[6],0,0,0,
+                0,0,0,0
+            };
     }
 
-    OpticalElement::OpticalElement(const char* name, const std::vector<double> slopeError, const std::shared_ptr<OpticalElement> previous)
-        : BeamlineObject(name), m_previous(previous), m_slopeError(slopeError) {}
+    OpticalElement::OpticalElement(const char* name, const double chi, const double dist, const std::vector<double> slopeError, const std::shared_ptr<OpticalElement> previous)
+        : BeamlineObject(name), m_chi(chi), m_distanceToPreceedingElement(dist), m_previous(previous), m_slopeError(slopeError) {}
 
 
     OpticalElement::OpticalElement() {}
@@ -83,22 +91,18 @@ namespace RAYX
 
 
     /**
-     * calculates in and out transformation matrices from grazing incidence, exit angles, azimuthal angle and distance to preceeding element
-     * angles are given in rad
-     * @param alpha         grazing incidence angle
-     * @param chi           azimuthal angle
-     * @param beta          grazing exit angle
-     * @param dist          distance to preceeding element
+     * calculates in and out transformation matrices from grazing incidence and exit angles, azimuthal angle and distance to preceeding element
      * @param misalignment  misalignment x,y,z,psi,phi,chi
      * @return void
     */
-    void OpticalElement::calcTransformationMatrices(const double alpha, const double chi, const double beta, const double dist, const std::vector<double> misalignment, bool global) {
-        double cos_c = cos(chi);
-        double sin_c = sin(chi);
-        double cos_a = cos(alpha);
-        double sin_a = sin(alpha);
-        double sin_b = sin(beta);
-        double cos_b = cos(beta);
+    void OpticalElement::calcTransformationMatrices(const std::vector<double> misalignment, bool global) {
+        
+        double cos_c = cos(m_chi);
+        double sin_c = sin(m_chi);
+        double cos_a = cos(m_alpha);
+        double sin_a = sin(m_alpha);
+        double sin_b = sin(m_beta);
+        double cos_b = cos(m_beta);
 
         // transposes of the actual matrices since they are transposed in the process of transferring to the shader
         /*std::vector<double> d_inRotation = {cos_c, -sin_c*cos_a, -sin_c*sin_a, 0,
@@ -109,12 +113,12 @@ namespace RAYX
         d_b2e = { cos_c, -sin_c * cos_a, -sin_c * sin_a, 0, // M_b2e
                 sin_c, cos_c * cos_a, sin_a * cos_c, 0,
                 0, -sin_a, cos_a, 0,
-                0, dist * sin_a, -dist * cos_a, 1 };
+                0, m_distanceToPreceedingElement * sin_a, -m_distanceToPreceedingElement * cos_a, 1 };
 
         d_inv_b2e = { cos_c, sin_c, 0, 0,            // (M_b2e)^-1
                 -sin_c * cos_a, cos_c * cos_a, -sin_a, 0,
                 -sin_c * sin_a, sin_a * cos_c, cos_a, 0,
-                0, 0, dist, 1 };
+                0, 0, m_distanceToPreceedingElement, 1 };
 
         d_e2b = { cos_c, sin_c, 0, 0, // M_e2b
                 -sin_c * cos_b, cos_c * cos_b,  sin_b, 0,
@@ -233,23 +237,20 @@ namespace RAYX
         m_inverseTemporaryMisalignmentMatrix = getMatrixProductAsVector(inverseRotation, inverseTranslation);
     }
 
-    void OpticalElement::setObjectParameters(std::vector<double> params) {
-        assert(params.size() == 16);
-        m_objectParameters = params;
-    }
-
     void OpticalElement::setElementParameters(std::vector<double> params) {
         assert(params.size() == 16);
         m_elementParameters = params;
     }
 
     void OpticalElement::setDimensions(double width, double height) {
-        setObjectParameters({
-            width, height, m_slopeError[0], m_slopeError[1],
-            m_slopeError[2], m_slopeError[3], m_slopeError[4], m_slopeError[5],
-            m_slopeError[6],0,0,0,
-            0,0,0,0
-            });
+        m_width = width;
+        m_height = height;
+        m_objectParameters = {
+                m_width, m_height, m_slopeError[0], m_slopeError[1],
+                m_slopeError[2], m_slopeError[3], m_slopeError[4], m_slopeError[5],
+                m_slopeError[6],0,0,0,
+                0,0,0,0
+            };
     }
 
     void OpticalElement::setInMatrix(std::vector<double> inputMatrix)
@@ -268,6 +269,37 @@ namespace RAYX
         assert(surface == nullptr);
         assert(m_surface != nullptr);
 
+    }
+
+    void OpticalElement::setAlpha(double alpha) {
+        m_alpha = alpha;
+    }
+    
+    void OpticalElement::setBeta(double beta) {
+        m_beta = beta;
+    }
+
+    double OpticalElement::getBeta() const {
+        return m_beta;
+    }
+
+    double OpticalElement::getWidth() const {
+        return abs(m_width);
+    }
+
+    double OpticalElement::getHeight() const {
+        return abs(m_height);
+    }
+
+    double OpticalElement::getAlpha() const {
+        return m_alpha;
+    }
+
+    double OpticalElement::getChi() const {
+        return m_chi;
+    }
+    double OpticalElement::getDistanceToPreceedingElement() const {
+        return m_distanceToPreceedingElement;
     }
 
     std::vector<double> OpticalElement::getInMatrix() const
@@ -339,7 +371,7 @@ namespace RAYX
         return m_inverseTemporaryMisalignmentMatrix;
     }
 
-    std::vector<double> OpticalElement::getObjectParameters() const
+    std::vector<double> OpticalElement::getObjectParameters()
     {
         return m_objectParameters;
     }

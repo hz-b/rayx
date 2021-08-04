@@ -61,7 +61,7 @@ TEST(PlaneMirror, testSimpleParams) {
     ASSERT_DOUBLE_EQ(plM.getAlpha(), rad(incidenceAngle));
     ASSERT_DOUBLE_EQ(plM.getBeta(), rad(incidenceAngle));
     ASSERT_DOUBLE_EQ(plM.getChi(), rad(azimuthalAngle));
-    ASSERT_DOUBLE_EQ(plM.getDist(), dist);
+    ASSERT_DOUBLE_EQ(plM.getDistanceToPreceedingElement(), dist);
     EXPECT_ITERABLE_DOUBLE_EQ(std::vector<double>, mis, plM.getMisalignmentParams());
     EXPECT_ITERABLE_DOUBLE_EQ(std::vector<double>, sE, plM.getSlopeError());
 }
@@ -81,7 +81,7 @@ TEST(PlaneMirror, testAdvancedParams) {
     ASSERT_DOUBLE_EQ(plM.getAlpha(), rad(incidenceAngle));
     ASSERT_DOUBLE_EQ(plM.getBeta(), rad(incidenceAngle));
     ASSERT_DOUBLE_EQ(plM.getChi(), rad(azimuthalAngle));
-    ASSERT_DOUBLE_EQ(plM.getDist(), dist);
+    ASSERT_DOUBLE_EQ(plM.getDistanceToPreceedingElement(), dist);
     EXPECT_ITERABLE_DOUBLE_EQ(std::vector<double>, mis, plM.getMisalignmentParams());
     EXPECT_ITERABLE_DOUBLE_EQ(std::vector<double>, sE, plM.getSlopeError());
 }
@@ -105,7 +105,7 @@ TEST(Sphere, testParams) {
     ASSERT_DOUBLE_EQ(sM.getAlpha(), rad(incidence));
     ASSERT_DOUBLE_EQ(sM.getBeta(), rad(incidence));
     ASSERT_DOUBLE_EQ(sM.getChi(), rad(azimuthal));
-    ASSERT_DOUBLE_EQ(sM.getDist(), dist);
+    ASSERT_DOUBLE_EQ(sM.getDistanceToPreceedingElement(), dist);
     ASSERT_DOUBLE_EQ(sM.getExitArmLength(), exitArmLength);
     ASSERT_DOUBLE_EQ(sM.getEntranceArmLength(), entranceArmLength);
     EXPECT_ITERABLE_DOUBLE_EQ(std::vector<double>, misalignmentParams, sM.getMisalignmentParams());
@@ -146,7 +146,7 @@ TEST(Ellips, testParamsCSCurvature) {
     ASSERT_DOUBLE_EQ(e.getWidth(), width);
     ASSERT_DOUBLE_EQ(e.getHeight(), height);
     EXPECT_NEAR(e.getRadius(), radius, 0.00000001);
-    ASSERT_DOUBLE_EQ(e.getAlpha(), rad(incidence));
+    ASSERT_DOUBLE_EQ(e.getIncidenceAngle(), rad(incidence));
     ASSERT_DOUBLE_EQ(e.getBeta(), rad(incidence));
     ASSERT_DOUBLE_EQ(e.getChi(), rad(azimuthal));
     ASSERT_DOUBLE_EQ(e.getDistanceToPreceedingElement(), dist);
@@ -158,7 +158,7 @@ TEST(Ellips, testParamsCSCurvature) {
     EXPECT_NEAR(e.getMy0(), surfaceCenterY0, 0.0000001);
     EXPECT_NEAR(e.getMz0(), surfaceCenterZ0, 0.0000001);
     EXPECT_NEAR(e.getHalfAxisC(), halfAxisC, 0.0000001);
-    EXPECT_NEAR(e.getAlpha1(), alphaE, 0.000001);
+    EXPECT_NEAR(e.getAlpha(), alphaE, 0.000001);
     EXPECT_ITERABLE_DOUBLE_EQ(std::vector<double>, correctTempMis, e.getTempMisalignmentParams());
     EXPECT_ITERABLE_DOUBLE_EQ(std::vector<double>, sE, e.getSlopeError());
 
@@ -169,7 +169,7 @@ TEST(Ellips, testParamsCSCurvature) {
     ASSERT_DOUBLE_EQ(e2.getWidth(), width);
     ASSERT_DOUBLE_EQ(e2.getHeight(), height);
     EXPECT_NEAR(e2.getRadius(), radius, 0.00000001);
-    ASSERT_DOUBLE_EQ(e2.getAlpha(), rad(incidence));
+    ASSERT_DOUBLE_EQ(e2.getIncidenceAngle(), rad(incidence));
     ASSERT_DOUBLE_EQ(e2.getBeta(), rad(incidence));
     ASSERT_DOUBLE_EQ(e2.getChi(), rad(azimuthal));
     ASSERT_DOUBLE_EQ(e2.getDistanceToPreceedingElement(), dist);
@@ -181,7 +181,7 @@ TEST(Ellips, testParamsCSCurvature) {
     EXPECT_NEAR(e2.getMy0(), surfaceCenterY0, 0.0000001);
     EXPECT_NEAR(e2.getMz0(), surfaceCenterZ0, 0.0000001);
     ASSERT_DOUBLE_EQ(e2.getHalfAxisC(), halfAxisC);
-    EXPECT_NEAR(e2.getAlpha1(), alphaE, 0.000001);
+    EXPECT_NEAR(e2.getAlpha(), alphaE, 0.000001);
     EXPECT_ITERABLE_DOUBLE_EQ(std::vector<double>, correctTempMis, e2.getTempMisalignmentParams());
     EXPECT_ITERABLE_DOUBLE_EQ(std::vector<double>, sE, e2.getSlopeError());
 
@@ -192,7 +192,7 @@ TEST(Ellips, testParamsCSCurvature) {
     ASSERT_DOUBLE_EQ(e3.getWidth(), width);
     ASSERT_DOUBLE_EQ(e3.getHeight(), height);
     EXPECT_NEAR(e3.getRadius(), radius, 0.00000001);
-    ASSERT_DOUBLE_EQ(e3.getAlpha(), rad(incidence));
+    ASSERT_DOUBLE_EQ(e3.getIncidenceAngle(), rad(incidence));
     ASSERT_DOUBLE_EQ(e3.getBeta(), rad(incidence));
     ASSERT_DOUBLE_EQ(e3.getChi(), rad(azimuthal));
     ASSERT_DOUBLE_EQ(e3.getDistanceToPreceedingElement(), dist);
@@ -204,7 +204,7 @@ TEST(Ellips, testParamsCSCurvature) {
     EXPECT_NEAR(e3.getMy0(), surfaceCenterY0, 0.0000001);
     EXPECT_NEAR(e3.getMz0(), surfaceCenterZ0, 0.0000001);
     EXPECT_NEAR(e3.getHalfAxisC(), halfAxisC, 0.00000001);
-    EXPECT_NEAR(e3.getAlpha1(), alphaE, 0.000001);
+    EXPECT_NEAR(e3.getAlpha(), alphaE, 0.000001);
     EXPECT_ITERABLE_DOUBLE_EQ(std::vector<double>, correctTempMis, e3.getTempMisalignmentParams());
     EXPECT_ITERABLE_DOUBLE_EQ(std::vector<double>, sE, e3.getSlopeError());
 
@@ -244,7 +244,7 @@ TEST(Ellips, testParamsCSMirror) {
     ASSERT_DOUBLE_EQ(e.getWidth(), width);
     ASSERT_DOUBLE_EQ(e.getHeight(), height);
     EXPECT_NEAR(e.getRadius(), radius, 0.00000001);
-    ASSERT_DOUBLE_EQ(e.getAlpha(), rad(incidence));
+    ASSERT_DOUBLE_EQ(e.getIncidenceAngle(), rad(incidence));
     ASSERT_DOUBLE_EQ(e.getBeta(), rad(incidence));
     ASSERT_DOUBLE_EQ(e.getChi(), rad(azimuthal));
     ASSERT_DOUBLE_EQ(e.getDistanceToPreceedingElement(), dist);
@@ -256,7 +256,7 @@ TEST(Ellips, testParamsCSMirror) {
     EXPECT_NEAR(e.getMy0(), surfaceCenterY0, 0.0000001);
     EXPECT_NEAR(e.getMz0(), surfaceCenterZ0, 0.0000001);
     EXPECT_NEAR(e.getHalfAxisC(), halfAxisC, 0.0000001);
-    EXPECT_NEAR(e.getAlpha1(), alphaE, 0.000001);
+    EXPECT_NEAR(e.getAlpha(), alphaE, 0.000001);
     EXPECT_ITERABLE_DOUBLE_EQ(std::vector<double>, correctTempMis, e.getTempMisalignmentParams());
     EXPECT_ITERABLE_DOUBLE_EQ(std::vector<double>, sE, e.getSlopeError());
 
@@ -267,7 +267,7 @@ TEST(Ellips, testParamsCSMirror) {
     ASSERT_DOUBLE_EQ(e2.getWidth(), width);
     ASSERT_DOUBLE_EQ(e2.getHeight(), height);
     EXPECT_NEAR(e.getRadius(), radius, 0.00000001);
-    ASSERT_DOUBLE_EQ(e2.getAlpha(), rad(incidence));
+    ASSERT_DOUBLE_EQ(e2.getIncidenceAngle(), rad(incidence));
     ASSERT_DOUBLE_EQ(e2.getBeta(), rad(incidence));
     ASSERT_DOUBLE_EQ(e2.getChi(), rad(azimuthal));
     ASSERT_DOUBLE_EQ(e2.getDistanceToPreceedingElement(), dist);
@@ -279,7 +279,7 @@ TEST(Ellips, testParamsCSMirror) {
     EXPECT_NEAR(e2.getMy0(), surfaceCenterY0, 0.0000001);
     EXPECT_NEAR(e2.getMz0(), surfaceCenterZ0, 0.0000001);
     ASSERT_DOUBLE_EQ(e2.getHalfAxisC(), halfAxisC);
-    EXPECT_NEAR(e2.getAlpha1(), alphaE, 0.000001);
+    EXPECT_NEAR(e2.getAlpha(), alphaE, 0.000001);
     EXPECT_ITERABLE_DOUBLE_EQ(std::vector<double>, correctTempMis, e2.getTempMisalignmentParams());
     EXPECT_ITERABLE_DOUBLE_EQ(std::vector<double>, sE, e2.getSlopeError());
 
@@ -290,7 +290,7 @@ TEST(Ellips, testParamsCSMirror) {
     ASSERT_DOUBLE_EQ(e3.getWidth(), width);
     ASSERT_DOUBLE_EQ(e3.getHeight(), height);
     EXPECT_NEAR(e3.getRadius(), radius, 0.00000001);
-    ASSERT_DOUBLE_EQ(e3.getAlpha(), rad(incidence));
+    ASSERT_DOUBLE_EQ(e3.getIncidenceAngle(), rad(incidence));
     ASSERT_DOUBLE_EQ(e3.getBeta(), rad(incidence));
     ASSERT_DOUBLE_EQ(e3.getChi(), rad(azimuthal));
     ASSERT_DOUBLE_EQ(e3.getDistanceToPreceedingElement(), dist);
@@ -302,7 +302,7 @@ TEST(Ellips, testParamsCSMirror) {
     EXPECT_NEAR(e3.getMy0(), surfaceCenterY0, 0.0000001);
     EXPECT_NEAR(e3.getMz0(), surfaceCenterZ0, 0.0000001);
     EXPECT_NEAR(e3.getHalfAxisC(), halfAxisC, 0.00000001);
-    EXPECT_NEAR(e3.getAlpha1(), alphaE, 0.000001);
+    EXPECT_NEAR(e3.getAlpha(), alphaE, 0.000001);
     EXPECT_ITERABLE_DOUBLE_EQ(std::vector<double>, correctTempMis, e3.getTempMisalignmentParams());
     EXPECT_ITERABLE_DOUBLE_EQ(std::vector<double>, sE, e3.getSlopeError());
 

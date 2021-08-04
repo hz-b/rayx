@@ -16,19 +16,13 @@ namespace RAYX
 
         void calcRadius();
         void calcHalfAxes();
-        void calcAlphaBeta(double grazinIncidence);
-        double getWidth();
-        double getHeight();
-        double getRadius();
+        void calcAlphaBeta();
+         double getRadius();
         double getExitArmLength();
         double getEntranceArmLength();
         double getMy0(); // center of ellipsoid
         double getMz0(); // -"-
-        // grazing incidence, in rad
-        double getAlpha();
-        double getBeta();
-        double getChi();
-        double getDistanceToPreceedingElement();
+        double getIncidenceAngle() const;
         double getShortHalfAxisB(); // b
         double getLongHalfAxisA(); // a
         double getOffsetY0(); // always = 0?
@@ -41,22 +35,17 @@ namespace RAYX
         double getHalfAxisC();
 
     private:
-        double m_totalWidth;
-        double m_totalHeight;
         double m_radius;
+        // grazing incidence, in rad
+        double m_incidence;
         double m_entranceArmLength;
         double m_exitArmLength;
         double m_y0; // center of ellipsoid
         double m_z0; // -"-
-        // grazing incidence, in rad
-        double m_alpha;
-        double m_beta;
-        double m_chi;
-        double m_distanceToPreceedingElement;
         double m_shortHalfAxisB; // b
         double m_longHalfAxisA; // a
         double m_offsetY0; // always = 0?
-        double m_alpha1; // from tangent angle and grazing incidence???
+        //double m_alpha1; // from tangent angle and grazing incidence???
         // derived params
         double d_tangentAngle;
         double d_a34;

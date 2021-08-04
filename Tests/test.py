@@ -264,7 +264,7 @@ class Tests(unittest.TestCase):
     
     def test_globalCoord_20rays(self):
         correct = open_old_file(
-            'Plane Mirror 3-RawRaysOutgoing_20Rays_mis.csv', 'Plane Mirror 3_')
+            'Plane Mirror 3-RawRaysOutgoing_20rays.csv', 'Plane Mirror 3_')
         result = open_new_file('testFile_globalCoordinates_20rays.csv', valid=1)
         self.assertTrue(np.allclose(correct, result))
     

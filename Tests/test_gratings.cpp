@@ -66,7 +66,11 @@ TEST(planeGrating, testParams) {
     double alpha = 1.457521229154248;
     double a = 0.010070077944000002;
     std::vector<double> quad = { 0,0,0,0, 0,0,0,-1, 0,0,0,0, 1,0,0,0 };
-    std::vector<double> params = { width,height,lineDensity,double(orderOfDiffraction), abs(hvlam(designEnergyMounting)),0,vls[0],vls[1], vls[2],vls[3],vls[4],vls[5], 0,0,0,double(add_order) };
+    std::vector<double> objparams = {width, height, sE[0], sE[1], 
+                                    sE[2], sE[3], sE[4], sE[5], 
+                                    sE[6], 0, 0, 0,
+                                    0, 0, 0, 0};
+    std::vector<double> elparams = { 0,0,lineDensity,double(orderOfDiffraction), abs(hvlam(designEnergyMounting)),0,vls[0],vls[1], vls[2],vls[3],vls[4],vls[5], 0,0,0,double(add_order) };
     ASSERT_DOUBLE_EQ(p1.getWidth(), width);
     ASSERT_DOUBLE_EQ(p1.getHeight(), height);
     ASSERT_DOUBLE_EQ(p1.getAlpha(), alpha);
@@ -75,7 +79,8 @@ TEST(planeGrating, testParams) {
     ASSERT_DOUBLE_EQ(p1.getBeta(), beta);
     EXPECT_NEAR(p1.getA(), a, 0.00000000001);
     EXPECT_ITERABLE_DOUBLE_EQ(std::vector<double>, p1.getSurfaceParams(), quad);
-    EXPECT_ITERABLE_DOUBLE_EQ(std::vector<double>, p1.getElementParameters(), params);
+    EXPECT_ITERABLE_DOUBLE_EQ(std::vector<double>, p1.getElementParameters(), elparams);
+    EXPECT_ITERABLE_DOUBLE_EQ(std::vector<double>, p1.getObjectParameters(), objparams);
     //EXPECT_NEAR (e.getRadius(),  radius, 0.00000001);
 
     // mount = 1, use incidence Angle
@@ -93,7 +98,11 @@ TEST(planeGrating, testParams) {
     a = 0.030210233832000003;
     beta = 1.3380699314613769;
     quad = { 0,0,0,0, 0,0,0,-1, 0,0,0,0, 1,0,0,0 };
-    params = { width,height,lineDensity,double(orderOfDiffraction), abs(hvlam(designEnergyMounting)),0,vls[0],vls[1], vls[2],vls[3],vls[4],vls[5], 0,0,0,double(add_order) };
+    objparams = {width, height, sE[0], sE[1], 
+                                    sE[2], sE[3], sE[4], sE[5], 
+                                    sE[6], 0, 0, 0,
+                                    0, 0, 0, 0};
+    elparams = { 0,0,lineDensity,double(orderOfDiffraction), abs(hvlam(designEnergyMounting)),0,vls[0],vls[1], vls[2],vls[3],vls[4],vls[5], 0,0,0,double(add_order) };
 
     RAYX::PlaneGrating p3 = RAYX::PlaneGrating("planegrating", mount, width, height, deviation, normalIncidence, azimuthal, dist, designEnergyMounting, lineDensity, orderOfDiffraction, fixFocusConstantCFF, add_order, mis, vls, sE, NULL, false); 
 
@@ -105,7 +114,8 @@ TEST(planeGrating, testParams) {
     ASSERT_DOUBLE_EQ(p3.getBeta(), beta);
     EXPECT_NEAR(p3.getA(), a, 0.00000000001);
     EXPECT_ITERABLE_DOUBLE_EQ(std::vector<double>, p3.getSurfaceParams(), quad);
-    EXPECT_ITERABLE_DOUBLE_EQ(std::vector<double>, p3.getElementParameters(), params);
+    EXPECT_ITERABLE_DOUBLE_EQ(std::vector<double>, p3.getElementParameters(), elparams);
+    EXPECT_ITERABLE_DOUBLE_EQ(std::vector<double>, p3.getObjectParameters(), objparams);
 
     // mount = 0, use deviation angle, with higher order of diffraction
     mount = 0;
@@ -113,7 +123,11 @@ TEST(planeGrating, testParams) {
     alpha = 1.4473913414095938;
     beta = 1.4777804849329026;
     quad = { 0,0,0,0, 0,0,0,-1, 0,0,0,0, 1,0,0,0 };
-    params = { width,height,lineDensity,double(orderOfDiffraction), abs(hvlam(designEnergyMounting)),0,vls[0],vls[1], vls[2],vls[3],vls[4],vls[5], 0,0,0,double(add_order) };
+    elparams = { 0,0,lineDensity,double(orderOfDiffraction), abs(hvlam(designEnergyMounting)),0,vls[0],vls[1], vls[2],vls[3],vls[4],vls[5], 0,0,0,double(add_order) };
+    objparams = {width, height, sE[0], sE[1], 
+                                    sE[2], sE[3], sE[4], sE[5], 
+                                    sE[6], 0, 0, 0,
+                                    0, 0, 0, 0};
 
     RAYX::PlaneGrating p4 = RAYX::PlaneGrating("planegrating", mount, width, height, deviation, normalIncidence, azimuthal, dist, designEnergyMounting, lineDensity, orderOfDiffraction, fixFocusConstantCFF, add_order, mis, vls, sE, nullptr, false); 
 
@@ -125,7 +139,8 @@ TEST(planeGrating, testParams) {
     ASSERT_DOUBLE_EQ(p4.getBeta(), beta);
     EXPECT_NEAR(p4.getA(), a, 0.00000000001);
     EXPECT_ITERABLE_DOUBLE_EQ(std::vector<double>, p4.getSurfaceParams(), quad);
-    EXPECT_ITERABLE_DOUBLE_EQ(std::vector<double>, p4.getElementParameters(), params);
+    EXPECT_ITERABLE_DOUBLE_EQ(std::vector<double>, p4.getElementParameters(), elparams);
+    EXPECT_ITERABLE_DOUBLE_EQ(std::vector<double>, p4.getObjectParameters(), objparams);
 
 }
 
@@ -163,7 +178,11 @@ TEST(SphereGrating, testParams) {
     double radius = 1134.9852832410934;
     double a = 0.002307769312661499;
     std::vector<double> quad = { 1,0,0,0, 0,1,0,-radius, 0,0,1,0, 2,0,0,0 };
-    std::vector<double> params = { width,height,linedensity,double(order), abs(hvlam(designEnergy)),0,vls[0],vls[1], vls[2],vls[3],vls[4],vls[5], 0,0,0,0 };
+    std::vector<double> elparams = { 0,0,linedensity,double(order), abs(hvlam(designEnergy)),0,vls[0],vls[1], vls[2],vls[3],vls[4],vls[5], 0,0,0,0 };
+    std::vector<double> objparams = {width, height, sE[0], sE[1], 
+                                    sE[2], sE[3], sE[4], sE[5], 
+                                    sE[6], 0, 0, 0,
+                                    0, 0, 0, 0};
 
     ASSERT_DOUBLE_EQ(s1.getWidth(), width);
     ASSERT_DOUBLE_EQ(s1.getHeight(), height);
@@ -180,7 +199,8 @@ TEST(SphereGrating, testParams) {
     EXPECT_NEAR(radius, s1.getRadius(), 0.0000001);
     EXPECT_NEAR(s1.getA(), a, 0.000000001);
     EXPECT_ITERABLE_DOUBLE_EQ(std::vector<double>, s1.getSurfaceParams(), quad);
-    EXPECT_ITERABLE_DOUBLE_EQ(std::vector<double>, s1.getElementParameters(), params);
+    EXPECT_ITERABLE_DOUBLE_EQ(std::vector<double>, s1.getElementParameters(), elparams);
+    EXPECT_ITERABLE_DOUBLE_EQ(std::vector<double>, s1.getObjectParameters(), objparams);
 
     mount = 1;
     RAYX::SphereGrating s2 = RAYX::SphereGrating("spheregrating", mount, width, height, deviation, incidence, azimuthal, distance, entranceArm, exitArm, designEnergy, linedensity, double(order), mis,vls, sE,NULL, false);

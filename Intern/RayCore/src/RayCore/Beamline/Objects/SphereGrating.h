@@ -17,18 +17,10 @@ namespace RAYX
         void calcAlpha(double deviation, double normalIncidence);
         void focus(double angle);
 
-        double getWidth() const;
-        double getHeight() const;
         double getRadius() const;
         double getExitArmLength() const;
         double getEntranceArmLength() const;
-        // angles in rad and normal angles (measured from normal! not incidence!!)
-        double getAlpha() const;
-        double getBeta() const;
         double getDeviation() const; // not always calculated
-        // in rad as well
-        double getChi() const;
-        double getDistanceToPreceedingElement() const;
         int getGratingMount() const;
         double getDesignEnergyMounting() const;
         double getLineDensity() const;
@@ -37,19 +29,11 @@ namespace RAYX
         std::vector<double> getVls() const;
 
     private:
-        double m_totalWidth;
-        double m_totalHeight;
 
         double m_radius;
         double m_entranceArmLength;
         double m_exitArmLength;
-        // angles in rad and normal angles (measured from normal! not incidence!!)
-        double m_alpha;
-        double m_beta;
         double m_deviation; // not always calculated
-        // in rad as well
-        double m_chi;
-        double m_distanceToPreceedingElement;
         enum GRATING_MOUNT { GM_DEVIATION, GM_INCIDENCE };
         GRATING_MOUNT m_gratingMount;
         double m_designEnergyMounting;

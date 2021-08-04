@@ -13,10 +13,6 @@ namespace RAYX
         Slit();
         ~Slit();
 
-        double getWidth() const;
-        double getHeight() const;
-        double getChi() const;
-        double getDist() const;
         int getShape() const;
         int getCentralBeamstop() const;
         double getBeamstopWidth() const;
@@ -24,8 +20,6 @@ namespace RAYX
         double getWaveLength() const;
 
     private:
-        double m_totalWidth;
-        double m_totalHeight;
         enum GEOMETRICAL_SHAPE { GS_RECTANGLE, GS_ELLIPTICAL };
         GEOMETRICAL_SHAPE m_shape;
         enum CENTRAL_BEAMSTOP { CS_NONE, CS_RECTANGLE, CS_ELLIPTICAL }; // central beamstop shape
@@ -33,8 +27,6 @@ namespace RAYX
         double m_beamstopWidth;
         double m_beamstopHeight;
         double m_waveLength;  // from lightsource
-        double m_chi;
-        double m_distanceToPreceedingElement;
         //double m_Depth;
         //double m_verDivergence;
         //double m_horDivergence;

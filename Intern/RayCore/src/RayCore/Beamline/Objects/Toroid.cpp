@@ -16,22 +16,16 @@ namespace RAYX
     */
     Toroid::Toroid(const char* name, const int geometricShape, const double width, const double height, const double grazingIncidence, const double azimuthal, const double distanceToPreceedingElement, const double mEntrance, const double mExit, const double sEntrance, const double sExit, const std::vector<double> misalignmentParams, const std::vector<double> slopeError, const std::shared_ptr<OpticalElement> previous, bool global) 
     : OpticalElement(name, {0,0,0,0, 0,0,0,0, 0,0,0,0, 0,0,0,0}, width, height, rad(grazingIncidence), rad(azimuthal), rad(grazingIncidence), distanceToPreceedingElement, misalignmentParams, {0,0,0,0,0,0}, slopeError, previous, global),
-        m_totalWidth (width),
-        m_totalHeight (height),
         m_sagittalEntranceArmLength (sEntrance),
         m_sagittalExitArmLength (sExit),
         m_meridionalEntranceArmLength (mEntrance),
-        m_meridionalExitArmLength (mExit),
-        m_alpha (rad(grazingIncidence)),
-        m_beta(m_alpha), // mirror -> exit angle = incidence angle
-        m_chi (rad(azimuthal)),
-        m_distanceToPreceedingElement (distanceToPreceedingElement)
+        m_meridionalExitArmLength (mExit)
     {
         // std::vector<double> inputPoints = {0,0,0,0, 0,0,0,-1, 0,0,0,0, 0,0,0,0};
 
         m_geometricalShape = geometricShape == 0 ? GS_RECTANGLE : GS_ELLIPTICAL;
         if(m_geometricalShape == GS_ELLIPTICAL) {
-            setDimensions(-m_totalWidth, -m_totalHeight);
+            setDimensions(-width, -height);
         } 
         calcRadius(); // calculate the radius
         setElementParameters({m_longRadius, m_shortRadius,0,0, 0,0,0,0, 0,0,0,0, 0,0,0,0});
@@ -46,37 +40,13 @@ namespace RAYX
      * calculate long and short radius from grazing incidence angle and meridional and sagittal entrance and exit arm lengths
      */
     void Toroid::calcRadius() {
-        m_longRadius = 2.0 / sin(m_alpha) / ( 1.0 / m_meridionalEntranceArmLength + 1.0 / m_meridionalExitArmLength);
+        m_longRadius = 2.0 / sin(getAlpha()) / ( 1.0 / m_meridionalEntranceArmLength + 1.0 / m_meridionalExitArmLength);
 
-        if (m_meridionalEntranceArmLength == 0.0 || m_meridionalExitArmLength == 0.0 || m_alpha == 0.0){
+        if (m_meridionalEntranceArmLength == 0.0 || m_meridionalExitArmLength == 0.0 || getAlpha() == 0.0){
             m_shortRadius = 0.0;
         } else {
-            m_shortRadius = 2.0 * sin(m_alpha) / ( 1.0 / m_sagittalEntranceArmLength + 1.0 / m_sagittalExitArmLength );
+            m_shortRadius = 2.0 * sin(getAlpha()) / ( 1.0 / m_sagittalEntranceArmLength + 1.0 / m_sagittalExitArmLength );
         }
-    }
-
-
-    double Toroid::getWidth() const {
-        return m_totalWidth;
-    }
-
-    double Toroid::getHeight() const {
-        return m_totalHeight;
-    }
-
-    double Toroid::getBeta() const {
-        return m_beta;
-    }
-
-    double Toroid::getAlpha() const {
-        return m_alpha;
-    }
-
-    double Toroid::getChi() const {
-        return m_chi;
-    }
-    double Toroid::getDist() const {
-        return m_distanceToPreceedingElement;
     }
 
     double Toroid::getSagittalEntranceArmLength() const {
