@@ -68,7 +68,7 @@ TEST(planeGrating, testParams) {
     std::vector<double> quad = { 0,0,0,0, 0,0,0,-1, 0,0,0,0, 1,0,0,0 };
     std::vector<double> objparams = {width, height, sE[0], sE[1], 
                                     sE[2], sE[3], sE[4], sE[5], 
-                                    sE[6], 0, 0, 0,
+                                    sE[6], alpha, 0, 0,
                                     0, 0, 0, 0};
     std::vector<double> elparams = { 0,0,lineDensity,double(orderOfDiffraction), abs(hvlam(designEnergyMounting)),0,vls[0],vls[1], vls[2],vls[3],vls[4],vls[5], 0,0,0,double(add_order) };
     ASSERT_DOUBLE_EQ(p1.getWidth(), width);
@@ -100,7 +100,7 @@ TEST(planeGrating, testParams) {
     quad = { 0,0,0,0, 0,0,0,-1, 0,0,0,0, 1,0,0,0 };
     objparams = {width, height, sE[0], sE[1], 
                                     sE[2], sE[3], sE[4], sE[5], 
-                                    sE[6], 0, 0, 0,
+                                    sE[6], alpha, 0, 0,
                                     0, 0, 0, 0};
     elparams = { 0,0,lineDensity,double(orderOfDiffraction), abs(hvlam(designEnergyMounting)),0,vls[0],vls[1], vls[2],vls[3],vls[4],vls[5], 0,0,0,double(add_order) };
 
@@ -126,7 +126,7 @@ TEST(planeGrating, testParams) {
     elparams = { 0,0,lineDensity,double(orderOfDiffraction), abs(hvlam(designEnergyMounting)),0,vls[0],vls[1], vls[2],vls[3],vls[4],vls[5], 0,0,0,double(add_order) };
     objparams = {width, height, sE[0], sE[1], 
                                     sE[2], sE[3], sE[4], sE[5], 
-                                    sE[6], 0, 0, 0,
+                                    sE[6], alpha, 0, 0,
                                     0, 0, 0, 0};
 
     RAYX::PlaneGrating p4 = RAYX::PlaneGrating("planegrating", mount, width, height, deviation, normalIncidence, azimuthal, dist, designEnergyMounting, lineDensity, orderOfDiffraction, fixFocusConstantCFF, add_order, mis, vls, sE, nullptr, false); 
@@ -181,7 +181,7 @@ TEST(SphereGrating, testParams) {
     std::vector<double> elparams = { 0,0,linedensity,double(order), abs(hvlam(designEnergy)),0,vls[0],vls[1], vls[2],vls[3],vls[4],vls[5], 0,0,0,0 };
     std::vector<double> objparams = {width, height, sE[0], sE[1], 
                                     sE[2], sE[3], sE[4], sE[5], 
-                                    sE[6], 0, 0, 0,
+                                    sE[6], alpha, 0, 0,
                                     0, 0, 0, 0};
 
     ASSERT_DOUBLE_EQ(s1.getWidth(), width);

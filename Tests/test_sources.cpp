@@ -74,7 +74,7 @@ TEST(RayTest, test1) {
     double s1 = 1;
     double s2 = 0;
     double s3 = 0;
-    Ray r = Ray(x, y, z, xdir, ydir, zdir, energy, weight);
+    Ray r = Ray(x, y, z, xdir, ydir, zdir, s0, s1, s2, s3, energy, weight);
     EXPECT_EQ(r.getxPos(), x);
     EXPECT_EQ(r.getyPos(), y);
     EXPECT_EQ(r.getzPos(), z);

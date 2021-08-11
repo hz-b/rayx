@@ -140,7 +140,7 @@ namespace RAYX
             if (SHORTOUTPUT)
                 outputFile << "Index;Xloc;Yloc\n";
             else
-                outputFile << "Index;Xloc;Yloc;Zloc;Weight;Xdir;Ydir;Zdir;Energy\n";
+                outputFile << "Index;Xloc;Yloc;Zloc;Weight;Xdir;Ydir;Zdir;Energy;Stokes0;Stokes1;Stokes2;Stokes3\n";
 
             //get rays from tracer
             for (auto outputRayIterator = tracer.getOutputIteratorBegin(), outputIteratorEnd = tracer.getOutputIteratorEnd();
@@ -174,21 +174,22 @@ namespace RAYX
         size_t size = outputRays.size();
 
         RAYX_DEBUG(std::cout << "writing " << outputRays.size() / 8 << " rays to file..." << std::endl);
-
+        
         if (SHORTOUTPUT) {
             char buff[64];
-            for (size_t i = 0; i < size; i = i + 8) { // ! + 8 because of placeholder
+            for (size_t i = 0; i < size; i = i + RAY_DOUBLE_COUNT) { // ! + 8 because of placeholder
                 sprintf(buff, "%d;%.17f;%.17f\n", index, outputRays[i], outputRays[i + 1]);
                 file << buff;
                 index++;
             }
         }
         else {
-            char buff[256];
-            for (size_t i = 0; i < size; i = i + 8) { // ! + 8 because of placeholder 
-                sprintf(buff, "%d;%.17f;%.17f;%.17f;%.17f;%.17f;%.17f;%.17f;%.17f\n", index,
+            char buff[384];
+            for (size_t i = 0; i < size; i = i + RAY_DOUBLE_COUNT) { // ! + 8 because of placeholder 
+                sprintf(buff, "%d;%.17f;%.17f;%.17f;%.17f;%.17f;%.17f;%.17f;%.17f;%.17f;%.17f;%.17f;%.17f\n", index,
                     outputRays[i], outputRays[i + 1], outputRays[i + 2], outputRays[i + 3],
-                    outputRays[i + 4], outputRays[i + 5], outputRays[i + 6], outputRays[i + 7]);
+                    outputRays[i + 4], outputRays[i + 5], outputRays[i + 6], outputRays[i + 7], 
+                    outputRays[i + 8], outputRays[i + 9], outputRays[i + 10], outputRays[i + 11]);
                 file << buff;
                 index++;
             }

@@ -27,6 +27,7 @@ namespace RAYX
         void setInMatrix(std::vector<double> inputMatrix);
         void setOutMatrix(std::vector<double> inputMatrix);
         void setSurface(std::unique_ptr<Surface> surface);
+        void updateObjectParams();
 
         void setAlpha(double alpha);
         void setBeta(double beta);

@@ -35,7 +35,7 @@ VkResult CreateDebugUtilsMessengerEXT(VkInstance instance, const VkDebugUtilsMes
 void DestroyDebugUtilsMessengerEXT(VkInstance instance, VkDebugUtilsMessengerEXT debugMessenger, const VkAllocationCallbacks* pAllocator);
 
 const int WORKGROUP_SIZE = 32;
-#define VULKANTRACER_RAY_DOUBLE_AMOUNT 8
+#define VULKANTRACER_RAY_DOUBLE_AMOUNT 12
 #define VULKANTRACER_QUADRIC_DOUBLE_AMOUNT 112 //7* dmat4 (16)
 #define VULKANTRACER_QUADRIC_PARAM_DOUBLE_AMOUNT 4
 #define GPU_MAX_STAGING_SIZE 134217728 //128MB

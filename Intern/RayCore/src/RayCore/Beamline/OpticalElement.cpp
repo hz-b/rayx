@@ -51,13 +51,8 @@ namespace RAYX
         m_misalignmentParams(misalignmentParams),
         m_slopeError(slopeError),
         m_elementParameters(EParameters)
-    {
-        m_objectParameters = {
-                m_width, m_height, m_slopeError[0], m_slopeError[1],
-                m_slopeError[2], m_slopeError[3], m_slopeError[4], m_slopeError[5],
-                m_slopeError[6],0,0,0,
-                0,0,0,0
-            };
+    {   
+        updateObjectParams();
         calcTransformationMatrices(misalignmentParams, global);
         setTemporaryMisalignment(tempMisalignmentParams);
     }
@@ -70,13 +65,8 @@ namespace RAYX
         m_distanceToPreceedingElement(dist),
         m_previous(previous),
         m_slopeError(slopeError) 
-    {
-        m_objectParameters = {
-                m_width, m_height, m_slopeError[0], m_slopeError[1],
-                m_slopeError[2], m_slopeError[3], m_slopeError[4], m_slopeError[5],
-                m_slopeError[6],0,0,0,
-                0,0,0,0
-            };
+    {   
+        updateObjectParams();
     }
 
     OpticalElement::OpticalElement(const char* name, const double chi, const double dist, const std::vector<double> slopeError, const std::shared_ptr<OpticalElement> previous)
@@ -245,12 +235,7 @@ namespace RAYX
     void OpticalElement::setDimensions(double width, double height) {
         m_width = width;
         m_height = height;
-        m_objectParameters = {
-                m_width, m_height, m_slopeError[0], m_slopeError[1],
-                m_slopeError[2], m_slopeError[3], m_slopeError[4], m_slopeError[5],
-                m_slopeError[6],0,0,0,
-                0,0,0,0
-            };
+        updateObjectParams();
     }
 
     void OpticalElement::setInMatrix(std::vector<double> inputMatrix)
@@ -271,8 +256,18 @@ namespace RAYX
 
     }
 
+    void OpticalElement::updateObjectParams() {
+        m_objectParameters = {
+                m_width, m_height, m_slopeError[0], m_slopeError[1],
+                m_slopeError[2], m_slopeError[3], m_slopeError[4], m_slopeError[5],
+                m_slopeError[6],m_alpha,0,0,
+                0,0,0,0
+            };
+    }
+
     void OpticalElement::setAlpha(double alpha) {
         m_alpha = alpha;
+        updateObjectParams();
     }
     
     void OpticalElement::setBeta(double beta) {

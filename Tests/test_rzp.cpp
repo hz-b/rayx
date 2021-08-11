@@ -87,7 +87,7 @@ TEST(RZP, testdefaultParams) {
                         rad(dAlpha), rad(dBeta), elementOffsetZ, double(additionalOrder) };
     std::vector<double> correctObjectParams = {width,height,sE[0],sE[1], 
                         sE[2],sE[3],sE[4],sE[5],
-                        sE[6],0,0,0,
+                        sE[6],alpha,0,0,
                         0,0,0,0};
     EXPECT_ITERABLE_DOUBLE_EQ(std::vector<double>, rzp.getElementParameters(), correctElementParams);
     EXPECT_ITERABLE_DOUBLE_EQ(std::vector<double>, rzp.getObjectParameters(), correctObjectParams);
@@ -157,7 +157,7 @@ TEST(RZP, testdefaultParamsElliptical) {
                         rad(dAlpha), rad(dBeta), elementOffsetZ, double(additionalOrder) };
     std::vector<double> correctObjectParams = {-width,-height,sE[0],sE[1], 
                         sE[2],sE[3],sE[4],sE[5],
-                        sE[6],0,0,0,
+                        sE[6],alpha,0,0,
                         0,0,0,0};
     EXPECT_ITERABLE_DOUBLE_EQ(std::vector<double>, rzp.getElementParameters(), correctElementParams);
     EXPECT_ITERABLE_DOUBLE_EQ(std::vector<double>, rzp.getObjectParameters(), correctObjectParams);
@@ -219,7 +219,7 @@ TEST(RZP, testParams) {
                         rad(dAlpha), rad(dBeta), elementOffsetZ, double(additionalOrder) };
     std::vector<double> correctObjectParams = { width, height, sE[0], sE[1],
                         sE[2], sE[3], sE[4], sE[5], 
-                        sE[6], 0, 0, 0,
+                        sE[6], rzp.getAlpha(), 0, 0,
                         0, 0, 0, 0};    
     EXPECT_ITERABLE_DOUBLE_EQ(std::vector<double>, rzp.getObjectParameters(), correctObjectParams);
     EXPECT_ITERABLE_DOUBLE_EQ(std::vector<double>, rzp.getElementParameters(), correctElementParams);

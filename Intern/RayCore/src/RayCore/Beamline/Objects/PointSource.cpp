@@ -62,7 +62,7 @@ namespace RAYX
             glm::dvec3 direction = getDirectionFromAngles(phi, psi);
             glm::dvec4 stokes = glm::dvec4(1, getLinear0(), getLinear45(), getCircular());
 
-            Ray r = Ray(position, direction, /*stokes,*/ en, 1.0);
+            Ray r = Ray(position, direction, stokes, en, 1.0);
             rayVector.emplace_back(r);
         }
         std::cout << &(rayVector[0]) << std::endl;

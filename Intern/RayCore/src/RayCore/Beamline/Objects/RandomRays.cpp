@@ -34,7 +34,7 @@ namespace RAYX
             double weight = unif(re);
             double en = unif(re);
             glm::dvec4 stokes = glm::dvec4(unif(re), unif(re), unif(re), unif(re));
-            Ray r = Ray(position, direction,/* stokes,*/ en, weight);
+            Ray r = Ray(position, direction, stokes, en, weight);
             rayList.emplace_back(r);
         }
         return rayList;

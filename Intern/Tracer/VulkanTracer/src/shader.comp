@@ -18,6 +18,7 @@ struct Ray{
 	double weight; // status of the ray (e.g if element missed -> 0)
 	dvec3 direction;
 	double energy;
+	dvec4 stokes;
 };
 struct Quadric{
 	dmat4 anchorPoints;
@@ -1190,7 +1191,7 @@ double r8_exp ( double x )
 }
 
 
-// DERIVED FUNCTIONS FOR SIN AND ASIN:
+// DERIVED FUNCTIONS FOR SIN AND ASIN AND ACOS:
 
 double r8_sin ( const double x ) {
 	double pi_half = 1.570796326794896619231321691639751442;
@@ -1199,6 +1200,10 @@ double r8_sin ( const double x ) {
 
 double r8_asin ( const double x ) {
 	return sign(x) * r8_atan(sqrt( (x*x) / (1-x*x) ));
+}
+
+double r8_acos ( const double x ) {
+	return PI/2 - r8_atan(x / (sqrt(1-x*x)));
 }
 
 
@@ -1580,6 +1585,26 @@ dvec4 iteratTo(inout Ray r, double longRadius, double shortRadius) {
 
 	r.position = dvec3(xx,yy,zz);
 	return normalize(normal);
+
+}
+
+// returns angle between ray direction and surface normal at intersection point
+double getTheta(Ray r, dvec4 normal) {
+	normal = normalize(normal);
+	double ar = dot(dvec3(normal), r.direction);
+	// cut to interval [-1,1]
+	if(ar < -1.0) ar = -1.0;
+	else if(ar > 1.0) ar = 1.0;
+
+	double theta = PI - r8_acos(ar);
+	int gt = int(theta > PI);
+	// theta in [0, pi]
+	theta = gt * (PI - theta) + (1-gt) * theta;
+	return theta;
+
+}
+
+void efficiency() {
 
 }
 
@@ -2467,7 +2492,9 @@ void testFunctions() {
 	if(settings == 1) { // TEST TRIG FUNCTIONS
 		res.position = dvec3(r8_cos(r.position.x), r8_cos(r.position.y),r8_sin(r.position.z));
 		res.weight = r8_sin(r.weight);
-		res.direction = dvec3(r8_atan(r.direction.x), r8_atan(r.direction.y), r8_asin(r.direction.z));
+		res.direction = dvec3(r8_atan(r.direction.x), r8_atan(r.direction.y), r8_acos(r.direction.z));
+		res.energy = r8_acos(r.energy);
+		res.stokes = dvec4(r8_asin(r.stokes[0]), r8_asin(r.stokes[1]), r8_atan(r.stokes[2]), r8_atan(r.stokes[3]));
 		rayData[uint(gl_GlobalInvocationID)] = res;
 	}
 	else if(settings == 2) { // test refrac
@@ -2510,6 +2537,7 @@ void testFunctions() {
 		res.position = dvec3(bessel1(r.position.x),bessel1(r.position.y),bessel1(r.position.z));
 		res.direction = dvec3(bessel1(r.direction.x),bessel1(r.direction.y),bessel1(r.direction.z));
 		res.weight = bessel1(r.weight);
+		res.stokes = dvec4(0,0,0,0);
 		res.energy = 0;
 		rayData[uint(gl_GlobalInvocationID)] = res;
 	}
@@ -2517,12 +2545,18 @@ void testFunctions() {
 		res.position.x = dpow(r.position.x, int(r.direction.x));
 		res.position.y = dpow(r.position.y, int(r.direction.y));
 		res.position.z = dpow(r.position.z, int(r.direction.z));
+		res.direction = dvec3(0,0,0);
+		res.stokes = dvec4(0,0,0,0);
+		res.weight = 0;
+		res.energy = 0;
 		rayData[uint(gl_GlobalInvocationID)] = res;
 	}
 	else if(settings == 8) { // factorial f(a) = a! test
 		res.position = dvec3(fact(int(r.position.x)), fact(int(r.position.y)), fact(int(r.position.z)));
 		res.direction = dvec3(fact(int(r.direction.x)), fact(int(r.direction.y)), fact(int(r.direction.z)));
 		res.weight = fact(int(r.weight));
+		res.stokes = dvec4(fact(int(r.stokes.x)), fact(int(r.stokes.y)), fact(int(r.stokes.z)), fact(int(r.stokes[3])));
+		res.energy = fact(int(r.energy));
 		rayData[uint(gl_GlobalInvocationID)] = res;
 	}
 	else if(settings == 9) { // cosini (direction x,y,z from phi,psi)
@@ -2540,6 +2574,7 @@ void testFunctions() {
 		double xLength = r.direction.x;
 		double zLength = r.direction.z;
 		double w = r.weight;
+		res = r;
 		res.weight = wasteBox(x, z, xLength, zLength, w);
 		rayData[uint(gl_GlobalInvocationID)] = res;
 	}
@@ -2565,6 +2600,9 @@ void testFunctions() {
 		// write result to r.position to bring it back to the c++ unit test
 		res.position.x = DX;
 		res.position.z = DZ;
+		res.position.y = 0;
+		res.direction = dvec3(0,0,0);
+		res.stokes = dvec4(0,0,0,0);
 		rayData[uint(gl_GlobalInvocationID)] = res;
 	}
 	else if(settings == 13) {
@@ -2572,7 +2610,7 @@ void testFunctions() {
 		double slopeX = r.position.x;
 		double slopeZ = r.position.z;
 		dvec4 new_normal = normal_cartesian(normal, slopeX, slopeZ);
-		// normal is in homogeneous coordinates but ray direction and position are only interpreted as dvec3 on C++ side -> store fourth value in weight
+		// normal is in homogeneous coordinates but ray direction and position are only interpreted as dvec3 -> store fourth value in weight
 		res.direction = dvec3(new_normal);
 		res.weight = new_normal[3];
 		rayData[uint(gl_GlobalInvocationID)] = res;
@@ -2608,6 +2646,7 @@ void testFunctions() {
 		res.energy = double(squares64RNG(ctr)) / double(uint64_t(0) - 1);
 		res.position = dvec3(squaresDoubleRNG(ctr), squaresDoubleRNG(ctr),squaresDoubleRNG(ctr));
 		res.direction = dvec3(squaresDoubleRNG(ctr), squaresDoubleRNG(ctr), squaresDoubleRNG(ctr));
+		res.stokes = dvec4(squaresDoubleRNG(ctr), squaresDoubleRNG(ctr), squaresDoubleRNG(ctr), squaresDoubleRNG(ctr));
 		rayData[uint(gl_GlobalInvocationID)] = res;
 	}
 	else if(settings == 18) { // test exponential function
@@ -2615,6 +2654,7 @@ void testFunctions() {
 		res.energy = r8_exp(r.energy);
 		res.position = dvec3(r8_exp(r.position.x), r8_exp(r.position.y), r8_exp(r.position.z));
 		res.direction = dvec3(r8_exp(r.direction.x), r8_exp(r.direction.y), r8_exp(r.direction.z));
+		res.stokes = dvec4(r8_exp(r.stokes.x), r8_exp(r.stokes.y), r8_exp(r.stokes.z), r8_exp(r.stokes[3]));
 		rayData[uint(gl_GlobalInvocationID)] = res;
 	}
 	else if(settings == 19) { // test logarithm function (natural logarithm)
@@ -2622,11 +2662,16 @@ void testFunctions() {
 		res.energy = r8_log(r.energy);
 		res.position = dvec3(r8_log(r.position.x), r8_log(r.position.y), r8_log(r.position.z));
 		res.direction = dvec3(r8_log(r.direction.x), r8_log(r.direction.y), r8_log(r.direction.z));
+		res.stokes = dvec4(r8_log(r.stokes.x), r8_log(r.stokes.y), r8_log(r.stokes.z), r8_log(r.stokes[3]));
 		rayData[uint(gl_GlobalInvocationID)] = res;
 	}
 	else if(settings == 20) { // test iteratTo (method for finding intersection and normal for non-quadric surfaces like the torus)
 		dvec4 normal = iteratTo(r, quadricData[0].anchorPoints[0][0], quadricData[0].anchorPoints[0][1]);
 		rayData[uint(gl_GlobalInvocationID)] = r;
+	}else if(settings == 21) {
+		Ray res;
+		res.weight = getTheta(r, dvec4(r.position,0));
+		rayData[uint(gl_GlobalInvocationID)] = res;
 	}
 	outputData[uint(gl_GlobalInvocationID)] = rayData[uint(gl_GlobalInvocationID)];
 }
