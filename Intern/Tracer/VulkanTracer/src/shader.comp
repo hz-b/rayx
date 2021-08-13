@@ -850,7 +850,8 @@ double r8_atan ( double x )
     	if ( sqeps < y ) {
      	 value = x * ( 0.75 + r8_csevl ( 50.0 * y * y - 1.0, atancs, nterms ) );
     	}
-  	}else if ( y <= xbnd4 ) {
+  	}
+	  else if ( y <= xbnd4 ) {
     	if ( xbnd3 < y ) {
       		n = 3;
     	}else if ( xbnd2 < y ) {
@@ -860,7 +861,8 @@ double r8_atan ( double x )
     	}
 		t = ( y - tanp8[n-1] ) / ( 1.0 + y * tanp8[n-1] );
 		value = conpi8[n-1] + ( pi8[n-1] + t * ( 0.75 + r8_csevl ( 50.0 * t * t - 1.0, atancs, nterms ) ) );
-	}else {
+	}
+	else {
 		value = conpi8[3] + pi8[3];
 		if ( y < xbig ) {
 			value = conpi8[3] + ( pi8[3] - ( 0.75 + r8_csevl ( 50.0 / y / y - 1.0, atancs, nterms ) ) / y );
@@ -2270,7 +2272,6 @@ the image plane is always parallel to x-y-plane of ray coordinate system in whic
 */
 Ray traceImagePlane(Ray r, Quadric q) {
 	r = rayMatrixMult(r, q.inTrans);
-	double dist = q.elementParameters[0][0];
 	double offset = 0 - r.position.z; // length between ray origin (intersection point of previous element) and image plane
 	r.position.x = r.position.x + ((r.direction.x / r.direction.z) * offset); // scale x-slope of ray (l/n) by z-length between origin and image plane
 	r.position.y = r.position.y + ((r.direction.y / r.direction.z) * offset);
@@ -2285,77 +2286,34 @@ Ray traceImagePlane(Ray r, Quadric q) {
 * quadric = optical element whose surface can be represented by a quadric equation
 */
 void iterateQuadrics(){
-	const int numberOfRays = rayData.length();
-	const int numberOfQuadrics = quadricData.length();
 	double type;
-
+	uint numberOfQuadrics = quadricData.length();
 	// ray specific "seed" for random numbers -> every ray has a different starting value for the counter that creates the random numbter
-	uint64_t workerCounterNum = (~(uint64_t(0)) / numberOfRays);
+	uint64_t workerCounterNum = (~(uint64_t(0)) / uint64_t(numberOfRays));
 	uint64_t ctr = uint(gl_GlobalInvocationID) * workerCounterNum;
 	//only one quadric: store directly in output buffer
-	if(numberOfQuadrics == 1){
-		type = quadricData[numberOfQuadrics-1].anchorPoints[3][0];
+	
+	//quadrics between first and last
+	for(int i=0; i<numberOfQuadricsPerBeamline; i++){
+		type = int(quadricData[i].anchorPoints[3][0]);
+		//first quadric
 		if (type == 0) { // mirror
-			outputData[uint(gl_GlobalInvocationID)] = traceMirror(rayData[uint(gl_GlobalInvocationID)], quadricData[numberOfQuadrics-1], ctr);
-		}else if(type == 1) { // plane grating
-			outputData[uint(gl_GlobalInvocationID)] = tracePlaneGrating(rayData[uint(gl_GlobalInvocationID)], quadricData[numberOfQuadrics-1], ctr);
-		}else if(type == 2) { // other gratings (eg spherical)
-			outputData[uint(gl_GlobalInvocationID)] = traceGeneralGrating(rayData[uint(gl_GlobalInvocationID)], quadricData[numberOfQuadrics-1], ctr);
-		}else if(type == 3){ // Slit
-			outputData[uint(gl_GlobalInvocationID)] = traceSlit(rayData[uint(gl_GlobalInvocationID)], quadricData[numberOfQuadrics-1], ctr);
-		}else if(type == 4) { // rzp
-			outputData[uint(gl_GlobalInvocationID)] = traceRZP(rayData[uint(gl_GlobalInvocationID)], quadricData[numberOfQuadrics-1], ctr);
-		}else if(type == 5) { // image plane
-			outputData[uint(gl_GlobalInvocationID)] = traceImagePlane(rayData[uint(gl_GlobalInvocationID)], quadricData[numberOfQuadrics-1]);
-		}else{ // undefined, return input rays
-			outputData[uint(gl_GlobalInvocationID)] = rayData[uint(gl_GlobalInvocationID)];
-		}
-
-	}
-	else{
-		//at least 2 quadrics
-		//for first quadric, read data from the input buffer RayData[] and write to the temporary storage temporaryRays[]
-		//for last quadric, read data from temporary storage and write to output buffer
-		//between read and write from/to temporary storage
-
-		//quadrics between first and last
-		for(int i=0; i<numberOfQuadrics-1; i++){
-			type = quadricData[i].anchorPoints[3][0];
-			//first quadric
-			if (type == 0) { // mirror
-				rayData[uint(gl_GlobalInvocationID)] = traceMirror(rayData[uint(gl_GlobalInvocationID)], quadricData[i], ctr);
-			}else if(type == 1){ // plane grating
-				rayData[uint(gl_GlobalInvocationID)] = tracePlaneGrating(rayData[uint(gl_GlobalInvocationID)], quadricData[i], ctr);
-			}else if(type == 2){ // general grating
-				rayData[uint(gl_GlobalInvocationID)] = traceGeneralGrating(rayData[uint(gl_GlobalInvocationID)], quadricData[i], ctr);
-			}else if(type == 3){ // Slit
-				rayData[uint(gl_GlobalInvocationID)] = traceSlit(rayData[uint(gl_GlobalInvocationID)], quadricData[i], ctr);
-			}else if(type == 4) { // rzp
-				rayData[uint(gl_GlobalInvocationID)] = traceRZP(rayData[uint(gl_GlobalInvocationID)], quadricData[i], ctr);
-			}else if(type == 5) { // image plane
-				rayData[uint(gl_GlobalInvocationID)] = traceImagePlane(rayData[uint(gl_GlobalInvocationID)], quadricData[i]);
-			}else{ // undefined
-				rayData[uint(gl_GlobalInvocationID)] = rayData[uint(gl_GlobalInvocationID)];
-			}
-		}
-		//last quadric
-		type = quadricData[numberOfQuadrics-1].anchorPoints[3][0];
-		if(type==0){ // mirror
-			outputData[uint(gl_GlobalInvocationID)] = traceMirror(rayData[uint(gl_GlobalInvocationID)], quadricData[numberOfQuadrics-1], ctr);
-		}else if(type==1) { // plane grating
-			outputData[uint(gl_GlobalInvocationID)] = tracePlaneGrating(rayData[uint(gl_GlobalInvocationID)], quadricData[numberOfQuadrics-1], ctr);
+			rayData[uint(gl_GlobalInvocationID)] = traceMirror(rayData[uint(gl_GlobalInvocationID)], quadricData[i], ctr);
+		}else if(type == 1){ // plane grating
+			rayData[uint(gl_GlobalInvocationID)] = tracePlaneGrating(rayData[uint(gl_GlobalInvocationID)], quadricData[i], ctr);	
 		}else if(type == 2){ // general grating
-			outputData[uint(gl_GlobalInvocationID)] = traceGeneralGrating(rayData[uint(gl_GlobalInvocationID)], quadricData[numberOfQuadrics-1], ctr);
+			rayData[uint(gl_GlobalInvocationID)] = traceGeneralGrating(rayData[uint(gl_GlobalInvocationID)], quadricData[i], ctr);	
 		}else if(type == 3){ // Slit
-			outputData[uint(gl_GlobalInvocationID)] = traceSlit(rayData[uint(gl_GlobalInvocationID)], quadricData[numberOfQuadrics-1], ctr);
+			rayData[uint(gl_GlobalInvocationID)] = traceSlit(rayData[uint(gl_GlobalInvocationID)], quadricData[i], ctr);	
 		}else if(type == 4) { // rzp
-			outputData[uint(gl_GlobalInvocationID)] = traceRZP(rayData[uint(gl_GlobalInvocationID)], quadricData[numberOfQuadrics-1], ctr);
+			rayData[uint(gl_GlobalInvocationID)] = traceRZP(rayData[uint(gl_GlobalInvocationID)], quadricData[i], ctr);	
 		}else if(type == 5) { // image plane
-			outputData[uint(gl_GlobalInvocationID)] = traceImagePlane(rayData[uint(gl_GlobalInvocationID)], quadricData[numberOfQuadrics-1]);
-		}else{
-			outputData[uint(gl_GlobalInvocationID)] = rayData[uint(gl_GlobalInvocationID)];
+			outputData[uint(gl_GlobalInvocationID)] = traceImagePlane(rayData[uint(gl_GlobalInvocationID)], quadricData[int(numberOfQuadricsPerBeamline)-1]);
+			return;
 		}
 	}
+	outputData[uint(gl_GlobalInvocationID)] = rayData[uint(gl_GlobalInvocationID)];
+	
 
 }
 
@@ -2595,7 +2553,8 @@ void cameraPlaneIntersection(outputData, cameraPlane){
 }
 */
 void main(){
-    testFunctions();
+    //testFunctions();
+	iterateQuadrics();
 	/*
 	Ray r = rayData[uint(gl_GlobalInvocationID)];
 	r.weight = double(ctr);
@@ -2604,14 +2563,17 @@ void main(){
 	r.direction = dvec3(double(squares64RNG(ctr)), squaresDoubleRNG(ctr), squaresDoubleRNG(ctr));
 	outputData[uint(gl_GlobalInvocationID)] = r;*/
     //outputData[uint(gl_GlobalInvocationID)] = rayData[uint(gl_GlobalInvocationID)];
-    //iterateQuadrics();
+    
 
 	//test intersection point
 	// uint64_t workerCounterNum = (~(uint64_t(0)) / int(numberOfRays));
 	// uint64_t ctr = uint(gl_GlobalInvocationID) * workerCounterNum;
 	// Ray r = rayData[uint(gl_GlobalInvocationID)];
-    // outputData[uint(gl_GlobalInvocationID)] = traceRZP(r, quadricData[0], ctr);
-	// outputData[uint(gl_GlobalInvocationID)] = r;
+	// // outputData[uint(gl_GlobalInvocationID)] = traceRZP(rayData[uint(gl_GlobalInvocationID)], quadricData[0], ctr);
+	// // outputData[uint(gl_GlobalInvocationID)] = traceImagePlane(rayData[uint(gl_GlobalInvocationID)], quadricData[1]);
+	// for(int i = 0;i<100;i++){
+	// 	intersectionPoint(r, quadricData[int(numberOfQuadricsPerBeamline)-1].anchorPoints ,1).x;
+	// }
 
     // outputData[uint(gl_GlobalInvocationID)] = iterateQuadrics(rayData[uint(gl_GlobalInvocationID)]);
     //outputData[uint(gl_GlobalInvocationID)] = rayData[uint(gl_GlobalInvocationID)];
