@@ -1521,6 +1521,7 @@ dvec3 getIntersectionPoint(inout Ray r, dmat4 quadric, int icurv)
 	double params[2] = {firstParam, secondParam};
 	//dvec4 normal;
 
+	xyznull[uint(gl_GlobalInvocationID)] = dvec4(0.0,0.0,0.0,0.0);
 	xyznull[uint(gl_GlobalInvocationID)][f_100] = rayData[uint(gl_GlobalInvocationID)].position[f_100] - firstParam * rayData[uint(gl_GlobalInvocationID)].position[cs];
 	xyznull[uint(gl_GlobalInvocationID)][f_221] = rayData[uint(gl_GlobalInvocationID)].position[f_221] - secondParam * rayData[uint(gl_GlobalInvocationID)].position[cs];
 	xyznull[uint(gl_GlobalInvocationID)][3] = 0;

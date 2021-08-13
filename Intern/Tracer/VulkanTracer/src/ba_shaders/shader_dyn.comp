@@ -1443,7 +1443,7 @@ dvec4 setIntersectionPoint(inout Ray r, dmat4 quadric, int icurv, dvec4 closestH
 	//r.direction = dvec3(firstParam,secondParam,c);
 	return normal;
 }
-dvec4 getIntersectionPoint(inout Ray r, dmat4 quadric, int icurv)
+dvec4 getIntersectionPoint(Ray r, dmat4 quadric, int icurv)
 {	
 	double a_11 = quadric[0][0];
 	double a_12 = quadric[0][1];
@@ -2046,7 +2046,6 @@ Ray traceRZP(Ray r, Quadric q, inout uint64_t ctr, dvec4 closestHitpoint) {
 	double element_offset_z = q.elementParameters[3][2];
 	r.position.z = r.position.z - element_offset_z;
 	//r = rayMatrixMult(r, q.misalignment); // misalignment not stored in intrans because it needs to be removed later
-
 
 	// RZP can be plane, toroidal or spherical curvature type. Use intersectionPoint for all except toroidal
 	// if !toroidal:
