@@ -1,18 +1,19 @@
 #pragma once
-#include "Quadric.h"
+#include "Surface/Quadric.h"
+#include "Beamline/OpticalElement.h"
 
-namespace RAY
+namespace RAYX
 {
 
-    class RAY_API ReflectionZonePlate : public Quadric {
+    class RAYX_API ReflectionZonePlate : public OpticalElement {
 
     public:
-        
-        ReflectionZonePlate(const char* name, int mount, int curvatureType, int designType, int elementOffsetType, double width, double height, double deviation, double incidenceAngle, double azimuthal, double distanceToPreceedingElement, double designEnergy, double sourceEnergy, double orderOfDiffraction, double designOrderOfDiffraction, double dAlpha, double dBeta, double mEntrance, double mExit, double sEntrance, double sExit, double shortRadius, double longRadius, int additional_zero_order, double elementOffsetZ, double fresnelZOffset, double beta, std::vector<double> misalignmentParams, std::vector<double> slopeError, Quadric* previous);
+
+        ReflectionZonePlate(const char* name, const int geometricShape, const int mount, const int curvatureType, const int designType, const int elementOffsetType, const double width, const double height, const double deviation, const double incidenceAngle, const double azimuthal, const double distanceToPreceedingElement, const double designEnergy, const double sourceEnergy, const double orderOfDiffraction, const double designOrderOfDiffraction, const double dAlpha, const double dBeta, const double mEntrance, const double mExit, const double sEntrance, const double sExit, const double shortRadius, const double longRadius, const int additional_zero_order, const double elementOffsetZ, const double fresnelZOffset, const double beta, const std::vector<double> misalignmentParams, const std::vector<double> slopeError, const std::shared_ptr<OpticalElement> previous, bool global);
         ReflectionZonePlate();
         ~ReflectionZonePlate();
 
-        void calcDesignAlphaAngle(double deviation, double normalIncidence);
+        void calcDesignAlphaAngle(const double deviation, const double normalIncidence);
         void calcAlpha2();
         void calcBeta2();
         void Illumination();
@@ -25,64 +26,55 @@ namespace RAY
         void VectorR1Center();
         void VectorR2Center();
 
-        void calcDesignOrderOfDiffraction(double designOrderOfDiffraction);
+        void calcDesignOrderOfDiffraction(const double designOrderOfDiffraction);
         void focus(double angle);
-        double rzpLineDensityDZ(double X, double Y, double Z, double FX, double FY, double FZ, double WL);
-    
-        void setBeta(double beta); // in degree
+        double rzpLineDensityDZ(const double X, const double Y, const double Z, const double FX, const double FY, const double FZ, const double WL);
 
-        double getWidth();
-        double getHeight();
-        double getAlpha();
-        double getBeta();
-        double getDesignAlphaAngle(); 
-        double getDesignBetaAngle();
+        double getIncidenceAngle() const;
+        double getDiffractionAngle() const;
+        double getDesignAlphaAngle() const;
+        double getDesignBetaAngle() const;
 
-        double getGratingMount();
+        double getGratingMount() const;
 
-        double getLongRadius();
-        double getShortRadius();
+        double getLongRadius() const;
+        double getShortRadius() const;
 
-        double getFresnelZOffset();
-        double getCalcFresnelZOffset();
+        double getFresnelZOffset() const;
+        double getCalcFresnelZOffset() const;
         // input and exit vector lengths
-        double getSagittalEntranceArmLength();
-        double getSagittalExitArmLength();
-        double getMeridionalEntranceArmLength();
-        double getMeridionalExitArmLength();
-        double getR1ArmLength();
-        double getR2ArmLength(); // what is this now??
+        double getSagittalEntranceArmLength() const;
+        double getSagittalExitArmLength() const;
+        double getMeridionalEntranceArmLength() const;
+        double getMeridionalExitArmLength() const;
+        double getR1ArmLength() const;
+        double getR2ArmLength() const; // what is this now??
 
-        double getDesignEnergy();//Mounting;
-        double getWaveLength();
-        double getLineDensity();
-        double getOrderOfDiffraction();
-        double getDesignOrderOfDiffraction();
-        double getDesignEnergyMounting(); // derived from source?
-        void printInfo();
-        
+        double getDesignEnergy() const;//Mounting;
+        double getWaveLength() const;
+        double getLineDensity() const;
+        double getOrderOfDiffraction() const;
+        double getDesignOrderOfDiffraction() const;
+        double getDesignEnergyMounting() const; // derived from source?
+        void printInfo() const;
+
     private:
-        double m_totalWidth;
-        double m_totalHeight;
-        // angles in rad and normal angles incidence
-        double m_alpha; // grazing incidence angle
-        double m_beta; // == alpha? grazing exit angle
-
         double m_incidenceMainBeamLength;
         double m_meridionalDistance;
         double m_meridionalDivergence;
-        double m_designAlphaAngle; 
+        double m_designAlphaAngle;
         double m_designBetaAngle; // what is this?
 
         double m_beta0Angle;
         double m_alpha0Angle; // and what are these? equivalent to designAlphaAngle when calculated from other values?
         double m_betaAngle; // calculated if DESIGN_TYPE == DT_ZOFFSET. design beta angle when m_fresnelZOffset is by user
         // in rad as well
-        double m_chi;
+        //double m_chi;
         double m_grazingIncidenceAngle;
-        double m_distanceToPreceedingElement;
-
-        enum GRATING_MOUNT  { GM_DEVIATION, GM_INCIDENCE};
+        
+        enum GEOMETRICAL_SHAPE {GS_RECTANGLE, GS_ELLIPTICAL};
+        GEOMETRICAL_SHAPE m_geometricalShape;
+        enum GRATING_MOUNT { GM_DEVIATION, GM_INCIDENCE };
         GRATING_MOUNT m_gratingMount;
         enum CURVATURE_TYPE { CT_PLANE, CT_TOROIDAL, CT_SPHERICAL };
         CURVATURE_TYPE m_curvatureType;
@@ -90,13 +82,13 @@ namespace RAY
         DESIGN_TYPE m_designType;
         enum DERIVATION_METHOD { DM_FORMULA, DM_PLOYNOM };
         DERIVATION_METHOD m_derivationMethod;
-        enum IMAGE_TYPE {IT_POINT2POINT, IT_ASTIGMATIC2ASTIGMATIC};
+        enum IMAGE_TYPE { IT_POINT2POINT, IT_ASTIGMATIC2ASTIGMATIC };
         IMAGE_TYPE m_imageType;
-        enum RZP_TYPE {RT_ELLIPTICAL, RT_MERIODIONAL};
+        enum RZP_TYPE { RT_ELLIPTICAL, RT_MERIODIONAL };
         RZP_TYPE m_rzpType;
-        enum ELEMENTOFFSET_TYPE {EZ_MANUAL, EZ_BEAMDIVERGENCE};
+        enum ELEMENTOFFSET_TYPE { EZ_MANUAL, EZ_BEAMDIVERGENCE };
         ELEMENTOFFSET_TYPE m_elementOffsetType;
-        enum ADDITIONAL_ZERO_ORDER {AO_OFF, AO_ON};
+        enum ADDITIONAL_ZERO_ORDER { AO_OFF, AO_ON };
         ADDITIONAL_ZERO_ORDER m_additionalOrder;
 
         double m_longRadius;
@@ -122,14 +114,14 @@ namespace RAY
         double m_designOrderOfDiffraction;
         double m_designEnergyMounting; // derived from source?
         double m_a; // calculated from line density, order of diffracion and design energy mounting
-        
-        
-        enum FULL_EFFICIENCY {FE_OFF, FE_ON};
+
+
+        enum FULL_EFFICIENCY { FE_OFF, FE_ON };
         FULL_EFFICIENCY m_fullEfficiency; // todo
-        enum DIFFRACTION_METHOD {DM_TWOGRATINGS, DM_2D};
+        enum DIFFRACTION_METHOD { DM_TWOGRATINGS, DM_2D };
         DIFFRACTION_METHOD m_diffractionMethod; // only use 2D
         double m_elementOffsetZ; // if given manually
         double m_elementOffsetZCalc; // if not given but has to be calculated by beam divergence
     };
 
-} // namespace RAY
+} // namespace RAYX

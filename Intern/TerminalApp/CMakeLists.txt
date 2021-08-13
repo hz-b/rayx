@@ -7,7 +7,7 @@ project(TerminalApp)
 add_executable(${PROJECT_NAME} main.cpp TerminalApp.cpp TerminalApp.h NotInUse/InputParser.cpp NotInUse/InputParser.h)
 
 if (WIN32)
-    target_compile_definitions(${PROJECT_NAME} PUBLIC RAY_PLATFORM_WINDOWS)
+    target_compile_definitions(${PROJECT_NAME} PUBLIC RAYX_PLATFORM_WINDOWS)
 endif ()
 
 

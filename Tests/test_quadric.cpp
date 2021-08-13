@@ -1,9 +1,9 @@
 #include "gtest/gtest.h"
 #include "gmock/gmock.h"
 #include "Beamline/Beamline.h"
-#include "Beamline/PlaneMirror.h"
-#include "Beamline/SphereMirror.h"
-#include "Beamline/Ellipsoid.h"
+#include "Beamline/Objects/PlaneMirror.h"
+#include "Beamline/Objects/SphereMirror.h"
+#include "Beamline/Objects/Ellipsoid.h"
 #include "Core.h"
 #include "Ray.h"
 
@@ -43,31 +43,31 @@ using ::testing::ElementsAre;
 #define EXPECT_ITERABLE_DOUBLE_EQ( TYPE, ref, target) \
     EXPECT_ITERABLE_BASE( EXPECT_DOUBLE_EQ, TYPE, TYPE, ref, target )
 
-TEST (Quadric, MatrixProduct) {
-    std::vector<double> A = {23,6,12,7, 8.1,53.1,4.1,0.51, 4.1,5.1,2.7,3.2, 12.5,12.9,4.2,9.1};
-    std::vector<double> B = {9.2,6,2.4,72.1, 8.6,21.3,78.2,12, 2.6,2.6,6.52,7.7, 2.25,62.1,5,2.2};
-    std::vector<double> result =  getMatrixProductAsVector(A, B);
-    std::vector<double> correct = {1171.29 , 1316.13 , 444.29999999999995 , 731.25 , 840.9499999999999 , 1736.25 , 452.07000000000005 , 430.503 , 203.84199999999998 , 286.242 , 91.804 , 110.46000000000001 , 602.76 , 3364.8900000000003 , 304.34999999999997 , 83.441};
+TEST(Quadric, MatrixProduct) {
+    std::vector<double> A = { 23,6,12,7, 8.1,53.1,4.1,0.51, 4.1,5.1,2.7,3.2, 12.5,12.9,4.2,9.1 };
+    std::vector<double> B = { 9.2,6,2.4,72.1, 8.6,21.3,78.2,12, 2.6,2.6,6.52,7.7, 2.25,62.1,5,2.2 };
+    std::vector<double> result = getMatrixProductAsVector(A, B);
+    std::vector<double> correct = { 1171.29 , 1316.13 , 444.29999999999995 , 731.25 , 840.9499999999999 , 1736.25 , 452.07000000000005 , 430.503 , 203.84199999999998 , 286.242 , 91.804 , 110.46000000000001 , 602.76 , 3364.8900000000003 , 304.34999999999997 , 83.441 };
     EXPECT_ITERABLE_DOUBLE_EQ(std::vector<double>, correct, result);
 }
 
-TEST (Quadric, testMisalignment) {
+TEST(Quadric, testMisalignment) {
     double width = 68.12;
     double height = 123.6;
     double incidenceAngle = 13.2;
     double azimuthalAngle = 0.0;
     double dist = 12005;
-    std::vector<double> sE = {1,2,3,4,5,6,7};
-    std::vector<double> mis = {1,2,3,0.03,0.02,0.01}; // psi, phi, chi
-    RAY::PlaneMirror plM = RAY::PlaneMirror("planemirror", width, height, incidenceAngle, azimuthalAngle, dist, mis, sE, NULL); // {1,2,3,0.01,0.02,0.03}
+    std::vector<double> sE = { 1,2,3,4,5,6,7 };
+    std::vector<double> mis = { 1,2,3,0.03,0.02,0.01 }; // psi, phi, chi
+    RAYX::PlaneMirror plM = RAYX::PlaneMirror("planemirror", width, height, incidenceAngle, azimuthalAngle, dist, mis, sE, NULL, false); // {1,2,3,0.01,0.02,0.03}
 
     //std::vector<double> Mis_out = plM.d_misalignmentMatrix();
     std::vector<double> Mis_in = plM.getMisalignmentMatrix();
-    std::vector<double> correctMisIn = {0.9997500170828264 , -0.009395493729051622 , 0.02028861849598634 , 0.0 , 0.009997833434164497 , 0.9995060552639085 , -0.02979410709189573 , 0.0 , -0.01999866669333308 , 0.029989501302422495 , 0.9993501304058158 , 0.0 , -1.0 , -2.0 , -3.0 , 1.0};
+    std::vector<double> correctMisIn = { 0.9997500170828264 , -0.009395493729051622 , 0.02028861849598634 , 0.0 , 0.009997833434164497 , 0.9995060552639085 , -0.02979410709189573 , 0.0 , -0.01999866669333308 , 0.029989501302422495 , 0.9993501304058158 , 0.0 , -1.0 , -2.0 , -3.0 , 1.0 };
     EXPECT_ITERABLE_DOUBLE_EQ(std::vector<double>, Mis_in, correctMisIn);
 
     std::vector<double> Mis_out = plM.getInverseMisalignmentMatrix();
-    std::vector<double> correctMisOut = {0.9997500170828264 , 0.009997833434164499 , -0.019998666693333084 , 0.0 , -0.00939549372905162 , 0.9995060552639086 , 0.029989501302422495 , 0.0 , 0.02028861849598634 , -0.02979410709189573 , 0.9993501304058158 , 0.0 , 1.0418248851126823 , 1.9196276226862943 , 3.0380307271289593 , 1.0  };
+    std::vector<double> correctMisOut = { 0.9997500170828264 , 0.009997833434164499 , -0.019998666693333084 , 0.0 , -0.00939549372905162 , 0.9995060552639086 , 0.029989501302422495 , 0.0 , 0.02028861849598634 , -0.02979410709189573 , 0.9993501304058158 , 0.0 , 1.0418248851126823 , 1.9196276226862943 , 3.0380307271289593 , 1.0 };
     EXPECT_ITERABLE_DOUBLE_EQ(std::vector<double>, Mis_out, correctMisOut);
 }
 
@@ -77,36 +77,36 @@ TEST(Quadric, testInMat) {
     double incidenceAngle = 13.2;
     double azimuthalAngle = 0.0;
     double dist = 12005;
-    std::vector<double> mis = {0,0,0,0,0,0};
-    std::vector<double> sE = {1,2,8,2,4, 6,3};
-    RAY::PlaneMirror plM = RAY::PlaneMirror("planemirror",width, height, incidenceAngle, azimuthalAngle, dist, mis, sE, NULL); // {1,2,3,0.01,0.02,0.03}
+    std::vector<double> mis = { 0,0,0,0,0,0 };
+    std::vector<double> sE = { 1,2,8,2,4, 6,3 };
+    RAYX::PlaneMirror plM = RAYX::PlaneMirror("planemirror",width, height, incidenceAngle, azimuthalAngle, dist, mis, sE, NULL, false); // {1,2,3,0.01,0.02,0.03}
 
     std::vector<double> Mis_out = plM.getInverseTempMisalignmentMatrix();
     std::vector<double> Mis_in = plM.getTempMisalignmentMatrix();
-    EXPECT_THAT(Mis_out, ElementsAre(1,0,0,0, 0,1,0,0, 0,0,1,0, 0,0,0,1));
-    EXPECT_THAT(Mis_in, ElementsAre(1,0,0,0, 0,1,0,0, 0,0,1,0, 0,0,0,1));
+    EXPECT_THAT(Mis_out, ElementsAre(1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1));
+    EXPECT_THAT(Mis_in, ElementsAre(1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1));
 
     std::vector<double> inMat = plM.getInMatrix();
-    std::vector<double> correctInMat = {1.00000000e+00,  0.00000000e+00,  0.00000000e+00, 0.00000000e+00,
+    std::vector<double> correctInMat = { 1.00000000e+00,  0.00000000e+00,  0.00000000e+00, 0.00000000e+00,
        -0.00000000e+00,  0.9735789028731603, 0.22835087011065572, 0.00000000e+00,
        -0.00000000e+00,  -0.22835087011065572,  0.9735789028731603, 0.00000000e+00,
-       0.00000000e+00,  2741.352195678422,  -11687.814728992289, 1.00000000e+00};
+       0.00000000e+00,  2741.352195678422,  -11687.814728992289, 1.00000000e+00 };
 
     EXPECT_ITERABLE_DOUBLE_EQ(std::vector<double>, inMat, correctInMat);
 }
 
 TEST(Quadric, testGlobalCoordinates) {
-    std::vector<double> sE = {0,0,0,0,0, 0,0};
-    RAY::PlaneMirror p1 = RAY::PlaneMirror("PlaneMirror1", 50, 200, 10, 7, 0, {0,0,0, 0,0,0}, sE, NULL); // {1,2,3,0.01,0.02,0.03}
-    RAY::PlaneMirror p2 = RAY::PlaneMirror("PlaneMirror2", 50, 200, 15, 4, 0, {0,0,0, 0,0,0}, sE, &p1); // {1,2,3,0.01,0.02,0.03}
-    RAY::PlaneMirror p3 = RAY::PlaneMirror("PlaneMirror3", 50, 200, 7, 10, 0, {0,0,0, 0,0,0}, sE, &p2); // {1,2,3,0.01,0.02,0.03}
-    RAY::PlaneMirror p4 = RAY::PlaneMirror("PlaneMirror4", 50, 200, 22, 17, 0, {0,0,0, 0,0,0}, sE, &p3); // {1,2,3,0.01,0.02,0.03}
-    
-    /*std::vector<double> worldCoord = {0.993, -0.120, -0.021, 0,
+    std::vector<double> sE = { 0,0,0,0,0, 0,0 };
+    std::shared_ptr<RAYX::PlaneMirror> p1 = std::make_shared<RAYX::PlaneMirror>("PlaneMirror1", 50, 200, 10, 7, 0, std::vector<double>{0,0,0, 0,0,0}, sE, nullptr, true); // {1,2,3,0.01,0.02,0.03}
+    std::shared_ptr<RAYX::PlaneMirror> p2 = std::make_shared<RAYX::PlaneMirror>("PlaneMirror2", 50, 200, 15, 4, 0, std::vector<double>{0,0,0, 0,0,0}, sE, p1, true); // {1,2,3,0.01,0.02,0.03}
+    std::shared_ptr<RAYX::PlaneMirror> p3 = std::make_shared<RAYX::PlaneMirror>("PlaneMirror3", 50, 200, 7, 10, 0, std::vector<double>{0,0,0, 0,0,0}, sE, p2, true); // {1,2,3,0.01,0.02,0.03}
+    std::shared_ptr<RAYX::PlaneMirror> p4 = std::make_shared<RAYX::PlaneMirror>("PlaneMirror4", 50, 200, 22, 17, 0, std::vector<double>{0,0,0, 0,0,0}, sE, p3, true); // {1,2,3,0.01,0.02,0.03}
+
+    std::vector<double> worldCoord = {0.993, -0.120, -0.021, 0,
                                         0.122, 0.977, 0.172, 0,
                                         0.000, -0.174, 0.985, 0,
                                         0, 0, 0, 1};
-    std::vector<double> result = p1.getInMatrix();
+    std::vector<double> result = p1->getInMatrix();
     for(int i = 0; i<16; i++) {
         EXPECT_NEAR(worldCoord[i], result[i], 0.001);
     }
@@ -116,7 +116,7 @@ TEST(Quadric, testGlobalCoordinates) {
                                         0.073, 0.818, 0.571, 0,
                                         0.018, -0.573, 0.819, 0,
                                         0, 0, 0, 1};
-    result = p2.getInMatrix();
+    result = p2->getInMatrix();
     for(int i = 0; i<16; i++) {
         EXPECT_NEAR(worldCoord[i], result[i], 0.001);
     }
@@ -125,7 +125,7 @@ TEST(Quadric, testGlobalCoordinates) {
                                         0.140, 0.534, 0.834, 0,
                                         -0.062, -0.836, 0.545, 0,
                                         0, 0, 0, 1};
-    result = p3.getInMatrix();
+    result = p3->getInMatrix();
     for(int i = 0; i<16; i++) {
         EXPECT_NEAR(worldCoord[i], result[i], 0.001);
     }
@@ -134,8 +134,8 @@ TEST(Quadric, testGlobalCoordinates) {
                                         0.191, 0.044, 0.981, 0,
                                         -0.171, -0.982, 0.077, 0,
                                         0, 0, 0, 1};
-    result = p4.getInMatrix();
+    result = p4->getInMatrix();
     for(int i = 0; i<16; i++) {
         EXPECT_NEAR(worldCoord[i], result[i], 0.001);
-    }*/
+    }
 }

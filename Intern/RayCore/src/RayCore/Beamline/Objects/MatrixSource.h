@@ -1,15 +1,15 @@
 #pragma once
-#include "LightSource.h"
+#include "Beamline/LightSource.h"
 
-namespace RAY
+namespace RAYX
 {
 
-    class RAY_API MatrixSource : public LightSource
+    class RAYX_API MatrixSource : public LightSource
     {
     public:
 
-        MatrixSource(int id, std::string name, int numberOfRays, int spreadType, double sourceWidth, double sourceHeight,
-            double sourceDepth, double horDivergence, double verDivergence, double photonEnergy, double energySpread, std::vector<double> misalignment);
+        MatrixSource(const int id, const std::string name, const int numberOfRays, const int spreadType, const double sourceWidth, const double sourceHeight,
+            const double sourceDepth, const double horDivergence, const double verDivergence, const double photonEnergy, const double energySpread, const double linPol0, const double linPol45, const double circPol, const std::vector<double> misalignment);
 
         MatrixSource();
         ~MatrixSource();
@@ -31,4 +31,4 @@ namespace RAY
 
     };
 
-} // namespace RAY
+} // namespace RAYX

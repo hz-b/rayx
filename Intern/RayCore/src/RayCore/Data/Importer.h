@@ -1,17 +1,21 @@
 #pragma once
+
+#include <memory>
+
+#include "Beamline/Beamline.h"
 #include "Core.h"
 
-namespace RAY
+namespace RAYX
 {
 
-	class RAY_API Importer
+	class RAYX_API Importer
 	{
 	public:
 		Importer();
 		~Importer();
 
-	private:
+		static Beamline importBeamline();
 
 	};
 
-} // namespace RAY
+} // namespace RAYX

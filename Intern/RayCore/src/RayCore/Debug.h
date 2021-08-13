@@ -9,7 +9,7 @@
 
 // Memory leak detection
 #	ifdef RAY_DEBUG_MODE
-#       ifdef RAY_PLATFORM_WINDOWS
+#       ifdef RAYX_PLATFORM_WINDOWS
 #		    define _CRTDBG_MAP_ALLOC
 #		    include <crtdbg.h>
 #       endif
@@ -20,7 +20,7 @@
 
 // Debug only code; just use it as: DEBUG(<statement>);
 #ifdef RAY_DEBUG_MODE
-#  define RAY_DEBUG(x) (x)
+#  define RAYX_DEBUG(x) (x)
 #else
-#  define RAY_DEBUG(x) do {} while (0)
+#  define RAYX_DEBUG(x) do {} while (0)
 #endif

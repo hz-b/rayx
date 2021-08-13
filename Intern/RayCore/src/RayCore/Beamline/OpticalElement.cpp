@@ -1,15 +1,17 @@
-#include "Quadric.h"
+#include "OpticalElement.h"
 #include <cassert>
+#include <assert.h>
 #include <math.h>
 
-namespace RAY
+namespace RAYX
 {
-    Quadric::Quadric(const char* name, std::vector<double> inputPoints, std::vector<double> inputInMatrix, std::vector<double> inputOutMatrix, std::vector<double> misalignmentMatrix, std::vector<double> inverseMisalignmentMatrix, std::vector<double> OParameters, std::vector<double> EParameters)
+    OpticalElement::OpticalElement(const char* name, const std::vector<double> surfacePoints, const std::vector<double> inputInMatrix, const std::vector<double> inputOutMatrix, const std::vector<double> misalignmentMatrix, const std::vector<double> inverseMisalignmentMatrix, const std::vector<double> OParameters, const std::vector<double> EParameters)
+        : BeamlineObject(name)
     {
-        m_name = name;
-        std::cout << inputPoints.size() << inputInMatrix.size() << inputOutMatrix.size() << misalignmentMatrix.size() << inverseMisalignmentMatrix.size() << EParameters.size() << OParameters.size() << std::endl;
-        assert(inputPoints.size() == 16 && inputInMatrix.size() == 16 && inputOutMatrix.size() == 16 && misalignmentMatrix.size() == 16 && inverseMisalignmentMatrix.size() == 16 && EParameters.size() == 16 && OParameters.size() == 16); //parameter size ==6?
-        m_anchorPoints = inputPoints;
+        std::cout << surfacePoints.size() << inputInMatrix.size() << inputOutMatrix.size() << misalignmentMatrix.size() << inverseMisalignmentMatrix.size() << EParameters.size() << OParameters.size() << std::endl;
+        // surface.getParams() to shader/buffer
+        assert(surfacePoints.size() == 16 && inputInMatrix.size() == 16 && inputOutMatrix.size() == 16 && misalignmentMatrix.size() == 16 && inverseMisalignmentMatrix.size() == 16 && EParameters.size() == 16 && OParameters.size() == 16);
+        m_surfaceParams = surfacePoints;
         m_inMatrix = inputInMatrix;
         m_outMatrix = inputOutMatrix;
         m_temporaryMisalignmentMatrix = misalignmentMatrix;
@@ -36,59 +38,61 @@ namespace RAY
      * @param misalignmentParams        angles and distances for the object's misalignment
      * @param tempMisalignmentParams    parameters for temporary misalignment that can be removed midtracing.
     */
-    Quadric::Quadric(const char* name, std::vector<double> inputPoints, std::vector<double> EParameters, double width, double height, double alpha, double chi, double beta, double dist, std::vector<double> misalignmentParams, std::vector<double> tempMisalignmentParams, std::vector<double> slopeError, Quadric* previous)
-    {
-        m_name = name;
-        m_previous = previous;
-        m_objectParameters = {
-            width, height, slopeError[0], slopeError[1],
-            slopeError[2], slopeError[3], slopeError[4], slopeError[5],
-            slopeError[6],0,0,0,
-            0,0,0,0
-        };
-        m_slopeError = slopeError;
-        m_elementParameters = EParameters;
-        m_anchorPoints = inputPoints;
-        m_misalignmentParams = misalignmentParams;
-        calcTransformationMatrices(alpha, chi, beta, dist, misalignmentParams);
+    OpticalElement::OpticalElement(const char* name, const std::vector<double> EParameters, const double width, const double height, const double alpha, const double chi, const double beta, const double dist, const std::vector<double> misalignmentParams, const std::vector<double> tempMisalignmentParams, const std::vector<double> slopeError, const std::shared_ptr<OpticalElement> previous, bool global)
+        : BeamlineObject(name),
+        //m_surface(std::move(surface)), 
+        m_width(width),
+        m_height(height),
+        m_alpha (alpha),
+        m_beta(beta), // mirror -> exit angle = incidence angle
+        m_chi (chi),
+        m_distanceToPreceedingElement (dist),
+        m_previous(previous),
+        m_misalignmentParams(misalignmentParams),
+        m_slopeError(slopeError),
+        m_elementParameters(EParameters)
+    {   
+        updateObjectParams();
+        calcTransformationMatrices(misalignmentParams, global);
         setTemporaryMisalignment(tempMisalignmentParams);
     }
 
-    Quadric::Quadric(const char* name, double width, double height, std::vector<double> slopeError, Quadric* previous) : m_name(name), m_previous(previous) {
-        m_slopeError = slopeError;
-        setObjectParameters({
-            width, height, slopeError[0], slopeError[1],
-            slopeError[2], slopeError[3], slopeError[4], slopeError[5],
-            slopeError[6],0,0,0,
-            0,0,0,0
-        });
-        
+    OpticalElement::OpticalElement(const char* name, const double width, const double height, const double chi, const double dist, const std::vector<double> slopeError, const std::shared_ptr<OpticalElement> previous)
+        : BeamlineObject(name),
+        m_width(width),
+        m_height(height),
+        m_chi(chi),
+        m_distanceToPreceedingElement(dist),
+        m_previous(previous),
+        m_slopeError(slopeError) 
+    {   
+        updateObjectParams();
     }
 
-    Quadric::Quadric() {} // TODO
+    OpticalElement::OpticalElement(const char* name, const double chi, const double dist, const std::vector<double> slopeError, const std::shared_ptr<OpticalElement> previous)
+        : BeamlineObject(name), m_chi(chi), m_distanceToPreceedingElement(dist), m_previous(previous), m_slopeError(slopeError) {}
 
-    Quadric::~Quadric()
+
+    OpticalElement::OpticalElement() {}
+
+    OpticalElement::~OpticalElement()
     {
     }
 
 
     /**
-     * calculates in and out transformation matrices from grazing incidence, exit angles, azimuthal angle and distance to preceeding element
-     * angles are given in rad
-     * @param alpha         grazing incidence angle
-     * @param chi           azimuthal angle
-     * @param beta          grazing exit angle
-     * @param dist          distance to preceeding element
+     * calculates in and out transformation matrices from grazing incidence and exit angles, azimuthal angle and distance to preceeding element
      * @param misalignment  misalignment x,y,z,psi,phi,chi
      * @return void
     */
-    void Quadric::calcTransformationMatrices(double alpha, double chi, double beta, double dist, std::vector<double> misalignment) {
-        double cos_c = cos(chi);
-        double sin_c = sin(chi);
-        double cos_a = cos(alpha);
-        double sin_a = sin(alpha);
-        double sin_b = sin(beta);
-        double cos_b = cos(beta);
+    void OpticalElement::calcTransformationMatrices(const std::vector<double> misalignment, bool global) {
+        
+        double cos_c = cos(m_chi);
+        double sin_c = sin(m_chi);
+        double cos_a = cos(m_alpha);
+        double sin_a = sin(m_alpha);
+        double sin_b = sin(m_beta);
+        double cos_b = cos(m_beta);
 
         // transposes of the actual matrices since they are transposed in the process of transferring to the shader
         /*std::vector<double> d_inRotation = {cos_c, -sin_c*cos_a, -sin_c*sin_a, 0,
@@ -99,12 +103,12 @@ namespace RAY
         d_b2e = { cos_c, -sin_c * cos_a, -sin_c * sin_a, 0, // M_b2e
                 sin_c, cos_c * cos_a, sin_a * cos_c, 0,
                 0, -sin_a, cos_a, 0,
-                0, dist * sin_a, -dist * cos_a, 1 };
+                0, m_distanceToPreceedingElement * sin_a, -m_distanceToPreceedingElement * cos_a, 1 };
 
         d_inv_b2e = { cos_c, sin_c, 0, 0,            // (M_b2e)^-1
                 -sin_c * cos_a, cos_c * cos_a, -sin_a, 0,
                 -sin_c * sin_a, sin_a * cos_c, cos_a, 0,
-                0, 0, dist, 1 };
+                0, 0, m_distanceToPreceedingElement, 1 };
 
         d_e2b = { cos_c, sin_c, 0, 0, // M_e2b
                 -sin_c * cos_b, cos_c * cos_b,  sin_b, 0,
@@ -151,10 +155,11 @@ namespace RAY
 
 
         // world coordinates = world coord of previous element * transformation from previous element to this one
-        if (m_previous != NULL) { //Mi_g2e = Mi_b2e * M(i-1))_e2b * M_(i-1)_g2e
+        if (m_previous != NULL) { //Mi_g2e = M_i_b2e * M_(i-1))_e2b * M_(i-1)_g2e
+            std::cout << "calc world coordinates" << std::endl;
             d_g2e = getMatrixProductAsVector(m_previous->getE2B(), m_previous->getG2E());
             d_g2e = getMatrixProductAsVector(d_b2e, d_g2e);
-            // Mi_e2g = M_(i-1)_e2g * M(i-1)_e2b^-1 * Mi_b2e^-1
+            // Mi_e2g = M_(i-1)_e2g * M_(i-1)_e2b^-1 * M_i_b2e^-1
             d_e2g = getMatrixProductAsVector(m_previous->getInvE2B(), d_inv_b2e);
             d_e2g = getMatrixProductAsVector(m_previous->getE2G(), d_e2g);
         }
@@ -164,13 +169,15 @@ namespace RAY
             std::cout << "first element" << std::endl;
         }
 
-        // combine in and out transformation (global <-> element coordinates) with misalignment
-        m_inMatrix = d_g2e;
-        m_outMatrix = d_e2g;
-
-        // to use usual ray coordinatesystem, also contains misalignment
-        // m_inMatrix = d_b2e;
-        // m_outMatrix = d_e2b;
+        if(global) {  // combine in and out transformation (global <-> element coordinates) with misalignment
+            std::cout << "global" << std::endl;
+            m_inMatrix = d_g2e;
+            m_outMatrix = d_e2g;
+        }else{  // to use usual ray coordinatesystem, also contains misalignment
+            std::cout << "RAY-UI beam coordinates" << std::endl;
+            m_inMatrix = d_b2e;
+            m_outMatrix = d_e2b;
+        }
 
         std::cout << "inMatrix: " << m_inMatrix.size() << std::endl;
         for (int i = 0; i < 16; i++) {
@@ -192,7 +199,7 @@ namespace RAY
      *  @param: vector with 6 values: dx, dy, dz, dphi, psi, dchi
      *  @returns void
      */
-    void Quadric::setTemporaryMisalignment(std::vector<double> misalignment) {
+    void OpticalElement::setTemporaryMisalignment(std::vector<double> misalignment) {
         double dx = misalignment[0];
         double dy = misalignment[1];
         double dz = misalignment[2];
@@ -220,133 +227,168 @@ namespace RAY
         m_inverseTemporaryMisalignmentMatrix = getMatrixProductAsVector(inverseRotation, inverseTranslation);
     }
 
-    std::vector<double> Quadric::getQuadric()
-    {
-        return m_anchorPoints;
-    }
-
-    void Quadric::setObjectParameters(std::vector<double> params) {
-        assert(params.size() == 16);
-        m_objectParameters = params;
-    }
-
-    void Quadric::setElementParameters(std::vector<double> params) {
+    void OpticalElement::setElementParameters(std::vector<double> params) {
         assert(params.size() == 16);
         m_elementParameters = params;
     }
 
-    /**
-     * set a new set of parameters a_11 to a_44 for the quadric function
-     * order: a_11,a_12,a_13,a_14, a_21,a_22,a_23,a_24, a_31,a_32,a_33,a_34, a_41,a_42,a_43,a_44
-     * @param inputPoints   16 entry vector a_11 to a_44
-     * @return void
-    */
-    void Quadric::editQuadric(std::vector<double> inputPoints)
-    {
-        assert(inputPoints.size() == 16);
-        m_anchorPoints = inputPoints;
+    void OpticalElement::setDimensions(double width, double height) {
+        m_width = width;
+        m_height = height;
+        updateObjectParams();
     }
 
-    std::vector<double> Quadric::getAnchorPoints() const
-    {
-        return m_anchorPoints;
-    }
-    void Quadric::setInMatrix(std::vector<double> inputMatrix)
+    void OpticalElement::setInMatrix(std::vector<double> inputMatrix)
     {
         assert(inputMatrix.size() == 16);
         m_inMatrix = inputMatrix;
     }
-    void Quadric::setOutMatrix(std::vector<double> inputMatrix)
+    void OpticalElement::setOutMatrix(std::vector<double> inputMatrix)
     {
         assert(inputMatrix.size() == 16);
         m_outMatrix = inputMatrix;
     }
-    std::vector<double> Quadric::getInMatrix() const
+
+    void OpticalElement::setSurface(std::unique_ptr<Surface> surface) {
+        m_surface = std::move(surface);
+        assert(surface == nullptr);
+        assert(m_surface != nullptr);
+
+    }
+
+    void OpticalElement::updateObjectParams() {
+        m_objectParameters = {
+                m_width, m_height, m_slopeError[0], m_slopeError[1],
+                m_slopeError[2], m_slopeError[3], m_slopeError[4], m_slopeError[5],
+                m_slopeError[6],m_alpha,0,0,
+                0,0,0,0
+            };
+    }
+
+    void OpticalElement::setAlpha(double alpha) {
+        m_alpha = alpha;
+        updateObjectParams();
+    }
+    
+    void OpticalElement::setBeta(double beta) {
+        m_beta = beta;
+    }
+
+    double OpticalElement::getBeta() const {
+        return m_beta;
+    }
+
+    double OpticalElement::getWidth() const {
+        return abs(m_width);
+    }
+
+    double OpticalElement::getHeight() const {
+        return abs(m_height);
+    }
+
+    double OpticalElement::getAlpha() const {
+        return m_alpha;
+    }
+
+    double OpticalElement::getChi() const {
+        return m_chi;
+    }
+    double OpticalElement::getDistanceToPreceedingElement() const {
+        return m_distanceToPreceedingElement;
+    }
+
+    std::vector<double> OpticalElement::getInMatrix() const
     {
         return m_inMatrix;
     }
-    std::vector<double> Quadric::getOutMatrix() const
+    std::vector<double> OpticalElement::getOutMatrix() const
     {
         return m_outMatrix;
     }
 
-    std::vector<double> Quadric::getMisalignmentParams() const
+    std::vector<double> OpticalElement::getMisalignmentParams() const
     {
         return m_misalignmentParams;
     }
 
-    std::vector<double> Quadric::getMisalignmentMatrix() const
+    std::vector<double> OpticalElement::getMisalignmentMatrix() const
     {
         return d_misalignmentMatrix;
     }
 
-    std::vector<double> Quadric::getInverseMisalignmentMatrix() const
+    std::vector<double> OpticalElement::getInverseMisalignmentMatrix() const
     {
         return d_inverseMisalignmentMatrix;
     }
 
-    std::vector<double> Quadric::getB2E() const
+    std::vector<double> OpticalElement::getB2E() const
     {
         return d_b2e;
     }
 
-    std::vector<double> Quadric::getE2B() const
+    std::vector<double> OpticalElement::getE2B() const
     {
         return d_e2b;
     }
 
-    std::vector<double> Quadric::getInvB2E() const 
+    std::vector<double> OpticalElement::getInvB2E() const
     {
         return d_inv_b2e;
     }
 
-    std::vector<double> Quadric::getInvE2B() const
+    std::vector<double> OpticalElement::getInvE2B() const
     {
         return d_inv_e2b;
     }
 
-    std::vector<double> Quadric::getE2G() const
+    std::vector<double> OpticalElement::getE2G() const
     {
         return d_e2g;
     }
 
-    std::vector<double> Quadric::getG2E() const
+    std::vector<double> OpticalElement::getG2E() const
     {
         return d_g2e;
     }
 
-    std::vector<double> Quadric::getTempMisalignmentParams() const
+    std::vector<double> OpticalElement::getTempMisalignmentParams() const
     {
         return m_temporaryMisalignmentParams;
     }
 
-    std::vector<double> Quadric::getTempMisalignmentMatrix() const
+    std::vector<double> OpticalElement::getTempMisalignmentMatrix() const
     {
         return m_temporaryMisalignmentMatrix;
     }
 
-    std::vector<double> Quadric::getInverseTempMisalignmentMatrix() const
+    std::vector<double> OpticalElement::getInverseTempMisalignmentMatrix() const
     {
         return m_inverseTemporaryMisalignmentMatrix;
     }
 
-    std::vector<double> Quadric::getObjectParameters() const
+    std::vector<double> OpticalElement::getObjectParameters()
     {
         return m_objectParameters;
     }
 
-    std::vector<double> Quadric::getElementParameters() const
+    std::vector<double> OpticalElement::getElementParameters() const
     {
         return m_elementParameters;
     }
 
-    std::vector<double> Quadric::getSlopeError() const
+    std::vector<double> OpticalElement::getSurfaceParams() const
+    {
+        std::cout << "return anchor points" << std::endl;
+        //assert(m_surface!=nullptr);
+        if (m_surface != nullptr)
+            return m_surface->getParams();
+        else
+            return m_surfaceParams;
+    }
+
+    std::vector<double> OpticalElement::getSlopeError() const
     {
         return m_slopeError;
     }
 
-    const char* Quadric::getName() const
-    {
-        return m_name;
-    }
-} // namespace RAY
+} // namespace RAYX

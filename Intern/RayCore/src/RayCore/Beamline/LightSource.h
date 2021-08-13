@@ -1,28 +1,33 @@
 #pragma once
-#include "Core.h"
-#include "glm.hpp"
 #include <vector>
 #include <iostream>
 #include <stdexcept>
 #include <cmath>
-#include "Tracer/Ray.h"
 #include <string>
 #include <random>
 
-namespace RAY
+#include "glm.hpp"
+
+#include "Core.h"
+#include "Tracer/Ray.h"
+#include "BeamlineObject.h"
+
+namespace RAYX
 {
 
-    class RAY_API LightSource
+    class RAYX_API LightSource : public BeamlineObject
     {
     public:
 
-        LightSource(int id, int numberOfRays, std::string name, int spreadType, double photonEnergy, double energySpread, std::vector<double> misalignment);
-        std::string getName();
+        LightSource(const int id, const int numberOfRays, const char* name, const int spreadType, const double photonEnergy, const double energySpread, const double linPol0, const double linPol45, const double circPol, const std::vector<double> misalignment);
         int getNumberOfRays();
         int getId();
         std::vector<double> getMisalignmentParams();
         double getPhotonEnergy();
         double getEnergySpread();
+        double getLinear0();
+        double getLinear45();
+        double getCircular();
         int getSpreadType();
 
         double selectEnergy();
@@ -37,7 +42,7 @@ namespace RAY
     private:
         int m_id;
         int m_numberOfRays;
-        std::string m_name;
+        // std::string m_name;
         std::vector<double> m_misalignmentParams; // x, y, psi, phi
         // std::vector<Ray *> m_rayList; ?
 
@@ -50,9 +55,12 @@ namespace RAY
         SOURCE_DISTRIBUTION_TYPE m_sourceDistributionType;
         double m_energySpread;
         double m_photonEnergy;
+        double m_linearPol_0;
+        double m_linearPol_45;
+        double m_circularPol;
         std::uniform_real_distribution<double> m_unif;
         std::default_random_engine re;
 
     };
 
-} // namespace RAY
+} // namespace RAYX

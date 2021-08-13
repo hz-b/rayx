@@ -2,15 +2,15 @@
 #include <cassert>
 #include <cmath>
 
-namespace RAY
+namespace RAYX
 {
 
 
-    PointSource::PointSource(int id, std::string name, int numberOfRays, int spreadType,
-        double sourceWidth, double sourceHeight, double sourceDepth, double horDivergence,
-        double verDivergence, int widthDist, int heightDist, int horDist, int verDist,
-        double photonEnergy, double energySpread, std::vector<double> misalignment)
-        : LightSource(id, numberOfRays, name.c_str(), spreadType, photonEnergy, energySpread, misalignment),
+    PointSource::PointSource(const int id, const std::string name, const int numberOfRays, const int spreadType,
+        const double sourceWidth, const double sourceHeight, const double sourceDepth, const double horDivergence,
+        const double verDivergence, const int widthDist, const int heightDist, const int horDist, const int verDist,
+        const double photonEnergy, const double energySpread, const double linPol0, const double linPol45, const double circPol, const std::vector<double> misalignment)
+        : LightSource(id, numberOfRays, name.c_str(), spreadType, photonEnergy, energySpread, linPol0, linPol45, circPol, misalignment),
         m_sourceDepth(sourceDepth),
         m_sourceHeight(sourceHeight),
         m_sourceWidth(sourceWidth),
@@ -60,7 +60,9 @@ namespace RAY
             phi = getCoord(m_horDist, m_horDivergence) + getMisalignmentParams()[3];
             // get corresponding angles based on distribution and deviation from main ray (main ray: xDir=0,yDir=0,zDir=1 for phi=psi=0)
             glm::dvec3 direction = getDirectionFromAngles(phi, psi);
-            Ray r = Ray(position, direction, en, 1.0);
+            glm::dvec4 stokes = glm::dvec4(1, getLinear0(), getLinear45(), getCircular());
+
+            Ray r = Ray(position, direction, stokes, en, 1.0);
             rayVector.emplace_back(r);
         }
         std::cout << &(rayVector[0]) << std::endl;
@@ -71,7 +73,7 @@ namespace RAY
     /**
      * get deviation from main ray according to specified distribution (uniform if hard edge, gaussian if soft edge)) and extent (eg specified width/height of source)
      */
-    double PointSource::getCoord(PointSource::SOURCE_DIST l, double extent) {
+    double PointSource::getCoord(const PointSource::SOURCE_DIST l, const double extent) {
         if (l == SD_HARDEDGE) {
             return (m_uniform(m_re) - 0.5) * extent;
         }
@@ -80,9 +82,9 @@ namespace RAY
         }
     }
 
-    double PointSource::getSourceDepth() { return m_sourceDepth; }
-    double PointSource::getSourceHeight() { return m_sourceHeight; }
-    double PointSource::getSourceWidth() { return m_sourceWidth; }
-    double PointSource::getVerDivergence() { return m_verDivergence; }
-    double PointSource::getHorDivergence() { return m_horDivergence; }
-} // namespace RAY
+    double PointSource::getSourceDepth() const { return m_sourceDepth; }
+    double PointSource::getSourceHeight() const { return m_sourceHeight; }
+    double PointSource::getSourceWidth() const { return m_sourceWidth; }
+    double PointSource::getVerDivergence() const { return m_verDivergence; }
+    double PointSource::getHorDivergence() const { return m_horDivergence; }
+} // namespace RAYX

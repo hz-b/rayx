@@ -35,7 +35,7 @@ VkResult CreateDebugUtilsMessengerEXT(VkInstance instance, const VkDebugUtilsMes
 void DestroyDebugUtilsMessengerEXT(VkInstance instance, VkDebugUtilsMessengerEXT debugMessenger, const VkAllocationCallbacks* pAllocator);
 
 const int WORKGROUP_SIZE = 32;
-#define VULKANTRACER_RAY_DOUBLE_AMOUNT 8
+#define VULKANTRACER_RAY_DOUBLE_AMOUNT 12
 #define VULKANTRACER_QUADRIC_DOUBLE_AMOUNT 112 //7* dmat4 (16)
 #define VULKANTRACER_QUADRIC_PARAM_DOUBLE_AMOUNT 4
 #define GPU_MAX_STAGING_SIZE 134217728 //128MB
@@ -50,7 +50,7 @@ public:
     //void addRay(double xpos, double ypos, double zpos, double xdir, double ydir, double zdir, double weight);
     //void addRay(double* location);
     void addRayVector(void* location, size_t size);
-    void addQuadric(std::vector<double> inQuadric, std::vector<double> inputInMatrix, std::vector<double> inputOutMatrix, std::vector<double> misalignmentMatrix, std::vector<double> inverseMisalignmentMatrix, std::vector<double> objectParameters, std::vector<double> elementParameters);
+    void addVectors(std::vector<double> surfaceParams, std::vector<double> inputInMatrix, std::vector<double> inputOutMatrix, std::vector<double> misalignmentMatrix, std::vector<double> inverseMisalignmentMatrix, std::vector<double> objectParameters, std::vector<double> elementParameters);
     void getRays();
     void cleanup();
     void setBeamlineParameters(uint32_t inNumberOfBeamlines, uint32_t inNumberOfQuadricsPerBeamline, uint32_t inNumberOfRays);

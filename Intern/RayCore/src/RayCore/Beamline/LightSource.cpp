@@ -2,40 +2,64 @@
 #include <cassert>
 #include <cmath>
 
-namespace RAY
+namespace RAYX
 {
-    LightSource::LightSource(int id, int numberOfRays, std::string name, int spreadType,
-        double photonEnergy, double energySpread, std::vector<double> misalignment)
-        : m_id(id),
+    LightSource::LightSource(const int id, const int numberOfRays, const char* name, const int spreadType,
+        const double photonEnergy, const double energySpread, const double linPol0, const double linPol45, const double circPol, const std::vector<double> misalignment)
+        : BeamlineObject(name),
+        m_id(id),
         m_numberOfRays(numberOfRays),
-        m_name(name),
         m_misalignmentParams(misalignment),
         m_energySpread(energySpread),
-        m_photonEnergy(photonEnergy)
+        m_photonEnergy(photonEnergy),
+        m_linearPol_0(linPol0),
+        m_linearPol_45(linPol45),
+        m_circularPol(circPol)
     {
         std::uniform_real_distribution<double> m_unif(0, 1);
         m_energySpreadType = spreadType == 0 ? ES_WHITE_BAND : ES_THREE_ENERGIES;
     }
 
-    std::string LightSource::getName() { return m_name; }
-    int LightSource::getNumberOfRays() { return m_numberOfRays; }
-    double LightSource::getPhotonEnergy() { return m_photonEnergy; }
-    double LightSource::getEnergySpread() { return m_energySpread; }
-    int LightSource::getSpreadType() { return m_energySpreadType; }
-
-    void LightSource::setNumberOfRays(int numberOfRays) { m_numberOfRays = numberOfRays; }
-    int LightSource::getId() { return m_id; }
-    std::vector<double> LightSource::getMisalignmentParams() { return m_misalignmentParams; }
+    int LightSource::getNumberOfRays() {
+        return m_numberOfRays;
+    }
+    double LightSource::getPhotonEnergy() {
+        return m_photonEnergy;
+    }
+    double LightSource::getEnergySpread() {
+        return m_energySpread;
+    }
+    int LightSource::getSpreadType() {
+        return m_energySpreadType;
+    }
+    double LightSource::getLinear0() {
+        return m_linearPol_0;
+    }
+    double LightSource::getLinear45(){
+        return m_linearPol_45;
+    }
+    double LightSource::getCircular(){
+        return m_circularPol;
+    }
+    void LightSource::setNumberOfRays(const int numberOfRays) {
+        m_numberOfRays = numberOfRays;
+    }
+    int LightSource::getId() {
+        return m_id;
+    }
+    std::vector<double> LightSource::getMisalignmentParams() {
+        return m_misalignmentParams;
+    }
 
     // needed for many of the light sources, from two angles to one direction vector
-    glm::dvec3 LightSource::getDirectionFromAngles(double phi, double psi) {
+    glm::dvec3 LightSource::getDirectionFromAngles(const double phi, const double psi) {
         double al = cos(psi) * sin(phi);
         double am = -sin(psi);
         double an = cos(psi) * cos(phi);
         return glm::dvec3(al, am, an);
     }
 
-    //  (see RAY.FOR select_energy)
+    //  (see RAYX.FOR select_energy)
     double LightSource::selectEnergy() {
         double en;
         if (m_energySpread == 0) { // if there is no spread specified use photonenergy directly
@@ -57,4 +81,4 @@ namespace RAY
     {
     }
 
-} // namespace RAY
+} // namespace RAYX
