@@ -1408,13 +1408,15 @@ double wasteBox(double x, double z, double xLength, double zLength, double w)
 }
 
 /**
-* calculates the intersection point of a ray with a quadric surface defined by a_11..a_44
+* sets the intersection point & calculates normal
 * @param r				ray for which the intersection is fount
 * @param a_11..a_44		define the quadric surface
 * @param icurv 			defines whether the first or the second intersection is used (1=first, -1=second)
 *
-* output: reflected Ray with intersection point as position and reflection as direction
+* @return: normal
+* @see getIntersectionPoint() - intersectionPoint() splitted into setIntersectionPoint & getIntersectionPoint()
 */
+
 dvec4 setIntersectionPoint(inout Ray r, dmat4 quadric, int icurv, dvec4 closestHitpoint)
 {
 	double x = closestHitpoint.x;
@@ -1443,6 +1445,14 @@ dvec4 setIntersectionPoint(inout Ray r, dmat4 quadric, int icurv, dvec4 closestH
 	//r.direction = dvec3(firstParam,secondParam,c);
 	return normal;
 }
+/**
+* calculates the intersection point of a ray with a quadric surface defined by a_11..a_44
+* @param r				ray for which the intersection is fount
+* @param a_11..a_44		define the quadric surface
+* @param icurv 			defines whether the first or the second intersection is used (1=first, -1=second)
+*
+* @return intersection point & weight
+*/
 dvec4 getIntersectionPoint(Ray r, dmat4 quadric, int icurv)
 {	
 	double a_11 = quadric[0][0];
@@ -2328,7 +2338,7 @@ dvec4 getOpticalElementIntersection(Ray r, uint quadricIndex, int whichIntersect
 void dynamicQuadrics(){
 	
 	const int numberOfQuadrics = quadricData.length();
-	//placeholder, info should later be transfered to shader
+	//TODO: placeholder, info should later be transfered to shader
 	const int maxBounces = 2;
 	Ray ray = rayData[uint(gl_GlobalInvocationID)];
 	int whichIntersection = 1;
@@ -2340,13 +2350,14 @@ void dynamicQuadrics(){
 	//iterate bounces
 	int closestQuadricIndex = -1;
 	dvec4 closestHitpoint = dvec4(1.0/0.0, 1.0/0.0, 1.0/0.0, 0.0);
+	//iterates bounces of ray
 	for(int i = 0; i<maxBounces; i++){
 		ray = rayData[uint(gl_GlobalInvocationID)];
 
 		uint lastClosestQuadricIndex = closestQuadricIndex;
 		closestHitpoint = dvec4(1.0/0.0, 1.0/0.0, 1.0/0.0, 0);
-		//find intersection points with all quadrics
 
+		//find intersection points with all quadrics
 		for(int quadricIndex = 0; quadricIndex<numberOfQuadrics; quadricIndex++){
 			if(quadricIndex == lastClosestQuadricIndex){
 				//TODO: self-intersection
