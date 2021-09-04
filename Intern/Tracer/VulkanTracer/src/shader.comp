@@ -2371,7 +2371,7 @@ Ray traceImagePlane(Ray r, const Quadric q) {
 	r.position.x = r.position.x + ((r.direction.x / r.direction.z) * offset); // scale x-slope of ray (l/n) by z-length between origin and image plane
 	r.position.y = r.position.y + ((r.direction.y / r.direction.z) * offset);
 	r.position.z = 0;
-	r = rayMatrixMult(r, q.outTrans);
+	//r = rayMatrixMult(r, q.outTrans);
 	return r;
 }
 
@@ -2892,8 +2892,8 @@ void cameraPlaneIntersection(outputData, cameraPlane){
 }
 */
 void main(){
-    //testFunctions();
-	iterateQuadrics();
+    testFunctions();
+	//iterateQuadrics();
 	/*
 	Ray r = rayData[uint(gl_GlobalInvocationID)];
 	r.weight = double(ctr);

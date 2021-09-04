@@ -19,7 +19,13 @@ namespace RAYX
      *          lineDensity = line density of the grating
      *          orderOfDiffraction =
     */
-    ReflectionZonePlate::ReflectionZonePlate(const char* name, const int geometricShape, const int mount, const int curvatureType, const int designType, const int elementOffsetType, const double width, const double height, const double deviation, const double incidenceAngle, const double azimuthal, const double distanceToPreceedingElement, const double designEnergy, const double sourceEnergy, const double orderOfDiffraction, const double designOrderOfDiffraction, const double dAlpha, const double dBeta, const double mEntrance, const double mExit, const double sEntrance, const double sExit, const double shortRadius, const double longRadius, const int additional_zero_order, const double elementOffsetZ, const double fresnelZOffset, const double beta, const std::vector<double> misalignmentParams, const std::vector<double> slopeError, const std::shared_ptr<OpticalElement> previous, bool global)
+    ReflectionZonePlate::ReflectionZonePlate(const char* name, const int geometricShape, const int mount, const int curvatureType, const int designType, 
+    const int elementOffsetType, const double width, const double height, const double deviation, const double incidenceAngle, const double azimuthal, 
+    const double distanceToPreceedingElement, const double designEnergy, const double sourceEnergy, const double orderOfDiffraction, 
+    const double designOrderOfDiffraction, const double dAlpha, const double dBeta, const double mEntrance, const double mExit, const double sEntrance, 
+    const double sExit, const double shortRadius, const double longRadius, const int additional_zero_order, const double elementOffsetZ, 
+    const double fresnelZOffset, const double beta, const std::vector<double> misalignmentParams, const std::vector<double> slopeError, 
+    const std::shared_ptr<OpticalElement> previous, bool global)
         : OpticalElement(name, width, height, rad(azimuthal), distanceToPreceedingElement, slopeError, previous),
         m_designAlphaAngle(rad(dAlpha)),
         m_designBetaAngle(rad(dBeta)),
@@ -65,7 +71,7 @@ namespace RAYX
             calcBeta2();
         }
         else { // auto == true
-            setBeta(beta);
+            setBeta(rad(beta));
         }
         std::cout << "alpha: " << getAlpha() << ", beta: " << getBeta() << std::endl;
         printInfo();
