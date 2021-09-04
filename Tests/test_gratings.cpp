@@ -57,6 +57,7 @@ TEST(planeGrating, testParams) {
     int orderOfDiffraction = 1; // use others
     double fixFocusConstantCFF = 12.1;
     int add_order = 0;
+    int icurv = 1;
     std::vector<double> sE = { 0,0,0,0,0, 0,0 };
     std::vector<double> mis = { 5.212,7.3,0.35, 0.23,0.011,0.0006 };
     std::vector<double> vls = { 2.1, 0.12, 12.2, 8.3, 5.1, 7.23 };
@@ -65,7 +66,7 @@ TEST(planeGrating, testParams) {
     double beta = 1.467650597188248;
     double alpha = 1.457521229154248;
     double a = 0.010070077944000002;
-    std::vector<double> quad = { 0,0,0,0, 0,0,0,-1, 0,0,0,0, 1,0,0,0 };
+    std::vector<double> quad = { 0,0,0,0, double(icurv),0,0,-1, 0,0,0,0, 1,0,0,0 };
     std::vector<double> objparams = {width, height, sE[0], sE[1], 
                                     sE[2], sE[3], sE[4], sE[5], 
                                     sE[6], alpha, 0, 0,
@@ -97,7 +98,7 @@ TEST(planeGrating, testParams) {
     orderOfDiffraction = 3;
     a = 0.030210233832000003;
     beta = 1.3380699314613769;
-    quad = { 0,0,0,0, 0,0,0,-1, 0,0,0,0, 1,0,0,0 };
+    quad = { 0,0,0,0, double(icurv),0,0,-1, 0,0,0,0, 1,0,0,0 };
     objparams = {width, height, sE[0], sE[1], 
                                     sE[2], sE[3], sE[4], sE[5], 
                                     sE[6], alpha, 0, 0,
@@ -122,7 +123,7 @@ TEST(planeGrating, testParams) {
     a = 0.030210233832000003;
     alpha = 1.4473913414095938;
     beta = 1.4777804849329026;
-    quad = { 0,0,0,0, 0,0,0,-1, 0,0,0,0, 1,0,0,0 };
+    quad = { 0,0,0,0, double(icurv),0,0,-1, 0,0,0,0, 1,0,0,0 };
     elparams = { 0,0,lineDensity,double(orderOfDiffraction), abs(hvlam(designEnergyMounting)),0,vls[0],vls[1], vls[2],vls[3],vls[4],vls[5], 0,0,0,double(add_order) };
     objparams = {width, height, sE[0], sE[1], 
                                     sE[2], sE[3], sE[4], sE[5], 
@@ -166,6 +167,7 @@ TEST(SphereGrating, testParams) {
     double linedensity = 432.2;
     int add_order = 0;
     int order = 1;
+    int icurv = 1;
     std::vector<double> mis = { 1.41,5.3,1.5, 0.2,1.0,1.4 };
     std::vector<double> vls = { 2.1, 0.12, 12.2, 8.3, 5.1, 7.23 };
     std::vector<double> sE = { 0.1,0.5,0.1,0.2,0.5, 1,3 };
@@ -177,7 +179,7 @@ TEST(SphereGrating, testParams) {
     double theta = 4.6738270800745312;
     double radius = 1134.9852832410934;
     double a = 0.002307769312661499;
-    std::vector<double> quad = { 1,0,0,0, 0,1,0,-radius, 0,0,1,0, 2,0,0,0 };
+    std::vector<double> quad = { 1,0,0,0, double(icurv),1,0,-radius, 0,0,1,0, 2,0,0,0 };
     std::vector<double> elparams = { 0,0,linedensity,double(order), abs(hvlam(designEnergy)),0,vls[0],vls[1], vls[2],vls[3],vls[4],vls[5], 0,0,0,0 };
     std::vector<double> objparams = {width, height, sE[0], sE[1], 
                                     sE[2], sE[3], sE[4], sE[5], 

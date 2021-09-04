@@ -49,7 +49,8 @@ namespace RAYX
             m_vls[2], m_vls[3], m_vls[4], m_vls[5],
             0, 0, 0, double(m_additionalOrder) });
         setTemporaryMisalignment({ 0,0,0,0,0,0 });
-        setSurface(std::make_unique<Quadric>(std::vector<double>{0, 0, 0, 0, 0, 0, 0, -1, 0, 0, 0, 0, 1, 0, 0, 0}));
+        double icurv = 1;
+        setSurface(std::make_unique<Quadric>(std::vector<double>{0, 0, 0, 0, icurv, 0, 0, -1, 0, 0, 0, 0, 1, 0, 0, 0}));
     }
 
     PlaneGrating::~PlaneGrating()

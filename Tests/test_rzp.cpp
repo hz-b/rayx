@@ -71,6 +71,7 @@ TEST(RZP, testdefaultParams) {
     double longRadius = 0;
     double elementOffsetZ = 2;
     double fresnelOffset = 0;
+    int icurv = 1;
     std::vector<double> mis = { 1,2,3, 0.001,0.002,0.003 };
     std::vector<double> sE = { 1,2,3,4,5,6,7 };
     RAYX::ReflectionZonePlate rzp = RAYX::ReflectionZonePlate("RZP", geometricalShape, mount, curvatureType, designType, elementOffsetType, width, height, deviation, grazingIncidence, azimuthal, dist, designEnergy, sourceEnergy, orderOfDiffraction, designOrderOfDiffraction, dAlpha, dBeta, sEntrance, sExit, mEntrance, mExit, shortRadius, longRadius, additionalOrder, elementOffsetZ, fresnelOffset, beta_in, mis, sE, NULL, false);
@@ -80,7 +81,7 @@ TEST(RZP, testdefaultParams) {
     double d_alpha = 0.017453292519943295;
     double d_beta = 0.017453292519943295;
     double wl = 12.39852;
-    std::vector<double> quad = { 0,0,0,0, 0,0,0,-1, 0,0,0,0, 4,0,0,0 }; // plane
+    std::vector<double> quad = { 0,0,0,0, double(icurv),0,0,-1, 0,0,0,0, 4,0,0,0 }; // plane
     std::vector<double> correctElementParams = { 0, 0, 0, inm2eV / sourceEnergy,
                         sourceEnergy, designOrderOfDiffraction, orderOfDiffraction, fresnelOffset,
                         sEntrance, sExit, mEntrance, mExit,
@@ -141,6 +142,7 @@ TEST(RZP, testdefaultParamsElliptical) {
     double longRadius = 0;
     double elementOffsetZ = 2;
     double fresnelOffset = 0;
+    int icurv = 1;
     std::vector<double> mis = { 1,2,3, 0.001,0.002,0.003 };
     std::vector<double> sE = { 1,2,3,4,5,6,7 };
     RAYX::ReflectionZonePlate rzp = RAYX::ReflectionZonePlate("RZP", geometricalShape, mount, curvatureType, designType, elementOffsetType, width, height, deviation, grazingIncidence, azimuthal, dist, designEnergy, sourceEnergy, orderOfDiffraction, designOrderOfDiffraction, dAlpha, dBeta, sEntrance, sExit, mEntrance, mExit, shortRadius, longRadius, additionalOrder, elementOffsetZ, fresnelOffset, beta_in, mis, sE, NULL, false);
@@ -150,7 +152,7 @@ TEST(RZP, testdefaultParamsElliptical) {
     double d_alpha = 0.017453292519943295;
     double d_beta = 0.017453292519943295;
     double wl = 12.39852;
-    std::vector<double> quad = { 0,0,0,0, 0,0,0,-1, 0,0,0,0, 4,0,0,0 }; // plane
+    std::vector<double> quad = { 0,0,0,0, double(icurv),0,0,-1, 0,0,0,0, 4,0,0,0 }; // plane
     std::vector<double> correctElementParams = { 0, 0, 0, inm2eV / sourceEnergy,
                         sourceEnergy, designOrderOfDiffraction, orderOfDiffraction, fresnelOffset,
                         sEntrance, sExit, mEntrance, mExit,
@@ -178,6 +180,61 @@ TEST(RZP, testdefaultParamsElliptical) {
     EXPECT_NEAR(rzp.getBeta(), beta, 0.00000001);
     EXPECT_NEAR(rzp.getAlpha(), alpha, 0.000000001);
 
+
+}
+
+TEST(RZP, testParamsBeta1) {
+    int mount = 0;
+    int geometricShape = 0;
+    int curvatureType = 0;
+    int designType = 0;
+    int elementOffsetType = 0;
+    int additionalOrder = 0;
+    double beta = 1;
+    double width = 151.74;
+    double height = 354.3;
+    double deviation = 13.7;
+    double grazingIncidence = 12.5;
+    double azimuthal = 32.412;
+    double dist = 5123.753;
+    double designEnergy = 331.5;
+    double sourceEnergy = 100; // using this per default (auto==true)
+    double orderOfDiffraction = 1;
+    double designOrderOfDiffraction = -1;
+    double dAlpha = 1; // degree
+    double dBeta = 1;
+    double sEntrance = 100;
+    double sExit = 500;
+    double mEntrance = 100;
+    double mExit = 500;
+    double shortRadius = 0;
+    double longRadius = 0;
+    double elementOffsetZ = 0;
+    double fresnelOffset = 12;
+    int icurv = 1;
+    std::vector<double> mis = { 0,0,0, 0,0,0 };
+    std::vector<double> sE = { 1,3,4,5,6,7,9 };
+    RAYX::ReflectionZonePlate rzp = RAYX::ReflectionZonePlate("RZP", geometricShape, mount, curvatureType, designType, elementOffsetType, width, height, deviation, grazingIncidence, azimuthal, dist, designEnergy, sourceEnergy, orderOfDiffraction, designOrderOfDiffraction, dAlpha, dBeta, sEntrance, sExit, mEntrance, mExit, shortRadius, longRadius, additionalOrder, elementOffsetZ, fresnelOffset, beta, mis, sE, NULL, false);
+    std::vector<double> quad = { 0,0,0,0, double(icurv),0,0,-1, 0,0,0,0, 4,0,0,0 }; // plane
+    std::vector<double> correctMis = { 1,0,0,0, 0,1,0,0, 0,0,1,0, 0,0,0,1 };
+    std::vector<double> correctElementParams = { 0, 0, 0, inm2eV / sourceEnergy,
+                        sourceEnergy, designOrderOfDiffraction, orderOfDiffraction, fresnelOffset,
+                        sEntrance, sExit, mEntrance, mExit,
+                        rad(dAlpha), rad(dBeta), elementOffsetZ, double(additionalOrder) };
+    std::vector<double> correctObjectParams = { width, height, sE[0], sE[1],
+                        sE[2], sE[3], sE[4], sE[5], 
+                        sE[6], rzp.getAlpha(), 0, 0,
+                        0, 0, 0, 0};  
+    double beta_correct = 0.017453292519943295;  
+    EXPECT_DOUBLE_EQ(beta_correct, rzp.getBeta());
+    EXPECT_ITERABLE_DOUBLE_EQ(std::vector<double>, rzp.getObjectParameters(), correctObjectParams);
+    EXPECT_ITERABLE_DOUBLE_EQ(std::vector<double>, rzp.getElementParameters(), correctElementParams);
+    EXPECT_ITERABLE_DOUBLE_EQ(std::vector<double>, rzp.getSlopeError(), sE);
+    EXPECT_ITERABLE_DOUBLE_EQ(std::vector<double>, rzp.getSurfaceParams(), quad);
+    EXPECT_ITERABLE_DOUBLE_EQ(std::vector<double>, rzp.getMisalignmentMatrix(), correctMis);
+    EXPECT_ITERABLE_DOUBLE_EQ(std::vector<double>, rzp.getTempMisalignmentMatrix(), correctMis);
+    EXPECT_ITERABLE_DOUBLE_EQ(std::vector<double>, rzp.getInverseMisalignmentMatrix(), correctMis);
+    EXPECT_ITERABLE_DOUBLE_EQ(std::vector<double>, rzp.getInverseTempMisalignmentMatrix(), correctMis);
 
 }
 
@@ -209,9 +266,11 @@ TEST(RZP, testParams) {
     double longRadius = 0;
     double elementOffsetZ = 0;
     double fresnelOffset = 12;
+    int icurv = 1;
     std::vector<double> mis = { 0,0,0, 0,0,0 };
     std::vector<double> sE = { 1,3,4,5,6,7,9 };
     RAYX::ReflectionZonePlate rzp = RAYX::ReflectionZonePlate("RZP", geometricShape, mount, curvatureType, designType, elementOffsetType, width, height, deviation, grazingIncidence, azimuthal, dist, designEnergy, sourceEnergy, orderOfDiffraction, designOrderOfDiffraction, dAlpha, dBeta, sEntrance, sExit, mEntrance, mExit, shortRadius, longRadius, additionalOrder, elementOffsetZ, fresnelOffset, beta, mis, sE, NULL, false);
+    std::vector<double> quad = { 0,0,0,0, double(icurv),0,0,-1, 0,0,0,0, 4,0,0,0 }; // plane
     std::vector<double> correctMis = { 1,0,0,0, 0,1,0,0, 0,0,1,0, 0,0,0,1 };
     std::vector<double> correctElementParams = { 0, 0, 0, inm2eV / sourceEnergy,
                         sourceEnergy, designOrderOfDiffraction, orderOfDiffraction, fresnelOffset,
@@ -221,9 +280,11 @@ TEST(RZP, testParams) {
                         sE[2], sE[3], sE[4], sE[5], 
                         sE[6], rzp.getAlpha(), 0, 0,
                         0, 0, 0, 0};    
+    
     EXPECT_ITERABLE_DOUBLE_EQ(std::vector<double>, rzp.getObjectParameters(), correctObjectParams);
     EXPECT_ITERABLE_DOUBLE_EQ(std::vector<double>, rzp.getElementParameters(), correctElementParams);
     EXPECT_ITERABLE_DOUBLE_EQ(std::vector<double>, rzp.getSlopeError(), sE);
+    EXPECT_ITERABLE_DOUBLE_EQ(std::vector<double>, rzp.getSurfaceParams(), quad);
     EXPECT_ITERABLE_DOUBLE_EQ(std::vector<double>, rzp.getMisalignmentMatrix(), correctMis);
     EXPECT_ITERABLE_DOUBLE_EQ(std::vector<double>, rzp.getTempMisalignmentMatrix(), correctMis);
     EXPECT_ITERABLE_DOUBLE_EQ(std::vector<double>, rzp.getInverseMisalignmentMatrix(), correctMis);

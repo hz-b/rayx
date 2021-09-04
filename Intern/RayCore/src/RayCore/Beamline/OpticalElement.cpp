@@ -185,6 +185,13 @@ namespace RAYX
             if (i % 4 == 3) std::cout << std::endl;
         }
         std::cout << std::endl;
+        std::cout << "outMatrix: " << m_outMatrix.size() << std::endl;
+        for (int i = 0; i < 16; i++) {
+            std::cout << m_outMatrix[i] << ", ";
+            if (i % 4 == 3) std::cout << std::endl;
+        }
+        std::cout << std::endl;
+        std::cout << "beta: " << m_beta << std::endl;
 
     }
 

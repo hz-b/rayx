@@ -234,6 +234,18 @@ void compareFromFunction(fn<ret, par> func, std::vector<RAYX::Ray> testValues, s
     }
 }
 
+void testOpticalElement(std::vector<std::shared_ptr<RAYX::OpticalElement>> elements, int n) {
+    std::shared_ptr<RAYX::MatrixSource> m = std::make_shared<RAYX::MatrixSource>(0, "Matrix source 1", n, 0, 0.065, 0.04, 0.0, 0.001, 0.001, 100, 0, 1, 0, 0, std::vector<double>{ 0,0,0,0 });
+
+    std::list<double> outputRays = runTracer(m->getRays(), elements);
+    std::string filename = "testFile_";
+    std::cout << elements[0]->getName();
+    filename.append(elements[0]->getName());
+    writeToFile(outputRays, filename);
+}
+
+// TEST 
+
 /*
 TEST(Tracer, testUniformRandom) {
     double settings = 17;
@@ -1010,22 +1022,14 @@ TEST(Tracer, getThetaTest) {
     double tolerance = 1e-09;
     compareFromCorrect(correct, outputRays, tolerance);
 
-}
+}*/
 
 
-void testOpticalElement(std::vector<std::shared_ptr<RAYX::OpticalElement>> elements, int n) {
-    std::shared_ptr<RAYX::MatrixSource> m = std::make_shared<RAYX::MatrixSource>(0, "Matrix source 1", n, 0, 0.065, 0.04, 0.0, 0.001, 0.001, 100, 0, 1, 0, 0, std::vector<double>{ 0,0,0,0 });
 
-    std::list<double> outputRays = runTracer(m->getRays(), elements);
-    std::string filename = "testFile_";
-    std::cout << elements[0]->getName();
-    filename.append(elements[0]->getName());
-    writeToFile(outputRays, filename);
-}
 // test complete optical elements instead of single functions
 // uses deterministic source (matrix source with source depth = 0)
 // use name of optical element as file name
-
+/*
 TEST(opticalElements, planeMirrorDefault) {
     std::shared_ptr<RAYX::PlaneMirror> plM = std::make_shared<RAYX::PlaneMirror>("PlaneMirrorDef", 50, 200, 10, 7.5, 10000, std::vector<double>{ 0,0,0, 0,0,0 }, zeros7, nullptr, false); // {1,2,3,0.01,0.02,0.03}
     testOpticalElement({ plM }, 20);
@@ -1119,10 +1123,10 @@ TEST(globalCoordinates, FourMirrors_9Rays) {
 }
 
 TEST(globalCoordinates, FourMirrors_20Rays) {
-    std::shared_ptr<RAYX::PlaneMirror> p1 = std::make_shared<RAYX::PlaneMirror>("globalCoordinates_20rays", 50, 200, 10, 7, 10000, std::vector<double>{ 0,0,0, 0,0,0 }, zeros7, nullptr, false); // {1,2,3,0.01,0.02,0.03}
-    std::shared_ptr<RAYX::PlaneMirror> p2 = std::make_shared<RAYX::PlaneMirror>("PlaneMirror2", 50, 200, 15, 4, 10000, std::vector<double>{ 0,0,0, 0,0,0 }, zeros7, p1, false); // {1,2,3,0.01,0.02,0.03}
-    std::shared_ptr<RAYX::PlaneMirror> p3 = std::make_shared<RAYX::PlaneMirror>("PlaneMirror3", 50, 200, 7, 10, 10000, std::vector<double>{ 0,0,0, 0,0,0 }, zeros7, p2, false); // {1,2,3,0.01,0.02,0.03}
-    std::shared_ptr<RAYX::PlaneMirror> p4 = std::make_shared<RAYX::PlaneMirror>("PlaneMirror4", 50, 200, 22, 17, 10000, std::vector<double>{ 0,0,0, 0,0,0 }, zeros7, p3, false); // {1,2,3,0.01,0.02,0.03}
+    std::shared_ptr<RAYX::PlaneMirror> p1 = std::make_shared<RAYX::PlaneMirror>("globalCoordinates_20rays", 50, 200, 10, 7, 10000, std::vector<double>{ 0,0,0, 0,0,0 }, zeros7, nullptr, true); // {1,2,3,0.01,0.02,0.03}
+    std::shared_ptr<RAYX::PlaneMirror> p2 = std::make_shared<RAYX::PlaneMirror>("PlaneMirror2", 50, 200, 15, 4, 10000, std::vector<double>{ 0,0,0, 0,0,0 }, zeros7, p1, true); // {1,2,3,0.01,0.02,0.03}
+    std::shared_ptr<RAYX::PlaneMirror> p3 = std::make_shared<RAYX::PlaneMirror>("PlaneMirror3", 50, 200, 7, 10, 10000, std::vector<double>{ 0,0,0, 0,0,0 }, zeros7, p2, true); // {1,2,3,0.01,0.02,0.03}
+    std::shared_ptr<RAYX::PlaneMirror> p4 = std::make_shared<RAYX::PlaneMirror>("PlaneMirror4", 50, 200, 22, 17, 10000, std::vector<double>{ 0,0,0, 0,0,0 }, zeros7, p3, true); // {1,2,3,0.01,0.02,0.03}
     // to stay in element coordinates and make a comparison with old RAY possible
     p4->setOutMatrix({ 1,0,0,0, 0,1,0,0, 0,0,1,0, 0,0,0,1 });
     testOpticalElement({ p1, p2, p3, p4 }, 20);
@@ -1159,7 +1163,7 @@ TEST(opticalElements, slit1) {
     }
 }
 
-bool global = false;
+bool global = true;
 // PETES SETUP
 // spec1-first_rzp4mm
 TEST(PeteRZP, spec1_first_rzp) {

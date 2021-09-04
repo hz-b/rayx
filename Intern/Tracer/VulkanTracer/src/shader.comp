@@ -323,77 +323,22 @@ int i4_mach ( int i )
     Output, int I4_MACH, the value of the chosen parameter.
 */
 {
-	int value;
+	int[18] return_values = int[18](1, 5, 6, 7, 6, 32, 4, 2, 31, 2147483647, 2, 24, -125, 128, 53, -1021, 1024, 0);
 
 	if ( i < 1 ) {
-		//fprintf ( stderr, "\n" );
-		//fprintf ( stderr, "I4_MACH - Fatal error!\n" );
 		//fprintf ( stderr, "  The input argument I is out of bounds.\n" );
 		//fprintf ( stderr, "  Legal values satisfy 1 <= I <= 16.\n" );
 		//fprintf ( stderr, "  I = %d\n", i );
-		value = 0;
 		return 1;
-		///exit ( 1 );
-	}
-	else if ( i == 1 ) {
-		value = 5;
-	}
-	else if ( i == 2 ) {
-		value = 6;
-	}
-	else if ( i == 3 ) {
-		value = 7;
-	}
-	else if ( i == 4 ) {
-		value = 6;
-	}
-	else if ( i == 5 ) {
-		value = 32;
-	}
-	else if ( i == 6 ) {
-		value = 4;
-	}
-	else if ( i == 7 ) {
-		value = 2;
-	}
-	else if ( i == 8 ) {
-		value = 31;
-	}
-	else if ( i == 9 ) {
-		value = 2147483647;
-	}
-	else if ( i == 10 ) {
-		value = 2;
-	}
-	else if ( i == 11 ) {
-		value = 24;
-	}
-	else if ( i == 12 ) {
-		value = -125;
-	}
-	else if ( i == 13 ) {
-		value = 128;
-	}
-	else if ( i == 14 ) {
-		value = 53;
-	}
-	else if ( i == 15 ) {
-		value = -1021;
-	}
-	else if ( i == 16 ) {
-		value = 1024;
 	}
 	else if ( 16 < i ) {
-		//fprintf ( stderr, "\n" );
-		//fprintf ( stderr, "I4_MACH - Fatal error!\n" );
 		//fprintf ( stderr, "  The input argument I is out of bounds.\n" );
 		//fprintf ( stderr, "  Legal values satisfy 1 <= I <= 16.\n" );
 		//fprintf ( stderr, "  I = %d\n", i );
-		value = 0;
-		//exit ( 1 );
+		return 0;
 	}
 
-	return value;
+	return return_values[i];
 }
 
 double r8_mach ( int i )
@@ -455,26 +400,18 @@ double r8_mach ( int i )
 		//fprintf ( stderr, "  Legal values satisfy 1 <= I <= 5.\n" );
 		//fprintf ( stderr, "  I = %d\n", i );
     	value = 0.0;
-    	return value;
-  	}else if ( i == 1 ) {
-    	value = 4.450147717014403E-308;
-  	}else if ( i == 2 ){
-    	value = 8.988465674311579E+307;
-	}else if ( i == 3 ){
-    	value = 1.110223024625157E-016;
-  	}else if ( i == 4 ) {
-    	value = 2.220446049250313E-016;
-	}else if ( i == 5 ) {
-    	value = 0.301029995663981E+000;
+    	return 0.0;
   	}else if ( 5 < i ) {
 		//fprintf ( stderr, "\n" );
 		//fprintf ( stderr, "R8_MACH - Fatal error!\n" );
 		//fprintf ( stderr, "  The input argument I is out of bounds.\n" );
 		//fprintf ( stderr, "  Legal values satisfy 1 <= I <= 5.\n" );
 		//fprintf ( stderr, "  I = %d\n", i );
-		value = 0.0;
+		return 0.0;
 	}
-	return value;
+	
+	double [6] return_values = double[6] (0, 4.450147717014403E-308, 8.988465674311579E+307, 1.110223024625157E-016, 2.220446049250313E-016, 0.301029995663981E+000);  
+	return return_values[i];
 }
 
 double r8_pak ( double y, int n )
@@ -1388,7 +1325,7 @@ double[2] gaussian(inout uint64_t ctr) {
 
 /**
 * checks whether the intersection point is within the extent of the surface
-* @param x, z			 	x- and z-coordinates of the intersection point
+* @param x, z			 	x- and z-coordinates of the intersection point in element coordinates
 * @param xLength, zLength	width and length of the optical element
 * @param w 					current weight of the ray
 *
@@ -1422,7 +1359,7 @@ double wasteBox(double x, double z, double xLength, double zLength, double w)
 *
 * output: reflected Ray with intersection point as position and reflection as direction
 */
-dvec4 intersectionPoint(inout Ray r, const dmat4 quadric, int icurv)
+dvec4 intersectionPoint(inout Ray r, const dmat4 quadric)
 {
 	// //for testing
 	// double firstParam;
@@ -1438,6 +1375,7 @@ dvec4 intersectionPoint(inout Ray r, const dmat4 quadric, int icurv)
 	double a_33 = quadric[2][2];
 	double a_34 = quadric[2][3];
 	double a_44 = quadric[3][3];
+	int icurv = int(quadric[1][0]);
 
 	double w = r.weight;
 	int cs = 1;
@@ -1544,6 +1482,231 @@ dvec4 intersectionPoint(inout Ray r, const dmat4 quadric, int icurv)
 	return normal;
 }
 
+dvec4 getIntersectionPoint(Ray r, dmat4 quadric)
+{
+	// //for testing
+	// double firstParam;
+	// double secondParam;
+
+	double a_11 = quadric[0][0];
+	double a_12 = quadric[0][1];
+	double a_13 = quadric[0][2];
+	double a_14 = quadric[0][3];
+	double a_22 = quadric[1][1];
+	double a_23 = quadric[1][2];
+	double a_24 = quadric[1][3];
+	double a_33 = quadric[2][2];
+	double a_34 = quadric[2][3];
+	double a_44 = quadric[3][3];
+	int icurv = int(quadric[1][0]);
+
+	double w = r.weight;
+	int cs = 1;
+	int d_sign = icurv;
+	if (abs(r.direction[1]) >= abs(r.direction[0]) && abs(r.direction[1]) >= abs(r.direction[2])) {
+		cs = 2;
+	}else if (abs(r.direction[2]) >= abs(r.direction[0]) && abs(r.direction[2]) >= abs(r.direction[1])) {
+		cs = 3;
+	}
+
+	double x;
+	double y;
+	double z;
+	double a = 0;
+	double b = 0;
+	double c = 0;
+
+	if (cs == 1) {
+		double aml = r.direction[1] / r.direction[0];
+		double anl = r.direction[2] / r.direction[0];
+		y = r.position[1] - aml * r.position[0];
+		z = r.position[2] - anl * r.position[0];
+		d_sign = int(sign(r.direction[0]) * icurv);
+
+		a = a_11 + 2*a_12*aml + a_22*aml*aml + 2*a_13*anl + 2*a_23*aml*anl + a_33*anl*anl;
+        b = a_14 + a_24*aml + a_34*anl + (a_12 + a_22*aml + a_23*anl)*y + (a_13 + a_23*aml + a_33*anl)*z;
+        c = a_44 + a_22*y*y + 2*a_34*z + a_33*z*z + 2*y*(a_24 + a_23*z);
+
+		double bbac = b*b - a*c;
+		if (bbac < 0) {
+			w = 0.0;
+			x = - y/aml; 	// x such that y=0
+		}else{
+			if (abs(a) > abs(c)*1e-10) {
+				x = (-b + d_sign*sqrt(bbac)) / a;
+			}else{
+				x = (-c/2)/b;
+			}
+		}
+		y = y + aml*x;
+		z = z + anl*x;
+	}else if (cs == 2) {
+		double alm = r.direction[0] / r.direction[1];
+		double anm = r.direction[2] / r.direction[1];
+		x = r.position[0] - alm * r.position[1];
+		z = r.position[2] - anm * r.position[1];
+		d_sign = int(sign(r.direction[1]) * icurv);
+
+		a = a_22 + 2*a_12*alm + a_11*alm*alm + 2*a_23*anm + 2*a_13*alm*anm + a_33*anm*anm;
+        b = a_24 + a_14*alm + a_34*anm + (a_12 + a_11*alm + a_13*anm)*x + (a_23 + a_13*alm + a_33*anm)*z;
+        c = a_44 + a_11*x*x + 2*a_34*z + a_33*z*z + 2*x*(a_14 + a_13*z);
+
+		double bbac = b*b - a*c;
+		if (bbac < 0) {
+			w = 0.0;
+			y = 0;
+		}else{
+			if (abs(a) > abs(c)*1e-10) {
+				y = (-b + d_sign*sqrt(bbac)) / a;
+			}else{
+				y = (-c/2)/b;
+			}
+		}
+		x = x + alm*y;
+		z = z + anm*y;
+
+	}else{
+		double aln = r.direction[0] / r.direction[2];
+		double amn = r.direction[1] / r.direction[2];
+		// firstParam = aln;
+		// secondParam = amn;
+		x = r.position[0] - aln * r.position[2];
+		y = r.position[1] - amn * r.position[2];
+		d_sign = int(sign(r.direction[2]) * icurv);
+
+		a = a_33 + 2*a_13*aln + a_11*aln*aln + 2*a_23*amn + 2*a_12*aln*amn + a_22*amn*amn;
+        b = a_34 + a_14*aln + a_24*amn + (a_13 + a_11*aln + a_12*amn)*x + (a_23 + a_12*aln + a_22*amn)*y;
+        c = a_44 + a_11*x*x + 2*a_24*y + a_22*y*y + 2*x*(a_14 + a_12*y);
+
+		double bbac = b*b - a*c;
+		if (bbac < 0) {
+			w = 0.0;
+			z = -y / amn;
+		}else{
+			if (abs(a) > abs(c)*1e-10) {//pow(10, double(-10))) {
+				z = (-b + d_sign*sqrt(bbac)) / a;
+			}else{
+				z = (-c/2)/b;
+			}
+		}
+		x = x + aln*z;
+		y = y + amn*z;
+		//r.position = dvec3(a, b, c);
+	}
+
+	return dvec4(x,y,z,w);
+}
+
+dvec4 setIntersectionPoint(inout Ray r, dmat4 quadric, dvec4 closestHitpoint)
+{
+	double x = closestHitpoint.x;
+	double y = closestHitpoint.y;
+	double z = closestHitpoint.z;
+	double w = closestHitpoint.w;
+
+	double a_11 = quadric[0][0];
+	double a_12 = quadric[0][1];
+	double a_13 = quadric[0][2];
+	double a_14 = quadric[0][3];
+	double a_22 = quadric[1][1];
+	double a_23 = quadric[1][2];
+	double a_24 = quadric[1][3];
+	double a_33 = quadric[2][2];
+	double a_34 = quadric[2][3];
+	double a_44 = quadric[3][3];
+
+	double fx = 2*a_14 + 2*a_11*x + 2*a_12*y + 2*a_13*z;
+	double fy = 2*a_24 + 2*a_12*x + 2*a_22*y + 2*a_23*z;
+    double fz = 2*a_34 + 2*a_13*x + 2*a_23*y + 2*a_33*z;
+
+	dvec4 normal = normalize(dvec4(fx,fy,fz,0));
+	r.position = dvec3(x,y,z); // new position = intersection point
+	r.weight = w; // unchanged, if ray did not miss surface, else 0
+	return normal;
+}
+
+/**
+* returns intersection point for a quadric element
+* @param r		 	current ray
+* @param quadric	4x4 matrix with quadric parameters, upper right part + diagonal for a_11..a_33
+* @param icurv 		sign of p/q formula for calculating intersection point (p/2 ICURV sqrt( (p/2)² -q)), quadric[1,0]
+*
+* @return			dvec4(intersection point in element coordinates, weight)
+*/
+dvec4 getIntersectionPointEnrico(Ray r, dmat4 quadric)
+{	
+	double w = r.weight;
+	int icurv = int(quadric[1][0]);
+	int cs = 0;
+	if (abs(rayData[uint(gl_GlobalInvocationID)].direction[1]) >= abs(rayData[uint(gl_GlobalInvocationID)].direction[0]) && abs(rayData[uint(gl_GlobalInvocationID)].direction[1]) >= abs(rayData[uint(gl_GlobalInvocationID)].direction[2])) {
+		cs = 1;
+	}else if (abs(rayData[uint(gl_GlobalInvocationID)].direction[2]) >= abs(rayData[uint(gl_GlobalInvocationID)].direction[0]) && abs(rayData[uint(gl_GlobalInvocationID)].direction[2]) >= abs(rayData[uint(gl_GlobalInvocationID)].direction[1])) {
+		cs = 2;
+	}
+	uint f_001 = uint(cs/2);
+	uint f_010 = cs%2;
+	uint f_011 = uint(cs+1/2);
+	uint f_012 = cs;
+	uint f_0x1 = uint(cs/2);
+	uint f_100 = (uint((cs+1)/2)+1)%2;
+	uint f_101 = ((cs%2)+1)%2;
+	uint f_110 = (uint(cs/2)+1)%2;
+	uint f_112 = int(cs/2)+1;
+	//uint f_1x0 = (cs/2)%2;
+	uint f_131 = ((cs%2)*2)+1;
+	uint f_220 = ((uint(cs/2)+1)%2)*2;
+	uint f_221 = ((uint(cs/2)+1)%2)+1;
+
+    //Formula: ((x+1)%3)/(x-1) and (x%3)/(x-1)
+	double firstParam = rayData[uint(gl_GlobalInvocationID)].direction[f_100] / rayData[uint(gl_GlobalInvocationID)].direction[cs];
+	double secondParam = rayData[uint(gl_GlobalInvocationID)].direction[f_221] / rayData[uint(gl_GlobalInvocationID)].direction[cs];
+	double params[2] = {firstParam, secondParam};
+	//dvec4 normal;
+	xyznull[uint(gl_GlobalInvocationID)] = dvec4(0.0,0.0,0.0,0.0);
+	xyznull[uint(gl_GlobalInvocationID)][f_100] = rayData[uint(gl_GlobalInvocationID)].position[f_100] - firstParam * rayData[uint(gl_GlobalInvocationID)].position[cs];
+	xyznull[uint(gl_GlobalInvocationID)][f_221] = rayData[uint(gl_GlobalInvocationID)].position[f_221] - secondParam * rayData[uint(gl_GlobalInvocationID)].position[cs];
+	xyznull[uint(gl_GlobalInvocationID)][3] = 0;
+
+	const int d_sign = int(sign(rayData[uint(gl_GlobalInvocationID)].direction[cs]) * icurv);
+
+	double a = quadric[cs][cs] + 2*quadric[0][f_112]*firstParam + quadric[f_100][f_100]*firstParam*firstParam + 2*quadric[f_011][2]*secondParam + 2*quadric[f_100][f_221]*firstParam*secondParam + quadric[f_221][f_221]*secondParam*secondParam;
+	double b = quadric[cs][3] + quadric[f_100][3]*firstParam + quadric[f_221][3]*secondParam + (quadric[0][f_112] + quadric[f_100][f_100]*firstParam + quadric[f_100][f_221]*secondParam)*xyznull[uint(gl_GlobalInvocationID)][f_100] + (quadric[f_011][2] + quadric[f_100][f_221]*firstParam + quadric[f_221][f_221]*secondParam)*xyznull[uint(gl_GlobalInvocationID)][f_221];
+	double c = quadric[3][3] + quadric[f_100][f_100]*xyznull[uint(gl_GlobalInvocationID)][f_100]*xyznull[uint(gl_GlobalInvocationID)][f_100] + 2*quadric[f_221][3]*xyznull[uint(gl_GlobalInvocationID)][f_221] + quadric[f_221][f_221]*xyznull[uint(gl_GlobalInvocationID)][f_221]*xyznull[uint(gl_GlobalInvocationID)][f_220] + 2*xyznull[uint(gl_GlobalInvocationID)][f_100]*(quadric[f_100][3] +quadric[f_100][f_221]*xyznull[uint(gl_GlobalInvocationID)][f_221]);
+
+	
+	double bbac = b*b - a*c;
+	if (bbac < 0) {
+		w = 0.0;
+		xyznull[uint(gl_GlobalInvocationID)][cs] = - xyznull[uint(gl_GlobalInvocationID)][f_131]/params[f_0x1]; 	// x such that y=0
+		return dvec4(1.0/0.0,1.0/0.0,1.0/0.0, 0);
+	}
+	else{
+		if (abs(a) > abs(c)*1e-10) {
+			xyznull[uint(gl_GlobalInvocationID)][cs] = (-b + d_sign*sqrt(bbac)) / a;
+		}else{
+			xyznull[uint(gl_GlobalInvocationID)][cs] = (-c/2)/b;
+		}
+	}
+	xyznull[uint(gl_GlobalInvocationID)][f_100] = xyznull[uint(gl_GlobalInvocationID)][f_100] + firstParam * xyznull[uint(gl_GlobalInvocationID)][cs];
+	xyznull[uint(gl_GlobalInvocationID)][f_221] = xyznull[uint(gl_GlobalInvocationID)][f_221] + secondParam*xyznull[uint(gl_GlobalInvocationID)][cs];
+	
+	if(w > 0.0){
+		return dvec4(xyznull[uint(gl_GlobalInvocationID)][0],xyznull[uint(gl_GlobalInvocationID)][1],xyznull[uint(gl_GlobalInvocationID)][2], w);
+	}
+	else{
+		return dvec4(1.0/0.0,1.0/0.0,1.0/0.0, 0);
+	}
+}
+
+/**
+* approximates intersection point with non-quadric element with Newton iteration
+* 
+* @param r 				current ray
+* @param longRadius		?
+* @param shortRadius	?
+* 
+* @return normal at intersection point, changes Ray position in place
+*/
 dvec4 iteratTo(inout Ray r, double longRadius, double shortRadius) {
 	double isigro = sign(shortRadius);
 	// sign radius: +1 = concave, -1 = convex
@@ -1577,9 +1740,9 @@ dvec4 iteratTo(inout Ray r, double longRadius, double shortRadius) {
 		double df = normalized_dir.x*normal.x + normalized_dir.y*normal.y + normal.z;//dot(normalized_dir, dvec3(normal));
 		dz = func / df;
 		n += 1;
-		if (n >= 1000) {
-			normal = intersectionPoint(r, dmat4(0,0,0,0, 0,0,0,0, 0,0,0,-1, 0,0,0,0), 1);
-			r.weight = 7; // -4 in old ray. thrown away or still in use?
+		if (n >= 50) {
+			normal = intersectionPoint(r, dmat4(0,0,0,0, 1,0,0,0, 0,0,0,-1, 0,0,0,0));
+			r.weight = 0; // -4 in old ray. thrown away or still in use?
 			return normal;
 		}
 		
@@ -1589,6 +1752,68 @@ dvec4 iteratTo(inout Ray r, double longRadius, double shortRadius) {
 	return normalize(normal);
 
 }
+
+dvec4 getTorusNormal(Ray r, double shortRadius, double longRadius) {
+	double isigro = sign(shortRadius);
+	dvec4 normal;
+
+	double sq = sqrt(shortRadius*shortRadius - r.position.x*r.position.x);
+	double rx = (longRadius - shortRadius + isigro*sq);
+
+	normal.x = (-2*r.position.x*isigro / sq) * rx;
+	normal.y = -2*(r.position.y - longRadius);
+	normal.z = -2*r.position.z;
+
+	return normal;
+}
+
+/**
+* calculates and returns the intersection of a given ray with a given optical element
+* if element is not hit, return (inf, inf, inf, 0)
+* @param r						current Ray in global coordinates
+* @param quadricIndex			index of current optical element in list of all elements
+* @param whichIntersection		whether to get first or second intersection (usually first)
+* 
+* @return global coordinates of intersection point of ray with optical element
+*/
+dvec4 getOpticalElementIntersection(Ray r, uint quadricIndex){
+
+	int type = int(quadricData[quadricIndex].anchorPoints[3][0]);
+	Quadric q = quadricData[quadricIndex];
+	dvec4 currentIntersection;
+	if(type > 6){
+		return dvec4(1.0/0.0,1.0/0.0,1.0/0.0, 0);
+	}
+	if(type == 4) { // rzp
+		r.position.z = r.position.z - q.elementParameters[3][2];
+	}
+
+	//rayData[uint(gl_GlobalInvocationID)] = rayMatrixMult(rayData[uint(gl_GlobalInvocationID)], q.inTrans); // ray/global to element coordinates, misalignment
+	r = rayMatrixMult(r, q.inTrans);
+	if(type == 5) { // image plane
+		double dist = q.elementParameters[0][0];
+		double offset = 0 - r.position.z; // length between ray origin (intersection point of previous element) and image plane
+		currentIntersection.x = r.position.x + ((r.direction.x / r.direction.z) * offset); // scale x-slope of ray (l/n) by z-length between origin and image plane
+		currentIntersection.y = r.position.y + ((r.direction.y / r.direction.z) * offset);
+		currentIntersection.z = 0;
+		currentIntersection.w = r.weight * int(r.direction.z > 0);
+		return currentIntersection;
+
+	}
+	else if(type == 6) { // torus
+		double longRadius = q.elementParameters[0][0];
+		double shortRadius = q.elementParameters[0][1];
+	
+		dvec4 normal = iteratTo(r, longRadius, shortRadius);
+		currentIntersection = dvec4(r.position, r.weight);
+		return currentIntersection;
+	}
+	currentIntersection = getIntersectionPoint(r, q.anchorPoints);
+	
+	r = rayMatrixMult(r, q.outTrans);
+	return currentIntersection; // in element coordinate system
+}
+
 
 // returns angle between ray direction and surface normal at intersection point
 double getTheta(Ray r, dvec4 normal) {
@@ -2062,10 +2287,12 @@ void diffraction(int iopt, double xLength, double yLength, double wl, inout doub
 *
 * output: reflected Ray with intersection point as position, reflection as direction in beam coordinates and possibly modified weight
 */
-Ray traceSlit(Ray r, const Quadric q, inout uint64_t ctr) {
-	r = rayMatrixMult(r, q.inTrans);
-	dvec4 normal = intersectionPoint(r, q.anchorPoints, 0);
-
+Ray traceSlit(Ray r, const Quadric q, inout uint64_t ctr, dvec4 intersection) {
+	//dvec4 normal = setIntersectionPoint(r, q.anchorPoints, intersectionPoint);
+	r = rayMatrixMult(r, q.outTrans);
+	//dvec4 normal = intersectionPoint(r, q.anchorPoints);
+	dvec4 normal = setIntersectionPoint(r, q.anchorPoints, intersection);
+	
 	double xLength = q.objectParameters[0][0]; // width
 	double yLength = q.objectParameters[0][1]; // height
 	double xStop = q.elementParameters[0][0]; // beamstop width
@@ -2096,11 +2323,11 @@ Ray traceSlit(Ray r, const Quadric q, inout uint64_t ctr) {
 	return r;
 }
 
-Ray traceToroid(Ray r, Quadric q, inout uint64_t ctr) {
+Ray traceToroid(Ray r, Quadric q, inout uint64_t ctr, dvec4 intersectionPoint) {
 	r = rayMatrixMult(r, q.inTrans);
-
 	double longRadius = q.elementParameters[0][0];
 	double shortRadius = q.elementParameters[0][1];
+	
 	dvec4 normal = iteratTo(r, longRadius, shortRadius);
 
 	double xLength = q.objectParameters[0][0]; // width
@@ -2109,7 +2336,7 @@ Ray traceToroid(Ray r, Quadric q, inout uint64_t ctr) {
 
 	// element missed
 	if(r.weight < 1.0) {
-		r = rayMatrixMult(r, q.outTrans); // inv mis & out trans
+		r = rayMatrixMult(r, q.outTrans);
 		return r;
 	}
 
@@ -2117,22 +2344,23 @@ Ray traceToroid(Ray r, Quadric q, inout uint64_t ctr) {
 	double slopeX = q.objectParameters[0][2];
 	double slopeZ = q.objectParameters[0][3];
 	normal = tanger(normal, slopeX, slopeZ, 0, ctr);
-
+	
 	r.direction = dvec3(reflect(dvec4(r.direction,0), normal));
+	
 	r = rayMatrixMult(r, q.outTrans);
 
 	return r;
 }
 
-Ray traceRZP(Ray r, const Quadric q, inout uint64_t ctr) {
+Ray traceRZP(Ray r, const Quadric q, inout uint64_t ctr, dvec4 intersection) {
 	r = rayMatrixMult(r, q.inTrans);
 	double element_offset_z = q.elementParameters[3][2];
 	r.position.z = r.position.z - element_offset_z;
-	//r = rayMatrixMult(r, q.misalignment); // misalignment not stored in intrans because it needs to be removed later
-
+	
 	// RZP can be plane, toroidal or spherical curvature type. Use intersectionPoint for all except toroidal
 	// if !toroidal:
-	dvec4 normal = intersectionPoint(r, q.anchorPoints, 1); // check if normal is correct
+	//dvec4 normal = intersectionPoint(r, q.anchorPoints);
+	dvec4 normal = setIntersectionPoint(r, q.anchorPoints, intersection);
 	// toroidal not implemented yet
 		//TODO
 
@@ -2202,17 +2430,17 @@ Ray traceRZP(Ray r, const Quadric q, inout uint64_t ctr) {
 *
 * output: reflected Ray with intersection point as position, reflection as direction in beam coordinates and possibly modified weight
 */
-Ray tracePlaneGrating(Ray r, const Quadric q, inout uint64_t ctr) {
+Ray tracePlaneGrating(Ray r, const Quadric q, inout uint64_t ctr, dvec4 intersection) {
+	
 	r = rayMatrixMult(r, q.inTrans);
-
 	// calculate intersection point with element surface and return surface normal at this point
-	dvec4 normal = intersectionPoint(r, q.anchorPoints, 1);
-	normal = dvec4(0,1,0,0);
-
+	//dvec4 normal = intersectionPoint(r, q.anchorPoints);
+	dvec4 normal = setIntersectionPoint(r, q.anchorPoints, intersection);
+	
 	// check if element was hit
 	double xLength = q.objectParameters[0][0];
 	double zLength = q.objectParameters[0][1];
-	r.weight = wasteBox(r.position[0],r.position[2],xLength,zLength, r.weight);
+	r.weight = wasteBox(r.position.x,r.position.z,xLength,zLength, r.weight);
 
 	if(r.weight < 1.0) {
 		r = rayMatrixMult(r, q.outTrans);
@@ -2230,7 +2458,7 @@ Ray tracePlaneGrating(Ray r, const Quadric q, inout uint64_t ctr) {
 	double b_params[6] = double[6] (q.elementParameters[1][2],q.elementParameters[1][3],q.elementParameters[2][0],q.elementParameters[2][1],q.elementParameters[2][2],q.elementParameters[2][3]);//(0.1,0.1,0.1,0.01,0.02,0.03);
 	int additional_order = int(q.elementParameters[3][3]);
 
-	double a = vlsGrating(lineDensity, r.position[2], b_params) * WL *  orderOfDiffraction * 1e-06;
+	double a = vlsGrating(lineDensity, r.position.z, b_params) * WL *  orderOfDiffraction * 1e-06;
 	if(additional_order == 1) {
 		if(squaresDoubleRNG(ctr) > 0.5)
 			a = 0;
@@ -2250,21 +2478,22 @@ Ray tracePlaneGrating(Ray r, const Quadric q, inout uint64_t ctr) {
 *
 * output: reflected Ray with intersection point as position, reflection as direction in beam coordinates and possibly modified weight
 */
-Ray traceGeneralGrating(Ray r, const Quadric q, inout uint64_t ctr) {
-	r = rayMatrixMult(r, q.inTrans); // ray/global to element coordinates, misalignment
-
+Ray traceGeneralGrating(Ray r, const Quadric q, inout uint64_t ctr, dvec4 intersection) {
+	r = rayMatrixMult(r, q.inTrans);
+	
 	int ISIG = 1;
 	double radius = q.anchorPoints[1][3]; // -radius , a_24
 	if(-radius < 0) {
 		ISIG = -1;
 	}
-	dvec4 normal = intersectionPoint(r, q.anchorPoints, ISIG);
-	normal = normalize(dvec4(-r.position[0], -radius - r.position[1]*ISIG, -r.position[2], 0));
+	//dvec4 normal = intersectionPoint(r, q.anchorPoints);
+	dvec4 normal = setIntersectionPoint(r, q.anchorPoints, intersection);
+	normal = normalize(dvec4(-r.position.x, -radius - r.position[1]*ISIG, -r.position[2], 0));
 
 	// check if element was hit
 	double xLength = q.objectParameters[0][0];
 	double zLength = q.objectParameters[0][1];
-	r.weight = wasteBox(r.position[0],r.position[2],xLength,zLength, r.weight);
+	r.weight = wasteBox(r.position.x,r.position.z,xLength,zLength, r.weight);
 
 	if(r.weight < 1.0) {
 		r = rayMatrixMult(r, q.outTrans);
@@ -2281,13 +2510,13 @@ Ray traceGeneralGrating(Ray r, const Quadric q, inout uint64_t ctr) {
 	double orderOfDiffraction = q.elementParameters[0][3];
 	double b_params[6] = double[6] (q.elementParameters[1][2],q.elementParameters[1][3],q.elementParameters[2][0],q.elementParameters[2][1],q.elementParameters[2][2],q.elementParameters[2][3]);//(0.1,0.1,0.1,0.01,0.02,0.03);
 	// a = WL * linedensity * order * 1e-06
-	double a = vlsGrating(lineDensity, r.position[2], b_params) * WL *  orderOfDiffraction * 1e-06;
+	double a = vlsGrating(lineDensity, r.position.z, b_params) * WL *  orderOfDiffraction * 1e-06;
 	// no additional zero order here
 
 	// refraction
 	r = refrac(r, normal, a);
 
-	r = rayMatrixMult(r, q.outTrans); // element to ray/global coordinates, inverse misalignment
+	r = rayMatrixMult(r, q.outTrans);
 	return r;
 }
 
@@ -2296,17 +2525,21 @@ Ray traceGeneralGrating(Ray r, const Quadric q, inout uint64_t ctr) {
 * transforms ray to object coordinate system, takes misalignment into account, traces the ray and transforms ray resulting of interaction with opt. element back to beam coordinates
 * @param r				ray to trace
 * @param q				quadric surface
+* @param ctr			counter for RNG
+* @param intersectionPoint	intersection point in ELEMENT coordinates
 *
 * output: reflected Ray with intersection point as position, reflection as direction in beam coordinates and possibly modified weight
 */
-Ray traceMirror(Ray r, const Quadric q, inout uint64_t ctr) {
+Ray traceMirror(Ray r, const Quadric q, inout uint64_t ctr, dvec4 intersection) {
 	r = rayMatrixMult(r, q.inTrans);
 
-	dvec4 normal = intersectionPoint(r, q.anchorPoints, 1);
+	//dvec4 normal = intersectionPoint(r, q.anchorPoints);
+	dvec4 normal = setIntersectionPoint(r, q.anchorPoints, intersection);
 
+	// not necessary anymore because at this point we already know that the element has been hit??
 	double xLength = q.objectParameters[0][0]; // width
 	double zLength = q.objectParameters[0][1]; // height
-	r.weight = wasteBox(r.position[0],r.position[2],xLength,zLength, r.weight);
+	r.weight = wasteBox(r.position.x,r.position.z,xLength,zLength, r.weight);
 	if(r.weight < 1.0) {
 		r = rayMatrixMult(r, q.outTrans);
 		return r;
@@ -2318,22 +2551,20 @@ Ray traceMirror(Ray r, const Quadric q, inout uint64_t ctr) {
 
 	r.direction = dvec3(reflect(dvec4(r.direction,0), normal));
 	r = rayMatrixMult(r, q.outTrans);
-
 	return r;
 }
 
 
-Ray traceEllipsoidMirror(Ray r, const Quadric q, inout uint64_t ctr) {
-	r = rayMatrixMult(r, q.inTrans); // 0: M*T*r, 1: A-1*M*A*T*r
+Ray traceEllipsoidMirror(Ray r, const Quadric q, inout uint64_t ctr, dvec4 intersection) {
+	r = rayMatrixMult(r, q.inTrans);
 	//inTransformation(r, q.misalignment, q.inTrans);
 
-	dvec4 normal = intersectionPoint(r, q.anchorPoints, 1);
+	dvec4 normal = setIntersectionPoint(r, q.anchorPoints, intersection);
 	r = rayMatrixMult(r, q.misalignment); // A
 
-	// will be changed, when width & heigth in "parameters"
 	double xLength = q.objectParameters[0][0]; // width
 	double zLength = q.objectParameters[0][1]; // height
-	r.weight = wasteBox(r.position[0],r.position[2],xLength,zLength, r.weight);
+	r.weight = wasteBox(r.position.x,r.position.z,xLength,zLength, r.weight);
 
 	if(r.weight < 1.0) {
 		r = rayMatrixMult(r, q.inverseMisalignment); // A-1
@@ -2355,8 +2586,7 @@ Ray traceEllipsoidMirror(Ray r, const Quadric q, inout uint64_t ctr) {
 
 	r.direction = dvec3(reflect(dvec4(r.direction,0), normal));
 
-	r = rayMatrixMult(r, q.outTrans); // 0: T-1*M-1 1: T-1*A-1*M-1*A
-	//outTransformation(r, q.inverseMisalignment, q.outTrans);
+	r = rayMatrixMult(r, q.outTrans);
 	return r;
 }
 
@@ -2371,41 +2601,42 @@ Ray traceImagePlane(Ray r, const Quadric q) {
 	r.position.x = r.position.x + ((r.direction.x / r.direction.z) * offset); // scale x-slope of ray (l/n) by z-length between origin and image plane
 	r.position.y = r.position.y + ((r.direction.y / r.direction.z) * offset);
 	r.position.z = 0;
+	r.weight *= int(r.direction.z > 0); // if ray points away from image plane there is no intersection with it
 	r = rayMatrixMult(r, q.outTrans);
 	return r;
 }
 
 
 /*
-* iterate through all quadrics (sequentially) and trace rays quadric by quadric
-* quadric = optical element whose surface can be represented by a quadric equation
+* iterate through all elements (sequentially) and trace rays element by element
 */
-void iterateQuadrics(){
+void iterateElements(){
 	double type;
 	uint numberOfQuadrics = quadricData.length();
 	// ray specific "seed" for random numbers -> every ray has a different starting value for the counter that creates the random numbter
 	uint64_t workerCounterNum = (~(uint64_t(0)) / uint64_t(numberOfRays));
 	uint64_t ctr = uint(gl_GlobalInvocationID) * workerCounterNum;
-	//only one quadric: store directly in output buffer
 	
-	//quadrics between first and last
 	for(int i=0; i<numberOfQuadricsPerBeamline; i++){
-		type = int(quadricData[i].anchorPoints[3][0]);
-		//first quadric
+		Quadric q = quadricData[i];
+
+		type = int(q.anchorPoints[3][0]);
+		dvec4 intersection = getOpticalElementIntersection(rayData[uint(gl_GlobalInvocationID)], i);
+		
 		if (type == 0) { // mirror
-			rayData[uint(gl_GlobalInvocationID)] = traceMirror(rayData[uint(gl_GlobalInvocationID)], quadricData[i], ctr);
+			rayData[uint(gl_GlobalInvocationID)] = traceMirror(rayData[uint(gl_GlobalInvocationID)], q, ctr, intersection);
 		}else if(type == 1){ // plane grating
-			rayData[uint(gl_GlobalInvocationID)] = tracePlaneGrating(rayData[uint(gl_GlobalInvocationID)], quadricData[i], ctr);	
+			rayData[uint(gl_GlobalInvocationID)] = tracePlaneGrating(rayData[uint(gl_GlobalInvocationID)], q, ctr, intersection);	
 		}else if(type == 2){ // general grating
-			rayData[uint(gl_GlobalInvocationID)] = traceGeneralGrating(rayData[uint(gl_GlobalInvocationID)], quadricData[i], ctr);	
+			rayData[uint(gl_GlobalInvocationID)] = traceGeneralGrating(rayData[uint(gl_GlobalInvocationID)], q, ctr, intersection);	
 		}else if(type == 3){ // Slit
-			rayData[uint(gl_GlobalInvocationID)] = traceSlit(rayData[uint(gl_GlobalInvocationID)], quadricData[i], ctr);	
+			rayData[uint(gl_GlobalInvocationID)] = traceSlit(rayData[uint(gl_GlobalInvocationID)], q, ctr, intersection);	
 		}else if(type == 4) { // rzp
-			rayData[uint(gl_GlobalInvocationID)] = traceRZP(rayData[uint(gl_GlobalInvocationID)], quadricData[i], ctr);	
+			rayData[uint(gl_GlobalInvocationID)] = traceRZP(rayData[uint(gl_GlobalInvocationID)], q, ctr, intersection);	
 		}else if(type == 5) { // image plane
-			outputData[uint(gl_GlobalInvocationID)] = traceImagePlane(rayData[uint(gl_GlobalInvocationID)], quadricData[int(numberOfQuadricsPerBeamline)-1]);
-			return;
+			rayData[uint(gl_GlobalInvocationID)] = traceImagePlane(rayData[uint(gl_GlobalInvocationID)], q);
 		}
+		//rayData[uint(gl_GlobalInvocationID)] = rayMatrixMult(rayData[uint(gl_GlobalInvocationID)], q.outTrans);
 	}
 	outputData[uint(gl_GlobalInvocationID)] = rayData[uint(gl_GlobalInvocationID)];
 	
@@ -2416,35 +2647,40 @@ void testFunctions() {
 	// flag to decide how to interpret the input
 	int settings = int(quadricData[0].anchorPoints[3][1]);
 	const int numberOfQuadrics = quadricData.length();
-	// default: 0 -> iterate through quadrics
 	Ray r = rayData[uint(gl_GlobalInvocationID)];
-	Ray res;
+	Ray res; // store the result here
 	
 	double type;
 	// ray specific "seed" for random numbers -> every ray has a different starting value for the counter that creates the random numbter
 	uint64_t workerCounterNum = (~(uint64_t(0)) / uint64_t(numberOfRays));
 	uint64_t ctr = uint(gl_GlobalInvocationID) * workerCounterNum;
-	//quadrics between first and last
 	
+	// default: 0 -> iterate through quadrics
 	for(int i=0; i<(numberOfQuadrics) * int(settings==0); i++){
 		type = quadricData[i].anchorPoints[3][0];
 		//first quadric
+		dvec4 intersection;// = getOpticalElementIntersection(rayData[uint(gl_GlobalInvocationID)], i);
+		//rayData[uint(gl_GlobalInvocationID)].position = intersection.xyz;
+		
 		if (type == 0) { // mirror
-			rayData[uint(gl_GlobalInvocationID)] = traceMirror(rayData[uint(gl_GlobalInvocationID)], quadricData[i], ctr);
+			rayData[uint(gl_GlobalInvocationID)] = traceMirror(rayData[uint(gl_GlobalInvocationID)], quadricData[i], ctr, intersection);
 		}else if(type == 1){ // plane grating
-			rayData[uint(gl_GlobalInvocationID)] = tracePlaneGrating(rayData[uint(gl_GlobalInvocationID)], quadricData[i], ctr);
+			rayData[uint(gl_GlobalInvocationID)] = tracePlaneGrating(rayData[uint(gl_GlobalInvocationID)], quadricData[i], ctr, intersection);
 		}else if(type == 2){ // general grating
-			rayData[uint(gl_GlobalInvocationID)] = traceGeneralGrating(rayData[uint(gl_GlobalInvocationID)], quadricData[i], ctr);
+			rayData[uint(gl_GlobalInvocationID)] = traceGeneralGrating(rayData[uint(gl_GlobalInvocationID)], quadricData[i], ctr, intersection);
 		}else if(type == 3){ // Slit
-			rayData[uint(gl_GlobalInvocationID)] = traceSlit(rayData[uint(gl_GlobalInvocationID)], quadricData[i], ctr);
+			rayData[uint(gl_GlobalInvocationID)] = traceSlit(rayData[uint(gl_GlobalInvocationID)], quadricData[i], ctr, intersection);
 		}else if(type == 4) { // rzp
-			rayData[uint(gl_GlobalInvocationID)] = traceRZP(rayData[uint(gl_GlobalInvocationID)], quadricData[i], ctr);
+			rayData[uint(gl_GlobalInvocationID)] = traceRZP(rayData[uint(gl_GlobalInvocationID)], quadricData[i], ctr, intersection);
 		}else if(type == 5) { // image plane
-			rayData[uint(gl_GlobalInvocationID)] = traceImagePlane(rayData[uint(gl_GlobalInvocationID)], quadricData[i]);
+			rayData[uint(gl_GlobalInvocationID)] = traceImagePlane(rayData[uint(gl_GlobalInvocationID)], quadricData[i]); //dvec3(intersection); //
 		}else if(type == 6) { // toroid
-			rayData[uint(gl_GlobalInvocationID)] = traceToroid(rayData[uint(gl_GlobalInvocationID)], quadricData[i], ctr);
+			rayData[uint(gl_GlobalInvocationID)] = traceToroid(rayData[uint(gl_GlobalInvocationID)], quadricData[i], ctr, intersection);
 		}
+		//rayData[uint(gl_GlobalInvocationID)].position = dvec3(intersection);
+		//rayData[uint(gl_GlobalInvocationID)] = rayMatrixMult(rayData[uint(gl_GlobalInvocationID)], q.outTrans); // element to global coordinates
 	}
+	 
 	// settings != 0 -> unit test cases in test_shader.cpp
 	// input rays and quadrics are interpreted depending on the test case
 	if(settings == 1) { // TEST TRIG FUNCTIONS
@@ -2631,269 +2867,120 @@ void testFunctions() {
 		res.weight = getTheta(r, dvec4(r.position,0));
 		rayData[uint(gl_GlobalInvocationID)] = res;
 	}
+	// store results to output buffer
 	outputData[uint(gl_GlobalInvocationID)] = rayData[uint(gl_GlobalInvocationID)];
 }
 
-void testFunctionsWithoutIf() {
-	// flag to decide how to interpret the input
-	int settings = int(quadricData[0].anchorPoints[3][1]);
+// dynamic ray tracing -> check which ray hits which element first
+void dynamicQuadrics(){
+	
 	const int numberOfQuadrics = quadricData.length();
-	// default: 0 -> iterate through quadrics
-	Ray r = rayData[uint(gl_GlobalInvocationID)];
-	Ray res;
-	res.position = dvec3(0,0,0);
-	res.direction = dvec3(0,0,0);
-	res.weight = 0;
-	res.energy = 0;
+	//placeholder, info should later be transfered to shader
+	const int maxBounces = numberOfQuadrics;
+	Ray ray = rayData[uint(gl_GlobalInvocationID)];
 	
+	// ray specific "seed" for random numbers -> every ray has a different starting value for the counter that creates the random number
+	uint64_t workerCounterNum = (~(uint64_t(0)) / int(numberOfRays));
+	uint64_t ctr = uint(gl_GlobalInvocationID) * workerCounterNum;
+	int type = -1;
+	//iterate bounces
+	int closestQuadricIndex = -1;
+	int lastClosestQuadricIndex;
+	dvec4 closestHitpoint = dvec4(1.0/0.0, 1.0/0.0, 1.0/0.0, 0.0);
+	dvec4 closestGlobalHitpoint;
+	for(int i = 0; i<maxBounces; i++){
+		ray = rayData[uint(gl_GlobalInvocationID)];
 
-	int type;
+		// last traced element
+		lastClosestQuadricIndex = closestQuadricIndex;
+		// index of quadric with current closest intersection with ray.
+		closestQuadricIndex = -1;
+		// global coordinates of first intersection point of ray among all elements in beamline
+		closestHitpoint = dvec4(1.0/0.0, 1.0/0.0, 1.0/0.0, 0);
+		closestGlobalHitpoint = dvec4(1.0/0.0, 1.0/0.0, 1.0/0.0, 0);
 
-	// ray specific "seed" for random numbers -> every ray has a different starting value for the counter that creates the random numbter
-	uint64_t workerCounterNum = (~(uint64_t(0)) / uint64_t(numberOfRays));
-	uint64_t countr = uint(gl_GlobalInvocationID) * workerCounterNum;
-	//quadrics between first and last
-	
-	if(settings ==0){
-		for(int i=0; i<(numberOfQuadrics); i++){
-			type = int(quadricData[i].anchorPoints[3][0]);
-			/*outputData[uint(gl_GlobalInvocationID)].position = dvec3(0,0,0);
-			outputData[uint(gl_GlobalInvocationID)].direction = dvec3(0,0,0);
-			outputData[uint(gl_GlobalInvocationID)].weight = 0;
-			outputData[uint(gl_GlobalInvocationID)].energy = 0;
-			
-			Ray temp = traceMirror(rayData[uint(gl_GlobalInvocationID)], quadricData[i], countr);
-			outputData[uint(gl_GlobalInvocationID)].position += temp.position * double(int(type == 0));
-			outputData[uint(gl_GlobalInvocationID)].direction += temp.direction * double(int(type == 0));
-			outputData[uint(gl_GlobalInvocationID)].weight += temp.weight * double(int(type == 0));
-			outputData[uint(gl_GlobalInvocationID)].energy += temp.energy * double(int(type == 0));
-
-			temp = tracePlaneGrating(rayData[uint(gl_GlobalInvocationID)], quadricData[i], countr);
-			outputData[uint(gl_GlobalInvocationID)].position += temp.position * double(int(type == 1));
-			outputData[uint(gl_GlobalInvocationID)].direction += temp.direction * double(int(type == 1));
-			outputData[uint(gl_GlobalInvocationID)].weight += temp.weight * double(int(type == 1));
-			outputData[uint(gl_GlobalInvocationID)].energy += temp.energy * double(int(type == 1));
-			
-			temp = traceGeneralGrating(rayData[uint(gl_GlobalInvocationID)], quadricData[i], countr);
-			outputData[uint(gl_GlobalInvocationID)].position += temp.position * double(int(type == 2));
-			outputData[uint(gl_GlobalInvocationID)].direction += temp.direction * double(int(type == 2));
-			outputData[uint(gl_GlobalInvocationID)].weight += temp.weight * double(int(type == 2));
-			outputData[uint(gl_GlobalInvocationID)].energy += temp.energy * double(int(type == 2));
-
-			temp = traceSlit(rayData[uint(gl_GlobalInvocationID)], quadricData[i], countr);
-			outputData[uint(gl_GlobalInvocationID)].position += temp.position * double(int(type == 3));
-			outputData[uint(gl_GlobalInvocationID)].direction += temp.direction * double(int(type == 3));
-			outputData[uint(gl_GlobalInvocationID)].weight += temp.weight * double(int(type == 3));
-			outputData[uint(gl_GlobalInvocationID)].energy += temp.energy * double(int(type == 3));
-
-			temp = traceRZP(rayData[uint(gl_GlobalInvocationID)], quadricData[i], countr);
-			outputData[uint(gl_GlobalInvocationID)].position += temp.position * double(int(type == 4));
-			outputData[uint(gl_GlobalInvocationID)].direction += temp.direction * double(int(type == 4));
-			outputData[uint(gl_GlobalInvocationID)].weight += temp.weight * double(int(type == 4));
-			outputData[uint(gl_GlobalInvocationID)].energy += temp.energy * double(int(type == 4));
-
-			temp = traceImagePlane(rayData[uint(gl_GlobalInvocationID)], quadricData[i]);
-			outputData[uint(gl_Glo
-			// write result to r.position to bring it back to the c++ unit test
-			res.position.x += DX;balInvocationID)].position += temp.position * double(int(type == 5));
-			outputData[uint(gl_GlobalInvocationID)].direction += temp.direction * double(int(type == 5));
-			outputData[uint(gl_GlobalInvocationID)].weight += temp.weight * double(int(type == 5));
-			outputData[uint(gl_GlobalInvocationID)].energy += temp.energy * double(int(type == 5));
-
-			rayData[uint(gl_GlobalInvocationID)] = outputData[uint(gl_GlobalInvocationID)];*/
-			if (type == 0) { // mirror
-				rayData[uint(gl_GlobalInvocationID)] = traceMirror(rayData[uint(gl_GlobalInvocationID)], quadricData[i], countr);
-			}else if(type == 1){ // plane grating
-				rayData[uint(gl_GlobalInvocationID)] = tracePlaneGrating(rayData[uint(gl_GlobalInvocationID)], quadricData[i], countr);
-			}else if(type == 2){ // general grating
-				rayData[uint(gl_GlobalInvocationID)] = traceGeneralGrating(rayData[uint(gl_GlobalInvocationID)], quadricData[i], countr);
-			}else if(type == 3){ // Slit
-				rayData[uint(gl_GlobalInvocationID)] = traceSlit(rayData[uint(gl_GlobalInvocationID)], quadricData[i], countr);
-			}else if(type == 4) { // rzp
-				rayData[uint(gl_GlobalInvocationID)] = traceRZP(rayData[uint(gl_GlobalInvocationID)], quadricData[i], countr);
-			}else if(type == 5) { // image plane
-				rayData[uint(gl_GlobalInvocationID)] = traceImagePlane(rayData[uint(gl_GlobalInvocationID)], quadricData[i]);
+		//find intersection points with all quadrics
+		for(int quadricIndex = 0; quadricIndex<numberOfQuadrics; quadricIndex++){
+			if(quadricIndex == lastClosestQuadricIndex){
+				//TODO: self-intersection
+				//rayData[uint(gl_GlobalInvocationID)].weight = 11;
+				continue;
 			}
+			//dvec4 currentIntersection = dvec4(1.0/0.0,1.0/0.0,1.0/0.0, 0.0);
+			dvec4 currentIntersection = getOpticalElementIntersection(ray, quadricIndex);
+			
+			// intersection coordinates in global coordinates 
+			dvec4 currentGlobalIntersection = currentIntersection;
+			currentGlobalIntersection.xyz = dvec3(quadricData[quadricIndex].outTrans *  dvec4(currentIntersection.xyz,1));
+			// check if current intersection is closer than the closest previous Hitpoint
+			if(length(ray.position - closestGlobalHitpoint.xyz) > length(ray.position-currentGlobalIntersection.xyz) && currentIntersection.w != 0){
+				closestHitpoint = currentIntersection;
+				closestGlobalHitpoint = currentGlobalIntersection;
+				closestQuadricIndex = quadricIndex;
+			}
+			//rayData[uint(gl_GlobalInvocationID)].direction.x = length(ray.position - closestHitpoint.xyz);
+			//rayData[uint(gl_GlobalInvocationID)].direction.y =  length(ray.position - currentIntersection.xyz);
 			
 		}
-		outputData[uint(gl_GlobalInvocationID)] = rayData[uint(gl_GlobalInvocationID)];
-	}else{
 		
-		//const int numberOfRays = rayData.length();
-		// settings != 0 -> unit test cases in test_shader.cpp
-		// input rays and quadrics are interpreted depending on the test case
-		// TEST TRIG FUNCTIONS
-		res.position += dvec3(r8_cos(r.position.x), r8_cos(r.position.y),r8_sin(r.position.z)) * int(settings==1);
-		res.weight += r8_sin(r.weight) * int(settings==1);
-		res.direction += dvec3(r8_atan(r.direction.x), r8_atan(r.direction.y), r8_asin(r.direction.z)) * int(settings==1);
-			
-		// test plane refrac
-		// refrac_plane(ray, normal, a) only y and z direction of ray are needed
-		// a encoded in weight, normal encoded in r.position
-		Ray refr_plane = refrac_plane(r, dvec4(r.position, 0), r.weight);
-		res.position += refr_plane.position * int(settings==3);
-		res.direction += refr_plane.direction * int(settings==3);
-		res.weight += refr_plane.weight * int(settings==3);
-		
-		// test vls grating
-		double b_params[6] = double[6] (r.position.x,r.position.y,r.position.z, r.direction.x,r.direction.y,r.direction.z);//(0.1,0.1,0.1,0.01,0.02,0.03);
-		res.weight += vlsGrating(r.weight, quadricData[0].anchorPoints[2][1], b_params) * int(settings==4);
-		res.energy += 0* int(settings==4);
-		
-		// diffraction
-		// double bessel1(double v)
-		// void bessel_diff(double radius, double wl, inout double dphi, inout double dpsi)
-		// void diffraction(int iopt, double xLength, double yLength, double wl, inout double dPhi, inout double dPsi)
-		// void fraun_diff(double dim, double wl, inout double dAngle)
-		double dPhi;
-		double dPsi;
-		int iopt = int(r.position.x);
-		double xLength = r.position.y;
-		double yLength = r.position.z;
-		double wl = r.weight;
-		diffraction(iopt, xLength, yLength, wl, dPhi, dPsi, countr);
-		res.position.x += dPhi * int(settings==5);
-		res.position.y += dPsi * int(settings==5);
-		res.weight += 100 * int(settings==5);
-		res.energy += 0 * int(settings==5);
-		
-		// bessel1 function
-		res.position += dvec3(bessel1(r.position.x),bessel1(r.position.y),bessel1(r.position.z)) * int(settings==6);
-		res.direction += dvec3(bessel1(r.direction.x),bessel1(r.direction.y),bessel1(r.direction.z)) * int(settings==6);
-		res.weight += bessel1(r.weight) * int(settings==6);
-		res.energy += 0 * int(settings==6);
-		
-		// double pow test
-		res.position.x += dpow(r.position.x, int(r.direction.x)) * int(settings==7);
-		res.position.y += dpow(r.position.y, int(r.direction.y)) * int(settings==7);
-		res.position.z += dpow(r.position.z, int(r.direction.z)) * int(settings==7);
-		
-		// factorial f(a) = a! test
-		res.position += dvec3(fact(int(r.position.x)), fact(int(r.position.y)), fact(int(r.position.z))) * int(settings==8);
-		res.direction += dvec3(fact(int(r.direction.x)), fact(int(r.direction.y)), fact(int(r.direction.z))) * int(settings==8);
-		res.weight += fact(int(r.weight)) * int(settings==8);
-		
-		// cosini (direction x,y,z from phi,psi)
-		Ray cosi;
-		cosini(cosi, r.position.x, r.position.y); // inout ray (only direction important for function), phi, psi
-		res.position += cosi.position * int(settings==9);
-		res.direction += cosi.direction * int(settings==9);
-		res.weight += cosi.weight * int(settings==9);
-		res.energy += cosi.energy * int(settings==9);
-		
-		// test RayMatrixMult
-		Ray multi = rayMatrixMult(r, quadricData[0].inTrans);
-		res.position += multi.position * int(settings ==10);
-		res.direction += multi.direction  * int(settings ==10);
-		res.weight += multi.weight  * int(settings ==10);
-		res.energy += multi.energy  * int(settings ==10);
-		
-		// wastebox
-		double x = r.position.x;
-		double z = r.position.z;
-		xLength = r.direction.x;
-		double zLength = r.direction.z;
-		double w = r.weight;
-		res.weight += (wasteBox(x, z, xLength, zLength, w) * int(settings==11));
-		
-		if(settings == 12) { // test RZP line density
-			dvec4 normal = dvec4(r.direction.x, r.direction.y, r.direction.z, 0);
-			int image_type = int(quadricData[0].inTrans[0][0]);
-			int rzp_type =  int(quadricData[0].inTrans[0][1]);
-			int derivation_method = int(quadricData[0].inTrans[0][2]);
-			double zOffsetCenter = quadricData[0].inTrans[0][3];
-			double risag = quadricData[0].inTrans[1][0];
-			double rosag = quadricData[0].inTrans[1][1];
-			double rimer = quadricData[0].inTrans[1][2];
-			double romer = quadricData[0].inTrans[1][3];
-			double d_alpha = quadricData[0].inTrans[2][0];
-			double d_beta = quadricData[0].inTrans[2][1];
-			double d_ord = quadricData[0].inTrans[2][2];
-			double wl = quadricData[0].inTrans[2][3];
-			double DX;
-			double DZ;
-			RZPLineDensity(r, normal, image_type, rzp_type, derivation_method, zOffsetCenter,
-				risag, rosag, rimer, romer, d_alpha, d_beta, d_ord, wl,
-				DX, DZ);
-			// write result to r.position to bring it back to the c++ unit test
-			res.position.x += DX;
-			res.position.z += DZ;
-			//rayData[uint(gl_GlobalInvocationID)] = res;
+		if(closestQuadricIndex == -1){ // no element was hit
+			//rayData[uint(gl_GlobalInvocationID)].weight = 12;
+			break;
 		}
-		
-		dvec4 normal = dvec4(r.direction,0);
-		double slopeX = r.position.x;
-		double slopeZ = r.position.z;
-		dvec4 new_normal = normal_cartesian(normal, slopeX, slopeZ);
-		// normal is in homogeneous coordinates but ray direction and position are only interpreted as dvec3 on C++ side -> store fourth value in weight
-		res.direction += dvec3(new_normal) * int(settings==13);
-		res.weight += new_normal[3] * int(settings==13);
-		
-		normal = dvec4(r.direction,0);
-		slopeX = r.position.x;
-		slopeZ = r.position.z;
-		new_normal = normal_cylindrical(normal, slopeX, slopeZ);
-		// normal is in homogeneous coordinates but ray direction and position are only interpreted as dvec3 on C++ side -> store fourth value in weight
-		res.direction += dvec3(new_normal) * int(settings==14);
-		res.weight += new_normal[3]  * int(settings==14);
-		
-		normal = dvec4(r.position, 0);
-		double a = quadricData[0].inTrans[0][0];
-		// only uses and  modifies ray.direction and weight -> use ray.position to transfer normal
-		Ray temp = refrac(r, normal, a);
-		res.direction += temp.direction * int(settings==15);
-		res.position += temp.position * int(settings==15);
-		res.energy += temp.energy * int(settings==15);
-		res.weight += temp.weight * int(settings==15);
-		
-		// Ray refrac2D(Ray r, dvec4 normal, double az, double ax)
-		// refrac2D changes only the direction of the ray -> encode normal at intersection point in ray position
-		normal = dvec4(r.position, 0);
-		double az = quadricData[uint(gl_GlobalInvocationID)].inTrans[0][0];
-		double ax = quadricData[uint(gl_GlobalInvocationID)].inTrans[0][1];
-		temp = refrac2D(r, normal, az, ax);
-		res.direction += temp.direction * int(settings==16);
-		res.position += temp.position * int(settings==16);
-		res.energy += temp.energy * int(settings==16);
-		res.weight += temp.weight * int(settings==16);
-		
-		// random uniform numbers
-		uint64_t workerCounterNum = (~(uint64_t(0)) / uint64_t(numberOfRays));
-		uint64_t ctr = uint(gl_GlobalInvocationID) * workerCounterNum;
-		res.weight += double(squares64RNG(ctr)) / double(uint64_t(0) - 1) * int(settings==17);
-		res.energy += double(squares64RNG(ctr)) / double(uint64_t(0) - 1) * int(settings==17);
-		res.position += dvec3(squaresDoubleRNG(ctr), squaresDoubleRNG(ctr),squaresDoubleRNG(ctr)) * int(settings==17);
-		res.direction += dvec3(squaresDoubleRNG(ctr), squaresDoubleRNG(ctr), squaresDoubleRNG(ctr)) * int(settings==17);
-		
-		// test exponential function
-		res.weight += r8_exp(r.weight) * int(settings==18);//double(squares64RNG(ctr)) / (uint64_t(1) << 63);
-		res.energy += r8_exp(r.energy) * int(settings==18);
-		res.position += dvec3(r8_exp(r.position.x), r8_exp(r.position.y), r8_exp(r.position.z)) * int(settings==18);
-		res.direction += dvec3(r8_exp(r.direction.x), r8_exp(r.direction.y), r8_exp(r.direction.z)) * int(settings==18);
-		
-		// test log
-		res.weight += r8_log(r.weight) * int(settings==19);//double(squares64RNG(ctr)) / (uint64_t(1) << 63);
-		res.energy += r8_log(r.energy) * int(settings==19);
-		res.position += dvec3(r8_log(r.position.x), r8_log(r.position.y), r8_log(r.position.z)) * int(settings==19);
-		res.direction += dvec3(r8_log(r.direction.x), r8_log(r.direction.y), r8_log(r.direction.z)) * int(settings==19);
-		
-		outputData[uint(gl_GlobalInvocationID)] = res;
-	}	
 
+		/*if(i==1) {
+			// outputData[uint(gl_GlobalInvocationID)] = rayData[uint(gl_GlobalInvocationID)];
+			//closestHitpoint.xyz = dvec3(quadricData[closestQuadricIndex].inTrans * dvec4(closestHitpoint.xyz,1));
+			//outputData[uint(gl_GlobalInvocationID)] = traceMirror(rayData[uint(gl_GlobalInvocationID)], quadricData[closestQuadricIndex], ctr, closestHitpoint);
+			outputData[uint(gl_GlobalInvocationID)].weight = 20;
+			outputData[uint(gl_GlobalInvocationID)].position = dvec3(next.outTrans * dvec4(closestHitpoint.xyz,1));
+			outputData[uint(gl_GlobalInvocationID)].energy = closestQuadricIndex;
+			return;
+		}*/
+		
+		//rayData[uint(gl_GlobalInvocationID)].energy = closestQuadricIndex;
+		// transform ray and intersection point in element coordiantes
+		Quadric next = quadricData[closestQuadricIndex];
+		//closestHitpoint.xyz = dvec3(next.inTrans * dvec4(closestHitpoint.xyz,1));
+		
+		//rayData[uint(gl_GlobalInvocationID)] = rayMatrixMult(rayData[uint(gl_GlobalInvocationID)], next.inTrans); // from global to element coordinates, misalignment
+		
+		// calculate interaction of ray with detected next quadric 
+		type = int(next.anchorPoints[3][0]);
+		if (type == 0) { // mirror
+			rayData[uint(gl_GlobalInvocationID)] = traceMirror(rayData[uint(gl_GlobalInvocationID)], next, ctr, closestHitpoint);
+		}else if(type == 1){ // plane grating
+			rayData[uint(gl_GlobalInvocationID)] = tracePlaneGrating(rayData[uint(gl_GlobalInvocationID)], next, ctr, closestHitpoint);	
+		}else if(type == 2){ // general grating
+			rayData[uint(gl_GlobalInvocationID)] = traceGeneralGrating(rayData[uint(gl_GlobalInvocationID)], next, ctr, closestHitpoint);	
+		}else if(type == 3){ // Slit
+			rayData[uint(gl_GlobalInvocationID)] = traceSlit(rayData[uint(gl_GlobalInvocationID)], next, ctr, closestHitpoint);	
+		}else if(type == 4) { // rzp
+			rayData[uint(gl_GlobalInvocationID)] = traceRZP(rayData[uint(gl_GlobalInvocationID)], next, ctr, closestHitpoint);	
+		}else if(type == 5) { // image plane
+			if(rayData[uint(gl_GlobalInvocationID)].weight == 1) {
+				rayData[uint(gl_GlobalInvocationID)].position = closestHitpoint.xyz;
+			}else{
+				rayData[uint(gl_GlobalInvocationID)].weight = 0;
+			}//dvec3(next.outTrans * dvec4(closestHitpoint.xyz,1)); // = traceImagePlane(rayData[uint(gl_GlobalInvocationID)], next);
+			//rayData[uint(gl_GlobalInvocationID)].weight = 10;
+			outputData[uint(gl_GlobalInvocationID)] = rayData[uint(gl_GlobalInvocationID)];
+			//outputData[uint(gl_GlobalInvocationID)].position = dvec3(next.outTrans *  dvec4(closestHitpoint.xyz,1)); 
+			//outputData[uint(gl_GlobalInvocationID)] = traceImagePlane(rayData[uint(gl_GlobalInvocationID)], next);
+			//outputData[uint(gl_GlobalInvocationID)] = rayMatrixMult(outputData[uint(gl_GlobalInvocationID)], next.outTrans);
+			return;
+		}
+		//rayData[uint(gl_GlobalInvocationID)] = rayMatrixMult(rayData[uint(gl_GlobalInvocationID)], next.outTrans); // from element to global coordinate system
+		
+	}
+	outputData[uint(gl_GlobalInvocationID)] = rayData[uint(gl_GlobalInvocationID)];
 }
 
-
-/*
-void cameraPlaneIntersection(outputData, cameraPlane){
-	const int numberOfQuadrics = quadricData.length()
-	Ray temporaryOutputVector;
-	temporaryOutputVector = traceRay(outputData[uint(gl_GlobalInvocationID)], quadricData[numberOfQuadrics-1]);
-	outputData[uint(gl_GlobalInvocationID)].position = temporaryOutputVector.position;
-}
-*/
 void main(){
-    //testFunctions();
-	iterateQuadrics();
+    dynamicQuadrics();
+	//Ray r = rayData[uint(gl_GlobalInvocationID)];
+	//testFunctions();
+	//iterateElements();
 	/*
 	Ray r = rayData[uint(gl_GlobalInvocationID)];
 	r.weight = double(ctr);

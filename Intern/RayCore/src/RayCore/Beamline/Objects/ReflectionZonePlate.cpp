@@ -65,17 +65,20 @@ namespace RAYX
             calcBeta2();
         }
         else { // auto == true
-            setBeta(beta);
+            setBeta(rad(beta));
         }
         std::cout << "alpha: " << getAlpha() << ", beta: " << getBeta() << std::endl;
         printInfo();
+        int icurv;
         // set parameters in Quadric class
         if (m_curvatureType == CT_PLANE) {
-            setSurface(std::make_unique<Quadric>(std::vector<double>{ 0, 0, 0, 0, 0, 0, 0, -1, 0, 0, 0, 0, 4, 0, 0, 0 }));
+            icurv = 1;
+            setSurface(std::make_unique<Quadric>(std::vector<double>{ 0, 0, 0, 0, double(icurv), 0, 0, -1, 0, 0, 0, 0, 4, 0, 0, 0 }));
         }
         else if (m_curvatureType == CT_SPHERICAL) {
+            icurv = 1;
             m_longRadius = longRadius; // for sphere and toroidal
-            setSurface(std::make_unique<Quadric>(std::vector<double>{ 1, 0, 0, 0, 0, 1, 0, -m_longRadius, 0, 0, 1, 0, 4, 0, 0, 0 }));
+            setSurface(std::make_unique<Quadric>(std::vector<double>{ 1, 0, 0, 0, double(icurv), 1, 0, -m_longRadius, 0, 0, 1, 0, 4, 0, 0, 0 }));
         }
         else {
             // no structure for non-quadric elements yet
@@ -88,10 +91,10 @@ namespace RAYX
         // the whole misalignment is also stored in temporaryMisalignment because it needs to be temporarily removed during tracing
         setTemporaryMisalignment(misalignmentParams);
         setElementParameters({
-            double(m_imageType), double(m_rzpType), double(m_derivationMethod), m_wavelength,
-            m_designEnergy, m_designOrderOfDiffraction,m_orderOfDiffraction,m_frenselZOffset,
-            m_sagittalEntranceArmLength,m_sagittalExitArmLength,m_meridionalEntranceArmLength,m_meridionalExitArmLength,
-            m_designAlphaAngle,m_designBetaAngle,m_elementOffsetZ, double(m_additionalOrder) }
+            double(m_imageType),        double(m_rzpType),          double(m_derivationMethod),     m_wavelength,
+            m_designEnergy,             m_designOrderOfDiffraction, m_orderOfDiffraction,           m_frenselZOffset,
+            m_sagittalEntranceArmLength,m_sagittalExitArmLength,    m_meridionalEntranceArmLength,  m_meridionalExitArmLength,
+            m_designAlphaAngle,         m_designBetaAngle,          m_elementOffsetZ,               double(m_additionalOrder) }
         );
     }
 

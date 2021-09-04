@@ -38,7 +38,8 @@ namespace RAYX
         calcRadius();
         // std::cout << m_a << std::endl;
         // set parameters in Quadric class
-        setSurface(std::make_unique<Quadric>(std::vector<double>{1, 0, 0, 0, 0, 1, 0, -m_radius, 0, 0, 1, 0, 2, 0, 0, 0}));
+        double icurv = 1; // -1 if radius < 0 in fortran
+        setSurface(std::make_unique<Quadric>(std::vector<double>{1,0,0,0, icurv,1,0,-m_radius, 0,0,1,0, 2,0,0,0}));
         calcTransformationMatrices(misalignmentParams, global);
         setElementParameters({
             0, 0, m_lineDensity, m_orderOfDiffraction,
