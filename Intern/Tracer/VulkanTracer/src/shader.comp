@@ -2359,8 +2359,8 @@ Ray traceRZP(Ray r, const Quadric q, inout uint64_t ctr, dvec4 intersection) {
 	
 	// RZP can be plane, toroidal or spherical curvature type. Use intersectionPoint for all except toroidal
 	// if !toroidal:
-	//dvec4 normal = intersectionPoint(r, q.anchorPoints);
-	dvec4 normal = setIntersectionPoint(r, q.anchorPoints, intersection);
+	dvec4 normal = intersectionPoint(r, q.anchorPoints);
+	//dvec4 normal = setIntersectionPoint(r, q.anchorPoints, intersection);
 	// toroidal not implemented yet
 		//TODO
 
@@ -2602,7 +2602,7 @@ Ray traceImagePlane(Ray r, const Quadric q) {
 	r.position.y = r.position.y + ((r.direction.y / r.direction.z) * offset);
 	r.position.z = 0;
 	r.weight *= int(r.direction.z > 0); // if ray points away from image plane there is no intersection with it
-	r = rayMatrixMult(r, q.outTrans);
+	//r = rayMatrixMult(r, q.outTrans);
 	return r;
 }
 
@@ -2959,6 +2959,7 @@ void dynamicQuadrics(){
 			rayData[uint(gl_GlobalInvocationID)] = traceRZP(rayData[uint(gl_GlobalInvocationID)], next, ctr, closestHitpoint);	
 		}else if(type == 5) { // image plane
 			if(rayData[uint(gl_GlobalInvocationID)].weight == 1) {
+				rayData[uint(gl_GlobalInvocationID)] = rayMatrixMult(rayData[uint(gl_GlobalInvocationID)], next.inTrans);
 				rayData[uint(gl_GlobalInvocationID)].position = closestHitpoint.xyz;
 			}else{
 				rayData[uint(gl_GlobalInvocationID)].weight = 0;
@@ -2982,6 +2983,7 @@ void main(){
 	//testFunctions();
 	//iterateElements();
 	/*
+	// E034Q98KIS
 	Ray r = rayData[uint(gl_GlobalInvocationID)];
 	r.weight = double(ctr);
 	r.energy = 27;
