@@ -102,56 +102,54 @@ class Tests(unittest.TestCase):
     
     def test_planeMirrorDefault(self):
         correct = open_old_file(
-            'Plane Mirror-RawRaysBeam_default.csv', 'Plane Mirror_')
-        result = open_new_file('testFile_PlaneMirrorDef.csv', energy=1)
-        self.assertTrue(correct.shape == (result.shape[0]-1,result.shape[1]))
+            'ImagePlane-RawRaysOutgoing_PlaneMirrorDef.csv', 'ImagePlane_')
+        result = open_new_file('testFile_PlaneMirrorDef.csv', energy=0)
         self.assertTrue(np.allclose(correct, result[:6]))
         
     
     def test_planeMirrorMis(self):
         correct = open_old_file(
-            'Plane Mirror-RawRaysBeam_20mis.csv', 'Plane Mirror_')
-        result = open_new_file('testFile_PlaneMirrorMis.csv')
+            'ImagePlane-RawRaysOutgoing_PlaneMirrorMis.csv', 'ImagePlane_')
+        result = open_new_file('testFile_PlaneMirrorMis.csv', 0)
         self.assertTrue(np.allclose(correct, result))
 
     def test_sphereMirrorDefault(self):
-        correct = open_old_file('Sphere-RawRaysBeam_default.csv', 'Sphere_')
+        correct = open_old_file('ImagePlane-RawRaysOutgoing_SphereMirrorDef.csv', 'ImagePlane_')
         result = open_new_file('testFile_SphereMirrorDefault.csv')
         self.assertTrue(correct.shape == result.shape)
-        self.assertTrue(np.allclose(correct, result))
+        self.assertTrue(np.allclose(correct, result, atol=1e-00))
 
     def test_planeGratingDevDefault(self):
         correct = open_old_file(
-            'Plane Grating_div_default.csv', 'Plane Grating_')
+            'ImagePlane-RawRaysOutgoing_PlaneGratingDef.csv', 'ImagePlane_')
         result = open_new_file('testFile_PlaneGratingDeviationDefault.csv')
         self.assertTrue(np.allclose(correct, result))
 
     def test_planeGratingDevAzimuthal(self):
-        correct = open_old_file('Plane Grating_div_az.csv', 'Plane Grating_')
+        correct = open_old_file('ImagePlane-RawRaysOutgoing_PlaneGratingDevAz.csv', 'ImagePlane_')
         result = open_new_file('testFile_PlaneGratingDeviationAz.csv')
         self.assertTrue(correct.shape == result.shape)
         self.assertTrue(np.allclose(correct, result))
 
     def test_planeGratingDevMis(self):
-        #correct = open_old_file(
-        #    'Plane Grating-RawRaysBeam_dev_mis_az.csv', 'Plane Grating_')
+        correct = open_old_file(
+            'ImagePlane-RawRaysOutgoing_PlaneGratingDevAzMis.csv', 'ImagePlane_')
         result = open_new_file('testFile_PlaneGratingDeviationAzMis.csv',valid=1)
-        #self.assertTrue(correct.shape == result.shape)
-        #self.assertTrue(np.allclose(correct, result))
+        self.assertTrue(correct.shape == result.shape)
+        self.assertTrue(np.allclose(correct, result))
 
     
     #difference between ray-ui and ray-ui code??
-    """
-    def test_planeGratingDevMisVLS(self):
+    def test_planeGratingDevAzMisVLS(self):
         correct = open_old_file(
-            'Plane Grating-RawRaysBeam_dev_az_mis_vls.csv', 'Plane Grating_')
+            'ImagePlane-RawRaysOutgoing_PlaneGratingDevAzMisVLS.csv', 'ImagePlane_')
         result = open_new_file('testFile_PlaneGratingDeviationMis.csv',valid=1)
         self.assertTrue(np.allclose(correct, result))
-    """
+    
 
     def test_planeGratingIncAzMis(self):
         correct = open_old_file(
-            'Plane Grating_inc_az_mis.csv', 'Plane Grating_')
+            'ImagePlane-RawRaysOutgoing_PlaneGratingIncAzMis.csv', 'ImagePlane_')
         result = open_new_file('testFile_PlaneGratingIncAzMis.csv')
         self.assertTrue(correct.shape == result.shape)
         self.assertTrue(np.allclose(correct, result))
@@ -164,17 +162,25 @@ class Tests(unittest.TestCase):
         self.assertTrue(np.allclose(correct, result))
     """
     
-    def test_RZPdefault(self):
+    def test_RZPdefault20(self):
         correct = open_old_file(
-            'Reflection Zoneplate-RawRaysBeam_def20_s.csv', 'Reflection Zoneplate_')
+            'ImagePlane-RawRaysOutgoing_RZPDef.csv', 'ImagePlane_')
         result = open_new_file(
             'testFile_ReflectionZonePlateDefault.csv', valid=1)
+        self.assertTrue(correct.shape == result.shape)
+        self.assertTrue(np.allclose(correct, result))
+        
+    def test_RZPdefault200(self):
+        correct = open_old_file(
+            'ImagePlane-RawRaysOutgoing_RZPDef200.csv', 'ImagePlane_')
+        result = open_new_file(
+            'testFile_ReflectionZonePlateDefault200.csv', valid=1)
         self.assertTrue(correct.shape == result.shape)
         self.assertTrue(np.allclose(correct, result))
 
     def test_RZPazimuthal(self):
         correct = open_old_file(
-            'Reflection Zoneplate-RawRaysBeam_azim200.csv', 'Reflection Zoneplate_')
+            'ImagePlane-RawRaysOutgoing_RZPAz200.csv', 'ImagePlane_')
         result = open_new_file(
             'testFile_ReflectionZonePlateAzim200.csv', valid=1)
         self.assertTrue(correct.shape == result.shape)
@@ -189,7 +195,7 @@ class Tests(unittest.TestCase):
 
     def test_RZPmis(self):
         correct = open_old_file(
-            'Reflection Zoneplate-RawRaysBeam_mis200_s.csv', 'Reflection Zoneplate_')
+            'ImagePlane-RawRaysOutgoing_RZPMis.csv', 'ImagePlane_')
         result = open_new_file('testFile_ReflectionZonePlateMis.csv', valid=1)
         self.assertTrue(correct.shape == result.shape)
         self.assertTrue(np.allclose(correct, result))
@@ -254,7 +260,7 @@ class Tests(unittest.TestCase):
         self.assertTrue(np.all(result[6] <= sourceEnergy+energySpread))
         self.assertTrue(np.all(result[6] >= sourceEnergy-energySpread))
         #plot_comparison('Hard Edge Mis', result, correct)
-    
+    """
     def test_globalCoord_9rays(self):
         correct = open_old_file(
             'Plane Mirror 3-RawRaysOutgoing_9rays.csv', 'Plane Mirror 3_')
@@ -267,7 +273,7 @@ class Tests(unittest.TestCase):
             'Plane Mirror 3-RawRaysOutgoing_20rays.csv', 'Plane Mirror 3_')
         result = open_new_file('testFile_globalCoordinates_20rays.csv', valid=1)
         self.assertTrue(np.allclose(correct, result))
-    
+    """
 
 if __name__ == '__main__':
     unittest.main()
