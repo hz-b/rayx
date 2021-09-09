@@ -50,6 +50,8 @@ namespace RAYX
                 }
             }
         }
+
+        return Beamline();
     }
 
 } // namespace RAYX

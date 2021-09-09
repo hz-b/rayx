@@ -38,7 +38,7 @@ namespace RAYX
         double getAlpha() const;
         double getChi() const;
         double getDistanceToPreceedingElement() const;
-        
+
         std::vector<double> getInMatrix() const;
         std::vector<double> getOutMatrix() const;
         std::vector<double> getMisalignmentMatrix() const;
@@ -69,36 +69,29 @@ namespace RAYX
         ~OpticalElement();
 
     private:
-        double width;
-        double m_heigth;
-
+        // Geometric Parameter
         double m_width;
         double m_height;
-        double m_alpha;
-        double m_beta;
-        double m_chi;
-        double m_distanceToPreceedingElement;
-
-        // name 
-        // surface (eg Quadric or if eg torus something else)
-        std::unique_ptr<Surface> m_surface;
-        std::vector<double> m_surfaceParams; // used to be anchor points
-
-        // previous optical element (needed for read access of the transformation matrices to derive global coordinates for this element)
-        std::shared_ptr<OpticalElement> m_previous;
-
-        // transformation matrices:
-
-        // dx,dy,dz,psi(x-axis),dphi(y-axis),dchi(z-axis) angles in rad, the order is fixed. This is added to the ray together with the InTrans and OutTrans in the beginning and end of the tracing process.
-        std::vector<double> m_misalignmentParams;
         // 7 paramters that specify the slope error, are stored in objectParamters to give to shader
         std::vector<double> m_slopeError;
-
         // stored only for completeness and not to transfer to the shader, these transformations are part of inMatrix/outMatrix which are transferred.
         std::vector<double> d_misalignmentMatrix;
         std::vector<double> d_inverseMisalignmentMatrix;
 
+
+        // User/Design Parameter
+        double m_alpha;
+        double m_beta;
+        double m_chi;
+        double m_distanceToPreceedingElement;
+        // previous optical element (needed for read access of the transformation matrices to derive global coordinates for this element)
+        std::shared_ptr<OpticalElement> m_previous;
+        // dx,dy,dz,psi(x-axis),dphi(y-axis),dchi(z-axis) angles in rad, the order is fixed. This is added to the ray together with the InTrans and OutTrans in the beginning and end of the tracing process.
+        std::vector<double> m_misalignmentParams;
+
+        // transformation matrices:
         // beam element transformation matrices derived directly from params alpha, beta, chi and distance
+        // TODO(Jannis): remove and make local for functions that need them
         std::vector<double> d_b2e; // inTrans M_b2e
         std::vector<double> d_e2b; // outTrans M_e2b
         std::vector<double> d_inv_b2e; // invInTrans; (M_b2e)^-1
@@ -106,7 +99,13 @@ namespace RAYX
         // transformation between global and element coordinate system, derived from beam-element matrices (of this and previous element, see wiki)
         std::vector<double> d_g2e; // m_inTransMis
         std::vector<double> d_e2g; // m_outTransMis;
+        // ----
 
+        // Surface (eg Quadric or if eg torus something else)
+        std::unique_ptr<Surface> m_surface;
+        std::vector<double> m_surfaceParams; // used to be anchor points
+
+        // TODO(Jannis): remove temporary misalignment (maybe move to rzp)
         // sometimes it is necessary to remove (partly (ellipsoid) or the whole (RZP)) misalignment midtracing, the parameters (see misalignment) is stored here and the corresponding
         // transformation matrix in m_temporaryMisalignmentMatrix (0's if not needed)
         std::vector<double> m_temporaryMisalignmentParams;

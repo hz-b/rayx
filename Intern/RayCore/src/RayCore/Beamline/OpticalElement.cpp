@@ -43,15 +43,15 @@ namespace RAYX
         //m_surface(std::move(surface)), 
         m_width(width),
         m_height(height),
-        m_alpha (alpha),
+        m_alpha(alpha),
         m_beta(beta), // mirror -> exit angle = incidence angle
-        m_chi (chi),
-        m_distanceToPreceedingElement (dist),
+        m_chi(chi),
+        m_distanceToPreceedingElement(dist),
         m_previous(previous),
         m_misalignmentParams(misalignmentParams),
         m_slopeError(slopeError),
         m_elementParameters(EParameters)
-    {   
+    {
         updateObjectParams();
         calcTransformationMatrices(misalignmentParams, global);
         setTemporaryMisalignment(tempMisalignmentParams);
@@ -64,8 +64,8 @@ namespace RAYX
         m_chi(chi),
         m_distanceToPreceedingElement(dist),
         m_previous(previous),
-        m_slopeError(slopeError) 
-    {   
+        m_slopeError(slopeError)
+    {
         updateObjectParams();
     }
 
@@ -86,7 +86,7 @@ namespace RAYX
      * @return void
     */
     void OpticalElement::calcTransformationMatrices(const std::vector<double> misalignment, bool global) {
-        
+
         double cos_c = cos(m_chi);
         double sin_c = sin(m_chi);
         double cos_a = cos(m_alpha);
@@ -169,11 +169,12 @@ namespace RAYX
             std::cout << "first element" << std::endl;
         }
 
-        if(global) {  // combine in and out transformation (global <-> element coordinates) with misalignment
+        if (global) {  // combine in and out transformation (global <-> element coordinates) with misalignment
             std::cout << "global" << std::endl;
             m_inMatrix = d_g2e;
             m_outMatrix = d_e2g;
-        }else{  // to use usual ray coordinatesystem, also contains misalignment
+        }
+        else {  // to use usual ray coordinatesystem, also contains misalignment
             std::cout << "RAY-UI beam coordinates" << std::endl;
             m_inMatrix = d_b2e;
             m_outMatrix = d_e2b;
@@ -262,14 +263,14 @@ namespace RAYX
                 m_slopeError[2], m_slopeError[3], m_slopeError[4], m_slopeError[5],
                 m_slopeError[6],m_alpha,0,0,
                 0,0,0,0
-            };
+        };
     }
 
     void OpticalElement::setAlpha(double alpha) {
         m_alpha = alpha;
         updateObjectParams();
     }
-    
+
     void OpticalElement::setBeta(double beta) {
         m_beta = beta;
     }
