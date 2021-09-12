@@ -59,7 +59,7 @@ namespace RAYX
         double m_linearPol_45;
         double m_circularPol;
         std::uniform_real_distribution<double> m_unif;
-        std::default_random_engine re;
+        std::default_random_engine m_re;
 
     };
 

@@ -4,14 +4,14 @@ namespace RAYX
 {
 
     /**
-     * angles given in degree and stored in rad
-     * initializes transformation matrices, and parameters for the quadric in super class (quadric)
-     * sets mirror-specific parameters in this class
-     * @params:
-     *          width, height = total width, height of the mirror (x- and z- dimensions)
-     *          grazingIncidence = desired incidence angle of the main ray
-     *          azimuthal = rotation of mirror around z-axis
-     *          distanceToPreceedingElement
+     * Angles given in degree and stored in rad. Initializes transformation matrices,
+     * and parameters for the quadric in super class (quadric). Sets mirror-specific
+     * parameters in this class.
+     *
+     * width, height = total width, height of the mirror (x- and z- dimensions)
+     * grazingIncidence = desired incidence angle of the main ray
+     * azimuthal = rotation of mirror around z-axis
+     * distanceToPreceedingElement
      *
     */
     Ellipsoid::Ellipsoid(const char* name, const double width, const double height, const double grazingIncidence, const double azimuthal, const double distanceToPreceedingElement,
@@ -62,8 +62,8 @@ namespace RAYX
             std::vector<double> AMA = getMatrixProductAsVector(invTempMis, MA); //A^-1M^-1A
             std::vector<double> TAMA = getMatrixProductAsVector(outTrans, AMA); // T-^1A^-1M^-1A
             setOutMatrix(TAMA);
-        }        
-else {
+        }
+        else {
             setTemporaryMisalignment({ 0,0,0,0,0,0 });
         }
     }
@@ -106,12 +106,12 @@ else {
         m_shortHalfAxisB = b;
         if (m_figureRotation == FR_YES) {
             d_halfAxisC = sqrt(pow(m_shortHalfAxisB, 2) / 1); // devided by 1??
-        }        
-else if (m_figureRotation == FR_PLANE) {
+        }
+        else if (m_figureRotation == FR_PLANE) {
             std::cout << "FR PLane" << std::endl;
             d_halfAxisC = INFINITY;
-        }        
-else {
+        }
+        else {
             d_halfAxisC = sqrt(pow(m_shortHalfAxisB, 2) / m_a11);
         }
         d_tangentAngle = angle;
@@ -140,7 +140,7 @@ else {
     double Ellipsoid::getIncidenceAngle() const {
         return m_incidence;
     }
-    
+
     double Ellipsoid::getShortHalfAxisB() {
         return m_shortHalfAxisB;
     }

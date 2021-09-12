@@ -5,8 +5,10 @@ namespace RAYX
 
     /**
      * initializes transformation matrices, and parameters for the quadric in super class (quadric)
-     * @param dist               distance to preceeding element
-     * @param previous           pointer to previous element in beamline, needed for calculating world coordinates
+     * @param   name        name of ImagePlane
+     * @param   distance    distance to preceeding element
+     * @param   previous    pointer to previous element in beamline, needed for calculating world coordinates
+     * @param   global
      *
     */
     ImagePlane::ImagePlane(const char* name, const double distance, const std::shared_ptr<OpticalElement> previous, bool global)

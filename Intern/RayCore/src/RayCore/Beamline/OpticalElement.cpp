@@ -82,7 +82,8 @@ namespace RAYX
 
     /**
      * calculates in and out transformation matrices from grazing incidence and exit angles, azimuthal angle and distance to preceeding element
-     * @param misalignment  misalignment x,y,z,psi,phi,chi
+     * @param   misalignment    misalignment x,y,z,psi,phi,chi
+     * @param   global          flag for global coordinate calculations
      * @return void
     */
     void OpticalElement::calcTransformationMatrices(const std::vector<double> misalignment, bool global) {

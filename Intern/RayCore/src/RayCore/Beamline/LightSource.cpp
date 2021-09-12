@@ -35,10 +35,10 @@ namespace RAYX
     double LightSource::getLinear0() {
         return m_linearPol_0;
     }
-    double LightSource::getLinear45(){
+    double LightSource::getLinear45() {
         return m_linearPol_45;
     }
-    double LightSource::getCircular(){
+    double LightSource::getCircular() {
         return m_circularPol;
     }
     void LightSource::setNumberOfRays(const int numberOfRays) {
@@ -67,11 +67,11 @@ namespace RAYX
             // else distinguish between two sprad types 
         }
         else if (m_energySpreadType == ES_WHITE_BAND) { //  energy uniform random in [photonEnergy - 0.5*spread, photonEnergy + 0.5*spread]
-            double rn = m_unif(re);
+            double rn = m_unif(m_re);
             en = m_photonEnergy + (rn - 0.5) * m_energySpread;
         }
         else { // three sources
-            double rn = m_unif(re);
+            double rn = m_unif(m_re);
             en = m_photonEnergy + double(int(rn * 3) - 1) * 0.5 * m_energySpread;
         }
         return en;

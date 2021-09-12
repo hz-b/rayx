@@ -16,9 +16,6 @@ namespace RAYX
 
     class RAYX_API TracerInterface
     {
-        struct RayVector {
-            std::vector<Ray> rayVector;
-        };
     public:
         enum m_dataType { RayType, QuadricType };
 
