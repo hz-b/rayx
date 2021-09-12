@@ -27,16 +27,19 @@ namespace RAYX
      *
      * angles given in rad
      * define transformation matrices based on grazing incidence (alpha) and exit (beta) angle, azimuthal angle (chi) and distance to preceeding element
-     * @param: inputPoints      Matrix A for quadric surfaces with a_11,a_12,a_13,a_14, a_21,a_22,a_23,a_24, a_31,a_32,a_33,a_34, a_41,a_42,a_43,a_44
-     *                      a_21,a_31,a_32,a_41,a_42,a_43 are never used for quadric surfaces because the matrix is symmetrial,
-     *                      we use a_21,a_31 for x and z dimensions of the surface (xlength, zlength)
+     * @param name
      * @param EParameters               vector with 16 entries that contain further element specific parameters that are needed on the shader
+     * @param width
+     * @param height
      * @param alpha                     grazing incidence angle
      * @param chi                       azimuthal angle
      * @param beta                      grazing exit angle
      * @param dist                      distance to preceeding element
      * @param misalignmentParams        angles and distances for the object's misalignment
      * @param tempMisalignmentParams    parameters for temporary misalignment that can be removed midtracing.
+     * @param slopeError
+     * @param previous
+     * @param global
     */
     OpticalElement::OpticalElement(const char* name, const std::vector<double> EParameters, const double width, const double height, const double alpha, const double chi, const double beta, const double dist, const std::vector<double> misalignmentParams, const std::vector<double> tempMisalignmentParams, const std::vector<double> slopeError, const std::shared_ptr<OpticalElement> previous, bool global)
         : BeamlineObject(name),
@@ -191,15 +194,15 @@ namespace RAYX
     }
 
     /**
-     * set some additional misalignment that needs to be removed in the process of tracing the ray (eg RZP and Ellipsoid),
-     * therefore it is stored in a separate matrix and not in the InTrans and OutTrans that are
-     * used in the beginning and in the end of the tracing only (from Ray-coord to object-coord. and back)
-     * angles given in rad
-     * we can calculate the misalignment with a matrix multiplication in the shader
+     * Set some additional misalignment that needs to be removed in the process of tracing the ray (eg RZP and Ellipsoid).
+     * It is stored in a separate matrix and not in the InTrans and OutTrans, which are used only at the beginning
+     * and end of the tracing (from ray-coord to object-coord and back).
+     * Angles given in radians.
+     * We can calculate the misalignment with a matrix multiplication in the shader
      * -> store the matrix derived from the 6 input values in m_misalignmentMatrix
-     * we calculate the inverse misalignment matrix as well
-     *  @param: vector with 6 values: dx, dy, dz, dphi, psi, dchi
-     *  @returns void
+     * We calculate the inverse misalignment matrix as well.
+     *
+     *  @param  misalignment    vector with 6 values: dx, dy, dz, dphi, psi, dchi
      */
     void OpticalElement::setTemporaryMisalignment(std::vector<double> misalignment) {
         double dx = misalignment[0];

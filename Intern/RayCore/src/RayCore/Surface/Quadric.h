@@ -9,10 +9,10 @@
 namespace RAYX {
     class RAYX_API Quadric : public Surface {
     public:
-        /// ctor
+        // ctor
         Quadric();
         Quadric(const std::vector<double> inputPoints);
-        /// dtor
+        // dtor
         ~Quadric();
 
 

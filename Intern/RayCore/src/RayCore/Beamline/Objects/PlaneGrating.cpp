@@ -2,41 +2,44 @@
 
 namespace RAYX
 {
-
+    // TODO(Jannis): complete documentation
     /**
-     * angles given in degree and stored in rad
-     * initializes transformation matrices, and parameters for the quadric in super class (quadric)
-     * sets mirror-specific parameters in this class
+     * Angles given in degree and stored in rad. Initializes transformation
+     * matrices, and parameters for the quadric in super class (quadric).
+     * Sets mirror-specific parameters in this class.
+     * @param name                  name of the plane grating
      * @param mount                 how angles of reflection are calculated: constant deviation, constant incidence,...
-     * @param width,                total width and..
+     * @param width                 total width and..
      * @param height                ..height of the mirror (x- and z- dimensions)
      * @param deviation             angle between incoming and outgoing main ray
-     * @param grazingIncidence      desired incidence angle of the main ray
+     * @param normalIncidence
      * @param azimuthal             rotation of mirror around z-axis
      * @param distanceToPreceedingElement
      * @param designEnergyMounting  energy, taken from source
      * @param lineDensity           line density of the grating
-     * @param orderOfDefraction
+     * @param orderOfDiffraction
      * @param fixFocusConstantCFF
+     * @param additional_zero_order
      * @param misalignmentParams    misalignmen parameters (x,y,z position and x,y,z direction)
      * @param vls                   vls grating paramters (6)
      * @param slopeError            7 slope error parameters: x-y sagittal (0), y-z meridional (1), thermal distortion x (2),y (3),z (4), cylindrical bowing amplitude y(5) and radius (6)
      * @param previous              pointer to previous element in beamline, needed for caclultation transformation matrices in global coordinate system
+     * @param global
     */
-    PlaneGrating::PlaneGrating(const char* name, const int mount, const double width, const double height, const double deviation, const double normalIncidence, const double azimuthal, const double distanceToPreceedingElement, const double designEnergyMounting, const double lineDensity, const double orderOfDiffraction, const double fixFocusConstantCFF, const int additional_zero_order, const std::vector<double> misalignmentParams, const std::vector<double> vls, const std::vector<double> slopeError, const std::shared_ptr<OpticalElement> previous, bool global) 
-    : OpticalElement(name, width, height, rad(azimuthal), distanceToPreceedingElement, slopeError, previous),
-        m_fixFocusConstantCFF(fixFocusConstantCFF), 
-        m_designEnergyMounting(designEnergyMounting), 
+    PlaneGrating::PlaneGrating(const char* name, const int mount, const double width, const double height, const double deviation, const double normalIncidence, const double azimuthal, const double distanceToPreceedingElement, const double designEnergyMounting, const double lineDensity, const double orderOfDiffraction, const double fixFocusConstantCFF, const int additional_zero_order, const std::vector<double> misalignmentParams, const std::vector<double> vls, const std::vector<double> slopeError, const std::shared_ptr<OpticalElement> previous, bool global)
+        : OpticalElement(name, width, height, rad(azimuthal), distanceToPreceedingElement, slopeError, previous),
+        m_fixFocusConstantCFF(fixFocusConstantCFF),
+        m_designEnergyMounting(designEnergyMounting),
         m_lineDensity(lineDensity),
-        m_orderOfDiffraction(orderOfDiffraction) 
-     {
+        m_orderOfDiffraction(orderOfDiffraction)
+    {
         // parameters in array 
         // std::vector<double> inputPoints = {0,0,0,0, 0,0,0,-1, 0,0,0,0, 0,0,0,0};
         m_a = abs(hvlam(m_designEnergyMounting)) * abs(m_lineDensity) * m_orderOfDiffraction * 1e-6; // wavelength * linedensity * order of diffraction * 10^-6
         std::cout << "wavelength" << abs(hvlam(m_designEnergyMounting)) << std::endl;
         m_additionalOrder = additional_zero_order == 0 ? AO_OFF : AO_ON;
         m_gratingMount = mount == 0 ? GM_DEVIATION : (mount == 1 ? GM_INCIDENCE : (mount == 2 ? GM_CCF : GM_CCF_NO_PREMIRROR));
-        
+
         calcAlpha(deviation, normalIncidence);
         std::cout << "alpha: " << getAlpha() << ", beta: " << getBeta() << " a: " << m_a << std::endl;
 
@@ -60,14 +63,14 @@ namespace RAYX
         double angle;
         if (m_gratingMount == GM_DEVIATION) {
             angle = deviation;
-        }        
-else if (m_gratingMount == GM_INCIDENCE) {
+        }
+        else if (m_gratingMount == GM_INCIDENCE) {
             angle = -normalIncidence;
-        }        
-else if (m_gratingMount == GM_CCF) {
+        }
+        else if (m_gratingMount == GM_CCF) {
             // TODO
-        }        
-else if (m_gratingMount == GM_CCF_NO_PREMIRROR) {
+        }
+        else if (m_gratingMount == GM_CCF_NO_PREMIRROR) {
             // TODO
         }
         focus(angle);
@@ -83,19 +86,19 @@ else if (m_gratingMount == GM_CCF_NO_PREMIRROR) {
             if (abs(arg) >= 1) { // cannot calculate alpha & beta
                 alph = 0;
                 bet = 0;
-            }            
+            }
             else {
                 alph = theta;
                 bet = asin(arg);
             }
-        }        
+        }
         else {  // constant alpha & beta mounting
             theta = theta / 2;
             double arg = m_a / 2 / cos(theta);
             if (abs(arg) >= 1) {
                 alph = 0;
                 bet = 0;
-            }            
+            }
             else {
                 bet = asin(arg) - theta;
                 alph = 2 * theta + bet;

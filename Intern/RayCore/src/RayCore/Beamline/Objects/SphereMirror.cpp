@@ -4,21 +4,22 @@ namespace RAYX
 {
 
     /**
-     * angles given in degree and stored in rad
-     * initializes transformation matrices, and parameters for the quadric in super class (quadric)
-     * sets mirror-specific parameters in this class
-     * @params:
-     *          width, height = total width, height of the mirror (x- and z- dimensions)
-     *          grazingIncidence = desired incidence angle of the main ray
-     *          azimuthal = rotation of mirror around z-axis
-     *          distanceToPreceedingElement
+     * Angles given in degree and stored in rad.
+     * Initializes transformation matrices, and parameters for the quadric in super class (quadric).
+     * Sets mirror-specific parameters in this class.
+     *
+     * Params:
+     * width, height = total width, height of the mirror (x- and z- dimensions)
+     * grazingIncidence = desired incidence angle of the main ray
+     * azimuthal = rotation of mirror around z-axis
+     * distanceToPreceedingElement
      *
     */
-    SphereMirror::SphereMirror(const char* name, const double width, const double height, const double grazingIncidence, const double azimuthal, const double distanceToPreceedingElement, const double entranceArmLength, const double exitArmLength, const std::vector<double> misalignmentParams, const std::vector<double> slopeError, const std::shared_ptr<OpticalElement> previous, bool global) 
-    : OpticalElement(name, {0,0,0,0, 0,0,0,0, 0,0,0,0, 0,0,0,0}, width, height, rad(grazingIncidence), rad(azimuthal), rad(grazingIncidence), distanceToPreceedingElement, misalignmentParams, {0,0,0,0,0,0}, slopeError, previous, global),
-        m_entranceArmLength (entranceArmLength),
-        m_exitArmLength (exitArmLength)
-        
+    SphereMirror::SphereMirror(const char* name, const double width, const double height, const double grazingIncidence, const double azimuthal, const double distanceToPreceedingElement, const double entranceArmLength, const double exitArmLength, const std::vector<double> misalignmentParams, const std::vector<double> slopeError, const std::shared_ptr<OpticalElement> previous, bool global)
+        : OpticalElement(name, { 0,0,0,0, 0,0,0,0, 0,0,0,0, 0,0,0,0 }, width, height, rad(grazingIncidence), rad(azimuthal), rad(grazingIncidence), distanceToPreceedingElement, misalignmentParams, { 0,0,0,0,0,0 }, slopeError, previous, global),
+        m_entranceArmLength(entranceArmLength),
+        m_exitArmLength(exitArmLength)
+
     {
         // std::vector<double> inputPoints = {0,0,0,0, 0,0,0,-1, 0,0,0,0, 0,0,0,0};
 
@@ -41,7 +42,7 @@ namespace RAYX
         return m_radius;
     }
 
-    
+
     double SphereMirror::getExitArmLength() const {
         return m_exitArmLength;
     }

@@ -62,7 +62,6 @@ namespace RAYX
         std::vector<double> getSlopeError() const;
 
         void calcTransformationMatrices(const std::vector<double> misalignment, bool global);
-        // set misalignment that needs to be removed separated from the transformation matrices during tracing
         void setTemporaryMisalignment(std::vector<double> misalignment);
 
         OpticalElement();

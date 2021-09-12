@@ -2,36 +2,36 @@
 
 namespace RAYX
 {
-
     /**
-     * angles given in degree and stored in rad
-     * initializes transformation matrices, and parameters for the quadric in super class (quadric)
-     * sets RZP-specific parameters in this class
-     * @params:
-     *          mount = how angles of reflection are calculated: constant deviation, constant incidence,...
-     *          width, height = total width, height of the mirror (x- and z- dimensions)
-     *          deviation = angle between incoming and outgoing main ray
-     *       or grazingIncidence = desired incidence angle of the main ray
-     *          azimuthal = rotation of mirror around z-axis
-     *          distanceToPreceedingElement
-     *          designEnergy = given by user, used if auto==false
-     *          sourceEnergy = energy, taken from source, used if auto==true
-     *          lineDensity = line density of the grating
-     *          orderOfDiffraction =
+     * Angles given in degree and stored in rad. Initializes transformation
+     * matrices, and parameters for the quadric in super class (quadric).
+     * Sets RZP-specific parameters in this class.
+     *
+     * Params:
+     * mount = how angles of reflection are calculated: constant deviation, constant incidence,...
+     * width, height = total width, height of the mirror (x- and z- dimensions)
+     * deviation = angle between incoming and outgoing main ray
+     * or grazingIncidence = desired incidence angle of the main ray
+     * azimuthal = rotation of mirror around z-axis
+     * distanceToPreceedingElement
+     * designEnergy = given by user, used if auto==false
+     * sourceEnergy = energy, taken from source, used if auto==true
+     * lineDensity = line density of the grating
+     * orderOfDiffraction =
     */
-    ReflectionZonePlate::ReflectionZonePlate(const char* name, const int geometricShape, const int mount, const int curvatureType, const int designType, 
-    const int elementOffsetType, const double width, const double height, const double deviation, const double incidenceAngle, const double azimuthal, 
-    const double distanceToPreceedingElement, const double designEnergy, const double sourceEnergy, const double orderOfDiffraction, 
-    const double designOrderOfDiffraction, const double dAlpha, const double dBeta, const double mEntrance, const double mExit, const double sEntrance, 
-    const double sExit, const double shortRadius, const double longRadius, const int additional_zero_order, const double elementOffsetZ, 
-    const double fresnelZOffset, const double beta, const std::vector<double> misalignmentParams, const std::vector<double> slopeError, 
-    const std::shared_ptr<OpticalElement> previous, bool global)
+    ReflectionZonePlate::ReflectionZonePlate(const char* name, const int geometricShape, const int mount, const int curvatureType, const int designType,
+        const int elementOffsetType, const double width, const double height, const double deviation, const double incidenceAngle, const double azimuthal,
+        const double distanceToPreceedingElement, const double designEnergy, const double sourceEnergy, const double orderOfDiffraction,
+        const double designOrderOfDiffraction, const double dAlpha, const double dBeta, const double mEntrance, const double mExit, const double sEntrance,
+        const double sExit, const double shortRadius, const double longRadius, const int additional_zero_order, const double elementOffsetZ,
+        const double fresnelZOffset, const double beta, const std::vector<double> misalignmentParams, const std::vector<double> slopeError,
+        const std::shared_ptr<OpticalElement> previous, bool global)
         : OpticalElement(name, width, height, rad(azimuthal), distanceToPreceedingElement, slopeError, previous),
         m_designAlphaAngle(rad(dAlpha)),
         m_designBetaAngle(rad(dBeta)),
 
         m_grazingIncidenceAngle(rad(incidenceAngle)),
-        
+
         m_frenselZOffset(fresnelZOffset),
         m_sagittalEntranceArmLength(sEntrance), //in mm
         m_sagittalExitArmLength(sExit),
@@ -48,7 +48,7 @@ namespace RAYX
         m_additionalOrder = additional_zero_order == 0 ? AO_OFF : AO_ON;
 
         m_geometricalShape = geometricShape == 0 ? GS_RECTANGLE : GS_ELLIPTICAL;
-        if(m_geometricalShape == GS_ELLIPTICAL) {
+        if (m_geometricalShape == GS_ELLIPTICAL) {
             setDimensions(-width, -height);
         }
         m_curvatureType = curvatureType == 0 ? CT_PLANE : (curvatureType == 1 ? CT_TOROIDAL : CT_SPHERICAL);
@@ -204,13 +204,14 @@ namespace RAYX
 
     }
 
+    // TODO(Jannis): Not called?
     /**
-     * calc alpha (incidence angle) from given mount (deviation or incidence angle given)
+     * Calc alpha (incidence angle) from given mount (deviation or incidence angle given)
      *
-     * @params: deviation:      deviation angle between incoming and outgoing ray
-     *          incidenceAngle: grazing incidence angle
+     * Params:
+     * deviation = deviation angle between incoming and outgoing ray
+     * incidenceAngle = grazing incidence angle
     */
-    // never called??
     void ReflectionZonePlate::calcDesignAlphaAngle(const double deviation, const double incidenceAngle) {
         //double angle;
         if (m_gratingMount == GM_DEVIATION) {
@@ -305,7 +306,7 @@ namespace RAYX
     }
 
     /**
-     * calculate fresnel z offset if DESIGN_TYPE == BETA from angle beta.
+     * Calculate fresnel z offset if DESIGN_TYPE == BETA from angle beta.
      * @param:
     */
     void ReflectionZonePlate::calcFresnelZOffset() {
@@ -323,7 +324,7 @@ namespace RAYX
     }
 
     /**
-     * calculate beta if DESIGN_TYPE == ZOFFSET from fresnel z offset
+     * Calculate beta if DESIGN_TYPE == ZOFFSET from fresnel z offset
      * analogous to calcFresnelZOffset if design type is beta.
     */
     void ReflectionZonePlate::calcBeta() {
@@ -370,10 +371,11 @@ namespace RAYX
     }
 
     /**
-     * calculates the design order of diffraction based on the design type (using the design beta angle
+     * Calculates the design order of diffraction based on the design type (using the design beta angle
      * or the fresnel center offset)
      *
-     * @params: designOrderOfDiffraction: parameter given by user
+     * Params:
+     * designOrderOfDiffraction = parameter given by user
     */
     void ReflectionZonePlate::calcDesignOrderOfDiffraction(const double designOrderOfDiffraction) {
         int presign;

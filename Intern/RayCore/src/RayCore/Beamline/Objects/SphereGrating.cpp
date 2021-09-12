@@ -4,19 +4,20 @@ namespace RAYX
 {
 
     /**
-     * angles given in degree and stored in rad
-     * initializes transformation matrices, and parameters for the quadric in super class (quadric)
-     * sets mirror-specific parameters in this class
-     * @params:
-     *          mount = how angles of reflection are calculated: constant deviation, constant incidence,...
-     *          width, height = total width, height of the mirror (x- and z- dimensions)
-     *          deviation = angle between incoming and outgoing main ray
-     *       or grazingIncidence = desired incidence angle of the main ray
-     *          azimuthal = rotation of mirror around z-axis
-     *          distanceToPreceedingElement
-     *          designEnergyMounting = energy, taken from source
-     *          lineDensity = line density of the grating
-     *          orderOfDefraction =
+     * Angles given in degree and stored in rad.
+     * Initializes transformation matrices, and parameters for the quadric in super class (quadric).
+     * Sets mirror-specific parameters in this class.
+     *
+     * Params
+     * mount = how angles of reflection are calculated: constant deviation, constant incidence,...
+     * width, height = total width, height of the mirror (x- and z- dimensions)
+     * deviation = angle between incoming and outgoing main ray
+     * or grazingIncidence = desired incidence angle of the main ray
+     * azimuthal = rotation of mirror around z-axis
+     * distanceToPreceedingElement
+     * designEnergyMounting = energy, taken from source
+     * lineDensity = line density of the grating
+     * orderOfDefraction =
     */
     SphereGrating::SphereGrating(const char* name, int mount, double width, double height, double deviation, double normalIncidence, double azimuthal, double distanceToPreceedingElement, double entranceArmLength, double exitArmLength, double designEnergyMounting, double lineDensity, double orderOfDiffraction, std::vector<double> misalignmentParams, std::vector<double> vls, std::vector<double> slopeError, std::shared_ptr<OpticalElement> previous, bool global)
         : OpticalElement(name, width, height, rad(azimuthal), distanceToPreceedingElement, slopeError, previous),
@@ -56,7 +57,7 @@ namespace RAYX
         if (m_gratingMount == GM_DEVIATION) {
             double theta = m_deviation > 0 ? (PI - m_deviation) / 2 : PI / 2 + m_deviation;
             m_radius = 2.0 / sin(theta) / (1.0 / m_entranceArmLength + 1.0 / m_exitArmLength);
-        }        
+        }
         else if (m_gratingMount == GM_INCIDENCE) {
             double ca = cos(getAlpha());
             double cb = cos(getBeta());
@@ -68,7 +69,7 @@ namespace RAYX
         double angle;
         if (m_gratingMount == GM_DEVIATION) {
             angle = deviation;
-        }        
+        }
         else if (m_gratingMount == GM_INCIDENCE) {
             angle = -normalIncidence;
         }
@@ -84,19 +85,19 @@ namespace RAYX
             if (abs(arg) >= 1) { // cannot calculate alpha & beta
                 alph = 0;
                 bet = 0;
-            }            
+            }
             else {
                 alph = theta;
                 bet = asin(arg);
             }
-        }        
+        }
         else {  // constant alpha & beta mounting
             theta = theta / 2;
             double arg = m_a / 2 / cos(theta);
             if (abs(arg) >= 1) {
                 alph = 0;
                 bet = 0;
-            }            
+            }
             else {
                 bet = asin(arg) - theta;
                 alph = 2 * theta + bet;
@@ -116,7 +117,7 @@ namespace RAYX
     double SphereGrating::getEntranceArmLength() const {
         return m_entranceArmLength;
     }
-    
+
     double SphereGrating::getDeviation() const {
         return m_deviation;
     }

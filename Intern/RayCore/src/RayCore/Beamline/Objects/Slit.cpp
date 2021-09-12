@@ -8,12 +8,19 @@ namespace RAYX
      * angles given in degree and stored in rad
      * initializes transformation matrices, and parameters for the quadric in super class (quadric)
      * sets mirror-specific parameters in this class
+     * @param name
+     * @param shape
+     * @param beamstop
      * @param width              width of mirror (x-dimension in element coord. sys.)
      * @param height             height of mirror (z-dimension in element coord. sys.)
-     * @param grazingIncidence   desired incidence angle of the main ray
      * @param azimuthal          rotation of mirror around z-axis
      * @param dist               distance to preceeding element
+     * @param beamstopWidth
+     * @param beamstopHeight
+     * @param sourceEnergy
      * @param misalignmentParams angles and distances for the mirror's misalignment
+     * @param previous
+     * @param global
      *
     */
     Slit::Slit(const char* name, int shape, int beamstop, double width, double height, double azimuthal, double dist, double beamstopWidth, double beamstopHeight, double sourceEnergy, std::vector<double> misalignmentParams, std::shared_ptr<OpticalElement> previous, bool global)
@@ -24,7 +31,7 @@ namespace RAYX
         m_centralBeamstop = beamstop == 0 ? CS_NONE : (beamstop == 1 ? CS_RECTANGLE : CS_ELLIPTICAL);
 
         // if elliptical encode width and height with negative sign, if rectangle -> positive sign
-        if(shape == GS_ELLIPTICAL) {
+        if (shape == GS_ELLIPTICAL) {
             setDimensions(-abs(width), -abs(height));
         }
         setAlpha(0);
