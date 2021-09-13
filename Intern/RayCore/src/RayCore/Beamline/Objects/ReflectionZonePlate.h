@@ -50,7 +50,7 @@ namespace RAYX
         double getR1ArmLength() const;
         double getR2ArmLength() const; // what is this now??
 
-        double getDesignEnergy() const;//Mounting;
+        double getDesignEnergy() const; ///< Mounting;
         double getWaveLength() const;
         double getLineDensity() const;
         double getOrderOfDiffraction() const;
@@ -59,69 +59,83 @@ namespace RAYX
         void printInfo() const;
 
     private:
+        // User Parameter
         double m_incidenceMainBeamLength;
         double m_meridionalDistance;
         double m_meridionalDivergence;
-        double m_designAlphaAngle;
-        double m_designBetaAngle; // what is this?
+        double m_fresnelZOffset; ///< parameter given by user in DESIGN_TYPE==DT_ZOFFSET
+        double m_calcFresnelZOffset; ///< calculated if DESIGN_TYPE==DT_BETA
+        double m_zOff; ///< zoffset dependant on elementOffSetType
+        double m_illuminationZ;
+        double m_designEnergyMounting; //? derived from source?
+        double m_elementOffsetZ; // if given manually
+        double m_elementOffsetZCalc; // if not given but has to be calculated by beam divergence
 
+        /** m_designAlphaAngle (incidence beam angle for which formula is designed)
+         *  and m_designBetaAngle (outgoing beam angle for which formula is designed)
+         *  are used to calculate line density. This is important for correctly
+         *  simulating light of different wavelengths.
+         */
+        double m_designAlphaAngle;
+        /** @see m_designAlphaAngle */
+        double m_designBetaAngle;
+        double m_designOrderOfDiffraction;
+        /** Wavelength for which m_designBetaAngle
+         *  is correct.
+         *  @see m_designAlphaAngle
+         */
+        double m_designEnergy; // TODO(Jannis): decide designEnergy vs designWavelength
+        // TODO(Jannis): rename m_design...
+        double m_wavelength;
+        double m_sagittalEntranceArmLength;
+        double m_sagittalExitArmLength;
+        double m_meridionalEntranceArmLength;
+        double m_meridionalExitArmLength;
+
+
+        // TODO(Jannis): remove
         double m_beta0Angle;
-        double m_alpha0Angle; // and what are these? equivalent to designAlphaAngle when calculated from other values?
-        double m_betaAngle; // calculated if DESIGN_TYPE == DT_ZOFFSET. design beta angle when m_fresnelZOffset is by user
-        // in rad as well
-        //double m_chi;
+        double m_alpha0Angle;
+        double m_betaAngle;
         double m_grazingIncidenceAngle;
-        
-        enum GEOMETRICAL_SHAPE {GS_RECTANGLE, GS_ELLIPTICAL};
+        double m_R1ArmLength;
+        double m_R2ArmLength; //? what is this??
+        double m_lineDensity;
+        double m_a; ///< calculated from line density, order of diffracion and design energy mounting
+        enum DIFFRACTION_METHOD { DM_TWOGRATINGS, DM_2D };
+        DIFFRACTION_METHOD m_diffractionMethod; // only use 2D
+        enum FULL_EFFICIENCY { FE_OFF, FE_ON };
+        FULL_EFFICIENCY m_fullEfficiency; // todo
+
+        // TODO(Jannis): move
+        enum GEOMETRICAL_SHAPE { GS_RECTANGLE, GS_ELLIPTICAL };
         GEOMETRICAL_SHAPE m_geometricalShape;
         enum GRATING_MOUNT { GM_DEVIATION, GM_INCIDENCE };
         GRATING_MOUNT m_gratingMount;
         enum CURVATURE_TYPE { CT_PLANE, CT_TOROIDAL, CT_SPHERICAL };
         CURVATURE_TYPE m_curvatureType;
-        enum DESIGN_TYPE { DT_ZOFFSET, DT_BETA }; // use Fresnel Center offset or use beta angle, todo
+
+        enum DESIGN_TYPE { DT_ZOFFSET, DT_BETA }; //TODO(Jannis): remove (default is DT_BETA)
         DESIGN_TYPE m_designType;
-        enum DERIVATION_METHOD { DM_FORMULA, DM_PLOYNOM };
+        enum DERIVATION_METHOD { DM_FORMULA, DM_PLOYNOM }; //TODO(Jannis): remove (default is DM_FORMULA)
         DERIVATION_METHOD m_derivationMethod;
+        enum ELEMENTOFFSET_TYPE { EZ_MANUAL, EZ_BEAMDIVERGENCE }; //TODO(Jannis): remove (included in world coordinates)
+        ELEMENTOFFSET_TYPE m_elementOffsetType;
+
+        // TODO(Jannis): have a look at this later
         enum IMAGE_TYPE { IT_POINT2POINT, IT_ASTIGMATIC2ASTIGMATIC };
         IMAGE_TYPE m_imageType;
         enum RZP_TYPE { RT_ELLIPTICAL, RT_MERIODIONAL };
         RZP_TYPE m_rzpType;
-        enum ELEMENTOFFSET_TYPE { EZ_MANUAL, EZ_BEAMDIVERGENCE };
-        ELEMENTOFFSET_TYPE m_elementOffsetType;
         enum ADDITIONAL_ZERO_ORDER { AO_OFF, AO_ON };
         ADDITIONAL_ZERO_ORDER m_additionalOrder;
 
+        // Surface Parameter (also in Toroid)
         double m_longRadius;
         double m_shortRadius;
 
-        double m_frenselZOffset; // parameter given by user in DESIGN_TYPE==DT_ZOFFSET
-        double m_calcFresnelZOffset; // calculated if DESIGN_TYPE==DT_BETA
-        // input and exit vector lengths
-        double m_sagittalEntranceArmLength;
-        double m_sagittalExitArmLength;
-        double m_meridionalEntranceArmLength;
-        double m_meridionalExitArmLength;
-        double m_R1ArmLength;
-        double m_R2ArmLength; // what is this??
-
-        double m_zOff; // zoffset dependant on elementOffSetType
-        double m_illuminationZ;
-
-        double m_designEnergy;
-        double m_wavelength; // hvlam(energy)
-        double m_lineDensity;
+        // Simulation Parameter
         double m_orderOfDiffraction;
-        double m_designOrderOfDiffraction;
-        double m_designEnergyMounting; // derived from source?
-        double m_a; // calculated from line density, order of diffracion and design energy mounting
-
-
-        enum FULL_EFFICIENCY { FE_OFF, FE_ON };
-        FULL_EFFICIENCY m_fullEfficiency; // todo
-        enum DIFFRACTION_METHOD { DM_TWOGRATINGS, DM_2D };
-        DIFFRACTION_METHOD m_diffractionMethod; // only use 2D
-        double m_elementOffsetZ; // if given manually
-        double m_elementOffsetZCalc; // if not given but has to be calculated by beam divergence
     };
 
 } // namespace RAYX

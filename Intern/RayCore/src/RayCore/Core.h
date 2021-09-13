@@ -1,5 +1,10 @@
 #pragma once
 
+/**
+ *  In this file we are defining the RAYX_API macro, which helps with
+ *  building the library (context based import/export of code).
+ */
+
 #if defined(RAYX_PLATFORM_WINDOWS) //  Microsoft
 #	ifdef RAYX_BUILD_DLL
 #		define RAYX_API __declspec(dllexport)

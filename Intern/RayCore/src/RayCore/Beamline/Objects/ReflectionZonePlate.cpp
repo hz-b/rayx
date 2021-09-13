@@ -32,7 +32,7 @@ namespace RAYX
 
         m_grazingIncidenceAngle(rad(incidenceAngle)),
 
-        m_frenselZOffset(fresnelZOffset),
+        m_fresnelZOffset(fresnelZOffset),
         m_sagittalEntranceArmLength(sEntrance), //in mm
         m_sagittalExitArmLength(sExit),
         m_meridionalEntranceArmLength(mEntrance),
@@ -95,7 +95,7 @@ namespace RAYX
         setTemporaryMisalignment(misalignmentParams);
         setElementParameters({
             double(m_imageType), double(m_rzpType), double(m_derivationMethod), m_wavelength,
-            m_designEnergy, m_designOrderOfDiffraction,m_orderOfDiffraction,m_frenselZOffset,
+            m_designEnergy, m_designOrderOfDiffraction,m_orderOfDiffraction,m_fresnelZOffset,
             m_sagittalEntranceArmLength,m_sagittalExitArmLength,m_meridionalEntranceArmLength,m_meridionalExitArmLength,
             m_designAlphaAngle,m_designBetaAngle,m_elementOffsetZ, double(m_additionalOrder) }
         );
@@ -199,7 +199,7 @@ namespace RAYX
         std::cout << "m_elementOffsetZ: " << m_elementOffsetZ << std::endl;
         std::cout << "m_elementOffsetZCalc: " << m_elementOffsetZCalc << std::endl;
         std::cout << "m_calcFresnelZOffset: " << m_calcFresnelZOffset << std::endl;
-        std::cout << "m_frenselZOffset: " << m_frenselZOffset << std::endl;
+        std::cout << "m_fresnelZOffset: " << m_fresnelZOffset << std::endl;
 
 
     }
@@ -330,15 +330,15 @@ namespace RAYX
     void ReflectionZonePlate::calcBeta() {
         if (m_designType == DT_ZOFFSET) {
             VectorR2Center();
-            if (m_frenselZOffset != 0) { // m_fresnelZOffset is given by the user as a parameter bc DESIGN_TYPE==DT_ZOFFSET
-                m_betaAngle = acos((-m_R2ArmLength * m_R2ArmLength * m_sagittalExitArmLength * m_sagittalExitArmLength * m_frenselZOffset * m_frenselZOffset) / (2 * m_sagittalExitArmLength * m_frenselZOffset));
+            if (m_fresnelZOffset != 0) { // m_fresnelZOffset is given by the user as a parameter bc DESIGN_TYPE==DT_ZOFFSET
+                m_betaAngle = acos((-m_R2ArmLength * m_R2ArmLength * m_sagittalExitArmLength * m_sagittalExitArmLength * m_fresnelZOffset * m_fresnelZOffset) / (2 * m_sagittalExitArmLength * m_fresnelZOffset));
             }
         }
     }
 
     void ReflectionZonePlate::VectorR1Center() {
         if (m_designType == DT_ZOFFSET) {
-            double param_R1cosZ = m_sagittalEntranceArmLength * cos(m_designAlphaAngle) * m_frenselZOffset;
+            double param_R1cosZ = m_sagittalEntranceArmLength * cos(m_designAlphaAngle) * m_fresnelZOffset;
             m_R1ArmLength = sqrt(pow(param_R1cosZ, 2) + pow(m_sagittalEntranceArmLength * sin(m_designAlphaAngle), 2));
             m_alpha0Angle = acos(param_R1cosZ / m_R1ArmLength);
         }
@@ -357,7 +357,7 @@ namespace RAYX
             VectorR1Center();
             double R2s = m_sagittalExitArmLength;
             double alpha = m_alpha0Angle; // why another alpha angle??
-            m_R2ArmLength = 0.5 * (-2 * m_frenselZOffset * cos(alpha) + sqrt(pow(2 * R2s, 2) - 2 * pow(m_frenselZOffset, 2) + 2 * pow(m_frenselZOffset, 2) * cos(2 * alpha)));
+            m_R2ArmLength = 0.5 * (-2 * m_fresnelZOffset * cos(alpha) + sqrt(pow(2 * R2s, 2) - 2 * pow(m_fresnelZOffset, 2) + 2 * pow(m_fresnelZOffset, 2) * cos(2 * alpha)));
             m_beta0Angle = m_alpha0Angle;
         }
         else if (m_designType == DT_BETA) {
@@ -383,7 +383,7 @@ namespace RAYX
             presign = (m_designAlphaAngle >= m_designBetaAngle) ? -1 : 1;
         }
         else if (m_designType == DT_BETA) {
-            presign = (m_frenselZOffset >= 0) ? -1 : 1;
+            presign = (m_fresnelZOffset >= 0) ? -1 : 1;
         }
         std::cout << "presign: " << presign << std::endl;
         m_designOrderOfDiffraction = abs(designOrderOfDiffraction) * presign;
@@ -545,7 +545,7 @@ namespace RAYX
     }
 
     double ReflectionZonePlate::getFresnelZOffset() const {
-        return m_frenselZOffset;
+        return m_fresnelZOffset;
     }
 
     double ReflectionZonePlate::getCalcFresnelZOffset() const {
