@@ -27,21 +27,29 @@ namespace RAYX
         RAYX_DEBUG(std::cout << "Deleting TracerInterface..." << std::endl);
     }
 
+    /** Adds new light source to light sources.
+     *
+     *  @param newSource shared pointer to light source to be added
+     */
     void TracerInterface::addLightSource(std::shared_ptr<LightSource> newSource) {
         m_LightSources.push_back(newSource);
     }
 
-    void TracerInterface::generateRays(VulkanTracer* tracer, std::shared_ptr<LightSource> source) {
+    /** Generates rays from light source into the tracer.
+     *
+     *  @param tracer   reference to tracer
+     *  @param source   shared pointer to light source used for ray generation
+     */
+    void TracerInterface::generateRays(VulkanTracer& tracer, std::shared_ptr<LightSource> source) {
         //only one Source for now
-        if (!tracer) return;
         if (!source) return;
         std::vector<RAYX::Ray> rays = source->getRays();
         RAYX_DEBUG(std::cout << "add rays" << std::endl);
-        tracer->addRayVector(rays.data(), rays.size());
+        tracer.addRayVector(rays.data(), rays.size());
     }
 
-    void TracerInterface::addOpticalElementToTracer(VulkanTracer* tracer, std::shared_ptr<OpticalElement> element) {
-        tracer->addVectors(element->getSurfaceParams(), element->getInMatrix(), element->getOutMatrix(), element->getTempMisalignmentMatrix(), element->getInverseTempMisalignmentMatrix(), element->getObjectParameters(), element->getElementParameters());
+    void TracerInterface::addOpticalElementToTracer(VulkanTracer& tracer, std::shared_ptr<OpticalElement> element) {
+        tracer.addVectors(element->getSurfaceParams(), element->getInMatrix(), element->getOutMatrix(), element->getTempMisalignmentMatrix(), element->getInverseTempMisalignmentMatrix(), element->getObjectParameters(), element->getElementParameters());
     }
 
     // ! parameters are temporary and need to be removed again
@@ -62,10 +70,10 @@ namespace RAYX
         bool GLOBAL = false;
         std::shared_ptr<MatrixSource> m = std::make_shared<MatrixSource>(0, "matrix source", 20000, 0, 0.065, 0.04, 0, 0.001, 0.001, 100, 0, 1, 0, 0, std::vector<double>{ 0, 0, 0, 0 });
         std::shared_ptr<Slit> s = std::make_shared<Slit>("slit", 1, 2, 20, 2, 7.5, 10000, 20, 1, m->getPhotonEnergy(), std::vector<double>{2, 1, 0, 0, 0, 0 }, nullptr, GLOBAL);
-        std::shared_ptr<PlaneMirror> pm = std::make_shared<PlaneMirror>("PM", 50,200, 10, 7.5, 10000, std::vector<double>{0,0,0, 0,0,0}, std::vector<double>{10,20,0,0,0,0,0}, nullptr, GLOBAL);
-        std::shared_ptr<Toroid> t = std::make_shared<Toroid>("Toroid", 0, 50, 200, 10, 0, 10000, 10000, 1000, 10000, 1000, std::vector<double>{0,0,0, 0,0,0}, std::vector<double>{0,0,0,0, 0,0,0}, nullptr, GLOBAL);
+        std::shared_ptr<PlaneMirror> pm = std::make_shared<PlaneMirror>("PM", 50, 200, 10, 7.5, 10000, std::vector<double>{0, 0, 0, 0, 0, 0}, std::vector<double>{10, 20, 0, 0, 0, 0, 0}, nullptr, GLOBAL);
+        std::shared_ptr<Toroid> t = std::make_shared<Toroid>("Toroid", 0, 50, 200, 10, 0, 10000, 10000, 1000, 10000, 1000, std::vector<double>{0, 0, 0, 0, 0, 0}, std::vector<double>{0, 0, 0, 0, 0, 0, 0}, nullptr, GLOBAL);
         std::shared_ptr<ImagePlane> i = std::make_shared<ImagePlane>("Image plane", 1000, t, GLOBAL);
-        
+
         // petes setup
         //PointSource p = PointSource(0, "spec1_first_rzp4", number_of_rays, 1, 0.005, 0.005, 0, 0.02, 0.06, 1, 1, 0, 0, 640, 120, 1, 0, 0, { 0,0,0,0 });
         //ReflectionZonePlate rzp = ReflectionZonePlate("ReflectionZonePete", 1, 0, 1, 1, 4, 60, 170, 2.2, 0, 90, p.getPhotonEnergy(), p.getPhotonEnergy(), 1, 1, 2.2, 4.75, 90, 400, 90, 400, 0, 0, 1, 0, -24.35, 4.75, { 0,0,0, 0,0,0 }, { 0,0,0,0, 0,0,0 }, nullptr);  // dx,dy,dz, dpsi,dphi,dchi //
@@ -75,7 +83,7 @@ namespace RAYX
 
         addLightSource(m);
         for (int j = 0; j < beamlinesSimultaneously; j++) {
-            generateRays(&tracer, m);
+            generateRays(tracer, m);
         }
         m_Beamline.addOpticalElement(t);
         //m_Beamline.addQuadric(pl);
@@ -116,7 +124,7 @@ namespace RAYX
         for (int j = 0; j < beamlinesSimultaneously; j++) {
             for (int i = 0; i<int(Elements.size()); i++) {
                 std::cout << "add " << Elements[i]->getName() << std::endl;
-                addOpticalElementToTracer(&tracer, Elements[i]);//, Quadrics[i].getInverseMisalignmentMatrix()
+                addOpticalElementToTracer(tracer, Elements[i]);//, Quadrics[i].getInverseMisalignmentMatrix()
             }
         }
 
@@ -174,7 +182,7 @@ namespace RAYX
         size_t size = outputRays.size();
 
         RAYX_DEBUG(std::cout << "writing " << outputRays.size() / 8 << " rays to file..." << std::endl);
-        
+
         if (SHORTOUTPUT) {
             char buff[64];
             for (size_t i = 0; i < size; i = i + RAY_DOUBLE_COUNT) { // ! + 8 because of placeholder
@@ -188,7 +196,7 @@ namespace RAYX
             for (size_t i = 0; i < size; i = i + RAY_DOUBLE_COUNT) { // ! + 8 because of placeholder 
                 sprintf(buff, "%d;%.17f;%.17f;%.17f;%.17f;%.17f;%.17f;%.17f;%.17f;%.17f;%.17f;%.17f;%.17f\n", index,
                     outputRays[i], outputRays[i + 1], outputRays[i + 2], outputRays[i + 3],
-                    outputRays[i + 4], outputRays[i + 5], outputRays[i + 6], outputRays[i + 7], 
+                    outputRays[i + 4], outputRays[i + 5], outputRays[i + 6], outputRays[i + 7],
                     outputRays[i + 8], outputRays[i + 9], outputRays[i + 10], outputRays[i + 11]);
                 file << buff;
                 index++;
