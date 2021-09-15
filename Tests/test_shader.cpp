@@ -72,7 +72,7 @@ std::list<double> runTracer(std::vector<RAYX::Ray> testValues, std::vector<std::
     std::cout << "add rays to tracer done" << std::endl;
 
     for (std::shared_ptr<RAYX::OpticalElement> e : elements) {
-        ti.addOpticalElementToTracer(&tracer, e);
+        ti.addOpticalElementToTracer(tracer, e);
     }
     tracer.run(); //run tracer
     std::list<double> outputRays;
@@ -98,7 +98,7 @@ std::list<double> runTracer(std::vector<RAYX::Ray> testValues, std::vector<std::
 
 void writeToFile(std::list<double> outputRays, std::string name)
 {
-    std::cout << "writing to file..." << name <<  std::endl;
+    std::cout << "writing to file..." << name << std::endl;
     std::ofstream outputFile;
     outputFile.precision(17);
     std::cout.precision(17);
@@ -107,7 +107,7 @@ void writeToFile(std::list<double> outputRays, std::string name)
     filename.append(".csv");
     outputFile.open(filename);
     char sep = ';'; // file is saved in .csv (comma seperated value), excel compatibility is manual right now
-    outputFile << "Index" << sep << "Xloc" << sep << "Yloc" << sep << "Zloc" << sep << "Weight" << sep << "Xdir" << sep << "Ydir" << sep << "Zdir" << sep << "Energy" << sep << "S0" << sep << "S1" << sep << "S2" << sep << "S3" <<std::endl;
+    outputFile << "Index" << sep << "Xloc" << sep << "Yloc" << sep << "Zloc" << sep << "Weight" << sep << "Xdir" << sep << "Ydir" << sep << "Zdir" << sep << "Energy" << sep << "S0" << sep << "S1" << sep << "S2" << sep << "S3" << std::endl;
     // outputFile << "Index,Xloc,Yloc,Zloc,Weight,Xdir,Ydir,Zdir" << std::endl;
 
     size_t counter = 0;
@@ -119,7 +119,7 @@ void writeToFile(std::list<double> outputRays, std::string name)
             if (print == 1) std::cout << "(";
         }
         outputFile << sep << *i;
-        if (counter % RAY_DOUBLE_COUNT == RAY_DOUBLE_COUNT-1) {
+        if (counter % RAY_DOUBLE_COUNT == RAY_DOUBLE_COUNT - 1) {
             outputFile << std::endl;
             counter++;
             continue;
@@ -273,7 +273,7 @@ TEST(Tracer, ExpTest) {
     double tolerance = 1e-13;
     auto expfun = fn<double, double>([] (double x) {return exp(x);});
     compareFromFunction(expfun, testValues, outputRays, tolerance);
-    
+
 }
 
 TEST(Tracer, LogTest) {
@@ -296,7 +296,7 @@ TEST(Tracer, LogTest) {
     double tolerance = 1e-13;
     auto logfun = fn<double, double>([] (double x) {return log(x);});
     compareFromFunction(logfun, testValues, outputRays, tolerance);
-    
+
 }
 
 
@@ -609,7 +609,7 @@ TEST(Tracer, testRZPLineDensityAstigmatic) { // astigmatic 2 astigmatic
     std::cout << "got " << outputRays.size() << " values from shader" << std::endl;
     double tolerance = 1e-10;
     compareFromCorrect(correct, outputRays, tolerance);
-    
+
 }
 
 
@@ -641,44 +641,44 @@ TEST(Tracer, testRayMatrixMult) {
     std::list<double> outputRays = runTracer(testValues, { q1 });
     std::cout << "got " << outputRays.size() << " values from shader" << std::endl;
     double tolerance = 1e-12;
-    compareFromCorrect(correct, outputRays, tolerance);    
+    compareFromCorrect(correct, outputRays, tolerance);
 }
 
 // test pow(a,b) = a^b function. ray position[i] ^ ray direction[i] for i in {0,1,2}
 TEST(Tracer, testDPow) {
     std::vector<RAYX::Ray> testValues;
     std::vector<RAYX::Ray> correct;
-    
+
     RAYX::Ray r = RAYX::Ray(glm::dvec3(0.0, 0, 0), glm::dvec3(0, 1, -1), glm::dvec4(0,0,0,0), 0, 0);
     testValues.push_back(r);
     RAYX::Ray c = RAYX::Ray(glm::dvec3(1,0,1), glm::dvec3(0,0,0), glm::dvec4(0,0,0,0), 0, 0);
     correct.push_back(c);
-    
+
     r = RAYX::Ray(glm::dvec3(2, 2, 3), glm::dvec3(0, 1, 7), glm::dvec4(0,0,0,0), 0, 0);
     testValues.push_back(r);
     c = RAYX::Ray(glm::dvec3(1,2,2187), glm::dvec3(0,0,0), glm::dvec4(0,0,0,0), 0, 0);
     correct.push_back(c);
-    
+
     r = RAYX::Ray(glm::dvec3(0, 0, 0), glm::dvec3(4, -4, 2), glm::dvec4(0,0,0,0), 0, 0);
     testValues.push_back(r);
     c = RAYX::Ray(glm::dvec3(0,1,0), glm::dvec3(0,0,0), glm::dvec4(0,0,0,0), 0, 0);
     correct.push_back(c);
-    
+
     r = RAYX::Ray(glm::dvec3(0.2, 19.99 / 2, PI), glm::dvec3(4, 3, 6), glm::dvec4(0,0,0,0), 0, 0);
     testValues.push_back(r);
     c = RAYX::Ray(glm::dvec3(0.0016,998.50074987499977,961.38919357530415), glm::dvec3(0,0,0), glm::dvec4(0,0,0,0), 0, 0);
     correct.push_back(c);
-    
+
     r = RAYX::Ray(glm::dvec3(-1.0, -1.0, -1.0), glm::dvec3(-4, 3, 0), glm::dvec4(0,0,0,0), 0, 0);
     testValues.push_back(r);
     c = RAYX::Ray(glm::dvec3(1, -1, 1), glm::dvec3(0,0,0), glm::dvec4(0,0,0,0), 0, 0);
     correct.push_back(c);
-    
+
     r = RAYX::Ray(glm::dvec3(-1.0, -1.0, -1.0), glm::dvec3(4, 5, 6), glm::dvec4(0,0,0,0), 0, 0);
     testValues.push_back(r);
     c = RAYX::Ray(glm::dvec3(1, -1, 1), glm::dvec3(0,0,0), glm::dvec4(0,0,0,0), 0, 0);
     correct.push_back(c);
-    
+
     double settings = 7;
     std::shared_ptr<RAYX::OpticalElement> q = std::make_shared<RAYX::OpticalElement>("testDoublePow", std::vector<double>{ 0,0,0,0, 0,0,0,0, 0,0,0,0, 0,settings,0,0 }, zeros, zeros, zeros, zeros, zeros, zeros);
 
@@ -770,7 +770,7 @@ TEST(Tracer, bessel1Test) {
     testValues.push_back(r);
     RAYX::Ray c = RAYX::Ray(glm::dvec3(0,0,0), glm::dvec3(0.066833545658411195,0,0), glm::dvec4(0,0,0,0), 0, 0);
     correct.push_back(c);
-    
+
     r = RAYX::Ray(glm::dvec3(12.123, 2, 0.00000001), glm::dvec3(19.99, 10.2, PI), glm::dvec4(0,0,0,0), 0, 4);
     testValues.push_back(r);
     c = RAYX::Ray(glm::dvec3(-0.21368198451302897,0.57672480775687363,5e-09), glm::dvec3(0.065192988349741882,-0.0066157432977083167,0.28461534317975273), glm::dvec4(0,0,0,0), 0, -0.06604332802354923);
