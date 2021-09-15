@@ -40,24 +40,33 @@ namespace RAYX
         virtual ~LightSource();
 
     private:
+        // TODO(Jannis): move to BeamlineObject
         int m_id;
-        int m_numberOfRays;
-        // std::string m_name;
-        std::vector<double> m_misalignmentParams; // x, y, psi, phi
-        // std::vector<Ray *> m_rayList; ?
 
+        // User/Design Parameter
+        std::vector<double> m_misalignmentParams; // x, y, psi, phi
+
+        // Simulation Parameter (default: general parameter for all sources)
+        int m_numberOfRays;
+
+        // Physics Parameters
         // point source & matrix source
         enum SPREAD_TYPE { ES_WHITE_BAND, ES_THREE_ENERGIES }; // default ES_WHITE_BAND
         SPREAD_TYPE m_energySpreadType;
+        double m_photonEnergy; ///< mid point
+        double m_energySpread; ///< distance to other two points
         enum ENERGY_DISTRIBUTION_TYPE { ET_FILE, ET_VALUES, ET_TOTAL, ET_PARAM }; // default ET_VALUES
         ENERGY_DISTRIBUTION_TYPE m_energyDistributionType;
-        enum SOURCE_DISTRIBUTION_TYPE { ST_SIMULTANEOUS, ST_HARD_EDGE, ST_GAUSS }; // default simultaneously
-        SOURCE_DISTRIBUTION_TYPE m_sourceDistributionType;
-        double m_energySpread;
-        double m_photonEnergy;
         double m_linearPol_0;
         double m_linearPol_45;
         double m_circularPol;
+
+        enum SOURCE_DISTRIBUTION_TYPE { ST_SIMULTANEOUS, ST_HARD_EDGE, ST_GAUSS }; // default simultaneously
+        // TODO(Jannis): move to children
+        SOURCE_DISTRIBUTION_TYPE m_sourceDistributionType;
+
+
+        // TODO(Jannis): rename
         std::uniform_real_distribution<double> m_unif;
         std::default_random_engine m_re;
 
