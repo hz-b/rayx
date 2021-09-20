@@ -1704,7 +1704,7 @@ inout double DX, inout double DZ) {
 	double Y = r.position.y;
 	double Z = r.position.z;
 
-	if(RZP_TYPE == 1) // meridional
+	if(RZP_TYPE == 1) // meridional (wie VLS grating)
 		X = 0;
 
 	// avoid calculating the same sinus/cosinus multiple times (costly)
@@ -2084,7 +2084,7 @@ Ray traceSlit(Ray r, const Quadric q, inout uint64_t ctr) {
 	double delPhi = 0;
 	double delPsi = 0;
 	int iopt = 1; // 1 = slit, 3 = zone plate
-	double wavelength = q.elementParameters[1][0]; // from parameters
+	double wavelength = q.elementParameters[1][0]; // from parameters or per ray
 	diffraction(iopt, xLength, yLength, wavelength, delPhi, delPsi, ctr);
 	phi = phi + delPhi;
 	psi = psi + delPsi;

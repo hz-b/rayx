@@ -4,6 +4,7 @@ project(RayCore)
 SET(SOURCE
     src/RayCore/Application.cpp
     src/RayCore/utils.cpp
+    src/RayCore/calculateWorldCoordinates.cpp
     src/RayCore/Beamline/Beamline.cpp
     src/RayCore/Beamline/BeamlineObject.cpp
     src/RayCore/Beamline/OpticalElement.cpp
@@ -34,6 +35,7 @@ SET(HEADERS
     src/RayCore/Application.h
     src/RayCore/Debug.h
     src/RayCore/utils.h
+    src/RayCore/calculateWorldCoordinates.h
     src/RayCore/Beamline/Beamline.h
     src/RayCore/Beamline/BeamlineObject.h
     src/RayCore/Beamline/OpticalElement.h

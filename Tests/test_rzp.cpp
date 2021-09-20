@@ -224,9 +224,9 @@ TEST(RZP, testParams) {
     EXPECT_ITERABLE_DOUBLE_EQ(std::vector<double>, rzp.getObjectParameters(), correctObjectParams);
     EXPECT_ITERABLE_DOUBLE_EQ(std::vector<double>, rzp.getElementParameters(), correctElementParams);
     EXPECT_ITERABLE_DOUBLE_EQ(std::vector<double>, rzp.getSlopeError(), sE);
-    EXPECT_ITERABLE_DOUBLE_EQ(std::vector<double>, rzp.getMisalignmentMatrix(), correctMis);
+    EXPECT_ITERABLE_DOUBLE_EQ(std::vector<double>, glmToVector16(rzp.getMisalignmentMatrix()), correctMis);
     EXPECT_ITERABLE_DOUBLE_EQ(std::vector<double>, rzp.getTempMisalignmentMatrix(), correctMis);
-    EXPECT_ITERABLE_DOUBLE_EQ(std::vector<double>, rzp.getInverseMisalignmentMatrix(), correctMis);
+    EXPECT_ITERABLE_DOUBLE_EQ(std::vector<double>, glmToVector16(rzp.getInverseMisalignmentMatrix()), correctMis);
     EXPECT_ITERABLE_DOUBLE_EQ(std::vector<double>, rzp.getInverseTempMisalignmentMatrix(), correctMis);
 
 }

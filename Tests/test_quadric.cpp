@@ -62,11 +62,11 @@ TEST(Quadric, testMisalignment) {
     RAYX::PlaneMirror plM = RAYX::PlaneMirror("planemirror", width, height, incidenceAngle, azimuthalAngle, dist, mis, sE, NULL, false); // {1,2,3,0.01,0.02,0.03}
 
     //std::vector<double> Mis_out = plM.d_misalignmentMatrix();
-    std::vector<double> Mis_in = plM.getMisalignmentMatrix();
+    std::vector<double> Mis_in = glmToVector16(plM.getMisalignmentMatrix());
     std::vector<double> correctMisIn = { 0.9997500170828264 , -0.009395493729051622 , 0.02028861849598634 , 0.0 , 0.009997833434164497 , 0.9995060552639085 , -0.02979410709189573 , 0.0 , -0.01999866669333308 , 0.029989501302422495 , 0.9993501304058158 , 0.0 , -1.0 , -2.0 , -3.0 , 1.0 };
     EXPECT_ITERABLE_DOUBLE_EQ(std::vector<double>, Mis_in, correctMisIn);
 
-    std::vector<double> Mis_out = plM.getInverseMisalignmentMatrix();
+    std::vector<double> Mis_out = glmToVector16(plM.getInverseMisalignmentMatrix());
     std::vector<double> correctMisOut = { 0.9997500170828264 , 0.009997833434164499 , -0.019998666693333084 , 0.0 , -0.00939549372905162 , 0.9995060552639086 , 0.029989501302422495 , 0.0 , 0.02028861849598634 , -0.02979410709189573 , 0.9993501304058158 , 0.0 , 1.0418248851126823 , 1.9196276226862943 , 3.0380307271289593 , 1.0 };
     EXPECT_ITERABLE_DOUBLE_EQ(std::vector<double>, Mis_out, correctMisOut);
 }

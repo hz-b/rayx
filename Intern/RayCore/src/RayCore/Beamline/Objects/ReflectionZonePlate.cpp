@@ -66,7 +66,7 @@ namespace RAYX
         m_meridionalDivergence = 0;
 
         calcDesignOrderOfDiffraction(designOrderOfDiffraction);
-        calcAlpha2();
+        calcAlpha();
         if (beta == 0) { // calculate from other parameters
             calcBeta2();
         }
@@ -90,7 +90,7 @@ namespace RAYX
             setSurface(std::make_unique<Quadric>(std::vector<double>{ 1, 0, 0, 0, 0, 1, 0, -m_longRadius, 0, 0, 1, 0, 4, 0, 0, 0 }));
         }
 
-        calcTransformationMatrices(misalignmentParams, global);
+        calcTransformationMatricesFromAngles(misalignmentParams, global);
         // the whole misalignment is also stored in temporaryMisalignment because it needs to be temporarily removed during tracing
         setTemporaryMisalignment(misalignmentParams);
         setElementParameters({
@@ -204,28 +204,9 @@ namespace RAYX
 
     }
 
-    // TODO(Jannis): Not called?
-    /**
-     * Calc alpha (incidence angle) from given mount (deviation or incidence angle given)
-     *
-     * Params:
-     * deviation = deviation angle between incoming and outgoing ray
-     * incidenceAngle = grazing incidence angle
-    */
-    void ReflectionZonePlate::calcDesignAlphaAngle(const double deviation, const double incidenceAngle) {
-        //double angle;
-        if (m_gratingMount == GM_DEVIATION) {
-            focus(deviation); // focus(hv=beamline->getPhotonEnergy, angle, d0=calcDz00, ord=orderofdiff, alpha, beta)
-            m_grazingIncidenceAngle = PI / 2 - m_grazingIncidenceAngle;
-        }
-        else if (m_gratingMount == GM_INCIDENCE) {
-            m_grazingIncidenceAngle = incidenceAngle; // m_designAlphaAngle
-        }
-    }
-
     // VectorIncidenceMainBeam
     // m_alpha = m_incidenceMainBeamAlphaAngle
-    void ReflectionZonePlate::calcAlpha2() { //  grazing or normal?
+    void ReflectionZonePlate::calcAlpha() { //  grazing or normal?
         double alphaMtest;
         double distance = m_meridionalDistance;
         if (m_elementOffsetType == EZ_MANUAL) {

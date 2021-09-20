@@ -7,6 +7,7 @@
 #include "Beamline/Objects/SphereMirror.h"
 #include "Beamline/Objects/MatrixSource.h"
 #include "Tracer/TracerInterface.h"
+#include "calculateWorldCoordinates.h"
 #include "Core.h"
 #include "Ray.h"
 // #include "Tracer/TracerInterface.h"
@@ -1027,13 +1028,23 @@ void testOpticalElement(std::vector<std::shared_ptr<RAYX::OpticalElement>> eleme
 // use name of optical element as file name
 
 TEST(opticalElements, planeMirrorDefault) {
-    std::shared_ptr<RAYX::PlaneMirror> plM = std::make_shared<RAYX::PlaneMirror>("PlaneMirrorDef", 50, 200, 10, 7.5, 10000, std::vector<double>{ 0,0,0, 0,0,0 }, zeros7, nullptr, false); // {1,2,3,0.01,0.02,0.03}
+    GeometricUserParams pm_param = GeometricUserParams(10, 10, 7.5, 10000, std::vector<double>{ 0,0,0, 0,0,0 });
+    glm::dvec4 pos_mirror = calcPosition(pm_param);
+    glm::dmat4x4 or_mirror = calcOrientation(pm_param);
+    std::shared_ptr<RAYX::PlaneMirror> plM = std::make_shared<RAYX::PlaneMirror>("PlaneMirrorDef", 50, 200, pos_mirror, or_mirror, zeros7); // {1,2,3,0.01,0.02,0.03}
+    
+    plM->setOutMatrix(glmToVector16(glm::transpose(calcE2B(pm_param)))); // to make comparison with old ray files possible, use the beam coordinate system
     testOpticalElement({ plM }, 20);
     ASSERT_TRUE(true);
 }
 
 TEST(opticalElements, planeMirrorMis) {
-    std::shared_ptr<RAYX::PlaneMirror> plM = std::make_shared<RAYX::PlaneMirror>("PlaneMirrorMis", 50, 200, 10, 0, 10000, std::vector<double>{ 1,2,3,0.001,0.002,0.003 }, zeros7, nullptr, false); // {1,2,3,0.01,0.02,0.03}
+    GeometricUserParams pm_param = GeometricUserParams(10, 10, 0, 10000, std::vector<double>{ 1,2,3,0.001,0.002,0.003 });
+    glm::dvec4 pos_mirror = calcPosition(pm_param);
+    glm::dmat4x4 or_mirror = calcOrientation(pm_param);
+    
+    std::shared_ptr<RAYX::PlaneMirror> plM = std::make_shared<RAYX::PlaneMirror>("PlaneMirrorMis", 50, 200, pos_mirror, or_mirror, zeros7); // {1,2,3,0.01,0.02,0.03}
+    plM->setOutMatrix(glmToVector16(glm::transpose(calcE2B(pm_param)))); // to make comparison with old ray files possible, use the beam coordinate system
     testOpticalElement({ plM }, 20);
     ASSERT_TRUE(true);
 }
@@ -1159,7 +1170,7 @@ TEST(opticalElements, slit1) {
     }
 }
 
-bool global = false;
+bool global = true;
 // PETES SETUP
 // spec1-first_rzp4mm
 TEST(PeteRZP, spec1_first_rzp) {

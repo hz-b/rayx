@@ -43,7 +43,7 @@ namespace RAYX
         m_beamstopHeight = m_centralBeamstop == CS_NONE ? 0 : (m_centralBeamstop == CS_ELLIPTICAL ? abs(beamstopHeight) : abs(beamstopHeight));
 
         setSurface(std::make_unique<Quadric>(std::vector<double>{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -1, 3, 0, 0, 0}));
-        calcTransformationMatrices(misalignmentParams, global);
+        calcTransformationMatricesFromAngles(misalignmentParams, global);
         setElementParameters({ m_beamstopWidth / 2,m_beamstopHeight / 2,0,0, m_waveLength,0,0,0, 0,0,0,0, 0,0,0,0 });
         setTemporaryMisalignment({ 0,0,0, 0,0,0 });
     }

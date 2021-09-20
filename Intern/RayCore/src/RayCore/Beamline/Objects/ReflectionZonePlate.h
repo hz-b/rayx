@@ -14,7 +14,7 @@ namespace RAYX
         ~ReflectionZonePlate();
 
         void calcDesignAlphaAngle(const double deviation, const double normalIncidence);
-        void calcAlpha2();
+        void calcAlpha();
         void calcBeta2();
         void Illumination();
         double calcZOffset();

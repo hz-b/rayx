@@ -45,7 +45,7 @@ namespace RAYX
 
         // set parameters in Optical Element class
         m_vls = vls; // into element parameters
-        calcTransformationMatrices(misalignmentParams, global);
+        calcTransformationMatricesFromAngles(misalignmentParams, global);
         setElementParameters({
             0, 0, m_lineDensity, m_orderOfDiffraction,
             abs(hvlam(m_designEnergyMounting)), 0, m_vls[0], m_vls[1],

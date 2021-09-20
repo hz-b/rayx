@@ -9,6 +9,7 @@
 #include "Core.h"
 #include "Surface/Surface.h"
 #include "utils.h"
+#include <glm.hpp>
 
 namespace RAYX
 {
@@ -22,6 +23,8 @@ namespace RAYX
         OpticalElement(const char* name, const double width, const double height, const double chi, const double dist, const std::vector<double> slopeError, const std::shared_ptr<OpticalElement> previous);
         OpticalElement(const char* name, const double chi, const double dist, const std::vector<double> slopeError, const std::shared_ptr<OpticalElement> previous);
 
+        OpticalElement(const char* name, const std::vector<double> EParameters, const double width, const double height, glm::dvec4 position, glm::dmat4x4 orientation, const std::vector<double> tempMisalignmentParams, const std::vector<double> slopeError);
+        
         void setElementParameters(std::vector<double> params);
         void setDimensions(double width, double height);
         void setInMatrix(std::vector<double> inputMatrix);
@@ -41,15 +44,18 @@ namespace RAYX
 
         std::vector<double> getInMatrix() const;
         std::vector<double> getOutMatrix() const;
-        std::vector<double> getMisalignmentMatrix() const;
-        std::vector<double> getInverseMisalignmentMatrix() const;
+        glm::dmat4x4 getMisalignmentMatrix() const;
+        glm::dmat4x4 getInverseMisalignmentMatrix() const;
         std::vector<double> getMisalignmentParams() const;
-        std::vector<double> getB2E() const;
-        std::vector<double> getE2B() const;
-        std::vector<double> getInvB2E() const;
-        std::vector<double> getInvE2B() const;
-        std::vector<double> getG2E() const;
-        std::vector<double> getE2G() const;
+        glm::dmat4x4 getB2E() const;
+        glm::dmat4x4 getE2B() const;
+        glm::dmat4x4 getInvB2E() const;
+        glm::dmat4x4 getInvE2B() const;
+        glm::dmat4x4 getG2E() const;
+        glm::dmat4x4 getE2G() const;
+
+        glm::dvec4 getPosition() const;
+        glm::dmat4 getOrientation() const;
 
         std::vector<double> getInTransMis() const;
         std::vector<double> getOutTransMis() const;
@@ -61,7 +67,8 @@ namespace RAYX
         std::vector<double> getSurfaceParams() const;
         std::vector<double> getSlopeError() const;
 
-        void calcTransformationMatrices(const std::vector<double> misalignment, bool global);
+        void calcTransformationMatrices(glm::dvec4 position, glm::dmat4 orientation);
+        void calcTransformationMatricesFromAngles(const std::vector<double> misalignment, bool global);
         void setTemporaryMisalignment(std::vector<double> misalignment);
 
         OpticalElement();
@@ -74,8 +81,8 @@ namespace RAYX
         // 7 paramters that specify the slope error, are stored in objectParamters to give to shader
         std::vector<double> m_slopeError;
         // stored only for completeness and not to transfer to the shader, these transformations are part of inMatrix/outMatrix which are transferred.
-        std::vector<double> d_misalignmentMatrix;
-        std::vector<double> d_inverseMisalignmentMatrix;
+        glm::dmat4x4 d_misalignmentMatrix;
+        glm::dmat4x4 d_inverseMisalignmentMatrix;
 
 
         // User/Design Parameter
@@ -91,14 +98,17 @@ namespace RAYX
         // transformation matrices:
         // beam element transformation matrices derived directly from params alpha, beta, chi and distance
         // TODO(Jannis): remove and make local for functions that need them
-        std::vector<double> d_b2e; // inTrans M_b2e
-        std::vector<double> d_e2b; // outTrans M_e2b
-        std::vector<double> d_inv_b2e; // invInTrans; (M_b2e)^-1
-        std::vector<double> d_inv_e2b; // invOutTrans; (M_e2b)^-1 = (M_e2b)^T
+        glm::dmat4x4 d_b2e; // inTrans M_b2e
+        glm::dmat4x4 d_e2b; // outTrans M_e2b
+        glm::dmat4x4 d_inv_b2e; // invInTrans; (M_b2e)^-1
+        glm::dmat4x4 d_inv_e2b; // invOutTrans; (M_e2b)^-1 = (M_e2b)^T
         // transformation between global and element coordinate system, derived from beam-element matrices (of this and previous element, see wiki)
-        std::vector<double> d_g2e; // m_inTransMis
-        std::vector<double> d_e2g; // m_outTransMis;
+        glm::dmat4x4 d_g2e; // m_inTransMis
+        glm::dmat4x4 d_e2g; // m_outTransMis;
         // ----
+
+        glm::dvec4 m_position;
+        glm::dmat4 m_orientation;
 
         // Surface (eg Quadric or if eg torus something else)
         std::unique_ptr<Surface> m_surface;

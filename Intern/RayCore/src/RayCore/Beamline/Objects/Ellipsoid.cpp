@@ -40,28 +40,28 @@ namespace RAYX
 
         setSurface(std::make_unique<Quadric>(std::vector<double>{m_a11, 0, 0, 0, 0, 1, 0, m_radius, 0, 0, d_a33, d_a34, 0, 0, 0, d_a44}));
         // setSurface(surface);
-        calcTransformationMatrices({ 0,0,0,0,0,0 }, global);
+        calcTransformationMatricesFromAngles({ 0,0,0,0,0,0 }, global);
         setElementParameters({ 0,0,m_a11,m_y0, d_a33,d_a34,d_a44,0, 0,0,0,0, 0,0,0,0 });
 
         // if m_misalignmentCoordSys == 1 rotate through d_tangentangle before misalignment and back after (-d_tangentangle)
         if (m_misalignmentCoordSys == CS_MIRROR) {
             setTemporaryMisalignment({ 0,0,0,0,0,d_tangentAngle });
-            std::vector<double> inTrans = getB2E();
-            std::vector<double> outTrans = getE2B();
-            std::vector<double> mis = getMisalignmentMatrix();
-            std::vector<double> invMis = getInverseMisalignmentMatrix();
-            std::vector<double> tempMis = getTempMisalignmentMatrix();
-            std::vector<double> invTempMis = getInverseTempMisalignmentMatrix();
+            glm::dmat4x4 inTrans = getB2E();
+            glm::dmat4x4 outTrans = getE2B();
+            glm::dmat4x4 mis = getMisalignmentMatrix();
+            glm::dmat4x4 invMis = getInverseMisalignmentMatrix();
+            glm::dmat4x4 tempMis = vectorToGlm16(getTempMisalignmentMatrix());
+            glm::dmat4x4 invTempMis = vectorToGlm16(getInverseTempMisalignmentMatrix());
 
-            std::vector<double> AT = getMatrixProductAsVector(tempMis, inTrans); // AT
-            std::vector<double> MAT = getMatrixProductAsVector(mis, AT); //MAT
-            std::vector<double> AMAT = getMatrixProductAsVector(invTempMis, MAT); //A^-1MAT
-            setInMatrix(AMAT);
+            glm::dmat4x4 AT = tempMis * inTrans; // AT
+            glm::dmat4x4 MAT = mis * AT; //MAT
+            glm::dmat4x4 AMAT = invTempMis * MAT; //A^-1MAT
+            setInMatrix(glmToVector16(AMAT));
 
-            std::vector<double> MA = getMatrixProductAsVector(invMis, tempMis); // M^-1A
-            std::vector<double> AMA = getMatrixProductAsVector(invTempMis, MA); //A^-1M^-1A
-            std::vector<double> TAMA = getMatrixProductAsVector(outTrans, AMA); // T-^1A^-1M^-1A
-            setOutMatrix(TAMA);
+            glm::dmat4x4 MA = invMis * tempMis; // M^-1A
+            glm::dmat4x4 AMA = invTempMis * MA; //A^-1M^-1A
+            glm::dmat4x4 TAMA = outTrans * AMA; // T-^1A^-1M^-1A
+            setOutMatrix(glmToVector16(TAMA));
         }
         else {
             setTemporaryMisalignment({ 0,0,0,0,0,0 });
