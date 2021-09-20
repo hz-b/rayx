@@ -75,8 +75,10 @@ namespace RAYX
     OpticalElement::OpticalElement(const char* name, const double chi, const double dist, const std::vector<double> slopeError, const std::shared_ptr<OpticalElement> previous)
         : BeamlineObject(name), m_chi(chi), m_distanceToPreceedingElement(dist), m_previous(previous), m_slopeError(slopeError) {}
 
+    /* NEW CONSTRUCTORS */
+
     /**
-     * @param name
+     * @param name                      name of the element
      * @param EParameters               Element specific parameters
      * @param width                     x-dimension of element
      * @param height                    z-dimension of element
@@ -97,6 +99,25 @@ namespace RAYX
         setTemporaryMisalignment(tempMisalignmentParams);
         calcTransformationMatrices(position, orientation);
     }
+
+    /**
+     * @param name                      name of the element
+     * @param width                     x-dimension of element
+     * @param height                    z-dimension of element
+     * @param position                  position in world coordinates
+     * @param orientation               orientation in world coordinate system
+     * @param slopeError                slope error parameters
+     */
+    OpticalElement::OpticalElement(const char* name, const double width, const double height, glm::dvec4 position, glm::dmat4x4 orientation, const std::vector<double> slopeError) 
+        : BeamlineObject(name),
+        m_width(width),
+        m_height(height),
+        m_slopeError(slopeError) 
+    {
+        updateObjectParams();
+        calcTransformationMatrices(position, orientation);
+    }
+
 
     OpticalElement::OpticalElement() {}
 
@@ -322,7 +343,7 @@ namespace RAYX
         m_objectParameters = {
                 m_width, m_height, m_slopeError[0], m_slopeError[1],
                 m_slopeError[2], m_slopeError[3], m_slopeError[4], m_slopeError[5],
-                m_slopeError[6],m_alpha,0,0,
+                m_slopeError[6], 0,0,0,
                 0,0,0,0
         };
     }
@@ -411,14 +432,6 @@ namespace RAYX
     glm::dmat4x4 OpticalElement::getG2E() const
     {
         return d_g2e;
-    }
-
-    glm::dvec4 OpticalElement::getPosition() const {
-        return m_position;
-    }
-    
-    glm::dmat4 OpticalElement::getOrientation() const {
-        return m_orientation;
     }
 
     std::vector<double> OpticalElement::getTempMisalignmentParams() const

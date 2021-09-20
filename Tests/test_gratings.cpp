@@ -3,7 +3,8 @@
 #include "Beamline/Beamline.h"
 #include "Beamline/Objects/PlaneGrating.h"
 #include "Beamline/Objects/SphereGrating.h"
-#include "Beamline/Objects/Ellipsoid.h"
+
+#include "calculateWorldCoordinates.h"
 #include "Core.h"
 #include "Ray.h"
 
@@ -44,100 +45,104 @@ using ::testing::ElementsAre;
     EXPECT_ITERABLE_BASE( EXPECT_DOUBLE_EQ, TYPE, TYPE, ref, target )
 
 TEST(planeGrating, testParams) {
-    // mount = 0, use deviation angle
-    int mount = 0; // { GM_DEVIATION, GM_INCIDENCE, GM_CCF, GM_CCF_NO_PREMIRROR}
-    double width = 125.23;
-    double height = 51.56;
-    double deviation = 12.4;
-    double normalIncidence = 15.12;
+    // user parameters
     double azimuthal = 61.142;
     double dist = 1245.71;
+    
+    int mount = 0; // { GM_DEVIATION, GM_INCIDENCE, GM_CCF, GM_CCF_NO_PREMIRROR}
+    double deviation = 12.4;
+    double normalIncidence = 15.12;
+    double fixFocusConstantCFF = 12.1;
+    std::vector<double> mis = { 5.212,7.3,0.35, 0.23,0.011,0.0006 };
+    
+    // derived from above 3 parameters
+    double beta = 1.4676505971882481;
+    double alpha = 1.457521229154248;
+    GeometricUserParams g_params = GeometricUserParams(alpha, beta, azimuthal, dist, mis);
+    glm::dvec4 position = calcPosition(g_params);
+    glm::dmat4x4 orientation = calcOrientation(g_params);
+
+    // other user parameters
+    double width = 125.23;
+    double height = 51.56;
     double designEnergyMounting = 100;
     double lineDensity = 812.2;
-    int orderOfDiffraction = 1; // use others
-    double fixFocusConstantCFF = 12.1;
+    int orderOfDiffraction = 1; 
     int add_order = 0;
+    
     std::vector<double> sE = { 0,0,0,0,0, 0,0 };
-    std::vector<double> mis = { 5.212,7.3,0.35, 0.23,0.011,0.0006 };
     std::vector<double> vls = { 2.1, 0.12, 12.2, 8.3, 5.1, 7.23 };
-    RAYX::PlaneGrating p1 = RAYX::PlaneGrating("planegrating", mount, width, height, deviation, normalIncidence, azimuthal, dist, designEnergyMounting, lineDensity, orderOfDiffraction, fixFocusConstantCFF, add_order, mis, vls, sE, NULL, false); 
+    RAYX::PlaneGrating p1 = RAYX::PlaneGrating("planegrating", width, height, position, orientation, designEnergyMounting, lineDensity, orderOfDiffraction, add_order, vls, sE); 
 
-    double beta = 1.467650597188248;
-    double alpha = 1.457521229154248;
-    double a = 0.010070077944000002;
     std::vector<double> quad = { 0,0,0,0, 0,0,0,-1, 0,0,0,0, 1,0,0,0 };
     std::vector<double> objparams = {width, height, sE[0], sE[1], 
                                     sE[2], sE[3], sE[4], sE[5], 
-                                    sE[6], alpha, 0, 0,
+                                    sE[6], 0, 0, 0,
                                     0, 0, 0, 0};
     std::vector<double> elparams = { 0,0,lineDensity,double(orderOfDiffraction), abs(hvlam(designEnergyMounting)),0,vls[0],vls[1], vls[2],vls[3],vls[4],vls[5], 0,0,0,double(add_order) };
     ASSERT_DOUBLE_EQ(p1.getWidth(), width);
     ASSERT_DOUBLE_EQ(p1.getHeight(), height);
-    ASSERT_DOUBLE_EQ(p1.getAlpha(), alpha);
-    ASSERT_DOUBLE_EQ(p1.getChi(), rad(azimuthal));
-    ASSERT_DOUBLE_EQ(p1.getDistanceToPreceedingElement(), dist);
-    ASSERT_DOUBLE_EQ(p1.getBeta(), beta);
-    EXPECT_NEAR(p1.getA(), a, 0.00000000001);
     EXPECT_ITERABLE_DOUBLE_EQ(std::vector<double>, p1.getSurfaceParams(), quad);
     EXPECT_ITERABLE_DOUBLE_EQ(std::vector<double>, p1.getElementParameters(), elparams);
     EXPECT_ITERABLE_DOUBLE_EQ(std::vector<double>, p1.getObjectParameters(), objparams);
-    //EXPECT_NEAR (e.getRadius(),  radius, 0.00000001);
-
-    // mount = 1, use incidence Angle
-    mount = 1; // { GM_DEVIATION, GM_INCIDENCE, GM_CCF, GM_CCF_NO_PREMIRROR}
-    add_order = 1;
-    RAYX::PlaneGrating p2 = RAYX::PlaneGrating("planegrating", mount, width, height, deviation, normalIncidence, azimuthal, dist, designEnergyMounting, lineDensity, orderOfDiffraction, fixFocusConstantCFF, add_order, mis, vls, sE, NULL, false); 
+    
+    // NEXT 
+    mount = 1;
     alpha = 1.3069025438933539;
     beta = 1.317319261832787;
+    g_params = GeometricUserParams(alpha, beta, azimuthal, dist, mis);
+    position = calcPosition(g_params);
+    orientation = calcOrientation(g_params);
 
-    ASSERT_DOUBLE_EQ(p2.getAlpha(), alpha);
-    ASSERT_DOUBLE_EQ(p2.getBeta(), beta);
+    add_order = 1;
+    RAYX::PlaneGrating p2 = RAYX::PlaneGrating("planegrating", width, height, position, orientation, designEnergyMounting, lineDensity, orderOfDiffraction, add_order, vls, sE); 
+    
+    elparams = { 0,0,lineDensity,double(orderOfDiffraction), abs(hvlam(designEnergyMounting)),0,vls[0],vls[1], vls[2],vls[3],vls[4],vls[5], 0,0,0,double(add_order) };
+    EXPECT_ITERABLE_DOUBLE_EQ(std::vector<double>, p2.getSurfaceParams(), quad);
+    EXPECT_ITERABLE_DOUBLE_EQ(std::vector<double>, p2.getElementParameters(), elparams);
+    EXPECT_ITERABLE_DOUBLE_EQ(std::vector<double>, p2.getObjectParameters(), objparams);
+    
+    // NEXT
+    beta = 1.3380699314613769;
+    g_params = GeometricUserParams(alpha, beta, azimuthal, dist, mis);
+    position = calcPosition(g_params);
+    orientation = calcOrientation(g_params);
 
     // higher order of diffraction, mount = 1
     orderOfDiffraction = 3;
-    a = 0.030210233832000003;
-    beta = 1.3380699314613769;
-    quad = { 0,0,0,0, 0,0,0,-1, 0,0,0,0, 1,0,0,0 };
+    RAYX::PlaneGrating p3 = RAYX::PlaneGrating("planegrating", width, height, position, orientation, designEnergyMounting, lineDensity, orderOfDiffraction, add_order, vls, sE); 
+
     objparams = {width, height, sE[0], sE[1], 
                                     sE[2], sE[3], sE[4], sE[5], 
-                                    sE[6], alpha, 0, 0,
+                                    sE[6], 0, 0, 0,
                                     0, 0, 0, 0};
     elparams = { 0,0,lineDensity,double(orderOfDiffraction), abs(hvlam(designEnergyMounting)),0,vls[0],vls[1], vls[2],vls[3],vls[4],vls[5], 0,0,0,double(add_order) };
 
-    RAYX::PlaneGrating p3 = RAYX::PlaneGrating("planegrating", mount, width, height, deviation, normalIncidence, azimuthal, dist, designEnergyMounting, lineDensity, orderOfDiffraction, fixFocusConstantCFF, add_order, mis, vls, sE, NULL, false); 
-
     ASSERT_DOUBLE_EQ(p3.getWidth(), width);
     ASSERT_DOUBLE_EQ(p3.getHeight(), height);
-    ASSERT_DOUBLE_EQ(p3.getAlpha(), alpha);
-    ASSERT_DOUBLE_EQ(p3.getChi(), rad(azimuthal));
-    ASSERT_DOUBLE_EQ(p3.getDistanceToPreceedingElement(), dist);
-    ASSERT_DOUBLE_EQ(p3.getBeta(), beta);
-    EXPECT_NEAR(p3.getA(), a, 0.00000000001);
     EXPECT_ITERABLE_DOUBLE_EQ(std::vector<double>, p3.getSurfaceParams(), quad);
     EXPECT_ITERABLE_DOUBLE_EQ(std::vector<double>, p3.getElementParameters(), elparams);
     EXPECT_ITERABLE_DOUBLE_EQ(std::vector<double>, p3.getObjectParameters(), objparams);
 
+    // NEXT
     // mount = 0, use deviation angle, with higher order of diffraction
     mount = 0;
-    a = 0.030210233832000003;
     alpha = 1.4473913414095938;
     beta = 1.4777804849329026;
-    quad = { 0,0,0,0, 0,0,0,-1, 0,0,0,0, 1,0,0,0 };
+    g_params = GeometricUserParams(alpha, beta, azimuthal, dist, mis);
+    position = calcPosition(g_params);
+    orientation = calcOrientation(g_params);
+
     elparams = { 0,0,lineDensity,double(orderOfDiffraction), abs(hvlam(designEnergyMounting)),0,vls[0],vls[1], vls[2],vls[3],vls[4],vls[5], 0,0,0,double(add_order) };
     objparams = {width, height, sE[0], sE[1], 
                                     sE[2], sE[3], sE[4], sE[5], 
-                                    sE[6], alpha, 0, 0,
+                                    sE[6], 0, 0, 0,
                                     0, 0, 0, 0};
 
-    RAYX::PlaneGrating p4 = RAYX::PlaneGrating("planegrating", mount, width, height, deviation, normalIncidence, azimuthal, dist, designEnergyMounting, lineDensity, orderOfDiffraction, fixFocusConstantCFF, add_order, mis, vls, sE, nullptr, false); 
+    RAYX::PlaneGrating p4 = RAYX::PlaneGrating("planegrating", width, height, position, orientation, designEnergyMounting, lineDensity, orderOfDiffraction, add_order, vls, sE); 
 
     ASSERT_DOUBLE_EQ(p4.getWidth(), width);
     ASSERT_DOUBLE_EQ(p4.getHeight(), height);
-    ASSERT_DOUBLE_EQ(p4.getAlpha(), alpha);
-    ASSERT_DOUBLE_EQ(p4.getChi(), rad(azimuthal));
-    ASSERT_DOUBLE_EQ(p4.getDistanceToPreceedingElement(), dist);
-    ASSERT_DOUBLE_EQ(p4.getBeta(), beta);
-    EXPECT_NEAR(p4.getA(), a, 0.00000000001);
     EXPECT_ITERABLE_DOUBLE_EQ(std::vector<double>, p4.getSurfaceParams(), quad);
     EXPECT_ITERABLE_DOUBLE_EQ(std::vector<double>, p4.getElementParameters(), elparams);
     EXPECT_ITERABLE_DOUBLE_EQ(std::vector<double>, p4.getObjectParameters(), objparams);
@@ -181,7 +186,7 @@ TEST(SphereGrating, testParams) {
     std::vector<double> elparams = { 0,0,linedensity,double(order), abs(hvlam(designEnergy)),0,vls[0],vls[1], vls[2],vls[3],vls[4],vls[5], 0,0,0,0 };
     std::vector<double> objparams = {width, height, sE[0], sE[1], 
                                     sE[2], sE[3], sE[4], sE[5], 
-                                    sE[6], alpha, 0, 0,
+                                    sE[6], 0, 0, 0,
                                     0, 0, 0, 0};
 
     ASSERT_DOUBLE_EQ(s1.getWidth(), width);

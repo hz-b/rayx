@@ -8,22 +8,54 @@ namespace RAYX
      * Initializes transformation matrices, and parameters for the quadric in super class (quadric).
      * Sets mirror-specific parameters in this class.
      *
-     * Params:
-     * width, height = total width, height of the mirror (x- and z- dimensions)
-     * grazingIncidence = desired incidence angle of the main ray
-     * azimuthal = rotation of mirror around z-axis
-     * distanceToPreceedingElement
-     *
+     * @param name
+     * @param width
+     * @param height
+     * @param grazingIncidence 
+     * @param azimuthal
+     * @param distanceToPreceedingElement
+     * @param entranceArmLength
+     * @param exitArmLength
+     * @param misalignment
+     * @param slopeError
+     * @param previous
+     * @param global
     */
     SphereMirror::SphereMirror(const char* name, const double width, const double height, const double grazingIncidence, const double azimuthal, const double distanceToPreceedingElement, const double entranceArmLength, const double exitArmLength, const std::vector<double> misalignmentParams, const std::vector<double> slopeError, const std::shared_ptr<OpticalElement> previous, bool global)
         : OpticalElement(name, { 0,0,0,0, 0,0,0,0, 0,0,0,0, 0,0,0,0 }, width, height, rad(grazingIncidence), rad(azimuthal), rad(grazingIncidence), distanceToPreceedingElement, misalignmentParams, { 0,0,0,0,0,0 }, slopeError, previous, global),
         m_entranceArmLength(entranceArmLength),
-        m_exitArmLength(exitArmLength)
-
+        m_exitArmLength(exitArmLength),
+        m_grazingIncidenceAngle(rad(grazingIncidence))
     {
         // std::vector<double> inputPoints = {0,0,0,0, 0,0,0,-1, 0,0,0,0, 0,0,0,0};
 
 
+        calcRadius(); // calculate the radius
+        setSurface(std::make_unique<Quadric>(std::vector<double>{1, 0, 0, 0, 0, 1, 0, -m_radius, 0, 0, 1, 0, 0, 0, 0, 0}));
+    }
+
+    /**
+     * Calculates transformation matrices, and sets parameters for the quadric surface.
+     * Sets mirror-specific parameters in this class.
+     *
+     * @param name
+     * @param width
+     * @param height
+     * @param grazingIncidenceAngle     angle in which the main ray should hit the element.
+     * @param position                  position of element in world coordinates
+     * @param orientation               orientation of element in world coordinates
+     * @param entranceArmLength
+     * @param exitArmLength
+     * @param slopeError
+     *
+    */
+    SphereMirror::SphereMirror(const char* name, const double width, const double height, const double grazingIncidenceAngle, glm::dvec4 position, glm::dmat4x4 orientation, const double entranceArmLength, const double exitArmLength, const std::vector<double> slopeError)
+        : OpticalElement(name, { 0,0,0,0, 0,0,0,0, 0,0,0,0, 0,0,0,0 }, width, height, position, orientation, { 0,0,0,0,0,0 }, slopeError),
+        m_entranceArmLength(entranceArmLength),
+        m_exitArmLength(exitArmLength),
+        m_grazingIncidenceAngle(rad(grazingIncidenceAngle))
+
+    {
         calcRadius(); // calculate the radius
         setSurface(std::make_unique<Quadric>(std::vector<double>{1, 0, 0, 0, 0, 1, 0, -m_radius, 0, 0, 1, 0, 0, 0, 0, 0}));
     }
@@ -33,8 +65,7 @@ namespace RAYX
     }
 
     void SphereMirror::calcRadius() {
-        double theta = getAlpha(); // grazing incidence in rad
-        m_radius = 2.0 / sin(theta) / (1.0 / m_entranceArmLength + 1.0 / m_exitArmLength);
+        m_radius = 2.0 / sin(m_grazingIncidenceAngle) / (1.0 / m_entranceArmLength + 1.0 / m_exitArmLength);
     }
 
 

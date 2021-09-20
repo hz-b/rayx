@@ -1012,7 +1012,7 @@ TEST(Tracer, getThetaTest) {
     compareFromCorrect(correct, outputRays, tolerance);
 
 }
-
+*/
 
 void testOpticalElement(std::vector<std::shared_ptr<RAYX::OpticalElement>> elements, int n) {
     std::shared_ptr<RAYX::MatrixSource> m = std::make_shared<RAYX::MatrixSource>(0, "Matrix source 1", n, 0, 0.065, 0.04, 0.0, 0.001, 0.001, 100, 0, 1, 0, 0, std::vector<double>{ 0,0,0,0 });
@@ -1026,7 +1026,7 @@ void testOpticalElement(std::vector<std::shared_ptr<RAYX::OpticalElement>> eleme
 // test complete optical elements instead of single functions
 // uses deterministic source (matrix source with source depth = 0)
 // use name of optical element as file name
-
+/*
 TEST(opticalElements, planeMirrorDefault) {
     GeometricUserParams pm_param = GeometricUserParams(10, 10, 7.5, 10000, std::vector<double>{ 0,0,0, 0,0,0 });
     glm::dvec4 pos_mirror = calcPosition(pm_param);
@@ -1050,41 +1050,89 @@ TEST(opticalElements, planeMirrorMis) {
 }
 
 TEST(opticalElements, sphereMirror) {
-    std::shared_ptr<RAYX::SphereMirror> s = std::make_shared<RAYX::SphereMirror>("SphereMirrorDefault", 50, 200, 10, 0.0, 10000, 10000, 1000, std::vector<double>{ 0,0,0,0,0,0 }, zeros7, nullptr, false);
+    double grazingIncidence = 10;
+    GeometricUserParams sm_param = GeometricUserParams(grazingIncidence, grazingIncidence, 0, 10000, std::vector<double>{ 0,0,0, 0,0,0 });
+    glm::dvec4 pos_mirror = calcPosition(sm_param);
+    glm::dmat4x4 or_mirror = calcOrientation(sm_param);
+    
+    std::shared_ptr<RAYX::SphereMirror> s = std::make_shared<RAYX::SphereMirror>("SphereMirrorDefault", 50, 200, sm_param.alpha, pos_mirror, or_mirror, 10000, 1000, zeros7);
+    s->setOutMatrix(glmToVector16(glm::transpose(calcE2B(sm_param)))); // to make comparison with old ray files possible, use the beam coordinate system
     testOpticalElement({ s }, 20);
     ASSERT_TRUE(true);
 }
 
 TEST(opticalElements, planeGratingDevDefault) {
-    std::shared_ptr<RAYX::PlaneGrating> plG = std::make_shared<RAYX::PlaneGrating>("PlaneGratingDeviationDefault", 0, 50, 200, 10, 0.0, 0.0, 10000, 100, 1000, 1, 2, 0, std::vector<double>{ 0,0,0,0,0,0 }, std::vector<double>{ 0,0,0,0,0,0 }, zeros7, nullptr, false); // dx,dy,dz, dpsi,dphi,dchi // {1,2,3,0.001,0.002,0.003}
+    double incidenceAngle = degree(1.4773068838645145);
+    double exitAngle = degree(1.4897528445258457);
+    GeometricUserParams pg_param = GeometricUserParams(incidenceAngle, exitAngle, 0, 10000, std::vector<double>{ 0,0,0, 0,0,0 });
+    glm::dvec4 position = calcPosition(pg_param);
+    glm::dmat4x4 orientation = calcOrientation(pg_param);
+    
+    std::shared_ptr<RAYX::PlaneGrating> plG = std::make_shared<RAYX::PlaneGrating>("PlaneGratingDeviationDefault", 50, 200, position, orientation, 100, 1000, 1, 0, std::vector<double>{ 0,0,0,0,0,0 }, zeros7); // dx,dy,dz, dpsi,dphi,dchi // {1,2,3,0.001,0.002,0.003}
+    //std::shared_ptr<RAYX::PlaneGrating> plG = std::make_shared<RAYX::PlaneGrating>("PlaneGratingDeviationDefault", 0, 50, 200, 10, 0.0, 0.0, 10000, 100, 1000, 1, 2, 0, std::vector<double>{ 0,0,0,0,0,0 }, std::vector<double>{ 0,0,0,0,0,0 }, zeros7, nullptr, false); // dx,dy,dz, dpsi,dphi,dchi // {1,2,3,0.001,0.002,0.003}
+    plG->setOutMatrix(glmToVector16(glm::transpose(calcE2B(pg_param)))); // to make comparison with old ray files possible, use the beam coordinate system
     testOpticalElement({ plG }, 20);
     ASSERT_TRUE(true);
 }
 
 TEST(opticalElements, planeGratingDevAzimuthal) {
-    std::shared_ptr<RAYX::PlaneGrating> plG = std::make_shared<RAYX::PlaneGrating>("PlaneGratingDeviationAz", 0, 50, 200, 10, 0.0, 7.5, 10000, 100, 1000, 1, 2, 0, std::vector<double>{ 0,0,0,0,0,0 }, std::vector<double>{ 0,0,0,0,0,0 }, zeros7, nullptr, false); // dx,dy,dz, dpsi,dphi,dchi // {1,2,3,0.001,0.002,0.003}
+    double incidenceAngle = degree(1.4773068838645145);
+    double exitAngle = degree(1.4897528445258457);
+    GeometricUserParams pg_param = GeometricUserParams(incidenceAngle, exitAngle, 7.5, 10000, std::vector<double>{ 0,0,0, 0,0,0 });
+    glm::dvec4 position = calcPosition(pg_param);
+    glm::dmat4x4 orientation = calcOrientation(pg_param);
+
+    std::shared_ptr<RAYX::PlaneGrating> plG = std::make_shared<RAYX::PlaneGrating>("PlaneGratingDeviationAz", 50, 200, position, orientation, 100, 1000, 1, 0, std::vector<double>{ 0,0,0,0,0,0 }, zeros7); // dx,dy,dz, dpsi,dphi,dchi // {1,2,3,0.001,0.002,0.003}
+    //std::shared_ptr<RAYX::PlaneGrating> plG = std::make_shared<RAYX::PlaneGrating>("PlaneGratingDeviationAz", 0, 50, 200, 10, 0.0, 7.5, 10000, 100, 1000, 1, 2, 0, std::vector<double>{ 0,0,0,0,0,0 }, std::vector<double>{ 0,0,0,0,0,0 }, zeros7, nullptr, false); // dx,dy,dz, dpsi,dphi,dchi // {1,2,3,0.001,0.002,0.003}
+    plG->setOutMatrix(glmToVector16(glm::transpose(calcE2B(pg_param)))); // to make comparison with old ray files possible, use the beam coordinate system
     testOpticalElement({ plG }, 20);
     ASSERT_TRUE(true);
 }
 
-TEST(opticalElements, planeGratingDevMis) {
-    std::shared_ptr<RAYX::PlaneGrating> plG = std::make_shared<RAYX::PlaneGrating>("PlaneGratingDeviationAzMis", 0, 50, 200, 10, 0.0, 7.5, 10000, 100, 1000, 1, 2, 0, std::vector<double>{ 1,2,3,0.001,0.002,0.003 }, std::vector<double>{ 0,0,0,0,0,0 }, zeros7, nullptr, false); // dx,dy,dz, dpsi,dphi,dchi // {1,2,3,0.001,0.002,0.003}
+TEST(opticalElements, planeGratingDevAzMis) {
+    double incidenceAngle = degree(1.4773068838645145);
+    double exitAngle = degree(1.4897528445258457);
+    GeometricUserParams pg_param = GeometricUserParams(incidenceAngle, exitAngle, 7.5, 10000, std::vector<double>{ 1,2,3,0.001,0.002,0.003 });
+    glm::dvec4 position = calcPosition(pg_param);
+    glm::dmat4x4 orientation = calcOrientation(pg_param);
+
+    std::shared_ptr<RAYX::PlaneGrating> plG = std::make_shared<RAYX::PlaneGrating>("PlaneGratingDeviationAzMis", 50, 200, position, orientation, 100, 1000, 1, 0, std::vector<double>{ 0,0,0,0,0,0 }, zeros7); // dx,dy,dz, dpsi,dphi,dchi // {1,2,3,0.001,0.002,0.003}
+    
+    //std::shared_ptr<RAYX::PlaneGrating> plG = std::make_shared<RAYX::PlaneGrating>("PlaneGratingDeviationAzMis", 0, 50, 200, 10, 0.0, 7.5, 10000, 100, 1000, 1, 2, 0, std::vector<double>{ 1,2,3,0.001,0.002,0.003 }, std::vector<double>{ 0,0,0,0,0,0 }, zeros7, nullptr, false); // dx,dy,dz, dpsi,dphi,dchi // {1,2,3,0.001,0.002,0.003}
+    plG->setOutMatrix(glmToVector16(glm::transpose(calcE2B(pg_param)))); // to make comparison with old ray files possible, use the beam coordinate system
     testOpticalElement({ plG }, 20);
     ASSERT_TRUE(true);
 }
 
 // constant incidence angle mode, azimuthal angle and misalignment
 TEST(opticalElements, planeGratingIncAzMis) {
-    std::shared_ptr<RAYX::PlaneGrating> plG = std::make_shared<RAYX::PlaneGrating>("PlaneGratingIncAzMis", 1, 50, 200, 0.0, 10, 7.5, 10000, 100, 1000, 1, 2, 0, std::vector<double>{ 1,2,3,0.001,0.002,0.003 }, std::vector<double>{ 0,0,0,0,0,0 }, zeros7, nullptr, false); // dx,dy,dz, dpsi,dphi,dchi // {1,2,3,0.001,0.002,0.003}
+    double incidenceAngle = degree(1.3962634015954636);
+    double exitAngle = degree(1.4088395764879007);
+    GeometricUserParams pg_param = GeometricUserParams(incidenceAngle, exitAngle, 7.5, 10000, std::vector<double>{ 1,2,3,0.001,0.002,0.003 });
+    glm::dvec4 position = calcPosition(pg_param);
+    glm::dmat4x4 orientation = calcOrientation(pg_param);
+    
+    std::shared_ptr<RAYX::PlaneGrating> plG = std::make_shared<RAYX::PlaneGrating>("PlaneGratingIncAzMis", 50, 200, position, orientation, 100, 1000, 1, 0,  std::vector<double>{ 0,0,0,0,0,0 }, zeros7); // dx,dy,dz, dpsi,dphi,dchi // {1,2,3,0.001,0.002,0.003}
+    //std::shared_ptr<RAYX::PlaneGrating> plG = std::make_shared<RAYX::PlaneGrating>("PlaneGratingIncAzMis", 1, 50, 200, 0.0, 10, 7.5, 10000, 100, 1000, 1, 2, 0, std::vector<double>{ 1,2,3,0.001,0.002,0.003 }, std::vector<double>{ 0,0,0,0,0,0 }, zeros7, nullptr, false); // dx,dy,dz, dpsi,dphi,dchi // {1,2,3,0.001,0.002,0.003}
+    plG->setOutMatrix(glmToVector16(glm::transpose(calcE2B(pg_param)))); // to make comparison with old ray files possible, use the beam coordinate system
     testOpticalElement({ plG }, 20);
     ASSERT_TRUE(true);
 }
 
 TEST(opticalElements, planeGratingDevMisVLS) {
-    std::shared_ptr<RAYX::PlaneGrating> plG = std::make_shared<RAYX::PlaneGrating>("PlaneGratingDeviationMis", 0, 50, 200, 10, 0.0, 7.5, 10000, 100, 1000, 1, 2, 0, std::vector<double>{ 1,2,3,0.001,0.002,0.003 }, std::vector<double>{ 1,2,3,4,5,6 }, zeros7, nullptr, false); // dx,dy,dz, dpsi,dphi,dchi // {1,2,3,0.001,0.002,0.003}
+    double incidenceAngle = degree(1.4773068838645145);
+    double exitAngle = degree(1.4897528445258457);
+    GeometricUserParams pg_param = GeometricUserParams(incidenceAngle, exitAngle, 7.5, 10000, std::vector<double>{ 1,2,3,0.001,0.002,0.003 });
+    glm::dvec4 position = calcPosition(pg_param);
+    glm::dmat4x4 orientation = calcOrientation(pg_param);
+    
+    std::shared_ptr<RAYX::PlaneGrating> plG = std::make_shared<RAYX::PlaneGrating>("PlaneGratingDeviationMis", 50, 200, position, orientation, 100, 1000, 1, 0, std::vector<double>{ 1,2,3,4,5,6 }, zeros7); // dx,dy,dz, dpsi,dphi,dchi // {1,2,3,0.001,0.002,0.003}
+    plG->setOutMatrix(glmToVector16(glm::transpose(calcE2B(pg_param)))); // to make comparison with old ray files possible, use the beam coordinate system
     testOpticalElement({ plG }, 20);
     ASSERT_TRUE(true);
 }
+
+// RZPs 
 
 TEST(opticalElements, RZPDefaultParams) {
     std::shared_ptr<RAYX::ReflectionZonePlate> rzp = std::make_shared<RAYX::ReflectionZonePlate>("ReflectionZonePlateDefault", 0, 1, 0, 0, 0, 50, 200, 170, 1, 0, 10000, 100, 100, -1, -1, 1, 1, 100, 500, 100, 500, 0, 0, 0, 0, 0, 0, std::vector<double>{ 0,0,0, 0,0,0 }, zeros7, nullptr, false); // dx,dy,dz, dpsi,dphi,dchi // {1,2,3,0.001,0.002,0.003}

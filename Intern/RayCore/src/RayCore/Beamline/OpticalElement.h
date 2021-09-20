@@ -24,7 +24,9 @@ namespace RAYX
         OpticalElement(const char* name, const double chi, const double dist, const std::vector<double> slopeError, const std::shared_ptr<OpticalElement> previous);
 
         OpticalElement(const char* name, const std::vector<double> EParameters, const double width, const double height, glm::dvec4 position, glm::dmat4x4 orientation, const std::vector<double> tempMisalignmentParams, const std::vector<double> slopeError);
-        
+        OpticalElement(const char* name, const double width, const double height, glm::dvec4 position, glm::dmat4x4 orientation, const std::vector<double> slopeError);
+
+
         void setElementParameters(std::vector<double> params);
         void setDimensions(double width, double height);
         void setInMatrix(std::vector<double> inputMatrix);
@@ -53,9 +55,6 @@ namespace RAYX
         glm::dmat4x4 getInvE2B() const;
         glm::dmat4x4 getG2E() const;
         glm::dmat4x4 getE2G() const;
-
-        glm::dvec4 getPosition() const;
-        glm::dmat4 getOrientation() const;
 
         std::vector<double> getInTransMis() const;
         std::vector<double> getOutTransMis() const;
@@ -106,9 +105,6 @@ namespace RAYX
         glm::dmat4x4 d_g2e; // m_inTransMis
         glm::dmat4x4 d_e2g; // m_outTransMis;
         // ----
-
-        glm::dvec4 m_position;
-        glm::dmat4 m_orientation;
 
         // Surface (eg Quadric or if eg torus something else)
         std::unique_ptr<Surface> m_surface;
