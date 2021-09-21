@@ -36,7 +36,7 @@ glm::dmat4x4 calcE2B(GeometricUserParams p) {
     glm::dmat4x4 inverseMisalignmentMatrix = inverseRotation * inverseTranslation;
     
     e2b = e2b * inverseMisalignmentMatrix;
-    return glm::transpose(e2b); //o
+    return glm::transpose(e2b);
 }
 
 /**
@@ -54,7 +54,7 @@ glm::dmat4x4 getMisalignmentOrientation(std::vector<double> misalignment) {
                             sin(dchi) * cos(dphi), cos(dpsi) * cos(dchi) - sin(dpsi) * sin(dphi) * sin(dchi), sin(dpsi) * cos(dchi) + cos(dpsi) * sin(dphi) * sin(dchi), 0,
                             -sin(dphi), -sin(dpsi) * cos(dphi), cos(dpsi) * cos(dphi), 0,
                             0, 0, 0, 1 );
-    return glm::transpose(misalignmentMatrix); // o
+    return glm::transpose(misalignmentMatrix);
 }
 
 /**
@@ -166,5 +166,5 @@ glm::dmat4x4 calcOrientation(GeometricUserParams current)
         }
         std::cout << std::endl;
     }
-    return orientation; // o
+    return orientation;
 }

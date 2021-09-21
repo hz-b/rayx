@@ -1012,7 +1012,7 @@ TEST(Tracer, getThetaTest) {
     compareFromCorrect(correct, outputRays, tolerance);
 
 }
-*/
+
 
 void testOpticalElement(std::vector<std::shared_ptr<RAYX::OpticalElement>> elements, int n) {
     std::shared_ptr<RAYX::MatrixSource> m = std::make_shared<RAYX::MatrixSource>(0, "Matrix source 1", n, 0, 0.065, 0.04, 0.0, 0.001, 0.001, 100, 0, 1, 0, 0, std::vector<double>{ 0,0,0,0 });
@@ -1026,7 +1026,7 @@ void testOpticalElement(std::vector<std::shared_ptr<RAYX::OpticalElement>> eleme
 // test complete optical elements instead of single functions
 // uses deterministic source (matrix source with source depth = 0)
 // use name of optical element as file name
-/*
+
 TEST(opticalElements, planeMirrorDefault) {
     GeometricUserParams pm_param = GeometricUserParams(10, 10, 7.5, 10000, std::vector<double>{ 0,0,0, 0,0,0 });
     glm::dvec4 pos_mirror = calcPosition(pm_param);
@@ -1135,26 +1135,51 @@ TEST(opticalElements, planeGratingDevMisVLS) {
 // RZPs 
 
 TEST(opticalElements, RZPDefaultParams) {
-    std::shared_ptr<RAYX::ReflectionZonePlate> rzp = std::make_shared<RAYX::ReflectionZonePlate>("ReflectionZonePlateDefault", 0, 1, 0, 0, 0, 50, 200, 170, 1, 0, 10000, 100, 100, -1, -1, 1, 1, 100, 500, 100, 500, 0, 0, 0, 0, 0, 0, std::vector<double>{ 0,0,0, 0,0,0 }, zeros7, nullptr, false); // dx,dy,dz, dpsi,dphi,dchi // {1,2,3,0.001,0.002,0.003}
+    // alpha and beta calculated from user parameters
+    GeometricUserParams rzp_param = GeometricUserParams( degree(0.017453292519943295), degree(0.017453292519941554), 0, 10000, std::vector<double>{ 0,0,0, 0,0,0 });
+    glm::dvec4 position = calcPosition(rzp_param);
+    glm::dmat4x4 orientation = calcOrientation(rzp_param);
+    
+    //std::shared_ptr<RAYX::ReflectionZonePlate> rzp = std::make_shared<RAYX::ReflectionZonePlate>("ReflectionZonePlateDefault", 0, 1, 0, 0, 0, 50, 200, 170, 1, 0, 10000, 100, 100, -1, -1, 1, 1, 100, 500, 100, 500, 0, 0, 0, 0, 0, 0, std::vector<double>{ 0,0,0, 0,0,0 }, zeros7, nullptr, false); // dx,dy,dz, dpsi,dphi,dchi // {1,2,3,0.001,0.002,0.003}
+    std::shared_ptr<RAYX::ReflectionZonePlate> rzp = std::make_shared<RAYX::ReflectionZonePlate>("ReflectionZonePlateDefault", 0, 0, 50, 200, position, orientation, 100, -1, -1, 1, 1, 100, 500, 100, 500, 0, 0, 0, 0, zeros7); // dx,dy,dz, dpsi,dphi,dchi // {1,2,3,0.001,0.002,0.003}
+    rzp->setOutMatrix(glmToVector16(glm::transpose(calcE2B(rzp_param)))); // to make comparison with old ray files possible, use the beam coordinate system
     testOpticalElement({ rzp }, 20);
     ASSERT_TRUE(true);
 }
 
 TEST(opticalElements, RZPDefaultParams200) {
-    std::shared_ptr<RAYX::ReflectionZonePlate> rzp = std::make_shared<RAYX::ReflectionZonePlate>("ReflectionZonePlateDefault200", 0, 1, 0, 0, 0, 50, 200, 170, 1, 0, 10000, 100, 100, -1, -1, 1, 1, 100, 500, 100, 500, 0, 0, 0, 0, 0, 0, std::vector<double>{ 0,0,0, 0,0,0 }, zeros7, nullptr, false); // dx,dy,dz, dpsi,dphi,dchi // {1,2,3,0.001,0.002,0.003}
+    GeometricUserParams rzp_param = GeometricUserParams( degree( 0.017453292519943295), degree(0.017453292519941554), 0, 10000, std::vector<double>{ 0,0,0, 0,0,0 });
+    glm::dvec4 position = calcPosition(rzp_param);
+    glm::dmat4x4 orientation = calcOrientation(rzp_param);
+    
+    //std::shared_ptr<RAYX::ReflectionZonePlate> rzp = std::make_shared<RAYX::ReflectionZonePlate>("ReflectionZonePlateDefault200", 0, 1, 0, 0, 0, 50, 200, 170, 1, 0, 10000, 100, 100, -1, -1, 1, 1, 100, 500, 100, 500, 0, 0, 0, 0, 0, 0, std::vector<double>{ 0,0,0, 0,0,0 }, zeros7, nullptr, false); // dx,dy,dz, dpsi,dphi,dchi // {1,2,3,0.001,0.002,0.003}
+    std::shared_ptr<RAYX::ReflectionZonePlate> rzp = std::make_shared<RAYX::ReflectionZonePlate>("ReflectionZonePlateDefault200", 0, 0, 50, 200, position, orientation, 100, -1, -1, 1, 1, 100, 500, 100, 500, 0, 0, 0, 0, zeros7); // dx,dy,dz, dpsi,dphi,dchi // {1,2,3,0.001,0.002,0.003}
+    rzp->setOutMatrix(glmToVector16(glm::transpose(calcE2B(rzp_param)))); // to make comparison with old ray files possible, use the beam coordinate system
     testOpticalElement({ rzp }, 200);
     ASSERT_TRUE(true);
 }
 
+
 TEST(opticalElements, RZPAzimuthal200) {
-    std::shared_ptr<RAYX::ReflectionZonePlate> rzp = std::make_shared<RAYX::ReflectionZonePlate>("ReflectionZonePlateAzim200", 0, 1, 0, 0, 0, 50, 200, 170, 1, 10, 10000, 100, 100, -1, -1, 1, 1, 100, 500, 100, 500, 0, 0, 0, 0, 0, 0, std::vector<double>{ 0,0,0, 0,0,0 }, zeros7, nullptr, false); // dx,dy,dz, dpsi,dphi,dchi // {1,2,3,0.001,0.002,0.003}
+    GeometricUserParams rzp_param = GeometricUserParams( degree( 0.017453292519943295), degree(0.017453292519941554), 10, 10000, std::vector<double>{ 0,0,0, 0,0,0 });
+    glm::dvec4 position = calcPosition(rzp_param);
+    glm::dmat4x4 orientation = calcOrientation(rzp_param);
+
+    std::shared_ptr<RAYX::ReflectionZonePlate> rzp = std::make_shared<RAYX::ReflectionZonePlate>("ReflectionZonePlateDefault200", 0, 0, 50, 200, position, orientation, 100, -1, -1, 1, 1, 100, 500, 100, 500, 0, 0, 0, 0, zeros7); // dx,dy,dz, dpsi,dphi,dchi // {1,2,3,0.001,0.002,0.003}
+    rzp->setOutMatrix(glmToVector16(glm::transpose(calcE2B(rzp_param)))); // to make comparison with old ray files possible, use the beam coordinate system
+    // std::shared_ptr<RAYX::ReflectionZonePlate> rzp = std::make_shared<RAYX::ReflectionZonePlate>("ReflectionZonePlateAzim200", 0, 1, 0, 0, 0, 50, 200, 170, 1, 10, 10000, 100, 100, -1, -1, 1, 1, 100, 500, 100, 500, 0, 0, 0, 0, 0, 0, std::vector<double>{ 0,0,0, 0,0,0 }, zeros7, nullptr, false); // dx,dy,dz, dpsi,dphi,dchi // {1,2,3,0.001,0.002,0.003}
     testOpticalElement({ rzp }, 200);
     ASSERT_TRUE(true);
 }
 
 
 TEST(opticalElements, RZPMis) {
-    std::shared_ptr<RAYX::ReflectionZonePlate> rzp = std::make_shared<RAYX::ReflectionZonePlate>("ReflectionZonePlateMis", 0, 1, 0, 0, 0, 50, 200, 170, 1, 0, 10000, 100, 100, -1, -1, 1, 1, 100, 500, 100, 500, 0, 0, 0, 0, 0, 0, std::vector<double>{ 1,2,3,0.001,0.002,0.003 }, zeros7, nullptr, false); // dx,dy,dz, dpsi,dphi,dchi //
+    GeometricUserParams rzp_param = GeometricUserParams( degree( 0.017453292519943295), degree(0.017453292519941554), 0, 10000, std::vector<double>{ 1,2,3,0.001,0.002,0.003 });
+    glm::dvec4 position = calcPosition(rzp_param);
+    glm::dmat4x4 orientation = calcOrientation(rzp_param);
+
+    std::shared_ptr<RAYX::ReflectionZonePlate> rzp = std::make_shared<RAYX::ReflectionZonePlate>("ReflectionZonePlateDefault200", 0, 0, 50, 200, position, orientation, 100, -1, -1, 1, 1, 100, 500, 100, 500, 0, 0, 0, 0, zeros7); // dx,dy,dz, dpsi,dphi,dchi // {1,2,3,0.001,0.002,0.003}
+    rzp->setOutMatrix(glmToVector16(glm::transpose(calcE2B(rzp_param)))); // to make comparison with old ray files possible, use the beam coordinate system
     testOpticalElement({ rzp }, 200);
     ASSERT_TRUE(true);
 }
@@ -1218,12 +1243,17 @@ TEST(opticalElements, slit1) {
     }
 }
 
-bool global = true;
+
 // PETES SETUP
 // spec1-first_rzp4mm
 TEST(PeteRZP, spec1_first_rzp) {
+    GeometricUserParams rzp_param = GeometricUserParams(degree(0.038397243543875255), degree(0.017453292519943295), 0, 90, std::vector<double>{ 0,0,0, 0,0,0 });
+    glm::dvec4 position = calcPosition(rzp_param);
+    glm::dmat4x4 orientation = calcOrientation(rzp_param);
+
     std::shared_ptr<RAYX::PointSource> p = std::make_shared<RAYX::PointSource>(0, "spec1_first_rzp", 20000 , 1, 0.005,0.005,0, 0.02,0.06, 1,1,0,0, 640, 120, 1, 0, 0, std::vector<double>{0,0,0,0});
-    std::shared_ptr<RAYX::ReflectionZonePlate> rzp = std::make_shared<RAYX::ReflectionZonePlate>("ReflectionZonePete", 0, 1, 0, 1, 1, 4, 60, 170, 2.2, 0, 90, p->getPhotonEnergy(), p->getPhotonEnergy(), -1, -1, 2.2, 1, 90, 400, 90, 400, 0, 0, 1, 0, 0, 1, std::vector<double>{ 0,0,0, 0,0,0 }, zeros7, nullptr, global); // dx,dy,dz, dpsi,dphi,dchi //
+    std::shared_ptr<RAYX::ReflectionZonePlate> rzp = std::make_shared<RAYX::ReflectionZonePlate>("ReflectionZonePete", 0, 0, 4, 60, position, orientation, p->getPhotonEnergy(), -1, -1, 2.2, 1, 90, 400, 90, 400, 0, 0, 1, 0, zeros7); // dx,dy,dz, dpsi,dphi,dchi //
+    rzp->setOutMatrix(glmToVector16(glm::transpose(calcE2B(rzp_param)))); // to make comparison with old ray files possible, use the beam coordinate system
     std::list<double> outputRays = runTracer(p->getRays(), {rzp});
     std::string filename = "testFile_spec1_first_rzp";
     writeToFile(outputRays, filename);
@@ -1231,8 +1261,17 @@ TEST(PeteRZP, spec1_first_rzp) {
 
 TEST(PeteRZP, spec1_first_ip) {
     std::shared_ptr<RAYX::PointSource> p = std::make_shared<RAYX::PointSource>(0, "spec1_first_rzp4",20000 , 1, 0.005,0.005,0, 0.02,0.06, 1,1,0,0, 640, 120, 1, 0, 0, std::vector<double>{0,0,0,0});
-    std::shared_ptr<RAYX::ReflectionZonePlate> rzp = std::make_shared<RAYX::ReflectionZonePlate>("ReflectionZonePete", 0, 1, 0, 1, 1, 4, 60, 170, 2.2, 0, 90, p->getPhotonEnergy(), p->getPhotonEnergy(), -1, -1, 2.2, 1, 90, 400, 90, 400, 0, 0, 1, 0, 0, 1, std::vector<double>{ 0,0,0, 0,0,0 }, zeros7, nullptr, global);  // dx,dy,dz, dpsi,dphi,dchi //
-    std::shared_ptr<RAYX::ImagePlane> ip1 = std::make_shared<RAYX::ImagePlane>("ImagePlane1", 385.0, rzp, global);
+    
+    GeometricUserParams rzp_param = GeometricUserParams(degree(0.038397243543875255), degree(0.017453292519943295), 0, 90, std::vector<double>{ 0,0,0, 0,0,0 });
+    glm::dvec4 rzp_position = calcPosition(rzp_param);
+    glm::dmat4x4 rzp_orientation = calcOrientation(rzp_param);
+    std::shared_ptr<RAYX::ReflectionZonePlate> rzp = std::make_shared<RAYX::ReflectionZonePlate>("ReflectionZonePete", 0, 0, 4, 60, rzp_position, rzp_orientation, p->getPhotonEnergy(), -1, -1, 2.2, 1, 90, 400, 90, 400, 0, 0, 1, 0, zeros7); // dx,dy,dz, dpsi,dphi,dchi //
+    
+    GeometricUserParams ip_param = GeometricUserParams(0, 0, 0, 385.0, std::vector<double>{ 0,0,0, 0,0,0 });
+    glm::dvec4 ip_position = calcPosition(ip_param, rzp_param, rzp_position, rzp_orientation);
+    glm::dmat4x4 ip_orientation = calcOrientation(ip_param, rzp_param, rzp_position, rzp_orientation);
+    std::shared_ptr<RAYX::ImagePlane> ip1 = std::make_shared<RAYX::ImagePlane>("ImagePlane1", ip_position, ip_orientation);
+    
     std::vector<RAYX::Ray> input = p->getRays();
     std::list<double> outputRays = runTracer(input, {rzp, ip1});
     std::string filename = "testFile_spec1_first_rzp_ip";
@@ -1241,7 +1280,14 @@ TEST(PeteRZP, spec1_first_ip) {
 
 TEST(PeteRZP, spec1_first_plus_rzp) {
     std::shared_ptr<RAYX::PointSource> p = std::make_shared<RAYX::PointSource>(0, "spec1_first_plus_rzp",20000 , 1, 0.005,0.005,0, 0.02,0.06, 1,1,0,0, 640, 120, 1, 0, 0, std::vector<double>{0,0,0,0});
-    std::shared_ptr<RAYX::ReflectionZonePlate> rzp = std::make_shared<RAYX::ReflectionZonePlate>("ReflectionZonePete", 0, 1, 0, 1, 1, 4, 60, 170, 2.2, 0, 90, p->getPhotonEnergy(), p->getPhotonEnergy(), 1, 1, 2.2, 4.75, 90, 400, 90, 400, 0, 0, 1, 0, -24.35, 4.75, std::vector<double>{ 0,0,0, 0,0,0 },  std::vector<double>{0,0,0,0, 0,0,0}, nullptr, global);  // dx,dy,dz, dpsi,dphi,dchi //
+    
+    GeometricUserParams rzp_param = GeometricUserParams(degree(0.038397243543875255), degree(0.082903139469730644), 0, 90, std::vector<double>{ 0,0,0, 0,0,0 });
+    glm::dvec4 rzp_position = calcPosition(rzp_param);
+    glm::dmat4x4 rzp_orientation = calcOrientation(rzp_param);
+    std::shared_ptr<RAYX::ReflectionZonePlate> rzp = std::make_shared<RAYX::ReflectionZonePlate>("ReflectionZonePete", 0, 0, 4, 60, rzp_position, rzp_orientation, p->getPhotonEnergy(), 1, 1, 2.2, 4.75, 90, 400, 90, 400, 0, 0, 1, -24.35, zeros7); // dx,dy,dz, dpsi,dphi,dchi //
+    
+    //std::shared_ptr<RAYX::ReflectionZonePlate> rzp = std::make_shared<RAYX::ReflectionZonePlate>("ReflectionZonePete", 0, 1, 0, 1, 1, 4, 60, 170, 2.2, 0, 90, p->getPhotonEnergy(), p->getPhotonEnergy(), 1, 1, 2.2, 4.75, 90, 400, 90, 400, 0, 0, 1, 0, -24.35, 4.75, std::vector<double>{ 0,0,0, 0,0,0 },  std::vector<double>{0,0,0,0, 0,0,0}, nullptr, true);  // dx,dy,dz, dpsi,dphi,dchi //
+    rzp->setOutMatrix(glmToVector16(glm::transpose(calcE2B(rzp_param)))); // to make comparison with old ray files possible, use the beam coordinate system
     std::list<double> outputRays = runTracer(p->getRays(), {rzp});
     std::string filename = "testFile_spec1_first_plus_rzp";
     writeToFile(outputRays, filename);
@@ -1249,8 +1295,17 @@ TEST(PeteRZP, spec1_first_plus_rzp) {
 
 TEST(PeteRZP, spec1_first_plus_ip) {
     std::shared_ptr<RAYX::PointSource> p = std::make_shared<RAYX::PointSource>(0, "spec1_first_plus_rzp_ip",20000 , 1, 0.005,0.005,0, 0.02,0.06, 1,1,0,0, 640, 120, 1, 0, 0, std::vector<double>{0,0,0,0});
-    std::shared_ptr<RAYX::ReflectionZonePlate> rzp = std::make_shared<RAYX::ReflectionZonePlate>("ReflectionZonePete", 0, 1, 0, 1, 1, 4, 60, 170, 2.2, 0, 90, p->getPhotonEnergy(), p->getPhotonEnergy(), 1, 1, 2.2, 4.75, 90, 400, 90, 400, 0, 0, 1, 0, -24.35, 4.75, std::vector<double>{ 0,0,0, 0,0,0 }, std::vector<double>{0,0,0,0, 0,0,0}, nullptr, global);  // dx,dy,dz, dpsi,dphi,dchi //
-    std::shared_ptr<RAYX::ImagePlane> ip1 = std::make_shared<RAYX::ImagePlane>("ImagePlane1", 400.0, rzp, global);
+    
+    GeometricUserParams rzp_param = GeometricUserParams(degree(0.038397243543875255), degree(0.082903139469730644), 0, 90, std::vector<double>{ 0,0,0, 0,0,0 });
+    glm::dvec4 rzp_position = calcPosition(rzp_param);
+    glm::dmat4x4 rzp_orientation = calcOrientation(rzp_param);
+    std::shared_ptr<RAYX::ReflectionZonePlate> rzp = std::make_shared<RAYX::ReflectionZonePlate>("ReflectionZonePete", 0, 0, 4, 60, rzp_position, rzp_orientation, p->getPhotonEnergy(), 1, 1, 2.2, 4.75, 90, 400, 90, 400, 0, 0, 1, -24.35, zeros7); // dx,dy,dz, dpsi,dphi,dchi //
+    
+    GeometricUserParams ip_param = GeometricUserParams(0, 0, 0, 400.0, std::vector<double>{ 0,0,0, 0,0,0 });
+    glm::dvec4 ip_position = calcPosition(ip_param, rzp_param, rzp_position, rzp_orientation);
+    glm::dmat4x4 ip_orientation = calcOrientation(ip_param, rzp_param, rzp_position, rzp_orientation);
+    std::shared_ptr<RAYX::ImagePlane> ip1 = std::make_shared<RAYX::ImagePlane>("ImagePlane1", ip_position, ip_orientation);
+
     std::vector<RAYX::Ray> input = p->getRays();
     std::list<double> outputRays = runTracer(input, {rzp, ip1});
     std::string filename = "testFile_spec1_first_plus_rzp_ip";
@@ -1259,7 +1314,14 @@ TEST(PeteRZP, spec1_first_plus_ip) {
 
 TEST(PeteRZP, spec1_first_minus_rzp2) {
     std::shared_ptr<RAYX::PointSource> p = std::make_shared<RAYX::PointSource>(0, "spec1_first_minus_rzp2",20000 , 1, 0.005,0.005,0, 0.001,0.06, 1,1,0,0, 640, 120, 1, 0, 0, std::vector<double>{0,0,0,0});
-    std::shared_ptr<RAYX::ReflectionZonePlate> rzp = std::make_shared<RAYX::ReflectionZonePlate>("ReflectionZonePete", 0, 1, 0, 1, 1, 2, 60, 170, 2.2, 0, 90, p->getPhotonEnergy(), p->getPhotonEnergy(), -1, -1, 2.2, 1, 90, 400, 90, 400, 0, 0, 1, 0, 0, 1, std::vector<double>{ 0,0,0, 0,0,0 },  std::vector<double>{0,0,0,0, 0,0,0}, nullptr, global);  // dx,dy,dz, dpsi,dphi,dchi //
+    
+    GeometricUserParams rzp_param = GeometricUserParams(degree(0.038397243543875255), degree(0.017453292519943295), 0, 90, std::vector<double>{ 0,0,0, 0,0,0 });
+    glm::dvec4 rzp_position = calcPosition(rzp_param);
+    glm::dmat4x4 rzp_orientation = calcOrientation(rzp_param);
+    std::shared_ptr<RAYX::ReflectionZonePlate> rzp = std::make_shared<RAYX::ReflectionZonePlate>("ReflectionZonePete", 0, 0, 4, 60, rzp_position, rzp_orientation, p->getPhotonEnergy(), -1, -1, 2.2, 1, 90, 400, 90, 400, 0, 0, 1, 0, zeros7); // dx,dy,dz, dpsi,dphi,dchi //
+    rzp->setOutMatrix(glmToVector16(glm::transpose(calcE2B(rzp_param)))); // to make comparison with old ray files possible, use the beam coordinate system
+    
+    //std::shared_ptr<RAYX::ReflectionZonePlate> rzp = std::make_shared<RAYX::ReflectionZonePlate>("ReflectionZonePete", 0, 1, 0, 1, 1, 2, 60, 170, 2.2, 0, 90, p->getPhotonEnergy(), p->getPhotonEnergy(), -1, -1, 2.2, 1, 90, 400, 90, 400, 0, 0, 1, 0, 0, 1, std::vector<double>{ 0,0,0, 0,0,0 },  std::vector<double>{0,0,0,0, 0,0,0}, nullptr, true);  // dx,dy,dz, dpsi,dphi,dchi //
     std::list<double> outputRays = runTracer(p->getRays(), {rzp});
     std::string filename = "testFile_spec1_first_minus_rzp2";
     writeToFile(outputRays, filename);
@@ -1267,8 +1329,17 @@ TEST(PeteRZP, spec1_first_minus_rzp2) {
 
 TEST(PeteRZP, spec1_first_minus_ip2) {
     std::shared_ptr<RAYX::PointSource> p = std::make_shared<RAYX::PointSource>(0, "spec1_first_minus_rzp_ip2",20000 , 1, 0.005,0.005,0, 0.001,0.06, 1,1,0,0, 640, 120, 1, 0, 0, std::vector<double>{0,0,0,0});
-    std::shared_ptr<RAYX::ReflectionZonePlate> rzp = std::make_shared<RAYX::ReflectionZonePlate>("ReflectionZonePete", 0, 1, 0, 1, 1, 2, 60, 170, 2.2, 0, 90, p->getPhotonEnergy(), p->getPhotonEnergy(), -1, -1, 2.2, 1, 90, 400, 90, 400, 0, 0, 1, 0, 0, 1, std::vector<double>{ 0,0,0, 0,0,0 },  std::vector<double>{0,0,0,0, 0,0,0}, nullptr, global);  // dx,dy,dz, dpsi,dphi,dchi //
-    std::shared_ptr<RAYX::ImagePlane> ip1 = std::make_shared<RAYX::ImagePlane>("ImagePlane1", 400.0, rzp, global);
+    
+    GeometricUserParams rzp_param = GeometricUserParams(degree(0.038397243543875255), degree(0.017453292519943295), 0, 90, std::vector<double>{ 0,0,0, 0,0,0 });
+    glm::dvec4 rzp_position = calcPosition(rzp_param);
+    glm::dmat4x4 rzp_orientation = calcOrientation(rzp_param);
+    std::shared_ptr<RAYX::ReflectionZonePlate> rzp = std::make_shared<RAYX::ReflectionZonePlate>("ReflectionZonePete", 0, 0, 4, 60, rzp_position, rzp_orientation, p->getPhotonEnergy(), -1, -1, 2.2, 1, 90, 400, 90, 400, 0, 0, 1, 0, zeros7); // dx,dy,dz, dpsi,dphi,dchi //
+    
+    GeometricUserParams ip_param = GeometricUserParams(0, 0, 0, 400.0, std::vector<double>{ 0,0,0, 0,0,0 });
+    glm::dvec4 ip_position = calcPosition(ip_param, rzp_param, rzp_position, rzp_orientation);
+    glm::dmat4x4 ip_orientation = calcOrientation(ip_param, rzp_param, rzp_position, rzp_orientation);
+    std::shared_ptr<RAYX::ImagePlane> ip1 = std::make_shared<RAYX::ImagePlane>("ImagePlane1", ip_position, ip_orientation);
+    
     std::vector<RAYX::Ray> input = p->getRays();
     std::list<double> outputRays = runTracer(input, {rzp, ip1});
     std::string filename = "testFile_spec1_first_minus_rzp_ip2";

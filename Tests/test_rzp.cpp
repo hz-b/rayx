@@ -4,6 +4,8 @@
 #include "Beamline/Objects/ReflectionZonePlate.h"
 #include "Core.h"
 #include "Ray.h"
+#include "calculateWorldCoordinates.h"
+#include "utils.h"
 
 using ::testing::ElementsAre;
 
@@ -73,18 +75,25 @@ TEST(RZP, testdefaultParams) {
     double fresnelOffset = 0;
     std::vector<double> mis = { 1,2,3, 0.001,0.002,0.003 };
     std::vector<double> sE = { 1,2,3,4,5,6,7 };
-    RAYX::ReflectionZonePlate rzp = RAYX::ReflectionZonePlate("RZP", geometricalShape, mount, curvatureType, designType, elementOffsetType, width, height, deviation, grazingIncidence, azimuthal, dist, designEnergy, sourceEnergy, orderOfDiffraction, designOrderOfDiffraction, dAlpha, dBeta, sEntrance, sExit, mEntrance, mExit, shortRadius, longRadius, additionalOrder, elementOffsetZ, fresnelOffset, beta_in, mis, sE, NULL, false);
-
+    
+    // alpha and beta calculated from user params
     double alpha = 0.017453292519943295;
     double beta = 0.017453292519941554;
+    
+    GeometricUserParams rzp_param = GeometricUserParams(degree(alpha), degree(beta), azimuthal, dist, mis);
+    glm::dvec4 position = calcPosition(rzp_param);
+    glm::dmat4x4 orientation = calcOrientation(rzp_param);
+    RAYX::ReflectionZonePlate rzp = RAYX::ReflectionZonePlate("RZP", geometricalShape, curvatureType, width, height, position, orientation, designEnergy, orderOfDiffraction, designOrderOfDiffraction, dAlpha, dBeta, sEntrance, sExit, mEntrance, mExit, shortRadius, longRadius, additionalOrder, fresnelOffset, sE);
+    //RAYX::ReflectionZonePlate rzp = RAYX::ReflectionZonePlate("RZP", geometricalShape, mount, curvatureType, designType, elementOffsetType, width, height, deviation, grazingIncidence, azimuthal, dist, designEnergy, sourceEnergy, orderOfDiffraction, designOrderOfDiffraction, dAlpha, dBeta, sEntrance, sExit, mEntrance, mExit, shortRadius, longRadius, additionalOrder, elementOffsetZ, fresnelOffset, beta_in, mis, sE, NULL, false);
+
     double d_alpha = 0.017453292519943295;
     double d_beta = 0.017453292519943295;
     double wl = 12.39852;
     std::vector<double> quad = { 0,0,0,0, 0,0,0,-1, 0,0,0,0, 4,0,0,0 }; // plane
-    std::vector<double> correctElementParams = { 0, 0, 0, inm2eV / sourceEnergy,
-                        sourceEnergy, designOrderOfDiffraction, orderOfDiffraction, fresnelOffset,
+    std::vector<double> correctElementParams = { 0, 0, 0, hvlam(sourceEnergy),
+                        0, designOrderOfDiffraction, orderOfDiffraction, fresnelOffset,
                         sEntrance, sExit, mEntrance, mExit,
-                        rad(dAlpha), rad(dBeta), elementOffsetZ, double(additionalOrder) };
+                        rad(dAlpha), rad(dBeta), 0, double(additionalOrder) };
     std::vector<double> correctObjectParams = {width,height,sE[0],sE[1], 
                         sE[2],sE[3],sE[4],sE[5],
                         sE[6],0,0,0,
@@ -92,22 +101,17 @@ TEST(RZP, testdefaultParams) {
     EXPECT_ITERABLE_DOUBLE_EQ(std::vector<double>, rzp.getElementParameters(), correctElementParams);
     EXPECT_ITERABLE_DOUBLE_EQ(std::vector<double>, rzp.getObjectParameters(), correctObjectParams);
     EXPECT_ITERABLE_DOUBLE_EQ(std::vector<double>, rzp.getSurfaceParams(), quad);
-    EXPECT_ITERABLE_DOUBLE_EQ(std::vector<double>, rzp.getTempMisalignmentParams(), mis);
     EXPECT_ITERABLE_DOUBLE_EQ(std::vector<double>, rzp.getSlopeError(), sE);
     std::vector<double> zeros = { 0,0,0, 0,0,0 };
-    EXPECT_ITERABLE_DOUBLE_EQ(std::vector<double>, rzp.getMisalignmentParams(), mis); // rzp stores misalignment in m_misalignment (to add to the m_inMatrix/m_outMatrix) AND tempMisalignment, because it has to be removed separated from the coordinate transformation matrices
     ASSERT_DOUBLE_EQ(rzp.getWidth(), width);
     ASSERT_DOUBLE_EQ(rzp.getHeight(), height);
-    ASSERT_DOUBLE_EQ(rzp.getGratingMount(), mount);
     ASSERT_DOUBLE_EQ(rzp.getDesignEnergy(), designEnergy);
     ASSERT_DOUBLE_EQ(rzp.getOrderOfDiffraction(), orderOfDiffraction);
     ASSERT_DOUBLE_EQ(rzp.getDesignOrderOfDiffraction(), designOrderOfDiffraction);
     ASSERT_DOUBLE_EQ(rzp.getWaveLength(), wl);
     EXPECT_NEAR(rzp.getDesignAlphaAngle(), d_alpha, 0.000000001);
     EXPECT_NEAR(rzp.getDesignBetaAngle(), d_beta, 0.000000001);
-    EXPECT_NEAR(rzp.getBeta(), beta, 0.00000001);
-    EXPECT_NEAR(rzp.getAlpha(), alpha, 0.000000001);
-
+    
 
 }
 
@@ -143,18 +147,24 @@ TEST(RZP, testdefaultParamsElliptical) {
     double fresnelOffset = 0;
     std::vector<double> mis = { 1,2,3, 0.001,0.002,0.003 };
     std::vector<double> sE = { 1,2,3,4,5,6,7 };
-    RAYX::ReflectionZonePlate rzp = RAYX::ReflectionZonePlate("RZP", geometricalShape, mount, curvatureType, designType, elementOffsetType, width, height, deviation, grazingIncidence, azimuthal, dist, designEnergy, sourceEnergy, orderOfDiffraction, designOrderOfDiffraction, dAlpha, dBeta, sEntrance, sExit, mEntrance, mExit, shortRadius, longRadius, additionalOrder, elementOffsetZ, fresnelOffset, beta_in, mis, sE, NULL, false);
-
+    
     double alpha = 0.017453292519943295;
     double beta = 0.017453292519941554;
+    
+    GeometricUserParams rzp_param = GeometricUserParams(degree(alpha), degree(beta), azimuthal, dist, mis);
+    glm::dvec4 position = calcPosition(rzp_param);
+    glm::dmat4x4 orientation = calcOrientation(rzp_param);
+    RAYX::ReflectionZonePlate rzp = RAYX::ReflectionZonePlate("RZP", geometricalShape, curvatureType, width, height, position, orientation, designEnergy, orderOfDiffraction, designOrderOfDiffraction, dAlpha, dBeta, sEntrance, sExit, mEntrance, mExit, shortRadius, longRadius, additionalOrder, fresnelOffset, sE);
+    // RAYX::ReflectionZonePlate rzp = RAYX::ReflectionZonePlate("RZP", geometricalShape, mount, curvatureType, designType, elementOffsetType, width, height, deviation, grazingIncidence, azimuthal, dist, designEnergy, sourceEnergy, orderOfDiffraction, designOrderOfDiffraction, dAlpha, dBeta, sEntrance, sExit, mEntrance, mExit, shortRadius, longRadius, additionalOrder, elementOffsetZ, fresnelOffset, beta_in, mis, sE, NULL, false);
+
     double d_alpha = 0.017453292519943295;
     double d_beta = 0.017453292519943295;
     double wl = 12.39852;
     std::vector<double> quad = { 0,0,0,0, 0,0,0,-1, 0,0,0,0, 4,0,0,0 }; // plane
     std::vector<double> correctElementParams = { 0, 0, 0, inm2eV / sourceEnergy,
-                        sourceEnergy, designOrderOfDiffraction, orderOfDiffraction, fresnelOffset,
+                        0, designOrderOfDiffraction, orderOfDiffraction, fresnelOffset,
                         sEntrance, sExit, mEntrance, mExit,
-                        rad(dAlpha), rad(dBeta), elementOffsetZ, double(additionalOrder) };
+                        rad(dAlpha), rad(dBeta), 0, double(additionalOrder) };
     std::vector<double> correctObjectParams = {-width,-height,sE[0],sE[1], 
                         sE[2],sE[3],sE[4],sE[5],
                         sE[6],0,0,0,
@@ -162,22 +172,18 @@ TEST(RZP, testdefaultParamsElliptical) {
     EXPECT_ITERABLE_DOUBLE_EQ(std::vector<double>, rzp.getElementParameters(), correctElementParams);
     EXPECT_ITERABLE_DOUBLE_EQ(std::vector<double>, rzp.getObjectParameters(), correctObjectParams);
     EXPECT_ITERABLE_DOUBLE_EQ(std::vector<double>, rzp.getSurfaceParams(), quad);
-    EXPECT_ITERABLE_DOUBLE_EQ(std::vector<double>, rzp.getTempMisalignmentParams(), mis);
     EXPECT_ITERABLE_DOUBLE_EQ(std::vector<double>, rzp.getSlopeError(), sE);
     std::vector<double> zeros = { 0,0,0, 0,0,0 };
-    EXPECT_ITERABLE_DOUBLE_EQ(std::vector<double>, rzp.getMisalignmentParams(), mis); // rzp stores misalignment in m_misalignment (to add to the m_inMatrix/m_outMatrix) AND tempMisalignment, because it has to be removed separated from the coordinate transformation matrices
+    
     ASSERT_DOUBLE_EQ(rzp.getWidth(), width);
     ASSERT_DOUBLE_EQ(rzp.getHeight(), height);
-    ASSERT_DOUBLE_EQ(rzp.getGratingMount(), mount);
     ASSERT_DOUBLE_EQ(rzp.getDesignEnergy(), designEnergy);
     ASSERT_DOUBLE_EQ(rzp.getOrderOfDiffraction(), orderOfDiffraction);
     ASSERT_DOUBLE_EQ(rzp.getDesignOrderOfDiffraction(), designOrderOfDiffraction);
     ASSERT_DOUBLE_EQ(rzp.getWaveLength(), wl);
     EXPECT_NEAR(rzp.getDesignAlphaAngle(), d_alpha, 0.000000001);
     EXPECT_NEAR(rzp.getDesignBetaAngle(), d_beta, 0.000000001);
-    EXPECT_NEAR(rzp.getBeta(), beta, 0.00000001);
-    EXPECT_NEAR(rzp.getAlpha(), alpha, 0.000000001);
-
+    
 
 }
 
@@ -188,7 +194,7 @@ TEST(RZP, testParams) {
     int designType = 0;
     int elementOffsetType = 0;
     int additionalOrder = 0;
-    double beta = 0;
+    double betaIn = 0;
     double width = 151.74;
     double height = 354.3;
     double deviation = 13.7;
@@ -211,22 +217,35 @@ TEST(RZP, testParams) {
     double fresnelOffset = 12;
     std::vector<double> mis = { 0,0,0, 0,0,0 };
     std::vector<double> sE = { 1,3,4,5,6,7,9 };
-    RAYX::ReflectionZonePlate rzp = RAYX::ReflectionZonePlate("RZP", geometricShape, mount, curvatureType, designType, elementOffsetType, width, height, deviation, grazingIncidence, azimuthal, dist, designEnergy, sourceEnergy, orderOfDiffraction, designOrderOfDiffraction, dAlpha, dBeta, sEntrance, sExit, mEntrance, mExit, shortRadius, longRadius, additionalOrder, elementOffsetZ, fresnelOffset, beta, mis, sE, NULL, false);
-    std::vector<double> correctMis = { 1,0,0,0, 0,1,0,0, 0,0,1,0, 0,0,0,1 };
-    std::vector<double> correctElementParams = { 0, 0, 0, inm2eV / sourceEnergy,
-                        sourceEnergy, designOrderOfDiffraction, orderOfDiffraction, fresnelOffset,
+    
+    double alpha = 0.21816615649929119;
+    double beta = 0.21816615649929122;
+    GeometricUserParams rzp_param = GeometricUserParams(degree(alpha), degree(beta), azimuthal, dist, mis);
+    glm::dvec4 position = calcPosition(rzp_param);
+    glm::dmat4x4 orientation = calcOrientation(rzp_param);
+    RAYX::ReflectionZonePlate rzp = RAYX::ReflectionZonePlate("RZP", geometricShape, curvatureType, width, height, position, orientation, designEnergy, orderOfDiffraction, designOrderOfDiffraction, dAlpha, dBeta, sEntrance, sExit, mEntrance, mExit, shortRadius, longRadius, additionalOrder, fresnelOffset, sE);
+    
+    RAYX::ReflectionZonePlate rzp2 = RAYX::ReflectionZonePlate("RZP", geometricShape, mount, curvatureType, designType, elementOffsetType, width, height, deviation, grazingIncidence, azimuthal, dist, designEnergy, sourceEnergy, orderOfDiffraction, designOrderOfDiffraction, dAlpha, dBeta, sEntrance, sExit, mEntrance, mExit, shortRadius, longRadius, additionalOrder, elementOffsetZ, fresnelOffset, betaIn, mis, sE, NULL, true);
+    
+    std::vector<double> correctElementParams = { 0, 0, 0, inm2eV / designEnergy,
+                        0, designOrderOfDiffraction, orderOfDiffraction, fresnelOffset,
                         sEntrance, sExit, mEntrance, mExit,
-                        rad(dAlpha), rad(dBeta), elementOffsetZ, double(additionalOrder) };
+                        rad(dAlpha), rad(dBeta), 0, double(additionalOrder) };
     std::vector<double> correctObjectParams = { width, height, sE[0], sE[1],
                         sE[2], sE[3], sE[4], sE[5], 
                         sE[6], 0, 0, 0,
-                        0, 0, 0, 0};    
-    EXPECT_ITERABLE_DOUBLE_EQ(std::vector<double>, rzp.getObjectParameters(), correctObjectParams);
+                        0, 0, 0, 0};                        
+    glm::dmat4x4 correctInMatrix = glm::dmat4x4(0.84421568368313848, -0.52329819288792645, -0.11601241633394895, 0, 
+                        0.53600361885290571, 0.82420440112787274, 0.18272171665687006, 0, 
+                        0, -0.21643961393810288, 0.97629600711993336, 0, 
+                        0, 1108.9831212341965, -5002.2995953687796, 1);
+    glm::dmat4x4 correctOutMatrix = glm::dmat4x4(0.84421568368313848, 0.53600361885290571, 0, 0, 
+                        -0.52329819288792645, 0.82420440112787274, -0.21643961393810288, 0, 
+                        -0.11601241633394895, 0.18272171665687006, 0.97629600711993336, 0, 
+                        0, 0, 5123.7529999999997, 1);
+    EXPECT_ITERABLE_DOUBLE_EQ(std::vector<double>, rzp.getObjectParameters(),  correctObjectParams);
     EXPECT_ITERABLE_DOUBLE_EQ(std::vector<double>, rzp.getElementParameters(), correctElementParams);
+    EXPECT_ITERABLE_DOUBLE_EQ(std::vector<double>, rzp.getInMatrix(), glmToVector16(correctInMatrix));
+    EXPECT_ITERABLE_DOUBLE_EQ(std::vector<double>, rzp.getOutMatrix(), glmToVector16(correctOutMatrix));
     EXPECT_ITERABLE_DOUBLE_EQ(std::vector<double>, rzp.getSlopeError(), sE);
-    EXPECT_ITERABLE_DOUBLE_EQ(std::vector<double>, glmToVector16(rzp.getMisalignmentMatrix()), correctMis);
-    EXPECT_ITERABLE_DOUBLE_EQ(std::vector<double>, rzp.getTempMisalignmentMatrix(), correctMis);
-    EXPECT_ITERABLE_DOUBLE_EQ(std::vector<double>, glmToVector16(rzp.getInverseMisalignmentMatrix()), correctMis);
-    EXPECT_ITERABLE_DOUBLE_EQ(std::vector<double>, rzp.getInverseTempMisalignmentMatrix(), correctMis);
-
 }

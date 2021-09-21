@@ -115,6 +115,7 @@ namespace RAYX
         m_slopeError(slopeError) 
     {
         updateObjectParams();
+        setTemporaryMisalignment({0,0,0, 0,0,0});
         calcTransformationMatrices(position, orientation);
     }
 

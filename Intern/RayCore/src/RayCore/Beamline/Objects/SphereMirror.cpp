@@ -64,6 +64,7 @@ namespace RAYX
     {
     }
 
+    // TODO(Theresa): move this to user params and just give the radius as a parameter to the sphere class?
     void SphereMirror::calcRadius() {
         m_radius = 2.0 / sin(m_grazingIncidenceAngle) / (1.0 / m_entranceArmLength + 1.0 / m_exitArmLength);
     }
