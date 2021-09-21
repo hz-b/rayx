@@ -351,7 +351,6 @@ namespace RAYX
 
     void OpticalElement::setAlpha(double alpha) {
         m_alpha = alpha;
-        updateObjectParams();
     }
 
     void OpticalElement::setBeta(double beta) {

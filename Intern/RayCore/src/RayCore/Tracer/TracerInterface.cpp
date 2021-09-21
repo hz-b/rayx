@@ -74,23 +74,22 @@ namespace RAYX
         GeometricUserParams pm_param = GeometricUserParams(10, 10, 0, 10000, std::vector<double>{1,2,3,0.001,0.002,0.003});
         glm::dvec4 pos_mirror = calcPosition(pm_param);
         glm::dmat4x4 or_mirror = calcOrientation(pm_param);
-        
         std::shared_ptr<PlaneMirror> pm = std::make_shared<PlaneMirror>("PM", 50, 200, pos_mirror, or_mirror, std::vector<double>{0,0,0,0,0,0,0});
         std::shared_ptr<PlaneMirror> pm2 = std::make_shared<PlaneMirror>("PM", 50, 200, 10, 0, 10000, std::vector<double>{1,2,3,0.001,0.002,0.003}, std::vector<double>{0,0,0,0,0,0,0}, nullptr, true);
         
-        //GeometricUserParams pm2_param = GeometricUserParams(5, 5, 10, 1000, std::vector<double>{0,0,0, 0,0,0});
-        //std::shared_ptr<Toroid> t = std::make_shared<Toroid>("Toroid", 0, 50, 200, 10, 0, 10000, 10000, 1000, 10000, 1000, std::vector<double>{0,0,0, 0,0,0}, std::vector<double>{0,0,0,0, 0,0,0}, nullptr, GLOBAL);
+        GeometricUserParams tor_param = GeometricUserParams(10, 10, 0, 10000, std::vector<double>{0,0,0, 0,0,0});
+        glm::dvec4 tor_position = calcPosition(tor_param);
+        glm::dmat4x4 tor_orientation = calcOrientation(tor_param);
+        std::shared_ptr<ToroidMirror> t = std::make_shared<ToroidMirror>("ToroidMirror", 0, 50, 200, tor_position, tor_orientation, 10, 10000, 1000, 10000, 1000, std::vector<double>{0,0,0,0, 0,0,0});
+        std::shared_ptr<ToroidMirror> t2 = std::make_shared<ToroidMirror>("ToroidMirror2", 0, 50, 200, 10, 0, 10000, 10000, 1000, 10000, 1000, std::vector<double>{0,0,0, 0,0,0}, std::vector<double>{0,0,0,0, 0,0,0}, nullptr, true);
         
         std::cout << "\n IMAGE PLANE \n" << std::endl;
         
-        
         GeometricUserParams im_param = GeometricUserParams(0, 0, 0, 1000, std::vector<double>{0,0,0, 0,0,0});
-        glm::dvec4 pos_imageplane = calcPosition(im_param, pm_param, pos_mirror, or_mirror);
-        glm::dmat4x4 or_imageplane = calcOrientation(im_param, pm_param, pos_mirror, or_mirror);
-        
-        
+        glm::dvec4 pos_imageplane = calcPosition(im_param, tor_param, tor_position, tor_orientation);
+        glm::dmat4x4 or_imageplane = calcOrientation(im_param, tor_param, tor_position, tor_orientation);
         std::shared_ptr<ImagePlane> i = std::make_shared<ImagePlane>("Image plane", pos_imageplane, or_imageplane);
-        std::shared_ptr<ImagePlane> i2 = std::make_shared<ImagePlane>("Image plane", 1000, pm2, true);
+        std::shared_ptr<ImagePlane> i2 = std::make_shared<ImagePlane>("Image plane", 1000, t2, true);
         
         
         // petes setup
@@ -104,7 +103,7 @@ namespace RAYX
         for (int j = 0; j < beamlinesSimultaneously; j++) {
             generateRays(tracer, m);
         }
-        m_Beamline.addOpticalElement(pm2);
+        m_Beamline.addOpticalElement(t2);
         //m_Beamline.addQuadric(pl);
         m_Beamline.addOpticalElement(i2);
 

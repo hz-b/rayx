@@ -2099,8 +2099,8 @@ Ray traceSlit(Ray r, const Quadric q, inout uint64_t ctr) {
 Ray traceToroid(Ray r, Quadric q, inout uint64_t ctr) {
 	r = rayMatrixMult(r, q.inTrans);
 
-	double longRadius = q.elementParameters[0][0];
-	double shortRadius = q.elementParameters[0][1];
+	double longRadius = q.anchorPoints[0][0];
+	double shortRadius = q.anchorPoints[0][1];
 	dvec4 normal = iteratTo(r, longRadius, shortRadius);
 
 	double xLength = q.objectParameters[0][0]; // width

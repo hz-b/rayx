@@ -15,7 +15,7 @@
 #include "Objects/ReflectionZonePlate.h"
 #include "Objects/RandomRays.h"
 #include "Objects/Slit.h"
-#include "Objects/Toroid.h"
+#include "Objects/ToroidMirror.h"
 
 #include <vector>
 

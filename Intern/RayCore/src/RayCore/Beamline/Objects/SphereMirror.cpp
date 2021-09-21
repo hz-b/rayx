@@ -57,7 +57,7 @@ namespace RAYX
 
     {
         calcRadius(); // calculate the radius
-        setSurface(std::make_unique<Quadric>(std::vector<double>{1, 0, 0, 0, 0, 1, 0, -m_radius, 0, 0, 1, 0, 0, 0, 0, 0}));
+        setSurface(std::make_unique<Quadric>(std::vector<double>{1,0,0,0, 0,1,0,-m_radius, 0,0,1,0, 0,0,0,0}));
     }
 
     SphereMirror::~SphereMirror()
