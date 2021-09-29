@@ -4,7 +4,7 @@
 #include "Beamline/Objects/PlaneGrating.h"
 #include "Beamline/Objects/SphereGrating.h"
 
-#include "calculateWorldCoordinates.h"
+#include "GeometricUserParams.h"
 #include "Core.h"
 #include "Ray.h"
 
@@ -58,9 +58,9 @@ TEST(planeGrating, testParams) {
     // derived from above 3 parameters
     double beta = 1.4676505971882481;
     double alpha = 1.457521229154248;
-    GeometricUserParams g_params = GeometricUserParams(alpha, beta, azimuthal, dist, mis);
-    glm::dvec4 position = calcPosition(g_params);
-    glm::dmat4x4 orientation = calcOrientation(g_params);
+    RAYX::GeometricUserParams g_params = RAYX::GeometricUserParams(alpha, beta, azimuthal, dist, mis);
+    glm::dvec4 position = g_params.calcPosition();
+    glm::dmat4x4 orientation = g_params.calcOrientation();
 
     // other user parameters
     double width = 125.23;
@@ -90,9 +90,9 @@ TEST(planeGrating, testParams) {
     mount = 1;
     alpha = 1.3069025438933539;
     beta = 1.317319261832787;
-    g_params = GeometricUserParams(alpha, beta, azimuthal, dist, mis);
-    position = calcPosition(g_params);
-    orientation = calcOrientation(g_params);
+    g_params = RAYX::GeometricUserParams(alpha, beta, azimuthal, dist, mis);
+    position = g_params.calcPosition();
+    orientation = g_params.calcOrientation();
 
     add_order = 1;
     RAYX::PlaneGrating p2 = RAYX::PlaneGrating("planegrating", width, height, position, orientation, designEnergyMounting, lineDensity, orderOfDiffraction, add_order, vls, sE); 
@@ -104,9 +104,9 @@ TEST(planeGrating, testParams) {
     
     // NEXT
     beta = 1.3380699314613769;
-    g_params = GeometricUserParams(alpha, beta, azimuthal, dist, mis);
-    position = calcPosition(g_params);
-    orientation = calcOrientation(g_params);
+    g_params = RAYX::GeometricUserParams(alpha, beta, azimuthal, dist, mis);
+    position = g_params.calcPosition();
+    orientation = g_params.calcOrientation();
 
     // higher order of diffraction, mount = 1
     orderOfDiffraction = 3;
@@ -129,9 +129,9 @@ TEST(planeGrating, testParams) {
     mount = 0;
     alpha = 1.4473913414095938;
     beta = 1.4777804849329026;
-    g_params = GeometricUserParams(alpha, beta, azimuthal, dist, mis);
-    position = calcPosition(g_params);
-    orientation = calcOrientation(g_params);
+    g_params = RAYX::GeometricUserParams(alpha, beta, azimuthal, dist, mis);
+    position = g_params.calcPosition();
+    orientation = g_params.calcOrientation();
 
     elparams = { 0,0,lineDensity,double(orderOfDiffraction), abs(hvlam(designEnergyMounting)),0,vls[0],vls[1], vls[2],vls[3],vls[4],vls[5], 0,0,0,double(add_order) };
     objparams = {width, height, sE[0], sE[1], 

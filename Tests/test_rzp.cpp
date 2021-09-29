@@ -4,7 +4,7 @@
 #include "Beamline/Objects/ReflectionZonePlate.h"
 #include "Core.h"
 #include "Ray.h"
-#include "calculateWorldCoordinates.h"
+#include "GeometricUserParams.h"
 #include "utils.h"
 
 using ::testing::ElementsAre;
@@ -80,9 +80,9 @@ TEST(RZP, testdefaultParams) {
     double alpha = 0.017453292519943295;
     double beta = 0.017453292519941554;
     
-    GeometricUserParams rzp_param = GeometricUserParams(degree(alpha), degree(beta), azimuthal, dist, mis);
-    glm::dvec4 position = calcPosition(rzp_param);
-    glm::dmat4x4 orientation = calcOrientation(rzp_param);
+    RAYX::GeometricUserParams rzp_param = RAYX::GeometricUserParams(degree(alpha), degree(beta), azimuthal, dist, mis);
+    glm::dvec4 position = rzp_param.calcPosition();
+    glm::dmat4x4 orientation = rzp_param.calcOrientation();
     RAYX::ReflectionZonePlate rzp = RAYX::ReflectionZonePlate("RZP", geometricalShape, curvatureType, width, height, position, orientation, designEnergy, orderOfDiffraction, designOrderOfDiffraction, dAlpha, dBeta, sEntrance, sExit, mEntrance, mExit, shortRadius, longRadius, additionalOrder, fresnelOffset, sE);
     //RAYX::ReflectionZonePlate rzp = RAYX::ReflectionZonePlate("RZP", geometricalShape, mount, curvatureType, designType, elementOffsetType, width, height, deviation, grazingIncidence, azimuthal, dist, designEnergy, sourceEnergy, orderOfDiffraction, designOrderOfDiffraction, dAlpha, dBeta, sEntrance, sExit, mEntrance, mExit, shortRadius, longRadius, additionalOrder, elementOffsetZ, fresnelOffset, beta_in, mis, sE, NULL, false);
 
@@ -151,9 +151,9 @@ TEST(RZP, testdefaultParamsElliptical) {
     double alpha = 0.017453292519943295;
     double beta = 0.017453292519941554;
     
-    GeometricUserParams rzp_param = GeometricUserParams(degree(alpha), degree(beta), azimuthal, dist, mis);
-    glm::dvec4 position = calcPosition(rzp_param);
-    glm::dmat4x4 orientation = calcOrientation(rzp_param);
+    RAYX::GeometricUserParams rzp_param = RAYX::GeometricUserParams(degree(alpha), degree(beta), azimuthal, dist, mis);
+    glm::dvec4 position = rzp_param.calcPosition();
+    glm::dmat4x4 orientation = rzp_param.calcOrientation();
     RAYX::ReflectionZonePlate rzp = RAYX::ReflectionZonePlate("RZP", geometricalShape, curvatureType, width, height, position, orientation, designEnergy, orderOfDiffraction, designOrderOfDiffraction, dAlpha, dBeta, sEntrance, sExit, mEntrance, mExit, shortRadius, longRadius, additionalOrder, fresnelOffset, sE);
     // RAYX::ReflectionZonePlate rzp = RAYX::ReflectionZonePlate("RZP", geometricalShape, mount, curvatureType, designType, elementOffsetType, width, height, deviation, grazingIncidence, azimuthal, dist, designEnergy, sourceEnergy, orderOfDiffraction, designOrderOfDiffraction, dAlpha, dBeta, sEntrance, sExit, mEntrance, mExit, shortRadius, longRadius, additionalOrder, elementOffsetZ, fresnelOffset, beta_in, mis, sE, NULL, false);
 
@@ -220,9 +220,9 @@ TEST(RZP, testParams) {
     
     double alpha = 0.21816615649929119;
     double beta = 0.21816615649929122;
-    GeometricUserParams rzp_param = GeometricUserParams(degree(alpha), degree(beta), azimuthal, dist, mis);
-    glm::dvec4 position = calcPosition(rzp_param);
-    glm::dmat4x4 orientation = calcOrientation(rzp_param);
+    RAYX::GeometricUserParams rzp_param = RAYX::GeometricUserParams(alpha, beta, rad(azimuthal), dist, mis);
+    glm::dvec4 position = rzp_param.calcPosition();
+    glm::dmat4x4 orientation = rzp_param.calcOrientation();
     RAYX::ReflectionZonePlate rzp = RAYX::ReflectionZonePlate("RZP", geometricShape, curvatureType, width, height, position, orientation, designEnergy, orderOfDiffraction, designOrderOfDiffraction, dAlpha, dBeta, sEntrance, sExit, mEntrance, mExit, shortRadius, longRadius, additionalOrder, fresnelOffset, sE);
     
     RAYX::ReflectionZonePlate rzp2 = RAYX::ReflectionZonePlate("RZP", geometricShape, mount, curvatureType, designType, elementOffsetType, width, height, deviation, grazingIncidence, azimuthal, dist, designEnergy, sourceEnergy, orderOfDiffraction, designOrderOfDiffraction, dAlpha, dBeta, sEntrance, sExit, mEntrance, mExit, shortRadius, longRadius, additionalOrder, elementOffsetZ, fresnelOffset, betaIn, mis, sE, NULL, true);

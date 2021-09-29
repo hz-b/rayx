@@ -8,7 +8,7 @@
 #include "Beamline/Objects/MatrixSource.h"
 #include "Beamline/Objects/PointSource.h"
 #include "Beamline/Objects/ReflectionZonePlate.h"
-#include "calculateWorldCoordinates.h"
+#include "GeometricUserParams.h"
 #include "Debug.h"
 #include "Ray.h"
 #include "VulkanTracer.h"
@@ -68,26 +68,26 @@ namespace RAYX
         int beamlinesSimultaneously = 1;
         int number_of_rays = 20000;
 
-        std::shared_ptr<MatrixSource> m = std::make_shared<MatrixSource>(0, "matrix source", 20000, 0, 0.065, 0.04, 0, 0.001, 0.001, 100, 0, 1, 0, 0, std::vector<double>{ 0, 0, 0, 0 });
+        std::shared_ptr<MatrixSource> m = std::make_shared<MatrixSource>(0, "matrix source", 20000, 0, 0.065, 0.04, 0, 0.001, 0.001, 100, 0, 1, 0, 0, std::vector<double>{ -3, -2, 0, 0 });
         //std::shared_ptr<Slit> s = std::make_shared<Slit>("slit", 1, 2, 20, 2, 7.5, 10000, 20, 1, m->getPhotonEnergy(), std::vector<double>{2, 1, 0, 0, 0, 0 }, nullptr, GLOBAL);
         
-        GeometricUserParams pm_param = GeometricUserParams(10, 10, 0, 10000, std::vector<double>{1,2,3,0.001,0.002,0.003});
-        glm::dvec4 pos_mirror = calcPosition(pm_param);
-        glm::dmat4x4 or_mirror = calcOrientation(pm_param);
+        GeometricUserParams param = GeometricUserParams(10, 10, 0, 10000, std::vector<double>{1,2,3,0.001,0.002,0.003});
+        glm::dvec4 pos_mirror = param.calcPosition();
+        glm::dmat4x4 or_mirror = param.calcOrientation();
         std::shared_ptr<PlaneMirror> pm = std::make_shared<PlaneMirror>("PM", 50, 200, pos_mirror, or_mirror, std::vector<double>{0,0,0,0,0,0,0});
         std::shared_ptr<PlaneMirror> pm2 = std::make_shared<PlaneMirror>("PM", 50, 200, 10, 0, 10000, std::vector<double>{1,2,3,0.001,0.002,0.003}, std::vector<double>{0,0,0,0,0,0,0}, nullptr, true);
         
         GeometricUserParams tor_param = GeometricUserParams(10, 10, 0, 10000, std::vector<double>{0,0,0, 0,0,0});
-        glm::dvec4 tor_position = calcPosition(tor_param);
-        glm::dmat4x4 tor_orientation = calcOrientation(tor_param);
+        glm::dvec4 tor_position = tor_param.calcPosition();
+        glm::dmat4x4 tor_orientation = tor_param.calcOrientation();
         std::shared_ptr<ToroidMirror> t = std::make_shared<ToroidMirror>("ToroidMirror", 0, 50, 200, tor_position, tor_orientation, 10, 10000, 1000, 10000, 1000, std::vector<double>{0,0,0,0, 0,0,0});
         std::shared_ptr<ToroidMirror> t2 = std::make_shared<ToroidMirror>("ToroidMirror2", 0, 50, 200, 10, 0, 10000, 10000, 1000, 10000, 1000, std::vector<double>{0,0,0, 0,0,0}, std::vector<double>{0,0,0,0, 0,0,0}, nullptr, true);
         
         std::cout << "\n IMAGE PLANE \n" << std::endl;
         
         GeometricUserParams im_param = GeometricUserParams(0, 0, 0, 1000, std::vector<double>{0,0,0, 0,0,0});
-        glm::dvec4 pos_imageplane = calcPosition(im_param, tor_param, tor_position, tor_orientation);
-        glm::dmat4x4 or_imageplane = calcOrientation(im_param, tor_param, tor_position, tor_orientation);
+        glm::dvec4 pos_imageplane = im_param.calcPosition(tor_param, tor_position, tor_orientation);
+        glm::dmat4x4 or_imageplane = im_param.calcOrientation(tor_param, tor_position, tor_orientation);
         std::shared_ptr<ImagePlane> i = std::make_shared<ImagePlane>("Image plane", pos_imageplane, or_imageplane);
         std::shared_ptr<ImagePlane> i2 = std::make_shared<ImagePlane>("Image plane", 1000, t2, true);
         

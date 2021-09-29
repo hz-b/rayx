@@ -7,7 +7,7 @@
 #include "Beamline/Objects/SphereMirror.h"
 #include "Beamline/Objects/MatrixSource.h"
 #include "Tracer/TracerInterface.h"
-#include "calculateWorldCoordinates.h"
+#include "GeometricUserParams.h"
 #include "Core.h"
 #include "Ray.h"
 // #include "Tracer/TracerInterface.h"
