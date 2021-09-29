@@ -76,7 +76,7 @@ namespace RAYX
             // no structure for non-quadric elements yet
             m_longRadius = longRadius; // for sphere and toroidal
             m_shortRadius = shortRadius; // only for Toroidal
-            setSurface(std::make_unique<Quadric>(std::vector<double>{ 1, 0, 0, 0, 0, 1, 0, -m_longRadius, 0, 0, 1, 0, 4, 0, 0, 0 }));
+            setSurface(std::make_unique<Toroid>(longRadius, shortRadius));
         }
 
         printInfo();
