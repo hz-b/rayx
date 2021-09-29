@@ -14,3 +14,5 @@ out/
 /Tests/output/*
 /Tests/.ipynb_checkpoints/*
 /Tests/plot2.ipynb
+CMakeCache.txt
+cmake.check_cache
