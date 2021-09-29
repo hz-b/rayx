@@ -74,10 +74,10 @@ namespace RAYX
      */
     PlaneGrating::PlaneGrating(const char* name, const double width, const double height, glm::dvec4 position, glm::dmat4x4 orientation, const double designEnergy, const double lineDensity, const double orderOfDiffraction, const int additionalZeroOrder, const std::vector<double> vls, const std::vector<double> slopeError)
         : OpticalElement(name, width, height, position, orientation, slopeError),
+        m_additionalOrder(additionalZeroOrder),
         m_designEnergyMounting(designEnergy),
         m_lineDensity(lineDensity),
         m_orderOfDiffraction(orderOfDiffraction),
-        m_additionalOrder(additionalZeroOrder),
         m_vls(vls) // TODO(Theresa): store these five params in element as attributes (m_..) at all or only in elementParams?
     {
         std::cout << "design wavelength = " << abs(hvlam(m_designEnergyMounting)) << std::endl;
