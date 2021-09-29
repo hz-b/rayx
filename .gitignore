@@ -12,3 +12,5 @@ out/
 *.code-workspace
 /CMakeSettings.json
 /Tests/output/*
+/Tests/.ipynb_checkpoints/*
+/Tests/plot2.ipynb
