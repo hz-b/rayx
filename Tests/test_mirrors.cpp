@@ -52,8 +52,10 @@ TEST(PlaneMirror, testSimpleParams) {
     double incidenceAngle = 13.2;
     double azimuthalAngle = 0.0;
     double dist = 12005;
+    int icurv = 1;
     std::vector<double> mis = { 0,0,0,0,0,0 };
     std::vector<double> sE = { 0,0,0,0,0, 0,0 };
+    std::vector<double> surface = {0,0,0,0, double(icurv),0,0,-1, 0,0,0,0, 0,0,0,0};
     RAYX::PlaneMirror plM = RAYX::PlaneMirror("planemirror",width, height, incidenceAngle, azimuthalAngle, dist, mis, sE, NULL, false); // {1,2,3,0.01,0.02,0.03}
 
     ASSERT_DOUBLE_EQ(plM.getWidth(), width);
@@ -64,6 +66,7 @@ TEST(PlaneMirror, testSimpleParams) {
     ASSERT_DOUBLE_EQ(plM.getDistanceToPreceedingElement(), dist);
     EXPECT_ITERABLE_DOUBLE_EQ(std::vector<double>, mis, plM.getMisalignmentParams());
     EXPECT_ITERABLE_DOUBLE_EQ(std::vector<double>, sE, plM.getSlopeError());
+    EXPECT_ITERABLE_DOUBLE_EQ(std::vector<double>, surface, plM.getSurfaceParams());
 }
 
 TEST(PlaneMirror, testAdvancedParams) {
@@ -72,8 +75,10 @@ TEST(PlaneMirror, testAdvancedParams) {
     double incidenceAngle = 23;
     double azimuthalAngle = 8.2;
     double dist = 12005;
+    int icurv = 1;
     std::vector<double> mis = { 1,2,3,0.01,0.02,0.03 };
     std::vector<double> sE = { 0.1,0.2,0.3,0.4,0.5, 0.6,0.7 };
+    std::vector<double> surface = {0,0,0,0, double(icurv),0,0,-1, 0,0,0,0, 0,0,0,0};
     RAYX::PlaneMirror plM = RAYX::PlaneMirror("planemirror",width, height, incidenceAngle, azimuthalAngle, dist, mis, sE, NULL, false); // {1,2,3,0.01,0.02,0.03}
 
     ASSERT_DOUBLE_EQ(plM.getWidth(), width);
@@ -84,6 +89,7 @@ TEST(PlaneMirror, testAdvancedParams) {
     ASSERT_DOUBLE_EQ(plM.getDistanceToPreceedingElement(), dist);
     EXPECT_ITERABLE_DOUBLE_EQ(std::vector<double>, mis, plM.getMisalignmentParams());
     EXPECT_ITERABLE_DOUBLE_EQ(std::vector<double>, sE, plM.getSlopeError());
+    EXPECT_ITERABLE_DOUBLE_EQ(std::vector<double>, surface, plM.getSurfaceParams());
 }
 
 TEST(Sphere, testParams) {
@@ -94,14 +100,16 @@ TEST(Sphere, testParams) {
     double dist = 12.12;
     double entranceArmLength = 12.7;
     double exitArmLength = 123.1;
+    int icurv = 1;
+    double radius = 104.32651829593351; // from old RAY
     std::vector<double> misalignmentParams = { 10,51,2,0.1,5,0.241 };
     std::vector<double> sE = { 0.7,0.5,0.3,0.7,0.3, 3,2 };
+    std::vector<double> surface = {1,0,0,0, double(icurv),1,0,-radius, 0,0,1,0, 0,0,0,0};
     RAYX::SphereMirror sM = RAYX::SphereMirror("spheremirror", width, height, incidence, azimuthal, dist, entranceArmLength, exitArmLength, misalignmentParams, sE, NULL, false); 
 
-    double radius = 104.326518296; // from old RAY, rounded to 9 digits
     ASSERT_DOUBLE_EQ(sM.getWidth(), width);
     ASSERT_DOUBLE_EQ(sM.getHeight(), height);
-    EXPECT_NEAR(sM.getRadius(), radius, 0.00000001);
+    EXPECT_NEAR(sM.getRadius(), radius, 0.0000000001);
     ASSERT_DOUBLE_EQ(sM.getAlpha(), rad(incidence));
     ASSERT_DOUBLE_EQ(sM.getBeta(), rad(incidence));
     ASSERT_DOUBLE_EQ(sM.getChi(), rad(azimuthal));
@@ -110,6 +118,7 @@ TEST(Sphere, testParams) {
     ASSERT_DOUBLE_EQ(sM.getEntranceArmLength(), entranceArmLength);
     EXPECT_ITERABLE_DOUBLE_EQ(std::vector<double>, misalignmentParams, sM.getMisalignmentParams());
     EXPECT_ITERABLE_DOUBLE_EQ(std::vector<double>, sE, sM.getSlopeError());
+    EXPECT_ITERABLE_DOUBLE_EQ(std::vector<double>, surface, sM.getSurfaceParams());
 }
 
 TEST(Ellips, testParamsCSCurvature) {

@@ -24,7 +24,7 @@ namespace RAYX
             height, rad(grazingIncidence), rad(azimuthal), rad(grazingIncidence),
             dist, misalignmentParams, { 0,0,0,0,0,0 }, slopeError, previous, global)
     {
-        setSurface(std::make_unique<Quadric>(std::vector<double>{0, 0, 0, 0, 0, 0, 0, -1, 0, 0, 0, 0, 0, 0, 0, 0}));
+        setSurface(std::make_unique<Quadric>(std::vector<double>{0,0,0,0, 1,0,0,-1, 0,0,0,0, 0,0,0,0}));
     }
 
     /**

@@ -64,6 +64,8 @@ namespace RAYX
         : BeamlineObject(name),
         m_width(width),
         m_height(height),
+        m_alpha(0),
+        m_beta(0),
         m_chi(chi),
         m_distanceToPreceedingElement(dist),
         m_previous(previous),
@@ -168,7 +170,7 @@ namespace RAYX
      * @return void
     */
     void OpticalElement::calcTransformationMatricesFromAngles(const std::vector<double> misalignment, bool global) {
-
+        std::cout << getName()  << " alpha " << m_alpha << " beta " << m_beta << " chi " << m_chi << std::endl;
         double cos_c = cos(m_chi);
         double sin_c = sin(m_chi);
         double cos_a = cos(m_alpha);
@@ -240,6 +242,7 @@ namespace RAYX
         if (m_previous != NULL) { //Mi_g2e = M_i_b2e * M_(i-1))_e2b * M_(i-1)_g2e
             std::cout << "calc world coordinates" << std::endl;
             d_g2e = m_previous->getE2B() * m_previous->getG2E();
+            printDMat4(d_b2e);
             d_g2e = d_b2e * d_g2e;
             // Mi_e2g = M_(i-1)_e2g * M_(i-1)_e2b^-1 * M_i_b2e^-1
             d_e2g = m_previous->getInvE2B() * d_inv_b2e;
@@ -264,11 +267,6 @@ namespace RAYX
 
         printMatrix(m_inMatrix);
         printMatrix(m_outMatrix);
-
-        glm::dmat4x4 orientation = glm::dmat4x4(0.991, 0.131, 0.0,0,  -0.129, 0.976, -0.174,0,  -0.023, 0.172, 0.985,0, 0,0,0,1);
-        glm::dvec4 position = glm::dvec4(0,0,10000,1);
-        //calcTransformationMatrices(position, orientation, misalignment);
-        
 
     }
 

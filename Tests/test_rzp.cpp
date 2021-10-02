@@ -73,6 +73,7 @@ TEST(RZP, testdefaultParams) {
     double longRadius = 0;
     double elementOffsetZ = 2;
     double fresnelOffset = 0;
+    
     std::vector<double> mis = { 1,2,3, 0.001,0.002,0.003 };
     std::vector<double> sE = { 1,2,3,4,5,6,7 };
     
@@ -89,7 +90,8 @@ TEST(RZP, testdefaultParams) {
     double d_alpha = 0.017453292519943295;
     double d_beta = 0.017453292519943295;
     double wl = 12.39852;
-    std::vector<double> quad = { 0,0,0,0, 0,0,0,-1, 0,0,0,0, 4,0,0,0 }; // plane
+    double icurv = 1;
+    std::vector<double> quad = { 0,0,0,0, icurv,0,0,-1, 0,0,0,0, 4,0,0,0 }; // plane
     std::vector<double> correctElementParams = { 0, 0, 0, hvlam(sourceEnergy),
                         0, designOrderOfDiffraction, orderOfDiffraction, fresnelOffset,
                         sEntrance, sExit, mEntrance, mExit,
@@ -145,6 +147,7 @@ TEST(RZP, testdefaultParamsElliptical) {
     double longRadius = 0;
     double elementOffsetZ = 2;
     double fresnelOffset = 0;
+    int icurv = 1;
     std::vector<double> mis = { 1,2,3, 0.001,0.002,0.003 };
     std::vector<double> sE = { 1,2,3,4,5,6,7 };
     
@@ -160,7 +163,7 @@ TEST(RZP, testdefaultParamsElliptical) {
     double d_alpha = 0.017453292519943295;
     double d_beta = 0.017453292519943295;
     double wl = 12.39852;
-    std::vector<double> quad = { 0,0,0,0, 0,0,0,-1, 0,0,0,0, 4,0,0,0 }; // plane
+    std::vector<double> quad = { 0,0,0,0, double(icurv),0,0,-1, 0,0,0,0, 4,0,0,0 }; // plane
     std::vector<double> correctElementParams = { 0, 0, 0, inm2eV / sourceEnergy,
                         0, designOrderOfDiffraction, orderOfDiffraction, fresnelOffset,
                         sEntrance, sExit, mEntrance, mExit,
@@ -215,6 +218,7 @@ TEST(RZP, testParams) {
     double longRadius = 0;
     double elementOffsetZ = 0;
     double fresnelOffset = 12;
+    
     std::vector<double> mis = { 0,0,0, 0,0,0 };
     std::vector<double> sE = { 1,3,4,5,6,7,9 };
     

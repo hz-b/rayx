@@ -38,7 +38,8 @@ namespace RAYX
         d_a44 = -pow(m_shortHalfAxisB, 2) + pow(m_y0, 2) + pow(m_z0 * m_shortHalfAxisB / m_longHalfAxisA, 2);
         m_radius = -m_y0;
 
-        setSurface(std::make_unique<Quadric>(std::vector<double>{m_a11, 0, 0, 0, 0, 1, 0, m_radius, 0, 0, d_a33, d_a34, 0, 0, 0, d_a44}));
+        double icurv = 1;
+        setSurface(std::make_unique<Quadric>(std::vector<double>{m_a11, 0, 0, 0, icurv, 1, 0, m_radius, 0, 0, d_a33, d_a34, 0, 0, 0, d_a44}));
         // setSurface(surface);
         calcTransformationMatricesFromAngles({ 0,0,0,0,0,0 }, global);
         setElementParameters({ 0,0,m_a11,m_y0, d_a33,d_a34,d_a44,0, 0,0,0,0, 0,0,0,0 });

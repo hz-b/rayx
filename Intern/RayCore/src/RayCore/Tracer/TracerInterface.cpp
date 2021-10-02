@@ -91,15 +91,26 @@ namespace RAYX
         std::shared_ptr<ImagePlane> i = std::make_shared<ImagePlane>("Image plane", pos_imageplane, or_imageplane);
         std::shared_ptr<ImagePlane> i2 = std::make_shared<ImagePlane>("Image plane", 1000, t2, true);
         
+        bool GLOBAL = false;
+        //std::shared_ptr<MatrixSource> m = std::make_shared<MatrixSource>(0, "matrix source", number_of_rays, 0, 0.065, 0.04, 0, 0.001, 0.001, 100, 0, 1, 0, 0, std::vector<double>{ 0, 0, 0, 0 });
+        //std::shared_ptr<Slit> s = std::make_shared<Slit>("slit", 1, 2, 20, 2, 7.5, 10000, 20, 1, m->getPhotonEnergy(), std::vector<double>{2, 1, 0, 0, 0, 0 }, nullptr, GLOBAL);
+        //std::shared_ptr<PlaneMirror> pm = std::make_shared<PlaneMirror>("PM", 50,200, 10, 7.5, 10000, std::vector<double>{0,0,0, 0,0,0}, std::vector<double>{10,20,0,0,0,0,0}, nullptr, GLOBAL);
+        //std::shared_ptr<Toroid> t = std::make_shared<Toroid>("Toroid", 1, 50, 200, 10, 5, 10000, 10000, 1000, 10000, 1000, std::vector<double>{0,0,0, 0,0,0}, std::vector<double>{0,0,0,0, 0,0,0}, nullptr, GLOBAL);
+        //std::shared_ptr<PlaneMirror> plM = std::make_shared<PlaneMirror>("PlaneMirrorDef", 50, 200, 10, 7.5, 10000, std::vector<double>{ 0,0,0, 0,0,0 }, std::vector<double> {0,0,0,0, 0,0,0}, nullptr, GLOBAL); // {1,2,3,0.01,0.02,0.03}
+        //std::shared_ptr<PlaneMirror> plM2 = std::make_shared<PlaneMirror>("PlaneMirrorDef", 50, 200, 10, 7.5, 10000, std::vector<double>{ 0,0,0, 0,0,0 }, std::vector<double> {0,0,0,0, 0,0,0}, plM, GLOBAL); // {1,2,3,0.01,0.02,0.03}
+        //std::shared_ptr<ImagePlane> i = std::make_shared<ImagePlane>("Image plane", 1000, plM2, GLOBAL);
         
         // petes setup
+        std::shared_ptr<RAYX::PointSource> p = std::make_shared<RAYX::PointSource>(0, "spec1_first_rzp4",20000 , 1, 0.005,0.005,0, 0.02,0.06, 1,1,0,0, 640, 120, 1, 0, 0, std::vector<double>{0,0,0,0});
+        std::shared_ptr<RAYX::ReflectionZonePlate> rzp = std::make_shared<RAYX::ReflectionZonePlate>("ReflectionZonePete", 0, 1, 0, 1, 1, 4, 60, 170, 2.2, 0, 90, p->getPhotonEnergy(), p->getPhotonEnergy(), -1, -1, 2.2, 1, 90, 400, 90, 400, 0, 0, 1, 0, 0, 1, std::vector<double>{ 0,0,0, 0,0,0 }, std::vector<double>{ 0,0,0, 0,0,0,0 }, nullptr, GLOBAL);  // dx,dy,dz, dpsi,dphi,dchi //
+        //std::shared_ptr<RAYX::ImagePlane> ip1 = std::make_shared<RAYX::ImagePlane>("ImagePlane1", 385.0, rzp, false);
         //PointSource p = PointSource(0, "spec1_first_rzp4", number_of_rays, 1, 0.005, 0.005, 0, 0.02, 0.06, 1, 1, 0, 0, 640, 120, 1, 0, 0, { 0,0,0,0 });
         //ReflectionZonePlate rzp = ReflectionZonePlate("ReflectionZonePete", 1, 0, 1, 1, 4, 60, 170, 2.2, 0, 90, p.getPhotonEnergy(), p.getPhotonEnergy(), 1, 1, 2.2, 4.75, 90, 400, 90, 400, 0, 0, 1, 0, -24.35, 4.75, { 0,0,0, 0,0,0 }, { 0,0,0,0, 0,0,0 }, nullptr);  // dx,dy,dz, dpsi,dphi,dchi //
         //PlaneGrating plG = PlaneGrating("PeteGratingDeviationAzMis", 0, 50, 200, 10, 0.0, 7.5, 10000, 100, 1000, 1, 2, 0, { 0,0,0, 0,0,0 }, { 0,0,0,0,0,0 }, { 0,0,0,0,0, 0,0 }, nullptr); // dx,dy,dz, dpsi,dphi,dchi // {1,2,3,0.001,0.002,0.003}
         //ImagePlane ip = ImagePlane("Image Plane", 385, &rzp); // one out of the bunch
         //PlaneMirror pl = PlaneMirror("plane Mirror", 50, 200, 10, 0, 10000, { 0,0,0, 0,0,0 }, { 10,10, 0,0,0, 0,0 }, nullptr);
 
-        addLightSource(m);
+        addLightSource(p);
         for (int j = 0; j < beamlinesSimultaneously; j++) {
             generateRays(tracer, m);
         }

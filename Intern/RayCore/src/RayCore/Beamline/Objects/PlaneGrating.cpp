@@ -25,7 +25,7 @@ namespace RAYX
      * @param slopeError                    7 slope error parameters: x-y sagittal (0), y-z meridional (1), thermal distortion x (2),y (3),z (4), cylindrical bowing amplitude y(5) and radius (6)
      * @param previous                      pointer to previous element in beamline, needed for caclultation transformation matrices in global coordinate system
      * @param global                        if tracing should be done in global or ray coordinates
-    
+    */
     PlaneGrating::PlaneGrating(const char* name, const int mount, const double width, const double height, const double deviation, const double normalIncidence, const double azimuthal, const double distanceToPreceedingElement, const double designEnergyMounting, const double lineDensity, const double orderOfDiffraction, const double fixFocusConstantCFF, const int additionalZeroOrder, const std::vector<double> misalignmentParams, const std::vector<double> vls, const std::vector<double> slopeError, const std::shared_ptr<OpticalElement> previous, bool global)
         : OpticalElement(name, width, height, rad(azimuthal), distanceToPreceedingElement, slopeError, previous),
         m_designEnergyMounting(designEnergyMounting),
@@ -36,7 +36,7 @@ namespace RAYX
         // std::vector<double> inputPoints = {0,0,0,0, 0,0,0,-1, 0,0,0,0, 0,0,0,0};
         std::cout << "wavelength" << abs(hvlam(m_designEnergyMounting)) << std::endl;
         m_additionalOrder = additionalZeroOrder;
-        m_gratingMount = mount == 0 ? GM_DEVIATION : (mount == 1 ? GM_INCIDENCE : (mount == 2 ? GM_CCF : GM_CCF_NO_PREMIRROR));
+        m_gratingMount = mount == 0 ? GM_DEVIATION : GM_INCIDENCE;
 
         calcAlpha(deviation, normalIncidence);
         std::cout.precision(17);
@@ -51,8 +51,8 @@ namespace RAYX
             m_vls[2], m_vls[3], m_vls[4], m_vls[5],
             0, 0, 0, double(m_additionalOrder) });
         setTemporaryMisalignment({ 0,0,0,0,0,0 });
-        setSurface(std::make_unique<Quadric>(std::vector<double>{0, 0, 0, 0, 0, 0, 0, -1, 0, 0, 0, 0, 1, 0, 0, 0}));
-    }*/
+        setSurface(std::make_unique<Quadric>(std::vector<double>{0,0,0,0, 1,0,0,-1, 0,0,0,0, 1,0,0,0}));
+    }
 
 
 
@@ -91,7 +91,7 @@ namespace RAYX
         
         setTemporaryMisalignment({ 0,0,0,0,0,0 }); // remove??
         // parameters of quadric surface
-        setSurface(std::make_unique<Quadric>(std::vector<double>{0, 0, 0, 0, 0, 0, 0, -1, 0, 0, 0, 0, 1, 0, 0, 0}));
+        setSurface(std::make_unique<Quadric>(std::vector<double>{0, 0, 0, 0, 1, 0, 0, -1, 0, 0, 0, 0, 1, 0, 0, 0}));
     }
 
     PlaneGrating::~PlaneGrating()
@@ -99,19 +99,13 @@ namespace RAYX
     }
 
     /* functions to derive angles from user input parameters -> moved to somewhere else for now */
-    /*void PlaneGrating::calcAlpha(const double deviation, const double normalIncidence) {
+    void PlaneGrating::calcAlpha(const double deviation, const double normalIncidence) {
         double angle;
         if (m_gratingMount == GM_DEVIATION) {
             angle = deviation;
         }
         else if (m_gratingMount == GM_INCIDENCE) {
             angle = -normalIncidence;
-        }
-        else if (m_gratingMount == GM_CCF) {
-            // TODO
-        }
-        else if (m_gratingMount == GM_CCF_NO_PREMIRROR) {
-            // TODO
         }
         focus(angle);
     }
@@ -148,7 +142,7 @@ namespace RAYX
         std::cout << alph << ", " << bet << " angles" << std::endl;
         setAlpha(PI / 2 - alph);
         setBeta(PI / 2 - abs(bet));
-    }*/
+    }
     /* END */
 
     double PlaneGrating::getDesignEnergyMounting() {

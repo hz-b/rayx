@@ -74,7 +74,7 @@ TEST(planeGrating, testParams) {
     std::vector<double> vls = { 2.1, 0.12, 12.2, 8.3, 5.1, 7.23 };
     RAYX::PlaneGrating p1 = RAYX::PlaneGrating("planegrating", width, height, position, orientation, designEnergyMounting, lineDensity, orderOfDiffraction, add_order, vls, sE); 
 
-    std::vector<double> quad = { 0,0,0,0, 0,0,0,-1, 0,0,0,0, 1,0,0,0 };
+    std::vector<double> quad = { 0,0,0,0, 1,0,0,-1, 0,0,0,0, 1,0,0,0 };
     std::vector<double> objparams = {width, height, sE[0], sE[1], 
                                     sE[2], sE[3], sE[4], sE[5], 
                                     sE[6], 0, 0, 0,
@@ -171,6 +171,7 @@ TEST(SphereGrating, testParams) {
     double linedensity = 432.2;
     int add_order = 0;
     int order = 1;
+    int icurv = 1;
     std::vector<double> mis = { 1.41,5.3,1.5, 0.2,1.0,1.4 };
     std::vector<double> vls = { 2.1, 0.12, 12.2, 8.3, 5.1, 7.23 };
     std::vector<double> sE = { 0.1,0.5,0.1,0.2,0.5, 1,3 };
@@ -182,7 +183,7 @@ TEST(SphereGrating, testParams) {
     double theta = 4.6738270800745312;
     double radius = 1134.9852832410934;
     double a = 0.002307769312661499;
-    std::vector<double> quad = { 1,0,0,0, 0,1,0,-radius, 0,0,1,0, 2,0,0,0 };
+    std::vector<double> quad = { 1,0,0,0, 1,1,0,-radius, 0,0,1,0, 2,0,0,0 };
     std::vector<double> elparams = { 0,0,linedensity,double(order), abs(hvlam(designEnergy)),0,vls[0],vls[1], vls[2],vls[3],vls[4],vls[5], 0,0,0,0 };
     std::vector<double> objparams = {width, height, sE[0], sE[1], 
                                     sE[2], sE[3], sE[4], sE[5], 

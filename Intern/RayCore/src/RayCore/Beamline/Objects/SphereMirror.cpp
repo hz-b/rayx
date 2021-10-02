@@ -31,7 +31,7 @@ namespace RAYX
 
 
         calcRadius(); // calculate the radius
-        setSurface(std::make_unique<Quadric>(std::vector<double>{1, 0, 0, 0, 0, 1, 0, -m_radius, 0, 0, 1, 0, 0, 0, 0, 0}));
+        setSurface(std::make_unique<Quadric>(std::vector<double>{1,0,0,0, 1,1,0,-m_radius, 0,0,1,0, 0,0,0,0}));
     }
 
     /**
@@ -41,7 +41,7 @@ namespace RAYX
      * @param name
      * @param width
      * @param height
-     * @param grazingIncidenceAngle     angle in which the main ray should hit the element.
+     * @param grazingIncidenceAngle     angle in which the main ray should hit the element. given in degree
      * @param position                  position of element in world coordinates
      * @param orientation               orientation of element in world coordinates
      * @param entranceArmLength
@@ -57,7 +57,7 @@ namespace RAYX
 
     {
         calcRadius(); // calculate the radius
-        setSurface(std::make_unique<Quadric>(std::vector<double>{1,0,0,0, 0,1,0,-m_radius, 0,0,1,0, 0,0,0,0}));
+        setSurface(std::make_unique<Quadric>(std::vector<double>{1,0,0,0, 1,1,0,-m_radius, 0,0,1,0, 0,0,0,0}));
     }
 
     SphereMirror::~SphereMirror()
