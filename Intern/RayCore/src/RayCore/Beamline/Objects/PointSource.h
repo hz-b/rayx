@@ -25,15 +25,18 @@ namespace RAYX
         double getHorDivergence() const;
 
     private:
+        // TODO(Jannis): move to light source
+        std::uniform_real_distribution<double> m_uniform;
+        std::normal_distribution<double> m_stdnorm;
+        std::default_random_engine m_re;
+        // Geometric Parameters 
         double m_sourceDepth;
         double m_sourceHeight;
         double m_sourceWidth;
         double m_horDivergence;
         double m_verDivergence;
-        std::vector<double> m_a;
-        std::uniform_real_distribution<double> m_uniform;
-        std::normal_distribution<double> m_stdnorm;
-        std::default_random_engine m_re;
+
+        // Geometric Parameters
         SOURCE_DIST m_widthDist;
         SOURCE_DIST m_heightDist;
         SOURCE_DIST m_horDist;

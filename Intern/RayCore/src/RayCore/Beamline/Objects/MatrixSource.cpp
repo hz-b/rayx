@@ -55,7 +55,7 @@ namespace RAYX
                 glm::dvec3 direction = getDirectionFromAngles(phi, psi);
                 glm::dvec4 stokes = glm::dvec4(1, getLinear0(), getLinear45(), getCircular());
 
-                Ray r = Ray(position, direction , stokes, en, 1.0);
+                Ray r = Ray(position, direction, stokes, en, 1.0);
                 rayVector.push_back(r);
             }
         }
@@ -66,8 +66,8 @@ namespace RAYX
             glm::dvec3 direction = glm::dvec3(r.m_direction[0], r.m_direction[1], r.m_direction[2]);
             en = selectEnergy();
             glm::dvec4 stokes = glm::dvec4(1, getLinear0(), getLinear45(), getCircular());
-            
-            Ray r_copy(position, direction , stokes , en, 1.0);
+
+            Ray r_copy(position, direction, stokes, en, 1.0);
             rayVector.push_back(r_copy);
         }
         std::cout << &(rayVector[0]) << std::endl;

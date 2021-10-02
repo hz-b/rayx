@@ -22,7 +22,8 @@ namespace RAYX
         double getHorDivergence() { return m_horDivergence; }
 
     private:
-        double m_sourceDepth;
+        // Geometric Parameters
+        double m_sourceDepth;  ///< defines interval (z-axis) where rays are defined
         double m_sourceHeight;
         double m_sourceWidth;
         double m_horDivergence;
