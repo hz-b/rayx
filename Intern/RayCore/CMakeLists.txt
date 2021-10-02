@@ -4,7 +4,6 @@ project(RayCore)
 SET(SOURCE
     src/RayCore/Application.cpp
     src/RayCore/utils.cpp
-    src/RayCore/GeometricUserParams.cpp
     src/RayCore/Beamline/Beamline.cpp
     src/RayCore/Beamline/BeamlineObject.cpp
     src/RayCore/Beamline/OpticalElement.cpp
@@ -25,18 +24,19 @@ SET(SOURCE
     src/RayCore/Beamline/Objects/ToroidMirror.cpp
     src/RayCore/Data/Exporter.cpp
     src/RayCore/Data/Importer.cpp
+    src/RayCore/Presenter/Presenter.cpp
     src/RayCore/Surface/Quadric.cpp
     src/RayCore/Surface/Toroid.cpp
     src/RayCore/Surface/Surface.cpp
     src/RayCore/Tracer/Ray.cpp
     src/RayCore/Tracer/TracerInterface.cpp
+    src/RayCore/UserParameter/GeometricUserParams.cpp
 )
 
 SET(HEADERS
     src/RayCore/Application.h
     src/RayCore/Debug.h
     src/RayCore/utils.h
-    src/RayCore/GeometricUserParams.h
     src/RayCore/Beamline/Beamline.h
     src/RayCore/Beamline/BeamlineObject.h
     src/RayCore/Beamline/OpticalElement.h
@@ -57,11 +57,13 @@ SET(HEADERS
     src/RayCore/Beamline/Objects/ToroidMirror.h
     src/RayCore/Data/Exporter.h
     src/RayCore/Data/Importer.h
+    src/RayCore/Presenter/Presenter.h
     src/RayCore/Surface/Quadric.h
     src/RayCore/Surface/Toroid.h
     src/RayCore/Surface/Surface.h
     src/RayCore/Tracer/Ray.h
     src/RayCore/Tracer/TracerInterface.h
+    src/RayCore/UserParameter/GeometricUserParams.h
 )
 
 

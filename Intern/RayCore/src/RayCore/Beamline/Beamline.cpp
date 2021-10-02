@@ -40,4 +40,8 @@ namespace RAYX
         return m_Objects;
     }
 
+    int Beamline::size() const {
+        return m_Objects.size();
+    }
+
 } // namespace RAYX

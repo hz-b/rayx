@@ -2,14 +2,12 @@
 
 #include "Beamline/Beamline.h"
 #include "Core.h"
-#include "Tracer/TracerInterface.h"
+#include "Presenter/Presenter.h"
 
 namespace RAYX
 {
 	/**
 	 *	Abstract class to be used by applications built with the RayCore library.
-	 *	It currently (13.09.2021) doesn't do anything, as we are still far from creating
-	 *	user applications.
 	 */
 	class RAYX_API Application
 	{
@@ -17,11 +15,12 @@ namespace RAYX
 		Application();
 		virtual ~Application();
 
+		void loadDummyBeamline();
 		virtual void run() = 0;
 
 	protected:
-		TracerInterface m_TracerInterface;
 		std::shared_ptr<Beamline> m_Beamline;
+		Presenter m_Presenter;
 
 	};
 

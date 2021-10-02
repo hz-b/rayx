@@ -4,7 +4,7 @@
 #include "Beamline/Objects/ReflectionZonePlate.h"
 #include "Core.h"
 #include "Ray.h"
-#include "GeometricUserParams.h"
+#include "UserParameter/GeometricUserParams.h"
 #include "utils.h"
 
 using ::testing::ElementsAre;
@@ -73,14 +73,14 @@ TEST(RZP, testdefaultParams) {
     double longRadius = 0;
     double elementOffsetZ = 2;
     double fresnelOffset = 0;
-    
+
     std::vector<double> mis = { 1,2,3, 0.001,0.002,0.003 };
     std::vector<double> sE = { 1,2,3,4,5,6,7 };
-    
+
     // alpha and beta calculated from user params
     double alpha = 0.017453292519943295;
     double beta = 0.017453292519941554;
-    
+
     RAYX::GeometricUserParams rzp_param = RAYX::GeometricUserParams(degree(alpha), degree(beta), azimuthal, dist, mis);
     glm::dvec4 position = rzp_param.calcPosition();
     glm::dmat4x4 orientation = rzp_param.calcOrientation();
@@ -96,10 +96,10 @@ TEST(RZP, testdefaultParams) {
                         0, designOrderOfDiffraction, orderOfDiffraction, fresnelOffset,
                         sEntrance, sExit, mEntrance, mExit,
                         rad(dAlpha), rad(dBeta), 0, double(additionalOrder) };
-    std::vector<double> correctObjectParams = {width,height,sE[0],sE[1], 
+    std::vector<double> correctObjectParams = { width,height,sE[0],sE[1],
                         sE[2],sE[3],sE[4],sE[5],
                         sE[6],0,0,0,
-                        0,0,0,0};
+                        0,0,0,0 };
     EXPECT_ITERABLE_DOUBLE_EQ(std::vector<double>, rzp.getElementParameters(), correctElementParams);
     EXPECT_ITERABLE_DOUBLE_EQ(std::vector<double>, rzp.getObjectParameters(), correctObjectParams);
     EXPECT_ITERABLE_DOUBLE_EQ(std::vector<double>, rzp.getSurfaceParams(), quad);
@@ -113,7 +113,7 @@ TEST(RZP, testdefaultParams) {
     ASSERT_DOUBLE_EQ(rzp.getWaveLength(), wl);
     EXPECT_NEAR(rzp.getDesignAlphaAngle(), d_alpha, 0.000000001);
     EXPECT_NEAR(rzp.getDesignBetaAngle(), d_beta, 0.000000001);
-    
+
 
 }
 
@@ -150,10 +150,10 @@ TEST(RZP, testdefaultParamsElliptical) {
     int icurv = 1;
     std::vector<double> mis = { 1,2,3, 0.001,0.002,0.003 };
     std::vector<double> sE = { 1,2,3,4,5,6,7 };
-    
+
     double alpha = 0.017453292519943295;
     double beta = 0.017453292519941554;
-    
+
     RAYX::GeometricUserParams rzp_param = RAYX::GeometricUserParams(degree(alpha), degree(beta), azimuthal, dist, mis);
     glm::dvec4 position = rzp_param.calcPosition();
     glm::dmat4x4 orientation = rzp_param.calcOrientation();
@@ -168,16 +168,16 @@ TEST(RZP, testdefaultParamsElliptical) {
                         0, designOrderOfDiffraction, orderOfDiffraction, fresnelOffset,
                         sEntrance, sExit, mEntrance, mExit,
                         rad(dAlpha), rad(dBeta), 0, double(additionalOrder) };
-    std::vector<double> correctObjectParams = {-width,-height,sE[0],sE[1], 
+    std::vector<double> correctObjectParams = { -width,-height,sE[0],sE[1],
                         sE[2],sE[3],sE[4],sE[5],
                         sE[6],0,0,0,
-                        0,0,0,0};
+                        0,0,0,0 };
     EXPECT_ITERABLE_DOUBLE_EQ(std::vector<double>, rzp.getElementParameters(), correctElementParams);
     EXPECT_ITERABLE_DOUBLE_EQ(std::vector<double>, rzp.getObjectParameters(), correctObjectParams);
     EXPECT_ITERABLE_DOUBLE_EQ(std::vector<double>, rzp.getSurfaceParams(), quad);
     EXPECT_ITERABLE_DOUBLE_EQ(std::vector<double>, rzp.getSlopeError(), sE);
     std::vector<double> zeros = { 0,0,0, 0,0,0 };
-    
+
     ASSERT_DOUBLE_EQ(rzp.getWidth(), width);
     ASSERT_DOUBLE_EQ(rzp.getHeight(), height);
     ASSERT_DOUBLE_EQ(rzp.getDesignEnergy(), designEnergy);
@@ -186,7 +186,7 @@ TEST(RZP, testdefaultParamsElliptical) {
     ASSERT_DOUBLE_EQ(rzp.getWaveLength(), wl);
     EXPECT_NEAR(rzp.getDesignAlphaAngle(), d_alpha, 0.000000001);
     EXPECT_NEAR(rzp.getDesignBetaAngle(), d_beta, 0.000000001);
-    
+
 
 }
 
@@ -218,36 +218,36 @@ TEST(RZP, testParams) {
     double longRadius = 0;
     double elementOffsetZ = 0;
     double fresnelOffset = 12;
-    
+
     std::vector<double> mis = { 0,0,0, 0,0,0 };
     std::vector<double> sE = { 1,3,4,5,6,7,9 };
-    
+
     double alpha = 0.21816615649929119;
     double beta = 0.21816615649929122;
     RAYX::GeometricUserParams rzp_param = RAYX::GeometricUserParams(alpha, beta, rad(azimuthal), dist, mis);
     glm::dvec4 position = rzp_param.calcPosition();
     glm::dmat4x4 orientation = rzp_param.calcOrientation();
     RAYX::ReflectionZonePlate rzp = RAYX::ReflectionZonePlate("RZP", geometricShape, curvatureType, width, height, position, orientation, designEnergy, orderOfDiffraction, designOrderOfDiffraction, dAlpha, dBeta, sEntrance, sExit, mEntrance, mExit, shortRadius, longRadius, additionalOrder, fresnelOffset, sE);
-    
+
     RAYX::ReflectionZonePlate rzp2 = RAYX::ReflectionZonePlate("RZP", geometricShape, mount, curvatureType, designType, elementOffsetType, width, height, deviation, grazingIncidence, azimuthal, dist, designEnergy, sourceEnergy, orderOfDiffraction, designOrderOfDiffraction, dAlpha, dBeta, sEntrance, sExit, mEntrance, mExit, shortRadius, longRadius, additionalOrder, elementOffsetZ, fresnelOffset, betaIn, mis, sE, NULL, true);
-    
+
     std::vector<double> correctElementParams = { 0, 0, 0, inm2eV / designEnergy,
                         0, designOrderOfDiffraction, orderOfDiffraction, fresnelOffset,
                         sEntrance, sExit, mEntrance, mExit,
                         rad(dAlpha), rad(dBeta), 0, double(additionalOrder) };
     std::vector<double> correctObjectParams = { width, height, sE[0], sE[1],
-                        sE[2], sE[3], sE[4], sE[5], 
+                        sE[2], sE[3], sE[4], sE[5],
                         sE[6], 0, 0, 0,
-                        0, 0, 0, 0};                        
-    glm::dmat4x4 correctInMatrix = glm::dmat4x4(0.84421568368313848, -0.52329819288792645, -0.11601241633394895, 0, 
-                        0.53600361885290571, 0.82420440112787274, 0.18272171665687006, 0, 
-                        0, -0.21643961393810288, 0.97629600711993336, 0, 
-                        0, 1108.9831212341965, -5002.2995953687796, 1);
-    glm::dmat4x4 correctOutMatrix = glm::dmat4x4(0.84421568368313848, 0.53600361885290571, 0, 0, 
-                        -0.52329819288792645, 0.82420440112787274, -0.21643961393810288, 0, 
-                        -0.11601241633394895, 0.18272171665687006, 0.97629600711993336, 0, 
-                        0, 0, 5123.7529999999997, 1);
-    EXPECT_ITERABLE_DOUBLE_EQ(std::vector<double>, rzp.getObjectParameters(),  correctObjectParams);
+                        0, 0, 0, 0 };
+    glm::dmat4x4 correctInMatrix = glm::dmat4x4(0.84421568368313848, -0.52329819288792645, -0.11601241633394895, 0,
+        0.53600361885290571, 0.82420440112787274, 0.18272171665687006, 0,
+        0, -0.21643961393810288, 0.97629600711993336, 0,
+        0, 1108.9831212341965, -5002.2995953687796, 1);
+    glm::dmat4x4 correctOutMatrix = glm::dmat4x4(0.84421568368313848, 0.53600361885290571, 0, 0,
+        -0.52329819288792645, 0.82420440112787274, -0.21643961393810288, 0,
+        -0.11601241633394895, 0.18272171665687006, 0.97629600711993336, 0,
+        0, 0, 5123.7529999999997, 1);
+    EXPECT_ITERABLE_DOUBLE_EQ(std::vector<double>, rzp.getObjectParameters(), correctObjectParams);
     EXPECT_ITERABLE_DOUBLE_EQ(std::vector<double>, rzp.getElementParameters(), correctElementParams);
     EXPECT_ITERABLE_DOUBLE_EQ(std::vector<double>, rzp.getInMatrix(), glmToVector16(correctInMatrix));
     EXPECT_ITERABLE_DOUBLE_EQ(std::vector<double>, rzp.getOutMatrix(), glmToVector16(correctOutMatrix));

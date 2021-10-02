@@ -9,10 +9,10 @@ TerminalApp::TerminalApp()
 {
 }
 
-TerminalApp::TerminalApp(int argc, char** argv)
+TerminalApp::TerminalApp(int argc, char** argv) :
+    m_argc(argc),
+    m_argv(argv)
 {
-    m_argc = argc;
-    m_argv = argv;
     RAYX_DEBUG(std::cout << "TerminalApp erstellt!" << std::endl);
 }
 
@@ -29,15 +29,23 @@ void TerminalApp::run()
         if (m_argc == 2) {
             // load rml file
             m_Beamline = std::make_shared<RAYX::Beamline>(RAYX::Importer::importBeamline());
+            m_Presenter = RAYX::Presenter(m_Beamline);
         }
-        m_TracerInterface.run(0.0, 0.0, 0.0);
+        else {
+            loadDummyBeamline();
+        }
+        m_Presenter.run(0.0, 0.0, 0.0);
     }
     // rzp params
     else if (m_argc >= 4) {
         if (m_argc == 5) {
             // load rml
+            m_Presenter = RAYX::Presenter(m_Beamline);
         }
-        m_TracerInterface.run(std::stod(std::string(m_argv[1])),
+        else {
+            loadDummyBeamline();
+        }
+        m_Presenter.run(std::stod(std::string(m_argv[1])),
             std::stod(std::string(m_argv[2])), std::stod(std::string(m_argv[3])));
     }
 }

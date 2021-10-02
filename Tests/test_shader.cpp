@@ -7,7 +7,7 @@
 #include "Beamline/Objects/SphereMirror.h"
 #include "Beamline/Objects/MatrixSource.h"
 #include "Tracer/TracerInterface.h"
-#include "GeometricUserParams.h"
+#include "UserParameter/GeometricUserParams.h"
 #include "Core.h"
 #include "Ray.h"
 // #include "Tracer/TracerInterface.h"
@@ -73,7 +73,7 @@ std::list<double> runTracer(std::vector<RAYX::Ray> testValues, std::vector<std::
     std::cout << "add rays to tracer done" << std::endl;
 
     for (std::shared_ptr<RAYX::OpticalElement> e : elements) {
-        ti.addOpticalElementToTracer(tracer, e);
+        ti.addOpticalElementToTracer(e);
     }
     tracer.run(); //run tracer
     std::list<double> outputRays;
