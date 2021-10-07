@@ -23,6 +23,8 @@ namespace RAYX
 
     private:
         const char* m_name;
+        //m_geometry;
+        //m_surface; //(for lightsource??)
 
 
     };

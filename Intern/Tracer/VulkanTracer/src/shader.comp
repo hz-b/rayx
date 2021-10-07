@@ -2289,9 +2289,9 @@ void diffraction(int iopt, double xLength, double yLength, double wl, inout doub
 */
 Ray traceSlit(Ray r, const Quadric q, inout uint64_t ctr, dvec4 intersection) {
 	//dvec4 normal = setIntersectionPoint(r, q.anchorPoints, intersectionPoint);
-	r = rayMatrixMult(r, q.outTrans);
-	//dvec4 normal = intersectionPoint(r, q.anchorPoints);
-	dvec4 normal = setIntersectionPoint(r, q.anchorPoints, intersection);
+	r = rayMatrixMult(r, q.inTrans);
+	dvec4 normal = intersectionPoint(r, q.anchorPoints);
+	//dvec4 normal = setIntersectionPoint(r, q.anchorPoints, intersection);
 	
 	double xLength = q.objectParameters[0][0]; // width
 	double yLength = q.objectParameters[0][1]; // height
@@ -2648,6 +2648,8 @@ void iterateElements(){
 			rayData[uint(gl_GlobalInvocationID)] = traceRZP(rayData[uint(gl_GlobalInvocationID)], q, ctr, intersection);	
 		}else if(type == 5) { // image plane
 			rayData[uint(gl_GlobalInvocationID)] = traceImagePlane(rayData[uint(gl_GlobalInvocationID)], q);
+		}else if(type == 6) { // toroid mirror
+			rayData[uint(gl_GlobalInvocationID)] = traceToroid(rayData[uint(gl_GlobalInvocationID)], q, ctr, intersection);	
 		}
 		//rayData[uint(gl_GlobalInvocationID)] = rayMatrixMult(rayData[uint(gl_GlobalInvocationID)], q.outTrans);
 	}
@@ -2673,6 +2675,7 @@ void dynamicQuadrics(){
 	int lastClosestQuadricIndex;
 	dvec4 closestHitpoint = dvec4(1.0/0.0, 1.0/0.0, 1.0/0.0, 0.0);
 	dvec4 closestGlobalHitpoint;
+	double threshold = 0.001;
 	for(int i = 0; i<maxBounces; i++){
 		ray = rayData[uint(gl_GlobalInvocationID)];
 
@@ -2751,6 +2754,8 @@ void dynamicQuadrics(){
 			}
 			outputData[uint(gl_GlobalInvocationID)] = rayData[uint(gl_GlobalInvocationID)];
 			return;
+		}else if(type == 6) { // toroid mirror
+			rayData[uint(gl_GlobalInvocationID)] = traceToroid(rayData[uint(gl_GlobalInvocationID)], next, ctr, closestHitpoint);
 		}
 		//rayData[uint(gl_GlobalInvocationID)] = rayMatrixMult(rayData[uint(gl_GlobalInvocationID)], next.outTrans); // from element to global coordinate system
 		
