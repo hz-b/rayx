@@ -1317,16 +1317,34 @@ TEST(opticalElements, slit1) {
 }
 
 TEST(opticalElements, slit2) {
-    std::shared_ptr<RAYX::MatrixSource> m = std::make_shared<RAYX::MatrixSource>(0, "matrix source", 20000, 0, 0.065, 0.04, 0, 0.001, 0.001, 100, 0, 1, 0, 0, std::vector<double>{ 0,0,0,0 });
-    std::shared_ptr<RAYX::Slit> s = std::make_shared<RAYX::Slit>("slit", 0, 1, 20, 2, 0, 10000, 20, 1, m->getPhotonEnergy(), std::vector<double>{ 0,0,0, 0,0,0 }, nullptr, true);
-    std::shared_ptr<RAYX::ImagePlane> ip = std::make_shared<RAYX::ImagePlane>("Image plane", 1000, s, true);
-    testOpticalElement({ s }, 20000);
+    RAYX::GeometricUserParams s_param = RAYX::GeometricUserParams(0, 0, 0, 10000, std::vector<double>{ 0,0,0, 0,0,0 });
+    glm::dvec4 s_position = s_param.calcPosition();
+    glm::dmat4x4 s_orientation = s_param.calcOrientation();
+    
+    RAYX::GeometricUserParams ip_param = RAYX::GeometricUserParams(0, 0, 0, 1000, std::vector<double>{ 0,0,0, 0,0,0 });
+    glm::dvec4 ip_position = ip_param.calcPosition(s_param, s_position, s_orientation);
+    glm::dmat4x4 ip_orientation = ip_param.calcOrientation(s_param, s_position, s_orientation);
+    
+    std::shared_ptr<RAYX::Slit> s = std::make_shared<RAYX::Slit>("slit", 0, 1, 20, 2, s_position, s_orientation, 20, 1, 100);
+    std::shared_ptr<RAYX::ImagePlane> ip = std::make_shared<RAYX::ImagePlane>("Image plane", ip_position, ip_orientation);
+    testOpticalElement({ s, ip }, 20000);
     
 }
 
 TEST(opticalElements, toroid) {
-    std::shared_ptr<RAYX::ToroidMirror> t = std::make_shared<RAYX::ToroidMirror>("toroid", 0, 50, 200, 10, 0, 10000, 10000, 1000, 10000, 1000, std::vector<double>{ 0,0,0, 0,0,0 }, zeros7,  nullptr, true);
-    std::shared_ptr<RAYX::ImagePlane> ip = std::make_shared<RAYX::ImagePlane>("Image plane", 1000, t, true);
+    RAYX::GeometricUserParams t_param = RAYX::GeometricUserParams(rad(10), rad(10), 0, 10000, std::vector<double>{ 0,0,0, 0,0,0 });
+    glm::dvec4 t_position = t_param.calcPosition();
+    glm::dmat4x4 t_orientation = t_param.calcOrientation();
+    std::shared_ptr<RAYX::Slit> s = std::make_shared<RAYX::Slit>("slit", 0, 1, 20, 2, t_position, t_orientation, 20, 1, 100);
+    
+    RAYX::GeometricUserParams ip_param = RAYX::GeometricUserParams(0, 0, 0, 1000, std::vector<double>{ 0,0,0, 0,0,0 });
+    glm::dvec4 ip_position = ip_param.calcPosition(t_param, t_position, t_orientation);
+    glm::dmat4x4 ip_orientation = ip_param.calcOrientation(t_param, t_position, t_orientation);
+
+    std::shared_ptr<RAYX::ToroidMirror> t = std::make_shared<RAYX::ToroidMirror>("toroid", 0, 50, 200, t_position, t_orientation, rad(10), 10000, 1000, 10000, 1000, zeros7);
+    std::shared_ptr<RAYX::ImagePlane> ip = std::make_shared<RAYX::ImagePlane>("Image plane", ip_position, ip_orientation);
+    //std::shared_ptr<RAYX::ToroidMirror> t = std::make_shared<RAYX::ToroidMirror>("toroid", 0, 50, 200, 10, 0, 10000, 10000, 1000, 10000, 1000, std::vector<double>{ 0,0,0, 0,0,0 }, zeros7,  nullptr, true);
+    //std::shared_ptr<RAYX::ImagePlane> ip = std::make_shared<RAYX::ImagePlane>("Image plane", 1000, t, true);
     testOpticalElement({ t, ip }, 20000);
     
 }

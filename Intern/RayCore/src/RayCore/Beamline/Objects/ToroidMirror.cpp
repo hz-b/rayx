@@ -11,7 +11,7 @@ namespace RAYX
      * @param geometricalShape          either rectangular or elliptical
      * @param width                     width of the element
      * @param height                    height of the element
-     * @param grazingIncidenceAngle     angle in which the main ray should hit the element, used to calculate the radii
+     * @param grazingIncidenceAngle     angle in which the main ray should hit the element, used to calculate the radii, in rad
      * @param position                  position of element in world coordinate system
      * @param orientation               orientation of element in world coordinate system
      * @param mEntrance                 meridional entrance arm length, used to calculate the radii
