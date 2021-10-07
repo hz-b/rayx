@@ -1331,11 +1331,11 @@ TEST(opticalElements, slit2) {
     
 }
 
+
 TEST(opticalElements, toroid) {
     RAYX::GeometricUserParams t_param = RAYX::GeometricUserParams(rad(10), rad(10), 0, 10000, std::vector<double>{ 0,0,0, 0,0,0 });
     glm::dvec4 t_position = t_param.calcPosition();
     glm::dmat4x4 t_orientation = t_param.calcOrientation();
-    std::shared_ptr<RAYX::Slit> s = std::make_shared<RAYX::Slit>("slit", 0, 1, 20, 2, t_position, t_orientation, 20, 1, 100);
     
     RAYX::GeometricUserParams ip_param = RAYX::GeometricUserParams(0, 0, 0, 1000, std::vector<double>{ 0,0,0, 0,0,0 });
     glm::dvec4 ip_position = ip_param.calcPosition(t_param, t_position, t_orientation);

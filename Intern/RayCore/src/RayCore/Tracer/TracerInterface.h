@@ -22,6 +22,7 @@ namespace RAYX
         TracerInterface(int numElements, int numRays);
         ~TracerInterface();
         void generateRays(std::shared_ptr<LightSource> source);
+        void setBeamlineParameters();
         void addOpticalElementToTracer(std::shared_ptr<OpticalElement> element);
         void writeToFile(const std::vector<double>& outputRays, std::ofstream& file, int index) const;
 

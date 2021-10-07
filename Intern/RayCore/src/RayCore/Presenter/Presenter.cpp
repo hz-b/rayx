@@ -11,7 +11,7 @@ namespace RAYX
 
     Presenter::Presenter(std::shared_ptr<Beamline> beamline) :
         m_Beamline(beamline),
-        m_TracerInterface(TracerInterface(m_Beamline->size(), 200000))
+        m_TracerInterface(TracerInterface(beamline->size(), 200000))
     {
     }
 
@@ -23,12 +23,13 @@ namespace RAYX
 
     // ! parameters are temporary and need to be removed again
     bool Presenter::run(double translationXerror, double translationYerror, double translationZerror)
-    {
+    {   
         /*int beamlinesSimultaneously = 1;*/
         for (int j = 0; j < 1/*beamlinesSimultaneously*/; j++) {
             m_TracerInterface.generateRays(m_lightSources[0]);
         }
 
+        m_TracerInterface.setBeamlineParameters();
         const std::vector<std::shared_ptr<OpticalElement>> Elements = m_Beamline->getObjects();
         for (int j = 0; j < 1/*beamlinesSimultaneously*/; j++) {
             for (int i = 0; i < int(Elements.size()); i++) {

@@ -49,6 +49,10 @@ namespace RAYX
         m_RayTracer.addRayVector(rays.data(), rays.size());
     }
 
+    void TracerInterface::setBeamlineParameters() {
+        m_RayTracer.setBeamlineParameters(1, m_numElements, m_numRays);
+    }
+
     void TracerInterface::addOpticalElementToTracer(std::shared_ptr<OpticalElement> element) {
         m_RayTracer.addVectors(element->getSurfaceParams(), element->getInMatrix(), element->getOutMatrix(), element->getTempMisalignmentMatrix(), element->getInverseTempMisalignmentMatrix(), element->getObjectParameters(), element->getElementParameters());
     }
@@ -59,8 +63,6 @@ namespace RAYX
 
 
         RAYX_DEBUG(std::cout << "add rays to tracer done" << std::endl);
-
-        m_RayTracer.setBeamlineParameters(1, m_numElements, m_numRays);
 
         const clock_t begin_time = clock();
         m_RayTracer.run(); //run tracer
