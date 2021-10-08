@@ -17,8 +17,8 @@ const double PI = 3.14159265358979323;
 
 // useful functions
 double RAYX_API hvlam(double x);
-double RAYX_API rad(double degree);
-double RAYX_API degree(double rad);
+double RAYX_API degToRad(double degree);
+double RAYX_API radToDeg(double rad);
 
 Matrix RAYX_API getMatrixProduct(Matrix A, Matrix B);
 std::vector<double> RAYX_API getMatrixProductAsVector(std::vector<double> A, std::vector<double> B);

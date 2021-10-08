@@ -81,7 +81,7 @@ TEST(RZP, testdefaultParams) {
     double alpha = 0.017453292519943295;
     double beta = 0.017453292519941554;
 
-    RAYX::GeometricUserParams rzp_param = RAYX::GeometricUserParams(degree(alpha), degree(beta), azimuthal, dist, mis);
+    RAYX::GeometricUserParams rzp_param = RAYX::GeometricUserParams(radToDeg(alpha), radToDeg(beta), azimuthal, dist, mis);
     glm::dvec4 position = rzp_param.calcPosition();
     glm::dmat4x4 orientation = rzp_param.calcOrientation();
     RAYX::ReflectionZonePlate rzp = RAYX::ReflectionZonePlate("RZP", geometricalShape, curvatureType, width, height, position, orientation, designEnergy, orderOfDiffraction, designOrderOfDiffraction, dAlpha, dBeta, sEntrance, sExit, mEntrance, mExit, shortRadius, longRadius, additionalOrder, fresnelOffset, sE);
@@ -95,7 +95,7 @@ TEST(RZP, testdefaultParams) {
     std::vector<double> correctElementParams = { 0, 0, 0, hvlam(sourceEnergy),
                         0, designOrderOfDiffraction, orderOfDiffraction, fresnelOffset,
                         sEntrance, sExit, mEntrance, mExit,
-                        rad(dAlpha), rad(dBeta), 0, double(additionalOrder) };
+                        degToRad(dAlpha), degToRad(dBeta), 0, double(additionalOrder) };
     std::vector<double> correctObjectParams = { width,height,sE[0],sE[1],
                         sE[2],sE[3],sE[4],sE[5],
                         sE[6],0,0,0,
@@ -154,7 +154,7 @@ TEST(RZP, testdefaultParamsElliptical) {
     double alpha = 0.017453292519943295;
     double beta = 0.017453292519941554;
 
-    RAYX::GeometricUserParams rzp_param = RAYX::GeometricUserParams(degree(alpha), degree(beta), azimuthal, dist, mis);
+    RAYX::GeometricUserParams rzp_param = RAYX::GeometricUserParams(radToDeg(alpha), radToDeg(beta), azimuthal, dist, mis);
     glm::dvec4 position = rzp_param.calcPosition();
     glm::dmat4x4 orientation = rzp_param.calcOrientation();
     RAYX::ReflectionZonePlate rzp = RAYX::ReflectionZonePlate("RZP", geometricalShape, curvatureType, width, height, position, orientation, designEnergy, orderOfDiffraction, designOrderOfDiffraction, dAlpha, dBeta, sEntrance, sExit, mEntrance, mExit, shortRadius, longRadius, additionalOrder, fresnelOffset, sE);
@@ -167,7 +167,7 @@ TEST(RZP, testdefaultParamsElliptical) {
     std::vector<double> correctElementParams = { 0, 0, 0, inm2eV / sourceEnergy,
                         0, designOrderOfDiffraction, orderOfDiffraction, fresnelOffset,
                         sEntrance, sExit, mEntrance, mExit,
-                        rad(dAlpha), rad(dBeta), 0, double(additionalOrder) };
+                        degToRad(dAlpha), degToRad(dBeta), 0, double(additionalOrder) };
     std::vector<double> correctObjectParams = { -width,-height,sE[0],sE[1],
                         sE[2],sE[3],sE[4],sE[5],
                         sE[6],0,0,0,
@@ -224,7 +224,7 @@ TEST(RZP, testParams) {
 
     double alpha = 0.21816615649929119;
     double beta = 0.21816615649929122;
-    RAYX::GeometricUserParams rzp_param = RAYX::GeometricUserParams(alpha, beta, rad(azimuthal), dist, mis);
+    RAYX::GeometricUserParams rzp_param = RAYX::GeometricUserParams(alpha, beta, degToRad(azimuthal), dist, mis);
     glm::dvec4 position = rzp_param.calcPosition();
     glm::dmat4x4 orientation = rzp_param.calcOrientation();
     RAYX::ReflectionZonePlate rzp = RAYX::ReflectionZonePlate("RZP", geometricShape, curvatureType, width, height, position, orientation, designEnergy, orderOfDiffraction, designOrderOfDiffraction, dAlpha, dBeta, sEntrance, sExit, mEntrance, mExit, shortRadius, longRadius, additionalOrder, fresnelOffset, sE);
@@ -234,7 +234,7 @@ TEST(RZP, testParams) {
     std::vector<double> correctElementParams = { 0, 0, 0, inm2eV / designEnergy,
                         0, designOrderOfDiffraction, orderOfDiffraction, fresnelOffset,
                         sEntrance, sExit, mEntrance, mExit,
-                        rad(dAlpha), rad(dBeta), 0, double(additionalOrder) };
+                        degToRad(dAlpha), degToRad(dBeta), 0, double(additionalOrder) };
     std::vector<double> correctObjectParams = { width, height, sE[0], sE[1],
                         sE[2], sE[3], sE[4], sE[5],
                         sE[6], 0, 0, 0,

@@ -22,10 +22,10 @@ namespace RAYX
      * @param global
     */
     SphereMirror::SphereMirror(const char* name, const double width, const double height, const double grazingIncidence, const double azimuthal, const double distanceToPreceedingElement, const double entranceArmLength, const double exitArmLength, const std::vector<double> misalignmentParams, const std::vector<double> slopeError, const std::shared_ptr<OpticalElement> previous, bool global)
-        : OpticalElement(name, { 0,0,0,0, 0,0,0,0, 0,0,0,0, 0,0,0,0 }, width, height, rad(grazingIncidence), rad(azimuthal), rad(grazingIncidence), distanceToPreceedingElement, misalignmentParams, { 0,0,0,0,0,0 }, slopeError, previous, global),
+        : OpticalElement(name, { 0,0,0,0, 0,0,0,0, 0,0,0,0, 0,0,0,0 }, width, height, degToRad(grazingIncidence), degToRad(azimuthal), degToRad(grazingIncidence), distanceToPreceedingElement, misalignmentParams, { 0,0,0,0,0,0 }, slopeError, previous, global),
         m_entranceArmLength(entranceArmLength),
         m_exitArmLength(exitArmLength),
-        m_grazingIncidenceAngle(rad(grazingIncidence))
+        m_grazingIncidenceAngle(degToRad(grazingIncidence))
     {
         // std::vector<double> inputPoints = {0,0,0,0, 0,0,0,-1, 0,0,0,0, 0,0,0,0};
 
@@ -53,7 +53,7 @@ namespace RAYX
         : OpticalElement(name, { 0,0,0,0, 0,0,0,0, 0,0,0,0, 0,0,0,0 }, width, height, position, orientation, { 0,0,0,0,0,0 }, slopeError),
         m_entranceArmLength(entranceArmLength),
         m_exitArmLength(exitArmLength),
-        m_grazingIncidenceAngle(rad(grazingIncidenceAngle))
+        m_grazingIncidenceAngle(degToRad(grazingIncidenceAngle))
 
     {
         calcRadius(); // calculate the radius

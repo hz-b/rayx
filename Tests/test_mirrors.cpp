@@ -60,9 +60,9 @@ TEST(PlaneMirror, testSimpleParams) {
 
     ASSERT_DOUBLE_EQ(plM.getWidth(), width);
     ASSERT_DOUBLE_EQ(plM.getHeight(), height);
-    ASSERT_DOUBLE_EQ(plM.getAlpha(), rad(incidenceAngle));
-    ASSERT_DOUBLE_EQ(plM.getBeta(), rad(incidenceAngle));
-    ASSERT_DOUBLE_EQ(plM.getChi(), rad(azimuthalAngle));
+    ASSERT_DOUBLE_EQ(plM.getAlpha(), degToRad(incidenceAngle));
+    ASSERT_DOUBLE_EQ(plM.getBeta(), degToRad(incidenceAngle));
+    ASSERT_DOUBLE_EQ(plM.getChi(), degToRad(azimuthalAngle));
     ASSERT_DOUBLE_EQ(plM.getDistanceToPreceedingElement(), dist);
     EXPECT_ITERABLE_DOUBLE_EQ(std::vector<double>, mis, plM.getMisalignmentParams());
     EXPECT_ITERABLE_DOUBLE_EQ(std::vector<double>, sE, plM.getSlopeError());
@@ -83,9 +83,9 @@ TEST(PlaneMirror, testAdvancedParams) {
 
     ASSERT_DOUBLE_EQ(plM.getWidth(), width);
     ASSERT_DOUBLE_EQ(plM.getHeight(), height);
-    ASSERT_DOUBLE_EQ(plM.getAlpha(), rad(incidenceAngle));
-    ASSERT_DOUBLE_EQ(plM.getBeta(), rad(incidenceAngle));
-    ASSERT_DOUBLE_EQ(plM.getChi(), rad(azimuthalAngle));
+    ASSERT_DOUBLE_EQ(plM.getAlpha(), degToRad(incidenceAngle));
+    ASSERT_DOUBLE_EQ(plM.getBeta(), degToRad(incidenceAngle));
+    ASSERT_DOUBLE_EQ(plM.getChi(), degToRad(azimuthalAngle));
     ASSERT_DOUBLE_EQ(plM.getDistanceToPreceedingElement(), dist);
     EXPECT_ITERABLE_DOUBLE_EQ(std::vector<double>, mis, plM.getMisalignmentParams());
     EXPECT_ITERABLE_DOUBLE_EQ(std::vector<double>, sE, plM.getSlopeError());
@@ -110,9 +110,9 @@ TEST(Sphere, testParams) {
     ASSERT_DOUBLE_EQ(sM.getWidth(), width);
     ASSERT_DOUBLE_EQ(sM.getHeight(), height);
     EXPECT_NEAR(sM.getRadius(), radius, 0.0000000001);
-    ASSERT_DOUBLE_EQ(sM.getAlpha(), rad(incidence));
-    ASSERT_DOUBLE_EQ(sM.getBeta(), rad(incidence));
-    ASSERT_DOUBLE_EQ(sM.getChi(), rad(azimuthal));
+    ASSERT_DOUBLE_EQ(sM.getAlpha(), degToRad(incidence));
+    ASSERT_DOUBLE_EQ(sM.getBeta(), degToRad(incidence));
+    ASSERT_DOUBLE_EQ(sM.getChi(), degToRad(azimuthal));
     ASSERT_DOUBLE_EQ(sM.getDistanceToPreceedingElement(), dist);
     ASSERT_DOUBLE_EQ(sM.getExitArmLength(), exitArmLength);
     ASSERT_DOUBLE_EQ(sM.getEntranceArmLength(), entranceArmLength);
@@ -155,9 +155,9 @@ TEST(Ellips, testParamsCSCurvature) {
     ASSERT_DOUBLE_EQ(e.getWidth(), width);
     ASSERT_DOUBLE_EQ(e.getHeight(), height);
     EXPECT_NEAR(e.getRadius(), radius, 0.00000001);
-    ASSERT_DOUBLE_EQ(e.getIncidenceAngle(), rad(incidence));
-    ASSERT_DOUBLE_EQ(e.getBeta(), rad(incidence));
-    ASSERT_DOUBLE_EQ(e.getChi(), rad(azimuthal));
+    ASSERT_DOUBLE_EQ(e.getIncidenceAngle(), degToRad(incidence));
+    ASSERT_DOUBLE_EQ(e.getBeta(), degToRad(incidence));
+    ASSERT_DOUBLE_EQ(e.getChi(), degToRad(azimuthal));
     ASSERT_DOUBLE_EQ(e.getDistanceToPreceedingElement(), dist);
     ASSERT_DOUBLE_EQ(e.getExitArmLength(), exitArmLength);
     ASSERT_DOUBLE_EQ(e.getEntranceArmLength(), entranceArmLength);
@@ -178,9 +178,9 @@ TEST(Ellips, testParamsCSCurvature) {
     ASSERT_DOUBLE_EQ(e2.getWidth(), width);
     ASSERT_DOUBLE_EQ(e2.getHeight(), height);
     EXPECT_NEAR(e2.getRadius(), radius, 0.00000001);
-    ASSERT_DOUBLE_EQ(e2.getIncidenceAngle(), rad(incidence));
-    ASSERT_DOUBLE_EQ(e2.getBeta(), rad(incidence));
-    ASSERT_DOUBLE_EQ(e2.getChi(), rad(azimuthal));
+    ASSERT_DOUBLE_EQ(e2.getIncidenceAngle(), degToRad(incidence));
+    ASSERT_DOUBLE_EQ(e2.getBeta(), degToRad(incidence));
+    ASSERT_DOUBLE_EQ(e2.getChi(), degToRad(azimuthal));
     ASSERT_DOUBLE_EQ(e2.getDistanceToPreceedingElement(), dist);
     ASSERT_DOUBLE_EQ(e2.getExitArmLength(), exitArmLength);
     ASSERT_DOUBLE_EQ(e2.getEntranceArmLength(), entranceArmLength);
@@ -201,9 +201,9 @@ TEST(Ellips, testParamsCSCurvature) {
     ASSERT_DOUBLE_EQ(e3.getWidth(), width);
     ASSERT_DOUBLE_EQ(e3.getHeight(), height);
     EXPECT_NEAR(e3.getRadius(), radius, 0.00000001);
-    ASSERT_DOUBLE_EQ(e3.getIncidenceAngle(), rad(incidence));
-    ASSERT_DOUBLE_EQ(e3.getBeta(), rad(incidence));
-    ASSERT_DOUBLE_EQ(e3.getChi(), rad(azimuthal));
+    ASSERT_DOUBLE_EQ(e3.getIncidenceAngle(), degToRad(incidence));
+    ASSERT_DOUBLE_EQ(e3.getBeta(), degToRad(incidence));
+    ASSERT_DOUBLE_EQ(e3.getChi(), degToRad(azimuthal));
     ASSERT_DOUBLE_EQ(e3.getDistanceToPreceedingElement(), dist);
     ASSERT_DOUBLE_EQ(e3.getExitArmLength(), exitArmLength);
     ASSERT_DOUBLE_EQ(e3.getEntranceArmLength(), entranceArmLength);
@@ -253,9 +253,9 @@ TEST(Ellips, testParamsCSMirror) {
     ASSERT_DOUBLE_EQ(e.getWidth(), width);
     ASSERT_DOUBLE_EQ(e.getHeight(), height);
     EXPECT_NEAR(e.getRadius(), radius, 0.00000001);
-    ASSERT_DOUBLE_EQ(e.getIncidenceAngle(), rad(incidence));
-    ASSERT_DOUBLE_EQ(e.getBeta(), rad(incidence));
-    ASSERT_DOUBLE_EQ(e.getChi(), rad(azimuthal));
+    ASSERT_DOUBLE_EQ(e.getIncidenceAngle(), degToRad(incidence));
+    ASSERT_DOUBLE_EQ(e.getBeta(), degToRad(incidence));
+    ASSERT_DOUBLE_EQ(e.getChi(), degToRad(azimuthal));
     ASSERT_DOUBLE_EQ(e.getDistanceToPreceedingElement(), dist);
     ASSERT_DOUBLE_EQ(e.getExitArmLength(), exitArmLength);
     ASSERT_DOUBLE_EQ(e.getEntranceArmLength(), entranceArmLength);
@@ -276,9 +276,9 @@ TEST(Ellips, testParamsCSMirror) {
     ASSERT_DOUBLE_EQ(e2.getWidth(), width);
     ASSERT_DOUBLE_EQ(e2.getHeight(), height);
     EXPECT_NEAR(e.getRadius(), radius, 0.00000001);
-    ASSERT_DOUBLE_EQ(e2.getIncidenceAngle(), rad(incidence));
-    ASSERT_DOUBLE_EQ(e2.getBeta(), rad(incidence));
-    ASSERT_DOUBLE_EQ(e2.getChi(), rad(azimuthal));
+    ASSERT_DOUBLE_EQ(e2.getIncidenceAngle(), degToRad(incidence));
+    ASSERT_DOUBLE_EQ(e2.getBeta(), degToRad(incidence));
+    ASSERT_DOUBLE_EQ(e2.getChi(), degToRad(azimuthal));
     ASSERT_DOUBLE_EQ(e2.getDistanceToPreceedingElement(), dist);
     ASSERT_DOUBLE_EQ(e2.getExitArmLength(), exitArmLength);
     ASSERT_DOUBLE_EQ(e2.getEntranceArmLength(), entranceArmLength);
@@ -299,9 +299,9 @@ TEST(Ellips, testParamsCSMirror) {
     ASSERT_DOUBLE_EQ(e3.getWidth(), width);
     ASSERT_DOUBLE_EQ(e3.getHeight(), height);
     EXPECT_NEAR(e3.getRadius(), radius, 0.00000001);
-    ASSERT_DOUBLE_EQ(e3.getIncidenceAngle(), rad(incidence));
-    ASSERT_DOUBLE_EQ(e3.getBeta(), rad(incidence));
-    ASSERT_DOUBLE_EQ(e3.getChi(), rad(azimuthal));
+    ASSERT_DOUBLE_EQ(e3.getIncidenceAngle(), degToRad(incidence));
+    ASSERT_DOUBLE_EQ(e3.getBeta(), degToRad(incidence));
+    ASSERT_DOUBLE_EQ(e3.getChi(), degToRad(azimuthal));
     ASSERT_DOUBLE_EQ(e3.getDistanceToPreceedingElement(), dist);
     ASSERT_DOUBLE_EQ(e3.getExitArmLength(), exitArmLength);
     ASSERT_DOUBLE_EQ(e3.getEntranceArmLength(), entranceArmLength);

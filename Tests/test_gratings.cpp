@@ -193,8 +193,8 @@ TEST(SphereGrating, testParams) {
     ASSERT_DOUBLE_EQ(s1.getWidth(), width);
     ASSERT_DOUBLE_EQ(s1.getHeight(), height);
     ASSERT_DOUBLE_EQ(s1.getGratingMount(), mount);
-    ASSERT_DOUBLE_EQ(s1.getChi(), rad(azimuthal));
-    ASSERT_DOUBLE_EQ(s1.getDeviation(), rad(deviation));
+    ASSERT_DOUBLE_EQ(s1.getChi(), degToRad(azimuthal));
+    ASSERT_DOUBLE_EQ(s1.getDeviation(), degToRad(deviation));
     ASSERT_DOUBLE_EQ(s1.getChi(), chi);
     ASSERT_DOUBLE_EQ(s1.getDistanceToPreceedingElement(), distance);
     ASSERT_DOUBLE_EQ(s1.getLineDensity(), linedensity);

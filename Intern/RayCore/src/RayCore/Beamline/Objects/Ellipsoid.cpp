@@ -16,8 +16,8 @@ namespace RAYX
     */
     Ellipsoid::Ellipsoid(const char* name, const double width, const double height, const double grazingIncidence, const double azimuthal, const double distanceToPreceedingElement,
         const double entranceArmLength, const double exitArmLength, const int coordSys, const int figRot, const double a_11, const std::vector<double> misalignmentParams, const std::vector<double> slopeError, const std::shared_ptr<OpticalElement> previous, bool global)
-        : OpticalElement(name, width, height, rad(azimuthal), distanceToPreceedingElement, slopeError, previous),
-        m_incidence(rad(grazingIncidence)),
+        : OpticalElement(name, width, height, degToRad(azimuthal), distanceToPreceedingElement, slopeError, previous),
+        m_incidence(degToRad(grazingIncidence)),
         m_entranceArmLength(entranceArmLength),
         m_exitArmLength(exitArmLength),
         m_a11(a_11)

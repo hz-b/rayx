@@ -38,8 +38,8 @@ namespace RAYX
         const double sExit, const double shortRadius, const double longRadius, const int additionalZeroOrder,
         const double fresnelZOffset, const std::vector<double> slopeError)
         : OpticalElement(name, width, height, position, orientation, slopeError),
-        m_designAlphaAngle(rad(dAlpha)),
-        m_designBetaAngle(rad(dBeta)),
+        m_designAlphaAngle(degToRad(dAlpha)),
+        m_designBetaAngle(degToRad(dBeta)),
         m_fresnelZOffset(fresnelZOffset),
         m_designSagittalEntranceArmLength(sEntrance), //in mm
         m_designSagittalExitArmLength(sExit),
@@ -112,10 +112,10 @@ namespace RAYX
         const double sExit, const double shortRadius, const double longRadius, const int additionalZeroOrder, const double elementOffsetZ,
         const double fresnelZOffset, const double beta, const std::vector<double> misalignmentParams, const std::vector<double> slopeError,
         const std::shared_ptr<OpticalElement> previous, bool global)
-        : OpticalElement(name, width, height, rad(azimuthal), distanceToPreceedingElement, slopeError, previous),
-        m_designAlphaAngle(rad(dAlpha)),
-        m_designBetaAngle(rad(dBeta)),
-        m_grazingIncidenceAngle(rad(incidenceAngle)),
+        : OpticalElement(name, width, height, degToRad(azimuthal), distanceToPreceedingElement, slopeError, previous),
+        m_designAlphaAngle(degToRad(dAlpha)),
+        m_designBetaAngle(degToRad(dBeta)),
+        m_grazingIncidenceAngle(degToRad(incidenceAngle)),
 
         m_fresnelZOffset(fresnelZOffset),
         m_designSagittalEntranceArmLength(sEntrance), //in mm
@@ -154,7 +154,7 @@ namespace RAYX
             calcBeta2();
         }
         else { // auto == true
-            setBeta(rad(beta));
+            setBeta(degToRad(beta));
         }
 
         std::cout.precision(17);

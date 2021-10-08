@@ -63,7 +63,7 @@ namespace RAYX
      *
     */
     Slit::Slit(const char* name, int shape, int beamstop, double width, double height, double azimuthal, double dist, double beamstopWidth, double beamstopHeight, double sourceEnergy, std::vector<double> misalignmentParams, std::shared_ptr<OpticalElement> previous, bool global)
-        : OpticalElement(name, width, height, rad(azimuthal), dist, { 0,0,0,0,0,0,0 }, previous),
+        : OpticalElement(name, width, height, degToRad(azimuthal), dist, { 0,0,0,0,0,0,0 }, previous),
         m_waveLength(abs(hvlam(sourceEnergy)))
     {
         m_shape = shape == 0 ? GS_RECTANGLE : GS_ELLIPTICAL;
