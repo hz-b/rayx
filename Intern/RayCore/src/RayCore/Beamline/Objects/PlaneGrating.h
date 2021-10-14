@@ -34,7 +34,6 @@ namespace RAYX
         double m_orderOfDiffraction;
         std::vector<double> m_vls;
 
-        enum GRATING_MOUNT {GM_DEVIATION, GM_INCIDENCE};
         GRATING_MOUNT m_gratingMount;
     };
 

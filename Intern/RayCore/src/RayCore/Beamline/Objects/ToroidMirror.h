@@ -30,7 +30,6 @@ namespace RAYX
         double m_meridionalExitArmLength;
         double m_longRadius;
         double m_shortRadius;
-        enum GEOMETRICAL_SHAPE {GS_RECTANGLE, GS_ELLIPTICAL};
         GEOMETRICAL_SHAPE m_geometricalShape;
 
     };

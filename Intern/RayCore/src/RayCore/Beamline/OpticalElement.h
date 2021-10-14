@@ -73,6 +73,9 @@ namespace RAYX
         OpticalElement();
         ~OpticalElement();
 
+        enum GEOMETRICAL_SHAPE { GS_RECTANGLE, GS_ELLIPTICAL }; // influences wastebox function in shader
+        enum GRATING_MOUNT { GM_DEVIATION, GM_INCIDENCE }; // influences incidence and exit angle calculation (moved somewhere else)
+
     private:
         // Geometric Parameter
         double m_width;
