@@ -4,6 +4,8 @@ namespace RAYX
 {
 
     /**
+     * old constructor
+     * 
      * angles given in degree and stored in rad
      * initializes transformation matrices, and parameters for the quadric in super class (optical element)
      * sets mirror-specific parameters in this class
@@ -28,6 +30,8 @@ namespace RAYX
     }
 
     /**
+     * new constructor
+     * 
      * initializes transformation matrices, and parameters for the quadric in super class (optical element)
      * sets mirror-specific parameters in this class
      * @param name                  name of the plane mirror
@@ -42,7 +46,7 @@ namespace RAYX
         : OpticalElement(name, { 0,0,0,0, 0,0,0,0, 0,0,0,0, 0,0,0,0 }, width,
             height, position, orientation, { 0,0,0,0,0,0 }, slopeError)
     {
-        setSurface(std::make_unique<Quadric>(std::vector<double>{0, 0, 0, 0, 0, 0, 0, -1, 0, 0, 0, 0, 0, 0, 0, 0}));
+        setSurface(std::make_unique<Quadric>(std::vector<double>{0, 0, 0, 0, 1, 0, 0, -1, 0, 0, 0, 0, 0, 0, 0, 0}));
     }
 
     PlaneMirror::~PlaneMirror()
