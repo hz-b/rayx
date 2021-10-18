@@ -5,10 +5,6 @@
 
 #include "TracerInterface.h"
 
-#include "Beamline/Objects/MatrixSource.h"
-#include "Beamline/Objects/PointSource.h"
-#include "Beamline/Objects/ReflectionZonePlate.h"
-#include "UserParameter/GeometricUserParams.h"
 #include "Debug.h"
 #include "Ray.h"
 

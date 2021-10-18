@@ -17,32 +17,33 @@ namespace RAYX
     class RAYX_API GeometricUserParams {
 
     public:
-
-        // old constructor with several user parameters to calculate incidence and exit angle (alpha, beta) has been moved to somewhere else
-        // PlaneGrating(const char* name, const int mount, const double width, const double height, const double deviation, const double normalIncidence, const double azimuthal, const double distanceToPreceedingElement, const double designEnergyMounting, const double lineDensity, const double orderOfDiffraction, const double fixFocusConstantCFF, const int additional_zero_order, const std::vector<double> misalignmentParams, const std::vector<double> vls, const std::vector<double> slopeError, const std::shared_ptr<OpticalElement> previous, bool global);
-        
-        GeometricUserParams(double alpha, double beta, double chi, double dist, std::vector<double> misalignment);
+        // constructor for mirrors
+        GeometricUserParams(double incidenceAngle);
+        // constructor for gratings
+        GeometricUserParams(int mount, double deviation, double normalIncidence, double lineDensity, double designEnergy, double additionalOrder, int orderOfDiffraction);
+        // constructor for rzp
+        GeometricUserParams(int imageType, double grazingIncidence, double sourceWavelength, double designWavelength, double orderOfDiffraction, double designOrderOfDiffraction, 
+                double designAlphaAngle, double designBetaAngle, double mEntrance, double mExit, double sEntrance, double sExit);
         GeometricUserParams();
         ~GeometricUserParams();
 
-        glm::dmat4x4 calcE2B();
-        glm::dmat4x4 getMisalignmentOrientation();
+        void focus(double angle, double designEnergy, double lineDensity, double orderOfDiffraction);
+        double calcDz00(int imageType, double designWavelength, double designAlphaAngle, double designBetaAngle, double designOrderOfDiffraction, double sEntrance, double sExit, double mEntrance, double mExit);
+        double calcFresnelZOffset(double designAlphaAngle, double designBetaAngle, double sEntrance, double sExit);
+        double rzpLineDensityDZ(int imageType, glm::dvec3 intersection, glm::dvec3 normal, double designWavelength, double designAlphaAngle, double designBetaAngle, double designOrderOfDiffraction, double sEntrance, double sExit, double mEntrance, double mExit);
+        void calcMirrorRadius(double entranceArmLength, double exitArmLength);
+        void calcGratingRadius(int mount, double deviation, double entranceArmLength, double exitArmLength);
+        void calcTorusRadius(double incidenceAngle, double sEntrance, double sExit, double mEntrance, double mExit);
 
-        glm::dvec4 calcPosition(GeometricUserParams prev, glm::dvec4 prev_pos, glm::dmat4x4 prev_or);
-        glm::dvec4 calcPosition();
-        glm::dmat4x4 calcOrientation(GeometricUserParams prev, glm::dvec4 prev_pos, glm::dmat4x4 prev_or);
-        glm::dmat4x4 calcOrientation();
-
-        std::vector<double> getMisalignment();
-        
+        double getAlpha();
+        double getBeta();
+        double getRadius();
+        double getShortRadius();
 
     private:
-        double m_incidenceAngle;
-        double m_exitAngle;
-        double m_azimuthalAngle;
-        double m_dist;
-        std::vector<double> m_misalignment;
-            
+        double m_alpha;
+        double m_beta;
+        double m_radius; // only for spheres and toroid (long radius)
+        double m_shortRadius; // only for toroid
     };
-
-} // namespace RAYX
+}

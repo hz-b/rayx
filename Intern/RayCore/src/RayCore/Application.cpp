@@ -5,6 +5,7 @@
 #include "Debug.h"
 #include "Data/Exporter.h"
 #include "UserParameter/GeometricUserParams.h"
+#include "UserParameter/WorldCoordinates.h"
 
 namespace RAYX
 {
@@ -28,13 +29,13 @@ namespace RAYX
         std::shared_ptr<MatrixSource> matSourcePtr = std::make_shared<MatrixSource>(0, "matrix source", 20000, 0, 0.065, 0.04, 0.0, 0.001, 0.001, 100, 0, 1, 0, 0, std::vector<double>{ 0, 0, 0, 0 });
         //std::shared_ptr<Slit> s = std::make_shared<Slit>("slit", 1, 2, 20, 2, 7.5, 10000, 20, 1, m->getPhotonEnergy(), std::vector<double>{2, 1, 0, 0, 0, 0 }, nullptr, GLOBAL);
 
-        GeometricUserParams param = GeometricUserParams(degToRad(10), degToRad(10), 0, 10000, std::vector<double>{1, 2, 3, 0.001, 0.002, 0.003});
+        WorldCoordinates param = WorldCoordinates(degToRad(10), degToRad(10), 0, 10000, std::vector<double>{1, 2, 3, 0.001, 0.002, 0.003});
         glm::dvec4 pos_mirror = param.calcPosition();
         glm::dmat4x4 or_mirror = param.calcOrientation();
         std::shared_ptr<PlaneMirror> pm = std::make_shared<PlaneMirror>("PM", 50, 200, pos_mirror, or_mirror, std::vector<double>{0, 0, 0, 0, 0, 0, 0});
         std::shared_ptr<PlaneMirror> pm2 = std::make_shared<PlaneMirror>("PM", 50, 200, 10, 0, 10000, std::vector<double>{1, 2, 3, 0.001, 0.002, 0.003}, std::vector<double>{0, 0, 0, 0, 0, 0, 0}, nullptr, true);
 
-        GeometricUserParams tor_param = GeometricUserParams(degToRad(10), degToRad(10), 0, 10000, std::vector<double>{0, 0, 0, 0, 0, 0});
+        WorldCoordinates tor_param = WorldCoordinates(degToRad(10), degToRad(10), 0, 10000, std::vector<double>{0, 0, 0, 0, 0, 0});
         glm::dvec4 tor_position = tor_param.calcPosition();
         glm::dmat4x4 tor_orientation = tor_param.calcOrientation();
         std::shared_ptr<RAYX::ToroidMirror> t = std::make_shared<RAYX::ToroidMirror>("toroid", 0, 50, 200, tor_position, tor_orientation, degToRad(10), 10000, 1000, 10000, 1000, std::vector<double>{0, 0, 0, 0, 0, 0, 0});
@@ -42,7 +43,7 @@ namespace RAYX
 
         std::cout << "\n IMAGE PLANE \n" << std::endl;
 
-        GeometricUserParams im_param = GeometricUserParams(0, 0, 0, 1000, std::vector<double>{0, 0, 0, 0, 0, 0});
+        WorldCoordinates im_param = WorldCoordinates(0, 0, 0, 1000, std::vector<double>{0, 0, 0, 0, 0, 0});
         glm::dvec4 pos_imageplane = im_param.calcPosition(tor_param, tor_position, tor_orientation);
         glm::dmat4x4 or_imageplane = im_param.calcOrientation(tor_param, tor_position, tor_orientation);
         std::shared_ptr<ImagePlane> i = std::make_shared<ImagePlane>("Image plane", pos_imageplane, or_imageplane);

@@ -1,194 +1,271 @@
 #include "GeometricUserParams.h"
 
 namespace RAYX
-{   
+{ 
     /**
-     * constructor for geometric user parameters of an object. In this class the world position and orientation is calculated based on the incidence, exit
-     * and azimuthal angles and the distance and misalignment of the element (beam coordinates)
-     * 
-     * angles are given in rad
-     * @param alpha         grazing incidence angle in rad (grazing = measured from the axis not from the normal)
-     * @param beta          grazing exit angle in rad
-     * @param chi           azimuthal angle in rad
-     * @param dist          distance to previous element
-     * @param misalignment  misalignment of the element
+     * for mirrors
+     * @param incidenceAngle        incidence Angle in degree
     */
-    GeometricUserParams::GeometricUserParams(double alpha, double beta, double chi, double dist, std::vector<double> misalignment) 
-     : m_incidenceAngle(alpha), m_exitAngle(beta), m_azimuthalAngle(chi), m_dist(dist), m_misalignment(misalignment) {}
+    GeometricUserParams::GeometricUserParams(double incidenceAngle) 
+    : m_alpha(degToRad(incidenceAngle)), m_beta(degToRad(incidenceAngle)), m_radius(0), m_shortRadius(0) {}
+
+    /**
+     * Plane + Sphere Grating
+     * angles in degree
+     * @param mount                 0 = constant deviation, 1 = constant incidence
+     * @param deviation             deviation angle (= (alpha + abs(beta)) / 2)
+     * @param normalIncidence       normal incidence angle
+     * @param lineDensity           line density of grating in lines/mm
+     * @param designEnergy          energy for which the grating is designed, usually source energy
+     * @param additionalOrder       0/1 whether or not to trace the zero order
+     * @param orderOfDiffraction    order of diffraction that should be traced
+    */
+    GeometricUserParams::GeometricUserParams(int mount, double deviation, double normalIncidence, double lineDensity, double designEnergy, double additionalOrder, int orderOfDiffraction)
+    : m_radius(0), m_shortRadius(0) {
+        double angle;
+        if (mount == 0) { // incidence 
+            angle = deviation;
+        }
+        else if (mount == 1) { // deviation
+            angle = -normalIncidence;
+        }
+        focus(angle, designEnergy, lineDensity, orderOfDiffraction);
+    }
+
+    // RZP
+    GeometricUserParams::GeometricUserParams(int imageType, double grazingIncidence, double sourceWavelength, double designWavelength, double orderOfDiffraction, double designOrderOfDiffraction, 
+        double designAlphaAngle, double designBetaAngle, double mEntrance, double mExit, double sEntrance, double sExit) 
+    : m_radius(0), m_shortRadius(0) {
+        m_alpha = degToRad(grazingIncidence);
+        double DZ = (designOrderOfDiffraction == 0) ? 0 : calcDz00(imageType, designWavelength, degToRad(designAlphaAngle), degToRad(designBetaAngle), designOrderOfDiffraction, sEntrance, sExit, mEntrance, mExit);
+        m_beta = acos(cos(m_alpha) - orderOfDiffraction * sourceWavelength * 1e-6 * DZ);
+    }
 
     GeometricUserParams::GeometricUserParams() {}
     GeometricUserParams::~GeometricUserParams() {}
-    /**
-     * calculates the element to beam coordinate transformation for a given element with (user-)parameters p.alpha, p.beta, p.chi, p.dist, p.misalignment
-     * this matrix is needed to calculate the position/orientation for an element based on the position/orientation of the previous element
-     * @param p         Geometric user params for current element
-     * 
-     * @return 4x4 matrix: element to beam coordinates transformation matrix
-     */
-    glm::dmat4x4 GeometricUserParams::calcE2B() {
-        double cos_c = cos(m_azimuthalAngle);
-        double sin_c = sin(m_azimuthalAngle);
-        double sin_b = sin(m_exitAngle);
-        double cos_b = cos(m_exitAngle);
 
-        
-        glm::dmat4x4 e2b = glm::dmat4x4( cos_c, sin_c, 0, 0, // M_e2b
-                    -sin_c * cos_b, cos_c * cos_b,  sin_b, 0,
-                    sin_c * sin_b, -cos_c * sin_b, cos_b, 0,
-                    0, 0, 0, 1 );
-        
-        double dchi = m_misalignment[5]; // rotation around z-axis
-        double dphi = m_misalignment[4]; // rotation around y-axis
-        double dpsi = -m_misalignment[3]; // rotation around x-axis (has to be negative)
-        double dx = m_misalignment[0];
-        double dy = m_misalignment[1];
-        double dz = m_misalignment[2];
-        glm::dmat4x4 inverseRotation = glm::dmat4x4( cos(dphi) * cos(dchi), sin(dchi) * cos(dphi), -sin(dphi), 0,
-                                -cos(dpsi) * sin(dchi) - sin(dpsi) * sin(dphi) * cos(dchi), cos(dpsi) * cos(dchi) - sin(dpsi) * sin(dphi) * sin(dchi), -sin(dpsi) * cos(dphi), 0,
-                                -sin(dpsi) * sin(dchi) + cos(dpsi) * sin(dphi) * cos(dchi), sin(dpsi) * cos(dchi) + cos(dpsi) * sin(dphi) * sin(dchi), cos(dpsi) * cos(dphi), 0,
-                                0,0,0,1 );
-        glm::dmat4x4 inverseTranslation = glm::dmat4x4( 1,0,0,0,
-                                0,1,0,0,
-                                0,0,1,0,
-                                dx, dy, dz, 1 );
-        glm::dmat4x4 inverseMisalignmentMatrix = inverseRotation * inverseTranslation;
-        
-        e2b = e2b * inverseMisalignmentMatrix;
-        return glm::transpose(e2b);
-    }
-
-    /**
-     * calculates the rotation part of the misalignment of an optical element
-     * @param misalignment          contains misalignment paramters for the optical element (dx, dy, dz, dpsi, dphi, dchi)
-     * 
-     * @return 4x4 homogeneous rotation matrix 
-     */
-    glm::dmat4x4 GeometricUserParams::getMisalignmentOrientation() {
-        double dchi = m_misalignment[5]; // rotation around z-axis
-        double dphi = m_misalignment[4]; // rotation around y-axis
-        double dpsi = -m_misalignment[3]; // rotation around x-axis (has to be negative)
-        glm::dmat4x4 misalignmentMatrix = glm::dmat4x4( 
-                                cos(dphi) * cos(dchi), -cos(dpsi) * sin(dchi) - sin(dpsi) * sin(dphi) * cos(dchi), -sin(dpsi) * sin(dchi) + cos(dpsi) * sin(dphi) * cos(dchi), 0,
-                                sin(dchi) * cos(dphi), cos(dpsi) * cos(dchi) - sin(dpsi) * sin(dphi) * sin(dchi), sin(dpsi) * cos(dchi) + cos(dpsi) * sin(dphi) * sin(dchi), 0,
-                                -sin(dphi), -sin(dpsi) * cos(dphi), cos(dpsi) * cos(dphi), 0,
-                                0, 0, 0, 1 );
-        return glm::transpose(misalignmentMatrix);
-    }
-
-    /**
-     * calculates the orientation (rotation with respect to the origin) in world coordinates
-     * @param current           geometrical parameters of current optical element
-     * @param prev              geometrical parameters of previous optical element (reference element)
-     * @param prev_pos          world coordinate position of previous element
-     * @param prev_or           world coordiante orientation of previous element.
-     * 
-     * @return 4x4 homogeneous orientation of the current element with respect to the origin 
-     */
-    glm::dmat4x4 GeometricUserParams::calcOrientation(GeometricUserParams prev, glm::dvec4 prev_pos, glm::dmat4x4 prev_or) 
-    {
-        glm::dmat4x4 current_misalignmentOr = getMisalignmentOrientation(); // local rotational misalignment
-        glm::dmat4x4 current_orientation = calcOrientation(); // orientation of new element in local coordinate system
-        glm::dmat4x4 prev_e2b = prev.calcE2B(); // rotation of new element coordinate system with respect to previous element
-
-        // new global orientation = previous global orientation * rotation of new element coordinate system with respect to previous element coordinate system
-        // * orientation of new element in its element coordinate system (misalignment * local orientation)
-        current_orientation = prev_or * prev_e2b * current_misalignmentOr * current_orientation;
-        
-        std::cout << "calculated orientation from previous" << std::endl;
-        for(int i = 0; i<4; i++) {
-            for(int j = 0; j<4; j++) {
-                std::cout << current_orientation[i][j] << ", ";
+    void GeometricUserParams::focus(double angle, double designEnergy, double lineDensity, double orderOfDiffraction) {
+        // from routine "focus" in RAYX.FOR
+        double theta = degToRad(abs(angle));
+        double alph, bet;
+        double a = abs(hvlam(designEnergy)) * abs(lineDensity) * orderOfDiffraction * 1e-6;
+        std::cout << "deviation " << angle << "theta" << theta << std::endl;
+        if (angle <= 0) { // constant alpha mounting
+            double arg = a - sin(theta);
+            if (abs(arg) >= 1) { // cannot calculate alpha & beta
+                alph = 0;
+                bet = 0;
             }
-            std::cout << std::endl;
-        }
-        return current_orientation;
-    }
-
-    /**
-     * calculates the orientation of the optical element with respect to the origin of the world coordinate system
-     * @param current               geometrical user parameters of the current optical element
-     * 
-     * @return 4x4 homogeneous orientation of the current element with respect to the origin 
-     */
-    glm::dmat4x4 GeometricUserParams::calcOrientation() 
-    {
-        double cos_c = cos(m_azimuthalAngle);
-        double sin_c = sin(m_azimuthalAngle);
-        double cos_a = cos(m_incidenceAngle);
-        double sin_a = sin(m_incidenceAngle);
-
-        glm::dmat4x4 misalignmentOr = getMisalignmentOrientation();
-        /*glm::dmat4x4 orientation = glm::dmat4x4(cos_c, -sin_c * cos_a, -sin_c * sin_a, 0, // M_b2e
-                                    sin_c, cos_c * cos_a, sin_a * cos_c, 0,
-                                    0, -sin_a, cos_a, 0,
-                                    0, 0, 0, 1 );*/
-        glm::dmat4x4 orientation = glm::dmat4x4(
-                                    cos_c,              sin_c,          0,      0, // M_b2e
-                                    -sin_c * cos_a,     cos_c * cos_a,  -sin_a, 0,
-                                    -sin_c * sin_a,     sin_a * cos_c,  cos_a,  0,
-                                    0,                  0,              0,      1 );
-                                    
-        orientation = orientation * misalignmentOr;
-        std::cout << "calculated orientation" << std::endl;
-        for(int i = 0; i<4; i++) {
-            for(int j = 0; j<4; j++) {
-                std::cout << orientation[i][j] << ", ";
+            else {
+                alph = theta;
+                bet = asin(arg);
             }
-            std::cout << std::endl;
         }
-        return orientation;
+        else {  // constant alpha & beta mounting
+            theta = theta / 2;
+            double arg = a / 2 / cos(theta);
+            if (abs(arg) >= 1) {
+                alph = 0;
+                bet = 0;
+            }
+            else {
+                bet = asin(arg) - theta;
+                alph = 2 * theta + bet;
+            }
+        }
+        std::cout << alph << ", " << bet << " angles" << std::endl;
+        m_alpha = (PI / 2 - alph);
+        m_beta = (PI / 2 - abs(bet));
     }
 
     /**
-     * calculates the position of an optical element based on its geometric paramters and the geometric parameters of the previous element
-     * @param current           geometric parameters of the current optical element
-     * @param prev              geometric parameters of the previous optical element
-     * @param prev_pos          world coordinate position of the previous element in homogeneous coordinates (4d vector)
-     * @param prev_or           world coordiante orientation (rotation) of the previous element in homogenous coordinates (4x4 matrix)
-     * 
-     * @return position of current element in homogeneous world coordinates.
+     * needed for calculating exit angle beta for the RZP
+     * @param imageType                 point to point vs astigmatic 2 astigmatic
+     * @param designWavelength
+     * @param designAlphaAngle          design incidence angle in degree
+     * @param designBetaAngle           design exit angle in degree
+     * @param designOrderOfDiffraction
+     * @param sEntrance                 sagittal entrance arm length
+     * @param sExit                     sagittal exit arm length
+     * @param mEntrance
+     * @param mExit
+     * @return Dz00 = line density at 0,0??
      */
-    glm::dvec4 GeometricUserParams::calcPosition(GeometricUserParams prev, glm::dvec4 prev_pos, glm::dmat4x4 prev_or) 
-    {
-        glm::dvec4 local_position = glm::dvec4(0.0, 0.0, m_dist, 0.0); // position of new element with respect to the previous element
-        glm::dmat4x4 orientation = calcOrientation();
-
-        glm::dvec4 new_offset = glm::dvec4(m_misalignment[0], m_misalignment[1], m_misalignment[2], 0);
-        glm::dvec4 prev_offset = glm::dvec4(prev.getMisalignment()[0], prev.getMisalignment()[1], prev.getMisalignment()[2], 0);
-        glm::dmat4x4 prev_e2b = prev.calcE2B();
-        
-        glm::dvec4 position = prev_pos - prev_or * prev_offset; // remove misalignemnt from position of previous element
-        position = position + prev_or * prev_e2b * local_position; // add the distance from previous to new element to the position of the previous element
-        position = position + orientation * new_offset; // add misalignment of new element to the position      
-        
-        for(int i = 0; i<4; i++) {
-            std::cout << position[i] << ", " << std::endl;
-        }
-        return position;
+    double GeometricUserParams::calcDz00(int imageType, double designWavelength, double designAlphaAngle, double designBetaAngle, double designOrderOfDiffraction, double sEntrance, double sExit, double mEntrance, double mExit) {
+        // double fresnelOffset = calcFresnelZOffset(designBetaAngle, designAlphaAngle, sEntrance, sExit); // overwrite given Fresneloffset 
+        // RAYX-UI calls rzpLineDensity function in fortran
+        double DZ = rzpLineDensityDZ(imageType, glm::dvec3(0, 0, 0), glm::dvec3(0, 1, 0), designWavelength, degToRad(designAlphaAngle), degToRad(designBetaAngle), designOrderOfDiffraction, sEntrance, sExit, mEntrance, mExit);
+        return DZ;
     }
 
     /**
-     * calculates the position of an optical element that does not have a predecessor / the geometrical parameters are with respect to the origin (light source)
-     * @param current           geometrical parameters with respect to the origin
-     * 
-     * @return position of optical element in homogeneous world coordinates
+     * Calculate fresnel z offset if DESIGN_TYPE == BETA from design angles.
+     * @param designBetaAngle
+     * @param designAlphaAngle
+     * @param sEntrance             sagittal entrance arm length
+     * @param sExit                 sagittal exit arm length
+     * @return fresnelZOffset
     */
-    glm::dvec4 GeometricUserParams::calcPosition() 
-    {
-        glm::dvec4 position = glm::dvec4(0.0, 0.0, m_dist, 1.0);
-        glm::dmat4x4 orientation = calcOrientation();
+    double GeometricUserParams::calcFresnelZOffset(double designAlphaAngle, double designBetaAngle, double sEntrance, double sExit) {
+        double RIcosa = sEntrance * cos(designAlphaAngle);
+        double ROcosb = sExit * cos(designBetaAngle);
+        double RIsina = sEntrance * sin(designAlphaAngle);
+        double ROsinb = sExit * sin(designBetaAngle);
+        double tanTheta = (RIsina + ROsinb) / (RIcosa + ROcosb);
+        return (RIsina / tanTheta) - RIcosa;
+    }
 
-        glm::dvec4 offset = glm::dvec4(m_misalignment[0], m_misalignment[1], m_misalignment[2], 0);
-        position = position  + orientation * offset;
+    /**
+     * needed for calculating exit angle of RZP
+     * calculates the line density at one specific point (x,y,z) for a given normal at this point and the design wavelength
+     * @param imageType
+     * @param intersection          coordinates of intersection point
+     * @param normal                normal at intersection point
+     * @param designWavelength      design wavelength of rzp
+     * @param designAlphaAngle
+     * @param designBetaAngle
+     * @param designOrderOfDiffraction
+     * @param sEntrance
+     * @param sExit
+     * @param mEntrance
+     * @param mExit
+     * @return line density on RZP in Z direction for given conditions       
+     */
+    double GeometricUserParams::rzpLineDensityDZ(int imageType, glm::dvec3 intersection, glm::dvec3 normal, double designWavelength, double designAlphaAngle, double designBetaAngle, double designOrderOfDiffraction, double sEntrance, double sExit, double mEntrance, double mExit) {
+        double s_beta = sin(designAlphaAngle);
+        double c_beta = cos(designBetaAngle);
+        double s_alpha = sin(designAlphaAngle);
+        double c_alpha = cos(designBetaAngle);
 
-        for(int i = 0; i<4; i++) {
-            std::cout << position[i] << ", " << std::endl;
+        double risag = sEntrance;
+        double rosag = sExit;
+        double rimer = mEntrance;
+        double romer = mExit;
+
+        double DZ;//, DX;
+        double xi;
+        double yi;
+        double zi;
+        double xm;
+        double ym;
+        double zm;
+
+        if (imageType == 0) { // point to point (standard)
+            if (normal.x == 0 && normal.z == 0) { // plane
+                zi = -(risag * c_alpha + intersection.z);
+                xi = intersection.x;
+                yi = risag * s_alpha;
+                zm = rosag * c_beta - intersection.z;
+                xm = intersection.x;
+                ym = rosag * s_beta;
+            }
+            else { // more general case, can be reduced to the plane with normal = (0,1,0) and y = 0
+                zi = normal.x * normal.z * intersection.x - (normal.x * normal.x + normal.y * normal.y) * (intersection.z + risag * c_alpha) + normal.y * normal.z * (intersection.y - risag * s_alpha);
+                xi = (normal.y * intersection.x - normal.x * intersection.y + normal.x * risag * s_alpha);
+                yi = -(normal.x * intersection.x) - normal.y * intersection.y - normal.z * intersection.z - normal.z * risag * c_alpha + normal.y * risag * s_alpha;
+                zm = normal.x * normal.z * intersection.x + (normal.x * normal.x + normal.y * normal.y) * (-intersection.z + rosag * c_beta) + normal.y * normal.z * (intersection.y - rosag * s_beta);
+                xm = (normal.y * intersection.x - normal.x * intersection.y + normal.x * rosag * s_beta);
+                ym = -(normal.x * intersection.x) - normal.y * intersection.y - normal.z * intersection.z + normal.z * rosag * c_beta + normal.y * rosag * s_beta;
+            }
         }
-        return position;
+        else if (imageType == 1) { // astigmatic to astigmatix
+            double s_rim = rimer < 0 ? -1 : 1;
+            double s_rom = romer < 0 ? -1 : 1;
+            double c_2alpha = cos(2 * designAlphaAngle);
+            double c_2beta = cos(2 * designBetaAngle);
+            if (normal.x == 0 && normal.z == 0) { //   !plane
+
+                zi = s_rim * (rimer * c_alpha + intersection.z);
+                xi = (s_rim * intersection.x * (c_alpha * intersection.z - 2 * s_alpha * s_alpha * rimer + s_alpha * intersection.y + rimer)) / (c_alpha * intersection.z - 2 * s_alpha * s_alpha * risag + s_alpha * intersection.y + risag);
+                yi = s_rim * (-rimer * s_alpha + intersection.y);
+                zm = s_rom * (romer * c_beta - intersection.z);
+                xm = (s_rom * intersection.x * (-c_beta * intersection.z - 2 * s_beta * s_beta * romer + s_beta * intersection.y + romer)) / (c_beta * intersection.z + 2 * s_beta * s_beta * rosag - s_beta * intersection.y - rosag);
+                ym = s_rom * (romer * s_beta - intersection.y);
+            }
+            else {
+                double denominator = intersection.z * c_alpha + risag * c_2alpha + intersection.y * s_alpha;
+                double nominator = intersection.x * (intersection.z * c_alpha + rimer * c_2alpha + intersection.y * s_alpha);
+                zi = s_rim * ((normal.x * normal.x + normal.y * normal.y) * (intersection.z + rimer * c_alpha) - normal.y * normal.z * (intersection.y - rimer * s_alpha) - (normal.x * normal.z * nominator) / denominator);
+                xi = s_rim * (-(normal.x * intersection.y) + normal.x * rimer * s_alpha + (normal.y * nominator) / denominator);
+                yi = s_rim * (normal.z * (intersection.z + rimer * c_alpha) + normal.y * (intersection.y - rimer * s_alpha) + (normal.x * nominator) / denominator);
+
+                denominator = (-(intersection.z * c_beta) + rosag * c_2beta + intersection.y * s_beta);
+                nominator = intersection.x * (-(intersection.z * c_beta) + romer * c_2beta + intersection.y * s_beta);
+                zm = s_rom * ((normal.x * normal.x + normal.y * normal.y) * (-intersection.z + romer * c_beta) + normal.y * normal.z * (intersection.y - romer * s_beta) + (normal.x * normal.z * nominator) / denominator);
+                xm = s_rom * (normal.x * (intersection.y - romer * s_beta) - (normal.y * nominator) / denominator);
+                ym = s_rom * (normal.z * (-intersection.z + romer * c_beta) + normal.y * (-intersection.y + romer * s_beta) - (normal.x * nominator) / denominator);
+            }
+            double ris = sqrt(zi * zi + xi * xi + yi * yi);
+            double rms = sqrt(zm * zm + xm * xm + ym * ym);
+
+            double ai = zi / ris;
+            double am = -zm / rms;
+            
+            DZ = (ai + am) / (designWavelength * designOrderOfDiffraction);
+            
+            return DZ;
+        }
+
+        double ris = sqrt(zi * zi + xi * xi + yi * yi);
+        double rms = sqrt(zm * zm + xm * xm + ym * ym);
+
+        //double ai = xi / ris;
+        //double am = xm / rms;
+        double bi = zi / ris;
+        double bm = zm / rms;
+
+
+        //DX = (ai + am) / (WL * m_designOrderOfDiffraction);
+        DZ = (-bi - bm) / (designWavelength * designOrderOfDiffraction);
+
+        return DZ;
+
+    }
+    
+    // calculate radius for sphere mirror
+    void GeometricUserParams::calcMirrorRadius(double entranceArmLength, double exitArmLength) {
+        m_radius = 2.0 / sin(m_alpha) / (1.0 / entranceArmLength + 1.0 / exitArmLength);
     }
 
-    std::vector<double> GeometricUserParams::getMisalignment() {
-        return m_misalignment;
+    // calculate radius for sphere grating
+    void GeometricUserParams::calcGratingRadius(int mount, double deviation, double entranceArmLength, double exitArmLength) {
+        if (mount == 0) { // deviation
+            double theta = deviation > 0 ? (PI - deviation) / 2 : PI / 2 + deviation;
+            m_radius = 2.0 / sin(theta) / (1.0 / entranceArmLength + 1.0 / exitArmLength);
+        }
+        else if (mount == 1) { // incidence
+            double ca = cos(m_alpha);
+            double cb = cos(m_beta);
+            m_radius = (ca + cb) / ((ca * ca) / entranceArmLength + (cb * cb) / exitArmLength);
+        }
     }
 
+    // calculate long and short radius for Torus
+    void GeometricUserParams::calcTorusRadius(double incidenceAngle, double sEntrance, double sExit, double mEntrance, double mExit) {
+        m_radius = 2.0 / sin(incidenceAngle) / (1.0 / mEntrance + 1.0 / mExit);
+
+        if (mEntrance == 0.0 || mExit == 0.0 || incidenceAngle == 0.0) {
+            m_shortRadius = 0.0;
+        }
+        else {
+            m_shortRadius = 2.0 * sin(incidenceAngle) / (1.0 / sEntrance + 1.0 / sExit);
+        }
+    }
+
+
+    double GeometricUserParams::getAlpha() {
+        return m_alpha;
+    }
+
+    double GeometricUserParams::getBeta() {
+        return m_beta;
+    }
+
+    double GeometricUserParams::getRadius() {
+        return m_radius;
+    }
+
+    double GeometricUserParams::getShortRadius() {
+        return m_shortRadius;
+    }
 }
