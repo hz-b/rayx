@@ -20,15 +20,15 @@ namespace RAYX
         double getBeamstopHeight() const;
         double getWaveLength() const;
 
+        enum CENTRAL_BEAMSTOP { CS_NONE, CS_RECTANGLE, CS_ELLIPTICAL }; ///< central beamstop shape
+
     private:
-        enum GEOMETRICAL_SHAPE { GS_RECTANGLE, GS_ELLIPTICAL };
         GEOMETRICAL_SHAPE m_shape;
 
         // TODO(Jannis): Is this necessary?
         double m_waveLength;  ///< from lightsource
 
         // TODO(Jannis): Extra class maybe?
-        enum CENTRAL_BEAMSTOP { CS_NONE, CS_RECTANGLE, CS_ELLIPTICAL }; ///< central beamstop shape
         CENTRAL_BEAMSTOP m_centralBeamstop;
         double m_beamstopWidth;
         double m_beamstopHeight;

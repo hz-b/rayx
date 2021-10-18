@@ -16,6 +16,7 @@ namespace RAYX
         ~PointSource();
 
         enum SOURCE_DIST { SD_HARDEDGE, SD_GAUSSIAN };
+
         std::vector<Ray> getRays();
         double getCoord(const SOURCE_DIST l, const double extent);
         double getSourceDepth() const;

@@ -18,7 +18,7 @@ double hvlam(double x) {
  *
  *  @param degree Input in degree, to calculate radians from
 */
-double rad(double degree) {
+double degToRad(double degree) {
     return degree * PI / 180;
 }
 
@@ -27,7 +27,7 @@ double rad(double degree) {
  *
  *  @param rad Input in radians, to calculate degree from
 */
-double degree(double rad) {
+double radToDeg(double rad) {
     return rad * 180 / PI;
 }
 

@@ -27,7 +27,7 @@ namespace RAYX
      * @param global                        if tracing should be done in global or ray coordinates
     */
     PlaneGrating::PlaneGrating(const char* name, const int mount, const double width, const double height, const double deviation, const double normalIncidence, const double azimuthal, const double distanceToPreceedingElement, const double designEnergyMounting, const double lineDensity, const double orderOfDiffraction, const double fixFocusConstantCFF, const int additionalZeroOrder, const std::vector<double> misalignmentParams, const std::vector<double> vls, const std::vector<double> slopeError, const std::shared_ptr<OpticalElement> previous, bool global)
-        : OpticalElement(name, width, height, rad(azimuthal), distanceToPreceedingElement, slopeError, previous),
+        : OpticalElement(name, width, height, degToRad(azimuthal), distanceToPreceedingElement, slopeError, previous),
         m_designEnergyMounting(designEnergyMounting),
         m_lineDensity(lineDensity),
         m_orderOfDiffraction(orderOfDiffraction)
@@ -112,7 +112,7 @@ namespace RAYX
 
     void PlaneGrating::focus(double angle) {
         // from routine "focus" in RAYX.FOR
-        double theta = rad(abs(angle));
+        double theta = degToRad(abs(angle));
         double alph, bet;
         double a = abs(hvlam(m_designEnergyMounting)) * abs(m_lineDensity) * m_orderOfDiffraction * 1e-6;
         std::cout << "deviation " << angle << "theta" << theta << std::endl;

@@ -34,7 +34,6 @@ namespace RAYX
         double m_entranceArmLength;
         double m_exitArmLength;
         double m_deviation; // not always calculated
-        enum GRATING_MOUNT { GM_DEVIATION, GM_INCIDENCE };
         GRATING_MOUNT m_gratingMount;
         double m_designEnergyMounting;
         double m_lineDensity;

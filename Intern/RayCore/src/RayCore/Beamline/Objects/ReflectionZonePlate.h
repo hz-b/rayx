@@ -64,6 +64,12 @@ namespace RAYX
         double getDesignEnergyMounting() const; // derived from source?
         void printInfo() const;
 
+        enum CURVATURE_TYPE { CT_PLANE, CT_TOROIDAL, CT_SPHERICAL }; // influences surface paramters for eg quadric function or (if torus) newton iteration
+        enum DESIGN_TYPE { DT_ZOFFSET, DT_BETA }; //TODO(Jannis): remove (default is DT_BETA)
+        enum ELEMENTOFFSET_TYPE { EZ_MANUAL, EZ_BEAMDIVERGENCE }; //TODO(Jannis): remove (included in world coordinates)
+        enum IMAGE_TYPE { IT_POINT2POINT, IT_ASTIGMATIC2ASTIGMATIC };
+        enum RZP_TYPE { RT_ELLIPTICAL, RT_MERIODIONAL };
+
     private:
         // User Parameter, 
         double m_incidenceMainBeamLength;
@@ -108,28 +114,21 @@ namespace RAYX
         double m_R2ArmLength; 
         double m_lineDensity;
 
-        enum GRATING_MOUNT { GM_DEVIATION, GM_INCIDENCE }; // influences incidence and exit angle calculation (moved somewhere else)
         GRATING_MOUNT m_gratingMount;
         
         
         // TODO(Jannis): move
-        enum GEOMETRICAL_SHAPE { GS_RECTANGLE, GS_ELLIPTICAL }; // influences wastebox function in shader
         GEOMETRICAL_SHAPE m_geometricalShape;
-        enum CURVATURE_TYPE { CT_PLANE, CT_TOROIDAL, CT_SPHERICAL }; // influences surface paramters for eg quadric function or (if torus) newton iteration
         CURVATURE_TYPE m_curvatureType;
 
         // set to default for now
         //int m_designType;
         int m_derivationMethod;
         //int m_elementOffsetType;
-        enum DESIGN_TYPE { DT_ZOFFSET, DT_BETA }; //TODO(Jannis): remove (default is DT_BETA)
         DESIGN_TYPE m_designType;
-        enum ELEMENTOFFSET_TYPE { EZ_MANUAL, EZ_BEAMDIVERGENCE }; //TODO(Jannis): remove (included in world coordinates)
         ELEMENTOFFSET_TYPE m_elementOffsetType;
         // TODO(Jannis): have a look at this later
-        enum IMAGE_TYPE { IT_POINT2POINT, IT_ASTIGMATIC2ASTIGMATIC };
         IMAGE_TYPE m_imageType;
-        enum RZP_TYPE { RT_ELLIPTICAL, RT_MERIODIONAL };
         RZP_TYPE m_rzpType;
         double m_additionalOrder;
 

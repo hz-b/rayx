@@ -20,10 +20,10 @@ namespace RAYX
      * orderOfDefraction =
     */
     SphereGrating::SphereGrating(const char* name, int mount, double width, double height, double deviation, double normalIncidence, double azimuthal, double distanceToPreceedingElement, double entranceArmLength, double exitArmLength, double designEnergyMounting, double lineDensity, double orderOfDiffraction, std::vector<double> misalignmentParams, std::vector<double> vls, std::vector<double> slopeError, std::shared_ptr<OpticalElement> previous, bool global)
-        : OpticalElement(name, width, height, rad(azimuthal), distanceToPreceedingElement, slopeError, previous),
+        : OpticalElement(name, width, height, degToRad(azimuthal), distanceToPreceedingElement, slopeError, previous),
         m_entranceArmLength(entranceArmLength),
         m_exitArmLength(exitArmLength),
-        m_deviation(rad(deviation)),
+        m_deviation(degToRad(deviation)),
         m_designEnergyMounting(designEnergyMounting),
         m_lineDensity(lineDensity),
         m_orderOfDiffraction(orderOfDiffraction),
@@ -79,7 +79,7 @@ namespace RAYX
 
     void SphereGrating::focus(double angle) {
         // from routine "focus" in RAYX.FOR
-        double theta = rad(abs(angle));
+        double theta = degToRad(abs(angle));
         double alph, bet;
         if (angle <= 0) { // constant alpha mounting
             double arg = m_a - sin(theta);

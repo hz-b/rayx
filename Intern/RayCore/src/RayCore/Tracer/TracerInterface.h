@@ -16,8 +16,6 @@ namespace RAYX
     class RAYX_API TracerInterface
     {
     public:
-        enum m_dataType { RayType, QuadricType };
-
         TracerInterface();
         TracerInterface(int numElements, int numRays);
         ~TracerInterface();
@@ -28,10 +26,15 @@ namespace RAYX
 
 
         bool run(double translationXerror, double translationYerror, double translationZerror);
+
+        enum DATA_TYPE { DT_RAY_TYPE, DT_QUADRIC_TYPE };
+
     private:
         int m_numElements;
         int m_numRays;
         // TODO(Jannis): should be generic Tracer for interchangeability of tracers
         VulkanTracer m_RayTracer;
     };
+
+
 } // namespace RAYX

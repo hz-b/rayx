@@ -34,6 +34,9 @@ namespace RAYX
         double getA44();
         double getHalfAxisC();
 
+        enum FIGURE_ROTATION { FR_YES, FR_PLANE, FR_A11 };
+        enum COORDINATESYSTEM_TYPE { CS_CURVATURE, CS_MIRROR };
+
     private:
         double m_radius;
         // grazing incidence, in rad
@@ -52,9 +55,7 @@ namespace RAYX
         double d_a33;
         double d_a44;
 
-        enum FIGURE_ROTATION { FR_YES, FR_PLANE, FR_A11 };
         FIGURE_ROTATION m_figureRotation;
-        enum COORDINATESYSTEM_TYPE { CS_CURVATURE, CS_MIRROR };
         COORDINATESYSTEM_TYPE m_misalignmentCoordSys;
         double m_a11; // param for quadric funciton, given by user
 

@@ -52,7 +52,7 @@ namespace RAYX
      *
     */
     ToroidMirror::ToroidMirror(const char* name, const int geometricShape, const double width, const double height, const double grazingIncidence, const double azimuthal, const double distanceToPreceedingElement, const double mEntrance, const double mExit, const double sEntrance, const double sExit, const std::vector<double> misalignmentParams, const std::vector<double> slopeError, const std::shared_ptr<OpticalElement> previous, bool global)
-        : OpticalElement(name, { 0,0,0,0, 0,0,0,0, 0,0,0,0, 0,0,0,0 }, width, height, rad(grazingIncidence), rad(azimuthal), rad(grazingIncidence), distanceToPreceedingElement, misalignmentParams, { 0,0,0,0,0,0 }, slopeError, previous, global),
+        : OpticalElement(name, { 0,0,0,0, 0,0,0,0, 0,0,0,0, 0,0,0,0 }, width, height, degToRad(grazingIncidence), degToRad(azimuthal), degToRad(grazingIncidence), distanceToPreceedingElement, misalignmentParams, { 0,0,0,0,0,0 }, slopeError, previous, global),
         m_sagittalEntranceArmLength(sEntrance),
         m_sagittalExitArmLength(sExit),
         m_meridionalEntranceArmLength(mEntrance),
@@ -64,7 +64,7 @@ namespace RAYX
         if (m_geometricalShape == GS_ELLIPTICAL) {
             setDimensions(-width, -height);
         }
-        calcRadius(rad(grazingIncidence)); // calculate the radius
+        calcRadius(degToRad(grazingIncidence)); // calculate the radius
         setSurface(std::make_unique<Toroid>(std::vector<double>{m_longRadius, m_shortRadius,0,0, 0,1,0,0, 0,0,1,0, 6,0,0,0}));
     }
 
