@@ -28,6 +28,7 @@ namespace RAYX
         m_vls(vls)
     {
         double icurv = 1;
+        m_gratingMount = mount == 0 ? GM_DEVIATION : GM_INCIDENCE;
         setSurface(std::make_unique<Quadric>(std::vector<double>{1,0,0,0, icurv,1,0,-radius, 0,0,1,0, 2,0,0,0}));
         setElementParameters({
             0, 0, m_lineDensity, m_orderOfDiffraction,

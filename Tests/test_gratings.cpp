@@ -3,6 +3,7 @@
 #include "Beamline/Beamline.h"
 #include "Beamline/Objects/PlaneGrating.h"
 #include "Beamline/Objects/SphereGrating.h"
+#include "Beamline/OpticalElement.h"
 
 #include "UserParameter/WorldCoordinates.h"
 #include "UserParameter/GeometricUserParams.h"
