@@ -7,7 +7,7 @@
 #include "Beamline/Objects/SphereMirror.h"
 #include "Beamline/Objects/MatrixSource.h"
 #include "Tracer/TracerInterface.h"
-#include "UserParameter/GeometricUserParams.h"
+#include "UserParameter/WorldCoordinates.h"
 #include "Core.h"
 #include "Ray.h"
 // #include "Tracer/TracerInterface.h"
@@ -1032,12 +1032,12 @@ TEST(Tracer, getThetaTest) {
 // use name of optical element as file name
 
 TEST(opticalElements, planeMirrorDefault) {
-    RAYX::GeometricUserParams pm_param = RAYX::GeometricUserParams(rad(10), rad(10), rad(7.5), 10000, std::vector<double>{ 0,0,0, 0,0,0 });
+    RAYX::WorldCoordinates pm_param = RAYX::WorldCoordinates(degToRad(10), degToRad(10), degToRad(7.5), 10000, std::vector<double>{ 0,0,0, 0,0,0 });
     glm::dvec4 pos_mirror = pm_param.calcPosition();
     glm::dmat4x4 or_mirror = pm_param.calcOrientation();
     std::shared_ptr<RAYX::PlaneMirror> plM = std::make_shared<RAYX::PlaneMirror>("PlaneMirrorDef", 50, 200, pos_mirror, or_mirror, zeros7); // {1,2,3,0.01,0.02,0.03}
     
-    RAYX::GeometricUserParams ip_param = RAYX::GeometricUserParams(0, 0, 0, 1000, std::vector<double>{ 0,0,0, 0,0,0 });
+    RAYX::WorldCoordinates ip_param = RAYX::WorldCoordinates(0, 0, 0, 1000, std::vector<double>{ 0,0,0, 0,0,0 });
     glm::dvec4 pos_ip = ip_param.calcPosition(pm_param, pos_mirror, or_mirror);
     glm::dmat4x4 or_ip = ip_param.calcOrientation(pm_param, pos_mirror, or_mirror);
     std::shared_ptr<RAYX::ImagePlane> ip = std::make_shared<RAYX::ImagePlane>("Image Plane", pos_ip, or_ip); // {1,2,3,0.01,0.02,0.03}
@@ -1050,12 +1050,12 @@ TEST(opticalElements, planeMirrorDefault) {
 }
 
 TEST(opticalElements, planeMirrorMis) {
-    RAYX::GeometricUserParams pm_param = RAYX::GeometricUserParams(rad(10), rad(10), 0, 10000, std::vector<double>{ 1,2,3,0.001,0.002,0.003 });
+    RAYX::WorldCoordinates pm_param = RAYX::WorldCoordinates(degToRad(10), degToRad(10), 0, 10000, std::vector<double>{ 1,2,3,0.001,0.002,0.003 });
     glm::dvec4 pos_mirror = pm_param.calcPosition();
     glm::dmat4x4 or_mirror = pm_param.calcOrientation();
     std::shared_ptr<RAYX::PlaneMirror> plM = std::make_shared<RAYX::PlaneMirror>("PlaneMirrorMis", 50, 200, pos_mirror, or_mirror, zeros7); // {1,2,3,0.01,0.02,0.03}
     
-    RAYX::GeometricUserParams ip_param = RAYX::GeometricUserParams(0, 0, 0, 1000, std::vector<double>{ 0,0,0, 0,0,0 });
+    RAYX::WorldCoordinates ip_param = RAYX::WorldCoordinates(0, 0, 0, 1000, std::vector<double>{ 0,0,0, 0,0,0 });
     glm::dvec4 pos_ip = ip_param.calcPosition(pm_param, pos_mirror, or_mirror);
     glm::dmat4x4 or_ip = ip_param.calcOrientation(pm_param, pos_mirror, or_mirror);
     std::shared_ptr<RAYX::ImagePlane> ip = std::make_shared<RAYX::ImagePlane>("Image Plane", pos_ip, or_ip);
@@ -1067,13 +1067,13 @@ TEST(opticalElements, planeMirrorMis) {
 }
 
 TEST(opticalElements, sphereMirror) {
-    double grazingIncidence = rad(10);
-    RAYX::GeometricUserParams sm_param = RAYX::GeometricUserParams(grazingIncidence, grazingIncidence, 0, 10000, std::vector<double>{ 0,0,0, 0,0,0 });
+    double grazingIncidence = degToRad(10);
+    RAYX::WorldCoordinates sm_param = RAYX::WorldCoordinates(grazingIncidence, grazingIncidence, 0, 10000, std::vector<double>{ 0,0,0, 0,0,0 });
     glm::dvec4 pos_mirror = sm_param.calcPosition();
     glm::dmat4x4 or_mirror = sm_param.calcOrientation();
-    std::shared_ptr<RAYX::SphereMirror> s = std::make_shared<RAYX::SphereMirror>("SphereMirrorDefault", 50, 200, degree(grazingIncidence), pos_mirror, or_mirror, 10000, 1000, zeros7);
+    std::shared_ptr<RAYX::SphereMirror> s = std::make_shared<RAYX::SphereMirror>("SphereMirrorDefault", 50, 200, radToDeg(grazingIncidence), pos_mirror, or_mirror, 10000, 1000, zeros7);
     
-    RAYX::GeometricUserParams ip_param = RAYX::GeometricUserParams(0, 0, 0, 1000, std::vector<double>{ 0,0,0, 0,0,0 });
+    RAYX::WorldCoordinates ip_param = RAYX::WorldCoordinates(0, 0, 0, 1000, std::vector<double>{ 0,0,0, 0,0,0 });
     glm::dvec4 pos_ip = ip_param.calcPosition(sm_param, pos_mirror, or_mirror);
     glm::dmat4x4 or_ip = ip_param.calcOrientation(sm_param, pos_mirror, or_mirror);
     std::shared_ptr<RAYX::ImagePlane> ip = std::make_shared<RAYX::ImagePlane>("Image Plane", pos_ip, or_ip);
@@ -1087,12 +1087,12 @@ TEST(opticalElements, sphereMirror) {
 TEST(opticalElements, planeGratingDevDefault) {
     double incidenceAngle = 1.4773068838645145;
     double exitAngle = 1.4897528445258457;
-    RAYX::GeometricUserParams pg_param = RAYX::GeometricUserParams(incidenceAngle, exitAngle, 0, 10000, std::vector<double>{ 0,0,0, 0,0,0 });
+    RAYX::WorldCoordinates pg_param = RAYX::WorldCoordinates(incidenceAngle, exitAngle, 0, 10000, std::vector<double>{ 0,0,0, 0,0,0 });
     glm::dvec4 position = pg_param.calcPosition();
     glm::dmat4x4 orientation = pg_param.calcOrientation();
     std::shared_ptr<RAYX::PlaneGrating> plG = std::make_shared<RAYX::PlaneGrating>("PlaneGratingDeviationDefault", 50, 200, position, orientation, 100, 1000, 1, 0, std::vector<double>{ 0,0,0,0,0,0 }, zeros7); // dx,dy,dz, dpsi,dphi,dchi // {1,2,3,0.001,0.002,0.003}
     
-    RAYX::GeometricUserParams ip_param = RAYX::GeometricUserParams(0, 0, 0, 1000, std::vector<double>{ 0,0,0, 0,0,0 });
+    RAYX::WorldCoordinates ip_param = RAYX::WorldCoordinates(0, 0, 0, 1000, std::vector<double>{ 0,0,0, 0,0,0 });
     glm::dvec4 pos_ip = ip_param.calcPosition(pg_param, position, orientation);
     glm::dmat4x4 or_ip = ip_param.calcOrientation(pg_param, position, orientation);
     std::shared_ptr<RAYX::ImagePlane> ip = std::make_shared<RAYX::ImagePlane>("Image Plane", pos_ip, or_ip);
@@ -1107,12 +1107,12 @@ TEST(opticalElements, planeGratingDevDefault) {
 TEST(opticalElements, planeGratingDevAzimuthal) {
     double incidenceAngle = 1.4773068838645145;
     double exitAngle = 1.4897528445258457;
-    RAYX::GeometricUserParams pg_param = RAYX::GeometricUserParams(incidenceAngle, exitAngle, rad(7.5), 10000, std::vector<double>{ 0,0,0, 0,0,0 });
+    RAYX::WorldCoordinates pg_param = RAYX::WorldCoordinates(incidenceAngle, exitAngle, degToRad(7.5), 10000, std::vector<double>{ 0,0,0, 0,0,0 });
     glm::dvec4 position = pg_param.calcPosition();
     glm::dmat4x4 orientation = pg_param.calcOrientation();
     std::shared_ptr<RAYX::PlaneGrating> plG = std::make_shared<RAYX::PlaneGrating>("PlaneGratingDeviationAz", 50, 200, position, orientation, 100, 1000, 1, 0, std::vector<double>{ 0,0,0,0,0,0 }, zeros7); // dx,dy,dz, dpsi,dphi,dchi // {1,2,3,0.001,0.002,0.003}
     
-    RAYX::GeometricUserParams ip_param = RAYX::GeometricUserParams(0, 0, 0, 1000, std::vector<double>{ 0,0,0, 0,0,0 });
+    RAYX::WorldCoordinates ip_param = RAYX::WorldCoordinates(0, 0, 0, 1000, std::vector<double>{ 0,0,0, 0,0,0 });
     glm::dvec4 pos_ip = ip_param.calcPosition(pg_param, position, orientation);
     glm::dmat4x4 or_ip = ip_param.calcOrientation(pg_param, position, orientation);
     std::shared_ptr<RAYX::ImagePlane> ip = std::make_shared<RAYX::ImagePlane>("Image Plane", pos_ip, or_ip);
@@ -1126,12 +1126,12 @@ TEST(opticalElements, planeGratingDevAzimuthal) {
 TEST(opticalElements, planeGratingDevAzMis) {
     double incidenceAngle = 1.4773068838645145;
     double exitAngle = 1.4897528445258457;
-    RAYX::GeometricUserParams pg_param = RAYX::GeometricUserParams(incidenceAngle, exitAngle, rad(7.5), 10000, std::vector<double>{ 1,2,3,0.001,0.002,0.003 });
+    RAYX::WorldCoordinates pg_param = RAYX::WorldCoordinates(incidenceAngle, exitAngle, degToRad(7.5), 10000, std::vector<double>{ 1,2,3,0.001,0.002,0.003 });
     glm::dvec4 position = pg_param.calcPosition();
     glm::dmat4x4 orientation = pg_param.calcOrientation();
     std::shared_ptr<RAYX::PlaneGrating> plG = std::make_shared<RAYX::PlaneGrating>("PlaneGratingDeviationAzMis", 50, 200, position, orientation, 100, 1000, 1, 0, std::vector<double>{ 0,0,0,0,0,0 }, zeros7); // dx,dy,dz, dpsi,dphi,dchi // {1,2,3,0.001,0.002,0.003}
     
-    RAYX::GeometricUserParams ip_param = RAYX::GeometricUserParams(0, 0, 0, 1000, std::vector<double>{ 0,0,0, 0,0,0 });
+    RAYX::WorldCoordinates ip_param = RAYX::WorldCoordinates(0, 0, 0, 1000, std::vector<double>{ 0,0,0, 0,0,0 });
     glm::dvec4 pos_ip = ip_param.calcPosition(pg_param, position, orientation);
     glm::dmat4x4 or_ip = ip_param.calcOrientation(pg_param, position, orientation);
     std::shared_ptr<RAYX::ImagePlane> ip = std::make_shared<RAYX::ImagePlane>("Image Plane", pos_ip, or_ip);
@@ -1146,11 +1146,11 @@ TEST(opticalElements, planeGratingDevAzMis) {
 TEST(opticalElements, planeGratingIncAzMis) {
     double incidenceAngle = 1.3962634015954636;
     double exitAngle = 1.4088395764879007;
-    RAYX::GeometricUserParams pg_param = RAYX::GeometricUserParams(incidenceAngle, exitAngle, rad(7.5), 10000, std::vector<double>{ 1,2,3,0.001,0.002,0.003 });
+    RAYX::WorldCoordinates pg_param = RAYX::WorldCoordinates(incidenceAngle, exitAngle, degToRad(7.5), 10000, std::vector<double>{ 1,2,3,0.001,0.002,0.003 });
     glm::dvec4 position = pg_param.calcPosition();
     glm::dmat4x4 orientation = pg_param.calcOrientation();
     
-    RAYX::GeometricUserParams ip_param = RAYX::GeometricUserParams(0, 0, 0, 1000, std::vector<double>{ 0,0,0, 0,0,0 });
+    RAYX::WorldCoordinates ip_param = RAYX::WorldCoordinates(0, 0, 0, 1000, std::vector<double>{ 0,0,0, 0,0,0 });
     glm::dvec4 pos_ip = ip_param.calcPosition(pg_param, position, orientation);
     glm::dmat4x4 or_ip = ip_param.calcOrientation(pg_param, position, orientation);
     std::shared_ptr<RAYX::ImagePlane> ip = std::make_shared<RAYX::ImagePlane>("Image Plane", pos_ip, or_ip);
@@ -1166,12 +1166,12 @@ TEST(opticalElements, planeGratingIncAzMis) {
 TEST(opticalElements, planeGratingDevMisVLS) {
     double incidenceAngle = 1.4773068838645145;
     double exitAngle = 1.4897528445258457;
-    RAYX::GeometricUserParams pg_param = RAYX::GeometricUserParams(incidenceAngle, exitAngle, rad(7.5), 10000, std::vector<double>{ 1,2,3,0.001,0.002,0.003 });
+    RAYX::WorldCoordinates pg_param = RAYX::WorldCoordinates(incidenceAngle, exitAngle, degToRad(7.5), 10000, std::vector<double>{ 1,2,3,0.001,0.002,0.003 });
     glm::dvec4 position = pg_param.calcPosition();
     glm::dmat4x4 orientation = pg_param.calcOrientation();
     std::shared_ptr<RAYX::PlaneGrating> plG = std::make_shared<RAYX::PlaneGrating>("PlaneGratingDeviationMis", 50, 200, position, orientation, 100, 1000, 1, 0, std::vector<double>{ 0.45, 0.3, 0.5, 0.2, 0.4, 0.35 }, zeros7); // dx,dy,dz, dpsi,dphi,dchi // {1,2,3,0.001,0.002,0.003}
     
-    RAYX::GeometricUserParams ip_param = RAYX::GeometricUserParams(0, 0, 0, 1000, std::vector<double>{ 0,0,0, 0,0,0 });
+    RAYX::WorldCoordinates ip_param = RAYX::WorldCoordinates(0, 0, 0, 1000, std::vector<double>{ 0,0,0, 0,0,0 });
     glm::dvec4 pos_ip = ip_param.calcPosition(pg_param, position, orientation);
     glm::dmat4x4 or_ip = ip_param.calcOrientation(pg_param, position, orientation);
     std::shared_ptr<RAYX::ImagePlane> ip = std::make_shared<RAYX::ImagePlane>("Image Plane", pos_ip, or_ip);
@@ -1186,12 +1186,12 @@ TEST(opticalElements, planeGratingDevMisVLS) {
 
 TEST(opticalElements, RZPDefaultParams) {
     // alpha and beta calculated from user parameters
-    RAYX::GeometricUserParams rzp_param = RAYX::GeometricUserParams( 0.017453292519943295, 0.017453292519941554, 0, 10000, std::vector<double>{ 0,0,0, 0,0,0 });
+    RAYX::WorldCoordinates rzp_param = RAYX::WorldCoordinates( 0.017453292519943295, 0.017453292519941554, 0, 10000, std::vector<double>{ 0,0,0, 0,0,0 });
     glm::dvec4 position = rzp_param.calcPosition();
     glm::dmat4x4 orientation = rzp_param.calcOrientation();
     std::shared_ptr<RAYX::ReflectionZonePlate> rzp = std::make_shared<RAYX::ReflectionZonePlate>("ReflectionZonePlateDefault", 0, 0, 50, 200, position, orientation, 100, -1, -1, 1, 1, 100, 500, 100, 500, 0, 0, 0, 0, zeros7); // dx,dy,dz, dpsi,dphi,dchi // {1,2,3,0.001,0.002,0.003}
     
-    RAYX::GeometricUserParams ip_param = RAYX::GeometricUserParams(0, 0, 0, 1000, std::vector<double>{ 0,0,0, 0,0,0 });
+    RAYX::WorldCoordinates ip_param = RAYX::WorldCoordinates(0, 0, 0, 1000, std::vector<double>{ 0,0,0, 0,0,0 });
     glm::dvec4 pos_ip = ip_param.calcPosition(rzp_param, position, orientation);
     glm::dmat4x4 or_ip = ip_param.calcOrientation(rzp_param, position, orientation);
     std::shared_ptr<RAYX::ImagePlane> ip = std::make_shared<RAYX::ImagePlane>("Image Plane", pos_ip, or_ip);
@@ -1204,12 +1204,12 @@ TEST(opticalElements, RZPDefaultParams) {
 }
 
 TEST(opticalElements, RZPDefaultParams200) {
-    RAYX::GeometricUserParams rzp_param = RAYX::GeometricUserParams( 0.017453292519943295, 0.017453292519941554, 0, 10000, std::vector<double>{ 0,0,0, 0,0,0 });
+    RAYX::WorldCoordinates rzp_param = RAYX::WorldCoordinates( 0.017453292519943295, 0.017453292519941554, 0, 10000, std::vector<double>{ 0,0,0, 0,0,0 });
     glm::dvec4 position = rzp_param.calcPosition();
     glm::dmat4x4 orientation = rzp_param.calcOrientation();
     std::shared_ptr<RAYX::ReflectionZonePlate> rzp = std::make_shared<RAYX::ReflectionZonePlate>("ReflectionZonePlateDefault200", 0, 0, 50, 200, position, orientation, 100, -1, -1, 1, 1, 100, 500, 100, 500, 0, 0, 0, 0, zeros7); // dx,dy,dz, dpsi,dphi,dchi // {1,2,3,0.001,0.002,0.003}
     
-    RAYX::GeometricUserParams ip_param = RAYX::GeometricUserParams(0, 0, 0, 1000, std::vector<double>{ 0,0,0, 0,0,0 });
+    RAYX::WorldCoordinates ip_param = RAYX::WorldCoordinates(0, 0, 0, 1000, std::vector<double>{ 0,0,0, 0,0,0 });
     glm::dvec4 pos_ip = ip_param.calcPosition(rzp_param, position, orientation);
     glm::dmat4x4 or_ip = ip_param.calcOrientation(rzp_param, position, orientation);
     std::shared_ptr<RAYX::ImagePlane> ip = std::make_shared<RAYX::ImagePlane>("Image Plane", pos_ip, or_ip);
@@ -1223,12 +1223,12 @@ TEST(opticalElements, RZPDefaultParams200) {
 
 
 TEST(opticalElements, RZPAzimuthal200) {
-    RAYX::GeometricUserParams rzp_param = RAYX::GeometricUserParams( 0.017453292519943295, 0.017453292519941554, rad(10), 10000, std::vector<double>{ 0,0,0, 0,0,0 });
+    RAYX::WorldCoordinates rzp_param = RAYX::WorldCoordinates( 0.017453292519943295, 0.017453292519941554, degToRad(10), 10000, std::vector<double>{ 0,0,0, 0,0,0 });
     glm::dvec4 position = rzp_param.calcPosition();
     glm::dmat4x4 orientation = rzp_param.calcOrientation();
     std::shared_ptr<RAYX::ReflectionZonePlate> rzp = std::make_shared<RAYX::ReflectionZonePlate>("ReflectionZonePlateAzim200", 0, 0, 50, 200, position, orientation, 100, -1, -1, 1, 1, 100, 500, 100, 500, 0, 0, 0, 0, zeros7); // dx,dy,dz, dpsi,dphi,dchi // {1,2,3,0.001,0.002,0.003}
     
-    RAYX::GeometricUserParams ip_param = RAYX::GeometricUserParams(0, 0, 0, 1000, std::vector<double>{ 0,0,0, 0,0,0 });
+    RAYX::WorldCoordinates ip_param = RAYX::WorldCoordinates(0, 0, 0, 1000, std::vector<double>{ 0,0,0, 0,0,0 });
     glm::dvec4 pos_ip = ip_param.calcPosition(rzp_param, position, orientation);
     glm::dmat4x4 or_ip = ip_param.calcOrientation(rzp_param, position, orientation);
     std::shared_ptr<RAYX::ImagePlane> ip = std::make_shared<RAYX::ImagePlane>("Image Plane", pos_ip, or_ip);
@@ -1241,12 +1241,12 @@ TEST(opticalElements, RZPAzimuthal200) {
 
 
 TEST(opticalElements, RZPMis) {
-    RAYX::GeometricUserParams rzp_param = RAYX::GeometricUserParams( 0.017453292519943295, 0.017453292519941554, 0, 10000, std::vector<double>{ 1,2,3,0.001,0.002,0.003 });
+    RAYX::WorldCoordinates rzp_param = RAYX::WorldCoordinates( 0.017453292519943295, 0.017453292519941554, 0, 10000, std::vector<double>{ 1,2,3,0.001,0.002,0.003 });
     glm::dvec4 position = rzp_param.calcPosition();
     glm::dmat4x4 orientation = rzp_param.calcOrientation();
     std::shared_ptr<RAYX::ReflectionZonePlate> rzp = std::make_shared<RAYX::ReflectionZonePlate>("ReflectionZonePlateMis", 0, 0, 50, 200, position, orientation, 100, -1, -1, 1, 1, 100, 500, 100, 500, 0, 0, 0, 0, zeros7); // dx,dy,dz, dpsi,dphi,dchi // {1,2,3,0.001,0.002,0.003}
     
-    RAYX::GeometricUserParams ip_param = RAYX::GeometricUserParams(0, 0, 0, 1000, std::vector<double>{ 0,0,0, 0,0,0 });
+    RAYX::WorldCoordinates ip_param = RAYX::WorldCoordinates(0, 0, 0, 1000, std::vector<double>{ 0,0,0, 0,0,0 });
     glm::dvec4 pos_ip = ip_param.calcPosition(rzp_param, position, orientation);
     glm::dmat4x4 or_ip = ip_param.calcOrientation(rzp_param, position, orientation);
     std::shared_ptr<RAYX::ImagePlane> ip = std::make_shared<RAYX::ImagePlane>("Image Plane", pos_ip, or_ip);
@@ -1317,11 +1317,11 @@ TEST(opticalElements, slit1) {
 }
 
 TEST(opticalElements, slit2) {
-    RAYX::GeometricUserParams s_param = RAYX::GeometricUserParams(0, 0, 0, 10000, std::vector<double>{ 0,0,0, 0,0,0 });
+    RAYX::WorldCoordinates s_param = RAYX::WorldCoordinates(0, 0, 0, 10000, std::vector<double>{ 0,0,0, 0,0,0 });
     glm::dvec4 s_position = s_param.calcPosition();
     glm::dmat4x4 s_orientation = s_param.calcOrientation();
     
-    RAYX::GeometricUserParams ip_param = RAYX::GeometricUserParams(0, 0, 0, 1000, std::vector<double>{ 0,0,0, 0,0,0 });
+    RAYX::WorldCoordinates ip_param = RAYX::WorldCoordinates(0, 0, 0, 1000, std::vector<double>{ 0,0,0, 0,0,0 });
     glm::dvec4 ip_position = ip_param.calcPosition(s_param, s_position, s_orientation);
     glm::dmat4x4 ip_orientation = ip_param.calcOrientation(s_param, s_position, s_orientation);
     
@@ -1333,15 +1333,15 @@ TEST(opticalElements, slit2) {
 
 
 TEST(opticalElements, toroid) {
-    RAYX::GeometricUserParams t_param = RAYX::GeometricUserParams(rad(10), rad(10), 0, 10000, std::vector<double>{ 0,0,0, 0,0,0 });
+    RAYX::WorldCoordinates t_param = RAYX::WorldCoordinates(degToRad(10), degToRad(10), 0, 10000, std::vector<double>{ 0,0,0, 0,0,0 });
     glm::dvec4 t_position = t_param.calcPosition();
     glm::dmat4x4 t_orientation = t_param.calcOrientation();
     
-    RAYX::GeometricUserParams ip_param = RAYX::GeometricUserParams(0, 0, 0, 1000, std::vector<double>{ 0,0,0, 0,0,0 });
+    RAYX::WorldCoordinates ip_param = RAYX::WorldCoordinates(0, 0, 0, 1000, std::vector<double>{ 0,0,0, 0,0,0 });
     glm::dvec4 ip_position = ip_param.calcPosition(t_param, t_position, t_orientation);
     glm::dmat4x4 ip_orientation = ip_param.calcOrientation(t_param, t_position, t_orientation);
 
-    std::shared_ptr<RAYX::ToroidMirror> t = std::make_shared<RAYX::ToroidMirror>("toroid", 0, 50, 200, t_position, t_orientation, rad(10), 10000, 1000, 10000, 1000, zeros7);
+    std::shared_ptr<RAYX::ToroidMirror> t = std::make_shared<RAYX::ToroidMirror>("toroid", 0, 50, 200, t_position, t_orientation, degToRad(10), 10000, 1000, 10000, 1000, zeros7);
     std::shared_ptr<RAYX::ImagePlane> ip = std::make_shared<RAYX::ImagePlane>("Image plane", ip_position, ip_orientation);
     //std::shared_ptr<RAYX::ToroidMirror> t = std::make_shared<RAYX::ToroidMirror>("toroid", 0, 50, 200, 10, 0, 10000, 10000, 1000, 10000, 1000, std::vector<double>{ 0,0,0, 0,0,0 }, zeros7,  nullptr, true);
     //std::shared_ptr<RAYX::ImagePlane> ip = std::make_shared<RAYX::ImagePlane>("Image plane", 1000, t, true);
@@ -1353,7 +1353,7 @@ TEST(opticalElements, toroid) {
 // PETES SETUP
 // spec1-first_rzp4mm
 TEST(PeteRZP, spec1_first_rzp) {
-    RAYX::GeometricUserParams rzp_param = RAYX::GeometricUserParams(0.038397243543875255, 0.017453292519943295, 0, 90, std::vector<double>{ 0,0,0, 0,0,0 });
+    RAYX::WorldCoordinates rzp_param = RAYX::WorldCoordinates(0.038397243543875255, 0.017453292519943295, 0, 90, std::vector<double>{ 0,0,0, 0,0,0 });
     glm::dvec4 position = rzp_param.calcPosition();
     glm::dmat4x4 orientation = rzp_param.calcOrientation();
 
@@ -1368,12 +1368,12 @@ TEST(PeteRZP, spec1_first_rzp) {
 TEST(PeteRZP, spec1_first_ip) {
     std::shared_ptr<RAYX::PointSource> p = std::make_shared<RAYX::PointSource>(0, "spec1_first_rzp4",20000 , 1, 0.005,0.005,0, 0.02,0.06, 1,1,0,0, 640, 120, 1, 0, 0, std::vector<double>{0,0,0,0});
     
-    RAYX::GeometricUserParams rzp_param = RAYX::GeometricUserParams(0.038397243543875255, 0.017453292519943295, 0, 90, std::vector<double>{ 0,0,0, 0,0,0 });
+    RAYX::WorldCoordinates rzp_param = RAYX::WorldCoordinates(0.038397243543875255, 0.017453292519943295, 0, 90, std::vector<double>{ 0,0,0, 0,0,0 });
     glm::dvec4 rzp_position = rzp_param.calcPosition();
     glm::dmat4x4 rzp_orientation = rzp_param.calcOrientation();
     std::shared_ptr<RAYX::ReflectionZonePlate> rzp = std::make_shared<RAYX::ReflectionZonePlate>("ReflectionZonePete", 0, 0, 4, 60, rzp_position, rzp_orientation, p->getPhotonEnergy(), -1, -1, 2.2, 1, 90, 400, 90, 400, 0, 0, 1, 0, zeros7); // dx,dy,dz, dpsi,dphi,dchi //
     
-    RAYX::GeometricUserParams ip_param = RAYX::GeometricUserParams(0, 0, 0, 385.0, std::vector<double>{ 0,0,0, 0,0,0 });
+    RAYX::WorldCoordinates ip_param = RAYX::WorldCoordinates(0, 0, 0, 385.0, std::vector<double>{ 0,0,0, 0,0,0 });
     glm::dvec4 ip_position = ip_param.calcPosition(rzp_param, rzp_position, rzp_orientation);
     glm::dmat4x4 ip_orientation = ip_param.calcOrientation(rzp_param, rzp_position, rzp_orientation);
     std::shared_ptr<RAYX::ImagePlane> ip1 = std::make_shared<RAYX::ImagePlane>("ImagePlane1", ip_position, ip_orientation);
@@ -1387,7 +1387,7 @@ TEST(PeteRZP, spec1_first_ip) {
 TEST(PeteRZP, spec1_first_plus_rzp) {
     std::shared_ptr<RAYX::PointSource> p = std::make_shared<RAYX::PointSource>(0, "spec1_first_plus_rzp",20000 , 1, 0.005,0.005,0, 0.02,0.06, 1,1,0,0, 640, 120, 1, 0, 0, std::vector<double>{0,0,0,0});
     
-    RAYX::GeometricUserParams rzp_param = RAYX::GeometricUserParams(0.038397243543875255, 0.082903139469730644, 0, 90, std::vector<double>{ 0,0,0, 0,0,0 });
+    RAYX::WorldCoordinates rzp_param = RAYX::WorldCoordinates(0.038397243543875255, 0.082903139469730644, 0, 90, std::vector<double>{ 0,0,0, 0,0,0 });
     glm::dvec4 rzp_position = rzp_param.calcPosition();
     glm::dmat4x4 rzp_orientation = rzp_param.calcOrientation();
     std::shared_ptr<RAYX::ReflectionZonePlate> rzp = std::make_shared<RAYX::ReflectionZonePlate>("ReflectionZonePete", 0, 0, 4, 60, rzp_position, rzp_orientation, p->getPhotonEnergy(), 1, 1, 2.2, 4.75, 90, 400, 90, 400, 0, 0, 1, -24.35, zeros7); // dx,dy,dz, dpsi,dphi,dchi //
@@ -1402,12 +1402,12 @@ TEST(PeteRZP, spec1_first_plus_rzp) {
 TEST(PeteRZP, spec1_first_plus_ip) {
     std::shared_ptr<RAYX::PointSource> p = std::make_shared<RAYX::PointSource>(0, "spec1_first_plus_rzp_ip",20000 , 1, 0.005,0.005,0, 0.02,0.06, 1,1,0,0, 640, 120, 1, 0, 0, std::vector<double>{0,0,0,0});
     
-    RAYX::GeometricUserParams rzp_param = RAYX::GeometricUserParams(0.038397243543875255, 0.082903139469730644, 0, 90, std::vector<double>{ 0,0,0, 0,0,0 });
+    RAYX::WorldCoordinates rzp_param = RAYX::WorldCoordinates(0.038397243543875255, 0.082903139469730644, 0, 90, std::vector<double>{ 0,0,0, 0,0,0 });
     glm::dvec4 rzp_position = rzp_param.calcPosition();
     glm::dmat4x4 rzp_orientation = rzp_param.calcOrientation();
     std::shared_ptr<RAYX::ReflectionZonePlate> rzp = std::make_shared<RAYX::ReflectionZonePlate>("ReflectionZonePete", 0, 0, 4, 60, rzp_position, rzp_orientation, p->getPhotonEnergy(), 1, 1, 2.2, 4.75, 90, 400, 90, 400, 0, 0, 1, -24.35, zeros7); // dx,dy,dz, dpsi,dphi,dchi //
     
-    RAYX::GeometricUserParams ip_param = RAYX::GeometricUserParams(0, 0, 0, 400.0, std::vector<double>{ 0,0,0, 0,0,0 });
+    RAYX::WorldCoordinates ip_param = RAYX::WorldCoordinates(0, 0, 0, 400.0, std::vector<double>{ 0,0,0, 0,0,0 });
     glm::dvec4 ip_position = ip_param.calcPosition(rzp_param, rzp_position, rzp_orientation);
     glm::dmat4x4 ip_orientation = ip_param.calcOrientation(rzp_param, rzp_position, rzp_orientation);
     std::shared_ptr<RAYX::ImagePlane> ip1 = std::make_shared<RAYX::ImagePlane>("ImagePlane1", ip_position, ip_orientation);
@@ -1421,7 +1421,7 @@ TEST(PeteRZP, spec1_first_plus_ip) {
 TEST(PeteRZP, spec1_first_minus_rzp2) {
     std::shared_ptr<RAYX::PointSource> p = std::make_shared<RAYX::PointSource>(0, "spec1_first_minus_rzp2",20000 , 1, 0.005,0.005,0, 0.001,0.06, 1,1,0,0, 640, 120, 1, 0, 0, std::vector<double>{0,0,0,0});
     
-    RAYX::GeometricUserParams rzp_param = RAYX::GeometricUserParams(0.038397243543875255, 0.017453292519943295, 0, 90, std::vector<double>{ 0,0,0, 0,0,0 });
+    RAYX::WorldCoordinates rzp_param = RAYX::WorldCoordinates(0.038397243543875255, 0.017453292519943295, 0, 90, std::vector<double>{ 0,0,0, 0,0,0 });
     glm::dvec4 rzp_position = rzp_param.calcPosition();
     glm::dmat4x4 rzp_orientation = rzp_param.calcOrientation();
     std::shared_ptr<RAYX::ReflectionZonePlate> rzp = std::make_shared<RAYX::ReflectionZonePlate>("ReflectionZonePete", 0, 0, 4, 60, rzp_position, rzp_orientation, p->getPhotonEnergy(), -1, -1, 2.2, 1, 90, 400, 90, 400, 0, 0, 1, 0, zeros7); // dx,dy,dz, dpsi,dphi,dchi //
@@ -1436,12 +1436,12 @@ TEST(PeteRZP, spec1_first_minus_rzp2) {
 TEST(PeteRZP, spec1_first_minus_ip2) {
     std::shared_ptr<RAYX::PointSource> p = std::make_shared<RAYX::PointSource>(0, "spec1_first_minus_rzp_ip2",20000 , 1, 0.005,0.005,0, 0.001,0.06, 1,1,0,0, 640, 120, 1, 0, 0, std::vector<double>{0,0,0,0});
     
-    RAYX::GeometricUserParams rzp_param = RAYX::GeometricUserParams(0.038397243543875255, 0.017453292519943295, 0, 90, std::vector<double>{ 0,0,0, 0,0,0 });
+    RAYX::WorldCoordinates rzp_param = RAYX::WorldCoordinates(0.038397243543875255, 0.017453292519943295, 0, 90, std::vector<double>{ 0,0,0, 0,0,0 });
     glm::dvec4 rzp_position = rzp_param.calcPosition();
     glm::dmat4x4 rzp_orientation = rzp_param.calcOrientation();
     std::shared_ptr<RAYX::ReflectionZonePlate> rzp = std::make_shared<RAYX::ReflectionZonePlate>("ReflectionZonePete", 0, 0, 4, 60, rzp_position, rzp_orientation, p->getPhotonEnergy(), -1, -1, 2.2, 1, 90, 400, 90, 400, 0, 0, 1, 0, zeros7); // dx,dy,dz, dpsi,dphi,dchi //
     
-    RAYX::GeometricUserParams ip_param = RAYX::GeometricUserParams(0, 0, 0, 400.0, std::vector<double>{ 0,0,0, 0,0,0 });
+    RAYX::WorldCoordinates ip_param = RAYX::WorldCoordinates(0, 0, 0, 400.0, std::vector<double>{ 0,0,0, 0,0,0 });
     glm::dvec4 ip_position = ip_param.calcPosition(rzp_param, rzp_position, rzp_orientation);
     glm::dmat4x4 ip_orientation = ip_param.calcOrientation(rzp_param, rzp_position, rzp_orientation);
     std::shared_ptr<RAYX::ImagePlane> ip1 = std::make_shared<RAYX::ImagePlane>("ImagePlane1", ip_position, ip_orientation);

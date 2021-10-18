@@ -78,7 +78,6 @@ namespace RAYX
 
     /**
      * calculates the orientation (rotation with respect to the origin) in world coordinates
-     * @param current           geometrical parameters of current optical element
      * @param prev              geometrical parameters of previous optical element (reference element)
      * @param prev_pos          world coordinate position of previous element
      * @param prev_or           world coordiante orientation of previous element.
@@ -87,13 +86,12 @@ namespace RAYX
      */
     glm::dmat4x4 WorldCoordinates::calcOrientation(WorldCoordinates prev, glm::dvec4 prev_pos, glm::dmat4x4 prev_or) 
     {
-        glm::dmat4x4 current_misalignmentOr = getMisalignmentOrientation(); // local rotational misalignment
         glm::dmat4x4 current_orientation = calcOrientation(); // orientation of new element in local coordinate system
         glm::dmat4x4 prev_e2b = prev.calcE2B(); // rotation of new element coordinate system with respect to previous element
 
         // new global orientation = previous global orientation * rotation of new element coordinate system with respect to previous element coordinate system
         // * orientation of new element in its element coordinate system (misalignment * local orientation)
-        current_orientation = prev_or * prev_e2b * current_misalignmentOr * current_orientation;
+        current_orientation = prev_or * prev_e2b * current_orientation;
         
         std::cout << "calculated orientation from previous" << std::endl;
         for(int i = 0; i<4; i++) {
@@ -107,7 +105,6 @@ namespace RAYX
 
     /**
      * calculates the orientation of the optical element with respect to the origin of the world coordinate system
-     * @param current               geometrical user parameters of the current optical element
      * 
      * @return 4x4 homogeneous orientation of the current element with respect to the origin 
      */
@@ -142,7 +139,6 @@ namespace RAYX
 
     /**
      * calculates the position of an optical element based on its geometric paramters and the geometric parameters of the previous element
-     * @param current           geometric parameters of the current optical element
      * @param prev              geometric parameters of the previous optical element
      * @param prev_pos          world coordinate position of the previous element in homogeneous coordinates (4d vector)
      * @param prev_or           world coordiante orientation (rotation) of the previous element in homogenous coordinates (4x4 matrix)
@@ -152,25 +148,26 @@ namespace RAYX
     glm::dvec4 WorldCoordinates::calcPosition(WorldCoordinates prev, glm::dvec4 prev_pos, glm::dmat4x4 prev_or) 
     {
         glm::dvec4 local_position = glm::dvec4(0.0, 0.0, m_dist, 0.0); // position of new element with respect to the previous element
-        glm::dmat4x4 orientation = calcOrientation();
+        glm::dmat4x4 orientation = calcOrientation(prev, prev_pos, prev_or);
 
         glm::dvec4 new_offset = glm::dvec4(m_misalignment[0], m_misalignment[1], m_misalignment[2], 0);
         glm::dvec4 prev_offset = glm::dvec4(prev.getMisalignment()[0], prev.getMisalignment()[1], prev.getMisalignment()[2], 0);
         glm::dmat4x4 prev_e2b = prev.calcE2B();
         
-        glm::dvec4 position = prev_pos - prev_or * prev_offset; // remove misalignemnt from position of previous element
+        glm::dvec4 position = prev_pos - prev_or * prev_offset; // remove misalignment from position of previous element
+        std::cout << "previous position = " << position[0] << ", " << position[1] << ", " << position[2] << ", " << position[3] << std::endl;
         position = position + prev_or * prev_e2b * local_position; // add the distance from previous to new element to the position of the previous element
         position = position + orientation * new_offset; // add misalignment of new element to the position      
         
         for(int i = 0; i<4; i++) {
             std::cout << position[i] << ", " << std::endl;
         }
+        std::cout << std::endl;
         return position;
     }
 
     /**
      * calculates the position of an optical element that does not have a predecessor / the geometrical parameters are with respect to the origin (light source)
-     * @param current           geometrical parameters with respect to the origin
      * 
      * @return position of optical element in homogeneous world coordinates
     */
