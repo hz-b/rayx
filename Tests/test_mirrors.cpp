@@ -4,6 +4,8 @@
 #include "Beamline/Objects/PlaneMirror.h"
 #include "Beamline/Objects/SphereMirror.h"
 #include "Beamline/Objects/Ellipsoid.h"
+#include "UserParameter/WorldCoordinates.h"
+#include "UserParameter/GeometricUserParams.h"
 #include "Core.h"
 #include "Ray.h"
 
@@ -56,17 +58,28 @@ TEST(PlaneMirror, testSimpleParams) {
     std::vector<double> mis = { 0,0,0,0,0,0 };
     std::vector<double> sE = { 0,0,0,0,0, 0,0 };
     std::vector<double> surface = {0,0,0,0, double(icurv),0,0,-1, 0,0,0,0, 0,0,0,0};
-    RAYX::PlaneMirror plM = RAYX::PlaneMirror("planemirror",width, height, incidenceAngle, azimuthalAngle, dist, mis, sE, NULL, false); // {1,2,3,0.01,0.02,0.03}
+    
+    RAYX::WorldCoordinates g_params = RAYX::WorldCoordinates(degToRad(incidenceAngle), degToRad(incidenceAngle), degToRad(azimuthalAngle), dist, mis);
+    glm::dvec4 position = g_params.calcPosition();
+    glm::dmat4x4 orientation = g_params.calcOrientation();
+
+    RAYX::PlaneMirror plM = RAYX::PlaneMirror("planemirror",width, height, position, orientation, sE); // {1,2,3,0.01,0.02,0.03}
+
+    glm::dmat4x4 correctInMatrix = glm::dmat4x4(1, 0, 0, 0, 
+        0, 0.97357890287316029, 0.22835087011065572, 0, 
+        0, -0.22835087011065572, 0.97357890287316029, 0, 
+        0, 2741.352195678422, -11687.814728992289, 1);
+    glm::dmat4x4 correctOutMatrix = glm::dmat4x4(1, 0, 0, 0, 
+        0, 0.97357890287316029, -0.22835087011065572, 0, 
+        0, 0.22835087011065572, 0.97357890287316029, 0, 
+        0, 0, 12005, 1);
 
     ASSERT_DOUBLE_EQ(plM.getWidth(), width);
     ASSERT_DOUBLE_EQ(plM.getHeight(), height);
-    ASSERT_DOUBLE_EQ(plM.getAlpha(), degToRad(incidenceAngle));
-    ASSERT_DOUBLE_EQ(plM.getBeta(), degToRad(incidenceAngle));
-    ASSERT_DOUBLE_EQ(plM.getChi(), degToRad(azimuthalAngle));
-    ASSERT_DOUBLE_EQ(plM.getDistanceToPreceedingElement(), dist);
-    EXPECT_ITERABLE_DOUBLE_EQ(std::vector<double>, mis, plM.getMisalignmentParams());
     EXPECT_ITERABLE_DOUBLE_EQ(std::vector<double>, sE, plM.getSlopeError());
     EXPECT_ITERABLE_DOUBLE_EQ(std::vector<double>, surface, plM.getSurfaceParams());
+    EXPECT_ITERABLE_DOUBLE_EQ(std::vector<double>, plM.getInMatrix(), glmToVector16(correctInMatrix));
+    EXPECT_ITERABLE_DOUBLE_EQ(std::vector<double>, plM.getOutMatrix(), glmToVector16(correctOutMatrix));
 }
 
 TEST(PlaneMirror, testAdvancedParams) {
@@ -79,20 +92,31 @@ TEST(PlaneMirror, testAdvancedParams) {
     std::vector<double> mis = { 1,2,3,0.01,0.02,0.03 };
     std::vector<double> sE = { 0.1,0.2,0.3,0.4,0.5, 0.6,0.7 };
     std::vector<double> surface = {0,0,0,0, double(icurv),0,0,-1, 0,0,0,0, 0,0,0,0};
-    RAYX::PlaneMirror plM = RAYX::PlaneMirror("planemirror",width, height, incidenceAngle, azimuthalAngle, dist, mis, sE, NULL, false); // {1,2,3,0.01,0.02,0.03}
+
+    RAYX::WorldCoordinates g_params = RAYX::WorldCoordinates(degToRad(incidenceAngle), degToRad(incidenceAngle), degToRad(azimuthalAngle), dist, mis);
+    glm::dvec4 position = g_params.calcPosition();
+    glm::dmat4x4 orientation = g_params.calcOrientation();
+    
+    RAYX::PlaneMirror plM = RAYX::PlaneMirror("planemirror",width, height, position, orientation, sE); // {1,2,3,0.01,0.02,0.03}
+
+    glm::dmat4x4 correctInMatrix = glm::dmat4x4(0.98631018201912979, -0.16127244932632739, -0.034400900187032908, 0, 
+        0.16212528089630251, 0.91026081860532748, 0.38097327387397439, 0, 
+        -0.030126701440516851, -0.38133507470497185, 0.92394585483136815, 0, 
+        360.67105079340479, 4575.9275718331864, -11094.969987250573, 1);
+    glm::dmat4x4 correctOutMatrix = glm::dmat4x4(0.98631018201912979, 0.16212528089630251, -0.030126701440516851, 0, 
+        -0.16127244932632739, 0.91026081860532748, -0.38133507470497185, 0, 
+        -0.034400900187032908, 0.38097327387397439, 0.92394585483136815, 0, 
+        0.56056258280537641, 3.1255667397288804, 12006.979040713644, 1);
 
     ASSERT_DOUBLE_EQ(plM.getWidth(), width);
     ASSERT_DOUBLE_EQ(plM.getHeight(), height);
-    ASSERT_DOUBLE_EQ(plM.getAlpha(), degToRad(incidenceAngle));
-    ASSERT_DOUBLE_EQ(plM.getBeta(), degToRad(incidenceAngle));
-    ASSERT_DOUBLE_EQ(plM.getChi(), degToRad(azimuthalAngle));
-    ASSERT_DOUBLE_EQ(plM.getDistanceToPreceedingElement(), dist);
-    EXPECT_ITERABLE_DOUBLE_EQ(std::vector<double>, mis, plM.getMisalignmentParams());
     EXPECT_ITERABLE_DOUBLE_EQ(std::vector<double>, sE, plM.getSlopeError());
     EXPECT_ITERABLE_DOUBLE_EQ(std::vector<double>, surface, plM.getSurfaceParams());
+    EXPECT_ITERABLE_DOUBLE_EQ(std::vector<double>, plM.getInMatrix(), glmToVector16(correctInMatrix));
+    EXPECT_ITERABLE_DOUBLE_EQ(std::vector<double>, plM.getOutMatrix(), glmToVector16(correctOutMatrix));
 }
 
-TEST(Sphere, testParams) {
+TEST(SphereMirror, testParams) {
     double width = 21.62;
     double height = 813.12;
     double incidence = 12.75;
@@ -102,23 +126,79 @@ TEST(Sphere, testParams) {
     double exitArmLength = 123.1;
     int icurv = 1;
     double radius = 104.32651829593351; // from old RAY
-    std::vector<double> misalignmentParams = { 10,51,2,0.1,5,0.241 };
+    std::vector<double> mis = { 10,51,2,0.1,5,0.241 };
     std::vector<double> sE = { 0.7,0.5,0.3,0.7,0.3, 3,2 };
     std::vector<double> surface = {1,0,0,0, double(icurv),1,0,-radius, 0,0,1,0, 0,0,0,0};
-    RAYX::SphereMirror sM = RAYX::SphereMirror("spheremirror", width, height, incidence, azimuthal, dist, entranceArmLength, exitArmLength, misalignmentParams, sE, NULL, false); 
+
+
+    RAYX::GeometricUserParams g_params = RAYX::GeometricUserParams(incidence);
+    RAYX::WorldCoordinates w_params = RAYX::WorldCoordinates(g_params.getAlpha(), g_params.getBeta(), degToRad(azimuthal), dist, mis);
+    glm::dvec4 position = w_params.calcPosition();
+    glm::dmat4x4 orientation = w_params.calcOrientation();
+    RAYX::SphereMirror sM = RAYX::SphereMirror("spheremirror", width, height, incidence, position, orientation, entranceArmLength, exitArmLength, sE); 
+
+    glm::dmat4x4 correctInMatrix = glm::dmat4x4(0.024368111991334068, -0.85883516451860731, -0.51167211698926318, 0, 
+        0.39036506969235873, 0.47936537520215317, -0.78601777932905481, 0, 
+        0.92033760516565755, -0.18058515233428035, 0.34694047799924849, 0, 
+        -21.15449177460777, -48.811307953708521, -6.2049185933508921, 1);
+    glm::dmat4x4 correctOutMatrix = glm::dmat4x4(0.024368111991334068, 0.39036506969235873, 0.92033760516565755, 0, 
+        -0.85883516451860731, 0.47936537520215317, -0.18058515233428035, 0, 
+        -0.51167211698926318, -0.78601777932905481, 0.34694047799924849, 0, 
+        -44.580256504514161, 26.779249273575296, 12.807414238606773, 1);
+
 
     ASSERT_DOUBLE_EQ(sM.getWidth(), width);
     ASSERT_DOUBLE_EQ(sM.getHeight(), height);
     EXPECT_NEAR(sM.getRadius(), radius, 0.0000000001);
-    ASSERT_DOUBLE_EQ(sM.getAlpha(), degToRad(incidence));
-    ASSERT_DOUBLE_EQ(sM.getBeta(), degToRad(incidence));
-    ASSERT_DOUBLE_EQ(sM.getChi(), degToRad(azimuthal));
-    ASSERT_DOUBLE_EQ(sM.getDistanceToPreceedingElement(), dist);
     ASSERT_DOUBLE_EQ(sM.getExitArmLength(), exitArmLength);
     ASSERT_DOUBLE_EQ(sM.getEntranceArmLength(), entranceArmLength);
-    EXPECT_ITERABLE_DOUBLE_EQ(std::vector<double>, misalignmentParams, sM.getMisalignmentParams());
     EXPECT_ITERABLE_DOUBLE_EQ(std::vector<double>, sE, sM.getSlopeError());
     EXPECT_ITERABLE_DOUBLE_EQ(std::vector<double>, surface, sM.getSurfaceParams());
+    EXPECT_ITERABLE_DOUBLE_EQ(std::vector<double>, sM.getInMatrix(), glmToVector16(correctInMatrix));
+    EXPECT_ITERABLE_DOUBLE_EQ(std::vector<double>, sM.getOutMatrix(), glmToVector16(correctOutMatrix));
+}
+
+TEST(SphereMirror, testPrecalculateRadius) {
+    double width = 21.62;
+    double height = 813.12;
+    double incidence = 12.75;
+    double azimuthal = 41.2;
+    double dist = 12.12;
+    double entranceArmLength = 12.7;
+    double exitArmLength = 123.1;
+    int icurv = 1;
+    double radius = 104.32651829593351; // from old RAY
+    std::vector<double> mis = { 10,51,2,0.1,5,0.241 };
+    std::vector<double> sE = { 0.7,0.5,0.3,0.7,0.3, 3,2 };
+    std::vector<double> surface = {1,0,0,0, double(icurv),1,0,-radius, 0,0,1,0, 0,0,0,0};
+
+
+    RAYX::GeometricUserParams g_params = RAYX::GeometricUserParams(incidence);
+    g_params.calcMirrorRadius(entranceArmLength, exitArmLength);
+    RAYX::WorldCoordinates w_params = RAYX::WorldCoordinates(g_params.getAlpha(), g_params.getBeta(), degToRad(azimuthal), dist, mis);
+    glm::dvec4 position = w_params.calcPosition();
+    glm::dmat4x4 orientation = w_params.calcOrientation();
+    RAYX::SphereMirror sM = RAYX::SphereMirror("spheremirror", width, height, incidence, position, orientation, entranceArmLength, exitArmLength, sE); 
+
+    glm::dmat4x4 correctInMatrix = glm::dmat4x4(0.024368111991334068, -0.85883516451860731, -0.51167211698926318, 0, 
+        0.39036506969235873, 0.47936537520215317, -0.78601777932905481, 0, 
+        0.92033760516565755, -0.18058515233428035, 0.34694047799924849, 0, 
+        -21.15449177460777, -48.811307953708521, -6.2049185933508921, 1);
+    glm::dmat4x4 correctOutMatrix = glm::dmat4x4(0.024368111991334068, 0.39036506969235873, 0.92033760516565755, 0, 
+        -0.85883516451860731, 0.47936537520215317, -0.18058515233428035, 0, 
+        -0.51167211698926318, -0.78601777932905481, 0.34694047799924849, 0, 
+        -44.580256504514161, 26.779249273575296, 12.807414238606773, 1);
+
+
+    ASSERT_DOUBLE_EQ(sM.getWidth(), width);
+    ASSERT_DOUBLE_EQ(sM.getHeight(), height);
+    EXPECT_NEAR(g_params.getRadius(), radius, 0.0000000001);
+    ASSERT_DOUBLE_EQ(sM.getExitArmLength(), exitArmLength);
+    ASSERT_DOUBLE_EQ(sM.getEntranceArmLength(), entranceArmLength);
+    EXPECT_ITERABLE_DOUBLE_EQ(std::vector<double>, sE, sM.getSlopeError());
+    EXPECT_ITERABLE_DOUBLE_EQ(std::vector<double>, surface, sM.getSurfaceParams());
+    EXPECT_ITERABLE_DOUBLE_EQ(std::vector<double>, sM.getInMatrix(), glmToVector16(correctInMatrix));
+    EXPECT_ITERABLE_DOUBLE_EQ(std::vector<double>, sM.getOutMatrix(), glmToVector16(correctOutMatrix));
 }
 
 TEST(Ellips, testParamsCSCurvature) {

@@ -30,6 +30,7 @@ SET(SOURCE
     src/RayCore/Surface/Surface.cpp
     src/RayCore/Tracer/Ray.cpp
     src/RayCore/Tracer/TracerInterface.cpp
+    src/RayCore/UserParameter/WorldCoordinates.cpp
     src/RayCore/UserParameter/GeometricUserParams.cpp
 )
 
@@ -63,6 +64,7 @@ SET(HEADERS
     src/RayCore/Surface/Surface.h
     src/RayCore/Tracer/Ray.h
     src/RayCore/Tracer/TracerInterface.h
+    src/RayCore/UserParameter/WorldCoordinates.h
     src/RayCore/UserParameter/GeometricUserParams.h
 )
 
