@@ -9,6 +9,9 @@ namespace RAYX
 
     public:
 
+        // new, shortened constructor
+        SphereGrating(const char* name, int mount, double width, double height, double radius, glm::dvec4 position, glm::dmat4x4 orientation, double designEnergyMounting, double lineDensity, double orderOfDiffraction, std::vector<double> vls, std::vector<double> slopeError);
+        // old constructor
         SphereGrating(const char* name, int mount, double width, double height, double deviation, double normalIncidence, double azimuthal, double distanceToPreceedingElement, double entranceArmLength, double exitArmLength, double designEnergyMounting, double lineDensity, double orderOfDiffraction, std::vector<double> misalignmentParams, std::vector<double> vls, std::vector<double> slopeError, std::shared_ptr<OpticalElement> previous, bool global);
         SphereGrating();
         ~SphereGrating();

@@ -5,6 +5,40 @@ namespace RAYX
 
     /**
      * Angles given in degree and stored in rad.
+     * Initializes transformation matrices, and parameters for the quadric in super class (optical element).
+     * Sets mirror-specific parameters in this class.
+     *
+     * Params
+     * @param mount                         how angles of reflection are calculated: constant deviation, constant incidence,...
+     * @param width                         total width of the mirror (x dimension)
+     * @param height                        total height of the mirror (z dimension)
+     * @param position                      position of the element in world coordinate system
+     * @param orientation                   orientation of the element in world coordinates
+     * @param designEnergyMounting          energy, taken from source
+     * @param lineDensity                   line density of the grating in lines/mm
+     * @param orderOfDefraction             diffraction order that should be traced
+     * @param vls
+     * @param slopeError
+    */
+    SphereGrating::SphereGrating(const char* name, int mount, double width, double height, double radius, glm::dvec4 position, glm::dmat4x4 orientation, double designEnergyMounting, double lineDensity, double orderOfDiffraction, std::vector<double> vls, std::vector<double> slopeError)
+        : OpticalElement(name, width, height, position, orientation, slopeError),
+        m_designEnergyMounting(designEnergyMounting),
+        m_lineDensity(lineDensity),
+        m_orderOfDiffraction(orderOfDiffraction),
+        m_vls(vls)
+    {
+        double icurv = 1;
+        setSurface(std::make_unique<Quadric>(std::vector<double>{1,0,0,0, icurv,1,0,-radius, 0,0,1,0, 2,0,0,0}));
+        setElementParameters({
+            0, 0, m_lineDensity, m_orderOfDiffraction,
+            abs(hvlam(m_designEnergyMounting)), 0, m_vls[0], m_vls[1],
+            m_vls[2], m_vls[3], m_vls[4], m_vls[5],
+            0, 0, 0, 0
+        });
+    }
+
+    /**
+     * Angles given in degree and stored in rad.
      * Initializes transformation matrices, and parameters for the quadric in super class (quadric).
      * Sets mirror-specific parameters in this class.
      *
@@ -104,8 +138,10 @@ namespace RAYX
                 alph = 2 * theta + bet;
             }
         }
+        // grazing incidence
         setAlpha((PI / 2) - alph);
         setBeta((PI / 2) - abs(bet));
+        
     }
 
     double SphereGrating::getRadius() const {
