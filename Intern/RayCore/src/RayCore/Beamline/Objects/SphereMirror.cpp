@@ -60,6 +60,25 @@ namespace RAYX
         setSurface(std::make_unique<Quadric>(std::vector<double>{1,0,0,0, 1,1,0,-m_radius, 0,0,1,0, 0,0,0,0}));
     }
 
+     /**
+     * Calculates transformation matrices, and sets parameters for the quadric surface.
+     * Sets mirror-specific parameters in this class.
+     *
+     * @param name
+     * @param width
+     * @param height
+     * @param radius                    radius of sphere
+     * @param position                  position of element in world coordinates
+     * @param orientation               orientation of element in world coordinates
+     * @param slopeError
+    */
+    SphereMirror::SphereMirror(const char* name, const double width, const double height, double radius, glm::dvec4 position, glm::dmat4x4 orientation, const std::vector<double> slopeError)
+        : OpticalElement(name, { 0,0,0,0, 0,0,0,0, 0,0,0,0, 0,0,0,0 }, width, height, position, orientation, { 0,0,0,0,0,0 }, slopeError)
+    {
+        setSurface(std::make_unique<Quadric>(std::vector<double>{1,0,0,0, 1,1,0,-radius, 0,0,1,0, 0,0,0,0}));
+    }
+
+
     SphereMirror::~SphereMirror()
     {
     }
