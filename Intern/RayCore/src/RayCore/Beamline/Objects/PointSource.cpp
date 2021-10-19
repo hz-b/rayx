@@ -1,4 +1,5 @@
 #include "PointSource.h"
+#include <Data/XMLHelper.h>
 #include <cassert>
 #include <cmath>
 
@@ -29,35 +30,65 @@ namespace RAYX
 
     // returns nullptr on error
     std::shared_ptr<PointSource> PointSource::createFromXML(rapidxml::xml_node<>* node) {
-        const int id = 0;
+        const int id = 0; //TODO(rudi) how do ids work?
         const std::string name = node->first_attribute("name")->value();
-        return nullptr;
-        /*
-        const int numberOfRays;
-        const int spreadType;
-        const double sourceWidth;
-        const double sourceHeight;
-        const double sourceDepth;
-        const double horDivergence;
-        const double verDivergence;
-        const int widthDist;
-        const int heightDist;
-        const int horDist;
-        const int verDist;
-        const double photonEnergy;
-        const double energySpread;
-        const double linPol0;
-        const double linPol45;
-        const double circPol;
-        const std::vector<double> misalignment;
 
+        int numberOfRays;
+        if (!xml::param_int(node, "numberRays", &numberOfRays)) { return nullptr; }
+
+        int spreadType;
+        if (!xml::param_int(node, "energySpreadType", &spreadType)) { return nullptr; }
+
+        double sourceWidth;
+        if (!xml::param_double(node, "sourceWidth", &sourceWidth)) { return nullptr; }
+
+        double sourceHeight;
+        if (!xml::param_double(node, "sourceHeight", &sourceHeight)) { return nullptr; }
+
+        double sourceDepth;
+        if (!xml::param_double(node, "sourceDepth", &sourceDepth)) { return nullptr; }
+
+        double horDivergence;
+        if (!xml::param_double(node, "horDiv", &horDivergence)) { return nullptr; }
+
+        double verDivergence;
+        if (!xml::param_double(node, "verDiv", &verDivergence)) { return nullptr; }
+
+        int widthDist;
+        if (!xml::param_int(node, "sourceWidthDistribution", &widthDist)) { return nullptr; }
+
+        int heightDist;
+        if (!xml::param_int(node, "sourceHeightDistribution", &heightDist)) { return nullptr; }
+
+        int horDist;
+        if (!xml::param_int(node, "horDivDistribution", &horDist)) { return nullptr; }
+
+        int verDist;
+        if (!xml::param_int(node, "verDivDistribution", &verDist)) { return nullptr; }
+
+        double photonEnergy;
+        if (!xml::param_double(node, "photonEnergy", &photonEnergy)) { return nullptr; }
+
+        double energySpread;
+        if (!xml::param_double(node, "energySpread", &energySpread)) { return nullptr; }
+
+        double linPol0;
+        if (!xml::param_double(node, "linearPol_0", &linPol0)) { return nullptr; }
+
+        double linPol45;
+        if (!xml::param_double(node, "linearPol_45", &linPol45)) { return nullptr; }
+
+        double circPol;
+        if (!xml::param_double(node, "circularPol", &circPol)) { return nullptr; }
+
+        std::vector<double> misalignment(1); // TODO(rudi) how should this be parsed?
+        if (!xml::param_double(node, "alignmentError", &misalignment[0])) { return nullptr; }
 
         return std::make_shared<PointSource>(PointSource(
             id, name, numberOfRays, spreadType, sourceWidth, sourceHeight, sourceDepth,
-            horDivergence, verDivergence, widthDist, horDist, verDist, photonEnergy, energySpread,
+            horDivergence, verDivergence, widthDist, heightDist, horDist, verDist, photonEnergy, energySpread,
             linPol0, linPol45, circPol, misalignment
         ));
-        */ // TODO(rudi)
     }
 
     /**

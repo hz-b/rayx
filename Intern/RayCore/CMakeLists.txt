@@ -24,6 +24,7 @@ SET(SOURCE
     src/RayCore/Beamline/Objects/ToroidMirror.cpp
     src/RayCore/Data/Exporter.cpp
     src/RayCore/Data/Importer.cpp
+    src/RayCore/Data/XMLHelper.cpp
     src/RayCore/Presenter/Presenter.cpp
     src/RayCore/Presenter/SimulationEnv.cpp
     src/RayCore/Surface/Quadric.cpp
@@ -59,6 +60,7 @@ SET(HEADERS
     src/RayCore/Beamline/Objects/ToroidMirror.h
     src/RayCore/Data/Exporter.h
     src/RayCore/Data/Importer.h
+    src/RayCore/Data/XMLHelper.h
     src/RayCore/Presenter/Presenter.h
     src/RayCore/Presenter/SimulationEnv.h
     src/RayCore/Surface/Quadric.h
