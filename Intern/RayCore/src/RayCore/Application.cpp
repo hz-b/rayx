@@ -26,7 +26,7 @@ namespace RAYX
         // ! objects are created here temporarily until reading in file works
         const clock_t all_begin_time = clock();
 
-        std::shared_ptr<MatrixSource> matSourcePtr = std::make_shared<MatrixSource>(0, "matrix source", 20000, 0, 0.065, 0.04, 0.0, 0.001, 0.001, 100, 0, 1, 0, 0, std::vector<double>{ 0, 0, 0, 0 });
+        std::shared_ptr<MatrixSource> matSourcePtr = std::make_shared<MatrixSource>("matrix source", 0, 0.065, 0.04, 0.0, 0.001, 0.001, 100, 0, 1, 0, 0, std::vector<double>{ 0, 0, 0, 0 });
         //std::shared_ptr<Slit> s = std::make_shared<Slit>("slit", 1, 2, 20, 2, 7.5, 10000, 20, 1, m->getPhotonEnergy(), std::vector<double>{2, 1, 0, 0, 0, 0 }, nullptr, GLOBAL);
 
         WorldCoordinates param = WorldCoordinates(degToRad(10), degToRad(10), 0, 10000, std::vector<double>{1, 2, 3, 0.001, 0.002, 0.003});
@@ -51,7 +51,7 @@ namespace RAYX
 
         bool GLOBAL = true;
         // petes setup
-        std::shared_ptr<RAYX::PointSource> p = std::make_shared<RAYX::PointSource>(0, "spec1_first_rzp4", 20000, 1, 0.005, 0.005, 0, 0.02, 0.06, 1, 1, 0, 0, 640, 120, 1, 0, 0, std::vector<double>{0, 0, 0, 0});
+        std::shared_ptr<RAYX::PointSource> p = std::make_shared<RAYX::PointSource>("spec1_first_rzp4", 1, 0.005, 0.005, 0, 0.02, 0.06, 1, 1, 0, 0, 640, 120, 1, 0, 0, std::vector<double>{0, 0, 0, 0});
         std::shared_ptr<RAYX::ReflectionZonePlate> rzp = std::make_shared<RAYX::ReflectionZonePlate>("ReflectionZonePete", 0, 1, 0, 1, 1, 4, 60, 170, 2.2, 0, 90, p->getPhotonEnergy(), p->getPhotonEnergy(), -1, -1, 2.2, 1, 90, 400, 90, 400, 0, 0, 1, 0, 0, 1, std::vector<double>{ 0, 0, 0, 0, 0, 0 }, std::vector<double>{ 0, 0, 0, 0, 0, 0, 0 }, nullptr, GLOBAL);  // dx,dy,dz, dpsi,dphi,dchi //
         m_Beamline->addOpticalElement(t);
         m_Beamline->addOpticalElement(i);

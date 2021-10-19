@@ -20,6 +20,8 @@ namespace RAYX
 
         const char* getName() const;
 
+        const int m_ID;
+
     protected:
         BeamlineObject(const char* name);
         BeamlineObject();

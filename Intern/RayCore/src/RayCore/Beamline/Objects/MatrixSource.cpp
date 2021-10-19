@@ -6,15 +6,8 @@ namespace RAYX
 {
 
     // angles given and stored in rad
-    MatrixSource::MatrixSource(const int id, const std::string name, const int numberOfRays, const int spreadType, const double sourceWidth,
-        const double sourceHeight, const double sourceDepth, const double horDivergence, const double verDivergence,
-        const double photonEnergy, const double energySpread, const double linPol0, const double linPol45, const double circPol, const std::vector<double> misalignment)
-        : LightSource(id, numberOfRays, name.c_str(), spreadType, photonEnergy, energySpread, linPol0, linPol45, circPol, misalignment),
-        m_sourceDepth(sourceDepth),
-        m_sourceHeight(sourceHeight),
-        m_sourceWidth(sourceWidth),
-        m_horDivergence(horDivergence),
-        m_verDivergence(verDivergence)
+    MatrixSource::MatrixSource(const std::string name, const int spreadType, const double sourceWidth, const double sourceHeight, const double sourceDepth, const double horDivergence, const double verDivergence, const double photonEnergy, const double energySpread, const double linPol0, const double linPol45, const double circPol, const std::vector<double> misalignment)
+        : LightSource(name.c_str(), spreadType, photonEnergy, energySpread, linPol0, linPol45, circPol, misalignment, sourceDepth, sourceHeight, sourceWidth, horDivergence, verDivergence)
     {
 
     }
@@ -35,7 +28,7 @@ namespace RAYX
         std::default_random_engine re;
 
         double x, y, z, psi, phi, en; //x,y,z pos, psi,phi direction cosines, en=energy
-        int rmat = int(sqrt(this->getNumberOfRays()));
+        int rmat = int(sqrt(SimulationEnv::get().m_numOfRays));
 
         std::vector<Ray> rayVector;
         rayVector.reserve(1048576);
@@ -60,7 +53,7 @@ namespace RAYX
             }
         }
         // afterwards start from the beginning again
-        for (int i = 0; i < this->getNumberOfRays() - rmat * rmat; i++) {
+        for (int i = 0; i < SimulationEnv::get().m_numOfRays - rmat * rmat; i++) {
             Ray r = rayVector.at(i);
             glm::dvec3 position = glm::dvec3(r.m_position[0], r.m_position[1], r.m_position[2]);
             glm::dvec3 direction = glm::dvec3(r.m_direction[0], r.m_direction[1], r.m_direction[2]);

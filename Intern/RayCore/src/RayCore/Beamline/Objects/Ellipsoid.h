@@ -17,7 +17,7 @@ namespace RAYX
         void calcRadius();
         void calcHalfAxes();
         void calcAlphaBeta();
-         double getRadius();
+        double getRadius();
         double getExitArmLength();
         double getEntranceArmLength();
         double getMy0(); // center of ellipsoid
@@ -50,16 +50,16 @@ namespace RAYX
         double m_offsetY0; // always = 0?
         //double m_alpha1; // from tangent angle and grazing incidence???
         // derived params
-        double d_tangentAngle;
-        double d_a34;
-        double d_a33;
-        double d_a44;
+        double m_tangentAngle;
+        double m_a34;
+        double m_a33;
+        double m_a44;
 
         FIGURE_ROTATION m_figureRotation;
         COORDINATESYSTEM_TYPE m_misalignmentCoordSys;
         double m_a11; // param for quadric funciton, given by user
 
-        double d_halfAxisC; // derived from figure_rotation, a_11 and half axes a, b
+        double m_halfAxisC; // derived from figure_rotation, a_11 and half axes a, b
         //double m_Depth;
         //double m_verDivergence;
         //double m_horDivergence;
