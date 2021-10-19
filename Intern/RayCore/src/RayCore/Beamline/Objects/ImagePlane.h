@@ -14,6 +14,8 @@ namespace RAYX
         ImagePlane();
         ~ImagePlane();
 
+        static std::shared_ptr<ImagePlane> createFromXML(rapidxml::xml_node<>*);
+
         double getDistance();
 
     private:

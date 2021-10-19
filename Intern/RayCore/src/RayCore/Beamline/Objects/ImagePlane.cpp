@@ -40,6 +40,16 @@ namespace RAYX
     {
     }
 
+    std::shared_ptr<ImagePlane> ImagePlane::createFromXML(rapidxml::xml_node<>* node) {
+        const char* name = node->first_attribute("name")->value();
+
+        // TODO(rudi): initialize
+        glm::dvec4 position;
+        glm::dmat4x4 orientation;
+
+        return std::make_shared<ImagePlane>(name, position, orientation);
+    }
+
     double ImagePlane::getDistance() {
         return m_distance;
     }

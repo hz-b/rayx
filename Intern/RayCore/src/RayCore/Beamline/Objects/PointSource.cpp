@@ -84,11 +84,11 @@ namespace RAYX
         std::vector<double> misalignment(1); // TODO(rudi) how should this be parsed?
         if (!xml::param_double(node, "alignmentError", &misalignment[0])) { return nullptr; }
 
-        return std::make_shared<PointSource>(PointSource(
+        return std::make_shared<PointSource>(
             id, name, numberOfRays, spreadType, sourceWidth, sourceHeight, sourceDepth,
             horDivergence, verDivergence, widthDist, heightDist, horDist, verDist, photonEnergy, energySpread,
             linPol0, linPol45, circPol, misalignment
-        ));
+        );
     }
 
     /**

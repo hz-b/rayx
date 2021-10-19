@@ -21,13 +21,12 @@ namespace RAYX
     // returns nullptr on failure
     std::shared_ptr<BeamlineObject> createBeamlineObjectFromXML(rapidxml::xml_node<>* node) {
         const char* type = node->first_attribute("type")->value();
+
         if (strcmp(type, "Point Source") == 0) {
             return std::static_pointer_cast<BeamlineObject>(PointSource::createFromXML(node));
-
-        // TODO(rudi): extend!
-        // } else if (strcmp(type, ...) ==  0) { ... }
-
-        } else {
+        } else if (strcmp(type, "ImagePlane") == 0) {
+            return std::static_pointer_cast<BeamlineObject>(ImagePlane::createFromXML(node));
+        } else { // TODO(rudi): extend this!
             return nullptr;
         }
     }
