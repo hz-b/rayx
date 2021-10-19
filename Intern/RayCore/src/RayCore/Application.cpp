@@ -58,7 +58,7 @@ namespace RAYX
 
         m_Presenter = Presenter(m_Beamline);
         m_Presenter.addLightSource(matSourcePtr);
-        RAYX_DEBUG(std::cout << "Creating dummy beamline took: " << float(clock() - all_begin_time) << " ms" << std::endl);
+        RAYX_DEBUG(std::cout << "Creating dummy beamline took: " << float(clock() - all_begin_time) / CLOCKS_PER_SEC * 1000 << " ms" << std::endl);
     }
 
     void Application::run()

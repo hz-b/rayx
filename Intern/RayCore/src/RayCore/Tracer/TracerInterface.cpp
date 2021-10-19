@@ -62,7 +62,7 @@ namespace RAYX
 
         const clock_t begin_time = clock();
         m_RayTracer.run(); //run tracer
-        std::cout << "tracer run time: " << float(clock() - begin_time) << " ms" << std::endl;
+        std::cout << "tracer run time: " << float(clock() - begin_time) / CLOCKS_PER_SEC * 1000 << " ms" << std::endl;
 
         RAYX_DEBUG(std::cout << "run succeeded" << std::endl);
 
@@ -95,7 +95,7 @@ namespace RAYX
         }
         outputFile.close();
 
-        RAYX_DEBUG(std::cout << "tracer run incl load rays time: " << float(clock() - begin_time) << " ms" << std::endl);
+        RAYX_DEBUG(std::cout << "tracer run incl load rays time: " << float(clock() - begin_time) / CLOCKS_PER_SEC * 1000 << " ms" << std::endl);
 
         //clean up tracer to avoid memory leaks
         m_RayTracer.cleanup();

@@ -94,11 +94,11 @@ void VulkanTracer::run()
 	}
 	//vulkan is initialized
 	initVulkan();
-	std::cout << "init run time: " << float(clock() - begin_time) << " ms" << std::endl;
+	std::cout << "init run time: " << float(clock() - begin_time) / CLOCKS_PER_SEC * 1000 << " ms" << std::endl;
 	const clock_t begin_time_getRays = clock();
 	mainLoop();
 	getRays();
-	std::cout << "getRays run time: " << float(clock() - begin_time_getRays) << " ms" << std::endl;
+	std::cout << "getRays run time: " << float(clock() - begin_time_getRays) / CLOCKS_PER_SEC * 1000 << " ms" << std::endl;
 }
 
 //function for initializing vulkan
@@ -123,7 +123,7 @@ void VulkanTracer::initVulkan()
 	createBuffers();
 	const clock_t begin_time_fillBuffer = clock();
 	fillRayBuffer();
-	std::cout << "fillBuffer run time: " << float(clock() - begin_time_fillBuffer) << " ms" << std::endl;
+	std::cout << "fillBuffer run time: " << float(clock() - begin_time_fillBuffer) / CLOCKS_PER_SEC * 1000 << " ms" << std::endl;
 	fillQuadricBuffer();
 	//creates the descriptors used to bind the buffer to shader access points (bindings)
 	createDescriptorSetLayout();
@@ -140,7 +140,7 @@ void VulkanTracer::mainLoop()
 {
 	const clock_t begin_time = clock();
 	runCommandBuffer();
-	std::cout << "commandBuffer run time: " << float(clock() - begin_time) << " ms" << std::endl;
+	std::cout << "commandBuffer run time: " << float(clock() - begin_time) / CLOCKS_PER_SEC * 1000 << " ms" << std::endl;
 }
 
 void VulkanTracer::cleanup()
