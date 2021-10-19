@@ -237,7 +237,7 @@ void compareFromFunction(fn<ret, par> func, std::vector<RAYX::Ray> testValues, s
 
 void testOpticalElement(std::vector<std::shared_ptr<RAYX::OpticalElement>> elements, int n) {
     RAYX::SimulationEnv::get().m_numOfRays = n;
-    std::shared_ptr<RAYX::MatrixSource> m = std::make_shared<RAYX::MatrixSource>(0, "Matrix source 1", 0, 0.065, 0.04, 0.0, 0.001, 0.001, 100, 0, 1, 0, 0, std::vector<double>{ 0, 0, 0, 0 });
+    std::shared_ptr<RAYX::MatrixSource> m = std::make_shared<RAYX::MatrixSource>("Matrix source 1", 0, 0.065, 0.04, 0.0, 0.001, 0.001, 100, 0, 1, 0, 0, std::vector<double>{ 0, 0, 0, 0 });
 
     std::list<double> outputRays = runTracer(m->getRays(), elements);
     std::string filename = "testFile_";
