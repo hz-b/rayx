@@ -37,7 +37,7 @@ namespace RAYX
                 m_TracerInterface.addOpticalElementToTracer(Elements[i]);
             }
         }
-        m_TracerInterface.run(translationXerror, translationYerror, translationZerror);
+        return m_TracerInterface.run(translationXerror, translationYerror, translationZerror);
     }
 
 

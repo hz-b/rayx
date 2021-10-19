@@ -30,23 +30,23 @@ namespace RAYX
         m_figureRotation = (figRot == 0 ? FR_YES : (figRot == 1 ? FR_PLANE : FR_A11));
 
         calcHalfAxes();
-        // grazingIncidence = m_alpha = m_alpha1 + d_tangentAngle
+        // grazingIncidence = m_alpha = m_alpha1 + m_tangentAngle
         calcAlphaBeta();
         // a33, 34, 44
-        d_a33 = pow(m_shortHalfAxisB / m_longHalfAxisA, 2);
-        d_a34 = m_z0 * d_a33;
-        d_a44 = -pow(m_shortHalfAxisB, 2) + pow(m_y0, 2) + pow(m_z0 * m_shortHalfAxisB / m_longHalfAxisA, 2);
+        m_a33 = pow(m_shortHalfAxisB / m_longHalfAxisA, 2);
+        m_a34 = m_z0 * m_a33;
+        m_a44 = -pow(m_shortHalfAxisB, 2) + pow(m_y0, 2) + pow(m_z0 * m_shortHalfAxisB / m_longHalfAxisA, 2);
         m_radius = -m_y0;
 
         double icurv = 1;
-        setSurface(std::make_unique<Quadric>(std::vector<double>{m_a11, 0, 0, 0, icurv, 1, 0, m_radius, 0, 0, d_a33, d_a34, 0, 0, 0, d_a44}));
+        setSurface(std::make_unique<Quadric>(std::vector<double>{m_a11, 0, 0, 0, icurv, 1, 0, m_radius, 0, 0, m_a33, m_a34, 0, 0, 0, m_a44}));
         // setSurface(surface);
         calcTransformationMatricesFromAngles({ 0,0,0,0,0,0 }, global);
-        setElementParameters({ 0,0,m_a11,m_y0, d_a33,d_a34,d_a44,0, 0,0,0,0, 0,0,0,0 });
+        setElementParameters({ 0,0,m_a11,m_y0, m_a33,m_a34,m_a44,0, 0,0,0,0, 0,0,0,0 });
 
         // if m_misalignmentCoordSys == 1 rotate through d_tangentangle before misalignment and back after (-d_tangentangle)
         if (m_misalignmentCoordSys == CS_MIRROR) {
-            setTemporaryMisalignment({ 0,0,0,0,0,d_tangentAngle });
+            setTemporaryMisalignment({ 0,0,0,0,0,m_tangentAngle });
             glm::dmat4x4 inTrans = getB2E();
             glm::dmat4x4 outTrans = getE2B();
             glm::dmat4x4 mis = getMisalignmentMatrix();
@@ -74,7 +74,7 @@ namespace RAYX
     }
 
     void Ellipsoid::calcAlphaBeta() {
-        setAlpha(m_incidence - d_tangentAngle);
+        setAlpha(m_incidence - m_tangentAngle);
         setBeta(m_incidence); // mirror -> exit angle = incidence angle
         std::cout << "alpha= " << m_incidence << " m_alpha1= " << getAlpha() << " beta= " << getBeta() << std::endl;
     }
@@ -106,17 +106,17 @@ namespace RAYX
         m_longHalfAxisA = a;
         m_shortHalfAxisB = b;
         if (m_figureRotation == FR_YES) {
-            d_halfAxisC = sqrt(pow(m_shortHalfAxisB, 2) / 1); // devided by 1??
+            m_halfAxisC = sqrt(pow(m_shortHalfAxisB, 2) / 1); // devided by 1??
         }
         else if (m_figureRotation == FR_PLANE) {
             std::cout << "FR PLane" << std::endl;
-            d_halfAxisC = INFINITY;
+            m_halfAxisC = INFINITY;
         }
         else {
-            d_halfAxisC = sqrt(pow(m_shortHalfAxisB, 2) / m_a11);
+            m_halfAxisC = sqrt(pow(m_shortHalfAxisB, 2) / m_a11);
         }
-        d_tangentAngle = angle;
-        std::cout << "A= " << m_longHalfAxisA << ", B= " << m_shortHalfAxisB << ", C= " << d_halfAxisC << ", angle = " << d_tangentAngle << ", Z0 = " << m_z0 << ", Y0= " << m_y0 << std::endl;
+        m_tangentAngle = angle;
+        std::cout << "A= " << m_longHalfAxisA << ", B= " << m_shortHalfAxisB << ", C= " << m_halfAxisC << ", angle = " << m_tangentAngle << ", Z0 = " << m_z0 << ", Y0= " << m_y0 << std::endl;
     }
 
     double Ellipsoid::getRadius() {
@@ -152,18 +152,18 @@ namespace RAYX
         return m_offsetY0;
     }
     double Ellipsoid::getTangentAngle() {
-        return d_tangentAngle;
+        return m_tangentAngle;
     }
     double Ellipsoid::getA34() {
-        return d_a34;
+        return m_a34;
     }
     double Ellipsoid::getA33() {
-        return d_a33;
+        return m_a33;
     }
     double Ellipsoid::getA44() {
-        return d_a44;
+        return m_a44;
     }
     double Ellipsoid::getHalfAxisC() {
-        return d_halfAxisC;
+        return m_halfAxisC;
     }
 }

@@ -7,8 +7,12 @@ namespace RAYX
 {
 
     // angles given and stored in rad
-    RandomRays::RandomRays(int n, int low, int high)
-        : LightSource(0, n, "Random rays", 0, 100, 0, 0, 0, 0, { 0,0,0,0 }), m_low(low), m_high(high) {}
+    RandomRays::RandomRays(int low, int high)
+        : LightSource("Random rays", 0, 100, 0, 0, 0, 0, { 0,0,0,0 }),
+        m_low(low),
+        m_high(high)
+    {
+    }
 
     RandomRays::~RandomRays()
     {
@@ -23,7 +27,7 @@ namespace RAYX
         std::uniform_real_distribution<double> unif(m_low, m_high);
         std::default_random_engine re;
 
-        int n = this->getNumberOfRays();
+        int n = SimulationEnv::get().m_numOfRays;
         std::vector<Ray> rayList;
         std::cout << "create " << n << " random rays " << std::endl;
         // fill the square with rmat1xrmat1 rays
@@ -44,7 +48,7 @@ namespace RAYX
         std::list<double> diff;
         std::cout.precision(17);
         //double max = 0;
-        for (int i = 0; i < this->getNumberOfRays(); i++) {
+        for (int i = 0; i < SimulationEnv::get().m_numOfRays; i++) {
             Ray* r1 = input[i];
             double a1 = atan(r1->m_position.x) - output[i * RAYCORE_RAY_DOUBLE_AMOUNT];
             diff.push_back(a1);

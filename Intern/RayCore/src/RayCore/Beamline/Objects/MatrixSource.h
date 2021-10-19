@@ -8,7 +8,7 @@ namespace RAYX
     {
     public:
 
-        MatrixSource(const int id, const std::string name, const int numberOfRays, const int spreadType, const double sourceWidth, const double sourceHeight,
+        MatrixSource(const std::string name, const int spreadType, const double sourceWidth, const double sourceHeight,
             const double sourceDepth, const double horDivergence, const double verDivergence, const double photonEnergy, const double energySpread, const double linPol0, const double linPol45, const double circPol, const std::vector<double> misalignment);
 
         MatrixSource();
@@ -20,16 +20,6 @@ namespace RAYX
         double getSourceWidth() { return m_sourceWidth; }
         double getVerDivergence() { return m_verDivergence; }
         double getHorDivergence() { return m_horDivergence; }
-
-    private:
-        // Geometric Parameters
-        double m_sourceDepth;  ///< defines interval (z-axis) where rays are defined
-        double m_sourceHeight;
-        double m_sourceWidth;
-        double m_horDivergence;
-        double m_verDivergence;
-
-
     };
 
 } // namespace RAYX

@@ -9,7 +9,7 @@ namespace RAYX
     {
     public:
 
-        RandomRays(int n, int low, int high);
+        RandomRays(int low, int high);
 
         RandomRays();
         ~RandomRays();

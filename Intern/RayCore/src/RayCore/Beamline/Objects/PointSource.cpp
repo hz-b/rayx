@@ -6,16 +6,11 @@ namespace RAYX
 {
 
 
-    PointSource::PointSource(const int id, const std::string name, const int numberOfRays, const int spreadType,
+    PointSource::PointSource(const std::string name, const int spreadType,
         const double sourceWidth, const double sourceHeight, const double sourceDepth, const double horDivergence,
         const double verDivergence, const int widthDist, const int heightDist, const int horDist, const int verDist,
         const double photonEnergy, const double energySpread, const double linPol0, const double linPol45, const double circPol, const std::vector<double> misalignment)
-        : LightSource(id, numberOfRays, name.c_str(), spreadType, photonEnergy, energySpread, linPol0, linPol45, circPol, misalignment),
-        m_sourceDepth(sourceDepth),
-        m_sourceHeight(sourceHeight),
-        m_sourceWidth(sourceWidth),
-        m_horDivergence(horDivergence),
-        m_verDivergence(verDivergence)
+        : LightSource(name.c_str(), spreadType, photonEnergy, energySpread, linPol0, linPol45, circPol, misalignment, sourceDepth, sourceHeight, sourceWidth, horDivergence, verDivergence)
     {
         m_widthDist = widthDist == 0 ? SD_HARDEDGE : SD_GAUSSIAN;
         m_heightDist = heightDist == 0 ? SD_HARDEDGE : SD_GAUSSIAN;
@@ -41,7 +36,7 @@ namespace RAYX
     std::vector<Ray> PointSource::getRays() {
         double x, y, z, psi, phi, en; //x,y,z pos, psi,phi direction cosines, en=energy
 
-        int n = this->getNumberOfRays();
+        int n = SimulationEnv::get().m_numOfRays;
         std::vector<Ray> rayVector;
         rayVector.reserve(1048576);
         std::cout << "create " << n << " rays with standard normal deviation..." << std::endl;
@@ -50,7 +45,7 @@ namespace RAYX
         for (int i = 0; i < n; i++) {
             x = getCoord(m_widthDist, m_sourceWidth) + getMisalignmentParams()[0];
             y = getCoord(m_heightDist, m_sourceHeight) + getMisalignmentParams()[1];
-            z = (m_uniform(m_re) - 0.5) * m_sourceDepth;
+            z = (m_uniformDist(m_randEngine) - 0.5) * m_sourceDepth;
             en = selectEnergy(); // LightSource.cpp
             //double z = (rn[2] - 0.5) * m_sourceDepth;
             glm::dvec3 position = glm::dvec3(x, y, z);
@@ -75,10 +70,10 @@ namespace RAYX
      */
     double PointSource::getCoord(const PointSource::SOURCE_DIST l, const double extent) {
         if (l == SD_HARDEDGE) {
-            return (m_uniform(m_re) - 0.5) * extent;
+            return (m_uniformDist(m_randEngine) - 0.5) * extent;
         }
         else {
-            return (m_stdnorm(m_re) * extent);
+            return (m_normDist(m_randEngine) * extent);
         }
     }
 

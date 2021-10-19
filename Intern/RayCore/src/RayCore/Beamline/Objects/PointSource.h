@@ -9,7 +9,7 @@ namespace RAYX
     {
     public:
 
-        PointSource(const int id, const std::string name, const int numberOfRays, const int spreadType, const double sourceWidth, const double sourceHeight,
+        PointSource(const std::string name, const int spreadType, const double sourceWidth, const double sourceHeight,
             const double sourceDepth, const double horDivergence, const double verDivergence, const int widthDist, const int heightDist, const int horDist, const int verDist, const double photonEnergy, const double energySpread, const double linPol0, const double linPol45, const double circPol, const std::vector<double> misalignment);
 
         PointSource();
@@ -26,16 +26,6 @@ namespace RAYX
         double getHorDivergence() const;
 
     private:
-        // TODO(Jannis): move to light source
-        std::uniform_real_distribution<double> m_uniform;
-        std::normal_distribution<double> m_stdnorm;
-        std::default_random_engine m_re;
-        // Geometric Parameters 
-        double m_sourceDepth;
-        double m_sourceHeight;
-        double m_sourceWidth;
-        double m_horDivergence;
-        double m_verDivergence;
 
         // Geometric Parameters
         SOURCE_DIST m_widthDist;

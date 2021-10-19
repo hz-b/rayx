@@ -3,7 +3,14 @@
 namespace RAYX
 {
 
-    int SimulationEnv::s_numOfRays = 200000;
+    SimulationEnv& SimulationEnv::get() {
+        static SimulationEnv simEnv;
+        return simEnv;
+    }
+
+    size_t SimulationEnv::genID() {
+        return ++m_idCounter;
+    }
 
 
 } // namespace RAYX

@@ -5,6 +5,8 @@
 #include "Beamline/Objects/MatrixSource.h"
 #include "Beamline/Objects/PointSource.h"
 
+#include "Presenter/SimulationEnv.h"
+
 #include "Core.h"
 #include "Ray.h"
 #include "VulkanTracer.h"
@@ -42,11 +44,11 @@ void writeRaysToFile(std::list<double> outputRays, std::string name)
         }
         if (counter % 8 == 3) {
             if (print == 1) std::cout << ") ";
-        }        
-else if (counter % 8 == 4) {
+        }
+        else if (counter % 8 == 4) {
             if (print == 1) std::cout << " (";
-        }        
-else if (counter % 8 != 0) {
+        }
+        else if (counter % 8 != 0) {
             if (print == 1) std::cout << ", ";
         }
         if (print == 1) std::cout << *i;
@@ -87,7 +89,7 @@ TEST(RayTest, test1) {
 
 
 TEST(MatrixTest, testParams) {
-    int n = 100;
+    int n = RAYX::SimulationEnv::get().m_numOfRays;
     double width = 0.065;
     double height = 0.04;
     double depth = 0.0;
@@ -98,13 +100,12 @@ TEST(MatrixTest, testParams) {
     double lin0 = 1;
     double lin45 = 0;
     double circ = 0;
-    int id = 3;
     int spreadType = 0;
     std::vector<double> mis = { 0,0,0,0 };
-    RAYX::MatrixSource m = RAYX::MatrixSource(id, "Matrix source 1", n, spreadType, width, height, depth, hordiv, verdiv, photonEnergy, energySpread, lin0, lin45, circ, mis);
+    RAYX::MatrixSource m = RAYX::MatrixSource("Matrix source 1", spreadType, width, height, depth, hordiv, verdiv, photonEnergy, energySpread, lin0, lin45, circ, mis);
 
-    ASSERT_DOUBLE_EQ(m.getId(), id);
-    ASSERT_DOUBLE_EQ(m.getNumberOfRays(), n);
+    // ASSERT_DOUBLE_EQ(m.m_ID, id);
+    ASSERT_DOUBLE_EQ(RAYX::SimulationEnv::get().m_numOfRays, n);
     ASSERT_DOUBLE_EQ(m.getSourceDepth(), depth);
     ASSERT_DOUBLE_EQ(m.getSourceWidth(), width);
     ASSERT_DOUBLE_EQ(m.getSourceHeight(), height);
@@ -116,27 +117,26 @@ TEST(MatrixTest, testParams) {
 }
 
 TEST(MatrixTest, testGetRays) {
-    int n = 100;
+    int n = RAYX::SimulationEnv::get().m_numOfRays;
     double width = 0.065;
     double height = 0.04;
     double depth = 0.0;
     double verdiv = 0.001;
     double hordiv = 0.001;
-    int id = 3;
     double photonEnergy = 200;
     double energySpread = 10;
     double lin0 = 1;
     double lin45 = 0;
     double circ = 0;
     int spreadType = 0;
-    RAYX::MatrixSource m = RAYX::MatrixSource(id, "Matrix source 1", n, spreadType, width, height, depth, hordiv, verdiv, photonEnergy, energySpread, lin0, lin45, circ, { 0,0,0,0 });
+    RAYX::MatrixSource m = RAYX::MatrixSource("Matrix source 1", spreadType, width, height, depth, hordiv, verdiv, photonEnergy, energySpread, lin0, lin45, circ, { 0,0,0,0 });
     std::vector<RAYX::Ray> rays = m.getRays();
 
     ASSERT_EQ(rays.size(), n);
 }
 
 TEST(PointSource, testParams) {
-    int number_of_rays = 1000;
+    int number_of_rays = RAYX::SimulationEnv::get().m_numOfRays;
     double width = 0.065;
     double height = 0.04;
     double depth = 1.0;
@@ -149,7 +149,7 @@ TEST(PointSource, testParams) {
     double circ = 0;
     int spreadType = 1;
     std::vector<double> misalignment = { 0,0,0,0 };
-    RAYX::PointSource p = RAYX::PointSource(0, "Point source 1", number_of_rays, spreadType, width, height, depth, hor, ver, 0, 0, 0, 0, photonEnergy, energySpread, lin0, lin45, circ, misalignment); // 0 = hard edge (uniform)
+    RAYX::PointSource p = RAYX::PointSource("Point source 1", spreadType, width, height, depth, hor, ver, 0, 0, 0, 0, photonEnergy, energySpread, lin0, lin45, circ, misalignment); // 0 = hard edge (uniform)
 
     ASSERT_DOUBLE_EQ(p.getSourceDepth(), depth);
     ASSERT_DOUBLE_EQ(p.getSourceWidth(), width);
@@ -166,7 +166,7 @@ TEST(PointSource, testParams) {
 
 
 TEST(LightSource, PointSourceHardEdge) {
-    int number_of_rays = 10000;
+    int number_of_rays = RAYX::SimulationEnv::get().m_numOfRays;
     double width = 0.065;
     double height = 0.04;
     double depth = 1.0;
@@ -179,7 +179,7 @@ TEST(LightSource, PointSourceHardEdge) {
     double circ = 0;
     int spreadType = 0;
     std::vector<double> mis = { 0,0,0,0 };
-    RAYX::PointSource p = RAYX::PointSource(0, "Point source 1", number_of_rays, spreadType, width, height, depth, hor, ver, 0, 0, 0, 0, photonEnergy, energySpread, lin0, lin45, circ, mis); // 0 = hard edge (uniform)
+    RAYX::PointSource p = RAYX::PointSource("Point source 1", spreadType, width, height, depth, hor, ver, 0, 0, 0, 0, photonEnergy, energySpread, lin0, lin45, circ, mis); // 0 = hard edge (uniform)
 
     ASSERT_DOUBLE_EQ(p.getSourceDepth(), depth);
     ASSERT_DOUBLE_EQ(p.getSourceWidth(), width);
@@ -218,7 +218,7 @@ TEST(LightSource, PointSourceSoftEdge) {
     double circ = 0;
     int spreadType = 0;
     std::vector<double> mis = { 0,0,0,0 };
-    RAYX::PointSource p = RAYX::PointSource(0, "Point source 1", number_of_rays, spreadType, width, height, depth, hor, ver, 1, 1, 1, 1, photonEnergy, energySpread, lin0, lin45, circ, mis); // 1 = soft edge (gaussian)
+    RAYX::PointSource p = RAYX::PointSource("Point source 1", spreadType, width, height, depth, hor, ver, 1, 1, 1, 1, photonEnergy, energySpread, lin0, lin45, circ, mis); // 1 = soft edge (gaussian)
 
     ASSERT_DOUBLE_EQ(p.getSourceDepth(), depth);
     ASSERT_DOUBLE_EQ(p.getSourceWidth(), width);
@@ -258,7 +258,7 @@ TEST(LightSource, PointSourceHardEdgeMis) {
     double circ = 0;
     int spreadType = 1;
     std::vector<double> mis = { 2,3,0.005,0.006 }; // x, y, psi, phi
-    RAYX::PointSource p = RAYX::PointSource(0, "Point source 1", number_of_rays, spreadType, width, height, depth, hor, ver, 0, 0, 0, 0, photonEnergy, energySpread, lin0, lin45, circ, mis); // 0 = hard edge (uniform)
+    RAYX::PointSource p = RAYX::PointSource("Point source 1", spreadType, width, height, depth, hor, ver, 0, 0, 0, 0, photonEnergy, energySpread, lin0, lin45, circ, mis); // 0 = hard edge (uniform)
 
     std::vector<RAYX::Ray> rays = p.getRays();
     std::list<double> rayList;
@@ -292,7 +292,7 @@ TEST(LightSource, PointSourceSoftEdgeMis) {
     double circ = 0;
     int spreadType = 1;
     std::vector<double> mis = { 2,3,0.005,0.006 }; // x,y,psi,phi in rad
-    RAYX::PointSource p = RAYX::PointSource(0, "Point source 1", number_of_rays, spreadType, width, height, depth, hor, ver, 1, 1, 1, 1, photonEnergy, energySpread, lin0, lin45, circ, mis); // 1 = soft edge (gaussian)
+    RAYX::PointSource p = RAYX::PointSource("Point source 1", spreadType, width, height, depth, hor, ver, 1, 1, 1, 1, photonEnergy, energySpread, lin0, lin45, circ, mis); // 1 = soft edge (gaussian)
 
     std::vector<RAYX::Ray> rays = p.getRays();
     std::list<double> rayList;
@@ -320,7 +320,7 @@ TEST(LightSource, MatrixSource20000) {
     double lin45 = 0;
     double circ = 0;
     int spreadType = 1;
-    RAYX::MatrixSource p = RAYX::MatrixSource(0, "Matrix20", number_of_rays, spreadType, 0.065, 0.04, 0.0, 0.001, 0.001, photonEnergy, energySpread, lin0, lin45, circ, { 0,0,0,0 });
+    RAYX::MatrixSource p = RAYX::MatrixSource("Matrix20", spreadType, 0.065, 0.04, 0.0, 0.001, 0.001, photonEnergy, energySpread, lin0, lin45, circ, { 0,0,0,0 });
 
     std::vector<RAYX::Ray> rays = p.getRays();
     std::list<double> rayList;
@@ -348,7 +348,7 @@ TEST(LightSource, PointSource20000) {
     double lin45 = 0;
     double circ = 0;
     int spreadType = 1;
-    RAYX::PointSource p = RAYX::PointSource(0, "spec1_first_rzp4", number_of_rays, 1, 0.005, 0.005, 0, 0.02, 0.06, 1, 1, 0, 0, 640, 120, lin0, lin45, circ, { 0,0,0,0 });
+    RAYX::PointSource p = RAYX::PointSource("spec1_first_rzp4", 1, 0.005, 0.005, 0, 0.02, 0.06, 1, 1, 0, 0, 640, 120, lin0, lin45, circ, { 0,0,0,0 });
 
     std::vector<RAYX::Ray> rays = p.getRays();
     std::list<double> rayList;

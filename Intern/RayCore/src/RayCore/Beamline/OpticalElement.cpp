@@ -1,4 +1,5 @@
 #include "OpticalElement.h"
+#include "Presenter/SimulationEnv.h"
 #include <cassert>
 #include <assert.h>
 #include <math.h>
@@ -75,7 +76,13 @@ namespace RAYX
     }
 
     OpticalElement::OpticalElement(const char* name, const double chi, const double dist, const std::vector<double> slopeError, const std::shared_ptr<OpticalElement> previous)
-        : BeamlineObject(name), m_chi(chi), m_distanceToPreceedingElement(dist), m_previous(previous), m_slopeError(slopeError) {}
+        : BeamlineObject(name),
+        m_chi(chi),
+        m_distanceToPreceedingElement(dist),
+        m_previous(previous),
+        m_slopeError(slopeError)
+    {
+    }
 
     /* NEW CONSTRUCTORS */
 
@@ -89,9 +96,9 @@ namespace RAYX
      * @param tempMisalignmentParams    remove?
      * @param slopeError                slope error parameters
      */
-    OpticalElement::OpticalElement(const char* name, const std::vector<double> EParameters, const double width, const double height, glm::dvec4 position, glm::dmat4x4 orientation, const std::vector<double> tempMisalignmentParams, const std::vector<double> slopeError) 
-        : BeamlineObject(name), 
-        m_width(width), 
+    OpticalElement::OpticalElement(const char* name, const std::vector<double> EParameters, const double width, const double height, glm::dvec4 position, glm::dmat4x4 orientation, const std::vector<double> tempMisalignmentParams, const std::vector<double> slopeError)
+        : BeamlineObject(name),
+        m_width(width),
         m_height(height),
         m_elementParameters(EParameters),
         m_slopeError(slopeError)
@@ -110,19 +117,22 @@ namespace RAYX
      * @param orientation               orientation in world coordinate system
      * @param slopeError                slope error parameters
      */
-    OpticalElement::OpticalElement(const char* name, const double width, const double height, glm::dvec4 position, glm::dmat4x4 orientation, const std::vector<double> slopeError) 
+    OpticalElement::OpticalElement(const char* name, const double width, const double height, glm::dvec4 position, glm::dmat4x4 orientation, const std::vector<double> slopeError)
         : BeamlineObject(name),
         m_width(width),
         m_height(height),
-        m_slopeError(slopeError) 
+        m_slopeError(slopeError)
     {
         updateObjectParams();
-        setTemporaryMisalignment({0,0,0, 0,0,0});
+        setTemporaryMisalignment({ 0,0,0, 0,0,0 });
         calcTransformationMatrices(position, orientation);
     }
 
 
-    OpticalElement::OpticalElement() {}
+    OpticalElement::OpticalElement()
+    {
+
+    }
 
     OpticalElement::~OpticalElement()
     {
@@ -136,31 +146,31 @@ namespace RAYX
     */
     void OpticalElement::calcTransformationMatrices(glm::dvec4 position, glm::dmat4x4 orientation) {
         glm::dmat4x4 translation = glm::dmat4x4(1, 0, 0, -position[0],
-                                        0, 1, 0, -position[1],
-                                        0, 0, 1, -position[2],
-                                        0, 0, 0, 1); // o
+            0, 1, 0, -position[1],
+            0, 0, 1, -position[2],
+            0, 0, 0, 1); // o
         glm::dmat4x4 inv_translation = glm::dmat4x4(1, 0, 0, position[0],
-                                        0, 1, 0, position[1],
-                                        0, 0, 1, position[2],
-                                        0, 0, 0, 1); // o
+            0, 1, 0, position[1],
+            0, 0, 1, position[2],
+            0, 0, 0, 1); // o
         glm::dmat4x4 rotation = glm::dmat4x4(orientation[0][0], orientation[0][1], orientation[0][2], 0.0,
-                                        orientation[1][0], orientation[1][1], orientation[1][2], 0.0,
-                                        orientation[2][0], orientation[2][1], orientation[2][2], 0.0,
-                                        0.0, 0.0, 0.0, 1.0); // o
+            orientation[1][0], orientation[1][1], orientation[1][2], 0.0,
+            orientation[2][0], orientation[2][1], orientation[2][2], 0.0,
+            0.0, 0.0, 0.0, 1.0); // o
         glm::dmat4x4 inv_rotation = glm::transpose(rotation);
-        
+
         // ray = tran * rot * ray
-        glm::dmat4x4 g2e = translation * rotation; 
-        m_inMatrix = glmToVector16( glm::transpose( g2e ) );
+        glm::dmat4x4 g2e = translation * rotation;
+        m_inMatrix = glmToVector16(glm::transpose(g2e));
 
         // inverse of m_inMatrix
         glm::dmat4x4 e2g = inv_rotation * inv_translation;
-        m_outMatrix = glmToVector16( glm::transpose( e2g ) );
+        m_outMatrix = glmToVector16(glm::transpose(e2g));
 
         std::cout << "from position and orientation" << std::endl;
         printMatrix(m_inMatrix);
         printMatrix(m_outMatrix);
-        
+
     }
 
     /**
@@ -170,7 +180,7 @@ namespace RAYX
      * @return void
     */
     void OpticalElement::calcTransformationMatricesFromAngles(const std::vector<double> misalignment, bool global) {
-        std::cout << getName()  << " alpha " << m_alpha << " beta " << m_beta << " chi " << m_chi << std::endl;
+        std::cout << getName() << " alpha " << m_alpha << " beta " << m_beta << " chi " << m_chi << std::endl;
         double cos_c = cos(m_chi);
         double sin_c = sin(m_chi);
         double cos_a = cos(m_alpha);
@@ -184,24 +194,24 @@ namespace RAYX
                 0, -sin_a, cos_a, 0,
                 0, 0, 0, 1};
         std::vector<double> d_inTranslation = {1,0,0,0, 0,1,0,0, 0,0,1,0, 0,0,-dist,1};*/
-        d_b2e = glm::dmat4x4( cos_c, -sin_c * cos_a, -sin_c * sin_a, 0, // M_b2e
-                sin_c, cos_c * cos_a, sin_a * cos_c, 0,
-                0, -sin_a, cos_a, 0,
-                0, m_distanceToPreceedingElement * sin_a, -m_distanceToPreceedingElement * cos_a, 1 );
+        d_b2e = glm::dmat4x4(cos_c, -sin_c * cos_a, -sin_c * sin_a, 0, // M_b2e
+            sin_c, cos_c * cos_a, sin_a * cos_c, 0,
+            0, -sin_a, cos_a, 0,
+            0, m_distanceToPreceedingElement * sin_a, -m_distanceToPreceedingElement * cos_a, 1);
 
-        d_inv_b2e = glm::dmat4x4( cos_c, sin_c, 0, 0,            // (M_b2e)^-1
-                -sin_c * cos_a, cos_c * cos_a, -sin_a, 0,
-                -sin_c * sin_a, sin_a * cos_c, cos_a, 0,
-                0, 0, m_distanceToPreceedingElement, 1 );
+        d_inv_b2e = glm::dmat4x4(cos_c, sin_c, 0, 0,            // (M_b2e)^-1
+            -sin_c * cos_a, cos_c * cos_a, -sin_a, 0,
+            -sin_c * sin_a, sin_a * cos_c, cos_a, 0,
+            0, 0, m_distanceToPreceedingElement, 1);
 
-        d_e2b = glm::dmat4x4( cos_c, sin_c, 0, 0, // M_e2b
-                -sin_c * cos_b, cos_c * cos_b,  sin_b, 0,
-                sin_c * sin_b, -cos_c * sin_b, cos_b, 0,
-                0, 0, 0, 1 );
-        d_inv_e2b = glm::dmat4x4( cos_c, -sin_c * cos_b, sin_c * sin_b, 0, // rotation -> orthogonal -> inverse = transpose
-                        sin_c, cos_c * cos_b, -cos_c * sin_b, 0,
-                        0, sin_b, cos_b, 0,
-                        0, 0, 0, 1 );
+        d_e2b = glm::dmat4x4(cos_c, sin_c, 0, 0, // M_e2b
+            -sin_c * cos_b, cos_c * cos_b, sin_b, 0,
+            sin_c * sin_b, -cos_c * sin_b, cos_b, 0,
+            0, 0, 0, 1);
+        d_inv_e2b = glm::dmat4x4(cos_c, -sin_c * cos_b, sin_c * sin_b, 0, // rotation -> orthogonal -> inverse = transpose
+            sin_c, cos_c * cos_b, -cos_c * sin_b, 0,
+            0, sin_b, cos_b, 0,
+            0, 0, 0, 1);
 
 
         double dchi = misalignment[5]; // rotation around z-axis
@@ -214,20 +224,20 @@ namespace RAYX
         m_misalignmentParams = misalignment;
         // transpose of original matrix, multiplication order: 1.chi(z) 2.phi(y) 3.psi(x), 4.dx, 5.dy, 6.dz
         // ray = tran * rot * ray
-        d_misalignmentMatrix = glm::dmat4x4( cos(dphi) * cos(dchi), -cos(dpsi) * sin(dchi) - sin(dpsi) * sin(dphi) * cos(dchi), -sin(dpsi) * sin(dchi) + cos(dpsi) * sin(dphi) * cos(dchi), 0,
-                                sin(dchi) * cos(dphi), cos(dpsi) * cos(dchi) - sin(dpsi) * sin(dphi) * sin(dchi), sin(dpsi) * cos(dchi) + cos(dpsi) * sin(dphi) * sin(dchi), 0,
-                                -sin(dphi), -sin(dpsi) * cos(dphi), cos(dpsi) * cos(dphi), 0,
-                                -dx, -dy, -dz, 1 );
+        d_misalignmentMatrix = glm::dmat4x4(cos(dphi) * cos(dchi), -cos(dpsi) * sin(dchi) - sin(dpsi) * sin(dphi) * cos(dchi), -sin(dpsi) * sin(dchi) + cos(dpsi) * sin(dphi) * cos(dchi), 0,
+            sin(dchi) * cos(dphi), cos(dpsi) * cos(dchi) - sin(dpsi) * sin(dphi) * sin(dchi), sin(dpsi) * cos(dchi) + cos(dpsi) * sin(dphi) * sin(dchi), 0,
+            -sin(dphi), -sin(dpsi) * cos(dphi), cos(dpsi) * cos(dphi), 0,
+            -dx, -dy, -dz, 1);
         // inverse of rotation part of misalignment matrix equals the transpose (orthogonal matrix)
-        glm::dmat4x4 inverseRotation = glm::dmat4x4( cos(dphi) * cos(dchi), sin(dchi) * cos(dphi), -sin(dphi), 0,
-                            -cos(dpsi) * sin(dchi) - sin(dpsi) * sin(dphi) * cos(dchi), cos(dpsi) * cos(dchi) - sin(dpsi) * sin(dphi) * sin(dchi), -sin(dpsi) * cos(dphi), 0,
-                            -sin(dpsi) * sin(dchi) + cos(dpsi) * sin(dphi) * cos(dchi), sin(dpsi) * cos(dchi) + cos(dpsi) * sin(dphi) * sin(dchi), cos(dpsi) * cos(dphi), 0,
-                            0,0,0,1 );
+        glm::dmat4x4 inverseRotation = glm::dmat4x4(cos(dphi) * cos(dchi), sin(dchi) * cos(dphi), -sin(dphi), 0,
+            -cos(dpsi) * sin(dchi) - sin(dpsi) * sin(dphi) * cos(dchi), cos(dpsi) * cos(dchi) - sin(dpsi) * sin(dphi) * sin(dchi), -sin(dpsi) * cos(dphi), 0,
+            -sin(dpsi) * sin(dchi) + cos(dpsi) * sin(dphi) * cos(dchi), sin(dpsi) * cos(dchi) + cos(dpsi) * sin(dphi) * sin(dchi), cos(dpsi) * cos(dphi), 0,
+            0, 0, 0, 1);
         // inverse of translation part is negative of offsets
-        glm::dmat4x4 inverseTranslation = glm::dmat4x4( 1,0,0,0,
-                            0,1,0,0,
-                            0,0,1,0,
-                            dx, dy, dz, 1 );
+        glm::dmat4x4 inverseTranslation = glm::dmat4x4(1, 0, 0, 0,
+            0, 1, 0, 0,
+            0, 0, 1, 0,
+            dx, dy, dz, 1);
         // inv(rot) * inv(tran) * ray
         d_inverseMisalignmentMatrix = inverseRotation * inverseTranslation;
 

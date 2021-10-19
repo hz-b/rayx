@@ -4,11 +4,13 @@
 
 namespace RAYX
 {
-    LightSource::LightSource(const int id, const int numberOfRays, const char* name, const int spreadType,
-        const double photonEnergy, const double energySpread, const double linPol0, const double linPol45, const double circPol, const std::vector<double> misalignment)
+    LightSource::LightSource(const char* name, const int spreadType, const double photonEnergy, const double energySpread, const double linPol0, const double linPol45, const double circPol, const std::vector<double> misalignment, const double sourceDepth, const double sourceHeight, const double sourceWidth, const double horDivergence, const double verDivergence)
         : BeamlineObject(name),
-        m_id(id),
-        m_numberOfRays(numberOfRays),
+        m_sourceDepth(sourceDepth),
+        m_sourceHeight(sourceHeight),
+        m_sourceWidth(sourceWidth),
+        m_horDivergence(horDivergence),
+        m_verDivergence(verDivergence),
         m_misalignmentParams(misalignment),
         m_energySpread(energySpread),
         m_photonEnergy(photonEnergy),
@@ -20,34 +22,52 @@ namespace RAYX
         m_energySpreadType = spreadType == 0 ? ES_WHITE_BAND : ES_THREE_ENERGIES;
     }
 
-    int LightSource::getNumberOfRays() {
-        return m_numberOfRays;
+    // ! Temporary code clone
+    LightSource::LightSource(const char* name, const int spreadType, const double photonEnergy, const double energySpread, const double linPol0, const double linPol45, const double circPol, const std::vector<double> misalignment)
+        : BeamlineObject(name),
+        m_misalignmentParams(misalignment),
+        m_energySpread(energySpread),
+        m_photonEnergy(photonEnergy),
+        m_linearPol_0(linPol0),
+        m_linearPol_45(linPol45),
+        m_circularPol(circPol)
+    {
+        std::uniform_real_distribution<double> m_unif(0, 1);
+        m_energySpreadType = spreadType == 0 ? ES_WHITE_BAND : ES_THREE_ENERGIES;
     }
-    double LightSource::getPhotonEnergy() {
+
+    double LightSource::getPhotonEnergy()
+    {
         return m_photonEnergy;
     }
-    double LightSource::getEnergySpread() {
+
+    double LightSource::getEnergySpread()
+    {
         return m_energySpread;
     }
-    int LightSource::getSpreadType() {
+
+    int LightSource::getSpreadType()
+    {
         return m_energySpreadType;
     }
-    double LightSource::getLinear0() {
+
+    double LightSource::getLinear0()
+    {
         return m_linearPol_0;
     }
-    double LightSource::getLinear45() {
+
+    double LightSource::getLinear45()
+    {
         return m_linearPol_45;
     }
-    double LightSource::getCircular() {
+
+    double LightSource::getCircular()
+    {
         return m_circularPol;
     }
-    void LightSource::setNumberOfRays(const int numberOfRays) {
-        m_numberOfRays = numberOfRays;
-    }
-    int LightSource::getId() {
-        return m_id;
-    }
-    std::vector<double> LightSource::getMisalignmentParams() {
+
+    std::vector<double> LightSource::getMisalignmentParams()
+    {
         return m_misalignmentParams;
     }
 
@@ -67,11 +87,11 @@ namespace RAYX
             // else distinguish between two sprad types 
         }
         else if (m_energySpreadType == ES_WHITE_BAND) { //  energy uniform random in [photonEnergy - 0.5*spread, photonEnergy + 0.5*spread]
-            double rn = m_unif(m_re);
+            double rn = m_uniformDist(m_randEngine);
             en = m_photonEnergy + (rn - 0.5) * m_energySpread;
         }
         else { // three sources
-            double rn = m_unif(m_re);
+            double rn = m_uniformDist(m_randEngine);
             en = m_photonEnergy + double(int(rn * 3) - 1) * 0.5 * m_energySpread;
         }
         return en;

@@ -19,8 +19,8 @@ namespace RAYX
 
         void addLightSource(std::shared_ptr<LightSource> newSource);
     private:
-        TracerInterface m_TracerInterface;
         std::shared_ptr<Beamline> m_Beamline;
+        TracerInterface m_TracerInterface;
         std::vector<std::shared_ptr<LightSource>> m_lightSources;
     };
 
