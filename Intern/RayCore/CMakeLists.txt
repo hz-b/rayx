@@ -25,6 +25,7 @@ SET(SOURCE
     src/RayCore/Data/Exporter.cpp
     src/RayCore/Data/Importer.cpp
     src/RayCore/Presenter/Presenter.cpp
+    src/RayCore/Presenter/SimulationEnv.cpp
     src/RayCore/Surface/Quadric.cpp
     src/RayCore/Surface/Toroid.cpp
     src/RayCore/Surface/Surface.cpp
@@ -59,6 +60,7 @@ SET(HEADERS
     src/RayCore/Data/Exporter.h
     src/RayCore/Data/Importer.h
     src/RayCore/Presenter/Presenter.h
+    src/RayCore/Presenter/SimulationEnv.h
     src/RayCore/Surface/Quadric.h
     src/RayCore/Surface/Toroid.h
     src/RayCore/Surface/Surface.h

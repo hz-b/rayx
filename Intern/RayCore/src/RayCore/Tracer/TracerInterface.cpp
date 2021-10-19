@@ -58,7 +58,7 @@ namespace RAYX
     {
 
 
-        RAYX_DEBUG(std::cout << "add rays to tracer done" << std::endl);
+        //RAYX_DEBUG(std::cout << "add rays to tracer done" << std::endl);
 
         const clock_t begin_time = clock();
         m_RayTracer.run(); //run tracer

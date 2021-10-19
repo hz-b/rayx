@@ -23,7 +23,7 @@ namespace RAYX
 
     // ! parameters are temporary and need to be removed again
     bool Presenter::run(double translationXerror, double translationYerror, double translationZerror)
-    {   
+    {
         /*int beamlinesSimultaneously = 1;*/
         for (int j = 0; j < 1/*beamlinesSimultaneously*/; j++) {
             m_TracerInterface.generateRays(m_lightSources[0]);

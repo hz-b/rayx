@@ -21,7 +21,7 @@ namespace RAYX
      * @param slopeError                7 slope error parameters: x-y sagittal (0), y-z meridional (1), thermal distortion x (2),y (3),z (4), cylindrical bowing amplitude y(5) and radius (6)
     */
     ToroidMirror::ToroidMirror(const char* name, const int geometricShape, const double width, const double height, glm::dvec4 position, glm::dmat4x4 orientation, const double incidenceAngle, const double mEntrance, const double mExit, const double sEntrance, const double sExit, const std::vector<double> slopeError)
-        : OpticalElement(name, { 0,0,0,0, 0,0,0,0, 0,0,0,0, 0,0,0,0 }, width, height, position, orientation, {0,0,0, 0,0,0}, slopeError),
+        : OpticalElement(name, { 0,0,0,0, 0,0,0,0, 0,0,0,0, 0,0,0,0 }, width, height, position, orientation, { 0,0,0, 0,0,0 }, slopeError),
         m_sagittalEntranceArmLength(sEntrance),
         m_sagittalExitArmLength(sExit),
         m_meridionalEntranceArmLength(mEntrance),
@@ -33,9 +33,9 @@ namespace RAYX
         }
         // TODO(Theresa): maybe move this function outside of this class (same for spheres) because this is derived from user parameters
         calcRadius(incidenceAngle); // calculate the radius
-        
+
         std::cout << "long Radius: " << m_longRadius << ", short Radius: " << m_shortRadius << std::endl;
-        setSurface(std::make_unique<Toroid>(std::vector<double>{m_longRadius, m_shortRadius,0,0, 0,1,0,0, 0,0,1,0, 6,0,0,0}));
+        setSurface(std::make_unique<Toroid>(std::vector<double>{m_longRadius, m_shortRadius, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 6, 0, 0, 0}));
         // setSurface(std::make_unique<Toroid>(m_longRadius, m_shortRadius));
     }
 
@@ -65,7 +65,7 @@ namespace RAYX
             setDimensions(-width, -height);
         }
         calcRadius(degToRad(grazingIncidence)); // calculate the radius
-        setSurface(std::make_unique<Toroid>(std::vector<double>{m_longRadius, m_shortRadius,0,0, 0,1,0,0, 0,0,1,0, 6,0,0,0}));
+        setSurface(std::make_unique<Toroid>(std::vector<double>{m_longRadius, m_shortRadius, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 6, 0, 0, 0}));
     }
 
     ToroidMirror::~ToroidMirror()
