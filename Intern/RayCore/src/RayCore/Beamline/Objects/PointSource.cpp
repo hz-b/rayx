@@ -4,8 +4,6 @@
 
 namespace RAYX
 {
-
-
     PointSource::PointSource(const int id, const std::string name, const int numberOfRays, const int spreadType,
         const double sourceWidth, const double sourceHeight, const double sourceDepth, const double horDivergence,
         const double verDivergence, const int widthDist, const int heightDist, const int horDist, const int verDist,
@@ -28,6 +26,39 @@ namespace RAYX
     }
 
     PointSource::~PointSource() {}
+
+    // returns nullptr on error
+    std::shared_ptr<PointSource> PointSource::createFromXML(rapidxml::xml_node<>* node) {
+        const int id = 0;
+        const std::string name = node->first_attribute("name")->value();
+        return nullptr;
+        /*
+        const int numberOfRays;
+        const int spreadType;
+        const double sourceWidth;
+        const double sourceHeight;
+        const double sourceDepth;
+        const double horDivergence;
+        const double verDivergence;
+        const int widthDist;
+        const int heightDist;
+        const int horDist;
+        const int verDist;
+        const double photonEnergy;
+        const double energySpread;
+        const double linPol0;
+        const double linPol45;
+        const double circPol;
+        const std::vector<double> misalignment;
+
+
+        return std::make_shared<PointSource>(PointSource(
+            id, name, numberOfRays, spreadType, sourceWidth, sourceHeight, sourceDepth,
+            horDivergence, verDivergence, widthDist, horDist, verDist, photonEnergy, energySpread,
+            linPol0, linPol45, circPol, misalignment
+        ));
+        */ // TODO
+    }
 
     /**
      * creates random rays from point source with specified width and height

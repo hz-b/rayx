@@ -35,8 +35,8 @@ namespace RAYX
         std::vector<std::shared_ptr<OpticalElement>> getObjects() const;
         int size() const;
 
-    private:
-        std::vector<std::shared_ptr<OpticalElement>> m_Objects;
+        // TODO: make this private again!
+        std::vector<std::shared_ptr<OpticalElement>> m_Objects; // TODO make BeamlineObject
 
     };
 

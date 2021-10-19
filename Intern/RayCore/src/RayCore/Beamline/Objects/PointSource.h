@@ -15,6 +15,8 @@ namespace RAYX
         PointSource();
         ~PointSource();
 
+        static std::shared_ptr<PointSource> createFromXML(rapidxml::xml_node<>*);
+
         enum SOURCE_DIST { SD_HARDEDGE, SD_GAUSSIAN };
 
         std::vector<Ray> getRays();
