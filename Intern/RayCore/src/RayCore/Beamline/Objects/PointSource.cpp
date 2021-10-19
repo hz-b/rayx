@@ -57,7 +57,7 @@ namespace RAYX
             horDivergence, verDivergence, widthDist, horDist, verDist, photonEnergy, energySpread,
             linPol0, linPol45, circPol, misalignment
         ));
-        */ // TODO
+        */ // TODO(rudi)
     }
 
     /**

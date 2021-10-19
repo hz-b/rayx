@@ -2,6 +2,7 @@
 #include "Debug.h"
 
 #include <iostream>
+#include <memory>
 
 namespace RAYX
 {
@@ -16,28 +17,33 @@ namespace RAYX
 
     // push copy of shared pointer to m_objects vector
     void Beamline::addOpticalElement(const std::shared_ptr<OpticalElement> q) {
-        m_Objects.push_back(q);
+        m_Objects.push_back(std::static_pointer_cast<BeamlineObject>(q));
     }
 
     void Beamline::addOpticalElement(const char* name, const std::vector<double>& inputPoints, std::vector<double> inputInMatrix, std::vector<double> inputOutMatrix, std::vector<double> misalignmentMatrix, std::vector<double> inverseMisalignmentMatrix, std::vector<double> OParameters, std::vector<double> EParameters)
     {
-        m_Objects.emplace_back(std::make_shared<OpticalElement>(name, inputPoints, inputInMatrix, inputOutMatrix, misalignmentMatrix, inverseMisalignmentMatrix, OParameters, EParameters));
+        m_Objects.emplace_back(std::static_pointer_cast<BeamlineObject>(std::make_shared<OpticalElement>(
+            name, inputPoints, inputInMatrix, inputOutMatrix, misalignmentMatrix, inverseMisalignmentMatrix, OParameters, EParameters
+        )));
     }
 
     void Beamline::addOpticalElement(const char* name, std::vector<double>&& inputPoints, std::vector<double>&& inputInMatrix, std::vector<double>&& inputOutMatrix, std::vector<double>&& misalignmentMatrix, std::vector<double>&& inverseMisalignmentMatrix, std::vector<double>&& OParameters, std::vector<double>&& EParameters)
     {
-        m_Objects.emplace_back(std::make_shared<OpticalElement>(name, std::move(inputPoints), std::move(inputInMatrix), std::move(inputOutMatrix), std::move(misalignmentMatrix), std::move(inverseMisalignmentMatrix), std::move(OParameters), std::move(EParameters)));
+        m_Objects.emplace_back(std::static_pointer_cast<BeamlineObject>(std::make_shared<OpticalElement>(
+            name, std::move(inputPoints), std::move(inputInMatrix), std::move(inputOutMatrix), std::move(misalignmentMatrix), std::move(inverseMisalignmentMatrix), std::move(OParameters), std::move(EParameters)
+        )));
     }
 
-    void Beamline::replaceNthObject(uint32_t index, std::shared_ptr<OpticalElement> newObject)
-    {
-        assert(m_Objects.size() >= index);
-        m_Objects[index] = newObject;
-    }
-
+    // TODO(rudi): this still returns OpticalElement to not disrupt the rest of the system.
+    // it should soon return BeamlineObject!
     std::vector<std::shared_ptr<OpticalElement>> Beamline::getObjects() const
     {
-        return m_Objects;
+        std::vector<std::shared_ptr<OpticalElement>> elems;
+        for (size_t i = 0; i < m_Objects.size(); i++) {
+            std::shared_ptr<OpticalElement> e = std::dynamic_pointer_cast<OpticalElement>(m_Objects[i]);
+            if (e) { elems.push_back(e); }
+        }
+        return elems;
     }
 
     int Beamline::size() const {

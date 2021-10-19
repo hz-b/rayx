@@ -16,7 +16,7 @@ namespace RAYX
     class RAYX_API BeamlineObject
     {
     public:
-        ~BeamlineObject();
+        virtual ~BeamlineObject(); // TODO(rudi) remove virtual, this is a temporary hotfix to allow dynamic casting
 
         const char* getName() const;
 

@@ -18,14 +18,14 @@ namespace RAYX
 
     }
 
-    // TODO: use std::optional<std::shared_ptr<BeamlineObject>> when updating to C++17
+    // TODO(rudi): use std::optional<std::shared_ptr<BeamlineObject>> when updating to C++17
     std::shared_ptr<OpticalElement> createBeamlineObjectFromXML(rapidxml::xml_node<>* node) {
         const char* type = node->first_attribute("type")->value();
         if (strcmp(type, "Point Source") ==  0) {
-            // TODO
+            // TODO(rudi)
             // return std::static_pointer_cast<OpticalBeamElement>(PointSource::createFromXML(node));
 
-        // TODO:
+        // TODO(rudi):
         // } else if (strcmp(type, ...) ==  0) { ... }
 
         } else {
@@ -54,7 +54,7 @@ namespace RAYX
 
             const auto obj = createBeamlineObjectFromXML(object);
             if (obj) {
-                // TODO
+                // TODO(rudi)
                 // beamline.m_Objects.push_back(obj);
             } else {
                 std::cerr << "could not construct beamline object:\n";
