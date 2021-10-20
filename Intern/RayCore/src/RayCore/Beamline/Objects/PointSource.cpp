@@ -84,9 +84,15 @@ namespace RAYX
             xml::paramDouble(node, "translationXerror", &misalignment[0]);
             xml::paramDouble(node, "translationYerror", &misalignment[1]);
             xml::paramDouble(node, "translationZerror", &misalignment[2]);
+
             xml::paramDouble(node, "rotationXerror", &misalignment[3]);
+            misalignment[3] /= 1000.f; // mrad -> rad conversion
+
             xml::paramDouble(node, "rotationYerror", &misalignment[4]);
+            misalignment[4] /= 1000.f;
+
             xml::paramDouble(node, "rotationZerror", &misalignment[5]);
+            misalignment[5] /= 1000.f;
         }
 
 
