@@ -45,7 +45,7 @@ using ::testing::ElementsAre;
     EXPECT_ITERABLE_BASE( EXPECT_DOUBLE_EQ, TYPE, TYPE, ref, target )
 
 TEST(RZP, testdefaultParams) {
-    int mount = 1;
+    int mount = 1; // incidence
     int geometricalShape = 0;
     int curvatureType = 0;
     int imageType = 0;
@@ -81,16 +81,16 @@ TEST(RZP, testdefaultParams) {
     // alpha and beta calculated from user params
     double alpha = 0.017453292519943295;
     double beta = 0.017453292519941554;
-    RAYX::GeometricUserParams rzp_guparams = RAYX::GeometricUserParams(imageType, grazingIncidence, hvlam(sourceEnergy), hvlam(designEnergy), orderOfDiffraction, designOrderOfDiffraction, dAlpha, dBeta, mEntrance, mExit, sEntrance, sExit);
-    ASSERT_DOUBLE_EQ(rzp_guparams.getAlpha(), alpha);
-    ASSERT_DOUBLE_EQ(rzp_guparams.getBeta(), beta);
+    RAYX::GeometricUserParams rzp_guparams = RAYX::GeometricUserParams(mount, imageType, deviation, grazingIncidence, beta_in, sourceEnergy, designEnergy, orderOfDiffraction, designOrderOfDiffraction, dAlpha, dBeta, mEntrance, mExit, sEntrance, sExit);
+    EXPECT_DOUBLE_EQ(rzp_guparams.getAlpha(), alpha);
+    EXPECT_DOUBLE_EQ(rzp_guparams.getBeta(), beta);
 
     RAYX::WorldCoordinates rzp_param = RAYX::WorldCoordinates(alpha, beta, azimuthal, dist, mis);
     glm::dvec4 position = rzp_param.calcPosition();
     glm::dmat4x4 orientation = rzp_param.calcOrientation();
 
     RAYX::ReflectionZonePlate rzp = RAYX::ReflectionZonePlate("RZP", geometricalShape, curvatureType, width, height, position, orientation, designEnergy, orderOfDiffraction, designOrderOfDiffraction, dAlpha, dBeta, sEntrance, sExit, mEntrance, mExit, shortRadius, longRadius, additionalOrder, fresnelOffset, sE);
-    //RAYX::ReflectionZonePlate rzp = RAYX::ReflectionZonePlate("RZP", geometricalShape, mount, curvatureType, designType, elementOffsetType, width, height, deviation, grazingIncidence, azimuthal, dist, designEnergy, sourceEnergy, orderOfDiffraction, designOrderOfDiffraction, dAlpha, dBeta, sEntrance, sExit, mEntrance, mExit, shortRadius, longRadius, additionalOrder, elementOffsetZ, fresnelOffset, beta_in, mis, sE, NULL, false);
+    RAYX::ReflectionZonePlate rzp2 = RAYX::ReflectionZonePlate("RZP", geometricalShape, mount, curvatureType, designType, elementOffsetType, width, height, deviation, grazingIncidence, azimuthal, dist, designEnergy, sourceEnergy, orderOfDiffraction, designOrderOfDiffraction, dAlpha, dBeta, sEntrance, sExit, mEntrance, mExit, shortRadius, longRadius, additionalOrder, elementOffsetZ, fresnelOffset, beta_in, mis, sE, NULL, false);
 
     double d_alpha = 0.017453292519943295;
     double d_beta = 0.017453292519943295;
@@ -123,7 +123,7 @@ TEST(RZP, testdefaultParams) {
 }
 
 TEST(RZP, testdefaultParamsElliptical) {
-    int mount = 1;
+    int mount = 1; // incidence
     int geometricalShape = 1;
     int curvatureType = 0;
     int imageType = 0;
@@ -135,7 +135,7 @@ TEST(RZP, testdefaultParamsElliptical) {
     double width = 50.0;
     double height = 200.0;
     double deviation = 170;
-    double grazingIncidence = 1; // auto == true -> taken from designAlpha
+    double grazingIncidence = 0; // auto == true -> taken from designAlpha
     double azimuthal = 0;
     double dist = 10000.0;
     double designEnergy = 100;
@@ -159,15 +159,15 @@ TEST(RZP, testdefaultParamsElliptical) {
     double alpha = 0.017453292519943295;
     double beta = 0.017453292519941554;
 
-    RAYX::GeometricUserParams rzp_guparams = RAYX::GeometricUserParams(imageType, grazingIncidence, hvlam(sourceEnergy), hvlam(designEnergy), orderOfDiffraction, designOrderOfDiffraction, dAlpha, dBeta, mEntrance, mExit, sEntrance, sExit);
-    ASSERT_DOUBLE_EQ(rzp_guparams.getAlpha(), alpha);
-    ASSERT_DOUBLE_EQ(rzp_guparams.getBeta(), beta);
+    RAYX::GeometricUserParams rzp_guparams = RAYX::GeometricUserParams(mount, imageType, deviation, grazingIncidence, beta_in, sourceEnergy, designEnergy, orderOfDiffraction, designOrderOfDiffraction, dAlpha, dBeta, mEntrance, mExit, sEntrance, sExit);
+    EXPECT_DOUBLE_EQ(rzp_guparams.getAlpha(), alpha);
+    EXPECT_DOUBLE_EQ(rzp_guparams.getBeta(), beta);
 
     RAYX::WorldCoordinates rzp_param = RAYX::WorldCoordinates(rzp_guparams.getAlpha(), rzp_guparams.getBeta(), azimuthal, dist, mis);
     glm::dvec4 position = rzp_param.calcPosition();
     glm::dmat4x4 orientation = rzp_param.calcOrientation();
     RAYX::ReflectionZonePlate rzp = RAYX::ReflectionZonePlate("RZP", geometricalShape, curvatureType, width, height, position, orientation, designEnergy, orderOfDiffraction, designOrderOfDiffraction, dAlpha, dBeta, sEntrance, sExit, mEntrance, mExit, shortRadius, longRadius, additionalOrder, fresnelOffset, sE);
-    // RAYX::ReflectionZonePlate rzp = RAYX::ReflectionZonePlate("RZP", geometricalShape, mount, curvatureType, designType, elementOffsetType, width, height, deviation, grazingIncidence, azimuthal, dist, designEnergy, sourceEnergy, orderOfDiffraction, designOrderOfDiffraction, dAlpha, dBeta, sEntrance, sExit, mEntrance, mExit, shortRadius, longRadius, additionalOrder, elementOffsetZ, fresnelOffset, beta_in, mis, sE, NULL, false);
+    RAYX::ReflectionZonePlate rzp2 = RAYX::ReflectionZonePlate("RZP", geometricalShape, mount, curvatureType, designType, elementOffsetType, width, height, deviation, grazingIncidence, azimuthal, dist, designEnergy, sourceEnergy, orderOfDiffraction, designOrderOfDiffraction, dAlpha, dBeta, sEntrance, sExit, mEntrance, mExit, shortRadius, longRadius, additionalOrder, elementOffsetZ, fresnelOffset, beta_in, mis, sE, NULL, false);
 
     double d_alpha = 0.017453292519943295;
     double d_beta = 0.017453292519943295;
@@ -200,14 +200,14 @@ TEST(RZP, testdefaultParamsElliptical) {
 }
 
 TEST(RZP, testParams) {
-    int mount = 0;
+    int mount = 0; // deviation
     int geometricShape = 0;
     int imageType = 0;
     int curvatureType = 0;
     int designType = 0;
     int elementOffsetType = 0;
     int additionalOrder = 0;
-    double betaIn = 0;
+    double beta_in = 0;
     double width = 151.74;
     double height = 354.3;
     double deviation = 13.7;
@@ -234,16 +234,16 @@ TEST(RZP, testParams) {
 
     double alpha = 0.21816615649929119;
     double beta = 0.21816615649929122;
-    RAYX::GeometricUserParams rzp_guparams = RAYX::GeometricUserParams(imageType, grazingIncidence, hvlam(sourceEnergy), hvlam(designEnergy), orderOfDiffraction, designOrderOfDiffraction, dAlpha, dBeta, mEntrance, mExit, sEntrance, sExit);
-    ASSERT_DOUBLE_EQ(rzp_guparams.getAlpha(), alpha);
-    ASSERT_DOUBLE_EQ(rzp_guparams.getBeta(), beta);
+    RAYX::GeometricUserParams rzp_guparams = RAYX::GeometricUserParams(mount, imageType, deviation, grazingIncidence, beta_in, sourceEnergy, designEnergy, orderOfDiffraction, designOrderOfDiffraction, dAlpha, dBeta, mEntrance, mExit, sEntrance, sExit);
+    EXPECT_DOUBLE_EQ(rzp_guparams.getAlpha(), alpha);
+    EXPECT_DOUBLE_EQ(rzp_guparams.getBeta(), beta);
 
-    RAYX::WorldCoordinates rzp_param = RAYX::WorldCoordinates(rzp_guparams.getAlpha(), rzp_guparams.getBeta(), degToRad(azimuthal), dist, mis);
+    RAYX::WorldCoordinates rzp_param = RAYX::WorldCoordinates(rzp_guparams.getAlpha(), 0.21816615649929122, degToRad(azimuthal), dist, mis);
     glm::dvec4 position = rzp_param.calcPosition();
     glm::dmat4x4 orientation = rzp_param.calcOrientation();
     RAYX::ReflectionZonePlate rzp = RAYX::ReflectionZonePlate("RZP", geometricShape, curvatureType, width, height, position, orientation, designEnergy, orderOfDiffraction, designOrderOfDiffraction, dAlpha, dBeta, sEntrance, sExit, mEntrance, mExit, shortRadius, longRadius, additionalOrder, fresnelOffset, sE);
 
-    RAYX::ReflectionZonePlate rzp2 = RAYX::ReflectionZonePlate("RZP", geometricShape, mount, curvatureType, designType, elementOffsetType, width, height, deviation, grazingIncidence, azimuthal, dist, designEnergy, sourceEnergy, orderOfDiffraction, designOrderOfDiffraction, dAlpha, dBeta, sEntrance, sExit, mEntrance, mExit, shortRadius, longRadius, additionalOrder, elementOffsetZ, fresnelOffset, betaIn, mis, sE, NULL, true);
+    RAYX::ReflectionZonePlate rzp2 = RAYX::ReflectionZonePlate("RZP", geometricShape, mount, curvatureType, designType, elementOffsetType, width, height, deviation, grazingIncidence, azimuthal, dist, designEnergy, sourceEnergy, orderOfDiffraction, designOrderOfDiffraction, dAlpha, dBeta, sEntrance, sExit, mEntrance, mExit, shortRadius, longRadius, additionalOrder, elementOffsetZ, fresnelOffset, beta_in, mis, sE, NULL, true);
 
     std::vector<double> correctElementParams = { 0, 0, 0, inm2eV / designEnergy,
                         0, designOrderOfDiffraction, orderOfDiffraction, fresnelOffset,

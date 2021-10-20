@@ -33,12 +33,36 @@ namespace RAYX
     }
 
     // RZP
-    GeometricUserParams::GeometricUserParams(int imageType, double grazingIncidence, double sourceWavelength, double designWavelength, double orderOfDiffraction, double designOrderOfDiffraction, 
+    GeometricUserParams::GeometricUserParams(int mount, int imageType, double deviationAngle, double grazingIncidence, double grazingExitAngle, double sourceEnergy, double designEnergy, double orderOfDiffraction, double designOrderOfDiffraction, 
         double designAlphaAngle, double designBetaAngle, double mEntrance, double mExit, double sEntrance, double sExit) 
     : m_radius(0), m_shortRadius(0) {
-        m_alpha = degToRad(grazingIncidence);
-        double DZ = (designOrderOfDiffraction == 0) ? 0 : calcDz00(imageType, designWavelength, degToRad(designAlphaAngle), degToRad(designBetaAngle), designOrderOfDiffraction, sEntrance, sExit, mEntrance, mExit);
-        m_beta = acos(cos(m_alpha) - orderOfDiffraction * sourceWavelength * 1e-6 * DZ);
+
+        double designWavelength = hvlam(designEnergy);
+        double sourceWavelength = hvlam(sourceEnergy);
+        double dz = calcDz00(imageType, designWavelength, designAlphaAngle, designBetaAngle, designOrderOfDiffraction, sEntrance, sExit, mEntrance, mExit);
+        
+        GRATING_MOUNT gratingMount = mount == 0 ? GM_DEVIATION : GM_INCIDENCE;
+        // calculate alpha depending on either incidence or deviation angle IF incidence not given directly
+        if(grazingIncidence == 0)  {
+            if ( gratingMount == GM_INCIDENCE ) {
+                std::cout << "use design angle" << std::endl;
+                m_alpha = degToRad(designAlphaAngle);
+            } else if (gratingMount == GM_DEVIATION ) {
+                std::cout << "use deviation angle" << std::endl;
+                focus(designEnergy, deviationAngle, dz, orderOfDiffraction);
+            }
+        }else{
+            std::cout << "use incidence angle" << std::endl;
+            m_alpha = degToRad(grazingIncidence);
+        }
+
+        if (grazingExitAngle == 0) { // calculate from other parameters
+            double DZ = (designOrderOfDiffraction == 0) ? 0 : dz;
+            m_beta = acos(cos(m_alpha) - orderOfDiffraction * sourceWavelength * 1e-6 * DZ);
+        }
+        else { // auto == true
+            m_beta = degToRad(grazingExitAngle);
+        }
     }
 
     GeometricUserParams::GeometricUserParams() {}

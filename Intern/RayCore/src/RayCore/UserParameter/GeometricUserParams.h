@@ -22,7 +22,7 @@ namespace RAYX
         // constructor for gratings
         GeometricUserParams(int mount, double deviation, double normalIncidence, double lineDensity, double designEnergy, double additionalOrder, int orderOfDiffraction);
         // constructor for rzp
-        GeometricUserParams(int imageType, double grazingIncidence, double sourceWavelength, double designWavelength, double orderOfDiffraction, double designOrderOfDiffraction, 
+        GeometricUserParams(int mount, int imageType, double deviationAngle, double grazingIncidence, double grazingExitAngle, double sourceEnergy, double designEnergy, double orderOfDiffraction, double designOrderOfDiffraction, 
                 double designAlphaAngle, double designBetaAngle, double mEntrance, double mExit, double sEntrance, double sExit);
         GeometricUserParams();
         ~GeometricUserParams();
@@ -40,6 +40,7 @@ namespace RAYX
         double getRadius();
         double getShortRadius();
 
+        enum GRATING_MOUNT { GM_DEVIATION, GM_INCIDENCE };
     private:
         double m_alpha;
         double m_beta;
