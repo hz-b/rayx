@@ -11,7 +11,7 @@ namespace RAYX
 
     Presenter::Presenter(std::shared_ptr<Beamline> beamline) :
         m_Beamline(beamline),
-        m_TracerInterface(TracerInterface(beamline->size(), 200000))
+        m_TracerInterface(TracerInterface(beamline->m_OpticalElements.size(), 200000))
     {
     }
 
@@ -26,11 +26,16 @@ namespace RAYX
     {
         /*int beamlinesSimultaneously = 1;*/
         for (int j = 0; j < 1/*beamlinesSimultaneously*/; j++) {
-            m_TracerInterface.generateRays(m_lightSources[0]);
+            if (m_Beamline->m_LightSources.empty()) {
+                std::cerr << "There is no light source!\n";
+                exit(1);
+            } else {
+                m_TracerInterface.generateRays(m_Beamline->m_LightSources[0]);
+            }
         }
 
         m_TracerInterface.setBeamlineParameters();
-        const std::vector<std::shared_ptr<OpticalElement>> Elements = m_Beamline->getObjects();
+        const std::vector<std::shared_ptr<OpticalElement>>& Elements = m_Beamline->m_OpticalElements;
         for (int j = 0; j < 1/*beamlinesSimultaneously*/; j++) {
             for (int i = 0; i < int(Elements.size()); i++) {
                 std::cout << "add " << Elements[i]->getName() << std::endl;
@@ -48,6 +53,6 @@ namespace RAYX
      */
     void Presenter::addLightSource(std::shared_ptr<LightSource> newSource)
     {
-        m_lightSources.push_back(newSource);
+        m_Beamline->m_LightSources.push_back(newSource);
     }
 } // namespace RAYX

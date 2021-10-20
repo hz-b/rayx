@@ -18,16 +18,15 @@ namespace RAYX
 
     }
 
-    // returns nullptr on failure
-    std::shared_ptr<BeamlineObject> createBeamlineObjectFromXML(rapidxml::xml_node<>* node) {
+    void addBeamlineObjectFromXML(rapidxml::xml_node<>* node, Beamline* beamline) {
         const char* type = node->first_attribute("type")->value();
 
         if (strcmp(type, "Point Source") == 0) {
-            return std::static_pointer_cast<BeamlineObject>(PointSource::createFromXML(node));
+            beamline->m_LightSources.push_back(PointSource::createFromXML(node));
         } else if (strcmp(type, "ImagePlane") == 0) {
-            return std::static_pointer_cast<BeamlineObject>(ImagePlane::createFromXML(node));
+            beamline->m_OpticalElements.push_back(ImagePlane::createFromXML(node));
         } else { // TODO(rudi): extend this!
-            return nullptr;
+            std::cerr << "could not construct beamline object with Name: " <<  node->first_attribute("name")->value() << "; Type: " << node->first_attribute("type")->value() << '\n';
         }
     }
 
@@ -46,21 +45,10 @@ namespace RAYX
 
         Beamline beamline;
 
-        for (rapidxml::xml_node<>* object = xml_beamline->first_node(); object; object = object->next_sibling()) // Iterating through objects
-        {
-            printf("Name: %s; Type: %s \n", object->first_attribute("name")->value(), object->first_attribute("type")->value());
-
-            const auto obj = createBeamlineObjectFromXML(object);
-            if (obj) {
-                // TODO(rudi)
-                // beamline.m_Objects.push_back(obj);
-            } else {
-                std::cerr << "could not construct beamline object:\n";
-                std::cerr << "Name: " <<  object->first_attribute("name")->value() << "; Type: " << object->first_attribute("type")->value() << '\n';
-            }
+        for (rapidxml::xml_node<>* object = xml_beamline->first_node(); object; object = object->next_sibling()) { // Iterating through objects
+            addBeamlineObjectFromXML(object, &beamline);
         }
-
-        return Beamline();
+        return beamline;
     }
 
 } // namespace RAYX
