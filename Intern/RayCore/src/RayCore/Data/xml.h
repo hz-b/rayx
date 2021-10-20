@@ -1,6 +1,7 @@
 #pragma once
 
 #include "rapidxml.hpp"
+#include <glm.hpp>
 
 namespace RAYX {
     namespace xml {
@@ -9,5 +10,6 @@ namespace RAYX {
         bool paramDouble(rapidxml::xml_node<>* node, const char* paramname, double* out);
         bool paramInt(rapidxml::xml_node<>* node, const char* paramname, int* out);
         bool paramStr(rapidxml::xml_node<>* node, const char* paramname, const char** out);
+        bool paramDvec3(rapidxml::xml_node<>* node, const char* paramname, glm::dvec3* out);
     }
 }

@@ -1,4 +1,5 @@
 #include "ImagePlane.h"
+#include <Data/xml.h>
 
 namespace RAYX
 {
@@ -43,9 +44,11 @@ namespace RAYX
     std::shared_ptr<ImagePlane> ImagePlane::createFromXML(rapidxml::xml_node<>* node) {
         const char* name = node->first_attribute("name")->value();
 
-        // TODO(rudi): initialize
-        glm::dvec4 position;
-        glm::dmat4x4 orientation;
+        glm::dvec3 position3;
+        if (!xml::paramDvec3(node, "worldPosition", &position3)) { return nullptr; }
+        glm::dvec4 position(position3, 1); // TODO(rudi): is this '1' correct?
+
+        glm::dmat4x4 orientation; // TODO(rudi): initialize
 
         return std::make_shared<ImagePlane>(name, position, orientation);
     }

@@ -21,10 +21,22 @@ namespace RAYX
     void addBeamlineObjectFromXML(rapidxml::xml_node<>* node, Beamline* beamline) {
         const char* type = node->first_attribute("type")->value();
 
+        const auto addLightSource = [&](std::shared_ptr<LightSource> s) {
+            if (s) {
+                beamline->m_LightSources.push_back(s);
+            }
+        };
+
+        const auto addOpticalElement = [&](std::shared_ptr<OpticalElement> e) {
+            if (e) {
+                beamline->m_OpticalElements.push_back(e);
+            }
+        };
+
         if (strcmp(type, "Point Source") == 0) {
-            beamline->m_LightSources.push_back(PointSource::createFromXML(node));
+            addLightSource(PointSource::createFromXML(node));
         } else if (strcmp(type, "ImagePlane") == 0) {
-            beamline->m_OpticalElements.push_back(ImagePlane::createFromXML(node));
+            addOpticalElement(ImagePlane::createFromXML(node));
         } else { // TODO(rudi): extend this!
             std::cerr << "could not construct beamline object with Name: " <<  node->first_attribute("name")->value() << "; Type: " << node->first_attribute("type")->value() << '\n';
         }
