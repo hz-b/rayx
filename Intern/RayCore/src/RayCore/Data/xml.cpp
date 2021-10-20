@@ -57,5 +57,13 @@ namespace RAYX {
             return true;
         }
 
+        bool paramYes(rapidxml::xml_node<>* node, const char* paramname) {
+            rapidxml::xml_node<>* p;
+            if (!param(node, paramname, &p)) { return false; }
+
+            return strcmp(p->first_attribute("comment")->value(), "Yes") == 0;
+        }
+
+
     }
 }

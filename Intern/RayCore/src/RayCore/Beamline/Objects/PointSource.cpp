@@ -77,8 +77,18 @@ namespace RAYX
         double circPol;
         if (!xml::paramDouble(node, "circularPol", &circPol)) { return nullptr; }
 
-        std::vector<double> misalignment(1); // TODO(rudi) how should this be parsed?
-        if (!xml::paramDouble(node, "alignmentError", &misalignment[0])) { return nullptr; }
+        std::vector<double> misalignment(6, 0.f);
+
+        if (xml::paramYes(node, "alignmentError")) { // TODO(rudi): is this the right condition?
+            // all misalignment-values will be left at 0 if they are missing.
+            xml::paramDouble(node, "translationXerror", &misalignment[0]);
+            xml::paramDouble(node, "translationYerror", &misalignment[1]);
+            xml::paramDouble(node, "translationZerror", &misalignment[2]);
+            xml::paramDouble(node, "rotationXerror", &misalignment[3]);
+            xml::paramDouble(node, "rotationYerror", &misalignment[4]);
+            xml::paramDouble(node, "rotationZerror", &misalignment[5]);
+        }
+
 
         return std::make_shared<PointSource>(
             name, spreadType, sourceWidth, sourceHeight, sourceDepth,

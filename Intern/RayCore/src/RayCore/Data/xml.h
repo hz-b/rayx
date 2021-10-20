@@ -11,5 +11,8 @@ namespace RAYX {
         bool paramInt(rapidxml::xml_node<>* node, const char* paramname, int* out);
         bool paramStr(rapidxml::xml_node<>* node, const char* paramname, const char** out);
         bool paramDvec3(rapidxml::xml_node<>* node, const char* paramname, glm::dvec3* out);
+
+        // checks whether the param with name `paramname` has comment="Yes" (and returns false, if there is none)
+        bool paramYes(rapidxml::xml_node<>* node, const char* paramname);
     }
 }
