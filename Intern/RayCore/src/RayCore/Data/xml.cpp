@@ -1,4 +1,4 @@
-#include "XMLHelper.h"
+#include "xml.h"
 #include <cstdio>
 #include <cstring>
 
@@ -15,7 +15,7 @@ namespace RAYX {
             return false;
         }
 
-        bool param_double(rapidxml::xml_node<>* node, const char* paramname, double* out) {
+        bool paramDouble(rapidxml::xml_node<>* node, const char* paramname, double* out) {
             rapidxml::xml_node<>* ref;
             if (!param(node, paramname, &ref)) { return false; }
 
@@ -24,7 +24,7 @@ namespace RAYX {
             return true;
         }
 
-        bool param_int(rapidxml::xml_node<>* node, const char* paramname, int* out) {
+        bool paramInt(rapidxml::xml_node<>* node, const char* paramname, int* out) {
             rapidxml::xml_node<>* ref;
             if (!param(node, paramname, &ref)) { return false; }
 
@@ -33,7 +33,7 @@ namespace RAYX {
             return true;
         }
 
-        bool param_str(rapidxml::xml_node<>* node, const char* paramname, const char** out) {
+        bool paramStr(rapidxml::xml_node<>* node, const char* paramname, const char** out) {
             rapidxml::xml_node<>* ref;
             if (!param(node, paramname, &ref)) { return false; }
             *out = ref->value();

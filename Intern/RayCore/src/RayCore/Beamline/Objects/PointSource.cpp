@@ -1,5 +1,5 @@
 #include "PointSource.h"
-#include <Data/XMLHelper.h>
+#include <Data/xml.h>
 #include <cassert>
 #include <cmath>
 
@@ -30,55 +30,55 @@ namespace RAYX
         const std::string name = node->first_attribute("name")->value();
 
         int numberOfRays;
-        if (!xml::param_int(node, "numberRays", &numberOfRays)) { return nullptr; }
+        if (!xml::paramInt(node, "numberRays", &numberOfRays)) { return nullptr; }
 
         int spreadType;
-        if (!xml::param_int(node, "energySpreadType", &spreadType)) { return nullptr; }
+        if (!xml::paramInt(node, "energySpreadType", &spreadType)) { return nullptr; }
 
         double sourceWidth;
-        if (!xml::param_double(node, "sourceWidth", &sourceWidth)) { return nullptr; }
+        if (!xml::paramDouble(node, "sourceWidth", &sourceWidth)) { return nullptr; }
 
         double sourceHeight;
-        if (!xml::param_double(node, "sourceHeight", &sourceHeight)) { return nullptr; }
+        if (!xml::paramDouble(node, "sourceHeight", &sourceHeight)) { return nullptr; }
 
         double sourceDepth;
-        if (!xml::param_double(node, "sourceDepth", &sourceDepth)) { return nullptr; }
+        if (!xml::paramDouble(node, "sourceDepth", &sourceDepth)) { return nullptr; }
 
         double horDivergence;
-        if (!xml::param_double(node, "horDiv", &horDivergence)) { return nullptr; }
+        if (!xml::paramDouble(node, "horDiv", &horDivergence)) { return nullptr; }
 
         double verDivergence;
-        if (!xml::param_double(node, "verDiv", &verDivergence)) { return nullptr; }
+        if (!xml::paramDouble(node, "verDiv", &verDivergence)) { return nullptr; }
 
         int widthDist;
-        if (!xml::param_int(node, "sourceWidthDistribution", &widthDist)) { return nullptr; }
+        if (!xml::paramInt(node, "sourceWidthDistribution", &widthDist)) { return nullptr; }
 
         int heightDist;
-        if (!xml::param_int(node, "sourceHeightDistribution", &heightDist)) { return nullptr; }
+        if (!xml::paramInt(node, "sourceHeightDistribution", &heightDist)) { return nullptr; }
 
         int horDist;
-        if (!xml::param_int(node, "horDivDistribution", &horDist)) { return nullptr; }
+        if (!xml::paramInt(node, "horDivDistribution", &horDist)) { return nullptr; }
 
         int verDist;
-        if (!xml::param_int(node, "verDivDistribution", &verDist)) { return nullptr; }
+        if (!xml::paramInt(node, "verDivDistribution", &verDist)) { return nullptr; }
 
         double photonEnergy;
-        if (!xml::param_double(node, "photonEnergy", &photonEnergy)) { return nullptr; }
+        if (!xml::paramDouble(node, "photonEnergy", &photonEnergy)) { return nullptr; }
 
         double energySpread;
-        if (!xml::param_double(node, "energySpread", &energySpread)) { return nullptr; }
+        if (!xml::paramDouble(node, "energySpread", &energySpread)) { return nullptr; }
 
         double linPol0;
-        if (!xml::param_double(node, "linearPol_0", &linPol0)) { return nullptr; }
+        if (!xml::paramDouble(node, "linearPol_0", &linPol0)) { return nullptr; }
 
         double linPol45;
-        if (!xml::param_double(node, "linearPol_45", &linPol45)) { return nullptr; }
+        if (!xml::paramDouble(node, "linearPol_45", &linPol45)) { return nullptr; }
 
         double circPol;
-        if (!xml::param_double(node, "circularPol", &circPol)) { return nullptr; }
+        if (!xml::paramDouble(node, "circularPol", &circPol)) { return nullptr; }
 
         std::vector<double> misalignment(1); // TODO(rudi) how should this be parsed?
-        if (!xml::param_double(node, "alignmentError", &misalignment[0])) { return nullptr; }
+        if (!xml::paramDouble(node, "alignmentError", &misalignment[0])) { return nullptr; }
 
         return std::make_shared<PointSource>(
             name, spreadType, sourceWidth, sourceHeight, sourceDepth,
