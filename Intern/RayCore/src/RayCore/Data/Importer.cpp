@@ -30,9 +30,11 @@ namespace RAYX
         }
     }
 
-    Beamline Importer::importBeamline() {
+    Beamline Importer::importBeamline(const char* filename) {
         // first implementation: stringstreams are slow; this might need optimization
-        std::ifstream t("test.rml");
+        std::cout << "importBeamline is called with file \"" << filename << "\"\n";
+
+        std::ifstream t(filename);
         std::stringstream buffer;
         buffer << t.rdbuf();
         std::string test = buffer.str();

@@ -14,7 +14,7 @@ namespace RAYX
 		Importer();
 		~Importer();
 
-		static Beamline importBeamline();
+		static Beamline importBeamline(const char* filename);
 
 	};
 
