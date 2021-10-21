@@ -19,8 +19,8 @@ namespace RAYX
      * @param slopeError
      *
     */
-    SphereMirror::SphereMirror(const char* name, const int geometricShape, const double width, const double height, const double grazingIncidenceAngle, glm::dvec4 position, glm::dmat4x4 orientation, const double entranceArmLength, const double exitArmLength, const std::vector<double> slopeError)
-        : OpticalElement(name, { 0,0,0,0, 0,0,0,0, 0,0,0,0, 0,0,0,0 }, width, height, position, orientation, { 0,0,0,0,0,0 }, slopeError),
+    SphereMirror::SphereMirror(const char* name, const int geometricalShape, const double width, const double height, const double grazingIncidenceAngle, glm::dvec4 position, glm::dmat4x4 orientation, const double entranceArmLength, const double exitArmLength, const std::vector<double> slopeError)
+        : OpticalElement(name, { 0,0,0,0, 0,0,0,0, 0,0,0,0, 0,0,0,0 }, geometricalShape, width, height, position, orientation, { 0,0,0,0,0,0 }, slopeError),
         m_entranceArmLength(entranceArmLength),
         m_exitArmLength(exitArmLength),
         m_grazingIncidenceAngle(degToRad(grazingIncidenceAngle))
@@ -43,8 +43,8 @@ namespace RAYX
      * @param orientation               orientation of element in world coordinates
      * @param slopeError
     */
-    SphereMirror::SphereMirror(const char* name, const int geometricShape, const double width, const double height, double radius, glm::dvec4 position, glm::dmat4x4 orientation, const std::vector<double> slopeError)
-        : OpticalElement(name, { 0,0,0,0, 0,0,0,0, 0,0,0,0, 0,0,0,0 }, width, height, position, orientation, { 0,0,0,0,0,0 }, slopeError)
+    SphereMirror::SphereMirror(const char* name, const int geometricalShape, const double width, const double height, double radius, glm::dvec4 position, glm::dmat4x4 orientation, const std::vector<double> slopeError)
+        : OpticalElement(name, { 0,0,0,0, 0,0,0,0, 0,0,0,0, 0,0,0,0 }, geometricalShape, width, height, position, orientation, { 0,0,0,0,0,0 }, slopeError)
     {
         setSurface(std::make_unique<Quadric>(std::vector<double>{1,0,0,0, 1,1,0,-radius, 0,0,1,0, 0,0,0,0}));
     }
