@@ -21,7 +21,6 @@ namespace RAYX
     private:
         std::shared_ptr<Beamline> m_Beamline;
         TracerInterface m_TracerInterface;
-        std::vector<std::shared_ptr<LightSource>> m_lightSources;
     };
 
 } // namespace RAYX

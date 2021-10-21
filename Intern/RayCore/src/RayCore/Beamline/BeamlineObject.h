@@ -3,6 +3,9 @@
 #include <vector>
 #include <iostream>
 #include <stdexcept>
+#include <memory>
+#include "rapidxml.hpp"
+
 
 namespace RAYX
 {
