@@ -213,12 +213,13 @@ TEST(Ellips, testParamsCSCurvature) {
     double dist = 12451.51535;
     double entranceArmLength = 6421.7234;
     double exitArmLength = 1762.622123;
+    int geometricalShape = 0;
     int coordSys = 0; // {CS_CURVATURE, CS_MIRROR};
     int figRot = 0; // { FR_YES, FR_PLANE, FR_A11};
     double a_11 = 12.62;
     std::vector<double>  mis = { 12,72,1.12, 0.1,0.7341,2.5 };
     std::vector<double> sE = { 1,2,3,4,5,6,7 };
-    RAYX::Ellipsoid e = RAYX::Ellipsoid("ellipsoid", width, height, incidence, azimuthal, dist, entranceArmLength, exitArmLength, coordSys, figRot, a_11, mis, sE, NULL, false); 
+    RAYX::Ellipsoid e = RAYX::Ellipsoid("ellipsoid", geometricalShape, width, height, incidence, azimuthal, dist, entranceArmLength, exitArmLength, coordSys, figRot, a_11, mis, sE, NULL, false); 
 
     // in old RAY
     double shortHalfAxis = 1758.53601375;
@@ -256,7 +257,7 @@ TEST(Ellips, testParamsCSCurvature) {
     EXPECT_ITERABLE_DOUBLE_EQ(std::vector<double>, sE, e.getSlopeError());
 
     figRot = 1;
-    RAYX::Ellipsoid e2 = RAYX::Ellipsoid("ellipsoid", width, height, incidence, azimuthal, dist, entranceArmLength, exitArmLength, coordSys, figRot, a_11, mis, sE, NULL, false); 
+    RAYX::Ellipsoid e2 = RAYX::Ellipsoid("ellipsoid", geometricalShape, width, height, incidence, azimuthal, dist, entranceArmLength, exitArmLength, coordSys, figRot, a_11, mis, sE, NULL, false); 
     halfAxisC = INFINITY;
 
     ASSERT_DOUBLE_EQ(e2.getWidth(), width);
@@ -279,7 +280,7 @@ TEST(Ellips, testParamsCSCurvature) {
     EXPECT_ITERABLE_DOUBLE_EQ(std::vector<double>, sE, e2.getSlopeError());
 
     figRot = 2;
-    RAYX::Ellipsoid e3 = RAYX::Ellipsoid("ellipsoid", width, height, incidence, azimuthal, dist, entranceArmLength, exitArmLength, coordSys, figRot, a_11, mis, sE, NULL, false); 
+    RAYX::Ellipsoid e3 = RAYX::Ellipsoid("ellipsoid", geometricalShape, width, height, incidence, azimuthal, dist, entranceArmLength, exitArmLength, coordSys, figRot, a_11, mis, sE, NULL, false); 
     halfAxisC = 495.0186818473859;
 
     ASSERT_DOUBLE_EQ(e3.getWidth(), width);
@@ -313,10 +314,11 @@ TEST(Ellips, testParamsCSMirror) {
     double exitArmLength = 1762.622123;
     int coordSys = 1; // {CS_CURVATURE, CS_MIRROR};
     int figRot = 0; // { FR_YES, FR_PLANE, FR_A11};
+    int geometricalShape = 0;
     double a_11 = 12.62;
     std::vector<double>  mis = { 12,72,1.12, 0.1,0.7341,2.5 };
     std::vector<double> sE = { 7,6,5,4,3,2,1 };
-    RAYX::Ellipsoid e = RAYX::Ellipsoid("ellipsoid", width, height, incidence, azimuthal, dist, entranceArmLength, exitArmLength, coordSys, figRot, a_11, mis, sE, NULL, false); 
+    RAYX::Ellipsoid e = RAYX::Ellipsoid("ellipsoid", geometricalShape, width, height, incidence, azimuthal, dist, entranceArmLength, exitArmLength, coordSys, figRot, a_11, mis, sE, NULL, false); 
 
     // in old RAY
     double shortHalfAxis = 1758.53601375;
@@ -354,7 +356,7 @@ TEST(Ellips, testParamsCSMirror) {
     EXPECT_ITERABLE_DOUBLE_EQ(std::vector<double>, sE, e.getSlopeError());
 
     figRot = 1;
-    RAYX::Ellipsoid e2 = RAYX::Ellipsoid("ellipsoid", width, height, incidence, azimuthal, dist, entranceArmLength, exitArmLength, coordSys, figRot, a_11, mis, sE, NULL, false); 
+    RAYX::Ellipsoid e2 = RAYX::Ellipsoid("ellipsoid", geometricalShape, width, height, incidence, azimuthal, dist, entranceArmLength, exitArmLength, coordSys, figRot, a_11, mis, sE, NULL, false); 
     halfAxisC = INFINITY;
 
     ASSERT_DOUBLE_EQ(e2.getWidth(), width);
@@ -377,7 +379,7 @@ TEST(Ellips, testParamsCSMirror) {
     EXPECT_ITERABLE_DOUBLE_EQ(std::vector<double>, sE, e2.getSlopeError());
 
     figRot = 2;
-    RAYX::Ellipsoid e3 = RAYX::Ellipsoid("ellipsoid", width, height, incidence, azimuthal, dist, entranceArmLength, exitArmLength, coordSys, figRot, a_11, mis, sE, NULL, false); 
+    RAYX::Ellipsoid e3 = RAYX::Ellipsoid("ellipsoid", geometricalShape, width, height, incidence, azimuthal, dist, entranceArmLength, exitArmLength, coordSys, figRot, a_11, mis, sE, NULL, false); 
     halfAxisC = 495.0186818473859;
 
     ASSERT_DOUBLE_EQ(e3.getWidth(), width);
