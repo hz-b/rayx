@@ -26,8 +26,8 @@ namespace RAYX
      * @param previous                      pointer to previous element in beamline, needed for caclultation transformation matrices in global coordinate system
      * @param global                        if tracing should be done in global or ray coordinates
     */
-    PlaneGrating::PlaneGrating(const char* name, const int mount, const double width, const double height, const double deviation, const double normalIncidence, const double azimuthal, const double distanceToPreceedingElement, const double designEnergyMounting, const double lineDensity, const double orderOfDiffraction, const double fixFocusConstantCFF, const int additionalZeroOrder, const std::vector<double> misalignmentParams, const std::vector<double> vls, const std::vector<double> slopeError, const std::shared_ptr<OpticalElement> previous, bool global)
-        : OpticalElement(name, width, height, degToRad(azimuthal), distanceToPreceedingElement, slopeError, previous),
+    PlaneGrating::PlaneGrating(const char* name, const int mount, const int geometricalShape, const double width, const double height, const double deviation, const double normalIncidence, const double azimuthal, const double distanceToPreceedingElement, const double designEnergyMounting, const double lineDensity, const double orderOfDiffraction, const double fixFocusConstantCFF, const int additionalZeroOrder, const std::vector<double> misalignmentParams, const std::vector<double> vls, const std::vector<double> slopeError, const std::shared_ptr<OpticalElement> previous, bool global)
+        : OpticalElement(name, geometricalShape, width, height, degToRad(azimuthal), distanceToPreceedingElement, slopeError, previous),
         m_designEnergyMounting(designEnergyMounting),
         m_lineDensity(lineDensity),
         m_orderOfDiffraction(orderOfDiffraction)
@@ -60,6 +60,7 @@ namespace RAYX
      * simplified constructor that assumes that incidence and exit angle are already calculated and the position and orientation has been derived from them already
      * 
      * @param name                  name of element
+     * @param geometricalShape              0/1 rectangle/elliptical
      * @param width                 width of element (x dimension)
      * @param height                height of element (z dimension)
      * @param position              position in world coordinate system
@@ -72,8 +73,8 @@ namespace RAYX
      * @param slopeError            7 slope error parameters: x-y sagittal (0), y-z meridional (1), thermal distortion: x (2),y (3),z (4), cylindrical bowing amplitude y(5) and radius (6)
      * 
      */
-    PlaneGrating::PlaneGrating(const char* name, const double width, const double height, glm::dvec4 position, glm::dmat4x4 orientation, const double designEnergy, const double lineDensity, const double orderOfDiffraction, const int additionalZeroOrder, const std::vector<double> vls, const std::vector<double> slopeError)
-        : OpticalElement(name, width, height, position, orientation, slopeError),
+    PlaneGrating::PlaneGrating(const char* name, const int geometricalShape, const double width, const double height, glm::dvec4 position, glm::dmat4x4 orientation, const double designEnergy, const double lineDensity, const double orderOfDiffraction, const int additionalZeroOrder, const std::vector<double> vls, const std::vector<double> slopeError)
+        : OpticalElement(name, geometricalShape, width, height, position, orientation, slopeError),
         m_additionalOrder(additionalZeroOrder),
         m_designEnergyMounting(designEnergy),
         m_lineDensity(lineDensity),
