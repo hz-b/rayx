@@ -66,7 +66,7 @@ TEST(Quadric, testTransformationMatrices) {
     RAYX::WorldCoordinates w_coord = RAYX::WorldCoordinates(g_params.getAlpha(), g_params.getBeta(), azimuthalAngle, dist, mis);
 
     RAYX::PlaneMirror plM = RAYX::PlaneMirror("planemirror", width, height, w_coord.calcPosition(), w_coord.calcOrientation(), sE); // {1,2,3,0.01,0.02,0.03}
-    RAYX::PlaneMirror plM1 = RAYX::PlaneMirror("planemirror", width, height, incidenceAngle, azimuthalAngle, dist, mis, sE, NULL, true); // {1,2,3,0.01,0.02,0.03}
+    // RAYX::PlaneMirror plM1 = RAYX::PlaneMirror("planemirror", width, height, incidenceAngle, azimuthalAngle, dist, mis, sE, NULL, true); // {1,2,3,0.01,0.02,0.03}
 
     std::vector<double> correctInMat = { 0.9997500170828264, -0.0093954937290516224, 0.02028861849598634, 0, 
         0.0051669667654668724, 0.97994613741550907, 0.199195557728752, 0, 
@@ -84,17 +84,15 @@ TEST(Quadric, testTransformationMatrices) {
 TEST(Quadric, testGlobalCoordinates) {
     std::vector<double> sE = { 0,0,0,0,0, 0,0 };
     RAYX::GeometricUserParams g_params = RAYX::GeometricUserParams(10);
-    RAYX::WorldCoordinates w_coord = RAYX::WorldCoordinates(degToRad(10), degToRad(10), degToRad(7), 2000, std::vector<double>{0.5,0.7,1.0, 0.04,0.03,0.05});
+    RAYX::WorldCoordinates w_coord = RAYX::WorldCoordinates(g_params.getAlpha(), g_params.getBeta(), degToRad(7), 2000, std::vector<double>{0.5,0.7,1.0, 0.04,0.03,0.05});
     glm::dvec4 pos = w_coord.calcPosition();
     glm::dmat4x4 or1 =  w_coord.calcOrientation();
-    std::shared_ptr<RAYX::PlaneMirror> p1 = std::make_shared<RAYX::PlaneMirror>("PlaneMirror1", 50, 200, 10, 7, 2000, std::vector<double>{0.5,0.7,1.0, 0.04,0.03,0.05}, sE, nullptr, true); // {1,2,3,0.01,0.02,0.03}
     std::shared_ptr<RAYX::PlaneMirror> p1a = std::make_shared<RAYX::PlaneMirror>("PlaneMirror1", 50, 200, pos, or1, sE); // {1,2,3,0.01,0.02,0.03}
     
     RAYX::GeometricUserParams g_params2 = RAYX::GeometricUserParams(15);
-    RAYX::WorldCoordinates w_coord2 = RAYX::WorldCoordinates(degToRad(15), degToRad(15), degToRad(4), 7000, std::vector<double>{2,4,6, 0.04,0.01,0.06});//std::vector<double>{0,0,0, 0,0,0});
+    RAYX::WorldCoordinates w_coord2 = RAYX::WorldCoordinates(g_params2.getAlpha(), g_params2.getBeta(), degToRad(4), 7000, std::vector<double>{2,4,6, 0.04,0.01,0.06});//std::vector<double>{0,0,0, 0,0,0});
     glm::dvec4 pos2 = w_coord2.calcPosition(w_coord, pos, or1);
     glm::dmat4x4 or2 =  w_coord2.calcOrientation(w_coord, pos, or1);
-    std::shared_ptr<RAYX::PlaneMirror> p2 = std::make_shared<RAYX::PlaneMirror>("PlaneMirror2", 50, 200, 15, 4, 7000, std::vector<double>{2,4,6, 0.04,0.01,0.06}, sE, p1, true); // {1,2,3,0.01,0.02,0.03}
     std::shared_ptr<RAYX::PlaneMirror> p2b = std::make_shared<RAYX::PlaneMirror>("PlaneMirror2", 50, 200, pos2, or2, sE); // {1,2,3,0.01,0.02,0.03}
     
     std::cout << "MIRROR 3" << std::endl;
@@ -102,7 +100,6 @@ TEST(Quadric, testGlobalCoordinates) {
     RAYX::WorldCoordinates w_coord3 = RAYX::WorldCoordinates(g_params.getAlpha(), g_params.getBeta(), degToRad(10), 8000, std::vector<double>{4,5,3, 0.01,0.02,0.03});
     glm::dvec4 pos3 = w_coord3.calcPosition(w_coord2, pos2, or2);
     glm::dmat4x4 or3 =  w_coord3.calcOrientation(w_coord2, pos2, or2);
-    std::shared_ptr<RAYX::PlaneMirror> p3 = std::make_shared<RAYX::PlaneMirror>("PlaneMirror3", 50, 200, 7, 10, 8000, std::vector<double>{4,5,3, 0.01,0.02,0.03}, sE, p2, true); // {1,2,3,0.01,0.02,0.03}
     std::shared_ptr<RAYX::PlaneMirror> p3c = std::make_shared<RAYX::PlaneMirror>("PlaneMirror1", 50, 200, pos3, or3, sE); // {1,2,3,0.01,0.02,0.03}
     
     std::cout << "MIRROR 4" << std::endl;
@@ -110,7 +107,6 @@ TEST(Quadric, testGlobalCoordinates) {
     RAYX::WorldCoordinates w_coord4 = RAYX::WorldCoordinates(g_params.getAlpha(), g_params.getBeta(), degToRad(17), 1000, std::vector<double>{10,3,2, 0.01,0.03,0.06});
     glm::dvec4 pos4 = w_coord4.calcPosition(w_coord3, pos3, or3);
     glm::dmat4x4 or4 =  w_coord4.calcOrientation(w_coord3, pos3, or3);
-    std::shared_ptr<RAYX::PlaneMirror> p4 = std::make_shared<RAYX::PlaneMirror>("PlaneMirror4", 50, 200, 22, 17, 1000, std::vector<double>{10,3,2, 0.01,0.03,0.06}, sE, p3, true); // {1,2,3,0.01,0.02,0.03}
     std::shared_ptr<RAYX::PlaneMirror> p4d = std::make_shared<RAYX::PlaneMirror>("PlaneMirror1", 50, 200, pos4, or4, sE); // {1,2,3,0.01,0.02,0.03}
     
     std::vector<double> correctInMat = {0.98549875516199115, -0.16900296657661762, 0.015172371682388559, 0, 

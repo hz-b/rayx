@@ -260,20 +260,20 @@ class Tests(unittest.TestCase):
         self.assertTrue(np.all(result[6] <= sourceEnergy+energySpread))
         self.assertTrue(np.all(result[6] >= sourceEnergy-energySpread))
         #plot_comparison('Hard Edge Mis', result, correct)
-    """
+    
     def test_globalCoord_9rays(self):
         correct = open_old_file(
-            'Plane Mirror 3-RawRaysOutgoing_9rays.csv', 'Plane Mirror 3_')
+            'ImagePlane-RawRaysOutgoing_9rays.csv', 'ImagePlane_')
         result = open_new_file('testFile_globalCoordinates_9rays.csv', valid=1)
         self.assertTrue(correct.shape == result.shape)
         self.assertTrue(np.allclose(correct, result))
     
     def test_globalCoord_20rays(self):
         correct = open_old_file(
-            'Plane Mirror 3-RawRaysOutgoing_20rays.csv', 'Plane Mirror 3_')
+            'ImagePlane-RawRaysOutgoing_20rays.csv', 'ImagePlane_')
         result = open_new_file('testFile_globalCoordinates_20rays.csv', valid=1)
+        self.assertTrue(correct.shape == result.shape)
         self.assertTrue(np.allclose(correct, result))
-    """
-
+    
 if __name__ == '__main__':
     unittest.main()
