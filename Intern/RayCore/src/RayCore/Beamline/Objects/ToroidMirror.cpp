@@ -20,14 +20,14 @@ namespace RAYX
      * @param sExit                     sagittal exit arm length, used to calculate the radii
      * @param slopeError                7 slope error parameters: x-y sagittal (0), y-z meridional (1), thermal distortion x (2),y (3),z (4), cylindrical bowing amplitude y(5) and radius (6)
     */
-    ToroidMirror::ToroidMirror(const char* name, const int geometricShape, const double width, const double height, glm::dvec4 position, glm::dmat4x4 orientation, const double incidenceAngle, const double mEntrance, const double mExit, const double sEntrance, const double sExit, const std::vector<double> slopeError)
-        : OpticalElement(name, { 0,0,0,0, 0,0,0,0, 0,0,0,0, 0,0,0,0 }, width, height, position, orientation, { 0,0,0, 0,0,0 }, slopeError),
+    ToroidMirror::ToroidMirror(const char* name, const int geometricalShape, const double width, const double height, glm::dvec4 position, glm::dmat4x4 orientation, const double incidenceAngle, const double mEntrance, const double mExit, const double sEntrance, const double sExit, const std::vector<double> slopeError)
+        : OpticalElement(name, { 0,0,0,0, 0,0,0,0, 0,0,0,0, 0,0,0,0 }, geometricalShape, width, height, position, orientation, { 0,0,0, 0,0,0 }, slopeError),
         m_sagittalEntranceArmLength(sEntrance),
         m_sagittalExitArmLength(sExit),
         m_meridionalEntranceArmLength(mEntrance),
         m_meridionalExitArmLength(mExit)
     {
-        m_geometricalShape = geometricShape == 0 ? GS_RECTANGLE : GS_ELLIPTICAL;
+        m_geometricalShape = geometricalShape == 0 ? GS_RECTANGLE : GS_ELLIPTICAL;
         if (m_geometricalShape == GS_ELLIPTICAL) {
             setDimensions(-width, -height);
         }
@@ -51,8 +51,8 @@ namespace RAYX
      * distanceToPreceedingElement
      *
     */
-    ToroidMirror::ToroidMirror(const char* name, const int geometricShape, const double width, const double height, const double grazingIncidence, const double azimuthal, const double distanceToPreceedingElement, const double mEntrance, const double mExit, const double sEntrance, const double sExit, const std::vector<double> misalignmentParams, const std::vector<double> slopeError, const std::shared_ptr<OpticalElement> previous, bool global)
-        : OpticalElement(name, { 0,0,0,0, 0,0,0,0, 0,0,0,0, 0,0,0,0 }, width, height, degToRad(grazingIncidence), degToRad(azimuthal), degToRad(grazingIncidence), distanceToPreceedingElement, misalignmentParams, { 0,0,0,0,0,0 }, slopeError, previous, global),
+    ToroidMirror::ToroidMirror(const char* name, const int geometricalShape, const double width, const double height, const double grazingIncidence, const double azimuthal, const double distanceToPreceedingElement, const double mEntrance, const double mExit, const double sEntrance, const double sExit, const std::vector<double> misalignmentParams, const std::vector<double> slopeError, const std::shared_ptr<OpticalElement> previous, bool global)
+        : OpticalElement(name, { 0,0,0,0, 0,0,0,0, 0,0,0,0, 0,0,0,0 }, geometricalShape, width, height, degToRad(grazingIncidence), degToRad(azimuthal), degToRad(grazingIncidence), distanceToPreceedingElement, misalignmentParams, { 0,0,0,0,0,0 }, slopeError, previous, global),
         m_sagittalEntranceArmLength(sEntrance),
         m_sagittalExitArmLength(sExit),
         m_meridionalEntranceArmLength(mEntrance),
@@ -60,7 +60,7 @@ namespace RAYX
     {
         // std::vector<double> inputPoints = {0,0,0,0, 0,0,0,-1, 0,0,0,0, 0,0,0,0};
 
-        m_geometricalShape = geometricShape == 0 ? GS_RECTANGLE : GS_ELLIPTICAL;
+        m_geometricalShape = geometricalShape == 0 ? GS_RECTANGLE : GS_ELLIPTICAL;
         if (m_geometricalShape == GS_ELLIPTICAL) {
             setDimensions(-width, -height);
         }
