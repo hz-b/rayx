@@ -1040,7 +1040,7 @@ TEST(opticalElements, planeMirrorDefault) {
     RAYX::WorldCoordinates pm_param = RAYX::WorldCoordinates(degToRad(10), degToRad(10), degToRad(7.5), 10000, std::vector<double>{ 0,0,0, 0,0,0 });
     glm::dvec4 pos_mirror = pm_param.calcPosition();
     glm::dmat4x4 or_mirror = pm_param.calcOrientation();
-    std::shared_ptr<RAYX::PlaneMirror> plM = std::make_shared<RAYX::PlaneMirror>("PlaneMirrorDef", 50, 200, pos_mirror, or_mirror, zeros7); // {1,2,3,0.01,0.02,0.03}
+    std::shared_ptr<RAYX::PlaneMirror> plM = std::make_shared<RAYX::PlaneMirror>("PlaneMirrorDef", 0, 50, 200, pos_mirror, or_mirror, zeros7); // {1,2,3,0.01,0.02,0.03}
     
     RAYX::WorldCoordinates ip_param = RAYX::WorldCoordinates(0, 0, 0, 1000, std::vector<double>{ 0,0,0, 0,0,0 });
     glm::dvec4 pos_ip = ip_param.calcPosition(pm_param, pos_mirror, or_mirror);
@@ -1058,7 +1058,7 @@ TEST(opticalElements, planeMirrorMis) {
     RAYX::WorldCoordinates pm_param = RAYX::WorldCoordinates(degToRad(10), degToRad(10), 0, 10000, std::vector<double>{ 1,2,3,0.001,0.002,0.003 });
     glm::dvec4 pos_mirror = pm_param.calcPosition();
     glm::dmat4x4 or_mirror = pm_param.calcOrientation();
-    std::shared_ptr<RAYX::PlaneMirror> plM = std::make_shared<RAYX::PlaneMirror>("PlaneMirrorMis", 50, 200, pos_mirror, or_mirror, zeros7); // {1,2,3,0.01,0.02,0.03}
+    std::shared_ptr<RAYX::PlaneMirror> plM = std::make_shared<RAYX::PlaneMirror>("PlaneMirrorMis", 0, 50, 200, pos_mirror, or_mirror, zeros7); // {1,2,3,0.01,0.02,0.03}
     
     RAYX::WorldCoordinates ip_param = RAYX::WorldCoordinates(0, 0, 0, 1000, std::vector<double>{ 0,0,0, 0,0,0 });
     glm::dvec4 pos_ip = ip_param.calcPosition(pm_param, pos_mirror, or_mirror);
@@ -1076,7 +1076,7 @@ TEST(opticalElements, sphereMirror) {
     RAYX::WorldCoordinates sm_param = RAYX::WorldCoordinates(grazingIncidence, grazingIncidence, 0, 10000, std::vector<double>{ 0,0,0, 0,0,0 });
     glm::dvec4 pos_mirror = sm_param.calcPosition();
     glm::dmat4x4 or_mirror = sm_param.calcOrientation();
-    std::shared_ptr<RAYX::SphereMirror> s = std::make_shared<RAYX::SphereMirror>("SphereMirrorDefault", 50, 200, radToDeg(grazingIncidence), pos_mirror, or_mirror, 10000, 1000, zeros7);
+    std::shared_ptr<RAYX::SphereMirror> s = std::make_shared<RAYX::SphereMirror>("SphereMirrorDefault", 0, 50, 200, radToDeg(grazingIncidence), pos_mirror, or_mirror, 10000, 1000, zeros7);
     
     RAYX::WorldCoordinates ip_param = RAYX::WorldCoordinates(0, 0, 0, 1000, std::vector<double>{ 0,0,0, 0,0,0 });
     glm::dvec4 pos_ip = ip_param.calcPosition(sm_param, pos_mirror, or_mirror);
@@ -1095,7 +1095,7 @@ TEST(opticalElements, planeGratingDevDefault) {
     RAYX::WorldCoordinates pg_param = RAYX::WorldCoordinates(incidenceAngle, exitAngle, 0, 10000, std::vector<double>{ 0,0,0, 0,0,0 });
     glm::dvec4 position = pg_param.calcPosition();
     glm::dmat4x4 orientation = pg_param.calcOrientation();
-    std::shared_ptr<RAYX::PlaneGrating> plG = std::make_shared<RAYX::PlaneGrating>("PlaneGratingDeviationDefault", 50, 200, position, orientation, 100, 1000, 1, 0, std::vector<double>{ 0,0,0,0,0,0 }, zeros7); // dx,dy,dz, dpsi,dphi,dchi // {1,2,3,0.001,0.002,0.003}
+    std::shared_ptr<RAYX::PlaneGrating> plG = std::make_shared<RAYX::PlaneGrating>("PlaneGratingDeviationDefault", 0, 50, 200, position, orientation, 100, 1000, 1, 0, std::vector<double>{ 0,0,0,0,0,0 }, zeros7); // dx,dy,dz, dpsi,dphi,dchi // {1,2,3,0.001,0.002,0.003}
     
     RAYX::WorldCoordinates ip_param = RAYX::WorldCoordinates(0, 0, 0, 1000, std::vector<double>{ 0,0,0, 0,0,0 });
     glm::dvec4 pos_ip = ip_param.calcPosition(pg_param, position, orientation);
@@ -1115,7 +1115,7 @@ TEST(opticalElements, planeGratingDevAzimuthal) {
     RAYX::WorldCoordinates pg_param = RAYX::WorldCoordinates(incidenceAngle, exitAngle, degToRad(7.5), 10000, std::vector<double>{ 0,0,0, 0,0,0 });
     glm::dvec4 position = pg_param.calcPosition();
     glm::dmat4x4 orientation = pg_param.calcOrientation();
-    std::shared_ptr<RAYX::PlaneGrating> plG = std::make_shared<RAYX::PlaneGrating>("PlaneGratingDeviationAz", 50, 200, position, orientation, 100, 1000, 1, 0, std::vector<double>{ 0,0,0,0,0,0 }, zeros7); // dx,dy,dz, dpsi,dphi,dchi // {1,2,3,0.001,0.002,0.003}
+    std::shared_ptr<RAYX::PlaneGrating> plG = std::make_shared<RAYX::PlaneGrating>("PlaneGratingDeviationAz", 0, 50, 200, position, orientation, 100, 1000, 1, 0, std::vector<double>{ 0,0,0,0,0,0 }, zeros7); // dx,dy,dz, dpsi,dphi,dchi // {1,2,3,0.001,0.002,0.003}
     
     RAYX::WorldCoordinates ip_param = RAYX::WorldCoordinates(0, 0, 0, 1000, std::vector<double>{ 0,0,0, 0,0,0 });
     glm::dvec4 pos_ip = ip_param.calcPosition(pg_param, position, orientation);
@@ -1134,7 +1134,7 @@ TEST(opticalElements, planeGratingDevAzMis) {
     RAYX::WorldCoordinates pg_param = RAYX::WorldCoordinates(incidenceAngle, exitAngle, degToRad(7.5), 10000, std::vector<double>{ 1,2,3,0.001,0.002,0.003 });
     glm::dvec4 position = pg_param.calcPosition();
     glm::dmat4x4 orientation = pg_param.calcOrientation();
-    std::shared_ptr<RAYX::PlaneGrating> plG = std::make_shared<RAYX::PlaneGrating>("PlaneGratingDeviationAzMis", 50, 200, position, orientation, 100, 1000, 1, 0, std::vector<double>{ 0,0,0,0,0,0 }, zeros7); // dx,dy,dz, dpsi,dphi,dchi // {1,2,3,0.001,0.002,0.003}
+    std::shared_ptr<RAYX::PlaneGrating> plG = std::make_shared<RAYX::PlaneGrating>("PlaneGratingDeviationAzMis", 0, 50, 200, position, orientation, 100, 1000, 1, 0, std::vector<double>{ 0,0,0,0,0,0 }, zeros7); // dx,dy,dz, dpsi,dphi,dchi // {1,2,3,0.001,0.002,0.003}
     
     RAYX::WorldCoordinates ip_param = RAYX::WorldCoordinates(0, 0, 0, 1000, std::vector<double>{ 0,0,0, 0,0,0 });
     glm::dvec4 pos_ip = ip_param.calcPosition(pg_param, position, orientation);
@@ -1160,7 +1160,7 @@ TEST(opticalElements, planeGratingIncAzMis) {
     glm::dmat4x4 or_ip = ip_param.calcOrientation(pg_param, position, orientation);
     std::shared_ptr<RAYX::ImagePlane> ip = std::make_shared<RAYX::ImagePlane>("Image Plane", pos_ip, or_ip);
     
-    std::shared_ptr<RAYX::PlaneGrating> plG = std::make_shared<RAYX::PlaneGrating>("PlaneGratingIncAzMis", 50, 200, position, orientation, 100, 1000, 1, 0,  std::vector<double>{ 0,0,0,0,0,0 }, zeros7); // dx,dy,dz, dpsi,dphi,dchi // {1,2,3,0.001,0.002,0.003}
+    std::shared_ptr<RAYX::PlaneGrating> plG = std::make_shared<RAYX::PlaneGrating>("PlaneGratingIncAzMis", 0, 50, 200, position, orientation, 100, 1000, 1, 0,  std::vector<double>{ 0,0,0,0,0,0 }, zeros7); // dx,dy,dz, dpsi,dphi,dchi // {1,2,3,0.001,0.002,0.003}
     testOpticalElement({ plG, ip }, 20);
 
     //std::shared_ptr<RAYX::PlaneGrating> plG = std::make_shared<RAYX::PlaneGrating>("PlaneGratingIncAzMis", 1, 50, 200, 0.0, 10, 7.5, 10000, 100, 1000, 1, 2, 0, std::vector<double>{ 1,2,3,0.001,0.002,0.003 }, std::vector<double>{ 0,0,0,0,0,0 }, zeros7, nullptr, true); // dx,dy,dz, dpsi,dphi,dchi // {1,2,3,0.001,0.002,0.003}
@@ -1174,7 +1174,7 @@ TEST(opticalElements, planeGratingDevMisVLS) {
     RAYX::WorldCoordinates pg_param = RAYX::WorldCoordinates(incidenceAngle, exitAngle, degToRad(7.5), 10000, std::vector<double>{ 1,2,3,0.001,0.002,0.003 });
     glm::dvec4 position = pg_param.calcPosition();
     glm::dmat4x4 orientation = pg_param.calcOrientation();
-    std::shared_ptr<RAYX::PlaneGrating> plG = std::make_shared<RAYX::PlaneGrating>("PlaneGratingDeviationMis", 50, 200, position, orientation, 100, 1000, 1, 0, std::vector<double>{ 0.45, 0.3, 0.5, 0.2, 0.4, 0.35 }, zeros7); // dx,dy,dz, dpsi,dphi,dchi // {1,2,3,0.001,0.002,0.003}
+    std::shared_ptr<RAYX::PlaneGrating> plG = std::make_shared<RAYX::PlaneGrating>("PlaneGratingDeviationMis", 0, 50, 200, position, orientation, 100, 1000, 1, 0, std::vector<double>{ 0.45, 0.3, 0.5, 0.2, 0.4, 0.35 }, zeros7); // dx,dy,dz, dpsi,dphi,dchi // {1,2,3,0.001,0.002,0.003}
     
     RAYX::WorldCoordinates ip_param = RAYX::WorldCoordinates(0, 0, 0, 1000, std::vector<double>{ 0,0,0, 0,0,0 });
     glm::dvec4 pos_ip = ip_param.calcPosition(pg_param, position, orientation);
@@ -1295,7 +1295,7 @@ TEST(opticalElements, ImagePlane) {
     glm::dvec4 pos2 = w_coord2.calcPosition(w_coord, pos, or1);
     glm::dmat4x4 or2 =  w_coord2.calcOrientation(w_coord, pos, or1);
     
-    std::shared_ptr<RAYX::PlaneMirror> plM = std::make_shared<RAYX::PlaneMirror>("PlaneMirror_ImagePlane", 50, 200, pos, or1, zeros7); // {1,2,3,0.01,0.02,0.03}
+    std::shared_ptr<RAYX::PlaneMirror> plM = std::make_shared<RAYX::PlaneMirror>("PlaneMirror_ImagePlane", 0, 50, 200, pos, or1, zeros7); // {1,2,3,0.01,0.02,0.03}
     std::shared_ptr<RAYX::ImagePlane> i = std::make_shared<RAYX::ImagePlane>("ImagePlane", pos2, or2);
     testOpticalElement({ plM, i }, 200);
     ASSERT_TRUE(true);
@@ -1308,28 +1308,28 @@ TEST(globalCoordinates, FourMirrors_9Rays) {
     RAYX::WorldCoordinates w_coord = RAYX::WorldCoordinates(degToRad(10), degToRad(10), degToRad(7), 10, std::vector<double>{0,0,0, 0,0,0});
     glm::dvec4 pos = w_coord.calcPosition();
     glm::dmat4x4 or1 =  w_coord.calcOrientation();
-    std::shared_ptr<RAYX::PlaneMirror> p1 = std::make_shared<RAYX::PlaneMirror>("globalCoordinates_9rays", 50, 200, pos, or1, zeros7); // {1,2,3,0.01,0.02,0.03}
+    std::shared_ptr<RAYX::PlaneMirror> p1 = std::make_shared<RAYX::PlaneMirror>("globalCoordinates_9rays", 0, 50, 200, pos, or1, zeros7); // {1,2,3,0.01,0.02,0.03}
     //std::shared_ptr<RAYX::PlaneMirror> p1 = std::make_shared<RAYX::PlaneMirror>("globalCoordinates_20rays", 50, 200, 10, 7, 10000, std::vector<double>{ 0,0,0, 0,0,0 }, zeros7, nullptr, true); // {1,2,3,0.01,0.02,0.03}
     
     RAYX::GeometricUserParams g_params2 = RAYX::GeometricUserParams(15);
     RAYX::WorldCoordinates w_coord2 = RAYX::WorldCoordinates(degToRad(15), degToRad(15), degToRad(4), 10, std::vector<double>{0,0,0, 0,0,0});//std::vector<double>{0,0,0, 0,0,0});
     glm::dvec4 pos2 = w_coord2.calcPosition(w_coord, pos, or1);
     glm::dmat4x4 or2 =  w_coord2.calcOrientation(w_coord, pos, or1);
-    std::shared_ptr<RAYX::PlaneMirror> p2 = std::make_shared<RAYX::PlaneMirror>("PlaneMirror2", 50, 200, pos2, or2, zeros7); // {1,2,3,0.01,0.02,0.03}
+    std::shared_ptr<RAYX::PlaneMirror> p2 = std::make_shared<RAYX::PlaneMirror>("PlaneMirror2", 0, 50, 200, pos2, or2, zeros7); // {1,2,3,0.01,0.02,0.03}
     //std::shared_ptr<RAYX::PlaneMirror> p2 = std::make_shared<RAYX::PlaneMirror>("PlaneMirror2", 50, 200, 15, 4, 10000, std::vector<double>{ 0,0,0, 0,0,0 }, zeros7, p1, true); // {1,2,3,0.01,0.02,0.03}
     
     g_params = RAYX::GeometricUserParams(7);
     RAYX::WorldCoordinates w_coord3 = RAYX::WorldCoordinates(g_params.getAlpha(), g_params.getBeta(), degToRad(10), 10, std::vector<double>{0,0,0, 0,0,0});
     glm::dvec4 pos3 = w_coord3.calcPosition(w_coord2, pos2, or2);
     glm::dmat4x4 or3 =  w_coord3.calcOrientation(w_coord2, pos2, or2);
-    std::shared_ptr<RAYX::PlaneMirror> p3 = std::make_shared<RAYX::PlaneMirror>("PlaneMirror3", 50, 200, pos3, or3, zeros7); // {1,2,3,0.01,0.02,0.03}
+    std::shared_ptr<RAYX::PlaneMirror> p3 = std::make_shared<RAYX::PlaneMirror>("PlaneMirror3", 0, 50, 200, pos3, or3, zeros7); // {1,2,3,0.01,0.02,0.03}
     //std::shared_ptr<RAYX::PlaneMirror> p3 = std::make_shared<RAYX::PlaneMirror>("PlaneMirror3", 50, 200, 7, 10, 10000, std::vector<double>{ 0,0,0, 0,0,0 }, zeros7, p2, true); // {1,2,3,0.01,0.02,0.03}
     
     g_params = RAYX::GeometricUserParams(22);
     RAYX::WorldCoordinates w_coord4 = RAYX::WorldCoordinates(g_params.getAlpha(), g_params.getBeta(), degToRad(17), 10, std::vector<double>{0,0,0, 0,0,0});
     glm::dvec4 pos4 = w_coord4.calcPosition(w_coord3, pos3, or3);
     glm::dmat4x4 or4 =  w_coord4.calcOrientation(w_coord3, pos3, or3);
-    std::shared_ptr<RAYX::PlaneMirror> p4 = std::make_shared<RAYX::PlaneMirror>("PlaneMirror4", 50, 200, pos4, or4, zeros7); // {1,2,3,0.01,0.02,0.03}
+    std::shared_ptr<RAYX::PlaneMirror> p4 = std::make_shared<RAYX::PlaneMirror>("PlaneMirror4", 0, 50, 200, pos4, or4, zeros7); // {1,2,3,0.01,0.02,0.03}
     //std::shared_ptr<RAYX::PlaneMirror> p4 = std::make_shared<RAYX::PlaneMirror>("PlaneMirror4", 50, 200, 22, 17, 10000, std::vector<double>{ 0,0,0, 0,0,0 }, zeros7, p3, true); // {1,2,3,0.01,0.02,0.03}
     
     RAYX::WorldCoordinates w_coord5 = RAYX::WorldCoordinates(0, 0, 0, 1000, std::vector<double>{0,0,0, 0,0,0});
@@ -1346,28 +1346,28 @@ TEST(globalCoordinates, FourMirrors_20Rays) {
     RAYX::WorldCoordinates w_coord = RAYX::WorldCoordinates(degToRad(10), degToRad(10), degToRad(7), 10, std::vector<double>{0,0,0, 0,0,0});
     glm::dvec4 pos = w_coord.calcPosition();
     glm::dmat4x4 or1 =  w_coord.calcOrientation();
-    std::shared_ptr<RAYX::PlaneMirror> p1 = std::make_shared<RAYX::PlaneMirror>("globalCoordinates_20rays", 50, 200, pos, or1, zeros7); // {1,2,3,0.01,0.02,0.03}
+    std::shared_ptr<RAYX::PlaneMirror> p1 = std::make_shared<RAYX::PlaneMirror>("globalCoordinates_20rays", 0, 50, 200, pos, or1, zeros7); // {1,2,3,0.01,0.02,0.03}
     //std::shared_ptr<RAYX::PlaneMirror> p1 = std::make_shared<RAYX::PlaneMirror>("globalCoordinates_20rays", 50, 200, 10, 7, 10000, std::vector<double>{ 0,0,0, 0,0,0 }, zeros7, nullptr, true); // {1,2,3,0.01,0.02,0.03}
     
     RAYX::GeometricUserParams g_params2 = RAYX::GeometricUserParams(15);
     RAYX::WorldCoordinates w_coord2 = RAYX::WorldCoordinates(degToRad(15), degToRad(15), degToRad(4), 10, std::vector<double>{0,0,0, 0,0,0});//std::vector<double>{0,0,0, 0,0,0});
     glm::dvec4 pos2 = w_coord2.calcPosition(w_coord, pos, or1);
     glm::dmat4x4 or2 =  w_coord2.calcOrientation(w_coord, pos, or1);
-    std::shared_ptr<RAYX::PlaneMirror> p2 = std::make_shared<RAYX::PlaneMirror>("PlaneMirror2", 50, 200, pos2, or2, zeros7); // {1,2,3,0.01,0.02,0.03}
+    std::shared_ptr<RAYX::PlaneMirror> p2 = std::make_shared<RAYX::PlaneMirror>("PlaneMirror2", 0, 50, 200, pos2, or2, zeros7); // {1,2,3,0.01,0.02,0.03}
     //std::shared_ptr<RAYX::PlaneMirror> p2 = std::make_shared<RAYX::PlaneMirror>("PlaneMirror2", 50, 200, 15, 4, 10000, std::vector<double>{ 0,0,0, 0,0,0 }, zeros7, p1, true); // {1,2,3,0.01,0.02,0.03}
     
     g_params = RAYX::GeometricUserParams(7);
     RAYX::WorldCoordinates w_coord3 = RAYX::WorldCoordinates(g_params.getAlpha(), g_params.getBeta(), degToRad(10), 10, std::vector<double>{0,0,0, 0,0,0});
     glm::dvec4 pos3 = w_coord3.calcPosition(w_coord2, pos2, or2);
     glm::dmat4x4 or3 =  w_coord3.calcOrientation(w_coord2, pos2, or2);
-    std::shared_ptr<RAYX::PlaneMirror> p3 = std::make_shared<RAYX::PlaneMirror>("PlaneMirror3", 50, 200, pos3, or3, zeros7); // {1,2,3,0.01,0.02,0.03}
+    std::shared_ptr<RAYX::PlaneMirror> p3 = std::make_shared<RAYX::PlaneMirror>("PlaneMirror3", 0, 50, 200, pos3, or3, zeros7); // {1,2,3,0.01,0.02,0.03}
     //std::shared_ptr<RAYX::PlaneMirror> p3 = std::make_shared<RAYX::PlaneMirror>("PlaneMirror3", 50, 200, 7, 10, 10000, std::vector<double>{ 0,0,0, 0,0,0 }, zeros7, p2, true); // {1,2,3,0.01,0.02,0.03}
     
     g_params = RAYX::GeometricUserParams(22);
     RAYX::WorldCoordinates w_coord4 = RAYX::WorldCoordinates(g_params.getAlpha(), g_params.getBeta(), degToRad(17), 10, std::vector<double>{0,0,0, 0,0,0});
     glm::dvec4 pos4 = w_coord4.calcPosition(w_coord3, pos3, or3);
     glm::dmat4x4 or4 =  w_coord4.calcOrientation(w_coord3, pos3, or3);
-    std::shared_ptr<RAYX::PlaneMirror> p4 = std::make_shared<RAYX::PlaneMirror>("PlaneMirror4", 50, 200, pos4, or4, zeros7); // {1,2,3,0.01,0.02,0.03}
+    std::shared_ptr<RAYX::PlaneMirror> p4 = std::make_shared<RAYX::PlaneMirror>("PlaneMirror4", 0, 50, 200, pos4, or4, zeros7); // {1,2,3,0.01,0.02,0.03}
     //std::shared_ptr<RAYX::PlaneMirror> p4 = std::make_shared<RAYX::PlaneMirror>("PlaneMirror4", 50, 200, 22, 17, 10000, std::vector<double>{ 0,0,0, 0,0,0 }, zeros7, p3, true); // {1,2,3,0.01,0.02,0.03}
     
     RAYX::WorldCoordinates w_coord5 = RAYX::WorldCoordinates(0, 0, 0, 1000, std::vector<double>{0,0,0, 0,0,0});
@@ -1382,8 +1382,17 @@ TEST(globalCoordinates, FourMirrors_20Rays) {
 TEST(opticalElements, slit1) {
     RAYX::SimulationEnv::get().m_numOfRays = 200;
     std::shared_ptr<RAYX::MatrixSource> m = std::make_shared<RAYX::MatrixSource>("matrix source", 0, 0.065, 0.04, 0, 0.001, 0.001, 100, 0, 1, 0, 0, std::vector<double>{ 0,0,0,0 });
-    std::shared_ptr<RAYX::Slit> s = std::make_shared<RAYX::Slit>("slit", 0, 1, 20, 2, 0, 10000, 20, 1, m->getPhotonEnergy(), std::vector<double>{ 0,0,0, 0,0,0 }, nullptr, true);
-    std::shared_ptr<RAYX::ImagePlane> ip = std::make_shared<RAYX::ImagePlane>("Image plane", 1000, s, true);
+    
+    RAYX::WorldCoordinates s_param = RAYX::WorldCoordinates(0, 0, 0, 10000, std::vector<double>{ 0,0,0, 0,0,0 });
+    glm::dvec4 s_position = s_param.calcPosition();
+    glm::dmat4x4 s_orientation = s_param.calcOrientation();
+    std::shared_ptr<RAYX::Slit> s = std::make_shared<RAYX::Slit>("slit", 0, 1, 20, 2, s_position, s_orientation, 20, 1, m->getPhotonEnergy());
+    
+    RAYX::WorldCoordinates ip_param = RAYX::WorldCoordinates(0, 0, 0, 1000, std::vector<double>{ 0,0,0, 0,0,0 });
+    glm::dvec4 ip_position = ip_param.calcPosition(s_param, s_position, s_orientation);
+    glm::dmat4x4 ip_orientation = ip_param.calcOrientation(s_param, s_position, s_orientation);
+    std::shared_ptr<RAYX::ImagePlane> ip = std::make_shared<RAYX::ImagePlane>("Image plane", ip_position, ip_orientation);
+    
     std::list<double> outputRays = runTracer(m->getRays(), {s,ip});
     int counter = 0;
     for (std::list<double>::iterator i = outputRays.begin(); i != outputRays.end();) {

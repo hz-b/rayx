@@ -32,12 +32,12 @@ namespace RAYX
      * @param fresnelZOffset
      * @param slopeError                    7 slope error parameters: x-y sagittal (0), y-z meridional (1), thermal distortion x (2),y (3),z (4), cylindrical bowing amplitude y(5) and radius (6)
     */
-    ReflectionZonePlate::ReflectionZonePlate(const char* name, const int geometricShape, const int curvatureType,
+    ReflectionZonePlate::ReflectionZonePlate(const char* name, const int geometricalShape, const int curvatureType,
         const double width, const double height, const glm::dvec4 position, const glm::dmat4x4 orientation, const double designEnergy, const double orderOfDiffraction,
         const double designOrderOfDiffraction, const double dAlpha, const double dBeta, const double mEntrance, const double mExit, const double sEntrance,
         const double sExit, const double shortRadius, const double longRadius, const int additionalZeroOrder,
         const double fresnelZOffset, const std::vector<double> slopeError)
-        : OpticalElement(name, width, height, position, orientation, slopeError),
+        : OpticalElement(name, geometricalShape, width, height, position, orientation, slopeError),
         m_designAlphaAngle(degToRad(dAlpha)),
         m_designBetaAngle(degToRad(dBeta)),
         m_fresnelZOffset(fresnelZOffset),
@@ -53,10 +53,6 @@ namespace RAYX
         // m_designEnergy = designEnergy; // if Auto == true, take energy of Source (param sourceEnergy), else m_designEnergy = designEnergy
         m_designWavelength = m_designEnergy == 0 ? 0 : hvlam(m_designEnergy);
         m_additionalOrder = double(additionalZeroOrder);
-
-        if (geometricShape == 1) { // elliptical
-            setDimensions(-width, -height);
-        }
 
         m_curvatureType = curvatureType == 0 ? CT_PLANE : (curvatureType == 1 ? CT_TOROIDAL : CT_SPHERICAL);
         m_designType = DT_ZOFFSET; // DT_ZOFFSET (0) default
@@ -105,14 +101,14 @@ namespace RAYX
      * lineDensity = line density of the grating
      * orderOfDiffraction =
     */
-    ReflectionZonePlate::ReflectionZonePlate(const char* name, const int geometricShape, const int mount, const int curvatureType, const int designType,
+    ReflectionZonePlate::ReflectionZonePlate(const char* name, const int geometricalShape, const int mount, const int curvatureType, const int designType,
         const int elementOffsetType, const double width, const double height, const double deviation, const double incidenceAngle, const double azimuthal,
         const double distanceToPreceedingElement, const double designEnergy, const double sourceEnergy, const double orderOfDiffraction,
         const double designOrderOfDiffraction, const double dAlpha, const double dBeta, const double mEntrance, const double mExit, const double sEntrance,
         const double sExit, const double shortRadius, const double longRadius, const int additionalZeroOrder, const double elementOffsetZ,
         const double fresnelZOffset, const double beta, const std::vector<double> misalignmentParams, const std::vector<double> slopeError,
         const std::shared_ptr<OpticalElement> previous, bool global)
-        : OpticalElement(name, width, height, degToRad(azimuthal), distanceToPreceedingElement, slopeError, previous),
+        : OpticalElement(name, geometricalShape, width, height, degToRad(azimuthal), distanceToPreceedingElement, slopeError, previous),
         m_designAlphaAngle(degToRad(dAlpha)),
         m_designBetaAngle(degToRad(dBeta)),
         m_grazingIncidenceAngle(degToRad(incidenceAngle)),
@@ -132,10 +128,6 @@ namespace RAYX
         m_designWavelength = m_designEnergy == 0 ? 0 : inm2eV / m_designEnergy;
         m_additionalOrder = double(additionalZeroOrder);
 
-        m_geometricalShape = geometricShape == 0 ? GS_RECTANGLE : GS_ELLIPTICAL;
-        if (m_geometricalShape == GS_ELLIPTICAL) {
-            setDimensions(-width, -height);
-        }
         m_curvatureType = curvatureType == 0 ? CT_PLANE : (curvatureType == 1 ? CT_TOROIDAL : CT_SPHERICAL);
         m_gratingMount = mount == 0 ? GM_DEVIATION : GM_INCIDENCE;
         m_designType = designType == 0 ? DT_ZOFFSET : DT_BETA; // default (0)
