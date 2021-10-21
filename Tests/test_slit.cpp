@@ -2,6 +2,8 @@
 #include "gmock/gmock.h"
 #include "Beamline/Beamline.h"
 #include "Beamline/Objects/Slit.h"
+#include "UserParameter/WorldCoordinates.h"
+#include "UserParameter/GeometricUserParams.h"
 #include "Core.h"
 #include "Ray.h"
 
@@ -68,7 +70,7 @@
 
 
 TEST(Slit, defaultParams) {
-    int shape = 0;
+    int geometricalShape = 0;
     int beamstop = 0;
     double width = 24;
     double height = 3;
@@ -78,28 +80,35 @@ TEST(Slit, defaultParams) {
     double beamstopHeight = 1;
     double energy = 100;
     std::vector<double> misalignment = { 0,0,0, 0,0,0 };
-    RAYX::Slit s = RAYX::Slit("slit", shape, beamstop, width, height, chi, dist, beamstopWidth, beamstopHeight, energy, misalignment, nullptr, false);
 
+    RAYX::WorldCoordinates w_coord = RAYX::WorldCoordinates(0, 0, degToRad(chi), dist, misalignment);
+    RAYX::Slit s = RAYX::Slit("slit", geometricalShape, beamstop, width, height, w_coord.calcPosition(), w_coord.calcOrientation(), beamstopWidth, beamstopHeight, energy);
+    //RAYX::Slit s = RAYX::Slit("slitt", geometricalShape, beamstop, width, height, chi, dist, beamstopWidth, beamstopHeight, energy, misalignment, nullptr, true);
+    
     double wavelength = 12.39852;
     std::vector<double> correctElementParams = { 0,0,0,0, wavelength,0,0,0, 0,0,0,0, 0,0,0,0 };
     std::vector<double> correctObjectParams = { width,height,0,0, 0,0,0,0, 0,0,0,0, 0,0,0,0 };
-    std::vector<double> quadric = { 0,0,0,0, 0,0,0,0, 0,0,0,-1, 3,0,0,0 };
+    std::vector<double> surface = { 0,0,0,0, 0,0,0,0, 0,0,0,-1, 3,0,0,0 };
     ASSERT_DOUBLE_EQ(s.getCentralBeamstop(), beamstop);
     ASSERT_DOUBLE_EQ(s.getBeamstopHeight(), 0);
     ASSERT_DOUBLE_EQ(s.getBeamstopWidth(), 0);
     ASSERT_DOUBLE_EQ(s.getHeight(), height);
     ASSERT_DOUBLE_EQ(s.getWidth(), width);
-    ASSERT_DOUBLE_EQ(s.getChi(), chi);
-    ASSERT_DOUBLE_EQ(s.getDistanceToPreceedingElement(), dist);
     ASSERT_DOUBLE_EQ(s.getWaveLength(), wavelength);
     EXPECT_ITERABLE_DOUBLE_EQ(std::vector<double>, s.getElementParameters(), correctElementParams);
-    EXPECT_ITERABLE_DOUBLE_EQ(std::vector<double>, s.getSurfaceParams(), quadric);
+    EXPECT_ITERABLE_DOUBLE_EQ(std::vector<double>, s.getSurfaceParams(), surface);
     EXPECT_ITERABLE_DOUBLE_EQ(std::vector<double>, s.getObjectParameters(), correctObjectParams);
+
+    std::vector<double> correctInMat = {1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, -10000, 1};
+    std::vector<double> correctOutMat = {1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 10000, 1};
+    EXPECT_ITERABLE_DOUBLE_EQ(std::vector<double>, s.getInMatrix(), correctInMat);
+    EXPECT_ITERABLE_DOUBLE_EQ(std::vector<double>, s.getOutMatrix(), correctOutMat);
+    
 
 }
 
 TEST(Slit, rectangleBeamstop) {
-    int shape = 0;
+    int geometricalShape = 0;
     int beamstop = 1;
     double width = 24;
     double height = 3;
@@ -109,27 +118,33 @@ TEST(Slit, rectangleBeamstop) {
     double beamstopHeight = 1;
     double energy = 100;
     std::vector<double> misalignment = { 0,0,0, 0,0,0 };
-    RAYX::Slit s = RAYX::Slit("slit", shape, beamstop, width, height, chi, dist, beamstopWidth, beamstopHeight, energy, misalignment, nullptr, false);
+    
+    RAYX::WorldCoordinates w_coord = RAYX::WorldCoordinates(0, 0, degToRad(chi), dist, misalignment);
+    //RAYX::Slit s = RAYX::Slit("slitt", geometricalShape, beamstop, width, height, chi, dist, beamstopWidth, beamstopHeight, energy, misalignment, nullptr, true);
+    RAYX::Slit s = RAYX::Slit("slit", geometricalShape, beamstop, width, height, w_coord.calcPosition(), w_coord.calcOrientation(), beamstopWidth, beamstopHeight, energy);
 
     double wavelength = 12.39852;
     std::vector<double> correctElementParams = { beamstopWidth / 2, beamstopHeight / 2,0,0, wavelength,0,0,0, 0,0,0,0, 0,0,0,0 };
     std::vector<double> correctObjectParams = { width,height,0,0, 0,0,0,0, 0,0,0,0, 0,0,0,0 };
-    std::vector<double> quadric = { 0,0,0,0, 0,0,0,0, 0,0,0,-1, 3,0,0,0 };
+    std::vector<double> surface = { 0,0,0,0, 0,0,0,0, 0,0,0,-1, 3,0,0,0 };
     ASSERT_DOUBLE_EQ(s.getCentralBeamstop(), beamstop);
     ASSERT_DOUBLE_EQ(s.getBeamstopHeight(), beamstopHeight);
     ASSERT_DOUBLE_EQ(s.getBeamstopWidth(), beamstopWidth);
     ASSERT_DOUBLE_EQ(s.getHeight(), height);
     ASSERT_DOUBLE_EQ(s.getWidth(), width);
-    ASSERT_DOUBLE_EQ(s.getChi(), chi);
-    ASSERT_DOUBLE_EQ(s.getDistanceToPreceedingElement(), dist);
     ASSERT_DOUBLE_EQ(s.getWaveLength(), wavelength);
     EXPECT_ITERABLE_DOUBLE_EQ(std::vector<double>, s.getElementParameters(), correctElementParams);
-    EXPECT_ITERABLE_DOUBLE_EQ(std::vector<double>, s.getSurfaceParams(), quadric);
+    EXPECT_ITERABLE_DOUBLE_EQ(std::vector<double>, s.getSurfaceParams(), surface);
     EXPECT_ITERABLE_DOUBLE_EQ(std::vector<double>, s.getObjectParameters(), correctObjectParams);
+    
+    std::vector<double> correctInMat = {1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, -10000, 1};
+    std::vector<double> correctOutMat = {1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 10000, 1};
+    EXPECT_ITERABLE_DOUBLE_EQ(std::vector<double>, s.getInMatrix(), correctInMat);
+    EXPECT_ITERABLE_DOUBLE_EQ(std::vector<double>, s.getOutMatrix(), correctOutMat);
 }
 
 TEST(Slit, ellipticalBeamstop) {
-    int shape = 0;
+    int geometricalShape = 0;
     int beamstop = 2;
     double width = 20;
     double height = 2;
@@ -139,114 +154,139 @@ TEST(Slit, ellipticalBeamstop) {
     double beamstopHeight = 1;
     double energy = 100;
     std::vector<double> misalignment = { 0,0,0, 0,0,0 };
-    RAYX::Slit s = RAYX::Slit("slit", shape, beamstop, width, height, chi, dist, beamstopWidth, beamstopHeight, energy, misalignment, nullptr, false);
+    
+    RAYX::WorldCoordinates w_coord = RAYX::WorldCoordinates(0, 0, degToRad(chi), dist, misalignment);
+    //RAYX::Slit s = RAYX::Slit("slitt", geometricalShape, beamstop, width, height, chi, dist, beamstopWidth, beamstopHeight, energy, misalignment, nullptr, true);
+    RAYX::Slit s = RAYX::Slit("slit", geometricalShape, beamstop, width, height, w_coord.calcPosition(), w_coord.calcOrientation(), beamstopWidth, beamstopHeight, energy);
 
     double wavelength = 12.39852;
     std::vector<double> correctElementParams = { -beamstopWidth / 2, beamstopHeight / 2,0,0, wavelength,0,0,0, 0,0,0,0, 0,0,0,0 };
     std::vector<double> correctObjectParams = { width,height,0,0, 0,0,0,0, 0,0,0,0, 0,0,0,0 };
-    std::vector<double> quadric = { 0,0,0,0, 0,0,0,0, 0,0,0,-1, 3,0,0,0 };
+    std::vector<double> surface = { 0,0,0,0, 0,0,0,0, 0,0,0,-1, 3,0,0,0 };
     ASSERT_DOUBLE_EQ(s.getCentralBeamstop(), beamstop);
     ASSERT_DOUBLE_EQ(s.getBeamstopHeight(), beamstopHeight);
     ASSERT_DOUBLE_EQ(s.getBeamstopWidth(), -beamstopWidth);
     ASSERT_DOUBLE_EQ(s.getHeight(), height);
     ASSERT_DOUBLE_EQ(s.getWidth(), width);
-    ASSERT_DOUBLE_EQ(s.getChi(), chi);
-    ASSERT_DOUBLE_EQ(s.getDistanceToPreceedingElement(), dist);
     ASSERT_DOUBLE_EQ(s.getWaveLength(), wavelength);
     EXPECT_ITERABLE_DOUBLE_EQ(std::vector<double>, s.getElementParameters(), correctElementParams);
-    EXPECT_ITERABLE_DOUBLE_EQ(std::vector<double>, s.getSurfaceParams(), quadric);
+    EXPECT_ITERABLE_DOUBLE_EQ(std::vector<double>, s.getSurfaceParams(), surface);
     EXPECT_ITERABLE_DOUBLE_EQ(std::vector<double>, s.getObjectParameters(), correctObjectParams);
+
+    std::vector<double> correctInMat = {1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, -10000, 1};
+    std::vector<double> correctOutMat = {1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 10000, 1};
+    EXPECT_ITERABLE_DOUBLE_EQ(std::vector<double>, s.getInMatrix(), correctInMat);
+    EXPECT_ITERABLE_DOUBLE_EQ(std::vector<double>, s.getOutMatrix(), correctOutMat);
 }
 
 
 TEST(Slit, ellipticalSlitellipticalBeamstop) {
-    int shape = 1;
+    int geometricalShape = 1;
     int beamstop = 2;
     double width = 24;
     double height = 3;
-    double chi = 0;
+    double chi = 10;
     double dist = 10000;
     double beamstopWidth = 20;
     double beamstopHeight = 1;
     double energy = 100;
     std::vector<double> misalignment = { 0,0,0, 0,0,0 };
-    RAYX::Slit s = RAYX::Slit("slit", shape, beamstop, width, height, chi, dist, beamstopWidth, beamstopHeight, energy, misalignment, nullptr, false);
+
+    RAYX::WorldCoordinates w_coord = RAYX::WorldCoordinates(0, 0, degToRad(chi), dist, misalignment);
+    //RAYX::Slit s = RAYX::Slit("slitt", geometricalShape, beamstop, width, height, chi, dist, beamstopWidth, beamstopHeight, energy, misalignment, nullptr, true);
+    RAYX::Slit s = RAYX::Slit("slit", geometricalShape, beamstop, width, height, w_coord.calcPosition(), w_coord.calcOrientation(), beamstopWidth, beamstopHeight, energy);
 
     double wavelength = 12.39852;
     std::vector<double> correctElementParams = { -beamstopWidth / 2, beamstopHeight / 2,0,0, wavelength,0,0,0, 0,0,0,0, 0,0,0,0 };
     std::vector<double> correctObjectParams = { -width,-height,0,0, 0,0,0,0, 0,0,0,0, 0,0,0,0 };
-    std::vector<double> quadric = { 0,0,0,0, 0,0,0,0, 0,0,0,-1, 3,0,0,0 };
+    std::vector<double> surface = { 0,0,0,0, 0,0,0,0, 0,0,0,-1, 3,0,0,0 };
     ASSERT_DOUBLE_EQ(s.getCentralBeamstop(), beamstop);
     ASSERT_DOUBLE_EQ(s.getBeamstopHeight(), beamstopHeight);
     ASSERT_DOUBLE_EQ(s.getBeamstopWidth(), -beamstopWidth);
     ASSERT_DOUBLE_EQ(s.getHeight(), height);
     ASSERT_DOUBLE_EQ(s.getWidth(), width);
-    ASSERT_DOUBLE_EQ(s.getChi(), chi);
-    ASSERT_DOUBLE_EQ(s.getDistanceToPreceedingElement(), dist);
     ASSERT_DOUBLE_EQ(s.getWaveLength(), wavelength);
     EXPECT_ITERABLE_DOUBLE_EQ(std::vector<double>, s.getElementParameters(), correctElementParams);
-    EXPECT_ITERABLE_DOUBLE_EQ(std::vector<double>, s.getSurfaceParams(), quadric);
+    EXPECT_ITERABLE_DOUBLE_EQ(std::vector<double>, s.getSurfaceParams(), surface);
     EXPECT_ITERABLE_DOUBLE_EQ(std::vector<double>, s.getObjectParameters(), correctObjectParams);
+
+    std::vector<double> correctInMat = {0.98480775301220802, -0.17364817766693033, 0, 0, 0.17364817766693033, 0.98480775301220802, 0, 0, 0, 0, 1, 0, 0, 0, -10000, 1};
+    std::vector<double> correctOutMat = {0.98480775301220802, 0.17364817766693033, 0, 0, -0.17364817766693033, 0.98480775301220802, 0, 0, 0, 0, 1, 0, 0, 0, 10000, 1};
+    EXPECT_ITERABLE_DOUBLE_EQ(std::vector<double>, s.getInMatrix(), correctInMat);
+    EXPECT_ITERABLE_DOUBLE_EQ(std::vector<double>, s.getOutMatrix(), correctOutMat);
 }
 
 
 TEST(Slit, ellipticalSlitrectangleBeamstop) {
-    int shape = 1;
+    int geometricalShape = 1;
     int beamstop = 1;
     double width = 24;
     double height = 3;
     double chi = 0;
-    double dist = 10000;
+    double dist = 1234;
     double beamstopWidth = 20;
     double beamstopHeight = 1;
     double energy = 100;
     std::vector<double> misalignment = { 0,0,0, 0,0,0 };
-    RAYX::Slit s = RAYX::Slit("slit", shape, beamstop, width, height, chi, dist, beamstopWidth, beamstopHeight, energy, misalignment, nullptr, false);
+
+    RAYX::WorldCoordinates w_coord = RAYX::WorldCoordinates(0, 0, degToRad(chi), dist, misalignment);
+    //RAYX::Slit s = RAYX::Slit("slitt", geometricalShape, beamstop, width, height, chi, dist, beamstopWidth, beamstopHeight, energy, misalignment, nullptr, true);
+    RAYX::Slit s = RAYX::Slit("slit", geometricalShape, beamstop, width, height, w_coord.calcPosition(), w_coord.calcOrientation(), beamstopWidth, beamstopHeight, energy);
 
     double wavelength = 12.39852;
     std::vector<double> correctElementParams = { beamstopWidth / 2, beamstopHeight / 2,0,0, wavelength,0,0,0, 0,0,0,0, 0,0,0,0 };
     std::vector<double> correctObjectParams = { -width,-height,0,0, 0,0,0,0, 0,0,0,0, 0,0,0,0 };
-    std::vector<double> quadric = { 0,0,0,0, 0,0,0,0, 0,0,0,-1, 3,0,0,0 };
+    std::vector<double> surface = { 0,0,0,0, 0,0,0,0, 0,0,0,-1, 3,0,0,0 };
     ASSERT_DOUBLE_EQ(s.getCentralBeamstop(), beamstop);
     ASSERT_DOUBLE_EQ(s.getBeamstopHeight(), beamstopHeight);
     ASSERT_DOUBLE_EQ(s.getBeamstopWidth(), beamstopWidth);
     ASSERT_DOUBLE_EQ(s.getHeight(), height);
     ASSERT_DOUBLE_EQ(s.getWidth(), width);
-    ASSERT_DOUBLE_EQ(s.getChi(), chi);
-    ASSERT_DOUBLE_EQ(s.getDistanceToPreceedingElement(), dist);
     ASSERT_DOUBLE_EQ(s.getWaveLength(), wavelength);
     EXPECT_ITERABLE_DOUBLE_EQ(std::vector<double>, s.getElementParameters(), correctElementParams);
-    EXPECT_ITERABLE_DOUBLE_EQ(std::vector<double>, s.getSurfaceParams(), quadric);
+    EXPECT_ITERABLE_DOUBLE_EQ(std::vector<double>, s.getSurfaceParams(), surface);
     EXPECT_ITERABLE_DOUBLE_EQ(std::vector<double>, s.getObjectParameters(), correctObjectParams);
+
+    std::vector<double> correctInMat = {1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, -1234, 1};
+    std::vector<double> correctOutMat = {1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 1234, 1};
+    EXPECT_ITERABLE_DOUBLE_EQ(std::vector<double>, s.getInMatrix(), correctInMat);
+    EXPECT_ITERABLE_DOUBLE_EQ(std::vector<double>, s.getOutMatrix(), correctOutMat);
 }
 
 
 TEST(Slit, ellipticalSlitNoBeamstop) {
-    int shape = 1;
+    int geometricalShape = 1;
     int beamstop = 0;
     double width = 24;
     double height = 3;
-    double chi = 0;
-    double dist = 10000;
+    double chi = 12;
+    double dist = 1201;
     double beamstopWidth = 20;
     double beamstopHeight = 1;
     double energy = 100;
     std::vector<double> misalignment = { 0,0,0, 0,0,0 };
-    RAYX::Slit s = RAYX::Slit("slit", shape, beamstop, width, height, chi, dist, beamstopWidth, beamstopHeight, energy, misalignment, nullptr, false);
+    
+    RAYX::WorldCoordinates w_coord = RAYX::WorldCoordinates(0, 0, degToRad(chi), dist, misalignment);
+    //RAYX::Slit s = RAYX::Slit("slitt", geometricalShape, beamstop, width, height, chi, dist, beamstopWidth, beamstopHeight, energy, misalignment, nullptr, true);
+    RAYX::Slit s = RAYX::Slit("slit", geometricalShape, beamstop, width, height, w_coord.calcPosition(), w_coord.calcOrientation(), beamstopWidth, beamstopHeight, energy);
 
     double wavelength = 12.39852;
     std::vector<double> correctElementParams = { 0,0,0,0, wavelength,0,0,0, 0,0,0,0, 0,0,0,0 };
     std::vector<double> correctObjectParams = { -width,-height,0,0, 0,0,0,0, 0,0,0,0, 0,0,0,0 };
-    std::vector<double> quadric = { 0,0,0,0, 0,0,0,0, 0,0,0,-1, 3,0,0,0 };
+    std::vector<double> surface = { 0,0,0,0, 0,0,0,0, 0,0,0,-1, 3,0,0,0 };
     ASSERT_DOUBLE_EQ(s.getCentralBeamstop(), beamstop);
     ASSERT_DOUBLE_EQ(s.getBeamstopHeight(), 0);
     ASSERT_DOUBLE_EQ(s.getBeamstopWidth(), 0);
     ASSERT_DOUBLE_EQ(s.getHeight(), height);
     ASSERT_DOUBLE_EQ(s.getWidth(), width);
-    ASSERT_DOUBLE_EQ(s.getChi(), chi);
-    ASSERT_DOUBLE_EQ(s.getDistanceToPreceedingElement(), dist);
     ASSERT_DOUBLE_EQ(s.getWaveLength(), wavelength);
     EXPECT_ITERABLE_DOUBLE_EQ(std::vector<double>, s.getElementParameters(), correctElementParams);
-    EXPECT_ITERABLE_DOUBLE_EQ(std::vector<double>, s.getSurfaceParams(), quadric);
+    EXPECT_ITERABLE_DOUBLE_EQ(std::vector<double>, s.getSurfaceParams(), surface);
     EXPECT_ITERABLE_DOUBLE_EQ(std::vector<double>, s.getObjectParameters(), correctObjectParams);
+
+    
+    std::vector<double> correctInMat = {0.97814760073380569, -0.20791169081775931, 0, 0, 0.20791169081775931, 0.97814760073380569, 0, 0, 0, 0, 1, 0, 0, 0, -1201, 1};
+    std::vector<double> correctOutMat = {0.97814760073380569, 0.20791169081775931, 0, 0, -0.20791169081775931, 0.97814760073380569, 0, 0, 0, 0, 1, 0, 0, 0, 1201, 1};
+    EXPECT_ITERABLE_DOUBLE_EQ(std::vector<double>, s.getInMatrix(), correctInMat);
+    EXPECT_ITERABLE_DOUBLE_EQ(std::vector<double>, s.getOutMatrix(), correctOutMat);
 }
