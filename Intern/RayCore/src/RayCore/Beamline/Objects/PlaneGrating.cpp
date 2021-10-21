@@ -2,60 +2,7 @@
 
 namespace RAYX
 {
-    // TODO(Jannis): complete documentation
-    /**
-     * Angles given in degree and stored in rad. Initializes transformation
-     * matrices, and parameters for the quadric in super class (quadric).
-     * Sets mirror-specific parameters in this class.
-     * @param name                          name of the plane grating
-     * @param mount                         how angles of reflection are calculated: constant deviation, constant incidence,...
-     * @param width                         total width and..
-     * @param height                        ..height of the mirror (x- and z- dimensions)
-     * @param deviation                     angle between incoming and outgoing main ray
-     * @param normalIncidence               angle between incoming ray and normal of element
-     * @param azimuthal                     rotation of mirror around z-axis
-     * @param distanceToPreceedingElement   distance to previous element
-     * @param designEnergyMounting          energy, taken from source
-     * @param lineDensity                   line density of the grating
-     * @param orderOfDiffraction            the order in which the grating should refract the ray
-     * @param fixFocusConstantCFF           
-     * @param additionalZeroOrder           if true half of the rays will be refracted in the 0th order (=reflection), if false all will be refracted according to orderOfDiffraction Parameter
-     * @param misalignmentParams            misalignmen parameters (x,y,z position and x,y,z direction)
-     * @param vls                           vls grating paramters (6) (variable line spacing)
-     * @param slopeError                    7 slope error parameters: x-y sagittal (0), y-z meridional (1), thermal distortion x (2),y (3),z (4), cylindrical bowing amplitude y(5) and radius (6)
-     * @param previous                      pointer to previous element in beamline, needed for caclultation transformation matrices in global coordinate system
-     * @param global                        if tracing should be done in global or ray coordinates
-    */
-    PlaneGrating::PlaneGrating(const char* name, const int mount, const int geometricalShape, const double width, const double height, const double deviation, const double normalIncidence, const double azimuthal, const double distanceToPreceedingElement, const double designEnergyMounting, const double lineDensity, const double orderOfDiffraction, const double fixFocusConstantCFF, const int additionalZeroOrder, const std::vector<double> misalignmentParams, const std::vector<double> vls, const std::vector<double> slopeError, const std::shared_ptr<OpticalElement> previous, bool global)
-        : OpticalElement(name, geometricalShape, width, height, degToRad(azimuthal), distanceToPreceedingElement, slopeError, previous),
-        m_designEnergyMounting(designEnergyMounting),
-        m_lineDensity(lineDensity),
-        m_orderOfDiffraction(orderOfDiffraction)
-    {
-        // parameters in array 
-        // std::vector<double> inputPoints = {0,0,0,0, 0,0,0,-1, 0,0,0,0, 0,0,0,0};
-        std::cout << "wavelength" << abs(hvlam(m_designEnergyMounting)) << std::endl;
-        m_additionalOrder = additionalZeroOrder;
-        m_gratingMount = mount == 0 ? GM_DEVIATION : GM_INCIDENCE;
-
-        calcAlpha(deviation, normalIncidence);
-        std::cout.precision(17);
-        std::cout << "alpha: " << getAlpha() << ", beta: " << getBeta() << std::endl;
-
-        // set parameters in Optical Element class
-        m_vls = vls; // into element parameters
-        calcTransformationMatricesFromAngles(misalignmentParams, global);
-        setElementParameters({
-            0, 0, m_lineDensity, m_orderOfDiffraction,
-            abs(hvlam(m_designEnergyMounting)), 0, m_vls[0], m_vls[1],
-            m_vls[2], m_vls[3], m_vls[4], m_vls[5],
-            0, 0, 0, double(m_additionalOrder) });
-        setTemporaryMisalignment({ 0,0,0,0,0,0 });
-        setSurface(std::make_unique<Quadric>(std::vector<double>{0,0,0,0, 1,0,0,-1, 0,0,0,0, 1,0,0,0}));
-    }
-
-
-
+    
     /**
      * simplified constructor that assumes that incidence and exit angle are already calculated and the position and orientation has been derived from them already
      * 

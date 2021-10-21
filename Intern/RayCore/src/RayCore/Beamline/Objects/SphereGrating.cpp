@@ -20,8 +20,8 @@ namespace RAYX
      * @param vls
      * @param slopeError
     */
-    SphereGrating::SphereGrating(const char* name, int mount, double width, double height, double radius, glm::dvec4 position, glm::dmat4x4 orientation, double designEnergyMounting, double lineDensity, double orderOfDiffraction, std::vector<double> vls, std::vector<double> slopeError)
-        : OpticalElement(name, width, height, position, orientation, slopeError),
+    SphereGrating::SphereGrating(const char* name, int mount, int geometricalShape, double width, double height, double radius, glm::dvec4 position, glm::dmat4x4 orientation, double designEnergyMounting, double lineDensity, double orderOfDiffraction, std::vector<double> vls, std::vector<double> slopeError)
+        : OpticalElement(name, geometricalShape, width, height, position, orientation, slopeError),
         m_designEnergyMounting(designEnergyMounting),
         m_lineDensity(lineDensity),
         m_orderOfDiffraction(orderOfDiffraction),
@@ -36,53 +36,6 @@ namespace RAYX
             m_vls[2], m_vls[3], m_vls[4], m_vls[5],
             0, 0, 0, 0
         });
-    }
-
-    /**
-     * Angles given in degree and stored in rad.
-     * Initializes transformation matrices, and parameters for the quadric in super class (quadric).
-     * Sets mirror-specific parameters in this class.
-     *
-     * Params
-     * mount = how angles of reflection are calculated: constant deviation, constant incidence,...
-     * width, height = total width, height of the mirror (x- and z- dimensions)
-     * deviation = angle between incoming and outgoing main ray
-     * or grazingIncidence = desired incidence angle of the main ray
-     * azimuthal = rotation of mirror around z-axis
-     * distanceToPreceedingElement
-     * designEnergyMounting = energy, taken from source
-     * lineDensity = line density of the grating
-     * orderOfDefraction =
-    */
-    SphereGrating::SphereGrating(const char* name, int mount, double width, double height, double deviation, double normalIncidence, double azimuthal, double distanceToPreceedingElement, double entranceArmLength, double exitArmLength, double designEnergyMounting, double lineDensity, double orderOfDiffraction, std::vector<double> misalignmentParams, std::vector<double> vls, std::vector<double> slopeError, std::shared_ptr<OpticalElement> previous, bool global)
-        : OpticalElement(name, width, height, degToRad(azimuthal), distanceToPreceedingElement, slopeError, previous),
-        m_entranceArmLength(entranceArmLength),
-        m_exitArmLength(exitArmLength),
-        m_deviation(degToRad(deviation)),
-        m_designEnergyMounting(designEnergyMounting),
-        m_lineDensity(lineDensity),
-        m_orderOfDiffraction(orderOfDiffraction),
-        m_vls(vls)
-    {
-        // parameters in array 
-        // std::vector<double> inputPoints = {0,0,0,0, 0,0,0,-1, 0,0,0,0, 0,0,0,0};
-
-        m_a = abs(hvlam(m_designEnergyMounting)) * abs(m_lineDensity) * m_orderOfDiffraction * 1e-6;
-        m_gratingMount = mount == 0 ? GM_DEVIATION : GM_INCIDENCE;
-
-        calcAlpha(deviation, normalIncidence);
-        calcRadius();
-        // std::cout << m_a << std::endl;
-        // set parameters in Quadric class
-        double icurv = 1;
-        setSurface(std::make_unique<Quadric>(std::vector<double>{1,0,0,0, icurv,1,0,-m_radius, 0,0,1,0, 2,0,0,0}));
-        calcTransformationMatricesFromAngles(misalignmentParams, global);
-        setElementParameters({
-            0, 0, m_lineDensity, m_orderOfDiffraction,
-            abs(hvlam(m_designEnergyMounting)), 0, m_vls[0], m_vls[1],
-            m_vls[2], m_vls[3], m_vls[4], m_vls[5],
-            0, 0, 0, 0
-            });
     }
 
     SphereGrating::~SphereGrating()
