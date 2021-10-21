@@ -30,6 +30,7 @@ namespace RAYX
      * define transformation matrices based on grazing incidence (alpha) and exit (beta) angle, azimuthal angle (chi) and distance to preceeding element
      * @param name
      * @param EParameters               vector with 16 entries that contain further element specific parameters that are needed on the shader
+     * @param geometricalShape          geometrical Shape of element (0 = rectangle, 1 = elliptical)
      * @param width
      * @param height
      * @param alpha                     grazing incidence angle
@@ -42,11 +43,9 @@ namespace RAYX
      * @param previous
      * @param global
     */
-    OpticalElement::OpticalElement(const char* name, const std::vector<double> EParameters, const double width, const double height, const double alpha, const double chi, const double beta, const double dist, const std::vector<double> misalignmentParams, const std::vector<double> tempMisalignmentParams, const std::vector<double> slopeError, const std::shared_ptr<OpticalElement> previous, bool global)
+    OpticalElement::OpticalElement(const char* name, const std::vector<double> EParameters, const int geometricalShape, const double width, const double height, const double alpha, const double chi, const double beta, const double dist, const std::vector<double> misalignmentParams, const std::vector<double> tempMisalignmentParams, const std::vector<double> slopeError, const std::shared_ptr<OpticalElement> previous, bool global)
         : BeamlineObject(name),
         //m_surface(std::move(surface)), 
-        m_width(width),
-        m_height(height),
         m_alpha(alpha),
         m_beta(beta), // mirror -> exit angle = incidence angle
         m_chi(chi),
@@ -56,15 +55,20 @@ namespace RAYX
         m_slopeError(slopeError),
         m_elementParameters(EParameters)
     {
+        if(geometricalShape == 0) {
+            m_width = width;
+            m_height = height;
+        }else if(geometricalShape == 1) {
+            m_width = -width;
+            m_height = -height;
+        }
         updateObjectParams();
         calcTransformationMatricesFromAngles(misalignmentParams, global);
         setTemporaryMisalignment(tempMisalignmentParams);
     }
 
-    OpticalElement::OpticalElement(const char* name, const double width, const double height, const double chi, const double dist, const std::vector<double> slopeError, const std::shared_ptr<OpticalElement> previous)
+    OpticalElement::OpticalElement(const char* name, const int geometricalShape, const double width, const double height, const double chi, const double dist, const std::vector<double> slopeError, const std::shared_ptr<OpticalElement> previous)
         : BeamlineObject(name),
-        m_width(width),
-        m_height(height),
         m_alpha(0),
         m_beta(0),
         m_chi(chi),
@@ -72,7 +76,15 @@ namespace RAYX
         m_previous(previous),
         m_slopeError(slopeError)
     {
+        if(geometricalShape == 0) {
+            m_width = width;
+            m_height = height;
+        }else if(geometricalShape == 1) {
+            m_width = -width;
+            m_height = -height;
+        }
         updateObjectParams();
+        
     }
 
     OpticalElement::OpticalElement(const char* name, const double chi, const double dist, const std::vector<double> slopeError, const std::shared_ptr<OpticalElement> previous)
@@ -80,8 +92,11 @@ namespace RAYX
         m_chi(chi),
         m_distanceToPreceedingElement(dist),
         m_previous(previous),
-        m_slopeError(slopeError)
+        m_slopeError(slopeError),
+        m_width(0),
+        m_height(0)
     {
+        updateObjectParams();
     }
 
     /* NEW CONSTRUCTORS */
@@ -89,6 +104,7 @@ namespace RAYX
     /**
      * @param name                      name of the element
      * @param EParameters               Element specific parameters
+     * @param geometricalShape          geometrical Shape of element (0 = rectangle, 1 = elliptical)
      * @param width                     x-dimension of element
      * @param height                    z-dimension of element
      * @param position                  position in world coordinates
@@ -96,14 +112,19 @@ namespace RAYX
      * @param tempMisalignmentParams    remove?
      * @param slopeError                slope error parameters
      */
-    OpticalElement::OpticalElement(const char* name, const std::vector<double> EParameters, const double width, const double height, glm::dvec4 position, glm::dmat4x4 orientation, const std::vector<double> tempMisalignmentParams, const std::vector<double> slopeError)
+    OpticalElement::OpticalElement(const char* name, const std::vector<double> EParameters, const int geometricalShape, const double width, const double height, glm::dvec4 position, glm::dmat4x4 orientation, const std::vector<double> tempMisalignmentParams, const std::vector<double> slopeError)
         : BeamlineObject(name),
-        m_width(width),
-        m_height(height),
         m_elementParameters(EParameters),
         m_slopeError(slopeError)
     {
         assert(EParameters.size() == 16 && slopeError.size() == 7 && tempMisalignmentParams.size() == 6);
+        if(geometricalShape == 0) {
+            m_width = width;
+            m_height = height;
+        }else if(geometricalShape == 1) {
+            m_width = -width;
+            m_height = -height;
+        }
         updateObjectParams();
         setTemporaryMisalignment(tempMisalignmentParams);
         calcTransformationMatrices(position, orientation);
@@ -111,18 +132,24 @@ namespace RAYX
 
     /**
      * @param name                      name of the element
+     * @param geometricalShape          geometrical Shape of element (0 = rectangle, 1 = elliptical)
      * @param width                     x-dimension of element
      * @param height                    z-dimension of element
      * @param position                  position in world coordinates
      * @param orientation               orientation in world coordinate system
      * @param slopeError                slope error parameters
      */
-    OpticalElement::OpticalElement(const char* name, const double width, const double height, glm::dvec4 position, glm::dmat4x4 orientation, const std::vector<double> slopeError)
+    OpticalElement::OpticalElement(const char* name, const int geometricalShape, const double width, const double height, glm::dvec4 position, glm::dmat4x4 orientation, const std::vector<double> slopeError)
         : BeamlineObject(name),
-        m_width(width),
-        m_height(height),
         m_slopeError(slopeError)
     {
+        if(geometricalShape == 0) {
+            m_width = width;
+            m_height = height;
+        }else if(geometricalShape == 1) {
+            m_width = -width;
+            m_height = -height;
+        }
         updateObjectParams();
         setTemporaryMisalignment({ 0,0,0, 0,0,0 });
         calcTransformationMatrices(position, orientation);
@@ -275,6 +302,7 @@ namespace RAYX
             m_outMatrix = glmToVector16(d_e2b);
         }
 
+        std::cout.precision(17);
         printMatrix(m_inMatrix);
         printMatrix(m_outMatrix);
 
