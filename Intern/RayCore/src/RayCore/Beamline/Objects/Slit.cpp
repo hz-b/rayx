@@ -21,15 +21,15 @@ namespace RAYX
      * @param misalignmentParams    angles and distances for the mirror's misalignment
      * 
     */
-    Slit::Slit(const char* name, int shape, int beamstop, double width, double height, glm::dvec4 position, glm::dmat4x4 orientation, double beamstopWidth, double beamstopHeight, double sourceEnergy)
+    Slit::Slit(const char* name, int geometricalShape, int beamstop, double width, double height, glm::dvec4 position, glm::dmat4x4 orientation, double beamstopWidth, double beamstopHeight, double sourceEnergy)
         : OpticalElement(name, width, height, position, orientation, { 0,0,0,0,0,0,0 }),
         m_waveLength(abs(hvlam(sourceEnergy)))
     {
-        m_shape = shape == 0 ? GS_RECTANGLE : GS_ELLIPTICAL;
+        m_shape = geometricalShape == 0 ? GS_RECTANGLE : GS_ELLIPTICAL;
         m_centralBeamstop = beamstop == 0 ? CS_NONE : (beamstop == 1 ? CS_RECTANGLE : CS_ELLIPTICAL);
 
         // if elliptical encode width and height with negative sign, if rectangle -> positive sign
-        if (shape == GS_ELLIPTICAL) {
+        if (geometricalShape == GS_ELLIPTICAL) {
             setDimensions(-abs(width), -abs(height));
         }
         
@@ -62,15 +62,15 @@ namespace RAYX
      * @param global
      *
     */
-    Slit::Slit(const char* name, int shape, int beamstop, double width, double height, double azimuthal, double dist, double beamstopWidth, double beamstopHeight, double sourceEnergy, std::vector<double> misalignmentParams, std::shared_ptr<OpticalElement> previous, bool global)
+    Slit::Slit(const char* name, int geometricalShape, int beamstop, double width, double height, double azimuthal, double dist, double beamstopWidth, double beamstopHeight, double sourceEnergy, std::vector<double> misalignmentParams, std::shared_ptr<OpticalElement> previous, bool global)
         : OpticalElement(name, width, height, degToRad(azimuthal), dist, { 0,0,0,0,0,0,0 }, previous),
         m_waveLength(abs(hvlam(sourceEnergy)))
     {
-        m_shape = shape == 0 ? GS_RECTANGLE : GS_ELLIPTICAL;
+        m_shape = geometricalShape == 0 ? GS_RECTANGLE : GS_ELLIPTICAL;
         m_centralBeamstop = beamstop == 0 ? CS_NONE : (beamstop == 1 ? CS_RECTANGLE : CS_ELLIPTICAL);
 
         // if elliptical encode width and height with negative sign, if rectangle -> positive sign
-        if (shape == GS_ELLIPTICAL) {
+        if (geometricalShape == GS_ELLIPTICAL) {
             setDimensions(-abs(width), -abs(height));
         }
         setAlpha(0);

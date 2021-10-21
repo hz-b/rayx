@@ -54,6 +54,7 @@ TEST(PlaneMirror, testSimpleParams) {
     double incidenceAngle = 13.2;
     double azimuthalAngle = 0.0;
     double dist = 12005;
+    int geometricalShape = 0;
     int icurv = 1;
     std::vector<double> mis = { 0,0,0,0,0,0 };
     std::vector<double> sE = { 0,0,0,0,0, 0,0 };
@@ -63,7 +64,7 @@ TEST(PlaneMirror, testSimpleParams) {
     glm::dvec4 position = g_params.calcPosition();
     glm::dmat4x4 orientation = g_params.calcOrientation();
 
-    RAYX::PlaneMirror plM = RAYX::PlaneMirror("planemirror",width, height, position, orientation, sE); // {1,2,3,0.01,0.02,0.03}
+    RAYX::PlaneMirror plM = RAYX::PlaneMirror("planemirror", geometricalShape, width, height, position, orientation, sE); // {1,2,3,0.01,0.02,0.03}
 
     glm::dmat4x4 correctInMatrix = glm::dmat4x4(1, 0, 0, 0, 
         0, 0.97357890287316029, 0.22835087011065572, 0, 
@@ -88,6 +89,7 @@ TEST(PlaneMirror, testAdvancedParams) {
     double incidenceAngle = 23;
     double azimuthalAngle = 8.2;
     double dist = 12005;
+    int geometricalShape = 0;
     int icurv = 1;
     std::vector<double> mis = { 1,2,3,0.01,0.02,0.03 };
     std::vector<double> sE = { 0.1,0.2,0.3,0.4,0.5, 0.6,0.7 };
@@ -97,7 +99,7 @@ TEST(PlaneMirror, testAdvancedParams) {
     glm::dvec4 position = g_params.calcPosition();
     glm::dmat4x4 orientation = g_params.calcOrientation();
     
-    RAYX::PlaneMirror plM = RAYX::PlaneMirror("planemirror",width, height, position, orientation, sE); // {1,2,3,0.01,0.02,0.03}
+    RAYX::PlaneMirror plM = RAYX::PlaneMirror("planemirror", geometricalShape, width, height, position, orientation, sE); // {1,2,3,0.01,0.02,0.03}
 
     glm::dmat4x4 correctInMatrix = glm::dmat4x4(0.98631018201912979, -0.16127244932632739, -0.034400900187032908, 0, 
         0.16212528089630251, 0.91026081860532748, 0.38097327387397439, 0, 
@@ -124,6 +126,7 @@ TEST(SphereMirror, testParams) {
     double dist = 12.12;
     double entranceArmLength = 12.7;
     double exitArmLength = 123.1;
+    int geometricalShape = 0;
     int icurv = 1;
     double radius = 104.32651829593351; // from old RAY
     std::vector<double> mis = { 10,51,2,0.1,5,0.241 };
@@ -135,7 +138,7 @@ TEST(SphereMirror, testParams) {
     RAYX::WorldCoordinates w_params = RAYX::WorldCoordinates(g_params.getAlpha(), g_params.getBeta(), degToRad(azimuthal), dist, mis);
     glm::dvec4 position = w_params.calcPosition();
     glm::dmat4x4 orientation = w_params.calcOrientation();
-    RAYX::SphereMirror sM = RAYX::SphereMirror("spheremirror", width, height, incidence, position, orientation, entranceArmLength, exitArmLength, sE); 
+    RAYX::SphereMirror sM = RAYX::SphereMirror("spheremirror", geometricalShape, width, height, incidence, position, orientation, entranceArmLength, exitArmLength, sE); 
 
     glm::dmat4x4 correctInMatrix = glm::dmat4x4(0.024368111991334068, -0.85883516451860731, -0.51167211698926318, 0, 
         0.39036506969235873, 0.47936537520215317, -0.78601777932905481, 0, 
@@ -166,6 +169,7 @@ TEST(SphereMirror, testPrecalculateRadius) {
     double dist = 12.12;
     double entranceArmLength = 12.7;
     double exitArmLength = 123.1;
+    int geometricalShape = 0;
     int icurv = 1;
     double radius = 104.32651829593351; // from old RAY
     std::vector<double> mis = { 10,51,2,0.1,5,0.241 };
@@ -178,7 +182,7 @@ TEST(SphereMirror, testPrecalculateRadius) {
     RAYX::WorldCoordinates w_params = RAYX::WorldCoordinates(g_params.getAlpha(), g_params.getBeta(), degToRad(azimuthal), dist, mis);
     glm::dvec4 position = w_params.calcPosition();
     glm::dmat4x4 orientation = w_params.calcOrientation();
-    RAYX::SphereMirror sM = RAYX::SphereMirror("spheremirror", width, height, incidence, position, orientation, entranceArmLength, exitArmLength, sE); 
+    RAYX::SphereMirror sM = RAYX::SphereMirror("spheremirror", geometricalShape, width, height, incidence, position, orientation, entranceArmLength, exitArmLength, sE); 
 
     glm::dmat4x4 correctInMatrix = glm::dmat4x4(0.024368111991334068, -0.85883516451860731, -0.51167211698926318, 0, 
         0.39036506969235873, 0.47936537520215317, -0.78601777932905481, 0, 

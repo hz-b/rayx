@@ -16,7 +16,7 @@ namespace RAYX
      * @param slopeError            7 slope error parameters: x-y sagittal (0), y-z meridional (1), thermal distortion x (2),y (3),z (4), cylindrical bowing amplitude y(5) and radius (6)
      * 
      */
-    PlaneMirror::PlaneMirror(const char* name, const double width, const double height, glm::dvec4 position, glm::dmat4x4 orientation, const std::vector<double> slopeError)
+    PlaneMirror::PlaneMirror(const char* name, const int geometricShape, const double width, const double height, glm::dvec4 position, glm::dmat4x4 orientation, const std::vector<double> slopeError)
         : OpticalElement(name, { 0,0,0,0, 0,0,0,0, 0,0,0,0, 0,0,0,0 }, width,
             height, position, orientation, { 0,0,0,0,0,0 }, slopeError)
     {
