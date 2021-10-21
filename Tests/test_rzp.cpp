@@ -98,7 +98,7 @@ TEST(RZP, testdefaultParams) {
     double icurv = 1;
     std::vector<double> quad = { 0,0,0,0, icurv,0,0,-1, 0,0,0,0, 4,0,0,0 }; // plane
     std::vector<double> correctElementParams = { 0, 0, 0, hvlam(sourceEnergy),
-                        0, designOrderOfDiffraction, orderOfDiffraction, fresnelOffset,
+                        double(curvatureType), designOrderOfDiffraction, orderOfDiffraction, fresnelOffset,
                         sEntrance, sExit, mEntrance, mExit,
                         degToRad(dAlpha), degToRad(dBeta), 0, double(additionalOrder) };
     std::vector<double> correctObjectParams = { width,height,sE[0],sE[1],
@@ -174,7 +174,7 @@ TEST(RZP, testdefaultParamsElliptical) {
     double wl = 12.39852;
     std::vector<double> quad = { 0,0,0,0, double(icurv),0,0,-1, 0,0,0,0, 4,0,0,0 }; // plane
     std::vector<double> correctElementParams = { 0, 0, 0, inm2eV / sourceEnergy,
-                        0, designOrderOfDiffraction, orderOfDiffraction, fresnelOffset,
+                        double(curvatureType), designOrderOfDiffraction, orderOfDiffraction, fresnelOffset,
                         sEntrance, sExit, mEntrance, mExit,
                         degToRad(dAlpha), degToRad(dBeta), 0, double(additionalOrder) };
     std::vector<double> correctObjectParams = { -width,-height,sE[0],sE[1],
@@ -246,7 +246,7 @@ TEST(RZP, testParams) {
     RAYX::ReflectionZonePlate rzp2 = RAYX::ReflectionZonePlate("RZP", geometricShape, mount, curvatureType, designType, elementOffsetType, width, height, deviation, grazingIncidence, azimuthal, dist, designEnergy, sourceEnergy, orderOfDiffraction, designOrderOfDiffraction, dAlpha, dBeta, sEntrance, sExit, mEntrance, mExit, shortRadius, longRadius, additionalOrder, elementOffsetZ, fresnelOffset, beta_in, mis, sE, NULL, true);
 
     std::vector<double> correctElementParams = { 0, 0, 0, inm2eV / designEnergy,
-                        0, designOrderOfDiffraction, orderOfDiffraction, fresnelOffset,
+                        double(curvatureType), designOrderOfDiffraction, orderOfDiffraction, fresnelOffset,
                         sEntrance, sExit, mEntrance, mExit,
                         degToRad(dAlpha), degToRad(dBeta), 0, double(additionalOrder) };
     std::vector<double> correctObjectParams = { width, height, sE[0], sE[1],

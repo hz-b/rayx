@@ -82,7 +82,7 @@ namespace RAYX
         printInfo();
         setElementParameters({
             double(m_imageType), double(m_rzpType), double(m_derivationMethod), m_designWavelength,
-            0, m_designOrderOfDiffraction,m_orderOfDiffraction,m_fresnelZOffset,
+            double(m_curvatureType), m_designOrderOfDiffraction,m_orderOfDiffraction,m_fresnelZOffset,
             m_designSagittalEntranceArmLength,m_designSagittalExitArmLength,m_designMeridionalEntranceArmLength,m_designMeridionalExitArmLength,
             m_designAlphaAngle,m_designBetaAngle,0, double(m_additionalOrder) }
         );
