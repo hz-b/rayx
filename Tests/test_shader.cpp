@@ -1030,7 +1030,7 @@ TEST(Tracer, getThetaTest) {
 
 }
 
-*/
+
 
 // test complete optical elements instead of single functions
 // uses deterministic source (matrix source with source depth = 0)
@@ -1575,3 +1575,4 @@ TEST(PeteRZP, spec1_first_minus_ip2) {
     std::string filename = "testFile_spec1_first_minus_rzp_ip2";
     writeToFile(outputRays, filename);
 }
+*/
