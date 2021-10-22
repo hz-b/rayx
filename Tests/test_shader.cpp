@@ -1460,7 +1460,7 @@ TEST(opticalElements, toroid) {
 // PETES SETUP
 // spec1-first_rzp4mm
 TEST(PeteRZP, spec1_first_rzp) {
-    RAYX::SimulationEnv::get().m_numOfRays = 40000;
+    RAYX::SimulationEnv::get().m_numOfRays = 20000;
     std::shared_ptr<RAYX::PointSource> p = std::make_shared<RAYX::PointSource>("spec1_first_rzp", 1, 0.005, 0.005, 0, 0.02, 0.06, 1, 1, 0, 0, 640, 120, 1, 0, 0, std::vector<double>{0, 0, 0, 0});
 
     RAYX::GeometricUserParams gu_rzp = RAYX::GeometricUserParams(0, 1, 170, 2.2, 1, p->getPhotonEnergy(), p->getPhotonEnergy(), 1, 1, 2.2, 1, 90, 400, 90, 400);

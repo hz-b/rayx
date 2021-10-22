@@ -14,8 +14,8 @@ import matplotlib.pyplot as plt
 PROJDIR = os.path.dirname(__file__)
 path = os.path.split(PROJDIR)[0]
 OUTPUT_FILE = p_join(path, 'build/bin/output.csv')
-RAY_REWORKED = p_join(path, 'Tests')
-RAY_REWORKED = p_join(RAY_REWORKED, 'output')
+TESTS = p_join(path, 'Tests')
+RAY_REWORKED = p_join(TESTS, 'output')
 print("new ray files in folder:",RAY_REWORKED)
 
 # where the results from old ray are
@@ -23,7 +23,7 @@ print("new ray files in folder:",RAY_REWORKED)
 #RAY_UI = p_join(RAY_UI, 'python')
 #RAY_UI = p_join(RAY_UI, 'test_output')
 #RAY_UI = p_join(RAY_UI, 'unittestData')
-RAY_UI = p_join(RAY_REWORKED, 'oldray_files')
+RAY_UI = p_join(TESTS, 'oldray_files')
 RAY_UI = p_join(RAY_UI, 'unittestData')
 print("old ray files in folder:",RAY_UI)
 scatterplot_size = 0.5
