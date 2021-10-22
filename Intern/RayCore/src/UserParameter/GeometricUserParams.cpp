@@ -268,8 +268,6 @@ namespace RAYX
         if (theta > PI / 2) {
             theta = PI / 2;
         }
-        double a = 0.5 * (entranceArmLength + exitArmLength);
-
         double angle = atan(tan(theta) * (entranceArmLength - exitArmLength) / (entranceArmLength + exitArmLength));
         return angle;
         //std::cout << "A= " << m_longHalfAxisA << ", B= " << m_shortHalfAxisB << ", C= " << m_halfAxisC << ", angle = " << m_tangentAngle << ", Z0 = " << m_z0 << ", Y0= " << m_y0 << std::endl;

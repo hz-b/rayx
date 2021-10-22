@@ -185,8 +185,8 @@ TEST(RZP, testdefaultParamsElliptical) {
     EXPECT_ITERABLE_DOUBLE_EQ(std::vector<double>, rzp.getSlopeError(), sE);
     std::vector<double> zeros = { 0,0,0, 0,0,0 };
 
-    ASSERT_DOUBLE_EQ(rzp.getWidth(), width);
-    ASSERT_DOUBLE_EQ(rzp.getHeight(), height);
+    ASSERT_DOUBLE_EQ(rzp.getWidth(), -width);
+    ASSERT_DOUBLE_EQ(rzp.getHeight(), -height);
     ASSERT_DOUBLE_EQ(rzp.getDesignEnergy(), designEnergy);
     ASSERT_DOUBLE_EQ(rzp.getOrderOfDiffraction(), orderOfDiffraction);
     ASSERT_DOUBLE_EQ(rzp.getDesignOrderOfDiffraction(), designOrderOfDiffraction);

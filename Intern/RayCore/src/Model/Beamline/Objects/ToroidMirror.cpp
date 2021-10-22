@@ -27,10 +27,6 @@ namespace RAYX
         m_meridionalEntranceArmLength(mEntrance),
         m_meridionalExitArmLength(mExit)
     {
-        m_geometricalShape = geometricalShape == 0 ? GS_RECTANGLE : GS_ELLIPTICAL;
-        if (m_geometricalShape == GS_ELLIPTICAL) {
-            setDimensions(-width, -height);
-        }
         // TODO(Theresa): maybe move this function outside of this class (same for spheres) because this is derived from user parameters
         calcRadius(incidenceAngle); // calculate the radius
 
@@ -39,34 +35,7 @@ namespace RAYX
         // setSurface(std::make_unique<Toroid>(m_longRadius, m_shortRadius));
     }
 
-    /**
-     * Angles given in degree and stored in rad.
-     * Initializes transformation matrices, and parameters for the quadric in super class (quadric).
-     * Sets mirror-specific parameters in this class.
-     *
-     * Params:
-     * width, height = total width, height of the mirror (x- and z- dimensions)
-     * grazingIncidence = desired incidence angle of the main ray
-     * azimuthal = rotation of mirror around z-axis
-     * distanceToPreceedingElement
-     *
-    */
-    ToroidMirror::ToroidMirror(const char* name, const int geometricalShape, const double width, const double height, const double grazingIncidence, const double azimuthal, const double distanceToPreceedingElement, const double mEntrance, const double mExit, const double sEntrance, const double sExit, const std::vector<double> misalignmentParams, const std::vector<double> slopeError, const std::shared_ptr<OpticalElement> previous, bool global)
-        : OpticalElement(name, { 0,0,0,0, 0,0,0,0, 0,0,0,0, 0,0,0,0 }, geometricalShape, width, height, degToRad(grazingIncidence), degToRad(azimuthal), degToRad(grazingIncidence), distanceToPreceedingElement, misalignmentParams, { 0,0,0,0,0,0 }, slopeError, previous, global),
-        m_sagittalEntranceArmLength(sEntrance),
-        m_sagittalExitArmLength(sExit),
-        m_meridionalEntranceArmLength(mEntrance),
-        m_meridionalExitArmLength(mExit)
-    {
-        // std::vector<double> inputPoints = {0,0,0,0, 0,0,0,-1, 0,0,0,0, 0,0,0,0};
-
-        m_geometricalShape = geometricalShape == 0 ? GS_RECTANGLE : GS_ELLIPTICAL;
-        if (m_geometricalShape == GS_ELLIPTICAL) {
-            setDimensions(-width, -height);
-        }
-        calcRadius(degToRad(grazingIncidence)); // calculate the radius
-        setSurface(std::make_unique<Toroid>(std::vector<double>{m_longRadius, m_shortRadius, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 6, 0, 0, 0}));
-    }
+    
 
     ToroidMirror::~ToroidMirror()
     {

@@ -30,7 +30,7 @@ SET(SOURCE
     src/Model/Surface/Quadric.cpp
     src/Model/Surface/Toroid.cpp
     src/Model/Surface/Surface.cpp
-    src/Model/Geometry/Geometry.h
+    src/Model/Geometry/Geometry.cpp
     src/Tracer/Ray.cpp
     src/Tracer/TracerInterface.cpp
     src/UserParameter/WorldUserParams.cpp

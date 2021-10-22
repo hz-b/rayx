@@ -9,6 +9,7 @@
 #include "Core.h"
 #include "Model/Surface/Surface.h"
 #include "utils.h"
+#include "Model/Geometry/Geometry.h"
 #include <glm.hpp>
 
 namespace RAYX
@@ -18,11 +19,12 @@ namespace RAYX
     {
     public:
 
-        OpticalElement(const char* name, const std::vector<double> surfacePoints, const std::vector<double> inputInMatrix, const std::vector<double> inputOutMatrix, const std::vector<double> misalignmentMatrix, const std::vector<double> inverseMisalignmentMatrix, const std::vector<double> OParameters, const std::vector<double> EParameters);
-        OpticalElement(const char* name, const std::vector<double> EParameters, const int geometricalShape, const double width, const double height, const double alpha, const double chi, const double beta, const double dist, const std::vector<double> misalignmentParams, const std::vector<double> tempMisalignmentParams, const std::vector<double> slopeError, const std::shared_ptr<OpticalElement> previous, bool global);
+        // needed to add optical elements to tracer
+        OpticalElement(const char* name, const std::vector<double> surfaceParams, const std::vector<double> inputInMatrix, const std::vector<double> inputOutMatrix, const std::vector<double> misalignmentMatrix, const std::vector<double> invMisalignmentMatrix, const std::vector<double> OParameters, const std::vector<double> EParameters);
+        // needed only for ellipsoid 
         OpticalElement(const char* name, const int geometricalShape, const double width, const double height, const double chi, const double dist, const std::vector<double> slopeError, const std::shared_ptr<OpticalElement> previous);
-        OpticalElement(const char* name, const double chi, const double dist, const std::vector<double> slopeError, const std::shared_ptr<OpticalElement> previous);
-
+        
+        // new constructors
         OpticalElement(const char* name, const std::vector<double> EParameters, const int geometricalShape, const double width, const double height, glm::dvec4 position, glm::dmat4x4 orientation, const std::vector<double> tempMisalignmentParams, const std::vector<double> slopeError);
         OpticalElement(const char* name, const int geometricalShape, const double width, const double height, glm::dvec4 position, glm::dmat4x4 orientation, const std::vector<double> slopeError);
 
@@ -33,12 +35,13 @@ namespace RAYX
         void setOutMatrix(std::vector<double> inputMatrix);
         void setSurface(std::unique_ptr<Surface> surface);
         void updateObjectParams();
+        void updateObjectParamsNoGeometry();
 
         void setAlpha(double alpha);
         void setBeta(double beta);
 
-        double getWidth() const;
-        double getHeight() const;
+        double getWidth();
+        double getHeight();
         double getBeta() const;
         double getAlpha() const;
         double getChi() const;
@@ -66,7 +69,6 @@ namespace RAYX
         std::vector<double> getSurfaceParams() const;
         std::vector<double> getSlopeError() const;
 
-        void calcTransformationMatrices(glm::dvec4 position, glm::dmat4 orientation);
         void calcTransformationMatricesFromAngles(const std::vector<double> misalignment, bool global);
         void setTemporaryMisalignment(std::vector<double> misalignment);
 
@@ -74,13 +76,14 @@ namespace RAYX
         ~OpticalElement();
 
         // TODO(Jannis): move to geometry
-        enum GEOMETRICAL_SHAPE { GS_RECTANGLE, GS_ELLIPTICAL }; ///< influences wastebox function in shader
         enum GRATING_MOUNT { GM_DEVIATION, GM_INCIDENCE }; ///< influences incidence and exit angle calculation (moved somewhere else)
 
     private:
+
+        // GEOMETRY
+        std::unique_ptr<Geometry> m_geometry; // will replace all of the following attributes (up until surface)
+
         // Geometric Parameter
-        double m_width;
-        double m_height;
         // 7 paramters that specify the slope error, are stored in objectParamters to give to shader
         std::vector<double> m_slopeError;
         // stored only for completeness and not to transfer to the shader, these transformations are part of inMatrix/outMatrix which are transferred.
@@ -110,7 +113,9 @@ namespace RAYX
         glm::dmat4x4 m_e2g; // m_outTransMis;
         // ----
 
-        // Surface (eg Quadric or if eg torus something else)
+
+
+        // SURFACE (eg Quadric or if eg torus something else)
         std::unique_ptr<Surface> m_surface;
         std::vector<double> m_surfaceParams; // used to be anchor points
 
