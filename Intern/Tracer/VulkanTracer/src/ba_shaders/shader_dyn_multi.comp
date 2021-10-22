@@ -1,0 +1,2432 @@
+//dynamic quadrics
+
+#version 450
+#extension GL_ARB_separate_shader_objects : enable
+#extension GL_ARB_gpu_shader_int64 : enable
+
+#define WORKGROUP_SIZE 32
+layout (local_size_x = WORKGROUP_SIZE, local_size_y = 1, local_size_z = 1 ) in;
+// 3.14159265358979323846264338327950
+const double PI = 3.14159265358979323846264338327950;
+const uint64_t rngKey = (0xc8e4fd15 << 32) | 0x4ce32f6d;
+const double inm2eV = 1.239852e3;
+
+/* STRUCTS */
+
+struct Ray{
+	dvec3 position;
+	double weight; // status of the ray (e.g if element missed -> 0)
+	dvec3 direction;
+	double energy;
+};
+struct Quadric{
+	dmat4 anchorPoints;
+	dmat4 inTrans;
+	dmat4 outTrans;
+	dmat4 misalignment;
+	dmat4 inverseMisalignment;
+	dmat4 objectParameters;
+	dmat4 elementParameters;
+};
+layout(std140, binding = 0) buffer ibuf
+{
+   Ray rayData[];
+};
+
+layout(std140, binding = 1) buffer obuf
+{
+   Ray outputData[];
+};
+layout(std140, binding = 2) buffer qbuf
+{
+	double numberOfBeamlines;
+	double numberOfQuadricsPerBeamline;
+	double numberOfRays;
+	double numberOfRaysPerBeamLine;
+	Quadric quadricData[];
+};
+layout(std140, binding = 3) buffer xyzbuf
+{
+	dvec4 xyznull[];
+};
+
+
+
+/**
+* DOUBLE PRECISION APPROXIMATION FOR ARCTAN AND COSINUS
+* source: https://people.sc.fsu.edu/~jburkardt/c_src/fn/fn.html
+*/
+
+
+double r8_aint ( double x )
+
+/******************************************************************************/
+/*
+  Purpose:
+
+    R8_AINT truncates an R8 argument to an integer.
+
+  Licensing:
+
+    This code is distributed under the GNU LGPL license.
+
+  Modified:
+
+    17 January 2012
+
+  Author:
+
+    John Burkardt.
+
+  Parameters:
+
+    Input, double X, the argument.
+
+    Output, double R8_AINT, the truncated version of X.
+*/
+{
+	double value;
+
+	if ( x < 0.0E+00 ) {
+		value = - ( double ( int(abs( x )) ) );
+	}
+	else {
+		value =   ( double ( int ( abs ( x ) ) ));
+	}
+	return value;
+}
+
+int r8_inits ( double dos[16], int nos, double eta )
+/******************************************************************************/
+/*
+  Purpose:
+
+    R8_INITS initializes a Chebyshev series.
+
+  Licensing:
+
+    This code is distributed under the GNU LGPL license.
+
+  Modified:
+
+    22 April 2016
+
+  Author:
+
+    C version by John Burkardt.
+
+  Reference:
+
+    Roger Broucke,
+    Algorithm 446:
+    Ten Subroutines for the Manipulation of Chebyshev Series,
+    Communications of the ACM,
+    Volume 16, Number 4, April 1973, pages 254-256.
+
+  Parameters:
+
+    Input, double DOS[NOS], the Chebyshev coefficients.
+
+    Input, int NOS, the number of coefficients.
+
+    Input, double ETA, the desired accuracy.
+
+    Output, int R8_INITS, the number of terms of the series needed
+    to ensure the requested accuracy.
+*/
+{
+	double err;
+	int i;
+	int value;
+
+  	if ( nos < 1 ){
+		//fprintf ( stderr, "\n" );
+		//fprintf ( stderr, "R8_INITS - Fatal error!\n" );
+		//fprintf ( stderr, "  Number of coefficients < 1.\n" );
+		return 1;
+  	}
+
+  	if ( eta < dos[nos-1] ){
+		//fprintf ( stderr, "\n" );
+		//fprintf ( stderr, "R8_INITS - Warning!\n" );
+		//fprintf ( stderr, "  ETA may be too small.\n" );
+		//fprintf ( stderr, "  The requested accuracy cannot be guaranteed.\n" );
+		//fprintf ( stderr, "  even if all available coefficients are used.\n" );
+		value = nos;
+  	}else{
+    	err = 0.0;
+
+    	for ( i = nos - 1; 0 <= i; i-- ){
+      		value = i + 1;
+      		err = err + abs ( dos[i] );
+      		if ( eta < err ){
+        		break;
+      		}
+    	}
+	}
+
+	return value;
+}
+
+
+void r8_upak ( double x, inout double y, inout int n )
+/******************************************************************************/
+/*
+  Purpose:
+
+    R8_UPAK unpacks an R8 into a mantissa and exponent.
+
+  Discussion:
+
+    This function unpacks a floating point number x so that
+
+      x = y * 2.0^n
+
+    where
+
+      0.5 <= abs ( y ) < 1.0 .
+
+  Licensing:
+
+    This code is distributed under the GNU LGPL license.
+
+  Modified:
+
+    17 January 2012
+
+  Author:
+
+    C version by John Burkardt.
+
+  Parameters:
+
+    Input, double X, the number to be unpacked.
+
+    Output, double *Y, the mantissa.
+
+    Output, int *N, the exponent.
+*/
+{
+	double absx;
+
+  	absx = abs ( x );
+  	n = 0;
+  	y = 0.0;
+
+  	if ( x == 0.0 ) {
+    	return;
+  	}
+
+  	while ( absx < 0.5 ) {
+    	n = n - 1;
+    	absx = absx * 2.0;
+  	}
+
+  	while ( 1.0 <= absx ) {
+	    n = n + 1;
+    	absx = absx * 0.5;
+  	}
+
+  	if ( x < 0.0 ) {
+    	y = - absx;
+  	}else{
+    	y = + absx;
+	}
+
+  	return;
+}
+
+int i4_mach ( int i )
+
+/******************************************************************************/
+/*
+  Purpose:
+
+    I4_MACH returns integer machine constants.
+
+  Discussion:
+
+    Input/output unit numbers.
+
+      I4_MACH(1) = the standard input unit.
+      I4_MACH(2) = the standard output unit.
+      I4_MACH(3) = the standard punch unit.
+      I4_MACH(4) = the standard error message unit.
+
+    Words.
+
+      I4_MACH(5) = the number of bits per integer storage unit.
+      I4_MACH(6) = the number of characters per integer storage unit.
+
+    Integers.
+
+    Assume integers are represented in the S digit base A form:
+
+      Sign * (X(S-1)*A^(S-1) + ... + X(1)*A + X(0))
+
+    where 0 <= X(1:S-1) < A.
+
+      I4_MACH(7) = A, the base.
+      I4_MACH(8) = S, the number of base A digits.
+      I4_MACH(9) = A^S-1, the largest integer.
+
+    Floating point numbers
+
+    Assume floating point numbers are represented in the T digit
+    base B form:
+
+      Sign * (B^E) * ((X(1)/B) + ... + (X(T)/B^T) )
+
+    where 0 <= X(I) < B for I=1 to T, 0 < X(1) and EMIN <= E <= EMAX.
+
+      I4_MACH(10) = B, the base.
+
+    Single precision
+
+      I4_MACH(11) = T, the number of base B digits.
+      I4_MACH(12) = EMIN, the smallest exponent E.
+      I4_MACH(13) = EMAX, the largest exponent E.
+
+    Double precision
+
+      I4_MACH(14) = T, the number of base B digits.
+      I4_MACH(15) = EMIN, the smallest exponent E.
+      I4_MACH(16) = EMAX, the largest exponent E.
+
+  Licensing:
+
+    This code is distributed under the GNU LGPL license.
+
+  Modified:
+
+    24 April 2007
+
+  Author:
+
+    Original FORTRAN77 version by Phyllis Fox, Andrew Hall, Norman Schryer.
+    C version by John Burkardt.
+
+  Reference:
+
+    Phyllis Fox, Andrew Hall, Norman Schryer,
+    Algorithm 528,
+    Framework for a Portable Library,
+    ACM Transactions on Mathematical Software,
+    Volume 4, Number 2, June 1978, page 176-188.
+
+  Parameters:
+
+    Input, int I, chooses the parameter to be returned.
+    1 <= I <= 16.
+
+    Output, int I4_MACH, the value of the chosen parameter.
+*/
+{
+	int value;
+
+	if ( i < 1 ) {
+		//fprintf ( stderr, "\n" );
+		//fprintf ( stderr, "I4_MACH - Fatal error!\n" );
+		//fprintf ( stderr, "  The input argument I is out of bounds.\n" );
+		//fprintf ( stderr, "  Legal values satisfy 1 <= I <= 16.\n" );
+		//fprintf ( stderr, "  I = %d\n", i );
+		value = 0;
+		return 1;
+		///exit ( 1 );
+	}
+	else if ( i == 1 ) {
+		value = 5;
+	}
+	else if ( i == 2 ) {
+		value = 6;
+	}
+	else if ( i == 3 ) {
+		value = 7;
+	}
+	else if ( i == 4 ) {
+		value = 6;
+	}
+	else if ( i == 5 ) {
+		value = 32;
+	}
+	else if ( i == 6 ) {
+		value = 4;
+	}
+	else if ( i == 7 ) {
+		value = 2;
+	}
+	else if ( i == 8 ) {
+		value = 31;
+	}
+	else if ( i == 9 ) {
+		value = 2147483647;
+	}
+	else if ( i == 10 ) {
+		value = 2;
+	}
+	else if ( i == 11 ) {
+		value = 24;
+	}
+	else if ( i == 12 ) {
+		value = -125;
+	}
+	else if ( i == 13 ) {
+		value = 128;
+	}
+	else if ( i == 14 ) {
+		value = 53;
+	}
+	else if ( i == 15 ) {
+		value = -1021;
+	}
+	else if ( i == 16 ) {
+		value = 1024;
+	}
+	else if ( 16 < i ) {
+		//fprintf ( stderr, "\n" );
+		//fprintf ( stderr, "I4_MACH - Fatal error!\n" );
+		//fprintf ( stderr, "  The input argument I is out of bounds.\n" );
+		//fprintf ( stderr, "  Legal values satisfy 1 <= I <= 16.\n" );
+		//fprintf ( stderr, "  I = %d\n", i );
+		value = 0;
+		//exit ( 1 );
+	}
+
+	return value;
+}
+
+double r8_mach ( int i )
+
+/******************************************************************************/
+/*
+  Purpose:
+
+    R8_MACH returns double precision real machine constants.
+
+  Discussion:
+
+    Assuming that the internal representation of a double precision real
+    number is in base B, with T the number of base-B digits in the mantissa,
+    and EMIN the smallest possible exponent and EMAX the largest possible
+    exponent, then
+
+      R8_MACH(1) = B^(EMIN-1), the smallest positive magnitude.
+      R8_MACH(2) = B^EMAX*(1-B^(-T)), the largest magnitude.
+      R8_MACH(3) = B^(-T), the smallest relative spacing.
+      R8_MACH(4) = B^(1-T), the largest relative spacing.
+      R8_MACH(5) = log10(B).
+
+  Licensing:
+
+    This code is distributed under the GNU LGPL license.
+
+  Modified:
+
+    24 April 2007
+
+  Author:
+
+    Original FORTRAN77 version by Phyllis Fox, Andrew Hall, Norman Schryer.
+    C version by John Burkardt.
+
+  Reference:
+
+    Phyllis Fox, Andrew Hall, Norman Schryer,
+    Algorithm 528:
+    Framework for a Portable Library,
+    ACM Transactions on Mathematical Software,
+    Volume 4, Number 2, June 1978, page 176-188.
+
+  Parameters:
+
+    Input, int I, chooses the parameter to be returned.
+    1 <= I <= 5.
+
+    Output, double R8_MACH, the value of the chosen parameter.
+*/
+{
+  	double value;
+
+  	if ( i < 1 ) {
+		//fprintf ( stderr, "\n" );
+		//fprintf ( stderr, "R8_MACH - Fatal error!\n" );
+		//fprintf ( stderr, "  The input argument I is out of bounds.\n" );
+		//fprintf ( stderr, "  Legal values satisfy 1 <= I <= 5.\n" );
+		//fprintf ( stderr, "  I = %d\n", i );
+    	value = 0.0;
+    	return value;
+  	}else if ( i == 1 ) {
+    	value = 4.450147717014403E-308;
+  	}else if ( i == 2 ){
+    	value = 8.988465674311579E+307;
+	}else if ( i == 3 ){
+    	value = 1.110223024625157E-016;
+  	}else if ( i == 4 ) {
+    	value = 2.220446049250313E-016;
+	}else if ( i == 5 ) {
+    	value = 0.301029995663981E+000;
+  	}else if ( 5 < i ) {
+		//fprintf ( stderr, "\n" );
+		//fprintf ( stderr, "R8_MACH - Fatal error!\n" );
+		//fprintf ( stderr, "  The input argument I is out of bounds.\n" );
+		//fprintf ( stderr, "  Legal values satisfy 1 <= I <= 5.\n" );
+		//fprintf ( stderr, "  I = %d\n", i );
+		value = 0.0;
+	}
+	return value;
+}
+
+double r8_pak ( double y, int n )
+
+/******************************************************************************/
+/*
+  Purpose:
+
+    R8_PAK packs a base 2 exponent into an R8.
+
+  Discussion:
+
+    This routine is almost the inverse of R8_UPAK.  It is not exactly
+    the inverse, because abs(x) need not be between 0.5 and 1.0.
+    If both R8_PAK and 2.0^n were known to be in range, we could compute
+    R8_PAK = x * 2.0^n .
+
+  Licensing:
+
+    This code is distributed under the GNU LGPL license.
+
+  Modified:
+
+    17 January 2012
+
+  Author:
+
+    C version by John Burkardt.
+
+  Parameters:
+
+    Input, double Y, the mantissa.
+
+    Input, int N, the exponent.
+
+    Output, double R8_PAK, the packed value.
+*/
+{
+	const double aln210 = 3.321928094887362347870319429489;
+	double aln2b;
+	int nmax = 0;
+	int nmin = 0;
+	int nsum;
+	int ny = 0;
+	double value = 0;
+
+	if ( nmin == 0 ) {
+		aln2b = 1.0;
+		if ( i4_mach ( 10 ) != 2 ) {
+				aln2b = r8_mach ( 5 ) * aln210;
+		}
+		nmin = int(aln2b * i4_mach ( 15 ) );
+		nmax = int(aln2b * i4_mach ( 16 ) );
+	}
+
+	r8_upak ( y, value, ny );
+
+	nsum = n + ny;
+
+	if ( nsum < nmin ) {
+		//fprintf ( stderr, "\n" );
+		//fprintf ( stderr, "R8_PAK - Warning!\n" );
+		//fprintf ( stderr, "  Packed number underflows.\n" );
+		value = 0.0;
+		return value;
+	}
+
+	if ( nmax < nsum )
+	{
+		//fprintf ( stderr, "\n" );
+		//fprintf ( stderr, "R8_PAK - Fatal error!\n" );
+		//fprintf ( stderr, "  Packed number overflows.\n" );
+		return ( 1 );
+	}
+
+	while ( nsum < 0 ) {
+		value = 0.5 * value;
+		nsum = nsum + 1;
+	}
+
+	while ( 0 < nsum ) {
+		value = 2.0 * value;
+		nsum = nsum - 1;
+	}
+	return value;
+}
+
+double r8_csevl ( double x, double a[16], int n )
+
+/******************************************************************************/
+/*
+  Purpose:
+
+    R8_CSEVL evaluates a Chebyshev series.
+
+  Licensing:
+
+    This code is distributed under the GNU LGPL license.
+
+  Modified:
+
+    17 January 2012
+
+  Author:
+
+    C version by John Burkardt.
+
+  Reference:
+
+    Roger Broucke,
+    Algorithm 446:
+    Ten Subroutines for the Manipulation of Chebyshev Series,
+    Communications of the ACM,
+    Volume 16, Number 4, April 1973, pages 254-256.
+
+  Parameters:
+
+    Input, double X, the evaluation point.
+
+    Input, double CS[N], the Chebyshev coefficients.
+
+    Input, int N, the number of Chebyshev coefficients.
+
+    Output, double R8_CSEVL, the Chebyshev series evaluated at X.
+*/
+{
+	double b0;
+	double b1;
+	double b2;
+	int i;
+	double twox;
+	double value;
+
+  	if ( n < 1 ) {
+		//fprintf ( stderr, "\n" );
+		//fprintf ( stderr, "R8_CSEVL - Fatal error!\n" );
+		//fprintf ( stderr, "  Number of terms <= 0.\n" );
+		return 1;
+  	}
+
+  	if ( 1000 < n ) {
+		//fprintf ( stderr, "\n" );
+		//fprintf ( stderr, "R8_CSEVL - Fatal error!\n" );
+		//fprintf ( stderr, "  Number of terms greater than 1000.\n" );
+		return 1;
+ 	}
+
+  	if ( x < -1.1 || 1.1 < x ) {
+		//fprintf ( stderr, "\n" );
+		//fprintf ( stderr, "R8_CSEVL - Fatal error!\n" );
+		//fprintf ( stderr, "  X outside (-1,+1).\n" );
+		return 1;
+  	}
+
+	twox = 2.0 * x;
+	b1 = 0.0;
+	b0 = 0.0;
+
+  	for ( i = n - 1; 0 <= i; i-- ){
+		b2 = b1;
+		b1 = b0;
+		b0 = twox * b1 - b2 + a[i];
+  	}
+
+  	value = 0.5 * ( b0 - b2 );
+	return value;
+}
+
+double r8_cos ( double x )
+/******************************************************************************/
+/*
+  Purpose:
+
+    R8_COS evaluates the cosine of an R8 argument.
+
+  Licensing:
+
+    This code is distributed under the GNU LGPL license.
+
+  Modified:
+
+    17 January 2012
+
+  Author:
+
+    Original FORTRAN77 version by Wayne Fullerton.
+    C version by John Burkardt.
+
+  Reference:
+
+    Wayne Fullerton,
+    Portable Special Function Routines,
+    in Portability of Numerical Software,
+    edited by Wayne Cowell,
+    Lecture Notes in Computer Science, Volume 57,
+    Springer 1977,
+    ISBN: 978-3-540-08446-4,
+    LC: QA297.W65.
+
+  Parameters:
+
+    Input, double X, the argument.
+
+    Output, double R8_COS, the cosine of X.
+*/
+{
+  double absx;
+  double f;
+  int n2;
+  int ntsn = 0;
+  const double pi2 = 1.57079632679489661923132169163975;
+  const double pi2rec = 0.63661977236758134307553505349006;
+  const double pihi = 3.140625;
+  const double pilo = 9.6765358979323846264338327950288E-04;
+  const double pirec = 0.31830988618379067153776752674503;
+  double sincs[16] = double[16](
+   -0.374991154955873175839919279977323464,
+   -0.181603155237250201863830316158004754,
+    0.005804709274598633559427341722857921,
+   -0.000086954311779340757113212316353178,
+    0.000000754370148088851481006839927030,
+   -0.000000004267129665055961107126829906,
+    0.000000000016980422945488168181824792,
+   -0.000000000000050120578889961870929524,
+    0.000000000000000114101026680010675628,
+   -0.000000000000000000206437504424783134,
+    0.000000000000000000000303969595918706,
+   -0.000000000000000000000000371357734157,
+    0.000000000000000000000000000382486123,
+   -0.000000000000000000000000000000336623,
+    0.000000000000000000000000000000000256,0);
+  double value;
+  double xmax = 0.0;
+  double xn;
+  double xsml = 0.0;
+  double xwarn = 0.0;
+  double y;
+
+  if ( ntsn == 0 )
+  {
+    ntsn = r8_inits ( sincs, 15, 0.1 * r8_mach ( 3 ) );
+    xsml = sqrt ( 2.0 * r8_mach ( 3 ) );
+    xmax = 1.0 / r8_mach ( 4 );
+	xwarn = sqrt ( xmax );
+  }
+
+  absx = abs ( x );
+  y = absx + pi2;
+
+  if ( xmax < y )
+  {
+    value = 0.0;
+    return value;
+  }
+
+  value = 1.0;
+
+  if ( absx < xsml )
+  {
+    return value;
+  }
+
+  xn =  floor ( y * pirec + 0.5 ) ;
+  n2 = int ( mod ( xn, 2.0 ) + 0.5 );
+  xn = xn - 0.5;
+  f = ( absx - xn * pihi ) - xn * pilo;
+
+  xn = 2.0 * ( f * pi2rec ) * ( f * pi2rec ) - 1.0;
+  value = f + f * r8_csevl ( xn, sincs, ntsn );
+
+  if ( n2 != 0 )
+  {
+    value = - value;
+  }
+
+  if ( value < -1.0 )
+  {
+    value = -1.0;
+  }
+  else if ( 1.0 < value )
+  {
+    value = 1.0;
+  }
+  return value;
+}
+
+double r8_atan ( double x )
+/******************************************************************************/
+/*
+  Purpose:
+
+    R8_ATAN evaluates the arc-tangent of an R8 argument.
+
+  Licensing:
+
+    This code is distributed under the GNU LGPL license.
+
+  Modified:
+
+    17 January 2012
+
+  Author:
+
+    Original FORTRAN77 version by Wayne Fullerton.
+    C version by John Burkardt.
+
+  Reference:
+
+    Wayne Fullerton,
+    Portable Special Function Routines,
+    in Portability of Numerical Software,
+    edited by Wayne Cowell,
+    Lecture Notes in Computer Science, Volume 57,
+    Springer 1977,
+    ISBN: 978-3-540-08446-4,
+    LC: QA297.W65.
+
+  Parameters:
+
+    Input, double X, the argument.
+
+    Output, double R8_ATAN, the arc-tangent of X.
+*/
+{
+	double atancs[16] = double[16](
+		+0.48690110349241406474636915902891E+00,
+		-0.65108316367174641818869794945974E-02,
+		+0.38345828265245177653569992430456E-04,
+		-0.26872212876223146539595410518788E-06,
+		+0.20500930985824269846636514686688E-08,
+		-0.16450717395484269455734135285348E-10,
+		+0.13650975274390773423813528484428E-12,
+		-0.11601779591998246322891309834666E-14,
+		+0.10038333943866273835797657402666E-16,
+		-0.88072747152163859327073696000000E-19,
+		+0.78136321005661722180580266666666E-21,
+		-0.69954535148267456086613333333333E-23,
+		+0.63105905713702136004266666666666E-25,
+		-0.57296075370213874346666666666666E-27,
+		+0.52274796280602282666666666666666E-29,
+		-0.48327903911608320000000000000000E-31 );
+	const double conpi8[4] = double[4](0.375, 0.75, 1.125, 1.5);
+	int n;
+	int nterms = 0;
+	const double pi8[4] = double[4](
+		+0.17699081698724154807830422909937E-01,
+		+0.35398163397448309615660845819875E-01,
+		+0.53097245096172464423491268729813E-01,
+		+0.70796326794896619231321691639751E-01 );
+	double sqeps = 0.0;
+	double t;
+	const double tanp8[3] = double[3](
+		+0.41421356237309504880168872420969,
+		+1.0,
+		+2.4142135623730950488016887242096 );
+	double value;
+	double xbig = 0.0;
+	const double xbnd1 = +0.19891236737965800691159762264467;
+	const double xbnd2 = +0.66817863791929891999775768652308;
+	const double xbnd3 = +1.4966057626654890176011351349424;
+	const double xbnd4 = +5.0273394921258481045149750710640;
+	double y;
+
+  	if ( nterms == 0 ) {
+		nterms = r8_inits ( atancs, 16, 0.1 * r8_mach ( 3 ) );
+		sqeps = sqrt ( 6.0 * r8_mach ( 3 ) );
+		xbig = 1.0 / r8_mach ( 3 );
+  	}
+
+  	y = abs ( x );
+
+  	if ( y <= xbnd1 ) {
+    	value = x;
+    	if ( sqeps < y ) {
+     	 value = x * ( 0.75 + r8_csevl ( 50.0 * y * y - 1.0, atancs, nterms ) );
+    	}
+  	}else if ( y <= xbnd4 ) {
+    	if ( xbnd3 < y ) {
+      		n = 3;
+    	}else if ( xbnd2 < y ) {
+      		n = 2;
+    	}else {
+      		n = 1;
+    	}
+		t = ( y - tanp8[n-1] ) / ( 1.0 + y * tanp8[n-1] );
+		value = conpi8[n-1] + ( pi8[n-1] + t * ( 0.75 + r8_csevl ( 50.0 * t * t - 1.0, atancs, nterms ) ) );
+	}else {
+		value = conpi8[3] + pi8[3];
+		if ( y < xbig ) {
+			value = conpi8[3] + ( pi8[3] - ( 0.75 + r8_csevl ( 50.0 / y / y - 1.0, atancs, nterms ) ) / y );
+		}
+  	}
+
+  	if ( x < 0.0 ) {
+  		value = - abs ( value );
+  	}
+  	else {
+    	value = + abs ( value );
+  	}
+	return value;
+}
+
+
+double r8_atan2 ( double sn, double cs )
+/******************************************************************************/
+/*
+  Purpose:
+
+    R8_ATAN2 evaluates the arc-tangent of two R8 arguments.
+
+  Licensing:
+
+    This code is distributed under the GNU LGPL license.
+
+  Modified:
+
+    17 January 2012
+
+  Author:
+
+    Original FORTRAN77 version by Wayne Fullerton.
+    C version by John Burkardt.
+
+  Reference:
+
+    Wayne Fullerton,
+    Portable Special Function Routines,
+    in Portability of Numerical Software,
+    edited by Wayne Cowell,
+    Lecture Notes in Computer Science, Volume 57,
+    Springer 1977,
+    ISBN: 978-3-540-08446-4,
+    LC: QA297.W65.
+
+  Parameters:
+
+    Input, double SN, CS, the Y and X coordinates of a
+    point on the angle.
+
+    Output, double R8_ATAN2, the arc-tangent of the angle.
+*/
+{
+	double abscs;
+  	double abssn;
+  	double big = 0.0;
+  	const double pi = 3.14159265358979323846264338327950;
+  	double sml = 0.0;
+  	double value;
+
+  	if ( sml == 0.0 ) {
+	    sml = r8_mach ( 1 );
+    	big = r8_mach ( 2 );
+  	}
+	/*
+  		We now make sure SN can be divided by CS.  It is painful.
+	*/
+  	abssn = abs ( sn );
+  	abscs = abs ( cs );
+
+  	if ( abscs <= abssn ) {
+    	if ( abscs < 1.0 && abscs * big <= abssn ) {
+			if ( sn < 0.0 ) {
+		        value = - 0.5 * pi;
+      		}else if ( sn == 0.0 ) {
+	        	//fprintf ( stderr, "\n" );
+    	    	//fprintf ( stderr, "R8_ATAN2 - Fatal error!\n" );
+        		//fprintf ( stderr, "  Both arguments are 0.\n" );
+        		return 1;
+      		}else{
+	        	value = 0.5 * pi;
+			}
+      		return value;
+		}
+  	}else{
+    	if ( 1.0 < abscs && abssn <= abscs * sml ) {
+      		if ( 0.0 <= cs ) {
+		        value = 0.0;
+      		}else{
+		        value = pi;
+      		}
+      		return value;
+    	}
+  	}
+  	value = r8_atan ( sn / cs );
+
+  	if ( cs < 0.0 ) {
+	    value = value + pi;
+  	}
+
+  	if ( pi < value ) {
+	    value = value - 2.0 * pi;
+  	}
+	return value;
+}
+
+double r8_log ( double x )
+/******************************************************************************/
+/*
+  Purpose:
+
+    R8_LOG evaluates the logarithm of an R8.
+
+  Licensing:
+
+    This code is distributed under the GNU LGPL license.
+
+  Modified:
+
+    17 January 2012
+
+  Author:
+
+    Original FORTRAN77 version by Wayne Fullerton.
+    C version by John Burkardt.
+
+  Reference:
+
+    Wayne Fullerton,
+    Portable Special Function Routines,
+    in Portability of Numerical Software,
+    edited by Wayne Cowell,
+    Lecture Notes in Computer Science, Volume 57,
+    Springer 1977,
+    ISBN: 978-3-540-08446-4,
+    LC: QA297.W65.
+
+  Parameters:
+
+    Input, double X, the evaluation point.
+
+    Output, double R8_LOG, the logarithm of X.
+*/
+{
+	const double aln2 = 0.06814718055994530941723212145818;
+  	//double atancs[16] = double[16](
+	double alncen[5] = double[5]( 0.0,
+    +0.22314355131420975576629509030983,
+    +0.40546510810816438197801311546434,
+    +0.55961578793542268627088850052682,
+    +0.69314718055994530941723212145817);
+  	double alncs[16] = double[16](
+    +0.13347199877973881561689386047187E+01,
+    +0.69375628328411286281372438354225E-03,
+    +0.42934039020450834506559210803662E-06,
+    +0.28933847795432594580466440387587E-09,
+    +0.20512517530340580901741813447726E-12,
+    +0.15039717055497386574615153319999E-15,
+    +0.11294540695636464284521613333333E-18,
+    +0.86355788671171868881946666666666E-22,
+    +0.66952990534350370613333333333333E-25,
+    +0.52491557448151466666666666666666E-28,
+    +0.41530540680362666666666666666666E-31,0,0,0,0,0 ); // fill up to length 16
+	double center[4] = double[4](1.0,1.25,1.50,1.75);
+	int n;
+	int nterms = 0;
+  	int ntrval;
+  	double t;
+  	double t2;
+  	double value;
+  	double xn;
+  	double y;
+
+  	if ( nterms == 0 ) {
+	    nterms = r8_inits ( alncs, 11, 28.9 * r8_mach ( 3 ) );
+  	}
+
+  	if ( x <= 0.0 ) {
+	    //fprintf ( stderr, "\n" );
+    	//fprintf ( stderr, "R8_LOG - Fatal error!\n" );
+   		//fprintf ( stderr, "  X <= 0.\n" );
+    	return 1;
+	}
+
+	r8_upak ( x, y, n ); // inout
+
+	xn = double( n - 1 );
+	y = 2.0 * y;
+	ntrval = int ( 4.0 * y - 2.5 );
+
+	if ( ntrval == 5 ) {
+	    t = ( ( y - 1.0 ) - 1.0 ) / ( y + 2.0 );
+	}else if ( ntrval < 5 ) {
+	    t = ( y - center[ntrval-1] ) / ( y + center[ntrval-1] );
+  	}
+
+	t2 = t * t;
+  	value = 0.625 * xn + ( aln2 * xn + alncen[ntrval-1] + 2.0 * t + t * t2 * r8_csevl ( 578.0 * t2 - 1.0, alncs, nterms) );
+
+  	return value;
+}
+
+double r8_exp ( double x )
+
+/******************************************************************************/
+/*
+  Purpose:
+
+    R8_EXP evaluates the exponential of an R8 argument.
+
+  Licensing:
+
+    This code is distributed under the GNU LGPL license.
+
+  Modified:
+
+    17 January 2012
+
+  Author:
+
+    Original FORTRAN77 version by Wayne Fullerton.
+    C version by John Burkardt.
+
+  Reference:
+
+    Wayne Fullerton,
+    Portable Special Function Routines,
+    in Portability of Numerical Software,
+    edited by Wayne Cowell,
+    Lecture Notes in Computer Science, Volume 57,
+    Springer 1977,
+    ISBN: 978-3-540-08446-4,
+    LC: QA297.W65.
+
+  Parameters:
+
+    Input, double X, the argument.
+
+    Output, double R8_EXP, the exponential of X.
+*/
+{
+  	double aln216 = +0.83120654223414517758794896030274E-01;
+  	double expcs[16] = double[16](
+		+0.866569493314985712733404647266231E-01,
+		+0.938494869299839561896336579701203E-03,
+		+0.677603970998168264074353014653601E-05,
+		+0.366931200393805927801891250687610E-07,
+		+0.158959053617461844641928517821508E-09,
+		+0.573859878630206601252990815262106E-12,
+		+0.177574448591421511802306980226000E-14,
+		+0.480799166842372422675950244533333E-17,
+		+0.115716376881828572809260000000000E-19,
+		+0.250650610255497719932458666666666E-22,
+		+0.493571708140495828480000000000000E-25,
+		+0.890929572740634240000000000000000E-28,
+		+0.148448062907997866666666666666666E-30,
+		+0.229678916630186666666666666666666E-33,0,0 );
+	double f;
+	int n;
+	int n16;
+  	int ndx;
+  	int nterms = 0;
+  	double twon16[17] = double[17](
+		+0.0,
+		+0.44273782427413840321966478739929E-01,
+		+0.90507732665257659207010655760707E-01,
+		+0.13878863475669165370383028384151,
+		+0.18920711500272106671749997056047,
+		+0.24185781207348404859367746872659,
+		+0.29683955465100966593375411779245,
+		+0.35425554693689272829801474014070,
+		+0.41421356237309504880168872420969,
+		+0.47682614593949931138690748037404,
+		+0.54221082540794082361229186209073,
+		+0.61049033194925430817952066735740,
+		+0.68179283050742908606225095246642,
+		+0.75625216037329948311216061937531,
+		+0.83400808640934246348708318958828,
+		+0.91520656139714729387261127029583,
+		+1.0 );
+	double value;
+	double xint;
+	double xmax;
+	double xmin;
+	double y;
+
+  	if ( nterms == 0 ) {
+		double eta = 0.1 * r8_mach ( 3 );
+		int nos = 14;
+		nterms = r8_inits ( expcs, nos,  eta);
+		xmin = r8_log ( r8_mach ( 1 ) ) + 0.01;
+		xmax = r8_log ( r8_mach ( 2 ) ) - 0.001;
+  	}
+	if ( x < xmin ) {
+		//fprintf ( stderr, "\n" );
+		//fprintf ( stderr, "R8_EXP - Warning!\n" );
+		//fprintf ( stderr, "  X so small that exp(X) underflows.\n" );
+		value = 0.0;
+  	}
+  	else if ( x <= xmax ) {
+		xint = int ( x );
+		y = x - xint;
+
+		y = 23.0 * y + x * aln216;
+		n = int(floor ( y )); // cast to int
+		f = y - double ( n );
+		n = int(23.0 * xint + ( double ( n )));
+		//return n;
+		n16 = int(n / 16);
+    	if ( n < 0 ) {
+    	  n16 = n16 - 1;
+    	}
+	    ndx = n - 16 * n16 + 1;
+		value = 1.0 + ( twon16[ndx-1] + f * ( 1.0 + twon16[ndx-1] )
+      		* r8_csevl ( f, expcs, nterms ) );
+		value = r8_pak ( value, n16 );
+  	}
+  	else {
+    //fprintf ( stderr, "\n" );
+    //fprintf ( stderr, "R8_EXP - Fatal error!\n" );
+    //fprintf ( stderr, "  X so large that exp(X) overflows.\n" );
+    	return 1;
+	}
+	return value;
+}
+
+
+// DERIVED FUNCTIONS FOR SIN AND ASIN:
+
+double r8_sin ( double x ) {
+	double pi_half = 1.570796326794896619231321691639751442;
+	return r8_cos(pi_half - x);
+}
+
+double r8_asin ( double x ) {
+	return sign(x) * r8_atan(sqrt( (x*x) / (1-x*x) ));
+}
+
+
+
+// ------------ Random Numbers --------------
+/*
+* Title: "Squares: A Fast Counter-Based RNG"
+* Author: Bernard Widynski
+* Date: November 24, 2020
+* URL: https://arxiv.org/pdf/2004.06278.pdf
+*/
+uint squares (inout uint64_t ctr, uint64_t key )
+{
+	uint64_t x, y, z;
+	y = x = ctr * key; z = y + key;
+	ctr++;
+
+	x = x*x + y; x = (x>>32) | (x<<32);       	/* round 1 */
+	x = x*x + z; x = (x>>32) | (x<<32);       	/* round 2 */
+	x = x*x + y; x = (x>>32) | (x<<32);       	/* round 3 */
+	x = (x*x + z) >> 32;					 	/* round 4 */
+
+	return uint(x);
+}
+
+// generates 64-Bit random integers from two 32-Bit random integers
+uint64_t squares64RNG(inout uint64_t ctr)
+{
+	return uint64_t( ( uint64_t(squares(ctr, rngKey)) << 32) | uint64_t(squares(ctr, rngKey)) );
+}
+
+// generates uniformly distributed doubles between 0 and 1 from one 64-Bit random integer
+double squaresDoubleRNG(inout uint64_t ctr)
+{
+	return double(squares64RNG(ctr)) / double(uint64_t(0) - 1);
+}
+
+// creates (via the Box-Muller transform) a normal distributed double with mean mu and standard deviation sigma
+double squaresNormalRNG(inout uint64_t ctr, double mu, double sigma)
+{
+	double U, V, R, Z;
+	double two_pi = 2.0 * PI;
+
+	U = squaresDoubleRNG(ctr);
+	V = squaresDoubleRNG(ctr);
+	R = squaresDoubleRNG(ctr);
+	Z = sqrt(-2.0 * r8_log(U));
+
+	if(R < 0.5)
+		Z *= r8_sin(two_pi * V);
+	else
+		Z *= r8_cos(two_pi * V);
+
+	Z = Z * sigma + mu;
+
+	return Z;
+}
+// -------------			   --------------
+
+
+
+/* HERE STARTS RAY TRACING CODE */
+
+double hvlam(double x) {
+    if(x==0) {
+        return 0.0;
+    }
+    return inm2eV / x;
+}
+
+// multiplies position and direction of ray r with transformation matrix m
+// r = dot(m, r)
+Ray rayMatrixMult(Ray r, dmat4 m) {
+	r.position = dvec3(m * dvec4(r.position,1));
+	r.direction = dvec3(m * dvec4(r.direction,0));
+	return r;
+}
+
+
+/**
+* uses given transformation matrix to transform ray position and direction into Object coordinates
+* also takes misalignment of the object into account
+* @param r				input ray in Ray-coordinates
+* @param misalignment	4x4 homogeneous matrix that contains the misalignment of the element (dx, dy, dz, dphi, dpsi, dchi)
+* @param inTrans		4x4 homogeneous matrix that contains the transformation of ray-coordinates to object coordinates (distance to previous element, grazing incidence angle, azimuthal angle)
+*
+* output: nothing. changes r in situ
+*/
+void inTransformation(inout Ray r, dmat4 misalignment, dmat4 inTrans) {
+	r.position = dvec3(misalignment * (inTrans *  dvec4(r.position,1)) );
+	r.direction = dvec3(misalignment * (inTrans * dvec4(r.direction,0)));
+}
+
+/**
+* uses given transformation matrix to transform ray position and direction back into Ray coordinates
+* also takes misalignment of the object into account. Note that the order of the transformations is reversed and we use the inverse of the misalignment matrix
+* @param r				input ray in Ray-coordinates
+* @param invMisalignment	4x4 homogeneous matrix that contains the misalignment of the element (dx, dy, dz, dphi, dpsi, dchi)
+* @param outTrans		3x3 homogeneous matrix (in 4x4 matrix for standardization) that contains the transformation of object coordinates to ray-coordinates (rotations only: grazing exit angle, neg. azimuthal angle)
+*
+* output: nothing. changes r in situ
+*/
+void outTransformation(inout Ray r, dmat4 invMisalignment, dmat4 outTrans) {
+	r.position = dvec3(outTrans * (invMisalignment * dvec4(r.position,1)));
+	r.direction = dvec3(outTrans * (invMisalignment * dvec4(r.direction,0)));
+}
+
+
+// only for testing purposes. generally, each angle in the shader is in rad!!
+double deg2rad(double degree) {
+	// double PI = 3.141592653589793238462643383279502884197169399;//3 7 5 1 0 5 8 2 0 9 7 4 9 4 4 5 9
+	return PI * degree / 180;
+}
+
+// dummy function for univariate random numbers
+double[3] random_number(int n) {
+	return double[3] (0.5,0.5,0.5);
+}
+
+// double pow simple
+double dpow (double a, int b) {
+	double res = 1;
+	for(int i = 1; i<=b; i++) {
+		res *= a;
+	}
+	return res;
+}
+
+// returns forial of a (from RAYLIB.for) (a!)
+double fact(int a) {
+	if(a < 0) {
+		return a;
+	}
+	double f = 1;
+	for(int i = 2; i<=a; i++) {
+		f *= i;
+	}
+	return f;
+}
+
+/**
+calculates direction cosini from angles phi,psi given in rad
+@params r		ray whose direction vector is recalculated (inout)
+		phi		horizontal angle in x-z-plane (pos.rotation, counterclockwise)
+		phi		vertical angle in y-z-plane (pos.rotation, counterclockwise)
+*/
+void cosini(inout Ray r, double phi, double psi) {
+	double cos_psi = r8_cos(psi);
+	double cos_phi = r8_cos(phi);
+	double sin_psi = r8_sin(psi);
+	double sin_phi = r8_sin(phi);
+
+	r.direction.x = cos_psi * sin_phi;
+	r.direction.y = -sin_psi;
+	r.direction.z = cos_psi * cos_phi;
+}
+
+/**
+calculates two standard normal distributed random values (mu = 0, sigma = 1)
+can be transformed to gaussian(normal dist.) with given mu, sigma by: mu + x * sigma
+this method always calculates two random values in one run, calculating only one number is not possible.
+-> one would have to calculate 2 anyways
+
+returns array of 2 standard normal distributed random numbers
+*/
+double[2] gaussian(inout uint64_t ctr) {
+	double random_values[2];
+	double r = 2;
+	double v1, v2;
+	while(r > 1) {
+		double uni[3] = random_number(2); // get array of 2 random uniform numbers in [0,1]
+		v1 = 2*uni[0] - 1;
+		v2 = 2*uni[1] - 1;
+		r = v1*v1 + v2*v2;
+	}
+	random_values[0] = v1 * sqrt(-2 * r8_log(r) / r); // r8_log
+	random_values[1] = v2 * sqrt(-2 * r8_log(r) / r);
+	return random_values;
+}
+
+/**
+* checks whether the intersection point is within the extent of the surface
+* @param x, z			 	x- and z-coordinates of the intersection point
+* @param xLength, zLength	width and length of the optical element
+* @param w 					current weight of the ray
+*
+* returns: unchanged weight if intersection point is within surface boundaries, 0.0 if not.
+*/
+double wasteBox(double x, double z, double xLength, double zLength, double w)
+{
+	double x_min = -xLength/2.0;
+	double x_max = xLength/2.0;
+	double z_min = -zLength/2.0;
+	double z_max = zLength/2.0;
+
+	if (xLength >= 0){ // Rectangular shape
+		if (x <= x_min || x >= x_max || z <= z_min || z >= z_max) {
+			return 0.0;
+		}
+	}else{	// Ring shape
+		double rd2 = (x/(xLength/2.0)) * (x/(xLength/2.0)) + (z/(zLength/2.0))*(z/(zLength/2.0));
+		if (rd2 > 1.0) {
+			return 0.0;
+		}
+	}
+	return w;
+}
+
+/**
+* calculates the intersection point of a ray with a quadric surface defined by a_11..a_44
+* @param r				ray for which the intersection is fount
+* @param a_11..a_44		define the quadric surface
+* @param icurv 			defines whether the first or the second intersection is used (1=first, -1=second)
+*
+* output: reflected Ray with intersection point as position and reflection as direction
+*/
+dvec4 setIntersectionPoint(inout Ray r, dmat4 quadric, int icurv, dvec4 closestHitpoint)
+{
+	double x = closestHitpoint.x;
+	double y = closestHitpoint.y;
+	double z = closestHitpoint.z;
+	double w = closestHitpoint.w;
+
+	double a_11 = quadric[0][0];
+	double a_12 = quadric[0][1];
+	double a_13 = quadric[0][2];
+	double a_14 = quadric[0][3];
+	double a_22 = quadric[1][1];
+	double a_23 = quadric[1][2];
+	double a_24 = quadric[1][3];
+	double a_33 = quadric[2][2];
+	double a_34 = quadric[2][3];
+	double a_44 = quadric[3][3];
+
+	double fx = 2*a_14 + 2*a_11*x + 2*a_12*y + 2*a_13*z;
+	double fy = 2*a_24 + 2*a_12*x + 2*a_22*y + 2*a_23*z;
+    double fz = 2*a_34 + 2*a_13*x + 2*a_23*y + 2*a_33*z;
+
+	dvec4 normal = normalize(dvec4(fx,fy,fz,0));
+	r.position = dvec3(x,y,z); // new position = intersection point
+	r.weight = w; // unchanged, if ray did not miss surface, else 0
+	//r.direction = dvec3(firstParam,secondParam,c);
+	return normal;
+}
+dvec4 getIntersectionPoint(Ray r, dmat4 quadric, int icurv)
+{	
+	double a_11 = quadric[0][0];
+	double a_12 = quadric[0][1];
+	double a_13 = quadric[0][2];
+	double a_14 = quadric[0][3];
+	double a_22 = quadric[1][1];
+	double a_23 = quadric[1][2];
+	double a_24 = quadric[1][3];
+	double a_33 = quadric[2][2];
+	double a_34 = quadric[2][3];
+	double a_44 = quadric[3][3];
+	
+	double w = r.weight;
+	int cs = 1;
+	int d_sign = icurv;
+	if (abs(r.direction[1]) >= abs(r.direction[0]) && abs(r.direction[1]) >= abs(r.direction[2])) {
+		cs = 2;
+	}else if (abs(r.direction[2]) >= abs(r.direction[0]) && abs(r.direction[2]) >= abs(r.direction[1])) {
+		cs = 3;
+	}
+	
+	double x;
+	double y;
+	double z;
+		
+	if (cs == 1) {
+		double aml = r.direction[1] / r.direction[0];
+		double anl = r.direction[2] / r.direction[0];
+		y = r.position[1] - aml * r.position[0];
+		z = r.position[2] - anl * r.position[0];
+		d_sign = int(sign(r.direction[0]) * icurv);
+		
+		double a = a_11 + 2*a_12*aml + a_22*aml*aml + 2*a_13*anl + 2*a_23*aml*anl + a_33*anl*anl;
+        double b = a_14 + a_24*aml + a_34*anl + (a_12 + a_22*aml + a_23*anl)*y + (a_13 + a_23*aml + a_33*anl)*z;
+        double c = a_44 + a_22*y*y + 2*a_34*z + a_33*z*z + 2*y*(a_24 + a_23*z);
+		
+		double bbac = b*b - a*c;
+		if (bbac < 0) {
+			w = 0.0;
+			x = - y/aml; 	// x such that y=0
+		}else{
+			if (abs(a) > abs(c)*1e-10) {
+				x = (-b + d_sign*sqrt(bbac)) / a;
+			}else{
+				x = (-c/2)/b;
+			}
+		}
+		y = y + aml*x;
+		z = z + anl*x;
+	}else if (cs == 2) {
+		double alm = r.direction[0] / r.direction[1];
+		double anm = r.direction[2] / r.direction[1];
+		x = r.position[0] - alm * r.position[1];
+		z = r.position[2] - anm * r.position[1];
+		d_sign = int(sign(r.direction[1]) * icurv);
+		
+		double a = a_22 + 2*a_12*alm + a_11*alm*alm + 2*a_23*anm + 2*a_13*alm*anm + a_33*anm*anm;
+        double b = a_24 + a_14*alm + a_34*anm + (a_12 + a_11*alm + a_13*anm)*x + (a_23 + a_13*alm + a_33*anm)*z;
+        double c = a_44 + a_11*x*x + 2*a_34*z + a_33*z*z + 2*x*(a_14 + a_13*z);
+		
+		double bbac = b*b - a*c;
+		if (bbac < 0) {
+			w = 0.0;
+			y = 0;
+		}else{
+			if (abs(a) > abs(c)*1e-10) {
+				y = (-b + d_sign*sqrt(bbac)) / a;
+			}else{
+				y = (-c/2)/b;
+			}
+		}
+		x = x + alm*y;
+		z = z + anm*y;
+
+	}else{
+		double aln = r.direction[0] / r.direction[2];
+		double amn = r.direction[1] / r.direction[2];
+		x = r.position[0] - aln * r.position[2];
+		y = r.position[1] - amn * r.position[2];
+		d_sign = int(sign(r.direction[2]) * icurv);
+		
+		double a = a_33 + 2*a_13*aln + a_11*aln*aln + 2*a_23*amn + 2*a_12*aln*amn + a_22*amn*amn;
+        double b = a_34 + a_14*aln + a_24*amn + (a_13 + a_11*aln + a_12*amn)*x + (a_23 + a_12*aln + a_22*amn)*y;
+        double c = a_44 + a_11*x*x + 2*a_24*y + a_22*y*y + 2*x*(a_14 + a_12*y);
+		
+		double bbac = b*b - a*c;
+		if (bbac < 0) {
+			w = 0.0;
+			z = -y / amn;
+		}else{
+			if (abs(a) > abs(c)*1e-10) {//pow(10, double(-10))) {
+				z = (-b + d_sign*sqrt(bbac)) / a;
+			}else{
+				z = (-c/2)/b;
+			}
+		}
+		x = x + aln*z;
+		y = y + amn*z;
+		//r.position = dvec3(a, b, c);
+	}
+	if(w > 0.0){
+		return dvec4(x,y,z,w);
+	}
+	else{
+		return dvec4(1.0/0.0,1.0/0.0,1.0/0.0,0);
+	}
+}
+/**
+turn the normal vector through x_rad and z_rad
+@params:  	normal: the normal vector
+			x_rad: angle in rad for x-axis
+			z_rad: angle in rad for z-axis
+returns modified normal vector
+*/
+dvec4 normal_cartesian(dvec4 normal, double x_rad, double z_rad){
+	double FX = normal[0];
+	double FY = normal[1];
+	double FZ = normal[2];
+
+	double cosx = r8_cos(x_rad);
+	double sinx = r8_sin(x_rad);
+	double cosz = r8_cos(z_rad);
+	double sinz = r8_sin(z_rad);
+
+	// put in matrix mult?
+	double FY2 = FY*cosz + FZ*sinz;
+	normal[0] = FX*cosx + FY2*sinx;
+	normal[1] = FY2*cosx - FX*sinx;
+	normal[2] = FZ*cosz - FY*sinz;
+
+	return normal;
+}
+
+/**
+turn the normal vector through x_rad and z_rad
+@params:  	normal: the normal vector
+			x_rad: angle in rad for x-axis
+			z_rad: angle in rad for z-axis
+returns modified normal vector
+*/
+dvec4 normal_cylindrical(dvec4 normal, double x_rad, double z_rad) {
+	double normFXFY = sqrt(normal[0]*normal[0] + normal[1]*normal[1]);
+	double arcTanFXFY = r8_atan2(normal[1], normal[0]);
+	double sinz = r8_sin(z_rad);
+	double cosz = r8_cos(z_rad);
+
+	normal[0] = r8_cos(x_rad+arcTanFXFY)*(normFXFY*cosz+normal[2]*sinz);
+	normal[1] = r8_sin(x_rad+arcTanFXFY)*(normFXFY*cosz+normal[2]*sinz);
+	normal[2] = normal[2]*cosz-normFXFY*sinz;
+
+	return normal;
+
+}
+
+/**
+adds slope error to the normal
+@params:
+	normal: normal vector
+	slopeX: sigma-slope error in x-y plane (chi) (RMS) in arcsec
+	slopeZ: sigma-slope error in y-z plane (psi) (RMS) in arcsec
+	O_type: cartesian or cylindrical type of slope error (0=cartesian, 1=cylindrical) (1 only for ellipsis relevant)
+returns new normal if there is a slope error in either x or z direction or the unmodified normal otherwise.
+*/
+dvec4 tanger(dvec4 normal, double slopeX, double slopeZ, int O_type, inout uint64_t ctr) {
+	// only calculate the random number if at least one slope error is not 0, since the calculation is costly (sin, cos, log involved)
+	if(slopeX != 0 || slopeZ != 0) {
+		double random_values[2] = double[2] (squaresNormalRNG(ctr, 0, slopeX), squaresNormalRNG(ctr, 0, slopeZ));
+
+		/*double x = random_values[0] * slopeX; // to get normal distribution from std.-norm. multiply by sigma (=slopeX) -> mu + x * sigma but mu=0 here
+		double z = random_values[1] * slopeZ;*/
+
+		double x_rad = deg2rad(random_values[0]/3600.0);
+		double z_rad = deg2rad(random_values[1]/3600.0);
+
+		if (O_type == 0) { // default
+			normal = normal_cartesian(normal, x_rad, z_rad);
+		}else if(O_type == 1) {
+			normal = normal_cylindrical(normal, x_rad, z_rad);
+		}
+	}
+
+	return normal;
+}
+
+
+/**
+calculates DX and DZ (line spacing in x and z direction) at a given point for a given direction on the grating
+@params: lots
+@returns: (inplace) DX, DZ
+*/
+void RZPLineDensity(Ray r, dvec4 normal, int IMAGE_TYPE, int RZP_TYPE, int DERIVATION_METHOD, double zOffsetCenter,
+double risag, double rosag, double rimer, double romer, double alpha, double beta, double Ord, double WL,
+inout double DX, inout double DZ) {
+
+	double FX = normal.x;
+	double FY = normal.y;
+	double FZ = normal.z;
+	double X = r.position.x;
+	double Y = r.position.y;
+	double Z = r.position.z;
+
+	if(RZP_TYPE == 1) // meridional
+		X = 0;
+
+	// avoid calculating the same sinus/cosinus multiple times (costly)
+	double s_beta = r8_sin(beta);
+	double c_beta = r8_cos(beta);
+	double s_alpha = r8_sin(alpha);
+	double c_alpha = r8_cos(alpha);
+
+	/*if (DERIVATION_METHOD == 1) {
+		DX = getLineDensity1d(ptr_dx,x,z);
+		DZ = getLineDensity1d(ptr_dz,x,z);
+		return;
+	}*/
+	double xi;
+	double yi;
+	double zi;
+	double xm;
+	double ym;
+	double zm;
+
+	if(IMAGE_TYPE == 0) { // point to point (standard)
+		if(FX == 0 && FZ == 0) { // plane
+			zi = -(risag * c_alpha+Z);
+			xi = X;
+			yi = risag * s_alpha;
+			zm = rosag * c_beta - Z;
+			xm = X;
+			ym = rosag * s_beta;
+		}else{ // more general case, can be reduced to the plane with normal = (0,1,0) and y = 0
+			zi = FX*FZ*X - (FX*FX + FY*FY)*(Z + risag*c_alpha) + FY*FZ*(Y - risag*s_alpha);
+			xi = (FY*X - FX*Y + FX*risag*s_alpha);
+            yi = -(FX*X) - FY*Y - FZ*Z - FZ*risag*c_alpha + FY*risag*s_alpha;
+            zm = FX*FZ*X + (FX*FX + FY*FY)*(-Z + rosag*c_beta) + FY*FZ*(Y - rosag*s_beta);
+            xm = (FY*X - FX*Y + FX*rosag*s_beta);
+            ym = -(FX*X) - FY*Y - FZ*Z + FZ*rosag*c_beta + FY*rosag*s_beta;
+		}
+	}else if(IMAGE_TYPE == 1){ // astigmatic to astigmatix
+		double s_rim = sign(rimer);
+		double s_rom = sign(romer);
+		double c_2alpha = r8_cos(2*alpha);
+		double c_2beta = r8_cos(2*beta);
+		if(FX == 0 && FZ == 0){ //   !plane
+
+			zi = s_rim*(rimer*c_alpha+Z);
+        	xi =(s_rim*X*(c_alpha*Z-2*s_alpha*s_alpha*rimer+s_alpha*Y+rimer)) / (c_alpha*Z-2*s_alpha*s_alpha*risag+s_alpha*Y+risag);
+            yi = s_rim*(-rimer*s_alpha+Y);
+            zm = s_rom*(romer*c_beta-Z);
+            xm = (s_rom*X*(-c_beta*Z-2*s_beta*s_beta*romer+s_beta*Y+romer)) / (c_beta*Z+2*s_beta*s_beta*rosag-s_beta*Y-rosag);
+            ym = s_rom*(romer*s_beta-Y);
+		}else{
+			double denominator = Z*c_alpha + risag*c_2alpha + Y*s_alpha;
+			double nominator = X*(Z*c_alpha + rimer*c_2alpha + Y*s_alpha);
+			zi = s_rim*((FX*FX + FY*FY)*(Z + rimer*c_alpha) - FY*FZ*(Y - rimer*s_alpha) - (FX*FZ*nominator) / denominator);
+			xi = s_rim*(-(FX*Y) + FX*rimer*s_alpha + (FY*nominator) / denominator);
+			yi = s_rim*(FZ*(Z + rimer*c_alpha) + FY*(Y - rimer*s_alpha) + (FX*nominator) / denominator);
+
+			denominator = (-(Z*c_beta) + rosag*c_2beta + Y*s_beta);
+			nominator = X*(-(Z*c_beta) + romer*c_2beta + Y*s_beta);
+			zm = s_rom*((FX*FX + FY*FY)*(-Z + romer*c_beta) + FY*FZ*(Y - romer*s_beta) + (FX*FZ*nominator)/denominator);
+			xm = s_rom*(FX*(Y - romer*s_beta) - (FY*nominator)/denominator);
+			ym = s_rom*(FZ*(-Z + romer*c_beta) + FY*(-Y + romer*s_beta) - (FX*nominator)/denominator);
+		}
+		double ris = sqrt(zi*zi + xi*xi + yi*yi);
+		double rms = sqrt(zm*zm + xm*xm + ym*ym);
+
+		double ai = zi/ris;
+		double bi = -xi/ris;
+		double am = -zm/rms;
+		double bm = xm/rms;
+
+		//double ci = yi/ris; // for what?
+		//double cm = -ym/rms;
+
+		DZ = (ai+am)/(WL*Ord);
+		DX = (-bi-bm)/(WL*Ord);
+
+		return;
+	}
+
+	double ris = sqrt(zi*zi + xi*xi + yi*yi);
+    double rms = sqrt(zm*zm + xm*xm + ym*ym);
+
+	double ai = xi/ris;
+	double am = xm/rms;
+	double bi = zi/ris;
+	double bm = zm/rms;
+
+
+	DX = (ai+am)/(WL*Ord);
+	DZ = (-bi-bm)/(WL*Ord);
+
+	return;
+
+}
+
+/**
+calculates refracted ray
+@params: 	r: ray
+			normal: normal at intersection point of ray and element
+			az: line spacing in z direction
+			ax: line spacing in x direction
+@returns: refracted ray (position unchanged, direction changed), weight = 0 if "ray beyond horizon"
+*/
+Ray refrac2D(Ray r, dvec4 normal, double az, double ax) {
+	double eps1 = -r8_atan(normal.x/normal.y);
+    double del1 = r8_asin(normal.z);
+
+	double cos_d = r8_cos(-del1);
+	double sin_d = r8_sin(-del1);
+	double cos_e = r8_cos(-eps1);
+	double sin_e = r8_sin(-eps1);
+	dmat3 rot = dmat3(cos_e, cos_d*sin_e, sin_d*sin_e,
+				-sin_e, cos_d*cos_e, sin_d*cos_e,
+				0, -sin_d, cos_d);
+	dmat3 inv_rot = dmat3(cos_e, -sin_e, 0,
+				cos_d*sin_e, cos_d*cos_e, -sin_d,
+				sin_d*sin_e, sin_d*cos_e, cos_d);
+	r.direction = rot * r.direction;
+
+	double x1 = r.direction.x - ax;
+	double z1 = r.direction.z - az;
+	double y1 = 1-x1*x1-z1*z1;
+
+	if (y1 > 0){
+	   y1 = sqrt(y1);
+
+	   r.direction.x = x1;
+	   r.direction.y = y1;
+	   r.direction.z = z1;
+	}else{ // beyond horizon - when divergence too large
+	   r.weight = 0.0;
+	}
+	r.direction = inv_rot * r.direction;
+	return r;
+}
+
+// refraction function used for gratings
+Ray refrac(Ray r, dvec4 normal, double a){
+	double xy = normal[0] / normal[1];
+	double zy = normal[2] / normal[1];
+	double sqq = sqrt(1 + zy*zy + xy*xy);
+	double an_x = xy/sqq;
+	double an_y = -1.0/sqq;
+	double an_z = zy/sqq;
+
+	double eps1 = r8_atan(an_x/ an_y); //-atan(an_x/an_z) around z, chi
+	double del1 = r8_asin(an_z); // sign(an_z) * r8_atan(sqrt( (an_z*an_z) / (1-an_z*an_z) )); // -asin(an_z); // -asin around x, psi
+	double cos_d = r8_cos(del1);
+	double a1 = a*cos_d;
+	double sin_d = r8_sin(-del1);
+	double cos_e = r8_cos(-eps1);
+	double sin_e = r8_sin(-eps1);
+	dmat4 rot = dmat4(cos_e, cos_d*sin_e, sin_d*sin_e, 0,
+				-sin_e, cos_d*cos_e, sin_d*cos_e, 0,
+				0, -sin_d, cos_d, 0,
+				0,0,0,1);
+	dmat4 inv_rot = dmat4(cos_e, -sin_e, 0, 0,
+				cos_d*sin_e, cos_d*cos_e, -sin_d, 0,
+				sin_d*sin_e, sin_d*cos_e, cos_d, 0,
+				0,0,0,1);
+	r.direction = dvec3(rot * dvec4(r.direction,0));
+
+	double y1 = (r.direction[1]*r.direction[1]+r.direction[2]*r.direction[2]-((r.direction[2]-a1)*(r.direction[2]-a1)));
+	if (y1 > 0){
+		y1 = sqrt(y1);
+		r.direction[1] = y1;
+		r.direction[2] -= a1;
+	}else{
+	   r.weight = 0.0;
+	}
+	r.direction = dvec3(inv_rot * dvec4(r.direction,0));
+	return r;
+}
+
+
+/** variable line spacing for gratings
+@params
+	lineDensity: general line density?
+	z: z-coordinate of ray position
+	vls[6]: 6 vls parameters given by user
+@returns line density specifically for this z-coordinate
+*/
+double vlsGrating(double lineDensity, double z, double[6] vls) {
+	// a = a * (1 + 2*b2*z + 3*b3*z**2 + 4*b4*z**3 + 5*b5*z**4 + 6*b6*z**5 + 7*b7*z**6)
+	double z2 = z*z;
+	double z3 = z2*z;
+	double z4 = z3*z;
+	double z5 = z4*z;
+	double z6 = z5*z;
+	double a = lineDensity * (1 + 2*vls[0]*z + 3*vls[1]*z2 + 4*vls[2]*z3 + 5*vls[3]*z4 + 6*vls[4]*z5 + 7*vls[5]*z6);
+	return a;
+}
+
+
+/*
+* simplified refraction function used for plane gratings
+* normal is always the same (0,1,0) -> no rotation and thus no trigonometric functions necessary
+* @param r			ray
+* @param normal		normal at ray-object intersection (for planes always (0,1,0))
+* @param a			a = WL * D0 * ORD * 1.e-6  with D0: line density (l/mm); WL:wavelength (nm); ORD order of diffraction
+*/
+Ray refrac_plane(Ray r, dvec4 normal, double a){
+	double y1 = r.direction[1]*r.direction[1] + r.direction[2]*r.direction[2] - (r.direction[2]-a)*(r.direction[2]-a);
+	if (y1 > 0){
+		y1 = sqrt(y1);
+		r.direction[1] = y1;
+		r.direction[2] = r.direction[2] - a;
+	}else{
+	   r.weight = 0.0; // status?
+	}
+	return r;
+}
+
+/**
+checks whether the ray is hit by a central beam stopper which may be rectangular (width: xStop/yStop)
+or circular.
+if so the ray is thrown away.
+if xStop is negative, then a circular shape of radius xStop is assumed and yStop is not used (from RAY.FOR)
+@params		x,y				x/y-coord. of ray direction
+			xStop, yStop	shape of beam stopper
+			weight			current weight of the ray, is changed if ray is stopped
+@return
+	new weight
+*/
+double stopBox(double x, double y, double xStop, double yStop, double weight) {
+	double w = weight;
+	// if w == 0 return
+	if(w != 0) {
+		if(xStop > 0) {
+			if(abs(x) < xStop && abs(y) < yStop) {
+				w = 0;
+			}
+		}else{
+			double radius = sqrt((x/xStop)*(x/xStop) + (y/yStop)*(y/yStop));
+			if(radius < 0) w = 0;
+		}
+	}
+	return w;
+}
+
+/**returns first bessel function of parameter v*/
+double bessel1(double v) {
+	if(v < 0.0 || v > 20.0) {
+		return 0.0;
+	}
+
+	double sum = 0;
+	int large = 30;
+
+	double PO1;
+	double PO2;
+	double FA1;
+	for(int small = 0; small<=large; small++) {
+		PO1 = dpow(-1.0, small);
+		PO2 = dpow(v/2.0, 2*small+1);
+		FA1 = fact(small);
+		sum += (PO1 / (FA1*FA1*(small+1))) * PO2;
+	}
+	return sum;
+}
+
+/**
+calculates the Bessel diffraction effects on circular slits and on circular zoneplates
+@params:	radius		radius < 0 (mm)
+			wl			wavelength (nm)
+			dphi, dpsi  angles of diffracted ray
+@returns
+	results stored in dphi, dpsi (inout)
+*/
+void bessel_diff(double radius, double wl, inout double dphi, inout double dpsi, inout uint64_t ctr) {
+	double b = abs(radius) * 1e06;
+	double ximax = 5.0*wl/b;
+
+	double rn1[3];
+	double c = -1;
+	while(c < 0) { // while c = wd - rn1[2] < 0 continue
+		rn1 = double[3] (squaresDoubleRNG(ctr), squaresDoubleRNG(ctr), squaresDoubleRNG(ctr));
+		dphi = rn1[0] * ximax;
+		dpsi = rn1[1] * ximax;
+		double xi = sqrt(0.5 * (dphi*dphi + dpsi*dpsi));
+		double u = 2.0 * PI * b * xi / wl;
+		double wd = 1;
+		if(u != 0) {
+			wd = 2.0 * bessel1(u) / u;
+			wd = wd*wd;
+		}
+		c = wd - rn1[2];
+	}
+
+	// 50% neg/pos sign
+	dphi = sign(squaresDoubleRNG(ctr) - 0.5) * dphi;
+	dpsi = sign(squaresDoubleRNG(ctr) - 0.5) * dpsi;
+
+}
+
+/**
+calculates fraunhofer diffraction effects on rectangular slits
+@params:	dim		dimension (x or y) (mm)
+			wl		wavelength (nm)
+			dAngle 	diffraction angle (inout)
+@returns
+	result stored in dAngle
+*/
+void fraun_diff(double dim, double wl, inout double dAngle, inout uint64_t ctr){
+	if (dim==0) return; // no diffraction in this direction
+	double b = dim * 1e06; 		// slit opening
+	double div = 10.0 * wl/b;	// up to 2nd maximum
+
+	double rna[2]; // 2 uniform random numbers in [0,1]
+	double c = -1;
+	while(c < 0) { // while c = wd - uni[1] < 0 continue
+		rna = double[2] (squaresDoubleRNG(ctr), squaresDoubleRNG(ctr));
+		dAngle = (rna[0]-0.5) * div;
+		double u = PI * b * r8_sin(dAngle) / wl;
+		double wd = 1;
+		if(u != 0) {
+			wd = r8_sin(u) / u;
+			wd = wd*wd;
+		}
+		c = wd - rna[1];
+	}
+}
+
+void diffraction(int iopt, double xLength, double yLength, double wl, inout double dPhi, inout double dPsi, inout uint64_t ctr) {
+	if(wl <= 0) return;
+
+	double yl = yLength;
+	double xl = xLength;
+
+	if(xLength > 0) {	// rectangular slit, zoneplate
+		if(iopt == 3) { 	// zoneplate
+			if(yLength > 0) {	// in x direction
+				yl = 0;
+			}
+			else if(yLength < 0) { // in y direction, what about ==0?
+				xl = 0;
+			}
+		}
+		fraun_diff(xl, wl, dPhi, ctr);
+		fraun_diff(yl, wl, dPsi, ctr);
+	}else{	// circular slit
+		if(iopt == 1){
+			xl = yLength; // SL R_max
+		}
+		bessel_diff(xl, wl, dPhi, dPsi, ctr);
+	}
+}
+
+/**
+* calculates resulting ray for a mirror element (plane and spherical)
+* transforms ray to object coordinate system, takes misalignment into account, traces the ray and transforms ray resulting of interaction with opt. element back to beam coordinates
+* @param r				ray to trace
+* @param q				quadric surface
+* @param ctr			counter for random number generator, always inout
+*
+* output: reflected Ray with intersection point as position, reflection as direction in beam coordinates and possibly modified weight
+*/
+Ray traceSlit(Ray r, Quadric q, inout uint64_t ctr, dvec4 closestHitpoint) {
+	r = rayMatrixMult(r, q.inTrans);
+	closestHitpoint.xyz = dvec3(q.inTrans * dvec4(closestHitpoint.xyz,1));
+	dvec4 normal = setIntersectionPoint(r, q.anchorPoints, 0, closestHitpoint);
+
+	double xLength = q.objectParameters[0][0]; // width
+	double yLength = q.objectParameters[0][1]; // height
+	double xStop = q.elementParameters[0][0];
+	double yStop = q.elementParameters[0][1];
+	// slit lies in x-y plane instead of x-z plane as other elements
+	r.weight = wasteBox(r.position[0],r.position[1],xLength,yLength, r.weight);
+	r.weight = stopBox(r.position[0],r.position[1], xStop, yStop, r.weight);
+
+	if(r.weight < 1.0) {
+		r = rayMatrixMult(r, q.outTrans);
+		return r;
+	}
+
+	double psi = -r8_asin(r.direction.y);
+	double phi = r8_asin(r.direction.x/r8_cos(psi));
+	double delPhi = 0;
+	double delPsi = 0;
+	int iopt = 1; // 1 = slit, 3 = zone plate
+	double wavelength = q.elementParameters[1][0]; // from parameters
+	diffraction(iopt, xLength, yLength, wavelength, delPhi, delPsi, ctr);
+	phi = phi + delPhi;
+	psi = psi + delPsi;
+	r.direction.x = delPhi;
+	r.direction.y = delPsi;
+	// new direction form angles
+	cosini(r, phi,psi);
+
+	r = rayMatrixMult(r, q.outTrans);
+	return r;
+}
+
+
+Ray traceRZP(Ray r, Quadric q, inout uint64_t ctr, dvec4 closestHitpoint) {
+
+	r = rayMatrixMult(r, q.inTrans);
+	double element_offset_z = q.elementParameters[3][2];
+	r.position.z = r.position.z - element_offset_z;
+	//r = rayMatrixMult(r, q.misalignment); // misalignment not stored in intrans because it needs to be removed later
+
+	// RZP can be plane, toroidal or spherical curvature type. Use intersectionPoint for all except toroidal
+	// if !toroidal:
+	closestHitpoint.xyz = dvec3(q.inTrans * dvec4(closestHitpoint.xyz,1));
+	dvec4 normal = setIntersectionPoint(r, q.anchorPoints, 1, closestHitpoint); // check if normal is correct
+	// toroidal not implemented yet
+		//TODO
+
+	// wastebox is the same no matter what curvature type
+	double xLength = q.objectParameters[0][0]; // width
+	double zLength = q.objectParameters[0][1]; // height
+	r.weight = wasteBox(r.position[0],r.position[2],xLength,zLength, r.weight);
+
+
+	if(r.weight < 1.0) {
+		r.position.z += element_offset_z;
+		r = rayMatrixMult(r, q.outTrans); // inv mis & out trans
+		return r;
+	}
+
+	// remove misalignment to calculate line density
+	r = rayMatrixMult(r, q.inverseMisalignment);
+
+	double DX, DZ;
+	//RZPLineDensity(...DX,DZ);
+	int IMAGE_TYPE = int(q.elementParameters[0][0]);
+	int RZP_TYPE = int(q.elementParameters[0][1]);
+	int DERIVATION_METHOD = int(q.elementParameters[0][2]);
+	double risag = q.elementParameters[2][0];
+	double rosag = q.elementParameters[2][1];
+	double rimer = q.elementParameters[2][2];
+	double romer = q.elementParameters[2][3];
+	double d_alpha = q.elementParameters[3][0];
+	double d_beta = q.elementParameters[3][1];
+	double d_ord = q.elementParameters[1][1];
+	double zOffsetCenter = q.elementParameters[1][3];; // fresnel center z offset
+	double WL = hvlam(r.energy);//12.39852;
+	double WL0 = 1e-06*q.elementParameters[0][3]; // source energy/design energy
+	double Ord = q.elementParameters[1][2];
+	int additional_order = int(q.elementParameters[3][3]);
+
+	RZPLineDensity(r, normal, IMAGE_TYPE, RZP_TYPE, DERIVATION_METHOD, zOffsetCenter, risag, rosag, rimer, romer, d_alpha, d_beta, d_ord, WL0, DX, DZ);
+
+	// tanger
+	double slopeX = q.objectParameters[0][2];
+	double slopeZ = q.objectParameters[0][3];
+	normal = tanger(normal, slopeX, slopeZ, 0, ctr);
+
+	if(additional_order == 1) {
+		if(squaresDoubleRNG(ctr) > 0.5)
+			Ord = 0;
+	}
+	// back to misalignment
+	r = rayMatrixMult(r, q.misalignment);
+
+	// only 2D case, not 2 1D gratings with 90 degree rotation
+	double az = WL*DZ*Ord*1e-6;
+	double ax = WL*DX*Ord*1e-6;
+ 	r = refrac2D(r, normal, az, ax);
+
+	r.position.z += element_offset_z;
+	r = rayMatrixMult(r, q.outTrans);
+	return r;
+}
+
+/**
+* calculates resulting ray for plane grating element
+* separate from "generalGratingElement" because normal is always (0,-1,0). Therefore, the refrac function can be simplified such that it does not use trigonom. functions
+* transforms ray to object coordinate system, takes misalignment into account, traces the ray and transforms ray resulting of interaction with grating back to beam coordinates
+* @param r				ray to trace
+* @param q				quadric parameters of the grating (a_24=-1)
+*
+* output: reflected Ray with intersection point as position, reflection as direction in beam coordinates and possibly modified weight
+*/
+Ray tracePlaneGrating(Ray r, Quadric q, inout uint64_t ctr, dvec4 closestHitpoint) {
+	r = rayMatrixMult(r, q.inTrans);
+	closestHitpoint.xyz = dvec3(q.inTrans * dvec4(closestHitpoint.xyz,1));
+	// calculate intersection point with element surface and return surface normal at this point
+	dvec4 normal = setIntersectionPoint(r, q.anchorPoints, 1, closestHitpoint);
+	normal = dvec4(0,1,0,0);
+
+	// check if element was hit
+	double xLength = q.objectParameters[0][0];
+	double zLength = q.objectParameters[0][1];
+	r.weight = wasteBox(r.position[0],r.position[2],xLength,zLength, r.weight);
+
+	if(r.weight < 1.0) {
+		r = rayMatrixMult(r, q.outTrans);
+		return r;
+	}
+	// modify normal according to slope error
+	double slopeX = q.objectParameters[0][2];
+	double slopeZ = q.objectParameters[0][3];
+	normal = tanger(normal, slopeX, slopeZ, 0, ctr);
+
+	// vls parameters passed in q.elementParameters
+	double WL = hvlam(r.energy);
+	double lineDensity = q.elementParameters[0][2];
+	double orderOfDiffraction = q.elementParameters[0][3];
+	double b_params[6] = double[6] (q.elementParameters[1][2],q.elementParameters[1][3],q.elementParameters[2][0],q.elementParameters[2][1],q.elementParameters[2][2],q.elementParameters[2][3]);//(0.1,0.1,0.1,0.01,0.02,0.03);
+	int additional_order = int(q.elementParameters[3][3]);
+
+	double a = vlsGrating(lineDensity, r.position[2], b_params) * WL *  orderOfDiffraction * 1e-06;
+	if(additional_order == 1) {
+		if(squaresDoubleRNG(ctr) > 0.5)
+			a = 0;
+	}
+
+	r = refrac_plane(r, normal, a);
+
+	r = rayMatrixMult(r, q.outTrans);
+	return r;
+}
+
+/**
+* calculates resulting ray for general grating element
+* transforms ray to object coordinate system, takes misalignment into account, traces the ray and transforms ray resulting of interaction with grating back to beam coordinates
+* @param r				ray to trace
+* @param q				quadric surface
+*
+* output: reflected Ray with intersection point as position, reflection as direction in beam coordinates and possibly modified weight
+*/
+Ray traceGeneralGrating(Ray r, Quadric q, inout uint64_t ctr, dvec4 closestHitpoint) {
+	r = rayMatrixMult(r, q.inTrans); // ray/global to element coordinates, misalignment
+	closestHitpoint.xyz = dvec3(q.inTrans * dvec4(closestHitpoint.xyz,1));
+
+	int ISIG = 1;
+	double radius = q.anchorPoints[1][3]; // -radius , a_24
+	if(-radius < 0) {
+		ISIG = -1;
+	}
+	dvec4 normal = setIntersectionPoint(r, q.anchorPoints, ISIG, closestHitpoint);
+	normal = normalize(dvec4(-r.position[0], -radius - r.position[1]*ISIG, -r.position[2], 0));
+
+	// check if element was hit
+	double xLength = q.objectParameters[0][0];
+	double zLength = q.objectParameters[0][1];
+	r.weight = wasteBox(r.position[0],r.position[2],xLength,zLength, r.weight);
+
+	if(r.weight < 1.0) {
+		r = rayMatrixMult(r, q.outTrans);
+		return r;
+	}
+	// modify normal according to slope error
+	double slopeX = q.objectParameters[0][2];
+	double slopeZ = q.objectParameters[0][3];
+	normal = tanger(normal, slopeX, slopeZ, 0, ctr);
+
+	// vls parameters passed in q.elementParameters
+	double WL = hvlam(r.energy);
+	double lineDensity = q.elementParameters[0][2];
+	double orderOfDiffraction = q.elementParameters[0][3];
+	double b_params[6] = double[6] (q.elementParameters[1][2],q.elementParameters[1][3],q.elementParameters[2][0],q.elementParameters[2][1],q.elementParameters[2][2],q.elementParameters[2][3]);//(0.1,0.1,0.1,0.01,0.02,0.03);
+	// a = WL * linedensity * order * 1e-06
+	double a = vlsGrating(lineDensity, r.position[2], b_params) * WL *  orderOfDiffraction * 1e-06;
+	// no additional zero order here
+
+	// refraction
+	r = refrac(r, normal, a);
+
+	r = rayMatrixMult(r, q.outTrans); // element to ray/global coordinates, inverse misalignment
+	return r;
+}
+
+/**
+* calculates resulting ray for a mirror element
+* transforms ray to object coordinate system, takes misalignment into account, traces the ray and transforms ray resulting of interaction with opt. element back to beam coordinates
+* @param r				ray to trace
+* @param q				quadric surface
+*
+* output: reflected Ray with intersection point as position, reflection as direction in beam coordinates and possibly modified weight
+*/
+Ray traceMirror(Ray r, Quadric q, inout uint64_t ctr, dvec4 closestHitpoint) {
+	r = rayMatrixMult(r, q.inTrans);
+
+	closestHitpoint.xyz = dvec3(q.inTrans * dvec4(closestHitpoint.xyz,1));
+	dvec4 normal = setIntersectionPoint(r, q.anchorPoints, 1, closestHitpoint);
+
+	double xLength = q.objectParameters[0][0]; // width
+	double zLength = q.objectParameters[0][1]; // height
+	r.weight = wasteBox(r.position[0],r.position[2],xLength,zLength, r.weight);
+	if(r.weight < 1.0) {
+		r = rayMatrixMult(r, q.outTrans);
+		return r;
+	}
+
+	double slopeX = q.objectParameters[0][2];
+	double slopeZ = q.objectParameters[0][3];
+	normal = tanger(normal, slopeX, slopeZ, 0, ctr); // option 0 = default, cartesian normal
+
+	r.direction = dvec3(reflect(dvec4(r.direction,0), normal));
+
+	r = rayMatrixMult(r, q.outTrans);
+
+	return r;
+}
+
+
+Ray traceEllipsoidMirror(Ray r, Quadric q, inout uint64_t ctr, dvec4 closestHitpoint) {
+	r = rayMatrixMult(r, q.inTrans); // 0: M*T*r, 1: A-1*M*A*T*r
+	//inTransformation(r, q.misalignment, q.inTrans);
+
+	dvec4 normal = setIntersectionPoint(r, q.anchorPoints, 1, closestHitpoint);
+	r = rayMatrixMult(r, q.misalignment); // A
+
+	// will be changed, when width & heigth in "parameters"
+	double xLength = q.objectParameters[0][0]; // width
+	double zLength = q.objectParameters[0][1]; // height
+	r.weight = wasteBox(r.position[0],r.position[2],xLength,zLength, r.weight);
+
+	if(r.weight < 1.0) {
+		r = rayMatrixMult(r, q.inverseMisalignment); // A-1
+		r = rayMatrixMult(r, q.outTrans); // 0: T-1*M-1 1: T-1*A-1*M-1*A
+		return r;
+	}
+	double slopeX = q.objectParameters[0][2];
+	double slopeZ = q.objectParameters[0][3];
+	normal = tanger(normal, slopeX, slopeZ, 0, ctr); // option 0 = default, cartesian normal
+
+
+	r = rayMatrixMult(r, q.inverseMisalignment); // A-1
+	/*
+	FX = -a11*X*bendingSign
+	FY = -(Y+a24)*bendingSign
+	FZ = -(a33*Z+a34)*bendingSign
+	*/
+	//normal = dvec4(-a_11*r.position.x*b_sign, );
+
+	r.direction = dvec3(reflect(dvec4(r.direction,0), normal));
+
+	r = rayMatrixMult(r, q.outTrans); // 0: T-1*M-1 1: T-1*A-1*M-1*A
+	//outTransformation(r, q.inverseMisalignment, q.outTrans);
+	return r;
+}
+
+
+/*
+the image plane is always parallel to x-y-plane of ray coordinate system in which the rays are when they leave the previous element
+-> defined by distance to that element
+*/
+Ray traceImagePlane(Ray r, Quadric q) {
+	r = rayMatrixMult(r, q.inTrans);
+	double offset = 0 - r.position.z; // length between ray origin (intersection point of previous element) and image plane
+	r.position.x = r.position.x + ((r.direction.x / r.direction.z) * offset); // scale x-slope of ray (l/n) by z-length between origin and image plane
+	r.position.y = r.position.y + ((r.direction.y / r.direction.z) * offset);
+	r.position.z = 0;
+	r = rayMatrixMult(r, q.outTrans);
+	return r;
+}
+
+// }
+dvec4 getOpticalElementIntersection(Ray r, uint quadricIndex, int whichIntersection){
+
+	double type = quadricData[quadricIndex].anchorPoints[3][0];
+	Quadric q = quadricData[quadricIndex];
+	dvec4 currentIntersection;
+	if(type > 5){
+		return dvec4(1.0/0.0,1.0/0.0,1.0/0.0, 0);
+	}
+	if(type == 4) {
+		r.position.z = r.position.z - q.elementParameters[3][2];
+	}
+	r = rayMatrixMult(r, q.inTrans);
+	if(type == 5) { // image plane
+		double dist = q.elementParameters[0][0];
+		double offset = 0 - r.position.z; // length between ray origin (intersection point of previous element) and image plane
+		r.position.x = r.position.x + ((r.direction.x / r.direction.z) * offset); // scale x-slope of ray (l/n) by z-length between origin and image plane
+		r.position.y = r.position.y + ((r.direction.y / r.direction.z) * offset);
+		r.position.z = 0;
+		currentIntersection.xyz = dvec3(q.outTrans *  dvec4(r.position,1));
+		currentIntersection.w = r.weight;
+		return currentIntersection;
+
+	}
+	currentIntersection = getIntersectionPoint(r, q.anchorPoints, whichIntersection);
+	currentIntersection.xyz = dvec3(q.outTrans *  dvec4(currentIntersection.xyz,1));
+
+	return currentIntersection;
+}
+void dynamicQuadrics(){
+	
+	const int numberOfQuadrics = quadricData.length();
+	//placeholder, info should later be transfered to shader
+	const int maxBounces = 2;
+	Ray ray = rayData[uint(gl_GlobalInvocationID)];
+	uint beamlineIndex = uint(double(gl_GlobalInvocationID)/numberOfRaysPerBeamLine);
+	int whichIntersection = 1;
+
+	// ray specific "seed" for random numbers -> every ray has a different starting value for the counter that creates the random number
+	uint64_t workerCounterNum = (~(uint64_t(0)) / int(numberOfRays));
+	uint64_t ctr = uint(gl_GlobalInvocationID) * workerCounterNum;
+	int type = -1;
+	//iterate bounces
+	int closestQuadricIndex = -1;
+	dvec4 closestHitpoint = dvec4(1.0/0.0, 1.0/0.0, 1.0/0.0, 0.0);
+	for(int i = 0; i<maxBounces; i++){
+		ray = rayData[uint(gl_GlobalInvocationID)];
+
+		uint lastClosestQuadricIndex = closestQuadricIndex;
+		closestHitpoint = dvec4(1.0/0.0, 1.0/0.0, 1.0/0.0, 0);
+		//find intersection points with all quadrics
+
+		for(int quadricIndex = int(beamlineIndex)*int(numberOfQuadricsPerBeamline); quadricIndex<(beamlineIndex+1)*numberOfQuadricsPerBeamline; quadricIndex++){
+			if(quadricIndex == lastClosestQuadricIndex){
+				//TODO: self-intersection
+				continue;
+				whichIntersection = -1;
+			}
+			else{
+				whichIntersection = 1;
+			}
+			dvec4 currentIntersection = dvec4(1.0/0.0,1.0/0.0,1.0/0.0, 0.0);
+			currentIntersection = getOpticalElementIntersection(ray, quadricIndex, whichIntersection);
+			if(length(ray.position - closestHitpoint.xyz)>length(ray.position-currentIntersection.xyz)){
+				closestHitpoint = currentIntersection;
+				closestQuadricIndex = quadricIndex;
+			}
+			
+		}
+		if(closestQuadricIndex == -1){
+			rayData[uint(gl_GlobalInvocationID)].weight = 0;
+			break;
+		}
+		type = int(quadricData[closestQuadricIndex].anchorPoints[3][0]);
+		
+		if (type == 0) { // mirror
+			rayData[uint(gl_GlobalInvocationID)] = traceMirror(rayData[uint(gl_GlobalInvocationID)], quadricData[closestQuadricIndex], ctr, closestHitpoint);
+		}else if(type == 1){ // plane grating
+			rayData[uint(gl_GlobalInvocationID)] = tracePlaneGrating(rayData[uint(gl_GlobalInvocationID)], quadricData[closestQuadricIndex], ctr, closestHitpoint);	
+		}else if(type == 2){ // general grating
+			rayData[uint(gl_GlobalInvocationID)] = traceGeneralGrating(rayData[uint(gl_GlobalInvocationID)], quadricData[closestQuadricIndex], ctr, closestHitpoint);	
+		}else if(type == 3){ // Slit
+			rayData[uint(gl_GlobalInvocationID)] = traceSlit(rayData[uint(gl_GlobalInvocationID)], quadricData[closestQuadricIndex], ctr, closestHitpoint);	
+		}else if(type == 4) { // rzp
+			rayData[uint(gl_GlobalInvocationID)] = traceRZP(rayData[uint(gl_GlobalInvocationID)], quadricData[closestQuadricIndex], ctr, closestHitpoint);	
+		}else if(type == 5) { // image plane
+			outputData[uint(gl_GlobalInvocationID)] = traceImagePlane(rayData[uint(gl_GlobalInvocationID)], quadricData[closestQuadricIndex]);
+			return;
+		}
+		
+	}
+	outputData[uint(gl_GlobalInvocationID)] = rayData[uint(gl_GlobalInvocationID)];
+}
+
+/*
+void cameraPlaneIntersection(outputData, cameraPlane){
+	const int numberOfQuadrics = quadricData.length()
+	Ray temporaryOutputVector;
+	temporaryOutputVector = traceRay(outputData[uint(gl_GlobalInvocationID)], quadricData[numberOfQuadrics-1]);
+	outputData[uint(gl_GlobalInvocationID)].position = temporaryOutputVector.position;
+}
+*/
+void main(){
+    //testFunctions();
+	/*
+	Ray r = rayData[uint(gl_GlobalInvocationID)];
+	r.weight = double(ctr);
+	r.energy = 27;
+	r.position = dvec3(squares64RNG(ctr), (squares(ctr, rngKey)),(squares(ctr, rngKey)));
+	r.direction = dvec3(double(squares64RNG(ctr)), squaresDoubleRNG(ctr), squaresDoubleRNG(ctr));
+	outputData[uint(gl_GlobalInvocationID)] = r;*/
+    //outputData[uint(gl_GlobalInvocationID)] = rayData[uint(gl_GlobalInvocationID)];
+    //iterateQuadrics();
+    dynamicQuadrics();
+
+	//test intersection point
+	// uint64_t workerCounterNum = (~(uint64_t(0)) / int(numberOfRays));
+	// uint64_t ctr = uint(gl_GlobalInvocationID) * workerCounterNum;
+	// Ray r = rayData[uint(gl_GlobalInvocationID)];
+    // outputData[uint(gl_GlobalInvocationID)] = traceRZP(r, quadricData[0], ctr);
+	// dvec4 test = getOpticalElementIntersection(r, 0, 1);
+	// outputData[uint(gl_GlobalInvocationID)].position = test.xyz;
+	// outputData[uint(gl_GlobalInvocationID)].weight = test.w;
+
+    // outputData[uint(gl_GlobalInvocationID)] = iterateQuadrics(rayData[uint(gl_GlobalInvocationID)]);
+    //outputData[uint(gl_GlobalInvocationID)] = rayData[uint(gl_GlobalInvocationID)];
+    //outputData[uint(gl_GlobalInvocationID)].position = dvec3(117.0, 225.0,534.0);
+    //outputData[uint(gl_GlobalInvocationID)].direction = dvec4(1887.0, 2285.0,5394.0, 876.0);
+    //[uint(gl_GlobalInvocationID)].weight = 1337.0;
+    //outputData[uint(gl_GlobalInvocationID)].direction = rayData[uint(gl_GlobalInvocationID)].direction;
+    //outputData[uint(gl_GlobalInvocationID)].weight = rayData[uint(gl_GlobalInvocationID)].weight; // starts at (0,20,-20)
+    // outputData[uint(gl_GlobalInvocationID)].direction = dvec4(0.0, 0.0, 0.0, 0.0); // hits the surface in 45 degree angle at (0,0,0) -> the normal should be (0,-1,0)
+
+}

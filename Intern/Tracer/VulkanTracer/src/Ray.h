@@ -10,7 +10,7 @@
 class Ray
 {
 public:
-	Ray(double xpos, double ypos, double zpos, double xdir, double ydir, double zdir, double w);
+	Ray(double xpos, double ypos, double zpos, double xdir, double ydir, double zdir, double s0, double s1, double s2, double s3, double en, double w);
 	Ray(double* location);
 	Ray();
 	~Ray();
@@ -21,15 +21,25 @@ public:
 	double getxPos();
 	double getyPos();
 	double getzPos();
+	double getEnergy();
 	double getWeight();
+	double getS0();
+	double getS1();
+	double getS2();
+	double getS3();
 
 private:
 	struct vec3
 	{
 		double x, y, z;
 	};
-	vec3 position;
-	double weight;
-	vec3 direction;
-	double placeholder;
+	struct vec4
+	{
+		double s0, s1, s2, s3;
+	};
+	vec3 m_position;
+	double m_weight;
+	vec3 m_direction;
+	double m_energy;
+	vec4 m_stokes;
 };

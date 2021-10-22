@@ -4,9 +4,15 @@
 bin/
 bin-int/
 build/
-RayCore/doc/html/
+Intern/RayCore/doc/*/
+out/
 
 # Files
 *.user
 *.code-workspace
 /CMakeSettings.json
+/Tests/output/*
+/Tests/.ipynb_checkpoints/*
+/Tests/plot2.ipynb
+CMakeCache.txt
+cmake.check_cache

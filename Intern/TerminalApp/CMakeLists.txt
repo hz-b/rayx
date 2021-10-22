@@ -1,13 +1,13 @@
 cmake_minimum_required(VERSION 3.0 FATAL_ERROR)
 project(TerminalApp)
 
-set(CMAKE_VERBOSE_MAKEFILE ON)
-set(CMAKE_COLOR_MAKEFILE   ON)
+# set(CMAKE_VERBOSE_MAKEFILE ON)
+# set(CMAKE_COLOR_MAKEFILE   ON)
 
 add_executable(${PROJECT_NAME} main.cpp TerminalApp.cpp TerminalApp.h NotInUse/InputParser.cpp NotInUse/InputParser.h)
 
 if (WIN32)
-    target_compile_definitions(${PROJECT_NAME} PUBLIC RAY_PLATFORM_WINDOWS)
+    target_compile_definitions(${PROJECT_NAME} PUBLIC RAYX_PLATFORM_WINDOWS)
 endif ()
 
 
