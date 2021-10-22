@@ -55,10 +55,6 @@ namespace RAYX
         glm::dmat4x4 or_imageplane = im_param.calcOrientation(tor_param, tor_position, tor_orientation);
         std::shared_ptr<ImagePlane> i = std::make_shared<ImagePlane>("Image plane", pos_imageplane, or_imageplane);
 
-        bool GLOBAL = true;
-        // petes setup
-        std::shared_ptr<RAYX::PointSource> p = std::make_shared<RAYX::PointSource>("spec1_first_rzp4", 1, 0.005, 0.005, 0, 0.02, 0.06, 1, 1, 0, 0, 640, 120, 1, 0, 0, std::vector<double>{0, 0, 0, 0});
-        std::shared_ptr<RAYX::ReflectionZonePlate> rzp = std::make_shared<RAYX::ReflectionZonePlate>("ReflectionZonePete", 0, 1, 0, 1, 1, 4, 60, 170, 2.2, 0, 90, p->getPhotonEnergy(), p->getPhotonEnergy(), -1, -1, 2.2, 1, 90, 400, 90, 400, 0, 0, 1, 0, 0, 1, std::vector<double>{ 0, 0, 0, 0, 0, 0 }, std::vector<double>{ 0, 0, 0, 0, 0, 0, 0 }, nullptr, GLOBAL);  // dx,dy,dz, dpsi,dphi,dchi //
         m_Beamline->addOpticalElement(t);
         m_Beamline->addOpticalElement(i);
 
