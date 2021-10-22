@@ -1,6 +1,6 @@
 #pragma once
-#include "Surface/Toroid.h"
-#include "Beamline/OpticalElement.h"
+#include "Model/Surface/Toroid.h"
+#include "Model/Beamline/OpticalElement.h"
 
 namespace RAYX
 {

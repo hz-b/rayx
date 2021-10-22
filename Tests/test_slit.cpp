@@ -1,7 +1,7 @@
 #include "gtest/gtest.h"
 #include "gmock/gmock.h"
-#include "Beamline/Beamline.h"
-#include "Beamline/Objects/Slit.h"
+#include "Model/Beamline/Beamline.h"
+#include "Model/Beamline/Objects/Slit.h"
 #include "UserParameter/WorldCoordinates.h"
 #include "UserParameter/GeometricUserParams.h"
 #include "Core.h"
@@ -84,7 +84,7 @@ TEST(Slit, defaultParams) {
     RAYX::WorldCoordinates w_coord = RAYX::WorldCoordinates(0, 0, degToRad(chi), dist, misalignment);
     RAYX::Slit s = RAYX::Slit("slit", geometricalShape, beamstop, width, height, w_coord.calcPosition(), w_coord.calcOrientation(), beamstopWidth, beamstopHeight, energy);
     //RAYX::Slit s = RAYX::Slit("slitt", geometricalShape, beamstop, width, height, chi, dist, beamstopWidth, beamstopHeight, energy, misalignment, nullptr, true);
-    
+
     double wavelength = 12.39852;
     std::vector<double> correctElementParams = { 0,0,0,0, wavelength,0,0,0, 0,0,0,0, 0,0,0,0 };
     std::vector<double> correctObjectParams = { width,height,0,0, 0,0,0,0, 0,0,0,0, 0,0,0,0 };
@@ -99,11 +99,11 @@ TEST(Slit, defaultParams) {
     EXPECT_ITERABLE_DOUBLE_EQ(std::vector<double>, s.getSurfaceParams(), surface);
     EXPECT_ITERABLE_DOUBLE_EQ(std::vector<double>, s.getObjectParameters(), correctObjectParams);
 
-    std::vector<double> correctInMat = {1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, -10000, 1};
-    std::vector<double> correctOutMat = {1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 10000, 1};
+    std::vector<double> correctInMat = { 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, -10000, 1 };
+    std::vector<double> correctOutMat = { 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 10000, 1 };
     EXPECT_ITERABLE_DOUBLE_EQ(std::vector<double>, s.getInMatrix(), correctInMat);
     EXPECT_ITERABLE_DOUBLE_EQ(std::vector<double>, s.getOutMatrix(), correctOutMat);
-    
+
 
 }
 
@@ -118,7 +118,7 @@ TEST(Slit, rectangleBeamstop) {
     double beamstopHeight = 1;
     double energy = 100;
     std::vector<double> misalignment = { 0,0,0, 0,0,0 };
-    
+
     RAYX::WorldCoordinates w_coord = RAYX::WorldCoordinates(0, 0, degToRad(chi), dist, misalignment);
     //RAYX::Slit s = RAYX::Slit("slitt", geometricalShape, beamstop, width, height, chi, dist, beamstopWidth, beamstopHeight, energy, misalignment, nullptr, true);
     RAYX::Slit s = RAYX::Slit("slit", geometricalShape, beamstop, width, height, w_coord.calcPosition(), w_coord.calcOrientation(), beamstopWidth, beamstopHeight, energy);
@@ -136,9 +136,9 @@ TEST(Slit, rectangleBeamstop) {
     EXPECT_ITERABLE_DOUBLE_EQ(std::vector<double>, s.getElementParameters(), correctElementParams);
     EXPECT_ITERABLE_DOUBLE_EQ(std::vector<double>, s.getSurfaceParams(), surface);
     EXPECT_ITERABLE_DOUBLE_EQ(std::vector<double>, s.getObjectParameters(), correctObjectParams);
-    
-    std::vector<double> correctInMat = {1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, -10000, 1};
-    std::vector<double> correctOutMat = {1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 10000, 1};
+
+    std::vector<double> correctInMat = { 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, -10000, 1 };
+    std::vector<double> correctOutMat = { 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 10000, 1 };
     EXPECT_ITERABLE_DOUBLE_EQ(std::vector<double>, s.getInMatrix(), correctInMat);
     EXPECT_ITERABLE_DOUBLE_EQ(std::vector<double>, s.getOutMatrix(), correctOutMat);
 }
@@ -154,7 +154,7 @@ TEST(Slit, ellipticalBeamstop) {
     double beamstopHeight = 1;
     double energy = 100;
     std::vector<double> misalignment = { 0,0,0, 0,0,0 };
-    
+
     RAYX::WorldCoordinates w_coord = RAYX::WorldCoordinates(0, 0, degToRad(chi), dist, misalignment);
     //RAYX::Slit s = RAYX::Slit("slitt", geometricalShape, beamstop, width, height, chi, dist, beamstopWidth, beamstopHeight, energy, misalignment, nullptr, true);
     RAYX::Slit s = RAYX::Slit("slit", geometricalShape, beamstop, width, height, w_coord.calcPosition(), w_coord.calcOrientation(), beamstopWidth, beamstopHeight, energy);
@@ -173,8 +173,8 @@ TEST(Slit, ellipticalBeamstop) {
     EXPECT_ITERABLE_DOUBLE_EQ(std::vector<double>, s.getSurfaceParams(), surface);
     EXPECT_ITERABLE_DOUBLE_EQ(std::vector<double>, s.getObjectParameters(), correctObjectParams);
 
-    std::vector<double> correctInMat = {1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, -10000, 1};
-    std::vector<double> correctOutMat = {1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 10000, 1};
+    std::vector<double> correctInMat = { 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, -10000, 1 };
+    std::vector<double> correctOutMat = { 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 10000, 1 };
     EXPECT_ITERABLE_DOUBLE_EQ(std::vector<double>, s.getInMatrix(), correctInMat);
     EXPECT_ITERABLE_DOUBLE_EQ(std::vector<double>, s.getOutMatrix(), correctOutMat);
 }
@@ -210,8 +210,8 @@ TEST(Slit, ellipticalSlitellipticalBeamstop) {
     EXPECT_ITERABLE_DOUBLE_EQ(std::vector<double>, s.getSurfaceParams(), surface);
     EXPECT_ITERABLE_DOUBLE_EQ(std::vector<double>, s.getObjectParameters(), correctObjectParams);
 
-    std::vector<double> correctInMat = {0.98480775301220802, -0.17364817766693033, 0, 0, 0.17364817766693033, 0.98480775301220802, 0, 0, 0, 0, 1, 0, 0, 0, -10000, 1};
-    std::vector<double> correctOutMat = {0.98480775301220802, 0.17364817766693033, 0, 0, -0.17364817766693033, 0.98480775301220802, 0, 0, 0, 0, 1, 0, 0, 0, 10000, 1};
+    std::vector<double> correctInMat = { 0.98480775301220802, -0.17364817766693033, 0, 0, 0.17364817766693033, 0.98480775301220802, 0, 0, 0, 0, 1, 0, 0, 0, -10000, 1 };
+    std::vector<double> correctOutMat = { 0.98480775301220802, 0.17364817766693033, 0, 0, -0.17364817766693033, 0.98480775301220802, 0, 0, 0, 0, 1, 0, 0, 0, 10000, 1 };
     EXPECT_ITERABLE_DOUBLE_EQ(std::vector<double>, s.getInMatrix(), correctInMat);
     EXPECT_ITERABLE_DOUBLE_EQ(std::vector<double>, s.getOutMatrix(), correctOutMat);
 }
@@ -247,8 +247,8 @@ TEST(Slit, ellipticalSlitrectangleBeamstop) {
     EXPECT_ITERABLE_DOUBLE_EQ(std::vector<double>, s.getSurfaceParams(), surface);
     EXPECT_ITERABLE_DOUBLE_EQ(std::vector<double>, s.getObjectParameters(), correctObjectParams);
 
-    std::vector<double> correctInMat = {1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, -1234, 1};
-    std::vector<double> correctOutMat = {1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 1234, 1};
+    std::vector<double> correctInMat = { 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, -1234, 1 };
+    std::vector<double> correctOutMat = { 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 1234, 1 };
     EXPECT_ITERABLE_DOUBLE_EQ(std::vector<double>, s.getInMatrix(), correctInMat);
     EXPECT_ITERABLE_DOUBLE_EQ(std::vector<double>, s.getOutMatrix(), correctOutMat);
 }
@@ -265,7 +265,7 @@ TEST(Slit, ellipticalSlitNoBeamstop) {
     double beamstopHeight = 1;
     double energy = 100;
     std::vector<double> misalignment = { 0,0,0, 0,0,0 };
-    
+
     RAYX::WorldCoordinates w_coord = RAYX::WorldCoordinates(0, 0, degToRad(chi), dist, misalignment);
     //RAYX::Slit s = RAYX::Slit("slitt", geometricalShape, beamstop, width, height, chi, dist, beamstopWidth, beamstopHeight, energy, misalignment, nullptr, true);
     RAYX::Slit s = RAYX::Slit("slit", geometricalShape, beamstop, width, height, w_coord.calcPosition(), w_coord.calcOrientation(), beamstopWidth, beamstopHeight, energy);
@@ -284,9 +284,9 @@ TEST(Slit, ellipticalSlitNoBeamstop) {
     EXPECT_ITERABLE_DOUBLE_EQ(std::vector<double>, s.getSurfaceParams(), surface);
     EXPECT_ITERABLE_DOUBLE_EQ(std::vector<double>, s.getObjectParameters(), correctObjectParams);
 
-    
-    std::vector<double> correctInMat = {0.97814760073380569, -0.20791169081775931, 0, 0, 0.20791169081775931, 0.97814760073380569, 0, 0, 0, 0, 1, 0, 0, 0, -1201, 1};
-    std::vector<double> correctOutMat = {0.97814760073380569, 0.20791169081775931, 0, 0, -0.20791169081775931, 0.97814760073380569, 0, 0, 0, 0, 1, 0, 0, 0, 1201, 1};
+
+    std::vector<double> correctInMat = { 0.97814760073380569, -0.20791169081775931, 0, 0, 0.20791169081775931, 0.97814760073380569, 0, 0, 0, 0, 1, 0, 0, 0, -1201, 1 };
+    std::vector<double> correctOutMat = { 0.97814760073380569, 0.20791169081775931, 0, 0, -0.20791169081775931, 0.97814760073380569, 0, 0, 0, 0, 1, 0, 0, 0, 1201, 1 };
     EXPECT_ITERABLE_DOUBLE_EQ(std::vector<double>, s.getInMatrix(), correctInMat);
     EXPECT_ITERABLE_DOUBLE_EQ(std::vector<double>, s.getOutMatrix(), correctOutMat);
 }

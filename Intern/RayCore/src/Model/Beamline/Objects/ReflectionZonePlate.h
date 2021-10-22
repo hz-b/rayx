@@ -1,7 +1,7 @@
 #pragma once
-#include "Surface/Quadric.h"
-#include "Surface/Toroid.h"
-#include "Beamline/OpticalElement.h"
+#include "Model/Surface/Quadric.h"
+#include "Model/Surface/Toroid.h"
+#include "Model/Beamline/OpticalElement.h"
 
 namespace RAYX
 {
@@ -16,8 +16,8 @@ namespace RAYX
         ReflectionZonePlate(const char* name, const int geometricalShape, const int curvatureType, const double width, const double height, const glm::dvec4 position, const glm::dmat4x4 orientation, const double designEnergy, const double orderOfDiffraction, const double designOrderOfDiffraction, const double dAlpha, const double dBeta, const double mEntrance, const double mExit, const double sEntrance, const double sExit, const double shortRadius, const double longRadius, const int additionalZeroOrder, const double fresnelZOffset, const std::vector<double> slopeError);
         ReflectionZonePlate();
         ~ReflectionZonePlate();
-        
-        
+
+
         // for calculating incidence and exit angle from user parameters
         void calcAlpha();
         void calcBeta2();
@@ -31,7 +31,7 @@ namespace RAYX
         void VectorR1Center();
         void VectorR2Center();
         double rzpLineDensityDZ(glm::dvec3 intersection, glm::dvec3 normal, const double WL);
-        
+
         // order of diffraction can be derived from the design order of diffraction (from user parameter)
         void calcDesignOrderOfDiffraction(const double designOrderOfDiffraction);
 
@@ -82,7 +82,7 @@ namespace RAYX
         double m_designEnergyMounting; //? derived from source?
         //TODO(Theresa): include in world coordinates:
         double m_elementOffsetZ; // given manually or has to be calculated by beam divergence
-        
+
         /** m_designAlphaAngle (incidence beam angle for which rzp is designed)
          *  and m_designBetaAngle (outgoing beam angle for which rzp is designed)
          *  are used to calculate line density. This is important for correctly
@@ -96,8 +96,8 @@ namespace RAYX
          *  is correct.
          *  @see m_designAlphaAngle
          */
-        // TODO(Jannis): decide designEnergy vs designWavelength
-        double m_designEnergy; 
+         // TODO(Jannis): decide designEnergy vs designWavelength
+        double m_designEnergy;
         double m_designWavelength;
         double m_designSagittalEntranceArmLength;
         double m_designSagittalExitArmLength;
@@ -111,12 +111,12 @@ namespace RAYX
         double m_betaAngle;
         double m_grazingIncidenceAngle;
         double m_R1ArmLength;
-        double m_R2ArmLength; 
+        double m_R2ArmLength;
         double m_lineDensity;
 
         GRATING_MOUNT m_gratingMount;
-        
-        
+
+
         // TODO(Jannis): move
         CURVATURE_TYPE m_curvatureType;
 

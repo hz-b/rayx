@@ -1,8 +1,5 @@
 #include <memory>
 
-#include "Beamline/Beamline.h"
-#include "Debug.h"
-#include "Data/Importer.h"
 #include "TerminalApp.h"
 
 TerminalApp::TerminalApp()

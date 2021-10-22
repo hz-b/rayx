@@ -1,6 +1,6 @@
 #pragma once
-#include "Surface/Quadric.h"
-#include "Beamline/OpticalElement.h"
+#include "Model/Surface/Quadric.h"
+#include "Model/Beamline/OpticalElement.h"
 
 namespace RAYX
 {
@@ -10,7 +10,7 @@ namespace RAYX
     public:
 
         // SphereMirror(const char* name, const double width, const double height, const double grazingIncidence, const double azimuthal, const double distanceToPreceedingElement, const double entranceArmLength, const double exitArmLength, const std::vector<double> misalignmentParams, const std::vector<double> slopeError, const std::shared_ptr<OpticalElement> previous, bool global);
-        
+
         // calculate radius in this class
         SphereMirror(const char* name, const int geometricalShape, const double width, const double height, const double grazingIncidenceAngle, glm::dvec4 position, glm::dmat4x4 orientation, const double entranceArmLength, const double exitArmLength, const std::vector<double> slopeError);
         // radius is precalculated and given as a parameter

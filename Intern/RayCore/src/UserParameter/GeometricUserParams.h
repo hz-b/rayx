@@ -6,7 +6,7 @@
 #include <stdexcept>
 #include "Core.h"
 #include "Ray.h"
-#include "Beamline/OpticalElement.h"
+#include "Model/Beamline/OpticalElement.h"
 #include "utils.h"
 #include <memory>
 #include <glm.hpp>
@@ -22,8 +22,8 @@ namespace RAYX
         // constructor for gratings
         GeometricUserParams(int mount, double deviation, double normalIncidence, double lineDensity, double designEnergy, double additionalOrder, int orderOfDiffraction);
         // constructor for rzp
-        GeometricUserParams(int mount, int imageType, double deviationAngle, double grazingIncidence, double grazingExitAngle, double sourceEnergy, double designEnergy, double orderOfDiffraction, double designOrderOfDiffraction, 
-                double designAlphaAngle, double designBetaAngle, double mEntrance, double mExit, double sEntrance, double sExit);
+        GeometricUserParams(int mount, int imageType, double deviationAngle, double grazingIncidence, double grazingExitAngle, double sourceEnergy, double designEnergy, double orderOfDiffraction, double designOrderOfDiffraction,
+            double designAlphaAngle, double designBetaAngle, double mEntrance, double mExit, double sEntrance, double sExit);
         GeometricUserParams();
         ~GeometricUserParams();
 

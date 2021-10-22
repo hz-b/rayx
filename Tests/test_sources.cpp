@@ -1,9 +1,9 @@
 #include "gtest/gtest.h"
 #include "gmock/gmock.h"
 
-#include "Beamline/Beamline.h"
-#include "Beamline/Objects/MatrixSource.h"
-#include "Beamline/Objects/PointSource.h"
+#include "Model/Beamline/Beamline.h"
+#include "Model/Beamline/Objects/MatrixSource.h"
+#include "Model/Beamline/Objects/PointSource.h"
 
 #include "Presenter/SimulationEnv.h"
 
@@ -26,7 +26,7 @@ void writeRaysToFile(std::list<double> outputRays, std::string name)
     outputFile.open(filename);
     char sep = ';'; // file is saved in .csv (comma seperated value), excel compatibility is manual right now
     outputFile << "Index" << sep << "Xloc" << sep << "Yloc" << sep << "Zloc" << sep << "Weight" << sep << "Xdir" << sep << "Ydir" << sep << "Zdir" << sep << "Energy" << sep << "S0" << sep << "S1" << sep << "S2" << sep << "S3" << std::endl;
-    
+
     size_t counter = 0;
     int print = 0; // whether to print on std::out (0=no, 1=yes)
     for (std::list<double>::iterator i = outputRays.begin(); i != outputRays.end(); i++) {
@@ -36,7 +36,7 @@ void writeRaysToFile(std::list<double> outputRays, std::string name)
             if (print == 1) std::cout << "(";
         }
         outputFile << sep << *i;
-        if (counter % RAY_DOUBLE_COUNT == RAY_DOUBLE_COUNT-1) {
+        if (counter % RAY_DOUBLE_COUNT == RAY_DOUBLE_COUNT - 1) {
             outputFile << std::endl;
             counter++;
             continue;
@@ -212,7 +212,7 @@ TEST(LightSource, PointSourceHardEdge) {
         ASSERT_TRUE(r.m_energy <= photonEnergy + (energySpread / 2));
     }
     std::cout << rayList.size() << std::endl;
-    ASSERT_EQ(rayList.size(), number_of_rays*RAY_DOUBLE_COUNT);
+    ASSERT_EQ(rayList.size(), number_of_rays * RAY_DOUBLE_COUNT);
     writeRaysToFile(rayList, "pointSourceHE");
 }
 
@@ -258,7 +258,7 @@ TEST(LightSource, PointSourceSoftEdge) {
         ASSERT_TRUE(r.m_energy <= photonEnergy + (energySpread / 2));
     }
     std::cout << rayList.size() << std::endl;
-    ASSERT_EQ(rayList.size(), number_of_rays*RAY_DOUBLE_COUNT);
+    ASSERT_EQ(rayList.size(), number_of_rays * RAY_DOUBLE_COUNT);
     writeRaysToFile(rayList, "pointSourceSE");
 }
 
@@ -300,7 +300,7 @@ TEST(LightSource, PointSourceHardEdgeMis) {
         ASSERT_TRUE(r.m_energy <= photonEnergy + (energySpread / 2));
     }
     std::cout << rayList.size() << std::endl;
-    ASSERT_EQ(rayList.size(), number_of_rays*RAY_DOUBLE_COUNT);
+    ASSERT_EQ(rayList.size(), number_of_rays * RAY_DOUBLE_COUNT);
     writeRaysToFile(rayList, "pointSourceHE_mis");
 }
 
@@ -341,7 +341,7 @@ TEST(LightSource, PointSourceSoftEdgeMis) {
         ASSERT_TRUE(r.m_energy <= photonEnergy + (energySpread / 2));
     }
     std::cout << rayList.size() << std::endl;
-    ASSERT_EQ(rayList.size(), number_of_rays*RAY_DOUBLE_COUNT);
+    ASSERT_EQ(rayList.size(), number_of_rays * RAY_DOUBLE_COUNT);
     writeRaysToFile(rayList, "pointSourceSE_mis");
 }
 
@@ -376,7 +376,7 @@ TEST(LightSource, MatrixSource20000) {
         ASSERT_TRUE(r.m_energy <= photonEnergy + (energySpread / 2));
     }
     std::cout << rayList.size() << std::endl;
-    ASSERT_EQ(rayList.size(), number_of_rays*RAY_DOUBLE_COUNT);
+    ASSERT_EQ(rayList.size(), number_of_rays * RAY_DOUBLE_COUNT);
     writeRaysToFile(rayList, "matrixsource20000");
 }
 
@@ -409,6 +409,6 @@ TEST(LightSource, PointSource20000) {
         rayList.push_back(r.m_stokes.w);
     }
     std::cout << rayList.size() << std::endl;
-    ASSERT_EQ(rayList.size(), number_of_rays*RAY_DOUBLE_COUNT);
+    ASSERT_EQ(rayList.size(), number_of_rays * RAY_DOUBLE_COUNT);
     writeRaysToFile(rayList, "pointsource20000");
 }

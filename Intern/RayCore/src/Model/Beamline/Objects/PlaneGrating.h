@@ -1,6 +1,6 @@
 #pragma once
-#include "Surface/Quadric.h"
-#include "Beamline/OpticalElement.h"
+#include "Model/Surface/Quadric.h"
+#include "Model/Beamline/OpticalElement.h"
 
 namespace RAYX
 {
@@ -28,7 +28,7 @@ namespace RAYX
         std::vector<double> getVls();
 
     private:
-        
+
         int m_additionalOrder;
         double m_designEnergyMounting;
         double m_lineDensity;

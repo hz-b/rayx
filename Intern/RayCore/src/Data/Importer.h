@@ -2,7 +2,7 @@
 
 #include <memory>
 
-#include "Beamline/Beamline.h"
+#include "Model/Beamline/Beamline.h"
 #include "Core.h"
 
 namespace RAYX

@@ -2,8 +2,8 @@
 
 #include <memory>
 
-#include "Beamline/LightSource.h"
-#include "Beamline/Beamline.h"
+#include "Model/Beamline/LightSource.h"
+#include "Model/Beamline/Beamline.h"
 #include "Core.h"
 #include "Tracer/TracerInterface.h"
 

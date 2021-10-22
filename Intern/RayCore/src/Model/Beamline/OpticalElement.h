@@ -7,7 +7,7 @@
 
 #include "BeamlineObject.h"
 #include "Core.h"
-#include "Surface/Surface.h"
+#include "Model/Surface/Surface.h"
 #include "utils.h"
 #include <glm.hpp>
 

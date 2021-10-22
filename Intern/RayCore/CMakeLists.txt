@@ -2,74 +2,76 @@ cmake_minimum_required(VERSION 3.15 FATAL_ERROR)
 project(RayCore)
 
 SET(SOURCE
-    src/RayCore/Application.cpp
-    src/RayCore/utils.cpp
-    src/RayCore/Beamline/Beamline.cpp
-    src/RayCore/Beamline/BeamlineObject.cpp
-    src/RayCore/Beamline/OpticalElement.cpp
-    src/RayCore/Beamline/LightSource.cpp
-    src/RayCore/Beamline/BeamlineObjectFactory.cpp
-    src/RayCore/Beamline/Objects/ImagePlane.cpp
-    src/RayCore/Beamline/Objects/MatrixSource.cpp
-    src/RayCore/Beamline/Objects/RandomRays.cpp
-    src/RayCore/Beamline/Objects/PointSource.cpp
-    src/RayCore/Beamline/Objects/Ellipsoid.cpp
-    src/RayCore/Beamline/Objects/ReflectionZonePlate.cpp
-    src/RayCore/Beamline/Objects/Slit.cpp
-    src/RayCore/Beamline/Objects/SphereGrating.cpp
-    src/RayCore/Beamline/Objects/PlaneGrating.cpp
-    src/RayCore/Beamline/Objects/PlaneMirror.cpp
-    src/RayCore/Beamline/Objects/PointSource.cpp
-    src/RayCore/Beamline/Objects/SphereMirror.cpp
-    src/RayCore/Beamline/Objects/ToroidMirror.cpp
-    src/RayCore/Data/Exporter.cpp
-    src/RayCore/Data/Importer.cpp
-    src/RayCore/Data/xml.cpp
-    src/RayCore/Presenter/Presenter.cpp
-    src/RayCore/Presenter/SimulationEnv.cpp
-    src/RayCore/Surface/Quadric.cpp
-    src/RayCore/Surface/Toroid.cpp
-    src/RayCore/Surface/Surface.cpp
-    src/RayCore/Tracer/Ray.cpp
-    src/RayCore/Tracer/TracerInterface.cpp
-    src/RayCore/UserParameter/WorldCoordinates.cpp
-    src/RayCore/UserParameter/GeometricUserParams.cpp
+    src/Application.cpp
+    src/utils.cpp
+    src/Model/Beamline/Beamline.cpp
+    src/Model/Beamline/BeamlineObject.cpp
+    src/Model/Beamline/OpticalElement.cpp
+    src/Model/Beamline/LightSource.cpp
+    src/Model/Beamline/BeamlineObjectFactory.cpp
+    src/Model/Beamline/Objects/ImagePlane.cpp
+    src/Model/Beamline/Objects/MatrixSource.cpp
+    src/Model/Beamline/Objects/RandomRays.cpp
+    src/Model/Beamline/Objects/PointSource.cpp
+    src/Model/Beamline/Objects/Ellipsoid.cpp
+    src/Model/Beamline/Objects/ReflectionZonePlate.cpp
+    src/Model/Beamline/Objects/Slit.cpp
+    src/Model/Beamline/Objects/SphereGrating.cpp
+    src/Model/Beamline/Objects/PlaneGrating.cpp
+    src/Model/Beamline/Objects/PlaneMirror.cpp
+    src/Model/Beamline/Objects/PointSource.cpp
+    src/Model/Beamline/Objects/SphereMirror.cpp
+    src/Model/Beamline/Objects/ToroidMirror.cpp
+    src/Data/Exporter.cpp
+    src/Data/Importer.cpp
+    src/Data/xml.cpp
+    src/Presenter/Presenter.cpp
+    src/Presenter/SimulationEnv.cpp
+    src/Model/Surface/Quadric.cpp
+    src/Model/Surface/Toroid.cpp
+    src/Model/Surface/Surface.cpp
+    src/Model/Geometry/Geometry.h
+    src/Tracer/Ray.cpp
+    src/Tracer/TracerInterface.cpp
+    src/UserParameter/WorldCoordinates.cpp
+    src/UserParameter/GeometricUserParams.cpp
 )
 
 SET(HEADERS
-    src/RayCore/Application.h
-    src/RayCore/Debug.h
-    src/RayCore/utils.h
-    src/RayCore/Beamline/Beamline.h
-    src/RayCore/Beamline/BeamlineObject.h
-    src/RayCore/Beamline/OpticalElement.h
-    src/RayCore/Beamline/LightSource.h
-    src/RayCore/Beamline/BeamlineObjectFactory.h
-    src/RayCore/Beamline/Objects/ImagePlane.h
-    src/RayCore/Beamline/Objects/MatrixSource.h
-    src/RayCore/Beamline/Objects/RandomRays.h
-    src/RayCore/Beamline/Objects/PointSource.h
-    src/RayCore/Beamline/Objects/Ellipsoid.h
-    src/RayCore/Beamline/Objects/ReflectionZonePlate.h
-    src/RayCore/Beamline/Objects/Slit.h
-    src/RayCore/Beamline/Objects/SphereGrating.h
-    src/RayCore/Beamline/Objects/PlaneGrating.h
-    src/RayCore/Beamline/Objects/PlaneMirror.h
-    src/RayCore/Beamline/Objects/PointSource.h
-    src/RayCore/Beamline/Objects/SphereMirror.h
-    src/RayCore/Beamline/Objects/ToroidMirror.h
-    src/RayCore/Data/Exporter.h
-    src/RayCore/Data/Importer.h
-    src/RayCore/Data/xml.h
-    src/RayCore/Presenter/Presenter.h
-    src/RayCore/Presenter/SimulationEnv.h
-    src/RayCore/Surface/Quadric.h
-    src/RayCore/Surface/Toroid.h
-    src/RayCore/Surface/Surface.h
-    src/RayCore/Tracer/Ray.h
-    src/RayCore/Tracer/TracerInterface.h
-    src/RayCore/UserParameter/WorldCoordinates.h
-    src/RayCore/UserParameter/GeometricUserParams.h
+    src/Application.h
+    src/Debug.h
+    src/utils.h
+    src/Model/Beamline/Beamline.h
+    src/Model/Beamline/BeamlineObject.h
+    src/Model/Beamline/OpticalElement.h
+    src/Model/Beamline/LightSource.h
+    src/Model/Beamline/BeamlineObjectFactory.h
+    src/Model/Beamline/Objects/ImagePlane.h
+    src/Model/Beamline/Objects/MatrixSource.h
+    src/Model/Beamline/Objects/RandomRays.h
+    src/Model/Beamline/Objects/PointSource.h
+    src/Model/Beamline/Objects/Ellipsoid.h
+    src/Model/Beamline/Objects/ReflectionZonePlate.h
+    src/Model/Beamline/Objects/Slit.h
+    src/Model/Beamline/Objects/SphereGrating.h
+    src/Model/Beamline/Objects/PlaneGrating.h
+    src/Model/Beamline/Objects/PlaneMirror.h
+    src/Model/Beamline/Objects/PointSource.h
+    src/Model/Beamline/Objects/SphereMirror.h
+    src/Model/Beamline/Objects/ToroidMirror.h
+    src/Data/Exporter.h
+    src/Data/Importer.h
+    src/Data/xml.h
+    src/Presenter/Presenter.h
+    src/Presenter/SimulationEnv.h
+    src/Model/Surface/Quadric.h
+    src/Model/Surface/Toroid.h
+    src/Model/Surface/Surface.h
+    src/Model/Geometry/Geometry.h
+    src/Tracer/Ray.h
+    src/Tracer/TracerInterface.h
+    src/UserParameter/WorldCoordinates.h
+    src/UserParameter/GeometricUserParams.h
 )
 
 
@@ -100,7 +102,7 @@ target_compile_definitions(${PROJECT_NAME}
 )
 
 target_include_directories(${PROJECT_NAME}  
-    PUBLIC ${RayCore_SOURCE_DIR}/src/RayCore/
+    PUBLIC ${RayCore_SOURCE_DIR}/src/
     PUBLIC ${RayCore_SOURCE_DIR}/../../Extern/glm/glm/
     PUBLIC ${RayCore_SOURCE_DIR}/../../Extern/rapidxml-1.13/
 )
