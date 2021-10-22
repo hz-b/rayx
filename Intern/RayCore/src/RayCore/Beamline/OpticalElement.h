@@ -73,8 +73,9 @@ namespace RAYX
         OpticalElement();
         ~OpticalElement();
 
-        enum GEOMETRICAL_SHAPE { GS_RECTANGLE, GS_ELLIPTICAL }; // influences wastebox function in shader
-        enum GRATING_MOUNT { GM_DEVIATION, GM_INCIDENCE }; // influences incidence and exit angle calculation (moved somewhere else)
+        // TODO(Jannis): move to geometry
+        enum GEOMETRICAL_SHAPE { GS_RECTANGLE, GS_ELLIPTICAL }; ///< influences wastebox function in shader
+        enum GRATING_MOUNT { GM_DEVIATION, GM_INCIDENCE }; ///< influences incidence and exit angle calculation (moved somewhere else)
 
     private:
         // Geometric Parameter
@@ -83,8 +84,8 @@ namespace RAYX
         // 7 paramters that specify the slope error, are stored in objectParamters to give to shader
         std::vector<double> m_slopeError;
         // stored only for completeness and not to transfer to the shader, these transformations are part of inMatrix/outMatrix which are transferred.
-        glm::dmat4x4 d_misalignmentMatrix;
-        glm::dmat4x4 d_inverseMisalignmentMatrix;
+        glm::dmat4x4 m_misalignmentMatrix;
+        glm::dmat4x4 m_inverseMisalignmentMatrix;
 
 
         // User/Design Parameter
@@ -100,13 +101,13 @@ namespace RAYX
         // transformation matrices:
         // beam element transformation matrices derived directly from params alpha, beta, chi and distance
         // TODO(Jannis): remove and make local for functions that need them
-        glm::dmat4x4 d_b2e; // inTrans M_b2e
-        glm::dmat4x4 d_e2b; // outTrans M_e2b
-        glm::dmat4x4 d_inv_b2e; // invInTrans; (M_b2e)^-1
-        glm::dmat4x4 d_inv_e2b; // invOutTrans; (M_e2b)^-1 = (M_e2b)^T
+        glm::dmat4x4 m_b2e; // inTrans M_b2e
+        glm::dmat4x4 m_e2b; // outTrans M_e2b
+        glm::dmat4x4 m_inv_b2e; // invInTrans; (M_b2e)^-1
+        glm::dmat4x4 m_inv_e2b; // invOutTrans; (M_e2b)^-1 = (M_e2b)^T
         // transformation between global and element coordinate system, derived from beam-element matrices (of this and previous element, see wiki)
-        glm::dmat4x4 d_g2e; // m_inTransMis
-        glm::dmat4x4 d_e2g; // m_outTransMis;
+        glm::dmat4x4 m_g2e; // m_inTransMis
+        glm::dmat4x4 m_e2g; // m_outTransMis;
         // ----
 
         // Surface (eg Quadric or if eg torus something else)

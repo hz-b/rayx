@@ -62,7 +62,7 @@ namespace RAYX
 
         const clock_t begin_time = clock();
         m_RayTracer.run(); //run tracer
-        std::cout << "tracer run time: " << float(clock() - begin_time) / CLOCKS_PER_SEC * 1000 << " ms" << std::endl;
+        std::cout << "tracer run time: " << float(clock() - begin_time) / (CLOCKS_PER_SEC * 1000) << " ms" << std::endl;
 
         RAYX_DEBUG(std::cout << "run succeeded" << std::endl);
 
@@ -95,7 +95,7 @@ namespace RAYX
         }
         outputFile.close();
 
-        RAYX_DEBUG(std::cout << "tracer run incl load rays time: " << float(clock() - begin_time) / CLOCKS_PER_SEC * 1000 << " ms" << std::endl);
+        RAYX_DEBUG(std::cout << "tracer run incl load rays time: " << float(clock() - begin_time) / (CLOCKS_PER_SEC * 1000) << " ms" << std::endl);
 
         //clean up tracer to avoid memory leaks
         m_RayTracer.cleanup();
@@ -113,7 +113,7 @@ namespace RAYX
 
         if (SHORTOUTPUT) {
             char buff[64];
-            for (size_t i = 0; i < size; i = i + RAY_DOUBLE_COUNT) { // ! + 8 because of placeholder
+            for (size_t i = 0; i < size; i = i + RAY_DOUBLE_COUNT) {
                 sprintf(buff, "%d;%.17f;%.17f\n", index, outputRays[i], outputRays[i + 1]);
                 file << buff;
                 index++;
@@ -121,7 +121,7 @@ namespace RAYX
         }
         else {
             char buff[384];
-            for (size_t i = 0; i < size; i = i + RAY_DOUBLE_COUNT) { // ! + 8 because of placeholder 
+            for (size_t i = 0; i < size; i = i + RAY_DOUBLE_COUNT) {
                 sprintf(buff, "%d;%.17f;%.17f;%.17f;%.17f;%.17f;%.17f;%.17f;%.17f;%.17f;%.17f;%.17f;%.17f\n", index,
                     outputRays[i], outputRays[i + 1], outputRays[i + 2], outputRays[i + 3],
                     outputRays[i + 4], outputRays[i + 5], outputRays[i + 6], outputRays[i + 7],

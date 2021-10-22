@@ -19,10 +19,10 @@ namespace RAYX
 
     private:
         SimulationEnv() :
-            m_idCounter(0),
-            m_numOfRays(200000)
+            m_numOfRays(200000),
+            m_idCounter(0)
         {}
 
-        size_t m_idCounter = 0;
+        size_t m_idCounter;
     };
 } // namespace RAYX

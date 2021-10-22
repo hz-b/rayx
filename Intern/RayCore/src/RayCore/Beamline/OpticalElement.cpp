@@ -55,10 +55,11 @@ namespace RAYX
         m_slopeError(slopeError),
         m_elementParameters(EParameters)
     {
-        if(geometricalShape == 0) {
+        if (geometricalShape == 0) {
             m_width = width;
             m_height = height;
-        }else if(geometricalShape == 1) {
+        }
+        else if (geometricalShape == 1) {
             m_width = -width;
             m_height = -height;
         }
@@ -76,15 +77,16 @@ namespace RAYX
         m_previous(previous),
         m_slopeError(slopeError)
     {
-        if(geometricalShape == 0) {
+        if (geometricalShape == 0) {
             m_width = width;
             m_height = height;
-        }else if(geometricalShape == 1) {
+        }
+        else if (geometricalShape == 1) {
             m_width = -width;
             m_height = -height;
         }
         updateObjectParams();
-        
+
     }
 
     OpticalElement::OpticalElement(const char* name, const double chi, const double dist, const std::vector<double> slopeError, const std::shared_ptr<OpticalElement> previous)
@@ -118,10 +120,11 @@ namespace RAYX
         m_slopeError(slopeError)
     {
         assert(EParameters.size() == 16 && slopeError.size() == 7 && tempMisalignmentParams.size() == 6);
-        if(geometricalShape == 0) {
+        if (geometricalShape == 0) {
             m_width = width;
             m_height = height;
-        }else if(geometricalShape == 1) {
+        }
+        else if (geometricalShape == 1) {
             m_width = -width;
             m_height = -height;
         }
@@ -143,10 +146,11 @@ namespace RAYX
         : BeamlineObject(name),
         m_slopeError(slopeError)
     {
-        if(geometricalShape == 0) {
+        if (geometricalShape == 0) {
             m_width = width;
             m_height = height;
-        }else if(geometricalShape == 1) {
+        }
+        else if (geometricalShape == 1) {
             m_width = -width;
             m_height = -height;
         }
@@ -221,21 +225,21 @@ namespace RAYX
                 0, -sin_a, cos_a, 0,
                 0, 0, 0, 1};
         std::vector<double> d_inTranslation = {1,0,0,0, 0,1,0,0, 0,0,1,0, 0,0,-dist,1};*/
-        d_b2e = glm::dmat4x4(cos_c, -sin_c * cos_a, -sin_c * sin_a, 0, // M_b2e
+        m_b2e = glm::dmat4x4(cos_c, -sin_c * cos_a, -sin_c * sin_a, 0, // M_b2e
             sin_c, cos_c * cos_a, sin_a * cos_c, 0,
             0, -sin_a, cos_a, 0,
             0, m_distanceToPreceedingElement * sin_a, -m_distanceToPreceedingElement * cos_a, 1);
 
-        d_inv_b2e = glm::dmat4x4(cos_c, sin_c, 0, 0,            // (M_b2e)^-1
+        m_inv_b2e = glm::dmat4x4(cos_c, sin_c, 0, 0,            // (M_b2e)^-1
             -sin_c * cos_a, cos_c * cos_a, -sin_a, 0,
             -sin_c * sin_a, sin_a * cos_c, cos_a, 0,
             0, 0, m_distanceToPreceedingElement, 1);
 
-        d_e2b = glm::dmat4x4(cos_c, sin_c, 0, 0, // M_e2b
+        m_e2b = glm::dmat4x4(cos_c, sin_c, 0, 0, // M_e2b
             -sin_c * cos_b, cos_c * cos_b, sin_b, 0,
             sin_c * sin_b, -cos_c * sin_b, cos_b, 0,
             0, 0, 0, 1);
-        d_inv_e2b = glm::dmat4x4(cos_c, -sin_c * cos_b, sin_c * sin_b, 0, // rotation -> orthogonal -> inverse = transpose
+        m_inv_e2b = glm::dmat4x4(cos_c, -sin_c * cos_b, sin_c * sin_b, 0, // rotation -> orthogonal -> inverse = transpose
             sin_c, cos_c * cos_b, -cos_c * sin_b, 0,
             0, sin_b, cos_b, 0,
             0, 0, 0, 1);
@@ -251,7 +255,7 @@ namespace RAYX
         m_misalignmentParams = misalignment;
         // transpose of original matrix, multiplication order: 1.chi(z) 2.phi(y) 3.psi(x), 4.dx, 5.dy, 6.dz
         // ray = tran * rot * ray
-        d_misalignmentMatrix = glm::dmat4x4(cos(dphi) * cos(dchi), -cos(dpsi) * sin(dchi) - sin(dpsi) * sin(dphi) * cos(dchi), -sin(dpsi) * sin(dchi) + cos(dpsi) * sin(dphi) * cos(dchi), 0,
+        m_misalignmentMatrix = glm::dmat4x4(cos(dphi) * cos(dchi), -cos(dpsi) * sin(dchi) - sin(dpsi) * sin(dphi) * cos(dchi), -sin(dpsi) * sin(dchi) + cos(dpsi) * sin(dphi) * cos(dchi), 0,
             sin(dchi) * cos(dphi), cos(dpsi) * cos(dchi) - sin(dpsi) * sin(dphi) * sin(dchi), sin(dpsi) * cos(dchi) + cos(dpsi) * sin(dphi) * sin(dchi), 0,
             -sin(dphi), -sin(dpsi) * cos(dphi), cos(dpsi) * cos(dphi), 0,
             -dx, -dy, -dz, 1);
@@ -266,40 +270,40 @@ namespace RAYX
             0, 0, 1, 0,
             dx, dy, dz, 1);
         // inv(rot) * inv(tran) * ray
-        d_inverseMisalignmentMatrix = inverseRotation * inverseTranslation;
+        m_inverseMisalignmentMatrix = inverseRotation * inverseTranslation;
 
         // add misalignment to beam<->element transformations
-        d_b2e = d_misalignmentMatrix * d_b2e;
-        d_inv_b2e = d_inv_b2e * d_inverseMisalignmentMatrix;
-        d_inv_e2b = d_misalignmentMatrix * d_inv_e2b;
-        d_e2b = d_e2b * d_inverseMisalignmentMatrix;
+        m_b2e = m_misalignmentMatrix * m_b2e;
+        m_inv_b2e = m_inv_b2e * m_inverseMisalignmentMatrix;
+        m_inv_e2b = m_misalignmentMatrix * m_inv_e2b;
+        m_e2b = m_e2b * m_inverseMisalignmentMatrix;
 
 
         // world coordinates = world coord of previous element * transformation from previous element to this one
         if (m_previous != NULL) { //Mi_g2e = M_i_b2e * M_(i-1))_e2b * M_(i-1)_g2e
             std::cout << "calc world coordinates" << std::endl;
-            d_g2e = m_previous->getE2B() * m_previous->getG2E();
-            printDMat4(d_b2e);
-            d_g2e = d_b2e * d_g2e;
+            m_g2e = m_previous->getE2B() * m_previous->getG2E();
+            printDMat4(m_b2e);
+            m_g2e = m_b2e * m_g2e;
             // Mi_e2g = M_(i-1)_e2g * M_(i-1)_e2b^-1 * M_i_b2e^-1
-            d_e2g = m_previous->getInvE2B() * d_inv_b2e;
-            d_e2g = m_previous->getE2G() * d_e2g;
+            m_e2g = m_previous->getInvE2B() * m_inv_b2e;
+            m_e2g = m_previous->getE2G() * m_e2g;
         }
         else {
-            d_g2e = d_b2e;
-            d_e2g = d_inv_b2e;
+            m_g2e = m_b2e;
+            m_e2g = m_inv_b2e;
             std::cout << "first element" << std::endl;
         }
 
         if (global) {  // combine in and out transformation (global <-> element coordinates) with misalignment
             std::cout << "global" << std::endl;
-            m_inMatrix = glmToVector16(d_g2e);
-            m_outMatrix = glmToVector16(d_e2g);
+            m_inMatrix = glmToVector16(m_g2e);
+            m_outMatrix = glmToVector16(m_e2g);
         }
         else {  // to use usual ray coordinatesystem, also contains misalignment
             std::cout << "RAY-UI beam coordinates" << std::endl;
-            m_inMatrix = glmToVector16(d_b2e);
-            m_outMatrix = glmToVector16(d_e2b);
+            m_inMatrix = glmToVector16(m_b2e);
+            m_outMatrix = glmToVector16(m_e2b);
         }
 
         std::cout.precision(17);
@@ -432,42 +436,42 @@ namespace RAYX
 
     glm::dmat4x4 OpticalElement::getMisalignmentMatrix() const
     {
-        return d_misalignmentMatrix;
+        return m_misalignmentMatrix;
     }
 
     glm::dmat4x4 OpticalElement::getInverseMisalignmentMatrix() const
     {
-        return d_inverseMisalignmentMatrix;
+        return m_inverseMisalignmentMatrix;
     }
 
     glm::dmat4x4 OpticalElement::getB2E() const
     {
-        return d_b2e;
+        return m_b2e;
     }
 
     glm::dmat4x4 OpticalElement::getE2B() const
     {
-        return d_e2b;
+        return m_e2b;
     }
 
     glm::dmat4x4 OpticalElement::getInvB2E() const
     {
-        return d_inv_b2e;
+        return m_inv_b2e;
     }
 
     glm::dmat4x4 OpticalElement::getInvE2B() const
     {
-        return d_inv_e2b;
+        return m_inv_e2b;
     }
 
     glm::dmat4x4 OpticalElement::getE2G() const
     {
-        return d_e2g;
+        return m_e2g;
     }
 
     glm::dmat4x4 OpticalElement::getG2E() const
     {
-        return d_g2e;
+        return m_g2e;
     }
 
     std::vector<double> OpticalElement::getTempMisalignmentParams() const
