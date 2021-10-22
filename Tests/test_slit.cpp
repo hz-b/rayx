@@ -2,7 +2,7 @@
 #include "gmock/gmock.h"
 #include "Model/Beamline/Beamline.h"
 #include "Model/Beamline/Objects/Slit.h"
-#include "UserParameter/WorldCoordinates.h"
+#include "UserParameter/WorldUserParams.h"
 #include "UserParameter/GeometricUserParams.h"
 #include "Core.h"
 #include "Ray.h"
@@ -81,7 +81,7 @@ TEST(Slit, defaultParams) {
     double energy = 100;
     std::vector<double> misalignment = { 0,0,0, 0,0,0 };
 
-    RAYX::WorldCoordinates w_coord = RAYX::WorldCoordinates(0, 0, degToRad(chi), dist, misalignment);
+    RAYX::WorldUserParams w_coord = RAYX::WorldUserParams(0, 0, degToRad(chi), dist, misalignment);
     RAYX::Slit s = RAYX::Slit("slit", geometricalShape, beamstop, width, height, w_coord.calcPosition(), w_coord.calcOrientation(), beamstopWidth, beamstopHeight, energy);
     //RAYX::Slit s = RAYX::Slit("slitt", geometricalShape, beamstop, width, height, chi, dist, beamstopWidth, beamstopHeight, energy, misalignment, nullptr, true);
 
@@ -119,7 +119,7 @@ TEST(Slit, rectangleBeamstop) {
     double energy = 100;
     std::vector<double> misalignment = { 0,0,0, 0,0,0 };
 
-    RAYX::WorldCoordinates w_coord = RAYX::WorldCoordinates(0, 0, degToRad(chi), dist, misalignment);
+    RAYX::WorldUserParams w_coord = RAYX::WorldUserParams(0, 0, degToRad(chi), dist, misalignment);
     //RAYX::Slit s = RAYX::Slit("slitt", geometricalShape, beamstop, width, height, chi, dist, beamstopWidth, beamstopHeight, energy, misalignment, nullptr, true);
     RAYX::Slit s = RAYX::Slit("slit", geometricalShape, beamstop, width, height, w_coord.calcPosition(), w_coord.calcOrientation(), beamstopWidth, beamstopHeight, energy);
 
@@ -155,7 +155,7 @@ TEST(Slit, ellipticalBeamstop) {
     double energy = 100;
     std::vector<double> misalignment = { 0,0,0, 0,0,0 };
 
-    RAYX::WorldCoordinates w_coord = RAYX::WorldCoordinates(0, 0, degToRad(chi), dist, misalignment);
+    RAYX::WorldUserParams w_coord = RAYX::WorldUserParams(0, 0, degToRad(chi), dist, misalignment);
     //RAYX::Slit s = RAYX::Slit("slitt", geometricalShape, beamstop, width, height, chi, dist, beamstopWidth, beamstopHeight, energy, misalignment, nullptr, true);
     RAYX::Slit s = RAYX::Slit("slit", geometricalShape, beamstop, width, height, w_coord.calcPosition(), w_coord.calcOrientation(), beamstopWidth, beamstopHeight, energy);
 
@@ -192,7 +192,7 @@ TEST(Slit, ellipticalSlitellipticalBeamstop) {
     double energy = 100;
     std::vector<double> misalignment = { 0,0,0, 0,0,0 };
 
-    RAYX::WorldCoordinates w_coord = RAYX::WorldCoordinates(0, 0, degToRad(chi), dist, misalignment);
+    RAYX::WorldUserParams w_coord = RAYX::WorldUserParams(0, 0, degToRad(chi), dist, misalignment);
     //RAYX::Slit s = RAYX::Slit("slitt", geometricalShape, beamstop, width, height, chi, dist, beamstopWidth, beamstopHeight, energy, misalignment, nullptr, true);
     RAYX::Slit s = RAYX::Slit("slit", geometricalShape, beamstop, width, height, w_coord.calcPosition(), w_coord.calcOrientation(), beamstopWidth, beamstopHeight, energy);
 
@@ -229,7 +229,7 @@ TEST(Slit, ellipticalSlitrectangleBeamstop) {
     double energy = 100;
     std::vector<double> misalignment = { 0,0,0, 0,0,0 };
 
-    RAYX::WorldCoordinates w_coord = RAYX::WorldCoordinates(0, 0, degToRad(chi), dist, misalignment);
+    RAYX::WorldUserParams w_coord = RAYX::WorldUserParams(0, 0, degToRad(chi), dist, misalignment);
     //RAYX::Slit s = RAYX::Slit("slitt", geometricalShape, beamstop, width, height, chi, dist, beamstopWidth, beamstopHeight, energy, misalignment, nullptr, true);
     RAYX::Slit s = RAYX::Slit("slit", geometricalShape, beamstop, width, height, w_coord.calcPosition(), w_coord.calcOrientation(), beamstopWidth, beamstopHeight, energy);
 
@@ -266,7 +266,7 @@ TEST(Slit, ellipticalSlitNoBeamstop) {
     double energy = 100;
     std::vector<double> misalignment = { 0,0,0, 0,0,0 };
 
-    RAYX::WorldCoordinates w_coord = RAYX::WorldCoordinates(0, 0, degToRad(chi), dist, misalignment);
+    RAYX::WorldUserParams w_coord = RAYX::WorldUserParams(0, 0, degToRad(chi), dist, misalignment);
     //RAYX::Slit s = RAYX::Slit("slitt", geometricalShape, beamstop, width, height, chi, dist, beamstopWidth, beamstopHeight, energy, misalignment, nullptr, true);
     RAYX::Slit s = RAYX::Slit("slit", geometricalShape, beamstop, width, height, w_coord.calcPosition(), w_coord.calcOrientation(), beamstopWidth, beamstopHeight, energy);
 

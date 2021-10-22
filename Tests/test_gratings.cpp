@@ -6,7 +6,7 @@
 #include "Model/Beamline/OpticalElement.h"
 #include "utils.h"
 
-#include "UserParameter/WorldCoordinates.h"
+#include "UserParameter/WorldUserParams.h"
 #include "UserParameter/GeometricUserParams.h"
 #include "Core.h"
 #include "Ray.h"
@@ -75,7 +75,7 @@ TEST(planeGrating, testParams) {
     ASSERT_DOUBLE_EQ(g_guparam.getAlpha(), alpha);
     ASSERT_DOUBLE_EQ(g_guparam.getBeta(), beta);
 
-    RAYX::WorldCoordinates g_params = RAYX::WorldCoordinates(g_guparam.getAlpha(), g_guparam.getBeta(), degToRad(azimuthal), dist, mis);
+    RAYX::WorldUserParams g_params = RAYX::WorldUserParams(g_guparam.getAlpha(), g_guparam.getBeta(), degToRad(azimuthal), dist, mis);
     glm::dvec4 position = g_params.calcPosition();
     glm::dmat4x4 orientation = g_params.calcOrientation();
 
@@ -137,7 +137,7 @@ TEST(planeGraing, mount1) {
     ASSERT_DOUBLE_EQ(g_guparam.getAlpha(), alpha);
     ASSERT_DOUBLE_EQ(g_guparam.getBeta(), beta);
 
-    RAYX::WorldCoordinates g_params = RAYX::WorldCoordinates(g_guparam.getAlpha(), g_guparam.getBeta(), degToRad(azimuthal), dist, mis);
+    RAYX::WorldUserParams g_params = RAYX::WorldUserParams(g_guparam.getAlpha(), g_guparam.getBeta(), degToRad(azimuthal), dist, mis);
     glm::dvec4 position = g_params.calcPosition();
     glm::dmat4x4 orientation = g_params.calcOrientation();
 
@@ -197,7 +197,7 @@ TEST(planeGrating, higherOrderOfDiffraction) {
     ASSERT_DOUBLE_EQ(g_guparam.getAlpha(), alpha);
     ASSERT_DOUBLE_EQ(g_guparam.getBeta(), beta);
 
-    RAYX::WorldCoordinates g_params = RAYX::WorldCoordinates(alpha, beta, degToRad(azimuthal), dist, mis);
+    RAYX::WorldUserParams g_params = RAYX::WorldUserParams(alpha, beta, degToRad(azimuthal), dist, mis);
     glm::dvec4 position = g_params.calcPosition();
     glm::dmat4x4 orientation = g_params.calcOrientation();
 
@@ -260,7 +260,7 @@ TEST(planeGrating, deviation) {
     ASSERT_DOUBLE_EQ(g_guparam.getAlpha(), alpha);
     ASSERT_DOUBLE_EQ(g_guparam.getBeta(), beta);
 
-    RAYX::WorldCoordinates g_params = RAYX::WorldCoordinates(alpha, beta, degToRad(azimuthal), dist, mis);
+    RAYX::WorldUserParams g_params = RAYX::WorldUserParams(alpha, beta, degToRad(azimuthal), dist, mis);
     glm::dvec4 position = g_params.calcPosition();
     glm::dmat4x4 orientation = g_params.calcOrientation();
 
@@ -331,7 +331,7 @@ TEST(SphereGrating, testParams) {
     ASSERT_DOUBLE_EQ(g_guparam.getBeta(), beta);
     ASSERT_DOUBLE_EQ(g_guparam.getRadius(), radius);
 
-    RAYX::WorldCoordinates g_params = RAYX::WorldCoordinates(alpha, beta, degToRad(azimuthal), distance, mis);
+    RAYX::WorldUserParams g_params = RAYX::WorldUserParams(alpha, beta, degToRad(azimuthal), distance, mis);
     glm::dvec4 position = g_params.calcPosition();
     glm::dmat4x4 orientation = g_params.calcOrientation();
 

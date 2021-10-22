@@ -4,7 +4,7 @@
 #include "Model/Beamline/Objects/ReflectionZonePlate.h"
 #include "Core.h"
 #include "Ray.h"
-#include "UserParameter/WorldCoordinates.h"
+#include "UserParameter/WorldUserParams.h"
 #include "UserParameter/GeometricUserParams.h"
 #include "utils.h"
 
@@ -85,7 +85,7 @@ TEST(RZP, testdefaultParams) {
     EXPECT_DOUBLE_EQ(rzp_guparams.getAlpha(), alpha);
     EXPECT_DOUBLE_EQ(rzp_guparams.getBeta(), beta);
 
-    RAYX::WorldCoordinates rzp_param = RAYX::WorldCoordinates(alpha, beta, azimuthal, dist, mis);
+    RAYX::WorldUserParams rzp_param = RAYX::WorldUserParams(alpha, beta, azimuthal, dist, mis);
     glm::dvec4 position = rzp_param.calcPosition();
     glm::dmat4x4 orientation = rzp_param.calcOrientation();
 
@@ -163,7 +163,7 @@ TEST(RZP, testdefaultParamsElliptical) {
     EXPECT_DOUBLE_EQ(rzp_guparams.getAlpha(), alpha);
     EXPECT_DOUBLE_EQ(rzp_guparams.getBeta(), beta);
 
-    RAYX::WorldCoordinates rzp_param = RAYX::WorldCoordinates(rzp_guparams.getAlpha(), rzp_guparams.getBeta(), azimuthal, dist, mis);
+    RAYX::WorldUserParams rzp_param = RAYX::WorldUserParams(rzp_guparams.getAlpha(), rzp_guparams.getBeta(), azimuthal, dist, mis);
     glm::dvec4 position = rzp_param.calcPosition();
     glm::dmat4x4 orientation = rzp_param.calcOrientation();
     RAYX::ReflectionZonePlate rzp = RAYX::ReflectionZonePlate("RZP", geometricalShape, curvatureType, width, height, position, orientation, designEnergy, orderOfDiffraction, designOrderOfDiffraction, dAlpha, dBeta, sEntrance, sExit, mEntrance, mExit, shortRadius, longRadius, additionalOrder, fresnelOffset, sE);
@@ -238,7 +238,7 @@ TEST(RZP, testParams) {
     EXPECT_DOUBLE_EQ(rzp_guparams.getAlpha(), alpha);
     EXPECT_DOUBLE_EQ(rzp_guparams.getBeta(), beta);
 
-    RAYX::WorldCoordinates rzp_param = RAYX::WorldCoordinates(rzp_guparams.getAlpha(), 0.21816615649929122, degToRad(azimuthal), dist, mis);
+    RAYX::WorldUserParams rzp_param = RAYX::WorldUserParams(rzp_guparams.getAlpha(), 0.21816615649929122, degToRad(azimuthal), dist, mis);
     glm::dvec4 position = rzp_param.calcPosition();
     glm::dmat4x4 orientation = rzp_param.calcOrientation();
     RAYX::ReflectionZonePlate rzp = RAYX::ReflectionZonePlate("RZP", geometricShape, curvatureType, width, height, position, orientation, designEnergy, orderOfDiffraction, designOrderOfDiffraction, dAlpha, dBeta, sEntrance, sExit, mEntrance, mExit, shortRadius, longRadius, additionalOrder, fresnelOffset, sE);

@@ -4,7 +4,7 @@
 #include "Model/Beamline/Objects/PlaneMirror.h"
 #include "Model/Beamline/Objects/SphereMirror.h"
 #include "Model/Beamline/Objects/Ellipsoid.h"
-#include "UserParameter/WorldCoordinates.h"
+#include "UserParameter/WorldUserParams.h"
 #include "UserParameter/GeometricUserParams.h"
 #include "Core.h"
 #include "Ray.h"
@@ -60,7 +60,7 @@ TEST(PlaneMirror, testSimpleParams) {
     std::vector<double> sE = { 0,0,0,0,0, 0,0 };
     std::vector<double> surface = { 0,0,0,0, double(icurv),0,0,-1, 0,0,0,0, 0,0,0,0 };
 
-    RAYX::WorldCoordinates g_params = RAYX::WorldCoordinates(degToRad(incidenceAngle), degToRad(incidenceAngle), degToRad(azimuthalAngle), dist, mis);
+    RAYX::WorldUserParams g_params = RAYX::WorldUserParams(degToRad(incidenceAngle), degToRad(incidenceAngle), degToRad(azimuthalAngle), dist, mis);
     glm::dvec4 position = g_params.calcPosition();
     glm::dmat4x4 orientation = g_params.calcOrientation();
 
@@ -95,7 +95,7 @@ TEST(PlaneMirror, testAdvancedParams) {
     std::vector<double> sE = { 0.1,0.2,0.3,0.4,0.5, 0.6,0.7 };
     std::vector<double> surface = { 0,0,0,0, double(icurv),0,0,-1, 0,0,0,0, 0,0,0,0 };
 
-    RAYX::WorldCoordinates g_params = RAYX::WorldCoordinates(degToRad(incidenceAngle), degToRad(incidenceAngle), degToRad(azimuthalAngle), dist, mis);
+    RAYX::WorldUserParams g_params = RAYX::WorldUserParams(degToRad(incidenceAngle), degToRad(incidenceAngle), degToRad(azimuthalAngle), dist, mis);
     glm::dvec4 position = g_params.calcPosition();
     glm::dmat4x4 orientation = g_params.calcOrientation();
 
@@ -135,7 +135,7 @@ TEST(SphereMirror, testParams) {
 
 
     RAYX::GeometricUserParams g_params = RAYX::GeometricUserParams(incidence);
-    RAYX::WorldCoordinates w_params = RAYX::WorldCoordinates(g_params.getAlpha(), g_params.getBeta(), degToRad(azimuthal), dist, mis);
+    RAYX::WorldUserParams w_params = RAYX::WorldUserParams(g_params.getAlpha(), g_params.getBeta(), degToRad(azimuthal), dist, mis);
     glm::dvec4 position = w_params.calcPosition();
     glm::dmat4x4 orientation = w_params.calcOrientation();
     RAYX::SphereMirror sM = RAYX::SphereMirror("spheremirror", geometricalShape, width, height, incidence, position, orientation, entranceArmLength, exitArmLength, sE);
@@ -179,7 +179,7 @@ TEST(SphereMirror, testPrecalculateRadius) {
 
     RAYX::GeometricUserParams g_params = RAYX::GeometricUserParams(incidence);
     g_params.calcMirrorRadius(entranceArmLength, exitArmLength);
-    RAYX::WorldCoordinates w_params = RAYX::WorldCoordinates(g_params.getAlpha(), g_params.getBeta(), degToRad(azimuthal), dist, mis);
+    RAYX::WorldUserParams w_params = RAYX::WorldUserParams(g_params.getAlpha(), g_params.getBeta(), degToRad(azimuthal), dist, mis);
     glm::dvec4 position = w_params.calcPosition();
     glm::dmat4x4 orientation = w_params.calcOrientation();
     RAYX::SphereMirror sM = RAYX::SphereMirror("spheremirror", geometricalShape, width, height, incidence, position, orientation, entranceArmLength, exitArmLength, sE);
