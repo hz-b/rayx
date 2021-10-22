@@ -6,7 +6,7 @@
 #include <stdexcept>
 #include "Core.h"
 #include "Ray.h"
-#include "OpticalElement.h"
+#include "Model/Beamline/OpticalElement.h"
 #include "utils.h"
 #include <memory>
 #include <glm.hpp>
