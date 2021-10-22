@@ -65,6 +65,21 @@ namespace RAYX
         }
     }
 
+    /**
+     * for ellipsoid mirror
+     * angles in degree
+     * 
+     * @param incidence         grazing incidence angle
+     * @param entranceArmLength length of entrance arm
+     * @param exitArmLength     length of exit arm
+    */
+    GeometricUserParams::GeometricUserParams(double incidence, double entranceArmLength, double exitArmLength) {
+        double incidenceAngle = degToRad(incidence);
+        double tangentAngle = calcTangentAngle(incidenceAngle, entranceArmLength, exitArmLength);
+        m_alpha = incidenceAngle - tangentAngle;
+        m_beta = incidenceAngle; // mirror -> exit angle = incidence angle
+    }
+        
     GeometricUserParams::GeometricUserParams() {}
     GeometricUserParams::~GeometricUserParams() {}
 
@@ -244,6 +259,20 @@ namespace RAYX
 
         return DZ;
 
+    }
+
+    
+    // ellipsoid method
+    double GeometricUserParams::calcTangentAngle(double incidence, double entranceArmLength, double exitArmLength) {
+        double theta = incidence; // designGrazingIncidenceAngle always equal to alpha (grazingIncidenceAngle)??
+        if (theta > PI / 2) {
+            theta = PI / 2;
+        }
+        double a = 0.5 * (entranceArmLength + exitArmLength);
+
+        double angle = atan(tan(theta) * (entranceArmLength - exitArmLength) / (entranceArmLength + exitArmLength));
+        return angle;
+        //std::cout << "A= " << m_longHalfAxisA << ", B= " << m_shortHalfAxisB << ", C= " << m_halfAxisC << ", angle = " << m_tangentAngle << ", Z0 = " << m_z0 << ", Y0= " << m_y0 << std::endl;
     }
     
     // calculate radius for sphere mirror

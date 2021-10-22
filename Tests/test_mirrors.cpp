@@ -219,6 +219,16 @@ TEST(Ellips, testParamsCSCurvature) {
     double a_11 = 12.62;
     std::vector<double>  mis = { 12,72,1.12, 0.1,0.7341,2.5 };
     std::vector<double> sE = { 1,2,3,4,5,6,7 };
+
+    RAYX::GeometricUserParams e_params = RAYX::GeometricUserParams(incidence, entranceArmLength, exitArmLength);
+    // derived from above parameters
+    double beta = 0.55000560718097313;
+    double alpha = 0.2141981204294254;
+    ASSERT_DOUBLE_EQ(e_params.getAlpha(), alpha);
+    ASSERT_DOUBLE_EQ(e_params.getBeta(), beta);
+    RAYX::WorldUserParams w_params = RAYX::WorldUserParams(e_params.getAlpha(), e_params.getBeta(), degToRad(azimuthal), dist, mis);
+    
+    RAYX::Ellipsoid eb = RAYX::Ellipsoid("ellipsoid", geometricalShape, width, height, w_params.calcPosition(), w_params.calcOrientation(), incidence, entranceArmLength, exitArmLength, coordSys, figRot, a_11, mis, sE);
     RAYX::Ellipsoid e = RAYX::Ellipsoid("ellipsoid", geometricalShape, width, height, incidence, azimuthal, dist, entranceArmLength, exitArmLength, coordSys, figRot, a_11, mis, sE, NULL, false);
 
     // in old RAY
@@ -229,7 +239,6 @@ TEST(Ellips, testParamsCSCurvature) {
     double tangentAngle = 0.3358074867515476;
     double halfAxisC = 1758.536013753882;
     double radius = -1365.026842783936;
-    double alpha = 0.2141981204294254;
     double a33 = 0.1846692617906655;
     double a34 = 476.4308339088623;
     double a44 = -4.65661e-10;
@@ -256,8 +265,19 @@ TEST(Ellips, testParamsCSCurvature) {
     EXPECT_ITERABLE_DOUBLE_EQ(std::vector<double>, correctTempMis, e.getTempMisalignmentParams());
     EXPECT_ITERABLE_DOUBLE_EQ(std::vector<double>, sE, e.getSlopeError());
 
+    glm::dmat4x4 correctInMat = {0.6259888054371695, -0.76201066544902907, -0.16576417347929398, 0, 
+        0.77983204311399357, 0.61168318281721634, 0.13306264837006021, 0, 
+        0, -0.21256394238094042, 0.9771471590295252, 0, 
+        0, 2646.7431914127951, -12166.962849865024, 1};
+    glm::dmat4x4 correctOutMat = {0.6259888054371695, 0.77983204311399357, 0, 0, 
+        -0.6648236542987721, 0.53366897251236345, 0.52269200918172165, 0, 
+        0.40761197743954031, -0.32719934643922, 0.85252159124421889, 0, 
+        0, 0, 0, 1};
+    EXPECT_ITERABLE_DOUBLE_EQ(std::vector<double>, e.getInMatrix(), glmToVector16(correctInMat));
+    EXPECT_ITERABLE_DOUBLE_EQ(std::vector<double>, e.getOutMatrix(), glmToVector16(correctOutMat));
+
     figRot = 1;
-    RAYX::Ellipsoid e2 = RAYX::Ellipsoid("ellipsoid", geometricalShape, width, height, incidence, azimuthal, dist, entranceArmLength, exitArmLength, coordSys, figRot, a_11, mis, sE, NULL, false);
+    RAYX::Ellipsoid e2 = RAYX::Ellipsoid("ellipsoid2", geometricalShape, width, height, incidence, azimuthal, dist, entranceArmLength, exitArmLength, coordSys, figRot, a_11, mis, sE, NULL, false);
     halfAxisC = INFINITY;
 
     ASSERT_DOUBLE_EQ(e2.getWidth(), width);
@@ -280,7 +300,7 @@ TEST(Ellips, testParamsCSCurvature) {
     EXPECT_ITERABLE_DOUBLE_EQ(std::vector<double>, sE, e2.getSlopeError());
 
     figRot = 2;
-    RAYX::Ellipsoid e3 = RAYX::Ellipsoid("ellipsoid", geometricalShape, width, height, incidence, azimuthal, dist, entranceArmLength, exitArmLength, coordSys, figRot, a_11, mis, sE, NULL, false);
+    RAYX::Ellipsoid e3 = RAYX::Ellipsoid("ellipsoid3", geometricalShape, width, height, incidence, azimuthal, dist, entranceArmLength, exitArmLength, coordSys, figRot, a_11, mis, sE, NULL, false);
     halfAxisC = 495.0186818473859;
 
     ASSERT_DOUBLE_EQ(e3.getWidth(), width);
