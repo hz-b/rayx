@@ -4,6 +4,8 @@
 #include <sstream>
 
 #include "TracerInterface.h"
+#include "Model/Beamline/OpticalElement.h"
+#include "Model/Beamline/LightSource.h"
 
 #include "Debug.h"
 #include "Ray.h"

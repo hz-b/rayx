@@ -3,7 +3,16 @@
 
 #include "Application.h"
 #include "Debug.h"
+
+#include "Model/Beamline/Objects/MatrixSource.h"
+#include "Model/Beamline/Objects/PointSource.h"
+#include "Model/Beamline/Objects/PlaneMirror.h"
+#include "Model/Beamline/Objects/ReflectionZonePlate.h"
+#include "Model/Beamline/Objects/ToroidMirror.h"
+#include "Model/Beamline/Objects/ImagePlane.h"
+
 #include "Data/Exporter.h"
+
 #include "UserParameter/GeometricUserParams.h"
 #include "UserParameter/WorldCoordinates.h"
 
@@ -33,19 +42,19 @@ namespace RAYX
         glm::dvec4 pos_mirror = param.calcPosition();
         glm::dmat4x4 or_mirror = param.calcOrientation();
         std::shared_ptr<PlaneMirror> pm = std::make_shared<PlaneMirror>("PM", 0, 50, 200, pos_mirror, or_mirror, std::vector<double>{0, 0, 0, 0, 0, 0, 0});
-        
+
         WorldCoordinates tor_param = WorldCoordinates(degToRad(10), degToRad(10), 0, 10000, std::vector<double>{0, 0, 0, 0, 0, 0});
         glm::dvec4 tor_position = tor_param.calcPosition();
         glm::dmat4x4 tor_orientation = tor_param.calcOrientation();
         std::shared_ptr<RAYX::ToroidMirror> t = std::make_shared<RAYX::ToroidMirror>("toroid", 0, 50, 200, tor_position, tor_orientation, degToRad(10), 10000, 1000, 10000, 1000, std::vector<double>{0, 0, 0, 0, 0, 0, 0});
-        
+
         std::cout << "\n IMAGE PLANE \n" << std::endl;
 
         WorldCoordinates im_param = WorldCoordinates(0, 0, 0, 1000, std::vector<double>{0, 0, 0, 0, 0, 0});
         glm::dvec4 pos_imageplane = im_param.calcPosition(tor_param, tor_position, tor_orientation);
         glm::dmat4x4 or_imageplane = im_param.calcOrientation(tor_param, tor_position, tor_orientation);
         std::shared_ptr<ImagePlane> i = std::make_shared<ImagePlane>("Image plane", pos_imageplane, or_imageplane);
-        
+
         bool GLOBAL = true;
         // petes setup
         std::shared_ptr<RAYX::PointSource> p = std::make_shared<RAYX::PointSource>("spec1_first_rzp4", 1, 0.005, 0.005, 0, 0.02, 0.06, 1, 1, 0, 0, 640, 120, 1, 0, 0, std::vector<double>{0, 0, 0, 0});

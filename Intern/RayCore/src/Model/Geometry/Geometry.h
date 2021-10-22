@@ -1,14 +1,7 @@
 #pragma once
 
-#include <math.h>
-#include <vector>
-#include <iostream>
-#include <stdexcept>
 #include "Core.h"
-#include "Ray.h"
 #include "Model/Beamline/OpticalElement.h"
-#include "utils.h"
-#include <memory>
 #include <glm.hpp>
 
 namespace RAYX
@@ -28,6 +21,6 @@ namespace RAYX
         double m_height;
         glm::dmat4x4 inMatrix;
         glm::dmat4x4 outMatrix;
-        GEOMETRICAL_SHAPE m_geometricalShape;
+        OpticalElement::GEOMETRICAL_SHAPE m_geometricalShape;
     };
 }

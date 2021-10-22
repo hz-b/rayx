@@ -1,11 +1,11 @@
 #pragma once
-#include "Core.h"
 #include <vector>
 #include <iostream>
 #include <stdexcept>
 #include <memory>
-#include "rapidxml.hpp"
 
+#include "Core.h"
+#include "rapidxml.hpp"
 
 namespace RAYX
 {
@@ -27,6 +27,7 @@ namespace RAYX
         BeamlineObject();
 
     private:
+
         const char* m_name;
         //m_geometry;
         //m_surface; //(for lightsource??)

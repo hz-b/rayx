@@ -1,4 +1,12 @@
 #include "Geometry.h"
+#include "Ray.h"
+#include "utils.h"
+
+#include <math.h>
+#include <memory>
+#include <vector>
+#include <iostream>
+#include <stdexcept>
 
 namespace RAYX
 {
@@ -8,7 +16,8 @@ namespace RAYX
         if (m_geometricalShape == GS_ELLIPTICAL) {
             m_width = -width;
             m_height = -height);
-        }else{
+        }
+        else {
             m_width = width;
             m_height = height);
         }

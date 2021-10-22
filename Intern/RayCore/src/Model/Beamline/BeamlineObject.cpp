@@ -1,5 +1,6 @@
 #include "BeamlineObject.h"
 #include "Presenter/SimulationEnv.h"
+
 #include <cassert>
 #include <math.h>
 

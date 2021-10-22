@@ -1,5 +1,6 @@
 #include "Presenter.h"
 #include "Debug.h"
+#include "Model/Beamline/OpticalElement.h"
 
 namespace RAYX
 {
@@ -29,7 +30,8 @@ namespace RAYX
             if (m_Beamline->m_LightSources.empty()) {
                 std::cerr << "There is no light source!\n";
                 exit(1);
-            } else {
+            }
+            else {
                 m_TracerInterface.generateRays(m_Beamline->m_LightSources[0]);
             }
         }

@@ -3,24 +3,13 @@
 #include "Core.h"
 #include "glm.hpp"
 
-// TODO:
-#include "Objects/PlaneGrating.h"
-#include "Objects/PlaneMirror.h"
-#include "Objects/SphereGrating.h"
-#include "Objects/ImagePlane.h"
-#include "Objects/MatrixSource.h"
-#include "Objects/Ellipsoid.h"
-#include "Objects/PointSource.h"
-#include "Objects/SphereMirror.h"
-#include "Objects/ReflectionZonePlate.h"
-#include "Objects/RandomRays.h"
-#include "Objects/Slit.h"
-#include "Objects/ToroidMirror.h"
-
+#include <memory>
 #include <vector>
 
 namespace RAYX
 {
+    class OpticalElement;
+    class LightSource;
 
     class RAYX_API Beamline
     {
