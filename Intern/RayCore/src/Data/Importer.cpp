@@ -4,6 +4,7 @@
 #include "rapidxml.hpp"
 
 #include "Model/Beamline/Objects/PointSource.h"
+#include "Model/Beamline/Objects/MatrixSource.h"
 #include "Model/Beamline/Objects/ImagePlane.h"
 
 #include "Importer.h"
@@ -38,8 +39,9 @@ namespace RAYX
 
         if (strcmp(type, "Point Source") == 0) {
             addLightSource(PointSource::createFromXML(node));
-        }
-        else if (strcmp(type, "ImagePlane") == 0) {
+        } else if (strcmp(type, "Matrix Source") == 0) {
+            addLightSource(MatrixSource::createFromXML(node));
+        } else if (strcmp(type, "ImagePlane") == 0) {
             addOpticalElement(ImagePlane::createFromXML(node));
         }
         else { // TODO(rudi): extend this!
