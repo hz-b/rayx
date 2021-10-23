@@ -53,7 +53,7 @@ namespace RAYX
         if (!xml::paramDouble(node, "totalWidth", &width)) { return nullptr; }
 
         double height;
-        if (!xml::paramDouble(node, "totalLength", &height)) { return nullptr; }
+        if (!xml::paramDouble(node, "totalHeight", &height)) { return nullptr; }
 
         glm::dvec4 position;
         if (!xml::paramPosition(node, &position)) { return nullptr; }
