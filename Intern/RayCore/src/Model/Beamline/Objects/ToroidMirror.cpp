@@ -45,7 +45,7 @@ namespace RAYX
         const char* name = node->first_attribute("name")->value();
 
         int geometricalShape;
-        if (!xml::paramInt(node, "gemetricalShape", &geometricalShape)) { return nullptr; }
+        if (!xml::paramInt(node, "geometricalShape", &geometricalShape)) { return nullptr; }
 
         double width;
         if (!xml::paramDouble(node, "totalWidth", &width)) { return nullptr; }
