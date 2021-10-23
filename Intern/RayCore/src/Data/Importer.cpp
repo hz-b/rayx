@@ -9,6 +9,7 @@
 #include "Model/Beamline/Objects/PlaneMirror.h"
 #include "Model/Beamline/Objects/ToroidMirror.h"
 #include "Model/Beamline/Objects/Slit.h"
+#include "Model/Beamline/Objects/SphereGrating.h"
 
 #include "Importer.h"
 #include <string.h>
@@ -58,6 +59,8 @@ namespace RAYX
             addOpticalElement(ToroidMirror::createFromXML(node));
         } else if (strcmp(type, "Slit") == 0) {
             addOpticalElement(Slit::createFromXML(node, calcSourceEnergy()));
+        } else if (strcmp(type, "Spherical Grating") == 0) {
+            addOpticalElement(SphereGrating::createFromXML(node));
         } else { // TODO(rudi): extend this!
             std::cerr << "could not construct beamline object with Name: " << node->first_attribute("name")->value() << "; Type: " << node->first_attribute("type")->value() << '\n';
         }

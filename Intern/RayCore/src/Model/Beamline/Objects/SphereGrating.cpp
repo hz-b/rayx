@@ -42,6 +42,48 @@ namespace RAYX
     {
     }
 
+    std::shared_ptr<SphereGrating> SphereGrating::createFromXML(rapidxml::xml_node<>* node) {
+        const char* name = node->first_attribute("name")->value();
+
+        int mount;
+        if (!xml::paramInt(node, "gratingMount", &mount)) { return nullptr; }
+
+        int geometricalShape;
+        if (!xml::paramInt(node, "geometricalShape", &geometricalShape)) { return nullptr; }
+
+        double width;
+        if (!xml::paramDouble(node, "totalWidth", &width)) { return nullptr; }
+
+        double height;
+        if (!xml::paramDouble(node, "totalLength", &height)) { return nullptr; }
+
+        double radius;
+        if (!xml::paramDouble(node, "radius", &radius)) { return nullptr; }
+
+        glm::dvec4 position;
+        if (!xml::paramPosition(node, &position)) { return nullptr; }
+
+        glm::dmat4x4 orientation;
+        if (!xml::paramOrientation(node, &orientation)) { return nullptr; }
+
+        double designEnergyMounting;
+        if (!xml::paramDouble(node, "designEnergy", &designEnergyMounting)) { return nullptr; }
+
+        double lineDensity;
+        if (!xml::paramDouble(node, "lineDensity", &lineDensity)) { return nullptr; }
+
+        double orderOfDiffraction;
+        if (!xml::paramDouble(node, "orderDiffraction", &orderOfDiffraction)) { return nullptr; }
+
+        std::vector<double> vls;
+        if (!xml::paramVls(node, &vls)) { return nullptr; }
+
+        std::vector<double> slopeError;
+        if (!xml::paramSlopeError(node, &slopeError)) { return nullptr; }
+
+        return std::make_shared<SphereGrating>(name, mount, geometricalShape, width, height, radius, position, orientation, designEnergyMounting, lineDensity, orderOfDiffraction, vls, slopeError);
+    }
+
     void SphereGrating::calcRadius() {
         if (m_gratingMount == GM_DEVIATION) {
             double theta = m_deviation > 0 ? (PI - m_deviation) / 2 : PI / 2 + m_deviation;

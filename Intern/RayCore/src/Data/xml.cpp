@@ -125,5 +125,25 @@ namespace RAYX {
 
             return true;
         }
+
+        bool paramVls(rapidxml::xml_node<>* node, std::vector<double>* out) {
+            *out = std::vector<double>(6, 0.f);
+
+            rapidxml::xml_node<>* p;
+            if (!param(node, "lineSpacing", &p)) { return false; }
+
+            if (strcmp(p->first_attribute("comment")->value(), "variable (VLS)") == 0) {
+                // all vls-values will be left at 0 if they are missing.
+                // Hence we ignore the return values of the upcoming paramDouble-calls.
+                xml::paramDouble(node, "vlsParameterB2", &((*out)[0]));
+                xml::paramDouble(node, "vlsParameterB3", &((*out)[1]));
+                xml::paramDouble(node, "vlsParameterB4", &((*out)[2]));
+                xml::paramDouble(node, "vlsParameterB5", &((*out)[3]));
+                xml::paramDouble(node, "vlsParameterB6", &((*out)[4]));
+                xml::paramDouble(node, "vlsParameterB7", &((*out)[5]));
+            }
+
+            return true;
+        }
     }
 }

@@ -1,6 +1,7 @@
 #pragma once
 #include "Model/Surface/Quadric.h"
 #include "Model/Beamline/OpticalElement.h"
+#include <Data/xml.h>
 
 namespace RAYX
 {
@@ -15,6 +16,8 @@ namespace RAYX
         // SphereGrating(const char* name, int mount, int geometricalShape, double width, double height, double deviation, double normalIncidence, double azimuthal, double distanceToPreceedingElement, double entranceArmLength, double exitArmLength, double designEnergyMounting, double lineDensity, double orderOfDiffraction, std::vector<double> misalignmentParams, std::vector<double> vls, std::vector<double> slopeError, std::shared_ptr<OpticalElement> previous, bool global);
         SphereGrating();
         ~SphereGrating();
+
+        static std::shared_ptr<SphereGrating> createFromXML(rapidxml::xml_node<>*);
 
         void calcRadius();
         void calcAlpha(double deviation, double normalIncidence);
