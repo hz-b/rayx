@@ -40,6 +40,36 @@ namespace RAYX
     Slit::Slit() {}
     Slit::~Slit() {}
 
+    std::shared_ptr<Slit> Slit::createFromXML(rapidxml::xml_node<>* node, double sourceEnergy) {
+        const char* name = node->first_attribute("name")->value();
+
+        int geometricalShape;
+        if (!xml::paramInt(node, "gemetricalShape", &geometricalShape)) { return nullptr; }
+
+        int beamstop;
+        if (!xml::paramInt(node, "centralBeamstop", &beamstop)) { return nullptr; }
+
+        double width;
+        if (!xml::paramDouble(node, "totalWidth", &width)) { return nullptr; }
+
+        double height;
+        if (!xml::paramDouble(node, "totalLength", &height)) { return nullptr; }
+
+        glm::dvec4 position;
+        if (!xml::paramPosition(node, &position)) { return nullptr; }
+
+        glm::dmat4x4 orientation;
+        if (!xml::paramOrientation(node, &orientation)) { return nullptr; }
+
+        double beamstopWidth;
+        if (!xml::paramDouble(node, "totalWidthStop", &beamstopWidth)) { return nullptr; }
+
+        double beamstopHeight;
+        if (!xml::paramDouble(node, "totalHeightStop", &beamstopHeight)) { return nullptr; }
+
+        return std::make_shared<Slit>(name, geometricalShape, beamstop, width, height, position, orientation, beamstopWidth, beamstopHeight, sourceEnergy);
+    }
+
     int Slit::getCentralBeamstop() const {
         return m_centralBeamstop;
     }

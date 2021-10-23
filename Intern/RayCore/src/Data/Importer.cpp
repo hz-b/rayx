@@ -8,6 +8,7 @@
 #include "Model/Beamline/Objects/ImagePlane.h"
 #include "Model/Beamline/Objects/PlaneMirror.h"
 #include "Model/Beamline/Objects/ToroidMirror.h"
+#include "Model/Beamline/Objects/Slit.h"
 
 #include "Importer.h"
 #include <string.h>
@@ -39,6 +40,12 @@ namespace RAYX
             }
         };
 
+        const auto calcSourceEnergy = [&] {
+            assert(!beamline->m_LightSources.empty());
+            assert(beamline->m_LightSources[0]);
+            return beamline->m_LightSources[0]->getPhotonEnergy();
+        };
+
         if (strcmp(type, "Point Source") == 0) {
             addLightSource(PointSource::createFromXML(node));
         } else if (strcmp(type, "Matrix Source") == 0) {
@@ -49,6 +56,8 @@ namespace RAYX
             addOpticalElement(PlaneMirror::createFromXML(node));
         } else if (strcmp(type, "Toroid") == 0) {
             addOpticalElement(ToroidMirror::createFromXML(node));
+        } else if (strcmp(type, "Slit") == 0) {
+            addOpticalElement(Slit::createFromXML(node, calcSourceEnergy()));
         } else { // TODO(rudi): extend this!
             std::cerr << "could not construct beamline object with Name: " << node->first_attribute("name")->value() << "; Type: " << node->first_attribute("type")->value() << '\n';
         }

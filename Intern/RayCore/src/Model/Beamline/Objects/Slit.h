@@ -1,6 +1,7 @@
 #pragma once
 #include "Model/Surface/Quadric.h"
 #include "Model/Beamline/OpticalElement.h"
+#include <Data/xml.h>
 
 namespace RAYX
 {
@@ -13,6 +14,8 @@ namespace RAYX
         //Slit(const char* name, int geometricalShape, int beamstop, double width, double height, double azimuthal, double dist, double beamstopWidth, double beamstopHeight, double sourceEnergy, std::vector<double> misalignmentParams, const std::shared_ptr<OpticalElement> previous, bool global);
         Slit();
         ~Slit();
+
+        static std::shared_ptr<Slit> createFromXML(rapidxml::xml_node<>*, double sourceEnergy);
 
         int getCentralBeamstop() const;
         double getBeamstopWidth() const;

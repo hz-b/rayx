@@ -41,7 +41,7 @@ namespace RAYX
     {
     }
 
-    std::shared_ptr<ToroidMirror> ToroidMirror::createFromXML(rapidxml::xml_node<>* node) { // TODO
+    std::shared_ptr<ToroidMirror> ToroidMirror::createFromXML(rapidxml::xml_node<>* node) {
         const char* name = node->first_attribute("name")->value();
 
         int geometricalShape;
