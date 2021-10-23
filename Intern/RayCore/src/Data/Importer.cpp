@@ -12,6 +12,7 @@
 #include "Model/Beamline/Objects/SphereGrating.h"
 #include "Model/Beamline/Objects/PlaneGrating.h"
 #include "Model/Beamline/Objects/SphereMirror.h"
+#include "Model/Beamline/Objects/ReflectionZonePlate.h"
 
 #include "Importer.h"
 #include <string.h>
@@ -67,7 +68,9 @@ namespace RAYX
             addOpticalElement(PlaneGrating::createFromXML(node));
         } else if (strcmp(type, "Sphere") == 0) {
             addOpticalElement(SphereMirror::createFromXML(node));
-        } else { // TODO(rudi): extend this!
+        } else if (strcmp(type, "Reflection Zoneplate") == 0) {
+            addOpticalElement(ReflectionZonePlate::createFromXML(node));
+        } else {
             std::cerr << "could not construct beamline object with Name: " << node->first_attribute("name")->value() << "; Type: " << node->first_attribute("type")->value() << '\n';
         }
     }

@@ -89,6 +89,77 @@ namespace RAYX
     {
     }
 
+    std::shared_ptr<ReflectionZonePlate> ReflectionZonePlate::createFromXML(rapidxml::xml_node<>* node) {
+        const char* name = node->first_attribute("name")->value();
+
+        int geometricalShape;
+        if (!xml::paramInt(node, "geometricalShape", &geometricalShape)) { return nullptr; }
+
+        int curvatureType;
+        if (!xml::paramInt(node, "curvatureType", &curvatureType)) { return nullptr; }
+
+        double width;
+        if (!xml::paramDouble(node, "totalWidth", &width)) { return nullptr; }
+
+        double height;
+        if (!xml::paramDouble(node, "totalLength", &height)) { return nullptr; }
+
+        glm::dvec4 position;
+        if (!xml::paramPosition(node, &position)) { return nullptr; }
+
+        glm::dmat4x4 orientation;
+        if (!xml::paramOrientation(node, &orientation)) { return nullptr; }
+
+        double designEnergy;
+        if (!xml::paramDouble(node, "designEnergy", &designEnergy)) { return nullptr; }
+
+        double orderOfDiffraction;
+        if (!xml::paramDouble(node, "orderDiffraction", &orderOfDiffraction)) { return nullptr; }
+
+        double designOrderOfDiffraction;
+        if (!xml::paramDouble(node, "designOrderDiffraction", &designOrderOfDiffraction)) { return nullptr; }
+
+        double dAlpha;
+        if (!xml::paramDouble(node, "designAlphaAngle", &dAlpha)) { return nullptr; }
+
+        double dBeta;
+        if (!xml::paramDouble(node, "designBetaAngle", &dBeta)) { return nullptr; }
+
+        double mEntrance;
+        if (!xml::paramDouble(node, "entranceArmLengthMer", &mEntrance)) { return nullptr; }
+
+        double mExit;
+        if (!xml::paramDouble(node, "exitArmLengthMer", &mExit)) { return nullptr; }
+
+        double sEntrance;
+        if (!xml::paramDouble(node, "entranceArmLengthSag", &sEntrance)) { return nullptr; }
+
+        double sExit;
+        if (!xml::paramDouble(node, "exitArmLengthSag", &sExit)) { return nullptr; }
+
+        double shortRadius;
+        if (!xml::paramDouble(node, "shortRadius", &shortRadius)) { return nullptr; }
+
+        double longRadius;
+        if (!xml::paramDouble(node, "longRadius", &longRadius)) { return nullptr; }
+
+        int additionalZeroOrder = 0;
+        xml::paramInt(node, "additionalOrder", &additionalZeroOrder); // may be missing in some RML files, that's fine though
+
+        double fresnelZOffset;
+        if (!xml::paramDouble(node, "FresnelZOffset", &fresnelZOffset)) { return nullptr; }
+
+        std::vector<double> slopeError;
+        if (!xml::paramSlopeError(node, &slopeError)) { return nullptr; }
+
+        return std::make_shared<ReflectionZonePlate>(name, geometricalShape, curvatureType,
+            width, height, position, orientation, designEnergy, orderOfDiffraction,
+            designOrderOfDiffraction, dAlpha, dBeta, mEntrance, mExit, sEntrance,
+            sExit, shortRadius, longRadius, additionalZeroOrder,
+            fresnelZOffset, slopeError
+        );
+    }
+
     void ReflectionZonePlate::printInfo() const
     {
         std::cout.precision(17);

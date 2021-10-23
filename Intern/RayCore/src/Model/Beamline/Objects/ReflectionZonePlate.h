@@ -2,6 +2,7 @@
 #include "Model/Surface/Quadric.h"
 #include "Model/Surface/Toroid.h"
 #include "Model/Beamline/OpticalElement.h"
+#include <Data/xml.h>
 
 namespace RAYX
 {
@@ -15,6 +16,7 @@ namespace RAYX
         ReflectionZonePlate();
         ~ReflectionZonePlate();
 
+        static std::shared_ptr<ReflectionZonePlate> createFromXML(rapidxml::xml_node<>*);
 
         // for calculating incidence and exit angle from user parameters
         void calcAlpha();
