@@ -16,6 +16,56 @@ namespace RAYX
     {
     }
 
+    // returns nullptr on error
+    std::shared_ptr<MatrixSource> MatrixSource::createFromXML(rapidxml::xml_node<>* node) {
+        const std::string name = node->first_attribute("name")->value();
+
+        if (!xml::paramInt(node, "numberRays", &SimulationEnv::get().m_numOfRays)) { return nullptr; }
+
+        int spreadType;
+        if (!xml::paramInt(node, "energySpreadType", &spreadType)) { return nullptr; }
+
+        double sourceWidth;
+        if (!xml::paramDouble(node, "sourceWidth", &sourceWidth)) { return nullptr; }
+
+        double sourceHeight;
+        if (!xml::paramDouble(node, "sourceHeight", &sourceHeight)) { return nullptr; }
+
+        double sourceDepth;
+        if (!xml::paramDouble(node, "sourceDepth", &sourceDepth)) { return nullptr; }
+
+        double horDivergence;
+        if (!xml::paramDouble(node, "horDiv", &horDivergence)) { return nullptr; }
+
+        double verDivergence;
+        if (!xml::paramDouble(node, "verDiv", &verDivergence)) { return nullptr; }
+
+        double photonEnergy;
+        if (!xml::paramDouble(node, "photonEnergy", &photonEnergy)) { return nullptr; }
+
+        double energySpread;
+        if (!xml::paramDouble(node, "energySpread", &energySpread)) { return nullptr; }
+
+        double linPol0;
+        if (!xml::paramDouble(node, "linearPol_0", &linPol0)) { return nullptr; }
+
+        double linPol45;
+        if (!xml::paramDouble(node, "linearPol_45", &linPol45)) { return nullptr; }
+
+        double circPol;
+        if (!xml::paramDouble(node, "circularPol", &circPol)) { return nullptr; }
+
+        std::vector<double> misalignment;
+        if (!xml::paramMisalignment(node, &misalignment)) { return nullptr; }
+
+        return std::make_shared<MatrixSource>(
+            name, spreadType, sourceWidth, sourceHeight, sourceDepth,
+            horDivergence, verDivergence, photonEnergy, energySpread,
+            linPol0, linPol45, circPol, misalignment
+        );
+    }
+
+
     /**
      * creates floor(sqrt(numberOfRays)) **2 rays (a grid with as many rows as columns, eg amountOfRays=20 -> 4*4=16, rest (4 rays) same as first 4)
      * distributed evenly across width & height of source

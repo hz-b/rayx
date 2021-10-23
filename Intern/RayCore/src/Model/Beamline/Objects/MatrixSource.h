@@ -1,5 +1,6 @@
 #pragma once
 #include "Model/Beamline/LightSource.h"
+#include <Data/xml.h>
 
 namespace RAYX
 {
@@ -13,6 +14,8 @@ namespace RAYX
 
         MatrixSource();
         ~MatrixSource();
+
+        static std::shared_ptr<MatrixSource> createFromXML(rapidxml::xml_node<>*);
 
         std::vector<Ray> getRays();
         double getSourceDepth() { return m_sourceDepth; }
