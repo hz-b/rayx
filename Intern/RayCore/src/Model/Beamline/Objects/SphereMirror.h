@@ -1,6 +1,7 @@
 #pragma once
 #include "Model/Surface/Quadric.h"
 #include "Model/Beamline/OpticalElement.h"
+#include <Data/xml.h>
 
 namespace RAYX
 {
@@ -17,6 +18,8 @@ namespace RAYX
         SphereMirror(const char* name, const int geometricalShape, const double width, const double height, double radius, glm::dvec4 position, glm::dmat4x4 orientation, const std::vector<double> slopeError);
         SphereMirror();
         ~SphereMirror();
+
+        static std::shared_ptr<SphereMirror> createFromXML(rapidxml::xml_node<>*);
 
         void calcRadius();
         double getRadius() const;

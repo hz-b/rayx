@@ -54,6 +54,39 @@ namespace RAYX
     {
     }
 
+    std::shared_ptr<SphereMirror> SphereMirror::createFromXML(rapidxml::xml_node<>* node) {
+        const char* name = node->first_attribute("name")->value();
+
+        int geometricalShape;
+        if (!xml::paramInt(node, "geometricalShape", &geometricalShape)) { return nullptr; }
+
+        double width;
+        if (!xml::paramDouble(node, "totalWidth", &width)) { return nullptr; }
+
+        double height;
+        if (!xml::paramDouble(node, "totalLength", &height)) { return nullptr; }
+
+        double grazingIncidenceAngle;
+        if (!xml::paramDouble(node, "grazingIncAngle", &grazingIncidenceAngle)) { return nullptr; }
+
+        glm::dvec4 position;
+        if (!xml::paramPosition(node, &position)) { return nullptr; }
+
+        glm::dmat4x4 orientation;
+        if (!xml::paramOrientation(node, &orientation)) { return nullptr; }
+
+        double entranceArmLength;
+        if (!xml::paramDouble(node, "entranceArmLength", &entranceArmLength)) { return nullptr; }
+
+        double exitArmLength;
+        if (!xml::paramDouble(node, "exitArmLength", &exitArmLength)) { return nullptr; }
+
+        std::vector<double> slopeError;
+        if (!xml::paramSlopeError(node, &slopeError)) { return nullptr; }
+
+        return std::make_shared<SphereMirror>(name, geometricalShape, width, height, grazingIncidenceAngle, position, orientation, entranceArmLength, exitArmLength, slopeError);
+    }
+
     // TODO(Theresa): move this to user params and just give the radius as a parameter to the sphere class?
     void SphereMirror::calcRadius() {
         m_radius = 2.0 / sin(m_grazingIncidenceAngle) / (1.0 / m_entranceArmLength + 1.0 / m_exitArmLength);
