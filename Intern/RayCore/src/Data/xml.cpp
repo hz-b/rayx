@@ -57,13 +57,30 @@ namespace RAYX {
             return true;
         }
 
-        bool paramYes(rapidxml::xml_node<>* node, const char* paramname) {
+        bool paramMisalignment(rapidxml::xml_node<>* node, std::vector<double>* out) {
+            *out = std::vector<double>(6, 0.f);
+
             rapidxml::xml_node<>* p;
-            if (!param(node, paramname, &p)) { return false; }
+            if (!param(node, "alignmentError", &p)) { return false; }
 
-            return strcmp(p->first_attribute("comment")->value(), "Yes") == 0;
+            if (strcmp(p->first_attribute("comment")->value(), "Yes") == 0) {
+                // all misalignment-values will be left at 0 if they are missing.
+                // Hence we ignore the return values of the upcoming paramDouble-calls.
+                xml::paramDouble(node, "translationXerror", &((*out)[0]));
+                xml::paramDouble(node, "translationYerror", &((*out)[1]));
+                xml::paramDouble(node, "translationZerror", &((*out)[2]));
+
+                xml::paramDouble(node, "rotationXerror", &((*out)[3]));
+                (*out)[3] /= 1000.f; // mrad -> rad conversion
+
+                xml::paramDouble(node, "rotationYerror", &((*out)[4]));
+                (*out)[4] /= 1000.f;
+
+                xml::paramDouble(node, "rotationZerror", &((*out)[5]));
+                (*out)[5] /= 1000.f;
+            }
+
+            return true;
         }
-
-
     }
 }

@@ -29,8 +29,7 @@ namespace RAYX
     std::shared_ptr<PointSource> PointSource::createFromXML(rapidxml::xml_node<>* node) {
         const std::string name = node->first_attribute("name")->value();
 
-        int numberOfRays;
-        if (!xml::paramInt(node, "numberRays", &numberOfRays)) { return nullptr; }
+        if (!xml::paramInt(node, "numberRays", &SimulationEnv::get().m_numOfRays)) { return nullptr; }
 
         int spreadType;
         if (!xml::paramInt(node, "energySpreadType", &spreadType)) { return nullptr; }
@@ -77,24 +76,8 @@ namespace RAYX
         double circPol;
         if (!xml::paramDouble(node, "circularPol", &circPol)) { return nullptr; }
 
-        std::vector<double> misalignment(6, 0.f);
-
-        if (xml::paramYes(node, "alignmentError")) { // TODO(rudi): is this the right condition?
-            // all misalignment-values will be left at 0 if they are missing.
-            xml::paramDouble(node, "translationXerror", &misalignment[0]);
-            xml::paramDouble(node, "translationYerror", &misalignment[1]);
-            xml::paramDouble(node, "translationZerror", &misalignment[2]);
-
-            xml::paramDouble(node, "rotationXerror", &misalignment[3]);
-            misalignment[3] /= 1000.f; // mrad -> rad conversion
-
-            xml::paramDouble(node, "rotationYerror", &misalignment[4]);
-            misalignment[4] /= 1000.f;
-
-            xml::paramDouble(node, "rotationZerror", &misalignment[5]);
-            misalignment[5] /= 1000.f;
-        }
-
+        std::vector<double> misalignment;
+        if (!xml::paramMisalignment(node, &misalignment)) { return nullptr; }
 
         return std::make_shared<PointSource>(
             name, spreadType, sourceWidth, sourceHeight, sourceDepth,
