@@ -82,5 +82,27 @@ namespace RAYX {
 
             return true;
         }
+
+        bool paramPosition(rapidxml::xml_node<>* node, glm::dvec4* out) {
+            glm::dvec3 position3;
+            if (!xml::paramDvec3(node, "worldPosition", &position3)) { return false; }
+            *out = glm::dvec4(position3, 1); // TODO(rudi): is this '1' correct?
+
+            return true;
+        }
+
+        bool paramOrientation(rapidxml::xml_node<>* node, glm::dmat4x4* out) {
+            glm::dvec3 worldXdirection, worldYdirection, worldZdirection;
+            if (!xml::paramDvec3(node, "worldXdirection", &worldXdirection)) { return false; }
+            if (!xml::paramDvec3(node, "worldYdirection", &worldYdirection)) { return false; }
+            if (!xml::paramDvec3(node, "worldZdirection", &worldZdirection)) { return false; }
+
+            (*out)[0] = glm::dvec4(worldXdirection, 0);
+            (*out)[1] = glm::dvec4(worldYdirection, 0);
+            (*out)[2] = glm::dvec4(worldZdirection, 0);
+            (*out)[3] = glm::dvec4(0, 0, 0, 1);
+
+            return true;
+        }
     }
 }
