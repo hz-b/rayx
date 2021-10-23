@@ -9,6 +9,10 @@ namespace RAYX
 
     public:
 
+        // slightly shortened constructor
+        Ellipsoid(const char* name, const int geometricalShape, const double width, const double height, glm::dvec4 position, glm::dmat4x4 orientation, const double grazingIncidence,
+            const double entranceArmLength, const double exitArmLength, const int coordSys, const int figRot, const double a_11, const std::vector<double> misalignmentParams, const std::vector<double> slopeError);
+        // long old constrcutor
         Ellipsoid(const char* name, const int geometricalShape, const double width, const double height, const double grazingIncidence, const double azimuthal, const double distanceToPreceedingElement,
             const double entranceArmLength, const double exitArmLength, const int coordSys, const int figRot, const double a11, const std::vector<double> misalignmentParams, const std::vector<double> slopeError, const std::shared_ptr<OpticalElement> previous, bool global);
         Ellipsoid();
@@ -43,18 +47,18 @@ namespace RAYX
         double m_incidence;
         double m_entranceArmLength;
         double m_exitArmLength;
-        double m_y0; // center of ellipsoid
-        double m_z0; // -"-
-        double m_shortHalfAxisB; // b
-        double m_longHalfAxisA; // a
-        double m_offsetY0; // always = 0?
         //double m_alpha1; // from tangent angle and grazing incidence???
         // derived params
         double m_tangentAngle;
         double m_a34;
         double m_a33;
         double m_a44;
-
+        double m_y0; // center of ellipsoid
+        double m_z0; // -"-
+        double m_shortHalfAxisB; // b
+        double m_longHalfAxisA; // a
+        double m_offsetY0; // always = 0?
+        
         FIGURE_ROTATION m_figureRotation;
         COORDINATESYSTEM_TYPE m_misalignmentCoordSys;
         double m_a11; // param for quadric funciton, given by user

@@ -12,7 +12,10 @@ out/
 *.code-workspace
 /CMakeSettings.json
 /Tests/output/*
+/Tests/oldray_files/unittestData
+/Tests/oldray_files/spec1-first_rzp02/data
+/Tests/oldray_files/spec1-first_rzp4mm/data
+/Tests/oldray_files/spec1+first_rzp4mm/data
 /Tests/.ipynb_checkpoints/*
-/Tests/plot2.ipynb
 CMakeCache.txt
 cmake.check_cache

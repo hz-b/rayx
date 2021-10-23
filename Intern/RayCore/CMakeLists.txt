@@ -30,10 +30,10 @@ SET(SOURCE
     src/Model/Surface/Quadric.cpp
     src/Model/Surface/Toroid.cpp
     src/Model/Surface/Surface.cpp
-    src/Model/Geometry/Geometry.h
+    src/Model/Geometry/Geometry.cpp
     src/Tracer/Ray.cpp
     src/Tracer/TracerInterface.cpp
-    src/UserParameter/WorldCoordinates.cpp
+    src/UserParameter/WorldUserParams.cpp
     src/UserParameter/GeometricUserParams.cpp
 )
 
@@ -70,7 +70,7 @@ SET(HEADERS
     src/Model/Geometry/Geometry.h
     src/Tracer/Ray.h
     src/Tracer/TracerInterface.h
-    src/UserParameter/WorldCoordinates.h
+    src/UserParameter/WorldUserParams.h
     src/UserParameter/GeometricUserParams.h
 )
 

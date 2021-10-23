@@ -6,67 +6,34 @@
 
 namespace RAYX
 {
-    OpticalElement::OpticalElement(const char* name, const std::vector<double> surfacePoints, const std::vector<double> inputInMatrix, const std::vector<double> inputOutMatrix, const std::vector<double> misalignmentMatrix, const std::vector<double> inverseMisalignmentMatrix, const std::vector<double> OParameters, const std::vector<double> EParameters)
+    /**
+     * constructor for adding elements to tracer. The given vectors contain the values that will actually be moved to the shader
+     * @param name                  name of the element
+     * @param surfaceParams         parameters that define the surface of the element
+     * @param inputInMatrix         16x16 world coordinate to element coordinate transformation matrix
+     * @param inputOutMatrix        16x16 element coordinate to world coordinate transformation matrix
+     * @param misalignmentMatrix    contains matrix for when the misalignment needs to be removed mid-tracing
+     * @param invMisalignmentMatrix contains inverse matrix for when the misalignment needs to be removed mid-tracing
+     * @param OParameters           Object parameters (width, height, slopeError..) something all elements have
+     * @param EParameters           Element specific parameters, depend on which element it is
+     */
+    OpticalElement::OpticalElement(const char* name, const std::vector<double> surfaceParams, const std::vector<double> inputInMatrix, const std::vector<double> inputOutMatrix, const std::vector<double> misalignmentMatrix, const std::vector<double> invMisalignmentMatrix, const std::vector<double> OParameters, const std::vector<double> EParameters)
         : BeamlineObject(name)
     {
-        std::cout << surfacePoints.size() << inputInMatrix.size() << inputOutMatrix.size() << misalignmentMatrix.size() << inverseMisalignmentMatrix.size() << EParameters.size() << OParameters.size() << std::endl;
+        std::cout << surfaceParams.size() << inputInMatrix.size() << inputOutMatrix.size() << misalignmentMatrix.size() << invMisalignmentMatrix.size() << EParameters.size() << OParameters.size() << std::endl;
         // surface.getParams() to shader/buffer
-        assert(surfacePoints.size() == 16 && inputInMatrix.size() == 16 && inputOutMatrix.size() == 16 && misalignmentMatrix.size() == 16 && inverseMisalignmentMatrix.size() == 16 && EParameters.size() == 16 && OParameters.size() == 16);
-        m_surfaceParams = surfacePoints;
-        m_inMatrix = inputInMatrix;
-        m_outMatrix = inputOutMatrix;
+        assert(surfaceParams.size() == 16 && inputInMatrix.size() == 16 && inputOutMatrix.size() == 16 && misalignmentMatrix.size() == 16 && invMisalignmentMatrix.size() == 16 && EParameters.size() == 16 && OParameters.size() == 16);
+        m_surfaceParams = surfaceParams;
+        m_geometry = std::make_unique<Geometry>();
+        m_geometry->setInMatrix(inputInMatrix);
+        m_geometry->setOutMatrix(inputOutMatrix);
         m_temporaryMisalignmentMatrix = misalignmentMatrix;
-        m_inverseTemporaryMisalignmentMatrix = inverseMisalignmentMatrix;
+        m_inverseTemporaryMisalignmentMatrix = invMisalignmentMatrix;
         m_objectParameters = OParameters;
         m_elementParameters = EParameters;
     }
 
-    /**
-     * standard constructor
-     * this class calculates and stores transformation matrices (beam to element and element to beam system),
-     * misalignment matrices and the parameters for the quadric equation!
-     *
-     * angles given in rad
-     * define transformation matrices based on grazing incidence (alpha) and exit (beta) angle, azimuthal angle (chi) and distance to preceeding element
-     * @param name
-     * @param EParameters               vector with 16 entries that contain further element specific parameters that are needed on the shader
-     * @param geometricalShape          geometrical Shape of element (0 = rectangle, 1 = elliptical)
-     * @param width
-     * @param height
-     * @param alpha                     grazing incidence angle
-     * @param chi                       azimuthal angle
-     * @param beta                      grazing exit angle
-     * @param dist                      distance to preceeding element
-     * @param misalignmentParams        angles and distances for the object's misalignment
-     * @param tempMisalignmentParams    parameters for temporary misalignment that can be removed midtracing.
-     * @param slopeError
-     * @param previous
-     * @param global
-    */
-    OpticalElement::OpticalElement(const char* name, const std::vector<double> EParameters, const int geometricalShape, const double width, const double height, const double alpha, const double chi, const double beta, const double dist, const std::vector<double> misalignmentParams, const std::vector<double> tempMisalignmentParams, const std::vector<double> slopeError, const std::shared_ptr<OpticalElement> previous, bool global)
-        : BeamlineObject(name),
-        //m_surface(std::move(surface)), 
-        m_alpha(alpha),
-        m_beta(beta), // mirror -> exit angle = incidence angle
-        m_chi(chi),
-        m_distanceToPreceedingElement(dist),
-        m_previous(previous),
-        m_misalignmentParams(misalignmentParams),
-        m_slopeError(slopeError),
-        m_elementParameters(EParameters)
-    {
-        if (geometricalShape == 0) {
-            m_width = width;
-            m_height = height;
-        }
-        else if (geometricalShape == 1) {
-            m_width = -width;
-            m_height = -height;
-        }
-        updateObjectParams();
-        calcTransformationMatricesFromAngles(misalignmentParams, global);
-        setTemporaryMisalignment(tempMisalignmentParams);
-    }
+    
 
     OpticalElement::OpticalElement(const char* name, const int geometricalShape, const double width, const double height, const double chi, const double dist, const std::vector<double> slopeError, const std::shared_ptr<OpticalElement> previous)
         : BeamlineObject(name),
@@ -77,28 +44,11 @@ namespace RAYX
         m_previous(previous),
         m_slopeError(slopeError)
     {
-        if (geometricalShape == 0) {
-            m_width = width;
-            m_height = height;
-        }
-        else if (geometricalShape == 1) {
-            m_width = -width;
-            m_height = -height;
-        }
+        glm::dvec4 pos = {0,0,0,0};
+        glm::dmat4x4 orientation = {0,0,0,0, 0,0,0,0, 0,0,0,0, 0,0,0,0};
+        m_geometry = std::make_unique<Geometry>(geometricalShape, width, height, pos, orientation);
         updateObjectParams();
 
-    }
-
-    OpticalElement::OpticalElement(const char* name, const double chi, const double dist, const std::vector<double> slopeError, const std::shared_ptr<OpticalElement> previous)
-        : BeamlineObject(name),
-        m_chi(chi),
-        m_distanceToPreceedingElement(dist),
-        m_previous(previous),
-        m_slopeError(slopeError),
-        m_width(0),
-        m_height(0)
-    {
-        updateObjectParams();
     }
 
     /* NEW CONSTRUCTORS */
@@ -119,18 +69,10 @@ namespace RAYX
         m_elementParameters(EParameters),
         m_slopeError(slopeError)
     {
+        m_geometry = std::make_unique<Geometry>(geometricalShape, width, height, position, orientation);
         assert(EParameters.size() == 16 && slopeError.size() == 7 && tempMisalignmentParams.size() == 6);
-        if (geometricalShape == 0) {
-            m_width = width;
-            m_height = height;
-        }
-        else if (geometricalShape == 1) {
-            m_width = -width;
-            m_height = -height;
-        }
         updateObjectParams();
         setTemporaryMisalignment(tempMisalignmentParams);
-        calcTransformationMatrices(position, orientation);
     }
 
     /**
@@ -146,17 +88,9 @@ namespace RAYX
         : BeamlineObject(name),
         m_slopeError(slopeError)
     {
-        if (geometricalShape == 0) {
-            m_width = width;
-            m_height = height;
-        }
-        else if (geometricalShape == 1) {
-            m_width = -width;
-            m_height = -height;
-        }
+        m_geometry = std::make_unique<Geometry>(geometricalShape, width, height, position, orientation);
         updateObjectParams();
         setTemporaryMisalignment({ 0,0,0, 0,0,0 });
-        calcTransformationMatrices(position, orientation);
     }
 
 
@@ -167,41 +101,6 @@ namespace RAYX
 
     OpticalElement::~OpticalElement()
     {
-    }
-
-    /**
-     * calculates element to world coordinates transformation matrix and its inverse
-     * @param   position     4 element vector which describes the position of the element in world coordinates
-     * @param   orientation  4x4 matrix that describes the orientation of the surface with respect to the world coordinate system
-     * @return void
-    */
-    void OpticalElement::calcTransformationMatrices(glm::dvec4 position, glm::dmat4x4 orientation) {
-        glm::dmat4x4 translation = glm::dmat4x4(1, 0, 0, -position[0],
-            0, 1, 0, -position[1],
-            0, 0, 1, -position[2],
-            0, 0, 0, 1); // o
-        glm::dmat4x4 inv_translation = glm::dmat4x4(1, 0, 0, position[0],
-            0, 1, 0, position[1],
-            0, 0, 1, position[2],
-            0, 0, 0, 1); // o
-        glm::dmat4x4 rotation = glm::dmat4x4(orientation[0][0], orientation[0][1], orientation[0][2], 0.0,
-            orientation[1][0], orientation[1][1], orientation[1][2], 0.0,
-            orientation[2][0], orientation[2][1], orientation[2][2], 0.0,
-            0.0, 0.0, 0.0, 1.0); // o
-        glm::dmat4x4 inv_rotation = glm::transpose(rotation);
-
-        // ray = tran * rot * ray
-        glm::dmat4x4 g2e = translation * rotation;
-        m_inMatrix = glmToVector16(glm::transpose(g2e));
-
-        // inverse of m_inMatrix
-        glm::dmat4x4 e2g = inv_rotation * inv_translation;
-        m_outMatrix = glmToVector16(glm::transpose(e2g));
-
-        std::cout << "from position and orientation" << std::endl;
-        printMatrix(m_inMatrix);
-        printMatrix(m_outMatrix);
-
     }
 
     /**
@@ -306,6 +205,8 @@ namespace RAYX
             m_outMatrix = glmToVector16(m_e2b);
         }
 
+        m_geometry->setInMatrix(m_inMatrix);
+        m_geometry->setOutMatrix(m_outMatrix);
         std::cout.precision(17);
         printMatrix(m_inMatrix);
         printMatrix(m_outMatrix);
@@ -356,21 +257,15 @@ namespace RAYX
         m_elementParameters = params;
     }
 
-    void OpticalElement::setDimensions(double width, double height) {
-        m_width = width;
-        m_height = height;
-        updateObjectParams();
-    }
-
     void OpticalElement::setInMatrix(std::vector<double> inputMatrix)
     {
         assert(inputMatrix.size() == 16);
-        m_inMatrix = inputMatrix;
+        m_geometry->setInMatrix(inputMatrix);
     }
     void OpticalElement::setOutMatrix(std::vector<double> inputMatrix)
     {
         assert(inputMatrix.size() == 16);
-        m_outMatrix = inputMatrix;
+        m_geometry->setOutMatrix(inputMatrix);
     }
 
     void OpticalElement::setSurface(std::unique_ptr<Surface> surface) {
@@ -382,7 +277,7 @@ namespace RAYX
 
     void OpticalElement::updateObjectParams() {
         m_objectParameters = {
-                m_width, m_height, m_slopeError[0], m_slopeError[1],
+                m_geometry->getWidth(), m_geometry->getHeight(), m_slopeError[0], m_slopeError[1],
                 m_slopeError[2], m_slopeError[3], m_slopeError[4], m_slopeError[5],
                 m_slopeError[6], 0,0,0,
                 0,0,0,0
@@ -401,12 +296,13 @@ namespace RAYX
         return m_beta;
     }
 
-    double OpticalElement::getWidth() const {
-        return abs(m_width);
+    double OpticalElement::getWidth() {
+        double width = m_geometry->getWidth();
+        return width;
     }
 
-    double OpticalElement::getHeight() const {
-        return abs(m_height);
+    double OpticalElement::getHeight() {
+        return m_geometry->getHeight();
     }
 
     double OpticalElement::getAlpha() const {
@@ -422,11 +318,11 @@ namespace RAYX
 
     std::vector<double> OpticalElement::getInMatrix() const
     {
-        return m_inMatrix;
+        return m_geometry->getInMatrix();
     }
     std::vector<double> OpticalElement::getOutMatrix() const
     {
-        return m_outMatrix;
+        return m_geometry->getOutMatrix();
     }
 
     std::vector<double> OpticalElement::getMisalignmentParams() const
