@@ -16,7 +16,6 @@ namespace RAYX {
         // dtor
         ~Toroid();
 
-
         void setParameters(std::vector<double> inputPoints);
 
         std::vector<double> getParams() const;

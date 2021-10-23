@@ -1,6 +1,7 @@
 #pragma once
 #include "Model/Surface/Toroid.h"
 #include "Model/Beamline/OpticalElement.h"
+#include <Data/xml.h>
 
 namespace RAYX
 {
@@ -15,6 +16,8 @@ namespace RAYX
         //ToroidMirror(const char* name, const int geometricalShape, const double width, const double height, const double grazingIncidence, const double azimuthal, const double distanceToPreceedingElement, const double mEntrance, const double mExit, const double sEntrance, const double sExit, const std::vector<double> misalignmentParams, const std::vector<double> slopeError, const std::shared_ptr<OpticalElement> previous, bool global);
         ToroidMirror();
         ~ToroidMirror();
+
+        static std::shared_ptr<ToroidMirror> createFromXML(rapidxml::xml_node<>*);
 
         void calcRadius(double incidenceAngle);
         double getRadius() const;

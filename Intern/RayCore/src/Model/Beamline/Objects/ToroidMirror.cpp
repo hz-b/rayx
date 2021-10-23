@@ -41,6 +41,46 @@ namespace RAYX
     {
     }
 
+    std::shared_ptr<ToroidMirror> ToroidMirror::createFromXML(rapidxml::xml_node<>* node) { // TODO
+        const char* name = node->first_attribute("name")->value();
+
+        int geometricalShape;
+        if (!xml::paramInt(node, "gemetricalShape", &geometricalShape)) { return nullptr; }
+
+        double width;
+        if (!xml::paramDouble(node, "totalWidth", &width)) { return nullptr; }
+
+        double height;
+        if (!xml::paramDouble(node, "totalLength", &height)) { return nullptr; }
+
+        glm::dvec4 position;
+        if (!xml::paramPosition(node, &position)) { return nullptr; }
+
+        glm::dmat4x4 orientation;
+        if (!xml::paramOrientation(node, &orientation)) { return nullptr; }
+
+        double incidenceAngle;
+        if (!xml::paramDouble(node, "grazingIncAngle", &incidenceAngle)) { return nullptr; }
+
+        double mEntrance;
+        if (!xml::paramDouble(node, "entranceArmLengthMer", &mEntrance)) { return nullptr; }
+
+        double mExit;
+        if (!xml::paramDouble(node, "exitArmLengthMer", &mExit)) { return nullptr; }
+
+        double sEntrance;
+        if (!xml::paramDouble(node, "entranceArmLengthSag", &sEntrance)) { return nullptr; }
+
+        double sExit;
+        if (!xml::paramDouble(node, "exitArmLengthSag", &sExit)) { return nullptr; }
+
+        std::vector<double> slopeError;
+        if (!xml::paramSlopeError(node, &slopeError)) { return nullptr; }
+
+        return std::make_shared<ToroidMirror>(name, geometricalShape, width, height, position, orientation, incidenceAngle, mEntrance, mExit, sEntrance, sExit, slopeError);
+    }
+
+
     /**
      * calculate long and short radius from grazing incidence angle and meridional and sagittal entrance and exit arm lengths
      */
