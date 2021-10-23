@@ -104,5 +104,26 @@ namespace RAYX {
 
             return true;
         }
+
+        bool paramSlopeError(rapidxml::xml_node<>* node, std::vector<double>* out) {
+            *out = std::vector<double>(7, 0.f);
+
+            rapidxml::xml_node<>* p;
+            if (!param(node, "slopeError", &p)) { return false; }
+
+            if (strcmp(p->first_attribute("comment")->value(), "Yes") == 0) {
+                // all slopeError-values will be left at 0 if they are missing.
+                // Hence we ignore the return values of the upcoming paramDouble-calls.
+                xml::paramDouble(node, "slopeErrorSag", &((*out)[0]));
+                xml::paramDouble(node, "slopeErrorMer", &((*out)[1]));
+                xml::paramDouble(node, "thermalDistortionAmp", &((*out)[2]));
+                xml::paramDouble(node, "thermalDistortionSigmaX", &((*out)[3]));
+                xml::paramDouble(node, "thermalDistortionSigmaZ", &((*out)[4]));
+                xml::paramDouble(node, "cylindricalBowingAmp", &((*out)[5]));
+                xml::paramDouble(node, "cylindricalBowingRadius", &((*out)[6]));
+            }
+
+            return true;
+        }
     }
 }

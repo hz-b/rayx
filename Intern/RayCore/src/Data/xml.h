@@ -15,5 +15,6 @@ namespace RAYX {
         bool paramMisalignment(rapidxml::xml_node<>* node, std::vector<double>* out);
         bool paramPosition(rapidxml::xml_node<>* node, glm::dvec4* out);
         bool paramOrientation(rapidxml::xml_node<>* node, glm::dmat4x4* out);
+        bool paramSlopeError(rapidxml::xml_node<>* node, std::vector<double>* out);
     }
 }

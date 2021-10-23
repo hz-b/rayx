@@ -14,6 +14,8 @@ namespace RAYX
         PlaneMirror();
         ~PlaneMirror();
 
+        static std::shared_ptr<PlaneMirror> createFromXML(rapidxml::xml_node<>*);
+
     };
 
 } // namespace RAYX

@@ -1,4 +1,5 @@
 #include "PlaneMirror.h"
+#include <Data/xml.h>
 
 namespace RAYX
 {
@@ -26,5 +27,30 @@ namespace RAYX
     PlaneMirror::~PlaneMirror()
     {
     }
+
+    std::shared_ptr<PlaneMirror> PlaneMirror::createFromXML(rapidxml::xml_node<>* node) {
+        const char* name = node->first_attribute("name")->value();
+
+        int geometricalShape;
+        if (!xml::paramInt(node, "geometricalShape", &geometricalShape)) { return nullptr; }
+
+        double width;
+        if (!xml::paramDouble(node, "totalWidth", &width)) { return nullptr; }
+
+        double height;
+        if (!xml::paramDouble(node, "totalLength", &height)) { return nullptr; }
+
+        glm::dvec4 position;
+        if (!xml::paramPosition(node, &position)) { return nullptr; }
+
+        glm::dmat4x4 orientation;
+        if (!xml::paramOrientation(node, &orientation)) { return nullptr; }
+
+        std::vector<double> slopeError;
+        if (!xml::paramSlopeError(node, &slopeError)) { return nullptr; }
+
+        return std::make_shared<PlaneMirror>(name, geometricalShape, width, height, position, orientation, slopeError);
+    }
+
 
 }

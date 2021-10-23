@@ -6,6 +6,7 @@
 #include "Model/Beamline/Objects/PointSource.h"
 #include "Model/Beamline/Objects/MatrixSource.h"
 #include "Model/Beamline/Objects/ImagePlane.h"
+#include "Model/Beamline/Objects/PlaneMirror.h"
 
 #include "Importer.h"
 #include <string.h>
@@ -43,8 +44,9 @@ namespace RAYX
             addLightSource(MatrixSource::createFromXML(node));
         } else if (strcmp(type, "ImagePlane") == 0) {
             addOpticalElement(ImagePlane::createFromXML(node));
-        }
-        else { // TODO(rudi): extend this!
+        } else if (strcmp(type, "Plane Mirror") == 0) {
+            addOpticalElement(PlaneMirror::createFromXML(node));
+        } else { // TODO(rudi): extend this!
             std::cerr << "could not construct beamline object with Name: " << node->first_attribute("name")->value() << "; Type: " << node->first_attribute("type")->value() << '\n';
         }
     }
