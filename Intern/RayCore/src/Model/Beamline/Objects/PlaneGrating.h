@@ -1,6 +1,7 @@
 #pragma once
 #include "Model/Surface/Quadric.h"
 #include "Model/Beamline/OpticalElement.h"
+#include <Data/xml.h>
 
 namespace RAYX
 {
@@ -15,6 +16,8 @@ namespace RAYX
         PlaneGrating(const char* name, const int geometricalShape, const double width, const double height, glm::dvec4 position, glm::dmat4x4 orientation, const double designEnergyMounting, const double lineDensity, const double orderOfDiffraction, const int additionalZeroOrder, const std::vector<double> vls, const std::vector<double> slopeError);
         PlaneGrating();
         ~PlaneGrating();
+
+        static std::shared_ptr<PlaneGrating> createFromXML(rapidxml::xml_node<>*);
 
         // functions used to derive incidence and exit angle from user parameters, will be moved to somewhere else
         void calcAlpha(const double deviation, const double normalIncidence);

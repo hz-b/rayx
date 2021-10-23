@@ -46,6 +46,46 @@ namespace RAYX
     {
     }
 
+    std::shared_ptr<PlaneGrating> PlaneGrating::createFromXML(rapidxml::xml_node<>* node) {
+        const char* name = node->first_attribute("name")->value();
+
+        int geometricalShape;
+        if (!xml::paramInt(node, "geometricalShape", &geometricalShape)) { return nullptr; }
+
+        double width;
+        if (!xml::paramDouble(node, "totalWidth", &width)) { return nullptr; }
+
+        double height;
+        if (!xml::paramDouble(node, "totalLength", &height)) { return nullptr; }
+
+        glm::dvec4 position;
+        if (!xml::paramPosition(node, &position)) { return nullptr; }
+
+        glm::dmat4x4 orientation;
+        if (!xml::paramOrientation(node, &orientation)) { return nullptr; }
+
+        double designEnergy;
+        if (!xml::paramDouble(node, "designEnergyMounting", &designEnergy)) { return nullptr; }
+
+        double lineDensity;
+        if (!xml::paramDouble(node, "lineDensity", &lineDensity)) { return nullptr; }
+
+        double orderOfDiffraction;
+        if (!xml::paramDouble(node, "orderDiffraction", &orderOfDiffraction)) { return nullptr; }
+
+        double additionalZeroOrder = 0;
+        xml::paramDouble(node, "additionalOrder", &additionalZeroOrder); // may be missing in some RML files, that's fine though
+
+        std::vector<double> vls;
+        if (!xml::paramVls(node, &vls)) { return nullptr; }
+
+        std::vector<double> slopeError;
+        if (!xml::paramSlopeError(node, &slopeError)) { return nullptr; }
+
+        return std::make_shared<PlaneGrating>(name, geometricalShape, width, height, position, orientation, designEnergy, lineDensity, orderOfDiffraction, additionalZeroOrder, vls, slopeError);
+    }
+
+
     /* functions to derive angles from user input parameters -> moved to somewhere else for now */
     void PlaneGrating::calcAlpha(const double deviation, const double normalIncidence) {
         double angle;
