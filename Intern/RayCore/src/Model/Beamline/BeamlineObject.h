@@ -30,7 +30,7 @@ namespace RAYX
 
         const char* m_name;
         //m_geometry;
-        //m_surface; //(for lightsource??)
+        //m_surfacePtr; //(for lightsource??)
 
 
     };

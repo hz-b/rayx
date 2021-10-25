@@ -23,7 +23,7 @@ namespace RAYX
         OpticalElement(const char* name, const std::vector<double> surfaceParams, const std::vector<double> inputInMatrix, const std::vector<double> inputOutMatrix, const std::vector<double> misalignmentMatrix, const std::vector<double> invMisalignmentMatrix, const std::vector<double> OParameters, const std::vector<double> EParameters);
         // needed only for ellipsoid 
         OpticalElement(const char* name, const int geometricalShape, const double width, const double height, const double chi, const double dist, const std::vector<double> slopeError, const std::shared_ptr<OpticalElement> previous);
-        
+
         // new constructors
         OpticalElement(const char* name, const std::vector<double> EParameters, const int geometricalShape, const double width, const double height, glm::dvec4 position, glm::dmat4x4 orientation, const std::vector<double> tempMisalignmentParams, const std::vector<double> slopeError);
         OpticalElement(const char* name, const int geometricalShape, const double width, const double height, glm::dvec4 position, glm::dmat4x4 orientation, const std::vector<double> slopeError);
@@ -116,10 +116,10 @@ namespace RAYX
 
 
         // SURFACE (eg Quadric or if eg torus something else)
-        std::unique_ptr<Surface> m_surface;
+        std::unique_ptr<Surface> m_surfacePtr;
         std::vector<double> m_surfaceParams; // used to be anchor points
 
-        // TODO(Jannis): remove temporary misalignment (maybe move to rzp)
+        // TODO(Jannis): remove temporary misalignment (maybe move to ellipsoid mirror)
         // sometimes it is necessary to remove (partly (ellipsoid) or the whole (RZP)) misalignment midtracing, the parameters (see misalignment) is stored here and the corresponding
         // transformation matrix in m_temporaryMisalignmentMatrix (0's if not needed)
         std::vector<double> m_temporaryMisalignmentParams;
