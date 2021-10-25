@@ -33,7 +33,7 @@ namespace RAYX
         m_elementParameters = EParameters;
     }
 
-    
+
 
     OpticalElement::OpticalElement(const char* name, const int geometricalShape, const double width, const double height, const double chi, const double dist, const std::vector<double> slopeError, const std::shared_ptr<OpticalElement> previous)
         : BeamlineObject(name),
@@ -44,8 +44,8 @@ namespace RAYX
         m_previous(previous),
         m_slopeError(slopeError)
     {
-        glm::dvec4 pos = {0,0,0,0};
-        glm::dmat4x4 orientation = {0,0,0,0, 0,0,0,0, 0,0,0,0, 0,0,0,0};
+        glm::dvec4 pos = { 0,0,0,0 };
+        glm::dmat4x4 orientation = { 0,0,0,0, 0,0,0,0, 0,0,0,0, 0,0,0,0 };
         m_geometry = std::make_unique<Geometry>(geometricalShape, width, height, pos, orientation);
         updateObjectParams();
 
@@ -269,9 +269,9 @@ namespace RAYX
     }
 
     void OpticalElement::setSurface(std::unique_ptr<Surface> surface) {
-        m_surface = std::move(surface);
+        m_surfacePtr = std::move(surface);
         assert(surface == nullptr);
-        assert(m_surface != nullptr);
+        assert(m_surfacePtr != nullptr);
 
     }
 
@@ -398,9 +398,9 @@ namespace RAYX
     std::vector<double> OpticalElement::getSurfaceParams() const
     {
         std::cout << "return anchor points" << std::endl;
-        //assert(m_surface!=nullptr);
-        if (m_surface != nullptr)
-            return m_surface->getParams();
+        //assert(m_surfacePtr!=nullptr);
+        if (m_surfacePtr != nullptr)
+            return m_surfacePtr->getParams();
         else
             return m_surfaceParams;
     }

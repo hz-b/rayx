@@ -4,7 +4,7 @@
 
 namespace RAYX
 {
-
+    // TODO(Jannis): rename or turn into surface
     class RAYX_API Ellipsoid : public OpticalElement {
 
     public:
@@ -58,7 +58,7 @@ namespace RAYX
         double m_shortHalfAxisB; // b
         double m_longHalfAxisA; // a
         double m_offsetY0; // always = 0?
-        
+
         FIGURE_ROTATION m_figureRotation;
         COORDINATESYSTEM_TYPE m_misalignmentCoordSys;
         double m_a11; // param for quadric funciton, given by user
