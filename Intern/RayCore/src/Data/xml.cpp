@@ -86,7 +86,7 @@ namespace RAYX {
         bool paramPosition(rapidxml::xml_node<>* node, glm::dvec4* out) {
             glm::dvec3 position3;
             if (!xml::paramDvec3(node, "worldPosition", &position3)) { return false; }
-            *out = glm::dvec4(position3, 1); // TODO(rudi): is this '1' correct?
+            *out = glm::dvec4(position3, 1);
 
             return true;
         }
