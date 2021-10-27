@@ -11,16 +11,11 @@ namespace RAYX {
         std::string line;
 
         // line 1
-        std::getline(s, line);
-        if (line[0] != '\"' || line[line.length()-1] != '\"') {
-            std::cerr << "Failed to parse DatFile \"" << filename << "\", at line 1: \"" << line << "\"\n";
-            return false;
-        }
-        out->title = line.substr(1, line.length()-2);
+        std::getline(s, out->title);
 
         // line 2
         std::getline(s, line);
-        if (sscanf(line.c_str(), "%d\t%le\t%le\t%le", &out->linecount, &out->start, &out->end, &out->step) != 4) {
+        if (sscanf(line.c_str(), "%d %le %le %le", &out->linecount, &out->start, &out->end, &out->step) != 4) {
             std::cerr << "Failed to parse DatFile \"" << filename << "\", at line 2: \"" << line << "\"\n";
             return false;
         }
@@ -33,7 +28,7 @@ namespace RAYX {
 
             DatEntry e;
             
-            if (sscanf(line.c_str(), "%le\t%le.", &e.energy, &e.weight) != 2) {
+            if (sscanf(line.c_str(), "%le %le", &e.energy, &e.weight) != 2) {
                 std::cerr << "Failed to parse DatFile \"" << filename << "\", at line " << lineidx << ": \"" << line << "\"\n";
                 return false;
             }
@@ -41,5 +36,16 @@ namespace RAYX {
         }
 
         return true;
+    }
+
+    std::string DatFile::dump() {
+        std::stringstream s;
+        s << title << '\n';
+        s << linecount << ' ' << start << ' ' << end << ' ' << step << '\n';
+        for (auto line: lines) {
+            s << line.energy << ' ' << line.weight << "\n";
+        }
+
+        return s.str();
     }
 }

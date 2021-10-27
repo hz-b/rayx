@@ -20,5 +20,8 @@ namespace RAYX {
 
         // loads the .DAT file `filename` and writes it's contents to out
         static bool load(const char* filename, DatFile* out);
+
+        // creates a valid .DAT file from this struct (may be used for testing)
+        std::string dump();
     };
 }
