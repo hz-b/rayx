@@ -25,6 +25,7 @@ SET(SOURCE
     src/Data/Exporter.cpp
     src/Data/Importer.cpp
     src/Data/xml.cpp
+    src/Data/dat.cpp
     src/Presenter/Presenter.cpp
     src/Presenter/SimulationEnv.cpp
     src/Model/Surface/Quadric.cpp
@@ -62,6 +63,7 @@ SET(HEADERS
     src/Data/Exporter.h
     src/Data/Importer.h
     src/Data/xml.h
+    src/Data/dat.h
     src/Presenter/Presenter.h
     src/Presenter/SimulationEnv.h
     src/Model/Surface/Quadric.h
