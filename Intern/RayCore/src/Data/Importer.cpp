@@ -32,6 +32,10 @@ namespace RAYX
     void addBeamlineObjectFromXML(rapidxml::xml_node<>* node, Beamline* beamline) {
         const char* type = node->first_attribute("type")->value();
 
+        // the following three blocks of code are lambda expressions (see https://en.cppreference.com/w/cpp/language/lambda)
+        // They define functions to be used in the if-else-chain below to keep it structured and readable.
+
+        // addLightSource(s, node) is a function adding a light source to the beamline (if it's not nullptr)
         const auto addLightSource = [&](std::shared_ptr<LightSource> s, rapidxml::xml_node<>* node) {
             if (s) {
                 beamline->m_LightSources.push_back(s);
@@ -40,6 +44,7 @@ namespace RAYX
             }
         };
 
+        // addOpticalElement(e, node) is a function adding an optical element to the beamline (if it's not nullptr)
         const auto addOpticalElement = [&](std::shared_ptr<OpticalElement> e, rapidxml::xml_node<>* node) {
             if (e) {
                 beamline->m_OpticalElements.push_back(e);
@@ -48,12 +53,15 @@ namespace RAYX
             }
         };
 
+        // calcSourceEnergy does some validity checks and then yields the source-energy required by the Slit::createFromXML function
         const auto calcSourceEnergy = [&] {
             assert(!beamline->m_LightSources.empty());
             assert(beamline->m_LightSources[0]);
             return beamline->m_LightSources[0]->getPhotonEnergy();
         };
 
+        // every beamline object has a function createFromXML which constructs the object from a given xml-node if possible (otherwise it will return a nullptr)
+        // The createFromXML functions use the param* functions declared in <Data/xml.h>
         if (strcmp(type, "Point Source") == 0) {
             addLightSource(PointSource::createFromXML(node), node);
         } else if (strcmp(type, "Matrix Source") == 0) {
