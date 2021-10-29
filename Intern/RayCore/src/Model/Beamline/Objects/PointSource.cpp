@@ -31,8 +31,8 @@ namespace RAYX
 
         if (!xml::paramInt(node, "numberRays", &SimulationEnv::get().m_numOfRays)) { return nullptr; }
 
-        int spreadType;
-        if (!xml::paramInt(node, "energySpreadType", &spreadType)) { return nullptr; }
+        EnergyDistribution energyDistribution;
+        if (!xml::paramEnergyDistribution(node, &energyDistribution)) { return nullptr; }
 
         double sourceWidth;
         if (!xml::paramDouble(node, "sourceWidth", &sourceWidth)) { return nullptr; }
@@ -61,12 +61,6 @@ namespace RAYX
         int verDist;
         if (!xml::paramInt(node, "verDivDistribution", &verDist)) { return nullptr; }
 
-        double photonEnergy;
-        if (!xml::paramDouble(node, "photonEnergy", &photonEnergy)) { return nullptr; }
-
-        double energySpread;
-        if (!xml::paramDouble(node, "energySpread", &energySpread)) { return nullptr; }
-
         double linPol0;
         if (!xml::paramDouble(node, "linearPol_0", &linPol0)) { return nullptr; }
 
@@ -80,8 +74,8 @@ namespace RAYX
         if (!xml::paramMisalignment(node, &misalignment)) { return nullptr; }
 
         return std::make_shared<PointSource>(
-            name, spreadType, sourceWidth, sourceHeight, sourceDepth,
-            horDivergence, verDivergence, widthDist, heightDist, horDist, verDist, photonEnergy, energySpread,
+            name, energyDistribution, sourceWidth, sourceHeight, sourceDepth,
+            horDivergence, verDivergence, widthDist, heightDist, horDist, verDist,
             linPol0, linPol45, circPol, misalignment
         );
     }

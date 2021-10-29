@@ -3,6 +3,7 @@
 #include "rapidxml.hpp"
 #include <glm.hpp>
 #include <vector>
+#include <Model/Beamline/EnergyDistribution.h>
 
 namespace RAYX {
     /** The xml namespace defines functions, which help to implement the createFromXML-functions for the beamline objects.
@@ -23,5 +24,6 @@ namespace RAYX {
         bool paramOrientation(rapidxml::xml_node<>* node, glm::dmat4x4* out);
         bool paramSlopeError(rapidxml::xml_node<>* node, std::vector<double>* out);
         bool paramVls(rapidxml::xml_node<>* node, std::vector<double>* out);
+        bool paramEnergyDistribution(rapidxml::xml_node<>* node, EnergyDistribution* out);
     }
 }

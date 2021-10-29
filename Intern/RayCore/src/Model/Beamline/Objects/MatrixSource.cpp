@@ -22,8 +22,8 @@ namespace RAYX
 
         if (!xml::paramInt(node, "numberRays", &SimulationEnv::get().m_numOfRays)) { return nullptr; }
 
-        int spreadType;
-        if (!xml::paramInt(node, "energySpreadType", &spreadType)) { return nullptr; }
+        EnergyDistribution energyDistribution;
+        if (!xml::paramEnergyDistribution(node, &energyDistribution)) { return nullptr; }
 
         double sourceWidth;
         if (!xml::paramDouble(node, "sourceWidth", &sourceWidth)) { return nullptr; }
@@ -59,8 +59,8 @@ namespace RAYX
         if (!xml::paramMisalignment(node, &misalignment)) { return nullptr; }
 
         return std::make_shared<MatrixSource>(
-            name, spreadType, sourceWidth, sourceHeight, sourceDepth,
-            horDivergence, verDivergence, photonEnergy, energySpread,
+            name, energyDistribution, sourceWidth, sourceHeight, sourceDepth,
+            horDivergence, verDivergence,
             linPol0, linPol45, circPol, misalignment
         );
     }

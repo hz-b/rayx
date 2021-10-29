@@ -1,6 +1,7 @@
 #include "xml.h"
 #include <cstdio>
 #include <cstring>
+#include <iostream>
 
 namespace RAYX {
     namespace xml {
@@ -144,6 +145,34 @@ namespace RAYX {
             }
 
             return true;
+        }
+
+        bool paramEnergyDistribution(rapidxml::xml_node<>* node, EnergyDistribution* out) {
+            int energyDistributionType;
+            if (!xml::paramInt(node, "energyDistributionType", &energyDistributionType)) { return false; }
+
+            if (energyDistributionType == ET_FILE) {
+                    std::cerr << "unimplemented!\n"; //TODO(rudi)
+                    return false;
+            } else if (energyDistributionType == ET_VALUES) {
+                    int spreadType;
+                    if (!xml::paramInt(node, "energySpreadType", &spreadType)) { return false; }
+
+                    double photonEnergy;
+                    if (!xml::paramDouble(node, "photonEnergy", &photonEnergy)) { return false; }
+
+                    double energySpread;
+                    if (!xml::paramDouble(node, "energySpread", &energySpread)) { return false; }
+
+                    bool continuous = !spreadType; // spreadType = 0 -> white band (meaning continuous), spreadType = 1 -> three energies (meaning discrete)
+
+                    *out = EnergyDistribution(EnergyRange(photonEnergy, energySpread), continuous);
+
+                    return true;
+            } else {
+                    std::cerr << "paramEnergyDistribution is not implemented for spreadType " << energyDistributionType << "!\n";
+                    return false;
+            }
         }
     }
 }
