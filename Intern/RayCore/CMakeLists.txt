@@ -8,6 +8,7 @@ SET(SOURCE
     src/Model/Beamline/BeamlineObject.cpp
     src/Model/Beamline/OpticalElement.cpp
     src/Model/Beamline/LightSource.cpp
+    src/Model/Beamline/EnergyDistribution.cpp
     src/Model/Beamline/BeamlineObjectFactory.cpp
     src/Model/Beamline/Objects/ImagePlane.cpp
     src/Model/Beamline/Objects/MatrixSource.cpp
@@ -46,6 +47,7 @@ SET(HEADERS
     src/Model/Beamline/BeamlineObject.h
     src/Model/Beamline/OpticalElement.h
     src/Model/Beamline/LightSource.h
+    src/Model/Beamline/EnergyDistribution.h
     src/Model/Beamline/BeamlineObjectFactory.h
     src/Model/Beamline/Objects/ImagePlane.h
     src/Model/Beamline/Objects/MatrixSource.h

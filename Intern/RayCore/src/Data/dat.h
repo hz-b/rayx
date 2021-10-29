@@ -25,5 +25,7 @@ namespace RAYX {
 
         /** creates a valid .DAT file from this struct (may be used for testing) */
         std::string dump();
+
+        double selectEnergy(bool continuous) const;
     };
 }

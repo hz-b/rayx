@@ -6,8 +6,8 @@ namespace RAYX
 {
 
     // angles given and stored in rad
-    MatrixSource::MatrixSource(const std::string name, const int spreadType, const double sourceWidth, const double sourceHeight, const double sourceDepth, const double horDivergence, const double verDivergence, const double photonEnergy, const double energySpread, const double linPol0, const double linPol45, const double circPol, const std::vector<double> misalignment)
-        : LightSource(name.c_str(), spreadType, photonEnergy, energySpread, linPol0, linPol45, circPol, misalignment, sourceDepth, sourceHeight, sourceWidth, horDivergence, verDivergence)
+    MatrixSource::MatrixSource(const std::string name, EnergyDistribution dist, const double sourceWidth, const double sourceHeight, const double sourceDepth, const double horDivergence, const double verDivergence, const double linPol0, const double linPol45, const double circPol, const std::vector<double> misalignment)
+        : LightSource(name.c_str(), dist, linPol0, linPol45, circPol, misalignment, sourceDepth, sourceHeight, sourceWidth, horDivergence, verDivergence)
     {
 
     }

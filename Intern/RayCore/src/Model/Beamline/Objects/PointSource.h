@@ -9,8 +9,8 @@ namespace RAYX
     {
     public:
 
-        PointSource(const std::string name, const int spreadType, const double sourceWidth, const double sourceHeight,
-            const double sourceDepth, const double horDivergence, const double verDivergence, const int widthDist, const int heightDist, const int horDist, const int verDist, const double photonEnergy, const double energySpread, const double linPol0, const double linPol45, const double circPol, const std::vector<double> misalignment);
+        PointSource(const std::string name, EnergyDistribution dist, const double sourceWidth, const double sourceHeight,
+            const double sourceDepth, const double horDivergence, const double verDivergence, const int widthDist, const int heightDist, const int horDist, const int verDist, const double linPol0, const double linPol45, const double circPol, const std::vector<double> misalignment);
 
         PointSource();
         ~PointSource();

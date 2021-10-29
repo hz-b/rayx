@@ -48,4 +48,8 @@ namespace RAYX {
 
         return s.str();
     }
+
+    double DatFile::selectEnergy(bool continuous) const {
+        return 0; //TODO(rudi)
+    }
 }
