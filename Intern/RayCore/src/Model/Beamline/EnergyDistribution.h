@@ -13,11 +13,14 @@ namespace RAYX {
         double m_CenterEnergy;
         double m_EnergySpread;
 
+        EnergyRange(double centerEnergy, double EnergySpread);
+
         double selectEnergy(bool continuous) const;
     };
 
     class EnergyDistribution {
         public:
+            EnergyDistribution(); // TODO this default-constructor is required because LightSource also has one, do we actually want it though?
             EnergyDistribution(DatFile, bool continuous);
             EnergyDistribution(EnergyRange, bool continuous);
 

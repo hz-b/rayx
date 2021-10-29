@@ -8,7 +8,7 @@ namespace RAYX
 
     // angles given and stored in rad
     RandomRays::RandomRays(int low, int high)
-        : LightSource("Random rays", 0, 100, 0, 0, 0, 0, { 0,0,0,0 }),
+        : LightSource("Random rays", EnergyDistribution(EnergyRange(100., 0.), true), 0, 0, 0, { 0,0,0,0 }),
         m_low(low),
         m_high(high)
     {
