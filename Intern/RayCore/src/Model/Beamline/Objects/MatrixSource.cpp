@@ -40,12 +40,6 @@ namespace RAYX
         double verDivergence;
         if (!xml::paramDouble(node, "verDiv", &verDivergence)) { return nullptr; }
 
-        double photonEnergy;
-        if (!xml::paramDouble(node, "photonEnergy", &photonEnergy)) { return nullptr; }
-
-        double energySpread;
-        if (!xml::paramDouble(node, "energySpread", &energySpread)) { return nullptr; }
-
         double linPol0;
         if (!xml::paramDouble(node, "linearPol_0", &linPol0)) { return nullptr; }
 
