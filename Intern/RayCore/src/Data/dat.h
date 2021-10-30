@@ -19,6 +19,8 @@ namespace RAYX {
         double end;
         double step;
 
+        double weightSum;
+
         std::vector<DatEntry> lines;
 
         /** loads the .DAT file `filename` and writes it's contents to `out` */
