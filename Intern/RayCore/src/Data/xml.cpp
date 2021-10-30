@@ -152,27 +152,34 @@ namespace RAYX {
             int energyDistributionType;
             if (!xml::paramInt(node, "energyDistributionType", &energyDistributionType)) { return false; }
 
+            int spreadType;
+            if (!xml::paramInt(node, "energySpreadType", &spreadType)) { return false; }
+
+            bool continuous = !spreadType; // spreadType = 0 -> white band (meaning continuous), spreadType = 1 -> three energies (meaning discrete)
+
             if (energyDistributionType == ET_FILE) {
-                    std::cerr << "unimplemented!\n"; //TODO(rudi)
-                    return false;
+                const char* filename;
+                if (!xml::paramStr(node, "photonEnergyDistributionFile", &filename)) { return false; }
+
+                DatFile df;
+                if (!DatFile::load(filename, &df)) { return false; }
+
+                *out = EnergyDistribution(df, continuous);
+
+                return true;
             } else if (energyDistributionType == ET_VALUES) {
-                    int spreadType;
-                    if (!xml::paramInt(node, "energySpreadType", &spreadType)) { return false; }
+                double photonEnergy;
+                if (!xml::paramDouble(node, "photonEnergy", &photonEnergy)) { return false; }
 
-                    double photonEnergy;
-                    if (!xml::paramDouble(node, "photonEnergy", &photonEnergy)) { return false; }
+                double energySpread;
+                if (!xml::paramDouble(node, "energySpread", &energySpread)) { return false; }
 
-                    double energySpread;
-                    if (!xml::paramDouble(node, "energySpread", &energySpread)) { return false; }
+                *out = EnergyDistribution(EnergyRange(photonEnergy, energySpread), continuous);
 
-                    bool continuous = !spreadType; // spreadType = 0 -> white band (meaning continuous), spreadType = 1 -> three energies (meaning discrete)
-
-                    *out = EnergyDistribution(EnergyRange(photonEnergy, energySpread), continuous);
-
-                    return true;
+                return true;
             } else {
-                    std::cerr << "paramEnergyDistribution is not implemented for spreadType " << energyDistributionType << "!\n";
-                    return false;
+                std::cerr << "paramEnergyDistribution is not implemented for spreadType " << energyDistributionType << "!\n";
+                return false;
             }
         }
     }
