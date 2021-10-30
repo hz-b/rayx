@@ -5,10 +5,10 @@
 
 namespace RAYX {
     EnergyDistribution::EnergyDistribution(DatFile df, bool continuous)
-        : m_IsContinuous(continuous), m_EnergyDistributionType(ET_FILE), m_Variant(df) {}
+        : m_IsContinuous(continuous), m_Variant(df) {}
 
     EnergyDistribution::EnergyDistribution(EnergyRange r, bool continuous)
-        : m_IsContinuous(continuous), m_EnergyDistributionType(ET_VALUES), m_Variant(r) {}
+        : m_IsContinuous(continuous), m_Variant(r) {}
 
     EnergyDistribution::EnergyDistribution()
         : EnergyDistribution(EnergyRange(100.0, 0.0), false) {}

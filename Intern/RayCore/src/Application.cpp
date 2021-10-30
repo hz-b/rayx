@@ -35,7 +35,8 @@ namespace RAYX
         // ! objects are created here temporarily until reading in file works
         const clock_t all_begin_time = clock();
 
-        std::shared_ptr<MatrixSource> matSourcePtr = std::make_shared<MatrixSource>("matrix source", 0, 0.065, 0.04, 0.0, 0.001, 0.001, 100, 0, 1, 0, 0, std::vector<double>{ 0, 0, 0, 0 });
+        EnergyDistribution dist = EnergyDistribution(EnergyRange(100, 0), true);
+        std::shared_ptr<MatrixSource> matSourcePtr = std::make_shared<MatrixSource>("matrix source", dist, 0.065, 0.04, 0.0, 0.001, 0.001, 1, 0, 0, std::vector<double>{ 0, 0, 0, 0 });
         //std::shared_ptr<Slit> s = std::make_shared<Slit>("slit", 1, 2, 20, 2, 7.5, 10000, 20, 1, m->getPhotonEnergy(), std::vector<double>{2, 1, 0, 0, 0, 0 }, nullptr, GLOBAL);
 
         WorldUserParams param = WorldUserParams(degToRad(10), degToRad(10), 0, 10000, std::vector<double>{1, 2, 3, 0.001, 0.002, 0.003});

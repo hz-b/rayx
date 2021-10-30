@@ -1,4 +1,5 @@
 #include "xml.h"
+#include <Model/Beamline/LightSource.h>
 #include <cstdio>
 #include <cstring>
 #include <iostream>

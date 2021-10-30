@@ -17,15 +17,16 @@
 
 namespace RAYX
 {
+    enum SPREAD_TYPE { ES_WHITE_BAND, ES_THREE_ENERGIES }; // default ES_WHITE_BAND
+    enum ENERGY_DISTRIBUTION_TYPE { ET_FILE, ET_VALUES, ET_TOTAL, ET_PARAM }; // default ET_VALUES
+    enum SOURCE_DISTRIBUTION_TYPE { ST_SIMULTANEOUS, ST_HARD_EDGE, ST_GAUSS }; // default simultaneously
+
     class RAYX_API LightSource : public BeamlineObject
     {
     public:
 
         LightSource(const char* name, EnergyDistribution dist, const double linPol0, const double linPol45, const double circPol, const std::vector<double> misalignment, const double sourceDepth, const double sourceHeight, const double sourceWidth, const double horDivergence, const double verDivergence);
         LightSource(const char* name, EnergyDistribution dist, const double linPol0, const double linPol45, const double circPol, const std::vector<double> misalignment);
-
-        // TODO: unused
-        enum SOURCE_DISTRIBUTION_TYPE { ST_SIMULTANEOUS, ST_HARD_EDGE, ST_GAUSS }; // default simultaneously
 
         // Getter
         int getNumberOfRays();
