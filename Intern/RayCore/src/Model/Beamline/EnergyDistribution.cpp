@@ -1,9 +1,12 @@
 #include <iostream>
 #include <utility>
+#include <ctime>
 
 #include "EnergyDistribution.h"
 
 namespace RAYX {
+    std::mt19937 EnergyDistribution::rng(time(NULL));
+
     EnergyDistribution::EnergyDistribution(DatFile df, bool continuous)
         : m_IsContinuous(continuous), m_Variant(df) {}
 
@@ -14,7 +17,7 @@ namespace RAYX {
         : EnergyDistribution(EnergyRange(100.0, 0.0), false) {}
 
     double EnergyDistribution::selectEnergy() {
-        const auto func = [&](const auto arg) -> double { return arg.selectEnergy(m_IsContinuous); };
+        const auto func = [&](const auto arg) -> double { return arg.selectEnergy(rng, m_IsContinuous); };
         return std::visit(func, m_Variant);
     }
 
@@ -22,8 +25,14 @@ namespace RAYX {
     EnergyRange::EnergyRange(double centerEnergy, double EnergySpread)
         : m_CenterEnergy(centerEnergy), m_EnergySpread(EnergySpread) {}
 
-    double EnergyRange::selectEnergy(bool continuous) const {
-        return 0; // TODO(rudi)
+    double EnergyRange::selectEnergy(std::mt19937& rng, bool continuous) const {
+        if (continuous) {
+            double percentage = ((double) rng()) / std::mt19937::max(); // in [0, 1]
+            return m_CenterEnergy + ((percentage - 0.5) * m_EnergySpread);
+        } else {
+            double arr[3] = {m_CenterEnergy - m_EnergySpread/2, m_CenterEnergy, m_CenterEnergy + m_EnergySpread/2};
+            return arr[rng()%3];
+        }
     }
 
 }

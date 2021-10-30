@@ -49,7 +49,7 @@ namespace RAYX {
         return s.str();
     }
 
-    double DatFile::selectEnergy(bool continuous) const {
+    double DatFile::selectEnergy(std::mt19937& rng, bool continuous) const {
         return 0; //TODO(rudi)
     }
 }

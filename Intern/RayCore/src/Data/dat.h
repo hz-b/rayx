@@ -2,6 +2,7 @@
 
 #include <vector>
 #include <string>
+#include <random>
 
 namespace RAYX {
     /** This struct represents one line of a .DAT file.  */
@@ -26,6 +27,6 @@ namespace RAYX {
         /** creates a valid .DAT file from this struct (may be used for testing) */
         std::string dump();
 
-        double selectEnergy(bool continuous) const;
+        double selectEnergy(std::mt19937& rng, bool continuous) const;
     };
 }

@@ -1,6 +1,7 @@
 #pragma once
 
 #include <variant>
+#include <random>
 
 #include <Data/dat.h>
 
@@ -12,7 +13,7 @@ namespace RAYX {
 
         EnergyRange(double centerEnergy, double EnergySpread);
 
-        double selectEnergy(bool continuous) const;
+        double selectEnergy(std::mt19937& rng, bool continuous) const;
     };
 
     class EnergyDistribution {
@@ -26,6 +27,7 @@ namespace RAYX {
         private:
             /** Shows whether the distribution is continuous or discrete */
             bool m_IsContinuous;
+            static std::mt19937 rng;
 
             std::variant<DatFile, EnergyRange> m_Variant;
     };
