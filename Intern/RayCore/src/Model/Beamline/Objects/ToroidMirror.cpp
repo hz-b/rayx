@@ -34,7 +34,7 @@ namespace RAYX
         // TODO(Theresa): maybe move this function outside of this class (same for spheres) because this is derived from user parameters
         calcRadius(incidenceAngle); // calculate the radius
 
-        std::cout << "long Radius: " << m_longRadius << ", short Radius: " << m_shortRadius << std::endl;
+        std::cout << "[ToroidMirror]: long Radius: " << m_longRadius << ", short Radius: " << m_shortRadius << std::endl;
         setSurface(std::make_unique<Toroid>(std::vector<double>{m_longRadius, m_shortRadius, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 6, 0, 0, 0}));
         // setSurface(std::make_unique<Toroid>(m_longRadius, m_shortRadius));
     }

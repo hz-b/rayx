@@ -28,7 +28,7 @@ namespace RAYX
         m_orderOfDiffraction(orderOfDiffraction),
         m_vls(vls) // TODO(Theresa): store these five params in element as attributes (m_..) at all or only in elementParams?
     {
-        std::cout << "design wavelength = " << abs(hvlam(m_designEnergyMounting)) << std::endl;
+        std::cout << "[PlaneGrating]: design wavelength = " << abs(hvlam(m_designEnergyMounting)) << std::endl;
         
         // set element specific parameters in Optical Element class. will be moved to shader and are needed for tracing
         setElementParameters({
@@ -63,7 +63,7 @@ namespace RAYX
         double theta = degToRad(abs(angle));
         double alph, bet;
         double a = abs(hvlam(m_designEnergyMounting)) * abs(m_lineDensity) * m_orderOfDiffraction * 1e-6;
-        std::cout << "deviation " << angle << "theta" << theta << std::endl;
+        std::cout << "[PlaneGrating]: deviation " << angle << "theta" << theta << std::endl;
         if (angle <= 0) { // constant alpha mounting
             double arg = a - sin(theta);
             if (abs(arg) >= 1) { // cannot calculate alpha & beta
@@ -87,7 +87,7 @@ namespace RAYX
                 alph = 2 * theta + bet;
             }
         }
-        std::cout << alph << ", " << bet << " angles" << std::endl;
+        std::cout <<"[PlaneGrating]: " << alph << ", " << bet << " angles" << std::endl;
         setAlpha(PI / 2 - alph);
         setBeta(PI / 2 - abs(bet));
     }

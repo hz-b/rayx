@@ -36,6 +36,7 @@ namespace RAYX
             m_vls[2], m_vls[3], m_vls[4], m_vls[5],
             0, 0, 0, 0
         });
+        std::cout << "[SphereGrating]: Created.\n";
     }
 
     SphereGrating::~SphereGrating()

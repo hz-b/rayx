@@ -7,7 +7,6 @@ namespace RAYX
      * sets parameters for the element in super class (optical element).
      * Sets RZP-specific parameters in this class.
      *
-     * Params:
      * @param name                          name of optical element
      * @param geometricalShape              shape of RZP (elliptical vs rectangular)
      * @param curvatureType                 Plane, Sphere, Toroid
@@ -82,24 +81,26 @@ namespace RAYX
             m_designSagittalEntranceArmLength,m_designSagittalExitArmLength,m_designMeridionalEntranceArmLength,m_designMeridionalExitArmLength,
             m_designAlphaAngle,m_designBetaAngle,0, double(m_additionalOrder) }
         );
+        std::cout << "[RZP]: Created.\n";
     }
 
+    // TODO(Oussama): Finish documentation if needed 
     /**
-     * Angles given in degree and stored in rad. Initializes transformation
+     * @brief Angles given in degree and stored in rad. Initializes transformation
      * matrices, and parameters for the quadric in super class (quadric).
      * Sets RZP-specific parameters in this class.
-     *
-     * Params:
-     * mount = how angles of reflection are calculated: constant deviation, constant incidence,...
-     * width, height = total width, height of the mirror (x- and z- dimensions)
-     * deviation = angle between incoming and outgoing main ray
-     * or grazingIncidence = desired incidence angle of the main ray
-     * azimuthal = rotation of mirror around z-axis
+     *  
+     * @param mount         how angles of reflection are calculated: constant deviation, constant incidence,...
+     * @param width         total width of the mirror (x- dimension)
+     * @param height        total height of the mirror (z- dimension)
+     * @param deviation     angle between incoming and outgoing main ray
+     * @param grazingIncidence desired incidence angle of the main ray
+     * @param azimuthal = rotation of mirror around z-axis
      * distanceToPreceedingElement
-     * designEnergy = given by user, used if auto==false
-     * sourceEnergy = energy, taken from source, used if auto==true
-     * lineDensity = line density of the grating
-     * orderOfDiffraction =
+     * @param designEnergy = given by user, used if auto==false
+     * @param sourceEnergy = energy, taken from source, used if auto==true
+     * @param lineDensity = line density of the grating
+     * @param orderOfDiffraction =
     */
     ReflectionZonePlate::ReflectionZonePlate(const char* name, const int geometricalShape, const int mount, const int curvatureType, const int designType,
         const int elementOffsetType, const double width, const double height, const double deviation, const double incidenceAngle, const double azimuthal,
@@ -150,7 +151,7 @@ namespace RAYX
         }
 
         std::cout.precision(17);
-        std::cout << "alpha: " << getAlpha() << ", beta: " << getBeta() << std::endl;
+        std::cout << "[RZP]: alpha: " << getAlpha() << ", beta: " << getBeta() << std::endl;
         printInfo();
         int icurv;
         // set parameters in Quadric class
@@ -188,16 +189,16 @@ namespace RAYX
     void ReflectionZonePlate::printInfo() const
     {
         std::cout.precision(17);
-
-        std::cout << m_rzpType;
+        
+        std::cout << "[RZP]: "<<  m_rzpType;
         if (m_rzpType == RT_ELLIPTICAL) {
-            std::cout << " rzp type: ELLIPTICAL" << std::endl;
+            std::cout << "type: ELLIPTICAL" << std::endl;
         }
         else if (m_rzpType == RT_MERIODIONAL) {
-            std::cout << " rzp type: MERIDIONAL" << std::endl;
+            std::cout << "type: MERIDIONAL" << std::endl;
         }
 
-        std::cout << m_designType;
+        std::cout << "[RZP]: "<< m_designType;
         if (m_curvatureType == CT_PLANE) {
             std::cout << " curvature type: PLANE" << std::endl;
         }
@@ -208,7 +209,7 @@ namespace RAYX
             std::cout << " curvature type: TOROIDAL" << std::endl;
         }
 
-        std::cout << m_imageType;
+        std::cout <<"[RZP]: "<< m_imageType;
         if (m_imageType == IT_POINT2POINT) {
             std::cout << " m_imageType: POINT2POINT" << std::endl;
         }
@@ -216,18 +217,18 @@ namespace RAYX
             std::cout << " m_imageType: ASTIGMATIC2ASTIGMATIC" << std::endl;
         }
 
-        std::cout << "VALUES" << std::endl;
-        std::cout << "m_alpha0Angle: " << m_alpha0Angle << std::endl;
-        std::cout << "m_beta0Angle: " << m_beta0Angle << std::endl;
-        std::cout << "m_designAlphaAngle: " << m_designAlphaAngle << std::endl;
-        std::cout << "m_designBetaAngle: " << m_designBetaAngle << std::endl;
-        std::cout << "m_zOff: " << m_zOff << std::endl;
-        std::cout << "m_wavelength: " << m_designWavelength << std::endl;
-        std::cout << "m_lineDensity: " << m_lineDensity << std::endl;
-        std::cout << "m_designOrderOfDiffraction: " << m_designOrderOfDiffraction << std::endl;
-        std::cout << "m_orderOfDiffraction: " << m_orderOfDiffraction << std::endl;
-        std::cout << "m_designEnergyMounting: " << m_designEnergyMounting << std::endl;
-        std::cout << "m_fresnelZOffset: " << m_fresnelZOffset << std::endl;
+        std::cout << "[RZP]:\t VALUES" << std::endl;
+        std::cout << "[RZP]:\tm_alpha0Angle: " << m_alpha0Angle << std::endl;
+        std::cout << "[RZP]:\tm_beta0Angle: " << m_beta0Angle << std::endl;
+        std::cout << "[RZP]:\tm_designAlphaAngle: " << m_designAlphaAngle << std::endl;
+        std::cout << "[RZP]:\tm_designBetaAngle: " << m_designBetaAngle << std::endl;
+        std::cout << "[RZP]:\tm_zOff: " << m_zOff << std::endl;
+        std::cout << "[RZP]:\tm_wavelength: " << m_designWavelength << std::endl;
+        std::cout << "[RZP]:\tm_lineDensity: " << m_lineDensity << std::endl;
+        std::cout << "[RZP]:\tm_designOrderOfDiffraction: " << m_designOrderOfDiffraction << std::endl;
+        std::cout << "[RZP]:\tm_orderOfDiffraction: " << m_orderOfDiffraction << std::endl;
+        std::cout << "[RZP]:\tm_designEnergyMounting: " << m_designEnergyMounting << std::endl;
+        std::cout << "[RZP]:\tm_fresnelZOffset: " << m_fresnelZOffset << std::endl;
 
 
     }
@@ -267,7 +268,7 @@ namespace RAYX
      */
     void ReflectionZonePlate::calcBeta2() {
         double DZ = (m_designOrderOfDiffraction == 0) ? 0 : calcDz00();
-        std::cout << "DZ calcBeta2 " << DZ << std::endl;
+        std::cout << "[RZP]: DZ calcBeta2 " << DZ << std::endl;
         setBeta(acos(cos(m_grazingIncidenceAngle) - m_orderOfDiffraction * m_designWavelength * 1e-6 * DZ));
     }
 
@@ -403,8 +404,7 @@ namespace RAYX
      * Calculates the design order of diffraction based on the design type (using the design beta angle
      * or the fresnel center offset)
      *
-     * Params:
-     * designOrderOfDiffraction = parameter given by user
+     * @param designOrderOfDiffraction parameter given by user
     */
     void ReflectionZonePlate::calcDesignOrderOfDiffraction(const double designOrderOfDiffraction) {
         int presign;
@@ -414,13 +414,13 @@ namespace RAYX
         else if (m_designType == DT_BETA) {
             presign = (m_fresnelZOffset >= 0) ? -1 : 1;
         }
-        std::cout << "presign: " << presign << std::endl;
+        std::cout << "[RZP]: presign: " << presign << std::endl;
         m_designOrderOfDiffraction = abs(designOrderOfDiffraction) * presign;
     } // design order of diffraction is directly given by the user
 
     /**
-     * needed for calculating incidence and exit angle
-     * calculates the line density at one specific point (x,y,z) for a given normal at this point and a wavelength
+     * @brief Needed for calculating incidence and exit angle.
+     * Calculates the line density at one specific point (x,y,z) for a given normal at this point and a wavelength
      * @param intersection          coordinates of intersection point
      * @param normal                normal at intersection point
      * @param WL                    wavelength of ray    

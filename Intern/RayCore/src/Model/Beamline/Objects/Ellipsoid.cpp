@@ -23,7 +23,7 @@ namespace RAYX
         m_a11(a_11)
     {
 
-        std::cout << "ellipsoid" << std::endl;
+        std::cout << "[Ellipsoid]: Created." << std::endl;
         m_offsetY0 = 0;// what is this for? RAYX.FOR: "only !=0 in case of Monocapillary"
 
         m_misalignmentCoordSys = (coordSys == 0 ? CS_CURVATURE : CS_MIRROR);
@@ -76,7 +76,7 @@ namespace RAYX
     void Ellipsoid::calcAlphaBeta() {
         setAlpha(m_incidence - m_tangentAngle);
         setBeta(m_incidence); // mirror -> exit angle = incidence angle
-        std::cout << "alpha= " << m_incidence << " m_alpha1= " << getAlpha() << " beta= " << getBeta() << std::endl;
+        std::cout << "[Ellipsoid]: alpha= " << m_incidence << " m_alpha1= " << getAlpha() << " beta= " << getBeta() << std::endl;
     }
 
     /*
@@ -109,14 +109,14 @@ namespace RAYX
             m_halfAxisC = sqrt(pow(m_shortHalfAxisB, 2) / 1); // devided by 1??
         }
         else if (m_figureRotation == FR_PLANE) {
-            std::cout << "FR PLane" << std::endl;
+            std::cout << "[Ellipsoid]: FR PLane" << std::endl;
             m_halfAxisC = INFINITY;
         }
         else {
             m_halfAxisC = sqrt(pow(m_shortHalfAxisB, 2) / m_a11);
         }
         m_tangentAngle = angle;
-        std::cout << "A= " << m_longHalfAxisA << ", B= " << m_shortHalfAxisB << ", C= " << m_halfAxisC << ", angle = " << m_tangentAngle << ", Z0 = " << m_z0 << ", Y0= " << m_y0 << std::endl;
+        std::cout << "[Ellipsoid]: A= " << m_longHalfAxisA << ", B= " << m_shortHalfAxisB << ", C= " << m_halfAxisC << ", angle = " << m_tangentAngle << ", Z0 = " << m_z0 << ", Y0= " << m_y0 << std::endl;
     }
 
     double Ellipsoid::getRadius() {

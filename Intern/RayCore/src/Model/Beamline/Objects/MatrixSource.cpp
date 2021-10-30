@@ -9,7 +9,7 @@ namespace RAYX
     MatrixSource::MatrixSource(const std::string name, const int spreadType, const double sourceWidth, const double sourceHeight, const double sourceDepth, const double horDivergence, const double verDivergence, const double photonEnergy, const double energySpread, const double linPol0, const double linPol45, const double circPol, const std::vector<double> misalignment)
         : LightSource(name.c_str(), spreadType, photonEnergy, energySpread, linPol0, linPol45, circPol, misalignment, sourceDepth, sourceHeight, sourceWidth, horDivergence, verDivergence)
     {
-
+      std::cout << "[MatrixSource]: Created.\n";   
     }
 
     MatrixSource::~MatrixSource()
@@ -32,7 +32,7 @@ namespace RAYX
 
         std::vector<Ray> rayVector;
         rayVector.reserve(1048576);
-        std::cout << "create " << rmat << " times " << rmat << " matrix with Matrix Source..." << std::endl;
+        std::cout << "[MatrixSource]: create " << rmat << " times " << rmat << " matrix with Matrix Source..." << std::endl;
         // fill the square with rmat1xrmat1 rays
         for (int col = 0; col < rmat; col++) {
             for (int row = 0; row < rmat; row++) {
@@ -63,7 +63,7 @@ namespace RAYX
             Ray r_copy(position, direction, stokes, en, 1.0);
             rayVector.push_back(r_copy);
         }
-        std::cout << &(rayVector[0]) << std::endl;
+        std::cout <<"[MatrixSource]: &rayVector: " << &(rayVector[0]) << std::endl;
         //rayVector.resize(1048576);
         return rayVector;
     }

@@ -12,10 +12,8 @@ namespace RAYX
      * 
     */
     ImagePlane::ImagePlane(const char* name, glm::dvec4 position, glm::dmat4x4 orientation)
-        : OpticalElement(name, { 0,0,0,0, 0,0,0,0, 0,0,0,0, 0,0,0,0 }, 0, 0, 0, position, orientation, { 0,0,0, 0,0,0 }, { 0,0,0,0,0, 0,0 }) {
-        
-        setSurface(std::make_unique<Quadric>(std::vector<double>{ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 5, 0, 0, 0 }));
-        
+        : OpticalElement(name, { 0,0,0,0, 0,0,0,0, 0,0,0,0, 0,0,0,0 }, 0, 0, 0, position, orientation, { 0,0,0, 0,0,0 }, { 0,0,0,0,0, 0,0 }) {        
+        setSurface(std::make_unique<Quadric>(std::vector<double>{ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 5, 0, 0, 0 }));        
     }
 
     ImagePlane::~ImagePlane()
@@ -26,7 +24,7 @@ namespace RAYX
         const char* name = node->first_attribute("name")->value();
 
         glm::dvec3 position3;
-        if (!xml::paramDvec3(node, "worldPosition", &position3)) { return nullptr; }
+        if (!xml::paramDvec3(node, "[Image-Plane]: worldPosition", &position3)) { return nullptr; }
         glm::dvec4 position(position3, 1); // TODO(rudi): is this '1' correct?
 
         glm::dvec3 worldXdirection, worldYdirection, worldZdirection;

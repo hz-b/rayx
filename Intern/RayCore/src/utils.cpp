@@ -93,10 +93,13 @@ Matrix getMatrixProduct(Matrix A, Matrix B) {
 }
 
 void printMatrix(std::vector<double> matrix) {
-    std::cout << "size: " << matrix.size() << std::endl;
+    std::cout << "[Matrix]: size: " << matrix.size() << std::endl;
+    std::cout << "\t";
     for (int i = 0; i < int(matrix.size()); i++) {
         std::cout << matrix[i] << ", ";
-        if (i % 4 == 3) std::cout << std::endl;
+        if (i % 4 == 3) {
+            std::cout << std::endl;
+            std::cout << "\t";}
     }
     std::cout << std::endl;
 }

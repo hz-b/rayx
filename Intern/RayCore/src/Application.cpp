@@ -22,12 +22,12 @@ namespace RAYX
     Application::Application() :
         m_Beamline(std::make_shared<Beamline>())
     {
-        RAYX_DEBUG(std::cout << "Creating Application..." << std::endl);
+        RAYX_DEBUG(std::cout << "[App]: Creating Application..." << std::endl);
     }
 
     Application::~Application()
     {
-        RAYX_DEBUG(std::cout << "Deleting Application..." << std::endl);
+        RAYX_DEBUG(std::cout << "[App]: Deleting Application..." << std::endl);
     }
 
     void Application::loadDummyBeamline()
@@ -48,7 +48,7 @@ namespace RAYX
         glm::dmat4x4 tor_orientation = tor_param.calcOrientation();
         std::shared_ptr<RAYX::ToroidMirror> t = std::make_shared<RAYX::ToroidMirror>("toroid", 0, 50, 200, tor_position, tor_orientation, degToRad(10), 10000, 1000, 10000, 1000, std::vector<double>{0, 0, 0, 0, 0, 0, 0});
 
-        std::cout << "\n IMAGE PLANE \n" << std::endl;
+        std::cout << "\n [App]: IMAGE PLANE \n" << std::endl;
 
         WorldUserParams im_param = WorldUserParams(0, 0, 0, 1000, std::vector<double>{0, 0, 0, 0, 0, 0});
         glm::dvec4 pos_imageplane = im_param.calcPosition(tor_param, tor_position, tor_orientation);
@@ -64,12 +64,12 @@ namespace RAYX
 
         m_Presenter = Presenter(m_Beamline);
         m_Presenter.addLightSource(matSourcePtr);
-        RAYX_DEBUG(std::cout << "Creating dummy beamline took: " << float(clock() - all_begin_time) / CLOCKS_PER_SEC * 1000 << " ms" << std::endl);
+        RAYX_DEBUG(std::cout << "[App]: Creating dummy beamline took: " << float(clock() - all_begin_time) / CLOCKS_PER_SEC * 1000 << " ms" << std::endl);
     }
 
     void Application::run()
     {
-        RAYX_DEBUG(std::cout << "Application running..." << std::endl);
+        RAYX_DEBUG(std::cout << "[App]: Application running..." << std::endl);
     }
 
 } // namespace RAYX
