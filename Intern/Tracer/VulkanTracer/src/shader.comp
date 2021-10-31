@@ -19,6 +19,7 @@ struct Ray{
 	dvec3 direction;
 	double energy;
 	dvec4 stokes;
+	double pathLength;
 };
 struct Quadric{
 	dmat4 anchorPoints;
@@ -2982,7 +2983,7 @@ void testFunctions() {
 void main(){
     //dynamicQuadrics();
 	//Ray r = rayData[uint(gl_GlobalInvocationID)];
-	testFunctions();
+	//testFunctions();
 	//iterateElements();
 	/*
 	// E034Q98KIS
@@ -3006,7 +3007,7 @@ void main(){
 	// }
 
     // outputData[uint(gl_GlobalInvocationID)] = iterateQuadrics(rayData[uint(gl_GlobalInvocationID)]);
-    //outputData[uint(gl_GlobalInvocationID)] = rayData[uint(gl_GlobalInvocationID)];
+    outputData[uint(gl_GlobalInvocationID)] = rayData[uint(gl_GlobalInvocationID)];
     //outputData[uint(gl_GlobalInvocationID)].position = dvec3(117.0, 225.0,534.0);
     //outputData[uint(gl_GlobalInvocationID)].direction = dvec4(1887.0, 2285.0,5394.0, 876.0);
     //[uint(gl_GlobalInvocationID)].weight = 1337.0;

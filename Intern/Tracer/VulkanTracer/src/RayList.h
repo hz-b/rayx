@@ -6,7 +6,7 @@
 
 #define RAY_MAX_ELEMENTS_IN_VECTOR 262144
 #define RAY_VECTOR_SIZE 16777216
-#define RAY_DOUBLE_COUNT 12
+#define RAY_DOUBLE_COUNT 13
 
 class RayList {
 public:

@@ -79,7 +79,7 @@ namespace RAYX
         if (SHORTOUTPUT)
             outputFile << "Index;Xloc;Yloc\n";
         else
-            outputFile << "Index;Xloc;Yloc;Zloc;Weight;Xdir;Ydir;Zdir;Energy;Stokes0;Stokes1;Stokes2;Stokes3\n";
+            outputFile << "Index;Xloc;Yloc;Zloc;Weight;Xdir;Ydir;Zdir;Energy;Stokes0;Stokes1;Stokes2;Stokes3;pathLength\n";
 
         //get rays from tracer
         for (auto outputRayIterator = m_RayTracer.getOutputIteratorBegin(), outputIteratorEnd = m_RayTracer.getOutputIteratorEnd();
@@ -124,10 +124,10 @@ namespace RAYX
         else {
             char buff[384];
             for (size_t i = 0; i < size; i = i + RAY_DOUBLE_COUNT) {
-                sprintf(buff, "%d;%.17f;%.17f;%.17f;%.17f;%.17f;%.17f;%.17f;%.17f;%.17f;%.17f;%.17f;%.17f\n", index,
+                sprintf(buff, "%d;%.17f;%.17f;%.17f;%.17f;%.17f;%.17f;%.17f;%.17f;%.17f;%.17f;%.17f;%.17f;%.17f\n", index,
                     outputRays[i], outputRays[i + 1], outputRays[i + 2], outputRays[i + 3],
                     outputRays[i + 4], outputRays[i + 5], outputRays[i + 6], outputRays[i + 7],
-                    outputRays[i + 8], outputRays[i + 9], outputRays[i + 10], outputRays[i + 11]);
+                    outputRays[i + 8], outputRays[i + 9], outputRays[i + 10], outputRays[i + 11], outputRays[i + 12]);
                 file << buff;
                 index++;
             }
