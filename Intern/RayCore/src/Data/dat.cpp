@@ -24,7 +24,6 @@ namespace RAYX {
         // line 3..EOF
         out->weightSum = 0;
         for (uint32_t lineidx = 3; std::getline(s, line); lineidx++) {
-            std::getline(s, line);
             if (line.empty()) { continue; }
 
             DatEntry e;
