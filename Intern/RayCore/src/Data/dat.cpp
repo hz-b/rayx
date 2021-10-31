@@ -37,6 +37,11 @@ namespace RAYX {
             out->weightSum += e.weight;
         }
 
+        out->average = 0;
+        for (auto line : out->lines) {
+            out->average += line.weight / out->weightSum * line.energy;
+        }
+
         return true;
     }
 
@@ -86,5 +91,9 @@ namespace RAYX {
             }
             return lines.back().energy;
         }
+    }
+
+    double DatFile::getAverage() const {
+        return average;
     }
 }

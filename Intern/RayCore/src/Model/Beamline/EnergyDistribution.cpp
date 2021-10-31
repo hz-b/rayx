@@ -16,8 +16,13 @@ namespace RAYX {
     EnergyDistribution::EnergyDistribution()
         : EnergyDistribution(EnergyRange(100.0, 0.0), false) {}
 
-    double EnergyDistribution::selectEnergy() {
+    double EnergyDistribution::selectEnergy() const {
         const auto func = [&](const auto arg) -> double { return arg.selectEnergy(rng, m_IsContinuous); };
+        return std::visit(func, m_Variant);
+    }
+
+    double EnergyDistribution::getAverage() const {
+        const auto func = [&](const auto arg) -> double { return arg.getAverage(); };
         return std::visit(func, m_Variant);
     }
 
@@ -35,4 +40,7 @@ namespace RAYX {
         }
     }
 
+    double EnergyRange::getAverage() const {
+        return m_CenterEnergy;
+    }
 }

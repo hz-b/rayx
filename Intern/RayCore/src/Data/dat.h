@@ -20,6 +20,7 @@ namespace RAYX {
         double step;
 
         double weightSum;
+        double average;
 
         std::vector<DatEntry> lines;
 
@@ -30,5 +31,6 @@ namespace RAYX {
         std::string dump();
 
         double selectEnergy(std::mt19937& rng, bool continuous) const;
+        double getAverage() const;
     };
 }

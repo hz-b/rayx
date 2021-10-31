@@ -45,7 +45,7 @@ namespace RAYX
         LightSource();
         virtual ~LightSource();
 
-
+        const EnergyDistribution m_EnergyDistribution;
     protected:
         // Geometric Parameters 
         double m_sourceDepth;
@@ -67,8 +67,6 @@ namespace RAYX
         double m_linearPol_0;
         double m_linearPol_45;
         double m_circularPol;
-
-        EnergyDistribution m_EnergyDistribution;
 
         // TODO(Jannis): move to children
         SOURCE_DISTRIBUTION_TYPE m_sourceDistributionType;

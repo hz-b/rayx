@@ -14,6 +14,7 @@ namespace RAYX {
         EnergyRange(double centerEnergy, double EnergySpread);
 
         double selectEnergy(std::mt19937& rng, bool continuous) const;
+        double getAverage() const;
     };
 
     class EnergyDistribution {
@@ -22,7 +23,8 @@ namespace RAYX {
             EnergyDistribution(DatFile, bool continuous);
             EnergyDistribution(EnergyRange, bool continuous);
 
-            double selectEnergy();
+            double selectEnergy() const;
+            double getAverage() const;
 
         private:
             /** Shows whether the distribution is continuous or discrete */
