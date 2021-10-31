@@ -30,7 +30,10 @@ namespace RAYX {
         /** creates a valid .DAT file from this struct (may be used for testing) */
         std::string dump();
 
+        /** samples from the distribution given by the .DAT file */
         double selectEnergy(std::mt19937& rng, bool continuous) const;
+
+        /** yields the expected value of the underlying distribution */
         double getAverage() const;
     };
 }

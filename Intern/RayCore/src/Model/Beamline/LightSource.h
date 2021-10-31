@@ -45,6 +45,7 @@ namespace RAYX
         LightSource();
         virtual ~LightSource();
 
+        /** the energy distribution used when deciding the energies of the rays. */
         const EnergyDistribution m_EnergyDistribution;
     protected:
         // Geometric Parameters 

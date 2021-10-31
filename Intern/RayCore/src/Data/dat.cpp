@@ -37,6 +37,8 @@ namespace RAYX {
             out->weightSum += e.weight;
         }
 
+        // calculation of the expected value
+
         out->average = 0;
         for (auto line : out->lines) {
             out->average += line.weight / out->weightSum * line.energy;
