@@ -110,7 +110,7 @@ namespace RAYX
      * @return void
     */
     void OpticalElement::calcTransformationMatricesFromAngles(const std::vector<double> misalignment, bool global) {
-        std::cout <<"[Optic-Element]: "<< getName() << " alpha " << m_alpha << " beta " << m_beta << " chi " << m_chi << std::endl;
+        std::cout << "[Optic-Element]: " << getName() << " alpha " << m_alpha << " beta " << m_beta << " chi " << m_chi << std::endl;
         double cos_c = cos(m_chi);
         double sin_c = sin(m_chi);
         double cos_a = cos(m_alpha);

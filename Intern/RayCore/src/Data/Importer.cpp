@@ -39,7 +39,8 @@ namespace RAYX
         const auto addLightSource = [&](std::shared_ptr<LightSource> s, rapidxml::xml_node<>* node) {
             if (s) {
                 beamline->m_LightSources.push_back(s);
-            } else {
+            }
+            else {
                 std::cerr << "could not construct LightSource with Name: " << node->first_attribute("name")->value() << "; Type: " << node->first_attribute("type")->value() << '\n';
             }
         };
@@ -48,7 +49,8 @@ namespace RAYX
         const auto addOpticalElement = [&](std::shared_ptr<OpticalElement> e, rapidxml::xml_node<>* node) {
             if (e) {
                 beamline->m_OpticalElements.push_back(e);
-            } else {
+            }
+            else {
                 std::cerr << "could not construct OpticalElement with Name: " << node->first_attribute("name")->value() << "; Type: " << node->first_attribute("type")->value() << '\n';
             }
         };
@@ -64,25 +66,35 @@ namespace RAYX
         // The createFromXML functions use the param* functions declared in <Data/xml.h>
         if (strcmp(type, "Point Source") == 0) {
             addLightSource(PointSource::createFromXML(node), node);
-        } else if (strcmp(type, "Matrix Source") == 0) {
+        }
+        else if (strcmp(type, "Matrix Source") == 0) {
             addLightSource(MatrixSource::createFromXML(node), node);
-        } else if (strcmp(type, "ImagePlane") == 0) {
+        }
+        else if (strcmp(type, "ImagePlane") == 0) {
             addOpticalElement(ImagePlane::createFromXML(node), node);
-        } else if (strcmp(type, "Plane Mirror") == 0) {
+        }
+        else if (strcmp(type, "Plane Mirror") == 0) {
             addOpticalElement(PlaneMirror::createFromXML(node), node);
-        } else if (strcmp(type, "Toroid") == 0) {
+        }
+        else if (strcmp(type, "Toroid") == 0) {
             addOpticalElement(ToroidMirror::createFromXML(node), node);
-        } else if (strcmp(type, "Slit") == 0) {
+        }
+        else if (strcmp(type, "Slit") == 0) {
             addOpticalElement(Slit::createFromXML(node, calcSourceEnergy()), node);
-        } else if (strcmp(type, "Spherical Grating") == 0) {
+        }
+        else if (strcmp(type, "Spherical Grating") == 0) {
             addOpticalElement(SphereGrating::createFromXML(node), node);
-        } else if (strcmp(type, "Plane Grating") == 0) {
+        }
+        else if (strcmp(type, "Plane Grating") == 0) {
             addOpticalElement(PlaneGrating::createFromXML(node), node);
-        } else if (strcmp(type, "Sphere") == 0) {
+        }
+        else if (strcmp(type, "Sphere") == 0) {
             addOpticalElement(SphereMirror::createFromXML(node), node);
-        } else if (strcmp(type, "Reflection Zoneplate") == 0) {
+        }
+        else if (strcmp(type, "Reflection Zoneplate") == 0) {
             addOpticalElement(ReflectionZonePlate::createFromXML(node), node);
-        } else {
+        }
+        else {
             std::cerr << "[Importer]: could not classify beamline object with Name: " << node->first_attribute("name")->value() << "; Type: " << node->first_attribute("type")->value() << '\n';
         }
     }

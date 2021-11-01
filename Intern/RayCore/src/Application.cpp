@@ -33,7 +33,7 @@ namespace RAYX
     void Application::loadDummyBeamline()
     {
         // ! objects are created here temporarily until reading in file works
-        const clock_t all_begin_time = clock();
+        const clock_t allBeginTime = clock();
 
         EnergyDistribution dist = EnergyDistribution(EnergyRange(100, 0), true);
         std::shared_ptr<MatrixSource> matSourcePtr = std::make_shared<MatrixSource>("matrix source", dist, 0.065, 0.04, 0.0, 0.001, 0.001, 1, 0, 0, std::vector<double>{ 0, 0, 0, 0 });
@@ -61,7 +61,7 @@ namespace RAYX
 
         m_Presenter = Presenter(m_Beamline);
         m_Presenter.addLightSource(matSourcePtr);
-        RAYX_DEBUG(std::cout << "[App]: Creating dummy beamline took: " << float(clock() - all_begin_time) / CLOCKS_PER_SEC * 1000 << " ms" << std::endl);
+        RAYX_DEBUG(std::cout << "[App]: Creating dummy beamline took: " << float(clock() - allBeginTime) / CLOCKS_PER_SEC * 1000 << " ms" << std::endl);
     }
 
     void Application::run()

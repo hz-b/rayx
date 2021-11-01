@@ -44,8 +44,8 @@ namespace RAYX {
             rapidxml::xml_node<>* subnode;
             if (!param(node, paramname, &subnode)) { return false; }
 
-            const char* names[3] = {"x", "y", "z"};
-            double* ptrs[3] = {&out->x, &out->y, &out->z};
+            const char* names[3] = { "x", "y", "z" };
+            double* ptrs[3] = { &out->x, &out->y, &out->z };
 
             for (rapidxml::xml_node<>* p = subnode->first_node(); p; p = p->next_sibling()) {
                 for (uint32_t i = 0; i < 3; i++) {
@@ -167,7 +167,8 @@ namespace RAYX {
                 *out = EnergyDistribution(df, continuous);
 
                 return true;
-            } else if (energyDistributionType == ET_VALUES) {
+            }
+            else if (energyDistributionType == ET_VALUES) {
                 double photonEnergy;
                 if (!xml::paramDouble(node, "photonEnergy", &photonEnergy)) { return false; }
 
@@ -177,7 +178,8 @@ namespace RAYX {
                 *out = EnergyDistribution(EnergyRange(photonEnergy, energySpread), continuous);
 
                 return true;
-            } else {
+            }
+            else {
                 std::cerr << "paramEnergyDistribution is not implemented for spreadType " << energyDistributionType << "!\n";
                 return false;
             }
