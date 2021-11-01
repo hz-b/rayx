@@ -25,7 +25,7 @@ void writeRaysToFile(std::list<double> outputRays, std::string name)
     filename.append(".csv");
     outputFile.open(filename);
     char sep = ';'; // file is saved in .csv (comma seperated value), excel compatibility is manual right now
-    outputFile << "Index" << sep << "Xloc" << sep << "Yloc" << sep << "Zloc" << sep << "Weight" << sep << "Xdir" << sep << "Ydir" << sep << "Zdir" << sep << "Energy" << sep << "S0" << sep << "S1" << sep << "S2" << sep << "S3" << std::endl;
+    outputFile << "Index" << sep << "Xloc" << sep << "Yloc" << sep << "Zloc" << sep << "Weight" << sep << "Xdir" << sep << "Ydir" << sep << "Zdir" << sep << "Energy" << sep << "S0" << sep << "S1" << sep << "S2" << sep << "S3" << sep << "pathLength" << sep << "order" << sep << "lastElement" << sep << "extraParam" << std::endl;
 
     size_t counter = 0;
     int print = 0; // whether to print on std::out (0=no, 1=yes)
