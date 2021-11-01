@@ -3,7 +3,7 @@
 namespace RAYX
 {
     /**
-     * calculates transformation matrices, 
+     * calculates transformation matrices,
      * sets parameters for the element in super class (optical element).
      * Sets RZP-specific parameters in this class.
      *
@@ -58,14 +58,14 @@ namespace RAYX
         m_derivationMethod = 0; // DM_FORMULA default
         m_rzpType = RT_ELLIPTICAL; // default (0)
         m_imageType = IT_POINT2POINT; // default (0)
-        
+
         // set parameters in Quadric class
         if (m_curvatureType == CT_PLANE) {
-            setSurface(std::make_unique<Quadric>(std::vector<double>{ 0,0,0,0, 1,0,0,-1, 0,0,0,0, 4,0,0,0 }));
+            setSurface(std::make_unique<Quadric>(std::vector<double>{ 0, 0, 0, 0, 1, 0, 0, -1, 0, 0, 0, 0, 4, 0, 0, 0 }));
         }
         else if (m_curvatureType == CT_SPHERICAL) {
             m_longRadius = longRadius; // for sphere and toroidal
-            setSurface(std::make_unique<Quadric>(std::vector<double>{ 1,0,0,0, 1,1,0,-m_longRadius, 0,0,1,0, 4,0,0,0 }));
+            setSurface(std::make_unique<Quadric>(std::vector<double>{ 1, 0, 0, 0, 1, 1, 0, -m_longRadius, 0, 0, 1, 0, 4, 0, 0, 0 }));
         }
         else {
             // no structure for non-quadric elements yet
@@ -84,9 +84,7 @@ namespace RAYX
         std::cout << "[RZP]: Created.\n";
     }
 
-    }
 
-    
     ReflectionZonePlate::~ReflectionZonePlate()
     {
     }
@@ -159,14 +157,14 @@ namespace RAYX
             designOrderOfDiffraction, dAlpha, dBeta, mEntrance, mExit, sEntrance,
             sExit, shortRadius, longRadius, additionalZeroOrder,
             fresnelZOffset, slopeError
-        );
+            );
     }
 
     void ReflectionZonePlate::printInfo() const
     {
         std::cout.precision(17);
-        
-        std::cout << "[RZP]: "<<  m_rzpType;
+
+        std::cout << "[RZP]: " << m_rzpType;
         if (m_rzpType == RT_ELLIPTICAL) {
             std::cout << "type: ELLIPTICAL" << std::endl;
         }
@@ -174,7 +172,7 @@ namespace RAYX
             std::cout << "type: MERIDIONAL" << std::endl;
         }
 
-        std::cout << "[RZP]: "<< m_designType;
+        std::cout << "[RZP]: " << m_designType;
         if (m_curvatureType == CT_PLANE) {
             std::cout << " curvature type: PLANE" << std::endl;
         }
@@ -185,7 +183,7 @@ namespace RAYX
             std::cout << " curvature type: TOROIDAL" << std::endl;
         }
 
-        std::cout <<"[RZP]: "<< m_imageType;
+        std::cout << "[RZP]: " << m_imageType;
         if (m_imageType == IT_POINT2POINT) {
             std::cout << " m_imageType: POINT2POINT" << std::endl;
         }
@@ -399,8 +397,8 @@ namespace RAYX
      * Calculates the line density at one specific point (x,y,z) for a given normal at this point and a wavelength
      * @param intersection          coordinates of intersection point
      * @param normal                normal at intersection point
-     * @param WL                    wavelength of ray    
-     * @return line density on RZP in Z direction for given conditions       
+     * @param WL                    wavelength of ray
+     * @return line density on RZP in Z direction for given conditions
      */
     double ReflectionZonePlate::rzpLineDensityDZ(glm::dvec3 intersection, glm::dvec3 normal, const double WL) {
         double s_beta = sin(m_designAlphaAngle);
