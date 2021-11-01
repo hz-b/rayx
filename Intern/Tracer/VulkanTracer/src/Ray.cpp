@@ -1,7 +1,7 @@
 #include "Ray.h"
 #include <cstring>
 
-Ray::Ray(double xpos, double ypos, double zpos, double xdir, double ydir, double zdir, double s0, double s1, double s2, double s3, double en, double w)
+Ray::Ray(double xpos, double ypos, double zpos, double xdir, double ydir, double zdir, double s0, double s1, double s2, double s3, double en, double w, double pathLength, double order, double lastElement, double extraParameter)
 {
 	m_position.x = xpos;
 	m_position.y = ypos;
@@ -15,6 +15,10 @@ Ray::Ray(double xpos, double ypos, double zpos, double xdir, double ydir, double
 	m_stokes.s3 = s3;
 	m_weight = w;
 	m_energy = en;
+	m_pathLength = pathLength;
+	m_order = order;
+	m_lastElement = lastElement;
+	m_extraParam = extraParameter;
 }
 //copies 64 byts of data in the following format: xloc, yloc, zloc, weight, xdir, ydir, zdir, placeholder
 Ray::Ray(double* location) {
