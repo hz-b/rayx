@@ -28,7 +28,7 @@ namespace RAYX
         /*int beamlinesSimultaneously = 1;*/
         for (int j = 0; j < 1/*beamlinesSimultaneously*/; j++) {
             if (m_Beamline->m_LightSources.empty()) {
-                std::cerr << "There is no light source!\n";
+                std::cerr << "(Presenter) There is no light source!\n";
                 exit(1);
             }
             else {

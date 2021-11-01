@@ -83,13 +83,13 @@ namespace RAYX
         } else if (strcmp(type, "Reflection Zoneplate") == 0) {
             addOpticalElement(ReflectionZonePlate::createFromXML(node), node);
         } else {
-            std::cerr << "could not classify beamline object with Name: " << node->first_attribute("name")->value() << "; Type: " << node->first_attribute("type")->value() << '\n';
+            std::cerr << "[Importer]: could not classify beamline object with Name: " << node->first_attribute("name")->value() << "; Type: " << node->first_attribute("type")->value() << '\n';
         }
     }
 
     Beamline Importer::importBeamline(const char* filename) {
         // first implementation: stringstreams are slow; this might need optimization
-        std::cout << "importBeamline is called with file \"" << filename << "\"\n";
+        std::cout << "[Importer]: importBeamline is called with file \"" << filename << "\"\n";
 
         std::ifstream t(filename);
         std::stringstream buffer;
@@ -99,7 +99,7 @@ namespace RAYX
         rapidxml::xml_document<> doc;
         doc.parse<0>(cstr.data());
 
-        std::cout << "Version: " << doc.first_node("lab")->first_node("version")->value() << std::endl;
+        std::cout << "\t Version: " << doc.first_node("lab")->first_node("version")->value() << std::endl;
         rapidxml::xml_node<>* xml_beamline = doc.first_node("lab")->first_node("beamline");
 
         Beamline beamline;

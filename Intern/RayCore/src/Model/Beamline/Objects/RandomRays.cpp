@@ -29,7 +29,7 @@ namespace RAYX
 
         int n = SimulationEnv::get().m_numOfRays;
         std::vector<Ray> rayList;
-        std::cout << "create " << n << " random rays " << std::endl;
+        std::cout << "[RandomRays]: create " << n << " random rays " << std::endl;
         // fill the square with rmat1xrmat1 rays
         for (int i = 0; i < n; i++) {
             glm::dvec3 position = glm::dvec3(unif(re), unif(re), unif(re));
@@ -64,7 +64,7 @@ namespace RAYX
             diff.push_back(a7);
         }
         diff.sort();
-        std::cout << "max difference: " << diff.front() << " " << diff.back() << std::endl;
+        std::cout << "[RandomRays]: max difference: " << diff.front() << " " << diff.back() << std::endl;
     }
 
 

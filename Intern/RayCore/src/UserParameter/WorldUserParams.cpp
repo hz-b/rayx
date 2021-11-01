@@ -93,8 +93,9 @@ namespace RAYX
         // * orientation of new element in its element coordinate system (misalignment * local orientation)
         current_orientation = prev_or * prev_e2b * current_orientation;
 
-        std::cout << "calculated orientation from previous" << std::endl;
+        std::cout << "[WUP]: Calculated orientation from previous" << std::endl;
         for (int i = 0; i < 4; i++) {
+            std::cout << '\t';
             for (int j = 0; j < 4; j++) {
                 std::cout << current_orientation[i][j] << ", ";
             }
@@ -127,8 +128,9 @@ namespace RAYX
             0, 0, 0, 1);
 
         orientation = orientation * misalignmentOr;
-        std::cout << "calculated orientation" << std::endl;
+        std::cout << "[WUP]: Calculated orientation" << std::endl;
         for (int i = 0; i < 4; i++) {
+            std::cout << '\t';
             for (int j = 0; j < 4; j++) {
                 std::cout << orientation[i][j] << ", ";
             }
@@ -155,7 +157,7 @@ namespace RAYX
         glm::dmat4x4 prev_e2b = prev.calcE2B();
 
         glm::dvec4 position = prev_pos - prev_or * prev_offset; // remove misalignment from position of previous element
-        std::cout << "previous position = " << position[0] << ", " << position[1] << ", " << position[2] << ", " << position[3] << std::endl;
+        std::cout << "[WUP]: previous position = " << position[0] << ", " << position[1] << ", " << position[2] << ", " << position[3] << std::endl;
         position = position + prev_or * prev_e2b * local_position; // add the distance from previous to new element to the position of the previous element
         position = position + orientation * new_offset; // add misalignment of new element to the position      
 
@@ -178,10 +180,11 @@ namespace RAYX
 
         glm::dvec4 offset = glm::dvec4(m_misalignment[0], m_misalignment[1], m_misalignment[2], 0);
         position = position + orientation * offset;
-
+        std::cout << "[WUP]: Position: "; 
         for (int i = 0; i < 4; i++) {
-            std::cout << position[i] << ", " << std::endl;
+            std::cout << position[i] << ", " ;
         }
+        std::cout <<  std::endl;
         return position;
     }
 
