@@ -202,6 +202,10 @@ TEST(LightSource, PointSourceHardEdge) {
         rayList.push_back(r.m_stokes.y);
         rayList.push_back(r.m_stokes.z);
         rayList.push_back(r.m_stokes.w);
+        rayList.push_back(r.m_pathLength);
+        rayList.push_back(r.m_order);
+        rayList.push_back(r.m_lastElement);
+        rayList.push_back(r.m_extraParam);
         ASSERT_TRUE(r.m_energy >= photonEnergy - (energySpread / 2));
         ASSERT_TRUE(r.m_energy <= photonEnergy + (energySpread / 2));
     }
@@ -248,6 +252,10 @@ TEST(LightSource, PointSourceSoftEdge) {
         rayList.push_back(r.m_stokes.y);
         rayList.push_back(r.m_stokes.z);
         rayList.push_back(r.m_stokes.w);
+        rayList.push_back(r.m_pathLength);
+        rayList.push_back(r.m_order);
+        rayList.push_back(r.m_lastElement);
+        rayList.push_back(r.m_extraParam);
         ASSERT_TRUE(r.m_energy >= photonEnergy - (energySpread / 2));
         ASSERT_TRUE(r.m_energy <= photonEnergy + (energySpread / 2));
     }
@@ -290,6 +298,10 @@ TEST(LightSource, PointSourceHardEdgeMis) {
         rayList.push_back(r.m_stokes.y);
         rayList.push_back(r.m_stokes.z);
         rayList.push_back(r.m_stokes.w);
+        rayList.push_back(r.m_pathLength);
+        rayList.push_back(r.m_order);
+        rayList.push_back(r.m_lastElement);
+        rayList.push_back(r.m_extraParam);
         ASSERT_TRUE(r.m_energy >= photonEnergy - (energySpread / 2));
         ASSERT_TRUE(r.m_energy <= photonEnergy + (energySpread / 2));
     }
@@ -332,6 +344,10 @@ TEST(LightSource, PointSourceSoftEdgeMis) {
         rayList.push_back(r.m_stokes.y);
         rayList.push_back(r.m_stokes.z);
         rayList.push_back(r.m_stokes.w);
+        rayList.push_back(r.m_pathLength);
+        rayList.push_back(r.m_order);
+        rayList.push_back(r.m_lastElement);
+        rayList.push_back(r.m_extraParam);
         ASSERT_TRUE(r.m_energy >= photonEnergy - (energySpread / 2));
         ASSERT_TRUE(r.m_energy <= photonEnergy + (energySpread / 2));
     }
@@ -367,6 +383,10 @@ TEST(LightSource, MatrixSource20000) {
         rayList.push_back(r.m_stokes.y);
         rayList.push_back(r.m_stokes.z);
         rayList.push_back(r.m_stokes.w);
+        rayList.push_back(r.m_pathLength);
+        rayList.push_back(r.m_order);
+        rayList.push_back(r.m_lastElement);
+        rayList.push_back(r.m_extraParam);
         ASSERT_TRUE(r.m_energy >= photonEnergy - (energySpread / 2));
         ASSERT_TRUE(r.m_energy <= photonEnergy + (energySpread / 2));
     }
@@ -402,6 +422,10 @@ TEST(LightSource, PointSource20000) {
         rayList.push_back(r.m_stokes.y);
         rayList.push_back(r.m_stokes.z);
         rayList.push_back(r.m_stokes.w);
+        rayList.push_back(r.m_pathLength);
+        rayList.push_back(r.m_order);
+        rayList.push_back(r.m_lastElement);
+        rayList.push_back(r.m_extraParam);
     }
     std::cout << rayList.size() << std::endl;
     ASSERT_EQ(rayList.size(), number_of_rays * RAY_DOUBLE_COUNT);
