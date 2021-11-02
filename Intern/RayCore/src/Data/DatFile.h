@@ -7,22 +7,22 @@
 namespace RAYX {
     /** This struct represents one line of a .DAT file.  */
     struct DatEntry {
-        double energy;
-        double weight;
+        double m_energy;
+        double m_weight;
     };
 
     /** This struct represents the contents of a .DAT file. */
     struct DatFile {
-        std::string title;
-        uint32_t linecount;
-        double start;
-        double end;
-        double step;
+        std::string m_title;
+        uint32_t m_linecount;
+        double m_start;
+        double m_end;
+        double m_step;
 
-        double weightSum;
-        double average;
+        double m_weightSum;
+        double m_average;
 
-        std::vector<DatEntry> lines;
+        std::vector<DatEntry> m_Lines;
 
         /** loads the .DAT file `filename` and writes it's contents to `out` */
         static bool load(const char* filename, DatFile* out);

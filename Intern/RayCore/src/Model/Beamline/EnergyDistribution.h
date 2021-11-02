@@ -8,10 +8,10 @@
 namespace RAYX {
     /** describes the interval `[m_CenterEnergy - m_EnergySpread/2, m_CenterEnergy + m_EnergySpread/2]` */
     struct EnergyRange {
-        double m_CenterEnergy;
-        double m_EnergySpread;
+        double m_centerEnergy;
+        double m_energySpread;
 
-        EnergyRange(double centerEnergy, double EnergySpread);
+        EnergyRange(double centerEnergy, double energySpread);
 
         double selectEnergy(std::mt19937& rng, bool continuous) const;
         double getAverage() const;
@@ -34,10 +34,10 @@ namespace RAYX {
 
         private:
             /** Shows whether the distribution is continuous or discrete */
-            bool m_IsContinuous;
+            bool m_isContinuous;
 
             /** the device for randomness, call `rng()` to get a random number */
-            static std::mt19937 rng;
+            static std::mt19937 s_rng;
 
             /** stores either a DatFile or an EnergyRange, depending on the constructor used to create this */
             std::variant<DatFile, EnergyRange> m_Variant;
