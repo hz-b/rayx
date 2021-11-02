@@ -2,7 +2,7 @@
 #include <sstream>
 #include <iostream>
 
-#include <Data/dat.h>
+#include <Data/DatFile.h>
 
 namespace RAYX {
     bool DatFile::load(const char* filename, DatFile* out) {

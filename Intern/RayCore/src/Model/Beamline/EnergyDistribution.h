@@ -3,7 +3,7 @@
 #include <variant>
 #include <random>
 
-#include <Data/dat.h>
+#include <Data/DatFile.h>
 
 namespace RAYX {
     /** describes the interval `[m_CenterEnergy - m_EnergySpread/2, m_CenterEnergy + m_EnergySpread/2]` */
