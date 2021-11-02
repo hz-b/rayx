@@ -52,6 +52,10 @@ namespace RAYX
         return m_misalignmentParams;
     }
 
+    double LightSource::getPhotonEnergy() const {
+        return m_EnergyDistribution.getAverage();
+    }
+
     // needed for many of the light sources, from two angles to one direction vector
     glm::dvec3 LightSource::getDirectionFromAngles(const double phi, const double psi) {
         double al = cos(psi) * sin(phi);

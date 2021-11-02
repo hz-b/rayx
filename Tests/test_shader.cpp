@@ -254,7 +254,8 @@ TEST(Tracer, testUniformRandom) {
     double settings = 17;
 
     RAYX::SimulationEnv::get().m_numOfRays = 2000;
-    std::shared_ptr<RAYX::MatrixSource> m = std::make_shared<RAYX::MatrixSource>("Matrix source 1", 0, 0.065, 0.04, 0.0, 0.001, 0.001, 100, 0, 1, 0, 0, std::vector<double>{ 0, 0, 0, 0 });
+    RAYX::EnergyDistribution dist(RAYX::EnergyRange(100, 0), true);
+    std::shared_ptr<RAYX::MatrixSource> m = std::make_shared<RAYX::MatrixSource>("Matrix source 1", dist, 0.065, 0.04, 0.0, 0.001, 0.001, 1, 0, 0, std::vector<double>{ 0, 0, 0, 0 });
     std::vector<RAYX::Ray> testValues = m->getRays();
 
     std::shared_ptr<RAYX::OpticalElement> q = std::make_shared<RAYX::OpticalElement>("testRandomNumbers", std::vector<double>{ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, settings, 0, 0 }, zeros, zeros, zeros, zeros, zeros, zeros);
@@ -1386,7 +1387,8 @@ TEST(globalCoordinates, FourMirrors_20Rays) {
 
 TEST(opticalElements, slit1) {
     RAYX::SimulationEnv::get().m_numOfRays = 200;
-    std::shared_ptr<RAYX::MatrixSource> m = std::make_shared<RAYX::MatrixSource>("matrix source", 0, 0.065, 0.04, 0, 0.001, 0.001, 100, 0, 1, 0, 0, std::vector<double>{ 0, 0, 0, 0 });
+    RAYX::EnergyDistribution dist(RAYX::EnergyRange(100, 0), true);
+    std::shared_ptr<RAYX::MatrixSource> m = std::make_shared<RAYX::MatrixSource>("matrix source", dist, 0.065, 0.04, 0, 0.001, 0.001, 1, 0, 0, std::vector<double>{ 0, 0, 0, 0 });
 
     RAYX::WorldUserParams s_param = RAYX::WorldUserParams(0, 0, 0, 10000, std::vector<double>{ 0, 0, 0, 0, 0, 0 });
     glm::dvec4 s_position = s_param.calcPosition();
@@ -1462,7 +1464,8 @@ TEST(opticalElements, toroid) {
 // spec1-first_rzp4mm
 TEST(PeteRZP, spec1_first_rzp) {
     RAYX::SimulationEnv::get().m_numOfRays = 20000;
-    std::shared_ptr<RAYX::PointSource> p = std::make_shared<RAYX::PointSource>("spec1_first_rzp", 1, 0.005, 0.005, 0, 0.02, 0.06, 1, 1, 0, 0, 640, 120, 1, 0, 0, std::vector<double>{0, 0, 0, 0});
+    RAYX::EnergyDistribution dist(RAYX::EnergyRange(640, 120), false);
+    std::shared_ptr<RAYX::PointSource> p = std::make_shared<RAYX::PointSource>("spec1_first_rzp", dist, 0.005, 0.005, 0, 0.02, 0.06, 1, 1, 0, 0, 1, 0, 0, std::vector<double>{0, 0, 0, 0});
 
     RAYX::GeometricUserParams gu_rzp = RAYX::GeometricUserParams(0, 1, 170, 2.2, 1, p->getPhotonEnergy(), p->getPhotonEnergy(), 1, 1, 2.2, 1, 90, 400, 90, 400);
     ASSERT_DOUBLE_EQ(gu_rzp.getAlpha(), 0.038397243543875255);
@@ -1481,7 +1484,8 @@ TEST(PeteRZP, spec1_first_rzp) {
 
 TEST(PeteRZP, spec1_first_ip) {
     RAYX::SimulationEnv::get().m_numOfRays = 20000;
-    std::shared_ptr<RAYX::PointSource> p = std::make_shared<RAYX::PointSource>("spec1_first_rzp4", 1, 0.005, 0.005, 0, 0.02, 0.06, 1, 1, 0, 0, 640, 120, 1, 0, 0, std::vector<double>{0, 0, 0, 0});
+    RAYX::EnergyDistribution dist(RAYX::EnergyRange(640, 120), false);
+    std::shared_ptr<RAYX::PointSource> p = std::make_shared<RAYX::PointSource>("spec1_first_rzp4", dist, 0.005, 0.005, 0, 0.02, 0.06, 1, 1, 0, 0, 1, 0, 0, std::vector<double>{0, 0, 0, 0});
 
     RAYX::GeometricUserParams gu_rzp = RAYX::GeometricUserParams(0, 1, 170, 2.2, 1, p->getPhotonEnergy(), p->getPhotonEnergy(), 1, 1, 2.2, 1, 90, 400, 90, 400);
     ASSERT_DOUBLE_EQ(gu_rzp.getAlpha(), 0.038397243543875255);
@@ -1505,7 +1509,8 @@ TEST(PeteRZP, spec1_first_ip) {
 
 TEST(PeteRZP, spec1_first_plus_rzp) {
     RAYX::SimulationEnv::get().m_numOfRays = 20000;
-    std::shared_ptr<RAYX::PointSource> p = std::make_shared<RAYX::PointSource>("spec1_first_plus_rzp", 1, 0.005, 0.005, 0, 0.02, 0.06, 1, 1, 0, 0, 640, 120, 1, 0, 0, std::vector<double>{0, 0, 0, 0});
+    RAYX::EnergyDistribution dist(RAYX::EnergyRange(640, 120), false);
+    std::shared_ptr<RAYX::PointSource> p = std::make_shared<RAYX::PointSource>("spec1_first_plus_rzp", dist, 0.005, 0.005, 0, 0.02, 0.06, 1, 1, 0, 0, 1, 0, 0, std::vector<double>{0, 0, 0, 0});
 
     RAYX::GeometricUserParams gu_rzp = RAYX::GeometricUserParams(0, 1, 170, 2.2, 4.75, p->getPhotonEnergy(), p->getPhotonEnergy(), 1, 1, 2.2, 4.75, 90, 400, 90, 400);
     ASSERT_DOUBLE_EQ(gu_rzp.getAlpha(), 0.038397243543875255);
@@ -1525,7 +1530,8 @@ TEST(PeteRZP, spec1_first_plus_rzp) {
 
 TEST(PeteRZP, spec1_first_plus_ip) {
     RAYX::SimulationEnv::get().m_numOfRays = 20000;
-    std::shared_ptr<RAYX::PointSource> p = std::make_shared<RAYX::PointSource>("spec1_first_plus_rzp_ip", 1, 0.005, 0.005, 0, 0.02, 0.06, 1, 1, 0, 0, 640, 120, 1, 0, 0, std::vector<double>{0, 0, 0, 0});
+    RAYX::EnergyDistribution dist(RAYX::EnergyRange(640, 120), false);
+    std::shared_ptr<RAYX::PointSource> p = std::make_shared<RAYX::PointSource>("spec1_first_plus_rzp_ip", dist, 0.005, 0.005, 0, 0.02, 0.06, 1, 1, 0, 0, 1, 0, 0, std::vector<double>{0, 0, 0, 0});
 
     RAYX::GeometricUserParams gu_rzp = RAYX::GeometricUserParams(0, 1, 170, 2.2, 4.75, p->getPhotonEnergy(), p->getPhotonEnergy(), 1, 1, 2.2, 4.75, 90, 400, 90, 400);
     ASSERT_DOUBLE_EQ(gu_rzp.getAlpha(), 0.038397243543875255);
@@ -1549,7 +1555,8 @@ TEST(PeteRZP, spec1_first_plus_ip) {
 
 TEST(PeteRZP, spec1_first_minus_rzp2) {
     RAYX::SimulationEnv::get().m_numOfRays = 20000;
-    std::shared_ptr<RAYX::PointSource> p = std::make_shared<RAYX::PointSource>("spec1_first_minus_rzp2", 1, 0.005, 0.005, 0, 0.001, 0.06, 1, 1, 0, 0, 640, 120, 1, 0, 0, std::vector<double>{0, 0, 0, 0});
+    RAYX::EnergyDistribution dist(RAYX::EnergyRange(640, 120), false);
+    std::shared_ptr<RAYX::PointSource> p = std::make_shared<RAYX::PointSource>("spec1_first_minus_rzp2", dist, 0.005, 0.005, 0, 0.001, 0.06, 1, 1, 0, 0, 1, 0, 0, std::vector<double>{0, 0, 0, 0});
 
     RAYX::GeometricUserParams gu_rzp = RAYX::GeometricUserParams(0, 1, 170, 2.2, 1, p->getPhotonEnergy(), p->getPhotonEnergy(), -1, -1, 2.2, 1, 90, 400, 90, 400);
     ASSERT_DOUBLE_EQ(gu_rzp.getAlpha(), 0.038397243543875255);
@@ -1569,7 +1576,8 @@ TEST(PeteRZP, spec1_first_minus_rzp2) {
 
 TEST(PeteRZP, spec1_first_minus_ip2) {
     RAYX::SimulationEnv::get().m_numOfRays = 20000;
-    std::shared_ptr<RAYX::PointSource> p = std::make_shared<RAYX::PointSource>("spec1_first_minus_rzp_ip2", 1, 0.005, 0.005, 0, 0.001, 0.06, 1, 1, 0, 0, 640, 120, 1, 0, 0, std::vector<double>{0, 0, 0, 0});
+    RAYX::EnergyDistribution dist(RAYX::EnergyRange(640, 120), false);
+    std::shared_ptr<RAYX::PointSource> p = std::make_shared<RAYX::PointSource>("spec1_first_minus_rzp_ip2", dist, 0.005, 0.005, 0, 0.001, 0.06, 1, 1, 0, 0, 1, 0, 0, std::vector<double>{0, 0, 0, 0});
 
     RAYX::GeometricUserParams gu_rzp = RAYX::GeometricUserParams(0, 1, 170, 2.2, 1, p->getPhotonEnergy(), p->getPhotonEnergy(), -1, -1, 2.2, 1, 90, 400, 90, 400);
     ASSERT_DOUBLE_EQ(gu_rzp.getAlpha(), 0.038397243543875255);

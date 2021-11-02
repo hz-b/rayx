@@ -36,6 +36,9 @@ namespace RAYX
         double getLinear45();
         double getCircular();
 
+        /** yields the average energy of the energy distribution m_EnergyDistribution */
+        double getPhotonEnergy() const;
+
         double selectEnergy();
         void setNumberOfRays(int numberOfRays);
         glm::dvec3 getDirectionFromAngles(double phi, double psi);
