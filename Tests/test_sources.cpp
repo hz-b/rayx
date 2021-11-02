@@ -25,7 +25,7 @@ void writeRaysToFile(std::list<double> outputRays, std::string name)
     filename.append(".csv");
     outputFile.open(filename);
     char sep = ';'; // file is saved in .csv (comma seperated value), excel compatibility is manual right now
-    outputFile << "Index" << sep << "Xloc" << sep << "Yloc" << sep << "Zloc" << sep << "Weight" << sep << "Xdir" << sep << "Ydir" << sep << "Zdir" << sep << "Energy" << sep << "S0" << sep << "S1" << sep << "S2" << sep << "S3" << std::endl;
+    outputFile << "Index" << sep << "Xloc" << sep << "Yloc" << sep << "Zloc" << sep << "Weight" << sep << "Xdir" << sep << "Ydir" << sep << "Zdir" << sep << "Energy" << sep << "S0" << sep << "S1" << sep << "S2" << sep << "S3" << sep << "pathLength" << sep << "order" << sep << "lastElement" << sep << "extraParam" << std::endl;
 
     size_t counter = 0;
     int print = 0; // whether to print on std::out (0=no, 1=yes)
@@ -202,6 +202,10 @@ TEST(LightSource, PointSourceHardEdge) {
         rayList.push_back(r.m_stokes.y);
         rayList.push_back(r.m_stokes.z);
         rayList.push_back(r.m_stokes.w);
+        rayList.push_back(r.m_pathLength);
+        rayList.push_back(r.m_order);
+        rayList.push_back(r.m_lastElement);
+        rayList.push_back(r.m_extraParam);
         ASSERT_TRUE(r.m_energy >= photonEnergy - (energySpread / 2));
         ASSERT_TRUE(r.m_energy <= photonEnergy + (energySpread / 2));
     }
@@ -248,6 +252,10 @@ TEST(LightSource, PointSourceSoftEdge) {
         rayList.push_back(r.m_stokes.y);
         rayList.push_back(r.m_stokes.z);
         rayList.push_back(r.m_stokes.w);
+        rayList.push_back(r.m_pathLength);
+        rayList.push_back(r.m_order);
+        rayList.push_back(r.m_lastElement);
+        rayList.push_back(r.m_extraParam);
         ASSERT_TRUE(r.m_energy >= photonEnergy - (energySpread / 2));
         ASSERT_TRUE(r.m_energy <= photonEnergy + (energySpread / 2));
     }
@@ -290,6 +298,10 @@ TEST(LightSource, PointSourceHardEdgeMis) {
         rayList.push_back(r.m_stokes.y);
         rayList.push_back(r.m_stokes.z);
         rayList.push_back(r.m_stokes.w);
+        rayList.push_back(r.m_pathLength);
+        rayList.push_back(r.m_order);
+        rayList.push_back(r.m_lastElement);
+        rayList.push_back(r.m_extraParam);
         ASSERT_TRUE(r.m_energy >= photonEnergy - (energySpread / 2));
         ASSERT_TRUE(r.m_energy <= photonEnergy + (energySpread / 2));
     }
@@ -332,6 +344,10 @@ TEST(LightSource, PointSourceSoftEdgeMis) {
         rayList.push_back(r.m_stokes.y);
         rayList.push_back(r.m_stokes.z);
         rayList.push_back(r.m_stokes.w);
+        rayList.push_back(r.m_pathLength);
+        rayList.push_back(r.m_order);
+        rayList.push_back(r.m_lastElement);
+        rayList.push_back(r.m_extraParam);
         ASSERT_TRUE(r.m_energy >= photonEnergy - (energySpread / 2));
         ASSERT_TRUE(r.m_energy <= photonEnergy + (energySpread / 2));
     }
@@ -367,6 +383,10 @@ TEST(LightSource, MatrixSource20000) {
         rayList.push_back(r.m_stokes.y);
         rayList.push_back(r.m_stokes.z);
         rayList.push_back(r.m_stokes.w);
+        rayList.push_back(r.m_pathLength);
+        rayList.push_back(r.m_order);
+        rayList.push_back(r.m_lastElement);
+        rayList.push_back(r.m_extraParam);
         ASSERT_TRUE(r.m_energy >= photonEnergy - (energySpread / 2));
         ASSERT_TRUE(r.m_energy <= photonEnergy + (energySpread / 2));
     }
@@ -402,6 +422,10 @@ TEST(LightSource, PointSource20000) {
         rayList.push_back(r.m_stokes.y);
         rayList.push_back(r.m_stokes.z);
         rayList.push_back(r.m_stokes.w);
+        rayList.push_back(r.m_pathLength);
+        rayList.push_back(r.m_order);
+        rayList.push_back(r.m_lastElement);
+        rayList.push_back(r.m_extraParam);
     }
     std::cout << rayList.size() << std::endl;
     ASSERT_EQ(rayList.size(), number_of_rays * RAY_DOUBLE_COUNT);

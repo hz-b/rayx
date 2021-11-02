@@ -40,7 +40,7 @@ namespace RAYX
     }
 
     std::vector<double> Quadric::getParams() const {
-        std::cout << "return anchor points" << std::endl;
+        std::cout << "[Quadric]: return anchor points" << std::endl;
         return m_anchorPoints;
     }
 

@@ -10,7 +10,7 @@
 class Ray
 {
 public:
-	Ray(double xpos, double ypos, double zpos, double xdir, double ydir, double zdir, double s0, double s1, double s2, double s3, double en, double w);
+	Ray(double xpos, double ypos, double zpos, double xdir, double ydir, double zdir, double s0, double s1, double s2, double s3, double en, double w, double pathLength = 13, double order = 1, double lastElement = 5, double extraParameter = 2);
 	Ray(double* location);
 	Ray();
 	~Ray();
@@ -42,4 +42,8 @@ private:
 	vec3 m_direction;
 	double m_energy;
 	vec4 m_stokes;
+	double m_pathLength;
+	double m_order;
+	double m_lastElement;
+	double m_extraParam;
 };

@@ -1,4 +1,5 @@
 #include "RandomRays.h"
+#include "VulkanTracer.h"
 #include <cassert>
 #include <cmath>
 #include <random>
@@ -29,7 +30,7 @@ namespace RAYX
 
         int n = SimulationEnv::get().m_numOfRays;
         std::vector<Ray> rayList;
-        std::cout << "create " << n << " random rays " << std::endl;
+        std::cout << "[RandomRays]: create " << n << " random rays " << std::endl;
         // fill the square with rmat1xrmat1 rays
         for (int i = 0; i < n; i++) {
             glm::dvec3 position = glm::dvec3(unif(re), unif(re), unif(re));
@@ -50,21 +51,21 @@ namespace RAYX
         //double max = 0;
         for (int i = 0; i < SimulationEnv::get().m_numOfRays; i++) {
             Ray* r1 = input[i];
-            double a1 = atan(r1->m_position.x) - output[i * RAYCORE_RAY_DOUBLE_AMOUNT];
+            double a1 = atan(r1->m_position.x) - output[i * VULKANTRACER_RAY_DOUBLE_AMOUNT];
             diff.push_back(a1);
-            double a2 = atan(r1->m_position.y) - output[i * RAYCORE_RAY_DOUBLE_AMOUNT + 1];
+            double a2 = atan(r1->m_position.y) - output[i * VULKANTRACER_RAY_DOUBLE_AMOUNT + 1];
             diff.push_back(a2);
-            double a3 = atan(r1->m_position.z) - output[i * RAYCORE_RAY_DOUBLE_AMOUNT + 2];
+            double a3 = atan(r1->m_position.z) - output[i * VULKANTRACER_RAY_DOUBLE_AMOUNT + 2];
             diff.push_back(a3);
-            double a5 = atan(r1->m_direction.x) - output[i * RAYCORE_RAY_DOUBLE_AMOUNT + 4];
+            double a5 = atan(r1->m_direction.x) - output[i * VULKANTRACER_RAY_DOUBLE_AMOUNT + 4];
             diff.push_back(a5);
-            double a6 = atan(r1->m_direction.y) - output[i * RAYCORE_RAY_DOUBLE_AMOUNT + 5];
+            double a6 = atan(r1->m_direction.y) - output[i * VULKANTRACER_RAY_DOUBLE_AMOUNT + 5];
             diff.push_back(a6);
-            double a7 = atan(r1->m_direction.z) - output[i * RAYCORE_RAY_DOUBLE_AMOUNT + 6];
+            double a7 = atan(r1->m_direction.z) - output[i * VULKANTRACER_RAY_DOUBLE_AMOUNT + 6];
             diff.push_back(a7);
         }
         diff.sort();
-        std::cout << "max difference: " << diff.front() << " " << diff.back() << std::endl;
+        std::cout << "[RandomRays]: max difference: " << diff.front() << " " << diff.back() << std::endl;
     }
 
 

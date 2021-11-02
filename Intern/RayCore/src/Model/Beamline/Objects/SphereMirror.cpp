@@ -45,7 +45,8 @@ namespace RAYX
     */
     SphereMirror::SphereMirror(const char* name, const int geometricalShape, const double width, const double height, double radius, glm::dvec4 position, glm::dmat4x4 orientation, const std::vector<double> slopeError)
         : OpticalElement(name, { 0,0,0,0, 0,0,0,0, 0,0,0,0, 0,0,0,0 }, geometricalShape, width, height, position, orientation, { 0,0,0,0,0,0 }, slopeError)
-    {
+    {   
+        std::cout << "[SphereMirror]: Created.\n";
         setSurface(std::make_unique<Quadric>(std::vector<double>{1,0,0,0, 1,1,0,-radius, 0,0,1,0, 0,0,0,0}));
     }
 

@@ -33,7 +33,7 @@ namespace RAYX
         m_elementParameters = EParameters;
     }
 
-    
+
 
     OpticalElement::OpticalElement(const char* name, const int geometricalShape, const double width, const double height, const double chi, const double dist, const std::vector<double> slopeError, const std::shared_ptr<OpticalElement> previous)
         : BeamlineObject(name),
@@ -44,8 +44,8 @@ namespace RAYX
         m_previous(previous),
         m_slopeError(slopeError)
     {
-        glm::dvec4 pos = {0,0,0,0};
-        glm::dmat4x4 orientation = {0,0,0,0, 0,0,0,0, 0,0,0,0, 0,0,0,0};
+        glm::dvec4 pos = { 0,0,0,0 };
+        glm::dmat4x4 orientation = { 0,0,0,0, 0,0,0,0, 0,0,0,0, 0,0,0,0 };
         m_geometry = std::make_unique<Geometry>(geometricalShape, width, height, pos, orientation);
         updateObjectParams();
 
@@ -110,7 +110,7 @@ namespace RAYX
      * @return void
     */
     void OpticalElement::calcTransformationMatricesFromAngles(const std::vector<double> misalignment, bool global) {
-        std::cout << getName() << " alpha " << m_alpha << " beta " << m_beta << " chi " << m_chi << std::endl;
+        std::cout << "[Optic-Element]: " << getName() << " alpha " << m_alpha << " beta " << m_beta << " chi " << m_chi << std::endl;
         double cos_c = cos(m_chi);
         double sin_c = sin(m_chi);
         double cos_a = cos(m_alpha);
@@ -180,7 +180,7 @@ namespace RAYX
 
         // world coordinates = world coord of previous element * transformation from previous element to this one
         if (m_previous != NULL) { //Mi_g2e = M_i_b2e * M_(i-1))_e2b * M_(i-1)_g2e
-            std::cout << "calc world coordinates" << std::endl;
+            std::cout << "[Optic-Element]: Calc world coordinates" << std::endl;
             m_g2e = m_previous->getE2B() * m_previous->getG2E();
             printDMat4(m_b2e);
             m_g2e = m_b2e * m_g2e;
@@ -191,16 +191,16 @@ namespace RAYX
         else {
             m_g2e = m_b2e;
             m_e2g = m_inv_b2e;
-            std::cout << "first element" << std::endl;
+            std::cout << "[Optic-Element]: First element" << std::endl;
         }
 
         if (global) {  // combine in and out transformation (global <-> element coordinates) with misalignment
-            std::cout << "global" << std::endl;
+            std::cout << "[Optic-Element]: Global" << std::endl;
             m_inMatrix = glmToVector16(m_g2e);
             m_outMatrix = glmToVector16(m_e2g);
         }
         else {  // to use usual ray coordinatesystem, also contains misalignment
-            std::cout << "RAY-UI beam coordinates" << std::endl;
+            std::cout << "\tRAY-UI beam coordinates" << std::endl;
             m_inMatrix = glmToVector16(m_b2e);
             m_outMatrix = glmToVector16(m_e2b);
         }
@@ -269,9 +269,9 @@ namespace RAYX
     }
 
     void OpticalElement::setSurface(std::unique_ptr<Surface> surface) {
-        m_surface = std::move(surface);
+        m_surfacePtr = std::move(surface);
         assert(surface == nullptr);
-        assert(m_surface != nullptr);
+        assert(m_surfacePtr != nullptr);
 
     }
 
@@ -397,10 +397,10 @@ namespace RAYX
 
     std::vector<double> OpticalElement::getSurfaceParams() const
     {
-        std::cout << "return anchor points" << std::endl;
-        //assert(m_surface!=nullptr);
-        if (m_surface != nullptr)
-            return m_surface->getParams();
+        std::cout << "[Optic-Element]: return anchor points" << std::endl;
+        //assert(m_surfacePtr!=nullptr);
+        if (m_surfacePtr != nullptr)
+            return m_surfacePtr->getParams();
         else
             return m_surfaceParams;
     }

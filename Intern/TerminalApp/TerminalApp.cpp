@@ -10,17 +10,17 @@ TerminalApp::TerminalApp(int argc, char** argv) :
     m_argc(argc),
     m_argv(argv)
 {
-    RAYX_DEBUG(std::cout << "TerminalApp erstellt!" << std::endl);
+    RAYX_DEBUG(std::cout << "[Terminal]: TerminalApp created!" << std::endl);
 }
 
 TerminalApp::~TerminalApp()
 {
-    RAYX_DEBUG(std::cout << "TerminalApp deleted!" << std::endl);
+    RAYX_DEBUG(std::cout << "[Terminal]: TerminalApp deleted!" << std::endl);
 }
 
 void TerminalApp::run()
 {
-    RAYX_DEBUG(std::cout << "TerminalApp running..." << std::endl);
+    RAYX_DEBUG(std::cout << "[Terminal]: TerminalApp running..." << std::endl);
 
     if (m_argc <= 2) {
         if (m_argc == 2) {

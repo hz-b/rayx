@@ -40,7 +40,7 @@ namespace RAYX
     }
 
     std::vector<double> Toroid::getParams() const {
-        std::cout << "return anchor points" << std::endl;
+        std::cout << "[Toroid]: Return anchor points" << std::endl;
         return m_parameters;
     }
 

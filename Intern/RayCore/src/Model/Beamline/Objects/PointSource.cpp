@@ -81,13 +81,13 @@ namespace RAYX
     }
 
     /**
-     * creates random rays from point source with specified width and height
-     * distributed according to either uniform or gaussian distribution across width & height of source
-     * the deviation of the direction of each ray from the main ray (0,0,1, phi=psi=0) can also be specified to be
-     * uniform or gaussian within a given range (m_verDivergence, m_horDivergence)
+     * Creates random rays from point source with specified width and height 
+     * distributed according to either uniform or gaussian distribution across width & height of source 
+     * the deviation of the direction of each ray from the main ray (0,0,1, phi=psi=0) can also be specified to be 
+     * uniform or gaussian within a given range (m_verDivergence, m_horDivergence) 
      * z-position of ray is always from uniform distribution
      *
-     * returns list of rays
+     * @returns list of rays
      */
     std::vector<Ray> PointSource::getRays() {
         double x, y, z, psi, phi, en; //x,y,z pos, psi,phi direction cosines, en=energy
@@ -95,7 +95,7 @@ namespace RAYX
         int n = SimulationEnv::get().m_numOfRays;
         std::vector<Ray> rayVector;
         rayVector.reserve(1048576);
-        std::cout << "create " << n << " rays with standard normal deviation..." << std::endl;
+        std::cout << "[PointSource]: Create " << n << " rays with standard normal deviation..." << std::endl;
 
         // create n rays with random position and divergence within the given span for width, height, depth, horizontal and vertical divergence
         for (int i = 0; i < n; i++) {
@@ -116,7 +116,7 @@ namespace RAYX
             Ray r = Ray(position, direction, stokes, en, 1.0);
             rayVector.emplace_back(r);
         }
-        std::cout << &(rayVector[0]) << std::endl;
+        std::cout << "[PointSource]: &rayVector: " <<  &(rayVector[0]) << std::endl;
         //rayVector.resize(1048576);
         return rayVector;
     }
