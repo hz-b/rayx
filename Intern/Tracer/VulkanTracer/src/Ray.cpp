@@ -1,6 +1,18 @@
 #include "Ray.h"
 #include <cstring>
 
+/**
+ * initializes Ray with given position, direction, weight, energy and stokes parameters. Pathlength, order and last element are set to 0
+ * @param xpos
+ * @param ypos
+ * @param zpos
+ * @param xdir
+ * @param ydir
+ * @param zdir
+ * @param s0
+ * @param s1
+ * @param s2
+*/
 Ray::Ray(double xpos, double ypos, double zpos, double xdir, double ydir, double zdir, double s0, double s1, double s2, double s3, double en, double w, double pathLength, double order, double lastElement, double extraParameter)
 {
 	m_position.x = xpos;
@@ -88,4 +100,16 @@ double Ray::getS2() {
 }
 double Ray::getS3() {
 	return m_stokes.s3;
+}
+double Ray::getPathLength() {
+	return m_pathLength;
+}
+double Ray::getOrder() {
+	return m_order;
+}
+double Ray::getLastElement() {
+	return m_lastElement;
+}
+double Ray::getExtraParam() {
+	return m_extraParam;
 }

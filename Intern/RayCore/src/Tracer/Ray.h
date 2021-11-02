@@ -11,7 +11,7 @@ namespace RAYX
     {
     public:
         // ctor
-        Ray(glm::dvec3 position, glm::dvec3 direction, glm::dvec4 stokes, double energy, double weight, double pathLength = 13, double order = 1, double lastElement = 5, double extraParameter = 2);
+        Ray(glm::dvec3 position, glm::dvec3 direction, glm::dvec4 stokes, double energy, double weight, double pathLength = 0, double order = 0, double lastElement = 0, double extraParameter = 0);
         // default ctor
         Ray() = default;
         // dtor

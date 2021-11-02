@@ -10,7 +10,7 @@
 class Ray
 {
 public:
-	Ray(double xpos, double ypos, double zpos, double xdir, double ydir, double zdir, double s0, double s1, double s2, double s3, double en, double w, double pathLength = 13, double order = 1, double lastElement = 5, double extraParameter = 2);
+	Ray(double xpos, double ypos, double zpos, double xdir, double ydir, double zdir, double s0, double s1, double s2, double s3, double en, double w, double pathLength = 0, double order = 0, double lastElement = 0, double extraParameter = 0);
 	Ray(double* location);
 	Ray();
 	~Ray();
@@ -27,6 +27,10 @@ public:
 	double getS1();
 	double getS2();
 	double getS3();
+	double getPathLength();
+	double getOrder();
+	double getLastElement();
+	double getExtraParam();
 
 private:
 	struct vec3

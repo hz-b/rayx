@@ -205,6 +205,58 @@ TEST(SphereMirror, testPrecalculateRadius) {
     EXPECT_ITERABLE_DOUBLE_EQ(std::vector<double>, sM.getOutMatrix(), glmToVector16(correctOutMatrix));
 }
 
+TEST(Ellips, defaultParams) {
+    int geometricalShape = 0; // rectangle
+    double width = 50;
+    double height = 200;
+    double incidence = 10;
+    double entranceArmLength = 10000;
+    double exitArmLength = 1000;
+
+    double a11 = 1;
+    int coordSys = 0;
+    int figRot = 0; // "yes"
+
+    double dist = 10000;
+    double chi = 0;
+    std::vector<double> mis = {1,2,3,0.004,0.005,0.006};
+    std::vector<double> sE = {0,0,0, 0,0,0,0};
+
+    double alpha = 0.031253965260898464;
+    double beta = 0.31781188513796743;
+    double tangentAngle = 0.14327895993853446; // alpha1 in old ray code
+    RAYX::GeometricUserParams e_params = RAYX::GeometricUserParams(incidence, entranceArmLength, exitArmLength);
+    ASSERT_DOUBLE_EQ(e_params.getAlpha(), alpha);
+    ASSERT_DOUBLE_EQ(e_params.getBeta(), beta);
+    ASSERT_DOUBLE_EQ(e_params.calcTangentAngle(incidence, entranceArmLength, exitArmLength, 1), tangentAngle);
+    
+    double shortHalfAxisC = 549.1237529650836;
+    double y0 = 312.4887730997391;
+    double z0 = 4522.597446463379;
+    double shortHalfAxisB = 549.1237529650836;
+    double longHalfAxisA = 5500;
+
+    double a33 = 0.0099681618535688628;
+    double a34 = 45.0819833448842;
+    double a44 = -5.8207660913467407e-11;
+    std::vector<double> surface = {1, 0, 0, 0, 1, 1, 0, -y0, 0, 0, a33, a34, 7, 0, 0, a44};
+    std::vector<double> elementParams = { sin(tangentAngle), cos(tangentAngle), y0, z0, 0,0,0,0, 0,0,0,0, 0,0,0,0 };
+
+    RAYX::WorldUserParams w_params = RAYX::WorldUserParams(e_params.getAlpha(), e_params.getBeta(), degToRad(chi), dist, mis);
+    RAYX::Ellipsoid eb = RAYX::Ellipsoid("ellipsoid", geometricalShape, width, height, w_params.calcPosition(), w_params.calcOrientation(), incidence, entranceArmLength, exitArmLength, coordSys, figRot, a11, mis, sE);
+    
+    EXPECT_NEAR(eb.getShortHalfAxisB(), shortHalfAxisB, 0.0000001);
+    EXPECT_NEAR(eb.getLongHalfAxisA(), longHalfAxisA, 0.0000001);
+    EXPECT_NEAR(eb.getHalfAxisC(), shortHalfAxisC, 0.0000001);
+    EXPECT_NEAR(eb.getY0(), y0, 0.0000001);
+    EXPECT_NEAR(eb.getZ0(), z0, 0.0000001);
+    EXPECT_NEAR(eb.getTangentAngle(), tangentAngle, 0.0000001);
+    EXPECT_ITERABLE_DOUBLE_EQ(std::vector<double>, surface, eb.getSurfaceParams());
+    EXPECT_ITERABLE_DOUBLE_EQ(std::vector<double>, elementParams, eb.getElementParameters());
+    
+
+}
+/*
 TEST(Ellips, testParamsCSCurvature) {
     double width = 123.51;
     double height = 85.234;
@@ -421,4 +473,4 @@ TEST(Ellips, testParamsCSMirror) {
     EXPECT_ITERABLE_DOUBLE_EQ(std::vector<double>, correctTempMis, e3.getTempMisalignmentParams());
     EXPECT_ITERABLE_DOUBLE_EQ(std::vector<double>, sE, e3.getSlopeError());
 
-}
+}*/

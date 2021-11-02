@@ -21,7 +21,6 @@ using ::testing::ElementsAre;
 std::vector<double> zeros = { 0,0,0,0, 0,0,0,0, 0,0,0,0, 0,0,0,0 };
 std::vector<double> zeros7 = { 0,0,0,0,0, 0,0 }; // for slope error
 
-#define RAY_DOUBLE_COUNT 12
 
 //! Using the google test framework, check all elements of two containers
 #define EXPECT_ITERABLE_BASE( PREDICATE, REFTYPE, TARTYPE, ref, target) \
@@ -89,6 +88,10 @@ std::list<double> runTracer(std::vector<RAYX::Ray> testValues, std::vector<std::
         outputRays.push_back((*iter).getS1());
         outputRays.push_back((*iter).getS2());
         outputRays.push_back((*iter).getS3());
+        outputRays.push_back((*iter).getPathLength());
+        outputRays.push_back((*iter).getOrder());
+        outputRays.push_back((*iter).getLastElement());
+        outputRays.push_back((*iter).getExtraParam());
     }
     std::cout << "got " << outputRays.size() << " values from shader" << std::endl;
     tracer.cleanup();
@@ -107,7 +110,7 @@ void writeToFile(std::list<double> outputRays, std::string name)
     filename.append(".csv");
     outputFile.open(filename);
     char sep = ';'; // file is saved in .csv (comma seperated value), excel compatibility is manual right now
-    outputFile << "Index" << sep << "Xloc" << sep << "Yloc" << sep << "Zloc" << sep << "Weight" << sep << "Xdir" << sep << "Ydir" << sep << "Zdir" << sep << "Energy" << sep << "S0" << sep << "S1" << sep << "S2" << sep << "S3" << std::endl;
+    outputFile << "Index" << sep << "Xloc" << sep << "Yloc" << sep << "Zloc" << sep << "Weight" << sep << "Xdir" << sep << "Ydir" << sep << "Zdir" << sep << "Energy" << sep << "S0" << sep << "S1" << sep << "S2" << sep << "S3" << sep << "pathLength" << sep << "order" << sep << "lastElement" << sep << "extraParam" << std::endl;
     // outputFile << "Index,Xloc,Yloc,Zloc,Weight,Xdir,Ydir,Zdir" << std::endl;
 
     size_t counter = 0;
@@ -179,6 +182,18 @@ void compareFromCorrect(std::vector<RAYX::Ray> correct, std::list<double> output
         }
         else if (counter % RAY_DOUBLE_COUNT == 11) {
             EXPECT_NEAR(*i, correct[int(counter / RAY_DOUBLE_COUNT)].m_stokes.w, tolerance);
+        }
+        else if (counter % RAY_DOUBLE_COUNT == 12) {
+            EXPECT_NEAR(*i, correct[int(counter / RAY_DOUBLE_COUNT)].m_pathLength, tolerance);
+        }
+        else if (counter % RAY_DOUBLE_COUNT == 13) {
+            EXPECT_NEAR(*i, correct[int(counter / RAY_DOUBLE_COUNT)].m_order, tolerance);
+        }
+        else if (counter % RAY_DOUBLE_COUNT == 14) {
+            EXPECT_NEAR(*i, correct[int(counter / RAY_DOUBLE_COUNT)].m_lastElement, tolerance);
+        }
+        else if (counter % RAY_DOUBLE_COUNT == 15) {
+            EXPECT_NEAR(*i, correct[int(counter / RAY_DOUBLE_COUNT)].m_extraParam, tolerance);
         }
         counter++;
         i++;
@@ -763,6 +778,7 @@ TEST(Tracer, factTest) {
     testValues.push_back(r);
 
     // pos, weight, dir, energy, stokes
+    //RAYX::Ray c = RAYX::Ray(glm::dvec3(1, 1, 2), glm::dvec3(-1, 24, 355687428096000), glm::dvec4(10, -4, 12.2, -0), 0, -2); // glm::dvec4(100, -4, 12.2, -0)
     std::vector<double> correct = { 1,1,2, -2, -1,24,355687428096000, 1, 3628800,-4,479001600,1 };
 
     double settings = 8;
@@ -1287,6 +1303,45 @@ TEST(opticalElements, RZPMis) {
     //std::shared_ptr<RAYX::ReflectionZonePlate> rzp = std::make_shared<RAYX::ReflectionZonePlate>("ReflectionZonePlateMis", 0, 1, 0, 0, 0, 50, 200, 170, 1, 0, 10000, 100, 100, -1, -1, 1, 1, 100, 500, 100, 500, 0, 0, 0, 0, 0, 0, std::vector<double>{ 1,2,3,0.001,0.002,0.003 }, zeros7, nullptr, true); // dx,dy,dz, dpsi,dphi,dchi //
     //std::shared_ptr<RAYX::ImagePlane> i = std::make_shared<RAYX::ImagePlane>("ImagePlane", 1000, rzp, true);
     ASSERT_TRUE(true);
+}
+
+TEST(opticalElements, EllipsoidImagePlane) {
+    RAYX::GeometricUserParams g_params = RAYX::GeometricUserParams(10, 10000, 1000);
+    double alpha = 0.031253965260898464;
+    double beta = 0.31781188513796743;
+    ASSERT_DOUBLE_EQ(g_params.getAlpha(), alpha);
+    ASSERT_DOUBLE_EQ(g_params.getBeta(), beta);
+    double tangentAngle = g_params.calcTangentAngle(10, 10000, 1000, 0);
+    
+    RAYX::WorldUserParams w_coord = RAYX::WorldUserParams(g_params.getAlpha(), g_params.getBeta(), 0, 10000, std::vector<double>{0, 0, 0, 0, 0, 0}, tangentAngle);
+    glm::dvec4 pos = w_coord.calcPosition();
+    glm::dmat4x4 or1 = w_coord.calcOrientation();
+
+    std::shared_ptr<RAYX::Ellipsoid> eb = std::make_shared<RAYX::Ellipsoid>("ellipsoid_ip_200default", 0, 50, 200, pos, or1, 10, 10000, 1000, 0, 0, 1, std::vector<double> {0, 0, 0, 0, 0, 0}, zeros7);
+    
+    RAYX::WorldUserParams w_coord2 = RAYX::WorldUserParams(0, 0, 0, 1000, std::vector<double>{0, 0, 0, 0, 0, 0});
+    glm::dvec4 pos2 = w_coord2.calcPosition(w_coord, pos, or1);
+    glm::dmat4x4 or2 = w_coord2.calcOrientation(w_coord, pos, or1);
+    std::shared_ptr<RAYX::ImagePlane> i = std::make_shared<RAYX::ImagePlane>("ImagePlane", pos2, or2);
+    
+    testOpticalElement({ eb, i }, 200);
+}
+
+TEST(opticalElements, Ellipsoid) {
+    RAYX::GeometricUserParams g_params = RAYX::GeometricUserParams(10, 10000, 1000);
+    double alpha = 0.031253965260898464;
+    double beta = 0.31781188513796743;
+    ASSERT_DOUBLE_EQ(g_params.getAlpha(), alpha);
+    ASSERT_DOUBLE_EQ(g_params.getBeta(), beta);
+    double tangentAngle = g_params.calcTangentAngle(10, 10000, 1000, 0);
+    
+    RAYX::WorldUserParams w_coord = RAYX::WorldUserParams(g_params.getAlpha(), g_params.getBeta(), 0, 10000, std::vector<double>{0, 0, 0, 0, 0, 0}, tangentAngle);
+    glm::dvec4 pos = w_coord.calcPosition();
+    glm::dmat4x4 or1 = w_coord.calcOrientation();
+
+    std::shared_ptr<RAYX::Ellipsoid> eb = std::make_shared<RAYX::Ellipsoid>("ellipsoid_200default", 0, 50, 200, pos, or1, 10, 10000, 1000, 0, 0, 1, std::vector<double> {0, 0, 0, 0, 0, 0}, zeros7);
+    eb->setOutMatrix(glmToVector16(glm::transpose(w_coord.calcE2B()))); // to make comparison with old ray files possible, use the beam coordinate system
+    testOpticalElement({ eb }, 200);
 }
 
 TEST(opticalElements, ImagePlane) {

@@ -17,10 +17,8 @@ namespace RAYX
 
     public:
 
-        // old constructor with several user parameters to calculate incidence and exit angle (alpha, beta) has been moved to somewhere else
-        // PlaneGrating(const char* name, const int mount, const double width, const double height, const double deviation, const double normalIncidence, const double azimuthal, const double distanceToPreceedingElement, const double designEnergyMounting, const double lineDensity, const double orderOfDiffraction, const double fixFocusConstantCFF, const int additional_zero_order, const std::vector<double> misalignmentParams, const std::vector<double> vls, const std::vector<double> slopeError, const std::shared_ptr<OpticalElement> previous, bool global);
-
-        WorldUserParams(double alpha, double beta, double chi, double dist, std::vector<double> misalignment);
+        
+        WorldUserParams(double alpha, double beta, double chi, double dist, std::vector<double> misalignment, double tangentAngle = 0);
         WorldUserParams();
         ~WorldUserParams();
 
@@ -41,6 +39,7 @@ namespace RAYX
         double m_azimuthalAngle;
         double m_dist;
         std::vector<double> m_misalignment;
+        double m_tangentAngle; // Only for ellipsoid
 
     };
 

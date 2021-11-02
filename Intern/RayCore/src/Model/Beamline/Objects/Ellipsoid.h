@@ -24,8 +24,8 @@ namespace RAYX
         double getRadius();
         double getExitArmLength();
         double getEntranceArmLength();
-        double getMy0(); // center of ellipsoid
-        double getMz0(); // -"-
+        double getY0(); // center of ellipsoid
+        double getZ0(); // -"-
         double getIncidenceAngle() const;
         double getShortHalfAxisB(); // b
         double getLongHalfAxisA(); // a
@@ -47,9 +47,8 @@ namespace RAYX
         double m_incidence;
         double m_entranceArmLength;
         double m_exitArmLength;
-        //double m_alpha1; // from tangent angle and grazing incidence???
-        // derived params
-        double m_tangentAngle;
+        // derived params, needed on shader
+        double m_tangentAngle; // == alpha1
         double m_a34;
         double m_a33;
         double m_a44;
@@ -58,12 +57,12 @@ namespace RAYX
         double m_shortHalfAxisB; // b
         double m_longHalfAxisA; // a
         double m_offsetY0; // always = 0?
-
+        double m_halfAxisC; // derived from figure_rotation, a_11 and half axes a, b
+        
         FIGURE_ROTATION m_figureRotation;
         COORDINATESYSTEM_TYPE m_misalignmentCoordSys;
         double m_a11; // param for quadric funciton, given by user
 
-        double m_halfAxisC; // derived from figure_rotation, a_11 and half axes a, b
         //double m_Depth;
         //double m_verDivergence;
         //double m_horDivergence;

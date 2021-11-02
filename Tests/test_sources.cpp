@@ -75,6 +75,45 @@ TEST(RayTest, test1) {
     double s1 = 1;
     double s2 = 0;
     double s3 = 0;
+    double pathLength = 15;
+    double order = 3;
+    double lastElement = 4;
+    double extraParam = 7;
+    Ray r = Ray(x, y, z, xdir, ydir, zdir, s0, s1, s2, s3, energy, weight, pathLength, order, lastElement, extraParam);
+    EXPECT_EQ(r.getxPos(), x);
+    EXPECT_EQ(r.getyPos(), y);
+    EXPECT_EQ(r.getzPos(), z);
+    EXPECT_EQ(r.getxDir(), xdir);
+    EXPECT_EQ(r.getyDir(), ydir);
+    EXPECT_EQ(r.getzDir(), zdir);
+    EXPECT_EQ(r.getWeight(), weight);
+    EXPECT_EQ(r.getEnergy(), energy);
+    EXPECT_EQ(r.getS0(), s0);
+    EXPECT_EQ(r.getS1(), s1);
+    EXPECT_EQ(r.getS2(), s2);
+    EXPECT_EQ(r.getS3(), s3);
+    EXPECT_EQ(r.getPathLength(), pathLength);
+    EXPECT_EQ(r.getOrder(), order);
+    EXPECT_EQ(r.getLastElement(), lastElement);
+    EXPECT_EQ(r.getExtraParam(), extraParam);
+}
+
+TEST(RayTest, testDefaultValues) {
+    //arrange
+    //act
+    //assert
+    double x = 0.2;
+    double y = 0.4;
+    double z = 0.1;
+    double xdir = 0.25;
+    double ydir = 0.05;
+    double zdir = 0.99;
+    double weight = 1.0;
+    double energy = 120.0;
+    double s0 = 1;
+    double s1 = 1;
+    double s2 = 0;
+    double s3 = 0;
     Ray r = Ray(x, y, z, xdir, ydir, zdir, s0, s1, s2, s3, energy, weight);
     EXPECT_EQ(r.getxPos(), x);
     EXPECT_EQ(r.getyPos(), y);
@@ -88,6 +127,10 @@ TEST(RayTest, test1) {
     EXPECT_EQ(r.getS1(), s1);
     EXPECT_EQ(r.getS2(), s2);
     EXPECT_EQ(r.getS3(), s3);
+    EXPECT_EQ(r.getPathLength(), 0);
+    EXPECT_EQ(r.getOrder(), 0);
+    EXPECT_EQ(r.getLastElement(), 0);
+    EXPECT_EQ(r.getExtraParam(), 0);
 }
 
 

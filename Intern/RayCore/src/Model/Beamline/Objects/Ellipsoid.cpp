@@ -40,12 +40,12 @@ namespace RAYX
         m_radius = -m_y0;
 
         double icurv = 1;
-        setSurface(std::make_unique<Quadric>(std::vector<double>{m_a11, 0, 0, 0, icurv, 1, 0, m_radius, 0, 0, m_a33, m_a34, 0, 0, 0, m_a44}));
+        setSurface(std::make_unique<Quadric>(std::vector<double>{m_a11, 0, 0, 0, icurv, 1, 0, m_radius, 0, 0, m_a33, m_a34, 7, 0, 0, m_a44}));
         // setSurface(surface);
-        setElementParameters({ 0,0,m_a11,m_y0, m_a33,m_a34,m_a44,0, 0,0,0,0, 0,0,0,0 });
+        setElementParameters({ sin(m_tangentAngle), cos(m_tangentAngle), m_y0, m_z0, double(m_figureRotation),0,0,0, 0,0,0,0, 0,0,0,0 });
 
         // if m_misalignmentCoordSys == 1 rotate through d_tangentangle before misalignment and back after (-d_tangentangle)
-        if (m_misalignmentCoordSys == CS_MIRROR) {
+        /*if (m_misalignmentCoordSys == CS_MIRROR) {
             setTemporaryMisalignment({ 0,0,0,0,0,m_tangentAngle });
             glm::dmat4x4 inTrans = getB2E();
             glm::dmat4x4 outTrans = getE2B();
@@ -66,7 +66,7 @@ namespace RAYX
         }
         else {
             setTemporaryMisalignment({ 0,0,0,0,0,0 });
-        }
+        }*/
     }
 
     /**
@@ -90,7 +90,7 @@ namespace RAYX
     {
 
         std::cout << "[Ellipsoid]: Created." << std::endl;
-        m_offsetY0 = 0;// what is this for? RAYX.FOR: "only !=0 in case of Monocapillary"
+        m_offsetY0 = 0;// what is this for? RAY.FOR: "only !=0 in case of Monocapillary"
 
         m_misalignmentCoordSys = (coordSys == 0 ? CS_CURVATURE : CS_MIRROR);
         m_figureRotation = (figRot == 0 ? FR_YES : (figRot == 1 ? FR_PLANE : FR_A11));
@@ -105,7 +105,7 @@ namespace RAYX
         m_radius = -m_y0;
 
         double icurv = 1;
-        setSurface(std::make_unique<Quadric>(std::vector<double>{m_a11, 0, 0, 0, icurv, 1, 0, m_radius, 0, 0, m_a33, m_a34, 0, 0, 0, m_a44}));
+        setSurface(std::make_unique<Quadric>(std::vector<double>{m_a11, 0, 0, 0, icurv, 1, 0, m_radius, 0, 0, m_a33, m_a34, 7, 0, 0, m_a44}));
         // setSurface(surface);
         calcTransformationMatricesFromAngles({ 0,0,0,0,0,0 }, global);
         setElementParameters({ 0,0,m_a11,m_y0, m_a33,m_a34,m_a44,0, 0,0,0,0, 0,0,0,0 });
@@ -170,8 +170,12 @@ namespace RAYX
         if (b != 0) {
             m_z0 = (a / b) * (a / b) * m_y0 * tan(angle);
         }
+
+        // << ellparam in RAY.for to calculate long and short half axis A and B
         m_longHalfAxisA = a;
         m_shortHalfAxisB = b;
+
+        // calculate half axis C
         if (m_figureRotation == FR_YES) {
             m_halfAxisC = sqrt(pow(m_shortHalfAxisB, 2) / 1); // devided by 1??
         }
@@ -198,11 +202,11 @@ namespace RAYX
         return m_entranceArmLength;
     }
 
-    double Ellipsoid::getMy0() {
+    double Ellipsoid::getY0() {
         return m_y0;
     }
 
-    double Ellipsoid::getMz0() {
+    double Ellipsoid::getZ0() {
         return m_z0;
     }
     double Ellipsoid::getIncidenceAngle() const {

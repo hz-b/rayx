@@ -1225,6 +1225,13 @@ Ray rayMatrixMult(Ray r, const dmat4 m) {
 	return r;
 }
 
+Ray rotationAroundX(Ray r, double sin_psi, double cos_psi) {
+	dmat4 rotation_matrix = dmat4(1, 0, 0, 0,
+				0, cos_psi, -sin_psi, 0,
+				0, sin_psi, cos_psi, 0,
+				0,0,0,1);
+	return rayMatrixMult(r, rotation_matrix);
+}
 
 /**
 * uses given transformation matrix to transform ray position and direction into Object coordinates
@@ -1233,7 +1240,7 @@ Ray rayMatrixMult(Ray r, const dmat4 m) {
 * @param misalignment	4x4 homogeneous matrix that contains the misalignment of the element (dx, dy, dz, dphi, dpsi, dchi)
 * @param inTrans		4x4 homogeneous matrix that contains the transformation of ray-coordinates to object coordinates (distance to previous element, grazing incidence angle, azimuthal angle)
 *
-* output: nothing. changes r in situ
+* output: nothing. changes r in place
 */
 void inTransformation(inout Ray r, const dmat4 misalignment, const dmat4 inTrans) {
 	r.position = dvec3(misalignment * (inTrans *  dvec4(r.position,1)) );
@@ -1247,7 +1254,7 @@ void inTransformation(inout Ray r, const dmat4 misalignment, const dmat4 inTrans
 * @param invMisalignment	4x4 homogeneous matrix that contains the misalignment of the element (dx, dy, dz, dphi, dpsi, dchi)
 * @param outTrans		3x3 homogeneous matrix (in 4x4 matrix for standardization) that contains the transformation of object coordinates to ray-coordinates (rotations only: grazing exit angle, neg. azimuthal angle)
 *
-* output: nothing. changes r in situ
+* output: nothing. changes r in place
 */
 void outTransformation(inout Ray r, const dmat4 invMisalignment, const dmat4 outTrans) {
 	r.position = dvec3(outTrans * (invMisalignment * dvec4(r.position,1)));
@@ -1790,7 +1797,7 @@ dvec4 getOpticalElementIntersection(Ray r, uint quadricIndex){
 	int type = int(quadricData[quadricIndex].anchorPoints[3][0]);
 	Quadric q = quadricData[quadricIndex];
 	dvec4 currentIntersection;
-	if(type > 6){
+	if(type > 7){
 		return dvec4(1.0/0.0,1.0/0.0,1.0/0.0, 0);
 	}
 	if(type == 4) { // rzp
@@ -2592,34 +2599,34 @@ Ray traceMirror(Ray r, const Quadric q, inout uint64_t ctr, dvec4 intersection) 
 
 Ray traceEllipsoidMirror(Ray r, const Quadric q, inout uint64_t ctr, dvec4 intersection) {
 	r = rayMatrixMult(r, q.inTrans);
-	//inTransformation(r, q.misalignment, q.inTrans);
-
-	dvec4 normal = setIntersectionPoint(r, q.anchorPoints, intersection);
-	r = rayMatrixMult(r, q.misalignment); // A
-
+	
+	double sin_tangentAngle = q.elementParameters[0][0];
+	double cos_tangentAngle = q.elementParameters[0][1];
+	int figureOfRotation = int(q.elementParameters[1][0]);
 	double xLength = q.objectParameters[0][0]; // width
 	double zLength = q.objectParameters[0][1]; // height
+	
+	dvec4 normal = setIntersectionPoint(r, q.anchorPoints, intersection);
+	double icurv = q.anchorPoints[1][0];
+	normal.x = -q.anchorPoints[0][0] * r.position.x * icurv;
+	normal.y = -(r.position.y + q.anchorPoints[1][3]) * icurv;
+	normal.z = -(q.anchorPoints[2][2] * r.position.z + q.anchorPoints[2][3]) * icurv;
+	normal = normalize(normal);
+	
+	r = rotationAroundX(r, -sin_tangentAngle, cos_tangentAngle); // change to coordinate system of mirror
 	r.weight = wasteBox(r.position.x,r.position.z,xLength,zLength, r.weight);
-
+	r = rotationAroundX(r, sin_tangentAngle, cos_tangentAngle); // change to coordinate system of curvation
+	
 	if(r.weight < 1.0) {
-		r = rayMatrixMult(r, q.inverseMisalignment); // A-1
-		r = rayMatrixMult(r, q.outTrans); // 0: T-1*M-1 1: T-1*A-1*M-1*A
+		r = rayMatrixMult(r, q.outTrans); 
 		// rays that missed an element get weight 2
 		r.weight = 2;
 		return r;
 	}
+
 	double slopeX = q.objectParameters[0][2];
 	double slopeZ = q.objectParameters[0][3];
 	normal = tanger(normal, slopeX, slopeZ, 0, ctr); // option 0 = default, cartesian normal
-
-
-	r = rayMatrixMult(r, q.inverseMisalignment); // A-1
-	/*
-	FX = -a11*X*bendingSign
-	FY = -(Y+a24)*bendingSign
-	FZ = -(a33*Z+a34)*bendingSign
-	*/
-	//normal = dvec4(-a_11*r.position.x*b_sign, );
 
 	r.direction = dvec3(reflect(dvec4(r.direction,0), normal));
 
@@ -2674,6 +2681,9 @@ void iterateElements(){
 			rayData[uint(gl_GlobalInvocationID)] = traceImagePlane(rayData[uint(gl_GlobalInvocationID)], q);
 		}else if(type == 6) { // toroid mirror
 			rayData[uint(gl_GlobalInvocationID)] = traceToroid(rayData[uint(gl_GlobalInvocationID)], q, ctr, intersection);	
+		}else if(type == 7) { // ellipsoid mirror
+			rayData[uint(gl_GlobalInvocationID)] = traceEllipsoidMirror(rayData[uint(gl_GlobalInvocationID)], q, ctr, intersection);	
+			rayData[uint(gl_GlobalInvocationID)].extraParameter = 12;
 		}
 		//rayData[uint(gl_GlobalInvocationID)] = rayMatrixMult(rayData[uint(gl_GlobalInvocationID)], q.outTrans);
 	}
@@ -2745,7 +2755,7 @@ void dynamicQuadrics(){
 		
 		// calculate interaction of ray with detected next quadric 
 		type = int(next.anchorPoints[3][0]);
-		if (type == 0) { // mirror
+		if (type == 0) { // plane + sphere mirror
 			rayData[uint(gl_GlobalInvocationID)] = traceMirror(rayData[uint(gl_GlobalInvocationID)], next, ctr, closestHitpoint); // intersection in ELEMENT coordinates
 		}else if(type == 1){ // plane grating
 			rayData[uint(gl_GlobalInvocationID)] = tracePlaneGrating(rayData[uint(gl_GlobalInvocationID)], next, ctr, closestHitpoint);	
@@ -2765,6 +2775,9 @@ void dynamicQuadrics(){
 			return;
 		}else if(type == 6) { // toroid mirror
 			rayData[uint(gl_GlobalInvocationID)] = traceToroid(rayData[uint(gl_GlobalInvocationID)], next, ctr, closestHitpoint);
+		}else if(type == 7) { // ellipsoid mirror
+			rayData[uint(gl_GlobalInvocationID)] = traceEllipsoidMirror(rayData[uint(gl_GlobalInvocationID)], next, ctr, closestHitpoint);	
+			rayData[uint(gl_GlobalInvocationID)].extraParameter = 12;
 		}
 		
 	}
@@ -2778,11 +2791,9 @@ void testFunctions() {
 	// flag to decide how to interpret the input
 	int settings = int(quadricData[0].anchorPoints[3][1]);
 
-	const int numberOfQuadrics = quadricData.length();
 	Ray r = rayData[uint(gl_GlobalInvocationID)];
 	Ray res; // store the result here
 	
-	double type;
 	// ray specific "seed" for random numbers -> every ray has a different starting value for the counter that creates the random numbter
 	uint64_t workerCounterNum = (~(uint64_t(0)) / uint64_t(numberOfRays));
 	uint64_t ctr = uint(gl_GlobalInvocationID) * workerCounterNum;
@@ -2804,7 +2815,7 @@ void testFunctions() {
 		rayData[uint(gl_GlobalInvocationID)] = res;
 	}
 	else if(settings == 2) { // test refrac
-		res = refrac(r, dvec4(r.position, 0), r.weight); // need quadric buffer to put a to shader
+		res = refrac(r, dvec4(r.position, 0), r.weight); // need quadric buffer to put calculated parameter to shader
 		rayData[uint(gl_GlobalInvocationID)] = res;
 	}
 	else if(settings == 3) { // test plane refrac
@@ -2956,7 +2967,7 @@ void testFunctions() {
 		rayData[uint(gl_GlobalInvocationID)] = res;
 	}
 	else if(settings == 18) { // test exponential function
-		res.weight = r8_exp(r.weight);//double(squares64RNG(ctr)) / (uint64_t(1) << 63);
+		res.weight = r8_exp(r.weight);
 		res.energy = r8_exp(r.energy);
 		res.position = dvec3(r8_exp(r.position.x), r8_exp(r.position.y), r8_exp(r.position.z));
 		res.direction = dvec3(r8_exp(r.direction.x), r8_exp(r.direction.y), r8_exp(r.direction.z));
@@ -2964,7 +2975,7 @@ void testFunctions() {
 		rayData[uint(gl_GlobalInvocationID)] = res;
 	}
 	else if(settings == 19) { // test logarithm function (natural logarithm)
-		res.weight = r8_log(r.weight);//double(squares64RNG(ctr)) / (uint64_t(1) << 63);
+		res.weight = r8_log(r.weight);
 		res.energy = r8_log(r.energy);
 		res.position = dvec3(r8_log(r.position.x), r8_log(r.position.y), r8_log(r.position.z));
 		res.direction = dvec3(r8_log(r.direction.x), r8_log(r.direction.y), r8_log(r.direction.z));
@@ -2974,7 +2985,7 @@ void testFunctions() {
 	else if(settings == 20) { // test iteratTo (method for finding intersection and normal for non-quadric surfaces like the torus)
 		dvec4 normal = iteratTo(r, quadricData[0].anchorPoints[0][0], quadricData[0].anchorPoints[0][1]);
 		rayData[uint(gl_GlobalInvocationID)] = r;
-	}else if(settings == 21) {
+	}else if(settings == 21) { // test getTheta function that is needed for the efficiency calculations
 		Ray res;
 		res.weight = getTheta(r, dvec4(r.position,0));
 		rayData[uint(gl_GlobalInvocationID)] = res;
@@ -2986,7 +2997,7 @@ void testFunctions() {
 void main(){
     //dynamicQuadrics();
 	//Ray r = rayData[uint(gl_GlobalInvocationID)];
-	//testFunctions();
+	testFunctions();
 	//iterateElements();
 	/*
 	// E034Q98KIS
@@ -3010,7 +3021,7 @@ void main(){
 	// }
 
     // outputData[uint(gl_GlobalInvocationID)] = iterateQuadrics(rayData[uint(gl_GlobalInvocationID)]);
-    outputData[uint(gl_GlobalInvocationID)] = rayData[uint(gl_GlobalInvocationID)];
+    // outputData[uint(gl_GlobalInvocationID)] = rayData[uint(gl_GlobalInvocationID)];
     //outputData[uint(gl_GlobalInvocationID)].position = dvec3(117.0, 225.0,534.0);
     //outputData[uint(gl_GlobalInvocationID)].direction = dvec4(1887.0, 2285.0,5394.0, 876.0);
     //[uint(gl_GlobalInvocationID)].weight = 1337.0;

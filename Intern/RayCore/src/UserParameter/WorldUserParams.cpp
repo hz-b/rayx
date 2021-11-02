@@ -13,8 +13,8 @@ namespace RAYX
      * @param dist          distance to previous element
      * @param misalignment  misalignment of the element
     */
-    WorldUserParams::WorldUserParams(double alpha, double beta, double chi, double dist, std::vector<double> misalignment)
-        : m_incidenceAngle(alpha), m_exitAngle(beta), m_azimuthalAngle(chi), m_dist(dist), m_misalignment(misalignment) {}
+    WorldUserParams::WorldUserParams(double alpha, double beta, double chi, double dist, std::vector<double> misalignment, double tangentAngle)
+        : m_incidenceAngle(alpha), m_exitAngle(beta), m_azimuthalAngle(chi), m_dist(dist), m_misalignment(misalignment), m_tangentAngle(tangentAngle) {}
 
     WorldUserParams::WorldUserParams() {}
     WorldUserParams::~WorldUserParams() {}
@@ -116,11 +116,18 @@ namespace RAYX
         double cos_a = cos(m_incidenceAngle);
         double sin_a = sin(m_incidenceAngle);
 
+        glm::dmat4x4 tangentAngleRotation = glm::dmat4x4(
+            1, 0, 0, 0,
+            0, cos(m_tangentAngle), -sin(m_tangentAngle), 0, // rotation around x-axis
+            0, sin(m_tangentAngle), cos(m_tangentAngle), 0,
+            0, 0, 0, 1);
+        glm::dmat4x4 inverseTangentAngleRotation = glm::transpose(tangentAngleRotation);
         glm::dmat4x4 misalignmentOr = getMisalignmentOrientation();
         /*glm::dmat4x4 orientation = glm::dmat4x4(cos_c, -sin_c * cos_a, -sin_c * sin_a, 0, // M_b2e
                                     sin_c, cos_c * cos_a, sin_a * cos_c, 0,
                                     0, -sin_a, cos_a, 0,
                                     0, 0, 0, 1 );*/
+        misalignmentOr = inverseTangentAngleRotation * misalignmentOr * inverseTangentAngleRotation;
         glm::dmat4x4 orientation = glm::dmat4x4(
             cos_c, sin_c, 0, 0, // M_b2e
             -sin_c * cos_a, cos_c * cos_a, -sin_a, 0,

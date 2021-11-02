@@ -74,10 +74,10 @@ namespace RAYX
      * @param exitArmLength     length of exit arm
     */
     GeometricUserParams::GeometricUserParams(double incidence, double entranceArmLength, double exitArmLength) {
+        double tangentAngle = calcTangentAngle(incidence, entranceArmLength, exitArmLength, 1);
         double incidenceAngle = degToRad(incidence);
-        double tangentAngle = calcTangentAngle(incidenceAngle, entranceArmLength, exitArmLength);
         m_alpha = incidenceAngle - tangentAngle;
-        m_beta = incidenceAngle; // mirror -> exit angle = incidence angle
+        m_beta = incidenceAngle + tangentAngle; // mirror -> exit angle = incidence angle
     }
         
     GeometricUserParams::GeometricUserParams() {}
@@ -263,8 +263,9 @@ namespace RAYX
 
     
     // ellipsoid method
-    double GeometricUserParams::calcTangentAngle(double incidence, double entranceArmLength, double exitArmLength) {
-        double theta = incidence; // designGrazingIncidenceAngle always equal to alpha (grazingIncidenceAngle)??
+    double GeometricUserParams::calcTangentAngle(double incidence, double entranceArmLength, double exitArmLength, int coordSys) {
+        if(coordSys == 0) return 0;
+        double theta = degToRad(incidence); // designGrazingIncidenceAngle always equal to alpha (grazingIncidenceAngle)??
         if (theta > PI / 2) {
             theta = PI / 2;
         }

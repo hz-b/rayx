@@ -274,6 +274,22 @@ class Tests(unittest.TestCase):
         result = open_new_file('testFile_globalCoordinates_20rays.csv', valid=1)
         self.assertTrue(correct.shape == result.shape)
         self.assertTrue(np.allclose(correct, result))
+        
+    def test_ellipsoid_mirror_default200(self):
+        correct = open_old_file(
+            'Ellipsoid-RawRaysBeam_default200.csv', 'Ellipsoid_')
+        result = open_new_file('testFile_ellipsoid_200default.csv', valid=1)
+        self.assertTrue(correct.shape == result.shape)
+        self.assertTrue(np.allclose(correct, result))
+        
+    def test_ellipsoid_mirror_imageplane_default200(self):
+        correct = open_old_file(
+            'Ellipsoid-ImagePlane-RawRaysOutgoing_default200.csv', 'ImagePlane_')
+        result = open_new_file('testFile_ellipsoid_ip_200default.csv', valid=1)
+        self.assertTrue(correct.shape == result.shape)
+        self.assertTrue(np.allclose(correct, result))    
+        
+        
     
 if __name__ == '__main__':
     unittest.main()

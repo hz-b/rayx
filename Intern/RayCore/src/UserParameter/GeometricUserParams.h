@@ -33,7 +33,7 @@ namespace RAYX
         double calcDz00(int imageType, double designWavelength, double designAlphaAngle, double designBetaAngle, double designOrderOfDiffraction, double sEntrance, double sExit, double mEntrance, double mExit);
         double calcFresnelZOffset(double designAlphaAngle, double designBetaAngle, double sEntrance, double sExit);
         double rzpLineDensityDZ(int imageType, glm::dvec3 intersection, glm::dvec3 normal, double designWavelength, double designAlphaAngle, double designBetaAngle, double designOrderOfDiffraction, double sEntrance, double sExit, double mEntrance, double mExit);
-        double calcTangentAngle(double incidence, double entranceArmLength, double exitArmLength);
+        double calcTangentAngle(double incidence, double entranceArmLength, double exitArmLength, int coordSys);
         
         void calcMirrorRadius(double entranceArmLength, double exitArmLength);
         void calcGratingRadius(int mount, double deviation, double entranceArmLength, double exitArmLength);
