@@ -6,7 +6,9 @@
 
 namespace RAYX {
     namespace xml {
-        bool param(rapidxml::xml_node<>* node, const char* paramname, rapidxml::xml_node<>** out) {
+        bool param(const rapidxml::xml_node<>* node, const char* paramname, rapidxml::xml_node<>** out) {
+            if (!node || !out) { return false; }
+
             for (rapidxml::xml_node<>* p = node->first_node(); p; p = p->next_sibling()) {
                 if (strcmp(p->name(), "param")) { continue; }
                 if (strcmp(p->first_attribute("id")->value(), paramname) == 0) {
@@ -17,7 +19,9 @@ namespace RAYX {
             return false;
         }
 
-        bool paramDouble(rapidxml::xml_node<>* node, const char* paramname, double* out) {
+        bool paramDouble(const rapidxml::xml_node<>* node, const char* paramname, double* out) {
+            if (!node || !out) { return false; }
+
             rapidxml::xml_node<>* ref;
             if (!param(node, paramname, &ref)) { return false; }
             if (sscanf(ref->value(), "%le", out) != 1) { return false; }
@@ -25,7 +29,9 @@ namespace RAYX {
             return true;
         }
 
-        bool paramInt(rapidxml::xml_node<>* node, const char* paramname, int* out) {
+        bool paramInt(const rapidxml::xml_node<>* node, const char* paramname, int* out) {
+            if (!node || !out) { return false; }
+
             rapidxml::xml_node<>* ref;
             if (!param(node, paramname, &ref)) { return false; }
             if (sscanf(ref->value(), "%d", out) != 1) { return false; }
@@ -33,14 +39,18 @@ namespace RAYX {
             return true;
         }
 
-        bool paramStr(rapidxml::xml_node<>* node, const char* paramname, const char** out) {
+        bool paramStr(const rapidxml::xml_node<>* node, const char* paramname, const char** out) {
+            if (!node || !out) { return false; }
+
             rapidxml::xml_node<>* ref;
             if (!param(node, paramname, &ref)) { return false; }
             *out = ref->value();
             return true;
         }
 
-        bool paramDvec3(rapidxml::xml_node<>* node, const char* paramname, glm::dvec3* out) {
+        bool paramDvec3(const rapidxml::xml_node<>* node, const char* paramname, glm::dvec3* out) {
+            if (!node || !out) { return false; }
+
             rapidxml::xml_node<>* subnode;
             if (!param(node, paramname, &subnode)) { return false; }
 
@@ -59,7 +69,9 @@ namespace RAYX {
             return true;
         }
 
-        bool paramMisalignment(rapidxml::xml_node<>* node, std::vector<double>* out) {
+        bool paramMisalignment(const rapidxml::xml_node<>* node, std::vector<double>* out) {
+            if (!node || !out) { return false; }
+
             *out = std::vector<double>(6, 0.f);
 
             rapidxml::xml_node<>* p;
@@ -85,7 +97,9 @@ namespace RAYX {
             return true;
         }
 
-        bool paramPosition(rapidxml::xml_node<>* node, glm::dvec4* out) {
+        bool paramPosition(const rapidxml::xml_node<>* node, glm::dvec4* out) {
+            if (!node || !out) { return false; }
+
             glm::dvec3 position3;
             if (!xml::paramDvec3(node, "worldPosition", &position3)) { return false; }
             *out = glm::dvec4(position3, 1);
@@ -93,7 +107,9 @@ namespace RAYX {
             return true;
         }
 
-        bool paramOrientation(rapidxml::xml_node<>* node, glm::dmat4x4* out) {
+        bool paramOrientation(const rapidxml::xml_node<>* node, glm::dmat4x4* out) {
+            if (!node || !out) { return false; }
+
             glm::dvec3 worldXdirection, worldYdirection, worldZdirection;
             if (!xml::paramDvec3(node, "worldXdirection", &worldXdirection)) { return false; }
             if (!xml::paramDvec3(node, "worldYdirection", &worldYdirection)) { return false; }
@@ -107,7 +123,9 @@ namespace RAYX {
             return true;
         }
 
-        bool paramSlopeError(rapidxml::xml_node<>* node, std::vector<double>* out) {
+        bool paramSlopeError(const rapidxml::xml_node<>* node, std::vector<double>* out) {
+            if (!node || !out) { return false; }
+
             *out = std::vector<double>(7, 0.f);
 
             rapidxml::xml_node<>* p;
@@ -128,7 +146,9 @@ namespace RAYX {
             return true;
         }
 
-        bool paramVls(rapidxml::xml_node<>* node, std::vector<double>* out) {
+        bool paramVls(const rapidxml::xml_node<>* node, std::vector<double>* out) {
+            if (!node || !out) { return false; }
+
             *out = std::vector<double>(6, 0.f);
 
             rapidxml::xml_node<>* p;
@@ -148,7 +168,9 @@ namespace RAYX {
             return true;
         }
 
-        bool paramEnergyDistribution(rapidxml::xml_node<>* node, EnergyDistribution* out) {
+        bool paramEnergyDistribution(const rapidxml::xml_node<>* node, EnergyDistribution* out) {
+            if (!node || !out) { return false; }
+
             int energyDistributionType;
             if (!xml::paramInt(node, "energyDistributionType", &energyDistributionType)) { return false; }
 
