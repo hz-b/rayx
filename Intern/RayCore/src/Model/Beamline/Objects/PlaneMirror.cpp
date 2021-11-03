@@ -19,7 +19,7 @@ namespace RAYX
      */
     PlaneMirror::PlaneMirror(const char* name, const int geometricalShape, const double width, const double height, glm::dvec4 position, glm::dmat4x4 orientation, const std::vector<double> slopeError)
         : OpticalElement(name, { 0,0,0,0, 0,0,0,0, 0,0,0,0, 0,0,0,0 }, geometricalShape, width,
-            height, position, orientation, { 0,0,0,0,0,0 }, slopeError)
+            height, position, orientation, slopeError)
     {
         setSurface(std::make_unique<Quadric>(std::vector<double>{0, 0, 0, 0, 1, 0, 0, -1, 0, 0, 0, 0, 0, 0, 0, 0}));
     }

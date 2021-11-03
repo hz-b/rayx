@@ -208,45 +208,6 @@ namespace RAYX
     }
 
     /**
-     *  calculate grazing incidence angle, needed for position and orientation in world coordinates
-     *  moved to somewhere else
-    */
-    void ReflectionZonePlate::calcAlpha() {
-        double alphaMtest;
-        double distance = m_meridionalDistance;
-        if (m_elementOffsetType == EZ_MANUAL) {
-            m_zOff = m_elementOffsetZ;
-        }
-        else if (m_elementOffsetType == EZ_BEAMDIVERGENCE) {
-            m_zOff = calcZOffset();
-        }
-        if (distance != 0) {
-            m_incidenceMainBeamLength = sqrt(pow(distance, 2) + pow(m_zOff, 2) - 2 * distance * m_zOff * cos(m_grazingIncidenceAngle)); // kosinussatz
-            alphaMtest = asin(sin(m_grazingIncidenceAngle) * distance / m_incidenceMainBeamLength); // sinussatz
-            if (fabs(distance / sin(alphaMtest) - m_zOff / sin(PI - alphaMtest - m_grazingIncidenceAngle)) <= 1e-05) {
-                setAlpha(PI - alphaMtest);
-            }
-            else {
-                setAlpha(alphaMtest);
-            }
-        }
-        else {
-            m_incidenceMainBeamLength = 0;
-            setAlpha(m_grazingIncidenceAngle);
-        }
-    }
-
-    /**
-     *  calculate exit angle, needed for position and orientation in world coordinates
-     *  moved to somewhere else
-     */
-    void ReflectionZonePlate::calcBeta2() {
-        double DZ = (m_designOrderOfDiffraction == 0) ? 0 : calcDz00();
-        std::cout << "[RZP]: DZ calcBeta2 " << DZ << std::endl;
-        setBeta(acos(cos(m_grazingIncidenceAngle) - m_orderOfDiffraction * m_designWavelength * 1e-6 * DZ));
-    }
-
-    /**
      * needed for caclulating incidence and exit angle
      */
     void ReflectionZonePlate::Illumination() {

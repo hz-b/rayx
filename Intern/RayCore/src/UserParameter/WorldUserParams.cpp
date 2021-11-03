@@ -52,9 +52,17 @@ namespace RAYX
             0, 1, 0, 0,
             0, 0, 1, 0,
             dx, dy, dz, 1);
-        glm::dmat4x4 inverseMisalignmentMatrix = inverseRotation * inverseTranslation;
 
-        e2b = e2b * inverseMisalignmentMatrix;
+        glm::dmat4x4 tangentAngleRotation = glm::dmat4x4(
+            1, 0, 0, 0,
+            0, cos(m_tangentAngle), -sin(m_tangentAngle), 0, // rotation around x-axis
+            0, sin(m_tangentAngle), cos(m_tangentAngle), 0,
+            0, 0, 0, 1);
+        glm::dmat4x4 inverseTangentAngleRotation = glm::transpose(tangentAngleRotation);
+
+       glm::dmat4x4 inverseMisalignmentMatrix = inverseRotation * inverseTranslation;
+
+        e2b = e2b * tangentAngleRotation * inverseMisalignmentMatrix * inverseTangentAngleRotation;
         return glm::transpose(e2b);
     }
 
@@ -122,12 +130,13 @@ namespace RAYX
             0, sin(m_tangentAngle), cos(m_tangentAngle), 0,
             0, 0, 0, 1);
         glm::dmat4x4 inverseTangentAngleRotation = glm::transpose(tangentAngleRotation);
+        
         glm::dmat4x4 misalignmentOr = getMisalignmentOrientation();
         /*glm::dmat4x4 orientation = glm::dmat4x4(cos_c, -sin_c * cos_a, -sin_c * sin_a, 0, // M_b2e
                                     sin_c, cos_c * cos_a, sin_a * cos_c, 0,
                                     0, -sin_a, cos_a, 0,
                                     0, 0, 0, 1 );*/
-        misalignmentOr = inverseTangentAngleRotation * misalignmentOr * inverseTangentAngleRotation;
+        misalignmentOr = tangentAngleRotation * misalignmentOr * inverseTangentAngleRotation;
         glm::dmat4x4 orientation = glm::dmat4x4(
             cos_c, sin_c, 0, 0, // M_b2e
             -sin_c * cos_a, cos_c * cos_a, -sin_a, 0,
@@ -182,11 +191,20 @@ namespace RAYX
     */
     glm::dvec4 WorldUserParams::calcPosition()
     {
-        glm::dvec4 position = glm::dvec4(0.0, 0.0, m_dist, 1.0);
+        glm::dvec4 position = glm::dvec4(0.0, 0.0, m_dist, 0.0);
         glm::dmat4x4 orientation = calcOrientation();
+        glm::dmat4x4 tangentAngleRotation = glm::dmat4x4(
+            1, 0, 0, 0,
+            0, cos(m_tangentAngle), -sin(m_tangentAngle), 0, // rotation around x-axis
+            0, sin(m_tangentAngle), cos(m_tangentAngle), 0,
+            0, 0, 0, 1);
+        glm::dmat4x4 inverseTangentAngleRotation = glm::transpose(tangentAngleRotation);
+        std::cout.precision(17);
+        std::cout << "[WUP] sin(tangentAngle) = " << sin(m_tangentAngle) << " cos(tangentAngle) = " << cos(m_tangentAngle) << std::endl;
+        glm::dvec4 offset = glm::dvec4(m_misalignment[0], m_misalignment[1], m_misalignment[2], 1.0);
 
-        glm::dvec4 offset = glm::dvec4(m_misalignment[0], m_misalignment[1], m_misalignment[2], 0);
-        position = position + orientation * offset;
+        offset = inverseTangentAngleRotation * offset * tangentAngleRotation;
+        position = position + orientation * offset ;
         std::cout << "[WUP]: Position: "; 
         for (int i = 0; i < 4; i++) {
             std::cout << position[i] << ", " ;

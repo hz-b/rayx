@@ -37,7 +37,6 @@ namespace RAYX
             m_vls[2], m_vls[3], m_vls[4], m_vls[5],
             0, 0, 0, double(m_additionalOrder) });
         
-        setTemporaryMisalignment({ 0,0,0,0,0,0 }); // remove??
         // parameters of quadric surface
         setSurface(std::make_unique<Quadric>(std::vector<double>{0, 0, 0, 0, 1, 0, 0, -1, 0, 0, 0, 0, 1, 0, 0, 0}));
     }
@@ -85,53 +84,6 @@ namespace RAYX
         return std::make_shared<PlaneGrating>(name, geometricalShape, width, height, position, orientation, designEnergy, lineDensity, orderOfDiffraction, additionalZeroOrder, vls, slopeError);
     }
 
-
-    /* functions to derive angles from user input parameters -> moved to somewhere else for now */
-    void PlaneGrating::calcAlpha(const double deviation, const double normalIncidence) {
-        double angle;
-        if (m_gratingMount == GM_DEVIATION) {
-            angle = deviation;
-        }
-        else if (m_gratingMount == GM_INCIDENCE) {
-            angle = -normalIncidence;
-        }
-        focus(angle);
-    }
-
-    void PlaneGrating::focus(double angle) {
-        // from routine "focus" in RAYX.FOR
-        double theta = degToRad(abs(angle));
-        double alph, bet;
-        double a = abs(hvlam(m_designEnergyMounting)) * abs(m_lineDensity) * m_orderOfDiffraction * 1e-6;
-        std::cout << "[PlaneGrating]: deviation " << angle << "theta" << theta << std::endl;
-        if (angle <= 0) { // constant alpha mounting
-            double arg = a - sin(theta);
-            if (abs(arg) >= 1) { // cannot calculate alpha & beta
-                alph = 0;
-                bet = 0;
-            }
-            else {
-                alph = theta;
-                bet = asin(arg);
-            }
-        }
-        else {  // constant alpha & beta mounting
-            theta = theta / 2;
-            double arg = a / 2 / cos(theta);
-            if (abs(arg) >= 1) {
-                alph = 0;
-                bet = 0;
-            }
-            else {
-                bet = asin(arg) - theta;
-                alph = 2 * theta + bet;
-            }
-        }
-        std::cout <<"[PlaneGrating]: " << alph << ", " << bet << " angles" << std::endl;
-        setAlpha(PI / 2 - alph);
-        setBeta(PI / 2 - abs(bet));
-    }
-    /* END */
 
     double PlaneGrating::getDesignEnergyMounting() {
         return m_designEnergyMounting;

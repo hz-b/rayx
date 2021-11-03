@@ -85,7 +85,7 @@ namespace RAYX
         return std::make_shared<SphereGrating>(name, mount, geometricalShape, width, height, radius, position, orientation, designEnergyMounting, lineDensity, orderOfDiffraction, vls, slopeError);
     }
 
-    void SphereGrating::calcRadius() {
+    /*void SphereGrating::calcRadius() {
         if (m_gratingMount == GM_DEVIATION) {
             double theta = m_deviation > 0 ? (PI - m_deviation) / 2 : PI / 2 + m_deviation;
             m_radius = 2.0 / sin(theta) / (1.0 / m_entranceArmLength + 1.0 / m_exitArmLength);
@@ -139,7 +139,7 @@ namespace RAYX
         setAlpha((PI / 2) - alph);
         setBeta((PI / 2) - abs(bet));
         
-    }
+    }*/
 
     double SphereGrating::getRadius() const {
         return m_radius;

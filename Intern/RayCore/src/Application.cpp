@@ -45,14 +45,15 @@ namespace RAYX
         RAYX::GeometricUserParams g_params = RAYX::GeometricUserParams(10, 10000, 1000);
         double alpha = 0.031253965260898464;
         double beta = 0.31781188513796743;
-        double tangentAngle = 0;
-        RAYX::WorldUserParams w_coord = RAYX::WorldUserParams(g_params.getAlpha(), g_params.getBeta(), 0, 10000, std::vector<double>{0, 0, 0, 0, 0, 0}, tangentAngle);
+        int coordinatesystem = 1; // 1 = misalignment in mirror coordinate system
+        double tangentAngle = g_params.calcTangentAngle(10, 10000, 1000, coordinatesystem);
+        
+        RAYX::WorldUserParams w_coord = RAYX::WorldUserParams(g_params.getAlpha(), g_params.getBeta(), 0, 10000, std::vector<double>{1,2,3, 0.004,0.005,0.006}, tangentAngle);
         glm::dvec4 pos = w_coord.calcPosition();
         glm::dmat4x4 or1 = w_coord.calcOrientation();
 
-        std::shared_ptr<Ellipsoid> eb = std::make_shared<Ellipsoid>("ellipsoid_200default", 0, 50, 200, pos, or1, 10, 10000, 1000, 0, 0, 1, std::vector<double> {0, 0, 0, 0, 0, 0}, std::vector<double> {0, 0, 0, 0, 0, 0, 0});
-        eb->setOutMatrix(glmToVector16(glm::transpose(w_coord.calcE2B()))); // to make comparison with old ray files possible, use the beam coordinate system
-    
+        std::shared_ptr<RAYX::Ellipsoid> eb = std::make_shared<RAYX::Ellipsoid>("ellipsoid_ip_200mirrormis", 0, 50, 200, pos, or1, 10, 10000, 1000, 0, 1, std::vector<double> {0, 0, 0, 0, 0, 0, 0});
+        eb->setOutMatrix(glmToVector16(glm::transpose(w_coord.calcE2B())));
         std::cout << "\n [App]: IMAGE PLANE \n" << std::endl;
 
         WorldUserParams im_param = WorldUserParams(0, 0, 0, 1000, std::vector<double>{0, 0, 0, 0, 0, 0});
@@ -61,6 +62,7 @@ namespace RAYX
         std::shared_ptr<ImagePlane> i = std::make_shared<ImagePlane>("Image plane", pos_imageplane, or_imageplane);
 
         m_Beamline->addOpticalElement(eb);
+        //m_Beamline->addOpticalElement(i);
 
         m_Presenter = Presenter(m_Beamline);
         m_Presenter.addLightSource(matSourcePtr);

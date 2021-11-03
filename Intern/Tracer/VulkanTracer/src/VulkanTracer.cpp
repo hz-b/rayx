@@ -1023,14 +1023,12 @@ void VulkanTracer::addRayVector(void* location, size_t size) {
 }
 
 //adds quad to beamline
-void VulkanTracer::addVectors(std::vector<double> surfaceParams, std::vector<double> inputInMatrix, std::vector<double> inputOutMatrix, std::vector<double> misalignmentMatrix, std::vector<double> inverseMisalignmentMatrix, std::vector<double> objectParameters, std::vector<double> elementParameters) {
-	assert(surfaceParams.size() == 16 && inputInMatrix.size() == 16 && inputOutMatrix.size() == 16 && misalignmentMatrix.size() == 16 && objectParameters.size() == 16 && elementParameters.size() == 16);
+void VulkanTracer::addVectors(std::vector<double> surfaceParams, std::vector<double> inputInMatrix, std::vector<double> inputOutMatrix, std::vector<double> objectParameters, std::vector<double> elementParameters) {
+	assert(surfaceParams.size() == 16 && inputInMatrix.size() == 16 && inputOutMatrix.size() == 16 && objectParameters.size() == 16 && elementParameters.size() == 16);
 	//beamline.resize(beamline.size()+1);
 	beamline.insert(beamline.end(), surfaceParams.begin(), surfaceParams.end());
 	beamline.insert(beamline.end(), inputInMatrix.begin(), inputInMatrix.end());
 	beamline.insert(beamline.end(), inputOutMatrix.begin(), inputOutMatrix.end());
-	beamline.insert(beamline.end(), misalignmentMatrix.begin(), misalignmentMatrix.end());
-	beamline.insert(beamline.end(), inverseMisalignmentMatrix.begin(), inverseMisalignmentMatrix.end());
 	beamline.insert(beamline.end(), objectParameters.begin(), objectParameters.end());
 	beamline.insert(beamline.end(), elementParameters.begin(), elementParameters.end());
 }

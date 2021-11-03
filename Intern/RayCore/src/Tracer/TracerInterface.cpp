@@ -52,7 +52,7 @@ namespace RAYX
     }
 
     void TracerInterface::addOpticalElementToTracer(std::shared_ptr<OpticalElement> element) {
-        m_RayTracer.addVectors(element->getSurfaceParams(), element->getInMatrix(), element->getOutMatrix(), element->getTempMisalignmentMatrix(), element->getInverseTempMisalignmentMatrix(), element->getObjectParameters(), element->getElementParameters());
+        m_RayTracer.addVectors(element->getSurfaceParams(), element->getInMatrix(), element->getOutMatrix(), element->getObjectParameters(), element->getElementParameters());
     }
 
     // ! parameters are temporary and need to be removed again
