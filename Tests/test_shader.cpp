@@ -262,10 +262,43 @@ void testOpticalElement(std::vector<std::shared_ptr<RAYX::OpticalElement>> eleme
 }
 
 // UNIT TESTS
-#define RUN_UNIT_TESTS 0
+/** checks whether this computer has a GPU capable of running the upcoming tests */
+bool hasCapableGPU() {
+    VkApplicationInfo appInfo{};
+    appInfo.sType = VK_STRUCTURE_TYPE_APPLICATION_INFO;
+    appInfo.pApplicationName = "Capable GPU Tester";
+    appInfo.applicationVersion = VK_MAKE_VERSION(1, 0, 0);
+    appInfo.pEngineName = "No Engine";
+    appInfo.engineVersion = VK_MAKE_VERSION(1, 0, 0);
+    appInfo.apiVersion = VK_API_VERSION_1_0;
 
-#if RUN_UNIT_TESTS == 1
+    VkInstanceCreateInfo createInfo{};
+    createInfo.sType = VK_STRUCTURE_TYPE_INSTANCE_CREATE_INFO;
+    createInfo.pApplicationInfo = &appInfo;
+    createInfo.enabledExtensionCount = 0;
+    createInfo.ppEnabledExtensionNames = nullptr;
+    createInfo.enabledLayerCount = 0;
+    createInfo.pNext = nullptr;
+
+    VkInstance instance;
+
+    if (vkCreateInstance(&createInfo, nullptr, &instance) != VK_SUCCESS) {
+        return false;
+    }
+
+    uint32_t deviceCount;
+    if (vkEnumeratePhysicalDevices(instance, &deviceCount, nullptr) != VK_SUCCESS) {
+        vkDestroyInstance(instance, nullptr);
+        return false;
+    }
+
+    vkDestroyInstance(instance, nullptr);
+    return deviceCount > 0;
+}
+
 TEST(Tracer, testUniformRandom) {
+    if (!hasCapableGPU()) { return; }
+
     double settings = 17;
 
     RAYX::SimulationEnv::get().m_numOfRays = 2000;
@@ -286,6 +319,8 @@ TEST(Tracer, testUniformRandom) {
 
 
 TEST(Tracer, ExpTest) {
+    if (!hasCapableGPU()) { return; }
+
     std::list<std::vector<RAYX::Ray>> rayList;
     int n = 10;
     int low = -4;
@@ -310,6 +345,8 @@ TEST(Tracer, ExpTest) {
 }
 
 TEST(Tracer, LogTest) {
+    if (!hasCapableGPU()) { return; }
+
     std::list<std::vector<RAYX::Ray>> rayList;
     int n = 10;
     int low = 1;
@@ -335,6 +372,8 @@ TEST(Tracer, LogTest) {
 
 
 TEST(Tracer, testRefrac2D) {
+    if (!hasCapableGPU()) { return; }
+
     std::vector<RAYX::Ray> testValues;
     std::vector<RAYX::Ray> correct;
     std::vector<std::shared_ptr<RAYX::OpticalElement>> quadrics;
@@ -386,6 +425,8 @@ TEST(Tracer, testRefrac2D) {
 }
 
 TEST(Tracer, testNormalCartesian) {
+    if (!hasCapableGPU()) { return; }
+
     std::vector<RAYX::Ray> testValues;
     std::vector<RAYX::Ray> correct;
 
@@ -426,6 +467,8 @@ TEST(Tracer, testNormalCartesian) {
 }
 
 TEST(Tracer, testNormalCylindrical) {
+    if (!hasCapableGPU()) { return; }
+
     std::vector<RAYX::Ray> testValues;
     std::vector<RAYX::Ray> correct;
 
@@ -466,6 +509,8 @@ TEST(Tracer, testNormalCylindrical) {
 }
 
 TEST(Tracer, testRefrac) {
+    if (!hasCapableGPU()) { return; }
+
     std::vector<RAYX::Ray> testValues;
     std::vector<RAYX::Ray> correct;
 
@@ -502,6 +547,8 @@ TEST(Tracer, testRefrac) {
 }
 
 TEST(Tracer, testRefracBeyondHor) {
+    if (!hasCapableGPU()) { return; }
+
     std::vector<RAYX::Ray> testValues;
     std::vector<RAYX::Ray> correct;
 
@@ -526,6 +573,8 @@ TEST(Tracer, testRefracBeyondHor) {
 }
 
 TEST(Tracer, testWasteBox) {
+    if (!hasCapableGPU()) { return; }
+
     std::vector<RAYX::Ray> testValues;
     std::vector<RAYX::Ray> correct;
 
@@ -565,6 +614,8 @@ TEST(Tracer, testWasteBox) {
 }
 
 TEST(Tracer, testRZPLineDensityDefaulParams) { // point to point
+    if (!hasCapableGPU()) { return; }
+
     std::vector<RAYX::Ray> testValues;
     std::vector<RAYX::Ray> correct;
     // {1st column, 2nd column, 3rd column, 4th column}
@@ -605,6 +656,8 @@ TEST(Tracer, testRZPLineDensityDefaulParams) { // point to point
 }
 
 TEST(Tracer, testRZPLineDensityAstigmatic) { // astigmatic 2 astigmatic
+    if (!hasCapableGPU()) { return; }
+
     VulkanTracer tracer;
     std::vector<RAYX::Ray> testValues;
     std::vector<RAYX::Ray> correct;
@@ -649,6 +702,8 @@ TEST(Tracer, testRZPLineDensityAstigmatic) { // astigmatic 2 astigmatic
 
 // test pow(a,b) = a^b function. ray position[i] ^ ray direction[i] for i in {0,1,2}
 TEST(Tracer, testRayMatrixMult) {
+    if (!hasCapableGPU()) { return; }
+
     std::vector<RAYX::Ray> testValues;
     std::vector<RAYX::Ray> correct;
     // {1st column, 2nd column, 3rd column, 4th column}
@@ -680,6 +735,8 @@ TEST(Tracer, testRayMatrixMult) {
 
 // test pow(a,b) = a^b function. ray position[i] ^ ray direction[i] for i in {0,1,2}
 TEST(Tracer, testDPow) {
+    if (!hasCapableGPU()) { return; }
+
     std::vector<RAYX::Ray> testValues;
     std::vector<RAYX::Ray> correct;
 
@@ -724,6 +781,8 @@ TEST(Tracer, testDPow) {
 
 // test pow(a,b) = a^b function. ray position[i] ^ ray direction[i] for i in {0,1,2}
 TEST(Tracer, testCosini) {
+    if (!hasCapableGPU()) { return; }
+
     VulkanTracer tracer;
     std::vector<RAYX::Ray> testValues;
     // phi, psi given in position.x, position.y
@@ -772,6 +831,8 @@ TEST(Tracer, testCosini) {
 
 // test factorial f(a) = a!
 TEST(Tracer, factTest) {
+    if (!hasCapableGPU()) { return; }
+
     VulkanTracer tracer;
     std::vector<RAYX::Ray> testValues;
     RAYX::Ray r = RAYX::Ray(glm::dvec3(0, 1, 2), glm::dvec3(-1, 4, 17), glm::dvec4(10, -4, 12.2, -0), 0, -2); // glm::dvec4(100, -4, 12.2, -0)
@@ -797,6 +858,8 @@ TEST(Tracer, factTest) {
 }
 
 TEST(Tracer, bessel1Test) {
+    if (!hasCapableGPU()) { return; }
+
     VulkanTracer tracer;
     std::vector<RAYX::Ray> testValues;
     std::vector<RAYX::Ray> correct;
@@ -822,6 +885,8 @@ TEST(Tracer, bessel1Test) {
 
 
 TEST(Tracer, diffractionTest) {
+    if (!hasCapableGPU()) { return; }
+
     VulkanTracer tracer;
     std::vector<RAYX::Ray> testValues;
     RAYX::Ray r;
@@ -862,6 +927,8 @@ TEST(Tracer, diffractionTest) {
 }
 
 TEST(Tracer, TrigTest) {
+    if (!hasCapableGPU()) { return; }
+
     std::list<std::vector<RAYX::Ray>> rayList;
     int n = 10;
     int low = -1;
@@ -936,6 +1003,8 @@ TEST(Tracer, TrigTest) {
 
 // test VLS function that calculates new a from given a, z-position and 6 vls parameters
 TEST(Tracer, vlsGratingTest) {
+    if (!hasCapableGPU()) { return; }
+
     std::vector<RAYX::Ray> testValues;
     std::vector<RAYX::Ray> correct;
 
@@ -967,6 +1036,8 @@ TEST(Tracer, vlsGratingTest) {
 }
 
 TEST(Tracer, planeRefracTest) {
+    if (!hasCapableGPU()) { return; }
+
     std::vector<RAYX::Ray> testValues;
     std::vector<RAYX::Ray> correct;
     double settings = 3;
@@ -1011,6 +1082,8 @@ TEST(Tracer, planeRefracTest) {
 }
 
 TEST(Tracer, iteratToTest) {
+    if (!hasCapableGPU()) { return; }
+
     std::vector<RAYX::Ray> testValues;
     std::vector<RAYX::Ray> correct;
     double settings = 20;
@@ -1033,6 +1106,8 @@ TEST(Tracer, iteratToTest) {
 }
 
 TEST(Tracer, getThetaTest) {
+    if (!hasCapableGPU()) { return; }
+
     std::vector<RAYX::Ray> testValues;
     std::vector<RAYX::Ray> correct;
     double settings = 21;
@@ -1059,6 +1134,8 @@ TEST(Tracer, getThetaTest) {
 // use name of optical element as file name
 
 TEST(opticalElements, planeMirrorDefault) {
+    if (!hasCapableGPU()) { return; }
+
     RAYX::WorldUserParams pm_param = RAYX::WorldUserParams(degToRad(10), degToRad(10), degToRad(7.5), 10000, std::vector<double>{ 0, 0, 0, 0, 0, 0 });
     glm::dvec4 pos_mirror = pm_param.calcPosition();
     glm::dmat4x4 or_mirror = pm_param.calcOrientation();
@@ -1077,6 +1154,8 @@ TEST(opticalElements, planeMirrorDefault) {
 }
 
 TEST(opticalElements, planeMirrorMis) {
+    if (!hasCapableGPU()) { return; }
+
     RAYX::WorldUserParams pm_param = RAYX::WorldUserParams(degToRad(10), degToRad(10), 0, 10000, std::vector<double>{ 1, 2, 3, 0.001, 0.002, 0.003 });
     glm::dvec4 pos_mirror = pm_param.calcPosition();
     glm::dmat4x4 or_mirror = pm_param.calcOrientation();
@@ -1094,6 +1173,8 @@ TEST(opticalElements, planeMirrorMis) {
 }
 
 TEST(opticalElements, sphereMirror) {
+    if (!hasCapableGPU()) { return; }
+
     double grazingIncidence = degToRad(10);
     RAYX::WorldUserParams sm_param = RAYX::WorldUserParams(grazingIncidence, grazingIncidence, 0, 10000, std::vector<double>{ 0, 0, 0, 0, 0, 0 });
     glm::dvec4 pos_mirror = sm_param.calcPosition();
@@ -1112,6 +1193,8 @@ TEST(opticalElements, sphereMirror) {
 }
 
 TEST(opticalElements, planeGratingDevDefault) {
+    if (!hasCapableGPU()) { return; }
+
     double incidenceAngle = 1.4773068838645145;
     double exitAngle = 1.4897528445258457;
     RAYX::WorldUserParams pg_param = RAYX::WorldUserParams(incidenceAngle, exitAngle, 0, 10000, std::vector<double>{ 0, 0, 0, 0, 0, 0 });
@@ -1132,6 +1215,8 @@ TEST(opticalElements, planeGratingDevDefault) {
 }
 
 TEST(opticalElements, planeGratingDevAzimuthal) {
+    if (!hasCapableGPU()) { return; }
+
     double incidenceAngle = 1.4773068838645145;
     double exitAngle = 1.4897528445258457;
     RAYX::WorldUserParams pg_param = RAYX::WorldUserParams(incidenceAngle, exitAngle, degToRad(7.5), 10000, std::vector<double>{ 0, 0, 0, 0, 0, 0 });
@@ -1151,6 +1236,8 @@ TEST(opticalElements, planeGratingDevAzimuthal) {
 }
 
 TEST(opticalElements, planeGratingDevAzMis) {
+    if (!hasCapableGPU()) { return; }
+
     double incidenceAngle = 1.4773068838645145;
     double exitAngle = 1.4897528445258457;
     RAYX::WorldUserParams pg_param = RAYX::WorldUserParams(incidenceAngle, exitAngle, degToRad(7.5), 10000, std::vector<double>{ 1, 2, 3, 0.001, 0.002, 0.003 });
@@ -1171,6 +1258,8 @@ TEST(opticalElements, planeGratingDevAzMis) {
 
 // constant incidence angle mode, azimuthal angle and misalignment
 TEST(opticalElements, planeGratingIncAzMis) {
+    if (!hasCapableGPU()) { return; }
+
     double incidenceAngle = 1.3962634015954636;
     double exitAngle = 1.4088395764879007;
     RAYX::WorldUserParams pg_param = RAYX::WorldUserParams(incidenceAngle, exitAngle, degToRad(7.5), 10000, std::vector<double>{ 1, 2, 3, 0.001, 0.002, 0.003 });
@@ -1191,6 +1280,8 @@ TEST(opticalElements, planeGratingIncAzMis) {
 }
 
 TEST(opticalElements, planeGratingDevMisVLS) {
+    if (!hasCapableGPU()) { return; }
+
     double incidenceAngle = 1.4773068838645145;
     double exitAngle = 1.4897528445258457;
     RAYX::WorldUserParams pg_param = RAYX::WorldUserParams(incidenceAngle, exitAngle, degToRad(7.5), 10000, std::vector<double>{ 1, 2, 3, 0.001, 0.002, 0.003 });
@@ -1212,6 +1303,8 @@ TEST(opticalElements, planeGratingDevMisVLS) {
 // RZPs
 
 TEST(opticalElements, RZPDefaultParams) {
+    if (!hasCapableGPU()) { return; }
+
     // alpha and beta calculated from user parameters
     RAYX::GeometricUserParams gu_rzp = RAYX::GeometricUserParams(1, 0, 170, 0, 0, 100, 100, -1, -1, 1, 1, 100, 500, 100, 500);
     ASSERT_DOUBLE_EQ(gu_rzp.getAlpha(), 0.017453292519943295);
@@ -1235,6 +1328,8 @@ TEST(opticalElements, RZPDefaultParams) {
 }
 
 TEST(opticalElements, RZPDefaultParams200) {
+    if (!hasCapableGPU()) { return; }
+
     RAYX::GeometricUserParams gu_rzp = RAYX::GeometricUserParams(1, 0, 170, 0, 0, 100, 100, -1, -1, 1, 1, 100, 500, 100, 500);
     ASSERT_DOUBLE_EQ(gu_rzp.getAlpha(), 0.017453292519943295);
     ASSERT_DOUBLE_EQ(gu_rzp.getBeta(), 0.017453292519941554);
@@ -1258,6 +1353,8 @@ TEST(opticalElements, RZPDefaultParams200) {
 
 
 TEST(opticalElements, RZPAzimuthal200) {
+    if (!hasCapableGPU()) { return; }
+
     RAYX::GeometricUserParams gu_rzp = RAYX::GeometricUserParams(1, 0, 170, 0, 0, 100, 100, -1, -1, 1, 1, 100, 500, 100, 500);
     RAYX::WorldUserParams rzp_param = RAYX::WorldUserParams(gu_rzp.getAlpha(), gu_rzp.getBeta(), degToRad(10), 10000, std::vector<double>{ 0, 0, 0, 0, 0, 0 });
     glm::dvec4 position = rzp_param.calcPosition();
@@ -1287,6 +1384,8 @@ TEST(opticalElements, RZPAzimuthal200) {
 
 
 TEST(opticalElements, RZPMis) {
+    if (!hasCapableGPU()) { return; }
+
     RAYX::GeometricUserParams gu_rzp = RAYX::GeometricUserParams(1, 0, 170, 0, 0, 100, 100, -1, -1, 1, 1, 100, 500, 100, 500);
     RAYX::WorldUserParams rzp_param = RAYX::WorldUserParams(gu_rzp.getAlpha(), gu_rzp.getBeta(), 0, 10000, std::vector<double>{ 1, 2, 3, 0.001, 0.002, 0.003 });
     glm::dvec4 position = rzp_param.calcPosition();
@@ -1306,6 +1405,8 @@ TEST(opticalElements, RZPMis) {
 }
 
 TEST(opticalElements, EllipsoidImagePlane) {
+    if (!hasCapableGPU()) { return; }
+
     RAYX::GeometricUserParams g_params = RAYX::GeometricUserParams(10, 10000, 1000);
     double alpha = 0.031253965260898464;
     double beta = 0.31781188513796743;
@@ -1329,6 +1430,8 @@ TEST(opticalElements, EllipsoidImagePlane) {
 }
 
 TEST(opticalElements, EllipsoidImagePlane_ellipsmisalignment) {
+    if (!hasCapableGPU()) { return; }
+
     RAYX::GeometricUserParams g_params = RAYX::GeometricUserParams(10, 10000, 1000);
     double alpha = 0.031253965260898464;
     double beta = 0.31781188513796743;
@@ -1352,6 +1455,8 @@ TEST(opticalElements, EllipsoidImagePlane_ellipsmisalignment) {
 }
 
 TEST(opticalElements, EllipsoidImagePlane_mirrormisalignment) {
+    if (!hasCapableGPU()) { return; }
+
     RAYX::GeometricUserParams g_params = RAYX::GeometricUserParams(10, 10000, 1000);
     double alpha = 0.031253965260898464;
     double beta = 0.31781188513796743;
@@ -1377,6 +1482,8 @@ TEST(opticalElements, EllipsoidImagePlane_mirrormisalignment) {
 }
 
 TEST(opticalElements, Ellipsoid) {
+    if (!hasCapableGPU()) { return; }
+
     RAYX::GeometricUserParams g_params = RAYX::GeometricUserParams(10, 10000, 1000);
     double alpha = 0.031253965260898464;
     double beta = 0.31781188513796743;
@@ -1394,6 +1501,8 @@ TEST(opticalElements, Ellipsoid) {
 }
 
 TEST(opticalElements, ImagePlane) {
+    if (!hasCapableGPU()) { return; }
+
     RAYX::GeometricUserParams g_params = RAYX::GeometricUserParams(10);
     ASSERT_DOUBLE_EQ(g_params.getAlpha(), degToRad(10));
     ASSERT_DOUBLE_EQ(g_params.getBeta(), degToRad(10));
@@ -1414,6 +1523,8 @@ TEST(opticalElements, ImagePlane) {
 
 
 TEST(globalCoordinates, FourMirrors_9Rays) {
+    if (!hasCapableGPU()) { return; }
+
     RAYX::GeometricUserParams g_params = RAYX::GeometricUserParams(10);
     RAYX::WorldUserParams w_coord = RAYX::WorldUserParams(degToRad(10), degToRad(10), degToRad(7), 10, std::vector<double>{0, 0, 0, 0, 0, 0});
     glm::dvec4 pos = w_coord.calcPosition();
@@ -1452,6 +1563,8 @@ TEST(globalCoordinates, FourMirrors_9Rays) {
 }
 
 TEST(globalCoordinates, FourMirrors_20Rays) {
+    if (!hasCapableGPU()) { return; }
+
     RAYX::GeometricUserParams g_params = RAYX::GeometricUserParams(10);
     RAYX::WorldUserParams w_coord = RAYX::WorldUserParams(degToRad(10), degToRad(10), degToRad(7), 10, std::vector<double>{0, 0, 0, 0, 0, 0});
     glm::dvec4 pos = w_coord.calcPosition();
@@ -1490,6 +1603,8 @@ TEST(globalCoordinates, FourMirrors_20Rays) {
 }
 
 TEST(opticalElements, slit1) {
+    if (!hasCapableGPU()) { return; }
+
     RAYX::SimulationEnv::get().m_numOfRays = 200;
     RAYX::EnergyDistribution dist(RAYX::EnergyRange(100, 0), true);
     std::shared_ptr<RAYX::MatrixSource> m = std::make_shared<RAYX::MatrixSource>("matrix source", dist, 0.065, 0.04, 0, 0.001, 0.001, 1, 0, 0, std::vector<double>{ 0, 0, 0, 0 });
@@ -1531,6 +1646,8 @@ TEST(opticalElements, slit1) {
 }
 
 TEST(opticalElements, slit2) {
+    if (!hasCapableGPU()) { return; }
+
     RAYX::WorldUserParams s_param = RAYX::WorldUserParams(0, 0, 0, 10000, std::vector<double>{ 0, 0, 0, 0, 0, 0 });
     glm::dvec4 s_position = s_param.calcPosition();
     glm::dmat4x4 s_orientation = s_param.calcOrientation();
@@ -1547,6 +1664,8 @@ TEST(opticalElements, slit2) {
 
 
 TEST(opticalElements, toroid) {
+    if (!hasCapableGPU()) { return; }
+
     RAYX::WorldUserParams t_param = RAYX::WorldUserParams(degToRad(10), degToRad(10), 0, 10000, std::vector<double>{ 0, 0, 0, 0, 0, 0 });
     glm::dvec4 t_position = t_param.calcPosition();
     glm::dmat4x4 t_orientation = t_param.calcOrientation();
@@ -1567,6 +1686,8 @@ TEST(opticalElements, toroid) {
 // PETES SETUP
 // spec1-first_rzp4mm
 TEST(PeteRZP, spec1_first_rzp) {
+    if (!hasCapableGPU()) { return; }
+
     RAYX::SimulationEnv::get().m_numOfRays = 20000;
     RAYX::EnergyDistribution dist(RAYX::EnergyRange(640, 120), false);
     std::shared_ptr<RAYX::PointSource> p = std::make_shared<RAYX::PointSource>("spec1_first_rzp", dist, 0.005, 0.005, 0, 0.02, 0.06, 1, 1, 0, 0, 1, 0, 0, std::vector<double>{0, 0, 0, 0});
@@ -1587,6 +1708,8 @@ TEST(PeteRZP, spec1_first_rzp) {
 }
 
 TEST(PeteRZP, spec1_first_ip) {
+    if (!hasCapableGPU()) { return; }
+
     RAYX::SimulationEnv::get().m_numOfRays = 20000;
     RAYX::EnergyDistribution dist(RAYX::EnergyRange(640, 120), false);
     std::shared_ptr<RAYX::PointSource> p = std::make_shared<RAYX::PointSource>("spec1_first_rzp4", dist, 0.005, 0.005, 0, 0.02, 0.06, 1, 1, 0, 0, 1, 0, 0, std::vector<double>{0, 0, 0, 0});
@@ -1612,6 +1735,8 @@ TEST(PeteRZP, spec1_first_ip) {
 }
 
 TEST(PeteRZP, spec1_first_plus_rzp) {
+    if (!hasCapableGPU()) { return; }
+
     RAYX::SimulationEnv::get().m_numOfRays = 20000;
     RAYX::EnergyDistribution dist(RAYX::EnergyRange(640, 120), false);
     std::shared_ptr<RAYX::PointSource> p = std::make_shared<RAYX::PointSource>("spec1_first_plus_rzp", dist, 0.005, 0.005, 0, 0.02, 0.06, 1, 1, 0, 0, 1, 0, 0, std::vector<double>{0, 0, 0, 0});
@@ -1633,6 +1758,8 @@ TEST(PeteRZP, spec1_first_plus_rzp) {
 }
 
 TEST(PeteRZP, spec1_first_plus_ip) {
+    if (!hasCapableGPU()) { return; }
+
     RAYX::SimulationEnv::get().m_numOfRays = 20000;
     RAYX::EnergyDistribution dist(RAYX::EnergyRange(640, 120), false);
     std::shared_ptr<RAYX::PointSource> p = std::make_shared<RAYX::PointSource>("spec1_first_plus_rzp_ip", dist, 0.005, 0.005, 0, 0.02, 0.06, 1, 1, 0, 0, 1, 0, 0, std::vector<double>{0, 0, 0, 0});
@@ -1658,6 +1785,8 @@ TEST(PeteRZP, spec1_first_plus_ip) {
 }
 
 TEST(PeteRZP, spec1_first_minus_rzp2) {
+    if (!hasCapableGPU()) { return; }
+
     RAYX::SimulationEnv::get().m_numOfRays = 20000;
     RAYX::EnergyDistribution dist(RAYX::EnergyRange(640, 120), false);
     std::shared_ptr<RAYX::PointSource> p = std::make_shared<RAYX::PointSource>("spec1_first_minus_rzp2", dist, 0.005, 0.005, 0, 0.001, 0.06, 1, 1, 0, 0, 1, 0, 0, std::vector<double>{0, 0, 0, 0});
@@ -1679,6 +1808,8 @@ TEST(PeteRZP, spec1_first_minus_rzp2) {
 }
 
 TEST(PeteRZP, spec1_first_minus_ip2) {
+    if (!hasCapableGPU()) { return; }
+
     RAYX::SimulationEnv::get().m_numOfRays = 20000;
     RAYX::EnergyDistribution dist(RAYX::EnergyRange(640, 120), false);
     std::shared_ptr<RAYX::PointSource> p = std::make_shared<RAYX::PointSource>("spec1_first_minus_rzp_ip2", dist, 0.005, 0.005, 0, 0.001, 0.06, 1, 1, 0, 0, 1, 0, 0, std::vector<double>{0, 0, 0, 0});
@@ -1702,4 +1833,3 @@ TEST(PeteRZP, spec1_first_minus_ip2) {
     std::string filename = "testFile_spec1_first_minus_rzp_ip2";
     writeToFile(outputRays, filename);
 }
-#endif
