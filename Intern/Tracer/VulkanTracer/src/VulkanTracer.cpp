@@ -1023,6 +1023,7 @@ void VulkanTracer::addRayVector(void* location, size_t size) {
 }
 
 //adds quad to beamline
+// TODO(Jannis): optimize so it doesn't copy seven vectors (either move or const ref)
 void VulkanTracer::addVectors(std::vector<double> surfaceParams, std::vector<double> inputInMatrix, std::vector<double> inputOutMatrix, std::vector<double> objectParameters, std::vector<double> elementParameters) {
 	assert(surfaceParams.size() == 16 && inputInMatrix.size() == 16 && inputOutMatrix.size() == 16 && objectParameters.size() == 16 && elementParameters.size() == 16);
 	//beamline.resize(beamline.size()+1);
