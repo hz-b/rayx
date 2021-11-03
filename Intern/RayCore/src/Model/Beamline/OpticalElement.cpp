@@ -53,7 +53,7 @@ namespace RAYX
         m_slopeError(slopeError)
     {
         m_geometry = std::make_unique<Geometry>(geometricalShape, width, height, position, orientation);
-        assert(EParameters.size() == 16 && slopeError.size() == 7 && tempMisalignmentParams.size() == 6);
+        assert(EParameters.size() == 16 && slopeError.size() == 7);
         updateObjectParams();
     }
 
