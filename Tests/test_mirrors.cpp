@@ -224,11 +224,14 @@ TEST(Ellips, defaultParams) {
 
     double alpha = 0.031253965260898464;
     double beta = 0.31781188513796743;
-    double tangentAngle = 0.14327895993853446; // alpha1 in old ray code
+    double correctTangentAngle = 0.14327895993853446; // alpha1 in old ray code
     RAYX::GeometricUserParams e_params = RAYX::GeometricUserParams(incidence, entranceArmLength, exitArmLength);
     ASSERT_DOUBLE_EQ(e_params.getAlpha(), alpha);
     ASSERT_DOUBLE_EQ(e_params.getBeta(), beta);
-    ASSERT_DOUBLE_EQ(e_params.calcTangentAngle(incidence, entranceArmLength, exitArmLength, 1), tangentAngle);
+    double tangentAngle = e_params.calcTangentAngle(incidence, entranceArmLength, exitArmLength, 1);
+    ASSERT_DOUBLE_EQ(correctTangentAngle, tangentAngle);
+    tangentAngle = e_params.calcTangentAngle(incidence, entranceArmLength, exitArmLength, 0);
+    ASSERT_DOUBLE_EQ(0, tangentAngle);
     
     double shortHalfAxisC = 549.1237529650836;
     double y0 = 312.4887730997391;
@@ -240,10 +243,10 @@ TEST(Ellips, defaultParams) {
     double a34 = 45.0819833448842;
     double a44 = -5.8207660913467407e-11;
     std::vector<double> surface = {1, 0, 0, 0, 1, 1, 0, -y0, 0, 0, a33, a34, 7, 0, 0, a44};
-    std::vector<double> elementParams = { sin(tangentAngle), cos(tangentAngle), y0, z0, 0,0,0,0, 0,0,0,0, 0,0,0,0 };
+    std::vector<double> elementParams = { sin(correctTangentAngle), cos(correctTangentAngle), y0, z0, 0,0,0,0, 0,0,0,0, 0,0,0,0 };
 
-    RAYX::WorldUserParams w_params = RAYX::WorldUserParams(e_params.getAlpha(), e_params.getBeta(), degToRad(chi), dist, mis);
-    RAYX::Ellipsoid eb = RAYX::Ellipsoid("ellipsoid", geometricalShape, width, height, w_params.calcPosition(), w_params.calcOrientation(), incidence, entranceArmLength, exitArmLength, coordSys, figRot, a11, mis, sE);
+    RAYX::WorldUserParams w_params = RAYX::WorldUserParams(e_params.getAlpha(), e_params.getBeta(), degToRad(chi), dist, mis, tangentAngle);
+    RAYX::Ellipsoid eb = RAYX::Ellipsoid("ellipsoid", geometricalShape, width, height, w_params.calcPosition(), w_params.calcOrientation(), incidence, entranceArmLength, exitArmLength, figRot, a11, sE);
     
     EXPECT_NEAR(eb.getShortHalfAxisB(), shortHalfAxisB, 0.0000001);
     EXPECT_NEAR(eb.getLongHalfAxisA(), longHalfAxisA, 0.0000001);

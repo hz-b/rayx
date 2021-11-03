@@ -28,8 +28,6 @@ struct Quadric{
 	dmat4 anchorPoints;
 	dmat4 inTrans;
 	dmat4 outTrans;
-	dmat4 misalignment;
-	dmat4 inverseMisalignment;
 	dmat4 objectParameters;
 	dmat4 elementParameters;
 };

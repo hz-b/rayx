@@ -16,7 +16,7 @@ namespace RAYX
      *
     */
     Ellipsoid::Ellipsoid(const char* name, const int geometricalShape, const double width, const double height, glm::dvec4 position, glm::dmat4x4 orientation, const double grazingIncidence,
-        const double entranceArmLength, const double exitArmLength, const int coordSys, const int figRot, const double a_11, const std::vector<double> misalignmentParams, const std::vector<double> slopeError)
+        const double entranceArmLength, const double exitArmLength, const int figRot, const double a_11, const std::vector<double> slopeError)
         : OpticalElement(name, geometricalShape, width, height, position, orientation, slopeError),
         m_incidence(degToRad(grazingIncidence)),
         m_entranceArmLength(entranceArmLength),
@@ -27,11 +27,8 @@ namespace RAYX
         std::cout << name << std::endl;
         m_offsetY0 = 0;// what is this for? RAYX.FOR: "only !=0 in case of Monocapillary"
 
-        m_misalignmentCoordSys = (coordSys == 0 ? CS_CURVATURE : CS_MIRROR);
         m_figureRotation = (figRot == 0 ? FR_YES : (figRot == 1 ? FR_PLANE : FR_A11));
-
         calcHalfAxes();
-        // grazingIncidence = m_alpha = m_alpha1 + m_tangentAngle
         
         // a33, 34, 44
         m_a33 = pow(m_shortHalfAxisB / m_longHalfAxisA, 2);
@@ -41,109 +38,13 @@ namespace RAYX
 
         double icurv = 1;
         setSurface(std::make_unique<Quadric>(std::vector<double>{m_a11, 0, 0, 0, icurv, 1, 0, m_radius, 0, 0, m_a33, m_a34, 7, 0, 0, m_a44}));
-        // setSurface(surface);
-        setElementParameters({ sin(m_tangentAngle), cos(m_tangentAngle), m_y0, m_z0, double(m_figureRotation),0,0,0, 0,0,0,0, 0,0,0,0 });
+        setElementParameters({ sin(m_tangentAngle), cos(m_tangentAngle), m_y0, m_z0, 0,0,0,0, 0,0,0,0, 0,0,0,0 });
 
-        // if m_misalignmentCoordSys == 1 rotate through d_tangentangle before misalignment and back after (-d_tangentangle)
-        /*if (m_misalignmentCoordSys == CS_MIRROR) {
-            setTemporaryMisalignment({ 0,0,0,0,0,m_tangentAngle });
-            glm::dmat4x4 inTrans = getB2E();
-            glm::dmat4x4 outTrans = getE2B();
-            glm::dmat4x4 mis = getMisalignmentMatrix();
-            glm::dmat4x4 invMis = getInverseMisalignmentMatrix();
-            glm::dmat4x4 tempMis = vectorToGlm16(getTempMisalignmentMatrix());
-            glm::dmat4x4 invTempMis = vectorToGlm16(getInverseTempMisalignmentMatrix());
-
-            glm::dmat4x4 AT = tempMis * inTrans; // AT
-            glm::dmat4x4 MAT = mis * AT; //MAT
-            glm::dmat4x4 AMAT = invTempMis * MAT; //A^-1MAT
-            setInMatrix(glmToVector16(AMAT));
-
-            glm::dmat4x4 MA = invMis * tempMis; // M^-1A
-            glm::dmat4x4 AMA = invTempMis * MA; //A^-1M^-1A
-            glm::dmat4x4 TAMA = outTrans * AMA; // T-^1A^-1M^-1A
-            setOutMatrix(glmToVector16(TAMA));
-        }
-        else {
-            setTemporaryMisalignment({ 0,0,0,0,0,0 });
-        }*/
     }
 
-    /**
-     * Angles given in degree and stored in rad. Initializes transformation matrices,
-     * and parameters for the quadric in super class (quadric). Sets mirror-specific
-     * parameters in this class.
-     *
-     * width, height = total width, height of the mirror (x- and z- dimensions)
-     * grazingIncidence = desired incidence angle of the main ray
-     * azimuthal = rotation of mirror around z-axis
-     * distanceToPreceedingElement
-     *
-    */
-    Ellipsoid::Ellipsoid(const char* name, const int geometricalShape, const double width, const double height, const double grazingIncidence, const double azimuthal, const double distanceToPreceedingElement,
-        const double entranceArmLength, const double exitArmLength, const int coordSys, const int figRot, const double a_11, const std::vector<double> misalignmentParams, const std::vector<double> slopeError, const std::shared_ptr<OpticalElement> previous, bool global)
-        : OpticalElement(name, geometricalShape, width, height, degToRad(azimuthal), distanceToPreceedingElement, slopeError, previous),
-        m_incidence(degToRad(grazingIncidence)),
-        m_entranceArmLength(entranceArmLength),
-        m_exitArmLength(exitArmLength),
-        m_a11(a_11)
-    {
-
-        std::cout << "[Ellipsoid]: Created." << std::endl;
-        m_offsetY0 = 0;// what is this for? RAY.FOR: "only !=0 in case of Monocapillary"
-
-        m_misalignmentCoordSys = (coordSys == 0 ? CS_CURVATURE : CS_MIRROR);
-        m_figureRotation = (figRot == 0 ? FR_YES : (figRot == 1 ? FR_PLANE : FR_A11));
-
-        calcHalfAxes();
-        // grazingIncidence = m_alpha = m_alpha1 + m_tangentAngle
-        calcAlphaBeta();
-        // a33, 34, 44
-        m_a33 = pow(m_shortHalfAxisB / m_longHalfAxisA, 2);
-        m_a34 = m_z0 * m_a33;
-        m_a44 = -pow(m_shortHalfAxisB, 2) + pow(m_y0, 2) + pow(m_z0 * m_shortHalfAxisB / m_longHalfAxisA, 2);
-        m_radius = -m_y0;
-
-        double icurv = 1;
-        setSurface(std::make_unique<Quadric>(std::vector<double>{m_a11, 0, 0, 0, icurv, 1, 0, m_radius, 0, 0, m_a33, m_a34, 7, 0, 0, m_a44}));
-        // setSurface(surface);
-        calcTransformationMatricesFromAngles({ 0,0,0,0,0,0 }, global);
-        setElementParameters({ 0,0,m_a11,m_y0, m_a33,m_a34,m_a44,0, 0,0,0,0, 0,0,0,0 });
-
-        // if m_misalignmentCoordSys == 1 rotate through d_tangentangle before misalignment and back after (-d_tangentangle)
-        if (m_misalignmentCoordSys == CS_MIRROR) {
-            setTemporaryMisalignment({ 0,0,0,0,0,m_tangentAngle });
-            glm::dmat4x4 inTrans = getB2E();
-            glm::dmat4x4 outTrans = getE2B();
-            glm::dmat4x4 mis = getMisalignmentMatrix();
-            glm::dmat4x4 invMis = getInverseMisalignmentMatrix();
-            glm::dmat4x4 tempMis = vectorToGlm16(getTempMisalignmentMatrix());
-            glm::dmat4x4 invTempMis = vectorToGlm16(getInverseTempMisalignmentMatrix());
-
-            glm::dmat4x4 AT = tempMis * inTrans; // AT
-            glm::dmat4x4 MAT = mis * AT; //MAT
-            glm::dmat4x4 AMAT = invTempMis * MAT; //A^-1MAT
-            setInMatrix(glmToVector16(AMAT));
-
-            glm::dmat4x4 MA = invMis * tempMis; // M^-1A
-            glm::dmat4x4 AMA = invTempMis * MA; //A^-1M^-1A
-            glm::dmat4x4 TAMA = outTrans * AMA; // T-^1A^-1M^-1A
-            setOutMatrix(glmToVector16(TAMA));
-        }
-        else {
-            setTemporaryMisalignment({ 0,0,0,0,0,0 });
-        }
-    }
 
     Ellipsoid::~Ellipsoid()
     {
-    }
-
-    void Ellipsoid::calcAlphaBeta() {
-        setAlpha(m_incidence - m_tangentAngle);
-        setBeta(m_incidence); // mirror -> exit angle = incidence angle
-        std::cout.precision(17);
-        std::cout << "[Ellipsoid]: alpha= " << m_incidence << " m_alpha1= " << getAlpha() << " beta= " << getBeta() << std::endl;
     }
 
     /*

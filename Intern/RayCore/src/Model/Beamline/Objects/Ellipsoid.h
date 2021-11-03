@@ -11,16 +11,11 @@ namespace RAYX
 
         // slightly shortened constructor
         Ellipsoid(const char* name, const int geometricalShape, const double width, const double height, glm::dvec4 position, glm::dmat4x4 orientation, const double grazingIncidence,
-            const double entranceArmLength, const double exitArmLength, const int coordSys, const int figRot, const double a_11, const std::vector<double> misalignmentParams, const std::vector<double> slopeError);
-        // long old constrcutor
-        Ellipsoid(const char* name, const int geometricalShape, const double width, const double height, const double grazingIncidence, const double azimuthal, const double distanceToPreceedingElement,
-            const double entranceArmLength, const double exitArmLength, const int coordSys, const int figRot, const double a11, const std::vector<double> misalignmentParams, const std::vector<double> slopeError, const std::shared_ptr<OpticalElement> previous, bool global);
+            const double entranceArmLength, const double exitArmLength, const int figRot, const double a_11, const std::vector<double> slopeError);
         Ellipsoid();
         ~Ellipsoid();
 
-        void calcRadius();
         void calcHalfAxes();
-        void calcAlphaBeta();
         double getRadius();
         double getExitArmLength();
         double getEntranceArmLength();
@@ -39,14 +34,16 @@ namespace RAYX
         double getHalfAxisC();
 
         enum FIGURE_ROTATION { FR_YES, FR_PLANE, FR_A11 };
-        enum COORDINATESYSTEM_TYPE { CS_CURVATURE, CS_MIRROR };
-
+        
     private:
         double m_radius;
         // grazing incidence, in rad
         double m_incidence;
         double m_entranceArmLength;
         double m_exitArmLength;
+        FIGURE_ROTATION m_figureRotation;
+        double m_a11; // param for quadric funciton, given by user
+        
         // derived params, needed on shader
         double m_tangentAngle; // == alpha1
         double m_a34;
@@ -59,10 +56,7 @@ namespace RAYX
         double m_offsetY0; // always = 0?
         double m_halfAxisC; // derived from figure_rotation, a_11 and half axes a, b
         
-        FIGURE_ROTATION m_figureRotation;
-        COORDINATESYSTEM_TYPE m_misalignmentCoordSys;
-        double m_a11; // param for quadric funciton, given by user
-
+        
         //double m_Depth;
         //double m_verDivergence;
         //double m_horDivergence;

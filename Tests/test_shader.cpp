@@ -70,7 +70,7 @@ std::list<double> runTracer(std::vector<RAYX::Ray> testValues, std::vector<std::
     std::cout << "add rays to tracer done" << std::endl;
 
     for (std::shared_ptr<RAYX::OpticalElement> element : elements) {
-        tracer.addVectors(element->getSurfaceParams(), element->getInMatrix(), element->getOutMatrix(), element->getTempMisalignmentMatrix(), element->getInverseTempMisalignmentMatrix(), element->getObjectParameters(), element->getElementParameters());
+        tracer.addVectors(element->getSurfaceParams(), element->getInMatrix(), element->getOutMatrix(), element->getObjectParameters(), element->getElementParameters());
     }
     tracer.run(); //run tracer
     std::list<double> outputRays;
@@ -273,7 +273,7 @@ TEST(Tracer, testUniformRandom) {
     std::shared_ptr<RAYX::MatrixSource> m = std::make_shared<RAYX::MatrixSource>("Matrix source 1", dist, 0.065, 0.04, 0.0, 0.001, 0.001, 1, 0, 0, std::vector<double>{ 0, 0, 0, 0 });
     std::vector<RAYX::Ray> testValues = m->getRays();
 
-    std::shared_ptr<RAYX::OpticalElement> q = std::make_shared<RAYX::OpticalElement>("testRandomNumbers", std::vector<double>{ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, settings, 0, 0 }, zeros, zeros, zeros, zeros, zeros, zeros);
+    std::shared_ptr<RAYX::OpticalElement> q = std::make_shared<RAYX::OpticalElement>("testRandomNumbers", std::vector<double>{ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, settings, 0, 0 }, zeros, zeros, zeros, zeros);
     std::list<double> outputRays = runTracer(testValues, { q });
 
     for (std::list<double>::iterator i = outputRays.begin(); i != outputRays.end(); i++) {
@@ -298,7 +298,7 @@ TEST(Tracer, ExpTest) {
     RAYX::Ray r = RAYX::Ray(glm::dvec3(0, 1, -3), glm::dvec3(PI, 2, 3), glm::dvec4(10, -4.41234, 0, 1.224), 4, 5);
     testValues.push_back(r);
 
-    std::shared_ptr<RAYX::OpticalElement> q = std::make_shared<RAYX::OpticalElement>("ExpTest", std::vector<double>{ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, settings, 0, 0 }, zeros, zeros, zeros, zeros, zeros, zeros);
+    std::shared_ptr<RAYX::OpticalElement> q = std::make_shared<RAYX::OpticalElement>("ExpTest", std::vector<double>{ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, settings, 0, 0 }, zeros, zeros, zeros, zeros);
 
     std::list<double> outputRays = runTracer(testValues, { q });
     std::cout << "got " << outputRays.size() << " values from shader" << std::endl;
@@ -322,7 +322,7 @@ TEST(Tracer, LogTest) {
     RAYX::Ray r = RAYX::Ray(glm::dvec3(0.1, 1, 0.3), glm::dvec3(PI, 2, 3), glm::dvec4(0.2345, 100, 3.423453, 0.00000001), 2.1, 5);
     testValues.push_back(r);
 
-    std::shared_ptr<RAYX::OpticalElement> q = std::make_shared<RAYX::OpticalElement>("LogTest", std::vector<double>{ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, settings, 0, 0 }, zeros, zeros, zeros, zeros, zeros, zeros);
+    std::shared_ptr<RAYX::OpticalElement> q = std::make_shared<RAYX::OpticalElement>("LogTest", std::vector<double>{ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, settings, 0, 0 }, zeros, zeros, zeros, zeros);
 
     std::list<double> outputRays = runTracer(testValues, { q });
     std::cout << "got " << outputRays.size() << " values from shader" << std::endl;
@@ -348,7 +348,7 @@ TEST(Tracer, testRefrac2D) {
     // one quadric for each ray to transport ax and az for that test ray to the shader
     double az = 0.00016514977645243345;
     double ax = 0.012830838024391771;
-    std::shared_ptr<RAYX::OpticalElement> q = std::make_shared<RAYX::OpticalElement>("testRefrac2D", std::vector<double>{ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, settings, 0, 0 }, std::vector<double>{ az, ax, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 }, zeros, zeros, zeros, zeros, zeros);
+    std::shared_ptr<RAYX::OpticalElement> q = std::make_shared<RAYX::OpticalElement>("testRefrac2D", std::vector<double>{ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, settings, 0, 0 }, std::vector<double>{ az, ax, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 }, zeros, zeros, zeros);
     quadrics.push_back(q);
 
     r = RAYX::Ray(glm::dvec3(0, 1, 0), glm::dvec3(0.00049999999722222275, -0.017285762731583675, 0.99985046502305308), glm::dvec4(1, 1, 0, 0), 0, 1.0);
@@ -357,7 +357,7 @@ TEST(Tracer, testRefrac2D) {
     correct.push_back(c);
     az = -6.2949352042540596e-05;
     ax = 0.038483898782123105;
-    q = std::make_shared<RAYX::OpticalElement>("testRefrac2D", std::vector<double>{ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, settings, 0, 0 }, std::vector<double>{ az, ax, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 }, zeros, zeros, zeros, zeros, zeros);
+    q = std::make_shared<RAYX::OpticalElement>("testRefrac2D", std::vector<double>{ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, settings, 0, 0 }, std::vector<double>{ az, ax, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 }, zeros, zeros, zeros);
     quadrics.push_back(q);
 
     r = RAYX::Ray(glm::dvec3(0, 1, 0), glm::dvec3(0.0001666666635802469, -0.017619047234249029, 0.99984475864845179), glm::dvec4(1, 1, 0, 0), 0, 1.0);
@@ -366,7 +366,7 @@ TEST(Tracer, testRefrac2D) {
     correct.push_back(c);
     az = -0.077169530850327184;
     ax = 0.2686127340088395;
-    q = std::make_shared<RAYX::OpticalElement>("testRefrac2D", std::vector<double>{ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, settings, 0, 0 }, std::vector<double>{ az, ax, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 }, zeros, zeros, zeros, zeros, zeros);
+    q = std::make_shared<RAYX::OpticalElement>("testRefrac2D", std::vector<double>{ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, settings, 0, 0 }, std::vector<double>{ az, ax, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 }, zeros, zeros, zeros);
     quadrics.push_back(q);
 
     // normal != 0 (spherical RZP)
@@ -376,7 +376,7 @@ TEST(Tracer, testRefrac2D) {
     correct.push_back(c);
     az = 0.0021599283476277926;
     ax = -0.050153240660177005;
-    q = std::make_shared<RAYX::OpticalElement>("testRefrac2D", std::vector<double>{ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, settings, 0, 0 }, std::vector<double>{ az, ax, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 }, zeros, zeros, zeros, zeros, zeros);
+    q = std::make_shared<RAYX::OpticalElement>("testRefrac2D", std::vector<double>{ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, settings, 0, 0 }, std::vector<double>{ az, ax, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 }, zeros, zeros, zeros);
     quadrics.push_back(q);
 
     std::list<double> outputRays = runTracer(testValues, quadrics);
@@ -416,7 +416,7 @@ TEST(Tracer, testNormalCartesian) {
     correct.push_back(c);
 
     double settings = 13;
-    std::shared_ptr<RAYX::OpticalElement> q1 = std::make_shared<RAYX::OpticalElement>("testNormalCartesian", std::vector<double>{ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, settings, 0, 0 }, zeros, zeros, zeros, zeros, zeros, zeros);
+    std::shared_ptr<RAYX::OpticalElement> q1 = std::make_shared<RAYX::OpticalElement>("testNormalCartesian", std::vector<double>{ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, settings, 0, 0 }, zeros, zeros, zeros, zeros);
 
     std::list<double> outputRays = runTracer(testValues, { q1 });
     std::cout << "got " << outputRays.size() << " values from shader" << std::endl;
@@ -456,7 +456,7 @@ TEST(Tracer, testNormalCylindrical) {
     correct.push_back(c);
 
     double settings = 14;
-    std::shared_ptr<RAYX::OpticalElement> q1 = std::make_shared<RAYX::OpticalElement>("testNormalCylindrical", std::vector<double>{ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, settings, 0, 0 }, zeros, zeros, zeros, zeros, zeros, zeros);
+    std::shared_ptr<RAYX::OpticalElement> q1 = std::make_shared<RAYX::OpticalElement>("testNormalCylindrical", std::vector<double>{ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, settings, 0, 0 }, zeros, zeros, zeros, zeros);
 
     std::list<double> outputRays = runTracer(testValues, { q1 });
     std::cout << "got " << outputRays.size() << " values from shader" << std::endl;
@@ -492,7 +492,7 @@ TEST(Tracer, testRefrac) {
 
 
     double settings = 15;
-    std::shared_ptr<RAYX::OpticalElement> q1 = std::make_shared<RAYX::OpticalElement>("testRefrac", std::vector<double>{ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, settings, 0, 0 }, std::vector<double>{ a, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 }, zeros, zeros, zeros, zeros, zeros);
+    std::shared_ptr<RAYX::OpticalElement> q1 = std::make_shared<RAYX::OpticalElement>("testRefrac", std::vector<double>{ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, settings, 0, 0 }, std::vector<double>{ a, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 }, zeros, zeros, zeros);
 
     std::list<double> outputRays = runTracer(testValues, { q1 });
     std::cout << "got " << outputRays.size() << " values from shader" << std::endl;
@@ -516,7 +516,7 @@ TEST(Tracer, testRefracBeyondHor) {
 
 
     double settings = 15;
-    std::shared_ptr<RAYX::OpticalElement> q1 = std::make_shared<RAYX::OpticalElement>("testRefrac", std::vector<double>{ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, settings, 0, 0 }, std::vector<double>{ a, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 }, zeros, zeros, zeros, zeros, zeros);
+    std::shared_ptr<RAYX::OpticalElement> q1 = std::make_shared<RAYX::OpticalElement>("testRefrac", std::vector<double>{ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, settings, 0, 0 }, std::vector<double>{ a, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 }, zeros, zeros, zeros);
 
     std::list<double> outputRays = runTracer(testValues, { q1 });
     std::cout << "got " << outputRays.size() << " values from shader" << std::endl;
@@ -556,7 +556,7 @@ TEST(Tracer, testWasteBox) {
     correct.push_back(c);
 
     double settings = 11;
-    std::shared_ptr<RAYX::OpticalElement> q1 = std::make_shared<RAYX::OpticalElement>("testWasteBox", std::vector<double>{ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, settings, 0, 0 }, zeros, zeros, zeros, zeros, zeros, zeros);
+    std::shared_ptr<RAYX::OpticalElement> q1 = std::make_shared<RAYX::OpticalElement>("testWasteBox", std::vector<double>{ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, settings, 0, 0 }, zeros, zeros, zeros, zeros);
 
     std::list<double> outputRays = runTracer(testValues, { q1 });
     std::cout << "got " << outputRays.size() << " values from shader" << std::endl;
@@ -596,7 +596,7 @@ TEST(Tracer, testRZPLineDensityDefaulParams) { // point to point
     correct.push_back(c);
 
     double settings = 12;
-    std::shared_ptr<RAYX::OpticalElement> q1 = std::make_shared<RAYX::OpticalElement>("testRZPpoint2point", std::vector<double>{ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, settings, 0, 0 }, inputValues, zeros, zeros, zeros, zeros, zeros);
+    std::shared_ptr<RAYX::OpticalElement> q1 = std::make_shared<RAYX::OpticalElement>("testRZPpoint2point", std::vector<double>{ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, settings, 0, 0 }, inputValues, zeros, zeros, zeros);
 
     std::list<double> outputRays = runTracer(testValues, { q1 });
     std::cout << "got " << outputRays.size() << " values from shader" << std::endl;
@@ -637,7 +637,7 @@ TEST(Tracer, testRZPLineDensityAstigmatic) { // astigmatic 2 astigmatic
     correct.push_back(c);
 
     double settings = 12;
-    std::shared_ptr<RAYX::OpticalElement> q1 = std::make_shared<RAYX::OpticalElement>("testRZPAstigmatic", std::vector<double>{ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, settings, 0, 0 }, inputValues, zeros, zeros, zeros, zeros, zeros);
+    std::shared_ptr<RAYX::OpticalElement> q1 = std::make_shared<RAYX::OpticalElement>("testRZPAstigmatic", std::vector<double>{ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, settings, 0, 0 }, inputValues, zeros, zeros, zeros);
 
     std::list<double> outputRays = runTracer(testValues, { q1 });
     std::cout << "got " << outputRays.size() << " values from shader" << std::endl;
@@ -670,7 +670,7 @@ TEST(Tracer, testRayMatrixMult) {
     correct.push_back(c);
 
     double settings = 10;
-    std::shared_ptr<RAYX::OpticalElement> q1 = std::make_shared<RAYX::OpticalElement>("testRayMatrixMult", std::vector<double>{ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, settings, 0, 0 }, matrix, zeros, zeros, zeros, zeros, zeros);
+    std::shared_ptr<RAYX::OpticalElement> q1 = std::make_shared<RAYX::OpticalElement>("testRayMatrixMult", std::vector<double>{ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, settings, 0, 0 }, matrix, zeros, zeros, zeros);
 
     std::list<double> outputRays = runTracer(testValues, { q1 });
     std::cout << "got " << outputRays.size() << " values from shader" << std::endl;
@@ -714,7 +714,7 @@ TEST(Tracer, testDPow) {
     correct.push_back(c);
 
     double settings = 7;
-    std::shared_ptr<RAYX::OpticalElement> q = std::make_shared<RAYX::OpticalElement>("testDoublePow", std::vector<double>{ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, settings, 0, 0 }, zeros, zeros, zeros, zeros, zeros, zeros);
+    std::shared_ptr<RAYX::OpticalElement> q = std::make_shared<RAYX::OpticalElement>("testDoublePow", std::vector<double>{ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, settings, 0, 0 }, zeros, zeros, zeros, zeros);
 
     std::list<double> outputRays = runTracer(testValues, { q });
     std::cout << "got " << outputRays.size() << " values from shader" << std::endl;
@@ -740,7 +740,7 @@ TEST(Tracer, testCosini) {
 
 
     double settings = 9;
-    std::shared_ptr<RAYX::OpticalElement> q = std::make_shared<RAYX::OpticalElement>("testCosini", std::vector<double>{ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, settings, 0, 0 }, zeros, zeros, zeros, zeros, zeros, zeros);
+    std::shared_ptr<RAYX::OpticalElement> q = std::make_shared<RAYX::OpticalElement>("testCosini", std::vector<double>{ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, settings, 0, 0 }, zeros, zeros, zeros, zeros);
 
     std::list<double> outputRays = runTracer(testValues, { q });
     std::cout << "got " << outputRays.size() << " values from shader" << std::endl;
@@ -782,7 +782,7 @@ TEST(Tracer, factTest) {
     std::vector<double> correct = { 1,1,2, -2, -1,24,355687428096000, 1, 3628800,-4,479001600,1 };
 
     double settings = 8;
-    std::shared_ptr<RAYX::OpticalElement> q = std::make_shared<RAYX::OpticalElement>("testPow", std::vector<double>{ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, settings, 0, 0 }, zeros, zeros, zeros, zeros, zeros, zeros);
+    std::shared_ptr<RAYX::OpticalElement> q = std::make_shared<RAYX::OpticalElement>("testPow", std::vector<double>{ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, settings, 0, 0 }, zeros, zeros, zeros, zeros);
 
     std::list<double> outputRays = runTracer(testValues, { q });
     std::cout << "got " << outputRays.size() << " values from shader" << std::endl;
@@ -812,7 +812,7 @@ TEST(Tracer, bessel1Test) {
     correct.push_back(c);
 
     double settings = 6;
-    std::shared_ptr<RAYX::OpticalElement> q = std::make_shared<RAYX::OpticalElement>("TestBessel1", std::vector<double>{ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, settings, 0, 0 }, zeros, zeros, zeros, zeros, zeros, zeros);
+    std::shared_ptr<RAYX::OpticalElement> q = std::make_shared<RAYX::OpticalElement>("TestBessel1", std::vector<double>{ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, settings, 0, 0 }, zeros, zeros, zeros, zeros);
 
     std::list<double> outputRays = runTracer(testValues, { q });
     std::cout << "got " << outputRays.size() << " values from shader" << std::endl;
@@ -839,7 +839,7 @@ TEST(Tracer, diffractionTest) {
     double upperDpsi = 1e-05;
 
     double settings = 5;
-    std::shared_ptr<RAYX::OpticalElement> q = std::make_shared<RAYX::OpticalElement>("TestDiffraction", std::vector<double>{ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, settings, 0, 0 }, zeros, zeros, zeros, zeros, zeros, zeros);
+    std::shared_ptr<RAYX::OpticalElement> q = std::make_shared<RAYX::OpticalElement>("TestDiffraction", std::vector<double>{ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, settings, 0, 0 }, zeros, zeros, zeros, zeros);
 
     std::list<double> outputRays = runTracer(testValues, { q });
     std::cout << "got " << outputRays.size() << " values from shader" << std::endl;
@@ -876,7 +876,7 @@ TEST(Tracer, TrigTest) {
     testValues.push_back(r);
     double settings = 1;
 
-    std::shared_ptr<RAYX::OpticalElement> q = std::make_shared<RAYX::OpticalElement>("qq", std::vector<double>{ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, settings, 0, 0 }, zeros, zeros, zeros, zeros, zeros, zeros);
+    std::shared_ptr<RAYX::OpticalElement> q = std::make_shared<RAYX::OpticalElement>("qq", std::vector<double>{ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, settings, 0, 0 }, zeros, zeros, zeros, zeros);
 
     std::list<double> outputRays = runTracer(testValues, { q });
     std::cout << "got " << outputRays.size() << " values from shader" << std::endl;
@@ -957,7 +957,7 @@ TEST(Tracer, vlsGratingTest) {
     correct.push_back(c);
 
     // give z position and setting=4 to start vls test on shader
-    std::shared_ptr<RAYX::OpticalElement> q = std::make_shared<RAYX::OpticalElement>("TestVLS", std::vector<double>{ 0, 0, 0, 0, 0, 0, 0, 0, 0, z, 0, 0, 0, settings, 0, 0 }, zeros, zeros, zeros, zeros, zeros, zeros);
+    std::shared_ptr<RAYX::OpticalElement> q = std::make_shared<RAYX::OpticalElement>("TestVLS", std::vector<double>{ 0, 0, 0, 0, 0, 0, 0, 0, 0, z, 0, 0, 0, settings, 0, 0 }, zeros, zeros, zeros, zeros);
 
     std::list<double> outputRays = runTracer(testValues, { q });
 
@@ -1001,7 +1001,7 @@ TEST(Tracer, planeRefracTest) {
     c = RAYX::Ray(glm::dvec3(0, 1, 0), glm::dvec3(-0.0004999999166666, 0.9966772027014974, 0.081452598714515267), glm::dvec4(1, 1, 0, 0), 0, 0.01239852);
     testValues.push_back(r);
     correct.push_back(c);
-    std::shared_ptr<RAYX::OpticalElement> q = std::make_shared<RAYX::OpticalElement>("TestPlaneRefrac", std::vector<double>{ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, settings, 0, 0 }, zeros, zeros, zeros, zeros, zeros, zeros);
+    std::shared_ptr<RAYX::OpticalElement> q = std::make_shared<RAYX::OpticalElement>("TestPlaneRefrac", std::vector<double>{ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, settings, 0, 0 }, zeros, zeros, zeros, zeros);
 
     std::list<double> outputRays = runTracer(testValues, { q });
     std::cout << "got " << outputRays.size() << " values from shader" << std::endl;
@@ -1023,7 +1023,7 @@ TEST(Tracer, iteratToTest) {
 
     double longRadius = 10470.491787499999;
     double shortRadius = 315.72395939400002;
-    std::shared_ptr<RAYX::OpticalElement> q = std::make_shared<RAYX::OpticalElement>("TestPlaneRefrac", std::vector<double>{ longRadius, shortRadius, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, settings, 0, 0 }, zeros, zeros, zeros, zeros, zeros, zeros);
+    std::shared_ptr<RAYX::OpticalElement> q = std::make_shared<RAYX::OpticalElement>("TestPlaneRefrac", std::vector<double>{ longRadius, shortRadius, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, settings, 0, 0 }, zeros, zeros, zeros, zeros);
 
     std::list<double> outputRays = runTracer(testValues, { q });
     std::cout << "got " << outputRays.size() << " values from shader" << std::endl;
@@ -1042,7 +1042,7 @@ TEST(Tracer, getThetaTest) {
     testValues.push_back(r);
     correct.push_back(c);
 
-    std::shared_ptr<RAYX::OpticalElement> q = std::make_shared<RAYX::OpticalElement>("getThetaTest", std::vector<double>{ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, settings, 0, 0 }, zeros, zeros, zeros, zeros, zeros, zeros);
+    std::shared_ptr<RAYX::OpticalElement> q = std::make_shared<RAYX::OpticalElement>("getThetaTest", std::vector<double>{ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, settings, 0, 0 }, zeros, zeros, zeros, zeros);
 
     std::list<double> outputRays = runTracer(testValues, { q });
     std::cout << "got " << outputRays.size() << " values from shader" << std::endl;
@@ -1311,13 +1311,14 @@ TEST(opticalElements, EllipsoidImagePlane) {
     double beta = 0.31781188513796743;
     ASSERT_DOUBLE_EQ(g_params.getAlpha(), alpha);
     ASSERT_DOUBLE_EQ(g_params.getBeta(), beta);
-    double tangentAngle = g_params.calcTangentAngle(10, 10000, 1000, 0);
+    int coordinatesystem = 0; // misalignment in ellipsoid coordinate system
+    double tangentAngle = g_params.calcTangentAngle(10, 10000, 1000, coordinatesystem);
     
     RAYX::WorldUserParams w_coord = RAYX::WorldUserParams(g_params.getAlpha(), g_params.getBeta(), 0, 10000, std::vector<double>{0, 0, 0, 0, 0, 0}, tangentAngle);
     glm::dvec4 pos = w_coord.calcPosition();
     glm::dmat4x4 or1 = w_coord.calcOrientation();
 
-    std::shared_ptr<RAYX::Ellipsoid> eb = std::make_shared<RAYX::Ellipsoid>("ellipsoid_ip_200default", 0, 50, 200, pos, or1, 10, 10000, 1000, 0, 0, 1, std::vector<double> {0, 0, 0, 0, 0, 0}, zeros7);
+    std::shared_ptr<RAYX::Ellipsoid> eb = std::make_shared<RAYX::Ellipsoid>("ellipsoid_ip_200default", 0, 50, 200, pos, or1, 10, 10000, 1000, 0, 1, zeros7);
     
     RAYX::WorldUserParams w_coord2 = RAYX::WorldUserParams(0, 0, 0, 1000, std::vector<double>{0, 0, 0, 0, 0, 0});
     glm::dvec4 pos2 = w_coord2.calcPosition(w_coord, pos, or1);
@@ -1325,6 +1326,54 @@ TEST(opticalElements, EllipsoidImagePlane) {
     std::shared_ptr<RAYX::ImagePlane> i = std::make_shared<RAYX::ImagePlane>("ImagePlane", pos2, or2);
     
     testOpticalElement({ eb, i }, 200);
+}
+
+TEST(opticalElements, EllipsoidImagePlane_ellipsmisalignment) {
+    RAYX::GeometricUserParams g_params = RAYX::GeometricUserParams(10, 10000, 1000);
+    double alpha = 0.031253965260898464;
+    double beta = 0.31781188513796743;
+    ASSERT_DOUBLE_EQ(g_params.getAlpha(), alpha);
+    ASSERT_DOUBLE_EQ(g_params.getBeta(), beta);
+    int coordinatesystem = 0; // misalignment in ellipsoid coordinate system
+    double tangentAngle = g_params.calcTangentAngle(10, 10000, 1000, coordinatesystem);
+    
+    RAYX::WorldUserParams w_coord = RAYX::WorldUserParams(g_params.getAlpha(), g_params.getBeta(), 0, 10000, std::vector<double>{1, 2, 3, 0.004, 0.005, 0.006}, tangentAngle);
+    glm::dvec4 pos = w_coord.calcPosition();
+    glm::dmat4x4 or1 = w_coord.calcOrientation();
+
+    std::shared_ptr<RAYX::Ellipsoid> eb = std::make_shared<RAYX::Ellipsoid>("ellipsoid_ip_200ellipsmis", 0, 50, 200, pos, or1, 10, 10000, 1000, 0, 1, zeros7);
+    
+    RAYX::WorldUserParams w_coord2 = RAYX::WorldUserParams(0, 0, 0, 1000, std::vector<double>{0, 0, 0, 0, 0, 0});
+    glm::dvec4 pos2 = w_coord2.calcPosition(w_coord, pos, or1);
+    glm::dmat4x4 or2 = w_coord2.calcOrientation(w_coord, pos, or1);
+    std::shared_ptr<RAYX::ImagePlane> i = std::make_shared<RAYX::ImagePlane>("ImagePlane", pos2, or2);
+    
+    testOpticalElement({ eb, i }, 200);
+}
+
+TEST(opticalElements, EllipsoidImagePlane_mirrormisalignment) {
+    RAYX::GeometricUserParams g_params = RAYX::GeometricUserParams(10, 10000, 1000);
+    double alpha = 0.031253965260898464;
+    double beta = 0.31781188513796743;
+    ASSERT_DOUBLE_EQ(g_params.getAlpha(), alpha);
+    ASSERT_DOUBLE_EQ(g_params.getBeta(), beta);
+    int coordinatesystem = 1; // misalignment in mirror coordinate system
+    double tangentAngle = g_params.calcTangentAngle(10, 10000, 1000, coordinatesystem);
+    ASSERT_DOUBLE_EQ(tangentAngle, 0.14327895993853446);
+    
+    RAYX::WorldUserParams w_coord = RAYX::WorldUserParams(g_params.getAlpha(), g_params.getBeta(), 0, 10000, std::vector<double>{1, 2, 3, 0.004, 0.005, 0.006}, tangentAngle);
+    glm::dvec4 pos = w_coord.calcPosition();
+    glm::dmat4x4 or1 = w_coord.calcOrientation();
+
+    std::shared_ptr<RAYX::Ellipsoid> eb = std::make_shared<RAYX::Ellipsoid>("ellipsoid_ip_200mirrormis", 0, 50, 200, pos, or1, 10, 10000, 1000, 0, 1, zeros7);
+    
+    RAYX::WorldUserParams w_coord2 = RAYX::WorldUserParams(0, 0, 0, 1000, std::vector<double>{0, 0, 0, 0, 0, 0});
+    glm::dvec4 pos2 = w_coord2.calcPosition(w_coord, pos, or1);
+    glm::dmat4x4 or2 = w_coord2.calcOrientation(w_coord, pos, or1);
+    std::shared_ptr<RAYX::ImagePlane> i = std::make_shared<RAYX::ImagePlane>("ImagePlane", pos2, or2);
+    eb->setOutMatrix(glmToVector16(glm::dmat4x4(1,0,0,0, 0,1,0,0, 0,0,1,0, 0,0,0,1))); // to make comparison with old ray files possible, use the beam coordinate system
+    
+    testOpticalElement({ eb }, 200);
 }
 
 TEST(opticalElements, Ellipsoid) {
@@ -1339,7 +1388,7 @@ TEST(opticalElements, Ellipsoid) {
     glm::dvec4 pos = w_coord.calcPosition();
     glm::dmat4x4 or1 = w_coord.calcOrientation();
 
-    std::shared_ptr<RAYX::Ellipsoid> eb = std::make_shared<RAYX::Ellipsoid>("ellipsoid_200default", 0, 50, 200, pos, or1, 10, 10000, 1000, 0, 0, 1, std::vector<double> {0, 0, 0, 0, 0, 0}, zeros7);
+    std::shared_ptr<RAYX::Ellipsoid> eb = std::make_shared<RAYX::Ellipsoid>("ellipsoid_200default", 0, 50, 200, pos, or1, 10, 10000, 1000, 0, 1, zeros7);
     eb->setOutMatrix(glmToVector16(glm::transpose(w_coord.calcE2B()))); // to make comparison with old ray files possible, use the beam coordinate system
     testOpticalElement({ eb }, 200);
 }

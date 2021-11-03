@@ -288,6 +288,21 @@ class Tests(unittest.TestCase):
         result = open_new_file('testFile_ellipsoid_ip_200default.csv', valid=1)
         self.assertTrue(correct.shape == result.shape)
         self.assertTrue(np.allclose(correct, result))    
+    
+    def test_ellipsoid_mirror_imageplane_ellipsmis200(self):
+        correct = open_old_file(
+            'ImagePlane-RawRaysOutgoing_ellipsmis200.csv', 'ImagePlane_')
+        result = open_new_file('testFile_ellipsoid_ip_200ellipsmis.csv', valid=1)
+        self.assertTrue(correct.shape == result.shape)
+        self.assertTrue(np.allclose(correct, result))    
+        
+    def test_ellipsoid_mirror_imageplane_mirrormis200(self):
+        correct = open_old_file(
+            'ImagePlane-RawRaysOutgoing_mirrormis200.csv', 'ImagePlane_')
+        result = open_new_file('testFile_ellipsoid_ip_200mirrormis.csv', valid=1)
+        self.assertTrue(correct.shape == result.shape)
+        self.assertTrue(np.allclose(correct, result))    
+        
         
         
     
