@@ -253,7 +253,7 @@ TEST(Ellips, defaultParams) {
     EXPECT_NEAR(eb.getHalfAxisC(), shortHalfAxisC, 0.0000001);
     EXPECT_NEAR(eb.getY0(), y0, 0.0000001);
     EXPECT_NEAR(eb.getZ0(), z0, 0.0000001);
-    EXPECT_NEAR(eb.getTangentAngle(), tangentAngle, 0.0000001);
+    EXPECT_NEAR(eb.getTangentAngle(), correctTangentAngle, 0.0000001);
     EXPECT_ITERABLE_DOUBLE_EQ(std::vector<double>, surface, eb.getSurfaceParams());
     EXPECT_ITERABLE_DOUBLE_EQ(std::vector<double>, elementParams, eb.getElementParameters());
     
