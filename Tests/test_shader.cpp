@@ -263,41 +263,18 @@ void testOpticalElement(std::vector<std::shared_ptr<RAYX::OpticalElement>> eleme
 
 // UNIT TESTS
 /** checks whether this computer has a GPU capable of running the upcoming tests */
-bool hasCapableGPU() {
-    VkApplicationInfo appInfo{};
-    appInfo.sType = VK_STRUCTURE_TYPE_APPLICATION_INFO;
-    appInfo.pApplicationName = "Capable GPU Tester";
-    appInfo.applicationVersion = VK_MAKE_VERSION(1, 0, 0);
-    appInfo.pEngineName = "No Engine";
-    appInfo.engineVersion = VK_MAKE_VERSION(1, 0, 0);
-    appInfo.apiVersion = VK_API_VERSION_1_0;
-
-    VkInstanceCreateInfo createInfo{};
-    createInfo.sType = VK_STRUCTURE_TYPE_INSTANCE_CREATE_INFO;
-    createInfo.pApplicationInfo = &appInfo;
-    createInfo.enabledExtensionCount = 0;
-    createInfo.ppEnabledExtensionNames = nullptr;
-    createInfo.enabledLayerCount = 0;
-    createInfo.pNext = nullptr;
-
-    VkInstance instance;
-
-    if (vkCreateInstance(&createInfo, nullptr, &instance) != VK_SUCCESS) {
+bool shouldDoVulkanTests() {
+    #ifdef VULKAN_TEST
+        std::cout << "doing vulkan tests!\n";
+        return true;
+    #else
+        std::cout << "NOT doing vulkan tests! :(\n";
         return false;
-    }
-
-    uint32_t deviceCount;
-    if (vkEnumeratePhysicalDevices(instance, &deviceCount, nullptr) != VK_SUCCESS) {
-        vkDestroyInstance(instance, nullptr);
-        return false;
-    }
-
-    vkDestroyInstance(instance, nullptr);
-    return deviceCount > 0;
+    #endif
 }
 
 TEST(Tracer, testUniformRandom) {
-    if (!hasCapableGPU()) { return; }
+    if (!shouldDoVulkanTests()) { return GTEST_SKIP(); }
 
     double settings = 17;
 
@@ -319,7 +296,7 @@ TEST(Tracer, testUniformRandom) {
 
 
 TEST(Tracer, ExpTest) {
-    if (!hasCapableGPU()) { return; }
+    if (!shouldDoVulkanTests()) { return GTEST_SKIP(); }
 
     std::list<std::vector<RAYX::Ray>> rayList;
     int n = 10;
@@ -345,7 +322,7 @@ TEST(Tracer, ExpTest) {
 }
 
 TEST(Tracer, LogTest) {
-    if (!hasCapableGPU()) { return; }
+    if (!shouldDoVulkanTests()) { return GTEST_SKIP(); }
 
     std::list<std::vector<RAYX::Ray>> rayList;
     int n = 10;
@@ -372,7 +349,7 @@ TEST(Tracer, LogTest) {
 
 
 TEST(Tracer, testRefrac2D) {
-    if (!hasCapableGPU()) { return; }
+    if (!shouldDoVulkanTests()) { return GTEST_SKIP(); }
 
     std::vector<RAYX::Ray> testValues;
     std::vector<RAYX::Ray> correct;
@@ -425,7 +402,7 @@ TEST(Tracer, testRefrac2D) {
 }
 
 TEST(Tracer, testNormalCartesian) {
-    if (!hasCapableGPU()) { return; }
+    if (!shouldDoVulkanTests()) { return GTEST_SKIP(); }
 
     std::vector<RAYX::Ray> testValues;
     std::vector<RAYX::Ray> correct;
@@ -467,7 +444,7 @@ TEST(Tracer, testNormalCartesian) {
 }
 
 TEST(Tracer, testNormalCylindrical) {
-    if (!hasCapableGPU()) { return; }
+    if (!shouldDoVulkanTests()) { return GTEST_SKIP(); }
 
     std::vector<RAYX::Ray> testValues;
     std::vector<RAYX::Ray> correct;
@@ -509,7 +486,7 @@ TEST(Tracer, testNormalCylindrical) {
 }
 
 TEST(Tracer, testRefrac) {
-    if (!hasCapableGPU()) { return; }
+    if (!shouldDoVulkanTests()) { return GTEST_SKIP(); }
 
     std::vector<RAYX::Ray> testValues;
     std::vector<RAYX::Ray> correct;
@@ -547,7 +524,7 @@ TEST(Tracer, testRefrac) {
 }
 
 TEST(Tracer, testRefracBeyondHor) {
-    if (!hasCapableGPU()) { return; }
+    if (!shouldDoVulkanTests()) { return GTEST_SKIP(); }
 
     std::vector<RAYX::Ray> testValues;
     std::vector<RAYX::Ray> correct;
@@ -573,7 +550,7 @@ TEST(Tracer, testRefracBeyondHor) {
 }
 
 TEST(Tracer, testWasteBox) {
-    if (!hasCapableGPU()) { return; }
+    if (!shouldDoVulkanTests()) { return GTEST_SKIP(); }
 
     std::vector<RAYX::Ray> testValues;
     std::vector<RAYX::Ray> correct;
@@ -614,7 +591,7 @@ TEST(Tracer, testWasteBox) {
 }
 
 TEST(Tracer, testRZPLineDensityDefaulParams) { // point to point
-    if (!hasCapableGPU()) { return; }
+    if (!shouldDoVulkanTests()) { return GTEST_SKIP(); }
 
     std::vector<RAYX::Ray> testValues;
     std::vector<RAYX::Ray> correct;
@@ -656,7 +633,7 @@ TEST(Tracer, testRZPLineDensityDefaulParams) { // point to point
 }
 
 TEST(Tracer, testRZPLineDensityAstigmatic) { // astigmatic 2 astigmatic
-    if (!hasCapableGPU()) { return; }
+    if (!shouldDoVulkanTests()) { return GTEST_SKIP(); }
 
     VulkanTracer tracer;
     std::vector<RAYX::Ray> testValues;
@@ -702,7 +679,7 @@ TEST(Tracer, testRZPLineDensityAstigmatic) { // astigmatic 2 astigmatic
 
 // test pow(a,b) = a^b function. ray position[i] ^ ray direction[i] for i in {0,1,2}
 TEST(Tracer, testRayMatrixMult) {
-    if (!hasCapableGPU()) { return; }
+    if (!shouldDoVulkanTests()) { return GTEST_SKIP(); }
 
     std::vector<RAYX::Ray> testValues;
     std::vector<RAYX::Ray> correct;
@@ -735,7 +712,7 @@ TEST(Tracer, testRayMatrixMult) {
 
 // test pow(a,b) = a^b function. ray position[i] ^ ray direction[i] for i in {0,1,2}
 TEST(Tracer, testDPow) {
-    if (!hasCapableGPU()) { return; }
+    if (!shouldDoVulkanTests()) { return GTEST_SKIP(); }
 
     std::vector<RAYX::Ray> testValues;
     std::vector<RAYX::Ray> correct;
@@ -781,7 +758,7 @@ TEST(Tracer, testDPow) {
 
 // test pow(a,b) = a^b function. ray position[i] ^ ray direction[i] for i in {0,1,2}
 TEST(Tracer, testCosini) {
-    if (!hasCapableGPU()) { return; }
+    if (!shouldDoVulkanTests()) { return GTEST_SKIP(); }
 
     VulkanTracer tracer;
     std::vector<RAYX::Ray> testValues;
@@ -831,7 +808,7 @@ TEST(Tracer, testCosini) {
 
 // test factorial f(a) = a!
 TEST(Tracer, factTest) {
-    if (!hasCapableGPU()) { return; }
+    if (!shouldDoVulkanTests()) { return GTEST_SKIP(); }
 
     VulkanTracer tracer;
     std::vector<RAYX::Ray> testValues;
@@ -858,7 +835,7 @@ TEST(Tracer, factTest) {
 }
 
 TEST(Tracer, bessel1Test) {
-    if (!hasCapableGPU()) { return; }
+    if (!shouldDoVulkanTests()) { return GTEST_SKIP(); }
 
     VulkanTracer tracer;
     std::vector<RAYX::Ray> testValues;
@@ -885,7 +862,7 @@ TEST(Tracer, bessel1Test) {
 
 
 TEST(Tracer, diffractionTest) {
-    if (!hasCapableGPU()) { return; }
+    if (!shouldDoVulkanTests()) { return GTEST_SKIP(); }
 
     VulkanTracer tracer;
     std::vector<RAYX::Ray> testValues;
@@ -927,7 +904,7 @@ TEST(Tracer, diffractionTest) {
 }
 
 TEST(Tracer, TrigTest) {
-    if (!hasCapableGPU()) { return; }
+    if (!shouldDoVulkanTests()) { return GTEST_SKIP(); }
 
     std::list<std::vector<RAYX::Ray>> rayList;
     int n = 10;
@@ -1003,7 +980,7 @@ TEST(Tracer, TrigTest) {
 
 // test VLS function that calculates new a from given a, z-position and 6 vls parameters
 TEST(Tracer, vlsGratingTest) {
-    if (!hasCapableGPU()) { return; }
+    if (!shouldDoVulkanTests()) { return GTEST_SKIP(); }
 
     std::vector<RAYX::Ray> testValues;
     std::vector<RAYX::Ray> correct;
@@ -1036,7 +1013,7 @@ TEST(Tracer, vlsGratingTest) {
 }
 
 TEST(Tracer, planeRefracTest) {
-    if (!hasCapableGPU()) { return; }
+    if (!shouldDoVulkanTests()) { return GTEST_SKIP(); }
 
     std::vector<RAYX::Ray> testValues;
     std::vector<RAYX::Ray> correct;
@@ -1082,7 +1059,7 @@ TEST(Tracer, planeRefracTest) {
 }
 
 TEST(Tracer, iteratToTest) {
-    if (!hasCapableGPU()) { return; }
+    if (!shouldDoVulkanTests()) { return GTEST_SKIP(); }
 
     std::vector<RAYX::Ray> testValues;
     std::vector<RAYX::Ray> correct;
@@ -1106,7 +1083,7 @@ TEST(Tracer, iteratToTest) {
 }
 
 TEST(Tracer, getThetaTest) {
-    if (!hasCapableGPU()) { return; }
+    if (!shouldDoVulkanTests()) { return GTEST_SKIP(); }
 
     std::vector<RAYX::Ray> testValues;
     std::vector<RAYX::Ray> correct;
@@ -1134,7 +1111,7 @@ TEST(Tracer, getThetaTest) {
 // use name of optical element as file name
 
 TEST(opticalElements, planeMirrorDefault) {
-    if (!hasCapableGPU()) { return; }
+    if (!shouldDoVulkanTests()) { return GTEST_SKIP(); }
 
     RAYX::WorldUserParams pm_param = RAYX::WorldUserParams(degToRad(10), degToRad(10), degToRad(7.5), 10000, std::vector<double>{ 0, 0, 0, 0, 0, 0 });
     glm::dvec4 pos_mirror = pm_param.calcPosition();
@@ -1154,7 +1131,7 @@ TEST(opticalElements, planeMirrorDefault) {
 }
 
 TEST(opticalElements, planeMirrorMis) {
-    if (!hasCapableGPU()) { return; }
+    if (!shouldDoVulkanTests()) { return GTEST_SKIP(); }
 
     RAYX::WorldUserParams pm_param = RAYX::WorldUserParams(degToRad(10), degToRad(10), 0, 10000, std::vector<double>{ 1, 2, 3, 0.001, 0.002, 0.003 });
     glm::dvec4 pos_mirror = pm_param.calcPosition();
@@ -1173,7 +1150,7 @@ TEST(opticalElements, planeMirrorMis) {
 }
 
 TEST(opticalElements, sphereMirror) {
-    if (!hasCapableGPU()) { return; }
+    if (!shouldDoVulkanTests()) { return GTEST_SKIP(); }
 
     double grazingIncidence = degToRad(10);
     RAYX::WorldUserParams sm_param = RAYX::WorldUserParams(grazingIncidence, grazingIncidence, 0, 10000, std::vector<double>{ 0, 0, 0, 0, 0, 0 });
@@ -1193,7 +1170,7 @@ TEST(opticalElements, sphereMirror) {
 }
 
 TEST(opticalElements, planeGratingDevDefault) {
-    if (!hasCapableGPU()) { return; }
+    if (!shouldDoVulkanTests()) { return GTEST_SKIP(); }
 
     double incidenceAngle = 1.4773068838645145;
     double exitAngle = 1.4897528445258457;
@@ -1215,7 +1192,7 @@ TEST(opticalElements, planeGratingDevDefault) {
 }
 
 TEST(opticalElements, planeGratingDevAzimuthal) {
-    if (!hasCapableGPU()) { return; }
+    if (!shouldDoVulkanTests()) { return GTEST_SKIP(); }
 
     double incidenceAngle = 1.4773068838645145;
     double exitAngle = 1.4897528445258457;
@@ -1236,7 +1213,7 @@ TEST(opticalElements, planeGratingDevAzimuthal) {
 }
 
 TEST(opticalElements, planeGratingDevAzMis) {
-    if (!hasCapableGPU()) { return; }
+    if (!shouldDoVulkanTests()) { return GTEST_SKIP(); }
 
     double incidenceAngle = 1.4773068838645145;
     double exitAngle = 1.4897528445258457;
@@ -1258,7 +1235,7 @@ TEST(opticalElements, planeGratingDevAzMis) {
 
 // constant incidence angle mode, azimuthal angle and misalignment
 TEST(opticalElements, planeGratingIncAzMis) {
-    if (!hasCapableGPU()) { return; }
+    if (!shouldDoVulkanTests()) { return GTEST_SKIP(); }
 
     double incidenceAngle = 1.3962634015954636;
     double exitAngle = 1.4088395764879007;
@@ -1280,7 +1257,7 @@ TEST(opticalElements, planeGratingIncAzMis) {
 }
 
 TEST(opticalElements, planeGratingDevMisVLS) {
-    if (!hasCapableGPU()) { return; }
+    if (!shouldDoVulkanTests()) { return GTEST_SKIP(); }
 
     double incidenceAngle = 1.4773068838645145;
     double exitAngle = 1.4897528445258457;
@@ -1303,7 +1280,7 @@ TEST(opticalElements, planeGratingDevMisVLS) {
 // RZPs
 
 TEST(opticalElements, RZPDefaultParams) {
-    if (!hasCapableGPU()) { return; }
+    if (!shouldDoVulkanTests()) { return GTEST_SKIP(); }
 
     // alpha and beta calculated from user parameters
     RAYX::GeometricUserParams gu_rzp = RAYX::GeometricUserParams(1, 0, 170, 0, 0, 100, 100, -1, -1, 1, 1, 100, 500, 100, 500);
@@ -1328,7 +1305,7 @@ TEST(opticalElements, RZPDefaultParams) {
 }
 
 TEST(opticalElements, RZPDefaultParams200) {
-    if (!hasCapableGPU()) { return; }
+    if (!shouldDoVulkanTests()) { return GTEST_SKIP(); }
 
     RAYX::GeometricUserParams gu_rzp = RAYX::GeometricUserParams(1, 0, 170, 0, 0, 100, 100, -1, -1, 1, 1, 100, 500, 100, 500);
     ASSERT_DOUBLE_EQ(gu_rzp.getAlpha(), 0.017453292519943295);
@@ -1353,7 +1330,7 @@ TEST(opticalElements, RZPDefaultParams200) {
 
 
 TEST(opticalElements, RZPAzimuthal200) {
-    if (!hasCapableGPU()) { return; }
+    if (!shouldDoVulkanTests()) { return GTEST_SKIP(); }
 
     RAYX::GeometricUserParams gu_rzp = RAYX::GeometricUserParams(1, 0, 170, 0, 0, 100, 100, -1, -1, 1, 1, 100, 500, 100, 500);
     RAYX::WorldUserParams rzp_param = RAYX::WorldUserParams(gu_rzp.getAlpha(), gu_rzp.getBeta(), degToRad(10), 10000, std::vector<double>{ 0, 0, 0, 0, 0, 0 });
@@ -1384,7 +1361,7 @@ TEST(opticalElements, RZPAzimuthal200) {
 
 
 TEST(opticalElements, RZPMis) {
-    if (!hasCapableGPU()) { return; }
+    if (!shouldDoVulkanTests()) { return GTEST_SKIP(); }
 
     RAYX::GeometricUserParams gu_rzp = RAYX::GeometricUserParams(1, 0, 170, 0, 0, 100, 100, -1, -1, 1, 1, 100, 500, 100, 500);
     RAYX::WorldUserParams rzp_param = RAYX::WorldUserParams(gu_rzp.getAlpha(), gu_rzp.getBeta(), 0, 10000, std::vector<double>{ 1, 2, 3, 0.001, 0.002, 0.003 });
@@ -1405,7 +1382,7 @@ TEST(opticalElements, RZPMis) {
 }
 
 TEST(opticalElements, EllipsoidImagePlane) {
-    if (!hasCapableGPU()) { return; }
+    if (!shouldDoVulkanTests()) { return GTEST_SKIP(); }
 
     RAYX::GeometricUserParams g_params = RAYX::GeometricUserParams(10, 10000, 1000);
     double alpha = 0.031253965260898464;
@@ -1430,7 +1407,7 @@ TEST(opticalElements, EllipsoidImagePlane) {
 }
 
 TEST(opticalElements, EllipsoidImagePlane_ellipsmisalignment) {
-    if (!hasCapableGPU()) { return; }
+    if (!shouldDoVulkanTests()) { return GTEST_SKIP(); }
 
     RAYX::GeometricUserParams g_params = RAYX::GeometricUserParams(10, 10000, 1000);
     double alpha = 0.031253965260898464;
@@ -1455,7 +1432,7 @@ TEST(opticalElements, EllipsoidImagePlane_ellipsmisalignment) {
 }
 
 TEST(opticalElements, EllipsoidImagePlane_mirrormisalignment) {
-    if (!hasCapableGPU()) { return; }
+    if (!shouldDoVulkanTests()) { return GTEST_SKIP(); }
 
     RAYX::GeometricUserParams g_params = RAYX::GeometricUserParams(10, 10000, 1000);
     double alpha = 0.031253965260898464;
@@ -1482,7 +1459,7 @@ TEST(opticalElements, EllipsoidImagePlane_mirrormisalignment) {
 }
 
 TEST(opticalElements, Ellipsoid) {
-    if (!hasCapableGPU()) { return; }
+    if (!shouldDoVulkanTests()) { return GTEST_SKIP(); }
 
     RAYX::GeometricUserParams g_params = RAYX::GeometricUserParams(10, 10000, 1000);
     double alpha = 0.031253965260898464;
@@ -1501,7 +1478,7 @@ TEST(opticalElements, Ellipsoid) {
 }
 
 TEST(opticalElements, ImagePlane) {
-    if (!hasCapableGPU()) { return; }
+    if (!shouldDoVulkanTests()) { return GTEST_SKIP(); }
 
     RAYX::GeometricUserParams g_params = RAYX::GeometricUserParams(10);
     ASSERT_DOUBLE_EQ(g_params.getAlpha(), degToRad(10));
@@ -1523,7 +1500,7 @@ TEST(opticalElements, ImagePlane) {
 
 
 TEST(globalCoordinates, FourMirrors_9Rays) {
-    if (!hasCapableGPU()) { return; }
+    if (!shouldDoVulkanTests()) { return GTEST_SKIP(); }
 
     RAYX::GeometricUserParams g_params = RAYX::GeometricUserParams(10);
     RAYX::WorldUserParams w_coord = RAYX::WorldUserParams(degToRad(10), degToRad(10), degToRad(7), 10, std::vector<double>{0, 0, 0, 0, 0, 0});
@@ -1563,7 +1540,7 @@ TEST(globalCoordinates, FourMirrors_9Rays) {
 }
 
 TEST(globalCoordinates, FourMirrors_20Rays) {
-    if (!hasCapableGPU()) { return; }
+    if (!shouldDoVulkanTests()) { return GTEST_SKIP(); }
 
     RAYX::GeometricUserParams g_params = RAYX::GeometricUserParams(10);
     RAYX::WorldUserParams w_coord = RAYX::WorldUserParams(degToRad(10), degToRad(10), degToRad(7), 10, std::vector<double>{0, 0, 0, 0, 0, 0});
@@ -1603,7 +1580,7 @@ TEST(globalCoordinates, FourMirrors_20Rays) {
 }
 
 TEST(opticalElements, slit1) {
-    if (!hasCapableGPU()) { return; }
+    if (!shouldDoVulkanTests()) { return GTEST_SKIP(); }
 
     RAYX::SimulationEnv::get().m_numOfRays = 200;
     RAYX::EnergyDistribution dist(RAYX::EnergyRange(100, 0), true);
@@ -1646,7 +1623,7 @@ TEST(opticalElements, slit1) {
 }
 
 TEST(opticalElements, slit2) {
-    if (!hasCapableGPU()) { return; }
+    if (!shouldDoVulkanTests()) { return GTEST_SKIP(); }
 
     RAYX::WorldUserParams s_param = RAYX::WorldUserParams(0, 0, 0, 10000, std::vector<double>{ 0, 0, 0, 0, 0, 0 });
     glm::dvec4 s_position = s_param.calcPosition();
@@ -1664,7 +1641,7 @@ TEST(opticalElements, slit2) {
 
 
 TEST(opticalElements, toroid) {
-    if (!hasCapableGPU()) { return; }
+    if (!shouldDoVulkanTests()) { return GTEST_SKIP(); }
 
     RAYX::WorldUserParams t_param = RAYX::WorldUserParams(degToRad(10), degToRad(10), 0, 10000, std::vector<double>{ 0, 0, 0, 0, 0, 0 });
     glm::dvec4 t_position = t_param.calcPosition();
@@ -1686,7 +1663,7 @@ TEST(opticalElements, toroid) {
 // PETES SETUP
 // spec1-first_rzp4mm
 TEST(PeteRZP, spec1_first_rzp) {
-    if (!hasCapableGPU()) { return; }
+    if (!shouldDoVulkanTests()) { return GTEST_SKIP(); }
 
     RAYX::SimulationEnv::get().m_numOfRays = 20000;
     RAYX::EnergyDistribution dist(RAYX::EnergyRange(640, 120), false);
@@ -1708,7 +1685,7 @@ TEST(PeteRZP, spec1_first_rzp) {
 }
 
 TEST(PeteRZP, spec1_first_ip) {
-    if (!hasCapableGPU()) { return; }
+    if (!shouldDoVulkanTests()) { return GTEST_SKIP(); }
 
     RAYX::SimulationEnv::get().m_numOfRays = 20000;
     RAYX::EnergyDistribution dist(RAYX::EnergyRange(640, 120), false);
@@ -1735,7 +1712,7 @@ TEST(PeteRZP, spec1_first_ip) {
 }
 
 TEST(PeteRZP, spec1_first_plus_rzp) {
-    if (!hasCapableGPU()) { return; }
+    if (!shouldDoVulkanTests()) { return GTEST_SKIP(); }
 
     RAYX::SimulationEnv::get().m_numOfRays = 20000;
     RAYX::EnergyDistribution dist(RAYX::EnergyRange(640, 120), false);
@@ -1758,7 +1735,7 @@ TEST(PeteRZP, spec1_first_plus_rzp) {
 }
 
 TEST(PeteRZP, spec1_first_plus_ip) {
-    if (!hasCapableGPU()) { return; }
+    if (!shouldDoVulkanTests()) { return GTEST_SKIP(); }
 
     RAYX::SimulationEnv::get().m_numOfRays = 20000;
     RAYX::EnergyDistribution dist(RAYX::EnergyRange(640, 120), false);
@@ -1785,7 +1762,7 @@ TEST(PeteRZP, spec1_first_plus_ip) {
 }
 
 TEST(PeteRZP, spec1_first_minus_rzp2) {
-    if (!hasCapableGPU()) { return; }
+    if (!shouldDoVulkanTests()) { return GTEST_SKIP(); }
 
     RAYX::SimulationEnv::get().m_numOfRays = 20000;
     RAYX::EnergyDistribution dist(RAYX::EnergyRange(640, 120), false);
@@ -1808,7 +1785,7 @@ TEST(PeteRZP, spec1_first_minus_rzp2) {
 }
 
 TEST(PeteRZP, spec1_first_minus_ip2) {
-    if (!hasCapableGPU()) { return; }
+    if (!shouldDoVulkanTests()) { return GTEST_SKIP(); }
 
     RAYX::SimulationEnv::get().m_numOfRays = 20000;
     RAYX::EnergyDistribution dist(RAYX::EnergyRange(640, 120), false);

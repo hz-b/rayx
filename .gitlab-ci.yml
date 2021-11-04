@@ -16,6 +16,7 @@ build-job:
   stage: build
   script:
     - git submodule update --init --recursive
+    - cmake -D VulkanTest:BOOL=OFF .
     - mkdir build && cd build
     - cmake ..
     - cmake --build .
