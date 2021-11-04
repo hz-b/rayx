@@ -15,9 +15,11 @@ set(SOURCES ${TEST_SOURCES})
 add_executable(${BINARY} ${TEST_SOURCES})
 add_test(NAME ${BINARY} COMMAND ${BINARY})
 
-option(VulkanTest "VulkanTest" ON)
-if (VulkanTest)
+if ("$ENV{VULKAN_TEST}" STREQUAL "NO")
+	message("#here No Vulkan Test!")
+else()
 	target_compile_options(${BINARY} PRIVATE -DVULKAN_TEST)
+	message("#here Vulkan Test!")
 endif()
 
 #if (WIN32)

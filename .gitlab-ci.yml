@@ -16,10 +16,9 @@ build-job:
   stage: build
   script:
     - git submodule update --init --recursive
-    - cmake -D VulkanTest:BOOL=OFF .
     - mkdir build && cd build
-    - cmake ..
-    - cmake --build .
+    - VULKAN_TEST=NO cmake ..
+    - VULKAN_TEST=NO cmake --build .
     - ls
   artifacts:
     paths:
