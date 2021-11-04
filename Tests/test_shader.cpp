@@ -262,12 +262,13 @@ void testOpticalElement(std::vector<std::shared_ptr<RAYX::OpticalElement>> eleme
 }
 
 // UNIT TESTS
+/** using this function is preferable to directly adding your test with `#ifdef VULKAN_TEST`,
+ * because with `if (!shouldDoVulkanTests()) { GTEST_SKIP(); }` your test will still be *compiled* even if VULKAN_TEST is diabled
+ */
 bool shouldDoVulkanTests() {
     #ifdef VULKAN_TEST
-        std::cout << "doing vulkan tests!\n";
         return true;
     #else
-        std::cout << "NOT doing vulkan tests! :(\n";
         return false;
     #endif
 }
