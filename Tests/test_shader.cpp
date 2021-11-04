@@ -262,7 +262,6 @@ void testOpticalElement(std::vector<std::shared_ptr<RAYX::OpticalElement>> eleme
 }
 
 // UNIT TESTS
-/** checks whether this computer has a GPU capable of running the upcoming tests */
 bool shouldDoVulkanTests() {
     #ifdef VULKAN_TEST
         std::cout << "doing vulkan tests!\n";
