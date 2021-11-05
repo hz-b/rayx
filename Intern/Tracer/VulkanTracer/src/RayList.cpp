@@ -14,7 +14,7 @@ void RayList::addVector() {
     if (m_rayList.size() > 0) {
 
         //std::cout<<"addVector: last vector size= "<< m_rayList.back().size() <<std::endl;    
-        assert(("Size of last Ray vector is not equal to RAY_VECTOR_SIZE", (m_rayList.back()).size() == RAY_MAX_ELEMENTS_IN_VECTOR));
+        assert(((m_rayList.back()).size() == RAY_MAX_ELEMENTS_IN_VECTOR) && "Size of last Ray vector is not equal to RAY_VECTOR_SIZE");
 
     }
     std::vector<Ray> newRayVector;
@@ -28,7 +28,6 @@ void RayList::addVector() {
 void RayList::insertVector(void* location, size_t inputSize) {
     //std::cout<<"insert vector: start"<<std::endl;
     std::vector<Ray> input;
-    size_t lastVectorSize = 0;
     //if the last vector of the list is full, we can just append
     //std::cout<<"RayList size= "<< m_rayList.size() <<std::endl;
     //std::cout << "input size= " << inputSize << std::endl;
@@ -49,7 +48,7 @@ void RayList::insertVector(void* location, size_t inputSize) {
         }
         size_t bytesToCopy = std::min(remainingBytes, freeBytes);
         //std::cout << "insertVector: bytesToCopy: " << bytesToCopy << std::endl;
-        memcpy((m_rayList.back().data() + m_rayList.back().size()), (char*)(location + (inputSize * RAY_DOUBLE_COUNT * sizeof(double) - remainingBytes)), bytesToCopy);
+        memcpy((m_rayList.back().data() + m_rayList.back().size()), (char*) location + (inputSize * RAY_DOUBLE_COUNT * sizeof(double) - remainingBytes), bytesToCopy);
         (m_rayList.back()).resize(m_rayList.back().size() + (bytesToCopy / (RAY_DOUBLE_COUNT * sizeof(double))));
         //std::cout << "insertVector: m_rayList.back().size(): " << m_rayList.back().size() << std::endl;
         //std::cout << "insertVector: sample ray: " << m_rayList.back()[0].getxDir() << std::endl;

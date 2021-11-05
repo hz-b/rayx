@@ -265,7 +265,7 @@ std::vector<const char*> VulkanTracer::getRequiredDeviceExtensions()
 
 	return extensions;
 }
-VKAPI_ATTR VkBool32 VKAPI_CALL VulkanTracer::debugCallback(VkDebugUtilsMessageSeverityFlagBitsEXT messageSeverity, VkDebugUtilsMessageTypeFlagsEXT messageType, const VkDebugUtilsMessengerCallbackDataEXT* pCallbackData, void* pUserData)
+VKAPI_ATTR VkBool32 VKAPI_CALL VulkanTracer::debugCallback(VkDebugUtilsMessageSeverityFlagBitsEXT messageSeverity, [[maybe_unused]] VkDebugUtilsMessageTypeFlagsEXT messageType, const VkDebugUtilsMessengerCallbackDataEXT* pCallbackData, [[maybe_unused]] void* pUserData)
 {	
 	// Only show Warnings or higher severity bits
 	if (messageSeverity >= VK_DEBUG_UTILS_MESSAGE_SEVERITY_WARNING_BIT_EXT){
@@ -534,7 +534,7 @@ void VulkanTracer::fillRayBuffer() {
 }
 
 //the input buffer is filled with the ray data
-void VulkanTracer::fillStagingBuffer(uint32_t offset, std::list<std::vector<Ray>>::iterator raySetIterator, size_t vectorsPerStagingBuffer)
+void VulkanTracer::fillStagingBuffer([[maybe_unused]] uint32_t offset, std::list<std::vector<Ray>>::iterator raySetIterator, size_t vectorsPerStagingBuffer) // TODO is it okay that offset is unused?
 {
 
 	//data is copied to the buffer
@@ -658,7 +658,6 @@ void VulkanTracer::getRays() {
 		void* mappedMemory = NULL;
 		// Map the buffer memory, so that we can read from it on the CPU.
 		vkMapMemory(device, bufferMemories[3], 0, GPU_MAX_STAGING_SIZE, 0, &mappedMemory);
-		double* pMappedMemory = (double*)mappedMemory;
 		//std::cout << "[VK]: getrays: sample double: " << (pMappedMemory)[0] << std::endl;
 		// for (uint32_t j = 0; j < GPU_MAX_STAGING_SIZE / RAY_DOUBLE_COUNT; j = j + RAY_DOUBLE_COUNT)
 		// {
@@ -681,7 +680,6 @@ void VulkanTracer::getRays() {
 	void* mappedMemory = NULL;
 	// Map the buffer memory, so that we can read from it on the CPU.
 	vkMapMemory(device, bufferMemories[3], 0, ((bytesNeeded - 1) % GPU_MAX_STAGING_SIZE) + 1, 0, &mappedMemory);
-	double* pMappedMemory = (double*)mappedMemory;
 	//std::cout << "[VK]: getrays: sample double: " << (pMappedMemory)[0] << std::endl;
 
 	// for (uint32_t j = 0; j < (((bytesNeeded - 1) % GPU_MAX_STAGING_SIZE) + 1) / VULKANTRACER_RAY_DOUBLE_AMOUNT; j = j + 8)

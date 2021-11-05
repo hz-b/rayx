@@ -49,8 +49,8 @@ namespace RAYX
      */
     OpticalElement::OpticalElement(const char* name, const std::vector<double> EParameters, const int geometricalShape, const double width, const double height, glm::dvec4 position, glm::dmat4x4 orientation, const std::vector<double> slopeError)
         : BeamlineObject(name),
-        m_elementParameters(EParameters),
-        m_slopeError(slopeError)
+        m_slopeError(slopeError),
+        m_elementParameters(EParameters)
     {
         m_geometry = std::make_unique<Geometry>(geometricalShape, width, height, position, orientation);
         assert(EParameters.size() == 16 && slopeError.size() == 7);

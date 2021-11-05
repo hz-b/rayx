@@ -43,8 +43,6 @@ namespace RAYX
         //std::shared_ptr<Slit> s = std::make_shared<Slit>("slit", 1, 2, 20, 2, 7.5, 10000, 20, 1, m->getPhotonEnergy(), std::vector<double>{2, 1, 0, 0, 0, 0 }, nullptr, GLOBAL);
 
         RAYX::GeometricUserParams g_params = RAYX::GeometricUserParams(10, 10000, 1000);
-        double alpha = 0.031253965260898464;
-        double beta = 0.31781188513796743;
         int coordinatesystem = 1; // 1 = misalignment in mirror coordinate system
         double tangentAngle = g_params.calcTangentAngle(10, 10000, 1000, coordinatesystem);
         

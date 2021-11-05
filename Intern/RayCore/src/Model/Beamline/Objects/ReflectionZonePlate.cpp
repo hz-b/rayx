@@ -37,16 +37,16 @@ namespace RAYX
         const double sExit, const double shortRadius, const double longRadius, const int additionalZeroOrder,
         const double fresnelZOffset, const std::vector<double> slopeError)
         : OpticalElement(name, geometricalShape, width, height, position, orientation, slopeError),
+        m_fresnelZOffset(fresnelZOffset),
         m_designAlphaAngle(degToRad(dAlpha)),
         m_designBetaAngle(degToRad(dBeta)),
-        m_fresnelZOffset(fresnelZOffset),
+        m_designOrderOfDiffraction(designOrderOfDiffraction),
+        m_designEnergy(designEnergy), // eV, if auto == true, else designEnergy
         m_designSagittalEntranceArmLength(sEntrance), //in mm
         m_designSagittalExitArmLength(sExit),
         m_designMeridionalEntranceArmLength(mEntrance),
         m_designMeridionalExitArmLength(mExit),
-        m_designEnergy(designEnergy), // eV, if auto == true, else designEnergy
-        m_orderOfDiffraction(orderOfDiffraction),
-        m_designOrderOfDiffraction(designOrderOfDiffraction)
+        m_orderOfDiffraction(orderOfDiffraction)
 
     {
         // m_designEnergy = designEnergy; // if Auto == true, take energy of Source (param sourceEnergy), else m_designEnergy = designEnergy
