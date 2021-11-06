@@ -262,7 +262,7 @@ void testOpticalElement(std::vector<std::shared_ptr<RAYX::OpticalElement>> eleme
 }
 
 // UNIT TESTS
-#define RUN_UNIT_TESTS 0
+#define RUN_UNIT_TESTS 1
 
 #if RUN_UNIT_TESTS == 1
 TEST(Tracer, testUniformRandom) {
@@ -1305,6 +1305,48 @@ TEST(opticalElements, RZPMis) {
     ASSERT_TRUE(true);
 }
 
+// ellipsoid mirrors
+
+// default ellipsoid with no image plane, no misalignment, data stored in beam coordinates to make comparison with RAY-UI possible
+TEST(opticalElements, Ellipsoid_default) {
+    RAYX::GeometricUserParams g_params = RAYX::GeometricUserParams(10, 10000, 1000);
+    double alpha = 0.031253965260898464;
+    double beta = 0.31781188513796743;
+    ASSERT_DOUBLE_EQ(g_params.getAlpha(), alpha);
+    ASSERT_DOUBLE_EQ(g_params.getBeta(), beta);
+    double tangentAngle = g_params.calcTangentAngle(10, 10000, 1000, 0);
+    
+    RAYX::WorldUserParams w_coord = RAYX::WorldUserParams(g_params.getAlpha(), g_params.getBeta(), 0, 10000, std::vector<double>{0, 0, 0, 0, 0, 0}, tangentAngle);
+    glm::dvec4 pos = w_coord.calcPosition();
+    glm::dmat4x4 or1 = w_coord.calcOrientation();
+
+    std::shared_ptr<RAYX::Ellipsoid> eb = std::make_shared<RAYX::Ellipsoid>("ellipsoid_200default", 0, 50, 200, pos, or1, 10, 10000, 1000, 0, 1, zeros7);
+    eb->setOutMatrix(glmToVector16(glm::transpose(w_coord.calcE2B()))); // to make comparison with old ray files possible, use the beam coordinate system
+    testOpticalElement({ eb }, 200);
+}
+
+// default ellipsoid with no image plane but with MIRROR misalignment (the more complicated misalignment), data stored in beam coordinates
+TEST(opticalElements, Ellipsoid_mirrormisalignment) {
+    RAYX::GeometricUserParams g_params = RAYX::GeometricUserParams(10, 10000, 1000);
+    double alpha = 0.031253965260898464;
+    double beta = 0.31781188513796743;
+    ASSERT_DOUBLE_EQ(g_params.getAlpha(), alpha);
+    ASSERT_DOUBLE_EQ(g_params.getBeta(), beta);
+    int coordinatesystem = 1; // misalignment in mirror coordinate system
+    double tangentAngle = g_params.calcTangentAngle(10, 10000, 1000, coordinatesystem);
+    ASSERT_DOUBLE_EQ(tangentAngle, 0.14327895993853446);
+    
+    RAYX::WorldUserParams w_coord = RAYX::WorldUserParams(g_params.getAlpha(), g_params.getBeta(), 0, 100, std::vector<double>{1, 2, 3, 0.004, 0.005, 0.006}, tangentAngle);
+    glm::dvec4 pos = w_coord.calcPosition();
+    glm::dmat4x4 or1 = w_coord.calcOrientation();
+
+    std::shared_ptr<RAYX::Ellipsoid> eb = std::make_shared<RAYX::Ellipsoid>("ellipsoid_200mirrormis", 0, 50, 200, pos, or1, 10, 10000, 1000, 0, 1, zeros7);
+    eb->setOutMatrix(glmToVector16(glm::transpose(w_coord.calcE2B()))); // to make comparison with old ray files possible, use the beam coordinate system
+    
+    testOpticalElement({ eb }, 200);
+}
+
+// default ellipsoid with no misalignment but with image plane, data stored in image-plane-coordinate system (footprint?)
 TEST(opticalElements, EllipsoidImagePlane) {
     RAYX::GeometricUserParams g_params = RAYX::GeometricUserParams(10, 10000, 1000);
     double alpha = 0.031253965260898464;
@@ -1328,6 +1370,7 @@ TEST(opticalElements, EllipsoidImagePlane) {
     testOpticalElement({ eb, i }, 200);
 }
 
+// default ellipsoid with ELLIPSOID misalignment and with image plane, data stored in image-plane-coordinate system
 TEST(opticalElements, EllipsoidImagePlane_ellipsmisalignment) {
     RAYX::GeometricUserParams g_params = RAYX::GeometricUserParams(10, 10000, 1000);
     double alpha = 0.031253965260898464;
@@ -1351,6 +1394,7 @@ TEST(opticalElements, EllipsoidImagePlane_ellipsmisalignment) {
     testOpticalElement({ eb, i }, 200);
 }
 
+// default ellipsoid with MIRROR misalignment and with image plane, data stored in image-plane-coordinate system
 TEST(opticalElements, EllipsoidImagePlane_mirrormisalignment) {
     RAYX::GeometricUserParams g_params = RAYX::GeometricUserParams(10, 10000, 1000);
     double alpha = 0.031253965260898464;
@@ -1371,26 +1415,38 @@ TEST(opticalElements, EllipsoidImagePlane_mirrormisalignment) {
     glm::dvec4 pos2 = w_coord2.calcPosition(w_coord, pos, or1);
     glm::dmat4x4 or2 = w_coord2.calcOrientation(w_coord, pos, or1);
     std::shared_ptr<RAYX::ImagePlane> i = std::make_shared<RAYX::ImagePlane>("ImagePlane", pos2, or2);
-    eb->setOutMatrix(glmToVector16(glm::dmat4x4(1,0,0,0, 0,1,0,0, 0,0,1,0, 0,0,0,1))); // to make comparison with old ray files possible, use the beam coordinate system
     
-    testOpticalElement({ eb }, 200);
+    testOpticalElement({ eb, i }, 200);
 }
 
-TEST(opticalElements, Ellipsoid) {
-    RAYX::GeometricUserParams g_params = RAYX::GeometricUserParams(10, 10000, 1000);
+
+// default ellipsoid with MIRROR misalignment and with image plane, data stored in image-plane-coordinate system
+TEST(opticalElements, PlaneMirrorEllipsoidImagePlane_mirrormisalignment) {
+    RAYX::GeometricUserParams pm_params = RAYX::GeometricUserParams(7);
+    RAYX::WorldUserParams w_coord = RAYX::WorldUserParams(pm_params.getAlpha(), pm_params.getBeta(), 0, 10000, std::vector<double>{1, 2, 3, 0.004, 0.005, 0.006});
+    glm::dvec4 pos1 = w_coord.calcPosition();
+    glm::dmat4x4 or1 = w_coord.calcOrientation();
+    std::shared_ptr<RAYX::PlaneMirror> pm = std::make_shared<RAYX::PlaneMirror>("pm_ell_ip_200mirrormis", 0, 50, 200, pos1, or1, zeros7);
+    
+    RAYX::GeometricUserParams ell_params = RAYX::GeometricUserParams(10, 10000, 1000);
     double alpha = 0.031253965260898464;
     double beta = 0.31781188513796743;
-    ASSERT_DOUBLE_EQ(g_params.getAlpha(), alpha);
-    ASSERT_DOUBLE_EQ(g_params.getBeta(), beta);
-    double tangentAngle = g_params.calcTangentAngle(10, 10000, 1000, 0);
+    ASSERT_DOUBLE_EQ(ell_params.getAlpha(), alpha);
+    ASSERT_DOUBLE_EQ(ell_params.getBeta(), beta);
+    int coordinatesystem = 1; // misalignment in mirror coordinate system
+    double tangentAngle = ell_params.calcTangentAngle(10, 10000, 1000, coordinatesystem);
+    ASSERT_DOUBLE_EQ(tangentAngle, 0.14327895993853446);
+    RAYX::WorldUserParams ell_w_coord = RAYX::WorldUserParams(ell_params.getAlpha(), ell_params.getBeta(), 0, 100, std::vector<double>{1, 2, 3, 0.004, 0.005, 0.006}, tangentAngle);
+    glm::dvec4 pos2 = ell_w_coord.calcPosition(w_coord, pos1, or1);
+    glm::dmat4x4 or2 = ell_w_coord.calcOrientation(w_coord, pos1, or1);
+    std::shared_ptr<RAYX::Ellipsoid> eb = std::make_shared<RAYX::Ellipsoid>("ellipsoid_ip_200mirrormis", 0, 50, 200, pos2, or2, 10, 10000, 1000, 0, 1, zeros7);
     
-    RAYX::WorldUserParams w_coord = RAYX::WorldUserParams(g_params.getAlpha(), g_params.getBeta(), 0, 10000, std::vector<double>{0, 0, 0, 0, 0, 0}, tangentAngle);
-    glm::dvec4 pos = w_coord.calcPosition();
-    glm::dmat4x4 or1 = w_coord.calcOrientation();
-
-    std::shared_ptr<RAYX::Ellipsoid> eb = std::make_shared<RAYX::Ellipsoid>("ellipsoid_200default", 0, 50, 200, pos, or1, 10, 10000, 1000, 0, 1, zeros7);
-    eb->setOutMatrix(glmToVector16(glm::transpose(w_coord.calcE2B()))); // to make comparison with old ray files possible, use the beam coordinate system
-    testOpticalElement({ eb }, 200);
+    RAYX::WorldUserParams ip_w_coord = RAYX::WorldUserParams(0, 0, 0, 1000, std::vector<double>{0, 0, 0, 0, 0, 0});
+    glm::dvec4 pos3 = ip_w_coord.calcPosition(ell_w_coord, pos2, or2);
+    glm::dmat4x4 or3 = ip_w_coord.calcOrientation(ell_w_coord, pos2, or2);
+    std::shared_ptr<RAYX::ImagePlane> i = std::make_shared<RAYX::ImagePlane>("ImagePlane", pos3, or3);
+    
+    testOpticalElement({ pm, eb, i }, 200);
 }
 
 TEST(opticalElements, ImagePlane) {

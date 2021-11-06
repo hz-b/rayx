@@ -84,6 +84,13 @@ namespace RAYX
         return glm::transpose(misalignmentMatrix);
     }
 
+    glm::dmat4x4 WorldUserParams::getTangentAngleRotation() {
+        return glm::dmat4x4(
+            1, 0, 0, 0,
+            0, cos(m_tangentAngle), -sin(m_tangentAngle), 0, // rotation around x-axis
+            0, sin(m_tangentAngle), cos(m_tangentAngle), 0,
+            0, 0, 0, 1);
+    }
     /**
      * calculates the orientation (rotation with respect to the origin) in world coordinates
      * @param prev              geometrical parameters of previous optical element (reference element)
@@ -136,14 +143,16 @@ namespace RAYX
                                     sin_c, cos_c * cos_a, sin_a * cos_c, 0,
                                     0, -sin_a, cos_a, 0,
                                     0, 0, 0, 1 );*/
-        misalignmentOr = tangentAngleRotation * misalignmentOr * inverseTangentAngleRotation;
+        std::cout << "misalignment matrix" << std::endl;
+        printDMat4(misalignmentOr);
+        misalignmentOr = misalignmentOr;
         glm::dmat4x4 orientation = glm::dmat4x4(
             cos_c, sin_c, 0, 0, // M_b2e
             -sin_c * cos_a, cos_c * cos_a, -sin_a, 0,
             -sin_c * sin_a, sin_a * cos_c, cos_a, 0,
             0, 0, 0, 1);
 
-        orientation = orientation * misalignmentOr;
+        orientation = orientation * tangentAngleRotation * misalignmentOr * inverseTangentAngleRotation;
         std::cout << "[WUP]: Calculated orientation" << std::endl;
         for (int i = 0; i < 4; i++) {
             std::cout << '\t';
@@ -172,10 +181,10 @@ namespace RAYX
         glm::dvec4 prev_offset = glm::dvec4(prev.getMisalignment()[0], prev.getMisalignment()[1], prev.getMisalignment()[2], 0);
         glm::dmat4x4 prev_e2b = prev.calcE2B();
 
-        glm::dvec4 position = prev_pos - prev_or * prev_offset; // remove misalignment from position of previous element
+        glm::dvec4 position = prev_pos - prev_or * prev.getTangentAngleRotation() * prev_offset; // remove misalignment from position of previous element
         std::cout << "[WUP]: previous position = " << position[0] << ", " << position[1] << ", " << position[2] << ", " << position[3] << std::endl;
         position = position + prev_or * prev_e2b * local_position; // add the distance from previous to new element to the position of the previous element
-        position = position + orientation * new_offset; // add misalignment of new element to the position      
+        position = position + orientation * getTangentAngleRotation() * new_offset; // add misalignment of new element to the position      
 
         for (int i = 0; i < 4; i++) {
             std::cout << position[i] << ", " << std::endl;
@@ -193,18 +202,16 @@ namespace RAYX
     {
         glm::dvec4 position = glm::dvec4(0.0, 0.0, m_dist, 0.0);
         glm::dmat4x4 orientation = calcOrientation();
-        glm::dmat4x4 tangentAngleRotation = glm::dmat4x4(
-            1, 0, 0, 0,
-            0, cos(m_tangentAngle), -sin(m_tangentAngle), 0, // rotation around x-axis
-            0, sin(m_tangentAngle), cos(m_tangentAngle), 0,
-            0, 0, 0, 1);
+        glm::dmat4x4 tangentAngleRotation = getTangentAngleRotation();
         glm::dmat4x4 inverseTangentAngleRotation = glm::transpose(tangentAngleRotation);
+
         std::cout.precision(17);
         std::cout << "[WUP] sin(tangentAngle) = " << sin(m_tangentAngle) << " cos(tangentAngle) = " << cos(m_tangentAngle) << std::endl;
+
         glm::dvec4 offset = glm::dvec4(m_misalignment[0], m_misalignment[1], m_misalignment[2], 1.0);
 
-        offset = inverseTangentAngleRotation * offset * tangentAngleRotation;
-        position = position + orientation * offset ;
+        offset = offset;
+        position = position + orientation * tangentAngleRotation * offset;
         std::cout << "[WUP]: Position: "; 
         for (int i = 0; i < 4; i++) {
             std::cout << position[i] << ", " ;
