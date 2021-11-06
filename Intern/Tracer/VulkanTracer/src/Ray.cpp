@@ -37,9 +37,6 @@ Ray::Ray(double* location) {
 	memcpy(&m_position.x, location, 64);
 }
 Ray::Ray() {}
-Ray::~Ray() {
-
-}
 
 std::vector<double> Ray::getRayInformation()
 {

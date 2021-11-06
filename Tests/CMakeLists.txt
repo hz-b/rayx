@@ -15,6 +15,10 @@ set(SOURCES ${TEST_SOURCES})
 add_executable(${BINARY} ${TEST_SOURCES})
 add_test(NAME ${BINARY} COMMAND ${BINARY})
 
+if (NOT "$ENV{VULKAN_TEST}" STREQUAL "NO")
+	target_compile_options(${BINARY} PRIVATE -DVULKAN_TEST)
+endif()
+
 #if (WIN32)
     #target_compile_definitions(${BINARY} PUBLIC RAYX_PLATFORM_WINDOWS)
 #endif ()

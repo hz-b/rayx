@@ -16,6 +16,14 @@ const bool enableValidationLayers = false;
 #else
 const bool enableValidationLayers = true;
 #endif
+#define USE_DGPU
+
+#ifdef USE_DGPU
+const bool useDiscreteGPU = true;
+#else
+const bool useDiscreteGPU = false;
+#endif
+
 
 //set debug generation information
 const std::vector<const char*> validationLayers = {
@@ -34,12 +42,14 @@ const std::vector<const char*> validationLayers = {
 VkResult CreateDebugUtilsMessengerEXT(VkInstance instance, const VkDebugUtilsMessengerCreateInfoEXT* pCreateInfo, const VkAllocationCallbacks* pAllocator, VkDebugUtilsMessengerEXT* pDebugMessenger);
 void DestroyDebugUtilsMessengerEXT(VkInstance instance, VkDebugUtilsMessengerEXT debugMessenger, const VkAllocationCallbacks* pAllocator);
 
-const int WORKGROUP_SIZE = 32;
+// Vulkan to Ray #defines
 #define VULKANTRACER_RAY_DOUBLE_AMOUNT 16
 #define VULKANTRACER_QUADRIC_DOUBLE_AMOUNT 112 //7* dmat4 (16)
 #define VULKANTRACER_QUADRIC_PARAM_DOUBLE_AMOUNT 4
 #define GPU_MAX_STAGING_SIZE 134217728 //128MB
 #define RAY_VECTOR_SIZE 16777216
+
+const int WORKGROUP_SIZE = 32;
 
 class VulkanTracer
 {
@@ -48,12 +58,14 @@ public:
     ~VulkanTracer();
     void run();
     //void addRay(double xpos, double ypos, double zpos, double xdir, double ydir, double zdir, double weight);
-    //void addRay(double* location);
+    //void addRay(double* location);    
+    void cleanup();
+    
+    void getRays();
     void addRayVector(void* location, size_t size);
     void addVectors(std::vector<double> surfaceParams, std::vector<double> inputInMatrix, std::vector<double> inputOutMatrix, std::vector<double> objectParameters, std::vector<double> elementParameters);
-    void getRays();
-    void cleanup();
     void setBeamlineParameters(uint32_t inNumberOfBeamlines, uint32_t inNumberOfQuadricsPerBeamline, uint32_t inNumberOfRays);
+
     std::list<std::vector<Ray>>::const_iterator getOutputIteratorBegin();
     std::list<std::vector<Ray>>::const_iterator getOutputIteratorEnd();
 
@@ -76,7 +88,6 @@ private:
         std::vector<double> outMatrix;
     };
     */
-    RayList m_outputData;
 
     struct QueueFamilyIndices
     {
@@ -107,15 +118,20 @@ private:
     VkDescriptorSetLayout descriptorSetLayout;
     VkQueue computeQueue;
     uint32_t queueFamilyIndex;
+    QueueFamilyIndices QueueFamily;
+
+    // Ray-related vars:
     uint32_t numberOfBeamlines;
     uint32_t numberOfQuadricsPerBeamline;
     uint32_t numberOfRays;
     uint32_t numberOfRaysPerBeamline;
     RayList rayList;
     std::vector<double> beamline;
-    QueueFamilyIndices QueueFamily;
+    RayList m_outputData;
+    
 
     //Member functions:
+    //Vulkan
     void initVulkan();
     void mainLoop();
     void createInstance();
@@ -135,17 +151,21 @@ private:
     void createBuffers();
     void fillRayBuffer();
     void fillStagingBuffer(uint32_t offset, std::list<std::vector<Ray>>::iterator raySetIterator, size_t vectorsPerStagingBuffer);
-    void copyToRayBuffer(uint32_t offset, uint32_t numberOfBytesToCopy);
-    void copyToOutputBuffer(uint32_t offset, uint32_t numberOfBytesToCopy);
-    void fillQuadricBuffer();
     void createDescriptorSetLayout();
     void createDescriptorSet();
-    uint32_t* readFile(uint32_t& length, const char* filename);
     void createCommandPool();
     void createComputePipeline();
     void createCommandBuffer();
     void runCommandBuffer();
+    
+    // Ray-related funcs:
     void divideAndSortRays();
+    void fillQuadricBuffer();
+    void copyToRayBuffer(uint32_t offset, uint32_t numberOfBytesToCopy);
+    void copyToOutputBuffer(uint32_t offset, uint32_t numberOfBytesToCopy);
+
+    // Utils
+    uint32_t* readFile(uint32_t& length, const char* filename);
 
     int main();
 };

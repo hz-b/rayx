@@ -13,7 +13,6 @@ public:
 	Ray(double xpos, double ypos, double zpos, double xdir, double ydir, double zdir, double s0, double s1, double s2, double s3, double en, double w, double pathLength = 0, double order = 0, double lastElement = 0, double extraParameter = 0);
 	Ray(double* location);
 	Ray();
-	~Ray();
 	std::vector<double> getRayInformation();
 	double getxDir();
 	double getyDir();
