@@ -1386,6 +1386,7 @@ TEST(opticalElements, RZPMis) {
 
 // default ellipsoid with no image plane, no misalignment, data stored in beam coordinates to make comparison with RAY-UI possible
 TEST(opticalElements, Ellipsoid_default) {
+    if (!shouldDoVulkanTests()) { GTEST_SKIP(); }
     RAYX::GeometricUserParams g_params = RAYX::GeometricUserParams(10, 10000, 1000);
     double alpha = 0.031253965260898464;
     double beta = 0.31781188513796743;
@@ -1404,6 +1405,7 @@ TEST(opticalElements, Ellipsoid_default) {
 
 // default ellipsoid with no image plane but with MIRROR misalignment (the more complicated misalignment), data stored in beam coordinates
 TEST(opticalElements, Ellipsoid_mirrormisalignment) {
+    if (!shouldDoVulkanTests()) { GTEST_SKIP(); }
     RAYX::GeometricUserParams g_params = RAYX::GeometricUserParams(10, 10000, 1000);
     double alpha = 0.031253965260898464;
     double beta = 0.31781188513796743;

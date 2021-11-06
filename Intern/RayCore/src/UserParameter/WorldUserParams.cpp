@@ -53,11 +53,7 @@ namespace RAYX
             0, 0, 1, 0,
             dx, dy, dz, 1);
 
-        glm::dmat4x4 tangentAngleRotation = glm::dmat4x4(
-            1, 0, 0, 0,
-            0, cos(m_tangentAngle), -sin(m_tangentAngle), 0, // rotation around x-axis
-            0, sin(m_tangentAngle), cos(m_tangentAngle), 0,
-            0, 0, 0, 1);
+        glm::dmat4x4 tangentAngleRotation = getTangentAngleRotation();
         glm::dmat4x4 inverseTangentAngleRotation = glm::transpose(tangentAngleRotation);
 
        glm::dmat4x4 inverseMisalignmentMatrix = inverseRotation * inverseTranslation;
@@ -131,11 +127,7 @@ namespace RAYX
         double cos_a = cos(m_incidenceAngle);
         double sin_a = sin(m_incidenceAngle);
 
-        glm::dmat4x4 tangentAngleRotation = glm::dmat4x4(
-            1, 0, 0, 0,
-            0, cos(m_tangentAngle), -sin(m_tangentAngle), 0, // rotation around x-axis
-            0, sin(m_tangentAngle), cos(m_tangentAngle), 0,
-            0, 0, 0, 1);
+        glm::dmat4x4 tangentAngleRotation = getTangentAngleRotation();
         glm::dmat4x4 inverseTangentAngleRotation = glm::transpose(tangentAngleRotation);
         
         glm::dmat4x4 misalignmentOr = getMisalignmentOrientation();
@@ -143,9 +135,6 @@ namespace RAYX
                                     sin_c, cos_c * cos_a, sin_a * cos_c, 0,
                                     0, -sin_a, cos_a, 0,
                                     0, 0, 0, 1 );*/
-        std::cout << "misalignment matrix" << std::endl;
-        printDMat4(misalignmentOr);
-        misalignmentOr = misalignmentOr;
         glm::dmat4x4 orientation = glm::dmat4x4(
             cos_c, sin_c, 0, 0, // M_b2e
             -sin_c * cos_a, cos_c * cos_a, -sin_a, 0,
@@ -205,12 +194,8 @@ namespace RAYX
         glm::dmat4x4 tangentAngleRotation = getTangentAngleRotation();
         glm::dmat4x4 inverseTangentAngleRotation = glm::transpose(tangentAngleRotation);
 
-        std::cout.precision(17);
-        std::cout << "[WUP] sin(tangentAngle) = " << sin(m_tangentAngle) << " cos(tangentAngle) = " << cos(m_tangentAngle) << std::endl;
-
         glm::dvec4 offset = glm::dvec4(m_misalignment[0], m_misalignment[1], m_misalignment[2], 1.0);
 
-        offset = offset;
         position = position + orientation * tangentAngleRotation * offset;
         std::cout << "[WUP]: Position: "; 
         for (int i = 0; i < 4; i++) {
