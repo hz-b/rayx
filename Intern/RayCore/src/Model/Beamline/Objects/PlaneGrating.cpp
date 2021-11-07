@@ -4,10 +4,10 @@ namespace RAYX
 {
     
     /**
-     * simplified constructor that assumes that incidence and exit angle are already calculated and the position and orientation has been derived from them already
+     * constructor that assumes that incidence and exit angle are already calculated (geometricUserParams.cpp) and the position and orientation has been derived from them already (WorldUserParameters.cpp)
      * 
      * @param name                  name of element
-     * @param geometricalShape              0/1 rectangle/elliptical
+     * @param geometricalShape      0/1 rectangle/elliptical
      * @param width                 width of element (x dimension)
      * @param height                height of element (z dimension)
      * @param position              position in world coordinate system
@@ -26,7 +26,7 @@ namespace RAYX
         m_designEnergyMounting(designEnergy),
         m_lineDensity(lineDensity),
         m_orderOfDiffraction(orderOfDiffraction),
-        m_vls(vls) // TODO(Theresa): store these five params in element as attributes (m_..) at all or only in elementParams?
+        m_vls(vls)
     {
         std::cout << "[PlaneGrating]: design wavelength = " << abs(hvlam(m_designEnergyMounting)) << std::endl;
         

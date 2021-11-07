@@ -18,7 +18,6 @@ namespace RAYX
      * @param beamstopWidth         width of central beamstop
      * @param beamstopHeight        height of central beamstop
      * @param sourceEnergy          energy of source
-     * @param misalignmentParams    angles and distances for the mirror's misalignment
      * 
     */
     Slit::Slit(const char* name, int geometricalShape, int beamstop, double width, double height, glm::dvec4 position, glm::dmat4x4 orientation, double beamstopWidth, double beamstopHeight, double sourceEnergy)

@@ -154,14 +154,6 @@ class Tests(unittest.TestCase):
         self.assertTrue(correct.shape == result.shape)
         self.assertTrue(np.allclose(correct, result))
     
-    """
-    def test_planeGratingVLSnoMIS(self):
-        correct = open_old_file(
-            'Plane Grating_default_azimuthal.csv', 'Plane Grating_')
-        result = open_new_file('output.csv')
-        self.assertTrue(np.allclose(correct, result))
-    """
-    
     def test_RZPdefault20(self):
         correct = open_old_file(
             'ImagePlane-RawRaysOutgoing_RZPDef.csv', 'ImagePlane_')

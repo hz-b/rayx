@@ -5,9 +5,7 @@ namespace RAYX
 {
 
     /**
-     * new constructor
-     * 
-     * initializes transformation matrices, and parameters for the quadric in super class (optical element)
+     * initializes transformation matrices from position and orientation, and parameters for the quadric in super class (optical element)
      * sets mirror-specific parameters in this class
      * @param name                  name of the plane mirror
      * @param width                 width of mirror (x-dimension in element coord. sys.)

@@ -3,7 +3,7 @@
 namespace RAYX
 { 
     /**
-     * for mirrors
+     * for Plane and Sphere Mirrors
      * @param incidenceAngle        incidence Angle in degree
     */
     GeometricUserParams::GeometricUserParams(double incidenceAngle) 
@@ -77,7 +77,7 @@ namespace RAYX
         double tangentAngle = calcTangentAngle(incidence, entranceArmLength, exitArmLength, 1);
         double incidenceAngle = degToRad(incidence);
         m_alpha = incidenceAngle - tangentAngle;
-        m_beta = incidenceAngle + tangentAngle; // mirror -> exit angle = incidence angle
+        m_beta = incidenceAngle + tangentAngle;
     }
         
     GeometricUserParams::GeometricUserParams() {}

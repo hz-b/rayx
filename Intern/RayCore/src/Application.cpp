@@ -51,8 +51,6 @@ namespace RAYX
         
         // ellipsoid with mirror misalignment
         RAYX::GeometricUserParams ell_params = RAYX::GeometricUserParams(10, 10000, 1000);
-        double alpha = 0.031253965260898464;
-        double beta = 0.31781188513796743;
         int coordinatesystem = 1; // misalignment in mirror coordinate system
         double tangentAngle = ell_params.calcTangentAngle(10, 10000, 1000, coordinatesystem);
         RAYX::WorldUserParams ell_w_coord = RAYX::WorldUserParams(ell_params.getAlpha(), ell_params.getBeta(), 0, 100, std::vector<double>{1, 2, 3, 0.004, 0.005, 0.006}, tangentAngle);

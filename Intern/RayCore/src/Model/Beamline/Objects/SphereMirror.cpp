@@ -4,20 +4,20 @@ namespace RAYX
 {
 
     /**
-     * Calculates transformation matrices, and sets parameters for the quadric surface.
+     * Calculates transformation matrices from position and orientation, and sets parameters for the quadric surface.
      * Sets mirror-specific parameters in this class.
      * calculates radius from incidence angle, entrance and exit arm lengths
      *
-     * @param name
-     * @param width
-     * @param height
+     * @param name                      name of the optical element
+     * @param width                     width of optical element (x dim)
+     * @param height                    height of optical element (z dim in element coordinates)
      * @param grazingIncidenceAngle     angle in which the main ray should hit the element. given in degree
      * @param position                  position of element in world coordinates
      * @param orientation               orientation of element in world coordinates
      * @param entranceArmLength
      * @param exitArmLength
-     * @param slopeError
-     *
+     * @param slopeError                7 slope error parameters: x-y sagittal (0), y-z meridional (1), thermal distortion: x (2),y (3),z (4), cylindrical bowing amplitude y(5) and radius (6)
+     * 
     */
     SphereMirror::SphereMirror(const char* name, const int geometricalShape, const double width, const double height, const double grazingIncidenceAngle, glm::dvec4 position, glm::dmat4x4 orientation, const double entranceArmLength, const double exitArmLength, const std::vector<double> slopeError)
         : OpticalElement(name, { 0,0,0,0, 0,0,0,0, 0,0,0,0, 0,0,0,0 }, geometricalShape, width, height, position, orientation, slopeError),
@@ -31,17 +31,18 @@ namespace RAYX
     }
 
      /**
-     * Calculates transformation matrices, and sets parameters for the quadric surface.
+     * Calculates transformation matrices from position and orientation, and sets parameters for the quadric surface.
      * Sets mirror-specific parameters in this class.
      * Radius is not calculated but given as a parameter
      *
-     * @param name
-     * @param width
-     * @param height
+     * @param name                      name of the optical element
+     * @param width                     width of optical element (x dim)
+     * @param height                    height of optical element (z dim in element coordinates)
      * @param radius                    radius of sphere
      * @param position                  position of element in world coordinates
      * @param orientation               orientation of element in world coordinates
-     * @param slopeError
+     * @param slopeError                7 slope error parameters: x-y sagittal (0), y-z meridional (1), thermal distortion: x (2),y (3),z (4), cylindrical bowing amplitude y(5) and radius (6)
+     * 
     */
     SphereMirror::SphereMirror(const char* name, const int geometricalShape, const double width, const double height, double radius, glm::dvec4 position, glm::dmat4x4 orientation, const std::vector<double> slopeError)
         : OpticalElement(name, { 0,0,0,0, 0,0,0,0, 0,0,0,0, 0,0,0,0 }, geometricalShape, width, height, position, orientation, slopeError)

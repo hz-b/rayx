@@ -23,6 +23,8 @@ namespace RAYX {
     private:
         // Quadric parameters; will be turned into 4x4 matrix
         std::vector<double> m_parameters;
+        double m_longRadius;
+        double m_shortRadius;
 
 
     };

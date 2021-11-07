@@ -2365,9 +2365,9 @@ Ray traceToroid(Ray r, Quadric q, inout uint64_t ctr, dvec4 intersectionPoint) {
 	// TODO use the given intersection point instead of recalculating it (still need to calculate the normal)
 	dvec4 normal = iteratTo(r, longRadius, shortRadius);
 
-	double xLength = q.objectParameters[0][0]; // width
-	double zLength = q.objectParameters[0][1]; // height
-	r.weight = wasteBox(r.position[0],r.position[2],xLength,zLength, r.weight);
+	double x_extent = q.objectParameters[0][0]; // width
+	double z_extent = q.objectParameters[0][1]; // length
+	r.weight = wasteBox(r.position[0],r.position[2],x_extent,z_extent, r.weight);
 
 	// element missed
 	if(r.weight < 1.0) {
@@ -2403,9 +2403,9 @@ Ray traceRZP(Ray r, const Quadric q, inout uint64_t ctr, dvec4 intersection) {
 		//TODO
 
 	// wastebox is the same no matter what curvature type
-	double xLength = q.objectParameters[0][0]; // width
-	double zLength = q.objectParameters[0][1]; // height
-	r.weight = wasteBox(r.position[0],r.position[2],xLength,zLength, r.weight);
+	double x_extent = q.objectParameters[0][0]; // width
+	double z_extent = q.objectParameters[0][1]; // height
+	r.weight = wasteBox(r.position[0],r.position[2],x_extent,z_extent, r.weight);
 
 
 	if(r.weight < 1.0) {
@@ -2441,6 +2441,7 @@ Ray traceRZP(Ray r, const Quadric q, inout uint64_t ctr, dvec4 intersection) {
 	double slopeZ = q.objectParameters[0][3];
 	normal = tanger(normal, slopeX, slopeZ, 0, ctr);
 
+	// if additional zero order should be traced, approx. half of the rays are randomly chosen to be traced in order 0 (= ordinary reflection) instead of the given order
 	if(additional_order == 1) {
 		if(squaresDoubleRNG(ctr) > 0.5)
 			Ord = 0;
@@ -2463,7 +2464,7 @@ Ray traceRZP(Ray r, const Quadric q, inout uint64_t ctr, dvec4 intersection) {
 * @param r				ray to trace
 * @param q				quadric parameters of the grating (a_24=-1)
 *
-* output: reflected Ray with intersection point as position, reflection as direction in beam coordinates and possibly modified weight
+* @return				reflected Ray with intersection point as position, reflection as direction in beam coordinates and possibly modified weight
 */
 Ray tracePlaneGrating(Ray r, const Quadric q, inout uint64_t ctr, dvec4 intersection) {
 	
@@ -2496,6 +2497,7 @@ Ray tracePlaneGrating(Ray r, const Quadric q, inout uint64_t ctr, dvec4 intersec
 	int additional_order = int(q.elementParameters[3][3]);
 
 	double a = vlsGrating(lineDensity, r.position.z, b_params) * WL *  orderOfDiffraction * 1e-06;
+
 	if(additional_order == 1) {
 		if(squaresDoubleRNG(ctr) > 0.5)
 			a = 0;
@@ -2550,7 +2552,7 @@ Ray traceGeneralGrating(Ray r, const Quadric q, inout uint64_t ctr, dvec4 inters
 	double b_params[6] = double[6] (q.elementParameters[1][2],q.elementParameters[1][3],q.elementParameters[2][0],q.elementParameters[2][1],q.elementParameters[2][2],q.elementParameters[2][3]);//(0.1,0.1,0.1,0.01,0.02,0.03);
 	// a = WL * linedensity * order * 1e-06
 	double a = vlsGrating(lineDensity, r.position.z, b_params) * WL *  orderOfDiffraction * 1e-06;
-	// no additional zero order here
+	// no additional zero order here?
 
 	// refraction
 	r = refrac(r, normal, a);

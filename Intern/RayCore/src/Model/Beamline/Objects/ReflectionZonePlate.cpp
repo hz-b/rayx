@@ -16,7 +16,7 @@ namespace RAYX
      * @param orientation                   orientation of the RZP in world coordinates
      * @param designEnergy                  given by user, used if auto==false
      * @param orderOfDiffraction            in what order the ray should be reflected
-     * @param designEnergy                  energy for which the RZP is designed
+     * @param designEnergy                  energy for which the RZP is designed or the source energy
      * @param orderOfDiffraction            order of diffraction that should be traced
      * @param designOrderOfDiffraction      order of diffraction for which the RZP is designed
      * @param dAlpha                        incidence angle for which the RZP is designed
@@ -41,7 +41,7 @@ namespace RAYX
         m_designAlphaAngle(degToRad(dAlpha)),
         m_designBetaAngle(degToRad(dBeta)),
         m_designOrderOfDiffraction(designOrderOfDiffraction),
-        m_designEnergy(designEnergy), // eV, if auto == true, else designEnergy
+        m_designEnergy(designEnergy), // in eV
         m_designSagittalEntranceArmLength(sEntrance), //in mm
         m_designSagittalExitArmLength(sExit),
         m_designMeridionalEntranceArmLength(mEntrance),

@@ -17,7 +17,7 @@ namespace RAYX
     class RAYX_API GeometricUserParams {
 
     public:
-        // constructor for mirrors
+        // constructor for plane and sphere mirrors
         GeometricUserParams(double incidenceAngle);
         // constructor for gratings
         GeometricUserParams(int mount, double deviation, double normalIncidence, double lineDensity, double designEnergy, double additionalOrder, int orderOfDiffraction);

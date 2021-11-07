@@ -4,19 +4,14 @@
 
 namespace RAYX
 {
-    /**
-     * standard constructor
-     * this class the parameters for the quadric equation!
-     *
-     * angles given in rad
-     * define transformation matrices based on grazing incidence (alpha) and exit (beta) angle, azimuthal angle (chi) and distance to preceeding element
-     * @param inputPoints      Matrix A for quadric surfaces with a_11,a_12,a_13,a_14, a_21,a_22,a_23,a_24, a_31,a_32,a_33,a_34, a_41,a_42,a_43,a_44
-     *                         a_21,a_31,a_32,a_41,a_42,a_43 are never used for quadric surfaces because the matrix is symmetrial,
+    /** for quadric surfaces: 16 parameters a_11,a_12,a_13,a_14, a_21,a_22,a_23,a_24, a_31,a_32,a_33,a_34, a_41,a_42,a_43,a_44!
+     * a_21,a_31,a_32,a_41,a_42,a_43 are never used for quadric surfaces because the matrix is symmetrial, can be used for other values
+     * @param inputPoints      4x4 Matrix as vector
     */
     Quadric::Quadric(const std::vector<double> inputPoints)
     {
-        assert(inputPoints.size() == 16); //parameter size ==6?
-        m_anchorPoints = inputPoints;
+        assert(inputPoints.size() == 16);
+        m_parameters = inputPoints;
     }
 
 
@@ -36,12 +31,12 @@ namespace RAYX
     void Quadric::setAnchorPoints(std::vector<double> inputPoints)
     {
         assert(inputPoints.size() == 16);
-        m_anchorPoints = inputPoints;
+        m_parameters = inputPoints;
     }
 
     std::vector<double> Quadric::getParams() const {
-        std::cout << "[Quadric]: return anchor points" << std::endl;
-        return m_anchorPoints;
+        std::cout << "[Quadric]: return surface parameters" << std::endl;
+        return m_parameters;
     }
 
 } // namespace RAYX

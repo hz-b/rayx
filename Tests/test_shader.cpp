@@ -1504,7 +1504,7 @@ TEST(opticalElements, EllipsoidImagePlane_mirrormisalignment) {
     testOpticalElement({ eb, i }, 200);
 }
 
-// default ellipsoid with MIRROR misalignment and with image plane, data stored in image-plane-coordinate system
+// plame mirror with misalignment, default ellipsoid with MIRROR misalignment and image plane, data stored in image-plane-coordinate system
 TEST(opticalElements, PlaneMirrorEllipsoidImagePlane_mirrormisalignment) {
     if (!shouldDoVulkanTests()) { GTEST_SKIP(); }
 
@@ -1515,7 +1515,6 @@ TEST(opticalElements, PlaneMirrorEllipsoidImagePlane_mirrormisalignment) {
     std::shared_ptr<RAYX::PlaneMirror> pm = std::make_shared<RAYX::PlaneMirror>("pm_ell_ip_200mirrormis", 0, 50, 200, pos1, or1, zeros7);
     
     RAYX::GeometricUserParams ell_params = RAYX::GeometricUserParams(10, 10000, 1000);
-
     double alpha = 0.031253965260898464;
     double beta = 0.31781188513796743;
     ASSERT_DOUBLE_EQ(ell_params.getAlpha(), alpha);
@@ -1558,7 +1557,7 @@ TEST(opticalElements, ImagePlane) {
 
 
 
-TEST(globalCoordinates, FourMirrors_9Rays) {
+TEST(dynamicTracing, FourMirrors_9Rays) {
     if (!shouldDoVulkanTests()) { GTEST_SKIP(); }
 
     RAYX::GeometricUserParams g_params = RAYX::GeometricUserParams(10);
@@ -1566,28 +1565,24 @@ TEST(globalCoordinates, FourMirrors_9Rays) {
     glm::dvec4 pos = w_coord.calcPosition();
     glm::dmat4x4 or1 = w_coord.calcOrientation();
     std::shared_ptr<RAYX::PlaneMirror> p1 = std::make_shared<RAYX::PlaneMirror>("globalCoordinates_9rays", 0, 50, 200, pos, or1, zeros7); // {1,2,3,0.01,0.02,0.03}
-    //std::shared_ptr<RAYX::PlaneMirror> p1 = std::make_shared<RAYX::PlaneMirror>("globalCoordinates_20rays", 50, 200, 10, 7, 10000, std::vector<double>{ 0,0,0, 0,0,0 }, zeros7, nullptr, true); // {1,2,3,0.01,0.02,0.03}
 
     RAYX::GeometricUserParams g_params2 = RAYX::GeometricUserParams(15);
     RAYX::WorldUserParams w_coord2 = RAYX::WorldUserParams(degToRad(15), degToRad(15), degToRad(4), 10, std::vector<double>{0, 0, 0, 0, 0, 0});//std::vector<double>{0,0,0, 0,0,0});
     glm::dvec4 pos2 = w_coord2.calcPosition(w_coord, pos, or1);
     glm::dmat4x4 or2 = w_coord2.calcOrientation(w_coord, pos, or1);
     std::shared_ptr<RAYX::PlaneMirror> p2 = std::make_shared<RAYX::PlaneMirror>("PlaneMirror2", 0, 50, 200, pos2, or2, zeros7); // {1,2,3,0.01,0.02,0.03}
-    //std::shared_ptr<RAYX::PlaneMirror> p2 = std::make_shared<RAYX::PlaneMirror>("PlaneMirror2", 50, 200, 15, 4, 10000, std::vector<double>{ 0,0,0, 0,0,0 }, zeros7, p1, true); // {1,2,3,0.01,0.02,0.03}
 
     g_params = RAYX::GeometricUserParams(7);
     RAYX::WorldUserParams w_coord3 = RAYX::WorldUserParams(g_params.getAlpha(), g_params.getBeta(), degToRad(10), 10, std::vector<double>{0, 0, 0, 0, 0, 0});
     glm::dvec4 pos3 = w_coord3.calcPosition(w_coord2, pos2, or2);
     glm::dmat4x4 or3 = w_coord3.calcOrientation(w_coord2, pos2, or2);
     std::shared_ptr<RAYX::PlaneMirror> p3 = std::make_shared<RAYX::PlaneMirror>("PlaneMirror3", 0, 50, 200, pos3, or3, zeros7); // {1,2,3,0.01,0.02,0.03}
-    //std::shared_ptr<RAYX::PlaneMirror> p3 = std::make_shared<RAYX::PlaneMirror>("PlaneMirror3", 50, 200, 7, 10, 10000, std::vector<double>{ 0,0,0, 0,0,0 }, zeros7, p2, true); // {1,2,3,0.01,0.02,0.03}
 
     g_params = RAYX::GeometricUserParams(22);
     RAYX::WorldUserParams w_coord4 = RAYX::WorldUserParams(g_params.getAlpha(), g_params.getBeta(), degToRad(17), 10, std::vector<double>{0, 0, 0, 0, 0, 0});
     glm::dvec4 pos4 = w_coord4.calcPosition(w_coord3, pos3, or3);
     glm::dmat4x4 or4 = w_coord4.calcOrientation(w_coord3, pos3, or3);
     std::shared_ptr<RAYX::PlaneMirror> p4 = std::make_shared<RAYX::PlaneMirror>("PlaneMirror4", 0, 50, 200, pos4, or4, zeros7); // {1,2,3,0.01,0.02,0.03}
-    //std::shared_ptr<RAYX::PlaneMirror> p4 = std::make_shared<RAYX::PlaneMirror>("PlaneMirror4", 50, 200, 22, 17, 10000, std::vector<double>{ 0,0,0, 0,0,0 }, zeros7, p3, true); // {1,2,3,0.01,0.02,0.03}
 
     RAYX::WorldUserParams w_coord5 = RAYX::WorldUserParams(0, 0, 0, 1000, std::vector<double>{0, 0, 0, 0, 0, 0});
     glm::dvec4 pos5 = w_coord5.calcPosition(w_coord4, pos4, or4);
@@ -1598,7 +1593,7 @@ TEST(globalCoordinates, FourMirrors_9Rays) {
     ASSERT_TRUE(true);
 }
 
-TEST(globalCoordinates, FourMirrors_20Rays) {
+TEST(dynamicTracing, FourMirrors_20Rays) {
     if (!shouldDoVulkanTests()) { GTEST_SKIP(); }
 
     RAYX::GeometricUserParams g_params = RAYX::GeometricUserParams(10);
@@ -1606,28 +1601,24 @@ TEST(globalCoordinates, FourMirrors_20Rays) {
     glm::dvec4 pos = w_coord.calcPosition();
     glm::dmat4x4 or1 = w_coord.calcOrientation();
     std::shared_ptr<RAYX::PlaneMirror> p1 = std::make_shared<RAYX::PlaneMirror>("globalCoordinates_20rays", 0, 50, 200, pos, or1, zeros7); // {1,2,3,0.01,0.02,0.03}
-    //std::shared_ptr<RAYX::PlaneMirror> p1 = std::make_shared<RAYX::PlaneMirror>("globalCoordinates_20rays", 50, 200, 10, 7, 10000, std::vector<double>{ 0,0,0, 0,0,0 }, zeros7, nullptr, true); // {1,2,3,0.01,0.02,0.03}
 
     RAYX::GeometricUserParams g_params2 = RAYX::GeometricUserParams(15);
     RAYX::WorldUserParams w_coord2 = RAYX::WorldUserParams(degToRad(15), degToRad(15), degToRad(4), 10, std::vector<double>{0, 0, 0, 0, 0, 0});//std::vector<double>{0,0,0, 0,0,0});
     glm::dvec4 pos2 = w_coord2.calcPosition(w_coord, pos, or1);
     glm::dmat4x4 or2 = w_coord2.calcOrientation(w_coord, pos, or1);
     std::shared_ptr<RAYX::PlaneMirror> p2 = std::make_shared<RAYX::PlaneMirror>("PlaneMirror2", 0, 50, 200, pos2, or2, zeros7); // {1,2,3,0.01,0.02,0.03}
-    //std::shared_ptr<RAYX::PlaneMirror> p2 = std::make_shared<RAYX::PlaneMirror>("PlaneMirror2", 50, 200, 15, 4, 10000, std::vector<double>{ 0,0,0, 0,0,0 }, zeros7, p1, true); // {1,2,3,0.01,0.02,0.03}
 
     g_params = RAYX::GeometricUserParams(7);
     RAYX::WorldUserParams w_coord3 = RAYX::WorldUserParams(g_params.getAlpha(), g_params.getBeta(), degToRad(10), 10, std::vector<double>{0, 0, 0, 0, 0, 0});
     glm::dvec4 pos3 = w_coord3.calcPosition(w_coord2, pos2, or2);
     glm::dmat4x4 or3 = w_coord3.calcOrientation(w_coord2, pos2, or2);
     std::shared_ptr<RAYX::PlaneMirror> p3 = std::make_shared<RAYX::PlaneMirror>("PlaneMirror3", 0, 50, 200, pos3, or3, zeros7); // {1,2,3,0.01,0.02,0.03}
-    //std::shared_ptr<RAYX::PlaneMirror> p3 = std::make_shared<RAYX::PlaneMirror>("PlaneMirror3", 50, 200, 7, 10, 10000, std::vector<double>{ 0,0,0, 0,0,0 }, zeros7, p2, true); // {1,2,3,0.01,0.02,0.03}
 
     g_params = RAYX::GeometricUserParams(22);
     RAYX::WorldUserParams w_coord4 = RAYX::WorldUserParams(g_params.getAlpha(), g_params.getBeta(), degToRad(17), 10, std::vector<double>{0, 0, 0, 0, 0, 0});
     glm::dvec4 pos4 = w_coord4.calcPosition(w_coord3, pos3, or3);
     glm::dmat4x4 or4 = w_coord4.calcOrientation(w_coord3, pos3, or3);
     std::shared_ptr<RAYX::PlaneMirror> p4 = std::make_shared<RAYX::PlaneMirror>("PlaneMirror4", 0, 50, 200, pos4, or4, zeros7); // {1,2,3,0.01,0.02,0.03}
-    //std::shared_ptr<RAYX::PlaneMirror> p4 = std::make_shared<RAYX::PlaneMirror>("PlaneMirror4", 50, 200, 22, 17, 10000, std::vector<double>{ 0,0,0, 0,0,0 }, zeros7, p3, true); // {1,2,3,0.01,0.02,0.03}
 
     RAYX::WorldUserParams w_coord5 = RAYX::WorldUserParams(0, 0, 0, 1000, std::vector<double>{0, 0, 0, 0, 0, 0});
     glm::dvec4 pos5 = w_coord5.calcPosition(w_coord4, pos4, or4);
@@ -1712,8 +1703,6 @@ TEST(opticalElements, toroid) {
 
     std::shared_ptr<RAYX::ToroidMirror> t = std::make_shared<RAYX::ToroidMirror>("toroid", 0, 50, 200, t_position, t_orientation, degToRad(10), 10000, 1000, 10000, 1000, zeros7);
     std::shared_ptr<RAYX::ImagePlane> ip = std::make_shared<RAYX::ImagePlane>("Image plane", ip_position, ip_orientation);
-    //std::shared_ptr<RAYX::ToroidMirror> t = std::make_shared<RAYX::ToroidMirror>("toroid", 0, 50, 200, 10, 0, 10000, 10000, 1000, 10000, 1000, std::vector<double>{ 0,0,0, 0,0,0 }, zeros7,  nullptr, true);
-    //std::shared_ptr<RAYX::ImagePlane> ip = std::make_shared<RAYX::ImagePlane>("Image plane", 1000, t, true);
     testOpticalElement({ t, ip }, 20000);
 
 }
@@ -1785,8 +1774,7 @@ TEST(PeteRZP, spec1_first_plus_rzp) {
     glm::dvec4 rzp_position = rzp_param.calcPosition();
     glm::dmat4x4 rzp_orientation = rzp_param.calcOrientation();
     std::shared_ptr<RAYX::ReflectionZonePlate> rzp = std::make_shared<RAYX::ReflectionZonePlate>("ReflectionZonePete", 0, 0, 4, 60, rzp_position, rzp_orientation, p->getPhotonEnergy(), 1, 1, 2.2, 4.75, 90, 400, 90, 400, 0, 0, 1, -24.35, zeros7); // dx,dy,dz, dpsi,dphi,dchi //
-
-    //std::shared_ptr<RAYX::ReflectionZonePlate> rzp = std::make_shared<RAYX::ReflectionZonePlate>("ReflectionZonePete", 0, 1, 0, 1, 1, 4, 60, 170, 2.2, 0, 90, p->getPhotonEnergy(), p->getPhotonEnergy(), 1, 1, 2.2, 4.75, 90, 400, 90, 400, 0, 0, 1, 0, -24.35, 4.75, std::vector<double>{ 0,0,0, 0,0,0 },  std::vector<double>{0,0,0,0, 0,0,0}, nullptr, true);  // dx,dy,dz, dpsi,dphi,dchi //
+    
     rzp->setOutMatrix(glmToVector16(glm::transpose(rzp_param.calcE2B()))); // to make comparison with old ray files possible, use the beam coordinate system
     std::list<double> outputRays = runTracer(p->getRays(), { rzp });
     std::string filename = "testFile_spec1_first_plus_rzp";
@@ -1837,7 +1825,6 @@ TEST(PeteRZP, spec1_first_minus_rzp2) {
     std::shared_ptr<RAYX::ReflectionZonePlate> rzp = std::make_shared<RAYX::ReflectionZonePlate>("ReflectionZonePete", 0, 0, 4, 60, rzp_position, rzp_orientation, p->getPhotonEnergy(), -1, -1, 2.2, 1, 90, 400, 90, 400, 0, 0, 1, 0, zeros7); // dx,dy,dz, dpsi,dphi,dchi //
     rzp->setOutMatrix(glmToVector16(glm::transpose(rzp_param.calcE2B()))); // to make comparison with old ray files possible, use the beam coordinate system
 
-    //std::shared_ptr<RAYX::ReflectionZonePlate> rzp = std::make_shared<RAYX::ReflectionZonePlate>("ReflectionZonePete", 0, 1, 0, 1, 1, 2, 60, 170, 2.2, 0, 90, p->getPhotonEnergy(), p->getPhotonEnergy(), -1, -1, 2.2, 1, 90, 400, 90, 400, 0, 0, 1, 0, 0, 1, std::vector<double>{ 0,0,0, 0,0,0 },  std::vector<double>{0,0,0,0, 0,0,0}, nullptr, true);  // dx,dy,dz, dpsi,dphi,dchi //
     std::list<double> outputRays = runTracer(p->getRays(), { rzp });
     std::string filename = "testFile_spec1_first_minus_rzp2";
     writeToFile(outputRays, filename);

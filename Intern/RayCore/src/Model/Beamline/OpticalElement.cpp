@@ -12,8 +12,6 @@ namespace RAYX
      * @param surfaceParams         parameters that define the surface of the element
      * @param inputInMatrix         16x16 world coordinate to element coordinate transformation matrix
      * @param inputOutMatrix        16x16 element coordinate to world coordinate transformation matrix
-     * @param misalignmentMatrix    contains matrix for when the misalignment needs to be removed mid-tracing
-     * @param invMisalignmentMatrix contains inverse matrix for when the misalignment needs to be removed mid-tracing
      * @param OParameters           Object parameters (width, height, slopeError..) something all elements have
      * @param EParameters           Element specific parameters, depend on which element it is
      */
@@ -44,7 +42,6 @@ namespace RAYX
      * @param height                    z-dimension of element
      * @param position                  position in world coordinates
      * @param orientation               orientation in world coordinate system
-     * @param tempMisalignmentParams    remove?
      * @param slopeError                slope error parameters
      */
     OpticalElement::OpticalElement(const char* name, const std::vector<double> EParameters, const int geometricalShape, const double width, const double height, glm::dvec4 position, glm::dmat4x4 orientation, const std::vector<double> slopeError)
@@ -71,6 +68,7 @@ namespace RAYX
         m_slopeError(slopeError)
     {
         m_geometry = std::make_unique<Geometry>(geometricalShape, width, height, position, orientation);
+        assert(slopeError.size() == 7);
         updateObjectParams();
     }
 

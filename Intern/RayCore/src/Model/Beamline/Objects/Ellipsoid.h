@@ -16,26 +16,27 @@ namespace RAYX
         ~Ellipsoid();
 
         void calcHalfAxes();
-        double getRadius();
-        double getExitArmLength();
-        double getEntranceArmLength();
-        double getY0(); // center of ellipsoid
-        double getZ0(); // -"-
+        double getRadius() const;
+        double getExitArmLength() const;
+        double getEntranceArmLength() const;
+        double getY0() const; // center of ellipsoid
+        double getZ0() const; // -"-
         double getIncidenceAngle() const;
-        double getShortHalfAxisB(); // b
-        double getLongHalfAxisA(); // a
-        double getOffsetY0(); // always = 0?
-        double getAlpha1(); // from tangent angle and grazing incidence???
+        double getShortHalfAxisB() const; // b
+        double getLongHalfAxisA() const; // a
+        double getOffsetY0() const; // always = 0?
+        double getAlpha1() const; // from tangent angle and grazing incidence???
         // derived params
-        double getTangentAngle();
-        double getA34();
-        double getA33();
-        double getA44();
-        double getHalfAxisC();
+        double getTangentAngle() const;
+        double getA34() const;
+        double getA33() const;
+        double getA44() const;
+        double getHalfAxisC() const;
 
         enum FIGURE_ROTATION { FR_YES, FR_PLANE, FR_A11 };
         
     private:
+        // user parameters:
         double m_radius;
         // grazing incidence, in rad
         double m_incidence;
@@ -46,7 +47,7 @@ namespace RAYX
         
         // derived params, needed on shader
         double m_tangentAngle; // == alpha1
-        double m_a34;
+        double m_a34; // paramters for quadric equation
         double m_a33;
         double m_a44;
         double m_y0; // center of ellipsoid
@@ -55,11 +56,6 @@ namespace RAYX
         double m_longHalfAxisA; // a
         double m_offsetY0; // always = 0?
         double m_halfAxisC; // derived from figure_rotation, a_11 and half axes a, b
-        
-        
-        //double m_Depth;
-        //double m_verDivergence;
-        //double m_horDivergence;
 
     };
 

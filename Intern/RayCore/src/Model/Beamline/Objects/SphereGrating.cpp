@@ -12,13 +12,15 @@ namespace RAYX
      * @param mount                         how angles of reflection are calculated: constant deviation, constant incidence,...
      * @param width                         total width of the mirror (x dimension)
      * @param height                        total height of the mirror (z dimension)
+     * @param radius                        radius of sphere
      * @param position                      position of the element in world coordinate system
      * @param orientation                   orientation of the element in world coordinates
      * @param designEnergyMounting          energy, taken from source
      * @param lineDensity                   line density of the grating in lines/mm
      * @param orderOfDefraction             diffraction order that should be traced
-     * @param vls
-     * @param slopeError
+     * @param vls                           vls grating paramters (6) (variable line spacing)
+     * @param slopeError                    7 slope error parameters: x-y sagittal (0), y-z meridional (1), thermal distortion: x (2),y (3),z (4), cylindrical bowing amplitude y(5) and radius (6)
+     * 
     */
     SphereGrating::SphereGrating(const char* name, int mount, int geometricalShape, double width, double height, double radius, glm::dvec4 position, glm::dmat4x4 orientation, double designEnergyMounting, double lineDensity, double orderOfDiffraction, std::vector<double> vls, std::vector<double> slopeError)
         : OpticalElement(name, geometricalShape, width, height, position, orientation, slopeError),
@@ -85,7 +87,8 @@ namespace RAYX
         return std::make_shared<SphereGrating>(name, mount, geometricalShape, width, height, radius, position, orientation, designEnergyMounting, lineDensity, orderOfDiffraction, vls, slopeError);
     }
 
-    /*void SphereGrating::calcRadius() {
+    /* TODO (Theresa): how to make radius calculation easier?
+    void SphereGrating::calcRadius() {
         if (m_gratingMount == GM_DEVIATION) {
             double theta = m_deviation > 0 ? (PI - m_deviation) / 2 : PI / 2 + m_deviation;
             m_radius = 2.0 / sin(theta) / (1.0 / m_entranceArmLength + 1.0 / m_exitArmLength);

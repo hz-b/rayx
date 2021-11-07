@@ -18,7 +18,8 @@ namespace RAYX
         ~SphereGrating();
 
         static std::shared_ptr<SphereGrating> createFromXML(rapidxml::xml_node<>*);
-
+        
+        // TODO (Theresa): should ideally be removed as soon as radius calculation is simplified in GeometricUSerParams.cpp
         void calcRadius();
         void calcAlpha(double deviation, double normalIncidence);
         void focus(double angle);

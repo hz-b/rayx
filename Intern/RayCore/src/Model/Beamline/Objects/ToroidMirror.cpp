@@ -27,7 +27,7 @@ namespace RAYX
         m_meridionalEntranceArmLength(mEntrance),
         m_meridionalExitArmLength(mExit)
     {
-        // TODO(Theresa): maybe move this function outside of this class (same for spheres) because this is derived from user parameters
+        // TODO(Theresa): maybe move this function outside of this class (same for spheres) because this can be derived from user parameters
         calcRadius(incidenceAngle); // calculate the radius
 
         std::cout << "[ToroidMirror]: long Radius: " << m_longRadius << ", short Radius: " << m_shortRadius << std::endl;

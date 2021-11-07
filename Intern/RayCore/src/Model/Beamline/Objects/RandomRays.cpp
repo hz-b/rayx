@@ -7,7 +7,9 @@
 namespace RAYX
 {
 
-    // angles given and stored in rad
+    /** creates random rays where each parameter is chosen uniformly from [low, high]
+     * used for testing only as these rays do not make much sense
+    */
     RandomRays::RandomRays(int low, int high)
         : LightSource("Random rays", EnergyDistribution(EnergyRange(100., 0.), true), 0, 0, 0, { 0,0,0,0 }),
         m_low(low),
@@ -20,8 +22,7 @@ namespace RAYX
     }
 
     /**
-     * creates floor(sqrt(numberOfRays)) **2 rays (a grid with as many rows as columns, eg amountOfRays=20 -> 4*4=16, rest (4 rays) same as first 4)
-     * distributed evenly across width & height of source
+     * every parameter is chosen randomly
      * returns list of rays
      */
     std::vector<Ray> RandomRays::getRays() {

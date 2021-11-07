@@ -5,15 +5,21 @@ namespace RAYX
 
 
     /**
-     * Angles given in degree and stored in rad. Initializes transformation matrices,
-     * and parameters for the quadric in super class (quadric). Sets mirror-specific
-     * parameters in this class.
+     * Angles given in degree and stored in rad. Initializes transformation matrices from position and orientation,
+     * and parameters for the quadric in super class (surface). 
+     * stores mirror-specific parameters in this class.
      *
-     * width, height = total width, height of the mirror (x- and z- dimensions)
-     * grazingIncidence = desired incidence angle of the main ray
-     * azimuthal = rotation of mirror around z-axis
-     * distanceToPreceedingElement
-     *
+     * @param width             width of the mirror (x-dimension)
+     * @param height            height of the mirror (z-dimension)
+     * @param position          position of the element in world coordinates
+     * @param orientation       orientation of the element in world coordinates
+     * @param grazingIncidence  desired incidence angle of the main ray
+     * @param entranceArmLength length of entrance arm
+     * @param exitArmLength     length of exit arm
+     * @param figRot            figure of rotation (0 = yes, 1 = plane, 2 = no, short half axis C)??
+     * @param a_11              a_11 in quadric equation
+     * @param slopeError        7 slope error parameters: x-y sagittal (0), y-z meridional (1), thermal distortion: x (2),y (3),z (4), cylindrical bowing amplitude y(5) and radius (6)
+     *        
     */
     Ellipsoid::Ellipsoid(const char* name, const int geometricalShape, const double width, const double height, glm::dvec4 position, glm::dmat4x4 orientation, const double grazingIncidence,
         const double entranceArmLength, const double exitArmLength, const int figRot, const double a_11, const std::vector<double> slopeError)
@@ -42,7 +48,7 @@ namespace RAYX
 
     }
 
-
+    // dstr
     Ellipsoid::~Ellipsoid()
     {
     }
@@ -53,7 +59,9 @@ namespace RAYX
         m_radius = 2.0/sin(theta) / (1.0 / m_entranceArmLength + 1.0 / m_exitArmLength);
     }*/
 
-    // caclulates the half axes from the entrance and exit arm lengths, see ELLPARAM in RAYX.FOR
+    /**
+     *  caclulates the half axes, tangent angle and the center of the ellipsoid (z0, y0) from the incidence angle, entrance and exit arm lengths, see ELLPARAM in RAYX.FOR
+    */
     void Ellipsoid::calcHalfAxes() {
         double theta = m_incidence; // designGrazingIncidenceAngle always equal to alpha (grazingIncidenceAngle)??
         if (theta > PI / 2) {
@@ -91,51 +99,51 @@ namespace RAYX
         std::cout << "[Ellipsoid]: A= " << m_longHalfAxisA << ", B= " << m_shortHalfAxisB << ", C= " << m_halfAxisC << ", angle = " << m_tangentAngle << ", Z0 = " << m_z0 << ", Y0= " << m_y0 << std::endl;
     }
 
-    double Ellipsoid::getRadius() {
+    double Ellipsoid::getRadius() const {
         return m_radius;
     }
 
-    double Ellipsoid::getExitArmLength() {
+    double Ellipsoid::getExitArmLength() const {
         return m_exitArmLength;
     }
 
-    double Ellipsoid::getEntranceArmLength() {
+    double Ellipsoid::getEntranceArmLength() const {
         return m_entranceArmLength;
     }
 
-    double Ellipsoid::getY0() {
+    double Ellipsoid::getY0() const {
         return m_y0;
     }
 
-    double Ellipsoid::getZ0() {
+    double Ellipsoid::getZ0() const {
         return m_z0;
     }
     double Ellipsoid::getIncidenceAngle() const {
         return m_incidence;
     }
 
-    double Ellipsoid::getShortHalfAxisB() {
+    double Ellipsoid::getShortHalfAxisB() const {
         return m_shortHalfAxisB;
     }
-    double Ellipsoid::getLongHalfAxisA() {
+    double Ellipsoid::getLongHalfAxisA() const {
         return m_longHalfAxisA;
     }
-    double Ellipsoid::getOffsetY0() {
+    double Ellipsoid::getOffsetY0() const {
         return m_offsetY0;
     }
-    double Ellipsoid::getTangentAngle() {
+    double Ellipsoid::getTangentAngle() const {
         return m_tangentAngle;
     }
-    double Ellipsoid::getA34() {
+    double Ellipsoid::getA34() const {
         return m_a34;
     }
-    double Ellipsoid::getA33() {
+    double Ellipsoid::getA33() const {
         return m_a33;
     }
-    double Ellipsoid::getA44() {
+    double Ellipsoid::getA44() const {
         return m_a44;
     }
-    double Ellipsoid::getHalfAxisC() {
+    double Ellipsoid::getHalfAxisC() const {
         return m_halfAxisC;
     }
 }

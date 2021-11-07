@@ -5,7 +5,21 @@
 namespace RAYX
 {
 
-    // angles given and stored in rad
+    /**
+     * creates floor(sqrt(numberOfRays)) **2 rays (a grid with as many rows as columns, eg amountOfRays=20 -> 4*4=16, rest (4 rays) same position and direction as first 4)
+     * distributed evenly across width & height of source
+     * @param name              name of source
+     * @param dist              Energy Distribution object, describes which values the energy of a ray can take. this energy is then chosen randomly for each ray from this distribution
+     * @param sourceWidth       width of the source, the x-coordinate of the origin(position) of the ray will be within [-sourceWidth/2, +sourceWidth/2]
+     * @param sourceHeight      height of the source, the y-coordinate of the origin(position) of the ray will be within [-sourceHeight/2, +sourceHeight/2]
+     * @param sourceDepth       depth of the source, the z-coordinate of the origin(position) of the ray will be within [-sourceDepth/2, +sourceDepth/2], but chosen randomly. if set to 0, the rays are chosen deterministically, which is useful for testing
+     * @param horDivergence     divergence span in mrad of the x-direction of the ray. 
+     * @param verDivergence     divergence span in mrad of the y-direction of the ray, since direction vectors have unit length, the z-direction is derived from the two other angles
+     * @param linPol0           polarization
+     * @param linPol45          polarization
+     * @param circPol           polarization
+     * @param misalignment      if the source is moved/turned in any direction (affects x,y position and x,y direction)
+    */
     MatrixSource::MatrixSource(const std::string name, EnergyDistribution dist, const double sourceWidth, const double sourceHeight, const double sourceDepth, const double horDivergence, const double verDivergence, const double linPol0, const double linPol45, const double circPol, const std::vector<double> misalignment)
         : LightSource(name.c_str(), dist, linPol0, linPol45, circPol, misalignment, sourceDepth, sourceHeight, sourceWidth, horDivergence, verDivergence)
     {
@@ -61,9 +75,9 @@ namespace RAYX
 
 
     /**
-     * creates floor(sqrt(numberOfRays)) **2 rays (a grid with as many rows as columns, eg amountOfRays=20 -> 4*4=16, rest (4 rays) same as first 4)
+     * creates floor(sqrt(numberOfRays)) **2 rays (a grid with as many rows as columns, eg amountOfRays=20 -> 4*4=16, rest (4 rays) same position and direction as first 4)
      * distributed evenly across width & height of source
-     * returns list of rays
+     * returns vector of rays
      */
     std::vector<Ray> MatrixSource::getRays() {
         double lower_bound = 0;
@@ -101,7 +115,9 @@ namespace RAYX
             Ray r = rayVector.at(i);
             glm::dvec3 position = glm::dvec3(r.m_position[0], r.m_position[1], r.m_position[2]);
             glm::dvec3 direction = glm::dvec3(r.m_direction[0], r.m_direction[1], r.m_direction[2]);
-            en = selectEnergy();
+            // selects the energy of the ray based on the given distribution or .dat file
+            en = selectEnergy(); 
+            // stokes parameters, needed for efficiency calculations (whether a ray is absorbed or reflected), related to polarisation 
             glm::dvec4 stokes = glm::dvec4(1, getLinear0(), getLinear45(), getCircular());
 
             Ray r_copy(position, direction, stokes, en, 1.0);

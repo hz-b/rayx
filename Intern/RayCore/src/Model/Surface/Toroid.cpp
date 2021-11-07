@@ -5,7 +5,7 @@
 namespace RAYX
 {
     /**
-     * @param inputPoints           16 entry vector that contains the paramters for a toroidal surface
+     * @param inputPoints           16 entry vector that contains the parameters for a toroidal surface
     */
     Toroid::Toroid(const std::vector<double> inputPoints)
     {
@@ -20,6 +20,8 @@ namespace RAYX
     Toroid::Toroid(double longRadius, double shortRadius)
     {
         m_parameters = std::vector<double>{longRadius, shortRadius,0,0, 0,0,0,0, 0,0,0,0, 6,0,0,0};
+        m_longRadius = longRadius;
+        m_shortRadius = shortRadius;
     }
 
     Toroid::Toroid() {}
@@ -30,17 +32,19 @@ namespace RAYX
 
     /**
      * sets the parameters of the toroidal surface to the given 16 entry vector
-     * @param inputPoints   16 entry vector a_11 to a_44
+     * @param inputPoints   16 entry vector
      * @return void
     */
     void Toroid::setParameters(const std::vector<double> inputPoints)
     {
-        assert(inputPoints.size() == 16); //parameter size ==6?
+        assert(inputPoints.size() == 16);
         m_parameters = inputPoints;
+        m_longRadius = inputPoints[0];
+        m_shortRadius = inputPoints[1];
     }
 
     std::vector<double> Toroid::getParams() const {
-        std::cout << "[Toroid]: Return anchor points" << std::endl;
+        std::cout << "[Toroid]: Return surface points" << std::endl;
         return m_parameters;
     }
 
