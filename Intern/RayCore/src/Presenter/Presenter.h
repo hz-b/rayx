@@ -15,7 +15,7 @@ namespace RAYX
         Presenter(std::shared_ptr<Beamline> beamline);
         ~Presenter();
 
-        bool run(double translationXerror, double translationYerror, double translationZerror);
+        bool run();
 
         void addLightSource(std::shared_ptr<LightSource> newSource);
     private:

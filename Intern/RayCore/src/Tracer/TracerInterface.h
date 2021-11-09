@@ -25,7 +25,7 @@ namespace RAYX
         void writeToFile(const std::vector<double>& outputRays, std::ofstream& file, int index) const;
 
 
-        bool run(double translationXerror, double translationYerror, double translationZerror);
+        bool run();
 
         enum DATA_TYPE { DT_RAY_TYPE, DT_QUADRIC_TYPE };
 

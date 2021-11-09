@@ -17,7 +17,7 @@ namespace RAYX
 
     public:
 
-        
+
         WorldUserParams(double alpha, double beta, double chi, double dist, std::vector<double> misalignment, double tangentAngle = 0);
         WorldUserParams();
         ~WorldUserParams();
@@ -27,13 +27,13 @@ namespace RAYX
         */
         glm::dmat4x4 calcE2B();
         glm::dmat4x4 getMisalignmentOrientation();
-        /** this is used only for the ellipsoid where two different 
-         * misalignemnt coordiante systems are possible, 
-         * where one is rotated by another angle (the tangent angle), 
-         * needs to be added/removed whenever the misalignment is handled. 
-         * For other elements the tangentangle is simply 0 and the matrix is the identity 
+        /** this is used only for the ellipsoid where two different
+         * misalignemnt coordiante systems are possible,
+         * where one is rotated by another angle (the tangent angle),
+         * needs to be added/removed whenever the misalignment is handled.
+         * For other elements the tangentangle is simply 0 and the matrix is the identity
         */
-        glm::dmat4x4 getTangentAngleRotation(); 
+        glm::dmat4x4 getTangentAngleRotation();
 
         glm::dvec4 calcPosition(WorldUserParams prev, glm::dvec4 prev_pos, glm::dmat4x4 prev_or);
         glm::dvec4 calcPosition();
@@ -53,7 +53,7 @@ namespace RAYX
          * the mirror coordinate system is the element coordinate system rotated by this angle
          * angle = 0 for other elements and if the ellipsoid misalignment is NOT in the mirror coordinate system
         */
-        double m_tangentAngle; 
+        double m_tangentAngle;
 
     };
 

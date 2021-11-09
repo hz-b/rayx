@@ -23,7 +23,7 @@ namespace RAYX
 
 
     // ! parameters are temporary and need to be removed again
-    bool Presenter::run(double translationXerror, double translationYerror, double translationZerror)
+    bool Presenter::run()
     {
         /*int beamlinesSimultaneously = 1;*/
         for (int j = 0; j < 1/*beamlinesSimultaneously*/; j++) {
@@ -44,7 +44,7 @@ namespace RAYX
                 m_TracerInterface.addOpticalElementToTracer(Elements[i]);
             }
         }
-        return m_TracerInterface.run(translationXerror, translationYerror, translationZerror);
+        return m_TracerInterface.run();
     }
 
 

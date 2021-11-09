@@ -97,5 +97,5 @@ namespace RAYX
     }
     std::vector<double> PlaneGrating::getVls() {
         return m_vls;
-    };
+    }
 }

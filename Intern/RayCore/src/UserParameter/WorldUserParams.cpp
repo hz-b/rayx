@@ -57,7 +57,7 @@ namespace RAYX
         glm::dmat4x4 tangentAngleRotation = getTangentAngleRotation();
         glm::dmat4x4 inverseTangentAngleRotation = glm::transpose(tangentAngleRotation);
 
-       glm::dmat4x4 inverseMisalignmentMatrix = inverseRotation * inverseTranslation;
+        glm::dmat4x4 inverseMisalignmentMatrix = inverseRotation * inverseTranslation;
 
         e2b = e2b * tangentAngleRotation * inverseMisalignmentMatrix * inverseTangentAngleRotation;
         return glm::transpose(e2b);
@@ -133,7 +133,7 @@ namespace RAYX
 
         glm::dmat4x4 tangentAngleRotation = getTangentAngleRotation();
         glm::dmat4x4 inverseTangentAngleRotation = glm::transpose(tangentAngleRotation);
-        
+
         glm::dmat4x4 misalignmentOr = getMisalignmentOrientation();
         glm::dmat4x4 orientation = glm::dmat4x4(
             cos_c, sin_c, 0, 0, // M_b2e
@@ -192,16 +192,16 @@ namespace RAYX
         glm::dvec4 position = glm::dvec4(0.0, 0.0, m_dist, 0.0);
         glm::dmat4x4 orientation = calcOrientation();
         glm::dmat4x4 tangentAngleRotation = getTangentAngleRotation();
-        
+
         glm::dvec4 offset = glm::dvec4(m_misalignment[0], m_misalignment[1], m_misalignment[2], 1.0);
 
         // add misalignment (possibly in different coord system -> tangentAngle) of new element to the position   
         position = position + orientation * tangentAngleRotation * offset;
-        std::cout << "[WUP]: Position: "; 
+        std::cout << "[WUP]: Position: ";
         for (int i = 0; i < 4; i++) {
-            std::cout << position[i] << ", " ;
+            std::cout << position[i] << ", ";
         }
-        std::cout <<  std::endl;
+        std::cout << std::endl;
         return position;
     }
 

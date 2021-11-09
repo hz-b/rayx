@@ -56,7 +56,7 @@ namespace RAYX
     }
 
     // ! parameters are temporary and need to be removed again
-    bool TracerInterface::run(double translationXerror, double translationYerror, double translationZerror)
+    bool TracerInterface::run()
     {
 
 
@@ -127,7 +127,7 @@ namespace RAYX
                 sprintf(buff, "%d;%.17f;%.17f;%.17f;%.17f;%.17f;%.17f;%.17f;%.17f;%.17f;%.17f;%.17f;%.17f;%.17f;%.17f;%.17f;%.17f\n", index,
                     outputRays[i], outputRays[i + 1], outputRays[i + 2], outputRays[i + 3],
                     outputRays[i + 4], outputRays[i + 5], outputRays[i + 6], outputRays[i + 7],
-                    outputRays[i + 8], outputRays[i + 9], outputRays[i + 10], outputRays[i + 11], 
+                    outputRays[i + 8], outputRays[i + 9], outputRays[i + 10], outputRays[i + 11],
                     outputRays[i + 12], outputRays[i + 13], outputRays[i + 14], outputRays[i + 15]);
                 file << buff;
                 index++;

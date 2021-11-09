@@ -15,7 +15,7 @@ namespace RAYX {
 
         // line 2
         std::getline(s, line);
-        if (sscanf(line.c_str(), "%d %le %le %le", &out->m_linecount, &out->m_start, &out->m_end, &out->m_step) != 4) {
+        if (sscanf(line.c_str(), "%u %le %le %le", &out->m_linecount, &out->m_start, &out->m_end, &out->m_step) != 4) {
             std::cerr << "Failed to parse DatFile \"" << filename << "\", at line 2: \"" << line << "\"\n";
             return false;
         }
@@ -27,7 +27,7 @@ namespace RAYX {
             if (line.empty()) { continue; }
 
             DatEntry e;
-            
+
             if (sscanf(line.c_str(), "%le %le", &e.m_energy, &e.m_weight) != 2) {
                 std::cerr << "Failed to parse DatFile \"" << filename << "\", at line " << lineidx << ": \"" << line << "\"\n";
                 return false;
@@ -50,7 +50,7 @@ namespace RAYX {
         std::stringstream s;
         s << m_title << '\n';
         s << m_linecount << ' ' << m_start << ' ' << m_end << ' ' << m_step << '\n';
-        for (auto line: m_Lines) {
+        for (auto line : m_Lines) {
             s << line.m_energy << ' ' << line.m_weight << "\n";
         }
 
@@ -64,23 +64,24 @@ namespace RAYX {
             }
             // this first rng() call will be used to find the index `idx`, s.t.
             // we will return an energy between lines[idx].energy and lines[idx+1].energy
-            double percentage = ((double) rng()) / std::mt19937::max(); // in [0, 1]
-            double continuousWeightSum = m_weightSum - m_Lines.front().m_weight/2 - m_Lines.back().m_weight/2;
+            double percentage = ((double)rng()) / std::mt19937::max(); // in [0, 1]
+            double continuousWeightSum = m_weightSum - m_Lines.front().m_weight / 2 - m_Lines.back().m_weight / 2;
             double w = percentage * continuousWeightSum; // in [0, continuousWeightSum]
 
             double counter = 0;
             uint32_t idx = 0;
-            for (; idx < m_Lines.size()-2; idx++) {
-                counter += (m_Lines[idx].m_weight + m_Lines[idx+1].m_weight)/2;
+            for (; idx < m_Lines.size() - 2; idx++) {
+                counter += (m_Lines[idx].m_weight + m_Lines[idx + 1].m_weight) / 2;
                 if (counter >= w) { break; }
             }
 
             // this second rng() call will be used to interpolate between lines[idx].energy and lines[idx+1].energy
             // percentage == 0 will yield lines[idx].energy, and percentage == 1 will yield lines[idx+1].energy
-            percentage = ((double) rng()) / std::mt19937::max(); // in [0, 1]
-            return m_Lines[idx].m_energy * (1-percentage) + m_Lines[idx+1].m_energy * percentage;
-        } else {
-            double percentage = ((double) rng()) / std::mt19937::max(); // in [0, 1]
+            percentage = ((double)rng()) / std::mt19937::max(); // in [0, 1]
+            return m_Lines[idx].m_energy * (1 - percentage) + m_Lines[idx + 1].m_energy * percentage;
+        }
+        else {
+            double percentage = ((double)rng()) / std::mt19937::max(); // in [0, 1]
             double w = percentage * m_weightSum; // in [0, weightSum]
 
             double counter = 0;
