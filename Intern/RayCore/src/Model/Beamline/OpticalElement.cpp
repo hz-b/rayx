@@ -134,7 +134,6 @@ namespace RAYX
     }
     std::vector<double> OpticalElement::getObjectParameters()
     {
-        updateObjectParams();
         return m_objectParameters;
     }
 
