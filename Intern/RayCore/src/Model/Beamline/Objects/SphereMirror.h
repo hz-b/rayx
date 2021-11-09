@@ -11,9 +11,9 @@ namespace RAYX
     public:
 
         // calculate radius in this class
-        SphereMirror(const char* name, const int geometricalShape, const double width, const double height, const double grazingIncidenceAngle, glm::dvec4 position, glm::dmat4x4 orientation, const double entranceArmLength, const double exitArmLength, const std::vector<double> slopeError);
+        SphereMirror(const char* name, Geometry::GEOMETRICAL_SHAPE geometricalShape, const double width, const double height, const double grazingIncidenceAngle, glm::dvec4 position, glm::dmat4x4 orientation, const double entranceArmLength, const double exitArmLength, const std::vector<double> slopeError);
         // radius is precalculated and given as a parameter
-        SphereMirror(const char* name, const int geometricalShape, const double width, const double height, double radius, glm::dvec4 position, glm::dmat4x4 orientation, const std::vector<double> slopeError);
+        SphereMirror(const char* name, Geometry::GEOMETRICAL_SHAPE geometricalShape, const double width, const double height, double radius, glm::dvec4 position, glm::dmat4x4 orientation, const std::vector<double> slopeError);
         SphereMirror();
         ~SphereMirror();
 

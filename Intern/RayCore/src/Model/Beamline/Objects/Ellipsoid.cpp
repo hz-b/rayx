@@ -6,7 +6,7 @@ namespace RAYX
 
     /**
      * Angles given in degree and stored in rad. Initializes transformation matrices from position and orientation,
-     * and parameters for the quadric in super class (surface). 
+     * and parameters for the quadric in super class (surface).
      * stores mirror-specific parameters in this class.
      *
      * @param width             width of the mirror (x-dimension)
@@ -19,9 +19,9 @@ namespace RAYX
      * @param figRot            figure of rotation (0 = yes, 1 = plane, 2 = no, short half axis C)??
      * @param a_11              a_11 in quadric equation
      * @param slopeError        7 slope error parameters: x-y sagittal (0), y-z meridional (1), thermal distortion: x (2),y (3),z (4), cylindrical bowing amplitude y(5) and radius (6)
-     *        
+     *
     */
-    Ellipsoid::Ellipsoid(const char* name, const int geometricalShape, const double width, const double height, glm::dvec4 position, glm::dmat4x4 orientation, const double grazingIncidence,
+    Ellipsoid::Ellipsoid(const char* name, Geometry::GEOMETRICAL_SHAPE geometricalShape, const double width, const double height, glm::dvec4 position, glm::dmat4x4 orientation, const double grazingIncidence,
         const double entranceArmLength, const double exitArmLength, const int figRot, const double a_11, const std::vector<double> slopeError)
         : OpticalElement(name, geometricalShape, width, height, position, orientation, slopeError),
         m_incidence(degToRad(grazingIncidence)),
@@ -35,7 +35,7 @@ namespace RAYX
 
         m_figureRotation = (figRot == 0 ? FR_YES : (figRot == 1 ? FR_PLANE : FR_A11));
         calcHalfAxes();
-        
+
         // a33, 34, 44
         m_a33 = pow(m_shortHalfAxisB / m_longHalfAxisA, 2);
         m_a34 = m_z0 * m_a33;

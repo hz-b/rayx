@@ -14,13 +14,13 @@ namespace RAYX
      * @param width                 width of mirror (x-dimension in element coord. sys.)
      * @param height                height of mirror (z-dimension in element coord. sys.)
      * @param position              position in world coordinates
-     * @param orientation           orientation in world coordinates 
+     * @param orientation           orientation in world coordinates
      * @param beamstopWidth         width of central beamstop
      * @param beamstopHeight        height of central beamstop
      * @param sourceEnergy          energy of source
-     * 
+     *
     */
-    Slit::Slit(const char* name, int geometricalShape, int beamstop, double width, double height, glm::dvec4 position, glm::dmat4x4 orientation, double beamstopWidth, double beamstopHeight, double sourceEnergy)
+    Slit::Slit(const char* name, Geometry::GEOMETRICAL_SHAPE geometricalShape, int beamstop, double width, double height, glm::dvec4 position, glm::dmat4x4 orientation, double beamstopWidth, double beamstopHeight, double sourceEnergy)
         : OpticalElement(name, geometricalShape, width, height, position, orientation, { 0,0,0,0,0,0,0 }),
         m_waveLength(abs(hvlam(sourceEnergy)))
     {
@@ -31,7 +31,7 @@ namespace RAYX
         m_beamstopWidth = m_centralBeamstop == CS_NONE ? 0 : (m_centralBeamstop == CS_ELLIPTICAL ? -abs(beamstopWidth) : abs(beamstopWidth));
         m_beamstopHeight = m_centralBeamstop == CS_NONE ? 0 : (m_centralBeamstop == CS_ELLIPTICAL ? abs(beamstopHeight) : abs(beamstopHeight));
 
-        setSurface(std::make_unique<Quadric>(std::vector<double>{0,0,0,0, 0,0,0,0, 0,0,0,-1, 3,0,0,0}));
+        setSurface(std::make_unique<Quadric>(std::vector<double>{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -1, 3, 0, 0, 0}));
         setElementParameters({ m_beamstopWidth / 2,m_beamstopHeight / 2,0,0, m_waveLength,0,0,0, 0,0,0,0, 0,0,0,0 });
         std::cout << "[Slit]: Created.\n";
     }
@@ -42,8 +42,9 @@ namespace RAYX
     std::shared_ptr<Slit> Slit::createFromXML(rapidxml::xml_node<>* node, double sourceEnergy) {
         const char* name = node->first_attribute("name")->value();
 
-        int geometricalShape;
-        if (!xml::paramInt(node, "geometricalShape", &geometricalShape)) { return nullptr; }
+        int gs;
+        if (!xml::paramInt(node, "geometricalShape", &gs)) { return nullptr; }
+        Geometry::GEOMETRICAL_SHAPE geometricalShape = static_cast<Geometry::GEOMETRICAL_SHAPE>(gs); // HACK(Jannis): convert to enum
 
         int beamstop;
         if (!xml::paramInt(node, "centralBeamstop", &beamstop)) { return nullptr; }

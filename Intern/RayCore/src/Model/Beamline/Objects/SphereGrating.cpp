@@ -20,9 +20,9 @@ namespace RAYX
      * @param orderOfDefraction             diffraction order that should be traced
      * @param vls                           vls grating paramters (6) (variable line spacing)
      * @param slopeError                    7 slope error parameters: x-y sagittal (0), y-z meridional (1), thermal distortion: x (2),y (3),z (4), cylindrical bowing amplitude y(5) and radius (6)
-     * 
+     *
     */
-    SphereGrating::SphereGrating(const char* name, int mount, int geometricalShape, double width, double height, double radius, glm::dvec4 position, glm::dmat4x4 orientation, double designEnergyMounting, double lineDensity, double orderOfDiffraction, std::vector<double> vls, std::vector<double> slopeError)
+    SphereGrating::SphereGrating(const char* name, int mount, Geometry::GEOMETRICAL_SHAPE geometricalShape, double width, double height, double radius, glm::dvec4 position, glm::dmat4x4 orientation, double designEnergyMounting, double lineDensity, double orderOfDiffraction, std::vector<double> vls, std::vector<double> slopeError)
         : OpticalElement(name, geometricalShape, width, height, position, orientation, slopeError),
         m_designEnergyMounting(designEnergyMounting),
         m_lineDensity(lineDensity),
@@ -31,13 +31,13 @@ namespace RAYX
     {
         double icurv = 1;
         m_gratingMount = mount == 0 ? GM_DEVIATION : GM_INCIDENCE;
-        setSurface(std::make_unique<Quadric>(std::vector<double>{1,0,0,0, icurv,1,0,-radius, 0,0,1,0, 2,0,0,0}));
+        setSurface(std::make_unique<Quadric>(std::vector<double>{1, 0, 0, 0, icurv, 1, 0, -radius, 0, 0, 1, 0, 2, 0, 0, 0}));
         setElementParameters({
             0, 0, m_lineDensity, m_orderOfDiffraction,
             abs(hvlam(m_designEnergyMounting)), 0, m_vls[0], m_vls[1],
             m_vls[2], m_vls[3], m_vls[4], m_vls[5],
             0, 0, 0, 0
-        });
+            });
         std::cout << "[SphereGrating]: Created.\n";
     }
 
@@ -51,8 +51,9 @@ namespace RAYX
         int mount;
         if (!xml::paramInt(node, "gratingMount", &mount)) { return nullptr; }
 
-        int geometricalShape;
-        if (!xml::paramInt(node, "geometricalShape", &geometricalShape)) { return nullptr; }
+        int gs;
+        if (!xml::paramInt(node, "geometricalShape", &gs)) { return nullptr; }
+        Geometry::GEOMETRICAL_SHAPE geometricalShape = static_cast<Geometry::GEOMETRICAL_SHAPE>(gs); // HACK(Jannis): convert to enum
 
         double width;
         if (!xml::paramDouble(node, "totalWidth", &width)) { return nullptr; }
@@ -141,7 +142,7 @@ namespace RAYX
         // grazing incidence
         setAlpha((PI / 2) - alph);
         setBeta((PI / 2) - abs(bet));
-        
+
     }*/
 
     double SphereGrating::getRadius() const {

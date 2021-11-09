@@ -2,6 +2,7 @@
 #include "gmock/gmock.h"
 #include "Model/Beamline/Beamline.h"
 #include "Model/Beamline/Objects/Slit.h"
+#include "Model/Geometry/Geometry.h"
 #include "UserParameter/WorldUserParams.h"
 #include "UserParameter/GeometricUserParams.h"
 #include "Core.h"
@@ -70,7 +71,7 @@
 
 
 TEST(Slit, defaultParams) {
-    int geometricalShape = 0;
+    RAYX::Geometry::GEOMETRICAL_SHAPE geometricalShape = RAYX::Geometry::GEOMETRICAL_SHAPE::RECTANGLE;
     int beamstop = 0;
     double width = 24;
     double height = 3;
@@ -108,7 +109,7 @@ TEST(Slit, defaultParams) {
 }
 
 TEST(Slit, rectangleBeamstop) {
-    int geometricalShape = 0;
+    RAYX::Geometry::GEOMETRICAL_SHAPE geometricalShape = RAYX::Geometry::GEOMETRICAL_SHAPE::RECTANGLE;
     int beamstop = 1;
     double width = 24;
     double height = 3;
@@ -144,7 +145,7 @@ TEST(Slit, rectangleBeamstop) {
 }
 
 TEST(Slit, ellipticalBeamstop) {
-    int geometricalShape = 0;
+    RAYX::Geometry::GEOMETRICAL_SHAPE geometricalShape = RAYX::Geometry::GEOMETRICAL_SHAPE::RECTANGLE;
     int beamstop = 2;
     double width = 20;
     double height = 2;
@@ -181,7 +182,7 @@ TEST(Slit, ellipticalBeamstop) {
 
 
 TEST(Slit, ellipticalSlitellipticalBeamstop) {
-    int geometricalShape = 1;
+    RAYX::Geometry::GEOMETRICAL_SHAPE geometricalShape = RAYX::Geometry::GEOMETRICAL_SHAPE::ELLIPTICAL;
     int beamstop = 2;
     double width = 24;
     double height = 3;
@@ -218,7 +219,7 @@ TEST(Slit, ellipticalSlitellipticalBeamstop) {
 
 
 TEST(Slit, ellipticalSlitrectangleBeamstop) {
-    int geometricalShape = 1;
+    RAYX::Geometry::GEOMETRICAL_SHAPE geometricalShape = RAYX::Geometry::GEOMETRICAL_SHAPE::ELLIPTICAL;
     int beamstop = 1;
     double width = 24;
     double height = 3;
@@ -255,7 +256,7 @@ TEST(Slit, ellipticalSlitrectangleBeamstop) {
 
 
 TEST(Slit, ellipticalSlitNoBeamstop) {
-    int geometricalShape = 1;
+    RAYX::Geometry::GEOMETRICAL_SHAPE geometricalShape = RAYX::Geometry::GEOMETRICAL_SHAPE::ELLIPTICAL;
     int beamstop = 0;
     double width = 24;
     double height = 3;

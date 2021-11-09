@@ -31,7 +31,7 @@ namespace RAYX
      * @param fresnelZOffset
      * @param slopeError                    7 slope error parameters: x-y sagittal (0), y-z meridional (1), thermal distortion x (2),y (3),z (4), cylindrical bowing amplitude y(5) and radius (6)
     */
-    ReflectionZonePlate::ReflectionZonePlate(const char* name, const int geometricalShape, const int curvatureType,
+    ReflectionZonePlate::ReflectionZonePlate(const char* name, Geometry::GEOMETRICAL_SHAPE geometricalShape, const int curvatureType,
         const double width, const double height, const glm::dvec4 position, const glm::dmat4x4 orientation, const double designEnergy, const double orderOfDiffraction,
         const double designOrderOfDiffraction, const double dAlpha, const double dBeta, const double mEntrance, const double mExit, const double sEntrance,
         const double sExit, const double shortRadius, const double longRadius, const int additionalZeroOrder,
@@ -92,8 +92,9 @@ namespace RAYX
     std::shared_ptr<ReflectionZonePlate> ReflectionZonePlate::createFromXML(rapidxml::xml_node<>* node) {
         const char* name = node->first_attribute("name")->value();
 
-        int geometricalShape;
-        if (!xml::paramInt(node, "geometricalShape", &geometricalShape)) { return nullptr; }
+        int gs;
+        if (!xml::paramInt(node, "geometricalShape", &gs)) { return nullptr; }
+        Geometry::GEOMETRICAL_SHAPE geometricalShape = static_cast<Geometry::GEOMETRICAL_SHAPE>(gs); // HACK(Jannis): convert to enum
 
         int curvatureType;
         if (!xml::paramInt(node, "curvatureType", &curvatureType)) { return nullptr; }

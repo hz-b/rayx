@@ -4,6 +4,7 @@
 #include "Model/Beamline/Objects/PlaneMirror.h"
 #include "Model/Beamline/Objects/SphereMirror.h"
 #include "Model/Beamline/Objects/Ellipsoid.h"
+#include "Model/Geometry/Geometry.h"
 #include "UserParameter/WorldUserParams.h"
 #include "UserParameter/GeometricUserParams.h"
 #include "Core.h"
@@ -54,7 +55,7 @@ TEST(PlaneMirror, testSimpleParams) {
     double incidenceAngle = 13.2;
     double azimuthalAngle = 0.0;
     double dist = 12005;
-    int geometricalShape = 0;
+    RAYX::Geometry::GEOMETRICAL_SHAPE geometricalShape = RAYX::Geometry::GEOMETRICAL_SHAPE::RECTANGLE;
     int icurv = 1;
     std::vector<double> mis = { 0,0,0,0,0,0 };
     std::vector<double> sE = { 0,0,0,0,0, 0,0 };
@@ -89,7 +90,7 @@ TEST(PlaneMirror, testAdvancedParams) {
     double incidenceAngle = 23;
     double azimuthalAngle = 8.2;
     double dist = 12005;
-    int geometricalShape = 0;
+    RAYX::Geometry::GEOMETRICAL_SHAPE geometricalShape = RAYX::Geometry::GEOMETRICAL_SHAPE::RECTANGLE;
     int icurv = 1;
     std::vector<double> mis = { 1,2,3,0.01,0.02,0.03 };
     std::vector<double> sE = { 0.1,0.2,0.3,0.4,0.5, 0.6,0.7 };
@@ -126,7 +127,7 @@ TEST(SphereMirror, testParams) {
     double dist = 12.12;
     double entranceArmLength = 12.7;
     double exitArmLength = 123.1;
-    int geometricalShape = 0;
+    RAYX::Geometry::GEOMETRICAL_SHAPE geometricalShape = RAYX::Geometry::GEOMETRICAL_SHAPE::RECTANGLE;
     int icurv = 1;
     double radius = 104.32651829593351; // from old RAY
     std::vector<double> mis = { 10,51,2,0.1,5,0.241 };
@@ -169,7 +170,7 @@ TEST(SphereMirror, testPrecalculateRadius) {
     double dist = 12.12;
     double entranceArmLength = 12.7;
     double exitArmLength = 123.1;
-    int geometricalShape = 0;
+    RAYX::Geometry::GEOMETRICAL_SHAPE geometricalShape = RAYX::Geometry::GEOMETRICAL_SHAPE::RECTANGLE;
     int icurv = 1;
     double radius = 104.32651829593351; // from old RAY
     std::vector<double> mis = { 10,51,2,0.1,5,0.241 };
@@ -206,7 +207,7 @@ TEST(SphereMirror, testPrecalculateRadius) {
 }
 
 TEST(Ellips, defaultParams) {
-    int geometricalShape = 0; // rectangle
+    RAYX::Geometry::GEOMETRICAL_SHAPE geometricalShape = RAYX::Geometry::GEOMETRICAL_SHAPE::RECTANGLE;
     double width = 50;
     double height = 200;
     double incidence = 10;
@@ -219,8 +220,8 @@ TEST(Ellips, defaultParams) {
 
     double dist = 10000;
     double chi = 0;
-    std::vector<double> mis = {1,2,3,0.004,0.005,0.006};
-    std::vector<double> sE = {0,0,0, 0,0,0,0};
+    std::vector<double> mis = { 1,2,3,0.004,0.005,0.006 };
+    std::vector<double> sE = { 0,0,0, 0,0,0,0 };
 
     double alpha = 0.031253965260898464;
     double beta = 0.31781188513796743;
@@ -232,7 +233,7 @@ TEST(Ellips, defaultParams) {
     ASSERT_DOUBLE_EQ(correctTangentAngle, tangentAngle);
     tangentAngle = e_params.calcTangentAngle(incidence, entranceArmLength, exitArmLength, 0);
     ASSERT_DOUBLE_EQ(0, tangentAngle);
-    
+
     double shortHalfAxisC = 549.1237529650836;
     double y0 = 312.4887730997391;
     double z0 = 4522.597446463379;
@@ -242,12 +243,12 @@ TEST(Ellips, defaultParams) {
     double a33 = 0.0099681618535688628;
     double a34 = 45.0819833448842;
     double a44 = -5.8207660913467407e-11;
-    std::vector<double> surface = {1, 0, 0, 0, 1, 1, 0, -y0, 0, 0, a33, a34, 7, 0, 0, a44};
+    std::vector<double> surface = { 1, 0, 0, 0, 1, 1, 0, -y0, 0, 0, a33, a34, 7, 0, 0, a44 };
     std::vector<double> elementParams = { sin(correctTangentAngle), cos(correctTangentAngle), y0, z0, 0,0,0,0, 0,0,0,0, 0,0,0,0 };
 
     RAYX::WorldUserParams w_params = RAYX::WorldUserParams(e_params.getAlpha(), e_params.getBeta(), degToRad(chi), dist, mis, tangentAngle);
     RAYX::Ellipsoid eb = RAYX::Ellipsoid("ellipsoid", geometricalShape, width, height, w_params.calcPosition(), w_params.calcOrientation(), incidence, entranceArmLength, exitArmLength, figRot, a11, sE);
-    
+
     EXPECT_NEAR(eb.getShortHalfAxisB(), shortHalfAxisB, 0.0000001);
     EXPECT_NEAR(eb.getLongHalfAxisA(), longHalfAxisA, 0.0000001);
     EXPECT_NEAR(eb.getHalfAxisC(), shortHalfAxisC, 0.0000001);
@@ -256,7 +257,7 @@ TEST(Ellips, defaultParams) {
     EXPECT_NEAR(eb.getTangentAngle(), correctTangentAngle, 0.0000001);
     EXPECT_ITERABLE_DOUBLE_EQ(std::vector<double>, surface, eb.getSurfaceParams());
     EXPECT_ITERABLE_DOUBLE_EQ(std::vector<double>, elementParams, eb.getElementParameters());
-    
+
 
 }
 /*
@@ -282,7 +283,7 @@ TEST(Ellips, testParamsCSCurvature) {
     ASSERT_DOUBLE_EQ(e_params.getAlpha(), alpha);
     ASSERT_DOUBLE_EQ(e_params.getBeta(), beta);
     RAYX::WorldUserParams w_params = RAYX::WorldUserParams(e_params.getAlpha(), e_params.getBeta(), degToRad(azimuthal), dist, mis);
-    
+
     RAYX::Ellipsoid eb = RAYX::Ellipsoid("ellipsoid", geometricalShape, width, height, w_params.calcPosition(), w_params.calcOrientation(), incidence, entranceArmLength, exitArmLength, coordSys, figRot, a_11, mis, sE);
     RAYX::Ellipsoid e = RAYX::Ellipsoid("ellipsoid", geometricalShape, width, height, incidence, azimuthal, dist, entranceArmLength, exitArmLength, coordSys, figRot, a_11, mis, sE, NULL, false);
 
@@ -320,13 +321,13 @@ TEST(Ellips, testParamsCSCurvature) {
     EXPECT_ITERABLE_DOUBLE_EQ(std::vector<double>, correctTempMis, e.getTempMisalignmentParams());
     EXPECT_ITERABLE_DOUBLE_EQ(std::vector<double>, sE, e.getSlopeError());
 
-    glm::dmat4x4 correctInMat = {0.6259888054371695, -0.76201066544902907, -0.16576417347929398, 0, 
-        0.77983204311399357, 0.61168318281721634, 0.13306264837006021, 0, 
-        0, -0.21256394238094042, 0.9771471590295252, 0, 
+    glm::dmat4x4 correctInMat = {0.6259888054371695, -0.76201066544902907, -0.16576417347929398, 0,
+        0.77983204311399357, 0.61168318281721634, 0.13306264837006021, 0,
+        0, -0.21256394238094042, 0.9771471590295252, 0,
         0, 2646.7431914127951, -12166.962849865024, 1};
-    glm::dmat4x4 correctOutMat = {0.6259888054371695, 0.77983204311399357, 0, 0, 
-        -0.6648236542987721, 0.53366897251236345, 0.52269200918172165, 0, 
-        0.40761197743954031, -0.32719934643922, 0.85252159124421889, 0, 
+    glm::dmat4x4 correctOutMat = {0.6259888054371695, 0.77983204311399357, 0, 0,
+        -0.6648236542987721, 0.53366897251236345, 0.52269200918172165, 0,
+        0.40761197743954031, -0.32719934643922, 0.85252159124421889, 0,
         0, 0, 0, 1};
     EXPECT_ITERABLE_DOUBLE_EQ(std::vector<double>, e.getInMatrix(), glmToVector16(correctInMat));
     EXPECT_ITERABLE_DOUBLE_EQ(std::vector<double>, e.getOutMatrix(), glmToVector16(correctOutMat));

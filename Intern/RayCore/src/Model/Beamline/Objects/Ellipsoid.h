@@ -10,7 +10,7 @@ namespace RAYX
     public:
 
         // slightly shortened constructor
-        Ellipsoid(const char* name, const int geometricalShape, const double width, const double height, glm::dvec4 position, glm::dmat4x4 orientation, const double grazingIncidence,
+        Ellipsoid(const char* name, Geometry::GEOMETRICAL_SHAPE geometricalShape, const double width, const double height, glm::dvec4 position, glm::dmat4x4 orientation, const double grazingIncidence,
             const double entranceArmLength, const double exitArmLength, const int figRot, const double a_11, const std::vector<double> slopeError);
         Ellipsoid();
         ~Ellipsoid();
@@ -34,7 +34,7 @@ namespace RAYX
         double getHalfAxisC() const;
 
         enum FIGURE_ROTATION { FR_YES, FR_PLANE, FR_A11 };
-        
+
     private:
         // user parameters:
         double m_radius;
@@ -44,7 +44,7 @@ namespace RAYX
         double m_exitArmLength;
         FIGURE_ROTATION m_figureRotation;
         double m_a11; // param for quadric funciton, given by user
-        
+
         // derived params, needed on shader
         double m_tangentAngle; // == alpha1
         double m_a34; // paramters for quadric equation

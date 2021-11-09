@@ -1352,7 +1352,7 @@ double wasteBox(double x, double z, double xLength, double zLength, double w)
 			return 0.0;
 		}
 	}else{	// Ring shape
-		double rd2 = (x/(xLength/2.0)) * (x/(xLength/2.0)) + (z/(zLength/2.0))*(z/(zLength/2.0));
+		double rd2 = (x/(xLength/2.0)) * (x/(xLength/2.0)) + (z/(zLength/2.0)) * (z/(zLength/2.0));
 		if (rd2 > 1.0) {
 			return 0.0;
 		}
@@ -2301,7 +2301,7 @@ void diffraction(int iopt, double xLength, double yLength, double wl, inout doub
 
 /**
 * calculates resulting ray for a slit
-* transforms ray to object coordinate system, takes misalignment into account, traces the ray and transforms ray resulting of interaction with opt. element back to global coordinates
+* transforms ray to object coordinate system, traces the ray and transforms ray resulting of interaction with opt. element back to global coordinates
 * @param r				ray to trace
 * @param q				quadric surface
 * @param ctr			counter for random number generator, always inout
@@ -2349,7 +2349,7 @@ Ray traceSlit(Ray r, const Quadric q, inout uint64_t ctr, dvec4 intersection) {
 
 /**
 * calculates resulting ray for a toroid
-* transforms ray to object coordinate system, takes misalignment into account, traces the ray and transforms ray resulting of interaction with opt. element back to global coordinates
+* transforms ray to object coordinate system, traces the ray and transforms ray resulting of interaction with opt. element back to global coordinates
 * @param r				ray to trace
 * @param q				quadric surface (well, not a quadric in the torus case, maybe rename this)
 * @param ctr			counter for random number generator, always inout

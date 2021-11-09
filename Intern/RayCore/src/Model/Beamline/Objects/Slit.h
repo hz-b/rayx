@@ -10,8 +10,8 @@ namespace RAYX
 
     public:
 
-        Slit(const char* name, int geometricalShape, int beamstop, double width, double height, glm::dvec4 position, glm::dmat4x4 orientation, double beamstopWidth, double beamstopHeight, double sourceEnergy);
-        
+        Slit(const char* name, Geometry::GEOMETRICAL_SHAPE geometricalShape, int beamstop, double width, double height, glm::dvec4 position, glm::dmat4x4 orientation, double beamstopWidth, double beamstopHeight, double sourceEnergy);
+
         Slit();
         ~Slit();
 

@@ -10,8 +10,9 @@ namespace RAYX
     class RAYX_API Geometry {
 
     public:
+        enum GEOMETRICAL_SHAPE { RECTANGLE, ELLIPTICAL, TRAPEZOID }; ///< influences wastebox function in shader
 
-        Geometry(const int geometricShape, double width, double height, glm::dvec4 position, glm::dmat4x4 orientation);
+        Geometry(GEOMETRICAL_SHAPE geometricShape, double width, double height, glm::dvec4 position, glm::dmat4x4 orientation);
         Geometry();
         ~Geometry();
 
@@ -22,9 +23,8 @@ namespace RAYX
         void setInMatrix(std::vector<double> inputMatrix);
         void setOutMatrix(std::vector<double> inputMatrix);
         void calcTransformationMatrices(glm::dvec4 position, glm::dmat4x4 orientation);
-        
-        enum GEOMETRICAL_SHAPE { GS_RECTANGLE, GS_ELLIPTICAL }; ///< influences wastebox function in shader
-        
+
+
 
     private:
         double m_width;

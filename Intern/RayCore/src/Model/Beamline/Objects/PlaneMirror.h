@@ -9,7 +9,7 @@ namespace RAYX
 
     public:
 
-        PlaneMirror(const char* name, const int geometricalShape, const double width, const double height, glm::dvec4 position, glm::dmat4x4 orientation, const std::vector<double> slopeError);
+        PlaneMirror(const char* name, Geometry::GEOMETRICAL_SHAPE geometricalShape, const double width, const double height, glm::dvec4 position, glm::dmat4x4 orientation, const std::vector<double> slopeError);
         PlaneMirror();
         ~PlaneMirror();
 

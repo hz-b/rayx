@@ -10,10 +10,10 @@
 
 namespace RAYX
 {
-    Geometry::Geometry(const int geometricShape, double width, double height, glm::dvec4 position, glm::dmat4x4 orientation)
+    Geometry::Geometry(GEOMETRICAL_SHAPE geometricShape, double width, double height, glm::dvec4 position, glm::dmat4x4 orientation)
     {
-        m_geometricalShape = geometricShape == 0 ? GS_RECTANGLE : GS_ELLIPTICAL;
-        if (m_geometricalShape == GS_ELLIPTICAL) {
+        m_geometricalShape = geometricShape;
+        if (m_geometricalShape == ELLIPTICAL) {
             m_width = -width;
             m_height = -height;
         }
@@ -63,11 +63,11 @@ namespace RAYX
 
     }
 
-    double Geometry::getWidth() 
+    double Geometry::getWidth()
     {
         return m_width;
     }
-    double Geometry::getHeight() 
+    double Geometry::getHeight()
     {
         return m_height;
     }
@@ -79,7 +79,7 @@ namespace RAYX
     std::vector<double> Geometry::getOutMatrix() {
         return m_outMatrix;
     }
-    
+
     void Geometry::setInMatrix(std::vector<double> inputMatrix)
     {
         assert(inputMatrix.size() == 16);

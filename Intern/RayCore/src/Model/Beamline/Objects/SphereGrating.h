@@ -11,14 +11,13 @@ namespace RAYX
     public:
 
         // new, shortened constructor
-        SphereGrating(const char* name, int mount, int geometricalShape, double width, double height, double radius, glm::dvec4 position, glm::dmat4x4 orientation, double designEnergyMounting, double lineDensity, double orderOfDiffraction, std::vector<double> vls, std::vector<double> slopeError);
-        // old constructor
-        // SphereGrating(const char* name, int mount, int geometricalShape, double width, double height, double deviation, double normalIncidence, double azimuthal, double distanceToPreceedingElement, double entranceArmLength, double exitArmLength, double designEnergyMounting, double lineDensity, double orderOfDiffraction, std::vector<double> misalignmentParams, std::vector<double> vls, std::vector<double> slopeError, std::shared_ptr<OpticalElement> previous, bool global);
+        SphereGrating(const char* name, int mount, Geometry::GEOMETRICAL_SHAPE geometricalShape, double width, double height, double radius, glm::dvec4 position, glm::dmat4x4 orientation, double designEnergyMounting, double lineDensity, double orderOfDiffraction, std::vector<double> vls, std::vector<double> slopeError);
+
         SphereGrating();
         ~SphereGrating();
 
         static std::shared_ptr<SphereGrating> createFromXML(rapidxml::xml_node<>*);
-        
+
         // TODO (Theresa): should ideally be removed as soon as radius calculation is simplified in GeometricUSerParams.cpp
         void calcRadius();
         void calcAlpha(double deviation, double normalIncidence);

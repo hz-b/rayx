@@ -1,12 +1,15 @@
 #include "gtest/gtest.h"
 #include "gmock/gmock.h"
-#include "Model/Beamline/Beamline.h"
-#include "Model/Beamline/Objects/ReflectionZonePlate.h"
+
 #include "Core.h"
 #include "Ray.h"
+#include "utils.h"
+
+#include "Model/Beamline/Beamline.h"
+#include "Model/Beamline/Objects/ReflectionZonePlate.h"
+#include "Model/Geometry/Geometry.h"
 #include "UserParameter/WorldUserParams.h"
 #include "UserParameter/GeometricUserParams.h"
-#include "utils.h"
 
 using ::testing::ElementsAre;
 
@@ -46,7 +49,7 @@ using ::testing::ElementsAre;
 
 TEST(RZP, testdefaultParams) {
     int mount = 1; // incidence
-    int geometricalShape = 0;
+    RAYX::Geometry::GEOMETRICAL_SHAPE geometricalShape = RAYX::Geometry::GEOMETRICAL_SHAPE::RECTANGLE;
     int curvatureType = 0;
     int imageType = 0;
     int rzp_type = 0;
@@ -90,7 +93,7 @@ TEST(RZP, testdefaultParams) {
     glm::dmat4x4 orientation = rzp_param.calcOrientation();
 
     RAYX::ReflectionZonePlate rzp = RAYX::ReflectionZonePlate("RZP", geometricalShape, curvatureType, width, height, position, orientation, designEnergy, orderOfDiffraction, designOrderOfDiffraction, dAlpha, dBeta, sEntrance, sExit, mEntrance, mExit, shortRadius, longRadius, additionalOrder, fresnelOffset, sE);
-    
+
     double d_alpha = 0.017453292519943295;
     double d_beta = 0.017453292519943295;
     double wl = 12.39852;
@@ -123,7 +126,7 @@ TEST(RZP, testdefaultParams) {
 
 TEST(RZP, testdefaultParamsElliptical) {
     int mount = 1; // incidence
-    int geometricalShape = 1;
+    RAYX::Geometry::GEOMETRICAL_SHAPE geometricalShape = RAYX::Geometry::GEOMETRICAL_SHAPE::ELLIPTICAL;
     int curvatureType = 0;
     int imageType = 0;
     int rzp_type = 0;
@@ -166,7 +169,7 @@ TEST(RZP, testdefaultParamsElliptical) {
     glm::dvec4 position = rzp_param.calcPosition();
     glm::dmat4x4 orientation = rzp_param.calcOrientation();
     RAYX::ReflectionZonePlate rzp = RAYX::ReflectionZonePlate("RZP", geometricalShape, curvatureType, width, height, position, orientation, designEnergy, orderOfDiffraction, designOrderOfDiffraction, dAlpha, dBeta, sEntrance, sExit, mEntrance, mExit, shortRadius, longRadius, additionalOrder, fresnelOffset, sE);
-    
+
     double d_alpha = 0.017453292519943295;
     double d_beta = 0.017453292519943295;
     double wl = 12.39852;
@@ -199,7 +202,7 @@ TEST(RZP, testdefaultParamsElliptical) {
 
 TEST(RZP, testParams) {
     int mount = 0; // deviation
-    int geometricShape = 0;
+    RAYX::Geometry::GEOMETRICAL_SHAPE geometricalShape = RAYX::Geometry::GEOMETRICAL_SHAPE::RECTANGLE;
     int imageType = 0;
     int curvatureType = 0;
     int designType = 0;
@@ -239,7 +242,7 @@ TEST(RZP, testParams) {
     RAYX::WorldUserParams rzp_param = RAYX::WorldUserParams(rzp_guparams.getAlpha(), 0.21816615649929122, degToRad(azimuthal), dist, mis);
     glm::dvec4 position = rzp_param.calcPosition();
     glm::dmat4x4 orientation = rzp_param.calcOrientation();
-    RAYX::ReflectionZonePlate rzp = RAYX::ReflectionZonePlate("RZP", geometricShape, curvatureType, width, height, position, orientation, designEnergy, orderOfDiffraction, designOrderOfDiffraction, dAlpha, dBeta, sEntrance, sExit, mEntrance, mExit, shortRadius, longRadius, additionalOrder, fresnelOffset, sE);
+    RAYX::ReflectionZonePlate rzp = RAYX::ReflectionZonePlate("RZP", geometricalShape, curvatureType, width, height, position, orientation, designEnergy, orderOfDiffraction, designOrderOfDiffraction, dAlpha, dBeta, sEntrance, sExit, mEntrance, mExit, shortRadius, longRadius, additionalOrder, fresnelOffset, sE);
 
     std::vector<double> correctElementParams = { 0, 0, 0, inm2eV / designEnergy,
                         double(curvatureType), designOrderOfDiffraction, orderOfDiffraction, fresnelOffset,
