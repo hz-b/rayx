@@ -71,7 +71,7 @@
 
 
 TEST(Slit, defaultParams) {
-    RAYX::Geometry::GEOMETRICAL_SHAPE geometricalShape = RAYX::Geometry::GEOMETRICAL_SHAPE::RECTANGLE;
+    RAYX::Geometry::GeometricalShape geometricalShape = RAYX::Geometry::GeometricalShape::RECTANGLE;
     int beamstop = 0;
     double width = 24;
     double height = 3;
@@ -109,7 +109,7 @@ TEST(Slit, defaultParams) {
 }
 
 TEST(Slit, rectangleBeamstop) {
-    RAYX::Geometry::GEOMETRICAL_SHAPE geometricalShape = RAYX::Geometry::GEOMETRICAL_SHAPE::RECTANGLE;
+    RAYX::Geometry::GeometricalShape geometricalShape = RAYX::Geometry::GeometricalShape::RECTANGLE;
     int beamstop = 1;
     double width = 24;
     double height = 3;
@@ -145,7 +145,7 @@ TEST(Slit, rectangleBeamstop) {
 }
 
 TEST(Slit, ellipticalBeamstop) {
-    RAYX::Geometry::GEOMETRICAL_SHAPE geometricalShape = RAYX::Geometry::GEOMETRICAL_SHAPE::RECTANGLE;
+    RAYX::Geometry::GeometricalShape geometricalShape = RAYX::Geometry::GeometricalShape::RECTANGLE;
     int beamstop = 2;
     double width = 20;
     double height = 2;
@@ -182,7 +182,7 @@ TEST(Slit, ellipticalBeamstop) {
 
 
 TEST(Slit, ellipticalSlitellipticalBeamstop) {
-    RAYX::Geometry::GEOMETRICAL_SHAPE geometricalShape = RAYX::Geometry::GEOMETRICAL_SHAPE::ELLIPTICAL;
+    RAYX::Geometry::GeometricalShape geometricalShape = RAYX::Geometry::GeometricalShape::ELLIPTICAL;
     int beamstop = 2;
     double width = 24;
     double height = 3;
@@ -219,7 +219,7 @@ TEST(Slit, ellipticalSlitellipticalBeamstop) {
 
 
 TEST(Slit, ellipticalSlitrectangleBeamstop) {
-    RAYX::Geometry::GEOMETRICAL_SHAPE geometricalShape = RAYX::Geometry::GEOMETRICAL_SHAPE::ELLIPTICAL;
+    RAYX::Geometry::GeometricalShape geometricalShape = RAYX::Geometry::GeometricalShape::ELLIPTICAL;
     int beamstop = 1;
     double width = 24;
     double height = 3;
@@ -256,7 +256,7 @@ TEST(Slit, ellipticalSlitrectangleBeamstop) {
 
 
 TEST(Slit, ellipticalSlitNoBeamstop) {
-    RAYX::Geometry::GEOMETRICAL_SHAPE geometricalShape = RAYX::Geometry::GEOMETRICAL_SHAPE::ELLIPTICAL;
+    RAYX::Geometry::GeometricalShape geometricalShape = RAYX::Geometry::GeometricalShape::ELLIPTICAL;
     int beamstop = 0;
     double width = 24;
     double height = 3;

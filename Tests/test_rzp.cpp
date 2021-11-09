@@ -49,7 +49,7 @@ using ::testing::ElementsAre;
 
 TEST(RZP, testdefaultParams) {
     int mount = 1; // incidence
-    RAYX::Geometry::GEOMETRICAL_SHAPE geometricalShape = RAYX::Geometry::GEOMETRICAL_SHAPE::RECTANGLE;
+    RAYX::Geometry::GeometricalShape geometricalShape = RAYX::Geometry::GeometricalShape::RECTANGLE;
     int curvatureType = 0;
     int imageType = 0;
     int rzp_type = 0;
@@ -126,7 +126,7 @@ TEST(RZP, testdefaultParams) {
 
 TEST(RZP, testdefaultParamsElliptical) {
     int mount = 1; // incidence
-    RAYX::Geometry::GEOMETRICAL_SHAPE geometricalShape = RAYX::Geometry::GEOMETRICAL_SHAPE::ELLIPTICAL;
+    RAYX::Geometry::GeometricalShape geometricalShape = RAYX::Geometry::GeometricalShape::ELLIPTICAL;
     int curvatureType = 0;
     int imageType = 0;
     int rzp_type = 0;
@@ -202,7 +202,7 @@ TEST(RZP, testdefaultParamsElliptical) {
 
 TEST(RZP, testParams) {
     int mount = 0; // deviation
-    RAYX::Geometry::GEOMETRICAL_SHAPE geometricalShape = RAYX::Geometry::GEOMETRICAL_SHAPE::RECTANGLE;
+    RAYX::Geometry::GeometricalShape geometricalShape = RAYX::Geometry::GeometricalShape::RECTANGLE;
     int imageType = 0;
     int curvatureType = 0;
     int designType = 0;

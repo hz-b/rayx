@@ -10,7 +10,7 @@ namespace RAYX
 
     public:
 
-        PlaneGrating(const char* name, Geometry::GEOMETRICAL_SHAPE geometricalShape, const double width, const double height, glm::dvec4 position, glm::dmat4x4 orientation, const double designEnergyMounting, const double lineDensity, const double orderOfDiffraction, const int additionalZeroOrder, const std::vector<double> vls, const std::vector<double> slopeError);
+        PlaneGrating(const char* name, Geometry::GeometricalShape geometricalShape, const double width, const double height, glm::dvec4 position, glm::dmat4x4 orientation, const double designEnergyMounting, const double lineDensity, const double orderOfDiffraction, const int additionalZeroOrder, const std::vector<double> vls, const std::vector<double> slopeError);
         PlaneGrating();
         ~PlaneGrating();
 

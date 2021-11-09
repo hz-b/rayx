@@ -23,8 +23,8 @@ namespace RAYX
         OpticalElement(const char* name, const std::vector<double> surfaceParams, const std::vector<double> inputInMatrix, const std::vector<double> inputOutMatrix, const std::vector<double> OParameters, const std::vector<double> EParameters);
 
         // new constructors
-        OpticalElement(const char* name, const std::vector<double> EParameters, Geometry::GEOMETRICAL_SHAPE geometricalShape, const double width, const double height, glm::dvec4 position, glm::dmat4x4 orientation, const std::vector<double> slopeError);
-        OpticalElement(const char* name, Geometry::GEOMETRICAL_SHAPE geometricalShape, const double width, const double height, glm::dvec4 position, glm::dmat4x4 orientation, const std::vector<double> slopeError);
+        OpticalElement(const char* name, const std::vector<double> EParameters, Geometry::GeometricalShape geometricalShape, const double width, const double height, glm::dvec4 position, glm::dmat4x4 orientation, const std::vector<double> slopeError);
+        OpticalElement(const char* name, Geometry::GeometricalShape geometricalShape, const double width, const double height, glm::dvec4 position, glm::dmat4x4 orientation, const std::vector<double> slopeError);
 
 
         void setElementParameters(std::vector<double> params);

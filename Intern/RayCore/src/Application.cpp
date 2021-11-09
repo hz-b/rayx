@@ -47,7 +47,7 @@ namespace RAYX
         RAYX::WorldUserParams w_coord = RAYX::WorldUserParams(pm_params.getAlpha(), pm_params.getBeta(), 0, 10000, std::vector<double>{1, 2, 3, 0.004, 0.005, 0.006});
         glm::dvec4 pos1 = w_coord.calcPosition();
         glm::dmat4x4 or1 = w_coord.calcOrientation();
-        std::shared_ptr<RAYX::PlaneMirror> pm = std::make_shared<RAYX::PlaneMirror>("pm_ell_ip_200mirrormis", Geometry::GEOMETRICAL_SHAPE::RECTANGLE, 50, 200, pos1, or1, std::vector<double>{0, 0, 0, 0, 0, 0, 0});
+        std::shared_ptr<RAYX::PlaneMirror> pm = std::make_shared<RAYX::PlaneMirror>("pm_ell_ip_200mirrormis", Geometry::GeometricalShape::RECTANGLE, 50, 200, pos1, or1, std::vector<double>{0, 0, 0, 0, 0, 0, 0});
 
         // ellipsoid with mirror misalignment
         RAYX::GeometricUserParams ell_params = RAYX::GeometricUserParams(10, 10000, 1000);
@@ -56,7 +56,7 @@ namespace RAYX
         RAYX::WorldUserParams ell_w_coord = RAYX::WorldUserParams(ell_params.getAlpha(), ell_params.getBeta(), 0, 100, std::vector<double>{1, 2, 3, 0.004, 0.005, 0.006}, tangentAngle);
         glm::dvec4 pos2 = ell_w_coord.calcPosition(w_coord, pos1, or1);
         glm::dmat4x4 or2 = ell_w_coord.calcOrientation(w_coord, pos1, or1);
-        std::shared_ptr<RAYX::Ellipsoid> eb = std::make_shared<RAYX::Ellipsoid>("ellipsoid_ip_200mirrormis", Geometry::GEOMETRICAL_SHAPE::RECTANGLE, 50, 200, pos2, or2, 10, 10000, 1000, 0, 1, std::vector<double>{0, 0, 0, 0, 0, 0, 0});
+        std::shared_ptr<RAYX::Ellipsoid> eb = std::make_shared<RAYX::Ellipsoid>("ellipsoid_ip_200mirrormis", Geometry::GeometricalShape::RECTANGLE, 50, 200, pos2, or2, 10, 10000, 1000, 0, 1, std::vector<double>{0, 0, 0, 0, 0, 0, 0});
 
         // image plane
         RAYX::WorldUserParams ip_w_coord = RAYX::WorldUserParams(0, 0, 0, 1000, std::vector<double>{0, 0, 0, 0, 0, 0});

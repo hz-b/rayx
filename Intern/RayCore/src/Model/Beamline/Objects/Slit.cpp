@@ -20,7 +20,7 @@ namespace RAYX
      * @param sourceEnergy          energy of source
      *
     */
-    Slit::Slit(const char* name, Geometry::GEOMETRICAL_SHAPE geometricalShape, int beamstop, double width, double height, glm::dvec4 position, glm::dmat4x4 orientation, double beamstopWidth, double beamstopHeight, double sourceEnergy)
+    Slit::Slit(const char* name, Geometry::GeometricalShape geometricalShape, int beamstop, double width, double height, glm::dvec4 position, glm::dmat4x4 orientation, double beamstopWidth, double beamstopHeight, double sourceEnergy)
         : OpticalElement(name, geometricalShape, width, height, position, orientation, { 0,0,0,0,0,0,0 }),
         m_waveLength(abs(hvlam(sourceEnergy)))
     {
@@ -44,7 +44,7 @@ namespace RAYX
 
         int gs;
         if (!xml::paramInt(node, "geometricalShape", &gs)) { return nullptr; }
-        Geometry::GEOMETRICAL_SHAPE geometricalShape = static_cast<Geometry::GEOMETRICAL_SHAPE>(gs); // HACK(Jannis): convert to enum
+        Geometry::GeometricalShape geometricalShape = static_cast<Geometry::GeometricalShape>(gs); // HACK(Jannis): convert to enum
 
         int beamstop;
         if (!xml::paramInt(node, "centralBeamstop", &beamstop)) { return nullptr; }

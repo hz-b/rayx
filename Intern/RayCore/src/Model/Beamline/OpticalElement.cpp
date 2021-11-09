@@ -44,7 +44,7 @@ namespace RAYX
      * @param orientation               orientation in world coordinate system
      * @param slopeError                slope error parameters
      */
-    OpticalElement::OpticalElement(const char* name, const std::vector<double> EParameters, Geometry::GEOMETRICAL_SHAPE geometricalShape, const double width, const double height, glm::dvec4 position, glm::dmat4x4 orientation, const std::vector<double> slopeError)
+    OpticalElement::OpticalElement(const char* name, const std::vector<double> EParameters, Geometry::GeometricalShape geometricalShape, const double width, const double height, glm::dvec4 position, glm::dmat4x4 orientation, const std::vector<double> slopeError)
         : BeamlineObject(name),
         m_slopeError(slopeError),
         m_elementParameters(EParameters)
@@ -63,7 +63,7 @@ namespace RAYX
      * @param orientation               orientation in world coordinate system
      * @param slopeError                slope error parameters
      */
-    OpticalElement::OpticalElement(const char* name, Geometry::GEOMETRICAL_SHAPE geometricalShape, const double width, const double height, glm::dvec4 position, glm::dmat4x4 orientation, const std::vector<double> slopeError)
+    OpticalElement::OpticalElement(const char* name, Geometry::GeometricalShape geometricalShape, const double width, const double height, glm::dvec4 position, glm::dmat4x4 orientation, const std::vector<double> slopeError)
         : BeamlineObject(name),
         m_slopeError(slopeError)
     {

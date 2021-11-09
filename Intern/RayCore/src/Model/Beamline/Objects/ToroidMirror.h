@@ -10,7 +10,7 @@ namespace RAYX
 
     public:
 
-        ToroidMirror(const char* name, Geometry::GEOMETRICAL_SHAPE geometricalShape, const double width, const double height, glm::dvec4 position, glm::dmat4x4 orientation, const double incidenceAngle, const double mEntrance, const double mExit, const double sEntrance, const double sExit, const std::vector<double> slopeError);
+        ToroidMirror(const char* name, Geometry::GeometricalShape geometricalShape, const double width, const double height, glm::dvec4 position, glm::dmat4x4 orientation, const double incidenceAngle, const double mEntrance, const double mExit, const double sEntrance, const double sExit, const std::vector<double> slopeError);
 
         ToroidMirror();
         ~ToroidMirror();

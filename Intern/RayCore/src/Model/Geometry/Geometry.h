@@ -10,9 +10,13 @@ namespace RAYX
     class RAYX_API Geometry {
 
     public:
-        enum GEOMETRICAL_SHAPE { RECTANGLE, ELLIPTICAL, TRAPEZOID }; ///< influences wastebox function in shader
+        enum class GeometricalShape {
+            RECTANGLE = 0,
+            ELLIPTICAL,
+            TRAPEZOID
+        }; ///< influences wastebox function in shader
 
-        Geometry(GEOMETRICAL_SHAPE geometricShape, double width, double height, glm::dvec4 position, glm::dmat4x4 orientation);
+        Geometry(GeometricalShape geometricShape, double width, double height, glm::dvec4 position, glm::dmat4x4 orientation);
         Geometry();
         ~Geometry();
 
@@ -31,6 +35,6 @@ namespace RAYX
         double m_height;
         std::vector<double> m_inMatrix;
         std::vector<double> m_outMatrix;
-        GEOMETRICAL_SHAPE m_geometricalShape;
+        GeometricalShape m_geometricalShape;
     };
 }

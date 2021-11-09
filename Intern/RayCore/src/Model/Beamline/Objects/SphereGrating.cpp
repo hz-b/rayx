@@ -22,7 +22,7 @@ namespace RAYX
      * @param slopeError                    7 slope error parameters: x-y sagittal (0), y-z meridional (1), thermal distortion: x (2),y (3),z (4), cylindrical bowing amplitude y(5) and radius (6)
      *
     */
-    SphereGrating::SphereGrating(const char* name, int mount, Geometry::GEOMETRICAL_SHAPE geometricalShape, double width, double height, double radius, glm::dvec4 position, glm::dmat4x4 orientation, double designEnergyMounting, double lineDensity, double orderOfDiffraction, std::vector<double> vls, std::vector<double> slopeError)
+    SphereGrating::SphereGrating(const char* name, int mount, Geometry::GeometricalShape geometricalShape, double width, double height, double radius, glm::dvec4 position, glm::dmat4x4 orientation, double designEnergyMounting, double lineDensity, double orderOfDiffraction, std::vector<double> vls, std::vector<double> slopeError)
         : OpticalElement(name, geometricalShape, width, height, position, orientation, slopeError),
         m_designEnergyMounting(designEnergyMounting),
         m_lineDensity(lineDensity),
@@ -53,7 +53,7 @@ namespace RAYX
 
         int gs;
         if (!xml::paramInt(node, "geometricalShape", &gs)) { return nullptr; }
-        Geometry::GEOMETRICAL_SHAPE geometricalShape = static_cast<Geometry::GEOMETRICAL_SHAPE>(gs); // HACK(Jannis): convert to enum
+        Geometry::GeometricalShape geometricalShape = static_cast<Geometry::GeometricalShape>(gs); // HACK(Jannis): convert to enum
 
         double width;
         if (!xml::paramDouble(node, "totalWidth", &width)) { return nullptr; }

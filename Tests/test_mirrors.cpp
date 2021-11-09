@@ -55,7 +55,7 @@ TEST(PlaneMirror, testSimpleParams) {
     double incidenceAngle = 13.2;
     double azimuthalAngle = 0.0;
     double dist = 12005;
-    RAYX::Geometry::GEOMETRICAL_SHAPE geometricalShape = RAYX::Geometry::GEOMETRICAL_SHAPE::RECTANGLE;
+    RAYX::Geometry::GeometricalShape geometricalShape = RAYX::Geometry::GeometricalShape::RECTANGLE;
     int icurv = 1;
     std::vector<double> mis = { 0,0,0,0,0,0 };
     std::vector<double> sE = { 0,0,0,0,0, 0,0 };
@@ -90,7 +90,7 @@ TEST(PlaneMirror, testAdvancedParams) {
     double incidenceAngle = 23;
     double azimuthalAngle = 8.2;
     double dist = 12005;
-    RAYX::Geometry::GEOMETRICAL_SHAPE geometricalShape = RAYX::Geometry::GEOMETRICAL_SHAPE::RECTANGLE;
+    RAYX::Geometry::GeometricalShape geometricalShape = RAYX::Geometry::GeometricalShape::RECTANGLE;
     int icurv = 1;
     std::vector<double> mis = { 1,2,3,0.01,0.02,0.03 };
     std::vector<double> sE = { 0.1,0.2,0.3,0.4,0.5, 0.6,0.7 };
@@ -127,7 +127,7 @@ TEST(SphereMirror, testParams) {
     double dist = 12.12;
     double entranceArmLength = 12.7;
     double exitArmLength = 123.1;
-    RAYX::Geometry::GEOMETRICAL_SHAPE geometricalShape = RAYX::Geometry::GEOMETRICAL_SHAPE::RECTANGLE;
+    RAYX::Geometry::GeometricalShape geometricalShape = RAYX::Geometry::GeometricalShape::RECTANGLE;
     int icurv = 1;
     double radius = 104.32651829593351; // from old RAY
     std::vector<double> mis = { 10,51,2,0.1,5,0.241 };
@@ -170,7 +170,7 @@ TEST(SphereMirror, testPrecalculateRadius) {
     double dist = 12.12;
     double entranceArmLength = 12.7;
     double exitArmLength = 123.1;
-    RAYX::Geometry::GEOMETRICAL_SHAPE geometricalShape = RAYX::Geometry::GEOMETRICAL_SHAPE::RECTANGLE;
+    RAYX::Geometry::GeometricalShape geometricalShape = RAYX::Geometry::GeometricalShape::RECTANGLE;
     int icurv = 1;
     double radius = 104.32651829593351; // from old RAY
     std::vector<double> mis = { 10,51,2,0.1,5,0.241 };
@@ -207,7 +207,7 @@ TEST(SphereMirror, testPrecalculateRadius) {
 }
 
 TEST(Ellips, defaultParams) {
-    RAYX::Geometry::GEOMETRICAL_SHAPE geometricalShape = RAYX::Geometry::GEOMETRICAL_SHAPE::RECTANGLE;
+    RAYX::Geometry::GeometricalShape geometricalShape = RAYX::Geometry::GeometricalShape::RECTANGLE;
     double width = 50;
     double height = 200;
     double incidence = 10;

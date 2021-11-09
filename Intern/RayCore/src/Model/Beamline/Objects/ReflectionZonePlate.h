@@ -12,7 +12,7 @@ namespace RAYX
     public:
 
         // shortened constructor that assumes that the angles are already calculated and the position and orientation in world coordinates is already derived 
-        ReflectionZonePlate(const char* name, Geometry::GEOMETRICAL_SHAPE geometricalShape, const int curvatureType, const double width, const double height, const glm::dvec4 position, const glm::dmat4x4 orientation, const double designEnergy, const double orderOfDiffraction, const double designOrderOfDiffraction, const double dAlpha, const double dBeta, const double mEntrance, const double mExit, const double sEntrance, const double sExit, const double shortRadius, const double longRadius, const int additionalZeroOrder, const double fresnelZOffset, const std::vector<double> slopeError);
+        ReflectionZonePlate(const char* name, Geometry::GeometricalShape geometricalShape, const int curvatureType, const double width, const double height, const glm::dvec4 position, const glm::dmat4x4 orientation, const double designEnergy, const double orderOfDiffraction, const double designOrderOfDiffraction, const double dAlpha, const double dBeta, const double mEntrance, const double mExit, const double sEntrance, const double sExit, const double shortRadius, const double longRadius, const int additionalZeroOrder, const double fresnelZOffset, const std::vector<double> slopeError);
         ReflectionZonePlate();
         ~ReflectionZonePlate();
 

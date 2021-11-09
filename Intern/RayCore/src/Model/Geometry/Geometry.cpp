@@ -10,10 +10,10 @@
 
 namespace RAYX
 {
-    Geometry::Geometry(GEOMETRICAL_SHAPE geometricShape, double width, double height, glm::dvec4 position, glm::dmat4x4 orientation)
+    Geometry::Geometry(GeometricalShape geometricShape, double width, double height, glm::dvec4 position, glm::dmat4x4 orientation)
     {
         m_geometricalShape = geometricShape;
-        if (m_geometricalShape == ELLIPTICAL) {
+        if (m_geometricalShape == GeometricalShape::ELLIPTICAL) {
             m_width = -width;
             m_height = -height;
         }

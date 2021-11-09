@@ -55,7 +55,7 @@ TEST(planeGrating, testParams) {
     double dist = 1245.71;
 
     int mount = 0; // { GM_DEVIATION, GM_INCIDENCE, GM_CCF, GM_CCF_NO_PREMIRROR}
-    RAYX::Geometry::GEOMETRICAL_SHAPE geometricalShape = RAYX::Geometry::GEOMETRICAL_SHAPE::RECTANGLE;
+    RAYX::Geometry::GeometricalShape geometricalShape = RAYX::Geometry::GeometricalShape::RECTANGLE;
     double deviation = 12.4;
     double normalIncidence = 15.12;
     double fixFocusConstantCFF = 12.1;
@@ -116,7 +116,7 @@ TEST(planeGraing, mount1) {
     double dist = 1245.71;
 
     int mount = 1;
-    RAYX::Geometry::GEOMETRICAL_SHAPE geometricalShape = RAYX::Geometry::GEOMETRICAL_SHAPE::RECTANGLE;
+    RAYX::Geometry::GeometricalShape geometricalShape = RAYX::Geometry::GeometricalShape::RECTANGLE;
     double deviation = 12.4;
     double normalIncidence = 15.12;
     double fixFocusConstantCFF = 12.1;
@@ -175,7 +175,7 @@ TEST(planeGrating, higherOrderOfDiffraction) {
     double dist = 1245.71;
 
     int mount = 1;
-    RAYX::Geometry::GEOMETRICAL_SHAPE geometricalShape = RAYX::Geometry::GEOMETRICAL_SHAPE::RECTANGLE;
+    RAYX::Geometry::GeometricalShape geometricalShape = RAYX::Geometry::GeometricalShape::RECTANGLE;
     double deviation = 12.4;
     double normalIncidence = 15.12;
     double fixFocusConstantCFF = 12.1;
@@ -237,7 +237,7 @@ TEST(planeGrating, deviation) {
     double azimuthal = 61.142;
     double dist = 1245.71;
 
-    RAYX::Geometry::GEOMETRICAL_SHAPE geometricalShape = RAYX::Geometry::GEOMETRICAL_SHAPE::RECTANGLE;
+    RAYX::Geometry::GeometricalShape geometricalShape = RAYX::Geometry::GeometricalShape::RECTANGLE;
     double deviation = 12.4;
     double normalIncidence = 15.12;
     double fixFocusConstantCFF = 12.1;
@@ -304,7 +304,7 @@ TEST(PlaneGrating, testHvlam) {
 
 TEST(SphereGrating, testParams) {
     int mount = 0;
-    RAYX::Geometry::GEOMETRICAL_SHAPE geometricalShape = RAYX::Geometry::GEOMETRICAL_SHAPE::RECTANGLE;
+    RAYX::Geometry::GeometricalShape geometricalShape = RAYX::Geometry::GeometricalShape::RECTANGLE;
     double width = 241.623;
     double height = 836.213;
     double deviation = 9.215;
