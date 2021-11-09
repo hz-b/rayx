@@ -305,7 +305,6 @@ bool VulkanTracer::checkValidationLayerSupport()
 //physical device for computation is chosen
 void VulkanTracer::pickPhysicalDevice()
 {
-
 	//search for devices
 	uint32_t deviceCount = 0;
 	vkEnumeratePhysicalDevices(instance, &deviceCount, nullptr);
@@ -316,30 +315,20 @@ void VulkanTracer::pickPhysicalDevice()
 	std::vector<VkPhysicalDevice> devices(deviceCount);
 	vkEnumeratePhysicalDevices(instance, &deviceCount, devices.data());
 
-	//search for suitable device for computation task
-	for (const auto& device : devices)
-	{	
-		
-		
-		if (isDeviceSuitable(device))
-		{	
-			physicalDevice = device;
-			break;
+	//pick fastest device
+	int currentRating = -1;
+	for (const auto& device : devices) {
+		if (isDeviceSuitable(device)) {
+			int rating = rateDevice(device);
+			if (rating > currentRating) {
+				physicalDevice = device;
+				currentRating = rating;
+			}
 		}
 	}
-	//error if no device is found
-	if (physicalDevice == VK_NULL_HANDLE)
-	{
-		throw std::runtime_error("failed to find suitable GPU!");
+	if (physicalDevice == VK_NULL_HANDLE) {
+		throw std::runtime_error("failed to find a suitable GPU!");
 	}
-
-	//pick fastest device
-	std::multimap<int, VkPhysicalDevice> candidates;
-	for (const auto& device : devices)
-	{
-		candidates.insert(std::make_pair(rateDevice(device), device));
-	}
-	candidates.rbegin()->first > 0 ? physicalDevice = candidates.rbegin()->second : throw std::runtime_error("failed to find a suitable GPU!");
 }
 
 //checks if given device is suitable for computation
@@ -357,10 +346,6 @@ bool VulkanTracer::isDeviceSuitable(VkPhysicalDevice device)
 	vkGetPhysicalDeviceFeatures(device, &deviceFeatures);
 
 	QueueFamilyIndices indices = findQueueFamilies(device);
-	if (useDiscreteGPU){
-		if (deviceProperties.deviceType != VK_PHYSICAL_DEVICE_TYPE_DISCRETE_GPU){
-			return false;
-		}}
 	return indices.hasvalue;
 }
 
