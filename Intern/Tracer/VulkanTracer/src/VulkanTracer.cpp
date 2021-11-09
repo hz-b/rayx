@@ -316,7 +316,9 @@ void VulkanTracer::pickPhysicalDevice()
 	vkEnumeratePhysicalDevices(instance, &deviceCount, devices.data());
 
 	//pick fastest device
+	physicalDevice = VK_NULL_HANDLE;
 	int currentRating = -1;
+
 	for (const auto& device : devices) {
 		if (isDeviceSuitable(device)) {
 			int rating = rateDevice(device);
@@ -329,6 +331,10 @@ void VulkanTracer::pickPhysicalDevice()
 	if (physicalDevice == VK_NULL_HANDLE) {
 		throw std::runtime_error("failed to find a suitable GPU!");
 	}
+
+	VkPhysicalDeviceProperties deviceProperties;
+	vkGetPhysicalDeviceProperties(physicalDevice, &deviceProperties);
+	std::cout << "[VK]: Chose GPU: " << deviceProperties.deviceName << std::endl;
 }
 
 //checks if given device is suitable for computation
