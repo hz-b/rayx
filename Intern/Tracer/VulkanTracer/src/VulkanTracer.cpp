@@ -359,7 +359,7 @@ int VulkanTracer::rateDevice(VkPhysicalDevice device)
 	//discrete GPUs are usually faster and get a bonus
 	//can be extended to choose the best discrete gpu if multiple are available
 	if (deviceProperties.deviceType == VK_PHYSICAL_DEVICE_TYPE_DISCRETE_GPU)
-		score += 1000;
+		score += 100000;
 	score += deviceProperties.limits.maxComputeSharedMemorySize;
 	return score;
 }

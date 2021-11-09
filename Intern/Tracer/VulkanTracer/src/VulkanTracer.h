@@ -16,14 +16,6 @@ const bool enableValidationLayers = false;
 #else
 const bool enableValidationLayers = true;
 #endif
-#define USE_DGPU
-
-#ifdef USE_DGPU
-const bool useDiscreteGPU = true;
-#else
-const bool useDiscreteGPU = false;
-#endif
-
 
 //set debug generation information
 const std::vector<const char*> validationLayers = {
