@@ -20,7 +20,7 @@ namespace RAYX
      * @param additionalOrder       0/1 whether or not to trace the zero order
      * @param orderOfDiffraction    order of diffraction that should be traced
     */
-    GeometricUserParams::GeometricUserParams(int mount, double deviation, double normalIncidence, double lineDensity, double designEnergy, double additionalOrder, int orderOfDiffraction)
+    GeometricUserParams::GeometricUserParams(int mount, double deviation, double normalIncidence, double lineDensity, double designEnergy, int orderOfDiffraction)
         : m_radius(0), m_shortRadius(0) {
         double angle;
         if (mount == 0) { // incidence 

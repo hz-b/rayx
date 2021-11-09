@@ -72,7 +72,7 @@ TEST(planeGrating, testParams) {
     // derived from above parameters
     double beta = 1.4676505971882481;
     double alpha = 1.457521229154248;
-    RAYX::GeometricUserParams g_guparam = RAYX::GeometricUserParams(mount, deviation, normalIncidence, lineDensity, designEnergy, add_order, orderOfDiffraction);
+    RAYX::GeometricUserParams g_guparam = RAYX::GeometricUserParams(mount, deviation, normalIncidence, lineDensity, designEnergy, orderOfDiffraction);
     ASSERT_DOUBLE_EQ(g_guparam.getAlpha(), alpha);
     ASSERT_DOUBLE_EQ(g_guparam.getBeta(), beta);
 
@@ -134,7 +134,7 @@ TEST(planeGraing, mount1) {
 
     double alpha = 1.3069025438933539;
     double beta = 1.317319261832787;
-    RAYX::GeometricUserParams g_guparam = RAYX::GeometricUserParams(mount, deviation, normalIncidence, lineDensity, designEnergy, add_order, orderOfDiffraction);
+    RAYX::GeometricUserParams g_guparam = RAYX::GeometricUserParams(mount, deviation, normalIncidence, lineDensity, designEnergy, orderOfDiffraction);
     ASSERT_DOUBLE_EQ(g_guparam.getAlpha(), alpha);
     ASSERT_DOUBLE_EQ(g_guparam.getBeta(), beta);
 
@@ -194,7 +194,7 @@ TEST(planeGrating, higherOrderOfDiffraction) {
     double beta = 1.3380699314613769;
     int orderOfDiffraction = 3;
 
-    RAYX::GeometricUserParams g_guparam = RAYX::GeometricUserParams(mount, deviation, normalIncidence, lineDensity, designEnergy, add_order, orderOfDiffraction);
+    RAYX::GeometricUserParams g_guparam = RAYX::GeometricUserParams(mount, deviation, normalIncidence, lineDensity, designEnergy, orderOfDiffraction);
     ASSERT_DOUBLE_EQ(g_guparam.getAlpha(), alpha);
     ASSERT_DOUBLE_EQ(g_guparam.getBeta(), beta);
 
@@ -257,7 +257,7 @@ TEST(planeGrating, deviation) {
     double alpha = 1.4473913414095938;
     double beta = 1.4777804849329026;
 
-    RAYX::GeometricUserParams g_guparam = RAYX::GeometricUserParams(mount, deviation, normalIncidence, lineDensity, designEnergy, add_order, orderOfDiffraction);
+    RAYX::GeometricUserParams g_guparam = RAYX::GeometricUserParams(mount, deviation, normalIncidence, lineDensity, designEnergy, orderOfDiffraction);
     ASSERT_DOUBLE_EQ(g_guparam.getAlpha(), alpha);
     ASSERT_DOUBLE_EQ(g_guparam.getBeta(), beta);
 
@@ -326,7 +326,7 @@ TEST(SphereGrating, testParams) {
     double beta = 1.4915379074397925;
     double radius = 1134.9852832410934;
 
-    RAYX::GeometricUserParams g_guparam = RAYX::GeometricUserParams(mount, deviation, incidence, linedensity, designEnergy, add_order, order);
+    RAYX::GeometricUserParams g_guparam = RAYX::GeometricUserParams(mount, deviation, incidence, linedensity, designEnergy, order);
     g_guparam.calcGratingRadius(mount, degToRad(deviation), entranceArm, exitArm);
     ASSERT_DOUBLE_EQ(g_guparam.getAlpha(), alpha);
     ASSERT_DOUBLE_EQ(g_guparam.getBeta(), beta);

@@ -20,7 +20,7 @@ namespace RAYX
         // constructor for plane and sphere mirrors
         GeometricUserParams(double incidenceAngle);
         // constructor for gratings
-        GeometricUserParams(int mount, double deviation, double normalIncidence, double lineDensity, double designEnergy, double additionalOrder, int orderOfDiffraction);
+        GeometricUserParams(int mount, double deviation, double normalIncidence, double lineDensity, double designEnergy, int orderOfDiffraction);
         // constructor for rzp
         GeometricUserParams(int mount, int imageType, double deviationAngle, double grazingIncidence, double grazingExitAngle, double sourceEnergy, double designEnergy, double orderOfDiffraction, double designOrderOfDiffraction,
             double designAlphaAngle, double designBetaAngle, double mEntrance, double mExit, double sEntrance, double sExit);
