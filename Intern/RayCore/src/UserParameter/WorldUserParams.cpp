@@ -99,7 +99,7 @@ namespace RAYX
      *
      * @return 4x4 homogeneous orientation of the current element with respect to the origin
      */
-    glm::dmat4x4 WorldUserParams::calcOrientation(WorldUserParams prev, glm::dvec4 prev_pos, glm::dmat4x4 prev_or)
+    glm::dmat4x4 WorldUserParams::calcOrientation(WorldUserParams prev, glm::dmat4x4 prev_or)
     {
         glm::dmat4x4 current_orientation = calcOrientation(); // orientation of new element in local coordinate system
         glm::dmat4x4 prev_e2b = prev.calcE2B(); // rotation of new element coordinate system with respect to previous element
@@ -164,7 +164,7 @@ namespace RAYX
     glm::dvec4 WorldUserParams::calcPosition(WorldUserParams prev, glm::dvec4 prev_pos, glm::dmat4x4 prev_or)
     {
         glm::dvec4 local_position = glm::dvec4(0.0, 0.0, m_dist, 0.0); // position of new element with respect to the previous element
-        glm::dmat4x4 orientation = calcOrientation(prev, prev_pos, prev_or);
+        glm::dmat4x4 orientation = calcOrientation(prev, prev_or);
 
         glm::dvec4 new_offset = glm::dvec4(m_misalignment[0], m_misalignment[1], m_misalignment[2], 0);
         glm::dvec4 prev_offset = glm::dvec4(prev.getMisalignment()[0], prev.getMisalignment()[1], prev.getMisalignment()[2], 0);

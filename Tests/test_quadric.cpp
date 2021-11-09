@@ -49,13 +49,6 @@ using ::testing::ElementsAre;
 #define EXPECT_ITERABLE_DOUBLE_EQ( TYPE, ref, target) \
     EXPECT_ITERABLE_BASE( EXPECT_DOUBLE_EQ, TYPE, TYPE, ref, target )
 
-TEST(Quadric, MatrixProduct) {
-    std::vector<double> A = { 23,6,12,7, 8.1,53.1,4.1,0.51, 4.1,5.1,2.7,3.2, 12.5,12.9,4.2,9.1 };
-    std::vector<double> B = { 9.2,6,2.4,72.1, 8.6,21.3,78.2,12, 2.6,2.6,6.52,7.7, 2.25,62.1,5,2.2 };
-    std::vector<double> result = getMatrixProductAsVector(A, B);
-    std::vector<double> correct = { 1171.29 , 1316.13 , 444.29999999999995 , 731.25 , 840.9499999999999 , 1736.25 , 452.07000000000005 , 430.503 , 203.84199999999998 , 286.242 , 91.804 , 110.46000000000001 , 602.76 , 3364.8900000000003 , 304.34999999999997 , 83.441 };
-    EXPECT_ITERABLE_DOUBLE_EQ(std::vector<double>, correct, result);
-}
 
 TEST(Quadric, testTransformationMatrices) {
     double width = 68.12;
@@ -97,21 +90,21 @@ TEST(Quadric, testGlobalCoordinates) {
     RAYX::GeometricUserParams g_params2 = RAYX::GeometricUserParams(15);
     RAYX::WorldUserParams w_coord2 = RAYX::WorldUserParams(g_params2.getAlpha(), g_params2.getBeta(), degToRad(4), 7000, std::vector<double>{2, 4, 6, 0.04, 0.01, 0.06});//std::vector<double>{0,0,0, 0,0,0});
     glm::dvec4 pos2 = w_coord2.calcPosition(w_coord, pos, or1);
-    glm::dmat4x4 or2 = w_coord2.calcOrientation(w_coord, pos, or1);
+    glm::dmat4x4 or2 = w_coord2.calcOrientation(w_coord, or1);
     std::shared_ptr<RAYX::PlaneMirror> p2b = std::make_shared<RAYX::PlaneMirror>("PlaneMirror2", RAYX::Geometry::GeometricalShape::RECTANGLE, 50, 200, pos2, or2, sE); // {1,2,3,0.01,0.02,0.03}
 
     std::cout << "MIRROR 3" << std::endl;
     g_params = RAYX::GeometricUserParams(7);
     RAYX::WorldUserParams w_coord3 = RAYX::WorldUserParams(g_params.getAlpha(), g_params.getBeta(), degToRad(10), 8000, std::vector<double>{4, 5, 3, 0.01, 0.02, 0.03});
     glm::dvec4 pos3 = w_coord3.calcPosition(w_coord2, pos2, or2);
-    glm::dmat4x4 or3 = w_coord3.calcOrientation(w_coord2, pos2, or2);
+    glm::dmat4x4 or3 = w_coord3.calcOrientation(w_coord2, or2);
     std::shared_ptr<RAYX::PlaneMirror> p3c = std::make_shared<RAYX::PlaneMirror>("PlaneMirror1", RAYX::Geometry::GeometricalShape::RECTANGLE, 50, 200, pos3, or3, sE); // {1,2,3,0.01,0.02,0.03}
 
     std::cout << "MIRROR 4" << std::endl;
     g_params = RAYX::GeometricUserParams(22);
     RAYX::WorldUserParams w_coord4 = RAYX::WorldUserParams(g_params.getAlpha(), g_params.getBeta(), degToRad(17), 1000, std::vector<double>{10, 3, 2, 0.01, 0.03, 0.06});
     glm::dvec4 pos4 = w_coord4.calcPosition(w_coord3, pos3, or3);
-    glm::dmat4x4 or4 = w_coord4.calcOrientation(w_coord3, pos3, or3);
+    glm::dmat4x4 or4 = w_coord4.calcOrientation(w_coord3, or3);
     std::shared_ptr<RAYX::PlaneMirror> p4d = std::make_shared<RAYX::PlaneMirror>("PlaneMirror1", RAYX::Geometry::GeometricalShape::RECTANGLE, 50, 200, pos4, or4, sE); // {1,2,3,0.01,0.02,0.03}
 
     std::vector<double> correctInMat = { 0.98549875516199115, -0.16900296657661762, 0.015172371682388559, 0,

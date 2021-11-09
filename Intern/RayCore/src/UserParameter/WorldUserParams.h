@@ -37,7 +37,7 @@ namespace RAYX
 
         glm::dvec4 calcPosition(WorldUserParams prev, glm::dvec4 prev_pos, glm::dmat4x4 prev_or);
         glm::dvec4 calcPosition();
-        glm::dmat4x4 calcOrientation(WorldUserParams prev, glm::dvec4 prev_pos, glm::dmat4x4 prev_or);
+        glm::dmat4x4 calcOrientation(WorldUserParams prev, glm::dmat4x4 prev_or);
         glm::dmat4x4 calcOrientation();
 
         std::vector<double> getMisalignment();

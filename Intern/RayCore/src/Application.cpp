@@ -55,13 +55,13 @@ namespace RAYX
         double tangentAngle = ell_params.calcTangentAngle(10, 10000, 1000, coordinatesystem);
         RAYX::WorldUserParams ell_w_coord = RAYX::WorldUserParams(ell_params.getAlpha(), ell_params.getBeta(), 0, 100, std::vector<double>{1, 2, 3, 0.004, 0.005, 0.006}, tangentAngle);
         glm::dvec4 pos2 = ell_w_coord.calcPosition(w_coord, pos1, or1);
-        glm::dmat4x4 or2 = ell_w_coord.calcOrientation(w_coord, pos1, or1);
+        glm::dmat4x4 or2 = ell_w_coord.calcOrientation(w_coord, or1);
         std::shared_ptr<RAYX::Ellipsoid> eb = std::make_shared<RAYX::Ellipsoid>("ellipsoid_ip_200mirrormis", Geometry::GeometricalShape::RECTANGLE, 50, 200, pos2, or2, 10, 10000, 1000, 0, 1, std::vector<double>{0, 0, 0, 0, 0, 0, 0});
 
         // image plane
         RAYX::WorldUserParams ip_w_coord = RAYX::WorldUserParams(0, 0, 0, 1000, std::vector<double>{0, 0, 0, 0, 0, 0});
         glm::dvec4 pos3 = ip_w_coord.calcPosition(ell_w_coord, pos2, or2);
-        glm::dmat4x4 or3 = ip_w_coord.calcOrientation(ell_w_coord, pos2, or2);
+        glm::dmat4x4 or3 = ip_w_coord.calcOrientation(ell_w_coord, or2);
         std::shared_ptr<RAYX::ImagePlane> i = std::make_shared<RAYX::ImagePlane>("ImagePlane", pos3, or3);
 
         m_Beamline->addOpticalElement(pm);
