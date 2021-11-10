@@ -1,20 +1,18 @@
 #pragma once
-#include "Model/Surface/Quadric.h"
 #include "Model/Beamline/OpticalElement.h"
+#include "Model/Surface/Quadric.h"
 
-namespace RAYX
-{
+namespace RAYX {
 
-    class RAYX_API PlaneMirror : public OpticalElement {
+class RAYX_API PlaneMirror : public OpticalElement {
+  public:
+    PlaneMirror(const char* name, Geometry::GeometricalShape geometricalShape,
+                const double width, const double height, glm::dvec4 position,
+                glm::dmat4x4 orientation, const std::vector<double> slopeError);
+    PlaneMirror();
+    ~PlaneMirror();
 
-    public:
+    static std::shared_ptr<PlaneMirror> createFromXML(rapidxml::xml_node<>*);
+};
 
-        PlaneMirror(const char* name, Geometry::GeometricalShape geometricalShape, const double width, const double height, glm::dvec4 position, glm::dmat4x4 orientation, const std::vector<double> slopeError);
-        PlaneMirror();
-        ~PlaneMirror();
-
-        static std::shared_ptr<PlaneMirror> createFromXML(rapidxml::xml_node<>*);
-
-    };
-
-} // namespace RAYX
+}  // namespace RAYX

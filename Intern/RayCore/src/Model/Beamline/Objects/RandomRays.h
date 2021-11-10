@@ -1,25 +1,23 @@
 #pragma once
 #include <list>
+
 #include "Model/Beamline/LightSource.h"
 
-namespace RAYX
-{
+namespace RAYX {
 
-    class RAYX_API RandomRays : public LightSource
-    {
-    public:
+class RAYX_API RandomRays : public LightSource {
+  public:
+    RandomRays(int low, int high);
 
-        RandomRays(int low, int high);
+    RandomRays();
+    ~RandomRays();
 
-        RandomRays();
-        ~RandomRays();
+    std::vector<Ray> getRays();
+    void compareRays(std::vector<Ray*> input, std::vector<double> output);
 
-        std::vector<Ray> getRays();
-        void compareRays(std::vector<Ray*> input, std::vector<double> output);
+  private:
+    int m_low;
+    int m_high;
+};
 
-    private:
-        int m_low;
-        int m_high;
-    };
-
-} // namespace RAYX
+}  // namespace RAYX

@@ -1,13 +1,15 @@
 #pragma once
 
 #include <math.h>
-#include <vector>
+
+#include <glm.hpp>
 #include <iostream>
+#include <memory>
 #include <stdexcept>
+#include <vector>
+
 #include "Core.h"
 #include "Ray.h"
-#include <memory>
-#include <glm.hpp>
 
 typedef std::vector<std::vector<double>> Matrix;
 

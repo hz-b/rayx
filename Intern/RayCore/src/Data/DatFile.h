@@ -1,39 +1,39 @@
 #pragma once
 
-#include <vector>
-#include <string>
 #include <random>
+#include <string>
+#include <vector>
 
 namespace RAYX {
-    /** This struct represents one line of a .DAT file.  */
-    struct DatEntry {
-        double m_energy;
-        double m_weight;
-    };
+/** This struct represents one line of a .DAT file.  */
+struct DatEntry {
+    double m_energy;
+    double m_weight;
+};
 
-    /** This struct represents the contents of a .DAT file. */
-    struct DatFile {
-        std::string m_title;
-        uint32_t m_linecount;
-        double m_start;
-        double m_end;
-        double m_step;
+/** This struct represents the contents of a .DAT file. */
+struct DatFile {
+    std::string m_title;
+    uint32_t m_linecount;
+    double m_start;
+    double m_end;
+    double m_step;
 
-        double m_weightSum;
-        double m_average;
+    double m_weightSum;
+    double m_average;
 
-        std::vector<DatEntry> m_Lines;
+    std::vector<DatEntry> m_Lines;
 
-        /** loads the .DAT file `filename` and writes it's contents to `out` */
-        static bool load(const char* filename, DatFile* out);
+    /** loads the .DAT file `filename` and writes it's contents to `out` */
+    static bool load(const char* filename, DatFile* out);
 
-        /** creates a valid .DAT file from this struct (may be used for testing) */
-        std::string dump();
+    /** creates a valid .DAT file from this struct (may be used for testing) */
+    std::string dump();
 
-        /** samples from the distribution given by the .DAT file */
-        double selectEnergy(std::mt19937& rng, bool continuous) const;
+    /** samples from the distribution given by the .DAT file */
+    double selectEnergy(std::mt19937& rng, bool continuous) const;
 
-        /** yields the expected value of the underlying distribution */
-        double getAverage() const;
-    };
-}
+    /** yields the expected value of the underlying distribution */
+    double getAverage() const;
+};
+}  // namespace RAYX

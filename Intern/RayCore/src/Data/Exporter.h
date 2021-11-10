@@ -1,19 +1,16 @@
 #pragma once
 #include "Core.h"
 
-namespace RAYX
-{
+namespace RAYX {
 
-    class RAYX_API Exporter
-    {
-    public:
-        Exporter();
-        ~Exporter();
+class RAYX_API Exporter {
+  public:
+    Exporter();
+    ~Exporter();
 
-        void exportToXML();
+    void exportToXML();
 
-    private:
+  private:
+};
 
-    };
-
-} // namespace RAYX
+}  // namespace RAYX

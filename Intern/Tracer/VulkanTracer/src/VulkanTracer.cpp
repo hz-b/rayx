@@ -80,9 +80,9 @@ void VulkanTracer::run() {
     // generateRays();
     // the sizes of the input and output buffers are set. The buffers need to be
     // the size numberOfRays * size of a Ray * the size of a double (a ray
-    //consists of 7 values in double precision, x,y,z for the position and x*,
-    //y*, z* for the direction and a weight. 8 values instead of 7 are used,
-    //because the shader size of the buffer needs to be multiples of 32 bytes)
+    // consists of 7 values in double precision, x,y,z for the position and x*,
+    // y*, z* for the direction and a weight. 8 values instead of 7 are used,
+    // because the shader size of the buffer needs to be multiples of 32 bytes)
     std::cout << "[VK]: Staging buffers:\n";
     // staging buffers need to be at the end of the buffer vector!
     bufferSizes[0] = (uint64_t)numberOfRays * VULKANTRACER_RAY_DOUBLE_AMOUNT *

@@ -1,16 +1,12 @@
 #include "SimulationEnv.h"
 
-namespace RAYX
-{
+namespace RAYX {
 
-    SimulationEnv& SimulationEnv::get() {
-        static SimulationEnv simEnv;
-        return simEnv;
-    }
+SimulationEnv& SimulationEnv::get() {
+    static SimulationEnv simEnv;
+    return simEnv;
+}
 
-    size_t SimulationEnv::genID() {
-        return ++m_idCounter;
-    }
+size_t SimulationEnv::genID() { return ++m_idCounter; }
 
-
-} // namespace RAYX
+}  // namespace RAYX

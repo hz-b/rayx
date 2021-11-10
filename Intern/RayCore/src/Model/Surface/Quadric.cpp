@@ -1,42 +1,40 @@
 #include "Quadric.h"
-#include <cassert>
+
 #include <math.h>
 
-namespace RAYX
-{
-    /** for quadric surfaces: 16 parameters a_11,a_12,a_13,a_14, a_21,a_22,a_23,a_24, a_31,a_32,a_33,a_34, a_41,a_42,a_43,a_44!
-     * a_21,a_31,a_32,a_41,a_42,a_43 are never used for quadric surfaces because the matrix is symmetrial, can be used for other values
-     * @param inputPoints      4x4 Matrix as vector
-    */
-    Quadric::Quadric(const std::vector<double> inputPoints)
-    {
-        assert(inputPoints.size() == 16);
-        m_parameters = inputPoints;
-    }
+#include <cassert>
 
+namespace RAYX {
+/** for quadric surfaces: 16 parameters a_11,a_12,a_13,a_14,
+ * a_21,a_22,a_23,a_24, a_31,a_32,a_33,a_34, a_41,a_42,a_43,a_44!
+ * a_21,a_31,a_32,a_41,a_42,a_43 are never used for quadric surfaces because the
+ * matrix is symmetrial, can be used for other values
+ * @param inputPoints      4x4 Matrix as vector
+ */
+Quadric::Quadric(const std::vector<double> inputPoints) {
+    assert(inputPoints.size() == 16);
+    m_parameters = inputPoints;
+}
 
+Quadric::Quadric() {}  // TODO
 
-    Quadric::Quadric() {} // TODO
+Quadric::~Quadric() {}
 
-    Quadric::~Quadric()
-    {
-    }
+/**
+ * set a new set of parameters a_11 to a_44 for the quadric function
+ * order: a_11,a_12,a_13,a_14, a_21,a_22,a_23,a_24, a_31,a_32,a_33,a_34,
+ * a_41,a_42,a_43,a_44
+ * @param inputPoints   16 entry vector a_11 to a_44
+ * @return void
+ */
+void Quadric::setAnchorPoints(std::vector<double> inputPoints) {
+    assert(inputPoints.size() == 16);
+    m_parameters = inputPoints;
+}
 
-    /**
-     * set a new set of parameters a_11 to a_44 for the quadric function
-     * order: a_11,a_12,a_13,a_14, a_21,a_22,a_23,a_24, a_31,a_32,a_33,a_34, a_41,a_42,a_43,a_44
-     * @param inputPoints   16 entry vector a_11 to a_44
-     * @return void
-    */
-    void Quadric::setAnchorPoints(std::vector<double> inputPoints)
-    {
-        assert(inputPoints.size() == 16);
-        m_parameters = inputPoints;
-    }
+std::vector<double> Quadric::getParams() const {
+    std::cout << "[Quadric]: return surface parameters" << std::endl;
+    return m_parameters;
+}
 
-    std::vector<double> Quadric::getParams() const {
-        std::cout << "[Quadric]: return surface parameters" << std::endl;
-        return m_parameters;
-    }
-
-} // namespace RAYX
+}  // namespace RAYX

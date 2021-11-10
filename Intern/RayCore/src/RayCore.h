@@ -3,7 +3,7 @@
 // For use by RAYX applications
 #include "Debug.h"
 
-// Application 
+// Application
 #include "Application.h"
 
 // Model

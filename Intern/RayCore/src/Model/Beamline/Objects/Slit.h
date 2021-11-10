@@ -1,37 +1,42 @@
 #pragma once
-#include "Model/Surface/Quadric.h"
-#include "Model/Beamline/OpticalElement.h"
 #include <Data/xml.h>
 
-namespace RAYX
-{
+#include "Model/Beamline/OpticalElement.h"
+#include "Model/Surface/Quadric.h"
 
-    class RAYX_API Slit : public OpticalElement {
+namespace RAYX {
 
-    public:
+class RAYX_API Slit : public OpticalElement {
+  public:
+    Slit(const char* name, Geometry::GeometricalShape geometricalShape,
+         int beamstop, double width, double height, glm::dvec4 position,
+         glm::dmat4x4 orientation, double beamstopWidth, double beamstopHeight,
+         double sourceEnergy);
 
-        Slit(const char* name, Geometry::GeometricalShape geometricalShape, int beamstop, double width, double height, glm::dvec4 position, glm::dmat4x4 orientation, double beamstopWidth, double beamstopHeight, double sourceEnergy);
+    Slit();
+    ~Slit();
 
-        Slit();
-        ~Slit();
+    static std::shared_ptr<Slit> createFromXML(rapidxml::xml_node<>*,
+                                               double sourceEnergy);
 
-        static std::shared_ptr<Slit> createFromXML(rapidxml::xml_node<>*, double sourceEnergy);
+    int getCentralBeamstop() const;
+    double getBeamstopWidth() const;
+    double getBeamstopHeight() const;
+    double getWaveLength() const;
 
-        int getCentralBeamstop() const;
-        double getBeamstopWidth() const;
-        double getBeamstopHeight() const;
-        double getWaveLength() const;
+    enum CENTRAL_BEAMSTOP {
+        CS_NONE,
+        CS_RECTANGLE,
+        CS_ELLIPTICAL
+    };  ///< central beamstop shape
 
-        enum CENTRAL_BEAMSTOP { CS_NONE, CS_RECTANGLE, CS_ELLIPTICAL }; ///< central beamstop shape
+  private:
+    double m_waveLength;  ///< from lightsource
 
-    private:
-        double m_waveLength;  ///< from lightsource
+    // TODO(Jannis): Extra class maybe?
+    CENTRAL_BEAMSTOP m_centralBeamstop;
+    double m_beamstopWidth;
+    double m_beamstopHeight;
+};
 
-        // TODO(Jannis): Extra class maybe?
-        CENTRAL_BEAMSTOP m_centralBeamstop;
-        double m_beamstopWidth;
-        double m_beamstopHeight;
-
-    };
-
-} // namespace RAYX
+}  // namespace RAYX

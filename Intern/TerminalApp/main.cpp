@@ -1,18 +1,16 @@
-#include "TerminalApp.h"
 #include "Debug.h"
+#include "TerminalApp.h"
 
-
-int main(int argc, char** argv)
-{
-#ifdef RAYX_PLATFORM_WINDOWS 
+int main(int argc, char** argv) {
+#ifdef RAYX_PLATFORM_WINDOWS
 #ifdef RAY_DEBUG_MODE
-	_CrtSetReportMode(_CRT_WARN, _CRTDBG_MODE_DEBUG);
-	_CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);
+    _CrtSetReportMode(_CRT_WARN, _CRTDBG_MODE_DEBUG);
+    _CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);
 #endif
 #endif
 
-	TerminalApp app = TerminalApp(argc, argv);
-	app.run(/*app.getProvidedFilePath()*/);
+    TerminalApp app = TerminalApp(argc, argv);
+    app.run(/*app.getProvidedFilePath()*/);
 
-	return 0;
+    return 0;
 }
