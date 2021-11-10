@@ -20,10 +20,6 @@ double RAYX_API hvlam(double x);
 double RAYX_API degToRad(double degree);
 double RAYX_API radToDeg(double rad);
 
-Matrix RAYX_API getMatrixProduct(Matrix A, Matrix B);
-std::vector<double> RAYX_API getMatrixProductAsVector(std::vector<double> A, std::vector<double> B);
-Matrix RAYX_API getVectorAsMatrix(std::vector<double> V);
-
 void printDMat4(glm::dmat4 matrix);
 void printMatrix(std::vector<double> matrix);
 
