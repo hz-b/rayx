@@ -12,7 +12,7 @@ namespace RAYX
 
     Presenter::Presenter(std::shared_ptr<Beamline> beamline) :
         m_Beamline(beamline),
-        m_TracerInterface(TracerInterface(beamline->m_OpticalElements.size(), 200000))
+        m_TracerInterface(TracerInterface(beamline->m_OpticalElements.size(), SimulationEnv::get().m_numOfRays))
     {
     }
 

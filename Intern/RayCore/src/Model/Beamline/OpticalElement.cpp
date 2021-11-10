@@ -54,6 +54,16 @@ namespace RAYX
         updateObjectParams();
     }
 
+    // ! temporary constructor for trapezoid (10/11/2021)
+    OpticalElement::OpticalElement(const char* name, Geometry::GeometricalShape geometricalShape, const double widthA, const double widthB, const double height, glm::dvec4 position, glm::dmat4x4 orientation, const std::vector<double> slopeError)
+        : BeamlineObject(name),
+        m_slopeError(slopeError)
+    {
+        m_geometry = std::make_unique<Geometry>(geometricalShape, widthA, widthB, height, position, orientation);
+        assert(slopeError.size() == 7);
+        updateObjectParams();
+    }
+
     /**
      * @param name                      name of the element
      * @param geometricalShape          geometrical Shape of element (0 = rectangle, 1 = elliptical)
@@ -106,17 +116,23 @@ namespace RAYX
 
     }
 
+    // ! temporary adjustment for trapezoid (10/11/2021)
     void OpticalElement::updateObjectParams() {
+        double widthA, widthB = 0.0;
+        m_geometry->getWidth(widthA, widthB);
+
         m_objectParameters = {
-                m_geometry->getWidth(), m_geometry->getHeight(), m_slopeError[0], m_slopeError[1],
+                widthA, m_geometry->getHeight(), m_slopeError[0], m_slopeError[1],
                 m_slopeError[2], m_slopeError[3], m_slopeError[4], m_slopeError[5],
-                m_slopeError[6], 0,0,0,
-                0,0,0,0
+                m_slopeError[6], widthB, 0, 0, 
+                0, 0, 0, 0
         };
     }
 
+    // ! temporary adjustment for trapezoid (10/11/2021)
     double OpticalElement::getWidth() {
-        double width = m_geometry->getWidth();
+        double width,tmp = 0.0;
+        m_geometry->getWidth(width, tmp);
         return width;
     }
 

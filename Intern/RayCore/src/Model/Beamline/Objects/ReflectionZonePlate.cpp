@@ -84,6 +84,55 @@ namespace RAYX
         std::cout << "[RZP]: Created.\n";
     }
 
+    ReflectionZonePlate::ReflectionZonePlate(const char* name, Geometry::GeometricalShape geometricalShape, const int curvatureType, const double widthA, const double widthB, const double height, const glm::dvec4 position, const glm::dmat4x4 orientation, const double designEnergy, const double orderOfDiffraction, const double designOrderOfDiffraction, const double dAlpha, const double dBeta, const double mEntrance, const double mExit, const double sEntrance, const double sExit, const double shortRadius, const double longRadius, const int additionalZeroOrder, const double fresnelZOffset, const std::vector<double> slopeError)
+        : OpticalElement(name, geometricalShape, widthA, widthB, height, position, orientation, slopeError),
+        m_fresnelZOffset(fresnelZOffset),
+        m_designAlphaAngle(degToRad(dAlpha)),
+        m_designBetaAngle(degToRad(dBeta)),
+        m_designOrderOfDiffraction(designOrderOfDiffraction),
+        m_designEnergy(designEnergy), // in eV
+        m_designSagittalEntranceArmLength(sEntrance), //in mm
+        m_designSagittalExitArmLength(sExit),
+        m_designMeridionalEntranceArmLength(mEntrance),
+        m_designMeridionalExitArmLength(mExit),
+        m_orderOfDiffraction(orderOfDiffraction)
+
+    {
+        // m_designEnergy = designEnergy; // if Auto == true, take energy of Source (param sourceEnergy), else m_designEnergy = designEnergy
+        m_designWavelength = m_designEnergy == 0 ? 0 : hvlam(m_designEnergy);
+        m_additionalOrder = double(additionalZeroOrder);
+
+        m_curvatureType = curvatureType == 0 ? CT_PLANE : (curvatureType == 1 ? CT_TOROIDAL : CT_SPHERICAL);
+        m_designType = DT_ZOFFSET; // DT_ZOFFSET (0) default
+        m_derivationMethod = 0; // DM_FORMULA default
+        m_rzpType = RT_ELLIPTICAL; // default (0)
+        m_imageType = IT_POINT2POINT; // default (0)
+
+        // set parameters in Quadric class
+        if (m_curvatureType == CT_PLANE) {
+            setSurface(std::make_unique<Quadric>(std::vector<double>{ 0, 0, 0, 0, 1, 0, 0, -1, 0, 0, 0, 0, 4, 0, 0, 0 }));
+        }
+        else if (m_curvatureType == CT_SPHERICAL) {
+            m_longRadius = longRadius; // for sphere and toroidal
+            setSurface(std::make_unique<Quadric>(std::vector<double>{ 1, 0, 0, 0, 1, 1, 0, -m_longRadius, 0, 0, 1, 0, 4, 0, 0, 0 }));
+        }
+        else {
+            // no structure for non-quadric elements yet
+            m_longRadius = longRadius; // for sphere and toroidal
+            m_shortRadius = shortRadius; // only for Toroidal
+            setSurface(std::make_unique<Toroid>(longRadius, shortRadius));
+        }
+
+        printInfo();
+        setElementParameters({
+            double(m_imageType), double(m_rzpType), double(m_derivationMethod), m_designWavelength,
+            double(m_curvatureType), m_designOrderOfDiffraction,m_orderOfDiffraction,m_fresnelZOffset,
+            m_designSagittalEntranceArmLength,m_designSagittalExitArmLength,m_designMeridionalEntranceArmLength,m_designMeridionalExitArmLength,
+            m_designAlphaAngle,m_designBetaAngle,0, double(m_additionalOrder) }
+        );
+        std::cout << "[RZP]: Created.\n";
+    }
+
 
     ReflectionZonePlate::~ReflectionZonePlate()
     {
@@ -99,8 +148,8 @@ namespace RAYX
         int curvatureType;
         if (!xml::paramInt(node, "curvatureType", &curvatureType)) { return nullptr; }
 
-        double width;
-        if (!xml::paramDouble(node, "totalWidth", &width)) { return nullptr; }
+        double widthA;
+        if (!xml::paramDouble(node, "totalWidth", &widthA)) { return nullptr; }
 
         double height;
         if (!xml::paramDouble(node, "totalLength", &height)) { return nullptr; }
@@ -153,12 +202,25 @@ namespace RAYX
         std::vector<double> slopeError;
         if (!xml::paramSlopeError(node, &slopeError)) { return nullptr; }
 
-        return std::make_shared<ReflectionZonePlate>(name, geometricalShape, curvatureType,
-            width, height, position, orientation, designEnergy, orderOfDiffraction,
-            designOrderOfDiffraction, dAlpha, dBeta, mEntrance, mExit, sEntrance,
-            sExit, shortRadius, longRadius, additionalZeroOrder,
-            fresnelZOffset, slopeError
-            );
+        // ! temporary for testing trapezoid rzp
+        double widthB;
+        bool foundWidthB = xml::paramDouble(node, "totalWidthB", &widthB);
+        if (foundWidthB) {
+            return std::make_shared<ReflectionZonePlate>(name, geometricalShape, curvatureType,
+                widthA, height, position, orientation, designEnergy, orderOfDiffraction,
+                designOrderOfDiffraction, dAlpha, dBeta, mEntrance, mExit, sEntrance,
+                sExit, shortRadius, longRadius, additionalZeroOrder,
+                fresnelZOffset, slopeError
+                );
+        }
+        else {
+            return std::make_shared<ReflectionZonePlate>(name, geometricalShape, curvatureType,
+                widthA, widthB, height, position, orientation, designEnergy, orderOfDiffraction,
+                designOrderOfDiffraction, dAlpha, dBeta, mEntrance, mExit, sEntrance,
+                sExit, shortRadius, longRadius, additionalZeroOrder,
+                fresnelZOffset, slopeError
+                );
+        }
     }
 
     void ReflectionZonePlate::printInfo() const

@@ -36,7 +36,7 @@ namespace RAYX
         // ! objects are created here temporarily until reading in file works
         const clock_t allBeginTime = clock();
 
-        RAYX::SimulationEnv::get().m_numOfRays = 200;
+        RAYX::SimulationEnv::get().m_numOfRays = 20000;
 
         EnergyDistribution dist = EnergyDistribution(EnergyRange(100, 0), true);
         std::shared_ptr<MatrixSource> matSourcePtr = std::make_shared<MatrixSource>("matrix source", dist, 0.065, 0.04, 0.0, 0.001, 0.001, 1, 0, 0, std::vector<double>{ 0, 0, 0, 0 });
@@ -56,7 +56,28 @@ namespace RAYX
         RAYX::WorldUserParams ell_w_coord = RAYX::WorldUserParams(ell_params.getAlpha(), ell_params.getBeta(), 0, 100, std::vector<double>{1, 2, 3, 0.004, 0.005, 0.006}, tangentAngle);
         glm::dvec4 pos2 = ell_w_coord.calcPosition(w_coord, pos1, or1);
         glm::dmat4x4 or2 = ell_w_coord.calcOrientation(w_coord, or1);
-        std::shared_ptr<RAYX::Ellipsoid> eb = std::make_shared<RAYX::Ellipsoid>("ellipsoid_ip_200mirrormis", Geometry::GeometricalShape::RECTANGLE, 50, 200, pos2, or2, 10, 10000, 1000, 0, 1, std::vector<double>{0, 0, 0, 0, 0, 0, 0});
+        // std::shared_ptr<RAYX::Ellipsoid> eb = std::make_shared<RAYX::Ellipsoid>("ellipsoid_ip_200mirrormis", Geometry::GeometricalShape::RECTANGLE, 50, 200, pos2, or2, 10, 10000, 1000, 0, 1, std::vector<double>{0, 0, 0, 0, 0, 0, 0});
+        RAYX::Geometry::GeometricalShape geometricalShape = RAYX::Geometry::GeometricalShape::RECTANGLE;
+        int curvatureType = 0;
+        int additionalOrder = 1;
+        double widthA = 50.0;
+        double height = 200.0;
+        double designEnergy = 100;
+        double orderOfDiffraction = 1;
+        double designOrderOfDiffraction = -1;
+        double dAlpha = 1; // degree
+        double dBeta = 1;
+        double sEntrance = 100;
+        double sExit = 500;
+        double mEntrance = 100;
+        double mExit = 500;
+        double shortRadius = 0;
+        double longRadius = 0;
+        double fresnelOffset = 0;
+        std::vector<double> mis = { 1,2,3, 0.001,0.002,0.003 };
+        std::vector<double> sE = { 1,2,3,4,5,6,7 };
+
+        std::shared_ptr<ReflectionZonePlate> rzpPtr = std::make_shared<ReflectionZonePlate>("RZP", geometricalShape, curvatureType, widthA, 60.0, height, pos2, or2, designEnergy, orderOfDiffraction, designOrderOfDiffraction, dAlpha, dBeta, sEntrance, sExit, mEntrance, mExit, shortRadius, longRadius, additionalOrder, fresnelOffset, sE);
 
         // image plane
         RAYX::WorldUserParams ip_w_coord = RAYX::WorldUserParams(0, 0, 0, 1000, std::vector<double>{0, 0, 0, 0, 0, 0});
@@ -65,7 +86,7 @@ namespace RAYX
         std::shared_ptr<RAYX::ImagePlane> i = std::make_shared<RAYX::ImagePlane>("ImagePlane", pos3, or3);
 
         m_Beamline->addOpticalElement(pm);
-        m_Beamline->addOpticalElement(eb);
+        m_Beamline->addOpticalElement(rzpPtr);
         m_Beamline->addOpticalElement(i);
 
         m_Presenter = Presenter(m_Beamline);

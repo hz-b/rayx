@@ -11,14 +11,31 @@
 namespace RAYX
 {
     Geometry::Geometry(GeometricalShape geometricShape, double width, double height, glm::dvec4 position, glm::dmat4x4 orientation)
+        : m_widthB(0)
     {
         m_geometricalShape = geometricShape;
         if (m_geometricalShape == GeometricalShape::ELLIPTICAL) {
-            m_width = -width;
+            m_widthA = -width;
             m_height = -height;
         }
         else {
-            m_width = width;
+            m_widthA = width;
+            m_height = height;
+        }
+        // calculate in and out matrices
+        calcTransformationMatrices(position, orientation);
+    }
+
+    Geometry::Geometry(GeometricalShape geometricShape, double widthA, double widthB, double height, glm::dvec4 position, glm::dmat4x4 orientation)
+        : m_widthB(widthB)
+    {
+        m_geometricalShape = geometricShape;
+        if (m_geometricalShape == GeometricalShape::ELLIPTICAL) {
+            m_widthA = -widthA;
+            m_height = -height;
+        }
+        else {
+            m_widthA = widthA;
             m_height = height;
         }
         // calculate in and out matrices
@@ -63,10 +80,11 @@ namespace RAYX
 
     }
 
-    double Geometry::getWidth()
-    {
-        return m_width;
+    void Geometry::getWidth(double& widthA, double& widthB) {
+        widthA = m_widthA;
+        widthB = m_widthB;
     }
+    
     double Geometry::getHeight()
     {
         return m_height;

@@ -1342,17 +1342,52 @@ double[2] gaussian(inout uint64_t ctr) {
 */
 double wasteBox(double x, double z, double xLength, double zLength, double w)
 {
-	double x_min = -xLength/2.0;
-	double x_max = xLength/2.0;
-	double z_min = -zLength/2.0;
-	double z_max = zLength/2.0;
-
-	if (xLength >= 0){ // Rectangular shape
+	if (xLength >= 0) { // Rectangular shape
+		double x_min = -xLength/2.0;
+		double x_max = xLength/2.0;
+		double z_min = -zLength/2.0;
+		double z_max = zLength/2.0;
 		if (x <= x_min || x >= x_max || z <= z_min || z >= z_max) {
 			return 0.0;
 		}
-	}else{	// Ring shape
+	}
+	else {	// Ring shape
 		double rd2 = (x/(xLength/2.0)) * (x/(xLength/2.0)) + (z/(zLength/2.0)) * (z/(zLength/2.0));
+		if (rd2 > 1.0) {
+			return 0.0;
+		}
+	}
+	return w;
+}
+
+// ! temporary for testing purposes (trapezoid)
+double wasteBox(double x, double z, double xLengthA, double xLengthB, double zLength, double w)
+{
+	if (xLengthA >= 0){ // Rectangular shape
+		if (xLengthB >= 0){ // Trapezoid shape
+			// Check point is within the trapezoid
+			dvec3 P = dvec3(x,0,z);
+			dvec3 A = dvec3(xLengthA/2.0, 0, zLength/2.0);
+			dvec3 B = dvec3(-xLengthA/2.0, 0, zLength/2.0);
+			dvec3 C = dvec3(xLengthB/2.0, 0, -zLength/2.0);
+			dvec3 D = dvec3(-xLengthB/2.0, 0, -zLength/2.0);
+
+			if (dot(cross(P-A, B-A), cross(P-D, C-D)) >= 0 || dot(cross(P-A, B-A), cross(P-D, C-D)) >= 0) {
+				return 0.0;
+			}
+		}
+		else {
+			double x_min = -xLengthA/2.0;
+			double x_max = xLengthA/2.0;
+			double z_min = -zLength/2.0;
+			double z_max = zLength/2.0;
+			
+			if (x <= x_min || x >= x_max || z <= z_min || z >= z_max) {
+				return 0.0;
+			}
+		}
+	}else{	// Ring shape
+		double rd2 = (x/(xLengthA/2.0)) * (x/(xLengthA/2.0)) + (z/(zLength/2.0)) * (z/(zLength/2.0));
 		if (rd2 > 1.0) {
 			return 0.0;
 		}
@@ -2423,10 +2458,12 @@ Ray traceRZP(Ray r, const int quadricIndex, inout uint64_t ctr, dvec4 intersecti
 	// toroidal not implemented yet
 		//TODO
 
+	// ! temporary change to test the trapezoid
 	// wastebox is the same no matter what curvature type
-	double x_extent = q.objectParameters[0][0]; // width
+	double x_extentA = q.objectParameters[0][0]; // widthA
+	double x_extentB = q.objectParameters[2][1]; // widthB for trapezoid
 	double z_extent = q.objectParameters[0][1]; // height
-	double hit  = wasteBox(r.position[0], r.position[2], x_extent, z_extent, r.weight);
+	double hit  = wasteBox(r.position[0], r.position[2], x_extentA, x_extentB, z_extent, r.weight);
 
 
 	if(hit < 1.0) {

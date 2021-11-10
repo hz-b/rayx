@@ -17,10 +17,11 @@ namespace RAYX
         }; ///< influences wastebox function in shader
 
         Geometry(GeometricalShape geometricShape, double width, double height, glm::dvec4 position, glm::dmat4x4 orientation);
+        Geometry(GeometricalShape geometricShape, double widthA, double widthB, double height, glm::dvec4 position, glm::dmat4x4 orientation);
         Geometry();
         ~Geometry();
 
-        double getWidth();
+        void getWidth(double& widthA, double& widthB);
         double getHeight();
         std::vector<double> getInMatrix();
         std::vector<double> getOutMatrix();
@@ -31,7 +32,8 @@ namespace RAYX
 
 
     private:
-        double m_width;
+        double m_widthA;
+        double m_widthB; //< this width is only used for trapezoid
         double m_height;
         std::vector<double> m_inMatrix;
         std::vector<double> m_outMatrix;
