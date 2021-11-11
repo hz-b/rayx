@@ -4,7 +4,7 @@
 
 TerminalApp::TerminalApp() {}
 
-TerminalApp::TerminalApp(int argc, char** argv) : m_argc(argc), m_argv(argv) {
+TerminalApp::TerminalApp(int argc, char** argv) : m_argv(argv), m_argc(argc) {
     RAYX_DEBUG(std::cout << "[Terminal]: TerminalApp created!" << std::endl);
 }
 

@@ -25,9 +25,12 @@ Application::~Application() {
     RAYX_DEBUG(std::cout << "[App]: Deleting Application..." << std::endl);
 }
 
-void Application::loadDummyBeamline() {
-    // ! objects are created here temporarily until reading in file works
+void Application::loadDummyBeamline() {  // ! objects are created here
+                                         // temporarily until reading in file
+                                         // works
+#ifdef RAY_DEBUG_MODE
     const clock_t allBeginTime = clock();
+#endif
 
     RAYX::SimulationEnv::get().m_numOfRays = 20000;
 
