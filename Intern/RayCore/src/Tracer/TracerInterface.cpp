@@ -124,7 +124,8 @@ void TracerInterface::writeToFile(const std::vector<double>& outputRays,
                                   std::ofstream& file, int index) const {
     size_t size = outputRays.size();
 
-    RAYX_DEBUG(std::cout << "[TracerInterf]: Writing " << outputRays.size() / 8
+    RAYX_DEBUG(std::cout << "[TracerInterf]: Writing "
+                         << outputRays.size() / RAY_DOUBLE_COUNT
                          << " rays to file..." << std::endl);
 
     if (SHORTOUTPUT) {
