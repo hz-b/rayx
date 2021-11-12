@@ -1500,7 +1500,7 @@ TEST(Tracer, vlsGratingTest) {
 
     std::list<double> outputRays = runTracer(testValues, {q});
 
-    double tolerance = 1e-15;
+    double tolerance = 1e-11;
     compareFromCorrect(correct, outputRays, tolerance);
 }
 
