@@ -76,21 +76,28 @@ void addBeamlineObjectFromXML(rapidxml::xml_node<>* node, Beamline* beamline,
     } else if (strcmp(type, "Matrix Source") == 0) {
         addLightSource(MatrixSource::createFromXML(node), node);
     } else if (strcmp(type, "ImagePlane") == 0) {
-        addOpticalElement(ImagePlane::createFromXML(node), node);
+        addOpticalElement(ImagePlane::createFromXML(node, group_context), node);
     } else if (strcmp(type, "Plane Mirror") == 0) {
-        addOpticalElement(PlaneMirror::createFromXML(node), node);
+        addOpticalElement(PlaneMirror::createFromXML(node, group_context),
+                          node);
     } else if (strcmp(type, "Toroid") == 0) {
-        addOpticalElement(ToroidMirror::createFromXML(node), node);
+        addOpticalElement(ToroidMirror::createFromXML(node, group_context),
+                          node);
     } else if (strcmp(type, "Slit") == 0) {
-        addOpticalElement(Slit::createFromXML(node, calcSourceEnergy()), node);
+        addOpticalElement(
+            Slit::createFromXML(node, calcSourceEnergy(), group_context), node);
     } else if (strcmp(type, "Spherical Grating") == 0) {
-        addOpticalElement(SphereGrating::createFromXML(node), node);
+        addOpticalElement(SphereGrating::createFromXML(node, group_context),
+                          node);
     } else if (strcmp(type, "Plane Grating") == 0) {
-        addOpticalElement(PlaneGrating::createFromXML(node), node);
+        addOpticalElement(PlaneGrating::createFromXML(node, group_context),
+                          node);
     } else if (strcmp(type, "Sphere") == 0) {
-        addOpticalElement(SphereMirror::createFromXML(node), node);
+        addOpticalElement(SphereMirror::createFromXML(node, group_context),
+                          node);
     } else if (strcmp(type, "Reflection Zoneplate") == 0) {
-        addOpticalElement(ReflectionZonePlate::createFromXML(node), node);
+        addOpticalElement(
+            ReflectionZonePlate::createFromXML(node, group_context), node);
     } else {
         std::cerr
             << "[Importer]: could not classify beamline object with Name: "

@@ -18,7 +18,8 @@ class RAYX_API ToroidMirror : public OpticalElement {
     ToroidMirror();
     ~ToroidMirror();
 
-    static std::shared_ptr<ToroidMirror> createFromXML(rapidxml::xml_node<>*);
+    static std::shared_ptr<ToroidMirror> createFromXML(
+        rapidxml::xml_node<>*, const std::vector<xml::Group>& group_context);
 
     void calcRadius(double incidenceAngle);
     double getRadius() const;

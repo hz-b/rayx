@@ -58,8 +58,9 @@ Slit::Slit(const char* name, Geometry::GeometricalShape geometricalShape,
 Slit::Slit() {}
 Slit::~Slit() {}
 
-std::shared_ptr<Slit> Slit::createFromXML(rapidxml::xml_node<>* node,
-                                          double sourceEnergy) {
+std::shared_ptr<Slit> Slit::createFromXML(
+    rapidxml::xml_node<>* node, double sourceEnergy,
+    const std::vector<xml::Group>& group_context) {
     const char* name = node->first_attribute("name")->value();
 
     int gs;
@@ -86,12 +87,12 @@ std::shared_ptr<Slit> Slit::createFromXML(rapidxml::xml_node<>* node,
     }
 
     glm::dvec4 position;
-    if (!xml::paramPosition(node, &position)) {
+    if (!xml::paramPosition(node, group_context, &position)) {
         return nullptr;
     }
 
     glm::dmat4x4 orientation;
-    if (!xml::paramOrientation(node, &orientation)) {
+    if (!xml::paramOrientation(node, group_context, &orientation)) {
         return nullptr;
     }
 

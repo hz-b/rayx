@@ -1,4 +1,8 @@
 #pragma once
+#include <Data/xml.h>
+
+#include <vector>
+
 #include "Model/Beamline/OpticalElement.h"
 #include "Model/Surface/Quadric.h"
 
@@ -10,7 +14,8 @@ class RAYX_API ImagePlane : public OpticalElement {
     ImagePlane();
     ~ImagePlane();
 
-    static std::shared_ptr<ImagePlane> createFromXML(rapidxml::xml_node<>*);
+    static std::shared_ptr<ImagePlane> createFromXML(
+        rapidxml::xml_node<>*, const std::vector<xml::Group>& group_context);
 
     double getDistance();
 };

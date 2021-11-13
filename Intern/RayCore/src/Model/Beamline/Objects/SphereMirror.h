@@ -23,7 +23,8 @@ class RAYX_API SphereMirror : public OpticalElement {
     SphereMirror();
     ~SphereMirror();
 
-    static std::shared_ptr<SphereMirror> createFromXML(rapidxml::xml_node<>*);
+    static std::shared_ptr<SphereMirror> createFromXML(
+        rapidxml::xml_node<>*, const std::vector<xml::Group>& group_context);
 
     void calcRadius();
     double getRadius() const;

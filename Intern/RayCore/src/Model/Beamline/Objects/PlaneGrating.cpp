@@ -63,7 +63,7 @@ PlaneGrating::PlaneGrating(const char* name,
 PlaneGrating::~PlaneGrating() {}
 
 std::shared_ptr<PlaneGrating> PlaneGrating::createFromXML(
-    rapidxml::xml_node<>* node) {
+    rapidxml::xml_node<>* node, const std::vector<xml::Group>& group_context) {
     const char* name = node->first_attribute("name")->value();
 
     int gs;
@@ -85,12 +85,12 @@ std::shared_ptr<PlaneGrating> PlaneGrating::createFromXML(
     }
 
     glm::dvec4 position;
-    if (!xml::paramPosition(node, &position)) {
+    if (!xml::paramPosition(node, group_context, &position)) {
         return nullptr;
     }
 
     glm::dmat4x4 orientation;
-    if (!xml::paramOrientation(node, &orientation)) {
+    if (!xml::paramOrientation(node, group_context, &orientation)) {
         return nullptr;
     }
 

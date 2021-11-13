@@ -39,13 +39,21 @@ bool paramDvec3(const rapidxml::xml_node<>* node, const char* paramname,
 // multiple createFromXML functions.
 bool paramMisalignment(const rapidxml::xml_node<>* node,
                        std::vector<double>* out);
-bool paramPosition(const rapidxml::xml_node<>* node, glm::dvec4* out);
-bool paramOrientation(const rapidxml::xml_node<>* node, glm::dmat4x4* out);
+bool paramPositionNoGroup(const rapidxml::xml_node<>* node, glm::dvec4* out);
+bool paramOrientationNoGroup(const rapidxml::xml_node<>* node,
+                             glm::dmat4x4* out);
 bool paramSlopeError(const rapidxml::xml_node<>* node,
                      std::vector<double>* out);
 bool paramVls(const rapidxml::xml_node<>* node, std::vector<double>* out);
 bool paramEnergyDistribution(const rapidxml::xml_node<>* node,
                              EnergyDistribution* out);
+
+bool paramPosition(const rapidxml::xml_node<>* node,
+                   const std::vector<xml::Group>& group_context,
+                   glm::dvec4* out);
+bool paramOrientation(const rapidxml::xml_node<>* node,
+                      const std::vector<xml::Group>& group_context,
+                      glm::dmat4x4* out);
 
 /** node needs to be a <group>-tag, output will be written to `out`. */
 bool parseGroup(rapidxml::xml_node<>* node, xml::Group* out);

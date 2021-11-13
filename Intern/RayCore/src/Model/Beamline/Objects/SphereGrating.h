@@ -19,7 +19,8 @@ class RAYX_API SphereGrating : public OpticalElement {
     SphereGrating();
     ~SphereGrating();
 
-    static std::shared_ptr<SphereGrating> createFromXML(rapidxml::xml_node<>*);
+    static std::shared_ptr<SphereGrating> createFromXML(
+        rapidxml::xml_node<>*, const std::vector<xml::Group>& group_context);
 
     // TODO (Theresa): should ideally be removed as soon as radius calculation
     // is simplified in GeometricUSerParams.cpp

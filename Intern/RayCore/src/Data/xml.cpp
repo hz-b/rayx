@@ -137,7 +137,7 @@ bool paramMisalignment(const rapidxml::xml_node<>* node,
     return true;
 }
 
-bool paramPosition(const rapidxml::xml_node<>* node, glm::dvec4* out) {
+bool paramPositionNoGroup(const rapidxml::xml_node<>* node, glm::dvec4* out) {
     if (!node || !out) {
         return false;
     }
@@ -151,7 +151,8 @@ bool paramPosition(const rapidxml::xml_node<>* node, glm::dvec4* out) {
     return true;
 }
 
-bool paramOrientation(const rapidxml::xml_node<>* node, glm::dmat4x4* out) {
+bool paramOrientationNoGroup(const rapidxml::xml_node<>* node,
+                             glm::dmat4x4* out) {
     if (!node || !out) {
         return false;
     }
@@ -287,6 +288,17 @@ bool paramEnergyDistribution(const rapidxml::xml_node<>* node,
     }
 }
 
+bool paramPosition(const rapidxml::xml_node<>* node,
+                   const std::vector<xml::Group>& group_context,
+                   glm::dvec4* out) {
+    return paramPositionNoGroup(node, out);  // TODO(rudi): implement
+}
+bool paramOrientation(const rapidxml::xml_node<>* node,
+                      const std::vector<xml::Group>& group_context,
+                      glm::dmat4x4* out) {
+    return paramOrientationNoGroup(node, out);  // TODO(rudi): implement
+}
+
 bool parseGroup(rapidxml::xml_node<>* node, xml::Group* out) {
     // default initialization
     out->m_position = glm::vec4();
@@ -298,8 +310,8 @@ bool parseGroup(rapidxml::xml_node<>* node, xml::Group* out) {
 
     // no return-value checks are done, as groups don't need to alter position
     // or orientation
-    paramPosition(node, &out->m_position);
-    paramOrientation(node, &out->m_orientation);
+    paramPositionNoGroup(node, &out->m_position);
+    paramOrientationNoGroup(node, &out->m_orientation);
 
     return true;
 }
