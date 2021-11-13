@@ -104,12 +104,9 @@ std::shared_ptr<SphereMirror> SphereMirror::createFromXML(
     }
 
     glm::dvec4 position;
-    if (!xml::paramPosition(node, group_context, &position)) {
-        return nullptr;
-    }
-
     glm::dmat4x4 orientation;
-    if (!xml::paramOrientation(node, group_context, &orientation)) {
+    if (!xml::paramPositionAndOrientation(node, group_context, &position,
+                                          &orientation)) {
         return nullptr;
     }
 

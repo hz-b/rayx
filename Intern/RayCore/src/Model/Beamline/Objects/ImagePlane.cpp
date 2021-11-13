@@ -29,12 +29,9 @@ std::shared_ptr<ImagePlane> ImagePlane::createFromXML(
     const char* name = node->first_attribute("name")->value();
 
     glm::dvec4 position;
-    if (!xml::paramPosition(node, group_context, &position)) {
-        return nullptr;
-    }
-
     glm::dmat4x4 orientation;
-    if (!xml::paramOrientation(node, group_context, &orientation)) {
+    if (!xml::paramPositionAndOrientation(node, group_context, &position,
+                                          &orientation)) {
         return nullptr;
     }
 

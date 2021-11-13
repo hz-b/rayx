@@ -288,15 +288,17 @@ bool paramEnergyDistribution(const rapidxml::xml_node<>* node,
     }
 }
 
-bool paramPosition(const rapidxml::xml_node<>* node,
-                   const std::vector<xml::Group>& group_context,
-                   glm::dvec4* out) {
-    return paramPositionNoGroup(node, out);  // TODO(rudi): implement
-}
-bool paramOrientation(const rapidxml::xml_node<>* node,
-                      const std::vector<xml::Group>& group_context,
-                      glm::dmat4x4* out) {
-    return paramOrientationNoGroup(node, out);  // TODO(rudi): implement
+bool paramPositionAndOrientation(const rapidxml::xml_node<>* node,
+                                 const std::vector<xml::Group>& group_context,
+                                 glm::dvec4* out_pos, glm::dmat4x4* out_ori) {
+    paramPositionNoGroup(node, out_pos);
+    paramOrientationNoGroup(node, out_ori);
+    for (unsigned i = group_context.size(); i-- > 0;) {
+        *out_ori *= group_context[i].m_orientation;
+        *out_pos = group_context[i].m_orientation * *out_pos;
+        *out_pos += group_context[i].m_position;
+    }
+    return true;
 }
 
 bool parseGroup(rapidxml::xml_node<>* node, xml::Group* out) {
