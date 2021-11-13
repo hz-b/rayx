@@ -1,5 +1,6 @@
 #include "Importer.h"
 
+#include <Data/xml.h>
 #include <string.h>
 
 #include <fstream>
@@ -22,7 +23,8 @@ Importer::Importer() {}
 
 Importer::~Importer() {}
 
-void addBeamlineObjectFromXML(rapidxml::xml_node<>* node, Beamline* beamline) {
+void addBeamlineObjectFromXML(rapidxml::xml_node<>* node, Beamline* beamline,
+                              const std::vector<xml::Group>& group_context) {
     const char* type = node->first_attribute("type")->value();
 
     // the following three blocks of code are lambda expressions (see
@@ -101,13 +103,24 @@ void addBeamlineObjectFromXML(rapidxml::xml_node<>* node, Beamline* beamline) {
  * iterate in order to add them to the beamline.
  * `collection` may either be a <beamline> or a <group>. */
 void handleObjectCollection(rapidxml::xml_node<>* collection,
-                            Beamline* beamline) {
+                            Beamline* beamline,
+                            std::vector<xml::Group>* group_context) {
     for (rapidxml::xml_node<>* object = collection->first_node(); object;
          object = object->next_sibling()) {  // Iterating through objects
         if (strcmp(object->name(), "object") == 0) {
-            addBeamlineObjectFromXML(object, beamline);
+            addBeamlineObjectFromXML(object, beamline, *group_context);
         } else if (strcmp(object->name(), "group") == 0) {
-            handleObjectCollection(object, beamline);
+            xml::Group g;
+            bool success = xml::parseGroup(object, &g);
+            if (success) {
+                group_context->push_back(g);
+            } else {
+                std::cerr << "parseGroup failed!\n";
+            }
+            handleObjectCollection(object, beamline, group_context);
+            if (success) {
+                group_context->pop_back();
+            }
         } else if (strcmp(object->name(), "param") != 0) {
             std::cerr << "received weird object->name(): " << object->name()
                       << std::endl;
@@ -136,7 +149,8 @@ Beamline Importer::importBeamline(const char* filename) {
         doc.first_node("lab")->first_node("beamline");
 
     Beamline beamline;
-    handleObjectCollection(xml_beamline, &beamline);
+    std::vector<xml::Group> group_context;
+    handleObjectCollection(xml_beamline, &beamline, &group_context);
     return beamline;
 }
 

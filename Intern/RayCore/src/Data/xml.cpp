@@ -286,5 +286,22 @@ bool paramEnergyDistribution(const rapidxml::xml_node<>* node,
         return false;
     }
 }
+
+bool parseGroup(rapidxml::xml_node<>* node, xml::Group* out) {
+    // default initialization
+    out->m_position = glm::vec4();
+    out->m_orientation = glm::dmat4x4();
+
+    if (strcmp(node->name(), "group") != 0) {
+        return false;
+    }
+
+    // no return-value checks are done, as groups don't need to alter position
+    // or orientation
+    paramPosition(node, &out->m_position);
+    paramOrientation(node, &out->m_orientation);
+
+    return true;
+}
 }  // namespace xml
 }  // namespace RAYX
