@@ -97,6 +97,24 @@ void addBeamlineObjectFromXML(rapidxml::xml_node<>* node, Beamline* beamline) {
     }
 }
 
+/** `collection` is an xml object, over whose children-objects we want to
+ * iterate in order to add them to the beamline.
+ * `collection` may either be a <beamline> or a <group>. */
+void handleObjectCollection(rapidxml::xml_node<>* collection,
+                            Beamline* beamline) {
+    for (rapidxml::xml_node<>* object = collection->first_node(); object;
+         object = object->next_sibling()) {  // Iterating through objects
+        if (strcmp(object->name(), "object") == 0) {
+            addBeamlineObjectFromXML(object, beamline);
+        } else if (strcmp(object->name(), "group") == 0) {
+            handleObjectCollection(object, beamline);
+        } else if (strcmp(object->name(), "param") != 0) {
+            std::cerr << "received weird object->name(): " << object->name()
+                      << std::endl;
+        }
+    }
+}
+
 Beamline Importer::importBeamline(const char* filename) {
     // first implementation: stringstreams are slow; this might need
     // optimization
@@ -118,11 +136,7 @@ Beamline Importer::importBeamline(const char* filename) {
         doc.first_node("lab")->first_node("beamline");
 
     Beamline beamline;
-
-    for (rapidxml::xml_node<>* object = xml_beamline->first_node(); object;
-         object = object->next_sibling()) {  // Iterating through objects
-        addBeamlineObjectFromXML(object, &beamline);
-    }
+    handleObjectCollection(xml_beamline, &beamline);
     return beamline;
 }
 

@@ -20,3 +20,10 @@ TEST(RmlTest, loadDatFile) {
     ASSERT_NEAR(b.m_LightSources[0]->m_EnergyDistribution.getAverage(),
                 (12. + 15. + 17.) / 3, 0.1);
 }
+
+TEST(RmlTest, loadGroups) {
+    auto b = RAYX::Importer::importBeamline(
+        "../../Tests/input-files/loadGroups.rml");
+    ASSERT_EQ(b.m_LightSources.size(), 1);
+    ASSERT_EQ(b.m_OpticalElements.size(), 4);
+}
