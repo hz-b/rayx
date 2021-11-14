@@ -296,14 +296,15 @@ bool paramPositionAndOrientation(const rapidxml::xml_node<>* node,
     for (unsigned i = group_context.size(); i-- > 0;) {
         *out_ori *= group_context[i].m_orientation;
         *out_pos = group_context[i].m_orientation * *out_pos;
-        *out_pos += group_context[i].m_position;
+        *out_pos += group_context[i].m_position;  // this gives us w=2!
+        out_pos->w = 1;
     }
     return true;
 }
 
 bool parseGroup(rapidxml::xml_node<>* node, xml::Group* out) {
     // default initialization
-    out->m_position = glm::vec4();
+    out->m_position = glm::vec4(0, 0, 0, 1);
     out->m_orientation = glm::dmat4x4();
 
     if (strcmp(node->name(), "group") != 0) {
