@@ -1342,7 +1342,7 @@ double wasteBox(double x, double z, double xLength, double zLength, double w)
 double wasteBox(double x, double z, double xLengthA, double xLengthB, double zLength, double w)
 {
 	if (xLengthA >= 0){ // Rectangular shape
-		if (xLengthB >= 0){ // Trapezoid shape
+		if (xLengthB > 0){ // Trapezoid shape
 			// Check point is within the trapezoid
 			dvec3 P = dvec3(x,0,z);
 			dvec3 A = dvec3(xLengthA/2.0, 0, zLength/2.0);
