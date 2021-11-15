@@ -1309,28 +1309,6 @@ void cosini(inout Ray r, double phi, double psi) {
 	r.direction.z = cos_psi * cos_phi;
 }
 
-/**
-calculates two standard normal distributed random values (mu = 0, sigma = 1)
-can be transformed to gaussian(normal dist.) with given mu, sigma by: mu + x * sigma
-this method always calculates two random values in one run, calculating only one number is not possible.
--> one would have to calculate 2 anyways
-
-returns array of 2 standard normal distributed random numbers
-*/
-double[2] gaussian(inout uint64_t ctr) {
-	double random_values[2];
-	double r = 2;
-	double v1, v2;
-	while(r > 1) {
-		double uni[3] = random_number(2); // get array of 2 random uniform numbers in [0,1]
-		v1 = 2*uni[0] - 1;
-		v2 = 2*uni[1] - 1;
-		r = v1*v1 + v2*v2;
-	}
-	random_values[0] = v1 * sqrt(-2 * r8_log(r) / r); // r8_log
-	random_values[1] = v2 * sqrt(-2 * r8_log(r) / r);
-	return random_values;
-}
 
 /**
 * checks whether the intersection point is within the extent of the surface
@@ -2450,20 +2428,21 @@ Ray traceRZP(Ray r, const int quadricIndex, inout uint64_t ctr, dvec4 intersecti
 	// store old position, needed for pathlength calculation
 	dvec3 old_position = r.position;
 	
+	dvec4 normal;
 	// RZP can be plane, toroidal or spherical curvature type. Use intersectionPoint for all except toroidal
 	int CURVATURE_TYPE = int(q.elementParameters[1][0]);
-	// if (CURVATURE_TYPE != 2)
-	dvec4 normal = intersectionPoint(r, q.anchorPoints);
-	//dvec4 normal = setIntersectionPoint(r, q.anchorPoints, intersection);
-	// toroidal not implemented yet
-		//TODO
+	if (CURVATURE_TYPE != 2) {
+		normal = setIntersectionPoint(r, q.anchorPoints, intersection);
+	} else {
+		double longRadius = q.elementParameters[0][0];
+		double shortRadius = q.elementParameters[0][1];
+		normal = getTorusNormal(r, shortRadius, longRadius);
+	}
 
-	// ! temporary change to test the trapezoid
 	// wastebox is the same no matter what curvature type
-	double x_extentA = q.objectParameters[0][0]; // widthA
-	double x_extentB = q.objectParameters[2][1]; // widthB for trapezoid
+	double x_extent = q.objectParameters[0][0]; // width
 	double z_extent = q.objectParameters[0][1]; // height
-	double hit  = wasteBox(r.position[0], r.position[2], x_extentA, x_extentB, z_extent, r.weight);
+	double hit  = wasteBox(r.position[0], r.position[2], x_extent, z_extent, r.weight);
 
 
 	if(hit < 1.0) {
@@ -2824,8 +2803,6 @@ void iterateElements(){
 		//rayData[uint(gl_GlobalInvocationID)] = rayMatrixMult(rayData[uint(gl_GlobalInvocationID)], q.outTrans);
 	}
 	outputData[uint(gl_GlobalInvocationID)] = rayData[uint(gl_GlobalInvocationID)];
-	
-
 }
 
 // dynamic ray tracing -> check which ray hits which element first
@@ -2966,8 +2943,13 @@ void testFunctions() {
 	}
 	else if(settings == 4) { // test vls grating
 		double b_params[6] = double[6] (r.position.x,r.position.y,r.position.z, r.direction.x,r.direction.y,r.direction.z);//(0.1,0.1,0.1,0.01,0.02,0.03);
-		res.weight = vlsGrating(r.weight, quadricData[0].anchorPoints[2][1], b_params);
-		res.energy = 0;
+		double z = r.energy;
+		double a = r.weight;
+		res.weight = vlsGrating(a, z, b_params);
+		res.pathLength = 0;
+		res.extraParameter = 0;
+		res.order = 0;
+		res.lastElement = 0;
 		rayData[uint(gl_GlobalInvocationID)] = res;
 	}
 	else if(settings == 5) { // diffraction
