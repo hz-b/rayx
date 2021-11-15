@@ -1,14 +1,4 @@
-#include "Core.h"
-#include "Model/Beamline/Beamline.h"
-#include "Model/Beamline/Objects/Objects.h"
-#include "Model/Surface/Quadric.h"
-#include "Ray.h"
-#include "Tracer/TracerInterface.h"
-#include "UserParameter/GeometricUserParams.h"
-#include "UserParameter/WorldUserParams.h"
-#include "gmock/gmock.h"
-#include "gtest/gtest.h"
-// #include "Tracer/TracerInterface.h"
+#include "setupTests.h"
 #include <fstream>
 #include <functional>
 #include <sstream>
@@ -16,47 +6,8 @@
 
 #include "VulkanTracer.h"
 
-using ::testing::ElementsAre;
 std::vector<double> zeros = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 std::vector<double> zeros7 = {0, 0, 0, 0, 0, 0, 0};  // for slope error
-
-//! Using the google test framework, check all elements of two containers
-#define EXPECT_ITERABLE_BASE(PREDICATE, REFTYPE, TARTYPE, ref, target)       \
-    {                                                                        \
-        const REFTYPE& ref_(ref);                                            \
-        const TARTYPE& target_(target);                                      \
-        REFTYPE::const_iterator refIter = ref_.begin();                      \
-        TARTYPE::const_iterator tarIter = target_.begin();                   \
-        unsigned int i = 0;                                                  \
-        while (refIter != ref_.end()) {                                      \
-            if (tarIter == target_.end()) {                                  \
-                ADD_FAILURE() << #target " has a smaller length than " #ref; \
-                break;                                                       \
-            }                                                                \
-            PREDICATE(*refIter, *tarIter)                                    \
-                << "Containers " #ref " (refIter) and " #target              \
-                   " (tarIter)"                                              \
-                   " differ at index "                                       \
-                << i;                                                        \
-            ++refIter;                                                       \
-            ++tarIter;                                                       \
-            ++i;                                                             \
-        }                                                                    \
-        EXPECT_TRUE(tarIter == target_.end())                                \
-            << #ref " has a smaller length than " #target;                   \
-    }
-
-//! Check that all elements of two same-type containers are equal
-#define EXPECT_ITERABLE_EQ(TYPE, ref, target) \
-    EXPECT_ITERABLE_BASE(EXPECT_EQ, TYPE, TYPE, ref, target)
-
-//! Check that all elements of two different-type containers are equal
-#define EXPECT_ITERABLE_EQ2(REFTYPE, TARTYPE, ref, target) \
-    EXPECT_ITERABLE_BASE(EXPECT_EQ, REFTYPE, TARTYPE, ref, target)
-
-//! Check that all elements of two same-type containers of doubles are equal
-#define EXPECT_ITERABLE_DOUBLE_EQ(TYPE, ref, target) \
-    EXPECT_ITERABLE_BASE(EXPECT_DOUBLE_EQ, TYPE, TYPE, ref, target)
 
 std::list<double> runTracer(
     std::vector<RAYX::Ray> testValues,
@@ -1474,27 +1425,27 @@ TEST(Tracer, vlsGratingTest) {
     // wl*linedensity*ord*1.e-6 is given as well (in weight of ray)
     RAYX::Ray r =
         RAYX::Ray(glm::dvec3(0.0, 0.0, 0.0), glm::dvec3(0.0, 0.0, 0.0),
-                  glm::dvec4(1, 1, 0, 0), 0, a);
+                  glm::dvec4(1, 1, 0, 0), z, a);
     testValues.push_back(r);
     // a should remain unchanged if all vls parameters are 0
     RAYX::Ray c =
         RAYX::Ray(glm::dvec3(0.0, 0.0, 0.0), glm::dvec3(0.0, 0.0, 0.0),
-                  glm::dvec4(1, 1, 0, 0), 0, a);
+                  glm::dvec4(1, 1, 0, 0), z, a);
     correct.push_back(c);
 
     // use some vls values and compare with A calculated by old ray UI
     r = RAYX::Ray(glm::dvec3(1, 2, 3), glm::dvec3(4, 5, 6),
-                  glm::dvec4(1, 1, 0, 0), 0, a);
+                  glm::dvec4(1, 1, 0, 0), z, a);
     testValues.push_back(r);
     c = RAYX::Ray(glm::dvec3(1, 2, 3), glm::dvec3(4, 5, 6),
-                  glm::dvec4(1, 1, 0, 0), 0, 9497.479959611925);
+                  glm::dvec4(1, 1, 0, 0), z, 9497.479959611925);
     correct.push_back(c);
 
     // give z position and setting=4 to start vls test on shader
     std::shared_ptr<RAYX::OpticalElement> q =
         std::make_shared<RAYX::OpticalElement>(
             "TestVLS",
-            std::vector<double>{0, 0, 0, 0, 0, 0, 0, 0, 0, z, 0, 0, 0, settings,
+            std::vector<double>{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, settings,
                                 0, 0},
             zeros, zeros, zeros, zeros);
 
