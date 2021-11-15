@@ -22,6 +22,8 @@ Geometry::Geometry(GeometricalShape geometricShape, double width, double height,
         m_widthA = width;
         m_height = height;
     }
+    m_orientation = orientation;
+    m_position = position;
     // calculate in and out matrices
     calcTransformationMatrices(position, orientation);
 }
@@ -91,6 +93,10 @@ double Geometry::getHeight() { return m_height; }
 std::vector<double> Geometry::getInMatrix() { return m_inMatrix; }
 
 std::vector<double> Geometry::getOutMatrix() { return m_outMatrix; }
+
+glm::dvec4 Geometry::getPosition() { return m_position; }
+
+glm::dmat4x4 Geometry::getOrientation() { return m_orientation; }
 
 void Geometry::setInMatrix(std::vector<double> inputMatrix) {
     assert(inputMatrix.size() == 16);

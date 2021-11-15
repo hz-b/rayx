@@ -26,6 +26,8 @@ class RAYX_API Geometry {
     double getHeight();
     std::vector<double> getInMatrix();
     std::vector<double> getOutMatrix();
+    glm::dvec4 getPosition();
+    glm::dmat4x4 getOrientation();
     void setInMatrix(std::vector<double> inputMatrix);
     void setOutMatrix(std::vector<double> inputMatrix);
     void calcTransformationMatrices(glm::dvec4 position,
@@ -35,6 +37,8 @@ class RAYX_API Geometry {
     double m_widthA;
     double m_widthB;  //< this width is only used for trapezoid
     double m_height;
+    glm::dmat4x4 m_orientation;
+    glm::dvec4 m_position;
     std::vector<double> m_inMatrix;
     std::vector<double> m_outMatrix;
     GeometricalShape m_geometricalShape;

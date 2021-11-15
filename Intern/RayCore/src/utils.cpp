@@ -27,6 +27,19 @@ double degToRad(double degree) { return degree * PI / 180; }
  */
 double radToDeg(double rad) { return rad * 180 / PI; }
 
+glm::dmat4x4 getRotationMatrix(double dpsi, double dphi, double dchi) {
+    glm::dmat4x4 misalignmentMatrix =
+        glm::dmat4x4(cos(dphi) * cos(dchi),
+                     -cos(dpsi) * sin(dchi) - sin(dpsi) * sin(dphi) * cos(dchi),
+                     -sin(dpsi) * sin(dchi) + cos(dpsi) * sin(dphi) * cos(dchi),
+                     0, sin(dchi) * cos(dphi),
+                     cos(dpsi) * cos(dchi) - sin(dpsi) * sin(dphi) * sin(dchi),
+                     sin(dpsi) * cos(dchi) + cos(dpsi) * sin(dphi) * sin(dchi),
+                     0, -sin(dphi), -sin(dpsi) * cos(dphi),
+                     cos(dpsi) * cos(dphi), 0, 0, 0, 0, 1);
+    return glm::transpose(misalignmentMatrix);
+}
+
 void printMatrix(std::vector<double> matrix) {
     std::cout << "[Matrix]: size: " << matrix.size() << std::endl;
     std::cout << "\t";
@@ -62,4 +75,9 @@ glm::dmat4x4 vectorToGlm16(std::vector<double> m) {
         glm::dmat4x4(m[0], m[1], m[2], m[3], m[4], m[5], m[6], m[7], m[8], m[9],
                      m[10], m[11], m[12], m[13], m[14], m[15]);
     return matrix;
+}
+
+std::vector<double> glmToVector4(glm::dvec4 v) {
+    std::vector<double> vector = {v[0], v[1], v[2], v[3]};
+    return vector;
 }

@@ -171,6 +171,12 @@ std::vector<double> OpticalElement::getInMatrix() const {
 std::vector<double> OpticalElement::getOutMatrix() const {
     return m_geometry->getOutMatrix();
 }
+glm::dvec4 OpticalElement::getPosition() const {
+    return m_geometry->getPosition();
+}
+glm::dmat4x4 OpticalElement::getOrientation() const {
+    return m_geometry->getOrientation();
+}
 std::vector<double> OpticalElement::getObjectParameters() {
     return m_objectParameters;
 }

@@ -53,6 +53,8 @@ class RAYX_API OpticalElement : public BeamlineObject {
 
     std::vector<double> getInMatrix() const;
     std::vector<double> getOutMatrix() const;
+    glm::dmat4x4 getOrientation() const;
+    glm::dvec4 getPosition() const;
     std::vector<double> getObjectParameters();
     std::vector<double> getElementParameters() const;
     std::vector<double> getSurfaceParams() const;
