@@ -6,6 +6,7 @@
 #include <vector>
 
 #include "rapidxml.hpp"
+#include "utils.h"
 
 namespace RAYX {
 /** The xml namespace defines functions, which help to implement the

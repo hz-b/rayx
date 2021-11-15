@@ -171,7 +171,7 @@ glm::dmat4x4 WorldUserParams::calcOrientation() {
 
     glm::dmat4x4 misalignmentOr = getMisalignmentOrientation();
     glm::dmat4x4 orientation =
-        glm::dmat4x4(cos_c, sin_c, 0, 0,  // M_b2e
+        glm::dmat4x4(cos_c, sin_c, 0, 0, 
                      -sin_c * cos_a, cos_c * cos_a, -sin_a, 0, -sin_c * sin_a,
                      sin_a * cos_c, cos_a, 0, 0, 0, 0, 1);
 

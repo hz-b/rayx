@@ -291,10 +291,20 @@ bool paramEnergyDistribution(const rapidxml::xml_node<>* node,
 bool paramPositionAndOrientation(const rapidxml::xml_node<>* node,
                                  const std::vector<xml::Group>& group_context,
                                  glm::dvec4* out_pos, glm::dmat4x4* out_ori) {
+    std::vector<double> misalignment = std::vector<double>{0, 0, 0, 0, 0, 0};
     paramPositionNoGroup(node, out_pos);
     paramOrientationNoGroup(node, out_ori);
+    paramMisalignment(node, &misalignment);
+
+    glm::dmat4x4 misOrientation = getRotationMatrix(-misalignment[3], misalignment[4], misalignment[5]);
+    printDMat4(misOrientation);
+    glm::dvec4 offset = glm::dvec4(misalignment[0], misalignment[1], misalignment[2], 1);
+    *out_ori = *out_ori * misOrientation;
+    *out_pos += *out_ori * offset;
+    out_pos->w = 1;
+
     for (unsigned i = group_context.size(); i-- > 0;) {
-        *out_ori *= group_context[i].m_orientation;
+        *out_ori = group_context[i].m_orientation * *out_ori;
         *out_pos = group_context[i].m_orientation * *out_pos;
         *out_pos += group_context[i].m_position;  // this gives us w=2!
         out_pos->w = 1;
