@@ -2439,10 +2439,13 @@ Ray traceRZP(Ray r, const int quadricIndex, inout uint64_t ctr, dvec4 intersecti
 		normal = getTorusNormal(r, shortRadius, longRadius);
 	}
 
+	// ! temporary change to test the trapezoid
 	// wastebox is the same no matter what curvature type
-	double x_extent = q.objectParameters[0][0]; // width
+	double x_extentA = q.objectParameters[0][0]; // widthA
+	double x_extentB = q.objectParameters[2][1]; // widthB for trapezoid
 	double z_extent = q.objectParameters[0][1]; // height
-	double hit  = wasteBox(r.position[0], r.position[2], x_extent, z_extent, r.weight);
+	double hit  = wasteBox(r.position[0], r.position[2], x_extentA, x_extentB, z_extent, r.weight);
+
 
 
 	if(hit < 1.0) {
