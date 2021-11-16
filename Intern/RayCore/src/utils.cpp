@@ -81,3 +81,33 @@ std::vector<double> glmToVector4(glm::dvec4 v) {
     std::vector<double> vector = {v[0], v[1], v[2], v[3]};
     return vector;
 }
+
+/**
+ * @brief Moves Source Vector at the end of destination Vector.
+ *
+ * Source Vector is empty after calling this function!
+ * @author
+ * //stackoverflow.com/questions/17010005/how-to-use-c11-move-semantics-to-append-vector-contents-to-another-vector
+ * @param srcVector Source vector to move.
+ * @param destVector Destiation vector to move into.
+ * @return vector<T>::iterator Iterator to the destination Vector
+ */
+std::vector<double>::iterator movingAppend(std::vector<double>&& srcVector,
+                                           std::vector<double>& destVector) {
+    typename std::vector<double>::iterator result;
+
+    if (destVector.empty()) {
+        destVector = std::move(srcVector);
+        result = std::begin(destVector);
+    } else {
+        result =
+            destVector.insert(std::end(destVector),
+                              std::make_move_iterator(std::begin(srcVector)),
+                              std::make_move_iterator(std::end(srcVector)));
+    }
+
+    srcVector.clear();
+    srcVector.shrink_to_fit();
+
+    return result;
+}

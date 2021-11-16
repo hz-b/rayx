@@ -30,3 +30,5 @@ void printMatrix(std::vector<double> matrix);
 std::vector<double> glmToVector16(glm::dmat4x4 m);
 glm::dmat4x4 vectorToGlm16(std::vector<double> m);
 std::vector<double> glmToVector4(glm::dvec4 v);
+std::vector<double>::iterator movingAppend(std::vector<double>&& srcVector,
+                                           std::vector<double>& destVector);

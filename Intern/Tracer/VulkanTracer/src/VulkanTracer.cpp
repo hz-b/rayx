@@ -1156,17 +1156,16 @@ void VulkanTracer::addRayVector(void* location, size_t size) {
 }
 
 // adds quad to beamline
-// TODO(Jannis): optimize so it doesn't copy seven vectors (either move or const
-// ref)
-void VulkanTracer::addVectors(std::vector<double> surfaceParams,
-                              std::vector<double> inputInMatrix,
-                              std::vector<double> inputOutMatrix,
-                              std::vector<double> objectParameters,
-                              std::vector<double> elementParameters) {
+void VulkanTracer::addVectors(const std::vector<double>& surfaceParams,
+                              const std::vector<double>& inputInMatrix,
+                              const std::vector<double>& inputOutMatrix,
+                              const std::vector<double>& objectParameters,
+                              const std::vector<double>& elementParameters) {
     assert(surfaceParams.size() == 16 && inputInMatrix.size() == 16 &&
            inputOutMatrix.size() == 16 && objectParameters.size() == 16 &&
            elementParameters.size() == 16);
     // beamline.resize(beamline.size()+1);
+
     beamline.insert(beamline.end(), surfaceParams.begin(), surfaceParams.end());
     beamline.insert(beamline.end(), inputInMatrix.begin(), inputInMatrix.end());
     beamline.insert(beamline.end(), inputOutMatrix.begin(),
@@ -1175,6 +1174,8 @@ void VulkanTracer::addVectors(std::vector<double> surfaceParams,
                     objectParameters.end());
     beamline.insert(beamline.end(), elementParameters.begin(),
                     elementParameters.end());
+
+    // Possibility to use utils/movingAppend
 }
 void VulkanTracer::divideAndSortRays() {
     for (auto i = rayList.begin(); i != rayList.end(); i++) {
