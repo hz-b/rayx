@@ -1451,6 +1451,9 @@ TEST(Tracer, vlsGratingTest) {
 
     std::list<double> outputRays = runTracer(testValues, {q});
 
+    // we reduced the precision here from 1e-15, because it didn't work on Rudi's and Oussama's video cards.
+    // we presume this inaccuracy is not relevant.
+    // interestingly though, it worked on the other video cards.
     double tolerance = 1e-11;
     compareFromCorrect(correct, outputRays, tolerance);
 }
