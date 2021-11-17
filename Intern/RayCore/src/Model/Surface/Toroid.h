@@ -12,7 +12,7 @@ class RAYX_API Toroid : public Surface {
     // ctor
     Toroid();
     Toroid(const std::vector<double> inputPoints);
-    Toroid(double longRadius, double shortRadius);
+    Toroid(double longRadius, double shortRadius, double elementType);
     // dtor
     ~Toroid();
 

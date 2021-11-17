@@ -17,10 +17,12 @@ Toroid::Toroid(const std::vector<double> inputPoints) {
 /**
  * @param longRadius            long radius of the toroidal shape
  * @param shortRadius           short radius of the toroidal shape
+ * @param elementType           6=toroid mirror, 4=toroid rzp
  */
-Toroid::Toroid(double longRadius, double shortRadius) {
-    m_parameters = std::vector<double>{
-        longRadius, shortRadius, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 6, 0, 0, 0};
+Toroid::Toroid(double longRadius, double shortRadius, double elementType) {
+    m_parameters =
+        std::vector<double>{longRadius, shortRadius, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                            0,          elementType, 0, 0, 0};
     m_longRadius = longRadius;
     m_shortRadius = shortRadius;
 }

@@ -180,7 +180,18 @@ class Tests(unittest.TestCase):
             'testFile_ReflectionZonePlateAzim200.csv', valid=1)
         self.assertTrue(correct.shape == result[:6].shape)
         self.assertTrue(np.allclose(correct, result[:6]))
-
+        
+    def test_RZPazimuthal(self):
+        correct = open_old_file(
+            'ImagePlane-RawRaysBeam_RZPtoroidal4020_200.csv', 'ImagePlane_')
+        result = open_new_file(
+            'testFile_ReflectionZonePlateDefault200Toroid.csv', valid=1)
+        df = pd.read_csv(p_join(RAY_REWORKED, 'testFile_ReflectionZonePlateDefault200Toroid.csv'), sep=';')
+        extraParam = np.array(df['extraParam'].values)
+        result = result[:, np.where([extraParam == 21])[1]]
+        self.assertTrue(correct.shape == result[:6].shape)
+        self.assertTrue(np.allclose(correct, result[:6]))
+    
     def test_ImagePlaneMatrixSource(self):
         correct = open_old_file(
             'ImagePlane-RawRaysOutgoing.csv', 'ImagePlane_')

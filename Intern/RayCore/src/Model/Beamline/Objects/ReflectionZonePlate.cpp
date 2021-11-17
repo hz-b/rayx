@@ -72,7 +72,7 @@ ReflectionZonePlate::ReflectionZonePlate(
 
     m_curvatureType = curvatureType == 0
                           ? CT_PLANE
-                          : (curvatureType == 1 ? CT_TOROIDAL : CT_SPHERICAL);
+                          : (curvatureType == 1 ? CT_SPHERICAL : CT_TOROIDAL);
     m_designType = DT_ZOFFSET;     // DT_ZOFFSET (0) default
     m_derivationMethod = 0;        // DM_FORMULA default
     m_rzpType = RT_ELLIPTICAL;     // default (0)
@@ -87,10 +87,9 @@ ReflectionZonePlate::ReflectionZonePlate(
         setSurface(std::make_unique<Quadric>(std::vector<double>{
             1, 0, 0, 0, 1, 1, 0, -m_longRadius, 0, 0, 1, 0, 4, 0, 0, 0}));
     } else {
-        // no structure for non-quadric elements yet
         m_longRadius = longRadius;    // for sphere and toroidal
         m_shortRadius = shortRadius;  // only for Toroidal
-        setSurface(std::make_unique<Toroid>(longRadius, shortRadius));
+        setSurface(std::make_unique<Toroid>(longRadius, shortRadius, 4));
     }
 
     printInfo();
@@ -136,7 +135,7 @@ ReflectionZonePlate::ReflectionZonePlate(
 
     m_curvatureType = curvatureType == 0
                           ? CT_PLANE
-                          : (curvatureType == 1 ? CT_TOROIDAL : CT_SPHERICAL);
+                          : (curvatureType == 1 ? CT_SPHERICAL : CT_TOROIDAL);
     m_designType = DT_ZOFFSET;     // DT_ZOFFSET (0) default
     m_derivationMethod = 0;        // DM_FORMULA default
     m_rzpType = RT_ELLIPTICAL;     // default (0)
@@ -151,10 +150,9 @@ ReflectionZonePlate::ReflectionZonePlate(
         setSurface(std::make_unique<Quadric>(std::vector<double>{
             1, 0, 0, 0, 1, 1, 0, -m_longRadius, 0, 0, 1, 0, 4, 0, 0, 0}));
     } else {
-        // no structure for non-quadric elements yet
         m_longRadius = longRadius;    // for sphere and toroidal
         m_shortRadius = shortRadius;  // only for Toroidal
-        setSurface(std::make_unique<Toroid>(longRadius, shortRadius));
+        setSurface(std::make_unique<Toroid>(longRadius, shortRadius, 4));
     }
 
     printInfo();

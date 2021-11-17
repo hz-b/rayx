@@ -1,10 +1,10 @@
-#include "setupTests.h"
 #include <fstream>
 #include <functional>
 #include <sstream>
 #include <type_traits>
 
 #include "VulkanTracer.h"
+#include "setupTests.h"
 
 std::vector<double> zeros = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 std::vector<double> zeros7 = {0, 0, 0, 0, 0, 0, 0};  // for slope error
@@ -1980,6 +1980,48 @@ TEST(opticalElements, RZPDefaultParams200) {
             "ReflectionZonePlateDefault200",
             RAYX::Geometry::GeometricalShape::RECTANGLE, 0, 50, 200, position,
             orientation, 100, -1, -1, 1, 1, 100, 500, 100, 500, 0, 0, 0, 0,
+            zeros7);  // dx,dy,dz, dpsi,dphi,dchi // {1,2,3,0.001,0.002,0.003}
+
+    RAYX::WorldUserParams ip_param = RAYX::WorldUserParams(
+        0, 0, 0, 1000, std::vector<double>{0, 0, 0, 0, 0, 0});
+    glm::dvec4 pos_ip = ip_param.calcPosition(rzp_param, position, orientation);
+    glm::dmat4x4 or_ip = ip_param.calcOrientation(rzp_param, orientation);
+    std::shared_ptr<RAYX::ImagePlane> ip =
+        std::make_shared<RAYX::ImagePlane>("Image Plane", pos_ip, or_ip);
+
+    testOpticalElement({rzp, ip}, 200);
+
+    // std::shared_ptr<RAYX::ReflectionZonePlate> rzp =
+    // std::make_shared<RAYX::ReflectionZonePlate>("ReflectionZonePlateDefault200",
+    // 0, 1, 0, 0, 0, 50, 200, 170, 1, 0, 10000, 100, 100, -1, -1, 1, 1, 100,
+    // 500, 100, 500, 0, 0, 0, 0, 0, 0, std::vector<double>{ 0,0,0, 0,0,0 },
+    // zeros7, nullptr, true); // dx,dy,dz, dpsi,dphi,dchi //
+    // {1,2,3,0.001,0.002,0.003} std::shared_ptr<RAYX::ImagePlane> i =
+    // std::make_shared<RAYX::ImagePlane>("ImagePlane", 1000, rzp, true);
+    ASSERT_TRUE(true);
+}
+
+TEST(opticalElements, RZPDefaultParamsToroid200) {
+    if (!shouldDoVulkanTests()) {
+        GTEST_SKIP();
+    }
+
+    // use given grazing incidence angle (10), mount = 1
+    RAYX::GeometricUserParams gu_rzp = RAYX::GeometricUserParams(
+        1, 0, 170, 10, 0, 100, 100, -1, -1, 1, 1, 100, 500, 100, 500);
+    ASSERT_DOUBLE_EQ(gu_rzp.getAlpha(), degToRad(10));
+    ASSERT_NEAR(gu_rzp.getBeta(), degToRad(10), 1e-12);
+
+    RAYX::WorldUserParams rzp_param =
+        RAYX::WorldUserParams(gu_rzp.getAlpha(), degToRad(10), 0, 10000,
+                              std::vector<double>{0, 0, 0, 0, 0, 0});
+    glm::dvec4 position = rzp_param.calcPosition();
+    glm::dmat4x4 orientation = rzp_param.calcOrientation();
+    std::shared_ptr<RAYX::ReflectionZonePlate> rzp =
+        std::make_shared<RAYX::ReflectionZonePlate>(
+            "ReflectionZonePlateDefault200Toroid",
+            RAYX::Geometry::GeometricalShape::RECTANGLE, 2, 50, 200, position,
+            orientation, 100, -1, -1, 1, 1, 100, 500, 100, 500, 20, 40, 0, 0,
             zeros7);  // dx,dy,dz, dpsi,dphi,dchi // {1,2,3,0.001,0.002,0.003}
 
     RAYX::WorldUserParams ip_param = RAYX::WorldUserParams(

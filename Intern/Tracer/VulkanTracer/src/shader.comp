@@ -25,7 +25,7 @@ struct Ray{
 	double extraParameter;
 };
 struct Quadric{
-	dmat4 anchorPoints;
+	dmat4 surfaceParams;
 	dmat4 inTrans;
 	dmat4 outTrans;
 	dmat4 objectParameters;
@@ -1805,7 +1805,7 @@ dvec4 getTorusNormal(Ray r, double shortRadius, double longRadius) {
 */
 dvec4 getOpticalElementIntersection(Ray r, uint quadricIndex){
 
-	int type = int(quadricData[quadricIndex].anchorPoints[3][0]);
+	int type = int(quadricData[quadricIndex].surfaceParams[3][0]);
 	Quadric q = quadricData[quadricIndex];
 	dvec4 currentIntersection;
 	if(type > 7){
@@ -1829,20 +1829,20 @@ dvec4 getOpticalElementIntersection(Ray r, uint quadricIndex){
 		r = rayMatrixMult(r, q.outTrans); // do not know if this is necessary as the ray r is not defined as inout
 		return currentIntersection;
 	}
-	else if(type == 6) { // torus
-		double longRadius = q.elementParameters[0][0];
-		double shortRadius = q.elementParameters[0][1];
+	else if(type == 6 || (type == 4 && q.elementParameters[1][0] == 2)) { // toroidal mirror or toroidal rzp
+		double longRadius = q.surfaceParams[0][0];
+		double shortRadius = q.surfaceParams[0][1];
 	
 		dvec4 normal = iteratTo(r, longRadius, shortRadius);
 		currentIntersection = dvec4(r.position, r.weight);
-			// intersection point is in the negative direction (behind the position when the direction is followed forwards), set weight to 0 
+		// intersection point is in the negative direction (behind the position when the direction is followed forwards), set weight to 0 
 		if( (currentIntersection.x - r.position.x) / r.direction.x < 0 || (currentIntersection.y - r.position.y) / r.direction.y < 0 || (currentIntersection.z - r.position.z) / r.direction.z < 0) {
 			currentIntersection.w = 0;
 		}
 
 		return currentIntersection;
 	}
-	currentIntersection = getIntersectionPoint(r, q.anchorPoints);
+	currentIntersection = getIntersectionPoint(r, q.surfaceParams);
 	
 	r = rayMatrixMult(r, q.outTrans);
 	return currentIntersection; // in element coordinate system
@@ -2314,23 +2314,21 @@ void diffraction(int iopt, double xLength, double yLength, double wl, inout doub
 
 /**
 * calculates resulting ray for a slit
-* transforms ray to object coordinate system, traces the ray and transforms ray resulting of interaction with opt. element back to global coordinates
-* @param r				ray to trace
+* @param r				ray to trace in element coordinates
 * @param q				quadric surface
 * @param ctr			counter for random number generator, always inout
 * @param intersection	intersection point in ELEMENT coordinates
 *
-* output: reflected Ray with intersection point as position, reflection as direction in beam coordinates and possibly modified weight in GLOBAL coordinates
+* output: diffracted Ray with intersection point as position, reflection as direction in beam coordinates and possibly modified weight in ELEMENT coordinates
 */
 Ray traceSlit(Ray r, const int quadricIndex, inout uint64_t ctr, dvec4 intersection) {
 	Quadric q = quadricData[quadricIndex];
-	r = rayMatrixMult(r, q.inTrans);
 	
 	// store old position, needed for pathlength calculation
 	dvec3 old_position = r.position;
 	
-	//dvec4 normal = intersectionPoint(r, q.anchorPoints); // if it is not sure whether the given intersection is correct, use this (recalculate the intersection)
-	dvec4 normal = setIntersectionPoint(r, q.anchorPoints, intersection);
+	//dvec4 normal = intersectionPoint(r, q.surfaceParams); // if it is not sure whether the given intersection is correct, use this (recalculate the intersection)
+	dvec4 normal = setIntersectionPoint(r, q.surfaceParams, intersection);
 	
 	double x_extent = q.objectParameters[0][0]; // width
 	double y_extent = q.objectParameters[0][1]; // height
@@ -2341,7 +2339,6 @@ Ray traceSlit(Ray r, const int quadricIndex, inout uint64_t ctr, dvec4 intersect
 	r.weight = stopBox(r.position[0], r.position[1], xStop, yStop, r.weight);
 
 	if(r.weight < 1.0) {
-		r = rayMatrixMult(r, q.outTrans);
 		// rays that missed an element get weight 2
 		r.weight = 2;
 		return r;
@@ -2364,30 +2361,27 @@ Ray traceSlit(Ray r, const int quadricIndex, inout uint64_t ctr, dvec4 intersect
 	// new direction from angles
 	cosini(r, phi,psi);
 
-	r = rayMatrixMult(r, q.outTrans);
 	r.order = 0;
 	return r;
 }
 
 /**
 * calculates resulting ray for a toroid
-* transforms ray to object coordinate system, traces the ray and transforms ray resulting of interaction with opt. element back to global coordinates
-* @param r				ray to trace
+* @param r				ray to trace in element coordinates
 * @param q				quadric surface (well, not a quadric in the torus case, maybe rename this)
 * @param ctr			counter for random number generator, always inout
 * @param intersection	intersection point in ELEMENT coordinates
 *
-* output: reflected Ray with intersection point as position, reflection as direction in beam coordinates and possibly modified weight in GLOBAL coordinates
+* output: reflected Ray with intersection point as position, reflection as direction in ELEMENT coordinates and possibly modified weight
 */
 Ray traceToroid(Ray r, const int quadricIndex, inout uint64_t ctr, dvec4 intersectionPoint) {
 	Quadric q = quadricData[quadricIndex];
-	r = rayMatrixMult(r, q.inTrans);
 
 	// store old position, needed for pathlength calculation
 	dvec3 old_position = r.position;
 	
-	double longRadius = q.anchorPoints[0][0];
-	double shortRadius = q.anchorPoints[0][1];
+	double longRadius = q.surfaceParams[0][0];
+	double shortRadius = q.surfaceParams[0][1];
 	// TODO use the given intersection point instead of recalculating it (still need to calculate the normal)
 	dvec4 normal = iteratTo(r, longRadius, shortRadius);
 
@@ -2397,7 +2391,6 @@ Ray traceToroid(Ray r, const int quadricIndex, inout uint64_t ctr, dvec4 interse
 
 	// element missed
 	if(r.weight < 1.0) {
-		r = rayMatrixMult(r, q.outTrans);
 		// rays that missed an element get weight 2
 		r.weight = 2;
 		return r;
@@ -2414,14 +2407,12 @@ Ray traceToroid(Ray r, const int quadricIndex, inout uint64_t ctr, dvec4 interse
 	
 	r.direction = dvec3(reflect(dvec4(r.direction,0), normal));
 	
-	r = rayMatrixMult(r, q.outTrans);
 	r.order = 0;
 	return r;
 }
 
 Ray traceRZP(Ray r, const int quadricIndex, inout uint64_t ctr, dvec4 intersection) {
 	Quadric q = quadricData[quadricIndex];
-	r = rayMatrixMult(r, q.inTrans);
 	double element_offset_z = q.elementParameters[3][2];
 	r.position.z = r.position.z - element_offset_z;
 	
@@ -2432,27 +2423,24 @@ Ray traceRZP(Ray r, const int quadricIndex, inout uint64_t ctr, dvec4 intersecti
 	// RZP can be plane, toroidal or spherical curvature type. Use intersectionPoint for all except toroidal
 	int CURVATURE_TYPE = int(q.elementParameters[1][0]);
 	if (CURVATURE_TYPE != 2) {
-		normal = setIntersectionPoint(r, q.anchorPoints, intersection);
+		normal = setIntersectionPoint(r, q.surfaceParams, intersection);
 	} else {
-		double longRadius = q.elementParameters[0][0];
-		double shortRadius = q.elementParameters[0][1];
-		normal = getTorusNormal(r, shortRadius, longRadius);
+		double longRadius = q.surfaceParams[0][0];
+		double shortRadius = q.surfaceParams[0][1];
+		normal = iteratTo(r, longRadius, shortRadius);
 	}
 
 	// ! temporary change to test the trapezoid
-	// wastebox is the same no matter what curvature type
 	double x_extentA = q.objectParameters[0][0]; // widthA
 	double x_extentB = q.objectParameters[2][1]; // widthB for trapezoid
 	double z_extent = q.objectParameters[0][1]; // height
 	double hit  = wasteBox(r.position[0], r.position[2], x_extentA, x_extentB, z_extent, r.weight);
 
 
-
 	if(hit < 1.0) {
 		r.position.z += element_offset_z;
 		// rays that missed an element get weight 2
 		r.weight = 2;
-		r = rayMatrixMult(r, q.outTrans); // inv mis & out trans
 		return r;
 	}
 	
@@ -2498,37 +2486,32 @@ Ray traceRZP(Ray r, const int quadricIndex, inout uint64_t ctr, dvec4 intersecti
 	r.order = Ord;
 	
 	r.position.z += element_offset_z;
-	// transform back to world coordinates
-	r = rayMatrixMult(r, q.outTrans);
 	return r;
 }
 
 /**
 * calculates resulting ray for plane grating element
 * separate from "generalGratingElement" because normal is always (0,-1,0). Therefore, the refrac function can be simplified such that it does not use trigonom. functions
-* transforms ray to object coordinate system, takes misalignment into account, traces the ray and transforms ray resulting of interaction with grating back to beam coordinates
-* @param r				ray to trace
+* @param r				ray to trace in element coordinates
 * @param q				quadric parameters of the grating (a_24=-1)
 *
-* @return				reflected Ray with intersection point as position, reflection as direction in beam coordinates and possibly modified weight
+* @return				reflected Ray with intersection point as position, reflection as direction in ELEMENT coordinates and possibly modified weight
 */
 Ray tracePlaneGrating(Ray r, const int quadricIndex, inout uint64_t ctr, dvec4 intersection) {
 	Quadric q = quadricData[quadricIndex];
-	r = rayMatrixMult(r, q.inTrans);
 	
 	// store old position, needed for pathlength calculation
 	dvec3 old_position = r.position;
 	
 	// calculate intersection point with element surface and return surface normal at this point
-	dvec4 normal = setIntersectionPoint(r, q.anchorPoints, intersection);
+	dvec4 normal = setIntersectionPoint(r, q.surfaceParams, intersection);
 	
 	// check if element was hit
 	double x_extent = q.objectParameters[0][0];
 	double z_extent = q.objectParameters[0][1];
-	r.weight = wasteBox(r.position.x, r.position.z, x_extent, z_extent, r.weight);
+	double hit = wasteBox(r.position.x, r.position.z, x_extent, z_extent, r.weight);
 
-	if(r.weight < 1.0) {
-		r = rayMatrixMult(r, q.outTrans);
+	if(hit < 1.0) {
 		// rays that missed an element get weight 2
 		r.weight = 2;
 		return r;
@@ -2562,25 +2545,21 @@ Ray tracePlaneGrating(Ray r, const int quadricIndex, inout uint64_t ctr, dvec4 i
 	// calculate refracted ray
 	r = refrac_plane(r, normal, a);
 
-	// transform back to world coordinates
-	r = rayMatrixMult(r, q.outTrans);
 	return r;
 }
 
 /**
 * calculates resulting ray for general grating element
-* transforms ray to object coordinate system, takes misalignment into account, traces the ray and transforms ray resulting of interaction with grating back to beam coordinates
-* @param r				ray to trace
+* @param r				ray to trace in element coordinates
 * @param q				quadric surface
 *
-* output: reflected Ray with intersection point as position, reflection as direction in beam coordinates and possibly modified weight
+* output: reflected Ray with intersection point as position, reflection as direction in ELEMENT coordinates and possibly modified weight
 */
 Ray traceGeneralGrating(Ray r, const int quadricIndex, inout uint64_t ctr, dvec4 intersection) {
 	Quadric q = quadricData[quadricIndex];
-	r = rayMatrixMult(r, q.inTrans);
 	
 	int ISIG = 1;
-	double radius = q.anchorPoints[1][3]; // -radius , a_24
+	double radius = q.surfaceParams[1][3]; // -radius , a_24
 	if(-radius < 0) {
 		ISIG = -1;
 	}
@@ -2588,17 +2567,16 @@ Ray traceGeneralGrating(Ray r, const int quadricIndex, inout uint64_t ctr, dvec4
 	// store old position, needed for pathlength calculation
 	dvec3 old_position = r.position;
 	
-	dvec4 normal = setIntersectionPoint(r, q.anchorPoints, intersection);
+	dvec4 normal = setIntersectionPoint(r, q.surfaceParams, intersection);
 	//normal = normalize(dvec4(-r.position.x, -radius - r.position[1]*ISIG, -r.position[2], 0));
 
 	// check if element was hit
 	double x_extent = q.objectParameters[0][0];
 	double z_extent = q.objectParameters[0][1];
-	r.weight = wasteBox(r.position.x, r.position.z, x_extent, z_extent, r.weight);
+	double hit = wasteBox(r.position.x, r.position.z, x_extent, z_extent, r.weight);
 
 	// if ray missed the surface, stop the tracing here and return the ray in world coordinates
-	if(r.weight < 1.0) {
-		r = rayMatrixMult(r, q.outTrans);
+	if(hit < 1.0) {
 		// rays that missed an element get weight 2
 		r.weight = 2;
 		return r;
@@ -2627,39 +2605,34 @@ Ray traceGeneralGrating(Ray r, const int quadricIndex, inout uint64_t ctr, dvec4
 	// refraction
 	r = refrac(r, normal, a);
 
-	// transform back to world coordinates
-	r = rayMatrixMult(r, q.outTrans);
 	return r;
 }
 
 /**
 * calculates resulting ray for a mirror element
-* transforms ray to object coordinate system, takes misalignment into account, traces the ray and transforms ray resulting of interaction with opt. element back to beam coordinates
-* @param r				ray to trace
-* @param q				quadric surface
+* @param r				ray to trace in element coordinates
+* @param qadricIndec	index of quadric surface
 * @param ctr			counter for RNG
 * @param intersectionPoint	intersection point in ELEMENT coordinates
 *
-* output: reflected Ray with intersection point as position, reflection as direction in beam coordinates and possibly modified weight
+* output: reflected Ray with intersection point as position, reflection as direction in ELEMENT coordinates and possibly modified weight
 */
 Ray traceMirror(Ray r, const int quadricIndex, inout uint64_t ctr, dvec4 intersection) {
 	Quadric q = quadricData[quadricIndex];
-	r = rayMatrixMult(r, q.inTrans);
-
+	
 	// store old position, needed for pathlength calculation
 	dvec3 old_position = r.position;
 	
 	// calculate intersection point and normal at intersection point
-	dvec4 normal = setIntersectionPoint(r, q.anchorPoints, intersection);
+	dvec4 normal = setIntersectionPoint(r, q.surfaceParams, intersection);
 
 	// check if ray hit the element within the boundaries
 	double x_extent = q.objectParameters[0][0]; // width
 	double z_extent = q.objectParameters[0][1]; // height
-	r.weight = wasteBox(r.position.x, r.position.z, x_extent, z_extent, r.weight);
+	double hit = wasteBox(r.position.x, r.position.z, x_extent, z_extent, r.weight);
 	
 	// if ray missed the surface, stop the tracing here and return the ray in world coordinates
-	if(r.weight < 1.0) {
-		r = rayMatrixMult(r, q.outTrans);
+	if(hit < 1.0) {
 		// rays that missed an element get weight 2
 		r.weight = 2;
 		return r;
@@ -2677,8 +2650,6 @@ Ray traceMirror(Ray r, const int quadricIndex, inout uint64_t ctr, dvec4 interse
 	// calculate the new direction after the reflection
 	r.direction = dvec3(reflect(dvec4(r.direction,0), normal));
 	
-	// transform back to world coordinates
-	r = rayMatrixMult(r, q.outTrans);
 	r.order = 0;
 	return r;
 }
@@ -2686,17 +2657,15 @@ Ray traceMirror(Ray r, const int quadricIndex, inout uint64_t ctr, dvec4 interse
 
 /**
 * calculates resulting ray for an ellipsoid mirror element
-* transforms ray to object coordinate system, takes misalignment into account, traces the ray and transforms ray resulting of interaction with opt. element back to beam coordinates
-* @param r				ray to trace
-* @param q				quadric surface
+* @param r				ray to trace in element coordinates
+* @param quadricIndex	index of quadric surface
 * @param ctr			counter for RNG
 * @param intersectionPoint	intersection point in ELEMENT coordinates
 *
-* output: reflected Ray with intersection point as position, reflection as direction in beam coordinates and possibly modified weight
+* @return reflected Ray with intersection point as position, reflection as direction in ELEMENT coordinates and possibly modified weight
 */
 Ray traceEllipsoidMirror(Ray r, const int quadricIndex, inout uint64_t ctr, dvec4 intersection) {
 	Quadric q = quadricData[quadricIndex];
-	r = rayMatrixMult(r, q.inTrans);
 	
 	double sin_tangentAngle = q.elementParameters[0][0];
 	double cos_tangentAngle = q.elementParameters[0][1];
@@ -2706,11 +2675,11 @@ Ray traceEllipsoidMirror(Ray r, const int quadricIndex, inout uint64_t ctr, dvec
 	dvec3 old_position = r.position;
 	
 	// calculate intersection point and normal at intersection point
-	dvec4 normal = setIntersectionPoint(r, q.anchorPoints, intersection);
-	double icurv = q.anchorPoints[1][0];
-	/*normal.x = -q.anchorPoints[0][0] * r.position.x * icurv;
-	normal.y = -(r.position.y + q.anchorPoints[1][3]) * icurv;
-	normal.z = -(q.anchorPoints[2][2] * r.position.z + q.anchorPoints[2][3]) * icurv;
+	dvec4 normal = setIntersectionPoint(r, q.surfaceParams, intersection);
+	double icurv = q.surfaceParams[1][0];
+	/*normal.x = -q.surfaceParams[0][0] * r.position.x * icurv;
+	normal.y = -(r.position.y + q.surfaceParams[1][3]) * icurv;
+	normal.z = -(q.surfaceParams[2][2] * r.position.z + q.surfaceParams[2][3]) * icurv;
 	normal = normalize(normal);*/
 	
 	// check if ray hit the element within the boundaries
@@ -2722,7 +2691,6 @@ Ray traceEllipsoidMirror(Ray r, const int quadricIndex, inout uint64_t ctr, dvec
 	
 	// if ray missed the surface, stop the tracing here and return the ray in world coordinates
 	if(hit < 1.0) {
-		r = rayMatrixMult(r, q.outTrans); 
 		// rays that missed an element get weight 2
 		return r;
 	}
@@ -2739,20 +2707,21 @@ Ray traceEllipsoidMirror(Ray r, const int quadricIndex, inout uint64_t ctr, dvec
 	// calculate the new direction after the reflection
 	r.direction = dvec3(reflect(dvec4(r.direction,0), normal));
 
-	// transform back to world coordinates
-	r = rayMatrixMult(r, q.outTrans);
 	r.order = 0;
 	return r;
 }
 
 
-/*
-the image plane is always parallel to x-y-plane of ray coordinate system in which the rays are when they leave the previous element
--> defined by distance to that element
+/**
+* the image plane is always parallel to x-y-plane of ray coordinate system in which the rays are when they leave the previous element
+* -> defined by distance to that element
+* @param r		ray to trace in element coordinates
+* @param quadricIndex	index of quadric element
+* @param intersection	intersection point of ray with optical element in ELMENT coordinates
+* @return  reflected Ray with intersection point as position in ELEMENT coordinates
 */
 Ray traceImagePlane(Ray r, const int quadricIndex, dvec4 intersection) {
 	Quadric q = quadricData[quadricIndex];
-	r = rayMatrixMult(r, q.inTrans);
 	// path length in element coordinates
 	r.pathLength += length(r.position - intersection.xyz);
 	r.position = intersection.xyz;
@@ -2783,7 +2752,7 @@ void iterateElements(){
 	for(int i=0; i<numberOfQuadricsPerBeamline; i++){
 		Quadric q = quadricData[i];
 
-		type = int(q.anchorPoints[3][0]);
+		type = int(q.surfaceParams[3][0]);
 		dvec4 intersection = getOpticalElementIntersection(rayData[uint(gl_GlobalInvocationID)], i);
 		
 		if (type == 0) { // mirror
@@ -2869,11 +2838,12 @@ void dynamicQuadrics(){
 			break;
 		}
 
-		// transform ray and intersection point in element coordiantes
+		// transform ray and intersection point in ELEMENT coordiantes
 		next = quadricData[closestQuadricIndex];
-		
+		rayData[uint(gl_GlobalInvocationID)] = rayMatrixMult(rayData[uint(gl_GlobalInvocationID)], next.inTrans);
+	
 		// calculate interaction of ray with detected next quadric 
-		type = int(next.anchorPoints[3][0]);
+		type = int(next.surfaceParams[3][0]);
 		if (type == 0) { // plane + sphere mirror
 			rayData[uint(gl_GlobalInvocationID)] = traceMirror(rayData[uint(gl_GlobalInvocationID)], closestQuadricIndex, ctr, closestHitpoint); // intersection in ELEMENT coordinates
 		}else if(type == 1){ // plane grating
@@ -2897,7 +2867,9 @@ void dynamicQuadrics(){
 		// use extraParameter to store the order in which the ray has hit which optical element (e.g extraParameter = 412 -> first hit element 2, then 1, then 4)
 		rayData[uint(gl_GlobalInvocationID)].extraParameter += ((closestQuadricIndex+1) * bounce) * int(rayData[uint(gl_GlobalInvocationID)].lastElement == closestQuadricIndex+1);
 		bounce *= pow(10, int(rayData[uint(gl_GlobalInvocationID)].lastElement == closestQuadricIndex+1));
-		
+		// transform back to world coordinates
+		rayData[uint(gl_GlobalInvocationID)] = rayMatrixMult(rayData[uint(gl_GlobalInvocationID)], next.outTrans);
+	
 	}
 	// end the tracing in element coordinates (makes comparison with old RAY easier)
 	//rayData[uint(gl_GlobalInvocationID)] = rayMatrixMult(rayData[uint(gl_GlobalInvocationID)], next.inTrans); 
@@ -2907,7 +2879,7 @@ void dynamicQuadrics(){
 
 void testFunctions() {
 	// flag to decide how to interpret the input
-	int settings = int(quadricData[0].anchorPoints[3][1]);
+	int settings = int(quadricData[0].surfaceParams[3][1]);
 
 	Ray r = rayData[uint(gl_GlobalInvocationID)];
 	Ray res; // store the result here
@@ -3106,7 +3078,7 @@ void testFunctions() {
 		rayData[uint(gl_GlobalInvocationID)] = res;
 	}
 	else if(settings == 20) { // test iteratTo (method for finding intersection and normal for non-quadric surfaces like the torus)
-		dvec4 normal = iteratTo(r, quadricData[0].anchorPoints[0][0], quadricData[0].anchorPoints[0][1]);
+		dvec4 normal = iteratTo(r, quadricData[0].surfaceParams[0][0], quadricData[0].surfaceParams[0][1]);
 		rayData[uint(gl_GlobalInvocationID)] = r;
 	}else if(settings == 21) { // test getTheta function that is needed for the efficiency calculations
 		Ray res;

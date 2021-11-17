@@ -1,4 +1,5 @@
 #include "Core.h"
+#include "Data/Importer.h"
 #include "Model/Beamline/Objects/Objects.h"
 #include "Model/Geometry/Geometry.h"
 #include "Ray.h"
@@ -6,7 +7,6 @@
 #include "UserParameter/WorldUserParams.h"
 #include "gmock/gmock.h"
 #include "gtest/gtest.h"
-#include "Data/Importer.h"
 
 //! Using the google test framework, check all elements of two containers
 #define EXPECT_ITERABLE_BASE(PREDICATE, REFTYPE, TARTYPE, ref, target)       \
@@ -45,7 +45,3 @@
 //! Check that all elements of two same-type containers of doubles are equal
 #define EXPECT_ITERABLE_DOUBLE_EQ(TYPE, ref, target) \
     EXPECT_ITERABLE_BASE(EXPECT_DOUBLE_EQ, TYPE, TYPE, ref, target)
-
-// check that they are equal with a certain tolerance
-#define EXPECT_ITERABLE_DOUBLE_NEAR(TYPE, ref, target, tolerance) \
-    EXPECT_NEAR_ITERABLE_BASE(EXPECT_NEAR, TYPE, TYPE, ref, target, tolerance)
