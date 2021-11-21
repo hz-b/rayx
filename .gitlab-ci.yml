@@ -17,8 +17,8 @@ build-job:
   script:
     - git submodule update --init --recursive
     - mkdir build && cd build
-    - WERROR=YES VULKAN_TEST=NO cmake ..
-    - WERROR=YES VULKAN_TEST=NO cmake --build .
+    - CI=YES cmake ..
+    - CI=YES cmake --build .
     - ls
   artifacts:
     paths:
