@@ -6,9 +6,6 @@ TEST(RZP, testdefaultParams) {
         RAYX::Geometry::GeometricalShape::RECTANGLE;
     int curvatureType = 0;
     int imageType = 0;
-    int rzp_type = 0;
-    int designType = 0;
-    int elementOffsetType = 0;
     int additionalOrder = 1;
     double beta_in = 0;
     double width = 50.0;
@@ -29,7 +26,6 @@ TEST(RZP, testdefaultParams) {
     double mExit = 500;
     double shortRadius = 0;
     double longRadius = 0;
-    double elementOffsetZ = 2;
     double fresnelOffset = 0;
 
     std::vector<double> mis = {1, 2, 3, 0.001, 0.002, 0.003};
@@ -106,9 +102,6 @@ TEST(RZP, testdefaultParamsElliptical) {
         RAYX::Geometry::GeometricalShape::ELLIPTICAL;
     int curvatureType = 0;
     int imageType = 0;
-    int rzp_type = 0;
-    int designType = 0;
-    int elementOffsetType = 0;
     int additionalOrder = 1;
     double beta_in = 0;
     double width = 50.0;
@@ -129,7 +122,6 @@ TEST(RZP, testdefaultParamsElliptical) {
     double mExit = 500;
     double shortRadius = 0;
     double longRadius = 0;
-    double elementOffsetZ = 2;
     double fresnelOffset = 0;
     int icurv = 1;
     std::vector<double> mis = {1, 2, 3, 0.001, 0.002, 0.003};
@@ -205,8 +197,6 @@ TEST(RZP, testParams) {
         RAYX::Geometry::GeometricalShape::RECTANGLE;
     int imageType = 0;
     int curvatureType = 0;
-    int designType = 0;
-    int elementOffsetType = 0;
     int additionalOrder = 0;
     double beta_in = 0;
     double width = 151.74;
@@ -227,7 +217,6 @@ TEST(RZP, testParams) {
     double mExit = 500;
     double shortRadius = 0;
     double longRadius = 0;
-    double elementOffsetZ = 0;
     double fresnelOffset = 12;
 
     std::vector<double> mis = {0, 0, 0, 0, 0, 0};

@@ -11,7 +11,6 @@ TEST(planeGrating, testParams) {
         RAYX::Geometry::GeometricalShape::RECTANGLE;
     double deviation = 12.4;
     double normalIncidence = 15.12;
-    double fixFocusConstantCFF = 12.1;
     std::vector<double> mis = {5.212, 7.3, 0.35, 0.23, 0.011, 0.0006};
 
     // other user parameters
@@ -99,7 +98,6 @@ TEST(planeGraing, mount1) {
         RAYX::Geometry::GeometricalShape::RECTANGLE;
     double deviation = 12.4;
     double normalIncidence = 15.12;
-    double fixFocusConstantCFF = 12.1;
     std::vector<double> mis = {5.212, 7.3, 0.35, 0.23, 0.011, 0.0006};
 
     double width = 125.23;
@@ -187,7 +185,6 @@ TEST(planeGrating, higherOrderOfDiffraction) {
         RAYX::Geometry::GeometricalShape::RECTANGLE;
     double deviation = 12.4;
     double normalIncidence = 15.12;
-    double fixFocusConstantCFF = 12.1;
     std::vector<double> mis = {5.212, 7.3, 0.35, 0.23, 0.011, 0.0006};
 
     double width = 125.23;
@@ -276,7 +273,6 @@ TEST(planeGrating, deviation) {
         RAYX::Geometry::GeometricalShape::RECTANGLE;
     double deviation = 12.4;
     double normalIncidence = 15.12;
-    double fixFocusConstantCFF = 12.1;
     std::vector<double> mis = {5.212, 7.3, 0.35, 0.23, 0.011, 0.0006};
 
     double width = 125.23;
@@ -378,9 +374,7 @@ TEST(SphereGrating, testParams) {
     double exitArm = 623.12;
     double designEnergy = 232.2;
     double linedensity = 432.2;
-    int add_order = 0;
     int order = 1;
-    int icurv = 1;
     std::vector<double> mis = {1.41, 5.3, 1.5, 0.2, 1.0, 1.4};
     std::vector<double> vls = {2.1, 0.12, 12.2, 8.3, 5.1, 7.23};
     std::vector<double> sE = {0.1, 0.5, 0.1, 0.2, 0.5, 1, 3};

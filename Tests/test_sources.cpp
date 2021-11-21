@@ -381,7 +381,6 @@ TEST(LightSource, PointSourceSoftEdgeMis) {
     double lin0 = 1;
     double lin45 = 0;
     double circ = 0;
-    int spreadType = 1;
     std::vector<double> mis = {2, 3, 0.005, 0.006};  // x,y,psi,phi in rad
     RAYX::EnergyDistribution dist(RAYX::EnergyRange(photonEnergy, energySpread),
                                   false);
@@ -462,8 +461,6 @@ TEST(LightSource, MatrixSource20000) {
 TEST(LightSource, PointSource20000) {
     int number_of_rays = 20000;
     RAYX::SimulationEnv::get().m_numOfRays = number_of_rays;
-    double photonEnergy = 120;
-    double energySpread = 20;
     double lin0 = 1;
     double lin45 = 0;
     double circ = 0;

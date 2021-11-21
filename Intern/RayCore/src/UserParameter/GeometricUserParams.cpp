@@ -29,7 +29,7 @@ GeometricUserParams::GeometricUserParams(int mount, double deviation,
                                          double designEnergy,
                                          int orderOfDiffraction)
     : m_radius(0), m_shortRadius(0) {
-    double angle;
+    double angle = 0;  // TODO what should angle be if mount is neither 0 or 1?
     if (mount == 0) {  // incidence
         angle = deviation;
     } else if (mount == 1) {  // deviation
@@ -212,12 +212,15 @@ double GeometricUserParams::rzpLineDensityDZ(
     double romer = mExit;
 
     double DZ;  //, DX;
-    double xi;
-    double yi;
-    double zi;
-    double xm;
-    double ym;
-    double zm;
+
+    // all of the upcoming variables will be defined in each of the following
+    // if-else blocks!
+    double xi = 0;
+    double yi = 0;
+    double zi = 0;
+    double xm = 0;
+    double ym = 0;
+    double zm = 0;
 
     if (imageType == 0) {                      // point to point (standard)
         if (normal.x == 0 && normal.z == 0) {  // plane

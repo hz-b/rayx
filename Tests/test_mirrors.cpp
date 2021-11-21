@@ -1,6 +1,5 @@
 #include "setupTests.h"
 
-
 TEST(PlaneMirror, testSimpleParams) {
     // arrange
     // act
@@ -208,7 +207,6 @@ TEST(Ellips, defaultParams) {
     double exitArmLength = 1000;
 
     double a11 = 1;
-    int coordSys = 0;
     int figRot = 0;  // "yes"
 
     double dist = 10000;

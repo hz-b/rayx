@@ -421,7 +421,8 @@ double ReflectionZonePlate::calcDz00() {
  * @param:
  */
 void ReflectionZonePlate::calcFresnelZOffset() {
-    double betaAngle;
+    double betaAngle =
+        0;  // TODO should this really be = 0 if m_designType != DT_BETA?
     if (m_designType == DT_BETA) {
         betaAngle = m_designBetaAngle;
     }
@@ -510,7 +511,8 @@ void ReflectionZonePlate::VectorR2Center() {
  */
 void ReflectionZonePlate::calcDesignOrderOfDiffraction(
     const double designOrderOfDiffraction) {
-    int presign;
+    int presign = 0;  // TODO should this really be = 0 if m_DesignType is
+                      // neither DT_ZOFFSET nor DT_BETA?
     if (m_designType == DT_ZOFFSET) {
         presign = (m_designAlphaAngle >= m_designBetaAngle) ? -1 : 1;
     } else if (m_designType == DT_BETA) {
@@ -543,6 +545,8 @@ double ReflectionZonePlate::rzpLineDensityDZ(glm::dvec3 intersection,
     double romer = m_designMeridionalExitArmLength;
 
     double DZ;  //, DX;
+
+    // all of the upcoming variables will be defined in each of the following if-else blocks!
     double xi = 0;
     double yi = 0;
     double zi = 0;

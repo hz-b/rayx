@@ -181,7 +181,6 @@ template <typename ret, typename par>
 void compareFromFunction(fn<ret, par> func, std::vector<RAYX::Ray> testValues,
                          std::list<double> outputRays, double tolerance) {
     int counter = 0;
-    typename std::remove_reference<par>::type p;
     for (std::list<double>::iterator i = outputRays.begin();
          i != outputRays.end();) {
         if (counter % RAY_DOUBLE_COUNT == 0) {
@@ -1119,7 +1118,6 @@ TEST(Tracer, testCosini) {
     std::cout << "got " << outputRays.size() << " values from shader"
               << std::endl;
     int counter = 0;
-    int corr_counter = 0;
     double tolerance = 1e-12;
     // return format = pos (x,y,z), weight, dir (x,y,z), 0
     for (std::list<double>::iterator i = outputRays.begin();
@@ -1274,7 +1272,6 @@ TEST(Tracer, diffractionTest) {
               << std::endl;
 
     int counter = 0;
-    double tolerance = 1e-12;
     for (std::list<double>::iterator i = outputRays.begin();
          i != outputRays.end();) {
         std::cout << *i << ", ";
@@ -1451,9 +1448,9 @@ TEST(Tracer, vlsGratingTest) {
 
     std::list<double> outputRays = runTracer(testValues, {q});
 
-    // we reduced the precision here from 1e-15, because it didn't work on Rudi's and Oussama's video cards.
-    // we presume this inaccuracy is not relevant.
-    // interestingly though, it worked on the other video cards.
+    // we reduced the precision here from 1e-15, because it didn't work on
+    // Rudi's and Oussama's video cards. we presume this inaccuracy is not
+    // relevant. interestingly though, it worked on the other video cards.
     double tolerance = 1e-11;
     compareFromCorrect(correct, outputRays, tolerance);
 }
@@ -2544,11 +2541,15 @@ TEST(opticalElements, slit1) {
     for (std::list<double>::iterator i = outputRays.begin();
          i != outputRays.end();) {
         // only if weight == 1
-        if (counter & RAY_DOUBLE_COUNT == 0) {
+        if (counter &
+            (RAY_DOUBLE_COUNT ==
+             0)) {  // TODO should this be `counter % RAY_DOUBLE_COUNT == 0`?
             std::list<double>::iterator j = i;
             j++;
             j++;
-            if (*(j) == 1) EXPECT_TRUE(abs(*i) <= 6);
+            if (*(j) == 1) {
+                EXPECT_TRUE(abs(*i) <= 6);
+            }
         } else if (counter % RAY_DOUBLE_COUNT == 1) {  // y loc
             std::list<double>::iterator j = i;
             j++;
