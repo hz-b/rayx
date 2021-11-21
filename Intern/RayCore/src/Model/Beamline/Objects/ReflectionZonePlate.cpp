@@ -543,12 +543,12 @@ double ReflectionZonePlate::rzpLineDensityDZ(glm::dvec3 intersection,
     double romer = m_designMeridionalExitArmLength;
 
     double DZ;  //, DX;
-    double xi;
-    double yi;
-    double zi;
-    double xm;
-    double ym;
-    double zm;
+    double xi = 0;
+    double yi = 0;
+    double zi = 0;
+    double xm = 0;
+    double ym = 0;
+    double zm = 0;
 
     if (m_imageType == IT_POINT2POINT) {       // point to point (standard)
         if (normal.x == 0 && normal.z == 0) {  // plane
