@@ -2540,22 +2540,20 @@ TEST(opticalElements, slit1) {
     int counter = 0;
     for (std::list<double>::iterator i = outputRays.begin();
          i != outputRays.end();) {
-        // only if weight == 1
-        if (counter &
-            (RAY_DOUBLE_COUNT ==
-             0)) {  // TODO should this be `counter % RAY_DOUBLE_COUNT == 0`?
+        if (counter % RAY_DOUBLE_COUNT == 0) {  // x loc
             std::list<double>::iterator j = i;
             j++;
             j++;
-            if (*(j) == 1) {
-                EXPECT_TRUE(abs(*i) <= 6);
-            }
+            if (*(j) == 1)
+                EXPECT_TRUE(
+                    abs(*i) <=
+                    6);  // if weight == 1 check if x location is correct
         } else if (counter % RAY_DOUBLE_COUNT == 1) {  // y loc
             std::list<double>::iterator j = i;
             j++;
             j++;
             j++;
-            if (*j == 1) {
+            if (*j == 1) {  // if weight == 1 check if y location is correct
                 EXPECT_TRUE(abs(*i) >= 0.5);
                 EXPECT_TRUE(abs(*i) <= 1.3);
             }

@@ -7,7 +7,7 @@
 namespace RAYX {
 /**
  * standard constructor
- * this class uses the parameters for the quadric equation!
+ * this class uses the parameters for surfaces
  */
 Surface::Surface() {}
 

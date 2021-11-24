@@ -43,6 +43,21 @@ void Toroid::setParameters(const std::vector<double> inputPoints) {
     m_shortRadius = inputPoints[1];
 }
 
+/**
+ * ENCODING:
+ *
+ * {longRadius,  shortRadius,   0.0 , 0.0,
+ *  0.0,         0.0,           0.0,  0.0,
+ *  0.0,         0.0,           0.0,  0.0,
+ *  type,        settings,      0.0,  0.0}
+ *
+ * @param type = what kind of optical element (mirror, plane grating, spherical
+ *grating, toroid mirror, rzp, slit..)
+ * @param setting = how to interpret the input of
+ *these params. During normal tracing always = 0 but when testing, this
+ *parameter defines which test to run
+ *
+ **/
 std::vector<double> Toroid::getParams() const {
     std::cout << "[Toroid]: Return surface points" << std::endl;
     return m_parameters;

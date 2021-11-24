@@ -32,6 +32,23 @@ void Quadric::setAnchorPoints(std::vector<double> inputPoints) {
     m_parameters = inputPoints;
 }
 
+/**
+ * ENCODING:
+ *
+ * {a_11,  a_12,     a_13, a_14,
+ *  icurv, a_22,     a_23, a_44,
+ *  0.0,   0.0,      a_33, a_34,
+ *  type,  settings, 0.0,  a_44}
+ *
+ * @param type = what kind of optical element (mirror, plane grating, spherical
+ *grating, toroid mirror, rzp, slit..)
+ * @param setting = how to interpret the input of these params. During normal
+ *tracing always = 0 but when testing, this parameter defines which test to run
+ * @param icurv = whether to take the first or second intersection of a ray with
+ *a quadric surface
+ * @param a_11, .., a_44 parameters of the quadric equation to find the
+ *intersection point. Depend on the element (plane, sphere, ellipsoid,..)
+ **/
 std::vector<double> Quadric::getParams() const {
     std::cout << "[Quadric]: return surface parameters" << std::endl;
     return m_parameters;

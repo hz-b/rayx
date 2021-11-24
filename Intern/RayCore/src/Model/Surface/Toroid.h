@@ -21,7 +21,7 @@ class RAYX_API Toroid : public Surface {
     std::vector<double> getParams() const;
 
   private:
-    // Quadric parameters; will be turned into 4x4 matrix
+    // 16 values that store the 2 surface params for the toroid and also some settings for the shader to know how to interpret the input
     std::vector<double> m_parameters;
     double m_longRadius;
     double m_shortRadius;
