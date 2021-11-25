@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.15 FATAL_ERROR)
+cmake_minimum_required(VERSION 3.2 FATAL_ERROR)
 project(RayCore)
 
 SET(SOURCE
@@ -78,7 +78,6 @@ SET(HEADERS
     src/UserParameter/GeometricUserParams.h
 )
 
-
 add_library(${PROJECT_NAME} SHARED ${SOURCE} ${HEADERS} )
 
 target_link_libraries(${PROJECT_NAME} 
@@ -98,8 +97,8 @@ target_compile_definitions(${PROJECT_NAME}
     PUBLIC ${COMPILE_PLATFORM}
 )
 
-target_include_directories(${PROJECT_NAME}  
-    PUBLIC ${RayCore_SOURCE_DIR}/src/
+target_include_directories(${PROJECT_NAME}
+    SYSTEM PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/src
     PUBLIC ${RayCore_SOURCE_DIR}/../../Extern/glm/glm/
     PUBLIC ${RayCore_SOURCE_DIR}/../../Extern/rapidxml-1.13/
 )

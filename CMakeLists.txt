@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.1 FATAL_ERROR)
+cmake_minimum_required(VERSION 3.2 FATAL_ERROR)
 
 set (CMAKE_CXX_STANDARD 17)
 
@@ -6,9 +6,11 @@ project(RayReworked)
 
 # enable all warnings
 if (MSVC)
-	set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /W4 /Wall")
+	message(STATUS "MSVC")
+	set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /W4")
 else()
-	set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra -Wpedantic")
+	message(STATUS "GCC")
+	set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra -Wpedantic") # -Wconversion -Wsign-conversion")
 endif()
 
 if ("$ENV{CI}" STREQUAL "YES")
