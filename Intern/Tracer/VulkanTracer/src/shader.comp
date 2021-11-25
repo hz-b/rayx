@@ -1178,7 +1178,7 @@ double dpow (double a, int b) {
 #define cx_sin(a) dvec2(r8_sin(a.x) * r8_cosh(a.y), r8_cos(a.x) * r8_sinh(a.y))
 #define cx_cos(a) dvec2(r8_cos(a.x) * r8_cosh(a.y), -r8_sin(a.x) * r8_sinh(a.y))
 
-dvec2 cx_sqrt(vec2 a) {
+dvec2 cx_sqrt(dvec2 a) {
     double r = length(a);
     double rpart = sqrt(0.5*(r+a.x));
     double ipart = sqrt(0.5*(r-a.x));
@@ -1943,8 +1943,111 @@ double getTheta(Ray r, dvec4 normal) {
 
 }
 
-void efficiency(inout double RS, inout double RP, inout double delta) {
+/** calculates cosinus of transmittance angle with snell's law 
+ * cosinus is needed in fresnel formula
+ * sin(transmittance_anlge) = (cn1 / cn2) * sin(incidence_angle)
+ * 
+ * @param cos_incidence			cosinus of complex incidence angle
+ * @param cn1					complex refractive index of material from which the ray is coming
+ * @param cn2					complex refractive index of material into which the ray is going
+ * @return cos_transmittance 	cosinus of complex transmittance angle 
+ */
+dvec2 snell(dvec2 cos_incidence, dvec2 cn1, dvec2 cn2) {
+	dvec2 sin_incidence = cx_sqrt( cx_sub(dvec2(1,0), cx_pow(cos_incidence, 2)) );
+	dvec2 refractive_ratio = cx_div(cn1, cn2);
+	dvec2 sin_transmittance = cx_mul(sin_incidence, refractive_ratio);
+	dvec2 cos_transmittance = cx_sqrt( cx_sub(dvec2(1,0), cx_pow(sin_transmittance, 2)));
+	return cos_transmittance;
+}
 
+/** calculates complex s- and p-polarization with fresnel formulas
+ * @param cn1					complex refractive index of material from which the ray is coming
+ * @param cn2					complex refractive index of material into which the ray is going
+ * @param cos_incidence			cosinus of complex incidence angle
+ * @param cos_transmittance 	cosinus of complex transmittance angle 
+ * @return complex_S			complex s-polarization 
+ * @return complex_P			complex p-polarization 
+ *
+ */
+void fresnel(dvec2 cn1, dvec2 cn2, dvec2 cos_incidence, dvec2 cos_transmittance, inout dvec2 complex_S, inout dvec2 complex_P) {
+	dvec2 mat1_incidence = cx_mul( cn1, cos_incidence ); // material one (incoming side)
+	dvec2 mat1_transmittance = cx_mul( cn1, cos_transmittance );
+	dvec2 mat2_incidence = cx_mul( cn2, cos_incidence ); // material two (into which the ray goes)
+	dvec2 mat2_transmittance = cx_mul( cn2, cos_transmittance );
+
+	complex_S = - cx_div(cx_sub(mat1_incidence, mat2_transmittance) , cx_add(mat1_incidence, mat2_transmittance));
+	complex_P = - cx_div(cx_sub(mat1_transmittance, mat2_incidence) , cx_add(mat1_transmittance, mat2_incidence));
+	return;
+}
+
+/** computes complex s and p polarization over all layers with fresnel and snell's law
+ * @param energy 				energy of ray
+ * @param incidence_angle		normal incidence angle
+ * @return complex_S			complex s-polarization
+ * @return complex_P			complex p-polarization
+ */
+void reflectance(double energy, double incidence_angle, inout dvec2 complex_S, inout dvec2 complex_P) {
+	dvec2 cos_incidence = dvec2( r8_cos(incidence_angle), 0.0); // complex number, initialization only for first layer, the others are then derived from this with snell's law
+	
+	// todo number of layers: loop over layers from top to bottom, transmittance angle for each layer, so far only one layer (substrate?)
+	// store cosinuses in array, bc needed in later loop for fresnel (or maybe only one loop is enough?)
+	// todo refractive indices of materials in extra buffer?
+	dvec2 cn1 = dvec2(1,0);
+	dvec2 cn2 = dvec2(1,0);
+	dvec2 cos_transmittance = snell(cos_incidence, cn1, cn2);
+
+	// todo again iterate over layers but from bottom to top, update s and p polarization in each iteration:
+	fresnel(cn1, cn2, cos_incidence, cos_transmittance, complex_S, complex_P);
+	// todo roughness (uses wavelength/energy)
+	// todo other calculations for layers that are not substrate (which is the first layer)
+	return;
+}
+/**
+ * computes complex number a + i*b in euler form: 
+ * euler = r * e^(i * phi) where r = sqrt(a**2 + b**2) = radius and phi = atan2(a,b) = (absolute) phase
+ */
+dvec2 cartesian_to_euler(dvec2 complex) {
+	double r = complex.x*complex.x + complex.y*complex.y; // r = sqrt(a**2 + b**"), why not take sqrt in fortran code?
+	dvec2 euler;
+	if(r < 0 || r > 1) {
+		euler = dvec2(1.0/0.0, 1.0/0.0);
+		return euler;
+	}
+	euler = dvec2(r, r8_atan2(complex.x, complex.y)); // TODO in grad or in rad?
+	return euler;
+}
+
+/** computes the difference in the phases of 2 complex number written in euler form: r * e^(i * phi)
+ * @param euler1 		first complex number
+ * @param euler2		second complex number
+ * @return delta = phi1 - phi2, in [-pi/2, pi/2] degrees
+ */
+double phase_difference(dvec2 euler1, dvec2 euler2) {
+	double delta = euler2.y - euler1.y;
+	delta = delta - int(delta > 180)*360.0 + int(delta < -180)*360.0;
+	return delta;
+}
+
+/** efficiency calculation
+ * uses complex numbers for s- and p-polarisation: 
+ * complex_S = a + i*b as dvec2. 
+ * in euler form: complex_S = r * e^(i * phi) where r = sqrt(a**2 + b**2) = radius and phi = atan2(a,b) = (absolute) phase
+ * @param real_S				inout, s-polarization (senkrecht), radius of complex number
+ * @param real_P				inout, p-polarization (parallel), radius of complex number
+ * @param delta					phase difference between angles of complex numbers complex_S, complex_P
+ * @param incidence_angle		normal incidence angle
+ * @param others
+ */
+void efficiency(Ray r, inout double real_S, inout double real_P, inout double delta, double incidence_angle) {
+	dvec2 complex_S, complex_P;
+	reflectance(r.energy, incidence_angle, complex_S, complex_P);
+
+	dvec2 euler_P = cartesian_to_euler(complex_P);
+	dvec2 euler_S = cartesian_to_euler(complex_S);
+
+	delta = phase_difference(euler_P, euler_S);
+	real_S = euler_S.x;
+	real_P = euler_P.x;
 }
 
 /**
