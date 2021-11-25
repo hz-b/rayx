@@ -2544,10 +2544,11 @@ TEST(opticalElements, slit1) {
             std::list<double>::iterator j = i;
             j++;
             j++;
-            if (*(j) == 1)
+            if (*(j) == 1) {
                 EXPECT_TRUE(
                     abs(*i) <=
                     6);  // if weight == 1 check if x location is correct
+            }
         } else if (counter % RAY_DOUBLE_COUNT == 1) {  // y loc
             std::list<double>::iterator j = i;
             j++;
