@@ -17,7 +17,6 @@ class RAYX_API Ray {
     // dtor
     ~Ray();
 
-    // TODO(Jannis): reorder (align to constructor)
     glm::dvec3 m_position;
     double m_weight;
     glm::dvec3 m_direction;

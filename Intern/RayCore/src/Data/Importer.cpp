@@ -6,6 +6,7 @@
 #include <fstream>
 #include <sstream>
 
+#include "Debug/Instrumentor.h"
 #include "Model/Beamline/Objects/ImagePlane.h"
 #include "Model/Beamline/Objects/MatrixSource.h"
 #include "Model/Beamline/Objects/PlaneGrating.h"
@@ -136,6 +137,7 @@ void handleObjectCollection(rapidxml::xml_node<>* collection,
 }
 
 Beamline Importer::importBeamline(const char* filename) {
+    RAYX_PROFILE_FUNCTION();
     // first implementation: stringstreams are slow; this might need
     // optimization
     std::cout << "[Importer]: importBeamline is called with file \"" << filename

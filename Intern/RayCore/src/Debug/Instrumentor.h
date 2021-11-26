@@ -23,19 +23,21 @@
 #include <string>
 #include <thread>
 
+#include "Core.h"
+
 namespace RAYX {
 
-struct ProfileResult {
+struct RAYX_API ProfileResult {
     std::string Name;
     long long Start, End;
     uint32_t ThreadID;
 };
 
-struct InstrumentationSession {
+struct RAYX_API InstrumentationSession {
     std::string Name;
 };
 
-class Instrumentor {
+class RAYX_API Instrumentor {
   private:
     InstrumentationSession* m_CurrentSession;
     std::ofstream m_OutputStream;
@@ -94,7 +96,7 @@ class Instrumentor {
     }
 };
 
-class InstrumentationTimer {
+class RAYX_API InstrumentationTimer {
   public:
     InstrumentationTimer(const char* name) : m_Name(name), m_Stopped(false) {
         m_StartTimepoint = std::chrono::high_resolution_clock::now();

@@ -100,10 +100,6 @@ void Application::loadDummyBeamline() {
 
     m_Presenter = Presenter(m_Beamline);
     m_Presenter.addLightSource(matSourcePtr);
-    RAYX_DEBUG(std::cout << "[App]: Creating dummy beamline took: "
-                         << float(clock() - allBeginTime) / CLOCKS_PER_SEC *
-                                1000
-                         << " ms" << std::endl);
 }
 
 void Application::run() {
