@@ -4,14 +4,8 @@
 #include <iostream>
 
 #include "Data/Exporter.h"
-#include "Debug.h"
-#include "Model/Beamline/Objects/Ellipsoid.h"
-#include "Model/Beamline/Objects/ImagePlane.h"
-#include "Model/Beamline/Objects/MatrixSource.h"
-#include "Model/Beamline/Objects/PlaneMirror.h"
-#include "Model/Beamline/Objects/PointSource.h"
-#include "Model/Beamline/Objects/ReflectionZonePlate.h"
-#include "Model/Beamline/Objects/ToroidMirror.h"
+#include "Debug/Instrumentor.h"
+#include "Model/Beamline/Objects/Objects.h"
 #include "UserParameter/GeometricUserParams.h"
 #include "UserParameter/WorldUserParams.h"
 
@@ -25,12 +19,8 @@ Application::~Application() {
     RAYX_DEBUG(std::cout << "[App]: Deleting Application..." << std::endl);
 }
 
-void Application::loadDummyBeamline() {  // ! objects are created here
-                                         // temporarily until reading in file
-                                         // works
-#ifdef RAY_DEBUG_MODE
-    const clock_t allBeginTime = clock();
-#endif
+void Application::loadDummyBeamline() {
+    RAYX_PROFILE_FUNCTION();
 
     RAYX::SimulationEnv::get().m_numOfRays = 20000;
 

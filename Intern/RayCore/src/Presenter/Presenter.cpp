@@ -1,6 +1,6 @@
 #include "Presenter.h"
 
-#include "Debug.h"
+#include "Debug/Instrumentor.h"
 #include "Model/Beamline/OpticalElement.h"
 
 namespace RAYX {
@@ -14,8 +14,8 @@ Presenter::Presenter(std::shared_ptr<Beamline> beamline)
 
 Presenter::~Presenter() {}
 
-// ! parameters are temporary and need to be removed again
 bool Presenter::run() {
+    RAYX_PROFILE_FUNCTION();
     /*int beamlinesSimultaneously = 1;*/
     for (int j = 0; j < 1 /*beamlinesSimultaneously*/; j++) {
         if (m_Beamline->m_LightSources.empty()) {

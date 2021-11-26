@@ -41,7 +41,6 @@ SET(SOURCE
 
 SET(HEADERS
     src/Application.h
-    src/Debug.h
     src/utils.h
     src/Model/Beamline/Beamline.h
     src/Model/Beamline/BeamlineObject.h

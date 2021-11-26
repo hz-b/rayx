@@ -2,19 +2,7 @@
 
 #include <iostream>
 
-#include "Debug.h"
-#include "Objects/Ellipsoid.h"
-#include "Objects/ImagePlane.h"
-#include "Objects/MatrixSource.h"
-#include "Objects/PlaneGrating.h"
-#include "Objects/PlaneMirror.h"
-#include "Objects/PointSource.h"
-#include "Objects/RandomRays.h"
-#include "Objects/ReflectionZonePlate.h"
-#include "Objects/Slit.h"
-#include "Objects/SphereGrating.h"
-#include "Objects/SphereMirror.h"
-#include "Objects/ToroidMirror.h"
+#include "Model/Beamline/Objects/Objects.h"
 
 namespace RAYX {
 Beamline::Beamline() {}

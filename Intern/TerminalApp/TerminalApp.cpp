@@ -13,6 +13,8 @@ TerminalApp::~TerminalApp() {
 }
 
 void TerminalApp::run() {
+    RAYX_PROFILE_FUNCTION();
+
     RAYX_DEBUG(std::cout << "[Terminal]: TerminalApp running..." << std::endl);
 
     if (m_argc == 2) {
