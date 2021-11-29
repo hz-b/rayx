@@ -36,6 +36,8 @@ bool PalikTable::load(const char* element, PalikTable* out) {
         out->m_Lines.push_back(e);
     }
 
+    out->m_element = element;
+
     return true;
 }
 }
