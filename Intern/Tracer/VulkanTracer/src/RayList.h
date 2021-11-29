@@ -5,9 +5,14 @@
 
 #include "Ray.h"
 
-#define RAY_MAX_ELEMENTS_IN_VECTOR 262144
+// Optimal size for a ray vector (only tested on one system). Higher numbers
+// will sometimes lead to bad allocs.
 #define RAY_VECTOR_SIZE 16777216
+// Doubles per ray
 #define RAY_DOUBLE_COUNT 16
+// Rays per vector
+#define RAY_MAX_ELEMENTS_IN_VECTOR \
+    RAY_VECTOR_SIZE / (sizeof(double) * RAY_DOUBLE_COUNT)
 
 class RayList {
   public:
