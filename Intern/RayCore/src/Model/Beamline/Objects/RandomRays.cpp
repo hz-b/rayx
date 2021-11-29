@@ -4,6 +4,7 @@
 #include <cmath>
 #include <random>
 
+#include "Debug/Instrumentor.h"
 #include "VulkanTracer.h"
 
 namespace RAYX {
@@ -25,6 +26,7 @@ RandomRays::~RandomRays() {}
  * returns list of rays
  */
 std::vector<Ray> RandomRays::getRays() {
+    RAYX_PROFILE_FUNCTION();
     std::uniform_real_distribution<double> unif(m_low, m_high);
     std::default_random_engine re;
 

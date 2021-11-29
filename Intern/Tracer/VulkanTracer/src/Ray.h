@@ -13,23 +13,23 @@ class Ray {
         double lastElement = 0, double extraParameter = 0);
     Ray(double* location);
     Ray();
-    std::vector<double> getRayInformation();
-    double getxDir();
-    double getyDir();
-    double getzDir();
-    double getxPos();
-    double getyPos();
-    double getzPos();
-    double getEnergy();
-    double getWeight();
-    double getS0();
-    double getS1();
-    double getS2();
-    double getS3();
-    double getPathLength();
-    double getOrder();
-    double getLastElement();
-    double getExtraParam();
+    std::vector<double> getRayInformation() const;
+    double getxDir() const;
+    double getyDir() const;
+    double getzDir() const;
+    double getxPos() const;
+    double getyPos() const;
+    double getzPos() const;
+    double getEnergy() const;
+    double getWeight() const;
+    double getS0() const;
+    double getS1() const;
+    double getS2() const;
+    double getS3() const;
+    double getPathLength() const;
+    double getOrder() const;
+    double getLastElement() const;
+    double getExtraParam() const;
 
   private:
     struct vec3 {

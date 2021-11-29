@@ -12,17 +12,23 @@
 namespace RAYX {
 
 Application::Application() : m_Beamline(std::make_shared<Beamline>()) {
+    #ifdef RAYX_PLATFORM_WINDOWS
+    #ifdef RAY_DEBUG_MODE
+        _CrtSetReportMode(_CRT_WARN, _CRTDBG_MODE_DEBUG);
+        _CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);
+    #endif
+    #endif
+    RAYX_PROFILE_BEGIN_SESSION("RayX Application", "profile_rayx_application.json");
     RAYX_DEBUG(std::cout << "[App]: Creating Application..." << std::endl);
 }
 
 Application::~Application() {
     RAYX_DEBUG(std::cout << "[App]: Deleting Application..." << std::endl);
+    RAYX_PROFILE_END_SESSION();
 }
 
 void Application::loadDummyBeamline() {
     RAYX_PROFILE_FUNCTION();
-
-    RAYX::SimulationEnv::get().m_numOfRays = 20000;
 
     EnergyDistribution dist = EnergyDistribution(EnergyRange(100, 0), true);
     std::shared_ptr<MatrixSource> matSourcePtr = std::make_shared<MatrixSource>(

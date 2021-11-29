@@ -3,6 +3,8 @@
 #include <cassert>
 #include <random>
 
+#include "Debug/Instrumentor.h"
+
 namespace RAYX {
 
 /**
@@ -117,6 +119,7 @@ std::shared_ptr<MatrixSource> MatrixSource::createFromXML(
  * returns vector of rays
  */
 std::vector<Ray> MatrixSource::getRays() {
+    RAYX_PROFILE_FUNCTION();
     double lower_bound = 0;
     double upper_bound = 1;
     std::uniform_real_distribution<double> unif(lower_bound, upper_bound);
