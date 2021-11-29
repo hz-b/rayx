@@ -1,7 +1,3 @@
 [submodule "Extern/glm"]
 	path = Extern/glm
 	url = https://github.com/g-truc/glm.git
-
-[submodule "Extern/spdlog"]
-	path = Extern/spdlog
-	url = https://github.com/gabime/spdlog.git
