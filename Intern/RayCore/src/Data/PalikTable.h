@@ -12,7 +12,15 @@ struct PalikEntry {
     double m_k;
 };
 
-/** This struct represents the contents of a .NKP file. */
+/** This struct represents the contents of a .NKP file.
+ *
+ * Example usage:
+ *
+ * PalikTable cu;
+ * bool success = PalikTable::load("CU", &cu); // the palik table for copper!
+ *
+ */
+
 struct PalikTable {
     std::string m_element;
     std::vector<PalikEntry> m_Lines;
