@@ -1403,15 +1403,10 @@ double wasteBox(double x, double z, double xLength, double zLength, double w)
 		double x_max = xLength/2.0;
 		double z_min = -zLength/2.0;
 		double z_max = zLength/2.0;
-		if (x <= x_min || x >= x_max || z <= z_min || z >= z_max) {
-			return 0.0;
-		}
-	}
-	else {	// Ring shape
+		w *= int(x > x_min) * int(x < x_max) * int(z > z_min) * int(z < z_max); // This sets w to zero, if (x <= x_min || x >= x_max || z <= z_min || z >= z_max)
+	} else {	// Ring shape
 		double rd2 = (x/(xLength/2.0)) * (x/(xLength/2.0)) + (z/(zLength/2.0)) * (z/(zLength/2.0));
-		if (rd2 > 1.0) {
-			return 0.0;
-		}
+		w *= int(rd2 <= 1.0); // This sets w to zero, if (rd > 1.0)
 	}
 	return w;
 }
