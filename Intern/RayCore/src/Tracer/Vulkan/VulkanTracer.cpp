@@ -36,6 +36,7 @@
 #define DBG_NEW new
 #endif
 
+namespace RAYX {
 VulkanTracer::VulkanTracer() {
     bufferSizes.resize(5);
     buffers.resize(5);
@@ -1203,3 +1204,4 @@ int VulkanTracer::main() {
     std::cout << "[VK]: Finished." << std::endl;
     return EXIT_SUCCESS;
 }
+}  // namespace RAYX

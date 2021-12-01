@@ -5,7 +5,7 @@
 #include <random>
 
 #include "Debug/Instrumentor.h"
-#include "VulkanTracer.h"
+#include "Tracer/Vulkan/VulkanTracer.h"
 
 namespace RAYX {
 

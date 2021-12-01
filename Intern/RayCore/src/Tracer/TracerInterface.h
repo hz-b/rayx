@@ -7,7 +7,7 @@
 
 #include "Core.h"
 #include "Model/Beamline/Beamline.h"
-#include "VulkanTracer.h"
+#include "Tracer/Vulkan/VulkanTracer.h"
 
 namespace RAYX {
 class Ray;

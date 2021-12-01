@@ -3,7 +3,7 @@
 #include <sstream>
 #include <type_traits>
 
-#include "VulkanTracer.h"
+#include "Tracer/Vulkan/VulkanTracer.h"
 #include "setupTests.h"
 
 std::vector<double> zeros = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
@@ -16,7 +16,7 @@ std::list<double> runTracer(
         std::cout << "elements[0]: " << elements[0]->getSurfaceParams()[i]
                   << std::endl;
     }
-    VulkanTracer tracer;
+    RAYX::VulkanTracer tracer;
 
     std::list<std::vector<RAYX::Ray>> rayList;
     tracer.setBeamlineParameters(1, elements.size(), testValues.size());
@@ -32,7 +32,7 @@ std::list<double> runTracer(
     }
     tracer.run();  // run tracer
     std::list<double> outputRays;
-    std::vector<Ray> outputRayVector = *(tracer.getOutputIteratorBegin());
+    std::vector<RAYX::Ray> outputRayVector = *(tracer.getOutputIteratorBegin());
     for (auto iter = outputRayVector.begin(); iter != outputRayVector.end();
          iter++) {
         outputRays.push_back((*iter).getxPos());
@@ -881,7 +881,7 @@ TEST(Tracer, testRZPLineDensityAstigmatic) {  // astigmatic 2 astigmatic
         GTEST_SKIP();
     }
 
-    VulkanTracer tracer;
+    RAYX::VulkanTracer tracer;
     std::vector<RAYX::Ray> testValues;
     std::vector<RAYX::Ray> correct;
     // {1st column, 2nd column, 3rd column, 4th column} ->
@@ -1087,7 +1087,7 @@ TEST(Tracer, testCosini) {
         GTEST_SKIP();
     }
 
-    VulkanTracer tracer;
+    RAYX::VulkanTracer tracer;
     std::vector<RAYX::Ray> testValues;
     // phi, psi given in position.x, position.y
     RAYX::Ray r = RAYX::Ray(glm::dvec3(0, 0, 0), glm::dvec3(0, 0, 0),
@@ -1159,7 +1159,7 @@ TEST(Tracer, factTest) {
         GTEST_SKIP();
     }
 
-    VulkanTracer tracer;
+    RAYX::VulkanTracer tracer;
     std::vector<RAYX::Ray> testValues;
     RAYX::Ray r = RAYX::Ray(glm::dvec3(0, 1, 2), glm::dvec3(-1, 4, 17),
                             glm::dvec4(10, -4, 12.2, -0), 0,
@@ -1199,7 +1199,7 @@ TEST(Tracer, bessel1Test) {
         GTEST_SKIP();
     }
 
-    VulkanTracer tracer;
+    RAYX::VulkanTracer tracer;
     std::vector<RAYX::Ray> testValues;
     std::vector<RAYX::Ray> correct;
     // RAYX::Ray r = RAYX::Ray(glm::dvec3(-12.123,20.1,100),
@@ -1242,7 +1242,7 @@ TEST(Tracer, diffractionTest) {
         GTEST_SKIP();
     }
 
-    VulkanTracer tracer;
+    RAYX::VulkanTracer tracer;
     std::vector<RAYX::Ray> testValues;
     RAYX::Ray r;
     // pos = (iopt,  xlenght, ylength) weight = wavelength

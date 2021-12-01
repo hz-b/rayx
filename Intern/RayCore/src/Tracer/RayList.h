@@ -2,6 +2,7 @@
 #pragma pack(16)
 
 #include <list>
+#include <vector>
 
 #include "Ray.h"
 
@@ -13,6 +14,8 @@
 // Rays per vector
 #define RAY_MAX_ELEMENTS_IN_VECTOR \
     RAY_VECTOR_SIZE / (sizeof(double) * RAY_DOUBLE_COUNT)
+
+namespace RAYX {
 
 class RayList {
   public:
@@ -32,3 +35,4 @@ class RayList {
     std::list<std::vector<Ray>> m_rayList;
     void addVector();
 };
+}

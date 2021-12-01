@@ -4,6 +4,8 @@
 #include <cmath>
 #include <cstring>
 
+namespace RAYX {
+
 RayList::RayList() {
     // addVector();
 }
@@ -85,3 +87,4 @@ int RayList::rayAmount() const {
                  (m_rayList.back()).size();
     return amount;
 }
+}  // namespace RAYX

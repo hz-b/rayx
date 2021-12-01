@@ -34,4 +34,21 @@ Ray::Ray(glm::dvec3 position, glm::dvec3 direction, glm::dvec4 stokes,
 
 Ray::~Ray() {}
 
+double Ray::getxDir() const { return m_direction.x; }
+double Ray::getyDir() const { return m_direction.y; }
+double Ray::getzDir() const { return m_direction.z; }
+double Ray::getxPos() const { return m_position.x; }
+double Ray::getyPos() const { return m_position.y; }
+double Ray::getzPos() const { return m_position.z; }
+double Ray::getEnergy() const { return m_energy; }
+double Ray::getWeight() const { return m_weight; }
+double Ray::getS0() const { return m_stokes.x; }
+double Ray::getS1() const { return m_stokes.y; }
+double Ray::getS2() const { return m_stokes.z; }
+double Ray::getS3() const { return m_stokes.w; }
+double Ray::getPathLength() const { return m_pathLength; }
+double Ray::getOrder() const { return m_order; }
+double Ray::getLastElement() const { return m_lastElement; }
+double Ray::getExtraParam() const { return m_extraParam; }
+
 }  // namespace RAYX

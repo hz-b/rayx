@@ -17,6 +17,23 @@ class RAYX_API Ray {
     // dtor
     ~Ray();
 
+    double getxDir() const;
+    double getyDir() const;
+    double getzDir() const;
+    double getxPos() const;
+    double getyPos() const;
+    double getzPos() const;
+    double getEnergy() const;
+    double getWeight() const;
+    double getS0() const;
+    double getS1() const;
+    double getS2() const;
+    double getS3() const;
+    double getPathLength() const;
+    double getOrder() const;
+    double getLastElement() const;
+    double getExtraParam() const;
+
     glm::dvec3 m_position;
     double m_weight;
     glm::dvec3 m_direction;
@@ -26,7 +43,5 @@ class RAYX_API Ray {
     double m_order;
     double m_lastElement;
     double m_extraParam;
-
-  private:
 };
 }  // namespace RAYX

@@ -6,8 +6,8 @@
 #include "Model/Beamline/Objects/MatrixSource.h"
 #include "Model/Beamline/Objects/PointSource.h"
 #include "Presenter/SimulationEnv.h"
-#include "Ray.h"
-#include "VulkanTracer.h"
+#include "Tracer/Ray.h"
+#include "Tracer/Vulkan/VulkanTracer.h"
 #include "gmock/gmock.h"
 #include "gtest/gtest.h"
 
@@ -78,8 +78,9 @@ TEST(RayTest, test1) {
     double order = 3;
     double lastElement = 4;
     double extraParam = 7;
-    Ray r = Ray(x, y, z, xdir, ydir, zdir, s0, s1, s2, s3, energy, weight,
-                pathLength, order, lastElement, extraParam);
+    RAYX::Ray r =
+        RAYX::Ray({x, y, z}, {xdir, ydir, zdir}, {s0, s1, s2, s3}, energy,
+                  weight, pathLength, order, lastElement, extraParam);
     EXPECT_EQ(r.getxPos(), x);
     EXPECT_EQ(r.getyPos(), y);
     EXPECT_EQ(r.getzPos(), z);
@@ -114,7 +115,8 @@ TEST(RayTest, testDefaultValues) {
     double s1 = 1;
     double s2 = 0;
     double s3 = 0;
-    Ray r = Ray(x, y, z, xdir, ydir, zdir, s0, s1, s2, s3, energy, weight);
+    RAYX::Ray r = RAYX::Ray({x, y, z}, {xdir, ydir, zdir}, {s0, s1, s2, s3},
+                            energy, weight);
     EXPECT_EQ(r.getxPos(), x);
     EXPECT_EQ(r.getyPos(), y);
     EXPECT_EQ(r.getzPos(), z);

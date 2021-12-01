@@ -15,6 +15,5 @@ set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -DRAY_DEBUG_MODE -fPIC")
 
 project(Intern)
 
-add_subdirectory(Tracer)
 add_subdirectory(RayCore)
 add_subdirectory(TerminalApp)
