@@ -109,7 +109,7 @@ target_include_directories(${PROJECT_NAME}
     PUBLIC ${RayCore_SOURCE_DIR}/../../Extern/rapidxml-1.13/
 )
 
-
+add_dependencies(${PROJECT_NAME} COMPILE_SHADER)
 
 # Compile Shaders
 set(COMPILED_SHADER ${CMAKE_BINARY_DIR}/bin/comp.spv)

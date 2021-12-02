@@ -24,7 +24,7 @@ std::list<double> runTracer(
     std::list<std::vector<RAYX::Ray>> rayList;
     tracer.setBeamlineParameters(1, elements.size(), testValues.size());
     std::cout << "testValues.size(): " << testValues.size() << std::endl;
-    (tracer).addRayVector(testValues, testValues.size());
+    (tracer).addRayVector(testValues.data(), testValues.size());
     std::cout << "add rays to tracer done" << std::endl;
 
     for (std::shared_ptr<RAYX::OpticalElement> element : elements) {
@@ -145,20 +145,16 @@ void compareFromCorrect(std::vector<RAYX::Ray> correct,
             EXPECT_NEAR(*i, correct[int(counter / RAY_DOUBLE_COUNT)].m_energy,
                         tolerance);
         } else if (counter % RAY_DOUBLE_COUNT == 8) {
-            EXPECT_NEAR(*i,
-                        correct[int(counter / RAY_DOUBLE_COUNT)].m_stokes.s0,
+            EXPECT_NEAR(*i, correct[int(counter / RAY_DOUBLE_COUNT)].m_stokes.x,
                         tolerance);
         } else if (counter % RAY_DOUBLE_COUNT == 9) {
-            EXPECT_NEAR(*i,
-                        correct[int(counter / RAY_DOUBLE_COUNT)].m_stokes.s1,
+            EXPECT_NEAR(*i, correct[int(counter / RAY_DOUBLE_COUNT)].m_stokes.y,
                         tolerance);
         } else if (counter % RAY_DOUBLE_COUNT == 10) {
-            EXPECT_NEAR(*i,
-                        correct[int(counter / RAY_DOUBLE_COUNT)].m_stokes.s2,
+            EXPECT_NEAR(*i, correct[int(counter / RAY_DOUBLE_COUNT)].m_stokes.z,
                         tolerance);
         } else if (counter % RAY_DOUBLE_COUNT == 11) {
-            EXPECT_NEAR(*i,
-                        correct[int(counter / RAY_DOUBLE_COUNT)].m_stokes.s3,
+            EXPECT_NEAR(*i, correct[int(counter / RAY_DOUBLE_COUNT)].m_stokes.w,
                         tolerance);
         } else if (counter % RAY_DOUBLE_COUNT == 12) {
             EXPECT_NEAR(*i,
@@ -231,22 +227,22 @@ void compareFromFunction(fn<ret, par> func, std::vector<RAYX::Ray> testValues,
         } else if (counter % RAY_DOUBLE_COUNT == 8) {
             EXPECT_NEAR(
                 *i,
-                func(testValues[int(counter / RAY_DOUBLE_COUNT)].m_stokes.s0),
+                func(testValues[int(counter / RAY_DOUBLE_COUNT)].m_stokes.x),
                 tolerance);
         } else if (counter % RAY_DOUBLE_COUNT == 9) {
             EXPECT_NEAR(
                 *i,
-                func(testValues[int(counter / RAY_DOUBLE_COUNT)].m_stokes.s1),
+                func(testValues[int(counter / RAY_DOUBLE_COUNT)].m_stokes.y),
                 tolerance);
         } else if (counter % RAY_DOUBLE_COUNT == 10) {
             EXPECT_NEAR(
                 *i,
-                func(testValues[int(counter / RAY_DOUBLE_COUNT)].m_stokes.s2),
+                func(testValues[int(counter / RAY_DOUBLE_COUNT)].m_stokes.z),
                 tolerance);
         } else if (counter % RAY_DOUBLE_COUNT == 11) {
             EXPECT_NEAR(
                 *i,
-                func(testValues[int(counter / RAY_DOUBLE_COUNT)].m_stokes.s3),
+                func(testValues[int(counter / RAY_DOUBLE_COUNT)].m_stokes.w),
                 tolerance);
         }
         counter++;
@@ -1378,30 +1374,32 @@ TEST(Tracer, TrigTest) {
                     tolerance);
             }
         } else if (counter % RAY_DOUBLE_COUNT == 8) {
-            if (testValues[int(counter / RAY_DOUBLE_COUNT)].m_stokes.s0 >= -1 &&
-                testValues[int(counter / RAY_DOUBLE_COUNT)].m_stokes.s0 <= 1) {
-                EXPECT_NEAR(*i,
-                            asin(testValues[int(counter / RAY_DOUBLE_COUNT)]
-                                     .m_stokes.s0),
-                            tolerance);
+            if (testValues[int(counter / RAY_DOUBLE_COUNT)].m_stokes.x >= -1 &&
+                testValues[int(counter / RAY_DOUBLE_COUNT)].m_stokes.x <= 1) {
+                EXPECT_NEAR(
+                    *i,
+                    asin(
+                        testValues[int(counter / RAY_DOUBLE_COUNT)].m_stokes.x),
+                    tolerance);
             }
         } else if (counter % RAY_DOUBLE_COUNT == 9) {
-            if (testValues[int(counter / RAY_DOUBLE_COUNT)].m_stokes.s1 >= -1 &&
-                testValues[int(counter / RAY_DOUBLE_COUNT)].m_stokes.s1 <= 1) {
-                EXPECT_NEAR(*i,
-                            asin(testValues[int(counter / RAY_DOUBLE_COUNT)]
-                                     .m_stokes.s1),
-                            tolerance);
+            if (testValues[int(counter / RAY_DOUBLE_COUNT)].m_stokes.y >= -1 &&
+                testValues[int(counter / RAY_DOUBLE_COUNT)].m_stokes.y <= 1) {
+                EXPECT_NEAR(
+                    *i,
+                    asin(
+                        testValues[int(counter / RAY_DOUBLE_COUNT)].m_stokes.y),
+                    tolerance);
             }
         } else if (counter % RAY_DOUBLE_COUNT == 10) {
             EXPECT_NEAR(
                 *i,
-                atan(testValues[int(counter / RAY_DOUBLE_COUNT)].m_stokes.s2),
+                atan(testValues[int(counter / RAY_DOUBLE_COUNT)].m_stokes.z),
                 tolerance);
         } else if (counter % RAY_DOUBLE_COUNT == 11) {
             EXPECT_NEAR(
                 *i,
-                atan(testValues[int(counter / RAY_DOUBLE_COUNT)].m_stokes.s3),
+                atan(testValues[int(counter / RAY_DOUBLE_COUNT)].m_stokes.w),
                 tolerance);
         }
         counter++;

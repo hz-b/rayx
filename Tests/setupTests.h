@@ -9,14 +9,14 @@
 #include "gtest/gtest.h"
 
 // Run Test Macros
-#define RUN_TEST_GRATINGS 1
-#define RUN_TEST_MIRRORS 1
-#define RUN_TEST_QUADRIC 1
-#define RUN_TEST_RML 1
-#define RUN_TEST_RZP 1
+#define RUN_TEST_GRATINGS 0
+#define RUN_TEST_MIRRORS 0
+#define RUN_TEST_QUADRIC 0
+#define RUN_TEST_RML 0
+#define RUN_TEST_RZP 0
 #define RUN_TEST_SHADER 1
-#define RUN_TEST_SLIT 1
-#define RUN_TEST_SOURCES 1
+#define RUN_TEST_SLIT 0
+#define RUN_TEST_SOURCES 0
 
 //! Using the google test framework, check all elements of two containers
 #define EXPECT_ITERABLE_BASE(PREDICATE, REFTYPE, TARTYPE, ref, target)       \

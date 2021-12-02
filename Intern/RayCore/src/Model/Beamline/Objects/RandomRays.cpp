@@ -41,9 +41,10 @@ std::vector<Ray> RandomRays::getRays() {
         double weight = unif(re);
         double en = unif(re);
         glm::dvec4 stokes = glm::dvec4(unif(re), unif(re), unif(re), unif(re));
-        Ray r = Ray(position, direction, stokes, en, weight, unif(re), unif(re),
-                    unif(re), unif(re));
-        rayList.emplace_back(r);
+        Ray r =
+            Ray(position.x, position.y, position.z, direction.x, direction.y,
+                direction.z, stokes.x, stokes.y, stokes.z, stokes.w, en, weight,
+                unif(re), unif(re), unif(re), unif(re));
     }
     return rayList;
 }

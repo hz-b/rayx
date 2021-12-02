@@ -186,7 +186,10 @@ std::vector<Ray> PointSource::getRays() {
         glm::dvec4 stokes =
             glm::dvec4(1, getLinear0(), getLinear45(), getCircular());
 
-        Ray r = Ray(position, direction, stokes, en, 1.0);
+        Ray r =
+            Ray(position.x, position.y, position.z, direction.x, direction.y,
+                direction.z, stokes.x, stokes.y, stokes.z, stokes.w, en, 1.0);
+
         rayVector.emplace_back(r);
     }
     std::cout << "[PointSource]: &rayVector: " << &(rayVector[0]) << std::endl;

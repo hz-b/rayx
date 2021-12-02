@@ -2,6 +2,8 @@
 
 #include <iostream>
 
+#include "RayList.h"
+
 namespace RAYX {
 /**
  * @param position          position/origin of ray
@@ -19,18 +21,38 @@ namespace RAYX {
  * @param extraParam        unused parameter, only to keep the amount of doubles
  * of a ray as a multiple of 4
  */
-Ray::Ray(glm::dvec3 position, glm::dvec3 direction, glm::dvec4 stokes,
-         double energy, double weight, double pathLength, double order,
-         double lastElement, double extraParameter)
-    : m_position(position),
+Ray::Ray(double xpos, double ypos, double zpos, double weight, double xdir,
+         double ydir, double zdir, double en, double s0, double s1, double s2,
+         double s3, double pathLength, double order, double lastElement,
+         double extraParameter)
+    : m_position{xpos, ypos, zpos},
       m_weight(weight),
-      m_direction(direction),
-      m_energy(energy),
-      m_stokes(stokes),
+      m_direction{xdir, ydir, zdir},
+      m_energy(en),
+      m_stokes{s0, s1, s2, s3},
       m_pathLength(pathLength),
       m_order(order),
       m_lastElement(lastElement),
       m_extraParam(extraParameter) {}
+
+Ray::Ray(glm::vec3 pos, glm::vec3 dir, glm::vec4 stokes, double weight,
+         double energy, double pathLength, double order, double lastElement,
+         double extraParameter)
+    : m_position({pos.x, pos.y, pos.z}),
+      m_weight(weight),
+      m_direction({dir.x, dir.y, dir.z}),
+      m_energy(energy),
+      m_stokes({stokes.x, stokes.y, stokes.z, stokes.w}),
+      m_pathLength(pathLength),
+      m_order(order),
+      m_lastElement(lastElement),
+      m_extraParam(extraParameter) {}
+
+Ray::Ray(double* location) {
+    memcpy(&m_position.x, location, RAY_DOUBLE_COUNT * sizeof(double));
+}
+
+Ray::Ray() {}
 
 Ray::~Ray() {}
 

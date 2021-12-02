@@ -9,11 +9,16 @@ namespace RAYX {
 class RAYX_API Ray {
   public:
     // ctor
-    Ray(glm::dvec3 position, glm::dvec3 direction, glm::dvec4 stokes,
-        double energy, double weight, double pathLength = 0, double order = 0,
+    Ray(double xpos, double ypos, double zpos, double weight, double xdir,
+        double ydir, double zdir, double en, double s0, double s1, double s2,
+        double s3, double pathLength = 0, double order = 0,
         double lastElement = 0, double extraParameter = 0);
+    Ray(glm::vec3 pos, glm::vec3 dir, glm::vec4 stokes, double weight,
+        double energy, double pathLength = 0, double order = 0,
+        double lastElement = 0, double extraParameter = 0);
+    Ray(double* location);
     // default ctor
-    Ray() = default;
+    Ray();
     // dtor
     ~Ray();
 
@@ -34,11 +39,17 @@ class RAYX_API Ray {
     double getLastElement() const;
     double getExtraParam() const;
 
-    glm::dvec3 m_position;
+    struct vec3 {
+        double x, y, z;
+    };
+    struct vec4 {
+        double x, y, z, w;
+    };
+    vec3 m_position;
     double m_weight;
-    glm::dvec3 m_direction;
+    vec3 m_direction;
     double m_energy;
-    glm::dvec4 m_stokes;
+    vec4 m_stokes;
     double m_pathLength;
     double m_order;
     double m_lastElement;
