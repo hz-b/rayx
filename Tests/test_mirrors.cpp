@@ -1,4 +1,5 @@
 #include "setupTests.h"
+#if RUN_TEST_MIRRORS
 
 TEST(PlaneMirror, testSimpleParams) {
     // arrange
@@ -503,3 +504,5 @@ e3.getTempMisalignmentParams()); EXPECT_ITERABLE_DOUBLE_EQ(std::vector<double>,
 sE, e3.getSlopeError());
 
 }*/
+
+#endif

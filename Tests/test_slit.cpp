@@ -1,4 +1,5 @@
 #include "setupTests.h"
+#if RUN_TEST_SLIT
 
 TEST(Slit, defaultParams) {
     RAYX::Geometry::GeometricalShape geometricalShape =
@@ -423,3 +424,5 @@ TEST(Slit, ellipticalSlitNoBeamstop) {
     EXPECT_ITERABLE_DOUBLE_EQ(std::vector<double>, s.getOutMatrix(),
                               correctOutMat);
 }
+
+#endif

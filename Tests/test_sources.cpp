@@ -1,3 +1,7 @@
+#include "setupTests.h"
+
+#if RUN_TEST_SOURCES
+
 #include <fstream>
 #include <sstream>
 
@@ -78,9 +82,9 @@ TEST(RayTest, test1) {
     double order = 3;
     double lastElement = 4;
     double extraParam = 7;
-    RAYX::Ray r =
-        RAYX::Ray({x, y, z}, {xdir, ydir, zdir}, {s0, s1, s2, s3}, energy,
-                  weight, pathLength, order, lastElement, extraParam);
+    RAYX::Ray r(RAYX::Ray::vec3{x, y, z}, RAYX::Ray::vec3{xdir, ydir, zdir},
+                RAYX::Ray::stokesVec{s0, s1, s2, s3}, energy, weight,
+                pathLength, order, lastElement, extraParam);
     EXPECT_EQ(r.getxPos(), x);
     EXPECT_EQ(r.getyPos(), y);
     EXPECT_EQ(r.getzPos(), z);
@@ -115,8 +119,9 @@ TEST(RayTest, testDefaultValues) {
     double s1 = 1;
     double s2 = 0;
     double s3 = 0;
-    RAYX::Ray r = RAYX::Ray({x, y, z}, {xdir, ydir, zdir}, {s0, s1, s2, s3},
-                            energy, weight);
+    RAYX::Ray r =
+        RAYX::Ray(RAYX::Ray::vec3{x, y, z}, RAYX::Ray::vec3{xdir, ydir, zdir},
+                  RAYX::Ray::stokesVec{s0, s1, s2, s3}, energy, weight);
     EXPECT_EQ(r.getxPos(), x);
     EXPECT_EQ(r.getyPos(), y);
     EXPECT_EQ(r.getzPos(), z);
@@ -253,10 +258,10 @@ TEST(LightSource, PointSourceHardEdge) {
         rayList.push_back(r.m_direction.y);
         rayList.push_back(r.m_direction.z);
         rayList.push_back(r.m_energy);
-        rayList.push_back(r.m_stokes.x);
-        rayList.push_back(r.m_stokes.y);
-        rayList.push_back(r.m_stokes.z);
-        rayList.push_back(r.m_stokes.w);
+        rayList.push_back(r.m_stokes.s0);
+        rayList.push_back(r.m_stokes.s1);
+        rayList.push_back(r.m_stokes.s2);
+        rayList.push_back(r.m_stokes.s3);
         rayList.push_back(r.m_pathLength);
         rayList.push_back(r.m_order);
         rayList.push_back(r.m_lastElement);
@@ -306,10 +311,10 @@ TEST(LightSource, PointSourceSoftEdge) {
         rayList.push_back(r.m_direction.y);
         rayList.push_back(r.m_direction.z);
         rayList.push_back(r.m_energy);
-        rayList.push_back(r.m_stokes.x);
-        rayList.push_back(r.m_stokes.y);
-        rayList.push_back(r.m_stokes.z);
-        rayList.push_back(r.m_stokes.w);
+        rayList.push_back(r.m_stokes.s0);
+        rayList.push_back(r.m_stokes.s1);
+        rayList.push_back(r.m_stokes.s2);
+        rayList.push_back(r.m_stokes.s3);
         rayList.push_back(r.m_pathLength);
         rayList.push_back(r.m_order);
         rayList.push_back(r.m_lastElement);
@@ -354,10 +359,10 @@ TEST(LightSource, PointSourceHardEdgeMis) {
         rayList.push_back(r.m_direction.y);
         rayList.push_back(r.m_direction.z);
         rayList.push_back(r.m_energy);
-        rayList.push_back(r.m_stokes.x);
-        rayList.push_back(r.m_stokes.y);
-        rayList.push_back(r.m_stokes.z);
-        rayList.push_back(r.m_stokes.w);
+        rayList.push_back(r.m_stokes.s0);
+        rayList.push_back(r.m_stokes.s1);
+        rayList.push_back(r.m_stokes.s2);
+        rayList.push_back(r.m_stokes.s3);
         rayList.push_back(r.m_pathLength);
         rayList.push_back(r.m_order);
         rayList.push_back(r.m_lastElement);
@@ -402,10 +407,10 @@ TEST(LightSource, PointSourceSoftEdgeMis) {
         rayList.push_back(r.m_direction.y);
         rayList.push_back(r.m_direction.z);
         rayList.push_back(r.m_energy);
-        rayList.push_back(r.m_stokes.x);
-        rayList.push_back(r.m_stokes.y);
-        rayList.push_back(r.m_stokes.z);
-        rayList.push_back(r.m_stokes.w);
+        rayList.push_back(r.m_stokes.s0);
+        rayList.push_back(r.m_stokes.s1);
+        rayList.push_back(r.m_stokes.s2);
+        rayList.push_back(r.m_stokes.s3);
         rayList.push_back(r.m_pathLength);
         rayList.push_back(r.m_order);
         rayList.push_back(r.m_lastElement);
@@ -444,10 +449,10 @@ TEST(LightSource, MatrixSource20000) {
         rayList.push_back(r.m_direction.y);
         rayList.push_back(r.m_direction.z);
         rayList.push_back(r.m_energy);
-        rayList.push_back(r.m_stokes.x);
-        rayList.push_back(r.m_stokes.y);
-        rayList.push_back(r.m_stokes.z);
-        rayList.push_back(r.m_stokes.w);
+        rayList.push_back(r.m_stokes.s0);
+        rayList.push_back(r.m_stokes.s1);
+        rayList.push_back(r.m_stokes.s2);
+        rayList.push_back(r.m_stokes.s3);
         rayList.push_back(r.m_pathLength);
         rayList.push_back(r.m_order);
         rayList.push_back(r.m_lastElement);
@@ -483,10 +488,10 @@ TEST(LightSource, PointSource20000) {
         rayList.push_back(r.m_direction.y);
         rayList.push_back(r.m_direction.z);
         rayList.push_back(r.m_energy);
-        rayList.push_back(r.m_stokes.x);
-        rayList.push_back(r.m_stokes.y);
-        rayList.push_back(r.m_stokes.z);
-        rayList.push_back(r.m_stokes.w);
+        rayList.push_back(r.m_stokes.s0);
+        rayList.push_back(r.m_stokes.s1);
+        rayList.push_back(r.m_stokes.s2);
+        rayList.push_back(r.m_stokes.s3);
         rayList.push_back(r.m_pathLength);
         rayList.push_back(r.m_order);
         rayList.push_back(r.m_lastElement);
@@ -496,3 +501,5 @@ TEST(LightSource, PointSource20000) {
     ASSERT_EQ(rayList.size(), number_of_rays * RAY_DOUBLE_COUNT);
     writeRaysToFile(rayList, "pointsource20000");
 }
+
+#endif

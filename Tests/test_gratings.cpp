@@ -1,4 +1,5 @@
 #include "setupTests.h"
+#if RUN_TEST_GRATINGS
 
 TEST(planeGrating, testParams) {
     // user parameters
@@ -451,3 +452,5 @@ TEST(SphereGrating, testParams) {
     EXPECT_ITERABLE_DOUBLE_EQ(std::vector<double>, s1.getOutMatrix(),
                               glmToVector16(correctOutMat));
 }
+
+#endif

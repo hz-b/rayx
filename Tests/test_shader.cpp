@@ -1,10 +1,13 @@
+#include "setupTests.h"
+
+#if RUN_TEST_SHADER
+
 #include <fstream>
 #include <functional>
 #include <sstream>
 #include <type_traits>
 
 #include "Tracer/Vulkan/VulkanTracer.h"
-#include "setupTests.h"
 
 std::vector<double> zeros = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 std::vector<double> zeros7 = {0, 0, 0, 0, 0, 0, 0};  // for slope error
@@ -21,7 +24,7 @@ std::list<double> runTracer(
     std::list<std::vector<RAYX::Ray>> rayList;
     tracer.setBeamlineParameters(1, elements.size(), testValues.size());
     std::cout << "testValues.size(): " << testValues.size() << std::endl;
-    (tracer).addRayVector(testValues.data(), testValues.size());
+    (tracer).addRayVector(testValues, testValues.size());
     std::cout << "add rays to tracer done" << std::endl;
 
     for (std::shared_ptr<RAYX::OpticalElement> element : elements) {
@@ -142,16 +145,20 @@ void compareFromCorrect(std::vector<RAYX::Ray> correct,
             EXPECT_NEAR(*i, correct[int(counter / RAY_DOUBLE_COUNT)].m_energy,
                         tolerance);
         } else if (counter % RAY_DOUBLE_COUNT == 8) {
-            EXPECT_NEAR(*i, correct[int(counter / RAY_DOUBLE_COUNT)].m_stokes.x,
+            EXPECT_NEAR(*i,
+                        correct[int(counter / RAY_DOUBLE_COUNT)].m_stokes.s0,
                         tolerance);
         } else if (counter % RAY_DOUBLE_COUNT == 9) {
-            EXPECT_NEAR(*i, correct[int(counter / RAY_DOUBLE_COUNT)].m_stokes.y,
+            EXPECT_NEAR(*i,
+                        correct[int(counter / RAY_DOUBLE_COUNT)].m_stokes.s1,
                         tolerance);
         } else if (counter % RAY_DOUBLE_COUNT == 10) {
-            EXPECT_NEAR(*i, correct[int(counter / RAY_DOUBLE_COUNT)].m_stokes.z,
+            EXPECT_NEAR(*i,
+                        correct[int(counter / RAY_DOUBLE_COUNT)].m_stokes.s2,
                         tolerance);
         } else if (counter % RAY_DOUBLE_COUNT == 11) {
-            EXPECT_NEAR(*i, correct[int(counter / RAY_DOUBLE_COUNT)].m_stokes.w,
+            EXPECT_NEAR(*i,
+                        correct[int(counter / RAY_DOUBLE_COUNT)].m_stokes.s3,
                         tolerance);
         } else if (counter % RAY_DOUBLE_COUNT == 12) {
             EXPECT_NEAR(*i,
@@ -224,22 +231,22 @@ void compareFromFunction(fn<ret, par> func, std::vector<RAYX::Ray> testValues,
         } else if (counter % RAY_DOUBLE_COUNT == 8) {
             EXPECT_NEAR(
                 *i,
-                func(testValues[int(counter / RAY_DOUBLE_COUNT)].m_stokes.x),
+                func(testValues[int(counter / RAY_DOUBLE_COUNT)].m_stokes.s0),
                 tolerance);
         } else if (counter % RAY_DOUBLE_COUNT == 9) {
             EXPECT_NEAR(
                 *i,
-                func(testValues[int(counter / RAY_DOUBLE_COUNT)].m_stokes.y),
+                func(testValues[int(counter / RAY_DOUBLE_COUNT)].m_stokes.s1),
                 tolerance);
         } else if (counter % RAY_DOUBLE_COUNT == 10) {
             EXPECT_NEAR(
                 *i,
-                func(testValues[int(counter / RAY_DOUBLE_COUNT)].m_stokes.z),
+                func(testValues[int(counter / RAY_DOUBLE_COUNT)].m_stokes.s2),
                 tolerance);
         } else if (counter % RAY_DOUBLE_COUNT == 11) {
             EXPECT_NEAR(
                 *i,
-                func(testValues[int(counter / RAY_DOUBLE_COUNT)].m_stokes.w),
+                func(testValues[int(counter / RAY_DOUBLE_COUNT)].m_stokes.s3),
                 tolerance);
         }
         counter++;
@@ -1371,32 +1378,30 @@ TEST(Tracer, TrigTest) {
                     tolerance);
             }
         } else if (counter % RAY_DOUBLE_COUNT == 8) {
-            if (testValues[int(counter / RAY_DOUBLE_COUNT)].m_stokes.x >= -1 &&
-                testValues[int(counter / RAY_DOUBLE_COUNT)].m_stokes.x <= 1) {
-                EXPECT_NEAR(
-                    *i,
-                    asin(
-                        testValues[int(counter / RAY_DOUBLE_COUNT)].m_stokes.x),
-                    tolerance);
+            if (testValues[int(counter / RAY_DOUBLE_COUNT)].m_stokes.s0 >= -1 &&
+                testValues[int(counter / RAY_DOUBLE_COUNT)].m_stokes.s0 <= 1) {
+                EXPECT_NEAR(*i,
+                            asin(testValues[int(counter / RAY_DOUBLE_COUNT)]
+                                     .m_stokes.s0),
+                            tolerance);
             }
         } else if (counter % RAY_DOUBLE_COUNT == 9) {
-            if (testValues[int(counter / RAY_DOUBLE_COUNT)].m_stokes.y >= -1 &&
-                testValues[int(counter / RAY_DOUBLE_COUNT)].m_stokes.y <= 1) {
-                EXPECT_NEAR(
-                    *i,
-                    asin(
-                        testValues[int(counter / RAY_DOUBLE_COUNT)].m_stokes.y),
-                    tolerance);
+            if (testValues[int(counter / RAY_DOUBLE_COUNT)].m_stokes.s1 >= -1 &&
+                testValues[int(counter / RAY_DOUBLE_COUNT)].m_stokes.s1 <= 1) {
+                EXPECT_NEAR(*i,
+                            asin(testValues[int(counter / RAY_DOUBLE_COUNT)]
+                                     .m_stokes.s1),
+                            tolerance);
             }
         } else if (counter % RAY_DOUBLE_COUNT == 10) {
             EXPECT_NEAR(
                 *i,
-                atan(testValues[int(counter / RAY_DOUBLE_COUNT)].m_stokes.z),
+                atan(testValues[int(counter / RAY_DOUBLE_COUNT)].m_stokes.s2),
                 tolerance);
         } else if (counter % RAY_DOUBLE_COUNT == 11) {
             EXPECT_NEAR(
                 *i,
-                atan(testValues[int(counter / RAY_DOUBLE_COUNT)].m_stokes.w),
+                atan(testValues[int(counter / RAY_DOUBLE_COUNT)].m_stokes.s3),
                 tolerance);
         }
         counter++;
@@ -2861,3 +2866,5 @@ TEST(PeteRZP, spec1_first_minus_ip2) {
     std::string filename = "testFile_spec1_first_minus_rzp_ip2";
     writeToFile(outputRays, filename);
 }
+
+#endif

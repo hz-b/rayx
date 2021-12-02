@@ -1,5 +1,5 @@
 #include "setupTests.h"
-
+#if RUN_TEST_QUADRIC
 
 TEST(Quadric, testTransformationMatrices) {
     double width = 68.12;
@@ -151,3 +151,5 @@ TEST(Quadric, testGlobalCoordinates) {
     EXPECT_ITERABLE_DOUBLE_EQ(std::vector<double>, p4d->getOutMatrix(),
                               correctOutMat);
 }
+
+#endif
