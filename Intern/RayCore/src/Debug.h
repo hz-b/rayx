@@ -32,6 +32,7 @@
     } while (0)
 #endif
 
+namespace RAYX {
 /**
  *
  * In the following we define
@@ -83,15 +84,16 @@ struct IgnoreLog {
         return *this;
     }
 };
+}  // namespace RAYX
 
-#define LOG Log<false>(__FILE__, __LINE__)
-#define ERR Log<true>(__FILE__, __LINE__)
+#define RAYX_LOG RAYX::Log<false>(__FILE__, __LINE__)
+#define RAYX_ERR RAYX::Log<true>(__FILE__, __LINE__)
 
 #ifdef RAY_DEBUG_MODE
-#define D_LOG LOG
-#define D_ERR ERR
+#define RAYX_D_LOG RAYX_LOG
+#define RAYX_D_ERR RAYX_ERR
 
 #else
-#define D_LOG IgnoreLog()
-#define D_ERR IgnoreLog()
+#define RAYX_D_LOG RAYX::IgnoreLog()
+#define RAYX_D_ERR RAYX::IgnoreLog()
 #endif

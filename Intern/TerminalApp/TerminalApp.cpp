@@ -13,7 +13,7 @@ TerminalApp::~TerminalApp() {
 }
 
 void TerminalApp::run() {
-    D_LOG << "TerminalApp running...";
+    RAYX_D_LOG << "TerminalApp running...";
 
     if (m_argc == 2) {
         // load rml file
