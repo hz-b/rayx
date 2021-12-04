@@ -13,7 +13,7 @@ TerminalApp::~TerminalApp() {
 }
 
 void TerminalApp::run() {
-    RAYX_DEBUG(std::cout << "[Terminal]: TerminalApp running..." << std::endl);
+    D_LOG << "TerminalApp running...";
 
     if (m_argc == 2) {
         // load rml file
