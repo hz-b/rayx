@@ -92,6 +92,6 @@ struct IgnoreLog {
 #define D_ERR ERR
 
 #else
-#define D_LOG IgnoreLog
-#define D_ERR IgnoreLog
+#define D_LOG IgnoreLog()
+#define D_ERR IgnoreLog()
 #endif
