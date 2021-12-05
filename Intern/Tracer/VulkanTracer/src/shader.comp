@@ -2033,7 +2033,7 @@ double phase_difference(dvec2 euler1, dvec2 euler2) {
  * @param incidence_angle		normal incidence angle
  * @param others
  */
-void efficiency(Ray r, inout double real_S, inout double real_P, inout double delta, double incidence_angle) {
+void efficiency(Ray r, out double real_S, out double real_P, out double delta, double incidence_angle) {
 	dvec2 complex_S, complex_P;
 	reflectance(r.energy, incidence_angle, complex_S, complex_P);
 
@@ -2829,6 +2829,7 @@ Ray traceMirror(Ray r, const int elementIndex, inout uint64_t ctr, dvec4 interse
 	
 	// calculate intersection point and normal at intersection point
 	dvec4 normal = setIntersectionPoint(r, mrr.surfaceParams, intersection);
+	double incidence_angle = getTheta(r, normal);
 
 	// check if ray hit the element within the boundaries
 	double x_extent = mrr.objectParameters[0][0]; // width
@@ -2853,6 +2854,10 @@ Ray traceMirror(Ray r, const int elementIndex, inout uint64_t ctr, dvec4 interse
 
 	// calculate the new direction after the reflection
 	r.direction = dvec3(reflect(dvec4(r.direction,0), normal));
+
+	double real_S, real_P, delta;
+	efficiency(r, real_S, real_P, delta, incidence_angle);
+	r.stokes = muller_matrix(real_S, real_P, delta) * r.stokes; // TODO r.stokes probably needs to be changed to another coordinate system first! (see (3) of schäfers list)
 	
 	r.order = 0;
 	return r;
