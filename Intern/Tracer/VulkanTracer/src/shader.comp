@@ -2045,6 +2045,23 @@ void efficiency(Ray r, inout double real_S, inout double real_P, inout double de
 	real_P = euler_P.x;
 }
 
+/** creates a Müller matrix (see p. 32 of Schäfers, 2007)
+ * @param R_s
+ * @param R_p
+ * @param delta
+ *
+ */
+dmat4 muller_matrix(double R_s, double R_p, double delta) {
+    double c = r8_cos(delta);
+    double s = r8_sin(delta);
+	return dmat4(
+		(R_s + R_p)/2.0, (R_p - R_s)/2.0,        0.0,       0.0,
+		(R_p - R_s)/2.0, (R_s + R_p)/2.0,        0.0,       0.0,
+		            0.0,             0.0,  R_s*R_p*c, R_s*R_p*s,
+		            0.0,             0.0, -R_s*R_p*s, R_s*R_p*c
+	);
+}
+
 /**
 turn the normal vector through x_rad and z_rad
 @params:  	normal: the normal vector
