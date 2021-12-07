@@ -1948,10 +1948,10 @@ double getTheta(Ray r, dvec4 normal) {
  * @return cos_transmittance 	cosinus of complex transmittance angle 
  */
 dvec2 snell(dvec2 cos_incidence, dvec2 cn1, dvec2 cn2) {
-	dvec2 sin_incidence = cx_sqrt( cx_sub(dvec2(1,0), cx_pow(cos_incidence, 2)) );
+	dvec2 sin_incidence = cx_sqrt( cx_sub(dvec2(1.0,0.0), cx_mul(cos_incidence, cos_incidence)) );
 	dvec2 refractive_ratio = cx_div(cn1, cn2);
 	dvec2 sin_transmittance = cx_mul(sin_incidence, refractive_ratio);
-	dvec2 cos_transmittance = cx_sqrt( cx_sub(dvec2(1,0), cx_pow(sin_transmittance, 2)));
+	dvec2 cos_transmittance = cx_sqrt( cx_sub(dvec2(1.0,0.0), cx_mul(sin_transmittance, sin_transmittance)));
 	return cos_transmittance;
 }
 
@@ -1970,7 +1970,8 @@ void fresnel(dvec2 cn1, dvec2 cn2, dvec2 cos_incidence, dvec2 cos_transmittance,
 	dvec2 mat2_incidence = cx_mul( cn2, cos_incidence ); // material two (into which the ray goes)
 	dvec2 mat2_transmittance = cx_mul( cn2, cos_transmittance );
 
-	complex_S = - cx_div(cx_sub(mat1_incidence, mat2_transmittance) , cx_add(mat1_incidence, mat2_transmittance));
+	// TODO check that these are correct
+	complex_S = cx_div(cx_sub(mat1_incidence, mat2_transmittance) , cx_add(mat1_incidence, mat2_transmittance));
 	complex_P = - cx_div(cx_sub(mat1_transmittance, mat2_incidence) , cx_add(mat1_transmittance, mat2_incidence));
 	return;
 }
@@ -2008,7 +2009,7 @@ dvec2 cartesian_to_euler(dvec2 complex) {
 		euler = dvec2(1.0/0.0, 1.0/0.0);
 		return euler;
 	}
-	euler = dvec2(r, r8_atan2(complex.x, complex.y)); // TODO in grad or in rad?
+	euler = dvec2(r, r8_atan2(complex.y, complex.x)); // TODO in grad or in rad?
 	return euler;
 }
 
@@ -2033,7 +2034,7 @@ double phase_difference(dvec2 euler1, dvec2 euler2) {
  * @param incidence_angle		normal incidence angle
  * @param others
  */
-void efficiency(Ray r, out double real_S, out double real_P, out double delta, double incidence_angle) {
+void efficiency(Ray r, inout double real_S, inout double real_P, inout double delta, double incidence_angle) {
 	dvec2 complex_S, complex_P;
 	reflectance(r.energy, incidence_angle, complex_S, complex_P);
 
@@ -2829,7 +2830,6 @@ Ray traceMirror(Ray r, const int elementIndex, inout uint64_t ctr, dvec4 interse
 	
 	// calculate intersection point and normal at intersection point
 	dvec4 normal = setIntersectionPoint(r, mrr.surfaceParams, intersection);
-	double incidence_angle = getTheta(r, normal);
 
 	// check if ray hit the element within the boundaries
 	double x_extent = mrr.objectParameters[0][0]; // width
@@ -2854,10 +2854,6 @@ Ray traceMirror(Ray r, const int elementIndex, inout uint64_t ctr, dvec4 interse
 
 	// calculate the new direction after the reflection
 	r.direction = dvec3(reflect(dvec4(r.direction,0), normal));
-
-	double real_S, real_P, delta;
-	efficiency(r, real_S, real_P, delta, incidence_angle);
-	r.stokes = muller_matrix(real_S, real_P, delta) * r.stokes; // TODO r.stokes probably needs to be changed to another coordinate system first! (see (3) of schäfers list)
 	
 	r.order = 0;
 	return r;
@@ -3101,6 +3097,16 @@ void testFunctions() {
 	
 	Ray r = rayData[uint(gl_GlobalInvocationID)];
 	Ray res; // store the result here
+	// initialize with 0's
+	res.position = dvec3(0,0,0);
+	res.direction = dvec3(0,0,0);
+	res.energy = 0;
+	res.weight = 0;
+	res.stokes = dvec4(0,0,0,0);
+	res.pathLength = 0;
+	res.extraParameter = 0;
+	res.order = 0;
+	res.lastElement = 0;
 	
 	// settings != 0 -> unit test cases in test_shader.cpp
 	// input rays and elements are interpreted depending on the test case
@@ -3129,10 +3135,6 @@ void testFunctions() {
 		double z = r.energy;
 		double a = r.weight;
 		res.weight = vlsGrating(a, z, b_params);
-		res.pathLength = 0;
-		res.extraParameter = 0;
-		res.order = 0;
-		res.lastElement = 0;
 		rayData[uint(gl_GlobalInvocationID)] = res;
 	}
 	else if(settings == 5) { // diffraction
@@ -3291,6 +3293,52 @@ void testFunctions() {
 	}else if(settings == 21) { // test getTheta function that is needed for the efficiency calculations
 		Ray res;
 		res.weight = getTheta(r, dvec4(r.position,0));
+		rayData[uint(gl_GlobalInvocationID)] = res;
+	}else if(settings == 22) { // test reflectance function that calculates the s and p polarization
+		double energy = r.energy;
+		double incidence_angle = r.weight;
+		dvec2 complex_S;
+		dvec2 complex_P;
+		reflectance(energy, incidence_angle, complex_S, complex_P);
+		res.position.x = complex_S.x; // complex s polarisation
+		res.position.y = complex_S.y;
+		res.direction.x = complex_P.x; // complex p polarisation
+		res.direction.y = complex_P.y;
+		rayData[uint(gl_GlobalInvocationID)] = res;
+	}else if(settings == 23) { // test snell's law
+		// all parameters are complex numbers -> dvec2
+		dvec2 cos_incidence = dvec2(r.position.x, r.position.y); // cosinus of incidence angle of ray
+		dvec2 cn1 = dvec2(r.direction.x, r.direction.y); // refractive index of first material
+		dvec2 cn2 = dvec2(r.stokes.x, r.stokes.y); // refractive index of second material
+
+		dvec2 cos_transmittance = snell(cos_incidence, cn1, cn2); // calculate cosinus of angle to normal of transmitted ray
+		res.position = dvec3(cos_transmittance, 0);
+		rayData[uint(gl_GlobalInvocationID)] = res;
+	}else if(settings == 24) { // test fresnel formula
+		// all parameters are complex numbers -> dvec2
+		dvec2 cos_incidence = dvec2(r.position.x, r.position.y); // cosinus of incidence angle of ray
+		dvec2 cos_transmittance = dvec2(r.direction.x, r.direction.y); // cosinus of transmittance angle (calc. by snell)
+		dvec2 cn1 = dvec2(r.stokes.x, r.stokes.y); // refractive index of first material
+		dvec2 cn2 = dvec2(r.stokes.z, r.stokes.w); // refractive index of second material
+		dvec2 complex_S, complex_P;
+
+		fresnel(cn1, cn2, cos_incidence, cos_transmittance, complex_S, complex_P);
+		res.position = dvec3(complex_S, 0); // complex s polarisation
+		res.direction = dvec3(complex_P, 0); // complex p polarisation
+		rayData[uint(gl_GlobalInvocationID)] = res;
+	}else if(settings == 25) { // cartesian representation of complex number (x + y*i) to euler (r * e^(i*phi))
+		dvec2 complex_cartesian1 = dvec2(r.position.x, r.position.y);
+		dvec2 complex_cartesian2 = dvec2(r.direction.x, r.direction.y);
+		dvec2 complex_cartesian3 = dvec2(r.stokes.x, r.stokes.y);
+		dvec2 complex_cartesian4 = dvec2(r.stokes.z, r.stokes.w);
+
+		dvec2 complex_euler1 = cartesian_to_euler(complex_cartesian1);
+		dvec2 complex_euler2 = cartesian_to_euler(complex_cartesian2);
+		dvec2 complex_euler3 = cartesian_to_euler(complex_cartesian3);
+		dvec2 complex_euler4 = cartesian_to_euler(complex_cartesian4);
+		res.position = dvec3(complex_euler1, 0);
+		res.direction = dvec3(complex_euler2, 0);
+		res.stokes = dvec4(complex_euler3, complex_euler4);
 		rayData[uint(gl_GlobalInvocationID)] = res;
 	}
 	// store results to output buffer
