@@ -1403,15 +1403,10 @@ double wasteBox(double x, double z, double xLength, double zLength, double w)
 		double x_max = xLength/2.0;
 		double z_min = -zLength/2.0;
 		double z_max = zLength/2.0;
-		if (x <= x_min || x >= x_max || z <= z_min || z >= z_max) {
-			return 0.0;
-		}
-	}
-	else {	// Ring shape
+		w *= int(x > x_min) * int(x < x_max) * int(z > z_min) * int(z < z_max); // This sets w to zero, if (x <= x_min || x >= x_max || z <= z_min || z >= z_max)
+	} else {	// Ring shape
 		double rd2 = (x/(xLength/2.0)) * (x/(xLength/2.0)) + (z/(zLength/2.0)) * (z/(zLength/2.0));
-		if (rd2 > 1.0) {
-			return 0.0;
-		}
+		w *= int(rd2 <= 1.0); // This sets w to zero, if (rd > 1.0)
 	}
 	return w;
 }
@@ -2048,6 +2043,23 @@ void efficiency(Ray r, inout double real_S, inout double real_P, inout double de
 	delta = phase_difference(euler_P, euler_S);
 	real_S = euler_S.x;
 	real_P = euler_P.x;
+}
+
+/** creates a Müller matrix (see p. 32 of Schäfers, 2007)
+ * @param R_s
+ * @param R_p
+ * @param delta
+ *
+ */
+dmat4 muller_matrix(double R_s, double R_p, double delta) {
+    double c = r8_cos(delta);
+    double s = r8_sin(delta);
+	return dmat4(
+		(R_s + R_p)/2.0, (R_p - R_s)/2.0,        0.0,       0.0,
+		(R_p - R_s)/2.0, (R_s + R_p)/2.0,        0.0,       0.0,
+		            0.0,             0.0,  R_s*R_p*c, R_s*R_p*s,
+		            0.0,             0.0, -R_s*R_p*s, R_s*R_p*c
+	);
 }
 
 /**
