@@ -1,5 +1,6 @@
 #include "Ray.h"
 
+#include <cstring>
 #include <iostream>
 
 #include "RayList.h"
