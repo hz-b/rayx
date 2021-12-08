@@ -1179,7 +1179,7 @@ double dpow (double a, int b) {
 #define cx_cos(a) dvec2(r8_cos(a.x) * r8_cosh(a.y), -r8_sin(a.x) * r8_sinh(a.y))
 
 dvec2 cx_sqrt(dvec2 a) {
-    double r = length(a);
+	double r = length(a);
     double rpart = sqrt(0.5*(r+a.x));
     double ipart = sqrt(0.5*(r-a.x));
     if (a.y < 0.0) ipart = -ipart;
@@ -1940,7 +1940,10 @@ double getTheta(Ray r, dvec4 normal) {
 
 /** calculates cosinus of transmittance angle with snell's law 
  * cosinus is needed in fresnel formula
- * sin(transmittance_anlge) = (cn1 / cn2) * sin(incidence_angle)
+ * sin(incidence_angle)² = 1 - cos(incidence_angle)²
+ * ratio² = (cn1 / cn2)²
+ * sin(transmittance_angle)² = (cn1 / cn2)² * sin(incidence_angle)²
+ * cos(transmittance_angle) = sqrt( 1 - sin(transmittance_angle)²) 
  * 
  * @param cos_incidence			cosinus of complex incidence angle
  * @param cn1					complex refractive index of material from which the ray is coming
@@ -1948,10 +1951,16 @@ double getTheta(Ray r, dvec4 normal) {
  * @return cos_transmittance 	cosinus of complex transmittance angle 
  */
 dvec2 snell(dvec2 cos_incidence, dvec2 cn1, dvec2 cn2) {
-	dvec2 sin_incidence = cx_sqrt( cx_sub(dvec2(1.0,0.0), cx_mul(cos_incidence, cos_incidence)) );
+	/*dvec2 sin_incidence = cx_sqrt( cx_sub(dvec2(1.0,0.0), cx_mul(cos_incidence, cos_incidence)) );
 	dvec2 refractive_ratio = cx_div(cn1, cn2);
 	dvec2 sin_transmittance = cx_mul(sin_incidence, refractive_ratio);
 	dvec2 cos_transmittance = cx_sqrt( cx_sub(dvec2(1.0,0.0), cx_mul(sin_transmittance, sin_transmittance)));
+	return cos_transmittance;*/
+	dvec2 sin_incidence_square = cx_sub(dvec2(1.0,0.0), cx_mul(cos_incidence, cos_incidence)); // 1 - cos(inc)**2
+	dvec2 refractive_ratio = cx_div(cn1, cn2); // cn1 / cn2
+	dvec2 ratio_square = cx_mul(refractive_ratio, refractive_ratio);
+	dvec2 sin_transmittance_square = cx_mul(sin_incidence_square, ratio_square); // sin(tr)**2 = sin(inc)**2 * (cn1/cn2)**2
+	dvec2 cos_transmittance = cx_sqrt( cx_sub(dvec2(1.0,0.0), sin_transmittance_square) ); // cos = sqrt( 1 - ratio**2*sin(tr)**2 )
 	return cos_transmittance;
 }
 
@@ -1970,7 +1979,6 @@ void fresnel(dvec2 cn1, dvec2 cn2, dvec2 cos_incidence, dvec2 cos_transmittance,
 	dvec2 mat2_incidence = cx_mul( cn2, cos_incidence ); // material two (into which the ray goes)
 	dvec2 mat2_transmittance = cx_mul( cn2, cos_transmittance );
 
-	// TODO check that these are correct
 	complex_S = cx_div(cx_sub(mat1_incidence, mat2_transmittance) , cx_add(mat1_incidence, mat2_transmittance));
 	complex_P = - cx_div(cx_sub(mat1_transmittance, mat2_incidence) , cx_add(mat1_transmittance, mat2_incidence));
 	return;
