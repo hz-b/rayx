@@ -47,10 +47,11 @@ TEST(RZP, testdefaultParams) {
     glm::dmat4x4 orientation = rzp_param.calcOrientation();
 
     RAYX::ReflectionZonePlate rzp = RAYX::ReflectionZonePlate(
-        "RZP", geometricalShape, curvatureType, width, height, position,
-        orientation, designEnergy, orderOfDiffraction, designOrderOfDiffraction,
-        dAlpha, dBeta, sEntrance, sExit, mEntrance, mExit, shortRadius,
-        longRadius, additionalOrder, fresnelOffset, sE);
+        "RZP", geometricalShape, curvatureType, width, height,
+        rzp_param.getAzimuthalAngle(), position, orientation, designEnergy,
+        orderOfDiffraction, designOrderOfDiffraction, dAlpha, dBeta, sEntrance,
+        sExit, mEntrance, mExit, shortRadius, longRadius, additionalOrder,
+        fresnelOffset, sE);
 
     double d_alpha = 0.017453292519943295;
     double d_beta = 0.017453292519943295;
@@ -74,9 +75,22 @@ TEST(RZP, testdefaultParams) {
                                                 degToRad(dBeta),
                                                 0,
                                                 double(additionalOrder)};
-    std::vector<double> correctObjectParams = {
-        width, height, sE[0], sE[1], sE[2], sE[3], sE[4], sE[5],
-        sE[6], 0,      0,     0,     0,     0,     0,     0};
+    std::vector<double> correctObjectParams = {width,
+                                               height,
+                                               sE[0],
+                                               sE[1],
+                                               sE[2],
+                                               sE[3],
+                                               sE[4],
+                                               sE[5],
+                                               sE[6],
+                                               0,
+                                               rzp_param.getAzimuthalAngle(),
+                                               0,
+                                               0,
+                                               0,
+                                               0,
+                                               0};
     EXPECT_ITERABLE_DOUBLE_EQ(std::vector<double>, rzp.getElementParameters(),
                               correctElementParams);
     EXPECT_ITERABLE_DOUBLE_EQ(std::vector<double>, rzp.getObjectParameters(),
@@ -142,10 +156,11 @@ TEST(RZP, testdefaultParamsElliptical) {
     glm::dvec4 position = rzp_param.calcPosition();
     glm::dmat4x4 orientation = rzp_param.calcOrientation();
     RAYX::ReflectionZonePlate rzp = RAYX::ReflectionZonePlate(
-        "RZP", geometricalShape, curvatureType, width, height, position,
-        orientation, designEnergy, orderOfDiffraction, designOrderOfDiffraction,
-        dAlpha, dBeta, sEntrance, sExit, mEntrance, mExit, shortRadius,
-        longRadius, additionalOrder, fresnelOffset, sE);
+        "RZP", geometricalShape, curvatureType, width, height,
+        rzp_param.getAzimuthalAngle(), position, orientation, designEnergy,
+        orderOfDiffraction, designOrderOfDiffraction, dAlpha, dBeta, sEntrance,
+        sExit, mEntrance, mExit, shortRadius, longRadius, additionalOrder,
+        fresnelOffset, sE);
 
     double d_alpha = 0.017453292519943295;
     double d_beta = 0.017453292519943295;
@@ -168,9 +183,22 @@ TEST(RZP, testdefaultParamsElliptical) {
                                                 degToRad(dBeta),
                                                 0,
                                                 double(additionalOrder)};
-    std::vector<double> correctObjectParams = {
-        -width, -height, sE[0], sE[1], sE[2], sE[3], sE[4], sE[5],
-        sE[6],  0,       0,     0,     0,     0,     0,     0};
+    std::vector<double> correctObjectParams = {-width,
+                                               -height,
+                                               sE[0],
+                                               sE[1],
+                                               sE[2],
+                                               sE[3],
+                                               sE[4],
+                                               sE[5],
+                                               sE[6],
+                                               0,
+                                               rzp_param.getAzimuthalAngle(),
+                                               0,
+                                               0,
+                                               0,
+                                               0,
+                                               0};
     EXPECT_ITERABLE_DOUBLE_EQ(std::vector<double>, rzp.getElementParameters(),
                               correctElementParams);
     EXPECT_ITERABLE_DOUBLE_EQ(std::vector<double>, rzp.getObjectParameters(),
@@ -237,10 +265,11 @@ TEST(RZP, testParams) {
     glm::dvec4 position = rzp_param.calcPosition();
     glm::dmat4x4 orientation = rzp_param.calcOrientation();
     RAYX::ReflectionZonePlate rzp = RAYX::ReflectionZonePlate(
-        "RZP", geometricalShape, curvatureType, width, height, position,
-        orientation, designEnergy, orderOfDiffraction, designOrderOfDiffraction,
-        dAlpha, dBeta, sEntrance, sExit, mEntrance, mExit, shortRadius,
-        longRadius, additionalOrder, fresnelOffset, sE);
+        "RZP", geometricalShape, curvatureType, width, height,
+        rzp_param.getAzimuthalAngle(), position, orientation, designEnergy,
+        orderOfDiffraction, designOrderOfDiffraction, dAlpha, dBeta, sEntrance,
+        sExit, mEntrance, mExit, shortRadius, longRadius, additionalOrder,
+        fresnelOffset, sE);
 
     std::vector<double> correctElementParams = {0,
                                                 0,
@@ -258,9 +287,22 @@ TEST(RZP, testParams) {
                                                 degToRad(dBeta),
                                                 0,
                                                 double(additionalOrder)};
-    std::vector<double> correctObjectParams = {
-        width, height, sE[0], sE[1], sE[2], sE[3], sE[4], sE[5],
-        sE[6], 0,      0,     0,     0,     0,     0,     0};
+    std::vector<double> correctObjectParams = {width,
+                                               height,
+                                               sE[0],
+                                               sE[1],
+                                               sE[2],
+                                               sE[3],
+                                               sE[4],
+                                               sE[5],
+                                               sE[6],
+                                               0,
+                                               rzp_param.getAzimuthalAngle(),
+                                               0,
+                                               0,
+                                               0,
+                                               0,
+                                               0};
     glm::dmat4x4 correctInMatrix = glm::dmat4x4(
         0.84421568368313848, -0.52329819288792645, -0.11601241633394895, 0,
         0.53600361885290571, 0.82420440112787274, 0.18272171665687006, 0, 0,

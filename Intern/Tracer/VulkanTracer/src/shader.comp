@@ -1923,7 +1923,7 @@ dvec4 getOpticalElementIntersection(Ray r, uint elementIndex){
 
 
 // returns angle between ray direction and surface normal at intersection point
-double getTheta(Ray r, dvec4 normal) {
+double getIncidenceAngle(Ray r, dvec4 normal) {
 	normal = normalize(normal);
 	double ar = dot(dvec3(normal), r.direction);
 	// cut to interval [-1,1]
@@ -2022,12 +2022,12 @@ dvec2 cartesian_to_euler(dvec2 complex) {
 }
 
 /** computes the difference in the phases of 2 complex number written in euler form: r * e^(i * phi)
- * @param euler1 		first complex number
- * @param euler2		second complex number
+ * @param euler1 		first complex number // p
+ * @param euler2		second complex number // s
  * @return delta = phi1 - phi2, in [-pi/2, pi/2] degrees
  */
 double phase_difference(dvec2 euler1, dvec2 euler2) {
-	double delta = euler2.y - euler1.y;
+	double delta = euler2.y - euler1.y; // s -p
 	delta = delta - int(delta > 180)*360.0 + int(delta < -180)*360.0;
 	return delta;
 }
@@ -2069,6 +2069,31 @@ dmat4 muller_matrix(double R_s, double R_p, double delta) {
 		            0.0,             0.0,  R_s*R_p*c, R_s*R_p*s,
 		            0.0,             0.0, -R_s*R_p*s, R_s*R_p*c
 	);
+}
+
+/** returns updated stokes vector
+ * @param r			ray
+ * @param real_S	real part of the complex s-polarization
+ * @param real_P	real part of the complex p-polarization
+ * @param delta		phase difference between complex s and p polarization
+ * @param azimuthal	angle of rotation of element in xy plane (chi + dchi (misalignment))
+ * @returns updated stokes vector of ray
+ */
+dvec4 update_stokes(Ray r, double real_S, double real_P, double delta, double azimuthal) {
+	dvec4 stokes_old = r.stokes;
+	double c_chi = r8_cos(azimuthal);
+	double s_chi = r8_sin(azimuthal);
+	dmat4 rot = dmat4(1, 0, 0, 0,
+					0, c_chi, -s_chi, 0,
+					0, s_chi, c_chi, 0,
+					0, 0, 0, 1);
+	dmat4 inv_rot = transpose(rot);
+
+	stokes_old = rot * stokes_old;
+	dvec4 stokes_new = muller_matrix(real_S, real_P, delta) * stokes_old;
+	stokes_new = inv_rot * stokes_new;
+
+	return stokes_new;
 }
 
 /**
@@ -2838,7 +2863,8 @@ Ray traceMirror(Ray r, const int elementIndex, inout uint64_t ctr, dvec4 interse
 	
 	// calculate intersection point and normal at intersection point
 	dvec4 normal = setIntersectionPoint(r, mrr.surfaceParams, intersection);
-	double incidence_angle = getTheta(r, normal);
+	double incidence_angle = getIncidenceAngle(r, normal); // getTheta
+	double azimuthal_angle = mrr.objectParameters[2][2]; // chi (azimuthalangle) in rad
 
 	// check if ray hit the element within the boundaries
 	double x_extent = mrr.objectParameters[0][0]; // width
@@ -2866,8 +2892,7 @@ Ray traceMirror(Ray r, const int elementIndex, inout uint64_t ctr, dvec4 interse
 	
 	double real_S, real_P, delta;
 	efficiency(r, real_S, real_P, delta, incidence_angle);
-	r.stokes = muller_matrix(real_S, real_P, delta) * r.stokes; // TODO r.stokes probably needs to be changed to another coordinate system first! (see (3) of schäfers list)
-
+	r.stokes = update_stokes(r, real_S, real_P, delta, azimuthal_angle); // TODO r.stokes probably needs to be changed to another coordinate system first! (see (3) of schäfers list)
 	
 	r.order = 0;
 	return r;
@@ -3304,9 +3329,9 @@ void testFunctions() {
 	else if(settings == 20) { // test iteratTo (method for finding intersection and normal for non-quadric surfaces like the torus)
 		dvec4 normal = iteratTo(r, quadricData[0].surfaceParams[0][0], quadricData[0].surfaceParams[0][1]);
 		rayData[uint(gl_GlobalInvocationID)] = r;
-	}else if(settings == 21) { // test getTheta function that is needed for the efficiency calculations
+	}else if(settings == 21) { // test getIncidenceAngle function that is needed for the efficiency calculations
 		Ray res;
-		res.weight = getTheta(r, dvec4(r.position,0));
+		res.weight = getIncidenceAngle(r, dvec4(r.position,0));
 		rayData[uint(gl_GlobalInvocationID)] = res;
 	}else if(settings == 22) { // test reflectance function that calculates the s and p polarization
 		double energy = r.energy;

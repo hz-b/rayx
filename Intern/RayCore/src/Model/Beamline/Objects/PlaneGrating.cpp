@@ -11,6 +11,8 @@ namespace RAYX {
  * @param geometricalShape      0/1 rectangle/elliptical
  * @param width                 width of element (x dimension)
  * @param height                height of element (z dimension)
+ * @param azimuthalAngle        rotation of element in xy-plane, needed for
+ * stokes vector
  * @param position              position in world coordinate system
  * @param orientation           orientation(rotation) of element in world
  * coordinate system
@@ -29,17 +31,15 @@ namespace RAYX {
  * amplitude y(5) and radius (6)
  *
  */
-PlaneGrating::PlaneGrating(const char* name,
-                           Geometry::GeometricalShape geometricalShape,
-                           const double width, const double height,
-                           glm::dvec4 position, glm::dmat4x4 orientation,
-                           const double designEnergy, const double lineDensity,
-                           const double orderOfDiffraction,
-                           const int additionalZeroOrder,
-                           const std::vector<double> vls,
-                           const std::vector<double> slopeError)
-    : OpticalElement(name, geometricalShape, width, height, position,
-                     orientation, slopeError),
+PlaneGrating::PlaneGrating(
+    const char* name, Geometry::GeometricalShape geometricalShape,
+    const double width, const double height, const double azimuthalAngle,
+    glm::dvec4 position, glm::dmat4x4 orientation, const double designEnergy,
+    const double lineDensity, const double orderOfDiffraction,
+    const int additionalZeroOrder, const std::vector<double> vls,
+    const std::vector<double> slopeError)
+    : OpticalElement(name, geometricalShape, width, height, azimuthalAngle,
+                     position, orientation, slopeError),
       m_additionalOrder(additionalZeroOrder),
       m_designEnergyMounting(designEnergy),
       m_lineDensity(lineDensity),
@@ -121,10 +121,10 @@ std::shared_ptr<PlaneGrating> PlaneGrating::createFromXML(
         return nullptr;
     }
 
-    return std::make_shared<PlaneGrating>(name, geometricalShape, width, height,
-                                          position, orientation, designEnergy,
-                                          lineDensity, orderOfDiffraction,
-                                          additionalZeroOrder, vls, slopeError);
+    return std::make_shared<PlaneGrating>(
+        name, geometricalShape, width, height, 0, position, orientation,
+        designEnergy, lineDensity, orderOfDiffraction, additionalZeroOrder, vls,
+        slopeError);
 }
 
 double PlaneGrating::getDesignEnergyMounting() {

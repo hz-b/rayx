@@ -106,6 +106,14 @@ glm::dmat4x4 WorldUserParams::getMisalignmentOrientation() {
 }
 
 /**
+ * @return azimuthalAngle: chi + dchi in rad
+ * = orientation of element in xy-plane + rotational misalignment in xy-plane
+ */
+double WorldUserParams::getAzimuthalAngle() {
+    return m_azimuthalAngle + m_misalignment[5];
+}
+
+/**
  * @return the rotation matrix around the x-axis by tangentAngle
  */
 glm::dmat4x4 WorldUserParams::getTangentAngleRotation() {
@@ -171,9 +179,8 @@ glm::dmat4x4 WorldUserParams::calcOrientation() {
 
     glm::dmat4x4 misalignmentOr = getMisalignmentOrientation();
     glm::dmat4x4 orientation =
-        glm::dmat4x4(cos_c, sin_c, 0, 0, 
-                     -sin_c * cos_a, cos_c * cos_a, -sin_a, 0, -sin_c * sin_a,
-                     sin_a * cos_c, cos_a, 0, 0, 0, 0, 1);
+        glm::dmat4x4(cos_c, sin_c, 0, 0, -sin_c * cos_a, cos_c * cos_a, -sin_a,
+                     0, -sin_c * sin_a, sin_a * cos_c, cos_a, 0, 0, 0, 0, 1);
 
     orientation = orientation * tangentAngleRotation * misalignmentOr *
                   inverseTangentAngleRotation;

@@ -51,7 +51,8 @@ void Application::loadDummyBeamline() {  // ! objects are created here
     glm::dmat4x4 or1 = w_coord.calcOrientation();
     std::shared_ptr<RAYX::PlaneMirror> pm = std::make_shared<RAYX::PlaneMirror>(
         "pm_ell_ip_200mirrormis", Geometry::GeometricalShape::RECTANGLE, 50,
-        200, pos1, or1, std::vector<double>{0, 0, 0, 0, 0, 0, 0});
+        200, w_coord.getAzimuthalAngle(), pos1, or1,
+        std::vector<double>{0, 0, 0, 0, 0, 0, 0});
 
     // ellipsoid with mirror misalignment
     RAYX::GeometricUserParams ell_params =
@@ -77,7 +78,8 @@ void Application::loadDummyBeamline() {  // ! objects are created here
     double designEnergy = 100;
     double orderOfDiffraction = 1;
     double designOrderOfDiffraction = -1;
-    double dAlpha = 1;  // degree
+    double azimuthalAngle = 0;  // rad
+    double dAlpha = 1;          // degree
     double dBeta = 1;
     double sEntrance = 100;
     double sExit = 500;
@@ -91,10 +93,11 @@ void Application::loadDummyBeamline() {  // ! objects are created here
 
     std::shared_ptr<ReflectionZonePlate> rzpPtr =
         std::make_shared<ReflectionZonePlate>(
-            "RZP", geometricalShape, curvatureType, widthA, 60.0, height, pos2,
-            or2, designEnergy, orderOfDiffraction, designOrderOfDiffraction,
-            dAlpha, dBeta, sEntrance, sExit, mEntrance, mExit, shortRadius,
-            longRadius, additionalOrder, fresnelOffset, sE);
+            "RZP", geometricalShape, curvatureType, widthA, 60.0, height,
+            azimuthalAngle, pos2, or2, designEnergy, orderOfDiffraction,
+            designOrderOfDiffraction, dAlpha, dBeta, sEntrance, sExit,
+            mEntrance, mExit, shortRadius, longRadius, additionalOrder,
+            fresnelOffset, sE);
 
     // image plane
     RAYX::WorldUserParams ip_w_coord = RAYX::WorldUserParams(

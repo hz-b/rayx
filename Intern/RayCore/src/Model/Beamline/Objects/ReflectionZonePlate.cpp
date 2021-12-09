@@ -11,6 +11,8 @@ namespace RAYX {
  * @param curvatureType                 Plane, Sphere, Toroid
  * @param width                         total width of the element (x-dimension)
  * @param height                        height of the element (z- dimensions)
+ * @param azimuthalAngle                rotation of element in xy-plane, needed
+ * for stokes vector
  * @param position                      position of the RZP in world coordinates
  * @param orientation                   orientation of the RZP in world
  * coordinates
@@ -44,15 +46,16 @@ namespace RAYX {
 ReflectionZonePlate::ReflectionZonePlate(
     const char* name, Geometry::GeometricalShape geometricalShape,
     const int curvatureType, const double width, const double height,
-    const glm::dvec4 position, const glm::dmat4x4 orientation,
-    const double designEnergy, const double orderOfDiffraction,
-    const double designOrderOfDiffraction, const double dAlpha,
-    const double dBeta, const double mEntrance, const double mExit,
-    const double sEntrance, const double sExit, const double shortRadius,
-    const double longRadius, const int additionalZeroOrder,
-    const double fresnelZOffset, const std::vector<double> slopeError)
-    : OpticalElement(name, geometricalShape, width, height, position,
-                     orientation, slopeError),
+    const double azimuthalAngle, const glm::dvec4 position,
+    const glm::dmat4x4 orientation, const double designEnergy,
+    const double orderOfDiffraction, const double designOrderOfDiffraction,
+    const double dAlpha, const double dBeta, const double mEntrance,
+    const double mExit, const double sEntrance, const double sExit,
+    const double shortRadius, const double longRadius,
+    const int additionalZeroOrder, const double fresnelZOffset,
+    const std::vector<double> slopeError)
+    : OpticalElement(name, geometricalShape, width, height, azimuthalAngle,
+                     position, orientation, slopeError),
       m_fresnelZOffset(fresnelZOffset),
       m_designAlphaAngle(degToRad(dAlpha)),
       m_designBetaAngle(degToRad(dBeta)),
@@ -106,7 +109,7 @@ ReflectionZonePlate::ReflectionZonePlate(
 ReflectionZonePlate::ReflectionZonePlate(
     const char* name, Geometry::GeometricalShape geometricalShape,
     const int curvatureType, const double widthA, const double widthB,
-    const double height, const glm::dvec4 position,
+    const double height, const double azimuthalAngle, const glm::dvec4 position,
     const glm::dmat4x4 orientation, const double designEnergy,
     const double orderOfDiffraction, const double designOrderOfDiffraction,
     const double dAlpha, const double dBeta, const double mEntrance,
@@ -114,8 +117,8 @@ ReflectionZonePlate::ReflectionZonePlate(
     const double shortRadius, const double longRadius,
     const int additionalZeroOrder, const double fresnelZOffset,
     const std::vector<double> slopeError)
-    : OpticalElement(name, geometricalShape, widthA, widthB, height, position,
-                     orientation, slopeError),
+    : OpticalElement(name, geometricalShape, widthA, widthB, height,
+                     azimuthalAngle, position, orientation, slopeError),
       m_fresnelZOffset(fresnelZOffset),
       m_designAlphaAngle(degToRad(dAlpha)),
       m_designBetaAngle(degToRad(dBeta)),
@@ -278,14 +281,14 @@ std::shared_ptr<ReflectionZonePlate> ReflectionZonePlate::createFromXML(
     bool foundWidthB = xml::paramDouble(node, "totalWidthB", &widthB);
     if (foundWidthB) {
         return std::make_shared<ReflectionZonePlate>(
-            name, geometricalShape, curvatureType, widthA, height, position,
+            name, geometricalShape, curvatureType, widthA, height, 0, position,
             orientation, designEnergy, orderOfDiffraction,
             designOrderOfDiffraction, dAlpha, dBeta, mEntrance, mExit,
             sEntrance, sExit, shortRadius, longRadius, additionalZeroOrder,
             fresnelZOffset, slopeError);
     } else {
         return std::make_shared<ReflectionZonePlate>(
-            name, geometricalShape, curvatureType, widthA, widthB, height,
+            name, geometricalShape, curvatureType, widthA, widthB, height, 0,
             position, orientation, designEnergy, orderOfDiffraction,
             designOrderOfDiffraction, dAlpha, dBeta, mEntrance, mExit,
             sEntrance, sExit, shortRadius, longRadius, additionalZeroOrder,
@@ -546,7 +549,8 @@ double ReflectionZonePlate::rzpLineDensityDZ(glm::dvec3 intersection,
 
     double DZ;  //, DX;
 
-    // all of the upcoming variables will be defined in each of the following if-else blocks!
+    // all of the upcoming variables will be defined in each of the following
+    // if-else blocks!
     double xi = 0;
     double yi = 0;
     double zi = 0;

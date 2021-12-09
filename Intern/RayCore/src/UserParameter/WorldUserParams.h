@@ -44,6 +44,7 @@ class RAYX_API WorldUserParams {
     glm::dmat4x4 calcOrientation();
 
     std::vector<double> getMisalignment();
+    double getAzimuthalAngle();
 
   private:
     double m_incidenceAngle;
