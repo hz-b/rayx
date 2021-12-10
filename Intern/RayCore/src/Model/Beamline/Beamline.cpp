@@ -3,6 +3,7 @@
 #include <iostream>
 
 #include "Debug.h"
+#include "Objects/Cylinder.h"
 #include "Objects/Ellipsoid.h"
 #include "Objects/ImagePlane.h"
 #include "Objects/MatrixSource.h"
