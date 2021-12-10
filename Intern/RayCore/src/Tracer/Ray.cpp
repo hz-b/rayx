@@ -36,7 +36,7 @@ Ray::Ray(double xpos, double ypos, double zpos, double weight, double xdir,
       m_lastElement(lastElement),
       m_extraParam(extraParameter) {}
 
-Ray::Ray(glm::vec3 pos, glm::vec3 dir, glm::vec4 stokes, double energy,
+Ray::Ray(glm::dvec3 pos, glm::dvec3 dir, glm::dvec4 stokes, double energy,
          double weight, double pathLength, double order, double lastElement,
          double extraParameter)
     : m_position({pos.x, pos.y, pos.z}),
