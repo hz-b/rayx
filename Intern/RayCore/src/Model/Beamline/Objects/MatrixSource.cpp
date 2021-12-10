@@ -159,9 +159,9 @@ std::vector<Ray> MatrixSource::getRays() {
             glm::dvec4 stokes =
                 glm::dvec4(1, getLinear0(), getLinear45(), getCircular());
 
-            Ray r = Ray(position.x, position.y, position.z, 1.0, direction.x,
+            Ray r = {position.x, position.y, position.z, 1.0, direction.x,
                         direction.y, direction.z, en, stokes.x, stokes.y,
-                        stokes.z, stokes.w);
+                        stokes.z, stokes.w, 0.0, 0.0, 0.0, 0.0};
             // Ray(1, 2, 3, 7, 4, 5, 6, 8, 9, 10, 11, 12, 13, 14, 15, 16);
             rayVector.push_back(r);
         }

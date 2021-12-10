@@ -326,7 +326,7 @@ TEST(Tracer, ExpTest) {
     RAYX::RandomRays random = RAYX::RandomRays(low, high);
 
     std::vector<RAYX::Ray> testValues = random.getRays();
-    RAYX::Ray r = RAYX::Ray(glm::dvec3(0, 1, -3), glm::dvec3(PI, 2, 3),
+    RAYX::Ray r = RAYX::Ray::makeRayFrom(glm::dvec3(0, 1, -3), glm::dvec3(PI, 2, 3),
                             glm::dvec4(10, -4.41234, 0, 1.224), 4, 5);
     testValues.push_back(r);
 
@@ -361,7 +361,7 @@ TEST(Tracer, LogTest) {
 
     std::vector<RAYX::Ray> testValues = random.getRays();
     RAYX::Ray r =
-        RAYX::Ray(glm::dvec3(0.1, 1, 0.3), glm::dvec3(PI, 2, 3),
+        RAYX::Ray::makeRayFrom(glm::dvec3(0.1, 1, 0.3), glm::dvec3(PI, 2, 3),
                   glm::dvec4(0.2345, 100, 3.423453, 0.00000001), 2.1, 5);
     testValues.push_back(r);
 
@@ -394,13 +394,13 @@ TEST(Tracer, testRefrac2D) {
     // ray.position = normal at intersection point, ray.direction = direction of
     // ray, ray.weight = weight of ray before refraction
     RAYX::Ray r =
-        RAYX::Ray(glm::dvec3(0, 1, 0),
+        RAYX::Ray::makeRayFrom(glm::dvec3(0, 1, 0),
                   glm::dvec3(0.0001666666635802469, -0.017285764670739875,
                              0.99985057611723738),
                   glm::dvec4(1, 1, 0, 0), 0, 1.0);
     testValues.push_back(r);
     RAYX::Ray c =
-        RAYX::Ray(glm::dvec3(0, 1, 0),
+        RAYX::Ray::makeRayFrom(glm::dvec3(0, 1, 0),
                   glm::dvec3(-0.012664171360811521, 0.021648721107426414,
                              0.99968542634078494),
                   glm::dvec4(1, 1, 0, 0), 0, 1.0);
@@ -419,12 +419,12 @@ TEST(Tracer, testRefrac2D) {
             zeros, zeros, zeros);
     quadrics.push_back(q);
 
-    r = RAYX::Ray(glm::dvec3(0, 1, 0),
+    r = RAYX::Ray::makeRayFrom(glm::dvec3(0, 1, 0),
                   glm::dvec3(0.00049999999722222275, -0.017285762731583675,
                              0.99985046502305308),
                   glm::dvec4(1, 1, 0, 0), 0, 1.0);
     testValues.push_back(r);
-    c = RAYX::Ray(glm::dvec3(0, 1, 0),
+    c = RAYX::Ray::makeRayFrom(glm::dvec3(0, 1, 0),
                   glm::dvec3(0.00049999999722222275, -0.017285762731583675,
                              0.99985046502305308),
                   glm::dvec4(1, 1, 0, 0), 0, 0.0);
@@ -439,12 +439,12 @@ TEST(Tracer, testRefrac2D) {
         zeros, zeros, zeros);
     quadrics.push_back(q);
 
-    r = RAYX::Ray(glm::dvec3(0, 1, 0),
+    r = RAYX::Ray::makeRayFrom(glm::dvec3(0, 1, 0),
                   glm::dvec3(0.0001666666635802469, -0.017619047234249029,
                              0.99984475864845179),
                   glm::dvec4(1, 1, 0, 0), 0, 1.0);
     testValues.push_back(r);
-    c = RAYX::Ray(glm::dvec3(0, 1, 0),
+    c = RAYX::Ray::makeRayFrom(glm::dvec3(0, 1, 0),
                   glm::dvec3(0.0001666666635802469, -0.017619047234249029,
                              0.99984475864845179),
                   glm::dvec4(1, 1, 0, 0), 0, 0.0);
@@ -460,13 +460,13 @@ TEST(Tracer, testRefrac2D) {
     quadrics.push_back(q);
 
     // normal != 0 (spherical RZP)
-    r = RAYX::Ray(glm::dvec3(0.050470500672820856, 0.95514062789960541,
+    r = RAYX::Ray::makeRayFrom(glm::dvec3(0.050470500672820856, 0.95514062789960541,
                              -0.29182033770349547),
                   glm::dvec3(-0.000499999916666667084, -0.016952478247434233,
                              0.99985617139734351),
                   glm::dvec4(1, 1, 0, 0), 0, 1.0);
     testValues.push_back(r);
-    c = RAYX::Ray(glm::dvec3(0.050470500672820856, 0.95514062789960541,
+    c = RAYX::Ray::makeRayFrom(glm::dvec3(0.050470500672820856, 0.95514062789960541,
                              -0.29182033770349547),
                   glm::dvec3(0.080765992839840872, 0.57052382524991363,
                              0.81730007905468893),
@@ -498,44 +498,44 @@ TEST(Tracer, testNormalCartesian) {
 
     // encode: ray.position.x = slopeX, ray.position.z = slopeZ. ray.direction =
     // normal at intersection point from eg quad fct.
-    RAYX::Ray r = RAYX::Ray(glm::dvec3(0, 0, 0), glm::dvec3(0, 1, 0),
+    RAYX::Ray r = RAYX::Ray::makeRayFrom(glm::dvec3(0, 0, 0), glm::dvec3(0, 1, 0),
                             glm::dvec4(1, 1, 0, 0), 0, 0);
     testValues.push_back(r);
     // store correct resulting normal[0:3] in ray.direction and fourth component
     // (normal[3]) in weight case: normal unchanged bc slope = 0
-    RAYX::Ray c = RAYX::Ray(glm::dvec3(0, 0, 0), glm::dvec3(0, 1, 0),
+    RAYX::Ray c = RAYX::Ray::makeRayFrom(glm::dvec3(0, 0, 0), glm::dvec3(0, 1, 0),
                             glm::dvec4(1, 1, 0, 0), 0, 0);
     correct.push_back(c);
 
     // normal != (0,1,0), slope still = 0
-    r = RAYX::Ray(
+    r = RAYX::Ray::makeRayFrom(
         glm::dvec3(0, 0, 0),
         glm::dvec3(5.0465463027123736, 10470.451695989539, -28.532199794465537),
         glm::dvec4(1, 1, 0, 0), 0, 0);
     testValues.push_back(r);
     // normal unchanged
-    c = RAYX::Ray(
+    c = RAYX::Ray::makeRayFrom(
         glm::dvec3(0, 0, 0),
         glm::dvec3(5.0465463027123736, 10470.451695989539, -28.532199794465537),
         glm::dvec4(1, 1, 0, 0), 0, 0.0);
     correct.push_back(c);
 
     // normal = (0,1,0), slopeX = 2, slopeZ = 3
-    r = RAYX::Ray(glm::dvec3(2, 0, 3), glm::dvec3(0, 1, 0),
+    r = RAYX::Ray::makeRayFrom(glm::dvec3(2, 0, 3), glm::dvec3(0, 1, 0),
                   glm::dvec4(1, 1, 0, 0), 0, 0);
     testValues.push_back(r);
-    c = RAYX::Ray(glm::dvec3(2, 0, 3),
+    c = RAYX::Ray::makeRayFrom(glm::dvec3(2, 0, 3),
                   glm::dvec3(-0.90019762973551742, 0.41198224566568298,
                              -0.14112000805986721),
                   glm::dvec4(1, 1, 0, 0), 0, 0);
     correct.push_back(c);
 
-    r = RAYX::Ray(
+    r = RAYX::Ray::makeRayFrom(
         glm::dvec3(2, 0, 3),
         glm::dvec3(5.0465463027123736, 10470.451695989539, -28.532199794465537),
         glm::dvec4(1, 1, 0, 0), 0, 0);
     testValues.push_back(r);
-    c = RAYX::Ray(glm::dvec3(2, 0, 3),
+    c = RAYX::Ray::makeRayFrom(glm::dvec3(2, 0, 3),
                   glm::dvec3(-9431.2371568647086, 4310.7269916467494,
                              -1449.3435640204684),
                   glm::dvec4(1, 1, 0, 0), 0, 0);
@@ -567,44 +567,44 @@ TEST(Tracer, testNormalCylindrical) {
 
     // encode: ray.position.x = slopeX, ray.position.z = slopeZ. ray.direction =
     // normal at intersection point from eg quad fct.
-    RAYX::Ray r = RAYX::Ray(glm::dvec3(0, 0, 0), glm::dvec3(0, 1, 0),
+    RAYX::Ray r = RAYX::Ray::makeRayFrom(glm::dvec3(0, 0, 0), glm::dvec3(0, 1, 0),
                             glm::dvec4(1, 1, 0, 0), 0, 0);
     testValues.push_back(r);
     // store correct resulting normal[0:3] in ray.direction and fourth component
     // (normal[3]) in weight case: normal unchanged bc slope = 0
-    RAYX::Ray c = RAYX::Ray(glm::dvec3(0, 0, 0), glm::dvec3(0, 1, 0),
+    RAYX::Ray c = RAYX::Ray::makeRayFrom(glm::dvec3(0, 0, 0), glm::dvec3(0, 1, 0),
                             glm::dvec4(1, 1, 0, 0), 0, 0);
     correct.push_back(c);
 
     // normal != (0,1,0), slope still = 0
-    r = RAYX::Ray(
+    r = RAYX::Ray::makeRayFrom(
         glm::dvec3(0, 0, 0),
         glm::dvec3(5.0465463027123736, 10470.451695989539, -28.532199794465537),
         glm::dvec4(1, 1, 0, 0), 0, 0);
     testValues.push_back(r);
     // normal slightly unchanged in x (due to limited precision?!)
-    c = RAYX::Ray(
+    c = RAYX::Ray::makeRayFrom(
         glm::dvec3(0, 0, 0),
         glm::dvec3(5.0465463027115769, 10470.451695989539, -28.532199794465537),
         glm::dvec4(1, 1, 0, 0), 0, 0.0);
     correct.push_back(c);
 
     // normal = (0,1,0), slopeX = 2, slopeZ = 3
-    r = RAYX::Ray(glm::dvec3(2, 0, 3), glm::dvec3(0, 1, 0),
+    r = RAYX::Ray::makeRayFrom(glm::dvec3(2, 0, 3), glm::dvec3(0, 1, 0),
                   glm::dvec4(1, 1, 0, 0), 0, 0);
     testValues.push_back(r);
-    c = RAYX::Ray(glm::dvec3(2, 0, 3),
+    c = RAYX::Ray::makeRayFrom(glm::dvec3(2, 0, 3),
                   glm::dvec3(0.90019762973551742, 0.41198224566568292,
                              -0.14112000805986721),
                   glm::dvec4(1, 1, 0, 0), 0, 0);
     correct.push_back(c);
 
-    r = RAYX::Ray(
+    r = RAYX::Ray::makeRayFrom(
         glm::dvec3(2, 0, 3),
         glm::dvec3(5.0465463027123736, 10470.451695989539, -28.532199794465537),
         glm::dvec4(1, 1, 0, 0), 0, 0);
     testValues.push_back(r);
-    c = RAYX::Ray(
+    c = RAYX::Ray::makeRayFrom(
         glm::dvec3(2, 0, 3),
         glm::dvec3(9431.2169472441783, 4310.7711493493844, -1449.3437356459144),
         glm::dvec4(1, 1, 0, 0), 0, 0);
@@ -638,7 +638,7 @@ TEST(Tracer, testRefrac) {
     // encode: ray.position = normal at intersection point. ray.direction =
     // direction of ray, ray.weigth = weight of ray plane surface
     RAYX::Ray r =
-        RAYX::Ray(glm::dvec3(0, 1, 0),
+        RAYX::Ray::makeRayFrom(glm::dvec3(0, 1, 0),
                   glm::dvec3(-0.00049999991666667084, -0.99558611855684065,
                              0.09385110834192622),
                   glm::dvec4(1, 1, 0, 0), 0, 1);
@@ -646,32 +646,32 @@ TEST(Tracer, testRefrac) {
     // store correct resulting weight in c.weight and calculated direction in
     // c.direction
     RAYX::Ray c =
-        RAYX::Ray(glm::dvec3(0, 1, 0),
+        RAYX::Ray::makeRayFrom(glm::dvec3(0, 1, 0),
                   glm::dvec3(-0.00049999991666667084, 0.99667709206767885,
                              0.08145258834192623),
                   glm::dvec4(1, 1, 0, 0), 0, 1);
     correct.push_back(c);
 
-    r = RAYX::Ray(glm::dvec3(0, 1, 0),
+    r = RAYX::Ray::makeRayFrom(glm::dvec3(0, 1, 0),
                   glm::dvec3(-0.000016666664506172893, -0.995586229182718,
                              0.093851118714515264),
                   glm::dvec4(1, 1, 0, 0), 0, 1.0);
     testValues.push_back(r);
-    c = RAYX::Ray(glm::dvec3(0, 1, 0),
+    c = RAYX::Ray::makeRayFrom(glm::dvec3(0, 1, 0),
                   glm::dvec3(-0.000016666664506160693, 0.9966772027014974,
                              0.081452598714515267),
                   glm::dvec4(1, 1, 0, 0), 0, 1.0);
     correct.push_back(c);
 
     // spherical grating, same a
-    r = RAYX::Ray(glm::dvec3(0.0027574667592826954, 0.99999244446428082,
+    r = RAYX::Ray::makeRayFrom(glm::dvec3(0.0027574667592826954, 0.99999244446428082,
                              -0.0027399619384214182),
                   glm::dvec3(-0.00049999991666667084, -0.99558611855684065,
                              0.093851108341926226),
                   glm::dvec4(1, 1, 0, 0), 0, 1);
     testValues.push_back(r);
     // pos does not matter
-    c = RAYX::Ray(glm::dvec3(0.0027574667592826954, 0.99999244446428082,
+    c = RAYX::Ray::makeRayFrom(glm::dvec3(0.0027574667592826954, 0.99999244446428082,
                              -0.0027399619384214182),
                   glm::dvec3(0.0049947959329671825, 0.99709586573547515,
                              0.07599267429701162),
@@ -707,13 +707,13 @@ TEST(Tracer, testRefracBeyondHor) {
     // direction of ray, ray.weigth = weight of ray plane surface beyond horizon
     double a = -0.038483898782123105;
     RAYX::Ray r =
-        RAYX::Ray(glm::dvec3(0.0, 1.0, 0.0),
+        RAYX::Ray::makeRayFrom(glm::dvec3(0.0, 1.0, 0.0),
                   glm::dvec3(-0.99991341437509562, 0.013149667401360443,
                              -0.00049999997222215965),
                   glm::dvec4(1, 1, 0, 0), 0, 1.0);
     testValues.push_back(r);
     RAYX::Ray c =
-        RAYX::Ray(glm::dvec3(0.0, 1.0, 0.0),
+        RAYX::Ray::makeRayFrom(glm::dvec3(0.0, 1.0, 0.0),
                   glm::dvec3(-0.99991341437509562, 0.013149667401360443,
                              -0.00049999997222215965),
                   glm::dvec4(1, 1, 0, 0), 0, 0.0);
@@ -749,36 +749,36 @@ TEST(Tracer, testWasteBox) {
     // ray.weigth = weight of ray before calling wastebox case: intersection
     // point on surface
     RAYX::Ray r =
-        RAYX::Ray(glm::dvec3(-5.0466620698997637, 0, 28.760236725599515),
+        RAYX::Ray::makeRayFrom(glm::dvec3(-5.0466620698997637, 0, 28.760236725599515),
                   glm::dvec3(50, 0, 200), glm::dvec4(0, 0, 0, 0), 0, 1);
     testValues.push_back(r);
     // store correct resulting weight in weight of c
     RAYX::Ray c =
-        RAYX::Ray(glm::dvec3(-5.0466620698997637, 0, 28.760236725599515),
+        RAYX::Ray::makeRayFrom(glm::dvec3(-5.0466620698997637, 0, 28.760236725599515),
                   glm::dvec3(50, 0, 200), glm::dvec4(0, 0, 0, 0), 0, 1);
     correct.push_back(c);
 
     // intersection point not on surface
-    r = RAYX::Ray(glm::dvec3(-5.0466620698997637, 0, 28.760236725599515),
+    r = RAYX::Ray::makeRayFrom(glm::dvec3(-5.0466620698997637, 0, 28.760236725599515),
                   glm::dvec3(5, 0, 20), glm::dvec4(0, 0, 0, 0), 0, 1.0);
     testValues.push_back(r);
-    c = RAYX::Ray(glm::dvec3(-5.0466620698997637, 0, 28.760236725599515),
+    c = RAYX::Ray::makeRayFrom(glm::dvec3(-5.0466620698997637, 0, 28.760236725599515),
                   glm::dvec3(5, 0, 20), glm::dvec4(0, 0, 0, 0), 0, 0.0);
     correct.push_back(c);
 
     // intersection point not on surface
-    r = RAYX::Ray(glm::dvec3(-1.6822205656320104, 0, 28.760233508097873),
+    r = RAYX::Ray::makeRayFrom(glm::dvec3(-1.6822205656320104, 0, 28.760233508097873),
                   glm::dvec3(5, 0, 20), glm::dvec4(0, 0, 0, 0), 0, 1);
     testValues.push_back(r);
-    c = RAYX::Ray(glm::dvec3(-1.6822205656320104, 0, 28.760233508097873),
+    c = RAYX::Ray::makeRayFrom(glm::dvec3(-1.6822205656320104, 0, 28.760233508097873),
                   glm::dvec3(5, 0, 20), glm::dvec4(0, 0, 0, 0), 0, 0);
     correct.push_back(c);
 
     // ray already had weight 0
-    r = RAYX::Ray(glm::dvec3(-5.0466620698997637, 0, 28.760236725599515),
+    r = RAYX::Ray::makeRayFrom(glm::dvec3(-5.0466620698997637, 0, 28.760236725599515),
                   glm::dvec3(50, 0, 200), glm::dvec4(0, 0, 0, 0), 0, 0);
     testValues.push_back(r);
-    c = RAYX::Ray(glm::dvec3(-5.0466620698997637, 0, 28.760236725599515),
+    c = RAYX::Ray::makeRayFrom(glm::dvec3(-5.0466620698997637, 0, 28.760236725599515),
                   glm::dvec3(50, 0, 200), glm::dvec4(0, 0, 0, 0), 0, 0);
     correct.push_back(c);
 
@@ -828,39 +828,39 @@ TEST(Tracer, testRZPLineDensityDefaulParams) {  // point to point
     // encode: ray.position = position of test ray. ray.direction = normal at
     // intersection point.
     RAYX::Ray r =
-        RAYX::Ray(glm::dvec3(-5.0805095016939532, 0, 96.032788311782269),
+        RAYX::Ray::makeRayFrom(glm::dvec3(-5.0805095016939532, 0, 96.032788311782269),
                   glm::dvec3(0, 1, 0), glm::dvec4(0, 0, 0, 0), 0, 0);
     testValues.push_back(r);
     RAYX::Ray c =
-        RAYX::Ray(glm::dvec3(3103.9106911246745, 0, 5.0771666329965663),
+        RAYX::Ray::makeRayFrom(glm::dvec3(3103.9106911246745, 0, 5.0771666329965663),
                   glm::dvec3(0, 0, 0), glm::dvec4(0, 0, 0, 0), 0, 0);
     correct.push_back(c);
 
-    r = RAYX::Ray(glm::dvec3(-1.6935030407867075, 0, 96.032777495754004),
+    r = RAYX::Ray::makeRayFrom(glm::dvec3(-1.6935030407867075, 0, 96.032777495754004),
                   glm::dvec3(0, 1, 0), glm::dvec4(1, 1, 0, 0), 0, 0);
     testValues.push_back(r);
-    c = RAYX::Ray(glm::dvec3(1034.8685185321933, 0, -13.320120179862874),
+    c = RAYX::Ray::makeRayFrom(glm::dvec3(1034.8685185321933, 0, -13.320120179862874),
                   glm::dvec3(0, 0, 0), glm::dvec4(0, 0, 0, 0), 0, 0);
     correct.push_back(c);
 
     // spherical (normal != (0,1,0))
-    r = RAYX::Ray(
+    r = RAYX::Ray::makeRayFrom(
         glm::dvec3(-5.047050067282087, 4.4859372100394515, 29.182033770349552),
         glm::dvec3(0.05047050067282087, 0.95514062789960552,
                    -0.29182033770349552),
         glm::dvec4(1, 1, 0, 0), 0, 0);
     testValues.push_back(r);
-    c = RAYX::Ray(glm::dvec3(4045.0989844091873, 0, -174.20856260487483),
+    c = RAYX::Ray::makeRayFrom(glm::dvec3(4045.0989844091873, 0, -174.20856260487483),
                   glm::dvec3(0, 0, 0), glm::dvec4(0, 0, 0, 0), 0, 0);
     correct.push_back(c);
 
-    r = RAYX::Ray(
+    r = RAYX::Ray::makeRayFrom(
         glm::dvec3(-1.6802365843267262, 1.3759250917712356, 16.445931214643075),
         glm::dvec3(0.016802365843267261, 0.98624074908228765,
                    -0.16445931214643075),
         glm::dvec4(1, 1, 0, 0), 0, 0);
     testValues.push_back(r);
-    c = RAYX::Ray(glm::dvec3(1418.1004208892471, 0, 253.09836635775156),
+    c = RAYX::Ray::makeRayFrom(glm::dvec3(1418.1004208892471, 0, 253.09836635775156),
                   glm::dvec3(0, 0, 0), glm::dvec4(0, 0, 0, 0), 0, 0);
     correct.push_back(c);
 
@@ -911,39 +911,39 @@ TEST(Tracer, testRZPLineDensityAstigmatic) {  // astigmatic 2 astigmatic
     // encode: ray.position = position of test ray. ray.direction = normal at
     // intersection point.
     RAYX::Ray r =
-        RAYX::Ray(glm::dvec3(-5.0805095016939532, 0, 96.032788311782269),
+        RAYX::Ray::makeRayFrom(glm::dvec3(-5.0805095016939532, 0, 96.032788311782269),
                   glm::dvec3(0, 1, 0), glm::dvec4(0, 0, 0, 0), 0, 0);
     testValues.push_back(r);
     RAYX::Ray c =
-        RAYX::Ray(glm::dvec3(3103.9106911246745, 0, 5.0771666329965663),
+        RAYX::Ray::makeRayFrom(glm::dvec3(3103.9106911246745, 0, 5.0771666329965663),
                   glm::dvec3(0, 0, 0), glm::dvec4(0, 0, 0, 0), 0, 0);
     correct.push_back(c);
 
-    r = RAYX::Ray(glm::dvec3(-1.6935030407867075, 0, 96.032777495754004),
+    r = RAYX::Ray::makeRayFrom(glm::dvec3(-1.6935030407867075, 0, 96.032777495754004),
                   glm::dvec3(0, 1, 0), glm::dvec4(0, 0, 0, 0), 0, 0);
     testValues.push_back(r);
-    c = RAYX::Ray(glm::dvec3(1034.8685185321933, 0, -13.320120179862874),
+    c = RAYX::Ray::makeRayFrom(glm::dvec3(1034.8685185321933, 0, -13.320120179862874),
                   glm::dvec3(0, 0, 0), glm::dvec4(0, 0, 0, 0), 0, 0);
     correct.push_back(c);
 
     // spherical (normal != (0,1,0))
-    r = RAYX::Ray(
+    r = RAYX::Ray::makeRayFrom(
         glm::dvec3(-5.047050067282087, 4.4859372100394515, 29.182033770349552),
         glm::dvec3(0.05047050067282087, 0.95514062789960552,
                    -0.29182033770349552),
         glm::dvec4(0, 0, 0, 0), 0, 0);
     testValues.push_back(r);
-    c = RAYX::Ray(glm::dvec3(4045.0989844091873, 0, -174.20856260487483),
+    c = RAYX::Ray::makeRayFrom(glm::dvec3(4045.0989844091873, 0, -174.20856260487483),
                   glm::dvec3(0, 0, 0), glm::dvec4(0, 0, 0, 0), 0, 0);
     correct.push_back(c);
 
-    r = RAYX::Ray(
+    r = RAYX::Ray::makeRayFrom(
         glm::dvec3(-1.6802365843267262, 1.3759250917712356, 16.445931214643075),
         glm::dvec3(0.016802365843267261, 0.98624074908228765,
                    -0.16445931214643075),
         glm::dvec4(0, 0, 0, 0), 0, 0);
     testValues.push_back(r);
-    c = RAYX::Ray(glm::dvec3(1418.1004208892471, 0, 253.09836635775156),
+    c = RAYX::Ray::makeRayFrom(glm::dvec3(1418.1004208892471, 0, 253.09836635775156),
                   glm::dvec3(0, 0, 0), glm::dvec4(0, 0, 0, 0), 0, 0);
     correct.push_back(c);
 
@@ -975,25 +975,25 @@ TEST(Tracer, testRayMatrixMult) {
     std::vector<double> matrix = {1, 2,  3,  4,  5,  6,  7,  8,
                                   9, 10, 11, 12, 13, 14, 15, 16};
 
-    RAYX::Ray r = RAYX::Ray(glm::dvec3(0, 0, 0), glm::dvec3(0, 0, 0),
+    RAYX::Ray r = RAYX::Ray::makeRayFrom(glm::dvec3(0, 0, 0), glm::dvec3(0, 0, 0),
                             glm::dvec4(0, 0, 0, 0), 0, 0);
     testValues.push_back(r);
-    RAYX::Ray c = RAYX::Ray(glm::dvec3(13, 14, 15), glm::dvec3(0, 0, 0),
+    RAYX::Ray c = RAYX::Ray::makeRayFrom(glm::dvec3(13, 14, 15), glm::dvec3(0, 0, 0),
                             glm::dvec4(0, 0, 0, 0), 0, 0);
     correct.push_back(c);
 
-    r = RAYX::Ray(glm::dvec3(1, 1, 0), glm::dvec3(0, 1, 1),
+    r = RAYX::Ray::makeRayFrom(glm::dvec3(1, 1, 0), glm::dvec3(0, 1, 1),
                   glm::dvec4(0, 0, 0, 0), 0, 0);
     testValues.push_back(r);
-    c = RAYX::Ray(glm::dvec3(1 + 5 + 13, 2 + 6 + 14, 3 + 7 + 15),
+    c = RAYX::Ray::makeRayFrom(glm::dvec3(1 + 5 + 13, 2 + 6 + 14, 3 + 7 + 15),
                   glm::dvec3(5 + 9, 6 + 10, 7 + 11), glm::dvec4(0, 0, 0, 0), 0,
                   0);
     correct.push_back(c);
 
-    r = RAYX::Ray(glm::dvec3(1, 2, 3), glm::dvec3(4, 5, 6),
+    r = RAYX::Ray::makeRayFrom(glm::dvec3(1, 2, 3), glm::dvec3(4, 5, 6),
                   glm::dvec4(0, 0, 0, 0), 0, 0);
     testValues.push_back(r);
-    c = RAYX::Ray(
+    c = RAYX::Ray::makeRayFrom(
         glm::dvec3(1 * 1 + 2 * 5 + 3 * 9 + 13, 1 * 2 + 2 * 6 + 3 * 10 + 14,
                    1 * 3 + 2 * 7 + 3 * 11 + 15),
         glm::dvec3(4 * 1 + 5 * 5 + 6 * 9, 4 * 2 + 5 * 6 + 6 * 10,
@@ -1026,45 +1026,45 @@ TEST(Tracer, testDPow) {
     std::vector<RAYX::Ray> testValues;
     std::vector<RAYX::Ray> correct;
 
-    RAYX::Ray r = RAYX::Ray(glm::dvec3(0.0, 0, 0), glm::dvec3(0, 1, -1),
+    RAYX::Ray r = RAYX::Ray::makeRayFrom(glm::dvec3(0.0, 0, 0), glm::dvec3(0, 1, -1),
                             glm::dvec4(0, 0, 0, 0), 0, 0);
     testValues.push_back(r);
-    RAYX::Ray c = RAYX::Ray(glm::dvec3(1, 0, 1), glm::dvec3(0, 0, 0),
+    RAYX::Ray c = RAYX::Ray::makeRayFrom(glm::dvec3(1, 0, 1), glm::dvec3(0, 0, 0),
                             glm::dvec4(0, 0, 0, 0), 0, 0);
     correct.push_back(c);
 
-    r = RAYX::Ray(glm::dvec3(2, 2, 3), glm::dvec3(0, 1, 7),
+    r = RAYX::Ray::makeRayFrom(glm::dvec3(2, 2, 3), glm::dvec3(0, 1, 7),
                   glm::dvec4(0, 0, 0, 0), 0, 0);
     testValues.push_back(r);
-    c = RAYX::Ray(glm::dvec3(1, 2, 2187), glm::dvec3(0, 0, 0),
+    c = RAYX::Ray::makeRayFrom(glm::dvec3(1, 2, 2187), glm::dvec3(0, 0, 0),
                   glm::dvec4(0, 0, 0, 0), 0, 0);
     correct.push_back(c);
 
-    r = RAYX::Ray(glm::dvec3(0, 0, 0), glm::dvec3(4, -4, 2),
+    r = RAYX::Ray::makeRayFrom(glm::dvec3(0, 0, 0), glm::dvec3(4, -4, 2),
                   glm::dvec4(0, 0, 0, 0), 0, 0);
     testValues.push_back(r);
-    c = RAYX::Ray(glm::dvec3(0, 1, 0), glm::dvec3(0, 0, 0),
+    c = RAYX::Ray::makeRayFrom(glm::dvec3(0, 1, 0), glm::dvec3(0, 0, 0),
                   glm::dvec4(0, 0, 0, 0), 0, 0);
     correct.push_back(c);
 
-    r = RAYX::Ray(glm::dvec3(0.2, 19.99 / 2, PI), glm::dvec3(4, 3, 6),
+    r = RAYX::Ray::makeRayFrom(glm::dvec3(0.2, 19.99 / 2, PI), glm::dvec3(4, 3, 6),
                   glm::dvec4(0, 0, 0, 0), 0, 0);
     testValues.push_back(r);
-    c = RAYX::Ray(glm::dvec3(0.0016, 998.50074987499977, 961.38919357530415),
+    c = RAYX::Ray::makeRayFrom(glm::dvec3(0.0016, 998.50074987499977, 961.38919357530415),
                   glm::dvec3(0, 0, 0), glm::dvec4(0, 0, 0, 0), 0, 0);
     correct.push_back(c);
 
-    r = RAYX::Ray(glm::dvec3(-1.0, -1.0, -1.0), glm::dvec3(-4, 3, 0),
+    r = RAYX::Ray::makeRayFrom(glm::dvec3(-1.0, -1.0, -1.0), glm::dvec3(-4, 3, 0),
                   glm::dvec4(0, 0, 0, 0), 0, 0);
     testValues.push_back(r);
-    c = RAYX::Ray(glm::dvec3(1, -1, 1), glm::dvec3(0, 0, 0),
+    c = RAYX::Ray::makeRayFrom(glm::dvec3(1, -1, 1), glm::dvec3(0, 0, 0),
                   glm::dvec4(0, 0, 0, 0), 0, 0);
     correct.push_back(c);
 
-    r = RAYX::Ray(glm::dvec3(-1.0, -1.0, -1.0), glm::dvec3(4, 5, 6),
+    r = RAYX::Ray::makeRayFrom(glm::dvec3(-1.0, -1.0, -1.0), glm::dvec3(4, 5, 6),
                   glm::dvec4(0, 0, 0, 0), 0, 0);
     testValues.push_back(r);
-    c = RAYX::Ray(glm::dvec3(1, -1, 1), glm::dvec3(0, 0, 0),
+    c = RAYX::Ray::makeRayFrom(glm::dvec3(1, -1, 1), glm::dvec3(0, 0, 0),
                   glm::dvec4(0, 0, 0, 0), 0, 0);
     correct.push_back(c);
 
@@ -1093,19 +1093,19 @@ TEST(Tracer, testCosini) {
     RAYX::VulkanTracer tracer;
     std::vector<RAYX::Ray> testValues;
     // phi, psi given in position.x, position.y
-    RAYX::Ray r = RAYX::Ray(glm::dvec3(0, 0, 0), glm::dvec3(0, 0, 0),
+    RAYX::Ray r = RAYX::Ray::makeRayFrom(glm::dvec3(0, 0, 0), glm::dvec3(0, 0, 0),
                             glm::dvec4(0, 0, 0, 0), 0, 0);
     testValues.push_back(r);
-    r = RAYX::Ray(glm::dvec3(1, 1, 0), glm::dvec3(0, 0, 0),
+    r = RAYX::Ray::makeRayFrom(glm::dvec3(1, 1, 0), glm::dvec3(0, 0, 0),
                   glm::dvec4(0, 0, 0, 0), 0, 0);
     testValues.push_back(r);
-    r = RAYX::Ray(glm::dvec3(1, 0, 0), glm::dvec3(0, 0, 0),
+    r = RAYX::Ray::makeRayFrom(glm::dvec3(1, 0, 0), glm::dvec3(0, 0, 0),
                   glm::dvec4(0, 0, 0, 0), 0, 0);
     testValues.push_back(r);
-    r = RAYX::Ray(glm::dvec3(0, 1, 0), glm::dvec3(0, 0, 0),
+    r = RAYX::Ray::makeRayFrom(glm::dvec3(0, 1, 0), glm::dvec3(0, 0, 0),
                   glm::dvec4(0, 0, 0, 0), 0, 0);
     testValues.push_back(r);
-    r = RAYX::Ray(glm::dvec3(PI, PI, 0), glm::dvec3(0, 0, 0),
+    r = RAYX::Ray::makeRayFrom(glm::dvec3(PI, PI, 0), glm::dvec3(0, 0, 0),
                   glm::dvec4(0, 0, 0, 0), 0, 0);
     testValues.push_back(r);
 
@@ -1164,13 +1164,13 @@ TEST(Tracer, factTest) {
 
     RAYX::VulkanTracer tracer;
     std::vector<RAYX::Ray> testValues;
-    RAYX::Ray r = RAYX::Ray(glm::dvec3(0, 1, 2), glm::dvec3(-1, 4, 17),
+    RAYX::Ray r = RAYX::Ray::makeRayFrom(glm::dvec3(0, 1, 2), glm::dvec3(-1, 4, 17),
                             glm::dvec4(10, -4, 12.2, -0), 0,
                             -2);  // glm::dvec4(100, -4, 12.2, -0)
     testValues.push_back(r);
 
     // pos, weight, dir, energy, stokes
-    // RAYX::Ray c = RAYX::Ray(glm::dvec3(1, 1, 2), glm::dvec3(-1, 24,
+    // RAYX::Ray c = RAYX::Ray::makeRayFrom(glm::dvec3(1, 1, 2), glm::dvec3(-1, 24,
     // 355687428096000), glm::dvec4(10, -4, 12.2, -0), 0, -2); //
     // glm::dvec4(100, -4, 12.2, -0)
     std::vector<double> correct = {
@@ -1206,21 +1206,21 @@ TEST(Tracer, bessel1Test) {
     RAYX::VulkanTracer tracer;
     std::vector<RAYX::Ray> testValues;
     std::vector<RAYX::Ray> correct;
-    // RAYX::Ray r = RAYX::Ray(glm::dvec3(-12.123,20.1,100),
+    // RAYX::Ray r = RAYX::Ray::makeRayFrom(glm::dvec3(-12.123,20.1,100),
     // glm::dvec3(20.0,0,23.1), 0);
     RAYX::Ray r =
-        RAYX::Ray(glm::dvec3(-12.123, 20.1, 100), glm::dvec3(20.0, 0, 23.1),
+        RAYX::Ray::makeRayFrom(glm::dvec3(-12.123, 20.1, 100), glm::dvec3(20.0, 0, 23.1),
                   glm::dvec4(0, 0, 0, 0), 0, -0.1);
     testValues.push_back(r);
     RAYX::Ray c =
-        RAYX::Ray(glm::dvec3(0, 0, 0), glm::dvec3(0.066833545658411195, 0, 0),
+        RAYX::Ray::makeRayFrom(glm::dvec3(0, 0, 0), glm::dvec3(0.066833545658411195, 0, 0),
                   glm::dvec4(0, 0, 0, 0), 0, 0);
     correct.push_back(c);
 
-    r = RAYX::Ray(glm::dvec3(12.123, 2, 0.00000001),
+    r = RAYX::Ray::makeRayFrom(glm::dvec3(12.123, 2, 0.00000001),
                   glm::dvec3(19.99, 10.2, PI), glm::dvec4(0, 0, 0, 0), 0, 4);
     testValues.push_back(r);
-    c = RAYX::Ray(glm::dvec3(-0.21368198451302897, 0.57672480775687363, 5e-09),
+    c = RAYX::Ray::makeRayFrom(glm::dvec3(-0.21368198451302897, 0.57672480775687363, 5e-09),
                   glm::dvec3(0.065192988349741882, -0.0066157432977083167,
                              0.28461534317975273),
                   glm::dvec4(0, 0, 0, 0), 0, -0.06604332802354923);
@@ -1250,11 +1250,11 @@ TEST(Tracer, diffractionTest) {
     std::vector<RAYX::Ray> testValues;
     RAYX::Ray r;
     // pos = (iopt,  xlenght, ylength) weight = wavelength
-    // r = RAYX::Ray(glm::dvec3(1, 50,100), glm::dvec3(0.0,0.0,0.0), 0.1);
+    // r = RAYX::Ray::makeRayFrom(glm::dvec3(1, 50,100), glm::dvec3(0.0,0.0,0.0), 0.1);
     // testValues.push_back(r);
     int n = 1;
     for (int i = 0; i < n; i++) {
-        r = RAYX::Ray(glm::dvec3(1, 20, 2), glm::dvec3(0.0, 0.0, 0.0),
+        r = RAYX::Ray::makeRayFrom(glm::dvec3(1, 20, 2), glm::dvec3(0.0, 0.0, 0.0),
                       glm::dvec4(0, 0, 0, 0), 0, 12.39852);
         testValues.push_back(r);
     }
@@ -1304,10 +1304,10 @@ TEST(Tracer, TrigTest) {
     RAYX::RandomRays random = RAYX::RandomRays(low, high);
 
     std::vector<RAYX::Ray> testValues = random.getRays();
-    RAYX::Ray r = RAYX::Ray(glm::dvec3(0, 1, 0), glm::dvec3(1, 0, 1),
+    RAYX::Ray r = RAYX::Ray::makeRayFrom(glm::dvec3(0, 1, 0), glm::dvec3(1, 0, 1),
                             glm::dvec4(1, -1, -1, 0), -1, 1);
     testValues.push_back(r);
-    r = RAYX::Ray(glm::dvec3(PI, PI, PI), glm::dvec3(PI, PI, PI),
+    r = RAYX::Ray::makeRayFrom(glm::dvec3(PI, PI, PI), glm::dvec3(PI, PI, PI),
                   glm::dvec4(1, 1, 0, 0), 0, PI);
     testValues.push_back(r);
     double settings = 1;
@@ -1425,20 +1425,20 @@ TEST(Tracer, vlsGratingTest) {
     // encode vls parameters in ray direction and position, a =
     // wl*linedensity*ord*1.e-6 is given as well (in weight of ray)
     RAYX::Ray r =
-        RAYX::Ray(glm::dvec3(0.0, 0.0, 0.0), glm::dvec3(0.0, 0.0, 0.0),
+        RAYX::Ray::makeRayFrom(glm::dvec3(0.0, 0.0, 0.0), glm::dvec3(0.0, 0.0, 0.0),
                   glm::dvec4(1, 1, 0, 0), z, a);
     testValues.push_back(r);
     // a should remain unchanged if all vls parameters are 0
     RAYX::Ray c =
-        RAYX::Ray(glm::dvec3(0.0, 0.0, 0.0), glm::dvec3(0.0, 0.0, 0.0),
+        RAYX::Ray::makeRayFrom(glm::dvec3(0.0, 0.0, 0.0), glm::dvec3(0.0, 0.0, 0.0),
                   glm::dvec4(1, 1, 0, 0), z, a);
     correct.push_back(c);
 
     // use some vls values and compare with A calculated by old ray UI
-    r = RAYX::Ray(glm::dvec3(1, 2, 3), glm::dvec3(4, 5, 6),
+    r = RAYX::Ray::makeRayFrom(glm::dvec3(1, 2, 3), glm::dvec3(4, 5, 6),
                   glm::dvec4(1, 1, 0, 0), z, a);
     testValues.push_back(r);
-    c = RAYX::Ray(glm::dvec3(1, 2, 3), glm::dvec3(4, 5, 6),
+    c = RAYX::Ray::makeRayFrom(glm::dvec3(1, 2, 3), glm::dvec3(4, 5, 6),
                   glm::dvec4(1, 1, 0, 0), z, 9497.479959611925);
     correct.push_back(c);
 
@@ -1471,65 +1471,65 @@ TEST(Tracer, planeRefracTest) {
     // normal (always 0,1,0) encoded in ray position, a encoded in direction.x,
     // direction.y and direction.z are actual ray directions
     RAYX::Ray r =
-        RAYX::Ray(glm::dvec3(0.0, 1.0, 0.0),
+        RAYX::Ray::makeRayFrom(glm::dvec3(0.0, 1.0, 0.0),
                   glm::dvec3(0, -0.99558611855684065, 0.09385110834192662),
                   glm::dvec4(1, 1, 0, 0), 0, 0.01239852);
     testValues.push_back(r);
     RAYX::Ray c =
-        RAYX::Ray(glm::dvec3(0.0, 1.0, 0.0),
+        RAYX::Ray::makeRayFrom(glm::dvec3(0.0, 1.0, 0.0),
                   glm::dvec3(0, 0.99667709206767885, 0.08145258834192623),
                   glm::dvec4(1, 1, 0, 0), 0, 0.01239852);
     correct.push_back(c);
 
-    r = RAYX::Ray(
+    r = RAYX::Ray::makeRayFrom(
         glm::dvec3(0.0, 1.0, 0.0),
         glm::dvec3(0.01239852, -0.99558611855684065, 0.09385110834192662),
         glm::dvec4(1, 1, 0, 0), 0, 0.01239852);
     testValues.push_back(r);
-    c = RAYX::Ray(
+    c = RAYX::Ray::makeRayFrom(
         glm::dvec3(0.0, 1.0, 0.0),
         glm::dvec3(0.01239852, 0.99667709206767885, 0.08145258834192623),
         glm::dvec4(1, 1, 0, 0), 0, 0.01239852);
     correct.push_back(c);
 
-    r = RAYX::Ray(
+    r = RAYX::Ray::makeRayFrom(
         glm::dvec3(0.0, 1.0, 0.0),
         glm::dvec3(0.01239852, -0.99567947186812988, 0.0928554753392902),
         glm::dvec4(1, 1, 0, 0), 0, 0.01239852);
     testValues.push_back(r);
-    c = RAYX::Ray(
+    c = RAYX::Ray::makeRayFrom(
         glm::dvec3(0.0, 1.0, 0.0),
         glm::dvec3(0.01239852, 0.99675795875308415, 0.080456955339290204),
         glm::dvec4(1, 1, 0, 0), 0, 0.01239852);
     correct.push_back(c);
 
-    r = RAYX::Ray(
+    r = RAYX::Ray::makeRayFrom(
         glm::dvec3(0.0, 1.0, 0.0),
         glm::dvec3(0.01239852, -0.99567947186812988, 0.0928554753392902),
         glm::dvec4(1, 1, 0, 0), 0, 0.01239852);
     testValues.push_back(r);
-    c = RAYX::Ray(
+    c = RAYX::Ray::makeRayFrom(
         glm::dvec3(0.0, 1.0, 0.0),
         glm::dvec3(0.01239852, 0.99675795875308415, 0.080456955339290204),
         glm::dvec4(1, 1, 0, 0), 0, 0.01239852);
     correct.push_back(c);
 
-    r = RAYX::Ray(glm::dvec3(0, 1, 0),
+    r = RAYX::Ray::makeRayFrom(glm::dvec3(0, 1, 0),
                   glm::dvec3(-0.0004999999166666, -0.99558611855684065,
                              0.093851108341926226),
                   glm::dvec4(1, 1, 0, 0), 0, 0.01239852);
-    c = RAYX::Ray(glm::dvec3(0, 1, 0),
+    c = RAYX::Ray::makeRayFrom(glm::dvec3(0, 1, 0),
                   glm::dvec3(-0.0004999999166666, 0.99667709206767885,
                              0.08145258834192623),
                   glm::dvec4(1, 1, 0, 0), 0, 0.01239852);
     testValues.push_back(r);
     correct.push_back(c);
 
-    r = RAYX::Ray(glm::dvec3(0, 1, 0),
+    r = RAYX::Ray::makeRayFrom(glm::dvec3(0, 1, 0),
                   glm::dvec3(-0.0004999999166666, -0.995586229182718,
                              0.093851118714515264),
                   glm::dvec4(1, 1, 0, 0), 0, 0.01239852);
-    c = RAYX::Ray(glm::dvec3(0, 1, 0),
+    c = RAYX::Ray::makeRayFrom(glm::dvec3(0, 1, 0),
                   glm::dvec3(-0.0004999999166666, 0.9966772027014974,
                              0.081452598714515267),
                   glm::dvec4(1, 1, 0, 0), 0, 0.01239852);
@@ -1562,12 +1562,12 @@ TEST(Tracer, iteratToTest) {
     // normal (always 0,1,0) encoded in ray position, a encoded in direction.x,
     // direction.y and direction.z are actual ray directions
     RAYX::Ray r =
-        RAYX::Ray(glm::dvec3(-0.0175, 1736.4751598838836, -9848.1551798768887),
+        RAYX::Ray::makeRayFrom(glm::dvec3(-0.0175, 1736.4751598838836, -9848.1551798768887),
                   glm::dvec3(-0.00026923073232438285, -0.17315574581145807,
                              0.984894418304465),
                   glm::dvec4(1, 1, 0, 0), 1.0, 100);
     RAYX::Ray c =
-        RAYX::Ray(glm::dvec3(-2.7173752216893443, 0.050407875158271054,
+        RAYX::Ray::makeRayFrom(glm::dvec3(-2.7173752216893443, 0.050407875158271054,
                              28.473736158432885),
                   glm::dvec3(-0.00026923073232438285, -0.17315574581145807,
                              0.984894418304465),
@@ -1602,12 +1602,12 @@ TEST(Tracer, getThetaTest) {
     double settings = 21;
 
     RAYX::Ray r =
-        RAYX::Ray(glm::dvec3(0, 1, 0),
+        RAYX::Ray::makeRayFrom(glm::dvec3(0, 1, 0),
                   glm::dvec3(-0.00049999997222222275, -0.17381228817387082,
                              0.98477867487054738),
                   glm::dvec4(1, 1, 0, 0), 1.0, 100);
     RAYX::Ray c =
-        RAYX::Ray(glm::dvec3(0, 1, 0),
+        RAYX::Ray::makeRayFrom(glm::dvec3(0, 1, 0),
                   glm::dvec3(-0.00049999997222222275, -0.17381228817387082,
                              0.98477867487054738),
                   glm::dvec4(1, 1, 0, 0), 1.0, 1.3960967569703167);

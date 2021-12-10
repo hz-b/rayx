@@ -36,7 +36,6 @@ SET(SOURCE
     src/Model/Surface/Surface.cpp
     src/Model/Geometry/Geometry.cpp
     src/Tracer/RayList.cpp
-    src/Tracer/Ray.cpp
     src/Tracer/TracerInterface.cpp
     src/Tracer/Vulkan/VulkanTracer.cpp
     src/UserParameter/WorldUserParams.cpp

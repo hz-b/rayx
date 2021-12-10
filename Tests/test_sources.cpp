@@ -82,8 +82,8 @@ TEST(RayTest, test1) {
     double order = 3;
     double lastElement = 4;
     double extraParam = 7;
-    RAYX::Ray r(x, y, z, xdir, ydir, zdir, s0, s1, s2, s3, energy, weight,
-                pathLength, order, lastElement, extraParam);
+    RAYX::Ray r{x, y, z, weight, xdir, ydir, zdir, energy, s0, s1, s2, s3,
+                pathLength, order, lastElement, extraParam};
     EXPECT_EQ(r.getxPos(), x);
     EXPECT_EQ(r.getyPos(), y);
     EXPECT_EQ(r.getzPos(), z);
@@ -118,8 +118,7 @@ TEST(RayTest, testDefaultValues) {
     double s1 = 1;
     double s2 = 0;
     double s3 = 0;
-    RAYX::Ray r =
-        RAYX::Ray(x, y, z, xdir, ydir, zdir, s0, s1, s2, s3, energy, weight);
+    RAYX::Ray r{x, y, z, weight, xdir, ydir, zdir, energy, s0, s1, s2, s3, 0, 0, 0, 0};
     EXPECT_EQ(r.getxPos(), x);
     EXPECT_EQ(r.getyPos(), y);
     EXPECT_EQ(r.getzPos(), z);

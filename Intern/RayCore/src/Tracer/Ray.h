@@ -1,45 +1,38 @@
 #pragma once
-#pragma pack(16)
+#pragma pack(8)
 
 #include <glm.hpp>
 
 #include "Core.h"
 
 namespace RAYX {
-class RAYX_API Ray {
-  public:
-    // ctor
-    Ray(Ray const&) = default;
-    Ray(double* location);
-
-    Ray(double xpos, double ypos, double zpos, double weight, double xdir,
-        double ydir, double zdir, double en, double s0, double s1, double s2,
-        double s3, double pathLength = 0, double order = 0,
-        double lastElement = 0, double extraParameter = 0);
-    Ray(glm::dvec3 pos, glm::dvec3 dir, glm::dvec4 stokes, double energy,
-        double weight, double pathLength = 0, double order = 0,
-        double lastElement = 0, double extraParameter = 0);
-    // default ctor
-    Ray();
-    // dtor
-    ~Ray();
-
-    double getxDir() const;
-    double getyDir() const;
-    double getzDir() const;
-    double getxPos() const;
-    double getyPos() const;
-    double getzPos() const;
-    double getEnergy() const;
-    double getWeight() const;
-    double getS0() const;
-    double getS1() const;
-    double getS2() const;
-    double getS3() const;
-    double getPathLength() const;
-    double getOrder() const;
-    double getLastElement() const;
-    double getExtraParam() const;
+struct RAYX_API Ray {
+    static Ray makeRayFrom(const glm::vec3& origin, const glm::vec3& direction, const glm::vec4& stokes, const double energy, const double weight) {
+        Ray ray;
+        ray.m_position = {origin.x, origin.y, origin.z};
+        ray.m_direction = {direction.x, direction.y, direction.z};
+        ray.m_stokes = {stokes.x, stokes.y, stokes.z, stokes.w};
+        ray.m_energy = energy;
+        ray.m_weight = weight;
+        return ray;
+    }
+    // TODO(Jannis): remove
+    double getxDir() const { return m_direction.x; }
+    double getyDir() const { return m_direction.y; }
+    double getzDir() const { return m_direction.z; }
+    double getxPos() const { return m_position.x; }
+    double getyPos() const { return m_position.y; }
+    double getzPos() const { return m_position.z; }
+    double getEnergy() const { return m_energy; }
+    double getWeight() const { return m_weight; }
+    double getS0() const { return m_stokes.x; }
+    double getS1() const { return m_stokes.y; }
+    double getS2() const { return m_stokes.z; }
+    double getS3() const { return m_stokes.w; }
+    double getPathLength() const { return m_pathLength; }
+    double getOrder() const { return m_order; }
+    double getLastElement() const { return m_lastElement; }
+    double getExtraParam() const { return m_extraParam; }
 
     struct vec3 {
         double x, y, z;
