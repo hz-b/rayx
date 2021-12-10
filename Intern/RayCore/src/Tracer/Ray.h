@@ -9,6 +9,9 @@ namespace RAYX {
 class RAYX_API Ray {
   public:
     // ctor
+    Ray(Ray const&) = default;
+    Ray(double* location);
+
     Ray(double xpos, double ypos, double zpos, double weight, double xdir,
         double ydir, double zdir, double en, double s0, double s1, double s2,
         double s3, double pathLength = 0, double order = 0,
@@ -16,7 +19,6 @@ class RAYX_API Ray {
     Ray(glm::dvec3 pos, glm::dvec3 dir, glm::dvec4 stokes, double energy,
         double weight, double pathLength = 0, double order = 0,
         double lastElement = 0, double extraParameter = 0);
-    Ray(double* location);
     // default ctor
     Ray();
     // dtor
