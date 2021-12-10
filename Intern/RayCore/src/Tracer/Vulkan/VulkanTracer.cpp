@@ -3,6 +3,8 @@
 #include <chrono>
 #include <cmath>
 
+#include "Debug/Instrumentor.h"
+
 #ifdef RAYX_PLATFORM_WINDOWS
 #include "GFSDK_Aftermath.h"
 #endif
@@ -51,6 +53,7 @@ VkResult CreateDebugUtilsMessengerEXT(
     VkInstance instance, const VkDebugUtilsMessengerCreateInfoEXT* pCreateInfo,
     const VkAllocationCallbacks* pAllocator,
     VkDebugUtilsMessengerEXT* pDebugMessenger) {
+    RAYX_PROFILE_FUNCTION();
     auto func = (PFN_vkCreateDebugUtilsMessengerEXT)vkGetInstanceProcAddr(
         instance, "vkCreateDebugUtilsMessengerEXT");
     if (func != nullptr) {
@@ -64,6 +67,7 @@ VkResult CreateDebugUtilsMessengerEXT(
 void DestroyDebugUtilsMessengerEXT(VkInstance instance,
                                    VkDebugUtilsMessengerEXT debugMessenger,
                                    const VkAllocationCallbacks* pAllocator) {
+    RAYX_PROFILE_FUNCTION();
     auto func = (PFN_vkDestroyDebugUtilsMessengerEXT)vkGetInstanceProcAddr(
         instance, "vkDestroyDebugUtilsMessengerEXT");
     if (func != nullptr) {
@@ -74,6 +78,7 @@ void DestroyDebugUtilsMessengerEXT(VkInstance instance,
 /* Function is used to start the Vulkan tracer
  */
 void VulkanTracer::run() {
+    RAYX_PROFILE_FUNCTION();
     const clock_t begin_time = clock();
     std::cout << "[VK]: Starting Vulkan Tracer.. \n";
     // std::cout << "[VK]: Amount of Rays: " << numberOfRays << std::endl; //
@@ -126,6 +131,7 @@ void VulkanTracer::run() {
 
 // function for initializing vulkan
 void VulkanTracer::initVulkan() {
+    RAYX_PROFILE_FUNCTION();
     // a vulkan instance is created
     createInstance();
 
@@ -162,6 +168,7 @@ void VulkanTracer::initVulkan() {
 }
 
 void VulkanTracer::mainLoop() {
+    RAYX_PROFILE_FUNCTION();
     const clock_t begin_time = clock();
     runCommandBuffer();
     std::cout << "[VK]: CommandBuffer, run time: "
@@ -170,7 +177,9 @@ void VulkanTracer::mainLoop() {
 }
 
 void VulkanTracer::cleanup() {
-    vkFreeCommandBuffers(device, commandPool, 1, &commandBuffer);
+    RAYX_PROFILE_FUNCTION();
+
+    /*vkFreeCommandBuffers(device, commandPool, 1, &commandBuffer);
     vkDestroyPipeline(device, pipeline, nullptr);
     vkDestroyPipelineLayout(device, pipelineLayout, nullptr);
     vkDestroyDescriptorPool(device, descriptorPool, nullptr);
@@ -185,9 +194,11 @@ void VulkanTracer::cleanup() {
     if (enableValidationLayers) {
         DestroyDebugUtilsMessengerEXT(instance, debugMessenger, nullptr);
     }
-    vkDestroyInstance(instance, nullptr);
+    vkDestroyInstance(instance, nullptr);*/
 }
+
 void VulkanTracer::createInstance() {
+    RAYX_PROFILE_FUNCTION();
     // validation layers are used for debugging
     if (enableValidationLayers && !checkValidationLayerSupport()) {
         throw std::runtime_error(
@@ -234,6 +245,7 @@ void VulkanTracer::createInstance() {
 }
 void VulkanTracer::populateDebugMessengerCreateInfo(
     VkDebugUtilsMessengerCreateInfoEXT& createInfo) {
+    RAYX_PROFILE_FUNCTION();
     createInfo = {};
     createInfo.sType = VK_STRUCTURE_TYPE_DEBUG_UTILS_MESSENGER_CREATE_INFO_EXT;
     createInfo.messageSeverity =
@@ -246,6 +258,7 @@ void VulkanTracer::populateDebugMessengerCreateInfo(
     createInfo.pfnUserCallback = debugCallback;
 }
 void VulkanTracer::setupDebugMessenger() {
+    RAYX_PROFILE_FUNCTION();
     if (!enableValidationLayers) return;
 
     VkDebugUtilsMessengerCreateInfoEXT createInfo;
@@ -257,6 +270,7 @@ void VulkanTracer::setupDebugMessenger() {
     }
 }
 std::vector<const char*> VulkanTracer::getRequiredExtensions() {
+    RAYX_PROFILE_FUNCTION();
     std::vector<const char*> extensions;
 
     if (enableValidationLayers) {
@@ -269,6 +283,7 @@ std::vector<const char*> VulkanTracer::getRequiredExtensions() {
 // Currently returns a  std::vector<const char*>
 // Can be further enhanced for propoer Window output with glfw.
 std::vector<const char*> VulkanTracer::getRequiredDeviceExtensions() {
+    RAYX_PROFILE_FUNCTION();
     std::vector<const char*> extensions;
 
     // if (enableValidationLayers)
@@ -283,6 +298,7 @@ VKAPI_ATTR VkBool32 VKAPI_CALL VulkanTracer::debugCallback(
     [[maybe_unused]] VkDebugUtilsMessageTypeFlagsEXT messageType,
     const VkDebugUtilsMessengerCallbackDataEXT* pCallbackData,
     [[maybe_unused]] void* pUserData) {
+    RAYX_PROFILE_FUNCTION();
     // Only show Warnings or higher severity bits
     if (messageSeverity >= VK_DEBUG_UTILS_MESSAGE_SEVERITY_WARNING_BIT_EXT) {
         std::cerr << "[VK](ValidationLayer!): " << pCallbackData->pMessage
@@ -294,6 +310,7 @@ VKAPI_ATTR VkBool32 VKAPI_CALL VulkanTracer::debugCallback(
 
 // Checks if all validation layers are supported.
 bool VulkanTracer::checkValidationLayerSupport() {
+    RAYX_PROFILE_FUNCTION();
     uint32_t layerCount;
     vkEnumerateInstanceLayerProperties(&layerCount, nullptr);
 
@@ -317,6 +334,7 @@ bool VulkanTracer::checkValidationLayerSupport() {
 
 // physical device for computation is chosen
 void VulkanTracer::pickPhysicalDevice() {
+    RAYX_PROFILE_FUNCTION();
     // search for devices
     uint32_t deviceCount = 0;
     vkEnumeratePhysicalDevices(instance, &deviceCount, nullptr);
@@ -353,6 +371,7 @@ void VulkanTracer::pickPhysicalDevice() {
 // checks if given device is suitable for computation
 // can be extended later if more specific features are needed
 bool VulkanTracer::isDeviceSuitable(VkPhysicalDevice device) {
+    RAYX_PROFILE_FUNCTION();
     // get device properties
     VkPhysicalDeviceProperties deviceProperties;
     vkGetPhysicalDeviceProperties(device, &deviceProperties);
@@ -368,6 +387,7 @@ bool VulkanTracer::isDeviceSuitable(VkPhysicalDevice device) {
 
 // Giving scores to each Physical Device
 int VulkanTracer::rateDevice(VkPhysicalDevice device) {
+    RAYX_PROFILE_FUNCTION();
     VkPhysicalDeviceProperties deviceProperties;
     vkGetPhysicalDeviceProperties(device, &deviceProperties);
 
@@ -382,6 +402,7 @@ int VulkanTracer::rateDevice(VkPhysicalDevice device) {
 
 VulkanTracer::QueueFamilyIndices VulkanTracer::findQueueFamilies(
     VkPhysicalDevice device) {
+    RAYX_PROFILE_FUNCTION();
     QueueFamilyIndices indices;
     indices.hasvalue = 0;
     uint32_t queueFamilyCount = 0;
@@ -406,6 +427,7 @@ VulkanTracer::QueueFamilyIndices VulkanTracer::findQueueFamilies(
 
 // creates a logical device to communicate with the physical device
 void VulkanTracer::createLogicalDevice() {
+    RAYX_PROFILE_FUNCTION();
     QueueFamilyIndices indices = findQueueFamilies(physicalDevice);
 
     // create info about the device queues
@@ -451,6 +473,7 @@ void VulkanTracer::createLogicalDevice() {
 // find memory type with desired properties.
 uint32_t VulkanTracer::findMemoryType(uint32_t memoryTypeBits,
                                       VkMemoryPropertyFlags properties) {
+    RAYX_PROFILE_FUNCTION();
     VkPhysicalDeviceMemoryProperties memoryProperties;
 
     vkGetPhysicalDeviceMemoryProperties(physicalDevice, &memoryProperties);
@@ -470,6 +493,7 @@ uint32_t VulkanTracer::findMemoryType(uint32_t memoryTypeBits,
 }
 
 void VulkanTracer::createBuffers() {
+    RAYX_PROFILE_FUNCTION();
     // Ray Buffer
     createBuffer(
         bufferSizes[0],
@@ -504,6 +528,7 @@ void VulkanTracer::createBuffer(VkDeviceSize size, VkBufferUsageFlags usage,
                                 VkMemoryPropertyFlags properties,
                                 VkBuffer& buffer,
                                 VkDeviceMemory& bufferMemory) {
+    RAYX_PROFILE_FUNCTION();
     VkBufferCreateInfo bufferCreateInfo = {};
     bufferCreateInfo.sType = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO;
     bufferCreateInfo.size = size;
@@ -534,6 +559,7 @@ void VulkanTracer::createBuffer(VkDeviceSize size, VkBufferUsageFlags usage,
 }
 
 void VulkanTracer::fillRayBuffer() {
+    RAYX_PROFILE_FUNCTION();
     uint32_t bytesNeeded =
         numberOfRays * VULKANTRACER_RAY_DOUBLE_AMOUNT * sizeof(double);
     uint32_t numberOfStagingBuffers =
@@ -571,6 +597,7 @@ void VulkanTracer::fillStagingBuffer(
     std::list<std::vector<Ray>>::iterator raySetIterator,
     size_t vectorsPerStagingBuffer)  // TODO is it okay that offset is unused?
 {
+    RAYX_PROFILE_FUNCTION();
     // data is copied to the buffer
     void* data;
     vkMapMemory(device, bufferMemories[3], 0, bufferSizes[3], 0, &data);
@@ -612,6 +639,7 @@ void VulkanTracer::fillStagingBuffer(
 
 void VulkanTracer::copyToRayBuffer(uint32_t offset,
                                    uint32_t numberOfBytesToCopy) {
+    RAYX_PROFILE_FUNCTION();
     VkCommandBufferAllocateInfo allocInfo{};
     allocInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
     allocInfo.level = VK_COMMAND_BUFFER_LEVEL_PRIMARY;
@@ -649,6 +677,7 @@ void VulkanTracer::copyToRayBuffer(uint32_t offset,
 }
 void VulkanTracer::copyToOutputBuffer(uint32_t offset,
                                       uint32_t numberOfBytesToCopy) {
+    RAYX_PROFILE_FUNCTION();
     VkCommandBufferAllocateInfo allocInfo{};
     allocInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
     allocInfo.level = VK_COMMAND_BUFFER_LEVEL_PRIMARY;
@@ -684,6 +713,7 @@ void VulkanTracer::copyToOutputBuffer(uint32_t offset,
     vkFreeCommandBuffers(device, commandPool, 1, &commandBuffer);
 }
 void VulkanTracer::getRays() {
+    RAYX_PROFILE_FUNCTION();
     std::cout << "[VK]: Debug Info: m_RayList.size(): " << rayList.size()
               << std::endl;
     // reserve enough data for all the rays
@@ -789,6 +819,7 @@ void VulkanTracer::getRays() {
 
 // the quad buffer is filled with the quadric data
 void VulkanTracer::fillQuadricBuffer() {
+    RAYX_PROFILE_FUNCTION();
     std::cout << "[VK]: Filling QuadricBuffer.." << std::endl;
     // data is copied to the buffer
     void* data;
@@ -808,6 +839,7 @@ void VulkanTracer::fillQuadricBuffer() {
     vkUnmapMemory(device, bufferMemories[2]);
 }
 void VulkanTracer::createDescriptorSetLayout() {
+    RAYX_PROFILE_FUNCTION();
     /*
     Here we specify a descriptor set layout. This allows us to bind our
     descriptors to resources in the shader.
@@ -844,6 +876,7 @@ void VulkanTracer::createDescriptorSetLayout() {
 }
 
 void VulkanTracer::createDescriptorSet() {
+    RAYX_PROFILE_FUNCTION();
     /*
     one descriptor for each buffer
     */
@@ -922,6 +955,7 @@ void VulkanTracer::createDescriptorSet() {
 // Read file into array of bytes, and cast to uint32_t*, then return.
 // The data has been padded, so that it fits into an array uint32_t.
 uint32_t* VulkanTracer::readFile(uint32_t& length, const char* filename) {
+    RAYX_PROFILE_FUNCTION();
     FILE* fp = fopen(filename, "rb");
     if (fp == NULL) {
         printf("Could not find or open file: %s\n", filename);
@@ -949,6 +983,7 @@ uint32_t* VulkanTracer::readFile(uint32_t& length, const char* filename) {
 }
 
 void VulkanTracer::createComputePipeline() {
+    RAYX_PROFILE_FUNCTION();
     /*
     We create a compute pipeline here.
     */
@@ -1010,6 +1045,7 @@ void VulkanTracer::createComputePipeline() {
 }
 
 void VulkanTracer::createCommandPool() {
+    RAYX_PROFILE_FUNCTION();
     /*
     In order to send commands to the device(GPU),
     we must first record commands into a command buffer.
@@ -1027,6 +1063,7 @@ void VulkanTracer::createCommandPool() {
 }
 
 void VulkanTracer::createCommandBuffer() {
+    RAYX_PROFILE_FUNCTION();
     std::cout << "[VK]: Creating commandBuffer.." << std::endl;
     /*
     Now allocate a command buffer from the command pool.
@@ -1085,6 +1122,7 @@ void VulkanTracer::createCommandBuffer() {
 }
 
 void VulkanTracer::runCommandBuffer() {
+    RAYX_PROFILE_FUNCTION();
     /*
     Now we shall finally submit the recorded command buffer to a queue.
     */
@@ -1123,6 +1161,7 @@ void VulkanTracer::runCommandBuffer() {
 void VulkanTracer::setBeamlineParameters(uint32_t inNumberOfBeamlines,
                                          uint32_t inNumberOfQuadricsPerBeamline,
                                          uint32_t inNumberOfRays) {
+    RAYX_PROFILE_FUNCTION();
     std::cout << "[VK]: Setting Beamline Parameters: \n\tNumber of beamlines: "
               << inNumberOfRays << "\n\tNumber of Quadrics/Beamline: "
               << inNumberOfQuadricsPerBeamline
@@ -1141,6 +1180,7 @@ void VulkanTracer::setBeamlineParameters(uint32_t inNumberOfBeamlines,
 }
 
 void VulkanTracer::addRayVector(void* location, size_t size) {
+    RAYX_PROFILE_FUNCTION();
     // std::vector<Ray> newRayVector;
     // std::cout << "1" << std::endl;
     // newRayVector.resize(size);
@@ -1162,6 +1202,7 @@ void VulkanTracer::addVectors(const std::vector<double>& surfaceParams,
                               const std::vector<double>& inputOutMatrix,
                               const std::vector<double>& objectParameters,
                               const std::vector<double>& elementParameters) {
+    RAYX_PROFILE_FUNCTION();
     assert(surfaceParams.size() == 16 && inputInMatrix.size() == 16 &&
            inputOutMatrix.size() == 16 && objectParameters.size() == 16 &&
            elementParameters.size() == 16);
@@ -1179,6 +1220,7 @@ void VulkanTracer::addVectors(const std::vector<double>& surfaceParams,
     // Possibility to use utils/movingAppend
 }
 void VulkanTracer::divideAndSortRays() {
+    RAYX_PROFILE_FUNCTION();
     for (auto i = rayList.begin(); i != rayList.end(); i++) {
     }
 }
@@ -1192,6 +1234,7 @@ VulkanTracer::getOutputIteratorEnd() {
 }
 // is not used anymore
 int VulkanTracer::main() {
+    RAYX_PROFILE_FUNCTION();
     VulkanTracer app;
 
     try {
