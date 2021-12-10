@@ -18,14 +18,13 @@ class RAYX_API Cylinder : public OpticalElement {
 
   private:
     // user params:
-    double m_radius;                 // Radius
     CYLINDER_DIRECTION m_direction;  // Cylinder in z-/x- Direction
+    double m_radius;                 // Radius
 
     double m_incidence;
     double m_entranceArmLength;
     double m_exitArmLength;
 
-    double m_a11;
     double m_a11;  // paramters for quadric equation
     double m_a33;
     double m_a24;
