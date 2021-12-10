@@ -1,5 +1,5 @@
 #pragma once
-#pragma pack(8)
+#pragma pack(16)
 
 #include <glm.hpp>
 
@@ -7,13 +7,17 @@
 
 namespace RAYX {
 struct RAYX_API Ray {
-    static Ray makeRayFrom(const glm::vec3& origin, const glm::vec3& direction, const glm::vec4& stokes, const double energy, const double weight) {
+    static Ray makeRayFrom(const glm::dvec3& origin, const glm::dvec3& direction, const glm::dvec4& stokes, const double energy, const double weight) {
         Ray ray;
         ray.m_position = {origin.x, origin.y, origin.z};
         ray.m_direction = {direction.x, direction.y, direction.z};
         ray.m_stokes = {stokes.x, stokes.y, stokes.z, stokes.w};
         ray.m_energy = energy;
         ray.m_weight = weight;
+        ray.m_pathLength = 0.0;
+        ray.m_order = 0.0;
+        ray.m_lastElement = 0.0;
+        ray.m_extraParam = 0.0;
         return ray;
     }
     // TODO(Jannis): remove
