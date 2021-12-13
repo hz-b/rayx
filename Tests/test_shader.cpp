@@ -1821,6 +1821,37 @@ TEST(Tracer, amplitudeTest) {
     compareFromCorrect(correct, outputRays, tolerance);
 }
 
+TEST(Tracer, palikTest) {
+    if (!shouldDoVulkanTests()) {
+        GTEST_SKIP();
+    }
+
+    std::vector<RAYX::Ray> testValues;
+    testValues.push_back(RAYX::Ray());
+
+    double settings = 26;
+
+    std::shared_ptr<RAYX::OpticalElement> q =
+        std::make_shared<RAYX::OpticalElement>(
+            "palikTest",
+            std::vector<double>{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, settings,
+                                0, 0},
+            zeros, zeros, zeros, zeros);
+
+    std::list<double> outputRays = runTracer(testValues, {q});
+
+    std::vector<double> v;
+    for (auto x : outputRays) {
+        v.push_back(x);
+    }
+    std::cout << "wow: " << v[0] << " " << v[1] << " " << v[2] << std::endl;
+
+    double tolerance = 1e-15;
+    EXPECT_NEAR(v[0], 1.0, tolerance);
+    EXPECT_NEAR(v[1], 0.433, tolerance);
+    EXPECT_NEAR(v[2], 8.46, tolerance);
+}
+
 // test complete optical elements instead of single functions
 // uses deterministic source (matrix source with source depth = 0)
 // use name of optical element as file name

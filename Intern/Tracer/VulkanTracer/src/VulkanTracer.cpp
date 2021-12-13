@@ -829,8 +829,8 @@ void VulkanTracer::fillMaterialBuffer() {
     std::vector<double> vec;
     for (auto x : t.m_Lines) {
         vec.push_back(x.m_energy);
-        vec.push_back(x.m_k);
         vec.push_back(x.m_n);
+        vec.push_back(x.m_k);
         vec.push_back(0);
     }
     assert(vec.size() == 324 * 4);
