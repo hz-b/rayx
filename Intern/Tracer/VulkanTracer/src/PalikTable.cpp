@@ -1,16 +1,19 @@
 
-#include <Data/PalikTable.h>
+#include "PalikTable.h"
 
 #include <fstream>
 #include <iostream>
 #include <sstream>
 
-namespace RAYX {
 bool PalikTable::load(const char* element, PalikTable* out) {
     std::string f = "../../Data/PALIK/";  // TODO(rudi): make paths more robust!
     f += element;
     f += ".NKP";
     std::ifstream s(f);
+
+    if (s.fail()) {
+        return false;
+    }
 
     std::string line;
 
@@ -39,5 +42,4 @@ bool PalikTable::load(const char* element, PalikTable* out) {
     out->m_element = element;
 
     return true;
-}
 }

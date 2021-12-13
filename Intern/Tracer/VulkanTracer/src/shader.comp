@@ -52,6 +52,10 @@ layout(std140, binding = 3) buffer xyzbuf
 {
 	dvec4 xyznull[];
 };
+layout(std140, binding = 4) buffer material /* TODO: this is only for CU for now! */
+{
+	dvec4 nkp[]; // contains PALIK tables, in other words [energy, n, k]-entries
+};
 
 
 

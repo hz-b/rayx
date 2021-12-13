@@ -49,6 +49,8 @@ add_library(${PROJECT_NAME}
         src/Ray.h 
         src/RayList.h
         src/RayList.cpp
+        src/PalikTable.h
+        src/PalikTable.cpp
         src/VulkanTracer.cpp
         src/VulkanTracer.h
 )

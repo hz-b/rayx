@@ -37,9 +37,9 @@
 #endif
 
 VulkanTracer::VulkanTracer() {
-    bufferSizes.resize(5);
-    buffers.resize(5);
-    bufferMemories.resize(5);
+    bufferSizes.resize(6);
+    buffers.resize(6);
+    bufferMemories.resize(6);
     // beamline.resize(0);
 }
 
@@ -101,6 +101,9 @@ void VulkanTracer::run() {
                  (uint64_t)numberOfRays * VULKANTRACER_RAY_DOUBLE_AMOUNT *
                      sizeof(double));  // maximum of 128MB
     bufferSizes[4] = (uint64_t)numberOfRays * 4 * sizeof(double);
+    bufferSizes[5] =
+        324 * 4 *
+        sizeof(double);  // TODO(Rudi): temporary! this only works for CU!
     for (uint32_t i = 0; i < bufferSizes.size(); i++) {
         std::cout << "[VK]: Buffer [" << i << "] of size : " << bufferSizes[i]
                   << " Bytes" << std::endl;
@@ -148,6 +151,7 @@ void VulkanTracer::initVulkan() {
               << float(clock() - begin_time_fillBuffer) / CLOCKS_PER_SEC * 1000
               << " ms" << std::endl;
     fillQuadricBuffer();
+    fillMaterialBuffer();
     // creates the descriptors used to bind the buffer to shader access points
     // (bindings)
     createDescriptorSetLayout();
@@ -496,6 +500,11 @@ void VulkanTracer::createBuffers() {
     createBuffer(bufferSizes[4], VK_BUFFER_USAGE_STORAGE_BUFFER_BIT,
                  VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, buffers[4],
                  bufferMemories[4]);
+    // buffer for material
+    createBuffer(bufferSizes[5], VK_BUFFER_USAGE_STORAGE_BUFFER_BIT,
+                 VK_MEMORY_PROPERTY_HOST_COHERENT_BIT |
+                     VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT,
+                 buffers[5], bufferMemories[5]);
     std::cout << "[VK]: All buffers created!" << std::endl;
 }
 
@@ -806,6 +815,30 @@ void VulkanTracer::fillQuadricBuffer() {
     std::cout << "[VK]: Done!" << std::endl;
     vkUnmapMemory(device, bufferMemories[2]);
 }
+
+void VulkanTracer::fillMaterialBuffer() {
+    std::cout << "[VK]: Filling MaterialBuffer.." << std::endl;
+    // data is copied to the buffer
+    void* data;
+    vkMapMemory(device, bufferMemories[5], 0, bufferSizes[5], 0, &data);
+    PalikTable t;
+    if (!PalikTable::load("CU", &t)) {  // TODO(Rudi): not only for copper!
+        std::cout << "[VK]: error loading PalikTable!" << std::endl;
+    }
+    // memcpy(data, t.m_Lines.data(), bufferSizes[5]);
+    std::vector<double> vec;
+    for (auto x : t.m_Lines) {
+        vec.push_back(x.m_energy);
+        vec.push_back(x.m_k);
+        vec.push_back(x.m_n);
+        vec.push_back(0);
+    }
+    assert(vec.size() == 324 * 4);
+    memcpy(data, vec.data(), bufferSizes[5]);
+    std::cout << "[VK]: Done!" << std::endl;
+    vkUnmapMemory(device, bufferMemories[5]);
+}
+
 void VulkanTracer::createDescriptorSetLayout() {
     /*
     Here we specify a descriptor set layout. This allows us to bind our
@@ -827,13 +860,15 @@ void VulkanTracer::createDescriptorSetLayout() {
         {2, VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, 1, VK_SHADER_STAGE_COMPUTE_BIT,
          NULL},
         {3, VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, 1, VK_SHADER_STAGE_COMPUTE_BIT,
+         NULL},
+        {4, VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, 1, VK_SHADER_STAGE_COMPUTE_BIT,
          NULL}};
 
     VkDescriptorSetLayoutCreateInfo descriptorSetLayoutCreateInfo = {};
     descriptorSetLayoutCreateInfo.sType =
         VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO;
     // 2 bindings are used in this layout
-    descriptorSetLayoutCreateInfo.bindingCount = 4;
+    descriptorSetLayoutCreateInfo.bindingCount = 5;
     descriptorSetLayoutCreateInfo.pBindings =
         descriptorSetLayoutBinding;  // TODO
 
@@ -848,7 +883,7 @@ void VulkanTracer::createDescriptorSet() {
     */
     VkDescriptorPoolSize descriptorPoolSize = {};
     descriptorPoolSize.type = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER;
-    descriptorPoolSize.descriptorCount = 4;
+    descriptorPoolSize.descriptorCount = 5;
 
     VkDescriptorPoolCreateInfo descriptorPoolCreateInfo = {};
     descriptorPoolCreateInfo.sType =
@@ -878,8 +913,7 @@ void VulkanTracer::createDescriptorSet() {
     VK_CHECK_RESULT(vkAllocateDescriptorSets(device, &descriptorSetAllocateInfo,
                                              &descriptorSet));
 
-    // no descriptor for the staging buffer
-    for (uint32_t i = 0; i < buffers.size() - 2; i++) {
+    for (uint32_t i = 0; i < buffers.size() - 3; i++) {
         // specify which buffer to use: input buffer
         VkDescriptorBufferInfo descriptorBufferInfo = {};
         descriptorBufferInfo.buffer = buffers[i];
@@ -899,23 +933,45 @@ void VulkanTracer::createDescriptorSet() {
         // perform the update of the descriptor set.
         vkUpdateDescriptorSets(device, 1, &writeDescriptorSet, 0, NULL);
     }
-    // specify which buffer to use: input buffer
-    VkDescriptorBufferInfo descriptorBufferInfo = {};
-    descriptorBufferInfo.buffer = buffers[4];
-    descriptorBufferInfo.offset = 0;
-    descriptorBufferInfo.range = bufferSizes[4];
+    {  // specify which buffer to use: input buffer
+        VkDescriptorBufferInfo descriptorBufferInfo = {};
+        descriptorBufferInfo.buffer = buffers[4];
+        descriptorBufferInfo.offset = 0;
+        descriptorBufferInfo.range = bufferSizes[4];
 
-    VkWriteDescriptorSet writeDescriptorSet = {};
-    writeDescriptorSet.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
-    writeDescriptorSet.dstSet = descriptorSet;  // write to this descriptor set.
-    writeDescriptorSet.dstBinding = 3;          // write to the ist binding.
-    writeDescriptorSet.descriptorCount = 1;     // update a single descriptor.
-    writeDescriptorSet.descriptorType =
-        VK_DESCRIPTOR_TYPE_STORAGE_BUFFER;  // storage buffer.
-    writeDescriptorSet.pBufferInfo = &descriptorBufferInfo;
+        VkWriteDescriptorSet writeDescriptorSet = {};
+        writeDescriptorSet.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
+        writeDescriptorSet.dstSet =
+            descriptorSet;                  // write to this descriptor set.
+        writeDescriptorSet.dstBinding = 3;  // write to the ist binding.
+        writeDescriptorSet.descriptorCount = 1;  // update a single descriptor.
+        writeDescriptorSet.descriptorType =
+            VK_DESCRIPTOR_TYPE_STORAGE_BUFFER;  // storage buffer.
+        writeDescriptorSet.pBufferInfo = &descriptorBufferInfo;
 
-    // perform the update of the descriptor set.
-    vkUpdateDescriptorSets(device, 1, &writeDescriptorSet, 0, NULL);
+        // perform the update of the descriptor set.
+        vkUpdateDescriptorSets(device, 1, &writeDescriptorSet, 0, NULL);
+    }
+
+    {  // for material buffer
+        VkDescriptorBufferInfo descriptorBufferInfo = {};
+        descriptorBufferInfo.buffer = buffers[5];
+        descriptorBufferInfo.offset = 0;
+        descriptorBufferInfo.range = bufferSizes[5];
+
+        VkWriteDescriptorSet writeDescriptorSet = {};
+        writeDescriptorSet.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
+        writeDescriptorSet.dstSet =
+            descriptorSet;                  // write to this descriptor set.
+        writeDescriptorSet.dstBinding = 4;  // write to the ist binding.
+        writeDescriptorSet.descriptorCount = 1;  // update a single descriptor.
+        writeDescriptorSet.descriptorType =
+            VK_DESCRIPTOR_TYPE_STORAGE_BUFFER;  // storage buffer.
+        writeDescriptorSet.pBufferInfo = &descriptorBufferInfo;
+
+        // perform the update of the descriptor set.
+        vkUpdateDescriptorSets(device, 1, &writeDescriptorSet, 0, NULL);
+    }
 }
 
 // Read file into array of bytes, and cast to uint32_t*, then return.

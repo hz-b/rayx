@@ -9,6 +9,7 @@
 #include <optional>
 #include <stdexcept>
 
+#include "PalikTable.h"
 #include "RayList.h"
 #include "vulkan/vulkan.hpp"
 
@@ -168,6 +169,7 @@ class VulkanTracer {
     // Ray-related funcs:
     void divideAndSortRays();
     void fillQuadricBuffer();
+    void fillMaterialBuffer();
     void copyToRayBuffer(uint32_t offset, uint32_t numberOfBytesToCopy);
     void copyToOutputBuffer(uint32_t offset, uint32_t numberOfBytesToCopy);
 
