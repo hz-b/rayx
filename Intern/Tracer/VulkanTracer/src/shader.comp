@@ -60,9 +60,14 @@ layout(std140, binding = 3) buffer xyzbuf
 {
 	dvec4 xyznull[];
 };
-layout(binding = 4) buffer material /* TODO: this is only for CU for now! */
+
+layout(binding = 4) buffer materialIndexBuf
 {
-	PalikEntry nkp[]; // contains PALIK table
+	int nkpIdx[]; // can be indexed by material-index defined in Material.h to get the starting point of this material in the `nkp` table.
+};
+layout(binding = 5) buffer materialBuf
+{
+	PalikEntry nkp[]; // contains PALIK table of all materials concatenated together
 };
 
 
@@ -424,7 +429,7 @@ double r8_mach ( int i )
 		return 0.0;
 	}
 	
-	double [6] return_values = double[6] (0, 4.450147717014403E-308, 8.988465674311579E+307, 1.110223024625157E-016, 2.220446049250313E-016, 0.301029995663981E+000);  
+	double [6] return_values = double[6] (0, 4.450147717014403E-308, 8.988465674311579E+307, 1.110223024625157E-016, 2.220446049250313E-016, 0.301029995663981E+000);
 	return return_values[i];
 }
 
@@ -1226,16 +1231,16 @@ dvec2 cx_sin_of_one_over_z(dvec2 z) {
 }
 
 // Additions by Johan Karlsson (DonKarlssonSan) https://gist.github.com/DonKarlssonSan
-// https://gist.github.com/DonKarlssonSan/f87ba5e4e5f1093cb83e39024a6a5e72 
+// https://gist.github.com/DonKarlssonSan/f87ba5e4e5f1093cb83e39024a6a5e72
 #define cx_sub(a, b) dvec2(a.x - b.x, a.y - b.y)
 #define cx_add(a, b) dvec2(a.x + b.x, a.y + b.y)
 #define cx_abs(a) length(a)
 dvec2 cx_to_polar(dvec2 a) {
     double phi = r8_atan(a.y / a.x);
     double r = length(a);
-    return dvec2(r, phi); 
+    return dvec2(r, phi);
 }
-    
+ 
 // Complex power
 dvec2 cx_pow(dvec2 a, int n) {
     double angle = r8_atan2(a.y, a.x);
@@ -1701,7 +1706,7 @@ dvec4 getIntersectionPoint(Ray r, dmat4 quadric)
 		//r.position = dvec3(a, b, c);
 	}
 
-	// intersection point is in the negative direction (behind the position when the direction is followed forwards), set weight to 0 
+	// intersection point is in the negative direction (behind the position when the direction is followed forwards), set weight to 0
 	if( (x - r.position.x) / r.direction.x < 0 || (y - r.position.y) / r.direction.y < 0 || (z - r.position.z) / r.direction.z < 0) {
 		w = 0;
 	}
@@ -1934,11 +1939,10 @@ dvec4 getOpticalElementIntersection(Ray r, uint elementIndex){
 }
 
 dvec2 getRefractiveIndex(double energy, int material) {
-	if(material == 1) { // copper
-		for(int i = 0; i<nkp.length(); i++) { // find energy level
-			if(nkp[i].energy <= energy && energy < nkp[i+1].energy) {
-				return dvec2(nkp[i].n, nkp[i].k); // return refractive index for energy level
-			}			
+	// TODO: prevent going out of bounds, if energy-range is incomplete!
+	for(int i = nkpIdx[material]; i<nkp.length(); i++) { // find energy level
+		if(nkp[i].energy <= energy && energy < nkp[i+1].energy) {
+			return dvec2(nkp[i].n, nkp[i].k); // return refractive index for energy level
 		}
 	}
 	return dvec2(1,0); // vacuum
