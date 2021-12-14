@@ -1844,12 +1844,15 @@ TEST(Tracer, palikTest) {
     for (auto x : outputRays) {
         v.push_back(x);
     }
-    std::cout << "wow: " << v[0] << " " << v[1] << " " << v[2] << std::endl;
 
     double tolerance = 1e-15;
     EXPECT_NEAR(v[0], 1.0, tolerance);
     EXPECT_NEAR(v[1], 0.433, tolerance);
     EXPECT_NEAR(v[2], 8.46, tolerance);
+    // v[3] is the weight, currently unused
+    EXPECT_NEAR(v[4], 1.5, tolerance);
+    EXPECT_NEAR(v[5], 0.26, tolerance);
+    EXPECT_NEAR(v[6], 5.26, tolerance);
 }
 
 // test complete optical elements instead of single functions

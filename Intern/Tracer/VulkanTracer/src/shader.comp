@@ -54,7 +54,7 @@ layout(std140, binding = 3) buffer xyzbuf
 };
 layout(binding = 4) buffer material /* TODO: this is only for CU for now! */
 {
-	double nkp[]; // contains PALIK tables, in other words [energy, n, k]-entries
+	dvec3 nkp[]; // contains PALIK table, in other words [energy, n, k]-entries
 };
 
 
@@ -3384,9 +3384,13 @@ void testFunctions() {
 		res.stokes = dvec4(complex_euler3, complex_euler4);
 		rayData[uint(gl_GlobalInvocationID)] = res;
 	}else if(settings == 26) { // test material loading
-		rayData[uint(gl_GlobalInvocationID)].position.x = nkp[0];
-		rayData[uint(gl_GlobalInvocationID)].position.y = nkp[1];
-		rayData[uint(gl_GlobalInvocationID)].position.z = nkp[2];
+		rayData[uint(gl_GlobalInvocationID)].position.x = nkp[0].x;
+		rayData[uint(gl_GlobalInvocationID)].position.y = nkp[0].y;
+		rayData[uint(gl_GlobalInvocationID)].position.z = nkp[0].z;
+
+		rayData[uint(gl_GlobalInvocationID)].direction.x = nkp[1].x;
+		rayData[uint(gl_GlobalInvocationID)].direction.y = nkp[1].y;
+		rayData[uint(gl_GlobalInvocationID)].direction.z = nkp[1].z;
 	}
 	// store results to output buffer
 	outputData[uint(gl_GlobalInvocationID)] = rayData[uint(gl_GlobalInvocationID)];
