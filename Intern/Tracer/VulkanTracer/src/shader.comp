@@ -1928,9 +1928,9 @@ dvec4 getOpticalElementIntersection(Ray r, uint elementIndex){
 dvec2 getRefractiveIndex(double energy, int material) {
 	int entrysize = 4;
 	if(material == 1) { // copper
-		for(int i = 0; i<nkp.length()-entrysize; i+=entrysize) { // find energy level
-			if(nkp[i] <= energy && energy < nkp[i+entrysize]) {
-				return dvec2(nkp[i+1], nkp[i+2]); // return refractive index for energy level
+		for(int i = 0; i<nkp.length(); i++) { // find energy level
+			if(nkp[i].x <= energy && energy < nkp[i+1].x) {
+				return dvec2(nkp[i].y, nkp[i].z); // return refractive index for energy level
 			}			
 		}
 	}
