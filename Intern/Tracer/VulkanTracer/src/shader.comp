@@ -1925,6 +1925,17 @@ dvec4 getOpticalElementIntersection(Ray r, uint elementIndex){
 	return currentIntersection; // in element coordinate system
 }
 
+dvec2 getRefractiveIndex(double energy, int material) {
+	int entrysize = 4;
+	if(material == 1) { // copper
+		for(int i = 0; i<nkp.length()-entrysize; i+=entrysize) { // find energy level
+			if(nkp[i] <= energy && energy < nkp[i+entrysize]) {
+				return dvec2(nkp[i+1], nkp[i+2]); // return refractive index for energy level
+			}			
+		}
+	}
+	return dvec2(1,0); // vacuum
+}
 
 // returns angle between ray direction and surface normal at intersection point
 double getIncidenceAngle(Ray r, dvec4 normal) {
@@ -1996,16 +2007,18 @@ void fresnel(dvec2 cn1, dvec2 cn2, dvec2 cos_incidence, dvec2 cos_transmittance,
  */
 void reflectance(double energy, double incidence_angle, inout dvec2 complex_S, inout dvec2 complex_P) {
 	dvec2 cos_incidence = dvec2( r8_cos(incidence_angle), 0.0); // complex number, initialization only for first layer, the others are then derived from this with snell's law
-	
+
+	int material1 = 0; // vacuum
+	int material2 = 1; // copper
 	// todo number of layers: loop over layers from top to bottom, transmittance angle for each layer, so far only one layer (substrate?)
 	// store cosinuses in array, bc needed in later loop for fresnel (or maybe only one loop is enough?)
 	// todo refractive indices of materials in extra buffer?
-	dvec2 cn1 = dvec2(1,0);
-	dvec2 cn2 = dvec2(1,0);
+	dvec2 cn1 = getRefractiveIndex(energy, material1);
+	dvec2 cn2 = getRefractiveIndex(energy, material2);
 	dvec2 cos_transmittance = snell(cos_incidence, cn1, cn2);
 
 	// todo again iterate over layers but from bottom to top, update s and p polarization in each iteration:
-	fresnel(cn1, cn2, cos_incidence, cos_transmittance, complex_S, complex_P);
+	fresnel(cn1, cn2, cos_transmittance, cos_incidence, complex_S, complex_P);
 	// todo roughness (uses wavelength/energy)
 	// todo other calculations for layers that are not substrate (which is the first layer)
 	return;
@@ -2896,7 +2909,8 @@ Ray traceMirror(Ray r, const int elementIndex, inout uint64_t ctr, dvec4 interse
 	
 	double real_S, real_P, delta;
 	efficiency(r, real_S, real_P, delta, incidence_angle);
-	r.stokes = update_stokes(r, real_S, real_P, delta, azimuthal_angle); // TODO r.stokes probably needs to be changed to another coordinate system first! (see (3) of schäfers list)
+	r.stokes = dvec4(real_S, real_P, delta, incidence_angle);
+	//update_stokes(r, real_S, real_P, delta, azimuthal_angle); 
 	
 	r.order = 0;
 	return r;
