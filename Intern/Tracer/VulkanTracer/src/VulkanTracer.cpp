@@ -920,7 +920,7 @@ void VulkanTracer::createDescriptorSet() {
     VK_CHECK_RESULT(vkAllocateDescriptorSets(device, &descriptorSetAllocateInfo,
                                              &descriptorSet));
 
-    for (uint32_t i = 0; i < buffers.size() - 3; i++) {
+    for (uint32_t i = 0; i < buffers.size(); i++) {
         // specify which buffer to use: input buffer
         VkDescriptorBufferInfo descriptorBufferInfo = {};
         descriptorBufferInfo.buffer = buffers[i];
@@ -930,68 +930,9 @@ void VulkanTracer::createDescriptorSet() {
         VkWriteDescriptorSet writeDescriptorSet = {};
         writeDescriptorSet.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
         writeDescriptorSet.dstSet =
-            descriptorSet;                  // write to this descriptor set.
-        writeDescriptorSet.dstBinding = i;  // write to the ist binding.
-        writeDescriptorSet.descriptorCount = 1;  // update a single descriptor.
-        writeDescriptorSet.descriptorType =
-            VK_DESCRIPTOR_TYPE_STORAGE_BUFFER;  // storage buffer.
-        writeDescriptorSet.pBufferInfo = &descriptorBufferInfo;
-
-        // perform the update of the descriptor set.
-        vkUpdateDescriptorSets(device, 1, &writeDescriptorSet, 0, NULL);
-    }
-    // TODO(rudi) clean up this mess!
-    {  // specify which buffer to use: input buffer
-        VkDescriptorBufferInfo descriptorBufferInfo = {};
-        descriptorBufferInfo.buffer = buffers[4];
-        descriptorBufferInfo.offset = 0;
-        descriptorBufferInfo.range = bufferSizes[4];
-
-        VkWriteDescriptorSet writeDescriptorSet = {};
-        writeDescriptorSet.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
-        writeDescriptorSet.dstSet =
-            descriptorSet;                  // write to this descriptor set.
-        writeDescriptorSet.dstBinding = 3;  // write to the ist binding.
-        writeDescriptorSet.descriptorCount = 1;  // update a single descriptor.
-        writeDescriptorSet.descriptorType =
-            VK_DESCRIPTOR_TYPE_STORAGE_BUFFER;  // storage buffer.
-        writeDescriptorSet.pBufferInfo = &descriptorBufferInfo;
-
-        // perform the update of the descriptor set.
-        vkUpdateDescriptorSets(device, 1, &writeDescriptorSet, 0, NULL);
-    }
-
-    {  // for material index buffer
-        VkDescriptorBufferInfo descriptorBufferInfo = {};
-        descriptorBufferInfo.buffer = buffers[5];
-        descriptorBufferInfo.offset = 0;
-        descriptorBufferInfo.range = bufferSizes[5];
-
-        VkWriteDescriptorSet writeDescriptorSet = {};
-        writeDescriptorSet.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
-        writeDescriptorSet.dstSet =
-            descriptorSet;                  // write to this descriptor set.
-        writeDescriptorSet.dstBinding = 4;  // write to the ist binding.
-        writeDescriptorSet.descriptorCount = 1;  // update a single descriptor.
-        writeDescriptorSet.descriptorType =
-            VK_DESCRIPTOR_TYPE_STORAGE_BUFFER;  // storage buffer.
-        writeDescriptorSet.pBufferInfo = &descriptorBufferInfo;
-
-        // perform the update of the descriptor set.
-        vkUpdateDescriptorSets(device, 1, &writeDescriptorSet, 0, NULL);
-    }
-
-    {  // for material index buffer
-        VkDescriptorBufferInfo descriptorBufferInfo = {};
-        descriptorBufferInfo.buffer = buffers[6];
-        descriptorBufferInfo.offset = 0;
-        descriptorBufferInfo.range = bufferSizes[6];
-
-        VkWriteDescriptorSet writeDescriptorSet = {};
-        writeDescriptorSet.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
-        writeDescriptorSet.dstSet =
-            descriptorSet;                  // write to this descriptor set.
-        writeDescriptorSet.dstBinding = 5;  // write to the ist binding.
+            descriptorSet;  // write to this descriptor set.
+        writeDescriptorSet.dstBinding =
+            i - (i >= 4);  // write to the ist binding, or i-1 th binding
         writeDescriptorSet.descriptorCount = 1;  // update a single descriptor.
         writeDescriptorSet.descriptorType =
             VK_DESCRIPTOR_TYPE_STORAGE_BUFFER;  // storage buffer.
