@@ -1939,13 +1939,16 @@ dvec4 getOpticalElementIntersection(Ray r, uint elementIndex){
 }
 
 dvec2 getRefractiveIndex(double energy, int material) {
+	if (material == -1) { // vacuum
+		return dvec2(1., 0.);
+	}
+
 	// TODO: prevent going out of bounds, if energy-range is incomplete!
 	for(int i = nkpIdx[material]; i<nkp.length(); i++) { // find energy level
 		if(nkp[i].energy <= energy && energy < nkp[i+1].energy) {
 			return dvec2(nkp[i].n, nkp[i].k); // return refractive index for energy level
 		}
 	}
-	return dvec2(1,0); // vacuum
 }
 
 // returns angle between ray direction and surface normal at intersection point
@@ -2019,8 +2022,8 @@ void fresnel(dvec2 cn1, dvec2 cn2, dvec2 cos_incidence, dvec2 cos_transmittance,
 void reflectance(double energy, double incidence_angle, inout dvec2 complex_S, inout dvec2 complex_P) {
 	dvec2 cos_incidence = dvec2( r8_cos(incidence_angle), 0.0); // complex number, initialization only for first layer, the others are then derived from this with snell's law
 
-	int material1 = 0; // vacuum
-	int material2 = 1; // copper
+	int material1 = -1; // vacuum
+	int material2 = 0; // copper
 	// todo number of layers: loop over layers from top to bottom, transmittance angle for each layer, so far only one layer (substrate?)
 	// store cosinuses in array, bc needed in later loop for fresnel (or maybe only one loop is enough?)
 	// todo refractive indices of materials in extra buffer?
