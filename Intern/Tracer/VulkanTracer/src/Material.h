@@ -5,7 +5,9 @@
 /**
  * This enum class is the c++ perspective on the Materials stored in
  * "materials.xmacro".
- * This makes heavy use of X Macros, see https://en.wikipedia.org/wiki/X_Macro
+ * Whenever you want to add a material, just add a line in materials.xmacro:
+ * everything else is done automagically. This makes heavy use of X Macros, see
+ * https://en.wikipedia.org/wiki/X_Macro
  **/
 enum class Material {
 #define X(e) e,
