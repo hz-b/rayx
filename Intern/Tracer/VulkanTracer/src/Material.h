@@ -8,5 +8,5 @@ enum class Material {
 #undef X
 };
 
-void fillMaterialTables(std::vector<int>* materialIndex,
-                        std::vector<double>* material);
+const std::vector<double>* getMaterialTable();
+const std::vector<int>* getMaterialIndexTable();

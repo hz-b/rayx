@@ -6,6 +6,10 @@
 
 #include "PalikTable.h"
 
+// this is private, because .cpp files are not included!
+static std::vector<double> MATERIAL_TABLE;
+static std::vector<int> MATERIAL_INDEX_TABLE;
+
 const char* getMaterialName(Material m) {
     switch (m) {
 #define X(e)          \
@@ -27,21 +31,31 @@ std::vector<Material> allMaterials() {
     return mats;
 }
 
-void fillMaterialTables(std::vector<int>* materialIndex,
-                        std::vector<double>* material) {
-    *materialIndex = std::vector<int>();
-    *material = std::vector<double>();
-
+void fillMaterialTables() {
     auto mats = allMaterials();
     for (uint i = 0; i < mats.size(); i++) {
         PalikTable t;
         assert(PalikTable::load(getMaterialName(mats[i]), &t));
-        materialIndex->push_back(material->size());
+        MATERIAL_INDEX_TABLE.push_back(MATERIAL_TABLE.size());
         for (auto x : t.m_Lines) {
-            material->push_back(x.m_energy);
-            material->push_back(x.m_n);
-            material->push_back(x.m_k);
-            material->push_back(0);
+            MATERIAL_TABLE.push_back(x.m_energy);
+            MATERIAL_TABLE.push_back(x.m_n);
+            MATERIAL_TABLE.push_back(x.m_k);
+            MATERIAL_TABLE.push_back(0);
         }
     }
+}
+
+const std::vector<double>* getMaterialTable() {
+    if (MATERIAL_TABLE.empty()) {
+        fillMaterialTables();
+    }
+    return &MATERIAL_TABLE;
+}
+
+const std::vector<int>* getMaterialIndexTable() {
+    if (MATERIAL_TABLE.empty()) {
+        fillMaterialTables();
+    }
+    return &MATERIAL_INDEX_TABLE;
 }
