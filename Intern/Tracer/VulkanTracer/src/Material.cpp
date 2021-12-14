@@ -6,10 +6,10 @@
 
 #include "PalikTable.h"
 
-// this is private, because .cpp files are not included!
-static std::vector<double> MATERIAL_TABLE;
-static std::vector<int> MATERIAL_INDEX_TABLE;
-
+/**
+ * returns the name of the material:
+ * EXAMPLE: getMaterialName(Material::CU) == "CU"
+ **/
 const char* getMaterialName(Material m) {
     switch (m) {
 #define X(e)          \
@@ -23,6 +23,7 @@ const char* getMaterialName(Material m) {
     return nullptr;
 }
 
+// std::vector over all materials
 std::vector<Material> allMaterials() {
     std::vector<Material> mats;
 #define X(e) mats.push_back(Material::e);
@@ -31,12 +32,19 @@ std::vector<Material> allMaterials() {
     return mats;
 }
 
+// these tables are private to this file, only read-access is granted to others
+// by the functions below
+static std::vector<double> MATERIAL_TABLE;
+static std::vector<int> MATERIAL_INDEX_TABLE;
+
+// fills the tables above
 void fillMaterialTables() {
     auto mats = allMaterials();
     for (uint i = 0; i < mats.size(); i++) {
         PalikTable t;
         assert(PalikTable::load(getMaterialName(mats[i]), &t));
-        MATERIAL_INDEX_TABLE.push_back(MATERIAL_TABLE.size() / 4);
+        MATERIAL_INDEX_TABLE.push_back(MATERIAL_TABLE.size() /
+                                       4);  // 4 doubles per PalikEntry
         for (auto x : t.m_Lines) {
             MATERIAL_TABLE.push_back(x.m_energy);
             MATERIAL_TABLE.push_back(x.m_n);
