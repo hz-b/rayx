@@ -36,7 +36,7 @@ void fillMaterialTables() {
     for (uint i = 0; i < mats.size(); i++) {
         PalikTable t;
         assert(PalikTable::load(getMaterialName(mats[i]), &t));
-        MATERIAL_INDEX_TABLE.push_back(MATERIAL_TABLE.size());
+        MATERIAL_INDEX_TABLE.push_back(MATERIAL_TABLE.size() / 4);
         for (auto x : t.m_Lines) {
             MATERIAL_TABLE.push_back(x.m_energy);
             MATERIAL_TABLE.push_back(x.m_n);

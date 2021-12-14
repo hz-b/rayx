@@ -3415,10 +3415,12 @@ void testFunctions() {
 		rayData[uint(gl_GlobalInvocationID)].position.x = nkp[0].energy;
 		rayData[uint(gl_GlobalInvocationID)].position.y = nkp[0].n;
 		rayData[uint(gl_GlobalInvocationID)].position.z = nkp[0].k;
+		rayData[uint(gl_GlobalInvocationID)].weight = nkpIdx[0];
 
-		rayData[uint(gl_GlobalInvocationID)].direction.x = nkp[1].energy;
-		rayData[uint(gl_GlobalInvocationID)].direction.y = nkp[1].n;
-		rayData[uint(gl_GlobalInvocationID)].direction.z = nkp[1].k;
+		rayData[uint(gl_GlobalInvocationID)].direction.x = nkp[nkpIdx[1]].energy;
+		rayData[uint(gl_GlobalInvocationID)].direction.y = nkp[nkpIdx[1]].n;
+		rayData[uint(gl_GlobalInvocationID)].direction.z = nkp[nkpIdx[1]].k;
+		rayData[uint(gl_GlobalInvocationID)].energy = nkpIdx[1];
 	}
 	// store results to output buffer
 	outputData[uint(gl_GlobalInvocationID)] = rayData[uint(gl_GlobalInvocationID)];

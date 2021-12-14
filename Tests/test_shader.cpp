@@ -1895,11 +1895,20 @@ TEST(Tracer, palikTest) {
     }
 
     double tolerance = 1e-15;
+
+    // first copper entry
     EXPECT_NEAR(v[0], 1.0, tolerance);
     EXPECT_NEAR(v[1], 0.433, tolerance);
     EXPECT_NEAR(v[2], 8.46, tolerance);
-    // v[3] is the weight, currently unused
-    EXPECT_NEAR(v[4], 1.5, tolerance);
-    EXPECT_NEAR(v[5], 0.26, tolerance);
-    EXPECT_NEAR(v[6], 5.26, tolerance);
+
+    // copper index
+    EXPECT_NEAR(v[3], 0., tolerance);
+
+    // first gold entry
+    EXPECT_NEAR(v[4], 0.04959, tolerance);
+    EXPECT_NEAR(v[5], 20.3, tolerance);
+    EXPECT_NEAR(v[6], 76.992, tolerance);
+
+    // gold index
+    EXPECT_NEAR(v[7], 324., tolerance);
 }
