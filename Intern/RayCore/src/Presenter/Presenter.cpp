@@ -31,7 +31,8 @@ bool Presenter::run() {
         m_Beamline->m_OpticalElements;
     for (int j = 0; j < 1 /*beamlinesSimultaneously*/; j++) {
         for (int i = 0; i < int(Elements.size()); i++) {
-            std::cout << "add " << Elements[i]->getName() << std::endl;
+            std::cout << "[Presenter]: add " << Elements[i]->getName()
+                      << std::endl;
             m_TracerInterface.addOpticalElementToTracer(Elements[i]);
         }
     }

@@ -37,8 +37,8 @@ Cylinder::Cylinder(const char* name,
     if (m_direction == X_DIR) {  // y² + z² = R²
         m_a11 = 0;
         m_a33 = 1;
-        m_a24 = -radius;
-    } else {  // Z_DIR y² + z² = R²
+        m_a24 = -radius;  // TODO (OS): always -raduis?
+    } else {              // Z_DIR y² + z² = R²
         m_a11 = 1;
         m_a33 = 0;
         m_a24 = radius;
@@ -46,7 +46,7 @@ Cylinder::Cylinder(const char* name,
     double icurv = 1;
     setSurface(std::make_unique<Quadric>(std::vector<double>{
         m_a11, 0, 0, 0, icurv, 1, 0, m_a24, 0, 0, m_a33, 0, 0, 0, 0, 0}));
-    // TODO(OS): Add Element parameters?
+    // TODO (OS): Add Element parameters?
     setElementParameters({radius, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0});
 }
 Cylinder::~Cylinder() {}
