@@ -831,7 +831,7 @@ void VulkanTracer::fillMaterialBuffer() {
         vec.push_back(x.m_energy);
         vec.push_back(x.m_n);
         vec.push_back(x.m_k);
-        vec.push_back(0);
+        vec.push_back(0);  // padding
     }
     assert(vec.size() == 324 * 4);
     memcpy(data, vec.data(), bufferSizes[5]);
