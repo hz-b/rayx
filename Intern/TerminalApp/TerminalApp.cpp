@@ -1,3 +1,4 @@
+#include "Debug.h"
 #include "TerminalApp.h"
 
 #include <memory>
