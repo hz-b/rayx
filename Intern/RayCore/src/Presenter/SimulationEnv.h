@@ -16,7 +16,7 @@ class RAYX_API SimulationEnv {
     void operator=(SimulationEnv const&) = delete;
 
   private:
-    SimulationEnv() : m_numOfRays(200000), m_idCounter(0) {}
+    SimulationEnv() : m_numOfRays(2000000), m_idCounter(0) {}
 
     size_t m_idCounter;
 };

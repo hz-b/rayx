@@ -5,7 +5,7 @@
 #include <iomanip>
 #include <sstream>
 
-#include "Debug.h"
+#include "Debug/Instrumentor.h"
 #include "Model/Beamline/LightSource.h"
 #include "Model/Beamline/OpticalElement.h"
 #include "Ray.h"
@@ -38,9 +38,8 @@ TracerInterface::~TracerInterface() {
 void TracerInterface::generateRays(std::shared_ptr<LightSource> source) {
     // only one Source for now
     if (!source) return;
-    std::vector<RAYX::Ray> rays = source->getRays();
     RAYX_DEBUG(std::cout << "[TracerInterf]: add rays" << std::endl);
-    m_RayTracer.addRayVector(rays.data(), rays.size());
+    m_RayTracer.addRayVector(source->getRays());
 }
 
 void TracerInterface::setBeamlineParameters() {
@@ -55,16 +54,10 @@ void TracerInterface::addOpticalElementToTracer(
                            element->getElementParameters());
 }
 
-// ! parameters are temporary and need to be removed again
 bool TracerInterface::run() {
-    // RAYX_DEBUG(std::cout << "add rays to tracer done" << std::endl);
+    RAYX_PROFILE_FUNCTION();
 
-    const clock_t begin_time = clock();
     m_RayTracer.run();  // run tracer
-    std::cout << "[TracerInterf]: Runtime: "
-              << (float(clock() - begin_time) / CLOCKS_PER_SEC) * 1000 << " ms"
-              << std::endl;
-
     RAYX_DEBUG(std::cout << "[TracerInterf]: Run succeeded!" << std::endl);
 
     // transform in to usable data
@@ -106,11 +99,6 @@ bool TracerInterface::run() {
         index = index + (*outputRayIterator).size();
     }
     outputFile.close();
-
-    RAYX_DEBUG(std::cout << "[TracerInterf]: Runtime (incl. loading rays): "
-                         << (float(clock() - begin_time) / CLOCKS_PER_SEC) *
-                                1000
-                         << " ms" << std::endl);
 
     // clean up tracer to avoid memory leaks
     m_RayTracer.cleanup();

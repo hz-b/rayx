@@ -1,5 +1,7 @@
 #include "utils.h"
 
+#include "Debug/Instrumentor.h"
+
 /**
  * Calculates photon wavelength (nm) from its energy (eV) or
  * vice verse. For example is used for gratings.
@@ -28,6 +30,7 @@ double degToRad(double degree) { return degree * PI / 180; }
 double radToDeg(double rad) { return rad * 180 / PI; }
 
 glm::dmat4x4 getRotationMatrix(double dpsi, double dphi, double dchi) {
+    RAYX_PROFILE_FUNCTION();
     glm::dmat4x4 misalignmentMatrix =
         glm::dmat4x4(cos(dphi) * cos(dchi),
                      -cos(dpsi) * sin(dchi) - sin(dpsi) * sin(dphi) * cos(dchi),
@@ -41,6 +44,7 @@ glm::dmat4x4 getRotationMatrix(double dpsi, double dphi, double dchi) {
 }
 
 void printMatrix(std::vector<double> matrix) {
+    RAYX_PROFILE_FUNCTION();
     std::cout << "[Matrix]: size: " << matrix.size() << std::endl;
     std::cout << "\t";
     for (int i = 0; i < int(matrix.size()); i++) {
@@ -54,6 +58,7 @@ void printMatrix(std::vector<double> matrix) {
 }
 
 void printDMat4(glm::dmat4 matrix) {
+    RAYX_PROFILE_FUNCTION();
     for (int i = 0; i < 4; i++) {
         for (int j = 0; j < 4; j++) {
             std::cout << matrix[i][j] << ", ";

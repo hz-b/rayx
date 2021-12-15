@@ -13,6 +13,8 @@ TerminalApp::~TerminalApp() {
 }
 
 void TerminalApp::run() {
+    RAYX_PROFILE_FUNCTION();
+
     RAYX_D_LOG << "TerminalApp running...";
 
     if (m_argc == 2) {

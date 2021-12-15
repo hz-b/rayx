@@ -2,19 +2,8 @@
 
 #include <iostream>
 
-#include "Debug.h"
-#include "Objects/Ellipsoid.h"
-#include "Objects/ImagePlane.h"
-#include "Objects/MatrixSource.h"
-#include "Objects/PlaneGrating.h"
-#include "Objects/PlaneMirror.h"
-#include "Objects/PointSource.h"
-#include "Objects/RandomRays.h"
-#include "Objects/ReflectionZonePlate.h"
-#include "Objects/Slit.h"
-#include "Objects/SphereGrating.h"
-#include "Objects/SphereMirror.h"
-#include "Objects/ToroidMirror.h"
+#include "Debug/Instrumentor.h"
+#include "Model/Beamline/Objects/Objects.h"
 
 namespace RAYX {
 Beamline::Beamline() {}
@@ -23,6 +12,7 @@ Beamline::~Beamline() {}
 
 // push copy of shared pointer to m_objects vector
 void Beamline::addOpticalElement(const std::shared_ptr<OpticalElement> q) {
+    RAYX_PROFILE_FUNCTION();
     m_OpticalElements.push_back(q);
 }
 
@@ -32,6 +22,7 @@ void Beamline::addOpticalElement(const char* name,
                                  std::vector<double> inputOutMatrix,
                                  std::vector<double> OParameters,
                                  std::vector<double> EParameters) {
+    RAYX_PROFILE_FUNCTION();
     m_OpticalElements.emplace_back(std::make_shared<OpticalElement>(
         name, inputPoints, inputInMatrix, inputOutMatrix, OParameters,
         EParameters));
@@ -43,6 +34,7 @@ void Beamline::addOpticalElement(const char* name,
                                  std::vector<double>&& inputOutMatrix,
                                  std::vector<double>&& OParameters,
                                  std::vector<double>&& EParameters) {
+    RAYX_PROFILE_FUNCTION();
     m_OpticalElements.emplace_back(std::make_shared<OpticalElement>(
         name, std::move(inputPoints), std::move(inputInMatrix),
         std::move(inputOutMatrix), std::move(OParameters),

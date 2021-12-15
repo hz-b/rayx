@@ -1,4 +1,5 @@
 cmake_minimum_required(VERSION 3.2 FATAL_ERROR)
+
 project(RayCore)
 
 SET(SOURCE
@@ -34,15 +35,15 @@ SET(SOURCE
     src/Model/Surface/Toroid.cpp
     src/Model/Surface/Surface.cpp
     src/Model/Geometry/Geometry.cpp
-    src/Tracer/Ray.cpp
+    src/Tracer/RayList.cpp
     src/Tracer/TracerInterface.cpp
+    src/Tracer/Vulkan/VulkanTracer.cpp
     src/UserParameter/WorldUserParams.cpp
     src/UserParameter/GeometricUserParams.cpp
 )
 
 SET(HEADERS
     src/Application.h
-    src/Debug.h
     src/utils.h
     src/Model/Beamline/Beamline.h
     src/Model/Beamline/BeamlineObject.h
@@ -74,17 +75,15 @@ SET(HEADERS
     src/Model/Surface/Toroid.h
     src/Model/Surface/Surface.h
     src/Model/Geometry/Geometry.h
+    src/Tracer/RayList.h
     src/Tracer/Ray.h
     src/Tracer/TracerInterface.h
+    src/Tracer/Vulkan/VulkanTracer.h
     src/UserParameter/WorldUserParams.h
     src/UserParameter/GeometricUserParams.h
 )
 
 add_library(${PROJECT_NAME} SHARED ${SOURCE} ${HEADERS} )
-
-target_link_libraries(${PROJECT_NAME} 
-    PUBLIC VulkanTracer
-)
 
 if (CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
     set(COMPILE_PLATFORM RAYX_PLATFORM_GCC)
@@ -99,14 +98,46 @@ target_compile_definitions(${PROJECT_NAME}
     PUBLIC ${COMPILE_PLATFORM}
 )
 
+find_package(Vulkan REQUIRED)
+
+target_link_libraries(${PROJECT_NAME} 
+    PUBLIC Vulkan::Vulkan
+)
+
 target_include_directories(${PROJECT_NAME}
     SYSTEM PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/src
     PUBLIC ${RayCore_SOURCE_DIR}/../../Extern/glm/glm/
     PUBLIC ${RayCore_SOURCE_DIR}/../../Extern/rapidxml-1.13/
 )
 
+add_dependencies(${PROJECT_NAME} COMPILE_SHADER)
 
+# Compile Shaders
+set(COMPILED_SHADER ${CMAKE_BINARY_DIR}/bin/comp.spv)
+set(COMPILED_SHADER_FAKE ${CMAKE_BINARY_DIR}/bin/___comp.spv) # this exists so file cannot be found -> always execute command
+# OS specific
+if (WIN32)
+    # The following code is used to always compile the shader.
+    # This is most likely not an optimal solution, but it will work
+    # until we find a better one.
+    add_custom_command(
+        OUTPUT 
+            ${COMPILED_SHADER}
+            ${COMPILED_SHADER_FAKE}
+        COMMAND "$ENV{VULKAN_SDK}/Bin/glslc.exe"
+        ARGS ${RayCore_SOURCE_DIR}/src/Tracer/Vulkan/shader.comp -o ${COMPILED_SHADER}
+    )
+elseif (UNIX)
+    add_custom_command(
+        OUTPUT 
+            ${COMPILED_SHADER}
+            ${COMPILED_SHADER_FAKE}
+        COMMAND "glslc"
+        ARGS ${RayCore_SOURCE_DIR}/src/Tracer/Vulkan/shader.comp -o ${COMPILED_SHADER}
+    )
+    # set_property(TARGET ${PROJECT_NAME} PROPERTY POSITION_INDEPENDENT_CODE ON)
+endif ()
 
-# set_target_properties(${PROJECT_NAME} PROPERTIES
-#                       RUNTIME_OUTPUT_DIRECTORY ${TerminalApp_BINARY_DIR}
-# )
+add_custom_target(COMPILE_SHADER ALL
+    DEPENDS ${COMPILED_SHADER}
+)

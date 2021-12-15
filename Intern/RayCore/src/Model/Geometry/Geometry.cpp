@@ -7,7 +7,7 @@
 #include <stdexcept>
 #include <vector>
 
-#include "Ray.h"
+#include "Tracer/Ray.h"
 #include "utils.h"
 
 namespace RAYX {

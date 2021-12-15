@@ -41,7 +41,6 @@ class RAYX_API LightSource : public BeamlineObject {
                 const std::vector<double> misalignment);
 
     // Getter
-    int getNumberOfRays();
     int getId();
     std::vector<double> getMisalignmentParams();
     double getLinear0();

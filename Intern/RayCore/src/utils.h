@@ -9,7 +9,7 @@
 #include <vector>
 
 #include "Core.h"
-#include "Ray.h"
+#include "Tracer/Ray.h"
 
 typedef std::vector<std::vector<double>> Matrix;
 

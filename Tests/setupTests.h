@@ -2,11 +2,21 @@
 #include "Data/Importer.h"
 #include "Model/Beamline/Objects/Objects.h"
 #include "Model/Geometry/Geometry.h"
-#include "Ray.h"
+#include "Tracer/Ray.h"
 #include "UserParameter/GeometricUserParams.h"
 #include "UserParameter/WorldUserParams.h"
 #include "gmock/gmock.h"
 #include "gtest/gtest.h"
+
+// Run Test Macros
+#define RUN_TEST_GRATINGS 1
+#define RUN_TEST_MIRRORS 1
+#define RUN_TEST_QUADRIC 1
+#define RUN_TEST_RML 1
+#define RUN_TEST_RZP 1
+#define RUN_TEST_SHADER 1
+#define RUN_TEST_SLIT 1
+#define RUN_TEST_SOURCES 1
 
 //! Using the google test framework, check all elements of two containers
 #define EXPECT_ITERABLE_BASE(PREDICATE, REFTYPE, TARTYPE, ref, target)       \

@@ -10,7 +10,7 @@
 
 #include "Core.h"
 #include "Model/Beamline/OpticalElement.h"
-#include "Ray.h"
+#include "Tracer/Ray.h"
 #include "utils.h"
 
 namespace RAYX {

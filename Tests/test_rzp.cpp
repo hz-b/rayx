@@ -1,4 +1,5 @@
 #include "setupTests.h"
+#if RUN_TEST_RZP
 
 TEST(RZP, testdefaultParams) {
     int mount = 1;  // incidence
@@ -281,3 +282,5 @@ TEST(RZP, testParams) {
                               glmToVector16(correctOutMatrix));
     EXPECT_ITERABLE_DOUBLE_EQ(std::vector<double>, rzp.getSlopeError(), sE);
 }
+
+#endif

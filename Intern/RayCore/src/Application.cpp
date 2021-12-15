@@ -4,35 +4,31 @@
 #include <iostream>
 
 #include "Data/Exporter.h"
-#include "Debug.h"
-#include "Model/Beamline/Objects/Ellipsoid.h"
-#include "Model/Beamline/Objects/ImagePlane.h"
-#include "Model/Beamline/Objects/MatrixSource.h"
-#include "Model/Beamline/Objects/PlaneMirror.h"
-#include "Model/Beamline/Objects/PointSource.h"
-#include "Model/Beamline/Objects/ReflectionZonePlate.h"
-#include "Model/Beamline/Objects/ToroidMirror.h"
+#include "Debug/Instrumentor.h"
+#include "Model/Beamline/Objects/Objects.h"
 #include "UserParameter/GeometricUserParams.h"
 #include "UserParameter/WorldUserParams.h"
 
 namespace RAYX {
 
 Application::Application() : m_Beamline(std::make_shared<Beamline>()) {
+    #ifdef RAYX_PLATFORM_WINDOWS
+    #ifdef RAY_DEBUG_MODE
+        _CrtSetReportMode(_CRT_WARN, _CRTDBG_MODE_DEBUG);
+        _CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);
+    #endif
+    #endif
+    RAYX_PROFILE_BEGIN_SESSION("RayX Application", "profile_rayx_application.json");
     RAYX_DEBUG(std::cout << "[App]: Creating Application..." << std::endl);
 }
 
 Application::~Application() {
     RAYX_DEBUG(std::cout << "[App]: Deleting Application..." << std::endl);
+    RAYX_PROFILE_END_SESSION();
 }
 
-void Application::loadDummyBeamline() {  // ! objects are created here
-                                         // temporarily until reading in file
-                                         // works
-#ifdef RAY_DEBUG_MODE
-    const clock_t allBeginTime = clock();
-#endif
-
-    RAYX::SimulationEnv::get().m_numOfRays = 20000;
+void Application::loadDummyBeamline() {
+    RAYX_PROFILE_FUNCTION();
 
     EnergyDistribution dist = EnergyDistribution(EnergyRange(100, 0), true);
     std::shared_ptr<MatrixSource> matSourcePtr = std::make_shared<MatrixSource>(
@@ -110,10 +106,6 @@ void Application::loadDummyBeamline() {  // ! objects are created here
 
     m_Presenter = Presenter(m_Beamline);
     m_Presenter.addLightSource(matSourcePtr);
-    RAYX_DEBUG(std::cout << "[App]: Creating dummy beamline took: "
-                         << float(clock() - allBeginTime) / CLOCKS_PER_SEC *
-                                1000
-                         << " ms" << std::endl);
 }
 
 void Application::run() {
