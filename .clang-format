@@ -1,0 +1,11 @@
+---
+BasedOnStyle: Google
+IndentWidth: 4
+---
+Language: Cpp
+# Force pointers to the type for C++.
+DerivePointerAlignment: false
+AccessModifierOffset: -2
+PointerAlignment: Left
+UseTab: Never
+TabWidth: 4

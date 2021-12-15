@@ -2,20 +2,19 @@
 
 #include <memory>
 
-#include "Model/Beamline/Beamline.h"
 #include "Core.h"
+#include "Model/Beamline/Beamline.h"
 
-namespace RAYX
-{
+namespace RAYX {
 
-	class RAYX_API Importer
-	{
-	public:
-		Importer();
-		~Importer();
+class RAYX_API Importer {
+  public:
+    Importer();
+    ~Importer();
 
-		static Beamline importBeamline(const char* filename);
+    static Beamline importBeamline(const char* filename);
 
-	};
+  private:
+};
 
-} // namespace RAYX
+}  // namespace RAYX

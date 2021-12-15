@@ -1,47 +1,57 @@
 #include "Quadric.h"
-#include <cassert>
+
 #include <math.h>
 
-namespace RAYX
-{
-    /**
-     * standard constructor
-     * this class the parameters for the quadric equation!
-     *
-     * angles given in rad
-     * define transformation matrices based on grazing incidence (alpha) and exit (beta) angle, azimuthal angle (chi) and distance to preceeding element
-     * @param inputPoints      Matrix A for quadric surfaces with a_11,a_12,a_13,a_14, a_21,a_22,a_23,a_24, a_31,a_32,a_33,a_34, a_41,a_42,a_43,a_44
-     *                         a_21,a_31,a_32,a_41,a_42,a_43 are never used for quadric surfaces because the matrix is symmetrial,
-    */
-    Quadric::Quadric(const std::vector<double> inputPoints)
-    {
-        assert(inputPoints.size() == 16); //parameter size ==6?
-        m_anchorPoints = inputPoints;
-    }
+#include <cassert>
 
+namespace RAYX {
+/** for quadric surfaces: 16 parameters a_11,a_12,a_13,a_14,
+ * a_21,a_22,a_23,a_24, a_31,a_32,a_33,a_34, a_41,a_42,a_43,a_44!
+ * a_21,a_31,a_32,a_41,a_42,a_43 are never used for quadric surfaces because the
+ * matrix is symmetrial, can be used for other values
+ * @param inputPoints      4x4 Matrix as vector
+ */
+Quadric::Quadric(const std::vector<double> inputPoints) {
+    assert(inputPoints.size() == 16);
+    m_parameters = inputPoints;
+}
 
+Quadric::Quadric() {}  // TODO
 
-    Quadric::Quadric() {} // TODO
+Quadric::~Quadric() {}
 
-    Quadric::~Quadric()
-    {
-    }
+/**
+ * set a new set of parameters a_11 to a_44 for the quadric function
+ * order: a_11,a_12,a_13,a_14, a_21,a_22,a_23,a_24, a_31,a_32,a_33,a_34,
+ * a_41,a_42,a_43,a_44
+ * @param inputPoints   16 entry vector a_11 to a_44
+ * @return void
+ */
+void Quadric::setAnchorPoints(std::vector<double> inputPoints) {
+    assert(inputPoints.size() == 16);
+    m_parameters = inputPoints;
+}
 
-    /**
-     * set a new set of parameters a_11 to a_44 for the quadric function
-     * order: a_11,a_12,a_13,a_14, a_21,a_22,a_23,a_24, a_31,a_32,a_33,a_34, a_41,a_42,a_43,a_44
-     * @param inputPoints   16 entry vector a_11 to a_44
-     * @return void
-    */
-    void Quadric::setAnchorPoints(std::vector<double> inputPoints)
-    {
-        assert(inputPoints.size() == 16);
-        m_anchorPoints = inputPoints;
-    }
+/**
+ * ENCODING:
+ *
+ * {a_11,  a_12,     a_13, a_14,
+ *  icurv, a_22,     a_23, a_44,
+ *  0.0,   0.0,      a_33, a_34,
+ *  type,  settings, 0.0,  a_44}
+ *
+ * @param type = what kind of optical element (mirror, plane grating, spherical
+ *grating, toroid mirror, rzp, slit..)
+ * @param setting = how to interpret the input of these params. During normal
+ *tracing always = 0 but when testing, this parameter defines which test to run
+ * @param icurv = whether to take the first or second intersection of a ray with
+ *a quadric surface
+ * @param a_11, .., a_44 parameters of the quadric equation to find the
+ *intersection point. Depend on the element (plane, sphere, ellipsoid,..)
+ **/
+std::vector<double> Quadric::getParams() const {
+    std::cout << "[Quadric]: return surface parameters" << std::endl;
+    return m_parameters;
+}
 
-    std::vector<double> Quadric::getParams() const {
-        std::cout << "[Quadric]: return anchor points" << std::endl;
-        return m_anchorPoints;
-    }
-
-} // namespace RAYX
+}  // namespace RAYX

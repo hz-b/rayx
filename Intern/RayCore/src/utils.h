@@ -1,13 +1,15 @@
 #pragma once
 
 #include <math.h>
-#include <vector>
-#include <iostream>
-#include <stdexcept>
-#include "Core.h"
-#include "Ray.h"
-#include <memory>
+
 #include <glm.hpp>
+#include <iostream>
+#include <memory>
+#include <stdexcept>
+#include <vector>
+
+#include "Core.h"
+#include "Tracer/Ray.h"
 
 typedef std::vector<std::vector<double>> Matrix;
 
@@ -20,12 +22,13 @@ double RAYX_API hvlam(double x);
 double RAYX_API degToRad(double degree);
 double RAYX_API radToDeg(double rad);
 
-Matrix RAYX_API getMatrixProduct(Matrix A, Matrix B);
-std::vector<double> RAYX_API getMatrixProductAsVector(std::vector<double> A, std::vector<double> B);
-Matrix RAYX_API getVectorAsMatrix(std::vector<double> V);
+glm::dmat4x4 getRotationMatrix(double dpsi, double dphi, double dchi);
 
 void printDMat4(glm::dmat4 matrix);
 void printMatrix(std::vector<double> matrix);
 
 std::vector<double> glmToVector16(glm::dmat4x4 m);
 glm::dmat4x4 vectorToGlm16(std::vector<double> m);
+std::vector<double> glmToVector4(glm::dvec4 v);
+std::vector<double>::iterator movingAppend(std::vector<double>&& srcVector,
+                                           std::vector<double>& destVector);

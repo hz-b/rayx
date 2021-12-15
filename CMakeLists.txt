@@ -1,8 +1,25 @@
-cmake_minimum_required(VERSION 3.1 FATAL_ERROR)
+cmake_minimum_required(VERSION 3.2 FATAL_ERROR)
 
-set (CMAKE_CXX_STANDARD 17)
+set (CMAKE_CXX_STANDARD 20)
 
 project(RayReworked)
+
+# enable all warnings
+if (MSVC)
+	message(STATUS "MSVC")
+	set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /W4")
+else()
+	message(STATUS "GCC")
+	set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra -Wpedantic") # -Wconversion -Wsign-conversion")
+endif()
+
+if ("$ENV{CI}" STREQUAL "YES")
+	# warnings are treated as errors
+	set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O3 -Werror") # -O3 finds more errors!
+else()
+	# enable vulkan testing
+	set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DVULKAN_TEST")
+endif()
 
 add_subdirectory(Intern)
 add_subdirectory(Extern)

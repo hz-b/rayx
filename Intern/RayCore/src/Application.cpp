@@ -1,75 +1,115 @@
-#include <iomanip> 
+#include "Application.h"
+
+#include <iomanip>
 #include <iostream>
 
-#include "Application.h"
-#include "Debug.h"
-
-#include "Model/Beamline/Objects/MatrixSource.h"
-#include "Model/Beamline/Objects/PointSource.h"
-#include "Model/Beamline/Objects/PlaneMirror.h"
-#include "Model/Beamline/Objects/ReflectionZonePlate.h"
-#include "Model/Beamline/Objects/ToroidMirror.h"
-#include "Model/Beamline/Objects/ImagePlane.h"
-
 #include "Data/Exporter.h"
-
+#include "Debug/Instrumentor.h"
+#include "Model/Beamline/Objects/Objects.h"
 #include "UserParameter/GeometricUserParams.h"
 #include "UserParameter/WorldUserParams.h"
 
-namespace RAYX
-{
+namespace RAYX {
 
-    Application::Application() :
-        m_Beamline(std::make_shared<Beamline>())
-    {
-        RAYX_DEBUG(std::cout << "[App]: Creating Application..." << std::endl);
-    }
+Application::Application() : m_Beamline(std::make_shared<Beamline>()) {
+    #ifdef RAYX_PLATFORM_WINDOWS
+    #ifdef RAY_DEBUG_MODE
+        _CrtSetReportMode(_CRT_WARN, _CRTDBG_MODE_DEBUG);
+        _CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);
+    #endif
+    #endif
+    RAYX_PROFILE_BEGIN_SESSION("RayX Application", "profile_rayx_application.json");
+    RAYX_DEBUG(std::cout << "[App]: Creating Application..." << std::endl);
+}
 
-    Application::~Application()
-    {
-        RAYX_DEBUG(std::cout << "[App]: Deleting Application..." << std::endl);
-    }
+Application::~Application() {
+    RAYX_DEBUG(std::cout << "[App]: Deleting Application..." << std::endl);
+    RAYX_PROFILE_END_SESSION();
+}
 
-    void Application::loadDummyBeamline()
-    {
-        // ! objects are created here temporarily until reading in file works
-        const clock_t all_begin_time = clock();
+void Application::loadDummyBeamline() {
+    RAYX_PROFILE_FUNCTION();
 
-        std::shared_ptr<MatrixSource> matSourcePtr = std::make_shared<MatrixSource>("matrix source", 0, 0.065, 0.04, 0.0, 0.001, 0.001, 100, 0, 1, 0, 0, std::vector<double>{ 0, 0, 0, 0 });
-        //std::shared_ptr<Slit> s = std::make_shared<Slit>("slit", 1, 2, 20, 2, 7.5, 10000, 20, 1, m->getPhotonEnergy(), std::vector<double>{2, 1, 0, 0, 0, 0 }, nullptr, GLOBAL);
+    EnergyDistribution dist = EnergyDistribution(EnergyRange(100, 0), true);
+    std::shared_ptr<MatrixSource> matSourcePtr = std::make_shared<MatrixSource>(
+        "matrix source", dist, 0.065, 0.04, 0.0, 0.001, 0.001, 1, 0, 0,
+        std::vector<double>{0, 0, 0, 0});
+    // std::shared_ptr<Slit> s = std::make_shared<Slit>("slit", 1, 2, 20,
+    // 2, 7.5, 10000, 20, 1, m->getPhotonEnergy(), std::vector<double>{2, 1, 0,
+    // 0, 0, 0 }, nullptr, GLOBAL);
 
-        WorldUserParams param = WorldUserParams(degToRad(10), degToRad(10), 0, 10000, std::vector<double>{1, 2, 3, 0.001, 0.002, 0.003});
-        glm::dvec4 pos_mirror = param.calcPosition();
-        glm::dmat4x4 or_mirror = param.calcOrientation();
-        std::shared_ptr<PlaneMirror> pm = std::make_shared<PlaneMirror>("PM", 0, 50, 200, pos_mirror, or_mirror, std::vector<double>{0, 0, 0, 0, 0, 0, 0});
+    // plane mirror with misalignment
+    RAYX::GeometricUserParams pm_params = RAYX::GeometricUserParams(7);
+    RAYX::WorldUserParams w_coord = RAYX::WorldUserParams(
+        pm_params.getAlpha(), pm_params.getBeta(), 0, 10000,
+        std::vector<double>{1, 2, 3, 0.004, 0.005, 0.006});
+    glm::dvec4 pos1 = w_coord.calcPosition();
+    glm::dmat4x4 or1 = w_coord.calcOrientation();
+    std::shared_ptr<RAYX::PlaneMirror> pm = std::make_shared<RAYX::PlaneMirror>(
+        "pm_ell_ip_200mirrormis", Geometry::GeometricalShape::RECTANGLE, 50,
+        200, pos1, or1, std::vector<double>{0, 0, 0, 0, 0, 0, 0});
 
-        WorldUserParams tor_param = WorldUserParams(degToRad(10), degToRad(10), 0, 10000, std::vector<double>{0, 0, 0, 0, 0, 0});
-        glm::dvec4 tor_position = tor_param.calcPosition();
-        glm::dmat4x4 tor_orientation = tor_param.calcOrientation();
-        std::shared_ptr<RAYX::ToroidMirror> t = std::make_shared<RAYX::ToroidMirror>("toroid", 0, 50, 200, tor_position, tor_orientation, degToRad(10), 10000, 1000, 10000, 1000, std::vector<double>{0, 0, 0, 0, 0, 0, 0});
+    // ellipsoid with mirror misalignment
+    RAYX::GeometricUserParams ell_params =
+        RAYX::GeometricUserParams(10, 10000, 1000);
+    int coordinatesystem = 1;  // misalignment in mirror coordinate system
+    double tangentAngle =
+        ell_params.calcTangentAngle(10, 10000, 1000, coordinatesystem);
+    RAYX::WorldUserParams ell_w_coord = RAYX::WorldUserParams(
+        ell_params.getAlpha(), ell_params.getBeta(), 0, 100,
+        std::vector<double>{1, 2, 3, 0.004, 0.005, 0.006}, tangentAngle);
+    glm::dvec4 pos2 = ell_w_coord.calcPosition(w_coord, pos1, or1);
+    glm::dmat4x4 or2 = ell_w_coord.calcOrientation(w_coord, or1);
+    // std::shared_ptr<RAYX::Ellipsoid> eb =
+    // std::make_shared<RAYX::Ellipsoid>("ellipsoid_ip_200mirrormis",
+    // Geometry::GeometricalShape::RECTANGLE, 50, 200, pos2, or2, 10, 10000,
+    // 1000, 0, 1, std::vector<double>{0, 0, 0, 0, 0, 0, 0});
+    RAYX::Geometry::GeometricalShape geometricalShape =
+        RAYX::Geometry::GeometricalShape::RECTANGLE;
+    int curvatureType = 0;
+    int additionalOrder = 1;
+    double widthA = 50.0;
+    double height = 200.0;
+    double designEnergy = 100;
+    double orderOfDiffraction = 1;
+    double designOrderOfDiffraction = -1;
+    double dAlpha = 1;  // degree
+    double dBeta = 1;
+    double sEntrance = 100;
+    double sExit = 500;
+    double mEntrance = 100;
+    double mExit = 500;
+    double shortRadius = 0;
+    double longRadius = 0;
+    double fresnelOffset = 0;
+    std::vector<double> mis = {1, 2, 3, 0.001, 0.002, 0.003};
+    std::vector<double> sE = {1, 2, 3, 4, 5, 6, 7};
 
-        std::cout << "\n [App]: IMAGE PLANE \n" << std::endl;
+    std::shared_ptr<ReflectionZonePlate> rzpPtr =
+        std::make_shared<ReflectionZonePlate>(
+            "RZP", geometricalShape, curvatureType, widthA, 60.0, height, pos2,
+            or2, designEnergy, orderOfDiffraction, designOrderOfDiffraction,
+            dAlpha, dBeta, sEntrance, sExit, mEntrance, mExit, shortRadius,
+            longRadius, additionalOrder, fresnelOffset, sE);
 
-        WorldUserParams im_param = WorldUserParams(0, 0, 0, 1000, std::vector<double>{0, 0, 0, 0, 0, 0});
-        glm::dvec4 pos_imageplane = im_param.calcPosition(tor_param, tor_position, tor_orientation);
-        glm::dmat4x4 or_imageplane = im_param.calcOrientation(tor_param, tor_position, tor_orientation);
-        std::shared_ptr<ImagePlane> i = std::make_shared<ImagePlane>("Image plane", pos_imageplane, or_imageplane);
+    // image plane
+    RAYX::WorldUserParams ip_w_coord = RAYX::WorldUserParams(
+        0, 0, 0, 1000, std::vector<double>{0, 0, 0, 0, 0, 0});
+    glm::dvec4 pos3 = ip_w_coord.calcPosition(ell_w_coord, pos2, or2);
+    glm::dmat4x4 or3 = ip_w_coord.calcOrientation(ell_w_coord, or2);
+    std::shared_ptr<RAYX::ImagePlane> i =
+        std::make_shared<RAYX::ImagePlane>("ImagePlane", pos3, or3);
 
-        bool GLOBAL = true;
-        // petes setup
-        std::shared_ptr<RAYX::PointSource> p = std::make_shared<RAYX::PointSource>("spec1_first_rzp4", 1, 0.005, 0.005, 0, 0.02, 0.06, 1, 1, 0, 0, 640, 120, 1, 0, 0, std::vector<double>{0, 0, 0, 0});
-        std::shared_ptr<RAYX::ReflectionZonePlate> rzp = std::make_shared<RAYX::ReflectionZonePlate>("ReflectionZonePete", 0, 1, 0, 1, 1, 4, 60, 170, 2.2, 0, 90, p->getPhotonEnergy(), p->getPhotonEnergy(), -1, -1, 2.2, 1, 90, 400, 90, 400, 0, 0, 1, 0, 0, 1, std::vector<double>{ 0, 0, 0, 0, 0, 0 }, std::vector<double>{ 0, 0, 0, 0, 0, 0, 0 }, nullptr, GLOBAL);  // dx,dy,dz, dpsi,dphi,dchi //
-        m_Beamline->addOpticalElement(t);
-        m_Beamline->addOpticalElement(i);
+    m_Beamline->addOpticalElement(pm);
+    m_Beamline->addOpticalElement(rzpPtr);
+    m_Beamline->addOpticalElement(i);
 
-        m_Presenter = Presenter(m_Beamline);
-        m_Presenter.addLightSource(matSourcePtr);
-        RAYX_DEBUG(std::cout << "[App]: Creating dummy beamline took: " << float(clock() - all_begin_time) / CLOCKS_PER_SEC * 1000 << " ms" << std::endl);
-    }
+    m_Presenter = Presenter(m_Beamline);
+    m_Presenter.addLightSource(matSourcePtr);
+}
 
-    void Application::run()
-    {
-        RAYX_DEBUG(std::cout << "[App]: Application running..." << std::endl);
-    }
+void Application::run() {
+    RAYX_DEBUG(std::cout << "[App]: Application running..." << std::endl);
+}
 
-} // namespace RAYX
+}  // namespace RAYX

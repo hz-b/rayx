@@ -1,35 +1,42 @@
 #pragma once
-#include "Model/Surface/Quadric.h"
+#include <Data/xml.h>
+
 #include "Model/Beamline/OpticalElement.h"
+#include "Model/Surface/Quadric.h"
 
-namespace RAYX
-{
+namespace RAYX {
 
-    class RAYX_API SphereMirror : public OpticalElement {
+class RAYX_API SphereMirror : public OpticalElement {
+  public:
+    // calculate radius in this class
+    SphereMirror(const char* name, Geometry::GeometricalShape geometricalShape,
+                 const double width, const double height,
+                 const double grazingIncidenceAngle, glm::dvec4 position,
+                 glm::dmat4x4 orientation, const double entranceArmLength,
+                 const double exitArmLength,
+                 const std::vector<double> slopeError);
+    // radius is precalculated and given as a parameter
+    SphereMirror(const char* name, Geometry::GeometricalShape geometricalShape,
+                 const double width, const double height, double radius,
+                 glm::dvec4 position, glm::dmat4x4 orientation,
+                 const std::vector<double> slopeError);
+    SphereMirror();
+    ~SphereMirror();
 
-    public:
+    static std::shared_ptr<SphereMirror> createFromXML(
+        rapidxml::xml_node<>*, const std::vector<xml::Group>& group_context);
 
-        // SphereMirror(const char* name, const double width, const double height, const double grazingIncidence, const double azimuthal, const double distanceToPreceedingElement, const double entranceArmLength, const double exitArmLength, const std::vector<double> misalignmentParams, const std::vector<double> slopeError, const std::shared_ptr<OpticalElement> previous, bool global);
+    void calcRadius();
+    double getRadius() const;
+    double getEntranceArmLength() const;
+    double getExitArmLength() const;
 
-        // calculate radius in this class
-        SphereMirror(const char* name, const int geometricalShape, const double width, const double height, const double grazingIncidenceAngle, glm::dvec4 position, glm::dmat4x4 orientation, const double entranceArmLength, const double exitArmLength, const std::vector<double> slopeError);
-        // radius is precalculated and given as a parameter
-        SphereMirror(const char* name, const int geometricalShape, const double width, const double height, double radius, glm::dvec4 position, glm::dmat4x4 orientation, const std::vector<double> slopeError);
-        SphereMirror();
-        ~SphereMirror();
+  private:
+    double m_radius;
+    double m_entranceArmLength;
+    double m_exitArmLength;
+    // grazing incidence, in rad
+    double m_grazingIncidenceAngle;
+};
 
-        void calcRadius();
-        double getRadius() const;
-        double getEntranceArmLength() const;
-        double getExitArmLength() const;
-
-    private:
-        double m_radius;
-        double m_entranceArmLength;
-        double m_exitArmLength;
-        // grazing incidence, in rad
-        double m_grazingIncidenceAngle;
-
-    };
-
-} // namespace RAYX
+}  // namespace RAYX

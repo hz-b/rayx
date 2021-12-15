@@ -1,47 +1,66 @@
 #include "Toroid.h"
-#include <cassert>
+
 #include <math.h>
 
-namespace RAYX
-{
-    /**
-     * @param inputPoints           16 entry vector that contains the paramters for a toroidal surface
-    */
-    Toroid::Toroid(const std::vector<double> inputPoints)
-    {
-        assert(inputPoints.size() == 16);
-        m_parameters = inputPoints;
-    }
+#include <cassert>
 
-    /**
-     * @param longRadius            long radius of the toroidal shape
-     * @param shortRadius           short radius of the toroidal shape
-    */
-    Toroid::Toroid(double longRadius, double shortRadius)
-    {
-        m_parameters = std::vector<double>{longRadius, shortRadius,0,0, 0,0,0,0, 0,0,0,0, 6,0,0,0};
-    }
+namespace RAYX {
+/**
+ * @param inputPoints           16 entry vector that contains the parameters for
+ * a toroidal surface
+ */
+Toroid::Toroid(const std::vector<double> inputPoints) {
+    assert(inputPoints.size() == 16);
+    m_parameters = inputPoints;
+}
 
-    Toroid::Toroid() {}
+/**
+ * @param longRadius            long radius of the toroidal shape
+ * @param shortRadius           short radius of the toroidal shape
+ * @param elementType           6=toroid mirror, 4=toroid rzp
+ */
+Toroid::Toroid(double longRadius, double shortRadius, double elementType) {
+    m_parameters =
+        std::vector<double>{longRadius, shortRadius, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                            0,          elementType, 0, 0, 0};
+    m_longRadius = longRadius;
+    m_shortRadius = shortRadius;
+}
 
-    Toroid::~Toroid()
-    {
-    }
+Toroid::Toroid() {}
 
-    /**
-     * sets the parameters of the toroidal surface to the given 16 entry vector
-     * @param inputPoints   16 entry vector a_11 to a_44
-     * @return void
-    */
-    void Toroid::setParameters(const std::vector<double> inputPoints)
-    {
-        assert(inputPoints.size() == 16); //parameter size ==6?
-        m_parameters = inputPoints;
-    }
+Toroid::~Toroid() {}
 
-    std::vector<double> Toroid::getParams() const {
-        std::cout << "[Toroid]: Return anchor points" << std::endl;
-        return m_parameters;
-    }
+/**
+ * sets the parameters of the toroidal surface to the given 16 entry vector
+ * @param inputPoints   16 entry vector
+ * @return void
+ */
+void Toroid::setParameters(const std::vector<double> inputPoints) {
+    assert(inputPoints.size() == 16);
+    m_parameters = inputPoints;
+    m_longRadius = inputPoints[0];
+    m_shortRadius = inputPoints[1];
+}
 
-} // namespace RAYX
+/**
+ * ENCODING:
+ *
+ * {longRadius,  shortRadius,   0.0 , 0.0,
+ *  0.0,         0.0,           0.0,  0.0,
+ *  0.0,         0.0,           0.0,  0.0,
+ *  type,        settings,      0.0,  0.0}
+ *
+ * @param type = what kind of optical element (mirror, plane grating, spherical
+ *grating, toroid mirror, rzp, slit..)
+ * @param setting = how to interpret the input of
+ *these params. During normal tracing always = 0 but when testing, this
+ *parameter defines which test to run
+ *
+ **/
+std::vector<double> Toroid::getParams() const {
+    std::cout << "[Toroid]: Return surface points" << std::endl;
+    return m_parameters;
+}
+
+}  // namespace RAYX
