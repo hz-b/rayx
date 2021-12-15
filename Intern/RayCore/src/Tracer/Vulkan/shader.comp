@@ -3296,6 +3296,6 @@ void main(){
     //dynamicElements();
 	testFunctions();
 	
-	// output = input:
+	//output = input:
     //outputData[uint(gl_GlobalInvocationID)] = rayData[uint(gl_GlobalInvocationID)];
 }

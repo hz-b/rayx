@@ -13,7 +13,7 @@
 #define RAY_DOUBLE_COUNT 16
 // Rays per vector
 #define RAY_MAX_ELEMENTS_IN_VECTOR \
-    RAY_VECTOR_SIZE / (sizeof(double) * RAY_DOUBLE_COUNT)
+    (RAY_VECTOR_SIZE / (sizeof(double) * RAY_DOUBLE_COUNT))
 
 namespace RAYX {
 
@@ -23,7 +23,7 @@ class RayList {
     RayList();
     ~RayList();
     // appends vector of Rays to the ray list
-    void insertVector(void* location, size_t size);
+    void insertVector(const std::vector<Ray>& inRayVector);
     std::list<std::vector<Ray>>::iterator begin();
     std::list<std::vector<Ray>>::iterator end();
     std::vector<Ray> back();

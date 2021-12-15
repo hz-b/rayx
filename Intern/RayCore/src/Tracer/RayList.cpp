@@ -3,6 +3,7 @@
 #include <cassert>
 #include <cmath>
 #include <cstring>
+#include <iostream>
 
 namespace RAYX {
 
@@ -28,8 +29,29 @@ void RayList::addVector() {
     // std::cout << "add vector: end" << std::endl;
 }
 
-void RayList::insertVector(void* location, size_t inputSize) {
-    // std::cout<<"insert vector: start"<<std::endl;
+void RayList::insertVector(const std::vector<Ray>& inRayVector) {
+    // cut inRayVector to RAY_VECTOR_SIZE big pieces and emplace back
+    int numberOfVecs = inRayVector.size() / RAY_MAX_ELEMENTS_IN_VECTOR;
+    if (inRayVector.size() % RAY_MAX_ELEMENTS_IN_VECTOR != 0) {
+        numberOfVecs++;
+    }
+
+    // TODO(Jannis): doesn't work correctly for multiple light sources (leaves
+    // gaps)
+    for (int i = 0; i < numberOfVecs; i++) {
+        if (i == numberOfVecs - 1) {
+            // last vector
+            m_rayList.emplace_back(
+                inRayVector.begin() + i * RAY_MAX_ELEMENTS_IN_VECTOR,
+                inRayVector.end());
+        } else {
+            m_rayList.emplace_back(
+                inRayVector.begin() + i * RAY_MAX_ELEMENTS_IN_VECTOR,
+                inRayVector.begin() + (i + 1) * RAY_MAX_ELEMENTS_IN_VECTOR);
+        }
+    }
+
+    /*// std::cout<<"insert vector: start"<<std::endl;
     std::vector<Ray> input;
     // if the last vector of the list is full, we can just append
     // std::cout<<"RayList size= "<< m_rayList.size() <<std::endl;
@@ -61,14 +83,14 @@ void RayList::insertVector(void* location, size_t inputSize) {
             (char*)location + (inputSize * RAY_DOUBLE_COUNT * sizeof(double) -
                                remainingBytes),
             bytesToCopy);
-        (m_rayList.back())
-            .resize(m_rayList.back().size() +
-                    (bytesToCopy / (RAY_DOUBLE_COUNT * sizeof(double))));
+        m_rayList.back().resize(
+            m_rayList.back().size() +
+            (bytesToCopy / (RAY_DOUBLE_COUNT * sizeof(double))));
         // std::cout << "insertVector: m_rayList.back().size(): " <<
         // m_rayList.back().size() << std::endl; std::cout << "insertVector:
         // sample ray: " << m_rayList.back()[0].getxDir() << std::endl;
         remainingBytes -= bytesToCopy;
-    }
+    }*/
 }
 
 std::list<std::vector<Ray>>::iterator RayList::begin() {

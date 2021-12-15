@@ -38,9 +38,8 @@ TracerInterface::~TracerInterface() {
 void TracerInterface::generateRays(std::shared_ptr<LightSource> source) {
     // only one Source for now
     if (!source) return;
-    std::vector<RAYX::Ray> rays = source->getRays();
     RAYX_DEBUG(std::cout << "[TracerInterf]: add rays" << std::endl);
-    m_RayTracer.addRayVector(rays.data(), rays.size());
+    m_RayTracer.addRayVector(source->getRays());
 }
 
 void TracerInterface::setBeamlineParameters() {

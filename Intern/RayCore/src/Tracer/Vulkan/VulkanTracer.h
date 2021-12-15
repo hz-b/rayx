@@ -62,7 +62,7 @@ class RAYX_API VulkanTracer {
     void cleanup();
 
     void getRays();
-    void addRayVector(void* location, size_t size);
+    void addRayVector(const std::vector<Ray>& inRayVector);
     void addVectors(const std::vector<double>& surfaceParams,
                     const std::vector<double>& inputInMatrix,
                     const std::vector<double>& inputOutMatrix,
