@@ -1967,7 +1967,7 @@ double getIncidenceAngle(Ray r, dvec4 normal) {
 	else if(ar > 1.0) ar = 1.0;
 
 	double theta = PI - r8_acos(ar);
-	int gt = int(theta > PI);
+	int gt = int(theta > PI/2);
 	// theta in [0, pi]
 	theta = gt * (PI - theta) + (1-gt) * theta;
 	return theta;
@@ -2039,7 +2039,7 @@ void reflectance(double energy, double incidence_angle, inout dvec2 complex_S, i
 	dvec2 cos_transmittance = snell(cos_incidence, cn1, cn2);
 
 	// todo again iterate over layers but from bottom to top, update s and p polarization in each iteration:
-	fresnel(cn1, cn2, cos_transmittance, cos_incidence, complex_S, complex_P);
+	fresnel(cn2, cn1, cos_transmittance, cos_incidence, complex_S, complex_P);
 	// todo roughness (uses wavelength/energy)
 	// todo other calculations for layers that are not substrate (which is the first layer)
 	return;
@@ -2049,23 +2049,23 @@ void reflectance(double energy, double incidence_angle, inout dvec2 complex_S, i
  * euler = r * e^(i * phi) where r = sqrt(a**2 + b**2) = radius and phi = atan2(a,b) = (absolute) phase
  */
 dvec2 cartesian_to_euler(dvec2 complex) {
-	double r = complex.x*complex.x + complex.y*complex.y; // r = sqrt(a**2 + b**"), why not take sqrt in fortran code?
+	double r = (dot(complex, complex)); // r = sqrt(a**2 + b**2), why not take sqrt in fortran code?
 	dvec2 euler;
 	if(r < 0 || r > 1) {
 		euler = dvec2(1.0/0.0, 1.0/0.0);
 		return euler;
 	}
-	euler = dvec2(r, r8_atan2(complex.y, complex.x)); // TODO in grad or in rad?
+	euler = dvec2(r, r8_atan2(complex.y, complex.x)); // phi in rad
 	return euler;
 }
 
 /** computes the difference in the phases of 2 complex number written in euler form: r * e^(i * phi)
- * @param euler1 		first complex number // p
- * @param euler2		second complex number // s
+ * @param euler1 		first complex number // s 
+ * @param euler2		second complex number // p
  * @return delta = phi1 - phi2, in [-pi/2, pi/2] degrees
  */
 double phase_difference(dvec2 euler1, dvec2 euler2) {
-	double delta = euler2.y - euler1.y; // s -p
+	double delta = euler2.y - euler1.y; // p - s
 	delta = delta - int(delta > 180)*360.0 + int(delta < -180)*360.0;
 	return delta;
 }
@@ -2087,7 +2087,7 @@ void efficiency(Ray r, out double real_S, out double real_P, out double delta, d
 	dvec2 euler_P = cartesian_to_euler(complex_P);
 	dvec2 euler_S = cartesian_to_euler(complex_S);
 
-	delta = phase_difference(euler_P, euler_S);
+	delta = phase_difference(euler_S, euler_P);
 	real_S = euler_S.x;
 	real_P = euler_P.x;
 }
@@ -2115,9 +2115,9 @@ dmat4 muller_matrix(double R_s, double R_p, double delta) {
  * @param real_P	real part of the complex p-polarization
  * @param delta		phase difference between complex s and p polarization
  * @param azimuthal	angle of rotation of element in xy plane (chi + dchi (misalignment))
- * @returns updated stokes vector of ray
+ * @returns updated stokes vector of ray, updates weight of ray
  */
-dvec4 update_stokes(Ray r, double real_S, double real_P, double delta, double azimuthal) {
+void update_stokes(inout Ray r, double real_S, double real_P, double delta, double azimuthal, inout uint64_t ctr) {
 	dvec4 stokes_old = r.stokes;
 	double c_chi = r8_cos(azimuthal);
 	double s_chi = r8_sin(azimuthal);
@@ -2127,11 +2127,13 @@ dvec4 update_stokes(Ray r, double real_S, double real_P, double delta, double az
 					0, 0, 0, 1);
 	dmat4 inv_rot = transpose(rot);
 
-	stokes_old = rot * stokes_old;
-	dvec4 stokes_new = muller_matrix(real_S, real_P, delta) * stokes_old;
-	stokes_new = inv_rot * stokes_new;
+	dvec4 stokes_new = muller_matrix(real_S, real_P, delta) * rot * stokes_old;;
+	r.stokes = inv_rot * stokes_new;
 
-	return stokes_new;
+	double rn = squaresDoubleRNG(ctr);
+	// throw ray away with certain probability
+	if((r.stokes.x / stokes_old.x) - rn <= 0) r.weight = 0;
+	return;
 }
 
 /**
@@ -2930,9 +2932,8 @@ Ray traceMirror(Ray r, const int elementIndex, inout uint64_t ctr, dvec4 interse
 	
 	double real_S, real_P, delta;
 	efficiency(r, real_S, real_P, delta, incidence_angle);
-	r.stokes = dvec4(real_S, real_P, delta, incidence_angle);
-	//update_stokes(r, real_S, real_P, delta, azimuthal_angle); 
-	
+	update_stokes(r, real_S, real_P, delta, azimuthal_angle, ctr); 
+
 	r.order = 0;
 	return r;
 }
