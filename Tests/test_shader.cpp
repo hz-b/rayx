@@ -2861,3 +2861,28 @@ TEST(PeteRZP, spec1_first_minus_ip2) {
     std::string filename = "testFile_spec1_first_minus_rzp_ip2";
     writeToFile(outputRays, filename);
 }
+
+TEST(opticalElements, CylinderDefault) {
+    RAYX::GeometricUserParams cy_params =
+        RAYX::GeometricUserParams(10, 10000, 1000);
+
+    RAYX::WorldUserParams cy_w_coord =
+        RAYX::WorldUserParams(degToRad(10), degToRad(10), 0, 10000,
+                              std::vector<double>{0, 0, 0, 0, 0, 0});
+
+    glm::dvec4 pos4 = cy_w_coord.calcPosition();
+    glm::dmat4x4 or4 = cy_w_coord.calcOrientation();
+    std::shared_ptr<RAYX::Cylinder> cy = std::make_shared<RAYX::Cylinder>(
+        "Cylinder", RAYX::Geometry::GeometricalShape::RECTANGLE, 10470.4917875,
+        0, 50, 200, pos4, or4, 10, 10000, 1000,
+        std::vector<double>{0, 0, 0, 0, 0, 0, 0});
+
+    // image plane
+    RAYX::WorldUserParams ip_w_coord = RAYX::WorldUserParams(
+        0, 0, 0, 1000, std::vector<double>{0, 0, 0, 0, 0, 0});
+    glm::dvec4 pos3 = ip_w_coord.calcPosition(cy_w_coord, pos4, or4);
+    glm::dmat4x4 or3 = ip_w_coord.calcOrientation(cy_w_coord, or4);
+    std::shared_ptr<RAYX::ImagePlane> i =
+        std::make_shared<RAYX::ImagePlane>("ImagePlane", pos3, or3);
+    testOpticalElement({cy, i}, 200);
+}

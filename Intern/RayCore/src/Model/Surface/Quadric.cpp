@@ -36,7 +36,7 @@ void Quadric::setAnchorPoints(std::vector<double> inputPoints) {
  * ENCODING:
  *
  * {a_11,  a_12,     a_13, a_14,
- *  icurv, a_22,     a_23, a_44,
+ *  icurv, a_22,     a_23, a_24,
  *  0.0,   0.0,      a_33, a_34,
  *  type,  settings, 0.0,  a_44}
  *

@@ -325,7 +325,12 @@ class Tests(unittest.TestCase):
         self.assertTrue(correct.shape == result[:6].shape)
         self.assertTrue(np.allclose(correct, result[:6]))    
         
-        
+    def test_cylinder(self):
+        correct = open_old_file(
+            'ImagePlane-RawRaysBeam.csv','ImagePlane_')
+        result = open_new_file('testFile_Cylinder.csv', valid=1) 
+        self.assertTrue(correct.shape == result[:6].shape)
+        self.assertTrue(np.allclose(correct, result[:6]))
         
     
 if __name__ == '__main__':

@@ -1,6 +1,7 @@
 #pragma once
 #include "Model/Beamline/OpticalElement.h"
 #include "Model/Surface/Quadric.h"
+#include "utils.h"
 
 namespace RAYX {
 class RAYX_API Cylinder : public OpticalElement {
@@ -12,9 +13,17 @@ class RAYX_API Cylinder : public OpticalElement {
              const double exitArmLength, const std::vector<double> slopeError);
     ~Cylinder();
 
-    double getRadius();
-    enum CYLINDER_DIRECTION { X_DIR, Y_DIR };
-    CYLINDER_DIRECTION getDirection();
+    void setRadius();
+    enum CYLINDER_DIRECTION {
+        LONG_RADIUS_R,
+        SHORT_RADIUS_RHO
+    };  // TODO: rename this
+    CYLINDER_DIRECTION getDirection() const;
+
+    double getIncidenceAngle() const;
+    double getExitArmLength() const;
+    double getRadius() const;
+    double getEntranceArmLength() const;
 
   private:
     // user params:
