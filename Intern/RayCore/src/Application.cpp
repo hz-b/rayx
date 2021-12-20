@@ -27,8 +27,12 @@ Application::~Application() {
     RAYX_PROFILE_END_SESSION();
 }
 
-void Application::loadDummyBeamline() {
+void Application::loadDummyBeamline() {  // ! objects are created here
+                                         // temporarily until reading in file
+                                         // works
     RAYX_PROFILE_FUNCTION();
+
+    RAYX::SimulationEnv::get().m_numOfRays = 20;
 
     EnergyDistribution dist = EnergyDistribution(EnergyRange(100, 0), true);
     std::shared_ptr<MatrixSource> matSourcePtr = std::make_shared<MatrixSource>(
@@ -39,41 +43,34 @@ void Application::loadDummyBeamline() {
     // 0, 0, 0 }, nullptr, GLOBAL);
 
     // plane mirror with misalignment
-    RAYX::GeometricUserParams pm_params = RAYX::GeometricUserParams(7);
-    RAYX::WorldUserParams w_coord = RAYX::WorldUserParams(
-        pm_params.getAlpha(), pm_params.getBeta(), 0, 10000,
-        std::vector<double>{1, 2, 3, 0.004, 0.005, 0.006});
+    RAYX::GeometricUserParams pm_params = RAYX::GeometricUserParams(10);
+    RAYX::WorldUserParams w_coord =
+        RAYX::WorldUserParams(pm_params.getAlpha(), pm_params.getBeta(), 0,
+                              10000, std::vector<double>{0, 0, 0, 0, 0, 0});
     glm::dvec4 pos1 = w_coord.calcPosition();
     glm::dmat4x4 or1 = w_coord.calcOrientation();
     std::shared_ptr<RAYX::PlaneMirror> pm = std::make_shared<RAYX::PlaneMirror>(
         "pm_ell_ip_200mirrormis", Geometry::GeometricalShape::RECTANGLE, 50,
-        200, pos1, or1, std::vector<double>{0, 0, 0, 0, 0, 0, 0});
+        200, w_coord.getAzimuthalAngle(), pos1, or1,
+        std::vector<double>{0, 0, 0, 0, 0, 0, 0});
 
-    // ellipsoid with mirror misalignment
-    RAYX::GeometricUserParams ell_params =
-        RAYX::GeometricUserParams(10, 10000, 1000);
-    int coordinatesystem = 1;  // misalignment in mirror coordinate system
-    double tangentAngle =
-        ell_params.calcTangentAngle(10, 10000, 1000, coordinatesystem);
-    RAYX::WorldUserParams ell_w_coord = RAYX::WorldUserParams(
-        ell_params.getAlpha(), ell_params.getBeta(), 0, 100,
-        std::vector<double>{1, 2, 3, 0.004, 0.005, 0.006}, tangentAngle);
-    glm::dvec4 pos2 = ell_w_coord.calcPosition(w_coord, pos1, or1);
-    glm::dmat4x4 or2 = ell_w_coord.calcOrientation(w_coord, or1);
-    // std::shared_ptr<RAYX::Ellipsoid> eb =
-    // std::make_shared<RAYX::Ellipsoid>("ellipsoid_ip_200mirrormis",
-    // Geometry::GeometricalShape::RECTANGLE, 50, 200, pos2, or2, 10, 10000,
-    // 1000, 0, 1, std::vector<double>{0, 0, 0, 0, 0, 0, 0});
     RAYX::Geometry::GeometricalShape geometricalShape =
         RAYX::Geometry::GeometricalShape::RECTANGLE;
     int curvatureType = 0;
+    double incidenceAngle =
+        0;  // if incidence angle = 0 and mount = 1 use dAlpha as incidenceAngle
+    double deviationAngle = 0;  // does not matter bc mount = 1
+    int mount = 1;              // incidence
+    double exitAngle = 0;
+    int imageType = 1;
     int additionalOrder = 1;
     double widthA = 50.0;
     double height = 200.0;
     double designEnergy = 100;
     double orderOfDiffraction = 1;
     double designOrderOfDiffraction = -1;
-    double dAlpha = 1;  // degree
+    double azimuthalAngle = 0;  // rad
+    double dAlpha = 1;          // degree
     double dBeta = 1;
     double sEntrance = 100;
     double sExit = 500;
@@ -82,26 +79,36 @@ void Application::loadDummyBeamline() {
     double shortRadius = 0;
     double longRadius = 0;
     double fresnelOffset = 0;
+    double azimuthal = 10;
     std::vector<double> mis = {1, 2, 3, 0.001, 0.002, 0.003};
     std::vector<double> sE = {1, 2, 3, 4, 5, 6, 7};
+    RAYX::GeometricUserParams gu_rzp = RAYX::GeometricUserParams(
+        mount, imageType, deviationAngle, incidenceAngle, exitAngle, 100,
+        designEnergy, orderOfDiffraction, designOrderOfDiffraction, dAlpha,
+        dBeta, mEntrance, mExit, sEntrance, sExit);
+    RAYX::WorldUserParams rzp_param = RAYX::WorldUserParams(
+        gu_rzp.getAlpha(), gu_rzp.getBeta(), degToRad(azimuthal), 10000,
+        std::vector<double>{0, 0, 0, 0, 0, 0});
+    glm::dvec4 pos2 = rzp_param.calcPosition();
+    glm::dmat4x4 or2 = rzp_param.calcOrientation();
 
     std::shared_ptr<ReflectionZonePlate> rzpPtr =
         std::make_shared<ReflectionZonePlate>(
-            "RZP", geometricalShape, curvatureType, widthA, 60.0, height, pos2,
-            or2, designEnergy, orderOfDiffraction, designOrderOfDiffraction,
-            dAlpha, dBeta, sEntrance, sExit, mEntrance, mExit, shortRadius,
-            longRadius, additionalOrder, fresnelOffset, sE);
+            "RZP", geometricalShape, curvatureType, widthA, 60.0, height,
+            azimuthalAngle, pos2, or2, designEnergy, orderOfDiffraction,
+            designOrderOfDiffraction, dAlpha, dBeta, sEntrance, sExit,
+            mEntrance, mExit, shortRadius, longRadius, additionalOrder,
+            fresnelOffset, sE);
 
     // image plane
     RAYX::WorldUserParams ip_w_coord = RAYX::WorldUserParams(
         0, 0, 0, 1000, std::vector<double>{0, 0, 0, 0, 0, 0});
-    glm::dvec4 pos3 = ip_w_coord.calcPosition(ell_w_coord, pos2, or2);
-    glm::dmat4x4 or3 = ip_w_coord.calcOrientation(ell_w_coord, or2);
+    glm::dvec4 pos3 = ip_w_coord.calcPosition(w_coord, pos1, or1);
+    glm::dmat4x4 or3 = ip_w_coord.calcOrientation(w_coord, or1);
     std::shared_ptr<RAYX::ImagePlane> i =
         std::make_shared<RAYX::ImagePlane>("ImagePlane", pos3, or3);
 
     m_Beamline->addOpticalElement(pm);
-    m_Beamline->addOpticalElement(rzpPtr);
     m_Beamline->addOpticalElement(i);
 
     m_Presenter = Presenter(m_Beamline);

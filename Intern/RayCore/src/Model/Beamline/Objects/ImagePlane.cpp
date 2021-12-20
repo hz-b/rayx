@@ -11,12 +11,12 @@ namespace RAYX {
  * @param   position        distance to preceeding element
  * @param   orientation     pointer to previous element in beamline, needed for
  * calculating world coordinates
- *
+ * does not have an azimuthal angle
  */
 ImagePlane::ImagePlane(const char* name, glm::dvec4 position,
                        glm::dmat4x4 orientation)
     : OpticalElement(name, {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-                     Geometry::GeometricalShape::RECTANGLE, 0, 0, position,
+                     Geometry::GeometricalShape::RECTANGLE, 0, 0, 0, position,
                      orientation, {0, 0, 0, 0, 0, 0, 0}) {
     setSurface(std::make_unique<Quadric>(
         std::vector<double>{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 5, 0, 0, 0}));

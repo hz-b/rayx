@@ -9,7 +9,8 @@ namespace RAYX {
 class RAYX_API PlaneGrating : public OpticalElement {
   public:
     PlaneGrating(const char* name, Geometry::GeometricalShape geometricalShape,
-                 const double width, const double height, glm::dvec4 position,
+                 const double width, const double height,
+                 const double azimuthalAngle, glm::dvec4 position,
                  glm::dmat4x4 orientation, const double designEnergyMounting,
                  const double lineDensity, const double orderOfDiffraction,
                  const int additionalZeroOrder, const std::vector<double> vls,

@@ -10,6 +10,8 @@ namespace RAYX {
  * @param geometricalShape          either rectangular or elliptical
  * @param width                     width of the element
  * @param height                    height of the element
+ * @param azimuthalAngle            rotation of element in xy-plane, needed for
+ * stokes vector
  * @param grazingIncidenceAngle     angle in which the main ray should hit the
  * element, used to calculate the radii, in rad
  * @param position                  position of element in world coordinate
@@ -28,17 +30,15 @@ namespace RAYX {
  * y-z meridional (1), thermal distortion x (2),y (3),z (4), cylindrical bowing
  * amplitude y(5) and radius (6)
  */
-ToroidMirror::ToroidMirror(const char* name,
-                           Geometry::GeometricalShape geometricalShape,
-                           const double width, const double height,
-                           glm::dvec4 position, glm::dmat4x4 orientation,
-                           const double incidenceAngle, const double mEntrance,
-                           const double mExit, const double sEntrance,
-                           const double sExit,
-                           const std::vector<double> slopeError)
+ToroidMirror::ToroidMirror(
+    const char* name, Geometry::GeometricalShape geometricalShape,
+    const double width, const double height, const double azimuthalAngle,
+    glm::dvec4 position, glm::dmat4x4 orientation, const double incidenceAngle,
+    const double mEntrance, const double mExit, const double sEntrance,
+    const double sExit, const std::vector<double> slopeError)
     : OpticalElement(name, {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-                     geometricalShape, width, height, position, orientation,
-                     slopeError),
+                     geometricalShape, width, height, azimuthalAngle, position,
+                     orientation, slopeError),
       m_sagittalEntranceArmLength(sEntrance),
       m_sagittalExitArmLength(sExit),
       m_meridionalEntranceArmLength(mEntrance),
@@ -117,7 +117,7 @@ std::shared_ptr<ToroidMirror> ToroidMirror::createFromXML(
     }
 
     return std::make_shared<ToroidMirror>(
-        name, geometricalShape, width, height, position, orientation,
+        name, geometricalShape, width, height, 0, position, orientation,
         incidenceAngle, mEntrance, mExit, sEntrance, sExit, slopeError);
 }
 

@@ -31,6 +31,14 @@ struct Element{
 	dmat4 objectParameters;
 	dmat4 elementParameters;
 };
+
+struct PalikEntry{
+	double energy;
+	double n;
+	double k;
+	double empty; // for padding
+};
+
 layout(std140, binding = 0) buffer ibuf
 {
    Ray rayData[];
@@ -51,6 +59,15 @@ layout(std140, binding = 2) buffer qbuf
 layout(std140, binding = 3) buffer xyzbuf
 {
 	dvec4 xyznull[];
+};
+
+layout(binding = 4) buffer materialIndexBuf
+{
+	int nkpIdx[]; // can be indexed by material-index defined in Material.h to get the starting point of this material in the `nkp` table.
+};
+layout(binding = 5) buffer materialBuf
+{
+	PalikEntry nkp[]; // contains PALIK table of all materials concatenated together
 };
 
 
@@ -412,7 +429,7 @@ double r8_mach ( int i )
 		return 0.0;
 	}
 	
-	double [6] return_values = double[6] (0, 4.450147717014403E-308, 8.988465674311579E+307, 1.110223024625157E-016, 2.220446049250313E-016, 0.301029995663981E+000);  
+	double [6] return_values = double[6] (0, 4.450147717014403E-308, 8.988465674311579E+307, 1.110223024625157E-016, 2.220446049250313E-016, 0.301029995663981E+000);
 	return return_values[i];
 }
 
@@ -1179,7 +1196,7 @@ double dpow (double a, int b) {
 #define cx_cos(a) dvec2(r8_cos(a.x) * r8_cosh(a.y), -r8_sin(a.x) * r8_sinh(a.y))
 
 dvec2 cx_sqrt(dvec2 a) {
-    double r = length(a);
+	double r = length(a);
     double rpart = sqrt(0.5*(r+a.x));
     double ipart = sqrt(0.5*(r-a.x));
     if (a.y < 0.0) ipart = -ipart;
@@ -1214,16 +1231,16 @@ dvec2 cx_sin_of_one_over_z(dvec2 z) {
 }
 
 // Additions by Johan Karlsson (DonKarlssonSan) https://gist.github.com/DonKarlssonSan
-// https://gist.github.com/DonKarlssonSan/f87ba5e4e5f1093cb83e39024a6a5e72 
+// https://gist.github.com/DonKarlssonSan/f87ba5e4e5f1093cb83e39024a6a5e72
 #define cx_sub(a, b) dvec2(a.x - b.x, a.y - b.y)
 #define cx_add(a, b) dvec2(a.x + b.x, a.y + b.y)
 #define cx_abs(a) length(a)
 dvec2 cx_to_polar(dvec2 a) {
     double phi = r8_atan(a.y / a.x);
     double r = length(a);
-    return dvec2(r, phi); 
+    return dvec2(r, phi);
 }
-    
+ 
 // Complex power
 dvec2 cx_pow(dvec2 a, int n) {
     double angle = r8_atan2(a.y, a.x);
@@ -1689,7 +1706,7 @@ dvec4 getIntersectionPoint(Ray r, dmat4 quadric)
 		//r.position = dvec3(a, b, c);
 	}
 
-	// intersection point is in the negative direction (behind the position when the direction is followed forwards), set weight to 0 
+	// intersection point is in the negative direction (behind the position when the direction is followed forwards), set weight to 0
 	if( (x - r.position.x) / r.direction.x < 0 || (y - r.position.y) / r.direction.y < 0 || (z - r.position.z) / r.direction.z < 0) {
 		w = 0;
 	}
@@ -1921,9 +1938,28 @@ dvec4 getOpticalElementIntersection(Ray r, uint elementIndex){
 	return currentIntersection; // in element coordinate system
 }
 
+dvec2 getRefractiveIndex(double energy, int material) {
+	if (material == -1) { // vacuum
+		return dvec2(1., 0.);
+	}
+
+	int low = nkpIdx[material]; // <= energy
+	int high = (material+1 < nkpIdx.length())? nkpIdx[material+1]-1 : nkp.length()-1; // >= energy
+
+	// binary search
+	while (high-low > 1) {
+		int center = (low+high)/2;
+		if (energy < nkp[center].energy) {
+			high = center;
+		} else {
+			low = center;
+		}
+	}
+	return dvec2(nkp[low].n, nkp[low].k); // return refractive index for energy level
+}
 
 // returns angle between ray direction and surface normal at intersection point
-double getTheta(Ray r, dvec4 normal) {
+double getIncidenceAngle(Ray r, dvec4 normal) {
 	normal = normalize(normal);
 	double ar = dot(dvec3(normal), r.direction);
 	// cut to interval [-1,1]
@@ -1931,7 +1967,7 @@ double getTheta(Ray r, dvec4 normal) {
 	else if(ar > 1.0) ar = 1.0;
 
 	double theta = PI - r8_acos(ar);
-	int gt = int(theta > PI);
+	int gt = int(theta > PI/2);
 	// theta in [0, pi]
 	theta = gt * (PI - theta) + (1-gt) * theta;
 	return theta;
@@ -1940,7 +1976,10 @@ double getTheta(Ray r, dvec4 normal) {
 
 /** calculates cosinus of transmittance angle with snell's law 
  * cosinus is needed in fresnel formula
- * sin(transmittance_anlge) = (cn1 / cn2) * sin(incidence_angle)
+ * sin(incidence_angle)² = 1 - cos(incidence_angle)²
+ * ratio² = (cn1 / cn2)²
+ * sin(transmittance_angle)² = (cn1 / cn2)² * sin(incidence_angle)²
+ * cos(transmittance_angle) = sqrt( 1 - sin(transmittance_angle)²) 
  * 
  * @param cos_incidence			cosinus of complex incidence angle
  * @param cn1					complex refractive index of material from which the ray is coming
@@ -1948,10 +1987,16 @@ double getTheta(Ray r, dvec4 normal) {
  * @return cos_transmittance 	cosinus of complex transmittance angle 
  */
 dvec2 snell(dvec2 cos_incidence, dvec2 cn1, dvec2 cn2) {
-	dvec2 sin_incidence = cx_sqrt( cx_sub(dvec2(1,0), cx_pow(cos_incidence, 2)) );
+	/*dvec2 sin_incidence = cx_sqrt( cx_sub(dvec2(1.0,0.0), cx_mul(cos_incidence, cos_incidence)) );
 	dvec2 refractive_ratio = cx_div(cn1, cn2);
 	dvec2 sin_transmittance = cx_mul(sin_incidence, refractive_ratio);
-	dvec2 cos_transmittance = cx_sqrt( cx_sub(dvec2(1,0), cx_pow(sin_transmittance, 2)));
+	dvec2 cos_transmittance = cx_sqrt( cx_sub(dvec2(1.0,0.0), cx_mul(sin_transmittance, sin_transmittance)));
+	return cos_transmittance;*/
+	dvec2 sin_incidence_square = cx_sub(dvec2(1.0,0.0), cx_mul(cos_incidence, cos_incidence)); // 1 - cos(inc)**2
+	dvec2 refractive_ratio = cx_div(cn1, cn2); // cn1 / cn2
+	dvec2 ratio_square = cx_mul(refractive_ratio, refractive_ratio);
+	dvec2 sin_transmittance_square = cx_mul(sin_incidence_square, ratio_square); // sin(tr)**2 = sin(inc)**2 * (cn1/cn2)**2
+	dvec2 cos_transmittance = cx_sqrt( cx_sub(dvec2(1.0,0.0), sin_transmittance_square) ); // cos = sqrt( 1 - ratio**2*sin(tr)**2 )
 	return cos_transmittance;
 }
 
@@ -1970,7 +2015,7 @@ void fresnel(dvec2 cn1, dvec2 cn2, dvec2 cos_incidence, dvec2 cos_transmittance,
 	dvec2 mat2_incidence = cx_mul( cn2, cos_incidence ); // material two (into which the ray goes)
 	dvec2 mat2_transmittance = cx_mul( cn2, cos_transmittance );
 
-	complex_S = - cx_div(cx_sub(mat1_incidence, mat2_transmittance) , cx_add(mat1_incidence, mat2_transmittance));
+	complex_S = cx_div(cx_sub(mat1_incidence, mat2_transmittance) , cx_add(mat1_incidence, mat2_transmittance));
 	complex_P = - cx_div(cx_sub(mat1_transmittance, mat2_incidence) , cx_add(mat1_transmittance, mat2_incidence));
 	return;
 }
@@ -1983,16 +2028,18 @@ void fresnel(dvec2 cn1, dvec2 cn2, dvec2 cos_incidence, dvec2 cos_transmittance,
  */
 void reflectance(double energy, double incidence_angle, inout dvec2 complex_S, inout dvec2 complex_P) {
 	dvec2 cos_incidence = dvec2( r8_cos(incidence_angle), 0.0); // complex number, initialization only for first layer, the others are then derived from this with snell's law
-	
+
+	int material1 = -1; // vacuum
+	int material2 = 0; // copper
 	// todo number of layers: loop over layers from top to bottom, transmittance angle for each layer, so far only one layer (substrate?)
 	// store cosinuses in array, bc needed in later loop for fresnel (or maybe only one loop is enough?)
 	// todo refractive indices of materials in extra buffer?
-	dvec2 cn1 = dvec2(1,0);
-	dvec2 cn2 = dvec2(1,0);
+	dvec2 cn1 = getRefractiveIndex(energy, material1);
+	dvec2 cn2 = getRefractiveIndex(energy, material2);
 	dvec2 cos_transmittance = snell(cos_incidence, cn1, cn2);
 
 	// todo again iterate over layers but from bottom to top, update s and p polarization in each iteration:
-	fresnel(cn1, cn2, cos_incidence, cos_transmittance, complex_S, complex_P);
+	fresnel(cn2, cn1, cos_transmittance, cos_incidence, complex_S, complex_P);
 	// todo roughness (uses wavelength/energy)
 	// todo other calculations for layers that are not substrate (which is the first layer)
 	return;
@@ -2002,23 +2049,23 @@ void reflectance(double energy, double incidence_angle, inout dvec2 complex_S, i
  * euler = r * e^(i * phi) where r = sqrt(a**2 + b**2) = radius and phi = atan2(a,b) = (absolute) phase
  */
 dvec2 cartesian_to_euler(dvec2 complex) {
-	double r = complex.x*complex.x + complex.y*complex.y; // r = sqrt(a**2 + b**"), why not take sqrt in fortran code?
+	double r = (dot(complex, complex)); // r = sqrt(a**2 + b**2), why not take sqrt in fortran code?
 	dvec2 euler;
 	if(r < 0 || r > 1) {
 		euler = dvec2(1.0/0.0, 1.0/0.0);
 		return euler;
 	}
-	euler = dvec2(r, r8_atan2(complex.x, complex.y)); // TODO in grad or in rad?
+	euler = dvec2(r, r8_atan2(complex.y, complex.x)); // phi in rad
 	return euler;
 }
 
 /** computes the difference in the phases of 2 complex number written in euler form: r * e^(i * phi)
- * @param euler1 		first complex number
- * @param euler2		second complex number
+ * @param euler1 		first complex number // s 
+ * @param euler2		second complex number // p
  * @return delta = phi1 - phi2, in [-pi/2, pi/2] degrees
  */
 double phase_difference(dvec2 euler1, dvec2 euler2) {
-	double delta = euler2.y - euler1.y;
+	double delta = euler2.y - euler1.y; // p - s
 	delta = delta - int(delta > 180)*360.0 + int(delta < -180)*360.0;
 	return delta;
 }
@@ -2033,14 +2080,14 @@ double phase_difference(dvec2 euler1, dvec2 euler2) {
  * @param incidence_angle		normal incidence angle
  * @param others
  */
-void efficiency(Ray r, inout double real_S, inout double real_P, inout double delta, double incidence_angle) {
+void efficiency(Ray r, out double real_S, out double real_P, out double delta, double incidence_angle) {
 	dvec2 complex_S, complex_P;
 	reflectance(r.energy, incidence_angle, complex_S, complex_P);
 
 	dvec2 euler_P = cartesian_to_euler(complex_P);
 	dvec2 euler_S = cartesian_to_euler(complex_S);
 
-	delta = phase_difference(euler_P, euler_S);
+	delta = phase_difference(euler_S, euler_P);
 	real_S = euler_S.x;
 	real_P = euler_P.x;
 }
@@ -2060,6 +2107,33 @@ dmat4 muller_matrix(double R_s, double R_p, double delta) {
 		            0.0,             0.0,  R_s*R_p*c, R_s*R_p*s,
 		            0.0,             0.0, -R_s*R_p*s, R_s*R_p*c
 	);
+}
+
+/** returns updated stokes vector
+ * @param r			ray
+ * @param real_S	real part of the complex s-polarization
+ * @param real_P	real part of the complex p-polarization
+ * @param delta		phase difference between complex s and p polarization
+ * @param azimuthal	angle of rotation of element in xy plane (chi + dchi (misalignment))
+ * @returns updated stokes vector of ray, updates weight of ray
+ */
+void update_stokes(inout Ray r, double real_S, double real_P, double delta, double azimuthal, inout uint64_t ctr) {
+	dvec4 stokes_old = r.stokes;
+	double c_chi = r8_cos(azimuthal);
+	double s_chi = r8_sin(azimuthal);
+	dmat4 rot = dmat4(1, 0, 0, 0,
+					0, c_chi, -s_chi, 0,
+					0, s_chi, c_chi, 0,
+					0, 0, 0, 1);
+	dmat4 inv_rot = transpose(rot);
+
+	dvec4 stokes_new = muller_matrix(real_S, real_P, delta) * rot * stokes_old;;
+	r.stokes = inv_rot * stokes_new;
+
+	double rn = squaresDoubleRNG(ctr);
+	// throw ray away with certain probability
+	if((r.stokes.x / stokes_old.x) - rn <= 0) r.weight = 0;
+	return;
 }
 
 /**
@@ -2829,6 +2903,8 @@ Ray traceMirror(Ray r, const int elementIndex, inout uint64_t ctr, dvec4 interse
 	
 	// calculate intersection point and normal at intersection point
 	dvec4 normal = setIntersectionPoint(r, mrr.surfaceParams, intersection);
+	double incidence_angle = getIncidenceAngle(r, normal); // getTheta
+	double azimuthal_angle = mrr.objectParameters[2][2]; // chi (azimuthalangle) in rad
 
 	// check if ray hit the element within the boundaries
 	double x_extent = mrr.objectParameters[0][0]; // width
@@ -2854,6 +2930,10 @@ Ray traceMirror(Ray r, const int elementIndex, inout uint64_t ctr, dvec4 interse
 	// calculate the new direction after the reflection
 	r.direction = dvec3(reflect(dvec4(r.direction,0), normal));
 	
+	double real_S, real_P, delta;
+	efficiency(r, real_S, real_P, delta, incidence_angle);
+	update_stokes(r, real_S, real_P, delta, azimuthal_angle, ctr); 
+
 	r.order = 0;
 	return r;
 }
@@ -3096,6 +3176,16 @@ void testFunctions() {
 	
 	Ray r = rayData[uint(gl_GlobalInvocationID)];
 	Ray res; // store the result here
+	// initialize with 0's
+	res.position = dvec3(0,0,0);
+	res.direction = dvec3(0,0,0);
+	res.energy = 0;
+	res.weight = 0;
+	res.stokes = dvec4(0,0,0,0);
+	res.pathLength = 0;
+	res.extraParameter = 0;
+	res.order = 0;
+	res.lastElement = 0;
 	
 	// settings != 0 -> unit test cases in test_shader.cpp
 	// input rays and elements are interpreted depending on the test case
@@ -3124,10 +3214,6 @@ void testFunctions() {
 		double z = r.energy;
 		double a = r.weight;
 		res.weight = vlsGrating(a, z, b_params);
-		res.pathLength = 0;
-		res.extraParameter = 0;
-		res.order = 0;
-		res.lastElement = 0;
 		rayData[uint(gl_GlobalInvocationID)] = res;
 	}
 	else if(settings == 5) { // diffraction
@@ -3283,10 +3369,66 @@ void testFunctions() {
 	else if(settings == 20) { // test iteratTo (method for finding intersection and normal for non-quadric surfaces like the torus)
 		dvec4 normal = iteratTo(r, quadricData[0].surfaceParams[0][0], quadricData[0].surfaceParams[0][1]);
 		rayData[uint(gl_GlobalInvocationID)] = r;
-	}else if(settings == 21) { // test getTheta function that is needed for the efficiency calculations
+	}else if(settings == 21) { // test getIncidenceAngle function that is needed for the efficiency calculations
 		Ray res;
-		res.weight = getTheta(r, dvec4(r.position,0));
+		res.weight = getIncidenceAngle(r, dvec4(r.position,0));
 		rayData[uint(gl_GlobalInvocationID)] = res;
+	}else if(settings == 22) { // test reflectance function that calculates the s and p polarization
+		double energy = r.energy;
+		double incidence_angle = r.weight;
+		dvec2 complex_S;
+		dvec2 complex_P;
+		reflectance(energy, incidence_angle, complex_S, complex_P);
+		res.position.x = complex_S.x; // complex s polarisation
+		res.position.y = complex_S.y;
+		res.direction.x = complex_P.x; // complex p polarisation
+		res.direction.y = complex_P.y;
+		rayData[uint(gl_GlobalInvocationID)] = res;
+	}else if(settings == 23) { // test snell's law
+		// all parameters are complex numbers -> dvec2
+		dvec2 cos_incidence = dvec2(r.position.x, r.position.y); // cosinus of incidence angle of ray
+		dvec2 cn1 = dvec2(r.direction.x, r.direction.y); // refractive index of first material
+		dvec2 cn2 = dvec2(r.stokes.x, r.stokes.y); // refractive index of second material
+
+		dvec2 cos_transmittance = snell(cos_incidence, cn1, cn2); // calculate cosinus of angle to normal of transmitted ray
+		res.position = dvec3(cos_transmittance, 0);
+		rayData[uint(gl_GlobalInvocationID)] = res;
+	}else if(settings == 24) { // test fresnel formula
+		// all parameters are complex numbers -> dvec2
+		dvec2 cos_incidence = dvec2(r.position.x, r.position.y); // cosinus of incidence angle of ray
+		dvec2 cos_transmittance = dvec2(r.direction.x, r.direction.y); // cosinus of transmittance angle (calc. by snell)
+		dvec2 cn1 = dvec2(r.stokes.x, r.stokes.y); // refractive index of first material
+		dvec2 cn2 = dvec2(r.stokes.z, r.stokes.w); // refractive index of second material
+		dvec2 complex_S, complex_P;
+
+		fresnel(cn1, cn2, cos_incidence, cos_transmittance, complex_S, complex_P);
+		res.position = dvec3(complex_S, 0); // complex s polarisation
+		res.direction = dvec3(complex_P, 0); // complex p polarisation
+		rayData[uint(gl_GlobalInvocationID)] = res;
+	}else if(settings == 25) { // cartesian representation of complex number (x + y*i) to euler (r * e^(i*phi))
+		dvec2 complex_cartesian1 = dvec2(r.position.x, r.position.y);
+		dvec2 complex_cartesian2 = dvec2(r.direction.x, r.direction.y);
+		dvec2 complex_cartesian3 = dvec2(r.stokes.x, r.stokes.y);
+		dvec2 complex_cartesian4 = dvec2(r.stokes.z, r.stokes.w);
+
+		dvec2 complex_euler1 = cartesian_to_euler(complex_cartesian1);
+		dvec2 complex_euler2 = cartesian_to_euler(complex_cartesian2);
+		dvec2 complex_euler3 = cartesian_to_euler(complex_cartesian3);
+		dvec2 complex_euler4 = cartesian_to_euler(complex_cartesian4);
+		res.position = dvec3(complex_euler1, 0);
+		res.direction = dvec3(complex_euler2, 0);
+		res.stokes = dvec4(complex_euler3, complex_euler4);
+		rayData[uint(gl_GlobalInvocationID)] = res;
+	}else if(settings == 26) { // test material loading
+		rayData[uint(gl_GlobalInvocationID)].position.x = nkp[0].energy;
+		rayData[uint(gl_GlobalInvocationID)].position.y = nkp[0].n;
+		rayData[uint(gl_GlobalInvocationID)].position.z = nkp[0].k;
+		rayData[uint(gl_GlobalInvocationID)].weight = nkpIdx[0];
+
+		rayData[uint(gl_GlobalInvocationID)].direction.x = nkp[nkpIdx[1]].energy;
+		rayData[uint(gl_GlobalInvocationID)].direction.y = nkp[nkpIdx[1]].n;
+		rayData[uint(gl_GlobalInvocationID)].direction.z = nkp[nkpIdx[1]].k;
+		rayData[uint(gl_GlobalInvocationID)].energy = nkpIdx[1];
 	}
 	// store results to output buffer
 	outputData[uint(gl_GlobalInvocationID)] = rayData[uint(gl_GlobalInvocationID)];

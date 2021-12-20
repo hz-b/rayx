@@ -26,8 +26,8 @@ Slit::Slit(const char* name, Geometry::GeometricalShape geometricalShape,
            int beamstop, double width, double height, glm::dvec4 position,
            glm::dmat4x4 orientation, double beamstopWidth,
            double beamstopHeight, double sourceEnergy)
-    : OpticalElement(name, geometricalShape, width, height, position,
-                     orientation, {0, 0, 0, 0, 0, 0, 0}),
+    : OpticalElement(name, geometricalShape, width, height, 0, position,
+                     orientation, {0, 0, 0, 0, 0, 0, 0}), // no azimuthal angle for slit bc no efficiency needed
       m_waveLength(abs(hvlam(sourceEnergy))) {
     m_centralBeamstop = beamstop == 0
                             ? CS_NONE

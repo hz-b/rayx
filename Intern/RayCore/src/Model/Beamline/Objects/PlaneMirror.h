@@ -1,15 +1,18 @@
 #pragma once
+#include <Data/xml.h>
+
+#include <vector>
+
 #include "Model/Beamline/OpticalElement.h"
 #include "Model/Surface/Quadric.h"
-#include <Data/xml.h>
-#include <vector>
 
 namespace RAYX {
 
 class RAYX_API PlaneMirror : public OpticalElement {
   public:
     PlaneMirror(const char* name, Geometry::GeometricalShape geometricalShape,
-                const double width, const double height, glm::dvec4 position,
+                const double width, const double height,
+                const double azimuthalAngle, glm::dvec4 position,
                 glm::dmat4x4 orientation, const std::vector<double> slopeError);
     PlaneMirror();
     ~PlaneMirror();

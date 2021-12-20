@@ -12,6 +12,8 @@ namespace RAYX {
  * constant deviation, constant incidence,...
  * @param width                         total width of the mirror (x dimension)
  * @param height                        total height of the mirror (z dimension)
+ * @param azimuthalAngle                rotation of element in xy-plane, needed
+ * for stokes vector
  * @param radius                        radius of sphere
  * @param position                      position of the element in world
  * coordinate system
@@ -29,13 +31,14 @@ namespace RAYX {
  */
 SphereGrating::SphereGrating(const char* name, int mount,
                              Geometry::GeometricalShape geometricalShape,
-                             double width, double height, double radius,
+                             double width, double height,
+                             const double azimuthalAngle, double radius,
                              glm::dvec4 position, glm::dmat4x4 orientation,
                              double designEnergyMounting, double lineDensity,
                              double orderOfDiffraction, std::vector<double> vls,
                              std::vector<double> slopeError)
-    : OpticalElement(name, geometricalShape, width, height, position,
-                     orientation, slopeError),
+    : OpticalElement(name, geometricalShape, width, height, azimuthalAngle,
+                     position, orientation, slopeError),
       m_designEnergyMounting(designEnergyMounting),
       m_lineDensity(lineDensity),
       m_orderOfDiffraction(orderOfDiffraction),
@@ -118,7 +121,7 @@ std::shared_ptr<SphereGrating> SphereGrating::createFromXML(
     }
 
     return std::make_shared<SphereGrating>(
-        name, mount, geometricalShape, width, height, radius, position,
+        name, mount, geometricalShape, width, height, 0, radius, position,
         orientation, designEnergyMounting, lineDensity, orderOfDiffraction, vls,
         slopeError);
 }
