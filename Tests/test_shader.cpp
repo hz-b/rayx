@@ -507,12 +507,12 @@ TEST(Tracer, testNormalCartesian) {
     // encode: ray.position.x = slopeX, ray.position.z = slopeZ. ray.direction =
     // normal at intersection point from eg quad fct.
     RAYX::Ray r = RAYX::Ray::makeRayFrom(
-        glm::dvec3(0, 0, 0), glm::dvec3(0, 1, 0), glm::dvec4(1, 1, 0, 0), 0, 0);
+        glm::dvec3(0, 0, 0), glm::dvec3(0, 1, 0), glm::dvec4(0, 0, 0, 0), 0, 0);
     testValues.push_back(r);
     // store correct resulting normal[0:3] in ray.direction and fourth component
     // (normal[3]) in weight case: normal unchanged bc slope = 0
     RAYX::Ray c = RAYX::Ray::makeRayFrom(
-        glm::dvec3(0, 0, 0), glm::dvec3(0, 1, 0), glm::dvec4(1, 1, 0, 0), 0, 0);
+        glm::dvec3(0, 0, 0), glm::dvec3(0, 1, 0), glm::dvec4(0, 0, 0, 0), 0, 0);
     correct.push_back(c);
 
     // normal != (0,1,0), slope still = 0
@@ -530,13 +530,13 @@ TEST(Tracer, testNormalCartesian) {
 
     // normal = (0,1,0), slopeX = 2, slopeZ = 3
     r = RAYX::Ray::makeRayFrom(glm::dvec3(2, 0, 3), glm::dvec3(0, 1, 0),
-                               glm::dvec4(1, 1, 0, 0), 0, 0);
+                               glm::dvec4(0, 0, 0, 0), 0, 0);
     testValues.push_back(r);
     c = RAYX::Ray::makeRayFrom(
-        glm::dvec3(2, 0, 3),
+        glm::dvec3(0, 0, 0),
         glm::dvec3(-0.90019762973551742, 0.41198224566568298,
                    -0.14112000805986721),
-        glm::dvec4(1, 1, 0, 0), 0, 0);
+        glm::dvec4(0, 0, 0, 0), 0, 0);
     correct.push_back(c);
 
     r = RAYX::Ray::makeRayFrom(
@@ -545,10 +545,10 @@ TEST(Tracer, testNormalCartesian) {
         glm::dvec4(0, 0, 0, 0), 0, 0);
     testValues.push_back(r);
     c = RAYX::Ray::makeRayFrom(
-        glm::dvec3(2, 0, 3),
+        glm::dvec3(0, 0, 0),
         glm::dvec3(-9431.2371568647086, 4310.7269916467494,
                    -1449.3435640204684),
-        glm::dvec4(1, 1, 0, 0), 0, 0);
+        glm::dvec4(0, 0, 0, 0), 0, 0);
     correct.push_back(c);
 
     double settings = 13;
@@ -583,7 +583,7 @@ TEST(Tracer, testNormalCylindrical) {
     // store correct resulting normal[0:3] in ray.direction and fourth component
     // (normal[3]) in weight case: normal unchanged bc slope = 0
     RAYX::Ray c = RAYX::Ray::makeRayFrom(
-        glm::dvec3(0, 0, 0), glm::dvec3(0, 1, 0), glm::dvec4(1, 1, 0, 0), 0, 0);
+        glm::dvec3(0, 0, 0), glm::dvec3(0, 1, 0), glm::dvec4(0, 0, 0, 0), 0, 0);
     correct.push_back(c);
 
     // normal != (0,1,0), slope still = 0
@@ -604,10 +604,10 @@ TEST(Tracer, testNormalCylindrical) {
                                glm::dvec4(1, 1, 0, 0), 0, 0);
     testValues.push_back(r);
     c = RAYX::Ray::makeRayFrom(
-        glm::dvec3(2, 0, 3),
+        glm::dvec3(0, 0, 0),
         glm::dvec3(0.90019762973551742, 0.41198224566568292,
                    -0.14112000805986721),
-        glm::dvec4(1, 1, 0, 0), 0, 0);
+        glm::dvec4(0, 0, 0, 0), 0, 0);
     correct.push_back(c);
 
     r = RAYX::Ray::makeRayFrom(
@@ -616,7 +616,7 @@ TEST(Tracer, testNormalCylindrical) {
         glm::dvec4(1, 1, 0, 0), 0, 0);
     testValues.push_back(r);
     c = RAYX::Ray::makeRayFrom(
-        glm::dvec3(2, 0, 3),
+        glm::dvec3(0, 0, 0),
         glm::dvec3(9431.2169472441783, 4310.7711493493844, -1449.3437356459144),
         glm::dvec4(0, 0, 0, 0), 0, 0);
     correct.push_back(c);
@@ -1470,15 +1470,15 @@ TEST(Tracer, vlsGratingTest) {
     // a should remain unchanged if all vls parameters are 0
     RAYX::Ray c = RAYX::Ray::makeRayFrom(glm::dvec3(0.0, 0.0, 0.0),
                                          glm::dvec3(0.0, 0.0, 0.0),
-                                         glm::dvec4(1, 1, 0, 0), z, a);
+                                         glm::dvec4(0, 0, 0, 0), 0, a);
     correct.push_back(c);
 
     // use some vls values and compare with A calculated by old ray UI
     r = RAYX::Ray::makeRayFrom(glm::dvec3(1, 2, 3), glm::dvec3(4, 5, 6),
                                glm::dvec4(1, 1, 0, 0), z, a);
     testValues.push_back(r);
-    c = RAYX::Ray::makeRayFrom(glm::dvec3(1, 2, 3), glm::dvec3(4, 5, 6),
-                               glm::dvec4(1, 1, 0, 0), z, 9497.479959611925);
+    c = RAYX::Ray::makeRayFrom(glm::dvec3(0, 0, 0), glm::dvec3(0, 0, 0),
+                               glm::dvec4(0, 0, 0, 0), 0, 9497.479959611925);
     correct.push_back(c);
 
     // give z position and setting=4 to start vls test on shader
