@@ -1686,12 +1686,13 @@ TEST(Tracer, reflectanceTest) {
 
     double energy = 100;
     double incidence_angle = 1.3962634006709251;
-    RAYX ::Ray r = RAYX::Ray(glm::dvec3(0, 0, 0), glm::dvec3(0, 0, 0),
-                             glm::dvec4(0, 0, 0, 0), energy, incidence_angle);
-    RAYX::Ray c =
-        RAYX::Ray(glm::dvec3(0.4312494615693625, 0.42810153127435358, 0),
-                  glm::dvec3(0.4385787674250865, 0.3522102644170379, 0),
-                  glm::dvec4(0, 0, 0, 0), 0, 0);
+    RAYX ::Ray r =
+        RAYX::Ray::makeRayFrom(glm::dvec3(0, 0, 0), glm::dvec3(0, 0, 0),
+                               glm::dvec4(0, 0, 0, 0), energy, incidence_angle);
+    RAYX::Ray c = RAYX::Ray::makeRayFrom(
+        glm::dvec3(0.4312494615693625, 0.42810153127435358, 0),
+        glm::dvec3(0.4385787674250865, 0.3522102644170379, 0),
+        glm::dvec4(0, 0, 0, 0), 0, 0);
     testValues.push_back(r);
     correct.push_back(c);
 
@@ -1719,7 +1720,7 @@ TEST(Tracer, snellTest) {
     std::vector<RAYX::Ray> correct;
     double settings = 23;
 
-    RAYX::Ray r = RAYX::Ray(
+    RAYX::Ray r = RAYX::Ray::makeRayFrom(
         glm::dvec3(0.17364817766693041, 0,
                    0),        // position.x,y = incidence angle
         glm::dvec3(1, 0, 0),  // direction.x,y = refractive index
@@ -1727,42 +1728,46 @@ TEST(Tracer, snellTest) {
         glm::dvec4(0.91452118089946777, 0.035187568837614078, 0,
                    0),  // stokes.x, y = refractive index 2nd material, cn2
         0.0, 0.0);
-    RAYX::Ray c =
-        RAYX::Ray(glm::dvec3(0.1090636366167056, 0.4078927218856746,
-                             0),  // x,y = complex cosinus of resulting angle
-                  glm::dvec3(0, 0, 0), glm::dvec4(0, 0, 0, 0), 0, 0);
+    RAYX::Ray c = RAYX::Ray::makeRayFrom(
+        glm::dvec3(0.1090636366167056, 0.4078927218856746,
+                   0),  // x,y = complex cosinus of resulting angle
+        glm::dvec3(0, 0, 0), glm::dvec4(0, 0, 0, 0), 0, 0);
     testValues.push_back(r);
     correct.push_back(c);
 
-    r = RAYX::Ray(glm::dvec3(0.17315572500228882, 0,
-                             0),        // position.x,y = incidence angle
-                  glm::dvec3(1, 0, 0),  // direction.x,y = refractive index
-                                        // 1st material, cn1
-                  glm::dvec4(0.91453807092958361, 0.035170965000031584, 0,
-                             0),  // stokes.x, y = refractive
-                                  // index 2nd material, cn2
-                  0.0, 0.0);
-    c = RAYX::Ray(glm::dvec3(0.10897754475504851, 0.40807275584607544,
-                             0),  // x,y = complex cosinus of resulting angle
-                  glm::dvec3(0, 0, 0), glm::dvec4(0, 0, 0, 0), 0, 0);
+    r = RAYX::Ray::makeRayFrom(
+        glm::dvec3(0.17315572500228882, 0,
+                   0),        // position.x,y = incidence angle
+        glm::dvec3(1, 0, 0),  // direction.x,y = refractive index
+                              // 1st material, cn1
+        glm::dvec4(0.91453807092958361, 0.035170965000031584, 0,
+                   0),  // stokes.x, y = refractive
+                        // index 2nd material, cn2
+        0.0, 0.0);
+    c = RAYX::Ray::makeRayFrom(
+        glm::dvec3(0.10897754475504851, 0.40807275584607544,
+                   0),  // x,y = complex cosinus of resulting angle
+        glm::dvec3(0, 0, 0), glm::dvec4(0, 0, 0, 0), 0, 0);
     testValues.push_back(r);
     correct.push_back(c);
 
-    r = RAYX::Ray(glm::dvec3(0.1736481785774231, 0,
-                             0),        // position.x,y = incidence angle
-                  glm::dvec3(1, 0, 0),  // direction.x,y = refractive index
-                                        // 1st material, cn1
-                  glm::dvec4(0.9668422, 6.5589860E-02, 0,
-                             0),  // stokes.x, y = refractive
-                                  // index 2nd material, cn2
-                  0.0, 0.0);
-    c = RAYX::Ray(glm::dvec3(0.24302165191294139, 0.28697207607552583,
-                             0),  // x,y = complex cosinus of resulting angle
-                  glm::dvec3(0, 0, 0), glm::dvec4(0, 0, 0, 0), 0, 0);
+    r = RAYX::Ray::makeRayFrom(
+        glm::dvec3(0.1736481785774231, 0,
+                   0),        // position.x,y = incidence angle
+        glm::dvec3(1, 0, 0),  // direction.x,y = refractive index
+                              // 1st material, cn1
+        glm::dvec4(0.9668422, 6.5589860E-02, 0,
+                   0),  // stokes.x, y = refractive
+                        // index 2nd material, cn2
+        0.0, 0.0);
+    c = RAYX::Ray::makeRayFrom(
+        glm::dvec3(0.24302165191294139, 0.28697207607552583,
+                   0),  // x,y = complex cosinus of resulting angle
+        glm::dvec3(0, 0, 0), glm::dvec4(0, 0, 0, 0), 0, 0);
     testValues.push_back(r);
     correct.push_back(c);
 
-    r = RAYX::Ray(
+    r = RAYX::Ray::makeRayFrom(
         glm::dvec3(0.16307067260397731, 0.0027314608130525712,
                    0),  // position.x,y = incidence angle
         glm::dvec3(0.99816471240025439, 0.00045674598468145697,
@@ -1771,9 +1776,10 @@ TEST(Tracer, snellTest) {
         glm::dvec4(0.99514154037883318, 0.0047593281563246184, 0,
                    0),  // stokes.x, y = refractive index 2nd material, cn2
         0.0, 0.0);
-    c = RAYX::Ray(glm::dvec3(0.14743465849863294, 0.031766878855366755,
-                             0),  // x,y = complex cosinus of resulting angle
-                  glm::dvec3(0, 0, 0), glm::dvec4(0, 0, 0, 0), 0, 0);
+    c = RAYX::Ray::makeRayFrom(
+        glm::dvec3(0.14743465849863294, 0.031766878855366755,
+                   0),  // x,y = complex cosinus of resulting angle
+        glm::dvec3(0, 0, 0), glm::dvec4(0, 0, 0, 0), 0, 0);
     testValues.push_back(r);
     correct.push_back(c);
 
@@ -1810,21 +1816,22 @@ TEST(Tracer, fresnelTest) {
     double cosa2x = 0.1736481785774231;
     double cosa2y = 0;
 
-    RAYX::Ray r =
-        RAYX::Ray(glm::dvec3(cosa1x, cosa1y,
-                             0),  // position.x,y = incidence angle // cosa1
-                  glm::dvec3(cosa2x, cosa2y, 0),  // direction.x,y = refractive
-                                                  // index 1st material
-                  glm::dvec4(cn1x, cn1y, cn2x,
-                             cn2y),  // stokes.x, y = refractive index 1st
-                                     // material, z,w = refractive index
-                                     // 2nd material
-                  0.0, 0.0);
-    RAYX::Ray c = RAYX::Ray(glm::dvec3(0.56981824812215442, 0.62585833416785819,
-                                       0),  // x,y = s polarization
-                            glm::dvec3(0.62929764490596996, 0.52731592442193231,
-                                       0),  // x,y p polarization
-                            glm::dvec4(0, 0, 0, 0), 0, 0);
+    RAYX::Ray r = RAYX::Ray::makeRayFrom(
+        glm::dvec3(cosa1x, cosa1y,
+                   0),  // position.x,y = incidence angle // cosa1
+        glm::dvec3(cosa2x, cosa2y, 0),  // direction.x,y = refractive
+                                        // index 1st material
+        glm::dvec4(cn1x, cn1y, cn2x,
+                   cn2y),  // stokes.x, y = refractive index 1st
+                           // material, z,w = refractive index
+                           // 2nd material
+        0.0, 0.0);
+    RAYX::Ray c = RAYX::Ray::makeRayFrom(
+        glm::dvec3(0.56981824812215442, 0.62585833416785819,
+                   0),  // x,y = s polarization
+        glm::dvec3(0.62929764490596996, 0.52731592442193231,
+                   0),  // x,y p polarization
+        glm::dvec4(0, 0, 0, 0), 0, 0);
     testValues.push_back(r);
     correct.push_back(c);
 
@@ -1836,20 +1843,22 @@ TEST(Tracer, fresnelTest) {
     cosa1y = 0.40807275584607544;
     cosa2x = 0.17315572500228882;
     cosa2y = 0;
-    r = RAYX::Ray(glm::dvec3(cosa1x, cosa1y,
-                             0),  // position.x,y = incidence angle // cosa1
-                  glm::dvec3(cosa2x, cosa2y, 0),  // direction.x,y = refractive
-                                                  // index 1st material
-                  glm::dvec4(cn1x, cn1y, cn2x,
-                             cn2y),  // stokes.x, y = refractive index 1st
-                                     // material, z,w = refractive index
-                                     // 2nd material
-                  0.0, 0.0);
-    c = RAYX::Ray(glm::dvec3(0.57163467986230043, 0.62486367906829532,
-                             0),  // x,y = s polarization
-                  glm::dvec3(0.63080662811278621, 0.52640331936127871,
-                             0),  // x,y p polarization
-                  glm::dvec4(0, 0, 0, 0), 0, 0);
+    r = RAYX::Ray::makeRayFrom(
+        glm::dvec3(cosa1x, cosa1y,
+                   0),  // position.x,y = incidence angle // cosa1
+        glm::dvec3(cosa2x, cosa2y, 0),  // direction.x,y = refractive
+                                        // index 1st material
+        glm::dvec4(cn1x, cn1y, cn2x,
+                   cn2y),  // stokes.x, y = refractive index 1st
+                           // material, z,w = refractive index
+                           // 2nd material
+        0.0, 0.0);
+    c = RAYX::Ray::makeRayFrom(
+        glm::dvec3(0.57163467986230043, 0.62486367906829532,
+                   0),  // x,y = s polarization
+        glm::dvec3(0.63080662811278621, 0.52640331936127871,
+                   0),  // x,y p polarization
+        glm::dvec4(0, 0, 0, 0), 0, 0);
     testValues.push_back(r);
     correct.push_back(c);
 
@@ -1886,13 +1895,13 @@ TEST(Tracer, amplitudeTest) {
     double complex_x4 = 0;
     double complex_y4 = 1;
 
-    RAYX::Ray r = RAYX::Ray(
+    RAYX::Ray r = RAYX::Ray::makeRayFrom(
         glm::dvec3(complex_x1, complex_y1,
                    0),  // position.x,y = complex number in x + y*i
         glm::dvec3(complex_x2, complex_y2,
                    0),  // direction.x,y = complex number in x + y*i
         glm::dvec4(complex_x3, complex_y3, complex_x4, complex_y4), 0.0, 0.0);
-    RAYX::Ray c = RAYX::Ray(
+    RAYX::Ray c = RAYX::Ray::makeRayFrom(
         glm::dvec3(
             0.67501745670559532,
             0.69542190922049119,  // position.x,y = r,phi in r * e^(phi*i)

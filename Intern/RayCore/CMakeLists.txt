@@ -37,6 +37,8 @@ SET(SOURCE
     src/Tracer/RayList.cpp
     src/Tracer/TracerInterface.cpp
     src/Tracer/Vulkan/VulkanTracer.cpp
+    src/Tracer/Vulkan/Material.cpp
+    src/Tracer/Vulkan/PalikTable.cpp
     src/UserParameter/WorldUserParams.cpp
     src/UserParameter/GeometricUserParams.cpp
 )
@@ -77,6 +79,8 @@ SET(HEADERS
     src/Tracer/Ray.h
     src/Tracer/TracerInterface.h
     src/Tracer/Vulkan/VulkanTracer.h
+    src/Tracer/Vulkan/Material.h
+    src/Tracer/Vulkan/PalikTable.h
     src/UserParameter/WorldUserParams.h
     src/UserParameter/GeometricUserParams.h
 )

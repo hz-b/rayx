@@ -10,9 +10,8 @@
 #include <stdexcept>
 
 #include "Core.h"
-#include "Tracer/RayList.h"
 #include "PalikTable.h"
-#include "RayList.h"
+#include "Tracer/RayList.h"
 #include "vulkan/vulkan.hpp"
 
 #ifdef NDEBUG
