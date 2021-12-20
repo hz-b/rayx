@@ -70,8 +70,14 @@ std::shared_ptr<PlaneMirror> PlaneMirror::createFromXML(
         return nullptr;
     }
 
+    double azimuthalAngle;
+    if (!xml::paramDouble(node, "azimuthalAngle", &azimuthalAngle)) {
+        return nullptr;
+    }
+
     return std::make_shared<PlaneMirror>(name, geometricalShape, width, height,
-                                         0, position, orientation, slopeError);
+                                         azimuthalAngle, position, orientation,
+                                         slopeError);
 }
 
 }  // namespace RAYX

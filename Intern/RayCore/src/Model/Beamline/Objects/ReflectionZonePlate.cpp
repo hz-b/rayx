@@ -276,23 +276,28 @@ std::shared_ptr<ReflectionZonePlate> ReflectionZonePlate::createFromXML(
         return nullptr;
     }
 
+    double azimuthalAngle;
+    if (!xml::paramDouble(node, "azimuthalAngle", &azimuthalAngle)) {
+        return nullptr;
+    }
+
     // ! temporary for testing trapezoid rzp
     double widthB;
     bool foundWidthB = xml::paramDouble(node, "totalWidthB", &widthB);
     if (foundWidthB) {
         return std::make_shared<ReflectionZonePlate>(
-            name, geometricalShape, curvatureType, widthA, height, 0, position,
-            orientation, designEnergy, orderOfDiffraction,
-            designOrderOfDiffraction, dAlpha, dBeta, mEntrance, mExit,
-            sEntrance, sExit, shortRadius, longRadius, additionalZeroOrder,
-            fresnelZOffset, slopeError);
+            name, geometricalShape, curvatureType, widthA, height,
+            azimuthalAngle, position, orientation, designEnergy,
+            orderOfDiffraction, designOrderOfDiffraction, dAlpha, dBeta,
+            mEntrance, mExit, sEntrance, sExit, shortRadius, longRadius,
+            additionalZeroOrder, fresnelZOffset, slopeError);
     } else {
         return std::make_shared<ReflectionZonePlate>(
-            name, geometricalShape, curvatureType, widthA, widthB, height, 0,
-            position, orientation, designEnergy, orderOfDiffraction,
-            designOrderOfDiffraction, dAlpha, dBeta, mEntrance, mExit,
-            sEntrance, sExit, shortRadius, longRadius, additionalZeroOrder,
-            fresnelZOffset, slopeError);
+            name, geometricalShape, curvatureType, widthA, widthB, height,
+            azimuthalAngle, position, orientation, designEnergy,
+            orderOfDiffraction, designOrderOfDiffraction, dAlpha, dBeta,
+            mEntrance, mExit, sEntrance, sExit, shortRadius, longRadius,
+            additionalZeroOrder, fresnelZOffset, slopeError);
     }
 }
 

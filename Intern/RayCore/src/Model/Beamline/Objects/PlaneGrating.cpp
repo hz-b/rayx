@@ -121,10 +121,15 @@ std::shared_ptr<PlaneGrating> PlaneGrating::createFromXML(
         return nullptr;
     }
 
+    double azimuthalAngle;
+    if (!xml::paramDouble(node, "azimuthalAngle", &azimuthalAngle)) {
+        return nullptr;
+    }
+
     return std::make_shared<PlaneGrating>(
-        name, geometricalShape, width, height, 0, position, orientation,
-        designEnergy, lineDensity, orderOfDiffraction, additionalZeroOrder, vls,
-        slopeError);
+        name, geometricalShape, width, height, azimuthalAngle, position,
+        orientation, designEnergy, lineDensity, orderOfDiffraction,
+        additionalZeroOrder, vls, slopeError);
 }
 
 double PlaneGrating::getDesignEnergyMounting() {

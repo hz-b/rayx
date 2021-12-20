@@ -127,9 +127,15 @@ std::shared_ptr<SphereMirror> SphereMirror::createFromXML(
         return nullptr;
     }
 
+    double azimuthalAngle;
+    if (!xml::paramDouble(node, "azimuthalAngle", &azimuthalAngle)) {
+        return nullptr;
+    }
+
     return std::make_shared<SphereMirror>(
-        name, geometricalShape, width, height, 0, grazingIncidenceAngle,
-        position, orientation, entranceArmLength, exitArmLength, slopeError);
+        name, geometricalShape, width, height, azimuthalAngle,
+        grazingIncidenceAngle, position, orientation, entranceArmLength,
+        exitArmLength, slopeError);
 }
 
 // TODO(Theresa): move this to user params and just give the radius as a

@@ -120,10 +120,15 @@ std::shared_ptr<SphereGrating> SphereGrating::createFromXML(
         return nullptr;
     }
 
+    double azimuthalAngle;
+    if (!xml::paramDouble(node, "azimuthalAngle", &azimuthalAngle)) {
+        return nullptr;
+    }
+
     return std::make_shared<SphereGrating>(
-        name, mount, geometricalShape, width, height, 0, radius, position,
-        orientation, designEnergyMounting, lineDensity, orderOfDiffraction, vls,
-        slopeError);
+        name, mount, geometricalShape, width, height, azimuthalAngle, radius,
+        position, orientation, designEnergyMounting, lineDensity,
+        orderOfDiffraction, vls, slopeError);
 }
 
 /* TODO (Theresa): how to make radius calculation easier?

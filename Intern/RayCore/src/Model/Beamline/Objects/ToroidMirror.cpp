@@ -116,9 +116,15 @@ std::shared_ptr<ToroidMirror> ToroidMirror::createFromXML(
         return nullptr;
     }
 
-    return std::make_shared<ToroidMirror>(
-        name, geometricalShape, width, height, 0, position, orientation,
-        incidenceAngle, mEntrance, mExit, sEntrance, sExit, slopeError);
+    double azimuthalAngle;
+    if (!xml::paramDouble(node, "azimuthalAngle", &azimuthalAngle)) {
+        return nullptr;
+    }
+
+    return std::make_shared<ToroidMirror>(name, geometricalShape, width, height,
+                                          azimuthalAngle, position, orientation,
+                                          incidenceAngle, mEntrance, mExit,
+                                          sEntrance, sExit, slopeError);
 }
 
 /**
