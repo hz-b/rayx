@@ -40,12 +40,12 @@ constexpr int PREFIX_LEN = 30;
 /**
  *
  * In the following we define
- * LOG: prints to std::cout
- * ERR: prints to std::cerr
- * ... and their debug-only variants D_LOG, D_ERR.
+ * RAYX_LOG: prints to std::cout
+ * RAYX_ERR: prints to std::cerr
+ * ... and their debug-only variants RAYX_D_LOG, RAYX_D_ERR.
  *
  * example usage:
- * LOG << "I am " << age << " years old";
+ * RAYX_LOG << "I am " << age << " years old";
  * */
 
 /**
