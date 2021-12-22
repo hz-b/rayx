@@ -6,7 +6,7 @@
 #include <sstream>
 
 bool PalikTable::load(const char* element, PalikTable* out) {
-    std::string f = "../../Data/PALIK/";  // TODO(rudi): make paths more robust!
+    std::string f = "../../../Data/PALIK/";  // TODO(rudi): make paths more robust!
     f += element;
     f += ".NKP";
     std::ifstream s(f);
