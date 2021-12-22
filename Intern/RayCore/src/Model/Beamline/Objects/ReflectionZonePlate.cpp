@@ -1,4 +1,5 @@
 #include "ReflectionZonePlate.h"
+#include "Debug.h"
 
 namespace RAYX {
 /**
@@ -103,7 +104,7 @@ ReflectionZonePlate::ReflectionZonePlate(
          m_designSagittalEntranceArmLength, m_designSagittalExitArmLength,
          m_designMeridionalEntranceArmLength, m_designMeridionalExitArmLength,
          m_designAlphaAngle, m_designBetaAngle, 0, double(m_additionalOrder)});
-    std::cout << "[RZP]: Created.\n";
+    RAYX_LOG << "Created.";
 }
 
 ReflectionZonePlate::ReflectionZonePlate(
@@ -166,7 +167,7 @@ ReflectionZonePlate::ReflectionZonePlate(
          m_designSagittalEntranceArmLength, m_designSagittalExitArmLength,
          m_designMeridionalEntranceArmLength, m_designMeridionalExitArmLength,
          m_designAlphaAngle, m_designBetaAngle, 0, double(m_additionalOrder)});
-    std::cout << "[RZP]: Created.\n";
+    RAYX_LOG << "Created.";
 }
 
 ReflectionZonePlate::~ReflectionZonePlate() {}
@@ -304,46 +305,44 @@ std::shared_ptr<ReflectionZonePlate> ReflectionZonePlate::createFromXML(
 void ReflectionZonePlate::printInfo() const {
     std::cout.precision(17);
 
-    std::cout << "[RZP]: " << m_rzpType;
     if (m_rzpType == RT_ELLIPTICAL) {
-        std::cout << "type: ELLIPTICAL" << std::endl;
+        RAYX_LOG << m_rzpType << ", type: ELLIPTICAL";
     } else if (m_rzpType == RT_MERIODIONAL) {
-        std::cout << "type: MERIDIONAL" << std::endl;
+        RAYX_LOG << m_rzpType << ", type: MERIDIONAL";
+    } else {
+        RAYX_LOG << m_rzpType;
     }
 
-    std::cout << "[RZP]: " << m_designType;
     if (m_curvatureType == CT_PLANE) {
-        std::cout << " curvature type: PLANE" << std::endl;
+        RAYX_LOG << m_designAlphaAngle << ", curvature type: PLANE";
     } else if (m_curvatureType == CT_SPHERICAL) {
-        std::cout << " curvature type: SPHERICAL" << std::endl;
+        RAYX_LOG << m_designAlphaAngle << ", curvature type: SPHERICAL";
     } else if (m_curvatureType == CT_TOROIDAL) {
-        std::cout << " curvature type: TOROIDAL" << std::endl;
+        RAYX_LOG << m_designAlphaAngle << ", curvature type: TOROIDAL";
+    } else {
+        RAYX_LOG << m_designType;
     }
 
-    std::cout << "[RZP]: " << m_imageType;
     if (m_imageType == IT_POINT2POINT) {
-        std::cout << " m_imageType: POINT2POINT" << std::endl;
+        RAYX_LOG << m_imageType << ", m_imageType: POINT2POINT";
     } else if (m_imageType == IT_ASTIGMATIC2ASTIGMATIC) {
-        std::cout << " m_imageType: ASTIGMATIC2ASTIGMATIC" << std::endl;
+        RAYX_LOG << m_imageType << ", m_imageType: ASTIGMATIC2ASTIGMATIC";
+    } else {
+        RAYX_LOG << m_imageType;
     }
 
-    std::cout << "[RZP]:\t VALUES" << std::endl;
-    std::cout << "[RZP]:\tm_alpha0Angle: " << m_alpha0Angle << std::endl;
-    std::cout << "[RZP]:\tm_beta0Angle: " << m_beta0Angle << std::endl;
-    std::cout << "[RZP]:\tm_designAlphaAngle: " << m_designAlphaAngle
-              << std::endl;
-    std::cout << "[RZP]:\tm_designBetaAngle: " << m_designBetaAngle
-              << std::endl;
-    std::cout << "[RZP]:\tm_zOff: " << m_zOff << std::endl;
-    std::cout << "[RZP]:\tm_wavelength: " << m_designWavelength << std::endl;
-    std::cout << "[RZP]:\tm_lineDensity: " << m_lineDensity << std::endl;
-    std::cout << "[RZP]:\tm_designOrderOfDiffraction: "
-              << m_designOrderOfDiffraction << std::endl;
-    std::cout << "[RZP]:\tm_orderOfDiffraction: " << m_orderOfDiffraction
-              << std::endl;
-    std::cout << "[RZP]:\tm_designEnergyMounting: " << m_designEnergyMounting
-              << std::endl;
-    std::cout << "[RZP]:\tm_fresnelZOffset: " << m_fresnelZOffset << std::endl;
+    RAYX_LOG << "\t VALUES";
+    RAYX_LOG << "\tm_alpha0Angle: " << m_alpha0Angle;
+    RAYX_LOG << "\tm_beta0Angle: " << m_beta0Angle;
+    RAYX_LOG << "\tm_designAlphaAngle: " << m_designAlphaAngle;
+    RAYX_LOG << "\tm_designBetaAngle: " << m_designBetaAngle;
+    RAYX_LOG << "\tm_zOff: " << m_zOff;
+    RAYX_LOG << "\tm_wavelength: " << m_designWavelength;
+    RAYX_LOG << "\tm_lineDensity: " << m_lineDensity;
+    RAYX_LOG << "\tm_designOrderOfDiffraction: " << m_designOrderOfDiffraction;
+    RAYX_LOG << "\tm_orderOfDiffraction: " << m_orderOfDiffraction;
+    RAYX_LOG << "\tm_designEnergyMounting: " << m_designEnergyMounting;
+    RAYX_LOG << "\tm_fresnelZOffset: " << m_fresnelZOffset;
 }
 
 /**
@@ -526,7 +525,7 @@ void ReflectionZonePlate::calcDesignOrderOfDiffraction(
     } else if (m_designType == DT_BETA) {
         presign = (m_fresnelZOffset >= 0) ? -1 : 1;
     }
-    std::cout << "[RZP]: presign: " << presign << std::endl;
+    RAYX_LOG << "presign: " << presign;
     m_designOrderOfDiffraction = abs(designOrderOfDiffraction) * presign;
 }  // design order of diffraction is directly given by the user
 
