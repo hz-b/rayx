@@ -4,6 +4,7 @@
 #include <random>
 
 #include "Debug/Instrumentor.h"
+#include "Debug.h"
 
 namespace RAYX {
 
@@ -43,7 +44,7 @@ MatrixSource::MatrixSource(const std::string name, EnergyDistribution dist,
     : LightSource(name.c_str(), dist, linPol0, linPol45, circPol, misalignment,
                   sourceDepth, sourceHeight, sourceWidth, horDivergence,
                   verDivergence) {
-    std::cout << "[MatrixSource]: Created.\n";
+    RAYX_LOG << "Created.";
 }
 
 MatrixSource::~MatrixSource() {}
@@ -131,8 +132,8 @@ std::vector<Ray> MatrixSource::getRays() {
 
     std::vector<Ray> rayVector;
     rayVector.reserve(1048576);
-    std::cout << "[MatrixSource]: create " << rmat << " times " << rmat
-              << " matrix with Matrix Source..." << std::endl;
+    RAYX_LOG << "create " << rmat << " times " << rmat
+              << " matrix with Matrix Source...";
     // fill the square with rmat1xrmat1 rays
     for (int col = 0; col < rmat; col++) {
         for (int row = 0; row < rmat; row++) {
@@ -187,7 +188,7 @@ std::vector<Ray> MatrixSource::getRays() {
         Ray r_copy((const Ray&)rayVector.at(i));
         rayVector.push_back(r_copy);
     }
-    std::cout << "[MatrixSource]: &rayVector: " << &(rayVector[0]) << std::endl;
+    RAYX_LOG << "&rayVector: " << &(rayVector[0]);
     // rayVector.resize(1048576);
     return rayVector;
 }
