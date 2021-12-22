@@ -11,6 +11,7 @@
 
 #include <iostream>
 #include <string>
+#include <sstream>
 
 // Memory leak detection (RAYX_NEW instead of new allows leaks to be detected)
 #ifdef RAY_DEBUG_MODE
@@ -47,6 +48,9 @@ namespace RAYX {
 /**
  * @param ERR       whether to use std::cerr or std::cout
  */
+
+constexpr int PREFIX_LEN = 30;
+
 template <bool ERR>
 struct Log {
     /**
@@ -58,7 +62,22 @@ struct Log {
         if (idx != std::string::npos) {
             filename = filename.substr(idx + 1);
         }
-        stream() << "[" << filename << ":" << line << "]: ";
+
+        std::stringstream strm;
+        strm << line;
+        std::string line_string = strm.str();
+
+        // this shortens filenames which are too long
+        if (filename.size() + line_string.size() + 4 > PREFIX_LEN) {
+            filename = filename.substr(0, PREFIX_LEN - 4 - line_string.size());
+            filename[filename.size() - 1] = '.';
+            filename[filename.size() - 2] = '.';
+            filename[filename.size() - 3] = '.';
+        }
+
+        std::string pad;
+        while (4 + line_string.size() + filename.size() + pad.size() < PREFIX_LEN) { pad += " "; }
+        stream() << "[" << pad << filename << ":" << line_string << "] ";
     }
 
     ~Log() { stream() << std::endl; }
