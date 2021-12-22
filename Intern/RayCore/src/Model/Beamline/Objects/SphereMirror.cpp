@@ -1,5 +1,7 @@
 #include "SphereMirror.h"
 
+#include "Debug.h"
+
 namespace RAYX {
 
 /**
@@ -71,7 +73,7 @@ SphereMirror::SphereMirror(const char* name,
     : OpticalElement(name, {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
                      geometricalShape, width, height, azimuthalAngle, position,
                      orientation, slopeError) {
-    std::cout << "[SphereMirror]: Created.\n";
+    RAYX_LOG << "Created.";
     setSurface(std::make_unique<Quadric>(std::vector<double>{
         1, 0, 0, 0, 1, 1, 0, -radius, 0, 0, 1, 0, 0, 0, 0, 0}));
 }

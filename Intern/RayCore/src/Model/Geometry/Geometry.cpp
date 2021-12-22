@@ -9,6 +9,7 @@
 
 #include "Tracer/Ray.h"
 #include "utils.h"
+#include "Debug.h"
 
 namespace RAYX {
 Geometry::Geometry(GeometricalShape geometricShape, double width, double height,
@@ -79,7 +80,7 @@ void Geometry::calcTransformationMatrices(glm::dvec4 position,
     glm::dmat4x4 e2g = inv_rotation * inv_translation;
     m_outMatrix = glmToVector16(glm::transpose(e2g));
 
-    std::cout << "from position and orientation" << std::endl;
+    RAYX_LOG << "from position and orientation";
     printMatrix(m_inMatrix);
     printMatrix(m_outMatrix);
 }

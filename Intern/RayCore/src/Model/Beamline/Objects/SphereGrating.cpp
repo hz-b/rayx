@@ -1,5 +1,7 @@
 #include "SphereGrating.h"
 
+#include "Debug.h"
+
 namespace RAYX {
 
 /**
@@ -51,7 +53,7 @@ SphereGrating::SphereGrating(const char* name, int mount,
                           abs(hvlam(m_designEnergyMounting)), 0, m_vls[0],
                           m_vls[1], m_vls[2], m_vls[3], m_vls[4], m_vls[5], 0,
                           0, 0, 0});
-    std::cout << "[SphereGrating]: Created.\n";
+    RAYX_LOG << "Created.";
 }
 
 SphereGrating::~SphereGrating() {}

@@ -1,5 +1,7 @@
 #include "ToroidMirror.h"
 
+#include "Debug.h"
+
 namespace RAYX {
 
 /**
@@ -47,8 +49,8 @@ ToroidMirror::ToroidMirror(
     // spheres) because this can be derived from user parameters
     calcRadius(incidenceAngle);  // calculate the radius
 
-    std::cout << "[ToroidMirror]: long Radius: " << m_longRadius
-              << ", short Radius: " << m_shortRadius << std::endl;
+    RAYX_LOG << "long Radius: " << m_longRadius
+              << ", short Radius: " << m_shortRadius;
     setSurface(std::make_unique<Toroid>(
         std::vector<double>{m_longRadius, m_shortRadius, 0, 0, 0, 1, 0, 0, 0, 0,
                             1, 0, 6, 0, 0, 0}));

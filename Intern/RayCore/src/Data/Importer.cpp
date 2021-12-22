@@ -7,6 +7,7 @@
 #include <sstream>
 
 #include "Debug/Instrumentor.h"
+#include "Debug.h"
 #include "Model/Beamline/Objects/ImagePlane.h"
 #include "Model/Beamline/Objects/MatrixSource.h"
 #include "Model/Beamline/Objects/PlaneGrating.h"
@@ -140,8 +141,7 @@ Beamline Importer::importBeamline(const char* filename) {
     RAYX_PROFILE_FUNCTION();
     // first implementation: stringstreams are slow; this might need
     // optimization
-    std::cout << "[Importer]: importBeamline is called with file \"" << filename
-              << "\"\n";
+    RAYX_LOG << "importBeamline is called with file \"" << filename << "\"";
 
     std::ifstream t(filename);
     std::stringstream buffer;
@@ -151,9 +151,8 @@ Beamline Importer::importBeamline(const char* filename) {
     rapidxml::xml_document<> doc;
     doc.parse<0>(cstr.data());
 
-    std::cout << "\t Version: "
-              << doc.first_node("lab")->first_node("version")->value()
-              << std::endl;
+    RAYX_LOG << "\t Version: "
+              << doc.first_node("lab")->first_node("version")->value();
     rapidxml::xml_node<>* xml_beamline =
         doc.first_node("lab")->first_node("beamline");
 

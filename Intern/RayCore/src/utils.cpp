@@ -1,6 +1,8 @@
 #include "utils.h"
 
 #include "Debug/Instrumentor.h"
+#include "Debug.h"
+#include <sstream>
 
 /**
  * Calculates photon wavelength (nm) from its energy (eV) or
@@ -45,27 +47,31 @@ glm::dmat4x4 getRotationMatrix(double dpsi, double dphi, double dchi) {
 
 void printMatrix(std::vector<double> matrix) {
     RAYX_PROFILE_FUNCTION();
-    std::cout << "[Matrix]: size: " << matrix.size() << std::endl;
-    std::cout << "\t";
+    RAYX_LOG << "size: " << matrix.size();
+    std::stringstream s;
+    s << "\t";
     for (int i = 0; i < int(matrix.size()); i++) {
-        std::cout << matrix[i] << ", ";
+        s << matrix[i] << ", ";
         if (i % 4 == 3) {
-            std::cout << std::endl;
-            std::cout << "\t";
+            RAYX_LOG << s.str();
+            s.clear();
+            s << "\t";
         }
     }
-    std::cout << std::endl;
+    RAYX_LOG << s.str();
 }
 
 void printDMat4(glm::dmat4 matrix) {
     RAYX_PROFILE_FUNCTION();
+    std::stringstream s;
     for (int i = 0; i < 4; i++) {
         for (int j = 0; j < 4; j++) {
-            std::cout << matrix[i][j] << ", ";
+            s << matrix[i][j] << ", ";
         }
-        std::cout << std::endl;
+        RAYX_LOG << s.str();
+        s.clear();
     }
-    std::cout << std::endl;
+    RAYX_LOG << s.str();
 }
 
 std::vector<double> glmToVector16(glm::dmat4x4 m) {

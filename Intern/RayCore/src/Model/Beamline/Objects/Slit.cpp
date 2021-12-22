@@ -1,5 +1,7 @@
 #include "Slit.h"
 
+#include "Debug.h"
+
 #include <assert.h>
 
 namespace RAYX {
@@ -52,7 +54,7 @@ Slit::Slit(const char* name, Geometry::GeometricalShape geometricalShape,
         std::vector<double>{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -1, 3, 0, 0, 0}));
     setElementParameters({m_beamstopWidth / 2, m_beamstopHeight / 2, 0, 0,
                           m_waveLength, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0});
-    std::cout << "[Slit]: Created.\n";
+    RAYX_LOG << "Created.";
 }
 
 Slit::Slit() {}

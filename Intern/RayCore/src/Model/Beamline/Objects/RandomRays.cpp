@@ -5,6 +5,7 @@
 #include <random>
 
 #include "Debug/Instrumentor.h"
+#include "Debug.h"
 #include "Tracer/Vulkan/VulkanTracer.h"
 
 namespace RAYX {
@@ -32,7 +33,7 @@ std::vector<Ray> RandomRays::getRays() {
 
     int n = SimulationEnv::get().m_numOfRays;
     std::vector<Ray> rayList;
-    std::cout << "[RandomRays]: create " << n << " random rays " << std::endl;
+    RAYX_LOG << "create " << n << " random rays ";
     // fill the square with rmat1xrmat1 rays
     for (int i = 0; i < n; i++) {
         glm::dvec3 position = glm::dvec3(unif(re), unif(re), unif(re));
@@ -76,8 +77,8 @@ void RandomRays::compareRays(std::vector<Ray*> input,
         diff.push_back(a7);
     }
     diff.sort();
-    std::cout << "[RandomRays]: max difference: " << diff.front() << " "
-              << diff.back() << std::endl;
+    RAYX_LOG << "max difference: " << diff.front() << " "
+              << diff.back();
 }
 
 }  // namespace RAYX

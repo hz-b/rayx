@@ -5,6 +5,7 @@
 
 #include <cassert>
 
+#include "Debug.h"
 #include "Presenter/SimulationEnv.h"
 
 namespace RAYX {
@@ -30,9 +31,9 @@ OpticalElement::OpticalElement(const char* name,
                                const std::vector<double> OParameters,
                                const std::vector<double> EParameters)
     : BeamlineObject(name) {
-    std::cout << surfaceParams.size() << inputInMatrix.size()
+    RAYX_LOG << surfaceParams.size() << inputInMatrix.size()
               << inputOutMatrix.size() << EParameters.size()
-              << OParameters.size() << std::endl;
+              << OParameters.size();
     // surface.getParams() to shader/buffer
     assert(surfaceParams.size() == 16 && inputInMatrix.size() == 16 &&
            inputOutMatrix.size() == 16 && EParameters.size() == 16 &&
@@ -189,7 +190,7 @@ std::vector<double> OpticalElement::getElementParameters() const {
 }
 
 std::vector<double> OpticalElement::getSurfaceParams() const {
-    std::cout << "[Optic-Element]: return anchor points" << std::endl;
+    RAYX_LOG << "return anchor points";
     // assert(m_surfacePtr!=nullptr);
     if (m_surfacePtr != nullptr)
         return m_surfacePtr->getParams();

@@ -1,5 +1,7 @@
 #include "PlaneGrating.h"
 
+#include "Debug.h"
+
 namespace RAYX {
 
 /**
@@ -45,8 +47,8 @@ PlaneGrating::PlaneGrating(
       m_lineDensity(lineDensity),
       m_orderOfDiffraction(orderOfDiffraction),
       m_vls(vls) {
-    std::cout << "[PlaneGrating]: design wavelength = "
-              << abs(hvlam(m_designEnergyMounting)) << std::endl;
+    RAYX_LOG << "design wavelength = "
+              << abs(hvlam(m_designEnergyMounting));
 
     // set element specific parameters in Optical Element class. will be moved
     // to shader and are needed for tracing

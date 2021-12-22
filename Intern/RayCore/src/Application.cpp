@@ -8,6 +8,7 @@
 #include "Model/Beamline/Objects/Objects.h"
 #include "UserParameter/GeometricUserParams.h"
 #include "UserParameter/WorldUserParams.h"
+#include "Debug.h"
 
 namespace RAYX {
 
@@ -19,11 +20,11 @@ Application::Application() : m_Beamline(std::make_shared<Beamline>()) {
     #endif
     #endif
     RAYX_PROFILE_BEGIN_SESSION("RayX Application", "profile_rayx_application.json");
-    RAYX_DEBUG(std::cout << "[App]: Creating Application..." << std::endl);
+    RAYX_D_LOG << "Creating Application...";
 }
 
 Application::~Application() {
-    RAYX_DEBUG(std::cout << "[App]: Deleting Application..." << std::endl);
+    RAYX_D_LOG << "Deleting Application...";
     RAYX_PROFILE_END_SESSION();
 }
 
@@ -116,7 +117,7 @@ void Application::loadDummyBeamline() {  // ! objects are created here
 }
 
 void Application::run() {
-    RAYX_DEBUG(std::cout << "[App]: Application running..." << std::endl);
+    RAYX_D_LOG << "Application running...";
 }
 
 }  // namespace RAYX

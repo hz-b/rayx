@@ -1,5 +1,6 @@
 #include "Toroid.h"
 
+#include "Debug.h"
 #include <math.h>
 
 #include <cassert>
@@ -59,7 +60,7 @@ void Toroid::setParameters(const std::vector<double> inputPoints) {
  *
  **/
 std::vector<double> Toroid::getParams() const {
-    std::cout << "[Toroid]: Return surface points" << std::endl;
+    RAYX_LOG << "Return surface points";
     return m_parameters;
 }
 
