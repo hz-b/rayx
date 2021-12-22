@@ -1,8 +1,9 @@
 #include "utils.h"
 
-#include "Debug/Instrumentor.h"
-#include "Debug.h"
 #include <sstream>
+
+#include "Debug.h"
+#include "Debug/Instrumentor.h"
 
 /**
  * Calculates photon wavelength (nm) from its energy (eV) or
@@ -54,7 +55,7 @@ void printMatrix(std::vector<double> matrix) {
         s << matrix[i] << ", ";
         if (i % 4 == 3) {
             RAYX_LOG << s.str();
-            s.clear();
+            s.str("");
             s << "\t";
         }
     }
@@ -69,7 +70,7 @@ void printDMat4(glm::dmat4 matrix) {
             s << matrix[i][j] << ", ";
         }
         RAYX_LOG << s.str();
-        s.clear();
+        s.str("");
     }
     RAYX_LOG << s.str();
 }
