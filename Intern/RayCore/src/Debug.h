@@ -34,6 +34,9 @@
 #endif
 
 namespace RAYX {
+
+constexpr int PREFIX_LEN = 30;
+
 /**
  *
  * In the following we define
@@ -48,9 +51,6 @@ namespace RAYX {
 /**
  * @param ERR       whether to use std::cerr or std::cout
  */
-
-constexpr int PREFIX_LEN = 30;
-
 template <bool ERR>
 struct Log {
     /**
@@ -99,7 +99,7 @@ struct Log {
 
 struct IgnoreLog {
     template <typename T>
-    IgnoreLog& operator<<(T t) {
+    IgnoreLog& operator<<(T) {
         return *this;
     }
 };
