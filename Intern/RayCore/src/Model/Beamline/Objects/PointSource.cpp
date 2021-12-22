@@ -1,6 +1,7 @@
 #include "PointSource.h"
 
 #include <Data/xml.h>
+#include "Debug.h"
 
 #include <cassert>
 #include <cmath>
@@ -164,8 +165,7 @@ std::vector<Ray> PointSource::getRays() {
     int n = SimulationEnv::get().m_numOfRays;
     std::vector<Ray> rayVector;
     rayVector.reserve(1048576);
-    std::cout << "[PointSource]: Create " << n
-              << " rays with standard normal deviation..." << std::endl;
+    RAYX_LOG << "Create " << n << " rays with standard normal deviation...";
 
     // create n rays with random position and divergence within the given span
     // for width, height, depth, horizontal and vertical divergence
@@ -193,7 +193,7 @@ std::vector<Ray> PointSource::getRays() {
 
         rayVector.emplace_back(r);
     }
-    std::cout << "[PointSource]: &rayVector: " << &(rayVector[0]) << std::endl;
+    RAYX_LOG << "&rayVector: " << &(rayVector[0]);
     // rayVector.resize(1048576);
     return rayVector;
 }
