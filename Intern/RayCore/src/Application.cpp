@@ -39,6 +39,7 @@ void Application::loadDummyBeamline() {  // ! objects are created here
     std::shared_ptr<MatrixSource> matSourcePtr = std::make_shared<MatrixSource>(
         "matrix source", dist, 0.065, 0.04, 0.0, 0.001, 0.001, 1, 0, 0,
         std::vector<double>{0, 0, 0, 0});
+
     // std::shared_ptr<Slit> s = std::make_shared<Slit>("slit", 1, 2, 20,
     // 2, 7.5, 10000, 20, 1, m->getPhotonEnergy(), std::vector<double>{2, 1, 0,
     // 0, 0, 0 }, nullptr, GLOBAL);
@@ -100,6 +101,22 @@ void Application::loadDummyBeamline() {  // ! objects are created here
             designOrderOfDiffraction, dAlpha, dBeta, sEntrance, sExit,
             mEntrance, mExit, shortRadius, longRadius, additionalOrder,
             fresnelOffset, sE);
+
+    // Cylinder with mirror misalignment
+    int coordinatesystem = 1;
+    RAYX::GeometricUserParams cy_params =
+        RAYX::GeometricUserParams(10, 10000, 1000);
+    // double cy_tangentAngle = cy_params.calcTangentAngle(
+    //     10, 10000, 1000, coordinatesystem);  // TODO: Actually not needed
+    RAYX::WorldUserParams cy_w_coord = RAYX::WorldUserParams(
+        cy_params.getAlpha(), cy_params.getBeta(), 0, 100,
+        std::vector<double>{1, 2, 3, 0.004, 0.005,
+                            0.006});  // TODO (OS): misalignment needed?
+    glm::dvec4 pos4 = w_coord.calcPosition();
+    glm::dmat4x4 or4 = w_coord.calcOrientation();
+    std::shared_ptr<RAYX::Cylinder> cy = std::make_shared<RAYX::Cylinder>(
+        "Cylinder", Geometry::GeometricalShape::RECTANGLE, 20, 0, 200, 10, pos4,
+        or4, 10, 10000, 1000, std::vector<double>{0, 0, 0, 0, 0, 0, 0});
 
     // image plane
     RAYX::WorldUserParams ip_w_coord = RAYX::WorldUserParams(

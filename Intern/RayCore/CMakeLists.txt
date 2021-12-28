@@ -24,6 +24,7 @@ SET(SOURCE
     src/Model/Beamline/Objects/PointSource.cpp
     src/Model/Beamline/Objects/SphereMirror.cpp
     src/Model/Beamline/Objects/ToroidMirror.cpp
+    src/Model/Beamline/Objects/Cylinder.cpp
     src/Data/Exporter.cpp
     src/Data/Importer.cpp
     src/Data/xml.cpp
@@ -65,6 +66,7 @@ SET(HEADERS
     src/Model/Beamline/Objects/PointSource.h
     src/Model/Beamline/Objects/SphereMirror.h
     src/Model/Beamline/Objects/ToroidMirror.h
+    src/Model/Beamline/Objects/Cylinder.h
     src/Data/Exporter.h
     src/Data/Importer.h
     src/Data/xml.h
