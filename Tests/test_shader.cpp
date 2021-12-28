@@ -1,6 +1,7 @@
 #include "setupTests.h"
 
-#if RUN_TEST_SHADER
+// #if RUN_TEST_SHADER TODO (Jannis): Commented out by OS: error: unterminated
+// #if
 
 #include <fstream>
 #include <functional>
@@ -3144,7 +3145,7 @@ TEST(opticalElements, CylinderDefault) {
     glm::dmat4x4 or4 = cy_w_coord.calcOrientation();
     std::shared_ptr<RAYX::Cylinder> cy = std::make_shared<RAYX::Cylinder>(
         "Cylinder", RAYX::Geometry::GeometricalShape::RECTANGLE, 10470.4917875,
-        0, 50, 200, pos4, or4, 10, 10000, 1000,
+        0, 50, 200, cy_w_coord.getAzimuthalAngle(), pos4, or4, 10, 10000, 1000,
         std::vector<double>{0, 0, 0, 0, 0, 0, 0});
 
     // image plane

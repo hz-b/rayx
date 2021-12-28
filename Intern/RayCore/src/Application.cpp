@@ -4,22 +4,23 @@
 #include <iostream>
 
 #include "Data/Exporter.h"
+#include "Debug.h"
 #include "Debug/Instrumentor.h"
 #include "Model/Beamline/Objects/Objects.h"
 #include "UserParameter/GeometricUserParams.h"
 #include "UserParameter/WorldUserParams.h"
-#include "Debug.h"
 
 namespace RAYX {
 
 Application::Application() : m_Beamline(std::make_shared<Beamline>()) {
-    #ifdef RAYX_PLATFORM_WINDOWS
-    #ifdef RAY_DEBUG_MODE
-        _CrtSetReportMode(_CRT_WARN, _CRTDBG_MODE_DEBUG);
-        _CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);
-    #endif
-    #endif
-    RAYX_PROFILE_BEGIN_SESSION("RayX Application", "profile_rayx_application.json");
+#ifdef RAYX_PLATFORM_WINDOWS
+#ifdef RAY_DEBUG_MODE
+    _CrtSetReportMode(_CRT_WARN, _CRTDBG_MODE_DEBUG);
+    _CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);
+#endif
+#endif
+    RAYX_PROFILE_BEGIN_SESSION("RayX Application",
+                               "profile_rayx_application.json");
     RAYX_D_LOG << "Creating Application...";
 }
 
@@ -103,20 +104,19 @@ void Application::loadDummyBeamline() {  // ! objects are created here
             fresnelOffset, sE);
 
     // Cylinder with mirror misalignment
-    int coordinatesystem = 1;
     RAYX::GeometricUserParams cy_params =
         RAYX::GeometricUserParams(10, 10000, 1000);
     // double cy_tangentAngle = cy_params.calcTangentAngle(
-    //     10, 10000, 1000, coordinatesystem);  // TODO: Actually not needed
+    //     10, 10000, 1000, coordinatesystem);  // Actually not needed
     RAYX::WorldUserParams cy_w_coord = RAYX::WorldUserParams(
         cy_params.getAlpha(), cy_params.getBeta(), 0, 100,
-        std::vector<double>{1, 2, 3, 0.004, 0.005,
-                            0.006});  // TODO (OS): misalignment needed?
+        std::vector<double>{1, 2, 3, 0.004, 0.005, 0.006});
     glm::dvec4 pos4 = w_coord.calcPosition();
     glm::dmat4x4 or4 = w_coord.calcOrientation();
     std::shared_ptr<RAYX::Cylinder> cy = std::make_shared<RAYX::Cylinder>(
-        "Cylinder", Geometry::GeometricalShape::RECTANGLE, 20, 0, 200, 10, pos4,
-        or4, 10, 10000, 1000, std::vector<double>{0, 0, 0, 0, 0, 0, 0});
+        "Cylinder", Geometry::GeometricalShape::RECTANGLE, 20, 0, 200, 10,
+        w_coord.getAzimuthalAngle(), pos4, or4, 10, 10000, 1000,
+        std::vector<double>{0, 0, 0, 0, 0, 0, 0});
 
     // image plane
     RAYX::WorldUserParams ip_w_coord = RAYX::WorldUserParams(
@@ -133,8 +133,6 @@ void Application::loadDummyBeamline() {  // ! objects are created here
     m_Presenter.addLightSource(matSourcePtr);
 }
 
-void Application::run() {
-    RAYX_D_LOG << "Application running...";
-}
+void Application::run() { RAYX_D_LOG << "Application running..."; }
 
 }  // namespace RAYX

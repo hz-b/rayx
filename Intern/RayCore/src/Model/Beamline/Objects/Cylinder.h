@@ -8,16 +8,14 @@ class RAYX_API Cylinder : public OpticalElement {
   public:
     Cylinder(const char* name, Geometry::GeometricalShape geometricalShape,
              const double radius, const int direction, const double width,
-             const double height, glm::dvec4 position, glm::dmat4x4 orientation,
+             const double height, const double azimuthalAngle,
+             glm::dvec4 position, glm::dmat4x4 orientation,
              const double grazingIncidence, const double entranceArmLength,
              const double exitArmLength, const std::vector<double> slopeError);
     ~Cylinder();
 
     void setRadius();
-    enum CYLINDER_DIRECTION {
-        LONG_RADIUS_R,
-        SHORT_RADIUS_RHO
-    };  // TODO: rename this
+    enum CYLINDER_DIRECTION { LONG_RADIUS_R, SHORT_RADIUS_RHO };
     CYLINDER_DIRECTION getDirection() const;
 
     double getIncidenceAngle() const;

@@ -1,5 +1,7 @@
 #include "Cylinder.h"
 
+#include "Debug.h"
+
 namespace RAYX {
 /**
  * @brief Construct a new Cylinder object
@@ -24,18 +26,19 @@ namespace RAYX {
 Cylinder::Cylinder(const char* name,
                    Geometry::GeometricalShape geometricalShape,
                    const double radius, const int direction, const double width,
-                   const double height, glm::dvec4 position,
-                   glm::dmat4x4 orientation, const double grazingIncidence,
+                   const double height, const double azimuthalAngle,
+                   glm::dvec4 position, glm::dmat4x4 orientation,
+                   const double grazingIncidence,
                    const double entranceArmLength, const double exitArmLength,
                    const std::vector<double> slopeError)
-    : OpticalElement(name, geometricalShape, width, height, position,
-                     orientation, slopeError),
+    : OpticalElement(name, geometricalShape, width, height, azimuthalAngle,
+                     position, orientation, slopeError),
       m_direction(CYLINDER_DIRECTION(direction)),
       m_radius(radius),
       m_incidence(degToRad(grazingIncidence)),
       m_entranceArmLength(entranceArmLength),
       m_exitArmLength(exitArmLength) {
-    std::cout << name << std::endl;
+    RAYX_LOG << name;
     if (m_direction == LONG_RADIUS_R) {  // X-DIR
         m_a11 = 0;
         m_a33 = 1;
