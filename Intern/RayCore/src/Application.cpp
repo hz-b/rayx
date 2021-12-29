@@ -103,11 +103,9 @@ void Application::loadDummyBeamline() {  // ! objects are created here
             mEntrance, mExit, shortRadius, longRadius, additionalOrder,
             fresnelOffset, sE);
 
-    // Cylinder with mirror misalignment
+    // Cylinder with mirror misalignment (Use alone)
     RAYX::GeometricUserParams cy_params =
         RAYX::GeometricUserParams(10, 10000, 1000);
-    // double cy_tangentAngle = cy_params.calcTangentAngle(
-    //     10, 10000, 1000, coordinatesystem);  // Actually not needed
     RAYX::WorldUserParams cy_w_coord = RAYX::WorldUserParams(
         cy_params.getAlpha(), cy_params.getBeta(), 0, 100,
         std::vector<double>{1, 2, 3, 0.004, 0.005, 0.006});
@@ -116,6 +114,19 @@ void Application::loadDummyBeamline() {  // ! objects are created here
     std::shared_ptr<RAYX::Cylinder> cy = std::make_shared<RAYX::Cylinder>(
         "Cylinder", Geometry::GeometricalShape::RECTANGLE, 20, 0, 200, 10,
         w_coord.getAzimuthalAngle(), pos4, or4, 10, 10000, 1000,
+        std::vector<double>{0, 0, 0, 0, 0, 0, 0});
+
+    // Cone with mirror misalignment (Use alone)
+    RAYX::GeometricUserParams co_params =
+        RAYX::GeometricUserParams(10, 10000, 1000);
+    RAYX::WorldUserParams co_w_coord = RAYX::WorldUserParams(
+        co_params.getAlpha(), co_params.getBeta(), 0, 100,
+        std::vector<double>{1, 2, 3, 0.004, 0.005, 0.006});
+    glm::dvec4 pos5 = w_coord.calcPosition();
+    glm::dmat4x4 or5 = w_coord.calcOrientation();
+    std::shared_ptr<RAYX::Cone> co_auto = std::make_shared<RAYX::Cone>(
+        "Cone 1", Geometry::GeometricalShape::RECTANGLE, 20, 200,
+        w_coord.getAzimuthalAngle(), pos5, or5, 10, 10000, 1000,
         std::vector<double>{0, 0, 0, 0, 0, 0, 0});
 
     // image plane

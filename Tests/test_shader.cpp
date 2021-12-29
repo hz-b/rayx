@@ -3157,3 +3157,53 @@ TEST(opticalElements, CylinderDefault) {
         std::make_shared<RAYX::ImagePlane>("ImagePlane", pos3, or3);
     testOpticalElement({cy, i}, 200);
 }
+
+TEST(opticalElements, ConeAuto) {
+    RAYX::GeometricUserParams co_params =
+        RAYX::GeometricUserParams(10, 10000, 1000);
+
+    RAYX::WorldUserParams co_w_coord =
+        RAYX::WorldUserParams(degToRad(10), degToRad(10), 0, 10000,
+                              std::vector<double>{0, 0, 0, 0, 0, 0});
+
+    glm::dvec4 pos5 = co_w_coord.calcPosition();
+    glm::dmat4x4 or5 = co_w_coord.calcOrientation();
+    std::shared_ptr<RAYX::Cone> co_auto = std::make_shared<RAYX::Cone>(
+        "Cone Auto", RAYX::Geometry::GeometricalShape::RECTANGLE, 20, 200,
+        co_w_coord.getAzimuthalAngle(), pos5, or5, 10, 10000, 1000,
+        std::vector<double>{0, 0, 0, 0, 0, 0, 0});
+
+    // image plane
+    RAYX::WorldUserParams ip_w_coord = RAYX::WorldUserParams(
+        0, 0, 0, 1000, std::vector<double>{0, 0, 0, 0, 0, 0});
+    glm::dvec4 pos3 = ip_w_coord.calcPosition(co_w_coord, pos5, or5);
+    glm::dmat4x4 or3 = ip_w_coord.calcOrientation(co_w_coord, or5);
+    std::shared_ptr<RAYX::ImagePlane> i =
+        std::make_shared<RAYX::ImagePlane>("ImagePlane", pos3, or3);
+    testOpticalElement({co_auto, i}, 200);
+}
+
+TEST(opticalElements, ConeManual) {
+    RAYX::GeometricUserParams co_params =
+        RAYX::GeometricUserParams(10, 10000, 1000);
+
+    RAYX::WorldUserParams co_w_coord =
+        RAYX::WorldUserParams(degToRad(10), degToRad(10), 0, 10000,
+                              std::vector<double>{0, 0, 0, 0, 0, 0});
+
+    glm::dvec4 pos5 = co_w_coord.calcPosition();
+    glm::dmat4x4 or5 = co_w_coord.calcOrientation();
+    std::shared_ptr<RAYX::Cone> co_man = std::make_shared<RAYX::Cone>(
+        "Cone Manual", RAYX::Geometry::GeometricalShape::RECTANGLE, 200,
+        346.855222938, 284.679301206, 20, co_w_coord.getAzimuthalAngle(), pos5,
+        or5, 10, 10000, 1000, std::vector<double>{0, 0, 0, 0, 0, 0, 0});
+
+    // image plane
+    RAYX::WorldUserParams ip_w_coord = RAYX::WorldUserParams(
+        0, 0, 0, 1000, std::vector<double>{0, 0, 0, 0, 0, 0});
+    glm::dvec4 pos3 = ip_w_coord.calcPosition(co_w_coord, pos5, or5);
+    glm::dmat4x4 or3 = ip_w_coord.calcOrientation(co_w_coord, or5);
+    std::shared_ptr<RAYX::ImagePlane> i =
+        std::make_shared<RAYX::ImagePlane>("ImagePlane", pos3, or3);
+    testOpticalElement({co_man, i}, 200);
+}

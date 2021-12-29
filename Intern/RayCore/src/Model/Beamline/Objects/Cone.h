@@ -11,14 +11,12 @@ class RAYX_API Cone : public OpticalElement {
          const double grazingIncidence, const double entranceArmLength,
          const double exitArmLength, const std::vector<double> slopeError);
 
-    Cone::Cone(const char* name, Geometry::GeometricalShape geometricalShape,
-               const double upstream_radius_r,
-               const double downstream_radius_rho, const double width,
-               const double height, const double azimuthalAngle,
-               glm::dvec4 position, glm::dmat4x4 orientation,
-               const double grazingIncidence, const double entranceArmLength,
-               const double exitArmLength,
-               const std::vector<double> slopeError);
+    Cone(const char* name, Geometry::GeometricalShape geometricalShape,
+         const double upstream_radius_r, const double downstream_radius_rho,
+         const double width, const double height, const double azimuthalAngle,
+         glm::dvec4 position, glm::dmat4x4 orientation,
+         const double grazingIncidence, const double entranceArmLength,
+         const double exitArmLength, const std::vector<double> slopeError);
     ~Cone();
     void calcConePar(const double ZL, const double ra, const double rb,
                      const double th, double* R, double* RHO);
