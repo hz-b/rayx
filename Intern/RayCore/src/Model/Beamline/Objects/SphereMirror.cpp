@@ -1,5 +1,7 @@
 #include "SphereMirror.h"
 
+#include "Debug.h"
+
 namespace RAYX {
 
 /**
@@ -11,6 +13,8 @@ namespace RAYX {
  * @param width                     width of optical element (x dim)
  * @param height                    height of optical element (z dim in element
  * coordinates)
+ * @param azimuthalAngle            rotation of element in xy-plane, needed for
+ * stokes vector
  * @param grazingIncidenceAngle     angle in which the main ray should hit the
  * element. given in degree
  * @param position                  position of element in world coordinates
@@ -22,17 +26,15 @@ namespace RAYX {
  * amplitude y(5) and radius (6)
  *
  */
-SphereMirror::SphereMirror(const char* name,
-                           Geometry::GeometricalShape geometricalShape,
-                           const double width, const double height,
-                           const double grazingIncidenceAngle,
-                           glm::dvec4 position, glm::dmat4x4 orientation,
-                           const double entranceArmLength,
-                           const double exitArmLength,
-                           const std::vector<double> slopeError)
+SphereMirror::SphereMirror(
+    const char* name, Geometry::GeometricalShape geometricalShape,
+    const double width, const double height, const double azimuthalAngle,
+    const double grazingIncidenceAngle, glm::dvec4 position,
+    glm::dmat4x4 orientation, const double entranceArmLength,
+    const double exitArmLength, const std::vector<double> slopeError)
     : OpticalElement(name, {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-                     geometricalShape, width, height, position, orientation,
-                     slopeError),
+                     geometricalShape, width, height, azimuthalAngle, position,
+                     orientation, slopeError),
       m_entranceArmLength(entranceArmLength),
       m_exitArmLength(exitArmLength),
       m_grazingIncidenceAngle(degToRad(grazingIncidenceAngle))
@@ -52,6 +54,8 @@ SphereMirror::SphereMirror(const char* name,
  * @param width                     width of optical element (x dim)
  * @param height                    height of optical element (z dim in element
  * coordinates)
+ * @param azimuthalAngle            rotation of element in xy-plane, needed for
+ * stokes vector
  * @param radius                    radius of sphere
  * @param position                  position of element in world coordinates
  * @param orientation               orientation of element in world coordinates
@@ -63,13 +67,13 @@ SphereMirror::SphereMirror(const char* name,
 SphereMirror::SphereMirror(const char* name,
                            Geometry::GeometricalShape geometricalShape,
                            const double width, const double height,
-                           double radius, glm::dvec4 position,
-                           glm::dmat4x4 orientation,
+                           const double azimuthalAngle, double radius,
+                           glm::dvec4 position, glm::dmat4x4 orientation,
                            const std::vector<double> slopeError)
     : OpticalElement(name, {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-                     geometricalShape, width, height, position, orientation,
-                     slopeError) {
-    std::cout << "[SphereMirror]: Created.\n";
+                     geometricalShape, width, height, azimuthalAngle, position,
+                     orientation, slopeError) {
+    RAYX_LOG << "Created.";
     setSurface(std::make_unique<Quadric>(std::vector<double>{
         1, 0, 0, 0, 1, 1, 0, -radius, 0, 0, 1, 0, 0, 0, 0, 0}));
 }
@@ -125,9 +129,15 @@ std::shared_ptr<SphereMirror> SphereMirror::createFromXML(
         return nullptr;
     }
 
+    double azimuthalAngle;
+    if (!xml::paramDouble(node, "azimuthalAngle", &azimuthalAngle)) {
+        return nullptr;
+    }
+
     return std::make_shared<SphereMirror>(
-        name, geometricalShape, width, height, grazingIncidenceAngle, position,
-        orientation, entranceArmLength, exitArmLength, slopeError);
+        name, geometricalShape, width, height, azimuthalAngle,
+        grazingIncidenceAngle, position, orientation, entranceArmLength,
+        exitArmLength, slopeError);
 }
 
 // TODO(Theresa): move this to user params and just give the radius as a

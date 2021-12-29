@@ -5,29 +5,28 @@
 #include <iomanip>
 #include <sstream>
 
-#include "Debug.h"
+#include "Debug/Instrumentor.h"
 #include "Model/Beamline/LightSource.h"
 #include "Model/Beamline/OpticalElement.h"
 #include "Ray.h"
+#include "Debug.h"
 
 #define SHORTOUTPUT false
 
 namespace RAYX {
 TracerInterface::TracerInterface() : m_numElements(0), m_numRays(0) {
-    RAYX_DEBUG(std::cout << "[TracerInterf]: Creating TracerInterface..."
-                         << std::endl);
+    RAYX_D_LOG << "Creating TracerInterface...";
 }
 
 TracerInterface::TracerInterface(int numElements, int numRays)
     : m_numElements(numElements), m_numRays(numRays) {
-    RAYX_DEBUG(std::cout << "[TracerInterf]: Creating TracerInterface with "
+    RAYX_D_LOG << "Creating TracerInterface with "
                          << numElements << " elements and " << numRays
-                         << " rays..." << std::endl);
+                         << " rays...";
 }
 
 TracerInterface::~TracerInterface() {
-    RAYX_DEBUG(std::cout << "[TracerInterf]: Deleting TracerInterface..."
-                         << std::endl);
+    RAYX_D_LOG << "Deleting TracerInterface...";
 }
 
 /** Generates rays from light source into the tracer.
@@ -38,9 +37,8 @@ TracerInterface::~TracerInterface() {
 void TracerInterface::generateRays(std::shared_ptr<LightSource> source) {
     // only one Source for now
     if (!source) return;
-    std::vector<RAYX::Ray> rays = source->getRays();
-    RAYX_DEBUG(std::cout << "[TracerInterf]: add rays" << std::endl);
-    m_RayTracer.addRayVector(rays.data(), rays.size());
+    RAYX_D_LOG << "add rays";
+    m_RayTracer.addRayVector(source->getRays());
 }
 
 void TracerInterface::setBeamlineParameters() {
@@ -55,17 +53,11 @@ void TracerInterface::addOpticalElementToTracer(
                            element->getElementParameters());
 }
 
-// ! parameters are temporary and need to be removed again
 bool TracerInterface::run() {
-    // RAYX_DEBUG(std::cout << "add rays to tracer done" << std::endl);
+    RAYX_PROFILE_FUNCTION();
 
-    const clock_t begin_time = clock();
     m_RayTracer.run();  // run tracer
-    std::cout << "[TracerInterf]: Runtime: "
-              << (float(clock() - begin_time) / CLOCKS_PER_SEC) * 1000 << " ms"
-              << std::endl;
-
-    RAYX_DEBUG(std::cout << "[TracerInterf]: Run succeeded!" << std::endl);
+    RAYX_D_LOG << "Run succeeded!";
 
     // transform in to usable data
     auto doubleVecSize = RAY_MAX_ELEMENTS_IN_VECTOR * RAY_DOUBLE_COUNT;
@@ -86,8 +78,7 @@ bool TracerInterface::run() {
     for (auto outputRayIterator = m_RayTracer.getOutputIteratorBegin(),
               outputIteratorEnd = m_RayTracer.getOutputIteratorEnd();
          outputRayIterator != outputIteratorEnd; outputRayIterator++) {
-        RAYX_DEBUG(std::cout << "[TracerInterf]: (*outputRayIterator).size(): "
-                             << (*outputRayIterator).size() << std::endl);
+        RAYX_D_LOG << "(*outputRayIterator).size(): " << (*outputRayIterator).size();
 
         memcpy(doubleVec.data(), (*outputRayIterator).data(),
                (*outputRayIterator).size() * VULKANTRACER_RAY_DOUBLE_AMOUNT *
@@ -95,27 +86,22 @@ bool TracerInterface::run() {
         doubleVec.resize((*outputRayIterator).size() *
                          VULKANTRACER_RAY_DOUBLE_AMOUNT);
 
-        RAYX_DEBUG(std::cout << "[TracerInterf]: sample ray: " << doubleVec[0]
+        RAYX_D_LOG << "sample ray: " << doubleVec[0]
                              << ", " << doubleVec[1] << ", " << doubleVec[2]
                              << ", " << doubleVec[3] << ", " << doubleVec[4]
                              << ", " << doubleVec[5] << ", " << doubleVec[6]
                              << ", energy: " << doubleVec[7]
-                             << ", stokes 0: " << doubleVec[8] << std::endl);
+                             << ", stokes 0: " << doubleVec[8];
 
         writeToFile(doubleVec, outputFile, index);
         index = index + (*outputRayIterator).size();
     }
     outputFile.close();
 
-    RAYX_DEBUG(std::cout << "[TracerInterf]: Runtime (incl. loading rays): "
-                         << (float(clock() - begin_time) / CLOCKS_PER_SEC) *
-                                1000
-                         << " ms" << std::endl);
-
     // clean up tracer to avoid memory leaks
     m_RayTracer.cleanup();
     // intentionally not RAYX_DEBUG()
-    std::cout << "[TracerInterf]: Done." << std::endl;
+    RAYX_LOG << "Done.";
     return true;
 }
 
@@ -124,9 +110,9 @@ void TracerInterface::writeToFile(const std::vector<double>& outputRays,
                                   std::ofstream& file, int index) const {
     size_t size = outputRays.size();
 
-    RAYX_DEBUG(std::cout << "[TracerInterf]: Writing "
+    RAYX_D_LOG << "Writing "
                          << outputRays.size() / RAY_DOUBLE_COUNT
-                         << " rays to file..." << std::endl);
+                         << " rays to file...";
 
     if (SHORTOUTPUT) {
         char buff[64];
@@ -153,7 +139,7 @@ void TracerInterface::writeToFile(const std::vector<double>& outputRays,
         }
     }
 
-    RAYX_DEBUG(std::cout << "[TracerInterf]: Writing done!" << std::endl);
+    RAYX_D_LOG << "Writing done!";
 }
 }  // namespace RAYX
 // namespace RAYX

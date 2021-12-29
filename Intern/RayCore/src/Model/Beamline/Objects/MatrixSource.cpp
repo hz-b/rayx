@@ -3,6 +3,9 @@
 #include <cassert>
 #include <random>
 
+#include "Debug/Instrumentor.h"
+#include "Debug.h"
+
 namespace RAYX {
 
 /**
@@ -41,7 +44,7 @@ MatrixSource::MatrixSource(const std::string name, EnergyDistribution dist,
     : LightSource(name.c_str(), dist, linPol0, linPol45, circPol, misalignment,
                   sourceDepth, sourceHeight, sourceWidth, horDivergence,
                   verDivergence) {
-    std::cout << "[MatrixSource]: Created.\n";
+    RAYX_LOG << "Created.";
 }
 
 MatrixSource::~MatrixSource() {}
@@ -117,6 +120,7 @@ std::shared_ptr<MatrixSource> MatrixSource::createFromXML(
  * returns vector of rays
  */
 std::vector<Ray> MatrixSource::getRays() {
+    RAYX_PROFILE_FUNCTION();
     double lower_bound = 0;
     double upper_bound = 1;
     std::uniform_real_distribution<double> unif(lower_bound, upper_bound);
@@ -128,8 +132,8 @@ std::vector<Ray> MatrixSource::getRays() {
 
     std::vector<Ray> rayVector;
     rayVector.reserve(1048576);
-    std::cout << "[MatrixSource]: create " << rmat << " times " << rmat
-              << " matrix with Matrix Source..." << std::endl;
+    RAYX_LOG << "create " << rmat << " times " << rmat
+              << " matrix with Matrix Source...";
     // fill the square with rmat1xrmat1 rays
     for (int col = 0; col < rmat; col++) {
         for (int row = 0; row < rmat; row++) {
@@ -156,17 +160,20 @@ std::vector<Ray> MatrixSource::getRays() {
             glm::dvec4 stokes =
                 glm::dvec4(1, getLinear0(), getLinear45(), getCircular());
 
-            Ray r = Ray(position, direction, stokes, en, 1.0);
+            Ray r = {position.x, position.y, position.z, 1.0, direction.x,
+                        direction.y, direction.z, en, stokes.x, stokes.y,
+                        stokes.z, stokes.w, 0.0, 0.0, 0.0, 0.0};
+            // Ray(1, 2, 3, 7, 4, 5, 6, 8, 9, 10, 11, 12, 13, 14, 15, 16);
             rayVector.push_back(r);
         }
     }
     // afterwards start from the beginning again
     for (int i = 0; i < SimulationEnv::get().m_numOfRays - rmat * rmat; i++) {
-        Ray r = rayVector.at(i);
+        /*Ray r = rayVector.at(i);
         glm::dvec3 position =
-            glm::dvec3(r.m_position[0], r.m_position[1], r.m_position[2]);
+            glm::dvec3(r.m_position.x, r.m_position.y, r.m_position.z);
         glm::dvec3 direction =
-            glm::dvec3(r.m_direction[0], r.m_direction[1], r.m_direction[2]);
+            glm::dvec3(r.m_position.x, r.m_position.y, r.m_position.z);
         // selects the energy of the ray based on the given distribution or .dat
         // file
         en = selectEnergy();
@@ -175,10 +182,13 @@ std::vector<Ray> MatrixSource::getRays() {
         glm::dvec4 stokes =
             glm::dvec4(1, getLinear0(), getLinear45(), getCircular());
 
-        Ray r_copy(position, direction, stokes, en, 1.0);
+        Ray r_copy(position.x, position.y, position.z, direction.x, direction.y,
+                   direction.z, stokes.x, stokes.y, stokes.z, stokes.w, en,
+                   1.0);*/
+        Ray r_copy((const Ray&)rayVector.at(i));
         rayVector.push_back(r_copy);
     }
-    std::cout << "[MatrixSource]: &rayVector: " << &(rayVector[0]) << std::endl;
+    RAYX_LOG << "&rayVector: " << &(rayVector[0]);
     // rayVector.resize(1048576);
     return rayVector;
 }

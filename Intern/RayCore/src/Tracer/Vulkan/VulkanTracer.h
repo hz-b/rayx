@@ -9,7 +9,9 @@
 #include <optional>
 #include <stdexcept>
 
-#include "RayList.h"
+#include "Core.h"
+#include "PalikTable.h"
+#include "Tracer/RayList.h"
 #include "vulkan/vulkan.hpp"
 
 #ifdef NDEBUG
@@ -17,6 +19,15 @@ const bool enableValidationLayers = false;
 #else
 const bool enableValidationLayers = true;
 #endif
+
+// Vulkan to Ray #defines
+#define VULKANTRACER_RAY_DOUBLE_AMOUNT 16
+#define VULKANTRACER_QUADRIC_DOUBLE_AMOUNT 112  // 7* dmat4 (16)
+#define VULKANTRACER_QUADRIC_PARAM_DOUBLE_AMOUNT 4
+#define GPU_MAX_STAGING_SIZE 134217728  // 128MB
+#define RAY_VECTOR_SIZE 16777216
+
+namespace RAYX {
 
 // set debug generation information
 const std::vector<const char*> validationLayers = {
@@ -40,16 +51,9 @@ void DestroyDebugUtilsMessengerEXT(VkInstance instance,
                                    VkDebugUtilsMessengerEXT debugMessenger,
                                    const VkAllocationCallbacks* pAllocator);
 
-// Vulkan to Ray #defines
-#define VULKANTRACER_RAY_DOUBLE_AMOUNT 16
-#define VULKANTRACER_QUADRIC_DOUBLE_AMOUNT 112  // 7* dmat4 (16)
-#define VULKANTRACER_QUADRIC_PARAM_DOUBLE_AMOUNT 4
-#define GPU_MAX_STAGING_SIZE 134217728  // 128MB
-#define RAY_VECTOR_SIZE 16777216
-
 const int WORKGROUP_SIZE = 32;
 
-class VulkanTracer {
+class RAYX_API VulkanTracer {
   public:
     VulkanTracer();
     ~VulkanTracer();
@@ -59,7 +63,7 @@ class VulkanTracer {
     void cleanup();
 
     void getRays();
-    void addRayVector(void* location, size_t size);
+    void addRayVector(const std::vector<Ray>& inRayVector);
     void addVectors(const std::vector<double>& surfaceParams,
                     const std::vector<double>& inputInMatrix,
                     const std::vector<double>& inputOutMatrix,
@@ -168,6 +172,7 @@ class VulkanTracer {
     // Ray-related funcs:
     void divideAndSortRays();
     void fillQuadricBuffer();
+    void fillMaterialBuffer();
     void copyToRayBuffer(uint32_t offset, uint32_t numberOfBytesToCopy);
     void copyToOutputBuffer(uint32_t offset, uint32_t numberOfBytesToCopy);
 
@@ -176,3 +181,4 @@ class VulkanTracer {
 
     int main();
 };
+}  // namespace RAYX

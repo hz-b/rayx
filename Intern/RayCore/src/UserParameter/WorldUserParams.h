@@ -10,7 +10,7 @@
 
 #include "Core.h"
 #include "Model/Beamline/OpticalElement.h"
-#include "Ray.h"
+#include "Tracer/Ray.h"
 #include "utils.h"
 
 namespace RAYX {
@@ -44,6 +44,7 @@ class RAYX_API WorldUserParams {
     glm::dmat4x4 calcOrientation();
 
     std::vector<double> getMisalignment();
+    double getAzimuthalAngle();
 
   private:
     double m_incidenceAngle;

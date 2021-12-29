@@ -1,3 +1,7 @@
+#include "setupTests.h"
+
+#if RUN_TEST_SOURCES
+
 #include <fstream>
 #include <sstream>
 
@@ -6,8 +10,8 @@
 #include "Model/Beamline/Objects/MatrixSource.h"
 #include "Model/Beamline/Objects/PointSource.h"
 #include "Presenter/SimulationEnv.h"
-#include "Ray.h"
-#include "VulkanTracer.h"
+#include "Tracer/Ray.h"
+#include "Tracer/Vulkan/VulkanTracer.h"
 #include "gmock/gmock.h"
 #include "gtest/gtest.h"
 
@@ -78,8 +82,8 @@ TEST(RayTest, test1) {
     double order = 3;
     double lastElement = 4;
     double extraParam = 7;
-    Ray r = Ray(x, y, z, xdir, ydir, zdir, s0, s1, s2, s3, energy, weight,
-                pathLength, order, lastElement, extraParam);
+    RAYX::Ray r{x, y, z, weight, xdir, ydir, zdir, energy, s0, s1, s2, s3,
+                pathLength, order, lastElement, extraParam};
     EXPECT_EQ(r.getxPos(), x);
     EXPECT_EQ(r.getyPos(), y);
     EXPECT_EQ(r.getzPos(), z);
@@ -114,7 +118,7 @@ TEST(RayTest, testDefaultValues) {
     double s1 = 1;
     double s2 = 0;
     double s3 = 0;
-    Ray r = Ray(x, y, z, xdir, ydir, zdir, s0, s1, s2, s3, energy, weight);
+    RAYX::Ray r{x, y, z, weight, xdir, ydir, zdir, energy, s0, s1, s2, s3, 0, 0, 0, 0};
     EXPECT_EQ(r.getxPos(), x);
     EXPECT_EQ(r.getyPos(), y);
     EXPECT_EQ(r.getzPos(), z);
@@ -494,3 +498,5 @@ TEST(LightSource, PointSource20000) {
     ASSERT_EQ(rayList.size(), number_of_rays * RAY_DOUBLE_COUNT);
     writeRaysToFile(rayList, "pointsource20000");
 }
+
+#endif

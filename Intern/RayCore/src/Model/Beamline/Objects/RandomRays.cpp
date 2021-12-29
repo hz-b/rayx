@@ -4,7 +4,9 @@
 #include <cmath>
 #include <random>
 
-#include "VulkanTracer.h"
+#include "Debug/Instrumentor.h"
+#include "Debug.h"
+#include "Tracer/Vulkan/VulkanTracer.h"
 
 namespace RAYX {
 
@@ -25,12 +27,13 @@ RandomRays::~RandomRays() {}
  * returns list of rays
  */
 std::vector<Ray> RandomRays::getRays() {
+    RAYX_PROFILE_FUNCTION();
     std::uniform_real_distribution<double> unif(m_low, m_high);
     std::default_random_engine re;
 
     int n = SimulationEnv::get().m_numOfRays;
     std::vector<Ray> rayList;
-    std::cout << "[RandomRays]: create " << n << " random rays " << std::endl;
+    RAYX_LOG << "create " << n << " random rays ";
     // fill the square with rmat1xrmat1 rays
     for (int i = 0; i < n; i++) {
         glm::dvec3 position = glm::dvec3(unif(re), unif(re), unif(re));
@@ -39,8 +42,9 @@ std::vector<Ray> RandomRays::getRays() {
         double weight = unif(re);
         double en = unif(re);
         glm::dvec4 stokes = glm::dvec4(unif(re), unif(re), unif(re), unif(re));
-        Ray r = Ray(position, direction, stokes, en, weight, unif(re), unif(re),
-                    unif(re), unif(re));
+        Ray r = {position.x, position.y, position.z, weight, direction.x,
+                        direction.y, direction.z, en, stokes.x, stokes.y,
+                        stokes.z, stokes.w, 0.0, 0.0, 0.0, 0.0};
         rayList.emplace_back(r);
     }
     return rayList;
@@ -73,8 +77,8 @@ void RandomRays::compareRays(std::vector<Ray*> input,
         diff.push_back(a7);
     }
     diff.sort();
-    std::cout << "[RandomRays]: max difference: " << diff.front() << " "
-              << diff.back() << std::endl;
+    RAYX_LOG << "max difference: " << diff.front() << " "
+              << diff.back();
 }
 
 }  // namespace RAYX

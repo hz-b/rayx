@@ -4,7 +4,6 @@
 #include <string>
 #include <vector>
 
-namespace RAYX {
 /** This struct represents one line of a .NKP file.  */
 struct PalikEntry {
     double m_energy;
@@ -20,7 +19,6 @@ struct PalikEntry {
  * bool success = PalikTable::load("CU", &cu); // the palik table for copper!
  *
  */
-
 struct PalikTable {
     std::string m_element;
     std::vector<PalikEntry> m_Lines;
@@ -31,4 +29,3 @@ struct PalikTable {
 
     // double interpolate(double x) const;
 };
-}  // namespace RAYX

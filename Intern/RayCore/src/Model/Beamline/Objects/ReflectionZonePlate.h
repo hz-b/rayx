@@ -14,19 +14,7 @@ class RAYX_API ReflectionZonePlate : public OpticalElement {
     ReflectionZonePlate(
         const char* name, Geometry::GeometricalShape geometricalShape,
         const int curvatureType, const double width, const double height,
-        const glm::dvec4 position, const glm::dmat4x4 orientation,
-        const double designEnergy, const double orderOfDiffraction,
-        const double designOrderOfDiffraction, const double dAlpha,
-        const double dBeta, const double mEntrance, const double mExit,
-        const double sEntrance, const double sExit, const double shortRadius,
-        const double longRadius, const int additionalZeroOrder,
-        const double fresnelZOffset, const std::vector<double> slopeError);
-
-    // ! temporary constructor for trapezoid (10/11/2021)
-    ReflectionZonePlate(
-        const char* name, Geometry::GeometricalShape geometricalShape,
-        const int curvatureType, const double widthA, const double widthB,
-        const double height, const glm::dvec4 position,
+        const double azimuthalAngle, const glm::dvec4 position,
         const glm::dmat4x4 orientation, const double designEnergy,
         const double orderOfDiffraction, const double designOrderOfDiffraction,
         const double dAlpha, const double dBeta, const double mEntrance,
@@ -34,6 +22,19 @@ class RAYX_API ReflectionZonePlate : public OpticalElement {
         const double shortRadius, const double longRadius,
         const int additionalZeroOrder, const double fresnelZOffset,
         const std::vector<double> slopeError);
+
+    // ! temporary constructor for trapezoid (10/11/2021)
+    ReflectionZonePlate(
+        const char* name, Geometry::GeometricalShape geometricalShape,
+        const int curvatureType, const double widthA, const double widthB,
+        const double height, const double azimuthalAngle,
+        const glm::dvec4 position, const glm::dmat4x4 orientation,
+        const double designEnergy, const double orderOfDiffraction,
+        const double designOrderOfDiffraction, const double dAlpha,
+        const double dBeta, const double mEntrance, const double mExit,
+        const double sEntrance, const double sExit, const double shortRadius,
+        const double longRadius, const int additionalZeroOrder,
+        const double fresnelZOffset, const std::vector<double> slopeError);
     ReflectionZonePlate();
     ~ReflectionZonePlate();
 

@@ -1,4 +1,5 @@
 #include "setupTests.h"
+#if RUN_TEST_GRATINGS
 
 TEST(planeGrating, testParams) {
     // user parameters
@@ -39,14 +40,28 @@ TEST(planeGrating, testParams) {
     std::vector<double> sE = {0, 0, 0, 0, 0, 0, 0};
     std::vector<double> vls = {2.1, 0.12, 12.2, 8.3, 5.1, 7.23};
     RAYX::PlaneGrating p1 = RAYX::PlaneGrating(
-        "planegrating", geometricalShape, width, height, position, orientation,
-        designEnergy, lineDensity, orderOfDiffraction, add_order, vls, sE);
+        "planegrating", geometricalShape, width, height,
+        g_params.getAzimuthalAngle(), position, orientation, designEnergy,
+        lineDensity, orderOfDiffraction, add_order, vls, sE);
 
     std::vector<double> surface = {0, 0, 0, 0, 1, 0, 0, -1,
                                    0, 0, 0, 0, 1, 0, 0, 0};
-    std::vector<double> objparams = {width, height, sE[0], sE[1], sE[2], sE[3],
-                                     sE[4], sE[5],  sE[6], 0,     0,     0,
-                                     0,     0,      0,     0};
+    std::vector<double> objparams = {width,
+                                     height,
+                                     sE[0],
+                                     sE[1],
+                                     sE[2],
+                                     sE[3],
+                                     sE[4],
+                                     sE[5],
+                                     sE[6],
+                                     0,
+                                     g_params.getAzimuthalAngle(),
+                                     0,
+                                     0,
+                                     0,
+                                     0,
+                                     0};
     std::vector<double> elparams = {0,
                                     0,
                                     lineDensity,
@@ -126,14 +141,28 @@ TEST(planeGraing, mount1) {
 
     add_order = 1;
     RAYX::PlaneGrating p2 = RAYX::PlaneGrating(
-        "planegrating", geometricalShape, width, height, position, orientation,
-        designEnergy, lineDensity, orderOfDiffraction, add_order, vls, sE);
+        "planegrating", geometricalShape, width, height,
+        g_params.getAzimuthalAngle(), position, orientation, designEnergy,
+        lineDensity, orderOfDiffraction, add_order, vls, sE);
 
     std::vector<double> surface = {0, 0, 0, 0, 1, 0, 0, -1,
                                    0, 0, 0, 0, 1, 0, 0, 0};
-    std::vector<double> objparams = {width, height, sE[0], sE[1], sE[2], sE[3],
-                                     sE[4], sE[5],  sE[6], 0,     0,     0,
-                                     0,     0,      0,     0};
+    std::vector<double> objparams = {width,
+                                     height,
+                                     sE[0],
+                                     sE[1],
+                                     sE[2],
+                                     sE[3],
+                                     sE[4],
+                                     sE[5],
+                                     sE[6],
+                                     0,
+                                     g_params.getAzimuthalAngle(),
+                                     0,
+                                     0,
+                                     0,
+                                     0,
+                                     0};
     std::vector<double> elparams = {0,
                                     0,
                                     lineDensity,
@@ -212,14 +241,28 @@ TEST(planeGrating, higherOrderOfDiffraction) {
     glm::dmat4x4 orientation = g_params.calcOrientation();
 
     RAYX::PlaneGrating p3 = RAYX::PlaneGrating(
-        "planegrating", geometricalShape, width, height, position, orientation,
-        designEnergy, lineDensity, orderOfDiffraction, add_order, vls, sE);
+        "planegrating", geometricalShape, width, height,
+        g_params.getAzimuthalAngle(), position, orientation, designEnergy,
+        lineDensity, orderOfDiffraction, add_order, vls, sE);
 
     std::vector<double> surface = {0, 0, 0, 0, 1, 0, 0, -1,
                                    0, 0, 0, 0, 1, 0, 0, 0};
-    std::vector<double> objparams = {width, height, sE[0], sE[1], sE[2], sE[3],
-                                     sE[4], sE[5],  sE[6], 0,     0,     0,
-                                     0,     0,      0,     0};
+    std::vector<double> objparams = {width,
+                                     height,
+                                     sE[0],
+                                     sE[1],
+                                     sE[2],
+                                     sE[3],
+                                     sE[4],
+                                     sE[5],
+                                     sE[6],
+                                     0,
+                                     g_params.getAzimuthalAngle(),
+                                     0,
+                                     0,
+                                     0,
+                                     0,
+                                     0};
     std::vector<double> elparams = {0,
                                     0,
                                     lineDensity,
@@ -318,13 +361,27 @@ TEST(planeGrating, deviation) {
                                     0,
                                     0,
                                     double(add_order)};
-    std::vector<double> objparams = {width, height, sE[0], sE[1], sE[2], sE[3],
-                                     sE[4], sE[5],  sE[6], 0,     0,     0,
-                                     0,     0,      0,     0};
+    std::vector<double> objparams = {width,
+                                     height,
+                                     sE[0],
+                                     sE[1],
+                                     sE[2],
+                                     sE[3],
+                                     sE[4],
+                                     sE[5],
+                                     sE[6],
+                                     0,
+                                     g_params.getAzimuthalAngle(),
+                                     0,
+                                     0,
+                                     0,
+                                     0,
+                                     0};
 
     RAYX::PlaneGrating p4 = RAYX::PlaneGrating(
-        "planegrating", geometricalShape, width, height, position, orientation,
-        designEnergy, lineDensity, orderOfDiffraction, add_order, vls, sE);
+        "planegrating", geometricalShape, width, height,
+        g_params.getAzimuthalAngle(), position, orientation, designEnergy,
+        lineDensity, orderOfDiffraction, add_order, vls, sE);
 
     ASSERT_DOUBLE_EQ(p4.getWidth(), width);
     ASSERT_DOUBLE_EQ(p4.getHeight(), height);
@@ -398,8 +455,8 @@ TEST(SphereGrating, testParams) {
 
     RAYX::SphereGrating s1 = RAYX::SphereGrating(
         "spheregrating", mount, geometricalShape, width, height,
-        g_guparam.getRadius(), position, orientation, designEnergy, linedensity,
-        double(order), vls, sE);
+        g_params.getAzimuthalAngle(), g_guparam.getRadius(), position,
+        orientation, designEnergy, linedensity, double(order), vls, sE);
 
     std::vector<double> quad = {1, 0, 0, 0, 1, 1, 0, -radius,
                                 0, 0, 1, 0, 2, 0, 0, 0};
@@ -419,9 +476,22 @@ TEST(SphereGrating, testParams) {
                                     0,
                                     0,
                                     0};
-    std::vector<double> objparams = {width, height, sE[0], sE[1], sE[2], sE[3],
-                                     sE[4], sE[5],  sE[6], 0,     0,     0,
-                                     0,     0,      0,     0};
+    std::vector<double> objparams = {width,
+                                     height,
+                                     sE[0],
+                                     sE[1],
+                                     sE[2],
+                                     sE[3],
+                                     sE[4],
+                                     sE[5],
+                                     sE[6],
+                                     0,
+                                     g_params.getAzimuthalAngle(),
+                                     0,
+                                     0,
+                                     0,
+                                     0,
+                                     0};
 
     ASSERT_DOUBLE_EQ(s1.getWidth(), width);
     ASSERT_DOUBLE_EQ(s1.getHeight(), height);
@@ -451,3 +521,5 @@ TEST(SphereGrating, testParams) {
     EXPECT_ITERABLE_DOUBLE_EQ(std::vector<double>, s1.getOutMatrix(),
                               glmToVector16(correctOutMat));
 }
+
+#endif

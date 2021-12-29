@@ -1,5 +1,7 @@
 #include "SphereGrating.h"
 
+#include "Debug.h"
+
 namespace RAYX {
 
 /**
@@ -12,6 +14,8 @@ namespace RAYX {
  * constant deviation, constant incidence,...
  * @param width                         total width of the mirror (x dimension)
  * @param height                        total height of the mirror (z dimension)
+ * @param azimuthalAngle                rotation of element in xy-plane, needed
+ * for stokes vector
  * @param radius                        radius of sphere
  * @param position                      position of the element in world
  * coordinate system
@@ -29,13 +33,14 @@ namespace RAYX {
  */
 SphereGrating::SphereGrating(const char* name, int mount,
                              Geometry::GeometricalShape geometricalShape,
-                             double width, double height, double radius,
+                             double width, double height,
+                             const double azimuthalAngle, double radius,
                              glm::dvec4 position, glm::dmat4x4 orientation,
                              double designEnergyMounting, double lineDensity,
                              double orderOfDiffraction, std::vector<double> vls,
                              std::vector<double> slopeError)
-    : OpticalElement(name, geometricalShape, width, height, position,
-                     orientation, slopeError),
+    : OpticalElement(name, geometricalShape, width, height, azimuthalAngle,
+                     position, orientation, slopeError),
       m_designEnergyMounting(designEnergyMounting),
       m_lineDensity(lineDensity),
       m_orderOfDiffraction(orderOfDiffraction),
@@ -48,7 +53,7 @@ SphereGrating::SphereGrating(const char* name, int mount,
                           abs(hvlam(m_designEnergyMounting)), 0, m_vls[0],
                           m_vls[1], m_vls[2], m_vls[3], m_vls[4], m_vls[5], 0,
                           0, 0, 0});
-    std::cout << "[SphereGrating]: Created.\n";
+    RAYX_LOG << "Created.";
 }
 
 SphereGrating::~SphereGrating() {}
@@ -117,10 +122,15 @@ std::shared_ptr<SphereGrating> SphereGrating::createFromXML(
         return nullptr;
     }
 
+    double azimuthalAngle;
+    if (!xml::paramDouble(node, "azimuthalAngle", &azimuthalAngle)) {
+        return nullptr;
+    }
+
     return std::make_shared<SphereGrating>(
-        name, mount, geometricalShape, width, height, radius, position,
-        orientation, designEnergyMounting, lineDensity, orderOfDiffraction, vls,
-        slopeError);
+        name, mount, geometricalShape, width, height, azimuthalAngle, radius,
+        position, orientation, designEnergyMounting, lineDensity,
+        orderOfDiffraction, vls, slopeError);
 }
 
 /* TODO (Theresa): how to make radius calculation easier?

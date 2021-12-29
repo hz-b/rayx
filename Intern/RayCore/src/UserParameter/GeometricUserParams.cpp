@@ -1,5 +1,7 @@
 #include "GeometricUserParams.h"
 
+#include "Debug.h"
+
 namespace RAYX {
 /**
  * for Plane and Sphere Mirrors
@@ -57,14 +59,14 @@ GeometricUserParams::GeometricUserParams(
     // incidence not given directly
     if (grazingIncidence == 0) {
         if (gratingMount == GM_INCIDENCE) {
-            std::cout << "use design angle" << std::endl;
+            RAYX_LOG << "use design angle";
             m_alpha = degToRad(designAlphaAngle);
         } else if (gratingMount == GM_DEVIATION) {
-            std::cout << "use deviation angle" << std::endl;
+            RAYX_LOG << "use deviation angle";
             focus(designEnergy, deviationAngle, dz, orderOfDiffraction);
         }
     } else {
-        std::cout << "use incidence angle" << std::endl;
+        RAYX_LOG << "use incidence angle";
         m_alpha = degToRad(grazingIncidence);
     }
 
@@ -105,7 +107,7 @@ void GeometricUserParams::focus(double angle, double designEnergy,
     double alph, bet;
     double a =
         abs(hvlam(designEnergy)) * abs(lineDensity) * orderOfDiffraction * 1e-6;
-    std::cout << "deviation " << angle << "theta" << theta << std::endl;
+    RAYX_LOG << "deviation " << angle << "theta" << theta;
     if (angle <= 0) {  // constant alpha mounting
         double arg = a - sin(theta);
         if (abs(arg) >= 1) {  // cannot calculate alpha & beta
@@ -126,7 +128,7 @@ void GeometricUserParams::focus(double angle, double designEnergy,
             alph = 2 * theta + bet;
         }
     }
-    std::cout << alph << ", " << bet << " angles" << std::endl;
+    RAYX_LOG << alph << ", " << bet << " angles";
     m_alpha = (PI / 2 - alph);
     m_beta = (PI / 2 - abs(bet));
 }
@@ -346,9 +348,9 @@ double GeometricUserParams::calcTangentAngle(double incidence,
     double angle = atan(tan(theta) * (entranceArmLength - exitArmLength) /
                         (entranceArmLength + exitArmLength));
     return angle;
-    // std::cout << "A= " << m_longHalfAxisA << ", B= " << m_shortHalfAxisB <<
+    // RAYX_LOG << "A= " << m_longHalfAxisA << ", B= " << m_shortHalfAxisB <<
     // ", C= " << m_halfAxisC << ", angle = " << m_tangentAngle << ", Z0 = " <<
-    // m_z0 << ", Y0= " << m_y0 << std::endl;
+    // m_z0 << ", Y0= " << m_y0;
 }
 
 // calculate radius for sphere mirror

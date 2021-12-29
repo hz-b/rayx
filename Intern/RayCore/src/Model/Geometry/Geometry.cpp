@@ -7,13 +7,15 @@
 #include <stdexcept>
 #include <vector>
 
-#include "Ray.h"
+#include "Tracer/Ray.h"
 #include "utils.h"
+#include "Debug.h"
 
 namespace RAYX {
 Geometry::Geometry(GeometricalShape geometricShape, double width, double height,
-                   glm::dvec4 position, glm::dmat4x4 orientation)
-    : m_widthB(0) {
+                   const double azimuthalAngle, glm::dvec4 position,
+                   glm::dmat4x4 orientation)
+    : m_widthB(0), m_azimuthalAngle(azimuthalAngle) {
     m_geometricalShape = geometricShape;
     if (m_geometricalShape == GeometricalShape::ELLIPTICAL) {
         m_widthA = -width;
@@ -29,9 +31,9 @@ Geometry::Geometry(GeometricalShape geometricShape, double width, double height,
 }
 
 Geometry::Geometry(GeometricalShape geometricShape, double widthA,
-                   double widthB, double height, glm::dvec4 position,
-                   glm::dmat4x4 orientation)
-    : m_widthB(widthB) {
+                   double widthB, double height, const double azimuthalAngle,
+                   glm::dvec4 position, glm::dmat4x4 orientation)
+    : m_widthB(widthB), m_azimuthalAngle(azimuthalAngle) {
     m_geometricalShape = geometricShape;
     if (m_geometricalShape == GeometricalShape::ELLIPTICAL) {
         m_widthA = -widthA;
@@ -78,7 +80,7 @@ void Geometry::calcTransformationMatrices(glm::dvec4 position,
     glm::dmat4x4 e2g = inv_rotation * inv_translation;
     m_outMatrix = glmToVector16(glm::transpose(e2g));
 
-    std::cout << "from position and orientation" << std::endl;
+    RAYX_LOG << "from position and orientation";
     printMatrix(m_inMatrix);
     printMatrix(m_outMatrix);
 }
@@ -89,6 +91,8 @@ void Geometry::getWidth(double& widthA, double& widthB) {
 }
 
 double Geometry::getHeight() { return m_height; }
+
+double Geometry::getAzimuthalAngle() { return m_azimuthalAngle; }
 
 std::vector<double> Geometry::getInMatrix() { return m_inMatrix; }
 

@@ -1,5 +1,7 @@
 #include "Ellipsoid.h"
 
+#include "Debug.h"
+
 namespace RAYX {
 
 /**
@@ -25,18 +27,18 @@ namespace RAYX {
 Ellipsoid::Ellipsoid(const char* name,
                      Geometry::GeometricalShape geometricalShape,
                      const double width, const double height,
-                     glm::dvec4 position, glm::dmat4x4 orientation,
-                     const double grazingIncidence,
+                     const double azimuthalAngle, glm::dvec4 position,
+                     glm::dmat4x4 orientation, const double grazingIncidence,
                      const double entranceArmLength, const double exitArmLength,
                      const int figRot, const double a_11,
                      const std::vector<double> slopeError)
-    : OpticalElement(name, geometricalShape, width, height, position,
-                     orientation, slopeError),
+    : OpticalElement(name, geometricalShape, width, height, azimuthalAngle,
+                     position, orientation, slopeError),
       m_incidence(degToRad(grazingIncidence)),
       m_entranceArmLength(entranceArmLength),
       m_exitArmLength(exitArmLength),
       m_a11(a_11) {
-    std::cout << name << std::endl;
+    RAYX_LOG << name;
     m_offsetY0 =
         0;  // what is this for? RAYX.FOR: "only !=0 in case of Monocapillary"
 
@@ -102,16 +104,16 @@ void Ellipsoid::calcHalfAxes() {
     if (m_figureRotation == FR_YES) {
         m_halfAxisC = sqrt(pow(m_shortHalfAxisB, 2) / 1);  // devided by 1??
     } else if (m_figureRotation == FR_PLANE) {
-        std::cout << "[Ellipsoid]: FR PLane" << std::endl;
+        RAYX_LOG << "FR PLane";
         m_halfAxisC = INFINITY;
     } else {
         m_halfAxisC = sqrt(pow(m_shortHalfAxisB, 2) / m_a11);
     }
     m_tangentAngle = angle;
-    std::cout << "[Ellipsoid]: A= " << m_longHalfAxisA
+    RAYX_LOG << "A= " << m_longHalfAxisA
               << ", B= " << m_shortHalfAxisB << ", C= " << m_halfAxisC
               << ", angle = " << m_tangentAngle << ", Z0 = " << m_z0
-              << ", Y0= " << m_y0 << std::endl;
+              << ", Y0= " << m_y0;
 }
 
 double Ellipsoid::getRadius() const { return m_radius; }

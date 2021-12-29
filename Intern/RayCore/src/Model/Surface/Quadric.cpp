@@ -1,4 +1,5 @@
 #include "Quadric.h"
+#include "Debug.h"
 
 #include <math.h>
 
@@ -36,7 +37,7 @@ void Quadric::setAnchorPoints(std::vector<double> inputPoints) {
  * ENCODING:
  *
  * {a_11,  a_12,     a_13, a_14,
- *  icurv, a_22,     a_23, a_44,
+ *  icurv, a_22,     a_23, a_24,
  *  0.0,   0.0,      a_33, a_34,
  *  type,  settings, 0.0,  a_44}
  *
@@ -50,7 +51,7 @@ void Quadric::setAnchorPoints(std::vector<double> inputPoints) {
  *intersection point. Depend on the element (plane, sphere, ellipsoid,..)
  **/
 std::vector<double> Quadric::getParams() const {
-    std::cout << "[Quadric]: return surface parameters" << std::endl;
+    RAYX_LOG << "return surface parameters";
     return m_parameters;
 }
 

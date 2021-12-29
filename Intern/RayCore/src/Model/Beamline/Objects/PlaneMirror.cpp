@@ -24,11 +24,12 @@ namespace RAYX {
 PlaneMirror::PlaneMirror(const char* name,
                          Geometry::GeometricalShape geometricalShape,
                          const double width, const double height,
-                         glm::dvec4 position, glm::dmat4x4 orientation,
+                         const double azimuthalAngle, glm::dvec4 position,
+                         glm::dmat4x4 orientation,
                          const std::vector<double> slopeError)
     : OpticalElement(name, {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-                     geometricalShape, width, height, position, orientation,
-                     slopeError) {
+                     geometricalShape, width, height, azimuthalAngle, position,
+                     orientation, slopeError) {
     setSurface(std::make_unique<Quadric>(
         std::vector<double>{0, 0, 0, 0, 1, 0, 0, -1, 0, 0, 0, 0, 0, 0, 0, 0}));
 }
@@ -69,8 +70,14 @@ std::shared_ptr<PlaneMirror> PlaneMirror::createFromXML(
         return nullptr;
     }
 
+    double azimuthalAngle;
+    if (!xml::paramDouble(node, "azimuthalAngle", &azimuthalAngle)) {
+        return nullptr;
+    }
+
     return std::make_shared<PlaneMirror>(name, geometricalShape, width, height,
-                                         position, orientation, slopeError);
+                                         azimuthalAngle, position, orientation,
+                                         slopeError);
 }
 
 }  // namespace RAYX

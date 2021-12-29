@@ -1,5 +1,10 @@
 #include "utils.h"
 
+#include <sstream>
+
+#include "Debug.h"
+#include "Debug/Instrumentor.h"
+
 /**
  * Calculates photon wavelength (nm) from its energy (eV) or
  * vice verse. For example is used for gratings.
@@ -28,6 +33,7 @@ double degToRad(double degree) { return degree * PI / 180; }
 double radToDeg(double rad) { return rad * 180 / PI; }
 
 glm::dmat4x4 getRotationMatrix(double dpsi, double dphi, double dchi) {
+    RAYX_PROFILE_FUNCTION();
     glm::dmat4x4 misalignmentMatrix =
         glm::dmat4x4(cos(dphi) * cos(dchi),
                      -cos(dpsi) * sin(dchi) - sin(dpsi) * sin(dphi) * cos(dchi),
@@ -41,26 +47,32 @@ glm::dmat4x4 getRotationMatrix(double dpsi, double dphi, double dchi) {
 }
 
 void printMatrix(std::vector<double> matrix) {
-    std::cout << "[Matrix]: size: " << matrix.size() << std::endl;
-    std::cout << "\t";
+    RAYX_PROFILE_FUNCTION();
+    RAYX_LOG << "size: " << matrix.size();
+    std::stringstream s;
+    s << "\t";
     for (int i = 0; i < int(matrix.size()); i++) {
-        std::cout << matrix[i] << ", ";
+        s << matrix[i] << ", ";
         if (i % 4 == 3) {
-            std::cout << std::endl;
-            std::cout << "\t";
+            RAYX_LOG << s.str();
+            s.str("");
+            s << "\t";
         }
     }
-    std::cout << std::endl;
+    RAYX_LOG << s.str();
 }
 
 void printDMat4(glm::dmat4 matrix) {
+    RAYX_PROFILE_FUNCTION();
+    std::stringstream s;
     for (int i = 0; i < 4; i++) {
         for (int j = 0; j < 4; j++) {
-            std::cout << matrix[i][j] << ", ";
+            s << matrix[i][j] << ", ";
         }
-        std::cout << std::endl;
+        RAYX_LOG << s.str();
+        s.str("");
     }
-    std::cout << std::endl;
+    RAYX_LOG << s.str();
 }
 
 std::vector<double> glmToVector16(glm::dmat4x4 m) {
