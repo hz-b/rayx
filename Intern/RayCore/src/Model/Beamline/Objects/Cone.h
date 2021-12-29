@@ -23,13 +23,12 @@ class RAYX_API Cone : public OpticalElement {
     void calcConePar(const double ZL, const double ra, const double rb,
                      const double th, double* R, double* RHO);
     double getIncidenceAngle() const;
-    double getExitArmLength() const;
-    double getRadius() const;
     double getEntranceArmLength() const;
+    double getExitArmLength() const;
+    double getR() const;
+    double getRHO() const;
 
   private:
-    double m_radius;
-
     double m_incidence;
     double m_entranceArmLength;
     double m_exitArmLength;
