@@ -120,10 +120,10 @@ TEST(SphereMirror, testParams) {
                               degToRad(azimuthal), dist, mis);
     glm::dvec4 position = w_params.calcPosition();
     glm::dmat4x4 orientation = w_params.calcOrientation();
-    RAYX::SphereMirror sM =
-        RAYX::SphereMirror("spheremirror", geometricalShape, width, height,
-                           w_params.getAzimuthalAngle(), incidence, position,
-                           orientation, entranceArmLength, exitArmLength, sE);
+    RAYX::SphereMirror sM = RAYX::SphereMirror(
+        "spheremirror", geometricalShape, width, height,
+        w_params.getAzimuthalAngle(), incidence, position, orientation,
+        entranceArmLength, exitArmLength, sE, Material::CU);
 
     glm::dmat4x4 correctInMatrix = glm::dmat4x4(
         0.024368111991334068, -0.85883516451860731, -0.51167211698926318, 0,
@@ -174,10 +174,10 @@ TEST(SphereMirror, testPrecalculateRadius) {
                               degToRad(azimuthal), dist, mis);
     glm::dvec4 position = w_params.calcPosition();
     glm::dmat4x4 orientation = w_params.calcOrientation();
-    RAYX::SphereMirror sM =
-        RAYX::SphereMirror("spheremirror", geometricalShape, width, height,
-                           w_params.getAzimuthalAngle(), incidence, position,
-                           orientation, entranceArmLength, exitArmLength, sE);
+    RAYX::SphereMirror sM = RAYX::SphereMirror(
+        "spheremirror", geometricalShape, width, height,
+        w_params.getAzimuthalAngle(), incidence, position, orientation,
+        entranceArmLength, exitArmLength, sE, Material::CU);
 
     glm::dmat4x4 correctInMatrix = glm::dmat4x4(
         0.024368111991334068, -0.85883516451860731, -0.51167211698926318, 0,
