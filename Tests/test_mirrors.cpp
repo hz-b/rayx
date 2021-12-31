@@ -1,3 +1,5 @@
+#include <Tracer/Vulkan/Material.h>
+
 #include "setupTests.h"
 #if RUN_TEST_MIRRORS
 
@@ -27,7 +29,7 @@ TEST(PlaneMirror, testSimpleParams) {
     RAYX::PlaneMirror plM =
         RAYX::PlaneMirror("planemirror", geometricalShape, width, height,
                           g_params.getAzimuthalAngle(), position, orientation,
-                          sE);  // {1,2,3,0.01,0.02,0.03}
+                          sE, Material::CU);  // {1,2,3,0.01,0.02,0.03}
 
     glm::dmat4x4 correctInMatrix =
         glm::dmat4x4(1, 0, 0, 0, 0, 0.97357890287316029, 0.22835087011065572, 0,
@@ -71,7 +73,7 @@ TEST(PlaneMirror, testAdvancedParams) {
     RAYX::PlaneMirror plM =
         RAYX::PlaneMirror("planemirror", geometricalShape, width, height,
                           g_params.getAzimuthalAngle(), position, orientation,
-                          sE);  // {1,2,3,0.01,0.02,0.03}
+                          sE, Material::CU);  // {1,2,3,0.01,0.02,0.03}
 
     glm::dmat4x4 correctInMatrix = glm::dmat4x4(
         0.98631018201912979, -0.16127244932632739, -0.034400900187032908, 0,
@@ -555,8 +557,8 @@ TEST(Ellips, testParamsCSMirror) {
     EXPECT_NEAR(e3.getAlpha(), alphaE, 0.000001);
     EXPECT_ITERABLE_DOUBLE_EQ(std::vector<double>, correctTempMis,
 
-	e3.getTempMisalignmentParams()); EXPECT_ITERABLE_DOUBLE_EQ(std::vector<double>,
-	sE, e3.getSlopeError());
+    e3.getTempMisalignmentParams());
+EXPECT_ITERABLE_DOUBLE_EQ(std::vector<double>, sE, e3.getSlopeError());
 
 }*/
 

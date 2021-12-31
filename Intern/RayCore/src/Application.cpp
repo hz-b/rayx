@@ -55,7 +55,7 @@ void Application::loadDummyBeamline() {  // ! objects are created here
     std::shared_ptr<RAYX::PlaneMirror> pm = std::make_shared<RAYX::PlaneMirror>(
         "pm_ell_ip_200mirrormis", Geometry::GeometricalShape::RECTANGLE, 50,
         200, w_coord.getAzimuthalAngle(), pos1, or1,
-        std::vector<double>{0, 0, 0, 0, 0, 0, 0});
+        std::vector<double>{0, 0, 0, 0, 0, 0, 0}, Material::CU);
 
     RAYX::Geometry::GeometricalShape geometricalShape =
         RAYX::Geometry::GeometricalShape::RECTANGLE;

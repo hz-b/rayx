@@ -1990,8 +1990,8 @@ TEST(opticalElements, planeMirrorDefault) {
     std::shared_ptr<RAYX::PlaneMirror> plM =
         std::make_shared<RAYX::PlaneMirror>(
             "PlaneMirrorDef", RAYX::Geometry::GeometricalShape::RECTANGLE, 50,
-            200, pm_param.getAzimuthalAngle(), pos_mirror, or_mirror,
-            zeros7);  // {1,2,3,0.01,0.02,0.03}
+            200, pm_param.getAzimuthalAngle(), pos_mirror, or_mirror, zeros7,
+            Material::CU);  // {1,2,3,0.01,0.02,0.03}
 
     RAYX::WorldUserParams ip_param = RAYX::WorldUserParams(
         0, 0, 0, 1000, std::vector<double>{0, 0, 0, 0, 0, 0});
@@ -2018,8 +2018,8 @@ TEST(opticalElements, planeMirrorMis) {
     std::shared_ptr<RAYX::PlaneMirror> plM =
         std::make_shared<RAYX::PlaneMirror>(
             "PlaneMirrorMis", RAYX::Geometry::GeometricalShape::RECTANGLE, 50,
-            200, pm_param.getAzimuthalAngle(), pos_mirror, or_mirror,
-            zeros7);  // {1,2,3,0.01,0.02,0.03}
+            200, pm_param.getAzimuthalAngle(), pos_mirror, or_mirror, zeros7,
+            Material::CU);  // {1,2,3,0.01,0.02,0.03}
 
     RAYX::WorldUserParams ip_param = RAYX::WorldUserParams(
         0, 0, 0, 1000, std::vector<double>{0, 0, 0, 0, 0, 0});
@@ -2592,7 +2592,7 @@ TEST(opticalElements, PlaneMirrorEllipsoidImagePlane_mirrormisalignment) {
     glm::dmat4x4 or1 = w_coord.calcOrientation();
     std::shared_ptr<RAYX::PlaneMirror> pm = std::make_shared<RAYX::PlaneMirror>(
         "pm_ell_ip_200mirrormis", RAYX::Geometry::GeometricalShape::RECTANGLE,
-        50, 200, w_coord.getAzimuthalAngle(), pos1, or1, zeros7);
+        50, 200, w_coord.getAzimuthalAngle(), pos1, or1, zeros7, Material::CU);
 
     RAYX::GeometricUserParams ell_params =
         RAYX::GeometricUserParams(10, 10000, 1000);
@@ -2642,8 +2642,8 @@ TEST(opticalElements, ImagePlane) {
         std::make_shared<RAYX::PlaneMirror>(
             "PlaneMirror_ImagePlane",
             RAYX::Geometry::GeometricalShape::RECTANGLE, 50, 200,
-            w_coord.getAzimuthalAngle(), pos, or1,
-            zeros7);  // {1,2,3,0.01,0.02,0.03}
+            w_coord.getAzimuthalAngle(), pos, or1, zeros7,
+            Material::CU);  // {1,2,3,0.01,0.02,0.03}
 
     RAYX::WorldUserParams w_coord2 = RAYX::WorldUserParams(
         0, 0, 0, 1000, std::vector<double>{0, 0, 0, 0, 0, 0});
@@ -2669,8 +2669,8 @@ TEST(dynamicTracing, FourMirrors_9Rays) {
     glm::dmat4x4 or1 = w_coord.calcOrientation();
     std::shared_ptr<RAYX::PlaneMirror> p1 = std::make_shared<RAYX::PlaneMirror>(
         "globalCoordinates_9rays", RAYX::Geometry::GeometricalShape::RECTANGLE,
-        50, 200, w_coord.getAzimuthalAngle(), pos, or1,
-        zeros7);  // {1,2,3,0.01,0.02,0.03}
+        50, 200, w_coord.getAzimuthalAngle(), pos, or1, zeros7,
+        Material::CU);  // {1,2,3,0.01,0.02,0.03}
 
     RAYX::GeometricUserParams g_params2 = RAYX::GeometricUserParams(15);
     RAYX::WorldUserParams w_coord2 = RAYX::WorldUserParams(
@@ -2681,8 +2681,8 @@ TEST(dynamicTracing, FourMirrors_9Rays) {
     glm::dmat4x4 or2 = w_coord2.calcOrientation(w_coord, or1);
     std::shared_ptr<RAYX::PlaneMirror> p2 = std::make_shared<RAYX::PlaneMirror>(
         "PlaneMirror2", RAYX::Geometry::GeometricalShape::RECTANGLE, 50, 200,
-        w_coord2.getAzimuthalAngle(), pos2, or2,
-        zeros7);  // {1,2,3,0.01,0.02,0.03}
+        w_coord2.getAzimuthalAngle(), pos2, or2, zeros7,
+        Material::CU);  // {1,2,3,0.01,0.02,0.03}
 
     g_params = RAYX::GeometricUserParams(7);
     RAYX::WorldUserParams w_coord3 = RAYX::WorldUserParams(
@@ -2692,8 +2692,8 @@ TEST(dynamicTracing, FourMirrors_9Rays) {
     glm::dmat4x4 or3 = w_coord3.calcOrientation(w_coord2, or2);
     std::shared_ptr<RAYX::PlaneMirror> p3 = std::make_shared<RAYX::PlaneMirror>(
         "PlaneMirror3", RAYX::Geometry::GeometricalShape::RECTANGLE, 50, 200,
-        w_coord3.getAzimuthalAngle(), pos3, or3,
-        zeros7);  // {1,2,3,0.01,0.02,0.03}
+        w_coord3.getAzimuthalAngle(), pos3, or3, zeros7,
+        Material::CU);  // {1,2,3,0.01,0.02,0.03}
 
     g_params = RAYX::GeometricUserParams(22);
     RAYX::WorldUserParams w_coord4 = RAYX::WorldUserParams(
@@ -2703,8 +2703,8 @@ TEST(dynamicTracing, FourMirrors_9Rays) {
     glm::dmat4x4 or4 = w_coord4.calcOrientation(w_coord3, or3);
     std::shared_ptr<RAYX::PlaneMirror> p4 = std::make_shared<RAYX::PlaneMirror>(
         "PlaneMirror4", RAYX::Geometry::GeometricalShape::RECTANGLE, 50, 200,
-        w_coord4.getAzimuthalAngle(), pos4, or4,
-        zeros7);  // {1,2,3,0.01,0.02,0.03}
+        w_coord4.getAzimuthalAngle(), pos4, or4, zeros7,
+        Material::CU);  // {1,2,3,0.01,0.02,0.03}
 
     RAYX::WorldUserParams w_coord5 = RAYX::WorldUserParams(
         0, 0, 0, 1000, std::vector<double>{0, 0, 0, 0, 0, 0});
@@ -2730,8 +2730,8 @@ TEST(dynamicTracing, FourMirrors_20Rays) {
     glm::dmat4x4 or1 = w_coord.calcOrientation();
     std::shared_ptr<RAYX::PlaneMirror> p1 = std::make_shared<RAYX::PlaneMirror>(
         "globalCoordinates_20rays", RAYX::Geometry::GeometricalShape::RECTANGLE,
-        50, 200, w_coord.getAzimuthalAngle(), pos, or1,
-        zeros7);  // {1,2,3,0.01,0.02,0.03}
+        50, 200, w_coord.getAzimuthalAngle(), pos, or1, zeros7,
+        Material::CU);  // {1,2,3,0.01,0.02,0.03}
 
     RAYX::GeometricUserParams g_params2 = RAYX::GeometricUserParams(15);
     RAYX::WorldUserParams w_coord2 = RAYX::WorldUserParams(
@@ -2743,7 +2743,7 @@ TEST(dynamicTracing, FourMirrors_20Rays) {
     std::shared_ptr<RAYX::PlaneMirror> p2 = std::make_shared<RAYX::PlaneMirror>(
         "PlaneMirror2", RAYX::Geometry::GeometricalShape::RECTANGLE, 50, 200,
         w_coord2.getAzimuthalAngle(), pos2, or2,
-        zeros7);  // {1,2,3,0.01,0.02,0.03}
+        zeros7, Material::CU);  // {1,2,3,0.01,0.02,0.03}
 
     g_params = RAYX::GeometricUserParams(7);
     RAYX::WorldUserParams w_coord3 = RAYX::WorldUserParams(
@@ -2754,7 +2754,7 @@ TEST(dynamicTracing, FourMirrors_20Rays) {
     std::shared_ptr<RAYX::PlaneMirror> p3 = std::make_shared<RAYX::PlaneMirror>(
         "PlaneMirror3", RAYX::Geometry::GeometricalShape::RECTANGLE, 50, 200,
         w_coord3.getAzimuthalAngle(), pos3, or3,
-        zeros7);  // {1,2,3,0.01,0.02,0.03}
+        zeros7, Material::CU);  // {1,2,3,0.01,0.02,0.03}
 
     g_params = RAYX::GeometricUserParams(22);
     RAYX::WorldUserParams w_coord4 = RAYX::WorldUserParams(
@@ -2765,7 +2765,7 @@ TEST(dynamicTracing, FourMirrors_20Rays) {
     std::shared_ptr<RAYX::PlaneMirror> p4 = std::make_shared<RAYX::PlaneMirror>(
         "PlaneMirror4", RAYX::Geometry::GeometricalShape::RECTANGLE, 50, 200,
         w_coord4.getAzimuthalAngle(), pos4, or4,
-        zeros7);  // {1,2,3,0.01,0.02,0.03}
+        zeros7, Material::CU);  // {1,2,3,0.01,0.02,0.03}
 
     RAYX::WorldUserParams w_coord5 = RAYX::WorldUserParams(
         0, 0, 0, 1000, std::vector<double>{0, 0, 0, 0, 0, 0});

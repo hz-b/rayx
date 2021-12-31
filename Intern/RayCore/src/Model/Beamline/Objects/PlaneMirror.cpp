@@ -26,12 +26,13 @@ PlaneMirror::PlaneMirror(const char* name,
                          const double width, const double height,
                          const double azimuthalAngle, glm::dvec4 position,
                          glm::dmat4x4 orientation,
-                         const std::vector<double> slopeError)
+                         const std::vector<double> slopeError, Material mat)
     : OpticalElement(name, {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
                      geometricalShape, width, height, azimuthalAngle, position,
                      orientation, slopeError) {
-    setSurface(std::make_unique<Quadric>(
-        std::vector<double>{0, 0, 0, 0, 1, 0, 0, -1, 0, 0, 0, 0, 0, 0, 0, 0}));
+    double matd = (double)static_cast<int>(mat);
+    setSurface(std::make_unique<Quadric>(std::vector<double>{
+        0, 0, 0, 0, 1, 0, 0, -1, 0, 0, 0, 0, 0, 0, matd, 0}));
 }
 
 PlaneMirror::~PlaneMirror() {}
@@ -75,9 +76,14 @@ std::shared_ptr<PlaneMirror> PlaneMirror::createFromXML(
         return nullptr;
     }
 
+    Material mat;
+    if (!xml::paramMaterial(node, &mat)) {
+        mat = Material::CU;  // default to copper
+    }
+
     return std::make_shared<PlaneMirror>(name, geometricalShape, width, height,
                                          azimuthalAngle, position, orientation,
-                                         slopeError);
+                                         slopeError, mat);
 }
 
 }  // namespace RAYX

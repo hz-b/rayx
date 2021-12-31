@@ -1,3 +1,5 @@
+#include <Tracer/Vulkan/Material.h>
+
 #include "setupTests.h"
 
 #if RUN_TEST_QUADRIC
@@ -21,7 +23,7 @@ TEST(Quadric, testTransformationMatrices) {
     RAYX::PlaneMirror plM = RAYX::PlaneMirror(
         "planemirror", geometricalShape, width, height,
         w_coord.getAzimuthalAngle(), w_coord.calcPosition(),
-        w_coord.calcOrientation(), sE);  // {1,2,3,0.01,0.02,0.03}
+        w_coord.calcOrientation(), sE, Material::CU);  // {1,2,3,0.01,0.02,0.03}
     // RAYX::PlaneMirror plM1 = RAYX::PlaneMirror("planemirror", width, height,
     // incidenceAngle, azimuthalAngle, dist, mis, sE, NULL, true); //
     // {1,2,3,0.01,0.02,0.03}
@@ -54,8 +56,8 @@ TEST(Quadric, testGlobalCoordinates) {
     std::shared_ptr<RAYX::PlaneMirror> p1a =
         std::make_shared<RAYX::PlaneMirror>(
             "PlaneMirror1", RAYX::Geometry::GeometricalShape::RECTANGLE, 50,
-            200, w_coord.getAzimuthalAngle(), pos, or1,
-            sE);  // {1,2,3,0.01,0.02,0.03}
+            200, w_coord.getAzimuthalAngle(), pos, or1, sE,
+            Material::CU);  // {1,2,3,0.01,0.02,0.03}
 
     RAYX::GeometricUserParams g_params2 = RAYX::GeometricUserParams(15);
     RAYX::WorldUserParams w_coord2 = RAYX::WorldUserParams(
@@ -67,8 +69,8 @@ TEST(Quadric, testGlobalCoordinates) {
     std::shared_ptr<RAYX::PlaneMirror> p2b =
         std::make_shared<RAYX::PlaneMirror>(
             "PlaneMirror2", RAYX::Geometry::GeometricalShape::RECTANGLE, 50,
-            200, w_coord2.getAzimuthalAngle(), pos2, or2,
-            sE);  // {1,2,3,0.01,0.02,0.03}
+            200, w_coord2.getAzimuthalAngle(), pos2, or2, sE,
+            Material::CU);  // {1,2,3,0.01,0.02,0.03}
 
     std::cout << "MIRROR 3" << std::endl;
     g_params = RAYX::GeometricUserParams(7);
@@ -80,8 +82,8 @@ TEST(Quadric, testGlobalCoordinates) {
     std::shared_ptr<RAYX::PlaneMirror> p3c =
         std::make_shared<RAYX::PlaneMirror>(
             "PlaneMirror1", RAYX::Geometry::GeometricalShape::RECTANGLE, 50,
-            200, w_coord3.getAzimuthalAngle(), pos3, or3,
-            sE);  // {1,2,3,0.01,0.02,0.03}
+            200, w_coord3.getAzimuthalAngle(), pos3, or3, sE,
+            Material::CU);  // {1,2,3,0.01,0.02,0.03}
 
     std::cout << "MIRROR 4" << std::endl;
     g_params = RAYX::GeometricUserParams(22);
@@ -93,8 +95,8 @@ TEST(Quadric, testGlobalCoordinates) {
     std::shared_ptr<RAYX::PlaneMirror> p4d =
         std::make_shared<RAYX::PlaneMirror>(
             "PlaneMirror1", RAYX::Geometry::GeometricalShape::RECTANGLE, 50,
-            200, w_coord4.getAzimuthalAngle(), pos4, or4,
-            sE);  // {1,2,3,0.01,0.02,0.03}
+            200, w_coord4.getAzimuthalAngle(), pos4, or4, sE,
+            Material::CU);  // {1,2,3,0.01,0.02,0.03}
 
     std::vector<double> correctInMat = {
         0.98549875516199115,   -0.16900296657661762, 0.015172371682388559, 0,
