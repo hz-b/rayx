@@ -1,9 +1,10 @@
 #include "Quadric.h"
-#include "Debug.h"
 
 #include <math.h>
 
 #include <cassert>
+
+#include "Debug.h"
 
 namespace RAYX {
 /** for quadric surfaces: 16 parameters a_11,a_12,a_13,a_14,
@@ -36,10 +37,10 @@ void Quadric::setAnchorPoints(std::vector<double> inputPoints) {
 /**
  * ENCODING:
  *
- * {a_11,  a_12,     a_13, a_14,
- *  icurv, a_22,     a_23, a_24,
- *  0.0,   0.0,      a_33, a_34,
- *  type,  settings, 0.0,  a_44}
+ * {a_11,  a_12,     a_13,      a_14,
+ *  icurv, a_22,     a_23,      a_24,
+ *  0.0,   0.0,      a_33,      a_34,
+ *  type,  settings, material,  a_44}
  *
  * @param type = what kind of optical element (mirror, plane grating, spherical
  *grating, toroid mirror, rzp, slit..)
@@ -49,6 +50,9 @@ void Quadric::setAnchorPoints(std::vector<double> inputPoints) {
  *a quadric surface
  * @param a_11, .., a_44 parameters of the quadric equation to find the
  *intersection point. Depend on the element (plane, sphere, ellipsoid,..)
+ * @param material = which material the surface has, stored as a number
+ *corresponding to the variants of the enum class Material (see Material.h and
+ *materials.xmacro)
  **/
 std::vector<double> Quadric::getParams() const {
     RAYX_LOG << "return surface parameters";

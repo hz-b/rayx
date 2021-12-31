@@ -1,6 +1,8 @@
 #include "Material.h"
 
+#include <Debug.h>
 #include <assert.h>
+#include <strings.h>
 
 #include <iostream>
 
@@ -52,6 +54,19 @@ void fillMaterialTables() {
             MATERIAL_TABLE.push_back(0);
         }
     }
+}
+
+bool materialFromString(const char* matname, Material* out) {
+    for (auto m : allMaterials()) {
+        const char* name = getMaterialName(m);
+        if (strcasecmp(name, matname) != 0) {
+            *out = m;
+            return true;
+        }
+    }
+    RAYX_ERR << "materialFromString(): material \"" << matname
+             << "\" not found";
+    return false;
 }
 
 const std::vector<double>* getMaterialTable() {

@@ -32,8 +32,8 @@ OpticalElement::OpticalElement(const char* name,
                                const std::vector<double> EParameters)
     : BeamlineObject(name) {
     RAYX_LOG << surfaceParams.size() << inputInMatrix.size()
-              << inputOutMatrix.size() << EParameters.size()
-              << OParameters.size();
+             << inputOutMatrix.size() << EParameters.size()
+             << OParameters.size();
     // surface.getParams() to shader/buffer
     assert(surfaceParams.size() == 16 && inputInMatrix.size() == 16 &&
            inputOutMatrix.size() == 16 && EParameters.size() == 16 &&

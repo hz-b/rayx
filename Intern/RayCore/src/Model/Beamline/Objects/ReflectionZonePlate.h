@@ -1,5 +1,6 @@
 #pragma once
 #include <Data/xml.h>
+#include <Tracer/Vulkan/Material.h>
 
 #include "Model/Beamline/OpticalElement.h"
 #include "Model/Surface/Quadric.h"
@@ -21,7 +22,7 @@ class RAYX_API ReflectionZonePlate : public OpticalElement {
         const double mExit, const double sEntrance, const double sExit,
         const double shortRadius, const double longRadius,
         const int additionalZeroOrder, const double fresnelZOffset,
-        const std::vector<double> slopeError);
+        const std::vector<double> slopeError, Material mat);
 
     // ! temporary constructor for trapezoid (10/11/2021)
     ReflectionZonePlate(
@@ -34,7 +35,8 @@ class RAYX_API ReflectionZonePlate : public OpticalElement {
         const double dBeta, const double mEntrance, const double mExit,
         const double sEntrance, const double sExit, const double shortRadius,
         const double longRadius, const int additionalZeroOrder,
-        const double fresnelZOffset, const std::vector<double> slopeError);
+        const double fresnelZOffset, const std::vector<double> slopeError,
+        Material mat);
     ReflectionZonePlate();
     ~ReflectionZonePlate();
 

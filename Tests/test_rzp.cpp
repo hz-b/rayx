@@ -1,3 +1,5 @@
+#include <Tracer/Vulkan/Material.h>
+
 #include "setupTests.h"
 #if RUN_TEST_RZP
 
@@ -52,7 +54,7 @@ TEST(RZP, testdefaultParams) {
         rzp_param.getAzimuthalAngle(), position, orientation, designEnergy,
         orderOfDiffraction, designOrderOfDiffraction, dAlpha, dBeta, sEntrance,
         sExit, mEntrance, mExit, shortRadius, longRadius, additionalOrder,
-        fresnelOffset, sE);
+        fresnelOffset, sE, Material::CU);
 
     double d_alpha = 0.017453292519943295;
     double d_beta = 0.017453292519943295;
@@ -161,7 +163,7 @@ TEST(RZP, testdefaultParamsElliptical) {
         rzp_param.getAzimuthalAngle(), position, orientation, designEnergy,
         orderOfDiffraction, designOrderOfDiffraction, dAlpha, dBeta, sEntrance,
         sExit, mEntrance, mExit, shortRadius, longRadius, additionalOrder,
-        fresnelOffset, sE);
+        fresnelOffset, sE, Material::CU);
 
     double d_alpha = 0.017453292519943295;
     double d_beta = 0.017453292519943295;
@@ -270,7 +272,7 @@ TEST(RZP, testParams) {
         rzp_param.getAzimuthalAngle(), position, orientation, designEnergy,
         orderOfDiffraction, designOrderOfDiffraction, dAlpha, dBeta, sEntrance,
         sExit, mEntrance, mExit, shortRadius, longRadius, additionalOrder,
-        fresnelOffset, sE);
+        fresnelOffset, sE, Material::CU);
 
     std::vector<double> correctElementParams = {0,
                                                 0,

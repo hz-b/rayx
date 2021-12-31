@@ -1,6 +1,7 @@
 #pragma once
 
 #include <Model/Beamline/EnergyDistribution.h>
+#include <Tracer/Vulkan/Material.h>
 
 #include <glm.hpp>
 #include <vector>
@@ -52,6 +53,7 @@ bool paramEnergyDistribution(const rapidxml::xml_node<>* node,
 bool paramPositionAndOrientation(const rapidxml::xml_node<>* node,
                                  const std::vector<xml::Group>& group_context,
                                  glm::dvec4* out_pos, glm::dmat4x4* out_ori);
+bool paramMaterial(const rapidxml::xml_node<>* node, Material* out);
 
 /** node needs to be a <group>-tag, output will be written to `out`. */
 bool parseGroup(rapidxml::xml_node<>* node, xml::Group* out);

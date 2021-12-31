@@ -296,9 +296,11 @@ bool paramPositionAndOrientation(const rapidxml::xml_node<>* node,
     paramOrientationNoGroup(node, out_ori);
     paramMisalignment(node, &misalignment);
 
-    glm::dmat4x4 misOrientation = getRotationMatrix(-misalignment[3], misalignment[4], misalignment[5]);
+    glm::dmat4x4 misOrientation =
+        getRotationMatrix(-misalignment[3], misalignment[4], misalignment[5]);
     printDMat4(misOrientation);
-    glm::dvec4 offset = glm::dvec4(misalignment[0], misalignment[1], misalignment[2], 1);
+    glm::dvec4 offset =
+        glm::dvec4(misalignment[0], misalignment[1], misalignment[2], 1);
     *out_ori = *out_ori * misOrientation;
     *out_pos += *out_ori * offset;
     out_pos->w = 1;
@@ -310,6 +312,19 @@ bool paramPositionAndOrientation(const rapidxml::xml_node<>* node,
         out_pos->w = 1;
     }
     return true;
+}
+
+bool paramMaterial(const rapidxml::xml_node<>* node, Material* out) {
+    if (!node || !out) {
+        return false;
+    }
+
+    const char* str;
+    if (!paramStr(node, "elementSubstrate", &str)) {
+        return false;
+    }
+
+    return materialFromString(str, out);
 }
 
 bool parseGroup(rapidxml::xml_node<>* node, xml::Group* out) {

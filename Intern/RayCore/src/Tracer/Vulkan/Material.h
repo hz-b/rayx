@@ -15,6 +15,11 @@ enum class Material {
 #undef X
 };
 
+/** returns whether a Material with the name `matname` has been found.
+ * it will be stored in `out`.
+ **/
+bool materialFromString(const char* matname, Material* out);
+
 // the following functions load the tables, and grant you a pointer to them.
 // the tables will be written to the nkp and nkpIdx buffers of shader.comp
 const std::vector<double>* getMaterialTable();

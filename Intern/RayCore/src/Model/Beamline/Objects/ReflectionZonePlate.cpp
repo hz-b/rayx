@@ -1,4 +1,7 @@
 #include "ReflectionZonePlate.h"
+
+#include <Tracer/Vulkan/Material.h>
+
 #include "Debug.h"
 
 namespace RAYX {
@@ -54,7 +57,7 @@ ReflectionZonePlate::ReflectionZonePlate(
     const double mExit, const double sEntrance, const double sExit,
     const double shortRadius, const double longRadius,
     const int additionalZeroOrder, const double fresnelZOffset,
-    const std::vector<double> slopeError)
+    const std::vector<double> slopeError, Material mat)
     : OpticalElement(name, geometricalShape, width, height, azimuthalAngle,
                      position, orientation, slopeError),
       m_fresnelZOffset(fresnelZOffset),
@@ -83,17 +86,18 @@ ReflectionZonePlate::ReflectionZonePlate(
     m_imageType = IT_POINT2POINT;  // default (0)
 
     // set parameters in Quadric class
+    double matd = (double)static_cast<int>(mat);
     if (m_curvatureType == CT_PLANE) {
         setSurface(std::make_unique<Quadric>(std::vector<double>{
-            0, 0, 0, 0, 1, 0, 0, -1, 0, 0, 0, 0, 4, 0, 0, 0}));
+            0, 0, 0, 0, 1, 0, 0, -1, 0, 0, 0, 0, 4, 0, matd, 0}));
     } else if (m_curvatureType == CT_SPHERICAL) {
         m_longRadius = longRadius;  // for sphere and toroidal
         setSurface(std::make_unique<Quadric>(std::vector<double>{
-            1, 0, 0, 0, 1, 1, 0, -m_longRadius, 0, 0, 1, 0, 4, 0, 0, 0}));
+            1, 0, 0, 0, 1, 1, 0, -m_longRadius, 0, 0, 1, 0, 4, 0, matd, 0}));
     } else {
         m_longRadius = longRadius;    // for sphere and toroidal
         m_shortRadius = shortRadius;  // only for Toroidal
-        setSurface(std::make_unique<Toroid>(longRadius, shortRadius, 4));
+        setSurface(std::make_unique<Toroid>(longRadius, shortRadius, 4, mat));
     }
 
     printInfo();
@@ -117,7 +121,7 @@ ReflectionZonePlate::ReflectionZonePlate(
     const double mExit, const double sEntrance, const double sExit,
     const double shortRadius, const double longRadius,
     const int additionalZeroOrder, const double fresnelZOffset,
-    const std::vector<double> slopeError)
+    const std::vector<double> slopeError, Material mat)
     : OpticalElement(name, geometricalShape, widthA, widthB, height,
                      azimuthalAngle, position, orientation, slopeError),
       m_fresnelZOffset(fresnelZOffset),
@@ -145,18 +149,20 @@ ReflectionZonePlate::ReflectionZonePlate(
     m_rzpType = RT_ELLIPTICAL;     // default (0)
     m_imageType = IT_POINT2POINT;  // default (0)
 
+    double matd = (double)static_cast<int>(mat);
+
     // set parameters in Quadric class
     if (m_curvatureType == CT_PLANE) {
         setSurface(std::make_unique<Quadric>(std::vector<double>{
-            0, 0, 0, 0, 1, 0, 0, -1, 0, 0, 0, 0, 4, 0, 0, 0}));
+            0, 0, 0, 0, 1, 0, 0, -1, 0, 0, 0, 0, 4, 0, matd, 0}));
     } else if (m_curvatureType == CT_SPHERICAL) {
         m_longRadius = longRadius;  // for sphere and toroidal
         setSurface(std::make_unique<Quadric>(std::vector<double>{
-            1, 0, 0, 0, 1, 1, 0, -m_longRadius, 0, 0, 1, 0, 4, 0, 0, 0}));
+            1, 0, 0, 0, 1, 1, 0, -m_longRadius, 0, 0, 1, 0, 4, 0, matd, 0}));
     } else {
         m_longRadius = longRadius;    // for sphere and toroidal
         m_shortRadius = shortRadius;  // only for Toroidal
-        setSurface(std::make_unique<Toroid>(longRadius, shortRadius, 4));
+        setSurface(std::make_unique<Toroid>(longRadius, shortRadius, 4, mat));
     }
 
     printInfo();
@@ -282,6 +288,11 @@ std::shared_ptr<ReflectionZonePlate> ReflectionZonePlate::createFromXML(
         return nullptr;
     }
 
+    Material mat;
+    if (!xml::paramMaterial(node, &mat)) {
+        mat = Material::CU;  // default to copper!
+    }
+
     // ! temporary for testing trapezoid rzp
     double widthB;
     bool foundWidthB = xml::paramDouble(node, "totalWidthB", &widthB);
@@ -291,14 +302,14 @@ std::shared_ptr<ReflectionZonePlate> ReflectionZonePlate::createFromXML(
             azimuthalAngle, position, orientation, designEnergy,
             orderOfDiffraction, designOrderOfDiffraction, dAlpha, dBeta,
             mEntrance, mExit, sEntrance, sExit, shortRadius, longRadius,
-            additionalZeroOrder, fresnelZOffset, slopeError);
+            additionalZeroOrder, fresnelZOffset, slopeError, mat);
     } else {
         return std::make_shared<ReflectionZonePlate>(
             name, geometricalShape, curvatureType, widthA, widthB, height,
             azimuthalAngle, position, orientation, designEnergy,
             orderOfDiffraction, designOrderOfDiffraction, dAlpha, dBeta,
             mEntrance, mExit, sEntrance, sExit, shortRadius, longRadius,
-            additionalZeroOrder, fresnelZOffset, slopeError);
+            additionalZeroOrder, fresnelZOffset, slopeError, mat);
     }
 }
 

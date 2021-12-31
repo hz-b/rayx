@@ -3,6 +3,8 @@
 // #if RUN_TEST_SHADER TODO (Jannis): Commented out by OS: error: unterminated
 // #if
 
+#include <Tracer/Vulkan/Material.h>
+
 #include <fstream>
 #include <functional>
 #include <sstream>
@@ -2241,8 +2243,9 @@ TEST(opticalElements, RZPDefaultParams) {
             "ReflectionZonePlateDefault",
             RAYX::Geometry::GeometricalShape::RECTANGLE, 0, 50, 200,
             rzp_param.getAzimuthalAngle(), position, orientation, 100, -1, -1,
-            1, 1, 100, 500, 100, 500, 0, 0, 0, 0,
-            zeros7);  // dx,dy,dz, dpsi,dphi,dchi // {1,2,3,0.001,0.002,0.003}
+            1, 1, 100, 500, 100, 500, 0, 0, 0, 0, zeros7,
+            Material::CU);  // dx,dy,dz, dpsi,dphi,dchi //
+                            // {1,2,3,0.001,0.002,0.003}
 
     RAYX::WorldUserParams ip_param = RAYX::WorldUserParams(
         0, 0, 0, 1000, std::vector<double>{0, 0, 0, 0, 0, 0});
@@ -2276,8 +2279,9 @@ TEST(opticalElements, RZPDefaultParams200) {
             "ReflectionZonePlateDefault200",
             RAYX::Geometry::GeometricalShape::RECTANGLE, 0, 50, 200,
             rzp_param.getAzimuthalAngle(), position, orientation, 100, -1, -1,
-            1, 1, 100, 500, 100, 500, 0, 0, 0, 0,
-            zeros7);  // dx,dy,dz, dpsi,dphi,dchi // {1,2,3,0.001,0.002,0.003}
+            1, 1, 100, 500, 100, 500, 0, 0, 0, 0, zeros7,
+            Material::CU);  // dx,dy,dz, dpsi,dphi,dchi //
+                            // {1,2,3,0.001,0.002,0.003}
 
     RAYX::WorldUserParams ip_param = RAYX::WorldUserParams(
         0, 0, 0, 1000, std::vector<double>{0, 0, 0, 0, 0, 0});
@@ -2312,8 +2316,9 @@ TEST(opticalElements, RZPDefaultParamsToroid200) {
             "ReflectionZonePlateDefault200Toroid",
             RAYX::Geometry::GeometricalShape::RECTANGLE, 2, 50, 200,
             rzp_param.getAzimuthalAngle(), position, orientation, 100, -1, -1,
-            1, 1, 100, 500, 100, 500, 20, 40, 0, 0,
-            zeros7);  // dx,dy,dz, dpsi,dphi,dchi // {1,2,3,0.001,0.002,0.003}
+            1, 1, 100, 500, 100, 500, 20, 40, 0, 0, zeros7,
+            Material::CU);  // dx,dy,dz, dpsi,dphi,dchi //
+                            // {1,2,3,0.001,0.002,0.003}
 
     RAYX::WorldUserParams ip_param = RAYX::WorldUserParams(
         0, 0, 0, 1000, std::vector<double>{0, 0, 0, 0, 0, 0});
@@ -2344,8 +2349,9 @@ TEST(opticalElements, RZPAzimuthal200) {
             "ReflectionZonePlateAzim200",
             RAYX::Geometry::GeometricalShape::RECTANGLE, 0, 50, 200,
             rzp_param.getAzimuthalAngle(), position, orientation, 100, -1, -1,
-            1, 1, 100, 500, 100, 500, 0, 0, 0, 0,
-            zeros7);  // dx,dy,dz, dpsi,dphi,dchi // {1,2,3,0.001,0.002,0.003}
+            1, 1, 100, 500, 100, 500, 0, 0, 0, 0, zeros7,
+            Material::CU);  // dx,dy,dz, dpsi,dphi,dchi //
+                            // {1,2,3,0.001,0.002,0.003}
 
     RAYX::WorldUserParams ip_param = RAYX::WorldUserParams(
         0, 0, 0, 1000, std::vector<double>{0, 0, 0, 0, 0, 0});
@@ -2371,13 +2377,12 @@ TEST(opticalElements, RZPMis) {
         std::vector<double>{1, 2, 3, 0.001, 0.002, 0.003});
     glm::dvec4 position = rzp_param.calcPosition();
     glm::dmat4x4 orientation = rzp_param.calcOrientation();
-    std::shared_ptr<RAYX::ReflectionZonePlate> rzp =
-        std::make_shared<RAYX::ReflectionZonePlate>(
-            "ReflectionZonePlateMis",
-            RAYX::Geometry::GeometricalShape::RECTANGLE, 0, 50, 200,
-            rzp_param.getAzimuthalAngle(), position, orientation, 100, -1, -1,
-            1, 1, 100, 500, 100, 500, 0, 0, 0, 0,
-            zeros7);  // dx,dy,dz, dpsi,dphi,dchi // {1,2,3,0.001,0.002,0.003}
+    std::shared_ptr<RAYX::ReflectionZonePlate> rzp = std::make_shared<
+        RAYX::ReflectionZonePlate>(
+        "ReflectionZonePlateMis", RAYX::Geometry::GeometricalShape::RECTANGLE,
+        0, 50, 200, rzp_param.getAzimuthalAngle(), position, orientation, 100,
+        -1, -1, 1, 1, 100, 500, 100, 500, 0, 0, 0, 0, zeros7,
+        Material::CU);  // dx,dy,dz, dpsi,dphi,dchi // {1,2,3,0.001,0.002,0.003}
 
     RAYX::WorldUserParams ip_param = RAYX::WorldUserParams(
         0, 0, 0, 1000, std::vector<double>{0, 0, 0, 0, 0, 0});
@@ -2913,7 +2918,7 @@ TEST(PeteRZP, spec1_first_rzp) {
             "ReflectionZonePete", RAYX::Geometry::GeometricalShape::RECTANGLE,
             0, 4, 60, rzp_param.getAzimuthalAngle(), position, orientation,
             p->getPhotonEnergy(), -1, -1, 2.2, 1, 90, 400, 90, 400, 0, 0, 1, 0,
-            zeros7);  // dx,dy,dz, dpsi,dphi,dchi //
+            zeros7, Material::CU);  // dx,dy,dz, dpsi,dphi,dchi //
     rzp->setOutMatrix(glmToVector16(glm::transpose(
         rzp_param.calcE2B())));  // to make comparison with old ray files
                                  // possible, use the beam coordinate system
@@ -2949,8 +2954,8 @@ TEST(PeteRZP, spec1_first_ip) {
             "ReflectionZonePete", RAYX::Geometry::GeometricalShape::RECTANGLE,
             0, 4, 60, rzp_param.getAzimuthalAngle(), rzp_position,
             rzp_orientation, p->getPhotonEnergy(), -1, -1, 2.2, 1, 90, 400, 90,
-            400, 0, 0, 1, 0,
-            zeros7);  // dx,dy,dz, dpsi,dphi,dchi //
+            400, 0, 0, 1, 0, zeros7,
+            Material::CU);  // dx,dy,dz, dpsi,dphi,dchi //
 
     RAYX::WorldUserParams ip_param = RAYX::WorldUserParams(
         0, 0, 0, 385.0, std::vector<double>{0, 0, 0, 0, 0, 0});
@@ -2994,8 +2999,8 @@ TEST(PeteRZP, spec1_first_plus_rzp) {
             "ReflectionZonePete", RAYX::Geometry::GeometricalShape::RECTANGLE,
             0, 4, 60, rzp_param.getAzimuthalAngle(), rzp_position,
             rzp_orientation, p->getPhotonEnergy(), 1, 1, 2.2, 4.75, 90, 400, 90,
-            400, 0, 0, 1, -24.35,
-            zeros7);  // dx,dy,dz, dpsi,dphi,dchi //
+            400, 0, 0, 1, -24.35, zeros7,
+            Material::CU);  // dx,dy,dz, dpsi,dphi,dchi //
 
     rzp->setOutMatrix(glmToVector16(glm::transpose(
         rzp_param.calcE2B())));  // to make comparison with old ray files
@@ -3032,8 +3037,8 @@ TEST(PeteRZP, spec1_first_plus_ip) {
             "ReflectionZonePete", RAYX::Geometry::GeometricalShape::RECTANGLE,
             0, 4, 60, rzp_param.getAzimuthalAngle(), rzp_position,
             rzp_orientation, p->getPhotonEnergy(), 1, 1, 2.2, 4.75, 90, 400, 90,
-            400, 0, 0, 1, -24.35,
-            zeros7);  // dx,dy,dz, dpsi,dphi,dchi //
+            400, 0, 0, 1, -24.35, zeros7,
+            Material::CU);  // dx,dy,dz, dpsi,dphi,dchi //
 
     RAYX::WorldUserParams ip_param = RAYX::WorldUserParams(
         0, 0, 0, 400.0, std::vector<double>{0, 0, 0, 0, 0, 0});
@@ -3077,8 +3082,8 @@ TEST(PeteRZP, spec1_first_minus_rzp2) {
             "ReflectionZonePete", RAYX::Geometry::GeometricalShape::RECTANGLE,
             0, 4, 60, rzp_param.getAzimuthalAngle(), rzp_position,
             rzp_orientation, p->getPhotonEnergy(), -1, -1, 2.2, 1, 90, 400, 90,
-            400, 0, 0, 1, 0,
-            zeros7);  // dx,dy,dz, dpsi,dphi,dchi //
+            400, 0, 0, 1, 0, zeros7,
+            Material::CU);  // dx,dy,dz, dpsi,dphi,dchi //
     rzp->setOutMatrix(glmToVector16(glm::transpose(
         rzp_param.calcE2B())));  // to make comparison with old ray files
                                  // possible, use the beam coordinate system
@@ -3115,8 +3120,8 @@ TEST(PeteRZP, spec1_first_minus_ip2) {
             "ReflectionZonePete", RAYX::Geometry::GeometricalShape::RECTANGLE,
             0, 4, 60, rzp_param.getAzimuthalAngle(), rzp_position,
             rzp_orientation, p->getPhotonEnergy(), -1, -1, 2.2, 1, 90, 400, 90,
-            400, 0, 0, 1, 0,
-            zeros7);  // dx,dy,dz, dpsi,dphi,dchi //
+            400, 0, 0, 1, 0, zeros7,
+            Material::CU);  // dx,dy,dz, dpsi,dphi,dchi //
 
     RAYX::WorldUserParams ip_param = RAYX::WorldUserParams(
         0, 0, 0, 400.0, std::vector<double>{0, 0, 0, 0, 0, 0});

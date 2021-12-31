@@ -101,7 +101,7 @@ void Application::loadDummyBeamline() {  // ! objects are created here
             azimuthalAngle, pos2, or2, designEnergy, orderOfDiffraction,
             designOrderOfDiffraction, dAlpha, dBeta, sEntrance, sExit,
             mEntrance, mExit, shortRadius, longRadius, additionalOrder,
-            fresnelOffset, sE);
+            fresnelOffset, sE, Material::CU);
 
     // Cylinder with mirror misalignment
     RAYX::GeometricUserParams cy_params =
