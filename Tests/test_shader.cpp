@@ -2874,7 +2874,7 @@ TEST(opticalElements, toroid) {
         std::make_shared<RAYX::ToroidMirror>(
             "toroid", RAYX::Geometry::GeometricalShape::RECTANGLE, 50, 200,
             t_param.getAzimuthalAngle(), t_position, t_orientation,
-            degToRad(10), 10000, 1000, 10000, 1000, zeros7);
+            degToRad(10), 10000, 1000, 10000, 1000, zeros7, Material::CU);
 
     RAYX::WorldUserParams ip_param = RAYX::WorldUserParams(
         0, 0, 0, 1000, std::vector<double>{0, 0, 0, 0, 0, 0});

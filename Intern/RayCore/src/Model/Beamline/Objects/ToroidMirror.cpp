@@ -37,7 +37,7 @@ ToroidMirror::ToroidMirror(
     const double width, const double height, const double azimuthalAngle,
     glm::dvec4 position, glm::dmat4x4 orientation, const double incidenceAngle,
     const double mEntrance, const double mExit, const double sEntrance,
-    const double sExit, const std::vector<double> slopeError)
+    const double sExit, const std::vector<double> slopeError, Material mat)
     : OpticalElement(name, {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
                      geometricalShape, width, height, azimuthalAngle, position,
                      orientation, slopeError),
@@ -50,10 +50,11 @@ ToroidMirror::ToroidMirror(
     calcRadius(incidenceAngle);  // calculate the radius
 
     RAYX_LOG << "long Radius: " << m_longRadius
-              << ", short Radius: " << m_shortRadius;
+             << ", short Radius: " << m_shortRadius;
+    double matd = (double)static_cast<int>(mat);
     setSurface(std::make_unique<Toroid>(
         std::vector<double>{m_longRadius, m_shortRadius, 0, 0, 0, 1, 0, 0, 0, 0,
-                            1, 0, 6, 0, 0, 0}));
+                            1, 0, 6, 0, matd, 0}));
     // setSurface(std::make_unique<Toroid>(m_longRadius, m_shortRadius));
 }
 
@@ -123,10 +124,15 @@ std::shared_ptr<ToroidMirror> ToroidMirror::createFromXML(
         return nullptr;
     }
 
+    Material mat;
+    if (!xml::paramMaterial(node, &mat)) {
+        mat = Material::CU;  // default to copper
+    }
+
     return std::make_shared<ToroidMirror>(name, geometricalShape, width, height,
                                           azimuthalAngle, position, orientation,
                                           incidenceAngle, mEntrance, mExit,
-                                          sEntrance, sExit, slopeError);
+                                          sEntrance, sExit, slopeError, mat);
 }
 
 /**
