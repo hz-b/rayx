@@ -320,7 +320,7 @@ bool paramMaterial(const rapidxml::xml_node<>* node, Material* out) {
     }
 
     const char* str;
-    if (!paramStr(node, "elementSubstrate", &str)) {
+    if (!paramStr(node, "materialSubstrate", &str)) {
         return false;
     }
 
