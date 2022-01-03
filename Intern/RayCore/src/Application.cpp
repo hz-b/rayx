@@ -1,5 +1,7 @@
 #include "Application.h"
 
+#include <Tracer/Vulkan/Material.h>
+
 #include <iomanip>
 #include <iostream>
 
@@ -116,7 +118,7 @@ void Application::loadDummyBeamline() {  // ! objects are created here
     std::shared_ptr<RAYX::Cylinder> cy = std::make_shared<RAYX::Cylinder>(
         "Cylinder", Geometry::GeometricalShape::RECTANGLE, 20, 0, 200, 10,
         w_coord.getAzimuthalAngle(), pos4, or4, 10, 10000, 1000,
-        std::vector<double>{0, 0, 0, 0, 0, 0, 0});
+        std::vector<double>{0, 0, 0, 0, 0, 0, 0}, Material::CU);
 
     // image plane
     RAYX::WorldUserParams ip_w_coord = RAYX::WorldUserParams(

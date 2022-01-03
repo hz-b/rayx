@@ -266,11 +266,11 @@ TEST(Ellips, defaultParams) {
     RAYX::WorldUserParams w_params =
         RAYX::WorldUserParams(e_params.getAlpha(), e_params.getBeta(),
                               degToRad(chi), dist, mis, tangentAngle);
-    RAYX::Ellipsoid eb =
-        RAYX::Ellipsoid("ellipsoid", geometricalShape, width, height,
-                        w_params.getAzimuthalAngle(), w_params.calcPosition(),
-                        w_params.calcOrientation(), incidence,
-                        entranceArmLength, exitArmLength, figRot, a11, sE);
+    RAYX::Ellipsoid eb = RAYX::Ellipsoid(
+        "ellipsoid", geometricalShape, width, height,
+        w_params.getAzimuthalAngle(), w_params.calcPosition(),
+        w_params.calcOrientation(), incidence, entranceArmLength, exitArmLength,
+        figRot, a11, sE, Material::CU);
 
     EXPECT_NEAR(eb.getShortHalfAxisB(), shortHalfAxisB, 0.0000001);
     EXPECT_NEAR(eb.getLongHalfAxisA(), longHalfAxisA, 0.0000001);

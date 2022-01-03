@@ -1,4 +1,6 @@
 #pragma once
+#include <Tracer/Vulkan/Material.h>
+
 #include "Model/Beamline/OpticalElement.h"
 #include "Model/Surface/Quadric.h"
 
@@ -13,7 +15,7 @@ class RAYX_API Ellipsoid : public OpticalElement {
               glm::dmat4x4 orientation, const double grazingIncidence,
               const double entranceArmLength, const double exitArmLength,
               const int figRot, const double a_11,
-              const std::vector<double> slopeError);
+              const std::vector<double> slopeError, Material mat);
     Ellipsoid();
     ~Ellipsoid();
 
