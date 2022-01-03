@@ -3258,7 +3258,9 @@ void testFunctions() {
 		rayData[uint(gl_GlobalInvocationID)] = res;
 	}
 	else if(settings == 10) { // test RayMatrixMult
-		res = rayMatrixMult(r, quadricData[0].inTrans);
+		r = rayMatrixMult(r, quadricData[0].inTrans);
+		res.position = r.position;
+		res.direction = r.direction;
 		rayData[uint(gl_GlobalInvocationID)] = res;
 	}
 	else if(settings == 11) { // wastebox

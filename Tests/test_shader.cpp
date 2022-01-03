@@ -907,7 +907,16 @@ TEST(Tracer, testRZPLineDensityAstigmatic) {  // astigmatic 2 astigmatic
     correct = addTestSetting(correct, glm::dvec3(expected_DX, 0, expected_DZ));
 
     double settings = 12;
-    std::list<double> outputRays = runUnitTest(settings, testValues);
+    std::shared_ptr<RAYX::OpticalElement> q1 =
+        std::make_shared<RAYX::OpticalElement>(
+            "testRZPAstigmatic",
+            std::vector<double>{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, settings,
+                                0, 0},
+            inputValues, zeros, zeros, zeros);
+
+    std::list<double> outputRays = runTracer(testValues, {q1});
+    std::cout << "got " << outputRays.size() << " values from shader"
+              << std::endl;
 
     double tolerance = 1e-10;
     compareFromCorrect(correct, outputRays, tolerance);
@@ -951,7 +960,16 @@ TEST(Tracer, testRayMatrixMult) {
     correct = addTestSetting(correct, expected_pos, expected_dir);
 
     double settings = 10;
-    std::list<double> outputRays = runUnitTest(settings, testValues);
+    std::shared_ptr<RAYX::OpticalElement> q1 =
+        std::make_shared<RAYX::OpticalElement>(
+            "testRayMatrixMult",
+            std::vector<double>{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, settings,
+                                0, 0},
+            matrix, zeros, zeros, zeros);
+
+    std::list<double> outputRays = runTracer(testValues, {q1});
+    std::cout << "got " << outputRays.size() << " values from shader"
+              << std::endl;
 
     double tolerance = 1e-12;
     compareFromCorrect(correct, outputRays, tolerance);
