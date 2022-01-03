@@ -39,7 +39,7 @@ PlaneGrating::PlaneGrating(
     glm::dvec4 position, glm::dmat4x4 orientation, const double designEnergy,
     const double lineDensity, const double orderOfDiffraction,
     const int additionalZeroOrder, const std::vector<double> vls,
-    const std::vector<double> slopeError)
+    const std::vector<double> slopeError, Material mat)
     : OpticalElement(name, geometricalShape, width, height, azimuthalAngle,
                      position, orientation, slopeError),
       m_additionalOrder(additionalZeroOrder),
@@ -47,8 +47,7 @@ PlaneGrating::PlaneGrating(
       m_lineDensity(lineDensity),
       m_orderOfDiffraction(orderOfDiffraction),
       m_vls(vls) {
-    RAYX_LOG << "design wavelength = "
-              << abs(hvlam(m_designEnergyMounting));
+    RAYX_LOG << "design wavelength = " << abs(hvlam(m_designEnergyMounting));
 
     // set element specific parameters in Optical Element class. will be moved
     // to shader and are needed for tracing
@@ -58,8 +57,9 @@ PlaneGrating::PlaneGrating(
                           0, 0, double(m_additionalOrder)});
 
     // parameters of quadric surface
-    setSurface(std::make_unique<Quadric>(
-        std::vector<double>{0, 0, 0, 0, 1, 0, 0, -1, 0, 0, 0, 0, 1, 0, 0, 0}));
+    double matd = (double)static_cast<int>(mat);
+    setSurface(std::make_unique<Quadric>(std::vector<double>{
+        0, 0, 0, 0, 1, 0, 0, -1, 0, 0, 0, 0, 1, 0, matd, 0}));
 }
 
 PlaneGrating::~PlaneGrating() {}
@@ -128,10 +128,15 @@ std::shared_ptr<PlaneGrating> PlaneGrating::createFromXML(
         return nullptr;
     }
 
+    Material mat;
+    if (!xml::paramMaterial(node, &mat)) {
+        mat = Material::CU;  // defaults to copper!
+    }
+
     return std::make_shared<PlaneGrating>(
         name, geometricalShape, width, height, azimuthalAngle, position,
         orientation, designEnergy, lineDensity, orderOfDiffraction,
-        additionalZeroOrder, vls, slopeError);
+        additionalZeroOrder, vls, slopeError, mat);
 }
 
 double PlaneGrating::getDesignEnergyMounting() {

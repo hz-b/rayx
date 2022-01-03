@@ -38,7 +38,7 @@ SphereGrating::SphereGrating(const char* name, int mount,
                              glm::dvec4 position, glm::dmat4x4 orientation,
                              double designEnergyMounting, double lineDensity,
                              double orderOfDiffraction, std::vector<double> vls,
-                             std::vector<double> slopeError)
+                             std::vector<double> slopeError, Material mat)
     : OpticalElement(name, geometricalShape, width, height, azimuthalAngle,
                      position, orientation, slopeError),
       m_designEnergyMounting(designEnergyMounting),
@@ -47,8 +47,9 @@ SphereGrating::SphereGrating(const char* name, int mount,
       m_vls(vls) {
     double icurv = 1;
     m_gratingMount = mount == 0 ? GM_DEVIATION : GM_INCIDENCE;
+    double matd = (double)static_cast<int>(mat);
     setSurface(std::make_unique<Quadric>(std::vector<double>{
-        1, 0, 0, 0, icurv, 1, 0, -radius, 0, 0, 1, 0, 2, 0, 0, 0}));
+        1, 0, 0, 0, icurv, 1, 0, -radius, 0, 0, 1, 0, 2, 0, matd, 0}));
     setElementParameters({0, 0, m_lineDensity, m_orderOfDiffraction,
                           abs(hvlam(m_designEnergyMounting)), 0, m_vls[0],
                           m_vls[1], m_vls[2], m_vls[3], m_vls[4], m_vls[5], 0,
@@ -127,10 +128,15 @@ std::shared_ptr<SphereGrating> SphereGrating::createFromXML(
         return nullptr;
     }
 
+    Material mat;
+    if (!xml::paramMaterial(node, &mat)) {
+        mat = Material::CU;  // defaults to copper
+    }
+
     return std::make_shared<SphereGrating>(
         name, mount, geometricalShape, width, height, azimuthalAngle, radius,
         position, orientation, designEnergyMounting, lineDensity,
-        orderOfDiffraction, vls, slopeError);
+        orderOfDiffraction, vls, slopeError, mat);
 }
 
 /* TODO (Theresa): how to make radius calculation easier?

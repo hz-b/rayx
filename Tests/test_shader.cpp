@@ -2079,8 +2079,9 @@ TEST(opticalElements, planeGratingDevDefault) {
             "PlaneGratingDeviationDefault",
             RAYX::Geometry::GeometricalShape::RECTANGLE, 50, 200,
             pg_param.getAzimuthalAngle(), position, orientation, 100, 1000, 1,
-            0, std::vector<double>{0, 0, 0, 0, 0, 0},
-            zeros7);  // dx,dy,dz, dpsi,dphi,dchi // {1,2,3,0.001,0.002,0.003}
+            0, std::vector<double>{0, 0, 0, 0, 0, 0}, zeros7,
+            Material::CU);  // dx,dy,dz, dpsi,dphi,dchi //
+                            // {1,2,3,0.001,0.002,0.003}
 
     RAYX::WorldUserParams ip_param = RAYX::WorldUserParams(
         0, 0, 0, 1000, std::vector<double>{0, 0, 0, 0, 0, 0});
@@ -2106,13 +2107,12 @@ TEST(opticalElements, planeGratingDevAzimuthal) {
                               std::vector<double>{0, 0, 0, 0, 0, 0});
     glm::dvec4 position = pg_param.calcPosition();
     glm::dmat4x4 orientation = pg_param.calcOrientation();
-    std::shared_ptr<RAYX::PlaneGrating> plG =
-        std::make_shared<RAYX::PlaneGrating>(
-            "PlaneGratingDeviationAz",
-            RAYX::Geometry::GeometricalShape::RECTANGLE, 50, 200,
-            pg_param.getAzimuthalAngle(), position, orientation, 100, 1000, 1,
-            0, std::vector<double>{0, 0, 0, 0, 0, 0},
-            zeros7);  // dx,dy,dz, dpsi,dphi,dchi // {1,2,3,0.001,0.002,0.003}
+    std::shared_ptr<RAYX::PlaneGrating> plG = std::make_shared<
+        RAYX::PlaneGrating>(
+        "PlaneGratingDeviationAz", RAYX::Geometry::GeometricalShape::RECTANGLE,
+        50, 200, pg_param.getAzimuthalAngle(), position, orientation, 100, 1000,
+        1, 0, std::vector<double>{0, 0, 0, 0, 0, 0}, zeros7,
+        Material::CU);  // dx,dy,dz, dpsi,dphi,dchi // {1,2,3,0.001,0.002,0.003}
 
     RAYX::WorldUserParams ip_param = RAYX::WorldUserParams(
         0, 0, 0, 1000, std::vector<double>{0, 0, 0, 0, 0, 0});
@@ -2143,8 +2143,9 @@ TEST(opticalElements, planeGratingDevAzMis) {
             "PlaneGratingDeviationAzMis",
             RAYX::Geometry::GeometricalShape::RECTANGLE, 50, 200,
             pg_param.getAzimuthalAngle(), position, orientation, 100, 1000, 1,
-            0, std::vector<double>{0, 0, 0, 0, 0, 0},
-            zeros7);  // dx,dy,dz, dpsi,dphi,dchi // {1,2,3,0.001,0.002,0.003}
+            0, std::vector<double>{0, 0, 0, 0, 0, 0}, zeros7,
+            Material::CU);  // dx,dy,dz, dpsi,dphi,dchi //
+                            // {1,2,3,0.001,0.002,0.003}
 
     RAYX::WorldUserParams ip_param = RAYX::WorldUserParams(
         0, 0, 0, 1000, std::vector<double>{0, 0, 0, 0, 0, 0});
@@ -2174,8 +2175,9 @@ TEST(opticalElements, planeGratingIncAzMis) {
         std::make_shared<RAYX::PlaneGrating>(
             "PlaneGratingIncAzMis", RAYX::Geometry::GeometricalShape::RECTANGLE,
             50, 200, pg_param.getAzimuthalAngle(), position, orientation, 100,
-            1000, 1, 0, std::vector<double>{0, 0, 0, 0, 0, 0},
-            zeros7);  // dx,dy,dz, dpsi,dphi,dchi // {1,2,3,0.001,0.002,0.003}
+            1000, 1, 0, std::vector<double>{0, 0, 0, 0, 0, 0}, zeros7,
+            Material::CU);  // dx,dy,dz, dpsi,dphi,dchi //
+                            // {1,2,3,0.001,0.002,0.003}
 
     RAYX::WorldUserParams ip_param = RAYX::WorldUserParams(
         0, 0, 0, 1000, std::vector<double>{0, 0, 0, 0, 0, 0});
@@ -2201,13 +2203,12 @@ TEST(opticalElements, planeGratingDevMisVLS) {
         std::vector<double>{1, 2, 3, 0.001, 0.002, 0.003});
     glm::dvec4 position = pg_param.calcPosition();
     glm::dmat4x4 orientation = pg_param.calcOrientation();
-    std::shared_ptr<RAYX::PlaneGrating> plG =
-        std::make_shared<RAYX::PlaneGrating>(
-            "PlaneGratingDeviationMis",
-            RAYX::Geometry::GeometricalShape::RECTANGLE, 50, 200,
-            pg_param.getAzimuthalAngle(), position, orientation, 100, 1000, 1,
-            0, std::vector<double>{0.45, 0.3, 0.5, 0.2, 0.4, 0.35},
-            zeros7);  // dx,dy,dz, dpsi,dphi,dchi // {1,2,3,0.001,0.002,0.003}
+    std::shared_ptr<RAYX::PlaneGrating> plG = std::make_shared<
+        RAYX::PlaneGrating>(
+        "PlaneGratingDeviationMis", RAYX::Geometry::GeometricalShape::RECTANGLE,
+        50, 200, pg_param.getAzimuthalAngle(), position, orientation, 100, 1000,
+        1, 0, std::vector<double>{0.45, 0.3, 0.5, 0.2, 0.4, 0.35}, zeros7,
+        Material::CU);  // dx,dy,dz, dpsi,dphi,dchi // {1,2,3,0.001,0.002,0.003}
 
     RAYX::WorldUserParams ip_param = RAYX::WorldUserParams(
         0, 0, 0, 1000, std::vector<double>{0, 0, 0, 0, 0, 0});
