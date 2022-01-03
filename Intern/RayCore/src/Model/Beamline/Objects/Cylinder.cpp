@@ -22,6 +22,8 @@ namespace RAYX {
  * @param slopeError        7 slope error parameters: x-y sagittal (0), y-z
  * meridional (1), thermal distortion: x (2),y (3),z (4), cylindrical bowing
  * amplitude y(5) and radius (6)
+ * @param mat               material (See Material.h)
+ *
  */
 Cylinder::Cylinder(const char* name,
                    Geometry::GeometricalShape geometricalShape,
