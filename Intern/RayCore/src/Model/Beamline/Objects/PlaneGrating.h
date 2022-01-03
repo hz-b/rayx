@@ -1,5 +1,6 @@
 #pragma once
 #include <Data/xml.h>
+#include <Tracer/Vulkan/Material.h>
 
 #include "Model/Beamline/OpticalElement.h"
 #include "Model/Surface/Quadric.h"
@@ -14,7 +15,7 @@ class RAYX_API PlaneGrating : public OpticalElement {
                  glm::dmat4x4 orientation, const double designEnergyMounting,
                  const double lineDensity, const double orderOfDiffraction,
                  const int additionalZeroOrder, const std::vector<double> vls,
-                 const std::vector<double> slopeError);
+                 const std::vector<double> slopeError, Material mat);
     PlaneGrating();
     ~PlaneGrating();
 

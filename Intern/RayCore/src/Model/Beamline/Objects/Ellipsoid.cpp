@@ -22,6 +22,7 @@ namespace RAYX {
  * @param slopeError        7 slope error parameters: x-y sagittal (0), y-z
  * meridional (1), thermal distortion: x (2),y (3),z (4), cylindrical bowing
  * amplitude y(5) and radius (6)
+ * @param mat               material (See Material.h)
  *
  */
 Ellipsoid::Ellipsoid(const char* name,
@@ -31,7 +32,7 @@ Ellipsoid::Ellipsoid(const char* name,
                      glm::dmat4x4 orientation, const double grazingIncidence,
                      const double entranceArmLength, const double exitArmLength,
                      const int figRot, const double a_11,
-                     const std::vector<double> slopeError)
+                     const std::vector<double> slopeError, Material mat)
     : OpticalElement(name, geometricalShape, width, height, azimuthalAngle,
                      position, orientation, slopeError),
       m_incidence(degToRad(grazingIncidence)),
@@ -54,9 +55,10 @@ Ellipsoid::Ellipsoid(const char* name,
     m_radius = -m_y0;
 
     double icurv = 1;
+    double matd = (double)static_cast<int>(mat);
     setSurface(std::make_unique<Quadric>(
         std::vector<double>{m_a11, 0, 0, 0, icurv, 1, 0, m_radius, 0, 0, m_a33,
-                            m_a34, 7, 0, 0, m_a44}));
+                            m_a34, 7, 0, matd, m_a44}));
     setElementParameters({sin(m_tangentAngle), cos(m_tangentAngle), m_y0, m_z0,
                           0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0});
 }
@@ -110,10 +112,9 @@ void Ellipsoid::calcHalfAxes() {
         m_halfAxisC = sqrt(pow(m_shortHalfAxisB, 2) / m_a11);
     }
     m_tangentAngle = angle;
-    RAYX_LOG << "A= " << m_longHalfAxisA
-              << ", B= " << m_shortHalfAxisB << ", C= " << m_halfAxisC
-              << ", angle = " << m_tangentAngle << ", Z0 = " << m_z0
-              << ", Y0= " << m_y0;
+    RAYX_LOG << "A= " << m_longHalfAxisA << ", B= " << m_shortHalfAxisB
+             << ", C= " << m_halfAxisC << ", angle = " << m_tangentAngle
+             << ", Z0 = " << m_z0 << ", Y0= " << m_y0;
 }
 
 double Ellipsoid::getRadius() const { return m_radius; }

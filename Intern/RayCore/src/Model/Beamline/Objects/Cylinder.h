@@ -1,4 +1,6 @@
 #pragma once
+#include <Tracer/Vulkan/Material.h>
+
 #include "Model/Beamline/OpticalElement.h"
 #include "Model/Surface/Quadric.h"
 #include "utils.h"
@@ -11,7 +13,8 @@ class RAYX_API Cylinder : public OpticalElement {
              const double height, const double azimuthalAngle,
              glm::dvec4 position, glm::dmat4x4 orientation,
              const double grazingIncidence, const double entranceArmLength,
-             const double exitArmLength, const std::vector<double> slopeError);
+             const double exitArmLength, const std::vector<double> slopeError,
+             Material mat);
     ~Cylinder();
 
     void setRadius();

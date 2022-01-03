@@ -22,6 +22,8 @@ namespace RAYX {
  * @param slopeError        7 slope error parameters: x-y sagittal (0), y-z
  * meridional (1), thermal distortion: x (2),y (3),z (4), cylindrical bowing
  * amplitude y(5) and radius (6)
+ * @param mat               material (See Material.h)
+ *
  */
 Cylinder::Cylinder(const char* name,
                    Geometry::GeometricalShape geometricalShape,
@@ -30,7 +32,7 @@ Cylinder::Cylinder(const char* name,
                    glm::dvec4 position, glm::dmat4x4 orientation,
                    const double grazingIncidence,
                    const double entranceArmLength, const double exitArmLength,
-                   const std::vector<double> slopeError)
+                   const std::vector<double> slopeError, Material mat)
     : OpticalElement(name, geometricalShape, width, height, azimuthalAngle,
                      position, orientation, slopeError),
       m_direction(CYLINDER_DIRECTION(direction)),
@@ -54,8 +56,9 @@ Cylinder::Cylinder(const char* name,
         setRadius();
     }
 
+    double matd = (double)static_cast<int>(mat);
     setSurface(std::make_unique<Quadric>(std::vector<double>{
-        m_a11, 0, 0, 0, icurv, 1, 0, m_a24, 0, 0, m_a33, 0, 0, 0, 0, 0}));
+        m_a11, 0, 0, 0, icurv, 1, 0, m_a24, 0, 0, m_a33, 0, 0, 0, matd, 0}));
     // TODO (OS): Add Element parameters?
     setElementParameters({0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0});
 }

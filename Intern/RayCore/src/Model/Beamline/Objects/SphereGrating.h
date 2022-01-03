@@ -1,5 +1,6 @@
 #pragma once
 #include <Data/xml.h>
+#include <Tracer/Vulkan/Material.h>
 
 #include "Model/Beamline/OpticalElement.h"
 #include "Model/Surface/Quadric.h"
@@ -15,7 +16,7 @@ class RAYX_API SphereGrating : public OpticalElement {
                   glm::dvec4 position, glm::dmat4x4 orientation,
                   double designEnergyMounting, double lineDensity,
                   double orderOfDiffraction, std::vector<double> vls,
-                  std::vector<double> slopeError);
+                  std::vector<double> slopeError, Material mat);
 
     SphereGrating();
     ~SphereGrating();

@@ -1,5 +1,6 @@
 #include "setupTests.h"
 #if RUN_TEST_GRATINGS
+#include <Tracer/Vulkan/Material.h>
 
 TEST(planeGrating, testParams) {
     // user parameters
@@ -42,7 +43,7 @@ TEST(planeGrating, testParams) {
     RAYX::PlaneGrating p1 = RAYX::PlaneGrating(
         "planegrating", geometricalShape, width, height,
         g_params.getAzimuthalAngle(), position, orientation, designEnergy,
-        lineDensity, orderOfDiffraction, add_order, vls, sE);
+        lineDensity, orderOfDiffraction, add_order, vls, sE, Material::CU);
 
     std::vector<double> surface = {0, 0, 0, 0, 1, 0, 0, -1,
                                    0, 0, 0, 0, 1, 0, 0, 0};
@@ -143,7 +144,7 @@ TEST(planeGraing, mount1) {
     RAYX::PlaneGrating p2 = RAYX::PlaneGrating(
         "planegrating", geometricalShape, width, height,
         g_params.getAzimuthalAngle(), position, orientation, designEnergy,
-        lineDensity, orderOfDiffraction, add_order, vls, sE);
+        lineDensity, orderOfDiffraction, add_order, vls, sE, Material::CU);
 
     std::vector<double> surface = {0, 0, 0, 0, 1, 0, 0, -1,
                                    0, 0, 0, 0, 1, 0, 0, 0};
@@ -243,7 +244,7 @@ TEST(planeGrating, higherOrderOfDiffraction) {
     RAYX::PlaneGrating p3 = RAYX::PlaneGrating(
         "planegrating", geometricalShape, width, height,
         g_params.getAzimuthalAngle(), position, orientation, designEnergy,
-        lineDensity, orderOfDiffraction, add_order, vls, sE);
+        lineDensity, orderOfDiffraction, add_order, vls, sE, Material::CU);
 
     std::vector<double> surface = {0, 0, 0, 0, 1, 0, 0, -1,
                                    0, 0, 0, 0, 1, 0, 0, 0};
@@ -381,7 +382,7 @@ TEST(planeGrating, deviation) {
     RAYX::PlaneGrating p4 = RAYX::PlaneGrating(
         "planegrating", geometricalShape, width, height,
         g_params.getAzimuthalAngle(), position, orientation, designEnergy,
-        lineDensity, orderOfDiffraction, add_order, vls, sE);
+        lineDensity, orderOfDiffraction, add_order, vls, sE, Material::CU);
 
     ASSERT_DOUBLE_EQ(p4.getWidth(), width);
     ASSERT_DOUBLE_EQ(p4.getHeight(), height);
@@ -456,7 +457,8 @@ TEST(SphereGrating, testParams) {
     RAYX::SphereGrating s1 = RAYX::SphereGrating(
         "spheregrating", mount, geometricalShape, width, height,
         g_params.getAzimuthalAngle(), g_guparam.getRadius(), position,
-        orientation, designEnergy, linedensity, double(order), vls, sE);
+        orientation, designEnergy, linedensity, double(order), vls, sE,
+        Material::CU);
 
     std::vector<double> quad = {1, 0, 0, 0, 1, 1, 0, -radius,
                                 0, 0, 1, 0, 2, 0, 0, 0};
