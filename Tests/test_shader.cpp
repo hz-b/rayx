@@ -2810,6 +2810,10 @@ TEST(PeteRZP, spec1_first_minus_ip2) {
 }
 
 TEST(opticalElements, CylinderDefault) {
+    if (!shouldDoVulkanTests()) {
+        GTEST_SKIP();
+    }
+
     RAYX::GeometricUserParams cy_params =
         RAYX::GeometricUserParams(10, 10000, 1000);
 
