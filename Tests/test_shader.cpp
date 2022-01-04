@@ -27,7 +27,7 @@ std::list<double> runTracer(
     std::list<std::vector<RAYX::Ray>> rayList;
     tracer.setBeamlineParameters(1, elements.size(), testValues.size());
     std::cout << "testValues.size(): " << testValues.size() << std::endl;
-    (tracer).addRayVector(testValues);
+    (tracer).addRayVector(std::move(testValues));
     std::cout << "add rays to tracer done" << std::endl;
 
     for (std::shared_ptr<RAYX::OpticalElement> element : elements) {

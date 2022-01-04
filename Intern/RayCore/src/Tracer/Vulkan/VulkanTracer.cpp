@@ -192,17 +192,17 @@ void VulkanTracer::cleanup() {
     }
     vkDestroyShaderModule(device, computeShaderModule, nullptr);
     vkDestroyCommandPool(device, commandPool, nullptr);
-    {
+    /*{
         RAYX_PROFILE_SCOPE("vkDestroyDevice");
         vkDestroyDevice(device, nullptr);
-    }
+    }*/
     if (enableValidationLayers) {
         DestroyDebugUtilsMessengerEXT(instance, debugMessenger, nullptr);
     }
-    {
+    /*{
         RAYX_PROFILE_SCOPE("vkDestroyInstance");
         vkDestroyInstance(instance, nullptr);
-    }
+    }*/
 }
 
 void VulkanTracer::createInstance() {
@@ -738,7 +738,7 @@ void VulkanTracer::getRays() {
         RAYX_LOG << "getRays: data.size(): " << data.size();
         RAYX_LOG << "getRays: m_outputData.size() before insert: "
                   << m_outputData.size();
-        m_outputData.insertVector(data);
+        m_outputData.insertVector(std::move(data));
         RAYX_LOG << "getRays: m_outputData.size() after insert: "
                   << m_outputData.size();
         vkUnmapMemory(device, bufferMemories[3]);
@@ -764,7 +764,7 @@ void VulkanTracer::getRays() {
     data.resize(((((bytesNeeded - 1) % GPU_MAX_STAGING_SIZE) + 1) /
                  (RAY_DOUBLE_COUNT * sizeof(double))));
     RAYX_LOG << "data size: " << data.size();
-    m_outputData.insertVector(data);
+    m_outputData.insertVector(std::move(data));
     vkUnmapMemory(device, bufferMemories[3]);
     RAYX_LOG << "Output Data size: " << m_outputData.size();
     RAYX_LOG << "Output Data size: "
@@ -1136,7 +1136,7 @@ void VulkanTracer::setBeamlineParameters(uint32_t inNumberOfBeamlines,
     beamline[3] = numberOfRaysPerBeamline;
 }
 
-void VulkanTracer::addRayVector(const std::vector<Ray>& inRayVector) {
+void VulkanTracer::addRayVector(std::vector<Ray>&& inRayVector) {
     RAYX_PROFILE_FUNCTION();
 
     RAYX_LOG << "Inserting into rayList. rayList.size() before: "
