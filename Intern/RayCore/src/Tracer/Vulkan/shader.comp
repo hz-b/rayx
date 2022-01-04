@@ -2023,14 +2023,15 @@ void fresnel(dvec2 cn1, dvec2 cn2, dvec2 cos_incidence, dvec2 cos_transmittance,
 /** computes complex s and p polarization over all layers with fresnel and snell's law
  * @param energy 				energy of ray
  * @param incidence_angle		normal incidence angle
+ * @param material              the material the photon collides with
  * @return complex_S			complex s-polarization
  * @return complex_P			complex p-polarization
  */
-void reflectance(double energy, double incidence_angle, inout dvec2 complex_S, inout dvec2 complex_P) {
+void reflectance(double energy, double incidence_angle, inout dvec2 complex_S, inout dvec2 complex_P, int material) {
 	dvec2 cos_incidence = dvec2( r8_cos(incidence_angle), 0.0); // complex number, initialization only for first layer, the others are then derived from this with snell's law
 
 	int material1 = -1; // vacuum
-	int material2 = 0; // copper
+	int material2 = material;
 	// todo number of layers: loop over layers from top to bottom, transmittance angle for each layer, so far only one layer (substrate?)
 	// store cosinuses in array, bc needed in later loop for fresnel (or maybe only one loop is enough?)
 	// todo refractive indices of materials in extra buffer?
@@ -2078,11 +2079,12 @@ double phase_difference(dvec2 euler1, dvec2 euler2) {
  * @param real_P				inout, p-polarization (parallel), radius of complex number
  * @param delta					phase difference between angles of complex numbers complex_S, complex_P
  * @param incidence_angle		normal incidence angle
+ * @param material				the material the photon collides with
  * @param others
  */
-void efficiency(Ray r, out double real_S, out double real_P, out double delta, double incidence_angle) {
+void efficiency(Ray r, out double real_S, out double real_P, out double delta, double incidence_angle, int material) {
 	dvec2 complex_S, complex_P;
-	reflectance(r.energy, incidence_angle, complex_S, complex_P);
+	reflectance(r.energy, incidence_angle, complex_S, complex_P, material);
 
 	dvec2 euler_P = cartesian_to_euler(complex_P);
 	dvec2 euler_S = cartesian_to_euler(complex_S);
@@ -2931,7 +2933,8 @@ Ray traceMirror(Ray r, const int elementIndex, inout uint64_t ctr, dvec4 interse
 	r.direction = dvec3(reflect(dvec4(r.direction,0), normal));
 	
 	double real_S, real_P, delta;
-	efficiency(r, real_S, real_P, delta, incidence_angle);
+	int material = int(quadricData[elementIndex].surfaceParams[3][2]);
+	efficiency(r, real_S, real_P, delta, incidence_angle, material);
 	update_stokes(r, real_S, real_P, delta, azimuthal_angle, ctr); 
 
 	r.order = 0;
@@ -3378,7 +3381,7 @@ void testFunctions() {
 		double incidence_angle = r.weight;
 		dvec2 complex_S;
 		dvec2 complex_P;
-		reflectance(energy, incidence_angle, complex_S, complex_P);
+		reflectance(energy, incidence_angle, complex_S, complex_P, 0); // 0 = copper
 		res.position.x = complex_S.x; // complex s polarisation
 		res.position.y = complex_S.y;
 		res.direction.x = complex_P.x; // complex p polarisation
@@ -3398,7 +3401,7 @@ void testFunctions() {
 		double incidence_angle = r.weight;
 		dvec2 complex_S;
 		dvec2 complex_P;
-		reflectance(energy, incidence_angle, complex_S, complex_P);
+		reflectance(energy, incidence_angle, complex_S, complex_P, 0); // 0 = copper
 		res.position.x = complex_S.x; // complex s polarisation
 		res.position.y = complex_S.y;
 		res.direction.x = complex_P.x; // complex p polarisation
