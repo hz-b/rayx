@@ -192,17 +192,17 @@ void VulkanTracer::cleanup() {
     }
     vkDestroyShaderModule(device, computeShaderModule, nullptr);
     vkDestroyCommandPool(device, commandPool, nullptr);
-    /*{
+    {
         RAYX_PROFILE_SCOPE("vkDestroyDevice");
         vkDestroyDevice(device, nullptr);
-    }*/
+    }
     if (enableValidationLayers) {
         DestroyDebugUtilsMessengerEXT(instance, debugMessenger, nullptr);
     }
-    /*{
+    {
         RAYX_PROFILE_SCOPE("vkDestroyInstance");
         vkDestroyInstance(instance, nullptr);
-    }*/
+    }
 }
 
 void VulkanTracer::createInstance() {
