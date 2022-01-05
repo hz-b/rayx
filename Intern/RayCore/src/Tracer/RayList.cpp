@@ -20,7 +20,8 @@ RayList::~RayList() {}
 void RayList::insertVector(std::vector<Ray>&& inRayVector) {
     // check if last vector is full, if not fill it
     size_t remainingSpace = 0;
-    if ((m_rayList.back().size() > 0) && (m_rayList.back().size() < RAY_MAX_ELEMENTS_IN_VECTOR)) {
+    if ((m_rayList.back().size() > 0) &&
+        (m_rayList.back().size() < RAY_MAX_ELEMENTS_IN_VECTOR)) {
         remainingSpace = RAY_MAX_ELEMENTS_IN_VECTOR - m_rayList.back().size();
         if (remainingSpace > 0) {
             // fill remaining space
@@ -51,6 +52,8 @@ void RayList::insertVector(std::vector<Ray>&& inRayVector) {
         }
     }
 }
+
+void RayList::clean() { m_rayList.clear(); }
 
 std::list<std::vector<Ray>>::iterator RayList::begin() {
     return m_rayList.begin();

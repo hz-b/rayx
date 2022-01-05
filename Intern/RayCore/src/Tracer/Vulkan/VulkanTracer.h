@@ -60,7 +60,12 @@ class RAYX_API VulkanTracer {
     void run();
     // void addRay(double xpos, double ypos, double zpos, double xdir, double
     // ydir, double zdir, double weight); void addRay(double* location);
+    // cleans and destroys the whole tracer instance
+    // CALL CLEANTRACER BEFORE CALLING THIS ONE
     void cleanup();
+    // empties raylist, Beamline and output data, etc. so that the tracer
+    // instance can be used again
+    void cleanTracer();
 
     void getRays();
     void addRayVector(std::vector<Ray>&& inRayVector);
@@ -134,6 +139,7 @@ class RAYX_API VulkanTracer {
     // Member functions:
     // Vulkan
     void initVulkan();
+    void prepareBuffers();
     void mainLoop();
     void createInstance();
     void populateDebugMessengerCreateInfo(

@@ -5,11 +5,11 @@
 #include <iomanip>
 #include <sstream>
 
+#include "Debug.h"
 #include "Debug/Instrumentor.h"
 #include "Model/Beamline/LightSource.h"
 #include "Model/Beamline/OpticalElement.h"
 #include "Ray.h"
-#include "Debug.h"
 
 #define SHORTOUTPUT false
 
@@ -20,9 +20,8 @@ TracerInterface::TracerInterface() : m_numElements(0), m_numRays(0) {
 
 TracerInterface::TracerInterface(int numElements, int numRays)
     : m_numElements(numElements), m_numRays(numRays) {
-    RAYX_D_LOG << "Creating TracerInterface with "
-                         << numElements << " elements and " << numRays
-                         << " rays...";
+    RAYX_D_LOG << "Creating TracerInterface with " << numElements
+               << " elements and " << numRays << " rays...";
 }
 
 TracerInterface::~TracerInterface() {
@@ -78,7 +77,8 @@ bool TracerInterface::run() {
     for (auto outputRayIterator = m_RayTracer.getOutputIteratorBegin(),
               outputIteratorEnd = m_RayTracer.getOutputIteratorEnd();
          outputRayIterator != outputIteratorEnd; outputRayIterator++) {
-        RAYX_D_LOG << "(*outputRayIterator).size(): " << (*outputRayIterator).size();
+        RAYX_D_LOG << "(*outputRayIterator).size(): "
+                   << (*outputRayIterator).size();
 
         memcpy(doubleVec.data(), (*outputRayIterator).data(),
                (*outputRayIterator).size() * VULKANTRACER_RAY_DOUBLE_AMOUNT *
@@ -86,12 +86,11 @@ bool TracerInterface::run() {
         doubleVec.resize((*outputRayIterator).size() *
                          VULKANTRACER_RAY_DOUBLE_AMOUNT);
 
-        RAYX_D_LOG << "sample ray: " << doubleVec[0]
-                             << ", " << doubleVec[1] << ", " << doubleVec[2]
-                             << ", " << doubleVec[3] << ", " << doubleVec[4]
-                             << ", " << doubleVec[5] << ", " << doubleVec[6]
-                             << ", energy: " << doubleVec[7]
-                             << ", stokes 0: " << doubleVec[8];
+        RAYX_D_LOG << "sample ray: " << doubleVec[0] << ", " << doubleVec[1]
+                   << ", " << doubleVec[2] << ", " << doubleVec[3] << ", "
+                   << doubleVec[4] << ", " << doubleVec[5] << ", "
+                   << doubleVec[6] << ", energy: " << doubleVec[7]
+                   << ", stokes 0: " << doubleVec[8];
 
         writeToFile(doubleVec, outputFile, index);
         index = index + (*outputRayIterator).size();
@@ -99,6 +98,7 @@ bool TracerInterface::run() {
     outputFile.close();
 
     // clean up tracer to avoid memory leaks
+    m_RayTracer.cleanTracer();
     m_RayTracer.cleanup();
     // intentionally not RAYX_DEBUG()
     RAYX_LOG << "Done.";
@@ -110,9 +110,8 @@ void TracerInterface::writeToFile(const std::vector<double>& outputRays,
                                   std::ofstream& file, int index) const {
     size_t size = outputRays.size();
 
-    RAYX_D_LOG << "Writing "
-                         << outputRays.size() / RAY_DOUBLE_COUNT
-                         << " rays to file...";
+    RAYX_D_LOG << "Writing " << outputRays.size() / RAY_DOUBLE_COUNT
+               << " rays to file...";
 
     if (SHORTOUTPUT) {
         char buff[64];

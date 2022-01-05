@@ -11,10 +11,49 @@
 #include <type_traits>
 
 #include "Tracer/Vulkan/VulkanTracer.h"
+RAYX::VulkanTracer tracer;
+
+/** using this function is preferable to directly adding your test with `#ifdef
+ * VULKAN_TEST`, because with `if (!shouldDoVulkanTests()) { GTEST_SKIP(); }`
+ * your test will still be *compiled* even if VULKAN_TEST is diabled
+ */
+bool shouldDoVulkanTests() {
+#ifdef VULKAN_TEST
+    return true;
+#else
+    return false;
+#endif
+}
+
+class Tracer : public ::testing::Test {
+  protected:
+    // before first test in test suite "Tracer" is run, initialize the tracer
+    // tracer will be a shared instance among all tests
+    static void SetUpTestSuite() {
+        std::cout << "initialize Vulkantracer instance" << std::endl;
+        tracer = RAYX::VulkanTracer();
+    }
+
+    virtual void SetUp() {
+        if (!shouldDoVulkanTests()) {
+            GTEST_SKIP();
+        }
+    }
+    // run after last test of suite "Tracer", cleans up the shared instance of
+    // tracer
+    static void TearDownTestSuite() {
+        tracer.cleanup();
+        std::cout << "clear tracer instance" << std::endl;
+    }
+};
 
 std::vector<double> zeros = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 std::vector<double> zeros7 = {0, 0, 0, 0, 0, 0, 0};  // for slope error
 
+/** runs beamline in "elements" with rays in "testValues"
+ * @param testValues        contains rays
+ * @param elements          contains optical elements that form the beamline
+ */
 std::list<double> runTracer(
     std::vector<RAYX::Ray> testValues,
     std::vector<std::shared_ptr<RAYX::OpticalElement>> elements) {
@@ -22,7 +61,6 @@ std::list<double> runTracer(
         std::cout << "elements[0]: " << elements[0]->getSurfaceParams()[i]
                   << std::endl;
     }
-    RAYX::VulkanTracer tracer;
 
     std::list<std::vector<RAYX::Ray>> rayList;
     tracer.setBeamlineParameters(1, elements.size(), testValues.size());
@@ -60,7 +98,8 @@ std::list<double> runTracer(
     }
     std::cout << "got " << outputRays.size() << " values from shader"
               << std::endl;
-    tracer.cleanup();
+    // empties buffers etc to reuse the tracer instance
+    tracer.cleanTracer();
     return outputRays;
 }
 
@@ -115,6 +154,8 @@ void writeToFile(std::list<double> outputRays, std::string name) {
 /**
  * encodes test values (max. 16 values) in a Ray because that is how they can be
 put to the shader
+ * you need to make sure that the corresponding test on shader side reads the
+values correctly!
  * @param testValues        vector of rays in which the test settings are stored
  * @param pos               holds 3 doubles
  * @param dir               holds 3 doubles
@@ -140,10 +181,10 @@ std::vector<RAYX::Ray> addTestSetting(
 }
 
 /**
- * use this to start the Unit test with the id "unittestid" (settings on shader)
- * with the given testValues. The function return the resulting values.
- * test values are always encoded in rays since this is the only way to get
- * values to the shader
+ * use this to run the Unit test with the id "unittestid" ("settings" on shader)
+ * with the given testValues. The function return the resulting values. test
+ * values are always encoded in rays since this is the only way to get values to
+ * the shader
  * @param unittestid            defines which unit test should be executed on
  * shader. if = 0, then the normal tracing is done
  * @param testValues            vector of rays that contains the input values
@@ -167,6 +208,33 @@ std::list<double> runUnitTest(double unittestid,
     return outputRays;
 }
 
+/**
+ * runs given beamline on shader with deterministic matrix source (no randomness
+ * in rays) writes resulting rays to a csv file with the name "testFile_"+name
+ * of first element in beamline
+ * @param elements      vector of optical elements that form the beamline to
+ * test
+ * @param n             number of rays that should be used
+ *
+ */
+void testOpticalElement(
+    std::vector<std::shared_ptr<RAYX::OpticalElement>> elements, int n) {
+    RAYX::SimulationEnv::get().m_numOfRays = n;
+    RAYX::EnergyDistribution dist(RAYX::EnergyRange(100, 0), true);
+    std::shared_ptr<RAYX::MatrixSource> m =
+        std::make_shared<RAYX::MatrixSource>("Matrix source 1", dist, 0.065,
+                                             0.04, 0.0, 0.001, 0.001, 1, 0, 0,
+                                             std::vector<double>{0, 0, 0, 0});
+    // run tracer with rays from source and elements from vector
+    std::list<double> outputRays = runTracer(m->getRays(), elements);
+    // write to file "testFile_"+name of first element in beamlin
+    std::string filename = "testFile_";
+    std::cout << elements[0]->getName();
+    filename.append(elements[0]->getName());
+    writeToFile(outputRays, filename);
+}
+
+// used to compare correct values and results in unit tests that use the shader
 void compareFromCorrect(std::vector<RAYX::Ray> correct,
                         std::list<double> outputRays, double tolerance) {
     int counter = 0;
@@ -308,51 +376,9 @@ void compareFromFunction(fn<ret, par> func, std::vector<RAYX::Ray> testValues,
     }
 }
 
-/**
- * runs given beamline on shader with deterministic matrix source (no randomness
- * in rays) writes resulting rays to a csv file with the name "testFile_"+name
- * of first element in beamline
- * @param elements      vector of optical elements that form the beamline to
- * test
- * @param n             number of rays that should be used
- *
- */
-void testOpticalElement(
-    std::vector<std::shared_ptr<RAYX::OpticalElement>> elements, int n) {
-    RAYX::SimulationEnv::get().m_numOfRays = n;
-    RAYX::EnergyDistribution dist(RAYX::EnergyRange(100, 0), true);
-    std::shared_ptr<RAYX::MatrixSource> m =
-        std::make_shared<RAYX::MatrixSource>("Matrix source 1", dist, 0.065,
-                                             0.04, 0.0, 0.001, 0.001, 1, 0, 0,
-                                             std::vector<double>{0, 0, 0, 0});
-    // run tracer with rays from source and elements from vector
-    std::list<double> outputRays = runTracer(m->getRays(), elements);
-    // write to file "testFile_"+name of first element in beamlin
-    std::string filename = "testFile_";
-    std::cout << elements[0]->getName();
-    filename.append(elements[0]->getName());
-    writeToFile(outputRays, filename);
-}
-
 // UNIT TESTS
 
-/** using this function is preferable to directly adding your test with `#ifdef
- * VULKAN_TEST`, because with `if (!shouldDoVulkanTests()) { GTEST_SKIP(); }`
- * your test will still be *compiled* even if VULKAN_TEST is diabled
- */
-bool shouldDoVulkanTests() {
-#ifdef VULKAN_TEST
-    return true;
-#else
-    return false;
-#endif
-}
-
-TEST(Tracer, testUniformRandom) {
-    if (!shouldDoVulkanTests()) {
-        GTEST_SKIP();
-    }
-
+TEST_F(Tracer, testUniformRandom) {
     double settings = 17;
 
     RAYX::SimulationEnv::get().m_numOfRays = 2000;
@@ -380,12 +406,7 @@ TEST(Tracer, testUniformRandom) {
     writeToFile(outputRays, filename);
 }
 
-TEST(Tracer, ExpTest) {
-    if (!shouldDoVulkanTests()) {
-        GTEST_SKIP();
-    }
-
-    std::list<std::vector<RAYX::Ray>> rayList;
+TEST_F(Tracer, ExpTest) {
     int n = 10;
     int low = -4;
     int high = 4;
@@ -405,11 +426,7 @@ TEST(Tracer, ExpTest) {
     compareFromFunction(expfun, testValues, outputRays, tolerance);
 }
 
-TEST(Tracer, LogTest) {
-    if (!shouldDoVulkanTests()) {
-        GTEST_SKIP();
-    }
-
+TEST_F(Tracer, LogTest) {
     std::list<std::vector<RAYX::Ray>> rayList;
     int n = 10;
     int low = 1;
@@ -430,11 +447,7 @@ TEST(Tracer, LogTest) {
     compareFromFunction(logfun, testValues, outputRays, tolerance);
 }
 
-TEST(Tracer, testRefrac2D) {
-    if (!shouldDoVulkanTests()) {
-        GTEST_SKIP();
-    }
-
+TEST_F(Tracer, testRefrac2D) {
     std::vector<RAYX::Ray> testValues;
     std::vector<RAYX::Ray> correct;
     std::vector<std::shared_ptr<RAYX::OpticalElement>> quadrics;
@@ -506,11 +519,7 @@ TEST(Tracer, testRefrac2D) {
     compareFromCorrect(correct, outputRays, tolerance);
 }
 
-TEST(Tracer, testNormalCartesian) {
-    if (!shouldDoVulkanTests()) {
-        GTEST_SKIP();
-    }
-
+TEST_F(Tracer, testNormalCartesian) {
     std::vector<RAYX::Ray> testValues;
     std::vector<RAYX::Ray> correct;
 
@@ -564,11 +573,7 @@ TEST(Tracer, testNormalCartesian) {
     compareFromCorrect(correct, outputRays, tolerance);
 }
 
-TEST(Tracer, testNormalCylindrical) {
-    if (!shouldDoVulkanTests()) {
-        GTEST_SKIP();
-    }
-
+TEST_F(Tracer, testNormalCylindrical) {
     std::vector<RAYX::Ray> testValues;
     std::vector<RAYX::Ray> correct;
 
@@ -621,11 +626,7 @@ TEST(Tracer, testNormalCylindrical) {
     compareFromCorrect(correct, outputRays, tolerance);
 }
 
-TEST(Tracer, testRefrac) {
-    if (!shouldDoVulkanTests()) {
-        GTEST_SKIP();
-    }
-
+TEST_F(Tracer, testRefrac) {
     std::vector<RAYX::Ray> testValues;
     std::vector<RAYX::Ray> correct;
 
@@ -695,11 +696,7 @@ TEST(Tracer, testRefrac) {
     compareFromCorrect(correct, outputRays, tolerance);
 }
 
-TEST(Tracer, testWasteBox) {
-    if (!shouldDoVulkanTests()) {
-        GTEST_SKIP();
-    }
-
+TEST_F(Tracer, testWasteBox) {
     std::vector<RAYX::Ray> testValues;
     std::vector<RAYX::Ray> correct;
 
@@ -759,11 +756,7 @@ TEST(Tracer, testWasteBox) {
     compareFromCorrect(correct, outputRays, tolerance);
 }
 
-TEST(Tracer, testRZPLineDensityDefaulParams) {  // point to point
-    if (!shouldDoVulkanTests()) {
-        GTEST_SKIP();
-    }
-
+TEST_F(Tracer, testRZPLineDensityDefaulParams) {  // point to point
     std::vector<RAYX::Ray> testValues;
     std::vector<RAYX::Ray> correct;
     // {1st column, 2nd column, 3rd column, 4th column}
@@ -839,12 +832,7 @@ TEST(Tracer, testRZPLineDensityDefaulParams) {  // point to point
     compareFromCorrect(correct, outputRays, tolerance);
 }
 
-TEST(Tracer, testRZPLineDensityAstigmatic) {  // astigmatic 2 astigmatic
-    if (!shouldDoVulkanTests()) {
-        GTEST_SKIP();
-    }
-
-    RAYX::VulkanTracer tracer;
+TEST_F(Tracer, testRZPLineDensityAstigmatic) {  // astigmatic 2 astigmatic
     std::vector<RAYX::Ray> testValues;
     std::vector<RAYX::Ray> correct;
     // {1st column, 2nd column, 3rd column, 4th column} ->
@@ -922,11 +910,7 @@ TEST(Tracer, testRZPLineDensityAstigmatic) {  // astigmatic 2 astigmatic
     compareFromCorrect(correct, outputRays, tolerance);
 }
 
-TEST(Tracer, testRayMatrixMult) {
-    if (!shouldDoVulkanTests()) {
-        GTEST_SKIP();
-    }
-
+TEST_F(Tracer, testRayMatrixMult) {
     std::vector<RAYX::Ray> testValues;
     std::vector<RAYX::Ray> correct;
     // {1st column, 2nd column, 3rd column, 4th column}
@@ -977,11 +961,7 @@ TEST(Tracer, testRayMatrixMult) {
 
 // test pow(a,b) = a^b function. ray position[i] ^ ray direction[i] for i in
 // {0,1,2}
-TEST(Tracer, testDPow) {
-    if (!shouldDoVulkanTests()) {
-        GTEST_SKIP();
-    }
-
+TEST_F(Tracer, testDPow) {
     std::vector<RAYX::Ray> testValues;
     std::vector<RAYX::Ray> correct;
 
@@ -1027,11 +1007,7 @@ TEST(Tracer, testDPow) {
     double tolerance = 1e-12;
     compareFromCorrect(correct, outputRays, tolerance);
 }
-TEST(Tracer, testCosini) {
-    if (!shouldDoVulkanTests()) {
-        GTEST_SKIP();
-    }
-
+TEST_F(Tracer, testCosini) {
     std::vector<RAYX::Ray> testValues;
     std::vector<RAYX::Ray> correct;
     // phi, psi given in position.x, position.y
@@ -1077,11 +1053,7 @@ TEST(Tracer, testCosini) {
 }
 
 // test factorial f(a) = a!
-TEST(Tracer, factTest) {
-    if (!shouldDoVulkanTests()) {
-        GTEST_SKIP();
-    }
-
+TEST_F(Tracer, factTest) {
     std::vector<RAYX::Ray> testValues;
     std::vector<RAYX::Ray> correct;
     testValues =
@@ -1099,11 +1071,7 @@ TEST(Tracer, factTest) {
     compareFromCorrect(correct, outputRays, tolerance);
 }
 
-TEST(Tracer, bessel1Test) {
-    if (!shouldDoVulkanTests()) {
-        GTEST_SKIP();
-    }
-
+TEST_F(Tracer, bessel1Test) {
     std::vector<RAYX::Ray> testValues;
     std::vector<RAYX::Ray> correct;
     // some test values for besser function
@@ -1130,11 +1098,7 @@ TEST(Tracer, bessel1Test) {
     compareFromCorrect(correct, outputRays, tolerance);
 }
 
-TEST(Tracer, diffractionTest) {
-    if (!shouldDoVulkanTests()) {
-        GTEST_SKIP();
-    }
-
+TEST_F(Tracer, diffractionTest) {
     std::vector<RAYX::Ray> testValues;
     // pos = (iopt,  xlenght, ylength) weight = wavelength
     // r = RAYX::Ray(glm::dvec3(1, 50,100), glm::dvec3(0.0,0.0,0.0), 0.1);
@@ -1174,11 +1138,7 @@ TEST(Tracer, diffractionTest) {
     }
 }
 
-TEST(Tracer, SinTest) {
-    if (!shouldDoVulkanTests()) {
-        GTEST_SKIP();
-    }
-
+TEST_F(Tracer, SinTest) {
     std::list<std::vector<RAYX::Ray>> rayList;
     int n = 10;
     int low = -1;
@@ -1199,7 +1159,7 @@ TEST(Tracer, SinTest) {
     compareFromFunction(sinfun, testValues, outputRays, tolerance);
 }
 
-TEST(Tracer, CosTest) {
+TEST_F(Tracer, CosTest) {
     if (!shouldDoVulkanTests()) {
         GTEST_SKIP();
     }
@@ -1223,11 +1183,7 @@ TEST(Tracer, CosTest) {
     compareFromFunction(fun, testValues, outputRays, tolerance);
 }
 
-TEST(Tracer, AtanTest) {
-    if (!shouldDoVulkanTests()) {
-        GTEST_SKIP();
-    }
-
+TEST_F(Tracer, AtanTest) {
     std::list<std::vector<RAYX::Ray>> rayList;
     int n = 10;
     int low = -1;
@@ -1249,11 +1205,7 @@ TEST(Tracer, AtanTest) {
 
 // test VLS function that calculates new a from given a, z-position and 6 vls
 // parameters
-TEST(Tracer, vlsGratingTest) {
-    if (!shouldDoVulkanTests()) {
-        GTEST_SKIP();
-    }
-
+TEST_F(Tracer, vlsGratingTest) {
     std::vector<RAYX::Ray> testValues;
     std::vector<RAYX::Ray> correct;
 
@@ -1295,11 +1247,7 @@ TEST(Tracer, vlsGratingTest) {
     compareFromCorrect(correct, outputRays, tolerance);
 }
 
-TEST(Tracer, planeRefracTest) {
-    if (!shouldDoVulkanTests()) {
-        GTEST_SKIP();
-    }
-
+TEST_F(Tracer, planeRefracTest) {
     std::vector<RAYX::Ray> testValues;
     std::vector<RAYX::Ray> correct;
     double settings = 3;
@@ -1389,11 +1337,7 @@ TEST(Tracer, planeRefracTest) {
     compareFromCorrect(correct, outputRays, tolerance);
 }
 
-TEST(Tracer, iteratToTest) {
-    if (!shouldDoVulkanTests()) {
-        GTEST_SKIP();
-    }
-
+TEST_F(Tracer, iteratToTest) {
     std::vector<RAYX::Ray> testValues;
     std::vector<RAYX::Ray> correct;
     double settings = 20;
@@ -1423,11 +1367,7 @@ TEST(Tracer, iteratToTest) {
     compareFromCorrect(correct, outputRays, tolerance);
 }
 
-TEST(Tracer, getThetaTest) {
-    if (!shouldDoVulkanTests()) {
-        GTEST_SKIP();
-    }
-
+TEST_F(Tracer, getThetaTest) {
     // put here what you want as input for the shader
     std::vector<RAYX::Ray> testValues;
     // put here what you expect to come back from the shader
@@ -1448,11 +1388,7 @@ TEST(Tracer, getThetaTest) {
     compareFromCorrect(correct, outputRays, tolerance);
 }
 
-TEST(Tracer, reflectanceTest) {
-    if (!shouldDoVulkanTests()) {
-        GTEST_SKIP();
-    }
-
+TEST_F(Tracer, reflectanceTest) {
     std::vector<RAYX::Ray> testValues;
     std::vector<RAYX::Ray> correct;
     double settings = 22;
@@ -1475,11 +1411,7 @@ TEST(Tracer, reflectanceTest) {
     compareFromCorrect(correct, outputRays, tolerance);
 }
 
-TEST(Tracer, snellTest) {
-    if (!shouldDoVulkanTests()) {
-        GTEST_SKIP();
-    }
-
+TEST_F(Tracer, snellTest) {
     std::vector<RAYX::Ray> testValues;
     std::vector<RAYX::Ray> correct;
     double settings = 23;
@@ -1534,11 +1466,7 @@ TEST(Tracer, snellTest) {
     compareFromCorrect(correct, outputRays, tolerance);
 }
 
-TEST(Tracer, fresnelTest) {
-    if (!shouldDoVulkanTests()) {
-        GTEST_SKIP();
-    }
-
+TEST_F(Tracer, fresnelTest) {
     std::vector<RAYX::Ray> testValues;
     std::vector<RAYX::Ray> correct;
     double settings = 24;
@@ -1574,11 +1502,7 @@ TEST(Tracer, fresnelTest) {
     compareFromCorrect(correct, outputRays, tolerance);
 }
 
-TEST(Tracer, amplitudeTest) {
-    if (!shouldDoVulkanTests()) {
-        GTEST_SKIP();
-    }
-
+TEST_F(Tracer, amplitudeTest) {
     std::vector<RAYX::Ray> testValues;
     std::vector<RAYX::Ray> correct;
     double settings = 25;
@@ -1604,11 +1528,7 @@ TEST(Tracer, amplitudeTest) {
     compareFromCorrect(correct, outputRays, tolerance);
 }
 
-TEST(Tracer, palikTest) {
-    if (!shouldDoVulkanTests()) {
-        GTEST_SKIP();
-    }
-
+TEST_F(Tracer, palikTest) {
     std::vector<RAYX::Ray> testValues;
     testValues.push_back(RAYX::Ray());
 
@@ -1643,12 +1563,9 @@ TEST(Tracer, palikTest) {
 // test complete optical elements instead of single functions
 // uses deterministic source (matrix source with source depth = 0)
 // use name of optical element as file name
+class opticalElements : public Tracer {};
 
-TEST(opticalElements, planeMirrorDefault) {
-    if (!shouldDoVulkanTests()) {
-        GTEST_SKIP();
-    }
-
+TEST_F(opticalElements, planeMirrorDefault) {
     RAYX::WorldUserParams pm_param =
         RAYX::WorldUserParams(degToRad(10), degToRad(10), degToRad(7.5), 10000,
                               std::vector<double>{0, 0, 0, 0, 0, 0});
@@ -1672,11 +1589,7 @@ TEST(opticalElements, planeMirrorDefault) {
     ASSERT_TRUE(true);
 }
 
-TEST(opticalElements, planeMirrorMis) {
-    if (!shouldDoVulkanTests()) {
-        GTEST_SKIP();
-    }
-
+TEST_F(opticalElements, planeMirrorMis) {
     RAYX::WorldUserParams pm_param = RAYX::WorldUserParams(
         degToRad(10), degToRad(10), 0, 10000,
         std::vector<double>{1, 2, 3, 0.001, 0.002, 0.003});
@@ -1700,11 +1613,7 @@ TEST(opticalElements, planeMirrorMis) {
     ASSERT_TRUE(true);
 }
 
-TEST(opticalElements, sphereMirror) {
-    if (!shouldDoVulkanTests()) {
-        GTEST_SKIP();
-    }
-
+TEST_F(opticalElements, sphereMirror) {
     double grazingIncidence = degToRad(10);
     RAYX::WorldUserParams sm_param =
         RAYX::WorldUserParams(grazingIncidence, grazingIncidence, 0, 10000,
@@ -1729,11 +1638,7 @@ TEST(opticalElements, sphereMirror) {
     ASSERT_TRUE(true);
 }
 
-TEST(opticalElements, planeGratingDevDefault) {
-    if (!shouldDoVulkanTests()) {
-        GTEST_SKIP();
-    }
-
+TEST_F(opticalElements, planeGratingDevDefault) {
     double incidenceAngle = 1.4773068838645145;
     double exitAngle = 1.4897528445258457;
     RAYX::WorldUserParams pg_param =
@@ -1762,11 +1667,7 @@ TEST(opticalElements, planeGratingDevDefault) {
     ASSERT_TRUE(true);
 }
 
-TEST(opticalElements, planeGratingDevAzimuthal) {
-    if (!shouldDoVulkanTests()) {
-        GTEST_SKIP();
-    }
-
+TEST_F(opticalElements, planeGratingDevAzimuthal) {
     double incidenceAngle = 1.4773068838645145;
     double exitAngle = 1.4897528445258457;
     RAYX::WorldUserParams pg_param =
@@ -1793,11 +1694,7 @@ TEST(opticalElements, planeGratingDevAzimuthal) {
     ASSERT_TRUE(true);
 }
 
-TEST(opticalElements, planeGratingDevAzMis) {
-    if (!shouldDoVulkanTests()) {
-        GTEST_SKIP();
-    }
-
+TEST_F(opticalElements, planeGratingDevAzMis) {
     double incidenceAngle = 1.4773068838645145;
     double exitAngle = 1.4897528445258457;
     RAYX::WorldUserParams pg_param = RAYX::WorldUserParams(
@@ -1826,11 +1723,7 @@ TEST(opticalElements, planeGratingDevAzMis) {
 }
 
 // constant incidence angle mode, azimuthal angle and misalignment
-TEST(opticalElements, planeGratingIncAzMis) {
-    if (!shouldDoVulkanTests()) {
-        GTEST_SKIP();
-    }
-
+TEST_F(opticalElements, planeGratingIncAzMis) {
     double incidenceAngle = 1.3962634015954636;
     double exitAngle = 1.4088395764879007;
     RAYX::WorldUserParams pg_param = RAYX::WorldUserParams(
@@ -1858,11 +1751,7 @@ TEST(opticalElements, planeGratingIncAzMis) {
     ASSERT_TRUE(true);
 }
 
-TEST(opticalElements, planeGratingDevMisVLS) {
-    if (!shouldDoVulkanTests()) {
-        GTEST_SKIP();
-    }
-
+TEST_F(opticalElements, planeGratingDevMisVLS) {
     double incidenceAngle = 1.4773068838645145;
     double exitAngle = 1.4897528445258457;
     RAYX::WorldUserParams pg_param = RAYX::WorldUserParams(
@@ -1890,11 +1779,7 @@ TEST(opticalElements, planeGratingDevMisVLS) {
 
 // RZPs
 
-TEST(opticalElements, RZPDefaultParams) {
-    if (!shouldDoVulkanTests()) {
-        GTEST_SKIP();
-    }
-
+TEST_F(opticalElements, RZPDefaultParams) {
     // alpha and beta calculated from user parameters
     RAYX::GeometricUserParams gu_rzp = RAYX::GeometricUserParams(
         1, 0, 170, 0, 0, 100, 100, -1, -1, 1, 1, 100, 500, 100, 500);
@@ -1927,11 +1812,7 @@ TEST(opticalElements, RZPDefaultParams) {
     ASSERT_TRUE(true);
 }
 
-TEST(opticalElements, RZPDefaultParams200) {
-    if (!shouldDoVulkanTests()) {
-        GTEST_SKIP();
-    }
-
+TEST_F(opticalElements, RZPDefaultParams200) {
     RAYX::GeometricUserParams gu_rzp = RAYX::GeometricUserParams(
         1, 0, 170, 0, 0, 100, 100, -1, -1, 1, 1, 100, 500, 100, 500);
     ASSERT_DOUBLE_EQ(gu_rzp.getAlpha(), 0.017453292519943295);
@@ -1963,11 +1844,7 @@ TEST(opticalElements, RZPDefaultParams200) {
     ASSERT_TRUE(true);
 }
 
-TEST(opticalElements, RZPDefaultParamsToroid200) {
-    if (!shouldDoVulkanTests()) {
-        GTEST_SKIP();
-    }
-
+TEST_F(opticalElements, RZPDefaultParamsToroid200) {
     // use given grazing incidence angle (10), mount = 1
     RAYX::GeometricUserParams gu_rzp = RAYX::GeometricUserParams(
         1, 0, 170, 10, 0, 100, 100, -1, -1, 1, 1, 100, 500, 100, 500);
@@ -2000,11 +1877,7 @@ TEST(opticalElements, RZPDefaultParamsToroid200) {
     ASSERT_TRUE(true);
 }
 
-TEST(opticalElements, RZPAzimuthal200) {
-    if (!shouldDoVulkanTests()) {
-        GTEST_SKIP();
-    }
-
+TEST_F(opticalElements, RZPAzimuthal200) {
     RAYX::GeometricUserParams gu_rzp = RAYX::GeometricUserParams(
         1, 0, 170, 0, 0, 100, 100, -1, -1, 1, 1, 100, 500, 100, 500);
     RAYX::WorldUserParams rzp_param =
@@ -2033,11 +1906,7 @@ TEST(opticalElements, RZPAzimuthal200) {
     ASSERT_TRUE(true);
 }
 
-TEST(opticalElements, RZPMis) {
-    if (!shouldDoVulkanTests()) {
-        GTEST_SKIP();
-    }
-
+TEST_F(opticalElements, RZPMis) {
     RAYX::GeometricUserParams gu_rzp = RAYX::GeometricUserParams(
         1, 0, 170, 0, 0, 100, 100, -1, -1, 1, 1, 100, 500, 100, 500);
     RAYX::WorldUserParams rzp_param = RAYX::WorldUserParams(
@@ -2068,10 +1937,7 @@ TEST(opticalElements, RZPMis) {
 
 // default ellipsoid with no image plane, no misalignment, data stored in beam
 // coordinates to make comparison with RAY-UI possible
-TEST(opticalElements, Ellipsoid_default) {
-    if (!shouldDoVulkanTests()) {
-        GTEST_SKIP();
-    }
+TEST_F(opticalElements, Ellipsoid_default) {
     RAYX::GeometricUserParams g_params =
         RAYX::GeometricUserParams(10, 10000, 1000);
     double alpha = 0.031253965260898464;
@@ -2098,10 +1964,7 @@ TEST(opticalElements, Ellipsoid_default) {
 
 // default ellipsoid with no image plane but with MIRROR misalignment (the more
 // complicated misalignment), data stored in beam coordinates
-TEST(opticalElements, Ellipsoid_mirrormisalignment) {
-    if (!shouldDoVulkanTests()) {
-        GTEST_SKIP();
-    }
+TEST_F(opticalElements, Ellipsoid_mirrormisalignment) {
     RAYX::GeometricUserParams g_params =
         RAYX::GeometricUserParams(10, 10000, 1000);
     double alpha = 0.031253965260898464;
@@ -2132,11 +1995,7 @@ TEST(opticalElements, Ellipsoid_mirrormisalignment) {
 
 // default ellipsoid with no misalignment but with image plane, data stored in
 // image-plane-coordinate system (footprint?)
-TEST(opticalElements, EllipsoidImagePlane) {
-    if (!shouldDoVulkanTests()) {
-        GTEST_SKIP();
-    }
-
+TEST_F(opticalElements, EllipsoidImagePlane) {
     RAYX::GeometricUserParams g_params =
         RAYX::GeometricUserParams(10, 10000, 1000);
     double alpha = 0.031253965260898464;
@@ -2170,11 +2029,7 @@ TEST(opticalElements, EllipsoidImagePlane) {
 
 // default ellipsoid with ELLIPSOID misalignment and with image plane, data
 // stored in image-plane-coordinate system
-TEST(opticalElements, EllipsoidImagePlane_ellipsmisalignment) {
-    if (!shouldDoVulkanTests()) {
-        GTEST_SKIP();
-    }
-
+TEST_F(opticalElements, EllipsoidImagePlane_ellipsmisalignment) {
     RAYX::GeometricUserParams g_params =
         RAYX::GeometricUserParams(10, 10000, 1000);
     double alpha = 0.031253965260898464;
@@ -2209,11 +2064,7 @@ TEST(opticalElements, EllipsoidImagePlane_ellipsmisalignment) {
 
 // default ellipsoid with MIRROR misalignment and with image plane, data stored
 // in image-plane-coordinate system
-TEST(opticalElements, EllipsoidImagePlane_mirrormisalignment) {
-    if (!shouldDoVulkanTests()) {
-        GTEST_SKIP();
-    }
-
+TEST_F(opticalElements, EllipsoidImagePlane_mirrormisalignment) {
     RAYX::GeometricUserParams g_params =
         RAYX::GeometricUserParams(10, 10000, 1000);
     double alpha = 0.031253965260898464;
@@ -2249,11 +2100,7 @@ TEST(opticalElements, EllipsoidImagePlane_mirrormisalignment) {
 
 // plame mirror with misalignment, default ellipsoid with MIRROR misalignment
 // and image plane, data stored in image-plane-coordinate system
-TEST(opticalElements, PlaneMirrorEllipsoidImagePlane_mirrormisalignment) {
-    if (!shouldDoVulkanTests()) {
-        GTEST_SKIP();
-    }
-
+TEST_F(opticalElements, PlaneMirrorEllipsoidImagePlane_mirrormisalignment) {
     RAYX::GeometricUserParams pm_params = RAYX::GeometricUserParams(7);
     RAYX::WorldUserParams w_coord = RAYX::WorldUserParams(
         pm_params.getAlpha(), pm_params.getBeta(), 0, 10000,
@@ -2296,11 +2143,7 @@ TEST(opticalElements, PlaneMirrorEllipsoidImagePlane_mirrormisalignment) {
     testOpticalElement({pm, eb, i}, 200);
 }
 
-TEST(opticalElements, ImagePlane) {
-    if (!shouldDoVulkanTests()) {
-        GTEST_SKIP();
-    }
-
+TEST_F(opticalElements, ImagePlane) {
     RAYX::GeometricUserParams g_params = RAYX::GeometricUserParams(10);
     ASSERT_DOUBLE_EQ(g_params.getAlpha(), degToRad(10));
     ASSERT_DOUBLE_EQ(g_params.getBeta(), degToRad(10));
@@ -2327,11 +2170,7 @@ TEST(opticalElements, ImagePlane) {
     ASSERT_TRUE(true);
 }
 
-TEST(dynamicTracing, FourMirrors_9Rays) {
-    if (!shouldDoVulkanTests()) {
-        GTEST_SKIP();
-    }
-
+TEST_F(opticalElements, FourMirrors_9Rays) {
     RAYX::GeometricUserParams g_params = RAYX::GeometricUserParams(10);
     RAYX::WorldUserParams w_coord =
         RAYX::WorldUserParams(degToRad(10), degToRad(10), degToRad(7), 10,
@@ -2388,11 +2227,7 @@ TEST(dynamicTracing, FourMirrors_9Rays) {
     ASSERT_TRUE(true);
 }
 
-TEST(dynamicTracing, FourMirrors_20Rays) {
-    if (!shouldDoVulkanTests()) {
-        GTEST_SKIP();
-    }
-
+TEST_F(opticalElements, FourMirrors_20Rays) {
     RAYX::GeometricUserParams g_params = RAYX::GeometricUserParams(10);
     RAYX::WorldUserParams w_coord =
         RAYX::WorldUserParams(degToRad(10), degToRad(10), degToRad(7), 10,
@@ -2449,11 +2284,7 @@ TEST(dynamicTracing, FourMirrors_20Rays) {
     ASSERT_TRUE(true);
 }
 
-TEST(opticalElements, slit1) {
-    if (!shouldDoVulkanTests()) {
-        GTEST_SKIP();
-    }
-
+TEST_F(opticalElements, slit1) {
     RAYX::SimulationEnv::get().m_numOfRays = 200;
     RAYX::EnergyDistribution dist(RAYX::EnergyRange(100, 0), true);
     std::shared_ptr<RAYX::MatrixSource> m =
@@ -2506,11 +2337,7 @@ TEST(opticalElements, slit1) {
     }
 }
 
-TEST(opticalElements, slit2) {
-    if (!shouldDoVulkanTests()) {
-        GTEST_SKIP();
-    }
-
+TEST_F(opticalElements, slit2) {
     RAYX::WorldUserParams s_param = RAYX::WorldUserParams(
         0, 0, 0, 10000, std::vector<double>{0, 0, 0, 0, 0, 0});
     glm::dvec4 s_position = s_param.calcPosition();
@@ -2531,11 +2358,7 @@ TEST(opticalElements, slit2) {
     testOpticalElement({s, ip}, 20000);
 }
 
-TEST(opticalElements, toroid) {
-    if (!shouldDoVulkanTests()) {
-        GTEST_SKIP();
-    }
-
+TEST_F(opticalElements, toroid) {
     RAYX::WorldUserParams t_param =
         RAYX::WorldUserParams(degToRad(10), degToRad(10), 0, 10000,
                               std::vector<double>{0, 0, 0, 0, 0, 0});
@@ -2561,11 +2384,7 @@ TEST(opticalElements, toroid) {
 
 // PETES SETUP
 // spec1-first_rzp4mm
-TEST(PeteRZP, spec1_first_rzp) {
-    if (!shouldDoVulkanTests()) {
-        GTEST_SKIP();
-    }
-
+TEST_F(opticalElements, spec1_first_rzp) {
     RAYX::SimulationEnv::get().m_numOfRays = 20000;
     RAYX::EnergyDistribution dist(RAYX::EnergyRange(640, 120), false);
     std::shared_ptr<RAYX::PointSource> p = std::make_shared<RAYX::PointSource>(
@@ -2598,11 +2417,7 @@ TEST(PeteRZP, spec1_first_rzp) {
     writeToFile(outputRays, filename);
 }
 
-TEST(PeteRZP, spec1_first_ip) {
-    if (!shouldDoVulkanTests()) {
-        GTEST_SKIP();
-    }
-
+TEST_F(opticalElements, spec1_first_ip) {
     RAYX::SimulationEnv::get().m_numOfRays = 20000;
     RAYX::EnergyDistribution dist(RAYX::EnergyRange(640, 120), false);
     std::shared_ptr<RAYX::PointSource> p = std::make_shared<RAYX::PointSource>(
@@ -2643,11 +2458,7 @@ TEST(PeteRZP, spec1_first_ip) {
     writeToFile(outputRays, filename);
 }
 
-TEST(PeteRZP, spec1_first_plus_rzp) {
-    if (!shouldDoVulkanTests()) {
-        GTEST_SKIP();
-    }
-
+TEST_F(opticalElements, spec1_first_plus_rzp) {
     RAYX::SimulationEnv::get().m_numOfRays = 20000;
     RAYX::EnergyDistribution dist(RAYX::EnergyRange(640, 120), false);
     std::shared_ptr<RAYX::PointSource> p = std::make_shared<RAYX::PointSource>(
@@ -2681,11 +2492,7 @@ TEST(PeteRZP, spec1_first_plus_rzp) {
     writeToFile(outputRays, filename);
 }
 
-TEST(PeteRZP, spec1_first_plus_ip) {
-    if (!shouldDoVulkanTests()) {
-        GTEST_SKIP();
-    }
-
+TEST_F(opticalElements, spec1_first_plus_ip) {
     RAYX::SimulationEnv::get().m_numOfRays = 20000;
     RAYX::EnergyDistribution dist(RAYX::EnergyRange(640, 120), false);
     std::shared_ptr<RAYX::PointSource> p = std::make_shared<RAYX::PointSource>(
@@ -2726,11 +2533,7 @@ TEST(PeteRZP, spec1_first_plus_ip) {
     writeToFile(outputRays, filename);
 }
 
-TEST(PeteRZP, spec1_first_minus_rzp2) {
-    if (!shouldDoVulkanTests()) {
-        GTEST_SKIP();
-    }
-
+TEST_F(opticalElements, spec1_first_minus_rzp2) {
     RAYX::SimulationEnv::get().m_numOfRays = 20000;
     RAYX::EnergyDistribution dist(RAYX::EnergyRange(640, 120), false);
     std::shared_ptr<RAYX::PointSource> p = std::make_shared<RAYX::PointSource>(
@@ -2764,11 +2567,7 @@ TEST(PeteRZP, spec1_first_minus_rzp2) {
     writeToFile(outputRays, filename);
 }
 
-TEST(PeteRZP, spec1_first_minus_ip2) {
-    if (!shouldDoVulkanTests()) {
-        GTEST_SKIP();
-    }
-
+TEST_F(opticalElements, spec1_first_minus_ip2) {
     RAYX::SimulationEnv::get().m_numOfRays = 20000;
     RAYX::EnergyDistribution dist(RAYX::EnergyRange(640, 120), false);
     std::shared_ptr<RAYX::PointSource> p = std::make_shared<RAYX::PointSource>(
@@ -2809,11 +2608,7 @@ TEST(PeteRZP, spec1_first_minus_ip2) {
     writeToFile(outputRays, filename);
 }
 
-TEST(opticalElements, CylinderDefault) {
-    if (!shouldDoVulkanTests()) {
-        GTEST_SKIP();
-    }
-
+TEST_F(opticalElements, CylinderDefault) {
     RAYX::GeometricUserParams cy_params =
         RAYX::GeometricUserParams(10, 10000, 1000);
 

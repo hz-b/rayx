@@ -3,8 +3,8 @@
 #include <chrono>
 #include <cmath>
 
-#include "Debug/Instrumentor.h"
 #include "Debug.h"
+#include "Debug/Instrumentor.h"
 #include "Material.h"
 
 #ifdef RAYX_PLATFORM_WINDOWS
@@ -45,6 +45,9 @@ VulkanTracer::VulkanTracer() {
     bufferSizes.resize(7);
     buffers.resize(7);
     bufferMemories.resize(7);
+    RAYX_LOG << "initialize tracer";
+    // Vulkan is initialized
+    initVulkan();
     // beamline.resize(0);
 }
 
@@ -112,14 +115,14 @@ void VulkanTracer::run() {
     bufferSizes[6] = getMaterialTable()->size() * sizeof(double);
     for (uint32_t i = 0; i < bufferSizes.size(); i++) {
         RAYX_LOG << "Buffer [" << i << "] of size : " << bufferSizes[i]
-                  << " Bytes";
+                 << " Bytes";
     }
 
-    // Vulkan is initialized
-    initVulkan();
-
+    // initVulkan();
     RAYX_LOG << "Vulkan initilized. Run-time: "
-              << float(clock() - begin_time) / CLOCKS_PER_SEC * 1000 << " ms";
+             << float(clock() - begin_time) / CLOCKS_PER_SEC * 1000 << " ms";
+    prepareBuffers();
+
     const clock_t begin_time_getRays = clock();
 
     mainLoop();
@@ -127,8 +130,8 @@ void VulkanTracer::run() {
     getRays();
 
     RAYX_LOG << "Got Rays. Run-time: "
-              << float(clock() - begin_time_getRays) / CLOCKS_PER_SEC * 1000
-              << " ms";
+             << float(clock() - begin_time_getRays) / CLOCKS_PER_SEC * 1000
+             << " ms";
 }
 
 // function for initializing vulkan
@@ -149,18 +152,36 @@ void VulkanTracer::initVulkan() {
     // create command pool which will be used to submit the staging buffer
     createCommandPool();
 
+    // creates the descriptors used to bind the buffer to shader access points
+    // (bindings)
+    createDescriptorSetLayout();
+
+    /*prepareBuffers();
+    // needs buffer sizes:
+    createDescriptorSet();
+    RAYX_LOG << "descriptor set created";
+
+    // a compute pipeline needs to be created
+    // the descriptors created earlier will be submitted here
+    createComputePipeline();
+    RAYX_LOG << "compute pipeline created";
+
+    createCommandBuffer();
+    RAYX_LOG << "command buffer created";*/
+    // creates the descriptors used to bind the buffer to shader access points
+    // (bindings)
+}
+
+void VulkanTracer::prepareBuffers() {
     // creates buffers to transfer data to and from the shader
     createBuffers();
     const clock_t begin_time_fillBuffer = clock();
     fillRayBuffer();
     RAYX_LOG << "RayBuffer filled, run time: "
-              << float(clock() - begin_time_fillBuffer) / CLOCKS_PER_SEC * 1000
-              << " ms";
+             << float(clock() - begin_time_fillBuffer) / CLOCKS_PER_SEC * 1000
+             << " ms";
     fillQuadricBuffer();
     fillMaterialBuffer();
-    // creates the descriptors used to bind the buffer to shader access points
-    // (bindings)
-    createDescriptorSetLayout();
 
     createDescriptorSet();
 
@@ -175,22 +196,16 @@ void VulkanTracer::mainLoop() {
     const clock_t begin_time = clock();
     runCommandBuffer();
     RAYX_LOG << "CommandBuffer, run time: "
-              << float(clock() - begin_time) / CLOCKS_PER_SEC * 1000 << " ms";
+             << float(clock() - begin_time) / CLOCKS_PER_SEC * 1000 << " ms";
 }
 
+/** Cleans and deletes the whole tracer instance. Do this only if you do not
+ * want to reuse the instance anymore
+ * CALL CLEANTRACER FIRST BEFORE CALLING THIS ONE
+ */
 void VulkanTracer::cleanup() {
     RAYX_PROFILE_FUNCTION();
-
-    vkFreeCommandBuffers(device, commandPool, 1, &commandBuffer);
-    vkDestroyPipeline(device, pipeline, nullptr);
-    vkDestroyPipelineLayout(device, pipelineLayout, nullptr);
-    vkDestroyDescriptorPool(device, descriptorPool, nullptr);
     vkDestroyDescriptorSetLayout(device, descriptorSetLayout, nullptr);
-    for (uint32_t i = 0; i < buffers.size(); i++) {
-        vkDestroyBuffer(device, buffers[i], nullptr);
-        vkFreeMemory(device, bufferMemories[i], nullptr);
-    }
-    vkDestroyShaderModule(device, computeShaderModule, nullptr);
     vkDestroyCommandPool(device, commandPool, nullptr);
     {
         RAYX_PROFILE_SCOPE("vkDestroyDevice");
@@ -203,6 +218,26 @@ void VulkanTracer::cleanup() {
         RAYX_PROFILE_SCOPE("vkDestroyInstance");
         vkDestroyInstance(instance, nullptr);
     }
+}
+
+/**
+ * Use this function if you want to reuse the tracer instance with a new
+ * beamline and new rays etc but do not want to initialize everything again
+ */
+void VulkanTracer::cleanTracer() {
+    rayList.clean();
+    beamline.clear();
+    m_outputData.clean();
+    vkFreeCommandBuffers(device, commandPool, 1, &commandBuffer);
+    vkDestroyPipeline(device, pipeline, nullptr);
+    vkDestroyPipelineLayout(device, pipelineLayout, nullptr);
+    vkDestroyDescriptorPool(device, descriptorPool, nullptr);
+
+    for (uint32_t i = 0; i < buffers.size(); i++) {
+        vkDestroyBuffer(device, buffers[i], nullptr);
+        vkFreeMemory(device, bufferMemories[i], nullptr);
+    }
+    vkDestroyShaderModule(device, computeShaderModule, nullptr);
 }
 
 void VulkanTracer::createInstance() {
@@ -400,7 +435,8 @@ int VulkanTracer::rateDevice(VkPhysicalDevice device) {
 
     int score = 1;
     // discrete GPUs are usually faster and get a bonus
-    // can be extended to choose the best discrete gpu if multiple are available
+    // can be extended to choose the best discrete gpu if multiple are
+    // available
     if (deviceProperties.deviceType == VK_PHYSICAL_DEVICE_TYPE_DISCRETE_GPU)
         score += 100000;
     score += deviceProperties.limits.maxComputeSharedMemorySize;
@@ -570,7 +606,6 @@ void VulkanTracer::createBuffer(VkDeviceSize size, VkBufferUsageFlags usage,
     // Now associate that allocated memory with the buffer. With that, the
     // buffer is backed by actual memory.
     VK_CHECK_RESULT(vkBindBufferMemory(device, buffer, bufferMemory, 0));
-
 }
 
 void VulkanTracer::fillRayBuffer() {
@@ -581,7 +616,7 @@ void VulkanTracer::fillRayBuffer() {
         std::ceil((double)bytesNeeded /
                   (double)bufferSizes[3]);  // bufferSizes[3] = 128MB
     RAYX_LOG << "Number of staging Buffers: " << numberOfStagingBuffers
-              << ", (Bytes needed): " << bytesNeeded << " Bytes";
+             << ", (Bytes needed): " << bytesNeeded << " Bytes";
     std::list<std::vector<Ray>>::iterator raySetIterator;
     RAYX_LOG << "Debug Info: rayList.size()= " << rayList.size();
     RAYX_LOG << "Staging...";
@@ -654,7 +689,7 @@ void VulkanTracer::copyToRayBuffer(uint32_t offset,
     copyRegion.dstOffset = offset;
     copyRegion.size = numberOfBytesToCopy;
     RAYX_LOG << "Copying [Staging→RayBuffer]: offset: " << offset
-              << " size: " << numberOfBytesToCopy << " Bytes";
+             << " size: " << numberOfBytesToCopy << " Bytes";
     vkCmdCopyBuffer(commandBuffer, buffers[3], buffers[0], 1, &copyRegion);
 
     vkEndCommandBuffer(commandBuffer);
@@ -689,8 +724,8 @@ void VulkanTracer::copyToOutputBuffer(uint32_t offset,
     vkBeginCommandBuffer(commandBuffer, &beginInfo);
 
     VkBufferCopy copyRegion{};
-    RAYX_LOG << "Copying [OutputBuffer→StagingBuffer]: offset: "
-              << offset << " size: " << numberOfBytesToCopy;
+    RAYX_LOG << "Copying [OutputBuffer→StagingBuffer]: offset: " << offset
+             << " size: " << numberOfBytesToCopy;
     copyRegion.srcOffset = offset;
     copyRegion.size = numberOfBytesToCopy;
     vkCmdCopyBuffer(commandBuffer, buffers[1], buffers[3], 1, &copyRegion);
@@ -719,7 +754,7 @@ void VulkanTracer::getRays() {
     uint32_t numberOfStagingBuffers =
         std::ceil((double)bytesNeeded / (double)bufferSizes[3]);
     RAYX_LOG << "getRays: Number of staging Buffers: "
-              << numberOfStagingBuffers;
+             << numberOfStagingBuffers;
 
     // TODO: ONLY FIRST STAGING BUFFER IS TRANSFERED
     // numberOfStagingBuffers = 1;
@@ -737,10 +772,10 @@ void VulkanTracer::getRays() {
         data.resize(GPU_MAX_STAGING_SIZE / (RAY_DOUBLE_COUNT * sizeof(double)));
         RAYX_LOG << "getRays: data.size(): " << data.size();
         RAYX_LOG << "getRays: m_outputData.size() before insert: "
-                  << m_outputData.size();
+                 << m_outputData.size();
         m_outputData.insertVector(std::move(data));
         RAYX_LOG << "getRays: m_outputData.size() after insert: "
-                  << m_outputData.size();
+                 << m_outputData.size();
         vkUnmapMemory(device, bufferMemories[3]);
         bytesNeeded = bytesNeeded - GPU_MAX_STAGING_SIZE;
     }
@@ -758,7 +793,7 @@ void VulkanTracer::getRays() {
                           (RAY_DOUBLE_COUNT * sizeof(double)));
 
     RAYX_LOG << "data size: " << data.size()
-              << " bytes needed: " << bytesNeeded;
+             << " bytes needed: " << bytesNeeded;
     memcpy(data.data(), mappedMemory,
            ((bytesNeeded - 1) % GPU_MAX_STAGING_SIZE) + 1);
     data.resize(((((bytesNeeded - 1) % GPU_MAX_STAGING_SIZE) + 1) /
@@ -768,9 +803,9 @@ void VulkanTracer::getRays() {
     vkUnmapMemory(device, bufferMemories[3]);
     RAYX_LOG << "Output Data size: " << m_outputData.size();
     RAYX_LOG << "Output Data size: "
-              << (*(m_outputData.begin())).size() * RAY_DOUBLE_COUNT *
-                     sizeof(double)
-              << " Bytes";
+             << (*(m_outputData.begin())).size() * RAY_DOUBLE_COUNT *
+                    sizeof(double)
+             << " Bytes";
     RAYX_LOG << "Done fetching [StagingBufer→OutputData].";
 }
 
@@ -816,10 +851,10 @@ void VulkanTracer::createDescriptorSetLayout() {
     */
 
     /*
-    Here we specify a binding of type VK_DESCRIPTOR_TYPE_STORAGE_BUFFER to the
-    binding point 0. This binds to layout(std140, binding = 0) buffer ibuf
-    (input) and layout(std140, binding = 1) buffer obuf (output) in the compute
-    shader.
+    Here we specify a binding of type VK_DESCRIPTOR_TYPE_STORAGE_BUFFER to
+    the binding point 0. This binds to layout(std140, binding = 0) buffer
+    ibuf (input) and layout(std140, binding = 1) buffer obuf (output) in the
+    compute shader.
     */
     // bindings 0, 1 and 2 are used right now
     VkDescriptorSetLayoutBinding descriptorSetLayoutBinding[] = {
@@ -968,7 +1003,8 @@ void VulkanTracer::createComputePipeline() {
     /*
     Now let us actually create the compute pipeline.
     It only consists of a single stage with a compute shader.
-    So first we specify the compute shader stage, and it's entry point(main).
+    So first we specify the compute shader stage, and it's entry
+    point(main).
     */
     VkPipelineShaderStageCreateInfo shaderStageCreateInfo = {};
     shaderStageCreateInfo.sType =
@@ -1006,14 +1042,15 @@ void VulkanTracer::createCommandPool() {
     /*
     In order to send commands to the device(GPU),
     we must first record commands into a command buffer.
-    To allocate a command buffer, we must first create a command pool. So let us
-    do that.
+    To allocate a command buffer, we must first create a command pool. So
+    let us do that.
     */
     VkCommandPoolCreateInfo commandPoolCreateInfo = {};
     commandPoolCreateInfo.sType = VK_STRUCTURE_TYPE_COMMAND_POOL_CREATE_INFO;
     commandPoolCreateInfo.flags = 0;
-    // the queue family of this command pool. All command buffers allocated from
-    // this command pool, must be submitted to queues of this family ONLY.
+    // the queue family of this command pool. All command buffers allocated
+    // from this command pool, must be submitted to queues of this family
+    // ONLY.
     commandPoolCreateInfo.queueFamilyIndex = QueueFamily.computeFamily;
     VK_CHECK_RESULT(vkCreateCommandPool(device, &commandPoolCreateInfo, NULL,
                                         &commandPool));
@@ -1030,10 +1067,10 @@ void VulkanTracer::createCommandBuffer() {
         VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
     commandBufferAllocateInfo.commandPool =
         commandPool;  // specify the command pool to allocate from.
-    // if the command buffer is primary, it can be directly submitted to queues.
-    // A secondary buffer has to be called from some primary command buffer, and
-    // cannot be directly submitted to a queue. To keep things simple, we use a
-    // primary command buffer.
+    // if the command buffer is primary, it can be directly submitted to
+    // queues. A secondary buffer has to be called from some primary command
+    // buffer, and cannot be directly submitted to a queue. To keep things
+    // simple, we use a primary command buffer.
     commandBufferAllocateInfo.level = VK_COMMAND_BUFFER_LEVEL_PRIMARY;
     commandBufferAllocateInfo.commandBufferCount =
         1;  // allocate a single command buffer.
@@ -1049,26 +1086,28 @@ void VulkanTracer::createCommandBuffer() {
     beginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
     beginInfo.flags =
         VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT;  // the buffer is only
-                                                      // submitted and used once
-                                                      // in this application.
+                                                      // submitted and used
+                                                      // once in this
+                                                      // application.
     VK_CHECK_RESULT(vkBeginCommandBuffer(
         commandBuffer, &beginInfo));  // start recording commands.
 
     /*
     We need to bind a pipeline, AND a descriptor set before we dispatch.
-    The validation layer will NOT give warnings if you forget these, so be very
-    careful not to forget them.
+    The validation layer will NOT give warnings if you forget these, so be
+    very careful not to forget them.
     */
     vkCmdBindPipeline(commandBuffer, VK_PIPELINE_BIND_POINT_COMPUTE, pipeline);
     vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_COMPUTE,
                             pipelineLayout, 0, 1, &descriptorSet, 0, NULL);
-    // vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_COMPUTE,
-    // pipelineLayout, 0, 1, &descriptorSets[1], 0, NULL);
+    // vkCmdBindDescriptorSets(commandBuffer,
+    // VK_PIPELINE_BIND_POINT_COMPUTE, pipelineLayout, 0, 1,
+    // &descriptorSets[1], 0, NULL);
     /*
-    Calling vkCmdDispatch basically starts the compute pipeline, and executes
-    the compute shader. The number of workgroups is specified in the arguments.
-    If you are already familiar with compute shaders from OpenGL, this should be
-    nothing new to you.
+    Calling vkCmdDispatch basically starts the compute pipeline, and
+    executes the compute shader. The number of workgroups is specified in
+    the arguments. If you are already familiar with compute shaders from
+    OpenGL, this should be nothing new to you.
     */
     RAYX_LOG << "Dispatching commandBuffer...";
     vkCmdDispatch(commandBuffer,
@@ -1100,15 +1139,15 @@ void VulkanTracer::runCommandBuffer() {
     VK_CHECK_RESULT(vkCreateFence(device, &fenceCreateInfo, NULL, &fence));
 
     /*
-    We submit the command buffer on the queue, at the same time giving a fence.
+    We submit the command buffer on the queue, at the same time giving a
+    fence.
     */
     VK_CHECK_RESULT(vkQueueSubmit(computeQueue, 1, &submitInfo, fence));
     /*
-    The command will not have finished executing until the fence is signalled.
-    So we wait here.
-    We will directly after this read our buffer from the GPU,
-    and we will not be sure that the command has finished executing unless we
-    wait for the fence. Hence, we use a fence here.
+    The command will not have finished executing until the fence is
+    signalled. So we wait here. We will directly after this read our buffer
+    from the GPU, and we will not be sure that the command has finished
+    executing unless we wait for the fence. Hence, we use a fence here.
     */
     VK_CHECK_RESULT(
         vkWaitForFences(device, 1, &fence, VK_TRUE, 1000000000000000));
@@ -1121,7 +1160,8 @@ void VulkanTracer::setBeamlineParameters(uint32_t inNumberOfBeamlines,
     RAYX_PROFILE_FUNCTION();
     RAYX_LOG << "Setting Beamline Parameters:";
     RAYX_LOG << "\tNumber of beamlines: " << inNumberOfRays;
-    RAYX_LOG << "\tNumber of Quadrics/Beamline: " << inNumberOfQuadricsPerBeamline;
+    RAYX_LOG << "\tNumber of Quadrics/Beamline: "
+             << inNumberOfQuadricsPerBeamline;
     RAYX_LOG << "\tNumber of Rays: " << inNumberOfRays;
     numberOfBeamlines = inNumberOfBeamlines;
     numberOfQuadricsPerBeamline = inNumberOfQuadricsPerBeamline;
@@ -1140,11 +1180,10 @@ void VulkanTracer::addRayVector(std::vector<Ray>&& inRayVector) {
     RAYX_PROFILE_FUNCTION();
 
     RAYX_LOG << "Inserting into rayList. rayList.size() before: "
-              << rayList.size();
+             << rayList.size();
     RAYX_LOG << "Sent size: " << inRayVector.size();
     rayList.insertVector(std::move(inRayVector));
-    RAYX_LOG << "rayList ray count per vector: "
-              << (*(rayList.begin())).size();
+    RAYX_LOG << "rayList ray count per vector: " << (*(rayList.begin())).size();
 }
 
 // adds quad to beamline
