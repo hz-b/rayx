@@ -18,6 +18,15 @@ class RAYX_API Ellipsoid : public OpticalElement {
               const double entranceArmLength, const double exitArmLength,
               const int figRot, const double a_11,
               const std::vector<double> slopeError, Material mat);
+
+    Ellipsoid(const char* name, Geometry::GeometricalShape geometricalShape,
+              const double width, const double height,
+              const double azimuthalAngle, glm::dvec4 position,
+              const double LongHalfAxisA, const double ShortHalfAxisB,
+              const double DesignAngle, glm::dmat4x4 orientation,
+              const double grazingIncidence, const double entranceArmLength,
+              const double exitArmLength, const int figRot, const double a_11,
+              const std::vector<double> slopeError, Material mat);
     Ellipsoid();
     ~Ellipsoid();
 
@@ -66,6 +75,7 @@ class RAYX_API Ellipsoid : public OpticalElement {
     double m_offsetY0;        // always = 0?
     double
         m_halfAxisC;  // derived from figure_rotation, a_11 and half axes a, b
+    double m_DesignGrazingAngle;
 };
 
 }  // namespace RAYX

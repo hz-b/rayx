@@ -46,6 +46,8 @@ SphereGrating::SphereGrating(const char* name, int mount,
       m_lineDensity(lineDensity),
       m_orderOfDiffraction(orderOfDiffraction),
       m_vls(vls) {
+    RAYX_LOG << name;
+
     double icurv = 1;
     m_gratingMount = mount == 0 ? GM_DEVIATION : GM_INCIDENCE;
     double matd = (double)static_cast<int>(mat);
@@ -55,7 +57,6 @@ SphereGrating::SphereGrating(const char* name, int mount,
                           abs(hvlam(m_designEnergyMounting)), 0, m_vls[0],
                           m_vls[1], m_vls[2], m_vls[3], m_vls[4], m_vls[5], 0,
                           0, 0, 0});
-    RAYX_LOG << "Created.";
 }
 
 SphereGrating::~SphereGrating() {}

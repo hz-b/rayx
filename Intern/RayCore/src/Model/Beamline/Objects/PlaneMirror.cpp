@@ -2,6 +2,8 @@
 
 #include <Data/xml.h>
 
+#include "Debug.h"
+
 namespace RAYX {
 
 /**
@@ -31,6 +33,7 @@ PlaneMirror::PlaneMirror(const char* name,
     : OpticalElement(name, {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
                      geometricalShape, width, height, azimuthalAngle, position,
                      orientation, slopeError) {
+    RAYX_LOG << name;
     double matd = (double)static_cast<int>(mat);
     setSurface(std::make_unique<Quadric>(std::vector<double>{
         0, 0, 0, 0, 1, 0, 0, -1, 0, 0, 0, 0, 0, 0, matd, 0}));

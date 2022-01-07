@@ -2,6 +2,8 @@
 
 #include <Data/xml.h>
 
+#include "Debug.h"
+
 namespace RAYX {
 
 /**
@@ -18,6 +20,7 @@ ImagePlane::ImagePlane(const char* name, glm::dvec4 position,
     : OpticalElement(name, {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
                      Geometry::GeometricalShape::RECTANGLE, 0, 0, 0, position,
                      orientation, {0, 0, 0, 0, 0, 0, 0}) {
+    RAYX_LOG << name;
     setSurface(std::make_unique<Quadric>(
         std::vector<double>{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 5, 0, 0, 0}));
 }

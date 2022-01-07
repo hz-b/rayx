@@ -82,6 +82,9 @@ void Cylinder::setRadius() {
                        (1.0 / m_entranceArmLength + 1.0 / m_exitArmLength);
         }
     }
+    RAYX_LOG << ((m_direction == LONG_RADIUS_R) ? "LONG RADIUS"
+                                                : "SHORT RADIUS");
+    RAYX_LOG << m_radius;
 }
 
 std::shared_ptr<Cylinder> Cylinder::createFromXML(

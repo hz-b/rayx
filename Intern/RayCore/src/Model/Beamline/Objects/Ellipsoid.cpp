@@ -62,6 +62,79 @@ Ellipsoid::Ellipsoid(const char* name,
     setElementParameters({sin(m_tangentAngle), cos(m_tangentAngle), m_y0, m_z0,
                           0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0});
 }
+// User-defined Parm constructor
+Ellipsoid::Ellipsoid(const char* name,
+                     Geometry::GeometricalShape geometricalShape,
+                     const double width, const double height,
+                     const double azimuthalAngle, glm::dvec4 position,
+                     const double LongHalfAxisA, const double ShortHalfAxisB,
+                     const double DesignAngle, glm::dmat4x4 orientation,
+                     const double grazingIncidence,
+                     const double entranceArmLength, const double exitArmLength,
+                     const int figRot, const double a_11,
+                     const std::vector<double> slopeError, Material mat)
+    : OpticalElement(name, geometricalShape, width, height, azimuthalAngle,
+                     position, orientation, slopeError),
+      m_incidence(degToRad(grazingIncidence)),
+      m_entranceArmLength(entranceArmLength),
+      m_exitArmLength(exitArmLength),
+      m_a11(a_11),
+      m_shortHalfAxisB(ShortHalfAxisB),
+      m_longHalfAxisA(LongHalfAxisA),
+      m_DesignGrazingAngle(DesignAngle) {
+    RAYX_LOG << name << " Manual";
+    m_offsetY0 =
+        0;  // what is this for? RAYX.FOR: "only !=0 in case of Monocapillary"
+
+    m_figureRotation =
+        (figRot == 0 ? FR_YES : (figRot == 1 ? FR_PLANE : FR_A11));
+
+    double theta = m_incidence;
+
+    if (theta > PI / 2) {
+        theta = PI / 2;
+    }
+
+    double angle = atan(tan(theta) * (m_entranceArmLength - m_exitArmLength) /
+                        (m_entranceArmLength + m_exitArmLength));
+
+    m_y0 = m_entranceArmLength * sin(theta - angle);
+
+    m_z0 = 0;  // center of ellipsoid y0,z0
+    if (m_shortHalfAxisB != 0) {
+        m_z0 = (m_longHalfAxisA / m_shortHalfAxisB) *
+               (m_longHalfAxisA / m_shortHalfAxisB) * m_y0 * tan(angle);
+    }
+
+    // calculate half axis C
+    if (m_figureRotation == FR_YES) {
+        m_halfAxisC = sqrt(pow(m_shortHalfAxisB, 2) / 1);  // devided by 1??
+    } else if (m_figureRotation == FR_PLANE) {
+        m_halfAxisC = INFINITY;
+    } else {
+        m_halfAxisC = sqrt(pow(m_shortHalfAxisB, 2) / m_a11);
+    }
+    m_tangentAngle = angle;
+
+    RAYX_LOG << "A= " << m_longHalfAxisA << ", B= " << m_shortHalfAxisB
+             << ", C= " << m_halfAxisC << ", angle = " << m_tangentAngle
+             << ", Z0 = " << m_z0 << ", Y0= " << m_y0;
+
+    // a33, 34, 44
+    m_a33 = pow(m_shortHalfAxisB / m_longHalfAxisA, 2);
+    m_a34 = m_z0 * m_a33;
+    m_a44 = -pow(m_shortHalfAxisB, 2) + pow(m_y0, 2) +
+            pow(m_z0 * m_shortHalfAxisB / m_longHalfAxisA, 2);
+    m_radius = -m_y0;
+
+    double icurv = 1;
+    double matd = (double)static_cast<int>(mat);
+    setSurface(std::make_unique<Quadric>(
+        std::vector<double>{m_a11, 0, 0, 0, icurv, 1, 0, m_radius, 0, 0, m_a33,
+                            m_a34, 7, 0, matd, m_a44}));
+    setElementParameters({sin(m_tangentAngle), cos(m_tangentAngle), m_y0, m_z0,
+                          0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0});
+}
 
 // dstr
 Ellipsoid::~Ellipsoid() {}
@@ -106,7 +179,6 @@ void Ellipsoid::calcHalfAxes() {
     if (m_figureRotation == FR_YES) {
         m_halfAxisC = sqrt(pow(m_shortHalfAxisB, 2) / 1);  // devided by 1??
     } else if (m_figureRotation == FR_PLANE) {
-        RAYX_LOG << "FR PLane";
         m_halfAxisC = INFINITY;
     } else {
         m_halfAxisC = sqrt(pow(m_shortHalfAxisB, 2) / m_a11);
@@ -181,7 +253,42 @@ std::shared_ptr<Ellipsoid> Ellipsoid::createFromXML(
         return nullptr;
     }
 
-    [[maybe_unused]] double mDesignGrazing;
+    double mAzimAngle;
+    if (!xml::paramDouble(node, "azimuthalAngle", &mAzimAngle)) {
+        return nullptr;
+    }
+    double m_a11;
+    if (!xml::paramDouble(node, "parameter_a11", &m_a11)) {
+        return nullptr;
+    }
+    int m_figRot;
+    const char* fig_rot;
+    if (!xml::paramInt(node, "figureRotation", &m_figRot)) {
+        return nullptr;
+    }
+
+    // if (strcmp(fig_rot, "plane") == 0)
+    //     m_figRot = Ellipsoid::FIGURE_ROTATION::FR_PLANE;
+    // else if (strcmp(fig_rot, "yes") == 0)
+    //     m_figRot = Ellipsoid::FIGURE_ROTATION::FR_YES;
+    // else if (strcmp(fig_rot, "a_11") == 0) {  // TODO OS: Fix these cases
+    // with
+    //                                           // correct expected strings
+    //     m_figRot = Ellipsoid::FIGURE_ROTATION::FR_A11;
+    // }>
+
+    std::vector<double> slopeError;
+    if (!xml::paramSlopeError(node, &slopeError)) {
+        return nullptr;
+    }
+
+    Material mat;
+    if (!xml::paramMaterial(node, &mat)) {
+        mat = Material::CU;  // default to copper
+    }
+
+    // TODO: Are values stored as 0.0 if set to AUTO?[RAY-UI]
+    double mDesignGrazing;
     if (!xml::paramDouble(node, "designGrazingIncAngle", &mExit)) {
         return nullptr;
     }
@@ -195,43 +302,17 @@ std::shared_ptr<Ellipsoid> Ellipsoid::createFromXML(
     if (!xml::paramDouble(node, "shortHalfAxisB", &mshortHalfAxisB)) {
         return nullptr;
     }
-
-    double mazimAngle;
-    if (!xml::paramDouble(node, "azimuthalAngle", &mazimAngle)) {
-        return nullptr;
+    if ((mDesignGrazing == 0.0) && (mlongHalfAxisA == 0.0) &&
+        (mshortHalfAxisB == 0.0)) {  // Auto calculation
+        return std::make_shared<Ellipsoid>(
+            name, geometricalShape, width, height, mAzimAngle, position,
+            orientation, incidenceAngle, mEntrance, mExit, m_figRot, m_a11,
+            slopeError, mat);
+    } else {
+        return std::make_shared<Ellipsoid>(
+            name, geometricalShape, width, height, mAzimAngle, position,
+            mlongHalfAxisA, mshortHalfAxisB, mDesignGrazing, orientation,
+            incidenceAngle, mEntrance, mExit, m_figRot, m_a11, slopeError, mat);
     }
-    double m_a11;
-    if (!xml::paramDouble(node, "parameter_a11", &m_a11)) {
-        return nullptr;
-    }
-    int m_figRot;
-    const char* fig_rot;
-    if (!xml::paramStr(node, "figureRotation", &fig_rot)) {
-        return nullptr;
-    }
-
-    if (strcmp(fig_rot, "plane") == 0)
-        m_figRot = Ellipsoid::FIGURE_ROTATION::FR_PLANE;
-    else if (strcmp(fig_rot, "yes") == 0)
-        m_figRot = Ellipsoid::FIGURE_ROTATION::FR_YES;
-    else if (strcmp(fig_rot, "a_11") == 0) {  // TODO OS: Fix these cases with
-                                              // correct expected strings
-        m_figRot = Ellipsoid::FIGURE_ROTATION::FR_A11;
-    }
-
-    std::vector<double> slopeError;
-    if (!xml::paramSlopeError(node, &slopeError)) {
-        return nullptr;
-    }
-
-    Material mat;
-    if (!xml::paramMaterial(node, &mat)) {
-        mat = Material::CU;  // default to copper
-    }
-
-    return std::make_shared<Ellipsoid>(name, geometricalShape, width, height,
-                                       mazimAngle, position, orientation,
-                                       incidenceAngle, mEntrance, mExit,
-                                       m_figRot, m_a11, slopeError, mat);
 }
 }  // namespace RAYX
