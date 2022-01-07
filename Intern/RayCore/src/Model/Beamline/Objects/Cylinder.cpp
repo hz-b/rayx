@@ -84,6 +84,81 @@ void Cylinder::setRadius() {
     }
 }
 
+std::shared_ptr<Cylinder> Cylinder::createFromXML(
+    rapidxml::xml_node<>* node, const std::vector<xml::Group>& group_context) {
+    const char* name = node->first_attribute("name")->value();
+
+    int gs;
+    if (!xml::paramInt(node, "geometricalShape", &gs)) {
+        return nullptr;
+    }
+    Geometry::GeometricalShape geometricalShape =
+        static_cast<Geometry::GeometricalShape>(
+            gs);  // HACK(Jannis): convert to enum
+
+    double width;
+    if (!xml::paramDouble(node, "totalWidth", &width)) {
+        return nullptr;
+    }
+
+    double height;
+    if (!xml::paramDouble(node, "totalLength", &height)) {
+        return nullptr;
+    }
+
+    glm::dvec4 position;
+    glm::dmat4x4 orientation;
+    if (!xml::paramPositionAndOrientation(node, group_context, &position,
+                                          &orientation)) {
+        return nullptr;
+    }
+
+    double incidenceAngle;
+    if (!xml::paramDouble(node, "grazingIncAngle", &incidenceAngle)) {
+        return nullptr;
+    }
+
+    double mEntrance;
+    if (!xml::paramDouble(node, "entranceArmLength", &mEntrance)) {
+        return nullptr;
+    }
+
+    double mExit;
+    if (!xml::paramDouble(node, "exitArmLength", &mExit)) {
+        return nullptr;
+    }
+
+    double mRadius;
+    if (!xml::paramDouble(node, "radius", &mRadius)) {
+        return nullptr;
+    }
+
+    double mBendingRadius;
+    if (!xml::paramDouble(node, "bendingRadius", &mBendingRadius)) {
+        return nullptr;
+    }
+
+    double azimuthalAngle;
+    if (!xml::paramDouble(node, "azimuthalAngle", &azimuthalAngle)) {
+        return nullptr;
+    }
+
+    std::vector<double> slopeError;
+    if (!xml::paramSlopeError(node, &slopeError)) {
+        return nullptr;
+    }
+
+    Material mat;
+    if (!xml::paramMaterial(node, &mat)) {
+        mat = Material::CU;  // default to copper
+    }
+
+    return std::make_shared<Cylinder>(name, geometricalShape, mRadius, 0, width,
+                                      height, azimuthalAngle, position,
+                                      orientation, incidenceAngle, mEntrance,
+                                      mExit, slopeError, mat);
+}
+
 Cylinder::CYLINDER_DIRECTION Cylinder::getDirection() const {
     return m_direction;
 }

@@ -1,5 +1,7 @@
 #pragma once
+#include <Data/xml.h>
 #include <Tracer/Vulkan/Material.h>
+#include <string.h>
 
 #include "Model/Beamline/OpticalElement.h"
 #include "Model/Surface/Quadric.h"
@@ -36,6 +38,9 @@ class RAYX_API Ellipsoid : public OpticalElement {
     double getA33() const;
     double getA44() const;
     double getHalfAxisC() const;
+
+    static std::shared_ptr<Ellipsoid> createFromXML(
+        rapidxml::xml_node<>*, const std::vector<xml::Group>& group_context);
 
     enum FIGURE_ROTATION { FR_YES, FR_PLANE, FR_A11 };
 

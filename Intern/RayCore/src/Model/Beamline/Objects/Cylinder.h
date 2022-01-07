@@ -1,4 +1,5 @@
 #pragma once
+#include <Data/xml.h>
 #include <Tracer/Vulkan/Material.h>
 
 #include "Model/Beamline/OpticalElement.h"
@@ -16,6 +17,9 @@ class RAYX_API Cylinder : public OpticalElement {
              const double exitArmLength, const std::vector<double> slopeError,
              Material mat);
     ~Cylinder();
+
+    static std::shared_ptr<Cylinder> createFromXML(
+        rapidxml::xml_node<>*, const std::vector<xml::Group>& group_context);
 
     void setRadius();
     enum CYLINDER_DIRECTION { LONG_RADIUS_R, SHORT_RADIUS_RHO };

@@ -136,4 +136,102 @@ double Ellipsoid::getA34() const { return m_a34; }
 double Ellipsoid::getA33() const { return m_a33; }
 double Ellipsoid::getA44() const { return m_a44; }
 double Ellipsoid::getHalfAxisC() const { return m_halfAxisC; }
+
+// Null if failed
+std::shared_ptr<Ellipsoid> Ellipsoid::createFromXML(
+    rapidxml::xml_node<>* node, const std::vector<xml::Group>& group_context) {
+    const char* name = node->first_attribute("name")->value();
+
+    int gs;
+    if (!xml::paramInt(node, "geometricalShape", &gs)) {
+        return nullptr;
+    }
+    Geometry::GeometricalShape geometricalShape =
+        static_cast<Geometry::GeometricalShape>(gs);
+
+    double width;
+    if (!xml::paramDouble(node, "totalWidth", &width)) {
+        return nullptr;
+    }
+
+    double height;
+    if (!xml::paramDouble(node, "totalLength", &height)) {
+        return nullptr;
+    }
+
+    glm::dvec4 position;
+    glm::dmat4x4 orientation;
+    if (!xml::paramPositionAndOrientation(node, group_context, &position,
+                                          &orientation)) {
+        return nullptr;
+    }
+
+    double incidenceAngle;
+    if (!xml::paramDouble(node, "grazingIncAngle", &incidenceAngle)) {
+        return nullptr;
+    }
+
+    double mEntrance;
+    if (!xml::paramDouble(node, "entranceArmLength", &mEntrance)) {
+        return nullptr;
+    }
+
+    double mExit;
+    if (!xml::paramDouble(node, "exitArmLength", &mExit)) {
+        return nullptr;
+    }
+
+    [[maybe_unused]] double mDesignGrazing;
+    if (!xml::paramDouble(node, "designGrazingIncAngle", &mExit)) {
+        return nullptr;
+    }
+
+    double mlongHalfAxisA;
+    if (!xml::paramDouble(node, "longHalfAxisA", &mlongHalfAxisA)) {
+        return nullptr;
+    }
+
+    double mshortHalfAxisB;
+    if (!xml::paramDouble(node, "shortHalfAxisB", &mshortHalfAxisB)) {
+        return nullptr;
+    }
+
+    double mazimAngle;
+    if (!xml::paramDouble(node, "azimuthalAngle", &mazimAngle)) {
+        return nullptr;
+    }
+    double m_a11;
+    if (!xml::paramDouble(node, "parameter_a11", &m_a11)) {
+        return nullptr;
+    }
+    int m_figRot;
+    const char* fig_rot;
+    if (!xml::paramStr(node, "figureRotation", &fig_rot)) {
+        return nullptr;
+    }
+
+    if (strcmp(fig_rot, "plane") == 0)
+        m_figRot = Ellipsoid::FIGURE_ROTATION::FR_PLANE;
+    else if (strcmp(fig_rot, "yes") == 0)
+        m_figRot = Ellipsoid::FIGURE_ROTATION::FR_YES;
+    else if (strcmp(fig_rot, "a_11") == 0) {  // TODO OS: Fix these cases with
+                                              // correct expected strings
+        m_figRot = Ellipsoid::FIGURE_ROTATION::FR_A11;
+    }
+
+    std::vector<double> slopeError;
+    if (!xml::paramSlopeError(node, &slopeError)) {
+        return nullptr;
+    }
+
+    Material mat;
+    if (!xml::paramMaterial(node, &mat)) {
+        mat = Material::CU;  // default to copper
+    }
+
+    return std::make_shared<Ellipsoid>(name, geometricalShape, width, height,
+                                       mazimAngle, position, orientation,
+                                       incidenceAngle, mEntrance, mExit,
+                                       m_figRot, m_a11, slopeError, mat);
+}
 }  // namespace RAYX

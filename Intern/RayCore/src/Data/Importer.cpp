@@ -6,18 +6,9 @@
 #include <fstream>
 #include <sstream>
 
-#include "Debug/Instrumentor.h"
 #include "Debug.h"
-#include "Model/Beamline/Objects/ImagePlane.h"
-#include "Model/Beamline/Objects/MatrixSource.h"
-#include "Model/Beamline/Objects/PlaneGrating.h"
-#include "Model/Beamline/Objects/PlaneMirror.h"
-#include "Model/Beamline/Objects/PointSource.h"
-#include "Model/Beamline/Objects/ReflectionZonePlate.h"
-#include "Model/Beamline/Objects/Slit.h"
-#include "Model/Beamline/Objects/SphereGrating.h"
-#include "Model/Beamline/Objects/SphereMirror.h"
-#include "Model/Beamline/Objects/ToroidMirror.h"
+#include "Debug/Instrumentor.h"
+#include "Model/Beamline/Objects/Objects.h"
 #include "rapidxml.hpp"
 
 namespace RAYX {
@@ -100,6 +91,10 @@ void addBeamlineObjectFromXML(rapidxml::xml_node<>* node, Beamline* beamline,
     } else if (strcmp(type, "Reflection Zoneplate") == 0) {
         addOpticalElement(
             ReflectionZonePlate::createFromXML(node, group_context), node);
+    } else if (strcmp(type, "Ellipsoid") == 0) {
+        addOpticalElement(Ellipsoid::createFromXML(node, group_context), node);
+    } else if (strcmp(type, "Cylinder") == 0) {
+        addOpticalElement(Cylinder::createFromXML(node, group_context), node);
     } else {
         std::cerr
             << "[Importer]: could not classify beamline object with Name: "
@@ -152,7 +147,7 @@ Beamline Importer::importBeamline(const char* filename) {
     doc.parse<0>(cstr.data());
 
     RAYX_LOG << "\t Version: "
-              << doc.first_node("lab")->first_node("version")->value();
+             << doc.first_node("lab")->first_node("version")->value();
     rapidxml::xml_node<>* xml_beamline =
         doc.first_node("lab")->first_node("beamline");
 
