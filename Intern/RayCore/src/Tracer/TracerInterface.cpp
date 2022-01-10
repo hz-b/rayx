@@ -2,7 +2,9 @@
 
 #include <cmath>
 #include <fstream>
-#include <highfive/H5Easy.hpp>
+
+// TODO(rudi): can only be included when libhdf5 is installed, which is not the case in our CI.
+// #include <highfive/H5Easy.hpp>
 #include <iomanip>
 #include <sstream>
 
