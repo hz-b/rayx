@@ -1,0 +1,474 @@
+/**
+* calculates the intersection point of a ray with a quadric surface defined by a_11..a_44
+* @param r				ray for which the intersection is fount
+* @param a_11..a_44		define the quadric surface
+* @param icurv 			defines whether the first or the second intersection is used (1=first, -1=second)
+*
+* output: reflected Ray with intersection point as position and reflection as direction
+*/
+dvec4 intersectionPoint(inout Ray r, const dmat4 quadric)
+{
+	// //for testing
+	// double firstParam;
+	// double secondParam;
+
+	double a_11 = quadric[0][0];
+	double a_12 = quadric[0][1];
+	double a_13 = quadric[0][2];
+	double a_14 = quadric[0][3];
+	double a_22 = quadric[1][1];
+	double a_23 = quadric[1][2];
+	double a_24 = quadric[1][3];
+	double a_33 = quadric[2][2];
+	double a_34 = quadric[2][3];
+	double a_44 = quadric[3][3];
+	int icurv = int(quadric[1][0]);
+
+	double w = r.weight;
+	int cs = 1;
+	int d_sign = icurv;
+	if (abs(r.direction[1]) >= abs(r.direction[0]) && abs(r.direction[1]) >= abs(r.direction[2])) {
+		cs = 2;
+	}else if (abs(r.direction[2]) >= abs(r.direction[0]) && abs(r.direction[2]) >= abs(r.direction[1])) {
+		cs = 3;
+	}
+
+	double x;
+	double y;
+	double z;
+	double a = 0;
+	double b = 0;
+	double c = 0;
+
+	if (cs == 1) {
+		double aml = r.direction[1] / r.direction[0];
+		double anl = r.direction[2] / r.direction[0];
+		y = r.position[1] - aml * r.position[0];
+		z = r.position[2] - anl * r.position[0];
+		d_sign = int(sign(r.direction[0]) * icurv);
+
+		a = a_11 + 2*a_12*aml + a_22*aml*aml + 2*a_13*anl + 2*a_23*aml*anl + a_33*anl*anl;
+        b = a_14 + a_24*aml + a_34*anl + (a_12 + a_22*aml + a_23*anl)*y + (a_13 + a_23*aml + a_33*anl)*z;
+        c = a_44 + a_22*y*y + 2*a_34*z + a_33*z*z + 2*y*(a_24 + a_23*z);
+
+		double bbac = b*b - a*c;
+		if (bbac < 0) {
+			w = 0.0;
+			x = - y/aml; 	// x such that y=0
+		}else{
+			if (abs(a) > abs(c)*1e-10) {
+				x = (-b + d_sign*sqrt(bbac)) / a;
+			}else{
+				x = (-c/2)/b;
+			}
+		}
+		y = y + aml*x;
+		z = z + anl*x;
+	}else if (cs == 2) {
+		double alm = r.direction[0] / r.direction[1];
+		double anm = r.direction[2] / r.direction[1];
+		x = r.position[0] - alm * r.position[1];
+		z = r.position[2] - anm * r.position[1];
+		d_sign = int(sign(r.direction[1]) * icurv);
+
+		a = a_22 + 2*a_12*alm + a_11*alm*alm + 2*a_23*anm + 2*a_13*alm*anm + a_33*anm*anm;
+        b = a_24 + a_14*alm + a_34*anm + (a_12 + a_11*alm + a_13*anm)*x + (a_23 + a_13*alm + a_33*anm)*z;
+        c = a_44 + a_11*x*x + 2*a_34*z + a_33*z*z + 2*x*(a_14 + a_13*z);
+
+		double bbac = b*b - a*c;
+		if (bbac < 0) {
+			w = 0.0;
+			y = 0;
+		}else{
+			if (abs(a) > abs(c)*1e-10) {
+				y = (-b + d_sign*sqrt(bbac)) / a;
+			}else{
+				y = (-c/2)/b;
+			}
+		}
+		x = x + alm*y;
+		z = z + anm*y;
+
+	}else{
+		double aln = r.direction[0] / r.direction[2];
+		double amn = r.direction[1] / r.direction[2];
+		// firstParam = aln;
+		// secondParam = amn;
+		x = r.position[0] - aln * r.position[2];
+		y = r.position[1] - amn * r.position[2];
+		d_sign = int(sign(r.direction[2]) * icurv);
+
+		a = a_33 + 2*a_13*aln + a_11*aln*aln + 2*a_23*amn + 2*a_12*aln*amn + a_22*amn*amn;
+        b = a_34 + a_14*aln + a_24*amn + (a_13 + a_11*aln + a_12*amn)*x + (a_23 + a_12*aln + a_22*amn)*y;
+        c = a_44 + a_11*x*x + 2*a_24*y + a_22*y*y + 2*x*(a_14 + a_12*y);
+
+		double bbac = b*b - a*c;
+		if (bbac < 0) {
+			w = 0.0;
+			z = -y / amn;
+		}else{
+			if (abs(a) > abs(c)*1e-10) {//pow(10, double(-10))) {
+				z = (-b + d_sign*sqrt(bbac)) / a;
+			}else{
+				z = (-c/2)/b;
+			}
+		}
+		x = x + aln*z;
+		y = y + amn*z;
+		//r.position = dvec3(a, b, c);
+	}
+
+	double fx = 2*a_14 + 2*a_11*x + 2*a_12*y + 2*a_13*z;
+	double fy = 2*a_24 + 2*a_12*x + 2*a_22*y + 2*a_23*z;
+    double fz = 2*a_34 + 2*a_13*x + 2*a_23*y + 2*a_33*z;
+
+	dvec4 normal = normalize(dvec4(fx,fy,fz,0));
+	r.position = dvec3(x,y,z); // new position = intersection point
+	r.weight = w; // unchanged, if ray did not miss surface, else 0
+	//r.direction = dvec3(firstParam,secondParam,c);
+	return normal;
+}
+
+dvec4 getIntersectionPoint(Ray r, dmat4 quadric)
+{
+	// //for testing
+	// double firstParam;
+	// double secondParam;
+
+	double a_11 = quadric[0][0];
+	double a_12 = quadric[0][1];
+	double a_13 = quadric[0][2];
+	double a_14 = quadric[0][3];
+	double a_22 = quadric[1][1];
+	double a_23 = quadric[1][2];
+	double a_24 = quadric[1][3];
+	double a_33 = quadric[2][2];
+	double a_34 = quadric[2][3];
+	double a_44 = quadric[3][3];
+	int icurv = int(quadric[1][0]);
+
+	double w = r.weight;
+	int cs = 1;
+	int d_sign = icurv;
+	if (abs(r.direction[1]) >= abs(r.direction[0]) && abs(r.direction[1]) >= abs(r.direction[2])) {
+		cs = 2;
+	}else if (abs(r.direction[2]) >= abs(r.direction[0]) && abs(r.direction[2]) >= abs(r.direction[1])) {
+		cs = 3;
+	}
+
+	double x;
+	double y;
+	double z;
+	double a = 0;
+	double b = 0;
+	double c = 0;
+
+	if (cs == 1) {
+		double aml = r.direction[1] / r.direction[0];
+		double anl = r.direction[2] / r.direction[0];
+		y = r.position[1] - aml * r.position[0];
+		z = r.position[2] - anl * r.position[0];
+		d_sign = int(sign(r.direction[0]) * icurv);
+
+		a = a_11 + 2*a_12*aml + a_22*aml*aml + 2*a_13*anl + 2*a_23*aml*anl + a_33*anl*anl;
+        b = a_14 + a_24*aml + a_34*anl + (a_12 + a_22*aml + a_23*anl)*y + (a_13 + a_23*aml + a_33*anl)*z;
+        c = a_44 + a_22*y*y + 2*a_34*z + a_33*z*z + 2*y*(a_24 + a_23*z);
+
+		double bbac = b*b - a*c;
+		if (bbac < 0) {
+			w = 0.0;
+			x = - y/aml; 	// x such that y=0
+		}else{
+			if (abs(a) > abs(c)*1e-10) {
+				x = (-b + d_sign*sqrt(bbac)) / a;
+			}else{
+				x = (-c/2)/b;
+			}
+		}
+		y = y + aml*x;
+		z = z + anl*x;
+	}else if (cs == 2) {
+		double alm = r.direction[0] / r.direction[1];
+		double anm = r.direction[2] / r.direction[1];
+		x = r.position[0] - alm * r.position[1];
+		z = r.position[2] - anm * r.position[1];
+		d_sign = int(sign(r.direction[1]) * icurv);
+
+		a = a_22 + 2*a_12*alm + a_11*alm*alm + 2*a_23*anm + 2*a_13*alm*anm + a_33*anm*anm;
+        b = a_24 + a_14*alm + a_34*anm + (a_12 + a_11*alm + a_13*anm)*x + (a_23 + a_13*alm + a_33*anm)*z;
+        c = a_44 + a_11*x*x + 2*a_34*z + a_33*z*z + 2*x*(a_14 + a_13*z);
+
+		double bbac = b*b - a*c;
+		if (bbac < 0) {
+			w = 0.0;
+			y = 0;
+		}else{
+			if (abs(a) > abs(c)*1e-10) {
+				y = (-b + d_sign*sqrt(bbac)) / a;
+			}else{
+				y = (-c/2)/b;
+			}
+		}
+		x = x + alm*y;
+		z = z + anm*y;
+
+	}else{
+		double aln = r.direction[0] / r.direction[2];
+		double amn = r.direction[1] / r.direction[2];
+		// firstParam = aln;
+		// secondParam = amn;
+		x = r.position[0] - aln * r.position[2];
+		y = r.position[1] - amn * r.position[2];
+		d_sign = int(sign(r.direction[2]) * icurv);
+
+		a = a_33 + 2*a_13*aln + a_11*aln*aln + 2*a_23*amn + 2*a_12*aln*amn + a_22*amn*amn;
+        b = a_34 + a_14*aln + a_24*amn + (a_13 + a_11*aln + a_12*amn)*x + (a_23 + a_12*aln + a_22*amn)*y;
+        c = a_44 + a_11*x*x + 2*a_24*y + a_22*y*y + 2*x*(a_14 + a_12*y);
+
+		double bbac = b*b - a*c;
+		if (bbac < 0) {
+			w = 0.0;
+			z = -y / amn;
+		}else{
+			if (abs(a) > abs(c)*1e-10) {//pow(10, double(-10))) {
+				z = (-b + d_sign*sqrt(bbac)) / a;
+			}else{
+				z = (-c/2)/b;
+			}
+		}
+		x = x + aln*z;
+		y = y + amn*z;
+		//r.position = dvec3(a, b, c);
+	}
+
+	// intersection point is in the negative direction (behind the position when the direction is followed forwards), set weight to 0
+	if( (x - r.position.x) / r.direction.x < 0 || (y - r.position.y) / r.direction.y < 0 || (z - r.position.z) / r.direction.z < 0) {
+		w = 0;
+	}
+
+	return dvec4(x,y,z,w);
+}
+
+dvec4 setIntersectionPoint(inout Ray r, dmat4 quadric, dvec4 closestHitpoint)
+{
+	double x = closestHitpoint.x;
+	double y = closestHitpoint.y;
+	double z = closestHitpoint.z;
+	double w = closestHitpoint.w;
+
+	double a_11 = quadric[0][0];
+	double a_12 = quadric[0][1];
+	double a_13 = quadric[0][2];
+	double a_14 = quadric[0][3];
+	double a_22 = quadric[1][1];
+	double a_23 = quadric[1][2];
+	double a_24 = quadric[1][3];
+	double a_33 = quadric[2][2];
+	double a_34 = quadric[2][3];
+	double a_44 = quadric[3][3];
+
+	double fx = 2*a_14 + 2*a_11*x + 2*a_12*y + 2*a_13*z;
+	double fy = 2*a_24 + 2*a_12*x + 2*a_22*y + 2*a_23*z;
+    double fz = 2*a_34 + 2*a_13*x + 2*a_23*y + 2*a_33*z;
+
+	dvec4 normal = normalize(dvec4(fx,fy,fz,0));
+	r.position = dvec3(x,y,z); // new position = intersection point
+	r.weight = w; // unchanged, if ray did not miss surface, else 0
+	return normal;
+}
+
+/**
+* returns intersection point for a quadric element
+* @param r		 	current ray
+* @param quadric	4x4 matrix with quadric parameters, upper right part + diagonal for a_11..a_33
+* @param icurv 		sign of p/q formula for calculating intersection point (p/2 ICURV sqrt( (p/2)² -q)), quadric[1,0]
+*
+* @return			dvec4(intersection point in element coordinates, weight)
+*/
+dvec4 getIntersectionPointEnrico(Ray r, dmat4 quadric)
+{	
+	double w = r.weight;
+	int icurv = int(quadric[1][0]);
+	int cs = 0;
+	if (abs(rayData[uint(gl_GlobalInvocationID)].direction[1]) >= abs(rayData[uint(gl_GlobalInvocationID)].direction[0]) && abs(rayData[uint(gl_GlobalInvocationID)].direction[1]) >= abs(rayData[uint(gl_GlobalInvocationID)].direction[2])) {
+		cs = 1;
+	}else if (abs(rayData[uint(gl_GlobalInvocationID)].direction[2]) >= abs(rayData[uint(gl_GlobalInvocationID)].direction[0]) && abs(rayData[uint(gl_GlobalInvocationID)].direction[2]) >= abs(rayData[uint(gl_GlobalInvocationID)].direction[1])) {
+		cs = 2;
+	}
+	uint f_001 = uint(cs/2);
+	uint f_010 = cs%2;
+	uint f_011 = uint(cs+1/2);
+	uint f_012 = cs;
+	uint f_0x1 = uint(cs/2);
+	uint f_100 = (uint((cs+1)/2)+1)%2;
+	uint f_101 = ((cs%2)+1)%2;
+	uint f_110 = (uint(cs/2)+1)%2;
+	uint f_112 = int(cs/2)+1;
+	//uint f_1x0 = (cs/2)%2;
+	uint f_131 = ((cs%2)*2)+1;
+	uint f_220 = ((uint(cs/2)+1)%2)*2;
+	uint f_221 = ((uint(cs/2)+1)%2)+1;
+
+    //Formula: ((x+1)%3)/(x-1) and (x%3)/(x-1)
+	double firstParam = rayData[uint(gl_GlobalInvocationID)].direction[f_100] / rayData[uint(gl_GlobalInvocationID)].direction[cs];
+	double secondParam = rayData[uint(gl_GlobalInvocationID)].direction[f_221] / rayData[uint(gl_GlobalInvocationID)].direction[cs];
+	double params[2] = {firstParam, secondParam};
+	//dvec4 normal;
+	xyznull[uint(gl_GlobalInvocationID)] = dvec4(0.0,0.0,0.0,0.0);
+	xyznull[uint(gl_GlobalInvocationID)][f_100] = rayData[uint(gl_GlobalInvocationID)].position[f_100] - firstParam * rayData[uint(gl_GlobalInvocationID)].position[cs];
+	xyznull[uint(gl_GlobalInvocationID)][f_221] = rayData[uint(gl_GlobalInvocationID)].position[f_221] - secondParam * rayData[uint(gl_GlobalInvocationID)].position[cs];
+	xyznull[uint(gl_GlobalInvocationID)][3] = 0;
+
+	const int d_sign = int(sign(rayData[uint(gl_GlobalInvocationID)].direction[cs]) * icurv);
+
+	double a = quadric[cs][cs] + 2*quadric[0][f_112]*firstParam + quadric[f_100][f_100]*firstParam*firstParam + 2*quadric[f_011][2]*secondParam + 2*quadric[f_100][f_221]*firstParam*secondParam + quadric[f_221][f_221]*secondParam*secondParam;
+	double b = quadric[cs][3] + quadric[f_100][3]*firstParam + quadric[f_221][3]*secondParam + (quadric[0][f_112] + quadric[f_100][f_100]*firstParam + quadric[f_100][f_221]*secondParam)*xyznull[uint(gl_GlobalInvocationID)][f_100] + (quadric[f_011][2] + quadric[f_100][f_221]*firstParam + quadric[f_221][f_221]*secondParam)*xyznull[uint(gl_GlobalInvocationID)][f_221];
+	double c = quadric[3][3] + quadric[f_100][f_100]*xyznull[uint(gl_GlobalInvocationID)][f_100]*xyznull[uint(gl_GlobalInvocationID)][f_100] + 2*quadric[f_221][3]*xyznull[uint(gl_GlobalInvocationID)][f_221] + quadric[f_221][f_221]*xyznull[uint(gl_GlobalInvocationID)][f_221]*xyznull[uint(gl_GlobalInvocationID)][f_220] + 2*xyznull[uint(gl_GlobalInvocationID)][f_100]*(quadric[f_100][3] +quadric[f_100][f_221]*xyznull[uint(gl_GlobalInvocationID)][f_221]);
+
+	
+	double bbac = b*b - a*c;
+	if (bbac < 0) {
+		w = 0.0;
+		xyznull[uint(gl_GlobalInvocationID)][cs] = - xyznull[uint(gl_GlobalInvocationID)][f_131]/params[f_0x1]; 	// x such that y=0
+		return dvec4(1.0/0.0,1.0/0.0,1.0/0.0, 0);
+	}
+	else{
+		if (abs(a) > abs(c)*1e-10) {
+			xyznull[uint(gl_GlobalInvocationID)][cs] = (-b + d_sign*sqrt(bbac)) / a;
+		}else{
+			xyznull[uint(gl_GlobalInvocationID)][cs] = (-c/2)/b;
+		}
+	}
+	xyznull[uint(gl_GlobalInvocationID)][f_100] = xyznull[uint(gl_GlobalInvocationID)][f_100] + firstParam * xyznull[uint(gl_GlobalInvocationID)][cs];
+	xyznull[uint(gl_GlobalInvocationID)][f_221] = xyznull[uint(gl_GlobalInvocationID)][f_221] + secondParam*xyznull[uint(gl_GlobalInvocationID)][cs];
+	
+	if(w > 0.0){
+		return dvec4(xyznull[uint(gl_GlobalInvocationID)][0],xyznull[uint(gl_GlobalInvocationID)][1],xyznull[uint(gl_GlobalInvocationID)][2], w);
+	}
+	else{
+		return dvec4(1.0/0.0,1.0/0.0,1.0/0.0, 0);
+	}
+}
+
+/**
+* approximates intersection point with non-quadric element with Newton iteration
+* 
+* @param r 				current ray
+* @param longRadius		?
+* @param shortRadius	?
+* 
+* @return normal at intersection point, changes Ray position in place
+*/
+dvec4 iteratTo(inout Ray r, double longRadius, double shortRadius) {
+	double isigro = sign(shortRadius);
+	// sign radius: +1 = concave, -1 = convex
+	
+	int n = 0;
+	//double aln = r.direction.x / r.direction.z;
+	//double amn = r.direction.y / r.direction.z;
+
+	dvec4 normal = dvec4(0,0,0,0);
+	double zz = 0.0;
+	double xx, yy;
+	double dz = 0.0;
+	dvec3 normalized_dir = dvec3(r.direction) / r.direction.z;
+	
+	// while not converted
+	do {
+		zz = zz + dz;
+		xx = r.position.x + normalized_dir.x*(zz - r.position.z);
+		if(xx*xx > shortRadius*shortRadius) {
+			xx = xx / abs(xx) * 0.95*shortRadius;
+		}
+		yy = r.position.y + normalized_dir.y*(zz - r.position.z);
+		double sq = sqrt(shortRadius*shortRadius - xx*xx);
+		double rx = (longRadius - shortRadius + isigro*sq);
+
+		normal.x = (-2*xx*isigro / sq) * rx;
+		normal.y = -2*(yy - longRadius);
+		normal.z = -2*zz;
+
+		double func = -rx*rx + (yy - longRadius)*(yy-longRadius) + zz*zz;
+		double df = normalized_dir.x*normal.x + normalized_dir.y*normal.y + normal.z;//dot(normalized_dir, dvec3(normal));
+		dz = func / df;
+		n += 1;
+		if (n >= 50) {
+			normal = intersectionPoint(r, dmat4(0,0,0,0, 1,0,0,0, 0,0,0,-1, 0,0,0,0));
+			r.weight = 0; // -4 in old ray. thrown away or still in use?
+			return normal;
+		}
+		
+	} while (abs(dz) > 0.0001);
+
+	r.position = dvec3(xx,yy,zz);
+	return normalize(normal);
+
+}
+
+dvec4 getTorusNormal(Ray r, double shortRadius, double longRadius) { // unused
+	double isigro = sign(shortRadius);
+	dvec4 normal;
+
+	double sq = sqrt(shortRadius*shortRadius - r.position.x*r.position.x);
+	double rx = (longRadius - shortRadius + isigro*sq);
+
+	normal.x = (-2*r.position.x*isigro / sq) * rx;
+	normal.y = -2*(r.position.y - longRadius);
+	normal.z = -2*r.position.z;
+
+	return normal;
+}
+
+/**
+* calculates and returns the intersection of a given ray with a given optical element
+* if element is not hit, return (inf, inf, inf, 0)
+* @param r						current Ray in global coordinates
+* @param elementIndex			index of current optical element in list of all elements
+* @param whichIntersection		whether to get first or second intersection (usually first)
+* 
+* @return ELEMENT coordinates of intersection point of ray with optical element
+*/
+dvec4 getOpticalElementIntersection(Ray r, uint elementIndex){
+
+	int type = int(quadricData[elementIndex].surfaceParams[3][0]);
+	Element e = quadricData[elementIndex];
+	dvec4 currentIntersection;
+	if(type > 7){
+		return dvec4(1.0/0.0,1.0/0.0,1.0/0.0, 0);
+	}
+	if(type == 4) { // rzp
+		r.position.z = r.position.z - e.elementParameters[3][2];
+	}
+
+	//rayData[uint(gl_GlobalInvocationID)] = rayMatrixMult(rayData[uint(gl_GlobalInvocationID)], q.inTrans); // ray/global to element coordinates, misalignment
+	r = rayMatrixMult(r, e.inTrans); // image plane is the x-y plane of the coordinate system
+	if(type == 5) { // image plane
+		double offset = 0 - r.position.z; // length between ray origin (intersection point of previous element) and image plane
+		currentIntersection.x = r.position.x + ((r.direction.x / r.direction.z) * offset); // scale x-slope of ray (l/n) by z-length between origin and image plane
+		currentIntersection.y = r.position.y + ((r.direction.y / r.direction.z) * offset);
+		currentIntersection.z = 0;
+		// the ray should not face away from the image plane. If that is the case, set the weight of the intersection to 0 so that it is not considered in the tracing process
+		// also the image plane detects only rays from one side
+		currentIntersection.w = r.weight * int(r.direction.z > 0);
+		// * int(r.direction.z > 0); // * (1-int((r.direction.z > 0 && r.position.z > 0) || (r.direction.z < 0 && r.position.z < 0)));
+		r = rayMatrixMult(r, e.outTrans); // do not know if this is necessary as the ray r is not defined as inout
+		return currentIntersection;
+	}
+	else if(type == 6 || (type == 4 && e.elementParameters[1][0] == 2)) { // toroidal mirror or toroidal rzp
+		double longRadius = e.surfaceParams[0][0];
+		double shortRadius = e.surfaceParams[0][1];
+	
+		dvec4 normal = iteratTo(r, longRadius, shortRadius);
+		currentIntersection = dvec4(r.position, r.weight);
+		// intersection point is in the negative direction (behind the position when the direction is followed forwards), set weight to 0 
+		if( (currentIntersection.x - r.position.x) / r.direction.x < 0 || (currentIntersection.y - r.position.y) / r.direction.y < 0 || (currentIntersection.z - r.position.z) / r.direction.z < 0) {
+			currentIntersection.w = 0;
+		}
+
+		return currentIntersection;
+	}
+	currentIntersection = getIntersectionPoint(r, e.surfaceParams);
+	
+	r = rayMatrixMult(r, e.outTrans);
+	return currentIntersection; // in element coordinate system
+}
