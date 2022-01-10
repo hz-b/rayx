@@ -2,6 +2,7 @@
 
 #include <cmath>
 #include <fstream>
+#include <highfive/H5Easy.hpp>
 #include <iomanip>
 #include <sstream>
 

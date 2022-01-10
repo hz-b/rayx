@@ -112,6 +112,7 @@ target_include_directories(${PROJECT_NAME}
     SYSTEM PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/src
     PUBLIC ${RayCore_SOURCE_DIR}/../../Extern/glm/glm/
     PUBLIC ${RayCore_SOURCE_DIR}/../../Extern/rapidxml-1.13/
+    PUBLIC ${RayCore_SOURCE_DIR}/../../Extern/HighFive/include/
 )
 
 add_dependencies(${PROJECT_NAME} COMPILE_SHADER)
