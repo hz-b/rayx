@@ -1,3 +1,6 @@
 [submodule "Extern/glm"]
 	path = Extern/glm
 	url = https://github.com/g-truc/glm.git
+[submodule "Extern/HighFive"]
+	path = Extern/HighFive
+	url = https://github.com/BlueBrain/HighFive.git
