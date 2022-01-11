@@ -37,6 +37,10 @@ SET(SOURCE
     src/Model/Geometry/Geometry.cpp
     src/Tracer/RayList.cpp
     src/Tracer/TracerInterface.cpp
+    src/Tracer/Writer/Writer.cpp
+    src/Tracer/Writer/CSVWriter.cpp
+    src/Tracer/Writer/H5Writer.cpp
+    src/Tracer/TracerInterface.cpp
     src/Tracer/Vulkan/VulkanTracer.cpp
     src/Tracer/Vulkan/Material.cpp
     src/Tracer/Vulkan/PalikTable.cpp
@@ -80,6 +84,9 @@ SET(HEADERS
     src/Tracer/RayList.h
     src/Tracer/Ray.h
     src/Tracer/TracerInterface.h
+    src/Tracer/Writer/Writer.hpp
+    src/Tracer/Writer/CSVWriter.hpp
+    src/Tracer/Writer/H5Writer.hpp
     src/Tracer/Vulkan/VulkanTracer.h
     src/Tracer/Vulkan/Material.h
     src/Tracer/Vulkan/PalikTable.h

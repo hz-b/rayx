@@ -2,9 +2,6 @@
 
 #include <cmath>
 #include <fstream>
-
-// TODO(rudi): can only be included when libhdf5 is installed, which is not the case in our CI.
-// #include <highfive/H5Easy.hpp>
 #include <iomanip>
 #include <sstream>
 
@@ -13,8 +10,7 @@
 #include "Model/Beamline/LightSource.h"
 #include "Model/Beamline/OpticalElement.h"
 #include "Ray.h"
-
-#define SHORTOUTPUT false
+#include "Writer/Writer.hpp"
 
 namespace RAYX {
 TracerInterface::TracerInterface() : m_numElements(0), m_numRays(0) {
@@ -66,16 +62,8 @@ bool TracerInterface::run() {
     std::vector<double> doubleVec(doubleVecSize);
     size_t index = 0;
 
-    // Print ray footprint into file
-    std::ofstream outputFile("output.csv");
-    outputFile.precision(17);
-    if (SHORTOUTPUT)
-        outputFile << "Index;Xloc;Yloc\n";
-    else
-        outputFile << "Index;Xloc;Yloc;Zloc;Weight;Xdir;Ydir;Zdir;Energy;"
-                      "Stokes0;Stokes1;Stokes2;Stokes3;pathLength;order;"
-                      "lastElement;extraParam\n";
-
+    std::unique_ptr<Writer> w =
+        std::make_unique<CSVWriter>();  // TODO(rudi) allow other writer
     // get rays from tracer
     for (auto outputRayIterator = m_RayTracer.getOutputIteratorBegin(),
               outputIteratorEnd = m_RayTracer.getOutputIteratorEnd();
@@ -95,10 +83,9 @@ bool TracerInterface::run() {
                    << doubleVec[6] << ", energy: " << doubleVec[7]
                    << ", stokes 0: " << doubleVec[8];
 
-        writeToFile(doubleVec, outputFile, index);
+        w->appendRays(doubleVec, index);
         index = index + (*outputRayIterator).size();
     }
-    outputFile.close();
 
     // clean up tracer to avoid memory leaks
     m_RayTracer.cleanTracer();
@@ -106,42 +93,6 @@ bool TracerInterface::run() {
     // intentionally not RAYX_DEBUG()
     RAYX_LOG << "Done.";
     return true;
-}
-
-// writes rays to file
-void TracerInterface::writeToFile(const std::vector<double>& outputRays,
-                                  std::ofstream& file, int index) const {
-    size_t size = outputRays.size();
-
-    RAYX_D_LOG << "Writing " << outputRays.size() / RAY_DOUBLE_COUNT
-               << " rays to file...";
-
-    if (SHORTOUTPUT) {
-        char buff[64];
-        for (size_t i = 0; i < size; i = i + RAY_DOUBLE_COUNT) {
-            sprintf(buff, "%d;%.17f;%.17f\n", index, outputRays[i],
-                    outputRays[i + 1]);
-            file << buff;
-            index++;
-        }
-    } else {
-        char buff[384];
-        for (size_t i = 0; i < size; i = i + RAY_DOUBLE_COUNT) {
-            sprintf(buff,
-                    "%d;%.17f;%.17f;%.17f;%.17f;%.17f;%.17f;%.17f;%.17f;%.17f;%"
-                    ".17f;%.17f;%.17f;%.17f;%.17f;%.17f;%.17f\n",
-                    index, outputRays[i], outputRays[i + 1], outputRays[i + 2],
-                    outputRays[i + 3], outputRays[i + 4], outputRays[i + 5],
-                    outputRays[i + 6], outputRays[i + 7], outputRays[i + 8],
-                    outputRays[i + 9], outputRays[i + 10], outputRays[i + 11],
-                    outputRays[i + 12], outputRays[i + 13], outputRays[i + 14],
-                    outputRays[i + 15]);
-            file << buff;
-            index++;
-        }
-    }
-
-    RAYX_D_LOG << "Writing done!";
 }
 }  // namespace RAYX
 // namespace RAYX
