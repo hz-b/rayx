@@ -284,6 +284,33 @@ TEST(Ellips, defaultParams) {
                               eb.getElementParameters());
 }
 
+TEST(Ellips, testEllipsoid) {
+    RAYX::Geometry::GeometricalShape geometricalShape =
+        RAYX::Geometry::GeometricalShape::RECTANGLE;
+    double width = 20;
+    double height = 390;
+    double incidence = 2;
+    double azimuthal = 90;
+    // double dist = 12451.51535;
+    double entranceArmLength = 39600;
+    double exitArmLength = 1900;
+    double longHalfAxisA = 20750;
+    double shortHalfAxisB = 302.721702601;
+    // int coordSys = 0;  // {CS_CURVATURE, CS_MIRROR};
+    int figRot = 1;  // { FR_YES, FR_PLANE, FR_A11};
+    double a_11 = 1;
+    double designAngle = 1.978;
+    glm::dvec4 position = glm::dvec4(-1684.797, 30.544, 39546.181, 1);
+    glm::dmat4x4 orientation = glm::dmat4x4(0, 1.0, 0, 0, -0.998, -0.0, -0.065,
+                                            0, -0.065, 0, 0.998, 0, 0, 0, 0, 1);
+    std::vector<double> mis = {12, 72, 1.12, 0.1, 0.7341, 2.5};
+    std::vector<double> sE = {0.037, 0.023, 0, 0, 0, 0, 0};
+    Material mat = Material::AL;
+    RAYX::Ellipsoid e = RAYX::Ellipsoid(
+        "ellips", geometricalShape, width, height, azimuthal, position,
+        longHalfAxisA, shortHalfAxisB, designAngle, orientation, incidence,
+        entranceArmLength, exitArmLength, figRot, a_11, sE, mat);
+}
 /*
 TEST(Ellips, testParamsCSCurvature) {
     double width = 123.51;

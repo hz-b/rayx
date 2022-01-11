@@ -81,40 +81,26 @@ Ellipsoid::Ellipsoid(const char* name,
       m_a11(a_11),
       m_shortHalfAxisB(ShortHalfAxisB),
       m_longHalfAxisA(LongHalfAxisA),
-      m_DesignGrazingAngle(DesignAngle) {
+      m_DesignGrazingAngle(degToRad(DesignAngle)) {
     RAYX_LOG << name << " Manual";
     m_offsetY0 =
-        0;  // what is this for? RAYX.FOR: "only !=0 in case of Monocapillary"
+        0;  // what is this for? RAY.FOR: "only !=0 in case of Monocapillary"
 
     m_figureRotation =
         (figRot == 0 ? FR_YES : (figRot == 1 ? FR_PLANE : FR_A11));
 
-    double theta = m_incidence;
-
-    if (theta > PI / 2) {
-        theta = PI / 2;
-    }
-
-    double angle = atan(tan(theta) * (m_entranceArmLength - m_exitArmLength) /
-                        (m_entranceArmLength + m_exitArmLength));
-
-    m_y0 = m_entranceArmLength * sin(theta - angle);
-
-    m_z0 = 0;  // center of ellipsoid y0,z0
-    if (m_shortHalfAxisB != 0) {
-        m_z0 = (m_longHalfAxisA / m_shortHalfAxisB) *
-               (m_longHalfAxisA / m_shortHalfAxisB) * m_y0 * tan(angle);
-    }
+    // if design angle not given, take incidenceAngle
+    calculateCenterFromHalfAxes(m_DesignGrazingAngle);
 
     // calculate half axis C
     if (m_figureRotation == FR_YES) {
-        m_halfAxisC = sqrt(pow(m_shortHalfAxisB, 2) / 1);  // devided by 1??
+        m_halfAxisC = m_shortHalfAxisB;  // sqrt(pow(m_shortHalfAxisB, 2) / 1);
+                                         // devided by 1??
     } else if (m_figureRotation == FR_PLANE) {
         m_halfAxisC = INFINITY;
     } else {
         m_halfAxisC = sqrt(pow(m_shortHalfAxisB, 2) / m_a11);
     }
-    m_tangentAngle = angle;
 
     RAYX_LOG << "A= " << m_longHalfAxisA << ", B= " << m_shortHalfAxisB
              << ", C= " << m_halfAxisC << ", angle = " << m_tangentAngle
@@ -145,6 +131,35 @@ void Ellipsoid::calcRadius() {
     m_radius = 2.0/sin(theta) / (1.0 / m_entranceArmLength + 1.0 /
 m_exitArmLength);
 }*/
+
+void Ellipsoid::calculateCenterFromHalfAxes(double angle) {
+    double mt;  // tangent slope
+    if (m_longHalfAxisA > m_shortHalfAxisB) {
+        if (angle > 0) {
+            m_y0 = -pow(m_shortHalfAxisB, 2) * 1 / tan(angle) /
+                   sqrt(pow(m_longHalfAxisA, 2) - pow(m_shortHalfAxisB, 2));
+        } else {
+            m_y0 = -m_shortHalfAxisB;
+        }
+    } else {
+        m_y0 = 0.0;
+    }
+    if (m_entranceArmLength > m_exitArmLength && -m_shortHalfAxisB < m_y0) {
+        m_z0 = m_longHalfAxisA * sqrt(pow(m_shortHalfAxisB, 2) - pow(m_y0, 2)) /
+               m_shortHalfAxisB;
+    } else if (m_entranceArmLength < m_exitArmLength &&
+               -m_shortHalfAxisB < m_y0) {
+        m_z0 = -m_longHalfAxisA *
+               sqrt(pow(m_shortHalfAxisB, 2) - pow(m_y0, 2)) / m_shortHalfAxisB;
+    } else {
+        m_z0 = 0.0;
+    }
+    if (m_longHalfAxisA > 0.0 && m_y0 < 0.0) {
+        mt = -pow(m_shortHalfAxisB / m_longHalfAxisA, 2) * m_z0 / m_y0;
+    }
+
+    m_tangentAngle = atan(mt);
+}
 
 /**
  *  caclulates the half axes, tangent angle and the center of the ellipsoid (z0,
