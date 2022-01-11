@@ -1,3 +1,5 @@
+#ifndef CI  // highfive doesn't work in CI
+
 #pragma once
 
 #include <highfive/H5Easy.hpp>
@@ -13,3 +15,5 @@ class H5Writer : public Writer {
   private:
     H5Easy::File m_file;
 };
+
+#endif

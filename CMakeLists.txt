@@ -15,10 +15,7 @@ endif()
 
 if ("$ENV{CI}" STREQUAL "YES")
 	# warnings are treated as errors
-	set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O3 -Werror") # -O3 finds more errors!
-else()
-	# enable vulkan testing
-	set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DVULKAN_TEST")
+	set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O3 -Werror -D CI") # -O3 finds more errors!
 endif()
 
 add_subdirectory(Intern)

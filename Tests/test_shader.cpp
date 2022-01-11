@@ -13,15 +13,15 @@
 #include "Tracer/Vulkan/VulkanTracer.h"
 RAYX::VulkanTracer tracer;
 
-/** using this function is preferable to directly adding your test with `#ifdef
- * VULKAN_TEST`, because with `if (!shouldDoVulkanTests()) { GTEST_SKIP(); }`
- * your test will still be *compiled* even if VULKAN_TEST is diabled
+/** using this function is preferable to directly adding your test with `#ifndef
+ * CI`, because with `if (!shouldDoVulkanTests()) { GTEST_SKIP(); }`
+ * your test will still be *compiled* even if CI is enabled
  */
 bool shouldDoVulkanTests() {
-#ifdef VULKAN_TEST
-    return true;
-#else
+#ifdef CI
     return false;
+#else
+    return true;
 #endif
 }
 

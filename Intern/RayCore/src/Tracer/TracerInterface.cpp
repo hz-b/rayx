@@ -62,8 +62,14 @@ bool TracerInterface::run() {
     std::vector<double> doubleVec(doubleVecSize);
     size_t index = 0;
 
-    std::unique_ptr<Writer> w =
-        std::make_unique<H5Writer>();  // TODO(rudi) allow other writer
+    std::unique_ptr<Writer> w =  // TODO(rudi): maybe allow CSVWriter to also be
+                                 // used in non-CI builds
+#ifdef CI
+        std::make_unique<CSVWriter>();
+#else
+        std::make_unique<H5Writer>();
+#endif
+
     // get rays from tracer
     for (auto outputRayIterator = m_RayTracer.getOutputIteratorBegin(),
               outputIteratorEnd = m_RayTracer.getOutputIteratorEnd();
