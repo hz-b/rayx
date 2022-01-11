@@ -31,10 +31,9 @@ void addBeamlineObjectFromXML(rapidxml::xml_node<>* node, Beamline* beamline,
         if (s) {
             beamline->m_LightSources.push_back(s);
         } else {
-            std::cerr << "could not construct LightSource with Name: "
-                      << node->first_attribute("name")->value()
-                      << "; Type: " << node->first_attribute("type")->value()
-                      << '\n';
+            RAYX_ERR << "could not construct LightSource with Name: "
+                     << node->first_attribute("name")->value()
+                     << "; Type: " << node->first_attribute("type")->value();
         }
     };
 
@@ -45,10 +44,9 @@ void addBeamlineObjectFromXML(rapidxml::xml_node<>* node, Beamline* beamline,
         if (e) {
             beamline->m_OpticalElements.push_back(e);
         } else {
-            std::cerr << "could not construct OpticalElement with Name: "
-                      << node->first_attribute("name")->value()
-                      << "; Type: " << node->first_attribute("type")->value()
-                      << '\n';
+            RAYX_ERR << "could not construct OpticalElement with Name: "
+                     << node->first_attribute("name")->value()
+                     << "; Type: " << node->first_attribute("type")->value();
         }
     };
 
@@ -96,10 +94,9 @@ void addBeamlineObjectFromXML(rapidxml::xml_node<>* node, Beamline* beamline,
     } else if (strcmp(type, "Cylinder") == 0) {
         addOpticalElement(Cylinder::createFromXML(node, group_context), node);
     } else {
-        std::cerr
-            << "[Importer]: could not classify beamline object with Name: "
-            << node->first_attribute("name")->value()
-            << "; Type: " << node->first_attribute("type")->value() << '\n';
+        RAYX_ERR << "could not classify beamline object with Name: "
+                 << node->first_attribute("name")->value()
+                 << "; Type: " << node->first_attribute("type")->value();
     }
 }
 
@@ -119,15 +116,14 @@ void handleObjectCollection(rapidxml::xml_node<>* collection,
             if (success) {
                 group_context->push_back(g);
             } else {
-                std::cerr << "parseGroup failed!\n";
+                RAYX_ERR << "parseGroup failed!";
             }
             handleObjectCollection(object, beamline, group_context);
             if (success) {
                 group_context->pop_back();
             }
         } else if (strcmp(object->name(), "param") != 0) {
-            std::cerr << "received weird object->name(): " << object->name()
-                      << std::endl;
+            RAYX_ERR << "received weird object->name(): " << object->name();
         }
     }
 }

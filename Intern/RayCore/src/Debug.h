@@ -10,8 +10,8 @@
  */
 
 #include <iostream>
-#include <string>
 #include <sstream>
+#include <string>
 
 // Memory leak detection (RAYX_NEW instead of new allows leaks to be detected)
 #ifdef RAY_DEBUG_MODE
@@ -76,11 +76,22 @@ struct Log {
         }
 
         std::string pad;
-        while (4 + line_string.size() + filename.size() + pad.size() < PREFIX_LEN) { pad += " "; }
+        while (4 + line_string.size() + filename.size() + pad.size() <
+               PREFIX_LEN) {
+            pad += " ";
+        }
+        if (ERR) {
+            stream() << "\x1B[31m";  // color red
+        }
         stream() << "[" << pad << filename << ":" << line_string << "] ";
     }
 
-    ~Log() { stream() << std::endl; }
+    ~Log() {
+        stream() << std::endl;
+        if (ERR) {
+            stream() << "\033[0m";  // color reset
+        }
+    }
 
     std::ostream& stream() const {
         if (ERR) {
