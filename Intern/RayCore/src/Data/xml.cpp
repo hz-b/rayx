@@ -112,10 +112,10 @@ bool paramMisalignment(const rapidxml::xml_node<>* node,
 
     rapidxml::xml_node<>* p;
 
-    if (!param(node, "alignmentError",
-               &p)) {  // if error is not given, it'll be zero.
-        *out = std::vector<double>(6, 0.f);
-        return true;
+    *out = std::vector<double>(6, 0.f);
+
+    if (!param(node, "alignmentError", &p)) {
+        return true;  // if error is not given, it'll be zero.
     }
 
     if (strcmp(p->first_attribute("comment")->value(), "Yes") == 0) {
