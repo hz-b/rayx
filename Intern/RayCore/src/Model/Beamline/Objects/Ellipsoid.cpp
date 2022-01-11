@@ -133,7 +133,8 @@ m_exitArmLength);
 }*/
 
 void Ellipsoid::calculateCenterFromHalfAxes(double angle) {
-    double mt;  // tangent slope
+    // TODO: is mt = 0 a good default for the case that it'll never be set?
+    double mt = 0;  // tangent slope
     if (m_longHalfAxisA > m_shortHalfAxisB) {
         if (angle > 0) {
             m_y0 = -pow(m_shortHalfAxisB, 2) * 1 / tan(angle) /
