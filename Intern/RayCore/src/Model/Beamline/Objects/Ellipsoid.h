@@ -31,6 +31,7 @@ class RAYX_API Ellipsoid : public OpticalElement {
     ~Ellipsoid();
 
     void calcHalfAxes();
+    void calculateCenterFromHalfAxes(double angle);
     double getRadius() const;
     double getExitArmLength() const;
     double getEntranceArmLength() const;
