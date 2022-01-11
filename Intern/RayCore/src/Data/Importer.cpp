@@ -142,6 +142,11 @@ Beamline Importer::importBeamline(const char* filename) {
     std::stringstream buffer;
     buffer << t.rdbuf();
     std::string test = buffer.str();
+    if (test.empty()) {
+        RAYX_ERR
+            << "importBeamline could not open file! (or it was just empty)";
+        exit(1);
+    }
     std::vector<char> cstr(test.c_str(), test.c_str() + test.size() + 1);
     rapidxml::xml_document<> doc;
     doc.parse<0>(cstr.data());
