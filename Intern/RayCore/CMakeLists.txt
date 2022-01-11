@@ -37,7 +37,6 @@ SET(SOURCE
     src/Model/Geometry/Geometry.cpp
     src/Tracer/RayList.cpp
     src/Tracer/TracerInterface.cpp
-    src/Tracer/Writer/Writer.cpp
     src/Tracer/Writer/CSVWriter.cpp
     src/Tracer/Writer/H5Writer.cpp
     src/Tracer/TracerInterface.cpp
