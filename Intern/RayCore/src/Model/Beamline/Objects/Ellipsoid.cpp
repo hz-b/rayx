@@ -159,7 +159,7 @@ void Ellipsoid::calculateCenterFromHalfAxes(double angle) {
         mt = -pow(m_shortHalfAxisB / m_longHalfAxisA, 2) * m_z0 / m_y0;
     }
 
-    m_tangentAngle = atan(mt);
+    m_tangentAngle = radToDeg(atan(mt));
 }
 
 /**
@@ -283,16 +283,6 @@ std::shared_ptr<Ellipsoid> Ellipsoid::createFromXML(
         return nullptr;
     }
 
-    // if (strcmp(fig_rot, "plane") == 0)
-    //     m_figRot = Ellipsoid::FIGURE_ROTATION::FR_PLANE;
-    // else if (strcmp(fig_rot, "yes") == 0)
-    //     m_figRot = Ellipsoid::FIGURE_ROTATION::FR_YES;
-    // else if (strcmp(fig_rot, "a_11") == 0) {  // TODO OS: Fix these cases
-    // with
-    //                                           // correct expected strings
-    //     m_figRot = Ellipsoid::FIGURE_ROTATION::FR_A11;
-    // }>
-
     std::vector<double> slopeError;
     if (!xml::paramSlopeError(node, &slopeError)) {
         return nullptr;
@@ -305,7 +295,7 @@ std::shared_ptr<Ellipsoid> Ellipsoid::createFromXML(
 
     // TODO: Are values stored as 0.0 if set to AUTO?[RAY-UI]
     double mDesignGrazing;
-    if (!xml::paramDouble(node, "designGrazingIncAngle", &mExit)) {
+    if (!xml::paramDouble(node, "designGrazingIncAngle", &mDesignGrazing)) {
         return nullptr;
     }
 
