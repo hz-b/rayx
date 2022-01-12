@@ -1159,7 +1159,7 @@ void VulkanTracer::setBeamlineParameters(uint32_t inNumberOfBeamlines,
                                          uint32_t inNumberOfRays) {
     RAYX_PROFILE_FUNCTION();
     RAYX_LOG << "Setting Beamline Parameters:";
-    RAYX_LOG << "\tNumber of beamlines: " << inNumberOfRays;
+    RAYX_LOG << "\tNumber of beamlines: " << inNumberOfBeamlines;
     RAYX_LOG << "\tNumber of Quadrics/Beamline: "
              << inNumberOfQuadricsPerBeamline;
     RAYX_LOG << "\tNumber of Rays: " << inNumberOfRays;
