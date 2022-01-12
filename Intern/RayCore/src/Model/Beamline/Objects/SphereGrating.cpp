@@ -15,7 +15,7 @@ namespace RAYX {
  * @param width                         total width of the mirror (x dimension)
  * @param height                        total height of the mirror (z dimension)
  * @param azimuthalAngle                rotation of element in xy-plane, needed
- * for stokes vector
+ * for stokes vector, in rad
  * @param radius                        radius of sphere
  * @param position                      position of the element in world
  * coordinate system
@@ -136,8 +136,8 @@ std::shared_ptr<SphereGrating> SphereGrating::createFromXML(
     }
 
     return std::make_shared<SphereGrating>(
-        name, mount, geometricalShape, width, height, azimuthalAngle, radius,
-        position, orientation, designEnergyMounting, lineDensity,
+        name, mount, geometricalShape, width, height, degToRad(azimuthalAngle),
+        radius, position, orientation, designEnergyMounting, lineDensity,
         orderOfDiffraction, vls, slopeError, mat);
 }
 

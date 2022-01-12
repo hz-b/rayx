@@ -16,7 +16,7 @@ namespace RAYX {
  * @param width                         total width of the element (x-dimension)
  * @param height                        height of the element (z- dimensions)
  * @param azimuthalAngle                rotation of element in xy-plane, needed
- * for stokes vector
+ * for stokes vector, in rad
  * @param position                      position of the RZP in world coordinates
  * @param orientation                   orientation of the RZP in world
  * coordinates
@@ -300,14 +300,14 @@ std::shared_ptr<ReflectionZonePlate> ReflectionZonePlate::createFromXML(
     if (foundWidthB) {
         return std::make_shared<ReflectionZonePlate>(
             name, geometricalShape, curvatureType, widthA, height,
-            azimuthalAngle, position, orientation, designEnergy,
+            degToRad(azimuthalAngle), position, orientation, designEnergy,
             orderOfDiffraction, designOrderOfDiffraction, dAlpha, dBeta,
             mEntrance, mExit, sEntrance, sExit, shortRadius, longRadius,
             additionalZeroOrder, fresnelZOffset, slopeError, mat);
     } else {
         return std::make_shared<ReflectionZonePlate>(
             name, geometricalShape, curvatureType, widthA, widthB, height,
-            azimuthalAngle, position, orientation, designEnergy,
+            degToRad(azimuthalAngle), position, orientation, designEnergy,
             orderOfDiffraction, designOrderOfDiffraction, dAlpha, dBeta,
             mEntrance, mExit, sEntrance, sExit, shortRadius, longRadius,
             additionalZeroOrder, fresnelZOffset, slopeError, mat);

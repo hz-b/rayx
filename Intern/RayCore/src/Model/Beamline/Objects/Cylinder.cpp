@@ -14,6 +14,8 @@ namespace RAYX {
  * (LONG_RADIUS/SHORT_RADIUS)
  * @param width             width of the mirror (x-dimension)
  * @param height            height of the mirror (z-dimension)
+ * @param azimuthalAngle        azimuthal angle of object (rotation in xy plane
+ * with respect to previous element) in rad
  * @param position          position of the element in world coordinates
  * @param orientation       orientation of the element in world coordinates
  * @param grazingIncidence  desired incidence angle of the main ray, in deg
@@ -157,9 +159,9 @@ std::shared_ptr<Cylinder> Cylinder::createFromXML(
     }
 
     return std::make_shared<Cylinder>(name, geometricalShape, mRadius, 0, width,
-                                      height, azimuthalAngle, position,
-                                      orientation, incidenceAngle, mEntrance,
-                                      mExit, slopeError, mat);
+                                      height, degToRad(azimuthalAngle),
+                                      position, orientation, incidenceAngle,
+                                      mEntrance, mExit, slopeError, mat);
 }
 
 Cylinder::CYLINDER_DIRECTION Cylinder::getDirection() const {

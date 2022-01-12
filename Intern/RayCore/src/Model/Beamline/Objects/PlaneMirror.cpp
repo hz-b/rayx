@@ -15,6 +15,8 @@ namespace RAYX {
  * sys.)
  * @param height                height of mirror (z-dimension in element coord.
  * sys.)
+ * @param azimuthalAngle        azimuthal angle of object (rotation in xy plane
+ * with respect to previous element) in rad
  * @param position              position in world coordinates (in homogeneous
  * coordinates)
  * @param orientation           orientation in world coordinates
@@ -86,8 +88,8 @@ std::shared_ptr<PlaneMirror> PlaneMirror::createFromXML(
     }
 
     return std::make_shared<PlaneMirror>(name, geometricalShape, width, height,
-                                         azimuthalAngle, position, orientation,
-                                         slopeError, mat);
+                                         degToRad(azimuthalAngle), position,
+                                         orientation, slopeError, mat);
 }
 
 }  // namespace RAYX

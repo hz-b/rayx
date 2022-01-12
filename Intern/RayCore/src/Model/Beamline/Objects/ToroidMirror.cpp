@@ -13,7 +13,7 @@ namespace RAYX {
  * @param width                     width of the element
  * @param height                    height of the element
  * @param azimuthalAngle            rotation of element in xy-plane, needed for
- * stokes vector
+ * stokes vector, in rad
  * @param grazingIncidenceAngle     angle in which the main ray should hit the
  * element, used to calculate the radii, in rad
  * @param position                  position of element in world coordinate
@@ -130,10 +130,10 @@ std::shared_ptr<ToroidMirror> ToroidMirror::createFromXML(
         mat = Material::CU;  // default to copper
     }
 
-    return std::make_shared<ToroidMirror>(name, geometricalShape, width, height,
-                                          azimuthalAngle, position, orientation,
-                                          incidenceAngle, mEntrance, mExit,
-                                          sEntrance, sExit, slopeError, mat);
+    return std::make_shared<ToroidMirror>(
+        name, geometricalShape, width, height, degToRad(azimuthalAngle),
+        position, orientation, incidenceAngle, mEntrance, mExit, sEntrance,
+        sExit, slopeError, mat);
 }
 
 /**

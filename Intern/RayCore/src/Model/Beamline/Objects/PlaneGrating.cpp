@@ -14,7 +14,7 @@ namespace RAYX {
  * @param width                 width of element (x dimension)
  * @param height                height of element (z dimension)
  * @param azimuthalAngle        rotation of element in xy-plane, needed for
- * stokes vector
+ * stokes vector. in rad
  * @param position              position in world coordinate system
  * @param orientation           orientation(rotation) of element in world
  * coordinate system
@@ -135,8 +135,8 @@ std::shared_ptr<PlaneGrating> PlaneGrating::createFromXML(
     }
 
     return std::make_shared<PlaneGrating>(
-        name, geometricalShape, width, height, azimuthalAngle, position,
-        orientation, designEnergy, lineDensity, orderOfDiffraction,
+        name, geometricalShape, width, height, degToRad(azimuthalAngle),
+        position, orientation, designEnergy, lineDensity, orderOfDiffraction,
         additionalZeroOrder, vls, slopeError, mat);
 }
 

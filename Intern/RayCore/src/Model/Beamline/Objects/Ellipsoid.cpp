@@ -11,6 +11,8 @@ namespace RAYX {
  *
  * @param width             width of the mirror (x-dimension)
  * @param height            height of the mirror (z-dimension)
+ * @param azimuthalAngle        azimuthal angle of object (rotation in xy plane
+ * with respect to previous element) in rad
  * @param position          position of the element in world coordinates
  * @param orientation       orientation of the element in world coordinates
  * @param grazingIncidence  desired incidence angle of the main ray
@@ -311,14 +313,15 @@ std::shared_ptr<Ellipsoid> Ellipsoid::createFromXML(
     if ((mDesignGrazing == 0.0) && (mlongHalfAxisA == 0.0) &&
         (mshortHalfAxisB == 0.0)) {  // Auto calculation
         return std::make_shared<Ellipsoid>(
-            name, geometricalShape, width, height, mAzimAngle, position,
-            orientation, incidenceAngle, mEntrance, mExit, m_figRot, m_a11,
-            slopeError, mat);
+            name, geometricalShape, width, height, degToRad(mAzimAngle),
+            position, orientation, incidenceAngle, mEntrance, mExit, m_figRot,
+            m_a11, slopeError, mat);
     } else {
         return std::make_shared<Ellipsoid>(
-            name, geometricalShape, width, height, mAzimAngle, position,
-            mlongHalfAxisA, mshortHalfAxisB, mDesignGrazing, orientation,
-            incidenceAngle, mEntrance, mExit, m_figRot, m_a11, slopeError, mat);
+            name, geometricalShape, width, height, degToRad(mAzimAngle),
+            position, mlongHalfAxisA, mshortHalfAxisB, mDesignGrazing,
+            orientation, incidenceAngle, mEntrance, mExit, m_figRot, m_a11,
+            slopeError, mat);
     }
 }
 }  // namespace RAYX

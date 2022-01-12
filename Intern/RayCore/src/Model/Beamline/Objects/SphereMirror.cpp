@@ -14,7 +14,7 @@ namespace RAYX {
  * @param height                    height of optical element (z dim in element
  * coordinates)
  * @param azimuthalAngle            rotation of element in xy-plane, needed for
- * stokes vector
+ * stokes vector, in rad
  * @param grazingIncidenceAngle     angle in which the main ray should hit the
  * element. given in degree
  * @param position                  position of element in world coordinates
@@ -148,7 +148,7 @@ std::shared_ptr<SphereMirror> SphereMirror::createFromXML(
     }
 
     return std::make_shared<SphereMirror>(
-        name, geometricalShape, width, height, azimuthalAngle,
+        name, geometricalShape, width, height, degToRad(azimuthalAngle),
         grazingIncidenceAngle, position, orientation, entranceArmLength,
         exitArmLength, slopeError, mat);
 }
