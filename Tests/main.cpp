@@ -13,6 +13,8 @@ int main(int argc, char** argv) {
     }
 
     testing::InitGoogleTest(&argc, argv);
+    // stop execution of tests as soon as the first fails
+    testing::FLAGS_gtest_fail_fast = "fast";
 
     return RUN_ALL_TESTS();
 }
