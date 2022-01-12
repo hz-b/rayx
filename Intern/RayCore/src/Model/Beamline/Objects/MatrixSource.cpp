@@ -110,7 +110,8 @@ std::shared_ptr<MatrixSource> MatrixSource::createFromXML(
 
     return std::make_shared<MatrixSource>(
         name, energyDistribution, sourceWidth, sourceHeight, sourceDepth,
-        horDivergence, verDivergence, linPol0, linPol45, circPol, misalignment);
+        horDivergence / 1000, verDivergence / 1000, linPol0, linPol45, circPol,
+        misalignment);
 }
 
 /**
@@ -187,6 +188,7 @@ std::vector<Ray> MatrixSource::getRays() {
                    direction.z, stokes.x, stokes.y, stokes.z, stokes.w, en,
                    1.0);*/
         Ray r_copy((const Ray&)rayVector.at(i));
+        r_copy.m_energy = en = selectEnergy();
         rayVector.push_back(r_copy);
     }
     RAYX_LOG << "&rayVector: " << &(rayVector[0]);

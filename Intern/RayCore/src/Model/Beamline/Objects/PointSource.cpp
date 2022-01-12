@@ -1,10 +1,11 @@
 #include "PointSource.h"
 
 #include <Data/xml.h>
-#include "Debug.h"
 
 #include <cassert>
 #include <cmath>
+
+#include "Debug.h"
 
 namespace RAYX {
 
@@ -144,8 +145,8 @@ std::shared_ptr<PointSource> PointSource::createFromXML(
 
     return std::make_shared<PointSource>(
         name, energyDistribution, sourceWidth, sourceHeight, sourceDepth,
-        horDivergence, verDivergence, widthDist, heightDist, horDist, verDist,
-        linPol0, linPol45, circPol, misalignment);
+        horDivergence / 1000.0, verDivergence / 1000.0, widthDist, heightDist,
+        horDist, verDist, linPol0, linPol45, circPol, misalignment);
 }
 
 /**
@@ -186,10 +187,10 @@ std::vector<Ray> PointSource::getRays() {
         glm::dvec4 stokes =
             glm::dvec4(1, getLinear0(), getLinear45(), getCircular());
 
-        Ray r = {position.x, position.y, position.z, 1.0, direction.x,
-                        direction.y, direction.z, en, stokes.x, stokes.y,
-                        stokes.z, stokes.w, 0.0, 0.0, 0.0, 0.0};
-                
+        Ray r = {position.x,  position.y,  position.z,  1.0,
+                 direction.x, direction.y, direction.z, en,
+                 stokes.x,    stokes.y,    stokes.z,    stokes.w,
+                 0.0,         0.0,         0.0,         0.0};
 
         rayVector.emplace_back(r);
     }
