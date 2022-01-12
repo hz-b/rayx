@@ -11,6 +11,8 @@
 #include <type_traits>
 
 #include "Tracer/Vulkan/VulkanTracer.h"
+
+#if RUN_TEST_SHADER
 RAYX::VulkanTracer tracer;
 
 /** using this function is preferable to directly adding your test with `#ifndef
@@ -25,58 +27,83 @@ bool shouldDoVulkanTests() {
 #endif
 }
 
+/**
+ * testing suite "Tracer"
+ */
 class Tracer : public ::testing::Test {
   protected:
-    // before first test in test suite "Tracer" is run, initialize the tracer
-    // tracer will be a shared instance among all tests
+    /** this is run before the first test in the testing Suite
+     * before first test in test suite "Tracer" is run, initialize the tracer
+     * tracer will be a shared instance among all tests
+     */
     static void SetUpTestSuite() {
         std::cout << "initialize Vulkantracer instance" << std::endl;
         tracer = RAYX::VulkanTracer();
     }
 
+    /**
+     * SetUp is run directly before each test
+     */
     virtual void SetUp() {
         if (!shouldDoVulkanTests()) {
             GTEST_SKIP();
         }
     }
-    // run after last test of suite "Tracer", cleans up the shared instance of
-    // tracer
+    /** this is run after the last test of the testing suite
+     * run after last test of suite "Tracer", cleans up the shared instance of
+     * tracer
+     */
     static void TearDownTestSuite() {
         tracer.cleanup();
         std::cout << "clear tracer instance" << std::endl;
     }
 };
 
-std::vector<double> zeros = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+std::vector<double> zeros = {
+    0, 0, 0, 0, 0, 0, 0, 0, 0,
+    0, 0, 0, 0, 0, 0, 0};  // 16 zeros for filling the optical elements for test
+                           // cases
 std::vector<double> zeros7 = {0, 0, 0, 0, 0, 0, 0};  // for slope error
 
 /** runs beamline in "elements" with rays in "testValues"
  * @param testValues        contains rays
  * @param elements          contains optical elements that form the beamline
+ * @return output rays, result from tracer after tracing the given rays in the
+ * given beamline
  */
 std::list<double> runTracer(
     std::vector<RAYX::Ray> testValues,
     std::vector<std::shared_ptr<RAYX::OpticalElement>> elements) {
-    for (int i = 0; i < 16; i++) {
-        std::cout << "elements[0]: " << elements[0]->getSurfaceParams()[i]
-                  << std::endl;
-    }
-
     std::list<std::vector<RAYX::Ray>> rayList;
+    // set beamline parameters (number of beamlines (1), number of elements,
+    // number of rays)
+    std::cout << "set beamline parameters" << std::endl;
     tracer.setBeamlineParameters(1, elements.size(), testValues.size());
+
+    // add rays
     std::cout << "testValues.size(): " << testValues.size() << std::endl;
     (tracer).addRayVector(std::move(testValues));
     std::cout << "add rays to tracer done" << std::endl;
 
+    // add elements
     for (std::shared_ptr<RAYX::OpticalElement> element : elements) {
+        std::cout << "add " << element->getName() << std::endl;
+        printMatrix(element->getSurfaceParams());
+        printMatrix(element->getObjectParameters());
+        printMatrix(element->getElementParameters());
+        printMatrix(element->getInMatrix());
         tracer.addVectors(element->getSurfaceParams(), element->getInMatrix(),
                           element->getOutMatrix(),
                           element->getObjectParameters(),
                           element->getElementParameters());
     }
+    // execute tracing
     tracer.run();  // run tracer
     std::list<double> outputRays;
+    // get resulting rays from tracer
     std::vector<RAYX::Ray> outputRayVector = *(tracer.getOutputIteratorBegin());
+    // convert to a list of doubles in order pos, weight, dir, energy, stokes,
+    // pathlength, order, lastElement, extraParam
     for (auto iter = outputRayVector.begin(); iter != outputRayVector.end();
          iter++) {
         outputRays.push_back((*iter).getxPos());
@@ -98,19 +125,31 @@ std::list<double> runTracer(
     }
     std::cout << "got " << outputRays.size() << " values from shader"
               << std::endl;
-    // empties buffers etc to reuse the tracer instance
+    // empties buffers etc to reuse the tracer instance with a new beamline and
+    // new rays
     tracer.cleanTracer();
     return outputRays;
 }
 
+/** writes doubles in outputRays to a file with name "rays"
+ * the list of output rays is expected to be in the order pos, weight, dir,
+ * energy, stokes, pathLength, order, lastElement, extraParam
+ * @param outputRays        list of doubles containing ray paramters
+ * @param name              name of csv file in which the rays are written
+ * (without ".csv" ending)
+ */
 void writeToFile(std::list<double> outputRays, std::string name) {
     std::cout << "writing to file..." << name << std::endl;
     std::ofstream outputFile;
+    // set the precision to 17
     outputFile.precision(17);
     std::cout.precision(17);
+
+    // relative path to folder from bin/build
     std::string filename = "../../Tests/output/";
     filename.append(name);
     filename.append(".csv");
+    // create file
     outputFile.open(filename);
     char sep = ';';  // file is saved in .csv (comma seperated value), excel
                      // compatibility is manual right now
@@ -122,31 +161,38 @@ void writeToFile(std::list<double> outputRays, std::string name) {
     // outputFile << "Index,Xloc,Yloc,Zloc,Weight,Xdir,Ydir,Zdir" << std::endl;
 
     size_t counter = 0;
-    int print = 0;  // whether to print on std::out (0=no, 1=yes)
+    bool print = false;  // whether to print on std::out
+    //
     for (std::list<double>::iterator i = outputRays.begin();
          i != outputRays.end(); i++) {
+        // beginning of ray -> put index
         if (counter % RAY_DOUBLE_COUNT == 0) {
             outputFile << counter / VULKANTRACER_RAY_DOUBLE_AMOUNT;
-            if (print == 1) std::cout << ")" << std::endl;
-            if (print == 1) std::cout << "(";
+            if (print) std::cout << ")" << std::endl;
+            if (print) std::cout << "(";
         }
+        // print seperator and current value
         outputFile << sep << *i;
+        // end of ray -> new line
         if (counter % RAY_DOUBLE_COUNT == RAY_DOUBLE_COUNT - 1) {
             outputFile << std::endl;
             counter++;
             continue;
         }
+        // for better readability in std::out
         if (counter % RAY_DOUBLE_COUNT == 3) {
-            if (print == 1) std::cout << ") ";
+            if (print) std::cout << ") ";
         } else if (counter % RAY_DOUBLE_COUNT == 4) {
-            if (print == 1) std::cout << " (";
+            if (print) std::cout << " (";
         } else if (counter % RAY_DOUBLE_COUNT != 0) {
-            if (print == 1) std::cout << ", ";
+            if (print) std::cout << ", ";
         }
-        if (print == 1) std::cout << *i;
+        // print current value to std out
+        if (print) std::cout << *i;
         counter++;
     }
-    if (print == 1) std::cout << ")" << std::endl;
+    if (print) std::cout << ")" << std::endl;
+    // close the file
     outputFile.close();
     std::cout << "done!" << std::endl;
 }
@@ -190,7 +236,8 @@ std::vector<RAYX::Ray> addTestSetting(
  * @param testValues            vector of rays that contains the input values
  * for the unit test, which value is stored where has to be the same on both
  * shader and c++ test setup.
- * @return list of doubles that contains the resulting values
+ * @return list of doubles that contains the resulting values after running the
+ * shader
  *
  */
 std::list<double> runUnitTest(double unittestid,
@@ -234,7 +281,26 @@ void testOpticalElement(
     writeToFile(outputRays, filename);
 }
 
-// used to compare correct values and results in unit tests that use the shader
+void testBeamline(std::shared_ptr<RAYX::Beamline> beamline) {
+    std::vector<std::shared_ptr<RAYX::OpticalElement>> elements =
+        beamline->m_OpticalElements;
+    std::string filename = "testFile_";
+    filename.append(elements[0]->getName());
+
+    std::vector<RAYX::Ray> testValues = beamline->m_LightSources[0]->getRays();
+    std::list<double> outputRays = runTracer(testValues, elements);
+    // write to file "testFile_"+name of first element in beamlin
+    writeToFile(outputRays, filename);
+}
+
+/** used to compare correct values and results in unit tests that use the shader
+ * @param correct           vector of rays that we expect from the tracer
+ * @param outputRays        list of doubles that contains ray parameters for
+ * each ray in the order pos, weight, dir, energy, stokes, pathLength, order,
+ * lastElement, extraParam
+ * @param tolerance         the max. difference that is allowed between expected
+ * and result
+ */
 void compareFromCorrect(std::vector<RAYX::Ray> correct,
                         std::list<double> outputRays, double tolerance) {
     int counter = 0;
@@ -306,6 +372,18 @@ void compareFromCorrect(std::vector<RAYX::Ray> correct,
 template <typename ret, typename par>
 using fn = std::function<ret(par)>;
 
+/** if we test a simple function of the form y = f(x) like exp, sin, log,.. on
+ * the shader we can use this function to verify its result
+ * @param func          the function
+ * @param testValues    the values for which we test the function. vector of
+ * rays but the parameters are meaningless, just store values there to get them
+ * to the shader
+ * @param outputRays    the rays that we get from the shader. contain the
+ * results for applying the function to each of the testValues on the shader
+ *
+ * applies func to each value in testValues and compares with outputRays to
+ * verify that our implementation of func on the shader is correct
+ */
 template <typename ret, typename par>
 void compareFromFunction(fn<ret, par> func, std::vector<RAYX::Ray> testValues,
                          std::list<double> outputRays, double tolerance) {
@@ -378,60 +456,75 @@ void compareFromFunction(fn<ret, par> func, std::vector<RAYX::Ray> testValues,
 
 // UNIT TESTS
 
+/** test random uniform number generator on shader
+ * does not actually test the randomness but only if between 0 and 1
+ */
 TEST_F(Tracer, testUniformRandom) {
     double settings = 17;
 
+    // we want 2000 * RAY_DOUBLE_COUNT test values
     RAYX::SimulationEnv::get().m_numOfRays = 2000;
     RAYX::EnergyDistribution dist(RAYX::EnergyRange(100, 0), true);
     std::shared_ptr<RAYX::MatrixSource> m =
         std::make_shared<RAYX::MatrixSource>("Matrix source 1", dist, 0.065,
                                              0.04, 0.0, 0.001, 0.001, 1, 0, 0,
                                              std::vector<double>{0, 0, 0, 0});
+    // create 2000 rays that are put to the shader. they will be overwritten by
+    // the random numbers
     std::vector<RAYX::Ray> testValues = m->getRays();
 
-    std::shared_ptr<RAYX::OpticalElement> q =
-        std::make_shared<RAYX::OpticalElement>(
-            "testRandomNumbers",
-            std::vector<double>{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, settings,
-                                0, 0},
-            zeros, zeros, zeros, zeros);
-    std::list<double> outputRays = runTracer(testValues, {q});
+    std::list<double> outputRays = runUnitTest(settings, testValues);
 
+    double sum = 0;
+    // expect all values to be between 0 and 1
     for (std::list<double>::iterator i = outputRays.begin();
          i != outputRays.end(); i++) {
+        sum += *i;
         ASSERT_TRUE(*i <= 1.0);
         ASSERT_TRUE(*i >= 0.0);
     }
+    // expect the mean of all values to be about 0.5
+    EXPECT_NEAR(sum / (RAYX::SimulationEnv::get().m_numOfRays * 12), 0.5, 1e-2);
     std::string filename = "testFile_randomUniform";
     writeToFile(outputRays, filename);
 }
 
+/** test the exponential function e^x
+ */
 TEST_F(Tracer, ExpTest) {
+    double settings = 18;
+    // create n random rays (pos, dir, energy, weight and stokes of the ray is
+    // each a uniformly distributed random number between low and high)
     int n = 10;
     int low = -4;
     int high = 4;
-    double settings = 18;
     RAYX::SimulationEnv::get().m_numOfRays = n;
     RAYX::RandomRays random = RAYX::RandomRays(low, high);
 
     std::vector<RAYX::Ray> testValues = random.getRays();
+    // add some values manually
     RAYX::Ray r = {0,  1,        -3, 5,     PI, 2, 3, 4,
                    10, -4.41234, 0,  1.224, 0,  0, 0, 0};
     testValues.push_back(r);
 
     std::list<double> outputRays = runUnitTest(settings, testValues);
 
+    // compare result from shader (outputRays) with CPU function exp(x) on
+    // testValues
     double tolerance = 1e-13;
     auto expfun = fn<double, double>([](double x) { return exp(x); });
     compareFromFunction(expfun, testValues, outputRays, tolerance);
 }
 
+/** test natural logarithm function
+ * @see ExpTest
+ */
 TEST_F(Tracer, LogTest) {
-    std::list<std::vector<RAYX::Ray>> rayList;
+    double settings = 19;
+
     int n = 10;
     int low = 1;
     int high = 4;
-    double settings = 19;
     RAYX::SimulationEnv::get().m_numOfRays = n;
     RAYX::RandomRays random = RAYX::RandomRays(low, high);
 
@@ -447,11 +540,23 @@ TEST_F(Tracer, LogTest) {
     compareFromFunction(logfun, testValues, outputRays, tolerance);
 }
 
+/**
+ * test refrac2D function
+ * for grating with lines in both dimensions (RZP eg?)
+ * each test case:
+ * input:   normal at intersection point
+ *          direction of incoming ray
+ *          weight of incoming ray
+ *          az refraction parameter (Wavelength * line density * order * 1e-6)
+ * in one dimension ax refraction parameter in other dimension
+ * output:  direction of ray after refraction
+ *          weight of ray after refraction
+ */
 TEST_F(Tracer, testRefrac2D) {
+    double settings = 16;
+
     std::vector<RAYX::Ray> testValues;
     std::vector<RAYX::Ray> correct;
-    std::vector<std::shared_ptr<RAYX::OpticalElement>> quadrics;
-    double settings = 16;
 
     glm::dvec3 normal = glm::dvec3(0, 1, 0);
     glm::dvec3 direction = glm::dvec3(
@@ -519,6 +624,13 @@ TEST_F(Tracer, testRefrac2D) {
     compareFromCorrect(correct, outputRays, tolerance);
 }
 
+/** test normal_cartesian function that rotates a given normal around the x and
+ * z axis with two given angles
+ * @param normal        given normal vector
+ * @param slopeX        given angle for x rotation
+ * @param slopeZ        given angle for z rotation
+ * @return normal       resulting normal
+ */
 TEST_F(Tracer, testNormalCartesian) {
     std::vector<RAYX::Ray> testValues;
     std::vector<RAYX::Ray> correct;
@@ -573,12 +685,18 @@ TEST_F(Tracer, testNormalCartesian) {
     compareFromCorrect(correct, outputRays, tolerance);
 }
 
+/** test normal_cylindrical function that rotates a given normal cylindrical
+ * @param normal        given normal vector
+ * @param slopeX        given angle for x rotation
+ * @param slopeZ        given angle for z rotation
+ * @return normal       resulting normal
+ */
 TEST_F(Tracer, testNormalCylindrical) {
     std::vector<RAYX::Ray> testValues;
     std::vector<RAYX::Ray> correct;
 
     // encode: ray.position.x = slopeX, ray.position.z = slopeZ. ray.direction =
-    // normal at intersection point from eg quad fct.
+    // normal at intersection point from quad fct.
     double slopeX = 0;
     double slopeZ = 0;
     glm::dvec3 normal = glm::dvec3(0, 1, 0);
@@ -1566,6 +1684,12 @@ TEST_F(Tracer, palikTest) {
 class opticalElements : public Tracer {};
 
 TEST_F(opticalElements, planeMirrorDefault) {
+    const char* filename = "../../Tests/rml_files/planeMirrorDefault.rml";
+    std::shared_ptr<RAYX::Beamline> beamline = std::make_shared<RAYX::Beamline>(
+        RAYX::Importer::importBeamline(filename));
+    std::cout << "beamline imported" << std::endl;
+    // testBeamline(beamline);
+
     RAYX::WorldUserParams pm_param =
         RAYX::WorldUserParams(degToRad(10), degToRad(10), degToRad(7.5), 10000,
                               std::vector<double>{0, 0, 0, 0, 0, 0});
@@ -2632,3 +2756,4 @@ TEST_F(opticalElements, CylinderDefault) {
         std::make_shared<RAYX::ImagePlane>("ImagePlane", pos3, or3);
     testOpticalElement({cy, i}, 200);
 }
+#endif
