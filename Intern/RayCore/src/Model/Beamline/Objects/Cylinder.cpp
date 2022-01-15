@@ -43,6 +43,8 @@ Cylinder::Cylinder(const char* name,
       m_entranceArmLength(entranceArmLength),
       m_exitArmLength(exitArmLength) {
     RAYX_LOG << name;
+    RAYX_LOG << ((m_direction == LONG_RADIUS_R) ? "LONG RADIUS"
+                                                : "SHORT RADIUS");
     if (m_direction == LONG_RADIUS_R) {  // X-DIR
         m_a11 = 0;
         m_a33 = 1;
@@ -84,9 +86,8 @@ void Cylinder::setRadius() {
                        (1.0 / m_entranceArmLength + 1.0 / m_exitArmLength);
         }
     }
-    RAYX_LOG << ((m_direction == LONG_RADIUS_R) ? "LONG RADIUS"
-                                                : "SHORT RADIUS");
-    RAYX_LOG << m_radius;
+
+    RAYX_LOG << "Radius: " << m_radius;
 }
 
 std::shared_ptr<Cylinder> Cylinder::createFromXML(
@@ -158,10 +159,10 @@ std::shared_ptr<Cylinder> Cylinder::createFromXML(
         mat = Material::CU;  // default to copper
     }
 
-    return std::make_shared<Cylinder>(name, geometricalShape, mRadius, 0, width,
-                                      height, degToRad(azimuthalAngle),
-                                      position, orientation, incidenceAngle,
-                                      mEntrance, mExit, slopeError, mat);
+    return std::make_shared<Cylinder>(
+        name, geometricalShape, mRadius, mBendingRadius, width, height,
+        degToRad(azimuthalAngle), position, orientation, incidenceAngle,
+        mEntrance, mExit, slopeError, mat);
 }
 
 Cylinder::CYLINDER_DIRECTION Cylinder::getDirection() const {
