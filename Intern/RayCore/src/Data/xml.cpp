@@ -299,11 +299,15 @@ bool paramPositionAndOrientation(const rapidxml::xml_node<>* node,
 
     glm::dmat4x4 misOrientation =
         getRotationMatrix(-misalignment[3], misalignment[4], misalignment[5]);
-    printDMat4(misOrientation);
     glm::dvec4 offset =
         glm::dvec4(misalignment[0], misalignment[1], misalignment[2], 1);
-    *out_ori = *out_ori * misOrientation;
-    *out_pos += *out_ori * offset;
+    // no need to add misalignment again
+    if (group_context.size() == 0) {
+        return true;
+    }
+    // remove misalignment from element
+    *out_pos -= *out_ori * offset;
+    *out_ori = *out_ori * glm::transpose(misOrientation);
     out_pos->w = 1;
 
     for (unsigned i = group_context.size(); i-- > 0;) {

@@ -38,9 +38,7 @@ TEST(RmlTest, groupTransform) {
         0,   1, 0,     0,  //
         -42, 0, -1000, 1,  //
     };
-    for (int i = 0; i < 16; i++) {
-        ASSERT_EQ(correct[i], m[i]);
-    }
+    EXPECT_ITERABLE_DOUBLE_EQ(std::vector<double>, correct, m);
 }
 
 TEST(RmlTest, groupTransform2) {
@@ -75,25 +73,22 @@ TEST(RmlTest, groupTransformMisalignment) {
 
     glm::dmat4x4 groupOr = glm::dmat4x4(1, 0, 0, 0, 0, 0.985, -0.174, 0, 0,
                                         0.174, 0.985, 0, 0, 0, 0, 1);
-    glm::dmat4x4 elementOr = glm::dmat4x4(1, 0, 0, 0, 0, 0.996, -0.087, 0, 0,
-                                          0.087, 0.996, 0, 0, 0, 0, 1);
-    glm::dmat4x4 misalignmentOr = getRotationMatrix(-0.004, 0.005, 0.006);
+    printDMat4(groupOr);
     glm::dvec4 groupPos = glm::dvec4(42, 2, 4, 0);
-    glm::dvec4 elementPos = glm::dvec4(0, 0, 1000, 0);
-    glm::dvec4 offset = glm::dvec4(1, 2, 3, 1);
+    glm::dvec4 elementPos = glm::dvec4(0, 0, 1000, 1);
 
-    glm::dmat4x4 orientationCorrect = groupOr * elementOr * misalignmentOr;
-    glm::dvec4 positionCorrect =
-        groupPos + groupOr * (elementPos + elementOr * misalignmentOr * offset);
+    glm::dvec4 positionCorrect = groupPos + groupOr * elementPos;
     glm::dmat4x4 orientationResult = b.m_OpticalElements[0]->getOrientation();
+    printDMat4(orientationResult);
     glm::dvec4 positionResult = b.m_OpticalElements[0]->getPosition();
 
     EXPECT_ITERABLE_DOUBLE_EQ(std::vector<double>,
-                              glmToVector16(orientationCorrect),
-                              glmToVector16(orientationResult));
-    EXPECT_ITERABLE_DOUBLE_EQ(std::vector<double>,
                               glmToVector4(positionCorrect),
                               glmToVector4(positionResult));
+    for (int i = 0; i < 16; i++) {
+        EXPECT_NEAR(glmToVector16(groupOr)[i],
+                    glmToVector16(orientationResult)[i], 1e-15);
+    }
 }
 
 #endif
