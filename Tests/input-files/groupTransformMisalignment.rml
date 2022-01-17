@@ -83,24 +83,24 @@
     <param id="rotationYerror" enabled="T">5</param>
     <param id="rotationZerror" enabled="T">6</param>
 		<param id="worldPosition" enabled="F">
-		  <x>0</x>
-		  <y>0</y>
-		  <z>1000</z>
+		  <x>1.0030812141917165</x>
+		  <y>1.9940383757786857</y>
+		  <z>1003.0029383999106</z>
 		</param>
 		<param id="worldXdirection" enabled="F">
-		  <x>1</x>
-		  <y>0</y>
-		  <z>0</z>
+      <x>0.9999695003050405</x>
+		  <y>0.0059998890006710479</y>
+		  <z>-0.0049999791666927081</z>
 		</param>
 		<param id="worldYdirection" enabled="F">
-		  <x>0</x>
-		  <y>0.996</y>
-		  <z>-0.087</z>
+		  <x>-0.0059799164970795564</x>
+		  <y>0.99997412020712606</y>
+		  <z>0.0039999393335793665</z>
 		</param>
 		<param id="worldZdirection" enabled="F">
-		  <x>0</x>
-		  <y>0.087</y>
-		  <z>0.996</z>
+		  <x>0.0050238489602783942</x>
+		  <y>-0.0039699178787458754</y>
+		  <z>0.999979500136708</z>
 		</param>
 	  </object>
   </group>
