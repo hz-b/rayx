@@ -40,7 +40,7 @@ MatrixSource::MatrixSource(const std::string name, EnergyDistribution dist,
                            const double sourceDepth, const double horDivergence,
                            const double verDivergence, const double linPol0,
                            const double linPol45, const double circPol,
-                           const std::vector<double> misalignment)
+                           const std::array<double, 6> misalignment)
     : LightSource(name.c_str(), dist, linPol0, linPol45, circPol, misalignment,
                   sourceDepth, sourceHeight, sourceWidth, horDivergence,
                   verDivergence) {
@@ -103,7 +103,7 @@ std::shared_ptr<MatrixSource> MatrixSource::createFromXML(
         return nullptr;
     }
 
-    std::vector<double> misalignment;
+    std::array<double, 6> misalignment;
     if (!xml::paramMisalignment(node, &misalignment)) {
         return nullptr;
     }

@@ -12,8 +12,8 @@ TEST(Quadric, testTransformationMatrices) {
     double dist = 12005;
     RAYX::Geometry::GeometricalShape geometricalShape =
         RAYX::Geometry::GeometricalShape::RECTANGLE;
-    std::vector<double> sE = {1, 2, 3, 4, 5, 6, 7};
-    std::vector<double> mis = {1, 2, 3, 0.03, 0.02, 0.01};  // psi, phi, chi
+    std::array<double, 7> sE = {1, 2, 3, 4, 5, 6, 7};
+    std::array<double, 6> mis = {1, 2, 3, 0.03, 0.02, 0.01};  // psi, phi, chi
 
     RAYX::GeometricUserParams g_params =
         RAYX::GeometricUserParams(incidenceAngle);
@@ -28,29 +28,27 @@ TEST(Quadric, testTransformationMatrices) {
     // incidenceAngle, azimuthalAngle, dist, mis, sE, NULL, true); //
     // {1,2,3,0.01,0.02,0.03}
 
-    std::vector<double> correctInMat = {
+    std::array<double, 4 * 4> correctInMat = {
         0.9997500170828264,    -0.0093954937290516224, 0.02028861849598634, 0,
         0.0051669667654668724, 0.97994613741550907,    0.199195557728752,   0,
         -0.0217532939421341,   -0.19904093162465691,   0.97974971382524823, 0,
         260.14829377531987,    2387.4863841540064,     -11764.895314472104, 1};
-    EXPECT_ITERABLE_DOUBLE_EQ(std::vector<double>, plM.getInMatrix(),
-                              correctInMat);
+    EXPECT_ITERABLE_DOUBLE_EQ_ARR(4 * 4, plM.getInMatrix(), correctInMat);
 
-    std::vector<double> correctOutMat = {
+    std::array<double, 4 * 4> correctOutMat = {
         0.9997500170828264,     0.0051669667654668724, -0.0217532939421341,  0,
         -0.0093954937290516224, 0.97994613741550907,   -0.19904093162465691, 0,
         0.02028861849598634,    0.199195557728752,     0.97974971382524823,  0,
         1.0418248851126821,     2.562645914782741,     12007.519413984284,   1};
-    EXPECT_ITERABLE_DOUBLE_EQ(std::vector<double>, plM.getOutMatrix(),
-                              correctOutMat);
+    EXPECT_ITERABLE_DOUBLE_EQ_ARR(4 * 4, plM.getOutMatrix(), correctOutMat);
 }
 
 TEST(Quadric, testGlobalCoordinates) {
-    std::vector<double> sE = {0, 0, 0, 0, 0, 0, 0};
+    std::array<double, 7> sE = {0, 0, 0, 0, 0, 0, 0};
     RAYX::GeometricUserParams g_params = RAYX::GeometricUserParams(10);
     RAYX::WorldUserParams w_coord = RAYX::WorldUserParams(
         g_params.getAlpha(), g_params.getBeta(), degToRad(7), 2000,
-        std::vector<double>{0.5, 0.7, 1.0, 0.04, 0.03, 0.05});
+        std::array<double, 6>{0.5, 0.7, 1.0, 0.04, 0.03, 0.05});
     glm::dvec4 pos = w_coord.calcPosition();
     glm::dmat4x4 or1 = w_coord.calcOrientation();
     std::shared_ptr<RAYX::PlaneMirror> p1a =
@@ -62,8 +60,8 @@ TEST(Quadric, testGlobalCoordinates) {
     RAYX::GeometricUserParams g_params2 = RAYX::GeometricUserParams(15);
     RAYX::WorldUserParams w_coord2 = RAYX::WorldUserParams(
         g_params2.getAlpha(), g_params2.getBeta(), degToRad(4), 7000,
-        std::vector<double>{2, 4, 6, 0.04, 0.01,
-                            0.06});  // std::vector<double>{0,0,0, 0,0,0});
+        std::array<double, 6>{2, 4, 6, 0.04, 0.01,
+                              0.06});  // std::vector<double>{0,0,0, 0,0,0});
     glm::dvec4 pos2 = w_coord2.calcPosition(w_coord, pos, or1);
     glm::dmat4x4 or2 = w_coord2.calcOrientation(w_coord, or1);
     std::shared_ptr<RAYX::PlaneMirror> p2b =
@@ -76,7 +74,7 @@ TEST(Quadric, testGlobalCoordinates) {
     g_params = RAYX::GeometricUserParams(7);
     RAYX::WorldUserParams w_coord3 = RAYX::WorldUserParams(
         g_params.getAlpha(), g_params.getBeta(), degToRad(10), 8000,
-        std::vector<double>{4, 5, 3, 0.01, 0.02, 0.03});
+        std::array<double, 6>{4, 5, 3, 0.01, 0.02, 0.03});
     glm::dvec4 pos3 = w_coord3.calcPosition(w_coord2, pos2, or2);
     glm::dmat4x4 or3 = w_coord3.calcOrientation(w_coord2, or2);
     std::shared_ptr<RAYX::PlaneMirror> p3c =
@@ -89,7 +87,7 @@ TEST(Quadric, testGlobalCoordinates) {
     g_params = RAYX::GeometricUserParams(22);
     RAYX::WorldUserParams w_coord4 = RAYX::WorldUserParams(
         g_params.getAlpha(), g_params.getBeta(), degToRad(17), 1000,
-        std::vector<double>{10, 3, 2, 0.01, 0.03, 0.06});
+        std::array<double, 6>{10, 3, 2, 0.01, 0.03, 0.06});
     glm::dvec4 pos4 = w_coord4.calcPosition(w_coord3, pos3, or3);
     glm::dmat4x4 or4 = w_coord4.calcOrientation(w_coord3, or3);
     std::shared_ptr<RAYX::PlaneMirror> p4d =
@@ -98,20 +96,18 @@ TEST(Quadric, testGlobalCoordinates) {
             200, w_coord4.getAzimuthalAngle(), pos4, or4, sE,
             Material::CU);  // {1,2,3,0.01,0.02,0.03}
 
-    std::vector<double> correctInMat = {
+    std::array<double, 4 * 4> correctInMat = {
         0.98549875516199115,   -0.16900296657661762, 0.015172371682388559, 0,
         0.16532344425841758,   0.97647242956597469,  0.13845487740074897,  0,
         -0.038214687656708428, -0.13393876058044285, 0.99025251631160971,  0,
         75.929375313416855,    267.1775211608857,    -1981.5050326232194,  1};
-    std::vector<double> correctOutMat = {
+    std::array<double, 4 * 4> correctOutMat = {
         0.98549875516199115,  0.16532344425841758, -0.038214687656708428, 0,
         -0.16900296657661762, 0.97647242956597469, -0.13393876058044285,  0,
         0.015172371682388559, 0.13845487740074897, 0.99025251631160971,   0,
         0.38961967265975178,  0.90464730022614015, 2000.877388040077,     1};
-    EXPECT_ITERABLE_DOUBLE_EQ(std::vector<double>, p1a->getInMatrix(),
-                              correctInMat);
-    EXPECT_ITERABLE_DOUBLE_EQ(std::vector<double>, p1a->getOutMatrix(),
-                              correctOutMat);
+    EXPECT_ITERABLE_DOUBLE_EQ_ARR(4 * 4, p1a->getInMatrix(), correctInMat);
+    EXPECT_ITERABLE_DOUBLE_EQ_ARR(4 * 4, p1a->getOutMatrix(), correctOutMat);
 
     correctInMat = {
         0.99293120507151145,   -0.11097960343033685, -0.042085028426756203, 0,
@@ -123,10 +119,8 @@ TEST(Quadric, testGlobalCoordinates) {
         -0.11097960343033686, 0.8343464348616344,  -0.5399532889575962,   0,
         -0.04208502842675621, 0.53887664765697396, 0.84133275758899373,   0,
         -290.48295826317462,  2383.0982743679397,  8580.687147244611,     1};
-    EXPECT_ITERABLE_DOUBLE_EQ(std::vector<double>, p2b->getInMatrix(),
-                              correctInMat);
-    EXPECT_ITERABLE_DOUBLE_EQ(std::vector<double>, p2b->getOutMatrix(),
-                              correctOutMat);
+    EXPECT_ITERABLE_DOUBLE_EQ_ARR(4 * 4, p2b->getInMatrix(), correctInMat);
+    EXPECT_ITERABLE_DOUBLE_EQ_ARR(4 * 4, p2b->getOutMatrix(), correctOutMat);
 
     correctInMat = {
         0.98543342847582116, -0.15825553171931203, -0.06225869194438529, 0,
@@ -138,10 +132,8 @@ TEST(Quadric, testGlobalCoordinates) {
         -0.15825553171931206,  0.53751266264821851, -0.82827249391312019,  0,
         -0.062258691944385297, 0.83174223714740392, 0.55165995524635025,   0,
         -827.25618948103272,   8485.1091498802671,  13719.145095369648,    1};
-    EXPECT_ITERABLE_DOUBLE_EQ(std::vector<double>, p3c->getInMatrix(),
-                              correctInMat);
-    EXPECT_ITERABLE_DOUBLE_EQ(std::vector<double>, p3c->getOutMatrix(),
-                              correctOutMat);
+    EXPECT_ITERABLE_DOUBLE_EQ_ARR(4 * 4, p3c->getInMatrix(), correctInMat);
+    EXPECT_ITERABLE_DOUBLE_EQ_ARR(4 * 4, p3c->getOutMatrix(), correctOutMat);
 
     correctInMat = {
         0.95892551908867896,  -0.24148295699748484, -0.14882147130121315, 0,
@@ -154,10 +146,8 @@ TEST(Quadric, testGlobalCoordinates) {
         -0.24148295699748484, 0.04190503407301399, -0.96949984507429876, 0,
         -0.14882147130121315, 0.98564933923174713, 0.079671511544351137, 0,
         -920.16688225314476,  9376.0458164086922,  14156.215944980175,   1};
-    EXPECT_ITERABLE_DOUBLE_EQ(std::vector<double>, p4d->getInMatrix(),
-                              correctInMat);
-    EXPECT_ITERABLE_DOUBLE_EQ(std::vector<double>, p4d->getOutMatrix(),
-                              correctOutMat);
+    EXPECT_ITERABLE_DOUBLE_EQ_ARR(4 * 4, p4d->getInMatrix(), correctInMat);
+    EXPECT_ITERABLE_DOUBLE_EQ_ARR(4 * 4, p4d->getOutMatrix(), correctOutMat);
 }
 
 #endif

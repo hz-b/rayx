@@ -1,8 +1,8 @@
 #include "Slit.h"
 
-#include "Debug.h"
-
 #include <assert.h>
+
+#include "Debug.h"
 
 namespace RAYX {
 
@@ -28,8 +28,10 @@ Slit::Slit(const char* name, Geometry::GeometricalShape geometricalShape,
            int beamstop, double width, double height, glm::dvec4 position,
            glm::dmat4x4 orientation, double beamstopWidth,
            double beamstopHeight, double sourceEnergy)
-    : OpticalElement(name, geometricalShape, width, height, 0, position,
-                     orientation, {0, 0, 0, 0, 0, 0, 0}), // no azimuthal angle for slit bc no efficiency needed
+    : OpticalElement(
+          name, geometricalShape, width, height, 0, position, orientation,
+          {0, 0, 0, 0, 0, 0,
+           0}),  // no azimuthal angle for slit bc no efficiency needed
       m_waveLength(abs(hvlam(sourceEnergy))) {
     m_centralBeamstop = beamstop == 0
                             ? CS_NONE
@@ -50,8 +52,8 @@ Slit::Slit(const char* name, Geometry::GeometricalShape geometricalShape,
             : (m_centralBeamstop == CS_ELLIPTICAL ? abs(beamstopHeight)
                                                   : abs(beamstopHeight));
 
-    setSurface(std::make_unique<Quadric>(
-        std::vector<double>{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -1, 3, 0, 0, 0}));
+    setSurface(std::make_unique<Quadric>(std::array<double, 4 * 4>{
+        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -1, 3, 0, 0, 0}));
     setElementParameters({m_beamstopWidth / 2, m_beamstopHeight / 2, 0, 0,
                           m_waveLength, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0});
     RAYX_LOG << "Created.";

@@ -11,16 +11,16 @@ class RAYX_API Quadric : public Surface {
   public:
     // ctor
     Quadric();
-    Quadric(const std::vector<double> inputPoints);
+    Quadric(const std::array<double, 4*4> inputPoints);
     // dtor
     ~Quadric();
 
-    void setAnchorPoints(std::vector<double> inputPoints);
+    void setAnchorPoints(std::array<double, 4*4> inputPoints);
 
-    std::vector<double> getParams() const;
+    std::array<double, 4*4> getParams() const;
 
   private:
     // Quadric parameters; will be turned into 4x4 matrix
-    std::vector<double> m_parameters;
+    std::array<double, 4*4> m_parameters;
 };
 }  // namespace RAYX

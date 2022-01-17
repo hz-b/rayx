@@ -7,7 +7,7 @@ namespace RAYX {
 LightSource::LightSource(const char* name, EnergyDistribution dist,
                          const double linPol0, const double linPol45,
                          const double circPol,
-                         const std::vector<double> misalignment,
+                         const std::array<double, 6> misalignment,
                          const double sourceDepth, const double sourceHeight,
                          const double sourceWidth, const double horDivergence,
                          const double verDivergence)
@@ -27,7 +27,7 @@ LightSource::LightSource(const char* name, EnergyDistribution dist,
 LightSource::LightSource(const char* name, EnergyDistribution dist,
                          const double linPol0, const double linPol45,
                          const double circPol,
-                         const std::vector<double> misalignment)
+                         const std::array<double, 6> misalignment)
     : BeamlineObject(name),
       m_EnergyDistribution(dist),
       m_misalignmentParams(misalignment),
@@ -41,7 +41,7 @@ double LightSource::getLinear45() { return m_linearPol_45; }
 
 double LightSource::getCircular() { return m_circularPol; }
 
-std::vector<double> LightSource::getMisalignmentParams() {
+std::array<double, 6> LightSource::getMisalignmentParams() {
     return m_misalignmentParams;
 }
 

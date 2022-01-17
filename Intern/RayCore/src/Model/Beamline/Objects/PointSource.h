@@ -12,7 +12,7 @@ class RAYX_API PointSource : public LightSource {
                 const double verDivergence, const int widthDist,
                 const int heightDist, const int horDist, const int verDist,
                 const double linPol0, const double linPol45,
-                const double circPol, const std::vector<double> misalignment);
+                const double circPol, const std::array<double, 6> misalignment);
 
     PointSource();
     ~PointSource();

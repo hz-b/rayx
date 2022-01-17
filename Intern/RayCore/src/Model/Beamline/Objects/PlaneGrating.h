@@ -14,8 +14,8 @@ class RAYX_API PlaneGrating : public OpticalElement {
                  const double azimuthalAngle, glm::dvec4 position,
                  glm::dmat4x4 orientation, const double designEnergyMounting,
                  const double lineDensity, const double orderOfDiffraction,
-                 const int additionalZeroOrder, const std::vector<double> vls,
-                 const std::vector<double> slopeError, Material mat);
+                 const int additionalZeroOrder, const std::array<double, 6> vls,
+                 const std::array<double, 7> slopeError, Material mat);
     PlaneGrating();
     ~PlaneGrating();
 
@@ -26,14 +26,14 @@ class RAYX_API PlaneGrating : public OpticalElement {
     double getDesignEnergyMounting();
     double getLineDensity();
     double getOrderOfDiffraction();
-    std::vector<double> getVls();
+    std::array<double, 6> getVls();
 
   private:
     int m_additionalOrder;
     double m_designEnergyMounting;
     double m_lineDensity;
     double m_orderOfDiffraction;
-    std::vector<double> m_vls;
+    std::array<double, 6> m_vls;
 };
 
 }  // namespace RAYX

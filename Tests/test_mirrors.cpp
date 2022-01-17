@@ -15,9 +15,9 @@ TEST(PlaneMirror, testSimpleParams) {
     RAYX::Geometry::GeometricalShape geometricalShape =
         RAYX::Geometry::GeometricalShape::RECTANGLE;
     int icurv = 1;
-    std::vector<double> mis = {0, 0, 0, 0, 0, 0};
-    std::vector<double> sE = {0, 0, 0, 0, 0, 0, 0};
-    std::vector<double> surface = {
+    std::array<double, 6> mis = {0, 0, 0, 0, 0, 0};
+    std::array<double, 7> sE = {0, 0, 0, 0, 0, 0, 0};
+    std::array<double, 4 * 4> surface = {
         0, 0, 0, 0, double(icurv), 0, 0, -1, 0, 0, 0, 0, 0, 0, 0, 0};
 
     RAYX::WorldUserParams g_params = RAYX::WorldUserParams(
@@ -41,13 +41,12 @@ TEST(PlaneMirror, testSimpleParams) {
 
     ASSERT_DOUBLE_EQ(plM.getWidth(), width);
     ASSERT_DOUBLE_EQ(plM.getHeight(), height);
-    EXPECT_ITERABLE_DOUBLE_EQ(std::vector<double>, sE, plM.getSlopeError());
-    EXPECT_ITERABLE_DOUBLE_EQ(std::vector<double>, surface,
-                              plM.getSurfaceParams());
-    EXPECT_ITERABLE_DOUBLE_EQ(std::vector<double>, plM.getInMatrix(),
-                              glmToVector16(correctInMatrix));
-    EXPECT_ITERABLE_DOUBLE_EQ(std::vector<double>, plM.getOutMatrix(),
-                              glmToVector16(correctOutMatrix));
+    EXPECT_ITERABLE_DOUBLE_EQ_ARR(7, sE, plM.getSlopeError());
+    EXPECT_ITERABLE_DOUBLE_EQ_ARR(4 * 4, surface, plM.getSurfaceParams());
+    EXPECT_ITERABLE_DOUBLE_EQ_ARR(4 * 4, plM.getInMatrix(),
+                                  glmToArray16(correctInMatrix));
+    EXPECT_ITERABLE_DOUBLE_EQ_ARR(4 * 4, plM.getOutMatrix(),
+                                  glmToArray16(correctOutMatrix));
 }
 
 TEST(PlaneMirror, testAdvancedParams) {
@@ -59,9 +58,9 @@ TEST(PlaneMirror, testAdvancedParams) {
     RAYX::Geometry::GeometricalShape geometricalShape =
         RAYX::Geometry::GeometricalShape::RECTANGLE;
     int icurv = 1;
-    std::vector<double> mis = {1, 2, 3, 0.01, 0.02, 0.03};
-    std::vector<double> sE = {0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7};
-    std::vector<double> surface = {
+    std::array<double, 6> mis = {1, 2, 3, 0.01, 0.02, 0.03};
+    std::array<double, 7> sE = {0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7};
+    std::array<double, 4 * 4> surface = {
         0, 0, 0, 0, double(icurv), 0, 0, -1, 0, 0, 0, 0, 0, 0, 0, 0};
 
     RAYX::WorldUserParams g_params = RAYX::WorldUserParams(
@@ -88,13 +87,12 @@ TEST(PlaneMirror, testAdvancedParams) {
 
     ASSERT_DOUBLE_EQ(plM.getWidth(), width);
     ASSERT_DOUBLE_EQ(plM.getHeight(), height);
-    EXPECT_ITERABLE_DOUBLE_EQ(std::vector<double>, sE, plM.getSlopeError());
-    EXPECT_ITERABLE_DOUBLE_EQ(std::vector<double>, surface,
-                              plM.getSurfaceParams());
-    EXPECT_ITERABLE_DOUBLE_EQ(std::vector<double>, plM.getInMatrix(),
-                              glmToVector16(correctInMatrix));
-    EXPECT_ITERABLE_DOUBLE_EQ(std::vector<double>, plM.getOutMatrix(),
-                              glmToVector16(correctOutMatrix));
+    EXPECT_ITERABLE_DOUBLE_EQ_ARR(7, sE, plM.getSlopeError());
+    EXPECT_ITERABLE_DOUBLE_EQ_ARR(4 * 4, surface, plM.getSurfaceParams());
+    EXPECT_ITERABLE_DOUBLE_EQ_ARR(4 * 4, plM.getInMatrix(),
+                                  glmToArray16(correctInMatrix));
+    EXPECT_ITERABLE_DOUBLE_EQ_ARR(4 * 4, plM.getOutMatrix(),
+                                  glmToArray16(correctOutMatrix));
 }
 
 TEST(SphereMirror, testParams) {
@@ -109,9 +107,9 @@ TEST(SphereMirror, testParams) {
         RAYX::Geometry::GeometricalShape::RECTANGLE;
     int icurv = 1;
     double radius = 104.32651829593351;  // from old RAY
-    std::vector<double> mis = {10, 51, 2, 0.1, 5, 0.241};
-    std::vector<double> sE = {0.7, 0.5, 0.3, 0.7, 0.3, 3, 2};
-    std::vector<double> surface = {
+    std::array<double, 6> mis = {10, 51, 2, 0.1, 5, 0.241};
+    std::array<double, 7> sE = {0.7, 0.5, 0.3, 0.7, 0.3, 3, 2};
+    std::array<double, 4 * 4> surface = {
         1, 0, 0, 0, double(icurv), 1, 0, -radius, 0, 0, 1, 0, 0, 0, 0, 0};
 
     RAYX::GeometricUserParams g_params = RAYX::GeometricUserParams(incidence);
@@ -141,13 +139,12 @@ TEST(SphereMirror, testParams) {
     EXPECT_NEAR(sM.getRadius(), radius, 0.0000000001);
     ASSERT_DOUBLE_EQ(sM.getExitArmLength(), exitArmLength);
     ASSERT_DOUBLE_EQ(sM.getEntranceArmLength(), entranceArmLength);
-    EXPECT_ITERABLE_DOUBLE_EQ(std::vector<double>, sE, sM.getSlopeError());
-    EXPECT_ITERABLE_DOUBLE_EQ(std::vector<double>, surface,
-                              sM.getSurfaceParams());
-    EXPECT_ITERABLE_DOUBLE_EQ(std::vector<double>, sM.getInMatrix(),
-                              glmToVector16(correctInMatrix));
-    EXPECT_ITERABLE_DOUBLE_EQ(std::vector<double>, sM.getOutMatrix(),
-                              glmToVector16(correctOutMatrix));
+    EXPECT_ITERABLE_DOUBLE_EQ_ARR(7, sE, sM.getSlopeError());
+    EXPECT_ITERABLE_DOUBLE_EQ_ARR(4 * 4, surface, sM.getSurfaceParams());
+    EXPECT_ITERABLE_DOUBLE_EQ_ARR(4 * 4, sM.getInMatrix(),
+                                  glmToArray16(correctInMatrix));
+    EXPECT_ITERABLE_DOUBLE_EQ_ARR(4 * 4, sM.getOutMatrix(),
+                                  glmToArray16(correctOutMatrix));
 }
 
 TEST(SphereMirror, testPrecalculateRadius) {
@@ -162,9 +159,9 @@ TEST(SphereMirror, testPrecalculateRadius) {
         RAYX::Geometry::GeometricalShape::RECTANGLE;
     int icurv = 1;
     double radius = 104.32651829593351;  // from old RAY
-    std::vector<double> mis = {10, 51, 2, 0.1, 5, 0.241};
-    std::vector<double> sE = {0.7, 0.5, 0.3, 0.7, 0.3, 3, 2};
-    std::vector<double> surface = {
+    std::array<double, 6> mis = {10, 51, 2, 0.1, 5, 0.241};
+    std::array<double, 7> sE = {0.7, 0.5, 0.3, 0.7, 0.3, 3, 2};
+    std::array<double, 4 * 4> surface = {
         1, 0, 0, 0, double(icurv), 1, 0, -radius, 0, 0, 1, 0, 0, 0, 0, 0};
 
     RAYX::GeometricUserParams g_params = RAYX::GeometricUserParams(incidence);
@@ -195,13 +192,12 @@ TEST(SphereMirror, testPrecalculateRadius) {
     EXPECT_NEAR(g_params.getRadius(), radius, 0.0000000001);
     ASSERT_DOUBLE_EQ(sM.getExitArmLength(), exitArmLength);
     ASSERT_DOUBLE_EQ(sM.getEntranceArmLength(), entranceArmLength);
-    EXPECT_ITERABLE_DOUBLE_EQ(std::vector<double>, sE, sM.getSlopeError());
-    EXPECT_ITERABLE_DOUBLE_EQ(std::vector<double>, surface,
-                              sM.getSurfaceParams());
-    EXPECT_ITERABLE_DOUBLE_EQ(std::vector<double>, sM.getInMatrix(),
-                              glmToVector16(correctInMatrix));
-    EXPECT_ITERABLE_DOUBLE_EQ(std::vector<double>, sM.getOutMatrix(),
-                              glmToVector16(correctOutMatrix));
+    EXPECT_ITERABLE_DOUBLE_EQ_ARR(7, sE, sM.getSlopeError());
+    EXPECT_ITERABLE_DOUBLE_EQ_ARR(4 * 4, surface, sM.getSurfaceParams());
+    EXPECT_ITERABLE_DOUBLE_EQ_ARR(4 * 4, sM.getInMatrix(),
+                                  glmToArray16(correctInMatrix));
+    EXPECT_ITERABLE_DOUBLE_EQ_ARR(4 * 4, sM.getOutMatrix(),
+                                  glmToArray16(correctOutMatrix));
 }
 
 TEST(Ellips, defaultParams) {
@@ -218,8 +214,8 @@ TEST(Ellips, defaultParams) {
 
     double dist = 10000;
     double chi = 0;
-    std::vector<double> mis = {1, 2, 3, 0.004, 0.005, 0.006};
-    std::vector<double> sE = {0, 0, 0, 0, 0, 0, 0};
+    std::array<double, 6> mis = {1, 2, 3, 0.004, 0.005, 0.006};
+    std::array<double, 7> sE = {0, 0, 0, 0, 0, 0, 0};
 
     double alpha = 0.031253965260898464;
     double beta = 0.31781188513796743;
@@ -244,24 +240,24 @@ TEST(Ellips, defaultParams) {
     double a33 = 0.0099681618535688628;
     double a34 = 45.0819833448842;
     double a44 = -5.8207660913467407e-11;
-    std::vector<double> surface = {1, 0, 0,   0,   1, 1, 0, y0,
-                                   0, 0, a33, a34, 7, 0, 0, a44};
-    std::vector<double> elementParams = {sin(correctTangentAngle),
-                                         cos(correctTangentAngle),
-                                         y0,
-                                         z0,
-                                         0,
-                                         0,
-                                         0,
-                                         0,
-                                         0,
-                                         0,
-                                         0,
-                                         0,
-                                         0,
-                                         0,
-                                         0,
-                                         0};
+    std::array<double, 4 * 4> surface = {1, 0, 0,   0,   1, 1, 0, y0,
+                                         0, 0, a33, a34, 7, 0, 0, a44};
+    std::array<double, 4 * 4> elementParams = {sin(correctTangentAngle),
+                                               cos(correctTangentAngle),
+                                               y0,
+                                               z0,
+                                               0,
+                                               0,
+                                               0,
+                                               0,
+                                               0,
+                                               0,
+                                               0,
+                                               0,
+                                               0,
+                                               0,
+                                               0,
+                                               0};
 
     RAYX::WorldUserParams w_params =
         RAYX::WorldUserParams(e_params.getAlpha(), e_params.getBeta(),
@@ -278,10 +274,9 @@ TEST(Ellips, defaultParams) {
     EXPECT_NEAR(eb.getY0(), y0, 0.0000001);
     EXPECT_NEAR(eb.getZ0(), z0, 0.0000001);
     EXPECT_NEAR(eb.getTangentAngle(), correctTangentAngle, 0.0000001);
-    EXPECT_ITERABLE_DOUBLE_EQ(std::vector<double>, surface,
-                              eb.getSurfaceParams());
-    EXPECT_ITERABLE_DOUBLE_EQ(std::vector<double>, elementParams,
-                              eb.getElementParameters());
+    EXPECT_ITERABLE_DOUBLE_EQ_ARR(4 * 4, surface, eb.getSurfaceParams());
+    EXPECT_ITERABLE_DOUBLE_EQ_ARR(4 * 4, elementParams,
+                                  eb.getElementParameters());
 }
 
 TEST(Ellips, testEllipsoid_e1) {
@@ -303,8 +298,8 @@ TEST(Ellips, testEllipsoid_e1) {
     glm::dvec4 position = glm::dvec4(-1684.797, 30.544, 39546.181, 1);
     glm::dmat4x4 orientation = glm::dmat4x4(0, 1.0, 0, 0, -0.998, -0.0, -0.065,
                                             0, -0.065, 0, 0.998, 0, 0, 0, 0, 1);
-    std::vector<double> mis = {12, 72, 1.12, 0.1, 0.7341, 2.5};
-    std::vector<double> sE = {0.037, 0.023, 0, 0, 0, 0, 0};
+    // std::array<double, 6> mis = {12, 72, 1.12, 0.1, 0.7341, 2.5};
+    std::array<double, 7> sE = {0.037, 0.023, 0, 0, 0, 0, 0};
     Material mat = Material::AL;
     RAYX::Ellipsoid e = RAYX::Ellipsoid(
         "ellips", geometricalShape, width, height, azimuthal, position,
@@ -332,8 +327,8 @@ TEST(Ellips, testEllipsoid_e2) {
     glm::dmat4x4 orientation =
         glm::dmat4x4(0.991, 0, 0.131, 0, -0.001, 1.0, -0.008, 0, -0.131, 0.008,
                      0.991, 0, 0, 0, 0, 1);
-    std::vector<double> mis = {12, 72, 1.12, 0.1, 0.7341, 2.5};
-    std::vector<double> sE = {0.045, 0.024, 0, 0, 0, 0, 0};
+    // std::array<double, 6> mis = {12, 72, 1.12, 0.1, 0.7341, 2.5};
+    std::array<double, 7> sE = {0.045, 0.024, 0, 0, 0, 0, 0};
     Material mat = Material::AL;
     RAYX::Ellipsoid e = RAYX::Ellipsoid(
         "ellips", geometricalShape, width, height, azimuthal, position,

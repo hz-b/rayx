@@ -38,7 +38,7 @@ ToroidMirror::ToroidMirror(
     const double width, const double height, const double azimuthalAngle,
     glm::dvec4 position, glm::dmat4x4 orientation, const double incidenceAngle,
     const double mEntrance, const double mExit, const double sEntrance,
-    const double sExit, const std::vector<double> slopeError, Material mat)
+    const double sExit, const std::array<double, 7> slopeError, Material mat)
     : OpticalElement(name, {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
                      geometricalShape, width, height, azimuthalAngle, position,
                      orientation, slopeError),
@@ -54,8 +54,8 @@ ToroidMirror::ToroidMirror(
              << ", short Radius: " << m_shortRadius;
     double matd = (double)static_cast<int>(mat);
     setSurface(std::make_unique<Toroid>(
-        std::vector<double>{m_longRadius, m_shortRadius, 0, 0, 0, 1, 0, 0, 0, 0,
-                            1, 0, 6, 0, matd, 0}));
+        std::array<double, 4 * 4>{m_longRadius, m_shortRadius, 0, 0, 0, 1, 0, 0,
+                                  0, 0, 1, 0, 6, 0, matd, 0}));
     // setSurface(std::make_unique<Toroid>(m_longRadius, m_shortRadius));
 }
 
@@ -115,7 +115,7 @@ std::shared_ptr<ToroidMirror> ToroidMirror::createFromXML(
         return nullptr;
     }
 
-    std::vector<double> slopeError;
+    std::array<double, 7> slopeError;
     if (!xml::paramSlopeError(node, &slopeError)) {
         return nullptr;
     }

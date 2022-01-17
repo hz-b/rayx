@@ -59,11 +59,11 @@ class Tracer : public ::testing::Test {
     }
 };
 
-std::vector<double> zeros = {
+std::array<double, 4 * 4> zeros = {
     0, 0, 0, 0, 0, 0, 0, 0, 0,
     0, 0, 0, 0, 0, 0, 0};  // 16 zeros for filling the optical elements for test
                            // cases
-std::vector<double> zeros7 = {0, 0, 0, 0, 0, 0, 0};  // for slope error
+std::array<double, 7> zeros7 = {0, 0, 0, 0, 0, 0, 0};  // for slope error
 
 /** runs beamline in "elements" with rays in "testValues"
  * @param testValues        contains rays
@@ -87,10 +87,10 @@ std::list<double> runTracer(
 
     // add elements
     for (std::shared_ptr<RAYX::OpticalElement> element : elements) {
-        tracer.addVectors(element->getSurfaceParams(), element->getInMatrix(),
-                          element->getOutMatrix(),
-                          element->getObjectParameters(),
-                          element->getElementParameters());
+        tracer.addArrays(element->getSurfaceParams(), element->getInMatrix(),
+                         element->getOutMatrix(),
+                         element->getObjectParameters(),
+                         element->getElementParameters());
     }
     // execute tracing
     tracer.run();  // run tracer
@@ -240,8 +240,8 @@ std::list<double> runUnitTest(double unittestid,
     std::shared_ptr<RAYX::OpticalElement> q =
         std::make_shared<RAYX::OpticalElement>(
             "qq",
-            std::vector<double>{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-                                unittestid, 0, 0},
+            std::array<double, 4 * 4>{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                                      unittestid, 0, 0},
             zeros, zeros, zeros, zeros);
 
     std::list<double> outputRays = runTracer(testValues, {q});
@@ -264,9 +264,9 @@ void testOpticalElement(
     RAYX::SimulationEnv::get().m_numOfRays = n;
     RAYX::EnergyDistribution dist(RAYX::EnergyRange(100, 0), true);
     std::shared_ptr<RAYX::MatrixSource> m =
-        std::make_shared<RAYX::MatrixSource>("Matrix source 1", dist, 0.065,
-                                             0.04, 0.0, 0.001, 0.001, 1, 0, 0,
-                                             std::vector<double>{0, 0, 0, 0});
+        std::make_shared<RAYX::MatrixSource>(
+            "Matrix source 1", dist, 0.065, 0.04, 0.0, 0.001, 0.001, 1, 0, 0,
+            std::array<double, 6>{0, 0, 0, 0, 0, 0});
     // run tracer with rays from source and elements from vector
     std::list<double> outputRays = runTracer(m->getRays(), elements);
     // write to file "testFile_"+name of first element in beamlin
@@ -470,9 +470,9 @@ TEST_F(Tracer, testUniformRandom) {
     RAYX::SimulationEnv::get().m_numOfRays = 2000;
     RAYX::EnergyDistribution dist(RAYX::EnergyRange(100, 0), true);
     std::shared_ptr<RAYX::MatrixSource> m =
-        std::make_shared<RAYX::MatrixSource>("Matrix source 1", dist, 0.065,
-                                             0.04, 0.0, 0.001, 0.001, 1, 0, 0,
-                                             std::vector<double>{0, 0, 0, 0});
+        std::make_shared<RAYX::MatrixSource>(
+            "Matrix source 1", dist, 0.065, 0.04, 0.0, 0.001, 0.001, 1, 0, 0,
+            std::array<double, 6>{0, 0, 0, 0, 0, 0});
     // create 2000 rays that are put to the shader. they will be overwritten
     // by the random numbers
     std::vector<RAYX::Ray> testValues = m->getRays();
@@ -884,22 +884,22 @@ TEST_F(Tracer, testRZPLineDensityDefaulParams) {  // point to point
     // {image_type, rzp_type, derivation_method, zOffsetCenter}, ->
     // point2point(0), elliptical(0), formulas(0), 0 {risag, rosag, rimer,
     // romer}, {d_alpha, d_beta, d_ord, wl}, {0,0,0,0}
-    std::vector<double> inputValues = {0,
-                                       0,
-                                       0,
-                                       0,
-                                       100,
-                                       500,
-                                       100,
-                                       500,
-                                       0.017453292519943295,
-                                       0.017453292519943295,
-                                       -1,
-                                       12.39852 * 1e-06,
-                                       0,
-                                       0,
-                                       0,
-                                       0};
+    std::array<double, 4 * 4> inputValues = {0,
+                                             0,
+                                             0,
+                                             0,
+                                             100,
+                                             500,
+                                             100,
+                                             500,
+                                             0.017453292519943295,
+                                             0.017453292519943295,
+                                             -1,
+                                             12.39852 * 1e-06,
+                                             0,
+                                             0,
+                                             0,
+                                             0};
 
     // encode: ray.position = position of test ray. ray.direction = normal
     // at intersection point.
@@ -943,8 +943,8 @@ TEST_F(Tracer, testRZPLineDensityDefaulParams) {  // point to point
     std::shared_ptr<RAYX::OpticalElement> q1 =
         std::make_shared<RAYX::OpticalElement>(
             "testRZPpoint2point",
-            std::vector<double>{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, settings,
-                                0, 0},
+            std::array<double, 4 * 4>{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                                      settings, 0, 0},
             inputValues, zeros, zeros, zeros);
 
     std::list<double> outputRays = runTracer(testValues, {q1});
@@ -960,22 +960,22 @@ TEST_F(Tracer, testRZPLineDensityAstigmatic) {  // astigmatic 2 astigmatic
     // astigmatic2astigmatic(1), elliptical(0), formulas(0), 0 {image_type,
     // rzp_type, derivation_method, zOffsetCenter}, {risag, rosag, rimer,
     // romer}, {d_alpha, d_beta, d_ord, wl}, {0,0,0,0}
-    std::vector<double> inputValues = {1,
-                                       0,
-                                       0,
-                                       0,
-                                       100,
-                                       500,
-                                       100,
-                                       500,
-                                       0.017453292519943295,
-                                       0.017453292519943295,
-                                       -1,
-                                       12.39852 * 1e-06,
-                                       0,
-                                       0,
-                                       0,
-                                       0};
+    std::array<double, 4 * 4> inputValues = {1,
+                                             0,
+                                             0,
+                                             0,
+                                             100,
+                                             500,
+                                             100,
+                                             500,
+                                             0.017453292519943295,
+                                             0.017453292519943295,
+                                             -1,
+                                             12.39852 * 1e-06,
+                                             0,
+                                             0,
+                                             0,
+                                             0};
 
     // encode: ray.position = position of test ray. ray.direction = normal
     // at intersection point.
@@ -1019,8 +1019,8 @@ TEST_F(Tracer, testRZPLineDensityAstigmatic) {  // astigmatic 2 astigmatic
     std::shared_ptr<RAYX::OpticalElement> q1 =
         std::make_shared<RAYX::OpticalElement>(
             "testRZPAstigmatic",
-            std::vector<double>{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, settings,
-                                0, 0},
+            std::array<double, 4 * 4>{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                                      settings, 0, 0},
             inputValues, zeros, zeros, zeros);
 
     std::list<double> outputRays = runTracer(testValues, {q1});
@@ -1035,8 +1035,8 @@ TEST_F(Tracer, testRayMatrixMult) {
     std::vector<RAYX::Ray> testValues;
     std::vector<RAYX::Ray> correct;
     // {1st column, 2nd column, 3rd column, 4th column}
-    std::vector<double> matrix = {1, 2,  3,  4,  5,  6,  7,  8,
-                                  9, 10, 11, 12, 13, 14, 15, 16};
+    std::array<double, 4 * 4> matrix = {1, 2,  3,  4,  5,  6,  7,  8,
+                                        9, 10, 11, 12, 13, 14, 15, 16};
 
     // multiply direction and position with matrix
     // in homogeneous coord (dvec4 from dvec3): (pos,1) and (dir, 0)
@@ -1068,8 +1068,8 @@ TEST_F(Tracer, testRayMatrixMult) {
     std::shared_ptr<RAYX::OpticalElement> q1 =
         std::make_shared<RAYX::OpticalElement>(
             "testRayMatrixMult",
-            std::vector<double>{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, settings,
-                                0, 0},
+            std::array<double, 4 * 4>{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                                      settings, 0, 0},
             matrix, zeros, zeros, zeros);
 
     std::list<double> outputRays = runTracer(testValues, {q1});
@@ -2211,7 +2211,7 @@ TEST_F(opticalElements, PlaneMirrorEllipsoidImagePlane_mirrormisalignment) {
     RAYX::GeometricUserParams pm_params = RAYX::GeometricUserParams(7);
     RAYX::WorldUserParams w_coord = RAYX::WorldUserParams(
         pm_params.getAlpha(), pm_params.getBeta(), 0, 10000,
-        std::vector<double>{1, 2, 3, 0.004, 0.005, 0.006});
+        std::array<double, 6>{1, 2, 3, 0.004, 0.005, 0.006});
     glm::dvec4 pos1 = w_coord.calcPosition();
     glm::dmat4x4 or1 = w_coord.calcOrientation();
     std::shared_ptr<RAYX::PlaneMirror> pm = std::make_shared<RAYX::PlaneMirror>(
@@ -2231,7 +2231,7 @@ TEST_F(opticalElements, PlaneMirrorEllipsoidImagePlane_mirrormisalignment) {
 
     RAYX::WorldUserParams ell_w_coord = RAYX::WorldUserParams(
         ell_params.getAlpha(), ell_params.getBeta(), 0, 100,
-        std::vector<double>{1, 2, 3, 0.004, 0.005, 0.006}, tangentAngle);
+        std::array<double, 6>{1, 2, 3, 0.004, 0.005, 0.006}, tangentAngle);
     glm::dvec4 pos2 = ell_w_coord.calcPosition(w_coord, pos1, or1);
     glm::dmat4x4 or2 = ell_w_coord.calcOrientation(w_coord, or1);
     std::shared_ptr<RAYX::Ellipsoid> eb = std::make_shared<RAYX::Ellipsoid>(
@@ -2241,7 +2241,7 @@ TEST_F(opticalElements, PlaneMirrorEllipsoidImagePlane_mirrormisalignment) {
         Material::CU);
 
     RAYX::WorldUserParams ip_w_coord = RAYX::WorldUserParams(
-        0, 0, 0, 1000, std::vector<double>{0, 0, 0, 0, 0, 0});
+        0, 0, 0, 1000, std::array<double, 6>{0, 0, 0, 0, 0, 0});
     glm::dvec4 pos3 = ip_w_coord.calcPosition(ell_w_coord, pos2, or2);
     glm::dmat4x4 or3 = ip_w_coord.calcOrientation(ell_w_coord, or2);
     std::shared_ptr<RAYX::ImagePlane> i =

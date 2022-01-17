@@ -23,7 +23,8 @@ namespace RAYX {
  * by a rotation through this angle
  */
 WorldUserParams::WorldUserParams(double alpha, double beta, double chi,
-                                 double dist, std::vector<double> misalignment,
+                                 double dist,
+                                 std::array<double, 6> misalignment,
                                  double tangentAngle)
     : m_incidenceAngle(alpha),
       m_exitAngle(beta),
@@ -280,7 +281,7 @@ glm::dvec4 WorldUserParams::calcPosition() {
     return position;
 }
 
-std::vector<double> WorldUserParams::getMisalignment() {
+std::array<double, 6> WorldUserParams::getMisalignment() {
     return m_misalignment;
 }
 

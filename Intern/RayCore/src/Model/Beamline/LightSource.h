@@ -32,17 +32,17 @@ class RAYX_API LightSource : public BeamlineObject {
   public:
     LightSource(const char* name, EnergyDistribution dist, const double linPol0,
                 const double linPol45, const double circPol,
-                const std::vector<double> misalignment,
+                const std::array<double, 6> misalignment,
                 const double sourceDepth, const double sourceHeight,
                 const double sourceWidth, const double horDivergence,
                 const double verDivergence);
     LightSource(const char* name, EnergyDistribution dist, const double linPol0,
                 const double linPol45, const double circPol,
-                const std::vector<double> misalignment);
+                const std::array<double, 6> misalignment);
 
     // Getter
     int getId();
-    std::vector<double> getMisalignmentParams();
+    std::array<double, 6> getMisalignmentParams();
     double getLinear0();
     double getLinear45();
     double getCircular();
@@ -78,7 +78,7 @@ class RAYX_API LightSource : public BeamlineObject {
 
   private:
     // User/Design Parameter
-    std::vector<double> m_misalignmentParams;  // x, y, psi, phi
+    std::array<double, 6> m_misalignmentParams;  // x, y, psi, phi
 
     // Physics Parameters
     // point source & matrix source

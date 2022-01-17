@@ -32,13 +32,13 @@ TEST(RmlTest, groupTransform) {
     ASSERT_EQ(b.m_LightSources.size(), 1);
     ASSERT_EQ(b.m_OpticalElements.size(), 1);
     auto m = b.m_OpticalElements[0]->getInMatrix();
-    std::vector<double> correct = {
+    std::array<double, 4 * 4> correct = {
         1,   0, 0,     0,  //
         0,   0, 1,     0,  //
         0,   1, 0,     0,  //
         -42, 0, -1000, 1,  //
     };
-    EXPECT_ITERABLE_DOUBLE_EQ(std::vector<double>, correct, m);
+    EXPECT_ITERABLE_DOUBLE_EQ_ARR(4 * 4, correct, m);
 }
 
 TEST(RmlTest, groupTransform2) {
@@ -57,12 +57,10 @@ TEST(RmlTest, groupTransform2) {
     glm::dvec4 positionCorrect = groupPos + (groupOr * elementPos);
     glm::dmat4x4 orientationResult = b.m_OpticalElements[0]->getOrientation();
     glm::dvec4 positionResult = b.m_OpticalElements[0]->getPosition();
-    EXPECT_ITERABLE_DOUBLE_EQ(std::vector<double>,
-                              glmToVector16(orientationCorrect),
-                              glmToVector16(orientationResult));
-    EXPECT_ITERABLE_DOUBLE_EQ(std::vector<double>,
-                              glmToVector4(positionCorrect),
-                              glmToVector4(positionResult));
+    EXPECT_ITERABLE_DOUBLE_EQ_ARR(4 * 4, glmToArray16(orientationCorrect),
+                                  glmToArray16(orientationResult));
+    EXPECT_ITERABLE_DOUBLE_EQ_ARR(4, glmToArray4(positionCorrect),
+                                  glmToArray4(positionResult));
 }
 
 TEST(RmlTest, groupTransformMisalignment) {
@@ -82,12 +80,11 @@ TEST(RmlTest, groupTransformMisalignment) {
     printDMat4(orientationResult);
     glm::dvec4 positionResult = b.m_OpticalElements[0]->getPosition();
 
-    EXPECT_ITERABLE_DOUBLE_EQ(std::vector<double>,
-                              glmToVector4(positionCorrect),
-                              glmToVector4(positionResult));
+    EXPECT_ITERABLE_DOUBLE_EQ_ARR(4, glmToArray4(positionCorrect),
+                                  glmToArray4(positionResult));
     for (int i = 0; i < 16; i++) {
-        EXPECT_NEAR(glmToVector16(groupOr)[i],
-                    glmToVector16(orientationResult)[i], 1e-15);
+        EXPECT_NEAR(glmToArray16(groupOr)[i],
+                    glmToArray16(orientationResult)[i], 1e-15);
     }
 }
 

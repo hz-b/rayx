@@ -15,8 +15,8 @@ class RAYX_API SphereGrating : public OpticalElement {
                   double height, const double azimuthalAngle, double radius,
                   glm::dvec4 position, glm::dmat4x4 orientation,
                   double designEnergyMounting, double lineDensity,
-                  double orderOfDiffraction, std::vector<double> vls,
-                  std::vector<double> slopeError, Material mat);
+                  double orderOfDiffraction, std::array<double, 6> vls,
+                  std::array<double, 7> slopeError, Material mat);
 
     SphereGrating();
     ~SphereGrating();
@@ -39,7 +39,7 @@ class RAYX_API SphereGrating : public OpticalElement {
     double getLineDensity() const;
     double getOrderOfDiffraction() const;
     double getA() const;
-    std::vector<double> getVls() const;
+    std::array<double, 6> getVls() const;
 
   private:
     double m_radius;
@@ -52,7 +52,7 @@ class RAYX_API SphereGrating : public OpticalElement {
     double m_orderOfDiffraction;
     double m_a;  // calculated from line density, order of diffracion and design
                  // energy mounting
-    std::vector<double> m_vls;
+    std::array<double, 6> m_vls;
     // double m_Depth;
     // double m_verDivergence;
     // double m_horDivergence;

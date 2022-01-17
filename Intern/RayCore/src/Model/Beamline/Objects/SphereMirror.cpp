@@ -35,7 +35,7 @@ SphereMirror::SphereMirror(const char* name,
                            glm::dvec4 position, glm::dmat4x4 orientation,
                            const double entranceArmLength,
                            const double exitArmLength,
-                           const std::vector<double> slopeError, Material mat)
+                           const std::array<double, 7> slopeError, Material mat)
     : OpticalElement(name, {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
                      geometricalShape, width, height, azimuthalAngle, position,
                      orientation, slopeError),
@@ -46,7 +46,7 @@ SphereMirror::SphereMirror(const char* name,
 {
     calcRadius();  // calculate the radius
     double matd = (double)static_cast<int>(mat);
-    setSurface(std::make_unique<Quadric>(std::vector<double>{
+    setSurface(std::make_unique<Quadric>(std::array<double, 4 * 4>{
         1, 0, 0, 0, 1, 1, 0, -m_radius, 0, 0, 1, 0, 0, 0, matd, 0}));
 }
 
@@ -75,14 +75,14 @@ SphereMirror::SphereMirror(const char* name,
                            const double width, const double height,
                            const double azimuthalAngle, double radius,
                            glm::dvec4 position, glm::dmat4x4 orientation,
-                           const std::vector<double> slopeError, Material mat)
+                           const std::array<double, 7> slopeError, Material mat)
     : OpticalElement(name, {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
                      geometricalShape, width, height, azimuthalAngle, position,
                      orientation, slopeError) {
     RAYX_LOG << "Created.";
 
     double matd = (double)static_cast<int>(mat);
-    setSurface(std::make_unique<Quadric>(std::vector<double>{
+    setSurface(std::make_unique<Quadric>(std::array<double, 4 * 4>{
         1, 0, 0, 0, 1, 1, 0, -radius, 0, 0, 1, 0, 0, 0, matd, 0}));
 }
 
@@ -132,7 +132,7 @@ std::shared_ptr<SphereMirror> SphereMirror::createFromXML(
         return nullptr;
     }
 
-    std::vector<double> slopeError;
+    std::array<double, 7> slopeError;
     if (!xml::paramSlopeError(node, &slopeError)) {
         return nullptr;
     }

@@ -69,11 +69,11 @@ class RAYX_API VulkanTracer {
 
     void getRays();
     void addRayVector(std::vector<Ray>&& inRayVector);
-    void addVectors(const std::vector<double>& surfaceParams,
-                    const std::vector<double>& inputInMatrix,
-                    const std::vector<double>& inputOutMatrix,
-                    const std::vector<double>& objectParameters,
-                    const std::vector<double>& elementParameters);
+    void addArrays(const std::array<double, 4*4>& surfaceParams,
+                    const std::array<double, 4*4>& inputInMatrix,
+                    const std::array<double, 4*4>& inputOutMatrix,
+                    const std::array<double, 4*4>& objectParameters,
+                    const std::array<double, 4*4>& elementParameters);
     void setBeamlineParameters(uint32_t inNumberOfBeamlines,
                                uint32_t inNumberOfQuadricsPerBeamline,
                                uint32_t inNumberOfRays);

@@ -14,7 +14,7 @@ class RAYX_API Cylinder : public OpticalElement {
              const double height, const double azimuthalAngle,
              glm::dvec4 position, glm::dmat4x4 orientation,
              const double grazingIncidence, const double entranceArmLength,
-             const double exitArmLength, const std::vector<double> slopeError,
+             const double exitArmLength, const std::array<double, 7> slopeError,
              Material mat);
     ~Cylinder();
 

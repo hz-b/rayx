@@ -92,11 +92,11 @@ void Geometry::calcTransformationMatrices(glm::dvec4 position,
 
     // ray = tran * rot * ray
     glm::dmat4x4 g2e = translation * rotation;
-    m_inMatrix = glmToVector16(glm::transpose(g2e));
+    m_inMatrix = glmToArray16(glm::transpose(g2e));
 
     // inverse of m_inMatrix
     glm::dmat4x4 e2g = inv_rotation * inv_translation;
-    m_outMatrix = glmToVector16(glm::transpose(e2g));
+    m_outMatrix = glmToArray16(glm::transpose(e2g));
 
     /*RAYX_LOG << "from position and orientation";
     printMatrix(m_inMatrix);
@@ -112,19 +112,19 @@ double Geometry::getHeight() { return m_height; }
 
 double Geometry::getAzimuthalAngle() { return m_azimuthalAngle; }
 
-std::vector<double> Geometry::getInMatrix() { return m_inMatrix; }
+std::array<double, 4 * 4> Geometry::getInMatrix() { return m_inMatrix; }
 
-std::vector<double> Geometry::getOutMatrix() { return m_outMatrix; }
+std::array<double, 4 * 4> Geometry::getOutMatrix() { return m_outMatrix; }
 
 glm::dvec4 Geometry::getPosition() { return m_position; }
 
 glm::dmat4x4 Geometry::getOrientation() { return m_orientation; }
 
-void Geometry::setInMatrix(std::vector<double> inputMatrix) {
+void Geometry::setInMatrix(std::array<double, 4 * 4> inputMatrix) {
     assert(inputMatrix.size() == 16);
     m_inMatrix = inputMatrix;
 }
-void Geometry::setOutMatrix(std::vector<double> inputMatrix) {
+void Geometry::setOutMatrix(std::array<double, 4 * 4> inputMatrix) {
     assert(inputMatrix.size() == 16);
     m_outMatrix = inputMatrix;
 }

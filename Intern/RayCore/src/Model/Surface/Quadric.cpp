@@ -13,8 +13,7 @@ namespace RAYX {
  * matrix is symmetrial, can be used for other values
  * @param inputPoints      4x4 Matrix as vector
  */
-Quadric::Quadric(const std::vector<double> inputPoints) {
-    assert(inputPoints.size() == 16);
+Quadric::Quadric(const std::array<double, 4*4> inputPoints) {
     m_parameters = inputPoints;
 }
 
@@ -29,8 +28,7 @@ Quadric::~Quadric() {}
  * @param inputPoints   16 entry vector a_11 to a_44
  * @return void
  */
-void Quadric::setAnchorPoints(std::vector<double> inputPoints) {
-    assert(inputPoints.size() == 16);
+void Quadric::setAnchorPoints(std::array<double, 4*4> inputPoints) {
     m_parameters = inputPoints;
 }
 
@@ -54,7 +52,7 @@ void Quadric::setAnchorPoints(std::vector<double> inputPoints) {
  *corresponding to the variants of the enum class Material (see Material.h and
  *materials.xmacro)
  **/
-std::vector<double> Quadric::getParams() const {
+std::array<double, 4*4> Quadric::getParams() const {
     RAYX_LOG << "return surface parameters";
     return m_parameters;
 }

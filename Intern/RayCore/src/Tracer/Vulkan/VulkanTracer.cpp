@@ -1187,15 +1187,13 @@ void VulkanTracer::addRayVector(std::vector<Ray>&& inRayVector) {
 }
 
 // adds quad to beamline
-void VulkanTracer::addVectors(const std::vector<double>& surfaceParams,
-                              const std::vector<double>& inputInMatrix,
-                              const std::vector<double>& inputOutMatrix,
-                              const std::vector<double>& objectParameters,
-                              const std::vector<double>& elementParameters) {
+void VulkanTracer::addArrays(
+    const std::array<double, 4 * 4>& surfaceParams,
+    const std::array<double, 4 * 4>& inputInMatrix,
+    const std::array<double, 4 * 4>& inputOutMatrix,
+    const std::array<double, 4 * 4>& objectParameters,
+    const std::array<double, 4 * 4>& elementParameters) {
     RAYX_PROFILE_FUNCTION();
-    assert(surfaceParams.size() == 16 && inputInMatrix.size() == 16 &&
-           inputOutMatrix.size() == 16 && objectParameters.size() == 16 &&
-           elementParameters.size() == 16);
     // beamline.resize(beamline.size()+1);
 
     beamline.insert(beamline.end(), surfaceParams.begin(), surfaceParams.end());

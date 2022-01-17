@@ -49,7 +49,7 @@ PointSource::PointSource(const std::string name, EnergyDistribution dist,
                          const int heightDist, const int horDist,
                          const int verDist, const double linPol0,
                          const double linPol45, const double circPol,
-                         const std::vector<double> misalignment)
+                         const std::array<double, 6> misalignment)
     : LightSource(name.c_str(), dist, linPol0, linPol45, circPol, misalignment,
                   sourceDepth, sourceHeight, sourceWidth, horDivergence,
                   verDivergence) {
@@ -138,7 +138,7 @@ std::shared_ptr<PointSource> PointSource::createFromXML(
         return nullptr;
     }
 
-    std::vector<double> misalignment;
+    std::array<double, 6> misalignment;
     if (!xml::paramMisalignment(node, &misalignment)) {
         return nullptr;
     }

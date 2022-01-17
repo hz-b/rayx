@@ -1,5 +1,6 @@
 #pragma once
 
+#include <array>
 #include <glm.hpp>
 #include <vector>
 
@@ -27,12 +28,12 @@ class RAYX_API Geometry {
     void getWidth(double& widthA, double& widthB);
     double getHeight();
     double getAzimuthalAngle();
-    std::vector<double> getInMatrix();
-    std::vector<double> getOutMatrix();
+    std::array<double, 4 * 4> getInMatrix();
+    std::array<double, 4 * 4> getOutMatrix();
     glm::dvec4 getPosition();
     glm::dmat4x4 getOrientation();
-    void setInMatrix(std::vector<double> inputMatrix);
-    void setOutMatrix(std::vector<double> inputMatrix);
+    void setInMatrix(std::array<double, 4 * 4> inputMatrix);
+    void setOutMatrix(std::array<double, 4 * 4> inputMatrix);
     void calcTransformationMatrices(glm::dvec4 position,
                                     glm::dmat4x4 orientation);
 
@@ -44,8 +45,8 @@ class RAYX_API Geometry {
                               // for stokes vector)
     glm::dmat4x4 m_orientation;
     glm::dvec4 m_position;
-    std::vector<double> m_inMatrix;
-    std::vector<double> m_outMatrix;
+    std::array<double, 4 * 4> m_inMatrix;
+    std::array<double, 4 * 4> m_outMatrix;
     GeometricalShape m_geometricalShape;
 };
 }  // namespace RAYX

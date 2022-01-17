@@ -58,7 +58,7 @@ ReflectionZonePlate::ReflectionZonePlate(
     const double mExit, const double sEntrance, const double sExit,
     const double shortRadius, const double longRadius,
     const int additionalZeroOrder, const double fresnelZOffset,
-    const std::vector<double> slopeError, Material mat)
+    const std::array<double, 7> slopeError, Material mat)
     : OpticalElement(name, geometricalShape, width, height, azimuthalAngle,
                      position, orientation, slopeError),
       m_fresnelZOffset(fresnelZOffset),
@@ -89,7 +89,7 @@ ReflectionZonePlate::ReflectionZonePlate(
     // set parameters in Quadric class
     double matd = (double)static_cast<int>(mat);
     if (m_curvatureType == CT_PLANE) {
-        setSurface(std::make_unique<Quadric>(std::vector<double>{
+        setSurface(std::make_unique<Quadric>(std::array<double, 4 * 4>{
             0, 0, 0, 0, 1, 0, 0, -1, 0, 0, 0, 0, 4, 0, matd, 0}));
     } else if (m_curvatureType == CT_TOROIDAL) {
         m_longRadius = longRadius;    // for sphere and toroidal
@@ -97,7 +97,7 @@ ReflectionZonePlate::ReflectionZonePlate(
         setSurface(std::make_unique<Toroid>(longRadius, shortRadius, 4, mat));
     } else {
         m_longRadius = longRadius;  // for sphere and toroidal
-        setSurface(std::make_unique<Quadric>(std::vector<double>{
+        setSurface(std::make_unique<Quadric>(std::array<double, 4 * 4>{
             1, 0, 0, 0, 1, 1, 0, -m_longRadius, 0, 0, 1, 0, 4, 0, matd, 0}));
     }
 
@@ -122,7 +122,7 @@ ReflectionZonePlate::ReflectionZonePlate(
     const double mExit, const double sEntrance, const double sExit,
     const double shortRadius, const double longRadius,
     const int additionalZeroOrder, const double fresnelZOffset,
-    const std::vector<double> slopeError, Material mat)
+    const std::array<double, 7> slopeError, Material mat)
     : OpticalElement(name, geometricalShape, widthA, widthB, height,
                      azimuthalAngle, position, orientation, slopeError),
       m_fresnelZOffset(fresnelZOffset),
@@ -154,7 +154,7 @@ ReflectionZonePlate::ReflectionZonePlate(
 
     // set parameters in Quadric class
     if (m_curvatureType == CT_PLANE) {
-        setSurface(std::make_unique<Quadric>(std::vector<double>{
+        setSurface(std::make_unique<Quadric>(std::array<double, 4 * 4>{
             0, 0, 0, 0, 1, 0, 0, -1, 0, 0, 0, 0, 4, 0, matd, 0}));
     } else if (m_curvatureType == CT_TOROIDAL) {
         m_longRadius = longRadius;    // for sphere and toroidal
@@ -162,7 +162,7 @@ ReflectionZonePlate::ReflectionZonePlate(
         setSurface(std::make_unique<Toroid>(longRadius, shortRadius, 4, mat));
     } else {
         m_longRadius = longRadius;  // for sphere and toroidal
-        setSurface(std::make_unique<Quadric>(std::vector<double>{
+        setSurface(std::make_unique<Quadric>(std::array<double, 4 * 4>{
             1, 0, 0, 0, 1, 1, 0, -m_longRadius, 0, 0, 1, 0, 4, 0, matd, 0}));
     }
 
@@ -279,7 +279,7 @@ std::shared_ptr<ReflectionZonePlate> ReflectionZonePlate::createFromXML(
         return nullptr;
     }
 
-    std::vector<double> slopeError;
+    std::array<double, 7> slopeError;
     if (!xml::paramSlopeError(node, &slopeError)) {
         return nullptr;
     }

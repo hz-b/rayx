@@ -19,7 +19,7 @@ class RAYX_API Ellipsoid : public OpticalElement {
               glm::dmat4x4 orientation, const double grazingIncidence,
               const double entranceArmLength, const double exitArmLength,
               const int figRot, const double a_11,
-              const std::vector<double> slopeError, Material mat);
+              const std::array<double, 7> slopeError, Material mat);
 
     Ellipsoid(const char* name, Geometry::GeometricalShape geometricalShape,
               const double width, const double height,
@@ -28,7 +28,7 @@ class RAYX_API Ellipsoid : public OpticalElement {
               const double DesignAngle, glm::dmat4x4 orientation,
               const double grazingIncidence, const double entranceArmLength,
               const double exitArmLength, const int figRot, const double a_11,
-              const std::vector<double> slopeError, Material mat);
+              const std::array<double, 7> slopeError, Material mat);
     Ellipsoid();
     ~Ellipsoid();
 

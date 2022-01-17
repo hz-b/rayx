@@ -3,6 +3,7 @@
 #include <Model/Beamline/EnergyDistribution.h>
 #include <Tracer/Vulkan/Material.h>
 
+#include <array>
 #include <glm.hpp>
 #include <vector>
 
@@ -40,13 +41,13 @@ bool paramDvec3(const rapidxml::xml_node<>* node, const char* paramname,
 // These functions parse more complex parts of beamline objects, and are used by
 // multiple createFromXML functions.
 bool paramMisalignment(const rapidxml::xml_node<>* node,
-                       std::vector<double>* out);
+                       std::array<double, 6>* out);
 bool paramPositionNoGroup(const rapidxml::xml_node<>* node, glm::dvec4* out);
 bool paramOrientationNoGroup(const rapidxml::xml_node<>* node,
                              glm::dmat4x4* out);
 bool paramSlopeError(const rapidxml::xml_node<>* node,
-                     std::vector<double>* out);
-bool paramVls(const rapidxml::xml_node<>* node, std::vector<double>* out);
+                     std::array<double, 7>* out);
+bool paramVls(const rapidxml::xml_node<>* node, std::array<double, 6>* out);
 bool paramEnergyDistribution(const rapidxml::xml_node<>* node,
                              EnergyDistribution* out);
 

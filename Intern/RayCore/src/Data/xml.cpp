@@ -105,14 +105,14 @@ bool paramDvec3(const rapidxml::xml_node<>* node, const char* paramname,
 }
 
 bool paramMisalignment(const rapidxml::xml_node<>* node,
-                       std::vector<double>* out) {
+                       std::array<double, 6>* out) {
     if (!node || !out) {
         return false;
     }
 
     rapidxml::xml_node<>* p;
 
-    *out = std::vector<double>(6, 0.f);
+    out->fill(0.f);
 
     if (!param(node, "alignmentError", &p)) {
         return true;  // if error is not given, it'll be zero.
@@ -178,12 +178,12 @@ bool paramOrientationNoGroup(const rapidxml::xml_node<>* node,
 }
 
 bool paramSlopeError(const rapidxml::xml_node<>* node,
-                     std::vector<double>* out) {
+                     std::array<double, 7>* out) {
     if (!node || !out) {
         return false;
     }
 
-    *out = std::vector<double>(7, 0.f);
+    out->fill(0.f);
 
     rapidxml::xml_node<>* p;
     if (!param(node, "slopeError", &p)) {
@@ -205,12 +205,12 @@ bool paramSlopeError(const rapidxml::xml_node<>* node,
     return true;
 }
 
-bool paramVls(const rapidxml::xml_node<>* node, std::vector<double>* out) {
+bool paramVls(const rapidxml::xml_node<>* node, std::array<double, 6>* out) {
     if (!node || !out) {
         return false;
     }
 
-    *out = std::vector<double>(6, 0.f);
+    out->fill(0.f);
 
     rapidxml::xml_node<>* p;
     if (!param(node, "lineSpacing", &p)) {
@@ -292,7 +292,9 @@ bool paramEnergyDistribution(const rapidxml::xml_node<>* node,
 bool paramPositionAndOrientation(const rapidxml::xml_node<>* node,
                                  const std::vector<xml::Group>& group_context,
                                  glm::dvec4* out_pos, glm::dmat4x4* out_ori) {
-    std::vector<double> misalignment = std::vector<double>{0, 0, 0, 0, 0, 0};
+    std::array<double, 6> misalignment;
+    misalignment.fill(0.f);
+
     paramPositionNoGroup(node, out_pos);
     paramOrientationNoGroup(node, out_ori);
     paramMisalignment(node, &misalignment);

@@ -34,7 +34,7 @@ Ellipsoid::Ellipsoid(const char* name,
                      glm::dmat4x4 orientation, const double grazingIncidence,
                      const double entranceArmLength, const double exitArmLength,
                      const int figRot, const double a_11,
-                     const std::vector<double> slopeError, Material mat)
+                     const std::array<double, 7> slopeError, Material mat)
     : OpticalElement(name, geometricalShape, width, height, azimuthalAngle,
                      position, orientation, slopeError),
       m_incidence(degToRad(grazingIncidence)),
@@ -60,10 +60,15 @@ Ellipsoid::Ellipsoid(const char* name,
     double icurv = 1;
     double matd = (double)static_cast<int>(mat);
     setSurface(std::make_unique<Quadric>(
-        std::vector<double>{m_a11, 0, 0, 0, icurv, 1, 0, m_radius, 0, 0, m_a33,
-                            m_a34, 7, 0, matd, m_a44}));
-    setElementParameters({sin(m_tangentAngle), cos(m_tangentAngle), m_y0, m_z0,
-                          0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0});
+        std::array<double, 4 * 4>{m_a11, 0, 0, 0,         //
+                                  icurv, 1, 0, m_radius,  //
+                                  0, 0, m_a33, m_a34,     //
+                                  7, 0, matd, m_a44}));
+    setElementParameters({sin(m_tangentAngle), cos(m_tangentAngle), m_y0,
+                          m_z0,        //
+                          0, 0, 0, 0,  //
+                          0, 0, 0, 0,  //
+                          0, 0, 0, 0});
 }
 // User-defined Parm constructor
 Ellipsoid::Ellipsoid(const char* name,
@@ -75,7 +80,7 @@ Ellipsoid::Ellipsoid(const char* name,
                      const double grazingIncidence,
                      const double entranceArmLength, const double exitArmLength,
                      const int figRot, const double a_11,
-                     const std::vector<double> slopeError, Material mat)
+                     const std::array<double, 7> slopeError, Material mat)
     : OpticalElement(name, geometricalShape, width, height, azimuthalAngle,
                      position, orientation, slopeError),
       m_incidence(degToRad(grazingIncidence)),
@@ -118,10 +123,16 @@ Ellipsoid::Ellipsoid(const char* name,
     double icurv = 1;
     double matd = (double)static_cast<int>(mat);
     setSurface(std::make_unique<Quadric>(
-        std::vector<double>{m_a11, 0, 0, 0, icurv, 1, 0, m_radius, 0, 0, m_a33,
-                            m_a34, 7, 0, matd, m_a44}));
-    setElementParameters({sin(m_tangentAngle), cos(m_tangentAngle), m_y0, m_z0,
-                          0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0});
+        std::array<double, 4 * 4>{m_a11, 0, 0, 0,         //
+                                  icurv, 1, 0, m_radius,  //
+                                  0, 0, m_a33,
+                                  m_a34,  //
+                                  7, 0, matd, m_a44}));
+    setElementParameters({sin(m_tangentAngle), cos(m_tangentAngle), m_y0,
+                          m_z0,        //
+                          0, 0, 0, 0,  //
+                          0, 0, 0, 0,  //
+                          0, 0, 0, 0});
 }
 
 // dstr
@@ -279,7 +290,7 @@ std::shared_ptr<Ellipsoid> Ellipsoid::createFromXML(
         return nullptr;
     }
 
-    std::vector<double> slopeError;
+    std::array<double, 7> slopeError;
     if (!xml::paramSlopeError(node, &slopeError)) {
         return nullptr;
     }
@@ -319,7 +330,7 @@ std::shared_ptr<Ellipsoid> Ellipsoid::createFromXML(
         return nullptr;
     }
 
-    std::vector<double> mis;
+    std::array<double, 6> mis;
     if (!xml::paramMisalignment(node, &mis)) {
         return nullptr;
     }

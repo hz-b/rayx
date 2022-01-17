@@ -82,8 +82,8 @@ TEST(RayTest, test1) {
     double order = 3;
     double lastElement = 4;
     double extraParam = 7;
-    RAYX::Ray r{x, y, z, weight, xdir, ydir, zdir, energy, s0, s1, s2, s3,
-                pathLength, order, lastElement, extraParam};
+    RAYX::Ray r{x,  y,  z,  weight, xdir,       ydir,  zdir,        energy,
+                s0, s1, s2, s3,     pathLength, order, lastElement, extraParam};
     EXPECT_EQ(r.getxPos(), x);
     EXPECT_EQ(r.getyPos(), y);
     EXPECT_EQ(r.getzPos(), z);
@@ -118,7 +118,8 @@ TEST(RayTest, testDefaultValues) {
     double s1 = 1;
     double s2 = 0;
     double s3 = 0;
-    RAYX::Ray r{x, y, z, weight, xdir, ydir, zdir, energy, s0, s1, s2, s3, 0, 0, 0, 0};
+    RAYX::Ray r{x,  y,  z,  weight, xdir, ydir, zdir, energy,
+                s0, s1, s2, s3,     0,    0,    0,    0};
     EXPECT_EQ(r.getxPos(), x);
     EXPECT_EQ(r.getyPos(), y);
     EXPECT_EQ(r.getzPos(), z);
@@ -149,7 +150,7 @@ TEST(MatrixTest, testParams) {
     double lin0 = 1;
     double lin45 = 0;
     double circ = 0;
-    std::vector<double> mis = {0, 0, 0, 0};
+    std::array<double, 6> mis = {0, 0, 0, 0, 0, 0};
     RAYX::EnergyDistribution dist(RAYX::EnergyRange(photonEnergy, energySpread),
                                   true);
     RAYX::MatrixSource m =
@@ -201,7 +202,7 @@ TEST(PointSource, testParams) {
     double lin0 = 1;
     double lin45 = 0;
     double circ = 0;
-    std::vector<double> misalignment = {0, 0, 0, 0};
+    std::array<double, 6> misalignment = {0, 0, 0, 0, 0, 0};
     RAYX::EnergyDistribution dist(RAYX::EnergyRange(photonEnergy, energySpread),
                                   false);
     RAYX::PointSource p = RAYX::PointSource(
@@ -231,7 +232,7 @@ TEST(LightSource, PointSourceHardEdge) {
     double lin0 = 1;
     double lin45 = 0;
     double circ = 0;
-    std::vector<double> mis = {0, 0, 0, 0};
+    std::array<double, 6> mis = {0, 0, 0, 0, 0, 0};
     RAYX::EnergyDistribution dist(RAYX::EnergyRange(photonEnergy, energySpread),
                                   true);
     RAYX::PointSource p = RAYX::PointSource(
@@ -284,7 +285,7 @@ TEST(LightSource, PointSourceSoftEdge) {
     double lin0 = 1;
     double lin45 = 0;
     double circ = 0;
-    std::vector<double> mis = {0, 0, 0, 0};
+    std::array<double, 6> mis = {0, 0, 0, 0, 0, 0};
     RAYX::EnergyDistribution dist(RAYX::EnergyRange(photonEnergy, energySpread),
                                   true);
     RAYX::PointSource p = RAYX::PointSource(
@@ -337,7 +338,7 @@ TEST(LightSource, PointSourceHardEdgeMis) {
     double lin0 = 1;
     double lin45 = 0;
     double circ = 0;
-    std::vector<double> mis = {2, 3, 0.005, 0.006};  // x, y, psi, phi
+    std::array<double, 6> mis = {2, 3, 0.005, 0.006, 0, 0};  // x, y, psi, phi
     RAYX::EnergyDistribution dist(RAYX::EnergyRange(photonEnergy, energySpread),
                                   false);
     RAYX::PointSource p = RAYX::PointSource(
@@ -385,7 +386,8 @@ TEST(LightSource, PointSourceSoftEdgeMis) {
     double lin0 = 1;
     double lin45 = 0;
     double circ = 0;
-    std::vector<double> mis = {2, 3, 0.005, 0.006};  // x,y,psi,phi in rad
+    std::array<double, 6> mis = {2,     3, 0.005,
+                                 0.006, 0, 0};  // x,y,psi,phi in rad
     RAYX::EnergyDistribution dist(RAYX::EnergyRange(photonEnergy, energySpread),
                                   false);
     RAYX::PointSource p = RAYX::PointSource(

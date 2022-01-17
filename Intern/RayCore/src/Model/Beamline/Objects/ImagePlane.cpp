@@ -21,8 +21,8 @@ ImagePlane::ImagePlane(const char* name, glm::dvec4 position,
                      Geometry::GeometricalShape::RECTANGLE, 0, 0, 0, position,
                      orientation, {0, 0, 0, 0, 0, 0, 0}) {
     RAYX_LOG << name;
-    setSurface(std::make_unique<Quadric>(
-        std::vector<double>{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 5, 0, 0, 0}));
+    setSurface(std::make_unique<Quadric>(std::array<double, 4 * 4>{
+        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 5, 0, 0, 0}));
 }
 
 ImagePlane::~ImagePlane() {}

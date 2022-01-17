@@ -22,7 +22,7 @@ class RAYX_API ReflectionZonePlate : public OpticalElement {
         const double mExit, const double sEntrance, const double sExit,
         const double shortRadius, const double longRadius,
         const int additionalZeroOrder, const double fresnelZOffset,
-        const std::vector<double> slopeError, Material mat);
+        const std::array<double, 7> slopeError, Material mat);
 
     // ! temporary constructor for trapezoid (10/11/2021)
     ReflectionZonePlate(
@@ -35,7 +35,7 @@ class RAYX_API ReflectionZonePlate : public OpticalElement {
         const double dBeta, const double mEntrance, const double mExit,
         const double sEntrance, const double sExit, const double shortRadius,
         const double longRadius, const int additionalZeroOrder,
-        const double fresnelZOffset, const std::vector<double> slopeError,
+        const double fresnelZOffset, const std::array<double, 7> slopeError,
         Material mat);
     ReflectionZonePlate();
     ~ReflectionZonePlate();

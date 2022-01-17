@@ -45,10 +45,10 @@ void TracerInterface::setBeamlineParameters() {
 
 void TracerInterface::addOpticalElementToTracer(
     std::shared_ptr<OpticalElement> element) {
-    m_RayTracer.addVectors(element->getSurfaceParams(), element->getInMatrix(),
-                           element->getOutMatrix(),
-                           element->getObjectParameters(),
-                           element->getElementParameters());
+    m_RayTracer.addArrays(element->getSurfaceParams(), element->getInMatrix(),
+                          element->getOutMatrix(),
+                          element->getObjectParameters(),
+                          element->getElementParameters());
 }
 
 bool TracerInterface::run() {

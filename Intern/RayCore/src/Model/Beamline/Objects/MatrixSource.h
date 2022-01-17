@@ -12,7 +12,7 @@ class RAYX_API MatrixSource : public LightSource {
                  const double sourceDepth, const double horDivergence,
                  const double verDivergence, const double linPol0,
                  const double linPol45, const double circPol,
-                 const std::vector<double> misalignment);
+                 const std::array<double, 6> misalignment);
 
     MatrixSource();
     ~MatrixSource();

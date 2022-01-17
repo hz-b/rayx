@@ -34,7 +34,7 @@ Cylinder::Cylinder(const char* name,
                    glm::dvec4 position, glm::dmat4x4 orientation,
                    const double grazingIncidence,
                    const double entranceArmLength, const double exitArmLength,
-                   const std::vector<double> slopeError, Material mat)
+                   const std::array<double, 7> slopeError, Material mat)
     : OpticalElement(name, geometricalShape, width, height, azimuthalAngle,
                      position, orientation, slopeError),
       m_direction(CYLINDER_DIRECTION(direction)),
@@ -61,7 +61,7 @@ Cylinder::Cylinder(const char* name,
     }
 
     double matd = (double)static_cast<int>(mat);
-    setSurface(std::make_unique<Quadric>(std::vector<double>{
+    setSurface(std::make_unique<Quadric>(std::array<double, 4 * 4>{
         m_a11, 0, 0, 0, icurv, 1, 0, m_a24, 0, 0, m_a33, 0, 0, 0, matd, 0}));
     // TODO (OS): Add Element parameters?
     setElementParameters({0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0});
@@ -149,7 +149,7 @@ std::shared_ptr<Cylinder> Cylinder::createFromXML(
         return nullptr;
     }
 
-    std::vector<double> slopeError;
+    std::array<double, 7> slopeError;
     if (!xml::paramSlopeError(node, &slopeError)) {
         return nullptr;
     }

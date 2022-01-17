@@ -39,8 +39,8 @@ PlaneGrating::PlaneGrating(
     const double width, const double height, const double azimuthalAngle,
     glm::dvec4 position, glm::dmat4x4 orientation, const double designEnergy,
     const double lineDensity, const double orderOfDiffraction,
-    const int additionalZeroOrder, const std::vector<double> vls,
-    const std::vector<double> slopeError, Material mat)
+    const int additionalZeroOrder, const std::array<double, 6> vls,
+    const std::array<double, 7> slopeError, Material mat)
     : OpticalElement(name, geometricalShape, width, height, azimuthalAngle,
                      position, orientation, slopeError),
       m_additionalOrder(additionalZeroOrder),
@@ -59,7 +59,7 @@ PlaneGrating::PlaneGrating(
 
     // parameters of quadric surface
     double matd = (double)static_cast<int>(mat);
-    setSurface(std::make_unique<Quadric>(std::vector<double>{
+    setSurface(std::make_unique<Quadric>(std::array<double, 4 * 4>{
         0, 0, 0, 0, 1, 0, 0, -1, 0, 0, 0, 0, 1, 0, matd, 0}));
 }
 
@@ -114,12 +114,12 @@ std::shared_ptr<PlaneGrating> PlaneGrating::createFromXML(
                      &additionalZeroOrder);  // may be missing in some RML
                                              // files, that's fine though
 
-    std::vector<double> vls;
+    std::array<double, 6> vls;
     if (!xml::paramVls(node, &vls)) {
         return nullptr;
     }
 
-    std::vector<double> slopeError;
+    std::array<double, 7> slopeError;
     if (!xml::paramSlopeError(node, &slopeError)) {
         return nullptr;
     }
@@ -145,5 +145,5 @@ double PlaneGrating::getDesignEnergyMounting() {
 }
 double PlaneGrating::getLineDensity() { return m_lineDensity; }
 double PlaneGrating::getOrderOfDiffraction() { return m_orderOfDiffraction; }
-std::vector<double> PlaneGrating::getVls() { return m_vls; }
+std::array<double, 6> PlaneGrating::getVls() { return m_vls; }
 }  // namespace RAYX
