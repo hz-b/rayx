@@ -87,11 +87,6 @@ std::list<double> runTracer(
 
     // add elements
     for (std::shared_ptr<RAYX::OpticalElement> element : elements) {
-        std::cout << "add " << element->getName() << std::endl;
-        printMatrix(element->getSurfaceParams());
-        printMatrix(element->getObjectParameters());
-        printMatrix(element->getElementParameters());
-        printMatrix(element->getInMatrix());
         tracer.addVectors(element->getSurfaceParams(), element->getInMatrix(),
                           element->getOutMatrix(),
                           element->getObjectParameters(),
@@ -281,16 +276,25 @@ void testOpticalElement(
     writeToFile(outputRays, filename);
 }
 
-void testBeamline(std::shared_ptr<RAYX::Beamline> beamline) {
+void testBeamline(const char* filename) {
+    std::string beamline_file = "../../Tests/rml_files/";
+    beamline_file.append(filename);
+    beamline_file.append(".rml");
+    std::shared_ptr<RAYX::Beamline> beamline = std::make_shared<RAYX::Beamline>(
+        RAYX::Importer::importBeamline(beamline_file.c_str()));
+
+    std::string outfile = "testFile_";
+    outfile.append(filename);
+
     std::vector<std::shared_ptr<RAYX::OpticalElement>> elements =
         beamline->m_OpticalElements;
-    std::string filename = "testFile_";
-    filename.append(elements[0]->getName());
-
     std::vector<RAYX::Ray> testValues = beamline->m_LightSources[0]->getRays();
+    printMatrix(elements[1]->getInMatrix());
+    printMatrix(elements[1]->getOutMatrix());
+
     std::list<double> outputRays = runTracer(testValues, elements);
     // write to file "testFile_"+name of first element in beamlin
-    writeToFile(outputRays, filename);
+    writeToFile(outputRays, outfile);
 }
 
 /** used to compare correct values and results in unit tests that use the shader
@@ -372,12 +376,12 @@ void compareFromCorrect(std::vector<RAYX::Ray> correct,
 template <typename ret, typename par>
 using fn = std::function<ret(par)>;
 
-/** if we test a simple function of the form y = f(x) like exp, sin, log,.. on
- * the shader we can use this function to verify its result
+/** if we test a simple function of the form y = f(x) like exp, sin, log,..
+ * on the shader we can use this function to verify its result
  * @param func          the function
  * @param testValues    the values for which we test the function. vector of
- * rays but the parameters are meaningless, just store values there to get them
- * to the shader
+ * rays but the parameters are meaningless, just store values there to get
+ * them to the shader
  * @param outputRays    the rays that we get from the shader. contain the
  * results for applying the function to each of the testValues on the shader
  *
@@ -469,8 +473,8 @@ TEST_F(Tracer, testUniformRandom) {
         std::make_shared<RAYX::MatrixSource>("Matrix source 1", dist, 0.065,
                                              0.04, 0.0, 0.001, 0.001, 1, 0, 0,
                                              std::vector<double>{0, 0, 0, 0});
-    // create 2000 rays that are put to the shader. they will be overwritten by
-    // the random numbers
+    // create 2000 rays that are put to the shader. they will be overwritten
+    // by the random numbers
     std::vector<RAYX::Ray> testValues = m->getRays();
 
     std::list<double> outputRays = runUnitTest(settings, testValues);
@@ -493,8 +497,8 @@ TEST_F(Tracer, testUniformRandom) {
  */
 TEST_F(Tracer, ExpTest) {
     double settings = 18;
-    // create n random rays (pos, dir, energy, weight and stokes of the ray is
-    // each a uniformly distributed random number between low and high)
+    // create n random rays (pos, dir, energy, weight and stokes of the ray
+    // is each a uniformly distributed random number between low and high)
     int n = 10;
     int low = -4;
     int high = 4;
@@ -547,10 +551,9 @@ TEST_F(Tracer, LogTest) {
  * input:   normal at intersection point
  *          direction of incoming ray
  *          weight of incoming ray
- *          az refraction parameter (Wavelength * line density * order * 1e-6)
- * in one dimension ax refraction parameter in other dimension
- * output:  direction of ray after refraction
- *          weight of ray after refraction
+ *          az refraction parameter (Wavelength * line density * order *
+ * 1e-6) in one dimension ax refraction parameter in other dimension output:
+ * direction of ray after refraction weight of ray after refraction
  */
 TEST_F(Tracer, testRefrac2D) {
     double settings = 16;
@@ -624,8 +627,8 @@ TEST_F(Tracer, testRefrac2D) {
     compareFromCorrect(correct, outputRays, tolerance);
 }
 
-/** test normal_cartesian function that rotates a given normal around the x and
- * z axis with two given angles
+/** test normal_cartesian function that rotates a given normal around the x
+ * and z axis with two given angles
  * @param normal        given normal vector
  * @param slopeX        given angle for x rotation
  * @param slopeZ        given angle for z rotation
@@ -695,8 +698,8 @@ TEST_F(Tracer, testNormalCylindrical) {
     std::vector<RAYX::Ray> testValues;
     std::vector<RAYX::Ray> correct;
 
-    // encode: ray.position.x = slopeX, ray.position.z = slopeZ. ray.direction =
-    // normal at intersection point from quad fct.
+    // encode: ray.position.x = slopeX, ray.position.z = slopeZ.
+    // ray.direction = normal at intersection point from quad fct.
     double slopeX = 0;
     double slopeZ = 0;
     glm::dvec3 normal = glm::dvec3(0, 1, 0);
@@ -818,10 +821,10 @@ TEST_F(Tracer, testWasteBox) {
     std::vector<RAYX::Ray> testValues;
     std::vector<RAYX::Ray> correct;
 
-    // encode: ray.position = position of intersection point. ray.direction.x =
-    // xLength of opt. element, ray.direction.z = zLength of optical element,
-    // ray.weigth = weight of ray before calling wastebox case: intersection
-    // point on surface
+    // encode: ray.position = position of intersection point.
+    // ray.direction.x = xLength of opt. element, ray.direction.z = zLength
+    // of optical element, ray.weigth = weight of ray before calling
+    // wastebox case: intersection point on surface
     glm::dvec3 pos = glm::dvec3(-5.0466620698997637, 0, 28.760236725599515);
     double xLength = 50;
     double zLength = 200;
@@ -898,8 +901,8 @@ TEST_F(Tracer, testRZPLineDensityDefaulParams) {  // point to point
                                        0,
                                        0};
 
-    // encode: ray.position = position of test ray. ray.direction = normal at
-    // intersection point.
+    // encode: ray.position = position of test ray. ray.direction = normal
+    // at intersection point.
     glm::dvec3 position =
         glm::dvec3(-5.0805095016939532, 0, 96.032788311782269);
     glm::dvec3 normal = glm::dvec3(0, 1, 0);
@@ -974,8 +977,8 @@ TEST_F(Tracer, testRZPLineDensityAstigmatic) {  // astigmatic 2 astigmatic
                                        0,
                                        0};
 
-    // encode: ray.position = position of test ray. ray.direction = normal at
-    // intersection point.
+    // encode: ray.position = position of test ray. ray.direction = normal
+    // at intersection point.
     glm::dvec3 position =
         glm::dvec3(-5.0805095016939532, 0, 96.032788311782269);
     glm::dvec3 normal = glm::dvec3(0, 1, 0);
@@ -1321,8 +1324,8 @@ TEST_F(Tracer, AtanTest) {
     compareFromFunction(fun, testValues, outputRays, tolerance);
 }
 
-// test VLS function that calculates new a from given a, z-position and 6 vls
-// parameters
+// test VLS function that calculates new a from given a, z-position and 6
+// vls parameters
 TEST_F(Tracer, vlsGratingTest) {
     std::vector<RAYX::Ray> testValues;
     std::vector<RAYX::Ray> correct;
@@ -1359,8 +1362,8 @@ TEST_F(Tracer, vlsGratingTest) {
     // Rudi's and Oussama's video cards. we presume this inaccuracy is not
     // relevant. interestingly though, it worked on the other video cards.
     // reduce to 1e-11 because control value 9497.479959611925 has no more
-    // digits after the comma than that. Apparently different computers handle
-    // this differently
+    // digits after the comma than that. Apparently different computers
+    // handle this differently
     double tolerance = 1e-11;
     compareFromCorrect(correct, outputRays, tolerance);
 }
@@ -1460,8 +1463,8 @@ TEST_F(Tracer, iteratToTest) {
     std::vector<RAYX::Ray> correct;
     double settings = 20;
 
-    // normal (always 0,1,0) encoded in ray position, a encoded in direction.x,
-    // direction.y and direction.z are actual ray directions
+    // normal (always 0,1,0) encoded in ray position, a encoded in
+    // direction.x, direction.y and direction.z are actual ray directions
     glm::dvec3 position =
         glm::dvec3(-0.0175, 1736.4751598838836, -9848.1551798768887);
     glm::dvec3 direction = glm::dvec3(-0.00026923073232438285,
@@ -1677,68 +1680,69 @@ TEST_F(Tracer, palikTest) {
     // gold index
     EXPECT_NEAR(v[7], 324., tolerance);
 }
-
 // test complete optical elements instead of single functions
 // uses deterministic source (matrix source with source depth = 0)
 // use name of optical element as file name
 class opticalElements : public Tracer {};
 
 TEST_F(opticalElements, planeMirrorDefault) {
-    const char* filename = "../../Tests/rml_files/planeMirrorDefault.rml";
-    std::shared_ptr<RAYX::Beamline> beamline = std::make_shared<RAYX::Beamline>(
-        RAYX::Importer::importBeamline(filename));
-    std::cout << "beamline imported" << std::endl;
-    // testBeamline(beamline);
-
-    RAYX::WorldUserParams pm_param =
-        RAYX::WorldUserParams(degToRad(10), degToRad(10), degToRad(7.5), 10000,
-                              std::vector<double>{0, 0, 0, 0, 0, 0});
-    glm::dvec4 pos_mirror = pm_param.calcPosition();
-    glm::dmat4x4 or_mirror = pm_param.calcOrientation();
-    std::shared_ptr<RAYX::PlaneMirror> plM =
+    const char* filename = "PlaneMirrorDef";
+    testBeamline(filename);
+    /*RAYX::WorldUserParams pm_param =
+        RAYX::WorldUserParams(degToRad(10), degToRad(10), degToRad(7.5),
+    10000, std::vector<double>{0, 0, 0, 0, 0, 0}); glm::dvec4 pos_mirror
+    = pm_param.calcPosition(); glm::dmat4x4 or_mirror =
+    pm_param.calcOrientation(); std::shared_ptr<RAYX::PlaneMirror> plM =
         std::make_shared<RAYX::PlaneMirror>(
-            "PlaneMirrorDef", RAYX::Geometry::GeometricalShape::RECTANGLE, 50,
-            200, pm_param.getAzimuthalAngle(), pos_mirror, or_mirror, zeros7,
+            "PlaneMirrorDef",
+    RAYX::Geometry::GeometricalShape::RECTANGLE, 50, 200,
+    pm_param.getAzimuthalAngle(), pos_mirror, or_mirror, zeros7,
             Material::CU);  // {1,2,3,0.01,0.02,0.03}
 
     RAYX::WorldUserParams ip_param = RAYX::WorldUserParams(
         0, 0, 0, 1000, std::vector<double>{0, 0, 0, 0, 0, 0});
-    glm::dvec4 pos_ip = ip_param.calcPosition(pm_param, pos_mirror, or_mirror);
-    glm::dmat4x4 or_ip = ip_param.calcOrientation(pm_param, or_mirror);
-    std::shared_ptr<RAYX::ImagePlane> ip = std::make_shared<RAYX::ImagePlane>(
-        "Image Plane", pos_ip, or_ip);  // {1,2,3,0.01,0.02,0.03}
+    glm::dvec4 pos_ip = ip_param.calcPosition(pm_param, pos_mirror,
+    or_mirror); glm::dmat4x4 or_ip = ip_param.calcOrientation(pm_param,
+    or_mirror); std::shared_ptr<RAYX::ImagePlane> ip =
+    std::make_shared<RAYX::ImagePlane>( "Image Plane", pos_ip, or_ip);
+    // {1,2,3,0.01,0.02,0.03}
 
-    testOpticalElement({plM, ip}, 20);
+    testOpticalElement({plM, ip}, 20);*/
 
     ASSERT_TRUE(true);
 }
 
 TEST_F(opticalElements, planeMirrorMis) {
-    RAYX::WorldUserParams pm_param = RAYX::WorldUserParams(
+    const char* filename = "PlaneMirrorMis";
+    testBeamline(filename);
+
+    /*RAYX::WorldUserParams pm_param = RAYX::WorldUserParams(
         degToRad(10), degToRad(10), 0, 10000,
         std::vector<double>{1, 2, 3, 0.001, 0.002, 0.003});
     glm::dvec4 pos_mirror = pm_param.calcPosition();
     glm::dmat4x4 or_mirror = pm_param.calcOrientation();
     std::shared_ptr<RAYX::PlaneMirror> plM =
         std::make_shared<RAYX::PlaneMirror>(
-            "PlaneMirrorMis", RAYX::Geometry::GeometricalShape::RECTANGLE, 50,
-            200, pm_param.getAzimuthalAngle(), pos_mirror, or_mirror, zeros7,
+            "PlaneMirrorMis", RAYX::Geometry::GeometricalShape::RECTANGLE,
+    50, 200, pm_param.getAzimuthalAngle(), pos_mirror, or_mirror, zeros7,
             Material::CU);  // {1,2,3,0.01,0.02,0.03}
-
     RAYX::WorldUserParams ip_param = RAYX::WorldUserParams(
         0, 0, 0, 1000, std::vector<double>{0, 0, 0, 0, 0, 0});
-    glm::dvec4 pos_ip = ip_param.calcPosition(pm_param, pos_mirror, or_mirror);
-    glm::dmat4x4 or_ip = ip_param.calcOrientation(pm_param, or_mirror);
-    std::shared_ptr<RAYX::ImagePlane> ip =
+    glm::dvec4 pos_ip = ip_param.calcPosition(pm_param, pos_mirror,
+    or_mirror); glm::dmat4x4 or_ip = ip_param.calcOrientation(pm_param,
+    or_mirror); std::shared_ptr<RAYX::ImagePlane> ip =
         std::make_shared<RAYX::ImagePlane>("Image Plane", pos_ip, or_ip);
 
-    testOpticalElement({plM, ip}, 20);
+    testOpticalElement({plM, beamline->m_OpticalElements[1]}, 20);*/
 
     ASSERT_TRUE(true);
 }
 
 TEST_F(opticalElements, sphereMirror) {
-    double grazingIncidence = degToRad(10);
+    const char* filename = "SphereMirrorDefault";
+    testBeamline(filename);
+
+    /*double grazingIncidence = degToRad(10);
     RAYX::WorldUserParams sm_param =
         RAYX::WorldUserParams(grazingIncidence, grazingIncidence, 0, 10000,
                               std::vector<double>{0, 0, 0, 0, 0, 0});
@@ -1746,24 +1750,28 @@ TEST_F(opticalElements, sphereMirror) {
     glm::dmat4x4 or_mirror = sm_param.calcOrientation();
     std::shared_ptr<RAYX::SphereMirror> s =
         std::make_shared<RAYX::SphereMirror>(
-            "SphereMirrorDefault", RAYX::Geometry::GeometricalShape::RECTANGLE,
-            50, 200, sm_param.getAzimuthalAngle(), radToDeg(grazingIncidence),
-            pos_mirror, or_mirror, 10000, 1000, zeros7, Material::CU);
+            "SphereMirrorDefault",
+    RAYX::Geometry::GeometricalShape::RECTANGLE, 50, 200,
+    sm_param.getAzimuthalAngle(), radToDeg(grazingIncidence), pos_mirror,
+    or_mirror, 10000, 1000, zeros7, Material::CU);
 
     RAYX::WorldUserParams ip_param = RAYX::WorldUserParams(
         0, 0, 0, 1000, std::vector<double>{0, 0, 0, 0, 0, 0});
-    glm::dvec4 pos_ip = ip_param.calcPosition(sm_param, pos_mirror, or_mirror);
-    glm::dmat4x4 or_ip = ip_param.calcOrientation(sm_param, or_mirror);
-    std::shared_ptr<RAYX::ImagePlane> ip =
+    glm::dvec4 pos_ip = ip_param.calcPosition(sm_param, pos_mirror,
+    or_mirror); glm::dmat4x4 or_ip = ip_param.calcOrientation(sm_param,
+    or_mirror); std::shared_ptr<RAYX::ImagePlane> ip =
         std::make_shared<RAYX::ImagePlane>("Image Plane", pos_ip, or_ip);
 
-    testOpticalElement({s, ip}, 20);
+    testOpticalElement({s, ip}, 20);*/
 
     ASSERT_TRUE(true);
 }
 
 TEST_F(opticalElements, planeGratingDevDefault) {
-    double incidenceAngle = 1.4773068838645145;
+    const char* filename = "PlaneGratingDeviationDefault";
+    testBeamline(filename);
+
+    /*double incidenceAngle = 1.4773068838645145;
     double exitAngle = 1.4897528445258457;
     RAYX::WorldUserParams pg_param =
         RAYX::WorldUserParams(incidenceAngle, exitAngle, 0, 10000,
@@ -1788,23 +1796,27 @@ TEST_F(opticalElements, planeGratingDevDefault) {
 
     testOpticalElement({plG, ip}, 20);
 
-    ASSERT_TRUE(true);
+    ASSERT_TRUE(true);*/
 }
 
 TEST_F(opticalElements, planeGratingDevAzimuthal) {
-    double incidenceAngle = 1.4773068838645145;
+    const char* filename = "PlaneGratingDeviationAz";
+    testBeamline(filename);
+    /*double incidenceAngle = 1.4773068838645145;
     double exitAngle = 1.4897528445258457;
     RAYX::WorldUserParams pg_param =
         RAYX::WorldUserParams(incidenceAngle, exitAngle, degToRad(7.5), 10000,
                               std::vector<double>{0, 0, 0, 0, 0, 0});
     glm::dvec4 position = pg_param.calcPosition();
     glm::dmat4x4 orientation = pg_param.calcOrientation();
-    std::shared_ptr<RAYX::PlaneGrating> plG = std::make_shared<
-        RAYX::PlaneGrating>(
-        "PlaneGratingDeviationAz", RAYX::Geometry::GeometricalShape::RECTANGLE,
-        50, 200, pg_param.getAzimuthalAngle(), position, orientation, 100, 1000,
-        1, 0, std::vector<double>{0, 0, 0, 0, 0, 0}, zeros7,
-        Material::CU);  // dx,dy,dz, dpsi,dphi,dchi // {1,2,3,0.001,0.002,0.003}
+    std::shared_ptr<RAYX::PlaneGrating> plG =
+        std::make_shared<RAYX::PlaneGrating>(
+            "PlaneGratingDeviationAz",
+            RAYX::Geometry::GeometricalShape::RECTANGLE, 50, 200,
+            pg_param.getAzimuthalAngle(), position, orientation, 100, 1000, 1,
+            0, std::vector<double>{0, 0, 0, 0, 0, 0}, zeros7,
+            Material::CU);  // dx,dy,dz, dpsi,dphi,dchi //
+                            // {1,2,3,0.001,0.002,0.003}
 
     RAYX::WorldUserParams ip_param = RAYX::WorldUserParams(
         0, 0, 0, 1000, std::vector<double>{0, 0, 0, 0, 0, 0});
@@ -1815,11 +1827,13 @@ TEST_F(opticalElements, planeGratingDevAzimuthal) {
 
     testOpticalElement({plG, ip}, 20);
 
-    ASSERT_TRUE(true);
+    ASSERT_TRUE(true);*/
 }
 
 TEST_F(opticalElements, planeGratingDevAzMis) {
-    double incidenceAngle = 1.4773068838645145;
+    const char* filename = "PlaneGratingDeviationAzMis";
+    testBeamline(filename);
+    /*double incidenceAngle = 1.4773068838645145;
     double exitAngle = 1.4897528445258457;
     RAYX::WorldUserParams pg_param = RAYX::WorldUserParams(
         incidenceAngle, exitAngle, degToRad(7.5), 10000,
@@ -1843,12 +1857,14 @@ TEST_F(opticalElements, planeGratingDevAzMis) {
         std::make_shared<RAYX::ImagePlane>("Image Plane", pos_ip, or_ip);
 
     testOpticalElement({plG, ip}, 20);
-    ASSERT_TRUE(true);
+    ASSERT_TRUE(true);*/
 }
 
 // constant incidence angle mode, azimuthal angle and misalignment
 TEST_F(opticalElements, planeGratingIncAzMis) {
-    double incidenceAngle = 1.3962634015954636;
+    const char* filename = "PlaneGratingIncAzMis";
+    testBeamline(filename);
+    /*double incidenceAngle = 1.3962634015954636;
     double exitAngle = 1.4088395764879007;
     RAYX::WorldUserParams pg_param = RAYX::WorldUserParams(
         incidenceAngle, exitAngle, degToRad(7.5), 10000,
@@ -1872,23 +1888,27 @@ TEST_F(opticalElements, planeGratingIncAzMis) {
 
     testOpticalElement({plG, ip}, 20);
 
-    ASSERT_TRUE(true);
+    ASSERT_TRUE(true);*/
 }
 
 TEST_F(opticalElements, planeGratingDevMisVLS) {
-    double incidenceAngle = 1.4773068838645145;
+    const char* filename = "PlaneGratingDevAzMisVLS";
+    testBeamline(filename);
+    /*double incidenceAngle = 1.4773068838645145;
     double exitAngle = 1.4897528445258457;
     RAYX::WorldUserParams pg_param = RAYX::WorldUserParams(
         incidenceAngle, exitAngle, degToRad(7.5), 10000,
         std::vector<double>{1, 2, 3, 0.001, 0.002, 0.003});
     glm::dvec4 position = pg_param.calcPosition();
     glm::dmat4x4 orientation = pg_param.calcOrientation();
-    std::shared_ptr<RAYX::PlaneGrating> plG = std::make_shared<
-        RAYX::PlaneGrating>(
-        "PlaneGratingDeviationMis", RAYX::Geometry::GeometricalShape::RECTANGLE,
-        50, 200, pg_param.getAzimuthalAngle(), position, orientation, 100, 1000,
-        1, 0, std::vector<double>{0.45, 0.3, 0.5, 0.2, 0.4, 0.35}, zeros7,
-        Material::CU);  // dx,dy,dz, dpsi,dphi,dchi // {1,2,3,0.001,0.002,0.003}
+    std::shared_ptr<RAYX::PlaneGrating> plG =
+        std::make_shared<RAYX::PlaneGrating>(
+            "PlaneGratingDevAzMisVLS",
+            RAYX::Geometry::GeometricalShape::RECTANGLE, 50, 200,
+            pg_param.getAzimuthalAngle(), position, orientation, 100, 1000, 1,
+            0, std::vector<double>{0.45, 0.3, 0.5, 0.2, 0.4, 0.35}, zeros7,
+            Material::CU);  // dx,dy,dz, dpsi,dphi,dchi //
+                            // {1,2,3,0.001,0.002,0.003}
 
     RAYX::WorldUserParams ip_param = RAYX::WorldUserParams(
         0, 0, 0, 1000, std::vector<double>{0, 0, 0, 0, 0, 0});
@@ -1897,15 +1917,17 @@ TEST_F(opticalElements, planeGratingDevMisVLS) {
     std::shared_ptr<RAYX::ImagePlane> ip =
         std::make_shared<RAYX::ImagePlane>("Image Plane", pos_ip, or_ip);
 
-    testOpticalElement({plG, ip}, 200);
+    testOpticalElement({plG, ip}, 200);*/
     ASSERT_TRUE(true);
 }
 
 // RZPs
 
 TEST_F(opticalElements, RZPDefaultParams) {
+    const char* filename = "ReflectionZonePlateDefault";
+    testBeamline(filename);
     // alpha and beta calculated from user parameters
-    RAYX::GeometricUserParams gu_rzp = RAYX::GeometricUserParams(
+    /*RAYX::GeometricUserParams gu_rzp = RAYX::GeometricUserParams(
         1, 0, 170, 0, 0, 100, 100, -1, -1, 1, 1, 100, 500, 100, 500);
     ASSERT_DOUBLE_EQ(gu_rzp.getAlpha(), 0.017453292519943295);
     ASSERT_DOUBLE_EQ(gu_rzp.getBeta(), 0.017453292519941554);
@@ -1933,11 +1955,13 @@ TEST_F(opticalElements, RZPDefaultParams) {
 
     testOpticalElement({rzp, ip}, 20);
 
-    ASSERT_TRUE(true);
+    ASSERT_TRUE(true);*/
 }
 
 TEST_F(opticalElements, RZPDefaultParams200) {
-    RAYX::GeometricUserParams gu_rzp = RAYX::GeometricUserParams(
+    const char* filename = "ReflectionZonePlateDefault200";
+    testBeamline(filename);
+    /*RAYX::GeometricUserParams gu_rzp = RAYX::GeometricUserParams(
         1, 0, 170, 0, 0, 100, 100, -1, -1, 1, 1, 100, 500, 100, 500);
     ASSERT_DOUBLE_EQ(gu_rzp.getAlpha(), 0.017453292519943295);
     ASSERT_DOUBLE_EQ(gu_rzp.getBeta(), 0.017453292519941554);
@@ -1963,14 +1987,16 @@ TEST_F(opticalElements, RZPDefaultParams200) {
     std::shared_ptr<RAYX::ImagePlane> ip =
         std::make_shared<RAYX::ImagePlane>("Image Plane", pos_ip, or_ip);
 
-    testOpticalElement({rzp, ip}, 200);
+    testOpticalElement({rzp, ip}, 200);*/
 
     ASSERT_TRUE(true);
 }
 
 TEST_F(opticalElements, RZPDefaultParamsToroid200) {
+    const char* filename = "ReflectionZonePlateDefault200Toroid";
+    testBeamline(filename);
     // use given grazing incidence angle (10), mount = 1
-    RAYX::GeometricUserParams gu_rzp = RAYX::GeometricUserParams(
+    /*RAYX::GeometricUserParams gu_rzp = RAYX::GeometricUserParams(
         1, 0, 170, 10, 0, 100, 100, -1, -1, 1, 1, 100, 500, 100, 500);
     ASSERT_DOUBLE_EQ(gu_rzp.getAlpha(), degToRad(10));
     ASSERT_NEAR(gu_rzp.getBeta(), degToRad(10), 1e-12);
@@ -1983,11 +2009,9 @@ TEST_F(opticalElements, RZPDefaultParamsToroid200) {
     std::shared_ptr<RAYX::ReflectionZonePlate> rzp =
         std::make_shared<RAYX::ReflectionZonePlate>(
             "ReflectionZonePlateDefault200Toroid",
-            RAYX::Geometry::GeometricalShape::RECTANGLE, 2, 50, 200,
+            RAYX::Geometry::GeometricalShape::RECTANGLE, 1, 50, 200,
             rzp_param.getAzimuthalAngle(), position, orientation, 100, -1, -1,
-            1, 1, 100, 500, 100, 500, 20, 40, 0, 0, zeros7,
-            Material::CU);  // dx,dy,dz, dpsi,dphi,dchi //
-                            // {1,2,3,0.001,0.002,0.003}
+            1, 1, 100, 500, 100, 500, 20, 40, 0, 0, zeros7, Material::CU);
 
     RAYX::WorldUserParams ip_param = RAYX::WorldUserParams(
         0, 0, 0, 1000, std::vector<double>{0, 0, 0, 0, 0, 0});
@@ -1997,12 +2021,14 @@ TEST_F(opticalElements, RZPDefaultParamsToroid200) {
         std::make_shared<RAYX::ImagePlane>("Image Plane", pos_ip, or_ip);
 
     testOpticalElement({rzp, ip}, 200);
-
+*/
     ASSERT_TRUE(true);
 }
 
 TEST_F(opticalElements, RZPAzimuthal200) {
-    RAYX::GeometricUserParams gu_rzp = RAYX::GeometricUserParams(
+    const char* filename = "ReflectionZonePlateAzim200";
+    testBeamline(filename);
+    /*RAYX::GeometricUserParams gu_rzp = RAYX::GeometricUserParams(
         1, 0, 170, 0, 0, 100, 100, -1, -1, 1, 1, 100, 500, 100, 500);
     RAYX::WorldUserParams rzp_param =
         RAYX::WorldUserParams(gu_rzp.getAlpha(), gu_rzp.getBeta(), degToRad(10),
@@ -2025,25 +2051,30 @@ TEST_F(opticalElements, RZPAzimuthal200) {
     std::shared_ptr<RAYX::ImagePlane> ip =
         std::make_shared<RAYX::ImagePlane>("Image Plane", pos_ip, or_ip);
 
-    testOpticalElement({rzp, ip}, 200);
+    testOpticalElement({rzp, ip}, 200);*/
 
     ASSERT_TRUE(true);
 }
 
 TEST_F(opticalElements, RZPMis) {
-    RAYX::GeometricUserParams gu_rzp = RAYX::GeometricUserParams(
+    const char* filename = "ReflectionZonePlateMis";
+    testBeamline(filename);
+
+    /*RAYX::GeometricUserParams gu_rzp = RAYX::GeometricUserParams(
         1, 0, 170, 0, 0, 100, 100, -1, -1, 1, 1, 100, 500, 100, 500);
     RAYX::WorldUserParams rzp_param = RAYX::WorldUserParams(
         gu_rzp.getAlpha(), gu_rzp.getBeta(), 0, 10000,
         std::vector<double>{1, 2, 3, 0.001, 0.002, 0.003});
     glm::dvec4 position = rzp_param.calcPosition();
     glm::dmat4x4 orientation = rzp_param.calcOrientation();
-    std::shared_ptr<RAYX::ReflectionZonePlate> rzp = std::make_shared<
-        RAYX::ReflectionZonePlate>(
-        "ReflectionZonePlateMis", RAYX::Geometry::GeometricalShape::RECTANGLE,
-        0, 50, 200, rzp_param.getAzimuthalAngle(), position, orientation, 100,
-        -1, -1, 1, 1, 100, 500, 100, 500, 0, 0, 0, 0, zeros7,
-        Material::CU);  // dx,dy,dz, dpsi,dphi,dchi // {1,2,3,0.001,0.002,0.003}
+    std::shared_ptr<RAYX::ReflectionZonePlate> rzp =
+        std::make_shared<RAYX::ReflectionZonePlate>(
+            "ReflectionZonePlateMis",
+            RAYX::Geometry::GeometricalShape::RECTANGLE, 0, 50, 200,
+            rzp_param.getAzimuthalAngle(), position, orientation, 100, -1, -1,
+            1, 1, 100, 500, 100, 500, 0, 0, 0, 0, zeros7,
+            Material::CU);  // dx,dy,dz, dpsi,dphi,dchi //
+                            // {1,2,3,0.001,0.002,0.003}
 
     RAYX::WorldUserParams ip_param = RAYX::WorldUserParams(
         0, 0, 0, 1000, std::vector<double>{0, 0, 0, 0, 0, 0});
@@ -2053,74 +2084,19 @@ TEST_F(opticalElements, RZPMis) {
         std::make_shared<RAYX::ImagePlane>("Image Plane", pos_ip, or_ip);
 
     testOpticalElement({rzp, ip}, 200);
-
+*/
     ASSERT_TRUE(true);
 }
 
 // ellipsoid mirrors
 
-// default ellipsoid with no image plane, no misalignment, data stored in beam
-// coordinates to make comparison with RAY-UI possible
-TEST_F(opticalElements, Ellipsoid_default) {
-    RAYX::GeometricUserParams g_params =
-        RAYX::GeometricUserParams(10, 10000, 1000);
-    double alpha = 0.031253965260898464;
-    double beta = 0.31781188513796743;
-    ASSERT_DOUBLE_EQ(g_params.getAlpha(), alpha);
-    ASSERT_DOUBLE_EQ(g_params.getBeta(), beta);
-    double tangentAngle = g_params.calcTangentAngle(10, 10000, 1000, 0);
-
-    RAYX::WorldUserParams w_coord = RAYX::WorldUserParams(
-        g_params.getAlpha(), g_params.getBeta(), 0, 10000,
-        std::vector<double>{0, 0, 0, 0, 0, 0}, tangentAngle);
-    glm::dvec4 pos = w_coord.calcPosition();
-    glm::dmat4x4 or1 = w_coord.calcOrientation();
-
-    std::shared_ptr<RAYX::Ellipsoid> eb = std::make_shared<RAYX::Ellipsoid>(
-        "ellipsoid_200default", RAYX::Geometry::GeometricalShape::RECTANGLE, 50,
-        200, w_coord.getAzimuthalAngle(), pos, or1, 10, 10000, 1000, 0, 1,
-        zeros7, Material::CU);
-    eb->setOutMatrix(glmToVector16(glm::transpose(
-        w_coord.calcE2B())));  // to make comparison with old ray files
-                               // possible, use the beam coordinate system
-    testOpticalElement({eb}, 200);
-}
-
-// default ellipsoid with no image plane but with MIRROR misalignment (the more
-// complicated misalignment), data stored in beam coordinates
-TEST_F(opticalElements, Ellipsoid_mirrormisalignment) {
-    RAYX::GeometricUserParams g_params =
-        RAYX::GeometricUserParams(10, 10000, 1000);
-    double alpha = 0.031253965260898464;
-    double beta = 0.31781188513796743;
-    ASSERT_DOUBLE_EQ(g_params.getAlpha(), alpha);
-    ASSERT_DOUBLE_EQ(g_params.getBeta(), beta);
-    int coordinatesystem = 1;  // misalignment in mirror coordinate system
-    double tangentAngle =
-        g_params.calcTangentAngle(10, 10000, 1000, coordinatesystem);
-    ASSERT_DOUBLE_EQ(tangentAngle, 0.14327895993853446);
-
-    RAYX::WorldUserParams w_coord = RAYX::WorldUserParams(
-        g_params.getAlpha(), g_params.getBeta(), 0, 100,
-        std::vector<double>{1, 2, 3, 0.004, 0.005, 0.006}, tangentAngle);
-    glm::dvec4 pos = w_coord.calcPosition();
-    glm::dmat4x4 or1 = w_coord.calcOrientation();
-
-    std::shared_ptr<RAYX::Ellipsoid> eb = std::make_shared<RAYX::Ellipsoid>(
-        "ellipsoid_200mirrormis", RAYX::Geometry::GeometricalShape::RECTANGLE,
-        50, 200, w_coord.getAzimuthalAngle(), pos, or1, 10, 10000, 1000, 0, 1,
-        zeros7, Material::CU);
-    eb->setOutMatrix(glmToVector16(glm::transpose(
-        w_coord.calcE2B())));  // to make comparison with old ray files
-                               // possible, use the beam coordinate system
-
-    testOpticalElement({eb}, 200);
-}
-
-// default ellipsoid with no misalignment but with image plane, data stored in
-// image-plane-coordinate system (footprint?)
+// default ellipsoid with no misalignment but with image plane, data stored
+// in image-plane-coordinate system (footprint?)
 TEST_F(opticalElements, EllipsoidImagePlane) {
-    RAYX::GeometricUserParams g_params =
+    const char* filename = "ellipsoid_ip_200default";
+    testBeamline(filename);
+
+    /*RAYX::GeometricUserParams g_params =
         RAYX::GeometricUserParams(10, 10000, 1000);
     double alpha = 0.031253965260898464;
     double beta = 0.31781188513796743;
@@ -2148,13 +2124,15 @@ TEST_F(opticalElements, EllipsoidImagePlane) {
     std::shared_ptr<RAYX::ImagePlane> i =
         std::make_shared<RAYX::ImagePlane>("ImagePlane", pos2, or2);
 
-    testOpticalElement({eb, i}, 200);
+    testOpticalElement({eb, i}, 200);*/
 }
 
 // default ellipsoid with ELLIPSOID misalignment and with image plane, data
 // stored in image-plane-coordinate system
 TEST_F(opticalElements, EllipsoidImagePlane_ellipsmisalignment) {
-    RAYX::GeometricUserParams g_params =
+    const char* filename = "ellipsoid_ip_200ellipsmis";
+    testBeamline(filename);
+    /*RAYX::GeometricUserParams g_params =
         RAYX::GeometricUserParams(10, 10000, 1000);
     double alpha = 0.031253965260898464;
     double beta = 0.31781188513796743;
@@ -2183,13 +2161,15 @@ TEST_F(opticalElements, EllipsoidImagePlane_ellipsmisalignment) {
     std::shared_ptr<RAYX::ImagePlane> i =
         std::make_shared<RAYX::ImagePlane>("ImagePlane", pos2, or2);
 
-    testOpticalElement({eb, i}, 200);
+    testOpticalElement({eb, i}, 200);*/
 }
 
-// default ellipsoid with MIRROR misalignment and with image plane, data stored
-// in image-plane-coordinate system
+// default ellipsoid with MIRROR misalignment and with image plane, data
+// stored in image-plane-coordinate system
 TEST_F(opticalElements, EllipsoidImagePlane_mirrormisalignment) {
-    RAYX::GeometricUserParams g_params =
+    const char* filename = "ellipsoid_ip_200mirrormis";
+    testBeamline(filename);
+    /*RAYX::GeometricUserParams g_params =
         RAYX::GeometricUserParams(10, 10000, 1000);
     double alpha = 0.031253965260898464;
     double beta = 0.31781188513796743;
@@ -2209,8 +2189,8 @@ TEST_F(opticalElements, EllipsoidImagePlane_mirrormisalignment) {
     std::shared_ptr<RAYX::Ellipsoid> eb = std::make_shared<RAYX::Ellipsoid>(
         "ellipsoid_ip_200mirrormis",
         RAYX::Geometry::GeometricalShape::RECTANGLE, 50, 200,
-        w_coord.getAzimuthalAngle(), pos, or1, 10, 10000, 1000, 0, 1, zeros7,
-        Material::CU);
+        w_coord.getAzimuthalAngle(), pos, or1, 10, 10000, 1000, 0, 1,
+    zeros7, Material::CU);
 
     RAYX::WorldUserParams w_coord2 = RAYX::WorldUserParams(
         0, 0, 0, 1000, std::vector<double>{0, 0, 0, 0, 0, 0});
@@ -2219,12 +2199,15 @@ TEST_F(opticalElements, EllipsoidImagePlane_mirrormisalignment) {
     std::shared_ptr<RAYX::ImagePlane> i =
         std::make_shared<RAYX::ImagePlane>("ImagePlane", pos2, or2);
 
-    testOpticalElement({eb, i}, 200);
+    testOpticalElement({eb, i}, 200);*/
 }
 
-// plame mirror with misalignment, default ellipsoid with MIRROR misalignment
-// and image plane, data stored in image-plane-coordinate system
+// plame mirror with misalignment, default ellipsoid with MIRROR
+// misalignment and image plane, data stored in image-plane-coordinate
+// system
 TEST_F(opticalElements, PlaneMirrorEllipsoidImagePlane_mirrormisalignment) {
+    // const char* filename = "pm_ell_ip_200mirrormis";
+    // testBeamline(filename);
     RAYX::GeometricUserParams pm_params = RAYX::GeometricUserParams(7);
     RAYX::WorldUserParams w_coord = RAYX::WorldUserParams(
         pm_params.getAlpha(), pm_params.getBeta(), 0, 10000,
@@ -2267,101 +2250,20 @@ TEST_F(opticalElements, PlaneMirrorEllipsoidImagePlane_mirrormisalignment) {
     testOpticalElement({pm, eb, i}, 200);
 }
 
-TEST_F(opticalElements, ImagePlane) {
-    RAYX::GeometricUserParams g_params = RAYX::GeometricUserParams(10);
-    ASSERT_DOUBLE_EQ(g_params.getAlpha(), degToRad(10));
-    ASSERT_DOUBLE_EQ(g_params.getBeta(), degToRad(10));
-    RAYX::WorldUserParams w_coord =
-        RAYX::WorldUserParams(g_params.getAlpha(), g_params.getBeta(), 0, 10000,
-                              std::vector<double>{0, 0, 0, 0, 0, 0});
-    glm::dvec4 pos = w_coord.calcPosition();
-    glm::dmat4x4 or1 = w_coord.calcOrientation();
-    std::shared_ptr<RAYX::PlaneMirror> plM =
-        std::make_shared<RAYX::PlaneMirror>(
-            "PlaneMirror_ImagePlane",
-            RAYX::Geometry::GeometricalShape::RECTANGLE, 50, 200,
-            w_coord.getAzimuthalAngle(), pos, or1, zeros7,
-            Material::CU);  // {1,2,3,0.01,0.02,0.03}
-
-    RAYX::WorldUserParams w_coord2 = RAYX::WorldUserParams(
-        0, 0, 0, 1000, std::vector<double>{0, 0, 0, 0, 0, 0});
-    glm::dvec4 pos2 = w_coord2.calcPosition(w_coord, pos, or1);
-    glm::dmat4x4 or2 = w_coord2.calcOrientation(w_coord, or1);
-    std::shared_ptr<RAYX::ImagePlane> i =
-        std::make_shared<RAYX::ImagePlane>("ImagePlane", pos2, or2);
-
-    testOpticalElement({plM, i}, 200);
-    ASSERT_TRUE(true);
-}
-
-TEST_F(opticalElements, FourMirrors_9Rays) {
-    RAYX::GeometricUserParams g_params = RAYX::GeometricUserParams(10);
-    RAYX::WorldUserParams w_coord =
-        RAYX::WorldUserParams(degToRad(10), degToRad(10), degToRad(7), 10,
-                              std::vector<double>{0, 0, 0, 0, 0, 0});
-    glm::dvec4 pos = w_coord.calcPosition();
-    glm::dmat4x4 or1 = w_coord.calcOrientation();
-    std::shared_ptr<RAYX::PlaneMirror> p1 = std::make_shared<RAYX::PlaneMirror>(
-        "globalCoordinates_9rays", RAYX::Geometry::GeometricalShape::RECTANGLE,
-        50, 200, w_coord.getAzimuthalAngle(), pos, or1, zeros7,
-        Material::CU);  // {1,2,3,0.01,0.02,0.03}
-
-    RAYX::GeometricUserParams g_params2 = RAYX::GeometricUserParams(15);
-    RAYX::WorldUserParams w_coord2 = RAYX::WorldUserParams(
-        degToRad(15), degToRad(15), degToRad(4), 10,
-        std::vector<double>{0, 0, 0, 0, 0,
-                            0});  // std::vector<double>{0,0,0, 0,0,0});
-    glm::dvec4 pos2 = w_coord2.calcPosition(w_coord, pos, or1);
-    glm::dmat4x4 or2 = w_coord2.calcOrientation(w_coord, or1);
-    std::shared_ptr<RAYX::PlaneMirror> p2 = std::make_shared<RAYX::PlaneMirror>(
-        "PlaneMirror2", RAYX::Geometry::GeometricalShape::RECTANGLE, 50, 200,
-        w_coord2.getAzimuthalAngle(), pos2, or2, zeros7,
-        Material::CU);  // {1,2,3,0.01,0.02,0.03}
-
-    g_params = RAYX::GeometricUserParams(7);
-    RAYX::WorldUserParams w_coord3 = RAYX::WorldUserParams(
-        g_params.getAlpha(), g_params.getBeta(), degToRad(10), 10,
-        std::vector<double>{0, 0, 0, 0, 0, 0});
-    glm::dvec4 pos3 = w_coord3.calcPosition(w_coord2, pos2, or2);
-    glm::dmat4x4 or3 = w_coord3.calcOrientation(w_coord2, or2);
-    std::shared_ptr<RAYX::PlaneMirror> p3 = std::make_shared<RAYX::PlaneMirror>(
-        "PlaneMirror3", RAYX::Geometry::GeometricalShape::RECTANGLE, 50, 200,
-        w_coord3.getAzimuthalAngle(), pos3, or3, zeros7,
-        Material::CU);  // {1,2,3,0.01,0.02,0.03}
-
-    g_params = RAYX::GeometricUserParams(22);
-    RAYX::WorldUserParams w_coord4 = RAYX::WorldUserParams(
-        g_params.getAlpha(), g_params.getBeta(), degToRad(17), 10,
-        std::vector<double>{0, 0, 0, 0, 0, 0});
-    glm::dvec4 pos4 = w_coord4.calcPosition(w_coord3, pos3, or3);
-    glm::dmat4x4 or4 = w_coord4.calcOrientation(w_coord3, or3);
-    std::shared_ptr<RAYX::PlaneMirror> p4 = std::make_shared<RAYX::PlaneMirror>(
-        "PlaneMirror4", RAYX::Geometry::GeometricalShape::RECTANGLE, 50, 200,
-        w_coord4.getAzimuthalAngle(), pos4, or4, zeros7,
-        Material::CU);  // {1,2,3,0.01,0.02,0.03}
-
-    RAYX::WorldUserParams w_coord5 = RAYX::WorldUserParams(
-        0, 0, 0, 1000, std::vector<double>{0, 0, 0, 0, 0, 0});
-    glm::dvec4 pos5 = w_coord5.calcPosition(w_coord4, pos4, or4);
-    glm::dmat4x4 or5 = w_coord5.calcOrientation(w_coord4, or4);
-    std::shared_ptr<RAYX::ImagePlane> i =
-        std::make_shared<RAYX::ImagePlane>("ImagePlane", pos5, or5);
-
-    testOpticalElement({p1, p2, p3, p4, i}, 9);
-    ASSERT_TRUE(true);
-}
-
 TEST_F(opticalElements, FourMirrors_20Rays) {
-    RAYX::GeometricUserParams g_params = RAYX::GeometricUserParams(10);
+    const char* filename = "globalCoordinates_20rays";
+    testBeamline(filename);
+    /*RAYX::GeometricUserParams g_params = RAYX::GeometricUserParams(10);
     RAYX::WorldUserParams w_coord =
         RAYX::WorldUserParams(degToRad(10), degToRad(10), degToRad(7), 10,
                               std::vector<double>{0, 0, 0, 0, 0, 0});
     glm::dvec4 pos = w_coord.calcPosition();
     glm::dmat4x4 or1 = w_coord.calcOrientation();
-    std::shared_ptr<RAYX::PlaneMirror> p1 = std::make_shared<RAYX::PlaneMirror>(
-        "globalCoordinates_20rays", RAYX::Geometry::GeometricalShape::RECTANGLE,
-        50, 200, w_coord.getAzimuthalAngle(), pos, or1, zeros7,
-        Material::CU);  // {1,2,3,0.01,0.02,0.03}
+    std::shared_ptr<RAYX::PlaneMirror> p1 =
+    std::make_shared<RAYX::PlaneMirror>( "globalCoordinates_20rays",
+    RAYX::Geometry::GeometricalShape::RECTANGLE, 50, 200,
+    w_coord.getAzimuthalAngle(), pos, or1, zeros7, Material::CU);  //
+    {1,2,3,0.01,0.02,0.03}
 
     RAYX::GeometricUserParams g_params2 = RAYX::GeometricUserParams(15);
     RAYX::WorldUserParams w_coord2 = RAYX::WorldUserParams(
@@ -2370,8 +2272,9 @@ TEST_F(opticalElements, FourMirrors_20Rays) {
                             0});  // std::vector<double>{0,0,0, 0,0,0});
     glm::dvec4 pos2 = w_coord2.calcPosition(w_coord, pos, or1);
     glm::dmat4x4 or2 = w_coord2.calcOrientation(w_coord, or1);
-    std::shared_ptr<RAYX::PlaneMirror> p2 = std::make_shared<RAYX::PlaneMirror>(
-        "PlaneMirror2", RAYX::Geometry::GeometricalShape::RECTANGLE, 50, 200,
+    std::shared_ptr<RAYX::PlaneMirror> p2 =
+    std::make_shared<RAYX::PlaneMirror>( "PlaneMirror2",
+    RAYX::Geometry::GeometricalShape::RECTANGLE, 50, 200,
         w_coord2.getAzimuthalAngle(), pos2, or2, zeros7,
         Material::CU);  // {1,2,3,0.01,0.02,0.03}
 
@@ -2381,8 +2284,9 @@ TEST_F(opticalElements, FourMirrors_20Rays) {
         std::vector<double>{0, 0, 0, 0, 0, 0});
     glm::dvec4 pos3 = w_coord3.calcPosition(w_coord2, pos2, or2);
     glm::dmat4x4 or3 = w_coord3.calcOrientation(w_coord2, or2);
-    std::shared_ptr<RAYX::PlaneMirror> p3 = std::make_shared<RAYX::PlaneMirror>(
-        "PlaneMirror3", RAYX::Geometry::GeometricalShape::RECTANGLE, 50, 200,
+    std::shared_ptr<RAYX::PlaneMirror> p3 =
+    std::make_shared<RAYX::PlaneMirror>( "PlaneMirror3",
+    RAYX::Geometry::GeometricalShape::RECTANGLE, 50, 200,
         w_coord3.getAzimuthalAngle(), pos3, or3, zeros7,
         Material::CU);  // {1,2,3,0.01,0.02,0.03}
 
@@ -2392,8 +2296,9 @@ TEST_F(opticalElements, FourMirrors_20Rays) {
         std::vector<double>{0, 0, 0, 0, 0, 0});
     glm::dvec4 pos4 = w_coord4.calcPosition(w_coord3, pos3, or3);
     glm::dmat4x4 or4 = w_coord4.calcOrientation(w_coord3, or3);
-    std::shared_ptr<RAYX::PlaneMirror> p4 = std::make_shared<RAYX::PlaneMirror>(
-        "PlaneMirror4", RAYX::Geometry::GeometricalShape::RECTANGLE, 50, 200,
+    std::shared_ptr<RAYX::PlaneMirror> p4 =
+    std::make_shared<RAYX::PlaneMirror>( "PlaneMirror4",
+    RAYX::Geometry::GeometricalShape::RECTANGLE, 50, 200,
         w_coord4.getAzimuthalAngle(), pos4, or4, zeros7,
         Material::CU);  // {1,2,3,0.01,0.02,0.03}
 
@@ -2405,16 +2310,30 @@ TEST_F(opticalElements, FourMirrors_20Rays) {
         std::make_shared<RAYX::ImagePlane>("ImagePlane", pos5, or5);
 
     testOpticalElement({p1, p2, p3, p4, i}, 20);
-    ASSERT_TRUE(true);
+    ASSERT_TRUE(true);*/
 }
 
 TEST_F(opticalElements, slit1) {
-    RAYX::SimulationEnv::get().m_numOfRays = 200;
+    std::string beamline_file = "../../Tests/rml_files/";
+    const char* filename = "slit";
+    beamline_file.append(filename);
+    beamline_file.append(".rml");
+    std::shared_ptr<RAYX::Beamline> beamline = std::make_shared<RAYX::Beamline>(
+        RAYX::Importer::importBeamline(beamline_file.c_str()));
+
+    std::string outfile = "testFile_";
+    outfile.append(filename);
+
+    std::vector<std::shared_ptr<RAYX::OpticalElement>> elements =
+        beamline->m_OpticalElements;
+    std::vector<RAYX::Ray> testValues = beamline->m_LightSources[0]->getRays();
+    std::list<double> outputRays = runTracer(testValues, elements);
+
+    /*RAYX::SimulationEnv::get().m_numOfRays = 200;
     RAYX::EnergyDistribution dist(RAYX::EnergyRange(100, 0), true);
     std::shared_ptr<RAYX::MatrixSource> m =
-        std::make_shared<RAYX::MatrixSource>("matrix source", dist, 0.065, 0.04,
-                                             0, 0.001, 0.001, 1, 0, 0,
-                                             std::vector<double>{0, 0, 0, 0});
+        std::make_shared<RAYX::MatrixSource>("matrix source", dist, 0.065,
+    0.04, 0, 0.001, 0.001, 1, 0, 0, std::vector<double>{0, 0, 0, 0});
 
     RAYX::WorldUserParams s_param = RAYX::WorldUserParams(
         0, 0, 0, 10000, std::vector<double>{0, 0, 0, 0, 0, 0});
@@ -2430,10 +2349,11 @@ TEST_F(opticalElements, slit1) {
         ip_param.calcPosition(s_param, s_position, s_orientation);
     glm::dmat4x4 ip_orientation =
         ip_param.calcOrientation(s_param, s_orientation);
-    std::shared_ptr<RAYX::ImagePlane> ip = std::make_shared<RAYX::ImagePlane>(
-        "Image plane", ip_position, ip_orientation);
+    std::shared_ptr<RAYX::ImagePlane> ip =
+    std::make_shared<RAYX::ImagePlane>( "Image plane", ip_position,
+    ip_orientation);
 
-    std::list<double> outputRays = runTracer(m->getRays(), {s, ip});
+    std::list<double> outputRays = runTracer(m->getRays(), {s, ip});*/
     int counter = 0;
     for (std::list<double>::iterator i = outputRays.begin();
          i != outputRays.end();) {
@@ -2462,7 +2382,10 @@ TEST_F(opticalElements, slit1) {
 }
 
 TEST_F(opticalElements, slit2) {
-    RAYX::WorldUserParams s_param = RAYX::WorldUserParams(
+    const char* filename = "slit";
+    testBeamline(filename);
+
+    /*RAYX::WorldUserParams s_param = RAYX::WorldUserParams(
         0, 0, 0, 10000, std::vector<double>{0, 0, 0, 0, 0, 0});
     glm::dvec4 s_position = s_param.calcPosition();
     glm::dmat4x4 s_orientation = s_param.calcOrientation();
@@ -2477,13 +2400,15 @@ TEST_F(opticalElements, slit2) {
     std::shared_ptr<RAYX::Slit> s = std::make_shared<RAYX::Slit>(
         "slit", RAYX::Geometry::GeometricalShape::RECTANGLE, 1, 20, 2,
         s_position, s_orientation, 20, 1, 100);
-    std::shared_ptr<RAYX::ImagePlane> ip = std::make_shared<RAYX::ImagePlane>(
-        "Image plane", ip_position, ip_orientation);
-    testOpticalElement({s, ip}, 20000);
+    std::shared_ptr<RAYX::ImagePlane> ip =
+    std::make_shared<RAYX::ImagePlane>( "Image plane", ip_position,
+    ip_orientation); testOpticalElement({s, ip}, 20000);*/
 }
 
 TEST_F(opticalElements, toroid) {
-    RAYX::WorldUserParams t_param =
+    const char* filename = "toroid";
+    testBeamline(filename);
+    /*RAYX::WorldUserParams t_param =
         RAYX::WorldUserParams(degToRad(10), degToRad(10), 0, 10000,
                               std::vector<double>{0, 0, 0, 0, 0, 0});
     glm::dvec4 t_position = t_param.calcPosition();
@@ -2500,134 +2425,76 @@ TEST_F(opticalElements, toroid) {
         ip_param.calcPosition(t_param, t_position, t_orientation);
     glm::dmat4x4 ip_orientation =
         ip_param.calcOrientation(t_param, t_orientation);
-    std::shared_ptr<RAYX::ImagePlane> ip = std::make_shared<RAYX::ImagePlane>(
-        "Image plane", ip_position, ip_orientation);
+    std::shared_ptr<RAYX::ImagePlane> ip =
+    std::make_shared<RAYX::ImagePlane>( "Image plane", ip_position,
+    ip_orientation);
 
-    testOpticalElement({t, ip}, 20000);
+    testOpticalElement({t, ip}, 20000);*/
 }
 
 // PETES SETUP
-// spec1-first_rzp4mm
-TEST_F(opticalElements, spec1_first_rzp) {
-    RAYX::SimulationEnv::get().m_numOfRays = 20000;
-    RAYX::EnergyDistribution dist(RAYX::EnergyRange(640, 120), false);
-    std::shared_ptr<RAYX::PointSource> p = std::make_shared<RAYX::PointSource>(
-        "spec1_first_rzp", dist, 0.005, 0.005, 0, 0.02, 0.06, 1, 1, 0, 0, 1, 0,
-        0, std::vector<double>{0, 0, 0, 0});
-
-    RAYX::GeometricUserParams gu_rzp = RAYX::GeometricUserParams(
-        0, 1, 170, 2.2, 1, p->getPhotonEnergy(), p->getPhotonEnergy(), 1, 1,
-        2.2, 1, 90, 400, 90, 400);
-    ASSERT_DOUBLE_EQ(gu_rzp.getAlpha(), 0.038397243543875255);
-    ASSERT_DOUBLE_EQ(gu_rzp.getBeta(), 0.017453292519943295);
-
-    RAYX::WorldUserParams rzp_param =
-        RAYX::WorldUserParams(gu_rzp.getAlpha(), gu_rzp.getBeta(), 0, 90,
-                              std::vector<double>{0, 0, 0, 0, 0, 0});
-    glm::dvec4 position = rzp_param.calcPosition();
-    glm::dmat4x4 orientation = rzp_param.calcOrientation();
-
-    std::shared_ptr<RAYX::ReflectionZonePlate> rzp =
-        std::make_shared<RAYX::ReflectionZonePlate>(
-            "ReflectionZonePete", RAYX::Geometry::GeometricalShape::RECTANGLE,
-            0, 4, 60, rzp_param.getAzimuthalAngle(), position, orientation,
-            p->getPhotonEnergy(), -1, -1, 2.2, 1, 90, 400, 90, 400, 0, 0, 1, 0,
-            zeros7, Material::CU);  // dx,dy,dz, dpsi,dphi,dchi //
-    rzp->setOutMatrix(glmToVector16(glm::transpose(
-        rzp_param.calcE2B())));  // to make comparison with old ray files
-                                 // possible, use the beam coordinate system
-    std::list<double> outputRays = runTracer(p->getRays(), {rzp});
-    std::string filename = "testFile_spec1_first_rzp";
-    writeToFile(outputRays, filename);
-}
 
 TEST_F(opticalElements, spec1_first_ip) {
-    RAYX::SimulationEnv::get().m_numOfRays = 20000;
-    RAYX::EnergyDistribution dist(RAYX::EnergyRange(640, 120), false);
-    std::shared_ptr<RAYX::PointSource> p = std::make_shared<RAYX::PointSource>(
-        "spec1_first_rzp4", dist, 0.005, 0.005, 0, 0.02, 0.06, 1, 1, 0, 0, 1, 0,
-        0, std::vector<double>{0, 0, 0, 0});
+    const char* filename = "Spec1-first_rzp4mm";
+    testBeamline(filename);
+    /*
+        RAYX::SimulationEnv::get().m_numOfRays = 20000;
+        RAYX::EnergyDistribution dist(RAYX::EnergyRange(640, 120), false);
+        std::shared_ptr<RAYX::PointSource> p =
+       std::make_shared<RAYX::PointSource>( "spec1_first_rzp4", dist, 0.005,
+       0.005, 0, 0.02, 0.06, 1, 1, 0, 0, 1, 0, 0, std::vector<double>{0, 0,
+       0, 0});
 
-    RAYX::GeometricUserParams gu_rzp = RAYX::GeometricUserParams(
-        0, 1, 170, 2.2, 1, p->getPhotonEnergy(), p->getPhotonEnergy(), 1, 1,
-        2.2, 1, 90, 400, 90, 400);
-    ASSERT_DOUBLE_EQ(gu_rzp.getAlpha(), 0.038397243543875255);
-    ASSERT_DOUBLE_EQ(gu_rzp.getBeta(), 0.017453292519943295);
+        RAYX::GeometricUserParams gu_rzp = RAYX::GeometricUserParams(
+            0, 1, 170, 2.2, 1, p->getPhotonEnergy(), p->getPhotonEnergy(),
+       1, 1, 2.2, 1, 90, 400, 90, 400); ASSERT_DOUBLE_EQ(gu_rzp.getAlpha(),
+       0.038397243543875255); ASSERT_DOUBLE_EQ(gu_rzp.getBeta(),
+       0.017453292519943295);
 
-    RAYX::WorldUserParams rzp_param =
-        RAYX::WorldUserParams(gu_rzp.getAlpha(), gu_rzp.getBeta(), 0, 90,
-                              std::vector<double>{0, 0, 0, 0, 0, 0});
-    glm::dvec4 rzp_position = rzp_param.calcPosition();
-    glm::dmat4x4 rzp_orientation = rzp_param.calcOrientation();
-    std::shared_ptr<RAYX::ReflectionZonePlate> rzp =
-        std::make_shared<RAYX::ReflectionZonePlate>(
-            "ReflectionZonePete", RAYX::Geometry::GeometricalShape::RECTANGLE,
-            0, 4, 60, rzp_param.getAzimuthalAngle(), rzp_position,
-            rzp_orientation, p->getPhotonEnergy(), -1, -1, 2.2, 1, 90, 400, 90,
-            400, 0, 0, 1, 0, zeros7,
-            Material::CU);  // dx,dy,dz, dpsi,dphi,dchi //
+        RAYX::WorldUserParams rzp_param =
+            RAYX::WorldUserParams(gu_rzp.getAlpha(), gu_rzp.getBeta(), 0,
+       90, std::vector<double>{0, 0, 0, 0, 0, 0}); glm::dvec4 rzp_position =
+       rzp_param.calcPosition(); glm::dmat4x4 rzp_orientation =
+       rzp_param.calcOrientation();
+        std::shared_ptr<RAYX::ReflectionZonePlate> rzp =
+            std::make_shared<RAYX::ReflectionZonePlate>(
+                "ReflectionZonePete",
+       RAYX::Geometry::GeometricalShape::RECTANGLE, 0, 4, 60,
+       rzp_param.getAzimuthalAngle(), rzp_position, rzp_orientation,
+       p->getPhotonEnergy(), -1, -1, 2.2, 1, 90, 400, 90, 400, 0, 0, 1, 0,
+       zeros7, Material::CU);  // dx,dy,dz, dpsi,dphi,dchi //
 
-    RAYX::WorldUserParams ip_param = RAYX::WorldUserParams(
-        0, 0, 0, 385.0, std::vector<double>{0, 0, 0, 0, 0, 0});
-    glm::dvec4 ip_position =
-        ip_param.calcPosition(rzp_param, rzp_position, rzp_orientation);
-    glm::dmat4x4 ip_orientation =
-        ip_param.calcOrientation(rzp_param, rzp_orientation);
-    std::shared_ptr<RAYX::ImagePlane> ip1 = std::make_shared<RAYX::ImagePlane>(
-        "ImagePlane1", ip_position, ip_orientation);
+        RAYX::WorldUserParams ip_param = RAYX::WorldUserParams(
+            0, 0, 0, 385.0, std::vector<double>{0, 0, 0, 0, 0, 0});
+        glm::dvec4 ip_position =
+            ip_param.calcPosition(rzp_param, rzp_position, rzp_orientation);
+        glm::dmat4x4 ip_orientation =
+            ip_param.calcOrientation(rzp_param, rzp_orientation);
+        std::shared_ptr<RAYX::ImagePlane> ip1 =
+       std::make_shared<RAYX::ImagePlane>( "ImagePlane1", ip_position,
+       ip_orientation);
 
-    std::vector<RAYX::Ray> input = p->getRays();
-    std::list<double> outputRays = runTracer(input, {rzp, ip1});
-    std::string filename = "testFile_spec1_first_rzp_ip";
-    writeToFile(outputRays, filename);
-}
-
-TEST_F(opticalElements, spec1_first_plus_rzp) {
-    RAYX::SimulationEnv::get().m_numOfRays = 20000;
-    RAYX::EnergyDistribution dist(RAYX::EnergyRange(640, 120), false);
-    std::shared_ptr<RAYX::PointSource> p = std::make_shared<RAYX::PointSource>(
-        "spec1_first_plus_rzp", dist, 0.005, 0.005, 0, 0.02, 0.06, 1, 1, 0, 0,
-        1, 0, 0, std::vector<double>{0, 0, 0, 0});
-
-    RAYX::GeometricUserParams gu_rzp = RAYX::GeometricUserParams(
-        0, 1, 170, 2.2, 4.75, p->getPhotonEnergy(), p->getPhotonEnergy(), 1, 1,
-        2.2, 4.75, 90, 400, 90, 400);
-    ASSERT_DOUBLE_EQ(gu_rzp.getAlpha(), 0.038397243543875255);
-    ASSERT_DOUBLE_EQ(gu_rzp.getBeta(), 0.082903139469730644);
-
-    RAYX::WorldUserParams rzp_param =
-        RAYX::WorldUserParams(0.038397243543875255, 0.082903139469730644, 0, 90,
-                              std::vector<double>{0, 0, 0, 0, 0, 0});
-    glm::dvec4 rzp_position = rzp_param.calcPosition();
-    glm::dmat4x4 rzp_orientation = rzp_param.calcOrientation();
-    std::shared_ptr<RAYX::ReflectionZonePlate> rzp =
-        std::make_shared<RAYX::ReflectionZonePlate>(
-            "ReflectionZonePete", RAYX::Geometry::GeometricalShape::RECTANGLE,
-            0, 4, 60, rzp_param.getAzimuthalAngle(), rzp_position,
-            rzp_orientation, p->getPhotonEnergy(), 1, 1, 2.2, 4.75, 90, 400, 90,
-            400, 0, 0, 1, -24.35, zeros7,
-            Material::CU);  // dx,dy,dz, dpsi,dphi,dchi //
-
-    rzp->setOutMatrix(glmToVector16(glm::transpose(
-        rzp_param.calcE2B())));  // to make comparison with old ray files
-                                 // possible, use the beam coordinate system
-    std::list<double> outputRays = runTracer(p->getRays(), {rzp});
-    std::string filename = "testFile_spec1_first_plus_rzp";
-    writeToFile(outputRays, filename);
+        std::vector<RAYX::Ray> input = p->getRays();
+        std::list<double> outputRays = runTracer(input, {rzp, ip1});
+        std::string filename = "testFile_spec1_first_rzp_ip";
+        writeToFile(outputRays, filename);*/
 }
 
 TEST_F(opticalElements, spec1_first_plus_ip) {
-    RAYX::SimulationEnv::get().m_numOfRays = 20000;
+    const char* filename = "Spec1+first_rzp4mm";
+    testBeamline(filename);
+    /*RAYX::SimulationEnv::get().m_numOfRays = 20000;
     RAYX::EnergyDistribution dist(RAYX::EnergyRange(640, 120), false);
-    std::shared_ptr<RAYX::PointSource> p = std::make_shared<RAYX::PointSource>(
-        "spec1_first_plus_rzp_ip", dist, 0.005, 0.005, 0, 0.02, 0.06, 1, 1, 0,
-        0, 1, 0, 0, std::vector<double>{0, 0, 0, 0});
+    std::shared_ptr<RAYX::PointSource> p =
+    std::make_shared<RAYX::PointSource>( "spec1_first_plus_rzp_ip", dist,
+    0.005, 0.005, 0, 0.02, 0.06, 1, 1, 0, 0, 1, 0, 0, std::vector<double>{0,
+    0, 0, 0});
 
     RAYX::GeometricUserParams gu_rzp = RAYX::GeometricUserParams(
-        0, 1, 170, 2.2, 4.75, p->getPhotonEnergy(), p->getPhotonEnergy(), 1, 1,
-        2.2, 4.75, 90, 400, 90, 400);
-    ASSERT_DOUBLE_EQ(gu_rzp.getAlpha(), 0.038397243543875255);
-    ASSERT_DOUBLE_EQ(gu_rzp.getBeta(), 0.082903139469730644);
+        0, 1, 170, 2.2, 4.75, p->getPhotonEnergy(), p->getPhotonEnergy(), 1,
+    1, 2.2, 4.75, 90, 400, 90, 400); ASSERT_DOUBLE_EQ(gu_rzp.getAlpha(),
+    0.038397243543875255); ASSERT_DOUBLE_EQ(gu_rzp.getBeta(),
+    0.082903139469730644);
 
     RAYX::WorldUserParams rzp_param =
         RAYX::WorldUserParams(gu_rzp.getAlpha(), gu_rzp.getBeta(), 0, 90,
@@ -2636,11 +2503,11 @@ TEST_F(opticalElements, spec1_first_plus_ip) {
     glm::dmat4x4 rzp_orientation = rzp_param.calcOrientation();
     std::shared_ptr<RAYX::ReflectionZonePlate> rzp =
         std::make_shared<RAYX::ReflectionZonePlate>(
-            "ReflectionZonePete", RAYX::Geometry::GeometricalShape::RECTANGLE,
-            0, 4, 60, rzp_param.getAzimuthalAngle(), rzp_position,
-            rzp_orientation, p->getPhotonEnergy(), 1, 1, 2.2, 4.75, 90, 400, 90,
-            400, 0, 0, 1, -24.35, zeros7,
-            Material::CU);  // dx,dy,dz, dpsi,dphi,dchi //
+            "ReflectionZonePete",
+    RAYX::Geometry::GeometricalShape::RECTANGLE, 0, 4, 60,
+    rzp_param.getAzimuthalAngle(), rzp_position, rzp_orientation,
+    p->getPhotonEnergy(), 1, 1, 2.2, 4.75, 90, 400, 90, 400, 0, 0, 1,
+    -24.35, zeros7, Material::CU);  // dx,dy,dz, dpsi,dphi,dchi //
 
     RAYX::WorldUserParams ip_param = RAYX::WorldUserParams(
         0, 0, 0, 400.0, std::vector<double>{0, 0, 0, 0, 0, 0});
@@ -2648,61 +2515,31 @@ TEST_F(opticalElements, spec1_first_plus_ip) {
         ip_param.calcPosition(rzp_param, rzp_position, rzp_orientation);
     glm::dmat4x4 ip_orientation =
         ip_param.calcOrientation(rzp_param, rzp_orientation);
-    std::shared_ptr<RAYX::ImagePlane> ip1 = std::make_shared<RAYX::ImagePlane>(
-        "ImagePlane1", ip_position, ip_orientation);
+    std::shared_ptr<RAYX::ImagePlane> ip1 =
+    std::make_shared<RAYX::ImagePlane>( "ImagePlane1", ip_position,
+    ip_orientation);
 
     std::vector<RAYX::Ray> input = p->getRays();
     std::list<double> outputRays = runTracer(input, {rzp, ip1});
     std::string filename = "testFile_spec1_first_plus_rzp_ip";
-    writeToFile(outputRays, filename);
-}
-
-TEST_F(opticalElements, spec1_first_minus_rzp2) {
-    RAYX::SimulationEnv::get().m_numOfRays = 20000;
-    RAYX::EnergyDistribution dist(RAYX::EnergyRange(640, 120), false);
-    std::shared_ptr<RAYX::PointSource> p = std::make_shared<RAYX::PointSource>(
-        "spec1_first_minus_rzp2", dist, 0.005, 0.005, 0, 0.001, 0.06, 1, 1, 0,
-        0, 1, 0, 0, std::vector<double>{0, 0, 0, 0});
-
-    RAYX::GeometricUserParams gu_rzp = RAYX::GeometricUserParams(
-        0, 1, 170, 2.2, 1, p->getPhotonEnergy(), p->getPhotonEnergy(), -1, -1,
-        2.2, 1, 90, 400, 90, 400);
-    ASSERT_DOUBLE_EQ(gu_rzp.getAlpha(), 0.038397243543875255);
-    ASSERT_DOUBLE_EQ(gu_rzp.getBeta(), 0.017453292519943295);
-
-    RAYX::WorldUserParams rzp_param =
-        RAYX::WorldUserParams(gu_rzp.getAlpha(), gu_rzp.getBeta(), 0, 90,
-                              std::vector<double>{0, 0, 0, 0, 0, 0});
-    glm::dvec4 rzp_position = rzp_param.calcPosition();
-    glm::dmat4x4 rzp_orientation = rzp_param.calcOrientation();
-    std::shared_ptr<RAYX::ReflectionZonePlate> rzp =
-        std::make_shared<RAYX::ReflectionZonePlate>(
-            "ReflectionZonePete", RAYX::Geometry::GeometricalShape::RECTANGLE,
-            0, 4, 60, rzp_param.getAzimuthalAngle(), rzp_position,
-            rzp_orientation, p->getPhotonEnergy(), -1, -1, 2.2, 1, 90, 400, 90,
-            400, 0, 0, 1, 0, zeros7,
-            Material::CU);  // dx,dy,dz, dpsi,dphi,dchi //
-    rzp->setOutMatrix(glmToVector16(glm::transpose(
-        rzp_param.calcE2B())));  // to make comparison with old ray files
-                                 // possible, use the beam coordinate system
-
-    std::list<double> outputRays = runTracer(p->getRays(), {rzp});
-    std::string filename = "testFile_spec1_first_minus_rzp2";
-    writeToFile(outputRays, filename);
+    writeToFile(outputRays, filename);*/
 }
 
 TEST_F(opticalElements, spec1_first_minus_ip2) {
-    RAYX::SimulationEnv::get().m_numOfRays = 20000;
+    const char* filename = "Spec1-first_rzp02mm";
+    testBeamline(filename);
+    /*RAYX::SimulationEnv::get().m_numOfRays = 20000;
     RAYX::EnergyDistribution dist(RAYX::EnergyRange(640, 120), false);
-    std::shared_ptr<RAYX::PointSource> p = std::make_shared<RAYX::PointSource>(
-        "spec1_first_minus_rzp_ip2", dist, 0.005, 0.005, 0, 0.001, 0.06, 1, 1,
-        0, 0, 1, 0, 0, std::vector<double>{0, 0, 0, 0});
+    std::shared_ptr<RAYX::PointSource> p =
+    std::make_shared<RAYX::PointSource>( "spec1_first_minus_rzp_ip2", dist,
+    0.005, 0.005, 0, 0.001, 0.06, 1, 1, 0, 0, 1, 0, 0,
+    std::vector<double>{0, 0, 0, 0});
 
     RAYX::GeometricUserParams gu_rzp = RAYX::GeometricUserParams(
-        0, 1, 170, 2.2, 1, p->getPhotonEnergy(), p->getPhotonEnergy(), -1, -1,
-        2.2, 1, 90, 400, 90, 400);
-    ASSERT_DOUBLE_EQ(gu_rzp.getAlpha(), 0.038397243543875255);
-    ASSERT_DOUBLE_EQ(gu_rzp.getBeta(), 0.017453292519943295);
+        0, 1, 170, 2.2, 1, p->getPhotonEnergy(), p->getPhotonEnergy(), -1,
+    -1, 2.2, 1, 90, 400, 90, 400); ASSERT_DOUBLE_EQ(gu_rzp.getAlpha(),
+    0.038397243543875255); ASSERT_DOUBLE_EQ(gu_rzp.getBeta(),
+    0.017453292519943295);
 
     RAYX::WorldUserParams rzp_param =
         RAYX::WorldUserParams(gu_rzp.getAlpha(), gu_rzp.getBeta(), 0, 90,
@@ -2711,11 +2548,11 @@ TEST_F(opticalElements, spec1_first_minus_ip2) {
     glm::dmat4x4 rzp_orientation = rzp_param.calcOrientation();
     std::shared_ptr<RAYX::ReflectionZonePlate> rzp =
         std::make_shared<RAYX::ReflectionZonePlate>(
-            "ReflectionZonePete", RAYX::Geometry::GeometricalShape::RECTANGLE,
-            0, 4, 60, rzp_param.getAzimuthalAngle(), rzp_position,
-            rzp_orientation, p->getPhotonEnergy(), -1, -1, 2.2, 1, 90, 400, 90,
-            400, 0, 0, 1, 0, zeros7,
-            Material::CU);  // dx,dy,dz, dpsi,dphi,dchi //
+            "ReflectionZonePete",
+    RAYX::Geometry::GeometricalShape::RECTANGLE, 0, 4, 60,
+    rzp_param.getAzimuthalAngle(), rzp_position, rzp_orientation,
+    p->getPhotonEnergy(), -1, -1, 2.2, 1, 90, 400, 90, 400, 0, 0, 1, 0,
+    zeros7, Material::CU);  // dx,dy,dz, dpsi,dphi,dchi //
 
     RAYX::WorldUserParams ip_param = RAYX::WorldUserParams(
         0, 0, 0, 400.0, std::vector<double>{0, 0, 0, 0, 0, 0});
@@ -2723,17 +2560,21 @@ TEST_F(opticalElements, spec1_first_minus_ip2) {
         ip_param.calcPosition(rzp_param, rzp_position, rzp_orientation);
     glm::dmat4x4 ip_orientation =
         ip_param.calcOrientation(rzp_param, rzp_orientation);
-    std::shared_ptr<RAYX::ImagePlane> ip1 = std::make_shared<RAYX::ImagePlane>(
-        "ImagePlane1", ip_position, ip_orientation);
+    std::shared_ptr<RAYX::ImagePlane> ip1 =
+    std::make_shared<RAYX::ImagePlane>( "ImagePlane1", ip_position,
+    ip_orientation);
 
     std::vector<RAYX::Ray> input = p->getRays();
     std::list<double> outputRays = runTracer(input, {rzp, ip1});
     std::string filename = "testFile_spec1_first_minus_rzp_ip2";
-    writeToFile(outputRays, filename);
+    writeToFile(outputRays, filename);*/
 }
 
 TEST_F(opticalElements, CylinderDefault) {
-    RAYX::GeometricUserParams cy_params =
+    const char* filename = "CylinderDefault";
+    testBeamline(filename);
+
+    /*RAYX::GeometricUserParams cy_params =
         RAYX::GeometricUserParams(10, 10000, 1000);
 
     RAYX::WorldUserParams cy_w_coord =
@@ -2743,9 +2584,10 @@ TEST_F(opticalElements, CylinderDefault) {
     glm::dvec4 pos4 = cy_w_coord.calcPosition();
     glm::dmat4x4 or4 = cy_w_coord.calcOrientation();
     std::shared_ptr<RAYX::Cylinder> cy = std::make_shared<RAYX::Cylinder>(
-        "Cylinder", RAYX::Geometry::GeometricalShape::RECTANGLE, 10470.4917875,
-        0, 50, 200, cy_w_coord.getAzimuthalAngle(), pos4, or4, 10, 10000, 1000,
-        std::vector<double>{0, 0, 0, 0, 0, 0, 0}, Material::CU);
+        "CylinderDefault", RAYX::Geometry::GeometricalShape::RECTANGLE,
+        10470.4917875, 0, 50, 200, cy_w_coord.getAzimuthalAngle(), pos4,
+    or4, 10, 10000, 1000, std::vector<double>{0, 0, 0, 0, 0, 0, 0},
+        Material::CU);
 
     // image plane
     RAYX::WorldUserParams ip_w_coord = RAYX::WorldUserParams(
@@ -2754,6 +2596,6 @@ TEST_F(opticalElements, CylinderDefault) {
     glm::dmat4x4 or3 = ip_w_coord.calcOrientation(cy_w_coord, or4);
     std::shared_ptr<RAYX::ImagePlane> i =
         std::make_shared<RAYX::ImagePlane>("ImagePlane", pos3, or3);
-    testOpticalElement({cy, i}, 200);
+    testOpticalElement({cy, i}, 200);*/
 }
 #endif

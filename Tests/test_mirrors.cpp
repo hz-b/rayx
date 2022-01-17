@@ -236,7 +236,7 @@ TEST(Ellips, defaultParams) {
     ASSERT_DOUBLE_EQ(0, tangentAngle);
 
     double shortHalfAxisC = 549.1237529650836;
-    double y0 = 312.4887730997391;
+    double y0 = -312.4887730997391;
     double z0 = 4522.597446463379;
     double shortHalfAxisB = 549.1237529650836;
     double longHalfAxisA = 5500;
@@ -244,7 +244,7 @@ TEST(Ellips, defaultParams) {
     double a33 = 0.0099681618535688628;
     double a34 = 45.0819833448842;
     double a44 = -5.8207660913467407e-11;
-    std::vector<double> surface = {1, 0, 0,   0,   1, 1, 0, -y0,
+    std::vector<double> surface = {1, 0, 0,   0,   1, 1, 0, y0,
                                    0, 0, a33, a34, 7, 0, 0, a44};
     std::vector<double> elementParams = {sin(correctTangentAngle),
                                          cos(correctTangentAngle),
@@ -284,7 +284,7 @@ TEST(Ellips, defaultParams) {
                               eb.getElementParameters());
 }
 
-TEST(Ellips, testEllipsoid) {
+TEST(Ellips, testEllipsoid_e1) {
     RAYX::Geometry::GeometricalShape geometricalShape =
         RAYX::Geometry::GeometricalShape::RECTANGLE;
     double width = 20;
@@ -311,6 +311,36 @@ TEST(Ellips, testEllipsoid) {
         longHalfAxisA, shortHalfAxisB, designAngle, orientation, incidence,
         entranceArmLength, exitArmLength, figRot, a_11, sE, mat);
 }
+
+TEST(Ellips, testEllipsoid_e2) {
+    RAYX::Geometry::GeometricalShape geometricalShape =
+        RAYX::Geometry::GeometricalShape::RECTANGLE;
+    double width = 20;
+    double height = 390;
+    double incidence = 2;
+    double azimuthal = 0;
+    // double dist = 12451.51535;
+    double entranceArmLength = 7750;
+    double exitArmLength = 1000;
+    double longHalfAxisA = 4375;
+    double shortHalfAxisB = 97.1560870104;
+    // int coordSys = 0;  // {CS_CURVATURE, CS_MIRROR};
+    int figRot = 1;  // { FR_YES, FR_PLANE, FR_A11};
+    double a_11 = 1;
+    double designAngle = 2.00735;
+    glm::dvec4 position = glm::dvec4(-1802.270, 30.545, 40438.481, 1);
+    glm::dmat4x4 orientation =
+        glm::dmat4x4(0.991, 0, 0.131, 0, -0.001, 1.0, -0.008, 0, -0.131, 0.008,
+                     0.991, 0, 0, 0, 0, 1);
+    std::vector<double> mis = {12, 72, 1.12, 0.1, 0.7341, 2.5};
+    std::vector<double> sE = {0.045, 0.024, 0, 0, 0, 0, 0};
+    Material mat = Material::AL;
+    RAYX::Ellipsoid e = RAYX::Ellipsoid(
+        "ellips", geometricalShape, width, height, azimuthal, position,
+        longHalfAxisA, shortHalfAxisB, designAngle, orientation, incidence,
+        entranceArmLength, exitArmLength, figRot, a_11, sE, mat);
+}
+
 /*
 TEST(Ellips, testParamsCSCurvature) {
     double width = 123.51;

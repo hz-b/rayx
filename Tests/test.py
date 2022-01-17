@@ -107,6 +107,8 @@ class Tests(unittest.TestCase):
         result = open_new_file('testFile_PlaneMirrorDef.csv')
         self.assertTrue(np.alltrue(result[7] <= 11001)) # check that path length makes sense
         self.assertTrue(np.alltrue(result[7] >= 11000))
+        self.assertTrue(np.allclose(result[0:3,:], correct[0:3,:])) # check if position is correct
+        self.assertTrue(np.allclose(result[3:6,:], correct[3:6,:])) # check if direction is correct
         self.assertTrue(np.allclose(correct, result[:6]))
         
     
@@ -146,7 +148,7 @@ class Tests(unittest.TestCase):
     def test_planeGratingDevAzMisVLS(self):
         correct = open_old_file(
             'ImagePlane-RawRaysOutgoing_PlaneGratingDevAzMisVLS.csv', 'ImagePlane_')
-        result = open_new_file('testFile_PlaneGratingDeviationMis.csv',valid=1)
+        result = open_new_file('testFile_PlaneGratingDevAzMisVLS.csv',valid=1)
         self.assertTrue(np.allclose(correct, result[:6]))
     
 
@@ -192,12 +194,6 @@ class Tests(unittest.TestCase):
         self.assertTrue(correct.shape == result[:6].shape)
         self.assertTrue(np.allclose(correct, result[:6]))
     
-    def test_ImagePlaneMatrixSource(self):
-        correct = open_old_file(
-            'ImagePlane-RawRaysOutgoing.csv', 'ImagePlane_')
-        result = open_new_file('testFile_PlaneMirror_ImagePlane.csv', valid=1)
-        self.assertTrue(correct.shape == result[:6].shape)
-        self.assertTrue(np.allclose(correct, result[:6]))
 
     def test_RZPmis(self):
         correct = open_old_file(
@@ -268,31 +264,11 @@ class Tests(unittest.TestCase):
         self.assertTrue(np.all(result[6] >= sourceEnergy-energySpread))
         #plot_comparison('Hard Edge Mis', result, correct)
     
-    def test_globalCoord_9rays(self):
-        correct = open_old_file(
-            'ImagePlane-RawRaysOutgoing_9rays.csv', 'ImagePlane_')
-        result = open_new_file('testFile_globalCoordinates_9rays.csv', valid=1)
-        self.assertTrue(correct.shape == result[:6].shape)
-        self.assertTrue(np.allclose(correct, result[:6]))
     
     def test_globalCoord_20rays(self):
         correct = open_old_file(
             'ImagePlane-RawRaysOutgoing_20rays.csv', 'ImagePlane_')
         result = open_new_file('testFile_globalCoordinates_20rays.csv', valid=1)
-        self.assertTrue(correct.shape == result[:6].shape)
-        self.assertTrue(np.allclose(correct, result[:6]))
-        
-    def test_ellipsoid_mirror_default200(self):
-        correct = open_old_file(
-            'Ellipsoid-RawRaysBeam_default200.csv', 'Ellipsoid_')
-        result = open_new_file('testFile_ellipsoid_200default.csv', valid=1)
-        self.assertTrue(correct.shape == result[:6].shape)
-        self.assertTrue(np.allclose(correct, result[:6]))
-    
-    def test_ellipsoid_mirror_mirrormis200(self):
-        correct = open_old_file(
-            'Ellipsoid-RawRaysBeam_200mirrormis.csv', 'Ellipsoid_')
-        result = open_new_file('testFile_ellipsoid_200mirrormis.csv', valid=1)
         self.assertTrue(correct.shape == result[:6].shape)
         self.assertTrue(np.allclose(correct, result[:6]))
         
@@ -327,8 +303,8 @@ class Tests(unittest.TestCase):
         
     def test_cylinder(self):
         correct = open_old_file(
-            'ImagePlane-RawRaysBeam.csv','ImagePlane_')
-        result = open_new_file('testFile_Cylinder.csv', valid=1) 
+            'ImagePlane-RawRaysBeam_Cylinder.csv','ImagePlane_')
+        result = open_new_file('testFile_CylinderDefault.csv', valid=1) 
         self.assertTrue(correct.shape == result[:6].shape)
         self.assertTrue(np.allclose(correct, result[:6]))
         
