@@ -1,6 +1,8 @@
 #include "WorldUserParams.h"
-#include "Debug.h"
+
 #include <sstream>
+
+#include "Debug.h"
 
 namespace RAYX {
 /**
@@ -151,15 +153,15 @@ glm::dmat4x4 WorldUserParams::calcOrientation(WorldUserParams prev,
     // (misalignment * local orientation)
     current_orientation = prev_or * prev_e2b * current_orientation;
 
-    RAYX_LOG << "Calculated orientation from previous";
+    /*RAYX_LOG << "Calculated orientation from previous";
     for (int i = 0; i < 4; i++) {
         std::stringstream s;
         s << "\t";
         for (int j = 0; j < 4; j++) {
-             s << current_orientation[i][j] << ", ";
+            s << current_orientation[i][j] << ", ";
         }
         RAYX_LOG << s.str();
-    }
+    }*/
     return current_orientation;
 }
 
@@ -187,7 +189,7 @@ glm::dmat4x4 WorldUserParams::calcOrientation() {
 
     orientation = orientation * tangentAngleRotation * misalignmentOr *
                   inverseTangentAngleRotation;
-    RAYX_LOG << "Calculated orientation";
+    /*RAYX_LOG << "Calculated orientation";
     for (int i = 0; i < 4; i++) {
         std::stringstream s;
         s << '\t';
@@ -195,7 +197,7 @@ glm::dmat4x4 WorldUserParams::calcOrientation() {
             s << orientation[i][j] << ", ";
         }
         RAYX_LOG << s.str();
-    }
+    }*/
     return orientation;
 }
 
@@ -230,8 +232,8 @@ glm::dvec4 WorldUserParams::calcPosition(WorldUserParams prev,
                        prev_offset;  // remove misalignment (possibly in
                                      // different coord system -> tangentAngle)
                                      // from position of previous element
-    RAYX_LOG << "previous position = " << position[0] << ", "
-              << position[1] << ", " << position[2] << ", " << position[3];
+    // RAYX_LOG << "previous position = " << position[0] << ", " << position[1]
+    //          << ", " << position[2] << ", " << position[3];
     position =
         position +
         prev_or * prev_e2b *
@@ -243,11 +245,11 @@ glm::dvec4 WorldUserParams::calcPosition(WorldUserParams prev,
             new_offset;  // add misalignment (possibly in different coord system
                          // -> tangentAngle) of new element to the position
 
-    std::stringstream s;
+    /*std::stringstream s;
     for (int i = 0; i < 4; i++) {
         s << position[i] << ", ";
     }
-    RAYX_LOG << s.str();
+    RAYX_LOG << s.str();*/
     return position;
 }
 
@@ -269,12 +271,12 @@ glm::dvec4 WorldUserParams::calcPosition() {
     // add misalignment (possibly in different coord system -> tangentAngle) of
     // new element to the position
     position = position + orientation * tangentAngleRotation * offset;
-    std::stringstream s;
+    /*std::stringstream s;
     s << "Position: ";
     for (int i = 0; i < 4; i++) {
         s << position[i] << ", ";
     }
-    RAYX_LOG << s.str();
+    RAYX_LOG << s.str();*/
     return position;
 }
 

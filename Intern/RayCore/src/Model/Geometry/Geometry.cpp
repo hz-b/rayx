@@ -7,9 +7,9 @@
 #include <stdexcept>
 #include <vector>
 
+#include "Debug.h"
 #include "Tracer/Ray.h"
 #include "utils.h"
-#include "Debug.h"
 
 namespace RAYX {
 Geometry::Geometry(GeometricalShape geometricShape, double width, double height,
@@ -59,6 +59,24 @@ Geometry::~Geometry() {}
  */
 void Geometry::calcTransformationMatrices(glm::dvec4 position,
                                           glm::dmat4x4 orientation) {
+    RAYX_LOG << "Calculated orientation";
+    for (int i = 0; i < 4; i++) {
+        std::stringstream s;
+        s.precision(17);
+        s << '\t';
+        for (int j = 0; j < 4; j++) {
+            s << orientation[i][j] << ", ";
+        }
+        RAYX_LOG << s.str();
+    }
+    std::stringstream s;
+    s.precision(17);
+    s << "Position: ";
+    for (int i = 0; i < 4; i++) {
+        s << position[i] << ", ";
+    }
+    RAYX_LOG << s.str();
+
     glm::dmat4x4 translation =
         glm::dmat4x4(1, 0, 0, -position[0], 0, 1, 0, -position[1], 0, 0, 1,
                      -position[2], 0, 0, 0, 1);  // o
@@ -80,9 +98,9 @@ void Geometry::calcTransformationMatrices(glm::dvec4 position,
     glm::dmat4x4 e2g = inv_rotation * inv_translation;
     m_outMatrix = glmToVector16(glm::transpose(e2g));
 
-    RAYX_LOG << "from position and orientation";
+    /*RAYX_LOG << "from position and orientation";
     printMatrix(m_inMatrix);
-    printMatrix(m_outMatrix);
+    printMatrix(m_outMatrix);*/
 }
 
 void Geometry::getWidth(double& widthA, double& widthB) {
