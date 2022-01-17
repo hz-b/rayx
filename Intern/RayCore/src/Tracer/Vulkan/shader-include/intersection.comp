@@ -454,7 +454,7 @@ dvec4 getOpticalElementIntersection(Ray r, uint elementIndex){
 		r = rayMatrixMult(r, e.outTrans); // do not know if this is necessary as the ray r is not defined as inout
 		return currentIntersection;
 	}
-	else if(type == 6 || (type == 4 && e.elementParameters[1][0] == 2)) { // toroidal mirror or toroidal rzp
+	else if(type == 6 || (type == 4 && e.elementParameters[1][0] == 1)) { // toroidal mirror or toroidal rzp
 		double longRadius = e.surfaceParams[0][0];
 		double shortRadius = e.surfaceParams[0][1];
 	

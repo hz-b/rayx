@@ -117,7 +117,7 @@ Ray traceRZP(Ray r, const int elementIndex, inout uint64_t ctr, dvec4 intersecti
 	dvec4 normal;
 	// RZP can be plane, toroidal or spherical curvature type. Use intersectionPoint for all except toroidal
 	int CURVATURE_TYPE = int(rzp.elementParameters[1][0]);
-	if (CURVATURE_TYPE != 2) {
+	if (CURVATURE_TYPE != 1) {
 		normal = setIntersectionPoint(r, rzp.surfaceParams, intersection);
 	} else {
 		double longRadius = rzp.surfaceParams[0][0];
@@ -352,7 +352,7 @@ Ray traceMirror(Ray r, const int elementIndex, inout uint64_t ctr, dvec4 interse
 	double incidence_angle = getIncidenceAngle(r, normal); // getTheta
 	int material = int(quadricData[elementIndex].surfaceParams[3][2]);
 	efficiency(r, real_S, real_P, delta, incidence_angle, material);
-	update_stokes(r, real_S, real_P, delta, azimuthal_angle, ctr); 
+	//update_stokes(r, real_S, real_P, delta, azimuthal_angle, ctr); 
 	r.order = 0;
 	return r;
 }

@@ -96,8 +96,8 @@ class RAYX_API ReflectionZonePlate : public OpticalElement {
 
     enum CURVATURE_TYPE {
         CT_PLANE,
-        CT_SPHERICAL,
-        CT_TOROIDAL
+        CT_TOROIDAL,
+        CT_SPHERICAL
     };  // influences surface paramters for eg quadric function or (if torus)
         // newton iteration
     enum DESIGN_TYPE {

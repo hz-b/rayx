@@ -80,7 +80,7 @@ ReflectionZonePlate::ReflectionZonePlate(
 
     m_curvatureType = curvatureType == 0
                           ? CT_PLANE
-                          : (curvatureType == 1 ? CT_SPHERICAL : CT_TOROIDAL);
+                          : (curvatureType == 1 ? CT_TOROIDAL : CT_SPHERICAL);
     m_designType = DT_ZOFFSET;     // DT_ZOFFSET (0) default
     m_derivationMethod = 0;        // DM_FORMULA default
     m_rzpType = RT_ELLIPTICAL;     // default (0)
@@ -91,14 +91,14 @@ ReflectionZonePlate::ReflectionZonePlate(
     if (m_curvatureType == CT_PLANE) {
         setSurface(std::make_unique<Quadric>(std::vector<double>{
             0, 0, 0, 0, 1, 0, 0, -1, 0, 0, 0, 0, 4, 0, matd, 0}));
-    } else if (m_curvatureType == CT_SPHERICAL) {
-        m_longRadius = longRadius;  // for sphere and toroidal
-        setSurface(std::make_unique<Quadric>(std::vector<double>{
-            1, 0, 0, 0, 1, 1, 0, -m_longRadius, 0, 0, 1, 0, 4, 0, matd, 0}));
-    } else {
+    } else if (m_curvatureType == CT_TOROIDAL) {
         m_longRadius = longRadius;    // for sphere and toroidal
         m_shortRadius = shortRadius;  // only for Toroidal
         setSurface(std::make_unique<Toroid>(longRadius, shortRadius, 4, mat));
+    } else {
+        m_longRadius = longRadius;  // for sphere and toroidal
+        setSurface(std::make_unique<Quadric>(std::vector<double>{
+            1, 0, 0, 0, 1, 1, 0, -m_longRadius, 0, 0, 1, 0, 4, 0, matd, 0}));
     }
 
     printInfo();
@@ -144,7 +144,7 @@ ReflectionZonePlate::ReflectionZonePlate(
 
     m_curvatureType = curvatureType == 0
                           ? CT_PLANE
-                          : (curvatureType == 1 ? CT_SPHERICAL : CT_TOROIDAL);
+                          : (curvatureType == 1 ? CT_TOROIDAL : CT_SPHERICAL);
     m_designType = DT_ZOFFSET;     // DT_ZOFFSET (0) default
     m_derivationMethod = 0;        // DM_FORMULA default
     m_rzpType = RT_ELLIPTICAL;     // default (0)
@@ -156,14 +156,14 @@ ReflectionZonePlate::ReflectionZonePlate(
     if (m_curvatureType == CT_PLANE) {
         setSurface(std::make_unique<Quadric>(std::vector<double>{
             0, 0, 0, 0, 1, 0, 0, -1, 0, 0, 0, 0, 4, 0, matd, 0}));
-    } else if (m_curvatureType == CT_SPHERICAL) {
-        m_longRadius = longRadius;  // for sphere and toroidal
-        setSurface(std::make_unique<Quadric>(std::vector<double>{
-            1, 0, 0, 0, 1, 1, 0, -m_longRadius, 0, 0, 1, 0, 4, 0, matd, 0}));
-    } else {
+    } else if (m_curvatureType == CT_TOROIDAL) {
         m_longRadius = longRadius;    // for sphere and toroidal
         m_shortRadius = shortRadius;  // only for Toroidal
         setSurface(std::make_unique<Toroid>(longRadius, shortRadius, 4, mat));
+    } else {
+        m_longRadius = longRadius;  // for sphere and toroidal
+        setSurface(std::make_unique<Quadric>(std::vector<double>{
+            1, 0, 0, 0, 1, 1, 0, -m_longRadius, 0, 0, 1, 0, 4, 0, matd, 0}));
     }
 
     printInfo();
@@ -355,6 +355,8 @@ void ReflectionZonePlate::printInfo() const {
     RAYX_LOG << "\tm_orderOfDiffraction: " << m_orderOfDiffraction;
     RAYX_LOG << "\tm_designEnergyMounting: " << m_designEnergyMounting;
     RAYX_LOG << "\tm_fresnelZOffset: " << m_fresnelZOffset;
+    RAYX_LOG << "\tm_shortRadius: " << m_shortRadius;
+    RAYX_LOG << "\tm_longRadius: " << m_longRadius;
 }
 
 /**
