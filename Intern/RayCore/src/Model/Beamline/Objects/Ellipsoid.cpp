@@ -48,13 +48,14 @@ Ellipsoid::Ellipsoid(const char* name,
     m_figureRotation =
         (figRot == 0 ? FR_YES : (figRot == 1 ? FR_PLANE : FR_A11));
     calcHalfAxes();
+    calculateCenterFromHalfAxes(m_incidence);
 
     // a33, 34, 44
     m_a33 = pow(m_shortHalfAxisB / m_longHalfAxisA, 2);
     m_a34 = m_z0 * m_a33;
     m_a44 = -pow(m_shortHalfAxisB, 2) + pow(m_y0, 2) +
             pow(m_z0 * m_shortHalfAxisB / m_longHalfAxisA, 2);
-    m_radius = -m_y0;
+    m_radius = m_y0;
 
     double icurv = 1;
     double matd = (double)static_cast<int>(mat);
@@ -105,15 +106,14 @@ Ellipsoid::Ellipsoid(const char* name,
     }
 
     RAYX_LOG << "A= " << m_longHalfAxisA << ", B= " << m_shortHalfAxisB
-             << ", C= " << m_halfAxisC << ", angle = " << m_tangentAngle
-             << ", Z0 = " << m_z0 << ", Y0= " << m_y0;
+             << ", C= " << m_halfAxisC;
 
     // a33, 34, 44
     m_a33 = pow(m_shortHalfAxisB / m_longHalfAxisA, 2);
     m_a34 = m_z0 * m_a33;
     m_a44 = -pow(m_shortHalfAxisB, 2) + pow(m_y0, 2) +
             pow(m_z0 * m_shortHalfAxisB / m_longHalfAxisA, 2);
-    m_radius = -m_y0;
+    m_radius = m_y0;
 
     double icurv = 1;
     double matd = (double)static_cast<int>(mat);
@@ -160,8 +160,9 @@ void Ellipsoid::calculateCenterFromHalfAxes(double angle) {
     if (m_longHalfAxisA > 0.0 && m_y0 < 0.0) {
         mt = -pow(m_shortHalfAxisB / m_longHalfAxisA, 2) * m_z0 / m_y0;
     }
-
-    m_tangentAngle = radToDeg(atan(mt));
+    m_tangentAngle = (atan(mt));
+    RAYX_LOG << ", Z0 = " << m_z0 << ", Y0= " << m_y0
+             << ", tangentAngle= " << m_tangentAngle;
 }
 
 /**
@@ -203,8 +204,8 @@ void Ellipsoid::calcHalfAxes() {
     }
     m_tangentAngle = angle;
     RAYX_LOG << "A= " << m_longHalfAxisA << ", B= " << m_shortHalfAxisB
-             << ", C= " << m_halfAxisC << ", angle = " << m_tangentAngle
-             << ", Z0 = " << m_z0 << ", Y0= " << m_y0;
+             << ", C= " << m_halfAxisC
+             << ", angle = " << radToDeg(m_tangentAngle);
 }
 
 double Ellipsoid::getRadius() const { return m_radius; }
@@ -246,13 +247,6 @@ std::shared_ptr<Ellipsoid> Ellipsoid::createFromXML(
 
     double height;
     if (!xml::paramDouble(node, "totalLength", &height)) {
-        return nullptr;
-    }
-
-    glm::dvec4 position;
-    glm::dmat4x4 orientation;
-    if (!xml::paramPositionAndOrientation(node, group_context, &position,
-                                          &orientation)) {
         return nullptr;
     }
 
@@ -310,6 +304,44 @@ std::shared_ptr<Ellipsoid> Ellipsoid::createFromXML(
     if (!xml::paramDouble(node, "shortHalfAxisB", &mshortHalfAxisB)) {
         return nullptr;
     }
+
+    // if old ray ui file, need to recalculate position and orientation because
+    // those in rml file are wrong. not necessary when our recalculated position
+    // and orientation is stored
+    double mdistancePreceding;
+    if (!xml::paramDouble(node, "distancePreceding", &mdistancePreceding)) {
+        return nullptr;
+    }
+
+    int mCoordSys;
+    // const char* fig_rot; // TODO unused
+    if (!xml::paramInt(node, "misalignmentCoordinateSystem", &mCoordSys)) {
+        return nullptr;
+    }
+
+    std::vector<double> mis;
+    if (!xml::paramMisalignment(node, &mis)) {
+        return nullptr;
+    }
+    glm::dvec4 position;
+    glm::dmat4x4 orientation;
+
+    /*if (!xml::paramPositionAndOrientation(node, group_context, &position,
+                                          &orientation)) {
+        return nullptr;
+    }*/
+
+    GeometricUserParams g_params =
+        GeometricUserParams(incidenceAngle, mEntrance, mExit);
+
+    double tangentAngle =
+        g_params.calcTangentAngle(incidenceAngle, mEntrance, mExit, mCoordSys);
+    WorldUserParams w_coord = WorldUserParams(
+        g_params.getAlpha(), g_params.getBeta(), degToRad(mAzimAngle),
+        mdistancePreceding, mis, tangentAngle);
+    position = w_coord.calcPosition();
+    orientation = w_coord.calcOrientation();
+
     if ((mDesignGrazing == 0.0) && (mlongHalfAxisA == 0.0) &&
         (mshortHalfAxisB == 0.0)) {  // Auto calculation
         return std::make_shared<Ellipsoid>(
