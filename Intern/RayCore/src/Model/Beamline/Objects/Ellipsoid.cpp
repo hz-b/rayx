@@ -326,10 +326,12 @@ std::shared_ptr<Ellipsoid> Ellipsoid::createFromXML(
     glm::dvec4 position;
     glm::dmat4x4 orientation;
 
-    /*if (!xml::paramPositionAndOrientation(node, group_context, &position,
+    // do not do this because position and orientation is wrong in RAY-UI
+    // files???
+    if (!xml::paramPositionAndOrientation(node, group_context, &position,
                                           &orientation)) {
         return nullptr;
-    }*/
+    }
 
     GeometricUserParams g_params =
         GeometricUserParams(incidenceAngle, mEntrance, mExit);
