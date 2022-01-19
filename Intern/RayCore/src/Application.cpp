@@ -85,7 +85,6 @@ void Application::loadDummyBeamline() {  // ! objects are created here
     double longRadius = 0;
     double fresnelOffset = 0;
     double azimuthal = 10;
-    std::array<double, 6> mis = {1, 2, 3, 0.001, 0.002, 0.003};
     std::array<double, 7> sE = {1, 2, 3, 4, 5, 6, 7};
     RAYX::GeometricUserParams gu_rzp = RAYX::GeometricUserParams(
         mount, imageType, deviationAngle, incidenceAngle, exitAngle, 100,
