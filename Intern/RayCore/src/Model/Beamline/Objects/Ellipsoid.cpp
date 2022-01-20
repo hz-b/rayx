@@ -337,23 +337,47 @@ std::shared_ptr<Ellipsoid> Ellipsoid::createFromXML(
     glm::dvec4 position;
     glm::dmat4x4 orientation;
 
-    // do not do this because position and orientation is wrong in RAY-UI
-    // files???
+    // read position and orientation from ray-ui files
     if (!xml::paramPositionAndOrientation(node, group_context, &position,
                                           &orientation)) {
         return nullptr;
     }
 
+    // use local orientation of ellipsoid the way ray calculates it
+    // to obtain the transformation from the previous element to this element
+    // without actually needing the previous element here
+    GeometricUserParams g_params_rayui = GeometricUserParams(incidenceAngle);
+    WorldUserParams w_coord_rayui =
+        WorldUserParams(g_params_rayui.getAlpha(), g_params_rayui.getBeta(),
+                        degToRad(mAzimAngle), mdistancePreceding, mis, 0);
+    glm::dmat4x4 orientation_rayui = w_coord_rayui.calcOrientation();
+
+    // remove RAY-UI's way of calculating the ellipsoid local orientation from
+    // the given orientation to get the transformation from the previous element
+    // to this element
+    glm::dmat4x4 orientation_previous =
+        orientation * glm::transpose(orientation_rayui);
+    // now remove RAY-UI's way of adding the positional misalignment from the
+    // given position
+    glm::dvec4 position_previous =
+        position - orientation * glm::dvec4(mis[0], mis[1], mis[2], 0);
+
     GeometricUserParams g_params =
         GeometricUserParams(incidenceAngle, mEntrance, mExit);
 
+    // now calculate the world coordinates according to RAY-X standard
     double tangentAngle =
         g_params.calcTangentAngle(incidenceAngle, mEntrance, mExit, mCoordSys);
     WorldUserParams w_coord = WorldUserParams(
         g_params.getAlpha(), g_params.getBeta(), degToRad(mAzimAngle),
         mdistancePreceding, mis, tangentAngle);
-    position = w_coord.calcPosition();
-    orientation = w_coord.calcOrientation();
+    // add RAY-X orientation that depends on the coordinate system of the
+    // misalignment to the previous orientation
+    orientation = orientation_previous * w_coord.calcOrientation();
+    // add misalignment again but with the orientation of RAY-X
+    position = position_previous + orientation *
+                                       w_coord.getTangentAngleRotation() *
+                                       glm::dvec4(mis[0], mis[1], mis[2], 0);
 
     if ((mDesignGrazing == 0.0) && (mlongHalfAxisA == 0.0) &&
         (mshortHalfAxisB == 0.0)) {  // Auto calculation

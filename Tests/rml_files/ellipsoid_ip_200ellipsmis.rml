@@ -103,24 +103,24 @@
     <param id="cylindricalBowingAmp" enabled="F">0</param>
     <param id="cylindricalBowingRadius" enabled="F">0</param>
     <param id="worldPosition" enabled="F">
-      <x>1.00001</x>
-      <y>2.49057</y>
-      <z>10002.6</z>
+      <x>1.0030812141917165</x>
+      <y>2.485199233061242</y>
+      <z>10002.611055887897</z>
     </param>
     <param id="worldXdirection" enabled="F">
-      <x>0.999994</x>
-      <y>0.00260712</y>
-      <z>-0.00249056</z>
+      <x>0.9999695003050405</x>
+      <y>0.0050404999344047102</y>
+      <z>-0.0059658880394288854</z>
     </param>
     <param id="worldYdirection" enabled="F">
-      <x>-0.00299799</x>
-      <y>0.984976</y>
-      <z>-0.172663</z>
+      <x>-0.0059799164970795564</x>
+      <y>0.98547684856759377</y>
+      <z>-0.16970451242077192</z>
     </param>
     <param id="worldZdirection" enabled="F">
-      <x>0.00200299</x>
-      <y>0.172669</y>
-      <z>0.984978</z>
+      <x>0.0050238489602783942</x>
+      <y>0.16973501199721652</y>
+      <z>0.9854769335930339</z>
     </param>
   </object>
 
@@ -138,8 +138,8 @@
     </param>
     <param id="worldYdirection" enabled="F">
       <x>0</x>
-      <y>0.93969262078590843</y>
-      <z>-0.34202014332566877</z>
+      <y>0.93969262078590832</y>
+      <z>-0.34202014332566866</z>
     </param>
     <param id="worldZdirection" enabled="F">
       <x>0</x>

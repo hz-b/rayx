@@ -338,7 +338,8 @@ double GeometricUserParams::calcTangentAngle(double incidence,
                                              double entranceArmLength,
                                              double exitArmLength,
                                              int coordSys) {
-    if (coordSys == 0) return 0;
+    if (coordSys == 0)
+        return 0;  // ellipsoid coord sys. else mirror coordinate system
     double theta =
         degToRad(incidence);  // designGrazingIncidenceAngle always equal to
                               // alpha (grazingIncidenceAngle)??

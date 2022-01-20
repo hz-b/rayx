@@ -61,9 +61,20 @@ void printMatrix(std::array<double, 4 * 4> matrix) {
     RAYX_LOG << s.str();
 }
 
+void printDVec4(glm::dvec4 vec) {
+    RAYX_PROFILE_FUNCTION();
+    std::stringstream s;
+    s.precision(17);
+    for (int i = 0; i < 4; i++) {
+        s << vec[i] << ", ";
+    }
+    RAYX_LOG << s.str();
+}
+
 void printDMat4(glm::dmat4 matrix) {
     RAYX_PROFILE_FUNCTION();
     std::stringstream s;
+    s.precision(17);
     for (int i = 0; i < 4; i++) {
         for (int j = 0; j < 4; j++) {
             s << matrix[i][j] << ", ";

@@ -22,6 +22,7 @@ double RAYX_API radToDeg(double rad);
 
 glm::dmat4x4 getRotationMatrix(double dpsi, double dphi, double dchi);
 
+void printDVec4(glm::dvec4 vec);
 void printDMat4(glm::dmat4 matrix);
 void printMatrix(std::array<double, 4 * 4> matrix);
 

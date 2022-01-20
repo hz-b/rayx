@@ -274,7 +274,7 @@ class Tests(unittest.TestCase):
         
     def test_ellipsoid_mirror_imageplane_default200(self):
         correct = open_old_file(
-            'Ellipsoid-ImagePlane-RawRaysOutgoing_default200.csv', 'ImagePlane_')
+            'ImagePlane-RawRaysBeam_ellipsdefault200.csv', 'ImagePlane_')
         result = open_new_file('testFile_ellipsoid_ip_200default.csv', valid=1)
         self.assertTrue(correct.shape == result[:6].shape)
         self.assertTrue(np.allclose(correct, result[:6]))    
