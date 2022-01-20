@@ -149,6 +149,7 @@ class Tests(unittest.TestCase):
         correct = open_old_file(
             'ImagePlane-RawRaysOutgoing_PlaneGratingDevAzMisVLS.csv', 'ImagePlane_')
         result = open_new_file('testFile_PlaneGratingDevAzMisVLS.csv',valid=1)
+        self.assertTrue(correct.shape == result[:6].shape)
         self.assertTrue(np.allclose(correct, result[:6]))
     
 
@@ -214,7 +215,7 @@ class Tests(unittest.TestCase):
         self.assertTrue(np.isclose(np.mean(correct[5]), np.mean(result[5])))
         self.assertTrue(np.all(result[6] <= sourceEnergy+energySpread))
         self.assertTrue(np.all(result[6] >= sourceEnergy-energySpread))
-        plot_comparison('Hard Edge', result, correct)
+        #plot_comparison('Hard Edge', result, correct)
 
     def test_pointSourceSoftEdge(self):
         sourceEnergy = 120
@@ -226,7 +227,7 @@ class Tests(unittest.TestCase):
         self.assertTrue(np.isclose(np.mean(correct[5]), np.mean(result[5])))
         self.assertTrue(np.all(result[6] <= sourceEnergy+energySpread))
         self.assertTrue(np.all(result[6] >= sourceEnergy-energySpread))
-        plot_comparison('Soft Edge', result, correct, mean=1)
+        #plot_comparison('Soft Edge', result, correct, mean=1)
 
     def test_pointSourceSoftEdgeMis(self):
         sourceEnergy = 130
@@ -238,7 +239,7 @@ class Tests(unittest.TestCase):
         self.assertTrue(np.isclose(np.mean(correct[5]), np.mean(result[5])))
         self.assertTrue(np.all(result[6] <= sourceEnergy+energySpread))
         self.assertTrue(np.all(result[6] >= sourceEnergy-energySpread))
-        plot_comparison('Soft Edge Mis', result, correct, mean=1)
+        #plot_comparison('Soft Edge Mis', result, correct, mean=1)
 
     def test_pointSourceHardEdgeMis(self):
         sourceEnergy = 151
@@ -250,7 +251,7 @@ class Tests(unittest.TestCase):
         self.assertTrue(np.isclose(np.mean(correct[5]), np.mean(result[5])))
         self.assertTrue(np.all(result[6] <= sourceEnergy+energySpread))
         self.assertTrue(np.all(result[6] >= sourceEnergy-energySpread))
-        plot_comparison('Hard Edge Mis', result, correct)
+        #plot_comparison('Hard Edge Mis', result, correct)
 
     def test_matrixSource20000(self):
         sourceEnergy = 120

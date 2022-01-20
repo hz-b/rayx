@@ -212,10 +212,4 @@ double PointSource::getCoord(const PointSource::SOURCE_DIST l,
         return (m_normDist(m_randEngine) * extent);
     }
 }
-
-double PointSource::getSourceDepth() const { return m_sourceDepth; }
-double PointSource::getSourceHeight() const { return m_sourceHeight; }
-double PointSource::getSourceWidth() const { return m_sourceWidth; }
-double PointSource::getVerDivergence() const { return m_verDivergence; }
-double PointSource::getHorDivergence() const { return m_horDivergence; }
 }  // namespace RAYX

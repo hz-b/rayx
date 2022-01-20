@@ -23,11 +23,6 @@ class RAYX_API PointSource : public LightSource {
 
     std::vector<Ray> getRays();
     double getCoord(const SOURCE_DIST l, const double extent);
-    double getSourceDepth() const;
-    double getSourceHeight() const;
-    double getSourceWidth() const;
-    double getVerDivergence() const;
-    double getHorDivergence() const;
 
   private:
     // Geometric Parameters

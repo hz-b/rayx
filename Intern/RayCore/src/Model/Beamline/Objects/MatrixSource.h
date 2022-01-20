@@ -20,11 +20,6 @@ class RAYX_API MatrixSource : public LightSource {
     static std::shared_ptr<MatrixSource> createFromXML(rapidxml::xml_node<>*);
 
     std::vector<Ray> getRays();
-    double getSourceDepth() { return m_sourceDepth; }
-    double getSourceHeight() { return m_sourceHeight; }
-    double getSourceWidth() { return m_sourceWidth; }
-    double getVerDivergence() { return m_verDivergence; }
-    double getHorDivergence() { return m_horDivergence; }
 };
 
 }  // namespace RAYX

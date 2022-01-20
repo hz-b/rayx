@@ -46,6 +46,11 @@ class RAYX_API LightSource : public BeamlineObject {
     double getLinear0();
     double getLinear45();
     double getCircular();
+    double getVerDivergence() { return m_verDivergence; }
+    double getHorDivergence() { return m_horDivergence; }
+    double getSourceDepth() { return m_sourceDepth; }
+    double getSourceHeight() { return m_sourceHeight; }
+    double getSourceWidth() { return m_sourceWidth; }
 
     /** yields the average energy of the energy distribution
      * m_EnergyDistribution */
@@ -69,6 +74,7 @@ class RAYX_API LightSource : public BeamlineObject {
     double m_sourceDepth;
     double m_sourceHeight;
     double m_sourceWidth;
+    // in rad:
     double m_horDivergence;
     double m_verDivergence;
 
