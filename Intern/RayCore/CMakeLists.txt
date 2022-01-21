@@ -25,6 +25,7 @@ SET(SOURCE
     src/Model/Beamline/Objects/SphereMirror.cpp
     src/Model/Beamline/Objects/ToroidMirror.cpp
     src/Model/Beamline/Objects/Cylinder.cpp
+    src/Model/Beamline/Objects/Cone.cpp
     src/Data/Exporter.cpp
     src/Data/Importer.cpp
     src/Data/xml.cpp
