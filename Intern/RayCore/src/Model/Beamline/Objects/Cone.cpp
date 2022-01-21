@@ -25,7 +25,7 @@ Cone::Cone(const char* name, Geometry::GeometricalShape geometricalShape,
            const double width, const double height, const double azimuthalAngle,
            glm::dvec4 position, glm::dmat4x4 orientation,
            const double grazingIncidence, const double entranceArmLength,
-           const double exitArmLength, const std::vector<double> slopeError)
+           const double exitArmLength, const std::array<double, 7> slopeError)
     : OpticalElement(name, geometricalShape, width, height, azimuthalAngle,
                      position, orientation, slopeError),
       m_incidence(degToRad(grazingIncidence)),
@@ -47,7 +47,7 @@ Cone::Cone(const char* name, Geometry::GeometricalShape geometricalShape,
     } else if (m_a23 == 0) {
         m_a24 = -m_upstreamRadius_R;
     }
-    setSurface(std::make_unique<Quadric>(std::vector<double>{
+    setSurface(std::make_unique<Quadric>(std::array<double, 4 * 4>{
         m_a11, 0, 0, 0, icurv, m_a22, m_a23, m_a24, 0, 0, 0, 0, 0, 0, 0, 0}));
     setElementParameters({0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0});
 }
@@ -75,7 +75,7 @@ Cone::Cone(const char* name, Geometry::GeometricalShape geometricalShape,
            const double width, const double height, const double azimuthalAngle,
            glm::dvec4 position, glm::dmat4x4 orientation,
            const double grazingIncidence, const double entranceArmLength,
-           const double exitArmLength, const std::vector<double> slopeError)
+           const double exitArmLength, const std::array<double, 7> slopeError)
     : OpticalElement(name, geometricalShape, width, height, azimuthalAngle,
                      position, orientation, slopeError),
       m_incidence(degToRad(grazingIncidence)),
@@ -96,7 +96,7 @@ Cone::Cone(const char* name, Geometry::GeometricalShape geometricalShape,
     } else if (m_a23 == 0) {
         m_a24 = -m_upstreamRadius_R;
     }
-    setSurface(std::make_unique<Quadric>(std::vector<double>{
+    setSurface(std::make_unique<Quadric>(std::array<double, 4 * 4>{
         m_a11, 0, 0, 0, icurv, m_a22, m_a23, m_a24, 0, 0, 0, 0, 0, 0, 0, 0}));
     setElementParameters({0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0});
 }
