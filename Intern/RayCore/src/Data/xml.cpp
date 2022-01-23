@@ -1,5 +1,6 @@
 #include "xml.h"
 
+#include <Debug.h>
 #include <Model/Beamline/LightSource.h>
 
 #include <cstdio>
@@ -326,7 +327,14 @@ bool paramMaterial(const rapidxml::xml_node<>* node, Material* out) {
         return false;
     }
 
+    int reflType;
+    if (paramInt(node, "reflectivityType", &reflType) && reflType == 0) {
+        *out = Material::REFLECTIVE;
+        return true;
+    }
+
     const char* str;
+
     if (!paramStr(node, "materialSubstrate", &str)) {
         return false;
     }

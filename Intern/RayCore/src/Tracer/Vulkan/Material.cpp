@@ -14,6 +14,11 @@
  **/
 const char* getMaterialName(Material m) {
     switch (m) {
+        case Material::VACUUM:
+            return "VACUUM";
+        case Material::REFLECTIVE:
+            return "REFLECTIVE";
+
 #define X(e)          \
     case Material::e: \
         return #e;
@@ -26,7 +31,7 @@ const char* getMaterialName(Material m) {
 }
 
 // std::vector over all materials
-std::vector<Material> allMaterials() {
+std::vector<Material> allNormalMaterials() {
     std::vector<Material> mats;
 #define X(e) mats.push_back(Material::e);
 #include "materials.xmacro"
@@ -41,7 +46,7 @@ static std::vector<int> MATERIAL_INDEX_TABLE;
 
 // fills the tables above
 void fillMaterialTables() {
-    auto mats = allMaterials();
+    auto mats = allNormalMaterials();
     for (uint i = 0; i < mats.size(); i++) {
         PalikTable t;
         assert(PalikTable::load(getMaterialName(mats[i]), &t));
@@ -57,7 +62,7 @@ void fillMaterialTables() {
 }
 
 bool materialFromString(const char* matname, Material* out) {
-    for (auto m : allMaterials()) {
+    for (auto m : allNormalMaterials()) {
         const char* name = getMaterialName(m);
         if (strcasecmp(name, matname) != 0) {
             *out = m;

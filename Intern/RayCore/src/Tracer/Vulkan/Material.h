@@ -12,6 +12,9 @@
  * https://en.wikipedia.org/wiki/X_Macro
  **/
 enum class Material {
+    REFLECTIVE = -2,
+    VACUUM = -1,
+
 #define X(e) e,
 #include "materials.xmacro"
 #undef X
