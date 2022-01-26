@@ -40,6 +40,16 @@
 #define DBG_NEW new
 #endif
 
+/**
+  * buffers[0] = ray buffer
+  * buffers[1] = output buffer
+  * buffers[2] = quadric buffer
+  * buffers[3] = staging buffer
+  * buffers[4] = xyznull buffer
+  * buffers[5] = material index table
+  * buffers[6] = material table
+  **/
+
 namespace RAYX {
 VulkanTracer::VulkanTracer() {
     bufferSizes.resize(7);
@@ -930,10 +940,12 @@ void VulkanTracer::createDescriptorSet() {
 
         VkWriteDescriptorSet writeDescriptorSet = {};
         writeDescriptorSet.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
+        writeDescriptorSet.pNext = NULL;
         writeDescriptorSet.dstSet =
             descriptorSet;  // write to this descriptor set.
         writeDescriptorSet.dstBinding =
             i - (i >= 4);  // write to the ist binding, or i-1 th binding
+        writeDescriptorSet.dstArrayElement = 0;
         writeDescriptorSet.descriptorCount = 1;  // update a single descriptor.
         writeDescriptorSet.descriptorType =
             VK_DESCRIPTOR_TYPE_STORAGE_BUFFER;  // storage buffer.
