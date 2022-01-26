@@ -1,7 +1,5 @@
 #include "Slit.h"
 
-#include <assert.h>
-
 #include "Debug.h"
 
 namespace RAYX {

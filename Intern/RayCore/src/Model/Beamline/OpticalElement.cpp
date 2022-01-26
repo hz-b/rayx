@@ -1,9 +1,6 @@
 #include "OpticalElement.h"
 
-#include <assert.h>
 #include <math.h>
-
-#include <cassert>
 
 #include "Debug.h"
 #include "Presenter/SimulationEnv.h"
@@ -79,7 +76,6 @@ OpticalElement::OpticalElement(const char* name,
     m_geometry =
         std::make_unique<Geometry>(geometricalShape, widthA, widthB, height,
                                    azimuthalAngle, position, orientation);
-    assert(slopeError.size() == 7);
     updateObjectParams();
 }
 
@@ -102,7 +98,6 @@ OpticalElement::OpticalElement(const char* name,
     : BeamlineObject(name), m_slopeError(slopeError) {
     m_geometry = std::make_unique<Geometry>(
         geometricalShape, width, height, azimuthalAngle, position, orientation);
-    assert(slopeError.size() == 7);
     updateObjectParams();
 }
 
@@ -123,8 +118,14 @@ void OpticalElement::setOutMatrix(std::array<double, 4*4> inputMatrix) {
 
 void OpticalElement::setSurface(std::unique_ptr<Surface> surface) {
     m_surfacePtr = std::move(surface);
-    assert(surface == nullptr);
-    assert(m_surfacePtr != nullptr);
+    if (surface) {
+        RAYX_ERR << "surface should be nullptr after move!";
+        exit(1);
+    }
+    if (!m_surfacePtr) {
+        RAYX_ERR << "m_surfacePtr should NOT be nullptr!";
+        exit(1);
+    }
 }
 
 // ! temporary adjustment for trapezoid (10/11/2021)

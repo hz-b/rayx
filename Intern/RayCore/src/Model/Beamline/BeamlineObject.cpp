@@ -2,8 +2,6 @@
 
 #include <math.h>
 
-#include <cassert>
-
 #include "Presenter/SimulationEnv.h"
 
 namespace RAYX {

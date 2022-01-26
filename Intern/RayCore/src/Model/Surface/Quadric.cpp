@@ -2,8 +2,6 @@
 
 #include <math.h>
 
-#include <cassert>
-
 #include "Debug.h"
 
 namespace RAYX {

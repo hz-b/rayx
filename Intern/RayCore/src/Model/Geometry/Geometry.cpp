@@ -121,11 +121,9 @@ glm::dvec4 Geometry::getPosition() { return m_position; }
 glm::dmat4x4 Geometry::getOrientation() { return m_orientation; }
 
 void Geometry::setInMatrix(std::array<double, 4 * 4> inputMatrix) {
-    assert(inputMatrix.size() == 16);
     m_inMatrix = inputMatrix;
 }
 void Geometry::setOutMatrix(std::array<double, 4 * 4> inputMatrix) {
-    assert(inputMatrix.size() == 16);
     m_outMatrix = inputMatrix;
 }
 

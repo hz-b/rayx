@@ -1,6 +1,5 @@
 #include "LightSource.h"
 
-#include <cassert>
 #include <cmath>
 
 namespace RAYX {

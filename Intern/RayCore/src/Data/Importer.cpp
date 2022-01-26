@@ -53,8 +53,14 @@ void addBeamlineObjectFromXML(rapidxml::xml_node<>* node, Beamline* beamline,
     // calcSourceEnergy does some validity checks and then yields the
     // source-energy required by the Slit::createFromXML function
     const auto calcSourceEnergy = [&] {
-        assert(!beamline->m_LightSources.empty());
-        assert(beamline->m_LightSources[0]);
+        if (beamline->m_LightSources.empty()) {
+          RAYX_ERR << "no light sources!";
+          exit(1);
+        }
+        if (!beamline->m_LightSources[0]) {
+          RAYX_ERR << "lightSources[0] is nullptr!";
+          exit(1);
+        }
         return beamline->m_LightSources[0]->m_EnergyDistribution.getAverage();
     };
 

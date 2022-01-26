@@ -1,6 +1,5 @@
 #include "RayList.h"
 
-#include <cassert>
 #include <cmath>
 #include <cstring>
 #include <iostream>

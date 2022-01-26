@@ -2,8 +2,6 @@
 
 #include <math.h>
 
-#include <cassert>
-
 namespace RAYX {
 /**
  * standard constructor

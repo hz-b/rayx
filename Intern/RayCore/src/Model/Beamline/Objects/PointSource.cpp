@@ -2,7 +2,6 @@
 
 #include <Data/xml.h>
 
-#include <cassert>
 #include <cmath>
 
 #include "Debug.h"

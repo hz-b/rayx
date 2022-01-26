@@ -1,6 +1,5 @@
 #include "RandomRays.h"
 
-#include <cassert>
 #include <cmath>
 #include <random>
 

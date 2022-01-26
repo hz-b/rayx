@@ -1,7 +1,5 @@
 #pragma once
 
-#include <assert.h>
-
 #include <cmath>
 #include <cstdlib>
 #include <iostream>
@@ -34,14 +32,13 @@ const std::vector<const char*> validationLayers = {
     "VK_LAYER_KHRONOS_validation"};
 
 // Used for validating return values of Vulkan API calls.
-#define VK_CHECK_RESULT(f)                                                     \
-    {                                                                          \
-        VkResult res = (f);                                                    \
-        if (res != VK_SUCCESS) {                                               \
-            printf("Fatal : VkResult is %d in %s at line %d\n", res, __FILE__, \
-                   __LINE__);                                                  \
-            assert(res == VK_SUCCESS);                                         \
-        }                                                                      \
+#define VK_CHECK_RESULT(f)                           \
+    {                                                \
+        VkResult res = (f);                          \
+        if (res != VK_SUCCESS) {                     \
+            RAYX_ERR << "Fatal : VkResult fail!";   \
+            exit(1);                                 \
+        }                                            \
     }
 VkResult CreateDebugUtilsMessengerEXT(
     VkInstance instance, const VkDebugUtilsMessengerCreateInfoEXT* pCreateInfo,

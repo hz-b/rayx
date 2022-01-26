@@ -1,7 +1,6 @@
 #include "Material.h"
 
 #include <Debug.h>
-#include <assert.h>
 #include <strings.h>
 
 #include <iostream>
@@ -26,7 +25,7 @@ const char* getMaterialName(Material m) {
 #undef X
     }
     RAYX_ERR << "unknown material in getMaterialName()!";
-    assert(false);
+    exit(1);
     return nullptr;
 }
 
@@ -49,7 +48,12 @@ void fillMaterialTables() {
     auto mats = allNormalMaterials();
     for (uint i = 0; i < mats.size(); i++) {
         PalikTable t;
-        assert(PalikTable::load(getMaterialName(mats[i]), &t));
+
+        if (!PalikTable::load(getMaterialName(mats[i]), &t)) {
+            RAYX_ERR << "could not load PalikTable!";
+            exit(1);
+        }
+
         MATERIAL_INDEX_TABLE.push_back(MATERIAL_TABLE.size() /
                                        4);  // 4 doubles per PalikEntry
         for (auto x : t.m_Lines) {
