@@ -351,9 +351,12 @@ Ray traceMirror(Ray r, const int elementIndex, inout uint64_t ctr, dvec4 interse
 	double real_S, real_P, delta;
 	double incidence_angle = getIncidenceAngle(r, normal); // getTheta
 	int material = int(quadricData[elementIndex].surfaceParams[3][2]);
-	efficiency(r, real_S, real_P, delta, incidence_angle, material);
-	//update_stokes(r, real_S, real_P, delta, azimuthal_angle, ctr); 
-	r.order = 0;
+	if (material != -2) {
+		efficiency(r, real_S, real_P, delta, incidence_angle, material);
+
+		update_stokes(r, real_S, real_P, delta, azimuthal_angle, ctr);
+		r.order = 0;
+	}
 	return r;
 }
 
