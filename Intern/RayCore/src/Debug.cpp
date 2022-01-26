@@ -43,13 +43,15 @@ Warn::~Warn() {
     std::cerr << std::endl << "\033[0m";  // color reset
 }
 
-Err::Err(std::string filename, int line) {
+Err::Err(std::string filename, int line) : filename(filename), line(line) {
     std::cerr << "\x1B[31m";  // color red
     formatDebugMsg(filename, line, std::cerr);
 }
 
 Err::~Err() {
-    std::cerr << "    --> Terminating...\033[0m" << std::endl;  // color reset
+    std::cerr << "\n";
+    formatDebugMsg(filename, line, std::cerr);
+    std::cerr << "Terminating...\033[0m" << std::endl;  // color reset
     exit(1);
 }
 

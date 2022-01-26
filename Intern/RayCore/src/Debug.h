@@ -77,6 +77,9 @@ struct Warn {
 };
 
 struct Err {
+    std::string filename;
+    int line;
+
     Err(std::string filename, int line);
 
     ~Err();
