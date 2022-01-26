@@ -36,8 +36,7 @@ const std::vector<const char*> validationLayers = {
     {                                                \
         VkResult res = (f);                          \
         if (res != VK_SUCCESS) {                     \
-            RAYX_ERR << "Fatal : VkResult fail!";   \
-            exit(1);                                 \
+            RAYX_ERR << "Fatal : VkResult fail!";    \
         }                                            \
     }
 VkResult CreateDebugUtilsMessengerEXT(

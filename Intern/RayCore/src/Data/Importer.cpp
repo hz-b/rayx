@@ -55,11 +55,9 @@ void addBeamlineObjectFromXML(rapidxml::xml_node<>* node, Beamline* beamline,
     const auto calcSourceEnergy = [&] {
         if (beamline->m_LightSources.empty()) {
           RAYX_ERR << "no light sources!";
-          exit(1);
         }
         if (!beamline->m_LightSources[0]) {
           RAYX_ERR << "lightSources[0] is nullptr!";
-          exit(1);
         }
         return beamline->m_LightSources[0]->m_EnergyDistribution.getAverage();
     };
@@ -100,7 +98,7 @@ void addBeamlineObjectFromXML(rapidxml::xml_node<>* node, Beamline* beamline,
     } else if (strcmp(type, "Cylinder") == 0) {
         addOpticalElement(Cylinder::createFromXML(node, group_context), node);
     } else {
-        RAYX_ERR << "could not classify beamline object with Name: "
+        RAYX_WARN << "could not classify beamline object with Name: "
                  << node->first_attribute("name")->value()
                  << "; Type: " << node->first_attribute("type")->value();
     }
@@ -147,7 +145,6 @@ Beamline Importer::importBeamline(const char* filename) {
     if (test.empty()) {
         RAYX_ERR
             << "importBeamline could not open file! (or it was just empty)";
-        exit(1);
     }
     std::vector<char> cstr(test.c_str(), test.c_str() + test.size() + 1);
     rapidxml::xml_document<> doc;

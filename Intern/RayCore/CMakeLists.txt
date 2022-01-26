@@ -4,6 +4,7 @@ project(RayCore)
 
 SET(SOURCE
     src/Application.cpp
+    src/Debug.cpp
     src/utils.cpp
     src/Model/Beamline/Beamline.cpp
     src/Model/Beamline/BeamlineObject.cpp

@@ -663,7 +663,6 @@ void VulkanTracer::fillStagingBuffer(
 
     if ((*raySetIterator).size() > GPU_MAX_STAGING_SIZE) {
         RAYX_ERR << "(*raySetIterator).size() > GPU_MAX_STAGING_SIZE)!";
-        exit(1);
     }
     vectorsPerStagingBuffer = std::min(rayList.size(), vectorsPerStagingBuffer);
     RAYX_LOG << "Vectors per StagingBuffer: " << vectorsPerStagingBuffer;

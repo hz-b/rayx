@@ -120,11 +120,9 @@ void OpticalElement::setSurface(std::unique_ptr<Surface> surface) {
     m_surfacePtr = std::move(surface);
     if (surface) {
         RAYX_ERR << "surface should be nullptr after move!";
-        exit(1);
     }
     if (!m_surfacePtr) {
         RAYX_ERR << "m_surfacePtr should NOT be nullptr!";
-        exit(1);
     }
 }
 

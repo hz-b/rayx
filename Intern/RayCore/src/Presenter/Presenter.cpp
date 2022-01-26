@@ -21,7 +21,6 @@ bool Presenter::run() {
     for (int j = 0; j < 1 /*beamlinesSimultaneously*/; j++) {
         if (m_Beamline->m_LightSources.empty()) {
             RAYX_ERR << "There is no light source!";
-            exit(1);
         } else {
             m_TracerInterface.generateRays(m_Beamline->m_LightSources[0]);
         }

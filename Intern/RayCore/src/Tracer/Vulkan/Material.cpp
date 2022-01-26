@@ -25,7 +25,6 @@ const char* getMaterialName(Material m) {
 #undef X
     }
     RAYX_ERR << "unknown material in getMaterialName()!";
-    exit(1);
     return nullptr;
 }
 
@@ -51,7 +50,6 @@ void fillMaterialTables() {
 
         if (!PalikTable::load(getMaterialName(mats[i]), &t)) {
             RAYX_ERR << "could not load PalikTable!";
-            exit(1);
         }
 
         MATERIAL_INDEX_TABLE.push_back(MATERIAL_TABLE.size() /
