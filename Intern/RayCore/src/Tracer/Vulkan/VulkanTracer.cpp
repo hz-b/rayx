@@ -41,14 +41,14 @@
 #endif
 
 /**
-  * buffers[0] = ray buffer
-  * buffers[1] = output buffer
-  * buffers[2] = quadric buffer
-  * buffers[3] = staging buffer
-  * buffers[4] = xyznull buffer
-  * buffers[5] = material index table
-  * buffers[6] = material table
-  **/
+ * buffers[0] = ray buffer
+ * buffers[1] = output buffer
+ * buffers[2] = quadric buffer
+ * buffers[3] = staging buffer
+ * buffers[4] = xyznull buffer
+ * buffers[5] = material index table
+ * buffers[6] = material table
+ **/
 
 namespace RAYX {
 VulkanTracer::VulkanTracer() {
@@ -352,10 +352,10 @@ VKAPI_ATTR VkBool32 VKAPI_CALL VulkanTracer::debugCallback(
     const VkDebugUtilsMessengerCallbackDataEXT* pCallbackData,
     [[maybe_unused]] void* pUserData) {
     RAYX_PROFILE_FUNCTION();
+
     // Only show Warnings or higher severity bits
     if (messageSeverity >= VK_DEBUG_UTILS_MESSAGE_SEVERITY_WARNING_BIT_EXT) {
-        std::cerr << "[VK](ValidationLayer!): " << pCallbackData->pMessage
-                  << std::endl;
+        RAYX_ERR << "(ValidationLayer!): " << pCallbackData->pMessage;
     }
 
     return VK_FALSE;  // Should return False
@@ -932,6 +932,10 @@ void VulkanTracer::createDescriptorSet() {
                                              &descriptorSet));
 
     for (uint32_t i = 0; i < buffers.size(); i++) {
+        if (i == 3) {
+            continue;
+        }  // the staging buffer is not part of the descriptor set.
+
         // specify which buffer to use: input buffer
         VkDescriptorBufferInfo descriptorBufferInfo = {};
         descriptorBufferInfo.buffer = buffers[i];
@@ -1240,8 +1244,8 @@ int VulkanTracer::main() {
     try {
         app.run();
     } catch (const std::exception& e) {
-        std::cerr << e.what() << std::endl;
-        RAYX_LOG << "VulkanTracer failure!";
+        RAYX_ERR << e.what();
+        RAYX_ERR << "VulkanTracer failure!";
         return EXIT_FAILURE;
     }
     RAYX_LOG << "Finished.";

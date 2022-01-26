@@ -1,6 +1,8 @@
 
 #include "PalikTable.h"
 
+#include <Debug.h>
+
 #include <fstream>
 #include <iostream>
 #include <sstream>
@@ -32,8 +34,8 @@ bool PalikTable::load(const char* element, PalikTable* out) {
 
         if (sscanf(line.c_str(), "%le %le %le", &e.m_energy, &e.m_n, &e.m_k) !=
             3) {
-            std::cerr << "Failed to parse PalikTable \"" << element
-                      << "\", at line " << lineidx << ": \"" << line << "\"\n";
+            RAYX_ERR << "Failed to parse PalikTable \"" << element
+                     << "\", at line " << lineidx << ": \"" << line << "\"";
             return false;
         }
         out->m_Lines.push_back(e);

@@ -283,9 +283,8 @@ bool paramEnergyDistribution(const rapidxml::xml_node<>* node,
 
         return true;
     } else {
-        std::cerr
-            << "paramEnergyDistribution is not implemented for spreadType "
-            << energyDistributionType << "!\n";
+        RAYX_ERR << "paramEnergyDistribution is not implemented for spreadType "
+                 << energyDistributionType << "!";
         return false;
     }
 }

@@ -25,7 +25,7 @@ const char* getMaterialName(Material m) {
 #include "materials.xmacro"
 #undef X
     }
-    std::cerr << "unknown material in getMaterialName()!\n";
+    RAYX_ERR << "unknown material in getMaterialName()!";
     assert(false);
     return nullptr;
 }
