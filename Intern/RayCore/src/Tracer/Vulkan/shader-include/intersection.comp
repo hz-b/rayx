@@ -432,6 +432,9 @@ dvec4 getOpticalElementIntersection(Ray r, uint elementIndex){
 
 	int type = int(quadricData[elementIndex].surfaceParams[3][0]);
 	Element e = quadricData[elementIndex];
+	double x_extent = e.objectParameters[0][0]; // width if relevant
+	double z_extent = e.objectParameters[0][1]; // height if relevant
+	
 	dvec4 currentIntersection;
 	if(type > 7){
 		return dvec4(1.0/0.0,1.0/0.0,1.0/0.0, 0);
@@ -460,6 +463,9 @@ dvec4 getOpticalElementIntersection(Ray r, uint elementIndex){
 	
 		dvec4 normal = iteratTo(r, longRadius, shortRadius);
 		currentIntersection = dvec4(r.position, r.weight);
+
+		// set weight to 0 if element was not hit
+		currentIntersection.w = wasteBox(currentIntersection.x, currentIntersection.z, x_extent, z_extent, currentIntersection.w);
 		// intersection point is in the negative direction (behind the position when the direction is followed forwards), set weight to 0 
 		if( (currentIntersection.x - r.position.x) / r.direction.x < 0 || (currentIntersection.y - r.position.y) / r.direction.y < 0 || (currentIntersection.z - r.position.z) / r.direction.z < 0) {
 			currentIntersection.w = 0;
@@ -468,6 +474,8 @@ dvec4 getOpticalElementIntersection(Ray r, uint elementIndex){
 		return currentIntersection;
 	}
 	currentIntersection = getIntersectionPoint(r, e.surfaceParams);
+	// set weight to 0 if element was not hit
+	currentIntersection.w = wasteBox(currentIntersection.x, currentIntersection.z, x_extent, z_extent, currentIntersection.w);
 	
 	r = rayMatrixMult(r, e.outTrans);
 	return currentIntersection; // in element coordinate system

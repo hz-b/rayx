@@ -294,8 +294,6 @@ void testBeamline(const char* filename) {
     std::vector<std::shared_ptr<RAYX::OpticalElement>> elements =
         beamline->m_OpticalElements;
     std::vector<RAYX::Ray> testValues = beamline->m_LightSources[0]->getRays();
-    printMatrix(elements[1]->getInMatrix());
-    printMatrix(elements[1]->getOutMatrix());
 
     std::list<double> outputRays = runTracer(testValues, elements);
     // write to file "testFile_"+name of first element in beamlin
@@ -1891,46 +1889,6 @@ TEST_F(opticalElements, EllipsoidImagePlane_mirrormisalignment) {
 TEST_F(opticalElements, PlaneMirrorEllipsoidImagePlane_mirrormisalignment) {
     const char* filename = "pm_ell_ip_200mirrormis";
     testBeamline(filename);
-
-    /*RAYX::GeometricUserParams pm_params = RAYX::GeometricUserParams(7);
-    RAYX::WorldUserParams w_coord = RAYX::WorldUserParams(
-        pm_params.getAlpha(), pm_params.getBeta(), 0, 10000,
-        std::array<double, 6>{1, 2, 3, 0.004, 0.005, 0.006});
-    glm::dvec4 pos1 = w_coord.calcPosition();
-    glm::dmat4x4 or1 = w_coord.calcOrientation();
-    std::shared_ptr<RAYX::PlaneMirror> pm = std::make_shared<RAYX::PlaneMirror>(
-        "pm_ell_ip_200mirrormis", RAYX::Geometry::GeometricalShape::RECTANGLE,
-        50, 200, w_coord.getAzimuthalAngle(), pos1, or1, zeros7, Material::CU);
-
-    RAYX::GeometricUserParams ell_params =
-        RAYX::GeometricUserParams(10, 10000, 1000);
-    double alpha = 0.031253965260898464;
-    double beta = 0.31781188513796743;
-    ASSERT_DOUBLE_EQ(ell_params.getAlpha(), alpha);
-    ASSERT_DOUBLE_EQ(ell_params.getBeta(), beta);
-    int coordinatesystem = 1;  // misalignment in mirror coordinate system
-    double tangentAngle =
-        ell_params.calcTangentAngle(10, 10000, 1000, coordinatesystem);
-    ASSERT_DOUBLE_EQ(tangentAngle, 0.14327895993853446);
-
-    RAYX::WorldUserParams ell_w_coord = RAYX::WorldUserParams(
-        ell_params.getAlpha(), ell_params.getBeta(), 0, 100,
-        std::array<double, 6>{1, 2, 3, 0.004, 0.005, 0.006}, tangentAngle);
-    glm::dvec4 pos2 = ell_w_coord.calcPosition(w_coord, pos1, or1);
-    glm::dmat4x4 or2 = ell_w_coord.calcOrientation(w_coord, or1);
-    std::shared_ptr<RAYX::Ellipsoid> eb = std::make_shared<RAYX::Ellipsoid>(
-        "ellips", RAYX::Geometry::GeometricalShape::RECTANGLE, 50, 200,
-        w_coord.getAzimuthalAngle(), pos2, or2, 10, 10000, 1000, 0, 1, zeros7,
-        Material::CU);
-
-    RAYX::WorldUserParams ip_w_coord = RAYX::WorldUserParams(
-        0, 0, 0, 1000, std::array<double, 6>{0, 0, 0, 0, 0, 0});
-    glm::dvec4 pos3 = ip_w_coord.calcPosition(ell_w_coord, pos2, or2);
-    glm::dmat4x4 or3 = ip_w_coord.calcOrientation(ell_w_coord, or2);
-    std::shared_ptr<RAYX::ImagePlane> i =
-        std::make_shared<RAYX::ImagePlane>("ImagePlane", pos3, or3);
-
-    testOpticalElement({pm, eb, i}, 200);*/
 }
 
 TEST_F(opticalElements, FourMirrors_20Rays) {

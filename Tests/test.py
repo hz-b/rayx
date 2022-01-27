@@ -215,7 +215,7 @@ class Tests(unittest.TestCase):
         self.assertTrue(np.isclose(np.mean(correct[5]), np.mean(result[5])))
         self.assertTrue(np.all(result[6] <= sourceEnergy+energySpread))
         self.assertTrue(np.all(result[6] >= sourceEnergy-energySpread))
-        #plot_comparison('Hard Edge', result, correct)
+        plot_comparison('Hard Edge', result, correct)
 
     def test_pointSourceSoftEdge(self):
         sourceEnergy = 120

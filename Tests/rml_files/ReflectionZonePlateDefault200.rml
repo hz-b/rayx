@@ -11,7 +11,7 @@
     <param id="horDiv" enabled="T">1</param>
     <param id="verDiv" enabled="T">1</param>
     <param id="energyDistributionType" comment="Values" enabled="T">1</param>
-    <param id="photonEnergyDistributionFile" relative="" enabled="F"></param>
+    <param id="photonEnergyDistributionFile" absolute="" enabled="F"></param>
     <param id="photonEnergy" enabled="T">100</param>
     <param id="energySpreadType" comment="white band" enabled="T">0</param>
     <param id="energySpread" enabled="T">0</param>
