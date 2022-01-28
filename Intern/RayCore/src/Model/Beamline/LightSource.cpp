@@ -20,7 +20,11 @@ LightSource::LightSource(const char* name, EnergyDistribution dist,
       m_misalignmentParams(misalignment),
       m_linearPol_0(linPol0),
       m_linearPol_45(linPol45),
-      m_circularPol(circPol) {}
+      m_circularPol(circPol) {
+    std::normal_distribution<double> m_normDist(0, 1);
+    std::uniform_real_distribution<double> m_uniformDist(0, 1);
+    std::default_random_engine m_randEngine;
+}
 
 // ! Temporary code clone
 LightSource::LightSource(const char* name, EnergyDistribution dist,
