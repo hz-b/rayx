@@ -15,17 +15,20 @@
 #include "glm.hpp"
 
 namespace RAYX {
-enum SPREAD_TYPE { ES_WHITE_BAND, ES_THREE_ENERGIES };  // default ES_WHITE_BAND
-enum ENERGY_DISTRIBUTION_TYPE {
-    ET_FILE,
-    ET_VALUES,
-    ET_TOTAL,
-    ET_PARAM
+enum class SpreadType {  // default WhiteBand
+    WhiteBand,
+    ThreeEnergies
+};
+enum class EnergyDistributionType {
+    File,
+    Values,
+    Total,
+    Param
 };  // default ET_VALUES
-enum SOURCE_DISTRIBUTION_TYPE {
-    ST_SIMULTANEOUS,
-    ST_HARD_EDGE,
-    ST_GAUSS
+enum class SourceDistType {
+    Simultaneous,
+    HardEdge,
+    Gauss
 };  // default simultaneously
 
 class RAYX_API LightSource : public BeamlineObject {
@@ -93,7 +96,7 @@ class RAYX_API LightSource : public BeamlineObject {
     double m_circularPol;
 
     // TODO(Jannis): move to children
-    SOURCE_DISTRIBUTION_TYPE m_sourceDistributionType;
+    SourceDistType m_sourceDistributionType;
 };
 
 }  // namespace RAYX

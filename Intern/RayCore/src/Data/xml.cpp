@@ -238,22 +238,23 @@ bool paramEnergyDistribution(const rapidxml::xml_node<>* node,
         return false;
     }
 
-    int energyDistributionType;
+    int energyDistributionType_int;
     if (!xml::paramInt(node, "energyDistributionType",
-                       &energyDistributionType)) {
+                       &energyDistributionType_int)) {
         return false;
     }
+    EnergyDistributionType energyDistributionType =
+        static_cast<EnergyDistributionType>(energyDistributionType_int);
 
-    int spreadType;
-    if (!xml::paramInt(node, "energySpreadType", &spreadType)) {
+    int spreadType_int;
+    if (!xml::paramInt(node, "energySpreadType", &spreadType_int)) {
         return false;
     }
+    SpreadType spreadType = static_cast<SpreadType>(spreadType_int);
 
-    bool continuous =
-        !spreadType;  // spreadType = 0 -> white band (meaning continuous),
-                      // spreadType = 1 -> three energies (meaning discrete)
+    bool continuous = spreadType == SpreadType::WhiteBand;
 
-    if (energyDistributionType == ET_FILE) {
+    if (energyDistributionType == EnergyDistributionType::File) {
         const char* filename;
         if (!xml::paramStr(node, "photonEnergyDistributionFile", &filename)) {
             return false;
@@ -267,7 +268,7 @@ bool paramEnergyDistribution(const rapidxml::xml_node<>* node,
         *out = EnergyDistribution(df, continuous);
 
         return true;
-    } else if (energyDistributionType == ET_VALUES) {
+    } else if (energyDistributionType == EnergyDistributionType::Values) {
         double photonEnergy;
         if (!xml::paramDouble(node, "photonEnergy", &photonEnergy)) {
             return false;
@@ -283,8 +284,9 @@ bool paramEnergyDistribution(const rapidxml::xml_node<>* node,
 
         return true;
     } else {
-        RAYX_ERR << "paramEnergyDistribution is not implemented for spreadType "
-                 << energyDistributionType << "!";
+        RAYX_ERR << "paramEnergyDistribution is not implemented for "
+                    "energyDistributionType"
+                 << static_cast<int>(energyDistributionType) << "!";
         return false;
     }
 }
