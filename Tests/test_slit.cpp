@@ -4,7 +4,7 @@
 TEST(Slit, defaultParams) {
     RAYX::Geometry::GeometricalShape geometricalShape =
         RAYX::Geometry::GeometricalShape::RECTANGLE;
-    int beamstop = 0;
+    RAYX::CentralBeamstop beamstop = RAYX::CentralBeamstop::None;
     double width = 24;
     double height = 3;
     double chi = 0;
@@ -30,7 +30,8 @@ TEST(Slit, defaultParams) {
         width, height, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
     std::array<double, 4 * 4> surface = {0, 0, 0, 0,  0, 0, 0, 0,
                                          0, 0, 0, -1, 3, 0, 0, 0};
-    ASSERT_DOUBLE_EQ(s.getCentralBeamstop(), beamstop);
+    ASSERT_DOUBLE_EQ(static_cast<int>(s.getCentralBeamstop()),
+                     static_cast<int>(beamstop));
     ASSERT_DOUBLE_EQ(s.getBeamstopHeight(), 0);
     ASSERT_DOUBLE_EQ(s.getBeamstopWidth(), 0);
     ASSERT_DOUBLE_EQ(s.getHeight(), height);
@@ -53,7 +54,7 @@ TEST(Slit, defaultParams) {
 TEST(Slit, rectangleBeamstop) {
     RAYX::Geometry::GeometricalShape geometricalShape =
         RAYX::Geometry::GeometricalShape::RECTANGLE;
-    int beamstop = 1;
+    RAYX::CentralBeamstop beamstop = RAYX::CentralBeamstop::Rectangle;
     double width = 24;
     double height = 3;
     double chi = 0;
@@ -93,7 +94,8 @@ TEST(Slit, rectangleBeamstop) {
         width, height, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
     std::array<double, 4 * 4> surface = {0, 0, 0, 0,  0, 0, 0, 0,
                                          0, 0, 0, -1, 3, 0, 0, 0};
-    ASSERT_DOUBLE_EQ(s.getCentralBeamstop(), beamstop);
+    ASSERT_DOUBLE_EQ(static_cast<int>(s.getCentralBeamstop()),
+                     static_cast<int>(beamstop));
     ASSERT_DOUBLE_EQ(s.getBeamstopHeight(), beamstopHeight);
     ASSERT_DOUBLE_EQ(s.getBeamstopWidth(), beamstopWidth);
     ASSERT_DOUBLE_EQ(s.getHeight(), height);
@@ -116,7 +118,7 @@ TEST(Slit, rectangleBeamstop) {
 TEST(Slit, ellipticalBeamstop) {
     RAYX::Geometry::GeometricalShape geometricalShape =
         RAYX::Geometry::GeometricalShape::RECTANGLE;
-    int beamstop = 2;
+    RAYX::CentralBeamstop beamstop = RAYX::CentralBeamstop::Elliptical;
     double width = 20;
     double height = 2;
     double chi = 0;
@@ -156,7 +158,8 @@ TEST(Slit, ellipticalBeamstop) {
         width, height, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
     std::array<double, 4 * 4> surface = {0, 0, 0, 0,  0, 0, 0, 0,
                                          0, 0, 0, -1, 3, 0, 0, 0};
-    ASSERT_DOUBLE_EQ(s.getCentralBeamstop(), beamstop);
+    ASSERT_DOUBLE_EQ(static_cast<int>(s.getCentralBeamstop()),
+                     static_cast<int>(beamstop));
     ASSERT_DOUBLE_EQ(s.getBeamstopHeight(), beamstopHeight);
     ASSERT_DOUBLE_EQ(s.getBeamstopWidth(), -beamstopWidth);
     ASSERT_DOUBLE_EQ(s.getHeight(), height);
@@ -179,7 +182,7 @@ TEST(Slit, ellipticalBeamstop) {
 TEST(Slit, ellipticalSlitellipticalBeamstop) {
     RAYX::Geometry::GeometricalShape geometricalShape =
         RAYX::Geometry::GeometricalShape::ELLIPTICAL;
-    int beamstop = 2;
+    RAYX::CentralBeamstop beamstop = RAYX::CentralBeamstop::Elliptical;
     double width = 24;
     double height = 3;
     double chi = 10;
@@ -219,7 +222,8 @@ TEST(Slit, ellipticalSlitellipticalBeamstop) {
         -width, -height, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
     std::array<double, 4 * 4> surface = {0, 0, 0, 0,  0, 0, 0, 0,
                                          0, 0, 0, -1, 3, 0, 0, 0};
-    ASSERT_DOUBLE_EQ(s.getCentralBeamstop(), beamstop);
+    ASSERT_DOUBLE_EQ(static_cast<int>(s.getCentralBeamstop()),
+                     static_cast<int>(beamstop));
     ASSERT_DOUBLE_EQ(s.getBeamstopHeight(), beamstopHeight);
     ASSERT_DOUBLE_EQ(s.getBeamstopWidth(), -beamstopWidth);
     ASSERT_DOUBLE_EQ(s.getHeight(), -height);
@@ -270,7 +274,7 @@ TEST(Slit, ellipticalSlitellipticalBeamstop) {
 TEST(Slit, ellipticalSlitrectangleBeamstop) {
     RAYX::Geometry::GeometricalShape geometricalShape =
         RAYX::Geometry::GeometricalShape::ELLIPTICAL;
-    int beamstop = 1;
+    RAYX::CentralBeamstop beamstop = RAYX::CentralBeamstop::Rectangle;
     double width = 24;
     double height = 3;
     double chi = 0;
@@ -310,7 +314,8 @@ TEST(Slit, ellipticalSlitrectangleBeamstop) {
         -width, -height, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
     std::array<double, 4 * 4> surface = {0, 0, 0, 0,  0, 0, 0, 0,
                                          0, 0, 0, -1, 3, 0, 0, 0};
-    ASSERT_DOUBLE_EQ(s.getCentralBeamstop(), beamstop);
+    ASSERT_DOUBLE_EQ(static_cast<int>(s.getCentralBeamstop()),
+                     static_cast<int>(beamstop));
     ASSERT_DOUBLE_EQ(s.getBeamstopHeight(), beamstopHeight);
     ASSERT_DOUBLE_EQ(s.getBeamstopWidth(), beamstopWidth);
     ASSERT_DOUBLE_EQ(s.getHeight(), -height);
@@ -333,7 +338,7 @@ TEST(Slit, ellipticalSlitrectangleBeamstop) {
 TEST(Slit, ellipticalSlitNoBeamstop) {
     RAYX::Geometry::GeometricalShape geometricalShape =
         RAYX::Geometry::GeometricalShape::ELLIPTICAL;
-    int beamstop = 0;
+    RAYX::CentralBeamstop beamstop = RAYX::CentralBeamstop::None;
     double width = 24;
     double height = 3;
     double chi = 12;
@@ -359,7 +364,8 @@ TEST(Slit, ellipticalSlitNoBeamstop) {
         -width, -height, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
     std::array<double, 4 * 4> surface = {0, 0, 0, 0,  0, 0, 0, 0,
                                          0, 0, 0, -1, 3, 0, 0, 0};
-    ASSERT_DOUBLE_EQ(s.getCentralBeamstop(), beamstop);
+    ASSERT_DOUBLE_EQ(static_cast<int>(s.getCentralBeamstop()),
+                     static_cast<int>(beamstop));
     ASSERT_DOUBLE_EQ(s.getBeamstopHeight(), 0);
     ASSERT_DOUBLE_EQ(s.getBeamstopWidth(), 0);
     ASSERT_DOUBLE_EQ(s.getHeight(), -height);
