@@ -16,6 +16,7 @@
 namespace RAYX {
 
 enum class GratingMount { Deviation, Incidence };
+enum class ImageType { Point2Point, Astigmatic2Astigmatic };
 
 class RAYX_API GeometricUserParams {
   public:
@@ -26,7 +27,7 @@ class RAYX_API GeometricUserParams {
                         double normalIncidence, double lineDensity,
                         double designEnergy, int orderOfDiffraction);
     // constructor for rzp
-    GeometricUserParams(GratingMount mount, int imageType,
+    GeometricUserParams(GratingMount mount, ImageType imageType,
                         double deviationAngle, double grazingIncidence,
                         double grazingExitAngle, double sourceEnergy,
                         double designEnergy, double orderOfDiffraction,
@@ -42,13 +43,13 @@ class RAYX_API GeometricUserParams {
 
     void focus(double angle, double designEnergy, double lineDensity,
                double orderOfDiffraction);
-    double calcDz00(int imageType, double designWavelength,
+    double calcDz00(ImageType imageType, double designWavelength,
                     double designAlphaAngle, double designBetaAngle,
                     double designOrderOfDiffraction, double sEntrance,
                     double sExit, double mEntrance, double mExit);
     double calcFresnelZOffset(double designAlphaAngle, double designBetaAngle,
                               double sEntrance, double sExit);
-    double rzpLineDensityDZ(int imageType, glm::dvec3 intersection,
+    double rzpLineDensityDZ(ImageType imageType, glm::dvec3 intersection,
                             glm::dvec3 normal, double designWavelength,
                             double designAlphaAngle, double designBetaAngle,
                             double designOrderOfDiffraction, double sEntrance,

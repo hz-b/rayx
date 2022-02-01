@@ -61,13 +61,13 @@ void Application::loadDummyBeamline() {  // ! objects are created here
 
     RAYX::Geometry::GeometricalShape geometricalShape =
         RAYX::Geometry::GeometricalShape::RECTANGLE;
-    int curvatureType = 0;
+    auto curvatureType = CurvatureType::Plane;
     double incidenceAngle =
         0;  // if incidence angle = 0 and mount = 1 use dAlpha as incidenceAngle
     double deviationAngle = 0;  // does not matter bc mount = 1
     GratingMount mount = GratingMount::Incidence;
     double exitAngle = 0;
-    int imageType = 1;
+    auto imageType = RAYX::ImageType::Astigmatic2Astigmatic;
     int additionalOrder = 1;
     double widthA = 50.0;
     double height = 200.0;

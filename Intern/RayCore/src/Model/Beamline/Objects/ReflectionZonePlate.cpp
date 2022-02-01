@@ -50,7 +50,7 @@ namespace RAYX {
  */
 ReflectionZonePlate::ReflectionZonePlate(
     const char* name, Geometry::GeometricalShape geometricalShape,
-    const int curvatureType, const double width, const double height,
+    CurvatureType curvatureType, const double width, const double height,
     const double azimuthalAngle, const glm::dvec4 position,
     const glm::dmat4x4 orientation, const double designEnergy,
     const double orderOfDiffraction, const double designOrderOfDiffraction,
@@ -78,20 +78,18 @@ ReflectionZonePlate::ReflectionZonePlate(
     m_designWavelength = m_designEnergy == 0 ? 0 : hvlam(m_designEnergy);
     m_additionalOrder = double(additionalZeroOrder);
 
-    m_curvatureType = curvatureType == 0
-                          ? CT_PLANE
-                          : (curvatureType == 1 ? CT_TOROIDAL : CT_SPHERICAL);
-    m_designType = DT_ZOFFSET;     // DT_ZOFFSET (0) default
-    m_derivationMethod = 0;        // DM_FORMULA default
-    m_rzpType = RT_ELLIPTICAL;     // default (0)
-    m_imageType = IT_POINT2POINT;  // default (0)
+    m_curvatureType = curvatureType;
+    m_designType = DesignType::ZOffset;    // DesignType::ZOffset (0) default
+    m_derivationMethod = 0;                // DM_FORMULA default
+    m_rzpType = RZPType::Elliptical;       // default (0)
+    m_imageType = ImageType::Point2Point;  // default (0)
 
     // set parameters in Quadric class
     double matd = (double)static_cast<int>(mat);
-    if (m_curvatureType == CT_PLANE) {
+    if (m_curvatureType == CurvatureType::Plane) {
         setSurface(std::make_unique<Quadric>(std::array<double, 4 * 4>{
             0, 0, 0, 0, 1, 0, 0, -1, 0, 0, 0, 0, 4, 0, matd, 0}));
-    } else if (m_curvatureType == CT_TOROIDAL) {
+    } else if (m_curvatureType == CurvatureType::Toroidal) {
         m_longRadius = longRadius;    // for sphere and toroidal
         m_shortRadius = shortRadius;  // only for Toroidal
         setSurface(std::make_unique<Toroid>(longRadius, shortRadius, 4, mat));
@@ -114,7 +112,7 @@ ReflectionZonePlate::ReflectionZonePlate(
 
 ReflectionZonePlate::ReflectionZonePlate(
     const char* name, Geometry::GeometricalShape geometricalShape,
-    const int curvatureType, const double widthA, const double widthB,
+    CurvatureType curvatureType, const double widthA, const double widthB,
     const double height, const double azimuthalAngle, const glm::dvec4 position,
     const glm::dmat4x4 orientation, const double designEnergy,
     const double orderOfDiffraction, const double designOrderOfDiffraction,
@@ -142,21 +140,19 @@ ReflectionZonePlate::ReflectionZonePlate(
     m_designWavelength = m_designEnergy == 0 ? 0 : hvlam(m_designEnergy);
     m_additionalOrder = double(additionalZeroOrder);
 
-    m_curvatureType = curvatureType == 0
-                          ? CT_PLANE
-                          : (curvatureType == 1 ? CT_TOROIDAL : CT_SPHERICAL);
-    m_designType = DT_ZOFFSET;     // DT_ZOFFSET (0) default
-    m_derivationMethod = 0;        // DM_FORMULA default
-    m_rzpType = RT_ELLIPTICAL;     // default (0)
-    m_imageType = IT_POINT2POINT;  // default (0)
+    m_curvatureType = curvatureType;
+    m_designType = DesignType::ZOffset;    // DesignType::ZOffset (0) default
+    m_derivationMethod = 0;                // DM_FORMULA default
+    m_rzpType = RZPType::Elliptical;       // default (0)
+    m_imageType = ImageType::Point2Point;  // default (0)
 
     double matd = (double)static_cast<int>(mat);
 
     // set parameters in Quadric class
-    if (m_curvatureType == CT_PLANE) {
+    if (m_curvatureType == CurvatureType::Plane) {
         setSurface(std::make_unique<Quadric>(std::array<double, 4 * 4>{
             0, 0, 0, 0, 1, 0, 0, -1, 0, 0, 0, 0, 4, 0, matd, 0}));
-    } else if (m_curvatureType == CT_TOROIDAL) {
+    } else if (m_curvatureType == CurvatureType::Toroidal) {
         m_longRadius = longRadius;    // for sphere and toroidal
         m_shortRadius = shortRadius;  // only for Toroidal
         setSurface(std::make_unique<Toroid>(longRadius, shortRadius, 4, mat));
@@ -299,48 +295,51 @@ std::shared_ptr<ReflectionZonePlate> ReflectionZonePlate::createFromXML(
     bool foundWidthB = xml::paramDouble(node, "totalWidthB", &widthB);
     if (foundWidthB) {
         return std::make_shared<ReflectionZonePlate>(
-            name, geometricalShape, curvatureType, widthA, height,
-            degToRad(azimuthalAngle), position, orientation, designEnergy,
-            orderOfDiffraction, designOrderOfDiffraction, dAlpha, dBeta,
-            mEntrance, mExit, sEntrance, sExit, shortRadius, longRadius,
+            name, geometricalShape, static_cast<CurvatureType>(curvatureType),
+            widthA, height, degToRad(azimuthalAngle), position, orientation,
+            designEnergy, orderOfDiffraction, designOrderOfDiffraction, dAlpha,
+            dBeta, mEntrance, mExit, sEntrance, sExit, shortRadius, longRadius,
             additionalZeroOrder, fresnelZOffset, slopeError, mat);
     } else {
         return std::make_shared<ReflectionZonePlate>(
-            name, geometricalShape, curvatureType, widthA, widthB, height,
-            degToRad(azimuthalAngle), position, orientation, designEnergy,
-            orderOfDiffraction, designOrderOfDiffraction, dAlpha, dBeta,
-            mEntrance, mExit, sEntrance, sExit, shortRadius, longRadius,
-            additionalZeroOrder, fresnelZOffset, slopeError, mat);
+            name, geometricalShape, static_cast<CurvatureType>(curvatureType),
+            widthA, widthB, height, degToRad(azimuthalAngle), position,
+            orientation, designEnergy, orderOfDiffraction,
+            designOrderOfDiffraction, dAlpha, dBeta, mEntrance, mExit,
+            sEntrance, sExit, shortRadius, longRadius, additionalZeroOrder,
+            fresnelZOffset, slopeError, mat);
     }
 }
 
 void ReflectionZonePlate::printInfo() const {
     std::cout.precision(17);
 
-    if (m_rzpType == RT_ELLIPTICAL) {
-        RAYX_LOG << m_rzpType << ", type: ELLIPTICAL";
-    } else if (m_rzpType == RT_MERIODIONAL) {
-        RAYX_LOG << m_rzpType << ", type: MERIDIONAL";
+    if (m_rzpType == RZPType::Elliptical) {
+        RAYX_LOG << static_cast<int>(m_rzpType) << ", type: ELLIPTICAL";
+    } else if (m_rzpType == RZPType::Meriodional) {
+        RAYX_LOG << static_cast<int>(m_rzpType) << ", type: MERIDIONAL";
     } else {
-        RAYX_LOG << m_rzpType;
+        RAYX_LOG << static_cast<int>(m_rzpType);
     }
 
-    if (m_curvatureType == CT_PLANE) {
+    if (m_curvatureType == CurvatureType::Plane) {
         RAYX_LOG << m_designAlphaAngle << ", curvature type: PLANE";
-    } else if (m_curvatureType == CT_SPHERICAL) {
+    } else if (m_curvatureType == CurvatureType::Spherical) {
         RAYX_LOG << m_designAlphaAngle << ", curvature type: SPHERICAL";
-    } else if (m_curvatureType == CT_TOROIDAL) {
+    } else if (m_curvatureType == CurvatureType::Toroidal) {
         RAYX_LOG << m_designAlphaAngle << ", curvature type: TOROIDAL";
     } else {
-        RAYX_LOG << m_designType;
+        RAYX_LOG << static_cast<int>(m_designType);
     }
 
-    if (m_imageType == IT_POINT2POINT) {
-        RAYX_LOG << m_imageType << ", m_imageType: POINT2POINT";
-    } else if (m_imageType == IT_ASTIGMATIC2ASTIGMATIC) {
-        RAYX_LOG << m_imageType << ", m_imageType: ASTIGMATIC2ASTIGMATIC";
+    if (m_imageType == ImageType::Point2Point) {
+        RAYX_LOG << static_cast<int>(m_imageType)
+                 << ", m_imageType: POINT2POINT";
+    } else if (m_imageType == ImageType::Astigmatic2Astigmatic) {
+        RAYX_LOG << static_cast<int>(m_imageType)
+                 << ", m_imageType: ASTIGMATIC2ASTIGMATIC";
     } else {
-        RAYX_LOG << m_imageType;
+        RAYX_LOG << static_cast<int>(m_imageType);
     }
 
     RAYX_LOG << "\t VALUES";
@@ -421,11 +420,11 @@ double ReflectionZonePlate::calcDz00() {
     // double beta;
     // double zeta;
     // double fresnelZOffset;
-    if (m_designType == DT_BETA) {
+    if (m_designType == DesignType::Beta) {
         // beta = m_designBetaAngle;
         calcFresnelZOffset();  // overwrite given Fresneloffset
     }
-    // else { // if(m_designType == DT_ZOFFSET) {
+    // else { // if(m_designType == DesignType::ZOffset) {
     // beta = m_betaAngle; // what is this beta angle
     // use given fresnelOffset
     //}
@@ -438,13 +437,13 @@ double ReflectionZonePlate::calcDz00() {
 }
 
 /**
- * Calculate fresnel z offset if DESIGN_TYPE == BETA from angle beta.
+ * Calculate fresnel z offset if DesignType == BETA from angle beta.
  * @param:
  */
 void ReflectionZonePlate::calcFresnelZOffset() {
-    double betaAngle =
-        0;  // TODO should this really be = 0 if m_designType != DT_BETA?
-    if (m_designType == DT_BETA) {
+    double betaAngle = 0;  // TODO should this really be = 0 if m_designType !=
+                           // DesignType::Beta?
+    if (m_designType == DesignType::Beta) {
         betaAngle = m_designBetaAngle;
     }
     m_betaAngle = betaAngle;
@@ -457,15 +456,15 @@ void ReflectionZonePlate::calcFresnelZOffset() {
 }
 
 /**
- * Calculate beta (exit angle) if DESIGN_TYPE == ZOFFSET from fresnel z offset
+ * Calculate beta (exit angle) if DesignType == ZOFFSET from fresnel z offset
  * analogous to calcFresnelZOffset if design type is beta.
  */
 void ReflectionZonePlate::calcBeta() {
-    if (m_designType == DT_ZOFFSET) {
+    if (m_designType == DesignType::ZOffset) {
         VectorR2Center();
         if (m_fresnelZOffset !=
             0) {  // m_fresnelZOffset is given by the user as a parameter bc
-                  // DESIGN_TYPE==DT_ZOFFSET
+                  // DesignType==DesignType::ZOffset
             m_betaAngle = acos(
                 (-m_R2ArmLength * m_R2ArmLength *
                  m_designSagittalExitArmLength * m_designSagittalExitArmLength *
@@ -479,7 +478,7 @@ void ReflectionZonePlate::calcBeta() {
  * needed for incidence and exit angle calculation
  */
 void ReflectionZonePlate::VectorR1Center() {
-    if (m_designType == DT_ZOFFSET) {
+    if (m_designType == DesignType::ZOffset) {
         double param_R1cosZ = m_designSagittalEntranceArmLength *
                               cos(m_designAlphaAngle) * m_fresnelZOffset;
         m_R1ArmLength =
@@ -487,7 +486,7 @@ void ReflectionZonePlate::VectorR1Center() {
                                                 sin(m_designAlphaAngle),
                                             2));
         m_alpha0Angle = acos(param_R1cosZ / m_R1ArmLength);
-    } else if (m_designType == DT_BETA) {
+    } else if (m_designType == DesignType::Beta) {
         double RIcosa =
             m_designSagittalEntranceArmLength * cos(m_designAlphaAngle);
         double ROcosb = m_designSagittalExitArmLength * cos(m_designBetaAngle);
@@ -503,7 +502,7 @@ void ReflectionZonePlate::VectorR1Center() {
  * needed for incidence and exit angle calculation
  */
 void ReflectionZonePlate::VectorR2Center() {
-    if (m_designType == DT_ZOFFSET) {
+    if (m_designType == DesignType::ZOffset) {
         VectorR1Center();
         double R2s = m_designSagittalExitArmLength;
         double alpha = m_alpha0Angle;  // why another alpha angle??
@@ -512,7 +511,7 @@ void ReflectionZonePlate::VectorR2Center() {
                    sqrt(pow(2 * R2s, 2) - 2 * pow(m_fresnelZOffset, 2) +
                         2 * pow(m_fresnelZOffset, 2) * cos(2 * alpha)));
         m_beta0Angle = m_alpha0Angle;
-    } else if (m_designType == DT_BETA) {
+    } else if (m_designType == DesignType::Beta) {
         double RIcosa =
             m_designSagittalEntranceArmLength * cos(m_designAlphaAngle);
         double ROcosb = m_designSagittalExitArmLength * cos(m_designBetaAngle);
@@ -533,10 +532,10 @@ void ReflectionZonePlate::VectorR2Center() {
 void ReflectionZonePlate::calcDesignOrderOfDiffraction(
     const double designOrderOfDiffraction) {
     int presign = 0;  // TODO should this really be = 0 if m_DesignType is
-                      // neither DT_ZOFFSET nor DT_BETA?
-    if (m_designType == DT_ZOFFSET) {
+                      // neither DesignType::ZOffset nor DesignType::Beta?
+    if (m_designType == DesignType::ZOffset) {
         presign = (m_designAlphaAngle >= m_designBetaAngle) ? -1 : 1;
-    } else if (m_designType == DT_BETA) {
+    } else if (m_designType == DesignType::Beta) {
         presign = (m_fresnelZOffset >= 0) ? -1 : 1;
     }
     RAYX_LOG << "presign: " << presign;
@@ -576,8 +575,8 @@ double ReflectionZonePlate::rzpLineDensityDZ(glm::dvec3 intersection,
     double ym = 0;
     double zm = 0;
 
-    if (m_imageType == IT_POINT2POINT) {       // point to point (standard)
-        if (normal.x == 0 && normal.z == 0) {  // plane
+    if (m_imageType == ImageType::Point2Point) {  // point to point (standard)
+        if (normal.x == 0 && normal.z == 0) {     // plane
             zi = -(risag * c_alpha + intersection.z);
             xi = intersection.x;
             yi = risag * s_alpha;
@@ -606,7 +605,7 @@ double ReflectionZonePlate::rzpLineDensityDZ(glm::dvec3 intersection,
                  normal.y * rosag * s_beta;
         }
     } else if (m_imageType ==
-               IT_ASTIGMATIC2ASTIGMATIC) {  // astigmatic to astigmatix
+               ImageType::Astigmatic2Astigmatic) {  // astigmatic to astigmatix
         double s_rim = rimer < 0 ? -1 : 1;
         double s_rom = romer < 0 ? -1 : 1;
         double c_2alpha = cos(2 * m_designAlphaAngle);
@@ -712,7 +711,7 @@ double ReflectionZonePlate::getFresnelZOffset() const {
 }
 
 double ReflectionZonePlate::getCalcFresnelZOffset() const {
-    return m_calcFresnelZOffset;  // calculated if DESIGN_TYPE==DT_BETA
+    return m_calcFresnelZOffset;  // calculated if DesignType==DesignType::Beta
 }
 
 // input and exit vector lengths

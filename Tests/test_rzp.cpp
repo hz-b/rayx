@@ -7,8 +7,8 @@ TEST(RZP, testdefaultParams) {
     RAYX::GratingMount mount = RAYX::GratingMount::Incidence;
     RAYX::Geometry::GeometricalShape geometricalShape =
         RAYX::Geometry::GeometricalShape::RECTANGLE;
-    int curvatureType = 0;
-    int imageType = 0;
+    RAYX::CurvatureType curvatureType = RAYX::CurvatureType::Plane;
+    auto imageType = RAYX::ImageType::Point2Point;
     int additionalOrder = 1;
     double beta_in = 0;
     double width = 50.0;
@@ -117,8 +117,8 @@ TEST(RZP, testdefaultParamsElliptical) {
     RAYX::GratingMount mount = RAYX::GratingMount::Incidence;
     RAYX::Geometry::GeometricalShape geometricalShape =
         RAYX::Geometry::GeometricalShape::ELLIPTICAL;
-    int curvatureType = 0;
-    int imageType = 0;
+    auto curvatureType = RAYX::CurvatureType::Plane;
+    auto imageType = RAYX::ImageType::Point2Point;
     int additionalOrder = 1;
     double beta_in = 0;
     double width = 50.0;
@@ -226,8 +226,8 @@ TEST(RZP, testParams) {
     RAYX::GratingMount mount = RAYX::GratingMount::Deviation;
     RAYX::Geometry::GeometricalShape geometricalShape =
         RAYX::Geometry::GeometricalShape::RECTANGLE;
-    int imageType = 0;
-    int curvatureType = 0;
+    auto imageType = RAYX::ImageType::Point2Point;
+    auto curvatureType = RAYX::CurvatureType::Plane;
     int additionalOrder = 0;
     double beta_in = 0;
     double width = 151.74;

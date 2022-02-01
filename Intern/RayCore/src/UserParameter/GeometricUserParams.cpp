@@ -42,7 +42,7 @@ GeometricUserParams::GeometricUserParams(GratingMount mount, double deviation,
 
 // RZP
 GeometricUserParams::GeometricUserParams(
-    GratingMount mount, int imageType, double deviationAngle,
+    GratingMount mount, ImageType imageType, double deviationAngle,
     double grazingIncidence, double grazingExitAngle, double sourceEnergy,
     double designEnergy, double orderOfDiffraction,
     double designOrderOfDiffraction, double designAlphaAngle,
@@ -147,12 +147,10 @@ void GeometricUserParams::focus(double angle, double designEnergy,
  * @param mExit
  * @return Dz00 = line density at 0,0??
  */
-double GeometricUserParams::calcDz00(int imageType, double designWavelength,
-                                     double designAlphaAngle,
-                                     double designBetaAngle,
-                                     double designOrderOfDiffraction,
-                                     double sEntrance, double sExit,
-                                     double mEntrance, double mExit) {
+double GeometricUserParams::calcDz00(
+    ImageType imageType, double designWavelength, double designAlphaAngle,
+    double designBetaAngle, double designOrderOfDiffraction, double sEntrance,
+    double sExit, double mEntrance, double mExit) {
     // double fresnelOffset = calcFresnelZOffset(designBetaAngle,
     // designAlphaAngle, sEntrance, sExit); // overwrite given Fresneloffset
     // RAYX-UI calls rzpLineDensity function in fortran
@@ -164,7 +162,7 @@ double GeometricUserParams::calcDz00(int imageType, double designWavelength,
 }
 
 /**
- * Calculate fresnel z offset if DESIGN_TYPE == BETA from design angles.
+ * Calculate fresnel z offset if DesignType == BETA from design angles.
  * @param designBetaAngle
  * @param designAlphaAngle
  * @param sEntrance             sagittal entrance arm length
@@ -200,7 +198,7 @@ double GeometricUserParams::calcFresnelZOffset(double designAlphaAngle,
  * @return line density on RZP in Z direction for given conditions
  */
 double GeometricUserParams::rzpLineDensityDZ(
-    int imageType, glm::dvec3 intersection, glm::dvec3 normal,
+    ImageType imageType, glm::dvec3 intersection, glm::dvec3 normal,
     double designWavelength, double designAlphaAngle, double designBetaAngle,
     double designOrderOfDiffraction, double sEntrance, double sExit,
     double mEntrance, double mExit) {
@@ -225,8 +223,8 @@ double GeometricUserParams::rzpLineDensityDZ(
     double ym = 0;
     double zm = 0;
 
-    if (imageType == 0) {                      // point to point (standard)
-        if (normal.x == 0 && normal.z == 0) {  // plane
+    if (imageType == ImageType::Point2Point) {  // point to point (standard)
+        if (normal.x == 0 && normal.z == 0) {   // plane
             zi = -(risag * c_alpha + intersection.z);
             xi = intersection.x;
             yi = risag * s_alpha;
@@ -254,7 +252,8 @@ double GeometricUserParams::rzpLineDensityDZ(
                  normal.z * intersection.z + normal.z * rosag * c_beta +
                  normal.y * rosag * s_beta;
         }
-    } else if (imageType == 1) {  // astigmatic to astigmatix
+    } else if (imageType ==
+               ImageType::Astigmatic2Astigmatic) {  // astigmatic to astigmatix
         double s_rim = rimer < 0 ? -1 : 1;
         double s_rom = romer < 0 ? -1 : 1;
         double c_2alpha = cos(2 * designAlphaAngle);

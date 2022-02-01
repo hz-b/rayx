@@ -9,13 +9,29 @@
 
 namespace RAYX {
 
+enum class CurvatureType {
+    Plane,
+    Toroidal,
+    Spherical
+};  // influences surface paramters for eg quadric function or (if torus)
+    // newton iteration
+enum class DesignType {
+    ZOffset,
+    Beta
+};  // TODO(Jannis): remove (default is Beta)
+enum class ElementOffsetType {
+    Manual,
+    Beamdivergence
+};  // TODO(Jannis): remove (included in world coordinates)
+enum class RZPType { Elliptical, Meriodional };
+
 class RAYX_API ReflectionZonePlate : public OpticalElement {
   public:
     // shortened constructor that assumes that the angles are already calculated
     // and the position and orientation in world coordinates is already derived
     ReflectionZonePlate(
         const char* name, Geometry::GeometricalShape geometricalShape,
-        const int curvatureType, const double width, const double height,
+        CurvatureType curvatureType, const double width, const double height,
         const double azimuthalAngle, const glm::dvec4 position,
         const glm::dmat4x4 orientation, const double designEnergy,
         const double orderOfDiffraction, const double designOrderOfDiffraction,
@@ -28,7 +44,7 @@ class RAYX_API ReflectionZonePlate : public OpticalElement {
     // ! temporary constructor for trapezoid (10/11/2021)
     ReflectionZonePlate(
         const char* name, Geometry::GeometricalShape geometricalShape,
-        const int curvatureType, const double widthA, const double widthB,
+        CurvatureType curvatureType, const double widthA, const double widthB,
         const double height, const double azimuthalAngle,
         const glm::dvec4 position, const glm::dmat4x4 orientation,
         const double designEnergy, const double orderOfDiffraction,
@@ -51,7 +67,7 @@ class RAYX_API ReflectionZonePlate : public OpticalElement {
     double calcZOffset();
     double calcDz00();
     // beta and fresnelZOffset are dependant of each other, depending on the
-    // given DESIGN_TYPE one is calculated from the other in calcDz00
+    // given DesignType one is calculated from the other in calcDz00
     void calcFresnelZOffset();  // from beta
     void calcBeta();            // from fresneloffset
     // calculates some more arms from the ones that are given by the user
@@ -95,32 +111,16 @@ class RAYX_API ReflectionZonePlate : public OpticalElement {
     double getDesignEnergyMounting() const;  // derived from source?
     void printInfo() const;
 
-    enum CURVATURE_TYPE {
-        CT_PLANE,
-        CT_TOROIDAL,
-        CT_SPHERICAL
-    };  // influences surface paramters for eg quadric function or (if torus)
-        // newton iteration
-    enum DESIGN_TYPE {
-        DT_ZOFFSET,
-        DT_BETA
-    };  // TODO(Jannis): remove (default is DT_BETA)
-    enum ELEMENTOFFSET_TYPE {
-        EZ_MANUAL,
-        EZ_BEAMDIVERGENCE
-    };  // TODO(Jannis): remove (included in world coordinates)
-    enum IMAGE_TYPE { IT_POINT2POINT, IT_ASTIGMATIC2ASTIGMATIC };
-    enum RZP_TYPE { RT_ELLIPTICAL, RT_MERIODIONAL };
-
   private:
     // User Parameter,
     double m_incidenceMainBeamLength;
     double m_meridionalDistance;
     double m_meridionalDivergence;
-    double m_fresnelZOffset;      ///< parameter given by user in
-                                  ///< DESIGN_TYPE==DT_ZOFFSET
-    double m_calcFresnelZOffset;  ///< calculated if DESIGN_TYPE==DT_BETA
-    double m_zOff;                ///< zoffset dependant on elementOffSetType
+    double m_fresnelZOffset;  ///< parameter given by user in
+                              ///< DesignType==DesignType::ZOffset
+    double
+        m_calcFresnelZOffset;  ///< calculated if DesignType==DesignType::Beta
+    double m_zOff;             ///< zoffset dependant on elementOffSetType
     double m_illuminationZ;
     double m_designEnergyMounting;  //? derived from source?
     // TODO(Theresa): include in world coordinates:
@@ -162,17 +162,17 @@ class RAYX_API ReflectionZonePlate : public OpticalElement {
     GratingMount m_gratingMount;
 
     // TODO(Jannis): move
-    CURVATURE_TYPE m_curvatureType;
+    CurvatureType m_curvatureType;
 
     // set to default for now
     // int m_designType;
     int m_derivationMethod;
     // int m_elementOffsetType;
-    DESIGN_TYPE m_designType;
-    ELEMENTOFFSET_TYPE m_elementOffsetType;
+    DesignType m_designType;
+    ElementOffsetType m_elementOffsetType;
     // TODO(Jannis): have a look at this later
-    IMAGE_TYPE m_imageType;
-    RZP_TYPE m_rzpType;
+    ImageType m_imageType;
+    RZPType m_rzpType;
     double m_additionalOrder;
 
     // Surface Parameter (also in Toroid)
