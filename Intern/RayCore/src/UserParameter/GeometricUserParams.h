@@ -15,19 +15,21 @@
 
 namespace RAYX {
 
+enum class GratingMount { Deviation, Incidence };
+
 class RAYX_API GeometricUserParams {
   public:
     // constructor for plane and sphere mirrors
     GeometricUserParams(double incidenceAngle);
     // constructor for gratings
-    GeometricUserParams(int mount, double deviation, double normalIncidence,
-                        double lineDensity, double designEnergy,
-                        int orderOfDiffraction);
+    GeometricUserParams(GratingMount mount, double deviation,
+                        double normalIncidence, double lineDensity,
+                        double designEnergy, int orderOfDiffraction);
     // constructor for rzp
-    GeometricUserParams(int mount, int imageType, double deviationAngle,
-                        double grazingIncidence, double grazingExitAngle,
-                        double sourceEnergy, double designEnergy,
-                        double orderOfDiffraction,
+    GeometricUserParams(GratingMount mount, int imageType,
+                        double deviationAngle, double grazingIncidence,
+                        double grazingExitAngle, double sourceEnergy,
+                        double designEnergy, double orderOfDiffraction,
                         double designOrderOfDiffraction,
                         double designAlphaAngle, double designBetaAngle,
                         double mEntrance, double mExit, double sEntrance,
@@ -55,7 +57,7 @@ class RAYX_API GeometricUserParams {
                             double exitArmLength, int coordSys);
 
     void calcMirrorRadius(double entranceArmLength, double exitArmLength);
-    void calcGratingRadius(int mount, double deviation,
+    void calcGratingRadius(GratingMount mount, double deviation,
                            double entranceArmLength, double exitArmLength);
     void calcTorusRadius(double incidenceAngle, double sEntrance, double sExit,
                          double mEntrance, double mExit);
@@ -64,8 +66,6 @@ class RAYX_API GeometricUserParams {
     double getBeta();
     double getRadius();
     double getShortRadius();
-
-    enum class GratingMount { Deviation, Incidence };
 
   private:
     double m_alpha;

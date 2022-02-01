@@ -44,18 +44,18 @@ namespace RAYX {
 PointSource::PointSource(const std::string name, EnergyDistribution dist,
                          const double sourceWidth, const double sourceHeight,
                          const double sourceDepth, const double horDivergence,
-                         const double verDivergence, const int widthDist,
-                         const int heightDist, const int horDist,
-                         const int verDist, const double linPol0,
+                         const double verDivergence, SourceDist widthDist,
+                         SourceDist heightDist, SourceDist horDist,
+                         SourceDist verDist, const double linPol0,
                          const double linPol45, const double circPol,
                          const std::array<double, 6> misalignment)
     : LightSource(name.c_str(), dist, linPol0, linPol45, circPol, misalignment,
                   sourceDepth, sourceHeight, sourceWidth, horDivergence,
                   verDivergence) {
-    m_widthDist = widthDist == 0 ? SD_UNIFORM : SD_GAUSSIAN;
-    m_heightDist = heightDist == 0 ? SD_UNIFORM : SD_GAUSSIAN;
-    m_horDist = horDist == 0 ? SD_UNIFORM : SD_GAUSSIAN;
-    m_verDist = verDist == 0 ? SD_UNIFORM : SD_GAUSSIAN;
+    m_widthDist = widthDist;
+    m_heightDist = heightDist;
+    m_horDist = horDist;
+    m_verDist = verDist;
     std::normal_distribution<double> m_stdnorm(0, 1);
     std::uniform_real_distribution<double> m_uniform(0, 1);
     std::default_random_engine m_re;
@@ -144,8 +144,10 @@ std::shared_ptr<PointSource> PointSource::createFromXML(
 
     return std::make_shared<PointSource>(
         name, energyDistribution, sourceWidth, sourceHeight, sourceDepth,
-        horDivergence / 1000.0, verDivergence / 1000.0, widthDist, heightDist,
-        horDist, verDist, linPol0, linPol45, circPol, misalignment);
+        horDivergence / 1000.0, verDivergence / 1000.0,
+        static_cast<SourceDist>(widthDist), static_cast<SourceDist>(heightDist),
+        static_cast<SourceDist>(horDist), static_cast<SourceDist>(verDist),
+        linPol0, linPol45, circPol, misalignment);
 }
 
 /**
@@ -203,9 +205,8 @@ std::vector<Ray> PointSource::getRays() {
  * hard edge, gaussian if soft edge)) and extent (eg specified width/height of
  * source)
  */
-double PointSource::getCoord(const PointSource::SOURCE_DIST l,
-                             const double extent) {
-    if (l == SD_UNIFORM) {
+double PointSource::getCoord(const SourceDist l, const double extent) {
+    if (l == SourceDist::Uniform) {
         return (m_uniformDist(m_randEngine) - 0.5) * extent;
     } else {
         return (m_normDist(m_randEngine) * extent);

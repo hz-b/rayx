@@ -1,6 +1,7 @@
 #pragma once
 #include <Data/xml.h>
 #include <Tracer/Vulkan/Material.h>
+#include <UserParameter/GeometricUserParams.h>
 
 #include "Model/Beamline/OpticalElement.h"
 #include "Model/Surface/Quadric.h"
@@ -71,7 +72,7 @@ class RAYX_API ReflectionZonePlate : public OpticalElement {
     double getDesignAlphaAngle() const;
     double getDesignBetaAngle() const;
 
-    double getGratingMount() const;
+    GratingMount getGratingMount() const;
 
     double getLongRadius() const;
     double getShortRadius() const;

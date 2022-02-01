@@ -68,13 +68,6 @@ class RAYX_API OpticalElement : public BeamlineObject {
     OpticalElement();
     ~OpticalElement();
 
-    // TODO(Jannis): move to geometry
-    enum GratingMount {
-        Deviation,
-        Incidence
-    };  ///< influences incidence and exit angle calculation (moved somewhere
-        ///< else)
-
   private:
     // GEOMETRY
     std::unique_ptr<Geometry> m_geometry;  // will replace all of the following

@@ -65,7 +65,7 @@ void Application::loadDummyBeamline() {  // ! objects are created here
     double incidenceAngle =
         0;  // if incidence angle = 0 and mount = 1 use dAlpha as incidenceAngle
     double deviationAngle = 0;  // does not matter bc mount = 1
-    int mount = 1;              // incidence
+    GratingMount mount = GratingMount::Incidence;
     double exitAngle = 0;
     int imageType = 1;
     int additionalOrder = 1;

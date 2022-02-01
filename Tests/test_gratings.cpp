@@ -9,8 +9,7 @@ TEST(planeGrating, testParams) {
     double azimuthal = 61.142;
     double dist = 1245.71;
 
-    int mount =
-        0;  // { GM_DEVIATION, GM_INCIDENCE, GM_CCF, GM_CCF_NO_PREMIRROR}
+    RAYX::GratingMount mount = RAYX::GratingMount::Deviation;
     RAYX::Geometry::GeometricalShape geometricalShape =
         RAYX::Geometry::GeometricalShape::RECTANGLE;
     double deviation = 12.4;
@@ -108,7 +107,7 @@ TEST(planeGraing, mount1) {
     double azimuthal = 61.142;
     double dist = 1245.71;
 
-    int mount = 1;
+    RAYX::GratingMount mount = RAYX::GratingMount::Incidence;
     RAYX::Geometry::GeometricalShape geometricalShape =
         RAYX::Geometry::GeometricalShape::RECTANGLE;
     double deviation = 12.4;
@@ -206,7 +205,7 @@ TEST(planeGrating, higherOrderOfDiffraction) {
     double azimuthal = 61.142;
     double dist = 1245.71;
 
-    int mount = 1;
+    RAYX::GratingMount mount = RAYX::GratingMount::Incidence;
     RAYX::Geometry::GeometricalShape geometricalShape =
         RAYX::Geometry::GeometricalShape::RECTANGLE;
     double deviation = 12.4;
@@ -322,7 +321,7 @@ TEST(planeGrating, deviation) {
     std::array<double, 7> sE = {0, 0, 0, 0, 0, 0, 0};
     std::array<double, 6> vls = {2.1, 0.12, 12.2, 8.3, 5.1, 7.23};
 
-    int mount = 0;
+    RAYX::GratingMount mount = RAYX::GratingMount::Deviation;
     double alpha = 1.4473913414095938;
     double beta = 1.4777804849329026;
 
@@ -409,7 +408,7 @@ TEST(PlaneGrating, testHvlam) {
 }
 
 TEST(SphereGrating, testParams) {
-    int mount = 0;
+    RAYX::GratingMount mount = RAYX::GratingMount::Deviation;
     RAYX::Geometry::GeometricalShape geometricalShape =
         RAYX::Geometry::GeometricalShape::RECTANGLE;
     double width = 241.623;
@@ -487,7 +486,8 @@ TEST(SphereGrating, testParams) {
 
     ASSERT_DOUBLE_EQ(s1.getWidth(), width);
     ASSERT_DOUBLE_EQ(s1.getHeight(), height);
-    ASSERT_DOUBLE_EQ(s1.getGratingMount(), mount);
+    ASSERT_DOUBLE_EQ(static_cast<int>(s1.getGratingMount()),
+                     static_cast<int>(mount));
     ASSERT_DOUBLE_EQ(s1.getLineDensity(), linedensity);
     ASSERT_DOUBLE_EQ(s1.getDesignEnergyMounting(), designEnergy);
     ASSERT_DOUBLE_EQ(s1.getOrderOfDiffraction(), double(order));

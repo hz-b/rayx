@@ -1,6 +1,7 @@
 #pragma once
 #include <Data/xml.h>
 #include <Tracer/Vulkan/Material.h>
+#include <UserParameter/GeometricUserParams.h>
 
 #include "Model/Beamline/OpticalElement.h"
 #include "Model/Surface/Quadric.h"
@@ -10,7 +11,7 @@ namespace RAYX {
 class RAYX_API SphereGrating : public OpticalElement {
   public:
     // new, shortened constructor
-    SphereGrating(const char* name, int mount,
+    SphereGrating(const char* name, GratingMount mount,
                   Geometry::GeometricalShape geometricalShape, double width,
                   double height, const double azimuthalAngle, double radius,
                   glm::dvec4 position, glm::dmat4x4 orientation,
@@ -34,7 +35,7 @@ class RAYX_API SphereGrating : public OpticalElement {
     double getExitArmLength() const;
     double getEntranceArmLength() const;
     double getDeviation() const;  // not always calculated
-    int getGratingMount() const;
+    GratingMount getGratingMount() const;
     double getDesignEnergyMounting() const;
     double getLineDensity() const;
     double getOrderOfDiffraction() const;

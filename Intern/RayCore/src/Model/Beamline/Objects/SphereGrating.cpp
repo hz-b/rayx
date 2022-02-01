@@ -32,12 +32,15 @@ namespace RAYX {
  * @param mat                           material (See Material.h)
  *
  */
-SphereGrating::SphereGrating(
-    const char* name, int mount, Geometry::GeometricalShape geometricalShape,
-    double width, double height, const double azimuthalAngle, double radius,
-    glm::dvec4 position, glm::dmat4x4 orientation, double designEnergyMounting,
-    double lineDensity, double orderOfDiffraction, std::array<double, 6> vls,
-    std::array<double, 7> slopeError, Material mat)
+SphereGrating::SphereGrating(const char* name, GratingMount mount,
+                             Geometry::GeometricalShape geometricalShape,
+                             double width, double height,
+                             const double azimuthalAngle, double radius,
+                             glm::dvec4 position, glm::dmat4x4 orientation,
+                             double designEnergyMounting, double lineDensity,
+                             double orderOfDiffraction,
+                             std::array<double, 6> vls,
+                             std::array<double, 7> slopeError, Material mat)
     : OpticalElement(name, geometricalShape, width, height, azimuthalAngle,
                      position, orientation, slopeError),
       m_designEnergyMounting(designEnergyMounting),
@@ -47,7 +50,7 @@ SphereGrating::SphereGrating(
     RAYX_LOG << name;
 
     double icurv = 1;
-    m_gratingMount = mount == 0 ? GratingMount::Deviation : GratingMount::Incidence;
+    m_gratingMount = mount;
     double matd = (double)static_cast<int>(mat);
     setSurface(std::make_unique<Quadric>(std::array<double, 4 * 4>{
         1, 0, 0, 0, icurv, 1, 0, -radius, 0, 0, 1, 0, 2, 0, matd, 0}));
@@ -63,10 +66,11 @@ std::shared_ptr<SphereGrating> SphereGrating::createFromXML(
     rapidxml::xml_node<>* node, const std::vector<xml::Group>& group_context) {
     const char* name = node->first_attribute("name")->value();
 
-    int mount;
-    if (!xml::paramInt(node, "gratingMount", &mount)) {
+    int mount_int;
+    if (!xml::paramInt(node, "gratingMount", &mount_int)) {
         return nullptr;
     }
+    GratingMount mount = static_cast<GratingMount>(mount_int);
 
     int gs;
     if (!xml::paramInt(node, "geometricalShape", &gs)) {
@@ -206,7 +210,7 @@ double SphereGrating::getEntranceArmLength() const {
 }
 
 double SphereGrating::getDeviation() const { return m_deviation; }
-int SphereGrating::getGratingMount() const { return m_gratingMount; }
+GratingMount SphereGrating::getGratingMount() const { return m_gratingMount; }
 double SphereGrating::getDesignEnergyMounting() const {
     return m_designEnergyMounting;
 }

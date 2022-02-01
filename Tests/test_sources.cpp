@@ -206,8 +206,10 @@ TEST(PointSource, testParams) {
     RAYX::EnergyDistribution dist(RAYX::EnergyRange(photonEnergy, energySpread),
                                   false);
     RAYX::PointSource p = RAYX::PointSource(
-        "Point source 1", dist, width, height, depth, hor, ver, 0, 0, 0, 0,
-        lin0, lin45, circ, misalignment);  // 0 = hard edge (uniform)
+        "Point source 1", dist, width, height, depth, hor, ver,
+        RAYX::SourceDist::Uniform, RAYX::SourceDist::Uniform,
+        RAYX::SourceDist::Uniform, RAYX::SourceDist::Uniform, lin0, lin45, circ,
+        misalignment);  // 0 = hard edge (uniform)
 
     ASSERT_DOUBLE_EQ(p.getSourceDepth(), depth);
     ASSERT_DOUBLE_EQ(p.getSourceWidth(), width);
@@ -236,8 +238,10 @@ TEST(LightSource, PointSourceHardEdge) {
     RAYX::EnergyDistribution dist(RAYX::EnergyRange(photonEnergy, energySpread),
                                   true);
     RAYX::PointSource p = RAYX::PointSource(
-        "Point source 1", dist, width, height, depth, hor, ver, 0, 0, 0, 0,
-        lin0, lin45, circ, mis);  // 0 = hard edge (uniform)
+        "Point source 1", dist, width, height, depth, hor, ver,
+        RAYX::SourceDist::Uniform, RAYX::SourceDist::Uniform,
+        RAYX::SourceDist::Uniform, RAYX::SourceDist::Uniform, lin0, lin45, circ,
+        mis);  // 0 = hard edge (uniform)
 
     ASSERT_DOUBLE_EQ(p.getSourceDepth(), depth);
     ASSERT_DOUBLE_EQ(p.getSourceWidth(), width);
@@ -289,8 +293,10 @@ TEST(LightSource, PointSourceSoftEdge) {
     RAYX::EnergyDistribution dist(RAYX::EnergyRange(photonEnergy, energySpread),
                                   true);
     RAYX::PointSource p = RAYX::PointSource(
-        "Point source 1", dist, width, height, depth, hor, ver, 1, 1, 1, 1,
-        lin0, lin45, circ, mis);  // 1 = soft edge (gaussian)
+        "Point source 1", dist, width, height, depth, hor, ver,
+        RAYX::SourceDist::Gaussian, RAYX::SourceDist::Gaussian,
+        RAYX::SourceDist::Gaussian, RAYX::SourceDist::Gaussian, lin0, lin45,
+        circ, mis);  // 1 = soft edge (gaussian)
 
     ASSERT_DOUBLE_EQ(p.getSourceDepth(), depth);
     ASSERT_DOUBLE_EQ(p.getSourceWidth(), width);
@@ -342,8 +348,10 @@ TEST(LightSource, PointSourceHardEdgeMis) {
     RAYX::EnergyDistribution dist(RAYX::EnergyRange(photonEnergy, energySpread),
                                   false);
     RAYX::PointSource p = RAYX::PointSource(
-        "Point source 1", dist, width, height, depth, hor, ver, 0, 0, 0, 0,
-        lin0, lin45, circ, mis);  // 0 = hard edge (uniform)
+        "Point source 1", dist, width, height, depth, hor, ver,
+        RAYX::SourceDist::Uniform, RAYX::SourceDist::Uniform,
+        RAYX::SourceDist::Uniform, RAYX::SourceDist::Uniform, lin0, lin45, circ,
+        mis);  // 0 = hard edge (uniform)
 
     std::vector<RAYX::Ray> rays = p.getRays();
     ASSERT_EQ(rays.size(), number_of_rays);
@@ -391,8 +399,10 @@ TEST(LightSource, PointSourceSoftEdgeMis) {
     RAYX::EnergyDistribution dist(RAYX::EnergyRange(photonEnergy, energySpread),
                                   false);
     RAYX::PointSource p = RAYX::PointSource(
-        "Point source 1", dist, width, height, depth, hor, ver, 1, 1, 1, 1,
-        lin0, lin45, circ, mis);  // 1 = soft edge (gaussian)
+        "Point source 1", dist, width, height, depth, hor, ver,
+        RAYX::SourceDist::Gaussian, RAYX::SourceDist::Gaussian,
+        RAYX::SourceDist::Gaussian, RAYX::SourceDist::Gaussian, lin0, lin45,
+        circ, mis);  // 1 = soft edge (gaussian)
 
     std::vector<RAYX::Ray> rays = p.getRays();
     ASSERT_EQ(rays.size(), number_of_rays);
@@ -471,9 +481,11 @@ TEST(LightSource, PointSource20000) {
     double lin45 = 0;
     double circ = 0;
     RAYX::EnergyDistribution dist(RAYX::EnergyRange(640, 120), false);
-    RAYX::PointSource p =
-        RAYX::PointSource("spec1_first_rzp4", dist, 0.005, 0.005, 0, 0.02, 0.06,
-                          1, 1, 0, 0, lin0, lin45, circ, {0, 0, 0, 0});
+    RAYX::PointSource p = RAYX::PointSource(
+        "spec1_first_rzp4", dist, 0.005, 0.005, 0, 0.02, 0.06,
+        RAYX::SourceDist::Gaussian, RAYX::SourceDist::Gaussian,
+        RAYX::SourceDist::Uniform, RAYX::SourceDist::Uniform, lin0, lin45, circ,
+        {0, 0, 0, 0});
 
     std::vector<RAYX::Ray> rays = p.getRays();
     ASSERT_EQ(rays.size(), number_of_rays);

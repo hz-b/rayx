@@ -699,7 +699,9 @@ double ReflectionZonePlate::getDesignBetaAngle() const {
     return m_designBetaAngle;
 }
 
-double ReflectionZonePlate::getGratingMount() const { return m_gratingMount; }
+GratingMount ReflectionZonePlate::getGratingMount() const {
+    return m_gratingMount;
+}
 
 double ReflectionZonePlate::getLongRadius() const { return m_longRadius; }
 

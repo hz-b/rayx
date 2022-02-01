@@ -4,7 +4,7 @@
 #if RUN_TEST_RZP
 
 TEST(RZP, testdefaultParams) {
-    int mount = 1;  // incidence
+    RAYX::GratingMount mount = RAYX::GratingMount::Incidence;
     RAYX::Geometry::GeometricalShape geometricalShape =
         RAYX::Geometry::GeometricalShape::RECTANGLE;
     int curvatureType = 0;
@@ -114,7 +114,7 @@ TEST(RZP, testdefaultParams) {
 }
 
 TEST(RZP, testdefaultParamsElliptical) {
-    int mount = 1;  // incidence
+    RAYX::GratingMount mount = RAYX::GratingMount::Incidence;
     RAYX::Geometry::GeometricalShape geometricalShape =
         RAYX::Geometry::GeometricalShape::ELLIPTICAL;
     int curvatureType = 0;
@@ -223,7 +223,7 @@ TEST(RZP, testdefaultParamsElliptical) {
 }
 
 TEST(RZP, testParams) {
-    int mount = 0;  // deviation
+    RAYX::GratingMount mount = RAYX::GratingMount::Deviation;
     RAYX::Geometry::GeometricalShape geometricalShape =
         RAYX::Geometry::GeometricalShape::RECTANGLE;
     int imageType = 0;

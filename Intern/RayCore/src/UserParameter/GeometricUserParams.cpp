@@ -25,16 +25,16 @@ GeometricUserParams::GeometricUserParams(double incidenceAngle)
  * @param additionalOrder       0/1 whether or not to trace the zero order
  * @param orderOfDiffraction    order of diffraction that should be traced
  */
-GeometricUserParams::GeometricUserParams(int mount, double deviation,
+GeometricUserParams::GeometricUserParams(GratingMount mount, double deviation,
                                          double normalIncidence,
                                          double lineDensity,
                                          double designEnergy,
                                          int orderOfDiffraction)
     : m_radius(0), m_shortRadius(0) {
     double angle = 0;  // TODO what should angle be if mount is neither 0 or 1?
-    if (mount == 0) {  // incidence
+    if (mount == GratingMount::Deviation) {
         angle = deviation;
-    } else if (mount == 1) {  // deviation
+    } else if (mount == GratingMount::Incidence) {
         angle = -normalIncidence;
     }
     focus(angle, designEnergy, lineDensity, orderOfDiffraction);
@@ -42,11 +42,12 @@ GeometricUserParams::GeometricUserParams(int mount, double deviation,
 
 // RZP
 GeometricUserParams::GeometricUserParams(
-    int mount, int imageType, double deviationAngle, double grazingIncidence,
-    double grazingExitAngle, double sourceEnergy, double designEnergy,
-    double orderOfDiffraction, double designOrderOfDiffraction,
-    double designAlphaAngle, double designBetaAngle, double mEntrance,
-    double mExit, double sEntrance, double sExit)
+    GratingMount mount, int imageType, double deviationAngle,
+    double grazingIncidence, double grazingExitAngle, double sourceEnergy,
+    double designEnergy, double orderOfDiffraction,
+    double designOrderOfDiffraction, double designAlphaAngle,
+    double designBetaAngle, double mEntrance, double mExit, double sEntrance,
+    double sExit)
     : m_radius(0), m_shortRadius(0) {
     double designWavelength = hvlam(designEnergy);
     double sourceWavelength = hvlam(sourceEnergy);
@@ -54,8 +55,7 @@ GeometricUserParams::GeometricUserParams(
         calcDz00(imageType, designWavelength, designAlphaAngle, designBetaAngle,
                  designOrderOfDiffraction, sEntrance, sExit, mEntrance, mExit);
 
-    GratingMount gratingMount =
-        mount == 0 ? GratingMount::Deviation : GratingMount::Incidence;
+    GratingMount gratingMount = mount;
     // calculate alpha depending on either incidence or deviation angle IF
     // incidence not given directly
     if (grazingIncidence == 0) {
@@ -363,15 +363,16 @@ void GeometricUserParams::calcMirrorRadius(double entranceArmLength,
 }
 
 // calculate radius for sphere grating
-void GeometricUserParams::calcGratingRadius(int mount, double deviation,
+void GeometricUserParams::calcGratingRadius(GratingMount mount,
+                                            double deviation,
                                             double entranceArmLength,
                                             double exitArmLength) {
-    if (mount == 0) {  // deviation
+    if (mount == GratingMount::Deviation) {
         double theta =
             deviation > 0 ? (PI - deviation) / 2 : PI / 2 + deviation;
         m_radius =
             2.0 / sin(theta) / (1.0 / entranceArmLength + 1.0 / exitArmLength);
-    } else if (mount == 1) {  // incidence
+    } else if (mount == GratingMount::Incidence) {
         double ca = cos(m_alpha);
         double cb = cos(m_beta);
         m_radius = (ca + cb) /
