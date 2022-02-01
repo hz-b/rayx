@@ -33,7 +33,7 @@ Ellipsoid::Ellipsoid(const char* name,
                      const double azimuthalAngle, glm::dvec4 position,
                      glm::dmat4x4 orientation, const double grazingIncidence,
                      const double entranceArmLength, const double exitArmLength,
-                     const int figRot, const double a_11,
+                     FigureRotation figRot, const double a_11,
                      const std::array<double, 7> slopeError, Material mat)
     : OpticalElement(name, geometricalShape, width, height, azimuthalAngle,
                      position, orientation, slopeError),
@@ -45,8 +45,7 @@ Ellipsoid::Ellipsoid(const char* name,
     m_offsetY0 =
         0;  // what is this for? RAYX.FOR: "only !=0 in case of Monocapillary"
 
-    m_figureRotation =
-        (figRot == 0 ? FR_YES : (figRot == 1 ? FR_PLANE : FR_A11));
+    m_figureRotation = figRot;
     calcHalfAxes();
     calculateCenterFromHalfAxes(m_incidence);
 
@@ -79,7 +78,7 @@ Ellipsoid::Ellipsoid(const char* name,
                      const double DesignAngle, glm::dmat4x4 orientation,
                      const double grazingIncidence,
                      const double entranceArmLength, const double exitArmLength,
-                     const int figRot, const double a_11,
+                     FigureRotation figRot, const double a_11,
                      const std::array<double, 7> slopeError, Material mat)
     : OpticalElement(name, geometricalShape, width, height, azimuthalAngle,
                      position, orientation, slopeError),
@@ -94,17 +93,16 @@ Ellipsoid::Ellipsoid(const char* name,
     m_offsetY0 =
         0;  // what is this for? RAY.FOR: "only !=0 in case of Monocapillary"
 
-    m_figureRotation =
-        (figRot == 0 ? FR_YES : (figRot == 1 ? FR_PLANE : FR_A11));
+    m_figureRotation = figRot;
 
     // if design angle not given, take incidenceAngle
     calculateCenterFromHalfAxes(m_DesignGrazingAngle);
 
     // calculate half axis C
-    if (m_figureRotation == FR_YES) {
+    if (m_figureRotation == FigureRotation::Yes) {
         m_halfAxisC = m_shortHalfAxisB;  // sqrt(pow(m_shortHalfAxisB, 2) / 1);
                                          // devided by 1??
-    } else if (m_figureRotation == FR_PLANE) {
+    } else if (m_figureRotation == FigureRotation::Plane) {
         m_halfAxisC = INFINITY;
     } else {
         m_halfAxisC = sqrt(pow(m_shortHalfAxisB, 2) / m_a11);
@@ -206,9 +204,9 @@ void Ellipsoid::calcHalfAxes() {
     m_shortHalfAxisB = b;
 
     // calculate half axis C
-    if (m_figureRotation == FR_YES) {
+    if (m_figureRotation == FigureRotation::Yes) {
         m_halfAxisC = sqrt(pow(m_shortHalfAxisB, 2) / 1);  // devided by 1??
-    } else if (m_figureRotation == FR_PLANE) {
+    } else if (m_figureRotation == FigureRotation::Plane) {
         m_halfAxisC = INFINITY;
     } else {
         m_halfAxisC = sqrt(pow(m_shortHalfAxisB, 2) / m_a11);
@@ -284,9 +282,9 @@ std::shared_ptr<Ellipsoid> Ellipsoid::createFromXML(
     if (!xml::paramDouble(node, "parameter_a11", &m_a11)) {
         return nullptr;
     }
-    int m_figRot;
+    int figRot;
     // const char* fig_rot; // TODO unused
-    if (!xml::paramInt(node, "figureRotation", &m_figRot)) {
+    if (!xml::paramInt(node, "figureRotation", &figRot)) {
         return nullptr;
     }
 
@@ -383,14 +381,14 @@ std::shared_ptr<Ellipsoid> Ellipsoid::createFromXML(
         (mshortHalfAxisB == 0.0)) {  // Auto calculation
         return std::make_shared<Ellipsoid>(
             name, geometricalShape, width, height, degToRad(mAzimAngle),
-            position, orientation, incidenceAngle, mEntrance, mExit, m_figRot,
-            m_a11, slopeError, mat);
+            position, orientation, incidenceAngle, mEntrance, mExit,
+            static_cast<FigureRotation>(figRot), m_a11, slopeError, mat);
     } else {
         return std::make_shared<Ellipsoid>(
             name, geometricalShape, width, height, degToRad(mAzimAngle),
             position, mlongHalfAxisA, mshortHalfAxisB, mDesignGrazing,
-            orientation, incidenceAngle, mEntrance, mExit, m_figRot, m_a11,
-            slopeError, mat);
+            orientation, incidenceAngle, mEntrance, mExit,
+            static_cast<FigureRotation>(figRot), m_a11, slopeError, mat);
     }
 }
 }  // namespace RAYX

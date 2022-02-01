@@ -9,6 +9,8 @@
 #include "UserParameter/WorldUserParams.h"
 
 namespace RAYX {
+enum class FigureRotation { Yes, Plane, A11 };
+
 // TODO(Jannis): rename or turn into surface
 class RAYX_API Ellipsoid : public OpticalElement {
   public:
@@ -18,7 +20,7 @@ class RAYX_API Ellipsoid : public OpticalElement {
               const double azimuthalAngle, glm::dvec4 position,
               glm::dmat4x4 orientation, const double grazingIncidence,
               const double entranceArmLength, const double exitArmLength,
-              const int figRot, const double a_11,
+              FigureRotation figRot, const double a_11,
               const std::array<double, 7> slopeError, Material mat);
 
     Ellipsoid(const char* name, Geometry::GeometricalShape geometricalShape,
@@ -27,8 +29,9 @@ class RAYX_API Ellipsoid : public OpticalElement {
               const double LongHalfAxisA, const double ShortHalfAxisB,
               const double DesignAngle, glm::dmat4x4 orientation,
               const double grazingIncidence, const double entranceArmLength,
-              const double exitArmLength, const int figRot, const double a_11,
-              const std::array<double, 7> slopeError, Material mat);
+              const double exitArmLength, FigureRotation figRot,
+              const double a_11, const std::array<double, 7> slopeError,
+              Material mat);
     Ellipsoid();
     ~Ellipsoid();
 
@@ -54,8 +57,6 @@ class RAYX_API Ellipsoid : public OpticalElement {
     static std::shared_ptr<Ellipsoid> createFromXML(
         rapidxml::xml_node<>*, const std::vector<xml::Group>& group_context);
 
-    enum FIGURE_ROTATION { FR_YES, FR_PLANE, FR_A11 };
-
   private:
     // user parameters:
     double m_radius;
@@ -63,7 +64,7 @@ class RAYX_API Ellipsoid : public OpticalElement {
     double m_incidence;
     double m_entranceArmLength;
     double m_exitArmLength;
-    FIGURE_ROTATION m_figureRotation;
+    FigureRotation m_figureRotation;
     double m_a11;  // param for quadric funciton, given by user
 
     // derived params, needed on shader

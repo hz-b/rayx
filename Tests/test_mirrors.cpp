@@ -209,7 +209,7 @@ TEST(Ellips, defaultParams) {
     double exitArmLength = 1000;
 
     double a11 = 1;
-    int figRot = 0;  // "yes"
+    RAYX::FigureRotation figRot = RAYX::FigureRotation::Yes;
 
     double dist = 10000;
     double chi = 0;
