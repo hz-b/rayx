@@ -25,7 +25,7 @@ class RAYX_API TracerInterface {
 
     bool run();
 
-    enum DATA_TYPE { DT_RAY_TYPE, DT_QUADRIC_TYPE };
+    enum class DataType { Ray, Quadric };
 
   private:
     int m_numElements;

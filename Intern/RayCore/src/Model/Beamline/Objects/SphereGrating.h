@@ -46,7 +46,7 @@ class RAYX_API SphereGrating : public OpticalElement {
     double m_entranceArmLength;
     double m_exitArmLength;
     double m_deviation;  // not always calculated
-    GRATING_MOUNT m_gratingMount;
+    GratingMount m_gratingMount;
     double m_designEnergyMounting;
     double m_lineDensity;
     double m_orderOfDiffraction;

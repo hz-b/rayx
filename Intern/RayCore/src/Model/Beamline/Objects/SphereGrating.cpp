@@ -47,7 +47,7 @@ SphereGrating::SphereGrating(
     RAYX_LOG << name;
 
     double icurv = 1;
-    m_gratingMount = mount == 0 ? GM_DEVIATION : GM_INCIDENCE;
+    m_gratingMount = mount == 0 ? GratingMount::Deviation : GratingMount::Incidence;
     double matd = (double)static_cast<int>(mat);
     setSurface(std::make_unique<Quadric>(std::array<double, 4 * 4>{
         1, 0, 0, 0, icurv, 1, 0, -radius, 0, 0, 1, 0, 2, 0, matd, 0}));
@@ -141,12 +141,12 @@ std::shared_ptr<SphereGrating> SphereGrating::createFromXML(
 
 /* TODO (Theresa): how to make radius calculation easier?
 void SphereGrating::calcRadius() {
-    if (m_gratingMount == GM_DEVIATION) {
+    if (m_gratingMount == GratingMount::Deviation) {
         double theta = m_deviation > 0 ? (PI - m_deviation) / 2 : PI / 2 +
 m_deviation; m_radius = 2.0 / sin(theta) / (1.0 / m_entranceArmLength + 1.0 /
 m_exitArmLength);
     }
-    else if (m_gratingMount == GM_INCIDENCE) {
+    else if (m_gratingMount == GratingMount::Incidence) {
         double ca = cos(getAlpha());
         double cb = cos(getBeta());
         m_radius = (ca + cb) / ((ca * ca) / m_entranceArmLength + (cb * cb) /
@@ -156,10 +156,10 @@ m_exitArmLength);
 
 void SphereGrating::calcAlpha(double deviation, double normalIncidence) {
     double angle;
-    if (m_gratingMount == GM_DEVIATION) {
+    if (m_gratingMount == GratingMount::Deviation) {
         angle = deviation;
     }
-    else if (m_gratingMount == GM_INCIDENCE) {
+    else if (m_gratingMount == GratingMount::Incidence) {
         angle = -normalIncidence;
     }
     focus(angle);

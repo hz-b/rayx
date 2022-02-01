@@ -158,7 +158,7 @@ class RAYX_API ReflectionZonePlate : public OpticalElement {
     double m_R2ArmLength;
     double m_lineDensity;
 
-    GRATING_MOUNT m_gratingMount;
+    GratingMount m_gratingMount;
 
     // TODO(Jannis): move
     CURVATURE_TYPE m_curvatureType;

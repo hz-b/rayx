@@ -54,14 +54,15 @@ GeometricUserParams::GeometricUserParams(
         calcDz00(imageType, designWavelength, designAlphaAngle, designBetaAngle,
                  designOrderOfDiffraction, sEntrance, sExit, mEntrance, mExit);
 
-    GRATING_MOUNT gratingMount = mount == 0 ? GM_DEVIATION : GM_INCIDENCE;
+    GratingMount gratingMount =
+        mount == 0 ? GratingMount::Deviation : GratingMount::Incidence;
     // calculate alpha depending on either incidence or deviation angle IF
     // incidence not given directly
     if (grazingIncidence == 0) {
-        if (gratingMount == GM_INCIDENCE) {
+        if (gratingMount == GratingMount::Incidence) {
             RAYX_LOG << "use design angle";
             m_alpha = degToRad(designAlphaAngle);
-        } else if (gratingMount == GM_DEVIATION) {
+        } else if (gratingMount == GratingMount::Deviation) {
             RAYX_LOG << "use deviation angle";
             focus(designEnergy, deviationAngle, dz, orderOfDiffraction);
         }

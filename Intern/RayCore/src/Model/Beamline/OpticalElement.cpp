@@ -22,13 +22,12 @@ namespace RAYX {
  * element it is
  */
 OpticalElement::OpticalElement(const char* name,
-                               const std::array<double, 4*4> surfaceParams,
-                               const std::array<double, 4*4> inputInMatrix,
-                               const std::array<double, 4*4> inputOutMatrix,
-                               const std::array<double, 4*4> OParameters,
-                               const std::array<double, 4*4> EParameters)
+                               const std::array<double, 4 * 4> surfaceParams,
+                               const std::array<double, 4 * 4> inputInMatrix,
+                               const std::array<double, 4 * 4> inputOutMatrix,
+                               const std::array<double, 4 * 4> OParameters,
+                               const std::array<double, 4 * 4> EParameters)
     : BeamlineObject(name) {
-
     m_surfaceParams = surfaceParams;
     m_geometry = std::make_unique<Geometry>();
     m_geometry->setInMatrix(inputInMatrix);
@@ -51,7 +50,7 @@ OpticalElement::OpticalElement(const char* name,
  * @param slopeError                slope error parameters
  */
 OpticalElement::OpticalElement(const char* name,
-                               const std::array<double, 4*4> EParameters,
+                               const std::array<double, 4 * 4> EParameters,
                                Geometry::GeometricalShape geometricalShape,
                                const double width, const double height,
                                const double azimuthalAngle, glm::dvec4 position,
@@ -105,14 +104,14 @@ OpticalElement::OpticalElement() {}
 
 OpticalElement::~OpticalElement() {}
 
-void OpticalElement::setElementParameters(std::array<double, 4*4> params) {
+void OpticalElement::setElementParameters(std::array<double, 4 * 4> params) {
     m_elementParameters = params;
 }
 
-void OpticalElement::setInMatrix(std::array<double, 4*4> inputMatrix) {
+void OpticalElement::setInMatrix(std::array<double, 4 * 4> inputMatrix) {
     m_geometry->setInMatrix(inputMatrix);
 }
-void OpticalElement::setOutMatrix(std::array<double, 4*4> inputMatrix) {
+void OpticalElement::setOutMatrix(std::array<double, 4 * 4> inputMatrix) {
     m_geometry->setOutMatrix(inputMatrix);
 }
 
@@ -158,10 +157,10 @@ double OpticalElement::getWidth() {
 
 double OpticalElement::getHeight() { return m_geometry->getHeight(); }
 
-std::array<double, 4*4> OpticalElement::getInMatrix() const {
+std::array<double, 4 * 4> OpticalElement::getInMatrix() const {
     return m_geometry->getInMatrix();
 }
-std::array<double, 4*4> OpticalElement::getOutMatrix() const {
+std::array<double, 4 * 4> OpticalElement::getOutMatrix() const {
     return m_geometry->getOutMatrix();
 }
 glm::dvec4 OpticalElement::getPosition() const {
@@ -170,15 +169,15 @@ glm::dvec4 OpticalElement::getPosition() const {
 glm::dmat4x4 OpticalElement::getOrientation() const {
     return m_geometry->getOrientation();
 }
-std::array<double, 4*4> OpticalElement::getObjectParameters() {
+std::array<double, 4 * 4> OpticalElement::getObjectParameters() {
     return m_objectParameters;
 }
 
-std::array<double, 4*4> OpticalElement::getElementParameters() const {
+std::array<double, 4 * 4> OpticalElement::getElementParameters() const {
     return m_elementParameters;
 }
 
-std::array<double, 4*4> OpticalElement::getSurfaceParams() const {
+std::array<double, 4 * 4> OpticalElement::getSurfaceParams() const {
     RAYX_LOG << "return anchor points";
     // assert(m_surfacePtr!=nullptr);
     if (m_surfacePtr != nullptr)

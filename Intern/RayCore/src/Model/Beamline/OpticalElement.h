@@ -18,7 +18,8 @@ namespace RAYX {
 class RAYX_API OpticalElement : public BeamlineObject {
   public:
     // needed to add optical elements to tracer
-    OpticalElement(const char* name, const std::array<double, 4*4> surfaceParams,
+    OpticalElement(const char* name,
+                   const std::array<double, 4 * 4> surfaceParams,
                    const std::array<double, 4 * 4> inputInMatrix,
                    const std::array<double, 4 * 4> inputOutMatrix,
                    const std::array<double, 4 * 4> OParameters,
@@ -68,9 +69,9 @@ class RAYX_API OpticalElement : public BeamlineObject {
     ~OpticalElement();
 
     // TODO(Jannis): move to geometry
-    enum GRATING_MOUNT {
-        GM_DEVIATION,
-        GM_INCIDENCE
+    enum GratingMount {
+        Deviation,
+        Incidence
     };  ///< influences incidence and exit angle calculation (moved somewhere
         ///< else)
 

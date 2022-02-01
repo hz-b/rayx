@@ -65,7 +65,7 @@ class RAYX_API GeometricUserParams {
     double getRadius();
     double getShortRadius();
 
-    enum GRATING_MOUNT { GM_DEVIATION, GM_INCIDENCE };
+    enum class GratingMount { Deviation, Incidence };
 
   private:
     double m_alpha;
