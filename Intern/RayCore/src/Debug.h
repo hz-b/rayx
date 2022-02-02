@@ -46,13 +46,6 @@ namespace RAYX {
  * RAYX_LOG << "I am " << age << " years old";
  * */
 
-/**
- * @param filename  the file where the log occured
- * @param line      the linenumber in which the log occured
- * @param o         the stream to which to write to
- * */
-void formatDebugMsg(std::string filename, int line, std::ostream& o);
-
 struct Log {
     Log(std::string filename, int line);
     ~Log();

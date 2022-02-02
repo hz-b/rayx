@@ -3,6 +3,15 @@
 namespace RAYX {
 constexpr int PREFIX_LEN = 30;
 
+/**
+ * @param filename  the file where the log occured
+ * @param line      the linenumber in which the log occured
+ * @param o         the stream to which to write to
+ *
+ * This function is only defined in this cpp file, and can not be included or
+ * used anywhere else.
+ * */
+
 void formatDebugMsg(std::string filename, int line, std::ostream& o) {
     size_t idx = filename.find_last_of("/\\");
     if (idx != std::string::npos) {
