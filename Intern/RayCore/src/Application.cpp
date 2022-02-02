@@ -115,9 +115,10 @@ void Application::loadDummyBeamline() {  // ! objects are created here
     glm::dvec4 pos4 = w_coord.calcPosition();
     glm::dmat4x4 or4 = w_coord.calcOrientation();
     std::shared_ptr<RAYX::Cylinder> cy = std::make_shared<RAYX::Cylinder>(
-        "Cylinder", Geometry::GeometricalShape::RECTANGLE, 20, 0, 200, 10,
-        w_coord.getAzimuthalAngle(), pos4, or4, 10, 10000, 1000,
-        std::array<double, 7>{0, 0, 0, 0, 0, 0, 0}, Material::CU);
+        "Cylinder", Geometry::GeometricalShape::RECTANGLE, 20,
+        CylinderDirection::LongRadiusR, 200, 10, w_coord.getAzimuthalAngle(),
+        pos4, or4, 10, 10000, 1000, std::array<double, 7>{0, 0, 0, 0, 0, 0, 0},
+        Material::CU);
 
     // image plane
     RAYX::WorldUserParams ip_w_coord = RAYX::WorldUserParams(

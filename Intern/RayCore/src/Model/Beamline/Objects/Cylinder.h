@@ -7,10 +7,12 @@
 #include "utils.h"
 
 namespace RAYX {
+enum class CylinderDirection { LongRadiusR, ShortRadiusRho };
+
 class RAYX_API Cylinder : public OpticalElement {
   public:
     Cylinder(const char* name, Geometry::GeometricalShape geometricalShape,
-             const double radius, const int direction, const double width,
+             const double radius, CylinderDirection direction, const double width,
              const double height, const double azimuthalAngle,
              glm::dvec4 position, glm::dmat4x4 orientation,
              const double grazingIncidence, const double entranceArmLength,
@@ -22,8 +24,7 @@ class RAYX_API Cylinder : public OpticalElement {
         rapidxml::xml_node<>*, const std::vector<xml::Group>& group_context);
 
     void setRadius();
-    enum CYLINDER_DIRECTION { LONG_RADIUS_R, SHORT_RADIUS_RHO };
-    CYLINDER_DIRECTION getDirection() const;
+    CylinderDirection getDirection() const;
 
     double getIncidenceAngle() const;
     double getExitArmLength() const;
@@ -32,7 +33,7 @@ class RAYX_API Cylinder : public OpticalElement {
 
   private:
     // user params:
-    CYLINDER_DIRECTION m_direction;  // Cylinder in z-/x- Direction
+    CylinderDirection m_direction;  // Cylinder in z-/x- Direction
     double m_radius;                 // Radius
 
     double m_incidence;
