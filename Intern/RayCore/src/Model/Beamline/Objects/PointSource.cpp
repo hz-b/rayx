@@ -56,9 +56,6 @@ PointSource::PointSource(const std::string name, EnergyDistribution dist,
     m_heightDist = heightDist;
     m_horDist = horDist;
     m_verDist = verDist;
-    std::normal_distribution<double> m_stdnorm(0, 1);
-    std::uniform_real_distribution<double> m_uniform(0, 1);
-    std::default_random_engine m_re;
 }
 
 PointSource::~PointSource() {}
