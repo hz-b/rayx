@@ -282,7 +282,7 @@ void testOpticalElement(
  * @param filename      name of rml file without ending .rml
  */
 void testBeamline(const char* filename) {
-    std::string beamline_file = "../../Tests/rml_files/";
+    std::string beamline_file = "../../Tests/rml_files/test_shader/";
     beamline_file.append(filename);
     beamline_file.append(".rml");
     std::shared_ptr<RAYX::Beamline> beamline = std::make_shared<RAYX::Beamline>(
@@ -1898,7 +1898,7 @@ TEST_F(opticalElements, FourMirrors_20Rays) {
 }
 
 TEST_F(opticalElements, slit1) {
-    std::string beamline_file = "../../Tests/rml_files/";
+    std::string beamline_file = "../../Tests/rml_files/test_shader/";
     const char* filename = "slit";
     beamline_file.append(filename);
     beamline_file.append(".rml");

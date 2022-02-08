@@ -3,7 +3,7 @@
 
 TEST(RmlTest, allBeamlineObjects) {
     auto b =
-        RAYX::Importer::importBeamline("../../Tests/input-files/allBeamlineObjects.rml");
+        RAYX::Importer::importBeamline("../../Tests/rml_files/test_rml/allBeamlineObjects.rml");
     ASSERT_EQ(b.m_LightSources.size(), 1);
     ASSERT_EQ(b.m_OpticalElements.size(),
               8);  // plane mirror, toroid, slit, sphere grating, plane grating,
@@ -12,7 +12,7 @@ TEST(RmlTest, allBeamlineObjects) {
 
 TEST(RmlTest, loadDatFile) {
     auto b =
-        RAYX::Importer::importBeamline("../../Tests/input-files/loadDatFile.rml");
+        RAYX::Importer::importBeamline("../../Tests/rml_files/test_rml/loadDatFile.rml");
     ASSERT_EQ(b.m_LightSources.size(), 1);
     ASSERT_EQ(b.m_OpticalElements.size(), 1);
     ASSERT_NEAR(b.m_LightSources[0]->m_EnergyDistribution.getAverage(),
@@ -21,14 +21,14 @@ TEST(RmlTest, loadDatFile) {
 
 TEST(RmlTest, loadGroups) {
     auto b = RAYX::Importer::importBeamline(
-        "../../Tests/input-files/loadGroups.rml");
+        "../../Tests/rml_files/test_rml/loadGroups.rml");
     ASSERT_EQ(b.m_LightSources.size(), 1);
     ASSERT_EQ(b.m_OpticalElements.size(), 4);
 }
 
 TEST(RmlTest, groupTransform) {
     auto b = RAYX::Importer::importBeamline(
-        "../../Tests/input-files/groupTransform.rml");
+        "../../Tests/rml_files/test_rml/groupTransform.rml");
     ASSERT_EQ(b.m_LightSources.size(), 1);
     ASSERT_EQ(b.m_OpticalElements.size(), 1);
     auto m = b.m_OpticalElements[0]->getInMatrix();
@@ -43,7 +43,7 @@ TEST(RmlTest, groupTransform) {
 
 TEST(RmlTest, groupTransform2) {
     auto b = RAYX::Importer::importBeamline(
-        "../../Tests/input-files/groupTransform2.rml");
+        "../../Tests/rml_files/test_rml/groupTransform2.rml");
     ASSERT_EQ(b.m_LightSources.size(), 1);
     ASSERT_EQ(b.m_OpticalElements.size(), 1);
     glm::dmat4x4 groupOr = glm::dmat4x4(1, 0, 0, 0, 0, 0.985, -0.174, 0, 0,
@@ -65,7 +65,7 @@ TEST(RmlTest, groupTransform2) {
 
 TEST(RmlTest, groupTransformMisalignment) {
     auto b = RAYX::Importer::importBeamline(
-        "../../Tests/input-files/groupTransformMisalignment.rml");
+        "../../Tests/rml_files/test_rml/groupTransformMisalignment.rml");
     ASSERT_EQ(b.m_LightSources.size(), 1);
     ASSERT_EQ(b.m_OpticalElements.size(), 1);
 
