@@ -1,4 +1,7 @@
 #pragma once
+#define PY_SSIZE_T_CLEAN
+#include <Python.h>
+
 #include "RayCore.h"
 
 enum OptFlags { Disabled, Enabled };
@@ -10,6 +13,11 @@ class TerminalApp : public RAYX::Application {
     ~TerminalApp();
 
     void run() override;
+
+    bool callPythonInterp(const char* outputName);
+
+    void pythonCleanup(PyObject* pName, PyObject* pModule, PyObject* pFunc,
+                       PyObject* pValue, PyObject* presult);
 
     const std::string& getProvidedFilePath() const { return providedFile; };
 
