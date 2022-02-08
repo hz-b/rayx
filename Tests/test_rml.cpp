@@ -3,7 +3,7 @@
 
 TEST(RmlTest, allBeamlineObjects) {
     auto b =
-        RAYX::Importer::importBeamline("../../Tests/input-files/test1.rml");
+        RAYX::Importer::importBeamline("../../Tests/input-files/allBeamlineObjects.rml");
     ASSERT_EQ(b.m_LightSources.size(), 1);
     ASSERT_EQ(b.m_OpticalElements.size(),
               8);  // plane mirror, toroid, slit, sphere grating, plane grating,
@@ -12,7 +12,7 @@ TEST(RmlTest, allBeamlineObjects) {
 
 TEST(RmlTest, loadDatFile) {
     auto b =
-        RAYX::Importer::importBeamline("../../Tests/input-files/test2.rml");
+        RAYX::Importer::importBeamline("../../Tests/input-files/loadDatFile.rml");
     ASSERT_EQ(b.m_LightSources.size(), 1);
     ASSERT_EQ(b.m_OpticalElements.size(), 1);
     ASSERT_NEAR(b.m_LightSources[0]->m_EnergyDistribution.getAverage(),
