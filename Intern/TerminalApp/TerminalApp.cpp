@@ -108,6 +108,7 @@ bool TerminalApp::callPythonInterp(const char* outputName = "output.h5") {
         pythonCleanup(pName, pModule, pFunc, pValue, presult);
         return false;
     }
+
     if (PyLong_AsLong(presult) == 0) {
         RAYX_ERR << "Error while running the python plot. \n";
         pythonCleanup(pName, pModule, pFunc, pValue, presult);
@@ -118,10 +119,19 @@ bool TerminalApp::callPythonInterp(const char* outputName = "output.h5") {
     return true;
 }
 
+/**
+ * @brief Clean up and stop Python
+ *
+ * @param pName
+ * @param pModule
+ * @param pFunc
+ * @param pValue
+ * @param presult
+ */
 void TerminalApp::pythonCleanup(PyObject* pName, PyObject* pModule,
                                 PyObject* pFunc, PyObject* pValue,
                                 PyObject* presult) {
-    // Clean up
+    // Clean up and free allocated memory
     Py_DECREF(pModule);
     Py_DECREF(pName);
     Py_DECREF(pValue);
