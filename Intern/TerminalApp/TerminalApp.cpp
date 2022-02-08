@@ -21,7 +21,7 @@ void TerminalApp::run() {
     if (m_argc == 2) {
         // load rml file
         m_Beamline = std::make_shared<RAYX::Beamline>(
-            RAYX::Importer::importBeamline(m_argv[1]));
+            RAYX::importBeamline(m_argv[1]));
         m_Presenter = RAYX::Presenter(m_Beamline);
     } else {
         loadDummyBeamline();

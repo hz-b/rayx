@@ -12,9 +12,6 @@
 #include "rapidxml.hpp"
 
 namespace RAYX {
-Importer::Importer() {}
-
-Importer::~Importer() {}
 
 void addBeamlineObjectFromXML(rapidxml::xml_node<>* node, Beamline* beamline,
                               const std::vector<xml::Group>& group_context) {
@@ -54,10 +51,10 @@ void addBeamlineObjectFromXML(rapidxml::xml_node<>* node, Beamline* beamline,
     // source-energy required by the Slit::createFromXML function
     const auto calcSourceEnergy = [&] {
         if (beamline->m_LightSources.empty()) {
-          RAYX_ERR << "no light sources!";
+            RAYX_ERR << "no light sources!";
         }
         if (!beamline->m_LightSources[0]) {
-          RAYX_ERR << "lightSources[0] is nullptr!";
+            RAYX_ERR << "lightSources[0] is nullptr!";
         }
         return beamline->m_LightSources[0]->m_EnergyDistribution.getAverage();
     };
@@ -99,8 +96,8 @@ void addBeamlineObjectFromXML(rapidxml::xml_node<>* node, Beamline* beamline,
         addOpticalElement(Cylinder::createFromXML(node, group_context), node);
     } else {
         RAYX_WARN << "could not classify beamline object with Name: "
-                 << node->first_attribute("name")->value()
-                 << "; Type: " << node->first_attribute("type")->value();
+                  << node->first_attribute("name")->value()
+                  << "; Type: " << node->first_attribute("type")->value();
     }
 }
 
@@ -132,7 +129,7 @@ void handleObjectCollection(rapidxml::xml_node<>* collection,
     }
 }
 
-Beamline Importer::importBeamline(const char* filename) {
+Beamline importBeamline(const char* filename) {
     RAYX_PROFILE_FUNCTION();
     // first implementation: stringstreams are slow; this might need
     // optimization

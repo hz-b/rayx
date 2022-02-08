@@ -286,7 +286,7 @@ void testBeamline(const char* filename) {
     beamline_file.append(filename);
     beamline_file.append(".rml");
     std::shared_ptr<RAYX::Beamline> beamline = std::make_shared<RAYX::Beamline>(
-        RAYX::Importer::importBeamline(beamline_file.c_str()));
+        RAYX::importBeamline(beamline_file.c_str()));
 
     std::string outfile = "testFile_";
     outfile.append(filename);
@@ -1903,7 +1903,7 @@ TEST_F(opticalElements, slit1) {
     beamline_file.append(filename);
     beamline_file.append(".rml");
     std::shared_ptr<RAYX::Beamline> beamline = std::make_shared<RAYX::Beamline>(
-        RAYX::Importer::importBeamline(beamline_file.c_str()));
+        RAYX::importBeamline(beamline_file.c_str()));
 
     std::string outfile = "testFile_";
     outfile.append(filename);
