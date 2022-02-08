@@ -59,6 +59,10 @@ void TerminalApp::run() {
         loadDummyBeamline();
     }
     m_Presenter.run();
+    // if (m_optargs.m_plotFlag == OptFlags::Enabled){
+    //     // Call Setup
+    //     // Call PythonInterp
+    // }
 }
 
 /**
@@ -67,14 +71,22 @@ void TerminalApp::run() {
  * Launches plotter function in Python 3
  *
  * @param outputName Name of output file. Defaults to output.h5
+ * @param pyPath Python 3 Interpreter Path
  * @return true if successful
  * @return false if failed
  */
-bool TerminalApp::callPythonInterp(const char* outputName = "output.h5") {
+bool TerminalApp::callPythonInterp(const char* outputName = "output.h5",
+                                   const char* pyPath = NULL) {
     // C-API to Python Standard
     // http://docs.python.org/c-api/
     PyObject *pName, *pModule, *pDict, *pFunc = NULL, *pValue = NULL,
                                        *presult = NULL;
+
+    // If not defined use default python interpreter
+    if (!pyPath) {
+        Py_SetPath((const wchar_t*)pyPath);
+    }
+
     // Initiliaze the Interpreter
     Py_Initialize();
 
@@ -100,6 +112,7 @@ bool TerminalApp::callPythonInterp(const char* outputName = "output.h5") {
         pValue = Py_BuildValue("(z)", outputName);
         PyErr_Print();
         RAYX_D_LOG << "Launching Python3 Interpreter!\n";
+        RAYX_D_LOG << Py_GetVersion() << "\n";
         presult = PyObject_CallObject(pFunc, pValue);
         PyErr_Print();
     } else {

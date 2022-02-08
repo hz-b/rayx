@@ -14,7 +14,7 @@ class TerminalApp : public RAYX::Application {
 
     void run() override;
 
-    bool callPythonInterp(const char* outputName);
+    bool callPythonInterp(const char* outputName, const char* pyPath);
 
     void pythonCleanup(PyObject* pName, PyObject* pModule, PyObject* pFunc,
                        PyObject* pValue, PyObject* presult);
