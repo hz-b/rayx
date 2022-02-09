@@ -10,7 +10,7 @@ default:
     - wget -qO /etc/apt/sources.list.d/lunarg-vulkan-1.2.176-focal.list https://packages.lunarg.com/vulkan/1.2.176/lunarg-vulkan-1.2.176-focal.list
     - apt update --yes
     - apt install --yes vulkan-sdk
-    - apt install python3-dev
+    - apt install python3-dev --yes 
     - echo "Vulkan installation ended"
 
 build-job:
