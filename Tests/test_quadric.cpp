@@ -5,42 +5,24 @@
 #if RUN_TEST_QUADRIC
 
 TEST(Quadric, testTransformationMatrices) {
-    double width = 68.12;
-    double height = 123.6;
-    double incidenceAngle = 13.2;
-    double azimuthalAngle = 0.0;
-    double dist = 12005;
-    RAYX::Geometry::GeometricalShape geometricalShape =
-        RAYX::Geometry::GeometricalShape::RECTANGLE;
-    std::array<double, 7> sE = {1, 2, 3, 4, 5, 6, 7};
-    std::array<double, 6> mis = {1, 2, 3, 0.03, 0.02, 0.01};  // psi, phi, chi
+    auto b = RAYX::importBeamline(
+        "../../Tests/rml_files/test_quadric/testTransformationMatrices.rml");
 
-    RAYX::GeometricUserParams g_params =
-        RAYX::GeometricUserParams(incidenceAngle);
-    RAYX::WorldUserParams w_coord = RAYX::WorldUserParams(
-        g_params.getAlpha(), g_params.getBeta(), azimuthalAngle, dist, mis);
-
-    RAYX::PlaneMirror plM = RAYX::PlaneMirror(
-        "planemirror", geometricalShape, width, height,
-        w_coord.getAzimuthalAngle(), w_coord.calcPosition(),
-        w_coord.calcOrientation(), sE, Material::CU);  // {1,2,3,0.01,0.02,0.03}
-    // RAYX::PlaneMirror plM1 = RAYX::PlaneMirror("planemirror", width, height,
-    // incidenceAngle, azimuthalAngle, dist, mis, sE, NULL, true); //
-    // {1,2,3,0.01,0.02,0.03}
+    auto plM = b.m_OpticalElements[0];
 
     std::array<double, 4 * 4> correctInMat = {
         0.9997500170828264,    -0.0093954937290516224, 0.02028861849598634, 0,
         0.0051669667654668724, 0.97994613741550907,    0.199195557728752,   0,
         -0.0217532939421341,   -0.19904093162465691,   0.97974971382524823, 0,
         260.14829377531987,    2387.4863841540064,     -11764.895314472104, 1};
-    EXPECT_ITERABLE_DOUBLE_EQ_ARR(4 * 4, plM.getInMatrix(), correctInMat);
+    EXPECT_ITERABLE_DOUBLE_EQ_ARR(4 * 4, plM->getInMatrix(), correctInMat);
 
     std::array<double, 4 * 4> correctOutMat = {
         0.9997500170828264,     0.0051669667654668724, -0.0217532939421341,  0,
         -0.0093954937290516224, 0.97994613741550907,   -0.19904093162465691, 0,
         0.02028861849598634,    0.199195557728752,     0.97974971382524823,  0,
         1.0418248851126821,     2.562645914782741,     12007.519413984284,   1};
-    EXPECT_ITERABLE_DOUBLE_EQ_ARR(4 * 4, plM.getOutMatrix(), correctOutMat);
+    EXPECT_ITERABLE_DOUBLE_EQ_ARR(4 * 4, plM->getOutMatrix(), correctOutMat);
 }
 
 TEST(Quadric, testGlobalCoordinates) {
