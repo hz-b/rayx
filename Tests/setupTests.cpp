@@ -8,7 +8,7 @@ void check_eq(std::string filename, int line, std::string l, std::string r,
     if (vl.size() != vr.size()) {
         RAYX::Warn(filename, line)
             << l << " != " << r << ": different lengths!";
-        EXPECT_TRUE(false);
+        ADD_FAILURE();
         return;
     }
 
@@ -47,5 +47,5 @@ void check_eq(std::string filename, int line, std::string l, std::string r,
     if (counter > 0) {
         RAYX::Warn(filename, line) << s.str();
     }
-    EXPECT_TRUE(false);
+    ADD_FAILURE();
 }
