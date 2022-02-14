@@ -5,10 +5,25 @@
 #if RUN_TEST_QUADRIC
 
 TEST(Quadric, testTransformationMatrices) {
+    // *UserParam calculations
+    double incidenceAngle = 13.2;
+    double azimuthalAngle = 0.0;
+    double dist = 12005;
+    std::array<double, 6> mis = {1, 2, 3, 0.03, 0.02, 0.01};  // psi, phi, chi
+
+    RAYX::GeometricUserParams g_params =
+        RAYX::GeometricUserParams(incidenceAngle);
+    RAYX::WorldUserParams w_coord = RAYX::WorldUserParams(
+         g_params.getAlpha(), g_params.getBeta(), azimuthalAngle, dist, mis);
+
+    // correct results from RML
     auto b = RAYX::importBeamline(
         "../../Tests/rml_files/test_quadric/testTransformationMatrices.rml");
 
     auto plM = b.m_OpticalElements[0];
+
+    CHECK_EQ(w_coord.calcOrientation(), plM->getOrientation(), 1e-10, 4, 4);
+    CHECK_EQ(w_coord.calcPosition(), plM->getPosition(), 1e-10, 3);
 
     std::array<double, 4 * 4> correctInMat = {
         0.9997500170828264,    -0.0093954937290516224, 0.02028861849598634, 0,
