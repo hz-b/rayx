@@ -28,7 +28,3 @@ add_test(NAME ${BINARY} COMMAND ${BINARY})
 #endif ()
 target_link_libraries(${BINARY} PUBLIC RayCore gtest gmock)
 
-
-
-
-    

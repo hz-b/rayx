@@ -14,7 +14,7 @@ TEST(Quadric, testTransformationMatrices) {
     RAYX::GeometricUserParams g_params =
         RAYX::GeometricUserParams(incidenceAngle);
     RAYX::WorldUserParams w_coord = RAYX::WorldUserParams(
-         g_params.getAlpha(), g_params.getBeta(), azimuthalAngle, dist, mis);
+        g_params.getAlpha(), g_params.getBeta(), azimuthalAngle, dist, mis);
 
     // correct results from RML
     auto b = RAYX::importBeamline(
@@ -22,22 +22,22 @@ TEST(Quadric, testTransformationMatrices) {
 
     auto plM = b.m_OpticalElements[0];
 
-    CHECK_EQ(w_coord.calcOrientation(), plM->getOrientation(), 1e-10, 4, 4);
-    CHECK_EQ(w_coord.calcPosition(), plM->getPosition(), 1e-10, 3);
+    CHECK_EQ(w_coord.calcOrientation(), plM->getOrientation());
+    CHECK_EQ(w_coord.calcPosition(), plM->getPosition());
 
     std::array<double, 4 * 4> correctInMat = {
         0.9997500170828264,    -0.0093954937290516224, 0.02028861849598634, 0,
         0.0051669667654668724, 0.97994613741550907,    0.199195557728752,   0,
         -0.0217532939421341,   -0.19904093162465691,   0.97974971382524823, 0,
         260.14829377531987,    2387.4863841540064,     -11764.895314472104, 1};
-    CHECK_EQ_ITER(plM->getInMatrix(), correctInMat, 1e-10, 4);
+    CHECK_EQ(plM->getInMatrix(), correctInMat);
 
     std::array<double, 4 * 4> correctOutMat = {
         0.9997500170828264,     0.0051669667654668724, -0.0217532939421341,  0,
         -0.0093954937290516224, 0.97994613741550907,   -0.19904093162465691, 0,
         0.02028861849598634,    0.199195557728752,     0.97974971382524823,  0,
         1.0418248851126821,     2.562645914782741,     12007.519413984284,   1};
-    CHECK_EQ_ITER(plM->getOutMatrix(), correctOutMat, 1e-10, 4);
+    CHECK_EQ(plM->getOutMatrix(), correctOutMat);
 }
 
 TEST(Quadric, testGlobalCoordinates) {

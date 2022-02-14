@@ -68,124 +68,33 @@
 
 // new EXPECT system:
 
-// used for float, int
-template <typename T1, typename T2>
-void check_eq(std::string filename, int line, std::string l, std::string r, T1 t1, T2 t2, double tolerance) {
-	if (abs(t1-t2) <= tolerance) return;
-
-	RAYX::Warn(filename, line) << l << " != " << r << ":";
-	RAYX::Warn(filename, line) << "\x1B[36m" << t1 << "|" << t2 << "\x1B[31m";
-	EXPECT_TRUE(false);
+template <int N, int M>
+inline std::vector<double> to_vec_impl(glm::mat<N, M, double> arg) {
+	std::vector<double> out(N*M);
+	for (size_t i = 0; i < N*M; i++) {
+		out[i] = arg[i/N][i%N];
+	}
+	return out;
 }
 
-// used for glm::dvec
-template <typename T1, typename T2>
-void check_eq(std::string filename, int line, std::string l, std::string r, T1 t1, T2 t2, double tolerance, int dim1) {
-	bool success = true;
-	for (auto i = 0; i < dim1; i++) {
-		if (abs(t1[i]-t2[i]) > tolerance) {
-			success = false;
-			break;
-		}
+template <int N>
+inline std::vector<double> to_vec_impl(glm::vec<N, double> arg) {
+	std::vector<double> out(N);
+	for (size_t i = 0; i < N; i++) {
+		out[i] = arg[i];
 	}
-	if (success) return;
-
-	RAYX::Warn(filename, line) << l << " != " << r << ":";
-	std::stringstream s;
-	for (auto i = 0; i < dim1; i++) {
-		if (i != 0) { s << " "; }
-		if (abs(t1[i]-t2[i]) <= tolerance) {
-			s << t1[i] << "|" << t2[i];
-		} else {
-			s << "\x1B[36m" << t1[i] << "|" << t2[i] << "\x1B[31m";
-		}
-	}
-	RAYX::Warn(filename, line) << s.str();
-	EXPECT_TRUE(false);
+	return out;
 }
 
-// used for glm::dmat
-template <typename T1, typename T2>
-void check_eq(std::string filename, int line, std::string l, std::string r, T1 t1, T2 t2, double tolerance, int dim1, int dim2) {
-	bool success = true;
-	for (auto i = 0; i < dim1; i++) {
-		for (auto j = 0; j < dim2; j++) {
-			if (abs(t1[i][j]-t2[i][j]) > tolerance) {
-				success = false;
-				break;
-			}
-		}
+template <size_t N>
+inline std::vector<double> to_vec_impl(std::array<double, N> arg) {
+	std::vector<double> out(N);
+	for (size_t i = 0; i < N; i++) {
+		out[i] = arg[i];
 	}
-	if (success) return;
-
-	RAYX::Warn(filename, line) << l << " != " << r << ":";
-	for (auto i = 0; i < dim1; i++) {
-		std::stringstream s;
-		for (auto j = 0; j < dim2; j++) {
-			if (j != 0) { s << " "; }
-			if (abs(t1[i][j]-t2[i][j]) <= tolerance) {
-				s << t1[i][j] << "|" << t2[i][j];
-			} else {
-				s << "\x1B[36m" << t1[i][j] << "|" << t2[i][j] << "\x1B[31m";
-			}
-			RAYX::Warn(filename, line) << s.str();
-		}
-	}
-	EXPECT_TRUE(false);
+	return out;
 }
 
-// used for arrays, vectors
-template <typename T1, typename T2>
-void check_eq_iter(std::string filename, int line, std::string l, std::string r, T1 t1, T2 t2, double tolerance, int break_after=-1) {
-	{
-		bool success = true;
+void check_eq(std::string filename, int line, std::string l, std::string r, std::vector<double> vl, std::vector<double> vr, double tolerance=1e-10);
 
-		auto a = t1.begin();
-		auto b = t2.begin();
-		while (a != t1.end() || b != t2.end()) {
-			if ((a == t1.end()) != (b == t2.end())) {
-				RAYX::Warn(filename, line) << l << " != " << r << ": different lengths!";
-				EXPECT_TRUE(false);
-				return;
-			}
-			if (*a != *b) {
-				success = false;
-				break;
-			}
-			a++;
-			b++;
-		}
-		if (success) return;
-	}
-
-	auto a = t1.begin();
-	auto b = t2.begin();
-	int counter = 0;
-
-	RAYX::Warn(filename, line) << l << " != " << r << ":";
-
-	std::stringstream s;
-	while (a != t1.end()) {
-		if (counter != 0) { s << " "; }
-		if (abs(*a-*b) <= tolerance) {
-			s << *a << "|" << *b;
-		} else {
-			s << "\x1B[36m" << *a << "|" << *b << "\x1B[31m";
-		}
-		counter++;
-		if (counter == break_after) {
-			counter = 0;
-			RAYX::Warn(filename, line) << s.str();
-			s = std::stringstream();
-		}
-		a++;
-		b++;
-	}
-	if (counter > 0) {
-		RAYX::Warn(filename, line) << s.str();
-	}
-	EXPECT_TRUE(false);
-}
-
-#define CHECK_EQ(L, R, ...) check_eq(__FILE__, __LINE__, #L, #R, L, R, __VA_ARGS__)
-#define CHECK_EQ_ITER(L, R, ...) check_eq_iter(__FILE__, __LINE__, #L, #R, L, R, __VA_ARGS__)
+#define CHECK_EQ(L, R) check_eq(__FILE__, __LINE__, #L, #R, to_vec_impl(L), to_vec_impl(R)) // TODO tolerance
