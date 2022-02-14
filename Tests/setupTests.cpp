@@ -1,5 +1,7 @@
 #include "setupTests.h"
 
+const int PREC = 17;
+
 void check_eq(std::string filename, int line, std::string l, std::string r,
               std::vector<double> vl, std::vector<double> vr,
               double tolerance) {
@@ -28,9 +30,10 @@ void check_eq(std::string filename, int line, std::string l, std::string r,
             s << " ";
         }
         if (abs(vl[i] - vr[i]) <= tolerance) {
-            s << vl[i] << "|" << vr[i];
+            s << std::setprecision(PREC) << vl[i] << "|" << vr[i];
         } else {
-            s << "\x1B[36m" << vl[i] << "|" << vr[i] << "\x1B[31m";
+            s << "\x1B[36m" << std::setprecision(PREC) << vl[i] << "|" << vr[i]
+              << "\x1B[31m";
         }
 
         counter++;
@@ -44,4 +47,5 @@ void check_eq(std::string filename, int line, std::string l, std::string r,
     if (counter > 0) {
         RAYX::Warn(filename, line) << s.str();
     }
+    EXPECT_TRUE(false);
 }
