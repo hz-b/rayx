@@ -15,31 +15,36 @@ PythonInterp::PythonInterp() {}
  * Used to launch functions in Python 3
  * Creates a class that wrappes a python interpreter
  *
- * @param pyPath Python 3 Interpreter Path (if NULL, uses default system python3
- * path)
  * @param pyName Python file name
  * @param pyFunc Python function name
+ * @param pyPath Python 3 Interpreter Path (if NULL, uses default system python3
+ * path)
  */
 PythonInterp::PythonInterp(const char* pyName, const char* pyFunc,
-                           const char* pyPath = NULL)
-    : m_pyPath(pyPath) {
+                           const char* pyPath)
+    : m_pyPath(pyPath), m_funcName(pyFunc) {
     // Set custom python interpreter
     if (!m_pyPath) Py_SetPath((const wchar_t*)pyPath);
 
     // Initiliaze the Interpreter
     Py_Initialize();
 
+    // Set module lookup dir
+    PyRun_SimpleString("import os");
+    PyRun_SimpleString("import sys");
+    PyRun_SimpleString("sys.path.append(os.getcwd()+'/py/python')");
+
     // Python file
-    m_pName = PyUnicode_FromString(pyName);
+    m_pName = PyUnicode_DecodeFSDefault(pyName);
 
     // Load the module object
     m_pModule = PyImport_Import(m_pName);
 
     if (m_pModule == NULL) {
-        RAYX_ERR << "No python module was found. \n";
-        cleanup();
-        // Throw exception
-        throw std::runtime_error("No python module was found.");
+        // cleanup();
+        PyErr_Print();
+        //  Throw exception
+        throw std::runtime_error("No python module was found");
     }
     // pDict is a borrowed reference
     m_pDict = PyModule_GetDict(m_pModule);
@@ -55,25 +60,22 @@ PythonInterp::PythonInterp(const char* pyName, const char* pyFunc,
  */
 void PythonInterp::execute() {
     if (m_pFunc && PyCallable_Check(m_pFunc)) {
-        m_pValue = Py_BuildValue("(z)", m_outputName);
+        if (m_outputName) m_pValue = Py_BuildValue("(z)", m_outputName);
         PyErr_Print();
         RAYX_D_LOG << "Launching Python3 Interpreter!\n";
-        RAYX_D_LOG << Py_GetVersion() << "\n";
         m_presult = PyObject_CallObject(m_pFunc, m_pValue);
         PyErr_Print();
     } else {
         PyErr_Print();
-        RAYX_ERR << "Error while running the python plot. \n";
-        cleanup();
-        throw std::runtime_error("Error while running the python plot");
+        throw std::runtime_error("Error while running the python module: " +
+                                 (std::string)(m_funcName));
     }
 
-    if (PyLong_AsLong(m_presult) == 0) {
-        RAYX_ERR << "Error while running the python plot. \n";
+    if (PyLong_AsLong(m_presult) == 0 || !m_presult) {
         cleanup();
-        throw std::runtime_error("Error while running the python plot");
+        throw std::runtime_error("Error while running the python module: " +
+                                 (std::string)(m_funcName));
     }
-
     cleanup();
 }
 
@@ -90,18 +92,19 @@ void PythonInterp::cleanup() {
     // Clean up and free allocated memory
     Py_DECREF(m_pModule);
     Py_DECREF(m_pName);
-    Py_DECREF(m_pValue);
-    Py_DECREF(m_pFunc);
-    Py_DECREF(m_presult);
+    // Py_DECREF(m_pValue);
+    //   Py_DECREF(m_pFunc);
+    //    Py_DECREF(m_presult);
 
     // Finish the Python Interpreter
     Py_Finalize();
 }
-/**
+/**files
  * @param outputName Name of output file. Defaults to output.h5 (Plotting
  * related)
  */
-void PythonInterp::setPlotFileName(
-    const char* outputName = (const char*)"output.h5") {
+void PythonInterp::setPlotFileName(const char* outputName) {
     m_outputName = outputName;
 }
+
+PythonInterp::~PythonInterp() {}

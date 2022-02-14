@@ -8,8 +8,8 @@ VENV_PATH_WINDOWS = "rayxvenv/bin/activate.bat"
 
 def setup():
     """
-    Setup for rayxvenv venv
-    * Checks activate bash script
+    Setup for RAY-X venv
+    * Checks "activate" bash script
     * Installs required packages
     New created venv will be in Application path 
     """
@@ -18,7 +18,7 @@ def setup():
         path = VENV_PATH_POSIX
     elif sys.platform == "darwin":  # MacOS
         path = VENV_PATH_POSIX
-    elif sys.platform == "win32":
+    elif sys.platform == "win32":  # Windows
         path = VENV_PATH_WINDOWS
 
     if(not(os.path.exists(VENV_PATH_POSIX))):  # no venv found!
@@ -41,5 +41,6 @@ def install_packages():
     packages = ['matplotlib', 'pandas', 'numpy']
 
     for package in packages:
-        subprocess.check_call(
+        test = subprocess.check_call(
             [python_venv_bin, '-m', 'pip', 'install', package])
+        print(test)

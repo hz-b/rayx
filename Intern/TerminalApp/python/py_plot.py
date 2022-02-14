@@ -1,20 +1,29 @@
 #!./rayxvenv/bin/python3
 
+import string
 import matplotlib.pyplot as plt
 import pandas as pd
 import numpy as np
-import h5py
+from pandas import HDFStore
 
 
 def importOutput():
+    """
+    Import output h5 format and clean data
+    """
     # TODO
-    filename = "output.h5"
-    h5 = h5py.File(filename, 'r')
-    df = pd.read_hdf(filename)
+    # filename = "output.h5"
+    # h5 = HDFStore(filename)
+    # print(h5.get())
+    df = pd.DataFrame()
     return df
 
 
-def plotOutput():
+def plotOutput(filename: string):
+    """
+    Plots output file to a matplotlib figure
+    """
+
     df = importOutput()
     f = plt.figure(figsize=(5, 10))
     plt.scatter(df['Xloc'], df['Yloc'], s=0.2)
