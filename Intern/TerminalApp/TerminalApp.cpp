@@ -23,10 +23,13 @@ void TerminalApp::run() {
 
     /////////////////// Argument Parser
     int c;
-    while ((c = getopt(m_argc, m_argv, "pi:")) != -1) {
+    while ((c = getopt(m_argc, m_argv, "pci:")) != -1) {
         switch (c) {
             case 'p':
                 m_optargs.m_plotFlag = OptFlags::Enabled;
+                break;
+            case 'c':
+                m_optargs.m_csvFlag = OptFlags::Enabled;
                 break;
             case 'i':
                 m_optargs.m_providedFile = optarg;
@@ -40,6 +43,7 @@ void TerminalApp::run() {
                              << ".\n\n"
                              << "Known commands:\n"
                              << "-p \t Plot output footprints and histograms.\n"
+                             << "-h \t Output stored as .csv file.\n"
                              << "-i \t Input RML File Path.\n";
                 else
                     RAYX_ERR << "Unknown option character. \n";
@@ -57,14 +61,19 @@ void TerminalApp::run() {
             RAYX::importBeamline(m_optargs.m_providedFile));
         m_Presenter = RAYX::Presenter(m_Beamline);
     } else {
-        RAYX_D_LOG << "test";
+        RAYX_D_LOG << "Loading dummy beamline.\n";
         loadDummyBeamline();
+    }
+
+    // Output File format
+    if (m_optargs.m_csvFlag == OptFlags::Enabled) {
+        RAYX_D_LOG << "CSV.\n";
     }
 
     // Run RAY-X Core
     m_Presenter.run();
-    m_optargs.m_plotFlag = OptFlags::Enabled;
-    // Plotin Python
+    // m_optargs.m_plotFlag = OptFlags::Enabled;
+    //  Plotin Python
     if (m_optargs.m_plotFlag == OptFlags::Enabled) {
         // Setup to create venv if needed
         try {

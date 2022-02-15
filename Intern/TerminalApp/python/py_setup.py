@@ -41,6 +41,5 @@ def install_packages():
     packages = ['matplotlib', 'pandas', 'numpy']
 
     for package in packages:
-        test = subprocess.check_call(
+        install = subprocess.check_call(
             [python_venv_bin, '-m', 'pip', 'install', package])
-        print(test)

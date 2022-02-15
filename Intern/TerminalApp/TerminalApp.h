@@ -31,7 +31,7 @@ class TerminalApp : public RAYX::Application {
     // Flags initialize to DISABLED
     struct Optargs {
         OptFlags m_plotFlag = OptFlags::Disabled;  // -p (Plot)
-        OptFlags m_h5 = OptFlags::Disabled;        // -h (H5 Output)
+        OptFlags m_csvFlag = OptFlags::Disabled;   // -c (.csv Output)
         char* m_providedFile = NULL;               // -i (Input)
 
     } m_optargs;

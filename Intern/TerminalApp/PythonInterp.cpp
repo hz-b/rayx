@@ -32,7 +32,7 @@ PythonInterp::PythonInterp(const char* pyName, const char* pyFunc,
     // Set module lookup dir
     PyRun_SimpleString("import os");
     PyRun_SimpleString("import sys");
-    PyRun_SimpleString("sys.path.append(os.getcwd()+'/py/python')");
+    PyRun_SimpleString("sys.path.append(os.getcwd()+'/python')");
 
     // Python file
     m_pName = PyUnicode_DecodeFSDefault(pyName);
@@ -62,7 +62,7 @@ void PythonInterp::execute() {
     if (m_pFunc && PyCallable_Check(m_pFunc)) {
         if (m_outputName) m_pValue = Py_BuildValue("(z)", m_outputName);
         PyErr_Print();
-        RAYX_D_LOG << "Launching Python3 Interpreter!\n";
+        RAYX_D_LOG << "Launching Python3 Interpreter.\n";
         m_presult = PyObject_CallObject(m_pFunc, m_pValue);
         PyErr_Print();
     } else {
@@ -93,8 +93,8 @@ void PythonInterp::cleanup() {
     Py_DECREF(m_pModule);
     Py_DECREF(m_pName);
     // Py_DECREF(m_pValue);
-    //   Py_DECREF(m_pFunc);
-    //    Py_DECREF(m_presult);
+    // Py_DECREF(m_pFunc);
+    // Py_DECREF(m_presult);
 
     // Finish the Python Interpreter
     Py_Finalize();
