@@ -3,15 +3,10 @@
 #define PY_SSIZE_T_CLEAN
 #include <Python.h>
 
-bool callPythonInterp(const char* outputName, const char* pyPath);
-
-void pythonCleanup(PyObject* pName, PyObject* pModule, PyObject* pFunc,
-                   PyObject* pValue, PyObject* presult);
-
 class PythonInterp {
   public:
     PythonInterp();
-    PythonInterp(const char* pyPath, const char* pyName, const char* pyFunc);
+    PythonInterp(const char* pyName, const char* pyFunc, const char* pyPath);
     ~PythonInterp();
 
     void cleanup();
@@ -19,8 +14,9 @@ class PythonInterp {
     void setPlotFileName(const char* outputName);
 
   private:
-    const char* m_outputName;
+    const char* m_outputName = NULL;
     const char* m_pyPath;
+    const char* m_funcName;
     PyObject* m_pName;
     PyObject* m_pModule;
     PyObject* m_pDict;

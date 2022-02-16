@@ -3,6 +3,13 @@
 #include "PythonInterp.h"
 #include "RayCore.h"
 
+// Virtual python Environment Path
+#ifdef WIN32  // Todo
+#define VENV_PATH "./rayxvenv/bin/python3"
+#else
+#define VENV_PATH "./rayxvenv/bin/python3"
+#endif
+
 enum OptFlags { Disabled, Enabled };
 
 class TerminalApp : public RAYX::Application {
@@ -24,6 +31,8 @@ class TerminalApp : public RAYX::Application {
     // Flags initialize to DISABLED
     struct Optargs {
         OptFlags m_plotFlag = OptFlags::Disabled;  // -p (Plot)
+        OptFlags m_csvFlag = OptFlags::Disabled;   // -c (.csv Output)
         char* m_providedFile = NULL;               // -i (Input)
+
     } m_optargs;
 };

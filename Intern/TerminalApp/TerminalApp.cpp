@@ -6,6 +6,7 @@
 #include <unistd.h>
 
 #include <memory>
+#include <stdexcept>
 
 TerminalApp::TerminalApp() {}
 
@@ -22,10 +23,13 @@ void TerminalApp::run() {
 
     /////////////////// Argument Parser
     int c;
-    while ((c = getopt(m_argc, m_argv, "pi:")) != -1) {
+    while ((c = getopt(m_argc, m_argv, "pci:")) != -1) {
         switch (c) {
             case 'p':
                 m_optargs.m_plotFlag = OptFlags::Enabled;
+                break;
+            case 'c':
+                m_optargs.m_csvFlag = OptFlags::Enabled;
                 break;
             case 'i':
                 m_optargs.m_providedFile = optarg;
@@ -39,6 +43,7 @@ void TerminalApp::run() {
                              << ".\n\n"
                              << "Known commands:\n"
                              << "-p \t Plot output footprints and histograms.\n"
+                             << "-h \t Output stored as .csv file.\n"
                              << "-i \t Input RML File Path.\n";
                 else
                     RAYX_ERR << "Unknown option character. \n";
@@ -49,19 +54,46 @@ void TerminalApp::run() {
     }
 
     /////////////////// Argument treatement
+    // Load RML files
     if (m_optargs.m_providedFile != NULL) {
         // load rml file
         m_Beamline = std::make_shared<RAYX::Beamline>(
             RAYX::importBeamline(m_optargs.m_providedFile));
         m_Presenter = RAYX::Presenter(m_Beamline);
     } else {
-        RAYX_D_LOG << "test";
+        RAYX_D_LOG << "Loading dummy beamline.\n";
         loadDummyBeamline();
     }
+
+    // Output File format
+    if (m_optargs.m_csvFlag == OptFlags::Enabled) {
+        RAYX_D_LOG << "CSV.\n";
+    }
+
+    // Run RAY-X Core
     m_Presenter.run();
+    // m_optargs.m_plotFlag = OptFlags::Enabled;
+    //  Plotin Python
     if (m_optargs.m_plotFlag == OptFlags::Enabled) {
-        // Call Setup
-        // std::unique_ptr<PythonInterp> pySetup = std::make_
-        // Call PythonInterp
+        // Setup to create venv if needed
+        try {
+            std::shared_ptr<PythonInterp> pySetup =
+                std::make_shared<PythonInterp>("py_setup", "setup",
+                                               (const char*)NULL);
+            pySetup->execute();
+        } catch (std::exception& e) {
+            RAYX_ERR << e.what() << "\n";
+        }
+
+        // Call PythonInterp from rayx venv
+        try {
+            std::shared_ptr<PythonInterp> pyPlot =
+                std::make_shared<PythonInterp>("py_plot", "plotOutput",
+                                               VENV_PATH);
+            pyPlot->setPlotFileName("output.h5");
+            pyPlot->execute();
+        } catch (std::exception& e) {
+            RAYX_ERR << e.what() << "\n";
+        }
     }
 }
