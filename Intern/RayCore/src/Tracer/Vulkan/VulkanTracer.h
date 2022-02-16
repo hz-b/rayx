@@ -78,7 +78,7 @@ class RAYX_API VulkanTracer {
     std::list<std::vector<Ray>>::const_iterator getOutputIteratorEnd();
 
     // getter
-    const RayList& getRayList() { return rayList; }
+    const RayList& getRayList() { return m_RayList; }
 
   private:
     // Member structs:
@@ -104,33 +104,33 @@ class RAYX_API VulkanTracer {
     };
 
     // Member variables:
-    VkInstance instance;
-    VkDebugUtilsMessengerEXT debugMessenger;
-    VkPhysicalDevice physicalDevice = VK_NULL_HANDLE;
-    VkDevice device;
-    std::vector<uint64_t> bufferSizes;
-    std::vector<VkBuffer> buffers;
-    std::vector<VkDeviceMemory> bufferMemories;
-    VkPipeline pipeline;
-    VkPipelineLayout pipelineLayout;
-    VkShaderModule computeShaderModule;
-    VkCommandPool commandPool;
-    VkCommandBuffer commandBuffer;
-    VkDescriptorPool descriptorPool;
-    VkDescriptorSet descriptorSet;
-    VkDescriptorSetLayout descriptorSetLayout;
-    VkQueue computeQueue;
-    uint32_t queueFamilyIndex;
-    QueueFamilyIndices QueueFamily;
+    VkInstance m_Instance;
+    VkDebugUtilsMessengerEXT m_DebugMessenger;
+    VkPhysicalDevice m_PhysicalDevice = VK_NULL_HANDLE;
+    VkDevice m_Device;
+    std::vector<uint64_t> m_bufferSizes;
+    std::vector<VkBuffer> m_buffers;
+    std::vector<VkDeviceMemory> m_bufferMemories;
+    VkPipeline m_Pipeline;
+    VkPipelineLayout m_PipelineLayout;
+    VkShaderModule m_ComputeShaderModule;
+    VkCommandPool m_CommandPool;
+    VkCommandBuffer m_CommandBuffer;
+    VkDescriptorPool m_DescriptorPool;
+    VkDescriptorSet m_DescriptorSet;
+    VkDescriptorSetLayout m_DescriptorSetLayout;
+    VkQueue m_ComputeQueue;
+    uint32_t m_QueueFamilyIndex;
+    QueueFamilyIndices m_QueueFamily;
 
     // Ray-related vars:
-    uint32_t numberOfBeamlines;
-    uint32_t numberOfQuadricsPerBeamline;
-    uint32_t numberOfRays;
-    uint32_t numberOfRaysPerBeamline;
-    RayList rayList;
-    std::vector<double> beamline;
-    RayList m_outputData;
+    uint32_t m_numberOfBeamlines;
+    uint32_t m_numberOfQuadricsPerBeamline;
+    uint32_t m_numberOfRays;
+    uint32_t m_numberOfRaysPerBeamline;
+    RayList m_RayList;
+    std::vector<double> m_beamlineData;
+    RayList m_OutputRays;
 
     // Member functions:
     // Vulkan
