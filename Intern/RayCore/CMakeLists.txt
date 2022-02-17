@@ -116,10 +116,16 @@ target_link_libraries(${PROJECT_NAME}
 )
 
 if (NOT "$ENV{CI}" STREQUAL "YES") 
+if (UNIX)
+    target_include_directories(${PROJECT_NAME} PUBLIC /usr/include/hdf5/serial)
+    target_link_directories(${PROJECT_NAME} PUBLIC /usr/lib/x86_64-linux-gnu/hdf5/serial)
+    target_link_libraries(${PROJECT_NAME} PUBLIC hdf5)
+elseif (Win32)
     find_package(HDF5 REQUIRED)
     target_link_libraries(${PROJECT_NAME} 
-        PUBLIC HDF5::HDF5
+    PUBLIC HDF5::HDF5
     )
+endif()
 endif()
 
 target_include_directories(${PROJECT_NAME}
