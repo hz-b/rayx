@@ -111,10 +111,16 @@ target_compile_definitions(${PROJECT_NAME}
 )
 
 find_package(Vulkan REQUIRED)
-
 target_link_libraries(${PROJECT_NAME} 
     PUBLIC Vulkan::Vulkan
 )
+
+if (NOT "$ENV{CI}" STREQUAL "YES") 
+    find_package(HDF5 REQUIRED)
+    target_link_libraries(${PROJECT_NAME} 
+        PUBLIC HDF5::HDF5
+    )
+endif()
 
 target_include_directories(${PROJECT_NAME}
     SYSTEM PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/src
