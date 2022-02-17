@@ -120,7 +120,7 @@ if (UNIX)
     target_include_directories(${PROJECT_NAME} PUBLIC /usr/include/hdf5/serial)
     target_link_directories(${PROJECT_NAME} PUBLIC /usr/lib/x86_64-linux-gnu/hdf5/serial)
     target_link_libraries(${PROJECT_NAME} PUBLIC hdf5)
-elseif (Win32)
+else()
     find_package(HDF5 REQUIRED)
     target_link_libraries(${PROJECT_NAME} 
     PUBLIC HDF5::HDF5
