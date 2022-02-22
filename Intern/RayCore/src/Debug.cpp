@@ -64,4 +64,31 @@ Err::~Err() {
     exit(1);
 }
 
+const int PREC = 17;
+
+void dbg(std::string filename, int line, std::string name,
+         std::vector<double> v) {
+    RAYX::Log(filename, line) << name << ":";
+
+    int counter = 0;  // stores the number of elements in the stringstream
+    std::stringstream s;
+    for (size_t i = 0; i < v.size(); i++) {
+        if (counter != 0) {
+            s << " ";
+        }
+        s << std::setprecision(PREC) << v[i];
+
+        counter++;
+        if (counter == 4 &&
+            v.size() == 16) {  // 4x4 things should be written in 4 rows
+            counter = 0;
+            RAYX::Log(filename, line) << s.str();
+            s = std::stringstream();
+        }
+    }
+    if (counter > 0) {
+        RAYX::Log(filename, line) << s.str();
+    }
+}
+
 }  // namespace RAYX

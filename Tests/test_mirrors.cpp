@@ -4,31 +4,10 @@
 #if RUN_TEST_MIRRORS
 
 TEST(PlaneMirror, testSimpleParams) {
-    // arrange
-    // act
-    // assert
-    double width = 68.12;
-    double height = 123.6;
-    double incidenceAngle = 13.2;
-    double azimuthalAngle = 0.0;
-    double dist = 12005;
-    RAYX::Geometry::GeometricalShape geometricalShape =
-        RAYX::Geometry::GeometricalShape::RECTANGLE;
-    int icurv = 1;
-    std::array<double, 6> mis = {0, 0, 0, 0, 0, 0};
-    std::array<double, 7> sE = {0, 0, 0, 0, 0, 0, 0};
-    std::array<double, 4 * 4> surface = {
-        0, 0, 0, 0, double(icurv), 0, 0, -1, 0, 0, 0, 0, 0, 0, 0, 0};
+    auto b = RAYX::importBeamline(
+        "../../Tests/rml_files/test_mirrors/testSimpleParams.rml");
 
-    RAYX::WorldUserParams g_params = RAYX::WorldUserParams(
-        degToRad(incidenceAngle), degToRad(incidenceAngle),
-        degToRad(azimuthalAngle), dist, mis);
-    glm::dvec4 position = g_params.calcPosition();
-    glm::dmat4x4 orientation = g_params.calcOrientation();
-
-    RAYX::PlaneMirror plM = RAYX::PlaneMirror(
-        "planemirror", geometricalShape, width, height,
-        g_params.getAzimuthalAngle(), position, orientation, sE, Material::CU);
+    auto plM = b.m_OpticalElements[0];
 
     glm::dmat4x4 correctInMatrix =
         glm::dmat4x4(1, 0, 0, 0, 0, 0.97357890287316029, 0.22835087011065572, 0,
@@ -38,14 +17,18 @@ TEST(PlaneMirror, testSimpleParams) {
         1, 0, 0, 0, 0, 0.97357890287316029, -0.22835087011065572, 0, 0,
         0.22835087011065572, 0.97357890287316029, 0, 0, 0, 12005, 1);
 
-    ASSERT_DOUBLE_EQ(plM.getWidth(), width);
-    ASSERT_DOUBLE_EQ(plM.getHeight(), height);
-    EXPECT_ITERABLE_DOUBLE_EQ_ARR(7, sE, plM.getSlopeError());
-    EXPECT_ITERABLE_DOUBLE_EQ_ARR(4 * 4, surface, plM.getSurfaceParams());
-    EXPECT_ITERABLE_DOUBLE_EQ_ARR(4 * 4, plM.getInMatrix(),
-                                  glmToArray16(correctInMatrix));
-    EXPECT_ITERABLE_DOUBLE_EQ_ARR(4 * 4, plM.getOutMatrix(),
-                                  glmToArray16(correctOutMatrix));
+    std::array<double, 7> sE = {0, 0, 0, 0, 0, 0, 0};
+
+    int icurv = 1;
+    std::array<double, 4 * 4> surface = {
+        0, 0, 0, 0, double(icurv), 0, 0, -1, 0, 0, 0, 0, 0, 0, 0, 0};
+
+    CHECK_EQ(plM->getWidth(), 68.12);
+    CHECK_EQ(plM->getHeight(), 123.6);
+    CHECK_EQ(sE, plM->getSlopeError());
+    CHECK_EQ(surface, plM->getSurfaceParams());
+    CHECK_EQ(plM->getInMatrix(), glmToArray16(correctInMatrix));
+    CHECK_EQ(plM->getOutMatrix(), glmToArray16(correctOutMatrix));
 }
 
 TEST(PlaneMirror, testAdvancedParams) {

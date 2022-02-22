@@ -9,9 +9,13 @@
  *
  */
 
+#include <array>
+#include <glm.hpp>
+#include <iomanip>
 #include <iostream>
 #include <sstream>
 #include <string>
+#include <vector>
 
 // Memory leak detection (RAYX_NEW instead of new allows leaks to be detected)
 #ifdef RAY_DEBUG_MODE
@@ -34,6 +38,10 @@
 #endif
 
 namespace RAYX {
+
+///////////////////////////////////////////////
+// LOGGING SYSTEM
+///////////////////////////////////////////////
 
 /**
  *
@@ -90,7 +98,6 @@ struct IgnoreLog {
         return *this;
     }
 };
-}  // namespace RAYX
 
 #define RAYX_LOG RAYX::Log(__FILE__, __LINE__)
 #define RAYX_WARN RAYX::Warn(__FILE__, __LINE__)
@@ -106,3 +113,53 @@ struct IgnoreLog {
 #define RAYX_D_WARN RAYX::IgnoreLog()
 #define RAYX_D_ERR RAYX::IgnoreLog()
 #endif
+
+/////////////////////////////////////////////////////////////////////////////
+// COLLECTION DEBUGGING SYSTEM
+/////////////////////////////////////////////////////////////////////////////
+
+/**
+ *
+ * In the following we define
+ * RAYX_DBG: prints collection to RAYX_LOG for debugging
+ *
+ * example usage:
+ * RAYX_DBG(orientation);
+ * RAYX_DBG(position);
+ * */
+
+template <int N, int M>
+inline std::vector<double> to_vec_impl(glm::mat<N, M, double> arg) {
+    std::vector<double> out(N * M);
+    for (size_t i = 0; i < N * M; i++) {
+        out[i] = arg[i / N][i % N];
+    }
+    return out;
+}
+
+template <int N>
+inline std::vector<double> to_vec_impl(glm::vec<N, double> arg) {
+    std::vector<double> out(N);
+    for (size_t i = 0; i < N; i++) {
+        out[i] = arg[i];
+    }
+    return out;
+}
+
+template <size_t N>
+inline std::vector<double> to_vec_impl(std::array<double, N> arg) {
+    std::vector<double> out(N);
+    for (size_t i = 0; i < N; i++) {
+        out[i] = arg[i];
+    }
+    return out;
+}
+
+inline std::vector<double> to_vec_impl(double arg) { return {arg}; }
+
+void dbg(std::string filename, int line, std::string name,
+         std::vector<double> v);
+
+#define RAYX_DBG(C) RAYX::dbg(__FILE__, __LINE__, #C, RAYX::to_vec_impl(C))
+
+}  // namespace RAYX
