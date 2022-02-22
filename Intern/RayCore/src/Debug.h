@@ -129,7 +129,7 @@ struct IgnoreLog {
  * */
 
 template <int N, int M>
-inline std::vector<double> to_vec_impl(glm::mat<N, M, double> arg) {
+inline std::vector<double> formatAsVec(glm::mat<N, M, double> arg) {
     std::vector<double> out(N * M);
     for (size_t i = 0; i < N * M; i++) {
         out[i] = arg[i / N][i % N];
@@ -138,7 +138,7 @@ inline std::vector<double> to_vec_impl(glm::mat<N, M, double> arg) {
 }
 
 template <int N>
-inline std::vector<double> to_vec_impl(glm::vec<N, double> arg) {
+inline std::vector<double> formatAsVec(glm::vec<N, double> arg) {
     std::vector<double> out(N);
     for (size_t i = 0; i < N; i++) {
         out[i] = arg[i];
@@ -147,7 +147,7 @@ inline std::vector<double> to_vec_impl(glm::vec<N, double> arg) {
 }
 
 template <size_t N>
-inline std::vector<double> to_vec_impl(std::array<double, N> arg) {
+inline std::vector<double> formatAsVec(std::array<double, N> arg) {
     std::vector<double> out(N);
     for (size_t i = 0; i < N; i++) {
         out[i] = arg[i];
@@ -155,11 +155,11 @@ inline std::vector<double> to_vec_impl(std::array<double, N> arg) {
     return out;
 }
 
-inline std::vector<double> to_vec_impl(double arg) { return {arg}; }
+inline std::vector<double> formatAsVec(double arg) { return {arg}; }
 
 void dbg(std::string filename, int line, std::string name,
          std::vector<double> v);
 
-#define RAYX_DBG(C) RAYX::dbg(__FILE__, __LINE__, #C, RAYX::to_vec_impl(C))
+#define RAYX_DBG(C) RAYX::dbg(__FILE__, __LINE__, #C, RAYX::formatAsVec(C))
 
 }  // namespace RAYX

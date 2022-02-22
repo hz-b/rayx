@@ -19,7 +19,7 @@
 #define RUN_TEST_SLIT 1
 #define RUN_TEST_SOURCES 1
 
-// old EXPECT system: (deprecated)
+// old CHECK system: (deprecated)
 
 //! Using the google test framework, check all elements of two containers
 #define EXPECT_ITERABLE_BASE(PREDICATE, REFTYPE, TARTYPE, ref, target)       \
@@ -65,17 +65,17 @@
     EXPECT_ITERABLE_BASE(EXPECT_DOUBLE_EQ, ARR(L), ARR(L), ref, target)
 //
 
-// new EXPECT system:
+// new CHECK system:
 /* usage:
     CHECK_EQ(A, B, 1e-10); // with explicit tolerance
     CHECK_EQ(A, B);        // without default tolerance
 */
 
-void check_eq(std::string filename, int line, std::string l, std::string r,
-              std::vector<double> vl, std::vector<double> vr,
-              double tolerance = 1e-10);
+void checkEq(std::string filename, int line, std::string l, std::string r,
+             std::vector<double> vl, std::vector<double> vr,
+             double tolerance = 1e-10);
 
-#define CHECK_EQ(L, R, ...)                                    \
-    check_eq(__FILE__, __LINE__, #L, #R, RAYX::to_vec_impl(L), \
-             RAYX::to_vec_impl(R),                             \
-             ##__VA_ARGS__)  // __VA_ARGS__ = tolerance or nothing
+#define CHECK_EQ(L, R, ...)                                   \
+    checkEq(__FILE__, __LINE__, #L, #R, RAYX::formatAsVec(L), \
+            RAYX::formatAsVec(R),                             \
+            ##__VA_ARGS__)  // __VA_ARGS__ = tolerance or nothing

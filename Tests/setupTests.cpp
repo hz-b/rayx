@@ -2,9 +2,8 @@
 
 const int PREC = 17;
 
-void check_eq(std::string filename, int line, std::string l, std::string r,
-              std::vector<double> vl, std::vector<double> vr,
-              double tolerance) {
+void checkEq(std::string filename, int line, std::string l, std::string r,
+             std::vector<double> vl, std::vector<double> vr, double tolerance) {
     if (vl.size() != vr.size()) {
         RAYX::Warn(filename, line)
             << l << " != " << r << ": different lengths!";
