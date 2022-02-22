@@ -25,8 +25,8 @@ TEST(PlaneMirror, testSimpleParams) {
 
     CHECK_EQ(plM->getWidth(), 68.12);
     CHECK_EQ(plM->getHeight(), 123.6);
-    CHECK_EQ(sE, plM->getSlopeError());
-    CHECK_EQ(surface, plM->getSurfaceParams());
+    CHECK_EQ(plM->getSlopeError(), sE);
+    CHECK_EQ(plM->getSurfaceParams(), surface);
     CHECK_EQ(plM->getInMatrix(), correctInMatrix);
     CHECK_EQ(plM->getOutMatrix(), correctOutMatrix);
 }
@@ -55,39 +55,24 @@ TEST(PlaneMirror, testAdvancedParams) {
 
     CHECK_EQ(plM->getWidth(), 124.12);
     CHECK_EQ(plM->getHeight(), 26);
-    CHECK_EQ(sE, plM->getSlopeError());
-    CHECK_EQ(surface, plM->getSurfaceParams());
+    CHECK_EQ(plM->getSlopeError(), sE);
+    CHECK_EQ(plM->getSurfaceParams(), surface);
     CHECK_EQ(plM->getInMatrix(), correctInMatrix);
     CHECK_EQ(plM->getOutMatrix(), correctOutMatrix);
 }
 
 TEST(SphereMirror, testParams) {
-    double width = 21.62;
-    double height = 813.12;
-    double incidence = 12.75;
-    double azimuthal = 41.2;
-    double dist = 12.12;
-    double entranceArmLength = 12.7;
-    double exitArmLength = 123.1;
-    RAYX::Geometry::GeometricalShape geometricalShape =
-        RAYX::Geometry::GeometricalShape::RECTANGLE;
+    auto b = RAYX::importBeamline(
+        "../../Tests/rml_files/test_mirrors/testParams.rml");
+
+    std::shared_ptr<RAYX::SphereMirror> sM =
+        std::dynamic_pointer_cast<RAYX::SphereMirror>(b.m_OpticalElements[0]);
+
     int icurv = 1;
     double radius = 104.32651829593351;  // from old RAY
-    std::array<double, 6> mis = {10, 51, 2, 0.1, 5, 0.241};
     std::array<double, 7> sE = {0.7, 0.5, 0.3, 0.7, 0.3, 3, 2};
     std::array<double, 4 * 4> surface = {
         1, 0, 0, 0, double(icurv), 1, 0, -radius, 0, 0, 1, 0, 0, 0, 0, 0};
-
-    RAYX::GeometricUserParams g_params = RAYX::GeometricUserParams(incidence);
-    RAYX::WorldUserParams w_params =
-        RAYX::WorldUserParams(g_params.getAlpha(), g_params.getBeta(),
-                              degToRad(azimuthal), dist, mis);
-    glm::dvec4 position = w_params.calcPosition();
-    glm::dmat4x4 orientation = w_params.calcOrientation();
-    RAYX::SphereMirror sM = RAYX::SphereMirror(
-        "spheremirror", geometricalShape, width, height,
-        w_params.getAzimuthalAngle(), incidence, position, orientation,
-        entranceArmLength, exitArmLength, sE, Material::CU);
 
     glm::dmat4x4 correctInMatrix = glm::dmat4x4(
         0.024368111991334068, -0.85883516451860731, -0.51167211698926318, 0,
@@ -100,17 +85,15 @@ TEST(SphereMirror, testParams) {
         -0.51167211698926318, -0.78601777932905481, 0.34694047799924849, 0,
         -44.580256504514161, 26.779249273575296, 12.807414238606773, 1);
 
-    ASSERT_DOUBLE_EQ(sM.getWidth(), width);
-    ASSERT_DOUBLE_EQ(sM.getHeight(), height);
-    EXPECT_NEAR(sM.getRadius(), radius, 0.0000000001);
-    ASSERT_DOUBLE_EQ(sM.getExitArmLength(), exitArmLength);
-    ASSERT_DOUBLE_EQ(sM.getEntranceArmLength(), entranceArmLength);
-    EXPECT_ITERABLE_DOUBLE_EQ_ARR(7, sE, sM.getSlopeError());
-    EXPECT_ITERABLE_DOUBLE_EQ_ARR(4 * 4, surface, sM.getSurfaceParams());
-    EXPECT_ITERABLE_DOUBLE_EQ_ARR(4 * 4, sM.getInMatrix(),
-                                  glmToArray16(correctInMatrix));
-    EXPECT_ITERABLE_DOUBLE_EQ_ARR(4 * 4, sM.getOutMatrix(),
-                                  glmToArray16(correctOutMatrix));
+    CHECK_EQ(sM->getWidth(), 21.62);
+    CHECK_EQ(sM->getHeight(), 813.12);
+    CHECK_EQ(sM->getRadius(), radius, 0.0000000001);
+    CHECK_EQ(sM->getExitArmLength(), 123.1);
+    CHECK_EQ(sM->getEntranceArmLength(), 12.7);
+    CHECK_EQ(sM->getSlopeError(), sE);
+    CHECK_EQ(sM->getSurfaceParams(), surface);
+    CHECK_EQ(sM->getInMatrix(), correctInMatrix);
+    CHECK_EQ(sM->getOutMatrix(), correctOutMatrix);
 }
 
 TEST(SphereMirror, testPrecalculateRadius) {

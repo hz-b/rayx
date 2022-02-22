@@ -66,7 +66,7 @@ class RAYX_API OpticalElement : public BeamlineObject {
     std::array<double, 7> getSlopeError() const;
 
     OpticalElement();
-    ~OpticalElement();
+    virtual ~OpticalElement();
 
   private:
     // GEOMETRY
