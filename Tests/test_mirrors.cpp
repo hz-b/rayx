@@ -27,34 +27,20 @@ TEST(PlaneMirror, testSimpleParams) {
     CHECK_EQ(plM->getHeight(), 123.6);
     CHECK_EQ(sE, plM->getSlopeError());
     CHECK_EQ(surface, plM->getSurfaceParams());
-    CHECK_EQ(plM->getInMatrix(), glmToArray16(correctInMatrix));
-    CHECK_EQ(plM->getOutMatrix(), glmToArray16(correctOutMatrix));
+    CHECK_EQ(plM->getInMatrix(), correctInMatrix);
+    CHECK_EQ(plM->getOutMatrix(), correctOutMatrix);
 }
 
 TEST(PlaneMirror, testAdvancedParams) {
-    double width = 124.12;
-    double height = 26;
-    double incidenceAngle = 23;
-    double azimuthalAngle = 8.2;
-    double dist = 12005;
-    RAYX::Geometry::GeometricalShape geometricalShape =
-        RAYX::Geometry::GeometricalShape::RECTANGLE;
+    auto b = RAYX::importBeamline(
+        "../../Tests/rml_files/test_mirrors/testAdvancedParams.rml");
+
+    auto plM = b.m_OpticalElements[0];
+
     int icurv = 1;
-    std::array<double, 6> mis = {1, 2, 3, 0.01, 0.02, 0.03};
     std::array<double, 7> sE = {0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7};
     std::array<double, 4 * 4> surface = {
         0, 0, 0, 0, double(icurv), 0, 0, -1, 0, 0, 0, 0, 0, 0, 0, 0};
-
-    RAYX::WorldUserParams g_params = RAYX::WorldUserParams(
-        degToRad(incidenceAngle), degToRad(incidenceAngle),
-        degToRad(azimuthalAngle), dist, mis);
-    glm::dvec4 position = g_params.calcPosition();
-    glm::dmat4x4 orientation = g_params.calcOrientation();
-
-    RAYX::PlaneMirror plM =
-        RAYX::PlaneMirror("planemirror", geometricalShape, width, height,
-                          g_params.getAzimuthalAngle(), position, orientation,
-                          sE, Material::CU);  // {1,2,3,0.01,0.02,0.03}
 
     glm::dmat4x4 correctInMatrix = glm::dmat4x4(
         0.98631018201912979, -0.16127244932632739, -0.034400900187032908, 0,
@@ -67,14 +53,12 @@ TEST(PlaneMirror, testAdvancedParams) {
         -0.034400900187032908, 0.38097327387397439, 0.92394585483136815, 0,
         0.56056258280537641, 3.1255667397288804, 12006.979040713644, 1);
 
-    ASSERT_DOUBLE_EQ(plM.getWidth(), width);
-    ASSERT_DOUBLE_EQ(plM.getHeight(), height);
-    EXPECT_ITERABLE_DOUBLE_EQ_ARR(7, sE, plM.getSlopeError());
-    EXPECT_ITERABLE_DOUBLE_EQ_ARR(4 * 4, surface, plM.getSurfaceParams());
-    EXPECT_ITERABLE_DOUBLE_EQ_ARR(4 * 4, plM.getInMatrix(),
-                                  glmToArray16(correctInMatrix));
-    EXPECT_ITERABLE_DOUBLE_EQ_ARR(4 * 4, plM.getOutMatrix(),
-                                  glmToArray16(correctOutMatrix));
+    CHECK_EQ(plM->getWidth(), 124.12);
+    CHECK_EQ(plM->getHeight(), 26);
+    CHECK_EQ(sE, plM->getSlopeError());
+    CHECK_EQ(surface, plM->getSurfaceParams());
+    CHECK_EQ(plM->getInMatrix(), correctInMatrix);
+    CHECK_EQ(plM->getOutMatrix(), correctOutMatrix);
 }
 
 TEST(SphereMirror, testParams) {
