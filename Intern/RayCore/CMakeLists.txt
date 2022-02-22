@@ -111,10 +111,22 @@ target_compile_definitions(${PROJECT_NAME}
 )
 
 find_package(Vulkan REQUIRED)
-
 target_link_libraries(${PROJECT_NAME} 
     PUBLIC Vulkan::Vulkan
 )
+
+if (NOT "$ENV{CI}" STREQUAL "YES") 
+if (UNIX)
+    target_include_directories(${PROJECT_NAME} PUBLIC /usr/include/hdf5/serial)
+    target_link_directories(${PROJECT_NAME} PUBLIC /usr/lib/x86_64-linux-gnu/hdf5/serial)
+    target_link_libraries(${PROJECT_NAME} PUBLIC hdf5)
+else()
+    find_package(HDF5 REQUIRED)
+    target_link_libraries(${PROJECT_NAME} 
+    PUBLIC HDF5::HDF5
+    )
+endif()
+endif()
 
 target_include_directories(${PROJECT_NAME}
     SYSTEM PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/src

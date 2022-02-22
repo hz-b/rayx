@@ -1,13 +1,13 @@
 cmake_minimum_required(VERSION 3.2 FATAL_ERROR)
 project(RayTests)
 
-if (NOT "$ENV{CI}" STREQUAL "YES") # lhdf5 doesn't exist in CI
-	# for ubuntu users:
-	include_directories("/usr/include/hdf5/serial")
-	link_directories("/usr/lib/x86_64-linux-gnu/hdf5/serial")
+# if (NOT "$ENV{CI}" STREQUAL "YES") # lhdf5 doesn't exist in CI
+# 	# for ubuntu users:
+# 	include_directories("/usr/include/hdf5/serial")
+# 	link_directories("/usr/lib/x86_64-linux-gnu/hdf5/serial")
 
-	link_libraries("hdf5")
-endif()
+# 	link_libraries("hdf5")
+# endif()
 
 
 include(CTest)

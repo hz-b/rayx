@@ -45,7 +45,7 @@ static std::vector<int> MATERIAL_INDEX_TABLE;
 // fills the tables above
 void fillMaterialTables() {
     auto mats = allNormalMaterials();
-    for (uint i = 0; i < mats.size(); i++) {
+    for (size_t i = 0; i < mats.size(); i++) {
         PalikTable t;
 
         if (!PalikTable::load(getMaterialName(mats[i]), &t)) {
