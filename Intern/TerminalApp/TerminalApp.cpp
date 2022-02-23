@@ -72,25 +72,28 @@ void TerminalApp::run() {
 
     // Run RAY-X Core
     m_Presenter.run();
-    // m_optargs.m_plotFlag = OptFlags::Enabled;
-    //  Plotin Python
+
+    //  Plot in Python
     if (m_optargs.m_plotFlag == OptFlags::Enabled) {
         // Setup to create venv if needed
         try {
             std::shared_ptr<PythonInterp> pySetup =
                 std::make_shared<PythonInterp>("py_setup", "setup",
-                                               (const char*)NULL);
+                                               (const char*)nullptr);
             pySetup->execute();
         } catch (std::exception& e) {
             RAYX_ERR << e.what() << "\n";
         }
+        RAYX_D_LOG << "Python Setup OK.";
 
-        // Call PythonInterp from rayx venv
+        // Call PythonInterp from rayx venv:
+        // *Temporary method (Calls sys python interpreter that calls rayx
+        // interpreter) [Python Dynamic linking problem]
         try {
             std::shared_ptr<PythonInterp> pyPlot =
-                std::make_shared<PythonInterp>("py_plot", "plotOutput",
-                                               VENV_PATH);
-            pyPlot->setPlotFileName("output.h5");
+                std::make_shared<PythonInterp>("py_plot_entry", "startPlot",
+                                               (const char*)nullptr);
+            // pyPlot->setPlotFileName("output.h5");
             pyPlot->execute();
         } catch (std::exception& e) {
             RAYX_ERR << e.what() << "\n";

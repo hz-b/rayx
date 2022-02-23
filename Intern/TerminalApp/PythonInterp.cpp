@@ -18,13 +18,16 @@ PythonInterp::PythonInterp() {}
  * @param pyName Python file name
  * @param pyFunc Python function name
  * @param pyPath Python 3 Interpreter Path (if NULL, uses default system python3
- * path)
+ * path) (Recommended : Leave as default)
  */
 PythonInterp::PythonInterp(const char* pyName, const char* pyFunc,
                            const char* pyPath)
     : m_pyPath(pyPath), m_funcName(pyFunc) {
-    // Set custom python interpreter
-    if (!m_pyPath) Py_SetPath((const wchar_t*)pyPath);
+    // Set custom python interpreter (Not recommended)
+    if (m_pyPath) {
+        RAYX_D_LOG << "set custom path";
+        setenv("PATH", pyPath, 1);
+    }
 
     // Initiliaze the Interpreter
     Py_Initialize();
@@ -62,7 +65,7 @@ void PythonInterp::execute() {
     if (m_pFunc && PyCallable_Check(m_pFunc)) {
         if (m_outputName) m_pValue = Py_BuildValue("(z)", m_outputName);
         PyErr_Print();
-        RAYX_D_LOG << "Launching Python3 Interpreter.\n";
+        RAYX_D_LOG << "Launching Python3 Interpreter.";
         m_presult = PyObject_CallObject(m_pFunc, m_pValue);
         PyErr_Print();
     } else {
