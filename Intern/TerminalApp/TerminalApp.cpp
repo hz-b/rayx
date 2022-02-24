@@ -22,9 +22,37 @@ void TerminalApp::run() {
     RAYX_D_LOG << "TerminalApp running...";
 
     /////////////////// Argument Parser
+    const static struct option long_options[] = {
+        {"plot", no_argument, 0, 'p'}, {"input", required_argument, 0, 'i'},
+        {"ocsv", no_argument, 0, 'c'}, {"version", no_argument, 0, 'v'},
+        {"help", no_argument, 0, 'h'}, {"dummy", no_argument, 0, 'd'}};
+
     int c;
-    while ((c = getopt(m_argc, m_argv, "pci:")) != -1) {
+    int option_index;
+    extern int opterr;
+    opterr = 0;  // Set opt auto error output to silent
+
+    while (
+        (c = getopt_long(m_argc, m_argv, "pi:cvhd",  // : required, :: optional
+                         long_options, &option_index)) != -1) {
         switch (c) {
+            case '?':
+                if (optopt == 'i')
+                    RAYX_ERR << "Option -" << static_cast<char>(optopt)
+                             << " needs an input RML file.\n";
+                else if (isprint(optopt))
+                    RAYX_ERR << "Unknown option -" << static_cast<char>(optopt)
+                             << ".\n";
+                else
+                    RAYX_ERR << "Unknown option character. \n";
+                getHelp();
+                exit(1);
+            case 'h':
+                getHelp();
+                exit(1);
+            case 'v':
+                getVersion();
+                exit(1);
             case 'p':
                 m_optargs.m_plotFlag = OptFlags::Enabled;
                 break;
@@ -34,19 +62,11 @@ void TerminalApp::run() {
             case 'i':
                 m_optargs.m_providedFile = optarg;
                 break;
-            case '?':
-                if (optopt == 'i')
-                    RAYX_ERR << "Option -" << static_cast<char>(optopt)
-                             << " needs an input RML file.\n";
-                else if (isprint(optopt))
-                    RAYX_ERR << "Unknown option -" << static_cast<char>(optopt)
-                             << ".\n\n"
-                             << "Known commands:\n"
-                             << "-p \t Plot output footprints and histograms.\n"
-                             << "-h \t Output stored as .csv file.\n"
-                             << "-i \t Input RML File Path.\n";
-                else
-                    RAYX_ERR << "Unknown option character. \n";
+            case 'd':
+                m_optargs.m_dummyFlag = OptFlags::Enabled;
+                break;
+            case 0:
+                RAYX_ERR << "No option given.";
                 break;
             default:
                 abort();
