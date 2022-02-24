@@ -23,9 +23,13 @@ void TerminalApp::run() {
 
     /////////////////// Argument Parser
     const static struct option long_options[] = {
-        {"plot", no_argument, 0, 'p'}, {"input", required_argument, 0, 'i'},
-        {"ocsv", no_argument, 0, 'c'}, {"version", no_argument, 0, 'v'},
-        {"help", no_argument, 0, 'h'}, {"dummy", no_argument, 0, 'd'}};
+        {"plot", no_argument, 0, 'p'},
+        {"input", required_argument, 0, 'i'},
+        {"ocsv", no_argument, 0, 'c'},
+        {"version", no_argument, 0, 'v'},
+        {"help", no_argument, 0, 'h'},
+        {"dummy", no_argument, 0, 'd'},
+        {0, 0, 0, 0}};
 
     int c;
     int option_index;
@@ -33,7 +37,8 @@ void TerminalApp::run() {
     opterr = 0;  // Set opt auto error output to silent
 
     while (
-        (c = getopt_long(m_argc, m_argv, "pi:cvhd",  // : required, :: optional
+        (c = getopt_long(m_argc, m_argv,
+                         "pi:cvhd",  // : required, :: optional, 'none' nothing
                          long_options, &option_index)) != -1) {
         switch (c) {
             case '?':
@@ -81,13 +86,19 @@ void TerminalApp::run() {
             RAYX::importBeamline(m_optargs.m_providedFile));
         m_Presenter = RAYX::Presenter(m_Beamline);
     } else {
-        RAYX_D_LOG << "Loading dummy beamline.\n";
-        loadDummyBeamline();
+        if (m_optargs.m_dummyFlag) {
+            RAYX_D_LOG << "Loading dummy beamline.\n";
+            loadDummyBeamline();
+        } else {
+            RAYX_ERR << "No Pipeline/Beamline provided, exiting..";
+            exit(1);
+        }
     }
 
     // Output File format
     if (m_optargs.m_csvFlag == OptFlags::Enabled) {
         RAYX_D_LOG << "CSV.\n";
+        // TODO : Enhance writer
     }
 
     // Run RAY-X Core

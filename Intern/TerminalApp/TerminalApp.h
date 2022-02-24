@@ -25,7 +25,9 @@ class TerminalApp : public RAYX::Application {
     const std::string& getProvidedFilePath() const { return providedFile; };
 
     inline void getHelp() const {
-        RAYX_LOG << "\nRAY-X known commands:\n"
+        RAYX_LOG << "\nRAY-X Terminal usage: "
+                 << "TerminalApp [OPTION].. [FILE]\n\n"
+                 << "Options:\n"
                  << "-p --plot\t Plot output footprints and histograms.\n"
                  << "-c --ocsv\t Output stored as .csv file.\n"
                  << "-i --input\t Input RML File Path.\n"
