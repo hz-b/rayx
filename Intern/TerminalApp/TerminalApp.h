@@ -4,6 +4,7 @@
 
 #include "PythonInterp.h"
 #include "RayCore.h"
+#include "TerminalAppConfig.h"
 
 // Virtual python Environment Path
 #ifdef WIN32  // Todo
@@ -25,7 +26,7 @@ class TerminalApp : public RAYX::Application {
     const std::string& getProvidedFilePath() const { return providedFile; };
 
     inline void getHelp() const {
-        RAYX_LOG << "\nRAY-X Terminal usage: "
+        RAYX_LOG << "\n\nRAY-X Terminal usage: "
                  << "TerminalApp [OPTION].. [FILE]\n\n"
                  << "Options:\n"
                  << "-p --plot\t Plot output footprints and histograms.\n"
@@ -39,13 +40,16 @@ class TerminalApp : public RAYX::Application {
     inline void getVersion() const {
         RAYX_LOG << R"(
 
-        ██████╗  █████╗ ██╗   ██╗    ██╗  ██╗    
-        ██╔══██╗██╔══██╗╚██╗ ██╔╝    ╚██╗██╔╝    
-        ██████╔╝███████║ ╚████╔╝      ╚███╔╝     
-        ██╔══██╗██╔══██║  ╚██╔╝       ██╔██╗     
-        ██║  ██║██║  ██║   ██║       ██╔╝ ██╗    
-        ╚═╝  ╚═╝╚═╝  ╚═╝   ╚═╝       ╚═╝  ╚═╝ HZB 2022.)";
-        RAYX_LOG << "RAY-X X.X.X Build xxxXXX";
+      ██████╗  █████╗ ██╗   ██╗    ██╗  ██╗    
+      ██╔══██╗██╔══██╗╚██╗ ██╔╝    ╚██╗██╔╝    
+      ██████╔╝███████║ ╚████╔╝      ╚███╔╝     
+      ██╔══██╗██╔══██║  ╚██╔╝       ██╔██╗     
+      ██║  ██║██║  ██║   ██║       ██╔╝ ██╗    
+      ╚═╝  ╚═╝╚═╝  ╚═╝   ╚═╝       ╚═╝  ╚═╝ HZB 2022.)";
+        RAYX_LOG << "RAY-X Terminal Application " << TERMINALAPP_VERSION_MAJOR
+                 << "." << TERMINALAPP_VERSION_MINOR << "."
+                 << TERMINALAPP_VERSION_PATCH << "."
+                 << TERMINALAPP_VERSION_TWEAK;
     }  // TODO: CMake config needed
 
   private:

@@ -90,7 +90,7 @@ void TerminalApp::run() {
             RAYX_D_LOG << "Loading dummy beamline.\n";
             loadDummyBeamline();
         } else {
-            RAYX_ERR << "No Pipeline/Beamline provided, exiting..";
+            RAYX_LOG << "No Pipeline/Beamline provided, exiting..";
             exit(1);
         }
     }
