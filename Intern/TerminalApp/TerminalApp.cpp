@@ -1,6 +1,7 @@
 #include "TerminalApp.h"
 
 #include "Debug.h"
+#include "PathResolver.h"
 
 // TODO: (potential) Replace Getopt with boost(header-only)
 #include <unistd.h>
@@ -11,6 +12,7 @@
 TerminalApp::TerminalApp() {}
 
 TerminalApp::TerminalApp(int argc, char** argv) : m_argv(argv), m_argc(argc) {
+    initPathResolver(argv[0]);
     RAYX_D_LOG << "TerminalApp created!";
 }
 

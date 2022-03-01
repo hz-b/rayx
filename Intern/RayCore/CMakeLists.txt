@@ -4,6 +4,7 @@ project(RayCore)
 
 SET(SOURCE
     src/Application.cpp
+    src/PathResolver.cpp
     src/Debug.cpp
     src/utils.cpp
     src/Model/Beamline/Beamline.cpp
@@ -51,6 +52,7 @@ SET(SOURCE
 
 SET(HEADERS
     src/Application.h
+    src/PathResolver.h
     src/utils.h
     src/Model/Beamline/Beamline.h
     src/Model/Beamline/BeamlineObject.h

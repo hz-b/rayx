@@ -1,9 +1,11 @@
 #include <filesystem>
 
+#include "PathResolver.h"
 #include "gmock/gmock.h"
 #include "gtest/gtest.h"
 
 int main(int argc, char** argv) {
+    initPathResolver(argv[0]);
     {
         const char* outputDir = "../../Tests/output/";
         if (!std::filesystem::is_directory(outputDir) ||
