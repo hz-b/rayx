@@ -1,9 +1,12 @@
 cmake_minimum_required(VERSION 3.2 FATAL_ERROR)
-project(TerminalApp)
+
+
+project(TerminalApp VERSION 0.3.0.0)
+
+configure_file(TerminalAppConfig.h.in TerminalAppConfig.h)
 
 # set(CMAKE_VERBOSE_MAKEFILE ON)
 # set(CMAKE_COLOR_MAKEFILE   ON)
-
 
 #Add Python files
 file(COPY python DESTINATION ${CMAKE_BINARY_DIR}/bin)
@@ -18,6 +21,7 @@ find_package(Python3 REQUIRED)
 find_package (PythonLibs REQUIRED)
 
 target_include_directories(${PROJECT_NAME} PRIVATE ${RayCore_SOURCE_DIR}/src)
+target_include_directories(${PROJECT_NAME} PRIVATE ${PROJECT_BINARY_DIR})
 
 include_directories(${PYTHON_INCLUDE_DIRS})
 
