@@ -141,7 +141,7 @@ void writeToFile(std::list<double> outputRays, std::string name) {
     std::cout.precision(17);
 
     // relative path to folder from bin/build
-    std::string filename = "../../Tests/output/";
+    std::string filename = resolvePath("Tests/output/");
     filename.append(name);
     filename.append(".csv");
     // create file
@@ -282,7 +282,7 @@ void testOpticalElement(
  * @param filename      name of rml file without ending .rml
  */
 void testBeamline(const char* filename) {
-    std::string beamline_file = "../../Tests/rml_files/test_shader/";
+    std::string beamline_file = resolvePath("Tests/rml_files/test_shader/");
     beamline_file.append(filename);
     beamline_file.append(".rml");
     std::shared_ptr<RAYX::Beamline> beamline = std::make_shared<RAYX::Beamline>(
@@ -1898,7 +1898,7 @@ TEST_F(opticalElements, FourMirrors_20Rays) {
 }
 
 TEST_F(opticalElements, slit1) {
-    std::string beamline_file = "../../Tests/rml_files/test_shader/";
+    std::string beamline_file = resolvePath("Tests/rml_files/test_shader/");
     const char* filename = "slit";
     beamline_file.append(filename);
     beamline_file.append(".rml");

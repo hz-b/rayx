@@ -5,7 +5,7 @@
 
 TEST(PlaneMirror, testSimpleParams) {
     auto b = RAYX::importBeamline(
-        "../../Tests/rml_files/test_mirrors/testSimpleParams.rml");
+        resolvePath("Tests/rml_files/test_mirrors/testSimpleParams.rml"));
 
     auto plM = b.m_OpticalElements[0];
 
@@ -33,7 +33,7 @@ TEST(PlaneMirror, testSimpleParams) {
 
 TEST(PlaneMirror, testAdvancedParams) {
     auto b = RAYX::importBeamline(
-        "../../Tests/rml_files/test_mirrors/testAdvancedParams.rml");
+        resolvePath("Tests/rml_files/test_mirrors/testAdvancedParams.rml"));
 
     auto plM = b.m_OpticalElements[0];
 
@@ -63,7 +63,7 @@ TEST(PlaneMirror, testAdvancedParams) {
 
 TEST(SphereMirror, testParams) {
     auto b = RAYX::importBeamline(
-        "../../Tests/rml_files/test_mirrors/testParams.rml");
+        resolvePath("Tests/rml_files/test_mirrors/testParams.rml"));
 
     std::shared_ptr<RAYX::SphereMirror> sM =
         std::dynamic_pointer_cast<RAYX::SphereMirror>(b.m_OpticalElements[0]);
@@ -99,7 +99,7 @@ TEST(SphereMirror, testParams) {
 
 TEST(Ellipse, defaultParams) {
     auto b = RAYX::importBeamline(
-        "../../Tests/rml_files/test_mirrors/defaultParams.rml");
+        resolvePath("Tests/rml_files/test_mirrors/defaultParams.rml"));
 
     auto eb =
         std::dynamic_pointer_cast<RAYX::Ellipsoid>(b.m_OpticalElements[0]);

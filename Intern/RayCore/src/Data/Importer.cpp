@@ -129,7 +129,7 @@ void handleObjectCollection(rapidxml::xml_node<>* collection,
     }
 }
 
-Beamline importBeamline(const char* filename) {
+Beamline importBeamline(std::filesystem::path filename) {
     RAYX_PROFILE_FUNCTION();
     // first implementation: stringstreams are slow; this might need
     // optimization

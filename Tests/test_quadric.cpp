@@ -8,8 +8,8 @@
 // commit 18f6af0). Is it possible to re-add this part while still using RML in
 // a simple way?
 TEST(Quadric, testTransformationMatrices) {
-    auto b = RAYX::importBeamline(
-        "../../Tests/rml_files/test_quadric/testTransformationMatrices.rml");
+    auto b = RAYX::importBeamline(resolvePath(
+        "Tests/rml_files/test_quadric/testTransformationMatrices.rml"));
 
     auto plM = b.m_OpticalElements[0];
 
@@ -30,7 +30,7 @@ TEST(Quadric, testTransformationMatrices) {
 
 TEST(Quadric, testGlobalCoordinates) {
     auto b = RAYX::importBeamline(
-        "../../Tests/rml_files/test_quadric/testGlobalCoordinates.rml");
+        resolvePath("Tests/rml_files/test_quadric/testGlobalCoordinates.rml"));
     auto p1 = b.m_OpticalElements[0];
     auto p2 = b.m_OpticalElements[1];
     auto p3 = b.m_OpticalElements[2];

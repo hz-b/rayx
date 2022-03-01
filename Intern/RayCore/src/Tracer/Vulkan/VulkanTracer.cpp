@@ -6,6 +6,7 @@
 #include "Debug.h"
 #include "Debug/Instrumentor.h"
 #include "Material.h"
+#include "PathResolver.h"
 
 #ifdef RAYX_PLATFORM_WINDOWS
 #include "GFSDK_Aftermath.h"
@@ -664,7 +665,8 @@ void VulkanTracer::fillStagingBuffer(
     if ((*raySetIterator).size() > GPU_MAX_STAGING_SIZE) {
         RAYX_ERR << "(*raySetIterator).size() > GPU_MAX_STAGING_SIZE)!";
     }
-    vectorsPerStagingBuffer = std::min(m_RayList.size(), vectorsPerStagingBuffer);
+    vectorsPerStagingBuffer =
+        std::min(m_RayList.size(), vectorsPerStagingBuffer);
     RAYX_LOG << "Vectors per StagingBuffer: " << vectorsPerStagingBuffer;
     for (uint32_t i = 0; i < vectorsPerStagingBuffer; i++) {
         memcpy(((char*)data) + i * RAY_VECTOR_SIZE, (*raySetIterator).data(),
@@ -840,7 +842,8 @@ void VulkanTracer::fillMaterialBuffer() {
     {
         // data is copied to the buffer
         void* data;
-        vkMapMemory(m_Device, m_bufferMemories[5], 0, m_bufferSizes[5], 0, &data);
+        vkMapMemory(m_Device, m_bufferMemories[5], 0, m_bufferSizes[5], 0,
+                    &data);
         memcpy(data, getMaterialIndexTable()->data(), m_bufferSizes[5]);
         vkUnmapMemory(m_Device, m_bufferMemories[5]);
     }
@@ -848,7 +851,8 @@ void VulkanTracer::fillMaterialBuffer() {
     // material buffer
     {
         void* data;
-        vkMapMemory(m_Device, m_bufferMemories[6], 0, m_bufferSizes[6], 0, &data);
+        vkMapMemory(m_Device, m_bufferMemories[6], 0, m_bufferSizes[6], 0,
+                    &data);
         memcpy(data, getMaterialTable()->data(), m_bufferSizes[6]);
         vkUnmapMemory(m_Device, m_bufferMemories[6]);
     }
@@ -892,8 +896,9 @@ void VulkanTracer::createDescriptorSetLayout() {
         descriptorSetLayoutBinding;  // TODO
 
     // Create the descriptor set layout.
-    VK_CHECK_RESULT(vkCreateDescriptorSetLayout(
-        m_Device, &descriptorSetLayoutCreateInfo, NULL, &m_DescriptorSetLayout));
+    VK_CHECK_RESULT(vkCreateDescriptorSetLayout(m_Device,
+                                                &descriptorSetLayoutCreateInfo,
+                                                NULL, &m_DescriptorSetLayout));
 }
 
 void VulkanTracer::createDescriptorSet() {
@@ -930,8 +935,8 @@ void VulkanTracer::createDescriptorSet() {
     descriptorSetAllocateInfo.pSetLayouts = &m_DescriptorSetLayout;
 
     // allocate descriptor set.
-    VK_CHECK_RESULT(vkAllocateDescriptorSets(m_Device, &descriptorSetAllocateInfo,
-                                             &m_DescriptorSet));
+    VK_CHECK_RESULT(vkAllocateDescriptorSets(
+        m_Device, &descriptorSetAllocateInfo, &m_DescriptorSet));
 
     for (uint32_t i = 0; i < m_buffers.size(); i++) {
         if (i == 3) {
@@ -1005,7 +1010,8 @@ void VulkanTracer::createComputePipeline() {
     uint32_t filelength;
     // the code in comp.spv was created by running the command:
     // glslangValidator.exe -V shader.comp
-    uint32_t* code = readFile(filelength, SHADERPATH);
+    std::string path = resolvePath(std::string("build/bin/") + SHADERPATH);
+    uint32_t* code = readFile(filelength, path.c_str());
     VkShaderModuleCreateInfo createInfo = {};
     createInfo.sType = VK_STRUCTURE_TYPE_SHADER_MODULE_CREATE_INFO;
     createInfo.pCode = code;
@@ -1013,8 +1019,8 @@ void VulkanTracer::createComputePipeline() {
 
     RAYX_LOG << "Create shader module";
 
-    VK_CHECK_RESULT(
-        vkCreateShaderModule(m_Device, &createInfo, NULL, &m_ComputeShaderModule));
+    VK_CHECK_RESULT(vkCreateShaderModule(m_Device, &createInfo, NULL,
+                                         &m_ComputeShaderModule));
     RAYX_LOG << "Shader module created";
     delete[] code;
 
@@ -1092,9 +1098,9 @@ void VulkanTracer::createCommandBuffer() {
     commandBufferAllocateInfo.level = VK_COMMAND_BUFFER_LEVEL_PRIMARY;
     commandBufferAllocateInfo.commandBufferCount =
         1;  // allocate a single command buffer.
-    VK_CHECK_RESULT(
-        vkAllocateCommandBuffers(m_Device, &commandBufferAllocateInfo,
-                                 &m_CommandBuffer));  // allocate command buffer.
+    VK_CHECK_RESULT(vkAllocateCommandBuffers(
+        m_Device, &commandBufferAllocateInfo,
+        &m_CommandBuffer));  // allocate command buffer.
 
     /*
     Now we shall start recording commands into the newly allocated command
@@ -1115,7 +1121,8 @@ void VulkanTracer::createCommandBuffer() {
     The validation layer will NOT give warnings if you forget these, so be
     very careful not to forget them.
     */
-    vkCmdBindPipeline(m_CommandBuffer, VK_PIPELINE_BIND_POINT_COMPUTE, m_Pipeline);
+    vkCmdBindPipeline(m_CommandBuffer, VK_PIPELINE_BIND_POINT_COMPUTE,
+                      m_Pipeline);
     vkCmdBindDescriptorSets(m_CommandBuffer, VK_PIPELINE_BIND_POINT_COMPUTE,
                             m_PipelineLayout, 0, 1, &m_DescriptorSet, 0, NULL);
     // vkCmdBindDescriptorSets(commandBuffer,
@@ -1201,7 +1208,8 @@ void VulkanTracer::addRayVector(std::vector<Ray>&& inRayVector) {
              << m_RayList.size();
     RAYX_LOG << "Sent size: " << inRayVector.size();
     m_RayList.insertVector(std::move(inRayVector));
-    RAYX_LOG << "rayList ray count per vector: " << (*(m_RayList.begin())).size();
+    RAYX_LOG << "rayList ray count per vector: "
+             << (*(m_RayList.begin())).size();
 }
 
 // adds quad to beamline
@@ -1214,14 +1222,16 @@ void VulkanTracer::addArrays(
     RAYX_PROFILE_FUNCTION();
     // beamline.resize(beamline.size()+1);
 
-    m_beamlineData.insert(m_beamlineData.end(), surfaceParams.begin(), surfaceParams.end());
-    m_beamlineData.insert(m_beamlineData.end(), inputInMatrix.begin(), inputInMatrix.end());
+    m_beamlineData.insert(m_beamlineData.end(), surfaceParams.begin(),
+                          surfaceParams.end());
+    m_beamlineData.insert(m_beamlineData.end(), inputInMatrix.begin(),
+                          inputInMatrix.end());
     m_beamlineData.insert(m_beamlineData.end(), inputOutMatrix.begin(),
-                    inputOutMatrix.end());
+                          inputOutMatrix.end());
     m_beamlineData.insert(m_beamlineData.end(), objectParameters.begin(),
-                    objectParameters.end());
+                          objectParameters.end());
     m_beamlineData.insert(m_beamlineData.end(), elementParameters.begin(),
-                    elementParameters.end());
+                          elementParameters.end());
 
     // Possibility to use utils/movingAppend
 }

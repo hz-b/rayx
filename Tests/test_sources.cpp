@@ -20,9 +20,7 @@ void writeRaysToFile(std::list<double> outputRays, std::string name) {
     std::ofstream outputFile;
     outputFile.precision(17);
     std::cout.precision(17);
-    std::string filename = "../../Tests/output/";
-    filename.append(name);
-    filename.append(".csv");
+    std::string filename = resolvePath("Tests/output/" + name + ".csv");
     outputFile.open(filename);
     char sep = ';';  // file is saved in .csv (comma seperated value), excel
                      // compatibility is manual right now
