@@ -4,6 +4,7 @@
 #include <Tracer/Vulkan/Material.h>
 
 #include <array>
+#include <filesystem>
 #include <glm.hpp>
 #include <vector>
 
@@ -49,6 +50,7 @@ bool paramSlopeError(const rapidxml::xml_node<>* node,
                      std::array<double, 7>* out);
 bool paramVls(const rapidxml::xml_node<>* node, std::array<double, 6>* out);
 bool paramEnergyDistribution(const rapidxml::xml_node<>* node,
+                             std::filesystem::path rmlFile,
                              EnergyDistribution* out);
 
 bool paramPositionAndOrientation(const rapidxml::xml_node<>* node,

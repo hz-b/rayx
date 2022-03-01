@@ -14,7 +14,8 @@
 namespace RAYX {
 
 void addBeamlineObjectFromXML(rapidxml::xml_node<>* node, Beamline* beamline,
-                              const std::vector<xml::Group>& group_context) {
+                              const std::vector<xml::Group>& group_context,
+                              std::filesystem::path filename) {
     const char* type = node->first_attribute("type")->value();
 
     // the following three blocks of code are lambda expressions (see
@@ -64,9 +65,9 @@ void addBeamlineObjectFromXML(rapidxml::xml_node<>* node, Beamline* beamline,
     // nullptr) The createFromXML functions use the param* functions declared in
     // <Data/xml.h>
     if (strcmp(type, "Point Source") == 0) {
-        addLightSource(PointSource::createFromXML(node), node);
+        addLightSource(PointSource::createFromXML(node, filename), node);
     } else if (strcmp(type, "Matrix Source") == 0) {
-        addLightSource(MatrixSource::createFromXML(node), node);
+        addLightSource(MatrixSource::createFromXML(node, filename), node);
     } else if (strcmp(type, "ImagePlane") == 0) {
         addOpticalElement(ImagePlane::createFromXML(node, group_context), node);
     } else if (strcmp(type, "Plane Mirror") == 0) {
@@ -106,11 +107,13 @@ void addBeamlineObjectFromXML(rapidxml::xml_node<>* node, Beamline* beamline,
  * `collection` may either be a <beamline> or a <group>. */
 void handleObjectCollection(rapidxml::xml_node<>* collection,
                             Beamline* beamline,
-                            std::vector<xml::Group>* group_context) {
+                            std::vector<xml::Group>* group_context,
+                            std::filesystem::path filename) {
     for (rapidxml::xml_node<>* object = collection->first_node(); object;
          object = object->next_sibling()) {  // Iterating through objects
         if (strcmp(object->name(), "object") == 0) {
-            addBeamlineObjectFromXML(object, beamline, *group_context);
+            addBeamlineObjectFromXML(object, beamline, *group_context,
+                                     filename);
         } else if (strcmp(object->name(), "group") == 0) {
             xml::Group g;
             bool success = xml::parseGroup(object, &g);
@@ -119,7 +122,7 @@ void handleObjectCollection(rapidxml::xml_node<>* collection,
             } else {
                 RAYX_ERR << "parseGroup failed!";
             }
-            handleObjectCollection(object, beamline, group_context);
+            handleObjectCollection(object, beamline, group_context, filename);
             if (success) {
                 group_context->pop_back();
             }
@@ -154,7 +157,7 @@ Beamline importBeamline(std::filesystem::path filename) {
 
     Beamline beamline;
     std::vector<xml::Group> group_context;
-    handleObjectCollection(xml_beamline, &beamline, &group_context);
+    handleObjectCollection(xml_beamline, &beamline, &group_context, filename);
     return beamline;
 }
 
