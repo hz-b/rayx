@@ -31,6 +31,7 @@ void TerminalApp::run() {
         {"version", no_argument, 0, 'v'},
         {"help", no_argument, 0, 'h'},
         {"dummy", no_argument, 0, 'd'},
+        {"benchmark", no_argument, 0, 'b'},
         {0, 0, 0, 0}};
 
     int c;
@@ -40,7 +41,7 @@ void TerminalApp::run() {
 
     while (
         (c = getopt_long(m_argc, m_argv,
-                         "pi:cvhd",  // : required, :: optional, 'none' nothing
+                         "pi:cvhdb",  // : required, :: optional, 'none' nothing
                          long_options, &option_index)) != -1) {
         switch (c) {
             case '?':
@@ -72,6 +73,9 @@ void TerminalApp::run() {
             case 'd':
                 m_optargs.m_dummyFlag = OptFlags::Enabled;
                 break;
+            case 'b':
+                m_optargs.m_benchmark = OptFlags::Enabled;
+                break;
             case 0:
                 RAYX_ERR << "No option given.";
                 break;
@@ -88,8 +92,14 @@ void TerminalApp::run() {
             RAYX::importBeamline(m_optargs.m_providedFile));
         m_Presenter = RAYX::Presenter(m_Beamline);
     } else {
+        // Benchmark mode
+        if (m_optargs.m_benchmark) {
+            RAYX_D_LOG << "Starting in Benchmark Mode \n";
+            m_start_time = std::chrono::system_clock::now();
+        }
+
         if (m_optargs.m_dummyFlag) {
-            RAYX_D_LOG << "Loading dummy beamline.\n";
+            RAYX_D_LOG << "Loading dummy beamline.";
             loadDummyBeamline();
         } else {
             RAYX_LOG << "No Pipeline/Beamline provided, exiting..";
@@ -105,6 +115,12 @@ void TerminalApp::run() {
 
     // Run RAY-X Core
     m_Presenter.run();
+
+    if (m_optargs.m_benchmark) {
+        const std::chrono::duration<double> duration =
+            std::chrono::system_clock::now() - m_start_time;
+        RAYX_LOG << "Benchmark: Done in " << duration.count() << "s.";
+    }
 
     //  Plot in Python
     if (m_optargs.m_plotFlag == OptFlags::Enabled) {

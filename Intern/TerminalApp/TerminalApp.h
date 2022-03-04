@@ -34,6 +34,8 @@ class TerminalApp : public RAYX::Application {
                  << "-i --input\t Input RML File Path.\n"
                  << "-d --dummy\t Run an in-house Beamline.\n"
                  << "-h --help\t Output this message.\n"
+                 << "-b --benchmark\t Benchmark application:\n"
+                 << "\t\t RML Parse → Trace → Output Storage\n"
                  << "-v --version\n";
     }
 
@@ -56,6 +58,7 @@ class TerminalApp : public RAYX::Application {
     char** m_argv;
     int m_argc;
     std::string providedFile;
+    std::chrono::_V2::system_clock::time_point m_start_time;
 
     // CLI Arguments
     // Flags initialize to DISABLED
@@ -64,6 +67,7 @@ class TerminalApp : public RAYX::Application {
         OptFlags m_plotFlag = OptFlags::Disabled;   // -p (Plot)
         OptFlags m_csvFlag = OptFlags::Disabled;    // -c (.csv Output)
         OptFlags m_dummyFlag = OptFlags::Disabled;  // -d (Dummy Beamline)
+        OptFlags m_benchmark = OptFlags::Disabled;  // -b (Benchmark)
         char* m_providedFile = NULL;                // -i (Input)
 
     } m_optargs;
