@@ -1977,4 +1977,107 @@ TEST_F(opticalElements, CylinderDefault) {
     testBeamline(filename);
     ASSERT_TRUE(true);
 }
+
+/**
+ * loads beamline from rml file, traces beamline and returns resulting rays
+ * @param filename      name of rml file without ending .rml
+ */
+std::list<double> trace(const char* filename) {
+    std::string beamline_file = resolvePath("Tests/rml_files/test_shader/");
+    beamline_file.append(filename);
+    beamline_file.append(".rml");
+    std::shared_ptr<RAYX::Beamline> beamline = std::make_shared<RAYX::Beamline>(
+        RAYX::importBeamline(beamline_file.c_str()));
+
+    std::vector<std::shared_ptr<RAYX::OpticalElement>> elements =
+        beamline->m_OpticalElements;
+    std::vector<RAYX::Ray> testValues = beamline->m_LightSources[0]->getRays();
+
+    return runTracer(testValues, elements);
+}
+
+double parseDouble(std::string s) {
+    double d;
+    if (sscanf(s.c_str(), "%le", &d) != 1) {
+        RAYX_WARN << "parseDouble failed for string:";
+        RAYX_ERR << s;
+        return false;
+    }
+    return d;
+}
+
+std::vector<double> parseCSVline(std::string line) {
+    std::vector<double> out;
+
+    if (line.ends_with('\n')) {
+        line.pop_back();
+    }
+
+    while (true) {
+        auto idx = line.find('\t');
+        if (idx == std::string::npos) {
+            out.push_back(parseDouble(line));
+            break;
+        } else {
+            out.push_back(parseDouble(line.substr(0, idx)));
+            line = line.substr(idx + 1);
+        }
+    }
+
+    return out;
+}
+
+std::vector<std::vector<double>> loadCSVRayUI(const char* csv) {
+    std::string beamline_file = resolvePath("Tests/rml_files/test_shader/");
+    beamline_file.append(csv);
+    beamline_file.append(".csv");
+
+    std::ifstream f(beamline_file);
+    std::string line;
+
+    // discard first two lines
+    for (int i = 0; i < 2; i++) {
+        std::getline(f, line);
+    }
+
+    std::vector<std::vector<double>> out;
+
+    while (std::getline(f, line)) {
+        out.push_back(parseCSVline(line));
+    }
+
+    return out;
+}
+
+void compareFromCSVRayUI(std::list<double> rays_list, const char* csv) {
+    auto correct = loadCSVRayUI(csv);
+
+    CHECK_EQ(correct.size(), rays_list.size() / RAY_DOUBLE_COUNT);
+
+    std::vector<double> rays;
+    for (auto x : rays_list) {
+        rays.push_back(x);
+    }
+
+    for (unsigned int i = 0; i < correct.size(); i++) {
+        CHECK_EQ(rays[16 * i + 0], correct[i][3]);    // x
+        CHECK_EQ(rays[16 * i + 1], correct[i][4]);    // y
+        CHECK_EQ(rays[16 * i + 2], correct[i][5]);    // z
+        CHECK_EQ(rays[16 * i + 4], correct[i][6]);    // dir x
+        CHECK_EQ(rays[16 * i + 5], correct[i][6]);    // dir y
+        CHECK_EQ(rays[16 * i + 6], correct[i][6]);    // dir z
+        CHECK_EQ(rays[16 * i + 7], correct[i][7]);    // energy
+        CHECK_EQ(rays[16 * i + 12], correct[i][8]);   // path length
+        CHECK_EQ(rays[16 * i + 8], correct[i][9]);    // s0
+        CHECK_EQ(rays[16 * i + 9], correct[i][10]);   // s1
+        CHECK_EQ(rays[16 * i + 10], correct[i][11]);  // s2
+        CHECK_EQ(rays[16 * i + 11], correct[i][12]);  // s3
+    }
+}
+
+TEST_F(opticalElements, ToroidAzimuth) {
+    const char* filename = "Toroid_Azimuth";
+    compareFromCSVRayUI(trace(filename), filename);
+}
+
 #endif
