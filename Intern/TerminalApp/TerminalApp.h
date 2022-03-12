@@ -41,13 +41,14 @@ class TerminalApp : public RAYX::Application {
 
     inline void getVersion() const {
         RAYX_LOG << R"(
-
-      ██████╗  █████╗ ██╗   ██╗    ██╗  ██╗    
-      ██╔══██╗██╔══██╗╚██╗ ██╔╝    ╚██╗██╔╝    
-      ██████╔╝███████║ ╚████╔╝      ╚███╔╝     
-      ██╔══██╗██╔══██║  ╚██╔╝       ██╔██╗     
-      ██║  ██║██║  ██║   ██║       ██╔╝ ██╗    
-      ╚═╝  ╚═╝╚═╝  ╚═╝   ╚═╝       ╚═╝  ╚═╝ HZB 2022.)";
+          
+        ╔═══╗╔═══╗╔╗  ╔╗     ╔═╗╔═╗
+        ║╔═╗║║╔═╗║║╚╗╔╝║     ╚╗╚╝╔╝
+        ║╚═╝║║║ ║║╚╗╚╝╔╝      ╚╗╔╝ 
+        ║╔╗╔╝║╚═╝║ ╚╗╔╝ ╔═══╗ ╔╝╚╗ 
+        ║║║╚╗║╔═╗║  ║║  ╚═══╝╔╝╔╗╚╗
+        ╚╝╚═╝╚╝ ╚╝  ╚╝       ╚═╝╚═╝ HZB 2022.
+        )";
         RAYX_LOG << "RAY-X Terminal Application " << TERMINALAPP_VERSION_MAJOR
                  << "." << TERMINALAPP_VERSION_MINOR << "."
                  << TERMINALAPP_VERSION_PATCH << "."
