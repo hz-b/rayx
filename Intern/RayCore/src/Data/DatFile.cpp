@@ -6,7 +6,7 @@
 #include <sstream>
 
 namespace RAYX {
-bool DatFile::load(const char* filename, DatFile* out) {
+bool DatFile::load(std::filesystem::path filename, DatFile* out) {
     std::ifstream s(filename);
 
     std::string line;

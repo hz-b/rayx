@@ -36,10 +36,14 @@ def setup():
 def install_packages():
     """
     Installs required packages for plotting: pandas, matplotlib etc..
+    * matplotlib : Interactive plotting module
+    * pandas : BigData Analysis module
+    * h5py : HDF5 binary data format module
+    * pyqt : Necessary for plot GUI Backend access. (if ran from terminal)
     """
     python_venv_bin = "./rayxvenv/bin/python3"
-    packages = ['matplotlib', 'pandas', 'numpy']
-
+    packages = ['matplotlib', 'pandas', 'h5py','pyqt5']
+    
     for package in packages:
-        install = subprocess.check_call(
+        subprocess.check_call(
             [python_venv_bin, '-m', 'pip', 'install', package])

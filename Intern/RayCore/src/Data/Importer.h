@@ -1,5 +1,6 @@
 #pragma once
 
+#include <filesystem>
 #include <memory>
 
 #include "Core.h"
@@ -7,6 +8,6 @@
 
 namespace RAYX {
 
-Beamline importBeamline(const char* filename);
+Beamline importBeamline(std::filesystem::path);
 
 }  // namespace RAYX

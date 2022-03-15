@@ -7,11 +7,11 @@
 #include <iostream>
 #include <sstream>
 
+#include "PathResolver.h"
+
 bool PalikTable::load(const char* element, PalikTable* out) {
-    std::string f = "../../Data/PALIK/";  // TODO(rudi): make paths more robust!
-    f += element;
-    f += ".NKP";
-    std::ifstream s(f);
+    std::string f = "Data/PALIK/" + std::string(element) + ".NKP";
+    std::ifstream s(resolvePath(f));
 
     if (s.fail()) {
         return false;

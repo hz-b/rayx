@@ -50,7 +50,7 @@ MatrixSource::~MatrixSource() {}
 
 // returns nullptr on error
 std::shared_ptr<MatrixSource> MatrixSource::createFromXML(
-    rapidxml::xml_node<>* node) {
+    rapidxml::xml_node<>* node, std::filesystem::path rmlFile) {
     const std::string name = node->first_attribute("name")->value();
 
     if (!xml::paramInt(node, "numberRays", &SimulationEnv::get().m_numOfRays)) {
@@ -58,7 +58,7 @@ std::shared_ptr<MatrixSource> MatrixSource::createFromXML(
     }
 
     EnergyDistribution energyDistribution;
-    if (!xml::paramEnergyDistribution(node, &energyDistribution)) {
+    if (!xml::paramEnergyDistribution(node, rmlFile, &energyDistribution)) {
         return nullptr;
     }
 

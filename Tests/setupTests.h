@@ -3,6 +3,7 @@
 #include "Debug.h"
 #include "Model/Beamline/Objects/Objects.h"
 #include "Model/Geometry/Geometry.h"
+#include "PathResolver.h"
 #include "Tracer/Ray.h"
 #include "UserParameter/GeometricUserParams.h"
 #include "UserParameter/WorldUserParams.h"

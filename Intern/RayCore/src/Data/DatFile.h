@@ -1,5 +1,6 @@
 #pragma once
 
+#include <filesystem>
 #include <random>
 #include <string>
 #include <vector>
@@ -25,7 +26,7 @@ struct DatFile {
     std::vector<DatEntry> m_Lines;
 
     /** loads the .DAT file `filename` and writes it's contents to `out` */
-    static bool load(const char* filename, DatFile* out);
+    static bool load(std::filesystem::path filename, DatFile* out);
 
     /** creates a valid .DAT file from this struct (may be used for testing) */
     std::string dump();

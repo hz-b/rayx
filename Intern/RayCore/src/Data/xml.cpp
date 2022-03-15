@@ -5,6 +5,7 @@
 
 #include <cstdio>
 #include <cstring>
+#include <filesystem>
 #include <iostream>
 
 namespace RAYX {
@@ -233,6 +234,7 @@ bool paramVls(const rapidxml::xml_node<>* node, std::array<double, 6>* out) {
 }
 
 bool paramEnergyDistribution(const rapidxml::xml_node<>* node,
+                             std::filesystem::path rmlFile,
                              EnergyDistribution* out) {
     if (!node || !out) {
         return false;
@@ -259,9 +261,13 @@ bool paramEnergyDistribution(const rapidxml::xml_node<>* node,
         if (!xml::paramStr(node, "photonEnergyDistributionFile", &filename)) {
             return false;
         }
+        std::filesystem::path path = std::filesystem::canonical(rmlFile);
+        path.replace_filename(
+            filename);  // this makes the path `filename` be relative to the
+                        // path of the rml file
 
         DatFile df;
-        if (!DatFile::load(filename, &df)) {
+        if (!DatFile::load(path, &df)) {
             return false;
         }
 

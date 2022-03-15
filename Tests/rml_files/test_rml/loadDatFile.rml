@@ -20,7 +20,7 @@
     <param id="rotationXerror" enabled="F">0</param>
     <param id="rotationYerror" enabled="F">0</param>
     <param id="energyDistributionType" comment="File" enabled="T">0</param>
-    <param id="photonEnergyDistributionFile" relative="../../Tests/rml_files/test_rml/loadDatFile.DAT" enabled="T">../../Tests/rml_files/test_rml/loadDatFile.DAT</param>
+    <param id="photonEnergyDistributionFile" relative="loadDatFile.DAT" enabled="T">loadDatFile.DAT</param>
     <param id="photonEnergy" enabled="F">100</param>
     <param id="energySpreadType" comment="white band" enabled="F">0</param>
     <param id="energySpreadUnit" comment="eV" enabled="F">0</param>
