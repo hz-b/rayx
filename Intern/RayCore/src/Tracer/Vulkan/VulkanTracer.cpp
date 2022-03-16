@@ -958,6 +958,7 @@ void VulkanTracer::createComputePipeline() {
     RAYX_LOG << "Shader module(s) created.";
     delete[] compShaderCode;
 
+    RAYX_LOG << "Creating pipeline...";
     /*
     Now let us actually create the compute pipeline.
     It only consists of a single stage with a compute shader.
@@ -991,6 +992,7 @@ void VulkanTracer::createComputePipeline() {
     */
     VK_CHECK_RESULT(vkCreateComputePipelines(m_Device, VK_NULL_HANDLE, 1, &pipelineCreateInfo, NULL,
                                              &m_Pipeline));
+    RAYX_LOG << "Pipeline created.";
 }
 
 void VulkanTracer::createCommandPool() {
