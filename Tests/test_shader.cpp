@@ -2083,6 +2083,13 @@ TEST_F(opticalElements, ToroidAzimuth_OnlyMatrixSource) {
     compareFromCSVRayUI(trace(filename), filename);
 }
 
+TEST_F(opticalElements, ToroidAzimuth_NoImagePlane) {
+    const char* filename = "Toroid_Azimuth_NoImagePlane";
+    testBeamline(filename);  // this generates an output file to manually
+                             // compare // TODO: remove
+    compareFromCSVRayUI(trace(filename), filename);
+}
+
 TEST_F(opticalElements, ToroidAzimuth) {
     const char* filename = "Toroid_Azimuth";
     testBeamline(filename);  // this generates an output file to manually
