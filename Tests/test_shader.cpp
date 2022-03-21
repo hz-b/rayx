@@ -2075,6 +2075,13 @@ void compareFromCSVRayUI(std::list<double> rays_list, const char* csv) {
     }
 }
 
+TEST_F(opticalElements, PlaneTest) {
+    const char* filename = "PlaneTest";
+    testBeamline(filename);  // this generates an output file to manually
+                             // compare // TODO: remove
+    compareFromCSVRayUI(trace(filename), filename);
+}
+
 // this is the same as ToroidAzimuth but only contains the MatrixSource
 TEST_F(opticalElements, ToroidAzimuth_OnlyMatrixSource) {
     const char* filename = "Toroid_Azimuth_OnlyMatrixSource";
