@@ -63,7 +63,11 @@ PythonInterp::PythonInterp(const char* pyName, const char* pyFunc,
  */
 void PythonInterp::execute() {
     if (m_pFunc && PyCallable_Check(m_pFunc)) {
-        if (m_outputName) m_pValue = Py_BuildValue("(z)", m_outputName);
+        if (!m_outputName.empty()) {
+            // If provided input file, parse to python interpreter as bytes
+            m_pValue = PyTuple_New(1);
+            PyTuple_SetItem(m_pValue,0,PyBytes_FromString(m_outputName.c_str()));
+        }
         PyErr_Print();
         RAYX_D_LOG << "Launching Python3 Interpreter.";
         m_presult = PyObject_CallObject(m_pFunc, m_pValue);
@@ -85,11 +89,6 @@ void PythonInterp::execute() {
 /**
  * @brief Clean up and stop Python
  *
- * @param pName
- * @param pModule
- * @param pFunc
- * @param pValue
- * @param presult
  */
 void PythonInterp::cleanup() {
     // Clean up and free allocated memory
@@ -102,12 +101,13 @@ void PythonInterp::cleanup() {
     // Finish the Python Interpreter
     Py_Finalize();
 }
-/**files
- * @param outputName Name of output file. Defaults to output.h5 (Plotting
+/**
+ * @brief Change plot title, call before .exexute
+ * @param outputName Name of input file. Defaults to NULL (Plotting
  * related)
  */
-void PythonInterp::setPlotFileName(const char* outputName) {
-    m_outputName = outputName;
+void PythonInterp::setPlotName(const char* outputName) {
+    m_outputName = std::string (outputName);
 }
 
 PythonInterp::~PythonInterp() {}

@@ -142,7 +142,9 @@ void TerminalApp::run() {
             std::shared_ptr<PythonInterp> pyPlot =
                 std::make_shared<PythonInterp>("py_plot_entry", "startPlot",
                                                (const char*)nullptr);
-            // pyPlot->setPlotFileName("output.h5");
+            if (m_optargs.m_providedFile){
+                std::string _providedFile = m_optargs.m_providedFile;
+                pyPlot->setPlotName( _providedFile.c_str());}
             pyPlot->execute();
         } catch (std::exception& e) {
             RAYX_ERR << e.what() << "\n";
