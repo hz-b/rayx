@@ -60,10 +60,10 @@ done
 
 #Summary
 echo "=============================================="
-echo "Average execution time: " $((total_time / (trials+1))) 
+echo "Average execution time: " $((total_time / (trials+1))) " ms"
 
 total_time_rms=$((total_time_rms / (trials+1)))
-echo "RMS: " $(echo "sqrt($total_time_rms)" | bc)
+echo "RMS: " $(echo "sqrt($total_time_rms)" | bc) " ms"
 
 rm output
 
