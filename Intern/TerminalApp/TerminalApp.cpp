@@ -94,7 +94,7 @@ void TerminalApp::run() {
     } else {
         // Benchmark mode
         if (m_optargs.m_benchmark) {
-            RAYX_D_LOG << "Starting in Benchmark Mode \n";
+            RAYX_D_LOG << "Starting in Benchmark Mode.\n";
             m_start_time = std::chrono::system_clock::now();
         }
 
@@ -117,9 +117,9 @@ void TerminalApp::run() {
     m_Presenter.run();
 
     if (m_optargs.m_benchmark) {
-        const std::chrono::duration<double> duration =
-            std::chrono::system_clock::now() - m_start_time;
-        RAYX_LOG << "Benchmark: Done in " << duration.count() << "s.";
+        std::chrono::steady_clock::time_point end = std::chrono::steady_clock::now();
+        RAYX_LOG << "Benchmark: Done in " << std::chrono::duration_cast<std::chrono::milliseconds>(end - start_time).count() << " ms" ;
+        RAYX_LOG << "Benchmark: Done in " << std::chrono::duration_cast<std::chrono::seconds>(end - start_time).count() << " s" ;
     }
 
     //  Plot in Python
