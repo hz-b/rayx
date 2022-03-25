@@ -84,6 +84,7 @@ void TerminalApp::run() {
         }
     }
 
+    auto start_time  = std::chrono::steady_clock::now();
     /////////////////// Argument treatement
     // Load RML files
     if (m_optargs.m_providedFile != NULL) {
@@ -95,7 +96,6 @@ void TerminalApp::run() {
         // Benchmark mode
         if (m_optargs.m_benchmark) {
             RAYX_D_LOG << "Starting in Benchmark Mode.\n";
-            m_start_time = std::chrono::system_clock::now();
         }
 
         if (m_optargs.m_dummyFlag) {
@@ -119,7 +119,6 @@ void TerminalApp::run() {
     if (m_optargs.m_benchmark) {
         std::chrono::steady_clock::time_point end = std::chrono::steady_clock::now();
         RAYX_LOG << "Benchmark: Done in " << std::chrono::duration_cast<std::chrono::milliseconds>(end - start_time).count() << " ms" ;
-        RAYX_LOG << "Benchmark: Done in " << std::chrono::duration_cast<std::chrono::seconds>(end - start_time).count() << " s" ;
     }
 
     //  Plot in Python
