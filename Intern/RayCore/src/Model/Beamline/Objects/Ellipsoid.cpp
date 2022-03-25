@@ -65,7 +65,7 @@ Ellipsoid::Ellipsoid(const char* name,
                                   7, 0, matd, m_a44}));
     setElementParameters({sin(m_tangentAngle), cos(m_tangentAngle), m_y0,
                           m_z0,        //
-                          0, 0, 0, 0,  //
+                          double(m_figureRotation), 0, 0, 0,  //
                           0, 0, 0, 0,  //
                           0, 0, 0, 0});
 }
@@ -128,7 +128,7 @@ Ellipsoid::Ellipsoid(const char* name,
                                   7, 0, matd, m_a44}));
     setElementParameters({sin(m_tangentAngle), cos(m_tangentAngle), m_y0,
                           m_z0,        //
-                          0, 0, 0, 0,  //
+                          double(m_figureRotation), 0, 0, 0,  //
                           0, 0, 0, 0,  //
                           0, 0, 0, 0});
 }
