@@ -38,12 +38,14 @@ echo "=============================================="
 
 file="output"
 words=()
-total_time=0
-total_time_rms=0
+total_time_sum=0
+total_time_sumSq=0
+trace_time_sum=0
+trace_time_sumSq=0
 trials=$2
 
 #Loop
-for (( i=0; i<= trials;i++ ));do
+for (( i=0; i<= trials-1;i++ ));do
 	#Run RAYX .. Change path here if needed
 	$RAYX -b -i ./../../../build/bin/$1 > output 
 	
@@ -52,18 +54,38 @@ for (( i=0; i<= trials;i++ ));do
 		if [[ $line == *"Benchmark:"* ]]; then	
 		echo -e "$line"
 		number=`echo $line | awk '{print $(NF-1)}'`
-		total_time=$((total_time + number))
-		total_time_rms=$((total_time_rms + number ** 2 ))
+		total_time_sum=$((total_time_sum + number))
+		total_time_sumSq=$((total_time_sumSq + number ** 2 ))
+		fi
+		if [[ $line == *"Got Rays. Run-time:"* ]]; then	
+		echo -e "$line"
+		numberstr=`echo $line | awk '{print $(NF-1)}'`
+		#echo "${numberstr}"
+		number=${numberstr%.*}
+		#echo "${number}"
+		trace_time_sum=$((trace_time_sum + number))
+		trace_time_sumSq=$((trace_time_sumSq + number ** 2 ))
 		fi
 	done <$file
 done
 
 #Summary
-echo "=============================================="
-echo "Average execution time: " $((total_time / (trials+1))) " ms"
+# Derivation of mean and standard deviation
 
-total_time_rms=$((total_time_rms / (trials+1)))
-echo "RMS: " $(echo "sqrt($total_time_rms)" | bc) " ms"
+echo "***************************************"
+
+total_time_mean=$((total_time_sum / trials))
+total_time_var=$(((total_time_sumSq - (total_time_sum * total_time_sum) / trials) / (trials-1)))
+total_time_sd=`echo "scale=4; sqrt($total_time_var)" | bc`
+
+trace_time_mean=$((trace_time_sum / trials))
+trace_time_var=$(((trace_time_sumSq - (trace_time_sum * trace_time_sum) / trials) / (trials-1)))
+trace_time_sd=`echo "scale=4; sqrt($trace_time_var)" | bc`
+
+
+echo "=============================================="
+echo "Average total execution time: " ${total_time_mean} +/-  ${total_time_sd}" ms"
+echo "Average total tracing   time: " ${trace_time_mean} +/-  ${trace_time_sd}" ms"
 
 rm output
 
