@@ -1,7 +1,7 @@
 #pragma once
 
 #include <getopt.h>
-
+#include <chrono>
 #include "PythonInterp.h"
 #include "RayCore.h"
 #include "TerminalAppConfig.h"
@@ -61,8 +61,7 @@ class TerminalApp : public RAYX::Application {
     char** m_argv;
     int m_argc;
     std::string providedFile;
-    std::chrono::_V2::system_clock::time_point m_start_time;
-
+    
     // CLI Arguments
     // Flags initialize to DISABLED
     // Set options in .cpp file

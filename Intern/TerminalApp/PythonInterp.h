@@ -2,6 +2,7 @@
 
 #define PY_SSIZE_T_CLEAN
 #include <Python.h>
+#include <string>
 
 class PythonInterp {
   public:
@@ -11,10 +12,10 @@ class PythonInterp {
 
     void cleanup();
     void execute();
-    void setPlotFileName(const char* outputName);
+    void setPlotName(const char* outputName);
 
   private:
-    const char* m_outputName = NULL;
+    std::string m_outputName; // Stored as string for better parsing
     const char* m_pyPath;
     const char* m_funcName;
     PyObject* m_pName;

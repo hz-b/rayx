@@ -84,6 +84,7 @@ void TerminalApp::run() {
         }
     }
 
+    auto start_time  = std::chrono::steady_clock::now();
     /////////////////// Argument treatement
     // Load RML files
     if (m_optargs.m_providedFile != NULL) {
@@ -94,8 +95,7 @@ void TerminalApp::run() {
     } else {
         // Benchmark mode
         if (m_optargs.m_benchmark) {
-            RAYX_D_LOG << "Starting in Benchmark Mode \n";
-            m_start_time = std::chrono::system_clock::now();
+            RAYX_D_LOG << "Starting in Benchmark Mode.\n";
         }
 
         if (m_optargs.m_dummyFlag) {
@@ -117,9 +117,8 @@ void TerminalApp::run() {
     m_Presenter.run();
 
     if (m_optargs.m_benchmark) {
-        const std::chrono::duration<double> duration =
-            std::chrono::system_clock::now() - m_start_time;
-        RAYX_LOG << "Benchmark: Done in " << duration.count() << "s.";
+        std::chrono::steady_clock::time_point end = std::chrono::steady_clock::now();
+        RAYX_LOG << "Benchmark: Done in " << std::chrono::duration_cast<std::chrono::milliseconds>(end - start_time).count() << " ms" ;
     }
 
     //  Plot in Python
@@ -142,7 +141,9 @@ void TerminalApp::run() {
             std::shared_ptr<PythonInterp> pyPlot =
                 std::make_shared<PythonInterp>("py_plot_entry", "startPlot",
                                                (const char*)nullptr);
-            // pyPlot->setPlotFileName("output.h5");
+            if (m_optargs.m_providedFile){
+                std::string _providedFile = m_optargs.m_providedFile;
+                pyPlot->setPlotName( _providedFile.c_str());}
             pyPlot->execute();
         } catch (std::exception& e) {
             RAYX_ERR << e.what() << "\n";
