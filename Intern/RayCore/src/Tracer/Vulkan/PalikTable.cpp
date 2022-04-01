@@ -10,7 +10,7 @@
 #include "PathResolver.h"
 
 bool PalikTable::load(const char* element, PalikTable* out) {
-    std::string f = "Data/PALIK/" + std::string(element) + ".NKP";
+    std::string f = "Data/RefractiveIndex/" + std::string(element) + ".NKP";
     std::ifstream s(resolvePath(f));
 
     if (s.fail()) {
