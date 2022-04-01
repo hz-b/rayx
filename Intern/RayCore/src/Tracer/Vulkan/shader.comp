@@ -38,6 +38,12 @@ struct PalikEntry {
     double empty;  // for padding
 };
 
+struct _debug_struct {
+    double _dEntry0;
+    double _dEntry1;
+    dmat4 _dmat; // Can also be used as vectors 
+};
+
 /* LAYOUTS */
 layout(std140, binding = 0) buffer ibuf { Ray rayData[]; };
 
@@ -63,14 +69,19 @@ layout(binding = 5) buffer materialBuf {
     PalikEntry nkp[];  // contains PALIK table of all materials concatenated together
 };
 
-// Order of the files in #include is important 
+layout(binding = 6) buffer debugBuf {
+    _debug_struct d_struct[];
+};
+
+// Order in #include is IMPROTANT, do not change.
+// clang-format off
 #include "shader-include/approx.comp"
 #include "shader-include/complex.comp"
 #include "shader-include/random.comp"
 #include "shader-include/utils.comp"
 #include "shader-include/intersection.comp"
 #include "shader-include/trace.comp"
-
+// clang-format on
 
 /*
  * iterate through all elements (sequentially) and trace rays element by element
