@@ -5,7 +5,7 @@
 
 #include <iostream>
 
-#include "PalikTable.h"
+#include "RefractiveIndexTable.h"
 
 /**
  * returns the name of the material:
@@ -46,14 +46,14 @@ static std::vector<int> MATERIAL_INDEX_TABLE;
 void fillMaterialTables() {
     auto mats = allNormalMaterials();
     for (size_t i = 0; i < mats.size(); i++) {
-        PalikTable t;
+        RefractiveIndexTable t;
 
-        if (!PalikTable::load(getMaterialName(mats[i]), &t)) {
-            RAYX_ERR << "could not load PalikTable!";
+        if (!RefractiveIndexTable::load(getMaterialName(mats[i]), &t)) {
+            RAYX_ERR << "could not load RefractiveIndexTable!";
         }
 
         MATERIAL_INDEX_TABLE.push_back(MATERIAL_TABLE.size() /
-                                       4);  // 4 doubles per PalikEntry
+                                       4);  // 4 doubles per RefractiveIndex Entry
         for (auto x : t.m_Lines) {
             MATERIAL_TABLE.push_back(x.m_energy);
             MATERIAL_TABLE.push_back(x.m_n);

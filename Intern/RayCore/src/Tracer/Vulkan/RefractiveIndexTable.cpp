@@ -1,5 +1,5 @@
 
-#include "PalikTable.h"
+#include "RefractiveIndexTable.h"
 
 #include <Debug.h>
 
@@ -9,7 +9,7 @@
 
 #include "PathResolver.h"
 
-bool PalikTable::load(const char* element, PalikTable* out) {
+bool RefractiveIndexTable::load(const char* element, RefractiveIndexTable* out) {
     std::string f = "Data/RefractiveIndex/" + std::string(element) + ".NKP";
     std::ifstream s(resolvePath(f));
 
@@ -30,11 +30,11 @@ bool PalikTable::load(const char* element, PalikTable* out) {
             continue;
         }
 
-        PalikEntry e;
+        RefractiveIndexEntry e;
 
         if (sscanf(line.c_str(), "%le %le %le", &e.m_energy, &e.m_n, &e.m_k) !=
             3) {
-            RAYX_ERR << "Failed to parse PalikTable \"" << element
+            RAYX_ERR << "Failed to parse RefractiveIndexTable\"" << element
                      << "\", at line " << lineidx << ": \"" << line << "\"";
             return false;
         }

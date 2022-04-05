@@ -31,7 +31,7 @@ struct Element {
     dmat4 elementParameters;
 };
 
-struct PalikEntry {
+struct RefractiveIndexEntry {
     double energy;
     double n;
     double k;
@@ -60,7 +60,7 @@ layout(binding = 4) buffer materialIndexBuf {
 };
 
 layout(binding = 5) buffer materialBuf {
-    PalikEntry nkp[];  // contains PALIK table of all materials concatenated together
+    RefractiveIndexEntry nkp[];  // contains PALIK table of all materials concatenated together
 };
 
 // Order of the files in #include is important 

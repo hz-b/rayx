@@ -5,7 +5,7 @@
 #include <vector>
 
 /** This struct represents one line of a .NKP file.  */
-struct PalikEntry {
+struct RefractiveIndexEntry {
     double m_energy;
     double m_n;
     double m_k;
@@ -15,17 +15,17 @@ struct PalikEntry {
  *
  * Example usage:
  *
- * PalikTable cu;
- * bool success = PalikTable::load("CU", &cu); // the palik table for copper!
+ * RefractiveIndexTable cu;
+ * bool success = RefractiveIndexTable::load("CU", &cu); // the refractive index table for copper!
  *
  */
-struct PalikTable {
+struct RefractiveIndexTable {
     std::string m_element;
-    std::vector<PalikEntry> m_Lines;
+    std::vector<RefractiveIndexEntry> m_Lines;
 
     /** loads the .NKP file of the element `element` and writes it's contents to
      * `out` */
-    static bool load(const char* element, PalikTable* out);
+    static bool load(const char* element, RefractiveIndexTable* out);
 
     // double interpolate(double x) const;
 };

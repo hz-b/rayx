@@ -45,7 +45,7 @@ SET(SOURCE
     src/Tracer/TracerInterface.cpp
     src/Tracer/Vulkan/VulkanTracer.cpp
     src/Tracer/Vulkan/Material.cpp
-    src/Tracer/Vulkan/PalikTable.cpp
+    src/Tracer/Vulkan/RefractiveIndexTable.cpp
     src/UserParameter/WorldUserParams.cpp
     src/UserParameter/GeometricUserParams.cpp
 )
@@ -92,7 +92,7 @@ SET(HEADERS
     src/Tracer/Writer/H5Writer.hpp
     src/Tracer/Vulkan/VulkanTracer.h
     src/Tracer/Vulkan/Material.h
-    src/Tracer/Vulkan/PalikTable.h
+    src/Tracer/Vulkan/RefractiveIndexTable.h
     src/UserParameter/WorldUserParams.h
     src/UserParameter/GeometricUserParams.h
 )

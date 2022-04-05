@@ -8,7 +8,7 @@
 #include <stdexcept>
 
 #include "Core.h"
-#include "PalikTable.h"
+#include "RefractiveIndexTable.h"
 #include "Tracer/RayList.h"
 #include "vulkan/vulkan.hpp"
 

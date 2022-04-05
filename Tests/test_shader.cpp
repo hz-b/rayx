@@ -1712,7 +1712,7 @@ TEST_F(Tracer, amplitudeTest) {
     compareFromCorrect(correct, outputRays, tolerance);
 }
 
-TEST_F(Tracer, palikTest) {
+TEST_F(Tracer, refractiveIndexTest) {
     std::vector<RAYX::Ray> testValues;
     testValues.push_back(RAYX::Ray());
 
