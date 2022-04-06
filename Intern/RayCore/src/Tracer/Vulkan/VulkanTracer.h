@@ -19,30 +19,36 @@ const bool enableValidationLayers = true;
 #endif
 
 // Vulkan to Ray #defines
-#define VULKANTRACER_RAY_DOUBLE_AMOUNT           16
-#define VULKANTRACER_QUADRIC_DOUBLE_AMOUNT       112  // 7* dmat4 (16)
+#define VULKANTRACER_RAY_DOUBLE_AMOUNT 16
+#define VULKANTRACER_QUADRIC_DOUBLE_AMOUNT 112  // 7* dmat4 (16)
 #define VULKANTRACER_QUADRIC_PARAM_DOUBLE_AMOUNT 4
-#define GPU_MAX_STAGING_SIZE                     134217728  // 128MB
-#define RAY_VECTOR_SIZE                          16777216
+#define GPU_MAX_STAGING_SIZE 134217728  // 128MB
+#define RAY_VECTOR_SIZE 16777216
 
 namespace RAYX {
 
 // set debug generation information
-const std::vector<const char*> validationLayers = {"VK_LAYER_KHRONOS_validation"};
+const std::vector<const char*> validationLayers = {
+    "VK_LAYER_KHRONOS_validation"};
 
 // Used for validating return values of Vulkan API calls.
-#define VK_CHECK_RESULT(f)                        \
-    {                                             \
-        VkResult res = (f);                       \
-        if (res != VK_SUCCESS) {                  \
-            RAYX_ERR << "Fatal : VkResult fail!"; \
-        }                                         \
+#define VK_CHECK_RESULT(f)                                               \
+    {                                                                    \
+        VkResult res = (f);                                              \
+        if (res != VK_SUCCESS) {                                         \
+            RAYX_WARN << "Fatal : VkResult fail!";                       \
+            RAYX_ERR << "Error code: " << res                            \
+                     << ", look up at "                                  \
+                        "https://www.khronos.org/registry/vulkan/specs/" \
+                        "1.3-extensions/man/html/VkResult.html";         \
+        }                                                                \
     }
-VkResult CreateDebugUtilsMessengerEXT(VkInstance instance,
-                                      const VkDebugUtilsMessengerCreateInfoEXT* pCreateInfo,
-                                      const VkAllocationCallbacks* pAllocator,
-                                      VkDebugUtilsMessengerEXT* pDebugMessenger);
-void DestroyDebugUtilsMessengerEXT(VkInstance instance, VkDebugUtilsMessengerEXT debugMessenger,
+VkResult CreateDebugUtilsMessengerEXT(
+    VkInstance instance, const VkDebugUtilsMessengerCreateInfoEXT* pCreateInfo,
+    const VkAllocationCallbacks* pAllocator,
+    VkDebugUtilsMessengerEXT* pDebugMessenger);
+void DestroyDebugUtilsMessengerEXT(VkInstance instance,
+                                   VkDebugUtilsMessengerEXT debugMessenger,
                                    const VkAllocationCallbacks* pAllocator);
 
 const int WORKGROUP_SIZE = 32;
@@ -68,7 +74,8 @@ class RAYX_API VulkanTracer {
                    const std::array<double, 4 * 4>& inputOutMatrix,
                    const std::array<double, 4 * 4>& objectParameters,
                    const std::array<double, 4 * 4>& elementParameters);
-    void setBeamlineParameters(uint32_t inNumberOfBeamlines, uint32_t inNumberOfQuadricsPerBeamline,
+    void setBeamlineParameters(uint32_t inNumberOfBeamlines,
+                               uint32_t inNumberOfQuadricsPerBeamline,
                                uint32_t inNumberOfRays);
 
     std::list<std::vector<Ray>>::const_iterator getOutputIteratorBegin();
@@ -135,26 +142,31 @@ class RAYX_API VulkanTracer {
     void prepareBuffers();
     void mainLoop();
     void createInstance();
-    void populateDebugMessengerCreateInfo(VkDebugUtilsMessengerCreateInfoEXT& createInfo);
+    void populateDebugMessengerCreateInfo(
+        VkDebugUtilsMessengerCreateInfoEXT& createInfo);
     void setupDebugMessenger();
     std::vector<const char*> getRequiredExtensions();
     std::vector<const char*> getRequiredDeviceExtensions();
     static VKAPI_ATTR VkBool32 VKAPI_CALL
     debugCallback(VkDebugUtilsMessageSeverityFlagBitsEXT messageSeverity,
                   VkDebugUtilsMessageTypeFlagsEXT messageType,
-                  const VkDebugUtilsMessengerCallbackDataEXT* pCallbackData, void* pUserData);
+                  const VkDebugUtilsMessengerCallbackDataEXT* pCallbackData,
+                  void* pUserData);
     bool checkValidationLayerSupport();
     void pickPhysicalDevice();
     bool isDeviceSuitable(VkPhysicalDevice device);
     int rateDevice(VkPhysicalDevice device);
     QueueFamilyIndices findQueueFamilies(VkPhysicalDevice device);
     void createLogicalDevice();
-    uint32_t findMemoryType(uint32_t memoryTypeBits, VkMemoryPropertyFlags properties);
-    void createBuffer(VkDeviceSize size, VkBufferUsageFlags usage, VkMemoryPropertyFlags properties,
-                      VkBuffer& buffer, VkDeviceMemory& bufferMemory);
+    uint32_t findMemoryType(uint32_t memoryTypeBits,
+                            VkMemoryPropertyFlags properties);
+    void createBuffer(VkDeviceSize size, VkBufferUsageFlags usage,
+                      VkMemoryPropertyFlags properties, VkBuffer& buffer,
+                      VkDeviceMemory& bufferMemory);
     void createBuffers();
     void fillRayBuffer();
-    void fillStagingBuffer(uint32_t offset, std::list<std::vector<Ray>>::iterator raySetIterator,
+    void fillStagingBuffer(uint32_t offset,
+                           std::list<std::vector<Ray>>::iterator raySetIterator,
                            size_t vectorsPerStagingBuffer);
     void createDescriptorSetLayout();
     void createDescriptorSet();
