@@ -336,9 +336,9 @@ VKAPI_ATTR VkBool32 VKAPI_CALL VulkanTracer::debugCallback(
 
     // Only show Warnings or higher severity bits
     if (messageSeverity == VK_DEBUG_UTILS_MESSAGE_SEVERITY_WARNING_BIT_EXT) {
-        RAYX_WARN << "(ValidationLayer): " << pCallbackData->pMessage;
+        RAYX_WARN << "(ValidationLayer warn): " << pCallbackData->pMessage;
     } else if (messageSeverity == VK_DEBUG_UTILS_MESSAGE_SEVERITY_ERROR_BIT_EXT) {
-        RAYX_ERR << "(ValidationLayer): " << pCallbackData->pMessage;
+        RAYX_ERR << "(ValidationLayer error): " << pCallbackData->pMessage;
     }
     // TODO consider also showing INFO or even VERBOSE messages under some
     // circumstances.
