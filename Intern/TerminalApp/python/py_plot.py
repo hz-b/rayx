@@ -122,7 +122,7 @@ def plotForEachSubplot(df: pd.DataFrame, title: str):
     plt.show()
 
 
-def plotOutput(filename: str, title: str):
+def plotOutput(filename: str, title: str, plot_type: int):
     """
     Plots output file to a matplotlib figure(s)
     """
@@ -130,7 +130,7 @@ def plotOutput(filename: str, title: str):
     df = importOutput(filename)
 
     #TODO: Enhance
-    _whichPlot = PlotType._plotLikeRAYUI  # Change accordingly
+    _whichPlot = PlotType(plot_type)
 
     if (_whichPlot == PlotType._plotForEach):
         plotForEach(df, title)
@@ -141,4 +141,4 @@ def plotOutput(filename: str, title: str):
 
 
 if __name__ == '__main__':
-    plotOutput('output.h5', str(sys.argv[1]))
+    plotOutput('output.h5', str(sys.argv[1]), int(sys.argv[2]))

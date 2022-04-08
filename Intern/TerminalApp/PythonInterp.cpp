@@ -65,8 +65,10 @@ void PythonInterp::execute() {
     if (m_pFunc && PyCallable_Check(m_pFunc)) {
         if (!m_outputName.empty()) {
             // If provided input file, parse to python interpreter as bytes
-            m_pValue = PyTuple_New(1);
-            PyTuple_SetItem(m_pValue,0,PyBytes_FromString(m_outputName.c_str()));
+            m_pValue = PyTuple_New(2);
+            PyTuple_SetItem(m_pValue, 0,
+                            PyBytes_FromString(m_outputName.c_str()));
+            PyTuple_SetItem(m_pValue, 1, PyLong_FromLong(long(m_plotType)));
         }
         PyErr_Print();
         RAYX_D_LOG << "Launching Python3 Interpreter.";
@@ -102,12 +104,27 @@ void PythonInterp::cleanup() {
     Py_Finalize();
 }
 /**
- * @brief Change plot title, call before .exexute
+ * @brief Change plot title, call before .execute
  * @param outputName Name of input file. Defaults to NULL (Plotting
  * related)
  */
 void PythonInterp::setPlotName(const char* outputName) {
-    m_outputName = std::string (outputName);
+    m_outputName = std::string(outputName);
 }
-
+/**
+ * @brief Change plot type, call before .execute (1,2,3)
+ *
+ * @details Supported Types:
+ *  _plotLikeRAYUI = 1
+ *  _plotForEach = 2
+ *  _plotForEachSubplot = 3
+ * @param plotType Name of input file. Defaults to NULL (Plotting
+ * related)
+ */
+void PythonInterp::setPlotType(int plotType) {
+    if (plotType < 1 || plotType > 3) {
+        RAYX_ERR << "Wrong plot type.";
+    }
+    m_plotType = plotType;
+}
 PythonInterp::~PythonInterp() {}
