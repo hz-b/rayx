@@ -337,8 +337,9 @@ Ray traceMirror(Ray r, const int elementIndex, inout uint64_t ctr, dvec4 interse
 
     // check if ray hit the element within the boundaries
     double x_extent = mrr.objectParameters[0][0];  // width
+    double x_extentB = mrr.objectParameters[2][1];  // widthB for trapezoid
     double z_extent = mrr.objectParameters[0][1];  // height
-    double hit      = wasteBox(r.position.x, r.position.z, x_extent, z_extent, r.weight);
+    double hit      = wasteBox(r.position.x, r.position.z, x_extent, x_extentB, z_extent, r.weight);
 
     // if ray missed the surface, stop the tracing here and return the ray in world coordinates
     if (hit < 1.0) {

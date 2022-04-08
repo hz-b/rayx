@@ -34,6 +34,13 @@ class RAYX_API OpticalElement : public BeamlineObject {
                    glm::dmat4x4 orientation,
                    const std::array<double, 7> slopeError);
     OpticalElement(const char* name,
+                   const std::array<double, 4 * 4> EParameters,
+                   Geometry::GeometricalShape geometricalShape,
+                   const double width, const double widthB, const double height,
+                   const double azimuthalAngle, glm::dvec4 position,
+                   glm::dmat4x4 orientation,
+                   const std::array<double, 7> slopeError);
+    OpticalElement(const char* name,
                    Geometry::GeometricalShape geometricalShape,
                    const double width, const double height,
                    const double azimuthalAngle, glm::dvec4 position,
