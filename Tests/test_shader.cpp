@@ -2075,6 +2075,20 @@ void compareFromCSVRayUI(std::list<double> rays_list, const char* csv) {
     }
 }
 
+TEST_F(opticalElements, PlaneTest1) {
+    const char* filename = "PlaneTest_1";
+    testBeamline(filename);  // this generates an output file to manually
+                             // compare // TODO: remove
+    compareFromCSVRayUI(trace(filename), filename);
+}
+
+TEST_F(opticalElements, PlaneTest2) {
+    const char* filename = "PlaneTest_2";
+    testBeamline(filename);  // this generates an output file to manually
+                             // compare // TODO: remove
+    compareFromCSVRayUI(trace(filename), filename);
+}
+
 TEST_F(opticalElements, PlaneTest) {
     const char* filename = "PlaneTest";
     testBeamline(filename);  // this generates an output file to manually
