@@ -120,21 +120,21 @@ double wasteBox(double x, double z, double xLengthA, double xLengthB, double zLe
         if (xLengthB > 0) {  // Trapezoid shape
             // Check point is within the trapezoid
             dvec3 P = dvec3(x, 0, z);
-            dvec3 A = dvec3(xLengthA / 2.0, 0, zLength / 2.0);
-            dvec3 B = dvec3(-xLengthA / 2.0, 0, zLength / 2.0);
-            dvec3 C = dvec3(xLengthB / 2.0, 0, -zLength / 2.0);
-            dvec3 D = dvec3(-xLengthB / 2.0, 0, -zLength / 2.0);
+            dvec3 A = dvec3(-xLengthA / 2.0, 0, -zLength / 2.0);
+            dvec3 B = dvec3(xLengthA / 2.0, 0, -zLength / 2.0);
+            dvec3 C = dvec3(xLengthB / 2.0, 0, zLength / 2.0);
+            dvec3 D = dvec3(-xLengthB / 2.0, 0, zLength / 2.0);
+            
+            dvec3 PmA = P - A;
+            dvec3 BmA = B - A;
+            dvec3 PmD = P - D;
+            dvec3 CmD = C - D;
+            dvec3 DmA = D - A;
+            dvec3 PmB = P - B;
+            dvec3 CmB = C - B;
 
-            dvec3 AP = P - A;
-            dvec3 AB = B - A;
-            dvec3 DP = P - D;
-            dvec3 DC = C - D;
-
-            dvec3 AD = D - A;
-            dvec3 BP = P - B;
-            dvec3 BC = C - B;
-
-            if ((strangeCross(AP.x, AP.z, AB.x, AB.z) * strangeCross(DP.x, DP.z, DC.x, DC.z)) > 0 && (strangeCross(AP.x, AP.z, AD.x, AD.z) * strangeCross(BP.x, BP.z, BC.x, BC.z)) > 0) {
+            if ((strangeCross(PmA.x, PmA.z, BmA.x, BmA.z) * strangeCross(PmD.x, PmD.z, CmD.x, CmD.z)) < 0
+                && (strangeCross(PmA.x, PmA.z, DmA.x, DmA.z) * strangeCross(PmB.x, PmB.z, CmB.x, CmB.z)) < 0) {
                 return w;
             } else {
                 return 0.0;
