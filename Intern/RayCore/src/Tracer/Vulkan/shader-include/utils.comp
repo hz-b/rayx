@@ -110,18 +110,33 @@ double wasteBox(double x, double z, double xLength, double zLength, double w) {
     return w;
 }
 
+double strangeCross(double ax, double ay, double bx, double by) {
+    return ax * by - ay * bx;
+}
+
 // ! temporary for testing purposes (trapezoid)
 double wasteBox(double x, double z, double xLengthA, double xLengthB, double zLength, double w) {
     if (xLengthA >= 0) {     // Rectangular shape
         if (xLengthB > 0) {  // Trapezoid shape
             // Check point is within the trapezoid
             dvec3 P = dvec3(x, 0, z);
-            dvec3 A = dvec3(xLengthA / 2.0, 0, zLength / 2.0);
-            dvec3 B = dvec3(-xLengthA / 2.0, 0, zLength / 2.0);
-            dvec3 C = dvec3(xLengthB / 2.0, 0, -zLength / 2.0);
-            dvec3 D = dvec3(-xLengthB / 2.0, 0, -zLength / 2.0);
+            dvec3 A = dvec3(-xLengthA / 2.0, 0, -zLength / 2.0);
+            dvec3 B = dvec3(xLengthA / 2.0, 0, -zLength / 2.0);
+            dvec3 C = dvec3(xLengthB / 2.0, 0, zLength / 2.0);
+            dvec3 D = dvec3(-xLengthB / 2.0, 0, zLength / 2.0);
+            
+            dvec3 PmA = P - A;
+            dvec3 BmA = B - A;
+            dvec3 PmD = P - D;
+            dvec3 CmD = C - D;
+            dvec3 DmA = D - A;
+            dvec3 PmB = P - B;
+            dvec3 CmB = C - B;
 
-            if (dot(cross(P - A, B - A), cross(P - D, C - D)) >= 0 || dot(cross(P - A, B - A), cross(P - D, C - D)) >= 0) {
+            if ((strangeCross(PmA.x, PmA.z, BmA.x, BmA.z) * strangeCross(PmD.x, PmD.z, CmD.x, CmD.z)) < 0
+                && (strangeCross(PmA.x, PmA.z, DmA.x, DmA.z) * strangeCross(PmB.x, PmB.z, CmB.x, CmB.z)) < 0) {
+                return w;
+            } else {
                 return 0.0;
             }
         } else {

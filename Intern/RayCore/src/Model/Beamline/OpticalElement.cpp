@@ -64,7 +64,22 @@ OpticalElement::OpticalElement(const char* name,
     updateObjectParams();
 }
 
-// ! temporary constructor for trapezoid (10/11/2021)
+// ! temporary constructors for trapezoid (10/11/2021)
+OpticalElement::OpticalElement(const char* name,
+                               const std::array<double, 4 * 4> EParameters,
+                               Geometry::GeometricalShape geometricalShape,
+                               const double width, const double widthB,
+                               const double height, const double azimuthalAngle,
+                               glm::dvec4 position, glm::dmat4x4 orientation,
+                               const std::array<double, 7> slopeError)
+    : BeamlineObject(name),
+      m_slopeError(slopeError),
+      m_elementParameters(EParameters) {
+    m_geometry =
+        std::make_unique<Geometry>(geometricalShape, width, widthB, height,
+                                   azimuthalAngle, position, orientation);
+    updateObjectParams();
+}
 OpticalElement::OpticalElement(const char* name,
                                Geometry::GeometricalShape geometricalShape,
                                const double widthA, const double widthB,

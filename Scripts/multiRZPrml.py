@@ -9,7 +9,7 @@ import numpy as np
 
 @dataclass
 class MetaData:
-    numElements = 40
+    numElements = 2
     fileName = "multi_RZP_test"
 
 
@@ -34,7 +34,7 @@ class RZP:
     name = "Reflection Zoneplate"
     type = "Reflection Zoneplate"
     geometricalShape = 0
-    totalWidthA = 0.2567627027
+    totalWidth = 0.2567627027
     totalWidthB = 0.1092372974
     totalLength = 72.5
     totalWidth = 0.183
@@ -160,7 +160,7 @@ def insertParamVec3(root: ET.Element, id: str, enabled: bool, xVal: float, yVal:
     y.text = str(yVal)
     z = ET.SubElement(param, 'z')
     z.text = str(zVal)
-    
+
     return root
 
 # Group Position and Direction
@@ -168,26 +168,27 @@ def insertParamVec3(root: ET.Element, id: str, enabled: bool, xVal: float, yVal:
 
 def insertGroupPostion(rzp: RZP, root: ET.Element):
     root = insertParamVec3(root, "worldPosition", "F",
-                    rzp.worldPosition.x, rzp.worldPosition.y, rzp.worldPosition.z)
+                           rzp.worldPosition.x, rzp.worldPosition.y, rzp.worldPosition.z)
     root = insertParamVec3(root, "worldXdirection", "F",
-                    rzp.worldXdirection.x, rzp.worldXdirection.y, rzp.worldXdirection.z)
+                           rzp.worldXdirection.x, rzp.worldXdirection.y, rzp.worldXdirection.z)
     root = insertParamVec3(root, "worldYdirection", "F",
-                    rzp.worldYdirection.x, rzp.worldYdirection.y, rzp.worldYdirection.z)
+                           rzp.worldYdirection.x, rzp.worldYdirection.y, rzp.worldYdirection.z)
     root = insertParamVec3(root, "worldZdirection", "F",
-                    rzp.worldZdirection.x, rzp.worldZdirection.y, rzp.worldZdirection.z)
-    
+                           rzp.worldZdirection.x, rzp.worldZdirection.y, rzp.worldZdirection.z)
+
     return root
 
 
 def insertRZP(root, rzp: RZP):
-    xmlRZP = ET.SubElement(root, 'object', name=rzp.name, type="Reflection Zoneplate")
+    xmlRZP = ET.SubElement(root, 'object', name=rzp.name,
+                           type="Reflection Zoneplate")
 
     geoShape = ET.SubElement(
         xmlRZP, 'param', id="geometricalShape", comment="rectangle", enabled="T")
     geoShape.text = str(rzp.geometricalShape)
 
-    totWidA = ET.SubElement(xmlRZP, 'param', id="totalWidthA", enabled="T")
-    totWidA.text = str(rzp.totalWidthA)
+    totWidA = ET.SubElement(xmlRZP, 'param', id="totalWidth", enabled="T")
+    totWidA.text = str(rzp.totalWidth)
 
     totWidB = ET.SubElement(xmlRZP, 'param', id="totalWidthB", enabled="T")
     totWidB.text = str(rzp.totalWidthB)
@@ -516,7 +517,7 @@ def insertRZP(root, rzp: RZP):
 
     # xmlRZP Position and Direction
     xmlRZP = insertGroupPostion(rzp, xmlRZP)
-    
+
     return root
 
 
@@ -540,7 +541,7 @@ def calculateObjectPos(prevPos: Vec3, w: float, chi: float, iterDirection: int):
     # iterDirection = iteration direction (-1 = left, 1 = right)
     y = prevPos.y
     x = prevPos.x - iterDirection * w * np.sin(chi)
-    z = prevPos.z + iterDirection * w * np.cos(chi)
+    z = prevPos.z - w * np.cos(chi)
 
     return Vec3(x, y, z)
 
@@ -573,9 +574,9 @@ def calcRZPs(numRZPs: int, baseRZP: RZP, iterDirection: int):
     # chi = top angle of the RZP
     # direction = iteration direction (-1 = left, 1 = right)
 
-    midWidth = (RZP.totalWidthA + RZP.totalWidthB) / 2
+    midWidth = (RZP.totalWidth + RZP.totalWidthB) / 2
     topAngleTrapezoid, _ = calcTrapezoidAngles(
-        RZP.totalWidthA, RZP.totalWidthB, RZP.totalLength)
+        RZP.totalWidth, RZP.totalWidthB, RZP.totalLength)
     dirDeviationAngle = 180 - topAngleTrapezoid * 2
 
     positions = [Vec3()] * (math.ceil(numRZPs / 2))
@@ -586,11 +587,11 @@ def calcRZPs(numRZPs: int, baseRZP: RZP, iterDirection: int):
         # calculate positions
         pos = calculateObjectPos(
             Vec3(0, 0, 0), midWidth/2, topAngleTrapezoid, iterDirection)
-        positions.append(pos)
+        positions[0] = pos
         for i in range(1, math.floor(numRZPs/2), 1):
             pos = calculateObjectPos(
                 positions[i], midWidth, topAngleTrapezoid, iterDirection)
-            positions.append(pos)
+            positions[i] = pos
 
         # calculate directions
         dirMat = calculateObjectDir(
@@ -598,17 +599,17 @@ def calcRZPs(numRZPs: int, baseRZP: RZP, iterDirection: int):
         for i in range(math.floor(numRZPs/2)):
             dirMat = calculateObjectDir(
                 dirMat, dirDeviationAngle, iterDirection)
-            directions.append(dirMat)
+            directions[i] = dirMat
 
     # number of RZPs odd
     else:
         # calculate positions
         pos = Vec3(0, 0, 0)
-        positions.append(pos)
+        positions[0] = pos
         for i in range(1, numRZPs/2, 1):
             pos = calculateObjectPos(
                 positions[i], midWidth, topAngleTrapezoid, iterDirection)
-            positions.append(pos)
+            positions[i] = pos
         # remove duplicate middle element on the right side
         if iterDirection == 1:
             positions.pop(0)
@@ -625,11 +626,9 @@ def main():
     meta = MetaData()
     baseRZP = RZP()
 
-
     # create RZP Group
-    root = ET.Element('Group')
+    root = ET.Element('group')
     root = insertGroupPostion(baseRZP, root)
-    
 
     # calculate positions and directions
     leftPositions, leftDirections = calcRZPs(meta.numElements, baseRZP, -1)
@@ -651,10 +650,10 @@ def main():
         # insert RZP parameters
         root = insertRZP(root, currRZP)
 
-
     indent(root)
     tmp = ET.tostring(root, encoding='UTF-8', method='xml')
-    xmlString = ET.tostring(root, encoding='UTF-8', method='xml').decode('UTF-8')
+    xmlString = ET.tostring(root, encoding='UTF-8',
+                            method='xml').decode('UTF-8')
     xmlToFile(meta.fileName, xmlString)
 
 

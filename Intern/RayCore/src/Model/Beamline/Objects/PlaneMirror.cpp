@@ -41,6 +41,21 @@ PlaneMirror::PlaneMirror(const char* name,
         0, 0, 0, 0, 1, 0, 0, -1, 0, 0, 0, 0, 0, 0, matd, 0}));
 }
 
+PlaneMirror::PlaneMirror(const char* name,
+                         Geometry::GeometricalShape geometricalShape,
+                         const double width, const double widthB,
+                         const double height, const double azimuthalAngle,
+                         glm::dvec4 position, glm::dmat4x4 orientation,
+                         const std::array<double, 7> slopeError, Material mat)
+    : OpticalElement(name, {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+                     geometricalShape, width, widthB, height, azimuthalAngle,
+                     position, orientation, slopeError) {
+    RAYX_LOG << name;
+    double matd = (double)static_cast<int>(mat);
+    setSurface(std::make_unique<Quadric>(std::array<double, 4 * 4>{
+        0, 0, 0, 0, 1, 0, 0, -1, 0, 0, 0, 0, 0, 0, matd, 0}));
+}
+
 PlaneMirror::~PlaneMirror() {}
 
 std::shared_ptr<PlaneMirror> PlaneMirror::createFromXML(
@@ -87,9 +102,17 @@ std::shared_ptr<PlaneMirror> PlaneMirror::createFromXML(
         mat = Material::CU;  // default to copper
     }
 
-    return std::make_shared<PlaneMirror>(name, geometricalShape, width, height,
-                                         degToRad(azimuthalAngle), position,
-                                         orientation, slopeError, mat);
+    double widthB;
+    bool foundWidthB = xml::paramDouble(node, "totalWidthB", &widthB);
+    if (foundWidthB) {
+        return std::make_shared<PlaneMirror>(
+            name, geometricalShape, width, widthB, height,
+            degToRad(azimuthalAngle), position, orientation, slopeError, mat);
+    } else {
+        return std::make_shared<PlaneMirror>(
+            name, geometricalShape, width, height, degToRad(azimuthalAngle),
+            position, orientation, slopeError, mat);
+    }
 }
 
 }  // namespace RAYX

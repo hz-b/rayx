@@ -32,6 +32,7 @@ void TerminalApp::run() {
         {"help", no_argument, 0, 'h'},
         {"dummy", no_argument, 0, 'd'},
         {"benchmark", no_argument, 0, 'b'},
+        {"multipleplot", no_argument, 0, 'm'},
         {0, 0, 0, 0}};
 
     int c;
@@ -39,10 +40,10 @@ void TerminalApp::run() {
     extern int opterr;
     opterr = 0;  // Set opt auto error output to silent
 
-    while (
-        (c = getopt_long(m_argc, m_argv,
-                         "pi:cvhdb",  // : required, :: optional, 'none' nothing
-                         long_options, &option_index)) != -1) {
+    while ((c = getopt_long(
+                m_argc, m_argv,
+                "pi:cvhdbm",  // : required, :: optional, 'none' nothing
+                long_options, &option_index)) != -1) {
         switch (c) {
             case '?':
                 if (optopt == 'i')
@@ -76,6 +77,9 @@ void TerminalApp::run() {
             case 'b':
                 m_optargs.m_benchmark = OptFlags::Enabled;
                 break;
+            case 'm':
+                m_optargs.m_multiplePlots = OptFlags::Enabled;
+                break;
             case 0:
                 RAYX_ERR << "No option given.";
                 break;
@@ -84,7 +88,7 @@ void TerminalApp::run() {
         }
     }
 
-    auto start_time  = std::chrono::steady_clock::now();
+    auto start_time = std::chrono::steady_clock::now();
     /////////////////// Argument treatement
     // Load RML files
     if (m_optargs.m_providedFile != NULL) {
@@ -117,8 +121,13 @@ void TerminalApp::run() {
     m_Presenter.run();
 
     if (m_optargs.m_benchmark) {
-        std::chrono::steady_clock::time_point end = std::chrono::steady_clock::now();
-        RAYX_LOG << "Benchmark: Done in " << std::chrono::duration_cast<std::chrono::milliseconds>(end - start_time).count() << " ms" ;
+        std::chrono::steady_clock::time_point end =
+            std::chrono::steady_clock::now();
+        RAYX_LOG << "Benchmark: Done in "
+                 << std::chrono::duration_cast<std::chrono::milliseconds>(
+                        end - start_time)
+                        .count()
+                 << " ms";
     }
 
     //  Plot in Python
@@ -141,9 +150,13 @@ void TerminalApp::run() {
             std::shared_ptr<PythonInterp> pyPlot =
                 std::make_shared<PythonInterp>("py_plot_entry", "startPlot",
                                                (const char*)nullptr);
-            if (m_optargs.m_providedFile){
+            if (m_optargs.m_providedFile) {
                 std::string _providedFile = m_optargs.m_providedFile;
-                pyPlot->setPlotName( _providedFile.c_str());}
+                pyPlot->setPlotName(_providedFile.c_str());
+            }
+            if (m_optargs.m_multiplePlots == OptFlags::Enabled) {
+                pyPlot->setPlotType(3);
+            }
             pyPlot->execute();
         } catch (std::exception& e) {
             RAYX_ERR << e.what() << "\n";
