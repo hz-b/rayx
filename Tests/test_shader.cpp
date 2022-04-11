@@ -2059,60 +2059,26 @@ void compareFromCSVRayUI(std::list<double> rays_list, const char* csv) {
         rays.push_back(x);
     }
 
+    auto t = 1e-5;
+
     for (unsigned int i = 0; i < correct.size(); i++) {
-        CHECK_EQ(rays[16 * i + 0], correct[i][3]);    // x
-        CHECK_EQ(rays[16 * i + 1], correct[i][4]);    // y
-        CHECK_EQ(rays[16 * i + 2], correct[i][5]);    // z
-        CHECK_EQ(rays[16 * i + 4], correct[i][6]);    // dir x
-        CHECK_EQ(rays[16 * i + 5], correct[i][7]);    // dir y
-        CHECK_EQ(rays[16 * i + 6], correct[i][8]);    // dir z
-        CHECK_EQ(rays[16 * i + 7], correct[i][9]);    // energy
-        CHECK_EQ(rays[16 * i + 12], correct[i][10]);  // path length
-        CHECK_EQ(rays[16 * i + 8], correct[i][11]);   // s0
-        CHECK_EQ(rays[16 * i + 9], correct[i][12]);   // s1
-        CHECK_EQ(rays[16 * i + 10], correct[i][13]);  // s2
-        CHECK_EQ(rays[16 * i + 11], correct[i][14]);  // s3
+        CHECK_EQ(rays[16 * i + 0], correct[i][3], t);    // x
+        CHECK_EQ(rays[16 * i + 1], correct[i][4], t);    // y
+        CHECK_EQ(rays[16 * i + 2], correct[i][5], t);    // z
+        CHECK_EQ(rays[16 * i + 4], correct[i][6], t);    // dir x
+        CHECK_EQ(rays[16 * i + 5], correct[i][7], t);    // dir y
+        CHECK_EQ(rays[16 * i + 6], correct[i][8], t);    // dir z
+        CHECK_EQ(rays[16 * i + 7], correct[i][9], t);    // energy
+        CHECK_EQ(rays[16 * i + 12], correct[i][10], t);  // path length
+        CHECK_EQ(rays[16 * i + 8], correct[i][11], t);   // s0
+        CHECK_EQ(rays[16 * i + 9], correct[i][12], t);   // s1
+        CHECK_EQ(rays[16 * i + 10], correct[i][13], t);  // s2
+        CHECK_EQ(rays[16 * i + 11], correct[i][14], t);  // s3
     }
 }
 
-TEST_F(opticalElements, PlaneTest1) {
-    const char* filename = "PlaneTest_1";
-    testBeamline(filename);  // this generates an output file to manually
-                             // compare // TODO: remove
-    compareFromCSVRayUI(trace(filename), filename);
-}
-
-TEST_F(opticalElements, PlaneTest2) {
-    const char* filename = "PlaneTest_2";
-    testBeamline(filename);  // this generates an output file to manually
-                             // compare // TODO: remove
-    compareFromCSVRayUI(trace(filename), filename);
-}
-
-TEST_F(opticalElements, PlaneTest) {
-    const char* filename = "PlaneTest";
-    testBeamline(filename);  // this generates an output file to manually
-                             // compare // TODO: remove
-    compareFromCSVRayUI(trace(filename), filename);
-}
-
-// this is the same as ToroidAzimuth but only contains the MatrixSource
-TEST_F(opticalElements, ToroidAzimuth_OnlyMatrixSource) {
-    const char* filename = "Toroid_Azimuth_OnlyMatrixSource";
-    testBeamline(filename);  // this generates an output file to manually
-                             // compare // TODO: remove
-    compareFromCSVRayUI(trace(filename), filename);
-}
-
-TEST_F(opticalElements, ToroidAzimuth_NoImagePlane) {
-    const char* filename = "Toroid_Azimuth_NoImagePlane";
-    testBeamline(filename);  // this generates an output file to manually
-                             // compare // TODO: remove
-    compareFromCSVRayUI(trace(filename), filename);
-}
-
-TEST_F(opticalElements, ToroidAzimuth) {
-    const char* filename = "Toroid_Azimuth";
+TEST_F(opticalElements, MatrixSource) {
+    const char* filename = "MatrixSource";
     testBeamline(filename);  // this generates an output file to manually
                              // compare // TODO: remove
     compareFromCSVRayUI(trace(filename), filename);

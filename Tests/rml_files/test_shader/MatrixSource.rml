@@ -7,7 +7,7 @@
     <param id="numberRays" enabled="T">20000</param>
     <param id="sourceWidth" enabled="T">0.065</param>
     <param id="sourceHeight" enabled="T">0.04</param>
-    <param id="sourceDepth" enabled="T">1</param>
+    <param id="sourceDepth" enabled="T">0</param>
     <param id="horDiv" enabled="T">1</param>
     <param id="verDiv" enabled="T">1</param>
     <param id="energyDistributionType" comment="Values" enabled="T">1</param>
