@@ -1,4 +1,5 @@
 #include "setupTests.h"
+#include "utils.h"
 
 // #if RUN_TEST_SHADER TODO (Jannis): Commented out by OS: error: unterminated
 // #if
@@ -1978,24 +1979,6 @@ TEST_F(opticalElements, CylinderDefault) {
     ASSERT_TRUE(true);
 }
 
-/**
- * loads beamline from rml file, traces beamline and returns resulting rays
- * @param filename      name of rml file without ending .rml
- */
-std::list<double> trace(const char* filename) {
-    std::string beamline_file = resolvePath("Tests/rml_files/test_shader/");
-    beamline_file.append(filename);
-    beamline_file.append(".rml");
-    std::shared_ptr<RAYX::Beamline> beamline = std::make_shared<RAYX::Beamline>(
-        RAYX::importBeamline(beamline_file.c_str()));
-
-    std::vector<std::shared_ptr<RAYX::OpticalElement>> elements =
-        beamline->m_OpticalElements;
-    std::vector<RAYX::Ray> testValues = beamline->m_LightSources[0]->getRays();
-
-    return runTracer(testValues, elements);
-}
-
 double parseDouble(std::string s) {
     double d;
     if (sscanf(s.c_str(), "%le", &d) != 1) {
@@ -2049,8 +2032,20 @@ std::vector<std::vector<double>> loadCSVRayUI(const char* csv) {
     return out;
 }
 
-void compareFromCSVRayUI(std::list<double> rays_list, const char* csv) {
-    auto correct = loadCSVRayUI(csv);
+void compareFromCSVRayUI(const char* filename) {
+    auto correct = loadCSVRayUI(filename);
+
+    std::string beamline_file = resolvePath("Tests/rml_files/test_shader/");
+    beamline_file.append(filename);
+    beamline_file.append(".rml");
+    std::shared_ptr<RAYX::Beamline> beamline = std::make_shared<RAYX::Beamline>(
+        RAYX::importBeamline(beamline_file.c_str()));
+
+    std::vector<std::shared_ptr<RAYX::OpticalElement>> elements =
+        beamline->m_OpticalElements;
+    std::vector<RAYX::Ray> testValues = beamline->m_LightSources[0]->getRays();
+
+    auto rays_list = runTracer(testValues, elements);
 
     CHECK_EQ(correct.size(), rays_list.size() / RAY_DOUBLE_COUNT);
 
@@ -2059,15 +2054,28 @@ void compareFromCSVRayUI(std::list<double> rays_list, const char* csv) {
         rays.push_back(x);
     }
 
-    auto t = 1e-5;
+    auto t = 1e-10;
+    auto transform = arrayToGlm16(elements.back()->getInMatrix());
 
+    // the comparison happens in element coordinates.
     for (unsigned int i = 0; i < correct.size(); i++) {
-        CHECK_EQ(rays[16 * i + 0], correct[i][3], t);    // x
-        CHECK_EQ(rays[16 * i + 1], correct[i][4], t);    // y
-        CHECK_EQ(rays[16 * i + 2], correct[i][5], t);    // z
-        CHECK_EQ(rays[16 * i + 4], correct[i][6], t);    // dir x
-        CHECK_EQ(rays[16 * i + 5], correct[i][7], t);    // dir y
-        CHECK_EQ(rays[16 * i + 6], correct[i][8], t);    // dir z
+        // original (global) position:
+        auto globalpos = arrayToGlm4(
+            {rays[16 * i + 0], rays[16 * i + 1], rays[16 * i + 2], 1});
+        auto globaldir = arrayToGlm4(
+            {rays[16 * i + 3], rays[16 * i + 4], rays[16 * i + 5], 0});
+
+        auto elementpos = transform * globalpos;
+        auto elementdir = transform * globaldir;
+
+        CHECK_EQ(elementpos[0], correct[i][3], t);  // x
+        CHECK_EQ(elementpos[1], correct[i][4], t);  // y
+        CHECK_EQ(elementpos[2], correct[i][5], t);  // z
+
+        CHECK_EQ(elementdir[0], correct[i][6], t);  // dir x
+        CHECK_EQ(elementdir[1], correct[i][7], t);  // dir y
+        CHECK_EQ(elementdir[2], correct[i][8], t);  // dir z
+
         CHECK_EQ(rays[16 * i + 7], correct[i][9], t);    // energy
         CHECK_EQ(rays[16 * i + 12], correct[i][10], t);  // path length
         CHECK_EQ(rays[16 * i + 8], correct[i][11], t);   // s0
@@ -2081,7 +2089,14 @@ TEST_F(opticalElements, MatrixSource) {
     const char* filename = "MatrixSource";
     testBeamline(filename);  // this generates an output file to manually
                              // compare // TODO: remove
-    compareFromCSVRayUI(trace(filename), filename);
+    compareFromCSVRayUI(filename);
+}
+
+TEST_F(opticalElements, PlaneMirror) {
+    const char* filename = "PlaneMirror";
+    testBeamline(filename);  // this generates an output file to manually
+                             // compare // TODO: remove
+    compareFromCSVRayUI(filename);
 }
 
 #endif
