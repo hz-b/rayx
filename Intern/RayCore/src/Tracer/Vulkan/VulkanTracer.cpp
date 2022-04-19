@@ -886,7 +886,7 @@ void VulkanTracer::getDebugBuffer(){
                 &debugMappedMemory);
     _debugBuf_t data;
     RAYX_D_LOG << "Debug Buffer size: " << sizeof(data)<< " bytes." ;
-    memcpy(&data,debugMappedMemory,VULKANTRACER_DEBUG_ENTRY_DOUBLE_AMOUNT * sizeof(double));
+    memcpy((void*) &data,debugMappedMemory,VULKANTRACER_DEBUG_ENTRY_DOUBLE_AMOUNT * sizeof(double));
     m_debugBufList.push_back(std::move(data));
     vkUnmapMemory(m_Device,m_bufferMemories[3]);
 
