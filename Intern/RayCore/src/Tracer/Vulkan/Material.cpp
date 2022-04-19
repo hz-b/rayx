@@ -5,7 +5,7 @@
 
 #include <iostream>
 
-#include "RefractiveIndexTable.h"
+#include "NffTable.h"
 
 /**
  * returns the name of the material:
@@ -46,18 +46,18 @@ static std::vector<int> MATERIAL_INDEX_TABLE;
 void fillMaterialTables() {
     auto mats = allNormalMaterials();
     for (size_t i = 0; i < mats.size(); i++) {
-        RefractiveIndexTable t;
+        NffTable t;
 
-        if (!RefractiveIndexTable::load(getMaterialName(mats[i]), &t)) {
-            RAYX_ERR << "could not load RefractiveIndexTable!";
+        if (!NffTable::load(getMaterialName(mats[i]), &t)) {
+            RAYX_ERR << "could not load NffTable!";
         }
 
         MATERIAL_INDEX_TABLE.push_back(MATERIAL_TABLE.size() /
-                                       4);  // 4 doubles per RefractiveIndex Entry
+                                       4);  // 4 doubles per Nff Entry
         for (auto x : t.m_Lines) {
             MATERIAL_TABLE.push_back(x.m_energy);
-            MATERIAL_TABLE.push_back(x.m_n);
-            MATERIAL_TABLE.push_back(x.m_k);
+            MATERIAL_TABLE.push_back(x.m_f1);
+            MATERIAL_TABLE.push_back(x.m_f2);
             MATERIAL_TABLE.push_back(0);
         }
     }
