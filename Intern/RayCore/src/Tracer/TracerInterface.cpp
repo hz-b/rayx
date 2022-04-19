@@ -92,7 +92,7 @@ bool TracerInterface::run() {
         w->appendRays(doubleVec, index);
         index = index + (*outputRayIterator).size();
     }
-
+    //TODO: Add debug print here 
     // clean up tracer to avoid memory leaks
     m_RayTracer.cleanTracer();
     m_RayTracer.cleanup();
