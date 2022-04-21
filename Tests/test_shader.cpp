@@ -1744,6 +1744,7 @@ TEST_F(Tracer, refractiveIndexTest) {
     // gold index
     EXPECT_NEAR(v[7], 324., tolerance);
 }
+
 // test complete optical elements instead of single functions
 // uses deterministic source (matrix source with source depth = 0)
 // use name of optical element as file name

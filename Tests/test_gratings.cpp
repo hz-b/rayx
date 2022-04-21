@@ -82,7 +82,7 @@ TEST(planeGrating, testParams) {
                                           double(add_order)};
     ASSERT_DOUBLE_EQ(p1.getWidth(), width);
     ASSERT_DOUBLE_EQ(p1.getHeight(), height);
-    EXPECT_ITERABLE_DOUBLE_EQ_ARR(4 * 4, p1.getSurfaceParams(), surface);
+    CHECK_EQ(p1.getSurfaceParams(), surface);
     EXPECT_ITERABLE_DOUBLE_EQ_ARR(4 * 4, p1.getElementParameters(), elparams);
     EXPECT_ITERABLE_DOUBLE_EQ_ARR(4 * 4, p1.getObjectParameters(), objparams);
 

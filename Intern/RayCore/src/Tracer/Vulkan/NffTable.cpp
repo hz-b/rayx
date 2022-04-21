@@ -17,7 +17,6 @@ bool NffTable::load(const char* element, NffTable* out) {
                    [](unsigned char c) { return std::tolower(c); });
 
     std::string f = "Data/nff/" + elementString + ".nff";
-    RAYX_LOG << f;
     std::ifstream s(resolvePath(f));
 
     if (s.fail()) {
