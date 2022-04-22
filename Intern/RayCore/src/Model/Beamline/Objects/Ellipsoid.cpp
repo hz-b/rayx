@@ -64,9 +64,9 @@ Ellipsoid::Ellipsoid(const char* name,
                                   0, 0, m_a33, m_a34,     //
                                   7, 0, matd, m_a44}));
     setElementParameters({sin(m_tangentAngle), cos(m_tangentAngle), m_y0,
-                          m_z0,        //
+                          m_z0,                               //
                           double(m_figureRotation), 0, 0, 0,  //
-                          0, 0, 0, 0,  //
+                          0, 0, 0, 0,                         //
                           0, 0, 0, 0});
 }
 // User-defined Parm constructor
@@ -127,9 +127,9 @@ Ellipsoid::Ellipsoid(const char* name,
                                   m_a34,  //
                                   7, 0, matd, m_a44}));
     setElementParameters({sin(m_tangentAngle), cos(m_tangentAngle), m_y0,
-                          m_z0,        //
+                          m_z0,                               //
                           double(m_figureRotation), 0, 0, 0,  //
-                          0, 0, 0, 0,  //
+                          0, 0, 0, 0,                         //
                           0, 0, 0, 0});
 }
 
@@ -295,7 +295,7 @@ std::shared_ptr<Ellipsoid> Ellipsoid::createFromXML(
 
     Material mat;
     if (!xml::paramMaterial(node, &mat)) {
-        mat = Material::CU;  // default to copper
+        mat = Material::Cu;  // default to copper
     }
 
     // TODO: Are values stored as 0.0 if set to AUTO?[RAY-UI]

@@ -1857,7 +1857,7 @@ TEST_F(opticalElements, EllipsoidImagePlane) {
     std::shared_ptr<RAYX::Ellipsoid> eb = std::make_shared<RAYX::Ellipsoid>(
         "ellipsoid_ip_200default", RAYX::Geometry::GeometricalShape::RECTANGLE,
         50, 200, w_coord.getAzimuthalAngle(), pos, or1, 10, 10000, 1000, 0, 1,
-        zeros7, Material::CU);
+        zeros7, Material::Cu);
 
     RAYX::WorldUserParams w_coord2 = RAYX::WorldUserParams(
         0, 0, 0, 1000, std::array<double, 6>{0, 0, 0, 0, 0, 0});

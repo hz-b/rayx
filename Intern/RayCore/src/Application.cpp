@@ -57,7 +57,7 @@ void Application::loadDummyBeamline() {  // ! objects are created here
     std::shared_ptr<RAYX::PlaneMirror> pm = std::make_shared<RAYX::PlaneMirror>(
         "pm_ell_ip_200mirrormis", Geometry::GeometricalShape::RECTANGLE, 50,
         200, w_coord.getAzimuthalAngle(), pos1, or1,
-        std::array<double, 7>{0, 0, 0, 0, 0, 0, 0}, Material::CU);
+        std::array<double, 7>{0, 0, 0, 0, 0, 0, 0}, Material::Cu);
 
     RAYX::Geometry::GeometricalShape geometricalShape =
         RAYX::Geometry::GeometricalShape::RECTANGLE;
@@ -102,7 +102,7 @@ void Application::loadDummyBeamline() {  // ! objects are created here
             azimuthalAngle, pos2, or2, designEnergy, orderOfDiffraction,
             designOrderOfDiffraction, dAlpha, dBeta, sEntrance, sExit,
             mEntrance, mExit, shortRadius, longRadius, additionalOrder,
-            fresnelOffset, sE, Material::CU);
+            fresnelOffset, sE, Material::Cu);
 
     // Cylinder with mirror misalignment
     RAYX::GeometricUserParams cy_params =
@@ -118,7 +118,7 @@ void Application::loadDummyBeamline() {  // ! objects are created here
         "Cylinder", Geometry::GeometricalShape::RECTANGLE, 20,
         CylinderDirection::LongRadiusR, 200, 10, w_coord.getAzimuthalAngle(),
         pos4, or4, 10, 10000, 1000, std::array<double, 7>{0, 0, 0, 0, 0, 0, 0},
-        Material::CU);
+        Material::Cu);
 
     // image plane
     RAYX::WorldUserParams ip_w_coord = RAYX::WorldUserParams(

@@ -131,7 +131,7 @@ std::shared_ptr<PlaneGrating> PlaneGrating::createFromXML(
 
     Material mat;
     if (!xml::paramMaterial(node, &mat)) {
-        mat = Material::CU;  // defaults to copper!
+        mat = Material::Cu;  // defaults to copper!
     }
 
     return std::make_shared<PlaneGrating>(

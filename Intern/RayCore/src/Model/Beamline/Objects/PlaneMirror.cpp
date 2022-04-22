@@ -99,7 +99,7 @@ std::shared_ptr<PlaneMirror> PlaneMirror::createFromXML(
 
     Material mat;
     if (!xml::paramMaterial(node, &mat)) {
-        mat = Material::CU;  // default to copper
+        mat = Material::Cu;  // default to copper
     }
 
     double widthB;

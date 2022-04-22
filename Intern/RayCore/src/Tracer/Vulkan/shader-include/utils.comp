@@ -1,12 +1,3 @@
-// N_array[material_id] = number of atoms of the given material in the unit volume 1*m^3.
-// calculated by the inverse of the molar volume taken from wikipedia.
-const double N_array[1] = {
-    140646.97609001407, // CU
-};
-
-// classical electron radius in meters, see https://en.wikipedia.org/wiki/Classical_electron_radius
-const double classical_electron_radius = 2.8179403227e-15;
-
 // converts energy in eV to wavelength in nm
 double hvlam(double x) {
     if (x == 0) {
@@ -168,6 +159,15 @@ double wasteBox(double x, double z, double xLengthA, double xLengthB, double zLe
     return w;
 }
 
+// returns dvec2(atomic mass, density) extracted from materials.xmacro
+dvec2 getAtomicMassAndRho(int material) {
+    switch(material) {
+        #define X(e, z, a, rho) case z: return dvec2(a, rho);
+        #include "../materials.xmacro"
+        #undef X
+    }
+}
+
 // returns dvec2 to represent a complex number
 dvec2 getRefractiveIndex(double energy, int material) {
     if (material == -1) {  // vacuum
@@ -187,10 +187,15 @@ dvec2 getRefractiveIndex(double energy, int material) {
         }
     }
 
-    double lambda = hvlam(nkp[low].energy) / 1e9; // wavelength in meters
-    double factor = N_array[material]*classical_electron_radius*lambda*lambda/(2.0*PI);
+    dvec2 massAndRho = getAtomicMassAndRho(material);
+    double mass = massAndRho.x;
+    double rho = massAndRho.y;
 
-    return dvec2(1.0 - factor * nkp[low].f1, -factor * nkp[low].f2);
+    double e = nkp[low].energy;
+    double n = 1 - (415.252 * rho * nkp[low].f1)/(e*e*mass);
+    double k = (415.252 * rho * nkp[low].f2)/(e*e*mass);
+
+    return dvec2(n, k);
 }
 
 // returns angle between ray direction and surface normal at intersection point

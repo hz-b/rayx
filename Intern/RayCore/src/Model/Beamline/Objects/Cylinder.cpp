@@ -157,7 +157,7 @@ std::shared_ptr<Cylinder> Cylinder::createFromXML(
 
     Material mat;
     if (!xml::paramMaterial(node, &mat)) {
-        mat = Material::CU;  // default to copper
+        mat = Material::Cu;  // default to copper
     }
 
     return std::make_shared<Cylinder>(

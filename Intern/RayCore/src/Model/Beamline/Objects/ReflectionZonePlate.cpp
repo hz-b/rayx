@@ -287,7 +287,7 @@ std::shared_ptr<ReflectionZonePlate> ReflectionZonePlate::createFromXML(
 
     Material mat;
     if (!xml::paramMaterial(node, &mat)) {
-        mat = Material::CU;  // default to copper!
+        mat = Material::Cu;  // default to copper!
     }
 
     // ! temporary for testing trapezoid rzp
