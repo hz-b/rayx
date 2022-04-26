@@ -69,6 +69,7 @@ class RAYX_API VulkanTracer {
     void cleanTracer();
 
     void getRays();
+    void getDebugBuffer();
     void addRayVector(std::vector<Ray>&& inRayVector);
     void addArrays(const std::array<double, 4 * 4>& surfaceParams,
                    const std::array<double, 4 * 4>& inputInMatrix,
@@ -82,7 +83,7 @@ class RAYX_API VulkanTracer {
     // getter
     std::list<std::vector<Ray>>::const_iterator getOutputIteratorBegin();
     std::list<std::vector<Ray>>::const_iterator getOutputIteratorEnd();
-    
+
     // https://www.khronos.org/registry/OpenGL/extensions/ARB/ARB_uniform_buffer_object.txt
     // stf140 align rules (Stick to only 1 matrix for simplicity)
     struct _debugBuf_t {

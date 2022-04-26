@@ -67,6 +67,9 @@ layout(binding = 5) buffer materialBuf {
     NffEntry nkp[];  // contains nff table of all materials concatenated together
 };
 
+layout(binding = 6) buffer debugBuf {
+    _debug_struct d_struct[];  // contains nff table of all materials concatenated together
+};
 
 // Order in #include is IMPROTANT, do not change.
 // clang-format off
