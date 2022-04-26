@@ -38,12 +38,6 @@ struct NffEntry {
     double empty;  // for padding
 };
 
-struct _debug_struct {
-    double _dEntry0;
-    double _dEntry1;
-    dmat4 _dmat; // Can also be used as vectors 
-};
-
 /* LAYOUTS */
 layout(std140, binding = 0) buffer ibuf { Ray rayData[]; };
 
@@ -69,9 +63,6 @@ layout(binding = 5) buffer materialBuf {
     NffEntry nkp[];  // contains nff table of all materials concatenated together
 };
 
-layout(binding = 6) buffer debugBuf {
-    _debug_struct d_struct[];
-};
 
 // Order in #include is IMPROTANT, do not change.
 // clang-format off

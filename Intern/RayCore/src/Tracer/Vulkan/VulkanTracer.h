@@ -24,7 +24,6 @@ const bool enableValidationLayers = true;
 #define VULKANTRACER_QUADRIC_PARAM_DOUBLE_AMOUNT 4
 #define GPU_MAX_STAGING_SIZE                     134217728  // 128MB
 #define RAY_VECTOR_SIZE                          16777216
-#define VULKANTRACER_DEBUG_ENTRY_DOUBLE_AMOUNT   18
 
 namespace RAYX {
 
@@ -69,7 +68,6 @@ class RAYX_API VulkanTracer {
     void cleanTracer();
 
     void getRays();
-    void getDebugBuffer();
     void addRayVector(std::vector<Ray>&& inRayVector);
     void addArrays(const std::array<double, 4 * 4>& surfaceParams,
                    const std::array<double, 4 * 4>& inputInMatrix,
@@ -109,12 +107,6 @@ class RAYX_API VulkanTracer {
         bool isComplete() { return hasvalue; }
     };
 
-    struct _debugBuf_t {
-        double _dEntry0;
-        double _dEntry1;
-        glm::mat4x4 _dmat;
-    };
-
     // Member variables:
     VkInstance m_Instance;
     VkDebugUtilsMessengerEXT m_DebugMessenger;
@@ -143,7 +135,6 @@ class RAYX_API VulkanTracer {
     RayList m_RayList;
     std::vector<double> m_beamlineData;
     RayList m_OutputRays;
-    std::vector<_debugBuf_t> m_debugBufList;
 
     // Member functions:
     // Vulkan
@@ -190,8 +181,6 @@ class RAYX_API VulkanTracer {
     void fillMaterialBuffer();
     void copyToRayBuffer(uint32_t offset, uint32_t numberOfBytesToCopy);
     void copyToOutputBuffer(uint32_t offset, uint32_t numberOfBytesToCopy);
-    void copyToDebugBuffer(uint32_t offset);
-
     // Utils
     uint32_t* readFile(uint32_t& length, const char* filename);
 
