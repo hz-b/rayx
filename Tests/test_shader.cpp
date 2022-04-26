@@ -1585,14 +1585,16 @@ TEST_F(Tracer, reflectanceTest) {
         addTestSetting(testValues, glm::dvec3(0, 0, 0), glm::dvec3(0, 0, 0),
                        glm::dvec4(0, 0, 0, 0), energy, incidence_angle);
 
-    glm::dvec2 exp_spol = glm::dvec2(0.4312494615693625, 0.42810153127435358);
-    glm::dvec2 exp_ppol = glm::dvec2(0.4385787674250865, 0.3522102644170379);
+    glm::dvec2 exp_spol = glm::dvec2(0.42417123658023947, 0.42596314541403829);
+    glm::dvec2 exp_ppol = glm::dvec2(0.43121543105812743, 0.35170101686487432);
     correct = addTestSetting(correct, glm::dvec3(exp_spol, 0),
                              glm::dvec3(exp_ppol, 0));
 
     std::list<double> outputRays = runUnitTest(settings, testValues);
 
-    double tolerance = 1e-09;
+    double tolerance =
+        1e-09;  // this tolerance is much stricter than our actual accuracy, as
+                // we interpolate between large gaps of energies.
     compareFromCorrect(correct, outputRays, tolerance);
 }
 
@@ -1728,21 +1730,21 @@ TEST_F(Tracer, refractiveIndexTest) {
 
     double tolerance = 1e-15;
 
-    // first copper entry
-    EXPECT_NEAR(v[0], 1.0, tolerance);
-    EXPECT_NEAR(v[1], 0.433, tolerance);
-    EXPECT_NEAR(v[2], 8.46, tolerance);
+    // first H entry
+    EXPECT_NEAR(v[0], 10.0, tolerance);
+    EXPECT_NEAR(v[1], -9999.0, tolerance);
+    EXPECT_NEAR(v[2], 0.239540e-16, tolerance);
 
-    // copper index
+    // H index
     EXPECT_NEAR(v[3], 0., tolerance);
 
-    // first gold entry
-    EXPECT_NEAR(v[4], 0.04959, tolerance);
-    EXPECT_NEAR(v[5], 20.3, tolerance);
-    EXPECT_NEAR(v[6], 76.992, tolerance);
+    // first He entry
+    EXPECT_NEAR(v[4], 10.0, tolerance);
+    EXPECT_NEAR(v[5], -9999.0, tolerance);
+    EXPECT_NEAR(v[6], 0.951230e-16, tolerance);
 
-    // gold index
-    EXPECT_NEAR(v[7], 324., tolerance);
+    // He index
+    EXPECT_NEAR(v[7], 501., tolerance);
 }
 
 // test complete optical elements instead of single functions

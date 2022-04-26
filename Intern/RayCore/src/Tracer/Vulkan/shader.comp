@@ -424,7 +424,7 @@ void runTraceFunctions() {
         double incidence_angle = r.weight;
         dvec2 complex_S;
         dvec2 complex_P;
-        reflectance(energy, incidence_angle, complex_S, complex_P, 0);  // 0 == copper
+        reflectance(energy, incidence_angle, complex_S, complex_P, 29);  // 29 == copper
         res.position.x                       = complex_S.x;             // complex s polarisation
         res.position.y                       = complex_S.y;
         res.direction.x                      = complex_P.x;  // complex p polarisation
