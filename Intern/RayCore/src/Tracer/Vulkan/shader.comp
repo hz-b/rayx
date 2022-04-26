@@ -38,6 +38,10 @@ struct NffEntry {
     double empty;  // for padding
 };
 
+struct _debug_struct {
+    dmat4 _dMat; // Can also be used as vectors or scalar
+};
+
 /* LAYOUTS */
 layout(std140, binding = 0) buffer ibuf { Ray rayData[]; };
 
@@ -134,6 +138,9 @@ void dynamicElements() {
     dvec4 closestHitpoint = dvec4(1.0 / 0.0, 1.0 / 0.0, 1.0 / 0.0, 0.0);
     dvec4 closestGlobalHitpoint;
     double threshold = 0.001;
+
+    // Set Debug Struct of current Ray to identity
+    d_struct[uint(gl_GlobalInvocationID)]._dMat = dmat4(1);
 
     Element nextElement;
     double bounce = 1;

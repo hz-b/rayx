@@ -99,8 +99,8 @@ void Geometry::calcTransformationMatrices(glm::dvec4 position,
     m_outMatrix = glmToArray16(glm::transpose(e2g));
 
     /*RAYX_LOG << "from position and orientation";
-    printMatrix(m_inMatrix);
-    printMatrix(m_outMatrix);*/
+    printDMatrix(m_inMatrix);
+    printDMatrix(m_outMatrix);*/
 }
 
 void Geometry::getWidth(double& widthA, double& widthB) {

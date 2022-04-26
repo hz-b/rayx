@@ -132,7 +132,7 @@ void TerminalApp::run() {
 
     //  Plot in Python
     if (m_optargs.m_plotFlag == OptFlags::Enabled) {
-        // Setup to create venv if needed
+        // Setup to create genv if needed
         try {
             std::shared_ptr<PythonInterp> pySetup =
                 std::make_shared<PythonInterp>("py_setup", "setup",

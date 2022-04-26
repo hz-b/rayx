@@ -92,7 +92,20 @@ bool TracerInterface::run() {
         w->appendRays(doubleVec, index);
         index = index + (*outputRayIterator).size();
     }
-    //TODO: Add debug print here 
+
+#ifdef RAY_DEBUG_MODE
+    RAYX_D_LOG << "Debug Buffer output:";
+    for (auto DebugBufListIteraor = m_RayTracer.getDebugIteratorBegin(),
+              DebugBufListIteraorEnd = m_RayTracer.getDebugIteratorEnd();
+         DebugBufListIteraor != DebugBufListIteraorEnd; DebugBufListIteraor++) {
+        if (!(isIdentMatrix(DebugBufListIteraor->_dMat))) {
+            RAYX_D_LOG << "@"
+                       << DebugBufListIteraor -
+                              m_RayTracer.getDebugIteratorBegin();
+            printDMatrix(glmToArray16(DebugBufListIteraor->_dMat));
+        }
+    }
+#endif
     // clean up tracer to avoid memory leaks
     m_RayTracer.cleanTracer();
     m_RayTracer.cleanup();

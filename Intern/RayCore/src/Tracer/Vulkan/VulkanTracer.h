@@ -22,8 +22,9 @@ const bool enableValidationLayers = true;
 #define VULKANTRACER_RAY_DOUBLE_AMOUNT 16
 #define VULKANTRACER_QUADRIC_DOUBLE_AMOUNT 112  // 7* dmat4 (16)
 #define VULKANTRACER_QUADRIC_PARAM_DOUBLE_AMOUNT 4
-#define GPU_MAX_STAGING_SIZE                     134217728  // 128MB
-#define RAY_VECTOR_SIZE                          16777216
+#define GPU_MAX_STAGING_SIZE 134217728  // 128MB
+#define RAY_VECTOR_SIZE 16777216
+#define VULKANTRACER_DEBUG_ENTRY_DOUBLE_AMOUNT 16
 
 namespace RAYX {
 
@@ -78,11 +79,20 @@ class RAYX_API VulkanTracer {
                                uint32_t inNumberOfQuadricsPerBeamline,
                                uint32_t inNumberOfRays);
 
+    // getter
     std::list<std::vector<Ray>>::const_iterator getOutputIteratorBegin();
     std::list<std::vector<Ray>>::const_iterator getOutputIteratorEnd();
+    
+    // https://www.khronos.org/registry/OpenGL/extensions/ARB/ARB_uniform_buffer_object.txt
+    // stf140 align rules (Stick to only 1 matrix for simplicity)
+    struct _debugBuf_t {
+        glm::dmat4x4 _dMat;  // Set to identiy matrix in shader.
+    };
+    std::vector<_debugBuf_t>::const_iterator getDebugIteratorBegin();
+    std::vector<_debugBuf_t>::const_iterator getDebugIteratorEnd();
 
-    // getter
     const RayList& getRayList() { return m_RayList; }
+    const auto getDebugList() { return m_debugBufList; }
 
   private:
     // Member structs:
@@ -112,9 +122,22 @@ class RAYX_API VulkanTracer {
     VkDebugUtilsMessengerEXT m_DebugMessenger;
     VkPhysicalDevice m_PhysicalDevice = VK_NULL_HANDLE;
     VkDevice m_Device;
-    std::vector<uint64_t> m_bufferSizes;
-    std::vector<VkBuffer> m_buffers;
-    std::vector<VkDeviceMemory> m_bufferMemories;
+    _debugBuf_t m_debug;
+    struct Compute {  // Possibilty to add CommandPool, Pipeline etc.. here
+        std::vector<uint64_t> m_BufferSizes;
+        std::vector<VkBuffer> m_Buffers;
+        std::vector<VkDeviceMemory> m_BufferMemories;
+    } m_compute;
+
+    struct Graphics {
+        // Placeholder for Graphic rendering (For later steps)
+    } m_graphics;
+    struct Staging {
+        std::vector<uint64_t> m_BufferSizes;
+        std::vector<VkBuffer> m_Buffers;
+        std::vector<VkDeviceMemory> m_BufferMemories;
+    } m_staging;
+
     VkPipeline m_Pipeline;
     VkPipelineLayout m_PipelineLayout;
     VkShaderModule m_ComputeShaderModule;
@@ -133,12 +156,13 @@ class RAYX_API VulkanTracer {
     uint32_t m_numberOfRays;
     uint32_t m_numberOfRaysPerBeamline;
     RayList m_RayList;
-    std::vector<double> m_beamlineData;
     RayList m_OutputRays;
+    std::vector<double> m_beamlineData;
+    std::vector<_debugBuf_t> m_debugBufList;
 
     // Member functions:
     // Vulkan
-    void initVulkan();
+    void prepareVulkan();
     void prepareBuffers();
     void mainLoop();
     void createInstance();
@@ -181,6 +205,8 @@ class RAYX_API VulkanTracer {
     void fillMaterialBuffer();
     void copyToRayBuffer(uint32_t offset, uint32_t numberOfBytesToCopy);
     void copyToOutputBuffer(uint32_t offset, uint32_t numberOfBytesToCopy);
+    void copyFromDebugBuffer(uint32_t offset, uint32_t numberOfBytesToCopy);
+
     // Utils
     uint32_t* readFile(uint32_t& length, const char* filename);
 

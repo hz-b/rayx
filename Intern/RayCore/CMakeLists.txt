@@ -39,6 +39,7 @@ SET(SOURCE
     src/Model/Surface/Surface.cpp
     src/Model/Geometry/Geometry.cpp
     src/Tracer/RayList.cpp
+    src/Tracer/DebugBufList.cpp
     src/Tracer/TracerInterface.cpp
     src/Tracer/Writer/CSVWriter.cpp
     src/Tracer/Writer/H5Writer.cpp
@@ -86,6 +87,8 @@ SET(HEADERS
     src/Model/Geometry/Geometry.h
     src/Tracer/RayList.h
     src/Tracer/Ray.h
+    src/Tracer/DebugBuf.h
+    src/Tracer/DebugBufList.h
     src/Tracer/TracerInterface.h
     src/Tracer/Writer/Writer.hpp
     src/Tracer/Writer/CSVWriter.hpp

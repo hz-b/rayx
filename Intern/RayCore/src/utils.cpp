@@ -46,7 +46,7 @@ glm::dmat4x4 getRotationMatrix(double dpsi, double dphi, double dchi) {
     return glm::transpose(misalignmentMatrix);
 }
 
-void printMatrix(std::array<double, 4 * 4> matrix) {
+void printDMatrix(std::array<double, 4 * 4> matrix) {
     RAYX_PROFILE_FUNCTION();
     std::stringstream s;
     s << "\t";
@@ -137,3 +137,12 @@ std::vector<double>::iterator movingAppend(std::vector<double>&& srcVector,
 
     return result;
 }
+
+/**
+ * @brief Checks if Matrix is the Identiy matrix;
+ *
+ * @param matrix Matrix to check
+ * @return true
+ * @return false
+ */
+bool isIdentMatrix(glm::dmat4x4 matrix) { return (matrix == glm::dmat4x4(1.0)); }
