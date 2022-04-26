@@ -1,3 +1,4 @@
+// converts energy in eV to wavelength in nm
 double hvlam(double x) {
     if (x == 0) {
         return 0.0;
@@ -158,6 +159,16 @@ double wasteBox(double x, double z, double xLengthA, double xLengthB, double zLe
     return w;
 }
 
+// returns dvec2(atomic mass, density) extracted from materials.xmacro
+dvec2 getAtomicMassAndRho(int material) {
+    switch(material) {
+        #define X(e, z, a, rho) case z: return dvec2(a, rho);
+        #include "../materials.xmacro"
+        #undef X
+    }
+}
+
+// returns dvec2 to represent a complex number
 dvec2 getRefractiveIndex(double energy, int material) {
     if (material == -1) {  // vacuum
         return dvec2(1., 0.);
@@ -175,7 +186,16 @@ dvec2 getRefractiveIndex(double energy, int material) {
             low = center;
         }
     }
-    return dvec2(nkp[low].n, nkp[low].k);  // return refractive index for energy level
+
+    dvec2 massAndRho = getAtomicMassAndRho(material);
+    double mass = massAndRho.x;
+    double rho = massAndRho.y;
+
+    double e = nkp[low].energy;
+    double n = 1 - (415.252 * rho * nkp[low].f1)/(e*e*mass);
+    double k = (415.252 * rho * nkp[low].f2)/(e*e*mass);
+
+    return dvec2(n, k);
 }
 
 // returns angle between ray direction and surface normal at intersection point

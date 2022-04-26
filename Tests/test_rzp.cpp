@@ -54,14 +54,14 @@ TEST(RZP, testdefaultParams) {
         rzp_param.getAzimuthalAngle(), position, orientation, designEnergy,
         orderOfDiffraction, designOrderOfDiffraction, dAlpha, dBeta, sEntrance,
         sExit, mEntrance, mExit, shortRadius, longRadius, additionalOrder,
-        fresnelOffset, sE, Material::CU);
+        fresnelOffset, sE, Material::Cu);
 
     double d_alpha = 0.017453292519943295;
     double d_beta = 0.017453292519943295;
     double wl = 12.39852;
     double icurv = 1;
-    std::array<double, 4 * 4> quad = {0, 0, 0, 0, icurv, 0, 0, -1,
-                                      0, 0, 0, 0, 4,     0, 0, 0};  // plane
+    std::array<double, 4 * 4> quad = {0, 0, 0, 0, icurv, 0, 0,  -1,
+                                      0, 0, 0, 0, 4,     0, 29, 0};  // plane
     std::array<double, 4 * 4> correctElementParams = {0,
                                                       0,
                                                       0,
@@ -163,13 +163,13 @@ TEST(RZP, testdefaultParamsElliptical) {
         rzp_param.getAzimuthalAngle(), position, orientation, designEnergy,
         orderOfDiffraction, designOrderOfDiffraction, dAlpha, dBeta, sEntrance,
         sExit, mEntrance, mExit, shortRadius, longRadius, additionalOrder,
-        fresnelOffset, sE, Material::CU);
+        fresnelOffset, sE, Material::Cu);
 
     double d_alpha = 0.017453292519943295;
     double d_beta = 0.017453292519943295;
     double wl = 12.39852;
     std::array<double, 4 * 4> quad = {
-        0, 0, 0, 0, double(icurv), 0, 0, -1, 0, 0, 0, 0, 4, 0, 0, 0};  // plane
+        0, 0, 0, 0, double(icurv), 0, 0, -1, 0, 0, 0, 0, 4, 0, 29, 0};  // plane
     std::array<double, 4 * 4> correctElementParams = {0,
                                                       0,
                                                       0,
@@ -272,7 +272,7 @@ TEST(RZP, testParams) {
         rzp_param.getAzimuthalAngle(), position, orientation, designEnergy,
         orderOfDiffraction, designOrderOfDiffraction, dAlpha, dBeta, sEntrance,
         sExit, mEntrance, mExit, shortRadius, longRadius, additionalOrder,
-        fresnelOffset, sE, Material::CU);
+        fresnelOffset, sE, Material::Cu);
 
     std::array<double, 4 * 4> correctElementParams = {0,
                                                       0,

@@ -21,7 +21,7 @@ TEST(PlaneMirror, testSimpleParams) {
 
     int icurv = 1;
     std::array<double, 4 * 4> surface = {
-        0, 0, 0, 0, double(icurv), 0, 0, -1, 0, 0, 0, 0, 0, 0, 0, 0};
+        0, 0, 0, 0, double(icurv), 0, 0, -1, 0, 0, 0, 0, 0, 0, 29, 0};
 
     CHECK_EQ(plM->getWidth(), 68.12);
     CHECK_EQ(plM->getHeight(), 123.6);
@@ -40,7 +40,7 @@ TEST(PlaneMirror, testAdvancedParams) {
     int icurv = 1;
     std::array<double, 7> sE = {0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7};
     std::array<double, 4 * 4> surface = {
-        0, 0, 0, 0, double(icurv), 0, 0, -1, 0, 0, 0, 0, 0, 0, 0, 0};
+        0, 0, 0, 0, double(icurv), 0, 0, -1, 0, 0, 0, 0, 0, 0, 29, 0};
 
     glm::dmat4x4 correctInMatrix = glm::dmat4x4(
         0.98631018201912979, -0.16127244932632739, -0.034400900187032908, 0,
@@ -72,7 +72,7 @@ TEST(SphereMirror, testParams) {
     double radius = 104.32651829593351;  // from old RAY
     std::array<double, 7> sE = {0.7, 0.5, 0.3, 0.7, 0.3, 3, 2};
     std::array<double, 4 * 4> surface = {
-        1, 0, 0, 0, double(icurv), 1, 0, -radius, 0, 0, 1, 0, 0, 0, 0, 0};
+        1, 0, 0, 0, double(icurv), 1, 0, -radius, 0, 0, 1, 0, 0, 0, 29, 0};
 
     glm::dmat4x4 correctInMatrix = glm::dmat4x4(
         0.024368111991334068, -0.85883516451860731, -0.51167211698926318, 0,
@@ -115,8 +115,8 @@ TEST(Ellipse, defaultParams) {
     double a33 = 0.0099681618535688628;
     double a34 = 45.0819833448842;
     double a44 = -5.8207660913467407e-11;
-    std::array<double, 4 * 4> surface = {1, 0, 0,   0,   1, 1, 0, y0,
-                                         0, 0, a33, a34, 7, 0, 0, a44};
+    std::array<double, 4 * 4> surface = {1, 0, 0,   0,   1, 1, 0,  y0,
+                                         0, 0, a33, a34, 7, 0, 79, a44};
     std::array<double, 4 * 4> elementParams = {sin(correctTangentAngle),
                                                cos(correctTangentAngle),
                                                y0,

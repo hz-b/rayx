@@ -15,7 +15,9 @@ enum class Material {
     REFLECTIVE = -2,
     VACUUM = -1,
 
-#define X(e) e,
+// Material = 0 is not used yet
+
+#define X(e, z, a, rho) e = z,
 #include "materials.xmacro"
 #undef X
 };

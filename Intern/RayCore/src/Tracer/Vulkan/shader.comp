@@ -31,10 +31,10 @@ struct Element {
     dmat4 elementParameters;
 };
 
-struct RefractiveIndexEntry {
+struct NffEntry {
     double energy;
-    double n;
-    double k;
+    double f1;
+    double f2;
     double empty;  // for padding
 };
 
@@ -66,7 +66,7 @@ layout(binding = 4) buffer materialIndexBuf {
 };
 
 layout(binding = 5) buffer materialBuf {
-    RefractiveIndexEntry nkp[];  // contains PALIK table of all materials concatenated together
+    NffEntry nkp[];  // contains nff table of all materials concatenated together
 };
 
 layout(binding = 6) buffer debugBuf {
@@ -435,7 +435,7 @@ void runTraceFunctions() {
         double incidence_angle = r.weight;
         dvec2 complex_S;
         dvec2 complex_P;
-        reflectance(energy, incidence_angle, complex_S, complex_P, 0);  // 0 == copper
+        reflectance(energy, incidence_angle, complex_S, complex_P, 29);  // 29 == copper
         res.position.x                       = complex_S.x;             // complex s polarisation
         res.position.y                       = complex_S.y;
         res.direction.x                      = complex_P.x;  // complex p polarisation
@@ -478,13 +478,13 @@ void runTraceFunctions() {
         rayData[uint(gl_GlobalInvocationID)] = res;
     } else if (settings == 26) {  // test material loading
         rayData[uint(gl_GlobalInvocationID)].position.x = nkp[0].energy;
-        rayData[uint(gl_GlobalInvocationID)].position.y = nkp[0].n;
-        rayData[uint(gl_GlobalInvocationID)].position.z = nkp[0].k;
+        rayData[uint(gl_GlobalInvocationID)].position.y = nkp[0].f1;
+        rayData[uint(gl_GlobalInvocationID)].position.z = nkp[0].f2;
         rayData[uint(gl_GlobalInvocationID)].weight     = nkpIdx[0];
 
         rayData[uint(gl_GlobalInvocationID)].direction.x = nkp[nkpIdx[1]].energy;
-        rayData[uint(gl_GlobalInvocationID)].direction.y = nkp[nkpIdx[1]].n;
-        rayData[uint(gl_GlobalInvocationID)].direction.z = nkp[nkpIdx[1]].k;
+        rayData[uint(gl_GlobalInvocationID)].direction.y = nkp[nkpIdx[1]].f1;
+        rayData[uint(gl_GlobalInvocationID)].direction.z = nkp[nkpIdx[1]].f2;
         rayData[uint(gl_GlobalInvocationID)].energy      = nkpIdx[1];
     } else if (settings == 27) {  // TEST TRIG FUNCTIONS: cos
         res.position                         = dvec3(r8_cos(r.position.x), r8_cos(r.position.y), r8_cos(r.position.z));
