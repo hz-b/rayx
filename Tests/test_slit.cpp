@@ -30,25 +30,25 @@ TEST(Slit, defaultParams) {
         width, height, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
     std::array<double, 4 * 4> surface = {0, 0, 0, 0,  0, 0, 0, 0,
                                          0, 0, 0, -1, 3, 0, 0, 0};
-    ASSERT_DOUBLE_EQ(static_cast<int>(s.getCentralBeamstop()),
+    CHECK_EQ(static_cast<int>(s.getCentralBeamstop()),
                      static_cast<int>(beamstop));
-    ASSERT_DOUBLE_EQ(s.getBeamstopHeight(), 0);
-    ASSERT_DOUBLE_EQ(s.getBeamstopWidth(), 0);
-    ASSERT_DOUBLE_EQ(s.getHeight(), height);
-    ASSERT_DOUBLE_EQ(s.getWidth(), width);
-    ASSERT_DOUBLE_EQ(s.getWaveLength(), wavelength);
-    EXPECT_ITERABLE_DOUBLE_EQ_ARR(4 * 4, s.getElementParameters(),
+    CHECK_EQ(s.getBeamstopHeight(), 0);
+    CHECK_EQ(s.getBeamstopWidth(), 0);
+    CHECK_EQ(s.getHeight(), height);
+    CHECK_EQ(s.getWidth(), width);
+    CHECK_EQ(s.getWaveLength(), wavelength);
+    CHECK_EQ(s.getElementParameters(),
                                   correctElementParams);
-    EXPECT_ITERABLE_DOUBLE_EQ_ARR(4 * 4, s.getSurfaceParams(), surface);
-    EXPECT_ITERABLE_DOUBLE_EQ_ARR(4 * 4, s.getObjectParameters(),
+    CHECK_EQ(s.getSurfaceParams(), surface);
+    CHECK_EQ(s.getObjectParameters(),
                                   correctObjectParams);
 
     std::array<double, 4 * 4> correctInMat = {1, 0, 0, 0, 0, 1, 0,      0,
                                               0, 0, 1, 0, 0, 0, -10000, 1};
     std::array<double, 4 * 4> correctOutMat = {1, 0, 0, 0, 0, 1, 0,     0,
                                                0, 0, 1, 0, 0, 0, 10000, 1};
-    EXPECT_ITERABLE_DOUBLE_EQ_ARR(4 * 4, s.getInMatrix(), correctInMat);
-    EXPECT_ITERABLE_DOUBLE_EQ_ARR(4 * 4, s.getOutMatrix(), correctOutMat);
+    CHECK_EQ(s.getInMatrix(), correctInMat);
+    CHECK_EQ(s.getOutMatrix(), correctOutMat);
 }
 
 TEST(Slit, rectangleBeamstop) {
@@ -94,25 +94,25 @@ TEST(Slit, rectangleBeamstop) {
         width, height, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
     std::array<double, 4 * 4> surface = {0, 0, 0, 0,  0, 0, 0, 0,
                                          0, 0, 0, -1, 3, 0, 0, 0};
-    ASSERT_DOUBLE_EQ(static_cast<int>(s.getCentralBeamstop()),
+    CHECK_EQ(static_cast<int>(s.getCentralBeamstop()),
                      static_cast<int>(beamstop));
-    ASSERT_DOUBLE_EQ(s.getBeamstopHeight(), beamstopHeight);
-    ASSERT_DOUBLE_EQ(s.getBeamstopWidth(), beamstopWidth);
-    ASSERT_DOUBLE_EQ(s.getHeight(), height);
-    ASSERT_DOUBLE_EQ(s.getWidth(), width);
-    ASSERT_DOUBLE_EQ(s.getWaveLength(), wavelength);
-    EXPECT_ITERABLE_DOUBLE_EQ_ARR(4 * 4, s.getElementParameters(),
+    CHECK_EQ(s.getBeamstopHeight(), beamstopHeight);
+    CHECK_EQ(s.getBeamstopWidth(), beamstopWidth);
+    CHECK_EQ(s.getHeight(), height);
+    CHECK_EQ(s.getWidth(), width);
+    CHECK_EQ(s.getWaveLength(), wavelength);
+    CHECK_EQ(s.getElementParameters(),
                                   correctElementParams);
-    EXPECT_ITERABLE_DOUBLE_EQ_ARR(4 * 4, s.getSurfaceParams(), surface);
-    EXPECT_ITERABLE_DOUBLE_EQ_ARR(4 * 4, s.getObjectParameters(),
+    CHECK_EQ(s.getSurfaceParams(), surface);
+    CHECK_EQ(s.getObjectParameters(),
                                   correctObjectParams);
 
     std::array<double, 4 * 4> correctInMat = {1, 0, 0, 0, 0, 1, 0,      0,
                                               0, 0, 1, 0, 0, 0, -10000, 1};
     std::array<double, 4 * 4> correctOutMat = {1, 0, 0, 0, 0, 1, 0,     0,
                                                0, 0, 1, 0, 0, 0, 10000, 1};
-    EXPECT_ITERABLE_DOUBLE_EQ_ARR(4 * 4, s.getInMatrix(), correctInMat);
-    EXPECT_ITERABLE_DOUBLE_EQ_ARR(4 * 4, s.getOutMatrix(), correctOutMat);
+    CHECK_EQ(s.getInMatrix(), correctInMat);
+    CHECK_EQ(s.getOutMatrix(), correctOutMat);
 }
 
 TEST(Slit, ellipticalBeamstop) {
@@ -158,25 +158,25 @@ TEST(Slit, ellipticalBeamstop) {
         width, height, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
     std::array<double, 4 * 4> surface = {0, 0, 0, 0,  0, 0, 0, 0,
                                          0, 0, 0, -1, 3, 0, 0, 0};
-    ASSERT_DOUBLE_EQ(static_cast<int>(s.getCentralBeamstop()),
+    CHECK_EQ(static_cast<int>(s.getCentralBeamstop()),
                      static_cast<int>(beamstop));
-    ASSERT_DOUBLE_EQ(s.getBeamstopHeight(), beamstopHeight);
-    ASSERT_DOUBLE_EQ(s.getBeamstopWidth(), -beamstopWidth);
-    ASSERT_DOUBLE_EQ(s.getHeight(), height);
-    ASSERT_DOUBLE_EQ(s.getWidth(), width);
-    ASSERT_DOUBLE_EQ(s.getWaveLength(), wavelength);
-    EXPECT_ITERABLE_DOUBLE_EQ_ARR(4 * 4, s.getElementParameters(),
+    CHECK_EQ(s.getBeamstopHeight(), beamstopHeight);
+    CHECK_EQ(s.getBeamstopWidth(), -beamstopWidth);
+    CHECK_EQ(s.getHeight(), height);
+    CHECK_EQ(s.getWidth(), width);
+    CHECK_EQ(s.getWaveLength(), wavelength);
+    CHECK_EQ(s.getElementParameters(),
                                   correctElementParams);
-    EXPECT_ITERABLE_DOUBLE_EQ_ARR(4 * 4, s.getSurfaceParams(), surface);
-    EXPECT_ITERABLE_DOUBLE_EQ_ARR(4 * 4, s.getObjectParameters(),
+    CHECK_EQ(s.getSurfaceParams(), surface);
+    CHECK_EQ(s.getObjectParameters(),
                                   correctObjectParams);
 
     std::array<double, 4 * 4> correctInMat = {1, 0, 0, 0, 0, 1, 0,      0,
                                               0, 0, 1, 0, 0, 0, -10000, 1};
     std::array<double, 4 * 4> correctOutMat = {1, 0, 0, 0, 0, 1, 0,     0,
                                                0, 0, 1, 0, 0, 0, 10000, 1};
-    EXPECT_ITERABLE_DOUBLE_EQ_ARR(4 * 4, s.getInMatrix(), correctInMat);
-    EXPECT_ITERABLE_DOUBLE_EQ_ARR(4 * 4, s.getOutMatrix(), correctOutMat);
+    CHECK_EQ(s.getInMatrix(), correctInMat);
+    CHECK_EQ(s.getOutMatrix(), correctOutMat);
 }
 
 TEST(Slit, ellipticalSlitellipticalBeamstop) {
@@ -222,17 +222,17 @@ TEST(Slit, ellipticalSlitellipticalBeamstop) {
         -width, -height, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
     std::array<double, 4 * 4> surface = {0, 0, 0, 0,  0, 0, 0, 0,
                                          0, 0, 0, -1, 3, 0, 0, 0};
-    ASSERT_DOUBLE_EQ(static_cast<int>(s.getCentralBeamstop()),
+    CHECK_EQ(static_cast<int>(s.getCentralBeamstop()),
                      static_cast<int>(beamstop));
-    ASSERT_DOUBLE_EQ(s.getBeamstopHeight(), beamstopHeight);
-    ASSERT_DOUBLE_EQ(s.getBeamstopWidth(), -beamstopWidth);
-    ASSERT_DOUBLE_EQ(s.getHeight(), -height);
-    ASSERT_DOUBLE_EQ(s.getWidth(), -width);
-    ASSERT_DOUBLE_EQ(s.getWaveLength(), wavelength);
-    EXPECT_ITERABLE_DOUBLE_EQ_ARR(4 * 4, s.getElementParameters(),
+    CHECK_EQ(s.getBeamstopHeight(), beamstopHeight);
+    CHECK_EQ(s.getBeamstopWidth(), -beamstopWidth);
+    CHECK_EQ(s.getHeight(), -height);
+    CHECK_EQ(s.getWidth(), -width);
+    CHECK_EQ(s.getWaveLength(), wavelength);
+    CHECK_EQ(s.getElementParameters(),
                                   correctElementParams);
-    EXPECT_ITERABLE_DOUBLE_EQ_ARR(4 * 4, s.getSurfaceParams(), surface);
-    EXPECT_ITERABLE_DOUBLE_EQ_ARR(4 * 4, s.getObjectParameters(),
+    CHECK_EQ(s.getSurfaceParams(), surface);
+    CHECK_EQ(s.getObjectParameters(),
                                   correctObjectParams);
 
     std::array<double, 4 * 4> correctInMat = {0.98480775301220802,
@@ -267,8 +267,8 @@ TEST(Slit, ellipticalSlitellipticalBeamstop) {
                                                0,
                                                10000,
                                                1};
-    EXPECT_ITERABLE_DOUBLE_EQ_ARR(4 * 4, s.getInMatrix(), correctInMat);
-    EXPECT_ITERABLE_DOUBLE_EQ_ARR(4 * 4, s.getOutMatrix(), correctOutMat);
+    CHECK_EQ(s.getInMatrix(), correctInMat);
+    CHECK_EQ(s.getOutMatrix(), correctOutMat);
 }
 
 TEST(Slit, ellipticalSlitrectangleBeamstop) {
@@ -314,25 +314,25 @@ TEST(Slit, ellipticalSlitrectangleBeamstop) {
         -width, -height, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
     std::array<double, 4 * 4> surface = {0, 0, 0, 0,  0, 0, 0, 0,
                                          0, 0, 0, -1, 3, 0, 0, 0};
-    ASSERT_DOUBLE_EQ(static_cast<int>(s.getCentralBeamstop()),
+    CHECK_EQ(static_cast<int>(s.getCentralBeamstop()),
                      static_cast<int>(beamstop));
-    ASSERT_DOUBLE_EQ(s.getBeamstopHeight(), beamstopHeight);
-    ASSERT_DOUBLE_EQ(s.getBeamstopWidth(), beamstopWidth);
-    ASSERT_DOUBLE_EQ(s.getHeight(), -height);
-    ASSERT_DOUBLE_EQ(s.getWidth(), -width);
-    ASSERT_DOUBLE_EQ(s.getWaveLength(), wavelength);
-    EXPECT_ITERABLE_DOUBLE_EQ_ARR(4 * 4, s.getElementParameters(),
+    CHECK_EQ(s.getBeamstopHeight(), beamstopHeight);
+    CHECK_EQ(s.getBeamstopWidth(), beamstopWidth);
+    CHECK_EQ(s.getHeight(), -height);
+    CHECK_EQ(s.getWidth(), -width);
+    CHECK_EQ(s.getWaveLength(), wavelength);
+    CHECK_EQ(s.getElementParameters(),
                                   correctElementParams);
-    EXPECT_ITERABLE_DOUBLE_EQ_ARR(4 * 4, s.getSurfaceParams(), surface);
-    EXPECT_ITERABLE_DOUBLE_EQ_ARR(4 * 4, s.getObjectParameters(),
+    CHECK_EQ(s.getSurfaceParams(), surface);
+    CHECK_EQ(s.getObjectParameters(),
                                   correctObjectParams);
 
     std::array<double, 4 * 4> correctInMat = {1, 0, 0, 0, 0, 1, 0,     0,
                                               0, 0, 1, 0, 0, 0, -1234, 1};
     std::array<double, 4 * 4> correctOutMat = {1, 0, 0, 0, 0, 1, 0,    0,
                                                0, 0, 1, 0, 0, 0, 1234, 1};
-    EXPECT_ITERABLE_DOUBLE_EQ_ARR(4 * 4, s.getInMatrix(), correctInMat);
-    EXPECT_ITERABLE_DOUBLE_EQ_ARR(4 * 4, s.getOutMatrix(), correctOutMat);
+    CHECK_EQ(s.getInMatrix(), correctInMat);
+    CHECK_EQ(s.getOutMatrix(), correctOutMat);
 }
 
 TEST(Slit, ellipticalSlitNoBeamstop) {
@@ -364,17 +364,17 @@ TEST(Slit, ellipticalSlitNoBeamstop) {
         -width, -height, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
     std::array<double, 4 * 4> surface = {0, 0, 0, 0,  0, 0, 0, 0,
                                          0, 0, 0, -1, 3, 0, 0, 0};
-    ASSERT_DOUBLE_EQ(static_cast<int>(s.getCentralBeamstop()),
+    CHECK_EQ(static_cast<int>(s.getCentralBeamstop()),
                      static_cast<int>(beamstop));
-    ASSERT_DOUBLE_EQ(s.getBeamstopHeight(), 0);
-    ASSERT_DOUBLE_EQ(s.getBeamstopWidth(), 0);
-    ASSERT_DOUBLE_EQ(s.getHeight(), -height);
-    ASSERT_DOUBLE_EQ(s.getWidth(), -width);
-    ASSERT_DOUBLE_EQ(s.getWaveLength(), wavelength);
-    EXPECT_ITERABLE_DOUBLE_EQ_ARR(4 * 4, s.getElementParameters(),
+    CHECK_EQ(s.getBeamstopHeight(), 0);
+    CHECK_EQ(s.getBeamstopWidth(), 0);
+    CHECK_EQ(s.getHeight(), -height);
+    CHECK_EQ(s.getWidth(), -width);
+    CHECK_EQ(s.getWaveLength(), wavelength);
+    CHECK_EQ(s.getElementParameters(),
                                   correctElementParams);
-    EXPECT_ITERABLE_DOUBLE_EQ_ARR(4 * 4, s.getSurfaceParams(), surface);
-    EXPECT_ITERABLE_DOUBLE_EQ_ARR(4 * 4, s.getObjectParameters(),
+    CHECK_EQ(s.getSurfaceParams(), surface);
+    CHECK_EQ(s.getObjectParameters(),
                                   correctObjectParams);
 
     std::array<double, 4 * 4> correctInMat = {0.97814760073380569,
@@ -409,8 +409,8 @@ TEST(Slit, ellipticalSlitNoBeamstop) {
                                                0,
                                                1201,
                                                1};
-    EXPECT_ITERABLE_DOUBLE_EQ_ARR(4 * 4, s.getInMatrix(), correctInMat);
-    EXPECT_ITERABLE_DOUBLE_EQ_ARR(4 * 4, s.getOutMatrix(), correctOutMat);
+    CHECK_EQ(s.getInMatrix(), correctInMat);
+    CHECK_EQ(s.getOutMatrix(), correctOutMat);
 }
 
 #endif

@@ -41,8 +41,8 @@ TEST(RZP, testdefaultParams) {
         mount, imageType, deviation, grazingIncidence, beta_in, sourceEnergy,
         designEnergy, orderOfDiffraction, designOrderOfDiffraction, dAlpha,
         dBeta, mEntrance, mExit, sEntrance, sExit);
-    EXPECT_DOUBLE_EQ(rzp_guparams.getAlpha(), alpha);
-    EXPECT_DOUBLE_EQ(rzp_guparams.getBeta(), beta);
+    CHECK_EQ(rzp_guparams.getAlpha(), alpha);
+    CHECK_EQ(rzp_guparams.getBeta(), beta);
 
     RAYX::WorldUserParams rzp_param =
         RAYX::WorldUserParams(alpha, beta, azimuthal, dist, mis);
@@ -95,22 +95,19 @@ TEST(RZP, testdefaultParams) {
         0,
         0,
         0};
-    EXPECT_ITERABLE_DOUBLE_EQ_ARR(4 * 4, rzp.getElementParameters(),
-                                  correctElementParams);
-    EXPECT_ITERABLE_DOUBLE_EQ_ARR(4 * 4, rzp.getObjectParameters(),
-                                  correctObjectParams);
-    EXPECT_ITERABLE_DOUBLE_EQ_ARR(4 * 4, rzp.getSurfaceParams(), quad);
-    EXPECT_ITERABLE_DOUBLE_EQ_ARR(7, rzp.getSlopeError(), sE);
+    CHECK_EQ(rzp.getElementParameters(), correctElementParams);
+    CHECK_EQ(rzp.getObjectParameters(), correctObjectParams);
+    CHECK_EQ(rzp.getSurfaceParams(), quad);
+    CHECK_EQ(rzp.getSlopeError(), sE);
     // std::vector<double> zeros = {0, 0, 0, 0, 0, 0};
-    ASSERT_DOUBLE_EQ(rzp.getWidth(), width);
-    ASSERT_DOUBLE_EQ(rzp.getHeight(), height);
-    ASSERT_DOUBLE_EQ(rzp.getDesignEnergy(), designEnergy);
-    ASSERT_DOUBLE_EQ(rzp.getOrderOfDiffraction(), orderOfDiffraction);
-    ASSERT_DOUBLE_EQ(rzp.getDesignOrderOfDiffraction(),
-                     designOrderOfDiffraction);
-    ASSERT_DOUBLE_EQ(rzp.getWaveLength(), wl);
-    EXPECT_NEAR(rzp.getDesignAlphaAngle(), d_alpha, 0.000000001);
-    EXPECT_NEAR(rzp.getDesignBetaAngle(), d_beta, 0.000000001);
+    CHECK_EQ(rzp.getWidth(), width);
+    CHECK_EQ(rzp.getHeight(), height);
+    CHECK_EQ(rzp.getDesignEnergy(), designEnergy);
+    CHECK_EQ(rzp.getOrderOfDiffraction(), orderOfDiffraction);
+    CHECK_EQ(rzp.getDesignOrderOfDiffraction(), designOrderOfDiffraction);
+    CHECK_EQ(rzp.getWaveLength(), wl);
+    CHECK_EQ(rzp.getDesignAlphaAngle(), d_alpha, 0.000000001);
+    CHECK_EQ(rzp.getDesignBetaAngle(), d_beta, 0.000000001);
 }
 
 TEST(RZP, testdefaultParamsElliptical) {
@@ -151,8 +148,8 @@ TEST(RZP, testdefaultParamsElliptical) {
         mount, imageType, deviation, grazingIncidence, beta_in, sourceEnergy,
         designEnergy, orderOfDiffraction, designOrderOfDiffraction, dAlpha,
         dBeta, mEntrance, mExit, sEntrance, sExit);
-    EXPECT_DOUBLE_EQ(rzp_guparams.getAlpha(), alpha);
-    EXPECT_DOUBLE_EQ(rzp_guparams.getBeta(), beta);
+    CHECK_EQ(rzp_guparams.getAlpha(), alpha);
+    CHECK_EQ(rzp_guparams.getBeta(), beta);
 
     RAYX::WorldUserParams rzp_param = RAYX::WorldUserParams(
         rzp_guparams.getAlpha(), rzp_guparams.getBeta(), azimuthal, dist, mis);
@@ -203,23 +200,20 @@ TEST(RZP, testdefaultParamsElliptical) {
         0,
         0,
         0};
-    EXPECT_ITERABLE_DOUBLE_EQ_ARR(4 * 4, rzp.getElementParameters(),
-                                  correctElementParams);
-    EXPECT_ITERABLE_DOUBLE_EQ_ARR(4 * 4, rzp.getObjectParameters(),
-                                  correctObjectParams);
-    EXPECT_ITERABLE_DOUBLE_EQ_ARR(4 * 4, rzp.getSurfaceParams(), quad);
-    EXPECT_ITERABLE_DOUBLE_EQ_ARR(7, rzp.getSlopeError(), sE);
+    CHECK_EQ(rzp.getElementParameters(), correctElementParams);
+    CHECK_EQ(rzp.getObjectParameters(), correctObjectParams);
+    CHECK_EQ(rzp.getSurfaceParams(), quad);
+    CHECK_EQ(rzp.getSlopeError(), sE);
     // std::vector<double> zeros = {0, 0, 0, 0, 0, 0};
 
-    ASSERT_DOUBLE_EQ(rzp.getWidth(), -width);
-    ASSERT_DOUBLE_EQ(rzp.getHeight(), -height);
-    ASSERT_DOUBLE_EQ(rzp.getDesignEnergy(), designEnergy);
-    ASSERT_DOUBLE_EQ(rzp.getOrderOfDiffraction(), orderOfDiffraction);
-    ASSERT_DOUBLE_EQ(rzp.getDesignOrderOfDiffraction(),
-                     designOrderOfDiffraction);
-    ASSERT_DOUBLE_EQ(rzp.getWaveLength(), wl);
-    EXPECT_NEAR(rzp.getDesignAlphaAngle(), d_alpha, 0.000000001);
-    EXPECT_NEAR(rzp.getDesignBetaAngle(), d_beta, 0.000000001);
+    CHECK_EQ(rzp.getWidth(), -width);
+    CHECK_EQ(rzp.getHeight(), -height);
+    CHECK_EQ(rzp.getDesignEnergy(), designEnergy);
+    CHECK_EQ(rzp.getOrderOfDiffraction(), orderOfDiffraction);
+    CHECK_EQ(rzp.getDesignOrderOfDiffraction(), designOrderOfDiffraction);
+    CHECK_EQ(rzp.getWaveLength(), wl);
+    CHECK_EQ(rzp.getDesignAlphaAngle(), d_alpha, 0.000000001);
+    CHECK_EQ(rzp.getDesignBetaAngle(), d_beta, 0.000000001);
 }
 
 TEST(RZP, testParams) {
@@ -259,8 +253,8 @@ TEST(RZP, testParams) {
         mount, imageType, deviation, grazingIncidence, beta_in, sourceEnergy,
         designEnergy, orderOfDiffraction, designOrderOfDiffraction, dAlpha,
         dBeta, mEntrance, mExit, sEntrance, sExit);
-    EXPECT_DOUBLE_EQ(rzp_guparams.getAlpha(), alpha);
-    EXPECT_DOUBLE_EQ(rzp_guparams.getBeta(), beta);
+    CHECK_EQ(rzp_guparams.getAlpha(), alpha);
+    CHECK_EQ(rzp_guparams.getBeta(), beta);
 
     RAYX::WorldUserParams rzp_param =
         RAYX::WorldUserParams(rzp_guparams.getAlpha(), 0.21816615649929122,
@@ -317,15 +311,11 @@ TEST(RZP, testParams) {
         0.82420440112787274, -0.21643961393810288, 0, -0.11601241633394895,
         0.18272171665687006, 0.97629600711993336, 0, 0, 0, 5123.7529999999997,
         1);
-    EXPECT_ITERABLE_DOUBLE_EQ_ARR(4 * 4, rzp.getObjectParameters(),
-                                  correctObjectParams);
-    EXPECT_ITERABLE_DOUBLE_EQ_ARR(4 * 4, rzp.getElementParameters(),
-                                  correctElementParams);
-    EXPECT_ITERABLE_DOUBLE_EQ_ARR(4 * 4, rzp.getInMatrix(),
-                                  glmToArray16(correctInMatrix));
-    EXPECT_ITERABLE_DOUBLE_EQ_ARR(4 * 4, rzp.getOutMatrix(),
-                                  glmToArray16(correctOutMatrix));
-    EXPECT_ITERABLE_DOUBLE_EQ_ARR(7, rzp.getSlopeError(), sE);
+    CHECK_EQ(rzp.getObjectParameters(), correctObjectParams);
+    CHECK_EQ(rzp.getElementParameters(), correctElementParams);
+    CHECK_EQ(rzp.getInMatrix(), correctInMatrix);
+    CHECK_EQ(rzp.getOutMatrix(), correctOutMatrix);
+    CHECK_EQ(rzp.getSlopeError(), sE);
 }
 
 #endif

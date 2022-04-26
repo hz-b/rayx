@@ -30,8 +30,8 @@ TEST(planeGrating, testParams) {
     RAYX::GeometricUserParams g_guparam = RAYX::GeometricUserParams(
         mount, deviation, normalIncidence, lineDensity, designEnergy,
         orderOfDiffraction);
-    ASSERT_DOUBLE_EQ(g_guparam.getAlpha(), alpha);
-    ASSERT_DOUBLE_EQ(g_guparam.getBeta(), beta);
+    CHECK_EQ(g_guparam.getAlpha(), alpha);
+    CHECK_EQ(g_guparam.getBeta(), beta);
 
     RAYX::WorldUserParams g_params =
         RAYX::WorldUserParams(g_guparam.getAlpha(), g_guparam.getBeta(),
@@ -46,7 +46,7 @@ TEST(planeGrating, testParams) {
         g_params.getAzimuthalAngle(), position, orientation, designEnergy,
         lineDensity, orderOfDiffraction, add_order, vls, sE, Material::Cu);
 
-    std::array<double, 4 * 4> surface = {0, 0, 0, 0, 1, 0, 0, -1,
+    std::array<double, 4 * 4> surface = {0, 0, 0, 0, 1, 0, 0,  -1,
                                          0, 0, 0, 0, 1, 0, 29, 0};
     std::array<double, 4 * 4> objparams = {width,
                                            height,
@@ -80,11 +80,11 @@ TEST(planeGrating, testParams) {
                                           0,
                                           0,
                                           double(add_order)};
-    ASSERT_DOUBLE_EQ(p1.getWidth(), width);
-    ASSERT_DOUBLE_EQ(p1.getHeight(), height);
+    CHECK_EQ(p1.getWidth(), width);
+    CHECK_EQ(p1.getHeight(), height);
     CHECK_EQ(p1.getSurfaceParams(), surface);
-    EXPECT_ITERABLE_DOUBLE_EQ_ARR(4 * 4, p1.getElementParameters(), elparams);
-    EXPECT_ITERABLE_DOUBLE_EQ_ARR(4 * 4, p1.getObjectParameters(), objparams);
+    CHECK_EQ(p1.getElementParameters(), elparams);
+    CHECK_EQ(p1.getObjectParameters(), objparams);
 
     glm::dmat4x4 correctInMat = {
         0.4921238928720304,     -0.29383657091479237, -0.8194352589787155, 0,
@@ -97,10 +97,8 @@ TEST(planeGrating, testParams) {
         -0.8194352589787155,  0.46395402654396495, 0.3365598276623748,     0,
         0.13314042132848769,  5.8976402370902958,  1238.9440885860024,     1};
 
-    EXPECT_ITERABLE_DOUBLE_EQ_ARR(4 * 4, p1.getInMatrix(),
-                                  glmToArray16(correctInMat));
-    EXPECT_ITERABLE_DOUBLE_EQ_ARR(4 * 4, p1.getOutMatrix(),
-                                  glmToArray16(correctOutMat));
+    CHECK_EQ(p1.getInMatrix(), (correctInMat));
+    CHECK_EQ(p1.getOutMatrix(), (correctOutMat));
 }
 
 TEST(planeGraing, mount1) {
@@ -129,8 +127,8 @@ TEST(planeGraing, mount1) {
     RAYX::GeometricUserParams g_guparam = RAYX::GeometricUserParams(
         mount, deviation, normalIncidence, lineDensity, designEnergy,
         orderOfDiffraction);
-    ASSERT_DOUBLE_EQ(g_guparam.getAlpha(), alpha);
-    ASSERT_DOUBLE_EQ(g_guparam.getBeta(), beta);
+    CHECK_EQ(g_guparam.getAlpha(), alpha);
+    CHECK_EQ(g_guparam.getBeta(), beta);
 
     RAYX::WorldUserParams g_params =
         RAYX::WorldUserParams(g_guparam.getAlpha(), g_guparam.getBeta(),
@@ -144,7 +142,7 @@ TEST(planeGraing, mount1) {
         g_params.getAzimuthalAngle(), position, orientation, designEnergy,
         lineDensity, orderOfDiffraction, add_order, vls, sE, Material::Cu);
 
-    std::array<double, 4 * 4> surface = {0, 0, 0, 0, 1, 0, 0, -1,
+    std::array<double, 4 * 4> surface = {0, 0, 0, 0, 1, 0, 0,  -1,
                                          0, 0, 0, 0, 1, 0, 29, 0};
     std::array<double, 4 * 4> objparams = {width,
                                            height,
@@ -226,8 +224,8 @@ TEST(planeGrating, higherOrderOfDiffraction) {
     RAYX::GeometricUserParams g_guparam = RAYX::GeometricUserParams(
         mount, deviation, normalIncidence, lineDensity, designEnergy,
         orderOfDiffraction);
-    ASSERT_DOUBLE_EQ(g_guparam.getAlpha(), alpha);
-    ASSERT_DOUBLE_EQ(g_guparam.getBeta(), beta);
+    CHECK_EQ(g_guparam.getAlpha(), alpha);
+    CHECK_EQ(g_guparam.getBeta(), beta);
 
     RAYX::WorldUserParams g_params =
         RAYX::WorldUserParams(alpha, beta, degToRad(azimuthal), dist, mis);
@@ -239,7 +237,7 @@ TEST(planeGrating, higherOrderOfDiffraction) {
         g_params.getAzimuthalAngle(), position, orientation, designEnergy,
         lineDensity, orderOfDiffraction, add_order, vls, sE, Material::Cu);
 
-    std::array<double, 4 * 4> surface = {0, 0, 0, 0, 1, 0, 0, -1,
+    std::array<double, 4 * 4> surface = {0, 0, 0, 0, 1, 0, 0,  -1,
                                          0, 0, 0, 0, 1, 0, 29, 0};
     std::array<double, 4 * 4> objparams = {width,
                                            height,
@@ -291,10 +289,8 @@ TEST(planeGrating, higherOrderOfDiffraction) {
         -0.76586920507506306, 0.43443518717569601, 0.47403631597305812,    0,
         -0.72894350458154844, 6.3727119490494584,  1239.4303003430443,     1};
 
-    EXPECT_ITERABLE_DOUBLE_EQ_ARR(4 * 4, p3.getInMatrix(),
-                                  glmToArray16(correctInMat));
-    EXPECT_ITERABLE_DOUBLE_EQ_ARR(4 * 4, p3.getOutMatrix(),
-                                  glmToArray16(correctOutMat));
+    CHECK_EQ(p3.getInMatrix(), (correctInMat));
+    CHECK_EQ(p3.getOutMatrix(), (correctOutMat));
 }
 
 TEST(planeGrating, deviation) {
@@ -326,15 +322,15 @@ TEST(planeGrating, deviation) {
     RAYX::GeometricUserParams g_guparam = RAYX::GeometricUserParams(
         mount, deviation, normalIncidence, lineDensity, designEnergy,
         orderOfDiffraction);
-    ASSERT_DOUBLE_EQ(g_guparam.getAlpha(), alpha);
-    ASSERT_DOUBLE_EQ(g_guparam.getBeta(), beta);
+    CHECK_EQ(g_guparam.getAlpha(), alpha);
+    CHECK_EQ(g_guparam.getBeta(), beta);
 
     RAYX::WorldUserParams g_params =
         RAYX::WorldUserParams(alpha, beta, degToRad(azimuthal), dist, mis);
     glm::dvec4 position = g_params.calcPosition();
     glm::dmat4x4 orientation = g_params.calcOrientation();
 
-    std::array<double, 4 * 4> surface = {0, 0, 0, 0, 1, 0, 0, -1,
+    std::array<double, 4 * 4> surface = {0, 0, 0, 0, 1, 0, 0,  -1,
                                          0, 0, 0, 0, 1, 0, 29, 0};
     std::array<double, 4 * 4> elparams = {0,
                                           0,
@@ -374,11 +370,11 @@ TEST(planeGrating, deviation) {
         g_params.getAzimuthalAngle(), position, orientation, designEnergy,
         lineDensity, orderOfDiffraction, add_order, vls, sE, Material::Cu);
 
-    ASSERT_DOUBLE_EQ(p4.getWidth(), width);
-    ASSERT_DOUBLE_EQ(p4.getHeight(), height);
+    CHECK_EQ(p4.getWidth(), width);
+    CHECK_EQ(p4.getHeight(), height);
     CHECK_EQ(p4.getSurfaceParams(), surface);
-    EXPECT_ITERABLE_DOUBLE_EQ_ARR(4 * 4, p4.getElementParameters(), elparams);
-    EXPECT_ITERABLE_DOUBLE_EQ_ARR(4 * 4, p4.getObjectParameters(), objparams);
+    CHECK_EQ(p4.getElementParameters(), elparams);
+    CHECK_EQ(p4.getObjectParameters(), objparams);
 
     glm::dmat4x4 correctInMat = {
         0.49210708552960752,    -0.30217566159372633, -0.81640705895524279, 0,
@@ -391,10 +387,8 @@ TEST(planeGrating, deviation) {
         -0.81640705895524279, 0.46228526538734399, 0.3460806950608537,     0,
         0.073237329511777249, 5.9306512508972986,  1238.9720881547919,     1};
 
-    EXPECT_ITERABLE_DOUBLE_EQ_ARR(4 * 4, p4.getInMatrix(),
-                                  glmToArray16(correctInMat));
-    EXPECT_ITERABLE_DOUBLE_EQ_ARR(4 * 4, p4.getOutMatrix(),
-                                  glmToArray16(correctOutMat));
+    CHECK_EQ(p4.getInMatrix(), (correctInMat));
+    CHECK_EQ(p4.getOutMatrix(), (correctOutMat));
 }
 
 TEST(PlaneGrating, testHvlam) {
@@ -402,7 +396,7 @@ TEST(PlaneGrating, testHvlam) {
     double linedensity = 1000;
     double orderOfDiff = 1;
     double a = abs(hvlam(hv)) * abs(linedensity) * orderOfDiff * 1e-06;
-    ASSERT_DOUBLE_EQ(a, 0.01239852);
+    CHECK_EQ(a, 0.01239852);
 }
 
 TEST(SphereGrating, testParams) {
@@ -432,9 +426,9 @@ TEST(SphereGrating, testParams) {
         mount, deviation, incidence, linedensity, designEnergy, order);
     g_guparam.calcGratingRadius(mount, degToRad(deviation), entranceArm,
                                 exitArm);
-    ASSERT_DOUBLE_EQ(g_guparam.getAlpha(), alpha);
-    ASSERT_DOUBLE_EQ(g_guparam.getBeta(), beta);
-    ASSERT_DOUBLE_EQ(g_guparam.getRadius(), radius);
+    CHECK_EQ(g_guparam.getAlpha(), alpha);
+    CHECK_EQ(g_guparam.getBeta(), beta);
+    CHECK_EQ(g_guparam.getRadius(), radius);
 
     RAYX::WorldUserParams g_params =
         RAYX::WorldUserParams(alpha, beta, degToRad(azimuthal), distance, mis);
@@ -447,7 +441,7 @@ TEST(SphereGrating, testParams) {
         orientation, designEnergy, linedensity, double(order), vls, sE,
         Material::Cu);
 
-    std::array<double, 4 * 4> quad = {1, 0, 0, 0, 1, 1, 0, -radius,
+    std::array<double, 4 * 4> quad = {1, 0, 0, 0, 1, 1, 0,  -radius,
                                       0, 0, 1, 0, 2, 0, 29, 0};
     std::array<double, 4 * 4> elparams = {0,
                                           0,
@@ -482,16 +476,15 @@ TEST(SphereGrating, testParams) {
                                            0,
                                            0};
 
-    ASSERT_DOUBLE_EQ(s1.getWidth(), width);
-    ASSERT_DOUBLE_EQ(s1.getHeight(), height);
-    ASSERT_DOUBLE_EQ(static_cast<int>(s1.getGratingMount()),
-                     static_cast<int>(mount));
-    ASSERT_DOUBLE_EQ(s1.getLineDensity(), linedensity);
-    ASSERT_DOUBLE_EQ(s1.getDesignEnergyMounting(), designEnergy);
-    ASSERT_DOUBLE_EQ(s1.getOrderOfDiffraction(), double(order));
-    EXPECT_ITERABLE_DOUBLE_EQ_ARR(4 * 4, s1.getSurfaceParams(), quad);
-    EXPECT_ITERABLE_DOUBLE_EQ_ARR(4 * 4, s1.getElementParameters(), elparams);
-    EXPECT_ITERABLE_DOUBLE_EQ_ARR(4 * 4, s1.getObjectParameters(), objparams);
+    CHECK_EQ(s1.getWidth(), width);
+    CHECK_EQ(s1.getHeight(), height);
+    CHECK_EQ(static_cast<int>(s1.getGratingMount()), static_cast<int>(mount));
+    CHECK_EQ(s1.getLineDensity(), linedensity);
+    CHECK_EQ(s1.getDesignEnergyMounting(), designEnergy);
+    CHECK_EQ(s1.getOrderOfDiffraction(), double(order));
+    CHECK_EQ(s1.getSurfaceParams(), quad);
+    CHECK_EQ(s1.getElementParameters(), elparams);
+    CHECK_EQ(s1.getObjectParameters(), objparams);
 
     glm::dmat4x4 correctInMat = {
         0.61518377465346108,  0.40117039712668984,  -0.67868345778597972,  0,
@@ -504,10 +497,8 @@ TEST(SphereGrating, testParams) {
         -0.67868345778597972, -0.042630846046937843, -0.73319259072428489, 0,
         1.9755870403538665,   -3.8876049626932021,   2147.9714820131962,   1};
 
-    EXPECT_ITERABLE_DOUBLE_EQ_ARR(4 * 4, s1.getInMatrix(),
-                                  glmToArray16(correctInMat));
-    EXPECT_ITERABLE_DOUBLE_EQ_ARR(4 * 4, s1.getOutMatrix(),
-                                  glmToArray16(correctOutMat));
+    CHECK_EQ(s1.getInMatrix(), (correctInMat));
+    CHECK_EQ(s1.getOutMatrix(), (correctOutMat));
 }
 
 #endif

@@ -314,60 +314,60 @@ void compareFromCorrect(std::vector<RAYX::Ray> correct,
     for (std::list<double>::iterator i = outputRays.begin();
          i != outputRays.end();) {
         if (counter % RAY_DOUBLE_COUNT == 0) {
-            EXPECT_NEAR(*i,
+            CHECK_EQ(*i,
                         correct[int(counter / RAY_DOUBLE_COUNT)].m_position.x,
                         tolerance);
         } else if (counter % RAY_DOUBLE_COUNT == 1) {
-            EXPECT_NEAR(*i,
+            CHECK_EQ(*i,
                         correct[int(counter / RAY_DOUBLE_COUNT)].m_position.y,
                         tolerance);
         } else if (counter % RAY_DOUBLE_COUNT == 2) {
-            EXPECT_NEAR(*i,
+            CHECK_EQ(*i,
                         correct[int(counter / RAY_DOUBLE_COUNT)].m_position.z,
                         tolerance);
         } else if (counter % RAY_DOUBLE_COUNT == 3) {
-            EXPECT_NEAR(*i, correct[int(counter / RAY_DOUBLE_COUNT)].m_weight,
+            CHECK_EQ(*i, correct[int(counter / RAY_DOUBLE_COUNT)].m_weight,
                         tolerance);
         } else if (counter % RAY_DOUBLE_COUNT == 4) {
-            EXPECT_NEAR(*i,
+            CHECK_EQ(*i,
                         correct[int(counter / RAY_DOUBLE_COUNT)].m_direction.x,
                         tolerance);
         } else if (counter % RAY_DOUBLE_COUNT == 5) {
-            EXPECT_NEAR(*i,
+            CHECK_EQ(*i,
                         correct[int(counter / RAY_DOUBLE_COUNT)].m_direction.y,
                         tolerance);
         } else if (counter % RAY_DOUBLE_COUNT == 6) {
-            EXPECT_NEAR(*i,
+            CHECK_EQ(*i,
                         correct[int(counter / RAY_DOUBLE_COUNT)].m_direction.z,
                         tolerance);
         } else if (counter % RAY_DOUBLE_COUNT == 7) {
-            EXPECT_NEAR(*i, correct[int(counter / RAY_DOUBLE_COUNT)].m_energy,
+            CHECK_EQ(*i, correct[int(counter / RAY_DOUBLE_COUNT)].m_energy,
                         tolerance);
         } else if (counter % RAY_DOUBLE_COUNT == 8) {
-            EXPECT_NEAR(*i, correct[int(counter / RAY_DOUBLE_COUNT)].m_stokes.x,
+            CHECK_EQ(*i, correct[int(counter / RAY_DOUBLE_COUNT)].m_stokes.x,
                         tolerance);
         } else if (counter % RAY_DOUBLE_COUNT == 9) {
-            EXPECT_NEAR(*i, correct[int(counter / RAY_DOUBLE_COUNT)].m_stokes.y,
+            CHECK_EQ(*i, correct[int(counter / RAY_DOUBLE_COUNT)].m_stokes.y,
                         tolerance);
         } else if (counter % RAY_DOUBLE_COUNT == 10) {
-            EXPECT_NEAR(*i, correct[int(counter / RAY_DOUBLE_COUNT)].m_stokes.z,
+            CHECK_EQ(*i, correct[int(counter / RAY_DOUBLE_COUNT)].m_stokes.z,
                         tolerance);
         } else if (counter % RAY_DOUBLE_COUNT == 11) {
-            EXPECT_NEAR(*i, correct[int(counter / RAY_DOUBLE_COUNT)].m_stokes.w,
+            CHECK_EQ(*i, correct[int(counter / RAY_DOUBLE_COUNT)].m_stokes.w,
                         tolerance);
         } else if (counter % RAY_DOUBLE_COUNT == 12) {
-            EXPECT_NEAR(*i,
+            CHECK_EQ(*i,
                         correct[int(counter / RAY_DOUBLE_COUNT)].m_pathLength,
                         tolerance);
         } else if (counter % RAY_DOUBLE_COUNT == 13) {
-            EXPECT_NEAR(*i, correct[int(counter / RAY_DOUBLE_COUNT)].m_order,
+            CHECK_EQ(*i, correct[int(counter / RAY_DOUBLE_COUNT)].m_order,
                         tolerance);
         } else if (counter % RAY_DOUBLE_COUNT == 14) {
-            EXPECT_NEAR(*i,
+            CHECK_EQ(*i,
                         correct[int(counter / RAY_DOUBLE_COUNT)].m_lastElement,
                         tolerance);
         } else if (counter % RAY_DOUBLE_COUNT == 15) {
-            EXPECT_NEAR(*i,
+            CHECK_EQ(*i,
                         correct[int(counter / RAY_DOUBLE_COUNT)].m_extraParam,
                         tolerance);
         }
@@ -398,60 +398,60 @@ void compareFromFunction(fn<ret, par> func, std::vector<RAYX::Ray> testValues,
     for (std::list<double>::iterator i = outputRays.begin();
          i != outputRays.end();) {
         if (counter % RAY_DOUBLE_COUNT == 0) {
-            EXPECT_NEAR(
+            CHECK_EQ(
                 *i,
                 func(testValues[int(counter / RAY_DOUBLE_COUNT)].m_position.x),
                 tolerance);
         } else if (counter % RAY_DOUBLE_COUNT == 1) {
-            EXPECT_NEAR(
+            CHECK_EQ(
                 *i,
                 func(testValues[int(counter / RAY_DOUBLE_COUNT)].m_position.y),
                 tolerance);
         } else if (counter % RAY_DOUBLE_COUNT == 2) {
-            EXPECT_NEAR(
+            CHECK_EQ(
                 *i,
                 func(testValues[int(counter / RAY_DOUBLE_COUNT)].m_position.z),
                 tolerance);
         } else if (counter % RAY_DOUBLE_COUNT == 3) {
-            EXPECT_NEAR(
+            CHECK_EQ(
                 *i, func(testValues[int(counter / RAY_DOUBLE_COUNT)].m_weight),
                 tolerance);
         } else if (counter % RAY_DOUBLE_COUNT == 4) {
-            EXPECT_NEAR(
+            CHECK_EQ(
                 *i,
                 func(testValues[int(counter / RAY_DOUBLE_COUNT)].m_direction.x),
                 tolerance);
         } else if (counter % RAY_DOUBLE_COUNT == 5) {
-            EXPECT_NEAR(
+            CHECK_EQ(
                 *i,
                 func(testValues[int(counter / RAY_DOUBLE_COUNT)].m_direction.y),
                 tolerance);
         } else if (counter % RAY_DOUBLE_COUNT == 6) {
-            EXPECT_NEAR(
+            CHECK_EQ(
                 *i,
                 func(testValues[int(counter / RAY_DOUBLE_COUNT)].m_direction.z),
                 tolerance);
         } else if (counter % RAY_DOUBLE_COUNT == 7) {
-            EXPECT_NEAR(
+            CHECK_EQ(
                 *i, func(testValues[int(counter / RAY_DOUBLE_COUNT)].m_energy),
                 tolerance);
         } else if (counter % RAY_DOUBLE_COUNT == 8) {
-            EXPECT_NEAR(
+            CHECK_EQ(
                 *i,
                 func(testValues[int(counter / RAY_DOUBLE_COUNT)].m_stokes.x),
                 tolerance);
         } else if (counter % RAY_DOUBLE_COUNT == 9) {
-            EXPECT_NEAR(
+            CHECK_EQ(
                 *i,
                 func(testValues[int(counter / RAY_DOUBLE_COUNT)].m_stokes.y),
                 tolerance);
         } else if (counter % RAY_DOUBLE_COUNT == 10) {
-            EXPECT_NEAR(
+            CHECK_EQ(
                 *i,
                 func(testValues[int(counter / RAY_DOUBLE_COUNT)].m_stokes.z),
                 tolerance);
         } else if (counter % RAY_DOUBLE_COUNT == 11) {
-            EXPECT_NEAR(
+            CHECK_EQ(
                 *i,
                 func(testValues[int(counter / RAY_DOUBLE_COUNT)].m_stokes.w),
                 tolerance);
@@ -491,7 +491,7 @@ TEST_F(Tracer, testUniformRandom) {
         ASSERT_TRUE(*i >= 0.0);
     }
     // expect the mean of all values to be about 0.5
-    EXPECT_NEAR(sum / (RAYX::SimulationEnv::get().m_numOfRays * 12), 0.5, 1e-2);
+    CHECK_EQ(sum / (RAYX::SimulationEnv::get().m_numOfRays * 12), 0.5, 1e-2);
     std::string filename = "testFile_randomUniform";
     writeToFile(outputRays, filename);
 }
@@ -1730,20 +1730,20 @@ TEST_F(Tracer, refractiveIndexTest) {
     double tolerance = 1e-15;
 
     // first H entry
-    EXPECT_NEAR(v[0], 10.0, tolerance);
-    EXPECT_NEAR(v[1], -9999.0, tolerance);
-    EXPECT_NEAR(v[2], 0.239540e-16, tolerance);
+    CHECK_EQ(v[0], 10.0, tolerance);
+    CHECK_EQ(v[1], -9999.0, tolerance);
+    CHECK_EQ(v[2], 0.239540e-16, tolerance);
 
     // H index
-    EXPECT_NEAR(v[3], 0., tolerance);
+    CHECK_EQ(v[3], 0., tolerance);
 
     // first He entry
-    EXPECT_NEAR(v[4], 10.0, tolerance);
-    EXPECT_NEAR(v[5], -9999.0, tolerance);
-    EXPECT_NEAR(v[6], 0.951230e-16, tolerance);
+    CHECK_EQ(v[4], 10.0, tolerance);
+    CHECK_EQ(v[5], -9999.0, tolerance);
+    CHECK_EQ(v[6], 0.951230e-16, tolerance);
 
     // He index
-    EXPECT_NEAR(v[7], 501., tolerance);
+    CHECK_EQ(v[7], 501., tolerance);
 }
 
 // test complete optical elements instead of single functions
@@ -1843,8 +1843,8 @@ TEST_F(opticalElements, EllipsoidImagePlane) {
         RAYX::GeometricUserParams(10, 10000, 1000);
     double alpha = 0.031253965260898464;
     double beta = 0.31781188513796743;
-    ASSERT_DOUBLE_EQ(g_params.getAlpha(), alpha);
-    ASSERT_DOUBLE_EQ(g_params.getBeta(), beta);
+    CHECK_EQ(g_params.getAlpha(), alpha);
+    CHECK_EQ(g_params.getBeta(), beta);
     int coordinatesystem = 0;  // misalignment in ellipsoid coordinate system
     double tangentAngle =
         g_params.calcTangentAngle(10, 10000, 1000, coordinatesystem);

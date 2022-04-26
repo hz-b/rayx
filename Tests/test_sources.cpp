@@ -82,22 +82,22 @@ TEST(RayTest, test1) {
     double extraParam = 7;
     RAYX::Ray r{x,  y,  z,  weight, xdir,       ydir,  zdir,        energy,
                 s0, s1, s2, s3,     pathLength, order, lastElement, extraParam};
-    EXPECT_EQ(r.getxPos(), x);
-    EXPECT_EQ(r.getyPos(), y);
-    EXPECT_EQ(r.getzPos(), z);
-    EXPECT_EQ(r.getxDir(), xdir);
-    EXPECT_EQ(r.getyDir(), ydir);
-    EXPECT_EQ(r.getzDir(), zdir);
-    EXPECT_EQ(r.getWeight(), weight);
-    EXPECT_EQ(r.getEnergy(), energy);
-    EXPECT_EQ(r.getS0(), s0);
-    EXPECT_EQ(r.getS1(), s1);
-    EXPECT_EQ(r.getS2(), s2);
-    EXPECT_EQ(r.getS3(), s3);
-    EXPECT_EQ(r.getPathLength(), pathLength);
-    EXPECT_EQ(r.getOrder(), order);
-    EXPECT_EQ(r.getLastElement(), lastElement);
-    EXPECT_EQ(r.getExtraParam(), extraParam);
+    CHECK_EQ(r.getxPos(), x);
+    CHECK_EQ(r.getyPos(), y);
+    CHECK_EQ(r.getzPos(), z);
+    CHECK_EQ(r.getxDir(), xdir);
+    CHECK_EQ(r.getyDir(), ydir);
+    CHECK_EQ(r.getzDir(), zdir);
+    CHECK_EQ(r.getWeight(), weight);
+    CHECK_EQ(r.getEnergy(), energy);
+    CHECK_EQ(r.getS0(), s0);
+    CHECK_EQ(r.getS1(), s1);
+    CHECK_EQ(r.getS2(), s2);
+    CHECK_EQ(r.getS3(), s3);
+    CHECK_EQ(r.getPathLength(), pathLength);
+    CHECK_EQ(r.getOrder(), order);
+    CHECK_EQ(r.getLastElement(), lastElement);
+    CHECK_EQ(r.getExtraParam(), extraParam);
 }
 
 TEST(RayTest, testDefaultValues) {
@@ -118,22 +118,22 @@ TEST(RayTest, testDefaultValues) {
     double s3 = 0;
     RAYX::Ray r{x,  y,  z,  weight, xdir, ydir, zdir, energy,
                 s0, s1, s2, s3,     0,    0,    0,    0};
-    EXPECT_EQ(r.getxPos(), x);
-    EXPECT_EQ(r.getyPos(), y);
-    EXPECT_EQ(r.getzPos(), z);
-    EXPECT_EQ(r.getxDir(), xdir);
-    EXPECT_EQ(r.getyDir(), ydir);
-    EXPECT_EQ(r.getzDir(), zdir);
-    EXPECT_EQ(r.getWeight(), weight);
-    EXPECT_EQ(r.getEnergy(), energy);
-    EXPECT_EQ(r.getS0(), s0);
-    EXPECT_EQ(r.getS1(), s1);
-    EXPECT_EQ(r.getS2(), s2);
-    EXPECT_EQ(r.getS3(), s3);
-    EXPECT_EQ(r.getPathLength(), 0);
-    EXPECT_EQ(r.getOrder(), 0);
-    EXPECT_EQ(r.getLastElement(), 0);
-    EXPECT_EQ(r.getExtraParam(), 0);
+    CHECK_EQ(r.getxPos(), x);
+    CHECK_EQ(r.getyPos(), y);
+    CHECK_EQ(r.getzPos(), z);
+    CHECK_EQ(r.getxDir(), xdir);
+    CHECK_EQ(r.getyDir(), ydir);
+    CHECK_EQ(r.getzDir(), zdir);
+    CHECK_EQ(r.getWeight(), weight);
+    CHECK_EQ(r.getEnergy(), energy);
+    CHECK_EQ(r.getS0(), s0);
+    CHECK_EQ(r.getS1(), s1);
+    CHECK_EQ(r.getS2(), s2);
+    CHECK_EQ(r.getS3(), s3);
+    CHECK_EQ(r.getPathLength(), 0);
+    CHECK_EQ(r.getOrder(), 0);
+    CHECK_EQ(r.getLastElement(), 0);
+    CHECK_EQ(r.getExtraParam(), 0);
 }
 
 TEST(MatrixTest, testParams) {
@@ -155,13 +155,13 @@ TEST(MatrixTest, testParams) {
         RAYX::MatrixSource("Matrix source 1", dist, width, height, depth,
                            hordiv, verdiv, lin0, lin45, circ, mis);
 
-    // ASSERT_DOUBLE_EQ(m.m_ID, id);
-    ASSERT_DOUBLE_EQ(RAYX::SimulationEnv::get().m_numOfRays, n);
-    ASSERT_DOUBLE_EQ(m.getSourceDepth(), depth);
-    ASSERT_DOUBLE_EQ(m.getSourceWidth(), width);
-    ASSERT_DOUBLE_EQ(m.getSourceHeight(), height);
-    ASSERT_DOUBLE_EQ(m.getHorDivergence(), hordiv);
-    ASSERT_DOUBLE_EQ(m.getVerDivergence(), verdiv);
+    // CHECK_EQ(m.m_ID, id);
+    CHECK_EQ(RAYX::SimulationEnv::get().m_numOfRays, n);
+    CHECK_EQ(m.getSourceDepth(), depth);
+    CHECK_EQ(m.getSourceWidth(), width);
+    CHECK_EQ(m.getSourceHeight(), height);
+    CHECK_EQ(m.getHorDivergence(), hordiv);
+    CHECK_EQ(m.getVerDivergence(), verdiv);
 }
 
 TEST(MatrixTest, testGetRays) {
@@ -184,7 +184,7 @@ TEST(MatrixTest, testGetRays) {
                            hordiv, verdiv, lin0, lin45, circ, {0, 0, 0, 0});
     std::vector<RAYX::Ray> rays = m.getRays();
 
-    ASSERT_EQ(rays.size(), n);
+    CHECK_EQ(rays.size(), n);
 }
 
 TEST(PointSource, testParams) {
@@ -209,14 +209,14 @@ TEST(PointSource, testParams) {
         RAYX::SourceDist::Uniform, RAYX::SourceDist::Uniform, lin0, lin45, circ,
         misalignment);  // 0 = hard edge (uniform)
 
-    ASSERT_DOUBLE_EQ(p.getSourceDepth(), depth);
-    ASSERT_DOUBLE_EQ(p.getSourceWidth(), width);
-    ASSERT_DOUBLE_EQ(p.getSourceHeight(), height);
-    ASSERT_DOUBLE_EQ(p.getHorDivergence(), hor);
-    ASSERT_DOUBLE_EQ(p.getVerDivergence(), ver);
+    CHECK_EQ(p.getSourceDepth(), depth);
+    CHECK_EQ(p.getSourceWidth(), width);
+    CHECK_EQ(p.getSourceHeight(), height);
+    CHECK_EQ(p.getHorDivergence(), hor);
+    CHECK_EQ(p.getVerDivergence(), ver);
 
     std::vector<RAYX::Ray> rays = p.getRays();
-    ASSERT_EQ(rays.size(), number_of_rays);
+    CHECK_EQ(rays.size(), number_of_rays);
 }
 
 TEST(LightSource, PointSourceHardEdge) {
@@ -241,13 +241,13 @@ TEST(LightSource, PointSourceHardEdge) {
         RAYX::SourceDist::Uniform, RAYX::SourceDist::Uniform, lin0, lin45, circ,
         mis);  // 0 = hard edge (uniform)
 
-    ASSERT_DOUBLE_EQ(p.getSourceDepth(), depth);
-    ASSERT_DOUBLE_EQ(p.getSourceWidth(), width);
-    ASSERT_DOUBLE_EQ(p.getSourceHeight(), height);
-    ASSERT_DOUBLE_EQ(p.getHorDivergence(), hor);
-    ASSERT_DOUBLE_EQ(p.getVerDivergence(), ver);
+    CHECK_EQ(p.getSourceDepth(), depth);
+    CHECK_EQ(p.getSourceWidth(), width);
+    CHECK_EQ(p.getSourceHeight(), height);
+    CHECK_EQ(p.getHorDivergence(), hor);
+    CHECK_EQ(p.getVerDivergence(), ver);
     std::vector<RAYX::Ray> rays = p.getRays();
-    ASSERT_EQ(rays.size(), number_of_rays);
+    CHECK_EQ(rays.size(), number_of_rays);
     std::list<double> rayList;
     for (RAYX::Ray r : rays) {
         rayList.push_back(r.m_position.x);
@@ -270,7 +270,7 @@ TEST(LightSource, PointSourceHardEdge) {
         ASSERT_TRUE(r.m_energy <= photonEnergy + (energySpread / 2));
     }
     std::cout << rayList.size() << std::endl;
-    ASSERT_EQ(rayList.size(), number_of_rays * RAY_DOUBLE_COUNT);
+    CHECK_EQ(rayList.size(), number_of_rays * RAY_DOUBLE_COUNT);
     writeRaysToFile(rayList, "pointSourceHE");
 }
 
@@ -296,13 +296,13 @@ TEST(LightSource, PointSourceSoftEdge) {
         RAYX::SourceDist::Gaussian, RAYX::SourceDist::Gaussian, lin0, lin45,
         circ, mis);  // 1 = soft edge (gaussian)
 
-    ASSERT_DOUBLE_EQ(p.getSourceDepth(), depth);
-    ASSERT_DOUBLE_EQ(p.getSourceWidth(), width);
-    ASSERT_DOUBLE_EQ(p.getSourceHeight(), height);
-    ASSERT_DOUBLE_EQ(p.getHorDivergence(), hor);
-    ASSERT_DOUBLE_EQ(p.getVerDivergence(), ver);
+    CHECK_EQ(p.getSourceDepth(), depth);
+    CHECK_EQ(p.getSourceWidth(), width);
+    CHECK_EQ(p.getSourceHeight(), height);
+    CHECK_EQ(p.getHorDivergence(), hor);
+    CHECK_EQ(p.getVerDivergence(), ver);
     std::vector<RAYX::Ray> rays = p.getRays();
-    ASSERT_EQ(rays.size(), number_of_rays);
+    CHECK_EQ(rays.size(), number_of_rays);
     std::list<double> rayList;
     for (RAYX::Ray r : rays) {
         rayList.push_back(r.m_position.x);
@@ -325,7 +325,7 @@ TEST(LightSource, PointSourceSoftEdge) {
         ASSERT_TRUE(r.m_energy <= photonEnergy + (energySpread / 2));
     }
     std::cout << rayList.size() << std::endl;
-    ASSERT_EQ(rayList.size(), number_of_rays * RAY_DOUBLE_COUNT);
+    CHECK_EQ(rayList.size(), number_of_rays * RAY_DOUBLE_COUNT);
     writeRaysToFile(rayList, "pointSourceSE");
 }
 
@@ -352,7 +352,7 @@ TEST(LightSource, PointSourceHardEdgeMis) {
         mis);  // 0 = hard edge (uniform)
 
     std::vector<RAYX::Ray> rays = p.getRays();
-    ASSERT_EQ(rays.size(), number_of_rays);
+    CHECK_EQ(rays.size(), number_of_rays);
     std::list<double> rayList;
     for (RAYX::Ray r : rays) {
         rayList.push_back(r.m_position.x);
@@ -375,7 +375,7 @@ TEST(LightSource, PointSourceHardEdgeMis) {
         ASSERT_TRUE(r.m_energy <= photonEnergy + (energySpread / 2));
     }
     std::cout << rayList.size() << std::endl;
-    ASSERT_EQ(rayList.size(), number_of_rays * RAY_DOUBLE_COUNT);
+    CHECK_EQ(rayList.size(), number_of_rays * RAY_DOUBLE_COUNT);
     writeRaysToFile(rayList, "pointSourceHE_mis");
 }
 
@@ -403,7 +403,7 @@ TEST(LightSource, PointSourceSoftEdgeMis) {
         circ, mis);  // 1 = soft edge (gaussian)
 
     std::vector<RAYX::Ray> rays = p.getRays();
-    ASSERT_EQ(rays.size(), number_of_rays);
+    CHECK_EQ(rays.size(), number_of_rays);
     std::list<double> rayList;
     for (RAYX::Ray r : rays) {
         rayList.push_back(r.m_position.x);
@@ -426,7 +426,7 @@ TEST(LightSource, PointSourceSoftEdgeMis) {
         ASSERT_TRUE(r.m_energy <= photonEnergy + (energySpread / 2));
     }
     std::cout << rayList.size() << std::endl;
-    ASSERT_EQ(rayList.size(), number_of_rays * RAY_DOUBLE_COUNT);
+    CHECK_EQ(rayList.size(), number_of_rays * RAY_DOUBLE_COUNT);
     writeRaysToFile(rayList, "pointSourceSE_mis");
 }
 
@@ -445,7 +445,7 @@ TEST(LightSource, MatrixSource20000) {
                            lin0, lin45, circ, {0, 0, 0, 0});
 
     std::vector<RAYX::Ray> rays = p.getRays();
-    ASSERT_EQ(rays.size(), number_of_rays);
+    CHECK_EQ(rays.size(), number_of_rays);
     std::list<double> rayList;
     for (RAYX::Ray r : rays) {
         rayList.push_back(r.m_position.x);
@@ -468,7 +468,7 @@ TEST(LightSource, MatrixSource20000) {
         ASSERT_TRUE(r.m_energy <= photonEnergy + (energySpread / 2));
     }
     std::cout << rayList.size() << std::endl;
-    ASSERT_EQ(rayList.size(), number_of_rays * RAY_DOUBLE_COUNT);
+    CHECK_EQ(rayList.size(), number_of_rays * RAY_DOUBLE_COUNT);
     writeRaysToFile(rayList, "matrixsource20000");
 }
 
@@ -486,7 +486,7 @@ TEST(LightSource, PointSource20000) {
         {0, 0, 0, 0});
 
     std::vector<RAYX::Ray> rays = p.getRays();
-    ASSERT_EQ(rays.size(), number_of_rays);
+    CHECK_EQ(rays.size(), number_of_rays);
     std::list<double> rayList;
     for (RAYX::Ray r : rays) {
         rayList.push_back(r.m_position.x);
@@ -507,7 +507,7 @@ TEST(LightSource, PointSource20000) {
         rayList.push_back(r.m_extraParam);
     }
     std::cout << rayList.size() << std::endl;
-    ASSERT_EQ(rayList.size(), number_of_rays * RAY_DOUBLE_COUNT);
+    CHECK_EQ(rayList.size(), number_of_rays * RAY_DOUBLE_COUNT);
     writeRaysToFile(rayList, "pointsource20000");
 }
 
