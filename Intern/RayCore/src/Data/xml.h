@@ -25,6 +25,32 @@ struct Group {
     glm::dmat4x4 m_orientation;
 };
 
+/**
+ * Parser gives you useful utility functions to write your own createFromXML
+ *functions.
+ **/
+struct Parser {
+    Parser(rapidxml::xml_node<>* node, std::vector<xml::Group> group_context);
+
+    double parseDouble(const char* paramname);
+    int parseInt(const char* paramname);
+    const char* parseStr(const char* paramname);
+    glm::dvec3 parseDvec3(const char* paramname);
+
+    std::array<double, 6> parseMisalignment();
+    std::array<double, 7> parseSlopeError();
+    std::array<double, 6> parseVls();
+    EnergyDistribution parseEnergyDistribution(std::filesystem::path rmlFile);
+
+    glm::dvec4 parsePosition();
+    glm::dmat4x4 parseOrientation();
+
+    Material parseMaterial();
+
+    rapidxml::xml_node<>* node;
+    std::vector<xml::Group> group_context;
+};
+
 // These functions get a `paramname` argument and look for <param
 // id="`paramname`">...</param> entries in the XML node to then return it's
 // content in the out-argument.

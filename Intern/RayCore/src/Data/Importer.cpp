@@ -60,12 +60,14 @@ void addBeamlineObjectFromXML(rapidxml::xml_node<>* node, Beamline* beamline,
         return beamline->m_LightSources[0]->m_EnergyDistribution.getAverage();
     };
 
+    RAYX::xml::Parser parser(node, group_context);
+
     // every beamline object has a function createFromXML which constructs the
     // object from a given xml-node if possible (otherwise it will return a
     // nullptr) The createFromXML functions use the param* functions declared in
     // <Data/xml.h>
     if (strcmp(type, "Point Source") == 0) {
-        addLightSource(PointSource::createFromXML(node, filename), node);
+        addLightSource(PointSource::createFromXML(parser, filename), node);
     } else if (strcmp(type, "Matrix Source") == 0) {
         addLightSource(MatrixSource::createFromXML(node, filename), node);
     } else if (strcmp(type, "ImagePlane") == 0) {

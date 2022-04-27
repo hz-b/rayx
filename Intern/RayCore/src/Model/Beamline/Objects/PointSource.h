@@ -1,5 +1,7 @@
 #pragma once
 
+#include <Data/xml.h>
+
 #include <filesystem>
 
 #include "Model/Beamline/LightSource.h"
@@ -23,7 +25,7 @@ class RAYX_API PointSource : public LightSource {
     ~PointSource();
 
     static std::shared_ptr<PointSource> createFromXML(
-        rapidxml::xml_node<>*, std::filesystem::path rmlFile);
+        xml::Parser, std::filesystem::path rmlFile);
 
     std::vector<Ray> getRays();
     double getCoord(const SourceDist l, const double extent);

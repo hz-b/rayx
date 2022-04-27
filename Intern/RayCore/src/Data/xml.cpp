@@ -10,6 +10,104 @@
 
 namespace RAYX {
 namespace xml {
+
+Parser::Parser(rapidxml::xml_node<>* node,
+               std::vector<xml::Group> group_context)
+    : node(node), group_context(group_context) {}
+
+double Parser::parseDouble(const char* paramname) {
+    double d;
+    if (!paramDouble(node, paramname, &d)) {
+        throw "parseDouble failed";
+    }
+    return d;
+}
+
+int Parser::parseInt(const char* paramname) {
+    int i;
+    if (!paramInt(node, paramname, &i)) {
+        throw "parseInt failed";
+    }
+    return i;
+}
+
+const char* Parser::parseStr(const char* paramname) {
+    const char* s;
+    if (!paramStr(node, paramname, &s)) {
+        throw "parseStr failed";
+    }
+    return s;
+}
+
+glm::dvec3 Parser::parseDvec3(const char* paramname) {
+    glm::dvec3 v;
+    if (!paramDvec3(node, paramname, &v)) {
+        throw "parseDvec3 failed";
+    }
+    return v;
+}
+
+std::array<double, 6> Parser::parseMisalignment() {
+    std::array<double, 6> x;
+    if (!paramMisalignment(node, &x)) {
+        throw "parseMisalignment failed";
+    }
+    return x;
+}
+
+std::array<double, 7> Parser::parseSlopeError() {
+    std::array<double, 7> x;
+    if (!paramSlopeError(node, &x)) {
+        throw "parseSlopeError failed";
+    }
+    return x;
+}
+
+std::array<double, 6> Parser::parseVls() {
+    std::array<double, 6> x;
+    if (!paramVls(node, &x)) {
+        throw "parseVls failed";
+    }
+    return x;
+}
+
+EnergyDistribution Parser::parseEnergyDistribution(
+    std::filesystem::path rmlFile) {
+    EnergyDistribution x;
+    if (!paramEnergyDistribution(node, rmlFile, &x)) {
+        throw "parseEnergyDistribution failed";
+    }
+    return x;
+}
+
+glm::dvec4 Parser::parsePosition() {
+    glm::dvec4 x;
+    glm::dmat4x4 y;
+    if (!paramPositionAndOrientation(node, group_context, &x, &y)) {
+        throw "parsePosition failed";
+    }
+    return x;
+}
+
+glm::dmat4x4 Parser::parseOrientation() {
+    glm::dvec4 x;
+    glm::dmat4x4 y;
+    if (!paramPositionAndOrientation(node, group_context, &x, &y)) {
+        throw "parseOrientation failed";
+    }
+    return y;
+}
+
+Material Parser::parseMaterial() {
+    Material m;
+    if (!paramMaterial(node, &m)) {
+        throw "parseMaterial failed";
+    }
+    return m;
+}
+
+// general scope functions:
+
 bool param(const rapidxml::xml_node<>* node, const char* paramname,
            rapidxml::xml_node<>** out) {
     if (!node || !out) {
@@ -122,7 +220,8 @@ bool paramMisalignment(const rapidxml::xml_node<>* node,
 
     if (strcmp(p->first_attribute("comment")->value(), "Yes") == 0) {
         // all misalignment-values will be left at 0 if they are missing.
-        // Hence we ignore the return values of the upcoming paramDouble-calls.
+        // Hence we ignore the return values of the upcoming
+        // paramDouble-calls.
         xml::paramDouble(node, "translationXerror", &((*out)[0]));
         xml::paramDouble(node, "translationYerror", &((*out)[1]));
         xml::paramDouble(node, "translationZerror", &((*out)[2]));
@@ -194,7 +293,8 @@ bool paramSlopeError(const rapidxml::xml_node<>* node,
 
     if (strcmp(p->first_attribute("comment")->value(), "Yes") == 0) {
         // all slopeError-values will be left at 0 if they are missing.
-        // Hence we ignore the return values of the upcoming paramDouble-calls.
+        // Hence we ignore the return values of the upcoming
+        // paramDouble-calls.
         xml::paramDouble(node, "slopeErrorSag", &((*out)[0]));
         xml::paramDouble(node, "slopeErrorMer", &((*out)[1]));
         xml::paramDouble(node, "thermalDistortionAmp", &((*out)[2]));
@@ -221,7 +321,8 @@ bool paramVls(const rapidxml::xml_node<>* node, std::array<double, 6>* out) {
 
     if (strcmp(p->first_attribute("comment")->value(), "variable (VLS)") == 0) {
         // all vls-values will be left at 0 if they are missing.
-        // Hence we ignore the return values of the upcoming paramDouble-calls.
+        // Hence we ignore the return values of the upcoming
+        // paramDouble-calls.
         xml::paramDouble(node, "vlsParameterB2", &((*out)[0]));
         xml::paramDouble(node, "vlsParameterB3", &((*out)[1]));
         xml::paramDouble(node, "vlsParameterB4", &((*out)[2]));
@@ -358,8 +459,8 @@ bool parseGroup(rapidxml::xml_node<>* node, xml::Group* out) {
         return false;
     }
 
-    // no return-value checks are done, as groups don't need to alter position
-    // or orientation
+    // no return-value checks are done, as groups don't need to alter
+    // position or orientation
     paramPositionNoGroup(node, &out->m_position);
     paramOrientationNoGroup(node, &out->m_orientation);
 

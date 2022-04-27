@@ -62,89 +62,21 @@ PointSource::~PointSource() {}
 
 // returns nullptr on error
 std::shared_ptr<PointSource> PointSource::createFromXML(
-    rapidxml::xml_node<>* node, std::filesystem::path rmlFile) {
-    const std::string name = node->first_attribute("name")->value();
+    RAYX::xml::Parser p, std::filesystem::path rmlFile) {
+    const std::string name = p.node->first_attribute("name")->value();
 
-    if (!xml::paramInt(node, "numberRays", &SimulationEnv::get().m_numOfRays)) {
-        return nullptr;
-    }
-
-    EnergyDistribution energyDistribution;
-    if (!xml::paramEnergyDistribution(node, rmlFile, &energyDistribution)) {
-        return nullptr;
-    }
-
-    double sourceWidth;
-    if (!xml::paramDouble(node, "sourceWidth", &sourceWidth)) {
-        return nullptr;
-    }
-
-    double sourceHeight;
-    if (!xml::paramDouble(node, "sourceHeight", &sourceHeight)) {
-        return nullptr;
-    }
-
-    double sourceDepth;
-    if (!xml::paramDouble(node, "sourceDepth", &sourceDepth)) {
-        return nullptr;
-    }
-
-    double horDivergence;
-    if (!xml::paramDouble(node, "horDiv", &horDivergence)) {
-        return nullptr;
-    }
-
-    double verDivergence;
-    if (!xml::paramDouble(node, "verDiv", &verDivergence)) {
-        return nullptr;
-    }
-
-    int widthDist;
-    if (!xml::paramInt(node, "sourceWidthDistribution", &widthDist)) {
-        return nullptr;
-    }
-
-    int heightDist;
-    if (!xml::paramInt(node, "sourceHeightDistribution", &heightDist)) {
-        return nullptr;
-    }
-
-    int horDist;
-    if (!xml::paramInt(node, "horDivDistribution", &horDist)) {
-        return nullptr;
-    }
-
-    int verDist;
-    if (!xml::paramInt(node, "verDivDistribution", &verDist)) {
-        return nullptr;
-    }
-
-    double linPol0;
-    if (!xml::paramDouble(node, "linearPol_0", &linPol0)) {
-        return nullptr;
-    }
-
-    double linPol45;
-    if (!xml::paramDouble(node, "linearPol_45", &linPol45)) {
-        return nullptr;
-    }
-
-    double circPol;
-    if (!xml::paramDouble(node, "circularPol", &circPol)) {
-        return nullptr;
-    }
-
-    std::array<double, 6> misalignment;
-    if (!xml::paramMisalignment(node, &misalignment)) {
-        return nullptr;
-    }
+    SimulationEnv::get().m_numOfRays = p.parseInt("numberRays");
 
     return std::make_shared<PointSource>(
-        name, energyDistribution, sourceWidth, sourceHeight, sourceDepth,
-        horDivergence / 1000.0, verDivergence / 1000.0,
-        static_cast<SourceDist>(widthDist), static_cast<SourceDist>(heightDist),
-        static_cast<SourceDist>(horDist), static_cast<SourceDist>(verDist),
-        linPol0, linPol45, circPol, misalignment);
+        name, p.parseEnergyDistribution(rmlFile), p.parseDouble("sourceWidth"),
+        p.parseDouble("sourceHeight"), p.parseDouble("sourceDepth"),
+        p.parseDouble("horDiv") / 1000.0, p.parseDouble("verDiv") / 1000.0,
+        static_cast<SourceDist>(p.parseInt("sourceWidthDistribution")),
+        static_cast<SourceDist>(p.parseInt("sourceHeightDistribution")),
+        static_cast<SourceDist>(p.parseInt("horDivDistribution")),
+        static_cast<SourceDist>(p.parseInt("verDivDistribution")),
+        p.parseInt("linearPol_0"), p.parseInt("linearPol_45"),
+        p.parseInt("circularPol"), p.parseMisalignment());
 }
 
 /**
