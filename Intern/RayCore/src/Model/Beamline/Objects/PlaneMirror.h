@@ -24,8 +24,7 @@ class RAYX_API PlaneMirror : public OpticalElement {
     PlaneMirror();
     ~PlaneMirror();
 
-    static std::shared_ptr<PlaneMirror> createFromXML(
-        rapidxml::xml_node<>*, const std::vector<xml::Group>& group_context);
+    static std::shared_ptr<PlaneMirror> createFromXML(xml::Parser);
 };
 
 }  // namespace RAYX

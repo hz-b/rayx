@@ -2,6 +2,7 @@
 
 #include <Model/Beamline/EnergyDistribution.h>
 #include <Model/Beamline/LightSource.h>
+#include <Model/Geometry/Geometry.h>
 #include <Tracer/Vulkan/Material.h>
 
 #include <array>
@@ -72,6 +73,15 @@ struct Parser {
     inline int parseLinearPol0() { return parseInt("linearPol_0"); }
     inline int parseLinearPol45() { return parseInt("linearPol_45"); }
     inline int parseCircularPol() { return parseInt("circularPol"); }
+    inline Geometry::GeometricalShape parseGeometricalShape() {
+        return static_cast<Geometry::GeometricalShape>(
+            parseInt("geometricalShape"));
+    }
+    inline double parseTotalWidth() { return parseDouble("totalWidth"); }
+    inline double parseTotalLength() { return parseDouble("totalLength"); }
+    inline double parseAzimuthalAngle() {
+        return degToRad(parseDouble("azimuthalAngle"));
+    }
 
     rapidxml::xml_node<>* node;
     std::vector<xml::Group> group_context;

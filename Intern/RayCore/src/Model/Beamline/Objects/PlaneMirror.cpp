@@ -58,60 +58,19 @@ PlaneMirror::PlaneMirror(const char* name,
 
 PlaneMirror::~PlaneMirror() {}
 
-std::shared_ptr<PlaneMirror> PlaneMirror::createFromXML(
-    rapidxml::xml_node<>* node, const std::vector<xml::Group>& group_context) {
-    const char* name = node->first_attribute("name")->value();
-
-    int gs;
-    if (!xml::paramInt(node, "geometricalShape", &gs)) {
-        return nullptr;
-    }
-    Geometry::GeometricalShape geometricalShape =
-        static_cast<Geometry::GeometricalShape>(
-            gs);  // HACK(Jannis): convert to enum
-
-    double width;
-    if (!xml::paramDouble(node, "totalWidth", &width)) {
-        return nullptr;
-    }
-
-    double height;
-    if (!xml::paramDouble(node, "totalLength", &height)) {
-        return nullptr;
-    }
-
-    glm::dvec4 position;
-    glm::dmat4x4 orientation;
-    if (!xml::paramPositionAndOrientation(node, group_context, &position,
-                                          &orientation)) {
-        return nullptr;
-    }
-
-    std::array<double, 7> slopeError;
-    if (!xml::paramSlopeError(node, &slopeError)) {
-        return nullptr;
-    }
-
-    double azimuthalAngle;
-    if (!xml::paramDouble(node, "azimuthalAngle", &azimuthalAngle)) {
-        return nullptr;
-    }
-
-    Material mat;
-    if (!xml::paramMaterial(node, &mat)) {
-        mat = Material::Cu;  // default to copper
-    }
-
+std::shared_ptr<PlaneMirror> PlaneMirror::createFromXML(xml::Parser p) {
     double widthB;
-    bool foundWidthB = xml::paramDouble(node, "totalWidthB", &widthB);
+    bool foundWidthB = xml::paramDouble(p.node, "totalWidthB", &widthB);
     if (foundWidthB) {
         return std::make_shared<PlaneMirror>(
-            name, geometricalShape, width, widthB, height,
-            degToRad(azimuthalAngle), position, orientation, slopeError, mat);
+            p.name(), p.parseGeometricalShape(), p.parseTotalWidth(), widthB,
+            p.parseTotalLength(), p.parseAzimuthalAngle(), p.parsePosition(),
+            p.parseOrientation(), p.parseSlopeError(), p.parseMaterial());
     } else {
         return std::make_shared<PlaneMirror>(
-            name, geometricalShape, width, height, degToRad(azimuthalAngle),
-            position, orientation, slopeError, mat);
+            p.name(), p.parseGeometricalShape(), p.parseTotalWidth(),
+            p.parseTotalLength(), p.parseAzimuthalAngle(), p.parsePosition(),
+            p.parseOrientation(), p.parseSlopeError(), p.parseMaterial());
     }
 }
 

@@ -105,7 +105,9 @@ glm::dmat4x4 Parser::parseOrientation() {
 Material Parser::parseMaterial() {
     Material m;
     if (!paramMaterial(node, &m)) {
-        throw "parseMaterial failed";
+        RAYX_D_LOG
+            << "No material specified in RML file: defaulting to copper!";
+        return Material::Cu;
     }
     return m;
 }
