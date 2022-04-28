@@ -31,6 +31,9 @@ enum class SourceDistType {
     Gauss
 };  // default simultaneously
 
+// TODO(rudi): SourceDist should be unified!
+enum class SourceDist { Uniform, Gaussian };
+
 class RAYX_API LightSource : public BeamlineObject {
   public:
     LightSource(const char* name, EnergyDistribution dist, const double linPol0,

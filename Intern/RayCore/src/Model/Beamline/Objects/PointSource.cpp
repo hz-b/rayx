@@ -65,15 +65,12 @@ std::shared_ptr<PointSource> PointSource::createFromXML(RAYX::xml::Parser p) {
     SimulationEnv::get().m_numOfRays = p.parseNumberRays();
 
     return std::make_shared<PointSource>(
-        p.name(), p.parseEnergyDistribution(), p.parseDouble("sourceWidth"),
-        p.parseDouble("sourceHeight"), p.parseDouble("sourceDepth"),
-        p.parseDouble("horDiv") / 1000.0, p.parseDouble("verDiv") / 1000.0,
-        static_cast<SourceDist>(p.parseInt("sourceWidthDistribution")),
-        static_cast<SourceDist>(p.parseInt("sourceHeightDistribution")),
-        static_cast<SourceDist>(p.parseInt("horDivDistribution")),
-        static_cast<SourceDist>(p.parseInt("verDivDistribution")),
-        p.parseInt("linearPol_0"), p.parseInt("linearPol_45"),
-        p.parseInt("circularPol"), p.parseMisalignment());
+        p.name(), p.parseEnergyDistribution(), p.parseSourceWidth(),
+        p.parseSourceHeight(), p.parseSourceDepth(), p.parseHorDiv(),
+        p.parseVerDiv(), p.parseSourceWidthDistribution(),
+        p.parseSourceHeightDistribution(), p.parseHorDivDistribution(),
+        p.parseVerDivDistribution(), p.parseLinearPol0(), p.parseLinearPol45(),
+        p.parseCircularPol(), p.parseMisalignment());
 }
 
 /**

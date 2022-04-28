@@ -18,6 +18,7 @@ Parser::Parser(rapidxml::xml_node<>* node,
 
 std::string Parser::name() { return node->first_attribute("name")->value(); }
 
+// parsers for fundamental types
 double Parser::parseDouble(const char* paramname) {
     double d;
     if (!paramDouble(node, paramname, &d)) {
@@ -50,6 +51,7 @@ glm::dvec3 Parser::parseDvec3(const char* paramname) {
     return v;
 }
 
+// parsers for derived parameters
 std::array<double, 6> Parser::parseMisalignment() {
     std::array<double, 6> x;
     if (!paramMisalignment(node, &x)) {
@@ -81,8 +83,6 @@ EnergyDistribution Parser::parseEnergyDistribution() {
     }
     return x;
 }
-
-int Parser::parseNumberRays() { return parseInt("numberRays"); }
 
 glm::dvec4 Parser::parsePosition() {
     glm::dvec4 x;

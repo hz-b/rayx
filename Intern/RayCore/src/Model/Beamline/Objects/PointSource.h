@@ -8,8 +8,6 @@
 
 namespace RAYX {
 
-enum class SourceDist { Uniform, Gaussian };
-
 class RAYX_API PointSource : public LightSource {
   public:
     PointSource(const std::string name, EnergyDistribution dist,

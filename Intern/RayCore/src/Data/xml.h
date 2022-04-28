@@ -1,6 +1,7 @@
 #pragma once
 
 #include <Model/Beamline/EnergyDistribution.h>
+#include <Model/Beamline/LightSource.h>
 #include <Tracer/Vulkan/Material.h>
 
 #include <array>
@@ -8,7 +9,6 @@
 #include <glm.hpp>
 #include <vector>
 
-#include "rapidxml.hpp"
 #include "utils.h"
 
 namespace RAYX {
@@ -34,22 +34,44 @@ struct Parser {
            std::filesystem::path rmlFile);
 
     std::string name();
+
+    // parsers for fundamental types
     double parseDouble(const char* paramname);
     int parseInt(const char* paramname);
     const char* parseStr(const char* paramname);
     glm::dvec3 parseDvec3(const char* paramname);
 
+    // parsers for derived parameters
     std::array<double, 6> parseMisalignment();
     std::array<double, 7> parseSlopeError();
     std::array<double, 6> parseVls();
     EnergyDistribution parseEnergyDistribution();
-
-    int parseNumberRays();
-
     glm::dvec4 parsePosition();
     glm::dmat4x4 parseOrientation();
-
     Material parseMaterial();
+
+    // parsers for trivial derived parameters
+    inline int parseNumberRays() { return parseInt("numberRays"); }
+    inline double parseSourceWidth() { return parseDouble("sourceWidth"); }
+    inline double parseSourceHeight() { return parseDouble("sourceHeight"); }
+    inline double parseSourceDepth() { return parseDouble("sourceDepth"); }
+    inline double parseHorDiv() { return parseDouble("horDiv") / 1000.0; }
+    inline double parseVerDiv() { return parseDouble("verDiv") / 1000.0; }
+    inline SourceDist parseSourceWidthDistribution() {
+        return static_cast<SourceDist>(parseInt("sourceWidthDistribution"));
+    }
+    inline SourceDist parseSourceHeightDistribution() {
+        return static_cast<SourceDist>(parseInt("sourceHeightDistribution"));
+    }
+    inline SourceDist parseHorDivDistribution() {
+        return static_cast<SourceDist>(parseInt("horDivDistribution"));
+    }
+    inline SourceDist parseVerDivDistribution() {
+        return static_cast<SourceDist>(parseInt("verDivDistribution"));
+    }
+    inline int parseLinearPol0() { return parseInt("linearPol_0"); }
+    inline int parseLinearPol45() { return parseInt("linearPol_45"); }
+    inline int parseCircularPol() { return parseInt("circularPol"); }
 
     rapidxml::xml_node<>* node;
     std::vector<xml::Group> group_context;
