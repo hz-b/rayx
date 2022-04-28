@@ -27,18 +27,9 @@ ImagePlane::ImagePlane(const char* name, glm::dvec4 position,
 
 ImagePlane::~ImagePlane() {}
 
-std::shared_ptr<ImagePlane> ImagePlane::createFromXML(
-    rapidxml::xml_node<>* node, const std::vector<xml::Group>& group_context) {
-    const char* name = node->first_attribute("name")->value();
-
-    glm::dvec4 position;
-    glm::dmat4x4 orientation;
-    if (!xml::paramPositionAndOrientation(node, group_context, &position,
-                                          &orientation)) {
-        return nullptr;
-    }
-
-    return std::make_shared<ImagePlane>(name, position, orientation);
+std::shared_ptr<ImagePlane> ImagePlane::createFromXML(xml::Parser p) {
+    return std::make_shared<ImagePlane>(p.name(), p.parsePosition(),
+                                        p.parseOrientation());
 }
 
 }  // namespace RAYX

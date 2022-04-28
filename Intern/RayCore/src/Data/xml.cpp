@@ -16,7 +16,7 @@ Parser::Parser(rapidxml::xml_node<>* node,
                std::filesystem::path rmlFile)
     : node(node), group_context(group_context), rmlFile(rmlFile) {}
 
-std::string Parser::name() { return node->first_attribute("name")->value(); }
+const char* Parser::name() { return node->first_attribute("name")->value(); }
 
 // parsers for fundamental types
 double Parser::parseDouble(const char* paramname) {

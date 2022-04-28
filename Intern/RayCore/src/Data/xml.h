@@ -33,7 +33,7 @@ struct Parser {
     Parser(rapidxml::xml_node<>* node, std::vector<xml::Group> group_context,
            std::filesystem::path rmlFile);
 
-    std::string name();
+    const char* name();
 
     // parsers for fundamental types
     double parseDouble(const char* paramname);
