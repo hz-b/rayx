@@ -19,8 +19,7 @@ class RAYX_API MatrixSource : public LightSource {
     MatrixSource();
     ~MatrixSource();
 
-    static std::shared_ptr<MatrixSource> createFromXML(
-        rapidxml::xml_node<>*, std::filesystem::path rmlFile);
+    static std::shared_ptr<MatrixSource> createFromXML(xml::Parser);
 
     std::vector<Ray> getRays();
 };

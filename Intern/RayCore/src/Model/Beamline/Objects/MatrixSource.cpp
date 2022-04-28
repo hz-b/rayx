@@ -49,68 +49,14 @@ MatrixSource::MatrixSource(const std::string name, EnergyDistribution dist,
 MatrixSource::~MatrixSource() {}
 
 // returns nullptr on error
-std::shared_ptr<MatrixSource> MatrixSource::createFromXML(
-    rapidxml::xml_node<>* node, std::filesystem::path rmlFile) {
-    const std::string name = node->first_attribute("name")->value();
-
-    if (!xml::paramInt(node, "numberRays", &SimulationEnv::get().m_numOfRays)) {
-        return nullptr;
-    }
-
-    EnergyDistribution energyDistribution;
-    if (!xml::paramEnergyDistribution(node, rmlFile, &energyDistribution)) {
-        return nullptr;
-    }
-
-    double sourceWidth;
-    if (!xml::paramDouble(node, "sourceWidth", &sourceWidth)) {
-        return nullptr;
-    }
-
-    double sourceHeight;
-    if (!xml::paramDouble(node, "sourceHeight", &sourceHeight)) {
-        return nullptr;
-    }
-
-    double sourceDepth;
-    if (!xml::paramDouble(node, "sourceDepth", &sourceDepth)) {
-        return nullptr;
-    }
-
-    double horDivergence;
-    if (!xml::paramDouble(node, "horDiv", &horDivergence)) {
-        return nullptr;
-    }
-
-    double verDivergence;
-    if (!xml::paramDouble(node, "verDiv", &verDivergence)) {
-        return nullptr;
-    }
-
-    double linPol0;
-    if (!xml::paramDouble(node, "linearPol_0", &linPol0)) {
-        return nullptr;
-    }
-
-    double linPol45;
-    if (!xml::paramDouble(node, "linearPol_45", &linPol45)) {
-        return nullptr;
-    }
-
-    double circPol;
-    if (!xml::paramDouble(node, "circularPol", &circPol)) {
-        return nullptr;
-    }
-
-    std::array<double, 6> misalignment;
-    if (!xml::paramMisalignment(node, &misalignment)) {
-        return nullptr;
-    }
+std::shared_ptr<MatrixSource> MatrixSource::createFromXML(xml::Parser p) {
+    SimulationEnv::get().m_numOfRays = p.parseNumberRays();
 
     return std::make_shared<MatrixSource>(
-        name, energyDistribution, sourceWidth, sourceHeight, sourceDepth,
-        horDivergence / 1000, verDivergence / 1000, linPol0, linPol45, circPol,
-        misalignment);
+        p.name(), p.parseEnergyDistribution(), p.parseSourceWidth(),
+        p.parseSourceHeight(), p.parseSourceDepth(), p.parseHorDiv(),
+        p.parseVerDiv(), p.parseLinearPol0(), p.parseLinearPol45(),
+        p.parseCircularPol(), p.parseMisalignment());
 }
 
 /**
