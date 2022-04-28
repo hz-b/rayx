@@ -82,6 +82,23 @@ struct Parser {
     inline double parseAzimuthalAngle() {
         return degToRad(parseDouble("azimuthalAngle"));
     }
+    inline double parseGrazingIncAngle() {
+        return parseDouble(
+            "grazingIncAngle");  // TODO(rudi): is it intentional that we don't
+                                 // do degToRad here?
+    }
+    inline double parseEntranceArmLengthMer() {
+        return parseDouble("entranceArmLengthMer");
+    }
+    inline double parseExitArmLengthMer() {
+        return parseDouble("exitArmLengthMer");
+    }
+    inline double parseEntranceArmLengthSag() {
+        return parseDouble("entranceArmLengthSag");
+    }
+    inline double parseExitArmLengthSag() {
+        return parseDouble("exitArmLengthSag");
+    }
 
     rapidxml::xml_node<>* node;
     std::vector<xml::Group> group_context;

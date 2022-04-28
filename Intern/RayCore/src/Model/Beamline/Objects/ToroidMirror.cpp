@@ -61,79 +61,14 @@ ToroidMirror::ToroidMirror(
 
 ToroidMirror::~ToroidMirror() {}
 
-std::shared_ptr<ToroidMirror> ToroidMirror::createFromXML(
-    rapidxml::xml_node<>* node, const std::vector<xml::Group>& group_context) {
-    const char* name = node->first_attribute("name")->value();
-
-    int gs;
-    if (!xml::paramInt(node, "geometricalShape", &gs)) {
-        return nullptr;
-    }
-    Geometry::GeometricalShape geometricalShape =
-        static_cast<Geometry::GeometricalShape>(
-            gs);  // HACK(Jannis): convert to enum
-
-    double width;
-    if (!xml::paramDouble(node, "totalWidth", &width)) {
-        return nullptr;
-    }
-
-    double height;
-    if (!xml::paramDouble(node, "totalLength", &height)) {
-        return nullptr;
-    }
-
-    glm::dvec4 position;
-    glm::dmat4x4 orientation;
-    if (!xml::paramPositionAndOrientation(node, group_context, &position,
-                                          &orientation)) {
-        return nullptr;
-    }
-
-    double incidenceAngle;
-    if (!xml::paramDouble(node, "grazingIncAngle", &incidenceAngle)) {
-        return nullptr;
-    }
-
-    double mEntrance;
-    if (!xml::paramDouble(node, "entranceArmLengthMer", &mEntrance)) {
-        return nullptr;
-    }
-
-    double mExit;
-    if (!xml::paramDouble(node, "exitArmLengthMer", &mExit)) {
-        return nullptr;
-    }
-
-    double sEntrance;
-    if (!xml::paramDouble(node, "entranceArmLengthSag", &sEntrance)) {
-        return nullptr;
-    }
-
-    double sExit;
-    if (!xml::paramDouble(node, "exitArmLengthSag", &sExit)) {
-        return nullptr;
-    }
-
-    std::array<double, 7> slopeError;
-    if (!xml::paramSlopeError(node, &slopeError)) {
-        return nullptr;
-    }
-
-    double azimuthalAngle;
-    if (!xml::paramDouble(node, "azimuthalAngle", &azimuthalAngle)) {
-        return nullptr;
-    }
-
-    Material mat;
-    if (!xml::paramMaterial(node, &mat)) {
-        mat = Material::Cu;  // default to copper
-    }
-
+std::shared_ptr<ToroidMirror> ToroidMirror::createFromXML(xml::Parser p) {
     return std::make_shared<ToroidMirror>(
-        name, geometricalShape, width, height, degToRad(azimuthalAngle),
-        position, orientation, incidenceAngle, mEntrance, mExit, sEntrance,
-        sExit, slopeError, mat);
+        p.name(), p.parseGeometricalShape(), p.parseTotalLength(),
+        p.parseTotalWidth(), p.parseAzimuthalAngle(), p.parsePosition(),
+        p.parseOrientation(), p.parseGrazingIncAngle(),
+        p.parseEntranceArmLengthMer(), p.parseExitArmLengthMer(),
+        p.parseEntranceArmLengthSag(), p.parseExitArmLengthSag(),
+        p.parseSlopeError(), p.parseMaterial());
 }
 
 /**
