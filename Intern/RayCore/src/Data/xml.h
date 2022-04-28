@@ -13,6 +13,8 @@
 #include "utils.h"
 
 namespace RAYX {
+enum class CentralBeamstop;  // forward declaration
+
 /** The xml namespace defines functions, which help to implement the
  * createFromXML-functions for the beamline objects. All of these functions
  * return a boolean indicating whether they were successful. In-case of success
@@ -79,6 +81,7 @@ struct Parser {
     }
     inline double parseTotalWidth() { return parseDouble("totalWidth"); }
     inline double parseTotalLength() { return parseDouble("totalLength"); }
+    inline double parseTotalHeight() { return parseDouble("totalHeight"); }
     inline double parseAzimuthalAngle() {
         return degToRad(parseDouble("azimuthalAngle"));
     }
@@ -98,6 +101,15 @@ struct Parser {
     }
     inline double parseExitArmLengthSag() {
         return parseDouble("exitArmLengthSag");
+    }
+    inline CentralBeamstop parseCentralBeamstop() {
+        return static_cast<CentralBeamstop>(parseInt("centralBeamstop"));
+    }
+    inline double parseTotalWidthStop() {
+        return parseDouble("totalWidthStop");
+    }
+    inline double parseTotalHeightStop() {
+        return parseDouble("totalHeightStop");
     }
 
     rapidxml::xml_node<>* node;

@@ -37,16 +37,16 @@ Slit::Slit(const char* name, Geometry::GeometricalShape geometricalShape,
     // if elliptical set width (xStop) to negative value to encode the shape
     // (xStop < 0 -> Elliptical, xStop > 0 -> rectangle, xStop = yStop = 0 ->
     // none)
-    m_beamstopWidth =
-        m_centralBeamstop == CentralBeamstop::None
-            ? 0
-            : (m_centralBeamstop == CentralBeamstop::Elliptical ? -abs(beamstopWidth)
-                                                  : abs(beamstopWidth));
-    m_beamstopHeight =
-        m_centralBeamstop == CentralBeamstop::None
-            ? 0
-            : (m_centralBeamstop == CentralBeamstop::Elliptical ? abs(beamstopHeight)
-                                                  : abs(beamstopHeight));
+    m_beamstopWidth = m_centralBeamstop == CentralBeamstop::None
+                          ? 0
+                          : (m_centralBeamstop == CentralBeamstop::Elliptical
+                                 ? -abs(beamstopWidth)
+                                 : abs(beamstopWidth));
+    m_beamstopHeight = m_centralBeamstop == CentralBeamstop::None
+                           ? 0
+                           : (m_centralBeamstop == CentralBeamstop::Elliptical
+                                  ? abs(beamstopHeight)
+                                  : abs(beamstopHeight));
 
     setSurface(std::make_unique<Quadric>(std::array<double, 4 * 4>{
         0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -1, 3, 0, 0, 0}));
@@ -58,55 +58,12 @@ Slit::Slit(const char* name, Geometry::GeometricalShape geometricalShape,
 Slit::Slit() {}
 Slit::~Slit() {}
 
-std::shared_ptr<Slit> Slit::createFromXML(
-    rapidxml::xml_node<>* node, double sourceEnergy,
-    const std::vector<xml::Group>& group_context) {
-    const char* name = node->first_attribute("name")->value();
-
-    int gs;
-    if (!xml::paramInt(node, "geometricalShape", &gs)) {
-        return nullptr;
-    }
-    Geometry::GeometricalShape geometricalShape =
-        static_cast<Geometry::GeometricalShape>(
-            gs);  // HACK(Jannis): convert to enum
-
-    int beamstop_int;
-    if (!xml::paramInt(node, "centralBeamstop", &beamstop_int)) {
-        return nullptr;
-    }
-    CentralBeamstop beamstop = static_cast<CentralBeamstop>(beamstop_int);
-
-    double width;
-    if (!xml::paramDouble(node, "totalWidth", &width)) {
-        return nullptr;
-    }
-
-    double height;
-    if (!xml::paramDouble(node, "totalHeight", &height)) {
-        return nullptr;
-    }
-
-    glm::dvec4 position;
-    glm::dmat4x4 orientation;
-    if (!xml::paramPositionAndOrientation(node, group_context, &position,
-                                          &orientation)) {
-        return nullptr;
-    }
-
-    double beamstopWidth;
-    if (!xml::paramDouble(node, "totalWidthStop", &beamstopWidth)) {
-        return nullptr;
-    }
-
-    double beamstopHeight;
-    if (!xml::paramDouble(node, "totalHeightStop", &beamstopHeight)) {
-        return nullptr;
-    }
-
-    return std::make_shared<Slit>(name, geometricalShape, beamstop, width,
-                                  height, position, orientation, beamstopWidth,
-                                  beamstopHeight, sourceEnergy);
+std::shared_ptr<Slit> Slit::createFromXML(xml::Parser p, double sourceEnergy) {
+    return std::make_shared<Slit>(p.name(), p.parseGeometricalShape(),
+                                  p.parseCentralBeamstop(), p.parseTotalWidth(),
+                                  p.parseTotalHeight(), p.parsePosition(),
+                                  p.parseOrientation(), p.parseTotalWidthStop(),
+                                  p.parseTotalHeightStop(), sourceEnergy);
 }
 
 CentralBeamstop Slit::getCentralBeamstop() const { return m_centralBeamstop; }

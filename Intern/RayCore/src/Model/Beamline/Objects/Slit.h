@@ -22,9 +22,8 @@ class RAYX_API Slit : public OpticalElement {
     Slit();
     ~Slit();
 
-    static std::shared_ptr<Slit> createFromXML(
-        rapidxml::xml_node<>*, double sourceEnergy,
-        const std::vector<xml::Group>& group_context);
+    static std::shared_ptr<Slit> createFromXML(xml::Parser,
+                                               double sourceEnergy);
 
     CentralBeamstop getCentralBeamstop() const;
     double getBeamstopWidth() const;
