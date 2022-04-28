@@ -30,8 +30,10 @@ struct Group {
  *functions.
  **/
 struct Parser {
-    Parser(rapidxml::xml_node<>* node, std::vector<xml::Group> group_context);
+    Parser(rapidxml::xml_node<>* node, std::vector<xml::Group> group_context,
+           std::filesystem::path rmlFile);
 
+    std::string name();
     double parseDouble(const char* paramname);
     int parseInt(const char* paramname);
     const char* parseStr(const char* paramname);
@@ -40,7 +42,9 @@ struct Parser {
     std::array<double, 6> parseMisalignment();
     std::array<double, 7> parseSlopeError();
     std::array<double, 6> parseVls();
-    EnergyDistribution parseEnergyDistribution(std::filesystem::path rmlFile);
+    EnergyDistribution parseEnergyDistribution();
+
+    int parseNumberRays();
 
     glm::dvec4 parsePosition();
     glm::dmat4x4 parseOrientation();
@@ -49,6 +53,7 @@ struct Parser {
 
     rapidxml::xml_node<>* node;
     std::vector<xml::Group> group_context;
+    std::filesystem::path rmlFile;
 };
 
 // These functions get a `paramname` argument and look for <param

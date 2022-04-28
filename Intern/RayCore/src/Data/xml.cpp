@@ -12,8 +12,11 @@ namespace RAYX {
 namespace xml {
 
 Parser::Parser(rapidxml::xml_node<>* node,
-               std::vector<xml::Group> group_context)
-    : node(node), group_context(group_context) {}
+               std::vector<xml::Group> group_context,
+               std::filesystem::path rmlFile)
+    : node(node), group_context(group_context), rmlFile(rmlFile) {}
+
+std::string Parser::name() { return node->first_attribute("name")->value(); }
 
 double Parser::parseDouble(const char* paramname) {
     double d;
@@ -71,14 +74,15 @@ std::array<double, 6> Parser::parseVls() {
     return x;
 }
 
-EnergyDistribution Parser::parseEnergyDistribution(
-    std::filesystem::path rmlFile) {
+EnergyDistribution Parser::parseEnergyDistribution() {
     EnergyDistribution x;
     if (!paramEnergyDistribution(node, rmlFile, &x)) {
         throw "parseEnergyDistribution failed";
     }
     return x;
 }
+
+int Parser::parseNumberRays() { return parseInt("numberRays"); }
 
 glm::dvec4 Parser::parsePosition() {
     glm::dvec4 x;

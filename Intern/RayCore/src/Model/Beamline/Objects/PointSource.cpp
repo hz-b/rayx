@@ -61,14 +61,11 @@ PointSource::PointSource(const std::string name, EnergyDistribution dist,
 PointSource::~PointSource() {}
 
 // returns nullptr on error
-std::shared_ptr<PointSource> PointSource::createFromXML(
-    RAYX::xml::Parser p, std::filesystem::path rmlFile) {
-    const std::string name = p.node->first_attribute("name")->value();
-
-    SimulationEnv::get().m_numOfRays = p.parseInt("numberRays");
+std::shared_ptr<PointSource> PointSource::createFromXML(RAYX::xml::Parser p) {
+    SimulationEnv::get().m_numOfRays = p.parseNumberRays();
 
     return std::make_shared<PointSource>(
-        name, p.parseEnergyDistribution(rmlFile), p.parseDouble("sourceWidth"),
+        p.name(), p.parseEnergyDistribution(), p.parseDouble("sourceWidth"),
         p.parseDouble("sourceHeight"), p.parseDouble("sourceDepth"),
         p.parseDouble("horDiv") / 1000.0, p.parseDouble("verDiv") / 1000.0,
         static_cast<SourceDist>(p.parseInt("sourceWidthDistribution")),

@@ -24,8 +24,7 @@ class RAYX_API PointSource : public LightSource {
     PointSource();
     ~PointSource();
 
-    static std::shared_ptr<PointSource> createFromXML(
-        xml::Parser, std::filesystem::path rmlFile);
+    static std::shared_ptr<PointSource> createFromXML(xml::Parser);
 
     std::vector<Ray> getRays();
     double getCoord(const SourceDist l, const double extent);
