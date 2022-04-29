@@ -29,6 +29,42 @@ struct Group {
     glm::dmat4x4 m_orientation;
 };
 
+// These functions get a `paramname` argument and look for <param
+// id="`paramname`">...</param> entries in the XML node to then return it's
+// content in the out-argument.
+bool param(const rapidxml::xml_node<>* node, const char* paramname,
+           rapidxml::xml_node<>** out);
+bool paramDouble(const rapidxml::xml_node<>* node, const char* paramname,
+                 double* out);
+bool paramInt(const rapidxml::xml_node<>* node, const char* paramname,
+              int* out);
+bool paramStr(const rapidxml::xml_node<>* node, const char* paramname,
+              const char** out);
+bool paramDvec3(const rapidxml::xml_node<>* node, const char* paramname,
+                glm::dvec3* out);
+
+// These functions parse more complex parts of beamline objects, and are used by
+// multiple createFromXML functions.
+bool paramMisalignment(const rapidxml::xml_node<>* node,
+                       std::array<double, 6>* out);
+bool paramPositionNoGroup(const rapidxml::xml_node<>* node, glm::dvec4* out);
+bool paramOrientationNoGroup(const rapidxml::xml_node<>* node,
+                             glm::dmat4x4* out);
+bool paramSlopeError(const rapidxml::xml_node<>* node,
+                     std::array<double, 7>* out);
+bool paramVls(const rapidxml::xml_node<>* node, std::array<double, 6>* out);
+bool paramEnergyDistribution(const rapidxml::xml_node<>* node,
+                             std::filesystem::path rmlFile,
+                             EnergyDistribution* out);
+
+bool paramPositionAndOrientation(const rapidxml::xml_node<>* node,
+                                 const std::vector<xml::Group>& group_context,
+                                 glm::dvec4* out_pos, glm::dmat4x4* out_ori);
+bool paramMaterial(const rapidxml::xml_node<>* node, Material* out);
+
+/** node needs to be a <group>-tag, output will be written to `out`. */
+bool parseGroup(rapidxml::xml_node<>* node, xml::Group* out);
+
 /**
  * Parser gives you useful utility functions to write your own createFromXML
  *functions.
@@ -121,46 +157,22 @@ struct Parser {
     inline double parseOrderDiffraction() {
         return parseDouble("orderDiffraction");
     }
+    inline double parseDesignEnergyMounting() {
+        return parseDouble("designEnergyMounting");
+    }
+    inline double parseAdditionalOrder() {
+        double additionalZeroOrder = 0;
+
+        // may be missing in some RML
+        // files, that's fine though
+        paramDouble(node, "additionalOrder", &additionalZeroOrder);
+        return additionalZeroOrder;
+    }
 
     rapidxml::xml_node<>* node;
     std::vector<xml::Group> group_context;
     std::filesystem::path rmlFile;
 };
 
-// These functions get a `paramname` argument and look for <param
-// id="`paramname`">...</param> entries in the XML node to then return it's
-// content in the out-argument.
-bool param(const rapidxml::xml_node<>* node, const char* paramname,
-           rapidxml::xml_node<>** out);
-bool paramDouble(const rapidxml::xml_node<>* node, const char* paramname,
-                 double* out);
-bool paramInt(const rapidxml::xml_node<>* node, const char* paramname,
-              int* out);
-bool paramStr(const rapidxml::xml_node<>* node, const char* paramname,
-              const char** out);
-bool paramDvec3(const rapidxml::xml_node<>* node, const char* paramname,
-                glm::dvec3* out);
-
-// These functions parse more complex parts of beamline objects, and are used by
-// multiple createFromXML functions.
-bool paramMisalignment(const rapidxml::xml_node<>* node,
-                       std::array<double, 6>* out);
-bool paramPositionNoGroup(const rapidxml::xml_node<>* node, glm::dvec4* out);
-bool paramOrientationNoGroup(const rapidxml::xml_node<>* node,
-                             glm::dmat4x4* out);
-bool paramSlopeError(const rapidxml::xml_node<>* node,
-                     std::array<double, 7>* out);
-bool paramVls(const rapidxml::xml_node<>* node, std::array<double, 6>* out);
-bool paramEnergyDistribution(const rapidxml::xml_node<>* node,
-                             std::filesystem::path rmlFile,
-                             EnergyDistribution* out);
-
-bool paramPositionAndOrientation(const rapidxml::xml_node<>* node,
-                                 const std::vector<xml::Group>& group_context,
-                                 glm::dvec4* out_pos, glm::dmat4x4* out_ori);
-bool paramMaterial(const rapidxml::xml_node<>* node, Material* out);
-
-/** node needs to be a <group>-tag, output will be written to `out`. */
-bool parseGroup(rapidxml::xml_node<>* node, xml::Group* out);
 }  // namespace xml
 }  // namespace RAYX

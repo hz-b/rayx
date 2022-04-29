@@ -65,79 +65,14 @@ PlaneGrating::PlaneGrating(
 
 PlaneGrating::~PlaneGrating() {}
 
-std::shared_ptr<PlaneGrating> PlaneGrating::createFromXML(
-    rapidxml::xml_node<>* node, const std::vector<xml::Group>& group_context) {
-    const char* name = node->first_attribute("name")->value();
-
-    int gs;
-    if (!xml::paramInt(node, "geometricalShape", &gs)) {
-        return nullptr;
-    }
-    Geometry::GeometricalShape geometricalShape =
-        static_cast<Geometry::GeometricalShape>(
-            gs);  // HACK(Jannis): convert to enum
-
-    double width;
-    if (!xml::paramDouble(node, "totalWidth", &width)) {
-        return nullptr;
-    }
-
-    double height;
-    if (!xml::paramDouble(node, "totalLength", &height)) {
-        return nullptr;
-    }
-
-    glm::dvec4 position;
-    glm::dmat4x4 orientation;
-    if (!xml::paramPositionAndOrientation(node, group_context, &position,
-                                          &orientation)) {
-        return nullptr;
-    }
-
-    double designEnergy;
-    if (!xml::paramDouble(node, "designEnergyMounting", &designEnergy)) {
-        return nullptr;
-    }
-
-    double lineDensity;
-    if (!xml::paramDouble(node, "lineDensity", &lineDensity)) {
-        return nullptr;
-    }
-
-    double orderOfDiffraction;
-    if (!xml::paramDouble(node, "orderDiffraction", &orderOfDiffraction)) {
-        return nullptr;
-    }
-
-    double additionalZeroOrder = 0;
-    xml::paramDouble(node, "additionalOrder",
-                     &additionalZeroOrder);  // may be missing in some RML
-                                             // files, that's fine though
-
-    std::array<double, 6> vls;
-    if (!xml::paramVls(node, &vls)) {
-        return nullptr;
-    }
-
-    std::array<double, 7> slopeError;
-    if (!xml::paramSlopeError(node, &slopeError)) {
-        return nullptr;
-    }
-
-    double azimuthalAngle;
-    if (!xml::paramDouble(node, "azimuthalAngle", &azimuthalAngle)) {
-        return nullptr;
-    }
-
-    Material mat;
-    if (!xml::paramMaterial(node, &mat)) {
-        mat = Material::Cu;  // defaults to copper!
-    }
-
+std::shared_ptr<PlaneGrating> PlaneGrating::createFromXML(xml::Parser p) {
     return std::make_shared<PlaneGrating>(
-        name, geometricalShape, width, height, degToRad(azimuthalAngle),
-        position, orientation, designEnergy, lineDensity, orderOfDiffraction,
-        additionalZeroOrder, vls, slopeError, mat);
+        p.name(), p.parseGeometricalShape(), p.parseTotalWidth(),
+        p.parseTotalLength(), p.parseAzimuthalAngle(), p.parsePosition(),
+        p.parseOrientation(), p.parseDesignEnergyMounting(),
+        p.parseLineDensity(), p.parseOrderDiffraction(),
+        p.parseAdditionalOrder(), p.parseVls(), p.parseSlopeError(),
+        p.parseMaterial());
 }
 
 double PlaneGrating::getDesignEnergyMounting() {

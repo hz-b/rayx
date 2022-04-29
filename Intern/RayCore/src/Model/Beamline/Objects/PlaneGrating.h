@@ -19,8 +19,7 @@ class RAYX_API PlaneGrating : public OpticalElement {
     PlaneGrating();
     ~PlaneGrating();
 
-    static std::shared_ptr<PlaneGrating> createFromXML(
-        rapidxml::xml_node<>*, const std::vector<xml::Group>& group_context);
+    static std::shared_ptr<PlaneGrating> createFromXML(xml::Parser);
 
     double getFixFocusConstantCFF();
     double getDesignEnergyMounting();

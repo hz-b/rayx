@@ -82,8 +82,7 @@ void addBeamlineObjectFromXML(rapidxml::xml_node<>* node, Beamline* beamline,
     } else if (strcmp(type, "Spherical Grating") == 0) {
         addOpticalElement(SphereGrating::createFromXML(parser), node);
     } else if (strcmp(type, "Plane Grating") == 0) {
-        addOpticalElement(PlaneGrating::createFromXML(node, group_context),
-                          node);
+        addOpticalElement(PlaneGrating::createFromXML(parser), node);
     } else if (strcmp(type, "Sphere") == 0) {
         addOpticalElement(SphereMirror::createFromXML(node, group_context),
                           node);
