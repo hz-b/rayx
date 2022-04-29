@@ -58,14 +58,17 @@
 
 namespace RAYX {
 VulkanTracer::VulkanTracer() {
+    // Set buffer settings (DEBUG OR RELEASE)
+    setSettings();
+
     // Compute Buffers (I/O Storage)
-    m_compute.m_BufferSizes.resize(7);
-    m_compute.m_Buffers.resize(7);
-    m_compute.m_BufferMemories.resize(7);
+    m_compute.m_BufferSizes.resize(m_settings.m_computeBuffersCount);
+    m_compute.m_Buffers.resize(m_settings.m_computeBuffersCount);
+    m_compute.m_BufferMemories.resize(m_settings.m_computeBuffersCount);
     // Staging Buffers (COPY)
-    m_staging.m_BufferSizes.resize(2);
-    m_staging.m_Buffers.resize(2);
-    m_staging.m_BufferMemories.resize(2);
+    m_staging.m_BufferSizes.resize(m_settings.m_stagingBuffersCount);
+    m_staging.m_Buffers.resize(m_settings.m_stagingBuffersCount);
+    m_staging.m_BufferMemories.resize(m_settings.m_stagingBuffersCount);
 
     RAYX_LOG << "Initializing Vulkan Tracer..";
 
@@ -135,7 +138,8 @@ void VulkanTracer::run() {
     m_compute.m_BufferSizes[4] =
         getMaterialIndexTable()->size() * sizeof(double);
     m_compute.m_BufferSizes[5] = getMaterialTable()->size() * sizeof(double);
-    m_compute.m_BufferSizes[6] = (uint64_t)m_numberOfRays * sizeof(m_debug);
+    if (isDebug())
+        m_compute.m_BufferSizes[6] = (uint64_t)m_numberOfRays * sizeof(m_debug);
 
     for (uint32_t i = 0; i < m_compute.m_BufferSizes.size(); i++) {
         RAYX_LOG << "Compute Buffer [" << i
@@ -147,9 +151,10 @@ void VulkanTracer::run() {
         std::min((uint64_t)GPU_MAX_STAGING_SIZE,
                  (uint64_t)m_numberOfRays * VULKANTRACER_RAY_DOUBLE_AMOUNT *
                      sizeof(double));  // maximum of 128MB
-    m_staging.m_BufferSizes[1] = std::min(
-        (uint64_t)GPU_MAX_STAGING_SIZE,
-        (uint64_t)m_numberOfRays * sizeof(m_debug));  // maximum of 128MB
+    if (isDebug())
+        m_staging.m_BufferSizes[1] = std::min(
+            (uint64_t)GPU_MAX_STAGING_SIZE,
+            (uint64_t)m_numberOfRays * sizeof(m_debug));  // maximum of 128MB
 
     for (uint32_t i = 0; i < m_staging.m_BufferSizes.size(); i++) {
         RAYX_LOG << "Staging Buffer [" << i
@@ -174,7 +179,6 @@ void VulkanTracer::run() {
 #ifdef RAY_DEBUG_MODE
     getDebugBuffer();
 #endif
-
 }
 
 // function for initializing vulkan
@@ -622,11 +626,12 @@ void VulkanTracer::createBuffers() {
                  m_compute.m_Buffers[5], m_compute.m_BufferMemories[5]);
 
     // Buffer for debug
-    createBuffer(
-        m_compute.m_BufferSizes[6],
-        VK_BUFFER_USAGE_TRANSFER_SRC_BIT | VK_BUFFER_USAGE_STORAGE_BUFFER_BIT,
-        VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, m_compute.m_Buffers[6],
-        m_compute.m_BufferMemories[6]);
+    if (isDebug())
+        createBuffer(m_compute.m_BufferSizes[6],
+                     VK_BUFFER_USAGE_TRANSFER_SRC_BIT |
+                         VK_BUFFER_USAGE_STORAGE_BUFFER_BIT,
+                     VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT,
+                     m_compute.m_Buffers[6], m_compute.m_BufferMemories[6]);
 
     // ----STAGING
     // staging buffer for rays
@@ -638,13 +643,13 @@ void VulkanTracer::createBuffers() {
                      VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT,
                  m_staging.m_Buffers[0], m_staging.m_BufferMemories[0]);
     // staging buffer for debug
-    createBuffer(m_staging.m_BufferSizes[1],
-                 VK_BUFFER_USAGE_TRANSFER_DST_BIT |
-                     VK_BUFFER_USAGE_TRANSFER_SRC_BIT |
-                     VK_BUFFER_USAGE_STORAGE_BUFFER_BIT,
-                 VK_MEMORY_PROPERTY_HOST_COHERENT_BIT |
-                     VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT,
-                 m_staging.m_Buffers[1], m_staging.m_BufferMemories[1]);
+    if (isDebug())
+        createBuffer(m_staging.m_BufferSizes[1],
+                     VK_BUFFER_USAGE_TRANSFER_DST_BIT |
+                         VK_BUFFER_USAGE_STORAGE_BUFFER_BIT,
+                     VK_MEMORY_PROPERTY_HOST_COHERENT_BIT |
+                         VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT,
+                     m_staging.m_Buffers[1], m_staging.m_BufferMemories[1]);
     RAYX_LOG << "All buffers created!";
 }
 
@@ -1038,14 +1043,17 @@ void VulkanTracer::createDescriptorSetLayout() {
          NULL},
         {5, VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, 1, VK_SHADER_STAGE_COMPUTE_BIT,
          NULL},
+#ifdef RAY_DEBUG_MODE
         {6, VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, 1, VK_SHADER_STAGE_COMPUTE_BIT,
-         NULL}};
+         NULL}
+#endif
+    };
 
     VkDescriptorSetLayoutCreateInfo descriptorSetLayoutCreateInfo = {};
     descriptorSetLayoutCreateInfo.sType =
         VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO;
-    // 7 bindings are used in this layout
-    descriptorSetLayoutCreateInfo.bindingCount = 7;
+    // 7 or 6 bindings are used in this layout
+    descriptorSetLayoutCreateInfo.bindingCount = m_settings.m_computeBuffersCount;
     descriptorSetLayoutCreateInfo.pBindings =
         descriptorSetLayoutBinding;  // TODO
 
@@ -1062,7 +1070,7 @@ void VulkanTracer::createDescriptorSet() {
     */
     VkDescriptorPoolSize descriptorPoolSize = {};
     descriptorPoolSize.type = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER;
-    descriptorPoolSize.descriptorCount = 7;
+    descriptorPoolSize.descriptorCount = m_settings.m_computeBuffersCount;
 
     VkDescriptorPoolCreateInfo descriptorPoolCreateInfo = {};
     descriptorPoolCreateInfo.sType =
@@ -1407,9 +1415,31 @@ std::vector<VulkanTracer::_debugBuf_t>::const_iterator
 VulkanTracer::getDebugIteratorBegin() {
     return m_debugBufList.begin();
 }
+
 std::vector<VulkanTracer::_debugBuf_t>::const_iterator
 VulkanTracer::getDebugIteratorEnd() {
     return m_debugBufList.end();
+}
+
+uint32_t VulkanTracer::getNumberOfBuffers() const {
+    return m_settings.m_buffersCount;
+}
+bool VulkanTracer::isDebug() const { return m_settings.m_isDebug; }
+
+// Set Vulkan Tracer m_settings according to Release or Debug Mode
+void VulkanTracer::setSettings() {
+#ifdef RAY_DEBUG_MODE
+    RAYX_D_LOG << "is Debug";
+    m_settings.m_isDebug = true;
+    m_settings.m_computeBuffersCount = 7;
+    m_settings.m_stagingBuffersCount = 2;
+#else
+    m_settings.m_isDebug = false;
+    m_settings.m_computeBuffersCount = 6;
+    m_settings.m_stagingBuffersCount = 1;
+#endif
+    m_settings.m_buffersCount =
+        m_settings.m_computeBuffersCount + m_settings.m_stagingBuffersCount;
 }
 
 // is not used anymore
