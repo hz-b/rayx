@@ -127,6 +127,12 @@ struct Parser {
             "grazingIncAngle");  // TODO(rudi): is it intentional that we don't
                                  // do degToRad here?
     }
+    inline double parseEntranceArmLength() {
+        return parseDouble("entranceArmLength");
+    }
+    inline double parseExitArmLength() {
+        return parseDouble("exitArmLength");
+    }
     inline double parseEntranceArmLengthMer() {
         return parseDouble("entranceArmLengthMer");
     }

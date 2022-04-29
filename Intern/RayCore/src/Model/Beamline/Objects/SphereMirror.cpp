@@ -88,69 +88,12 @@ SphereMirror::SphereMirror(const char* name,
 
 SphereMirror::~SphereMirror() {}
 
-std::shared_ptr<SphereMirror> SphereMirror::createFromXML(
-    rapidxml::xml_node<>* node, const std::vector<xml::Group>& group_context) {
-    const char* name = node->first_attribute("name")->value();
-
-    int gs;
-    if (!xml::paramInt(node, "geometricalShape", &gs)) {
-        return nullptr;
-    }
-    Geometry::GeometricalShape geometricalShape =
-        static_cast<Geometry::GeometricalShape>(
-            gs);  // HACK(Jannis): convert to enum
-
-    double width;
-    if (!xml::paramDouble(node, "totalWidth", &width)) {
-        return nullptr;
-    }
-
-    double height;
-    if (!xml::paramDouble(node, "totalLength", &height)) {
-        return nullptr;
-    }
-
-    double grazingIncidenceAngle;
-    if (!xml::paramDouble(node, "grazingIncAngle", &grazingIncidenceAngle)) {
-        return nullptr;
-    }
-
-    glm::dvec4 position;
-    glm::dmat4x4 orientation;
-    if (!xml::paramPositionAndOrientation(node, group_context, &position,
-                                          &orientation)) {
-        return nullptr;
-    }
-
-    double entranceArmLength;
-    if (!xml::paramDouble(node, "entranceArmLength", &entranceArmLength)) {
-        return nullptr;
-    }
-
-    double exitArmLength;
-    if (!xml::paramDouble(node, "exitArmLength", &exitArmLength)) {
-        return nullptr;
-    }
-
-    std::array<double, 7> slopeError;
-    if (!xml::paramSlopeError(node, &slopeError)) {
-        return nullptr;
-    }
-
-    double azimuthalAngle;
-    if (!xml::paramDouble(node, "azimuthalAngle", &azimuthalAngle)) {
-        return nullptr;
-    }
-
-    Material mat;
-    if (!xml::paramMaterial(node, &mat)) {
-        mat = Material::Cu;  // defaults to copper
-    }
-
+std::shared_ptr<SphereMirror> SphereMirror::createFromXML(xml::Parser p) {
     return std::make_shared<SphereMirror>(
-        name, geometricalShape, width, height, degToRad(azimuthalAngle),
-        grazingIncidenceAngle, position, orientation, entranceArmLength,
-        exitArmLength, slopeError, mat);
+        p.name(), p.parseGeometricalShape(), p.parseTotalWidth(),
+        p.parseTotalLength(), p.parseAzimuthalAngle(), p.parseGrazingIncAngle(),
+        p.parsePosition(), p.parseOrientation(), p.parseEntranceArmLength(),
+        p.parseExitArmLength(), p.parseSlopeError(), p.parseMaterial());
 }
 
 // TODO(Theresa): move this to user params and just give the radius as a
