@@ -6,6 +6,7 @@
 #extension GL_GOOGLE_include_directive : enable
 
 #define WORKGROUP_SIZE 32
+#include "shader-include/settings.comp"
 layout(local_size_x = WORKGROUP_SIZE, local_size_y = 1, local_size_z = 1) in;
 const double PI       = 3.14159265358979323846264338327950;
 const uint64_t rngKey = (0xc8e4fd15 << 32) | 0x4ce32f6d;
@@ -37,11 +38,11 @@ struct NffEntry {
     double f2;
     double empty;  // for padding
 };
-
+#ifdef DEBUG
 struct _debug_struct {
     dmat4 _dMat; // Can also be used as vectors or scalar
 };
-
+#endif 
 /* LAYOUTS */
 layout(std140, binding = 0) buffer ibuf { Ray rayData[]; };
 
@@ -67,10 +68,11 @@ layout(binding = 5) buffer materialBuf {
     NffEntry nkp[];  // contains nff table of all materials concatenated together
 };
 
+#ifdef DEBUG
 layout(binding = 6) buffer debugBuf {
     _debug_struct d_struct[];  // contains nff table of all materials concatenated together
 };
-
+#endif
 // Order in #include is IMPROTANT, do not change.
 // clang-format off
 #include "shader-include/approx.comp"
@@ -141,9 +143,11 @@ void dynamicElements() {
     dvec4 closestHitpoint = dvec4(1.0 / 0.0, 1.0 / 0.0, 1.0 / 0.0, 0.0);
     dvec4 closestGlobalHitpoint;
     double threshold = 0.001;
-
+    
+    #ifdef DEBUG
     // Set Debug Struct of current Ray to identity
     d_struct[uint(gl_GlobalInvocationID)]._dMat = dmat4(1);
+    #endif
 
     Element nextElement;
     double bounce = 1;

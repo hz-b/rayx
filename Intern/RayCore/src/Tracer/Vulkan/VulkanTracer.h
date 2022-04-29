@@ -161,6 +161,13 @@ class RAYX_API VulkanTracer {
     std::vector<double> m_beamlineData;
     std::vector<_debugBuf_t> m_debugBufList;
 
+    struct Settings {
+        bool m_isDebug;
+        uint32_t m_buffersCount;
+        uint32_t m_computeBuffersCount;
+        uint32_t m_stagingBuffersCount;
+    } m_settings;
+
     // Member functions:
     // Vulkan
     void prepareVulkan();
@@ -199,6 +206,9 @@ class RAYX_API VulkanTracer {
     void createComputePipeline();
     void createCommandBuffer();
     void runCommandBuffer();
+    void setSettings();
+    bool isDebug() const;
+    uint32_t getNumberOfBuffers() const;
 
     // Ray-related funcs:
     void divideAndSortRays();
