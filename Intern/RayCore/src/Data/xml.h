@@ -4,6 +4,7 @@
 #include <Model/Beamline/LightSource.h>
 #include <Model/Geometry/Geometry.h>
 #include <Tracer/Vulkan/Material.h>
+#include <UserParameter/GeometricUserParams.h>
 
 #include <array>
 #include <filesystem>
@@ -110,6 +111,15 @@ struct Parser {
     }
     inline double parseTotalHeightStop() {
         return parseDouble("totalHeightStop");
+    }
+    inline GratingMount parseGratingMount() {
+        return static_cast<GratingMount>(parseInt("gratingMount"));
+    }
+    inline double parseRadius() { return parseDouble("radius"); }
+    inline double parseDesignEnergy() { return parseDouble("designEnergy"); }
+    inline double parseLineDensity() { return parseDouble("lineDensity"); }
+    inline double parseOrderDiffraction() {
+        return parseDouble("orderDiffraction");
     }
 
     rapidxml::xml_node<>* node;

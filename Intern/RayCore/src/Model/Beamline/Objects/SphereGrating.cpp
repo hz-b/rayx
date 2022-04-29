@@ -62,85 +62,13 @@ SphereGrating::SphereGrating(const char* name, GratingMount mount,
 
 SphereGrating::~SphereGrating() {}
 
-std::shared_ptr<SphereGrating> SphereGrating::createFromXML(
-    rapidxml::xml_node<>* node, const std::vector<xml::Group>& group_context) {
-    const char* name = node->first_attribute("name")->value();
-
-    int mount_int;
-    if (!xml::paramInt(node, "gratingMount", &mount_int)) {
-        return nullptr;
-    }
-    GratingMount mount = static_cast<GratingMount>(mount_int);
-
-    int gs;
-    if (!xml::paramInt(node, "geometricalShape", &gs)) {
-        return nullptr;
-    }
-    Geometry::GeometricalShape geometricalShape =
-        static_cast<Geometry::GeometricalShape>(
-            gs);  // HACK(Jannis): convert to enum
-
-    double width;
-    if (!xml::paramDouble(node, "totalWidth", &width)) {
-        return nullptr;
-    }
-
-    double height;
-    if (!xml::paramDouble(node, "totalLength", &height)) {
-        return nullptr;
-    }
-
-    double radius;
-    if (!xml::paramDouble(node, "radius", &radius)) {
-        return nullptr;
-    }
-
-    glm::dvec4 position;
-    glm::dmat4x4 orientation;
-    if (!xml::paramPositionAndOrientation(node, group_context, &position,
-                                          &orientation)) {
-        return nullptr;
-    }
-
-    double designEnergyMounting;
-    if (!xml::paramDouble(node, "designEnergy", &designEnergyMounting)) {
-        return nullptr;
-    }
-
-    double lineDensity;
-    if (!xml::paramDouble(node, "lineDensity", &lineDensity)) {
-        return nullptr;
-    }
-
-    double orderOfDiffraction;
-    if (!xml::paramDouble(node, "orderDiffraction", &orderOfDiffraction)) {
-        return nullptr;
-    }
-
-    std::array<double, 6> vls;
-    if (!xml::paramVls(node, &vls)) {
-        return nullptr;
-    }
-
-    std::array<double, 7> slopeError;
-    if (!xml::paramSlopeError(node, &slopeError)) {
-        return nullptr;
-    }
-
-    double azimuthalAngle;
-    if (!xml::paramDouble(node, "azimuthalAngle", &azimuthalAngle)) {
-        return nullptr;
-    }
-
-    Material mat;
-    if (!xml::paramMaterial(node, &mat)) {
-        mat = Material::Cu;  // defaults to copper
-    }
-
+std::shared_ptr<SphereGrating> SphereGrating::createFromXML(xml::Parser p) {
     return std::make_shared<SphereGrating>(
-        name, mount, geometricalShape, width, height, degToRad(azimuthalAngle),
-        radius, position, orientation, designEnergyMounting, lineDensity,
-        orderOfDiffraction, vls, slopeError, mat);
+        p.name(), p.parseGratingMount(), p.parseGeometricalShape(),
+        p.parseTotalWidth(), p.parseTotalLength(), p.parseAzimuthalAngle(),
+        p.parseRadius(), p.parsePosition(), p.parseOrientation(),
+        p.parseDesignEnergy(), p.parseLineDensity(), p.parseOrderDiffraction(),
+        p.parseVls(), p.parseSlopeError(), p.parseMaterial());
 }
 
 /* TODO (Theresa): how to make radius calculation easier?
