@@ -86,8 +86,7 @@ void addBeamlineObjectFromXML(rapidxml::xml_node<>* node, Beamline* beamline,
     } else if (strcmp(type, "Sphere") == 0) {
         addOpticalElement(SphereMirror::createFromXML(parser), node);
     } else if (strcmp(type, "Reflection Zoneplate") == 0) {
-        addOpticalElement(
-            ReflectionZonePlate::createFromXML(node, group_context), node);
+        addOpticalElement(ReflectionZonePlate::createFromXML(parser), node);
     } else if (strcmp(type, "Ellipsoid") == 0) {
         addOpticalElement(Ellipsoid::createFromXML(node, group_context), node);
     } else if (strcmp(type, "Cylinder") == 0) {

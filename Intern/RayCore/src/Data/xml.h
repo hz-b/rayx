@@ -15,6 +15,7 @@
 
 namespace RAYX {
 enum class CentralBeamstop;  // forward declaration
+enum class CurvatureType;  // forward declaration
 
 /** The xml namespace defines functions, which help to implement the
  * createFromXML-functions for the beamline objects. All of these functions
@@ -130,9 +131,7 @@ struct Parser {
     inline double parseEntranceArmLength() {
         return parseDouble("entranceArmLength");
     }
-    inline double parseExitArmLength() {
-        return parseDouble("exitArmLength");
-    }
+    inline double parseExitArmLength() { return parseDouble("exitArmLength"); }
     inline double parseEntranceArmLengthMer() {
         return parseDouble("entranceArmLengthMer");
     }
@@ -173,6 +172,25 @@ struct Parser {
         // files, that's fine though
         paramDouble(node, "additionalOrder", &additionalZeroOrder);
         return additionalZeroOrder;
+    }
+
+    inline CurvatureType parseCurvatureType() {
+        return static_cast<CurvatureType>(parseInt("curvatureType"));
+    }
+
+    inline double parseDesignOrderDiffraction() {
+        return parseDouble("designOrderDiffraction");
+    }
+    inline double parseDesignAlphaAngle() {
+        return parseDouble("designAlphaAngle");
+    }
+    inline double parseDesignBetaAngle() {
+        return parseDouble("designBetaAngle");
+    }
+    inline double parseShortRadius() { return parseDouble("shortRadius"); }
+    inline double parseLongRadius() { return parseDouble("longRadius"); }
+    inline double parseFresnelZOffset() {
+        return parseDouble("FresnelZOffset");
     }
 
     rapidxml::xml_node<>* node;

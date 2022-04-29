@@ -57,8 +57,7 @@ class RAYX_API ReflectionZonePlate : public OpticalElement {
     ReflectionZonePlate();
     ~ReflectionZonePlate();
 
-    static std::shared_ptr<ReflectionZonePlate> createFromXML(
-        rapidxml::xml_node<>*, const std::vector<xml::Group>& group_context);
+    static std::shared_ptr<ReflectionZonePlate> createFromXML(xml::Parser);
 
     // for calculating incidence and exit angle from user parameters
     void calcAlpha();

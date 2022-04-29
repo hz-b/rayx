@@ -176,138 +176,33 @@ ReflectionZonePlate::ReflectionZonePlate(
 ReflectionZonePlate::~ReflectionZonePlate() {}
 
 std::shared_ptr<ReflectionZonePlate> ReflectionZonePlate::createFromXML(
-    rapidxml::xml_node<>* node, const std::vector<xml::Group>& group_context) {
-    const char* name = node->first_attribute("name")->value();
-
-    int gs;
-    if (!xml::paramInt(node, "geometricalShape", &gs)) {
-        return nullptr;
-    }
-    Geometry::GeometricalShape geometricalShape =
-        static_cast<Geometry::GeometricalShape>(
-            gs);  // HACK(Jannis): convert to enum
-
-    int curvatureType;
-    if (!xml::paramInt(node, "curvatureType", &curvatureType)) {
-        return nullptr;
-    }
-
-    double widthA;
-    if (!xml::paramDouble(node, "totalWidth", &widthA)) {
-        return nullptr;
-    }
-
-    double height;
-    if (!xml::paramDouble(node, "totalLength", &height)) {
-        return nullptr;
-    }
-
-    glm::dvec4 position;
-    glm::dmat4x4 orientation;
-    if (!xml::paramPositionAndOrientation(node, group_context, &position,
-                                          &orientation)) {
-        return nullptr;
-    }
-
-    double designEnergy;
-    if (!xml::paramDouble(node, "designEnergy", &designEnergy)) {
-        return nullptr;
-    }
-
-    double orderOfDiffraction;
-    if (!xml::paramDouble(node, "orderDiffraction", &orderOfDiffraction)) {
-        return nullptr;
-    }
-
-    double designOrderOfDiffraction;
-    if (!xml::paramDouble(node, "designOrderDiffraction",
-                          &designOrderOfDiffraction)) {
-        return nullptr;
-    }
-
-    double dAlpha;
-    if (!xml::paramDouble(node, "designAlphaAngle", &dAlpha)) {
-        return nullptr;
-    }
-
-    double dBeta;
-    if (!xml::paramDouble(node, "designBetaAngle", &dBeta)) {
-        return nullptr;
-    }
-
-    double mEntrance;
-    if (!xml::paramDouble(node, "entranceArmLengthMer", &mEntrance)) {
-        return nullptr;
-    }
-
-    double mExit;
-    if (!xml::paramDouble(node, "exitArmLengthMer", &mExit)) {
-        return nullptr;
-    }
-
-    double sEntrance;
-    if (!xml::paramDouble(node, "entranceArmLengthSag", &sEntrance)) {
-        return nullptr;
-    }
-
-    double sExit;
-    if (!xml::paramDouble(node, "exitArmLengthSag", &sExit)) {
-        return nullptr;
-    }
-
-    double shortRadius;
-    if (!xml::paramDouble(node, "shortRadius", &shortRadius)) {
-        return nullptr;
-    }
-
-    double longRadius;
-    if (!xml::paramDouble(node, "longRadius", &longRadius)) {
-        return nullptr;
-    }
-
-    int additionalZeroOrder = 0;
-    xml::paramInt(node, "additionalOrder",
-                  &additionalZeroOrder);  // may be missing in some RML files,
-                                          // that's fine though
-
-    double fresnelZOffset;
-    if (!xml::paramDouble(node, "FresnelZOffset", &fresnelZOffset)) {
-        return nullptr;
-    }
-
-    std::array<double, 7> slopeError;
-    if (!xml::paramSlopeError(node, &slopeError)) {
-        return nullptr;
-    }
-
-    double azimuthalAngle;
-    if (!xml::paramDouble(node, "azimuthalAngle", &azimuthalAngle)) {
-        return nullptr;
-    }
-
-    Material mat;
-    if (!xml::paramMaterial(node, &mat)) {
-        mat = Material::Cu;  // default to copper!
-    }
-
+    xml::Parser p) {
     // ! temporary for testing trapezoid rzp
     double widthB;
-    bool foundWidthB = xml::paramDouble(node, "totalWidthB", &widthB);
+    bool foundWidthB = xml::paramDouble(p.node, "totalWidthB", &widthB);
     if (foundWidthB) {
         return std::make_shared<ReflectionZonePlate>(
-            name, geometricalShape, static_cast<CurvatureType>(curvatureType),
-            widthA, height, degToRad(azimuthalAngle), position, orientation,
-            designEnergy, orderOfDiffraction, designOrderOfDiffraction, dAlpha,
-            dBeta, mEntrance, mExit, sEntrance, sExit, shortRadius, longRadius,
-            additionalZeroOrder, fresnelZOffset, slopeError, mat);
+            p.name(), p.parseGeometricalShape(), p.parseCurvatureType(),
+            p.parseTotalWidth(), p.parseTotalLength(), p.parseAzimuthalAngle(),
+            p.parsePosition(), p.parseOrientation(), p.parseDesignEnergy(),
+            p.parseOrderDiffraction(), p.parseDesignOrderDiffraction(),
+            p.parseDesignAlphaAngle(), p.parseDesignBetaAngle(),
+            p.parseEntranceArmLengthMer(), p.parseExitArmLengthMer(),
+            p.parseEntranceArmLengthSag(), p.parseExitArmLengthSag(),
+            p.parseShortRadius(), p.parseLongRadius(), p.parseAdditionalOrder(),
+            p.parseFresnelZOffset(), p.parseSlopeError(), p.parseMaterial());
     } else {
         return std::make_shared<ReflectionZonePlate>(
-            name, geometricalShape, static_cast<CurvatureType>(curvatureType),
-            widthA, widthB, height, degToRad(azimuthalAngle), position,
-            orientation, designEnergy, orderOfDiffraction,
-            designOrderOfDiffraction, dAlpha, dBeta, mEntrance, mExit,
-            sEntrance, sExit, shortRadius, longRadius, additionalZeroOrder,
-            fresnelZOffset, slopeError, mat);
+            p.name(), p.parseGeometricalShape(), p.parseCurvatureType(),
+            p.parseTotalWidth(), widthB, p.parseTotalLength(),
+            p.parseAzimuthalAngle(), p.parsePosition(), p.parseOrientation(),
+            p.parseDesignEnergy(), p.parseOrderDiffraction(),
+            p.parseDesignOrderDiffraction(), p.parseDesignAlphaAngle(),
+            p.parseDesignBetaAngle(), p.parseEntranceArmLengthMer(),
+            p.parseExitArmLengthMer(), p.parseEntranceArmLengthSag(),
+            p.parseExitArmLengthSag(), p.parseShortRadius(),
+            p.parseLongRadius(), p.parseAdditionalOrder(),
+            p.parseFresnelZOffset(), p.parseSlopeError(), p.parseMaterial());
     }
 }
 
