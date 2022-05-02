@@ -9,7 +9,7 @@ import numpy as np
 
 @dataclass
 class MetaData:
-    numElements = 2
+    numElements = 20
     fileName = "multi_RZP_test"
 
 
@@ -26,9 +26,8 @@ class Direction:
     yDir: Vec3 = Vec3(0.0, 1.0, 0.0)
     zDir: Vec3 = Vec3(0.0, 0.0, 1.0)
 
+
 # Standard RZP Parameters
-
-
 @dataclass
 class RZP:
     name = "Reflection Zoneplate"
@@ -546,18 +545,18 @@ def calculateObjectPos(prevPos: Vec3, w: float, chi: float, iterDirection: int):
     return Vec3(x, y, z)
 
 
-def calculateObjectDir(prevDir: Direction, alpha: float, iterDirection: int):
+def calculateObjectDir(prevDir: np.array, alpha: float, iterDirection: int):
     # Rotation matrix around y axis (clockwise)
     rotY = np.array([[np.cos(alpha), 0, np.sin(alpha)],
                      [0, 1, 0],
-                     [-np.sin(alpha), 0, np.cos(alpha)]])
+                     [-np.sin(alpha), 0, np.cos(alpha)]])  # ? sehr starke rotation
 
     if iterDirection == -1:
         # Transpose the rotation matrix
         rotY = np.transpose(rotY)
 
     # Apply rotation matrix
-    rotatedDirMat = np.matmul(rotY, np.identity(3))
+    rotatedDirMat = np.matmul(rotY, prevDir)
 
     dirMat = Direction(Vec3(rotatedDirMat[0][0], rotatedDirMat[0][1], rotatedDirMat[0][2]),
                        Vec3(rotatedDirMat[1][0], rotatedDirMat[1]
@@ -565,6 +564,22 @@ def calculateObjectDir(prevDir: Direction, alpha: float, iterDirection: int):
                        Vec3(rotatedDirMat[2][0], rotatedDirMat[2][1], rotatedDirMat[2][2]))
 
     return dirMat
+
+
+def dirToNPMat(dir: Direction):
+    # Diretion to np matrix
+    dir = np.array(
+        [[dir.xDir.x, dir.xDir.y, dir.xDir.z],
+         [dir.yDir.x, dir.yDir.y, dir.yDir.z],
+         [dir.zDir.x, dir.zDir.y, dir.zDir.z]])
+    return dir
+
+
+def npMatToDir(dir: np.array):
+    # np matrix to Diretion
+    dir = Direction(Vec3(dir[0][0], dir[0][1], dir[0][2]),
+                    Vec3(dir[1][0], dir[1][1], dir[1][2]),
+                    Vec3(dir[2][0], dir[2][1], dir[2][2]))
 
 
 def calcRZPs(numRZPs: int, baseRZP: RZP, iterDirection: int):
@@ -595,10 +610,10 @@ def calcRZPs(numRZPs: int, baseRZP: RZP, iterDirection: int):
 
         # calculate directions
         dirMat = calculateObjectDir(
-            Direction, dirDeviationAngle/2, -iterDirection)
+            np.identity(3), dirDeviationAngle/2, -iterDirection)
         for i in range(math.floor(numRZPs/2)):
             dirMat = calculateObjectDir(
-                dirMat, dirDeviationAngle, iterDirection)
+                dirToNPMat(dirMat), dirDeviationAngle, iterDirection)
             directions[i] = dirMat
 
     # number of RZPs odd
@@ -615,8 +630,11 @@ def calcRZPs(numRZPs: int, baseRZP: RZP, iterDirection: int):
             positions.pop(0)
 
         # calculate directions
-        dirMat = calculateObjectDir(
-            Direction, dirDeviationAngle, iterDirection)
+        dirMat = np.identity(3)
+        for i in range(math.floor(numRZPs/2)):
+            dirMat = calculateObjectDir(
+                dirMat, dirDeviationAngle, iterDirection)
+            directions[i] = npMatToDir(dirMat)
 
     return positions, directions
 
