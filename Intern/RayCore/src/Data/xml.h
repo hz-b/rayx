@@ -14,8 +14,11 @@
 #include "utils.h"
 
 namespace RAYX {
-enum class CentralBeamstop;  // forward declaration
-enum class CurvatureType;  // forward declaration
+// forward declarations:
+enum class CentralBeamstop;
+enum class CurvatureType;
+enum class CylinderDirection;
+enum class FigureRotation;
 
 /** The xml namespace defines functions, which help to implement the
  * createFromXML-functions for the beamline objects. All of these functions
@@ -191,6 +194,30 @@ struct Parser {
     inline double parseLongRadius() { return parseDouble("longRadius"); }
     inline double parseFresnelZOffset() {
         return parseDouble("FresnelZOffset");
+    }
+    inline CylinderDirection parseBendingRadius() {
+        return static_cast<CylinderDirection>(parseInt("bendingRadius"));
+    }
+    inline double parseParameterA11() { return parseDouble("parameter_a11"); }
+    inline FigureRotation parseFigureRotation() {
+        return static_cast<FigureRotation>(parseInt("figureRotation"));
+    }
+    // TODO: Are values stored as 0.0 if set to AUTO?[RAY-UI]
+    inline double parseDesignGrazingIncAngle() {
+        return parseDouble("designGrazingIncAngle");
+    }
+    inline double parseLongHalfAxisA() { return parseDouble("longHalfAxisA"); }
+    inline double parseShortHalfAxisB() {
+        return parseDouble("shortHalfAxisB");
+    }
+    // if old ray ui file, need to recalculate position and orientation because
+    // those in rml file are wrong. not necessary when our recalculated position
+    // and orientation is stored
+    inline double parseDistancePreceding() {
+        return parseDouble("distancePreceding");
+    }
+    inline int parseMisalignmentCoordinateSystem() {
+        return parseInt("misalignmentCoordinateSystem");
     }
 
     rapidxml::xml_node<>* node;

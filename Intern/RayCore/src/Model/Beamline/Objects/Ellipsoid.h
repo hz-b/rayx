@@ -54,8 +54,7 @@ class RAYX_API Ellipsoid : public OpticalElement {
     double getA44() const;
     double getHalfAxisC() const;
 
-    static std::shared_ptr<Ellipsoid> createFromXML(
-        rapidxml::xml_node<>*, const std::vector<xml::Group>& group_context);
+    static std::shared_ptr<Ellipsoid> createFromXML(xml::Parser);
 
   private:
     // user parameters:

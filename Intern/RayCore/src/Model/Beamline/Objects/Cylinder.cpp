@@ -91,80 +91,13 @@ void Cylinder::setRadius() {
     RAYX_LOG << "Radius: " << m_radius;
 }
 
-std::shared_ptr<Cylinder> Cylinder::createFromXML(
-    rapidxml::xml_node<>* node, const std::vector<xml::Group>& group_context) {
-    const char* name = node->first_attribute("name")->value();
-
-    int gs;
-    if (!xml::paramInt(node, "geometricalShape", &gs)) {
-        return nullptr;
-    }
-    Geometry::GeometricalShape geometricalShape =
-        static_cast<Geometry::GeometricalShape>(
-            gs);  // HACK(Jannis): convert to enum
-
-    double width;
-    if (!xml::paramDouble(node, "totalWidth", &width)) {
-        return nullptr;
-    }
-
-    double height;
-    if (!xml::paramDouble(node, "totalLength", &height)) {
-        return nullptr;
-    }
-
-    glm::dvec4 position;
-    glm::dmat4x4 orientation;
-    if (!xml::paramPositionAndOrientation(node, group_context, &position,
-                                          &orientation)) {
-        return nullptr;
-    }
-
-    double incidenceAngle;
-    if (!xml::paramDouble(node, "grazingIncAngle", &incidenceAngle)) {
-        return nullptr;
-    }
-
-    double mEntrance;
-    if (!xml::paramDouble(node, "entranceArmLength", &mEntrance)) {
-        return nullptr;
-    }
-
-    double mExit;
-    if (!xml::paramDouble(node, "exitArmLength", &mExit)) {
-        return nullptr;
-    }
-
-    double mRadius;
-    if (!xml::paramDouble(node, "radius", &mRadius)) {
-        return nullptr;
-    }
-
-    int mBendingRadius;
-    if (!xml::paramInt(node, "bendingRadius", &mBendingRadius)) {
-        return nullptr;
-    }
-
-    double azimuthalAngle;
-    if (!xml::paramDouble(node, "azimuthalAngle", &azimuthalAngle)) {
-        return nullptr;
-    }
-
-    std::array<double, 7> slopeError;
-    if (!xml::paramSlopeError(node, &slopeError)) {
-        return nullptr;
-    }
-
-    Material mat;
-    if (!xml::paramMaterial(node, &mat)) {
-        mat = Material::Cu;  // default to copper
-    }
-
+std::shared_ptr<Cylinder> Cylinder::createFromXML(xml::Parser p) {
     return std::make_shared<Cylinder>(
-        name, geometricalShape, mRadius,
-        static_cast<CylinderDirection>(mBendingRadius), width, height,
-        degToRad(azimuthalAngle), position, orientation, incidenceAngle,
-        mEntrance, mExit, slopeError, mat);
+        p.name(), p.parseGeometricalShape(), p.parseRadius(),
+        p.parseBendingRadius(), p.parseTotalWidth(), p.parseTotalLength(),
+        p.parseAzimuthalAngle(), p.parsePosition(), p.parseOrientation(),
+        p.parseGrazingIncAngle(), p.parseEntranceArmLength(),
+        p.parseExitArmLength(), p.parseSlopeError(), p.parseMaterial());
 }
 
 CylinderDirection Cylinder::getDirection() const { return m_direction; }

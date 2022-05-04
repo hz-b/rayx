@@ -238,116 +238,35 @@ double Ellipsoid::getA44() const { return m_a44; }
 double Ellipsoid::getHalfAxisC() const { return m_halfAxisC; }
 
 // Null if failed
-std::shared_ptr<Ellipsoid> Ellipsoid::createFromXML(
-    rapidxml::xml_node<>* node, const std::vector<xml::Group>& group_context) {
-    const char* name = node->first_attribute("name")->value();
-
-    int gs;
-    if (!xml::paramInt(node, "geometricalShape", &gs)) {
-        return nullptr;
-    }
-    Geometry::GeometricalShape geometricalShape =
-        static_cast<Geometry::GeometricalShape>(gs);
-
-    double width;
-    if (!xml::paramDouble(node, "totalWidth", &width)) {
-        return nullptr;
-    }
-
-    double height;
-    if (!xml::paramDouble(node, "totalLength", &height)) {
-        return nullptr;
-    }
-
-    double incidenceAngle;
-    if (!xml::paramDouble(node, "grazingIncAngle", &incidenceAngle)) {
-        return nullptr;
-    }
-
-    double mEntrance;
-    if (!xml::paramDouble(node, "entranceArmLength", &mEntrance)) {
-        return nullptr;
-    }
-
-    double mExit;
-    if (!xml::paramDouble(node, "exitArmLength", &mExit)) {
-        return nullptr;
-    }
-
-    double mAzimAngle;
-    if (!xml::paramDouble(node, "azimuthalAngle", &mAzimAngle)) {
-        return nullptr;
-    }
-    double m_a11;
-    if (!xml::paramDouble(node, "parameter_a11", &m_a11)) {
-        return nullptr;
-    }
-    int figRot;
-    // const char* fig_rot; // TODO unused
-    if (!xml::paramInt(node, "figureRotation", &figRot)) {
-        return nullptr;
-    }
-
-    std::array<double, 7> slopeError;
-    if (!xml::paramSlopeError(node, &slopeError)) {
-        return nullptr;
-    }
-
-    Material mat;
-    if (!xml::paramMaterial(node, &mat)) {
-        mat = Material::Cu;  // default to copper
-    }
-
-    // TODO: Are values stored as 0.0 if set to AUTO?[RAY-UI]
-    double mDesignGrazing;
-    if (!xml::paramDouble(node, "designGrazingIncAngle", &mDesignGrazing)) {
-        return nullptr;
-    }
-
-    double mlongHalfAxisA;
-    if (!xml::paramDouble(node, "longHalfAxisA", &mlongHalfAxisA)) {
-        return nullptr;
-    }
-
-    double mshortHalfAxisB;
-    if (!xml::paramDouble(node, "shortHalfAxisB", &mshortHalfAxisB)) {
-        return nullptr;
-    }
-
-    // if old ray ui file, need to recalculate position and orientation because
-    // those in rml file are wrong. not necessary when our recalculated position
-    // and orientation is stored
-    double mdistancePreceding;
-    if (!xml::paramDouble(node, "distancePreceding", &mdistancePreceding)) {
-        return nullptr;
-    }
-
-    int mCoordSys;
-    // const char* fig_rot; // TODO unused
-    if (!xml::paramInt(node, "misalignmentCoordinateSystem", &mCoordSys)) {
-        return nullptr;
-    }
-
-    std::array<double, 6> mis;
-    if (!xml::paramMisalignment(node, &mis)) {
-        return nullptr;
-    }
-    glm::dvec4 position;
-    glm::dmat4x4 orientation;
-
-    // read position and orientation from ray-ui files
-    if (!xml::paramPositionAndOrientation(node, group_context, &position,
-                                          &orientation)) {
-        return nullptr;
-    }
+std::shared_ptr<Ellipsoid> Ellipsoid::createFromXML(xml::Parser p) {
+    Geometry::GeometricalShape geometricalShape = p.parseGeometricalShape();
+    double width = p.parseTotalWidth();
+    double height = p.parseTotalLength();
+    double incidenceAngle = p.parseGrazingIncAngle();
+    double mEntrance = p.parseEntranceArmLength();
+    double mExit = p.parseExitArmLength();
+    double mAzimAngle = p.parseAzimuthalAngle();
+    double m_a11 = p.parseParameterA11();
+    FigureRotation figRot = p.parseFigureRotation();
+    std::array<double, 7> slopeError = p.parseSlopeError();
+    Material mat = p.parseMaterial();
+    // TODO: why do all these variables have a 'm' prefix?
+    double mDesignGrazing = p.parseDesignGrazingIncAngle();
+    double mlongHalfAxisA = p.parseLongHalfAxisA();
+    double mshortHalfAxisB = p.parseShortHalfAxisB();
+    double mdistancePreceding = p.parseDistancePreceding();
+    int mCoordSys = p.parseMisalignmentCoordinateSystem();
+    std::array<double, 6> mis = p.parseMisalignment();
+    glm::dvec4 position = p.parsePosition();
+    glm::dmat4x4 orientation = p.parseOrientation();
 
     // use local orientation of ellipsoid the way ray calculates it
-    // to obtain the transformation from the previous element to this element
-    // without actually needing the previous element here
+    // to obtain the transformation from the previous element to this
+    // element without actually needing the previous element here
     GeometricUserParams g_params_rayui = GeometricUserParams(incidenceAngle);
     WorldUserParams w_coord_rayui =
         WorldUserParams(g_params_rayui.getAlpha(), g_params_rayui.getBeta(),
-                        degToRad(mAzimAngle), mdistancePreceding, mis, 0);
+                        mAzimAngle, mdistancePreceding, mis, 0);
     glm::dmat4x4 orientation_rayui = w_coord_rayui.calcOrientation();
 
     // remove RAY-UI's way of calculating the ellipsoid local orientation from
@@ -366,9 +285,9 @@ std::shared_ptr<Ellipsoid> Ellipsoid::createFromXML(
     // now calculate the world coordinates according to RAY-X standard
     double tangentAngle =
         g_params.calcTangentAngle(incidenceAngle, mEntrance, mExit, mCoordSys);
-    WorldUserParams w_coord = WorldUserParams(
-        g_params.getAlpha(), g_params.getBeta(), degToRad(mAzimAngle),
-        mdistancePreceding, mis, tangentAngle);
+    WorldUserParams w_coord =
+        WorldUserParams(g_params.getAlpha(), g_params.getBeta(), mAzimAngle,
+                        mdistancePreceding, mis, tangentAngle);
     // add RAY-X orientation that depends on the coordinate system of the
     // misalignment to the previous orientation
     orientation = orientation_previous * w_coord.calcOrientation();
@@ -380,15 +299,14 @@ std::shared_ptr<Ellipsoid> Ellipsoid::createFromXML(
     if ((mDesignGrazing == 0.0) && (mlongHalfAxisA == 0.0) &&
         (mshortHalfAxisB == 0.0)) {  // Auto calculation
         return std::make_shared<Ellipsoid>(
-            name, geometricalShape, width, height, degToRad(mAzimAngle),
-            position, orientation, incidenceAngle, mEntrance, mExit,
-            static_cast<FigureRotation>(figRot), m_a11, slopeError, mat);
+            p.name(), geometricalShape, width, height, mAzimAngle, position,
+            orientation, incidenceAngle, mEntrance, mExit, figRot, m_a11,
+            slopeError, mat);
     } else {
         return std::make_shared<Ellipsoid>(
-            name, geometricalShape, width, height, degToRad(mAzimAngle),
-            position, mlongHalfAxisA, mshortHalfAxisB, mDesignGrazing,
-            orientation, incidenceAngle, mEntrance, mExit,
-            static_cast<FigureRotation>(figRot), m_a11, slopeError, mat);
+            p.name(), geometricalShape, width, height, mAzimAngle, position,
+            mlongHalfAxisA, mshortHalfAxisB, mDesignGrazing, orientation,
+            incidenceAngle, mEntrance, mExit, figRot, m_a11, slopeError, mat);
     }
 }
 }  // namespace RAYX
