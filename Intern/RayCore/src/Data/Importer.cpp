@@ -48,18 +48,6 @@ void addBeamlineObjectFromXML(rapidxml::xml_node<>* node, Beamline* beamline,
         }
     };
 
-    // calcSourceEnergy does some validity checks and then yields the
-    // source-energy required by the Slit::createFromXML function
-    const auto calcSourceEnergy = [&] {
-        if (beamline->m_LightSources.empty()) {
-            RAYX_ERR << "no light sources!";
-        }
-        if (!beamline->m_LightSources[0]) {
-            RAYX_ERR << "lightSources[0] is nullptr!";
-        }
-        return beamline->m_LightSources[0]->m_EnergyDistribution.getAverage();
-    };
-
     RAYX::xml::Parser parser(node, group_context, filename);
 
     // every beamline object has a function createFromXML which constructs the
@@ -77,8 +65,7 @@ void addBeamlineObjectFromXML(rapidxml::xml_node<>* node, Beamline* beamline,
     } else if (strcmp(type, "Toroid") == 0) {
         addOpticalElement(ToroidMirror::createFromXML(parser), node);
     } else if (strcmp(type, "Slit") == 0) {
-        addOpticalElement(Slit::createFromXML(parser, calcSourceEnergy()),
-                          node);
+        addOpticalElement(Slit::createFromXML(parser), node);
     } else if (strcmp(type, "Spherical Grating") == 0) {
         addOpticalElement(SphereGrating::createFromXML(parser), node);
     } else if (strcmp(type, "Plane Grating") == 0) {

@@ -17,22 +17,18 @@ class RAYX_API Slit : public OpticalElement {
     Slit(const char* name, Geometry::GeometricalShape geometricalShape,
          CentralBeamstop beamstop, double width, double height,
          glm::dvec4 position, glm::dmat4x4 orientation, double beamstopWidth,
-         double beamstopHeight, double sourceEnergy);
+         double beamstopHeight);
 
     Slit();
     ~Slit();
 
-    static std::shared_ptr<Slit> createFromXML(xml::Parser,
-                                               double sourceEnergy);
+    static std::shared_ptr<Slit> createFromXML(xml::Parser);
 
     CentralBeamstop getCentralBeamstop() const;
     double getBeamstopWidth() const;
     double getBeamstopHeight() const;
-    double getWaveLength() const;
 
   private:
-    double m_waveLength;  ///< from lightsource
-
     // TODO(Jannis): Extra class maybe?
     CentralBeamstop m_centralBeamstop;
     double m_beamstopWidth;

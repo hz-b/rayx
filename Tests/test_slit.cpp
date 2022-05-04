@@ -11,37 +11,32 @@ TEST(Slit, defaultParams) {
     double dist = 10000;
     double beamstopWidth = 20;
     double beamstopHeight = 1;
-    double energy = 100;
     std::array<double, 6> misalignment = {0, 0, 0, 0, 0, 0};
 
     RAYX::WorldUserParams w_coord =
         RAYX::WorldUserParams(0, 0, degToRad(chi), dist, misalignment);
     RAYX::Slit s = RAYX::Slit("slit", geometricalShape, beamstop, width, height,
                               w_coord.calcPosition(), w_coord.calcOrientation(),
-                              beamstopWidth, beamstopHeight, energy);
+                              beamstopWidth, beamstopHeight);
     // RAYX::Slit s = RAYX::Slit("slitt", geometricalShape, beamstop, width,
     // height, chi, dist, beamstopWidth, beamstopHeight, energy, misalignment,
     // nullptr, true);
 
-    double wavelength = 12.39852;
-    std::array<double, 4 * 4> correctElementParams = {
-        0, 0, 0, 0, wavelength, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+    std::array<double, 4 * 4> correctElementParams = {0, 0, 0, 0, 0, 0, 0, 0,
+                                                      0, 0, 0, 0, 0, 0, 0, 0};
     std::array<double, 4 * 4> correctObjectParams = {
         width, height, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
     std::array<double, 4 * 4> surface = {0, 0, 0, 0,  0, 0, 0, 0,
                                          0, 0, 0, -1, 3, 0, 0, 0};
     CHECK_EQ(static_cast<int>(s.getCentralBeamstop()),
-                     static_cast<int>(beamstop));
+             static_cast<int>(beamstop));
     CHECK_EQ(s.getBeamstopHeight(), 0);
     CHECK_EQ(s.getBeamstopWidth(), 0);
     CHECK_EQ(s.getHeight(), height);
     CHECK_EQ(s.getWidth(), width);
-    CHECK_EQ(s.getWaveLength(), wavelength);
-    CHECK_EQ(s.getElementParameters(),
-                                  correctElementParams);
+    CHECK_EQ(s.getElementParameters(), correctElementParams);
     CHECK_EQ(s.getSurfaceParams(), surface);
-    CHECK_EQ(s.getObjectParameters(),
-                                  correctObjectParams);
+    CHECK_EQ(s.getObjectParameters(), correctObjectParams);
 
     std::array<double, 4 * 4> correctInMat = {1, 0, 0, 0, 0, 1, 0,      0,
                                               0, 0, 1, 0, 0, 0, -10000, 1};
@@ -61,7 +56,6 @@ TEST(Slit, rectangleBeamstop) {
     double dist = 10000;
     double beamstopWidth = 20;
     double beamstopHeight = 1;
-    double energy = 100;
     std::array<double, 6> misalignment = {0, 0, 0, 0, 0, 0};
 
     RAYX::WorldUserParams w_coord =
@@ -71,14 +65,13 @@ TEST(Slit, rectangleBeamstop) {
     // nullptr, true);
     RAYX::Slit s = RAYX::Slit("slit", geometricalShape, beamstop, width, height,
                               w_coord.calcPosition(), w_coord.calcOrientation(),
-                              beamstopWidth, beamstopHeight, energy);
+                              beamstopWidth, beamstopHeight);
 
-    double wavelength = 12.39852;
     std::array<double, 4 * 4> correctElementParams = {beamstopWidth / 2,
                                                       beamstopHeight / 2,
                                                       0,
                                                       0,
-                                                      wavelength,
+                                                      0,
                                                       0,
                                                       0,
                                                       0,
@@ -95,17 +88,14 @@ TEST(Slit, rectangleBeamstop) {
     std::array<double, 4 * 4> surface = {0, 0, 0, 0,  0, 0, 0, 0,
                                          0, 0, 0, -1, 3, 0, 0, 0};
     CHECK_EQ(static_cast<int>(s.getCentralBeamstop()),
-                     static_cast<int>(beamstop));
+             static_cast<int>(beamstop));
     CHECK_EQ(s.getBeamstopHeight(), beamstopHeight);
     CHECK_EQ(s.getBeamstopWidth(), beamstopWidth);
     CHECK_EQ(s.getHeight(), height);
     CHECK_EQ(s.getWidth(), width);
-    CHECK_EQ(s.getWaveLength(), wavelength);
-    CHECK_EQ(s.getElementParameters(),
-                                  correctElementParams);
+    CHECK_EQ(s.getElementParameters(), correctElementParams);
     CHECK_EQ(s.getSurfaceParams(), surface);
-    CHECK_EQ(s.getObjectParameters(),
-                                  correctObjectParams);
+    CHECK_EQ(s.getObjectParameters(), correctObjectParams);
 
     std::array<double, 4 * 4> correctInMat = {1, 0, 0, 0, 0, 1, 0,      0,
                                               0, 0, 1, 0, 0, 0, -10000, 1};
@@ -125,7 +115,6 @@ TEST(Slit, ellipticalBeamstop) {
     double dist = 10000;
     double beamstopWidth = 20;
     double beamstopHeight = 1;
-    double energy = 100;
     std::array<double, 6> misalignment = {0, 0, 0, 0, 0, 0};
 
     RAYX::WorldUserParams w_coord =
@@ -135,14 +124,13 @@ TEST(Slit, ellipticalBeamstop) {
     // nullptr, true);
     RAYX::Slit s = RAYX::Slit("slit", geometricalShape, beamstop, width, height,
                               w_coord.calcPosition(), w_coord.calcOrientation(),
-                              beamstopWidth, beamstopHeight, energy);
+                              beamstopWidth, beamstopHeight);
 
-    double wavelength = 12.39852;
     std::array<double, 4 * 4> correctElementParams = {-beamstopWidth / 2,
                                                       beamstopHeight / 2,
                                                       0,
                                                       0,
-                                                      wavelength,
+                                                      0,
                                                       0,
                                                       0,
                                                       0,
@@ -159,17 +147,14 @@ TEST(Slit, ellipticalBeamstop) {
     std::array<double, 4 * 4> surface = {0, 0, 0, 0,  0, 0, 0, 0,
                                          0, 0, 0, -1, 3, 0, 0, 0};
     CHECK_EQ(static_cast<int>(s.getCentralBeamstop()),
-                     static_cast<int>(beamstop));
+             static_cast<int>(beamstop));
     CHECK_EQ(s.getBeamstopHeight(), beamstopHeight);
     CHECK_EQ(s.getBeamstopWidth(), -beamstopWidth);
     CHECK_EQ(s.getHeight(), height);
     CHECK_EQ(s.getWidth(), width);
-    CHECK_EQ(s.getWaveLength(), wavelength);
-    CHECK_EQ(s.getElementParameters(),
-                                  correctElementParams);
+    CHECK_EQ(s.getElementParameters(), correctElementParams);
     CHECK_EQ(s.getSurfaceParams(), surface);
-    CHECK_EQ(s.getObjectParameters(),
-                                  correctObjectParams);
+    CHECK_EQ(s.getObjectParameters(), correctObjectParams);
 
     std::array<double, 4 * 4> correctInMat = {1, 0, 0, 0, 0, 1, 0,      0,
                                               0, 0, 1, 0, 0, 0, -10000, 1};
@@ -189,7 +174,6 @@ TEST(Slit, ellipticalSlitellipticalBeamstop) {
     double dist = 10000;
     double beamstopWidth = 20;
     double beamstopHeight = 1;
-    double energy = 100;
     std::array<double, 6> misalignment = {0, 0, 0, 0, 0, 0};
 
     RAYX::WorldUserParams w_coord =
@@ -199,14 +183,13 @@ TEST(Slit, ellipticalSlitellipticalBeamstop) {
     // nullptr, true);
     RAYX::Slit s = RAYX::Slit("slit", geometricalShape, beamstop, width, height,
                               w_coord.calcPosition(), w_coord.calcOrientation(),
-                              beamstopWidth, beamstopHeight, energy);
+                              beamstopWidth, beamstopHeight);
 
-    double wavelength = 12.39852;
     std::array<double, 4 * 4> correctElementParams = {-beamstopWidth / 2,
                                                       beamstopHeight / 2,
                                                       0,
                                                       0,
-                                                      wavelength,
+                                                      0,
                                                       0,
                                                       0,
                                                       0,
@@ -223,17 +206,14 @@ TEST(Slit, ellipticalSlitellipticalBeamstop) {
     std::array<double, 4 * 4> surface = {0, 0, 0, 0,  0, 0, 0, 0,
                                          0, 0, 0, -1, 3, 0, 0, 0};
     CHECK_EQ(static_cast<int>(s.getCentralBeamstop()),
-                     static_cast<int>(beamstop));
+             static_cast<int>(beamstop));
     CHECK_EQ(s.getBeamstopHeight(), beamstopHeight);
     CHECK_EQ(s.getBeamstopWidth(), -beamstopWidth);
     CHECK_EQ(s.getHeight(), -height);
     CHECK_EQ(s.getWidth(), -width);
-    CHECK_EQ(s.getWaveLength(), wavelength);
-    CHECK_EQ(s.getElementParameters(),
-                                  correctElementParams);
+    CHECK_EQ(s.getElementParameters(), correctElementParams);
     CHECK_EQ(s.getSurfaceParams(), surface);
-    CHECK_EQ(s.getObjectParameters(),
-                                  correctObjectParams);
+    CHECK_EQ(s.getObjectParameters(), correctObjectParams);
 
     std::array<double, 4 * 4> correctInMat = {0.98480775301220802,
                                               -0.17364817766693033,
@@ -281,7 +261,6 @@ TEST(Slit, ellipticalSlitrectangleBeamstop) {
     double dist = 1234;
     double beamstopWidth = 20;
     double beamstopHeight = 1;
-    double energy = 100;
     std::array<double, 6> misalignment = {0, 0, 0, 0, 0, 0};
 
     RAYX::WorldUserParams w_coord =
@@ -291,14 +270,13 @@ TEST(Slit, ellipticalSlitrectangleBeamstop) {
     // nullptr, true);
     RAYX::Slit s = RAYX::Slit("slit", geometricalShape, beamstop, width, height,
                               w_coord.calcPosition(), w_coord.calcOrientation(),
-                              beamstopWidth, beamstopHeight, energy);
+                              beamstopWidth, beamstopHeight);
 
-    double wavelength = 12.39852;
     std::array<double, 4 * 4> correctElementParams = {beamstopWidth / 2,
                                                       beamstopHeight / 2,
                                                       0,
                                                       0,
-                                                      wavelength,
+                                                      0,
                                                       0,
                                                       0,
                                                       0,
@@ -315,17 +293,14 @@ TEST(Slit, ellipticalSlitrectangleBeamstop) {
     std::array<double, 4 * 4> surface = {0, 0, 0, 0,  0, 0, 0, 0,
                                          0, 0, 0, -1, 3, 0, 0, 0};
     CHECK_EQ(static_cast<int>(s.getCentralBeamstop()),
-                     static_cast<int>(beamstop));
+             static_cast<int>(beamstop));
     CHECK_EQ(s.getBeamstopHeight(), beamstopHeight);
     CHECK_EQ(s.getBeamstopWidth(), beamstopWidth);
     CHECK_EQ(s.getHeight(), -height);
     CHECK_EQ(s.getWidth(), -width);
-    CHECK_EQ(s.getWaveLength(), wavelength);
-    CHECK_EQ(s.getElementParameters(),
-                                  correctElementParams);
+    CHECK_EQ(s.getElementParameters(), correctElementParams);
     CHECK_EQ(s.getSurfaceParams(), surface);
-    CHECK_EQ(s.getObjectParameters(),
-                                  correctObjectParams);
+    CHECK_EQ(s.getObjectParameters(), correctObjectParams);
 
     std::array<double, 4 * 4> correctInMat = {1, 0, 0, 0, 0, 1, 0,     0,
                                               0, 0, 1, 0, 0, 0, -1234, 1};
@@ -345,7 +320,6 @@ TEST(Slit, ellipticalSlitNoBeamstop) {
     double dist = 1201;
     double beamstopWidth = 20;
     double beamstopHeight = 1;
-    double energy = 100;
     std::array<double, 6> misalignment = {0, 0, 0, 0, 0, 0};
 
     RAYX::WorldUserParams w_coord =
@@ -355,27 +329,23 @@ TEST(Slit, ellipticalSlitNoBeamstop) {
     // nullptr, true);
     RAYX::Slit s = RAYX::Slit("slit", geometricalShape, beamstop, width, height,
                               w_coord.calcPosition(), w_coord.calcOrientation(),
-                              beamstopWidth, beamstopHeight, energy);
+                              beamstopWidth, beamstopHeight);
 
-    double wavelength = 12.39852;
-    std::array<double, 4 * 4> correctElementParams = {
-        0, 0, 0, 0, wavelength, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+    std::array<double, 4 * 4> correctElementParams = {0, 0, 0, 0, 0, 0, 0, 0,
+                                                      0, 0, 0, 0, 0, 0, 0, 0};
     std::array<double, 4 * 4> correctObjectParams = {
         -width, -height, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
     std::array<double, 4 * 4> surface = {0, 0, 0, 0,  0, 0, 0, 0,
                                          0, 0, 0, -1, 3, 0, 0, 0};
     CHECK_EQ(static_cast<int>(s.getCentralBeamstop()),
-                     static_cast<int>(beamstop));
+             static_cast<int>(beamstop));
     CHECK_EQ(s.getBeamstopHeight(), 0);
     CHECK_EQ(s.getBeamstopWidth(), 0);
     CHECK_EQ(s.getHeight(), -height);
     CHECK_EQ(s.getWidth(), -width);
-    CHECK_EQ(s.getWaveLength(), wavelength);
-    CHECK_EQ(s.getElementParameters(),
-                                  correctElementParams);
+    CHECK_EQ(s.getElementParameters(), correctElementParams);
     CHECK_EQ(s.getSurfaceParams(), surface);
-    CHECK_EQ(s.getObjectParameters(),
-                                  correctObjectParams);
+    CHECK_EQ(s.getObjectParameters(), correctObjectParams);
 
     std::array<double, 4 * 4> correctInMat = {0.97814760073380569,
                                               -0.20791169081775931,

@@ -25,12 +25,12 @@ namespace RAYX {
 Slit::Slit(const char* name, Geometry::GeometricalShape geometricalShape,
            CentralBeamstop beamstop, double width, double height,
            glm::dvec4 position, glm::dmat4x4 orientation, double beamstopWidth,
-           double beamstopHeight, double sourceEnergy)
+           double beamstopHeight)
     : OpticalElement(
           name, geometricalShape, width, height, 0, position, orientation,
           {0, 0, 0, 0, 0, 0,
-           0}),  // no azimuthal angle for slit bc no efficiency needed
-      m_waveLength(abs(hvlam(sourceEnergy))) {
+           0})  // no azimuthal angle for slit bc no efficiency needed
+{
     m_centralBeamstop = beamstop;
 
     // if no beamstop -> set to zero
@@ -50,25 +50,23 @@ Slit::Slit(const char* name, Geometry::GeometricalShape geometricalShape,
 
     setSurface(std::make_unique<Quadric>(std::array<double, 4 * 4>{
         0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -1, 3, 0, 0, 0}));
-    setElementParameters({m_beamstopWidth / 2, m_beamstopHeight / 2, 0, 0,
-                          m_waveLength, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0});
+    setElementParameters({m_beamstopWidth / 2, m_beamstopHeight / 2, 0, 0, 0, 0,
+                          0, 0, 0, 0, 0, 0, 0, 0, 0, 0});
     RAYX_LOG << "Created.";
 }
 
 Slit::Slit() {}
 Slit::~Slit() {}
 
-std::shared_ptr<Slit> Slit::createFromXML(xml::Parser p, double sourceEnergy) {
+std::shared_ptr<Slit> Slit::createFromXML(xml::Parser p) {
     return std::make_shared<Slit>(p.name(), p.parseGeometricalShape(),
                                   p.parseCentralBeamstop(), p.parseTotalWidth(),
                                   p.parseTotalHeight(), p.parsePosition(),
                                   p.parseOrientation(), p.parseTotalWidthStop(),
-                                  p.parseTotalHeightStop(), sourceEnergy);
+                                  p.parseTotalHeightStop());
 }
 
 CentralBeamstop Slit::getCentralBeamstop() const { return m_centralBeamstop; }
 double Slit::getBeamstopWidth() const { return m_beamstopWidth; }
 double Slit::getBeamstopHeight() const { return m_beamstopHeight; }
-double Slit::getWaveLength() const { return m_waveLength; }
-
 }  // namespace RAYX

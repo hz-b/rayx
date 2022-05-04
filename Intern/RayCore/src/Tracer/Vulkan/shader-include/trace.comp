@@ -42,7 +42,7 @@ Ray traceSlit(Ray r, const int elementIndex, inout uint64_t ctr, dvec4 intersect
     double delPhi     = 0;
     double delPsi     = 0;
     int iopt          = 1;                             // 1 = slit, 3 = zone plate
-    double wavelength = slit.elementParameters[1][0];  // from parameters or per ray
+    double wavelength = hvlam(r.energy);
     diffraction(iopt, x_extent, y_extent, wavelength, delPhi, delPsi, ctr);
     phi = phi + delPhi;
     psi = psi + delPsi;
