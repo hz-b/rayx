@@ -77,98 +77,114 @@ struct Parser {
     Parser(rapidxml::xml_node<>* node, std::vector<xml::Group> group_context,
            std::filesystem::path rmlFile);
 
-    const char* name();
+    const char* name() const;
 
     // parsers for fundamental types
-    double parseDouble(const char* paramname);
-    int parseInt(const char* paramname);
-    const char* parseStr(const char* paramname);
-    glm::dvec3 parseDvec3(const char* paramname);
+    double parseDouble(const char* paramname) const;
+    int parseInt(const char* paramname) const;
+    const char* parseStr(const char* paramname) const;
+    glm::dvec3 parseDvec3(const char* paramname) const;
 
     // parsers for derived parameters
-    std::array<double, 6> parseMisalignment();
-    std::array<double, 7> parseSlopeError();
-    std::array<double, 6> parseVls();
-    EnergyDistribution parseEnergyDistribution();
-    glm::dvec4 parsePosition();
-    glm::dmat4x4 parseOrientation();
-    Material parseMaterial();
+    std::array<double, 6> parseMisalignment() const;
+    std::array<double, 7> parseSlopeError() const;
+    std::array<double, 6> parseVls() const;
+    EnergyDistribution parseEnergyDistribution() const;
+    glm::dvec4 parsePosition() const;
+    glm::dmat4x4 parseOrientation() const;
+    Material parseMaterial() const;
 
     // parsers for trivial derived parameters
-    inline int parseNumberRays() { return parseInt("numberRays"); }
-    inline double parseSourceWidth() { return parseDouble("sourceWidth"); }
-    inline double parseSourceHeight() { return parseDouble("sourceHeight"); }
-    inline double parseSourceDepth() { return parseDouble("sourceDepth"); }
-    inline double parseHorDiv() { return parseDouble("horDiv") / 1000.0; }
-    inline double parseVerDiv() { return parseDouble("verDiv") / 1000.0; }
-    inline SourceDist parseSourceWidthDistribution() {
+    inline int parseNumberRays() const { return parseInt("numberRays"); }
+    inline double parseSourceWidth() const {
+        return parseDouble("sourceWidth");
+    }
+    inline double parseSourceHeight() const {
+        return parseDouble("sourceHeight");
+    }
+    inline double parseSourceDepth() const {
+        return parseDouble("sourceDepth");
+    }
+    inline double parseHorDiv() const { return parseDouble("horDiv") / 1000.0; }
+    inline double parseVerDiv() const { return parseDouble("verDiv") / 1000.0; }
+    inline SourceDist parseSourceWidthDistribution() const {
         return static_cast<SourceDist>(parseInt("sourceWidthDistribution"));
     }
-    inline SourceDist parseSourceHeightDistribution() {
+    inline SourceDist parseSourceHeightDistribution() const {
         return static_cast<SourceDist>(parseInt("sourceHeightDistribution"));
     }
-    inline SourceDist parseHorDivDistribution() {
+    inline SourceDist parseHorDivDistribution() const {
         return static_cast<SourceDist>(parseInt("horDivDistribution"));
     }
-    inline SourceDist parseVerDivDistribution() {
+    inline SourceDist parseVerDivDistribution() const {
         return static_cast<SourceDist>(parseInt("verDivDistribution"));
     }
-    inline int parseLinearPol0() { return parseInt("linearPol_0"); }
-    inline int parseLinearPol45() { return parseInt("linearPol_45"); }
-    inline int parseCircularPol() { return parseInt("circularPol"); }
-    inline Geometry::GeometricalShape parseGeometricalShape() {
+    inline int parseLinearPol0() const { return parseInt("linearPol_0"); }
+    inline int parseLinearPol45() const { return parseInt("linearPol_45"); }
+    inline int parseCircularPol() const { return parseInt("circularPol"); }
+    inline Geometry::GeometricalShape parseGeometricalShape() const {
         return static_cast<Geometry::GeometricalShape>(
             parseInt("geometricalShape"));
     }
-    inline double parseTotalWidth() { return parseDouble("totalWidth"); }
-    inline double parseTotalLength() { return parseDouble("totalLength"); }
-    inline double parseTotalHeight() { return parseDouble("totalHeight"); }
-    inline double parseAzimuthalAngle() {
+    inline double parseTotalWidth() const { return parseDouble("totalWidth"); }
+    inline double parseTotalLength() const {
+        return parseDouble("totalLength");
+    }
+    inline double parseTotalHeight() const {
+        return parseDouble("totalHeight");
+    }
+    inline double parseAzimuthalAngle() const {
         return degToRad(parseDouble("azimuthalAngle"));
     }
-    inline double parseGrazingIncAngle() {
+    inline double parseGrazingIncAngle() const {
         return parseDouble(
             "grazingIncAngle");  // TODO(rudi): is it intentional that we don't
                                  // do degToRad here?
     }
-    inline double parseEntranceArmLength() {
+    inline double parseEntranceArmLength() const {
         return parseDouble("entranceArmLength");
     }
-    inline double parseExitArmLength() { return parseDouble("exitArmLength"); }
-    inline double parseEntranceArmLengthMer() {
+    inline double parseExitArmLength() const {
+        return parseDouble("exitArmLength");
+    }
+    inline double parseEntranceArmLengthMer() const {
         return parseDouble("entranceArmLengthMer");
     }
-    inline double parseExitArmLengthMer() {
+    inline double parseExitArmLengthMer() const {
         return parseDouble("exitArmLengthMer");
     }
-    inline double parseEntranceArmLengthSag() {
+    inline double parseEntranceArmLengthSag() const {
         return parseDouble("entranceArmLengthSag");
     }
-    inline double parseExitArmLengthSag() {
+    inline double parseExitArmLengthSag() const {
         return parseDouble("exitArmLengthSag");
     }
-    inline CentralBeamstop parseCentralBeamstop() {
+    inline CentralBeamstop parseCentralBeamstop() const {
         return static_cast<CentralBeamstop>(parseInt("centralBeamstop"));
     }
-    inline double parseTotalWidthStop() {
+    inline double parseTotalWidthStop() const {
         return parseDouble("totalWidthStop");
     }
-    inline double parseTotalHeightStop() {
+    inline double parseTotalHeightStop() const {
         return parseDouble("totalHeightStop");
     }
-    inline GratingMount parseGratingMount() {
+    inline GratingMount parseGratingMount() const {
         return static_cast<GratingMount>(parseInt("gratingMount"));
     }
-    inline double parseRadius() { return parseDouble("radius"); }
-    inline double parseDesignEnergy() { return parseDouble("designEnergy"); }
-    inline double parseLineDensity() { return parseDouble("lineDensity"); }
-    inline double parseOrderDiffraction() {
+    inline double parseRadius() const { return parseDouble("radius"); }
+    inline double parseDesignEnergy() const {
+        return parseDouble("designEnergy");
+    }
+    inline double parseLineDensity() const {
+        return parseDouble("lineDensity");
+    }
+    inline double parseOrderDiffraction() const {
         return parseDouble("orderDiffraction");
     }
-    inline double parseDesignEnergyMounting() {
+    inline double parseDesignEnergyMounting() const {
         return parseDouble("designEnergyMounting");
     }
-    inline double parseAdditionalOrder() {
+    inline double parseAdditionalOrder() const {
         double additionalZeroOrder = 0;
 
         // may be missing in some RML
@@ -177,46 +193,52 @@ struct Parser {
         return additionalZeroOrder;
     }
 
-    inline CurvatureType parseCurvatureType() {
+    inline CurvatureType parseCurvatureType() const {
         return static_cast<CurvatureType>(parseInt("curvatureType"));
     }
 
-    inline double parseDesignOrderDiffraction() {
+    inline double parseDesignOrderDiffraction() const {
         return parseDouble("designOrderDiffraction");
     }
-    inline double parseDesignAlphaAngle() {
+    inline double parseDesignAlphaAngle() const {
         return parseDouble("designAlphaAngle");
     }
-    inline double parseDesignBetaAngle() {
+    inline double parseDesignBetaAngle() const {
         return parseDouble("designBetaAngle");
     }
-    inline double parseShortRadius() { return parseDouble("shortRadius"); }
-    inline double parseLongRadius() { return parseDouble("longRadius"); }
-    inline double parseFresnelZOffset() {
+    inline double parseShortRadius() const {
+        return parseDouble("shortRadius");
+    }
+    inline double parseLongRadius() const { return parseDouble("longRadius"); }
+    inline double parseFresnelZOffset() const {
         return parseDouble("FresnelZOffset");
     }
-    inline CylinderDirection parseBendingRadius() {
+    inline CylinderDirection parseBendingRadius() const {
         return static_cast<CylinderDirection>(parseInt("bendingRadius"));
     }
-    inline double parseParameterA11() { return parseDouble("parameter_a11"); }
-    inline FigureRotation parseFigureRotation() {
+    inline double parseParameterA11() const {
+        return parseDouble("parameter_a11");
+    }
+    inline FigureRotation parseFigureRotation() const {
         return static_cast<FigureRotation>(parseInt("figureRotation"));
     }
     // TODO: Are values stored as 0.0 if set to AUTO?[RAY-UI]
-    inline double parseDesignGrazingIncAngle() {
+    inline double parseDesignGrazingIncAngle() const {
         return parseDouble("designGrazingIncAngle");
     }
-    inline double parseLongHalfAxisA() { return parseDouble("longHalfAxisA"); }
-    inline double parseShortHalfAxisB() {
+    inline double parseLongHalfAxisA() const {
+        return parseDouble("longHalfAxisA");
+    }
+    inline double parseShortHalfAxisB() const {
         return parseDouble("shortHalfAxisB");
     }
     // if old ray ui file, need to recalculate position and orientation because
     // those in rml file are wrong. not necessary when our recalculated position
     // and orientation is stored
-    inline double parseDistancePreceding() {
+    inline double parseDistancePreceding() const {
         return parseDouble("distancePreceding");
     }
-    inline int parseMisalignmentCoordinateSystem() {
+    inline int parseMisalignmentCoordinateSystem() const {
         return parseInt("misalignmentCoordinateSystem");
     }
 

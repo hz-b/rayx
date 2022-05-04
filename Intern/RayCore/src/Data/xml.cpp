@@ -11,109 +11,7 @@
 namespace RAYX {
 namespace xml {
 
-Parser::Parser(rapidxml::xml_node<>* node,
-               std::vector<xml::Group> group_context,
-               std::filesystem::path rmlFile)
-    : node(node), group_context(group_context), rmlFile(rmlFile) {}
-
-const char* Parser::name() { return node->first_attribute("name")->value(); }
-
-// parsers for fundamental types
-double Parser::parseDouble(const char* paramname) {
-    double d;
-    if (!paramDouble(node, paramname, &d)) {
-        throw "parseDouble failed";
-    }
-    return d;
-}
-
-int Parser::parseInt(const char* paramname) {
-    int i;
-    if (!paramInt(node, paramname, &i)) {
-        throw "parseInt failed";
-    }
-    return i;
-}
-
-const char* Parser::parseStr(const char* paramname) {
-    const char* s;
-    if (!paramStr(node, paramname, &s)) {
-        throw "parseStr failed";
-    }
-    return s;
-}
-
-glm::dvec3 Parser::parseDvec3(const char* paramname) {
-    glm::dvec3 v;
-    if (!paramDvec3(node, paramname, &v)) {
-        throw "parseDvec3 failed";
-    }
-    return v;
-}
-
-// parsers for derived parameters
-std::array<double, 6> Parser::parseMisalignment() {
-    std::array<double, 6> x;
-    if (!paramMisalignment(node, &x)) {
-        throw "parseMisalignment failed";
-    }
-    return x;
-}
-
-std::array<double, 7> Parser::parseSlopeError() {
-    std::array<double, 7> x;
-    if (!paramSlopeError(node, &x)) {
-        throw "parseSlopeError failed";
-    }
-    return x;
-}
-
-std::array<double, 6> Parser::parseVls() {
-    std::array<double, 6> x;
-    if (!paramVls(node, &x)) {
-        throw "parseVls failed";
-    }
-    return x;
-}
-
-EnergyDistribution Parser::parseEnergyDistribution() {
-    EnergyDistribution x;
-    if (!paramEnergyDistribution(node, rmlFile, &x)) {
-        throw "parseEnergyDistribution failed";
-    }
-    return x;
-}
-
-glm::dvec4 Parser::parsePosition() {
-    glm::dvec4 x;
-    glm::dmat4x4 y;
-    if (!paramPositionAndOrientation(node, group_context, &x, &y)) {
-        throw "parsePosition failed";
-    }
-    return x;
-}
-
-glm::dmat4x4 Parser::parseOrientation() {
-    glm::dvec4 x;
-    glm::dmat4x4 y;
-    if (!paramPositionAndOrientation(node, group_context, &x, &y)) {
-        throw "parseOrientation failed";
-    }
-    return y;
-}
-
-Material Parser::parseMaterial() {
-    Material m;
-    if (!paramMaterial(node, &m)) {
-        RAYX_D_LOG
-            << "No material specified in RML file: defaulting to copper!";
-        return Material::Cu;
-    }
-    return m;
-}
-
 // general scope functions:
-
 bool param(const rapidxml::xml_node<>* node, const char* paramname,
            rapidxml::xml_node<>** out) {
     if (!node || !out) {
@@ -472,5 +370,111 @@ bool parseGroup(rapidxml::xml_node<>* node, xml::Group* out) {
 
     return true;
 }
+
+// Parser implementation
+
+Parser::Parser(rapidxml::xml_node<>* node,
+               std::vector<xml::Group> group_context,
+               std::filesystem::path rmlFile)
+    : node(node), group_context(group_context), rmlFile(rmlFile) {}
+
+const char* Parser::name() const {
+    return node->first_attribute("name")->value();
+}
+
+// parsers for fundamental types
+double Parser::parseDouble(const char* paramname) const {
+    double d;
+    if (!paramDouble(node, paramname, &d)) {
+        throw "parseDouble failed";
+    }
+    return d;
+}
+
+int Parser::parseInt(const char* paramname) const {
+    int i;
+    if (!paramInt(node, paramname, &i)) {
+        throw "parseInt failed";
+    }
+    return i;
+}
+
+const char* Parser::parseStr(const char* paramname) const {
+    const char* s;
+    if (!paramStr(node, paramname, &s)) {
+        throw "parseStr failed";
+    }
+    return s;
+}
+
+glm::dvec3 Parser::parseDvec3(const char* paramname) const {
+    glm::dvec3 v;
+    if (!paramDvec3(node, paramname, &v)) {
+        throw "parseDvec3 failed";
+    }
+    return v;
+}
+
+// parsers for derived parameters
+std::array<double, 6> Parser::parseMisalignment() const {
+    std::array<double, 6> x;
+    if (!paramMisalignment(node, &x)) {
+        throw "parseMisalignment failed";
+    }
+    return x;
+}
+
+std::array<double, 7> Parser::parseSlopeError() const {
+    std::array<double, 7> x;
+    if (!paramSlopeError(node, &x)) {
+        throw "parseSlopeError failed";
+    }
+    return x;
+}
+
+std::array<double, 6> Parser::parseVls() const {
+    std::array<double, 6> x;
+    if (!paramVls(node, &x)) {
+        throw "parseVls failed";
+    }
+    return x;
+}
+
+EnergyDistribution Parser::parseEnergyDistribution() const {
+    EnergyDistribution x;
+    if (!paramEnergyDistribution(node, rmlFile, &x)) {
+        throw "parseEnergyDistribution failed";
+    }
+    return x;
+}
+
+glm::dvec4 Parser::parsePosition() const {
+    glm::dvec4 x;
+    glm::dmat4x4 y;
+    if (!paramPositionAndOrientation(node, group_context, &x, &y)) {
+        throw "parsePosition failed";
+    }
+    return x;
+}
+
+glm::dmat4x4 Parser::parseOrientation() const {
+    glm::dvec4 x;
+    glm::dmat4x4 y;
+    if (!paramPositionAndOrientation(node, group_context, &x, &y)) {
+        throw "parseOrientation failed";
+    }
+    return y;
+}
+
+Material Parser::parseMaterial() const {
+    Material m;
+    if (!paramMaterial(node, &m)) {
+        RAYX_D_LOG
+            << "No material specified in RML file: defaulting to copper!";
+        return Material::Cu;
+    }
+    return m;
+}
+
 }  // namespace xml
 }  // namespace RAYX
