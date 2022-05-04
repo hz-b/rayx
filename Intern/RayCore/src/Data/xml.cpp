@@ -386,7 +386,7 @@ const char* Parser::name() const {
 double Parser::parseDouble(const char* paramname) const {
     double d;
     if (!paramDouble(node, paramname, &d)) {
-        throw "parseDouble failed";
+        throw std::runtime_error("parseDouble failed");
     }
     return d;
 }
@@ -394,7 +394,7 @@ double Parser::parseDouble(const char* paramname) const {
 int Parser::parseInt(const char* paramname) const {
     int i;
     if (!paramInt(node, paramname, &i)) {
-        throw "parseInt failed";
+        throw std::runtime_error("parseInt failed");
     }
     return i;
 }
@@ -402,7 +402,7 @@ int Parser::parseInt(const char* paramname) const {
 const char* Parser::parseStr(const char* paramname) const {
     const char* s;
     if (!paramStr(node, paramname, &s)) {
-        throw "parseStr failed";
+        throw std::runtime_error("parseStr failed");
     }
     return s;
 }
@@ -410,7 +410,7 @@ const char* Parser::parseStr(const char* paramname) const {
 glm::dvec3 Parser::parseDvec3(const char* paramname) const {
     glm::dvec3 v;
     if (!paramDvec3(node, paramname, &v)) {
-        throw "parseDvec3 failed";
+        throw std::runtime_error("parseDvec3 failed");
     }
     return v;
 }
@@ -419,7 +419,7 @@ glm::dvec3 Parser::parseDvec3(const char* paramname) const {
 std::array<double, 6> Parser::parseMisalignment() const {
     std::array<double, 6> x;
     if (!paramMisalignment(node, &x)) {
-        throw "parseMisalignment failed";
+        throw std::runtime_error("parseMisalignment failed");
     }
     return x;
 }
@@ -427,7 +427,7 @@ std::array<double, 6> Parser::parseMisalignment() const {
 std::array<double, 7> Parser::parseSlopeError() const {
     std::array<double, 7> x;
     if (!paramSlopeError(node, &x)) {
-        throw "parseSlopeError failed";
+        throw std::runtime_error("parseSlopeError failed");
     }
     return x;
 }
@@ -435,7 +435,7 @@ std::array<double, 7> Parser::parseSlopeError() const {
 std::array<double, 6> Parser::parseVls() const {
     std::array<double, 6> x;
     if (!paramVls(node, &x)) {
-        throw "parseVls failed";
+        throw std::runtime_error("parseVls failed");
     }
     return x;
 }
@@ -443,7 +443,7 @@ std::array<double, 6> Parser::parseVls() const {
 EnergyDistribution Parser::parseEnergyDistribution() const {
     EnergyDistribution x;
     if (!paramEnergyDistribution(node, rmlFile, &x)) {
-        throw "parseEnergyDistribution failed";
+        throw std::runtime_error("parseEnergyDistribution failed");
     }
     return x;
 }
@@ -452,7 +452,7 @@ glm::dvec4 Parser::parsePosition() const {
     glm::dvec4 x;
     glm::dmat4x4 y;
     if (!paramPositionAndOrientation(node, group_context, &x, &y)) {
-        throw "parsePosition failed";
+        throw std::runtime_error("parsePosition failed");
     }
     return x;
 }
@@ -461,7 +461,7 @@ glm::dmat4x4 Parser::parseOrientation() const {
     glm::dvec4 x;
     glm::dmat4x4 y;
     if (!paramPositionAndOrientation(node, group_context, &x, &y)) {
-        throw "parseOrientation failed";
+        throw std::runtime_error("parseOrientation failed");
     }
     return y;
 }
