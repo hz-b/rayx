@@ -6,26 +6,16 @@
 #include <fstream>
 #include <sstream>
 
+#include "Debug.h"
 #include "Debug/Instrumentor.h"
-#include "Model/Beamline/Objects/ImagePlane.h"
-#include "Model/Beamline/Objects/MatrixSource.h"
-#include "Model/Beamline/Objects/PlaneGrating.h"
-#include "Model/Beamline/Objects/PlaneMirror.h"
-#include "Model/Beamline/Objects/PointSource.h"
-#include "Model/Beamline/Objects/ReflectionZonePlate.h"
-#include "Model/Beamline/Objects/Slit.h"
-#include "Model/Beamline/Objects/SphereGrating.h"
-#include "Model/Beamline/Objects/SphereMirror.h"
-#include "Model/Beamline/Objects/ToroidMirror.h"
+#include "Model/Beamline/Objects/Objects.h"
 #include "rapidxml.hpp"
 
 namespace RAYX {
-Importer::Importer() {}
-
-Importer::~Importer() {}
 
 void addBeamlineObjectFromXML(rapidxml::xml_node<>* node, Beamline* beamline,
-                              const std::vector<xml::Group>& group_context) {
+                              const std::vector<xml::Group>& group_context,
+                              std::filesystem::path filename) {
     const char* type = node->first_attribute("type")->value();
 
     // the following three blocks of code are lambda expressions (see
@@ -39,10 +29,9 @@ void addBeamlineObjectFromXML(rapidxml::xml_node<>* node, Beamline* beamline,
         if (s) {
             beamline->m_LightSources.push_back(s);
         } else {
-            std::cerr << "could not construct LightSource with Name: "
-                      << node->first_attribute("name")->value()
-                      << "; Type: " << node->first_attribute("type")->value()
-                      << '\n';
+            RAYX_ERR << "could not construct LightSource with Name: "
+                     << node->first_attribute("name")->value()
+                     << "; Type: " << node->first_attribute("type")->value();
         }
     };
 
@@ -53,57 +42,46 @@ void addBeamlineObjectFromXML(rapidxml::xml_node<>* node, Beamline* beamline,
         if (e) {
             beamline->m_OpticalElements.push_back(e);
         } else {
-            std::cerr << "could not construct OpticalElement with Name: "
-                      << node->first_attribute("name")->value()
-                      << "; Type: " << node->first_attribute("type")->value()
-                      << '\n';
+            RAYX_ERR << "could not construct OpticalElement with Name: "
+                     << node->first_attribute("name")->value()
+                     << "; Type: " << node->first_attribute("type")->value();
         }
     };
 
-    // calcSourceEnergy does some validity checks and then yields the
-    // source-energy required by the Slit::createFromXML function
-    const auto calcSourceEnergy = [&] {
-        assert(!beamline->m_LightSources.empty());
-        assert(beamline->m_LightSources[0]);
-        return beamline->m_LightSources[0]->m_EnergyDistribution.getAverage();
-    };
+    RAYX::xml::Parser parser(node, group_context, filename);
 
     // every beamline object has a function createFromXML which constructs the
     // object from a given xml-node if possible (otherwise it will return a
     // nullptr) The createFromXML functions use the param* functions declared in
     // <Data/xml.h>
     if (strcmp(type, "Point Source") == 0) {
-        addLightSource(PointSource::createFromXML(node), node);
+        addLightSource(PointSource::createFromXML(parser), node);
     } else if (strcmp(type, "Matrix Source") == 0) {
-        addLightSource(MatrixSource::createFromXML(node), node);
+        addLightSource(MatrixSource::createFromXML(parser), node);
     } else if (strcmp(type, "ImagePlane") == 0) {
-        addOpticalElement(ImagePlane::createFromXML(node, group_context), node);
+        addOpticalElement(ImagePlane::createFromXML(parser), node);
     } else if (strcmp(type, "Plane Mirror") == 0) {
-        addOpticalElement(PlaneMirror::createFromXML(node, group_context),
-                          node);
+        addOpticalElement(PlaneMirror::createFromXML(parser), node);
     } else if (strcmp(type, "Toroid") == 0) {
-        addOpticalElement(ToroidMirror::createFromXML(node, group_context),
-                          node);
+        addOpticalElement(ToroidMirror::createFromXML(parser), node);
     } else if (strcmp(type, "Slit") == 0) {
-        addOpticalElement(
-            Slit::createFromXML(node, calcSourceEnergy(), group_context), node);
+        addOpticalElement(Slit::createFromXML(parser), node);
     } else if (strcmp(type, "Spherical Grating") == 0) {
-        addOpticalElement(SphereGrating::createFromXML(node, group_context),
-                          node);
+        addOpticalElement(SphereGrating::createFromXML(parser), node);
     } else if (strcmp(type, "Plane Grating") == 0) {
-        addOpticalElement(PlaneGrating::createFromXML(node, group_context),
-                          node);
+        addOpticalElement(PlaneGrating::createFromXML(parser), node);
     } else if (strcmp(type, "Sphere") == 0) {
-        addOpticalElement(SphereMirror::createFromXML(node, group_context),
-                          node);
+        addOpticalElement(SphereMirror::createFromXML(parser), node);
     } else if (strcmp(type, "Reflection Zoneplate") == 0) {
-        addOpticalElement(
-            ReflectionZonePlate::createFromXML(node, group_context), node);
+        addOpticalElement(ReflectionZonePlate::createFromXML(parser), node);
+    } else if (strcmp(type, "Ellipsoid") == 0) {
+        addOpticalElement(Ellipsoid::createFromXML(parser), node);
+    } else if (strcmp(type, "Cylinder") == 0) {
+        addOpticalElement(Cylinder::createFromXML(parser), node);
     } else {
-        std::cerr
-            << "[Importer]: could not classify beamline object with Name: "
-            << node->first_attribute("name")->value()
-            << "; Type: " << node->first_attribute("type")->value() << '\n';
+        RAYX_WARN << "could not classify beamline object with Name: "
+                  << node->first_attribute("name")->value()
+                  << "; Type: " << node->first_attribute("type")->value();
     }
 }
 
@@ -112,54 +90,57 @@ void addBeamlineObjectFromXML(rapidxml::xml_node<>* node, Beamline* beamline,
  * `collection` may either be a <beamline> or a <group>. */
 void handleObjectCollection(rapidxml::xml_node<>* collection,
                             Beamline* beamline,
-                            std::vector<xml::Group>* group_context) {
+                            std::vector<xml::Group>* group_context,
+                            std::filesystem::path filename) {
     for (rapidxml::xml_node<>* object = collection->first_node(); object;
          object = object->next_sibling()) {  // Iterating through objects
         if (strcmp(object->name(), "object") == 0) {
-            addBeamlineObjectFromXML(object, beamline, *group_context);
+            addBeamlineObjectFromXML(object, beamline, *group_context,
+                                     filename);
         } else if (strcmp(object->name(), "group") == 0) {
             xml::Group g;
             bool success = xml::parseGroup(object, &g);
             if (success) {
                 group_context->push_back(g);
             } else {
-                std::cerr << "parseGroup failed!\n";
+                RAYX_ERR << "parseGroup failed!";
             }
-            handleObjectCollection(object, beamline, group_context);
+            handleObjectCollection(object, beamline, group_context, filename);
             if (success) {
                 group_context->pop_back();
             }
         } else if (strcmp(object->name(), "param") != 0) {
-            std::cerr << "received weird object->name(): " << object->name()
-                      << std::endl;
+            RAYX_ERR << "received weird object->name(): " << object->name();
         }
     }
 }
 
-Beamline Importer::importBeamline(const char* filename) {
+Beamline importBeamline(std::filesystem::path filename) {
     RAYX_PROFILE_FUNCTION();
     // first implementation: stringstreams are slow; this might need
     // optimization
-    std::cout << "[Importer]: importBeamline is called with file \"" << filename
-              << "\"\n";
+    RAYX_LOG << "importBeamline is called with file \"" << filename << "\"";
 
     std::ifstream t(filename);
     std::stringstream buffer;
     buffer << t.rdbuf();
     std::string test = buffer.str();
+    if (test.empty()) {
+        RAYX_ERR
+            << "importBeamline could not open file! (or it was just empty)";
+    }
     std::vector<char> cstr(test.c_str(), test.c_str() + test.size() + 1);
     rapidxml::xml_document<> doc;
     doc.parse<0>(cstr.data());
 
-    std::cout << "\t Version: "
-              << doc.first_node("lab")->first_node("version")->value()
-              << std::endl;
+    RAYX_LOG << "\t Version: "
+             << doc.first_node("lab")->first_node("version")->value();
     rapidxml::xml_node<>* xml_beamline =
         doc.first_node("lab")->first_node("beamline");
 
     Beamline beamline;
     std::vector<xml::Group> group_context;
-    handleObjectCollection(xml_beamline, &beamline, &group_context);
+    handleObjectCollection(xml_beamline, &beamline, &group_context, filename);
     return beamline;
 }
 

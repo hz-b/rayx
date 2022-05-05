@@ -8,14 +8,20 @@
 #include "rapidxml.hpp"
 
 namespace RAYX {
-/*
- * Brief: Abstract parent class for all beamline objects used in Ray-X.
+/**
+ * @brief This is an abstract parent class for all beamline objects used in
+ * Ray-X.
  *
+ * Beamline objects are used to define the beamline of a simulation. They are a
+ * vital part of our model. Beamline objects can be mirrors, gratings, etc.
+ * which represent real world parts of the beamline. Different beamline objects
+ * come with different properties, such as reflectivity, transmission, etc.
  */
 class RAYX_API BeamlineObject {
   public:
     ~BeamlineObject();
 
+    /// Getter for the ID of the beamline object.
     const char* getName() const;
 
     const int m_ID;

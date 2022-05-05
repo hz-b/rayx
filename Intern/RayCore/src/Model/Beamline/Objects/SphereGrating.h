@@ -1,5 +1,7 @@
 #pragma once
 #include <Data/xml.h>
+#include <Tracer/Vulkan/Material.h>
+#include <UserParameter/GeometricUserParams.h>
 
 #include "Model/Beamline/OpticalElement.h"
 #include "Model/Surface/Quadric.h"
@@ -9,18 +11,18 @@ namespace RAYX {
 class RAYX_API SphereGrating : public OpticalElement {
   public:
     // new, shortened constructor
-    SphereGrating(const char* name, int mount,
+    SphereGrating(const char* name, GratingMount mount,
                   Geometry::GeometricalShape geometricalShape, double width,
-                  double height, double radius, glm::dvec4 position,
-                  glm::dmat4x4 orientation, double designEnergyMounting,
-                  double lineDensity, double orderOfDiffraction,
-                  std::vector<double> vls, std::vector<double> slopeError);
+                  double height, const double azimuthalAngle, double radius,
+                  glm::dvec4 position, glm::dmat4x4 orientation,
+                  double designEnergyMounting, double lineDensity,
+                  double orderOfDiffraction, std::array<double, 6> vls,
+                  std::array<double, 7> slopeError, Material mat);
 
     SphereGrating();
     ~SphereGrating();
 
-    static std::shared_ptr<SphereGrating> createFromXML(
-        rapidxml::xml_node<>*, const std::vector<xml::Group>& group_context);
+    static std::shared_ptr<SphereGrating> createFromXML(xml::Parser);
 
     // TODO (Theresa): should ideally be removed as soon as radius calculation
     // is simplified in GeometricUSerParams.cpp
@@ -32,25 +34,25 @@ class RAYX_API SphereGrating : public OpticalElement {
     double getExitArmLength() const;
     double getEntranceArmLength() const;
     double getDeviation() const;  // not always calculated
-    int getGratingMount() const;
+    GratingMount getGratingMount() const;
     double getDesignEnergyMounting() const;
     double getLineDensity() const;
     double getOrderOfDiffraction() const;
     double getA() const;
-    std::vector<double> getVls() const;
+    std::array<double, 6> getVls() const;
 
   private:
     double m_radius;
     double m_entranceArmLength;
     double m_exitArmLength;
     double m_deviation;  // not always calculated
-    GRATING_MOUNT m_gratingMount;
+    GratingMount m_gratingMount;
     double m_designEnergyMounting;
     double m_lineDensity;
     double m_orderOfDiffraction;
     double m_a;  // calculated from line density, order of diffracion and design
                  // energy mounting
-    std::vector<double> m_vls;
+    std::array<double, 6> m_vls;
     // double m_Depth;
     // double m_verDivergence;
     // double m_horDivergence;

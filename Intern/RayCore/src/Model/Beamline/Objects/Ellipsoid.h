@@ -1,22 +1,42 @@
 #pragma once
+#include <Data/xml.h>
+#include <Tracer/Vulkan/Material.h>
+#include <string.h>
+
 #include "Model/Beamline/OpticalElement.h"
 #include "Model/Surface/Quadric.h"
+#include "UserParameter/GeometricUserParams.h"
+#include "UserParameter/WorldUserParams.h"
 
 namespace RAYX {
+enum class FigureRotation { Yes, Plane, A11 };
+
 // TODO(Jannis): rename or turn into surface
 class RAYX_API Ellipsoid : public OpticalElement {
   public:
     // slightly shortened constructor
     Ellipsoid(const char* name, Geometry::GeometricalShape geometricalShape,
-              const double width, const double height, glm::dvec4 position,
+              const double width, const double height,
+              const double azimuthalAngle, glm::dvec4 position,
               glm::dmat4x4 orientation, const double grazingIncidence,
               const double entranceArmLength, const double exitArmLength,
-              const int figRot, const double a_11,
-              const std::vector<double> slopeError);
+              FigureRotation figRot, const double a_11,
+              const std::array<double, 7> slopeError, Material mat);
+
+    Ellipsoid(const char* name, Geometry::GeometricalShape geometricalShape,
+              const double width, const double height,
+              const double azimuthalAngle, glm::dvec4 position,
+              const double LongHalfAxisA, const double ShortHalfAxisB,
+              const double DesignAngle, glm::dmat4x4 orientation,
+              const double grazingIncidence, const double entranceArmLength,
+              const double exitArmLength, FigureRotation figRot,
+              const double a_11, const std::array<double, 7> slopeError,
+              Material mat);
     Ellipsoid();
     ~Ellipsoid();
 
     void calcHalfAxes();
+    void calculateCenterFromHalfAxes(double angle);
     double getRadius() const;
     double getExitArmLength() const;
     double getEntranceArmLength() const;
@@ -34,7 +54,7 @@ class RAYX_API Ellipsoid : public OpticalElement {
     double getA44() const;
     double getHalfAxisC() const;
 
-    enum FIGURE_ROTATION { FR_YES, FR_PLANE, FR_A11 };
+    static std::shared_ptr<Ellipsoid> createFromXML(xml::Parser);
 
   private:
     // user parameters:
@@ -43,7 +63,7 @@ class RAYX_API Ellipsoid : public OpticalElement {
     double m_incidence;
     double m_entranceArmLength;
     double m_exitArmLength;
-    FIGURE_ROTATION m_figureRotation;
+    FigureRotation m_figureRotation;
     double m_a11;  // param for quadric funciton, given by user
 
     // derived params, needed on shader
@@ -58,6 +78,7 @@ class RAYX_API Ellipsoid : public OpticalElement {
     double m_offsetY0;        // always = 0?
     double
         m_halfAxisC;  // derived from figure_rotation, a_11 and half axes a, b
+    double m_DesignGrazingAngle;
 };
 
 }  // namespace RAYX

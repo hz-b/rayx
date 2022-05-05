@@ -1,15 +1,13 @@
 #include "OpticalElement.h"
 
-#include <assert.h>
 #include <math.h>
 
-#include <cassert>
-
+#include "Debug.h"
 #include "Presenter/SimulationEnv.h"
 
 namespace RAYX {
 /**
- * constructor for adding elements to tracer. The given vectors contain the
+ * constructor for adding elements to tracer. The given arrays contain the
  * values that will actually be moved to the shader
  * @param name                  name of the element
  * @param surfaceParams         parameters that define the surface of the
@@ -24,19 +22,12 @@ namespace RAYX {
  * element it is
  */
 OpticalElement::OpticalElement(const char* name,
-                               const std::vector<double> surfaceParams,
-                               const std::vector<double> inputInMatrix,
-                               const std::vector<double> inputOutMatrix,
-                               const std::vector<double> OParameters,
-                               const std::vector<double> EParameters)
+                               const std::array<double, 4 * 4> surfaceParams,
+                               const std::array<double, 4 * 4> inputInMatrix,
+                               const std::array<double, 4 * 4> inputOutMatrix,
+                               const std::array<double, 4 * 4> OParameters,
+                               const std::array<double, 4 * 4> EParameters)
     : BeamlineObject(name) {
-    std::cout << surfaceParams.size() << inputInMatrix.size()
-              << inputOutMatrix.size() << EParameters.size()
-              << OParameters.size() << std::endl;
-    // surface.getParams() to shader/buffer
-    assert(surfaceParams.size() == 16 && inputInMatrix.size() == 16 &&
-           inputOutMatrix.size() == 16 && EParameters.size() == 16 &&
-           OParameters.size() == 16);
     m_surfaceParams = surfaceParams;
     m_geometry = std::make_unique<Geometry>();
     m_geometry->setInMatrix(inputInMatrix);
@@ -59,31 +50,46 @@ OpticalElement::OpticalElement(const char* name,
  * @param slopeError                slope error parameters
  */
 OpticalElement::OpticalElement(const char* name,
-                               const std::vector<double> EParameters,
+                               const std::array<double, 4 * 4> EParameters,
                                Geometry::GeometricalShape geometricalShape,
                                const double width, const double height,
-                               glm::dvec4 position, glm::dmat4x4 orientation,
-                               const std::vector<double> slopeError)
+                               const double azimuthalAngle, glm::dvec4 position,
+                               glm::dmat4x4 orientation,
+                               const std::array<double, 7> slopeError)
     : BeamlineObject(name),
       m_slopeError(slopeError),
       m_elementParameters(EParameters) {
-    m_geometry = std::make_unique<Geometry>(geometricalShape, width, height,
-                                            position, orientation);
-    assert(EParameters.size() == 16 && slopeError.size() == 7);
+    m_geometry = std::make_unique<Geometry>(
+        geometricalShape, width, height, azimuthalAngle, position, orientation);
     updateObjectParams();
 }
 
-// ! temporary constructor for trapezoid (10/11/2021)
+// ! temporary constructors for trapezoid (10/11/2021)
+OpticalElement::OpticalElement(const char* name,
+                               const std::array<double, 4 * 4> EParameters,
+                               Geometry::GeometricalShape geometricalShape,
+                               const double width, const double widthB,
+                               const double height, const double azimuthalAngle,
+                               glm::dvec4 position, glm::dmat4x4 orientation,
+                               const std::array<double, 7> slopeError)
+    : BeamlineObject(name),
+      m_slopeError(slopeError),
+      m_elementParameters(EParameters) {
+    m_geometry =
+        std::make_unique<Geometry>(geometricalShape, width, widthB, height,
+                                   azimuthalAngle, position, orientation);
+    updateObjectParams();
+}
 OpticalElement::OpticalElement(const char* name,
                                Geometry::GeometricalShape geometricalShape,
                                const double widthA, const double widthB,
-                               const double height, glm::dvec4 position,
-                               glm::dmat4x4 orientation,
-                               const std::vector<double> slopeError)
+                               const double height, const double azimuthalAngle,
+                               glm::dvec4 position, glm::dmat4x4 orientation,
+                               const std::array<double, 7> slopeError)
     : BeamlineObject(name), m_slopeError(slopeError) {
-    m_geometry = std::make_unique<Geometry>(geometricalShape, widthA, widthB,
-                                            height, position, orientation);
-    assert(slopeError.size() == 7);
+    m_geometry =
+        std::make_unique<Geometry>(geometricalShape, widthA, widthB, height,
+                                   azimuthalAngle, position, orientation);
     updateObjectParams();
 }
 
@@ -100,12 +106,12 @@ OpticalElement::OpticalElement(const char* name,
 OpticalElement::OpticalElement(const char* name,
                                Geometry::GeometricalShape geometricalShape,
                                const double width, const double height,
-                               glm::dvec4 position, glm::dmat4x4 orientation,
-                               const std::vector<double> slopeError)
+                               const double azimuthalAngle, glm::dvec4 position,
+                               glm::dmat4x4 orientation,
+                               const std::array<double, 7> slopeError)
     : BeamlineObject(name), m_slopeError(slopeError) {
-    m_geometry = std::make_unique<Geometry>(geometricalShape, width, height,
-                                            position, orientation);
-    assert(slopeError.size() == 7);
+    m_geometry = std::make_unique<Geometry>(
+        geometricalShape, width, height, azimuthalAngle, position, orientation);
     updateObjectParams();
 }
 
@@ -113,24 +119,25 @@ OpticalElement::OpticalElement() {}
 
 OpticalElement::~OpticalElement() {}
 
-void OpticalElement::setElementParameters(std::vector<double> params) {
-    assert(params.size() == 16);
+void OpticalElement::setElementParameters(std::array<double, 4 * 4> params) {
     m_elementParameters = params;
 }
 
-void OpticalElement::setInMatrix(std::vector<double> inputMatrix) {
-    assert(inputMatrix.size() == 16);
+void OpticalElement::setInMatrix(std::array<double, 4 * 4> inputMatrix) {
     m_geometry->setInMatrix(inputMatrix);
 }
-void OpticalElement::setOutMatrix(std::vector<double> inputMatrix) {
-    assert(inputMatrix.size() == 16);
+void OpticalElement::setOutMatrix(std::array<double, 4 * 4> inputMatrix) {
     m_geometry->setOutMatrix(inputMatrix);
 }
 
 void OpticalElement::setSurface(std::unique_ptr<Surface> surface) {
     m_surfacePtr = std::move(surface);
-    assert(surface == nullptr);
-    assert(m_surfacePtr != nullptr);
+    if (surface) {
+        RAYX_ERR << "surface should be nullptr after move!";
+    }
+    if (!m_surfacePtr) {
+        RAYX_ERR << "m_surfacePtr should NOT be nullptr!";
+    }
 }
 
 // ! temporary adjustment for trapezoid (10/11/2021)
@@ -138,19 +145,19 @@ void OpticalElement::updateObjectParams() {
     double widthA, widthB = 0.0;
     m_geometry->getWidth(widthA, widthB);
 
-    m_objectParameters = {widthA,
-                          m_geometry->getHeight(),
+    m_objectParameters = {widthA,                   // shader:  [0][0]
+                          m_geometry->getHeight(),  // [0][1]
                           m_slopeError[0],
                           m_slopeError[1],
-                          m_slopeError[2],
+                          m_slopeError[2],  // [1][0]
                           m_slopeError[3],
                           m_slopeError[4],
                           m_slopeError[5],
-                          m_slopeError[6],
+                          m_slopeError[6],  // [2][0]
                           widthB,
+                          m_geometry->getAzimuthalAngle(),
                           0,
-                          0,
-                          0,
+                          0,  // [3][0]
                           0,
                           0,
                           0};
@@ -165,10 +172,10 @@ double OpticalElement::getWidth() {
 
 double OpticalElement::getHeight() { return m_geometry->getHeight(); }
 
-std::vector<double> OpticalElement::getInMatrix() const {
+std::array<double, 4 * 4> OpticalElement::getInMatrix() const {
     return m_geometry->getInMatrix();
 }
-std::vector<double> OpticalElement::getOutMatrix() const {
+std::array<double, 4 * 4> OpticalElement::getOutMatrix() const {
     return m_geometry->getOutMatrix();
 }
 glm::dvec4 OpticalElement::getPosition() const {
@@ -177,16 +184,16 @@ glm::dvec4 OpticalElement::getPosition() const {
 glm::dmat4x4 OpticalElement::getOrientation() const {
     return m_geometry->getOrientation();
 }
-std::vector<double> OpticalElement::getObjectParameters() {
+std::array<double, 4 * 4> OpticalElement::getObjectParameters() {
     return m_objectParameters;
 }
 
-std::vector<double> OpticalElement::getElementParameters() const {
+std::array<double, 4 * 4> OpticalElement::getElementParameters() const {
     return m_elementParameters;
 }
 
-std::vector<double> OpticalElement::getSurfaceParams() const {
-    std::cout << "[Optic-Element]: return anchor points" << std::endl;
+std::array<double, 4 * 4> OpticalElement::getSurfaceParams() const {
+    RAYX_LOG << "return anchor points";
     // assert(m_surfacePtr!=nullptr);
     if (m_surfacePtr != nullptr)
         return m_surfacePtr->getParams();
@@ -194,7 +201,7 @@ std::vector<double> OpticalElement::getSurfaceParams() const {
         return m_surfaceParams;
 }
 
-std::vector<double> OpticalElement::getSlopeError() const {
+std::array<double, 7> OpticalElement::getSlopeError() const {
     return m_slopeError;
 }
 

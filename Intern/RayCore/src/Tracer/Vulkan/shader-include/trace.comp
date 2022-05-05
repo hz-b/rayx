@@ -1,0 +1,456 @@
+/**
+ * calculates resulting ray for a slit
+ * @param r				ray to trace in element coordinates
+ * @param elementIndex	index of element in data buffer
+ * @param ctr			counter for random number generator, always inout
+ * @param intersection	intersection point in ELEMENT coordinates
+ *
+ * output: diffracted Ray with intersection point as position, reflection as direction in beam coordinates and possibly modified weight in ELEMENT
+ * coordinates
+ */
+Ray traceSlit(Ray r, const int elementIndex, inout uint64_t ctr, dvec4 intersection) {
+    Element slit = quadricData[elementIndex];
+
+    // store old position, needed for pathlength calculation
+    dvec3 old_position = r.position;
+
+    // dvec4 normal = intersectionPoint(r, q.surfaceParams); // if it is not sure whether the given intersection is correct, use this (recalculate the
+    // intersection)
+    dvec4 normal = setIntersectionPoint(r, slit.surfaceParams, intersection);
+
+    double x_extent = slit.objectParameters[0][0];   // width
+    double y_extent = slit.objectParameters[0][1];   // height
+    double xStop    = slit.elementParameters[0][0];  // beamstop width
+    double yStop    = slit.elementParameters[0][1];  // beamstop heigth
+    // slit lies in x-y plane instead of x-z plane as other elements
+    r.weight = wasteBox(r.position[0], r.position[1], x_extent, y_extent, r.weight);
+    r.weight = stopBox(r.position[0], r.position[1], xStop, yStop, r.weight);
+
+    if (r.weight < 1.0) {
+        // rays that missed an element get weight 2
+        r.weight = 2;
+        return r;
+    }
+
+    // add the travelled distance from the previous position to the new intersection to pathlength (both are in the same coordinate system so we do
+    // not need to transform back to world coordinates??)
+    r.pathLength += length(old_position - r.position);
+    r.lastElement = elementIndex + 1;
+
+    double psi        = -r8_asin(r.direction.y);
+    double phi        = r8_asin(r.direction.x / r8_cos(psi));
+    double delPhi     = 0;
+    double delPsi     = 0;
+    int iopt          = 1;                             // 1 = slit, 3 = zone plate
+    double wavelength = hvlam(r.energy);
+    diffraction(iopt, x_extent, y_extent, wavelength, delPhi, delPsi, ctr);
+    phi = phi + delPhi;
+    psi = psi + delPsi;
+
+    // new direction from angles
+    cosini(r, phi, psi);
+
+    r.order = 0;
+    return r;
+}
+
+/**
+ * calculates resulting ray for a toroid
+ * @param r				ray to trace in element coordinates
+ * @param elementIndex	index of element in data buffer
+ * @param ctr			counter for random number generator, always inout
+ * @param intersection	intersection point in ELEMENT coordinates
+ *
+ * output: reflected Ray with intersection point as position, reflection as direction in ELEMENT coordinates and possibly modified weight
+ */
+Ray traceToroid(Ray r, const int elementIndex, inout uint64_t ctr, dvec4 intersectionPoint) {
+    Element tor = quadricData[elementIndex];
+
+    // store old position, needed for pathlength calculation
+    dvec3 old_position = r.position;
+
+    double longRadius  = tor.surfaceParams[0][0];
+    double shortRadius = tor.surfaceParams[0][1];
+    // TODO use the given intersection point instead of recalculating it (still need to calculate the normal)
+    dvec4 normal = iteratTo(r, longRadius, shortRadius);
+
+    double x_extent = tor.objectParameters[0][0];  // width
+    double z_extent = tor.objectParameters[0][1];  // length
+    r.weight        = wasteBox(r.position[0], r.position[2], x_extent, z_extent, r.weight);
+
+    // element missed
+    if (r.weight < 1.0) {
+        // rays that missed an element get weight 2
+        r.weight = 2;
+        return r;
+    }
+
+    // add the travelled distance from the previous position to the new intersection to pathlength (both are in the same coordinate system so we do
+    // not need to transform back to world coordinates??)
+    r.pathLength += length(old_position - r.position);
+    r.lastElement = elementIndex + 1;
+
+    // tanger/slope Error
+    double slopeX = tor.objectParameters[0][2];
+    double slopeZ = tor.objectParameters[0][3];
+    normal        = tanger(normal, slopeX, slopeZ, 0, ctr);
+
+    r.direction = dvec3(reflect(dvec4(r.direction, 0), normal));
+
+    r.order = 0;
+    return r;
+}
+
+/**
+ * calculates resulting ray for an RZP
+ * @param r				ray to trace in element coordinates
+ * @param elementIndex	index of element in data buffer
+ * @param ctr			counter for random number generator, always inout
+ * @param intersection	intersection point in ELEMENT coordinates
+ *
+ * output: reflected Ray with intersection point as position, reflection as direction in ELEMENT coordinates and possibly modified weight
+ */
+Ray traceRZP(Ray r, const int elementIndex, inout uint64_t ctr, dvec4 intersection) {
+    Element rzp             = quadricData[elementIndex];
+    double element_offset_z = rzp.elementParameters[3][2];
+    r.position.z            = r.position.z - element_offset_z;
+
+    // store old position, needed for pathlength calculation
+    dvec3 old_position = r.position;
+
+    dvec4 normal;
+    // RZP can be plane, toroidal or spherical curvature type. Use intersectionPoint for all except toroidal
+    int CURVATURE_TYPE = int(rzp.elementParameters[1][0]);
+    if (CURVATURE_TYPE != 1) {
+        normal = setIntersectionPoint(r, rzp.surfaceParams, intersection);
+    } else {
+        double longRadius  = rzp.surfaceParams[0][0];
+        double shortRadius = rzp.surfaceParams[0][1];
+        normal             = iteratTo(r, longRadius, shortRadius);
+    }
+
+    // ! temporary change to test the trapezoid
+    double x_extentA = rzp.objectParameters[0][0];  // widthA
+    double x_extentB = rzp.objectParameters[2][1];  // widthB for trapezoid
+    double z_extent  = rzp.objectParameters[0][1];  // height
+    double hit       = wasteBox(r.position[0], r.position[2], x_extentA, x_extentB, z_extent, r.weight);
+
+    if (hit < 1.0) {
+        r.position.z += element_offset_z;
+        // rays that missed an element get weight 2
+        r.weight = 2;
+        return r;
+    }
+
+    // add the travelled distance from the previous position to the new intersection to pathlength (both are in the same coordinate system so we do
+    // not need to transform back to world coordinates??)
+    r.pathLength += length(old_position - r.position);
+    r.lastElement = elementIndex + 1;
+
+    int IMAGE_TYPE        = int(rzp.elementParameters[0][0]);
+    int RZP_TYPE          = int(rzp.elementParameters[0][1]);
+    int DERIVATION_METHOD = int(rzp.elementParameters[0][2]);
+    double risag          = rzp.elementParameters[2][0];
+    double rosag          = rzp.elementParameters[2][1];
+    double rimer          = rzp.elementParameters[2][2];
+    double romer          = rzp.elementParameters[2][3];
+    double d_alpha        = rzp.elementParameters[3][0];
+    double d_beta         = rzp.elementParameters[3][1];
+    double d_ord          = rzp.elementParameters[1][1];
+    double zOffsetCenter  = rzp.elementParameters[1][3];
+    ;  // fresnel center z offset
+    double WL            = hvlam(r.energy);
+    double WL0           = 1e-06 * rzp.elementParameters[0][3];  // source energy/design energy
+    double Ord           = rzp.elementParameters[1][2];
+    int additional_order = int(rzp.elementParameters[3][3]);
+
+    // calculate the RZP line density for the position of the intersection on the RZP
+    double DX, DZ;
+    RZPLineDensity(r, normal, IMAGE_TYPE, RZP_TYPE, DERIVATION_METHOD, zOffsetCenter, risag, rosag, rimer, romer, d_alpha, d_beta, d_ord, WL0, DX,
+                   DZ);
+
+    // tanger/slope Error
+    double slopeX = rzp.objectParameters[0][2];
+    double slopeZ = rzp.objectParameters[0][3];
+    normal        = tanger(normal, slopeX, slopeZ, 0, ctr);
+
+    // if additional zero order should be traced, approx. half of the rays are randomly chosen to be traced in order 0 (= ordinary reflection) instead
+    // of the given order
+    if (additional_order == 1) {
+        if (squaresDoubleRNG(ctr) > 0.5) Ord = 0;
+    }
+
+    // only 2D case, not 2 1D gratings with 90 degree rotation as in old RAY
+    double az = WL * DZ * Ord * 1e-6;
+    double ax = WL * DX * Ord * 1e-6;
+    r         = refrac2D(r, normal, az, ax);
+    r.order   = Ord;
+
+    r.position.z += element_offset_z;
+    return r;
+}
+
+/**
+ * calculates resulting ray for plane grating element
+ * separate from "generalGratingElement" because normal is always (0,-1,0). Therefore, the refrac function can be simplified such that it does not use
+ * trigonom. functions
+ * @param r				ray to trace in element coordinates
+ * @param elementIndex	index of element in data buffer
+ * @param ctr			counter for random number generator, always inout
+ * @param intersection	intersection point in ELEMENT coordinates
+ * @return				reflected Ray with intersection point as position, reflection as direction in ELEMENT coordinates and possibly modified weight
+ */
+Ray tracePlaneGrating(Ray r, const int elementIndex, inout uint64_t ctr, dvec4 intersection) {
+    Element plgrt = quadricData[elementIndex];
+
+    // store old position, needed for pathlength calculation
+    dvec3 old_position = r.position;
+
+    // calculate intersection point with element surface and return surface normal at this point
+    dvec4 normal = setIntersectionPoint(r, plgrt.surfaceParams, intersection);
+
+    // check if element was hit
+    double x_extent = plgrt.objectParameters[0][0];
+    double z_extent = plgrt.objectParameters[0][1];
+    double hit      = wasteBox(r.position.x, r.position.z, x_extent, z_extent, r.weight);
+
+    if (hit < 1.0) {
+        // rays that missed an element get weight 2
+        r.weight = 2;
+        return r;
+    }
+    // modify normal according to slope error
+    double slopeX = plgrt.objectParameters[0][2];
+    double slopeZ = plgrt.objectParameters[0][3];
+    normal        = tanger(normal, slopeX, slopeZ, 0, ctr);
+
+    // vls parameters passed in q.elementParameters
+    double WL                 = hvlam(r.energy);
+    double lineDensity        = plgrt.elementParameters[0][2];
+    double orderOfDiffraction = plgrt.elementParameters[0][3];
+    double b_params[6]        = double[6](plgrt.elementParameters[1][2], plgrt.elementParameters[1][3], plgrt.elementParameters[2][0],
+                                   plgrt.elementParameters[2][1], plgrt.elementParameters[2][2], plgrt.elementParameters[2][3]);
+    int additional_order      = int(plgrt.elementParameters[3][3]);
+
+    // a = WL * linedensity * order * 1e-06
+    double a = vlsGrating(lineDensity, r.position.z, b_params) * WL * orderOfDiffraction * 1e-06;
+    r.order  = orderOfDiffraction;
+
+    // if additional zero order should be traced, approx. half of the rays are randomly chosen to be traced in order 0 (= ordinary reflection) instead
+    // of the given order
+    if (additional_order == 1) {
+        if (squaresDoubleRNG(ctr) > 0.5) a = 0;
+    }
+
+    // add the travelled distance from the previous position to the new intersection to pathlength (both are in the same coordinate system so we do
+    // not need to transform back to world coordinates??)
+    r.pathLength += length(old_position - r.position);
+    r.lastElement = elementIndex + 1;
+
+    // calculate refracted ray
+    r = refrac_plane(r, normal, a);
+
+    return r;
+}
+
+/**
+ * calculates resulting ray for general grating element
+ * @param r				ray to trace in element coordinates
+ * @param elementIndex	index of element in data buffer
+ * @param ctr			counter for random number generator, always inout
+ * @param intersection	intersection point in ELEMENT coordinates
+ * @return reflected Ray with intersection point as position, reflection as direction in ELEMENT coordinates and possibly modified weight
+ */
+Ray traceGeneralGrating(Ray r, const int elementIndex, inout uint64_t ctr, dvec4 intersection) {
+    Element grt = quadricData[elementIndex];
+
+    int ISIG      = 1;
+    double radius = grt.surfaceParams[1][3];  // -radius , a_24
+    if (-radius < 0) {
+        ISIG = -1;
+    }
+
+    // store old position, needed for pathlength calculation
+    dvec3 old_position = r.position;
+
+    dvec4 normal = setIntersectionPoint(r, grt.surfaceParams, intersection);
+    // normal = normalize(dvec4(-r.position.x, -radius - r.position[1]*ISIG, -r.position[2], 0));
+
+    // check if element was hit
+    double x_extent = grt.objectParameters[0][0];
+    double z_extent = grt.objectParameters[0][1];
+    double hit      = wasteBox(r.position.x, r.position.z, x_extent, z_extent, r.weight);
+
+    // if ray missed the surface, stop the tracing here and return the ray in world coordinates
+    if (hit < 1.0) {
+        // rays that missed an element get weight 2
+        r.weight = 2;
+        return r;
+    }
+
+    // add the travelled distance from the previous position to the new intersection to pathlength (both are in the same coordinate system so we do
+    // not need to transform back to world coordinates??)
+    r.pathLength += length(old_position - r.position);
+    r.lastElement = elementIndex + 1;
+
+    // modify normal according to slope error
+    double slopeX = grt.objectParameters[0][2];
+    double slopeZ = grt.objectParameters[0][3];
+    normal        = tanger(normal, slopeX, slopeZ, 0, ctr);
+
+    // vls parameters passed in q.elementParameters
+    double WL                 = hvlam(r.energy);
+    double lineDensity        = grt.elementParameters[0][2];
+    double orderOfDiffraction = grt.elementParameters[0][3];
+    double b_params[6] = double[6](grt.elementParameters[1][2], grt.elementParameters[1][3], grt.elementParameters[2][0], grt.elementParameters[2][1],
+                                   grt.elementParameters[2][2], grt.elementParameters[2][3]);
+
+    // linedensity = WL * default_linedensity * order * 1e-06
+    double linedensity = vlsGrating(lineDensity, r.position.z, b_params) * WL * orderOfDiffraction * 1e-06;
+    r.order            = orderOfDiffraction;
+    // no additional zero order here?
+
+    // refraction
+    r = refrac(r, normal, linedensity);
+
+    return r;
+}
+
+/**
+ * calculates resulting ray for a mirror element
+ * @param r				ray to trace in element coordinates
+ * @param elementIndex	index of element in data buffer
+ * @param ctr			counter for RNG
+ * @param intersection	intersection point in ELEMENT coordinates
+ *
+ * output: reflected Ray with intersection point as position, reflection as direction in ELEMENT coordinates and possibly modified weight
+ */
+Ray traceMirror(Ray r, const int elementIndex, inout uint64_t ctr, dvec4 intersection) {
+    Element mrr = quadricData[elementIndex];
+
+    // store old position, needed for pathlength calculation
+    dvec3 old_position = r.position;
+
+    // calculate intersection point and normal at intersection point
+    dvec4 normal           = setIntersectionPoint(r, mrr.surfaceParams, intersection);
+    double azimuthal_angle = mrr.objectParameters[2][2];  // chi (azimuthalangle) in rad
+
+    // check if ray hit the element within the boundaries
+    double x_extent = mrr.objectParameters[0][0];  // width
+    double x_extentB = mrr.objectParameters[2][1];  // widthB for trapezoid
+    double z_extent = mrr.objectParameters[0][1];  // height
+    double hit      = wasteBox(r.position.x, r.position.z, x_extent, x_extentB, z_extent, r.weight);
+
+    // if ray missed the surface, stop the tracing here and return the ray in world coordinates
+    if (hit < 1.0) {
+        // rays that missed an element get weight 2
+        r.weight = 2;
+        return r;
+    }
+
+    // add the travelled distance from the previous position to the new intersection to pathlength (both are in the same coordinate system so we do
+    // not need to transform back to world coordinates??)
+    r.pathLength += length(old_position - r.position);
+    r.lastElement = elementIndex + 1;
+
+    // take the slope error into account for the normal
+    double slopeX = mrr.objectParameters[0][2];
+    double slopeZ = mrr.objectParameters[0][3];
+    normal        = tanger(normal, slopeX, slopeZ, 0, ctr);  // option 0 = default, cartesian normal
+
+    // calculate the new direction after the reflection
+    r.direction = dvec3(reflect(dvec4(r.direction, 0), normal));
+
+    double real_S, real_P, delta;
+    double incidence_angle = getIncidenceAngle(r, normal);  // getTheta
+    int material           = int(quadricData[elementIndex].surfaceParams[3][2]);
+    if (material != -2) {
+        efficiency(r, real_S, real_P, delta, incidence_angle, material);
+
+        update_stokes(r, real_S, real_P, delta, azimuthal_angle, ctr);
+        r.order = 0;
+    }
+    return r;
+}
+
+/**
+ * calculates resulting ray for an ellipsoid mirror element
+ * @param r				ray to trace in element coordinates
+ * @param elementIndex	index of element in data buffer
+ * @param ctr			counter for RNG
+ * @param intersectionPoint	intersection point in ELEMENT coordinates
+ *
+ * @return reflected Ray with intersection point as position, reflection as direction in ELEMENT coordinates and possibly modified weight
+ */
+Ray traceEllipsoidMirror(Ray r, const int elementIndex, inout uint64_t ctr, dvec4 intersection) {
+    Element ell = quadricData[elementIndex];
+
+    double sin_tangentAngle = ell.elementParameters[0][0];
+    double cos_tangentAngle = ell.elementParameters[0][1];
+    int figureOfRotation    = int(ell.elementParameters[1][0]);
+
+    // store old position, needed for pathlength calculation
+    dvec3 old_position = r.position;
+
+    // calculate intersection point and normal at intersection point
+    dvec4 normal = setIntersectionPoint(r, ell.surfaceParams, intersection);
+    double icurv = ell.surfaceParams[1][0];
+    /*normal.x = -q.surfaceParams[0][0] * r.position.x * icurv;
+    normal.y = -(r.position.y + q.surfaceParams[1][3]) * icurv;
+    normal.z = -(q.surfaceParams[2][2] * r.position.z + q.surfaceParams[2][3]) * icurv;
+    normal = normalize(normal);*/
+
+    // check if ray hit the element within the boundaries
+    double x_extent = ell.objectParameters[0][0];                               // width
+    double z_extent = ell.objectParameters[0][1];                               // height
+    r               = rotationAroundX(r, -sin_tangentAngle, cos_tangentAngle);  // change to coordinate system of mirror
+    double hit      = wasteBox(r.position.x, r.position.z, x_extent, z_extent, r.weight);
+    r               = rotationAroundX(r, sin_tangentAngle, cos_tangentAngle);  // change to coordinate system of curvation
+
+    // if ray missed the surface, stop the tracing here and return the ray in world coordinates
+    if (hit < 1.0) {
+        // rays that missed an element get weight 2
+        return r;
+    }
+
+    // add the travelled distance from the previous position to the new intersection to pathlength (both are in the same
+    // coordinate system so we do not need to transform back to world coordinates??)
+    r.pathLength += length(old_position - r.position);
+    r.lastElement = elementIndex + 1;
+
+    // take the slope error into account for the normal
+    double slopeX = ell.objectParameters[0][2];
+    double slopeZ = ell.objectParameters[0][3];
+    normal        = tanger(normal, slopeX, slopeZ, 0, ctr);  // option 0 = default, cartesian normal
+
+    // calculate the new direction after the reflection
+    r.direction = dvec3(reflect(dvec4(r.direction, 0), normal));
+
+    r.order = 0;
+    return r;
+}
+
+/**
+ * the image plane is always parallel to x-y-plane of ray coordinate system in which the rays are when they leave the previous element
+ * -> defined by distance to that element
+ * @param r		ray to trace in element coordinates
+ * @param elementIndex	index of element in data buffer
+ * @param intersection	intersection point of ray with optical element in ELMENT coordinates
+ * @return  reflected Ray with intersection point as position in ELEMENT coordinates
+ */
+Ray traceImagePlane(Ray r, const int elementIndex, dvec4 intersection) {
+    // path length in element coordinates
+    r.pathLength += length(r.position - intersection.xyz);
+    r.position = intersection.xyz;
+    return r;
+    /*r = rayMatrixMult(r, q.inTrans);
+    dvec3 old_position = r.position;
+    double offset = 0 - r.position.z; // length between ray origin (intersection point of previous element) and image plane
+    r.position.x = r.position.x + ((r.direction.x / r.direction.z) * offset); // scale x-slope of ray (l/n) by z-length between origin and image plane
+    r.position.y = r.position.y + ((r.direction.y / r.direction.z) * offset);
+    r.position.z = 0;
+    r.weight *= int(r.direction.z > 0); // if ray points away from image plane there is no intersection with it
+    r.pathLength += length(r.position - old_position);
+    //r = rayMatrixMult(r, q.outTrans);
+    return r;*/
+}

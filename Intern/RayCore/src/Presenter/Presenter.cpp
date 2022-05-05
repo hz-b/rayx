@@ -2,6 +2,7 @@
 
 #include "Debug/Instrumentor.h"
 #include "Model/Beamline/OpticalElement.h"
+#include "Debug.h"
 
 namespace RAYX {
 
@@ -19,8 +20,7 @@ bool Presenter::run() {
     /*int beamlinesSimultaneously = 1;*/
     for (int j = 0; j < 1 /*beamlinesSimultaneously*/; j++) {
         if (m_Beamline->m_LightSources.empty()) {
-            std::cerr << "(Presenter) There is no light source!\n";
-            exit(1);
+            RAYX_ERR << "There is no light source!";
         } else {
             m_TracerInterface.generateRays(m_Beamline->m_LightSources[0]);
         }
@@ -31,7 +31,7 @@ bool Presenter::run() {
         m_Beamline->m_OpticalElements;
     for (int j = 0; j < 1 /*beamlinesSimultaneously*/; j++) {
         for (int i = 0; i < int(Elements.size()); i++) {
-            std::cout << "add " << Elements[i]->getName() << std::endl;
+            RAYX_LOG << "add " << Elements[i]->getName();
             m_TracerInterface.addOpticalElementToTracer(Elements[i]);
         }
     }

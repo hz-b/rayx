@@ -15,37 +15,48 @@
 #include "glm.hpp"
 
 namespace RAYX {
-enum SPREAD_TYPE { ES_WHITE_BAND, ES_THREE_ENERGIES };  // default ES_WHITE_BAND
-enum ENERGY_DISTRIBUTION_TYPE {
-    ET_FILE,
-    ET_VALUES,
-    ET_TOTAL,
-    ET_PARAM
+enum class SpreadType {  // default WhiteBand
+    WhiteBand,
+    ThreeEnergies
+};
+enum class EnergyDistributionType {
+    File,
+    Values,
+    Total,
+    Param
 };  // default ET_VALUES
-enum SOURCE_DISTRIBUTION_TYPE {
-    ST_SIMULTANEOUS,
-    ST_HARD_EDGE,
-    ST_GAUSS
+enum class SourceDistType {
+    Simultaneous,
+    HardEdge,
+    Gauss
 };  // default simultaneously
+
+// TODO(rudi): unify!
+enum class SourceDist { Uniform, Gaussian };
 
 class RAYX_API LightSource : public BeamlineObject {
   public:
     LightSource(const char* name, EnergyDistribution dist, const double linPol0,
                 const double linPol45, const double circPol,
-                const std::vector<double> misalignment,
+                const std::array<double, 6> misalignment,
                 const double sourceDepth, const double sourceHeight,
                 const double sourceWidth, const double horDivergence,
                 const double verDivergence);
     LightSource(const char* name, EnergyDistribution dist, const double linPol0,
                 const double linPol45, const double circPol,
-                const std::vector<double> misalignment);
+                const std::array<double, 6> misalignment);
 
     // Getter
     int getId();
-    std::vector<double> getMisalignmentParams();
+    std::array<double, 6> getMisalignmentParams();
     double getLinear0();
     double getLinear45();
     double getCircular();
+    double getVerDivergence() { return m_verDivergence; }
+    double getHorDivergence() { return m_horDivergence; }
+    double getSourceDepth() { return m_sourceDepth; }
+    double getSourceHeight() { return m_sourceHeight; }
+    double getSourceWidth() { return m_sourceWidth; }
 
     /** yields the average energy of the energy distribution
      * m_EnergyDistribution */
@@ -69,6 +80,7 @@ class RAYX_API LightSource : public BeamlineObject {
     double m_sourceDepth;
     double m_sourceHeight;
     double m_sourceWidth;
+    // in rad:
     double m_horDivergence;
     double m_verDivergence;
 
@@ -78,7 +90,7 @@ class RAYX_API LightSource : public BeamlineObject {
 
   private:
     // User/Design Parameter
-    std::vector<double> m_misalignmentParams;  // x, y, psi, phi
+    std::array<double, 6> m_misalignmentParams;  // x, y, psi, phi
 
     // Physics Parameters
     // point source & matrix source
@@ -87,7 +99,7 @@ class RAYX_API LightSource : public BeamlineObject {
     double m_circularPol;
 
     // TODO(Jannis): move to children
-    SOURCE_DISTRIBUTION_TYPE m_sourceDistributionType;
+    SourceDistType m_sourceDistributionType;
 };
 
 }  // namespace RAYX

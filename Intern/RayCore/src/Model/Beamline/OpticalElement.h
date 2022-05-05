@@ -1,5 +1,6 @@
 #pragma once
 
+#include <array>
 #include <glm.hpp>
 #include <iostream>
 #include <memory>
@@ -17,33 +18,44 @@ namespace RAYX {
 class RAYX_API OpticalElement : public BeamlineObject {
   public:
     // needed to add optical elements to tracer
-    OpticalElement(const char* name, const std::vector<double> surfaceParams,
-                   const std::vector<double> inputInMatrix,
-                   const std::vector<double> inputOutMatrix,
-                   const std::vector<double> OParameters,
-                   const std::vector<double> EParameters);
+    OpticalElement(const char* name,
+                   const std::array<double, 4 * 4> surfaceParams,
+                   const std::array<double, 4 * 4> inputInMatrix,
+                   const std::array<double, 4 * 4> inputOutMatrix,
+                   const std::array<double, 4 * 4> OParameters,
+                   const std::array<double, 4 * 4> EParameters);
 
     // new constructors
-    OpticalElement(const char* name, const std::vector<double> EParameters,
+    OpticalElement(const char* name,
+                   const std::array<double, 4 * 4> EParameters,
                    Geometry::GeometricalShape geometricalShape,
-                   const double width, const double height, glm::dvec4 position,
+                   const double width, const double height,
+                   const double azimuthalAngle, glm::dvec4 position,
                    glm::dmat4x4 orientation,
-                   const std::vector<double> slopeError);
+                   const std::array<double, 7> slopeError);
+    OpticalElement(const char* name,
+                   const std::array<double, 4 * 4> EParameters,
+                   Geometry::GeometricalShape geometricalShape,
+                   const double width, const double widthB, const double height,
+                   const double azimuthalAngle, glm::dvec4 position,
+                   glm::dmat4x4 orientation,
+                   const std::array<double, 7> slopeError);
     OpticalElement(const char* name,
                    Geometry::GeometricalShape geometricalShape,
-                   const double width, const double height, glm::dvec4 position,
+                   const double width, const double height,
+                   const double azimuthalAngle, glm::dvec4 position,
                    glm::dmat4x4 orientation,
-                   const std::vector<double> slopeError);
+                   const std::array<double, 7> slopeError);
     OpticalElement(const char* name,
                    Geometry::GeometricalShape geometricalShape,
                    const double widthA, const double widthB,
-                   const double height, glm::dvec4 position,
-                   glm::dmat4x4 orientation,
-                   const std::vector<double> slopeError);
+                   const double height, const double azimuthalAngle,
+                   glm::dvec4 position, glm::dmat4x4 orientation,
+                   const std::array<double, 7> slopeError);
 
-    void setElementParameters(std::vector<double> params);
-    void setInMatrix(std::vector<double> inputMatrix);
-    void setOutMatrix(std::vector<double> inputMatrix);
+    void setElementParameters(std::array<double, 4 * 4> params);
+    void setInMatrix(std::array<double, 4 * 4> inputMatrix);
+    void setOutMatrix(std::array<double, 4 * 4> inputMatrix);
     void setSurface(std::unique_ptr<Surface> surface);
     void updateObjectParams();
     void updateObjectParamsNoGeometry();
@@ -51,24 +63,17 @@ class RAYX_API OpticalElement : public BeamlineObject {
     double getWidth();
     double getHeight();
 
-    std::vector<double> getInMatrix() const;
-    std::vector<double> getOutMatrix() const;
+    std::array<double, 4 * 4> getInMatrix() const;
+    std::array<double, 4 * 4> getOutMatrix() const;
     glm::dmat4x4 getOrientation() const;
     glm::dvec4 getPosition() const;
-    std::vector<double> getObjectParameters();
-    std::vector<double> getElementParameters() const;
-    std::vector<double> getSurfaceParams() const;
-    std::vector<double> getSlopeError() const;
+    std::array<double, 4 * 4> getObjectParameters();
+    std::array<double, 4 * 4> getElementParameters() const;
+    std::array<double, 4 * 4> getSurfaceParams() const;
+    std::array<double, 7> getSlopeError() const;
 
     OpticalElement();
-    ~OpticalElement();
-
-    // TODO(Jannis): move to geometry
-    enum GRATING_MOUNT {
-        GM_DEVIATION,
-        GM_INCIDENCE
-    };  ///< influences incidence and exit angle calculation (moved somewhere
-        ///< else)
+    virtual ~OpticalElement();
 
   private:
     // GEOMETRY
@@ -76,22 +81,22 @@ class RAYX_API OpticalElement : public BeamlineObject {
                                            // attributes (up until surface)
     // SURFACE (eg Quadric or if eg torus something else)
     std::unique_ptr<Surface> m_surfacePtr;
-    std::vector<double> m_surfaceParams;  // used to be anchor points
+    std::array<double, 4 * 4> m_surfaceParams;  // used to be anchor points
 
     // Geometric Parameter
     // 7 paramters that specify the slope error, are stored in objectParamters
     // to give to shader
-    std::vector<double> m_slopeError;
+    std::array<double, 7> m_slopeError;
 
-    std::vector<double> m_inMatrix;
-    std::vector<double> m_outMatrix;
+    std::array<double, 4 * 4> m_inMatrix;
+    std::array<double, 4 * 4> m_outMatrix;
 
     // things every optical element has (e.g. slope error) (16 entries -> one
     // dmat4x4 in shader) also put to shader
-    std::vector<double> m_objectParameters;
+    std::array<double, 4 * 4> m_objectParameters;
     // additional element-specific parameters that are used for tracing (16
     // entries -> one dmat4x4 in shader)
-    std::vector<double> m_elementParameters;
+    std::array<double, 4 * 4> m_elementParameters;
 };
 
 }  // namespace RAYX

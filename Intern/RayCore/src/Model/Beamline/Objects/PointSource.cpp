@@ -2,8 +2,9 @@
 
 #include <Data/xml.h>
 
-#include <cassert>
 #include <cmath>
+
+#include "Debug.h"
 
 namespace RAYX {
 
@@ -43,108 +44,33 @@ namespace RAYX {
 PointSource::PointSource(const std::string name, EnergyDistribution dist,
                          const double sourceWidth, const double sourceHeight,
                          const double sourceDepth, const double horDivergence,
-                         const double verDivergence, const int widthDist,
-                         const int heightDist, const int horDist,
-                         const int verDist, const double linPol0,
+                         const double verDivergence, SourceDist widthDist,
+                         SourceDist heightDist, SourceDist horDist,
+                         SourceDist verDist, const double linPol0,
                          const double linPol45, const double circPol,
-                         const std::vector<double> misalignment)
+                         const std::array<double, 6> misalignment)
     : LightSource(name.c_str(), dist, linPol0, linPol45, circPol, misalignment,
                   sourceDepth, sourceHeight, sourceWidth, horDivergence,
                   verDivergence) {
-    m_widthDist = widthDist == 0 ? SD_UNIFORM : SD_GAUSSIAN;
-    m_heightDist = heightDist == 0 ? SD_UNIFORM : SD_GAUSSIAN;
-    m_horDist = horDist == 0 ? SD_UNIFORM : SD_GAUSSIAN;
-    m_verDist = verDist == 0 ? SD_UNIFORM : SD_GAUSSIAN;
-    std::normal_distribution<double> m_stdnorm(0, 1);
-    std::uniform_real_distribution<double> m_uniform(0, 1);
-    std::default_random_engine m_re;
+    m_widthDist = widthDist;
+    m_heightDist = heightDist;
+    m_horDist = horDist;
+    m_verDist = verDist;
 }
 
 PointSource::~PointSource() {}
 
 // returns nullptr on error
-std::shared_ptr<PointSource> PointSource::createFromXML(
-    rapidxml::xml_node<>* node) {
-    const std::string name = node->first_attribute("name")->value();
-
-    if (!xml::paramInt(node, "numberRays", &SimulationEnv::get().m_numOfRays)) {
-        return nullptr;
-    }
-
-    EnergyDistribution energyDistribution;
-    if (!xml::paramEnergyDistribution(node, &energyDistribution)) {
-        return nullptr;
-    }
-
-    double sourceWidth;
-    if (!xml::paramDouble(node, "sourceWidth", &sourceWidth)) {
-        return nullptr;
-    }
-
-    double sourceHeight;
-    if (!xml::paramDouble(node, "sourceHeight", &sourceHeight)) {
-        return nullptr;
-    }
-
-    double sourceDepth;
-    if (!xml::paramDouble(node, "sourceDepth", &sourceDepth)) {
-        return nullptr;
-    }
-
-    double horDivergence;
-    if (!xml::paramDouble(node, "horDiv", &horDivergence)) {
-        return nullptr;
-    }
-
-    double verDivergence;
-    if (!xml::paramDouble(node, "verDiv", &verDivergence)) {
-        return nullptr;
-    }
-
-    int widthDist;
-    if (!xml::paramInt(node, "sourceWidthDistribution", &widthDist)) {
-        return nullptr;
-    }
-
-    int heightDist;
-    if (!xml::paramInt(node, "sourceHeightDistribution", &heightDist)) {
-        return nullptr;
-    }
-
-    int horDist;
-    if (!xml::paramInt(node, "horDivDistribution", &horDist)) {
-        return nullptr;
-    }
-
-    int verDist;
-    if (!xml::paramInt(node, "verDivDistribution", &verDist)) {
-        return nullptr;
-    }
-
-    double linPol0;
-    if (!xml::paramDouble(node, "linearPol_0", &linPol0)) {
-        return nullptr;
-    }
-
-    double linPol45;
-    if (!xml::paramDouble(node, "linearPol_45", &linPol45)) {
-        return nullptr;
-    }
-
-    double circPol;
-    if (!xml::paramDouble(node, "circularPol", &circPol)) {
-        return nullptr;
-    }
-
-    std::vector<double> misalignment;
-    if (!xml::paramMisalignment(node, &misalignment)) {
-        return nullptr;
-    }
+std::shared_ptr<PointSource> PointSource::createFromXML(RAYX::xml::Parser p) {
+    SimulationEnv::get().m_numOfRays = p.parseNumberRays();
 
     return std::make_shared<PointSource>(
-        name, energyDistribution, sourceWidth, sourceHeight, sourceDepth,
-        horDivergence, verDivergence, widthDist, heightDist, horDist, verDist,
-        linPol0, linPol45, circPol, misalignment);
+        p.name(), p.parseEnergyDistribution(), p.parseSourceWidth(),
+        p.parseSourceHeight(), p.parseSourceDepth(), p.parseHorDiv(),
+        p.parseVerDiv(), p.parseSourceWidthDistribution(),
+        p.parseSourceHeightDistribution(), p.parseHorDivDistribution(),
+        p.parseVerDivDistribution(), p.parseLinearPol0(), p.parseLinearPol45(),
+        p.parseCircularPol(), p.parseMisalignment());
 }
 
 /**
@@ -164,8 +90,7 @@ std::vector<Ray> PointSource::getRays() {
     int n = SimulationEnv::get().m_numOfRays;
     std::vector<Ray> rayVector;
     rayVector.reserve(1048576);
-    std::cout << "[PointSource]: Create " << n
-              << " rays with standard normal deviation..." << std::endl;
+    RAYX_LOG << "Create " << n << " rays with standard normal deviation...";
 
     // create n rays with random position and divergence within the given span
     // for width, height, depth, horizontal and vertical divergence
@@ -186,14 +111,14 @@ std::vector<Ray> PointSource::getRays() {
         glm::dvec4 stokes =
             glm::dvec4(1, getLinear0(), getLinear45(), getCircular());
 
-        Ray r = {position.x, position.y, position.z, 1.0, direction.x,
-                        direction.y, direction.z, en, stokes.x, stokes.y,
-                        stokes.z, stokes.w, 0.0, 0.0, 0.0, 0.0};
-                
+        Ray r = {position.x,  position.y,  position.z,  1.0,
+                 direction.x, direction.y, direction.z, en,
+                 stokes.x,    stokes.y,    stokes.z,    stokes.w,
+                 0.0,         0.0,         0.0,         0.0};
 
         rayVector.emplace_back(r);
     }
-    std::cout << "[PointSource]: &rayVector: " << &(rayVector[0]) << std::endl;
+    RAYX_LOG << "&rayVector: " << &(rayVector[0]);
     // rayVector.resize(1048576);
     return rayVector;
 }
@@ -203,18 +128,11 @@ std::vector<Ray> PointSource::getRays() {
  * hard edge, gaussian if soft edge)) and extent (eg specified width/height of
  * source)
  */
-double PointSource::getCoord(const PointSource::SOURCE_DIST l,
-                             const double extent) {
-    if (l == SD_UNIFORM) {
+double PointSource::getCoord(const SourceDist l, const double extent) {
+    if (l == SourceDist::Uniform) {
         return (m_uniformDist(m_randEngine) - 0.5) * extent;
     } else {
         return (m_normDist(m_randEngine) * extent);
     }
 }
-
-double PointSource::getSourceDepth() const { return m_sourceDepth; }
-double PointSource::getSourceHeight() const { return m_sourceHeight; }
-double PointSource::getSourceWidth() const { return m_sourceWidth; }
-double PointSource::getVerDivergence() const { return m_verDivergence; }
-double PointSource::getHorDivergence() const { return m_horDivergence; }
 }  // namespace RAYX

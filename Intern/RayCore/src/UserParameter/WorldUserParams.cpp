@@ -1,5 +1,9 @@
 #include "WorldUserParams.h"
 
+#include <sstream>
+
+#include "Debug.h"
+
 namespace RAYX {
 /**
  * constructor for geometric user parameters of an object. In this class the
@@ -19,7 +23,8 @@ namespace RAYX {
  * by a rotation through this angle
  */
 WorldUserParams::WorldUserParams(double alpha, double beta, double chi,
-                                 double dist, std::vector<double> misalignment,
+                                 double dist,
+                                 std::array<double, 6> misalignment,
                                  double tangentAngle)
     : m_incidenceAngle(alpha),
       m_exitAngle(beta),
@@ -106,6 +111,14 @@ glm::dmat4x4 WorldUserParams::getMisalignmentOrientation() {
 }
 
 /**
+ * @return azimuthalAngle: chi + dchi in rad
+ * = orientation of element in xy-plane + rotational misalignment in xy-plane
+ */
+double WorldUserParams::getAzimuthalAngle() {
+    return m_azimuthalAngle + m_misalignment[5];
+}
+
+/**
  * @return the rotation matrix around the x-axis by tangentAngle
  */
 glm::dmat4x4 WorldUserParams::getTangentAngleRotation() {
@@ -141,14 +154,15 @@ glm::dmat4x4 WorldUserParams::calcOrientation(WorldUserParams prev,
     // (misalignment * local orientation)
     current_orientation = prev_or * prev_e2b * current_orientation;
 
-    std::cout << "[WUP]: Calculated orientation from previous" << std::endl;
+    /*RAYX_LOG << "Calculated orientation from previous";
     for (int i = 0; i < 4; i++) {
-        std::cout << '\t';
+        std::stringstream s;
+        s << "\t";
         for (int j = 0; j < 4; j++) {
-            std::cout << current_orientation[i][j] << ", ";
+            s << current_orientation[i][j] << ", ";
         }
-        std::cout << std::endl;
-    }
+        RAYX_LOG << s.str();
+    }*/
     return current_orientation;
 }
 
@@ -171,20 +185,20 @@ glm::dmat4x4 WorldUserParams::calcOrientation() {
 
     glm::dmat4x4 misalignmentOr = getMisalignmentOrientation();
     glm::dmat4x4 orientation =
-        glm::dmat4x4(cos_c, sin_c, 0, 0, 
-                     -sin_c * cos_a, cos_c * cos_a, -sin_a, 0, -sin_c * sin_a,
-                     sin_a * cos_c, cos_a, 0, 0, 0, 0, 1);
+        glm::dmat4x4(cos_c, sin_c, 0, 0, -sin_c * cos_a, cos_c * cos_a, -sin_a,
+                     0, -sin_c * sin_a, sin_a * cos_c, cos_a, 0, 0, 0, 0, 1);
 
     orientation = orientation * tangentAngleRotation * misalignmentOr *
                   inverseTangentAngleRotation;
-    std::cout << "[WUP]: Calculated orientation" << std::endl;
+    /*RAYX_LOG << "Calculated orientation";
     for (int i = 0; i < 4; i++) {
-        std::cout << '\t';
+        std::stringstream s;
+        s << '\t';
         for (int j = 0; j < 4; j++) {
-            std::cout << orientation[i][j] << ", ";
+            s << orientation[i][j] << ", ";
         }
-        std::cout << std::endl;
-    }
+        RAYX_LOG << s.str();
+    }*/
     return orientation;
 }
 
@@ -219,9 +233,8 @@ glm::dvec4 WorldUserParams::calcPosition(WorldUserParams prev,
                        prev_offset;  // remove misalignment (possibly in
                                      // different coord system -> tangentAngle)
                                      // from position of previous element
-    std::cout << "[WUP]: previous position = " << position[0] << ", "
-              << position[1] << ", " << position[2] << ", " << position[3]
-              << std::endl;
+    // RAYX_LOG << "previous position = " << position[0] << ", " << position[1]
+    //          << ", " << position[2] << ", " << position[3];
     position =
         position +
         prev_or * prev_e2b *
@@ -233,10 +246,11 @@ glm::dvec4 WorldUserParams::calcPosition(WorldUserParams prev,
             new_offset;  // add misalignment (possibly in different coord system
                          // -> tangentAngle) of new element to the position
 
+    /*std::stringstream s;
     for (int i = 0; i < 4; i++) {
-        std::cout << position[i] << ", " << std::endl;
+        s << position[i] << ", ";
     }
-    std::cout << std::endl;
+    RAYX_LOG << s.str();*/
     return position;
 }
 
@@ -258,15 +272,16 @@ glm::dvec4 WorldUserParams::calcPosition() {
     // add misalignment (possibly in different coord system -> tangentAngle) of
     // new element to the position
     position = position + orientation * tangentAngleRotation * offset;
-    std::cout << "[WUP]: Position: ";
+    /*std::stringstream s;
+    s << "Position: ";
     for (int i = 0; i < 4; i++) {
-        std::cout << position[i] << ", ";
+        s << position[i] << ", ";
     }
-    std::cout << std::endl;
+    RAYX_LOG << s.str();*/
     return position;
 }
 
-std::vector<double> WorldUserParams::getMisalignment() {
+std::array<double, 6> WorldUserParams::getMisalignment() {
     return m_misalignment;
 }
 

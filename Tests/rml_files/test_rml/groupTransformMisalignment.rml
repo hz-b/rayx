@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<lab>
+<version>1.1</version>
+<beamline>
+
+  <object name="Point Source" type="Point Source">
+    <param id="numberRays" enabled="T">20000</param>
+    <param id="sourceWidthDistribution" comment="gaussian (sigma)" enabled="T">1</param>
+    <param id="sourceWidth" enabled="T">0.065</param>
+    <param id="sourceHeightDistribution" comment="gaussian (sigma)" enabled="T">1</param>
+    <param id="sourceHeight" enabled="T">0.04</param>
+    <param id="sourceDepth" enabled="T">1</param>
+    <param id="horDivDistribution" comment="gaussian (sigma)" enabled="T">1</param>
+    <param id="horDiv" enabled="T">1</param>
+    <param id="verDivDistribution" comment="gaussian (sigma)" enabled="T">1</param>
+    <param id="verDiv" enabled="T">1</param>
+    <param id="alignmentError" comment="No" enabled="T">1</param>
+    <param id="translationXerror" enabled="F">0</param>
+    <param id="translationYerror" enabled="F">0</param>
+    <param id="rotationXerror" enabled="F">0</param>
+    <param id="rotationYerror" enabled="F">0</param>
+    <param id="energyDistributionType" comment="File" enabled="T">0</param>
+    <param id="photonEnergyDistributionFile" relative="loadDatFile.DAT" enabled="T">loadDatFile.DAT</param>
+    <param id="photonEnergy" enabled="F">100</param>
+    <param id="energySpreadType" comment="white band" enabled="F">0</param>
+    <param id="energySpreadUnit" comment="eV" enabled="F">0</param>
+    <param id="energySpread" enabled="F">0</param>
+    <param id="linearPol_0" enabled="T">1</param>
+    <param id="linearPol_45" enabled="T">0</param>
+    <param id="circularPol" enabled="T">0</param>
+    <param id="sourcePulseType" comment="all rays start simultaneously" enabled="T">0</param>
+    <param id="sourcePulseLength" enabled="F">0</param>
+    <param id="worldPosition" enabled="F">
+      <x>0</x>
+      <y>0</y>
+      <z>0</z>
+    </param>
+    <param id="worldXdirection" enabled="F">
+      <x>1</x>
+      <y>0</y>
+      <z>0</z>
+    </param>
+    <param id="worldYdirection" enabled="F">
+      <x>0</x>
+      <y>1</y>
+      <z>0</z>
+    </param>
+    <param id="worldZdirection" enabled="F">
+      <x>0</x>
+      <y>0</y>
+      <z>1</z>
+    </param>
+  </object>
+
+  <group>
+    <param id="worldPosition" enabled="F">
+      <x>42</x>
+      <y>2</y>
+      <z>4</z>
+    </param>
+    <param id="worldXdirection" enabled="F">
+      <x>1</x>
+      <y>0</y>
+      <z>0</z>
+    </param>
+    <param id="worldYdirection" enabled="F">
+      <x>0</x>
+      <y>0.985</y>
+      <z>-0.174</z>
+    </param>
+    <param id="worldZdirection" enabled="F">
+      <x>0</x>
+      <y>0.174</y>
+      <z>0.985</z>
+    </param>
+	  <object name="ImagePlane1" type="ImagePlane">
+		<param id="distanceImagePlane" enabled="T">1000</param>
+    <param id="alignmentError" comment="Yes" enabled="T">0</param>
+    <param id="translationXerror" enabled="T">1</param>
+    <param id="translationYerror" enabled="T">2</param>
+    <param id="translationZerror" enabled="T">3</param>
+    <param id="rotationXerror" enabled="T">4</param>
+    <param id="rotationYerror" enabled="T">5</param>
+    <param id="rotationZerror" enabled="T">6</param>
+		<param id="worldPosition" enabled="F">
+		  <x>1.0030812141917165</x>
+		  <y>1.9940383757786857</y>
+		  <z>1003.0029383999106</z>
+		</param>
+		<param id="worldXdirection" enabled="F">
+      <x>0.9999695003050405</x>
+		  <y>0.0059998890006710479</y>
+		  <z>-0.0049999791666927081</z>
+		</param>
+		<param id="worldYdirection" enabled="F">
+		  <x>-0.0059799164970795564</x>
+		  <y>0.99997412020712606</y>
+		  <z>0.0039999393335793665</z>
+		</param>
+		<param id="worldZdirection" enabled="F">
+		  <x>0.0050238489602783942</x>
+		  <y>-0.0039699178787458754</y>
+		  <z>0.999979500136708</z>
+		</param>
+	  </object>
+  </group>
+
+
+</beamline>
+
+<ExtraData>
+</ExtraData>
+</lab>

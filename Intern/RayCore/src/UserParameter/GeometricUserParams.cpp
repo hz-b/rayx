@@ -1,5 +1,7 @@
 #include "GeometricUserParams.h"
 
+#include "Debug.h"
+
 namespace RAYX {
 /**
  * for Plane and Sphere Mirrors
@@ -23,16 +25,16 @@ GeometricUserParams::GeometricUserParams(double incidenceAngle)
  * @param additionalOrder       0/1 whether or not to trace the zero order
  * @param orderOfDiffraction    order of diffraction that should be traced
  */
-GeometricUserParams::GeometricUserParams(int mount, double deviation,
+GeometricUserParams::GeometricUserParams(GratingMount mount, double deviation,
                                          double normalIncidence,
                                          double lineDensity,
                                          double designEnergy,
                                          int orderOfDiffraction)
     : m_radius(0), m_shortRadius(0) {
     double angle = 0;  // TODO what should angle be if mount is neither 0 or 1?
-    if (mount == 0) {  // incidence
+    if (mount == GratingMount::Deviation) {
         angle = deviation;
-    } else if (mount == 1) {  // deviation
+    } else if (mount == GratingMount::Incidence) {
         angle = -normalIncidence;
     }
     focus(angle, designEnergy, lineDensity, orderOfDiffraction);
@@ -40,11 +42,12 @@ GeometricUserParams::GeometricUserParams(int mount, double deviation,
 
 // RZP
 GeometricUserParams::GeometricUserParams(
-    int mount, int imageType, double deviationAngle, double grazingIncidence,
-    double grazingExitAngle, double sourceEnergy, double designEnergy,
-    double orderOfDiffraction, double designOrderOfDiffraction,
-    double designAlphaAngle, double designBetaAngle, double mEntrance,
-    double mExit, double sEntrance, double sExit)
+    GratingMount mount, ImageType imageType, double deviationAngle,
+    double grazingIncidence, double grazingExitAngle, double sourceEnergy,
+    double designEnergy, double orderOfDiffraction,
+    double designOrderOfDiffraction, double designAlphaAngle,
+    double designBetaAngle, double mEntrance, double mExit, double sEntrance,
+    double sExit)
     : m_radius(0), m_shortRadius(0) {
     double designWavelength = hvlam(designEnergy);
     double sourceWavelength = hvlam(sourceEnergy);
@@ -52,19 +55,19 @@ GeometricUserParams::GeometricUserParams(
         calcDz00(imageType, designWavelength, designAlphaAngle, designBetaAngle,
                  designOrderOfDiffraction, sEntrance, sExit, mEntrance, mExit);
 
-    GRATING_MOUNT gratingMount = mount == 0 ? GM_DEVIATION : GM_INCIDENCE;
+    GratingMount gratingMount = mount;
     // calculate alpha depending on either incidence or deviation angle IF
     // incidence not given directly
     if (grazingIncidence == 0) {
-        if (gratingMount == GM_INCIDENCE) {
-            std::cout << "use design angle" << std::endl;
+        if (gratingMount == GratingMount::Incidence) {
+            RAYX_LOG << "use design angle";
             m_alpha = degToRad(designAlphaAngle);
-        } else if (gratingMount == GM_DEVIATION) {
-            std::cout << "use deviation angle" << std::endl;
+        } else if (gratingMount == GratingMount::Deviation) {
+            RAYX_LOG << "use deviation angle";
             focus(designEnergy, deviationAngle, dz, orderOfDiffraction);
         }
     } else {
-        std::cout << "use incidence angle" << std::endl;
+        RAYX_LOG << "use incidence angle";
         m_alpha = degToRad(grazingIncidence);
     }
 
@@ -105,7 +108,7 @@ void GeometricUserParams::focus(double angle, double designEnergy,
     double alph, bet;
     double a =
         abs(hvlam(designEnergy)) * abs(lineDensity) * orderOfDiffraction * 1e-6;
-    std::cout << "deviation " << angle << "theta" << theta << std::endl;
+    RAYX_LOG << "deviation " << angle << "theta" << theta;
     if (angle <= 0) {  // constant alpha mounting
         double arg = a - sin(theta);
         if (abs(arg) >= 1) {  // cannot calculate alpha & beta
@@ -126,7 +129,7 @@ void GeometricUserParams::focus(double angle, double designEnergy,
             alph = 2 * theta + bet;
         }
     }
-    std::cout << alph << ", " << bet << " angles" << std::endl;
+    RAYX_LOG << alph << ", " << bet << " angles";
     m_alpha = (PI / 2 - alph);
     m_beta = (PI / 2 - abs(bet));
 }
@@ -144,12 +147,10 @@ void GeometricUserParams::focus(double angle, double designEnergy,
  * @param mExit
  * @return Dz00 = line density at 0,0??
  */
-double GeometricUserParams::calcDz00(int imageType, double designWavelength,
-                                     double designAlphaAngle,
-                                     double designBetaAngle,
-                                     double designOrderOfDiffraction,
-                                     double sEntrance, double sExit,
-                                     double mEntrance, double mExit) {
+double GeometricUserParams::calcDz00(
+    ImageType imageType, double designWavelength, double designAlphaAngle,
+    double designBetaAngle, double designOrderOfDiffraction, double sEntrance,
+    double sExit, double mEntrance, double mExit) {
     // double fresnelOffset = calcFresnelZOffset(designBetaAngle,
     // designAlphaAngle, sEntrance, sExit); // overwrite given Fresneloffset
     // RAYX-UI calls rzpLineDensity function in fortran
@@ -161,7 +162,7 @@ double GeometricUserParams::calcDz00(int imageType, double designWavelength,
 }
 
 /**
- * Calculate fresnel z offset if DESIGN_TYPE == BETA from design angles.
+ * Calculate fresnel z offset if DesignType == BETA from design angles.
  * @param designBetaAngle
  * @param designAlphaAngle
  * @param sEntrance             sagittal entrance arm length
@@ -197,7 +198,7 @@ double GeometricUserParams::calcFresnelZOffset(double designAlphaAngle,
  * @return line density on RZP in Z direction for given conditions
  */
 double GeometricUserParams::rzpLineDensityDZ(
-    int imageType, glm::dvec3 intersection, glm::dvec3 normal,
+    ImageType imageType, glm::dvec3 intersection, glm::dvec3 normal,
     double designWavelength, double designAlphaAngle, double designBetaAngle,
     double designOrderOfDiffraction, double sEntrance, double sExit,
     double mEntrance, double mExit) {
@@ -222,8 +223,8 @@ double GeometricUserParams::rzpLineDensityDZ(
     double ym = 0;
     double zm = 0;
 
-    if (imageType == 0) {                      // point to point (standard)
-        if (normal.x == 0 && normal.z == 0) {  // plane
+    if (imageType == ImageType::Point2Point) {  // point to point (standard)
+        if (normal.x == 0 && normal.z == 0) {   // plane
             zi = -(risag * c_alpha + intersection.z);
             xi = intersection.x;
             yi = risag * s_alpha;
@@ -251,7 +252,8 @@ double GeometricUserParams::rzpLineDensityDZ(
                  normal.z * intersection.z + normal.z * rosag * c_beta +
                  normal.y * rosag * s_beta;
         }
-    } else if (imageType == 1) {  // astigmatic to astigmatix
+    } else if (imageType ==
+               ImageType::Astigmatic2Astigmatic) {  // astigmatic to astigmatix
         double s_rim = rimer < 0 ? -1 : 1;
         double s_rom = romer < 0 ? -1 : 1;
         double c_2alpha = cos(2 * designAlphaAngle);
@@ -336,7 +338,8 @@ double GeometricUserParams::calcTangentAngle(double incidence,
                                              double entranceArmLength,
                                              double exitArmLength,
                                              int coordSys) {
-    if (coordSys == 0) return 0;
+    if (coordSys == 0)
+        return 0;  // ellipsoid coord sys. else mirror coordinate system
     double theta =
         degToRad(incidence);  // designGrazingIncidenceAngle always equal to
                               // alpha (grazingIncidenceAngle)??
@@ -346,9 +349,9 @@ double GeometricUserParams::calcTangentAngle(double incidence,
     double angle = atan(tan(theta) * (entranceArmLength - exitArmLength) /
                         (entranceArmLength + exitArmLength));
     return angle;
-    // std::cout << "A= " << m_longHalfAxisA << ", B= " << m_shortHalfAxisB <<
+    // RAYX_LOG << "A= " << m_longHalfAxisA << ", B= " << m_shortHalfAxisB <<
     // ", C= " << m_halfAxisC << ", angle = " << m_tangentAngle << ", Z0 = " <<
-    // m_z0 << ", Y0= " << m_y0 << std::endl;
+    // m_z0 << ", Y0= " << m_y0;
 }
 
 // calculate radius for sphere mirror
@@ -359,15 +362,16 @@ void GeometricUserParams::calcMirrorRadius(double entranceArmLength,
 }
 
 // calculate radius for sphere grating
-void GeometricUserParams::calcGratingRadius(int mount, double deviation,
+void GeometricUserParams::calcGratingRadius(GratingMount mount,
+                                            double deviation,
                                             double entranceArmLength,
                                             double exitArmLength) {
-    if (mount == 0) {  // deviation
+    if (mount == GratingMount::Deviation) {
         double theta =
             deviation > 0 ? (PI - deviation) / 2 : PI / 2 + deviation;
         m_radius =
             2.0 / sin(theta) / (1.0 / entranceArmLength + 1.0 / exitArmLength);
-    } else if (mount == 1) {  // incidence
+    } else if (mount == GratingMount::Incidence) {
         double ca = cos(m_alpha);
         double cb = cos(m_beta);
         m_radius = (ca + cb) /

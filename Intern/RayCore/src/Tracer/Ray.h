@@ -39,6 +39,26 @@ struct RAYX_API Ray {
         ray.m_extraParam = 0.0;
         return ray;
     }
+
+    static Ray makeRayFrom(const glm::dvec3& origin,
+                           const glm::dvec3& direction,
+                           const glm::dvec4& stokes, const double energy,
+                           const double weight, const double pathLength,
+                           const double order, const double lastElement,
+                           const double extraParam) {
+        Ray ray;
+        ray.m_position = {origin.x, origin.y, origin.z};
+        ray.m_direction = {direction.x, direction.y, direction.z};
+        ray.m_stokes = {stokes.x, stokes.y, stokes.z, stokes.w};
+        ray.m_energy = energy;
+        ray.m_weight = weight;
+        ray.m_pathLength = pathLength;
+        ray.m_order = order;
+        ray.m_lastElement = lastElement;
+        ray.m_extraParam = extraParam;
+        return ray;
+    }
+
     // TODO(Jannis): remove
     double getxDir() const { return m_direction.x; }
     double getyDir() const { return m_direction.y; }

@@ -7,13 +7,15 @@
 #include <stdexcept>
 #include <vector>
 
+#include "Debug.h"
 #include "Tracer/Ray.h"
 #include "utils.h"
 
 namespace RAYX {
 Geometry::Geometry(GeometricalShape geometricShape, double width, double height,
-                   glm::dvec4 position, glm::dmat4x4 orientation)
-    : m_widthB(0) {
+                   const double azimuthalAngle, glm::dvec4 position,
+                   glm::dmat4x4 orientation)
+    : m_widthB(0), m_azimuthalAngle(azimuthalAngle) {
     m_geometricalShape = geometricShape;
     if (m_geometricalShape == GeometricalShape::ELLIPTICAL) {
         m_widthA = -width;
@@ -29,9 +31,9 @@ Geometry::Geometry(GeometricalShape geometricShape, double width, double height,
 }
 
 Geometry::Geometry(GeometricalShape geometricShape, double widthA,
-                   double widthB, double height, glm::dvec4 position,
-                   glm::dmat4x4 orientation)
-    : m_widthB(widthB) {
+                   double widthB, double height, const double azimuthalAngle,
+                   glm::dvec4 position, glm::dmat4x4 orientation)
+    : m_widthB(widthB), m_azimuthalAngle(azimuthalAngle) {
     m_geometricalShape = geometricShape;
     if (m_geometricalShape == GeometricalShape::ELLIPTICAL) {
         m_widthA = -widthA;
@@ -57,6 +59,24 @@ Geometry::~Geometry() {}
  */
 void Geometry::calcTransformationMatrices(glm::dvec4 position,
                                           glm::dmat4x4 orientation) {
+    RAYX_LOG << "Calculated orientation";
+    for (int i = 0; i < 4; i++) {
+        std::stringstream s;
+        s.precision(17);
+        s << '\t';
+        for (int j = 0; j < 4; j++) {
+            s << orientation[i][j] << ", ";
+        }
+        RAYX_LOG << s.str();
+    }
+    std::stringstream s;
+    s.precision(17);
+    s << "Position: ";
+    for (int i = 0; i < 4; i++) {
+        s << position[i] << ", ";
+    }
+    RAYX_LOG << s.str();
+
     glm::dmat4x4 translation =
         glm::dmat4x4(1, 0, 0, -position[0], 0, 1, 0, -position[1], 0, 0, 1,
                      -position[2], 0, 0, 0, 1);  // o
@@ -72,15 +92,15 @@ void Geometry::calcTransformationMatrices(glm::dvec4 position,
 
     // ray = tran * rot * ray
     glm::dmat4x4 g2e = translation * rotation;
-    m_inMatrix = glmToVector16(glm::transpose(g2e));
+    m_inMatrix = glmToArray16(glm::transpose(g2e));
 
     // inverse of m_inMatrix
     glm::dmat4x4 e2g = inv_rotation * inv_translation;
-    m_outMatrix = glmToVector16(glm::transpose(e2g));
+    m_outMatrix = glmToArray16(glm::transpose(e2g));
 
-    std::cout << "from position and orientation" << std::endl;
-    printMatrix(m_inMatrix);
-    printMatrix(m_outMatrix);
+    /*RAYX_LOG << "from position and orientation";
+    printDMatrix(m_inMatrix);
+    printDMatrix(m_outMatrix);*/
 }
 
 void Geometry::getWidth(double& widthA, double& widthB) {
@@ -90,20 +110,20 @@ void Geometry::getWidth(double& widthA, double& widthB) {
 
 double Geometry::getHeight() { return m_height; }
 
-std::vector<double> Geometry::getInMatrix() { return m_inMatrix; }
+double Geometry::getAzimuthalAngle() { return m_azimuthalAngle; }
 
-std::vector<double> Geometry::getOutMatrix() { return m_outMatrix; }
+std::array<double, 4 * 4> Geometry::getInMatrix() { return m_inMatrix; }
+
+std::array<double, 4 * 4> Geometry::getOutMatrix() { return m_outMatrix; }
 
 glm::dvec4 Geometry::getPosition() { return m_position; }
 
 glm::dmat4x4 Geometry::getOrientation() { return m_orientation; }
 
-void Geometry::setInMatrix(std::vector<double> inputMatrix) {
-    assert(inputMatrix.size() == 16);
+void Geometry::setInMatrix(std::array<double, 4 * 4> inputMatrix) {
     m_inMatrix = inputMatrix;
 }
-void Geometry::setOutMatrix(std::vector<double> inputMatrix) {
-    assert(inputMatrix.size() == 16);
+void Geometry::setOutMatrix(std::array<double, 4 * 4> inputMatrix) {
     m_outMatrix = inputMatrix;
 }
 

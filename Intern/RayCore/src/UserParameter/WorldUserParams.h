@@ -7,6 +7,7 @@
 #include <memory>
 #include <stdexcept>
 #include <vector>
+#include <array>
 
 #include "Core.h"
 #include "Model/Beamline/OpticalElement.h"
@@ -17,7 +18,7 @@ namespace RAYX {
 class RAYX_API WorldUserParams {
   public:
     WorldUserParams(double alpha, double beta, double chi, double dist,
-                    std::vector<double> misalignment, double tangentAngle = 0);
+                    std::array<double, 6> misalignment, double tangentAngle = 0);
     WorldUserParams();
     ~WorldUserParams();
 
@@ -43,14 +44,15 @@ class RAYX_API WorldUserParams {
     glm::dmat4x4 calcOrientation(WorldUserParams prev, glm::dmat4x4 prev_or);
     glm::dmat4x4 calcOrientation();
 
-    std::vector<double> getMisalignment();
+    std::array<double, 6> getMisalignment();
+    double getAzimuthalAngle();
 
   private:
     double m_incidenceAngle;
     double m_exitAngle;
     double m_azimuthalAngle;
     double m_dist;
-    std::vector<double> m_misalignment;
+    std::array<double, 6> m_misalignment;
     /** Only for ellipsoid when the misalignment is defined in the mirror
      * coordinate system and not in the element coordinate system the mirror
      * coordinate system is the element coordinate system rotated by this angle

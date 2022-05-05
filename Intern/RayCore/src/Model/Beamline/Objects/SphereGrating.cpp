@@ -1,5 +1,7 @@
 #include "SphereGrating.h"
 
+#include "Debug.h"
+
 namespace RAYX {
 
 /**
@@ -12,6 +14,8 @@ namespace RAYX {
  * constant deviation, constant incidence,...
  * @param width                         total width of the mirror (x dimension)
  * @param height                        total height of the mirror (z dimension)
+ * @param azimuthalAngle                rotation of element in xy-plane, needed
+ * for stokes vector, in rad
  * @param radius                        radius of sphere
  * @param position                      position of the element in world
  * coordinate system
@@ -25,112 +29,56 @@ namespace RAYX {
  * @param slopeError                    7 slope error parameters: x-y sagittal
  * (0), y-z meridional (1), thermal distortion: x (2),y (3),z (4), cylindrical
  * bowing amplitude y(5) and radius (6)
+ * @param mat                           material (See Material.h)
  *
  */
-SphereGrating::SphereGrating(const char* name, int mount,
+SphereGrating::SphereGrating(const char* name, GratingMount mount,
                              Geometry::GeometricalShape geometricalShape,
-                             double width, double height, double radius,
+                             double width, double height,
+                             const double azimuthalAngle, double radius,
                              glm::dvec4 position, glm::dmat4x4 orientation,
                              double designEnergyMounting, double lineDensity,
-                             double orderOfDiffraction, std::vector<double> vls,
-                             std::vector<double> slopeError)
-    : OpticalElement(name, geometricalShape, width, height, position,
-                     orientation, slopeError),
+                             double orderOfDiffraction,
+                             std::array<double, 6> vls,
+                             std::array<double, 7> slopeError, Material mat)
+    : OpticalElement(name, geometricalShape, width, height, azimuthalAngle,
+                     position, orientation, slopeError),
       m_designEnergyMounting(designEnergyMounting),
       m_lineDensity(lineDensity),
       m_orderOfDiffraction(orderOfDiffraction),
       m_vls(vls) {
+    RAYX_LOG << name;
+
     double icurv = 1;
-    m_gratingMount = mount == 0 ? GM_DEVIATION : GM_INCIDENCE;
-    setSurface(std::make_unique<Quadric>(std::vector<double>{
-        1, 0, 0, 0, icurv, 1, 0, -radius, 0, 0, 1, 0, 2, 0, 0, 0}));
+    m_gratingMount = mount;
+    double matd = (double)static_cast<int>(mat);
+    setSurface(std::make_unique<Quadric>(std::array<double, 4 * 4>{
+        1, 0, 0, 0, icurv, 1, 0, -radius, 0, 0, 1, 0, 2, 0, matd, 0}));
     setElementParameters({0, 0, m_lineDensity, m_orderOfDiffraction,
                           abs(hvlam(m_designEnergyMounting)), 0, m_vls[0],
                           m_vls[1], m_vls[2], m_vls[3], m_vls[4], m_vls[5], 0,
                           0, 0, 0});
-    std::cout << "[SphereGrating]: Created.\n";
 }
 
 SphereGrating::~SphereGrating() {}
 
-std::shared_ptr<SphereGrating> SphereGrating::createFromXML(
-    rapidxml::xml_node<>* node, const std::vector<xml::Group>& group_context) {
-    const char* name = node->first_attribute("name")->value();
-
-    int mount;
-    if (!xml::paramInt(node, "gratingMount", &mount)) {
-        return nullptr;
-    }
-
-    int gs;
-    if (!xml::paramInt(node, "geometricalShape", &gs)) {
-        return nullptr;
-    }
-    Geometry::GeometricalShape geometricalShape =
-        static_cast<Geometry::GeometricalShape>(
-            gs);  // HACK(Jannis): convert to enum
-
-    double width;
-    if (!xml::paramDouble(node, "totalWidth", &width)) {
-        return nullptr;
-    }
-
-    double height;
-    if (!xml::paramDouble(node, "totalLength", &height)) {
-        return nullptr;
-    }
-
-    double radius;
-    if (!xml::paramDouble(node, "radius", &radius)) {
-        return nullptr;
-    }
-
-    glm::dvec4 position;
-    glm::dmat4x4 orientation;
-    if (!xml::paramPositionAndOrientation(node, group_context, &position,
-                                          &orientation)) {
-        return nullptr;
-    }
-
-    double designEnergyMounting;
-    if (!xml::paramDouble(node, "designEnergy", &designEnergyMounting)) {
-        return nullptr;
-    }
-
-    double lineDensity;
-    if (!xml::paramDouble(node, "lineDensity", &lineDensity)) {
-        return nullptr;
-    }
-
-    double orderOfDiffraction;
-    if (!xml::paramDouble(node, "orderDiffraction", &orderOfDiffraction)) {
-        return nullptr;
-    }
-
-    std::vector<double> vls;
-    if (!xml::paramVls(node, &vls)) {
-        return nullptr;
-    }
-
-    std::vector<double> slopeError;
-    if (!xml::paramSlopeError(node, &slopeError)) {
-        return nullptr;
-    }
-
+std::shared_ptr<SphereGrating> SphereGrating::createFromXML(xml::Parser p) {
     return std::make_shared<SphereGrating>(
-        name, mount, geometricalShape, width, height, radius, position,
-        orientation, designEnergyMounting, lineDensity, orderOfDiffraction, vls,
-        slopeError);
+        p.name(), p.parseGratingMount(), p.parseGeometricalShape(),
+        p.parseTotalWidth(), p.parseTotalLength(), p.parseAzimuthalAngle(),
+        p.parseRadius(), p.parsePosition(), p.parseOrientation(),
+        p.parseDesignEnergy(), p.parseLineDensity(), p.parseOrderDiffraction(),
+        p.parseVls(), p.parseSlopeError(), p.parseMaterial());
 }
 
 /* TODO (Theresa): how to make radius calculation easier?
 void SphereGrating::calcRadius() {
-    if (m_gratingMount == GM_DEVIATION) {
+    if (m_gratingMount == GratingMount::Deviation) {
         double theta = m_deviation > 0 ? (PI - m_deviation) / 2 : PI / 2 +
 m_deviation; m_radius = 2.0 / sin(theta) / (1.0 / m_entranceArmLength + 1.0 /
 m_exitArmLength);
     }
-    else if (m_gratingMount == GM_INCIDENCE) {
+    else if (m_gratingMount == GratingMount::Incidence) {
         double ca = cos(getAlpha());
         double cb = cos(getBeta());
         m_radius = (ca + cb) / ((ca * ca) / m_entranceArmLength + (cb * cb) /
@@ -140,10 +88,10 @@ m_exitArmLength);
 
 void SphereGrating::calcAlpha(double deviation, double normalIncidence) {
     double angle;
-    if (m_gratingMount == GM_DEVIATION) {
+    if (m_gratingMount == GratingMount::Deviation) {
         angle = deviation;
     }
-    else if (m_gratingMount == GM_INCIDENCE) {
+    else if (m_gratingMount == GratingMount::Incidence) {
         angle = -normalIncidence;
     }
     focus(angle);
@@ -190,7 +138,7 @@ double SphereGrating::getEntranceArmLength() const {
 }
 
 double SphereGrating::getDeviation() const { return m_deviation; }
-int SphereGrating::getGratingMount() const { return m_gratingMount; }
+GratingMount SphereGrating::getGratingMount() const { return m_gratingMount; }
 double SphereGrating::getDesignEnergyMounting() const {
     return m_designEnergyMounting;
 }

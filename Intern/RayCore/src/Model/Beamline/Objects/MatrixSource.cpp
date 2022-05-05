@@ -1,8 +1,8 @@
 #include "MatrixSource.h"
 
-#include <cassert>
 #include <random>
 
+#include "Debug.h"
 #include "Debug/Instrumentor.h"
 
 namespace RAYX {
@@ -39,77 +39,24 @@ MatrixSource::MatrixSource(const std::string name, EnergyDistribution dist,
                            const double sourceDepth, const double horDivergence,
                            const double verDivergence, const double linPol0,
                            const double linPol45, const double circPol,
-                           const std::vector<double> misalignment)
+                           const std::array<double, 6> misalignment)
     : LightSource(name.c_str(), dist, linPol0, linPol45, circPol, misalignment,
                   sourceDepth, sourceHeight, sourceWidth, horDivergence,
                   verDivergence) {
-    std::cout << "[MatrixSource]: Created.\n";
+    RAYX_LOG << "Created.";
 }
 
 MatrixSource::~MatrixSource() {}
 
 // returns nullptr on error
-std::shared_ptr<MatrixSource> MatrixSource::createFromXML(
-    rapidxml::xml_node<>* node) {
-    const std::string name = node->first_attribute("name")->value();
-
-    if (!xml::paramInt(node, "numberRays", &SimulationEnv::get().m_numOfRays)) {
-        return nullptr;
-    }
-
-    EnergyDistribution energyDistribution;
-    if (!xml::paramEnergyDistribution(node, &energyDistribution)) {
-        return nullptr;
-    }
-
-    double sourceWidth;
-    if (!xml::paramDouble(node, "sourceWidth", &sourceWidth)) {
-        return nullptr;
-    }
-
-    double sourceHeight;
-    if (!xml::paramDouble(node, "sourceHeight", &sourceHeight)) {
-        return nullptr;
-    }
-
-    double sourceDepth;
-    if (!xml::paramDouble(node, "sourceDepth", &sourceDepth)) {
-        return nullptr;
-    }
-
-    double horDivergence;
-    if (!xml::paramDouble(node, "horDiv", &horDivergence)) {
-        return nullptr;
-    }
-
-    double verDivergence;
-    if (!xml::paramDouble(node, "verDiv", &verDivergence)) {
-        return nullptr;
-    }
-
-    double linPol0;
-    if (!xml::paramDouble(node, "linearPol_0", &linPol0)) {
-        return nullptr;
-    }
-
-    double linPol45;
-    if (!xml::paramDouble(node, "linearPol_45", &linPol45)) {
-        return nullptr;
-    }
-
-    double circPol;
-    if (!xml::paramDouble(node, "circularPol", &circPol)) {
-        return nullptr;
-    }
-
-    std::vector<double> misalignment;
-    if (!xml::paramMisalignment(node, &misalignment)) {
-        return nullptr;
-    }
+std::shared_ptr<MatrixSource> MatrixSource::createFromXML(xml::Parser p) {
+    SimulationEnv::get().m_numOfRays = p.parseNumberRays();
 
     return std::make_shared<MatrixSource>(
-        name, energyDistribution, sourceWidth, sourceHeight, sourceDepth,
-        horDivergence, verDivergence, linPol0, linPol45, circPol, misalignment);
+        p.name(), p.parseEnergyDistribution(), p.parseSourceWidth(),
+        p.parseSourceHeight(), p.parseSourceDepth(), p.parseHorDiv(),
+        p.parseVerDiv(), p.parseLinearPol0(), p.parseLinearPol45(),
+        p.parseCircularPol(), p.parseMisalignment());
 }
 
 /**
@@ -131,8 +78,8 @@ std::vector<Ray> MatrixSource::getRays() {
 
     std::vector<Ray> rayVector;
     rayVector.reserve(1048576);
-    std::cout << "[MatrixSource]: create " << rmat << " times " << rmat
-              << " matrix with Matrix Source..." << std::endl;
+    RAYX_LOG << "create " << rmat << " times " << rmat
+             << " matrix with Matrix Source...";
     // fill the square with rmat1xrmat1 rays
     for (int col = 0; col < rmat; col++) {
         for (int row = 0; row < rmat; row++) {
@@ -159,9 +106,10 @@ std::vector<Ray> MatrixSource::getRays() {
             glm::dvec4 stokes =
                 glm::dvec4(1, getLinear0(), getLinear45(), getCircular());
 
-            Ray r = {position.x, position.y, position.z, 1.0, direction.x,
-                        direction.y, direction.z, en, stokes.x, stokes.y,
-                        stokes.z, stokes.w, 0.0, 0.0, 0.0, 0.0};
+            Ray r = {position.x,  position.y,  position.z,  1.0,
+                     direction.x, direction.y, direction.z, en,
+                     stokes.x,    stokes.y,    stokes.z,    stokes.w,
+                     0.0,         0.0,         0.0,         0.0};
             // Ray(1, 2, 3, 7, 4, 5, 6, 8, 9, 10, 11, 12, 13, 14, 15, 16);
             rayVector.push_back(r);
         }
@@ -185,9 +133,10 @@ std::vector<Ray> MatrixSource::getRays() {
                    direction.z, stokes.x, stokes.y, stokes.z, stokes.w, en,
                    1.0);*/
         Ray r_copy((const Ray&)rayVector.at(i));
+        r_copy.m_energy = en = selectEnergy();
         rayVector.push_back(r_copy);
     }
-    std::cout << "[MatrixSource]: &rayVector: " << &(rayVector[0]) << std::endl;
+    RAYX_LOG << "&rayVector: " << &(rayVector[0]);
     // rayVector.resize(1048576);
     return rayVector;
 }

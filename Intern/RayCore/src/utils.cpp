@@ -1,5 +1,8 @@
 #include "utils.h"
 
+#include <sstream>
+
+#include "Debug.h"
 #include "Debug/Instrumentor.h"
 
 /**
@@ -43,48 +46,66 @@ glm::dmat4x4 getRotationMatrix(double dpsi, double dphi, double dchi) {
     return glm::transpose(misalignmentMatrix);
 }
 
-void printMatrix(std::vector<double> matrix) {
+void printDMatrix(std::array<double, 4 * 4> matrix) {
     RAYX_PROFILE_FUNCTION();
-    std::cout << "[Matrix]: size: " << matrix.size() << std::endl;
-    std::cout << "\t";
-    for (int i = 0; i < int(matrix.size()); i++) {
-        std::cout << matrix[i] << ", ";
+    std::stringstream s;
+    s << "\t";
+    for (int i = 0; i < 4 * 4; i++) {
+        s << matrix[i] << ", ";
         if (i % 4 == 3) {
-            std::cout << std::endl;
-            std::cout << "\t";
+            RAYX_LOG << s.str();
+            s.str("");
+            s << "\t";
         }
     }
-    std::cout << std::endl;
+    RAYX_LOG << s.str();
+}
+
+void printDVec4(glm::dvec4 vec) {
+    RAYX_PROFILE_FUNCTION();
+    std::stringstream s;
+    s.precision(17);
+    for (int i = 0; i < 4; i++) {
+        s << vec[i] << ", ";
+    }
+    RAYX_LOG << s.str();
 }
 
 void printDMat4(glm::dmat4 matrix) {
     RAYX_PROFILE_FUNCTION();
+    std::stringstream s;
+    s.precision(17);
     for (int i = 0; i < 4; i++) {
         for (int j = 0; j < 4; j++) {
-            std::cout << matrix[i][j] << ", ";
+            s << matrix[i][j] << ", ";
         }
-        std::cout << std::endl;
+        RAYX_LOG << s.str();
+        s.str("");
     }
-    std::cout << std::endl;
+    RAYX_LOG << s.str();
 }
 
-std::vector<double> glmToVector16(glm::dmat4x4 m) {
-    std::vector<double> matrix = {
+std::array<double, 4 * 4> glmToArray16(glm::dmat4x4 m) {
+    std::array<double, 4 * 4> matrix = {
         m[0][0], m[0][1], m[0][2], m[0][3], m[1][0], m[1][1], m[1][2], m[1][3],
         m[2][0], m[2][1], m[2][2], m[2][3], m[3][0], m[3][1], m[3][2], m[3][3]};
     return matrix;
 }
 
-glm::dmat4x4 vectorToGlm16(std::vector<double> m) {
+glm::dmat4x4 arrayToGlm16(std::array<double, 4 * 4> m) {
     glm::dmat4x4 matrix =
         glm::dmat4x4(m[0], m[1], m[2], m[3], m[4], m[5], m[6], m[7], m[8], m[9],
                      m[10], m[11], m[12], m[13], m[14], m[15]);
     return matrix;
 }
 
-std::vector<double> glmToVector4(glm::dvec4 v) {
-    std::vector<double> vector = {v[0], v[1], v[2], v[3]};
-    return vector;
+std::array<double, 4> glmToArray4(glm::dvec4 v) {
+    std::array<double, 4> a = {v[0], v[1], v[2], v[3]};
+    return a;
+}
+
+glm::dvec4 arrayToGlm4(std::array<double, 4> v) {
+    return glm::dvec4(v[0], v[1], v[2], v[3]);
 }
 
 /**
@@ -116,3 +137,12 @@ std::vector<double>::iterator movingAppend(std::vector<double>&& srcVector,
 
     return result;
 }
+
+/**
+ * @brief Checks if Matrix is the Identiy matrix;
+ *
+ * @param matrix Matrix to check
+ * @return true
+ * @return false
+ */
+bool isIdentMatrix(glm::dmat4x4 matrix) { return (matrix == glm::dmat4x4(1.0)); }

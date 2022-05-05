@@ -1,5 +1,6 @@
 #pragma once
 
+#include <array>
 #include <memory>
 #include <vector>
 
@@ -17,16 +18,16 @@ class RAYX_API Beamline {
 
     void addOpticalElement(const std::shared_ptr<OpticalElement> q);
     void addOpticalElement(const char* name,
-                           const std::vector<double>& inputPoints,
-                           std::vector<double> inputInMatrix,
-                           std::vector<double> inputOutMatrix,
-                           std::vector<double> OParameters,
-                           std::vector<double> EParameters);
-    void addOpticalElement(const char* name, std::vector<double>&& inputPoints,
-                           std::vector<double>&& inputInMatrix,
-                           std::vector<double>&& inputOutMatrix,
-                           std::vector<double>&& OParameters,
-                           std::vector<double>&& EParameters);
+                           const std::array<double, 4*4>& inputPoints,
+                           std::array<double, 4 * 4> inputInMatrix,
+                           std::array<double, 4 * 4> inputOutMatrix,
+                           std::array<double, 4 * 4> OParameters,
+                           std::array<double, 4 * 4> EParameters);
+    void addOpticalElement(const char* name, std::array<double, 4*4>&& inputPoints,
+                           std::array<double, 4 * 4>&& inputInMatrix,
+                           std::array<double, 4 * 4>&& inputOutMatrix,
+                           std::array<double, 4 * 4>&& OParameters,
+                           std::array<double, 4 * 4>&& EParameters);
 
     std::vector<std::shared_ptr<OpticalElement>> m_OpticalElements;
     std::vector<std::shared_ptr<LightSource>> m_LightSources;

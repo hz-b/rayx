@@ -8,6 +8,8 @@
 #include "Model/Beamline/Objects/RandomRays.h"
 
 // Optical Elements
+#include "Model/Beamline/Objects/Cone.h"
+#include "Model/Beamline/Objects/Cylinder.h"
 #include "Model/Beamline/Objects/Ellipsoid.h"
 #include "Model/Beamline/Objects/ImagePlane.h"
 #include "Model/Beamline/Objects/PlaneGrating.h"

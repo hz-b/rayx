@@ -1,11 +1,12 @@
 #include <Data/DatFile.h>
+#include <Debug.h>
 
 #include <fstream>
 #include <iostream>
 #include <sstream>
 
 namespace RAYX {
-bool DatFile::load(const char* filename, DatFile* out) {
+bool DatFile::load(std::filesystem::path filename, DatFile* out) {
     std::ifstream s(filename);
 
     std::string line;
@@ -17,8 +18,8 @@ bool DatFile::load(const char* filename, DatFile* out) {
     std::getline(s, line);
     if (sscanf(line.c_str(), "%u %le %le %le", &out->m_linecount, &out->m_start,
                &out->m_end, &out->m_step) != 4) {
-        std::cerr << "Failed to parse DatFile \"" << filename
-                  << "\", at line 2: \"" << line << "\"\n";
+        RAYX_ERR << "Failed to parse DatFile \"" << filename
+                 << "\", at line 2: \"" << line << "\"";
         return false;
     }
     out->m_Lines.reserve(out->m_linecount);
@@ -33,8 +34,8 @@ bool DatFile::load(const char* filename, DatFile* out) {
         DatEntry e;
 
         if (sscanf(line.c_str(), "%le %le", &e.m_energy, &e.m_weight) != 2) {
-            std::cerr << "Failed to parse DatFile \"" << filename
-                      << "\", at line " << lineidx << ": \"" << line << "\"\n";
+            RAYX_ERR << "Failed to parse DatFile \"" << filename
+                     << "\", at line " << lineidx << ": \"" << line << "\"";
             return false;
         }
         out->m_Lines.push_back(e);

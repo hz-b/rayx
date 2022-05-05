@@ -1,7 +1,5 @@
 #pragma once
 
-#include <assert.h>
-
 #include <cmath>
 #include <cstdlib>
 #include <iostream>
@@ -10,6 +8,7 @@
 #include <stdexcept>
 
 #include "Core.h"
+#include "NffTable.h"
 #include "Tracer/RayList.h"
 #include "vulkan/vulkan.hpp"
 
@@ -25,6 +24,7 @@ const bool enableValidationLayers = true;
 #define VULKANTRACER_QUADRIC_PARAM_DOUBLE_AMOUNT 4
 #define GPU_MAX_STAGING_SIZE 134217728  // 128MB
 #define RAY_VECTOR_SIZE 16777216
+#define VULKANTRACER_DEBUG_ENTRY_DOUBLE_AMOUNT 16
 
 namespace RAYX {
 
@@ -33,14 +33,16 @@ const std::vector<const char*> validationLayers = {
     "VK_LAYER_KHRONOS_validation"};
 
 // Used for validating return values of Vulkan API calls.
-#define VK_CHECK_RESULT(f)                                                     \
-    {                                                                          \
-        VkResult res = (f);                                                    \
-        if (res != VK_SUCCESS) {                                               \
-            printf("Fatal : VkResult is %d in %s at line %d\n", res, __FILE__, \
-                   __LINE__);                                                  \
-            assert(res == VK_SUCCESS);                                         \
-        }                                                                      \
+#define VK_CHECK_RESULT(f)                                               \
+    {                                                                    \
+        VkResult res = (f);                                              \
+        if (res != VK_SUCCESS) {                                         \
+            RAYX_WARN << "Fatal : VkResult fail!";                       \
+            RAYX_ERR << "Error code: " << res                            \
+                     << ", look up at "                                  \
+                        "https://www.khronos.org/registry/vulkan/specs/" \
+                        "1.3-extensions/man/html/VkResult.html";         \
+        }                                                                \
     }
 VkResult CreateDebugUtilsMessengerEXT(
     VkInstance instance, const VkDebugUtilsMessengerCreateInfoEXT* pCreateInfo,
@@ -59,24 +61,39 @@ class RAYX_API VulkanTracer {
     void run();
     // void addRay(double xpos, double ypos, double zpos, double xdir, double
     // ydir, double zdir, double weight); void addRay(double* location);
+    // cleans and destroys the whole tracer instance
+    // CALL CLEANTRACER BEFORE CALLING THIS ONE
     void cleanup();
+    // empties raylist, Beamline and output data, etc. so that the tracer
+    // instance can be used again
+    void cleanTracer();
 
     void getRays();
-    void addRayVector(const std::vector<Ray>& inRayVector);
-    void addVectors(const std::vector<double>& surfaceParams,
-                    const std::vector<double>& inputInMatrix,
-                    const std::vector<double>& inputOutMatrix,
-                    const std::vector<double>& objectParameters,
-                    const std::vector<double>& elementParameters);
+    void getDebugBuffer();
+    void addRayVector(std::vector<Ray>&& inRayVector);
+    void addArrays(const std::array<double, 4 * 4>& surfaceParams,
+                   const std::array<double, 4 * 4>& inputInMatrix,
+                   const std::array<double, 4 * 4>& inputOutMatrix,
+                   const std::array<double, 4 * 4>& objectParameters,
+                   const std::array<double, 4 * 4>& elementParameters);
     void setBeamlineParameters(uint32_t inNumberOfBeamlines,
                                uint32_t inNumberOfQuadricsPerBeamline,
                                uint32_t inNumberOfRays);
 
+    // getter
     std::list<std::vector<Ray>>::const_iterator getOutputIteratorBegin();
     std::list<std::vector<Ray>>::const_iterator getOutputIteratorEnd();
 
-    // getter
-    const RayList& getRayList() { return rayList; }
+    // https://www.khronos.org/registry/OpenGL/extensions/ARB/ARB_uniform_buffer_object.txt
+    // stf140 align rules (Stick to only 1 matrix for simplicity)
+    struct _debugBuf_t {
+        glm::dmat4x4 _dMat;  // Set to identiy matrix in shader.
+    };
+    std::vector<_debugBuf_t>::const_iterator getDebugIteratorBegin();
+    std::vector<_debugBuf_t>::const_iterator getDebugIteratorEnd();
+
+    const RayList& getRayList() { return m_RayList; }
+    const auto getDebugList() { return m_debugBufList; }
 
   private:
     // Member structs:
@@ -102,37 +119,59 @@ class RAYX_API VulkanTracer {
     };
 
     // Member variables:
-    VkInstance instance;
-    VkDebugUtilsMessengerEXT debugMessenger;
-    VkPhysicalDevice physicalDevice = VK_NULL_HANDLE;
-    VkDevice device;
-    std::vector<uint64_t> bufferSizes;
-    std::vector<VkBuffer> buffers;
-    std::vector<VkDeviceMemory> bufferMemories;
-    VkPipeline pipeline;
-    VkPipelineLayout pipelineLayout;
-    VkShaderModule computeShaderModule;
-    VkCommandPool commandPool;
-    VkCommandBuffer commandBuffer;
-    VkDescriptorPool descriptorPool;
-    VkDescriptorSet descriptorSet;
-    VkDescriptorSetLayout descriptorSetLayout;
-    VkQueue computeQueue;
-    uint32_t queueFamilyIndex;
-    QueueFamilyIndices QueueFamily;
+    VkInstance m_Instance;
+    VkDebugUtilsMessengerEXT m_DebugMessenger;
+    VkPhysicalDevice m_PhysicalDevice = VK_NULL_HANDLE;
+    VkDevice m_Device;
+    _debugBuf_t m_debug;
+    struct Compute {  // Possibilty to add CommandPool, Pipeline etc.. here
+        std::vector<uint64_t> m_BufferSizes;
+        std::vector<VkBuffer> m_Buffers;
+        std::vector<VkDeviceMemory> m_BufferMemories;
+    } m_compute;
+
+    struct Graphics {
+        // Placeholder for Graphic rendering (For later steps)
+    } m_graphics;
+    struct Staging {
+        std::vector<uint64_t> m_BufferSizes;
+        std::vector<VkBuffer> m_Buffers;
+        std::vector<VkDeviceMemory> m_BufferMemories;
+    } m_staging;
+
+    VkPipeline m_Pipeline;
+    VkPipelineLayout m_PipelineLayout;
+    VkShaderModule m_ComputeShaderModule;
+    VkCommandPool m_CommandPool;
+    VkCommandBuffer m_CommandBuffer;
+    VkDescriptorPool m_DescriptorPool;
+    VkDescriptorSet m_DescriptorSet;
+    VkDescriptorSetLayout m_DescriptorSetLayout;
+    VkQueue m_ComputeQueue;
+    uint32_t m_QueueFamilyIndex;
+    QueueFamilyIndices m_QueueFamily;
 
     // Ray-related vars:
-    uint32_t numberOfBeamlines;
-    uint32_t numberOfQuadricsPerBeamline;
-    uint32_t numberOfRays;
-    uint32_t numberOfRaysPerBeamline;
-    RayList rayList;
-    std::vector<double> beamline;
-    RayList m_outputData;
+    uint32_t m_numberOfBeamlines;
+    uint32_t m_numberOfQuadricsPerBeamline;
+    uint32_t m_numberOfRays;
+    uint32_t m_numberOfRaysPerBeamline;
+    RayList m_RayList;
+    RayList m_OutputRays;
+    std::vector<double> m_beamlineData;
+    std::vector<_debugBuf_t> m_debugBufList;
+
+    struct Settings {
+        bool m_isDebug;
+        uint32_t m_buffersCount;
+        uint32_t m_computeBuffersCount;
+        uint32_t m_stagingBuffersCount;
+    } m_settings;
 
     // Member functions:
     // Vulkan
-    void initVulkan();
+    void prepareVulkan();
+    void prepareBuffers();
     void mainLoop();
     void createInstance();
     void populateDebugMessengerCreateInfo(
@@ -167,12 +206,17 @@ class RAYX_API VulkanTracer {
     void createComputePipeline();
     void createCommandBuffer();
     void runCommandBuffer();
+    void setSettings();
+    bool isDebug() const;
+    uint32_t getNumberOfBuffers() const;
 
     // Ray-related funcs:
     void divideAndSortRays();
     void fillQuadricBuffer();
+    void fillMaterialBuffer();
     void copyToRayBuffer(uint32_t offset, uint32_t numberOfBytesToCopy);
     void copyToOutputBuffer(uint32_t offset, uint32_t numberOfBytesToCopy);
+    void copyFromDebugBuffer(uint32_t offset, uint32_t numberOfBytesToCopy);
 
     // Utils
     uint32_t* readFile(uint32_t& length, const char* filename);
