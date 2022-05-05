@@ -1,12 +1,8 @@
-This will be the place, where we will create the new (reworked) version of Ray-UI.
+RAY-X is a simulation and design tool for beamlines in energy storage rings. It traces synchrotron radiation through a series of mirrors, gratings and more and gives the user helpful insights, how a given beamline performs. 
 
-Following goals are set for this project:
-- Modularization of the old Ray-UI project for:
-    - Better maintenance
-    - Easier readability
-- Translating the Fortran code to C++ code
-- Improving performance of the tracing simulation with gpu acceleration
+This software is the predecessor of [RAY-UI](https://www.helmholtz-berlin.de/forschung/oe/wi/optik-strahlrohre/arbeitsgebiete/ray_en.html) and aims to reengineer a valuable tool for physicists, engineers and others working on beamlines for electron storage rings.
+
+For the moment we only support a cli application for the RayCore-library, which will enable you to trace beamlines created through RAY-UI efficiently. The main reason for the faster simulations is that we make use of dedicated GPUs.
 
 
-Here is our Wiki, where you can find most information about the project:
-[RayReworked Wiki](https://gitlab.helmholtz-berlin.de/RAY/rayreworked/-/wikis/home)
+Please have a look at the wiki if you are interested in the project, or contact us if you have any questions or bug concerning RAY-X. 
