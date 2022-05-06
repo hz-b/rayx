@@ -467,6 +467,16 @@ void VulkanTracer::pickPhysicalDevice() {
     VkPhysicalDeviceProperties deviceProperties;
     vkGetPhysicalDeviceProperties(m_PhysicalDevice, &deviceProperties);
     RAYX_LOG << "Chose GPU: " << deviceProperties.deviceName;
+    RAYX_D_LOG << "==== Compute Info ====";
+    RAYX_D_LOG << "Compute Max workgroup count: "
+               << deviceProperties.limits.maxComputeWorkGroupCount[1];
+    RAYX_D_LOG << "Compute Max workgroup invocations: "
+               << deviceProperties.limits.maxComputeWorkGroupInvocations;
+    RAYX_D_LOG << "Compute Max workgroup Group size :"
+               << deviceProperties.limits.maxComputeWorkGroupSize[0];
+    RAYX_D_LOG << "Compute Max shared memory size: "
+               << deviceProperties.limits.maxComputeSharedMemorySize;
+    RAYX_D_LOG << "======================";
 }
 
 // checks if given device is suitable for computation
@@ -1303,6 +1313,9 @@ void VulkanTracer::createCommandBuffer() {
     OpenGL, this should be nothing new to you.
     */
     RAYX_LOG << "Dispatching commandBuffer...";
+    RAYX_D_LOG << "Sending "
+             << "("<< (uint32_t)ceil(m_numberOfRays / float(WORKGROUP_SIZE))
+             << ",1,1) to the GPU";
     vkCmdDispatch(m_CommandBuffer,
                   (uint32_t)ceil(m_numberOfRays / float(WORKGROUP_SIZE)), 1, 1);
 
@@ -1436,7 +1449,7 @@ bool VulkanTracer::isDebug() const { return m_settings.m_isDebug; }
 // Set Vulkan Tracer m_settings according to Release or Debug Mode
 void VulkanTracer::setSettings() {
 #ifdef RAY_DEBUG_MODE
-    RAYX_D_LOG << "VulkanTracer running in Debug";
+    RAYX_D_LOG << "VulkanTracer Debug: ON";
     m_settings.m_isDebug = true;
     m_settings.m_computeBuffersCount = 7;
     m_settings.m_stagingBuffersCount = 2;
