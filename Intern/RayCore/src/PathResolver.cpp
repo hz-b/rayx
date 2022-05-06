@@ -9,10 +9,10 @@ static std::optional<std::filesystem::path> ROOT;
 
 void initPathResolver(char* executablePath) {
     std::filesystem::path p = std::filesystem::canonical(
-        executablePath);  // rayreworked/build/bin/TerminalApp
-    p = p.parent_path();  // rayreworked/build/bin/
-    p = p.parent_path();  // rayreworked/build
-    p = p.parent_path();  // rayreworked
+        executablePath);  // ray-x/build/bin/TerminalApp
+    p = p.parent_path();  // ray-x/build/bin/
+    p = p.parent_path();  // ray-x/build
+    p = p.parent_path();  // ray-x
     ROOT = p;
 }
 

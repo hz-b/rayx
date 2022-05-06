@@ -59,6 +59,7 @@
 namespace RAYX {
 VulkanTracer::VulkanTracer() {
     // Set buffer settings (DEBUG OR RELEASE)
+    RAYX_LOG << "Initializing Vulkan Tracer..";
     setSettings();
 
     // Compute Buffers (I/O Storage)
@@ -70,9 +71,10 @@ VulkanTracer::VulkanTracer() {
     m_staging.m_Buffers.resize(m_settings.m_stagingBuffersCount);
     m_staging.m_BufferMemories.resize(m_settings.m_stagingBuffersCount);
 
-    RAYX_LOG << "Initializing Vulkan Tracer..";
-
     // Vulkan is initialized (from scratch)
+    // PS: To Save time and performance, Vulkan is initialized only once
+    // throughout the whole trace process. If any of Vulkan resources are bound
+    // to change, Vulkan might need to "be prepared again" (potential TODO)
     prepareVulkan();
     // beamline.resize(0);
 }
@@ -181,7 +183,11 @@ void VulkanTracer::run() {
 #endif
 }
 
-// function for initializing vulkan
+/**
+ * @brief Prepares Vulkan for "first" trace sequence.
+ * Instance, DebugMessenger(validiation-layers), Physical Device, Logical
+ * Device, CommandPool and DescriptorSetLayout are created.
+ */
 void VulkanTracer::prepareVulkan() {
     RAYX_PROFILE_FUNCTION();
     // a vulkan instance is created
@@ -197,10 +203,11 @@ void VulkanTracer::prepareVulkan() {
     createLogicalDevice();
 
     // create command pool which will be used to submit the staging buffer
+    // or draw/compute
     createCommandPool();
 
-    // creates the descriptors used to bind the buffer to shader access points
-    // (bindings)
+    // creates the descriptors used to bind the buffer to shader access
+    // points (bindings)
     createDescriptorSetLayout();
 }
 
@@ -1053,9 +1060,9 @@ void VulkanTracer::createDescriptorSetLayout() {
     descriptorSetLayoutCreateInfo.sType =
         VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO;
     // 7 or 6 bindings are used in this layout
-    descriptorSetLayoutCreateInfo.bindingCount = m_settings.m_computeBuffersCount;
-    descriptorSetLayoutCreateInfo.pBindings =
-        descriptorSetLayoutBinding;  // TODO
+    descriptorSetLayoutCreateInfo.bindingCount =
+        m_settings.m_computeBuffersCount;
+    descriptorSetLayoutCreateInfo.pBindings = descriptorSetLayoutBinding;
 
     // Create the descriptor set layout.
     VK_CHECK_RESULT(vkCreateDescriptorSetLayout(m_Device,
@@ -1429,7 +1436,7 @@ bool VulkanTracer::isDebug() const { return m_settings.m_isDebug; }
 // Set Vulkan Tracer m_settings according to Release or Debug Mode
 void VulkanTracer::setSettings() {
 #ifdef RAY_DEBUG_MODE
-    RAYX_D_LOG << "is Debug";
+    RAYX_D_LOG << "VulkanTracer running in Debug";
     m_settings.m_isDebug = true;
     m_settings.m_computeBuffersCount = 7;
     m_settings.m_stagingBuffersCount = 2;

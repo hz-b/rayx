@@ -1,17 +1,18 @@
 #include "Presenter.h"
 
+#include "Debug.h"
 #include "Debug/Instrumentor.h"
 #include "Model/Beamline/OpticalElement.h"
-#include "Debug.h"
 
 namespace RAYX {
 
 Presenter::Presenter() {}
 
 Presenter::Presenter(std::shared_ptr<Beamline> beamline)
-    : m_Beamline(beamline),
-      m_TracerInterface(TracerInterface(beamline->m_OpticalElements.size(),
-                                        SimulationEnv::get().m_numOfRays)) {}
+    : m_Beamline(beamline) {
+    m_TracerInterface = std::make_shared<RAYX::TracerInterface>(
+        beamline->m_OpticalElements.size(), SimulationEnv::get().m_numOfRays);
+}
 
 Presenter::~Presenter() {}
 
@@ -22,20 +23,20 @@ bool Presenter::run() {
         if (m_Beamline->m_LightSources.empty()) {
             RAYX_ERR << "There is no light source!";
         } else {
-            m_TracerInterface.generateRays(m_Beamline->m_LightSources[0]);
+            m_TracerInterface->generateRays(m_Beamline->m_LightSources[0]);
         }
     }
 
-    m_TracerInterface.setBeamlineParameters();
+    m_TracerInterface->setBeamlineParameters();
     const std::vector<std::shared_ptr<OpticalElement>>& Elements =
         m_Beamline->m_OpticalElements;
     for (int j = 0; j < 1 /*beamlinesSimultaneously*/; j++) {
         for (int i = 0; i < int(Elements.size()); i++) {
             RAYX_LOG << "add " << Elements[i]->getName();
-            m_TracerInterface.addOpticalElementToTracer(Elements[i]);
+            m_TracerInterface->addOpticalElementToTracer(Elements[i]);
         }
     }
-    return m_TracerInterface.run();
+    return m_TracerInterface->run();
 }
 
 /** Adds new light source to light sources.

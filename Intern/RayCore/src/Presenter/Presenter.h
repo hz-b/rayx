@@ -20,7 +20,7 @@ class RAYX_API Presenter {
 
   private:
     std::shared_ptr<Beamline> m_Beamline;
-    TracerInterface m_TracerInterface;
+    std::shared_ptr<TracerInterface> m_TracerInterface;
 };
 
 }  // namespace RAYX

@@ -133,6 +133,7 @@ class RAYX_API VulkanTracer {
     struct Graphics {
         // Placeholder for Graphic rendering (For later steps)
     } m_graphics;
+
     struct Staging {
         std::vector<uint64_t> m_BufferSizes;
         std::vector<VkBuffer> m_Buffers;
@@ -170,7 +171,6 @@ class RAYX_API VulkanTracer {
 
     // Member functions:
     // Vulkan
-    void prepareVulkan();
     void prepareBuffers();
     void mainLoop();
     void createInstance();
