@@ -171,6 +171,7 @@ class RAYX_API VulkanTracer {
 
     // Member functions:
     // Vulkan
+    void prepareVulkan();
     void prepareBuffers();
     void mainLoop();
     void createInstance();
