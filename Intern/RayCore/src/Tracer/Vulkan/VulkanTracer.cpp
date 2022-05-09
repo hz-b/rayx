@@ -709,6 +709,7 @@ void VulkanTracer::createBuffer(VkDeviceSize size, VkBufferUsageFlags usage,
 
 void VulkanTracer::fillRayBuffer() {
     RAYX_PROFILE_FUNCTION();
+
     uint32_t bytesNeeded =
         m_numberOfRays * VULKANTRACER_RAY_DOUBLE_AMOUNT * sizeof(double);
     uint32_t numberOfStagingBuffers = std::ceil(
@@ -1312,12 +1313,26 @@ void VulkanTracer::createCommandBuffer() {
     the arguments. If you are already familiar with compute shaders from
     OpenGL, this should be nothing new to you.
     */
+    uint32_t localWorkGroupNo =
+        (uint32_t)ceil(m_numberOfRays /
+                       float(WORKGROUP_SIZE));  // number of local works groups
+
+    // check if there are too many rays
+    VkPhysicalDeviceProperties deviceProperties;
+    vkGetPhysicalDeviceProperties(m_PhysicalDevice, &deviceProperties);
+
+    auto limits = deviceProperties.limits;
+
+    if (localWorkGroupNo > limits.maxComputeWorkGroupCount[0]) {
+        RAYX_ERR << "maxComputeWorkGroupCount: "
+                 << limits.maxComputeWorkGroupCount[0]
+                 << " has been exceeded: " << localWorkGroupNo;
+    }
+
     RAYX_LOG << "Dispatching commandBuffer...";
     RAYX_D_LOG << "Sending "
-             << "("<< (uint32_t)ceil(m_numberOfRays / float(WORKGROUP_SIZE))
-             << ",1,1) to the GPU";
-    vkCmdDispatch(m_CommandBuffer,
-                  (uint32_t)ceil(m_numberOfRays / float(WORKGROUP_SIZE)), 1, 1);
+               << "(" << localWorkGroupNo << ",1,1) to the GPU";
+    vkCmdDispatch(m_CommandBuffer, localWorkGroupNo, 1, 1);
 
     VK_CHECK_RESULT(
         vkEndCommandBuffer(m_CommandBuffer));  // end recording commands.
