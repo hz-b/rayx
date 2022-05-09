@@ -315,62 +315,53 @@ void compareFromCorrect(std::vector<RAYX::Ray> correct,
     for (std::list<double>::iterator i = outputRays.begin();
          i != outputRays.end();) {
         if (counter % RAY_DOUBLE_COUNT == 0) {
-            CHECK_EQ(*i,
-                        correct[int(counter / RAY_DOUBLE_COUNT)].m_position.x,
-                        tolerance);
+            CHECK_EQ(*i, correct[int(counter / RAY_DOUBLE_COUNT)].m_position.x,
+                     tolerance);
         } else if (counter % RAY_DOUBLE_COUNT == 1) {
-            CHECK_EQ(*i,
-                        correct[int(counter / RAY_DOUBLE_COUNT)].m_position.y,
-                        tolerance);
+            CHECK_EQ(*i, correct[int(counter / RAY_DOUBLE_COUNT)].m_position.y,
+                     tolerance);
         } else if (counter % RAY_DOUBLE_COUNT == 2) {
-            CHECK_EQ(*i,
-                        correct[int(counter / RAY_DOUBLE_COUNT)].m_position.z,
-                        tolerance);
+            CHECK_EQ(*i, correct[int(counter / RAY_DOUBLE_COUNT)].m_position.z,
+                     tolerance);
         } else if (counter % RAY_DOUBLE_COUNT == 3) {
             CHECK_EQ(*i, correct[int(counter / RAY_DOUBLE_COUNT)].m_weight,
-                        tolerance);
+                     tolerance);
         } else if (counter % RAY_DOUBLE_COUNT == 4) {
-            CHECK_EQ(*i,
-                        correct[int(counter / RAY_DOUBLE_COUNT)].m_direction.x,
-                        tolerance);
+            CHECK_EQ(*i, correct[int(counter / RAY_DOUBLE_COUNT)].m_direction.x,
+                     tolerance);
         } else if (counter % RAY_DOUBLE_COUNT == 5) {
-            CHECK_EQ(*i,
-                        correct[int(counter / RAY_DOUBLE_COUNT)].m_direction.y,
-                        tolerance);
+            CHECK_EQ(*i, correct[int(counter / RAY_DOUBLE_COUNT)].m_direction.y,
+                     tolerance);
         } else if (counter % RAY_DOUBLE_COUNT == 6) {
-            CHECK_EQ(*i,
-                        correct[int(counter / RAY_DOUBLE_COUNT)].m_direction.z,
-                        tolerance);
+            CHECK_EQ(*i, correct[int(counter / RAY_DOUBLE_COUNT)].m_direction.z,
+                     tolerance);
         } else if (counter % RAY_DOUBLE_COUNT == 7) {
             CHECK_EQ(*i, correct[int(counter / RAY_DOUBLE_COUNT)].m_energy,
-                        tolerance);
+                     tolerance);
         } else if (counter % RAY_DOUBLE_COUNT == 8) {
             CHECK_EQ(*i, correct[int(counter / RAY_DOUBLE_COUNT)].m_stokes.x,
-                        tolerance);
+                     tolerance);
         } else if (counter % RAY_DOUBLE_COUNT == 9) {
             CHECK_EQ(*i, correct[int(counter / RAY_DOUBLE_COUNT)].m_stokes.y,
-                        tolerance);
+                     tolerance);
         } else if (counter % RAY_DOUBLE_COUNT == 10) {
             CHECK_EQ(*i, correct[int(counter / RAY_DOUBLE_COUNT)].m_stokes.z,
-                        tolerance);
+                     tolerance);
         } else if (counter % RAY_DOUBLE_COUNT == 11) {
             CHECK_EQ(*i, correct[int(counter / RAY_DOUBLE_COUNT)].m_stokes.w,
-                        tolerance);
+                     tolerance);
         } else if (counter % RAY_DOUBLE_COUNT == 12) {
-            CHECK_EQ(*i,
-                        correct[int(counter / RAY_DOUBLE_COUNT)].m_pathLength,
-                        tolerance);
+            CHECK_EQ(*i, correct[int(counter / RAY_DOUBLE_COUNT)].m_pathLength,
+                     tolerance);
         } else if (counter % RAY_DOUBLE_COUNT == 13) {
             CHECK_EQ(*i, correct[int(counter / RAY_DOUBLE_COUNT)].m_order,
-                        tolerance);
+                     tolerance);
         } else if (counter % RAY_DOUBLE_COUNT == 14) {
-            CHECK_EQ(*i,
-                        correct[int(counter / RAY_DOUBLE_COUNT)].m_lastElement,
-                        tolerance);
+            CHECK_EQ(*i, correct[int(counter / RAY_DOUBLE_COUNT)].m_lastElement,
+                     tolerance);
         } else if (counter % RAY_DOUBLE_COUNT == 15) {
-            CHECK_EQ(*i,
-                        correct[int(counter / RAY_DOUBLE_COUNT)].m_extraParam,
-                        tolerance);
+            CHECK_EQ(*i, correct[int(counter / RAY_DOUBLE_COUNT)].m_extraParam,
+                     tolerance);
         }
         counter++;
         i++;
@@ -414,9 +405,9 @@ void compareFromFunction(fn<ret, par> func, std::vector<RAYX::Ray> testValues,
                 func(testValues[int(counter / RAY_DOUBLE_COUNT)].m_position.z),
                 tolerance);
         } else if (counter % RAY_DOUBLE_COUNT == 3) {
-            CHECK_EQ(
-                *i, func(testValues[int(counter / RAY_DOUBLE_COUNT)].m_weight),
-                tolerance);
+            CHECK_EQ(*i,
+                     func(testValues[int(counter / RAY_DOUBLE_COUNT)].m_weight),
+                     tolerance);
         } else if (counter % RAY_DOUBLE_COUNT == 4) {
             CHECK_EQ(
                 *i,
@@ -433,9 +424,9 @@ void compareFromFunction(fn<ret, par> func, std::vector<RAYX::Ray> testValues,
                 func(testValues[int(counter / RAY_DOUBLE_COUNT)].m_direction.z),
                 tolerance);
         } else if (counter % RAY_DOUBLE_COUNT == 7) {
-            CHECK_EQ(
-                *i, func(testValues[int(counter / RAY_DOUBLE_COUNT)].m_energy),
-                tolerance);
+            CHECK_EQ(*i,
+                     func(testValues[int(counter / RAY_DOUBLE_COUNT)].m_energy),
+                     tolerance);
         } else if (counter % RAY_DOUBLE_COUNT == 8) {
             CHECK_EQ(
                 *i,
@@ -2046,6 +2037,10 @@ void compareFromCSVRayUI(const char* filename) {
 
     std::vector<std::shared_ptr<RAYX::OpticalElement>> elements =
         beamline->m_OpticalElements;
+    if (elements.size() == 0) {
+        RAYX_WARN << "No optical elements in beamline";
+        return;
+    }
     std::vector<RAYX::Ray> testValues = beamline->m_LightSources[0]->getRays();
 
     auto rays_list = runTracer(testValues, elements);
