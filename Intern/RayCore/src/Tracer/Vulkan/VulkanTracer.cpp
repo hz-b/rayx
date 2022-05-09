@@ -1053,7 +1053,8 @@ void VulkanTracer::createDescriptorSetLayout() {
     descriptorSetLayoutCreateInfo.sType =
         VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO;
     // 7 or 6 bindings are used in this layout
-    descriptorSetLayoutCreateInfo.bindingCount = m_settings.m_computeBuffersCount;
+    descriptorSetLayoutCreateInfo.bindingCount =
+        m_settings.m_computeBuffersCount;
     descriptorSetLayoutCreateInfo.pBindings =
         descriptorSetLayoutBinding;  // TODO
 
@@ -1137,17 +1138,25 @@ uint32_t* VulkanTracer::readFile(uint32_t& length, const char* filename) {
     // get file size.
     fseek(fp, 0, SEEK_END);
     long filesize = ftell(fp);
+    if (filesize == -1) {
+        RAYX_D_ERR << "Could not get file size.";
+        return nullptr;
+    }
     fseek(fp, 0, SEEK_SET);
 
-    long filesizepadded = long(ceil(filesize / 4.0)) * 4;
+    uint32_t filesizepadded = uint32_t(ceil(filesize / 4.0)) * 4;
 
     // read file contents.
     char* str = DBG_NEW char[filesizepadded];
-    fread(str, filesize, sizeof(char), fp);
+    uint32_t readCount = fread(str, sizeof(char), filesize, fp);
+    if (readCount != (uint32_t)filesize) {
+        RAYX_D_LOG << readCount << " != " << filesize << "...";
+        RAYX_D_ERR << "Errors while reading file: " << filename;
+    }
     fclose(fp);
 
     // data padding.
-    for (int i = filesize; i < filesizepadded; i++) {
+    for (uint32_t i = filesize; i < filesizepadded; i++) {
         str[i] = 0;
     }
 
