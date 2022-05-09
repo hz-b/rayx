@@ -25,27 +25,25 @@ jobs:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - uses: actions/checkout@v3
 
-      - name: Get mdbook binary
-        working-directory: ${{github.workspace}}/docs
+      - name: Install mdbook
         run: |
-          mkdir bin
-          curl -sSL https://github.com/rust-lang/mdBook/releases/download/v0.4.18/mdbook-v0.4.18-x86_64-unknown-linux-gnu.tar.gz | tar -xz --directory=bin
+            mkdir mdbook
+            curl -sSL https://github.com/rust-lang/mdBook/releases/download/v0.4.14/mdbook-v0.4.14-x86_64-unknown-linux-gnu.tar.gz | tar -xz --directory=./mdbook
+            echo `pwd`/mdbook >> $GITHUB_PATH
         
-      
       - name: Deploy GitHub Pages
-        working-directory: ${{github.workspace}}/docs
         run: |
-          # This assumes your book is in the root of your repository.
-          # Just add a `cd` here if you need to change to another directory.
-          bin/mdbook build
-          git worktree add gh-pages gh-pages
-          git config user.name "Deploy from CI"
-          git config user.email ""
-          cd gh-pages
-          # Delete the ref to avoid keeping history.
-          git update-ref -d refs/heads/gh-pages
-          rm -rf *
-          mv ../book/* .
-          git add .
-          git commit -m "Deploy $GITHUB_SHA to gh-pages"
-          git push --force
+            # This assumes your book is in the root of your repository.
+            # Just add a `cd` here if you need to change to another directory.
+            mdbook build
+            git worktree add gh-pages gh-pages
+            git config user.name "Deploy from CI"
+            git config user.email ""
+            cd gh-pages
+            # Delete the ref to avoid keeping history.
+            git update-ref -d refs/heads/gh-pages
+            rm -rf *
+            mv ../book/* .
+            git add .
+            git commit -m "Deploy $GITHUB_SHA to gh-pages"
+            git push --force
