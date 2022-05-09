@@ -1,6 +1,6 @@
 # RAY-X: A synchrotron radiation tracer
 
-![Element 4@3x](https://user-images.githubusercontent.com/13185253/167402648-788eee6a-2ba4-466a-8a0a-62e59663e957.png)
+<img src="https://user-images.githubusercontent.com/13185253/167402648-788eee6a-2ba4-466a-8a0a-62e59663e957.png" width="400" height="400"/>
 
 RAY-X is a simulation and design tool for beamlines in energy storage rings. It traces synchrotron radiation through a series of mirrors, gratings and more and gives the user helpful insights, how a given beamline performs. 
 
