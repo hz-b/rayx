@@ -9,4 +9,8 @@ This software is the predecessor of [RAY-UI](https://www.helmholtz-berlin.de/for
 For the moment we only support a cli application for the RayCore-library, which will enable you to trace beamlines created through RAY-UI efficiently. The main reason for the faster simulations is that we make use of dedicated GPUs.
 
 
-Please have a look at the wiki if you are interested in the project, or contact us if you have any questions or bug concerning RAY-X. 
+This wiki is divided into three main parts. They are designed for App Users, API Users, and Developer. The areas are not exclusive to these audiences and an API User might need to look at some pages in the App User Area and a Developer might find interesting info in all three parts.
+
+- [App User Area](./AppUser/AppUser.md)
+- [API User Area](./APIUser/APIUser.md)
+- [Developer Area](./Developer/Developer.md)
