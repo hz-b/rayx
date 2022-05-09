@@ -1,40 +1,28 @@
-# This is a basic workflow to help you get started with Actions
-
-name: mdbook
+name: mdbook deploy
 
 # Controls when the workflow will run
 on:
   # Triggers the workflow on push or pull request events but only for the master branch
   push:
-    branches: [ development ]
+    branches: [ master ]
   pull_request:
-    branches: [ development ]
+    branches: [ master ]
 
-  # Allows you to run this workflow manually from the Actions tab
-  workflow_dispatch:
-
-# A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
-  # This workflow contains a single job called "build"
-  build:
-    # The type of runner that the job will run on
-    runs-on: ubuntu-latest
-
-    # Steps represent a sequence of tasks that will be executed as part of the job
-    steps:
-      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
-      - uses: actions/checkout@v3
-
-      - name: Install mdbook
+    deploy:
+        runs-on: ubuntu-latest
+        steps:
+        - uses: actions/checkout@v2
+        with:
+            fetch-depth: 0
+        - name: Install mdbook
         run: |
             mkdir mdbook
             curl -sSL https://github.com/rust-lang/mdBook/releases/download/v0.4.14/mdbook-v0.4.14-x86_64-unknown-linux-gnu.tar.gz | tar -xz --directory=./mdbook
             echo `pwd`/mdbook >> $GITHUB_PATH
-        
-      - name: Deploy GitHub Pages
+        - name: Deploy GitHub Pages
         run: |
-            # This assumes your book is in the root of your repository.
-            # Just add a `cd` here if you need to change to another directory.
+            cd docs/
             mdbook build
             git worktree add gh-pages gh-pages
             git config user.name "Deploy from CI"
