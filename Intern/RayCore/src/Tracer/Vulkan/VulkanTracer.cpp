@@ -1313,7 +1313,7 @@ void VulkanTracer::createCommandBuffer() {
     the arguments. If you are already familiar with compute shaders from
     OpenGL, this should be nothing new to you.
     */
-    uint32_t localWorkGroupNo =
+    uint32_t requiredLocalWorkGroupNo =
         (uint32_t)ceil(m_numberOfRays /
                        float(WORKGROUP_SIZE));  // number of local works groups
 
@@ -1323,16 +1323,52 @@ void VulkanTracer::createCommandBuffer() {
 
     auto limits = deviceProperties.limits;
 
-    if (localWorkGroupNo > limits.maxComputeWorkGroupCount[0]) {
-        RAYX_ERR << "maxComputeWorkGroupCount: "
-                 << limits.maxComputeWorkGroupCount[0]
-                 << " has been exceeded: " << localWorkGroupNo;
+    auto xgroups = limits.maxComputeWorkGroupCount[0];
+    auto ygroups = limits.maxComputeWorkGroupCount[1];
+    auto zgroups = limits.maxComputeWorkGroupCount[2];
+
+    // if this limit is reached, you may start using
+    // multidimensional local workgroups.
+    if (requiredLocalWorkGroupNo > xgroups * ygroups * zgroups) {
+        RAYX_ERR << "the given task requires " << requiredLocalWorkGroupNo
+                 << " many local work groups, but the maximal number on this "
+                    "machine is "
+                 << xgroups * ygroups * zgroups;
+    } else {
+        RAYX_D_LOG << "your machine supports up to "
+                   << xgroups * ygroups * zgroups * WORKGROUP_SIZE << " rays";
+    }
+
+    // decrease xgroups, ygroups, zgroups so that we get a small number of
+    // workgroups stlil covering requiredLocalWorkGroupNo
+    {
+        while (xgroups * ygroups * (zgroups / 2) >= requiredLocalWorkGroupNo) {
+            zgroups /= 2;
+        }
+        while (xgroups * ygroups * (zgroups - 1) >= requiredLocalWorkGroupNo) {
+            zgroups--;
+        }
+
+        while (xgroups * (ygroups / 2) * zgroups >= requiredLocalWorkGroupNo) {
+            ygroups /= 2;
+        }
+        while (xgroups * (ygroups - 1) * zgroups >= requiredLocalWorkGroupNo) {
+            ygroups--;
+        }
+
+        while ((xgroups / 2) * ygroups * zgroups >= requiredLocalWorkGroupNo) {
+            xgroups /= 2;
+        }
+        while ((xgroups - 1) * ygroups * zgroups >= requiredLocalWorkGroupNo) {
+            xgroups--;
+        }
     }
 
     RAYX_LOG << "Dispatching commandBuffer...";
     RAYX_D_LOG << "Sending "
-               << "(" << localWorkGroupNo << ",1,1) to the GPU";
-    vkCmdDispatch(m_CommandBuffer, localWorkGroupNo, 1, 1);
+               << "(" << xgroups << ", " << ygroups << ", " << zgroups
+               << ") to the GPU";
+    vkCmdDispatch(m_CommandBuffer, xgroups, ygroups, zgroups);
 
     VK_CHECK_RESULT(
         vkEndCommandBuffer(m_CommandBuffer));  // end recording commands.
