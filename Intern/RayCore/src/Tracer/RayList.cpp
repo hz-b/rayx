@@ -4,6 +4,8 @@
 #include <cstring>
 #include <iostream>
 
+#include "Debug.h"
+
 namespace RAYX {
 
 RayList::RayList() {}
@@ -19,6 +21,12 @@ RayList::~RayList() {}
 void RayList::insertVector(std::vector<Ray>&& inRayVector) {
     // check if last vector is full, if not fill it
     size_t remainingSpace = 0;
+
+    if (m_rayList.empty()) {  // if m_rayList is empty, then m_rayList.back()
+                              // will be undefined below.
+        m_rayList.push_back({});
+    }
+
     if ((m_rayList.back().size() > 0) &&
         (m_rayList.back().size() < RAY_MAX_ELEMENTS_IN_VECTOR)) {
         remainingSpace = RAY_MAX_ELEMENTS_IN_VECTOR - m_rayList.back().size();

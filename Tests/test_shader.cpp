@@ -82,7 +82,7 @@ std::list<double> runTracer(
 
     // add rays
     std::cout << "testValues.size(): " << testValues.size() << std::endl;
-    (tracer).addRayVector(std::move(testValues));
+    tracer.addRayVector(std::move(testValues));
     std::cout << "add rays to tracer done" << std::endl;
 
     // add elements
