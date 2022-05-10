@@ -2036,9 +2036,6 @@ void compareFromCSVRayUI(const char* filename) {
 
     std::vector<std::shared_ptr<RAYX::OpticalElement>> elements =
         beamline->m_OpticalElements;
-    if (elements.size() == 0) {
-        RAYX_WARN << "No optical elements in beamline";
-    }
     std::vector<RAYX::Ray> testValues = beamline->m_LightSources[0]->getRays();
 
     auto rays_list = runTracer(testValues, elements);
