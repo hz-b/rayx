@@ -1,3 +1,5 @@
+#pragma once
+
 #include "Core.h"
 #include "Data/Importer.h"
 #include "Debug.h"

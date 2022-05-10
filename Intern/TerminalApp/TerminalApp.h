@@ -4,7 +4,6 @@
 
 #include <chrono>
 
-#include "PythonInterp.h"
 #include "RayCore.h"
 #include "TerminalAppConfig.h"
 

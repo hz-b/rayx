@@ -1,6 +1,5 @@
 #pragma once
 
-#include <cmath>
 #include <cstdlib>
 #include <iostream>
 #include <map>
@@ -8,7 +7,6 @@
 #include <stdexcept>
 
 #include "Core.h"
-#include "NffTable.h"
 #include "Tracer/RayList.h"
 #include "vulkan/vulkan.hpp"
 

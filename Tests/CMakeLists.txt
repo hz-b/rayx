@@ -18,11 +18,14 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 
 set(BINARY ${CMAKE_PROJECT_NAME}_tst)
 
+
 file(GLOB_RECURSE TEST_SOURCES LIST_DIRECTORIES false *.h *.cpp)
 set(SOURCES ${TEST_SOURCES})
 add_executable(${BINARY} ${TEST_SOURCES})
 add_test(NAME ${BINARY} COMMAND ${BINARY})
 
+target_precompile_headers(${BINARY} PRIVATE testsPCH.h)
+set(CMAKE_PCH_INSTANTIATE_TEMPLATES ON)
 #if (WIN32)
     #target_compile_definitions(${BINARY} PUBLIC RAYX_PLATFORM_WINDOWS)
 #endif ()

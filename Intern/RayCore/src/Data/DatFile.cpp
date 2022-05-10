@@ -1,9 +1,10 @@
-#include <Data/DatFile.h>
-#include <Debug.h>
+#include "DatFile.h"
 
 #include <fstream>
 #include <iostream>
 #include <sstream>
+
+#include "Debug.h"
 
 namespace RAYX {
 bool DatFile::load(std::filesystem::path filename, DatFile* out) {

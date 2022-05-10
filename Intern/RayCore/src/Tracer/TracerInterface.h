@@ -10,7 +10,6 @@
 #include "Tracer/Vulkan/VulkanTracer.h"
 
 namespace RAYX {
-class Ray;
 
 class RAYX_API TracerInterface {
   public:
