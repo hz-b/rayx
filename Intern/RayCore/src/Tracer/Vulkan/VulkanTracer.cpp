@@ -899,6 +899,7 @@ void VulkanTracer::getRays() {
     /*
     data.reserve((uint64_t)numberOfRays * VULKANTRACER_RAY_DOUBLE_AMOUNT);
     */
+
     uint32_t bytesNeeded =
         m_numberOfRays * VULKANTRACER_RAY_DOUBLE_AMOUNT * sizeof(double);
     uint32_t numberOfStagingBuffers =
