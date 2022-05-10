@@ -4,13 +4,12 @@
 // #if RUN_TEST_SHADER TODO (Jannis): Commented out by OS: error: unterminated
 // #if
 
-#include <Tracer/Vulkan/Material.h>
-
 #include <fstream>
 #include <functional>
 #include <sstream>
 #include <type_traits>
 
+#include "Tracer/Vulkan/Material.h"
 #include "Tracer/Vulkan/VulkanTracer.h"
 
 #if RUN_TEST_SHADER
