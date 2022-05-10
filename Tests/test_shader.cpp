@@ -2048,7 +2048,21 @@ void compareFromCSVRayUI(const char* filename) {
     }
 
     auto t = 1e-10;
-    auto transform = arrayToGlm16(elements.back()->getInMatrix());
+
+    glm::dmat4x4 transform;
+    if (!elements.empty()) {
+        transform = arrayToGlm16(elements.back()->getInMatrix());
+    } else if (!beamline->m_LightSources.empty()) {
+        // TODO light sources have no getInMatrix() currently, but for now the
+        // light sources would have InMatrix = identity. so the transform is
+        // identity matrix for light sources.
+        transform = glm::dmat4x4(1.0, 0.0, 0.0, 0.0,  //
+                                 0.0, 1.0, 0.0, 0.0,  //
+                                 0.0, 0.0, 1.0, 0.0,  //
+                                 0.0, 0.0, 0.0, 1.0);
+    } else {
+        RAYX_ERR << "compareFromCSVRayUI called with empty beamline";
+    }
 
     // the comparison happens in element coordinates.
     for (unsigned int i = 0; i < correct.size(); i++) {
@@ -2056,7 +2070,7 @@ void compareFromCSVRayUI(const char* filename) {
         auto globalpos = arrayToGlm4(
             {rays[16 * i + 0], rays[16 * i + 1], rays[16 * i + 2], 1});
         auto globaldir = arrayToGlm4(
-            {rays[16 * i + 3], rays[16 * i + 4], rays[16 * i + 5], 0});
+            {rays[16 * i + 4], rays[16 * i + 5], rays[16 * i + 6], 0});
 
         auto elementpos = transform * globalpos;
         auto elementdir = transform * globaldir;
