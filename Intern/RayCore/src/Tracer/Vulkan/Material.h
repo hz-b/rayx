@@ -27,7 +27,12 @@ enum class Material {
  **/
 bool materialFromString(const char* matname, Material* out);
 
+struct MaterialTables {
+    std::vector<double> materialTable;
+    std::vector<int>
+        indexTable;
+};
+
 // the following functions load the tables, and grant you a pointer to them.
 // the tables will be written to the nkp and nkpIdx buffers of shader.comp
-const std::vector<double>* getMaterialTable();
-const std::vector<int>* getMaterialIndexTable();
+MaterialTables loadMaterialTables();

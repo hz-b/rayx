@@ -125,6 +125,8 @@ void VulkanTracer::run() {
 
     RAYX_LOG << "Setting compute buffers:";
 
+    m_MaterialTables = loadMaterialTables();
+
     // Prepare size of compute storage buffers
     m_compute.m_BufferSizes[0] = (uint64_t)m_numberOfRays *
                                  VULKANTRACER_RAY_DOUBLE_AMOUNT *
@@ -138,8 +140,9 @@ void VulkanTracer::run() {
 
     m_compute.m_BufferSizes[3] = (uint64_t)m_numberOfRays * 4 * sizeof(double);
     m_compute.m_BufferSizes[4] =
-        getMaterialIndexTable()->size() * sizeof(double);
-    m_compute.m_BufferSizes[5] = getMaterialTable()->size() * sizeof(double);
+        m_MaterialTables.indexTable.size() * sizeof(int);
+    m_compute.m_BufferSizes[5] =
+        m_MaterialTables.materialTable.size() * sizeof(double);
     if (isDebug())
         m_compute.m_BufferSizes[6] = (uint64_t)m_numberOfRays * sizeof(m_debug);
 
@@ -1017,7 +1020,7 @@ void VulkanTracer::fillMaterialBuffer() {
         void* data;
         vkMapMemory(m_Device, m_compute.m_BufferMemories[4], 0,
                     m_compute.m_BufferSizes[4], 0, &data);
-        memcpy(data, getMaterialIndexTable()->data(),
+        memcpy(data, m_MaterialTables.indexTable.data(),
                m_compute.m_BufferSizes[4]);
         vkUnmapMemory(m_Device, m_compute.m_BufferMemories[4]);
     }
@@ -1027,7 +1030,8 @@ void VulkanTracer::fillMaterialBuffer() {
         void* data;
         vkMapMemory(m_Device, m_compute.m_BufferMemories[5], 0,
                     m_compute.m_BufferSizes[5], 0, &data);
-        memcpy(data, getMaterialTable()->data(), m_compute.m_BufferSizes[5]);
+        memcpy(data, m_MaterialTables.materialTable.data(),
+               m_compute.m_BufferSizes[5]);
         vkUnmapMemory(m_Device, m_compute.m_BufferMemories[5]);
     }
     RAYX_LOG << "Done!";

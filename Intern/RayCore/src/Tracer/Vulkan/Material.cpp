@@ -37,32 +37,6 @@ std::vector<Material> allNormalMaterials() {
     return mats;
 }
 
-// these tables are private to this file, only read-access is granted to others
-// by the functions below
-static std::vector<double> MATERIAL_TABLE;
-static std::vector<int> MATERIAL_INDEX_TABLE;
-
-// fills the tables above
-void fillMaterialTables() {
-    auto mats = allNormalMaterials();
-    for (size_t i = 0; i < mats.size(); i++) {
-        NffTable t;
-
-        if (!NffTable::load(getMaterialName(mats[i]), &t)) {
-            RAYX_ERR << "could not load NffTable!";
-        }
-
-        MATERIAL_INDEX_TABLE.push_back(MATERIAL_TABLE.size() /
-                                       4);  // 4 doubles per Nff Entry
-        for (auto x : t.m_Lines) {
-            MATERIAL_TABLE.push_back(x.m_energy);
-            MATERIAL_TABLE.push_back(x.m_f1);
-            MATERIAL_TABLE.push_back(x.m_f2);
-            MATERIAL_TABLE.push_back(0);
-        }
-    }
-}
-
 bool materialFromString(const char* matname, Material* out) {
     for (auto m : allNormalMaterials()) {
         const char* name = getMaterialName(m);
@@ -76,16 +50,26 @@ bool materialFromString(const char* matname, Material* out) {
     return false;
 }
 
-const std::vector<double>* getMaterialTable() {
-    if (MATERIAL_TABLE.empty()) {
-        fillMaterialTables();
-    }
-    return &MATERIAL_TABLE;
-}
+MaterialTables loadMaterialTables() {
+    MaterialTables out;
 
-const std::vector<int>* getMaterialIndexTable() {
-    if (MATERIAL_TABLE.empty()) {
-        fillMaterialTables();
+    auto mats = allNormalMaterials();
+    for (size_t i = 0; i < mats.size(); i++) {
+        NffTable t;
+
+        if (!NffTable::load(getMaterialName(mats[i]), &t)) {
+            RAYX_ERR << "could not load NffTable!";
+        }
+
+        out.indexTable.push_back(out.materialTable.size() /
+                                 4);  // 4 doubles per Nff Entry
+        for (auto x : t.m_Lines) {
+            out.materialTable.push_back(x.m_energy);
+            out.materialTable.push_back(x.m_f1);
+            out.materialTable.push_back(x.m_f2);
+            out.materialTable.push_back(0);
+        }
     }
-    return &MATERIAL_INDEX_TABLE;
+
+    return out;
 }
