@@ -4,12 +4,13 @@
 #include <memory>
 #include <string>
 
-#include "BeamlineObject.h"
 #include "Core.h"
 
 #define REGISTER_DEC_TYPE(NAME) static BeamlineObjectRegister<NAME> reg
 
 #define REGISTER_DEF_TYPE(NAME) BeamlineObjectRegister<NAME> NAME::reg(#NAME)
+
+class BeamlineObject;
 
 namespace RAYX {
 class RAYX_API BeamlineObjectFactory {

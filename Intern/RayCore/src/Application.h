@@ -1,8 +1,9 @@
 #pragma once
 
 #include "Core.h"
-#include "Model/Beamline/Beamline.h"
 #include "Presenter/Presenter.h"
+
+class Beamline;
 
 namespace RAYX {
 /**

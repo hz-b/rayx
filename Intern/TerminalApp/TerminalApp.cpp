@@ -2,6 +2,7 @@
 
 #include "Debug.h"
 #include "PathResolver.h"
+#include "PythonInterp.h"
 
 // TODO: (potential) Replace Getopt with boost(header-only)
 #include <unistd.h>

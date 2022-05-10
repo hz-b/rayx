@@ -4,8 +4,6 @@
 #include <list>
 #include <vector>
 
-#include "DebugBuf.h"
-
 #define DEBUG_BUF_DOUBLE_COUNT 16
 
 namespace RAYX {

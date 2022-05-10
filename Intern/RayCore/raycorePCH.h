@@ -8,3 +8,4 @@
 #include <vector>
 
 #include "Core.h"
+#include "Data/xml.h"
