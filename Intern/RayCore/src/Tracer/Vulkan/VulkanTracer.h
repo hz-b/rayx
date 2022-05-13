@@ -7,6 +7,7 @@
 #include <stdexcept>
 
 #include "Core.h"
+#include "Material.h"
 #include "Tracer/RayList.h"
 #include "vulkan/vulkan.hpp"
 
@@ -159,6 +160,9 @@ class RAYX_API VulkanTracer {
     RayList m_OutputRays;
     std::vector<double> m_beamlineData;
     std::vector<_debugBuf_t> m_debugBufList;
+
+    // Material tables
+    MaterialTables m_MaterialTables;
 
     struct Settings {
         bool m_isDebug;

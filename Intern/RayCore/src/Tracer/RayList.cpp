@@ -4,6 +4,8 @@
 #include <cstring>
 #include <iostream>
 
+#include "Debug.h"
+
 namespace RAYX {
 
 RayList::RayList() {}
@@ -17,38 +19,16 @@ RayList::~RayList() {}
  * @param inRayVector vector of Rays to be inserted
  */
 void RayList::insertVector(std::vector<Ray>&& inRayVector) {
-    // check if last vector is full, if not fill it
-    size_t remainingSpace = 0;
-    if ((m_rayList.back().size() > 0) &&
-        (m_rayList.back().size() < RAY_MAX_ELEMENTS_IN_VECTOR)) {
-        remainingSpace = RAY_MAX_ELEMENTS_IN_VECTOR - m_rayList.back().size();
-        if (remainingSpace > 0) {
-            // fill remaining space
-            m_rayList.back().resize(RAY_MAX_ELEMENTS_IN_VECTOR);
-            m_rayList.back().insert(m_rayList.back().end(), inRayVector.begin(),
-                                    inRayVector.begin() + remainingSpace);
-            // erase from vector
-            inRayVector.erase(inRayVector.begin(),
-                              inRayVector.begin() + remainingSpace);
-        }
-    }
+    // note that this can be optimized quite a bit.
+    // But the previous "optimized" version had multiple memory unsafety issues
+    // and was hence replaced.
 
-    // cut inRayVector to RAY_VECTOR_SIZE big pieces and emplace back
-    int numberOfVecs = inRayVector.size() / RAY_MAX_ELEMENTS_IN_VECTOR;
-    if (inRayVector.size() % RAY_MAX_ELEMENTS_IN_VECTOR != 0) {
-        numberOfVecs++;
-    }
-    for (int i = 0; i < numberOfVecs; i++) {
-        if (i == numberOfVecs - 1) {
-            // last vector
-            m_rayList.emplace_back(
-                inRayVector.begin() + i * RAY_MAX_ELEMENTS_IN_VECTOR,
-                inRayVector.end());
-        } else {
-            m_rayList.emplace_back(
-                inRayVector.begin() + i * RAY_MAX_ELEMENTS_IN_VECTOR,
-                inRayVector.begin() + (i + 1) * RAY_MAX_ELEMENTS_IN_VECTOR);
+    for (Ray r : inRayVector) {
+        if (m_rayList.empty() ||
+            m_rayList.back().size() == RAY_MAX_ELEMENTS_IN_VECTOR) {
+            m_rayList.push_back({});
         }
+        m_rayList.back().push_back(r);
     }
 }
 
