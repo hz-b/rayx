@@ -97,6 +97,9 @@ std::list<double> runTracer(
     std::list<double> outputRays;
     // get resulting rays from tracer
     std::vector<RAYX::Ray> outputRayVector = *(tracer.getOutputIteratorBegin());
+
+    // TODO: This only considers the first entry of the RayList!
+
     // convert to a list of doubles in order pos, weight, dir, energy, stokes,
     // pathlength, order, lastElement, extraParam
     for (auto iter = outputRayVector.begin(); iter != outputRayVector.end();
@@ -119,6 +122,52 @@ std::list<double> runTracer(
         outputRays.push_back((*iter).getExtraParam());
     }
     std::cout << "got " << outputRays.size() << " values from shader"
+              << std::endl;
+    // empties buffers etc to reuse the tracer instance with a new beamline and
+    // new rays
+    tracer.cleanTracer();
+    return outputRays;
+}
+
+/** runs beamline in "elements" with rays in "testValues"
+ * @param testValues        contains rays
+ * @param elements          contains optical elements that form the beamline
+ * @return output rays, result from tracer after tracing the given rays in the
+ * given beamline
+ */
+std::vector<RAYX::Ray> runTracerRaw(
+    std::vector<RAYX::Ray> testValues,
+    std::vector<std::shared_ptr<RAYX::OpticalElement>> elements) {
+    std::list<std::vector<RAYX::Ray>> rayList;
+    // set beamline parameters (number of beamlines (1), number of elements,
+    // number of rays)
+    std::cout << "set beamline parameters" << std::endl;
+    tracer.setBeamlineParameters(1, elements.size(), testValues.size());
+
+    // add rays
+    std::cout << "testValues.size(): " << testValues.size() << std::endl;
+    tracer.addRayVector(std::move(testValues));
+    std::cout << "add rays to tracer done" << std::endl;
+
+    // add elements
+    for (std::shared_ptr<RAYX::OpticalElement> element : elements) {
+        tracer.addArrays(element->getSurfaceParams(), element->getInMatrix(),
+                         element->getOutMatrix(),
+                         element->getObjectParameters(),
+                         element->getElementParameters());
+    }
+    // execute tracing
+    tracer.run();  // run tracer
+    std::vector<RAYX::Ray> outputRays;
+    // get resulting rays from tracer
+
+    auto end = tracer.getOutputIteratorEnd();
+    for (auto it = tracer.getOutputIteratorBegin(); it != end; it++) {
+        for (auto ray : *it) {
+            outputRays.push_back(ray);
+        }
+    }
+    std::cout << "got " << outputRays.size() << " rays from shader"
               << std::endl;
     // empties buffers etc to reuse the tracer instance with a new beamline and
     // new rays
@@ -1982,8 +2031,8 @@ double parseDouble(std::string s) {
     return d;
 }
 
-std::vector<double> parseCSVline(std::string line) {
-    std::vector<double> out;
+RAYX::Ray parseCSVline(std::string line) {
+    std::vector<double> vec;
 
     if (line.ends_with('\n')) {
         line.pop_back();
@@ -1992,18 +2041,29 @@ std::vector<double> parseCSVline(std::string line) {
     while (true) {
         auto idx = line.find('\t');
         if (idx == std::string::npos) {
-            out.push_back(parseDouble(line));
+            vec.push_back(parseDouble(line));
             break;
         } else {
-            out.push_back(parseDouble(line.substr(0, idx)));
+            vec.push_back(parseDouble(line.substr(0, idx)));
             line = line.substr(idx + 1);
         }
     }
 
-    return out;
+    RAYX::Ray ray;
+    // order of doubles:
+    // RN, RS, RO, position=(OX, OY, OZ), direction=(DX, DY, DZ), energy,
+    // path length, stokes=(S0, S1, S2, S3)
+
+    ray.m_position = {vec[3], vec[4], vec[5]};
+    ray.m_direction = {vec[6], vec[7], vec[8]};
+    ray.m_energy = vec[9];
+    ray.m_pathLength = vec[10];
+    ray.m_stokes = {vec[11], vec[12], vec[13], vec[14]};
+
+    return ray;
 }
 
-std::vector<std::vector<double>> loadCSVRayUI(const char* csv) {
+std::vector<RAYX::Ray> loadCSVRayUI(const char* csv) {
     std::string beamline_file = resolvePath("Tests/rml_files/test_shader/");
     beamline_file.append(csv);
     beamline_file.append(".csv");
@@ -2016,7 +2076,7 @@ std::vector<std::vector<double>> loadCSVRayUI(const char* csv) {
         std::getline(f, line);
     }
 
-    std::vector<std::vector<double>> out;
+    std::vector<RAYX::Ray> out;
 
     while (std::getline(f, line)) {
         out.push_back(parseCSVline(line));
@@ -2026,7 +2086,7 @@ std::vector<std::vector<double>> loadCSVRayUI(const char* csv) {
 }
 
 void compareFromCSVRayUI(const char* filename) {
-    auto correct = loadCSVRayUI(filename);
+    auto rayui = loadCSVRayUI(filename);
 
     std::string beamline_file = resolvePath("Tests/rml_files/test_shader/");
     beamline_file.append(filename);
@@ -2038,14 +2098,9 @@ void compareFromCSVRayUI(const char* filename) {
         beamline->m_OpticalElements;
     std::vector<RAYX::Ray> testValues = beamline->m_LightSources[0]->getRays();
 
-    auto rays_list = runTracer(testValues, elements);
+    auto rayxGlobal = runTracerRaw(testValues, elements);
 
-    CHECK_EQ(correct.size(), rays_list.size() / RAY_DOUBLE_COUNT);
-
-    std::vector<double> rays;
-    for (auto x : rays_list) {
-        rays.push_back(x);
-    }
+    CHECK_EQ(rayui.size(), rayxGlobal.size());
 
     auto t = 1e-10;
 
@@ -2065,30 +2120,37 @@ void compareFromCSVRayUI(const char* filename) {
     }
 
     // the comparison happens in element coordinates.
-    for (unsigned int i = 0; i < correct.size(); i++) {
+    for (unsigned int i = 0; i < rayui.size(); i++) {
         // original (global) position:
-        auto globalpos = arrayToGlm4(
-            {rays[16 * i + 0], rays[16 * i + 1], rays[16 * i + 2], 1});
-        auto globaldir = arrayToGlm4(
-            {rays[16 * i + 4], rays[16 * i + 5], rays[16 * i + 6], 0});
+        auto globalpos =
+            arrayToGlm4({rayxGlobal[i].m_position.x, rayxGlobal[i].m_position.y,
+                         rayxGlobal[i].m_position.z, 1});
+        auto globaldir = arrayToGlm4({rayxGlobal[i].m_direction.x,
+                                      rayxGlobal[i].m_direction.y,
+                                      rayxGlobal[i].m_direction.z, 0});
 
         auto elementpos = transform * globalpos;
         auto elementdir = transform * globaldir;
 
-        CHECK_EQ(elementpos[0], correct[i][3], t);  // x
-        CHECK_EQ(elementpos[1], correct[i][4], t);  // y
-        CHECK_EQ(elementpos[2], correct[i][5], t);  // z
+        auto rayx = rayxGlobal[i];
+        rayx.m_position = {elementpos.x, elementpos.y, elementpos.z};
+        rayx.m_direction = {elementdir.x, elementdir.y, elementdir.z};
 
-        CHECK_EQ(elementdir[0], correct[i][6], t);  // dir x
-        CHECK_EQ(elementdir[1], correct[i][7], t);  // dir y
-        CHECK_EQ(elementdir[2], correct[i][8], t);  // dir z
+        CHECK_EQ(rayx.m_position.x, rayui[i].m_position.x, t);
+        CHECK_EQ(rayx.m_position.y, rayui[i].m_position.y, t);
+        CHECK_EQ(rayx.m_position.z, rayui[i].m_position.z, t);
 
-        CHECK_EQ(rays[16 * i + 7], correct[i][9], t);    // energy
-        CHECK_EQ(rays[16 * i + 12], correct[i][10], t);  // path length
-        CHECK_EQ(rays[16 * i + 8], correct[i][11], t);   // s0
-        CHECK_EQ(rays[16 * i + 9], correct[i][12], t);   // s1
-        CHECK_EQ(rays[16 * i + 10], correct[i][13], t);  // s2
-        CHECK_EQ(rays[16 * i + 11], correct[i][14], t);  // s3
+        CHECK_EQ(rayx.m_direction.x, rayui[i].m_direction.x, t);
+        CHECK_EQ(rayx.m_direction.y, rayui[i].m_direction.y, t);
+        CHECK_EQ(rayx.m_direction.z, rayui[i].m_direction.z, t);
+
+        CHECK_EQ(rayx.m_energy, rayui[i].m_energy, t);
+        CHECK_EQ(rayx.m_pathLength, rayui[i].m_pathLength, t);
+
+        CHECK_EQ(rayx.m_stokes.x, rayui[i].m_stokes.x, t);
+        CHECK_EQ(rayx.m_stokes.y, rayui[i].m_stokes.y, t);
+        CHECK_EQ(rayx.m_stokes.z, rayui[i].m_stokes.z, t);
+        CHECK_EQ(rayx.m_stokes.w, rayui[i].m_stokes.w, t);
     }
 }
 
