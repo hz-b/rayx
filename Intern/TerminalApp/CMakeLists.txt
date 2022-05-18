@@ -30,7 +30,7 @@ configure_file(TerminalAppConfig.h.in TerminalAppConfig.h)
 #Add Python files
 file(COPY python DESTINATION ${CMAKE_BINARY_DIR}/bin)
 
-add_executable(${PROJECT_NAME} main.cpp TerminalApp.cpp TerminalApp.h PythonInterp.cpp)
+add_executable(${PROJECT_NAME} main.cpp TerminalApp.cpp TerminalApp.h PythonInterp.cpp CommandParser.cpp)
 
 if (WIN32)
     target_compile_definitions(${PROJECT_NAME} PUBLIC RAYX_PLATFORM_WINDOWS)
