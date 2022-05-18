@@ -9,19 +9,31 @@ import random
 
 cwd = os.getcwd()
 
-#add RML Files for testing here
+
+# This Script works only when you set the correct paths to RAY-UI and RAY-X
+
+# add RML Files for testing here
+# These are the original RML Files to generate the randoms from.
 rmls = [tuple(['Ellips/test_0.rml','Ellips']),
 tuple(['Toroid/test_0.rml','Toroid'])]
 
-rayxdir = os.path.join(cwd,'build/bin')
-rayuidir = os.path.join('/home/osm/Documents/HZB/RAY/src/Ray-UI')
+rayxdir = os.path.join(cwd,'build/bin') # MAKE SURE THAT RAY-X IS CORRECTLY BUILT
+
+###CHANGE HERE
+RAY_UI = '' # SET THE PATH TO RAY-UI executable (Absolute e.g /home/Documents/Ray-UI)
+
+LD_LIBRARY_PATH = '' # Popen needs this env variable to find the library qwt for dynamic linking
+#(e.g /home/usr/Documents/qwt-6.2.0/lib/)
+
+###END CHANGE 
+
+rayuidir = os.path.join(RAY_UI) 
 
 export_dir = os.path.join(cwd)
-TESTS = 20 
 
 RAD_INCREMENT = 10
 MM_INCREMENT = 250
-TRIALS = 10
+TRIALS = 10 # SET THE AMOUNT OF TESTS TO CHECK
 
 """
 Randomly change the values 
@@ -37,7 +49,7 @@ def increment_random(amount_type:int,element_name, param_id,value):
     return new_value
 
 """
-Conditions to change. 
+Conditions to randomly change. 
 """
 conditions = {
     'Ellipsoid' : {
@@ -72,20 +84,23 @@ def change_value(root,xmlTree:ET.ElementTree):
 
 
 if __name__ == '__main__':
+
+    if RAY_UI == '' or LD_LIBRARY_PATH == '':
+        raise Exception('Missing arguments RAY_UI/LD_LIBRARY_PATH')
+
     xmlTree = ET.parse(os.path.join(rayxdir,rmls[0][0]))
     root = xmlTree.getroot()
-    path= {
-        'LD_LIBRARY_PATH' : '/home/osm/Documents/HZBExtra/qwt-6.2.0/lib/'
-    }
+
+    #Delete the generated files from last run
     for _, dirs, files in os.walk(rayxdir+'/'+rmls[0][1]):
         for file in files:
             if 'auto' in str(file):
                 os.remove(rayxdir+'/'+rmls[0][1]+'/'+file)
     
     my_env = os.environ.copy()
-    my_env["LD_LIBRARY_PATH"] = "/home/osm/Documents/HZBExtra/qwt-6.2.0/lib/" 
+    my_env["LD_LIBRARY_PATH"] = LD_LIBRARY_PATH
 
-    for i in trange(TESTS):
+    for i in trange(TRIALS):
         print(f'Generating new values..')
         _rml = change_value(root,xmlTree)
         print(f'Running RAY-X...')
@@ -93,4 +108,4 @@ if __name__ == '__main__':
         #ray_x_proc.wait()
         print(f'Running RAY-UI...')
         ray_ui_proc = subprocess.Popen(rayuidir + '/Ray-UI -t '+ _rml,shell=True,env=my_env,stdin=subprocess.PIPE,stdout=subprocess.PIPE)
-        wait_res = input("Finished. Press any key for next.")
+        wait_res = input("Finished. Press any key for next trial.")
