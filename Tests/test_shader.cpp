@@ -2104,7 +2104,7 @@ void compareFromCSVRayUI(const char* filename) {
 
     CHECK_EQ(rayui.size(), rayxGlobal.size());
 
-    auto t = 1e-3;  // TODO: much stricter tolerance!
+    auto t = 1e-5;  // TODO: stricter tolerance!
 
     glm::dmat4x4 transform;
     if (!elements.empty()) {
