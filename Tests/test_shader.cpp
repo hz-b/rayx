@@ -13,7 +13,7 @@
 #include "Tracer/Vulkan/VulkanTracer.h"
 
 #if RUN_TEST_SHADER
-RAYX::VulkanTracer tracer;
+std::unique_ptr<RAYX::VulkanTracer> tracer = nullptr;
 
 /** using this function is preferable to directly adding your test with `#ifndef
  * CI`, because with `if (!shouldDoVulkanTests()) { GTEST_SKIP(); }`
@@ -30,15 +30,17 @@ bool shouldDoVulkanTests() {
 /**
  * testing suite "Tracer"
  */
-class Tracer : public ::testing::Test {
+class Tracer : public testing::Test {
   protected:
     /** this is run before the first test in the testing Suite
      * before first test in test suite "Tracer" is run, initialize the tracer
      * tracer will be a shared instance among all tests
      */
     static void SetUpTestSuite() {
-        std::cout << "initialize Vulkantracer instance" << std::endl;
-        tracer = RAYX::VulkanTracer();
+        if (shouldDoVulkanTests()) {
+            std::cout << "initialize Vulkantracer instance" << std::endl;
+            tracer = std::make_unique<RAYX::VulkanTracer>();
+        }
     }
 
     /**
@@ -50,12 +52,14 @@ class Tracer : public ::testing::Test {
         }
     }
     /** this is run after the last test of the testing suite
-     * run after last test of suite "Tracer", cleans up the shared instance of
-     * tracer
+     * run after last test of suite "Tracer", cleans up the shared instance
+     * of tracer
      */
     static void TearDownTestSuite() {
-        tracer.cleanup();
-        std::cout << "clear tracer instance" << std::endl;
+        if (shouldDoVulkanTests()) {
+            tracer->cleanup();
+            std::cout << "clear tracer instance" << std::endl;
+        }
     }
 };
 
@@ -78,28 +82,27 @@ std::list<double> runTracer(
     // set beamline parameters (number of beamlines (1), number of elements,
     // number of rays)
     std::cout << "set beamline parameters" << std::endl;
-    tracer.setBeamlineParameters(1, elements.size(), testValues.size());
+    tracer->setBeamlineParameters(1, elements.size(), testValues.size());
 
     // add rays
     std::cout << "testValues.size(): " << testValues.size() << std::endl;
-    tracer.addRayVector(std::move(testValues));
+    tracer->addRayVector(std::move(testValues));
     std::cout << "add rays to tracer done" << std::endl;
 
     // add elements
     for (std::shared_ptr<RAYX::OpticalElement> element : elements) {
-        tracer.addArrays(element->getSurfaceParams(), element->getInMatrix(),
-                         element->getOutMatrix(),
-                         element->getObjectParameters(),
-                         element->getElementParameters());
+        tracer->addArrays(element->getSurfaceParams(), element->getInMatrix(),
+                          element->getOutMatrix(),
+                          element->getObjectParameters(),
+                          element->getElementParameters());
     }
     // execute tracing
-    tracer.run();  // run tracer
+    tracer->run();  // run tracer
     std::list<double> outputRays;
     // get resulting rays from tracer
-    std::vector<RAYX::Ray> outputRayVector = *(tracer.getOutputIteratorBegin());
-
+    std::vector<RAYX::Ray> outputRayVector =
+        *(tracer->getOutputIteratorBegin());
     // TODO: This only considers the first entry of the RayList!
-
     // convert to a list of doubles in order pos, weight, dir, energy, stokes,
     // pathlength, order, lastElement, extraParam
     for (auto iter = outputRayVector.begin(); iter != outputRayVector.end();
@@ -125,7 +128,7 @@ std::list<double> runTracer(
               << std::endl;
     // empties buffers etc to reuse the tracer instance with a new beamline and
     // new rays
-    tracer.cleanTracer();
+    tracer->cleanTracer();
     return outputRays;
 }
 
@@ -142,27 +145,27 @@ std::vector<RAYX::Ray> runTracerRaw(
     // set beamline parameters (number of beamlines (1), number of elements,
     // number of rays)
     std::cout << "set beamline parameters" << std::endl;
-    tracer.setBeamlineParameters(1, elements.size(), testValues.size());
+    tracer->setBeamlineParameters(1, elements.size(), testValues.size());
 
     // add rays
     std::cout << "testValues.size(): " << testValues.size() << std::endl;
-    tracer.addRayVector(std::move(testValues));
+    tracer->addRayVector(std::move(testValues));
     std::cout << "add rays to tracer done" << std::endl;
 
     // add elements
     for (std::shared_ptr<RAYX::OpticalElement> element : elements) {
-        tracer.addArrays(element->getSurfaceParams(), element->getInMatrix(),
-                         element->getOutMatrix(),
-                         element->getObjectParameters(),
-                         element->getElementParameters());
+        tracer->addArrays(element->getSurfaceParams(), element->getInMatrix(),
+                          element->getOutMatrix(),
+                          element->getObjectParameters(),
+                          element->getElementParameters());
     }
     // execute tracing
-    tracer.run();  // run tracer
+    tracer->run();  // run tracer
     std::vector<RAYX::Ray> outputRays;
     // get resulting rays from tracer
 
-    auto end = tracer.getOutputIteratorEnd();
-    for (auto it = tracer.getOutputIteratorBegin(); it != end; it++) {
+    auto end = tracer->getOutputIteratorEnd();
+    for (auto it = tracer->getOutputIteratorBegin(); it != end; it++) {
         for (auto ray : *it) {
             outputRays.push_back(ray);
         }
@@ -171,7 +174,7 @@ std::vector<RAYX::Ray> runTracerRaw(
               << std::endl;
     // empties buffers etc to reuse the tracer instance with a new beamline and
     // new rays
-    tracer.cleanTracer();
+    tracer->cleanTracer();
     return outputRays;
 }
 

@@ -341,8 +341,10 @@ void VulkanTracer::createInstance() {
 
     // create instance
     VkResult result = vkCreateInstance(&createInfo, nullptr, &m_Instance);
-    if (result != VK_SUCCESS)
+    if (result != VK_SUCCESS) {
+        RAYX_LOG << "Failed to create instance! Error Code " << result;
         throw std::runtime_error("failed to create instance!");
+    }
 }
 
 void VulkanTracer::populateDebugMessengerCreateInfo(
@@ -584,6 +586,7 @@ void VulkanTracer::createLogicalDevice() {
 
     if (vkCreateDevice(m_PhysicalDevice, &createInfo, nullptr, &m_Device) !=
         VK_SUCCESS) {
+        RAYX_LOG << "Failed to create instance!";
         throw std::runtime_error("failed to create logical device!");
     }
 
