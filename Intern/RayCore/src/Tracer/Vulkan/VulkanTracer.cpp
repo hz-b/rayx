@@ -56,6 +56,13 @@
  * buffers[1] = Debug Staging buffer
  **/
 
+const char* COMPUTE_BUFFER_NAMES[7] = {"ray buffer",           "output buffer",
+                                       "quadric buffer",       "xyznull buffer",
+                                       "material index table", "material table",
+                                       "debug buffer"};
+const char* STAGING_BUFFER_NAMES[2] = {"In/Out staging buffer",
+                                       "Debug staging buffer"};
+
 namespace RAYX {
 VulkanTracer::VulkanTracer() {
     // Set buffer settings (DEBUG OR RELEASE)
@@ -150,8 +157,8 @@ void VulkanTracer::run() {
         m_compute.m_BufferSizes[6] = (uint64_t)m_numberOfRays * sizeof(m_debug);
 
     for (uint32_t i = 0; i < m_compute.m_BufferSizes.size(); i++) {
-        RAYX_LOG << "Compute Buffer [" << i
-                 << "] of size : " << m_compute.m_BufferSizes[i] << " Bytes";
+        RAYX_LOG << "Compute Buffer \"" << COMPUTE_BUFFER_NAMES[i]
+                 << "\" of size: " << m_compute.m_BufferSizes[i] << " Bytes";
     }
 
     // Prepare size of staging buffers
@@ -165,8 +172,8 @@ void VulkanTracer::run() {
             (uint64_t)m_numberOfRays * sizeof(m_debug));  // maximum of 128MB
 
     for (uint32_t i = 0; i < m_staging.m_BufferSizes.size(); i++) {
-        RAYX_LOG << "Staging Buffer [" << i
-                 << "] of size : " << m_staging.m_BufferSizes[i] << " Bytes";
+        RAYX_LOG << "Staging Buffer \"" << STAGING_BUFFER_NAMES[i]
+                 << "\" of size: " << m_staging.m_BufferSizes[i] << " Bytes";
     }
     // initVulkan();
     RAYX_LOG << "Buffer sizes initiliazed. Run-time: "
@@ -1021,7 +1028,8 @@ void VulkanTracer::fillQuadricBuffer() {
 }
 
 void VulkanTracer::fillMaterialBuffer() {
-    RAYX_LOG << "Filling MaterialBuffer..";
+    RAYX_LOG << "Filling MaterialBuffer.. (size = "
+             << m_MaterialTables.materialTable.size() << " doubles)";
 
     // material index buffer
     {

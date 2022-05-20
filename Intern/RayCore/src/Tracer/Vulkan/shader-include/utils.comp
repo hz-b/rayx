@@ -183,22 +183,22 @@ struct NffEntry {
 int getPalikEntryCount(int material) {
 	int m = material-1; // in [0, 91]
 	// this counts how many doubles are in between the materials index, and the next index in the table.
-	// division by 4, because each entry has 4 members currently: energy, n, k, padding.
-	return (matIdx[m+1] - matIdx[m])/4;
+	// division by 3, because each entry has 3 members currently: energy, n, k, padding.
+	return (matIdx[m+1] - matIdx[m])/3;
 }
 
 int getNffEntryCount(int material) {
 	int m = material-1; // in [0, 91]
 	// the offset of 92 (== number of materials), skips the palik table and reaches into the nff table.
 	// the rest of the logic is as above.
-	return (matIdx[92+m+1] - matIdx[92+m])/4;
+	return (matIdx[92+m+1] - matIdx[92+m])/3;
 }
 
 PalikEntry getPalikEntry(int index, int material) {
 	int m = material-1; // in [0, 91]
 	// matIdx[m] is the start of the Palik table of material m.
-	// 4*index skips 'index'-many entries.
-	int i = matIdx[m] + 4*index;
+	// 3*index skips 'index'-many entries.
+	int i = matIdx[m] + 3*index;
 
 	PalikEntry e;
 	e.energy = mat[i];
@@ -211,8 +211,8 @@ PalikEntry getPalikEntry(int index, int material) {
 NffEntry getNffEntry(int index, int material) {
 	int m = material-1; // in [0, 91]
 	// matIdx[92+m] is the start of the Nff table of material m.
-	// 4*index skips 'index'-many entries.
-	int i = matIdx[92+m] + 4*index;
+	// 3*index skips 'index'-many entries.
+	int i = matIdx[92+m] + 3*index;
 
 	NffEntry e;
 	e.energy = mat[i];

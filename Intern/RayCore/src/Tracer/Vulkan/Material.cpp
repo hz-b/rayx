@@ -73,7 +73,6 @@ MaterialTables loadMaterialTables(std::array<bool, 92> relevantMaterials) {
                 out.materialTable.push_back(x.m_energy);
                 out.materialTable.push_back(x.m_n);
                 out.materialTable.push_back(x.m_k);
-                out.materialTable.push_back(0);
             }
         }
     }
@@ -92,7 +91,6 @@ MaterialTables loadMaterialTables(std::array<bool, 92> relevantMaterials) {
                 out.materialTable.push_back(x.m_energy);
                 out.materialTable.push_back(x.m_f1);
                 out.materialTable.push_back(x.m_f2);
-                out.materialTable.push_back(0);
             }
         }
     }
