@@ -51,7 +51,7 @@ bool materialFromString(const char* matname, Material* out) {
     return false;
 }
 
-MaterialTables loadMaterialTables() {
+MaterialTables loadMaterialTables(std::array<bool, 92> relevantMaterials) {
     MaterialTables out;
 
     auto mats = allNormalMaterials();
@@ -61,40 +61,52 @@ MaterialTables loadMaterialTables() {
 
     // add palik table content
     for (size_t i = 0; i < mats.size(); i++) {
-        PalikTable t;
-
-        if (!PalikTable::load(getMaterialName(mats[i]), &t)) {
-            RAYX_ERR << "could not load PalikTable!";
-        }
-
         out.indexTable.push_back(out.materialTable.size());
-        for (auto x : t.m_Lines) {
-            out.materialTable.push_back(x.m_energy);
-            out.materialTable.push_back(x.m_n);
-            out.materialTable.push_back(x.m_k);
-            out.materialTable.push_back(0);
+        if (relevantMaterials[i]) {
+            PalikTable t;
+
+            if (!PalikTable::load(getMaterialName(mats[i]), &t)) {
+                RAYX_ERR << "could not load PalikTable!";
+            }
+
+            for (auto x : t.m_Lines) {
+                out.materialTable.push_back(x.m_energy);
+                out.materialTable.push_back(x.m_n);
+                out.materialTable.push_back(x.m_k);
+                out.materialTable.push_back(0);
+            }
         }
     }
 
     // add nff table content
     for (size_t i = 0; i < mats.size(); i++) {
-        NffTable t;
-
-        if (!NffTable::load(getMaterialName(mats[i]), &t)) {
-            RAYX_ERR << "could not load NffTable!";
-        }
-
         out.indexTable.push_back(out.materialTable.size());
-        for (auto x : t.m_Lines) {
-            out.materialTable.push_back(x.m_energy);
-            out.materialTable.push_back(x.m_f1);
-            out.materialTable.push_back(x.m_f2);
-            out.materialTable.push_back(0);
+        if (relevantMaterials[i]) {
+            NffTable t;
+
+            if (!NffTable::load(getMaterialName(mats[i]), &t)) {
+                RAYX_ERR << "could not load NffTable!";
+            }
+
+            for (auto x : t.m_Lines) {
+                out.materialTable.push_back(x.m_energy);
+                out.materialTable.push_back(x.m_f1);
+                out.materialTable.push_back(x.m_f2);
+                out.materialTable.push_back(0);
+            }
         }
     }
 
-    // this extra index simplifies computation on the GPU
+    // this extra index simplifies computation on the GPU, as then the table
+    // within indexTable[i]..indexTable[i+1] can be used without checks.
     out.indexTable.push_back(out.materialTable.size());
+
+    // materialTable can't be empty, because
+    // Vulkan does not support empty buffers.
+    if (out.materialTable.empty()) {
+        // this number should never be accessed on the GPU.
+        out.materialTable.push_back(0);
+    }
 
     return out;
 }

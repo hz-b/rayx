@@ -235,7 +235,7 @@ dvec2 getRefractiveIndex(double energy, int material) {
 	}
 
 	// try to get refractive index using Palik table
-	{
+	if (getPalikEntryCount(material) > 0) { // don't try binary search if there are 0 entries!
 		int low  = 0;                               // <= energy
 		int high = getPalikEntryCount(material)-1;  // >= energy
 
@@ -260,7 +260,7 @@ dvec2 getRefractiveIndex(double energy, int material) {
 	}
 
 	// get refractive index with Nff table
-	{
+	if (getNffEntryCount(material) > 0) { // don't try binary search if there are 0 entries!
 		int low  = 0;                             // <= energy
 		int high = getNffEntryCount(material)-1;  // >= energy
 
@@ -286,6 +286,9 @@ dvec2 getRefractiveIndex(double energy, int material) {
 
 		return dvec2(n, k);
 	}
+
+	// error, no matching entry found.
+	return dvec2(0.0/0.0, 0.0/0.0);
 }
 
 // returns angle between ray direction and surface normal at intersection point

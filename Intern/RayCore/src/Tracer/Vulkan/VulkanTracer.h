@@ -163,6 +163,7 @@ class RAYX_API VulkanTracer {
 
     // Material tables
     MaterialTables m_MaterialTables;
+    std::array<bool, 92> m_relevantMaterials;
 
     struct Settings {
         bool m_isDebug;
