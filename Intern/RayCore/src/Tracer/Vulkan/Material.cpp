@@ -6,6 +6,7 @@
 #include <iostream>
 
 #include "NffTable.h"
+#include "PalikTable.h"
 
 /**
  * returns the name of the material:
@@ -54,6 +55,28 @@ MaterialTables loadMaterialTables() {
     MaterialTables out;
 
     auto mats = allNormalMaterials();
+    if (mats.size() != 92) {
+        RAYX_ERR << "unexpected number of materials. this is a bug.";
+    }
+
+    // add palik table content
+    for (size_t i = 0; i < mats.size(); i++) {
+        PalikTable t;
+
+        if (!PalikTable::load(getMaterialName(mats[i]), &t)) {
+            RAYX_ERR << "could not load PalikTable!";
+        }
+
+        out.indexTable.push_back(out.materialTable.size());
+        for (auto x : t.m_Lines) {
+            out.materialTable.push_back(x.m_energy);
+            out.materialTable.push_back(x.m_n);
+            out.materialTable.push_back(x.m_k);
+            out.materialTable.push_back(0);
+        }
+    }
+
+    // add nff table content
     for (size_t i = 0; i < mats.size(); i++) {
         NffTable t;
 
@@ -61,8 +84,7 @@ MaterialTables loadMaterialTables() {
             RAYX_ERR << "could not load NffTable!";
         }
 
-        out.indexTable.push_back(out.materialTable.size() /
-                                 4);  // 4 doubles per Nff Entry
+        out.indexTable.push_back(out.materialTable.size());
         for (auto x : t.m_Lines) {
             out.materialTable.push_back(x.m_energy);
             out.materialTable.push_back(x.m_f1);
@@ -70,6 +92,9 @@ MaterialTables loadMaterialTables() {
             out.materialTable.push_back(0);
         }
     }
+
+    // this extra index simplifies computation on the GPU
+    out.indexTable.push_back(out.materialTable.size());
 
     return out;
 }

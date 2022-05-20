@@ -47,6 +47,7 @@ SET(SOURCE
     src/Tracer/Vulkan/VulkanTracer.cpp
     src/Tracer/Vulkan/Material.cpp
     src/Tracer/Vulkan/NffTable.cpp
+    src/Tracer/Vulkan/PalikTable.cpp
     src/UserParameter/WorldUserParams.cpp
     src/UserParameter/GeometricUserParams.cpp
 )
@@ -96,6 +97,7 @@ SET(HEADERS
     src/Tracer/Vulkan/VulkanTracer.h
     src/Tracer/Vulkan/Material.h
     src/Tracer/Vulkan/NffTable.h
+    src/Tracer/Vulkan/PalikTable.h
     src/UserParameter/WorldUserParams.h
     src/UserParameter/GeometricUserParams.h
 )

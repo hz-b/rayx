@@ -32,12 +32,6 @@ struct Element {
     dmat4 elementParameters;
 };
 
-struct NffEntry {
-    double energy;
-    double f1;
-    double f2;
-    double empty;  // for padding
-};
 #ifdef DEBUG
 struct _debug_struct {
     dmat4 _dMat; // Can also be used as vectors or scalar
@@ -59,13 +53,13 @@ layout(std140, binding = 2) buffer qbuf {
 layout(std140, binding = 3) buffer xyzbuf { dvec4 xyznull[]; };
 
 layout(binding = 4) buffer materialIndexBuf {
-    int nkpIdx[];  // can be indexed by material-index defined in Material.h to
-                   // get the starting point of this material in the `nkp`
-                   // table.
+    int matIdx[]; // matIdx[0..91] contains the indices of the Palik Table, whereas matIdx[92..92+91] contains the indices of the NffTable.
+				  // generally, an entry of matIdx tells you the index you need to look up in the 'mat'-table below.
 };
 
 layout(binding = 5) buffer materialBuf {
-    NffEntry nkp[];  // contains nff table of all materials concatenated together
+    double mat[];  // contains: (Palik tables of all materials concatenated together) concatenated with (Nff tables of all materials concatenated together)
+				   // use the matIdx-table to determine the relevant indices for when which table starts and stops.
 };
 
 #ifdef DEBUG
@@ -482,15 +476,7 @@ void runTraceFunctions() {
         res.stokes                           = dvec4(complex_euler3, complex_euler4);
         rayData[uint(gl_GlobalInvocationID)] = res;
     } else if (settings == 26) {  // test material loading
-        rayData[uint(gl_GlobalInvocationID)].position.x = nkp[0].energy;
-        rayData[uint(gl_GlobalInvocationID)].position.y = nkp[0].f1;
-        rayData[uint(gl_GlobalInvocationID)].position.z = nkp[0].f2;
-        rayData[uint(gl_GlobalInvocationID)].weight     = nkpIdx[0];
-
-        rayData[uint(gl_GlobalInvocationID)].direction.x = nkp[nkpIdx[1]].energy;
-        rayData[uint(gl_GlobalInvocationID)].direction.y = nkp[nkpIdx[1]].f1;
-        rayData[uint(gl_GlobalInvocationID)].direction.z = nkp[nkpIdx[1]].f2;
-        rayData[uint(gl_GlobalInvocationID)].energy      = nkpIdx[1];
+		// TODO(rudi): implement meaningful material test.
     } else if (settings == 27) {  // TEST TRIG FUNCTIONS: cos
         res.position                         = dvec3(r8_cos(r.position.x), r8_cos(r.position.y), r8_cos(r.position.z));
         res.weight                           = r8_cos(r.weight);

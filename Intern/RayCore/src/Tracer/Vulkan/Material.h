@@ -29,10 +29,9 @@ bool materialFromString(const char* matname, Material* out);
 
 struct MaterialTables {
     std::vector<double> materialTable;
-    std::vector<int>
-        indexTable;
+    std::vector<int> indexTable;
 };
 
-// the following functions load the tables, and grant you a pointer to them.
-// the tables will be written to the nkp and nkpIdx buffers of shader.comp
+// the following function loads the Palik & Nff tables.
+// the tables will later be written to the mat and matIdx buffers of shader.comp
 MaterialTables loadMaterialTables();
