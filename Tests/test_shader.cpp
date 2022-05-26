@@ -2172,6 +2172,23 @@ TEST_F(opticalElements, MatrixSource) {
 
 TEST_F(opticalElements, PlaneMirror) {
     const char* filename = "PlaneMirror";
+
+    // test In & Out matrix accuracy
+    {
+        std::string beamline_file = resolvePath("Tests/rml_files/test_shader/");
+        beamline_file.append(filename);
+        beamline_file.append(".rml");
+        std::shared_ptr<RAYX::Beamline> beamline =
+            std::make_shared<RAYX::Beamline>(
+                RAYX::importBeamline(beamline_file.c_str()));
+        auto mirror = beamline->m_OpticalElements[0];
+        auto inmat = arrayToGlm16(mirror->getInMatrix());
+        auto outmat = arrayToGlm16(mirror->getOutMatrix());
+        glm::dvec4 original_vec = {0, 0, 0, 1};
+        glm::dvec4 new_vec = outmat * (inmat * original_vec);
+        CHECK_EQ(original_vec, new_vec, 1e-10);
+    }
+
     testBeamline(filename);  // this generates an output file to manually
                              // compare // TODO: remove
     compareFromCSVRayUI(filename);
