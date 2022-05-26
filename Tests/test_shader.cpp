@@ -2182,11 +2182,11 @@ TEST_F(opticalElements, PlaneMirror) {
             std::make_shared<RAYX::Beamline>(
                 RAYX::importBeamline(beamline_file.c_str()));
         auto mirror = beamline->m_OpticalElements[0];
-        auto inmat = arrayToGlm16(mirror->getInMatrix());
-        auto outmat = arrayToGlm16(mirror->getOutMatrix());
+        auto inmat = glm::transpose(arrayToGlm16(mirror->getInMatrix()));
+        auto outmat = glm::transpose(arrayToGlm16(mirror->getOutMatrix()));
         glm::dvec4 original_vec = {0, 0, 0, 1};
         glm::dvec4 new_vec = outmat * (inmat * original_vec);
-        CHECK_EQ(original_vec, new_vec, 1e-10);
+        CHECK_EQ(original_vec, new_vec, 1e-15);
     }
 
     testBeamline(filename);  // this generates an output file to manually
