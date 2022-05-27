@@ -102,8 +102,10 @@ Ellipsoid::Ellipsoid(const char* name,
     if (m_figureRotation == FigureRotation::Yes) {
         m_halfAxisC = m_shortHalfAxisB;  // sqrt(pow(m_shortHalfAxisB, 2) / 1);
                                          // devided by 1??
+        m_a11 = 1;
     } else if (m_figureRotation == FigureRotation::Plane) {
         m_halfAxisC = INFINITY;
+        m_a11 = 0;
     } else {
         m_halfAxisC = sqrt(pow(m_shortHalfAxisB, 2) / m_a11);
     }
@@ -206,8 +208,10 @@ void Ellipsoid::calcHalfAxes() {
     // calculate half axis C
     if (m_figureRotation == FigureRotation::Yes) {
         m_halfAxisC = sqrt(pow(m_shortHalfAxisB, 2) / 1);  // devided by 1??
+        m_a11 = 1;
     } else if (m_figureRotation == FigureRotation::Plane) {
         m_halfAxisC = INFINITY;
+        m_a11 = 0;
     } else {
         m_halfAxisC = sqrt(pow(m_shortHalfAxisB, 2) / m_a11);
     }
