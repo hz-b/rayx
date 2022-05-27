@@ -11,6 +11,6 @@ BeamlineObject::BeamlineObject() : m_ID(SimulationEnv::get().genID()) {}
 
 BeamlineObject::~BeamlineObject() {}
 
-const char* BeamlineObject::getName() const { return m_name; }
+const std::string& BeamlineObject::getName() const { return m_name; }
 
 }  // namespace RAYX

@@ -22,7 +22,7 @@ class RAYX_API BeamlineObject {
     ~BeamlineObject();
 
     /// Getter for the ID of the beamline object.
-    const char* getName() const;
+    const std::string& getName() const;
 
     const int m_ID;
 
@@ -31,7 +31,7 @@ class RAYX_API BeamlineObject {
     BeamlineObject();
 
   private:
-    const char* m_name;
+    const std::string m_name;
     // m_geometry;
     // m_surfacePtr; //(for lightsource??)
 };
