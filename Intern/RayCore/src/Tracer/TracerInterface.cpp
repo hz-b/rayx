@@ -66,7 +66,12 @@ bool TracerInterface::run(bool useCsv) {
     if (useCsv) {
         w = std::make_unique<CSVWriter>();
     } else {
+#ifdef CI
+        w = std::make_unique<CSVWriter>();
+        RAYX_LOG << "using CSV Writer because of CI!";
+#else
         w = std::make_unique<H5Writer>();
+#endif
     }
 
     // get rays from tracer
