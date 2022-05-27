@@ -22,7 +22,7 @@ class RAYX_API TracerInterface {
     void writeToFile(const std::vector<double>& outputRays, std::ofstream& file,
                      int index) const;
 
-    bool run();
+    bool run(bool useCsv=false);
 
     enum class DataType { Ray, Quadric };
 

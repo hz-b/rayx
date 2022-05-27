@@ -51,7 +51,7 @@ void TracerInterface::addOpticalElementToTracer(
                           element->getElementParameters());
 }
 
-bool TracerInterface::run() {
+bool TracerInterface::run(bool useCsv) {
     RAYX_PROFILE_FUNCTION();
 
     m_RayTracer.run();  // run tracer
@@ -62,13 +62,12 @@ bool TracerInterface::run() {
     std::vector<double> doubleVec(doubleVecSize);
     size_t index = 0;
 
-    std::unique_ptr<Writer> w =  // TODO(rudi): maybe allow CSVWriter to also be
-                                 // used in non-CI builds
-#ifdef CI
-        std::make_unique<CSVWriter>();
-#else
-        std::make_unique<H5Writer>();
-#endif
+    std::unique_ptr<Writer> w;
+    if (useCsv) {
+        w = std::make_unique<CSVWriter>();
+    } else {
+        w = std::make_unique<H5Writer>();
+    }
 
     // get rays from tracer
     for (auto outputRayIterator = m_RayTracer.getOutputIteratorBegin(),

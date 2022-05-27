@@ -49,15 +49,15 @@ void TerminalApp::run() {
         }
     }
 
+    bool useCsv = false;
     // Output File format
     if (m_CommandParser->m_optargs.m_csvFlag ==
         CommandParser::OptFlags::Enabled) {
-        RAYX_D_LOG << "CSV.\n";
-        // TODO : Enhance writer
+        useCsv = true;
     }
 
     // Run RAY-X Core
-    m_Presenter.run();
+    m_Presenter.run(useCsv);
 
     if (m_CommandParser->m_optargs.m_benchmark) {
         std::chrono::steady_clock::time_point end =

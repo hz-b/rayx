@@ -16,7 +16,7 @@ Presenter::Presenter(std::shared_ptr<Beamline> beamline)
 
 Presenter::~Presenter() {}
 
-bool Presenter::run() {
+bool Presenter::run(bool useCsv) {
     RAYX_PROFILE_FUNCTION();
     /*int beamlinesSimultaneously = 1;*/
     for (int j = 0; j < 1 /*beamlinesSimultaneously*/; j++) {
@@ -36,7 +36,7 @@ bool Presenter::run() {
             m_TracerInterface->addOpticalElementToTracer(Elements[i]);
         }
     }
-    return m_TracerInterface->run();
+    return m_TracerInterface->run(useCsv);
 }
 
 /** Adds new light source to light sources.
