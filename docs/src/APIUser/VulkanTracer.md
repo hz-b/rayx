@@ -1,3 +1,5 @@
+# VulkanTracer (RAY-X)
+
 The VulkanTracer is a ray tracing module using VULKAN by KHRONOS GROUP to efficiently trace rays with hardware acceleration.
 
 In the current version the VulkanTracer class is simply called using the run() function. In future versions information about the rays and optical elements will be transfered.

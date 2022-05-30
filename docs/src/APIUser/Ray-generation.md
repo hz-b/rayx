@@ -1,3 +1,5 @@
+# Ray Generation
+
 Rays are described in 3 dimensional space with an origin and a direction.
 The origin are described with a three dimensional vector. However, the direction can be interpreted as the cosines of two angles &phi; and &psi;. Since the z-axis is the direction of the center ray, the direction of all other rays can be described as the angle between ray direction vector and z-y-plane (horizontal divergence &phi;) and between vector and z-x-plane (vertical divergence &psi;).
 See also [documentation](https://it-ed-git.basisit.de/RAY/RAY/-/wikis/uploads/bdcf4515e03b2fccf462c5f0d76052c3/Paper_Schaefers_RAY_Springer_2007.pdf) p.18,19.

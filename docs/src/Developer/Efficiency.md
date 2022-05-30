@@ -1,3 +1,5 @@
+# Efficiency 
+
 wiki for efficiency calculations
 
 ### Snell's law

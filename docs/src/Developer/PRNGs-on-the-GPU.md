@@ -1,3 +1,5 @@
+# Pseudo Random Number Generators (PRNGs) on the GPU
+
 For Ray-Rayworked we looked a little to to find a good and performant pseudo random number generator. We decided to use Squares RNG, which is counter based and utilizes a version of the Middle Square Weyl Sequence. We tested the method with the TestU01 bigcrush test with different seeds and it passed all of them.
 
 [Squares: A Fast Counter-Based RNG](https://arxiv.org/pdf/2004.06278.pdf)

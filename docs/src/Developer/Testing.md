@@ -1,10 +1,12 @@
+# Testing in RAY-X
+
 There are several kinds of tests: 
-#### testing c++ code
+## Testing C++ Code
 testing only c++ code and not using the shader, to check if parameters of optical elements are calculated correctly
 
 check especially if the values that are derived from given user parameters and given to the shader are correct. These include the surface Parameters, the object parameters, the element parameters and the world to element and element to world coordinate transformation matrices, each of which are stored in an 16 element value array. 
 
-#### testing shader code (test_shader.cpp) 
+## Testing Shader Code (test_shader.cpp) 
 
 The testing suite "Tracer" contains unit tests that check if the individual functions in the shader code are behaving as expected. As the functions that are tested are on the shader and in our current framework the only values that can be moved to the shader are mainly the Ray and Optical Element buffers, we cannot just call the functions with the required input values. 
 Instead we first store the test values in Rays on the C++ side and retrieve them from the Rays on the shader side. Then the test can be executed on the shader and the results are stored again in the Ray buffer (outputRays). Back on the C++ side this can then be compared with the expected values. 
@@ -68,6 +70,6 @@ If a test has more test values than a ray has paramters, one could use the optic
 
 To make things even more complicated, we also need to have an id for each test to distinguish on the shader side which test is run and how the rays should be interpreted. The id is set in the surfaceParams of an optical Element. Because we want to have only one main function on the shader we also have to distinguish between a test case and a normal run of a beamline. This is achieved by setting the id to 0 if it is a beamline and to the test id otherwise (there is no test with id=0).
 
-#### testing beamlines (test_shader.cpp) 
+## Testing Beamlines (test_shader.cpp) 
 Tests from the testing suite opticalElements read a beamline from a given rml file, run the tracer on it and writes the returned rays to a csv file with the same name as the rml file. 
 If the beamlines give deterministic results, we can compare them with the output of RAY-UI using the test.py file. Therefore it is necessary to export the traced data from the same beamline traced in RAY-UI. Moreover, the beamline needs to end with an image plane because of the different coordinate systems that are used (Ray coodinates vs world coordinates).

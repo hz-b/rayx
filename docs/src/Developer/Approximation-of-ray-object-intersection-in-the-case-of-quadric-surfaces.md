@@ -1,3 +1,5 @@
+# Approximation of Ray Object Intersection in the Case of Quadric Surfaces
+
 The following illustration intends to aid your intuition concerning the intersection point calculation for rays. Quadrics in Ray-X have the origin $(0, 0, 0)$ in the object coordinate system. 
 
 ## Geometric Shape of Objects

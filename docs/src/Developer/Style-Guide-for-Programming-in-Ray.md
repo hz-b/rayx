@@ -1,3 +1,7 @@
+# Style Guide
+
+Here you can find a collection of rules for our code base, which developed over the projects lifetime. There are here to make it easier for others on the team, to read your code. Please read them carefully.
+
 ## General
 
 Keep collective ownership of the code in mind, when writing it (write code to be read by your team mates, not the compiler). 

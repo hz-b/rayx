@@ -1,3 +1,5 @@
+# Quad(ric) Function
+
 Function for calculating the intersection of a ray with the surface of an optical element in 3-dimensional space.
 
 ### Input: 
