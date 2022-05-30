@@ -24,5 +24,5 @@ std::string resolvePath(std::string path) {
 
     std::filesystem::path p = *ROOT;
     p.append(path);
-    return p;
+    return p.string();
 }

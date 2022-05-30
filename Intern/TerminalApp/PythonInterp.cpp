@@ -26,7 +26,7 @@ PythonInterp::PythonInterp(const char* pyName, const char* pyFunc,
     // Set custom python interpreter (Not recommended)
     if (m_pyPath) {
         RAYX_D_LOG << "set custom path";
-        setenv("PATH", pyPath, 1);
+        _putenv_s("PATH", pyPath);
     }
 
     // Initiliaze the Interpreter
