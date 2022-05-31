@@ -8,14 +8,14 @@ Current procedure:
 
 * generate rays
 * create input and output buffers
-* initialize vulkan using initVulkan()
+* initialize Vulkan using initVulkan()
 * run the main loop using mainLoop()
 * clean up (free the memory allocated)
 
 initVulkan():
 
 * create a Vulkan instance
-* setup the debug messenger
+* set up the debug messenger
 * pick the physical device and create a logical device to access it
 * create the input and output buffers
 * create the descriptors to connect the buffers to the shader
@@ -26,28 +26,28 @@ mainLoop():
 * run the command buffer
 * read the data from the output buffer
 ---
-# **How vulkantracer works**
+# **How the VulkanTracer works**
 
-![vulkan_flow](/RAY/rayreworked/-/wikis/uploads/fe29b8ceeb1467bec87aed5de3144cad/vulkan_flow.png)
+![vulkan_flow](../res/vulkan_flow.png)
 
 ## _Buffer types used:_
 
-**A uniform buffer** (VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER) is a descriptor type associated with a buffer resource directly, described in a shader as a structure with various members that load operations can be performed on. [More here](https://www.khronos.org/registry/vulkan/specs/1.2-extensions/html/vkspec.html#descriptorsets-storagebuffer)
+**A uniform buffer** (`VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER`) is a descriptor type associated with a buffer resource directly, described in a shader as a structure with various members that load operations can be performed on. [More here](https://www.khronos.org/registry/vulkan/specs/1.2-extensions/html/vkspec.html#descriptorsets-storagebuffer)
 
-**A storage buffer** (VK_DESCRIPTOR_TYPE_STORAGE_BUFFER) is a descriptor type associated with a buffer resource directly, described in a shader as a structure with various members that load, store, and atomic operations can be performed on.
+**A storage buffer** (`VK_DESCRIPTOR_TYPE_STORAGE_BUFFER`) is a descriptor type associated with a buffer resource directly, described in a shader as a structure with various members that load, store, and atomic operations can be performed on.
 
 ---
 
 
 **Vulkan commands (Recording and pushing to pipeline):**
 
-![CommandBuffers](/RAY/rayreworked/-/wikis/uploads/ed43760242d13d1004607fef0131747e/CommandBuffers.png)
+![CommandBuffers](../res/CommandBuffers.png)
 
 ---
 
 **Layout concept (applied on "Sets" using `storage buffer|uniform buffer`):**
 
-![DescriptorLayouts](uploads/090e2e5c162e12db1f5a93a1b30dbb79/DescriptorLayouts.png)
+![DescriptorLayouts](../res/DescriptorLayouts.png)
 
 ---
 # Buffers:
@@ -61,6 +61,6 @@ mainLoop():
 
 ## Buffer Usages:
 
-**VK_BUFFER_USAGE_TRANSFER_SRC_BIT** specifies that the buffer can be used as the source of a transfer command (see the definition of VK_PIPELINE_STAGE_TRANSFER_BIT).
+`VK_BUFFER_USAGE_TRANSFER_SRC_BIT` specifies that the buffer can be used as the source of a transfer command (see the definition of VK_PIPELINE_STAGE_TRANSFER_BIT).
 
-**VK_BUFFER_USAGE_TRANSFER_DST_BIT** specifies that the buffer can be used as the destination of a transfer command.
+`VK_BUFFER_USAGE_TRANSFER_DST_BIT` specifies that the buffer can be used as the destination of a transfer command.

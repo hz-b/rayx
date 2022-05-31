@@ -10,11 +10,11 @@ We use clang-format for this purpose. The style is defined in the .clang-format 
 
 If you are using Visual Studio Code you can use the C/C++ extension for formatting. It includes the clang-format binary so you just need to change a few settings to configure it correctly. You can see the changes (highlighted in red) in the following screenshots:
 
-![image](uploads/2c63612ff9801ed26e63223f2aa161e2/image.png)
+![image](../res/format1.png)
 
 The following settings control, when the formatting should happen. This is up to you as long as the commited code is formatted.
 
-![image](uploads/f29aa032e92a97edc3f1c16e506afe30/image.png)
+![image](../res/format2.png)
 
 ### Using _Format All Files in Workspace_
 To format all the workspace at once, you can use the following [Visual Studio Code's Extension](https://marketplace.visualstudio.com/items?itemName=alexr00.formatallfilesinworkspace).

@@ -6,7 +6,7 @@ In Ray-X we intend to work on better modularity and readability in our code. In 
 
 A Model Parameter is any parameter that is directly influencing the calculations of the tracer. Further, a Model Parameter can also be a parameter, which is required for the fundamental definition of our model. 
 
-**Here is an example for clarification:**
+### Example
 
 The position and direction Matrix are not directly used in the calculations of the Tracer, but they still are Model Parameters, since they are essential in directly defining our model.
 
