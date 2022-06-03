@@ -2163,35 +2163,35 @@ void compareFromCSVRayUI(const char* filename) {
     }
 }
 
-TEST_F(opticalElements, MatrixSource) {
-    const char* filename = "MatrixSource";
-    testBeamline(filename);  // this generates an output file to manually
-                             // compare // TODO: remove
-    compareFromCSVRayUI(filename);
-}
+TEST_F(opticalElements, MatrixSource) { compareFromCSVRayUI("MatrixSource"); }
+TEST_F(opticalElements, PlaneMirror) { compareFromCSVRayUI("PlaneMirror"); }
+TEST_F(opticalElements, Ellipsoid) {
+    std::string beamline_file =
+        resolvePath("Tests/rml_files/test_shader/Ellipsoid.rml");
+    std::shared_ptr<RAYX::Beamline> beamline = std::make_shared<RAYX::Beamline>(
+        RAYX::importBeamline(beamline_file.c_str()));
 
-TEST_F(opticalElements, PlaneMirror) {
-    const char* filename = "PlaneMirror";
+    std::vector<std::shared_ptr<RAYX::OpticalElement>> elements =
+        beamline->m_OpticalElements;
+    std::vector<RAYX::Ray> testValues = beamline->m_LightSources[0]->getRays();
 
-    // test In & Out matrix accuracy
-    {
-        std::string beamline_file = resolvePath("Tests/rml_files/test_shader/");
-        beamline_file.append(filename);
-        beamline_file.append(".rml");
-        std::shared_ptr<RAYX::Beamline> beamline =
-            std::make_shared<RAYX::Beamline>(
-                RAYX::importBeamline(beamline_file.c_str()));
-        auto mirror = beamline->m_OpticalElements[0];
-        auto inmat = glm::transpose(arrayToGlm16(mirror->getInMatrix()));
-        auto outmat = glm::transpose(arrayToGlm16(mirror->getOutMatrix()));
-        glm::dvec4 original_vec = {0, 0, 0, 1};
-        glm::dvec4 new_vec = outmat * (inmat * original_vec);
-        CHECK_EQ(original_vec, new_vec, 1e-15);
+    auto rayxGlobal = runTracerRaw(testValues, elements);
+
+    int count = 0;
+    for (auto ray : rayxGlobal) {
+        auto dist =
+            abs(ray.m_extraParam - 21);  // 1 = PlaneMirror, 2 = ImagePlane
+        if (dist < 0.5) {
+            count += 1;
+            CHECK_EQ(ray.m_position.x, 0, 1e-10);
+            CHECK_EQ(ray.m_position.y, 0, 1e-10);
+            CHECK_EQ(ray.m_position.z, 0, 1e-10);
+        }
     }
-
-    testBeamline(filename);  // this generates an output file to manually
-                             // compare // TODO: remove
-    compareFromCSVRayUI(filename);
+    if (count != 18223) {
+        RAYX_ERR << "unexpected number of rays hitting the ImagePlane from the "
+                    "PlaneMirror!";
+    }
 }
 
 #endif
