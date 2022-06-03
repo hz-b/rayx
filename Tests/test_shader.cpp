@@ -2183,9 +2183,9 @@ TEST_F(opticalElements, Ellipsoid) {
             abs(ray.m_extraParam - 21);  // 1 = PlaneMirror, 2 = ImagePlane
         if (dist < 0.5) {
             count += 1;
-            CHECK_EQ(ray.m_position.x, 0, 1e-10);
-            CHECK_EQ(ray.m_position.y, 0, 1e-10);
-            CHECK_EQ(ray.m_position.z, 0, 1e-10);
+            CHECK_EQ(ray.m_position.x, 0, 1e-11);
+            CHECK_EQ(ray.m_position.y, 0, 1e-11);
+            CHECK_EQ(ray.m_position.z, 0, 1e-11);
         }
     }
     if (count != 18223) {
