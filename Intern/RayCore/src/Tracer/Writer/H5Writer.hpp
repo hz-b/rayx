@@ -2,9 +2,13 @@
 
 #pragma once
 
-#include <highfive/H5Easy.hpp>
+#include <highfive/H5File.hpp>
+#include <highfive/H5DataSet.hpp>
+#include <highfive/H5DataSpace.hpp>
 
 #include "Writer.hpp"
+
+#define RAY_DOUBLE_COUNT 16 // Same as in RayList.h
 
 class H5Writer : public Writer {
   public:
@@ -13,7 +17,7 @@ class H5Writer : public Writer {
     virtual void appendRays(const std::vector<double>& rays, size_t index);
 
   private:
-    H5Easy::File m_file;
+    HighFive::File m_file;
 };
 
 #endif
