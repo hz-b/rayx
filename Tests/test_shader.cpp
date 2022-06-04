@@ -178,6 +178,31 @@ std::vector<RAYX::Ray> runTracerRaw(
     return outputRays;
 }
 
+// converts global coordinates to element coordinates.
+// to be used in conjunction with runTracerRaw
+std::vector<RAYX::Ray> mapGlobalToElement(
+    std::vector<RAYX::Ray> global, std::shared_ptr<RAYX::OpticalElement> o) {
+    glm::dmat4x4 transform = arrayToGlm16(o->getInMatrix());
+    std::vector<RAYX::Ray> out;
+
+    for (auto r : global) {
+        auto globalpos =
+            arrayToGlm4({r.m_position.x, r.m_position.y, r.m_position.z, 1});
+        auto globaldir =
+            arrayToGlm4({r.m_direction.x, r.m_direction.y, r.m_direction.z, 0});
+
+        auto elementpos = transform * globalpos;
+        auto elementdir = transform * globaldir;
+
+        auto r_element = r;
+        r_element.m_position = {elementpos.x, elementpos.y, elementpos.z};
+        r_element.m_direction = {elementdir.x, elementdir.y, elementdir.z};
+
+        out.push_back(r_element);
+    }
+    return out;
+}
+
 /** writes doubles in outputRays to a file with name "rays"
  * the list of output rays is expected to be in the order pos, weight, dir,
  * energy, stokes, pathLength, order, lastElement, extraParam
@@ -2112,54 +2137,37 @@ void compareFromCSVRayUI(const char* filename) {
 
     auto t = 1e-11;
 
-    glm::dmat4x4 transform;
+    std::vector<RAYX::Ray> rayx;  // rayxGlobal but in element coordiantes.
     if (!elements.empty()) {
-        transform = arrayToGlm16(elements.back()->getInMatrix());
+        rayx =
+            mapGlobalToElement(rayxGlobal, beamline->m_OpticalElements.back());
     } else if (!beamline->m_LightSources.empty()) {
-        // TODO light sources have no getInMatrix() currently, but for now the
-        // light sources would have InMatrix = identity. so the transform is
-        // identity matrix for light sources.
-        transform = glm::dmat4x4(1.0, 0.0, 0.0, 0.0,  //
-                                 0.0, 1.0, 0.0, 0.0,  //
-                                 0.0, 0.0, 1.0, 0.0,  //
-                                 0.0, 0.0, 0.0, 1.0);
+        // light sources have no getInMatrix() currently, but for now the
+        // light sources would have InMatrix = identity. so element = rayxGlobal
+        // works for light sources for now.
+        rayx = rayxGlobal;
     } else {
         RAYX_ERR << "compareFromCSVRayUI called with empty beamline";
     }
 
     // the comparison happens in element coordinates.
     for (unsigned int i = 0; i < rayui.size(); i++) {
-        // original (global) position:
-        auto globalpos =
-            arrayToGlm4({rayxGlobal[i].m_position.x, rayxGlobal[i].m_position.y,
-                         rayxGlobal[i].m_position.z, 1});
-        auto globaldir = arrayToGlm4({rayxGlobal[i].m_direction.x,
-                                      rayxGlobal[i].m_direction.y,
-                                      rayxGlobal[i].m_direction.z, 0});
+        CHECK_EQ(rayx[i].m_position.x, rayui[i].m_position.x, t);
+        CHECK_EQ(rayx[i].m_position.y, rayui[i].m_position.y, t);
+        CHECK_EQ(rayx[i].m_position.z, rayui[i].m_position.z, t);
 
-        auto elementpos = transform * globalpos;
-        auto elementdir = transform * globaldir;
+        CHECK_EQ(rayx[i].m_direction.x, rayui[i].m_direction.x, t);
+        CHECK_EQ(rayx[i].m_direction.y, rayui[i].m_direction.y, t);
+        CHECK_EQ(rayx[i].m_direction.z, rayui[i].m_direction.z, t);
 
-        auto rayx = rayxGlobal[i];
-        rayx.m_position = {elementpos.x, elementpos.y, elementpos.z};
-        rayx.m_direction = {elementdir.x, elementdir.y, elementdir.z};
-
-        CHECK_EQ(rayx.m_position.x, rayui[i].m_position.x, t);
-        CHECK_EQ(rayx.m_position.y, rayui[i].m_position.y, t);
-        CHECK_EQ(rayx.m_position.z, rayui[i].m_position.z, t);
-
-        CHECK_EQ(rayx.m_direction.x, rayui[i].m_direction.x, t);
-        CHECK_EQ(rayx.m_direction.y, rayui[i].m_direction.y, t);
-        CHECK_EQ(rayx.m_direction.z, rayui[i].m_direction.z, t);
-
-        CHECK_EQ(rayx.m_energy, rayui[i].m_energy, t);
+        CHECK_EQ(rayx[i].m_energy, rayui[i].m_energy, t);
         // CHECK_EQ(rayx.m_pathLength, rayui[i].m_pathLength, t);
         // TODO: also compare pathLength
 
-        CHECK_EQ(rayx.m_stokes.x, rayui[i].m_stokes.x, t);
-        CHECK_EQ(rayx.m_stokes.y, rayui[i].m_stokes.y, t);
-        CHECK_EQ(rayx.m_stokes.z, rayui[i].m_stokes.z, t);
-        CHECK_EQ(rayx.m_stokes.w, rayui[i].m_stokes.w, t);
+        CHECK_EQ(rayx[i].m_stokes.x, rayui[i].m_stokes.x, t);
+        CHECK_EQ(rayx[i].m_stokes.y, rayui[i].m_stokes.y, t);
+        CHECK_EQ(rayx[i].m_stokes.z, rayui[i].m_stokes.z, t);
+        CHECK_EQ(rayx[i].m_stokes.w, rayui[i].m_stokes.w, t);
     }
 }
 
@@ -2180,7 +2188,7 @@ TEST_F(opticalElements, Ellipsoid) {
     int count = 0;
     for (auto ray : rayxGlobal) {
         auto dist =
-            abs(ray.m_extraParam - 21);  // 1 = PlaneMirror, 2 = ImagePlane
+            abs(ray.m_extraParam - 21);  // 1 = Ellipsoid, 2 = ImagePlane
         if (dist < 0.5) {
             count += 1;
             CHECK_EQ(ray.m_position.x, 0, 1e-11);
@@ -2190,8 +2198,28 @@ TEST_F(opticalElements, Ellipsoid) {
     }
     if (count != 18223) {
         RAYX_ERR << "unexpected number of rays hitting the ImagePlane from the "
-                    "PlaneMirror!";
+                    "Ellipsoid!";
     }
+}
+
+TEST_F(opticalElements, Toroid) {
+    std::string beamline_file =
+        resolvePath("Tests/rml_files/test_shader/Toroid.rml");
+    std::shared_ptr<RAYX::Beamline> beamline = std::make_shared<RAYX::Beamline>(
+        RAYX::importBeamline(beamline_file.c_str()));
+
+    std::vector<std::shared_ptr<RAYX::OpticalElement>> elements =
+        beamline->m_OpticalElements;
+    std::vector<RAYX::Ray> testValues = beamline->m_LightSources[0]->getRays();
+
+    auto global = runTracerRaw(testValues, elements);
+    auto last = beamline->m_OpticalElements.back();
+    auto element = mapGlobalToElement(global, last);
+
+    if (element.size() != 4) {
+        RAYX_ERR << "impossible!";
+    }
+    // TODO(rudi) also check that the 4 rays are in the edges of the rect.
 }
 
 #endif
