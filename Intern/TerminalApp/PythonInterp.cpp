@@ -76,13 +76,13 @@ void PythonInterp::execute() {
         PyErr_Print();
     } else {
         PyErr_Print();
-        throw std::runtime_error("Error while running the python module: " +
+        throw std::runtime_error("Error while running the python module: [ERR010]" +
                                  (std::string)(m_funcName));
     }
 
     if (PyLong_AsLong(m_presult) == 0 || !m_presult) {
         cleanup();
-        throw std::runtime_error("Error while running the python module: " +
+        throw std::runtime_error("Error while running the python module: [ERR011]" +
                                  (std::string)(m_funcName));
     }
     cleanup();
@@ -123,7 +123,7 @@ void PythonInterp::setPlotName(const char* outputName) {
  */
 void PythonInterp::setPlotType(int plotType) {
     if (plotType < 1 || plotType > 3) {
-        RAYX_ERR << "Wrong plot type.";
+        RAYX_ERR << "Error while setthing the python parameters: [ERR001]";
     }
     m_plotType = plotType;
 }
