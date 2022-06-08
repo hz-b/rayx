@@ -9,7 +9,9 @@
 #include "PathResolver.h"
 
 #ifdef RAYX_PLATFORM_WINDOWS
+#ifdef USE_NSIGHT_AFTERMATH
 #include "GFSDK_Aftermath.h"
+#endif
 #endif
 
 #define SHADERPATH "comp.spv"
@@ -34,9 +36,9 @@
 #define _CRTDBG_MAP_ALLOC
 #include <crtdbg.h>
 #include <stdlib.h>
+#endif
 #ifndef NDEBUG
 #define DBG_NEW new (_NORMAL_BLOCK, __FILE__, __LINE__)
-#endif
 #else
 #define DBG_NEW new
 #endif
