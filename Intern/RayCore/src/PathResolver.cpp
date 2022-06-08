@@ -1,9 +1,9 @@
 #include "PathResolver.h"
 
-#include <Debug.h>
-
 #include <filesystem>
 #include <optional>
+
+#include "Debug.h"
 
 static std::optional<std::filesystem::path> ROOT;
 

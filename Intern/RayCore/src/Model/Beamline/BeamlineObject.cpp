@@ -1,6 +1,6 @@
 #include "BeamlineObject.h"
 
-#include <math.h>
+#include <cmath>
 
 #include "Presenter/SimulationEnv.h"
 
