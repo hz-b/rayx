@@ -16,6 +16,7 @@
 #include <sstream>
 #include <string>
 #include <vector>
+#include <Tracer/Ray.h>
 
 #include "Core.h"
 
@@ -155,6 +156,14 @@ inline std::vector<double> formatAsVec(std::array<double, N> arg) {
         out[i] = arg[i];
     }
     return out;
+}
+
+inline std::vector<double> formatAsVec(Ray::vec3 arg) {
+	return {arg.x, arg.y, arg.z};
+}
+
+inline std::vector<double> formatAsVec(Ray::vec4 arg) {
+	return {arg.x, arg.y, arg.z, arg.w};
 }
 
 inline std::vector<double> formatAsVec(double arg) { return {arg}; }
