@@ -33,6 +33,7 @@ file(COPY python DESTINATION ${CMAKE_BINARY_DIR}/bin)
 add_executable(${PROJECT_NAME} main.cpp TerminalApp.cpp TerminalApp.h PythonInterp.cpp CommandParser.cpp)
 
 if (WIN32)
+    target_include_directories(${PROJECT_NAME} PRIVATE Platform/windows)
     target_compile_definitions(${PROJECT_NAME} PUBLIC RAYX_PLATFORM_WINDOWS)
 endif ()
 
