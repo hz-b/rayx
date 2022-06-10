@@ -3,7 +3,7 @@ import subprocess
 import os
 
 VENV_PATH_POSIX = "./rayxvenv/bin/activate"
-VENV_PATH_WINDOWS = "rayxvenv/bin/activate.bat"
+VENV_PATH_WINDOWS = "rayxvenv\\bin\\activate.bat"
 
 
 def setup():
@@ -21,7 +21,7 @@ def setup():
     elif sys.platform == "win32":  # Windows
         path = VENV_PATH_WINDOWS
 
-    if(not(os.path.exists(VENV_PATH_POSIX))):  # no venv found!
+    if(not(os.path.exists(path))):  # no venv found!
         try:
             subprocess.check_call(
                 [sys.executable, '-m', 'venv', 'rayxvenv'])  # Make new venv : rayxvenv
@@ -41,7 +41,10 @@ def install_packages():
     * h5py : HDF5 binary data format module
     * pyqt : Necessary for plot GUI Backend access. (if ran from terminal)
     """
-    python_venv_bin = "./rayxvenv/bin/python3"
+    if sys.platform == "win32" : # Winows
+        python_venv_bin = ".\\rayxvenv\\bin\\python3"
+    else: #Linux, MacOS and other
+        python_venv_bin = "./rayxvenv/bin/python3"
     packages = ['matplotlib', 'pandas', 'h5py','pyqt5']
     
     for package in packages:

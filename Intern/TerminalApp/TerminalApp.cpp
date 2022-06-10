@@ -72,14 +72,14 @@ void TerminalApp::run() {
     //  Plot in Python
     if (m_CommandParser->m_optargs.m_plotFlag ==
         CommandParser::OptFlags::Enabled) {
-        // Setup to create genv if needed
+        // Setup to create venv if needed
         try {
             std::shared_ptr<PythonInterp> pySetup =
                 std::make_shared<PythonInterp>("py_setup", "setup",
                                                (const char*)nullptr);
             pySetup->execute();
         } catch (std::exception& e) {
-            RAYX_ERR << e.what() << "\n";
+            RAYX_ERR << e.what();
         }
         RAYX_D_LOG << "Python Setup OK.";
 
@@ -101,7 +101,7 @@ void TerminalApp::run() {
             }
             pyPlot->execute();
         } catch (std::exception& e) {
-            RAYX_ERR << e.what() << "\n";
+            RAYX_ERR << e.what();
         }
     }
 }

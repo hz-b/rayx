@@ -26,8 +26,7 @@ PythonInterp::PythonInterp(const char* pyName, const char* pyFunc,
     // Set custom python interpreter (Not recommended)
     if (m_pyPath) {
         RAYX_D_LOG << "set custom path";
-        // setenv("PATH", pyPath, 1);
-        putenv(const_cast<char*>(m_pyPath));
+        setenv("PATH", pyPath, 1);
     }
 
     // Initiliaze the Interpreter
@@ -36,8 +35,11 @@ PythonInterp::PythonInterp(const char* pyName, const char* pyFunc,
     // Set module lookup dir
     PyRun_SimpleString("import os");
     PyRun_SimpleString("import sys");
+    #if defined(WIN32)
+    PyRun_SimpleString("sys.path.append(os.getcwd()+'\\python')");
+    #else
     PyRun_SimpleString("sys.path.append(os.getcwd()+'/python')");
-
+    #endif
     // Python file
     m_pName = PyUnicode_DecodeFSDefault(pyName);
 
