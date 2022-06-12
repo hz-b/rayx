@@ -15,7 +15,7 @@
 namespace RAYX {
 
 Application::Application() : m_Beamline(std::make_shared<Beamline>()) {
-#ifdef RAYX_PLATFORM_WINDOWS
+#ifdef RAYX_PLATFORM_MSVC
 #ifdef RAY_DEBUG_MODE
     _CrtSetReportMode(_CRT_WARN, _CRTDBG_MODE_DEBUG);
     _CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);

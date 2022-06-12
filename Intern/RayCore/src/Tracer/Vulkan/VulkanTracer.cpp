@@ -8,7 +8,7 @@
 #include "Material.h"
 #include "PathResolver.h"
 
-#ifdef RAYX_PLATFORM_WINDOWS
+#ifdef RAYX_PLATFORM_MSVC
 #ifdef USE_NSIGHT_AFTERMATH
 #include "GFSDK_Aftermath.h"
 #endif
@@ -31,17 +31,15 @@
 #define SHADERPATH "comp_new_all.spv"
 #endif
 
-// Memory leak detection in debug mode
-#ifdef RAYX_PLATFORM_WINDOWS
-#define _CRTDBG_MAP_ALLOC
-#include <crtdbg.h>
-#include <stdlib.h>
-#endif
-#ifndef NDEBUG
-#define DBG_NEW new (_NORMAL_BLOCK, __FILE__, __LINE__)
-#else
-#define DBG_NEW new
-#endif
+// Memory leak detection in windows (debug mode)
+#   if defined(NDEBUG) && defined(RAYX_PLATFORM_MSVC)
+#       define _CRTDBG_MAP_ALLOC
+#       include <crtdbg.h>
+#       include <stdlib.h>
+#       define DBG_NEW new ( _NORMAL_BLOCK , __FILE__ , __LINE__ )
+#   else
+#       define DBG_NEW new
+#   endif
 
 /**
  * Compute:
