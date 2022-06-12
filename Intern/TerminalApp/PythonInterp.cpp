@@ -7,6 +7,26 @@
 
 #include "Debug.h"
 
+#if defined(WIN32)
+    #include <stdlib.h>
+    int setenv(const char *name, const char *value, int overwrite)
+    {
+        int errcode = 0;
+        if(!overwrite) {
+            const char* envStr = getenv(name);
+            if(envStr != NULL) {
+                errcode = -1;
+            } else {
+                errcode = 0;
+            }      
+        }
+        if(errcode == 0) {
+            errcode = _putenv_s(name, value);
+        }
+        return errcode;
+    }
+#endif
+
 PythonInterp::PythonInterp() {}
 
 /**
