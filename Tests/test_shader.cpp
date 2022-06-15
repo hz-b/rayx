@@ -2202,24 +2202,7 @@ TEST_F(opticalElements, Ellipsoid) {
     }
 }
 
-TEST_F(opticalElements, Toroid) {
-    std::string beamline_file =
-        resolvePath("Tests/rml_files/test_shader/Toroid.rml");
-    std::shared_ptr<RAYX::Beamline> beamline = std::make_shared<RAYX::Beamline>(
-        RAYX::importBeamline(beamline_file.c_str()));
-
-    std::vector<std::shared_ptr<RAYX::OpticalElement>> elements =
-        beamline->m_OpticalElements;
-    std::vector<RAYX::Ray> testValues = beamline->m_LightSources[0]->getRays();
-
-    auto global = runTracerRaw(testValues, elements);
-    auto last = beamline->m_OpticalElements.back();
-    auto element = mapGlobalToElement(global, last);
-
-    if (element.size() != 4) {
-        RAYX_ERR << "impossible!";
-    }
-    // TODO(rudi) also check that the 4 rays are in the edges of the rect.
-}
+TEST_F(opticalElements, Toroid_half) { compareFromCSVRayUI("Toroid_half"); }
+TEST_F(opticalElements, Toroid) { compareFromCSVRayUI("Toroid"); }
 
 #endif
