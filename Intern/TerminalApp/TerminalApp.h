@@ -11,7 +11,7 @@
 
 // Virtual python Environment Path
 #ifdef WIN32  // Todo
-#define VENV_PATH "./rayxvenv/bin/python3"
+#define VENV_PATH ".\\rayxvenv\\bin\\python3"
 #else
 #define VENV_PATH "./rayxvenv/bin/python3"
 #endif

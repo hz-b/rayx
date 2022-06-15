@@ -29,10 +29,10 @@ void TerminalApp::run() {
     auto start_time = std::chrono::steady_clock::now();
     /////////////////// Argument treatement
     // Load RML files
-    if (m_CommandParser->m_optargs.m_providedFile != NULL) {
+    if (m_CommandParser->m_optargs.m_providedFile != "") {
         // load rml file
         m_Beamline = std::make_shared<RAYX::Beamline>(
-            RAYX::importBeamline(m_CommandParser->m_optargs.m_providedFile));
+            RAYX::importBeamline(m_CommandParser->m_optargs.m_providedFile.c_str()));
         m_Presenter = RAYX::Presenter(m_Beamline);
     } else {
         // Benchmark mode
@@ -90,10 +90,10 @@ void TerminalApp::run() {
             std::shared_ptr<PythonInterp> pyPlot =
                 std::make_shared<PythonInterp>("py_plot_entry", "startPlot",
                                                (const char*)nullptr);
-            if (m_CommandParser->m_optargs.m_providedFile) {
-                std::string _providedFile =
-                    m_CommandParser->m_optargs.m_providedFile;
-                pyPlot->setPlotName(_providedFile.c_str());
+            if (m_CommandParser->m_optargs.m_providedFile != "") {
+                // std::string _providedFile =
+                //     m_CommandParser->m_optargs.m_providedFile;
+                pyPlot->setPlotName(m_CommandParser->m_optargs.m_providedFile.c_str());
             }
             if (m_CommandParser->m_optargs.m_multiplePlots ==
                 CommandParser::OptFlags::Enabled) {

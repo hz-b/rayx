@@ -1,5 +1,6 @@
 #pragma once
-#include <getopt.h>
+
+#include <CLI/CLI.hpp>
 
 #include "Debug.h"
 #include "TerminalAppConfig.h"
@@ -7,13 +8,15 @@
 class CommandParser {
   public:
     // Default constructor
-    CommandParser();
+    CommandParser() = default;
     // Custom constructor
     CommandParser(int ___argc, char* const* ___argv);
 
     ~CommandParser();
 
     enum OptFlags { Disabled, Enabled };
+    std::shared_ptr<CLI::App> m_cli11;
+    int m_cli11_return;
 
     inline void getHelp() const {
         RAYX_LOG << "\n\nRAY-X Terminal usage: "
@@ -34,12 +37,13 @@ class CommandParser {
     // Flags initialize to DISABLED
     // Set options in .cpp file
     struct Optargs {
-        OptFlags m_plotFlag = OptFlags::Disabled;       // -p (Plot)
-        OptFlags m_csvFlag = OptFlags::Disabled;        // -c (.csv Output)
-        OptFlags m_dummyFlag = OptFlags::Disabled;      // -d (Dummy Beamline)
-        OptFlags m_benchmark = OptFlags::Disabled;      // -b (Benchmark)
-        OptFlags m_multiplePlots = OptFlags::Disabled;  // -m (Multiple Plots)
-        char* m_providedFile = NULL;                    // -i (Input)
+        bool m_plotFlag = false;       // -p (Plot)
+        bool m_csvFlag = false;        // -c (.csv Output)
+        bool m_dummyFlag = false;      // -d (Dummy Beamline)
+        bool m_benchmark = false;      // -b (Benchmark)
+        bool m_multiplePlots = false;  // -m (Multiple Plots)
+        bool m_version = false;        // -v (Version)
+        std::string m_providedFile = "";            // -i (Input)
     } m_optargs;
 
     inline void getVersion() const {
@@ -59,5 +63,36 @@ class CommandParser {
                  << TERMINALAPP_VERSION_TWEAK << "\n \t GIT: " << GIT_REVISION
                  << "\n \t BUILD: " << BUILD_TIMESTAMP;
     };  // TODO: CMake config needed
+  private:
+    struct Options {
+        // CLI::Option cli11_option;
+        const char* type;
+        const char* full_name;
+        const char* description;
+        void* option_flag;
+    };
 
+    // Map short arg to its parameters
+    std::unordered_map<char, Options> m_ParserCommands = {
+        {'p',
+         {"bool", "plot", "Plot output footprints and histograms.",
+          &(m_optargs.m_plotFlag)}},
+        {'c',
+         {"bool", "ocsv", "Output stored as .csv file.",
+          &(m_optargs.m_csvFlag)}},
+        {'d',
+         {"bool", "dummy", "Run an in-house built Beamline.",
+          &(m_optargs.m_dummyFlag)}},
+        {'b',
+         {"bool", "benchmark",
+          "Benchmark application: \t (RML Parse → Trace → Output Storage)",
+          &(m_optargs.m_benchmark)}},
+        {'m',
+         {"bool", "mult", "Multiple plots extension at output.",
+          &(m_optargs.m_multiplePlots)}},
+        {'i',
+         {"string", "input", "Input RML File Path.",
+          &(m_optargs.m_providedFile)}}
+        // {'v', {"bool", "version", "", (void*)m_optargs.m_version}},
+    };
 };
