@@ -121,31 +121,6 @@
       <z>0.984808</z>
     </param>
   </object>
-
-  <object name="ImagePlane" type="ImagePlane">
-    <param id="distanceImagePlane" enabled="T">1000</param>
-    <param id="worldPosition" enabled="F">
-      <x>0</x>
-      <y>342.02</y>
-      <z>10939.7</z>
-    </param>
-    <param id="worldXdirection" enabled="F">
-      <x>1</x>
-      <y>0</y>
-      <z>0</z>
-    </param>
-    <param id="worldYdirection" enabled="F">
-      <x>0</x>
-      <y>0.939693</y>
-      <z>-0.34202</z>
-    </param>
-    <param id="worldZdirection" enabled="F">
-      <x>0</x>
-      <y>0.34202</y>
-      <z>0.939693</z>
-    </param>
-  </object>
-
 </beamline>
 
 <ExtraData>
