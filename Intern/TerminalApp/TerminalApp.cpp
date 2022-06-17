@@ -4,7 +4,7 @@
 #include "PathResolver.h"
 
 // TODO: (potential) Replace Getopt with boost(header-only)
-#include <unistd.h>
+//#include <unistd.h>
 
 #include <memory>
 #include <stdexcept>

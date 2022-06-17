@@ -1,30 +1,39 @@
 #include "PythonInterp.h"
 
+// On msvc
+#ifdef _MSC_VER
+# include <corecrt.h>
+#endif
 #define PY_SSIZE_T_CLEAN
-#include <Python.h>
+#ifdef _DEBUG
+# undef _DEBUG
+# include <python.h>
+# define _DEBUG
+#else
+# include <python.h>
+#endif
 
 #include <stdexcept>
 
 #include "Debug.h"
 
 #if defined(WIN32)
-    #include <stdlib.h>
-    int setenv(const char *name, const char *value, int overwrite)
-    {
-        int errcode = 0;
-        if(!overwrite) {
-            const char* envStr = getenv(name);
-            if(envStr != NULL) {
-                errcode = -1;
-            } else {
-                errcode = 0;
-            }      
+#include <stdlib.h>
+int setenv(const char* name, const char* value, int overwrite) {
+    int errcode = 0;
+    if (!overwrite) {
+        const char* envStr = getenv(name);
+        if (envStr != NULL) {
+            errcode = -1;
+        } else {
+            errcode = 0;
         }
-        if(errcode == 0) {
-            errcode = _putenv_s(name, value);
-        }
-        return errcode;
     }
+    if (errcode == 0) {
+        errcode = _putenv_s(name, value);
+    }
+    return errcode;
+}
 #endif
 
 PythonInterp::PythonInterp() {}
@@ -55,11 +64,11 @@ PythonInterp::PythonInterp(const char* pyName, const char* pyFunc,
     // Set module lookup dir
     PyRun_SimpleString("import os");
     PyRun_SimpleString("import sys");
-    #if defined(WIN32)
+#if defined(WIN32)
     PyRun_SimpleString("sys.path.append(os.getcwd()+'\\python')");
-    #else
+#else
     PyRun_SimpleString("sys.path.append(os.getcwd()+'/python')");
-    #endif
+#endif
     // Python file
     m_pName = PyUnicode_DecodeFSDefault(pyName);
 
@@ -99,14 +108,16 @@ void PythonInterp::execute() {
         PyErr_Print();
     } else {
         PyErr_Print();
-        throw std::runtime_error("Error while running the python module: [ERR010]" +
-                                 (std::string)(m_funcName));
+        throw std::runtime_error(
+            "Error while running the python module: [ERR010]" +
+            (std::string)(m_funcName));
     }
 
     if (PyLong_AsLong(m_presult) == 0 || !m_presult) {
         cleanup();
-        throw std::runtime_error("Error while running the python module: [ERR011]" +
-                                 (std::string)(m_funcName));
+        throw std::runtime_error(
+            "Error while running the python module: [ERR011]" +
+            (std::string)(m_funcName));
     }
     cleanup();
 }
