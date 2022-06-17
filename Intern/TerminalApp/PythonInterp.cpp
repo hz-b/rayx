@@ -1,18 +1,5 @@
 #include "PythonInterp.h"
 
-// On msvc
-#ifdef _MSC_VER
-# include <corecrt.h>
-#endif
-#define PY_SSIZE_T_CLEAN
-#ifdef _DEBUG
-# undef _DEBUG
-# include <python.h>
-# define _DEBUG
-#else
-# include <python.h>
-#endif
-
 #include <stdexcept>
 
 #include "Debug.h"
