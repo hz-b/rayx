@@ -1,5 +1,6 @@
 #pragma once
 
+#include <Material/Material.h>
 #include <Tracer/RayList.h>
 
 #include <array>
@@ -19,6 +20,10 @@ class RAYX_API Beamline {
     ~Beamline();
 
     RayList getInputRays() const;
+
+    // quality-of-life function to calculate the smallest possible
+    // MaterialTables which cover all materials from this beamline
+    MaterialTables calcMinimalMaterialTables() const;
 
     std::vector<std::shared_ptr<OpticalElement>> m_OpticalElements;
     std::vector<std::shared_ptr<LightSource>> m_LightSources;

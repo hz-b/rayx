@@ -20,7 +20,6 @@ CpuTracer::CpuTracer() {
     // Set buffer settings (DEBUG OR RELEASE)
     RAYX_LOG << "Initializing Cpu Tracer..";
 
-    m_relevantMaterials.fill(false);
     setSettings();
 }
 
@@ -37,6 +36,8 @@ RayList CpuTracer::trace(const Beamline& beamline) {
                   e->getObjectParameters(), e->getElementParameters());
     }
 
+    m_MaterialTables = beamline.calcMinimalMaterialTables();
+
     run();
 
     RayList outRays = m_OutputRays;
@@ -50,8 +51,6 @@ void CpuTracer::run() {
     RAYX_PROFILE_FUNCTION();
     const clock_t begin_time = clock();
     RAYX_LOG << "Starting Cpu Tracer..";
-
-    m_MaterialTables = loadMaterialTables(m_relevantMaterials);
 
     const clock_t begin_time_getRays = clock();
 
@@ -145,8 +144,6 @@ void CpuTracer::cleanup() {}
  * beamline and new rays etc but do not want to initialize everything again
  */
 void CpuTracer::cleanTracer() {
-    m_relevantMaterials.fill(false);
-
     m_RayList.clean();
     m_elementData.clear();
     m_OutputRays.clean();
@@ -218,20 +215,9 @@ void CpuTracer::addArrays(const std::array<double, 4 * 4>& surfaceParams,
     e.elementParameters = arrayToGlm16(elementParameters);
     m_elementData.push_back(e);
 
-    // if some material occurs in an OpticalElement, it needs to be added to
-    // m_relevantMaterials so that the corresponding tables will be loaded.
-    int material = surfaceParams[14];  // in [1, 92]
-    if (1 <= material && material <= 92) {
-        m_relevantMaterials[material - 1] = true;
-    }
-
     // Possibility to use utils/movingAppend
 }
-void CpuTracer::divideAndSortRays() {
-    RAYX_PROFILE_FUNCTION();
-    for (auto i = m_RayList.begin(); i != m_RayList.end(); i++) {
-    }
-}
+
 std::list<std::vector<Ray>>::const_iterator
 CpuTracer::getOutputIteratorBegin() {
     return m_OutputRays.begin();

@@ -1,5 +1,7 @@
 #pragma once
 
+#include <Material/Material.h>
+
 #include <cstdlib>
 #include <iostream>
 #include <map>
@@ -81,9 +83,7 @@ class RAYX_API CpuTracer : public Tracer {
     RayList m_OutputRays;
     std::vector<Element> m_elementData;
 
-    // Material tables
     MaterialTables m_MaterialTables;
-    std::array<bool, 92> m_relevantMaterials;
 
     struct Settings {
         bool m_isDebug;
@@ -97,9 +97,6 @@ class RAYX_API CpuTracer : public Tracer {
     void prepareVulkan();
     void mainLoop();
     void setSettings();
-
-    // Ray-related funcs:
-    void divideAndSortRays();
 
     int main();
 };

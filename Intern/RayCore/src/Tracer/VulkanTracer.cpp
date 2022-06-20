@@ -71,8 +71,6 @@ VulkanTracer::VulkanTracer() {
     setSettings();
 
     // until they are added, all materials are considered to be irrelevant.
-    m_relevantMaterials.fill(false);
-
     // Compute Buffers (I/O Storage)
     m_compute.m_BufferSizes.resize(m_settings.m_computeBuffersCount);
     m_compute.m_Buffers.resize(m_settings.m_computeBuffersCount);
@@ -102,6 +100,8 @@ RayList VulkanTracer::trace(const Beamline& beamline) {
         addArrays(e->getSurfaceParams(), e->getInMatrix(), e->getOutMatrix(),
                   e->getObjectParameters(), e->getElementParameters());
     }
+
+    m_MaterialTables = beamline.calcMinimalMaterialTables();
 
     run();
 
@@ -155,8 +155,6 @@ void VulkanTracer::run() {
     // bytes!
 
     RAYX_LOG << "Setting compute buffers:";
-
-    m_MaterialTables = loadMaterialTables(m_relevantMaterials);
 
     // Prepare size of compute storage buffers
     m_compute.m_BufferSizes[0] = (uint64_t)m_numberOfRays *
@@ -303,8 +301,6 @@ void VulkanTracer::cleanup() {
  * beamline and new rays etc but do not want to initialize everything again
  */
 void VulkanTracer::cleanTracer() {
-    m_relevantMaterials.fill(false);
-
     m_RayList.clean();
     m_beamlineData.clear();
     m_OutputRays.clean();
@@ -1516,15 +1512,6 @@ void VulkanTracer::addArrays(
                           objectParameters.end());
     m_beamlineData.insert(m_beamlineData.end(), elementParameters.begin(),
                           elementParameters.end());
-
-    // if some material occurs in an OpticalElement, it needs to be added to
-    // m_relevantMaterials so that the corresponding tables will be loaded.
-    int material = surfaceParams[14];  // in [1, 92]
-    if (1 <= material && material <= 92) {
-        m_relevantMaterials[material - 1] = true;
-    }
-
-    // Possibility to use utils/movingAppend
 }
 void VulkanTracer::divideAndSortRays() {
     RAYX_PROFILE_FUNCTION();

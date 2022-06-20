@@ -23,4 +23,18 @@ RayList Beamline::getInputRays() const {
     return list;
 }
 
+MaterialTables Beamline::calcMinimalMaterialTables() const {
+    std::array<bool, 92> relevantMaterials;
+    relevantMaterials.fill(false);
+
+    for (auto e : m_OpticalElements) {
+        int material = e->getSurfaceParams()[14];  // in [1, 92]
+        if (1 <= material && material <= 92) {
+            relevantMaterials[material - 1] = true;
+        }
+    }
+
+    return loadMaterialTables(relevantMaterials);
+}
+
 }  // namespace RAYX
