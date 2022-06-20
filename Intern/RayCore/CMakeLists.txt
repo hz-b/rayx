@@ -40,6 +40,7 @@ SET(SOURCE
     src/Tracer/RayList.cpp
     src/Tracer/DebugBuf/DebugBufList.cpp
     src/Tracer/VulkanTracer.cpp
+    src/Tracer/CpuTracer.cpp
     src/Writer/CSVWriter.cpp
     src/Writer/H5Writer.cpp
     src/UserParameter/WorldUserParams.cpp

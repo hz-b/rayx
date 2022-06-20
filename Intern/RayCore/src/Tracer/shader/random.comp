@@ -5,7 +5,7 @@
  * Date: November 24, 2020
  * URL: https://arxiv.org/pdf/2004.06278.pdf
  */
-uint squares(inout uint64_t ctr, uint64_t key) {
+uint squares(INOUT(uint64_t) ctr, uint64_t key) {
     uint64_t x, y, z;
     y = x = ctr * key;
     z     = y + key;
@@ -23,13 +23,13 @@ uint squares(inout uint64_t ctr, uint64_t key) {
 }
 
 // generates 64-Bit random integers from two 32-Bit random integers
-uint64_t squares64RNG(inout uint64_t ctr) { return uint64_t((uint64_t(squares(ctr, rngKey)) << 32) | uint64_t(squares(ctr, rngKey))); }
+uint64_t squares64RNG(INOUT(uint64_t) ctr) { return uint64_t((uint64_t(squares(ctr, rngKey)) << 32) | uint64_t(squares(ctr, rngKey))); }
 
 // generates uniformly distributed doubles between 0 and 1 from one 64-Bit random integer
-double squaresDoubleRNG(inout uint64_t ctr) { return double(squares64RNG(ctr)) / double(uint64_t(0) - 1); }
+double squaresDoubleRNG(INOUT(uint64_t) ctr) { return double(squares64RNG(ctr)) / double(uint64_t(0) - 1); }
 
 // creates (via the Box-Muller transform) a normal distributed double with mean mu and standard deviation sigma
-double squaresNormalRNG(inout uint64_t ctr, double mu, double sigma) {
+double squaresNormalRNG(INOUT(uint64_t) ctr, double mu, double sigma) {
     double U, V, R, Z;
     double two_pi = 2.0 * PI;
 

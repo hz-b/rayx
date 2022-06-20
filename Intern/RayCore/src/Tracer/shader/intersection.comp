@@ -6,7 +6,7 @@
  *
  * output: reflected Ray with intersection point as position and reflection as direction
  */
-dvec4 intersectionPoint(inout Ray r, const dmat4 quadric) {
+dvec4 intersectionPoint(INOUT(Ray) r, const dmat4 quadric) {
     double a_11 = quadric[0][0];
     double a_12 = quadric[0][1];
     double a_13 = quadric[0][2];
@@ -239,7 +239,7 @@ dvec4 getIntersectionPoint(Ray r, dmat4 quadric) {
     return dvec4(x, y, z, w);
 }
 
-dvec4 setIntersectionPoint(inout Ray r, dmat4 quadric, dvec4 closestHitpoint) {
+dvec4 setIntersectionPoint(INOUT(Ray) r, dmat4 quadric, dvec4 closestHitpoint) {
     double x = closestHitpoint.x;
     double y = closestHitpoint.y;
     double z = closestHitpoint.z;
@@ -358,7 +358,7 @@ dvec4 getIntersectionPointEnrico(Ray r, dmat4 quadric) {
  *
  * @return normal at intersection point, changes Ray position in place
  */
-dvec4 iteratTo(inout Ray r, double longRadius, double shortRadius) {
+dvec4 iteratTo(INOUT(Ray) r, double longRadius, double shortRadius) {
     double isigro = sign(shortRadius);
     // sign radius: +1 = concave, -1 = convex
 

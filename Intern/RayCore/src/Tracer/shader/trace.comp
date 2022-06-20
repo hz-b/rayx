@@ -8,7 +8,7 @@
  * output: diffracted Ray with intersection point as position, reflection as direction in beam coordinates and possibly modified weight in ELEMENT
  * coordinates
  */
-Ray traceSlit(Ray r, const int elementIndex, inout uint64_t ctr, dvec4 intersection) {
+Ray traceSlit(Ray r, const int elementIndex, INOUT(uint64_t) ctr, dvec4 intersection) {
     Element slit = quadricData[elementIndex];
 
     // store old position, needed for pathlength calculation
@@ -63,7 +63,7 @@ Ray traceSlit(Ray r, const int elementIndex, inout uint64_t ctr, dvec4 intersect
  *
  * output: reflected Ray with intersection point as position, reflection as direction in ELEMENT coordinates and possibly modified weight
  */
-Ray traceToroid(Ray r, const int elementIndex, inout uint64_t ctr, dvec4 intersectionPoint) {
+Ray traceToroid(Ray r, const int elementIndex, INOUT(uint64_t) ctr, dvec4 intersectionPoint) {
     Element tor = quadricData[elementIndex];
 
     // store old position, needed for pathlength calculation
@@ -110,7 +110,7 @@ Ray traceToroid(Ray r, const int elementIndex, inout uint64_t ctr, dvec4 interse
  *
  * output: reflected Ray with intersection point as position, reflection as direction in ELEMENT coordinates and possibly modified weight
  */
-Ray traceRZP(Ray r, const int elementIndex, inout uint64_t ctr, dvec4 intersection) {
+Ray traceRZP(Ray r, const int elementIndex, INOUT(uint64_t) ctr, dvec4 intersection) {
     Element rzp             = quadricData[elementIndex];
     double element_offset_z = rzp.elementParameters[3][2];
     r.position.z            = r.position.z - element_offset_z;
@@ -200,7 +200,7 @@ Ray traceRZP(Ray r, const int elementIndex, inout uint64_t ctr, dvec4 intersecti
  * @param intersection	intersection point in ELEMENT coordinates
  * @return				reflected Ray with intersection point as position, reflection as direction in ELEMENT coordinates and possibly modified weight
  */
-Ray tracePlaneGrating(Ray r, const int elementIndex, inout uint64_t ctr, dvec4 intersection) {
+Ray tracePlaneGrating(Ray r, const int elementIndex, INOUT(uint64_t) ctr, dvec4 intersection) {
     Element plgrt = quadricData[elementIndex];
 
     // store old position, needed for pathlength calculation
@@ -228,8 +228,8 @@ Ray tracePlaneGrating(Ray r, const int elementIndex, inout uint64_t ctr, dvec4 i
     double WL                 = hvlam(r.energy);
     double lineDensity        = plgrt.elementParameters[0][2];
     double orderOfDiffraction = plgrt.elementParameters[0][3];
-    double b_params[6]        = double[6](plgrt.elementParameters[1][2], plgrt.elementParameters[1][3], plgrt.elementParameters[2][0],
-                                   plgrt.elementParameters[2][1], plgrt.elementParameters[2][2], plgrt.elementParameters[2][3]);
+    double b_params[6]        = {plgrt.elementParameters[1][2], plgrt.elementParameters[1][3], plgrt.elementParameters[2][0],
+                                   plgrt.elementParameters[2][1], plgrt.elementParameters[2][2], plgrt.elementParameters[2][3]};
     int additional_order      = int(plgrt.elementParameters[3][3]);
 
     // a = WL * linedensity * order * 1e-06
@@ -261,7 +261,7 @@ Ray tracePlaneGrating(Ray r, const int elementIndex, inout uint64_t ctr, dvec4 i
  * @param intersection	intersection point in ELEMENT coordinates
  * @return reflected Ray with intersection point as position, reflection as direction in ELEMENT coordinates and possibly modified weight
  */
-Ray traceGeneralGrating(Ray r, const int elementIndex, inout uint64_t ctr, dvec4 intersection) {
+Ray traceGeneralGrating(Ray r, const int elementIndex, INOUT(uint64_t) ctr, dvec4 intersection) {
     Element grt = quadricData[elementIndex];
 
     int ISIG      = 1;
@@ -302,8 +302,8 @@ Ray traceGeneralGrating(Ray r, const int elementIndex, inout uint64_t ctr, dvec4
     double WL                 = hvlam(r.energy);
     double lineDensity        = grt.elementParameters[0][2];
     double orderOfDiffraction = grt.elementParameters[0][3];
-    double b_params[6] = double[6](grt.elementParameters[1][2], grt.elementParameters[1][3], grt.elementParameters[2][0], grt.elementParameters[2][1],
-                                   grt.elementParameters[2][2], grt.elementParameters[2][3]);
+    double b_params[6] = {grt.elementParameters[1][2], grt.elementParameters[1][3], grt.elementParameters[2][0], grt.elementParameters[2][1],
+                                   grt.elementParameters[2][2], grt.elementParameters[2][3]};
 
     // linedensity = WL * default_linedensity * order * 1e-06
     double linedensity = vlsGrating(lineDensity, r.position.z, b_params) * WL * orderOfDiffraction * 1e-06;
@@ -325,7 +325,7 @@ Ray traceGeneralGrating(Ray r, const int elementIndex, inout uint64_t ctr, dvec4
  *
  * output: reflected Ray with intersection point as position, reflection as direction in ELEMENT coordinates and possibly modified weight
  */
-Ray traceMirror(Ray r, const int elementIndex, inout uint64_t ctr, dvec4 intersection) {
+Ray traceMirror(Ray r, const int elementIndex, INOUT(uint64_t) ctr, dvec4 intersection) {
     Element mrr = quadricData[elementIndex];
 
     // store old position, needed for pathlength calculation
@@ -382,7 +382,7 @@ Ray traceMirror(Ray r, const int elementIndex, inout uint64_t ctr, dvec4 interse
  *
  * @return reflected Ray with intersection point as position, reflection as direction in ELEMENT coordinates and possibly modified weight
  */
-Ray traceEllipsoidMirror(Ray r, const int elementIndex, inout uint64_t ctr, dvec4 intersection) {
+Ray traceEllipsoidMirror(Ray r, const int elementIndex, INOUT(uint64_t) ctr, dvec4 intersection) {
     Element ell = quadricData[elementIndex];
 
     double sin_tangentAngle = ell.elementParameters[0][0];
@@ -440,8 +440,9 @@ Ray traceEllipsoidMirror(Ray r, const int elementIndex, inout uint64_t ctr, dvec
  */
 Ray traceImagePlane(Ray r, const int elementIndex, dvec4 intersection) {
     // path length in element coordinates
-    r.pathLength += length(r.position - intersection.xyz);
-    r.position = intersection.xyz;
+    dvec3 intersection_xyz = dvec3(intersection.x, intersection.y, intersection.z);
+    r.pathLength += length(r.position - intersection_xyz);
+    r.position = intersection_xyz;
     return r;
     /*r = rayMatrixMult(r, q.inTrans);
     dvec3 old_position = r.position;
