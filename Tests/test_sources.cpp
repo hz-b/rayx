@@ -9,7 +9,6 @@
 #include "Model/Beamline/Beamline.h"
 #include "Model/Beamline/Objects/MatrixSource.h"
 #include "Model/Beamline/Objects/PointSource.h"
-#include "Presenter/SimulationEnv.h"
 #include "Tracer/Ray.h"
 #include "Tracer/Vulkan/VulkanTracer.h"
 #include "gmock/gmock.h"

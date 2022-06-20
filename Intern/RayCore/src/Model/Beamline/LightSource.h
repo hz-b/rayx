@@ -10,7 +10,6 @@
 #include "BeamlineObject.h"
 #include "Core.h"
 #include "EnergyDistribution.h"
-#include "Presenter/SimulationEnv.h"
 #include "Tracer/Ray.h"
 #include "glm.hpp"
 
@@ -63,7 +62,6 @@ class RAYX_API LightSource : public BeamlineObject {
     double getPhotonEnergy() const;
 
     double selectEnergy();
-    void setNumberOfRays(int numberOfRays);
     glm::dvec3 getDirectionFromAngles(double phi, double psi);
     // get the rays according to specific light source, has to be implemented in
     // each class that inherits from LightSource

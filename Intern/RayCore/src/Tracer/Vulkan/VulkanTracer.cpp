@@ -89,7 +89,28 @@ VulkanTracer::VulkanTracer() {
     // beamline.resize(0);
 }
 
-VulkanTracer::~VulkanTracer() {}
+VulkanTracer::~VulkanTracer() {
+	cleanup();
+}
+
+RayList VulkanTracer::trace(const Beamline& beamline) {
+	for (auto s : beamline.m_LightSources) {
+		m_RayList.insertVector(s->getRays());
+	}
+    setBeamlineParameters(1, beamline.m_OpticalElements.size(), m_RayList.rayAmount());
+
+	for (auto e : beamline.m_OpticalElements) {
+		addArrays(e->getSurfaceParams(), e->getInMatrix(), e->getOutMatrix(), e->getObjectParameters(), e->getElementParameters());
+	}
+
+	run();
+
+	RayList outRays = m_OutputRays;
+
+	cleanTracer();
+
+	return outRays;
+}
 
 //	This function creates a debug messenger
 VkResult CreateDebugUtilsMessengerEXT(

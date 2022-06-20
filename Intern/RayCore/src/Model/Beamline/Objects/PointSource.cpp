@@ -41,7 +41,7 @@ namespace RAYX {
  * (affects x,y position and x,y direction)
  *
  */
-PointSource::PointSource(const std::string name, EnergyDistribution dist,
+PointSource::PointSource(const std::string name, int numberOfRays, EnergyDistribution dist,
                          const double sourceWidth, const double sourceHeight,
                          const double sourceDepth, const double horDivergence,
                          const double verDivergence, SourceDist widthDist,
@@ -51,7 +51,7 @@ PointSource::PointSource(const std::string name, EnergyDistribution dist,
                          const std::array<double, 6> misalignment)
     : LightSource(name.c_str(), dist, linPol0, linPol45, circPol, misalignment,
                   sourceDepth, sourceHeight, sourceWidth, horDivergence,
-                  verDivergence) {
+                  verDivergence), m_numberOfRays(numberOfRays) {
     m_widthDist = widthDist;
     m_heightDist = heightDist;
     m_horDist = horDist;
@@ -62,10 +62,8 @@ PointSource::~PointSource() {}
 
 // returns nullptr on error
 std::shared_ptr<PointSource> PointSource::createFromXML(RAYX::xml::Parser p) {
-    SimulationEnv::get().m_numOfRays = p.parseNumberRays();
-
     return std::make_shared<PointSource>(
-        p.name(), p.parseEnergyDistribution(), p.parseSourceWidth(),
+        p.name(), p.parseNumberRays(), p.parseEnergyDistribution(), p.parseSourceWidth(),
         p.parseSourceHeight(), p.parseSourceDepth(), p.parseHorDiv(),
         p.parseVerDiv(), p.parseSourceWidthDistribution(),
         p.parseSourceHeightDistribution(), p.parseHorDivDistribution(),
@@ -87,7 +85,7 @@ std::vector<Ray> PointSource::getRays() {
     double x, y, z, psi, phi,
         en;  // x,y,z pos, psi,phi direction cosines, en=energy
 
-    int n = SimulationEnv::get().m_numOfRays;
+    int n = m_numberOfRays;
     std::vector<Ray> rayVector;
     rayVector.reserve(1048576);
     RAYX_LOG << "Create " << n << " rays with standard normal deviation...";

@@ -9,6 +9,8 @@
 #include "RayCore.h"
 #include "TerminalAppConfig.h"
 
+#include <Tracer/Tracer.h>
+
 // Virtual python Environment Path
 #ifdef WIN32  // Todo
 #define VENV_PATH "./rayxvenv/bin/python3"
@@ -16,13 +18,13 @@
 #define VENV_PATH "./rayxvenv/bin/python3"
 #endif
 
-class TerminalApp : public RAYX::Application {
+class TerminalApp {
   public:
     TerminalApp();
     TerminalApp(int argc, char** argv);
     ~TerminalApp();
 
-    void run() override;
+    void run();
 
     const std::string& getProvidedFilePath() const { return providedFile; };
 
@@ -31,4 +33,6 @@ class TerminalApp : public RAYX::Application {
     int m_argc;
     std::string providedFile;
     std::unique_ptr<CommandParser> m_CommandParser;
+	std::unique_ptr<RAYX::Tracer> m_Tracer;
+	std::unique_ptr<RAYX::Beamline> m_Beamline;
 };

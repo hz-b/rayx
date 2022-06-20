@@ -5,9 +5,6 @@
 #include "Debug.h"
 #include "Debug/Instrumentor.h"
 
-// Application
-#include "Application.h"
-
 // Model
 #include "Model/Beamline/Beamline.h"
 #include "Model/Beamline/Objects/Objects.h"

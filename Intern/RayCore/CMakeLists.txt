@@ -3,7 +3,6 @@ cmake_minimum_required(VERSION 3.2 FATAL_ERROR)
 project(RayCore)
 
 SET(SOURCE
-    src/Application.cpp
     src/PathResolver.cpp
     src/Debug.cpp
     src/utils.cpp
@@ -12,7 +11,6 @@ SET(SOURCE
     src/Model/Beamline/OpticalElement.cpp
     src/Model/Beamline/LightSource.cpp
     src/Model/Beamline/EnergyDistribution.cpp
-    src/Model/Beamline/BeamlineObjectFactory.cpp
     src/Model/Beamline/Objects/ImagePlane.cpp
     src/Model/Beamline/Objects/MatrixSource.cpp
     src/Model/Beamline/Objects/RandomRays.cpp
@@ -32,18 +30,14 @@ SET(SOURCE
     src/Data/Importer.cpp
     src/Data/xml.cpp
     src/Data/DatFile.cpp
-    src/Presenter/Presenter.cpp
-    src/Presenter/SimulationEnv.cpp
     src/Model/Surface/Quadric.cpp
     src/Model/Surface/Toroid.cpp
     src/Model/Surface/Surface.cpp
     src/Model/Geometry/Geometry.cpp
     src/Tracer/RayList.cpp
     src/Tracer/DebugBufList.cpp
-    src/Tracer/TracerInterface.cpp
     src/Tracer/Writer/CSVWriter.cpp
     src/Tracer/Writer/H5Writer.cpp
-    src/Tracer/TracerInterface.cpp
     src/Tracer/Vulkan/VulkanTracer.cpp
     src/Tracer/Vulkan/Material.cpp
     src/Tracer/Vulkan/NffTable.cpp
@@ -53,7 +47,6 @@ SET(SOURCE
 )
 
 SET(HEADERS
-    src/Application.h
     src/PathResolver.h
     src/utils.h
     src/Model/Beamline/Beamline.h
@@ -61,7 +54,6 @@ SET(HEADERS
     src/Model/Beamline/OpticalElement.h
     src/Model/Beamline/LightSource.h
     src/Model/Beamline/EnergyDistribution.h
-    src/Model/Beamline/BeamlineObjectFactory.h
     src/Model/Beamline/Objects/ImagePlane.h
     src/Model/Beamline/Objects/MatrixSource.h
     src/Model/Beamline/Objects/RandomRays.h
@@ -80,8 +72,6 @@ SET(HEADERS
     src/Data/Importer.h
     src/Data/xml.h
     src/Data/DatFile.h
-    src/Presenter/Presenter.h
-    src/Presenter/SimulationEnv.h
     src/Model/Surface/Quadric.h
     src/Model/Surface/Toroid.h
     src/Model/Surface/Surface.h
@@ -90,7 +80,8 @@ SET(HEADERS
     src/Tracer/Ray.h
     src/Tracer/DebugBuf.h
     src/Tracer/DebugBufList.h
-    src/Tracer/TracerInterface.h
+    src/Tracer/Tracer.h
+    src/Tracer/CpuTracer.h
     src/Tracer/Writer/Writer.hpp
     src/Tracer/Writer/CSVWriter.hpp
     src/Tracer/Writer/H5Writer.hpp

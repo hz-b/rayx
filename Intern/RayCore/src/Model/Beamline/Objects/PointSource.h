@@ -8,7 +8,7 @@ namespace RAYX {
 
 class RAYX_API PointSource : public LightSource {
   public:
-    PointSource(const std::string name, EnergyDistribution dist,
+    PointSource(const std::string name, int numberOfRays, EnergyDistribution dist,
                 const double sourceWidth, const double sourceHeight,
                 const double sourceDepth, const double horDivergence,
                 const double verDivergence, const SourceDist widthDist,
@@ -31,6 +31,7 @@ class RAYX_API PointSource : public LightSource {
     SourceDist m_heightDist;
     SourceDist m_horDist;
     SourceDist m_verDist;
+	int m_numberOfRays;
     // std::vector<SOURCE_LENGTH> m_source_lengths;
 };
 

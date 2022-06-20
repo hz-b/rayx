@@ -22,7 +22,7 @@ class CommandParser {
                  << "-p --plot\t Plot output footprints and histograms.\n"
                  << "-c --ocsv\t Output stored as .csv file.\n"
                  << "-i --input\t Input RML File Path.\n"
-                 << "-d --dummy\t Run an in-house Beamline.\n"
+                 << "-x --cpu\t Run CPU tracer instead of CPU tracer.\n"
                  << "-h --help\t Output this message.\n"
                  << "-b --benchmark\t Benchmark application:\n"
                  << "\t\t RML Parse → Trace → Output Storage\n"
@@ -36,7 +36,7 @@ class CommandParser {
     struct Optargs {
         OptFlags m_plotFlag = OptFlags::Disabled;       // -p (Plot)
         OptFlags m_csvFlag = OptFlags::Disabled;        // -c (.csv Output)
-        OptFlags m_dummyFlag = OptFlags::Disabled;      // -d (Dummy Beamline)
+        OptFlags m_cpuFlag = OptFlags::Disabled;      // -x (CPU Tracer)
         OptFlags m_benchmark = OptFlags::Disabled;      // -b (Benchmark)
         OptFlags m_multiplePlots = OptFlags::Disabled;  // -m (Multiple Plots)
         char* m_providedFile = NULL;                    // -i (Input)

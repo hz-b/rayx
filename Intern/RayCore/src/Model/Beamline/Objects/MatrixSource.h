@@ -9,7 +9,7 @@ namespace RAYX {
 
 class RAYX_API MatrixSource : public LightSource {
   public:
-    MatrixSource(const std::string name, EnergyDistribution dist,
+    MatrixSource(const std::string name, int numberOfRays, EnergyDistribution dist,
                  const double sourceWidth, const double sourceHeight,
                  const double sourceDepth, const double horDivergence,
                  const double verDivergence, const double linPol0,
@@ -22,6 +22,9 @@ class RAYX_API MatrixSource : public LightSource {
     static std::shared_ptr<MatrixSource> createFromXML(xml::Parser);
 
     std::vector<Ray> getRays();
+
+  private:
+	int m_numberOfRays;
 };
 
 }  // namespace RAYX

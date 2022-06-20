@@ -7,7 +7,7 @@ namespace RAYX {
 
 class RAYX_API RandomRays : public LightSource {
   public:
-    RandomRays(int low, int high);
+    RandomRays(int low, int high, int numberOfRays);
 
     RandomRays();
     ~RandomRays();
@@ -18,6 +18,7 @@ class RAYX_API RandomRays : public LightSource {
   private:
     int m_low;
     int m_high;
+	int m_numberOfRays;
 };
 
 }  // namespace RAYX
