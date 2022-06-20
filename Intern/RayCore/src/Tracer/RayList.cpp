@@ -18,7 +18,7 @@ RayList::~RayList() {}
  * Intactness of inRayVector is not guaranteed.
  * @param inRayVector vector of Rays to be inserted
  */
-void RayList::insertVector(std::vector<Ray>&& inRayVector) {
+void RayList::insertVector(const std::vector<Ray>& inRayVector) {
     // note that this can be optimized quite a bit.
     // But the previous "optimized" version had multiple memory unsafety issues
     // and was hence replaced.

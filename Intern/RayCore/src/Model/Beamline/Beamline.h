@@ -1,5 +1,7 @@
 #pragma once
 
+#include <Tracer/RayList.h>
+
 #include <array>
 #include <memory>
 #include <vector>
@@ -16,21 +18,14 @@ class RAYX_API Beamline {
     Beamline();
     ~Beamline();
 
-    void addOpticalElement(const std::shared_ptr<OpticalElement> q);
-    void addOpticalElement(const char* name,
-                           const std::array<double, 4*4>& inputPoints,
-                           std::array<double, 4 * 4> inputInMatrix,
-                           std::array<double, 4 * 4> inputOutMatrix,
-                           std::array<double, 4 * 4> OParameters,
-                           std::array<double, 4 * 4> EParameters);
-    void addOpticalElement(const char* name, std::array<double, 4*4>&& inputPoints,
-                           std::array<double, 4 * 4>&& inputInMatrix,
-                           std::array<double, 4 * 4>&& inputOutMatrix,
-                           std::array<double, 4 * 4>&& OParameters,
-                           std::array<double, 4 * 4>&& EParameters);
+    RayList getInputRays() const;
 
     std::vector<std::shared_ptr<OpticalElement>> m_OpticalElements;
     std::vector<std::shared_ptr<LightSource>> m_LightSources;
+
+    // a mostly-empty vector, containing input rays to be used in addition to
+    // those from the light sources. relevant for testing!
+    std::vector<Ray> m_extraRays;
 };
 
 }  // namespace RAYX

@@ -34,15 +34,17 @@ namespace RAYX {
  * @param misalignment      if the source is moved/turned in any direction
  * (affects x,y position and x,y direction)
  */
-MatrixSource::MatrixSource(const std::string name, int numberOfRays, EnergyDistribution dist,
-                           const double sourceWidth, const double sourceHeight,
-                           const double sourceDepth, const double horDivergence,
+MatrixSource::MatrixSource(const std::string name, int numberOfRays,
+                           EnergyDistribution dist, const double sourceWidth,
+                           const double sourceHeight, const double sourceDepth,
+                           const double horDivergence,
                            const double verDivergence, const double linPol0,
                            const double linPol45, const double circPol,
                            const std::array<double, 6> misalignment)
     : LightSource(name.c_str(), dist, linPol0, linPol45, circPol, misalignment,
                   sourceDepth, sourceHeight, sourceWidth, horDivergence,
-                  verDivergence), m_numberOfRays(numberOfRays) {
+                  verDivergence),
+      m_numberOfRays(numberOfRays) {
     RAYX_LOG << "Created.";
 }
 
@@ -51,10 +53,10 @@ MatrixSource::~MatrixSource() {}
 // returns nullptr on error
 std::shared_ptr<MatrixSource> MatrixSource::createFromXML(xml::Parser p) {
     return std::make_shared<MatrixSource>(
-        p.name(), p.parseNumberRays(), p.parseEnergyDistribution(), p.parseSourceWidth(),
-        p.parseSourceHeight(), p.parseSourceDepth(), p.parseHorDiv(),
-        p.parseVerDiv(), p.parseLinearPol0(), p.parseLinearPol45(),
-        p.parseCircularPol(), p.parseMisalignment());
+        p.name(), p.parseNumberRays(), p.parseEnergyDistribution(),
+        p.parseSourceWidth(), p.parseSourceHeight(), p.parseSourceDepth(),
+        p.parseHorDiv(), p.parseVerDiv(), p.parseLinearPol0(),
+        p.parseLinearPol45(), p.parseCircularPol(), p.parseMisalignment());
 }
 
 /**
@@ -63,7 +65,7 @@ std::shared_ptr<MatrixSource> MatrixSource::createFromXML(xml::Parser p) {
  * direction as first 4) distributed evenly across width & height of source
  * returns vector of rays
  */
-std::vector<Ray> MatrixSource::getRays() {
+std::vector<Ray> MatrixSource::getRays() const {
     RAYX_PROFILE_FUNCTION();
     double lower_bound = 0;
     double upper_bound = 1;

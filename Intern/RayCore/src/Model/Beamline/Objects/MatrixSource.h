@@ -9,11 +9,12 @@ namespace RAYX {
 
 class RAYX_API MatrixSource : public LightSource {
   public:
-    MatrixSource(const std::string name, int numberOfRays, EnergyDistribution dist,
-                 const double sourceWidth, const double sourceHeight,
-                 const double sourceDepth, const double horDivergence,
-                 const double verDivergence, const double linPol0,
-                 const double linPol45, const double circPol,
+    MatrixSource(const std::string name, int numberOfRays,
+                 EnergyDistribution dist, const double sourceWidth,
+                 const double sourceHeight, const double sourceDepth,
+                 const double horDivergence, const double verDivergence,
+                 const double linPol0, const double linPol45,
+                 const double circPol,
                  const std::array<double, 6> misalignment);
 
     MatrixSource();
@@ -21,10 +22,10 @@ class RAYX_API MatrixSource : public LightSource {
 
     static std::shared_ptr<MatrixSource> createFromXML(xml::Parser);
 
-    std::vector<Ray> getRays();
+    virtual std::vector<Ray> getRays() const override;
 
   private:
-	int m_numberOfRays;
+    int m_numberOfRays;
 };
 
 }  // namespace RAYX

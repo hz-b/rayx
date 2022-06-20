@@ -23,7 +23,7 @@ class RayList {
     RayList();
     ~RayList();
     // appends vector of Rays to the ray list
-    void insertVector(std::vector<Ray>&& inRayVector);
+    void insertVector(const std::vector<Ray>& inRayVector);
     void clean();
     std::list<std::vector<Ray>>::iterator begin();
     std::list<std::vector<Ray>>::iterator end();
@@ -35,4 +35,4 @@ class RayList {
     // adds empty vector to the list
     std::list<std::vector<Ray>> m_rayList;
 };
-}
+}  // namespace RAYX

@@ -17,8 +17,6 @@ LightSource::LightSource(const char* name, EnergyDistribution dist,
       m_sourceWidth(sourceWidth),
       m_horDivergence(horDivergence),
       m_verDivergence(verDivergence),
-      m_uniformDist(0, 1),
-      m_normDist(0, 1),
       m_misalignmentParams(misalignment),
       m_linearPol_0(linPol0),
       m_linearPol_45(linPol45),
@@ -36,13 +34,13 @@ LightSource::LightSource(const char* name, EnergyDistribution dist,
       m_linearPol_45(linPol45),
       m_circularPol(circPol) {}
 
-double LightSource::getLinear0() { return m_linearPol_0; }
+double LightSource::getLinear0() const { return m_linearPol_0; }
 
-double LightSource::getLinear45() { return m_linearPol_45; }
+double LightSource::getLinear45() const { return m_linearPol_45; }
 
-double LightSource::getCircular() { return m_circularPol; }
+double LightSource::getCircular() const { return m_circularPol; }
 
-std::array<double, 6> LightSource::getMisalignmentParams() {
+std::array<double, 6> LightSource::getMisalignmentParams() const {
     return m_misalignmentParams;
 }
 
@@ -52,7 +50,7 @@ double LightSource::getPhotonEnergy() const {
 
 // needed for many of the light sources, from two angles to one direction vector
 glm::dvec3 LightSource::getDirectionFromAngles(const double phi,
-                                               const double psi) {
+                                               const double psi) const {
     double al = cos(psi) * sin(phi);
     double am = -sin(psi);
     double an = cos(psi) * cos(phi);
@@ -60,7 +58,7 @@ glm::dvec3 LightSource::getDirectionFromAngles(const double phi,
 }
 
 //  (see RAYX.FOR select_energy)
-double LightSource::selectEnergy() {
+double LightSource::selectEnergy() const {
     return m_EnergyDistribution.selectEnergy();
 }
 
