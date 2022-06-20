@@ -1,14 +1,16 @@
 #pragma once
 
+#include <Tracer/Tracer.h>
+
 #include "Debug.h"
 
 namespace RAYX {
 
 class RAYX_API CpuTracer : public Tracer {
-	RayList trace(const Beamline&) {
-		RAYX_ERR << "oh no!";
-		return {};
-	}
+    RayList trace(const Beamline&) {
+        RAYX_ERR << "oh no!";
+        return {};
+    }
 };
 
-};
+};  // namespace RAYX

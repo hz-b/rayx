@@ -21,5 +21,4 @@ endif()
 
 add_subdirectory(Intern)
 add_subdirectory(Extern)
-# TODO(rudi) re-add tests
-# add_subdirectory(Tests)
+add_subdirectory(Tests)

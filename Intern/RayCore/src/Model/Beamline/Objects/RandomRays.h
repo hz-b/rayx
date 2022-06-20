@@ -12,13 +12,13 @@ class RAYX_API RandomRays : public LightSource {
     RandomRays();
     ~RandomRays();
 
-    std::vector<Ray> getRays();
+    std::vector<Ray> getRays() const override;
     void compareRays(std::vector<Ray*> input, std::vector<double> output);
 
   private:
     int m_low;
     int m_high;
-	int m_numberOfRays;
+    int m_numberOfRays;
 };
 
 }  // namespace RAYX

@@ -1,11 +1,13 @@
 #include "RandomRays.h"
 
+#include <Tracer/Vulkan/VulkanTracer.h>
+
 #include <cmath>
 #include <random>
 
-#include "Debug/Instrumentor.h"
 #include "Debug.h"
-#include <Tracer/Vulkan/VulkanTracer.h>
+#include "Debug/Instrumentor.h"
+#include "RandomRays.h"
 
 namespace RAYX {
 
@@ -17,7 +19,8 @@ RandomRays::RandomRays(int low, int high, int numberOfRays)
                   EnergyDistribution(EnergyRange(100., 0.), true), 0, 0, 0,
                   {0, 0, 0, 0}),
       m_low(low),
-      m_high(high), m_numberOfRays(numberOfRays) {}
+      m_high(high),
+      m_numberOfRays(numberOfRays) {}
 
 RandomRays::~RandomRays() {}
 
@@ -25,7 +28,7 @@ RandomRays::~RandomRays() {}
  * every parameter is chosen randomly
  * returns list of rays
  */
-std::vector<Ray> RandomRays::getRays() {
+std::vector<Ray> RandomRays::getRays() const {
     RAYX_PROFILE_FUNCTION();
     std::uniform_real_distribution<double> unif(m_low, m_high);
     std::default_random_engine re;
@@ -41,9 +44,10 @@ std::vector<Ray> RandomRays::getRays() {
         double weight = unif(re);
         double en = unif(re);
         glm::dvec4 stokes = glm::dvec4(unif(re), unif(re), unif(re), unif(re));
-        Ray r = {position.x, position.y, position.z, weight, direction.x,
-                        direction.y, direction.z, en, stokes.x, stokes.y,
-                        stokes.z, stokes.w, 0.0, 0.0, 0.0, 0.0};
+        Ray r = {position.x,  position.y,  position.z,  weight,
+                 direction.x, direction.y, direction.z, en,
+                 stokes.x,    stokes.y,    stokes.z,    stokes.w,
+                 0.0,         0.0,         0.0,         0.0};
         rayList.emplace_back(r);
     }
     return rayList;
@@ -76,8 +80,7 @@ void RandomRays::compareRays(std::vector<Ray*> input,
         diff.push_back(a7);
     }
     diff.sort();
-    RAYX_LOG << "max difference: " << diff.front() << " "
-              << diff.back();
+    RAYX_LOG << "max difference: " << diff.front() << " " << diff.back();
 }
 
 }  // namespace RAYX
