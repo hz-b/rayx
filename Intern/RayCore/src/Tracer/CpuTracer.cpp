@@ -18,7 +18,9 @@ namespace CPP_TRACER {
 
 CpuTracer::CpuTracer() {
     // Set buffer settings (DEBUG OR RELEASE)
-    RAYX_LOG << "Initializing Vulkan Tracer..";
+    RAYX_LOG << "Initializing Cpu Tracer..";
+
+    m_relevantMaterials.fill(false);
     setSettings();
 }
 
@@ -44,12 +46,10 @@ RayList CpuTracer::trace(const Beamline& beamline) {
     return outRays;
 }
 
-/** Function is used to start the Vulkan tracer
- */
 void CpuTracer::run() {
     RAYX_PROFILE_FUNCTION();
     const clock_t begin_time = clock();
-    RAYX_LOG << "Starting Vulkan Tracer..";
+    RAYX_LOG << "Starting Cpu Tracer..";
 
     m_MaterialTables = loadMaterialTables(m_relevantMaterials);
 
@@ -240,7 +240,7 @@ std::list<std::vector<Ray>>::const_iterator CpuTracer::getOutputIteratorEnd() {
     return m_OutputRays.end();
 }
 
-// Set Vulkan Tracer m_settings according to Release or Debug Mode
+// Set Cpu Tracer m_settings according to Release or Debug Mode
 void CpuTracer::setSettings() {
 #ifdef RAY_DEBUG_MODE
     RAYX_D_LOG << "CpuTracer Debug: ON";

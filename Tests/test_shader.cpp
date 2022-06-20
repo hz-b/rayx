@@ -14,8 +14,7 @@
 
 #if RUN_TEST_SHADER
 
-// TODO: maybe allow non-ci builds to run cpu test-suite too!
-#ifdef CI
+#ifdef CPU
 std::unique_ptr<RAYX::Tracer> tracer = std::make_unique<RAYX::CpuTracer>();
 #else
 std::unique_ptr<RAYX::Tracer> tracer = std::make_unique<RAYX::VulkanTracer>();
@@ -1290,10 +1289,10 @@ TEST_F(ShaderTest, diffractionTest) {
             testValues, glm::dvec3(iopt, xlength, ylength),
             glm::dvec3(0.0, 0.0, 0.0), glm::dvec4(0, 0, 0, 0), 0, wavelength);
     }
-    double lowerDphi = 1e-10;
-    double upperDphi = 1e-06;
-    double lowerDpsi = 1e-08;
-    double upperDpsi = 1e-05;
+    double lowerDphi = 1e-11;
+    double upperDphi = 1e-05;
+    double lowerDpsi = 1e-09;
+    double upperDpsi = 1e-04;
 
     double settings = 5;
     std::list<double> outputRays = runUnitTest(settings, testValues);

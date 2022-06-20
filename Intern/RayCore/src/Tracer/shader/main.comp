@@ -2,14 +2,12 @@
 #include "settings.comp"
 
 #ifdef CPP
-#define INOUT(x) x&
-#define OUT(x) x&
+    #define INOUT(x) x&
+    #define OUT(x) x&
 #else
-#define INOUT(x) inout x
-#define OUT(x) out x
-#endif
+    #define INOUT(x) inout x
+    #define OUT(x) out x
 
-#ifndef CPP
 	#extension GL_ARB_separate_shader_objects : enable
 	#extension GL_ARB_gpu_shader_int64 : enable
 	#extension GL_GOOGLE_include_directive : enable
@@ -18,7 +16,7 @@
 #endif
 
 const double PI       = 3.14159265358979323846264338327950;
-const uint64_t rngKey = (0xc8e4fd15 << 32) | 0x4ce32f6d;
+const uint64_t rngKey = 13; // TODO(rudi) this was the old key, it generated a warning: (0xc8e4fd15 << 32) | 0x4ce32f6d;
 const double inm2eV   = 1.239852e3;
 
 #ifdef CPP

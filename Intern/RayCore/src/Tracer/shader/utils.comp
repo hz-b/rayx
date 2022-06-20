@@ -163,6 +163,10 @@ dvec2 getAtomicMassAndRho(int material) {
         #include "../../Material/materials.xmacro"
         #undef X
     }
+    #ifdef CPP
+    RAYX_ERR << "invalid material in getAtomicMassAndRho";
+    #endif
+    return dvec2(0.0, 0.0);
 }
 
 struct PalikEntry {
