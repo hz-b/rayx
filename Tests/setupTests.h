@@ -3,6 +3,7 @@
 #include "Core.h"
 #include "Data/Importer.h"
 #include "Debug.h"
+#include "Material/Material.h"
 #include "Model/Beamline/Objects/Objects.h"
 #include "Model/Geometry/Geometry.h"
 #include "PathResolver.h"

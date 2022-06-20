@@ -1,6 +1,6 @@
 #include "RandomRays.h"
 
-#include <Tracer/Vulkan/VulkanTracer.h>
+#include <Tracer/VulkanTracer.h>
 
 #include <cmath>
 #include <random>

@@ -2,7 +2,7 @@
 
 #include "Core.h"
 #include "Surface.h"
-#include "Tracer/Vulkan/Material.h"
+#include "Material/Material.h"
 #include "utils.h"
 
 #define RAYCORE_QUADRIC_DOUBLE_AMOUNT 48;

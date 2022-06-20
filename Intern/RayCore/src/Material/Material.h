@@ -1,7 +1,6 @@
 #pragma once
 
-// TODO(rudi): move this out of the Vulkan Tracer, doesn't belong here anymore.
-
+#include <array>
 #include <vector>
 
 /**

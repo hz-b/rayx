@@ -10,8 +10,7 @@
 #include <type_traits>
 
 #include "Tracer/CpuTracer.h"
-#include "Tracer/Vulkan/Material.h"
-#include "Tracer/Vulkan/VulkanTracer.h"
+#include "Tracer/VulkanTracer.h"
 
 #if RUN_TEST_SHADER
 

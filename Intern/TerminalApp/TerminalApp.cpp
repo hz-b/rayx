@@ -4,13 +4,12 @@
 #include "PathResolver.h"
 
 // TODO: (potential) Replace Getopt with boost(header-only)
+#include <Tracer/CpuTracer.h>
+#include <Tracer/VulkanTracer.h>
 #include <unistd.h>
 
 #include <memory>
 #include <stdexcept>
-
-#include <Tracer/Vulkan/VulkanTracer.h>
-#include <Tracer/CpuTracer.h>
 
 TerminalApp::TerminalApp() {}
 
@@ -37,18 +36,18 @@ void TerminalApp::run() {
         m_Beamline = std::make_unique<RAYX::Beamline>(
             RAYX::importBeamline(m_CommandParser->m_optargs.m_providedFile));
     } else {
-		RAYX_LOG << "No Pipeline/Beamline provided, exiting..";
-		exit(1);
+        RAYX_LOG << "No Pipeline/Beamline provided, exiting..";
+        exit(1);
     }
 
-	if (m_CommandParser->m_optargs.m_cpuFlag) {
-		m_Tracer = std::make_unique<RAYX::CpuTracer>();
-	} else {
-		m_Tracer = std::make_unique<RAYX::VulkanTracer>();
-	}
+    if (m_CommandParser->m_optargs.m_cpuFlag) {
+        m_Tracer = std::make_unique<RAYX::CpuTracer>();
+    } else {
+        m_Tracer = std::make_unique<RAYX::VulkanTracer>();
+    }
 
     // Run RAY-X Core
-	auto rays = m_Tracer->trace(*m_Beamline);
+    auto rays = m_Tracer->trace(*m_Beamline);
 
     if (m_CommandParser->m_optargs.m_benchmark) {
         std::chrono::steady_clock::time_point end =

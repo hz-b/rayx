@@ -6,7 +6,7 @@
 #extension GL_GOOGLE_include_directive : enable
 
 #define WORKGROUP_SIZE 32
-#include "shader-include/settings.comp"
+#include "settings.comp"
 layout(local_size_x = WORKGROUP_SIZE, local_size_y = 1, local_size_z = 1) in;
 const double PI       = 3.14159265358979323846264338327950;
 const uint64_t rngKey = (0xc8e4fd15 << 32) | 0x4ce32f6d;
@@ -69,12 +69,12 @@ layout(binding = 6) buffer debugBuf {
 #endif
 // Order in #include is IMPROTANT, do not change.
 // clang-format off
-#include "shader-include/approx.comp"
-#include "shader-include/complex.comp"
-#include "shader-include/random.comp"
-#include "shader-include/utils.comp"
-#include "shader-include/intersection.comp"
-#include "shader-include/trace.comp"
+#include "approx.comp"
+#include "complex.comp"
+#include "random.comp"
+#include "utils.comp"
+#include "intersection.comp"
+#include "trace.comp"
 // clang-format on
 
 /*

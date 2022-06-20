@@ -2,7 +2,7 @@
 
 #include <Debug.h>
 
-#include "../RayList.h"
+#include "../Tracer/RayList.h"
 
 #define SHORTOUTPUT false
 

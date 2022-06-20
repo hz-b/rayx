@@ -1,11 +1,12 @@
 #include "VulkanTracer.h"
 
+#include <Material/Material.h>
+
 #include <chrono>
 #include <cmath>
 
 #include "Debug.h"
 #include "Debug/Instrumentor.h"
-#include "Material.h"
 #include "PathResolver.h"
 
 #ifdef RAYX_PLATFORM_WINDOWS

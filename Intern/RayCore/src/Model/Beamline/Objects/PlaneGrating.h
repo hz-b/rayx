@@ -1,6 +1,6 @@
 #pragma once
 #include <Data/xml.h>
-#include <Tracer/Vulkan/Material.h>
+#include <Material/Material.h>
 
 #include "Model/Beamline/OpticalElement.h"
 #include "Model/Surface/Quadric.h"

@@ -163,7 +163,7 @@ double wasteBox(double x, double z, double xLengthA, double xLengthB, double zLe
 dvec2 getAtomicMassAndRho(int material) {
     switch(material) {
         #define X(e, z, a, rho) case z: return dvec2(a, rho);
-        #include "../materials.xmacro"
+        #include "../../Material/materials.xmacro"
         #undef X
     }
 }

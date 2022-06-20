@@ -1,5 +1,7 @@
 #pragma once
 
+#include <Material/Material.h>
+
 #include <cstdlib>
 #include <iostream>
 #include <map>
@@ -7,7 +9,6 @@
 #include <stdexcept>
 
 #include "Core.h"
-#include "Material.h"
 #include "Tracer/RayList.h"
 #include "Tracer/Tracer.h"
 #include "vulkan/vulkan.hpp"

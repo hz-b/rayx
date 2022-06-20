@@ -10,7 +10,7 @@
 #include "Model/Beamline/Objects/MatrixSource.h"
 #include "Model/Beamline/Objects/PointSource.h"
 #include "Tracer/Ray.h"
-#include "Tracer/Vulkan/VulkanTracer.h"
+#include "Tracer/VulkanTracer.h"
 #include "gmock/gmock.h"
 #include "gtest/gtest.h"
 
