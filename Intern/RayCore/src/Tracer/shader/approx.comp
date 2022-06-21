@@ -843,7 +843,7 @@ double r8_log(double x)
     int n;
     int nterms = 0;
     int ntrval;
-    double t;
+    double t = 0;
     double t2;
     double value;
     double xn;

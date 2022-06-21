@@ -583,12 +583,12 @@ void RZPLineDensity(Ray r, dvec4 normal, int IMAGE_TYPE, int RZP_TYPE, int DERIV
         RAYX_WARN << "DERIVATION_METHOD = 1 not implemented!"; // TODO
         #endif
     }
-    double xi;
-    double yi;
-    double zi;
-    double xm;
-    double ym;
-    double zm;
+    double xi = 0;
+    double yi = 0;
+    double zi = 0;
+    double xm = 0;
+    double ym = 0;
+    double zm = 0;
 
     if (IMAGE_TYPE == 0) {         // point to point (standard)
         if (FX == 0 && FZ == 0) {  // plane
