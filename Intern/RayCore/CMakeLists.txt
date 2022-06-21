@@ -38,7 +38,6 @@ SET(SOURCE
     src/Material/NffTable.cpp
     src/Material/PalikTable.cpp
     src/Tracer/RayList.cpp
-    src/Tracer/DebugBuf/DebugBufList.cpp
     src/Tracer/VulkanTracer.cpp
     src/Tracer/CpuTracer.cpp
     src/Writer/CSVWriter.cpp
@@ -79,8 +78,6 @@ SET(HEADERS
     src/Model/Geometry/Geometry.h
     src/Tracer/RayList.h
     src/Tracer/Ray.h
-    src/Tracer/DebugBuf/DebugBuf.h
-    src/Tracer/DebugBuf/DebugBufList.h
     src/Tracer/Tracer.h
     src/Tracer/CpuTracer.h
     src/Writer/Writer.hpp
