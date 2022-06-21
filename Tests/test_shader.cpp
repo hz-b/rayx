@@ -35,7 +35,7 @@ class ShaderTest : public testing::Test {
         }
     }
     virtual void SetUp() {}
-    static void TearDownTestSuite() {}
+    static void TearDownTestSuite() { tracer = nullptr; }
 };
 
 std::array<double, 4 * 4> zeros = {
