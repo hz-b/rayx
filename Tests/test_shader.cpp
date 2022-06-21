@@ -514,8 +514,15 @@ TEST_F(ShaderTest, ExpTest) {
 
     std::vector<RAYX::Ray> testValues = random.getRays();
     // add some values manually
-    RAYX::Ray r = {0,  1,        -3, 5,     PI, 2, 3, 4,
-                   10, -4.41234, 0,  1.224, 0,  0, 0, 0};
+    RAYX::Ray r = {glm::dvec3(0, 1, -3),
+                   5,
+                   glm::dvec3(PI, 2, 3),
+                   4,
+                   glm::dvec4(10, -4.41234, 0, 1.224),
+                   0,
+                   0,
+                   0,
+                   0};
     testValues.push_back(r);
 
     std::list<double> outputRays = runUnitTest(settings, testValues);

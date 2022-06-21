@@ -20,38 +20,28 @@ CpuTracer::CpuTracer() { RAYX_LOG << "Initializing Cpu Tracer.."; }
 
 CpuTracer::~CpuTracer() {}
 
-glm::dvec3 convert(Ray::vec3 v) { return glm::dvec3(v.x, v.y, v.z); }
-glm::dvec4 convert(Ray::vec4 v) { return glm::dvec4(v.x, v.y, v.z, v.w); }
-
+// those conversion functions only need to exist, as the shader doesn't use m_ prefixes to variables, whereas the c++ code does.
 CPP_TRACER::Ray convert(Ray r) {
     CPP_TRACER::Ray out;
-    out.position = convert(r.m_position);
+    out.position = r.m_position;
     out.weight = r.m_weight;
-    out.direction = convert(r.m_direction);
+    out.direction = r.m_direction;
     out.energy = r.m_energy;
-    out.stokes = convert(r.m_stokes);
+    out.stokes = r.m_stokes;
     out.pathLength = r.m_pathLength;
     out.order = r.m_order;
     out.lastElement = r.m_lastElement;
-    out.extraParameter = r.m_extraParam;
+    out.extraParameter = r.m_extraParam; // TODO: unite extraParameter vs. extraParam
     return out;
 }
 
-CPP_TRACER::Element convert(Element e) {
-    return {e.surfaceParams, e.inTrans, e.outTrans, e.objectParameters,
-            e.elementParameters};
-}
-
-Ray::vec3 bconvert(glm::dvec3 v) { return Ray::vec3(v.x, v.y, v.z); }
-Ray::vec4 bconvert(glm::dvec4 v) { return Ray::vec4(v.x, v.y, v.z, v.w); }
-
-Ray bconvert(CPP_TRACER::Ray r) {
+Ray back_convert(CPP_TRACER::Ray r) {
     Ray out;
-    out.m_position = bconvert(r.position);
+    out.m_position = r.position;
     out.m_weight = r.weight;
-    out.m_direction = bconvert(r.direction);
+    out.m_direction = r.direction;
     out.m_energy = r.energy;
-    out.m_stokes = bconvert(r.stokes);
+    out.m_stokes = r.stokes;
     out.m_pathLength = r.pathLength;
     out.m_order = r.order;
     out.m_lastElement = r.lastElement;
@@ -61,17 +51,6 @@ Ray bconvert(CPP_TRACER::Ray r) {
 
 RayList CpuTracer::trace(const Beamline& beamline) {
     auto rayList = beamline.getInputRays();
-
-    std::vector<Element> elements;
-    for (auto el : beamline.m_OpticalElements) {
-        Element e;
-        e.surfaceParams = arrayToGlm16(el->getSurfaceParams());
-        e.inTrans = arrayToGlm16(el->getInMatrix());
-        e.outTrans = arrayToGlm16(el->getOutMatrix());
-        e.objectParameters = arrayToGlm16(el->getObjectParameters());
-        e.elementParameters = arrayToGlm16(el->getElementParameters());
-        elements.push_back(e);
-    }
 
     CPP_TRACER::numberOfBeamlines = 1;
     CPP_TRACER::numberOfElementsPerBeamline = beamline.m_OpticalElements.size();
@@ -95,8 +74,14 @@ RayList CpuTracer::trace(const Beamline& beamline) {
     }
 
     // init quadricData
-    for (auto e : elements) {
-        CPP_TRACER::quadricData.data.push_back(convert(e));
+    for (auto el : beamline.m_OpticalElements) {
+        CPP_TRACER::Element e;
+        e.surfaceParams = arrayToGlm16(el->getSurfaceParams());
+        e.inTrans = arrayToGlm16(el->getInMatrix());
+        e.outTrans = arrayToGlm16(el->getOutMatrix());
+        e.objectParameters = arrayToGlm16(el->getObjectParameters());
+        e.elementParameters = arrayToGlm16(el->getElementParameters());
+        CPP_TRACER::quadricData.data.push_back(e);
     }
 
     auto materialTables = beamline.calcMinimalMaterialTables();
@@ -116,7 +101,7 @@ RayList CpuTracer::trace(const Beamline& beamline) {
 
     RayList outRays;
     for (auto r : CPP_TRACER::outputData.data) {
-        outRays.insertVector({bconvert(r)});
+        outRays.insertVector({back_convert(r)});
     }
 
     return outRays;

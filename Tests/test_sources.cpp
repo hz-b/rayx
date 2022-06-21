@@ -81,8 +81,15 @@ TEST(RayTest, test1) {
     double order = 3;
     double lastElement = 4;
     double extraParam = 7;
-    RAYX::Ray r{x,  y,  z,  weight, xdir,       ydir,  zdir,        energy,
-                s0, s1, s2, s3,     pathLength, order, lastElement, extraParam};
+    RAYX::Ray r{glm::dvec3(x, y, z),
+                weight,
+                glm::dvec3(xdir, ydir, zdir),
+                energy,
+                glm::dvec4(s0, s1, s2, s3),
+                pathLength,
+                order,
+                lastElement,
+                extraParam};
     CHECK_EQ(r.getxPos(), x);
     CHECK_EQ(r.getyPos(), y);
     CHECK_EQ(r.getzPos(), z);
@@ -117,8 +124,15 @@ TEST(RayTest, testDefaultValues) {
     double s1 = 1;
     double s2 = 0;
     double s3 = 0;
-    RAYX::Ray r{x,  y,  z,  weight, xdir, ydir, zdir, energy,
-                s0, s1, s2, s3,     0,    0,    0,    0};
+    RAYX::Ray r{glm::dvec3(x, y, z),
+                weight,
+                glm::dvec3(xdir, ydir, zdir),
+                energy,
+                glm::dvec4(s0, s1, s2, s3),
+                0,
+                0,
+                0,
+                0};
     CHECK_EQ(r.getxPos(), x);
     CHECK_EQ(r.getyPos(), y);
     CHECK_EQ(r.getzPos(), z);

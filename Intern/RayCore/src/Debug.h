@@ -156,14 +156,6 @@ inline std::vector<double> formatAsVec(std::array<double, N> arg) {
     return out;
 }
 
-inline std::vector<double> formatAsVec(Ray::vec3 arg) {
-	return {arg.x, arg.y, arg.z};
-}
-
-inline std::vector<double> formatAsVec(Ray::vec4 arg) {
-	return {arg.x, arg.y, arg.z, arg.w};
-}
-
 inline std::vector<double> formatAsVec(double arg) { return {arg}; }
 
 void dbg(std::string filename, int line, std::string name,
