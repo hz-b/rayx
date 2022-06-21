@@ -35,7 +35,7 @@ CPP_TRACER::Ray convert(Ray r) {
     return out;
 }
 
-Ray back_convert(CPP_TRACER::Ray r) {
+Ray backConvert(CPP_TRACER::Ray r) {
     Ray out;
     out.m_position = r.position;
     out.m_weight = r.weight;
@@ -101,7 +101,7 @@ RayList CpuTracer::trace(const Beamline& beamline) {
 
     RayList outRays;
     for (auto r : CPP_TRACER::outputData.data) {
-        outRays.insertVector({back_convert(r)});
+        outRays.insertVector({backConvert(r)});
     }
 
     return outRays;
