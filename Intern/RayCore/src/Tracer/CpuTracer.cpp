@@ -101,7 +101,7 @@ RayList CpuTracer::trace(const Beamline& beamline) {
 
     RayList outRays;
     for (auto r : CPP_TRACER::outputData.data) {
-        outRays.insertVector({backConvert(r)});
+        outRays.push(backConvert(r));
     }
 
     return outRays;

@@ -24,12 +24,16 @@ void RayList::insertVector(const std::vector<Ray>& inRayVector) {
     // and was hence replaced.
 
     for (Ray r : inRayVector) {
-        if (m_rayList.empty() ||
-            m_rayList.back().size() == RAY_MAX_ELEMENTS_IN_VECTOR) {
-            m_rayList.push_back({});
-        }
-        m_rayList.back().push_back(r);
+        push(r);
     }
+}
+
+void RayList::push(Ray r) {
+    if (m_rayList.empty() ||
+        m_rayList.back().size() == RAY_MAX_ELEMENTS_IN_VECTOR) {
+        m_rayList.push_back({});
+    }
+    m_rayList.back().push_back(r);
 }
 
 void RayList::clean() { m_rayList.clear(); }
