@@ -14,15 +14,26 @@
 
 #if RUN_TEST_SHADER
 
-#ifdef CPU
-std::unique_ptr<RAYX::Tracer> tracer = std::make_unique<RAYX::CpuTracer>();
-#else
-std::unique_ptr<RAYX::Tracer> tracer = std::make_unique<RAYX::VulkanTracer>();
-#endif
+std::unique_ptr<RAYX::Tracer> tracer;
 
 class ShaderTest : public testing::Test {
   protected:
-    static void SetUpTestSuite() {}
+    static void SetUpTestSuite() {
+        bool cpu = false;
+        for (int i = 1; i < GLOBAL_ARGC; i++) {
+            if (strcmp(GLOBAL_ARGV[i], "-x") == 0 ||
+                strcmp(GLOBAL_ARGV[i], "--cpu") == 0) {
+                cpu = true;
+                break;
+            }
+        }
+
+        if (cpu) {
+            tracer = std::make_unique<RAYX::CpuTracer>();
+        } else {
+            tracer = std::make_unique<RAYX::VulkanTracer>();
+        }
+    }
     virtual void SetUp() {}
     static void TearDownTestSuite() {}
 };

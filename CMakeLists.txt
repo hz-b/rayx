@@ -13,10 +13,10 @@ else()
 	set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra -Wpedantic") # -Wconversion -Wsign-conversion")
 endif()
 
-if ("$ENV{CPU}" STREQUAL "YES")
+if ("$ENV{CI}" STREQUAL "YES")
 	# warnings are treated as errors
-	set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O3 -Werror -D CPU") # -O3 finds more errors!
-	message(STATUS "CPU mode")
+	set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O3 -Werror") # -O3 finds more errors!
+	message(STATUS "CI mode")
 endif()
 
 add_subdirectory(Intern)

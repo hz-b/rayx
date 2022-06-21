@@ -18,8 +18,8 @@ build-job:
   script:
     - git submodule update --init --recursive
     - mkdir build && cd build
-    - CPU=YES cmake ..
-    - CPU=YES cmake --build .
+    - CI=YES cmake ..
+    - CI=YES cmake --build .
     - ls
   artifacts:
     paths:
@@ -45,7 +45,7 @@ test-job:
     - cd build
     - cd bin
     - ls
-    - ./RayReworked_tst
+    - ./RayReworked_tst -x
 
 deploy-prod:
   stage: deploy

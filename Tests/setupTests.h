@@ -23,6 +23,9 @@
 #define RUN_TEST_SLIT 1
 #define RUN_TEST_SOURCES 1
 
+extern int GLOBAL_ARGC;
+extern char** GLOBAL_ARGV;
+
 /* usage:
     CHECK_EQ(A, B, 1e-10); // with explicit tolerance
     CHECK_EQ(A, B);        // without default tolerance
