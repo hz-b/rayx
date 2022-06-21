@@ -16,7 +16,7 @@ Ray traceSlit(Ray r, const int elementIndex, INOUT(uint64_t) ctr, dvec4 intersec
 
     // dvec4 normal = intersectionPoint(r, q.surfaceParams); // if it is not sure whether the given intersection is correct, use this (recalculate the
     // intersection)
-    dvec4 normal = setIntersectionPoint(r, slit.surfaceParams, intersection);
+    setIntersectionPoint(r, slit.surfaceParams, intersection);
 
     double x_extent = slit.objectParameters[0][0];   // width
     double y_extent = slit.objectParameters[0][1];   // height
@@ -65,6 +65,11 @@ Ray traceSlit(Ray r, const int elementIndex, INOUT(uint64_t) ctr, dvec4 intersec
  */
 Ray traceToroid(Ray r, const int elementIndex, INOUT(uint64_t) ctr, dvec4 intersectionPoint) {
     Element tor = quadricData[elementIndex];
+    if (intersectionPoint.x != 0) {
+        #ifdef CPP
+        RAYX_WARN << "why is intersectionPoint unused?"; // TODO
+        #endif
+    }
 
     // store old position, needed for pathlength calculation
     dvec3 old_position = r.position;
@@ -264,12 +269,6 @@ Ray tracePlaneGrating(Ray r, const int elementIndex, INOUT(uint64_t) ctr, dvec4 
 Ray traceGeneralGrating(Ray r, const int elementIndex, INOUT(uint64_t) ctr, dvec4 intersection) {
     Element grt = quadricData[elementIndex];
 
-    int ISIG      = 1;
-    double radius = grt.surfaceParams[1][3];  // -radius , a_24
-    if (-radius < 0) {
-        ISIG = -1;
-    }
-
     // store old position, needed for pathlength calculation
     dvec3 old_position = r.position;
 
@@ -387,14 +386,12 @@ Ray traceEllipsoidMirror(Ray r, const int elementIndex, INOUT(uint64_t) ctr, dve
 
     double sin_tangentAngle = ell.elementParameters[0][0];
     double cos_tangentAngle = ell.elementParameters[0][1];
-    int figureOfRotation    = int(ell.elementParameters[1][0]);
 
     // store old position, needed for pathlength calculation
     dvec3 old_position = r.position;
 
     // calculate intersection point and normal at intersection point
     dvec4 normal = setIntersectionPoint(r, ell.surfaceParams, intersection);
-    double icurv = ell.surfaceParams[1][0];
     /*normal.x = -q.surfaceParams[0][0] * r.position.x * icurv;
     normal.y = -(r.position.y + q.surfaceParams[1][3]) * icurv;
     normal.z = -(q.surfaceParams[2][2] * r.position.z + q.surfaceParams[2][3]) * icurv;
@@ -439,6 +436,13 @@ Ray traceEllipsoidMirror(Ray r, const int elementIndex, INOUT(uint64_t) ctr, dve
  * @return  reflected Ray with intersection point as position in ELEMENT coordinates
  */
 Ray traceImagePlane(Ray r, const int elementIndex, dvec4 intersection) {
+
+    if (elementIndex != -1) {
+        #ifdef CPP
+        RAYX_WARN << "why is elementIndex unused?"; // TODO
+        #endif
+    }
+
     // path length in element coordinates
     dvec3 intersection_xyz = dvec3(intersection.x, intersection.y, intersection.z);
     r.pathLength += length(r.position - intersection_xyz);

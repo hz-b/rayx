@@ -567,11 +567,22 @@ void RZPLineDensity(Ray r, dvec4 normal, int IMAGE_TYPE, int RZP_TYPE, int DERIV
     double s_alpha = r8_sin(alpha);
     double c_alpha = r8_cos(alpha);
 
-    /*if (DERIVATION_METHOD == 1) {
+
+    if (zOffsetCenter != 0) {
+        #ifdef CPP
+        RAYX_WARN << "zOffsetCenter not used!"; // TODO
+        #endif
+    }
+    if (DERIVATION_METHOD == 1) {
+        /*
         DX = getLineDensity1d(ptr_dx,x,z);
         DZ = getLineDensity1d(ptr_dz,x,z);
         return;
-    }*/
+        */
+        #ifdef CPP
+        RAYX_WARN << "DERIVATION_METHOD = 1 not implemented!"; // TODO
+        #endif
+    }
     double xi;
     double yi;
     double zi;
@@ -750,6 +761,12 @@ double vlsGrating(double lineDensity, double z, double vls[6]) {
  */
 Ray refrac_plane(Ray r, dvec4 normal, double a) {
     double y1 = r.direction[1] * r.direction[1] + r.direction[2] * r.direction[2] - (r.direction[2] - a) * (r.direction[2] - a);
+    if (normal.x != 0) {
+        #ifdef CPP
+        RAYX_WARN << "normal unused!"; // TODO
+        #endif
+    }
+
     if (y1 > 0) {
         y1             = sqrt(y1);
         r.direction[1] = y1;

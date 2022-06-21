@@ -254,7 +254,6 @@ dvec4 setIntersectionPoint(INOUT(Ray) r, dmat4 quadric, dvec4 closestHitpoint) {
     double a_24 = quadric[1][3];
     double a_33 = quadric[2][2];
     double a_34 = quadric[2][3];
-    double a_44 = quadric[3][3];
 
     double fx = 2 * a_14 + 2 * a_11 * x + 2 * a_12 * y + 2 * a_13 * z;
     double fy = 2 * a_24 + 2 * a_12 * x + 2 * a_22 * y + 2 * a_23 * z;
@@ -285,14 +284,14 @@ dvec4 getIntersectionPointEnrico(Ray r, dmat4 quadric) {
                abs(rayData[uint(gl_GlobalInvocationID)].direction[2]) >= abs(rayData[uint(gl_GlobalInvocationID)].direction[1])) {
         cs = 2;
     }
-    uint f_001 = uint(cs / 2);
-    uint f_010 = cs % 2;
+    // uint f_001 = uint(cs / 2);
+    // uint f_010 = cs % 2;
     uint f_011 = uint(cs + 1 / 2);
-    uint f_012 = cs;
+    // uint f_012 = cs;
     uint f_0x1 = uint(cs / 2);
     uint f_100 = (uint((cs + 1) / 2) + 1) % 2;
-    uint f_101 = ((cs % 2) + 1) % 2;
-    uint f_110 = (uint(cs / 2) + 1) % 2;
+    // uint f_101 = ((cs % 2) + 1) % 2;
+    // uint f_110 = (uint(cs / 2) + 1) % 2;
     uint f_112 = int(cs / 2) + 1;
     // uint f_1x0 = (cs/2)%2;
     uint f_131 = ((cs % 2) * 2) + 1;
@@ -461,7 +460,7 @@ dvec4 getOpticalElementIntersection(Ray r, uint elementIndex) {
         double longRadius  = e.surfaceParams[0][0];
         double shortRadius = e.surfaceParams[0][1];
 
-        dvec4 normal        = iteratTo(r, longRadius, shortRadius);
+        iteratTo(r, longRadius, shortRadius);
         currentIntersection = dvec4(r.position, r.weight);
 
         // set weight to 0 if element was not hit

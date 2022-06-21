@@ -332,25 +332,6 @@ double r8_mach(int i)
     Output, double R8_MACH, the value of the chosen parameter.
 */
 {
-    double value;
-
-    if (i < 1) {
-        // fprintf ( stderr, "\n" );
-        // fprintf ( stderr, "R8_MACH - Fatal error!\n" );
-        // fprintf ( stderr, "  The input argument I is out of bounds.\n" );
-        // fprintf ( stderr, "  Legal values satisfy 1 <= I <= 5.\n" );
-        // fprintf ( stderr, "  I = %d\n", i );
-        value = 0.0;
-        return 0.0;
-    } else if (5 < i) {
-        // fprintf ( stderr, "\n" );
-        // fprintf ( stderr, "R8_MACH - Fatal error!\n" );
-        // fprintf ( stderr, "  The input argument I is out of bounds.\n" );
-        // fprintf ( stderr, "  Legal values satisfy 1 <= I <= 5.\n" );
-        // fprintf ( stderr, "  I = %d\n", i );
-        return 0.0;
-    }
-
     double return_values[6] =
         {0, 4.450147717014403E-308, 8.988465674311579E+307, 1.110223024625157E-016, 2.220446049250313E-016, 0.301029995663981E+000};
     return return_values[i];
@@ -578,14 +559,12 @@ double r8_cos(const double x)
     double xmax = 0.0;
     double xn;
     double xsml  = 0.0;
-    double xwarn = 0.0;
     double y;
 
     if (ntsn == 0) {
         ntsn  = r8_inits(sincs, 15, 0.1 * r8_mach(3));
         xsml  = sqrt(2.0 * r8_mach(3));
         xmax  = 1.0 / r8_mach(4);
-        xwarn = sqrt(xmax);
     }
 
     absx = abs(x);
