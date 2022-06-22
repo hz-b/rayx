@@ -10,11 +10,14 @@
 #include "Tracer/RayList.h"
 
 namespace RAYX {
-
+/**
+ * @brief Abstract Tracer Interface for Tracing "plugins" e.g Vulkan..
+ * 
+ */
 class RAYX_API Tracer {
   public:
-	Tracer() {}
-	virtual ~Tracer() {}
+    Tracer() {}
+    virtual ~Tracer() {}
     virtual RayList trace(const Beamline&) = 0;
 };
 

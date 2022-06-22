@@ -21,15 +21,22 @@ class RAYX_API Beamline {
 
     RayList getInputRays() const;
 
-    // quality-of-life function to calculate the smallest possible
-    // MaterialTables which cover all materials from this beamline
+    /**
+     * @brief Quality-of-life function to calculate the smallest possible
+     * MaterialTables which cover all materials from this beamline
+     *
+     * @return MaterialTables
+     */
     MaterialTables calcMinimalMaterialTables() const;
 
     std::vector<std::shared_ptr<OpticalElement>> m_OpticalElements;
     std::vector<std::shared_ptr<LightSource>> m_LightSources;
 
-    // a mostly-empty vector, containing input rays to be used in addition to
-    // those from the light sources. relevant for testing!
+    /**
+     * @brief A mostly-empty vector, containing input rays to be used in
+     * addition to those from the light sources. relevant for testing!
+     *
+     */
     std::vector<Ray> m_extraRays;
 };
 

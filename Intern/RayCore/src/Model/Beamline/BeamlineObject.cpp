@@ -3,8 +3,7 @@
 #include <math.h>
 
 namespace RAYX {
-BeamlineObject::BeamlineObject(const char* name)
-    : m_name(name) {}
+BeamlineObject::BeamlineObject(const char* name) : m_name(name) {}
 BeamlineObject::BeamlineObject() {}
 BeamlineObject::~BeamlineObject() {}
 
