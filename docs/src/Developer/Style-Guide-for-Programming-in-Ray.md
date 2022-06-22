@@ -8,6 +8,16 @@ Keep collective ownership of the code in mind, when writing it (write code to be
 
 So keep it stupid simple. In most places it is not necessary or sensible to optimise the runtime of code to the last CPU cycle. Often the compiler does it better than the programmer anyways.
 
+## Includes
+As an easy step towards readability we divide includes in the following way: 
+
+`#include "internalHeader.h"`
+
+`#include <externalHeader.h>`
+
+Where internal headers are the ones we wrote ourselves and external headers are from dependencies we included into our project.
+
+
 ## Comments
 
 Write comments often and as precise as possible. Comments should contain what you would say to a newcomer to the project, because that is most likely the person that reads/needs the comments.
