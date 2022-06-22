@@ -549,8 +549,8 @@ calculates DX and DZ (line spacing in x and z direction) at a given point for a 
 @params: lots
 @returns: (inplace) DX, DZ
 */
-void RZPLineDensity(Ray r, dvec4 normal, int IMAGE_TYPE, int RZP_TYPE, int DERIVATION_METHOD, double zOffsetCenter, double risag, double rosag,
-                    double rimer, double romer, double alpha, double beta, double Ord, double WL, INOUT(double) DX, INOUT(double) DZ) {
+void RZPLineDensity(Ray r, dvec4 normal, int IMAGE_TYPE, int RZP_TYPE, ALLOW_UNUSED int DERIVATION_METHOD, ALLOW_UNUSED double zOffsetCenter, double risag, double rosag,
+                    double rimer, double romer, double alpha, double beta, double Ord, double WL, INOUT(double) DX, INOUT(double) DZ) { // TODO fix unused var
     double FX = normal.x;
     double FY = normal.y;
     double FZ = normal.z;
@@ -568,21 +568,13 @@ void RZPLineDensity(Ray r, dvec4 normal, int IMAGE_TYPE, int RZP_TYPE, int DERIV
     double c_alpha = r8_cos(alpha);
 
 
-    if (zOffsetCenter != 0) {
-        #ifdef CPP
-        RAYX_WARN << "zOffsetCenter not used!"; // TODO
-        #endif
-    }
+	/*
     if (DERIVATION_METHOD == 1) {
-        /*
         DX = getLineDensity1d(ptr_dx,x,z);
         DZ = getLineDensity1d(ptr_dz,x,z);
         return;
-        */
-        #ifdef CPP
-        RAYX_WARN << "DERIVATION_METHOD = 1 not implemented!"; // TODO
-        #endif
     }
+	*/
     double xi = 0;
     double yi = 0;
     double zi = 0;
@@ -759,14 +751,8 @@ double vlsGrating(double lineDensity, double z, double vls[6]) {
  * @param normal		normal at ray-object intersection (for planes always (0,1,0))
  * @param a			a = WL * D0 * ORD * 1.e-6  with D0: line density (l/mm); WL:wavelength (nm); ORD order of diffraction
  */
-Ray refrac_plane(Ray r, dvec4 normal, double a) {
+Ray refrac_plane(Ray r, ALLOW_UNUSED dvec4 normal, double a) { // TODO fix unused var
     double y1 = r.direction[1] * r.direction[1] + r.direction[2] * r.direction[2] - (r.direction[2] - a) * (r.direction[2] - a);
-    if (normal.x != 0) {
-        #ifdef CPP
-        RAYX_WARN << "normal unused!"; // TODO
-        #endif
-    }
-
     if (y1 > 0) {
         y1             = sqrt(y1);
         r.direction[1] = y1;

@@ -4,9 +4,11 @@
 #ifdef CPP
     #define INOUT(x) x&
     #define OUT(x) x&
+    #define ALLOW_UNUSED [[maybe_unused]]
 #else
     #define INOUT(x) inout x
     #define OUT(x) out x
+    #define ALLOW_UNUSED
 
 	#extension GL_ARB_separate_shader_objects : enable
 	#extension GL_ARB_gpu_shader_int64 : enable

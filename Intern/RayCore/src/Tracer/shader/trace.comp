@@ -63,13 +63,8 @@ Ray traceSlit(Ray r, const int elementIndex, INOUT(uint64_t) ctr, dvec4 intersec
  *
  * output: reflected Ray with intersection point as position, reflection as direction in ELEMENT coordinates and possibly modified weight
  */
-Ray traceToroid(Ray r, const int elementIndex, INOUT(uint64_t) ctr, dvec4 intersectionPoint) {
+Ray traceToroid(Ray r, const int elementIndex, INOUT(uint64_t) ctr, ALLOW_UNUSED dvec4 intersectionPoint) { // TODO fix unused var
     Element tor = quadricData[elementIndex];
-    if (intersectionPoint.x != 0) {
-        #ifdef CPP
-        RAYX_WARN << "why is intersectionPoint unused?"; // TODO
-        #endif
-    }
 
     // store old position, needed for pathlength calculation
     dvec3 old_position = r.position;
@@ -435,14 +430,7 @@ Ray traceEllipsoidMirror(Ray r, const int elementIndex, INOUT(uint64_t) ctr, dve
  * @param intersection	intersection point of ray with optical element in ELMENT coordinates
  * @return  reflected Ray with intersection point as position in ELEMENT coordinates
  */
-Ray traceImagePlane(Ray r, const int elementIndex, dvec4 intersection) {
-
-    if (elementIndex != -1) {
-        #ifdef CPP
-        RAYX_WARN << "why is elementIndex unused?"; // TODO
-        #endif
-    }
-
+Ray traceImagePlane(Ray r, ALLOW_UNUSED const int elementIndex, dvec4 intersection) { // TODO fix unused var
     // path length in element coordinates
     dvec3 intersection_xyz = dvec3(intersection.x, intersection.y, intersection.z);
     r.pathLength += length(r.position - intersection_xyz);
