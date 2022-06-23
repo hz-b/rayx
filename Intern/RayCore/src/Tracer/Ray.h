@@ -58,23 +58,5 @@ struct RAYX_API Ray {
         ray.m_extraParam = extraParam;
         return ray;
     }
-
-    // TODO(Jannis): remove
-    double getxDir() const { return m_direction.x; }
-    double getyDir() const { return m_direction.y; }
-    double getzDir() const { return m_direction.z; }
-    double getxPos() const { return m_position.x; }
-    double getyPos() const { return m_position.y; }
-    double getzPos() const { return m_position.z; }
-    double getEnergy() const { return m_energy; }
-    double getWeight() const { return m_weight; }
-    double getS0() const { return m_stokes.x; }
-    double getS1() const { return m_stokes.y; }
-    double getS2() const { return m_stokes.z; }
-    double getS3() const { return m_stokes.w; }
-    double getPathLength() const { return m_pathLength; }
-    double getOrder() const { return m_order; }
-    double getLastElement() const { return m_lastElement; }
-    double getExtraParam() const { return m_extraParam; }
 };
 }  // namespace RAYX

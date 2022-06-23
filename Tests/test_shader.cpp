@@ -107,22 +107,22 @@ std::list<double> runTracer(
     // pathlength, order, lastElement, extraParam
     for (auto iter = outputRayVector.begin(); iter != outputRayVector.end();
          iter++) {
-        outputRays.push_back((*iter).getxPos());
-        outputRays.push_back((*iter).getyPos());
-        outputRays.push_back((*iter).getzPos());
-        outputRays.push_back((*iter).getWeight());
-        outputRays.push_back((*iter).getxDir());
-        outputRays.push_back((*iter).getyDir());
-        outputRays.push_back((*iter).getzDir());
-        outputRays.push_back((*iter).getEnergy());
-        outputRays.push_back((*iter).getS0());
-        outputRays.push_back((*iter).getS1());
-        outputRays.push_back((*iter).getS2());
-        outputRays.push_back((*iter).getS3());
-        outputRays.push_back((*iter).getPathLength());
-        outputRays.push_back((*iter).getOrder());
-        outputRays.push_back((*iter).getLastElement());
-        outputRays.push_back((*iter).getExtraParam());
+        outputRays.push_back((*iter).m_position.x);
+        outputRays.push_back((*iter).m_position.y);
+        outputRays.push_back((*iter).m_position.z);
+        outputRays.push_back((*iter).m_weight);
+        outputRays.push_back((*iter).m_direction.x);
+        outputRays.push_back((*iter).m_direction.y);
+        outputRays.push_back((*iter).m_direction.z);
+        outputRays.push_back((*iter).m_energy);
+        outputRays.push_back((*iter).m_stokes.x);
+        outputRays.push_back((*iter).m_stokes.y);
+        outputRays.push_back((*iter).m_stokes.z);
+        outputRays.push_back((*iter).m_stokes.w);
+        outputRays.push_back((*iter).m_pathLength);
+        outputRays.push_back((*iter).m_order);
+        outputRays.push_back((*iter).m_lastElement);
+        outputRays.push_back((*iter).m_extraParam);
     }
     std::cout << "got " << outputRays.size() << " values from shader"
               << std::endl;

@@ -82,22 +82,22 @@ TEST(RayTest, test1) {
     double extraParam = 7;
     RAYX::Ray r{x,  y,  z,  weight, xdir,       ydir,  zdir,        energy,
                 s0, s1, s2, s3,     pathLength, order, lastElement, extraParam};
-    CHECK_EQ(r.getxPos(), x);
-    CHECK_EQ(r.getyPos(), y);
-    CHECK_EQ(r.getzPos(), z);
-    CHECK_EQ(r.getxDir(), xdir);
-    CHECK_EQ(r.getyDir(), ydir);
-    CHECK_EQ(r.getzDir(), zdir);
-    CHECK_EQ(r.getWeight(), weight);
-    CHECK_EQ(r.getEnergy(), energy);
-    CHECK_EQ(r.getS0(), s0);
-    CHECK_EQ(r.getS1(), s1);
-    CHECK_EQ(r.getS2(), s2);
-    CHECK_EQ(r.getS3(), s3);
-    CHECK_EQ(r.getPathLength(), pathLength);
-    CHECK_EQ(r.getOrder(), order);
-    CHECK_EQ(r.getLastElement(), lastElement);
-    CHECK_EQ(r.getExtraParam(), extraParam);
+    CHECK_EQ(r.m_position.x, x);
+    CHECK_EQ(r.m_position.y, y);
+    CHECK_EQ(r.m_position.z, z);
+    CHECK_EQ(r.m_direction.x, xdir);
+    CHECK_EQ(r.m_direction.y, ydir);
+    CHECK_EQ(r.m_direction.z, zdir);
+    CHECK_EQ(r.m_weight, weight);
+    CHECK_EQ(r.m_energy, energy);
+    CHECK_EQ(r.m_stokes.x, s0);
+    CHECK_EQ(r.m_stokes.y, s1);
+    CHECK_EQ(r.m_stokes.z, s2);
+    CHECK_EQ(r.m_stokes.w, s3);
+    CHECK_EQ(r.m_pathLength, pathLength);
+    CHECK_EQ(r.m_order, order);
+    CHECK_EQ(r.m_lastElement, lastElement);
+    CHECK_EQ(r.m_extraParam, extraParam);
 }
 
 TEST(RayTest, testDefaultValues) {
@@ -118,22 +118,22 @@ TEST(RayTest, testDefaultValues) {
     double s3 = 0;
     RAYX::Ray r{x,  y,  z,  weight, xdir, ydir, zdir, energy,
                 s0, s1, s2, s3,     0,    0,    0,    0};
-    CHECK_EQ(r.getxPos(), x);
-    CHECK_EQ(r.getyPos(), y);
-    CHECK_EQ(r.getzPos(), z);
-    CHECK_EQ(r.getxDir(), xdir);
-    CHECK_EQ(r.getyDir(), ydir);
-    CHECK_EQ(r.getzDir(), zdir);
-    CHECK_EQ(r.getWeight(), weight);
-    CHECK_EQ(r.getEnergy(), energy);
-    CHECK_EQ(r.getS0(), s0);
-    CHECK_EQ(r.getS1(), s1);
-    CHECK_EQ(r.getS2(), s2);
-    CHECK_EQ(r.getS3(), s3);
-    CHECK_EQ(r.getPathLength(), 0);
-    CHECK_EQ(r.getOrder(), 0);
-    CHECK_EQ(r.getLastElement(), 0);
-    CHECK_EQ(r.getExtraParam(), 0);
+    CHECK_EQ(r.m_position.x, x);
+    CHECK_EQ(r.m_position.y, y);
+    CHECK_EQ(r.m_position.z, z);
+    CHECK_EQ(r.m_direction.x, xdir);
+    CHECK_EQ(r.m_direction.y, ydir);
+    CHECK_EQ(r.m_direction.z, zdir);
+    CHECK_EQ(r.m_weight, weight);
+    CHECK_EQ(r.m_energy, energy);
+    CHECK_EQ(r.m_stokes.x, s0);
+    CHECK_EQ(r.m_stokes.y, s1);
+    CHECK_EQ(r.m_stokes.z, s2);
+    CHECK_EQ(r.m_stokes.w, s3);
+    CHECK_EQ(r.m_pathLength, 0);
+    CHECK_EQ(r.m_order, 0);
+    CHECK_EQ(r.m_lastElement, 0);
+    CHECK_EQ(r.m_extraParam, 0);
 }
 
 TEST(MatrixTest, testParams) {
