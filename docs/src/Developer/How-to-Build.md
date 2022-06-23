@@ -3,7 +3,7 @@
 For building the project and running the project, we recommend to use [Visual Studio Code](https://code.visualstudio.com/) as your IDE with these extensions: C/C++ and CMake Tools. You can use any IDE you like, but the VSCode extensions make the building process very easy.
 
 Clone the git repository with:
-`git clone --recurse-submodules git@gitlab.helmholtz-berlin.de:RAY/RAY-X.git -b development`
+`git clone --recurse-submodules git@github.com:hz-b/RAY-X.git -b development`
 
 to get the dev branch and to make sure, you also clone all of it's submodules.
 

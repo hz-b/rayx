@@ -28,7 +28,7 @@ mainLoop():
 ---
 # **How the VulkanTracer works**
 
-![vulkan_flow](../res/vulkan_flow.png)
+![vulkan_flow](/docs/src/uploads/fe29b8ceeb1467bec87aed5de3144cad/vulkan_flow.png)
 
 ## _Buffer types used:_
 
@@ -41,13 +41,13 @@ mainLoop():
 
 **Vulkan commands (Recording and pushing to pipeline):**
 
-![CommandBuffers](../res/CommandBuffers.png)
+![CommandBuffers](/docs/src/uploads/ed43760242d13d1004607fef0131747e/CommandBuffers.png)
 
 ---
 
 **Layout concept (applied on "Sets" using `storage buffer|uniform buffer`):**
 
-![DescriptorLayouts](../res/DescriptorLayouts.png)
+![DescriptorLayouts](/docs/src/uploads/090e2e5c162e12db1f5a93a1b30dbb79/DescriptorLayouts.png)
 
 ---
 # Buffers:

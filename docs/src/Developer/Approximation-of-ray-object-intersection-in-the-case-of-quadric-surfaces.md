@@ -16,4 +16,4 @@ Currently, we are calculating the intersection of a planar surface in the xz-pla
 This could lead to a reported hit (resp. miss) of the object, where there should be a miss (resp. hit).
 
 
-![image](../res/wastebox.png)
+![image](/docs/src/uploads/809e84f0b69db93770ef0cd57729b892/image.png)
