@@ -3,16 +3,18 @@ cmake_minimum_required(VERSION 3.2 FATAL_ERROR)
 project(RayCore)
 
 SET(SOURCE
-    src/Application.cpp
     src/PathResolver.cpp
     src/Debug.cpp
     src/utils.cpp
+    src/Data/Exporter.cpp
+    src/Data/Importer.cpp
+    src/Data/xml.cpp
+    src/Data/DatFile.cpp
     src/Model/Beamline/Beamline.cpp
     src/Model/Beamline/BeamlineObject.cpp
     src/Model/Beamline/OpticalElement.cpp
     src/Model/Beamline/LightSource.cpp
     src/Model/Beamline/EnergyDistribution.cpp
-    src/Model/Beamline/BeamlineObjectFactory.cpp
     src/Model/Beamline/Objects/ImagePlane.cpp
     src/Model/Beamline/Objects/MatrixSource.cpp
     src/Model/Beamline/Objects/RandomRays.cpp
@@ -28,32 +30,23 @@ SET(SOURCE
     src/Model/Beamline/Objects/ToroidMirror.cpp
     src/Model/Beamline/Objects/Cylinder.cpp
     src/Model/Beamline/Objects/Cone.cpp
-    src/Data/Exporter.cpp
-    src/Data/Importer.cpp
-    src/Data/xml.cpp
-    src/Data/DatFile.cpp
-    src/Presenter/Presenter.cpp
-    src/Presenter/SimulationEnv.cpp
     src/Model/Surface/Quadric.cpp
     src/Model/Surface/Toroid.cpp
     src/Model/Surface/Surface.cpp
     src/Model/Geometry/Geometry.cpp
+    src/Material/Material.cpp
+    src/Material/NffTable.cpp
+    src/Material/PalikTable.cpp
     src/Tracer/RayList.cpp
-    src/Tracer/DebugBufList.cpp
-    src/Tracer/TracerInterface.cpp
-    src/Tracer/Writer/CSVWriter.cpp
-    src/Tracer/Writer/H5Writer.cpp
-    src/Tracer/TracerInterface.cpp
-    src/Tracer/Vulkan/VulkanTracer.cpp
-    src/Tracer/Vulkan/Material.cpp
-    src/Tracer/Vulkan/NffTable.cpp
-    src/Tracer/Vulkan/PalikTable.cpp
+    src/Tracer/VulkanTracer.cpp
+    src/Tracer/CpuTracer.cpp
+    src/Writer/CSVWriter.cpp
+    src/Writer/H5Writer.cpp
     src/UserParameter/WorldUserParams.cpp
     src/UserParameter/GeometricUserParams.cpp
 )
 
 SET(HEADERS
-    src/Application.h
     src/PathResolver.h
     src/utils.h
     src/Model/Beamline/Beamline.h
@@ -61,7 +54,6 @@ SET(HEADERS
     src/Model/Beamline/OpticalElement.h
     src/Model/Beamline/LightSource.h
     src/Model/Beamline/EnergyDistribution.h
-    src/Model/Beamline/BeamlineObjectFactory.h
     src/Model/Beamline/Objects/ImagePlane.h
     src/Model/Beamline/Objects/MatrixSource.h
     src/Model/Beamline/Objects/RandomRays.h
@@ -80,24 +72,21 @@ SET(HEADERS
     src/Data/Importer.h
     src/Data/xml.h
     src/Data/DatFile.h
-    src/Presenter/Presenter.h
-    src/Presenter/SimulationEnv.h
     src/Model/Surface/Quadric.h
     src/Model/Surface/Toroid.h
     src/Model/Surface/Surface.h
     src/Model/Geometry/Geometry.h
     src/Tracer/RayList.h
     src/Tracer/Ray.h
-    src/Tracer/DebugBuf.h
-    src/Tracer/DebugBufList.h
-    src/Tracer/TracerInterface.h
-    src/Tracer/Writer/Writer.hpp
-    src/Tracer/Writer/CSVWriter.hpp
-    src/Tracer/Writer/H5Writer.hpp
-    src/Tracer/Vulkan/VulkanTracer.h
-    src/Tracer/Vulkan/Material.h
-    src/Tracer/Vulkan/NffTable.h
-    src/Tracer/Vulkan/PalikTable.h
+    src/Tracer/Tracer.h
+    src/Tracer/CpuTracer.h
+    src/Writer/Writer.hpp
+    src/Writer/CSVWriter.hpp
+    src/Writer/H5Writer.hpp
+    src/Tracer/VulkanTracer.h
+    src/Material/Material.h
+    src/Material/NffTable.h
+    src/Material/PalikTable.h
     src/UserParameter/WorldUserParams.h
     src/UserParameter/GeometricUserParams.h
 )
@@ -169,7 +158,7 @@ if (WIN32)
             ${COMPILED_SHADER}
             ${COMPILED_SHADER_FAKE}
         COMMAND "$ENV{VULKAN_SDK}/Bin/glslc.exe"
-        ARGS ${RayCore_SOURCE_DIR}/src/Tracer/Vulkan/shader.comp -o ${COMPILED_SHADER}
+        ARGS ${RayCore_SOURCE_DIR}/src/Tracer/shader/main-glsl.comp -o ${COMPILED_SHADER}
     )
 elseif (UNIX)
     add_custom_command(
@@ -177,7 +166,7 @@ elseif (UNIX)
             ${COMPILED_SHADER}
             ${COMPILED_SHADER_FAKE}
         COMMAND "glslc"
-        ARGS ${RayCore_SOURCE_DIR}/src/Tracer/Vulkan/shader.comp -o ${COMPILED_SHADER}
+        ARGS ${RayCore_SOURCE_DIR}/src/Tracer/shader/main-glsl.comp -o ${COMPILED_SHADER}
     )
     # set_property(TARGET ${PROJECT_NAME} PROPERTY POSITION_INDEPENDENT_CODE ON)
 endif ()

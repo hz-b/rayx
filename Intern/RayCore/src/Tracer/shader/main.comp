@@ -1,16 +1,59 @@
-// Working compute shader main entry point
-
-#version 450
-#extension GL_ARB_separate_shader_objects : enable
-#extension GL_ARB_gpu_shader_int64 : enable
-#extension GL_GOOGLE_include_directive : enable
-
 #define WORKGROUP_SIZE 32
-#include "shader-include/settings.comp"
-layout(local_size_x = WORKGROUP_SIZE, local_size_y = 1, local_size_z = 1) in;
+#include "settings.comp"
+
+#ifdef CPP
+    #define INOUT(x) x&
+    #define OUT(x) x&
+    #define ALLOW_UNUSED [[maybe_unused]]
+#else
+    #define INOUT(x) inout x
+    #define OUT(x) out x
+    #define ALLOW_UNUSED
+
+	#extension GL_ARB_separate_shader_objects : enable
+	#extension GL_ARB_gpu_shader_int64 : enable
+	#extension GL_GOOGLE_include_directive : enable
+
+	layout(local_size_x = WORKGROUP_SIZE, local_size_y = 1, local_size_z = 1) in;
+#endif
+
 const double PI       = 3.14159265358979323846264338327950;
-const uint64_t rngKey = (0xc8e4fd15 << 32) | 0x4ce32f6d;
+const uint64_t rngKey = 13; // TODO(rudi) this was the old key, it generated a warning: (0xc8e4fd15 << 32) | 0x4ce32f6d;
 const double inm2eV   = 1.239852e3;
+
+#ifdef CPP
+	// this type intends to mimic the GLSL type T[], this is used for layouts.
+	template <typename T>
+	struct ShaderArray {
+		std::vector<T> data;
+
+		int length() {
+			return data.size();
+		}
+		T& operator [](int i) {
+			return data[i];
+		}
+	};
+
+	using dvec2 = glm::dvec2;
+
+	double length(dvec2 v) {
+		return sqrt(v.x*v.x + v.y*v.y);
+	}
+
+	using dvec3 = glm::dvec3;
+	using dvec4 = glm::dvec4;
+	using dmat3 = glm::dmat3;
+	using dmat4 = glm::dmat4;
+
+	double mod(double x, double y) {
+		return glm::mod(x, y);
+	}
+
+	double sign(double x) {
+		return glm::sign(x);
+	}
+#endif
 
 /* STRUCTS */
 struct Ray {
@@ -33,88 +76,68 @@ struct Element {
 };
 
 #ifdef DEBUG
-struct _debug_struct {
-    dmat4 _dMat; // Can also be used as vectors or scalar
-};
+	struct _debug_struct {
+		dmat4 _dMat; // Can also be used as vectors or scalar
+	};
 #endif 
 /* LAYOUTS */
-layout(std140, binding = 0) buffer ibuf { Ray rayData[]; };
+#ifdef CPP
+	int gl_GlobalInvocationID;
 
-layout(std140, binding = 1) buffer obuf { Ray outputData[]; };
+	ShaderArray<Ray> rayData;
+	ShaderArray<Ray> outputData;
+	double numberOfBeamlines;
+	double numberOfElementsPerBeamline;
+	double numberOfRays;
+	double numberOfRaysPerBeamLine;
+	ShaderArray<Element> quadricData;
+	ShaderArray<dvec4> xyznull;
+	ShaderArray<int> matIdx;
+	ShaderArray<double> mat;
+	#ifdef DEBUG
+		ShaderArray<_debug_struct> d_struct;
+	#endif
+#else
+	layout(std140, binding = 0) buffer ibuf { Ray rayData[]; };
 
-layout(std140, binding = 2) buffer qbuf {
-    double numberOfBeamlines;
-    double numberOfElementsPerBeamline;
-    double numberOfRays;
-    double numberOfRaysPerBeamLine;
-    Element quadricData[];
-};
+	layout(std140, binding = 1) buffer obuf { Ray outputData[]; };
 
-layout(std140, binding = 3) buffer xyzbuf { dvec4 xyznull[]; };
+	layout(std140, binding = 2) buffer qbuf {
+		double numberOfBeamlines;
+		double numberOfElementsPerBeamline;
+		double numberOfRays;
+		double numberOfRaysPerBeamLine;
+		Element quadricData[];
+	};
 
-layout(binding = 4) buffer materialIndexBuf {
-    int matIdx[]; // matIdx[0..91] contains the indices of the Palik Table, whereas matIdx[92..92+91] contains the indices of the NffTable.
-				  // generally, an entry of matIdx tells you the index you need to look up in the 'mat'-table below.
-};
+	layout(std140, binding = 3) buffer xyzbuf { dvec4 xyznull[]; };
 
-layout(binding = 5) buffer materialBuf {
-    double mat[];  // contains: (Palik tables of all materials concatenated together) concatenated with (Nff tables of all materials concatenated together)
-				   // use the matIdx-table to determine the relevant indices for when which table starts and stops.
-};
+	layout(binding = 4) buffer materialIndexBuf {
+		int matIdx[]; // matIdx[0..91] contains the indices of the Palik Table, whereas matIdx[92..92+91] contains the indices of the NffTable.
+					  // generally, an entry of matIdx tells you the index you need to look up in the 'mat'-table below.
+	};
 
-#ifdef DEBUG
-layout(binding = 6) buffer debugBuf {
-    _debug_struct d_struct[];  // contains nff table of all materials concatenated together
-};
+	layout(binding = 5) buffer materialBuf {
+		double mat[];  // contains: (Palik tables of all materials concatenated together) concatenated with (Nff tables of all materials concatenated together)
+					   // use the matIdx-table to determine the relevant indices for when which table starts and stops.
+	};
+
+	#ifdef DEBUG
+		layout(binding = 6) buffer debugBuf {
+			_debug_struct d_struct[];  // contains nff table of all materials concatenated together
+		};
+	#endif
 #endif
+
 // Order in #include is IMPROTANT, do not change.
 // clang-format off
-#include "shader-include/approx.comp"
-#include "shader-include/complex.comp"
-#include "shader-include/random.comp"
-#include "shader-include/utils.comp"
-#include "shader-include/intersection.comp"
-#include "shader-include/trace.comp"
+#include "approx.comp"
+#include "complex.comp"
+#include "random.comp"
+#include "utils.comp"
+#include "intersection.comp"
+#include "trace.comp"
 // clang-format on
-
-/*
- * iterate through all elements (sequentially) and trace rays element by element
- * NOT USED ANYMORE
- */
-void iterateElements() {  // unused
-    double type;
-    uint numberOfElements = quadricData.length();
-    // ray specific "seed" for random numbers -> every ray has a different starting value for the counter that creates the random numbter
-    uint64_t workerCounterNum = (~(uint64_t(0)) / uint64_t(numberOfRays));
-    uint64_t ctr              = uint(gl_GlobalInvocationID) * workerCounterNum;
-
-    for (int i = 0; i < numberOfElementsPerBeamline; i++) {
-        Element e = quadricData[i];
-
-        type               = int(e.surfaceParams[3][0]);
-        dvec4 intersection = getOpticalElementIntersection(rayData[uint(gl_GlobalInvocationID)], i);
-
-        if (type == 0) {  // mirror
-            rayData[uint(gl_GlobalInvocationID)] = traceMirror(rayData[uint(gl_GlobalInvocationID)], i, ctr, intersection);
-        } else if (type == 1) {  // plane grating
-            rayData[uint(gl_GlobalInvocationID)] = tracePlaneGrating(rayData[uint(gl_GlobalInvocationID)], i, ctr, intersection);
-        } else if (type == 2) {  // general grating
-            rayData[uint(gl_GlobalInvocationID)] = traceGeneralGrating(rayData[uint(gl_GlobalInvocationID)], i, ctr, intersection);
-        } else if (type == 3) {  // Slit
-            rayData[uint(gl_GlobalInvocationID)] = traceSlit(rayData[uint(gl_GlobalInvocationID)], i, ctr, intersection);
-        } else if (type == 4) {  // rzp
-            rayData[uint(gl_GlobalInvocationID)] = traceRZP(rayData[uint(gl_GlobalInvocationID)], i, ctr, intersection);
-        } else if (type == 5) {  // image plane
-            rayData[uint(gl_GlobalInvocationID)] = traceImagePlane(rayData[uint(gl_GlobalInvocationID)], i, intersection);
-        } else if (type == 6) {  // toroid mirror
-            rayData[uint(gl_GlobalInvocationID)] = traceToroid(rayData[uint(gl_GlobalInvocationID)], i, ctr, intersection);
-        } else if (type == 7) {  // ellipsoid mirror
-            rayData[uint(gl_GlobalInvocationID)] = traceEllipsoidMirror(rayData[uint(gl_GlobalInvocationID)], i, ctr, intersection);
-        }
-        // rayData[uint(gl_GlobalInvocationID)] = rayMatrixMult(rayData[uint(gl_GlobalInvocationID)], q.outTrans);
-    }
-    outputData[uint(gl_GlobalInvocationID)] = rayData[uint(gl_GlobalInvocationID)];
-}
 
 // @brief: Dynamic ray tracing: check which ray hits which element first
 // in this function we need to make sure that rayData ALWAYS remains in GLOBAL coordinates (it can be changed in a function but needs to be changed
@@ -125,7 +148,6 @@ void dynamicElements() {
     const int maxBounces  = numberOfElements;
     Ray ray               = rayData[uint(gl_GlobalInvocationID)];
     uint beamlineIndex    = uint(double(gl_GlobalInvocationID) / numberOfRaysPerBeamLine);
-    int whichIntersection = 1;
 
     // ray specific "seed" for random numbers -> every ray has a different starting value for the counter that creates the random number
     uint64_t workerCounterNum = (~(uint64_t(0)) / int(numberOfRays));
@@ -136,7 +158,6 @@ void dynamicElements() {
     int lastClosestElementIndex;
     dvec4 closestHitpoint = dvec4(1.0 / 0.0, 1.0 / 0.0, 1.0 / 0.0, 0.0);
     dvec4 closestGlobalHitpoint;
-    double threshold = 0.001;
     
     #ifdef DEBUG
     // Set Debug Struct of current Ray to identity
@@ -168,14 +189,18 @@ void dynamicElements() {
             }
 
             dvec4 currentIntersection = getOpticalElementIntersection(ray, elementIndex);
+            dvec3 currentIntersection_xyz = dvec3(currentIntersection.x, currentIntersection.y, currentIntersection.z);
 
             // Intersection coordinates in GLOBAL coordinates
             dvec4 currentGlobalIntersection;
-            currentGlobalIntersection.xyz = dvec3(quadricData[elementIndex].outTrans * dvec4(currentIntersection.xyz, 1));
+            dvec3 tmp = dvec3(quadricData[elementIndex].outTrans * dvec4(currentIntersection_xyz, 1));
+            currentGlobalIntersection = dvec4(tmp, currentGlobalIntersection.w);
+            dvec3 currentGlobalIntersection_xyz = dvec3(currentGlobalIntersection.x, currentGlobalIntersection.y, currentGlobalIntersection.z);
 
+            dvec3 closestGlobalHitpoint_xyz = dvec3(closestGlobalHitpoint.x, closestGlobalHitpoint.y, closestGlobalHitpoint.z);
             // check if current intersection is closer than the closest previous Hitpoint
             // If yes then update. Since the old intersection is occluded by the old Intersection/Hit point
-            if (length(ray.position - closestGlobalHitpoint.xyz) > length(ray.position - currentGlobalIntersection.xyz) &&
+            if (length(ray.position - closestGlobalHitpoint_xyz) > length(ray.position - currentGlobalIntersection_xyz) &&
                 currentIntersection.w != 0) {
                 closestHitpoint       = currentIntersection;
                 closestGlobalHitpoint = currentGlobalIntersection;
@@ -287,7 +312,7 @@ void runTraceFunctions() {
         rayData[uint(gl_GlobalInvocationID)] = res;
     } else if (settings == 4) {  // test vls grating
         double b_params[6] =
-            double[6](r.position.x, r.position.y, r.position.z, r.direction.x, r.direction.y, r.direction.z);  //(0.1,0.1,0.1,0.01,0.02,0.03);
+            {r.position.x, r.position.y, r.position.z, r.direction.x, r.direction.y, r.direction.z};  //(0.1,0.1,0.1,0.01,0.02,0.03);
         double z                             = r.energy;
         double a                             = r.weight;
         res.weight                           = vlsGrating(a, z, b_params);
@@ -422,7 +447,7 @@ void runTraceFunctions() {
     } else if (settings == 20) {  // test iteratTo (method for finding intersection and normal for non-quadric surfaces like the torus)
         double longRadius                    = r.stokes.x;
         double shortRadius                   = r.stokes.y;
-        dvec4 normal                         = iteratTo(r, longRadius, shortRadius);
+        iteratTo(r, longRadius, shortRadius);
         res.position                         = r.position;
         res.direction                        = r.direction;  // normal?
         rayData[uint(gl_GlobalInvocationID)] = res;

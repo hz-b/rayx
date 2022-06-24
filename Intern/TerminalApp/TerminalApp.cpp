@@ -4,6 +4,8 @@
 #include "PathResolver.h"
 
 // TODO: (potential) Replace Getopt with boost(header-only)
+#include <Tracer/CpuTracer.h>
+#include <Tracer/VulkanTracer.h>
 #include <unistd.h>
 
 #include <memory>
@@ -31,33 +33,21 @@ void TerminalApp::run() {
     // Load RML files
     if (m_CommandParser->m_optargs.m_providedFile != NULL) {
         // load rml file
-        m_Beamline = std::make_shared<RAYX::Beamline>(
+        m_Beamline = std::make_unique<RAYX::Beamline>(
             RAYX::importBeamline(m_CommandParser->m_optargs.m_providedFile));
-        m_Presenter = RAYX::Presenter(m_Beamline);
     } else {
-        // Benchmark mode
-        if (m_CommandParser->m_optargs.m_benchmark) {
-            RAYX_D_LOG << "Starting in Benchmark Mode.\n";
-        }
-
-        if (m_CommandParser->m_optargs.m_dummyFlag) {
-            RAYX_D_LOG << "Loading dummy beamline.";
-            loadDummyBeamline();
-        } else {
-            RAYX_LOG << "No Pipeline/Beamline provided, exiting..";
-            exit(1);
-        }
+        RAYX_LOG << "No Pipeline/Beamline provided, exiting..";
+        exit(1);
     }
 
-    bool useCsv = false;
-    // Output File format
-    if (m_CommandParser->m_optargs.m_csvFlag ==
-        CommandParser::OptFlags::Enabled) {
-        useCsv = true;
+    if (m_CommandParser->m_optargs.m_cpuFlag) {
+        m_Tracer = std::make_unique<RAYX::CpuTracer>();
+    } else {
+        m_Tracer = std::make_unique<RAYX::VulkanTracer>();
     }
 
     // Run RAY-X Core
-    m_Presenter.run(useCsv);
+    auto rays = m_Tracer->trace(*m_Beamline);
 
     if (m_CommandParser->m_optargs.m_benchmark) {
         std::chrono::steady_clock::time_point end =

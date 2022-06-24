@@ -3,7 +3,6 @@
 #include <math.h>
 
 #include "Debug.h"
-#include "Presenter/SimulationEnv.h"
 
 namespace RAYX {
 /**

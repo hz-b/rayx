@@ -1,5 +1,7 @@
 #pragma once
 
+#include <Material/Material.h>
+
 #include <cstdlib>
 #include <iostream>
 #include <map>
@@ -7,8 +9,8 @@
 #include <stdexcept>
 
 #include "Core.h"
-#include "Material.h"
 #include "Tracer/RayList.h"
+#include "Tracer/Tracer.h"
 #include "vulkan/vulkan.hpp"
 
 #ifdef NDEBUG
@@ -53,10 +55,14 @@ void DestroyDebugUtilsMessengerEXT(VkInstance instance,
 
 const int WORKGROUP_SIZE = 32;
 
-class RAYX_API VulkanTracer {
+class RAYX_API VulkanTracer : public Tracer {
   public:
     VulkanTracer();
     ~VulkanTracer();
+
+    RayList trace(const Beamline&) override;
+
+  private:
     void run();
     // void addRay(double xpos, double ypos, double zpos, double xdir, double
     // ydir, double zdir, double weight); void addRay(double* location);
@@ -163,7 +169,6 @@ class RAYX_API VulkanTracer {
 
     // Material tables
     MaterialTables m_MaterialTables;
-    std::array<bool, 92> m_relevantMaterials;
 
     struct Settings {
         bool m_isDebug;

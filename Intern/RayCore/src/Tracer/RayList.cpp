@@ -18,18 +18,22 @@ RayList::~RayList() {}
  * Intactness of inRayVector is not guaranteed.
  * @param inRayVector vector of Rays to be inserted
  */
-void RayList::insertVector(std::vector<Ray>&& inRayVector) {
+void RayList::insertVector(const std::vector<Ray>& inRayVector) {
     // note that this can be optimized quite a bit.
     // But the previous "optimized" version had multiple memory unsafety issues
     // and was hence replaced.
 
     for (Ray r : inRayVector) {
-        if (m_rayList.empty() ||
-            m_rayList.back().size() == RAY_MAX_ELEMENTS_IN_VECTOR) {
-            m_rayList.push_back({});
-        }
-        m_rayList.back().push_back(r);
+        push(r);
     }
+}
+
+void RayList::push(Ray r) {
+    if (m_rayList.empty() ||
+        m_rayList.back().size() == RAY_MAX_ELEMENTS_IN_VECTOR) {
+        m_rayList.push_back({});
+    }
+    m_rayList.back().push_back(r);
 }
 
 void RayList::clean() { m_rayList.clear(); }

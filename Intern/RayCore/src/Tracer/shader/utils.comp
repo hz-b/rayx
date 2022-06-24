@@ -29,7 +29,7 @@ Ray rotationAroundX(Ray r, double sin_psi, double cos_psi) {
  *
  * output: nothing. changes r in place
  */
-void inTransformation(inout Ray r, const dmat4 misalignment, const dmat4 inTrans) {
+void inTransformation(INOUT(Ray) r, const dmat4 misalignment, const dmat4 inTrans) {
     r.position  = dvec3(misalignment * (inTrans * dvec4(r.position, 1)));
     r.direction = dvec3(misalignment * (inTrans * dvec4(r.direction, 0)));
 }
@@ -45,7 +45,7 @@ void inTransformation(inout Ray r, const dmat4 misalignment, const dmat4 inTrans
  *
  * output: nothing. changes r in place
  */
-void outTransformation(inout Ray r, const dmat4 invMisalignment, const dmat4 outTrans) {
+void outTransformation(INOUT(Ray) r, const dmat4 invMisalignment, const dmat4 outTrans) {
     r.position  = dvec3(outTrans * (invMisalignment * dvec4(r.position, 1)));
     r.direction = dvec3(outTrans * (invMisalignment * dvec4(r.direction, 0)));
 }
@@ -55,9 +55,6 @@ double deg2rad(double degree) {
     // double PI = 3.141592653589793238462643383279502884197169399;//3 7 5 1 0 5 8 2 0 9 7 4 9 4 4 5 9
     return PI * degree / 180;
 }
-
-// dummy function for univariate random numbers
-double[3] random_number(int n) { return double[3](0.5, 0.5, 0.5); }
 
 // returns forial of a (from RAYLIB.for) (a!)
 double fact(int a) {
@@ -77,7 +74,7 @@ calculates direction cosini from angles phi,psi given in rad
         phi		horizontal angle in x-z-plane (pos.rotation, counterclockwise)
         phi		vertical angle in y-z-plane (pos.rotation, counterclockwise)
 */
-void cosini(inout Ray r, double phi, double psi) {
+void cosini(INOUT(Ray) r, double phi, double psi) {
     double cos_psi = r8_cos(psi);
     double cos_phi = r8_cos(phi);
     double sin_psi = r8_sin(psi);
@@ -163,9 +160,13 @@ double wasteBox(double x, double z, double xLengthA, double xLengthB, double zLe
 dvec2 getAtomicMassAndRho(int material) {
     switch(material) {
         #define X(e, z, a, rho) case z: return dvec2(a, rho);
-        #include "../materials.xmacro"
+        #include "../../Material/materials.xmacro"
         #undef X
     }
+    #ifdef CPP
+    RAYX_ERR << "invalid material in getAtomicMassAndRho";
+    #endif
+    return dvec2(0.0, 0.0);
 }
 
 struct PalikEntry {
@@ -343,7 +344,7 @@ dvec2 snell(dvec2 cos_incidence, dvec2 cn1, dvec2 cn2) {
  * @return complex_P			complex p-polarization
  *
  */
-void fresnel(dvec2 cn1, dvec2 cn2, dvec2 cos_incidence, dvec2 cos_transmittance, inout dvec2 complex_S, inout dvec2 complex_P) {
+void fresnel(dvec2 cn1, dvec2 cn2, dvec2 cos_incidence, dvec2 cos_transmittance, INOUT(dvec2) complex_S, INOUT(dvec2) complex_P) {
     dvec2 mat1_incidence     = cx_mul(cn1, cos_incidence);  // material one (incoming side)
     dvec2 mat1_transmittance = cx_mul(cn1, cos_transmittance);
     dvec2 mat2_incidence     = cx_mul(cn2, cos_incidence);  // material two (into which the ray goes)
@@ -361,7 +362,7 @@ void fresnel(dvec2 cn1, dvec2 cn2, dvec2 cos_incidence, dvec2 cos_transmittance,
  * @return complex_S			complex s-polarization
  * @return complex_P			complex p-polarization
  */
-void reflectance(double energy, double incidence_angle, inout dvec2 complex_S, inout dvec2 complex_P, int material) {
+void reflectance(double energy, double incidence_angle, INOUT(dvec2) complex_S, INOUT(dvec2) complex_P, int material) {
     dvec2 cos_incidence = dvec2(r8_cos(incidence_angle),
                                 0.0);  // complex number, initialization only for first layer, the others are then derived from this with snell's law
 
@@ -417,7 +418,7 @@ double phase_difference(dvec2 euler1, dvec2 euler2) {
  * @param material				material the photon collides with
  * @param others
  */
-void efficiency(Ray r, out double real_S, out double real_P, out double delta, double incidence_angle, int material) {
+void efficiency(Ray r, OUT(double) real_S, OUT(double) real_P, OUT(double) delta, double incidence_angle, int material) {
     dvec2 complex_S, complex_P;
     reflectance(r.energy, incidence_angle, complex_S, complex_P, material);
 
@@ -450,7 +451,7 @@ dmat4 muller_matrix(double R_s, double R_p, double delta) {
  * @param azimuthal	angle of rotation of element in xy plane (chi + dchi (misalignment))
  * @returns updated stokes vector of ray, updates weight of ray
  */
-void update_stokes(inout Ray r, double real_S, double real_P, double delta, double azimuthal, inout uint64_t ctr) {
+void update_stokes(INOUT(Ray) r, double real_S, double real_P, double delta, double azimuthal, INOUT(uint64_t) ctr) {
     dvec4 stokes_old = r.stokes;
     double c_chi     = r8_cos(azimuthal);
     double s_chi     = r8_sin(azimuthal);
@@ -522,10 +523,10 @@ adds slope error to the normal
     O_type: cartesian or cylindrical type of slope error (0=cartesian, 1=cylindrical) (1 only for ellipsis relevant)
 returns new normal if there is a slope error in either x or z direction or the unmodified normal otherwise.
 */
-dvec4 tanger(dvec4 normal, double slopeX, double slopeZ, int O_type, inout uint64_t ctr) {
+dvec4 tanger(dvec4 normal, double slopeX, double slopeZ, int O_type, INOUT(uint64_t) ctr) {
     // only calculate the random number if at least one slope error is not 0, since the calculation is costly (sin, cos, log involved)
     if (slopeX != 0 || slopeZ != 0) {
-        double random_values[2] = double[2](squaresNormalRNG(ctr, 0, slopeX), squaresNormalRNG(ctr, 0, slopeZ));
+        double random_values[2] = {squaresNormalRNG(ctr, 0, slopeX), squaresNormalRNG(ctr, 0, slopeZ)};
 
         /*double x = random_values[0] * slopeX; // to get normal distribution from std.-norm. multiply by sigma (=slopeX) -> mu + x * sigma but mu=0
         here double z = random_values[1] * slopeZ;*/
@@ -548,8 +549,8 @@ calculates DX and DZ (line spacing in x and z direction) at a given point for a 
 @params: lots
 @returns: (inplace) DX, DZ
 */
-void RZPLineDensity(Ray r, dvec4 normal, int IMAGE_TYPE, int RZP_TYPE, int DERIVATION_METHOD, double zOffsetCenter, double risag, double rosag,
-                    double rimer, double romer, double alpha, double beta, double Ord, double WL, inout double DX, inout double DZ) {
+void RZPLineDensity(Ray r, dvec4 normal, int IMAGE_TYPE, int RZP_TYPE, ALLOW_UNUSED int DERIVATION_METHOD, ALLOW_UNUSED double zOffsetCenter, double risag, double rosag,
+                    double rimer, double romer, double alpha, double beta, double Ord, double WL, INOUT(double) DX, INOUT(double) DZ) { // TODO fix unused var
     double FX = normal.x;
     double FY = normal.y;
     double FZ = normal.z;
@@ -566,17 +567,20 @@ void RZPLineDensity(Ray r, dvec4 normal, int IMAGE_TYPE, int RZP_TYPE, int DERIV
     double s_alpha = r8_sin(alpha);
     double c_alpha = r8_cos(alpha);
 
-    /*if (DERIVATION_METHOD == 1) {
+
+	/*
+    if (DERIVATION_METHOD == 1) {
         DX = getLineDensity1d(ptr_dx,x,z);
         DZ = getLineDensity1d(ptr_dz,x,z);
         return;
-    }*/
-    double xi;
-    double yi;
-    double zi;
-    double xm;
-    double ym;
-    double zm;
+    }
+	*/
+    double xi = 0;
+    double yi = 0;
+    double zi = 0;
+    double xm = 0;
+    double ym = 0;
+    double zm = 0;
 
     if (IMAGE_TYPE == 0) {         // point to point (standard)
         if (FX == 0 && FZ == 0) {  // plane
@@ -729,7 +733,7 @@ Ray refrac(Ray r, dvec4 normal, double linedensity) {
     vls[6]: 6 vls parameters given by user
 @returns line density specifically for this z-coordinate
 */
-double vlsGrating(double lineDensity, double z, double[6] vls) {
+double vlsGrating(double lineDensity, double z, double vls[6]) {
     // lineDensity = lineDensity * (1 + 2*b2*z + 3*b3*z**2 + 4*b4*z**3 + 5*b5*z**4 + 6*b6*z**5 + 7*b7*z**6)
     double z2 = z * z;
     double z3 = z2 * z;
@@ -747,7 +751,7 @@ double vlsGrating(double lineDensity, double z, double[6] vls) {
  * @param normal		normal at ray-object intersection (for planes always (0,1,0))
  * @param a			a = WL * D0 * ORD * 1.e-6  with D0: line density (l/mm); WL:wavelength (nm); ORD order of diffraction
  */
-Ray refrac_plane(Ray r, dvec4 normal, double a) {
+Ray refrac_plane(Ray r, ALLOW_UNUSED dvec4 normal, double a) { // TODO fix unused var
     double y1 = r.direction[1] * r.direction[1] + r.direction[2] * r.direction[2] - (r.direction[2] - a) * (r.direction[2] - a);
     if (y1 > 0) {
         y1             = sqrt(y1);
@@ -815,14 +819,17 @@ calculates the Bessel diffraction effects on circular slits and on circular zone
 @returns
     results stored in dphi, dpsi (inout)
 */
-void bessel_diff(double radius, double wl, inout double dphi, inout double dpsi, inout uint64_t ctr) {
+void bessel_diff(double radius, double wl, INOUT(double) dphi, INOUT(double) dpsi, INOUT(uint64_t) ctr) {
     double b     = abs(radius) * 1e06;
     double ximax = 5.0 * wl / b;
 
     double rn1[3];
     double c = -1;
     while (c < 0) {  // while c = wd - rn1[2] < 0 continue
-        rn1       = double[3](squaresDoubleRNG(ctr), squaresDoubleRNG(ctr), squaresDoubleRNG(ctr));
+        for (int i = 0; i < 3; i++) {
+            rn1[i] = squaresDoubleRNG(ctr);
+        }
+
         dphi      = rn1[0] * ximax;
         dpsi      = rn1[1] * ximax;
         double xi = sqrt(0.5 * (dphi * dphi + dpsi * dpsi));
@@ -848,7 +855,7 @@ void bessel_diff(double radius, double wl, inout double dphi, inout double dpsi,
  * @param ctr		counter for random number generator
  * @return result stored in dAngle
  */
-void fraun_diff(double dim, double wl, inout double dAngle, inout uint64_t ctr) {
+void fraun_diff(double dim, double wl, INOUT(double) dAngle, INOUT(uint64_t) ctr) {
     if (dim == 0) return;        // no diffraction in this direction
     double b   = dim * 1e06;     // slit opening
     double div = 10.0 * wl / b;  // up to 2nd maximum
@@ -856,7 +863,9 @@ void fraun_diff(double dim, double wl, inout double dAngle, inout uint64_t ctr) 
     double rna[2];  // 2 uniform random numbers in [0,1]
     double c = -1;
     while (c < 0) {  // while c = wd - uni[1] < 0 continue
-        rna       = double[2](squaresDoubleRNG(ctr), squaresDoubleRNG(ctr));
+        for (int i = 0; i < 2; i++) {
+            rna[i] = squaresDoubleRNG(ctr);
+        }
         dAngle    = (rna[0] - 0.5) * div;
         double u  = PI * b * r8_sin(dAngle) / wl;
         double wd = 1;
@@ -868,7 +877,7 @@ void fraun_diff(double dim, double wl, inout double dAngle, inout uint64_t ctr) 
     }
 }
 
-void diffraction(int iopt, double xLength, double yLength, double wl, inout double dPhi, inout double dPsi, inout uint64_t ctr) {
+void diffraction(int iopt, double xLength, double yLength, double wl, INOUT(double) dPhi, INOUT(double) dPsi, INOUT(uint64_t) ctr) {
     if (wl <= 0) return;
 
     double yl = yLength;

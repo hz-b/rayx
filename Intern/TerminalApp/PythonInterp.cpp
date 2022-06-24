@@ -31,11 +31,12 @@ PythonInterp::PythonInterp(const char* pyName, const char* pyFunc,
 
     // Initiliaze the Interpreter
     Py_Initialize();
-
-    // Set module lookup dir
+    // Set module lookup dir, otherwise Python can't run the files
     PyRun_SimpleString("import os");
     PyRun_SimpleString("import sys");
-    PyRun_SimpleString("sys.path.append(os.getcwd()+'/python')");
+    std::string python_dir(resolvePath("build/bin/python"));
+    python_dir = "sys.path.append(\""+python_dir+"\")";
+    PyRun_SimpleString(python_dir.c_str());
 
     // Python file
     m_pName = PyUnicode_DecodeFSDefault(pyName);

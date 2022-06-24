@@ -2,7 +2,6 @@
 
 #include "setupTests.h"
 #if RUN_TEST_GRATINGS
-#include "Tracer/Vulkan/Material.h"
 
 TEST(planeGrating, testParams) {
     // user parameters

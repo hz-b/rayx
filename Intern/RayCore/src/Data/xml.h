@@ -1,9 +1,9 @@
 #pragma once
 
+#include <Material/Material.h>
 #include <Model/Beamline/EnergyDistribution.h>
 #include <Model/Beamline/LightSource.h>
 #include <Model/Geometry/Geometry.h>
-#include <Tracer/Vulkan/Material.h>
 #include <UserParameter/GeometricUserParams.h>
 
 #include <array>

@@ -1,6 +1,6 @@
 #include "ReflectionZonePlate.h"
 
-#include <Tracer/Vulkan/Material.h>
+#include <Material/Material.h>
 
 #include "Debug.h"
 

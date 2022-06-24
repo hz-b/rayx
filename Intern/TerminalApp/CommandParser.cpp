@@ -13,13 +13,13 @@ CommandParser::CommandParser(int ___argc, char* const* ___argv) {
                                           {"ocsv", no_argument, 0, 'c'},
                                           {"version", no_argument, 0, 'v'},
                                           {"help", no_argument, 0, 'h'},
-                                          {"dummy", no_argument, 0, 'd'},
+                                          {"cpu", no_argument, 0, 'x'},
                                           {"benchmark", no_argument, 0, 'b'},
                                           {"multipleplot", no_argument, 0, 'm'},
                                           {0, 0, 0, 0}};                                      
     while ((c = getopt_long(
                 ___argc, ___argv,
-                "pi:cvhdbm",  // : required, :: optional, 'none' nothing
+                "pi:cvhxbm",  // : required, :: optional, 'none' nothing
                 long_options, &option_index)) != -1) {
         switch (c) {
             case '?':
@@ -48,8 +48,8 @@ CommandParser::CommandParser(int ___argc, char* const* ___argv) {
             case 'i':
                 m_optargs.m_providedFile = optarg;
                 break;
-            case 'd':
-                m_optargs.m_dummyFlag = OptFlags::Enabled;
+            case 'x':
+                m_optargs.m_cpuFlag = OptFlags::Enabled;
                 break;
             case 'b':
                 m_optargs.m_benchmark = OptFlags::Enabled;

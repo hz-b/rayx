@@ -24,8 +24,6 @@ class RAYX_API BeamlineObject {
     /// Getter for the ID of the beamline object.
     const std::string& getName() const;
 
-    const int m_ID;
-
   protected:
     BeamlineObject(const char* name);
     BeamlineObject();
