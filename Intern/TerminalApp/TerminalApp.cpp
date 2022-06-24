@@ -8,6 +8,7 @@
 #include <Tracer/VulkanTracer.h>
 #include <unistd.h>
 
+#include <Writer/Writer.hpp>
 #include <memory>
 #include <stdexcept>
 
@@ -40,6 +41,7 @@ void TerminalApp::run() {
         exit(1);
     }
 
+    // Chose Hardware
     if (m_CommandParser->m_optargs.m_cpuFlag) {
         m_Tracer = std::make_unique<RAYX::CpuTracer>();
     } else {
@@ -47,7 +49,12 @@ void TerminalApp::run() {
     }
 
     // Run RAY-X Core
-    auto rays = m_Tracer->trace(*m_Beamline);
+    m_Tracer->trace(*m_Beamline);
+
+    // Export Rays to external data.
+    if (!exportRays()) {
+        RAYX_ERR << "Error in exporting";
+    }
 
     if (m_CommandParser->m_optargs.m_benchmark) {
         std::chrono::steady_clock::time_point end =
@@ -94,4 +101,53 @@ void TerminalApp::run() {
             RAYX_ERR << e.what() << "\n";
         }
     }
+}
+
+bool TerminalApp::exportRays() {
+    bool retval = false;
+    std::unique_ptr<Writer> w;
+    bool useCsv = m_CommandParser->m_optargs.m_csvFlag;
+
+#ifdef CI
+    w = std::make_unique<CSVWriter>();
+    RAYX_LOG << "Using CSV Writer because of CI!";
+#else
+    if (useCsv) {
+        w = std::make_unique<CSVWriter>();
+    } else {
+        w = std::make_unique<H5Writer>();
+    }
+#endif
+
+    size_t index = 0;
+    auto doubleVecSize = RAY_MAX_ELEMENTS_IN_VECTOR * RAY_DOUBLE_COUNT;
+    std::vector<double> doubleVec(doubleVecSize);
+
+    // Transform list into double vectors for correct output.
+    for (auto outputRayIterator = m_Tracer->m_OutputRays.begin(),
+              outputIteratorEnd = m_Tracer->m_OutputRays.end();
+         outputRayIterator != outputIteratorEnd; outputRayIterator++) {
+        RAYX_D_LOG << "(*outputRayIterator).size(): "
+                   << (*outputRayIterator).size();
+
+        memcpy(doubleVec.data(), (*outputRayIterator).data(),
+               (*outputRayIterator).size() * VULKANTRACER_RAY_DOUBLE_AMOUNT *
+                   sizeof(double));
+        doubleVec.resize((*outputRayIterator).size() *
+                         VULKANTRACER_RAY_DOUBLE_AMOUNT);
+
+        RAYX_D_LOG << "sample ray: " << doubleVec[0] << ", " << doubleVec[1]
+                   << ", " << doubleVec[2] << ", " << doubleVec[3] << ", "
+                   << doubleVec[4] << ", " << doubleVec[5] << ", "
+                   << doubleVec[6] << ", energy: " << doubleVec[7]
+                   << ", stokes 0: " << doubleVec[8];
+
+        w->appendRays(doubleVec, index);
+        index = index + (*outputRayIterator).size();
+    }
+
+    // TODO(Oussama): Add the debug buffer output too.
+    retval = true;
+
+    return retval;
 }

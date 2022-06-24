@@ -20,7 +20,7 @@ class RAYX_API CpuTracer : public Tracer {
     CpuTracer();
     ~CpuTracer();
 
-    RayList trace(const Beamline&) override;
+    void trace(const Beamline&) override;
 };
 
 }  // namespace RAYX

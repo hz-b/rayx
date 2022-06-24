@@ -1,15 +1,14 @@
 #pragma once
 
+#include <Tracer/Tracer.h>
 #include <getopt.h>
 
 #include <chrono>
 
-#include "PythonInterp.h"
 #include "CommandParser.h"
+#include "PythonInterp.h"
 #include "RayCore.h"
 #include "TerminalAppConfig.h"
-
-#include <Tracer/Tracer.h>
 
 // Virtual python Environment Path
 #ifdef WIN32  // Todo
@@ -25,14 +24,19 @@ class TerminalApp {
     ~TerminalApp();
 
     void run();
-
     const std::string& getProvidedFilePath() const { return providedFile; };
 
   private:
+    /**
+     * @brief Write Rays into output file
+     * @return true 
+     * @return false 
+     */
+    bool exportRays();
     char** m_argv;
     int m_argc;
     std::string providedFile;
     std::unique_ptr<CommandParser> m_CommandParser;
-	std::unique_ptr<RAYX::Tracer> m_Tracer;
-	std::unique_ptr<RAYX::Beamline> m_Beamline;
+    std::unique_ptr<RAYX::Tracer> m_Tracer;
+    std::unique_ptr<RAYX::Beamline> m_Beamline;
 };

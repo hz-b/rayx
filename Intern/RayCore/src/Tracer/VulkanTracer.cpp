@@ -90,7 +90,7 @@ VulkanTracer::VulkanTracer() {
 
 VulkanTracer::~VulkanTracer() { cleanup(); }
 
-RayList VulkanTracer::trace(const Beamline& beamline) {
+void VulkanTracer::trace(const Beamline& beamline) {
     m_RayList = beamline.getInputRays();
 
     setBeamlineParameters(1, beamline.m_OpticalElements.size(),
@@ -105,11 +105,9 @@ RayList VulkanTracer::trace(const Beamline& beamline) {
 
     run();
 
-    RayList outRays = m_OutputRays;
+    Tracer::m_OutputRays = m_OutputRays;
 
     cleanTracer();
-
-    return outRays;
 }
 
 //	This function creates a debug messenger
