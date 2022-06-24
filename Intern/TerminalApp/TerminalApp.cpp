@@ -106,13 +106,12 @@ void TerminalApp::run() {
 bool TerminalApp::exportRays() {
     bool retval = false;
     std::unique_ptr<Writer> w;
-    bool useCsv = m_CommandParser->m_optargs.m_csvFlag;
 
 #ifdef CI
     w = std::make_unique<CSVWriter>();
     RAYX_LOG << "Using CSV Writer because of CI!";
 #else
-    if (useCsv) {
+    if (m_CommandParser->m_optargs.m_csvFlag) {
         w = std::make_unique<CSVWriter>();
     } else {
         w = std::make_unique<H5Writer>();
