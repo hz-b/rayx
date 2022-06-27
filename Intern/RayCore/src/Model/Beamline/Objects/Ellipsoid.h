@@ -14,15 +14,6 @@ enum class FigureRotation { Yes, Plane, A11 };
 // TODO(Jannis): rename or turn into surface
 class RAYX_API Ellipsoid : public OpticalElement {
   public:
-    // slightly shortened constructor
-    Ellipsoid(const char* name, Geometry::GeometricalShape geometricalShape,
-              const double width, const double height,
-              const double azimuthalAngle, glm::dvec4 position,
-              glm::dmat4x4 orientation, const double grazingIncidence,
-              const double entranceArmLength, const double exitArmLength,
-              FigureRotation figRot, const double a_11,
-              const std::array<double, 7> slopeError, Material mat);
-
     Ellipsoid(const char* name, Geometry::GeometricalShape geometricalShape,
               const double width, const double height,
               const double azimuthalAngle, glm::dvec4 position,
@@ -32,7 +23,7 @@ class RAYX_API Ellipsoid : public OpticalElement {
               const double exitArmLength, FigureRotation figRot,
               const double a_11, const std::array<double, 7> slopeError,
               Material mat);
-    Ellipsoid();
+    Ellipsoid() = default;
     ~Ellipsoid();
 
     void calcHalfAxes();

@@ -27,48 +27,6 @@ namespace RAYX {
  * @param mat               material (See Material.h)
  *
  */
-Ellipsoid::Ellipsoid(const char* name,
-                     Geometry::GeometricalShape geometricalShape,
-                     const double width, const double height,
-                     const double azimuthalAngle, glm::dvec4 position,
-                     glm::dmat4x4 orientation, const double grazingIncidence,
-                     const double entranceArmLength, const double exitArmLength,
-                     FigureRotation figRot, const double a_11,
-                     const std::array<double, 7> slopeError, Material mat)
-    : OpticalElement(name, geometricalShape, width, height, azimuthalAngle,
-                     position, orientation, slopeError),
-      m_incidence(degToRad(grazingIncidence)),
-      m_entranceArmLength(entranceArmLength),
-      m_exitArmLength(exitArmLength),
-      m_a11(a_11) {
-    RAYX_LOG << name;
-    m_offsetY0 =
-        0;  // what is this for? RAYX.FOR: "only !=0 in case of Monocapillary"
-
-    m_figureRotation = figRot;
-    calcHalfAxes();
-    calculateCenterFromHalfAxes(m_incidence);
-
-    // a33, 34, 44
-    m_a33 = pow(m_shortHalfAxisB / m_longHalfAxisA, 2);
-    m_a34 = m_z0 * m_a33;
-    m_a44 = -pow(m_shortHalfAxisB, 2) + pow(m_y0, 2) +
-            pow(m_z0 * m_shortHalfAxisB / m_longHalfAxisA, 2);
-    m_radius = m_y0;
-
-    double icurv = 1;
-    double matd = (double)static_cast<int>(mat);
-    setSurface(std::make_unique<Quadric>(
-        std::array<double, 4 * 4>{m_a11, 0, 0, 0,         //
-                                  icurv, 1, 0, m_radius,  //
-                                  0, 0, m_a33, m_a34,     //
-                                  7, 0, matd, m_a44}));
-    setElementParameters({sin(m_tangentAngle), cos(m_tangentAngle), m_y0,
-                          m_z0,                               //
-                          double(m_figureRotation), 0, 0, 0,  //
-                          0, 0, 0, 0,                         //
-                          0, 0, 0, 0});
-}
 // User-defined Parm constructor
 Ellipsoid::Ellipsoid(const char* name,
                      Geometry::GeometricalShape geometricalShape,
@@ -89,7 +47,7 @@ Ellipsoid::Ellipsoid(const char* name,
       m_shortHalfAxisB(ShortHalfAxisB),
       m_longHalfAxisA(LongHalfAxisA),
       m_DesignGrazingAngle(degToRad(DesignAngle)) {
-    RAYX_LOG << name << " Manual";
+    RAYX_LOG << name;
     m_offsetY0 =
         0;  // what is this for? RAY.FOR: "only !=0 in case of Monocapillary"
 
@@ -264,53 +222,9 @@ std::shared_ptr<Ellipsoid> Ellipsoid::createFromXML(xml::Parser p) {
     glm::dvec4 position = p.parsePosition();
     glm::dmat4x4 orientation = p.parseOrientation();
 
-    // use local orientation of ellipsoid the way ray calculates it
-    // to obtain the transformation from the previous element to this
-    // element without actually needing the previous element here
-    GeometricUserParams g_params_rayui = GeometricUserParams(incidenceAngle);
-    WorldUserParams w_coord_rayui =
-        WorldUserParams(g_params_rayui.getAlpha(), g_params_rayui.getBeta(),
-                        mAzimAngle, mdistancePreceding, mis, 0);
-    glm::dmat4x4 orientation_rayui = w_coord_rayui.calcOrientation();
-
-    // remove RAY-UI's way of calculating the ellipsoid local orientation from
-    // the given orientation to get the transformation from the previous element
-    // to this element
-    glm::dmat4x4 orientation_previous =
-        orientation * glm::transpose(orientation_rayui);
-    // now remove RAY-UI's way of adding the positional misalignment from the
-    // given position
-    glm::dvec4 position_previous =
-        position - orientation * glm::dvec4(mis[0], mis[1], mis[2], 0);
-
-    GeometricUserParams g_params =
-        GeometricUserParams(incidenceAngle, mEntrance, mExit);
-
-    // now calculate the world coordinates according to RAY-X standard
-    double tangentAngle =
-        g_params.calcTangentAngle(incidenceAngle, mEntrance, mExit, mCoordSys);
-    WorldUserParams w_coord =
-        WorldUserParams(g_params.getAlpha(), g_params.getBeta(), mAzimAngle,
-                        mdistancePreceding, mis, tangentAngle);
-    // add RAY-X orientation that depends on the coordinate system of the
-    // misalignment to the previous orientation
-    orientation = orientation_previous * w_coord.calcOrientation();
-    // add misalignment again but with the orientation of RAY-X
-    position = position_previous + orientation *
-                                       w_coord.getTangentAngleRotation() *
-                                       glm::dvec4(mis[0], mis[1], mis[2], 0);
-
-    if ((mDesignGrazing == 0.0) && (mlongHalfAxisA == 0.0) &&
-        (mshortHalfAxisB == 0.0)) {  // Auto calculation
-        return std::make_shared<Ellipsoid>(
-            p.name(), geometricalShape, width, height, mAzimAngle, position,
-            orientation, incidenceAngle, mEntrance, mExit, figRot, m_a11,
-            slopeError, mat);
-    } else {
-        return std::make_shared<Ellipsoid>(
-            p.name(), geometricalShape, width, height, mAzimAngle, position,
-            mlongHalfAxisA, mshortHalfAxisB, mDesignGrazing, orientation,
-            incidenceAngle, mEntrance, mExit, figRot, m_a11, slopeError, mat);
-    }
+	return std::make_shared<Ellipsoid>(
+		p.name(), geometricalShape, width, height, mAzimAngle, position,
+		mlongHalfAxisA, mshortHalfAxisB, mDesignGrazing, orientation,
+		incidenceAngle, mEntrance, mExit, figRot, m_a11, slopeError, mat);
 }
 }  // namespace RAYX
