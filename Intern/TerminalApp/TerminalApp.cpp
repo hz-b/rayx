@@ -49,10 +49,10 @@ void TerminalApp::run() {
     }
 
     // Run RAY-X Core
-    m_Tracer->trace(*m_Beamline);
+    auto rays = m_Tracer->trace(*m_Beamline);
 
     // Export Rays to external data.
-    if (!exportRays()) {
+    if (!exportRays(rays)) {
         RAYX_ERR << "Error in exporting";
     }
 
@@ -103,7 +103,7 @@ void TerminalApp::run() {
     }
 }
 
-bool TerminalApp::exportRays() {
+bool TerminalApp::exportRays(RAYX::RayList& rays) {
     bool retval = false;
     std::unique_ptr<Writer> w;
 
@@ -123,8 +123,7 @@ bool TerminalApp::exportRays() {
     std::vector<double> doubleVec(doubleVecSize);
 
     // Transform list into double vectors for correct output.
-    for (auto outputRayIterator = m_Tracer->m_OutputRays.begin(),
-              outputIteratorEnd = m_Tracer->m_OutputRays.end();
+    for (auto outputRayIterator = rays.begin(), outputIteratorEnd = rays.end();
          outputRayIterator != outputIteratorEnd; outputRayIterator++) {
         RAYX_D_LOG << "(*outputRayIterator).size(): "
                    << (*outputRayIterator).size();

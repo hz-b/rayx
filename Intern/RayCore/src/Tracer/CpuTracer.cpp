@@ -43,9 +43,9 @@ CPP_TRACER::Ray convert(Ray r) {
 }
 /**
  * @brief Similar to CPP_TRACER::RAY, but the other way around.
- * 
- * @param r 
- * @return Ray 
+ *
+ * @param r
+ * @return Ray
  */
 Ray backConvert(CPP_TRACER::Ray r) {
     Ray out;
@@ -61,7 +61,7 @@ Ray backConvert(CPP_TRACER::Ray r) {
     return out;
 }
 
-void CpuTracer::trace(const Beamline& beamline) {
+RayList CpuTracer::trace(const Beamline& beamline) {
     auto rayList = beamline.getInputRays();
 
     CPP_TRACER::numberOfBeamlines = 1;
@@ -113,10 +113,11 @@ void CpuTracer::trace(const Beamline& beamline) {
     }
 
     // Fetch Rays back from the Shader "container"
+    RayList out;
     for (auto r : CPP_TRACER::outputData.data) {
-        m_OutputRays.push(backConvert(r));
+        out.push(backConvert(r));
     }
-
+    return out;
 }
 
 }  // namespace RAYX

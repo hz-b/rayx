@@ -9,6 +9,7 @@
 #include "PythonInterp.h"
 #include "RayCore.h"
 #include "TerminalAppConfig.h"
+#include "Tracer/RayList.h"
 
 // Virtual python Environment Path
 #ifdef WIN32  // Todo
@@ -29,10 +30,10 @@ class TerminalApp {
   private:
     /**
      * @brief Write Rays into output file
-     * @return true 
-     * @return false 
+     * @return true
+     * @return false
      */
-    bool exportRays();
+    bool exportRays(RAYX::RayList&);
     char** m_argv;
     int m_argc;
     std::string providedFile;

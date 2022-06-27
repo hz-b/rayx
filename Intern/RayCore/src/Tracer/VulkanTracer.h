@@ -60,7 +60,7 @@ class RAYX_API VulkanTracer : public Tracer {
     VulkanTracer();
     ~VulkanTracer();
 
-    void trace(const Beamline&) override;
+    RayList trace(const Beamline&) override;
 
   private:
     void run();
