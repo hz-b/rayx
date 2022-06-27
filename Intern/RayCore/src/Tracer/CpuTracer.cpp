@@ -75,7 +75,9 @@ RayList CpuTracer::trace(const Beamline& beamline) {
     CPP_TRACER::xyznull.data.clear();
     CPP_TRACER::matIdx.data.clear();
     CPP_TRACER::mat.data.clear();
+#ifdef RAYX_DEBUG_MODE
     CPP_TRACER::d_struct.data.clear();
+#endif
 
     // init rayData, outputData
     for (auto a : rayList) {
@@ -100,11 +102,13 @@ RayList CpuTracer::trace(const Beamline& beamline) {
     CPP_TRACER::mat.data = materialTables.materialTable;
     CPP_TRACER::matIdx.data = materialTables.indexTable;
 
-    // init debug buffer
+// init debug buffer
+#ifdef RAYX_DEBUG_MODE
     for (int i = 0; i < CPP_TRACER::numberOfRays; i++) {
         CPP_TRACER::_debug_struct d;
         CPP_TRACER::d_struct.data.push_back(d);
     }
+#endif
 
     // Run the tracing by for all rays
     for (int i = 0; i < CPP_TRACER::numberOfRays; i++) {
