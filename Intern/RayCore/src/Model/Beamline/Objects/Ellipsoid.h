@@ -58,11 +58,12 @@ class RAYX_API Ellipsoid : public OpticalElement {
     double m_a11;  // param for quadric funciton, given by user
 
     // derived params, needed on shader
-    double m_tangentAngle;  // == alpha1
+    double m_tangentAngle;  // == alpha1 (= x-rotational offset to the ellipsoid coordianate system
     double m_a34;           // paramters for quadric equation
     double m_a33;
     double m_a44;
-    double m_y0;              // center of ellipsoid
+    double m_a22;
+    double m_y0;              // offset to center of ellipsoid
     double m_z0;              // -"-
     double m_shortHalfAxisB;  // b
     double m_longHalfAxisA;   // a
