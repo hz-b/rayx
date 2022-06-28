@@ -49,7 +49,7 @@ class RAYX_API Ellipsoid : public OpticalElement {
 
   private:
     // user parameters:
-    double m_radius;
+    // double m_radius;
     // grazing incidence, in rad
     double m_incidence;
     double m_entranceArmLength;
@@ -63,9 +63,14 @@ class RAYX_API Ellipsoid : public OpticalElement {
     double m_a33;
     double m_a44;
     double m_a22;
+    double m_a23;
+    double m_a24;
     double m_y0;              // offset to center of ellipsoid
     double m_z0;              // -"-
     double m_shortHalfAxisB;  // b
+    //double m_A;
+    //double m_B;
+    //double m_a0;
     double m_longHalfAxisA;   // a
     double m_offsetY0;        // always = 0?
     double
