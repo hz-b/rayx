@@ -9,6 +9,8 @@
  *
  */
 
+#include <Tracer/Ray.h>
+
 #include <array>
 #include <glm.hpp>
 #include <iomanip>
@@ -16,10 +18,9 @@
 #include <sstream>
 #include <string>
 #include <vector>
-#include <Tracer/Ray.h>
 
 // Memory leak detection (RAYX_NEW instead of new allows leaks to be detected)
-#ifdef RAY_DEBUG_MODE
+#ifdef RAYX_DEBUG_MODE
 #ifdef RAYX_PLATFORM_WINDOWS
 #define _CRTDBG_MAP_ALLOC
 #include <crtdbg.h>
@@ -30,7 +31,7 @@
 #endif
 
 // Debug only code; use it as: DEBUG(<statement>);
-#ifdef RAY_DEBUG_MODE
+#ifdef RAYX_DEBUG_MODE
 #define RAYX_DEBUG(x) (x)
 #else
 #define RAYX_DEBUG(x) \
@@ -104,7 +105,7 @@ struct IgnoreLog {
 #define RAYX_WARN RAYX::Warn(__FILE__, __LINE__)
 #define RAYX_ERR RAYX::Err(__FILE__, __LINE__)
 
-#ifdef RAY_DEBUG_MODE
+#ifdef RAYX_DEBUG_MODE
 #define RAYX_D_LOG RAYX_LOG
 #define RAYX_D_WARN RAYX_WARN
 #define RAYX_D_ERR RAYX_ERR

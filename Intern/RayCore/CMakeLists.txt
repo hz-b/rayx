@@ -107,6 +107,8 @@ endif()
 target_compile_definitions(${PROJECT_NAME}
     PRIVATE RAYX_BUILD_DLL
     PUBLIC ${COMPILE_PLATFORM}
+        $<$<CONFIG:Debug>:RAYX_DEBUG_MODE>
+        $<$<CONFIG:RelWithDebInfo>:RAYX_DEBUG_MODE>
 )
 
 find_package(Vulkan REQUIRED)

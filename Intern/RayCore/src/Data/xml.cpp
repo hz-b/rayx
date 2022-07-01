@@ -174,7 +174,7 @@ bool paramOrientationNoGroup(const rapidxml::xml_node<>* node,
         return false;
     }
 
-#ifdef RAY_DEBUG_MODE
+#ifdef RAYX_DEBUG_MODE
 
     // check if vectors are a basis (determinant =/= 0)
     glm::dmat3x3 worldDirections = {worldXdirection, worldYdirection,
