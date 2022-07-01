@@ -38,6 +38,48 @@ class ShaderTest : public testing::Test {
     static void TearDownTestSuite() { tracer = nullptr; }
 };
 
+// new test suite basis
+
+/* // TODO continue
+void writeToCSV(RayList& rays, std::string filename) {
+	CSVWriter writer(filename);
+	writer.
+}
+
+RayList traceRML(std::string filename) {
+	auto beamline = Importer::importBeamline(filename);
+	auto rays = tracer->trace(beamline);
+	writeToCSV(rays, "ok");
+	return rays;
+}
+
+RayList loadCSVRayUI(std::string filename) {
+    std::string beamline_file = resolvePath("Tests/rml_files/test_shader/");
+    beamline_file.append(csv);
+    beamline_file.append(".csv");
+
+    std::ifstream f(beamline_file);
+    std::string line;
+
+    // discard first two lines
+    for (int i = 0; i < 2; i++) {
+        std::getline(f, line);
+    }
+
+    RayList out;
+
+    while (std::getline(f, line)) {
+        out.push(parseCSVline(line));
+    }
+
+	writeToCSV(out, "ok");
+
+    return out;
+}
+*/
+
+// old test suite basis
+
 std::array<double, 4 * 4> zeros = {
     0, 0, 0, 0, 0, 0, 0, 0, 0,
     0, 0, 0, 0, 0, 0, 0};  // 16 zeros for filling the optical elements for test
