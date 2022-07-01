@@ -2155,6 +2155,12 @@ RAYX::Ray parseCSVline(std::string line) {
     ray.m_pathLength = vec[10];
     ray.m_stokes = {vec[11], vec[12], vec[13], vec[14]};
 
+    // otherwise uninitialized:
+    ray.m_extraParam = -1;
+    ray.m_weight = -1;
+    ray.m_lastElement = -1;
+    ray.m_order = -1;
+
     return ray;
 }
 
