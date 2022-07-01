@@ -58,8 +58,7 @@ std::list<double> runTracer(
     beamline.m_OpticalElements = elements;
     // execute tracing
 
-    tracer->trace(beamline);
-    auto rays = tracer->m_OutputRays;
+    auto rays = tracer->trace(beamline);
 
     std::list<double> outputRays;
 
@@ -103,8 +102,7 @@ std::vector<RAYX::Ray> runTracerRaw(
     beamline.m_OpticalElements = elements;
     // execute tracing
 
-    tracer->trace(beamline);
-    auto rays = tracer->m_OutputRays;
+    auto rays = tracer->trace(beamline);
 
     std::vector<RAYX::Ray> outputRays;
 

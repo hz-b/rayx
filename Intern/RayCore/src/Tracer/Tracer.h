@@ -22,12 +22,7 @@ class RAYX_API Tracer {
      * @brief Run the tracing on the Beamline object
      *
      */
-    virtual void trace(const Beamline&) = 0;
-    /**
-     * @brief Tracer output. Be careful with the double alignment.
-     *
-     */
-    RayList m_OutputRays;
+    virtual RayList trace(const Beamline&) = 0;
 };
 
 }  // namespace RAYX

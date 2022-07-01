@@ -5,7 +5,7 @@
 #endif
 
 // Memory leak detection (RAYX_NEW instead of new allows leaks to be detected)
-#ifdef RAY_DEBUG_MODE
+#ifdef RAYX_DEBUG_MODE
 #ifdef RAYX_PLATFORM_WINDOWS
 #define _CRTDBG_MAP_ALLOC
 #include <crtdbg.h>
@@ -16,7 +16,7 @@
 #endif
 
 // Debug only code; use it as: DEBUG(<statement>);
-#ifdef RAY_DEBUG_MODE
+#ifdef RAYX_DEBUG_MODE
 #define RAYX_DEBUG(x) (x)
 #else
 #define RAYX_DEBUG(x) \

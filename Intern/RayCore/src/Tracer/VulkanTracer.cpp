@@ -90,7 +90,7 @@ VulkanTracer::VulkanTracer() {
 
 VulkanTracer::~VulkanTracer() { cleanup(); }
 
-void VulkanTracer::trace(const Beamline& beamline) {
+RayList VulkanTracer::trace(const Beamline& beamline) {
     m_RayList = beamline.getInputRays();
 
     setBeamlineParameters(1, beamline.m_OpticalElements.size(),
@@ -105,9 +105,12 @@ void VulkanTracer::trace(const Beamline& beamline) {
 
     run();
 
-    Tracer::m_OutputRays = m_OutputRays;
+    RayList out = std::move(m_OutputRays);
+    m_OutputRays = {};
 
     cleanTracer();
+
+    return out;
 }
 
 //	This function creates a debug messenger
@@ -208,7 +211,7 @@ void VulkanTracer::run() {
              << float(clock() - begin_time_getRays) / CLOCKS_PER_SEC * 1000
              << " ms";
 
-#ifdef RAY_DEBUG_MODE
+#ifdef RAYX_DEBUG_MODE
     getDebugBuffer();
 #endif
 }
@@ -1097,7 +1100,7 @@ void VulkanTracer::createDescriptorSetLayout() {
          NULL},
         {5, VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, 1, VK_SHADER_STAGE_COMPUTE_BIT,
          NULL},
-#ifdef RAY_DEBUG_MODE
+#ifdef RAYX_DEBUG_MODE
         {6, VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, 1, VK_SHADER_STAGE_COMPUTE_BIT,
          NULL}
 #endif
@@ -1542,7 +1545,7 @@ bool VulkanTracer::isDebug() const { return m_settings.m_isDebug; }
 
 // Set Vulkan Tracer m_settings according to Release or Debug Mode
 void VulkanTracer::setSettings() {
-#ifdef RAY_DEBUG_MODE
+#ifdef RAYX_DEBUG_MODE
     RAYX_D_LOG << "VulkanTracer Debug: ON";
     m_settings.m_isDebug = true;
     m_settings.m_computeBuffersCount = 7;
