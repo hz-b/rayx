@@ -47,24 +47,32 @@ class ShaderTest : public testing::Test {
 
 // new test suite basis
 
+// will look at Tests/rml_files/test_shader/<filename>.rml
+RAYX::Beamline loadBeamline(std::string filename) {
+    std::string beamline_file =
+        resolvePath("Tests/rml_files/test_shader/" + filename + ".rml");
+
+    return RAYX::importBeamline(beamline_file);
+}
+
 // will write to Tests/output-new/<filename>.csv
 void writeToOutputCSV(RAYX::RayList& rays, std::string filename) {
     std::string f = resolvePath("Tests/output-new/" + filename + ".csv");
     writeCSV(rays, f);
 }
 
-// will look at Tests/rml_files/test_shader/<filename>.rml
 // if convertToElementCoords = true, all rays are converted to element
 // coordinates of beamline->back()
 RAYX::RayList traceRML(std::string filename,
                        bool convertToElementCoords = true) {
-    std::string beamline_file =
-        resolvePath("Tests/rml_files/test_shader/" + filename + ".rml");
-
-    auto beamline = RAYX::importBeamline(beamline_file);
+    auto beamline = loadBeamline(filename);
     auto rays = tracer->trace(beamline);
 
     if (convertToElementCoords) {
+        if (beamline.m_OpticalElements.empty()) {
+            ADD_FAILURE() << "no optical elements!";
+        }
+
         rays =
             mapGlobalToElementRayList(rays, beamline.m_OpticalElements.back());
     }
@@ -2227,29 +2235,28 @@ void compareFromCSVRayUI(const char* filename) {
     }
 }
 
-TEST_F(ShaderTest, MatrixSource) { compareFromCSVRayUI("MatrixSource"); }
+// TODO this is not really a shader test
+TEST_F(ShaderTest, MatrixSource) {
+    auto beamline = loadBeamline("MatrixSource");
+    auto a = beamline.getInputRays();
+    auto b = loadCSVRayUI2("MatrixSource");
+    compareRayLists(a, b);
+}
 TEST_F(ShaderTest, PlaneMirror) { compareAgainstRayUI("PlaneMirror"); }
 TEST_F(ShaderTest, Ellipsoid) {
-    std::string beamline_file =
-        resolvePath("Tests/rml_files/test_shader/Ellipsoid.rml");
-    std::shared_ptr<RAYX::Beamline> beamline = std::make_shared<RAYX::Beamline>(
-        RAYX::importBeamline(beamline_file.c_str()));
-
-    std::vector<std::shared_ptr<RAYX::OpticalElement> > elements =
-        beamline->m_OpticalElements;
-    std::vector<RAYX::Ray> testValues = beamline->m_LightSources[0]->getRays();
-
-    auto rayxGlobal = runTracerRaw(testValues, elements);
+    auto rayxGlobal = traceRML("Ellipsoid", false);
 
     int count = 0;
-    for (auto ray : rayxGlobal) {
-        auto dist =
-            abs(ray.m_extraParam - 21);  // 1 = Ellipsoid, 2 = ImagePlane
-        if (dist < 0.5) {
-            count += 1;
-            CHECK_EQ(ray.m_position.x, 0, 1e-11);
-            CHECK_EQ(ray.m_position.y, 0, 1e-11);
-            CHECK_EQ(ray.m_position.z, 0, 1e-11);
+    for (auto l : rayxGlobal) {
+        for (auto ray : l) {
+            auto dist =
+                abs(ray.m_extraParam - 21);  // 1 = Ellipsoid, 2 = ImagePlane
+            if (dist < 0.5) {
+                count += 1;
+                CHECK_EQ(ray.m_position.x, 0, 1e-11);
+                CHECK_EQ(ray.m_position.y, 0, 1e-11);
+                CHECK_EQ(ray.m_position.z, 0, 1e-11);
+            }
         }
     }
     if (count != 18223) {
