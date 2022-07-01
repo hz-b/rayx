@@ -75,9 +75,7 @@ RayList CpuTracer::trace(const Beamline& beamline) {
     CPP_TRACER::xyznull.data.clear();
     CPP_TRACER::matIdx.data.clear();
     CPP_TRACER::mat.data.clear();
-#ifdef DEBUG  // TODO(rudi): it's quite the hack that this C++ file uses the
-              // shader DEBUG macro, but RAYX_DEBUG_MODE isn't defined for the
-              // test suite sadly!
+#ifdef RAYX_DEBUG_MODE
     CPP_TRACER::d_struct.data.clear();
 #endif
 
@@ -105,7 +103,7 @@ RayList CpuTracer::trace(const Beamline& beamline) {
     CPP_TRACER::matIdx.data = materialTables.indexTable;
 
 // init debug buffer
-#ifdef DEBUG
+#ifdef RAYX_DEBUG_MODE
     for (int i = 0; i < CPP_TRACER::numberOfRays; i++) {
         CPP_TRACER::_debug_struct d;
         CPP_TRACER::d_struct.data.push_back(d);
