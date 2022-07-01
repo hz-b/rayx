@@ -15,15 +15,6 @@
 #define RAYX_NEW new
 #endif
 
-// Debug only code; use it as: DEBUG(<statement>);
-#ifdef RAYX_DEBUG_MODE
-#define RAYX_DEBUG(x) (x)
-#else
-#define RAYX_DEBUG(x) \
-    do {              \
-    } while (0)
-#endif
-
 /**
  *  Defining the RAYX_API macro, which helps with
  *  building the library (context based import/export of code).
