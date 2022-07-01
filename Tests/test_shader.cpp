@@ -20,6 +20,8 @@ std::unique_ptr<RAYX::Tracer> tracer;
 
 // TODO(rudi) remove later
 RAYX::Ray parseCSVline(std::string line);
+RAYX::RayList mapGlobalToElementRayList(
+    RAYX::RayList& global, std::shared_ptr<RAYX::OpticalElement> o);
 
 class ShaderTest : public testing::Test {
   protected:
@@ -47,18 +49,25 @@ class ShaderTest : public testing::Test {
 
 // will write to Tests/output-new/<filename>.csv
 void writeToOutputCSV(RAYX::RayList& rays, std::string filename) {
-    std::string f =
-        resolvePath("Tests/rml_files/output-new/" + filename + ".csv");
+    std::string f = resolvePath("Tests/output-new/" + filename + ".csv");
     writeCSV(rays, f);
 }
 
 // will look at Tests/rml_files/test_shader/<filename>.rml
-RAYX::RayList traceRML(std::string filename) {
+// if convertToElementCoords = true, all rays are converted to element
+// coordinates of beamline->back()
+RAYX::RayList traceRML(std::string filename,
+                       bool convertToElementCoords = true) {
     std::string beamline_file =
         resolvePath("Tests/rml_files/test_shader/" + filename + ".rml");
 
     auto beamline = RAYX::importBeamline(beamline_file);
     auto rays = tracer->trace(beamline);
+
+    if (convertToElementCoords) {
+        rays =
+            mapGlobalToElementRayList(rays, beamline.m_OpticalElements.back());
+    }
 
     writeToOutputCSV(rays, filename + ".rayx");
 
@@ -241,6 +250,16 @@ std::vector<RAYX::Ray> mapGlobalToElement(
         r_element.m_direction = {elementdir.x, elementdir.y, elementdir.z};
 
         out.push_back(r_element);
+    }
+    return out;
+}
+
+RAYX::RayList mapGlobalToElementRayList(
+    RAYX::RayList& global, std::shared_ptr<RAYX::OpticalElement> o) {
+    RAYX::RayList out;
+    for (auto l : global) {
+        auto element = mapGlobalToElement(l, o);
+        out.insertVector(element);
     }
     return out;
 }
@@ -2209,7 +2228,7 @@ void compareFromCSVRayUI(const char* filename) {
 }
 
 TEST_F(ShaderTest, MatrixSource) { compareFromCSVRayUI("MatrixSource"); }
-TEST_F(ShaderTest, PlaneMirror) { compareFromCSVRayUI("PlaneMirror"); }
+TEST_F(ShaderTest, PlaneMirror) { compareAgainstRayUI("PlaneMirror"); }
 TEST_F(ShaderTest, Ellipsoid) {
     std::string beamline_file =
         resolvePath("Tests/rml_files/test_shader/Ellipsoid.rml");
