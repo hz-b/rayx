@@ -30,10 +30,10 @@ class RayList {
     std::list<std::vector<Ray>>::iterator end();
     std::vector<Ray> back();
     std::size_t size();
+
     int rayAmount() const;
 
-  private:
-    // adds empty vector to the list
     std::list<std::vector<Ray>> m_rayList;
 };
+
 }  // namespace RAYX

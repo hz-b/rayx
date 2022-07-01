@@ -10,11 +10,16 @@
 #include <type_traits>
 
 #include "Tracer/CpuTracer.h"
+#include "Tracer/RayList.h"
 #include "Tracer/VulkanTracer.h"
+#include "Writer/CSVWriter.h"
 
 #if RUN_TEST_SHADER
 
 std::unique_ptr<RAYX::Tracer> tracer;
+
+// TODO(rudi) remove later
+RAYX::Ray parseCSVline(std::string line);
 
 class ShaderTest : public testing::Test {
   protected:
@@ -40,25 +45,32 @@ class ShaderTest : public testing::Test {
 
 // new test suite basis
 
-/* // TODO continue
-void writeToCSV(RayList& rays, std::string filename) {
-	CSVWriter writer(filename);
-	writer.
+// will write to Tests/output-new/<filename>.csv
+void writeToOutputCSV(RAYX::RayList& rays, std::string filename) {
+    std::string f =
+        resolvePath("Tests/rml_files/output-new/" + filename + ".csv");
+    writeCSV(rays, f);
 }
 
-RayList traceRML(std::string filename) {
-	auto beamline = Importer::importBeamline(filename);
-	auto rays = tracer->trace(beamline);
-	writeToCSV(rays, "ok");
-	return rays;
+// will look at Tests/rml_files/test_shader/<filename>.rml
+RAYX::RayList traceRML(std::string filename) {
+    std::string beamline_file =
+        resolvePath("Tests/rml_files/test_shader/" + filename + ".rml");
+
+    auto beamline = RAYX::importBeamline(beamline_file);
+    auto rays = tracer->trace(beamline);
+
+    writeToOutputCSV(rays, filename + ".rayx");
+
+    return rays;
 }
 
-RayList loadCSVRayUI(std::string filename) {
-    std::string beamline_file = resolvePath("Tests/rml_files/test_shader/");
-    beamline_file.append(csv);
-    beamline_file.append(".csv");
+// will look at Tests/rml_files/test_shader/<filename>.csv
+RAYX::RayList loadCSVRayUI2(std::string filename) {
+    std::string file =
+        resolvePath("Tests/rml_files/test_shader/" + filename + ".csv");
 
-    std::ifstream f(beamline_file);
+    std::ifstream f(file);
     std::string line;
 
     // discard first two lines
@@ -66,17 +78,66 @@ RayList loadCSVRayUI(std::string filename) {
         std::getline(f, line);
     }
 
-    RayList out;
+    RAYX::RayList out;
 
     while (std::getline(f, line)) {
         out.push(parseCSVline(line));
     }
 
-	writeToCSV(out, "ok");
+    writeToOutputCSV(out, filename + ".rayui");
 
     return out;
 }
-*/
+
+void compareRayLists(RAYX::RayList& rayx, RAYX::RayList& rayui,
+                     double t = 1e-11) {
+    CHECK_EQ(rayx.rayAmount(), rayui.rayAmount());
+
+    auto itRayX = rayx.begin();
+    auto itRayXEnd = rayx.end();
+
+    auto itRayUI = rayui.begin();
+    auto itRayUIEnd = rayui.end();
+
+    while (itRayX != itRayXEnd) {
+        auto rayx = *itRayX;
+        auto rayui = *itRayUI;
+
+        CHECK_EQ(rayx.size(), rayui.size());
+
+        for (unsigned int i = 0; i < rayui.size(); i++) {
+            CHECK_EQ(rayx[i].m_position.x, rayui[i].m_position.x, t);
+            CHECK_EQ(rayx[i].m_position.y, rayui[i].m_position.y, t);
+            CHECK_EQ(rayx[i].m_position.z, rayui[i].m_position.z, t);
+
+            CHECK_EQ(rayx[i].m_direction.x, rayui[i].m_direction.x, t);
+            CHECK_EQ(rayx[i].m_direction.y, rayui[i].m_direction.y, t);
+            CHECK_EQ(rayx[i].m_direction.z, rayui[i].m_direction.z, t);
+
+            CHECK_EQ(rayx[i].m_energy, rayui[i].m_energy, t);
+            // CHECK_EQ(rayx.m_pathLength, rayui[i].m_pathLength, t);
+            // TODO: also compare pathLength
+
+            CHECK_EQ(rayx[i].m_stokes.x, rayui[i].m_stokes.x, t);
+            CHECK_EQ(rayx[i].m_stokes.y, rayui[i].m_stokes.y, t);
+            CHECK_EQ(rayx[i].m_stokes.z, rayui[i].m_stokes.z, t);
+            CHECK_EQ(rayx[i].m_stokes.w, rayui[i].m_stokes.w, t);
+        }
+
+        itRayX++;
+        itRayUI++;
+
+        bool endX = itRayX == itRayXEnd;
+        bool endUI = itRayUI == itRayUIEnd;
+        CHECK_EQ((int)endX, (int)endUI);
+    }
+}
+
+void compareAgainstRayUI(std::string filename) {
+    auto a = traceRML(filename);
+    auto b = loadCSVRayUI2(filename);
+    compareRayLists(a, b);
+}
 
 // old test suite basis
 
