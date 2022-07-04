@@ -46,7 +46,7 @@ Ellipsoid::Ellipsoid(const char* name,
       m_a11(a_11),
       m_shortHalfAxisB(ShortHalfAxisB),
       m_longHalfAxisA(LongHalfAxisA),
-      m_DesignGrazingAngle(degToRad(DesignAngle)) {
+      m_designGrazingAngle(degToRad(DesignAngle)) {
     RAYX_LOG << name;
     m_offsetY0 =
         0;  // what is this for? RAY.FOR: "only !=0 in case of Monocapillary"
@@ -54,7 +54,7 @@ Ellipsoid::Ellipsoid(const char* name,
     m_figureRotation = figRot;
 
     // if design angle not given, take incidenceAngle
-    calculateCenterFromHalfAxes(m_DesignGrazingAngle);
+    calculateCenterFromHalfAxes(m_designGrazingAngle);
 
     // calculate half axis C
     if (m_figureRotation == FigureRotation::Yes) {
@@ -228,26 +228,26 @@ std::shared_ptr<Ellipsoid> Ellipsoid::createFromXML(xml::Parser p) {
     double width = p.parseTotalWidth();
     double height = p.parseTotalLength();
     double incidenceAngle = p.parseGrazingIncAngle();
-    double mEntrance = p.parseEntranceArmLength();
-    double mExit = p.parseExitArmLength();
-    double mAzimAngle = p.parseAzimuthalAngle();
+    double entranceArmLength = p.parseEntranceArmLength();
+    double exitArmLength = p.parseExitArmLength();
+    double azimuthalAngle = p.parseAzimuthalAngle();
     double m_a11 = p.parseParameterA11();
     FigureRotation figRot = p.parseFigureRotation();
     std::array<double, 7> slopeError = p.parseSlopeError();
     Material mat = p.parseMaterial();
     // TODO: why do all these variables have a 'm' prefix?
-    double mDesignGrazing = p.parseDesignGrazingIncAngle();
-    double mlongHalfAxisA = p.parseLongHalfAxisA();
-    double mshortHalfAxisB = p.parseShortHalfAxisB();
-    double mdistancePreceding = p.parseDistancePreceding();
+    double designGrazing = p.parseDesignGrazingIncAngle();
+    double longHalfAxisA = p.parseLongHalfAxisA();
+    double shortHalfAxisB = p.parseShortHalfAxisB();
+    double distancePreceding = p.parseDistancePreceding();
     int mCoordSys = p.parseMisalignmentCoordinateSystem();
     std::array<double, 6> mis = p.parseMisalignment();
     glm::dvec4 position = p.parsePosition();
     glm::dmat4x4 orientation = p.parseOrientation();
 
 	return std::make_shared<Ellipsoid>(
-		p.name(), geometricalShape, width, height, mAzimAngle, position,
-		mlongHalfAxisA, mshortHalfAxisB, mDesignGrazing, orientation,
-		incidenceAngle, mEntrance, mExit, figRot, m_a11, slopeError, mat);
+		p.name(), geometricalShape, width, height, azimuthalAngle, position,
+		longHalfAxisA, shortHalfAxisB, designGrazing, orientation,
+		incidenceAngle, entranceArmLength, exitArmLength, figRot, m_a11, slopeError, mat);
 }
 }  // namespace RAYX

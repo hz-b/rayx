@@ -75,7 +75,7 @@ class RAYX_API Ellipsoid : public OpticalElement {
     double m_offsetY0;        // always = 0?
     double
         m_halfAxisC;  // derived from figure_rotation, a_11 and half axes a, b
-    double m_DesignGrazingAngle;
+    double m_designGrazingAngle;
 };
 
 }  // namespace RAYX
