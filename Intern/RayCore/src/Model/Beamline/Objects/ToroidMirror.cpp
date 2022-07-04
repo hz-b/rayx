@@ -37,17 +37,21 @@ ToroidMirror::ToroidMirror(
     const char* name, Geometry::GeometricalShape geometricalShape,
     const double width, const double height, const double azimuthalAngle,
     glm::dvec4 position, glm::dmat4x4 orientation, const double incidenceAngle,
+    const double longRadius, const double shortRadius,
     const double mEntrance, const double mExit, const double sEntrance,
     const double sExit, const std::array<double, 7> slopeError, Material mat)
     : OpticalElement(name, {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
                      geometricalShape, width, height, azimuthalAngle, position,
                      orientation, slopeError),
+      m_longRadius(longRadius),
+      m_shortRadius(shortRadius),
       m_sagittalEntranceArmLength(sEntrance),
       m_sagittalExitArmLength(sExit),
       m_meridionalEntranceArmLength(mEntrance),
       m_meridionalExitArmLength(mExit) {
     // TODO(Theresa): maybe move this function outside of this class (same for
     // spheres) because this can be derived from user parameters
+    // 
     calcRadius(incidenceAngle);  // calculate the radius
 
     RAYX_LOG << "long Radius: " << m_longRadius
@@ -66,6 +70,7 @@ std::shared_ptr<ToroidMirror> ToroidMirror::createFromXML(xml::Parser p) {
         p.name(), p.parseGeometricalShape(), p.parseTotalLength(),
         p.parseTotalWidth(), p.parseAzimuthalAngle(), p.parsePosition(),
         p.parseOrientation(), p.parseGrazingIncAngle(),
+        p.parseLongRadius(), p.parseShortRadius(),
         p.parseEntranceArmLengthMer(), p.parseExitArmLengthMer(),
         p.parseEntranceArmLengthSag(), p.parseExitArmLengthSag(),
         p.parseSlopeError(), p.parseMaterial());
@@ -76,7 +81,7 @@ std::shared_ptr<ToroidMirror> ToroidMirror::createFromXML(xml::Parser p) {
  * and sagittal entrance and exit arm lengths
  */
 void ToroidMirror::calcRadius(double incidenceAngle) {
-    m_longRadius =
+/*    m_longRadius =
         2.0 / sin(incidenceAngle) /
         (1.0 / m_meridionalEntranceArmLength + 1.0 / m_meridionalExitArmLength);
 
@@ -87,7 +92,7 @@ void ToroidMirror::calcRadius(double incidenceAngle) {
         m_shortRadius =
             2.0 * sin(incidenceAngle) /
             (1.0 / m_sagittalEntranceArmLength + 1.0 / m_sagittalExitArmLength);
-    }
+    } */
 }
 
 double ToroidMirror::getSagittalEntranceArmLength() const {

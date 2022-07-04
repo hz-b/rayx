@@ -13,6 +13,7 @@ class RAYX_API ToroidMirror : public OpticalElement {
                  const double width, const double height,
                  const double azimuthalAngle, glm::dvec4 position,
                  glm::dmat4x4 orientation, const double incidenceAngle,
+                 const double longRadius, const double shortRadius,
                  const double mEntrance, const double mExit,
                  const double sEntrance, const double sExit,
                  const std::array<double, 7> slopeError, Material mat);
