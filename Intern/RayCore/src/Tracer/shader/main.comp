@@ -1,5 +1,4 @@
 #define WORKGROUP_SIZE 32
-#include "settings.comp"
 
 #ifdef CPP
     #define INOUT(x) x&
@@ -75,7 +74,7 @@ struct Element {
     dmat4 elementParameters;
 };
 
-#ifdef DEBUG
+#ifdef RAYX_DEBUG_MODE
 	struct _debug_struct {
 		dmat4 _dMat; // Can also be used as vectors or scalar
 	};
@@ -94,7 +93,7 @@ struct Element {
 	ShaderArray<dvec4> xyznull;
 	ShaderArray<int> matIdx;
 	ShaderArray<double> mat;
-	#ifdef DEBUG
+	#ifdef RAYX_DEBUG_MODE
 		ShaderArray<_debug_struct> d_struct;
 	#endif
 #else
@@ -122,7 +121,7 @@ struct Element {
 					   // use the matIdx-table to determine the relevant indices for when which table starts and stops.
 	};
 
-	#ifdef DEBUG
+	#ifdef RAYX_DEBUG_MODE
 		layout(binding = 6) buffer debugBuf {
 			_debug_struct d_struct[];  // contains nff table of all materials concatenated together
 		};
@@ -159,7 +158,7 @@ void dynamicElements() {
     dvec4 closestHitpoint = dvec4(1.0 / 0.0, 1.0 / 0.0, 1.0 / 0.0, 0.0);
     dvec4 closestGlobalHitpoint;
     
-    #ifdef DEBUG
+    #ifdef RAYX_DEBUG_MODE
     // Set Debug Struct of current Ray to identity
     d_struct[uint(gl_GlobalInvocationID)]._dMat = dmat4(1);
     #endif
