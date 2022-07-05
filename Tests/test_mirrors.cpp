@@ -114,7 +114,7 @@ TEST(Ellipse, defaultParams) {
     double m_a23 = 0.13991733136051135;
     double m_a24 = -315.72395939432272;  // not equal to radius
     double a33 = 0.03015368960704581;
-    double a34 = 0.0; //45.0819833448842;
+    double a34 = 0.0; // always equal to zero?
     double a44 = -2.9103830456733704e-11;
     std::array<double, 4 * 4> surface = {m_a11, 0, 0, 0, 
                                          1, m_a22, m_a23, m_a24,
