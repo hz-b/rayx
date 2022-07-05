@@ -1955,7 +1955,7 @@ TEST_F(ShaderTest, slit2) {
 }
 
 TEST_F(ShaderTest, toroid) {
-    const char* filename = "toroid";
+    const char* filename = "toroidSecond";
     testBeamline(filename);
     ASSERT_TRUE(true);
 }

@@ -170,9 +170,9 @@ void dynamicElements() {
     // Printing Example
     if (uint(gl_GlobalInvocationID) == 2 ){
     #ifndef CPP
-    debugPrintfEXT("Hello from GPU\n"); 
+    debugPrintfEXT("Hello from GPU. \n"); 
     #else
-    RAYX_D_LOG << "Hello from CPU" ; 
+    RAYX_D_LOG << "Tracing on CPU..." ; 
     #endif
     }
     // Iterate through all bounces

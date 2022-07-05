@@ -5,7 +5,6 @@ bin/
 bin-int/
 build/
 Intern/RayCore/doc/*/
-Intern/RayCore/src/Tracer/shader/settings.comp # this file is generated
 out/
 
 # Files

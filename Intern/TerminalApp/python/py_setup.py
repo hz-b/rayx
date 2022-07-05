@@ -47,7 +47,6 @@ def install_packages(venv_path:str):
     * h5py : HDF5 binary data format module
     * pyqt : Necessary for plot GUI Backend access. (if ran from terminal)
     """
-    print(os.path.join(venv_path,"bin","python3"))
     python_venv_bin = os.path.join(venv_path,"bin","python3")
     packages = ['matplotlib', 'pandas', 'h5py','pyqt5']
     for package in packages:
