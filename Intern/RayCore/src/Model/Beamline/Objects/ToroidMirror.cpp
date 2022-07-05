@@ -27,12 +27,13 @@ namespace RAYX {
  * amplitude y(5) and radius (6)
  * @param mat                       material (See Material.h)
  */
-ToroidMirror::ToroidMirror(
-    const char* name, Geometry::GeometricalShape geometricalShape,
-    const double width, const double height, const double azimuthalAngle,
-    glm::dvec4 position, glm::dmat4x4 orientation,
-    const double longRadius, const double shortRadius,
-    const std::array<double, 7> slopeError, Material mat)
+ToroidMirror::ToroidMirror(const char* name,
+                           Geometry::GeometricalShape geometricalShape,
+                           const double width, const double height,
+                           const double azimuthalAngle, glm::dvec4 position,
+                           glm::dmat4x4 orientation,
+                           const double longRadius, const double shortRadius,
+                           const std::array<double, 7> slopeError, Material mat)
     : OpticalElement(name, geometricalShape, width, height, azimuthalAngle,
                      position, orientation, slopeError),
       m_longRadius(longRadius),
@@ -55,10 +56,8 @@ std::shared_ptr<ToroidMirror> ToroidMirror::createFromXML(xml::Parser p) {
     return std::make_shared<ToroidMirror>(
         p.name(), p.parseGeometricalShape(), p.parseTotalLength(),
         p.parseTotalWidth(), p.parseAzimuthalAngle(), p.parsePosition(),
-        p.parseOrientation(), p.parseGrazingIncAngle(),
-        p.parseLongRadius(), p.parseShortRadius(),
-        p.parseSlopeError(), p.parseMaterial());
+        p.parseOrientation(), p.parseLongRadius(),
+        p.parseShortRadius(), p.parseSlopeError(), p.parseMaterial());
 }
-
 
 }  // namespace RAYX
