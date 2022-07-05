@@ -235,13 +235,9 @@ std::shared_ptr<Ellipsoid> Ellipsoid::createFromXML(xml::Parser p) {
     FigureRotation figRot = p.parseFigureRotation();
     std::array<double, 7> slopeError = p.parseSlopeError();
     Material mat = p.parseMaterial();
-    // TODO: why do all these variables have a 'm' prefix?
     double designGrazing = p.parseDesignGrazingIncAngle();
     double longHalfAxisA = p.parseLongHalfAxisA();
     double shortHalfAxisB = p.parseShortHalfAxisB();
-    double distancePreceding = p.parseDistancePreceding();
-    int mCoordSys = p.parseMisalignmentCoordinateSystem();
-    std::array<double, 6> mis = p.parseMisalignment();
     glm::dvec4 position = p.parsePosition();
     glm::dmat4x4 orientation = p.parseOrientation();
 
