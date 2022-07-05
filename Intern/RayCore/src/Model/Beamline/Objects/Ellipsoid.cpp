@@ -73,33 +73,25 @@ Ellipsoid::Ellipsoid(const char* name,
 
     // a33, 34, 44
     // a11 from rml file
-    // m_tangentAngle = -m_tangentAngle;
-    // m_a0 = m_tangentAngle;
-    // m_A = m_longHalfAxisA;
-    // m_B = m_shortHalfAxisB;
+    // first rotation arround x-axes then translation (yo/zo)
  
     m_a22 = pow(cos(m_tangentAngle),2) + pow(m_shortHalfAxisB*sin(m_tangentAngle)/m_longHalfAxisA,2);
     m_a23 = (pow(m_shortHalfAxisB, 2) - pow(m_longHalfAxisA, 2))*cos(m_tangentAngle)*sin(m_tangentAngle)/pow(m_longHalfAxisA, 2);
-    
-    m_a24 =  pow(m_shortHalfAxisB / m_longHalfAxisA, 2) * m_z0*sin(m_tangentAngle) + m_y0*cos(m_tangentAngle);
-    // m_a24 = pow(m_B/m_A,2) * sin(m_a0)*(m_z0 * cos(m_a0) + m_y0 * sin(m_a0)) + cos(m_a0)*(m_y0 * cos(m_a0) - m_z0 * sin(m_a0));
+    m_a24 = pow(m_shortHalfAxisB / m_longHalfAxisA, 2) * m_z0*sin(m_tangentAngle) + m_y0*cos(m_tangentAngle);
     m_a33 = pow(sin(m_tangentAngle),2) + pow(m_shortHalfAxisB*cos(m_tangentAngle)/m_longHalfAxisA,2);
-    m_a34 = pow(m_shortHalfAxisB / m_longHalfAxisA, 2) * m_z0*cos(m_tangentAngle) - 
-                        m_y0*sin(m_tangentAngle);
-    // m_a34 =  pow(m_B / m_A, 2) * cos(m_a0)*(m_z0 * cos(m_a0) + m_y0 * sin(m_a0)) - sin(m_a0)*(m_y0 * cos(m_a0) - m_z0 * sin(m_a0));
+    m_a34 = pow(m_shortHalfAxisB / m_longHalfAxisA, 2) * m_z0*cos(m_tangentAngle) - m_y0*sin(m_tangentAngle);
     m_a44 = -pow(m_shortHalfAxisB, 2) + pow(m_y0, 2) + pow(m_z0 * m_shortHalfAxisB / m_longHalfAxisA, 2);
-    // m_a44 = - pow(m_B,2) + pow(m_B/m_A,2)*(m_z0 * cos(m_a0) + m_y0 * sin(m_a0)) + (m_y0 * cos(m_a0) - m_z0 * sin(m_a0));
 
-    RAYX_LOG << "alpha1: " << m_tangentAngle << "; in Degree: " << radToDeg(m_tangentAngle);
-    RAYX_LOG << "m_y0: " << m_y0;
-    RAYX_LOG << "m_z0: " << m_z0;
-    RAYX_LOG << "m_a11: " << m_a11;
-    RAYX_LOG << "m_a22: " << m_a22;
-    RAYX_LOG << "m_a23: " << m_a23;
-    RAYX_LOG << "m_a24 (m_radius): " << m_a24;
-    RAYX_LOG << "m_a33: " << m_a33;
-    RAYX_LOG << "m_a34: " << m_a34;
-    RAYX_LOG << "m_a44: " << m_a44;
+    // RAYX_LOG << "alpha1: " << m_tangentAngle << "; in Degree: " << radToDeg(m_tangentAngle);
+    // RAYX_LOG << "m_y0: " << m_y0;
+    // RAYX_LOG << "m_z0: " << m_z0;
+    // RAYX_LOG << "m_a11: " << m_a11;
+    // RAYX_LOG << "m_a22: " << m_a22;
+    // RAYX_LOG << "m_a23: " << m_a23;
+    // RAYX_LOG << "m_a24 (m_radius): " << m_a24;
+    // RAYX_LOG << "m_a33: " << m_a33;
+    // RAYX_LOG << "m_a34: " << m_a34; // is m_a34 always zero?
+    // RAYX_LOG << "m_a44: " << m_a44;
 
     double icurv = 1;
     double matd = (double)static_cast<int>(mat);
