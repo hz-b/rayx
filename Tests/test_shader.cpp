@@ -2021,7 +2021,7 @@ TEST_F(opticalElements, slit2) {
 }
 
 TEST_F(opticalElements, toroid) {
-    const char* filename = "toroid";
+    const char* filename = "toroidSecond";
     testBeamline(filename);
     ASSERT_TRUE(true);
 }
