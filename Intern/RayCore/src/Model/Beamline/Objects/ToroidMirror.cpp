@@ -30,7 +30,7 @@ namespace RAYX {
 ToroidMirror::ToroidMirror(
     const char* name, Geometry::GeometricalShape geometricalShape,
     const double width, const double height, const double azimuthalAngle,
-    glm::dvec4 position, glm::dmat4x4 orientation, const double incidenceAngle,
+    glm::dvec4 position, glm::dmat4x4 orientation,
     const double longRadius, const double shortRadius,
     const std::array<double, 7> slopeError, Material mat)
     : OpticalElement(name, geometricalShape, width, height, azimuthalAngle,
