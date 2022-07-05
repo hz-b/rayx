@@ -14,15 +14,6 @@ enum class FigureRotation { Yes, Plane, A11 };
 // TODO(Jannis): rename or turn into surface
 class RAYX_API Ellipsoid : public OpticalElement {
   public:
-    // slightly shortened constructor
-    Ellipsoid(const char* name, Geometry::GeometricalShape geometricalShape,
-              const double width, const double height,
-              const double azimuthalAngle, glm::dvec4 position,
-              glm::dmat4x4 orientation, const double grazingIncidence,
-              const double entranceArmLength, const double exitArmLength,
-              FigureRotation figRot, const double a_11,
-              const std::array<double, 7> slopeError, Material mat);
-
     Ellipsoid(const char* name, Geometry::GeometricalShape geometricalShape,
               const double width, const double height,
               const double azimuthalAngle, glm::dvec4 position,
@@ -32,7 +23,7 @@ class RAYX_API Ellipsoid : public OpticalElement {
               const double exitArmLength, FigureRotation figRot,
               const double a_11, const std::array<double, 7> slopeError,
               Material mat);
-    Ellipsoid();
+    Ellipsoid() = default;
     ~Ellipsoid();
 
     void calcHalfAxes();
@@ -58,7 +49,7 @@ class RAYX_API Ellipsoid : public OpticalElement {
 
   private:
     // user parameters:
-    double m_radius;
+    // double m_radius;
     // grazing incidence, in rad
     double m_incidence;
     double m_entranceArmLength;
@@ -67,18 +58,24 @@ class RAYX_API Ellipsoid : public OpticalElement {
     double m_a11;  // param for quadric funciton, given by user
 
     // derived params, needed on shader
-    double m_tangentAngle;  // == alpha1
+    double m_tangentAngle;  // == alpha1 (= x-rotational offset to the ellipsoid coordianate system
     double m_a34;           // paramters for quadric equation
     double m_a33;
     double m_a44;
-    double m_y0;              // center of ellipsoid
+    double m_a22;
+    double m_a23;
+    double m_a24;
+    double m_y0;              // offset to center of ellipsoid
     double m_z0;              // -"-
     double m_shortHalfAxisB;  // b
+    //double m_A;
+    //double m_B;
+    //double m_a0;
     double m_longHalfAxisA;   // a
     double m_offsetY0;        // always = 0?
     double
         m_halfAxisC;  // derived from figure_rotation, a_11 and half axes a, b
-    double m_DesignGrazingAngle;
+    double m_designGrazingAngle;
 };
 
 }  // namespace RAYX

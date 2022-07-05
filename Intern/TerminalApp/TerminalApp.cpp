@@ -69,7 +69,7 @@ void TerminalApp::run() {
     //  Plot in Python
     if (m_CommandParser->m_optargs.m_plotFlag ==
         CommandParser::OptFlags::Enabled) {
-        // Setup to create genv if needed
+        // Setup to create venv if needed
         try {
             std::shared_ptr<PythonInterp> pySetup =
                 std::make_shared<PythonInterp>("py_setup", "setup",
@@ -89,7 +89,7 @@ void TerminalApp::run() {
                                                (const char*)nullptr);
             if (m_CommandParser->m_optargs.m_providedFile) {
                 std::string _providedFile =
-                    m_CommandParser->m_optargs.m_providedFile;
+                    getFilename(m_CommandParser->m_optargs.m_providedFile);
                 pyPlot->setPlotName(_providedFile.c_str());
             }
             if (m_CommandParser->m_optargs.m_multiplePlots ==
