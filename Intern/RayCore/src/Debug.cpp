@@ -33,6 +33,7 @@ void formatDebugMsg(std::string filename, int line, std::ostream& o) {
     while (4 + line_string.size() + filename.size() + pad.size() < PREFIX_LEN) {
         pad += " ";
     }
+    o.precision(17);
     o << "[" << pad << filename << ":" << line_string << "] ";
 }
 
