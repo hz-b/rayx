@@ -2,9 +2,6 @@
 
 #include <Debug.h>
 
-#include <filesystem>
-#include <optional>
-
 static std::optional<std::filesystem::path> ROOT;
 
 void initPathResolver(char* executablePath) {
@@ -25,4 +22,12 @@ std::string resolvePath(std::string path) {
     std::filesystem::path p = *ROOT;
     p.append(path);
     return p.string();
+}
+
+std::string getFilename(char* path) {
+    return std::filesystem::path(std::string(path)).filename();
+}
+
+std::string getFilename(std::string path) {
+    return std::filesystem::path(path).filename();
 }
