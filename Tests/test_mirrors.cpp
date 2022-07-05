@@ -109,12 +109,17 @@ TEST(Ellipse, defaultParams) {
     double z0 = 4522.597446463712;
     double shortHalfAxisB = 549.1237529650836;
     double longHalfAxisA = 5500;
-
-    double a33 = 0.0099681618535688628;
-    double a34 = 45.0819833448842;
-    double a44 = -5.8207660913467407e-11;
-    std::array<double, 4 * 4> surface = {1, 0, 0,   0,   1, 1, 0,  y0,
-                                         0, 0, a33, a34, 7, 0, 79, a44};
+    double m_a11 = 1;
+    double m_a22 = 0.97981447224651996;
+    double m_a23 = 0.13991733136051135;
+    double m_a24 = -315.72395939432272;  // not equal to radius
+    double a33 = 0.03015368960704581;
+    double a34 = 0.0; //45.0819833448842;
+    double a44 = -2.9103830456733704e-11;
+    std::array<double, 4 * 4> surface = {m_a11, 0, 0, 0, 
+                                         1, m_a22, m_a23, m_a24,
+                                         0, 0, a33, a34, 
+                                         7, 0, 79, a44};
     std::array<double, 4 * 4> elementParams = {sin(correctTangentAngle),
                                                cos(correctTangentAngle),
                                                y0,
