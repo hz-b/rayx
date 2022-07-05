@@ -102,7 +102,7 @@ TEST(Ellipse, defaultParams) {
     auto eb =
         std::dynamic_pointer_cast<RAYX::Ellipsoid>(b.m_OpticalElements[0]);
 
-    double correctTangentAngle = 0.14327895993853446;  // alpha1 in old ray code
+    double correctTangentAngle = -0.14327895993853446;  // alpha1 in old ray code
 
     double shortHalfAxisC = 549.1237529650836;
     double y0 = -312.4887730997391;
