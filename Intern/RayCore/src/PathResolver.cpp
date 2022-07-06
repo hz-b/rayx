@@ -25,9 +25,9 @@ std::string RAYX_API resolvePath(std::string path) {
 }
 
 std::string RAYX_API getFilename(char* path) {
-    return std::filesystem::path(std::string(path)).filename();
+    return std::filesystem::path(std::string(path)).filename().string();
 }
 
 std::string RAYX_API getFilename(std::string path) {
-    return std::filesystem::path(path).filename();
+    return std::filesystem::path(path).filename().string();
 }

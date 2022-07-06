@@ -45,6 +45,7 @@ const double inm2eV   = 1.239852e3;
 	using dvec4 = glm::dvec4;
 	using dmat3 = glm::dmat3;
 	using dmat4 = glm::dmat4;
+    using uint = unsigned int;
 
 	double mod(double x, double y) {
 		return glm::mod(x, y);
