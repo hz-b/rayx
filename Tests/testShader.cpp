@@ -361,8 +361,6 @@ TEST_F(TestSuite, testRZPLineDensityDefaulParams) {
         double in_beta;
         double in_Ord;
         double in_WL;
-        double in_DX;
-        double in_DZ;
 
         double out_DX;
         double out_DZ;
@@ -371,14 +369,14 @@ TEST_F(TestSuite, testRZPLineDensityDefaulParams) {
     std::vector<InOutPair> inouts;
 
     for (auto p : inouts) {
-        CPP_TRACER::RZPLineDensity(
-            p.in_ray, p.in_normal, p.in_imageType, p.in_rzpType,
-            p.in_derivationMethod, p.in_zOffsetCenter, p.in_risag, p.in_rosag,
-            p.in_rimer, p.in_romer, p.in_alpha, p.in_beta, p.in_Ord, p.in_WL,
-            p.in_DX, p.in_DZ);
-        double out_DX = p.in_DX;  // p.in_DX was mutated by RZPLineDensity.
-        double out_DZ = p.in_DZ;  // p.in_DZ was mutated by RZPLineDensity.
-        CHECK_EQ(out_DX, p.out_DX);
-        CHECK_EQ(out_DZ, p.out_DZ);
+        double DX;
+        double DZ;
+        CPP_TRACER::RZPLineDensity(p.in_ray, p.in_normal, p.in_imageType,
+                                   p.in_rzpType, p.in_derivationMethod,
+                                   p.in_zOffsetCenter, p.in_risag, p.in_rosag,
+                                   p.in_rimer, p.in_romer, p.in_alpha,
+                                   p.in_beta, p.in_Ord, p.in_WL, DX, DZ);
+        CHECK_EQ(DX, p.out_DX);
+        CHECK_EQ(DZ, p.out_DZ);
     }
 }
