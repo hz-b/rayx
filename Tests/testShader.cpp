@@ -12,6 +12,7 @@ Ray refrac2D(Ray, glm::dvec4, double, double);
 Ray refrac(Ray, glm::dvec4, double);
 glm::dvec4 normal_cartesian(glm::dvec4, double, double);
 glm::dvec4 normal_cylindrical(glm::dvec4, double, double);
+double wasteBox(double, double, double, double, double);
 }  // namespace CPP_TRACER
 }  // namespace RAYX
 
@@ -284,5 +285,57 @@ TEST_F(TestSuite, testRefrac) {
         auto out = CPP_TRACER::refrac(r, normal, a);
 
         CHECK_EQ(out, correct[i]);
+    }
+}
+
+TEST_F(TestSuite, testWasteBox) {
+    struct InOutPair {
+        double in_x;
+        double in_z;
+        double in_xLength;
+        double in_zLength;
+        double in_w;
+
+        double out;
+    };
+
+    std::vector<InOutPair> inouts = {{
+                                         .in_x = -5.0466620698997637,
+                                         .in_z = 28.760236725599515,
+                                         .in_xLength = 50,
+                                         .in_zLength = 200,
+                                         .in_w = 1,
+                                         .out = 1,
+                                     },
+                                     {
+                                         .in_x = -5.0466620698997637,
+                                         .in_z = 28.760236725599515,
+                                         .in_xLength = 5,
+                                         .in_zLength = 20,
+                                         .in_w = 1,
+                                         .out = 0,
+                                     },
+                                     {
+                                         .in_x = -1.6822205656320104,
+                                         .in_z = 28.760233508097873,
+                                         .in_xLength = 5,
+                                         .in_zLength = 20,
+                                         .in_w = 1,
+                                         .out = 0,
+                                     },
+                                     {
+                                         .in_x = -5.0466620698997637,
+                                         .in_z = 28.760236725599515,
+                                         .in_xLength = 50,
+                                         .in_zLength = 200,
+                                         .in_w = 0,
+                                         .out = 0,
+                                     }};
+
+    for (auto p : inouts) {
+        auto out = CPP_TRACER::wasteBox(p.in_x, p.in_z, p.in_xLength,
+                                        p.in_zLength, p.in_w);
+
+        CHECK_EQ(out, p.out);
     }
 }
