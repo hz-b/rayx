@@ -66,10 +66,10 @@ class ShaderTest : public testing::Test {
 
 RAYX::Ray parseCSVline(std::string line);
 
-// will look at Tests/rml_files/test_shader/<filename>.rml
+// will look at Tests/input/<filename>.rml
 RAYX::Beamline loadBeamline(std::string filename);
 
-// will write to Tests/output-new/<filename>.csv
+// will write to Tests/output/<filename>.csv
 void writeToOutputCSV(RAYX::RayList& rays, std::string filename);
 
 // if convertToElementCoords = true, all rays are converted to element
@@ -77,7 +77,7 @@ void writeToOutputCSV(RAYX::RayList& rays, std::string filename);
 RAYX::RayList traceRML(std::string filename,
                        bool convertToElementCoords = true);
 
-// will look at Tests/rml_files/test_shader/<filename>.csv
+// will look at Tests/input/<filename>.csv
 // the Ray-UI files are to be obtained by Export > RawRaysOutgoing (which are in
 // element coordinates of the relevant element!)
 RAYX::RayList loadCSVRayUI(std::string filename);

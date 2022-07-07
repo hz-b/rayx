@@ -106,17 +106,16 @@ RAYX::Ray parseCSVline(std::string line) {
     return ray;
 }
 
-// will look at Tests/rml_files/test_shader/<filename>.rml
+// will look at Tests/input/<filename>.rml
 RAYX::Beamline loadBeamline(std::string filename) {
-    std::string beamline_file =
-        resolvePath("Tests/rml_files/test_shader/" + filename + ".rml");
+    std::string beamline_file = resolvePath("Tests/input/" + filename + ".rml");
 
     return RAYX::importBeamline(beamline_file);
 }
 
-// will write to Tests/output-new/<filename>.csv
+// will write to Tests/output/<filename>.csv
 void writeToOutputCSV(RAYX::RayList& rays, std::string filename) {
-    std::string f = resolvePath("Tests/output-new/" + filename + ".csv");
+    std::string f = resolvePath("Tests/output/" + filename + ".csv");
     writeCSV(rays, f);
 }
 
@@ -140,12 +139,11 @@ RAYX::RayList traceRML(std::string filename, bool convertToElementCoords) {
     return rays;
 }
 
-// will look at Tests/rml_files/test_shader/<filename>.csv
+// will look at Tests/input/<filename>.csv
 // the Ray-UI files are to be obtained by Export > RawRaysOutgoing (which are in
 // element coordinates of the relevant element!)
 RAYX::RayList loadCSVRayUI(std::string filename) {
-    std::string file =
-        resolvePath("Tests/rml_files/test_shader/" + filename + ".csv");
+    std::string file = resolvePath("Tests/input/" + filename + ".csv");
 
     std::ifstream f(file);
     std::string line;
