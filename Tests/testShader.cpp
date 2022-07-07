@@ -17,6 +17,7 @@ void RZPLineDensity(Ray r, glm::dvec4 normal, int IMAGE_TYPE, int RZP_TYPE,
                     int DERIVATION_METHOD, double zOffsetCenter, double risag,
                     double rosag, double rimer, double romer, double alpha,
                     double beta, double Ord, double WL, double& DX, double& DZ);
+Ray rayMatrixMult(Ray, glm::dmat4);
 
 }  // namespace CPP_TRACER
 }  // namespace RAYX
@@ -601,5 +602,65 @@ TEST_F(TestSuite, testRZPLineDensityAstigmatic) {
                                    p.in_beta, p.in_Ord, p.in_WL, DX, DZ);
         CHECK_EQ(DX, p.out_DX);
         CHECK_EQ(DZ, p.out_DZ);
+    }
+}
+
+TEST_F(TestSuite, testRayMatrixMult) {
+    struct InOutPair {
+        Ray in_ray;
+        glm::dmat4 in_matrix;
+
+        Ray out_ray;
+    };
+
+    std::vector<InOutPair> inouts = {
+        {
+            .in_ray =
+                {
+                    .m_position = glm::dvec3(0, 0, 0),
+                    .m_direction = glm::dvec3(0, 0, 0),
+                },
+            .in_matrix = glm::dmat4(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13,
+                                    14, 15, 16),
+            .out_ray =
+                {
+                    .m_position = glm::dvec3(13, 14, 15),
+                    .m_direction = glm::dvec3(0, 0, 0),
+                },
+        },
+        {
+            .in_ray =
+                {
+                    .m_position = glm::dvec3(1, 1, 0),
+                    .m_direction = glm::dvec3(0, 1, 1),
+                },
+            .in_matrix = glm::dmat4(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13,
+                                    14, 15, 16),
+            .out_ray =
+                {
+                    .m_position = glm::dvec3(19, 22, 25),
+                    .m_direction = glm::dvec3(14, 16, 18),
+                },
+        },
+        {
+            .in_ray =
+                {
+                    .m_position = glm::dvec3(1, 2, 3),
+                    .m_direction = glm::dvec3(4, 5, 6),
+                },
+            .in_matrix = glm::dmat4(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13,
+                                    14, 15, 16),
+            .out_ray =
+                {
+                    .m_position = glm::dvec3(51, 58, 65),
+                    .m_direction = glm::dvec3(83, 98, 113),
+                },
+        },
+
+    };
+
+    for (auto p : inouts) {
+        auto out_ray = CPP_TRACER::rayMatrixMult(p.in_ray, p.in_matrix);
+        CHECK_EQ(out_ray, p.out_ray);
     }
 }
