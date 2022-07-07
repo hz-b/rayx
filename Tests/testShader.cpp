@@ -13,6 +13,11 @@ Ray refrac(Ray, glm::dvec4, double);
 glm::dvec4 normal_cartesian(glm::dvec4, double, double);
 glm::dvec4 normal_cylindrical(glm::dvec4, double, double);
 double wasteBox(double, double, double, double, double);
+void RZPLineDensity(Ray r, glm::dvec4 normal, int IMAGE_TYPE, int RZP_TYPE,
+                    int DERIVATION_METHOD, double zOffsetCenter, double risag,
+                    double rosag, double rimer, double romer, double alpha,
+                    double beta, double Ord, double WL, double& DX, double& DZ);
+
 }  // namespace CPP_TRACER
 }  // namespace RAYX
 
@@ -337,5 +342,43 @@ TEST_F(TestSuite, testWasteBox) {
                                         p.in_zLength, p.in_w);
 
         CHECK_EQ(out, p.out);
+    }
+}
+
+TEST_F(TestSuite, testRZPLineDensityDefaulParams) {
+    struct InOutPair {
+        Ray in_ray;
+        glm::dvec4 in_normal;
+        int in_imageType;
+        int in_rzpType;
+        int in_derivationMethod;
+        double in_zOffsetCenter;
+        double in_risag;
+        double in_rosag;
+        double in_rimer;
+        double in_romer;
+        double in_alpha;
+        double in_beta;
+        double in_Ord;
+        double in_WL;
+        double in_DX;
+        double in_DZ;
+
+        double out_DX;
+        double out_DZ;
+    };
+
+    std::vector<InOutPair> inouts;
+
+    for (auto p : inouts) {
+        CPP_TRACER::RZPLineDensity(
+            p.in_ray, p.in_normal, p.in_imageType, p.in_rzpType,
+            p.in_derivationMethod, p.in_zOffsetCenter, p.in_risag, p.in_rosag,
+            p.in_rimer, p.in_romer, p.in_alpha, p.in_beta, p.in_Ord, p.in_WL,
+            p.in_DX, p.in_DZ);
+        double out_DX = p.in_DX;  // p.in_DX was mutated by RZPLineDensity.
+        double out_DZ = p.in_DZ;  // p.in_DZ was mutated by RZPLineDensity.
+        CHECK_EQ(out_DX, p.out_DX);
+        CHECK_EQ(out_DZ, p.out_DZ);
     }
 }
