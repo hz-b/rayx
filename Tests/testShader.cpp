@@ -366,7 +366,100 @@ TEST_F(TestSuite, testRZPLineDensityDefaulParams) {
         double out_DZ;
     };
 
-    std::vector<InOutPair> inouts;
+    std::vector<InOutPair> inouts = {
+        {
+            .in_ray =
+                {
+                    .m_position =
+                        glm::dvec3(-5.0805095016939532, 0, 96.032788311782269),
+                    .m_direction = glm::dvec3(0, 1, 0),
+                },
+            .in_normal = glm::dvec4(0, 1, 0, 0),
+            .in_imageType = 0,
+            .in_rzpType = 0,
+            .in_derivationMethod = 0,
+            .in_zOffsetCenter = 0,
+            .in_risag = 100,
+            .in_rosag = 500,
+            .in_rimer = 100,
+            .in_romer = 500,
+            .in_alpha = 0.017453292519943295,
+            .in_beta = 0.017453292519943295,
+            .in_Ord = -1,
+            .in_WL = 1.239852e-05,
+
+            .out_DX = 3103.9106911246749,
+            .out_DZ = 5.0771666330055218,
+        },
+        {.in_ray =
+             {
+                 .m_position =
+                     glm::dvec3(-1.6935030407867075, 0, 96.032777495754004),
+                 .m_direction = glm::dvec3(0, 1, 0),
+             },
+         .in_normal = glm::dvec4(0, 1, 0, 0),
+         .in_imageType = 0,
+         .in_rzpType = 0,
+         .in_derivationMethod = 0,
+         .in_zOffsetCenter = 0,
+         .in_risag = 100,
+         .in_rosag = 500,
+         .in_rimer = 100,
+         .in_romer = 500,
+         .in_alpha = 0.017453292519943295,
+         .in_beta = 0.017453292519943295,
+         .in_Ord = -1,
+         .in_WL = 1.239852e-05,
+         .out_DX = 1034.8685185321938,
+         .out_DZ = -13.320120179862876},
+        {.in_ray = {.m_position =
+                        glm::dvec3(-5.047050067282087, 4.4859372100394515,
+                                   29.182033770349552),
+                    .m_direction =
+                        glm::dvec3(0.05047050067282087, 0.95514062789960552,
+                                   -0.29182033770349552)},
+         .in_normal = glm::dvec4(0.05047050067282087, 0.95514062789960552,
+                                 -0.29182033770349552, 0),
+         .in_imageType = 0,
+         .in_rzpType = 0,
+         .in_derivationMethod = 0,
+         .in_zOffsetCenter = 0,
+         .in_risag = 100,
+         .in_rosag = 500,
+         .in_rimer = 100,
+         .in_romer = 500,
+         .in_alpha = 0.017453292519943295,
+         .in_beta = 0.017453292519943295,
+         .in_Ord = -1,
+         .in_WL = 1.239852e-05,
+         .out_DX = 4045.0989844091882,
+         .out_DZ = -174.2085626048659},
+        {.in_ray =
+             {
+                 .m_position =
+                     glm::dvec3(-1.6802365843267262, 1.3759250917712356,
+                                16.445931214643075),
+                 .m_direction =
+                     glm::dvec3(0.016802365843267261, 0.98624074908228765,
+                                -0.16445931214643075),
+             },
+         .in_normal = glm::dvec4(0.016802365843267261, 0.98624074908228765,
+                                 -0.16445931214643075, 0),
+         .in_imageType = 0,
+         .in_rzpType = 0,
+         .in_derivationMethod = 0,
+         .in_zOffsetCenter = 0,
+         .in_risag = 100,
+         .in_rosag = 500,
+         .in_rimer = 100,
+         .in_romer = 500,
+         .in_alpha = 0.017453292519943295,
+         .in_beta = 0.017453292519943295,
+         .in_Ord = -1,
+         .in_WL = 1.239852e-05,
+         .out_DX = 1418.1004208892475,
+         .out_DZ = 253.09836635775162},
+    };
 
     for (auto p : inouts) {
         double DX;
