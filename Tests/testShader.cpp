@@ -18,6 +18,7 @@ void RZPLineDensity(Ray r, glm::dvec4 normal, int IMAGE_TYPE, int RZP_TYPE,
                     double rosag, double rimer, double romer, double alpha,
                     double beta, double Ord, double WL, double& DX, double& DZ);
 Ray rayMatrixMult(Ray, glm::dmat4);
+double dpow(double, int);
 
 }  // namespace CPP_TRACER
 }  // namespace RAYX
@@ -662,5 +663,110 @@ TEST_F(TestSuite, testRayMatrixMult) {
     for (auto p : inouts) {
         auto out_ray = CPP_TRACER::rayMatrixMult(p.in_ray, p.in_matrix);
         CHECK_EQ(out_ray, p.out_ray);
+    }
+}
+
+TEST_F(TestSuite, testDPow) {
+    struct InOutPair {
+        double in_a;
+        int in_b;
+
+        double out;
+    };
+
+    std::vector<InOutPair> inouts = {{
+                                         .in_a = 0,
+                                         .in_b = 0,
+                                         .out = 1,
+                                     },
+                                     {
+                                         .in_a = 0,
+                                         .in_b = 1,
+                                         .out = 0,
+                                     },
+                                     {
+                                         .in_a = 0,
+                                         .in_b = -1,
+                                         .out = 1,
+                                     },
+                                     {
+                                         .in_a = 2,
+                                         .in_b = 0,
+                                         .out = 1,
+                                     },
+                                     {
+                                         .in_a = 2,
+                                         .in_b = 1,
+                                         .out = 2,
+                                     },
+                                     {
+                                         .in_a = 3,
+                                         .in_b = 7,
+                                         .out = 2187,
+                                     },
+                                     {
+                                         .in_a = 0,
+                                         .in_b = 4,
+                                         .out = 0,
+                                     },
+                                     {
+                                         .in_a = 0,
+                                         .in_b = -4,
+                                         .out = 1,
+                                     },
+                                     {
+                                         .in_a = 0,
+                                         .in_b = 2,
+                                         .out = 0,
+                                     },
+                                     {
+                                         .in_a = 0.20000000000000001,
+                                         .in_b = 4,
+                                         .out = 0.0016000000000000005,
+                                     },
+                                     {
+                                         .in_a = 9.9949999999999992,
+                                         .in_b = 3,
+                                         .out = 998.50074987499977,
+                                     },
+                                     {
+                                         .in_a = 3.1415926535897931,
+                                         .in_b = 6,
+                                         .out = 961.38919357530415,
+                                     },
+                                     {
+                                         .in_a = -1,
+                                         .in_b = -4,
+                                         .out = 1,
+                                     },
+                                     {
+                                         .in_a = -1,
+                                         .in_b = 3,
+                                         .out = -1,
+                                     },
+                                     {
+                                         .in_a = -1,
+                                         .in_b = 0,
+                                         .out = 1,
+                                     },
+                                     {
+                                         .in_a = -1,
+                                         .in_b = 4,
+                                         .out = 1,
+                                     },
+                                     {
+                                         .in_a = -1,
+                                         .in_b = 5,
+                                         .out = -1,
+                                     },
+                                     {
+                                         .in_a = -1,
+                                         .in_b = 6,
+                                         .out = 1,
+                                     }};
+
+    for (auto p : inouts) {
+        auto out = CPP_TRACER::dpow(p.in_a, p.in_b);
+        CHECK_EQ(out, p.out);
     }
 }
