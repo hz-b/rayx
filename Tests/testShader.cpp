@@ -10,6 +10,7 @@ double r8_log(double);
 double squaresDoubleRNG(uint64_t&);
 Ray refrac2D(Ray, glm::dvec4, double, double);
 glm::dvec4 normal_cartesian(glm::dvec4, double, double);
+glm::dvec4 normal_cylindrical(glm::dvec4, double, double);
 }  // namespace CPP_TRACER
 }  // namespace RAYX
 
@@ -170,5 +171,61 @@ TEST_F(TestSuite, testNormalCartesian) {
         glm::dvec4 out = CPP_TRACER::normal_cartesian(normal, slopeX, slopeZ);
 
         CHECK_EQ(glm::dvec3(out), correct[i]);
+    }
+}
+
+TEST_F(TestSuite, testNormalCylindrical) {
+    std::vector<Ray> input = {
+        {
+            .m_position = glm::dvec3(0, 0, 0),
+            .m_weight = 0,
+            .m_direction = glm::dvec3(0, 1, 0),
+            .m_energy = 0,
+            .m_stokes = glm::dvec4(0, 0, 0, 0),
+        },
+        {
+            .m_position = glm::dvec3(0, 0, 0),
+            .m_weight = 0,
+            .m_direction = glm::dvec3(5.0465463027123736, 10470.451695989539,
+                                      -28.532199794465537),
+            .m_energy = 0,
+            .m_stokes = glm::dvec4(0, 0, 0, 0),
+        },
+        {
+            .m_position = glm::dvec3(2, 0, 3),
+            .m_weight = 0,
+            .m_direction = glm::dvec3(0, 1, 0),
+            .m_energy = 0,
+            .m_stokes = glm::dvec4(0, 0, 0, 0),
+        },
+        {
+            .m_position = glm::dvec3(2, 0, 3),
+            .m_weight = 0,
+            .m_direction = glm::dvec3(5.0465463027123736, 10470.451695989539,
+                                      -28.532199794465537),
+            .m_energy = 0,
+            .m_stokes = glm::dvec4(0, 0, 0, 0),
+        }};
+
+    std::vector<glm::dvec4> correct = {
+        glm::dvec4(0, 1, 0, 0),
+        glm::dvec4(5.0465463027115769, 10470.451695989539, -28.532199794465537,
+                   0),
+        glm::dvec4(0.90019762973551742, 0.41198224566568292,
+                   -0.14112000805986721, 0),
+        glm::dvec4(9431.2169472441783, 4310.7711493493844, -1449.3437356459144,
+                   0),
+    };
+
+    CHECK_EQ(input.size(), correct.size());
+    for (uint i = 0; i < input.size(); i++) {
+        auto r = input[i];
+
+        glm::dvec4 normal = glm::dvec4(r.m_direction, 0);
+        double slopeX = r.m_position.x;
+        double slopeZ = r.m_position.z;
+
+        glm::dvec4 out = CPP_TRACER::normal_cylindrical(normal, slopeX, slopeZ);
+        CHECK_EQ(out, correct[i]);
     }
 }
