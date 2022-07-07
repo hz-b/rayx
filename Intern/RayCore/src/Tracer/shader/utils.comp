@@ -232,7 +232,10 @@ dvec2 getRefractiveIndex(double energy, int material) {
 
 	// out of range check
 	if (material < 1 || material > 92) {
-		return dvec2(0.0/0.0, 0.0/0.0);
+		#ifdef CPP
+		RAYX_ERR << "getRefractiveIndex material " << material << " out of range!";
+		#endif
+		return dvec2(-1.0, -1.0);
 	}
 
 	// try to get refractive index using Palik table
