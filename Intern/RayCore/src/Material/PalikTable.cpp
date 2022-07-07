@@ -1,8 +1,8 @@
-
 #include "PalikTable.h"
 
 #include <Debug.h>
 
+#include <algorithm>
 #include <fstream>
 #include <iostream>
 #include <sstream>
