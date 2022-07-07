@@ -17,16 +17,6 @@
 #include "gmock/gmock.h"
 #include "gtest/gtest.h"
 
-// Run Test Macros
-#define RUN_TEST_GRATINGS 1
-#define RUN_TEST_MIRRORS 1
-#define RUN_TEST_QUADRIC 1
-#define RUN_TEST_RML 1
-#define RUN_TEST_RZP 1
-#define RUN_TEST_SHADER 1
-#define RUN_TEST_SLIT 1
-#define RUN_TEST_SOURCES 1
-
 extern int GLOBAL_ARGC;
 extern char** GLOBAL_ARGV;
 
