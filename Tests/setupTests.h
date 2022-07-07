@@ -24,7 +24,7 @@ extern char** GLOBAL_ARGV;
 
 /* usage:
     CHECK_EQ(A, B, 1e-10); // with explicit tolerance
-    CHECK_EQ(A, B);        // without default tolerance
+    CHECK_EQ(A, B);        // with default tolerance
 */
 
 void checkEq(std::string filename, int line, std::string l, std::string r,
@@ -40,7 +40,7 @@ void checkEq(std::string filename, int line, std::string l, std::string r,
 
 extern std::unique_ptr<RAYX::Tracer> tracer;
 
-class ShaderTest : public testing::Test {
+class TestSuite : public testing::Test {
   protected:
     static void SetUpTestSuite() {
         bool cpu = false;

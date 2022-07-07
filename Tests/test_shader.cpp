@@ -7,8 +7,8 @@
 #include "utils.h"
 
 // TODO this is not really a shader test
-TEST_F(ShaderTest, PlaneMirror) { compareAgainstRayUI("PlaneMirror"); }
-TEST_F(ShaderTest, Ellipsoid) {
+TEST_F(TestSuite, PlaneMirror) { compareAgainstRayUI("PlaneMirror"); }
+TEST_F(TestSuite, Ellipsoid) {
     auto rayxGlobal = traceRML("Ellipsoid", false);
 
     int count = 0;
@@ -24,8 +24,9 @@ TEST_F(ShaderTest, Ellipsoid) {
             }
         }
     }
-    if (count != 18223) {
-        RAYX_ERR << "unexpected number of rays hitting the ImagePlane from the "
+    if (count != 92) {
+        RAYX_ERR << "unexpected number of rays (" << count
+                 << ") hitting the ImagePlane from the "
                     "Ellipsoid!";
     }
 }
