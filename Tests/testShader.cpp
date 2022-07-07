@@ -18,6 +18,7 @@ void RZPLineDensity(Ray r, glm::dvec4 normal, int IMAGE_TYPE, int RZP_TYPE,
                     double rosag, double rimer, double romer, double alpha,
                     double beta, double Ord, double WL, double& DX, double& DZ);
 Ray rayMatrixMult(Ray, glm::dmat4);
+void cosini(Ray&, double, double);
 double dpow(double, int);
 
 }  // namespace CPP_TRACER
@@ -768,5 +769,63 @@ TEST_F(TestSuite, testDPow) {
     for (auto p : inouts) {
         auto out = CPP_TRACER::dpow(p.in_a, p.in_b);
         CHECK_EQ(out, p.out);
+    }
+}
+
+TEST_F(TestSuite, testCosini) {
+    struct InOutPair {
+        double in_phi;
+        double in_psi;
+
+        glm::dvec3 out_direction;
+    };
+
+    std::vector<InOutPair> inouts = {
+        {
+            .in_phi = 0,
+            .in_psi = 0,
+            .out_direction =
+                glm::dvec3(6.1257422745431001e-17, -6.1257422745431001e-17, 1),
+        },
+        {
+            .in_phi = 1,
+            .in_psi = 1,
+            .out_direction = glm::dvec3(
+                0.45464871341284091, -0.8414709848078965, 0.29192658172642888),
+        },
+        {
+            .in_phi = 1,
+            .in_psi = 0,
+            .out_direction =
+                glm::dvec3(0.8414709848078965, -6.1257422745431001e-17,
+                           0.54030230586813977),
+        },
+        {
+            .in_phi = 0,
+            .in_psi = 1,
+            .out_direction =
+                glm::dvec3(3.3097526760895799e-17, -0.8414709848078965,
+                           0.54030230586813977),
+        },
+        {
+            .in_phi = 3.1415926535897931,
+            .in_psi = 3.1415926535897931,
+            .out_direction =
+                glm::dvec3(-6.1257422745430988e-17, -6.1257422745431001e-17,
+                           0.99999999999999978),
+        },
+        {
+            .in_phi = 0,
+            .in_psi = 1.5707963267948966,
+            .out_direction =
+                glm::dvec3(3.7524718414124473e-33, -1, 6.1257422745431001e-17),
+        },
+
+    };
+
+    for (auto p : inouts) {
+        Ray out_ray;
+        CPP_TRACER::cosini(out_ray, p.in_phi, p.in_psi);
+        CHECK_EQ(out_ray.m_direction, p.out_direction);
     }
 }
