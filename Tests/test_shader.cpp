@@ -83,7 +83,9 @@ RAYX::RayList traceRML(std::string filename,
 }
 
 // will look at Tests/rml_files/test_shader/<filename>.csv
-RAYX::RayList loadCSVRayUI2(std::string filename) {
+// the Ray-UI files are to be obtained by Export > RawRaysOutgoing (which are in
+// element coordinates of the relevant element!)
+RAYX::RayList loadCSVRayUI(std::string filename) {
     std::string file =
         resolvePath("Tests/rml_files/test_shader/" + filename + ".csv");
 
@@ -152,7 +154,7 @@ void compareRayLists(RAYX::RayList& rayx, RAYX::RayList& rayui,
 
 void compareAgainstRayUI(std::string filename) {
     auto a = traceRML(filename);
-    auto b = loadCSVRayUI2(filename);
+    auto b = loadCSVRayUI(filename);
     compareRayLists(a, b);
 }
 
@@ -2164,88 +2166,11 @@ RAYX::Ray parseCSVline(std::string line) {
     return ray;
 }
 
-std::vector<RAYX::Ray> loadCSVRayUI(const char* csv) {
-    std::string beamline_file = resolvePath("Tests/rml_files/test_shader/");
-    beamline_file.append(csv);
-    beamline_file.append(".csv");
-
-    std::ifstream f(beamline_file);
-    std::string line;
-
-    // discard first two lines
-    for (int i = 0; i < 2; i++) {
-        std::getline(f, line);
-    }
-
-    std::vector<RAYX::Ray> out;
-
-    while (std::getline(f, line)) {
-        out.push_back(parseCSVline(line));
-    }
-
-    return out;
-}
-
-// the Ray-UI files are to be obtained by Export > RawRaysOutgoing (which are in
-// element coordinates of the relevant element!)
-void compareFromCSVRayUI(const char* filename) {
-    auto rayui = loadCSVRayUI(filename);
-
-    std::string beamline_file = resolvePath("Tests/rml_files/test_shader/");
-    beamline_file.append(filename);
-    beamline_file.append(".rml");
-    std::shared_ptr<RAYX::Beamline> beamline = std::make_shared<RAYX::Beamline>(
-        RAYX::importBeamline(beamline_file.c_str()));
-
-    std::vector<std::shared_ptr<RAYX::OpticalElement> > elements =
-        beamline->m_OpticalElements;
-    std::vector<RAYX::Ray> testValues = beamline->m_LightSources[0]->getRays();
-
-    auto rayxGlobal = runTracerRaw(testValues, elements);
-
-    CHECK_EQ(rayui.size(), rayxGlobal.size());
-
-    auto t = 1e-11;
-
-    std::vector<RAYX::Ray> rayx;  // rayxGlobal but in element coordiantes.
-    if (!elements.empty()) {
-        rayx =
-            mapGlobalToElement(rayxGlobal, beamline->m_OpticalElements.back());
-    } else if (!beamline->m_LightSources.empty()) {
-        // light sources have no getInMatrix() currently, but for now the
-        // light sources would have InMatrix = identity. so element = rayxGlobal
-        // works for light sources for now.
-        rayx = rayxGlobal;
-    } else {
-        RAYX_ERR << "compareFromCSVRayUI called with empty beamline";
-    }
-
-    // the comparison happens in element coordinates.
-    for (unsigned int i = 0; i < rayui.size(); i++) {
-        CHECK_EQ(rayx[i].m_position.x, rayui[i].m_position.x, t);
-        CHECK_EQ(rayx[i].m_position.y, rayui[i].m_position.y, t);
-        CHECK_EQ(rayx[i].m_position.z, rayui[i].m_position.z, t);
-
-        CHECK_EQ(rayx[i].m_direction.x, rayui[i].m_direction.x, t);
-        CHECK_EQ(rayx[i].m_direction.y, rayui[i].m_direction.y, t);
-        CHECK_EQ(rayx[i].m_direction.z, rayui[i].m_direction.z, t);
-
-        CHECK_EQ(rayx[i].m_energy, rayui[i].m_energy, t);
-        // CHECK_EQ(rayx.m_pathLength, rayui[i].m_pathLength, t);
-        // TODO: also compare pathLength
-
-        CHECK_EQ(rayx[i].m_stokes.x, rayui[i].m_stokes.x, t);
-        CHECK_EQ(rayx[i].m_stokes.y, rayui[i].m_stokes.y, t);
-        CHECK_EQ(rayx[i].m_stokes.z, rayui[i].m_stokes.z, t);
-        CHECK_EQ(rayx[i].m_stokes.w, rayui[i].m_stokes.w, t);
-    }
-}
-
 // TODO this is not really a shader test
 TEST_F(ShaderTest, MatrixSource) {
     auto beamline = loadBeamline("MatrixSource");
     auto a = beamline.getInputRays();
-    auto b = loadCSVRayUI2("MatrixSource");
+    auto b = loadCSVRayUI("MatrixSource");
     compareRayLists(a, b);
 }
 TEST_F(ShaderTest, PlaneMirror) { compareAgainstRayUI("PlaneMirror"); }
