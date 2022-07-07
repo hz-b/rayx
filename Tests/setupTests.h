@@ -1,5 +1,10 @@
 #pragma once
 
+#include <fstream>
+#include <functional>
+#include <sstream>
+#include <type_traits>
+
 #include "Core.h"
 #include "Data/Importer.h"
 #include "Debug.h"
@@ -27,13 +32,76 @@ extern char** GLOBAL_ARGV;
     CHECK_EQ(A, B);        // with default tolerance
 */
 
-void checkEq(std::string filename, int line, std::string l, std::string r,
-             std::vector<double> vl, std::vector<double> vr,
-             double tolerance = 1e-10);
+const int PREC = 17;
 
-#define CHECK_EQ(L, R, ...)                                   \
-    checkEq(__FILE__, __LINE__, #L, #R, RAYX::formatAsVec(L), \
-            RAYX::formatAsVec(R),                             \
+template <typename TL, typename TR>
+inline void checkEq(std::string filename, int line, std::string l,
+                    std::string r, const TL& tl, const TR& tr,
+                    std::vector<double> vl, std::vector<double> vr,
+                    double tolerance = 1e-10) {
+    if (vl.size() != vr.size()) {
+        RAYX::Err(filename, line) << l << " != " << r << ": different lengths!";
+        return;
+    }
+
+    bool success = true;
+    for (size_t i = 0; i < vl.size(); i++) {
+        if (abs(vl[i] - vr[i]) > tolerance) {
+            success = false;
+            break;
+        }
+    }
+    if (success) return;
+
+    RAYX::Warn(filename, line) << l << " != " << r << ":";
+
+    int counter = 0;  // stores the number of elements in the stringstream
+    std::stringstream s;
+    for (size_t i = 0; i < vl.size(); i++) {
+        if (counter != 0) {
+            s << " ";
+        }
+        if (abs(vl[i] - vr[i]) <= tolerance) {
+            s << std::setprecision(PREC) << vl[i] << "|" << vr[i];
+        } else {
+            s << "\x1B[36m" << std::setprecision(PREC) << vl[i] << "|" << vr[i]
+              << "\x1B[31m";
+        }
+
+        counter++;
+        if (counter == 4 &&
+            vl.size() == 16) {  // 4x4 things should be written in 4 rows
+            counter = 0;
+            RAYX::Warn(filename, line) << s.str();
+            s = std::stringstream();
+        }
+    }
+    if (counter > 0) {
+        RAYX::Warn(filename, line) << s.str();
+    }
+    ADD_FAILURE();
+}
+
+// specialized handling for rays, better prints!
+template <>
+inline void checkEq(std::string filename, int line, std::string l,
+                    std::string r, const RAYX::Ray& tl, const RAYX::Ray& tr,
+                    std::vector<double> vl, std::vector<double> vr,
+                    double tolerance) {
+    std::vector<char*> names = {
+        ".m_position.x",  ".m_position.y",  ".m_position.z",  ".m_weight",
+        ".m_direction.x", ".m_direction.y", ".m_direction.z", ".m_energy",
+        ".m_stokes.x",    ".m_stokes.y",    ".m_stokey.z",    ".m_stokes.w",
+        ".m_pathLength",  ".m_order",       ".m_lastElement", ".m_extraParam"};
+    for (int i = 0; i < 16; i++) {
+        checkEq(filename, line, l + names[i], r + names[i], vl[i], vr[i],
+                {vl[i]}, {vr[i]}, tolerance);
+    }
+}
+
+#define CHECK_EQ(L, R, ...)                                         \
+    checkEq(__FILE__, __LINE__, #L, #R, L, R, RAYX::formatAsVec(L), \
+            RAYX::formatAsVec(R),                                   \
             ##__VA_ARGS__)  // __VA_ARGS__ = tolerance or nothing
 
 // ShaderTest
