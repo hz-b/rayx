@@ -101,6 +101,10 @@ struct IgnoreLog {
     }
 };
 
+// the function to be called after RAYX_ERR happens.
+// normally exit(1), but in the test suite it's ADD_FAILURE.
+extern void (*error_fn)();
+
 #define RAYX_LOG RAYX::Log(__FILE__, __LINE__)
 #define RAYX_WARN RAYX::Warn(__FILE__, __LINE__)
 #define RAYX_ERR RAYX::Err(__FILE__, __LINE__)

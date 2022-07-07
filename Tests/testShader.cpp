@@ -14,11 +14,19 @@ using namespace RAYX::CPP_TRACER;
 
 TEST_F(TestSuite, testUniformRandom) {
 	uint64_t ctr = 13;
+	double old = 0;
+
 	for (int i = 0; i < 100; i++) {
 		double d = squaresDoubleRNG(ctr);
-		if (d < 0.0 || d > 1.0) {
-			ADD_FAILURE() << "invalid d";
+		/* // TODO(rudi) uncomment this when it works.
+		if (d == old) {
+			RAYX_ERR << "repeating number! " << d;
 		}
+		*/
+		if (d < 0.0 || d > 1.0) {
+			RAYX_ERR << "random number out of range [0, 1]: " << d;
+		}
+		old = d;
 	}
 }
 

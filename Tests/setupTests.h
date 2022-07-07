@@ -40,9 +40,13 @@ void checkEq(std::string filename, int line, std::string l, std::string r,
 
 extern std::unique_ptr<RAYX::Tracer> tracer;
 
+inline void add_failure() { ADD_FAILURE(); }
+
 class TestSuite : public testing::Test {
   protected:
     static void SetUpTestSuite() {
+        RAYX::error_fn = add_failure;
+
         bool cpu = false;
         for (int i = 1; i < GLOBAL_ARGC; i++) {
             if (strcmp(GLOBAL_ARGV[i], "-x") == 0 ||

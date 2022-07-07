@@ -61,8 +61,12 @@ Err::~Err() {
     std::cerr << "\n";
     formatDebugMsg(filename, line, std::cerr);
     std::cerr << "Terminating...\033[0m" << std::endl;  // color reset
-    exit(1);
+
+    error_fn();
 }
+
+void exit1() { exit(1); }
+void (*error_fn)() = exit1;
 
 const int PREC = 17;
 
