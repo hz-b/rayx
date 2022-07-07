@@ -9,6 +9,7 @@ double r8_exp(double);
 double r8_log(double);
 double squaresDoubleRNG(uint64_t&);
 Ray refrac2D(Ray, glm::dvec4, double, double);
+Ray refrac(Ray, glm::dvec4, double);
 glm::dvec4 normal_cartesian(glm::dvec4, double, double);
 glm::dvec4 normal_cylindrical(glm::dvec4, double, double);
 }  // namespace CPP_TRACER
@@ -215,5 +216,73 @@ TEST_F(TestSuite, testNormalCylindrical) {
         auto out = CPP_TRACER::normal_cylindrical(p.in_normal, p.in_slopeX,
                                                   p.in_slopeZ);
         CHECK_EQ(out, p.out);
+    }
+}
+
+TEST_F(TestSuite, testRefrac) {
+    std::vector<Ray> input = {
+        {
+            .m_position = glm::dvec3(0, 1, 0),
+            .m_weight = 1,
+            .m_direction =
+                glm::dvec3(-0.00049999991666667084, -0.99558611855684065,
+                           0.093851108341926226),
+            .m_energy = 0.01239852,
+        },
+        {
+            .m_position = glm::dvec3(0, 1, 0),
+            .m_weight = 1,
+            .m_direction = glm::dvec3(-1.6666664506172892e-05,
+                                      -0.995586229182718, 0.093851118714515264),
+            .m_energy = 0.01239852,
+        },
+        {
+            .m_position = glm::dvec3(0.0027574667592826954, 0.99999244446428082,
+                                     -0.0027399619384214182),
+            .m_weight = 1,
+            .m_direction =
+                glm::dvec3(-0.00049999991666667084, -0.99558611855684065,
+                           0.093851108341926226),
+            .m_energy = 0.01239852,
+        },
+        {
+            .m_position = glm::dvec3(0, 1, 0),
+            .m_weight = 1,
+            .m_direction =
+                glm::dvec3(-0.99991341437509562, 0.013149667401360443,
+                           -0.00049999997222215965),
+            .m_energy = -0.038483898782123105,
+        },
+    };
+
+    // the correct rays should only be altered in weight & direction.
+    std::vector<Ray> correct = input;
+
+    correct[0].m_weight = 1;
+    correct[0].m_direction = glm::dvec3(
+        -0.00049999991666667084, 0.99667709206767885, 0.08145258834192623);
+
+    correct[1].m_weight = 1;
+    correct[1].m_direction = glm::dvec3(
+        -1.6666664506160695e-05, 0.9966772027014974, 0.081452598714515267);
+
+    correct[2].m_weight = 1;
+    correct[2].m_direction = glm::dvec3(
+        0.0049947959329671825, 0.99709586573547515, 0.07599267429701162);
+
+    correct[3].m_weight = 0;
+    correct[3].m_direction = glm::dvec3(
+        -0.99991341437509562, 0.013149667401360443, -0.00049999997222215965);
+
+    CHECK_EQ(input.size(), correct.size());
+    for (uint i = 0; i < input.size(); i++) {
+        auto r = input[i];
+
+        glm::dvec4 normal = glm::dvec4(r.m_position, 0);
+        double a = r.m_energy;
+
+        auto out = CPP_TRACER::refrac(r, normal, a);
+
+        CHECK_EQ(out, correct[i]);
     }
 }
