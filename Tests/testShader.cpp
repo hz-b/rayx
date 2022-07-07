@@ -18,11 +18,9 @@ TEST_F(TestSuite, testUniformRandom) {
 
 	for (int i = 0; i < 100; i++) {
 		double d = squaresDoubleRNG(ctr);
-		/* // TODO(rudi) uncomment this when it works.
 		if (d == old) {
-			RAYX_ERR << "repeating number! " << d;
+			RAYX_WARN << "repeating number in testUniformRandom! " << d;
 		}
-		*/
 		if (d < 0.0 || d > 1.0) {
 			RAYX_ERR << "random number out of range [0, 1]: " << d;
 		}
