@@ -57,10 +57,6 @@ TEST_F(TestSuite, testRefrac2D) {
             .m_energy = 0,
             .m_stokes =
                 glm::dvec4(0.00016514977645243345, 0.012830838024391771, 0, 0),
-            .m_pathLength = 0,
-            .m_order = 0,
-            .m_lastElement = 0,
-            .m_extraParam = 0,
         },
         {
             .m_position = glm::dvec3(0, 1, 0),
@@ -71,10 +67,6 @@ TEST_F(TestSuite, testRefrac2D) {
             .m_energy = 0,
             .m_stokes =
                 glm::dvec4(-6.2949352042540596e-05, 0.038483898782123105, 0, 0),
-            .m_pathLength = 0,
-            .m_order = 0,
-            .m_lastElement = 0,
-            .m_extraParam = 0,
         },
         {
             .m_position = glm::dvec3(0, 1, 0),
@@ -85,10 +77,6 @@ TEST_F(TestSuite, testRefrac2D) {
             .m_energy = 0,
             .m_stokes =
                 glm::dvec4(-0.077169530850327184, 0.2686127340088395, 0, 0),
-            .m_pathLength = 0,
-            .m_order = 0,
-            .m_lastElement = 0,
-            .m_extraParam = 0,
         },
         {
             .m_position = glm::dvec3(0.050470500672820856, 0.95514062789960541,
@@ -100,10 +88,6 @@ TEST_F(TestSuite, testRefrac2D) {
             .m_energy = 0,
             .m_stokes =
                 glm::dvec4(0.0021599283476277926, -0.050153240660177005, 0, 0),
-            .m_pathLength = 0,
-            .m_order = 0,
-            .m_lastElement = 0,
-            .m_extraParam = 0,
         },
     };
 
