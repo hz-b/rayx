@@ -9,6 +9,7 @@ double r8_exp(double);
 double r8_log(double);
 double squaresDoubleRNG(uint64_t&);
 Ray refrac2D(Ray, glm::dvec4, double, double);
+glm::dvec4 normal_cartesian(glm::dvec4, double, double);
 }  // namespace CPP_TRACER
 }  // namespace RAYX
 
@@ -110,6 +111,7 @@ TEST_F(TestSuite, testRefrac2D) {
     correct[3].m_direction = glm::dvec3(
         0.080765992839840872, 0.57052382524991363, 0.81730007905468893);
 
+    CHECK_EQ(input.size(), correct.size());
     for (uint i = 0; i < input.size(); i++) {
         auto r = input[i];
 
@@ -120,5 +122,53 @@ TEST_F(TestSuite, testRefrac2D) {
         auto out = CPP_TRACER::refrac2D(r, normal, az, ax);
 
         CHECK_EQ(out, correct[i]);
+    }
+}
+
+TEST_F(TestSuite, testNormalCartesian) {
+    std::vector<Ray> input = {
+        {
+            .m_position = glm::dvec3(0, 0, 0),
+            .m_weight = 0,
+            .m_direction = glm::dvec3(0, 1, 0),
+        },
+        {
+            .m_position = glm::dvec3(0, 0, 0),
+            .m_weight = 0,
+            .m_direction = glm::dvec3(5.0465463027123736, 10470.451695989539,
+                                      -28.532199794465537),
+        },
+        {
+            .m_position = glm::dvec3(2, 0, 3),
+            .m_weight = 0,
+            .m_direction = glm::dvec3(0, 1, 0),
+        },
+        {
+            .m_position = glm::dvec3(2, 0, 3),
+            .m_weight = 0,
+            .m_direction = glm::dvec3(5.0465463027123736, 10470.451695989539,
+                                      -28.532199794465537),
+        }};
+
+    std::vector<glm::dvec3> correct = {
+        glm::dvec3(0, 1, 0),
+        glm::dvec3(5.0465463027123736, 10470.451695989539, -28.532199794465537),
+        glm::dvec3(-0.90019762973551742, 0.41198224566568298,
+                   -0.14112000805986721),
+        glm::dvec3(-9431.2371568647086, 4310.7269916467494,
+                   -1449.3435640204684),
+    };
+
+    CHECK_EQ(input.size(), correct.size());
+    for (uint i = 0; i < input.size(); i++) {
+        auto r = input[i];
+
+        glm::dvec4 normal = glm::dvec4(r.m_direction, 0);
+        double slopeX = r.m_position.x;
+        double slopeZ = r.m_position.z;
+
+        glm::dvec4 out = CPP_TRACER::normal_cartesian(normal, slopeX, slopeZ);
+
+        CHECK_EQ(glm::dvec3(out), correct[i]);
     }
 }
