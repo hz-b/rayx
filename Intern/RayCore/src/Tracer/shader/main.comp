@@ -56,17 +56,20 @@ const double inm2eV   = 1.239852e3;
 #endif
 
 /* STRUCTS */
+// for CPP, the according struct is already defined.
+#ifndef CPP
 struct Ray {
-    dvec3 position;
-    double weight;  // status of the ray (e.g if element missed -> 0)
-    dvec3 direction;
-    double energy;
-    dvec4 stokes;
-    double pathLength;
-    double order;
-    double lastElement;
-    double extraParameter;
+    dvec3 m_position;
+    double m_weight;  // status of the ray (e.g if element missed -> 0)
+    dvec3 m_direction;
+    double m_energy;
+    dvec4 m_stokes;
+    double m_pathLength;
+    double m_order;
+    double m_lastElement;
+    double m_extraParam;
 };
+#endif
 struct Element {
     dmat4 surfaceParams;
     dmat4 inTrans;
@@ -184,7 +187,7 @@ void dynamicElements() {
              elementIndex < (beamlineIndex + 1) * numberOfElementsPerBeamline; elementIndex++) {
             if (elementIndex == lastClosestElementIndex) {
                 // TODO: self-intersection
-                // rayData[uint(gl_GlobalInvocationID)].weight = 11;
+                // rayData[uint(gl_GlobalInvocationID)].m_weight = 11;
                 continue;
             }
 
@@ -200,7 +203,7 @@ void dynamicElements() {
             dvec3 closestGlobalHitpoint_xyz = dvec3(closestGlobalHitpoint.x, closestGlobalHitpoint.y, closestGlobalHitpoint.z);
             // check if current intersection is closer than the closest previous Hitpoint
             // If yes then update. Since the old intersection is occluded by the old Intersection/Hit point
-            if (length(ray.position - closestGlobalHitpoint_xyz) > length(ray.position - currentGlobalIntersection_xyz) &&
+            if (length(ray.m_position - closestGlobalHitpoint_xyz) > length(ray.m_position - currentGlobalIntersection_xyz) &&
                 currentIntersection.w != 0) {
                 closestHitpoint       = currentIntersection;
                 closestGlobalHitpoint = currentGlobalIntersection;
@@ -235,8 +238,8 @@ void dynamicElements() {
             rayData[uint(gl_GlobalInvocationID)] = traceRZP(rayData[uint(gl_GlobalInvocationID)], closestElementIndex, ctr, closestHitpoint);
 
         } else if (type == 5) {  // image plane
-            rayData[uint(gl_GlobalInvocationID)].extraParameter += (closestElementIndex + 1) * bounce;
-            rayData[uint(gl_GlobalInvocationID)].lastElement = closestElementIndex + 1;
+            rayData[uint(gl_GlobalInvocationID)].m_extraParam += (closestElementIndex + 1) * bounce;
+            rayData[uint(gl_GlobalInvocationID)].m_lastElement = closestElementIndex + 1;
             outputData[uint(gl_GlobalInvocationID)] = traceImagePlane(rayData[uint(gl_GlobalInvocationID)], closestElementIndex, closestHitpoint);
             return;
 
@@ -250,9 +253,9 @@ void dynamicElements() {
 
         // use extraParameter to store the order in which the ray has hit which optical element (e.g extraParameter = 412 -> first hit element 2, then
         // 1, then 4)
-        rayData[uint(gl_GlobalInvocationID)].extraParameter +=
-            ((closestElementIndex + 1) * bounce) * int(rayData[uint(gl_GlobalInvocationID)].lastElement == closestElementIndex + 1);
-        bounce *= pow(10, int(rayData[uint(gl_GlobalInvocationID)].lastElement == closestElementIndex + 1));
+        rayData[uint(gl_GlobalInvocationID)].m_extraParam +=
+            ((closestElementIndex + 1) * bounce) * int(rayData[uint(gl_GlobalInvocationID)].m_lastElement == closestElementIndex + 1);
+        bounce *= pow(10, int(rayData[uint(gl_GlobalInvocationID)].m_lastElement == closestElementIndex + 1));
 
         // transform back to WORLD coordinates
         rayData[uint(gl_GlobalInvocationID)] = rayMatrixMult(rayData[uint(gl_GlobalInvocationID)], nextElement.outTrans);

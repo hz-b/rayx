@@ -9,8 +9,8 @@ double hvlam(double x) {
 // multiplies position and direction of ray r with transformation matrix m
 // r = dot(m, r)
 Ray rayMatrixMult(Ray r, const dmat4 m) {
-    r.position  = dvec3(m * dvec4(r.position, 1));
-    r.direction = dvec3(m * dvec4(r.direction, 0));
+    r.m_position  = dvec3(m * dvec4(r.m_position, 1));
+    r.m_direction = dvec3(m * dvec4(r.m_direction, 0));
     return r;
 }
 
@@ -30,8 +30,8 @@ Ray rotationAroundX(Ray r, double sin_psi, double cos_psi) {
  * output: nothing. changes r in place
  */
 void inTransformation(INOUT(Ray) r, const dmat4 misalignment, const dmat4 inTrans) {
-    r.position  = dvec3(misalignment * (inTrans * dvec4(r.position, 1)));
-    r.direction = dvec3(misalignment * (inTrans * dvec4(r.direction, 0)));
+    r.m_position  = dvec3(misalignment * (inTrans * dvec4(r.m_position, 1)));
+    r.m_direction = dvec3(misalignment * (inTrans * dvec4(r.m_direction, 0)));
 }
 
 /**
@@ -46,8 +46,8 @@ void inTransformation(INOUT(Ray) r, const dmat4 misalignment, const dmat4 inTran
  * output: nothing. changes r in place
  */
 void outTransformation(INOUT(Ray) r, const dmat4 invMisalignment, const dmat4 outTrans) {
-    r.position  = dvec3(outTrans * (invMisalignment * dvec4(r.position, 1)));
-    r.direction = dvec3(outTrans * (invMisalignment * dvec4(r.direction, 0)));
+    r.m_position  = dvec3(outTrans * (invMisalignment * dvec4(r.m_position, 1)));
+    r.m_direction = dvec3(outTrans * (invMisalignment * dvec4(r.m_direction, 0)));
 }
 
 // only for testing purposes. generally, each angle in the shader is in rad!!
@@ -80,9 +80,9 @@ void cosini(INOUT(Ray) r, double phi, double psi) {
     double sin_psi = r8_sin(psi);
     double sin_phi = r8_sin(phi);
 
-    r.direction.x = cos_psi * sin_phi;
-    r.direction.y = -sin_psi;
-    r.direction.z = cos_psi * cos_phi;
+    r.m_direction.x = cos_psi * sin_phi;
+    r.m_direction.y = -sin_psi;
+    r.m_direction.z = cos_psi * cos_phi;
 }
 
 /**
@@ -295,7 +295,7 @@ dvec2 getRefractiveIndex(double energy, int material) {
 // returns angle between ray direction and surface normal at intersection point
 double getIncidenceAngle(Ray r, dvec4 normal) {
     normal    = normalize(normal);
-    double ar = dot(dvec3(normal), r.direction);
+    double ar = dot(dvec3(normal), r.m_direction);
     // cut to interval [-1,1]
     if (ar < -1.0)
         ar = -1.0;
@@ -420,7 +420,7 @@ double phase_difference(dvec2 euler1, dvec2 euler2) {
  */
 void efficiency(Ray r, OUT(double) real_S, OUT(double) real_P, OUT(double) delta, double incidence_angle, int material) {
     dvec2 complex_S, complex_P;
-    reflectance(r.energy, incidence_angle, complex_S, complex_P, material);
+    reflectance(r.m_energy, incidence_angle, complex_S, complex_P, material);
 
     dvec2 euler_P = cartesian_to_euler(complex_P);
     dvec2 euler_S = cartesian_to_euler(complex_S);
@@ -452,7 +452,7 @@ dmat4 muller_matrix(double R_s, double R_p, double delta) {
  * @returns updated stokes vector of ray, updates weight of ray
  */
 void update_stokes(INOUT(Ray) r, double real_S, double real_P, double delta, double azimuthal, INOUT(uint64_t) ctr) {
-    dvec4 stokes_old = r.stokes;
+    dvec4 stokes_old = r.m_stokes;
     double c_chi     = r8_cos(azimuthal);
     double s_chi     = r8_sin(azimuthal);
     dmat4 rot        = dmat4(1, 0, 0, 0, 0, c_chi, -s_chi, 0, 0, s_chi, c_chi, 0, 0, 0, 0, 1);
@@ -460,11 +460,11 @@ void update_stokes(INOUT(Ray) r, double real_S, double real_P, double delta, dou
 
     dvec4 stokes_new = muller_matrix(real_S, real_P, delta) * rot * stokes_old;
     ;
-    r.stokes = inv_rot * stokes_new;
+    r.m_stokes = inv_rot * stokes_new;
 
     double rn = squaresDoubleRNG(ctr);
     // throw ray away with certain probability
-    if ((r.stokes.x / stokes_old.x) - rn <= 0) r.weight = 0;
+    if ((r.m_stokes.x / stokes_old.x) - rn <= 0) r.m_weight = 0;
     return;
 }
 
@@ -554,9 +554,9 @@ void RZPLineDensity(Ray r, dvec4 normal, int IMAGE_TYPE, int RZP_TYPE, ALLOW_UNU
     double FX = normal.x;
     double FY = normal.y;
     double FZ = normal.z;
-    double X  = r.position.x;
-    double Y  = r.position.y;
-    double Z  = r.position.z;
+    double X  = r.m_position.x;
+    double Y  = r.m_position.y;
+    double Z  = r.m_position.z;
 
     if (RZP_TYPE == 1)  // meridional (wie VLS grating)
         X = 0;
@@ -675,22 +675,22 @@ Ray refrac2D(Ray r, dvec4 normal, double az, double ax) {
     double sin_e  = r8_sin(-eps1);
     dmat3 rot     = dmat3(cos_e, cos_d * sin_e, sin_d * sin_e, -sin_e, cos_d * cos_e, sin_d * cos_e, 0, -sin_d, cos_d);
     dmat3 inv_rot = dmat3(cos_e, -sin_e, 0, cos_d * sin_e, cos_d * cos_e, -sin_d, sin_d * sin_e, sin_d * cos_e, cos_d);
-    r.direction   = rot * r.direction;
+    r.m_direction   = rot * r.m_direction;
 
-    double x1 = r.direction.x - ax;
-    double z1 = r.direction.z - az;
+    double x1 = r.m_direction.x - ax;
+    double z1 = r.m_direction.z - az;
     double y1 = 1 - x1 * x1 - z1 * z1;
 
     if (y1 > 0) {
         y1 = sqrt(y1);
 
-        r.direction.x = x1;
-        r.direction.y = y1;
-        r.direction.z = z1;
+        r.m_direction.x = x1;
+        r.m_direction.y = y1;
+        r.m_direction.z = z1;
     } else {  // beyond horizon - when divergence too large
-        r.weight = 0.0;
+        r.m_weight = 0.0;
     }
-    r.direction = inv_rot * r.direction;
+    r.m_direction = inv_rot * r.m_direction;
     return r;
 }
 
@@ -712,17 +712,17 @@ Ray refrac(Ray r, dvec4 normal, double linedensity) {
     double sin_e  = r8_sin(-eps1);
     dmat4 rot     = dmat4(cos_e, cos_d * sin_e, sin_d * sin_e, 0, -sin_e, cos_d * cos_e, sin_d * cos_e, 0, 0, -sin_d, cos_d, 0, 0, 0, 0, 1);
     dmat4 inv_rot = dmat4(cos_e, -sin_e, 0, 0, cos_d * sin_e, cos_d * cos_e, -sin_d, 0, sin_d * sin_e, sin_d * cos_e, cos_d, 0, 0, 0, 0, 1);
-    r.direction   = dvec3(rot * dvec4(r.direction, 0));
+    r.m_direction   = dvec3(rot * dvec4(r.m_direction, 0));
 
-    double y1 = (r.direction[1] * r.direction[1] + r.direction[2] * r.direction[2] - ((r.direction[2] - a1) * (r.direction[2] - a1)));
+    double y1 = (r.m_direction[1] * r.m_direction[1] + r.m_direction[2] * r.m_direction[2] - ((r.m_direction[2] - a1) * (r.m_direction[2] - a1)));
     if (y1 > 0) {
         y1             = sqrt(y1);
-        r.direction[1] = y1;
-        r.direction[2] -= a1;
+        r.m_direction[1] = y1;
+        r.m_direction[2] -= a1;
     } else {
-        r.weight = 0.0;
+        r.m_weight = 0.0;
     }
-    r.direction = dvec3(inv_rot * dvec4(r.direction, 0));
+    r.m_direction = dvec3(inv_rot * dvec4(r.m_direction, 0));
     return r;
 }
 
@@ -752,13 +752,13 @@ double vlsGrating(double lineDensity, double z, double vls[6]) {
  * @param a			a = WL * D0 * ORD * 1.e-6  with D0: line density (l/mm); WL:wavelength (nm); ORD order of diffraction
  */
 Ray refrac_plane(Ray r, ALLOW_UNUSED dvec4 normal, double a) { // TODO fix unused var
-    double y1 = r.direction[1] * r.direction[1] + r.direction[2] * r.direction[2] - (r.direction[2] - a) * (r.direction[2] - a);
+    double y1 = r.m_direction[1] * r.m_direction[1] + r.m_direction[2] * r.m_direction[2] - (r.m_direction[2] - a) * (r.m_direction[2] - a);
     if (y1 > 0) {
         y1             = sqrt(y1);
-        r.direction[1] = y1;
-        r.direction[2] = r.direction[2] - a;
+        r.m_direction[1] = y1;
+        r.m_direction[2] = r.m_direction[2] - a;
     } else {
-        r.weight = 0.0;  // status?
+        r.m_weight = 0.0;  // status?
     }
     return r;
 }

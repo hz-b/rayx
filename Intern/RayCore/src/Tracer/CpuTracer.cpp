@@ -20,47 +20,6 @@ CpuTracer::CpuTracer() { RAYX_LOG << "Initializing Cpu Tracer.."; }
 
 CpuTracer::~CpuTracer() {}
 
-/**
- * @brief These conversion functions only need to exist, as the shader doesn't
- * use m_prefixes to variables, whereas the c++ code does.
- *
- * @param r Input Ray from RAY-X Core
- * @return CPP_TRACER::Ray Output Ray to Shader
- */
-CPP_TRACER::Ray convert(Ray r) {
-    CPP_TRACER::Ray out;
-    out.position = r.m_position;
-    out.weight = r.m_weight;
-    out.direction = r.m_direction;
-    out.energy = r.m_energy;
-    out.stokes = r.m_stokes;
-    out.pathLength = r.m_pathLength;
-    out.order = r.m_order;
-    out.lastElement = r.m_lastElement;
-    out.extraParameter =
-        r.m_extraParam;  // TODO: unite extraParameter vs. extraParam
-    return out;
-}
-/**
- * @brief Similar to CPP_TRACER::RAY, but the other way around.
- *
- * @param r
- * @return Ray
- */
-Ray backConvert(CPP_TRACER::Ray r) {
-    Ray out;
-    out.m_position = r.position;
-    out.m_weight = r.weight;
-    out.m_direction = r.direction;
-    out.m_energy = r.energy;
-    out.m_stokes = r.stokes;
-    out.m_pathLength = r.pathLength;
-    out.m_order = r.order;
-    out.m_lastElement = r.lastElement;
-    out.m_extraParam = r.extraParameter;
-    return out;
-}
-
 RayList CpuTracer::trace(const Beamline& beamline) {
     auto rayList = beamline.getInputRays();
 
@@ -82,7 +41,7 @@ RayList CpuTracer::trace(const Beamline& beamline) {
     // init rayData, outputData
     for (auto a : rayList) {
         for (auto r : a) {
-            CPP_TRACER::rayData.data.push_back(convert(r));
+            CPP_TRACER::rayData.data.push_back(r);
             CPP_TRACER::outputData.data.push_back({});
         }
     }
@@ -119,7 +78,7 @@ RayList CpuTracer::trace(const Beamline& beamline) {
     // Fetch Rays back from the Shader "container"
     RayList out;
     for (auto r : CPP_TRACER::outputData.data) {
-        out.push(backConvert(r));
+        out.push(r);
     }
     return out;
 }
