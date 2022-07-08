@@ -20,6 +20,7 @@ void RZPLineDensity(Ray r, glm::dvec4 normal, int IMAGE_TYPE, int RZP_TYPE,
 Ray rayMatrixMult(Ray, glm::dmat4);
 void cosini(Ray&, double, double);
 double dpow(double, int);
+double fact(int);
 
 }  // namespace CPP_TRACER
 }  // namespace RAYX
@@ -827,5 +828,70 @@ TEST_F(TestSuite, testCosini) {
         Ray out_ray;
         CPP_TRACER::cosini(out_ray, p.in_phi, p.in_psi);
         CHECK_EQ(out_ray.m_direction, p.out_direction);
+    }
+}
+
+TEST_F(TestSuite, testFact) {
+    struct InOutPair {
+        int in;
+
+        double out;
+    };
+
+    std::vector<InOutPair> inouts = {
+        {
+            .in = 2,
+            .out = 2,
+        },
+        {
+            .in = 1,
+            .out = 1,
+        },
+        {
+            .in = 0,
+            .out = 1,
+        },
+        {
+            .in = 17,
+            .out = 355687428096000,
+        },
+        {
+            .in = 4,
+            .out = 24,
+        },
+        {
+            .in = -1,
+            .out = -1,
+        },
+        {
+            .in = -2,
+            .out = -2,
+        },
+        {
+            .in = 0,
+            .out = 1,
+        },
+        {
+            .in = 12,
+            .out = 479001600,
+        },
+        {
+            .in = -4,
+            .out = -4,
+        },
+        {
+            .in = 10,
+            .out = 3628800,
+        },
+        {
+            .in = 0,
+            .out = 1,
+        },
+
+    };
+
+    for (auto p : inouts) {
+        auto out = CPP_TRACER::fact(p.in);
+        CHECK_EQ(out, p.out);
     }
 }
