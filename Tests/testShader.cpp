@@ -25,6 +25,7 @@ double bessel1(double);
 double r8_sin(double);
 double r8_cos(double);
 double r8_atan(double);
+double vlsGrating(double, double, double[6]);
 
 }  // namespace CPP_TRACER
 }  // namespace RAYX
@@ -1014,6 +1015,34 @@ TEST_F(TestSuite, testBessel1) {
 
     for (auto p : inouts) {
         auto out = CPP_TRACER::bessel1(p.in);
+        CHECK_EQ(out, p.out);
+    }
+}
+
+TEST_F(TestSuite, testVlsGrating) {
+    struct InOutPair {
+        double in_lineDensity;
+        double in_z;
+        double in_vls[6];
+
+        double out;
+    };
+
+    std::vector<InOutPair> inouts = {{
+                                         .in_lineDensity = 0.01239852,
+                                         .in_z = 5.0020783775947848,
+                                         .in_vls = {0, 0, 0, 0, 0, 0},
+                                         .out = 0.01239852,
+                                     },
+                                     {
+                                         .in_lineDensity = 0.01239852,
+                                         .in_z = 5.0020783775947848,
+                                         .in_vls = {1, 2, 3, 4, 5, 6},
+                                         .out = 9497.4799596119265,
+                                     }};
+
+    for (auto p : inouts) {
+        auto out = CPP_TRACER::vlsGrating(p.in_lineDensity, p.in_z, p.in_vls);
         CHECK_EQ(out, p.out);
     }
 }
