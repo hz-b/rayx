@@ -11,7 +11,6 @@ SET(SOURCE
     src/Data/xml.cpp
     src/Data/DatFile.cpp
     src/Model/Beamline/Beamline.cpp
-    src/Model/Beamline/BeamlineObject.cpp
     src/Model/Beamline/OpticalElement.cpp
     src/Model/Beamline/LightSource.cpp
     src/Model/Beamline/EnergyDistribution.cpp
@@ -50,7 +49,6 @@ SET(HEADERS
     src/PathResolver.h
     src/utils.h
     src/Model/Beamline/Beamline.h
-    src/Model/Beamline/BeamlineObject.h
     src/Model/Beamline/OpticalElement.h
     src/Model/Beamline/LightSource.h
     src/Model/Beamline/EnergyDistribution.h

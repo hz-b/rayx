@@ -7,7 +7,7 @@
 #include <stdexcept>
 #include <vector>
 
-#include "BeamlineObject.h"
+
 #include "Core.h"
 #include "Model/Geometry/Geometry.h"
 #include "Model/Surface/Surface.h"
@@ -15,7 +15,7 @@
 
 namespace RAYX {
 
-class RAYX_API OpticalElement : public BeamlineObject {
+class RAYX_API OpticalElement {
   public:
     // needed to add optical elements to tracer
     OpticalElement(const char* name,
@@ -75,6 +75,7 @@ class RAYX_API OpticalElement : public BeamlineObject {
     OpticalElement();
     virtual ~OpticalElement();
 
+    const char* m_name;
   private:
     // GEOMETRY
     std::unique_ptr<Geometry> m_geometry;  // will replace all of the following
