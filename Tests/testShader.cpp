@@ -21,6 +21,7 @@ Ray rayMatrixMult(Ray, glm::dmat4);
 void cosini(Ray&, double, double);
 double dpow(double, int);
 double fact(int);
+double bessel1(double);
 
 }  // namespace CPP_TRACER
 }  // namespace RAYX
@@ -892,6 +893,79 @@ TEST_F(TestSuite, testFact) {
 
     for (auto p : inouts) {
         auto out = CPP_TRACER::fact(p.in);
+        CHECK_EQ(out, p.out);
+    }
+}
+
+TEST_F(TestSuite, testBessel1) {
+    struct InOutPair {
+        double in;
+
+        double out;
+    };
+
+    std::vector<InOutPair> inouts = {
+        {
+            .in = 100,
+            .out = 0,
+        },
+        {
+            .in = 20.100000000000001,
+            .out = 0,
+        },
+        {
+            .in = -12.122999999999999,
+            .out = 0,
+        },
+        {
+            .in = 23.100000000000001,
+            .out = 0,
+        },
+        {
+            .in = 0,
+            .out = 0,
+        },
+        {
+            .in = 20,
+            .out = 0.066833545658411236,
+        },
+        {
+            .in = -0.10000000000000001,
+            .out = 0,
+        },
+        {
+            .in = 1e-08,
+            .out = 5.0000000000000001e-09,
+        },
+        {
+            .in = 2,
+            .out = 0.57672480775687363,
+        },
+        {
+            .in = 12.122999999999999,
+            .out = -0.21368198451302897,
+        },
+        {
+            .in = 3.1415926535897931,
+            .out = 0.28461534317975273,
+        },
+        {
+            .in = 10.199999999999999,
+            .out = -0.0066157432977083167,
+        },
+        {
+            .in = 19.989999999999998,
+            .out = 0.065192988349741909,
+        },
+        {
+            .in = 4,
+            .out = -0.06604332802354923,
+        },
+
+    };
+
+    for (auto p : inouts) {
+        auto out = CPP_TRACER::bessel1(p.in);
         CHECK_EQ(out, p.out);
     }
 }
