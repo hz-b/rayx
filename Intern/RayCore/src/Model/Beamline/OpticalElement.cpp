@@ -26,7 +26,7 @@ OpticalElement::OpticalElement(const char* name,
                                const std::array<double, 4 * 4> inputOutMatrix,
                                const std::array<double, 4 * 4> OParameters,
                                const std::array<double, 4 * 4> EParameters)
-    : BeamlineObject(name) {
+    : m_name(name) {
     m_surfaceParams = surfaceParams;
     m_geometry = std::make_unique<Geometry>();
     m_geometry->setInMatrix(inputInMatrix);
@@ -55,7 +55,7 @@ OpticalElement::OpticalElement(const char* name,
                                const double azimuthalAngle, glm::dvec4 position,
                                glm::dmat4x4 orientation,
                                const std::array<double, 7> slopeError)
-    : BeamlineObject(name),
+    : m_name(name), 
       m_slopeError(slopeError),
       m_elementParameters(EParameters) {
     m_geometry = std::make_unique<Geometry>(
@@ -71,7 +71,7 @@ OpticalElement::OpticalElement(const char* name,
                                const double height, const double azimuthalAngle,
                                glm::dvec4 position, glm::dmat4x4 orientation,
                                const std::array<double, 7> slopeError)
-    : BeamlineObject(name),
+    : m_name(name), 
       m_slopeError(slopeError),
       m_elementParameters(EParameters) {
     m_geometry =
@@ -85,7 +85,7 @@ OpticalElement::OpticalElement(const char* name,
                                const double height, const double azimuthalAngle,
                                glm::dvec4 position, glm::dmat4x4 orientation,
                                const std::array<double, 7> slopeError)
-    : BeamlineObject(name), m_slopeError(slopeError) {
+    : m_name(name), m_slopeError(slopeError) {
     m_geometry =
         std::make_unique<Geometry>(geometricalShape, widthA, widthB, height,
                                    azimuthalAngle, position, orientation);
@@ -108,7 +108,7 @@ OpticalElement::OpticalElement(const char* name,
                                const double azimuthalAngle, glm::dvec4 position,
                                glm::dmat4x4 orientation,
                                const std::array<double, 7> slopeError)
-    : BeamlineObject(name), m_slopeError(slopeError) {
+    : m_name(name), m_slopeError(slopeError) {
     m_geometry = std::make_unique<Geometry>(
         geometricalShape, width, height, azimuthalAngle, position, orientation);
     updateObjectParams();

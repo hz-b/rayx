@@ -8,7 +8,7 @@
 #include <variant>
 #include <vector>
 
-#include "BeamlineObject.h"
+
 #include "Core.h"
 #include "EnergyDistribution.h"
 #include "Tracer/Ray.h"
@@ -34,7 +34,7 @@ enum class SourceDistType {
 // TODO(rudi): unify!
 enum class SourceDist { Uniform, Gaussian };
 
-class RAYX_API LightSource : public BeamlineObject {
+class RAYX_API LightSource {
   public:
     LightSource(const char* name, EnergyDistribution dist, const double linPol0,
                 const double linPol45, const double circPol,
@@ -70,6 +70,7 @@ class RAYX_API LightSource : public BeamlineObject {
     LightSource();
     virtual ~LightSource();
 
+    const char* m_name;
     /** the energy distribution used when deciding the energies of the rays. */
     const EnergyDistribution m_EnergyDistribution;
 

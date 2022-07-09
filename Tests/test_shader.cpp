@@ -286,8 +286,8 @@ void testOpticalElement(
     std::list<double> outputRays = runTracer(m->getRays(), elements);
     // write to file "testFile_"+name of first element in beamlin
     std::string filename = "testFile_";
-    std::cout << elements[0]->getName();
-    filename.append(elements[0]->getName());
+    std::cout << elements[0]->m_name;
+    filename.append(elements[0]->m_name);
     writeToFile(outputRays, filename);
 }
 
