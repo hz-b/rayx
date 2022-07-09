@@ -1,8 +1,11 @@
+#pragma once
+
 #include "Core.h"
 #include "Data/Importer.h"
 #include "Debug.h"
+#include "Material/Material.h"
 #include "Model/Beamline/Objects/Objects.h"
-#include "Model/Geometry/Geometry.h"
+
 #include "PathResolver.h"
 #include "Tracer/Ray.h"
 #include "UserParameter/GeometricUserParams.h"
@@ -19,6 +22,9 @@
 #define RUN_TEST_SHADER 1
 #define RUN_TEST_SLIT 1
 #define RUN_TEST_SOURCES 1
+
+extern int GLOBAL_ARGC;
+extern char** GLOBAL_ARGV;
 
 /* usage:
     CHECK_EQ(A, B, 1e-10); // with explicit tolerance

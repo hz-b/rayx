@@ -112,13 +112,13 @@
     </param>
     <param id="worldYdirection" enabled="F">
       <x>0</x>
-      <y>0.766044</y>
-      <z>-0.642788</z>
+      <y>0.766044443118978</y>
+      <z>-0.6427876096865393</z>
     </param>
     <param id="worldZdirection" enabled="F">
       <x>0</x>
-      <y>0.642788</y>
-      <z>0.766044</z>
+      <y>0.6427876096865393</y>
+      <z>0.766044443118978</z>
     </param>
   </object>
 

@@ -1,6 +1,6 @@
 #pragma once
 #include <Data/xml.h>
-#include <Tracer/Vulkan/Material.h>
+#include <Material/Material.h>
 #include <UserParameter/GeometricUserParams.h>
 
 #include "Model/Beamline/OpticalElement.h"
@@ -12,15 +12,12 @@ class RAYX_API SphereGrating : public OpticalElement {
   public:
     // new, shortened constructor
     SphereGrating(const char* name, GratingMount mount,
-                  Geometry::GeometricalShape geometricalShape, double width,
+                  OpticalElement::GeometricalShape geometricalShape, double width,
                   double height, const double azimuthalAngle, double radius,
                   glm::dvec4 position, glm::dmat4x4 orientation,
                   double designEnergyMounting, double lineDensity,
                   double orderOfDiffraction, std::array<double, 6> vls,
                   std::array<double, 7> slopeError, Material mat);
-
-    SphereGrating();
-    ~SphereGrating();
 
     static std::shared_ptr<SphereGrating> createFromXML(xml::Parser);
 

@@ -4,8 +4,11 @@
 #include "PathResolver.h"
 
 // TODO: (potential) Replace Getopt with boost(header-only)
-#include <unistd.h>
+#include <Tracer/CpuTracer.h>
+#include <Tracer/VulkanTracer.h>
+//#include <unistd.h>
 
+#include <Writer/Writer.hpp>
 #include <memory>
 #include <stdexcept>
 
@@ -24,103 +27,45 @@ void TerminalApp::run() {
     RAYX_D_LOG << "TerminalApp running...";
 
     /////////////////// Argument Parser
-    const static struct option long_options[] = {
-        {"plot", no_argument, 0, 'p'},
-        {"input", required_argument, 0, 'i'},
-        {"ocsv", no_argument, 0, 'c'},
-        {"version", no_argument, 0, 'v'},
-        {"help", no_argument, 0, 'h'},
-        {"dummy", no_argument, 0, 'd'},
-        {"benchmark", no_argument, 0, 'b'},
-        {"multipleplot", no_argument, 0, 'm'},
-        {0, 0, 0, 0}};
-
-    int c;
-    int option_index;
-    extern int opterr;
-    opterr = 0;  // Set opt auto error output to silent
-
-    while ((c = getopt_long(
-                m_argc, m_argv,
-                "pi:cvhdbm",  // : required, :: optional, 'none' nothing
-                long_options, &option_index)) != -1) {
-        switch (c) {
-            case '?':
-                if (optopt == 'i')
-                    RAYX_ERR << "Option -" << static_cast<char>(optopt)
-                             << " needs an input RML file.\n";
-                else if (isprint(optopt))
-                    RAYX_ERR << "Unknown option -" << static_cast<char>(optopt)
-                             << ".\n";
-                else
-                    RAYX_ERR << "Unknown option character. \n";
-                getHelp();
-                exit(1);
-            case 'h':
-                getHelp();
-                exit(1);
-            case 'v':
-                getVersion();
-                exit(1);
-            case 'p':
-                m_optargs.m_plotFlag = OptFlags::Enabled;
-                break;
-            case 'c':
-                m_optargs.m_csvFlag = OptFlags::Enabled;
-                break;
-            case 'i':
-                m_optargs.m_providedFile = optarg;
-                break;
-            case 'd':
-                m_optargs.m_dummyFlag = OptFlags::Enabled;
-                break;
-            case 'b':
-                m_optargs.m_benchmark = OptFlags::Enabled;
-                break;
-            case 'm':
-                m_optargs.m_multiplePlots = OptFlags::Enabled;
-                break;
-            case 0:
-                RAYX_ERR << "No option given.";
-                break;
-            default:
-                abort();
-        }
-    }
+    m_CommandParser = std::make_unique<CommandParser>(m_argc, m_argv);
+    // Check correct use (This will exit if error)
+    m_CommandParser->analyzeCommands();
 
     auto start_time = std::chrono::steady_clock::now();
     /////////////////// Argument treatement
+    if (m_CommandParser->m_args.m_version) {
+        m_CommandParser->getVersion();
+        exit(1);
+    }
     // Load RML files
-    if (m_optargs.m_providedFile != NULL) {
+    if (m_CommandParser->m_args.m_providedFile != "") {
         // load rml file
-        m_Beamline = std::make_shared<RAYX::Beamline>(
-            RAYX::importBeamline(m_optargs.m_providedFile));
-        m_Presenter = RAYX::Presenter(m_Beamline);
+        m_Beamline = std::make_unique<RAYX::Beamline>(
+            RAYX::importBeamline(m_CommandParser->m_args.m_providedFile));
     } else {
-        // Benchmark mode
-        if (m_optargs.m_benchmark) {
-            RAYX_D_LOG << "Starting in Benchmark Mode.\n";
-        }
-
-        if (m_optargs.m_dummyFlag) {
-            RAYX_D_LOG << "Loading dummy beamline.";
-            loadDummyBeamline();
-        } else {
-            RAYX_LOG << "No Pipeline/Beamline provided, exiting..";
-            exit(1);
-        }
+        RAYX_LOG << "No Pipeline/Beamline provided, exiting..";
+        exit(1);
     }
 
-    // Output File format
-    if (m_optargs.m_csvFlag == OptFlags::Enabled) {
-        RAYX_D_LOG << "CSV.\n";
-        // TODO : Enhance writer
+    // Chose Hardware
+    if (m_CommandParser->m_args.m_cpuFlag) {
+        m_Tracer = std::make_unique<RAYX::CpuTracer>();
+    } else {
+        m_Tracer = std::make_unique<RAYX::VulkanTracer>();
     }
 
+    if (m_CommandParser->m_args.m_benchmark) {
+        RAYX_D_LOG << "Starting in Benchmark Mode.\n";
+    }
     // Run RAY-X Core
-    m_Presenter.run();
+    auto rays = m_Tracer->trace(*m_Beamline);
 
-    if (m_optargs.m_benchmark) {
+    // Export Rays to external data.
+    if (!exportRays(rays)) {
+        RAYX_ERR << "Error in exporting";
+    }
+
+    if (m_CommandParser->m_args.m_benchmark) {
         std::chrono::steady_clock::time_point end =
             std::chrono::steady_clock::now();
         RAYX_LOG << "Benchmark: Done in "
@@ -131,15 +76,15 @@ void TerminalApp::run() {
     }
 
     //  Plot in Python
-    if (m_optargs.m_plotFlag == OptFlags::Enabled) {
-        // Setup to create genv if needed
+    if (m_CommandParser->m_args.m_plotFlag) {
+        // Setup to create venv if needed
         try {
             std::shared_ptr<PythonInterp> pySetup =
                 std::make_shared<PythonInterp>("py_setup", "setup",
                                                (const char*)nullptr);
             pySetup->execute();
         } catch (std::exception& e) {
-            RAYX_ERR << e.what() << "\n";
+            RAYX_ERR << e.what();
         }
         RAYX_D_LOG << "Python Setup OK.";
 
@@ -150,16 +95,67 @@ void TerminalApp::run() {
             std::shared_ptr<PythonInterp> pyPlot =
                 std::make_shared<PythonInterp>("py_plot_entry", "startPlot",
                                                (const char*)nullptr);
-            if (m_optargs.m_providedFile) {
-                std::string _providedFile = m_optargs.m_providedFile;
+            if (m_CommandParser->m_args.m_providedFile != "") {
+                std::string _providedFile =
+                    getFilename(m_CommandParser->m_args.m_providedFile);
                 pyPlot->setPlotName(_providedFile.c_str());
             }
-            if (m_optargs.m_multiplePlots == OptFlags::Enabled) {
+            if (m_CommandParser->m_args.m_dummyFlag) {
+                pyPlot->setPlotName("Dummy Beamline");
+            }
+            if (m_CommandParser->m_args.m_multiplePlots) {
                 pyPlot->setPlotType(3);
             }
             pyPlot->execute();
         } catch (std::exception& e) {
-            RAYX_ERR << e.what() << "\n";
+            RAYX_ERR << e.what();
         }
     }
+}
+
+bool TerminalApp::exportRays(RAYX::RayList& rays) {
+    bool retval = false;
+    std::unique_ptr<Writer> w;
+
+#ifdef CI
+    w = std::make_unique<CSVWriter>();
+    RAYX_LOG << "Using CSV Writer because of CI!";
+#else
+    if (m_CommandParser->m_args.m_csvFlag) {
+        w = std::make_unique<CSVWriter>();
+    } else {
+        w = std::make_unique<H5Writer>();
+    }
+#endif
+
+    size_t index = 0;
+    auto doubleVecSize = RAY_MAX_ELEMENTS_IN_VECTOR * RAY_DOUBLE_COUNT;
+    std::vector<double> doubleVec(doubleVecSize);
+
+    // Transform list into double vectors for correct output.
+    for (auto outputRayIterator = rays.begin(), outputIteratorEnd = rays.end();
+         outputRayIterator != outputIteratorEnd; outputRayIterator++) {
+        RAYX_D_LOG << "(*outputRayIterator).size(): "
+                   << (*outputRayIterator).size();
+
+        memcpy(doubleVec.data(), (*outputRayIterator).data(),
+               (*outputRayIterator).size() * VULKANTRACER_RAY_DOUBLE_AMOUNT *
+                   sizeof(double));
+        doubleVec.resize((*outputRayIterator).size() *
+                         VULKANTRACER_RAY_DOUBLE_AMOUNT);
+
+        RAYX_D_LOG << "sample ray: " << doubleVec[0] << ", " << doubleVec[1]
+                   << ", " << doubleVec[2] << ", " << doubleVec[3] << ", "
+                   << doubleVec[4] << ", " << doubleVec[5] << ", "
+                   << doubleVec[6] << ", energy: " << doubleVec[7]
+                   << ", stokes 0: " << doubleVec[8];
+
+        w->appendRays(doubleVec, index);
+        index = index + (*outputRayIterator).size();
+    }
+
+    // TODO(Oussama): Add the debug buffer output too.
+    retval = true;
+
+    return retval;
 }

@@ -1,5 +1,3 @@
-#include <Tracer/Vulkan/Material.h>
-
 #include "setupTests.h"
 
 #if RUN_TEST_QUADRIC

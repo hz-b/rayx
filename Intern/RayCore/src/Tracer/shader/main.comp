@@ -1,0 +1,540 @@
+#define WORKGROUP_SIZE 32
+
+#ifdef CPP
+    #define INOUT(x) x&
+    #define OUT(x) x&
+    #define ALLOW_UNUSED [[maybe_unused]]
+#else
+    #define INOUT(x) inout x
+    #define OUT(x) out x
+    #define ALLOW_UNUSED
+
+    #extension GL_EXT_debug_printf : enable
+	#extension GL_ARB_separate_shader_objects : enable
+	#extension GL_ARB_gpu_shader_int64 : enable
+	#extension GL_GOOGLE_include_directive : enable
+
+	layout(local_size_x = WORKGROUP_SIZE, local_size_y = 1, local_size_z = 1) in;
+#endif
+
+const double PI       = 3.14159265358979323846264338327950;
+const uint64_t rngKey = 13; // TODO(rudi) this was the old key, it generated a warning: (0xc8e4fd15 << 32) | 0x4ce32f6d;
+const double inm2eV   = 1.239852e3;
+
+#ifdef CPP
+	// this type intends to mimic the GLSL type T[], this is used for layouts.
+	template <typename T>
+	struct ShaderArray {
+		std::vector<T> data;
+
+		int length() {
+			return data.size();
+		}
+		T& operator [](int i) {
+			return data[i];
+		}
+	};
+
+	using dvec2 = glm::dvec2;
+
+	double length(dvec2 v) {
+		return sqrt(v.x*v.x + v.y*v.y);
+	}
+
+	using dvec3 = glm::dvec3;
+	using dvec4 = glm::dvec4;
+	using dmat3 = glm::dmat3;
+	using dmat4 = glm::dmat4;
+    using uint = unsigned int;
+
+	double mod(double x, double y) {
+		return glm::mod(x, y);
+	}
+
+	double sign(double x) {
+		return glm::sign(x);
+	}
+#endif
+
+/* STRUCTS */
+struct Ray {
+    dvec3 position;
+    double weight;  // status of the ray (e.g if element missed -> 0)
+    dvec3 direction;
+    double energy;
+    dvec4 stokes;
+    double pathLength;
+    double order;
+    double lastElement;
+    double extraParameter;
+};
+struct Element {
+    dmat4 surfaceParams;
+    dmat4 inTrans;
+    dmat4 outTrans;
+    dmat4 objectParameters;
+    dmat4 elementParameters;
+};
+
+#ifdef RAYX_DEBUG_MODE
+	struct _debug_struct {
+		dmat4 _dMat; // Can also be used as vectors or scalar
+	};
+#endif 
+/* LAYOUTS */
+#ifdef CPP
+	int gl_GlobalInvocationID;
+
+	ShaderArray<Ray> rayData;
+	ShaderArray<Ray> outputData;
+	double numberOfBeamlines;
+	double numberOfElementsPerBeamline;
+	double numberOfRays;
+	double numberOfRaysPerBeamLine;
+	ShaderArray<Element> quadricData;
+	ShaderArray<dvec4> xyznull;
+	ShaderArray<int> matIdx;
+	ShaderArray<double> mat;
+	#ifdef RAYX_DEBUG_MODE
+		ShaderArray<_debug_struct> d_struct;
+	#endif
+#else
+	layout(std140, binding = 0) buffer ibuf { Ray rayData[]; };
+
+	layout(std140, binding = 1) buffer obuf { Ray outputData[]; };
+
+	layout(std140, binding = 2) buffer qbuf {
+		double numberOfBeamlines;
+		double numberOfElementsPerBeamline;
+		double numberOfRays;
+		double numberOfRaysPerBeamLine;
+		Element quadricData[];
+	};
+
+	layout(std140, binding = 3) buffer xyzbuf { dvec4 xyznull[]; };
+
+	layout(binding = 4) buffer materialIndexBuf {
+		int matIdx[]; // matIdx[0..91] contains the indices of the Palik Table, whereas matIdx[92..92+91] contains the indices of the NffTable.
+					  // generally, an entry of matIdx tells you the index you need to look up in the 'mat'-table below.
+	};
+
+	layout(binding = 5) buffer materialBuf {
+		double mat[];  // contains: (Palik tables of all materials concatenated together) concatenated with (Nff tables of all materials concatenated together)
+					   // use the matIdx-table to determine the relevant indices for when which table starts and stops.
+	};
+
+	#ifdef RAYX_DEBUG_MODE
+		layout(binding = 6) buffer debugBuf {
+			_debug_struct d_struct[];  // contains nff table of all materials concatenated together
+		};
+	#endif
+#endif
+
+// Order in #include is IMPROTANT, do not change.
+// clang-format off
+#include "approx.comp"
+#include "complex.comp"
+#include "random.comp"
+#include "utils.comp"
+#include "intersection.comp"
+#include "trace.comp"
+// clang-format on
+
+// @brief: Dynamic ray tracing: check which ray hits which element first
+// in this function we need to make sure that rayData ALWAYS remains in GLOBAL coordinates (it can be changed in a function but needs to be changed
+// back before the function returns to this function)
+void dynamicElements() {
+    const int numberOfElements = quadricData.length();
+    // placeholder, info should later be transfered to shader
+    const int maxBounces  = numberOfElements;
+    Ray ray               = rayData[uint(gl_GlobalInvocationID)];
+    uint beamlineIndex    = uint(double(gl_GlobalInvocationID) / numberOfRaysPerBeamLine);
+
+    // ray specific "seed" for random numbers -> every ray has a different starting value for the counter that creates the random number
+    uint64_t workerCounterNum = (~(uint64_t(0)) / int(numberOfRays));
+    uint64_t ctr              = uint(gl_GlobalInvocationID) * workerCounterNum;
+    int type                  = -1;
+
+    int closestElementIndex = -1;
+    int lastClosestElementIndex;
+    dvec4 closestHitpoint = dvec4(1.0 / 0.0, 1.0 / 0.0, 1.0 / 0.0, 0.0);
+    dvec4 closestGlobalHitpoint;
+    
+    #ifdef RAYX_DEBUG_MODE
+    // Set Debug Struct of current Ray to identity
+    d_struct[uint(gl_GlobalInvocationID)]._dMat = dmat4(1);
+    #endif
+
+    Element nextElement;
+    double bounce = 1;
+
+    // Printing Example
+    if (uint(gl_GlobalInvocationID) == 2 ){
+    #ifndef CPP
+    debugPrintfEXT("Hello from GPU. \n"); 
+    #else
+    RAYX_D_LOG << "Tracing on CPU..." ; 
+    #endif
+    }
+    // Iterate through all bounces
+    for (int i = 0; i < maxBounces; i++) {
+        ray = rayData[uint(gl_GlobalInvocationID)];
+
+        lastClosestElementIndex = closestElementIndex;
+
+        // index of element with current closest intersection with ray, initialized with -1
+        closestElementIndex = -1;
+
+        // global coordinates of first intersection point of ray among all elements in beamline
+        closestHitpoint       = dvec4(1.0 / 0.0, 1.0 / 0.0, 1.0 / 0.0, 0);
+        closestGlobalHitpoint = dvec4(1.0 / 0.0, 1.0 / 0.0, 1.0 / 0.0, 0);
+
+        // Find intersection points through all elements
+        for (int elementIndex = int(beamlineIndex) * int(numberOfElementsPerBeamline);
+             elementIndex < (beamlineIndex + 1) * numberOfElementsPerBeamline; elementIndex++) {
+            if (elementIndex == lastClosestElementIndex) {
+                // TODO: self-intersection
+                // rayData[uint(gl_GlobalInvocationID)].weight = 11;
+                continue;
+            }
+
+            dvec4 currentIntersection = getOpticalElementIntersection(ray, elementIndex);
+            dvec3 currentIntersection_xyz = dvec3(currentIntersection.x, currentIntersection.y, currentIntersection.z);
+
+            // Intersection coordinates in GLOBAL coordinates
+            dvec4 currentGlobalIntersection;
+            dvec3 tmp = dvec3(quadricData[elementIndex].outTrans * dvec4(currentIntersection_xyz, 1));
+            currentGlobalIntersection = dvec4(tmp, currentGlobalIntersection.w);
+            dvec3 currentGlobalIntersection_xyz = dvec3(currentGlobalIntersection.x, currentGlobalIntersection.y, currentGlobalIntersection.z);
+
+            dvec3 closestGlobalHitpoint_xyz = dvec3(closestGlobalHitpoint.x, closestGlobalHitpoint.y, closestGlobalHitpoint.z);
+            // check if current intersection is closer than the closest previous Hitpoint
+            // If yes then update. Since the old intersection is occluded by the old Intersection/Hit point
+            if (length(ray.position - closestGlobalHitpoint_xyz) > length(ray.position - currentGlobalIntersection_xyz) &&
+                currentIntersection.w != 0) {
+                closestHitpoint       = currentIntersection;
+                closestGlobalHitpoint = currentGlobalIntersection;
+                closestElementIndex   = elementIndex;
+            }
+        }
+
+        if (closestElementIndex == -1) {  // no element was hit. Ray is considered to move forward to inf. (With weight == 0)
+            break;
+        }
+
+        // transform ray and intersection point in ELEMENT coordiantes
+        nextElement                          = quadricData[closestElementIndex];
+        rayData[uint(gl_GlobalInvocationID)] = rayMatrixMult(rayData[uint(gl_GlobalInvocationID)], nextElement.inTrans);
+
+        // Calculate interaction(reflection,material, absorption etc.) of ray with detected next element
+        type = int(nextElement.surfaceParams[3][0]);
+        if (type == 0) {  // plane + sphere mirror
+            rayData[uint(gl_GlobalInvocationID)] = traceMirror(rayData[uint(gl_GlobalInvocationID)], closestElementIndex, ctr, closestHitpoint);
+
+        } else if (type == 1) {  // plane grating
+            rayData[uint(gl_GlobalInvocationID)] = tracePlaneGrating(rayData[uint(gl_GlobalInvocationID)], closestElementIndex, ctr, closestHitpoint);
+
+        } else if (type == 2) {  // general grating
+            rayData[uint(gl_GlobalInvocationID)] =
+                traceGeneralGrating(rayData[uint(gl_GlobalInvocationID)], closestElementIndex, ctr, closestHitpoint);
+
+        } else if (type == 3) {  // Slit
+            rayData[uint(gl_GlobalInvocationID)] = traceSlit(rayData[uint(gl_GlobalInvocationID)], closestElementIndex, ctr, closestHitpoint);
+
+        } else if (type == 4) {  // rzp
+            rayData[uint(gl_GlobalInvocationID)] = traceRZP(rayData[uint(gl_GlobalInvocationID)], closestElementIndex, ctr, closestHitpoint);
+
+        } else if (type == 5) {  // image plane
+            rayData[uint(gl_GlobalInvocationID)].extraParameter += (closestElementIndex + 1) * bounce;
+            rayData[uint(gl_GlobalInvocationID)].lastElement = closestElementIndex + 1;
+            outputData[uint(gl_GlobalInvocationID)] = traceImagePlane(rayData[uint(gl_GlobalInvocationID)], closestElementIndex, closestHitpoint);
+            return;
+
+        } else if (type == 6) {  // toroid mirror
+            rayData[uint(gl_GlobalInvocationID)] = traceToroid(rayData[uint(gl_GlobalInvocationID)], closestElementIndex, ctr, closestHitpoint);
+
+        } else if (type == 7) {  // ellipsoid mirror
+            rayData[uint(gl_GlobalInvocationID)] =
+                traceEllipsoidMirror(rayData[uint(gl_GlobalInvocationID)], closestElementIndex, ctr, closestHitpoint);
+        }
+
+        // use extraParameter to store the order in which the ray has hit which optical element (e.g extraParameter = 412 -> first hit element 2, then
+        // 1, then 4)
+        rayData[uint(gl_GlobalInvocationID)].extraParameter +=
+            ((closestElementIndex + 1) * bounce) * int(rayData[uint(gl_GlobalInvocationID)].lastElement == closestElementIndex + 1);
+        bounce *= pow(10, int(rayData[uint(gl_GlobalInvocationID)].lastElement == closestElementIndex + 1));
+
+        // transform back to WORLD coordinates
+        rayData[uint(gl_GlobalInvocationID)] = rayMatrixMult(rayData[uint(gl_GlobalInvocationID)], nextElement.outTrans);
+    }
+    // end the tracing in element coordinates (makes comparison with old RAY easier)
+    // rayData[uint(gl_GlobalInvocationID)] = rayMatrixMult(rayData[uint(gl_GlobalInvocationID)], nextElement.inTrans);
+    outputData[uint(gl_GlobalInvocationID)] = rayData[uint(gl_GlobalInvocationID)];
+    return;
+}
+
+void runTraceFunctions() {
+    // flag to decide how to interpret the input
+    int settings = int(quadricData[0].surfaceParams[3][1]);
+
+    // use dynamic tracing for the given beamline (not a unit test)
+    if (settings == 0) {
+        dynamicElements();
+        return;
+    }
+
+    // ray specific "seed" for random numbers -> every ray has a different starting value for the counter that creates the random numbter
+    uint64_t workerCounterNum = (~(uint64_t(0)) / uint64_t(numberOfRays));
+    uint64_t ctr              = uint(gl_GlobalInvocationID) * workerCounterNum;
+
+    Ray r = rayData[uint(gl_GlobalInvocationID)];
+    Ray res;  // store the result here
+    // initialize with 0's
+    res.position       = dvec3(0, 0, 0);
+    res.direction      = dvec3(0, 0, 0);
+    res.energy         = 0;
+    res.weight         = 0;
+    res.stokes         = dvec4(0, 0, 0, 0);
+    res.pathLength     = 0;
+    res.extraParameter = 0;
+    res.order          = 0;
+    res.lastElement    = 0;
+
+    // settings != 0 -> unit test cases in test_shader.cpp
+    // input rays and elements are interpreted depending on the test case
+    if (settings == 1) {  // TEST TRIG FUNCTIONS: sin
+        res.position                         = dvec3(r8_sin(r.position.x), r8_sin(r.position.y), r8_sin(r.position.z));
+        res.weight                           = r8_sin(r.weight);
+        res.direction                        = dvec3(r8_sin(r.direction.x), r8_sin(r.direction.y), r8_sin(r.direction.z));
+        res.energy                           = r8_sin(r.energy);
+        res.stokes                           = dvec4(r8_sin(r.stokes[0]), r8_sin(r.stokes[1]), r8_sin(r.stokes[2]), r8_sin(r.stokes[3]));
+        rayData[uint(gl_GlobalInvocationID)] = res;
+    } else if (settings == 2) {                           // test refrac
+        res = refrac(r, dvec4(r.position, 0), r.weight);  // need quadric buffer to put calculated parameter to shader
+        rayData[uint(gl_GlobalInvocationID)] = res;
+    } else if (settings == 3) {  // test plane refrac
+        Ray r = rayData[uint(gl_GlobalInvocationID)];
+        // refrac_plane(ray, normal, a) only y and z direction of ray are needed
+        // a encoded in weight, normal encoded in r.position
+        r                                    = refrac_plane(r, dvec4(r.position, 0), r.weight);
+        res.direction                        = r.direction;
+        res.weight                           = r.weight;
+        rayData[uint(gl_GlobalInvocationID)] = res;
+    } else if (settings == 4) {  // test vls grating
+        double b_params[6] =
+            {r.position.x, r.position.y, r.position.z, r.direction.x, r.direction.y, r.direction.z};  //(0.1,0.1,0.1,0.01,0.02,0.03);
+        double z                             = r.energy;
+        double a                             = r.weight;
+        res.weight                           = vlsGrating(a, z, b_params);
+        rayData[uint(gl_GlobalInvocationID)] = res;
+    } else if (settings == 5) {  // diffraction
+        // double bessel1(double v)
+        // void bessel_diff(double radius, double wl, inout double dphi, inout double dpsi)
+        // void diffraction(int iopt, double xLength, double yLength, double wl, inout double dPhi, inout double dPsi)
+        // void fraun_diff(double dim, double wl, inout double dAngle)
+        double dPhi;
+        double dPsi;
+        int iopt       = int(r.position.x);
+        double xLength = r.position.y;
+        double yLength = r.position.z;
+        double wl      = r.weight;
+        diffraction(iopt, xLength, yLength, wl, dPhi, dPsi, ctr);
+        res.position.x                       = dPhi;
+        res.position.y                       = dPsi;
+        rayData[uint(gl_GlobalInvocationID)] = res;
+    } else if (settings == 6) {  // bessel1 function
+        res.position                         = dvec3(bessel1(r.position.x), bessel1(r.position.y), bessel1(r.position.z));
+        res.direction                        = dvec3(bessel1(r.direction.x), bessel1(r.direction.y), bessel1(r.direction.z));
+        res.weight                           = bessel1(r.weight);
+        rayData[uint(gl_GlobalInvocationID)] = res;
+    } else if (settings == 7) {  // double pow test
+        res.position.x                       = dpow(r.position.x, int(r.direction.x));
+        res.position.y                       = dpow(r.position.y, int(r.direction.y));
+        res.position.z                       = dpow(r.position.z, int(r.direction.z));
+        rayData[uint(gl_GlobalInvocationID)] = res;
+    } else if (settings == 8) {  // factorial f(a) = a! test
+        res.position                         = dvec3(fact(int(r.position.x)), fact(int(r.position.y)), fact(int(r.position.z)));
+        res.direction                        = dvec3(fact(int(r.direction.x)), fact(int(r.direction.y)), fact(int(r.direction.z)));
+        res.weight                           = fact(int(r.weight));
+        res.stokes                           = dvec4(fact(int(r.stokes.x)), fact(int(r.stokes.y)), fact(int(r.stokes.z)), fact(int(r.stokes[3])));
+        res.energy                           = fact(int(r.energy));
+        rayData[uint(gl_GlobalInvocationID)] = res;
+    } else if (settings == 9) {                 // cosini (direction x,y,z from phi,psi)
+        cosini(r, r.position.x, r.position.y);  // inout ray (only direction important for function), phi, psi
+        res.position                         = r.direction;
+        rayData[uint(gl_GlobalInvocationID)] = res;
+    } else if (settings == 10) {  // test RayMatrixMult
+        r                                    = rayMatrixMult(r, quadricData[0].inTrans);
+        res.position                         = r.position;
+        res.direction                        = r.direction;
+        rayData[uint(gl_GlobalInvocationID)] = res;
+    } else if (settings == 11) {  // wastebox
+        double x                             = r.position.x;
+        double z                             = r.position.z;
+        double x_extent                      = r.direction.x;
+        double z_extent                      = r.direction.z;
+        double w                             = r.weight;
+        res.position.x                       = wasteBox(x, z, x_extent, z_extent, w);
+        rayData[uint(gl_GlobalInvocationID)] = res;
+    } else if (settings == 12) {  // test RZP line density
+        dvec4 normal          = dvec4(r.direction.x, r.direction.y, r.direction.z, 0);
+        int image_type        = int(quadricData[0].inTrans[0][0]);
+        int rzp_type          = int(quadricData[0].inTrans[0][1]);
+        int derivation_method = int(quadricData[0].inTrans[0][2]);
+        double zOffsetCenter  = quadricData[0].inTrans[0][3];
+        double risag          = quadricData[0].inTrans[1][0];
+        double rosag          = quadricData[0].inTrans[1][1];
+        double rimer          = quadricData[0].inTrans[1][2];
+        double romer          = quadricData[0].inTrans[1][3];
+        double d_alpha        = quadricData[0].inTrans[2][0];
+        double d_beta         = quadricData[0].inTrans[2][1];
+        double d_ord          = quadricData[0].inTrans[2][2];
+        double wl             = quadricData[0].inTrans[2][3];
+        double DX;
+        double DZ;
+        RZPLineDensity(r, normal, image_type, rzp_type, derivation_method, zOffsetCenter, risag, rosag, rimer, romer, d_alpha, d_beta, d_ord, wl, DX,
+                       DZ);
+        // write result to r.position to bring it back to the c++ unit test
+        res.position.x                       = DX;
+        res.position.z                       = DZ;
+        rayData[uint(gl_GlobalInvocationID)] = res;
+    } else if (settings == 13) {
+        dvec4 normal                         = dvec4(r.direction, 0);
+        double slopeX                        = r.position.x;
+        double slopeZ                        = r.position.z;
+        dvec4 new_normal                     = normal_cartesian(normal, slopeX, slopeZ);
+        res.position                         = dvec3(new_normal);
+        rayData[uint(gl_GlobalInvocationID)] = res;
+    } else if (settings == 14) {
+        dvec4 normal     = dvec4(r.direction, 0);
+        double slopeX    = r.position.x;
+        double slopeZ    = r.position.z;
+        dvec4 new_normal = normal_cylindrical(normal, slopeX, slopeZ);
+        // normal is in homogeneous coordinates but ray direction and position are only interpreted as dvec3 on C++ side -> store fourth value in
+        // weight
+        res.position                         = dvec3(new_normal);
+        res.weight                           = new_normal[3];
+        rayData[uint(gl_GlobalInvocationID)] = res;
+    } else if (settings == 15) {
+        dvec4 normal = dvec4(r.position, 0);
+        double a     = r.energy;
+        // only uses and  modifies ray.direction and weight -> use ray.position to transfer normal
+        r                                    = refrac(r, normal, a);
+        res.direction                        = r.direction;
+        res.weight                           = r.weight;
+        rayData[uint(gl_GlobalInvocationID)] = res;
+    } else if (settings == 16) {
+        // Ray refrac2D(Ray r, dvec4 normal, double az, double ax)
+        // refrac2D changes only the direction of the ray -> encode normal at intersection point in ray position
+        dvec4 normal                         = dvec4(r.position, 0);
+        double az                            = r.stokes.x;
+        double ax                            = r.stokes.y;
+        r                                    = refrac2D(r, normal, az, ax);
+        res.weight                           = r.weight;
+        res.direction                        = r.direction;
+        rayData[uint(gl_GlobalInvocationID)] = res;
+    } else if (settings == 17) {  // test uniform distribution
+        res.weight                           = double(squares64RNG(ctr)) / double(uint64_t(0) - 1);
+        res.energy                           = double(squares64RNG(ctr)) / double(uint64_t(0) - 1);
+        res.position                         = dvec3(squaresDoubleRNG(ctr), squaresDoubleRNG(ctr), squaresDoubleRNG(ctr));
+        res.direction                        = dvec3(squaresDoubleRNG(ctr), squaresDoubleRNG(ctr), squaresDoubleRNG(ctr));
+        res.stokes                           = dvec4(squaresDoubleRNG(ctr), squaresDoubleRNG(ctr), squaresDoubleRNG(ctr), squaresDoubleRNG(ctr));
+        rayData[uint(gl_GlobalInvocationID)] = res;
+    } else if (settings == 18) {  // test exponential function
+        res.weight                           = r8_exp(r.weight);
+        res.energy                           = r8_exp(r.energy);
+        res.position                         = dvec3(r8_exp(r.position.x), r8_exp(r.position.y), r8_exp(r.position.z));
+        res.direction                        = dvec3(r8_exp(r.direction.x), r8_exp(r.direction.y), r8_exp(r.direction.z));
+        res.stokes                           = dvec4(r8_exp(r.stokes.x), r8_exp(r.stokes.y), r8_exp(r.stokes.z), r8_exp(r.stokes[3]));
+        rayData[uint(gl_GlobalInvocationID)] = res;
+    } else if (settings == 19) {  // test logarithm function (natural logarithm)
+        res.weight                           = r8_log(r.weight);
+        res.energy                           = r8_log(r.energy);
+        res.position                         = dvec3(r8_log(r.position.x), r8_log(r.position.y), r8_log(r.position.z));
+        res.direction                        = dvec3(r8_log(r.direction.x), r8_log(r.direction.y), r8_log(r.direction.z));
+        res.stokes                           = dvec4(r8_log(r.stokes.x), r8_log(r.stokes.y), r8_log(r.stokes.z), r8_log(r.stokes[3]));
+        rayData[uint(gl_GlobalInvocationID)] = res;
+    } else if (settings == 20) {  // test iteratTo (method for finding intersection and normal for non-quadric surfaces like the torus)
+        double longRadius                    = r.stokes.x;
+        double shortRadius                   = r.stokes.y;
+        iteratTo(r, longRadius, shortRadius);
+        res.position                         = r.position;
+        res.direction                        = r.direction;  // normal?
+        rayData[uint(gl_GlobalInvocationID)] = res;
+    } else if (settings == 21) {  // test getIncidenceAngle function that is needed for the efficiency calculations
+        res.position.x                       = getIncidenceAngle(r, dvec4(r.position, 0));
+        rayData[uint(gl_GlobalInvocationID)] = res;
+    } else if (settings == 22) {  // test reflectance function that calculates the s and p polarization
+        double energy          = r.energy;
+        double incidence_angle = r.weight;
+        dvec2 complex_S;
+        dvec2 complex_P;
+        reflectance(energy, incidence_angle, complex_S, complex_P, 29);  // 29 == copper
+        res.position.x                       = complex_S.x;             // complex s polarisation
+        res.position.y                       = complex_S.y;
+        res.direction.x                      = complex_P.x;  // complex p polarisation
+        res.direction.y                      = complex_P.y;
+        rayData[uint(gl_GlobalInvocationID)] = res;
+    } else if (settings == 23) {  // test snell's law
+        // all parameters are complex numbers -> dvec2
+        dvec2 cos_incidence = dvec2(r.position.x, r.position.y);    // cosinus of incidence angle of ray
+        dvec2 cn1           = dvec2(r.direction.x, r.direction.y);  // refractive index of first material
+        dvec2 cn2           = dvec2(r.stokes.x, r.stokes.y);        // refractive index of second material
+
+        dvec2 cos_transmittance              = snell(cos_incidence, cn1, cn2);  // calculate cosinus of angle to normal of transmitted ray
+        res.position                         = dvec3(cos_transmittance, 0);
+        rayData[uint(gl_GlobalInvocationID)] = res;
+    } else if (settings == 24) {  // test fresnel formula
+        // all parameters are complex numbers -> dvec2
+        dvec2 cos_incidence     = dvec2(r.position.x, r.position.y);    // cosinus of incidence angle of ray
+        dvec2 cos_transmittance = dvec2(r.direction.x, r.direction.y);  // cosinus of transmittance angle (calc. by snell)
+        dvec2 cn1               = dvec2(r.stokes.x, r.stokes.y);        // refractive index of first material
+        dvec2 cn2               = dvec2(r.stokes.z, r.stokes.w);        // refractive index of second material
+        dvec2 complex_S, complex_P;
+
+        fresnel(cn1, cn2, cos_incidence, cos_transmittance, complex_S, complex_P);
+        res.position                         = dvec3(complex_S, 0);  // complex s polarisation
+        res.direction                        = dvec3(complex_P, 0);  // complex p polarisation
+        rayData[uint(gl_GlobalInvocationID)] = res;
+    } else if (settings == 25) {  // cartesian representation of complex number (x + y*i) to euler (r * e^(i*phi))
+        dvec2 complex_cartesian1 = dvec2(r.position.x, r.position.y);
+        dvec2 complex_cartesian2 = dvec2(r.direction.x, r.direction.y);
+        dvec2 complex_cartesian3 = dvec2(r.stokes.x, r.stokes.y);
+        dvec2 complex_cartesian4 = dvec2(r.stokes.z, r.stokes.w);
+
+        dvec2 complex_euler1                 = cartesian_to_euler(complex_cartesian1);
+        dvec2 complex_euler2                 = cartesian_to_euler(complex_cartesian2);
+        dvec2 complex_euler3                 = cartesian_to_euler(complex_cartesian3);
+        dvec2 complex_euler4                 = cartesian_to_euler(complex_cartesian4);
+        res.position                         = dvec3(complex_euler1, 0);
+        res.direction                        = dvec3(complex_euler2, 0);
+        res.stokes                           = dvec4(complex_euler3, complex_euler4);
+        rayData[uint(gl_GlobalInvocationID)] = res;
+    } else if (settings == 26) {  // test material loading
+		// TODO(rudi): implement meaningful material test.
+    } else if (settings == 27) {  // TEST TRIG FUNCTIONS: cos
+        res.position                         = dvec3(r8_cos(r.position.x), r8_cos(r.position.y), r8_cos(r.position.z));
+        res.weight                           = r8_cos(r.weight);
+        res.direction                        = dvec3(r8_cos(r.direction.x), r8_cos(r.direction.y), r8_cos(r.direction.z));
+        res.energy                           = r8_cos(r.energy);
+        res.stokes                           = dvec4(r8_cos(r.stokes[0]), r8_cos(r.stokes[1]), r8_cos(r.stokes[2]), r8_cos(r.stokes[3]));
+        rayData[uint(gl_GlobalInvocationID)] = res;
+    } else if (settings == 28) {  // TEST TRIG FUNCTIONS: atan
+        res.position                         = dvec3(r8_atan(r.position.x), r8_atan(r.position.y), r8_atan(r.position.z));
+        res.weight                           = r8_atan(r.weight);
+        res.direction                        = dvec3(r8_atan(r.direction.x), r8_atan(r.direction.y), r8_atan(r.direction.z));
+        res.energy                           = r8_atan(r.energy);
+        res.stokes                           = dvec4(r8_atan(r.stokes[0]), r8_atan(r.stokes[1]), r8_atan(r.stokes[2]), r8_atan(r.stokes[3]));
+        rayData[uint(gl_GlobalInvocationID)] = res;
+    }
+    // store results to output buffer
+    outputData[uint(gl_GlobalInvocationID)] = rayData[uint(gl_GlobalInvocationID)];
+}
+
+void main() {
+    // dynamicElements();
+    runTraceFunctions();
+
+    // output = input:
+    // outputData[uint(gl_GlobalInvocationID)] = rayData[uint(gl_GlobalInvocationID)];
+}

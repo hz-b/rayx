@@ -6,7 +6,7 @@
 
 // Memory leak detection (RAYX_NEW instead of new allows leaks to be detected)
 #ifdef RAY_DEBUG_MODE
-#ifdef RAYX_PLATFORM_WINDOWS
+#ifdef RAYX_PLATFORM_MSVC
 #define _CRTDBG_MAP_ALLOC
 #include <crtdbg.h>
 #endif
@@ -15,20 +15,11 @@
 #define RAYX_NEW new
 #endif
 
-// Debug only code; use it as: DEBUG(<statement>);
-#ifdef RAY_DEBUG_MODE
-#define RAYX_DEBUG(x) (x)
-#else
-#define RAYX_DEBUG(x) \
-    do {              \
-    } while (0)
-#endif
-
 /**
  *  Defining the RAYX_API macro, which helps with
  *  building the library (context based import/export of code).
  */
-#if defined(RAYX_PLATFORM_WINDOWS)  //  Microsoft
+#if defined(RAYX_PLATFORM_MSVC)  //  Microsoft
 #ifdef RAYX_BUILD_DLL
 #define RAYX_API __declspec(dllexport)
 #else

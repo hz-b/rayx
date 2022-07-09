@@ -1,3 +1,5 @@
+# Approximation of Ray Object Intersection in the Case of Quadric Surfaces
+
 The following illustration intends to aid your intuition concerning the intersection point calculation for rays. Quadrics in Ray-X have the origin $(0, 0, 0)$ in the object coordinate system. 
 
 ## Geometric Shape of Objects
@@ -14,4 +16,4 @@ Currently, we are calculating the intersection of a planar surface in the xz-pla
 This could lead to a reported hit (resp. miss) of the object, where there should be a miss (resp. hit).
 
 
-![image](/RAY/rayreworked/-/wikis/uploads/809e84f0b69db93770ef0cd57729b892/image.png)
+![image](/docs/src/uploads/809e84f0b69db93770ef0cd57729b892/image.png)

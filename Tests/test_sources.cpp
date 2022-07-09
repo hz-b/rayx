@@ -9,11 +9,12 @@
 #include "Model/Beamline/Beamline.h"
 #include "Model/Beamline/Objects/MatrixSource.h"
 #include "Model/Beamline/Objects/PointSource.h"
-#include "Presenter/SimulationEnv.h"
 #include "Tracer/Ray.h"
-#include "Tracer/Vulkan/VulkanTracer.h"
+#include "Tracer/VulkanTracer.h"
 #include "gmock/gmock.h"
 #include "gtest/gtest.h"
+
+const int RAY_COUNT = 2000000;
 
 void writeRaysToFile(std::list<double> outputRays, std::string name) {
     std::cout << "writing to file..." << std::endl;
@@ -80,24 +81,31 @@ TEST(RayTest, test1) {
     double order = 3;
     double lastElement = 4;
     double extraParam = 7;
-    RAYX::Ray r{x,  y,  z,  weight, xdir,       ydir,  zdir,        energy,
-                s0, s1, s2, s3,     pathLength, order, lastElement, extraParam};
-    CHECK_EQ(r.getxPos(), x);
-    CHECK_EQ(r.getyPos(), y);
-    CHECK_EQ(r.getzPos(), z);
-    CHECK_EQ(r.getxDir(), xdir);
-    CHECK_EQ(r.getyDir(), ydir);
-    CHECK_EQ(r.getzDir(), zdir);
-    CHECK_EQ(r.getWeight(), weight);
-    CHECK_EQ(r.getEnergy(), energy);
-    CHECK_EQ(r.getS0(), s0);
-    CHECK_EQ(r.getS1(), s1);
-    CHECK_EQ(r.getS2(), s2);
-    CHECK_EQ(r.getS3(), s3);
-    CHECK_EQ(r.getPathLength(), pathLength);
-    CHECK_EQ(r.getOrder(), order);
-    CHECK_EQ(r.getLastElement(), lastElement);
-    CHECK_EQ(r.getExtraParam(), extraParam);
+    RAYX::Ray r{glm::dvec3(x, y, z),
+                weight,
+                glm::dvec3(xdir, ydir, zdir),
+                energy,
+                glm::dvec4(s0, s1, s2, s3),
+                pathLength,
+                order,
+                lastElement,
+                extraParam};
+    CHECK_EQ(r.m_position.x, x);
+    CHECK_EQ(r.m_position.y, y);
+    CHECK_EQ(r.m_position.z, z);
+    CHECK_EQ(r.m_direction.x, xdir);
+    CHECK_EQ(r.m_direction.y, ydir);
+    CHECK_EQ(r.m_direction.z, zdir);
+    CHECK_EQ(r.m_weight, weight);
+    CHECK_EQ(r.m_energy, energy);
+    CHECK_EQ(r.m_stokes.x, s0);
+    CHECK_EQ(r.m_stokes.y, s1);
+    CHECK_EQ(r.m_stokes.z, s2);
+    CHECK_EQ(r.m_stokes.w, s3);
+    CHECK_EQ(r.m_pathLength, pathLength);
+    CHECK_EQ(r.m_order, order);
+    CHECK_EQ(r.m_lastElement, lastElement);
+    CHECK_EQ(r.m_extraParam, extraParam);
 }
 
 TEST(RayTest, testDefaultValues) {
@@ -116,28 +124,35 @@ TEST(RayTest, testDefaultValues) {
     double s1 = 1;
     double s2 = 0;
     double s3 = 0;
-    RAYX::Ray r{x,  y,  z,  weight, xdir, ydir, zdir, energy,
-                s0, s1, s2, s3,     0,    0,    0,    0};
-    CHECK_EQ(r.getxPos(), x);
-    CHECK_EQ(r.getyPos(), y);
-    CHECK_EQ(r.getzPos(), z);
-    CHECK_EQ(r.getxDir(), xdir);
-    CHECK_EQ(r.getyDir(), ydir);
-    CHECK_EQ(r.getzDir(), zdir);
-    CHECK_EQ(r.getWeight(), weight);
-    CHECK_EQ(r.getEnergy(), energy);
-    CHECK_EQ(r.getS0(), s0);
-    CHECK_EQ(r.getS1(), s1);
-    CHECK_EQ(r.getS2(), s2);
-    CHECK_EQ(r.getS3(), s3);
-    CHECK_EQ(r.getPathLength(), 0);
-    CHECK_EQ(r.getOrder(), 0);
-    CHECK_EQ(r.getLastElement(), 0);
-    CHECK_EQ(r.getExtraParam(), 0);
+    RAYX::Ray r{glm::dvec3(x, y, z),
+                weight,
+                glm::dvec3(xdir, ydir, zdir),
+                energy,
+                glm::dvec4(s0, s1, s2, s3),
+                0,
+                0,
+                0,
+                0};
+    CHECK_EQ(r.m_position.x, x);
+    CHECK_EQ(r.m_position.y, y);
+    CHECK_EQ(r.m_position.z, z);
+    CHECK_EQ(r.m_direction.x, xdir);
+    CHECK_EQ(r.m_direction.y, ydir);
+    CHECK_EQ(r.m_direction.z, zdir);
+    CHECK_EQ(r.m_weight, weight);
+    CHECK_EQ(r.m_energy, energy);
+    CHECK_EQ(r.m_stokes.x, s0);
+    CHECK_EQ(r.m_stokes.y, s1);
+    CHECK_EQ(r.m_stokes.z, s2);
+    CHECK_EQ(r.m_stokes.w, s3);
+    CHECK_EQ(r.m_pathLength, 0);
+    CHECK_EQ(r.m_order, 0);
+    CHECK_EQ(r.m_lastElement, 0);
+    CHECK_EQ(r.m_extraParam, 0);
 }
 
 TEST(MatrixTest, testParams) {
-    int n = RAYX::SimulationEnv::get().m_numOfRays;
+    int n = 2000000;
     double width = 0.065;
     double height = 0.04;
     double depth = 0.0;
@@ -152,11 +167,10 @@ TEST(MatrixTest, testParams) {
     RAYX::EnergyDistribution dist(RAYX::EnergyRange(photonEnergy, energySpread),
                                   true);
     RAYX::MatrixSource m =
-        RAYX::MatrixSource("Matrix source 1", dist, width, height, depth,
+        RAYX::MatrixSource("Matrix source 1", n, dist, width, height, depth,
                            hordiv, verdiv, lin0, lin45, circ, mis);
 
     // CHECK_EQ(m.m_ID, id);
-    CHECK_EQ(RAYX::SimulationEnv::get().m_numOfRays, n);
     CHECK_EQ(m.getSourceDepth(), depth);
     CHECK_EQ(m.getSourceWidth(), width);
     CHECK_EQ(m.getSourceHeight(), height);
@@ -166,7 +180,6 @@ TEST(MatrixTest, testParams) {
 
 TEST(MatrixTest, testGetRays) {
     int n = 1000;
-    RAYX::SimulationEnv::get().m_numOfRays = n;
     double width = 0.065;
     double height = 0.04;
     double depth = 0.0;
@@ -180,7 +193,7 @@ TEST(MatrixTest, testGetRays) {
     RAYX::EnergyDistribution dist(RAYX::EnergyRange(photonEnergy, energySpread),
                                   true);
     RAYX::MatrixSource m =
-        RAYX::MatrixSource("Matrix source 1", dist, width, height, depth,
+        RAYX::MatrixSource("Matrix source 1", n, dist, width, height, depth,
                            hordiv, verdiv, lin0, lin45, circ, {0, 0, 0, 0});
     std::vector<RAYX::Ray> rays = m.getRays();
 
@@ -189,7 +202,6 @@ TEST(MatrixTest, testGetRays) {
 
 TEST(PointSource, testParams) {
     int number_of_rays = 100;
-    RAYX::SimulationEnv::get().m_numOfRays = number_of_rays;
     double width = 0.065;
     double height = 0.04;
     double depth = 1.0;
@@ -204,7 +216,7 @@ TEST(PointSource, testParams) {
     RAYX::EnergyDistribution dist(RAYX::EnergyRange(photonEnergy, energySpread),
                                   false);
     RAYX::PointSource p = RAYX::PointSource(
-        "Point source 1", dist, width, height, depth, hor, ver,
+        "Point source 1", number_of_rays, dist, width, height, depth, hor, ver,
         RAYX::SourceDist::Uniform, RAYX::SourceDist::Uniform,
         RAYX::SourceDist::Uniform, RAYX::SourceDist::Uniform, lin0, lin45, circ,
         misalignment);  // 0 = hard edge (uniform)
@@ -221,7 +233,6 @@ TEST(PointSource, testParams) {
 
 TEST(LightSource, PointSourceHardEdge) {
     int number_of_rays = 10000;
-    RAYX::SimulationEnv::get().m_numOfRays = number_of_rays;
     double width = 0.065;
     double height = 0.04;
     double depth = 1.0;
@@ -236,7 +247,7 @@ TEST(LightSource, PointSourceHardEdge) {
     RAYX::EnergyDistribution dist(RAYX::EnergyRange(photonEnergy, energySpread),
                                   true);
     RAYX::PointSource p = RAYX::PointSource(
-        "Point source 1", dist, width, height, depth, hor, ver,
+        "Point source 1", number_of_rays, dist, width, height, depth, hor, ver,
         RAYX::SourceDist::Uniform, RAYX::SourceDist::Uniform,
         RAYX::SourceDist::Uniform, RAYX::SourceDist::Uniform, lin0, lin45, circ,
         mis);  // 0 = hard edge (uniform)
@@ -276,7 +287,6 @@ TEST(LightSource, PointSourceHardEdge) {
 
 TEST(LightSource, PointSourceSoftEdge) {
     int number_of_rays = 10000;
-    RAYX::SimulationEnv::get().m_numOfRays = number_of_rays;
     double width = 0.065;
     double height = 0.04;
     double depth = 1.0;
@@ -291,7 +301,7 @@ TEST(LightSource, PointSourceSoftEdge) {
     RAYX::EnergyDistribution dist(RAYX::EnergyRange(photonEnergy, energySpread),
                                   true);
     RAYX::PointSource p = RAYX::PointSource(
-        "Point source 1", dist, width, height, depth, hor, ver,
+        "Point source 1", number_of_rays, dist, width, height, depth, hor, ver,
         RAYX::SourceDist::Gaussian, RAYX::SourceDist::Gaussian,
         RAYX::SourceDist::Gaussian, RAYX::SourceDist::Gaussian, lin0, lin45,
         circ, mis);  // 1 = soft edge (gaussian)
@@ -331,7 +341,6 @@ TEST(LightSource, PointSourceSoftEdge) {
 
 TEST(LightSource, PointSourceHardEdgeMis) {
     int number_of_rays = 10000;
-    RAYX::SimulationEnv::get().m_numOfRays = number_of_rays;
     double width = 0.065;
     double height = 0.04;
     double depth = 1.0;
@@ -346,7 +355,7 @@ TEST(LightSource, PointSourceHardEdgeMis) {
     RAYX::EnergyDistribution dist(RAYX::EnergyRange(photonEnergy, energySpread),
                                   false);
     RAYX::PointSource p = RAYX::PointSource(
-        "Point source 1", dist, width, height, depth, hor, ver,
+        "Point source 1", number_of_rays, dist, width, height, depth, hor, ver,
         RAYX::SourceDist::Uniform, RAYX::SourceDist::Uniform,
         RAYX::SourceDist::Uniform, RAYX::SourceDist::Uniform, lin0, lin45, circ,
         mis);  // 0 = hard edge (uniform)
@@ -381,7 +390,6 @@ TEST(LightSource, PointSourceHardEdgeMis) {
 
 TEST(LightSource, PointSourceSoftEdgeMis) {
     int number_of_rays = 10000;
-    RAYX::SimulationEnv::get().m_numOfRays = number_of_rays;
     double width = 0.065;
     double height = 0.04;
     double depth = 1.0;
@@ -397,7 +405,7 @@ TEST(LightSource, PointSourceSoftEdgeMis) {
     RAYX::EnergyDistribution dist(RAYX::EnergyRange(photonEnergy, energySpread),
                                   false);
     RAYX::PointSource p = RAYX::PointSource(
-        "Point source 1", dist, width, height, depth, hor, ver,
+        "Point source 1", number_of_rays, dist, width, height, depth, hor, ver,
         RAYX::SourceDist::Gaussian, RAYX::SourceDist::Gaussian,
         RAYX::SourceDist::Gaussian, RAYX::SourceDist::Gaussian, lin0, lin45,
         circ, mis);  // 1 = soft edge (gaussian)
@@ -432,7 +440,6 @@ TEST(LightSource, PointSourceSoftEdgeMis) {
 
 TEST(LightSource, MatrixSource20000) {
     int number_of_rays = 20000;
-    RAYX::SimulationEnv::get().m_numOfRays = number_of_rays;
     double photonEnergy = 120;
     double energySpread = 20;
     double lin0 = 1;
@@ -441,8 +448,8 @@ TEST(LightSource, MatrixSource20000) {
     RAYX::EnergyDistribution dist(RAYX::EnergyRange(photonEnergy, energySpread),
                                   false);
     RAYX::MatrixSource p =
-        RAYX::MatrixSource("Matrix20", dist, 0.065, 0.04, 0.0, 0.001, 0.001,
-                           lin0, lin45, circ, {0, 0, 0, 0});
+        RAYX::MatrixSource("Matrix20", number_of_rays, dist, 0.065, 0.04, 0.0,
+                           0.001, 0.001, lin0, lin45, circ, {0, 0, 0, 0});
 
     std::vector<RAYX::Ray> rays = p.getRays();
     CHECK_EQ(rays.size(), number_of_rays);
@@ -474,13 +481,12 @@ TEST(LightSource, MatrixSource20000) {
 
 TEST(LightSource, PointSource20000) {
     int number_of_rays = 20000;
-    RAYX::SimulationEnv::get().m_numOfRays = number_of_rays;
     double lin0 = 1;
     double lin45 = 0;
     double circ = 0;
     RAYX::EnergyDistribution dist(RAYX::EnergyRange(640, 120), false);
     RAYX::PointSource p = RAYX::PointSource(
-        "spec1_first_rzp4", dist, 0.005, 0.005, 0, 0.02, 0.06,
+        "spec1_first_rzp4", number_of_rays, dist, 0.005, 0.005, 0, 0.02, 0.06,
         RAYX::SourceDist::Gaussian, RAYX::SourceDist::Gaussian,
         RAYX::SourceDist::Uniform, RAYX::SourceDist::Uniform, lin0, lin45, circ,
         {0, 0, 0, 0});

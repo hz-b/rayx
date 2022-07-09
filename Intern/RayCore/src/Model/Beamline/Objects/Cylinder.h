@@ -1,6 +1,6 @@
 #pragma once
 #include <Data/xml.h>
-#include <Tracer/Vulkan/Material.h>
+#include <Material/Material.h>
 
 #include "Model/Beamline/OpticalElement.h"
 #include "Model/Surface/Quadric.h"
@@ -11,7 +11,7 @@ enum class CylinderDirection { LongRadiusR, ShortRadiusRho };
 
 class RAYX_API Cylinder : public OpticalElement {
   public:
-    Cylinder(const char* name, Geometry::GeometricalShape geometricalShape,
+    Cylinder(const char* name, OpticalElement::GeometricalShape geometricalShape,
              const double radius, CylinderDirection direction,
              const double width, const double height,
              const double azimuthalAngle, glm::dvec4 position,

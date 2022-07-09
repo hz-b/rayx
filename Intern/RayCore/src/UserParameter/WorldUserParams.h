@@ -1,13 +1,13 @@
 #pragma once
 
-#include <math.h>
+#include <cmath>
 
+#include <array>
 #include <glm.hpp>
 #include <iostream>
 #include <memory>
 #include <stdexcept>
 #include <vector>
-#include <array>
 
 #include "Core.h"
 #include "Model/Beamline/OpticalElement.h"
@@ -18,7 +18,8 @@ namespace RAYX {
 class RAYX_API WorldUserParams {
   public:
     WorldUserParams(double alpha, double beta, double chi, double dist,
-                    std::array<double, 6> misalignment, double tangentAngle = 0);
+                    std::array<double, 6> misalignment,
+                    double tangentAngle = 0);
     WorldUserParams();
     ~WorldUserParams();
 

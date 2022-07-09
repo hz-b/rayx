@@ -5,13 +5,13 @@
 namespace RAYX {
 class RAYX_API Cone : public OpticalElement {
   public:
-    Cone(const char* name, Geometry::GeometricalShape geometricalShape,
+    Cone(const char* name, OpticalElement::GeometricalShape geometricalShape,
          const double width, const double height, const double azimuthalAngle,
          glm::dvec4 position, glm::dmat4x4 orientation,
          const double grazingIncidence, const double entranceArmLength,
          const double exitArmLength, const std::array<double, 7> slopeError);
 
-    Cone(const char* name, Geometry::GeometricalShape geometricalShape,
+    Cone(const char* name, OpticalElement::GeometricalShape geometricalShape,
          const double upstream_radius_r, const double downstream_radius_rho,
          const double width, const double height, const double azimuthalAngle,
          glm::dvec4 position, glm::dmat4x4 orientation,

@@ -1,3 +1,5 @@
+# How to use RayCore
+
 --- This page is outdated ---
 
 On this page you will find out how to use the RayCore library to build an Application.

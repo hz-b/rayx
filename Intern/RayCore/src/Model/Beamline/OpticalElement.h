@@ -7,16 +7,127 @@
 #include <stdexcept>
 #include <vector>
 
-#include "BeamlineObject.h"
 #include "Core.h"
-#include "Model/Geometry/Geometry.h"
+#include "Debug.h"
 #include "Model/Surface/Surface.h"
 #include "utils.h"
 
 namespace RAYX {
 
-class RAYX_API OpticalElement : public BeamlineObject {
+class RAYX_API OpticalElement {
   public:
+    enum class GeometricalShape {
+        RECTANGLE = 0,
+        ELLIPTICAL,
+        TRAPEZOID
+    };  ///< influences wastebox function in shader
+
+    struct Geometry {
+        double m_widthA = 0.0;
+        double m_widthB = 0.0;  //< this width is only used for trapezoid
+        double m_height = 0.0;
+        double m_azimuthalAngle = 0.0;  // rotation of element through xy-plane
+                                        // (needed for stokes vector)
+        glm::dmat4x4 m_orientation = glm::dmat4x4();
+        glm::dvec4 m_position = glm::dvec4();
+        glm::dmat4 m_inMatrix = glm::dmat4();
+        glm::dmat4 m_outMatrix = glm::dmat4();
+        GeometricalShape m_geometricalShape = GeometricalShape::RECTANGLE;
+
+        // Default CTOR
+        Geometry() {
+            m_widthA = 0.0;          ///< x-dimension of element
+            m_widthB = 0.0;          ///< this width is only used for trapezoid
+            m_height = 0.0;          ///< z-dimension of element
+            m_azimuthalAngle = 0.0;  // rotation of element through xy-plane
+                                     // (needed for stokes vector)
+            m_orientation =
+                glm::dmat4x4();  ///< orientation in world coordinate system
+            m_position = glm::dvec4();  ///< position in world coordinates
+            m_inMatrix = glm::dmat4();
+            m_outMatrix = glm::dmat4();
+            m_geometricalShape = GeometricalShape::RECTANGLE;
+            calcTransformationMatrices(m_position, m_orientation);
+        }
+        // Copy CTOR
+        Geometry(const Geometry& geometry) {
+            m_widthA = geometry.m_widthA;
+            m_widthB = geometry.m_widthB;
+            m_height = geometry.m_height;
+            m_azimuthalAngle = geometry.m_azimuthalAngle;
+            m_orientation = geometry.m_orientation;
+            m_position = geometry.m_position;
+            m_inMatrix = geometry.m_inMatrix;
+            m_outMatrix = geometry.m_outMatrix;
+            m_geometricalShape = geometry.m_geometricalShape;
+        }
+
+        void setHeightWidth(double height, double widthA, double widthB = 0.0) {
+            m_widthB = widthB;
+            if (m_geometricalShape == GeometricalShape::ELLIPTICAL) {
+                m_widthA = -widthA;
+                m_height = -height;
+            } else {
+                m_widthA = widthA;
+                m_height = height;
+            }
+        }
+        /**
+         * calculates element to world coordinates transformation matrix and its
+         * inverse
+         * @param   position     4 element vector which describes the position
+         * of the element in world coordinates
+         * @param   orientation  4x4 matrix that describes the orientation of
+         * the surface with respect to the world coordinate system
+         * @return void
+         */
+        void calcTransformationMatrices(glm::dvec4 position,
+                                        glm::dmat4x4 orientation) {
+            RAYX_LOG << "Calculated orientation";
+            for (int i = 0; i < 4; i++) {
+                std::stringstream s;
+                s.precision(17);
+                s << '\t';
+                for (int j = 0; j < 4; j++) {
+                    s << orientation[i][j] << ", ";
+                }
+                RAYX_LOG << s.str();
+            }
+            std::stringstream s;
+            s.precision(17);
+            s << "Position: ";
+            for (int i = 0; i < 4; i++) {
+                s << position[i] << ", ";
+            }
+            RAYX_LOG << s.str();
+
+            glm::dmat4x4 translation =
+                glm::dmat4x4(1, 0, 0, -position[0], 0, 1, 0, -position[1], 0, 0,
+                             1, -position[2], 0, 0, 0, 1);  // o
+            glm::dmat4x4 inv_translation =
+                glm::dmat4x4(1, 0, 0, position[0], 0, 1, 0, position[1], 0, 0,
+                             1, position[2], 0, 0, 0, 1);  // o
+            glm::dmat4x4 rotation = glm::dmat4x4(
+                orientation[0][0], orientation[0][1], orientation[0][2], 0.0,
+                orientation[1][0], orientation[1][1], orientation[1][2], 0.0,
+                orientation[2][0], orientation[2][1], orientation[2][2], 0.0,
+                0.0, 0.0, 0.0, 1.0);  // o
+            glm::dmat4x4 inv_rotation = glm::transpose(rotation);
+
+            // ray = tran * rot * ray
+            glm::dmat4x4 g2e = translation * rotation;
+            m_inMatrix = glm::transpose(g2e);
+
+            // inverse of m_inMatrix
+            glm::dmat4x4 e2g = inv_rotation * inv_translation;
+            m_outMatrix = glm::transpose(e2g);
+
+            /*RAYX_LOG << "from position and orientation";
+            printDMatrix(m_inMatrix);
+            printDMatrix(m_outMatrix);*/
+        }
+    };
+
     // needed to add optical elements to tracer
     OpticalElement(const char* name,
                    const std::array<double, 4 * 4> surfaceParams,
@@ -25,33 +136,18 @@ class RAYX_API OpticalElement : public BeamlineObject {
                    const std::array<double, 4 * 4> OParameters,
                    const std::array<double, 4 * 4> EParameters);
 
-    // new constructors
     OpticalElement(const char* name,
                    const std::array<double, 4 * 4> EParameters,
-                   Geometry::GeometricalShape geometricalShape,
-                   const double width, const double height,
-                   const double azimuthalAngle, glm::dvec4 position,
-                   glm::dmat4x4 orientation,
-                   const std::array<double, 7> slopeError);
-    OpticalElement(const char* name,
-                   const std::array<double, 4 * 4> EParameters,
-                   Geometry::GeometricalShape geometricalShape,
-                   const double width, const double widthB, const double height,
-                   const double azimuthalAngle, glm::dvec4 position,
-                   glm::dmat4x4 orientation,
-                   const std::array<double, 7> slopeError);
-    OpticalElement(const char* name,
-                   Geometry::GeometricalShape geometricalShape,
-                   const double width, const double height,
-                   const double azimuthalAngle, glm::dvec4 position,
-                   glm::dmat4x4 orientation,
-                   const std::array<double, 7> slopeError);
-    OpticalElement(const char* name,
-                   Geometry::GeometricalShape geometricalShape,
-                   const double widthA, const double widthB,
-                   const double height, const double azimuthalAngle,
-                   glm::dvec4 position, glm::dmat4x4 orientation,
-                   const std::array<double, 7> slopeError);
+                   const std::array<double, 7> slopeError,
+                   const Geometry& geometry = Geometry());
+
+    OpticalElement(const char* name, const std::array<double, 7> slopeError,
+                   const Geometry& geometry = Geometry());
+
+    virtual ~OpticalElement() = default;
+
+    // TODO(Jannis): Add a method where each element can define how to build its
+    // geometry
 
     void setElementParameters(std::array<double, 4 * 4> params);
     void setInMatrix(std::array<double, 4 * 4> inputMatrix);
@@ -72,12 +168,11 @@ class RAYX_API OpticalElement : public BeamlineObject {
     std::array<double, 4 * 4> getSurfaceParams() const;
     std::array<double, 7> getSlopeError() const;
 
-    OpticalElement();
-    virtual ~OpticalElement();
+    const char* m_name;
 
-  private:
+  protected:
     // GEOMETRY
-    std::unique_ptr<Geometry> m_geometry;  // will replace all of the following
+    std::unique_ptr<Geometry> m_Geometry;  // will replace all of the following
                                            // attributes (up until surface)
     // SURFACE (eg Quadric or if eg torus something else)
     std::unique_ptr<Surface> m_surfacePtr;
@@ -87,9 +182,6 @@ class RAYX_API OpticalElement : public BeamlineObject {
     // 7 paramters that specify the slope error, are stored in objectParamters
     // to give to shader
     std::array<double, 7> m_slopeError;
-
-    std::array<double, 4 * 4> m_inMatrix;
-    std::array<double, 4 * 4> m_outMatrix;
 
     // things every optical element has (e.g. slope error) (16 entries -> one
     // dmat4x4 in shader) also put to shader

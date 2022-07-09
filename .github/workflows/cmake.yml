@@ -38,7 +38,6 @@ jobs:
       # See https://cmake.org/cmake/help/latest/variable/CMAKE_BUILD_TYPE.html?highlight=cmake_build_type
       run: |
         CI=YES cmake -B ${{github.workspace}}/build -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}}
-        echo $CI
 
     - name: Build
       # Build your program with the given configuration
@@ -46,5 +45,5 @@ jobs:
 
     - name: Test
       working-directory: ${{github.workspace}}/build/bin
-      run: ./RayReworked_tst
+      run: ./RAYX_tst -x
       

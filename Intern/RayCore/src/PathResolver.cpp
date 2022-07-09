@@ -2,21 +2,18 @@
 
 #include <Debug.h>
 
-#include <filesystem>
-#include <optional>
-
 static std::optional<std::filesystem::path> ROOT;
 
-void initPathResolver(char* executablePath) {
+void RAYX_API initPathResolver(char* executablePath) {
     std::filesystem::path p = std::filesystem::canonical(
-        executablePath);  // rayreworked/build/bin/TerminalApp
-    p = p.parent_path();  // rayreworked/build/bin/
-    p = p.parent_path();  // rayreworked/build
-    p = p.parent_path();  // rayreworked
+        executablePath);  // ray-x/build/bin/TerminalApp
+    p = p.parent_path();  // ray-x/build/bin/
+    p = p.parent_path();  // ray-x/build
+    p = p.parent_path();  // ray-x
     ROOT = p;
 }
 
-std::string resolvePath(std::string path) {
+std::string RAYX_API resolvePath(std::string path) {
     if (!ROOT) {
         RAYX_ERR
             << "can not resolve path without prior call to initPathResolver";
@@ -24,5 +21,13 @@ std::string resolvePath(std::string path) {
 
     std::filesystem::path p = *ROOT;
     p.append(path);
-    return p;
+    return p.string();
+}
+
+std::string RAYX_API getFilename(char* path) {
+    return std::filesystem::path(std::string(path)).filename().string();
+}
+
+std::string RAYX_API getFilename(std::string path) {
+    return std::filesystem::path(path).filename().string();
 }

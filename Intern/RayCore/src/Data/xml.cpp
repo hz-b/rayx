@@ -174,6 +174,27 @@ bool paramOrientationNoGroup(const rapidxml::xml_node<>* node,
         return false;
     }
 
+#ifdef RAYX_DEBUG_MODE
+
+    // check if vectors are a basis (determinant =/= 0)
+    glm::dmat3x3 worldDirections = {worldXdirection, worldYdirection,
+                                    worldZdirection};
+    double determinant = glm::determinant(worldDirections);
+
+    if (determinant == 0) {
+        RAYX_WARN << "Vectors are not a basis.";
+    }
+
+    // ((v1 x v2) dot v3) > 0 ==> right-handed (else left-handed)
+    glm::dvec3 crossProduct = glm::cross(worldXdirection, worldYdirection);
+    double dotProduct = glm::dot(crossProduct, worldZdirection);
+
+    if (dotProduct < 0) {
+        RAYX_WARN << "Coordinate system is not right-handed.";
+    }
+
+#endif
+
     (*out)[0] = glm::dvec4(worldXdirection, 0);
     (*out)[1] = glm::dvec4(worldYdirection, 0);
     (*out)[2] = glm::dvec4(worldZdirection, 0);

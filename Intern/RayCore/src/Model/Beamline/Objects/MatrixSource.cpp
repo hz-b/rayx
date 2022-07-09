@@ -34,15 +34,17 @@ namespace RAYX {
  * @param misalignment      if the source is moved/turned in any direction
  * (affects x,y position and x,y direction)
  */
-MatrixSource::MatrixSource(const std::string name, EnergyDistribution dist,
-                           const double sourceWidth, const double sourceHeight,
-                           const double sourceDepth, const double horDivergence,
+MatrixSource::MatrixSource(const std::string name, int numberOfRays,
+                           EnergyDistribution dist, const double sourceWidth,
+                           const double sourceHeight, const double sourceDepth,
+                           const double horDivergence,
                            const double verDivergence, const double linPol0,
                            const double linPol45, const double circPol,
                            const std::array<double, 6> misalignment)
     : LightSource(name.c_str(), dist, linPol0, linPol45, circPol, misalignment,
                   sourceDepth, sourceHeight, sourceWidth, horDivergence,
-                  verDivergence) {
+                  verDivergence),
+      m_numberOfRays(numberOfRays) {
     RAYX_LOG << "Created.";
 }
 
@@ -50,13 +52,11 @@ MatrixSource::~MatrixSource() {}
 
 // returns nullptr on error
 std::shared_ptr<MatrixSource> MatrixSource::createFromXML(xml::Parser p) {
-    SimulationEnv::get().m_numOfRays = p.parseNumberRays();
-
     return std::make_shared<MatrixSource>(
-        p.name(), p.parseEnergyDistribution(), p.parseSourceWidth(),
-        p.parseSourceHeight(), p.parseSourceDepth(), p.parseHorDiv(),
-        p.parseVerDiv(), p.parseLinearPol0(), p.parseLinearPol45(),
-        p.parseCircularPol(), p.parseMisalignment());
+        p.name(), p.parseNumberRays(), p.parseEnergyDistribution(),
+        p.parseSourceWidth(), p.parseSourceHeight(), p.parseSourceDepth(),
+        p.parseHorDiv(), p.parseVerDiv(), p.parseLinearPol0(),
+        p.parseLinearPol45(), p.parseCircularPol(), p.parseMisalignment());
 }
 
 /**
@@ -65,7 +65,7 @@ std::shared_ptr<MatrixSource> MatrixSource::createFromXML(xml::Parser p) {
  * direction as first 4) distributed evenly across width & height of source
  * returns vector of rays
  */
-std::vector<Ray> MatrixSource::getRays() {
+std::vector<Ray> MatrixSource::getRays() const {
     RAYX_PROFILE_FUNCTION();
     double lower_bound = 0;
     double upper_bound = 1;
@@ -74,7 +74,7 @@ std::vector<Ray> MatrixSource::getRays() {
 
     double x, y, z, psi, phi,
         en;  // x,y,z pos, psi,phi direction cosines, en=energy
-    int rmat = int(sqrt(SimulationEnv::get().m_numOfRays));
+    int rmat = int(sqrt(m_numberOfRays));
 
     std::vector<Ray> rayVector;
     rayVector.reserve(1048576);
@@ -106,16 +106,13 @@ std::vector<Ray> MatrixSource::getRays() {
             glm::dvec4 stokes =
                 glm::dvec4(1, getLinear0(), getLinear45(), getCircular());
 
-            Ray r = {position.x,  position.y,  position.z,  1.0,
-                     direction.x, direction.y, direction.z, en,
-                     stokes.x,    stokes.y,    stokes.z,    stokes.w,
-                     0.0,         0.0,         0.0,         0.0};
+            Ray r = {position, 1.0, direction, en, stokes, 0.0, 0.0, 0.0, 0.0};
             // Ray(1, 2, 3, 7, 4, 5, 6, 8, 9, 10, 11, 12, 13, 14, 15, 16);
             rayVector.push_back(r);
         }
     }
     // afterwards start from the beginning again
-    for (int i = 0; i < SimulationEnv::get().m_numOfRays - rmat * rmat; i++) {
+    for (int i = 0; i < m_numberOfRays - rmat * rmat; i++) {
         /*Ray r = rayVector.at(i);
         glm::dvec3 position =
             glm::dvec3(r.m_position.x, r.m_position.y, r.m_position.z);

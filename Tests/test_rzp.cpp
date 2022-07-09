@@ -1,12 +1,10 @@
-#include <Tracer/Vulkan/Material.h>
-
 #include "setupTests.h"
 #if RUN_TEST_RZP
 
 TEST(RZP, testdefaultParams) {
     RAYX::GratingMount mount = RAYX::GratingMount::Incidence;
-    RAYX::Geometry::GeometricalShape geometricalShape =
-        RAYX::Geometry::GeometricalShape::RECTANGLE;
+    RAYX::OpticalElement::GeometricalShape geometricalShape =
+        RAYX::OpticalElement::GeometricalShape::RECTANGLE;
     RAYX::CurvatureType curvatureType = RAYX::CurvatureType::Plane;
     auto imageType = RAYX::ImageType::Point2Point;
     int additionalOrder = 1;
@@ -112,8 +110,8 @@ TEST(RZP, testdefaultParams) {
 
 TEST(RZP, testdefaultParamsElliptical) {
     RAYX::GratingMount mount = RAYX::GratingMount::Incidence;
-    RAYX::Geometry::GeometricalShape geometricalShape =
-        RAYX::Geometry::GeometricalShape::ELLIPTICAL;
+    RAYX::OpticalElement::GeometricalShape geometricalShape =
+        RAYX::OpticalElement::GeometricalShape::ELLIPTICAL;
     auto curvatureType = RAYX::CurvatureType::Plane;
     auto imageType = RAYX::ImageType::Point2Point;
     int additionalOrder = 1;
@@ -218,8 +216,8 @@ TEST(RZP, testdefaultParamsElliptical) {
 
 TEST(RZP, testParams) {
     RAYX::GratingMount mount = RAYX::GratingMount::Deviation;
-    RAYX::Geometry::GeometricalShape geometricalShape =
-        RAYX::Geometry::GeometricalShape::RECTANGLE;
+    RAYX::OpticalElement::GeometricalShape geometricalShape =
+        RAYX::OpticalElement::GeometricalShape::RECTANGLE;
     auto imageType = RAYX::ImageType::Point2Point;
     auto curvatureType = RAYX::CurvatureType::Plane;
     int additionalOrder = 0;

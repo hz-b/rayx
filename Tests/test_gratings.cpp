@@ -2,7 +2,6 @@
 
 #include "setupTests.h"
 #if RUN_TEST_GRATINGS
-#include <Tracer/Vulkan/Material.h>
 
 TEST(planeGrating, testParams) {
     // user parameters
@@ -10,8 +9,8 @@ TEST(planeGrating, testParams) {
     double dist = 1245.71;
 
     RAYX::GratingMount mount = RAYX::GratingMount::Deviation;
-    RAYX::Geometry::GeometricalShape geometricalShape =
-        RAYX::Geometry::GeometricalShape::RECTANGLE;
+    RAYX::OpticalElement::GeometricalShape geometricalShape =
+        RAYX::OpticalElement::GeometricalShape::RECTANGLE;
     double deviation = 12.4;
     double normalIncidence = 15.12;
     std::array<double, 6> mis = {5.212, 7.3, 0.35, 0.23, 0.011, 0.0006};
@@ -106,8 +105,8 @@ TEST(planeGraing, mount1) {
     double dist = 1245.71;
 
     RAYX::GratingMount mount = RAYX::GratingMount::Incidence;
-    RAYX::Geometry::GeometricalShape geometricalShape =
-        RAYX::Geometry::GeometricalShape::RECTANGLE;
+    RAYX::OpticalElement::GeometricalShape geometricalShape =
+        RAYX::OpticalElement::GeometricalShape::RECTANGLE;
     double deviation = 12.4;
     double normalIncidence = 15.12;
     std::array<double, 6> mis = {5.212, 7.3, 0.35, 0.23, 0.011, 0.0006};
@@ -202,8 +201,8 @@ TEST(planeGrating, higherOrderOfDiffraction) {
     double dist = 1245.71;
 
     RAYX::GratingMount mount = RAYX::GratingMount::Incidence;
-    RAYX::Geometry::GeometricalShape geometricalShape =
-        RAYX::Geometry::GeometricalShape::RECTANGLE;
+    RAYX::OpticalElement::GeometricalShape geometricalShape =
+        RAYX::OpticalElement::GeometricalShape::RECTANGLE;
     double deviation = 12.4;
     double normalIncidence = 15.12;
     std::array<double, 6> mis = {5.212, 7.3, 0.35, 0.23, 0.011, 0.0006};
@@ -299,8 +298,8 @@ TEST(planeGrating, deviation) {
     double azimuthal = 61.142;
     double dist = 1245.71;
 
-    RAYX::Geometry::GeometricalShape geometricalShape =
-        RAYX::Geometry::GeometricalShape::RECTANGLE;
+    RAYX::OpticalElement::GeometricalShape geometricalShape =
+        RAYX::OpticalElement::GeometricalShape::RECTANGLE;
     double deviation = 12.4;
     double normalIncidence = 15.12;
     std::array<double, 6> mis = {5.212, 7.3, 0.35, 0.23, 0.011, 0.0006};
@@ -401,8 +400,8 @@ TEST(PlaneGrating, testHvlam) {
 
 TEST(SphereGrating, testParams) {
     RAYX::GratingMount mount = RAYX::GratingMount::Deviation;
-    RAYX::Geometry::GeometricalShape geometricalShape =
-        RAYX::Geometry::GeometricalShape::RECTANGLE;
+    RAYX::OpticalElement::GeometricalShape geometricalShape =
+        RAYX::OpticalElement::GeometricalShape::RECTANGLE;
     double width = 241.623;
     double height = 836.213;
     double deviation = 9.215;

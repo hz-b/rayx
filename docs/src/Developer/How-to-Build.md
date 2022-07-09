@@ -1,11 +1,13 @@
+# How to Build
+
 For building the project and running the project, we recommend to use [Visual Studio Code](https://code.visualstudio.com/) as your IDE with these extensions: C/C++ and CMake Tools. You can use any IDE you like, but the VSCode extensions make the building process very easy.
 
 Clone the git repository with:
-`git clone --recurse-submodules git@gitlab.helmholtz-berlin.de:RAY/RAY-X.git -b development`
+`git clone --recurse-submodules git@github.com:hz-b/RAY-X.git -b development`
 
 to get the dev branch and to make sure, you also clone all of it's submodules.
 
-**On Windows**:
+## On Windows
 - Install [CMake](https://cmake.org/download/)
 - Install [Vulkan](https://vulkan.lunarg.com/) for Windows
 - Install [HDF5](https://www.hdfgroup.org/downloads/hdf5/) library 
@@ -13,7 +15,7 @@ to get the dev branch and to make sure, you also clone all of it's submodules.
 - Also allow the CMake Extension to configure the project
 - Then you can click build in the bottom panel
 
-**On Linux**:
+## On Linux
 - Make sure you have cmake, gcc, gdb and make installed and on the latest version
 - Download Vulkan SDK from [https://vulkan.lunarg.com/sdk/home](https://vulkan.lunarg.com/sdk/home)
 - run `source setup-env.sh` in terminal in the downloaded folder and run `vkcube` to test it (!now only in this specific terminal available!)
@@ -24,13 +26,13 @@ to get the dev branch and to make sure, you also clone all of it's submodules.
 - Starting from Jan 2022, the project also uses [libhdf5](https://github.com/BlueBrain/HighFive). Make sure that you have the correct libraries _(Ubuntu and debian-based Distros)_ :  `apt update && apt -y install libblas-dev liblapack-dev libhdf5-dev`
 - Make sure that the libraries are installed at `/usr/include/hdf5/serial` and `/usr/lib/x86_64-linux-gnu/hdf5/serial`
 
-**Fedora**:
+## Fedora
 
 ```
 sudo dnf install cmake gcc gdb vulkan vulkan-tools vulkan-validation-layers hdf5-devel
 ```
 
-**Building independent of IDE**
+## Building independent of IDE
 
 In case you decide against using VSCode you can setup your build system with the command:
 
