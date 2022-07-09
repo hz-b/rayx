@@ -25,14 +25,15 @@ def importOutput(filename: str):
         # default, Columns are hard-coded, to be changed if necessary
         _keys = [int(i)for i in list(h5f.keys())]
         _keys.sort()
-        
-        _dfs= []
+
+        _dfs = []
         for key in _keys:
             dataset = h5f[str(key)]
-            _df = pd.DataFrame(dataset,columns=['Xloc', 'Yloc', 'Zloc', 'Weight', 'Xdir', 'Ydir', 'Zdir', 'Energy',
-                                               'Stokes0', 'Stokes1', 'Stokes2', 'Stokes3', 'pathLength', 'order', 'lastElement', 'extraParam'])
+            _df = pd.DataFrame(dataset, columns=['Xloc', 'Yloc', 'Zloc', 'Weight', 'Xdir', 'Ydir', 'Zdir', 'Energy',
+                                                 'Stokes0', 'Stokes1', 'Stokes2', 'Stokes3', 'pathLength', 'order', 'lastElement', 'extraParam'])
             _dfs.append(_df)
-        df = pd.concat(_dfs,axis=0) # concat once done otherwise, too memory intensive
+        # concat once done otherwise, too memory intensive
+        df = pd.concat(_dfs, axis=0)
     return df
 
 
@@ -120,7 +121,8 @@ def plotForEachSubplot(df: pd.DataFrame, title: str, _single_color=False):
         if (temp_df.shape[0] < 50):
             _size = 5
         if not(_single_color):
-            plt.scatter(x, y, s=_size, label='Ray', color=viridis_col.colors[i])
+            plt.scatter(x, y, s=_size, label='Ray',
+                        color=viridis_col.colors[i])
         else:
             plt.scatter(x, y, s=_size, label='Ray')
         plt.xlabel('x / mm')
