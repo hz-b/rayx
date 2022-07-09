@@ -19,7 +19,7 @@
 #define RUN_TEST_QUADRIC 1
 #define RUN_TEST_RML 1
 #define RUN_TEST_RZP 1
-#define RUN_TEST_SHADER 1
+#define RUN_TEST_SHADER 0
 #define RUN_TEST_SLIT 1
 #define RUN_TEST_SOURCES 1
 

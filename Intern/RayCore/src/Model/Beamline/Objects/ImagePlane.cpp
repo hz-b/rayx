@@ -20,7 +20,6 @@ ImagePlane::ImagePlane(const char* name, glm::dvec4 position,
     : OpticalElement(name, {0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0}) {
     m_Geometry->m_orientation = orientation;
     m_Geometry->m_position = position;
-    m_Geometry->calcTransformationMatrices(position, orientation);
     updateObjectParams();
 
     RAYX_LOG << name;

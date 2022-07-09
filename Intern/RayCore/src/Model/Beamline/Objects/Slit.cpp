@@ -36,7 +36,6 @@ Slit::Slit(const char* name, OpticalElement::GeometricalShape geometricalShape,
     m_Geometry->m_position = position;
     m_Geometry->m_orientation = orientation;
     m_centralBeamstop = beamstop;
-    m_Geometry->calcTransformationMatrices(position, orientation);
     updateObjectParams();
 
     // if no beamstop -> set to zero

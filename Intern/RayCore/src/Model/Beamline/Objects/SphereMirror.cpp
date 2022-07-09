@@ -48,7 +48,6 @@ SphereMirror::SphereMirror(const char* name,
     m_Geometry->m_azimuthalAngle = azimuthalAngle;
     m_Geometry->m_position = position;
     m_Geometry->m_orientation = orientation;
-    m_Geometry->calcTransformationMatrices(position, orientation);
     updateObjectParams();
 
     calcRadius();  // calculate the radius
@@ -90,7 +89,6 @@ SphereMirror::SphereMirror(const char* name,
     m_Geometry->m_azimuthalAngle = azimuthalAngle;
     m_Geometry->m_position = position;
     m_Geometry->m_orientation = orientation;
-    m_Geometry->calcTransformationMatrices(position, orientation);
     updateObjectParams();
 
     RAYX_LOG << "Created.";

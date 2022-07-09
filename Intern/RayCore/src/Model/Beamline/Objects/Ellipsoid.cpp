@@ -51,8 +51,7 @@ Ellipsoid::Ellipsoid(const char* name,
     m_Geometry->setHeightWidth(height, width);
     m_Geometry->m_azimuthalAngle = azimuthalAngle;
     m_Geometry->m_position = position;
-    m_Geometry->m_orientation = orientation;
-    m_Geometry->calcTransformationMatrices(position, orientation);
+    m_Geometry->m_orientation = orientation;    
     updateObjectParams();
 
     RAYX_LOG << name;

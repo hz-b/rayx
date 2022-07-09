@@ -91,8 +91,8 @@ RayList CpuTracer::trace(const Beamline& beamline) {
     for (auto el : beamline.m_OpticalElements) {
         CPP_TRACER::Element e;
         e.surfaceParams = arrayToGlm16(el->getSurfaceParams());
-        e.inTrans = arrayToGlm16(el->getInMatrix());
-        e.outTrans = arrayToGlm16(el->getOutMatrix());
+        e.inTrans = el->getInMatrix();
+        e.outTrans = el->getOutMatrix();
         e.objectParameters = arrayToGlm16(el->getObjectParameters());
         e.elementParameters = arrayToGlm16(el->getElementParameters());
         CPP_TRACER::quadricData.data.push_back(e);
