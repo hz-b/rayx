@@ -2,8 +2,8 @@
 #if RUN_TEST_SLIT
 
 TEST(Slit, defaultParams) {
-    RAYX::Geometry::GeometricalShape geometricalShape =
-        RAYX::Geometry::GeometricalShape::RECTANGLE;
+    RAYX::OpticalElement::GeometricalShape geometricalShape =
+        RAYX::OpticalElement::GeometricalShape::RECTANGLE;
     RAYX::CentralBeamstop beamstop = RAYX::CentralBeamstop::None;
     double width = 24;
     double height = 3;
@@ -47,8 +47,8 @@ TEST(Slit, defaultParams) {
 }
 
 TEST(Slit, rectangleBeamstop) {
-    RAYX::Geometry::GeometricalShape geometricalShape =
-        RAYX::Geometry::GeometricalShape::RECTANGLE;
+    RAYX::OpticalElement::GeometricalShape geometricalShape =
+        RAYX::OpticalElement::GeometricalShape::RECTANGLE;
     RAYX::CentralBeamstop beamstop = RAYX::CentralBeamstop::Rectangle;
     double width = 24;
     double height = 3;
@@ -106,8 +106,8 @@ TEST(Slit, rectangleBeamstop) {
 }
 
 TEST(Slit, ellipticalBeamstop) {
-    RAYX::Geometry::GeometricalShape geometricalShape =
-        RAYX::Geometry::GeometricalShape::RECTANGLE;
+    RAYX::OpticalElement::GeometricalShape geometricalShape =
+        RAYX::OpticalElement::GeometricalShape::RECTANGLE;
     RAYX::CentralBeamstop beamstop = RAYX::CentralBeamstop::Elliptical;
     double width = 20;
     double height = 2;
@@ -165,8 +165,8 @@ TEST(Slit, ellipticalBeamstop) {
 }
 
 TEST(Slit, ellipticalSlitellipticalBeamstop) {
-    RAYX::Geometry::GeometricalShape geometricalShape =
-        RAYX::Geometry::GeometricalShape::ELLIPTICAL;
+    RAYX::OpticalElement::GeometricalShape geometricalShape =
+        RAYX::OpticalElement::GeometricalShape::ELLIPTICAL;
     RAYX::CentralBeamstop beamstop = RAYX::CentralBeamstop::Elliptical;
     double width = 24;
     double height = 3;
@@ -252,8 +252,8 @@ TEST(Slit, ellipticalSlitellipticalBeamstop) {
 }
 
 TEST(Slit, ellipticalSlitrectangleBeamstop) {
-    RAYX::Geometry::GeometricalShape geometricalShape =
-        RAYX::Geometry::GeometricalShape::ELLIPTICAL;
+    RAYX::OpticalElement::GeometricalShape geometricalShape =
+        RAYX::OpticalElement::GeometricalShape::ELLIPTICAL;
     RAYX::CentralBeamstop beamstop = RAYX::CentralBeamstop::Rectangle;
     double width = 24;
     double height = 3;
@@ -311,8 +311,8 @@ TEST(Slit, ellipticalSlitrectangleBeamstop) {
 }
 
 TEST(Slit, ellipticalSlitNoBeamstop) {
-    RAYX::Geometry::GeometricalShape geometricalShape =
-        RAYX::Geometry::GeometricalShape::ELLIPTICAL;
+    RAYX::OpticalElement::GeometricalShape geometricalShape =
+        RAYX::OpticalElement::GeometricalShape::ELLIPTICAL;
     RAYX::CentralBeamstop beamstop = RAYX::CentralBeamstop::None;
     double width = 24;
     double height = 3;

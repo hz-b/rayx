@@ -32,7 +32,6 @@ SET(SOURCE
     src/Model/Surface/Quadric.cpp
     src/Model/Surface/Toroid.cpp
     src/Model/Surface/Surface.cpp
-    src/Model/Geometry/Geometry.cpp
     src/Material/Material.cpp
     src/Material/NffTable.cpp
     src/Material/PalikTable.cpp
@@ -73,7 +72,6 @@ SET(HEADERS
     src/Model/Surface/Quadric.h
     src/Model/Surface/Toroid.h
     src/Model/Surface/Surface.h
-    src/Model/Geometry/Geometry.h
     src/Tracer/RayList.h
     src/Tracer/Ray.h
     src/Tracer/Tracer.h

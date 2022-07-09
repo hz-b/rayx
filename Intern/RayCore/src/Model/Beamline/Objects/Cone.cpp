@@ -21,7 +21,7 @@ namespace RAYX {
  * meridional (1), thermal distortion: x (2),y (3),z (4), cylindrical bowing
  * amplitude y(5) and radius (6)
  */
-Cone::Cone(const char* name, Geometry::GeometricalShape geometricalShape,
+Cone::Cone(const char* name, OpticalElement::GeometricalShape geometricalShape,
            const double width, const double height, const double azimuthalAngle,
            glm::dvec4 position, glm::dmat4x4 orientation,
            const double grazingIncidence, const double entranceArmLength,
@@ -70,7 +70,7 @@ Cone::Cone(const char* name, Geometry::GeometricalShape geometricalShape,
  * meridional (1), thermal distortion: x (2),y (3),z (4), cylindrical bowing
  * amplitude y(5) and radius (6)
  */
-Cone::Cone(const char* name, Geometry::GeometricalShape geometricalShape,
+Cone::Cone(const char* name, OpticalElement::GeometricalShape geometricalShape,
            const double upstream_radius_r, const double downstream_radius_rho,
            const double width, const double height, const double azimuthalAngle,
            glm::dvec4 position, glm::dmat4x4 orientation,

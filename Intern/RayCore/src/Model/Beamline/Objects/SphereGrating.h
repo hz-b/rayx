@@ -12,7 +12,7 @@ class RAYX_API SphereGrating : public OpticalElement {
   public:
     // new, shortened constructor
     SphereGrating(const char* name, GratingMount mount,
-                  Geometry::GeometricalShape geometricalShape, double width,
+                  OpticalElement::GeometricalShape geometricalShape, double width,
                   double height, const double azimuthalAngle, double radius,
                   glm::dvec4 position, glm::dmat4x4 orientation,
                   double designEnergyMounting, double lineDensity,

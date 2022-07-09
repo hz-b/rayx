@@ -22,7 +22,7 @@ namespace RAYX {
  * @param sourceEnergy          energy of source
  *
  */
-Slit::Slit(const char* name, Geometry::GeometricalShape geometricalShape,
+Slit::Slit(const char* name, OpticalElement::GeometricalShape geometricalShape,
            CentralBeamstop beamstop, double width, double height,
            glm::dvec4 position, glm::dmat4x4 orientation, double beamstopWidth,
            double beamstopHeight)

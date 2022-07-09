@@ -27,7 +27,7 @@ namespace RAYX {
  *
  */
 PlaneMirror::PlaneMirror(const char* name,
-                         Geometry::GeometricalShape geometricalShape,
+                         OpticalElement::GeometricalShape geometricalShape,
                          const double width, const double height,
                          const double azimuthalAngle, glm::dvec4 position,
                          glm::dmat4x4 orientation,
@@ -42,7 +42,7 @@ PlaneMirror::PlaneMirror(const char* name,
 }
 
 PlaneMirror::PlaneMirror(const char* name,
-                         Geometry::GeometricalShape geometricalShape,
+                         OpticalElement::GeometricalShape geometricalShape,
                          const double width, const double widthB,
                          const double height, const double azimuthalAngle,
                          glm::dvec4 position, glm::dmat4x4 orientation,

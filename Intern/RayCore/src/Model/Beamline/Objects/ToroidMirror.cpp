@@ -28,7 +28,7 @@ namespace RAYX {
  * @param mat                       material (See Material.h)
  */
 ToroidMirror::ToroidMirror(const char* name,
-                           Geometry::GeometricalShape geometricalShape,
+                           OpticalElement::GeometricalShape geometricalShape,
                            const double width, const double height,
                            const double azimuthalAngle, glm::dvec4 position,
                            glm::dmat4x4 orientation,

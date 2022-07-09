@@ -14,7 +14,7 @@ enum class FigureRotation { Yes, Plane, A11 };
 // TODO(Jannis): rename or turn into surface
 class RAYX_API Ellipsoid : public OpticalElement {
   public:
-    Ellipsoid(const char* name, Geometry::GeometricalShape geometricalShape,
+    Ellipsoid(const char* name, OpticalElement::GeometricalShape geometricalShape,
               const double width, const double height,
               const double azimuthalAngle, glm::dvec4 position,
               const double LongHalfAxisA, const double ShortHalfAxisB,

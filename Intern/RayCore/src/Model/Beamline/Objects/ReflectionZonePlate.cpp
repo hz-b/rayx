@@ -49,7 +49,7 @@ namespace RAYX {
  * @param mat                           material (See Material.h)
  */
 ReflectionZonePlate::ReflectionZonePlate(
-    const char* name, Geometry::GeometricalShape geometricalShape,
+    const char* name, OpticalElement::GeometricalShape geometricalShape,
     CurvatureType curvatureType, const double width, const double height,
     const double azimuthalAngle, const glm::dvec4 position,
     const glm::dmat4x4 orientation, const double designEnergy,
@@ -111,7 +111,7 @@ ReflectionZonePlate::ReflectionZonePlate(
 }
 
 ReflectionZonePlate::ReflectionZonePlate(
-    const char* name, Geometry::GeometricalShape geometricalShape,
+    const char* name, OpticalElement::GeometricalShape geometricalShape,
     CurvatureType curvatureType, const double widthA, const double widthB,
     const double height, const double azimuthalAngle, const glm::dvec4 position,
     const glm::dmat4x4 orientation, const double designEnergy,

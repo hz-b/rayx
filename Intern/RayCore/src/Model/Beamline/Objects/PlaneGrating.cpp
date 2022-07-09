@@ -35,7 +35,7 @@ namespace RAYX {
  *
  */
 PlaneGrating::PlaneGrating(
-    const char* name, Geometry::GeometricalShape geometricalShape,
+    const char* name, OpticalElement::GeometricalShape geometricalShape,
     const double width, const double height, const double azimuthalAngle,
     glm::dvec4 position, glm::dmat4x4 orientation, const double designEnergy,
     const double lineDensity, const double orderOfDiffraction,

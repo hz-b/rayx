@@ -9,7 +9,6 @@
 #include "Material/Material.h"
 #include "Model/Beamline/EnergyDistribution.h"
 #include "Model/Beamline/LightSource.h"
-#include "Model/Geometry/Geometry.h"
 #include "UserParameter/GeometricUserParams.h"
 #include "utils.h"
 
@@ -122,8 +121,8 @@ struct Parser {
     inline int parseLinearPol0() const { return parseInt("linearPol_0"); }
     inline int parseLinearPol45() const { return parseInt("linearPol_45"); }
     inline int parseCircularPol() const { return parseInt("circularPol"); }
-    inline Geometry::GeometricalShape parseGeometricalShape() const {
-        return static_cast<Geometry::GeometricalShape>(
+    inline OpticalElement::GeometricalShape parseGeometricalShape() const {
+        return static_cast<OpticalElement::GeometricalShape>(
             parseInt("geometricalShape"));
     }
     inline double parseTotalWidth() const { return parseDouble("totalWidth"); }

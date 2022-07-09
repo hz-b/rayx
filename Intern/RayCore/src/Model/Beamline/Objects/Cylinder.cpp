@@ -30,7 +30,7 @@ namespace RAYX {
  *
  */
 Cylinder::Cylinder(const char* name,
-                   Geometry::GeometricalShape geometricalShape,
+                   OpticalElement::GeometricalShape geometricalShape,
                    const double radius, CylinderDirection direction,
                    const double width, const double height,
                    const double azimuthalAngle, glm::dvec4 position,

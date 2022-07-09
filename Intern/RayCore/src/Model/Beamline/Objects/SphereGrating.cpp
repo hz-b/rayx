@@ -33,7 +33,7 @@ namespace RAYX {
  *
  */
 SphereGrating::SphereGrating(const char* name, GratingMount mount,
-                             Geometry::GeometricalShape geometricalShape,
+                             OpticalElement::GeometricalShape geometricalShape,
                              double width, double height,
                              const double azimuthalAngle, double radius,
                              glm::dvec4 position, glm::dmat4x4 orientation,

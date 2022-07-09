@@ -1861,7 +1861,7 @@ TEST_F(ShaderTest, EllipsoidImagePlane) {
     glm::dmat4x4 or1 = w_coord.calcOrientation();
 
     std::shared_ptr<RAYX::Ellipsoid> eb = std::make_shared<RAYX::Ellipsoid>(
-        "ellipsoid_ip_200default", RAYX::Geometry::GeometricalShape::RECTANGLE,
+        "ellipsoid_ip_200default", RAYX::OpticalElement::GeometricalShape::RECTANGLE,
         50, 200, w_coord.getAzimuthalAngle(), pos, or1, 10, 10000, 1000, 0, 1,
         zeros7, Material::Cu);
 
