@@ -8,9 +8,9 @@
 #include <vector>
 
 #include "Core.h"
+#include "Debug.h"
 #include "Model/Surface/Surface.h"
 #include "utils.h"
-#include "Debug.h"
 
 namespace RAYX {
 
@@ -34,6 +34,44 @@ class RAYX_API OpticalElement {
         glm::dmat4 m_outMatrix = glm::dmat4();
         GeometricalShape m_geometricalShape = GeometricalShape::RECTANGLE;
 
+        // Default CTOR
+        Geometry() {
+            m_widthA = 0.0;          ///< x-dimension of element
+            m_widthB = 0.0;          ///< this width is only used for trapezoid
+            m_height = 0.0;          ///< z-dimension of element
+            m_azimuthalAngle = 0.0;  // rotation of element through xy-plane
+                                     // (needed for stokes vector)
+            m_orientation =
+                glm::dmat4x4();  ///< orientation in world coordinate system
+            m_position = glm::dvec4();  ///< position in world coordinates
+            m_inMatrix = glm::dmat4();
+            m_outMatrix = glm::dmat4();
+            m_geometricalShape = GeometricalShape::RECTANGLE;
+            calcTransformationMatrices(m_position, m_orientation);
+        }
+        // Copy CTOR
+        Geometry(const Geometry& geometry) {
+            m_widthA = geometry.m_widthA;
+            m_widthB = geometry.m_widthB;
+            m_height = geometry.m_height;
+            m_azimuthalAngle = geometry.m_azimuthalAngle;
+            m_orientation = geometry.m_orientation;
+            m_position = geometry.m_position;
+            m_inMatrix = geometry.m_inMatrix;
+            m_outMatrix = geometry.m_outMatrix;
+            m_geometricalShape = geometry.m_geometricalShape;
+        }
+
+        void setHeightWidth(double height, double widthA, double widthB = 0.0) {
+            m_widthB = widthB;
+            if (m_geometricalShape == GeometricalShape::ELLIPTICAL) {
+                m_widthA = -widthA;
+                m_height = -height;
+            } else {
+                m_widthA = widthA;
+                m_height = height;
+            }
+        }
         /**
          * calculates element to world coordinates transformation matrix and its
          * inverse
@@ -44,7 +82,7 @@ class RAYX_API OpticalElement {
          * @return void
          */
         void calcTransformationMatrices(glm::dvec4 position,
-                                                  glm::dmat4x4 orientation) {
+                                        glm::dmat4x4 orientation) {
             RAYX_LOG << "Calculated orientation";
             for (int i = 0; i < 4; i++) {
                 std::stringstream s;
@@ -98,30 +136,18 @@ class RAYX_API OpticalElement {
                    const std::array<double, 4 * 4> OParameters,
                    const std::array<double, 4 * 4> EParameters);
 
-    // new constructors
     OpticalElement(const char* name,
                    const std::array<double, 4 * 4> EParameters,
-                   GeometricalShape geometricalShape, const double width,
-                   const double height, const double azimuthalAngle,
-                   glm::dvec4 position, glm::dmat4x4 orientation,
-                   const std::array<double, 7> slopeError);
-    OpticalElement(const char* name,
-                   const std::array<double, 4 * 4> EParameters,
-                   GeometricalShape geometricalShape, const double width,
-                   const double widthB, const double height,
-                   const double azimuthalAngle, glm::dvec4 position,
-                   glm::dmat4x4 orientation,
-                   const std::array<double, 7> slopeError);
-    OpticalElement(const char* name, GeometricalShape geometricalShape,
-                   const double width, const double height,
-                   const double azimuthalAngle, glm::dvec4 position,
-                   glm::dmat4x4 orientation,
-                   const std::array<double, 7> slopeError);
-    OpticalElement(const char* name, GeometricalShape geometricalShape,
-                   const double widthA, const double widthB,
-                   const double height, const double azimuthalAngle,
-                   glm::dvec4 position, glm::dmat4x4 orientation,
-                   const std::array<double, 7> slopeError);
+                   const std::array<double, 7> slopeError,
+                   const Geometry& geometry = Geometry());
+
+    OpticalElement(const char* name, const std::array<double, 7> slopeError,
+                   const Geometry& geometry = Geometry());
+
+    virtual ~OpticalElement() = default;
+
+    // TODO(Jannis): Add a method where each element can define how to build its
+    // geometry
 
     void setElementParameters(std::array<double, 4 * 4> params);
     void setInMatrix(std::array<double, 4 * 4> inputMatrix);
@@ -142,12 +168,9 @@ class RAYX_API OpticalElement {
     std::array<double, 4 * 4> getSurfaceParams() const;
     std::array<double, 7> getSlopeError() const;
 
-    OpticalElement();
-    virtual ~OpticalElement();
-
     const char* m_name;
 
-  private:
+  protected:
     // GEOMETRY
     std::unique_ptr<Geometry> m_Geometry;  // will replace all of the following
                                            // attributes (up until surface)
@@ -159,9 +182,6 @@ class RAYX_API OpticalElement {
     // 7 paramters that specify the slope error, are stored in objectParamters
     // to give to shader
     std::array<double, 7> m_slopeError;
-
-    std::array<double, 4 * 4> m_inMatrix;
-    std::array<double, 4 * 4> m_outMatrix;
 
     // things every optical element has (e.g. slope error) (16 entries -> one
     // dmat4x4 in shader) also put to shader

@@ -31,13 +31,21 @@ ToroidMirror::ToroidMirror(const char* name,
                            OpticalElement::GeometricalShape geometricalShape,
                            const double width, const double height,
                            const double azimuthalAngle, glm::dvec4 position,
-                           glm::dmat4x4 orientation,
-                           const double longRadius, const double shortRadius,
+                           glm::dmat4x4 orientation, const double longRadius,
+                           const double shortRadius,
                            const std::array<double, 7> slopeError, Material mat)
-    : OpticalElement(name, geometricalShape, width, height, azimuthalAngle,
-                     position, orientation, slopeError),
+    : OpticalElement(name, slopeError),
       m_longRadius(longRadius),
       m_shortRadius(shortRadius) {
+    // set geometry
+    m_Geometry->m_geometricalShape = geometricalShape;
+    m_Geometry->setHeightWidth(height, width);
+    m_Geometry->m_azimuthalAngle = azimuthalAngle;
+    m_Geometry->m_position = position;
+    m_Geometry->m_orientation = orientation;
+    m_Geometry->calcTransformationMatrices(position, orientation);
+    updateObjectParams();
+
     // TODO(Theresa): maybe move this function outside of this class (same for
     // spheres) because this can be derived from user parameters
 
@@ -50,14 +58,12 @@ ToroidMirror::ToroidMirror(const char* name,
     // setSurface(std::make_unique<Toroid>(m_longRadius, m_shortRadius));
 }
 
-ToroidMirror::~ToroidMirror() {}
-
 std::shared_ptr<ToroidMirror> ToroidMirror::createFromXML(xml::Parser p) {
     return std::make_shared<ToroidMirror>(
         p.name(), p.parseGeometricalShape(), p.parseTotalLength(),
         p.parseTotalWidth(), p.parseAzimuthalAngle(), p.parsePosition(),
-        p.parseOrientation(), p.parseLongRadius(),
-        p.parseShortRadius(), p.parseSlopeError(), p.parseMaterial());
+        p.parseOrientation(), p.parseLongRadius(), p.parseShortRadius(),
+        p.parseSlopeError(), p.parseMaterial());
 }
 
 }  // namespace RAYX

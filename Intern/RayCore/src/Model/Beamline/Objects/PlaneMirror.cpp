@@ -32,9 +32,16 @@ PlaneMirror::PlaneMirror(const char* name,
                          const double azimuthalAngle, glm::dvec4 position,
                          glm::dmat4x4 orientation,
                          const std::array<double, 7> slopeError, Material mat)
-    : OpticalElement(name, {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-                     geometricalShape, width, height, azimuthalAngle, position,
-                     orientation, slopeError) {
+    : OpticalElement(name, slopeError) {
+    // set geometry
+    m_Geometry->m_geometricalShape = geometricalShape;
+    m_Geometry->setHeightWidth(height, width);
+    m_Geometry->m_azimuthalAngle = azimuthalAngle;
+    m_Geometry->m_position = position;
+    m_Geometry->m_orientation = orientation;
+    m_Geometry->calcTransformationMatrices(position, orientation);
+    updateObjectParams();
+
     RAYX_LOG << name;
     double matd = (double)static_cast<int>(mat);
     setSurface(std::make_unique<Quadric>(std::array<double, 4 * 4>{
@@ -47,16 +54,21 @@ PlaneMirror::PlaneMirror(const char* name,
                          const double height, const double azimuthalAngle,
                          glm::dvec4 position, glm::dmat4x4 orientation,
                          const std::array<double, 7> slopeError, Material mat)
-    : OpticalElement(name, {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-                     geometricalShape, width, widthB, height, azimuthalAngle,
-                     position, orientation, slopeError) {
+    : OpticalElement(name, slopeError) {
+    // set geometry
+    m_Geometry->m_geometricalShape = geometricalShape;
+    m_Geometry->setHeightWidth(height, width, widthB);
+    m_Geometry->m_azimuthalAngle = azimuthalAngle;
+    m_Geometry->m_position = position;
+    m_Geometry->m_orientation = orientation;
+    m_Geometry->calcTransformationMatrices(position, orientation);
+    updateObjectParams();
+    
     RAYX_LOG << name;
     double matd = (double)static_cast<int>(mat);
     setSurface(std::make_unique<Quadric>(std::array<double, 4 * 4>{
         0, 0, 0, 0, 1, 0, 0, -1, 0, 0, 0, 0, 0, 0, matd, 0}));
 }
-
-PlaneMirror::~PlaneMirror() {}
 
 std::shared_ptr<PlaneMirror> PlaneMirror::createFromXML(xml::Parser p) {
     double widthB;

@@ -19,9 +19,6 @@ class RAYX_API Slit : public OpticalElement {
          glm::dvec4 position, glm::dmat4x4 orientation, double beamstopWidth,
          double beamstopHeight);
 
-    Slit();
-    ~Slit();
-
     static std::shared_ptr<Slit> createFromXML(xml::Parser);
 
     CentralBeamstop getCentralBeamstop() const;

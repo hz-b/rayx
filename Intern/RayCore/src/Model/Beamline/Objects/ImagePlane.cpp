@@ -17,9 +17,12 @@ namespace RAYX {
  */
 ImagePlane::ImagePlane(const char* name, glm::dvec4 position,
                        glm::dmat4x4 orientation)
-    : OpticalElement(name, {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-                     OpticalElement::GeometricalShape::RECTANGLE, 0, 0, 0, position,
-                     orientation, {0, 0, 0, 0, 0, 0, 0}) {
+    : OpticalElement(name, {0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0}) {
+    m_Geometry->m_orientation = orientation;
+    m_Geometry->m_position = position;
+    m_Geometry->calcTransformationMatrices(position, orientation);
+    updateObjectParams();
+
     RAYX_LOG << name;
     setSurface(std::make_unique<Quadric>(std::array<double, 4 * 4>{
         0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 5, 0, 0, 0}));

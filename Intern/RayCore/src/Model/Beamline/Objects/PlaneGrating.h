@@ -16,8 +16,6 @@ class RAYX_API PlaneGrating : public OpticalElement {
                  const double lineDensity, const double orderOfDiffraction,
                  const int additionalZeroOrder, const std::array<double, 6> vls,
                  const std::array<double, 7> slopeError, Material mat);
-    PlaneGrating();
-    ~PlaneGrating();
 
     static std::shared_ptr<PlaneGrating> createFromXML(xml::Parser);
 

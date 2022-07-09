@@ -23,8 +23,6 @@ class RAYX_API Ellipsoid : public OpticalElement {
               const double exitArmLength, FigureRotation figRot,
               const double a_11, const std::array<double, 7> slopeError,
               Material mat);
-    Ellipsoid() = default;
-    ~Ellipsoid();
 
     void calcHalfAxes();
     void calculateCenterFromHalfAxes(double angle);

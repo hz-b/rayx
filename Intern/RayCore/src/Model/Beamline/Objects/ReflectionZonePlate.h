@@ -54,8 +54,6 @@ class RAYX_API ReflectionZonePlate : public OpticalElement {
         const double longRadius, const int additionalZeroOrder,
         const double fresnelZOffset, const std::array<double, 7> slopeError,
         Material mat);
-    ReflectionZonePlate();
-    ~ReflectionZonePlate();
 
     static std::shared_ptr<ReflectionZonePlate> createFromXML(xml::Parser);
 

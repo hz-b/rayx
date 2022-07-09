@@ -8,6 +8,7 @@
 #include "utils.h"
 
 namespace RAYX {
+
 /**
  * constructor for adding elements to tracer. The given arrays contain the
  * values that will actually be moved to the shader
@@ -30,129 +31,30 @@ OpticalElement::OpticalElement(const char* name,
                                const std::array<double, 4 * 4> OParameters,
                                const std::array<double, 4 * 4> EParameters)
     : m_name(name), m_surfaceParams(surfaceParams),
-      m_objectParameters(OParameters), m_elementParameters(EParameters){
+      m_objectParameters(OParameters), m_elementParameters(EParameters) {
     m_Geometry = std::make_unique<Geometry>();
     m_Geometry->m_inMatrix = arrayToGlm16(inputInMatrix);
     m_Geometry->m_outMatrix = arrayToGlm16(inputOutMatrix);
 }
 
-/* NEW CONSTRUCTORS */
-
-/**
- * @param name                      name of the element
- * @param EParameters               Element specific parameters
- * @param geometricalShape          geometrical Shape of element (0 = rectangle,
- * 1 = elliptical)
- * @param width                     x-dimension of element
- * @param height                    z-dimension of element
- * @param position                  position in world coordinates
- * @param orientation               orientation in world coordinate system
- * @param slopeError                slope error parameters
- */
-OpticalElement::OpticalElement(
-    const char* name, const std::array<double, 4 * 4> EParameters,
-    OpticalElement::GeometricalShape geometricalShape, const double width,
-    const double height, const double azimuthalAngle, glm::dvec4 position,
-    glm::dmat4x4 orientation, const std::array<double, 7> slopeError)
-    : m_name(name), m_slopeError(slopeError), m_elementParameters(EParameters) {
-    m_Geometry = std::make_unique<Geometry>();
-    m_Geometry->m_geometricalShape = geometricalShape;
-    if (m_Geometry->m_geometricalShape == GeometricalShape::ELLIPTICAL) {
-        m_Geometry->m_widthA = -width;
-        m_Geometry->m_height = -height;
-    } else {
-        m_Geometry->m_widthA = width;
-        m_Geometry->m_height = height;
-    }
-    m_Geometry->m_azimuthalAngle = azimuthalAngle;
-    m_Geometry->m_position = position;
-    m_Geometry->m_orientation = orientation;
-    m_Geometry->calcTransformationMatrices(position, orientation);
+OpticalElement::OpticalElement(const char* name,
+                               const std::array<double, 4 * 4> eParameters,
+                               const std::array<double, 7> slopeError,
+                               const Geometry& geometry)
+    : m_name(name), m_Geometry(std::make_unique<Geometry>(geometry)) {
+    m_slopeError = slopeError;
+    m_elementParameters = eParameters;
     updateObjectParams();
 }
 
-// ! temporary constructors for trapezoid (10/11/2021)
-OpticalElement::OpticalElement(
-    const char* name, const std::array<double, 4 * 4> EParameters,
-    OpticalElement::GeometricalShape geometricalShape, const double width,
-    const double widthB, const double height, const double azimuthalAngle,
-    glm::dvec4 position, glm::dmat4x4 orientation,
-    const std::array<double, 7> slopeError)
-    : m_name(name), m_slopeError(slopeError), m_elementParameters(EParameters) {
-    m_Geometry = std::make_unique<Geometry>();
-    m_Geometry->m_geometricalShape = geometricalShape;
-    if (m_Geometry->m_geometricalShape == GeometricalShape::ELLIPTICAL) {
-        m_Geometry->m_widthA = -width;
-        m_Geometry->m_height = -height;
-    } else {
-        m_Geometry->m_widthA = width;
-        m_Geometry->m_height = height;
-    }
-    m_Geometry->m_widthB = widthB;
-    m_Geometry->m_azimuthalAngle = azimuthalAngle;
-    m_Geometry->m_position = position;
-    m_Geometry->m_orientation = orientation;
-    m_Geometry->calcTransformationMatrices(position, orientation);
+OpticalElement::OpticalElement(const char* name,
+                               const std::array<double, 7> slopeError,
+                               const Geometry& geometry)
+    : m_name(name), m_Geometry(std::make_unique<Geometry>(geometry)) {
+    m_slopeError = slopeError;
+    m_elementParameters = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
     updateObjectParams();
 }
-OpticalElement::OpticalElement(
-    const char* name, OpticalElement::GeometricalShape geometricalShape,
-    const double widthA, const double widthB, const double height,
-    const double azimuthalAngle, glm::dvec4 position, glm::dmat4x4 orientation,
-    const std::array<double, 7> slopeError)
-    : m_name(name), m_slopeError(slopeError) {
-    m_Geometry = std::make_unique<Geometry>();
-    m_Geometry->m_geometricalShape = geometricalShape;
-    if (m_Geometry->m_geometricalShape == GeometricalShape::ELLIPTICAL) {
-        m_Geometry->m_widthA = -widthA;
-        m_Geometry->m_height = -height;
-    } else {
-        m_Geometry->m_widthA = widthA;
-        m_Geometry->m_height = height;
-    }
-    m_Geometry->m_widthB = widthB;
-    m_Geometry->m_azimuthalAngle = azimuthalAngle;
-    m_Geometry->m_position = position;
-    m_Geometry->m_orientation = orientation;
-    m_Geometry->calcTransformationMatrices(position, orientation);
-    updateObjectParams();
-}
-
-/**
- * @param name                      name of the element
- * @param geometricalShape          geometrical Shape of element (0 = rectangle,
- * 1 = elliptical)
- * @param width                     x-dimension of element
- * @param height                    z-dimension of element
- * @param position                  position in world coordinates
- * @param orientation               orientation in world coordinate system
- * @param slopeError                slope error parameters
- */
-OpticalElement::OpticalElement(
-    const char* name, OpticalElement::GeometricalShape geometricalShape,
-    const double width, const double height, const double azimuthalAngle,
-    glm::dvec4 position, glm::dmat4x4 orientation,
-    const std::array<double, 7> slopeError)
-    : m_name(name), m_slopeError(slopeError) {
-    m_Geometry = std::make_unique<Geometry>();
-    m_Geometry->m_geometricalShape = geometricalShape;
-    if (m_Geometry->m_geometricalShape == GeometricalShape::ELLIPTICAL) {
-        m_Geometry->m_widthA = -width;
-        m_Geometry->m_height = -height;
-    } else {
-        m_Geometry->m_widthA = width;
-        m_Geometry->m_height = height;
-    }
-    m_Geometry->m_azimuthalAngle = azimuthalAngle;
-    m_Geometry->m_position = position;
-    m_Geometry->m_orientation = orientation;
-    m_Geometry->calcTransformationMatrices(position, orientation);
-    updateObjectParams();
-}
-
-OpticalElement::OpticalElement() {}
-
-OpticalElement::~OpticalElement() {}
 
 void OpticalElement::setElementParameters(std::array<double, 4 * 4> params) {
     m_elementParameters = params;

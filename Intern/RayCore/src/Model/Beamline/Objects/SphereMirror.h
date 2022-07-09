@@ -23,8 +23,6 @@ class RAYX_API SphereMirror : public OpticalElement {
                  const double azimuthalAngle, double radius,
                  glm::dvec4 position, glm::dmat4x4 orientation,
                  const std::array<double, 7> slopeError, Material mat);
-    SphereMirror();
-    ~SphereMirror();
 
     static std::shared_ptr<SphereMirror> createFromXML(xml::Parser);
 

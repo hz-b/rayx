@@ -38,8 +38,7 @@ Ellipsoid::Ellipsoid(const char* name,
                      const double entranceArmLength, const double exitArmLength,
                      FigureRotation figRot, const double a_11,
                      const std::array<double, 7> slopeError, Material mat)
-    : OpticalElement(name, geometricalShape, width, height, azimuthalAngle,
-                     position, orientation, slopeError),
+    : OpticalElement(name, slopeError),
       m_incidence(degToRad(grazingIncidence)),
       m_entranceArmLength(entranceArmLength),
       m_exitArmLength(exitArmLength),
@@ -47,6 +46,15 @@ Ellipsoid::Ellipsoid(const char* name,
       m_shortHalfAxisB(ShortHalfAxisB),
       m_longHalfAxisA(LongHalfAxisA),
       m_designGrazingAngle(degToRad(DesignAngle)) {
+    // set geometry
+    m_Geometry->m_geometricalShape = geometricalShape;
+    m_Geometry->setHeightWidth(height, width);
+    m_Geometry->m_azimuthalAngle = azimuthalAngle;
+    m_Geometry->m_position = position;
+    m_Geometry->m_orientation = orientation;
+    m_Geometry->calcTransformationMatrices(position, orientation);
+    updateObjectParams();
+
     RAYX_LOG << name;
     m_offsetY0 =
         0;  // what is this for? RAY.FOR: "only !=0 in case of Monocapillary"
@@ -115,9 +123,6 @@ Ellipsoid::Ellipsoid(const char* name,
                           0, 0, 0, 0,                         //
                           0, 0, 0, 0});
 }
-
-// dstr
-Ellipsoid::~Ellipsoid() {}
 
 /*
 void Ellipsoid::calcRadius() {

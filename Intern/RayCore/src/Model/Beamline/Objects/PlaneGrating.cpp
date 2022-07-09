@@ -41,13 +41,21 @@ PlaneGrating::PlaneGrating(
     const double lineDensity, const double orderOfDiffraction,
     const int additionalZeroOrder, const std::array<double, 6> vls,
     const std::array<double, 7> slopeError, Material mat)
-    : OpticalElement(name, geometricalShape, width, height, azimuthalAngle,
-                     position, orientation, slopeError),
+    : OpticalElement(name, slopeError),
       m_additionalOrder(additionalZeroOrder),
       m_designEnergyMounting(designEnergy),
       m_lineDensity(lineDensity),
       m_orderOfDiffraction(orderOfDiffraction),
       m_vls(vls) {
+    // set geometry
+    m_Geometry->m_geometricalShape = geometricalShape;
+    m_Geometry->setHeightWidth(height, width);
+    m_Geometry->m_azimuthalAngle = azimuthalAngle;
+    m_Geometry->m_position = position;
+    m_Geometry->m_orientation = orientation;
+    m_Geometry->calcTransformationMatrices(position, orientation);
+    updateObjectParams();
+    
     RAYX_LOG << "design wavelength = " << abs(hvlam(m_designEnergyMounting));
 
     // set element specific parameters in Optical Element class. will be moved
@@ -62,8 +70,6 @@ PlaneGrating::PlaneGrating(
     setSurface(std::make_unique<Quadric>(std::array<double, 4 * 4>{
         0, 0, 0, 0, 1, 0, 0, -1, 0, 0, 0, 0, 1, 0, matd, 0}));
 }
-
-PlaneGrating::~PlaneGrating() {}
 
 std::shared_ptr<PlaneGrating> PlaneGrating::createFromXML(xml::Parser p) {
     return std::make_shared<PlaneGrating>(

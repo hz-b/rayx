@@ -59,8 +59,7 @@ ReflectionZonePlate::ReflectionZonePlate(
     const double shortRadius, const double longRadius,
     const int additionalZeroOrder, const double fresnelZOffset,
     const std::array<double, 7> slopeError, Material mat)
-    : OpticalElement(name, geometricalShape, width, height, azimuthalAngle,
-                     position, orientation, slopeError),
+    : OpticalElement(name, slopeError),
       m_fresnelZOffset(fresnelZOffset),
       m_designAlphaAngle(degToRad(dAlpha)),
       m_designBetaAngle(degToRad(dBeta)),
@@ -71,8 +70,15 @@ ReflectionZonePlate::ReflectionZonePlate(
       m_designMeridionalEntranceArmLength(mEntrance),
       m_designMeridionalExitArmLength(mExit),
       m_orderOfDiffraction(orderOfDiffraction)
-
 {
+    // set geometry
+    m_Geometry->m_geometricalShape = geometricalShape;
+    m_Geometry->setHeightWidth(height, width);
+    m_Geometry->m_azimuthalAngle = azimuthalAngle;
+    m_Geometry->m_position = position;
+    m_Geometry->m_orientation = orientation;
+    m_Geometry->calcTransformationMatrices(position, orientation);
+    updateObjectParams();
     // m_designEnergy = designEnergy; // if Auto == true, take energy of Source
     // (param sourceEnergy), else m_designEnergy = designEnergy
     m_designWavelength = m_designEnergy == 0 ? 0 : hvlam(m_designEnergy);
@@ -121,8 +127,7 @@ ReflectionZonePlate::ReflectionZonePlate(
     const double shortRadius, const double longRadius,
     const int additionalZeroOrder, const double fresnelZOffset,
     const std::array<double, 7> slopeError, Material mat)
-    : OpticalElement(name, geometricalShape, widthA, widthB, height,
-                     azimuthalAngle, position, orientation, slopeError),
+    : OpticalElement(name, slopeError),
       m_fresnelZOffset(fresnelZOffset),
       m_designAlphaAngle(degToRad(dAlpha)),
       m_designBetaAngle(degToRad(dBeta)),
@@ -135,6 +140,15 @@ ReflectionZonePlate::ReflectionZonePlate(
       m_orderOfDiffraction(orderOfDiffraction)
 
 {
+    // set geometry
+    m_Geometry->m_geometricalShape = geometricalShape;
+    m_Geometry->setHeightWidth(height, widthA, widthB);
+    m_Geometry->m_azimuthalAngle = azimuthalAngle;
+    m_Geometry->m_position = position;
+    m_Geometry->m_orientation = orientation;
+    m_Geometry->calcTransformationMatrices(position, orientation);
+    updateObjectParams();
+    
     // m_designEnergy = designEnergy; // if Auto == true, take energy of Source
     // (param sourceEnergy), else m_designEnergy = designEnergy
     m_designWavelength = m_designEnergy == 0 ? 0 : hvlam(m_designEnergy);
@@ -172,8 +186,6 @@ ReflectionZonePlate::ReflectionZonePlate(
          m_designAlphaAngle, m_designBetaAngle, 0, double(m_additionalOrder)});
     RAYX_LOG << "Created.";
 }
-
-ReflectionZonePlate::~ReflectionZonePlate() {}
 
 std::shared_ptr<ReflectionZonePlate> ReflectionZonePlate::createFromXML(
     xml::Parser p) {

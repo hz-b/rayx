@@ -26,11 +26,19 @@ Cone::Cone(const char* name, OpticalElement::GeometricalShape geometricalShape,
            glm::dvec4 position, glm::dmat4x4 orientation,
            const double grazingIncidence, const double entranceArmLength,
            const double exitArmLength, const std::array<double, 7> slopeError)
-    : OpticalElement(name, geometricalShape, width, height, azimuthalAngle,
-                     position, orientation, slopeError),
+    : OpticalElement(name, slopeError),
       m_incidence(degToRad(grazingIncidence)),
       m_entranceArmLength(entranceArmLength),
       m_exitArmLength(exitArmLength) {
+    // set geometry
+    m_Geometry->m_geometricalShape = geometricalShape;
+    m_Geometry->setHeightWidth(height, width);
+    m_Geometry->m_azimuthalAngle = azimuthalAngle;
+    m_Geometry->m_position = position;
+    m_Geometry->m_orientation = orientation;
+    m_Geometry->calcTransformationMatrices(position, orientation);
+    updateObjectParams();
+
     RAYX_LOG << name << " :Auto";
     calcConePar(width, entranceArmLength, exitArmLength, grazingIncidence,
                 &m_upstreamRadius_R, &m_downstreamRadius_rho);
@@ -76,13 +84,21 @@ Cone::Cone(const char* name, OpticalElement::GeometricalShape geometricalShape,
            glm::dvec4 position, glm::dmat4x4 orientation,
            const double grazingIncidence, const double entranceArmLength,
            const double exitArmLength, const std::array<double, 7> slopeError)
-    : OpticalElement(name, geometricalShape, width, height, azimuthalAngle,
-                     position, orientation, slopeError),
+    : OpticalElement(name, slopeError),
       m_incidence(degToRad(grazingIncidence)),
       m_entranceArmLength(entranceArmLength),
       m_exitArmLength(exitArmLength),
       m_downstreamRadius_rho(downstream_radius_rho),
       m_upstreamRadius_R(upstream_radius_r) {
+    // set geometry
+    m_Geometry->m_geometricalShape = geometricalShape;
+    m_Geometry->setHeightWidth(height, width);
+    m_Geometry->m_azimuthalAngle = azimuthalAngle;
+    m_Geometry->m_position = position;
+    m_Geometry->m_orientation = orientation;
+    m_Geometry->calcTransformationMatrices(position, orientation);
+    updateObjectParams();
+
     RAYX_LOG << name << " :Manual";
     m_cm = pow((m_upstreamRadius_R - m_downstreamRadius_rho) / width, 2);
 
