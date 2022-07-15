@@ -83,9 +83,4 @@ RayList CpuTracer::trace(const Beamline& beamline) {
     return out;
 }
 
-void CpuTracer::setMaterialTables(MaterialTables materialTables) {
-    CPU_TRACER::mat.data = materialTables.materialTable;
-    CPU_TRACER::matIdx.data = materialTables.indexTable;
-}
-
 }  // namespace RAYX

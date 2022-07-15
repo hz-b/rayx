@@ -3,44 +3,6 @@
 
 // TODO(rudi): shader tests
 
-namespace RAYX {
-namespace CPU_TRACER {
-double r8_exp(double);
-double r8_log(double);
-double squaresDoubleRNG(uint64_t&);
-Ray refrac2D(Ray, glm::dvec4, double, double);
-Ray refrac(Ray, glm::dvec4, double);
-glm::dvec4 normal_cartesian(glm::dvec4, double, double);
-glm::dvec4 normal_cylindrical(glm::dvec4, double, double);
-double wasteBox(double, double, double, double, double);
-void RZPLineDensity(Ray r, glm::dvec4 normal, int IMAGE_TYPE, int RZP_TYPE,
-                    int DERIVATION_METHOD, double zOffsetCenter, double risag,
-                    double rosag, double rimer, double romer, double alpha,
-                    double beta, double Ord, double WL, double& DX, double& DZ);
-Ray rayMatrixMult(Ray, glm::dmat4);
-void cosini(Ray&, double, double);
-double dpow(double, int);
-double fact(int);
-double bessel1(double);
-double r8_sin(double);
-double r8_cos(double);
-double r8_atan(double);
-double vlsGrating(double, double, double[6]);
-void diffraction(int iopt, double xLength, double yLength, double wl,
-                 double& dPhi, double& dPsi, uint64_t& ctr);
-Ray refrac_plane(Ray, glm::dvec4, double);
-glm::dvec4 iteratTo(Ray& r, double longRadius, double shortRadius);
-double getIncidenceAngle(Ray r, glm::dvec4 normal);
-void reflectance(double energy, double incidence_angle, glm::dvec2& complex_S,
-                 glm::dvec2& complex_P, int material);
-glm::dvec2 snell(glm::dvec2 cos_incidence, glm::dvec2 cn1, glm::dvec2 cn2);
-void fresnel(glm::dvec2 cn1, glm::dvec2 cn2, glm::dvec2 cos_incidence,
-             glm::dvec2 cos_transmittance, glm::dvec2& complex_S,
-             glm::dvec2& complex_P);
-glm::dvec2 cartesian_to_euler(glm::dvec2 complex);
-}  // namespace CPU_TRACER
-}  // namespace RAYX
-
 using namespace RAYX;
 
 TEST_F(TestSuite, testUniformRandom) {
@@ -1354,10 +1316,14 @@ TEST_F(TestSuite, testGetIncidenceAngle) {
 
 // TODO(rudi): this test is and was broken before the refactor. See the nans.
 TEST_F(TestSuite, testReflectance) {
-    std::array<bool, 92> mats;
-    mats.fill(false);
-    mats[29] = true;  // copper is relevant!
-    CpuTracer::setMaterialTables(loadMaterialTables(mats));
+    {  // add copper material to cpu tracer
+        std::array<bool, 92> mats;
+        mats.fill(false);
+        mats[29] = true;  // copper is relevant!
+        auto materialTables = loadMaterialTables(mats);
+        CPU_TRACER::mat.data = materialTables.materialTable;
+        CPU_TRACER::matIdx.data = materialTables.indexTable;
+    }
 
     struct InOutPair {
         double in_energy;

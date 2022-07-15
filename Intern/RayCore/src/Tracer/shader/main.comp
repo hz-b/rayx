@@ -21,44 +21,25 @@ const double PI       = 3.14159265358979323846264338327950;
 const uint64_t rngKey = 13; // TODO(rudi) this was the old key, it generated a warning: (0xc8e4fd15 << 32) | 0x4ce32f6d;
 const double inm2eV   = 1.239852e3;
 
-#ifdef CPP
-	// this type intends to mimic the GLSL type T[], this is used for layouts.
-	template <typename T>
-	struct ShaderArray {
-		std::vector<T> data;
-
-		int length() {
-			return data.size();
-		}
-		T& operator [](int i) {
-			return data[i];
-		}
-	};
-
-	using dvec2 = glm::dvec2;
-
-	double length(dvec2 v) {
-		return sqrt(v.x*v.x + v.y*v.y);
-	}
-
-	using dvec3 = glm::dvec3;
-	using dvec4 = glm::dvec4;
-	using dmat3 = glm::dmat3;
-	using dmat4 = glm::dmat4;
-    using uint = unsigned int;
-
-	double mod(double x, double y) {
-		return glm::mod(x, y);
-	}
-
-	double sign(double x) {
-		return glm::sign(x);
-	}
-#endif
-
 /* STRUCTS */
-// for CPP, the according struct is already defined.
-#ifndef CPP
+// for CPP, the according things are mostly defined in CpuTracer.h
+#ifdef CPP
+int gl_GlobalInvocationID;
+
+ShaderArray<Ray> rayData;
+ShaderArray<Ray> outputData;
+double numberOfBeamlines;
+double numberOfElementsPerBeamline;
+double numberOfRays;
+double numberOfRaysPerBeamLine;
+ShaderArray<Element> quadricData;
+ShaderArray<dvec4> xyznull;
+ShaderArray<int> matIdx;
+ShaderArray<double> mat;
+#ifdef RAYX_DEBUG_MODE
+ShaderArray<_debug_struct> d_struct;
+#endif
+#else
 struct Ray {
     dvec3 m_position;
     double m_weight;  // status of the ray (e.g if element missed -> 0)
@@ -70,7 +51,6 @@ struct Ray {
     double m_lastElement;
     double m_extraParam;
 };
-#endif
 struct Element {
     dmat4 surfaceParams;
     dmat4 inTrans;
@@ -85,23 +65,6 @@ struct Element {
 	};
 #endif 
 /* LAYOUTS */
-#ifdef CPP
-	int gl_GlobalInvocationID;
-
-	ShaderArray<Ray> rayData;
-	ShaderArray<Ray> outputData;
-	double numberOfBeamlines;
-	double numberOfElementsPerBeamline;
-	double numberOfRays;
-	double numberOfRaysPerBeamLine;
-	ShaderArray<Element> quadricData;
-	ShaderArray<dvec4> xyznull;
-	ShaderArray<int> matIdx;
-	ShaderArray<double> mat;
-	#ifdef RAYX_DEBUG_MODE
-		ShaderArray<_debug_struct> d_struct;
-	#endif
-#else
 	layout(std140, binding = 0) buffer ibuf { Ray rayData[]; };
 
 	layout(std140, binding = 1) buffer obuf { Ray outputData[]; };
