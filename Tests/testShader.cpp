@@ -37,7 +37,7 @@ glm::dvec2 snell(glm::dvec2 cos_incidence, glm::dvec2 cn1, glm::dvec2 cn2);
 void fresnel(glm::dvec2 cn1, glm::dvec2 cn2, glm::dvec2 cos_incidence,
              glm::dvec2 cos_transmittance, glm::dvec2& complex_S,
              glm::dvec2& complex_P);
-
+glm::dvec2 cartesian_to_euler(glm::dvec2 complex);
 }  // namespace CPP_TRACER
 }  // namespace RAYX
 
@@ -1352,6 +1352,7 @@ TEST_F(TestSuite, testGetIncidenceAngle) {
     }
 }
 
+// TODO(rudi): invalid read here, because the material tables are empty!
 TEST_F(TestSuite, testReflectance) {
     struct InOutPair {
         double in_energy;
@@ -1454,5 +1455,26 @@ TEST_F(TestSuite, testFresnel) {
                             out_complex_P);
         CHECK_EQ(out_complex_S, p.out_complex_S);
         CHECK_EQ(out_complex_P, p.out_complex_P);
+    }
+}
+
+TEST_F(TestSuite, testCartesianToEuler) {
+    struct InOutPair {
+        glm::dvec2 in_complex;
+        glm::dvec2 out;
+    };
+
+    std::vector<InOutPair> inouts = {
+        {.in_complex = glm::dvec2(0.63080662811278621, 0.52640331936127871),
+         .out = glm::dvec2(0.67501745670559532, 0.69542190922049119)},
+        {.in_complex = glm::dvec2(0.57163467986230043, 0.62486367906829532),
+         .out = glm::dvec2(0.71722082464004022, 0.82985616444880206)},
+        {.in_complex = glm::dvec2(1, 0), .out = glm::dvec2(1, 0)},
+        {.in_complex = glm::dvec2(0, 1),
+         .out = glm::dvec2(1, 1.5707963267948966)}};
+
+    for (auto p : inouts) {
+        auto out = CPP_TRACER::cartesian_to_euler(p.in_complex);
+        CHECK_EQ(out, p.out);
     }
 }
