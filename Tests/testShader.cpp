@@ -30,7 +30,7 @@ void diffraction(int iopt, double xLength, double yLength, double wl,
                  double& dPhi, double& dPsi, uint64_t& ctr);
 Ray refrac_plane(Ray, glm::dvec4, double);
 glm::dvec4 iteratTo(Ray& r, double longRadius, double shortRadius);
-
+double getIncidenceAngle(Ray r, glm::dvec4 normal);
 }  // namespace CPP_TRACER
 }  // namespace RAYX
 
@@ -1317,5 +1317,30 @@ TEST_F(TestSuite, testIteratTo) {
             CPP_TRACER::iteratTo(r, p.in_longRadius, p.in_shortRadius);
         CHECK_EQ(out_vec, p.out_vec);
         CHECK_EQ(r, p.out_ray);
+    }
+}
+
+TEST_F(TestSuite, testGetIncidenceAngle) {
+    struct InOutPair {
+        Ray in_ray;
+        glm::dvec4 in_normal;
+
+        double out;
+    };
+
+    std::vector<InOutPair> inouts = {
+        {.in_ray =
+             {
+                 .m_position = glm::dvec3(0, 1, 0),
+                 .m_direction =
+                     glm::dvec3(-0.00049999997222222275, -0.17381228817387082,
+                                0.98477867487054738),
+             },
+         .in_normal = glm::dvec4(0, 1, 0, 0),
+         .out = 1.3960967569703167}};
+
+    for (auto p : inouts) {
+        auto out = CPP_TRACER::getIncidenceAngle(p.in_ray, p.in_normal);
+        CHECK_EQ(out, p.out);
     }
 }
