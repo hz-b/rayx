@@ -52,7 +52,7 @@ TEST_F(TestSuite, testUniformRandom) {
     }
 }
 
-TEST_F(TestSuite, SinTest) {
+TEST_F(TestSuite, testSin) {
     std::vector<double> args = {
         -0.5620816275750421,  -0.082699735953560394, -0.73692442452247864,
         -0.93085577907030514, 0.038832744045494971,  0.86938579245347758,
@@ -67,7 +67,7 @@ TEST_F(TestSuite, SinTest) {
     }
 }
 
-TEST_F(TestSuite, CosTest) {
+TEST_F(TestSuite, testCos) {
     std::vector<double> args = {
         -0.5620816275750421,  -0.082699735953560394, -0.73692442452247864,
         -0.93085577907030514, 0.038832744045494971,  0.86938579245347758,
@@ -82,7 +82,7 @@ TEST_F(TestSuite, CosTest) {
     }
 }
 
-TEST_F(TestSuite, AtanTest) {
+TEST_F(TestSuite, testAtan) {
     std::vector<double> args = {
         -0.5620816275750421,  -0.082699735953560394, -0.73692442452247864,
         -0.93085577907030514, 0.038832744045494971,  0.86938579245347758,
@@ -97,7 +97,7 @@ TEST_F(TestSuite, AtanTest) {
     }
 }
 
-TEST_F(TestSuite, ExpTest) {
+TEST_F(TestSuite, testExp) {
     std::vector<double> args = {10.0, 5.0, 2.0, 1.0, 0.5, 0.0001, 0.0};
     for (auto x : args) {
         CHECK_EQ(CPP_TRACER::r8_exp(x), exp(x));
@@ -106,7 +106,7 @@ TEST_F(TestSuite, ExpTest) {
 }
 
 // interestingly r8_log and log behave differently on input 0, namely 1 vs -inf.
-TEST_F(TestSuite, LogTest) {
+TEST_F(TestSuite, testLog) {
     std::vector<double> args = {10.0, 5.0, 2.0, 1.0, 0.5, 0.0001, 0.0000001};
     for (auto x : args) {
         CHECK_EQ(CPP_TRACER::r8_log(x), log(x));
@@ -1273,7 +1273,7 @@ TEST_F(TestSuite, testPlaneRefrac) {
     }
 }
 
-TEST_F(TestSuite, iteratToTest) {
+TEST_F(TestSuite, testIteratTo) {
     struct InOutPair {
         Ray in_ray;
         double in_longRadius;
