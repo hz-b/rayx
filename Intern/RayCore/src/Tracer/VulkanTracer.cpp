@@ -97,7 +97,7 @@ RayList VulkanTracer::trace(const Beamline& beamline) {
                           m_RayList.rayAmount());
 
     for (auto e : beamline.m_OpticalElements) {
-        addArrays(e->getSurfaceParams(), e->getInMatrix(), e->getOutMatrix(),
+        addArrays(e->getSurfaceParams(), glmToArray16(e->getInMatrix()), glmToArray16(e->getOutMatrix()),
                   e->getObjectParameters(), e->getElementParameters());
     }
 
