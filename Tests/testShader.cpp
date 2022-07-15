@@ -33,6 +33,7 @@ glm::dvec4 iteratTo(Ray& r, double longRadius, double shortRadius);
 double getIncidenceAngle(Ray r, glm::dvec4 normal);
 void reflectance(double energy, double incidence_angle, glm::dvec2& complex_S,
                  glm::dvec2& complex_P, int material);
+glm::dvec2 snell(glm::dvec2 cos_incidence, glm::dvec2 cn1, glm::dvec2 cn2);
 void fresnel(glm::dvec2 cn1, glm::dvec2 cn2, glm::dvec2 cos_incidence,
              glm::dvec2 cos_transmittance, glm::dvec2& complex_S,
              glm::dvec2& complex_P);
@@ -1377,6 +1378,42 @@ TEST_F(TestSuite, testReflectance) {
                                 complex_P, p.in_material);
         CHECK_EQ(complex_S, p.out_complex_S);
         CHECK_EQ(complex_P, p.out_complex_P);
+    }
+}
+
+TEST_F(TestSuite, testSnell) {
+    struct InOutPair {
+        glm::dvec2 in_cosIncidence;
+        glm::dvec2 in_cn1;
+        glm::dvec2 in_cn2;
+
+        glm::dvec2 out;
+    };
+
+    std::vector<InOutPair> inouts = {
+        {.in_cosIncidence = glm::dvec2(0.17364817766693041, 0),
+         .in_cn1 = glm::dvec2(1, 0),
+         .in_cn2 = glm::dvec2(0.91452118089946777, 0.035187568837614078),
+         .out = glm::dvec2(0.10906363661670573, 0.40789272188567433)},
+        {.in_cosIncidence = glm::dvec2(0.17315572500228882, 0),
+         .in_cn1 = glm::dvec2(1, 0),
+         .in_cn2 = glm::dvec2(0.91453807092958361, 0.035170965000031584),
+         .out = glm::dvec2(0.10897754475504863, 0.40807275584607489)},
+        {.in_cosIncidence = glm::dvec2(0.1736481785774231, 0),
+         .in_cn1 = glm::dvec2(1, 0),
+         .in_cn2 = glm::dvec2(0.96684219999999998, 0.06558986),
+         .out = glm::dvec2(0.24302165191294173, 0.28697207607552533)},
+        {.in_cosIncidence =
+             glm::dvec2(0.16307067260397731, 0.0027314608130525712),
+         .in_cn1 = glm::dvec2(0.99816471240025439, 0.00045674598468145697),
+         .in_cn2 = glm::dvec2(0.99514154037883318, 0.0047593281563246184),
+         .out = glm::dvec2(0.14743465849863333, 0.031766878855366699)},
+
+    };
+
+    for (auto p : inouts) {
+        auto out = CPP_TRACER::snell(p.in_cosIncidence, p.in_cn1, p.in_cn2);
+        CHECK_EQ(out, p.out);
     }
 }
 
