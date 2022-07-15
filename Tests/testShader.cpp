@@ -29,6 +29,8 @@ double vlsGrating(double, double, double[6]);
 void diffraction(int iopt, double xLength, double yLength, double wl,
                  double& dPhi, double& dPsi, uint64_t& ctr);
 Ray refrac_plane(Ray, glm::dvec4, double);
+glm::dvec4 iteratTo(Ray& r, double longRadius, double shortRadius);
+
 }  // namespace CPP_TRACER
 }  // namespace RAYX
 
@@ -1268,5 +1270,52 @@ TEST_F(TestSuite, testPlaneRefrac) {
     for (auto p : inouts) {
         auto out_ray = CPP_TRACER::refrac_plane(p.in_ray, p.in_normal, p.in_a);
         CHECK_EQ(out_ray, p.out_ray);
+    }
+}
+
+TEST_F(TestSuite, iteratToTest) {
+    struct InOutPair {
+        Ray in_ray;
+        double in_longRadius;
+        double in_shortRadius;
+
+        Ray out_ray;
+        glm::dvec4 out_vec;
+    };
+
+    std::vector<InOutPair> inouts = {
+        {.in_ray =
+             {
+                 .m_position =
+                     glm::dvec3(-0.017500000000000002, 1736.4751598838836,
+                                -9848.1551798768887),
+                 .m_weight = 1,
+                 .m_direction =
+                     glm::dvec3(-0.00026923073232438285, -0.17315574581145807,
+                                0.984894418304465),
+             },
+         .in_longRadius = 10470.491787499999,
+         .in_shortRadius = 315.72395939400002,
+         .out_ray =
+             {
+                 .m_position =
+                     glm::dvec3(-2.7173752216893443, 0.050407875158271054,
+                                28.473736158432885),
+                 .m_weight = 1,
+                 .m_direction =
+                     glm::dvec3(-0.00026923073232438285, -0.17315574581145807,
+                                0.984894418304465),
+             },
+         .out_vec = glm::dvec4(0.0086068071179840333, 0.99995926323042061,
+                               -0.0027193291283604047, 0)},
+
+    };
+
+    for (auto p : inouts) {
+        Ray r = p.in_ray;
+        auto out_vec =
+            CPP_TRACER::iteratTo(r, p.in_longRadius, p.in_shortRadius);
+        CHECK_EQ(out_vec, p.out_vec);
+        CHECK_EQ(r, p.out_ray);
     }
 }
