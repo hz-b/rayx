@@ -26,7 +26,8 @@ double r8_sin(double);
 double r8_cos(double);
 double r8_atan(double);
 double vlsGrating(double, double, double[6]);
-
+void diffraction(int iopt, double xLength, double yLength, double wl,
+                 double& dPhi, double& dPsi, uint64_t& ctr);
 }  // namespace CPP_TRACER
 }  // namespace RAYX
 
@@ -1016,6 +1017,109 @@ TEST_F(TestSuite, testBessel1) {
     for (auto p : inouts) {
         auto out = CPP_TRACER::bessel1(p.in);
         CHECK_EQ(out, p.out);
+    }
+}
+
+TEST_F(TestSuite, testDiffraction) {
+    struct In {
+        int in_iopt;
+        double in_xLength;
+        double in_yLength;
+        double in_wl;
+        uint64_t in_ctr;
+    };
+
+    std::vector<In> ins = {{
+                               .in_iopt = 1,
+                               .in_xLength = 20,
+                               .in_yLength = 2,
+                               .in_wl = 12.39852,
+                               .in_ctr = 0UL,
+                           },
+                           {
+                               .in_iopt = 1,
+                               .in_xLength = 20,
+                               .in_yLength = 2,
+                               .in_wl = 12.39852,
+                               .in_ctr = 1844674407370955161UL,
+                           },
+                           {
+                               .in_iopt = 1,
+                               .in_xLength = 20,
+                               .in_yLength = 2,
+                               .in_wl = 12.39852,
+                               .in_ctr = 3689348814741910322UL,
+                           },
+                           {
+                               .in_iopt = 1,
+                               .in_xLength = 20,
+                               .in_yLength = 2,
+                               .in_wl = 12.39852,
+                               .in_ctr = 5534023222112865483UL,
+                           },
+                           {
+                               .in_iopt = 1,
+                               .in_xLength = 20,
+                               .in_yLength = 2,
+                               .in_wl = 12.39852,
+                               .in_ctr = 7378697629483820644UL,
+                           },
+                           {
+                               .in_iopt = 1,
+                               .in_xLength = 20,
+                               .in_yLength = 2,
+                               .in_wl = 12.39852,
+                               .in_ctr = 9223372036854775805UL,
+                           },
+                           {
+                               .in_iopt = 1,
+                               .in_xLength = 20,
+                               .in_yLength = 2,
+                               .in_wl = 12.39852,
+                               .in_ctr = 11068046444225730966UL,
+                           },
+                           {
+                               .in_iopt = 1,
+                               .in_xLength = 20,
+                               .in_yLength = 2,
+                               .in_wl = 12.39852,
+                               .in_ctr = 12912720851596686127UL,
+                           },
+                           {
+                               .in_iopt = 1,
+                               .in_xLength = 20,
+                               .in_yLength = 2,
+                               .in_wl = 12.39852,
+                               .in_ctr = 14757395258967641288UL,
+                           },
+                           {
+                               .in_iopt = 1,
+                               .in_xLength = 20,
+                               .in_yLength = 2,
+                               .in_wl = 12.39852,
+                               .in_ctr = 16602069666338596449UL,
+                           }
+
+    };
+
+    const double lowerDphi = 1e-11;
+    const double upperDphi = 1e-05;
+    const double lowerDpsi = 1e-09;
+    const double upperDpsi = 1e-04;
+
+    for (auto i : ins) {
+        double dphi = 0;
+        double dpsi = 0;
+        CPP_TRACER::diffraction(i.in_iopt, i.in_xLength, i.in_yLength, i.in_wl,
+                                dphi, dpsi, i.in_ctr);
+        double abs_dphi = abs(dphi);
+        double abs_dpsi = abs(dpsi);
+        if (abs_dphi < lowerDphi || abs_dphi > upperDphi) {
+            RAYX_ERR << "wrong dphi";
+        }
+        if (abs_dpsi < lowerDpsi || abs_dpsi > upperDpsi) {
+            RAYX_ERR << "wrong dpsi";
+        }
     }
 }
 
