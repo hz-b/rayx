@@ -33,6 +33,10 @@ glm::dvec4 iteratTo(Ray& r, double longRadius, double shortRadius);
 double getIncidenceAngle(Ray r, glm::dvec4 normal);
 void reflectance(double energy, double incidence_angle, glm::dvec2& complex_S,
                  glm::dvec2& complex_P, int material);
+void fresnel(glm::dvec2 cn1, glm::dvec2 cn2, glm::dvec2 cos_incidence,
+             glm::dvec2 cos_transmittance, glm::dvec2& complex_S,
+             glm::dvec2& complex_P);
+
 }  // namespace CPP_TRACER
 }  // namespace RAYX
 
@@ -1373,5 +1377,45 @@ TEST_F(TestSuite, testReflectance) {
                                 complex_P, p.in_material);
         CHECK_EQ(complex_S, p.out_complex_S);
         CHECK_EQ(complex_P, p.out_complex_P);
+    }
+}
+
+TEST_F(TestSuite, testFresnel) {
+    struct InOutPair {
+        glm::dvec2 in_cn1;
+        glm::dvec2 in_cn2;
+        glm::dvec2 in_cosIncidence;
+        glm::dvec2 in_cosTransmittance;
+
+        glm::dvec2 out_complex_S;
+        glm::dvec2 out_complex_P;
+    };
+
+    std::vector<InOutPair> inouts = {
+        {.in_cn1 = glm::dvec2(0.91453807092958361, 0.035170965000031584),
+         .in_cn2 = glm::dvec2(1, 0),
+         .in_cosIncidence =
+             glm::dvec2(0.10897754475504851, 0.40807275584607544),
+         .in_cosTransmittance = glm::dvec2(0.17315572500228882, 0),
+         .out_complex_S = glm::dvec2(0.57163467986230054, 0.62486367906829521),
+         .out_complex_P = glm::dvec2(0.63080662811278632, 0.52640331936127849)},
+        {.in_cn1 = glm::dvec2(0.91452118089946777, 0.035187568837614078),
+         .in_cn2 = glm::dvec2(1, 0),
+         .in_cosIncidence =
+             glm::dvec2(0.10906363669865969, 0.40789272144618016),
+         .in_cosTransmittance = glm::dvec2(0.1736481785774231, 0),
+         .out_complex_S = glm::dvec2(0.56981824812215454, 0.62585833416785819),
+         .out_complex_P = glm::dvec2(0.62929764490597007, 0.52731592442193231)},
+
+    };
+
+    for (auto p : inouts) {
+        glm::dvec2 out_complex_S;
+        glm::dvec2 out_complex_P;
+        CPP_TRACER::fresnel(p.in_cn1, p.in_cn2, p.in_cosIncidence,
+                            p.in_cosTransmittance, out_complex_S,
+                            out_complex_P);
+        CHECK_EQ(out_complex_S, p.out_complex_S);
+        CHECK_EQ(out_complex_P, p.out_complex_P);
     }
 }
