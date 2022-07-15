@@ -31,6 +31,8 @@ void diffraction(int iopt, double xLength, double yLength, double wl,
 Ray refrac_plane(Ray, glm::dvec4, double);
 glm::dvec4 iteratTo(Ray& r, double longRadius, double shortRadius);
 double getIncidenceAngle(Ray r, glm::dvec4 normal);
+void reflectance(double energy, double incidence_angle, glm::dvec2& complex_S,
+                 glm::dvec2& complex_P, int material);
 }  // namespace CPP_TRACER
 }  // namespace RAYX
 
@@ -1342,5 +1344,34 @@ TEST_F(TestSuite, testGetIncidenceAngle) {
     for (auto p : inouts) {
         auto out = CPP_TRACER::getIncidenceAngle(p.in_ray, p.in_normal);
         CHECK_EQ(out, p.out);
+    }
+}
+
+TEST_F(TestSuite, testReflectance) {
+    struct InOutPair {
+        double in_energy;
+        double in_incidenceAngle;
+        int in_material;
+
+        glm::dvec2 out_complex_S;
+        glm::dvec2 out_complex_P;
+    };
+
+    std::vector<InOutPair> inouts = {
+        {.in_energy = 100,
+         .in_incidenceAngle = 1.3962634006709251,
+         .in_material = 29,
+         .out_complex_S =
+             glm::dvec2(-NAN, -NAN),  // TODO(rudi): this test is and was
+                                      // probably broken. The NANs..
+         .out_complex_P = glm::dvec2(NAN, NAN)}};
+
+    for (auto p : inouts) {
+        glm::dvec2 complex_S;
+        glm::dvec2 complex_P;
+        CPP_TRACER::reflectance(p.in_energy, p.in_incidenceAngle, complex_S,
+                                complex_P, p.in_material);
+        CHECK_EQ(complex_S, p.out_complex_S);
+        CHECK_EQ(complex_P, p.out_complex_P);
     }
 }
