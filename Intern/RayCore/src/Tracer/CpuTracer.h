@@ -23,7 +23,7 @@ class RAYX_API CpuTracer : public Tracer {
     RayList trace(const Beamline&) override;
 
 	// used for testing only. I'd love to deprecate this.
-	// This would be possible by adding a header-file for the shader, so everyone could work with the data in CPP_TRACER.
+	// This would be possible by adding a header-file for the shader, so everyone could work with the data in CPU_TRACER.
 	static void setMaterialTables(MaterialTables);
 };
 

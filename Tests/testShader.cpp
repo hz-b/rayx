@@ -4,7 +4,7 @@
 // TODO(rudi): shader tests
 
 namespace RAYX {
-namespace CPP_TRACER {
+namespace CPU_TRACER {
 double r8_exp(double);
 double r8_log(double);
 double squaresDoubleRNG(uint64_t&);
@@ -38,7 +38,7 @@ void fresnel(glm::dvec2 cn1, glm::dvec2 cn2, glm::dvec2 cos_incidence,
              glm::dvec2 cos_transmittance, glm::dvec2& complex_S,
              glm::dvec2& complex_P);
 glm::dvec2 cartesian_to_euler(glm::dvec2 complex);
-}  // namespace CPP_TRACER
+}  // namespace CPU_TRACER
 }  // namespace RAYX
 
 using namespace RAYX;
@@ -48,7 +48,7 @@ TEST_F(TestSuite, testUniformRandom) {
     double old = 0;
 
     for (int i = 0; i < 100; i++) {
-        double d = CPP_TRACER::squaresDoubleRNG(ctr);
+        double d = CPU_TRACER::squaresDoubleRNG(ctr);
         if (d == old) {
             RAYX_WARN << "repeating number in testUniformRandom! " << d;
         }
@@ -70,7 +70,7 @@ TEST_F(TestSuite, testSin) {
     };
 
     for (auto x : args) {
-        CHECK_EQ(CPP_TRACER::r8_sin(x), sin(x));
+        CHECK_EQ(CPU_TRACER::r8_sin(x), sin(x));
     }
 }
 
@@ -85,7 +85,7 @@ TEST_F(TestSuite, testCos) {
     };
 
     for (auto x : args) {
-        CHECK_EQ(CPP_TRACER::r8_cos(x), cos(x));
+        CHECK_EQ(CPU_TRACER::r8_cos(x), cos(x));
     }
 }
 
@@ -100,15 +100,15 @@ TEST_F(TestSuite, testAtan) {
     };
 
     for (auto x : args) {
-        CHECK_EQ(CPP_TRACER::r8_atan(x), atan(x));
+        CHECK_EQ(CPU_TRACER::r8_atan(x), atan(x));
     }
 }
 
 TEST_F(TestSuite, testExp) {
     std::vector<double> args = {10.0, 5.0, 2.0, 1.0, 0.5, 0.0001, 0.0};
     for (auto x : args) {
-        CHECK_EQ(CPP_TRACER::r8_exp(x), exp(x));
-        CHECK_EQ(CPP_TRACER::r8_exp(-x), exp(-x));
+        CHECK_EQ(CPU_TRACER::r8_exp(x), exp(x));
+        CHECK_EQ(CPU_TRACER::r8_exp(-x), exp(-x));
     }
 }
 
@@ -116,7 +116,7 @@ TEST_F(TestSuite, testExp) {
 TEST_F(TestSuite, testLog) {
     std::vector<double> args = {10.0, 5.0, 2.0, 1.0, 0.5, 0.0001, 0.0000001};
     for (auto x : args) {
-        CHECK_EQ(CPP_TRACER::r8_log(x), log(x));
+        CHECK_EQ(CPU_TRACER::r8_log(x), log(x));
     }
 }
 
@@ -192,7 +192,7 @@ TEST_F(TestSuite, testRefrac2D) {
         double az = r.m_stokes.x;
         double ax = r.m_stokes.y;
 
-        auto out = CPP_TRACER::refrac2D(r, normal, az, ax);
+        auto out = CPU_TRACER::refrac2D(r, normal, az, ax);
 
         CHECK_EQ(out, correct[i]);
     }
@@ -240,7 +240,7 @@ TEST_F(TestSuite, testNormalCartesian) {
 
     for (auto p : inouts) {
         auto out =
-            CPP_TRACER::normal_cartesian(p.in_normal, p.in_slopeX, p.in_slopeZ);
+            CPU_TRACER::normal_cartesian(p.in_normal, p.in_slopeX, p.in_slopeZ);
         CHECK_EQ(out, p.out);
     }
 }
@@ -284,7 +284,7 @@ TEST_F(TestSuite, testNormalCylindrical) {
                            -1449.3437356459144, 0)}};
 
     for (auto p : inouts) {
-        auto out = CPP_TRACER::normal_cylindrical(p.in_normal, p.in_slopeX,
+        auto out = CPU_TRACER::normal_cylindrical(p.in_normal, p.in_slopeX,
                                                   p.in_slopeZ);
         CHECK_EQ(out, p.out);
     }
@@ -352,7 +352,7 @@ TEST_F(TestSuite, testRefrac) {
         glm::dvec4 normal = glm::dvec4(r.m_position, 0);
         double a = r.m_energy;
 
-        auto out = CPP_TRACER::refrac(r, normal, a);
+        auto out = CPU_TRACER::refrac(r, normal, a);
 
         CHECK_EQ(out, correct[i]);
     }
@@ -403,7 +403,7 @@ TEST_F(TestSuite, testWasteBox) {
                                      }};
 
     for (auto p : inouts) {
-        auto out = CPP_TRACER::wasteBox(p.in_x, p.in_z, p.in_xLength,
+        auto out = CPU_TRACER::wasteBox(p.in_x, p.in_z, p.in_xLength,
                                         p.in_zLength, p.in_w);
 
         CHECK_EQ(out, p.out);
@@ -529,7 +529,7 @@ TEST_F(TestSuite, testRZPLineDensityDefaulParams) {
     for (auto p : inouts) {
         double DX;
         double DZ;
-        CPP_TRACER::RZPLineDensity(p.in_ray, p.in_normal, p.in_imageType,
+        CPU_TRACER::RZPLineDensity(p.in_ray, p.in_normal, p.in_imageType,
                                    p.in_rzpType, p.in_derivationMethod,
                                    p.in_zOffsetCenter, p.in_risag, p.in_rosag,
                                    p.in_rimer, p.in_romer, p.in_alpha,
@@ -659,7 +659,7 @@ TEST_F(TestSuite, testRZPLineDensityAstigmatic) {
     for (auto p : inouts) {
         double DX;
         double DZ;
-        CPP_TRACER::RZPLineDensity(p.in_ray, p.in_normal, p.in_imageType,
+        CPU_TRACER::RZPLineDensity(p.in_ray, p.in_normal, p.in_imageType,
                                    p.in_rzpType, p.in_derivationMethod,
                                    p.in_zOffsetCenter, p.in_risag, p.in_rosag,
                                    p.in_rimer, p.in_romer, p.in_alpha,
@@ -724,7 +724,7 @@ TEST_F(TestSuite, testRayMatrixMult) {
     };
 
     for (auto p : inouts) {
-        auto out_ray = CPP_TRACER::rayMatrixMult(p.in_ray, p.in_matrix);
+        auto out_ray = CPU_TRACER::rayMatrixMult(p.in_ray, p.in_matrix);
         CHECK_EQ(out_ray, p.out_ray);
     }
 }
@@ -829,7 +829,7 @@ TEST_F(TestSuite, testDPow) {
                                      }};
 
     for (auto p : inouts) {
-        auto out = CPP_TRACER::dpow(p.in_a, p.in_b);
+        auto out = CPU_TRACER::dpow(p.in_a, p.in_b);
         CHECK_EQ(out, p.out);
     }
 }
@@ -887,7 +887,7 @@ TEST_F(TestSuite, testCosini) {
 
     for (auto p : inouts) {
         Ray out_ray;
-        CPP_TRACER::cosini(out_ray, p.in_phi, p.in_psi);
+        CPU_TRACER::cosini(out_ray, p.in_phi, p.in_psi);
         CHECK_EQ(out_ray.m_direction, p.out_direction);
     }
 }
@@ -952,7 +952,7 @@ TEST_F(TestSuite, testFact) {
     };
 
     for (auto p : inouts) {
-        auto out = CPP_TRACER::fact(p.in);
+        auto out = CPU_TRACER::fact(p.in);
         CHECK_EQ(out, p.out);
     }
 }
@@ -1025,7 +1025,7 @@ TEST_F(TestSuite, testBessel1) {
     };
 
     for (auto p : inouts) {
-        auto out = CPP_TRACER::bessel1(p.in);
+        auto out = CPU_TRACER::bessel1(p.in);
         CHECK_EQ(out, p.out);
     }
 }
@@ -1120,7 +1120,7 @@ TEST_F(TestSuite, testDiffraction) {
     for (auto i : ins) {
         double dphi = 0;
         double dpsi = 0;
-        CPP_TRACER::diffraction(i.in_iopt, i.in_xLength, i.in_yLength, i.in_wl,
+        CPU_TRACER::diffraction(i.in_iopt, i.in_xLength, i.in_yLength, i.in_wl,
                                 dphi, dpsi, i.in_ctr);
         double abs_dphi = abs(dphi);
         double abs_dpsi = abs(dpsi);
@@ -1156,7 +1156,7 @@ TEST_F(TestSuite, testVlsGrating) {
                                      }};
 
     for (auto p : inouts) {
-        auto out = CPP_TRACER::vlsGrating(p.in_lineDensity, p.in_z, p.in_vls);
+        auto out = CPU_TRACER::vlsGrating(p.in_lineDensity, p.in_z, p.in_vls);
         CHECK_EQ(out, p.out);
     }
 }
@@ -1275,7 +1275,7 @@ TEST_F(TestSuite, testPlaneRefrac) {
     };
 
     for (auto p : inouts) {
-        auto out_ray = CPP_TRACER::refrac_plane(p.in_ray, p.in_normal, p.in_a);
+        auto out_ray = CPU_TRACER::refrac_plane(p.in_ray, p.in_normal, p.in_a);
         CHECK_EQ(out_ray, p.out_ray);
     }
 }
@@ -1321,7 +1321,7 @@ TEST_F(TestSuite, testIteratTo) {
     for (auto p : inouts) {
         Ray r = p.in_ray;
         auto out_vec =
-            CPP_TRACER::iteratTo(r, p.in_longRadius, p.in_shortRadius);
+            CPU_TRACER::iteratTo(r, p.in_longRadius, p.in_shortRadius);
         CHECK_EQ(out_vec, p.out_vec);
         CHECK_EQ(r, p.out_ray);
     }
@@ -1347,7 +1347,7 @@ TEST_F(TestSuite, testGetIncidenceAngle) {
          .out = 1.3960967569703167}};
 
     for (auto p : inouts) {
-        auto out = CPP_TRACER::getIncidenceAngle(p.in_ray, p.in_normal);
+        auto out = CPU_TRACER::getIncidenceAngle(p.in_ray, p.in_normal);
         CHECK_EQ(out, p.out);
     }
 }
@@ -1377,7 +1377,7 @@ TEST_F(TestSuite, testReflectance) {
     for (auto p : inouts) {
         glm::dvec2 complex_S;
         glm::dvec2 complex_P;
-        CPP_TRACER::reflectance(p.in_energy, p.in_incidenceAngle, complex_S,
+        CPU_TRACER::reflectance(p.in_energy, p.in_incidenceAngle, complex_S,
                                 complex_P, p.in_material);
         CHECK_EQ(complex_S, p.out_complex_S);
         CHECK_EQ(complex_P, p.out_complex_P);
@@ -1415,7 +1415,7 @@ TEST_F(TestSuite, testSnell) {
     };
 
     for (auto p : inouts) {
-        auto out = CPP_TRACER::snell(p.in_cosIncidence, p.in_cn1, p.in_cn2);
+        auto out = CPU_TRACER::snell(p.in_cosIncidence, p.in_cn1, p.in_cn2);
         CHECK_EQ(out, p.out);
     }
 }
@@ -1452,7 +1452,7 @@ TEST_F(TestSuite, testFresnel) {
     for (auto p : inouts) {
         glm::dvec2 out_complex_S;
         glm::dvec2 out_complex_P;
-        CPP_TRACER::fresnel(p.in_cn1, p.in_cn2, p.in_cosIncidence,
+        CPU_TRACER::fresnel(p.in_cn1, p.in_cn2, p.in_cosIncidence,
                             p.in_cosTransmittance, out_complex_S,
                             out_complex_P);
         CHECK_EQ(out_complex_S, p.out_complex_S);
@@ -1476,7 +1476,7 @@ TEST_F(TestSuite, testCartesianToEuler) {
          .out = glm::dvec2(1, 1.5707963267948966)}};
 
     for (auto p : inouts) {
-        auto out = CPP_TRACER::cartesian_to_euler(p.in_complex);
+        auto out = CPU_TRACER::cartesian_to_euler(p.in_complex);
         CHECK_EQ(out, p.out);
     }
 }
