@@ -28,6 +28,7 @@ double r8_atan(double);
 double vlsGrating(double, double, double[6]);
 void diffraction(int iopt, double xLength, double yLength, double wl,
                  double& dPhi, double& dPsi, uint64_t& ctr);
+Ray refrac_plane(Ray, glm::dvec4, double);
 }  // namespace CPP_TRACER
 }  // namespace RAYX
 
@@ -1148,5 +1149,124 @@ TEST_F(TestSuite, testVlsGrating) {
     for (auto p : inouts) {
         auto out = CPP_TRACER::vlsGrating(p.in_lineDensity, p.in_z, p.in_vls);
         CHECK_EQ(out, p.out);
+    }
+}
+
+TEST_F(TestSuite, testPlaneRefrac) {
+    struct InOutPair {
+        Ray in_ray;
+        glm::dvec4 in_normal;
+        double in_a;
+
+        Ray out_ray;
+    };
+
+    std::vector<InOutPair> inouts = {
+        {.in_ray =
+             {
+                 .m_position = glm::dvec3(0, 1, 0),
+                 .m_weight = 0.01239852,
+                 .m_direction =
+                     glm::dvec3(0, -0.99558611855684065, 0.093851108341926615),
+             },
+         .in_normal = glm::dvec4(0, 1, 0, 0),
+         .in_a = 0.01239852,
+         .out_ray =
+             {
+                 .m_position = glm::dvec3(0, 1, 0),
+                 .m_weight = 0.01239852,
+                 .m_direction =
+                     glm::dvec3(0, 0.99667709206767885, 0.081452588341926618),
+             }},
+        {.in_ray =
+             {
+                 .m_position = glm::dvec3(0, 1, 0),
+                 .m_weight = 0.01239852,
+                 .m_direction = glm::dvec3(0.01239852, -0.99558611855684065,
+                                           0.093851108341926615),
+             },
+         .in_normal = glm::dvec4(0, 1, 0, 0),
+         .in_a = 0.01239852,
+         .out_ray =
+             {
+                 .m_position = glm::dvec3(0, 1, 0),
+                 .m_weight = 0.01239852,
+                 .m_direction = glm::dvec3(0.01239852, 0.99667709206767885,
+                                           0.081452588341926618),
+             }},
+        {.in_ray =
+             {
+                 .m_position = glm::dvec3(0, 1, 0),
+                 .m_weight = 0.01239852,
+                 .m_direction = glm::dvec3(0.01239852, -0.99567947186812988,
+                                           0.0928554753392902),
+             },
+         .in_normal = glm::dvec4(0, 1, 0, 0),
+         .in_a = 0.01239852,
+         .out_ray =
+             {
+                 .m_position = glm::dvec3(0, 1, 0),
+                 .m_weight = 0.01239852,
+                 .m_direction = glm::dvec3(0.01239852, 0.99675795875308415,
+                                           0.080456955339290204),
+             }},
+        {.in_ray =
+             {
+                 .m_position = glm::dvec3(0, 1, 0),
+                 .m_weight = 0.01239852,
+                 .m_direction = glm::dvec3(0.01239852, -0.99567947186812988,
+                                           0.0928554753392902),
+             },
+         .in_normal = glm::dvec4(0, 1, 0, 0),
+         .in_a = 0.01239852,
+         .out_ray =
+             {
+                 .m_position = glm::dvec3(0, 1, 0),
+                 .m_weight = 0.01239852,
+                 .m_direction = glm::dvec3(0.01239852, 0.99675795875308415,
+                                           0.080456955339290204),
+             }},
+        {.in_ray =
+             {
+                 .m_position = glm::dvec3(0, 1, 0),
+                 .m_weight = 0.01239852,
+                 .m_direction =
+                     glm::dvec3(-0.00049999991666660004, -0.99558611855684065,
+                                0.093851108341926226),
+             },
+         .in_normal = glm::dvec4(0, 1, 0, 0),
+         .in_a = 0.01239852,
+         .out_ray =
+             {
+                 .m_position = glm::dvec3(0, 1, 0),
+                 .m_weight = 0.01239852,
+                 .m_direction =
+                     glm::dvec3(-0.00049999991666660004, 0.99667709206767885,
+                                0.08145258834192623),
+             }},
+        {.in_ray =
+             {
+                 .m_position = glm::dvec3(0, 1, 0),
+                 .m_weight = 0.01239852,
+                 .m_direction =
+                     glm::dvec3(-0.00049999991666660004, -0.995586229182718,
+                                0.093851118714515264),
+             },
+         .in_normal = glm::dvec4(0, 1, 0, 0),
+         .in_a = 0.01239852,
+         .out_ray =
+             {
+                 .m_position = glm::dvec3(0, 1, 0),
+                 .m_weight = 0.01239852,
+                 .m_direction =
+                     glm::dvec3(-0.00049999991666660004, 0.9966772027014974,
+                                0.081452598714515267),
+             }},
+
+    };
+
+    for (auto p : inouts) {
+        auto out_ray = CPP_TRACER::refrac_plane(p.in_ray, p.in_normal, p.in_a);
+        CHECK_EQ(out_ray, p.out_ray);
     }
 }
