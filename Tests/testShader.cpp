@@ -1352,8 +1352,13 @@ TEST_F(TestSuite, testGetIncidenceAngle) {
     }
 }
 
-// TODO(rudi): invalid read here, because the material tables are empty!
+// TODO(rudi): this test is and was broken before the refactor. See the nans.
 TEST_F(TestSuite, testReflectance) {
+    std::array<bool, 92> mats;
+    mats.fill(false);
+    mats[29] = true;  // copper is relevant!
+    CpuTracer::setMaterialTables(loadMaterialTables(mats));
+
     struct InOutPair {
         double in_energy;
         double in_incidenceAngle;
@@ -1363,14 +1368,11 @@ TEST_F(TestSuite, testReflectance) {
         glm::dvec2 out_complex_P;
     };
 
-    std::vector<InOutPair> inouts = {
-        {.in_energy = 100,
-         .in_incidenceAngle = 1.3962634006709251,
-         .in_material = 29,
-         .out_complex_S =
-             glm::dvec2(-NAN, -NAN),  // TODO(rudi): this test is and was
-                                      // probably broken. The NANs..
-         .out_complex_P = glm::dvec2(NAN, NAN)}};
+    std::vector<InOutPair> inouts = {{.in_energy = 100,
+                                      .in_incidenceAngle = 1.3962634006709251,
+                                      .in_material = 29,
+                                      .out_complex_S = glm::dvec2(-NAN, -NAN),
+                                      .out_complex_P = glm::dvec2(NAN, NAN)}};
 
     for (auto p : inouts) {
         glm::dvec2 complex_S;
