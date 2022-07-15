@@ -163,7 +163,7 @@ void compareAgainstRayUI(std::string filename) {
 // to be used in conjunction with runTracerRaw
 std::vector<RAYX::Ray> mapGlobalToElement(
     std::vector<RAYX::Ray> global, std::shared_ptr<RAYX::OpticalElement> o) {
-    glm::dmat4x4 transform = arrayToGlm16(o->getInMatrix());
+    glm::dmat4x4 transform = o->getInMatrix();
     std::vector<RAYX::Ray> out;
 
     for (auto r : global) {
