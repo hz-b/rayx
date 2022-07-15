@@ -9,15 +9,13 @@ namespace RAYX {
 
 class RAYX_API PlaneGrating : public OpticalElement {
   public:
-    PlaneGrating(const char* name, Geometry::GeometricalShape geometricalShape,
+    PlaneGrating(const char* name, OpticalElement::GeometricalShape geometricalShape,
                  const double width, const double height,
                  const double azimuthalAngle, glm::dvec4 position,
                  glm::dmat4x4 orientation, const double designEnergyMounting,
                  const double lineDensity, const double orderOfDiffraction,
                  const int additionalZeroOrder, const std::array<double, 6> vls,
                  const std::array<double, 7> slopeError, Material mat);
-    PlaneGrating();
-    ~PlaneGrating();
 
     static std::shared_ptr<PlaneGrating> createFromXML(xml::Parser);
 

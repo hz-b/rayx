@@ -1,8 +1,19 @@
 #pragma once
 
+// On msvc
+#ifdef _MSC_VER
+#include <corecrt.h>
+#endif
 #define PY_SSIZE_T_CLEAN
+#ifdef _DEBUG
+#undef _DEBUG
+#include <python.h>
+#define _DEBUG
+#else
 #include <Python.h>
-#include "PathResolver.h"
+#endif
+
+#include <PathResolver.h>
 
 #include <string>
 

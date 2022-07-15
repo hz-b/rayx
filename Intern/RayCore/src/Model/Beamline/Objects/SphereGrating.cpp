@@ -33,7 +33,7 @@ namespace RAYX {
  *
  */
 SphereGrating::SphereGrating(const char* name, GratingMount mount,
-                             Geometry::GeometricalShape geometricalShape,
+                             OpticalElement::GeometricalShape geometricalShape,
                              double width, double height,
                              const double azimuthalAngle, double radius,
                              glm::dvec4 position, glm::dmat4x4 orientation,
@@ -41,12 +41,20 @@ SphereGrating::SphereGrating(const char* name, GratingMount mount,
                              double orderOfDiffraction,
                              std::array<double, 6> vls,
                              std::array<double, 7> slopeError, Material mat)
-    : OpticalElement(name, geometricalShape, width, height, azimuthalAngle,
-                     position, orientation, slopeError),
+    : OpticalElement(name, slopeError),
       m_designEnergyMounting(designEnergyMounting),
       m_lineDensity(lineDensity),
       m_orderOfDiffraction(orderOfDiffraction),
       m_vls(vls) {
+    // set geometry
+    m_Geometry->m_geometricalShape = geometricalShape;
+    m_Geometry->setHeightWidth(height, width);
+    m_Geometry->m_azimuthalAngle = azimuthalAngle;
+    m_Geometry->m_position = position;
+    m_Geometry->m_orientation = orientation;
+    m_Geometry->calcTransformationMatrices(position, orientation);
+    updateObjectParams();
+    
     RAYX_LOG << name;
 
     double icurv = 1;
@@ -59,8 +67,6 @@ SphereGrating::SphereGrating(const char* name, GratingMount mount,
                           m_vls[1], m_vls[2], m_vls[3], m_vls[4], m_vls[5], 0,
                           0, 0, 0});
 }
-
-SphereGrating::~SphereGrating() {}
 
 std::shared_ptr<SphereGrating> SphereGrating::createFromXML(xml::Parser p) {
     return std::make_shared<SphereGrating>(

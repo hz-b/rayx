@@ -5,6 +5,7 @@ import os
 VENV_PATH_POSIX = "/rayxvenv/bin/activate"
 VENV_PATH_WINDOWS = "\\rayxvenv\\bin\\activate.bat"
 
+
 def setup():
     """
     Setup for RAY-X venv
@@ -16,7 +17,7 @@ def setup():
     def get_venv_path() -> str:
         real_path = os.path.realpath(__file__)
         _dir = real_path.split(os.sep)
-        del _dir[-2:] # remove last elements related to build/bin
+        del _dir[-2:]  # remove last elements related to build/bin
         return str(os.sep + os.path.join(*_dir))
 
     dir_path = get_venv_path()
@@ -24,9 +25,9 @@ def setup():
     if sys.platform == "linux":
         path = dir_path + VENV_PATH_POSIX
     elif sys.platform == "darwin":  # MacOS
-        path = dir_path +VENV_PATH_POSIX
+        path = dir_path + VENV_PATH_POSIX
     elif sys.platform == "win32":  # Windows
-        path = dir_path +VENV_PATH_WINDOWS
+        path = dir_path + VENV_PATH_WINDOWS
     if(not(os.path.exists(path))):  # no venv found!
         try:
             subprocess.check_call(
@@ -39,7 +40,7 @@ def setup():
         return True
 
 
-def install_packages(venv_path:str):
+def install_packages(venv_path: str):
     """
     Installs required packages for plotting: pandas, matplotlib etc..
     * matplotlib : Interactive plotting module
@@ -47,10 +48,8 @@ def install_packages(venv_path:str):
     * h5py : HDF5 binary data format module
     * pyqt : Necessary for plot GUI Backend access. (if ran from terminal)
     """
-    print(os.path.join(venv_path,"bin","python3"))
-    python_venv_bin = os.path.join(venv_path,"bin","python3")
-    packages = ['matplotlib', 'pandas', 'h5py','pyqt5']
+    python_venv_bin = os.path.join(venv_path, "bin", "python3")
+    packages = ['matplotlib', 'pandas', 'h5py', 'pyqt5']
     for package in packages:
         subprocess.check_call(
             [python_venv_bin, '-m', 'pip', 'install', package])
-

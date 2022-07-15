@@ -1,4 +1,3 @@
-
 #include "PalikTable.h"
 
 #include <Debug.h>

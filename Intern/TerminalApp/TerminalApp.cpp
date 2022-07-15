@@ -8,6 +8,7 @@
 #include <Tracer/VulkanTracer.h>
 #include <Writer/Writer.h>
 #include <unistd.h>
+//#include <unistd.h>
 
 #include <memory>
 #include <stdexcept>
@@ -28,33 +29,42 @@ void TerminalApp::run() {
 
     /////////////////// Argument Parser
     m_CommandParser = std::make_unique<CommandParser>(m_argc, m_argv);
+    // Check correct use (This will exit if error)
+    m_CommandParser->analyzeCommands();
 
     auto start_time = std::chrono::steady_clock::now();
     /////////////////// Argument treatement
+    if (m_CommandParser->m_args.m_version) {
+        m_CommandParser->getVersion();
+        exit(1);
+    }
     // Load RML files
-    if (m_CommandParser->m_optargs.m_providedFile != NULL) {
+    if (m_CommandParser->m_args.m_providedFile != "") {
         // load rml file
         m_Beamline = std::make_unique<RAYX::Beamline>(
-            RAYX::importBeamline(m_CommandParser->m_optargs.m_providedFile));
+            RAYX::importBeamline(m_CommandParser->m_args.m_providedFile));
     } else {
         RAYX_LOG << "No Pipeline/Beamline provided, exiting..";
         exit(1);
     }
 
     // Chose Hardware
-    if (m_CommandParser->m_optargs.m_cpuFlag) {
+    if (m_CommandParser->m_args.m_cpuFlag) {
         m_Tracer = std::make_unique<RAYX::CpuTracer>();
     } else {
         m_Tracer = std::make_unique<RAYX::VulkanTracer>();
     }
 
+    if (m_CommandParser->m_args.m_benchmark) {
+        RAYX_D_LOG << "Starting in Benchmark Mode.\n";
+    }
     // Run RAY-X Core
     auto rays = m_Tracer->trace(*m_Beamline);
 
     // Export Rays to external data.
     exportRays(rays);
 
-    if (m_CommandParser->m_optargs.m_benchmark) {
+    if (m_CommandParser->m_args.m_benchmark) {
         std::chrono::steady_clock::time_point end =
             std::chrono::steady_clock::now();
         RAYX_LOG << "Benchmark: Done in "
@@ -65,16 +75,15 @@ void TerminalApp::run() {
     }
 
     //  Plot in Python
-    if (m_CommandParser->m_optargs.m_plotFlag ==
-        CommandParser::OptFlags::Enabled) {
-        // Setup to create genv if needed
+    if (m_CommandParser->m_args.m_plotFlag) {
+        // Setup to create venv if needed
         try {
             std::shared_ptr<PythonInterp> pySetup =
                 std::make_shared<PythonInterp>("py_setup", "setup",
                                                (const char*)nullptr);
             pySetup->execute();
         } catch (std::exception& e) {
-            RAYX_ERR << e.what() << "\n";
+            RAYX_ERR << e.what();
         }
         RAYX_D_LOG << "Python Setup OK.";
 
@@ -85,18 +94,20 @@ void TerminalApp::run() {
             std::shared_ptr<PythonInterp> pyPlot =
                 std::make_shared<PythonInterp>("py_plot_entry", "startPlot",
                                                (const char*)nullptr);
-            if (m_CommandParser->m_optargs.m_providedFile) {
+            if (m_CommandParser->m_args.m_providedFile != "") {
                 std::string _providedFile =
-                    m_CommandParser->m_optargs.m_providedFile;
+                    getFilename(m_CommandParser->m_args.m_providedFile);
                 pyPlot->setPlotName(_providedFile.c_str());
             }
-            if (m_CommandParser->m_optargs.m_multiplePlots ==
-                CommandParser::OptFlags::Enabled) {
+            if (m_CommandParser->m_args.m_dummyFlag) {
+                pyPlot->setPlotName("Dummy Beamline");
+            }
+            if (m_CommandParser->m_args.m_multiplePlots) {
                 pyPlot->setPlotType(3);
             }
             pyPlot->execute();
         } catch (std::exception& e) {
-            RAYX_ERR << e.what() << "\n";
+            RAYX_ERR << e.what();
         }
     }
 }
@@ -105,7 +116,7 @@ void TerminalApp::exportRays(RAYX::RayList& rays) {
 #ifdef CI
     bool csv = true;
 #else
-    bool csv = m_CommandParser->m_optargs.m_csvFlag;
+    bool csv = m_CommandParser->m_args.m_csvFlag;
 #endif
 
     if (csv) {

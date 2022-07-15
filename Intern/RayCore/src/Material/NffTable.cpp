@@ -1,6 +1,7 @@
 
 #include "NffTable.h"
 
+#include <algorithm>
 #include <Debug.h>
 
 #include <algorithm>

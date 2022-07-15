@@ -30,7 +30,7 @@ class RAYX_API ReflectionZonePlate : public OpticalElement {
     // shortened constructor that assumes that the angles are already calculated
     // and the position and orientation in world coordinates is already derived
     ReflectionZonePlate(
-        const char* name, Geometry::GeometricalShape geometricalShape,
+        const char* name, OpticalElement::GeometricalShape geometricalShape,
         CurvatureType curvatureType, const double width, const double height,
         const double azimuthalAngle, const glm::dvec4 position,
         const glm::dmat4x4 orientation, const double designEnergy,
@@ -43,7 +43,7 @@ class RAYX_API ReflectionZonePlate : public OpticalElement {
 
     // ! temporary constructor for trapezoid (10/11/2021)
     ReflectionZonePlate(
-        const char* name, Geometry::GeometricalShape geometricalShape,
+        const char* name, OpticalElement::GeometricalShape geometricalShape,
         CurvatureType curvatureType, const double widthA, const double widthB,
         const double height, const double azimuthalAngle,
         const glm::dvec4 position, const glm::dmat4x4 orientation,
@@ -54,8 +54,6 @@ class RAYX_API ReflectionZonePlate : public OpticalElement {
         const double longRadius, const int additionalZeroOrder,
         const double fresnelZOffset, const std::array<double, 7> slopeError,
         Material mat);
-    ReflectionZonePlate();
-    ~ReflectionZonePlate();
 
     static std::shared_ptr<ReflectionZonePlate> createFromXML(xml::Parser);
 

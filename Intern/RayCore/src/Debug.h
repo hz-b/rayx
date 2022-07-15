@@ -18,10 +18,13 @@
 #include <sstream>
 #include <string>
 #include <vector>
+#include <Tracer/Ray.h>
+
+#include "Core.h"
 
 // Memory leak detection (RAYX_NEW instead of new allows leaks to be detected)
-#ifdef RAYX_DEBUG_MODE
-#ifdef RAYX_PLATFORM_WINDOWS
+#ifdef RAY_DEBUG_MODE
+#ifdef RAYX_PLATFORM_MSVC
 #define _CRTDBG_MAP_ALLOC
 #include <crtdbg.h>
 #endif
@@ -56,7 +59,7 @@ namespace RAYX {
  * RAYX_LOG << "I am " << age << " years old";
  * */
 
-struct Log {
+struct RAYX_API Log {
     Log(std::string filename, int line);
     ~Log();
 
@@ -67,7 +70,7 @@ struct Log {
     }
 };
 
-struct Warn {
+struct RAYX_API Warn {
     Warn(std::string filename, int line);
 
     ~Warn();
@@ -79,7 +82,7 @@ struct Warn {
     }
 };
 
-struct Err {
+struct RAYX_API Err {
     std::string filename;
     int line;
 
@@ -94,7 +97,7 @@ struct Err {
     }
 };
 
-struct IgnoreLog {
+struct RAYX_API IgnoreLog {
     template <typename T>
     IgnoreLog& operator<<(T) {
         return *this;

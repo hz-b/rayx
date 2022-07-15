@@ -1,5 +1,4 @@
 #define WORKGROUP_SIZE 32
-#include "settings.comp"
 
 #ifdef CPP
     #define INOUT(x) x&
@@ -10,6 +9,7 @@
     #define OUT(x) out x
     #define ALLOW_UNUSED
 
+    #extension GL_EXT_debug_printf : enable
 	#extension GL_ARB_separate_shader_objects : enable
 	#extension GL_ARB_gpu_shader_int64 : enable
 	#extension GL_GOOGLE_include_directive : enable
@@ -45,6 +45,7 @@ const double inm2eV   = 1.239852e3;
 	using dvec4 = glm::dvec4;
 	using dmat3 = glm::dmat3;
 	using dmat4 = glm::dmat4;
+    using uint = unsigned int;
 
 	double mod(double x, double y) {
 		return glm::mod(x, y);
@@ -78,7 +79,7 @@ struct Element {
     dmat4 elementParameters;
 };
 
-#ifdef DEBUG
+#ifdef RAYX_DEBUG_MODE
 	struct _debug_struct {
 		dmat4 _dMat; // Can also be used as vectors or scalar
 	};
@@ -97,7 +98,7 @@ struct Element {
 	ShaderArray<dvec4> xyznull;
 	ShaderArray<int> matIdx;
 	ShaderArray<double> mat;
-	#ifdef DEBUG
+	#ifdef RAYX_DEBUG_MODE
 		ShaderArray<_debug_struct> d_struct;
 	#endif
 #else
@@ -125,7 +126,7 @@ struct Element {
 					   // use the matIdx-table to determine the relevant indices for when which table starts and stops.
 	};
 
-	#ifdef DEBUG
+	#ifdef RAYX_DEBUG_MODE
 		layout(binding = 6) buffer debugBuf {
 			_debug_struct d_struct[];  // contains nff table of all materials concatenated together
 		};
@@ -162,13 +163,22 @@ void dynamicElements() {
     dvec4 closestHitpoint = dvec4(1.0 / 0.0, 1.0 / 0.0, 1.0 / 0.0, 0.0);
     dvec4 closestGlobalHitpoint;
     
-    #ifdef DEBUG
+    #ifdef RAYX_DEBUG_MODE
     // Set Debug Struct of current Ray to identity
     d_struct[uint(gl_GlobalInvocationID)]._dMat = dmat4(1);
     #endif
 
     Element nextElement;
     double bounce = 1;
+
+    // Printing Example
+    if (uint(gl_GlobalInvocationID) == 2 ){
+    #ifndef CPP
+    debugPrintfEXT("Hello from GPU. \n"); 
+    #else
+    RAYX_D_LOG << "Tracing on CPU..." ; 
+    #endif
+    }
     // Iterate through all bounces
     for (int i = 0; i < maxBounces; i++) {
         ray = rayData[uint(gl_GlobalInvocationID)];
