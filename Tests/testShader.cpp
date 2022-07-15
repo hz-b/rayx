@@ -147,7 +147,7 @@ TEST_F(TestSuite, testRefrac2D) {
         0.080765992839840872, 0.57052382524991363, 0.81730007905468893);
 
     CHECK_EQ(input.size(), correct.size());
-    for (uint i = 0; i < input.size(); i++) {
+    for (uint32_t i = 0; i < input.size(); i++) {
         auto r = input[i];
 
         glm::dvec4 normal = glm::dvec4(r.m_position, 0);
@@ -308,7 +308,7 @@ TEST_F(TestSuite, testRefrac) {
         -0.99991341437509562, 0.013149667401360443, -0.00049999997222215965);
 
     CHECK_EQ(input.size(), correct.size());
-    for (uint i = 0; i < input.size(); i++) {
+    for (uint32_t i = 0; i < input.size(); i++) {
         auto r = input[i];
 
         glm::dvec4 normal = glm::dvec4(r.m_position, 0);
