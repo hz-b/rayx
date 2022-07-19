@@ -80,7 +80,16 @@ RayList CpuTracer::trace(const Beamline& beamline) {
     for (auto r : CPU_TRACER::outputData.data) {
         out.push(r);
     }
+
     return out;
+}
+
+void* CpuTracer::getDebugList(){
+    std::vector<CPU_TRACER::_debug_struct> debug_out;
+        for (auto r : CPU_TRACER::d_struct.data){
+        debug_out.emplace_back(r);
+    }
+    return debug_out.data();
 }
 
 }  // namespace RAYX

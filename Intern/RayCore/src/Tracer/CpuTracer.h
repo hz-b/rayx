@@ -21,6 +21,7 @@ class RAYX_API CpuTracer : public Tracer {
     ~CpuTracer();
 
     RayList trace(const Beamline&) override;
+    void* getDebugList() override;
 };
 
 namespace CPU_TRACER {
