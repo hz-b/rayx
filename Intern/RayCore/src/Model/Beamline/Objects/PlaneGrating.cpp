@@ -65,12 +65,12 @@ PlaneGrating::PlaneGrating(
                           0, 0, double(m_additionalOrder)});
 
     // parameters of quadric surface
-    double matd = (double)static_cast<int>(mat);
+    auto matd = (double)static_cast<int>(mat);
     setSurface(std::make_unique<Quadric>(std::array<double, 4 * 4>{
         0, 0, 0, 0, 1, 0, 0, -1, 0, 0, 0, 0, 1, 0, matd, 0}));
 }
 
-std::shared_ptr<PlaneGrating> PlaneGrating::createFromXML(xml::Parser p) {
+std::shared_ptr<PlaneGrating> PlaneGrating::createFromXML(const xml::Parser& p) {
     return std::make_shared<PlaneGrating>(
         p.name(), p.parseGeometricalShape(), p.parseTotalWidth(),
         p.parseTotalLength(), p.parseAzimuthalAngle(), p.parsePosition(),
@@ -80,10 +80,10 @@ std::shared_ptr<PlaneGrating> PlaneGrating::createFromXML(xml::Parser p) {
         p.parseMaterial());
 }
 
-double PlaneGrating::getDesignEnergyMounting() {
+double PlaneGrating::getDesignEnergyMounting() const {
     return m_designEnergyMounting;
 }
-double PlaneGrating::getLineDensity() { return m_lineDensity; }
-double PlaneGrating::getOrderOfDiffraction() { return m_orderOfDiffraction; }
+double PlaneGrating::getLineDensity() const { return m_lineDensity; }
+double PlaneGrating::getOrderOfDiffraction() const { return m_orderOfDiffraction; }
 std::array<double, 6> PlaneGrating::getVls() { return m_vls; }
 }  // namespace RAYX

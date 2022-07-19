@@ -1,5 +1,7 @@
 #include "Debug.h"
 
+#include <utility>
+
 namespace RAYX {
 constexpr int PREFIX_LEN = 30;
 
@@ -38,21 +40,22 @@ void formatDebugMsg(std::string filename, int line, std::ostream& o) {
 }
 
 Log::Log(std::string filename, int line) {
-    formatDebugMsg(filename, line, std::cout);
+    formatDebugMsg(std::move(filename), line, std::cout);
 }
 
 Log::~Log() { std::cout << std::endl; }
 
 Warn::Warn(std::string filename, int line) {
     std::cerr << "\x1B[31m";  // color red
-    formatDebugMsg(filename, line, std::cerr);
+    formatDebugMsg(std::move(filename), line, std::cerr);
 }
 
 Warn::~Warn() {
     std::cerr << std::endl << "\033[0m";  // color reset
 }
 
-Err::Err(std::string filename, int line) : filename(filename), line(line) {
+Err::Err(const std::string& filename, int line)
+    : filename(filename), line(line) {
     std::cerr << "\x1B[31m";  // color red
     formatDebugMsg(filename, line, std::cerr);
 }
@@ -70,9 +73,9 @@ void (*error_fn)() = exit1;
 
 const int PREC = 17;
 
-void dbg(std::string filename, int line, std::string name,
+void dbg(const std::string& filename, int line, std::string name,
          std::vector<double> v) {
-    RAYX::Log(filename, line) << name << ":";
+    RAYX::Log(filename, line) << std::move(name) << ":";
 
     int counter = 0;  // stores the number of elements in the stringstream
     std::stringstream s;

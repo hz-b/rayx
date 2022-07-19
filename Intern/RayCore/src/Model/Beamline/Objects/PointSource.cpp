@@ -2,7 +2,7 @@
 
 #include <Data/xml.h>
 
-#include <cmath>
+#include <utility>
 
 #include "Debug.h"
 
@@ -41,7 +41,7 @@ namespace RAYX {
  * (affects x,y position and x,y direction)
  *
  */
-PointSource::PointSource(const std::string name, int numberOfRays,
+PointSource::PointSource(const std::string& name, int numberOfRays,
                          EnergyDistribution dist, const double sourceWidth,
                          const double sourceHeight, const double sourceDepth,
                          const double horDivergence, const double verDivergence,
@@ -50,7 +50,7 @@ PointSource::PointSource(const std::string name, int numberOfRays,
                          const double linPol0, const double linPol45,
                          const double circPol,
                          const std::array<double, 6> misalignment)
-    : LightSource(name.c_str(), dist, linPol0, linPol45, circPol, misalignment,
+    : LightSource(name.c_str(), std::move(dist), linPol0, linPol45, circPol, misalignment,
                   sourceDepth, sourceHeight, sourceWidth, horDivergence,
                   verDivergence),
       m_numberOfRays(numberOfRays) {
@@ -60,10 +60,10 @@ PointSource::PointSource(const std::string name, int numberOfRays,
     m_verDist = verDist;
 }
 
-PointSource::~PointSource() {}
+PointSource::~PointSource() = default;
 
 // returns nullptr on error
-std::shared_ptr<PointSource> PointSource::createFromXML(RAYX::xml::Parser p) {
+std::shared_ptr<PointSource> PointSource::createFromXML(const RAYX::xml::Parser& p) {
     return std::make_shared<PointSource>(
         p.name(), p.parseNumberRays(), p.parseEnergyDistribution(),
         p.parseSourceWidth(), p.parseSourceHeight(), p.parseSourceDepth(),

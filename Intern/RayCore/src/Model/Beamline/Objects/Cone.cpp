@@ -115,7 +115,7 @@ Cone::Cone(const char* name, OpticalElement::GeometricalShape geometricalShape,
     setElementParameters({0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0});
 }
 
-Cone::~Cone() {}
+Cone::~Cone() = default;
 
 /**
  * @brief Calculate of R and RHO For Cone from given Theta Entrance- and exit

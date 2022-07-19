@@ -90,7 +90,7 @@ ReflectionZonePlate::ReflectionZonePlate(
     m_imageType = ImageType::Point2Point;  // default (0)
 
     // set parameters in Quadric class
-    double matd = (double)static_cast<int>(mat);
+    auto matd = (double)static_cast<int>(mat);
     if (m_curvatureType == CurvatureType::Plane) {
         setSurface(std::make_unique<Quadric>(std::array<double, 4 * 4>{
             0, 0, 0, 0, 1, 0, 0, -1, 0, 0, 0, 0, 4, 0, matd, 0}));
@@ -158,7 +158,7 @@ ReflectionZonePlate::ReflectionZonePlate(
     m_rzpType = RZPType::Elliptical;       // default (0)
     m_imageType = ImageType::Point2Point;  // default (0)
 
-    double matd = (double)static_cast<int>(mat);
+    auto matd = (double)static_cast<int>(mat);
 
     // set parameters in Quadric class
     if (m_curvatureType == CurvatureType::Plane) {
@@ -186,7 +186,7 @@ ReflectionZonePlate::ReflectionZonePlate(
 }
 
 std::shared_ptr<ReflectionZonePlate> ReflectionZonePlate::createFromXML(
-    xml::Parser p) {
+    const xml::Parser& p) {
     // ! temporary for testing trapezoid rzp
     double widthB;
     bool foundWidthB = xml::paramDouble(p.node, "totalWidthB", &widthB);
@@ -398,7 +398,7 @@ void ReflectionZonePlate::VectorR1Center() {
         double RIsina =
             m_designSagittalEntranceArmLength * sin(m_designAlphaAngle);
         double ROsinb = m_designSagittalExitArmLength * sin(m_designBetaAngle);
-        double m_alpha0Angle = (RIsina + ROsinb) / (RIcosa + ROcosb);
+        m_alpha0Angle = (RIsina + ROsinb) / (RIcosa + ROcosb);
         m_R1ArmLength = RIsina / sin(m_alpha0Angle);
     }
 }

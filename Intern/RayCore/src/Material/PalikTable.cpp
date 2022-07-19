@@ -2,10 +2,8 @@
 
 #include <Debug.h>
 
-#include <algorithm>
 #include <fstream>
 #include <iostream>
-#include <sstream>
 
 #include "PathResolver.h"
 
@@ -35,7 +33,7 @@ bool PalikTable::load(const char* element, PalikTable* out) {
             continue;
         }
 
-        PalikEntry e;
+        PalikEntry e{};
 
         if (sscanf(line.c_str(), "%le %le %le", &e.m_energy, &e.m_n, &e.m_k) !=
             3) {

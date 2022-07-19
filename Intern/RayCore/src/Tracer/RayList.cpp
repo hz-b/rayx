@@ -1,6 +1,5 @@
 #include "RayList.h"
 
-#include <cmath>
 #include <cstring>
 #include <iostream>
 
@@ -8,9 +7,9 @@
 
 namespace RAYX {
 
-RayList::RayList() {}
+RayList::RayList() = default;
 
-RayList::~RayList() {}
+RayList::~RayList() = default;
 
 /**
  * @brief insertVector function inserts a vector of Rays to the ray list.
@@ -31,7 +30,7 @@ void RayList::insertVector(const std::vector<Ray>& inRayVector) {
 void RayList::push(Ray r) {
     if (m_rayList.empty() ||
         m_rayList.back().size() == RAY_MAX_ELEMENTS_IN_VECTOR) {
-        m_rayList.push_back({});
+        m_rayList.emplace_back();
     }
     m_rayList.back().push_back(r);
 }
@@ -43,11 +42,11 @@ std::list<std::vector<Ray>>::iterator RayList::begin() {
 }
 std::list<std::vector<Ray>>::iterator RayList::end() { return m_rayList.end(); }
 std::vector<Ray> RayList::back() { return m_rayList.back(); }
-std::size_t RayList::size() { return m_rayList.size(); }
+std::size_t RayList::size() const { return m_rayList.size(); }
 
 int RayList::rayAmount() const {
-    int amount = (m_rayList.size() - 1) * RAY_MAX_ELEMENTS_IN_VECTOR +
-                 (m_rayList.back()).size();
+    int amount = (int)((m_rayList.size() - 1) * RAY_MAX_ELEMENTS_IN_VECTOR +
+                       (m_rayList.back()).size());
     return amount;
 }
 }  // namespace RAYX

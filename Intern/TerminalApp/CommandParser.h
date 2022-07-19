@@ -10,7 +10,7 @@ class CommandParser {
     // Default constructor
     CommandParser() = default;
     // Custom constructor
-    CommandParser(int ___argc, char* const* ___argv);
+    CommandParser(int _argc, char* const* _argv);
 
     ~CommandParser();
 

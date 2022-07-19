@@ -20,7 +20,7 @@ int min(int a, int b) {
 }
 
 Cell strToCell(const char* x) {
-    Cell out;
+    Cell out{};
     int n = strlen(x);
 
     if (n > CELL_SIZE) {
@@ -83,7 +83,7 @@ void writeCSV(RAYX::RayList& rays, std::string filename) {
     RAYX_D_LOG << "Writing " << rays.rayAmount() << " rays to file...";
 
     int index = 0;
-    for (auto l : rays) {
+    for (const auto& l : rays) {
         for (auto ray : l) {
             file << ulongToCell(index).buf << " | "               //
                  << doubleToCell(ray.m_position.x).buf << " | "   //

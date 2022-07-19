@@ -4,7 +4,6 @@
 #ifdef _MSC_VER
 #include <corecrt.h>
 #endif
-#define PY_SSIZE_T_CLEAN
 #ifdef _DEBUG
 #undef _DEBUG
 #include <python.h>
@@ -36,7 +35,7 @@ class PythonInterp {
     PyObject* m_pName;
     PyObject* m_pModule;
     PyObject* m_pDict;
-    PyObject* m_pFunc = NULL;
-    PyObject* m_pValue = NULL;
-    PyObject* m_presult = NULL;
+    PyObject* m_pFunc = nullptr;
+    PyObject* m_pValue = nullptr;
+    PyObject* m_presult = nullptr;
 };

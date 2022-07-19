@@ -27,11 +27,9 @@ ImagePlane::ImagePlane(const char* name, glm::dvec4 position,
         0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 5, 0, 0, 0}));
 }
 
-ImagePlane::~ImagePlane() {}
-
-std::shared_ptr<ImagePlane> ImagePlane::createFromXML(xml::Parser p) {
+std::shared_ptr<ImagePlane> ImagePlane::createFromXML(const xml::Parser& p) {
     return std::make_shared<ImagePlane>(p.name(), p.parsePosition(),
                                         p.parseOrientation());
 }
-
+ImagePlane::~ImagePlane() = default;
 }  // namespace RAYX

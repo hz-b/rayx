@@ -51,7 +51,7 @@ SphereMirror::SphereMirror(const char* name,
     updateObjectParams();
 
     calcRadius();  // calculate the radius
-    double matd = (double)static_cast<int>(mat);
+    auto matd = (double)static_cast<int>(mat);
     setSurface(std::make_unique<Quadric>(std::array<double, 4 * 4>{
         1, 0, 0, 0, 1, 1, 0, -m_radius, 0, 0, 1, 0, 0, 0, matd, 0}));
 }
@@ -93,12 +93,12 @@ SphereMirror::SphereMirror(const char* name,
 
     RAYX_LOG << "Created.";
 
-    double matd = (double)static_cast<int>(mat);
+    auto matd = (double)static_cast<int>(mat);
     setSurface(std::make_unique<Quadric>(std::array<double, 4 * 4>{
         1, 0, 0, 0, 1, 1, 0, -radius, 0, 0, 1, 0, 0, 0, matd, 0}));
 }
 
-std::shared_ptr<SphereMirror> SphereMirror::createFromXML(xml::Parser p) {
+std::shared_ptr<SphereMirror> SphereMirror::createFromXML(const xml::Parser& p) {
     return std::make_shared<SphereMirror>(
         p.name(), p.parseGeometricalShape(), p.parseTotalWidth(),
         p.parseTotalLength(), p.parseAzimuthalAngle(), p.parseGrazingIncAngle(),

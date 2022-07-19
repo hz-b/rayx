@@ -6,9 +6,9 @@
 #include "rapidxml.hpp"
 
 namespace RAYX {
-Exporter::Exporter() {}
+Exporter::Exporter() = default;
 
-Exporter::~Exporter() {}
+Exporter::~Exporter() = default;
 
 void Exporter::exportToXML() {
     std::string text = "This is a test!";

@@ -107,16 +107,16 @@ class RAYX_API OpticalElement {
 
             if (calcInMatrix) {
                 glm::dmat4x4 translation =
-                    glm::dmat4x4(1, 0, 0, -position[0], 0, 1, 0, -position[1], 0, 0,
-                                1, -position[2], 0, 0, 0, 1);  // o
+                    glm::dmat4x4(1, 0, 0, -position[0], 0, 1, 0, -position[1],
+                                 0, 0, 1, -position[2], 0, 0, 0, 1);  // o
                 // ray = tran * rot * ray
                 glm::dmat4x4 g2e = translation * rotation;
                 output = glm::transpose(g2e);
                 return;
             } else {
                 glm::dmat4x4 inv_translation =
-                    glm::dmat4x4(1, 0, 0, position[0], 0, 1, 0, position[1], 0, 0,
-                                1, position[2], 0, 0, 0, 1);  // o
+                    glm::dmat4x4(1, 0, 0, position[0], 0, 1, 0, position[1], 0,
+                                 0, 1, position[2], 0, 0, 0, 1);  // o
                 // inverse of m_inMatrix
                 glm::dmat4x4 e2g = inv_rotation * inv_translation;
                 output = glm::transpose(e2g);
@@ -144,7 +144,7 @@ class RAYX_API OpticalElement {
     void setElementParameters(std::array<double, 4 * 4> params);
     void setSurface(std::unique_ptr<Surface> surface);
     void updateObjectParams();
-    void updateObjectParamsNoGeometry();
+    [[maybe_unused]] void updateObjectParamsNoGeometry();
 
     double getWidth();
     double getHeight();
@@ -158,7 +158,7 @@ class RAYX_API OpticalElement {
     std::array<double, 4 * 4> getSurfaceParams() const;
     std::array<double, 7> getSlopeError() const;
 
-    const char* m_name;
+    [[maybe_unused]] const char* m_name;
 
   protected:
     // GEOMETRY

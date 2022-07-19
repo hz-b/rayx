@@ -2,10 +2,8 @@
 
 #include <cmath>
 #include <glm.hpp>
-#include <gtc/type_ptr.hpp>
 
 #include "Debug.h"
-#include "utils.h"
 
 namespace RAYX {
 
@@ -99,14 +97,16 @@ double OpticalElement::getHeight() { return m_Geometry->m_height; }
 // TODO(Jannis): make these return a glm::dvec4
 glm::dmat4 OpticalElement::getInMatrix() const {
     // return glmToArray16(m_Geometry->m_inMatrix);,
-    glm::dmat4 inMatrix = glm::dmat4(); 
-    m_Geometry->calcTransformationMatrices(m_Geometry->m_position, m_Geometry->m_orientation, inMatrix, true);
+    glm::dmat4 inMatrix = glm::dmat4();
+    m_Geometry->calcTransformationMatrices(
+        m_Geometry->m_position, m_Geometry->m_orientation, inMatrix, true);
     return inMatrix;
 }
 glm::dmat4 OpticalElement::getOutMatrix() const {
     // return glmToArray16(m_Geometry->m_outMatrix);
-    glm::dmat4 outMatrix = glm::dmat4(); 
-    m_Geometry->calcTransformationMatrices(m_Geometry->m_position, m_Geometry->m_orientation, outMatrix, false);
+    glm::dmat4 outMatrix = glm::dmat4();
+    m_Geometry->calcTransformationMatrices(
+        m_Geometry->m_position, m_Geometry->m_orientation, outMatrix, false);
     return outMatrix;
 }
 glm::dvec4 OpticalElement::getPosition() const {
@@ -135,5 +135,6 @@ std::array<double, 4 * 4> OpticalElement::getSurfaceParams() const {
 std::array<double, 7> OpticalElement::getSlopeError() const {
     return m_slopeError;
 }
+[[maybe_unused]] void OpticalElement::updateObjectParamsNoGeometry() {}
 
 }  // namespace RAYX

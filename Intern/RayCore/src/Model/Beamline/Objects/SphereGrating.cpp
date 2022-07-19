@@ -58,7 +58,7 @@ SphereGrating::SphereGrating(const char* name, GratingMount mount,
 
     double icurv = 1;
     m_gratingMount = mount;
-    double matd = (double)static_cast<int>(mat);
+    auto matd = (double)static_cast<int>(mat);
     setSurface(std::make_unique<Quadric>(std::array<double, 4 * 4>{
         1, 0, 0, 0, icurv, 1, 0, -radius, 0, 0, 1, 0, 2, 0, matd, 0}));
     setElementParameters({0, 0, m_lineDensity, m_orderOfDiffraction,
@@ -67,7 +67,7 @@ SphereGrating::SphereGrating(const char* name, GratingMount mount,
                           0, 0, 0});
 }
 
-std::shared_ptr<SphereGrating> SphereGrating::createFromXML(xml::Parser p) {
+std::shared_ptr<SphereGrating> SphereGrating::createFromXML(const xml::Parser& p) {
     return std::make_shared<SphereGrating>(
         p.name(), p.parseGratingMount(), p.parseGeometricalShape(),
         p.parseTotalWidth(), p.parseTotalLength(), p.parseAzimuthalAngle(),

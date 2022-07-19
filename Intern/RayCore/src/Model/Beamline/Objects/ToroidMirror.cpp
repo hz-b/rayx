@@ -50,14 +50,14 @@ ToroidMirror::ToroidMirror(const char* name,
 
     RAYX_LOG << "long Radius: " << m_longRadius
              << ", short Radius: " << m_shortRadius;
-    double matd = (double)static_cast<int>(mat);
+    auto matd = (double)static_cast<int>(mat);
     setSurface(std::make_unique<Toroid>(
         std::array<double, 4 * 4>{m_longRadius, m_shortRadius, 0, 0, 0, 1, 0, 0,
                                   0, 0, 1, 0, 6, 0, matd, 0}));
     // setSurface(std::make_unique<Toroid>(m_longRadius, m_shortRadius));
 }
 
-std::shared_ptr<ToroidMirror> ToroidMirror::createFromXML(xml::Parser p) {
+std::shared_ptr<ToroidMirror> ToroidMirror::createFromXML(const xml::Parser& p) {
     return std::make_shared<ToroidMirror>(
         p.name(), p.parseGeometricalShape(), p.parseTotalLength(),
         p.parseTotalWidth(), p.parseAzimuthalAngle(), p.parsePosition(),

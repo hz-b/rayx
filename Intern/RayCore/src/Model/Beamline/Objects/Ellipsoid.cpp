@@ -110,7 +110,7 @@ Ellipsoid::Ellipsoid(const char* name,
     RAYX_LOG << "m_a44: " << m_a44;
 
     double icurv = 1;
-    double matd = (double)static_cast<int>(mat);
+    auto matd = (double)static_cast<int>(mat);
     setSurface(std::make_unique<Quadric>(
         std::array<double, 4 * 4>{m_a11, 0, 0, 0,              //
                                   icurv, m_a22, m_a23, m_a24,  //
@@ -227,7 +227,7 @@ double Ellipsoid::getA44() const { return m_a44; }
 double Ellipsoid::getHalfAxisC() const { return m_halfAxisC; }
 
 // Null if failed
-std::shared_ptr<Ellipsoid> Ellipsoid::createFromXML(xml::Parser p) {
+std::shared_ptr<Ellipsoid> Ellipsoid::createFromXML(const xml::Parser& p) {
     OpticalElement::GeometricalShape geometricalShape = p.parseGeometricalShape();
     double width = p.parseTotalWidth();
     double height = p.parseTotalLength();
