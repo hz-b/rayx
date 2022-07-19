@@ -61,9 +61,6 @@ class CommandParser {
     // Map short arg to its parameters
     // this can also be done with app.get_option()
     std::unordered_map<char, Options> m_ParserCommands = {
-        {'p',
-         {OptionType::BOOL, "plot", "Plot output footprints and histograms.",
-          &(m_args.m_plotFlag)}},
         {'c',
          {OptionType::BOOL, "ocsv", "Output stored as .csv file.",
           &(m_args.m_csvFlag)}},
@@ -72,11 +69,14 @@ class CommandParser {
           &(m_args.m_dummyFlag)}},
         {'b',
          {OptionType::BOOL, "benchmark",
-          "Benchmark application: \t (RML Parse → Trace → Output Storage)",
+          "Benchmark application: (RML → Trace → Output)",
           &(m_args.m_benchmark)}},
         {'m',
          {OptionType::BOOL, "mult", "Multiple plots extension at output.",
           &(m_args.m_multiplePlots)}},
+        {'p',
+         {OptionType::BOOL, "plot", "Plot output footprints and histograms.",
+          &(m_args.m_plotFlag)}},
         {'x', {OptionType::BOOL, "cpu", "Tracing on CPU", &(m_args.m_cpuFlag)}},
         {'i',
          {OptionType::STRING, "input", "Input RML File Path.",
