@@ -83,7 +83,7 @@ RayList CpuTracer::trace(const Beamline& beamline) {
 
     return out;
 }
-
+#ifdef RAYX_DEBUG_MODE
 void* CpuTracer::getDebugList(){
     std::vector<CPU_TRACER::_debug_struct> debug_out;
         for (auto r : CPU_TRACER::d_struct.data){
@@ -91,5 +91,5 @@ void* CpuTracer::getDebugList(){
     }
     return debug_out.data();
 }
-
+#endif
 }  // namespace RAYX

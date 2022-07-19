@@ -129,6 +129,7 @@ void TerminalApp::exportRays(RAYX::RayList& rays) {
     }
 }
 
+#ifdef RAYX_DEBUG_MODE
 /**
  * @brief Gets All Debug Buffers and check if they are the identity matrix.
  * This is a default function to show how the implemented Debug Buffer works.
@@ -150,3 +151,4 @@ void TerminalApp::exportDebug(std::size_t Amount) {
         }
     }
 }
+#endif
