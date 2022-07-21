@@ -65,20 +65,9 @@ void writeToOutputCSV(RAYX::RayList& rays, std::string filename) {
     writeCSV(rays, f);
 }
 
-// if convertToElementCoords = true, all rays are converted to element
-// coordinates of beamline->back()
-RAYX::RayList traceRML(std::string filename, bool convertToElementCoords) {
+RAYX::RayList traceRML(std::string filename) {
     auto beamline = loadBeamline(filename);
     auto rays = tracer->trace(beamline);
-
-    if (convertToElementCoords) {
-        if (beamline.m_OpticalElements.empty()) {
-            ADD_FAILURE() << "no optical elements!";
-        }
-
-        rays =
-            mapGlobalToElementRayList(rays, beamline.m_OpticalElements.back());
-    }
 
     writeToOutputCSV(rays, filename + ".rayx");
 

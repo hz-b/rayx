@@ -10,7 +10,6 @@
 #include "Debug.h"
 #include "Material/Material.h"
 #include "Model/Beamline/Objects/Objects.h"
-
 #include "PathResolver.h"
 #include "Tracer/CpuTracer.h"
 #include "Tracer/Ray.h"
@@ -144,10 +143,8 @@ RAYX::Beamline loadBeamline(std::string filename);
 // will write to Tests/output/<filename>.csv
 void writeToOutputCSV(RAYX::RayList& rays, std::string filename);
 
-// if convertToElementCoords = true, all rays are converted to element
-// coordinates of beamline->back()
-RAYX::RayList traceRML(std::string filename,
-                       bool convertToElementCoords = true);
+// returns rays in element coordinates
+RAYX::RayList traceRML(std::string filename);
 
 // will look at Tests/input/<filename>.csv
 // the Ray-UI files are to be obtained by Export > RawRaysOutgoing (which are in

@@ -65,9 +65,9 @@ struct Element {
 	};
 #endif 
 /* LAYOUTS */
-	layout(std140, binding = 0) buffer ibuf { Ray rayData[]; };
+	layout(std140, binding = 0) buffer ibuf { Ray rayData[]; }; // in global coordinates
 
-	layout(std140, binding = 1) buffer obuf { Ray outputData[]; };
+	layout(std140, binding = 1) buffer obuf { Ray outputData[]; }; // in element coordinates, i.e. relative to the last element the ray has collided with.
 
 	layout(std140, binding = 2) buffer qbuf {
 		double numberOfBeamlines;
@@ -233,10 +233,9 @@ void dynamicElements() {
         // transform back to WORLD coordinates
         rayData[uint(gl_GlobalInvocationID)] = rayMatrixMult(rayData[uint(gl_GlobalInvocationID)], nextElement.outTrans);
     }
-    // end the tracing in element coordinates (makes comparison with old RAY easier)
-    // rayData[uint(gl_GlobalInvocationID)] = rayMatrixMult(rayData[uint(gl_GlobalInvocationID)], nextElement.inTrans);
-    outputData[uint(gl_GlobalInvocationID)] = rayData[uint(gl_GlobalInvocationID)];
-    return;
+
+    // outputData should be in element coordinates.
+    outputData[uint(gl_GlobalInvocationID)] = rayMatrixMult(rayData[uint(gl_GlobalInvocationID)], nextElement.inTrans);
 }
 
 void main() {

@@ -1,19 +1,18 @@
 #include "setupTests.h"
 
+TEST_F(TestSuite, BoringImagePlane) { compareAgainstRayUI("BoringImagePlane"); }
 TEST_F(TestSuite, PlaneMirror) { compareAgainstRayUI("PlaneMirror"); }
 TEST_F(TestSuite, Ellipsoid) {
-    auto rayxGlobal = traceRML("Ellipsoid", false);
+    auto rayx = traceRML("Ellipsoid");
 
     int count = 0;
-    for (auto l : rayxGlobal) {
+    for (auto l : rayx) {
         for (auto ray : l) {
             auto dist =
                 abs(ray.m_extraParam - 21);  // 1 = Ellipsoid, 2 = ImagePlane
             if (dist < 0.5) {
                 count += 1;
-                CHECK_EQ(ray.m_position.x, 0, 1e-11);
-                CHECK_EQ(ray.m_position.y, 0, 1e-11);
-                CHECK_EQ(ray.m_position.z, 0, 1e-11);
+                CHECK_EQ(ray.m_position, glm::dvec3(0, 0, 0), 1e-11);
             }
         }
     }
