@@ -34,6 +34,7 @@ class TerminalApp {
     char** m_argv;
     int m_argc;
     void exportRays(RAYX::RayList&);
+    void exportDebug(std::size_t Amount);
     std::string providedFile;
     std::unique_ptr<CommandParser> m_CommandParser;
     std::unique_ptr<RAYX::Tracer> m_Tracer;

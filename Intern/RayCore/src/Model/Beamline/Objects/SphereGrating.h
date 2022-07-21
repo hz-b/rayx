@@ -19,7 +19,7 @@ class RAYX_API SphereGrating : public OpticalElement {
                   double orderOfDiffraction, std::array<double, 6> vls,
                   std::array<double, 7> slopeError, Material mat);
 
-    static std::shared_ptr<SphereGrating> createFromXML(xml::Parser);
+    static std::shared_ptr<SphereGrating> createFromXML(const xml::Parser&);
 
     // TODO (Theresa): should ideally be removed as soon as radius calculation
     // is simplified in GeometricUSerParams.cpp

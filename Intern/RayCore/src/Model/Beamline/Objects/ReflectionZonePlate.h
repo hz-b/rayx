@@ -55,7 +55,7 @@ class RAYX_API ReflectionZonePlate : public OpticalElement {
         const double fresnelZOffset, const std::array<double, 7> slopeError,
         Material mat);
 
-    static std::shared_ptr<ReflectionZonePlate> createFromXML(xml::Parser);
+    static std::shared_ptr<ReflectionZonePlate> createFromXML(const xml::Parser&);
 
     // for calculating incidence and exit angle from user parameters
     void calcAlpha();

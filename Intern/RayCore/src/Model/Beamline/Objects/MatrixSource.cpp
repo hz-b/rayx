@@ -1,6 +1,7 @@
 #include "MatrixSource.h"
 
 #include <random>
+#include <utility>
 
 #include "Debug.h"
 #include "Debug/Instrumentor.h"
@@ -34,24 +35,24 @@ namespace RAYX {
  * @param misalignment      if the source is moved/turned in any direction
  * (affects x,y position and x,y direction)
  */
-MatrixSource::MatrixSource(const std::string name, int numberOfRays,
+MatrixSource::MatrixSource(const std::string& name, int numberOfRays,
                            EnergyDistribution dist, const double sourceWidth,
                            const double sourceHeight, const double sourceDepth,
                            const double horDivergence,
                            const double verDivergence, const double linPol0,
                            const double linPol45, const double circPol,
                            const std::array<double, 6> misalignment)
-    : LightSource(name.c_str(), dist, linPol0, linPol45, circPol, misalignment,
+    : LightSource(name.c_str(), std::move(dist), linPol0, linPol45, circPol, misalignment,
                   sourceDepth, sourceHeight, sourceWidth, horDivergence,
                   verDivergence),
       m_numberOfRays(numberOfRays) {
     RAYX_LOG << "Created.";
 }
 
-MatrixSource::~MatrixSource() {}
+MatrixSource::~MatrixSource() = default;
 
 // returns nullptr on error
-std::shared_ptr<MatrixSource> MatrixSource::createFromXML(xml::Parser p) {
+std::shared_ptr<MatrixSource> MatrixSource::createFromXML(const xml::Parser& p) {
     return std::make_shared<MatrixSource>(
         p.name(), p.parseNumberRays(), p.parseEnergyDistribution(),
         p.parseSourceWidth(), p.parseSourceHeight(), p.parseSourceDepth(),
@@ -86,10 +87,10 @@ std::vector<Ray> MatrixSource::getRays() const {
             double rn = unif(re);  // uniform random in [0,1)
             x = -0.5 * m_sourceWidth + (m_sourceWidth / (rmat - 1)) * row +
                 getMisalignmentParams()[0];
-            ;
+
             y = -0.5 * m_sourceHeight + (m_sourceHeight / (rmat - 1)) * col +
                 getMisalignmentParams()[1];
-            ;
+
             z = (rn - 0.5) * m_sourceDepth;
             en = selectEnergy();
             glm::dvec3 position = glm::dvec3(x, y, z);
@@ -97,11 +98,11 @@ std::vector<Ray> MatrixSource::getRays() const {
             phi = -0.5 * m_horDivergence +
                   (m_horDivergence / (rmat - 1)) * row +
                   getMisalignmentParams()[2];
-            ;
+
             psi = -0.5 * m_verDivergence +
                   (m_verDivergence / (rmat - 1)) * col +
                   getMisalignmentParams()[3];
-            ;
+
             glm::dvec3 direction = getDirectionFromAngles(phi, psi);
             glm::dvec4 stokes =
                 glm::dvec4(1, getLinear0(), getLinear45(), getCircular());

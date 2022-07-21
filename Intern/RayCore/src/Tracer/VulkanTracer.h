@@ -98,7 +98,9 @@ class RAYX_API VulkanTracer : public Tracer {
     std::vector<_debugBuf_t>::const_iterator getDebugIteratorEnd();
 
     const RayList& getRayList() { return m_RayList; }
-    const auto getDebugList() { return m_debugBufList; }
+    #ifdef RAYX_DEBUG_MODE
+    void* getDebugList() override { return m_debugBufList.data();}
+    #endif
 
   private:
     // Member structs:

@@ -2,16 +2,11 @@
 
 #include "H5Writer.h"
 
-#include <assert.h>
-
-#include <highfive/H5DataSet.hpp>
 #include <highfive/H5DataSpace.hpp>
 #include <highfive/H5File.hpp>
-#include <sstream>
 #include <string>
 
 #include "Debug.h"
-#include "Writer.h"
 
 #define RAY_DOUBLE_COUNT 16  // Same as in RayList.h
 
@@ -36,7 +31,7 @@ void writeH5(RAYX::RayList& rays, std::string filename) {
             auto name = intToString(counter);
             auto dataset =
                 file.createDataSet<double>(name, HighFive::DataSpace(dims));
-            double* ptr = (double*)l.data();
+            auto* ptr = (double*)l.data();
             dataset.write_raw(ptr);
         } catch (HighFive::Exception& err) {
             RAYX_D_ERR << err.what();

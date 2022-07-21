@@ -36,7 +36,6 @@ Slit::Slit(const char* name, OpticalElement::GeometricalShape geometricalShape,
     m_Geometry->m_position = position;
     m_Geometry->m_orientation = orientation;
     m_centralBeamstop = beamstop;
-    m_Geometry->calcTransformationMatrices(position, orientation);
     updateObjectParams();
 
     // if no beamstop -> set to zero
@@ -50,9 +49,7 @@ Slit::Slit(const char* name, OpticalElement::GeometricalShape geometricalShape,
                                  : abs(beamstopWidth));
     m_beamstopHeight = m_centralBeamstop == CentralBeamstop::None
                            ? 0
-                           : (m_centralBeamstop == CentralBeamstop::Elliptical
-                                  ? abs(beamstopHeight)
-                                  : abs(beamstopHeight));
+                           : abs(beamstopHeight) != 0;
 
     setSurface(std::make_unique<Quadric>(std::array<double, 4 * 4>{
         0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -1, 3, 0, 0, 0}));
@@ -61,7 +58,7 @@ Slit::Slit(const char* name, OpticalElement::GeometricalShape geometricalShape,
     RAYX_LOG << "Created.";
 }
 
-std::shared_ptr<Slit> Slit::createFromXML(xml::Parser p) {
+std::shared_ptr<Slit> Slit::createFromXML(const xml::Parser& p) {
     return std::make_shared<Slit>(p.name(), p.parseGeometricalShape(),
                                   p.parseCentralBeamstop(), p.parseTotalWidth(),
                                   p.parseTotalHeight(), p.parsePosition(),

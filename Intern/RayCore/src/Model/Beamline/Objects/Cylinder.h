@@ -20,7 +20,7 @@ class RAYX_API Cylinder : public OpticalElement {
              const std::array<double, 7> slopeError, Material mat);
     ~Cylinder();
 
-    static std::shared_ptr<Cylinder> createFromXML(xml::Parser);
+    static std::shared_ptr<Cylinder> createFromXML(const xml::Parser&);
 
     void setRadius();
     CylinderDirection getDirection() const;

@@ -50,8 +50,8 @@ RayList CpuTracer::trace(const Beamline& beamline) {
     for (auto el : beamline.m_OpticalElements) {
         CPU_TRACER::Element e;
         e.surfaceParams = arrayToGlm16(el->getSurfaceParams());
-        e.inTrans = arrayToGlm16(el->getInMatrix());
-        e.outTrans = arrayToGlm16(el->getOutMatrix());
+        e.inTrans = el->getInMatrix();
+        e.outTrans = el->getOutMatrix();
         e.objectParameters = arrayToGlm16(el->getObjectParameters());
         e.elementParameters = arrayToGlm16(el->getElementParameters());
         CPU_TRACER::quadricData.data.push_back(e);
@@ -80,7 +80,16 @@ RayList CpuTracer::trace(const Beamline& beamline) {
     for (auto r : CPU_TRACER::outputData.data) {
         out.push(r);
     }
+
     return out;
 }
-
+#ifdef RAYX_DEBUG_MODE
+void* CpuTracer::getDebugList(){
+    std::vector<CPU_TRACER::_debug_struct> debug_out;
+        for (auto r : CPU_TRACER::d_struct.data){
+        debug_out.emplace_back(r);
+    }
+    return debug_out.data();
+}
+#endif
 }  // namespace RAYX

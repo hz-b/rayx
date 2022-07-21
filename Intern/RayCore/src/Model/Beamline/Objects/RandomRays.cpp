@@ -22,7 +22,7 @@ RandomRays::RandomRays(int low, int high, int numberOfRays)
       m_high(high),
       m_numberOfRays(numberOfRays) {}
 
-RandomRays::~RandomRays() {}
+RandomRays::~RandomRays() = default;
 
 /**
  * every parameter is chosen randomly
@@ -51,7 +51,7 @@ std::vector<Ray> RandomRays::getRays() const {
 }
 
 void RandomRays::compareRays(std::vector<Ray*> input,
-                             std::vector<double> output) {
+                             std::vector<double> output) const {
     std::list<double> diff;
     std::cout.precision(17);
     // double max = 0;

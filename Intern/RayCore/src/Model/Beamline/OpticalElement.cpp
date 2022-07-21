@@ -2,10 +2,8 @@
 
 #include <cmath>
 #include <glm.hpp>
-#include <gtc/type_ptr.hpp>
 
 #include "Debug.h"
-#include "utils.h"
 
 namespace RAYX {
 
@@ -26,15 +24,13 @@ namespace RAYX {
  */
 OpticalElement::OpticalElement(const char* name,
                                const std::array<double, 4 * 4> surfaceParams,
-                               const std::array<double, 4 * 4> inputInMatrix,
-                               const std::array<double, 4 * 4> inputOutMatrix,
                                const std::array<double, 4 * 4> OParameters,
                                const std::array<double, 4 * 4> EParameters)
-    : m_name(name), m_surfaceParams(surfaceParams),
-      m_objectParameters(OParameters), m_elementParameters(EParameters) {
+    : m_name(name),
+      m_surfaceParams(surfaceParams),
+      m_objectParameters(OParameters),
+      m_elementParameters(EParameters) {
     m_Geometry = std::make_unique<Geometry>();
-    m_Geometry->m_inMatrix = arrayToGlm16(inputInMatrix);
-    m_Geometry->m_outMatrix = arrayToGlm16(inputOutMatrix);
 }
 
 OpticalElement::OpticalElement(const char* name,
@@ -58,13 +54,6 @@ OpticalElement::OpticalElement(const char* name,
 
 void OpticalElement::setElementParameters(std::array<double, 4 * 4> params) {
     m_elementParameters = params;
-}
-
-void OpticalElement::setInMatrix(std::array<double, 4 * 4> inputMatrix) {
-    m_Geometry->m_inMatrix = glm::make_mat4x4(&inputMatrix[0]);
-}
-void OpticalElement::setOutMatrix(std::array<double, 4 * 4> inputMatrix) {
-    m_Geometry->m_outMatrix = glm::make_mat4x4(&inputMatrix[0]);
 }
 
 void OpticalElement::setSurface(std::unique_ptr<Surface> surface) {
@@ -106,11 +95,19 @@ double OpticalElement::getWidth() { return m_Geometry->m_widthA; }
 double OpticalElement::getHeight() { return m_Geometry->m_height; }
 
 // TODO(Jannis): make these return a glm::dvec4
-std::array<double, 4 * 4> OpticalElement::getInMatrix() const {
-    return glmToArray16(m_Geometry->m_inMatrix);
+glm::dmat4 OpticalElement::getInMatrix() const {
+    // return glmToArray16(m_Geometry->m_inMatrix);,
+    glm::dmat4 inMatrix = glm::dmat4();
+    m_Geometry->calcTransformationMatrices(
+        m_Geometry->m_position, m_Geometry->m_orientation, inMatrix, true);
+    return inMatrix;
 }
-std::array<double, 4 * 4> OpticalElement::getOutMatrix() const {
-    return glmToArray16(m_Geometry->m_outMatrix);
+glm::dmat4 OpticalElement::getOutMatrix() const {
+    // return glmToArray16(m_Geometry->m_outMatrix);
+    glm::dmat4 outMatrix = glm::dmat4();
+    m_Geometry->calcTransformationMatrices(
+        m_Geometry->m_position, m_Geometry->m_orientation, outMatrix, false);
+    return outMatrix;
 }
 glm::dvec4 OpticalElement::getPosition() const {
     return m_Geometry->m_position;
@@ -138,5 +135,6 @@ std::array<double, 4 * 4> OpticalElement::getSurfaceParams() const {
 std::array<double, 7> OpticalElement::getSlopeError() const {
     return m_slopeError;
 }
+[[maybe_unused]] void OpticalElement::updateObjectParamsNoGeometry() {}
 
 }  // namespace RAYX

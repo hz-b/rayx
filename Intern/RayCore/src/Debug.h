@@ -18,7 +18,6 @@
 #include <sstream>
 #include <string>
 #include <vector>
-#include <Tracer/Ray.h>
 
 #include "Core.h"
 
@@ -86,7 +85,7 @@ struct RAYX_API Err {
     std::string filename;
     int line;
 
-    Err(std::string filename, int line);
+    Err(const std::string& filename, int line);
 
     ~Err();
 
@@ -175,7 +174,7 @@ inline std::vector<double> formatAsVec(Ray arg) {
             arg.m_extraParam};
 }
 
-void dbg(std::string filename, int line, std::string name,
+void dbg(const std::string& filename, int line, std::string name,
          std::vector<double> v);
 
 #define RAYX_DBG(C) RAYX::dbg(__FILE__, __LINE__, #C, RAYX::formatAsVec(C))

@@ -29,7 +29,7 @@ class RayList {
     std::list<std::vector<Ray>>::iterator begin();
     std::list<std::vector<Ray>>::iterator end();
     std::vector<Ray> back();
-    std::size_t size();
+    std::size_t size() const;
 
     int rayAmount() const;
 

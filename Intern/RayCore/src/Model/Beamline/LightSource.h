@@ -70,7 +70,7 @@ class RAYX_API LightSource {
     LightSource();
     virtual ~LightSource();
 
-    const char* m_name;
+    [[maybe_unused]] const char* m_name;
     /** the energy distribution used when deciding the energies of the rays. */
     const EnergyDistribution m_EnergyDistribution;
 

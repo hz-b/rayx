@@ -10,11 +10,11 @@ namespace RAYX {
 
 class RAYX_API ImagePlane : public OpticalElement {
   public:
+    ImagePlane() = default;
     ImagePlane(const char* name, glm::dvec4 position, glm::dmat4x4 orientation);
-    ImagePlane();
     ~ImagePlane();
 
-    static std::shared_ptr<ImagePlane> createFromXML(xml::Parser);
+    static std::shared_ptr<ImagePlane> createFromXML(const xml::Parser&);
 
     double getDistance();
 };

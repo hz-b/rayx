@@ -36,7 +36,6 @@ Cone::Cone(const char* name, OpticalElement::GeometricalShape geometricalShape,
     m_Geometry->m_azimuthalAngle = azimuthalAngle;
     m_Geometry->m_position = position;
     m_Geometry->m_orientation = orientation;
-    m_Geometry->calcTransformationMatrices(position, orientation);
     updateObjectParams();
 
     RAYX_LOG << name << " :Auto";
@@ -96,7 +95,6 @@ Cone::Cone(const char* name, OpticalElement::GeometricalShape geometricalShape,
     m_Geometry->m_azimuthalAngle = azimuthalAngle;
     m_Geometry->m_position = position;
     m_Geometry->m_orientation = orientation;
-    m_Geometry->calcTransformationMatrices(position, orientation);
     updateObjectParams();
 
     RAYX_LOG << name << " :Manual";
@@ -117,7 +115,7 @@ Cone::Cone(const char* name, OpticalElement::GeometricalShape geometricalShape,
     setElementParameters({0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0});
 }
 
-Cone::~Cone() {}
+Cone::~Cone() = default;
 
 /**
  * @brief Calculate of R and RHO For Cone from given Theta Entrance- and exit

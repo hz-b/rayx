@@ -7,9 +7,9 @@
 #include <cstring>
 #include <filesystem>
 #include <iostream>
+#include <utility>
 
-namespace RAYX {
-namespace xml {
+namespace RAYX::xml {
 
 // general scope functions:
 bool param(const rapidxml::xml_node<>* node, const char* paramname,
@@ -20,7 +20,7 @@ bool param(const rapidxml::xml_node<>* node, const char* paramname,
 
     for (rapidxml::xml_node<>* p = node->first_node(); p;
          p = p->next_sibling()) {
-        if (strcmp(p->name(), "param")) {
+        if (strcmp(p->name(), "param") != 0) {
             continue;
         }
         if (strcmp(p->first_attribute("id")->value(), paramname) == 0) {
@@ -260,7 +260,7 @@ bool paramVls(const rapidxml::xml_node<>* node, std::array<double, 6>* out) {
 }
 
 bool paramEnergyDistribution(const rapidxml::xml_node<>* node,
-                             std::filesystem::path rmlFile,
+                             const std::filesystem::path &rmlFile,
                              EnergyDistribution* out) {
     if (!node || !out) {
         return false;
@@ -271,14 +271,14 @@ bool paramEnergyDistribution(const rapidxml::xml_node<>* node,
                        &energyDistributionType_int)) {
         return false;
     }
-    EnergyDistributionType energyDistributionType =
+    auto energyDistributionType =
         static_cast<EnergyDistributionType>(energyDistributionType_int);
 
     int spreadType_int;
     if (!xml::paramInt(node, "energySpreadType", &spreadType_int)) {
         return false;
     }
-    SpreadType spreadType = static_cast<SpreadType>(spreadType_int);
+    auto spreadType = static_cast<SpreadType>(spreadType_int);
 
     bool continuous = spreadType == SpreadType::WhiteBand;
 
@@ -326,7 +326,8 @@ bool paramEnergyDistribution(const rapidxml::xml_node<>* node,
 bool paramPositionAndOrientation(const rapidxml::xml_node<>* node,
                                  const std::vector<xml::Group>& group_context,
                                  glm::dvec4* out_pos, glm::dmat4x4* out_ori) {
-    std::array<double, 6> misalignment;
+    // Always returns True!
+    std::array<double, 6> misalignment{};
     misalignment.fill(0.f);
 
     paramPositionNoGroup(node, out_pos);
@@ -338,7 +339,7 @@ bool paramPositionAndOrientation(const rapidxml::xml_node<>* node,
     glm::dvec4 offset =
         glm::dvec4(misalignment[0], misalignment[1], misalignment[2], 1);
     // no need to add misalignment again
-    if (group_context.size() == 0) {
+    if (group_context.empty()) {
         return true;
     }
     // remove misalignment from element
@@ -397,7 +398,7 @@ bool parseGroup(rapidxml::xml_node<>* node, xml::Group* out) {
 Parser::Parser(rapidxml::xml_node<>* node,
                std::vector<xml::Group> group_context,
                std::filesystem::path rmlFile)
-    : node(node), group_context(group_context), rmlFile(rmlFile) {}
+    : node(node), group_context(std::move(group_context)), rmlFile(std::move(rmlFile)) {}
 
 const char* Parser::name() const {
     return node->first_attribute("name")->value();
@@ -438,7 +439,7 @@ glm::dvec3 Parser::parseDvec3(const char* paramname) const {
 
 // parsers for derived parameters
 std::array<double, 6> Parser::parseMisalignment() const {
-    std::array<double, 6> x;
+    std::array<double, 6> x{};
     if (!paramMisalignment(node, &x)) {
         throw std::runtime_error("parseMisalignment failed");
     }
@@ -446,7 +447,7 @@ std::array<double, 6> Parser::parseMisalignment() const {
 }
 
 std::array<double, 7> Parser::parseSlopeError() const {
-    std::array<double, 7> x;
+    std::array<double, 7> x{};
     if (!paramSlopeError(node, &x)) {
         throw std::runtime_error("parseSlopeError failed");
     }
@@ -454,7 +455,7 @@ std::array<double, 7> Parser::parseSlopeError() const {
 }
 
 std::array<double, 6> Parser::parseVls() const {
-    std::array<double, 6> x;
+    std::array<double, 6> x{};
     if (!paramVls(node, &x)) {
         throw std::runtime_error("parseVls failed");
     }
@@ -497,5 +498,4 @@ Material Parser::parseMaterial() const {
     return m;
 }
 
-}  // namespace xml
 }  // namespace RAYX

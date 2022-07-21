@@ -105,7 +105,7 @@ std::array<double, 4> glmToArray4(glm::dvec4 v) {
 }
 
 glm::dvec4 RAYX_API arrayToGlm4(std::array<double, 4> v) {
-    return glm::dvec4(v[0], v[1], v[2], v[3]);
+    return {v[0], v[1], v[2], v[3]};
 }
 
 /**

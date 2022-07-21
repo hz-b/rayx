@@ -17,12 +17,12 @@ class RAYX_API PlaneGrating : public OpticalElement {
                  const int additionalZeroOrder, const std::array<double, 6> vls,
                  const std::array<double, 7> slopeError, Material mat);
 
-    static std::shared_ptr<PlaneGrating> createFromXML(xml::Parser);
+    static std::shared_ptr<PlaneGrating> createFromXML(const xml::Parser&);
 
     double getFixFocusConstantCFF();
-    double getDesignEnergyMounting();
-    double getLineDensity();
-    double getOrderOfDiffraction();
+    double getDesignEnergyMounting() const;
+    double getLineDensity() const;
+    double getOrderOfDiffraction() const;
     std::array<double, 6> getVls();
 
   private:

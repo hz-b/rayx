@@ -23,7 +23,7 @@ int setenv(const char* name, const char* value, int overwrite) {
 }
 #endif
 
-PythonInterp::PythonInterp() {}
+PythonInterp::PythonInterp() = default;
 
 /**
  * @brief
@@ -60,7 +60,7 @@ PythonInterp::PythonInterp(const char* pyName, const char* pyFunc,
     // Load the module object
     m_pModule = PyImport_Import(m_pName);
 
-    if (m_pModule == NULL) {
+    if (m_pModule == nullptr) {
         // cleanup();
         PyErr_Print();
         //  Throw exception
@@ -146,4 +146,4 @@ void PythonInterp::setPlotType(int plotType) {
     }
     m_plotType = plotType;
 }
-PythonInterp::~PythonInterp() {}
+PythonInterp::~PythonInterp() = default;
