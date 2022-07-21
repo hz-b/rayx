@@ -83,27 +83,25 @@ void writeCSV(RAYX::RayList& rays, std::string filename) {
     RAYX_D_LOG << "Writing " << rays.rayAmount() << " rays to file...";
 
     int index = 0;
-    for (const auto& l : rays) {
-        for (auto ray : l) {
-            file << ulongToCell(index).buf << " | "               //
-                 << doubleToCell(ray.m_position.x).buf << " | "   //
-                 << doubleToCell(ray.m_position.y).buf << " | "   //
-                 << doubleToCell(ray.m_position.z).buf << " | "   //
-                 << doubleToCell(ray.m_weight).buf << " | "       //
-                 << doubleToCell(ray.m_direction.x).buf << " | "  //
-                 << doubleToCell(ray.m_direction.y).buf << " | "  //
-                 << doubleToCell(ray.m_direction.z).buf << " | "  //
-                 << doubleToCell(ray.m_energy).buf << " | "       //
-                 << doubleToCell(ray.m_stokes.x).buf << " | "     //
-                 << doubleToCell(ray.m_stokes.y).buf << " | "     //
-                 << doubleToCell(ray.m_stokes.z).buf << " | "     //
-                 << doubleToCell(ray.m_stokes.w).buf << " | "     //
-                 << doubleToCell(ray.m_pathLength).buf << " | "   //
-                 << doubleToCell(ray.m_order).buf << " | "        //
-                 << doubleToCell(ray.m_lastElement).buf << " | "  //
-                 << doubleToCell(ray.m_extraParam).buf << '\n';
-            index++;
-        }
+    for (auto ray : rays) {
+        file << ulongToCell(index).buf << " | "               //
+             << doubleToCell(ray.m_position.x).buf << " | "   //
+             << doubleToCell(ray.m_position.y).buf << " | "   //
+             << doubleToCell(ray.m_position.z).buf << " | "   //
+             << doubleToCell(ray.m_weight).buf << " | "       //
+             << doubleToCell(ray.m_direction.x).buf << " | "  //
+             << doubleToCell(ray.m_direction.y).buf << " | "  //
+             << doubleToCell(ray.m_direction.z).buf << " | "  //
+             << doubleToCell(ray.m_energy).buf << " | "       //
+             << doubleToCell(ray.m_stokes.x).buf << " | "     //
+             << doubleToCell(ray.m_stokes.y).buf << " | "     //
+             << doubleToCell(ray.m_stokes.z).buf << " | "     //
+             << doubleToCell(ray.m_stokes.w).buf << " | "     //
+             << doubleToCell(ray.m_pathLength).buf << " | "   //
+             << doubleToCell(ray.m_order).buf << " | "        //
+             << doubleToCell(ray.m_lastElement).buf << " | "  //
+             << doubleToCell(ray.m_extraParam).buf << '\n';
+        index++;
     }
 
     RAYX_D_LOG << "Writing done!";

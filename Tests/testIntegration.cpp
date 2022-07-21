@@ -6,14 +6,12 @@ TEST_F(TestSuite, Ellipsoid) {
     auto rayx = traceRML("Ellipsoid");
 
     int count = 0;
-    for (auto l : rayx) {
-        for (auto ray : l) {
-            auto dist =
-                abs(ray.m_extraParam - 21);  // 1 = Ellipsoid, 2 = ImagePlane
-            if (dist < 0.5) {
-                count += 1;
-                CHECK_EQ(ray.m_position, glm::dvec3(0, 0, 0), 1e-11);
-            }
+    for (auto ray : rayx) {
+        auto dist =
+            abs(ray.m_extraParam - 21);  // 1 = Ellipsoid, 2 = ImagePlane
+        if (dist < 0.5) {
+            count += 1;
+            CHECK_EQ(ray.m_position, glm::dvec3(0, 0, 0), 1e-11);
         }
     }
     if (count != 92) {
@@ -21,6 +19,18 @@ TEST_F(TestSuite, Ellipsoid) {
                  << ") hitting the ImagePlane from the "
                     "Ellipsoid!";
     }
+}
+
+TEST_F(TestSuite, PlaneMirrorMis) {
+    auto a = traceRML("PlaneMirrorMis");
+    auto b = loadCSVRayUI("PlaneMirrorMis");
+    for (auto r : a) {
+        r.m_stokes = glm::dvec4(0, 0, 0, 0);
+    }
+    for (auto r : b) {
+        r.m_stokes = glm::dvec4(0, 0, 0, 0);
+    }
+    compareRayLists(a, b);
 }
 
 // TODO(rudi): this test fails. Possibly because of a wasteBox bug.

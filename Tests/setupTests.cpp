@@ -99,46 +99,20 @@ RAYX::RayList loadCSVRayUI(std::string filename) {
     return out;
 }
 
-void compareRayLists(RAYX::RayList& rayx, RAYX::RayList& rayui, double t) {
+void compareRayLists(const RAYX::RayList& rayx, const RAYX::RayList& rayui,
+                     double t) {
     CHECK_EQ(rayx.rayAmount(), rayui.rayAmount());
 
-    auto itRayX = rayx.begin();
-    auto itRayXEnd = rayx.end();
+    auto itRayX = rayx.cbegin();
+    auto itRayXEnd = rayx.cend();
 
-    auto itRayUI = rayui.begin();
-    auto itRayUIEnd = rayui.end();
+    auto itRayUI = rayui.cbegin();
 
     while (itRayX != itRayXEnd) {
-        auto rayx = *itRayX;
-        auto rayui = *itRayUI;
+        CHECK_EQ(*itRayX, *itRayUI, t);
 
-        CHECK_EQ(rayx.size(), rayui.size());
-
-        for (unsigned int i = 0; i < rayui.size(); i++) {
-            CHECK_EQ(rayx[i].m_position.x, rayui[i].m_position.x, t);
-            CHECK_EQ(rayx[i].m_position.y, rayui[i].m_position.y, t);
-            CHECK_EQ(rayx[i].m_position.z, rayui[i].m_position.z, t);
-
-            CHECK_EQ(rayx[i].m_direction.x, rayui[i].m_direction.x, t);
-            CHECK_EQ(rayx[i].m_direction.y, rayui[i].m_direction.y, t);
-            CHECK_EQ(rayx[i].m_direction.z, rayui[i].m_direction.z, t);
-
-            CHECK_EQ(rayx[i].m_energy, rayui[i].m_energy, t);
-            // CHECK_EQ(rayx.m_pathLength, rayui[i].m_pathLength, t);
-            // TODO: also compare pathLength
-
-            CHECK_EQ(rayx[i].m_stokes.x, rayui[i].m_stokes.x, t);
-            CHECK_EQ(rayx[i].m_stokes.y, rayui[i].m_stokes.y, t);
-            CHECK_EQ(rayx[i].m_stokes.z, rayui[i].m_stokes.z, t);
-            CHECK_EQ(rayx[i].m_stokes.w, rayui[i].m_stokes.w, t);
-        }
-
-        itRayX++;
-        itRayUI++;
-
-        bool endX = itRayX == itRayXEnd;
-        bool endUI = itRayUI == itRayUIEnd;
-        CHECK_EQ((int)endX, (int)endUI);
+        ++itRayX;
+        ++itRayUI;
     }
 }
 
@@ -146,39 +120,4 @@ void compareAgainstRayUI(std::string filename) {
     auto a = traceRML(filename);
     auto b = loadCSVRayUI(filename);
     compareRayLists(a, b);
-}
-
-// converts global coordinates to element coordinates.
-// to be used in conjunction with runTracerRaw
-std::vector<RAYX::Ray> mapGlobalToElement(
-    std::vector<RAYX::Ray> global, std::shared_ptr<RAYX::OpticalElement> o) {
-    glm::dmat4x4 transform = o->getInMatrix();
-    std::vector<RAYX::Ray> out;
-
-    for (auto r : global) {
-        auto globalpos =
-            arrayToGlm4({r.m_position.x, r.m_position.y, r.m_position.z, 1});
-        auto globaldir =
-            arrayToGlm4({r.m_direction.x, r.m_direction.y, r.m_direction.z, 0});
-
-        auto elementpos = transform * globalpos;
-        auto elementdir = transform * globaldir;
-
-        auto r_element = r;
-        r_element.m_position = {elementpos.x, elementpos.y, elementpos.z};
-        r_element.m_direction = {elementdir.x, elementdir.y, elementdir.z};
-
-        out.push_back(r_element);
-    }
-    return out;
-}
-
-RAYX::RayList mapGlobalToElementRayList(
-    RAYX::RayList& global, std::shared_ptr<RAYX::OpticalElement> o) {
-    RAYX::RayList out;
-    for (auto l : global) {
-        auto element = mapGlobalToElement(l, o);
-        out.insertVector(element);
-    }
-    return out;
 }

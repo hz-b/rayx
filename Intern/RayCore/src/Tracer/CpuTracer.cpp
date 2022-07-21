@@ -39,11 +39,9 @@ RayList CpuTracer::trace(const Beamline& beamline) {
 #endif
 
     // init rayData, outputData
-    for (auto a : rayList) {
-        for (auto r : a) {
-            CPU_TRACER::rayData.data.push_back(r);
-            CPU_TRACER::outputData.data.push_back({});
-        }
+    for (auto r : rayList) {
+        CPU_TRACER::rayData.data.push_back(r);
+        CPU_TRACER::outputData.data.push_back({});
     }
 
     // init quadricData

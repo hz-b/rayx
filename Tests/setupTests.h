@@ -151,15 +151,7 @@ RAYX::RayList traceRML(std::string filename);
 // element coordinates of the relevant element!)
 RAYX::RayList loadCSVRayUI(std::string filename);
 
-void compareRayLists(RAYX::RayList& rayx, RAYX::RayList& rayui,
+void compareRayLists(const RAYX::RayList& rayx, const RAYX::RayList& rayui,
                      double t = 1e-11);
 
 void compareAgainstRayUI(std::string filename);
-
-// converts global coordinates to element coordinates.
-// to be used in conjunction with runTracerRaw
-std::vector<RAYX::Ray> mapGlobalToElement(
-    std::vector<RAYX::Ray> global, std::shared_ptr<RAYX::OpticalElement> o);
-
-RAYX::RayList mapGlobalToElementRayList(
-    RAYX::RayList& global, std::shared_ptr<RAYX::OpticalElement> o);

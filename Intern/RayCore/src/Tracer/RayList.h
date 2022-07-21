@@ -17,6 +17,24 @@
 
 namespace RAYX {
 
+struct RayListIter {
+    std::list<std::vector<Ray>>::iterator m_iter;  // iterator over list
+    size_t m_offset;                               // index within std::vector
+
+    bool operator==(const RayListIter& o) const;
+    void operator++();
+    Ray& operator*();
+};
+
+struct ConstRayListIter {
+    std::list<std::vector<Ray>>::const_iterator m_iter;
+    size_t m_offset;
+
+    bool operator==(const ConstRayListIter&) const;
+    void operator++();
+    const Ray& operator*();
+};
+
 class RayList {
   public:
     // list of vectors
@@ -26,14 +44,18 @@ class RayList {
     void insertVector(const std::vector<Ray>& inRayVector);
     void push(Ray);
     void clean();
-    std::list<std::vector<Ray>>::iterator begin();
-    std::list<std::vector<Ray>>::iterator end();
-    std::vector<Ray> back();
-    std::size_t size() const;
+
+    RayListIter begin();
+    RayListIter end();
+
+    ConstRayListIter cbegin() const;
+    ConstRayListIter cend() const;
 
     int rayAmount() const;
 
-    std::list<std::vector<Ray>> m_rayList;
+    std::list<std::vector<Ray>>
+        m_rayList;  // TODO(Rudi) rename, writing rayList.m_rayList is
+                    // confusing. Typical contains name this .data()
 };
 
 }  // namespace RAYX

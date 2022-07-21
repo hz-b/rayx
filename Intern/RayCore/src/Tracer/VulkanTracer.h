@@ -86,21 +86,16 @@ class RAYX_API VulkanTracer : public Tracer {
                                uint32_t inNumberOfRays);
 
     // getter
-    std::list<std::vector<Ray>>::const_iterator getOutputIteratorBegin();
-    std::list<std::vector<Ray>>::const_iterator getOutputIteratorEnd();
-
     // https://www.khronos.org/registry/OpenGL/extensions/ARB/ARB_uniform_buffer_object.txt
     // stf140 align rules (Stick to only 1 matrix for simplicity)
     struct _debugBuf_t {
         glm::dmat4x4 _dMat;  // Set to identiy matrix in shader.
     };
-    std::vector<_debugBuf_t>::const_iterator getDebugIteratorBegin();
-    std::vector<_debugBuf_t>::const_iterator getDebugIteratorEnd();
 
     const RayList& getRayList() { return m_RayList; }
-    #ifdef RAYX_DEBUG_MODE
-    void* getDebugList() override { return m_debugBufList.data();}
-    #endif
+#ifdef RAYX_DEBUG_MODE
+    void* getDebugList() override { return m_debugBufList.data(); }
+#endif
 
   private:
     // Member structs:
@@ -222,7 +217,6 @@ class RAYX_API VulkanTracer : public Tracer {
     uint32_t getNumberOfBuffers() const;
 
     // Ray-related funcs:
-    void divideAndSortRays();
     void fillQuadricBuffer();
     void fillMaterialBuffer();
     void copyToRayBuffer(uint32_t offset, uint32_t numberOfBytesToCopy);
