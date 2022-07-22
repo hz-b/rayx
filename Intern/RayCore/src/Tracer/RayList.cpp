@@ -28,32 +28,32 @@ void RayList::insertVector(const std::vector<Ray>& inRayVector) {
 }
 
 void RayList::push(Ray r) {
-    if (m_rayList.empty() ||
-        m_rayList.back().size() == RAY_MAX_ELEMENTS_IN_VECTOR) {
-        m_rayList.emplace_back();
+    if (m_data.empty() ||
+        m_data.back().size() == RAY_MAX_ELEMENTS_IN_VECTOR) {
+        m_data.emplace_back();
     }
-    m_rayList.back().push_back(r);
+    m_data.back().push_back(r);
 }
 
-void RayList::clean() { m_rayList.clear(); }
+void RayList::clean() { m_data.clear(); }
 
 RayListIter RayList::begin() {
-    return {.m_iter = m_rayList.begin(), .m_offset = 0};
+    return {.m_iter = m_data.begin(), .m_offset = 0};
 }
 RayListIter RayList::end() {
-    return {.m_iter = m_rayList.end(), .m_offset = 0};
+    return {.m_iter = m_data.end(), .m_offset = 0};
 }
 
 ConstRayListIter RayList::cbegin() const {
-    return {.m_iter = m_rayList.cbegin(), .m_offset = 0};
+    return {.m_iter = m_data.cbegin(), .m_offset = 0};
 }
 ConstRayListIter RayList::cend() const {
-    return {.m_iter = m_rayList.cend(), .m_offset = 0};
+    return {.m_iter = m_data.cend(), .m_offset = 0};
 }
 
 int RayList::rayAmount() const {
-    int amount = (int)((m_rayList.size() - 1) * RAY_MAX_ELEMENTS_IN_VECTOR +
-                       (m_rayList.back()).size());
+    int amount = (int)((m_data.size() - 1) * RAY_MAX_ELEMENTS_IN_VECTOR +
+                       (m_data.back()).size());
     return amount;
 }
 

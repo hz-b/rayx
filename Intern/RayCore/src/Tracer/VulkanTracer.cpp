@@ -763,7 +763,7 @@ void VulkanTracer::fillRayBuffer() {
              << ", (Bytes needed): " << bytesNeeded << " Bytes";
     std::list<std::vector<Ray>>::iterator raySetIterator;
     RAYX_LOG << "Staging...";
-    raySetIterator = m_RayList.m_rayList.begin();
+    raySetIterator = m_RayList.m_data.begin();
     size_t vectorsPerStagingBuffer =
         std::floor(GPU_MAX_STAGING_SIZE / RAY_VECTOR_SIZE);
 
@@ -800,7 +800,7 @@ void VulkanTracer::fillStagingBuffer(
         RAYX_ERR << "(*raySetIterator).size() > GPU_MAX_STAGING_SIZE)!";
     }
     vectorsPerStagingBuffer =
-        std::min(m_RayList.m_rayList.size(), vectorsPerStagingBuffer);
+        std::min(m_RayList.m_data.size(), vectorsPerStagingBuffer);
     RAYX_LOG << "Vectors per StagingBuffer: " << vectorsPerStagingBuffer;
     for (uint32_t i = 0; i < vectorsPerStagingBuffer; i++) {
         memcpy(((char*)data) + i * RAY_VECTOR_SIZE, (*raySetIterator).data(),
@@ -988,7 +988,7 @@ void VulkanTracer::getRays() {
     vkUnmapMemory(m_Device, m_staging.m_BufferMemories[0]);
 
     RAYX_LOG << "Output Data size: "
-             << m_OutputRays.m_rayList.front().size() * RAY_DOUBLE_COUNT *
+             << m_OutputRays.m_data.front().size() * RAY_DOUBLE_COUNT *
                     sizeof(double)
              << " Bytes";
     RAYX_LOG << "Done fetching [StagingBufer→OutputData].";

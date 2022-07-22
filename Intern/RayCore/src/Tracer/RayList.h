@@ -55,9 +55,7 @@ class RayList {
 
     int rayAmount() const;
 
-    std::list<std::vector<Ray>>
-        m_rayList;  // TODO(Rudi) rename, writing rayList.m_rayList is
-                    // confusing. Typical contains name this .data()
+    std::list<std::vector<Ray>> m_data;
 
     // a typical filter operator, receiving a function f of type Ray& -> bool
     // (aka F), this returns a new RayList returning only those who satisfy the

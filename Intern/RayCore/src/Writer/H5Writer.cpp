@@ -24,7 +24,7 @@ void writeH5(RAYX::RayList& rays, std::string filename) {
                                       HighFive::File::Truncate);
     int counter = 0;
 
-    for (auto l : rays.m_rayList) {
+    for (auto l : rays.m_data) {
         try {
             std::vector<size_t> dims{l.size(),
                                      16};  // Max size of one chunk is 128MB
