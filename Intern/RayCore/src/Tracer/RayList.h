@@ -22,6 +22,7 @@ struct RayListIter {
     size_t m_offset;                               // index within std::vector
 
     bool operator==(const RayListIter& o) const;
+    bool operator!=(const RayListIter& o) const;
     void operator++();
     Ray& operator*();
 };
@@ -31,6 +32,7 @@ struct ConstRayListIter {
     size_t m_offset;
 
     bool operator==(const ConstRayListIter&) const;
+    bool operator!=(const ConstRayListIter&) const;
     void operator++();
     const Ray& operator*();
 };

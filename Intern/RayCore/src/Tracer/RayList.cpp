@@ -61,6 +61,9 @@ int RayList::rayAmount() const {
 bool RayListIter::operator==(const RayListIter& o) const {
     return m_iter == o.m_iter && m_offset == o.m_offset;
 }
+bool RayListIter::operator!=(const RayListIter& o) const {
+    return !(*this == o);
+}
 void RayListIter::operator++() {
     m_offset++;
     if (m_offset >= m_iter->size()) {
@@ -73,6 +76,9 @@ Ray& RayListIter::operator*() { return (*m_iter)[m_offset]; }
 // ConstRayListIter
 bool ConstRayListIter::operator==(const ConstRayListIter& o) const {
     return m_iter == o.m_iter && m_offset == o.m_offset;
+}
+bool ConstRayListIter::operator!=(const ConstRayListIter& o) const {
+	return !(*this == o);
 }
 void ConstRayListIter::operator++() {
     m_offset++;
