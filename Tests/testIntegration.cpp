@@ -21,17 +21,4 @@ TEST_F(TestSuite, Ellipsoid) {
     }
 }
 
-TEST_F(TestSuite, PlaneMirrorMis) {
-    auto a = traceRML("PlaneMirrorMis");
-    auto b = loadCSVRayUI("PlaneMirrorMis");
-    for (auto r : a) {
-        r.m_stokes = glm::dvec4(0, 0, 0, 0);
-    }
-    for (auto r : b) {
-        r.m_stokes = glm::dvec4(0, 0, 0, 0);
-    }
-    compareRayLists(a, b);
-}
-
-// TODO(rudi): this test fails. Possibly because of a wasteBox bug.
-// TEST_F(TestSuite, Toroid) { compareAgainstRayUI("Toroid"); }
+TEST_F(TestSuite, PlaneMirrorMis) { compareAgainstRayUI("PlaneMirrorMis"); }
