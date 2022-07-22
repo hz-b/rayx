@@ -99,17 +99,24 @@ RAYX::RayList loadCSVRayUI(std::string filename) {
     return out;
 }
 
-void compareRayLists(const RAYX::RayList& rayx, const RAYX::RayList& rayui,
-                     double t) {
-    CHECK_EQ(rayx.rayAmount(), rayui.rayAmount());
+void compareRayLists(const RAYX::RayList& rayx_list,
+                     const RAYX::RayList& rayui_list, double t) {
+    CHECK_EQ(rayx_list.rayAmount(), rayui_list.rayAmount());
 
-    auto itRayX = rayx.cbegin();
-    auto itRayXEnd = rayx.cend();
+    auto itRayX = rayx_list.cbegin();
+    auto itRayXEnd = rayx_list.cend();
 
-    auto itRayUI = rayui.cbegin();
+    auto itRayUI = rayui_list.cbegin();
 
     while (itRayX != itRayXEnd) {
-        CHECK_EQ(*itRayX, *itRayUI, t);
+        auto rayx = *itRayX;
+        auto rayui = *itRayUI;
+        CHECK_EQ(rayx.m_position, rayui.m_position, t);
+        CHECK_EQ(rayx.m_direction, rayui.m_direction, t);
+        CHECK_EQ(rayx.m_energy, rayui.m_energy, t);
+
+        // TODO(Rudi): the other ray-parameters are not tested yet.
+        // Many of them, because RAY-UI doesn't export them.
 
         ++itRayX;
         ++itRayUI;
