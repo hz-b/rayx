@@ -1,5 +1,7 @@
 #include "setupTests.h"
 
+using namespace RAYX;
+
 TEST_F(TestSuite, PlaneMirror) { compareAgainstRayUI("PlaneMirror"); }
 TEST_F(TestSuite, PlaneMirrorDef) { compareAgainstRayUI("PlaneMirrorDef"); }
 TEST_F(TestSuite, PlaneMirrorMis) { compareAgainstRayUI("PlaneMirrorMis"); }
@@ -31,7 +33,17 @@ TEST_F(TestSuite, PlaneGratingIncAzMis) {
     compareAgainstRayUI("PlaneGratingIncAzMis");
 }
 TEST_F(TestSuite, ReflectionZonePlateAzim200) {
-    compareAgainstRayUI("ReflectionZonePlateAzim200");
+    auto a_unfiltered = traceRML("ReflectionZonePlateAzim200");
+    auto b = loadCSVRayUI("ReflectionZonePlateAzim200");
+
+    RayList a;
+    for (auto r : a_unfiltered) {
+        if (r.m_extraParam == 21.0) {
+            a.push(r);
+        }
+    }
+
+    compareRayLists(a, b, 1e-7);
 }
 TEST_F(TestSuite, ReflectionZonePlateDefault) {
     compareAgainstRayUI("ReflectionZonePlateDefault");
