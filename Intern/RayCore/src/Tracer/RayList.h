@@ -56,6 +56,21 @@ class RayList {
     std::list<std::vector<Ray>>
         m_rayList;  // TODO(Rudi) rename, writing rayList.m_rayList is
                     // confusing. Typical contains name this .data()
+
+    // a typical filter operator, receiving a function f of type Ray& -> bool
+    // (aka F), this returns a new RayList returning only those who satisfy the
+    // constraint f.
+    template <typename F>
+    inline RayList filter(F f) const {
+        RayList out;
+        for (auto it = cbegin(); it != cend(); ++it) {
+            auto r = *it;
+            if (f(r)) {
+                out.push(r);
+            }
+        }
+        return out;
+    }
 };
 
 }  // namespace RAYX

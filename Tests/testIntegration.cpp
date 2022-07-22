@@ -33,67 +33,42 @@ TEST_F(TestSuite, PlaneGratingIncAzMis) {
     compareAgainstRayUI("PlaneGratingIncAzMis");
 }
 TEST_F(TestSuite, ReflectionZonePlateAzim200) {
-    auto a_unfiltered = traceRML("ReflectionZonePlateAzim200");
+    auto a = traceRML("ReflectionZonePlateAzim200").filter([](Ray& r) {
+        return r.m_extraParam == 21.0;
+    });
     auto b = loadCSVRayUI("ReflectionZonePlateAzim200");
-
-    RayList a;
-    for (auto r : a_unfiltered) {
-        if (r.m_extraParam == 21.0) {
-            a.push(r);
-        }
-    }
 
     compareRayLists(a, b, 1e-7);
 }
 TEST_F(TestSuite, ReflectionZonePlateDefault) {
-    auto a_unfiltered = traceRML("ReflectionZonePlateDefault");
+    auto a = traceRML("ReflectionZonePlateDefault").filter([](Ray& r) {
+        return r.m_extraParam == 21.0;
+    });
     auto b = loadCSVRayUI("ReflectionZonePlateDefault");
-
-    RayList a;
-    for (auto r : a_unfiltered) {
-        if (r.m_extraParam == 21.0) {
-            a.push(r);
-        }
-    }
 
     compareRayLists(a, b, 1e-7);
 }
 TEST_F(TestSuite, ReflectionZonePlateDefault200) {
-    auto a_unfiltered = traceRML("ReflectionZonePlateDefault200");
+    auto a = traceRML("ReflectionZonePlateDefault200").filter([](Ray& r) {
+        return r.m_extraParam == 21.0;
+    });
     auto b = loadCSVRayUI("ReflectionZonePlateDefault200");
-
-    RayList a;
-    for (auto r : a_unfiltered) {
-        if (r.m_extraParam == 21.0) {
-            a.push(r);
-        }
-    }
 
     compareRayLists(a, b, 1e-7);
 }
 TEST_F(TestSuite, ReflectionZonePlateDefault200Toroid) {
-    auto a_unfiltered = traceRML("ReflectionZonePlateDefault200Toroid");
+    auto a = traceRML("ReflectionZonePlateDefault200Toroid").filter([](Ray& r) {
+        return r.m_extraParam == 21.0;
+    });
     auto b = loadCSVRayUI("ReflectionZonePlateDefault200Toroid");
-
-    RayList a;
-    for (auto r : a_unfiltered) {
-        if (r.m_extraParam == 21.0) {
-            a.push(r);
-        }
-    }
 
     compareRayLists(a, b, 1e-7);
 }
 TEST_F(TestSuite, ReflectionZonePlateMis) {
-    auto a_unfiltered = traceRML("ReflectionZonePlateMis");
+    auto a = traceRML("ReflectionZonePlateMis").filter([](Ray& r) {
+        return r.m_extraParam == 21.0;
+    });
     auto b = loadCSVRayUI("ReflectionZonePlateMis");
-
-    RayList a;
-    for (auto r : a_unfiltered) {
-        if (r.m_extraParam == 21.0) {
-            a.push(r);
-        }
-    }
 
     compareRayLists(a, b, 1e-7);
 }
@@ -122,18 +97,11 @@ TEST_F(TestSuite, slit) { compareAgainstRayUI("slit"); }
 TEST_F(TestSuite, toroid) { compareAgainstRayUI("toroid"); }
 
 TEST_F(TestSuite, Ellipsoid) {
-    auto rayx = traceRML("Ellipsoid");
-
-    int count = 0;
-    for (auto ray : rayx) {
-        if (ray.m_extraParam == 21.0) {  // 1 = Ellipsoid, 2 = ImagePlane
-            count += 1;
-            CHECK_EQ(ray.m_position, glm::dvec3(0, 0, 0), 1e-11);
-        }
-    }
-    if (count != 92) {
-        RAYX_ERR << "unexpected number of rays (" << count
-                 << ") hitting the ImagePlane from the "
-                    "Ellipsoid!";
+    auto rayx = traceRML("Ellipsoid").filter([](Ray& r) {
+        return r.m_extraParam == 21.0;
+    });
+    CHECK_EQ(rayx.rayAmount(), 92);
+    for (auto r : rayx) {
+        CHECK_EQ(r.m_position, glm::dvec3(0, 0, 0), 1e-11);
     }
 }

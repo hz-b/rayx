@@ -99,19 +99,10 @@ RAYX::RayList loadCSVRayUI(std::string filename) {
     return out;
 }
 
-RAYX::RayList filterWeightZeroRays(const RAYX::RayList& input) {
-    RAYX::RayList out;
-    for (auto it = input.cbegin(); it != input.cend(); ++it) {
-        if ((*it).m_weight != 0) {
-            out.push(*it);
-        }
-    }
-    return out;
-}
-
 void compareRayLists(const RAYX::RayList& rayx_list_unfiltered,
                      const RAYX::RayList& rayui_list, double t) {
-    auto rayx_list = filterWeightZeroRays(rayx_list_unfiltered);
+    auto rayx_list = rayx_list_unfiltered.filter(
+        [](RAYX::Ray& r) { return r.m_weight != 0; });
 
     CHECK_EQ(rayx_list.rayAmount(), rayui_list.rayAmount());
 
