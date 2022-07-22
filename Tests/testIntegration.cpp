@@ -20,6 +20,55 @@ TEST_F(TestSuite, PlaneGratingDeviationAzMis) {
 
 TEST_F(TestSuite, BoringImagePlane) { compareAgainstRayUI("BoringImagePlane"); }
 
+TEST_F(TestSuite, CylinderDefault) {
+    compareAgainstRayUI("CylinderDefault", 1e-7);
+}
+
+TEST_F(TestSuite, PlaneGratingDevAzMisVLS) {
+    compareAgainstRayUI("PlaneGratingDevAzMisVLS", 1e-7);
+}
+TEST_F(TestSuite, PlaneGratingIncAzMis) {
+    compareAgainstRayUI("PlaneGratingIncAzMis");
+}
+TEST_F(TestSuite, ReflectionZonePlateAzim200) {
+    compareAgainstRayUI("ReflectionZonePlateAzim200");
+}
+TEST_F(TestSuite, ReflectionZonePlateDefault) {
+    compareAgainstRayUI("ReflectionZonePlateDefault");
+}
+TEST_F(TestSuite, ReflectionZonePlateDefault200) {
+    compareAgainstRayUI("ReflectionZonePlateDefault200");
+}
+TEST_F(TestSuite, ReflectionZonePlateDefault200Toroid) {
+    compareAgainstRayUI("ReflectionZonePlateDefault200Toroid");
+}
+TEST_F(TestSuite, ReflectionZonePlateMis) {
+    compareAgainstRayUI("ReflectionZonePlateMis");
+}
+TEST_F(TestSuite, Spec1Pfirst_rzp4mm) {
+    compareAgainstRayUI("Spec1+first_rzp4mm");
+}
+TEST_F(TestSuite, Spec1Mfirst_rzp02mm) {
+    compareAgainstRayUI("Spec1-first_rzp02mm");
+}
+TEST_F(TestSuite, Spec1Mfirst_rzp4mm) {
+    compareAgainstRayUI("Spec1-first_rzp4mm");
+}
+TEST_F(TestSuite, ellipsoid_ip_200ellipsmis) {
+    compareAgainstRayUI("ellipsoid_ip_200ellipsmis");
+}
+TEST_F(TestSuite, ellipsoid_ip_200mirrormis) {
+    compareAgainstRayUI("ellipsoid_ip_200mirrormis");
+}
+TEST_F(TestSuite, globalCoordinates_20rays) {
+    compareAgainstRayUI("globalCoordinates_20rays");
+}
+TEST_F(TestSuite, pm_ell_ip_200mirrormis) {
+    compareAgainstRayUI("pm_ell_ip_200mirrormis");
+}
+TEST_F(TestSuite, slit) { compareAgainstRayUI("slit"); }
+TEST_F(TestSuite, toroid) { compareAgainstRayUI("toroid"); }
+
 TEST_F(TestSuite, Ellipsoid) {
     auto rayx = traceRML("Ellipsoid");
 
