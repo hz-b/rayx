@@ -46,16 +46,56 @@ TEST_F(TestSuite, ReflectionZonePlateAzim200) {
     compareRayLists(a, b, 1e-7);
 }
 TEST_F(TestSuite, ReflectionZonePlateDefault) {
-    compareAgainstRayUI("ReflectionZonePlateDefault");
+    auto a_unfiltered = traceRML("ReflectionZonePlateDefault");
+    auto b = loadCSVRayUI("ReflectionZonePlateDefault");
+
+    RayList a;
+    for (auto r : a_unfiltered) {
+        if (r.m_extraParam == 21.0) {
+            a.push(r);
+        }
+    }
+
+    compareRayLists(a, b, 1e-7);
 }
 TEST_F(TestSuite, ReflectionZonePlateDefault200) {
-    compareAgainstRayUI("ReflectionZonePlateDefault200");
+    auto a_unfiltered = traceRML("ReflectionZonePlateDefault200");
+    auto b = loadCSVRayUI("ReflectionZonePlateDefault200");
+
+    RayList a;
+    for (auto r : a_unfiltered) {
+        if (r.m_extraParam == 21.0) {
+            a.push(r);
+        }
+    }
+
+    compareRayLists(a, b, 1e-7);
 }
 TEST_F(TestSuite, ReflectionZonePlateDefault200Toroid) {
-    compareAgainstRayUI("ReflectionZonePlateDefault200Toroid");
+    auto a_unfiltered = traceRML("ReflectionZonePlateDefault200Toroid");
+    auto b = loadCSVRayUI("ReflectionZonePlateDefault200Toroid");
+
+    RayList a;
+    for (auto r : a_unfiltered) {
+        if (r.m_extraParam == 21.0) {
+            a.push(r);
+        }
+    }
+
+    compareRayLists(a, b, 1e-7);
 }
 TEST_F(TestSuite, ReflectionZonePlateMis) {
-    compareAgainstRayUI("ReflectionZonePlateMis");
+    auto a_unfiltered = traceRML("ReflectionZonePlateMis");
+    auto b = loadCSVRayUI("ReflectionZonePlateMis");
+
+    RayList a;
+    for (auto r : a_unfiltered) {
+        if (r.m_extraParam == 21.0) {
+            a.push(r);
+        }
+    }
+
+    compareRayLists(a, b, 1e-7);
 }
 TEST_F(TestSuite, Spec1Pfirst_rzp4mm) {
     compareAgainstRayUI("Spec1+first_rzp4mm");
@@ -86,9 +126,7 @@ TEST_F(TestSuite, Ellipsoid) {
 
     int count = 0;
     for (auto ray : rayx) {
-        auto dist =
-            abs(ray.m_extraParam - 21);  // 1 = Ellipsoid, 2 = ImagePlane
-        if (dist < 0.5) {
+        if (ray.m_extraParam == 21.0) {  // 1 = Ellipsoid, 2 = ImagePlane
             count += 1;
             CHECK_EQ(ray.m_position, glm::dvec3(0, 0, 0), 1e-11);
         }
