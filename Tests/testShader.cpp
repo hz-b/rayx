@@ -1,8 +1,6 @@
 #include "Tracer/CpuTracer.h"
 #include "setupTests.h"
 
-// TODO(rudi): shader tests
-
 using namespace RAYX;
 
 TEST_F(TestSuite, testUniformRandom) {
@@ -1314,7 +1312,6 @@ TEST_F(TestSuite, testGetIncidenceAngle) {
     }
 }
 
-// TODO(rudi): this test is and was broken before the refactor. See the nans.
 TEST_F(TestSuite, testReflectance) {
     {  // add copper material to cpu tracer
         std::array<bool, 92> mats;

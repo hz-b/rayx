@@ -151,9 +151,10 @@ RAYX::RayList traceRML(std::string filename);
 // element coordinates of the relevant element!)
 RAYX::RayList loadCSVRayUI(std::string filename);
 
-// TODO(rudi): this only asserts that position, direction, energy are the same
+//  this only asserts that position, direction, energy are the same
 // yet! many parameters are missing in RayUI and hence cannot be compared. but
-// for example path length could be compared. This function automatcaily filters
+// for example path length could be compared, but tests fail currently if we do so (TODO(rudi)).
+// Thhis function automatcaily filters
 // out weight = 0 rays from rayx, as they are missing in rayui.
 void compareRayLists(const RAYX::RayList& rayx, const RAYX::RayList& rayui,
                      double t = 1e-11);
