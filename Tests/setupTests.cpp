@@ -115,16 +115,13 @@ void compareRayLists(const RAYX::RayList& rayx_list,
         CHECK_EQ(rayx.m_direction, rayui.m_direction, t);
         CHECK_EQ(rayx.m_energy, rayui.m_energy, t);
 
-        // TODO(Rudi): the other ray-parameters are not tested yet.
-        // Many of them, because RAY-UI doesn't export them.
-
         ++itRayX;
         ++itRayUI;
     }
 }
 
-void compareAgainstRayUI(std::string filename) {
+void compareAgainstRayUI(std::string filename, double tolerance) {
     auto a = traceRML(filename);
     auto b = loadCSVRayUI(filename);
-    compareRayLists(a, b);
+    compareRayLists(a, b, tolerance);
 }

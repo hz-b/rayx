@@ -4,6 +4,12 @@ TEST_F(TestSuite, PlaneMirror) { compareAgainstRayUI("PlaneMirror"); }
 TEST_F(TestSuite, PlaneMirrorDef) { compareAgainstRayUI("PlaneMirrorDef"); }
 TEST_F(TestSuite, PlaneMirrorMis) { compareAgainstRayUI("PlaneMirrorMis"); }
 
+TEST_F(TestSuite, SphereMirrorDefault) {
+    compareAgainstRayUI("SphereMirrorDefault",
+                        1e-7);  // TODO(Rudi) this is unacceptable tolerance,
+                                // directly taken from the old test suite.
+}
+
 TEST_F(TestSuite, BoringImagePlane) { compareAgainstRayUI("BoringImagePlane"); }
 
 TEST_F(TestSuite, Ellipsoid) {
