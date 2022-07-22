@@ -11,6 +11,12 @@ TEST_F(TestSuite, SphereMirrorDefault) {
 TEST_F(TestSuite, PlaneGratingDeviationDefault) {
     compareAgainstRayUI("PlaneGratingDeviationDefault");
 }
+TEST_F(TestSuite, PlaneGratingDeviationAz) {
+    compareAgainstRayUI("PlaneGratingDeviationAz");
+}
+TEST_F(TestSuite, PlaneGratingDeviationAzMis) {
+    compareAgainstRayUI("PlaneGratingDeviationAzMis");
+}
 
 TEST_F(TestSuite, BoringImagePlane) { compareAgainstRayUI("BoringImagePlane"); }
 
