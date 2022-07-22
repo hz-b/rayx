@@ -292,7 +292,10 @@ dvec2 getRefractiveIndex(double energy, int material) {
 	}
 
 	// error, no matching entry found.
-	return dvec2(0.0/0.0, 0.0/0.0);
+	#ifdef CPP
+	RAYX_ERR << "getRefractiveIndex: no matching entry found!";
+	#endif
+	return dvec2(-1.0, -1.0);
 }
 
 // returns angle between ray direction and surface normal at intersection point
