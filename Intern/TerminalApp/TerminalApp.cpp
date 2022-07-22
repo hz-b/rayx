@@ -60,10 +60,11 @@ void TerminalApp::run() {
 
     // Export Rays to external data.
     exportRays(rays);
-    #ifdef RAYX_DEBUG_MODE
+
+#if defined(RAYX_DEBUG_MODE) && not defined(CPP)
     // Export Debug Matrics.
-    exportDebug(rays.rayAmount());
-    #endif
+    exportDebug();
+#endif
 
     if (m_CommandParser->m_args.m_benchmark) {
         std::chrono::steady_clock::time_point end =
@@ -129,26 +130,28 @@ void TerminalApp::exportRays(RAYX::RayList& rays) {
     }
 }
 
-#ifdef RAYX_DEBUG_MODE
+#if defined(RAYX_DEBUG_MODE) && not defined(CPP)
 /**
  * @brief Gets All Debug Buffers and check if they are the identity matrix.
  * This is a default function to show how the implemented Debug Buffer works.
  * You can write your own checking func.
  *
- * @param Amount Amount of Debug Buffer(=Number of rays)
+ * Debugging Matrices are only available on Vulkan Tracing In Debug mode
+ *
  */
-void TerminalApp::exportDebug(std::size_t Amount) {
-    struct debug_t {  // For Size reasonns
-        glm::dmat4 mat;
-    };
-    auto d = m_Tracer->getDebugList();
-    for (long unsigned int i = 0; i < Amount * sizeof(debug_t);
-         i += sizeof(debug_t)) {
-        auto* debugPtr = (struct debug_t*)(((uint8_t*)d) + i);
-        if (isIdentMatrix(debugPtr->mat)) {
-            RAYX_D_LOG << "@" << i / sizeof(debug_t);
-            printDMat4(debugPtr->mat);
+void TerminalApp::exportDebug() {
+    if (m_CommandParser->m_args.m_cpuFlag) {
+        return;
+    }
+    auto d = (const RAYX::VulkanTracer*)(m_Tracer.get());
+    int index = 0;
+    RAYX_D_LOG << "Debug Matrix Check...";
+    for (auto m : d->getDebugList()) {
+        if (isIdentMatrix(m._dMat)) {
+            printDMat4(m._dMat);
+            RAYX_D_ERR << "@" << index;
         }
+        index += 1;
     }
 }
 #endif

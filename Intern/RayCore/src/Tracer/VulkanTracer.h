@@ -61,6 +61,15 @@ class RAYX_API VulkanTracer : public Tracer {
     ~VulkanTracer();
 
     RayList trace(const Beamline&) override;
+    #ifdef RAYX_DEBUG_MODE
+    /**
+     * @brief Get the Debug List containing the Debug Matrices
+     * (Size heavy)
+     * 
+     * @return std::vector<..> of Debug Struct (MAT4x4)
+     */
+    auto getDebugList() const { return m_debugBufList; }
+#endif
 
   private:
     void run();
@@ -93,9 +102,6 @@ class RAYX_API VulkanTracer : public Tracer {
     };
 
     const RayList& getRayList() { return m_RayList; }
-#ifdef RAYX_DEBUG_MODE
-    void* getDebugList() override { return m_debugBufList.data(); }
-#endif
 
   private:
     // Member structs:

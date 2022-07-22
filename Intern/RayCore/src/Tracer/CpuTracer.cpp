@@ -34,9 +34,6 @@ RayList CpuTracer::trace(const Beamline& beamline) {
     CPU_TRACER::xyznull.data.clear();
     CPU_TRACER::matIdx.data.clear();
     CPU_TRACER::mat.data.clear();
-#ifdef RAYX_DEBUG_MODE
-    CPU_TRACER::d_struct.data.clear();
-#endif
 
     // init rayData, outputData
     for (auto r : rayList) {
@@ -59,14 +56,6 @@ RayList CpuTracer::trace(const Beamline& beamline) {
     CPU_TRACER::mat.data = materialTables.materialTable;
     CPU_TRACER::matIdx.data = materialTables.indexTable;
 
-// init debug buffer
-#ifdef RAYX_DEBUG_MODE
-    for (int i = 0; i < CPU_TRACER::numberOfRays; i++) {
-        CPU_TRACER::_debug_struct d;
-        CPU_TRACER::d_struct.data.push_back(d);
-    }
-#endif
-
     // Run the tracing by for all rays
     for (int i = 0; i < CPU_TRACER::numberOfRays; i++) {
         CPU_TRACER::gl_GlobalInvocationID = i;
@@ -81,13 +70,4 @@ RayList CpuTracer::trace(const Beamline& beamline) {
 
     return out;
 }
-#ifdef RAYX_DEBUG_MODE
-void* CpuTracer::getDebugList(){
-    std::vector<CPU_TRACER::_debug_struct> debug_out;
-        for (auto r : CPU_TRACER::d_struct.data){
-        debug_out.emplace_back(r);
-    }
-    return debug_out.data();
-}
-#endif
 }  // namespace RAYX

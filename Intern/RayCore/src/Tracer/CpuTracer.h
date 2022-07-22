@@ -21,9 +21,6 @@ class RAYX_API CpuTracer : public Tracer {
     ~CpuTracer();
 
     RayList trace(const Beamline&) override;
-    #ifdef RAYX_DEBUG_MODE
-    void* getDebugList() override;
-    #endif
 };
 
 namespace CPU_TRACER {
@@ -33,12 +30,6 @@ using dvec4 = glm::dvec4;
 using dmat3 = glm::dmat3;
 using dmat4 = glm::dmat4;
 using uint = unsigned int;
-
-#ifdef RAYX_DEBUG_MODE
-struct _debug_struct {
-    dmat4 _dMat;  // Can also be used as vectors or scalar
-};
-#endif
 
 struct Element {
     dmat4 surfaceParams;
@@ -68,9 +59,6 @@ extern ShaderArray<Element> quadricData;
 extern ShaderArray<dvec4> xyznull;
 extern ShaderArray<int> matIdx;
 extern ShaderArray<double> mat;
-#ifdef RAYX_DEBUG_MODE
-extern ShaderArray<_debug_struct> d_struct;
-#endif
 
 inline double length(dvec2 v) { return sqrt(v.x * v.x + v.y * v.y); }
 inline double mod(double x, double y) { return glm::mod(x, y); }

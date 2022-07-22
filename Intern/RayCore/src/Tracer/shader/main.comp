@@ -36,9 +36,7 @@ ShaderArray<Element> quadricData;
 ShaderArray<dvec4> xyznull;
 ShaderArray<int> matIdx;
 ShaderArray<double> mat;
-#ifdef RAYX_DEBUG_MODE
-ShaderArray<_debug_struct> d_struct;
-#endif
+
 #else
 struct Ray {
     dvec3 m_position;
@@ -126,20 +124,22 @@ void dynamicElements() {
     dvec4 closestHitpoint = dvec4(1.0 / 0.0, 1.0 / 0.0, 1.0 / 0.0, 0.0);
     dvec4 closestGlobalHitpoint;
     
-    #ifdef RAYX_DEBUG_MODE
+    #ifdef RAYX_DEBUG_MODE // Debug Matrix only works in GPU Mode and on DEBUG Build Type
+    #ifndef CPP  
     // Set Debug Struct of current Ray to identity
     d_struct[uint(gl_GlobalInvocationID)]._dMat = dmat4(1);
+    #endif
     #endif
 
     Element nextElement;
     double bounce = 1;
 
-    // Printing Example
+    // Printing Example over vkconfig Validation Layers
     if (uint(gl_GlobalInvocationID) == 2 ){
     #ifndef CPP
-    debugPrintfEXT("Hello from GPU. \n"); 
+        debugPrintfEXT("Hello from GPU. \n"); 
     #else
-    RAYX_D_LOG << "Tracing on CPU..." ; 
+        RAYX_D_LOG << "Tracing on CPU..." ; 
     #endif
     }
     // Iterate through all bounces
