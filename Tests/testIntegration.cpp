@@ -1,7 +1,11 @@
 #include "setupTests.h"
 
-TEST_F(TestSuite, BoringImagePlane) { compareAgainstRayUI("BoringImagePlane"); }
 TEST_F(TestSuite, PlaneMirror) { compareAgainstRayUI("PlaneMirror"); }
+TEST_F(TestSuite, PlaneMirrorDef) { compareAgainstRayUI("PlaneMirrorDef"); }
+TEST_F(TestSuite, PlaneMirrorMis) { compareAgainstRayUI("PlaneMirrorMis"); }
+
+TEST_F(TestSuite, BoringImagePlane) { compareAgainstRayUI("BoringImagePlane"); }
+
 TEST_F(TestSuite, Ellipsoid) {
     auto rayx = traceRML("Ellipsoid");
 
@@ -20,5 +24,3 @@ TEST_F(TestSuite, Ellipsoid) {
                     "Ellipsoid!";
     }
 }
-
-TEST_F(TestSuite, PlaneMirrorMis) { compareAgainstRayUI("PlaneMirrorMis"); }
