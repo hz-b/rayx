@@ -69,8 +69,7 @@ ReflectionZonePlate::ReflectionZonePlate(
       m_designSagittalExitArmLength(sExit),
       m_designMeridionalEntranceArmLength(mEntrance),
       m_designMeridionalExitArmLength(mExit),
-      m_orderOfDiffraction(orderOfDiffraction)
-{
+      m_orderOfDiffraction(orderOfDiffraction) {
     // set geometry
     m_Geometry->m_geometricalShape = geometricalShape;
     m_Geometry->setHeightWidth(height, width);
@@ -146,7 +145,7 @@ ReflectionZonePlate::ReflectionZonePlate(
     m_Geometry->m_position = position;
     m_Geometry->m_orientation = orientation;
     updateObjectParams();
-    
+
     // m_designEnergy = designEnergy; // if Auto == true, take energy of Source
     // (param sourceEnergy), else m_designEnergy = designEnergy
     m_designWavelength = m_designEnergy == 0 ? 0 : hvlam(m_designEnergy);
@@ -193,17 +192,6 @@ std::shared_ptr<ReflectionZonePlate> ReflectionZonePlate::createFromXML(
     if (foundWidthB) {
         return std::make_shared<ReflectionZonePlate>(
             p.name(), p.parseGeometricalShape(), p.parseCurvatureType(),
-            p.parseTotalWidth(), p.parseTotalLength(), p.parseAzimuthalAngle(),
-            p.parsePosition(), p.parseOrientation(), p.parseDesignEnergy(),
-            p.parseOrderDiffraction(), p.parseDesignOrderDiffraction(),
-            p.parseDesignAlphaAngle(), p.parseDesignBetaAngle(),
-            p.parseEntranceArmLengthMer(), p.parseExitArmLengthMer(),
-            p.parseEntranceArmLengthSag(), p.parseExitArmLengthSag(),
-            p.parseShortRadius(), p.parseLongRadius(), p.parseAdditionalOrder(),
-            p.parseFresnelZOffset(), p.parseSlopeError(), p.parseMaterial());
-    } else {
-        return std::make_shared<ReflectionZonePlate>(
-            p.name(), p.parseGeometricalShape(), p.parseCurvatureType(),
             p.parseTotalWidth(), widthB, p.parseTotalLength(),
             p.parseAzimuthalAngle(), p.parsePosition(), p.parseOrientation(),
             p.parseDesignEnergy(), p.parseOrderDiffraction(),
@@ -212,6 +200,17 @@ std::shared_ptr<ReflectionZonePlate> ReflectionZonePlate::createFromXML(
             p.parseExitArmLengthMer(), p.parseEntranceArmLengthSag(),
             p.parseExitArmLengthSag(), p.parseShortRadius(),
             p.parseLongRadius(), p.parseAdditionalOrder(),
+            p.parseFresnelZOffset(), p.parseSlopeError(), p.parseMaterial());
+    } else {
+        return std::make_shared<ReflectionZonePlate>(
+            p.name(), p.parseGeometricalShape(), p.parseCurvatureType(),
+            p.parseTotalWidth(), p.parseTotalLength(), p.parseAzimuthalAngle(),
+            p.parsePosition(), p.parseOrientation(), p.parseDesignEnergy(),
+            p.parseOrderDiffraction(), p.parseDesignOrderDiffraction(),
+            p.parseDesignAlphaAngle(), p.parseDesignBetaAngle(),
+            p.parseEntranceArmLengthMer(), p.parseExitArmLengthMer(),
+            p.parseEntranceArmLengthSag(), p.parseExitArmLengthSag(),
+            p.parseShortRadius(), p.parseLongRadius(), p.parseAdditionalOrder(),
             p.parseFresnelZOffset(), p.parseSlopeError(), p.parseMaterial());
     }
 }
