@@ -6,8 +6,10 @@ TEST_F(TestSuite, PlaneMirrorMis) { compareAgainstRayUI("PlaneMirrorMis"); }
 
 TEST_F(TestSuite, SphereMirrorDefault) {
     compareAgainstRayUI("SphereMirrorDefault",
-                        1e-7);  // TODO(Rudi) this is unacceptable tolerance,
-                                // directly taken from the old test suite.
+                        1e-7);  // TODO(Rudi) this tolerance is not so great.
+}
+TEST_F(TestSuite, PlaneGratingDeviationDefault) {
+    compareAgainstRayUI("PlaneGratingDeviationDefault");
 }
 
 TEST_F(TestSuite, BoringImagePlane) { compareAgainstRayUI("BoringImagePlane"); }
