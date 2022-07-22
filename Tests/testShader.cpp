@@ -1319,7 +1319,7 @@ TEST_F(TestSuite, testReflectance) {
     {  // add copper material to cpu tracer
         std::array<bool, 92> mats;
         mats.fill(false);
-        mats[29] = true;  // copper is relevant!
+        mats[29 - 1] = true;  // copper (i.e. element 29) is relevant!
         auto materialTables = loadMaterialTables(mats);
         CPU_TRACER::mat.data = materialTables.materialTable;
         CPU_TRACER::matIdx.data = materialTables.indexTable;
