@@ -1441,3 +1441,15 @@ TEST_F(TestSuite, testCartesianToEuler) {
         CHECK_EQ(out, p.out);
     }
 }
+
+// both the Cpp code as well as the shader define hvlam.
+TEST_F(TestSuite, testHvlam) {
+    double hv = 100;
+    double linedensity = 1000;
+    double orderOfDiff = 1;
+    double a = abs(hvlam(hv)) * abs(linedensity) * orderOfDiff * 1e-06;
+    CHECK_EQ(a, 0.01239852);
+
+    a = abs(CPU_TRACER::hvlam(hv)) * abs(linedensity) * orderOfDiff * 1e-06;
+    CHECK_EQ(a, 0.01239852);
+}

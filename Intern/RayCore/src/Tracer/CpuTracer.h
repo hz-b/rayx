@@ -99,6 +99,7 @@ void fresnel(glm::dvec2 cn1, glm::dvec2 cn2, glm::dvec2 cos_incidence,
              glm::dvec2 cos_transmittance, glm::dvec2& complex_S,
              glm::dvec2& complex_P);
 glm::dvec2 cartesian_to_euler(glm::dvec2 complex);
+double hvlam(double);
 }  // namespace CPU_TRACER
 
 }  // namespace RAYX
