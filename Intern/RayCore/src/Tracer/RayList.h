@@ -50,8 +50,8 @@ class RayList {
     RayListIter begin();
     RayListIter end();
 
-    ConstRayListIter cbegin() const;
-    ConstRayListIter cend() const;
+    ConstRayListIter begin() const;
+    ConstRayListIter end() const;
 
     int rayAmount() const;
 
@@ -63,8 +63,7 @@ class RayList {
     template <typename F>
     inline RayList filter(F f) const {
         RayList out;
-        for (auto it = cbegin(); it != cend(); ++it) {
-            auto r = *it;
+        for (auto r : *this) {
             if (f(r)) {
                 out.push(r);
             }

@@ -121,10 +121,10 @@ void compareRayLists(const RAYX::RayList& rayx_list,
                      const RAYX::RayList& rayui_list, double t) {
     CHECK_EQ(rayx_list.rayAmount(), rayui_list.rayAmount());
 
-    auto itRayX = rayx_list.cbegin();
-    auto itRayXEnd = rayx_list.cend();
+    auto itRayX = rayx_list.begin();
+    auto itRayXEnd = rayx_list.end();
 
-    auto itRayUI = rayui_list.cbegin();
+    auto itRayUI = rayui_list.begin();
 
     while (itRayX != itRayXEnd) {
         auto rayx = *itRayX;

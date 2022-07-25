@@ -28,8 +28,7 @@ void RayList::insertVector(const std::vector<Ray>& inRayVector) {
 }
 
 void RayList::push(Ray r) {
-    if (m_data.empty() ||
-        m_data.back().size() == RAY_MAX_ELEMENTS_IN_VECTOR) {
+    if (m_data.empty() || m_data.back().size() == RAY_MAX_ELEMENTS_IN_VECTOR) {
         m_data.emplace_back();
     }
     m_data.back().push_back(r);
@@ -40,14 +39,12 @@ void RayList::clean() { m_data.clear(); }
 RayListIter RayList::begin() {
     return {.m_iter = m_data.begin(), .m_offset = 0};
 }
-RayListIter RayList::end() {
-    return {.m_iter = m_data.end(), .m_offset = 0};
-}
+RayListIter RayList::end() { return {.m_iter = m_data.end(), .m_offset = 0}; }
 
-ConstRayListIter RayList::cbegin() const {
+ConstRayListIter RayList::begin() const {
     return {.m_iter = m_data.cbegin(), .m_offset = 0};
 }
-ConstRayListIter RayList::cend() const {
+ConstRayListIter RayList::end() const {
     return {.m_iter = m_data.cend(), .m_offset = 0};
 }
 
@@ -78,7 +75,7 @@ bool ConstRayListIter::operator==(const ConstRayListIter& o) const {
     return m_iter == o.m_iter && m_offset == o.m_offset;
 }
 bool ConstRayListIter::operator!=(const ConstRayListIter& o) const {
-	return !(*this == o);
+    return !(*this == o);
 }
 void ConstRayListIter::operator++() {
     m_offset++;
