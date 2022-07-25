@@ -63,8 +63,13 @@ TEST_F(TestSuite, Ellipsoid) {
         CHECK_EQ(r.m_position, glm::dvec3(0, 0, 0), 1e-11);
     }
 }
-// TODO(Rudi): fix and re-enable tests:
+
+// TODO(Rudi): fix and re-enable tests, Why do they fail?
 /*
+TEST_F(TestSuite, Ellipsoid_DGIA) { compareAgainstRayUI("Ellipsoid_DGIA"); }
+TEST_F(TestSuite, Ellipsoid_MB) { compareAgainstRayUI("Ellipsoid_MB"); }
+TEST_F(TestSuite, Ellipsoid_PM) { compareAgainstRayUI("Ellipsoid_PM"); }
+
 TEST_F(TestSuite, ellipsoid_ip_200ellipsmis_simpl) { // this is a temporary
 _simpl test, it is the same as the next test but without the ImagePlane.
     compareAgainstRayUI("ellipsoid_ip_200ellipsmis_simpl");
@@ -75,6 +80,7 @@ TEST_F(TestSuite, ellipsoid_ip_200ellipsmis) {
 TEST_F(TestSuite, ellipsoid_ip_200mirrormis) {
     compareAgainstRayUI("ellipsoid_ip_200mirrormis");
 }
-TEST_F(TestSuite, slit) { compareAgainstRayUI("slit"); }
-TEST_F(TestSuite, toroid) { compareAgainstRayUI("toroid"); }
+TEST_F(TestSuite, slit) { compareAgainstRayUI("slit"); } // remember to add both
+slit tests from test.py TEST_F(TestSuite, toroid) {
+compareAgainstRayUI("toroid"); }
 */
