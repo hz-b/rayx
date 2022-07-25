@@ -49,9 +49,14 @@ ConstRayListIter RayList::end() const {
 }
 
 int RayList::rayAmount() const {
-    int amount = (int)((m_data.size() - 1) * RAY_MAX_ELEMENTS_IN_VECTOR +
-                       (m_data.back()).size());
-    return amount;
+    if (m_data.empty()) {
+        return 0;
+    } else {
+        auto back = m_data.back();
+        int amount =
+            back.size() + (m_data.size() - 1) * RAY_MAX_ELEMENTS_IN_VECTOR;
+        return amount;
+    }
 }
 
 // mutable RayListIter
