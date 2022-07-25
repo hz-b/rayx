@@ -99,11 +99,8 @@ RAYX::RayList loadCSVRayUI(std::string filename) {
     return out;
 }
 
-void compareRayLists(const RAYX::RayList& rayx_list_unfiltered,
+void compareRayLists(const RAYX::RayList& rayx_list,
                      const RAYX::RayList& rayui_list, double t) {
-    auto rayx_list = rayx_list_unfiltered.filter(
-        [](RAYX::Ray& r) { return r.m_weight != 0; });
-
     CHECK_EQ(rayx_list.rayAmount(), rayui_list.rayAmount());
 
     auto itRayX = rayx_list.cbegin();
@@ -123,8 +120,30 @@ void compareRayLists(const RAYX::RayList& rayx_list_unfiltered,
     }
 }
 
+int intexp(int a, int b) {
+    if (b == 0) return 1;
+    return a * intexp(a, b - 1);
+}
+
+// sequentialExtraParam yields the desired extraParam for rays which went the
+// sequential route through a beamline with `count` OpticalElements.
+// sequentialExtraParam(2) = 21
+// sequentialExtraParam(3) = 321 // i.e. first element 1, then 2 and then 3.
+// ...
+int sequentialExtraParam(int count) {
+    if (count == 1) {
+        return 1;
+    }
+    return sequentialExtraParam(count - 1) + count * intexp(10, count - 1);
+}
+
 void compareAgainstRayUI(std::string filename, double tolerance) {
-    auto a = traceRML(filename);
+    auto beamline = loadBeamline(filename);
+    auto extra = sequentialExtraParam(beamline.m_OpticalElements.size());
+
+    auto a = traceRML(filename)
+                 .filter([=](Ray& r) { return r.m_extraParam == extra; })
+                 .filter([](Ray& r) { return r.m_weight != 0; });
     auto b = loadCSVRayUI(filename);
     compareRayLists(a, b, tolerance);
 }

@@ -21,6 +21,8 @@
 #include "gmock/gmock.h"
 #include "gtest/gtest.h"
 
+using namespace RAYX;
+
 extern int GLOBAL_ARGC;
 extern char** GLOBAL_ARGV;
 
@@ -151,12 +153,14 @@ RAYX::RayList traceRML(std::string filename);
 // element coordinates of the relevant element!)
 RAYX::RayList loadCSVRayUI(std::string filename);
 
-//  this only asserts that position, direction, energy are the same
+// This only asserts that position, direction, energy are the same
 // yet! many parameters are missing in RayUI and hence cannot be compared. but
-// for example path length could be compared, but tests fail currently if we do so (TODO(rudi)).
-// Thhis function automatcaily filters
-// out weight = 0 rays from rayx, as they are missing in rayui.
+// for example path length could be compared, but tests fail currently if we do
+// so (TODO(rudi)).
 void compareRayLists(const RAYX::RayList& rayx, const RAYX::RayList& rayui,
                      double t = 1e-11);
 
+// This function automatcaily filters
+// out weight = 0 rays from rayx, as they are automatically missing in rayui.
+// This also filters out non-sequential rays to compare to Ray-UI correctly.
 void compareAgainstRayUI(std::string filename, double t = 1e-11);

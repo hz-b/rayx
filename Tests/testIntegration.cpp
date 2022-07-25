@@ -1,7 +1,5 @@
 #include "setupTests.h"
 
-using namespace RAYX;
-
 TEST_F(TestSuite, PlaneMirror) { compareAgainstRayUI("PlaneMirror"); }
 TEST_F(TestSuite, PlaneMirrorDef) { compareAgainstRayUI("PlaneMirrorDef"); }
 TEST_F(TestSuite, PlaneMirrorMis) { compareAgainstRayUI("PlaneMirrorMis"); }
@@ -33,44 +31,19 @@ TEST_F(TestSuite, PlaneGratingIncAzMis) {
     compareAgainstRayUI("PlaneGratingIncAzMis");
 }
 TEST_F(TestSuite, ReflectionZonePlateAzim200) {
-    auto a = traceRML("ReflectionZonePlateAzim200").filter([](Ray& r) {
-        return r.m_extraParam == 21.0;
-    });
-    auto b = loadCSVRayUI("ReflectionZonePlateAzim200");
-
-    compareRayLists(a, b, 1e-7);
+    compareAgainstRayUI("ReflectionZonePlateAzim200", 1e-7);
 }
 TEST_F(TestSuite, ReflectionZonePlateDefault) {
-    auto a = traceRML("ReflectionZonePlateDefault").filter([](Ray& r) {
-        return r.m_extraParam == 21.0;
-    });
-    auto b = loadCSVRayUI("ReflectionZonePlateDefault");
-
-    compareRayLists(a, b, 1e-7);
+    compareAgainstRayUI("ReflectionZonePlateDefault");
 }
 TEST_F(TestSuite, ReflectionZonePlateDefault200) {
-    auto a = traceRML("ReflectionZonePlateDefault200").filter([](Ray& r) {
-        return r.m_extraParam == 21.0;
-    });
-    auto b = loadCSVRayUI("ReflectionZonePlateDefault200");
-
-    compareRayLists(a, b, 1e-7);
+    compareAgainstRayUI("ReflectionZonePlateDefault200");
 }
 TEST_F(TestSuite, ReflectionZonePlateDefault200Toroid) {
-    auto a = traceRML("ReflectionZonePlateDefault200Toroid").filter([](Ray& r) {
-        return r.m_extraParam == 21.0;
-    });
-    auto b = loadCSVRayUI("ReflectionZonePlateDefault200Toroid");
-
-    compareRayLists(a, b, 1e-7);
+    compareAgainstRayUI("ReflectionZonePlateDefault200Toroid", 1e-7);
 }
 TEST_F(TestSuite, ReflectionZonePlateMis) {
-    auto a = traceRML("ReflectionZonePlateMis").filter([](Ray& r) {
-        return r.m_extraParam == 21.0;
-    });
-    auto b = loadCSVRayUI("ReflectionZonePlateMis");
-
-    compareRayLists(a, b, 1e-7);
+    compareAgainstRayUI("ReflectionZonePlateMis", 1e-7);
 }
 
 TEST_F(TestSuite, globalCoordinates_20rays) {

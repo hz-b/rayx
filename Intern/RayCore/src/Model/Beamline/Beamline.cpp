@@ -11,8 +11,6 @@ Beamline::~Beamline() = default;
 RayList Beamline::getInputRays() const {
     RayList list;
 
-    list.insertVector(m_extraRays);
-
     for (const auto& s : m_LightSources) {
         auto sub = s->getRays();
         list.insertVector(sub);

@@ -1,8 +1,6 @@
 #include "Tracer/CpuTracer.h"
 #include "setupTests.h"
 
-using namespace RAYX;
-
 TEST_F(TestSuite, testUniformRandom) {
     uint64_t ctr = 13;
     double old = 0;
