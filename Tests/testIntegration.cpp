@@ -37,7 +37,7 @@ TEST_F(TestSuite, ReflectionZonePlateDefault) {
     compareAgainstRayUI("ReflectionZonePlateDefault");
 }
 TEST_F(TestSuite, ReflectionZonePlateDefault200) {
-    compareAgainstRayUI("ReflectionZonePlateDefault200");
+    compareAgainstRayUI("ReflectionZonePlateDefault200", 1e-7);
 }
 TEST_F(TestSuite, ReflectionZonePlateDefault200Toroid) {
     compareAgainstRayUI("ReflectionZonePlateDefault200Toroid", 1e-7);

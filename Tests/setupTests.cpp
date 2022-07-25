@@ -88,7 +88,8 @@ RAYX::RayList traceRML(std::string filename, Filter filter) {
     rays = rays.filter([](Ray& r) { return r.m_weight != 0; });
     if (filter == Filter::OnlySequentialRays) {
         auto extra = sequentialExtraParam(beamline.m_OpticalElements.size());
-        rays = rays.filter([=](Ray& r) { return r.m_extraParam == extra; });
+        rays = rays.filter(
+            [=](Ray& r) { return abs(r.m_extraParam - extra) < 0.5; });
     }
 
     return rays;
@@ -140,10 +141,8 @@ void compareRayLists(const RAYX::RayList& rayx_list,
 
 void compareAgainstRayUI(std::string filename, double tolerance) {
     auto beamline = loadBeamline(filename);
-    auto extra = sequentialExtraParam(beamline.m_OpticalElements.size());
 
-    auto a = traceRML(filename).filter(
-        [=](Ray& r) { return r.m_extraParam == extra; });
+    auto a = traceRML(filename, Filter::OnlySequentialRays);
     auto b = loadCSVRayUI(filename);
 
     writeToOutputCSV(a, filename + ".rayx");
