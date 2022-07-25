@@ -65,6 +65,10 @@ TEST_F(TestSuite, Ellipsoid) {
 }
 // TODO(Rudi): fix and re-enable tests:
 /*
+TEST_F(TestSuite, ellipsoid_ip_200ellipsmis_simpl) { // this is a temporary
+_simpl test, it is the same as the next test but without the ImagePlane.
+    compareAgainstRayUI("ellipsoid_ip_200ellipsmis_simpl");
+}
 TEST_F(TestSuite, ellipsoid_ip_200ellipsmis) {
     compareAgainstRayUI("ellipsoid_ip_200ellipsmis");
 }
