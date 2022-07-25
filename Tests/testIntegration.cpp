@@ -54,10 +54,11 @@ TEST_F(TestSuite, pm_ell_ip_200mirrormis) {
 }
 
 TEST_F(TestSuite, Ellipsoid) {
-    auto rayx = traceRML("Ellipsoid").filter([](Ray& r) {
-        return r.m_extraParam == 21.0;
-    });
+    auto rayx = traceRML("Ellipsoid", Filter::OnlySequentialRays);
+
+    writeToOutputCSV(rayx, "Ellipsoid.rayx");
     CHECK_EQ(rayx.rayAmount(), 92);
+
     for (auto r : rayx) {
         CHECK_EQ(r.m_position, glm::dvec3(0, 0, 0), 1e-11);
     }

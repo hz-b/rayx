@@ -145,8 +145,13 @@ RAYX::Beamline loadBeamline(std::string filename);
 // will write to Tests/output/<filename>.csv
 void writeToOutputCSV(RAYX::RayList& rays, std::string filename);
 
+enum class Filter { KeepAllRays, OnlySequentialRays };
+
 // returns rays in element coordinates
-RAYX::RayList traceRML(std::string filename);
+// weight = 0 rays are filtered out.
+// if filter == OnlySequentialRays, then only the sequential rays are returned.
+RAYX::RayList traceRML(std::string filename,
+                       Filter filter = Filter::KeepAllRays);
 
 // will look at Tests/input/<filename>.csv
 // the Ray-UI files are to be obtained by Export > RawRaysOutgoing (which are in

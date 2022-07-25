@@ -65,11 +65,31 @@ void writeToOutputCSV(RAYX::RayList& rays, std::string filename) {
     writeCSV(rays, f);
 }
 
-RAYX::RayList traceRML(std::string filename) {
+int intexp(int a, int b) {
+    if (b == 0) return 1;
+    return a * intexp(a, b - 1);
+}
+
+// sequentialExtraParam yields the desired extraParam for rays which went the
+// sequential route through a beamline with `count` OpticalElements.
+// sequentialExtraParam(2) = 21
+// sequentialExtraParam(3) = 321 // i.e. first element 1, then 2 and then 3.
+// ...
+int sequentialExtraParam(int count) {
+    if (count == 1) {
+        return 1;
+    }
+    return sequentialExtraParam(count - 1) + count * intexp(10, count - 1);
+}
+
+RAYX::RayList traceRML(std::string filename, Filter filter) {
     auto beamline = loadBeamline(filename);
     auto rays = tracer->trace(beamline);
-
-    writeToOutputCSV(rays, filename + ".rayx");
+    rays = rays.filter([](Ray& r) { return r.m_weight != 0; });
+    if (filter == Filter::OnlySequentialRays) {
+        auto extra = sequentialExtraParam(beamline.m_OpticalElements.size());
+        rays = rays.filter([=](Ray& r) { return r.m_extraParam == extra; });
+    }
 
     return rays;
 }
@@ -93,8 +113,6 @@ RAYX::RayList loadCSVRayUI(std::string filename) {
     while (std::getline(f, line)) {
         out.push(parseCSVline(line));
     }
-
-    writeToOutputCSV(out, filename + ".rayui");
 
     return out;
 }
@@ -120,30 +138,16 @@ void compareRayLists(const RAYX::RayList& rayx_list,
     }
 }
 
-int intexp(int a, int b) {
-    if (b == 0) return 1;
-    return a * intexp(a, b - 1);
-}
-
-// sequentialExtraParam yields the desired extraParam for rays which went the
-// sequential route through a beamline with `count` OpticalElements.
-// sequentialExtraParam(2) = 21
-// sequentialExtraParam(3) = 321 // i.e. first element 1, then 2 and then 3.
-// ...
-int sequentialExtraParam(int count) {
-    if (count == 1) {
-        return 1;
-    }
-    return sequentialExtraParam(count - 1) + count * intexp(10, count - 1);
-}
-
 void compareAgainstRayUI(std::string filename, double tolerance) {
     auto beamline = loadBeamline(filename);
     auto extra = sequentialExtraParam(beamline.m_OpticalElements.size());
 
-    auto a = traceRML(filename)
-                 .filter([=](Ray& r) { return r.m_extraParam == extra; })
-                 .filter([](Ray& r) { return r.m_weight != 0; });
+    auto a = traceRML(filename).filter(
+        [=](Ray& r) { return r.m_extraParam == extra; });
     auto b = loadCSVRayUI(filename);
+
+    writeToOutputCSV(a, filename + ".rayx");
+    writeToOutputCSV(b, filename + ".rayui");
+
     compareRayLists(a, b, tolerance);
 }
