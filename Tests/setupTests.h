@@ -105,22 +105,26 @@ inline void checkEq(std::string filename, int line, std::string l,
             RAYX::formatAsVec(R),                                   \
             ##__VA_ARGS__)  // __VA_ARGS__ = tolerance or nothing
 
-#define CHECK(x)                                              \
-    {                                                         \
-        if (!(x)) {                                           \
+#define CHECK(x)                                      \
+    {                                                 \
+        if (!(x)) {                                   \
             RAYX_ERR << "CHECK(" << #x << ") failed"; \
-        }                                                     \
+        }                                             \
     }
 
-#define CHECK_IN(expr, low, high)                                       \
-    {                                                                   \
-        auto res = expr;                                                \
-        if (res < (low)) {                                              \
-            RAYX_ERR << "CHECK_IN failed: " << #expr << " < " << #low;  \
-        }                                                               \
-        if (res > (high)) {                                             \
-            RAYX_ERR << "CHECK_IN failed: " << #expr << " > " << #high; \
-        }                                                               \
+#define CHECK_IN(expr, low, high)                                             \
+    {                                                                         \
+        auto res = expr;                                                      \
+        auto res_low = low;                                                   \
+        if (res < res_low) {                                                  \
+            RAYX_ERR << "CHECK_IN failed: " << #expr << " (" << res << ") < " \
+                     << #low;                                                 \
+        }                                                                     \
+        auto res_high = high;                                                 \
+        if (res > res_high) {                                                 \
+            RAYX_ERR << "CHECK_IN failed: " << #expr << " (" << res << ") > " \
+                     << #high;                                                \
+        }                                                                     \
     }
 
 // ShaderTest

@@ -7,9 +7,7 @@ TEST_F(TestSuite, testUniformRandom) {
 
     for (int i = 0; i < 100; i++) {
         double d = CPU_TRACER::squaresDoubleRNG(ctr);
-        if (d == old) {
-            RAYX_ERR << "repeating number in testUniformRandom! " << d;
-        }
+        CHECK(d != old);  // repeating numbers are forbidden!
         CHECK_IN(d, 0.0, 1.0);
         old = d;
     }

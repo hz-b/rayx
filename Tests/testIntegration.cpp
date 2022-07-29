@@ -100,7 +100,6 @@ TEST_F(TestSuite, ellipsoid_ip_200ellipsmis) {
 TEST_F(TestSuite, ellipsoid_ip_200mirrormis) {
     compareAgainstRayUI("ellipsoid_ip_200mirrormis");
 }
-TEST_F(TestSuite, slit) { compareAgainstRayUI("slit"); } // remember to add both
-slit tests from test.py TEST_F(TestSuite, toroid) {
+TEST_F(TestSuite, toroid) {
 compareAgainstRayUI("toroid"); }
 */
