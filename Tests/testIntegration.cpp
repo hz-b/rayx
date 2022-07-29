@@ -1,7 +1,17 @@
 #include "setupTests.h"
 
 TEST_F(TestSuite, PlaneMirror) { compareAgainstRayUI("PlaneMirror"); }
-TEST_F(TestSuite, PlaneMirrorDef) { compareAgainstRayUI("PlaneMirrorDef"); }
+TEST_F(TestSuite, PlaneMirrorDef) {
+    compareAgainstRayUI("PlaneMirrorDef");
+
+    // additional path length test
+    auto rays = traceRML("PlaneMirrorDef");
+    for (auto r : rays) {
+        if (r.m_pathLength < 11000 || r.m_pathLength > 11001) {
+            RAYX_ERR << "out of range pathLength: " << r.m_pathLength;
+        }
+    }
+}
 TEST_F(TestSuite, PlaneMirrorMis) { compareAgainstRayUI("PlaneMirrorMis"); }
 
 TEST_F(TestSuite, SphereMirrorDefault) {
