@@ -89,7 +89,7 @@ RAYX::RayList traceRML(std::string filename, Filter filter) {
     if (filter == Filter::OnlySequentialRays) {
         auto extra = sequentialExtraParam(beamline.m_OpticalElements.size());
         rays = rays.filter(
-            [=](Ray& r) { return abs(r.m_extraParam - extra) < 0.5; });
+            [=](Ray& r) { return intclose(r.m_extraParam, extra); });
     }
 
     return rays;

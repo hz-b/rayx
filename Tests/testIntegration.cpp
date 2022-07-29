@@ -75,7 +75,7 @@ TEST_F(TestSuite, Ellipsoid) {
 TEST_F(TestSuite, Slit) {
     auto rays = traceRML("slit");
     for (auto r : rays) {
-        if (r.m_weight != 1) {
+        if (!intclose(r.m_weight, 1)) {
             continue;
         }
 
