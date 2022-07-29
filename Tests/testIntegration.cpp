@@ -7,9 +7,7 @@ TEST_F(TestSuite, PlaneMirrorDef) {
     // additional path length test
     auto rays = traceRML("PlaneMirrorDef");
     for (auto r : rays) {
-        if (r.m_pathLength < 11000 || r.m_pathLength > 11001) {
-            RAYX_ERR << "out of range pathLength: " << r.m_pathLength;
-        }
+        CHECK_IN(r.m_pathLength, 11000, 11001);
     }
 }
 TEST_F(TestSuite, PlaneMirrorMis) { compareAgainstRayUI("PlaneMirrorMis"); }
@@ -71,6 +69,18 @@ TEST_F(TestSuite, Ellipsoid) {
 
     for (auto r : rayx) {
         CHECK_EQ(r.m_position, glm::dvec3(0, 0, 0), 1e-11);
+    }
+}
+
+TEST_F(TestSuite, Slit) {
+    auto rays = traceRML("slit");
+    for (auto r : rays) {
+        if (r.m_weight != 1) {
+            continue;
+        }
+
+        CHECK_IN(abs(r.m_position.x), 0, 6);
+        CHECK_IN(abs(r.m_position.y), 0.5, 1.3);
     }
 }
 

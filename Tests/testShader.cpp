@@ -10,9 +10,7 @@ TEST_F(TestSuite, testUniformRandom) {
         if (d == old) {
             RAYX_ERR << "repeating number in testUniformRandom! " << d;
         }
-        if (d < 0.0 || d > 1.0) {
-            RAYX_ERR << "random number out of range [0, 1]: " << d;
-        }
+        CHECK_IN(d, 0.0, 1.0);
         old = d;
     }
 }
@@ -1080,14 +1078,8 @@ TEST_F(TestSuite, testDiffraction) {
         double dpsi = 0;
         CPU_TRACER::diffraction(i.in_iopt, i.in_xLength, i.in_yLength, i.in_wl,
                                 dphi, dpsi, i.in_ctr);
-        double abs_dphi = abs(dphi);
-        double abs_dpsi = abs(dpsi);
-        if (abs_dphi < lowerDphi || abs_dphi > upperDphi) {
-            RAYX_ERR << "wrong dphi";
-        }
-        if (abs_dpsi < lowerDpsi || abs_dpsi > upperDpsi) {
-            RAYX_ERR << "wrong dpsi";
-        }
+        CHECK_IN(abs(dphi), lowerDphi, upperDphi);
+        CHECK_IN(abs(dpsi), lowerDpsi, upperDpsi);
     }
 }
 
