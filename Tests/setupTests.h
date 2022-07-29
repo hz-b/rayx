@@ -105,6 +105,13 @@ inline void checkEq(std::string filename, int line, std::string l,
             RAYX::formatAsVec(R),                                   \
             ##__VA_ARGS__)  // __VA_ARGS__ = tolerance or nothing
 
+#define ASSERT(x)                                             \
+    {                                                         \
+        if (!(x)) {                                           \
+            RAYX_ERR << "assertion failed: \"" << #x << "\""; \
+        }                                                     \
+    }
+
 // ShaderTest
 
 extern std::unique_ptr<RAYX::Tracer> tracer;
