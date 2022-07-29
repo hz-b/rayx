@@ -16,6 +16,13 @@ TEST_F(TestSuite, MatrixSource) {
     compareRayLists(a, b);
 }
 
+// this tests tracing an only-lightsource beamline. An error-prone edge case.
+TEST_F(TestSuite, MatrixSourceTraced) {
+    auto a = traceRML("MatrixSource");
+    auto b = loadCSVRayUI("MatrixSource");
+    compareRayLists(a, b);
+}
+
 TEST_F(TestSuite, PointSourceHardEdge) {
     auto rays = loadBeamline("PointSourceHardEdge").getInputRays();
     checkDistribution(rays, 120.97, 12.1);
