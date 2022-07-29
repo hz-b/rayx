@@ -84,8 +84,8 @@ TEST_F(TestSuite, Slit) {
     }
 }
 
-/*
 TEST_F(TestSuite, toroid_MS) { compareAgainstRayUI("toroid_MS"); }
+/*
 TEST_F(TestSuite, toroid_MS_T) { compareAgainstRayUI("toroid_MS_T"); }
 TEST_F(TestSuite, toroid) { compareAgainstRayUI("toroid"); }
 */

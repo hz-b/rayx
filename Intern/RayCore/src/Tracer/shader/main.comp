@@ -132,6 +132,10 @@ void dynamicElements() {
     #endif
 
     Element nextElement;
+    // at the end of this function we apply inTrans, if no collision happened (i.e. nextElement undefined), we want this to do nothing.
+    nextElement.inTrans = dmat4(1);
+    nextElement.outTrans = dmat4(1);
+
     double bounce = 1;
 
     // Printing Example over vkconfig Validation Layers
