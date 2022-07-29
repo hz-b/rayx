@@ -1,12 +1,5 @@
 #include "setupTests.h"
 
-TEST_F(TestSuite, MatrixSource) {
-    auto beamline = loadBeamline("MatrixSource");
-    auto a = beamline.getInputRays();
-    auto b = loadCSVRayUI("MatrixSource");
-    compareRayLists(a, b);
-}
-
 void checkDistribution(const RayList& rays, double sourceEnergy,
                        double energySpread) {
     CHECK_EQ(rays.rayAmount(), 200);
@@ -18,6 +11,13 @@ void checkDistribution(const RayList& rays, double sourceEnergy,
             RAYX_ERR << "range is " << min_e << " to " << max_e;
         }
     }
+}
+
+TEST_F(TestSuite, MatrixSource) {
+    auto beamline = loadBeamline("MatrixSource");
+    auto a = beamline.getInputRays();
+    auto b = loadCSVRayUI("MatrixSource");
+    compareRayLists(a, b);
 }
 
 TEST_F(TestSuite, PointSourceHardEdge) {
