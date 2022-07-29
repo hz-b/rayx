@@ -38,3 +38,19 @@ TEST_F(TestSuite, PointSourceSoftEdge) {
         }
     }
 }
+
+TEST_F(TestSuite, MatrixSourceEnergyDistribution) {
+    auto rays = loadBeamline("MatrixSourceSpreaded").getInputRays();
+
+    double sourceEnergy = 42;
+    double energySpread = 10;
+    CHECK_EQ(rays.rayAmount(), 200);
+    for (auto r : rays) {
+        double min_e = sourceEnergy - energySpread;
+        double max_e = sourceEnergy + energySpread;
+        if (r.m_energy > max_e || r.m_energy < min_e) {
+            RAYX_WARN << "energy out of range: " << r.m_energy;
+            RAYX_ERR << "range is " << min_e << " to " << max_e;
+        }
+    }
+}
