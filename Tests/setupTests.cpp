@@ -65,21 +65,19 @@ void writeToOutputCSV(RAYX::RayList& rays, std::string filename) {
     writeCSV(rays, f);
 }
 
-int intexp(int a, int b) {
-    if (b == 0) return 1;
-    return a * intexp(a, b - 1);
-}
-
 // sequentialExtraParam yields the desired extraParam for rays which went the
 // sequential route through a beamline with `count` OpticalElements.
 // sequentialExtraParam(2) = 21
 // sequentialExtraParam(3) = 321 // i.e. first element 1, then 2 and then 3.
 // ...
 int sequentialExtraParam(int count) {
-    if (count == 1) {
-        return 1;
+    int out = 0;
+    int fac = 1;
+    for (int i = 1; i <= count; i++) {  // i goes from 1 to count
+        out += i * fac;
+        fac *= 10;
     }
-    return sequentialExtraParam(count - 1) + count * intexp(10, count - 1);
+    return out;
 }
 
 RAYX::RayList traceRML(std::string filename, Filter filter) {
