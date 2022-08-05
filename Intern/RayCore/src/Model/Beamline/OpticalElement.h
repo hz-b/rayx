@@ -65,64 +65,6 @@ class RAYX_API OpticalElement {
                 m_height = height;
             }
         }
-        /**
-         * calculates element to world coordinates transformation matrix and its
-         * inverse
-         * @param   position     4 element vector which describes the position
-         * of the element in world coordinates
-         * @param   orientation  4x4 matrix that describes the orientation of
-         * the surface with respect to the world coordinate system
-         * @return void
-         */
-        void calcTransformationMatrices(glm::dvec4 position,
-                                        glm::dmat4 orientation,
-                                        glm::dmat4& output,
-                                        bool calcInMatrix = true) {
-#ifdef RAYX_DEBUG_MODE
-            RAYX_LOG << "Calculated orientation";
-            for (int i = 0; i < 4; i++) {
-                std::stringstream s;
-                s.precision(17);
-                s << '\t';
-                for (int j = 0; j < 4; j++) {
-                    s << orientation[i][j] << ", ";
-                }
-                RAYX_LOG << s.str();
-            }
-            std::stringstream s;
-            s.precision(17);
-            s << "Position: ";
-            for (int i = 0; i < 4; i++) {
-                s << position[i] << ", ";
-            }
-            RAYX_LOG << s.str();
-#endif
-
-            glm::dmat4x4 rotation = glm::dmat4x4(
-                orientation[0][0], orientation[0][1], orientation[0][2], 0.0,
-                orientation[1][0], orientation[1][1], orientation[1][2], 0.0,
-                orientation[2][0], orientation[2][1], orientation[2][2], 0.0,
-                0.0, 0.0, 0.0, 1.0);  // o
-            glm::dmat4x4 inv_rotation = glm::transpose(rotation);
-
-            if (calcInMatrix) {
-                glm::dmat4x4 translation =
-                    glm::dmat4x4(1, 0, 0, -position[0], 0, 1, 0, -position[1],
-                                 0, 0, 1, -position[2], 0, 0, 0, 1);  // o
-                // ray = tran * rot * ray
-                glm::dmat4x4 g2e = translation * rotation;
-                output = glm::transpose(g2e);
-                return;
-            } else {
-                glm::dmat4x4 inv_translation =
-                    glm::dmat4x4(1, 0, 0, position[0], 0, 1, 0, position[1], 0,
-                                 0, 1, position[2], 0, 0, 0, 1);  // o
-                // inverse of m_inMatrix
-                glm::dmat4x4 e2g = inv_rotation * inv_translation;
-                output = glm::transpose(e2g);
-                return;
-            }
-        }
     };
 
     // needed to add optical elements to tracer
@@ -145,6 +87,10 @@ class RAYX_API OpticalElement {
     void setSurface(std::unique_ptr<Surface> surface);
     void updateObjectParams();
     [[maybe_unused]] void updateObjectParamsNoGeometry();
+
+    void calcTransformationMatrices(glm::dvec4 position, glm::dmat4 orientation,
+                                    glm::dmat4& output,
+                                    bool calcInMatrix = true) const;
 
     double getWidth();
     double getHeight();
