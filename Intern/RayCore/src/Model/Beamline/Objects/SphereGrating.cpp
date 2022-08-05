@@ -54,8 +54,6 @@ SphereGrating::SphereGrating(const char* name, GratingMount mount,
     m_Geometry->m_orientation = orientation;
     updateObjectParams();
     
-    RAYX_LOG << name;
-
     double icurv = 1;
     m_gratingMount = mount;
     auto matd = (double)static_cast<int>(mat);

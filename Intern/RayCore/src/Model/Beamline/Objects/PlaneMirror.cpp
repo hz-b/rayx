@@ -41,7 +41,6 @@ PlaneMirror::PlaneMirror(const char* name,
     m_Geometry->m_orientation = orientation;    
     updateObjectParams();
 
-    RAYX_LOG << name;
     auto matd = (double)static_cast<int>(mat);
     setSurface(std::make_unique<Quadric>(std::array<double, 4 * 4>{
         0, 0, 0, 0, 1, 0, 0, -1, 0, 0, 0, 0, 0, 0, matd, 0}));

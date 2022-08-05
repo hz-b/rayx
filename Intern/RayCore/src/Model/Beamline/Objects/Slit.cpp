@@ -55,7 +55,6 @@ Slit::Slit(const char* name, OpticalElement::GeometricalShape geometricalShape,
         0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -1, 3, 0, 0, 0}));
     setElementParameters({m_beamstopWidth / 2, m_beamstopHeight / 2, 0, 0, 0, 0,
                           0, 0, 0, 0, 0, 0, 0, 0, 0, 0});
-    RAYX_LOG << "Created.";
 }
 
 std::shared_ptr<Slit> Slit::createFromXML(const xml::Parser& p) {

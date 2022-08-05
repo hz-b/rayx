@@ -22,7 +22,6 @@ ImagePlane::ImagePlane(const char* name, glm::dvec4 position,
     m_Geometry->m_position = position;
     updateObjectParams();
 
-    RAYX_LOG << name;
     setSurface(std::make_unique<Quadric>(std::array<double, 4 * 4>{
         0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 5, 0, 0, 0}));
 }

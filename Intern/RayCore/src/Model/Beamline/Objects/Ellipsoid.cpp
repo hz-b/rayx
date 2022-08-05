@@ -54,7 +54,7 @@ Ellipsoid::Ellipsoid(const char* name,
     m_Geometry->m_orientation = orientation;    
     updateObjectParams();
 
-    RAYX_LOG << name;
+    RAYX_D_LOG << name;
     m_offsetY0 =
         0;  // what is this for? RAY.FOR: "only !=0 in case of Monocapillary"
 
@@ -75,7 +75,7 @@ Ellipsoid::Ellipsoid(const char* name,
         m_halfAxisC = sqrt(pow(m_shortHalfAxisB, 2) / m_a11);
     }
 
-    RAYX_LOG << "A= " << m_longHalfAxisA << ", B= " << m_shortHalfAxisB
+    RAYX_D_LOG << "A= " << m_longHalfAxisA << ", B= " << m_shortHalfAxisB
              << ", C= " << m_halfAxisC;
 
     // a33, 34, 44
@@ -97,17 +97,17 @@ Ellipsoid::Ellipsoid(const char* name,
     m_a44 = -pow(m_shortHalfAxisB, 2) + pow(m_y0, 2) +
             pow(m_z0 * m_shortHalfAxisB / m_longHalfAxisA, 2);
 
-    RAYX_LOG << "alpha1: " << m_tangentAngle
+    RAYX_D_LOG << "alpha1: " << m_tangentAngle
              << "; in Degree: " << radToDeg(m_tangentAngle);
-    RAYX_LOG << "m_y0: " << m_y0;
-    RAYX_LOG << "m_z0: " << m_z0;
-    RAYX_LOG << "m_a11: " << m_a11;
-    RAYX_LOG << "m_a22: " << m_a22;
-    RAYX_LOG << "m_a23: " << m_a23;
-    RAYX_LOG << "m_a24 (m_radius): " << m_a24;
-    RAYX_LOG << "m_a33: " << m_a33;
-    RAYX_LOG << "m_a34: " << m_a34;
-    RAYX_LOG << "m_a44: " << m_a44;
+    RAYX_D_LOG << "m_y0: " << m_y0;
+    RAYX_D_LOG << "m_z0: " << m_z0;
+    RAYX_D_LOG << "m_a11: " << m_a11;
+    RAYX_D_LOG << "m_a22: " << m_a22;
+    RAYX_D_LOG << "m_a23: " << m_a23;
+    RAYX_D_LOG << "m_a24 (m_radius): " << m_a24;
+    RAYX_D_LOG << "m_a33: " << m_a33;
+    RAYX_D_LOG << "m_a34: " << m_a34;
+    RAYX_D_LOG << "m_a44: " << m_a44;
 
     double icurv = 1;
     auto matd = (double)static_cast<int>(mat);
@@ -157,7 +157,7 @@ void Ellipsoid::calculateCenterFromHalfAxes(double angle) {
         mt = pow(m_shortHalfAxisB / m_longHalfAxisA, 2) * m_z0 / m_y0;
     }
     m_tangentAngle = (atan(mt));
-    RAYX_LOG << "Z0 = " << m_z0 << ", Y0= " << m_y0
+    RAYX_D_LOG << "Z0 = " << m_z0 << ", Y0= " << m_y0
              << ", tangentAngle= " << m_tangentAngle;
 }
 
@@ -201,7 +201,7 @@ void Ellipsoid::calcHalfAxes() {
         m_halfAxisC = sqrt(pow(m_shortHalfAxisB, 2) / m_a11);
     }
     m_tangentAngle = angle;
-    RAYX_LOG << "A= " << m_longHalfAxisA << ", B= " << m_shortHalfAxisB
+    RAYX_D_LOG << "A= " << m_longHalfAxisA << ", B= " << m_shortHalfAxisB
              << ", C= " << m_halfAxisC
              << ", angle = " << radToDeg(m_tangentAngle);
 }

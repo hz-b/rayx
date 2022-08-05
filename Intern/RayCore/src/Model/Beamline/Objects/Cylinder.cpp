@@ -51,8 +51,7 @@ Cylinder::Cylinder(const char* name,
     m_Geometry->m_orientation = orientation;
     updateObjectParams();
     
-    RAYX_LOG << name;
-    RAYX_LOG << ((m_direction == CylinderDirection::LongRadiusR)
+    RAYX_D_LOG << ((m_direction == CylinderDirection::LongRadiusR)
                      ? "LONG RADIUS"
                      : "SHORT RADIUS");
     if (m_direction == CylinderDirection::LongRadiusR) {  // X-DIR
