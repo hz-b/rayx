@@ -102,25 +102,11 @@ void OpticalElement::calcTransformationMatrices(glm::dvec4 position,
                                                 glm::dmat4 orientation,
                                                 glm::dmat4& output,
                                                 bool calcInMatrix) const {
-#ifdef RAYX_DEBUG_MODE
-    RAYX_LOG << "Calculated orientation";
-    for (int i = 0; i < 4; i++) {
-        std::stringstream s;
-        s.precision(17);
-        s << '\t';
-        for (int j = 0; j < 4; j++) {
-            s << orientation[i][j] << ", ";
-        }
-        RAYX_LOG << s.str();
-    }
-    std::stringstream s;
-    s.precision(17);
-    s << "Position: ";
-    for (int i = 0; i < 4; i++) {
-        s << position[i] << ", ";
-    }
-    RAYX_LOG << s.str();
-#endif
+    // Uncomment for verbose calculations
+    // RAYX_D_LOG << "Orientation:";
+    // printDMat4(orientation);
+    // RAYX_D_LOG << "Position: ";
+    // printDVec4(position);
 
     glm::dmat4x4 rotation = glm::dmat4x4(
         orientation[0][0], orientation[0][1], orientation[0][2], 0.0,
@@ -183,7 +169,6 @@ std::array<double, 4 * 4> OpticalElement::getElementParameters() const {
 }
 
 std::array<double, 4 * 4> OpticalElement::getSurfaceParams() const {
-    RAYX_LOG << "return anchor points";
     // assert(m_surfacePtr!=nullptr);
     if (m_surfacePtr != nullptr)
         return m_surfacePtr->getParams();

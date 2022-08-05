@@ -49,7 +49,6 @@ Quadric::~Quadric() = default;
  *materials.xmacro)
  **/
 std::array<double, 4 * 4> Quadric::getParams() const {
-    RAYX_LOG << "return surface parameters";
     return m_parameters;
 }
 
