@@ -31,20 +31,7 @@ class RAYX_API ReflectionZonePlate : public OpticalElement {
     // and the position and orientation in world coordinates is already derived
     ReflectionZonePlate(
         const char* name, OpticalElement::GeometricalShape geometricalShape,
-        CurvatureType curvatureType, const double width, const double height,
-        const double azimuthalAngle, const glm::dvec4 position,
-        const glm::dmat4x4 orientation, const double designEnergy,
-        const double orderOfDiffraction, const double designOrderOfDiffraction,
-        const double dAlpha, const double dBeta, const double mEntrance,
-        const double mExit, const double sEntrance, const double sExit,
-        const double shortRadius, const double longRadius,
-        const int additionalZeroOrder, const double fresnelZOffset,
-        const std::array<double, 7> slopeError, Material mat);
-
-    // ! temporary constructor for trapezoid (10/11/2021)
-    ReflectionZonePlate(
-        const char* name, OpticalElement::GeometricalShape geometricalShape,
-        CurvatureType curvatureType, const double widthA, const double widthB,
+        CurvatureType curvatureType, const double widthA, const std::optional<double> widthB,
         const double height, const double azimuthalAngle,
         const glm::dvec4 position, const glm::dmat4x4 orientation,
         const double designEnergy, const double orderOfDiffraction,
