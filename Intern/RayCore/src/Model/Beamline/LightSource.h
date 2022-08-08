@@ -8,10 +8,10 @@
 #include <variant>
 #include <vector>
 
-
 #include "Core.h"
 #include "EnergyDistribution.h"
 #include "Tracer/Ray.h"
+#include "Tracer/RayList.h"
 #include "glm.hpp"
 
 namespace RAYX {
@@ -65,7 +65,7 @@ class RAYX_API LightSource {
     glm::dvec3 getDirectionFromAngles(double phi, double psi) const;
     // get the rays according to specific light source, has to be implemented in
     // each class that inherits from LightSource
-    virtual std::vector<Ray> getRays() const = 0;
+    virtual RayList getRays() const = 0;
 
     LightSource();
     virtual ~LightSource();

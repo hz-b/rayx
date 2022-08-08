@@ -22,7 +22,7 @@ class RAYX_API PointSource : public LightSource {
 
     static std::shared_ptr<PointSource> createFromXML(const xml::Parser&);
 
-    std::vector<Ray> getRays() const override;
+    RayList getRays() const override;
 
   private:
     // Geometric Parameters

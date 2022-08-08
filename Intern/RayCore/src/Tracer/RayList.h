@@ -45,7 +45,14 @@ class RayList {
     // appends vector of Rays to the ray list
     void insertVector(const std::vector<Ray>& inRayVector);
     void push(Ray);
+    void append(const RayList& other);
     void clean();
+
+    // Ray& at(size_t index);
+    const Ray& at(size_t index) const;
+    // Ray& operator[](size_t index);
+    const Ray& operator[](size_t index) const;
+    
 
     RayListIter begin();
     RayListIter end();
@@ -55,7 +62,7 @@ class RayList {
 
     int rayAmount() const;
 
-    std::list<std::vector<Ray>> m_data;
+    std::list<std::vector<Ray>> m_data; // TODO(Jannis): make private
 
     // a typical filter operator, receiving a function f of type Ray& -> bool
     // (aka F), this returns a new RayList returning only those who satisfy the

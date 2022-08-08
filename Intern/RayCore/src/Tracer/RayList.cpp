@@ -34,7 +34,29 @@ void RayList::push(Ray r) {
     m_data.back().push_back(r);
 }
 
+void RayList::append(const RayList& other) {
+    for (auto& vec : other.m_data) {
+        insertVector(vec);
+    }
+}
+
 void RayList::clean() { m_data.clear(); }
+
+// Ray& at(size_t index);
+const Ray& RayList::at(size_t index) const {
+    size_t vecIndex = index / RAY_MAX_ELEMENTS_IN_VECTOR;
+    size_t elemIndex = index % RAY_MAX_ELEMENTS_IN_VECTOR;
+    auto listIter = m_data.begin();
+    std::advance(listIter, vecIndex);
+    return (*listIter)[elemIndex];
+}
+
+// Ray& operator[](size_t index);
+const Ray& RayList::operator[](size_t index) const {
+    return at(index);
+}
+
+
 
 RayListIter RayList::begin() {
     return {.m_iter = m_data.begin(), .m_offset = 0};

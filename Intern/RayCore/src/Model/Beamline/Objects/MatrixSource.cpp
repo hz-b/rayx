@@ -66,7 +66,7 @@ std::shared_ptr<MatrixSource> MatrixSource::createFromXML(const xml::Parser& p) 
  * direction as first 4) distributed evenly across width & height of source
  * returns vector of rays
  */
-std::vector<Ray> MatrixSource::getRays() const {
+RayList MatrixSource::getRays() const {
     RAYX_PROFILE_FUNCTION();
     double lower_bound = 0;
     double upper_bound = 1;
@@ -77,8 +77,8 @@ std::vector<Ray> MatrixSource::getRays() const {
         en;  // x,y,z pos, psi,phi direction cosines, en=energy
     int rmat = int(sqrt(m_numberOfRays));
 
-    std::vector<Ray> rayVector;
-    rayVector.reserve(1048576);
+    RayList returnList;
+    // rayVector.reserve(1048576);
     RAYX_LOG << "create " << rmat << " times " << rmat
              << " matrix with Matrix Source...";
     // fill the square with rmat1xrmat1 rays
@@ -109,7 +109,7 @@ std::vector<Ray> MatrixSource::getRays() const {
 
             Ray r = {position, 1.0, direction, en, stokes, 0.0, 0.0, 0.0, 0.0};
             // Ray(1, 2, 3, 7, 4, 5, 6, 8, 9, 10, 11, 12, 13, 14, 15, 16);
-            rayVector.push_back(r);
+            returnList.push(r);
         }
     }
     // afterwards start from the beginning again
@@ -130,13 +130,13 @@ std::vector<Ray> MatrixSource::getRays() const {
         Ray r_copy(position.x, position.y, position.z, direction.x, direction.y,
                    direction.z, stokes.x, stokes.y, stokes.z, stokes.w, en,
                    1.0);*/
-        Ray r_copy((const Ray&)rayVector.at(i));
+        Ray r_copy((const Ray&)returnList.at(i));
         r_copy.m_energy = en = selectEnergy();
-        rayVector.push_back(r_copy);
+        returnList.push(r_copy);
     }
-    RAYX_LOG << "&rayVector: " << &(rayVector[0]);
+    RAYX_LOG << "&rayVector: " << &(returnList[0]);
     // rayVector.resize(1048576);
-    return rayVector;
+    return returnList;
 }
 
 }  // namespace RAYX

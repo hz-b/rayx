@@ -13,7 +13,7 @@ RayList Beamline::getInputRays() const {
 
     for (const auto& s : m_LightSources) {
         auto sub = s->getRays();
-        list.insertVector(sub);
+        list.append(sub);
     }
 
     return list;
