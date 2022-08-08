@@ -1,11 +1,13 @@
 #pragma once
-#include <Data/xml.h>
-#include <Material/Material.h>
-#include <UserParameter/GeometricUserParams.h>
 
+#include <optional>
+
+#include "Data/xml.h"
+#include "Material/Material.h"
 #include "Model/Beamline/OpticalElement.h"
 #include "Model/Surface/Quadric.h"
 #include "Model/Surface/Toroid.h"
+#include "UserParameter/GeometricUserParams.h"
 
 namespace RAYX {
 
@@ -31,18 +33,19 @@ class RAYX_API ReflectionZonePlate : public OpticalElement {
     // and the position and orientation in world coordinates is already derived
     ReflectionZonePlate(
         const char* name, OpticalElement::GeometricalShape geometricalShape,
-        CurvatureType curvatureType, const double widthA, const std::optional<double> widthB,
-        const double height, const double azimuthalAngle,
-        const glm::dvec4 position, const glm::dmat4x4 orientation,
-        const double designEnergy, const double orderOfDiffraction,
-        const double designOrderOfDiffraction, const double dAlpha,
-        const double dBeta, const double mEntrance, const double mExit,
-        const double sEntrance, const double sExit, const double shortRadius,
-        const double longRadius, const int additionalZeroOrder,
-        const double fresnelZOffset, const std::array<double, 7> slopeError,
-        Material mat);
+        CurvatureType curvatureType, const double widthA,
+        const std::optional<double> widthB, const double height,
+        const double azimuthalAngle, const glm::dvec4 position,
+        const glm::dmat4x4 orientation, const double designEnergy,
+        const double orderOfDiffraction, const double designOrderOfDiffraction,
+        const double dAlpha, const double dBeta, const double mEntrance,
+        const double mExit, const double sEntrance, const double sExit,
+        const double shortRadius, const double longRadius,
+        const int additionalZeroOrder, const double fresnelZOffset,
+        const std::array<double, 7> slopeError, Material mat);
 
-    static std::shared_ptr<ReflectionZonePlate> createFromXML(const xml::Parser&);
+    static std::shared_ptr<ReflectionZonePlate> createFromXML(
+        const xml::Parser&);
 
     // for calculating incidence and exit angle from user parameters
     void calcAlpha();
