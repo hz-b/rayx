@@ -40,6 +40,30 @@ void RayList::append(const RayList& other) {
     }
 }
 
+/**
+ * @brief size returns the number of vectors in the ray list.
+ * @return number of vectors in the ray list.
+ */
+size_t RayList::size() const {
+    if (m_data.empty()) return 0;
+    return m_data.size();
+}
+
+/**
+ * @brief rayAmount returns the number of rays in the ray list.
+ * @return number of rays in the ray list.
+ */
+size_t RayList::rayAmount() const {
+    if (m_data.empty()) {
+        return 0;
+    } else {
+        auto back = m_data.back();
+        int amount =
+            back.size() + (m_data.size() - 1) * RAY_MAX_ELEMENTS_IN_VECTOR;
+        return amount;
+    }
+}
+
 void RayList::clean() { m_data.clear(); }
 
 // Ray& at(size_t index);
@@ -52,11 +76,7 @@ const Ray& RayList::at(size_t index) const {
 }
 
 // Ray& operator[](size_t index);
-const Ray& RayList::operator[](size_t index) const {
-    return at(index);
-}
-
-
+const Ray& RayList::operator[](size_t index) const { return at(index); }
 
 RayListIter RayList::begin() {
     return {.m_iter = m_data.begin(), .m_offset = 0};
@@ -68,17 +88,6 @@ ConstRayListIter RayList::begin() const {
 }
 ConstRayListIter RayList::end() const {
     return {.m_iter = m_data.cend(), .m_offset = 0};
-}
-
-int RayList::rayAmount() const {
-    if (m_data.empty()) {
-        return 0;
-    } else {
-        auto back = m_data.back();
-        int amount =
-            back.size() + (m_data.size() - 1) * RAY_MAX_ELEMENTS_IN_VECTOR;
-        return amount;
-    }
 }
 
 // mutable RayListIter

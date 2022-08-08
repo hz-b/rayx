@@ -46,23 +46,20 @@ class RayList {
     void insertVector(const std::vector<Ray>& inRayVector);
     void push(Ray);
     void append(const RayList& other);
+    size_t size() const;
+    size_t rayAmount() const;
     void clean();
 
     // Ray& at(size_t index);
     const Ray& at(size_t index) const;
     // Ray& operator[](size_t index);
     const Ray& operator[](size_t index) const;
-    
 
     RayListIter begin();
     RayListIter end();
 
     ConstRayListIter begin() const;
     ConstRayListIter end() const;
-
-    int rayAmount() const;
-
-    std::list<std::vector<Ray>> m_data; // TODO(Jannis): make private
 
     // a typical filter operator, receiving a function f of type Ray& -> bool
     // (aka F), this returns a new RayList returning only those who satisfy the
@@ -77,6 +74,9 @@ class RayList {
         }
         return out;
     }
+
+    // private:
+    std::list<std::vector<Ray>> m_data;  // TODO(Jannis): make private
 };
 
 }  // namespace RAYX
