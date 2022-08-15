@@ -148,3 +148,14 @@ void compareAgainstRayUI(std::string filename, double tolerance) {
 
     compareRayLists(a, b, tolerance);
 }
+
+void updateCpuTracerMaterialTables(std::vector<Material> mats_vec) {
+    std::array<bool, 92> mats;
+    mats.fill(false);
+    for (auto m : mats_vec) {
+        mats[static_cast<int>(m) - 1] = true;
+    }
+    auto materialTables = loadMaterialTables(mats);
+    CPU_TRACER::mat.data = materialTables.materialTable;
+    CPU_TRACER::matIdx.data = materialTables.indexTable;
+}
