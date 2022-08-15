@@ -29,7 +29,9 @@ void RayList::insertVector(const std::vector<Ray>& inRayVector) {
 
 void RayList::push(Ray r) {
     if (m_data.empty() || m_data.back().size() == RAY_MAX_ELEMENTS_IN_VECTOR) {
-        m_data.emplace_back();
+        std::vector<Ray> v;
+        v.reserve(RAY_MAX_ELEMENTS_IN_VECTOR);
+        m_data.emplace_back(v);
     }
     m_data.back().push_back(r);
 }
