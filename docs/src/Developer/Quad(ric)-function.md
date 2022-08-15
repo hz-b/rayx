@@ -5,7 +5,7 @@ Function for calculating the intersection of a ray with the surface of an optica
 ### Input: 
 
 * 16 parameters $a_{11}$ to $a_{44}$ to define the surface in 3D space with the general equation for second order surfaces. Parameter values for specific surfaces can be found in the [documentation](https://it-ed-git.basisit.de/RAY/RAY/-/wikis/uploads/bdcf4515e03b2fccf462c5f0d76052c3/Paper_Schaefers_RAY_Springer_2007.pdf).
-* $ray = \begin{bmatrix} x_{S'} \\ y_{S'} \\z_{S'} \\ \end{bmatrix} + t \begin{bmatrix} l_{S'} \\ m_{S'}\\ n_{S'} \\ \end{bmatrix}$
+* $ray = \begin{bmatrix} x_{S'} \cr y_{S'} \cr z_{S'} \end{bmatrix} + t \begin{bmatrix} l_{S'} \cr m_{S'} \cr n_{S'} \end{bmatrix}$
 * weight/III (set to 0(python)/-4(Fortran) if ray missed surface, unchanged otherwise)
 * icurv: determines the sign in the formula for calculating $t$, if negative first intersection point, if positive second intersection point.
 
@@ -46,9 +46,9 @@ Assume $l_{S'} \geq m_{S'}$ and $l_{S'} \geq n_{S'}$ (first case). Then, we can 
 $$
 \begin{align*}
     ray 
-    &\overset{\text{I}}{=} \begin{bmatrix} x_{S'} \\ y_{S'} \\z_{S'} \\ \end{bmatrix} + t \begin{bmatrix} 1 \\ m_{S'}/l_{S'}\\ n_{S'}/l_{S'} \\ \end{bmatrix} \\
-    &\overset{\text{II}}{=} \begin{bmatrix} x_{S'}-1\cdot x_{S'} \\ y_{S'} - (m_{S'}/l_{S'}) \cdot y_{S'} \\z_{S'} - (n_{S'}/l_{S'}) \cdot z_{S'} \\ \end{bmatrix} + t \begin{bmatrix} 1 \\ m_{S'}/l_{S'}\\ n_{S'}/l_{S'} \\ \end{bmatrix} \\
-    &\overset{\text{III}}{=} \begin{bmatrix} 0 \\ y \\ z \end{bmatrix} + t \begin{bmatrix} 1 \\ a_{ml} \\ a_{nl} \\ \end{bmatrix} 
+    &\overset{\text{I}}{=} \begin{bmatrix} x_{S'} \cr y_{S'} \cr z_{S'} \end{bmatrix} + t \begin{bmatrix} 1 \\ m_{S'}/l_{S'}\\ n_{S'}/l_{S'} \\ \end{bmatrix} \\
+    &\overset{\text{II}}{=} \begin{bmatrix} x_{S'}-1\cdot x_{S'} \\ y_{S'} - (m_{S'}/l_{S'}) \cdot y_{S'} \cr z_{S'} - (n_{S'}/l_{S'}) \cdot z_{S'} \cr \end{bmatrix} + t \begin{bmatrix} 1 \cr m_{S'}/l_{S'} \cr n_{S'}/l_{S'} \end{bmatrix} \\
+    &\overset{\text{III}}{=} \begin{bmatrix} 0 \cr y \cr z \end{bmatrix} + t \begin{bmatrix} 1 \cr a_{ml} \cr a_{nl} \end{bmatrix} 
 \end{align*}
 $$
 
