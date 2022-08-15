@@ -1488,6 +1488,37 @@ TEST_F(TestSuite, testPalik) {
     CHECK_EQ(Au10.k, 57.666);
 }
 
+TEST_F(TestSuite, testNff) {
+    updateCpuTracerMaterialTables({Material::Cu, Material::Au});
+
+    int Cu = static_cast<int>(Material::Cu);
+    CHECK_EQ(CPU_TRACER::getNffEntryCount(Cu), 504);
+
+    auto Cu0 = CPU_TRACER::getNffEntry(0, Cu);
+
+    CHECK_EQ(Cu0.energy, 10.0);
+    CHECK_EQ(Cu0.f1, -9999.0);
+    CHECK_EQ(Cu0.f2, 1.30088);
+
+    auto Cu10 = CPU_TRACER::getNffEntry(10, Cu);
+    CHECK_EQ(Cu10.energy, 11.7404);
+    CHECK_EQ(Cu10.f1, -9999.0);
+    CHECK_EQ(Cu10.f2, 1.66946);
+
+    int Au = static_cast<int>(Material::Au);
+    CHECK_EQ(CPU_TRACER::getNffEntryCount(Au), 506);
+
+    auto Au0 = CPU_TRACER::getNffEntry(0, Au);
+    CHECK_EQ(Au0.energy, 10.0);
+    CHECK_EQ(Au0.f1, -9999.0);
+    CHECK_EQ(Au0.f2, 1.73645);
+
+    auto Au10 = CPU_TRACER::getNffEntry(10, Au);
+    CHECK_EQ(Au10.energy, 11.7404);
+    CHECK_EQ(Au10.f1, -9999.0);
+    CHECK_EQ(Au10.f2, 2.67227);
+}
+
 TEST_F(TestSuite, testRefractiveIndex) {
     updateCpuTracerMaterialTables({Material::Cu});
 
