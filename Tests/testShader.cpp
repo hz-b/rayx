@@ -1458,6 +1458,36 @@ TEST_F(TestSuite, testGetAtomicMassAndRho) {
              glm::dvec2(238.0289, 18.92));
 }
 
+TEST_F(TestSuite, testPalik) {
+    updateCpuTracerMaterialTables({Material::Cu, Material::Au});
+
+    int Cu = static_cast<int>(Material::Cu);
+    CHECK_EQ(CPU_TRACER::getPalikEntryCount(Cu), 324);
+
+    auto Cu0 = CPU_TRACER::getPalikEntry(0, Cu);
+    CHECK_EQ(Cu0.energy, 1.0);
+    CHECK_EQ(Cu0.n, 0.433);
+    CHECK_EQ(Cu0.k, 8.46);
+
+    auto Cu10 = CPU_TRACER::getPalikEntry(10, Cu);
+    CHECK_EQ(Cu10.energy, 2.3);
+    CHECK_EQ(Cu10.n, 1.04);
+    CHECK_EQ(Cu10.k, 2.59);
+
+    int Au = static_cast<int>(Material::Au);
+    CHECK_EQ(CPU_TRACER::getPalikEntryCount(Au), 386);
+
+    auto Au0 = CPU_TRACER::getPalikEntry(0, Au);
+    CHECK_EQ(Au0.energy, 0.04959);
+    CHECK_EQ(Au0.n, 20.3);
+    CHECK_EQ(Au0.k, 76.992);
+
+    auto Au10 = CPU_TRACER::getPalikEntry(10, Au);
+    CHECK_EQ(Au10.energy, 0.11158);
+    CHECK_EQ(Au10.n, 12.963);
+    CHECK_EQ(Au10.k, 57.666);
+}
+
 TEST_F(TestSuite, testRefractiveIndex) {
     updateCpuTracerMaterialTables({Material::Cu});
 

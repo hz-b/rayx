@@ -39,8 +39,17 @@ struct Element {
     dmat4 elementParameters;
 };
 
-struct PalikEntry;
-struct NffEntry;
+struct PalikEntry {
+    double energy;
+    double n;
+    double k;
+};
+
+struct NffEntry {
+    double energy;
+    double f1;
+    double f2;
+};
 
 // this type intends to mimic the GLSL type T[], this is used for layouts.
 template <typename T>
