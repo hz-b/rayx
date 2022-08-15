@@ -1443,3 +1443,28 @@ TEST_F(TestSuite, testHvlam) {
     a = abs(CPU_TRACER::hvlam(hv)) * abs(linedensity) * orderOfDiff * 1e-06;
     CHECK_EQ(a, 0.01239852);
 }
+
+TEST_F(TestSuite, testRefractiveIndex) {
+    {  // add copper material to cpu tracer
+        std::array<bool, 92> mats;
+        mats.fill(false);
+        mats[29 - 1] = true;  // copper (i.e. element 29) is relevant!
+        auto materialTables = loadMaterialTables(mats);
+        CPU_TRACER::mat.data = materialTables.materialTable;
+        CPU_TRACER::matIdx.data = materialTables.indexTable;
+    }
+    // vacuum
+    CHECK_EQ(CPU_TRACER::getRefractiveIndex(42.0, -1), glm::dvec2(1.0, 0.0));
+
+    // palik tests for Cu
+    // data taken from Data/PALIK
+    CHECK_EQ(CPU_TRACER::getRefractiveIndex(1.0, 29), glm::dvec2(0.433, 8.46));
+    CHECK_EQ(CPU_TRACER::getRefractiveIndex(1.8, 29), glm::dvec2(0.213, 4.05));
+    CHECK_EQ(CPU_TRACER::getRefractiveIndex(1977.980, 29),
+             glm::dvec2(1.000032, 9.4646668E-05));
+
+    // nff tests for Cu
+    // data taken from https://refractiveindex.info/?shelf=main&book=Cu&page=Hagemann
+    CHECK_EQ(CPU_TRACER::getRefractiveIndex(25146.2, 29),
+             glm::dvec2(1.0, 1.0328e-7), 1e-5);
+}
