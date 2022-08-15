@@ -1301,7 +1301,7 @@ TEST_F(TestSuite, testGetIncidenceAngle) {
 }
 
 TEST_F(TestSuite, testReflectance) {
-	updateCpuTracerMaterialTables({Material::Cu});
+    updateCpuTracerMaterialTables({Material::Cu});
 
     struct InOutPair {
         double in_energy;
@@ -1437,8 +1437,29 @@ TEST_F(TestSuite, testHvlam) {
     CHECK_EQ(a, 0.01239852);
 }
 
+TEST_F(TestSuite, testGetAtomicMassAndRho) {
+    CHECK_EQ(CPU_TRACER::getAtomicMassAndRho(static_cast<int>(Material::H)),
+             glm::dvec2(1.00794, 0.0708));
+    CHECK_EQ(CPU_TRACER::getAtomicMassAndRho(static_cast<int>(Material::He)),
+             glm::dvec2(4.0026, 0.122));
+    CHECK_EQ(CPU_TRACER::getAtomicMassAndRho(static_cast<int>(Material::Li)),
+             glm::dvec2(6.941, 0.533));
+    CHECK_EQ(CPU_TRACER::getAtomicMassAndRho(static_cast<int>(Material::Be)),
+             glm::dvec2(9.01218, 1.845));
+    CHECK_EQ(CPU_TRACER::getAtomicMassAndRho(static_cast<int>(Material::B)),
+             glm::dvec2(10.81, 2.34));
+    CHECK_EQ(CPU_TRACER::getAtomicMassAndRho(static_cast<int>(Material::C)),
+             glm::dvec2(12.011, 2.26));
+    // ...
+    CHECK_EQ(CPU_TRACER::getAtomicMassAndRho(static_cast<int>(Material::Cu)),
+             glm::dvec2(63.546, 8.94));
+    // ...
+    CHECK_EQ(CPU_TRACER::getAtomicMassAndRho(static_cast<int>(Material::U)),
+             glm::dvec2(238.0289, 18.92));
+}
+
 TEST_F(TestSuite, testRefractiveIndex) {
-	updateCpuTracerMaterialTables({Material::Cu});
+    updateCpuTracerMaterialTables({Material::Cu});
 
     // vacuum
     CHECK_EQ(CPU_TRACER::getRefractiveIndex(42.0, -1), glm::dvec2(1.0, 0.0));
