@@ -38,12 +38,10 @@ PlaneMirror::PlaneMirror(const char* name,
     m_Geometry->setHeightWidth(height, width);
     m_Geometry->m_azimuthalAngle = azimuthalAngle;
     m_Geometry->m_position = position;
-    m_Geometry->m_orientation = orientation;
-    m_Geometry->calcTransformationMatrices(position, orientation);
+    m_Geometry->m_orientation = orientation;    
     updateObjectParams();
 
-    RAYX_LOG << name;
-    double matd = (double)static_cast<int>(mat);
+    auto matd = (double)static_cast<int>(mat);
     setSurface(std::make_unique<Quadric>(std::array<double, 4 * 4>{
         0, 0, 0, 0, 1, 0, 0, -1, 0, 0, 0, 0, 0, 0, matd, 0}));
 }
@@ -61,16 +59,15 @@ PlaneMirror::PlaneMirror(const char* name,
     m_Geometry->m_azimuthalAngle = azimuthalAngle;
     m_Geometry->m_position = position;
     m_Geometry->m_orientation = orientation;
-    m_Geometry->calcTransformationMatrices(position, orientation);
     updateObjectParams();
     
     RAYX_LOG << name;
-    double matd = (double)static_cast<int>(mat);
+    auto matd = (double)static_cast<int>(mat);
     setSurface(std::make_unique<Quadric>(std::array<double, 4 * 4>{
         0, 0, 0, 0, 1, 0, 0, -1, 0, 0, 0, 0, 0, 0, matd, 0}));
 }
 
-std::shared_ptr<PlaneMirror> PlaneMirror::createFromXML(xml::Parser p) {
+std::shared_ptr<PlaneMirror> PlaneMirror::createFromXML(const xml::Parser& p) {
     double widthB;
     bool foundWidthB = xml::paramDouble(p.node, "totalWidthB", &widthB);
     if (foundWidthB) {

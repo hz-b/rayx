@@ -16,7 +16,7 @@ class RAYX_API ToroidMirror : public OpticalElement {
                  const double longRadius, const double shortRadius,           
                  const std::array<double, 7> slopeError, Material mat);
 
-    static std::shared_ptr<ToroidMirror> createFromXML(xml::Parser);
+    static std::shared_ptr<ToroidMirror> createFromXML(const xml::Parser&);
 
     double getRadius() const;
 

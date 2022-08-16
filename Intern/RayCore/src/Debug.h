@@ -18,7 +18,6 @@
 #include <sstream>
 #include <string>
 #include <vector>
-#include <Tracer/Ray.h>
 
 #include "Core.h"
 
@@ -86,7 +85,7 @@ struct RAYX_API Err {
     std::string filename;
     int line;
 
-    Err(std::string filename, int line);
+    Err(const std::string& filename, int line);
 
     ~Err();
 
@@ -103,6 +102,10 @@ struct RAYX_API IgnoreLog {
         return *this;
     }
 };
+
+// the function to be called after RAYX_ERR happens.
+// normally exit(1), but in the test suite it's ADD_FAILURE.
+extern void (*error_fn)();
 
 #define RAYX_LOG RAYX::Log(__FILE__, __LINE__)
 #define RAYX_WARN RAYX::Warn(__FILE__, __LINE__)
@@ -162,7 +165,16 @@ inline std::vector<double> formatAsVec(std::array<double, N> arg) {
 
 inline std::vector<double> formatAsVec(double arg) { return {arg}; }
 
-void dbg(std::string filename, int line, std::string name,
+inline std::vector<double> formatAsVec(Ray arg) {
+    return {arg.m_position.x,  arg.m_position.y,  arg.m_position.z,
+            arg.m_weight,      arg.m_direction.x, arg.m_direction.y,
+            arg.m_direction.z, arg.m_energy,      arg.m_stokes.x,
+            arg.m_stokes.y,    arg.m_stokes.z,    arg.m_stokes.w,
+            arg.m_pathLength,  arg.m_order,       arg.m_lastElement,
+            arg.m_extraParam};
+}
+
+void dbg(const std::string& filename, int line, std::string name,
          std::vector<double> v);
 
 #define RAYX_DBG(C) RAYX::dbg(__FILE__, __LINE__, #C, RAYX::formatAsVec(C))

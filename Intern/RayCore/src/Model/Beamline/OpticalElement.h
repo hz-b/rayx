@@ -30,8 +30,6 @@ class RAYX_API OpticalElement {
                                         // (needed for stokes vector)
         glm::dmat4x4 m_orientation = glm::dmat4x4();
         glm::dvec4 m_position = glm::dvec4();
-        glm::dmat4 m_inMatrix = glm::dmat4();
-        glm::dmat4 m_outMatrix = glm::dmat4();
         GeometricalShape m_geometricalShape = GeometricalShape::RECTANGLE;
 
         // Default CTOR
@@ -44,10 +42,7 @@ class RAYX_API OpticalElement {
             m_orientation =
                 glm::dmat4x4();  ///< orientation in world coordinate system
             m_position = glm::dvec4();  ///< position in world coordinates
-            m_inMatrix = glm::dmat4();
-            m_outMatrix = glm::dmat4();
             m_geometricalShape = GeometricalShape::RECTANGLE;
-            calcTransformationMatrices(m_position, m_orientation);
         }
         // Copy CTOR
         Geometry(const Geometry& geometry) {
@@ -57,8 +52,6 @@ class RAYX_API OpticalElement {
             m_azimuthalAngle = geometry.m_azimuthalAngle;
             m_orientation = geometry.m_orientation;
             m_position = geometry.m_position;
-            m_inMatrix = geometry.m_inMatrix;
-            m_outMatrix = geometry.m_outMatrix;
             m_geometricalShape = geometry.m_geometricalShape;
         }
 
@@ -72,67 +65,11 @@ class RAYX_API OpticalElement {
                 m_height = height;
             }
         }
-        /**
-         * calculates element to world coordinates transformation matrix and its
-         * inverse
-         * @param   position     4 element vector which describes the position
-         * of the element in world coordinates
-         * @param   orientation  4x4 matrix that describes the orientation of
-         * the surface with respect to the world coordinate system
-         * @return void
-         */
-        void calcTransformationMatrices(glm::dvec4 position,
-                                        glm::dmat4x4 orientation) {
-            RAYX_LOG << "Calculated orientation";
-            for (int i = 0; i < 4; i++) {
-                std::stringstream s;
-                s.precision(17);
-                s << '\t';
-                for (int j = 0; j < 4; j++) {
-                    s << orientation[i][j] << ", ";
-                }
-                RAYX_LOG << s.str();
-            }
-            std::stringstream s;
-            s.precision(17);
-            s << "Position: ";
-            for (int i = 0; i < 4; i++) {
-                s << position[i] << ", ";
-            }
-            RAYX_LOG << s.str();
-
-            glm::dmat4x4 translation =
-                glm::dmat4x4(1, 0, 0, -position[0], 0, 1, 0, -position[1], 0, 0,
-                             1, -position[2], 0, 0, 0, 1);  // o
-            glm::dmat4x4 inv_translation =
-                glm::dmat4x4(1, 0, 0, position[0], 0, 1, 0, position[1], 0, 0,
-                             1, position[2], 0, 0, 0, 1);  // o
-            glm::dmat4x4 rotation = glm::dmat4x4(
-                orientation[0][0], orientation[0][1], orientation[0][2], 0.0,
-                orientation[1][0], orientation[1][1], orientation[1][2], 0.0,
-                orientation[2][0], orientation[2][1], orientation[2][2], 0.0,
-                0.0, 0.0, 0.0, 1.0);  // o
-            glm::dmat4x4 inv_rotation = glm::transpose(rotation);
-
-            // ray = tran * rot * ray
-            glm::dmat4x4 g2e = translation * rotation;
-            m_inMatrix = glm::transpose(g2e);
-
-            // inverse of m_inMatrix
-            glm::dmat4x4 e2g = inv_rotation * inv_translation;
-            m_outMatrix = glm::transpose(e2g);
-
-            /*RAYX_LOG << "from position and orientation";
-            printDMatrix(m_inMatrix);
-            printDMatrix(m_outMatrix);*/
-        }
     };
 
     // needed to add optical elements to tracer
     OpticalElement(const char* name,
                    const std::array<double, 4 * 4> surfaceParams,
-                   const std::array<double, 4 * 4> inputInMatrix,
-                   const std::array<double, 4 * 4> inputOutMatrix,
                    const std::array<double, 4 * 4> OParameters,
                    const std::array<double, 4 * 4> EParameters);
 
@@ -146,21 +83,20 @@ class RAYX_API OpticalElement {
 
     virtual ~OpticalElement() = default;
 
-    // TODO(Jannis): Add a method where each element can define how to build its
-    // geometry
-
     void setElementParameters(std::array<double, 4 * 4> params);
-    void setInMatrix(std::array<double, 4 * 4> inputMatrix);
-    void setOutMatrix(std::array<double, 4 * 4> inputMatrix);
     void setSurface(std::unique_ptr<Surface> surface);
     void updateObjectParams();
-    void updateObjectParamsNoGeometry();
+    [[maybe_unused]] void updateObjectParamsNoGeometry();
+
+    void calcTransformationMatrices(glm::dvec4 position, glm::dmat4 orientation,
+                                    glm::dmat4& output,
+                                    bool calcInMatrix = true) const;
 
     double getWidth();
     double getHeight();
 
-    std::array<double, 4 * 4> getInMatrix() const;
-    std::array<double, 4 * 4> getOutMatrix() const;
+    glm::dmat4 getInMatrix() const;
+    glm::dmat4 getOutMatrix() const;
     glm::dmat4x4 getOrientation() const;
     glm::dvec4 getPosition() const;
     std::array<double, 4 * 4> getObjectParameters();
@@ -168,7 +104,7 @@ class RAYX_API OpticalElement {
     std::array<double, 4 * 4> getSurfaceParams() const;
     std::array<double, 7> getSlopeError() const;
 
-    const char* m_name;
+    [[maybe_unused]] const char* m_name;
 
   protected:
     // GEOMETRY

@@ -21,8 +21,8 @@ class RAYX_API PlaneMirror : public OpticalElement {
                 const double azimuthalAngle, glm::dvec4 position,
                 glm::dmat4x4 orientation,
                 const std::array<double, 7> slopeError, Material mat);
-
-    static std::shared_ptr<PlaneMirror> createFromXML(xml::Parser);
+                
+    static std::shared_ptr<PlaneMirror> createFromXML(const xml::Parser&);
 };
 
 }  // namespace RAYX

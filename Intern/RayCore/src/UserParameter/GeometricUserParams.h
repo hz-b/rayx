@@ -1,7 +1,6 @@
 #pragma once
 
 #include <cmath>
-
 #include <glm.hpp>
 #include <iostream>
 #include <memory>
@@ -63,10 +62,10 @@ class RAYX_API GeometricUserParams {
     void calcTorusRadius(double incidenceAngle, double sEntrance, double sExit,
                          double mEntrance, double mExit);
 
-    double getAlpha();
-    double getBeta();
-    double getRadius();
-    double getShortRadius();
+    double getAlpha() const;
+    double getBeta() const;
+    double getRadius() const;
+    double getShortRadius() const;
 
   private:
     double m_alpha;

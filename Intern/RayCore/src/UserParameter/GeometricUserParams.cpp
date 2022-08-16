@@ -64,7 +64,7 @@ GeometricUserParams::GeometricUserParams(
             m_alpha = degToRad(designAlphaAngle);
         } else if (gratingMount == GratingMount::Deviation) {
             RAYX_LOG << "use deviation angle";
-            focus(designEnergy, deviationAngle, dz, orderOfDiffraction);
+            focus(deviationAngle, designEnergy, dz, orderOfDiffraction);
         }
     } else {
         RAYX_LOG << "use incidence angle";
@@ -98,8 +98,8 @@ GeometricUserParams::GeometricUserParams(double incidence,
     m_beta = incidenceAngle + tangentAngle;
 }
 
-GeometricUserParams::GeometricUserParams() {}
-GeometricUserParams::~GeometricUserParams() {}
+GeometricUserParams::GeometricUserParams() = default;
+GeometricUserParams::~GeometricUserParams() = default;
 
 void GeometricUserParams::focus(double angle, double designEnergy,
                                 double lineDensity, double orderOfDiffraction) {
@@ -393,11 +393,11 @@ void GeometricUserParams::calcTorusRadius(double incidenceAngle,
     }
 }
 
-double GeometricUserParams::getAlpha() { return m_alpha; }
+double GeometricUserParams::getAlpha() const { return m_alpha; }
 
-double GeometricUserParams::getBeta() { return m_beta; }
+double GeometricUserParams::getBeta() const { return m_beta; }
 
-double GeometricUserParams::getRadius() { return m_radius; }
+double GeometricUserParams::getRadius() const { return m_radius; }
 
-double GeometricUserParams::getShortRadius() { return m_shortRadius; }
+double GeometricUserParams::getShortRadius() const { return m_shortRadius; }
 }  // namespace RAYX

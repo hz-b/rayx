@@ -26,7 +26,7 @@ settings = {
 
 # CHANGE HERE
 STEPS = 500
-TRIALS = 10
+TRIALS = 30
 
 rayx_cpu_times = []
 rayx_gpu_times = []
@@ -79,19 +79,19 @@ def plot(cpu_times, gpu_times):
     N = len(cpu_times)
     assert(N == TRIALS)
 
-    ind = np.arange(1, N*STEPS+1, step=STEPS)
+    indices = np.arange(1, N*STEPS+1, step=STEPS)
 
-    plt.scatter(ind, cpu_times, label='CPU')
-    plt.scatter(ind, gpu_times, label='GPU')
+    plt.scatter(indices, cpu_times, label='CPU')
+    plt.scatter(indices, gpu_times, label='GPU')
 
     plt.xlabel('Number of Rays')
-    plt.xticks(ind)
+    plt.xticks(indices[:len(indices)+1:int(len(indices) / 5)])
 
     # Grid display
-    plt.grid(linewidth=.25)
+    plt.grid(linewidth=.5)
 
     plt.ylabel('time (s)')
-    plt.title("RAY-X: CPU vs GPU (Vulkan) Tracer")
+    plt.title(f"RAY-X: CPU vs GPU(Vulkan) Tracer [Max Rays = {N*STEPS+1}]")
     plt.legend()
     plt.show()
 

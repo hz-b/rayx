@@ -76,9 +76,9 @@ SET(HEADERS
     src/Tracer/Ray.h
     src/Tracer/Tracer.h
     src/Tracer/CpuTracer.h
-    src/Writer/Writer.hpp
-    src/Writer/CSVWriter.hpp
-    src/Writer/H5Writer.hpp
+    src/Writer/Writer.h
+    src/Writer/CSVWriter.h
+    src/Writer/H5Writer.h
     src/Tracer/VulkanTracer.h
     src/Material/Material.h
     src/Material/NffTable.h

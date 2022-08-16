@@ -1,6 +1,5 @@
 #include "RayList.h"
 
-#include <cmath>
 #include <cstring>
 #include <iostream>
 
@@ -8,9 +7,9 @@
 
 namespace RAYX {
 
-RayList::RayList() {}
+RayList::RayList() = default;
 
-RayList::~RayList() {}
+RayList::~RayList() = default;
 
 /**
  * @brief insertVector function inserts a vector of Rays to the ray list.
@@ -29,25 +28,100 @@ void RayList::insertVector(const std::vector<Ray>& inRayVector) {
 }
 
 void RayList::push(Ray r) {
-    if (m_rayList.empty() ||
-        m_rayList.back().size() == RAY_MAX_ELEMENTS_IN_VECTOR) {
-        m_rayList.push_back({});
+    if (m_data.empty() || m_data.back().size() == RAY_MAX_ELEMENTS_IN_VECTOR) {
+        std::vector<Ray> v;
+        v.reserve(RAY_MAX_ELEMENTS_IN_VECTOR);
+        m_data.emplace_back(v);
     }
-    m_rayList.back().push_back(r);
+    m_data.back().push_back(r);
 }
 
-void RayList::clean() { m_rayList.clear(); }
-
-std::list<std::vector<Ray>>::iterator RayList::begin() {
-    return m_rayList.begin();
+void RayList::append(const RayList& other) {
+    for (auto& vec : other.m_data) {
+        insertVector(vec);
+    }
 }
-std::list<std::vector<Ray>>::iterator RayList::end() { return m_rayList.end(); }
-std::vector<Ray> RayList::back() { return m_rayList.back(); }
-std::size_t RayList::size() { return m_rayList.size(); }
 
-int RayList::rayAmount() const {
-    int amount = (m_rayList.size() - 1) * RAY_MAX_ELEMENTS_IN_VECTOR +
-                 (m_rayList.back()).size();
-    return amount;
+/**
+ * @brief size returns the number of vectors in the ray list.
+ * @return number of vectors in the ray list.
+ */
+size_t RayList::size() const {
+    if (m_data.empty()) return 0;
+    return m_data.size();
 }
+
+/**
+ * @brief rayAmount returns the number of rays in the ray list.
+ * @return number of rays in the ray list.
+ */
+size_t RayList::rayAmount() const {
+    if (m_data.empty()) {
+        return 0;
+    } else {
+        auto back = m_data.back();
+        int amount =
+            back.size() + (m_data.size() - 1) * RAY_MAX_ELEMENTS_IN_VECTOR;
+        return amount;
+    }
+}
+
+void RayList::clean() { m_data.clear(); }
+
+// Ray& at(size_t index);
+const Ray& RayList::at(size_t index) const {
+    size_t vecIndex = index / RAY_MAX_ELEMENTS_IN_VECTOR;
+    size_t elemIndex = index % RAY_MAX_ELEMENTS_IN_VECTOR;
+    auto listIter = m_data.begin();
+    std::advance(listIter, vecIndex);
+    return (*listIter)[elemIndex];
+}
+
+// Ray& operator[](size_t index);
+const Ray& RayList::operator[](size_t index) const { return at(index); }
+
+RayListIter RayList::begin() {
+    return {.m_iter = m_data.begin(), .m_offset = 0};
+}
+RayListIter RayList::end() { return {.m_iter = m_data.end(), .m_offset = 0}; }
+
+ConstRayListIter RayList::begin() const {
+    return {.m_iter = m_data.cbegin(), .m_offset = 0};
+}
+ConstRayListIter RayList::end() const {
+    return {.m_iter = m_data.cend(), .m_offset = 0};
+}
+
+// mutable RayListIter
+bool RayListIter::operator==(const RayListIter& o) const {
+    return m_iter == o.m_iter && m_offset == o.m_offset;
+}
+bool RayListIter::operator!=(const RayListIter& o) const {
+    return !(*this == o);
+}
+void RayListIter::operator++() {
+    m_offset++;
+    if (m_offset >= m_iter->size()) {
+        m_iter++;
+        m_offset = 0;
+    }
+}
+Ray& RayListIter::operator*() { return (*m_iter)[m_offset]; }
+
+// ConstRayListIter
+bool ConstRayListIter::operator==(const ConstRayListIter& o) const {
+    return m_iter == o.m_iter && m_offset == o.m_offset;
+}
+bool ConstRayListIter::operator!=(const ConstRayListIter& o) const {
+    return !(*this == o);
+}
+void ConstRayListIter::operator++() {
+    m_offset++;
+    if (m_offset >= m_iter->size()) {
+        m_iter++;
+        m_offset = 0;
+    }
+}
+const Ray& ConstRayListIter::operator*() { return (*m_iter)[m_offset]; }
+
 }  // namespace RAYX

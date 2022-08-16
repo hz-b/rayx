@@ -1,6 +1,7 @@
 #pragma once
 
 #include <Tracer/Tracer.h>
+
 #include <chrono>
 
 #include "CommandParser.h"
@@ -31,9 +32,12 @@ class TerminalApp {
      * @return true
      * @return false
      */
-    bool exportRays(RAYX::RayList&);
     char** m_argv;
     int m_argc;
+    void exportRays(RAYX::RayList&);
+#if defined(RAYX_DEBUG_MODE) && not defined(CPP)
+    void exportDebug();
+#endif
     std::string providedFile;
     std::unique_ptr<CommandParser> m_CommandParser;
     std::unique_ptr<RAYX::Tracer> m_Tracer;

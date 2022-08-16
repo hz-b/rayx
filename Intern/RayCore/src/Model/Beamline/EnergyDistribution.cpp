@@ -1,11 +1,8 @@
 #include "EnergyDistribution.h"
 
 #include <ctime>
-#include <iostream>
-#include <utility>
-
 namespace RAYX {
-std::mt19937 EnergyDistribution::s_rng(time(NULL));
+std::mt19937 EnergyDistribution::s_rng(time(nullptr));
 
 EnergyDistribution::EnergyDistribution(DatFile df, bool continuous)
     : m_isContinuous(continuous), m_Variant(df) {}

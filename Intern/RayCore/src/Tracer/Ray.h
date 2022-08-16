@@ -7,15 +7,15 @@
 
 namespace RAYX {
 struct RAYX_API Ray {
-    glm::dvec3 m_position;
-    double m_weight;
-    glm::dvec3 m_direction;
-    double m_energy;
-    glm::dvec4 m_stokes;
-    double m_pathLength;
-    double m_order;
-    double m_lastElement;
-    double m_extraParam;
+    glm::dvec3 m_position = glm::dvec3(0, 0, 0);
+    double m_weight = 0;
+    glm::dvec3 m_direction = glm::dvec3(0, 0, 0);
+    double m_energy = 0;
+    glm::dvec4 m_stokes = glm::dvec4(0, 0, 0, 0);
+    double m_pathLength = 0;
+    double m_order = 0;
+    double m_lastElement = 0;
+    double m_extraParam = 0;
 
     static Ray makeRayFrom(const glm::dvec3& origin,
                            const glm::dvec3& direction,

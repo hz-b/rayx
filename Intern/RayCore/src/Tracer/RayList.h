@@ -17,6 +17,26 @@
 
 namespace RAYX {
 
+struct RayListIter {
+    std::list<std::vector<Ray>>::iterator m_iter;  // iterator over list
+    size_t m_offset;                               // index within std::vector
+
+    bool operator==(const RayListIter& o) const;
+    bool operator!=(const RayListIter& o) const;
+    void operator++();
+    Ray& operator*();
+};
+
+struct ConstRayListIter {
+    std::list<std::vector<Ray>>::const_iterator m_iter;
+    size_t m_offset;
+
+    bool operator==(const ConstRayListIter&) const;
+    bool operator!=(const ConstRayListIter&) const;
+    void operator++();
+    const Ray& operator*();
+};
+
 class RayList {
   public:
     // list of vectors
@@ -25,15 +45,38 @@ class RayList {
     // appends vector of Rays to the ray list
     void insertVector(const std::vector<Ray>& inRayVector);
     void push(Ray);
+    void append(const RayList& other);
+    size_t size() const;
+    size_t rayAmount() const;
     void clean();
-    std::list<std::vector<Ray>>::iterator begin();
-    std::list<std::vector<Ray>>::iterator end();
-    std::vector<Ray> back();
-    std::size_t size();
-    int rayAmount() const;
 
-  private:
-    // adds empty vector to the list
-    std::list<std::vector<Ray>> m_rayList;
+    // Ray& at(size_t index);
+    const Ray& at(size_t index) const;
+    // Ray& operator[](size_t index);
+    const Ray& operator[](size_t index) const;
+
+    RayListIter begin();
+    RayListIter end();
+
+    ConstRayListIter begin() const;
+    ConstRayListIter end() const;
+
+    // a typical filter operator, receiving a function f of type Ray& -> bool
+    // (aka F), this returns a new RayList returning only those who satisfy the
+    // constraint f.
+    template <typename F>
+    inline RayList filter(F f) const {
+        RayList out;
+        for (auto r : *this) {
+            if (f(r)) {
+                out.push(r);
+            }
+        }
+        return out;
+    }
+
+    // private:
+    std::list<std::vector<Ray>> m_data;  // TODO(Jannis): make private
 };
+
 }  // namespace RAYX

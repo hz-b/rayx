@@ -7,8 +7,6 @@
 #include <strings.h>
 #endif
 
-#include <iostream>
-
 #include "NffTable.h"
 #include "PalikTable.h"
 

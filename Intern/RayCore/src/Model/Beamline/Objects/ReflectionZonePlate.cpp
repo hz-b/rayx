@@ -13,7 +13,8 @@ namespace RAYX {
  * @param name                          name of optical element
  * @param geometricalShape              shape of RZP (elliptical vs rectangular)
  * @param curvatureType                 Plane, Sphere, Toroid
- * @param width                         total width of the element (x-dimension)
+ * @param widthA                        total width of the element (x-dimension)
+ * @param widthB                        if set then widthA is top width and widthB is bottom width
  * @param height                        height of the element (z- dimensions)
  * @param azimuthalAngle                rotation of element in xy-plane, needed
  * for stokes vector, in rad
@@ -50,75 +51,7 @@ namespace RAYX {
  */
 ReflectionZonePlate::ReflectionZonePlate(
     const char* name, OpticalElement::GeometricalShape geometricalShape,
-    CurvatureType curvatureType, const double width, const double height,
-    const double azimuthalAngle, const glm::dvec4 position,
-    const glm::dmat4x4 orientation, const double designEnergy,
-    const double orderOfDiffraction, const double designOrderOfDiffraction,
-    const double dAlpha, const double dBeta, const double mEntrance,
-    const double mExit, const double sEntrance, const double sExit,
-    const double shortRadius, const double longRadius,
-    const int additionalZeroOrder, const double fresnelZOffset,
-    const std::array<double, 7> slopeError, Material mat)
-    : OpticalElement(name, slopeError),
-      m_fresnelZOffset(fresnelZOffset),
-      m_designAlphaAngle(degToRad(dAlpha)),
-      m_designBetaAngle(degToRad(dBeta)),
-      m_designOrderOfDiffraction(designOrderOfDiffraction),
-      m_designEnergy(designEnergy),                  // in eV
-      m_designSagittalEntranceArmLength(sEntrance),  // in mm
-      m_designSagittalExitArmLength(sExit),
-      m_designMeridionalEntranceArmLength(mEntrance),
-      m_designMeridionalExitArmLength(mExit),
-      m_orderOfDiffraction(orderOfDiffraction)
-{
-    // set geometry
-    m_Geometry->m_geometricalShape = geometricalShape;
-    m_Geometry->setHeightWidth(height, width);
-    m_Geometry->m_azimuthalAngle = azimuthalAngle;
-    m_Geometry->m_position = position;
-    m_Geometry->m_orientation = orientation;
-    m_Geometry->calcTransformationMatrices(position, orientation);
-    updateObjectParams();
-    // m_designEnergy = designEnergy; // if Auto == true, take energy of Source
-    // (param sourceEnergy), else m_designEnergy = designEnergy
-    m_designWavelength = m_designEnergy == 0 ? 0 : hvlam(m_designEnergy);
-    m_additionalOrder = double(additionalZeroOrder);
-
-    m_curvatureType = curvatureType;
-    m_designType = DesignType::ZOffset;    // DesignType::ZOffset (0) default
-    m_derivationMethod = 0;                // DM_FORMULA default
-    m_rzpType = RZPType::Elliptical;       // default (0)
-    m_imageType = ImageType::Point2Point;  // default (0)
-
-    // set parameters in Quadric class
-    double matd = (double)static_cast<int>(mat);
-    if (m_curvatureType == CurvatureType::Plane) {
-        setSurface(std::make_unique<Quadric>(std::array<double, 4 * 4>{
-            0, 0, 0, 0, 1, 0, 0, -1, 0, 0, 0, 0, 4, 0, matd, 0}));
-    } else if (m_curvatureType == CurvatureType::Toroidal) {
-        m_longRadius = longRadius;    // for sphere and toroidal
-        m_shortRadius = shortRadius;  // only for Toroidal
-        setSurface(std::make_unique<Toroid>(longRadius, shortRadius, 4, mat));
-    } else {
-        m_longRadius = longRadius;  // for sphere and toroidal
-        setSurface(std::make_unique<Quadric>(std::array<double, 4 * 4>{
-            1, 0, 0, 0, 1, 1, 0, -m_longRadius, 0, 0, 1, 0, 4, 0, matd, 0}));
-    }
-
-    printInfo();
-    setElementParameters(
-        {double(m_imageType), double(m_rzpType), double(m_derivationMethod),
-         m_designWavelength, double(m_curvatureType),
-         m_designOrderOfDiffraction, m_orderOfDiffraction, m_fresnelZOffset,
-         m_designSagittalEntranceArmLength, m_designSagittalExitArmLength,
-         m_designMeridionalEntranceArmLength, m_designMeridionalExitArmLength,
-         m_designAlphaAngle, m_designBetaAngle, 0, double(m_additionalOrder)});
-    RAYX_LOG << "Created.";
-}
-
-ReflectionZonePlate::ReflectionZonePlate(
-    const char* name, OpticalElement::GeometricalShape geometricalShape,
-    CurvatureType curvatureType, const double widthA, const double widthB,
+    CurvatureType curvatureType, const double widthA, const std::optional<double> widthB,
     const double height, const double azimuthalAngle, const glm::dvec4 position,
     const glm::dmat4x4 orientation, const double designEnergy,
     const double orderOfDiffraction, const double designOrderOfDiffraction,
@@ -142,13 +75,17 @@ ReflectionZonePlate::ReflectionZonePlate(
 {
     // set geometry
     m_Geometry->m_geometricalShape = geometricalShape;
-    m_Geometry->setHeightWidth(height, widthA, widthB);
+    // setHeightWidth
+    if (widthB) {
+        m_Geometry->setHeightWidth(height, widthA, *widthB);
+    } else {
+        m_Geometry->setHeightWidth(height, widthA);
+    }
     m_Geometry->m_azimuthalAngle = azimuthalAngle;
     m_Geometry->m_position = position;
     m_Geometry->m_orientation = orientation;
-    m_Geometry->calcTransformationMatrices(position, orientation);
     updateObjectParams();
-    
+
     // m_designEnergy = designEnergy; // if Auto == true, take energy of Source
     // (param sourceEnergy), else m_designEnergy = designEnergy
     m_designWavelength = m_designEnergy == 0 ? 0 : hvlam(m_designEnergy);
@@ -160,7 +97,7 @@ ReflectionZonePlate::ReflectionZonePlate(
     m_rzpType = RZPType::Elliptical;       // default (0)
     m_imageType = ImageType::Point2Point;  // default (0)
 
-    double matd = (double)static_cast<int>(mat);
+    auto matd = (double)static_cast<int>(mat);
 
     // set parameters in Quadric class
     if (m_curvatureType == CurvatureType::Plane) {
@@ -188,34 +125,24 @@ ReflectionZonePlate::ReflectionZonePlate(
 }
 
 std::shared_ptr<ReflectionZonePlate> ReflectionZonePlate::createFromXML(
-    xml::Parser p) {
+    const xml::Parser& p) {
     // ! temporary for testing trapezoid rzp
-    double widthB;
-    bool foundWidthB = xml::paramDouble(p.node, "totalWidthB", &widthB);
-    if (foundWidthB) {
-        return std::make_shared<ReflectionZonePlate>(
-            p.name(), p.parseGeometricalShape(), p.parseCurvatureType(),
-            p.parseTotalWidth(), p.parseTotalLength(), p.parseAzimuthalAngle(),
-            p.parsePosition(), p.parseOrientation(), p.parseDesignEnergy(),
-            p.parseOrderDiffraction(), p.parseDesignOrderDiffraction(),
-            p.parseDesignAlphaAngle(), p.parseDesignBetaAngle(),
-            p.parseEntranceArmLengthMer(), p.parseExitArmLengthMer(),
-            p.parseEntranceArmLengthSag(), p.parseExitArmLengthSag(),
-            p.parseShortRadius(), p.parseLongRadius(), p.parseAdditionalOrder(),
-            p.parseFresnelZOffset(), p.parseSlopeError(), p.parseMaterial());
-    } else {
-        return std::make_shared<ReflectionZonePlate>(
-            p.name(), p.parseGeometricalShape(), p.parseCurvatureType(),
-            p.parseTotalWidth(), widthB, p.parseTotalLength(),
-            p.parseAzimuthalAngle(), p.parsePosition(), p.parseOrientation(),
-            p.parseDesignEnergy(), p.parseOrderDiffraction(),
-            p.parseDesignOrderDiffraction(), p.parseDesignAlphaAngle(),
-            p.parseDesignBetaAngle(), p.parseEntranceArmLengthMer(),
-            p.parseExitArmLengthMer(), p.parseEntranceArmLengthSag(),
-            p.parseExitArmLengthSag(), p.parseShortRadius(),
-            p.parseLongRadius(), p.parseAdditionalOrder(),
-            p.parseFresnelZOffset(), p.parseSlopeError(), p.parseMaterial());
+    std::optional<double> widthB;
+    bool foundWidthB = xml::paramDouble(p.node, "totalWidthB", &(*widthB));
+    if (!foundWidthB) {
+        widthB = {};
     }
+    return std::make_shared<ReflectionZonePlate>(
+        p.name(), p.parseGeometricalShape(), p.parseCurvatureType(),
+        p.parseTotalWidth(), widthB, p.parseTotalLength(),
+        p.parseAzimuthalAngle(), p.parsePosition(), p.parseOrientation(),
+        p.parseDesignEnergy(), p.parseOrderDiffraction(),
+        p.parseDesignOrderDiffraction(), p.parseDesignAlphaAngle(),
+        p.parseDesignBetaAngle(), p.parseEntranceArmLengthMer(),
+        p.parseExitArmLengthMer(), p.parseEntranceArmLengthSag(),
+        p.parseExitArmLengthSag(), p.parseShortRadius(),
+        p.parseLongRadius(), p.parseAdditionalOrder(),
+        p.parseFresnelZOffset(), p.parseSlopeError(), p.parseMaterial());
 }
 
 void ReflectionZonePlate::printInfo() const {
@@ -400,7 +327,7 @@ void ReflectionZonePlate::VectorR1Center() {
         double RIsina =
             m_designSagittalEntranceArmLength * sin(m_designAlphaAngle);
         double ROsinb = m_designSagittalExitArmLength * sin(m_designBetaAngle);
-        double m_alpha0Angle = (RIsina + ROsinb) / (RIcosa + ROcosb);
+        m_alpha0Angle = (RIsina + ROsinb) / (RIcosa + ROcosb);
         m_R1ArmLength = RIsina / sin(m_alpha0Angle);
     }
 }

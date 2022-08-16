@@ -79,10 +79,10 @@ void RAYX_API printDMat4(glm::dmat4 matrix) {
         for (int j = 0; j < 4; j++) {
             s << matrix[i][j] << ", ";
         }
-        RAYX_LOG << s.str();
+        RAYX_D_LOG << s.str();
         s.str("");
     }
-    RAYX_LOG << s.str();
+    RAYX_D_LOG << s.str();
 }
 
 std::array<double, 4 * 4> glmToArray16(glm::dmat4x4 m) {
@@ -105,7 +105,7 @@ std::array<double, 4> glmToArray4(glm::dvec4 v) {
 }
 
 glm::dvec4 RAYX_API arrayToGlm4(std::array<double, 4> v) {
-    return glm::dvec4(v[0], v[1], v[2], v[3]);
+    return {v[0], v[1], v[2], v[3]};
 }
 
 /**

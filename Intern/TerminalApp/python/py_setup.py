@@ -21,14 +21,14 @@ def setup():
         return str(os.sep + os.path.join(*_dir))
 
     dir_path = get_venv_path()
-
+    path = " "
     if sys.platform == "linux":
         path = dir_path + VENV_PATH_POSIX
     elif sys.platform == "darwin":  # MacOS
         path = dir_path + VENV_PATH_POSIX
     elif sys.platform == "win32":  # Windows
         path = dir_path + VENV_PATH_WINDOWS
-    if(not(os.path.exists(path))):  # no venv found!
+    if not(os.path.exists(path)):  # no venv found!
         try:
             subprocess.check_call(
                 [sys.executable, '-m', 'venv', str(dir_path+os.sep+'rayxvenv')])  # Make new venv : rayxvenv

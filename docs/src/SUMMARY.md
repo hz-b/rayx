@@ -16,6 +16,7 @@
     - [Reflection Zone Plate (RZP)](./Developer/RZP.md)
     - [VSCode recommended Extensions](./Developer/VSCode-recommended-Extensions.md)
     - [Debugging](./Developer/Debugging.md)
+    - [Code Coverage](./Developer/Code-Coverage.md)
 
 - [API User Area](./APIUser/APIUser.md)
     - [How to use RayCore](./APIUser/How-to-use-RayCore.md)

@@ -3,7 +3,7 @@
 #include "Core.h"
 #include "Surface.h"
 #include "utils.h"
-
+// Unused Macro
 #define RAYCORE_QUADRIC_DOUBLE_AMOUNT 48;
 
 namespace RAYX {
@@ -15,7 +15,7 @@ class RAYX_API Quadric : public Surface {
     // dtor
     ~Quadric();
 
-    void setAnchorPoints(std::array<double, 4 * 4> inputPoints);
+    [[maybe_unused]] [[maybe_unused]] void setAnchorPoints(std::array<double, 4 * 4> inputPoints);
     std::array<double, 4 * 4> getParams() const;
 
   private:

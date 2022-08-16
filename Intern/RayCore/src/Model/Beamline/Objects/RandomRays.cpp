@@ -22,22 +22,21 @@ RandomRays::RandomRays(int low, int high, int numberOfRays)
       m_high(high),
       m_numberOfRays(numberOfRays) {}
 
-RandomRays::~RandomRays() {}
+RandomRays::~RandomRays() = default;
 
 /**
  * every parameter is chosen randomly
  * returns list of rays
  */
-std::vector<Ray> RandomRays::getRays() const {
+RayList RandomRays::getRays() const {
     RAYX_PROFILE_FUNCTION();
     std::uniform_real_distribution<double> unif(m_low, m_high);
     std::default_random_engine re;
 
-    int n = m_numberOfRays;
-    std::vector<Ray> rayList;
-    RAYX_LOG << "create " << n << " random rays ";
+    RayList rayList;
+    RAYX_LOG << "create " << m_numberOfRays << " random rays ";
     // fill the square with rmat1xrmat1 rays
-    for (int i = 0; i < n; i++) {
+    for (int i = 0; i < m_numberOfRays; i++) {
         glm::dvec3 position = glm::dvec3(unif(re), unif(re), unif(re));
 
         glm::dvec3 direction = glm::dvec3(unif(re), unif(re), unif(re));
@@ -45,13 +44,13 @@ std::vector<Ray> RandomRays::getRays() const {
         double en = unif(re);
         glm::dvec4 stokes = glm::dvec4(unif(re), unif(re), unif(re), unif(re));
         Ray r = {position, weight, direction, en, stokes, 0.0, 0.0, 0.0, 0.0};
-        rayList.emplace_back(r);
+        rayList.push(r);
     }
     return rayList;
 }
 
 void RandomRays::compareRays(std::vector<Ray*> input,
-                             std::vector<double> output) {
+                             std::vector<double> output) const {
     std::list<double> diff;
     std::cout.precision(17);
     // double max = 0;
