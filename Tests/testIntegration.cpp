@@ -85,6 +85,7 @@ TEST_F(TestSuite, Slit) {
 }
 
 TEST_F(TestSuite, toroid_MS) { compareAgainstRayUI("toroid_MS"); }
+TEST_F(TestSuite, Ellipsoid_DGIA) { compareAgainstRayUI("Ellipsoid_DGIA"); }
 /*
 TEST_F(TestSuite, toroid_MS_T) { compareAgainstRayUI("toroid_MS_T"); }
 TEST_F(TestSuite, toroid) { compareAgainstRayUI("toroid"); }
@@ -92,7 +93,6 @@ TEST_F(TestSuite, toroid) { compareAgainstRayUI("toroid"); }
 
 // TODO(Rudi): fix and re-enable tests, Why do they fail?
 /*
-TEST_F(TestSuite, Ellipsoid_DGIA) { compareAgainstRayUI("Ellipsoid_DGIA"); }
 TEST_F(TestSuite, Ellipsoid_MB) { compareAgainstRayUI("Ellipsoid_MB"); }
 TEST_F(TestSuite, Ellipsoid_PM) { compareAgainstRayUI("Ellipsoid_PM"); }
 
