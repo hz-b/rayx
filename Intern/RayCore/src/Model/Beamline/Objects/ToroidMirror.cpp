@@ -59,8 +59,8 @@ ToroidMirror::ToroidMirror(const char* name,
 
 std::shared_ptr<ToroidMirror> ToroidMirror::createFromXML(const xml::Parser& p) {
     return std::make_shared<ToroidMirror>(
-        p.name(), p.parseGeometricalShape(), p.parseTotalLength(),
-        p.parseTotalWidth(), p.parseAzimuthalAngle(), p.parsePosition(),
+        p.name(), p.parseGeometricalShape(), p.parseTotalWidth(),
+        p.parseTotalLength(), p.parseAzimuthalAngle(), p.parsePosition(),
         p.parseOrientation(), p.parseLongRadius(), p.parseShortRadius(),
         p.parseSlopeError(), p.parseMaterial());
 }
