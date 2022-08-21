@@ -91,10 +91,10 @@ TEST_F(TestSuite, toroid) { compareAgainstRayUI("toroid"); }
 TEST_F(TestSuite, toroid_swapped) { compareAgainstRayUI("toroid_swapped"); }
 
 TEST_F(TestSuite, Ellipsoid_DGIA) { compareAgainstRayUI("Ellipsoid_DGIA"); }
+TEST_F(TestSuite, Ellipsoid_MB) { compareAgainstRayUI("Ellipsoid_MB"); }
 
 // TODO(Rudi): fix and re-enable tests, Why do they fail?
 /*
-TEST_F(TestSuite, Ellipsoid_MB) { compareAgainstRayUI("Ellipsoid_MB"); }
 TEST_F(TestSuite, Ellipsoid_PM) { compareAgainstRayUI("Ellipsoid_PM"); }
 
 TEST_F(TestSuite, ellipsoid_ip_200ellipsmis_simpl) { // this is a temporary
