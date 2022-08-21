@@ -3,27 +3,17 @@
 <version>1.12</version>
 <beamline>
 
-  <object name="Point Source" type="Point Source">
-    <param id="numberRays" enabled="T">20000</param>
-    <param id="sourceWidthDistribution" comment="gaussian (sigma)" enabled="T">1</param>
+  <object name="Matrix Source" type="Matrix Source">
+    <param id="numberRays" enabled="T">200</param>
     <param id="sourceWidth" enabled="T">0</param>
-    <param id="sourceHeightDistribution" comment="gaussian (sigma)" enabled="T">1</param>
     <param id="sourceHeight" enabled="T">0</param>
     <param id="sourceDepth" enabled="T">0</param>
-    <param id="horDivDistribution" comment="gaussian (sigma)" enabled="T">1</param>
     <param id="horDiv" enabled="T">1</param>
-    <param id="verDivDistribution" comment="gaussian (sigma)" enabled="T">1</param>
     <param id="verDiv" enabled="T">1</param>
-    <param id="alignmentError" comment="No" enabled="T">1</param>
-    <param id="translationXerror" enabled="F">0</param>
-    <param id="translationYerror" enabled="F">0</param>
-    <param id="rotationXerror" enabled="F">0</param>
-    <param id="rotationYerror" enabled="F">0</param>
     <param id="energyDistributionType" comment="Values" enabled="T">1</param>
     <param id="photonEnergyDistributionFile" absolute="" enabled="F"></param>
     <param id="photonEnergy" enabled="T">100</param>
     <param id="energySpreadType" comment="white band" enabled="T">0</param>
-    <param id="energySpreadUnit" comment="eV" enabled="T">0</param>
     <param id="energySpread" enabled="T">0</param>
     <param id="linearPol_0" enabled="T">1</param>
     <param id="linearPol_45" enabled="T">0</param>
@@ -65,7 +55,7 @@
     <param id="pimpaleAlpha2" enabled="F">2</param>
     <param id="pimpaleAlpha3" enabled="F">3</param>
     <param id="distancePremirrorGrating" enabled="T">8.09724e-320</param>
-    <param id="reflectivityType" comment="Derived by Material" enabled="T">1</param>
+    <param id="reflectivityType" comment="100%" enabled="T">0</param>
     <param id="reflectivitySenkrecht" enabled="T">0.716391</param>
     <param id="reflectivityParallel" enabled="T">0.674078</param>
     <param id="reflectivityPhase" enabled="T">-7.72232</param>
