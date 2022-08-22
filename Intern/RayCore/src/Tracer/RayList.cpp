@@ -43,12 +43,11 @@ void RayList::append(const RayList& other) {
 }
 
 /**
- * @brief size returns the number of vectors in the ray list.
- * @return number of vectors in the ray list.
+ * @brief Get window into raw data of ray list (list of vectors of rays).
+ * @return const ray list data
  */
-size_t RayList::size() const {
-    if (m_data.empty()) return 0;
-    return m_data.size();
+const std::list<std::vector<Ray>>& RayList::getData() const {
+    return m_data;
 }
 
 /**

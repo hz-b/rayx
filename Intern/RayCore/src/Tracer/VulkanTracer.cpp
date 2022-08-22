@@ -761,9 +761,8 @@ void VulkanTracer::fillRayBuffer() {
         (double)m_staging.m_BufferSizes[0]);  // bufferSizes[0] = 128MB
     RAYX_LOG << "Number of staging Buffers: " << numberOfStagingBuffers
              << ", (Bytes needed): " << bytesNeeded << " Bytes";
-    std::list<std::vector<Ray>>::iterator raySetIterator;
+    auto raySetIterator = m_RayList.getData().begin();
     RAYX_LOG << "Staging...";
-    raySetIterator = m_RayList.m_data.begin();
     size_t vectorsPerStagingBuffer =
         std::floor(GPU_MAX_STAGING_SIZE / RAY_VECTOR_SIZE);
 
@@ -787,7 +786,7 @@ void VulkanTracer::fillRayBuffer() {
 // the input buffer is filled with the ray data
 void VulkanTracer::fillStagingBuffer(
     [[maybe_unused]] uint32_t offset,
-    std::list<std::vector<Ray>>::iterator raySetIterator,
+    std::list<std::vector<Ray>>::const_iterator raySetIterator,
     size_t vectorsPerStagingBuffer)  // TODO is it okay that offset is unused?
 {
     RAYX_PROFILE_FUNCTION();
@@ -800,7 +799,7 @@ void VulkanTracer::fillStagingBuffer(
         RAYX_ERR << "(*raySetIterator).size() > GPU_MAX_STAGING_SIZE)!";
     }
     vectorsPerStagingBuffer =
-        std::min(m_RayList.m_data.size(), vectorsPerStagingBuffer);
+        std::min(m_RayList.getData().size(), vectorsPerStagingBuffer);
     RAYX_LOG << "Vectors per StagingBuffer: " << vectorsPerStagingBuffer;
     for (uint32_t i = 0; i < vectorsPerStagingBuffer; i++) {
         memcpy(((char*)data) + i * RAY_VECTOR_SIZE, (*raySetIterator).data(),
@@ -988,7 +987,7 @@ void VulkanTracer::getRays() {
     vkUnmapMemory(m_Device, m_staging.m_BufferMemories[0]);
 
     RAYX_LOG << "Output Data size: "
-             << m_OutputRays.m_data.front().size() * RAY_DOUBLE_COUNT *
+             << m_OutputRays.getData().front().size() * RAY_DOUBLE_COUNT *
                     sizeof(double)
              << " Bytes";
     RAYX_LOG << "Done fetching [StagingBufer→OutputData].";
