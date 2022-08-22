@@ -115,9 +115,6 @@ Ellipsoid::Ellipsoid(const char* name,
                           0, 0, 0, 0});
 }
 
-// dstr
-Ellipsoid::~Ellipsoid() {}
-
 /*
 void Ellipsoid::calcRadius() {
     double theta = m_alpha; // grazing incidence in rad
