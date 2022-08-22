@@ -96,3 +96,5 @@ TEST_F(TestSuite, Ellipsoid_MB) { compareAgainstRayUI("Ellipsoid_MB"); }
 // TODO: why is this called Ellipsoid_PM if it contains a PlaneMirror and no
 // Ellipsoid?
 TEST_F(TestSuite, Ellipsoid_PM) { compareAgainstRayUI("Ellipsoid_PM"); }
+
+TEST_F(TestSuite, ellipsoid_ip_200mirrormis) { compareAgainstRayUI("ellipsoid_ip_200mirrormis"); }
