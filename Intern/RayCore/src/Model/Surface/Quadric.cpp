@@ -1,7 +1,5 @@
 #include "Quadric.h"
 
-#include <math.h>
-
 #include "Debug.h"
 
 namespace RAYX {
@@ -11,13 +9,13 @@ namespace RAYX {
  * matrix is symmetrial, can be used for other values
  * @param inputPoints      4x4 Matrix as vector
  */
-Quadric::Quadric(const std::array<double, 4*4> inputPoints) {
+Quadric::Quadric(const std::array<double, 4 * 4> inputPoints) {
     m_parameters = inputPoints;
 }
 
-Quadric::Quadric() {}  // TODO
+Quadric::Quadric() = default;  // TODO
 
-Quadric::~Quadric() {}
+Quadric::~Quadric() = default;
 
 /**
  * set a new set of parameters a_11 to a_44 for the quadric function
@@ -26,7 +24,7 @@ Quadric::~Quadric() {}
  * @param inputPoints   16 entry vector a_11 to a_44
  * @return void
  */
-void Quadric::setAnchorPoints(std::array<double, 4*4> inputPoints) {
+[[maybe_unused]] void Quadric::setAnchorPoints(std::array<double, 4 * 4> inputPoints) {
     m_parameters = inputPoints;
 }
 
@@ -50,8 +48,7 @@ void Quadric::setAnchorPoints(std::array<double, 4*4> inputPoints) {
  *corresponding to the variants of the enum class Material (see Material.h and
  *materials.xmacro)
  **/
-std::array<double, 4*4> Quadric::getParams() const {
-    RAYX_LOG << "return surface parameters";
+std::array<double, 4 * 4> Quadric::getParams() const {
     return m_parameters;
 }
 

@@ -1,9 +1,11 @@
 #include "Material.h"
 
 #include <Debug.h>
+#ifdef _WIN32
+#include <string.h> 
+#else
 #include <strings.h>
-
-#include <iostream>
+#endif
 
 #include "NffTable.h"
 #include "PalikTable.h"

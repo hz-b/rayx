@@ -1,10 +1,12 @@
 #include "OpticalElement.h"
 
-#include <math.h>
+#include <cmath>
+#include <glm.hpp>
 
 #include "Debug.h"
 
 namespace RAYX {
+
 /**
  * constructor for adding elements to tracer. The given arrays contain the
  * values that will actually be moved to the shader
@@ -22,111 +24,36 @@ namespace RAYX {
  */
 OpticalElement::OpticalElement(const char* name,
                                const std::array<double, 4 * 4> surfaceParams,
-                               const std::array<double, 4 * 4> inputInMatrix,
-                               const std::array<double, 4 * 4> inputOutMatrix,
                                const std::array<double, 4 * 4> OParameters,
                                const std::array<double, 4 * 4> EParameters)
-    : BeamlineObject(name) {
-    m_surfaceParams = surfaceParams;
-    m_geometry = std::make_unique<Geometry>();
-    m_geometry->setInMatrix(inputInMatrix);
-    m_geometry->setOutMatrix(inputOutMatrix);
-    m_objectParameters = OParameters;
-    m_elementParameters = EParameters;
-}
-
-/* NEW CONSTRUCTORS */
-
-/**
- * @param name                      name of the element
- * @param EParameters               Element specific parameters
- * @param geometricalShape          geometrical Shape of element (0 = rectangle,
- * 1 = elliptical)
- * @param width                     x-dimension of element
- * @param height                    z-dimension of element
- * @param position                  position in world coordinates
- * @param orientation               orientation in world coordinate system
- * @param slopeError                slope error parameters
- */
-OpticalElement::OpticalElement(const char* name,
-                               const std::array<double, 4 * 4> EParameters,
-                               Geometry::GeometricalShape geometricalShape,
-                               const double width, const double height,
-                               const double azimuthalAngle, glm::dvec4 position,
-                               glm::dmat4x4 orientation,
-                               const std::array<double, 7> slopeError)
-    : BeamlineObject(name),
-      m_slopeError(slopeError),
+    : m_name(name),
+      m_surfaceParams(surfaceParams),
+      m_objectParameters(OParameters),
       m_elementParameters(EParameters) {
-    m_geometry = std::make_unique<Geometry>(
-        geometricalShape, width, height, azimuthalAngle, position, orientation);
-    updateObjectParams();
+    m_Geometry = std::make_unique<Geometry>();
 }
 
-// ! temporary constructors for trapezoid (10/11/2021)
 OpticalElement::OpticalElement(const char* name,
-                               const std::array<double, 4 * 4> EParameters,
-                               Geometry::GeometricalShape geometricalShape,
-                               const double width, const double widthB,
-                               const double height, const double azimuthalAngle,
-                               glm::dvec4 position, glm::dmat4x4 orientation,
-                               const std::array<double, 7> slopeError)
-    : BeamlineObject(name),
-      m_slopeError(slopeError),
-      m_elementParameters(EParameters) {
-    m_geometry =
-        std::make_unique<Geometry>(geometricalShape, width, widthB, height,
-                                   azimuthalAngle, position, orientation);
+                               const std::array<double, 4 * 4> eParameters,
+                               const std::array<double, 7> slopeError,
+                               const Geometry& geometry)
+    : m_name(name), m_Geometry(std::make_unique<Geometry>(geometry)) {
+    m_slopeError = slopeError;
+    m_elementParameters = eParameters;
     updateObjectParams();
 }
+
 OpticalElement::OpticalElement(const char* name,
-                               Geometry::GeometricalShape geometricalShape,
-                               const double widthA, const double widthB,
-                               const double height, const double azimuthalAngle,
-                               glm::dvec4 position, glm::dmat4x4 orientation,
-                               const std::array<double, 7> slopeError)
-    : BeamlineObject(name), m_slopeError(slopeError) {
-    m_geometry =
-        std::make_unique<Geometry>(geometricalShape, widthA, widthB, height,
-                                   azimuthalAngle, position, orientation);
+                               const std::array<double, 7> slopeError,
+                               const Geometry& geometry)
+    : m_name(name), m_Geometry(std::make_unique<Geometry>(geometry)) {
+    m_slopeError = slopeError;
+    m_elementParameters = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
     updateObjectParams();
 }
-
-/**
- * @param name                      name of the element
- * @param geometricalShape          geometrical Shape of element (0 = rectangle,
- * 1 = elliptical)
- * @param width                     x-dimension of element
- * @param height                    z-dimension of element
- * @param position                  position in world coordinates
- * @param orientation               orientation in world coordinate system
- * @param slopeError                slope error parameters
- */
-OpticalElement::OpticalElement(const char* name,
-                               Geometry::GeometricalShape geometricalShape,
-                               const double width, const double height,
-                               const double azimuthalAngle, glm::dvec4 position,
-                               glm::dmat4x4 orientation,
-                               const std::array<double, 7> slopeError)
-    : BeamlineObject(name), m_slopeError(slopeError) {
-    m_geometry = std::make_unique<Geometry>(
-        geometricalShape, width, height, azimuthalAngle, position, orientation);
-    updateObjectParams();
-}
-
-OpticalElement::OpticalElement() {}
-
-OpticalElement::~OpticalElement() {}
 
 void OpticalElement::setElementParameters(std::array<double, 4 * 4> params) {
     m_elementParameters = params;
-}
-
-void OpticalElement::setInMatrix(std::array<double, 4 * 4> inputMatrix) {
-    m_geometry->setInMatrix(inputMatrix);
-}
-void OpticalElement::setOutMatrix(std::array<double, 4 * 4> inputMatrix) {
-    m_geometry->setOutMatrix(inputMatrix);
 }
 
 void OpticalElement::setSurface(std::unique_ptr<Surface> surface) {
@@ -141,11 +68,11 @@ void OpticalElement::setSurface(std::unique_ptr<Surface> surface) {
 
 // ! temporary adjustment for trapezoid (10/11/2021)
 void OpticalElement::updateObjectParams() {
-    double widthA, widthB = 0.0;
-    m_geometry->getWidth(widthA, widthB);
+    double widthA = m_Geometry->m_widthA;
+    double widthB = m_Geometry->m_widthB;
 
-    m_objectParameters = {widthA,                   // shader:  [0][0]
-                          m_geometry->getHeight(),  // [0][1]
+    m_objectParameters = {widthA,                // shader:  [0][0]
+                          m_Geometry->m_height,  // [0][1]
                           m_slopeError[0],
                           m_slopeError[1],
                           m_slopeError[2],  // [1][0]
@@ -154,7 +81,7 @@ void OpticalElement::updateObjectParams() {
                           m_slopeError[5],
                           m_slopeError[6],  // [2][0]
                           widthB,
-                          m_geometry->getAzimuthalAngle(),
+                          m_Geometry->m_azimuthalAngle,
                           0,
                           0,  // [3][0]
                           0,
@@ -162,26 +89,76 @@ void OpticalElement::updateObjectParams() {
                           0};
 }
 
+/**
+ * calculates element to world coordinates transformation matrix and its
+ * inverse
+ * @param   position     4 element vector which describes the position
+ * of the element in world coordinates
+ * @param   orientation  4x4 matrix that describes the orientation of
+ * the surface with respect to the world coordinate system
+ * @return void
+ */
+void OpticalElement::calcTransformationMatrices(glm::dvec4 position,
+                                                glm::dmat4 orientation,
+                                                glm::dmat4& output,
+                                                bool calcInMatrix) const {
+    // Uncomment for verbose calculations
+    // RAYX_D_LOG << "Orientation:";
+    // printDMat4(orientation);
+    // RAYX_D_LOG << "Position: ";
+    // printDVec4(position);
+
+    glm::dmat4x4 rotation = glm::dmat4x4(
+        orientation[0][0], orientation[0][1], orientation[0][2], 0.0,
+        orientation[1][0], orientation[1][1], orientation[1][2], 0.0,
+        orientation[2][0], orientation[2][1], orientation[2][2], 0.0, 0.0, 0.0,
+        0.0, 1.0);  // o
+    glm::dmat4x4 inv_rotation = glm::transpose(rotation);
+
+    if (calcInMatrix) {
+        glm::dmat4x4 translation =
+            glm::dmat4x4(1, 0, 0, -position[0], 0, 1, 0, -position[1], 0, 0, 1,
+                         -position[2], 0, 0, 0, 1);  // o
+        // ray = tran * rot * ray
+        glm::dmat4x4 g2e = translation * rotation;
+        output = glm::transpose(g2e);
+        return;
+    } else {
+        glm::dmat4x4 inv_translation =
+            glm::dmat4x4(1, 0, 0, position[0], 0, 1, 0, position[1], 0, 0, 1,
+                         position[2], 0, 0, 0, 1);  // o
+        // inverse of m_inMatrix
+        glm::dmat4x4 e2g = inv_rotation * inv_translation;
+        output = glm::transpose(e2g);
+        return;
+    }
+}
+
 // ! temporary adjustment for trapezoid (10/11/2021)
-double OpticalElement::getWidth() {
-    double width, tmp = 0.0;
-    m_geometry->getWidth(width, tmp);
-    return width;
-}
+double OpticalElement::getWidth() { return m_Geometry->m_widthA; }
 
-double OpticalElement::getHeight() { return m_geometry->getHeight(); }
+double OpticalElement::getHeight() { return m_Geometry->m_height; }
 
-std::array<double, 4 * 4> OpticalElement::getInMatrix() const {
-    return m_geometry->getInMatrix();
+// TODO(Jannis): make these return a glm::dvec4
+glm::dmat4 OpticalElement::getInMatrix() const {
+    // return glmToArray16(m_Geometry->m_inMatrix);,
+    glm::dmat4 inMatrix = glm::dmat4();
+    calcTransformationMatrices(m_Geometry->m_position,
+                               m_Geometry->m_orientation, inMatrix);
+    return inMatrix;
 }
-std::array<double, 4 * 4> OpticalElement::getOutMatrix() const {
-    return m_geometry->getOutMatrix();
+glm::dmat4 OpticalElement::getOutMatrix() const {
+    // return glmToArray16(m_Geometry->m_outMatrix);
+    glm::dmat4 outMatrix = glm::dmat4();
+    calcTransformationMatrices(m_Geometry->m_position,
+                               m_Geometry->m_orientation, outMatrix, false);
+    return outMatrix;
 }
 glm::dvec4 OpticalElement::getPosition() const {
-    return m_geometry->getPosition();
+    return m_Geometry->m_position;
 }
 glm::dmat4x4 OpticalElement::getOrientation() const {
-    return m_geometry->getOrientation();
+    return m_Geometry->m_orientation;
 }
 std::array<double, 4 * 4> OpticalElement::getObjectParameters() {
     return m_objectParameters;
@@ -192,7 +169,6 @@ std::array<double, 4 * 4> OpticalElement::getElementParameters() const {
 }
 
 std::array<double, 4 * 4> OpticalElement::getSurfaceParams() const {
-    RAYX_LOG << "return anchor points";
     // assert(m_surfacePtr!=nullptr);
     if (m_surfacePtr != nullptr)
         return m_surfacePtr->getParams();
@@ -203,5 +179,6 @@ std::array<double, 4 * 4> OpticalElement::getSurfaceParams() const {
 std::array<double, 7> OpticalElement::getSlopeError() const {
     return m_slopeError;
 }
+[[maybe_unused]] void OpticalElement::updateObjectParamsNoGeometry() {}
 
 }  // namespace RAYX

@@ -17,19 +17,18 @@ namespace RAYX {
  */
 ImagePlane::ImagePlane(const char* name, glm::dvec4 position,
                        glm::dmat4x4 orientation)
-    : OpticalElement(name, {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-                     Geometry::GeometricalShape::RECTANGLE, 0, 0, 0, position,
-                     orientation, {0, 0, 0, 0, 0, 0, 0}) {
-    RAYX_LOG << name;
+    : OpticalElement(name, {0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0}) {
+    m_Geometry->m_orientation = orientation;
+    m_Geometry->m_position = position;
+    updateObjectParams();
+
     setSurface(std::make_unique<Quadric>(std::array<double, 4 * 4>{
         0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 5, 0, 0, 0}));
 }
 
-ImagePlane::~ImagePlane() {}
-
-std::shared_ptr<ImagePlane> ImagePlane::createFromXML(xml::Parser p) {
+std::shared_ptr<ImagePlane> ImagePlane::createFromXML(const xml::Parser& p) {
     return std::make_shared<ImagePlane>(p.name(), p.parsePosition(),
                                         p.parseOrientation());
 }
-
+ImagePlane::~ImagePlane() = default;
 }  // namespace RAYX

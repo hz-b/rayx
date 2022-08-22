@@ -29,7 +29,7 @@ namespace RAYX {
  */
 // User-defined Parm constructor
 Ellipsoid::Ellipsoid(const char* name,
-                     Geometry::GeometricalShape geometricalShape,
+                     OpticalElement::GeometricalShape geometricalShape,
                      const double width, const double height,
                      const double azimuthalAngle, glm::dvec4 position,
                      const double LongHalfAxisA, const double ShortHalfAxisB,
@@ -38,8 +38,7 @@ Ellipsoid::Ellipsoid(const char* name,
                      const double entranceArmLength, const double exitArmLength,
                      FigureRotation figRot, const double a_11,
                      const std::array<double, 7> slopeError, Material mat)
-    : OpticalElement(name, geometricalShape, width, height, azimuthalAngle,
-                     position, orientation, slopeError),
+    : OpticalElement(name, slopeError),
       m_incidence(degToRad(grazingIncidence)),
       m_entranceArmLength(entranceArmLength),
       m_exitArmLength(exitArmLength),
@@ -73,25 +72,34 @@ Ellipsoid::Ellipsoid(const char* name,
 
     // a33, 34, 44
     // a11 from rml file
-    // first rotation arround x-axes then translation (yo/zo)
- 
-    m_a22 = pow(cos(m_tangentAngle),2) + pow(m_shortHalfAxisB*sin(m_tangentAngle)/m_longHalfAxisA,2);
-    m_a23 = (pow(m_shortHalfAxisB, 2) - pow(m_longHalfAxisA, 2))*cos(m_tangentAngle)*sin(m_tangentAngle)/pow(m_longHalfAxisA, 2);
-    m_a24 = pow(m_shortHalfAxisB / m_longHalfAxisA, 2) * m_z0*sin(m_tangentAngle) + m_y0*cos(m_tangentAngle);
-    m_a33 = pow(sin(m_tangentAngle),2) + pow(m_shortHalfAxisB*cos(m_tangentAngle)/m_longHalfAxisA,2);
-    m_a34 = pow(m_shortHalfAxisB / m_longHalfAxisA, 2) * m_z0*cos(m_tangentAngle) - m_y0*sin(m_tangentAngle);
-    m_a44 = -pow(m_shortHalfAxisB, 2) + pow(m_y0, 2) + pow(m_z0 * m_shortHalfAxisB / m_longHalfAxisA, 2);
 
-    // RAYX_LOG << "alpha1: " << m_tangentAngle << "; in Degree: " << radToDeg(m_tangentAngle);
-    // RAYX_LOG << "m_y0: " << m_y0;
-    // RAYX_LOG << "m_z0: " << m_z0;
-    // RAYX_LOG << "m_a11: " << m_a11;
-    // RAYX_LOG << "m_a22: " << m_a22;
-    // RAYX_LOG << "m_a23: " << m_a23;
-    // RAYX_LOG << "m_a24 (m_radius): " << m_a24;
-    // RAYX_LOG << "m_a33: " << m_a33;
-    // RAYX_LOG << "m_a34: " << m_a34; // is m_a34 always zero?
-    // RAYX_LOG << "m_a44: " << m_a44;
+    m_a22 = pow(cos(m_tangentAngle), 2) +
+            pow(m_shortHalfAxisB * sin(m_tangentAngle) / m_longHalfAxisA, 2);
+    m_a23 = (pow(m_shortHalfAxisB, 2) - pow(m_longHalfAxisA, 2)) *
+            cos(m_tangentAngle) * sin(m_tangentAngle) / pow(m_longHalfAxisA, 2);
+
+    m_a24 = pow(m_shortHalfAxisB / m_longHalfAxisA, 2) * m_z0 *
+                sin(m_tangentAngle) +
+            m_y0 * cos(m_tangentAngle);
+    m_a33 = pow(sin(m_tangentAngle), 2) +
+            pow(m_shortHalfAxisB * cos(m_tangentAngle) / m_longHalfAxisA, 2);
+    m_a34 = pow(m_shortHalfAxisB / m_longHalfAxisA, 2) * m_z0 *
+                cos(m_tangentAngle) -
+            m_y0 * sin(m_tangentAngle);
+    m_a44 = -pow(m_shortHalfAxisB, 2) + pow(m_y0, 2) +
+            pow(m_z0 * m_shortHalfAxisB / m_longHalfAxisA, 2);
+
+    RAYX_D_LOG << "alpha1: " << m_tangentAngle
+             << "; in Degree: " << radToDeg(m_tangentAngle);
+    RAYX_D_LOG << "m_y0: " << m_y0;
+    RAYX_D_LOG << "m_z0: " << m_z0;
+    RAYX_D_LOG << "m_a11: " << m_a11;
+    RAYX_D_LOG << "m_a22: " << m_a22;
+    RAYX_D_LOG << "m_a23: " << m_a23;
+    RAYX_D_LOG << "m_a24 (m_radius): " << m_a24;
+    RAYX_D_LOG << "m_a33: " << m_a33;
+    RAYX_D_LOG << "m_a34: " << m_a34;
+    RAYX_D_LOG << "m_a44: " << m_a44;
 
     double icurv = 1;
     double matd = (double)static_cast<int>(mat);
@@ -105,7 +113,6 @@ Ellipsoid::Ellipsoid(const char* name,
                           double(m_figureRotation), 0, 0, 0,  //
                           0, 0, 0, 0,                         //
                           0, 0, 0, 0});
-                          
 }
 
 // dstr
@@ -145,7 +152,7 @@ void Ellipsoid::calculateCenterFromHalfAxes(double angle) {
         mt = pow(m_shortHalfAxisB / m_longHalfAxisA, 2) * m_z0 / m_y0;
     }
     m_tangentAngle = (atan(mt));
-    RAYX_LOG << "Z0 = " << m_z0 << ", Y0= " << m_y0
+    RAYX_D_LOG << "Z0 = " << m_z0 << ", Y0= " << m_y0
              << ", tangentAngle= " << m_tangentAngle;
 }
 
@@ -189,7 +196,7 @@ void Ellipsoid::calcHalfAxes() {
         m_halfAxisC = sqrt(pow(m_shortHalfAxisB, 2) / m_a11);
     }
     m_tangentAngle = angle;
-    RAYX_LOG << "A= " << m_longHalfAxisA << ", B= " << m_shortHalfAxisB
+    RAYX_D_LOG << "A= " << m_longHalfAxisA << ", B= " << m_shortHalfAxisB
              << ", C= " << m_halfAxisC
              << ", angle = " << radToDeg(m_tangentAngle);
 }
@@ -215,8 +222,8 @@ double Ellipsoid::getA44() const { return m_a44; }
 double Ellipsoid::getHalfAxisC() const { return m_halfAxisC; }
 
 // Null if failed
-std::shared_ptr<Ellipsoid> Ellipsoid::createFromXML(xml::Parser p) {
-    Geometry::GeometricalShape geometricalShape = p.parseGeometricalShape();
+std::shared_ptr<Ellipsoid> Ellipsoid::createFromXML(const xml::Parser& p) {
+    OpticalElement::GeometricalShape geometricalShape = p.parseGeometricalShape();
     double width = p.parseTotalWidth();
     double height = p.parseTotalLength();
     double incidenceAngle = p.parseGrazingIncAngle();
@@ -233,9 +240,10 @@ std::shared_ptr<Ellipsoid> Ellipsoid::createFromXML(xml::Parser p) {
     glm::dvec4 position = p.parsePosition();
     glm::dmat4x4 orientation = p.parseOrientation();
 
-	return std::make_shared<Ellipsoid>(
-		p.name(), geometricalShape, width, height, azimuthalAngle, position,
-		longHalfAxisA, shortHalfAxisB, designGrazing, orientation,
-		incidenceAngle, entranceArmLength, exitArmLength, figRot, m_a11, slopeError, mat);
+    return std::make_shared<Ellipsoid>(
+        p.name(), geometricalShape, width, height, azimuthalAngle, position,
+        longHalfAxisA, shortHalfAxisB, designGrazing, orientation,
+        incidenceAngle, entranceArmLength, exitArmLength, figRot, m_a11,
+        slopeError, mat);
 }
 }  // namespace RAYX

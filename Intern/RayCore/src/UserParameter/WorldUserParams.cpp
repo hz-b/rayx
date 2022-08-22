@@ -1,7 +1,5 @@
 #include "WorldUserParams.h"
 
-#include <sstream>
-
 #include "Debug.h"
 
 namespace RAYX {
@@ -34,7 +32,7 @@ WorldUserParams::WorldUserParams(double alpha, double beta, double chi,
       m_tangentAngle(tangentAngle) {}
 
 WorldUserParams::WorldUserParams() {}
-WorldUserParams::~WorldUserParams() {}
+WorldUserParams::~WorldUserParams() = default;
 
 /**
  * calculates the element to beam coordinate transformation for a given element

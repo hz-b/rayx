@@ -9,17 +9,14 @@ namespace RAYX {
 
 class RAYX_API ToroidMirror : public OpticalElement {
   public:
-    ToroidMirror(const char* name, Geometry::GeometricalShape geometricalShape,
+    ToroidMirror(const char* name, OpticalElement::GeometricalShape geometricalShape,
                  const double width, const double height,
                  const double azimuthalAngle, glm::dvec4 position,
                  glm::dmat4x4 orientation,
                  const double longRadius, const double shortRadius,           
                  const std::array<double, 7> slopeError, Material mat);
 
-    ToroidMirror();
-    ~ToroidMirror();
-
-    static std::shared_ptr<ToroidMirror> createFromXML(xml::Parser);
+    static std::shared_ptr<ToroidMirror> createFromXML(const xml::Parser&);
 
     double getRadius() const;
 

@@ -35,19 +35,26 @@ namespace RAYX {
  *
  */
 PlaneGrating::PlaneGrating(
-    const char* name, Geometry::GeometricalShape geometricalShape,
+    const char* name, OpticalElement::GeometricalShape geometricalShape,
     const double width, const double height, const double azimuthalAngle,
     glm::dvec4 position, glm::dmat4x4 orientation, const double designEnergy,
     const double lineDensity, const double orderOfDiffraction,
     const int additionalZeroOrder, const std::array<double, 6> vls,
     const std::array<double, 7> slopeError, Material mat)
-    : OpticalElement(name, geometricalShape, width, height, azimuthalAngle,
-                     position, orientation, slopeError),
+    : OpticalElement(name, slopeError),
       m_additionalOrder(additionalZeroOrder),
       m_designEnergyMounting(designEnergy),
       m_lineDensity(lineDensity),
       m_orderOfDiffraction(orderOfDiffraction),
       m_vls(vls) {
+    // set geometry
+    m_Geometry->m_geometricalShape = geometricalShape;
+    m_Geometry->setHeightWidth(height, width);
+    m_Geometry->m_azimuthalAngle = azimuthalAngle;
+    m_Geometry->m_position = position;
+    m_Geometry->m_orientation = orientation;
+    updateObjectParams();
+    
     RAYX_LOG << "design wavelength = " << abs(hvlam(m_designEnergyMounting));
 
     // set element specific parameters in Optical Element class. will be moved
@@ -58,14 +65,12 @@ PlaneGrating::PlaneGrating(
                           0, 0, double(m_additionalOrder)});
 
     // parameters of quadric surface
-    double matd = (double)static_cast<int>(mat);
+    auto matd = (double)static_cast<int>(mat);
     setSurface(std::make_unique<Quadric>(std::array<double, 4 * 4>{
         0, 0, 0, 0, 1, 0, 0, -1, 0, 0, 0, 0, 1, 0, matd, 0}));
 }
 
-PlaneGrating::~PlaneGrating() {}
-
-std::shared_ptr<PlaneGrating> PlaneGrating::createFromXML(xml::Parser p) {
+std::shared_ptr<PlaneGrating> PlaneGrating::createFromXML(const xml::Parser& p) {
     return std::make_shared<PlaneGrating>(
         p.name(), p.parseGeometricalShape(), p.parseTotalWidth(),
         p.parseTotalLength(), p.parseAzimuthalAngle(), p.parsePosition(),
@@ -75,10 +80,10 @@ std::shared_ptr<PlaneGrating> PlaneGrating::createFromXML(xml::Parser p) {
         p.parseMaterial());
 }
 
-double PlaneGrating::getDesignEnergyMounting() {
+double PlaneGrating::getDesignEnergyMounting() const {
     return m_designEnergyMounting;
 }
-double PlaneGrating::getLineDensity() { return m_lineDensity; }
-double PlaneGrating::getOrderOfDiffraction() { return m_orderOfDiffraction; }
+double PlaneGrating::getLineDensity() const { return m_lineDensity; }
+double PlaneGrating::getOrderOfDiffraction() const { return m_orderOfDiffraction; }
 std::array<double, 6> PlaneGrating::getVls() { return m_vls; }
 }  // namespace RAYX

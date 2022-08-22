@@ -22,16 +22,21 @@ namespace RAYX {
  * @param sourceEnergy          energy of source
  *
  */
-Slit::Slit(const char* name, Geometry::GeometricalShape geometricalShape,
+Slit::Slit(const char* name, OpticalElement::GeometricalShape geometricalShape,
            CentralBeamstop beamstop, double width, double height,
            glm::dvec4 position, glm::dmat4x4 orientation, double beamstopWidth,
            double beamstopHeight)
     : OpticalElement(
-          name, geometricalShape, width, height, 0, position, orientation,
-          {0, 0, 0, 0, 0, 0,
-           0})  // no azimuthal angle for slit bc no efficiency needed
+          name, {0, 0, 0, 0, 0, 0,
+                 0})  // no azimuthal angle for slit bc no efficiency needed
 {
+    // set geometry
+    m_Geometry->m_geometricalShape = geometricalShape;
+    m_Geometry->setHeightWidth(height, width);
+    m_Geometry->m_position = position;
+    m_Geometry->m_orientation = orientation;
     m_centralBeamstop = beamstop;
+    updateObjectParams();
 
     // if no beamstop -> set to zero
     // if elliptical set width (xStop) to negative value to encode the shape
@@ -44,21 +49,15 @@ Slit::Slit(const char* name, Geometry::GeometricalShape geometricalShape,
                                  : abs(beamstopWidth));
     m_beamstopHeight = m_centralBeamstop == CentralBeamstop::None
                            ? 0
-                           : (m_centralBeamstop == CentralBeamstop::Elliptical
-                                  ? abs(beamstopHeight)
-                                  : abs(beamstopHeight));
+                           : abs(beamstopHeight) != 0;
 
     setSurface(std::make_unique<Quadric>(std::array<double, 4 * 4>{
         0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -1, 3, 0, 0, 0}));
     setElementParameters({m_beamstopWidth / 2, m_beamstopHeight / 2, 0, 0, 0, 0,
                           0, 0, 0, 0, 0, 0, 0, 0, 0, 0});
-    RAYX_LOG << "Created.";
 }
 
-Slit::Slit() {}
-Slit::~Slit() {}
-
-std::shared_ptr<Slit> Slit::createFromXML(xml::Parser p) {
+std::shared_ptr<Slit> Slit::createFromXML(const xml::Parser& p) {
     return std::make_shared<Slit>(p.name(), p.parseGeometricalShape(),
                                   p.parseCentralBeamstop(), p.parseTotalWidth(),
                                   p.parseTotalHeight(), p.parsePosition(),

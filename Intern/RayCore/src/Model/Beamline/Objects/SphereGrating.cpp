@@ -33,7 +33,7 @@ namespace RAYX {
  *
  */
 SphereGrating::SphereGrating(const char* name, GratingMount mount,
-                             Geometry::GeometricalShape geometricalShape,
+                             OpticalElement::GeometricalShape geometricalShape,
                              double width, double height,
                              const double azimuthalAngle, double radius,
                              glm::dvec4 position, glm::dmat4x4 orientation,
@@ -41,17 +41,22 @@ SphereGrating::SphereGrating(const char* name, GratingMount mount,
                              double orderOfDiffraction,
                              std::array<double, 6> vls,
                              std::array<double, 7> slopeError, Material mat)
-    : OpticalElement(name, geometricalShape, width, height, azimuthalAngle,
-                     position, orientation, slopeError),
+    : OpticalElement(name, slopeError),
       m_designEnergyMounting(designEnergyMounting),
       m_lineDensity(lineDensity),
       m_orderOfDiffraction(orderOfDiffraction),
       m_vls(vls) {
-    RAYX_LOG << name;
-
+    // set geometry
+    m_Geometry->m_geometricalShape = geometricalShape;
+    m_Geometry->setHeightWidth(height, width);
+    m_Geometry->m_azimuthalAngle = azimuthalAngle;
+    m_Geometry->m_position = position;
+    m_Geometry->m_orientation = orientation;
+    updateObjectParams();
+    
     double icurv = 1;
     m_gratingMount = mount;
-    double matd = (double)static_cast<int>(mat);
+    auto matd = (double)static_cast<int>(mat);
     setSurface(std::make_unique<Quadric>(std::array<double, 4 * 4>{
         1, 0, 0, 0, icurv, 1, 0, -radius, 0, 0, 1, 0, 2, 0, matd, 0}));
     setElementParameters({0, 0, m_lineDensity, m_orderOfDiffraction,
@@ -60,9 +65,7 @@ SphereGrating::SphereGrating(const char* name, GratingMount mount,
                           0, 0, 0});
 }
 
-SphereGrating::~SphereGrating() {}
-
-std::shared_ptr<SphereGrating> SphereGrating::createFromXML(xml::Parser p) {
+std::shared_ptr<SphereGrating> SphereGrating::createFromXML(const xml::Parser& p) {
     return std::make_shared<SphereGrating>(
         p.name(), p.parseGratingMount(), p.parseGeometricalShape(),
         p.parseTotalWidth(), p.parseTotalLength(), p.parseAzimuthalAngle(),

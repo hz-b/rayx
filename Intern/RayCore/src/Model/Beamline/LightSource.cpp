@@ -1,6 +1,7 @@
 #include "LightSource.h"
 
 #include <cmath>
+#include <utility>
 
 namespace RAYX {
 LightSource::LightSource(const char* name, EnergyDistribution dist,
@@ -10,8 +11,8 @@ LightSource::LightSource(const char* name, EnergyDistribution dist,
                          const double sourceDepth, const double sourceHeight,
                          const double sourceWidth, const double horDivergence,
                          const double verDivergence)
-    : BeamlineObject(name),
-      m_EnergyDistribution(dist),
+    : m_name(name),
+      m_EnergyDistribution(std::move(dist)),
       m_sourceDepth(sourceDepth),
       m_sourceHeight(sourceHeight),
       m_sourceWidth(sourceWidth),
@@ -27,8 +28,8 @@ LightSource::LightSource(const char* name, EnergyDistribution dist,
                          const double linPol0, const double linPol45,
                          const double circPol,
                          const std::array<double, 6> misalignment)
-    : BeamlineObject(name),
-      m_EnergyDistribution(dist),
+    : m_name(name),
+      m_EnergyDistribution(std::move(dist)),
       m_misalignmentParams(misalignment),
       m_linearPol_0(linPol0),
       m_linearPol_45(linPol45),
@@ -44,7 +45,7 @@ std::array<double, 6> LightSource::getMisalignmentParams() const {
     return m_misalignmentParams;
 }
 
-double LightSource::getPhotonEnergy() const {
+[[maybe_unused]] double LightSource::getPhotonEnergy() const {
     return m_EnergyDistribution.getAverage();
 }
 
@@ -54,14 +55,15 @@ glm::dvec3 LightSource::getDirectionFromAngles(const double phi,
     double al = cos(psi) * sin(phi);
     double am = -sin(psi);
     double an = cos(psi) * cos(phi);
-    return glm::dvec3(al, am, an);
+    return {al, am, an};
 }
 
 //  (see RAYX.FOR select_energy)
 double LightSource::selectEnergy() const {
     return m_EnergyDistribution.selectEnergy();
 }
+LightSource::LightSource() = default;
 
-LightSource::~LightSource() {}
+LightSource::~LightSource() = default;
 
 }  // namespace RAYX

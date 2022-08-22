@@ -8,7 +8,7 @@ namespace RAYX {
 
 class RAYX_API PointSource : public LightSource {
   public:
-    PointSource(const std::string name, int numberOfRays,
+    PointSource(const std::string& name, int numberOfRays,
                 EnergyDistribution dist, const double sourceWidth,
                 const double sourceHeight, const double sourceDepth,
                 const double horDivergence, const double verDivergence,
@@ -20,9 +20,9 @@ class RAYX_API PointSource : public LightSource {
     PointSource();
     ~PointSource();
 
-    static std::shared_ptr<PointSource> createFromXML(xml::Parser);
+    static std::shared_ptr<PointSource> createFromXML(const xml::Parser&);
 
-    std::vector<Ray> getRays() const override;
+    RayList getRays() const override;
 
   private:
     // Geometric Parameters

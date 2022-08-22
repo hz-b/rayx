@@ -1,8 +1,18 @@
 #pragma once
 
-#define PY_SSIZE_T_CLEAN
+// On msvc
+#ifdef _MSC_VER
+#include <corecrt.h>
+#endif
+#ifdef _DEBUG
+#undef _DEBUG
+#include <python.h>
+#define _DEBUG
+#else
 #include <Python.h>
-#include "PathResolver.h"
+#endif
+
+#include <PathResolver.h>
 
 #include <string>
 
@@ -25,7 +35,7 @@ class PythonInterp {
     PyObject* m_pName;
     PyObject* m_pModule;
     PyObject* m_pDict;
-    PyObject* m_pFunc = NULL;
-    PyObject* m_pValue = NULL;
-    PyObject* m_presult = NULL;
+    PyObject* m_pFunc = nullptr;
+    PyObject* m_pValue = nullptr;
+    PyObject* m_presult = nullptr;
 };

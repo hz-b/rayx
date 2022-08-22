@@ -1,34 +1,43 @@
 #ifndef CI  // highfive doesn't work in CI
 
-#include "H5Writer.hpp"
+#include "H5Writer.h"
 
-#include <assert.h>
-
-#include <sstream>
+#include <highfive/H5DataSpace.hpp>
+#include <highfive/H5File.hpp>
 #include <string>
 
 #include "Debug.h"
 
+#define RAY_DOUBLE_COUNT 16  // Same as in RayList.h
 
+std::string intToString(int x) {
+    std::stringstream ss;
+    ss << x;
+    std::string s;
+    ss >> s;
+    return s;
+}
 
-H5Writer::H5Writer()
-    : m_file("output.h5", HighFive::File::ReadWrite | HighFive::File::Create |
-                              HighFive::File::Truncate) {}
+void writeH5(RAYX::RayList& rays, std::string filename) {
+    HighFive::File file(filename, HighFive::File::ReadWrite |
+                                      HighFive::File::Create |
+                                      HighFive::File::Truncate);
+    int counter = 0;
 
-void H5Writer::appendRays(const std::vector<double>& outputRays, size_t index) {
-    auto rows = outputRays.size() / RAY_DOUBLE_COUNT;
-    assert((double)rows == rows);
-    try {
-        std::vector<size_t> dims{rows, 16};  // Max size of one chunk is 128MB
-        std::stringstream ss;
-        ss << index;
-        std::string s;
-        ss >> s;
-        auto dataset =
-            m_file.createDataSet<double>(s, HighFive::DataSpace(dims));
-        dataset.write_raw(outputRays.data());
-    } catch (HighFive::Exception& err) {
-        RAYX_D_ERR << err.what();
+    for (auto l : rays.m_data) {
+        try {
+            std::vector<size_t> dims{l.size(),
+                                     16};  // Max size of one chunk is 128MB
+            auto name = intToString(counter);
+            auto dataset =
+                file.createDataSet<double>(name, HighFive::DataSpace(dims));
+            auto* ptr = (double*)l.data();
+            dataset.write_raw(ptr);
+        } catch (HighFive::Exception& err) {
+            RAYX_D_ERR << err.what();
+        }
+
+        counter += l.size();
     }
 }
 

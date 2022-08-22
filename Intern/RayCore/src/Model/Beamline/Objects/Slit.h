@@ -14,22 +14,18 @@ enum class CentralBeamstop {
 
 class RAYX_API Slit : public OpticalElement {
   public:
-    Slit(const char* name, Geometry::GeometricalShape geometricalShape,
+    Slit(const char* name, OpticalElement::GeometricalShape geometricalShape,
          CentralBeamstop beamstop, double width, double height,
          glm::dvec4 position, glm::dmat4x4 orientation, double beamstopWidth,
          double beamstopHeight);
 
-    Slit();
-    ~Slit();
-
-    static std::shared_ptr<Slit> createFromXML(xml::Parser);
+    static std::shared_ptr<Slit> createFromXML(const xml::Parser&);
 
     CentralBeamstop getCentralBeamstop() const;
     double getBeamstopWidth() const;
     double getBeamstopHeight() const;
 
   private:
-    // TODO(Jannis): Extra class maybe?
     CentralBeamstop m_centralBeamstop;
     double m_beamstopWidth;
     double m_beamstopHeight;

@@ -1,54 +1,107 @@
-#include "CSVWriter.hpp"
-
 #include <Debug.h>
+
+#include <cstring>
+#include <fstream>
+#include <sstream>
 
 #include "../Tracer/RayList.h"
 
-#define SHORTOUTPUT false
+const int CELL_SIZE = 23;
 
-CSVWriter::CSVWriter() : m_outputFile("output.csv") {
-    m_outputFile.precision(17);
-    if (SHORTOUTPUT)
-        m_outputFile << "Index;Xloc;Yloc\n";
-    else
-        m_outputFile << "Index;Xloc;Yloc;Zloc;Weight;Xdir;Ydir;Zdir;Energy;"
-                        "Stokes0;Stokes1;Stokes2;Stokes3;pathLength;order;"
-                        "lastElement;extraParam\n";
+struct Cell {
+    char buf[CELL_SIZE + 1];
+};
+
+int min(int a, int b) {
+    if (a > b) {
+        return b;
+    }
+    return a;
 }
 
-CSVWriter::~CSVWriter() {}
+Cell strToCell(const char* x) {
+    Cell out{};
+    int n = strlen(x);
 
-void CSVWriter::appendRays(const std::vector<double>& outputRays,
-                           size_t index) {
-    size_t size = outputRays.size();
+    if (n > CELL_SIZE) {
+        RAYX_WARN << "strToCell: string \"" << x << "\" needs to be shortened!";
+    }
 
-    RAYX_D_LOG << "Writing " << outputRays.size() / RAY_DOUBLE_COUNT
-               << " rays to file...";
+    for (int i = 0; i < min(n, CELL_SIZE); i++) {
+        out.buf[i] = x[i];
+    }
+    for (int i = n; i < CELL_SIZE; i++) {
+        out.buf[i] = ' ';
+    }
+    out.buf[CELL_SIZE - 1] = '\0';
+    return out;
+}
 
-    if (SHORTOUTPUT) {
-        char buff[64];
-        for (size_t i = 0; i < size; i = i + RAY_DOUBLE_COUNT) {
-            sprintf(buff, "%lu;%.17f;%.17f\n", (unsigned long)index,
-                    outputRays[i], outputRays[i + 1]);
-            m_outputFile << buff;
-            index++;
-        }
-    } else {
-        char buff[384];
-        for (size_t i = 0; i < size; i = i + RAY_DOUBLE_COUNT) {
-            sprintf(
-                buff,
-                "%lu;%.17f;%.17f;%.17f;%.17f;%.17f;%.17f;%.17f;%.17f;%.17f;%"
-                ".17f;%.17f;%.17f;%.17f;%.17f;%.17f;%.17f\n",
-                (unsigned long)index, outputRays[i], outputRays[i + 1],
-                outputRays[i + 2], outputRays[i + 3], outputRays[i + 4],
-                outputRays[i + 5], outputRays[i + 6], outputRays[i + 7],
-                outputRays[i + 8], outputRays[i + 9], outputRays[i + 10],
-                outputRays[i + 11], outputRays[i + 12], outputRays[i + 13],
-                outputRays[i + 14], outputRays[i + 15]);
-            m_outputFile << buff;
-            index++;
-        }
+Cell ulongToCell(unsigned long x) {
+    std::stringstream ss;
+    std::string s;
+    ss << x;
+    ss >> s;
+    return strToCell(s.c_str());
+}
+
+Cell doubleToCell(double x) {
+    std::stringstream ss;
+    ss.precision(17);
+    std::string s;
+    ss << x;
+    ss >> s;
+    return strToCell(s.c_str());
+}
+
+void writeCSV(RAYX::RayList& rays, std::string filename) {
+    std::ofstream file(filename);
+
+    file << strToCell("Index").buf << " | "        //
+         << strToCell("X position").buf << " | "   //
+         << strToCell("Y position").buf << " | "   //
+         << strToCell("Z position").buf << " | "   //
+         << strToCell("Weight").buf << " | "       //
+         << strToCell("X direction").buf << " | "  //
+         << strToCell("Y direction").buf << " | "  //
+         << strToCell("Z direction").buf << " | "  //
+         << strToCell("Energy").buf << " | "       //
+         << strToCell("Stokes0").buf << " | "      //
+         << strToCell("Stokes1").buf << " | "      //
+         << strToCell("Stokes2").buf << " | "      //
+         << strToCell("Stokes3").buf << " | "      //
+         << strToCell("pathLength").buf << " | "   //
+         << strToCell("order").buf << " | "        //
+         << strToCell("lastElement").buf << " | "  //
+         << strToCell("extraParam").buf << '\n';
+
+    for (int i = 0; i < 320; i++) {
+        file << '-';
+    }
+    file << '\n';
+
+    RAYX_D_LOG << "Writing " << rays.rayAmount() << " rays to file...";
+
+    int index = 0;
+    for (auto ray : rays) {
+        file << ulongToCell(index).buf << " | "               //
+             << doubleToCell(ray.m_position.x).buf << " | "   //
+             << doubleToCell(ray.m_position.y).buf << " | "   //
+             << doubleToCell(ray.m_position.z).buf << " | "   //
+             << doubleToCell(ray.m_weight).buf << " | "       //
+             << doubleToCell(ray.m_direction.x).buf << " | "  //
+             << doubleToCell(ray.m_direction.y).buf << " | "  //
+             << doubleToCell(ray.m_direction.z).buf << " | "  //
+             << doubleToCell(ray.m_energy).buf << " | "       //
+             << doubleToCell(ray.m_stokes.x).buf << " | "     //
+             << doubleToCell(ray.m_stokes.y).buf << " | "     //
+             << doubleToCell(ray.m_stokes.z).buf << " | "     //
+             << doubleToCell(ray.m_stokes.w).buf << " | "     //
+             << doubleToCell(ray.m_pathLength).buf << " | "   //
+             << doubleToCell(ray.m_order).buf << " | "        //
+             << doubleToCell(ray.m_lastElement).buf << " | "  //
+             << doubleToCell(ray.m_extraParam).buf << '\n';
+        index++;
     }
 
     RAYX_D_LOG << "Writing done!";

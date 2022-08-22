@@ -1,10 +1,9 @@
 #include "Importer.h"
 
 #include <Data/xml.h>
-#include <string.h>
-
-#include <fstream>
+#include <cstring>
 #include <sstream>
+#include <utility>
 
 #include "Debug.h"
 #include "Debug/Instrumentor.h"
@@ -24,7 +23,7 @@ void addBeamlineObjectFromXML(rapidxml::xml_node<>* node, Beamline* beamline,
 
     // addLightSource(s, node) is a function adding a light source to the
     // beamline (if it's not nullptr)
-    const auto addLightSource = [&](std::shared_ptr<LightSource> s,
+    const auto addLightSource = [&](const std::shared_ptr<LightSource>& s,
                                     rapidxml::xml_node<>* node) {
         if (s) {
             beamline->m_LightSources.push_back(s);
@@ -37,7 +36,7 @@ void addBeamlineObjectFromXML(rapidxml::xml_node<>* node, Beamline* beamline,
 
     // addOpticalElement(e, node) is a function adding an optical element to the
     // beamline (if it's not nullptr)
-    const auto addOpticalElement = [&](std::shared_ptr<OpticalElement> e,
+    const auto addOpticalElement = [&](const std::shared_ptr<OpticalElement>& e,
                                        rapidxml::xml_node<>* node) {
         if (e) {
             beamline->m_OpticalElements.push_back(e);
@@ -48,7 +47,7 @@ void addBeamlineObjectFromXML(rapidxml::xml_node<>* node, Beamline* beamline,
         }
     };
 
-    RAYX::xml::Parser parser(node, group_context, filename);
+    RAYX::xml::Parser parser(node, group_context, std::move(filename));
 
     // every beamline object has a function createFromXML which constructs the
     // object from a given xml-node if possible (otherwise it will return a
@@ -91,14 +90,14 @@ void addBeamlineObjectFromXML(rapidxml::xml_node<>* node, Beamline* beamline,
 void handleObjectCollection(rapidxml::xml_node<>* collection,
                             Beamline* beamline,
                             std::vector<xml::Group>* group_context,
-                            std::filesystem::path filename) {
+                            const std::filesystem::path& filename) {
     for (rapidxml::xml_node<>* object = collection->first_node(); object;
          object = object->next_sibling()) {  // Iterating through objects
         if (strcmp(object->name(), "object") == 0) {
             addBeamlineObjectFromXML(object, beamline, *group_context,
                                      filename);
         } else if (strcmp(object->name(), "group") == 0) {
-            xml::Group g;
+            xml::Group g{};
             bool success = xml::parseGroup(object, &g);
             if (success) {
                 group_context->push_back(g);
@@ -115,7 +114,7 @@ void handleObjectCollection(rapidxml::xml_node<>* collection,
     }
 }
 
-Beamline importBeamline(std::filesystem::path filename) {
+Beamline importBeamline(const std::filesystem::path& filename) {
     RAYX_PROFILE_FUNCTION();
     // first implementation: stringstreams are slow; this might need
     // optimization

@@ -2,12 +2,11 @@
 
 #include <fstream>
 #include <iostream>
-#include <sstream>
 
 #include "Debug.h"
 
 namespace RAYX {
-bool DatFile::load(std::filesystem::path filename, DatFile* out) {
+bool DatFile::load(const std::filesystem::path& filename, DatFile* out) {
     std::ifstream s(filename);
 
     std::string line;
@@ -32,7 +31,7 @@ bool DatFile::load(std::filesystem::path filename, DatFile* out) {
             continue;
         }
 
-        DatEntry e;
+        DatEntry e{};
 
         if (sscanf(line.c_str(), "%le %le", &e.m_energy, &e.m_weight) != 2) {
             RAYX_ERR << "Failed to parse DatFile \"" << filename
@@ -46,14 +45,14 @@ bool DatFile::load(std::filesystem::path filename, DatFile* out) {
     // calculation of the expected value
 
     out->m_average = 0;
-    for (auto line : out->m_Lines) {
-        out->m_average += line.m_weight / out->m_weightSum * line.m_energy;
+    for (auto _line : out->m_Lines) {
+        out->m_average += _line.m_weight / out->m_weightSum * _line.m_energy;
     }
 
     return true;
 }
 
-std::string DatFile::dump() {
+[[maybe_unused]] std::string DatFile::dump() {
     std::stringstream s;
     s << m_title << '\n';
     s << m_linecount << ' ' << m_start << ' ' << m_end << ' ' << m_step << '\n';

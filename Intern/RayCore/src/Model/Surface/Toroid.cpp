@@ -1,7 +1,5 @@
 #include "Toroid.h"
 
-#include <math.h>
-
 #include "Debug.h"
 
 namespace RAYX {
@@ -9,7 +7,7 @@ namespace RAYX {
  * @param inputPoints           16 entry vector that contains the parameters for
  * a toroidal surface
  */
-Toroid::Toroid(const std::array<double, 4*4> inputPoints) {
+Toroid::Toroid(const std::array<double, 4 * 4> inputPoints) {
     m_parameters = inputPoints;
 }
 
@@ -20,25 +18,27 @@ Toroid::Toroid(const std::array<double, 4*4> inputPoints) {
  */
 Toroid::Toroid(double longRadius, double shortRadius, double elementType,
                Material mat) {
-    double matd = (double)static_cast<int>(mat);
-    m_parameters = std::array<double, 4*4>{longRadius,  shortRadius, 0,    0,  //
-                                       0,           0,           0,    0,  //
-                                       0,           0,           0,    0,  //
-                                       elementType, 0,           matd, 0};
+    auto matd = (double)static_cast<int>(mat);
+    m_parameters =
+        std::array<double, 4 * 4>{longRadius,  shortRadius, 0,    0,  //
+                                  0,           0,           0,    0,  //
+                                  0,           0,           0,    0,  //
+                                  elementType, 0,           matd, 0};
     m_longRadius = longRadius;
     m_shortRadius = shortRadius;
 }
 
-Toroid::Toroid() {}
+Toroid::Toroid() = default;
 
-Toroid::~Toroid() {}
+Toroid::~Toroid() = default;
 
 /**
  * sets the parameters of the toroidal surface to the given 16 entry vector
  * @param inputPoints   16 entry vector
  * @return void
  */
-void Toroid::setParameters(const std::array<double, 4*4> inputPoints) {
+[[maybe_unused]] void Toroid::setParameters(
+    const std::array<double, 4 * 4> inputPoints) {
     m_parameters = inputPoints;
     m_longRadius = inputPoints[0];
     m_shortRadius = inputPoints[1];
@@ -62,7 +62,7 @@ void Toroid::setParameters(const std::array<double, 4*4> inputPoints) {
  *materials.xmacro)
  *
  **/
-std::array<double, 4*4> Toroid::getParams() const {
+std::array<double, 4 * 4> Toroid::getParams() const {
     RAYX_LOG << "Return surface points";
     return m_parameters;
 }

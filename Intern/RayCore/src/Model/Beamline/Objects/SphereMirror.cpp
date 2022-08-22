@@ -28,7 +28,7 @@ namespace RAYX {
  *
  */
 SphereMirror::SphereMirror(const char* name,
-                           Geometry::GeometricalShape geometricalShape,
+                           OpticalElement::GeometricalShape geometricalShape,
                            const double width, const double height,
                            const double azimuthalAngle,
                            const double grazingIncidenceAngle,
@@ -36,16 +36,22 @@ SphereMirror::SphereMirror(const char* name,
                            const double entranceArmLength,
                            const double exitArmLength,
                            const std::array<double, 7> slopeError, Material mat)
-    : OpticalElement(name, {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-                     geometricalShape, width, height, azimuthalAngle, position,
-                     orientation, slopeError),
+    : OpticalElement(name, slopeError),
       m_entranceArmLength(entranceArmLength),
       m_exitArmLength(exitArmLength),
       m_grazingIncidenceAngle(degToRad(grazingIncidenceAngle))
 
 {
+    // set geometry
+    m_Geometry->m_geometricalShape = geometricalShape;
+    m_Geometry->setHeightWidth(height, width);
+    m_Geometry->m_azimuthalAngle = azimuthalAngle;
+    m_Geometry->m_position = position;
+    m_Geometry->m_orientation = orientation;
+    updateObjectParams();
+
     calcRadius();  // calculate the radius
-    double matd = (double)static_cast<int>(mat);
+    auto matd = (double)static_cast<int>(mat);
     setSurface(std::make_unique<Quadric>(std::array<double, 4 * 4>{
         1, 0, 0, 0, 1, 1, 0, -m_radius, 0, 0, 1, 0, 0, 0, matd, 0}));
 }
@@ -71,24 +77,28 @@ SphereMirror::SphereMirror(const char* name,
  *
  */
 SphereMirror::SphereMirror(const char* name,
-                           Geometry::GeometricalShape geometricalShape,
+                           OpticalElement::GeometricalShape geometricalShape,
                            const double width, const double height,
                            const double azimuthalAngle, double radius,
                            glm::dvec4 position, glm::dmat4x4 orientation,
                            const std::array<double, 7> slopeError, Material mat)
-    : OpticalElement(name, {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-                     geometricalShape, width, height, azimuthalAngle, position,
-                     orientation, slopeError) {
+    : OpticalElement(name, slopeError) {
+    // set geometry
+    m_Geometry->m_geometricalShape = geometricalShape;
+    m_Geometry->setHeightWidth(height, width);
+    m_Geometry->m_azimuthalAngle = azimuthalAngle;
+    m_Geometry->m_position = position;
+    m_Geometry->m_orientation = orientation;
+    updateObjectParams();
+
     RAYX_LOG << "Created.";
 
-    double matd = (double)static_cast<int>(mat);
+    auto matd = (double)static_cast<int>(mat);
     setSurface(std::make_unique<Quadric>(std::array<double, 4 * 4>{
         1, 0, 0, 0, 1, 1, 0, -radius, 0, 0, 1, 0, 0, 0, matd, 0}));
 }
 
-SphereMirror::~SphereMirror() {}
-
-std::shared_ptr<SphereMirror> SphereMirror::createFromXML(xml::Parser p) {
+std::shared_ptr<SphereMirror> SphereMirror::createFromXML(const xml::Parser& p) {
     return std::make_shared<SphereMirror>(
         p.name(), p.parseGeometricalShape(), p.parseTotalWidth(),
         p.parseTotalLength(), p.parseAzimuthalAngle(), p.parseGrazingIncAngle(),

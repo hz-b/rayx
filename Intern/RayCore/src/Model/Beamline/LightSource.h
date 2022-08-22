@@ -1,4 +1,5 @@
 #pragma once
+#include <array>
 #include <cmath>
 #include <iostream>
 #include <random>
@@ -7,10 +8,10 @@
 #include <variant>
 #include <vector>
 
-#include "BeamlineObject.h"
 #include "Core.h"
 #include "EnergyDistribution.h"
 #include "Tracer/Ray.h"
+#include "Tracer/RayList.h"
 #include "glm.hpp"
 
 namespace RAYX {
@@ -33,7 +34,7 @@ enum class SourceDistType {
 // TODO(rudi): unify!
 enum class SourceDist { Uniform, Gaussian };
 
-class RAYX_API LightSource : public BeamlineObject {
+class RAYX_API LightSource {
   public:
     LightSource(const char* name, EnergyDistribution dist, const double linPol0,
                 const double linPol45, const double circPol,
@@ -64,11 +65,12 @@ class RAYX_API LightSource : public BeamlineObject {
     glm::dvec3 getDirectionFromAngles(double phi, double psi) const;
     // get the rays according to specific light source, has to be implemented in
     // each class that inherits from LightSource
-    virtual std::vector<Ray> getRays() const = 0;
+    virtual RayList getRays() const = 0;
 
     LightSource();
     virtual ~LightSource();
 
+    [[maybe_unused]] const char* m_name;
     /** the energy distribution used when deciding the energies of the rays. */
     const EnergyDistribution m_EnergyDistribution;
 

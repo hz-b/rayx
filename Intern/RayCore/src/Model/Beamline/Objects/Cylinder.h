@@ -11,7 +11,7 @@ enum class CylinderDirection { LongRadiusR, ShortRadiusRho };
 
 class RAYX_API Cylinder : public OpticalElement {
   public:
-    Cylinder(const char* name, Geometry::GeometricalShape geometricalShape,
+    Cylinder(const char* name, OpticalElement::GeometricalShape geometricalShape,
              const double radius, CylinderDirection direction,
              const double width, const double height,
              const double azimuthalAngle, glm::dvec4 position,
@@ -20,7 +20,7 @@ class RAYX_API Cylinder : public OpticalElement {
              const std::array<double, 7> slopeError, Material mat);
     ~Cylinder();
 
-    static std::shared_ptr<Cylinder> createFromXML(xml::Parser);
+    static std::shared_ptr<Cylinder> createFromXML(const xml::Parser&);
 
     void setRadius();
     CylinderDirection getDirection() const;

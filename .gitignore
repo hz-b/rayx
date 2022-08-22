@@ -5,7 +5,6 @@ bin/
 bin-int/
 build/
 Intern/RayCore/doc/*/
-Intern/RayCore/src/Tracer/shader/settings.comp # this file is generated
 out/
 
 # Files
@@ -13,6 +12,7 @@ out/
 *.code-workspace
 /CMakeSettings.json
 /Tests/output/*
+/Tests/output-new/*
 /Tests/oldray_files/unittestData
 /Tests/oldray_files/spec1-first_rzp02/data
 /Tests/oldray_files/spec1-first_rzp4mm/data

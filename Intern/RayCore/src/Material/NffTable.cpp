@@ -3,9 +3,9 @@
 
 #include <Debug.h>
 
+#include <algorithm>
 #include <fstream>
 #include <iostream>
-#include <sstream>
 
 #include "PathResolver.h"
 
@@ -34,7 +34,7 @@ bool NffTable::load(const char* element, NffTable* out) {
             continue;
         }
 
-        NffEntry e;
+        NffEntry e{};
 
         if (sscanf(line.c_str(), "%le %le %le", &e.m_energy, &e.m_f1,
                    &e.m_f2) != 3) {

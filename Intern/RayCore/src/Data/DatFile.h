@@ -26,10 +26,10 @@ struct DatFile {
     std::vector<DatEntry> m_Lines;
 
     /** loads the .DAT file `filename` and writes it's contents to `out` */
-    static bool load(std::filesystem::path filename, DatFile* out);
+    static bool load(const std::filesystem::path &filename, DatFile* out);
 
     /** creates a valid .DAT file from this struct (may be used for testing) */
-    std::string dump();
+    [[maybe_unused]] std::string dump();
 
     /** samples from the distribution given by the .DAT file */
     double selectEnergy(std::mt19937& rng, bool continuous) const;
