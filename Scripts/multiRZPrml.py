@@ -110,7 +110,7 @@ class RZP:
     thermalDistortionSigmaZ = 0
     cylindricalBowingAmp = 0
     cylindricalBowingRadius = 0
-    worldPosition = np.array([0, 0, 0])
+    worldPosition = np.array([0, 0, 90])
     worldXdirection = np.array([1,   0,          0        ])
     worldYdirection = np.array([0,   0.999263,  -0.0383878])
     worldZdirection = np.array([0,   0.0383878,  0.999263 ])
@@ -522,19 +522,6 @@ def calcTrapezoidAngles(widthA, widthB, height):
     return alpha, beta
 
 
-def calculateObjectPos(prevPos: np.array, w: float, chi: float, iterDirection: int):
-    # Calculate the world position of the RZP
-    # prevPos = previous RZP position
-    # w = width of the RZP (middle)
-    # chi = top angle of the RZP
-    # iterDirection = iteration direction (-1 = left, 1 = right)
-    x = prevPos[0] + iterDirection * w * np.sin(chi)
-    y = prevPos[1]
-    z = prevPos[2] + w * np.cos(chi)
-
-    return np.array([x, y, z])
-
-
 def rotateYDeg(prevDir: np.array, alpha: float, iterDirection: int):
     
     # Rotation matrix around y axis (clockwise)
@@ -558,52 +545,41 @@ def calcRZPs(numRZPs: int, baseRZP: RZP, iterDirection: int):
     midWidth = (RZP.totalWidth + RZP.totalWidthB) / 2
     topAngleTrapezoid, _ = calcTrapezoidAngles(
         RZP.totalWidth, RZP.totalWidthB, RZP.totalLength)
+    
+    # Calculate distance of intersection point of all z-direction vectors
+    # and the midpoints of the trapezoids
+    triangleHeight = midWidth/2 * math.tan(math.radians(topAngleTrapezoid))
+    intersecMidDist = np.sqrt((midWidth**2)/4 + triangleHeight**2)
+    
+    # Calculate angle between direction vectors
     dirDeviationAngle = 180 - topAngleTrapezoid * 2
+    
 
     positions = [np.array([0,0,0])] * (math.ceil(numRZPs / 2))
     directions = [np.array([[0,0,0],[0,0,0],[0,0,0]])] * (math.ceil(numRZPs / 2))
-
-    # number of RZPs even
-    if numRZPs % 2 == 0:
-        # calculate directions
-        dirMat = rotateYDeg(
-            np.identity(3), dirDeviationAngle/2, -iterDirection)
-        for i in range(math.floor(numRZPs/2)):
-            dirMat = rotateYDeg(
-                dirMat, dirDeviationAngle, iterDirection)
-            directions[i] = dirMat
+    
+    if numRZPs % 2 == 1: # odd number of RZPs
+        positions[0] = np.array([0,0,intersecMidDist])
+        directions[0] = np.array([[1,0,0],[0,1,0],[0,0,1]])
+        for i in range(1, math.ceil(numRZPs / 2)):
+            positions[i] = rotateYDeg(positions[0], i*dirDeviationAngle, iterDirection)
+            directions[i] = rotateYDeg(directions[i-1], dirDeviationAngle, iterDirection)
             
-        # calculate positions
-        pos = calculateObjectPos(
-            np.array([0,0,0]), midWidth/2, topAngleTrapezoid, iterDirection)
-        pos = rotateYDeg(pos, dirDeviationAngle/2, iterDirection)
-        positions[0] = pos
-        for i in range(1, math.floor(numRZPs/2)):
-            pos = calculateObjectPos(
-                positions[i-1], midWidth, topAngleTrapezoid, iterDirection)
-            pos = rotateYDeg(pos, dirDeviationAngle, iterDirection)
-            positions[i] = pos
-
-    # number of RZPs odd
-    else:
-        # calculate directions
-        dirMat = np.identity(3)
-        for i in range(math.floor(numRZPs/2)):
-            dirMat = rotateYDeg(
-                dirMat, dirDeviationAngle, iterDirection)
-            directions[i] = dirMat
+        if iterDirection == -1:
+            positions = positions[1::]
+            directions = directions[1::]
             
-        # calculate positions
-        pos = np.array([0,0,0])
-        positions[0] = pos
-        for i in range(1, numRZPs/2):
-            pos = calculateObjectPos(
-                positions[i-1], midWidth, topAngleTrapezoid, iterDirection)
-            positions[i] = pos
-        # remove duplicate middle element on the right side
-        if iterDirection == 1:
-            positions.pop(0)
-
+    else: # even number of RZPs
+        pos = np.array([0,0,intersecMidDist])
+        positions[0] = rotateYDeg(pos, dirDeviationAngle/2, iterDirection)
+        direct = np.array([[1,0,0],[0,1,0],[0,0,1]])
+        directions[0] = rotateYDeg(direct, dirDeviationAngle/2, iterDirection)
+        for i in range(1, math.ceil(numRZPs / 2)):
+            positions[i] = rotateYDeg(positions[0], i*dirDeviationAngle, iterDirection)
+            directions[i] = rotateYDeg(directions[i-1], dirDeviationAngle, iterDirection)
+    
+    # translate rzps back to origin
+    positions = [pos - [0,0,intersecMidDist] for pos in positions]
     return positions, directions
 
 
@@ -637,51 +613,31 @@ def main():
         root = insertRZP(root, currRZP)
     
     xPositions = [pos[0] for pos in positions]
-    yPositions = [pos[1] for pos in positions]
     zPositions = [pos[2] for pos in positions]
-    fig = plt.figure()
-    ax = plt.axes(projection='3d')
-    ax.plot3D(xPositions, yPositions, zPositions, 'o');
-    ax.set_xlabel('X')
-    ax.set_ylabel('Y')
-    ax.set_zlabel('Z')
+    plt.scatter(xPositions, zPositions)
+    plt.xlabel('x')
+    plt.ylabel('z')
+    plt.gca().set_aspect('equal', adjustable='box')
     plt.show()
-    fig.savefig('RZPs.png')  
     
-    # Plot directions
+    
+    
+    # Plot x directions
     xDirectionsx = [dir[0][0] for dir in directions]
-    xDirectionsy = [dir[0][1] for dir in directions]
     xDirectionsz = [dir[0][2] for dir in directions]
-    fig = plt.figure()
-    ax = plt.axes(projection='3d')
-    ax.plot3D(xDirectionsx, xDirectionsy, xDirectionsz, 'o');
-    ax.set_xlabel('X')
-    ax.set_ylabel('Y')
-    ax.set_zlabel('Z')
+    plt.scatter(xDirectionsx, xDirectionsz)
+    plt.xlabel('x')
+    plt.ylabel('z')
+    plt.gca().set_aspect('equal', adjustable='box')
     plt.show()
     
-    # Plot directions
-    yDirectionsx = [dir[1][0] for dir in directions]
-    yDirectionsy = [dir[1][1] for dir in directions]
-    yDirectionsz = [dir[1][2] for dir in directions]
-    fig = plt.figure()
-    ax = plt.axes(projection='3d')
-    ax.plot3D(yDirectionsx, yDirectionsy, yDirectionsz, 'o');
-    ax.set_xlabel('X')
-    ax.set_ylabel('Y')
-    ax.set_zlabel('Z')
-    plt.show()
-    
-    # Plot directions
+    # Plot z directions
     zDirectionsx = [dir[2][0] for dir in directions]
-    zDirectionsy = [dir[2][1] for dir in directions]
     zDirectionsz = [dir[2][2] for dir in directions]
-    fig = plt.figure()
-    ax = plt.axes(projection='3d')
-    ax.plot3D(zDirectionsx, zDirectionsy, zDirectionsz, 'o');
-    ax.set_xlabel('X')
-    ax.set_ylabel('Y')
-    ax.set_zlabel('Z')
+    plt.scatter(zDirectionsx, zDirectionsz)
+    plt.xlabel('x')
+    plt.ylabel('z')
+    plt.gca().set_aspect('equal', adjustable='box')
     plt.show()
 
     indent(root)
