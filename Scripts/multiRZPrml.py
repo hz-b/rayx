@@ -528,14 +528,14 @@ def calculateObjectPos(prevPos: np.array, w: float, chi: float, iterDirection: i
     # w = width of the RZP (middle)
     # chi = top angle of the RZP
     # iterDirection = iteration direction (-1 = left, 1 = right)
-    x = prevPos[0] - iterDirection * w * np.sin(chi)
+    x = prevPos[0] + iterDirection * w * np.sin(chi)
     y = prevPos[1]
-    z = prevPos[2] - w * np.cos(chi)
+    z = prevPos[2] + w * np.cos(chi)
 
     return np.array([x, y, z])
 
 
-def calculateObjectDir(prevDir: np.array, alpha: float, iterDirection: int):
+def rotateYDeg(prevDir: np.array, alpha: float, iterDirection: int):
     
     # Rotation matrix around y axis (clockwise)
     rotY = np.array([[np.cos(alpha), 0, np.sin(alpha)],
@@ -565,25 +565,34 @@ def calcRZPs(numRZPs: int, baseRZP: RZP, iterDirection: int):
 
     # number of RZPs even
     if numRZPs % 2 == 0:
+        # calculate directions
+        dirMat = rotateYDeg(
+            np.identity(3), dirDeviationAngle/2, -iterDirection)
+        for i in range(math.floor(numRZPs/2)):
+            dirMat = rotateYDeg(
+                dirMat, dirDeviationAngle, iterDirection)
+            directions[i] = dirMat
+            
         # calculate positions
         pos = calculateObjectPos(
             np.array([0,0,0]), midWidth/2, topAngleTrapezoid, iterDirection)
+        pos = rotateYDeg(pos, dirDeviationAngle/2, iterDirection)
         positions[0] = pos
         for i in range(1, math.floor(numRZPs/2)):
             pos = calculateObjectPos(
                 positions[i-1], midWidth, topAngleTrapezoid, iterDirection)
+            pos = rotateYDeg(pos, dirDeviationAngle, iterDirection)
             positions[i] = pos
-
-        # calculate directions
-        dirMat = calculateObjectDir(
-            np.identity(3), dirDeviationAngle/2, -iterDirection)
-        for i in range(math.floor(numRZPs/2)):
-            dirMat = calculateObjectDir(
-                dirMat, dirDeviationAngle, iterDirection)
-            directions[i] = dirMat
 
     # number of RZPs odd
     else:
+        # calculate directions
+        dirMat = np.identity(3)
+        for i in range(math.floor(numRZPs/2)):
+            dirMat = rotateYDeg(
+                dirMat, dirDeviationAngle, iterDirection)
+            directions[i] = dirMat
+            
         # calculate positions
         pos = np.array([0,0,0])
         positions[0] = pos
@@ -594,13 +603,6 @@ def calcRZPs(numRZPs: int, baseRZP: RZP, iterDirection: int):
         # remove duplicate middle element on the right side
         if iterDirection == 1:
             positions.pop(0)
-
-        # calculate directions
-        dirMat = np.identity(3)
-        for i in range(math.floor(numRZPs/2)):
-            dirMat = calculateObjectDir(
-                dirMat, dirDeviationAngle, iterDirection)
-            directions[i] = dirMat
 
     return positions, directions
 
