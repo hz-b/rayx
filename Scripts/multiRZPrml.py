@@ -4,28 +4,16 @@ from dataclasses import dataclass
 import xml.etree.ElementTree as ET
 import math
 from defer import return_value
+import matplotlib.pyplot as plt
+from mpl_toolkits import mplot3d
 import numpy as np
+from pyrsistent import b
 
 
 @dataclass
 class MetaData:
     numElements = 20
     fileName = "multi_RZP_test"
-
-
-@dataclass
-class Vec3:
-    x: float = 0.0
-    y: float = 0.0
-    z: float = 0.0
-
-
-@dataclass
-class Direction:
-    xDir: Vec3 = Vec3(1.0, 0.0, 0.0)
-    yDir: Vec3 = Vec3(0.0, 1.0, 0.0)
-    zDir: Vec3 = Vec3(0.0, 0.0, 1.0)
-
 
 # Standard RZP Parameters
 @dataclass
@@ -122,10 +110,10 @@ class RZP:
     thermalDistortionSigmaZ = 0
     cylindricalBowingAmp = 0
     cylindricalBowingRadius = 0
-    worldPosition = Vec3(0,   0,          0)
-    worldXdirection = Vec3(1,   0,          0)
-    worldYdirection = Vec3(0,   0.999263,   -0.0383878)
-    worldZdirection = Vec3(0,   0.0383878,  0.999263)
+    worldPosition = np.array([0, 0, 0])
+    worldXdirection = np.array([1,   0,          0        ])
+    worldYdirection = np.array([0,   0.999263,  -0.0383878])
+    worldZdirection = np.array([0,   0.0383878,  0.999263 ])
 
 # -------------- XML Generation --------------
 
@@ -167,13 +155,13 @@ def insertParamVec3(root: ET.Element, id: str, enabled: bool, xVal: float, yVal:
 
 def insertGroupPostion(rzp: RZP, root: ET.Element):
     root = insertParamVec3(root, "worldPosition", "F",
-                           rzp.worldPosition.x, rzp.worldPosition.y, rzp.worldPosition.z)
+                           rzp.worldPosition[0], rzp.worldPosition[1], rzp.worldPosition[2])
     root = insertParamVec3(root, "worldXdirection", "F",
-                           rzp.worldXdirection.x, rzp.worldXdirection.y, rzp.worldXdirection.z)
+                           rzp.worldXdirection[0], rzp.worldXdirection[1], rzp.worldXdirection[2])
     root = insertParamVec3(root, "worldYdirection", "F",
-                           rzp.worldYdirection.x, rzp.worldYdirection.y, rzp.worldYdirection.z)
+                           rzp.worldYdirection[0], rzp.worldYdirection[1], rzp.worldYdirection[2])
     root = insertParamVec3(root, "worldZdirection", "F",
-                           rzp.worldZdirection.x, rzp.worldZdirection.y, rzp.worldZdirection.z)
+                           rzp.worldZdirection[0], rzp.worldZdirection[1], rzp.worldZdirection[2])
 
     return root
 
@@ -523,29 +511,32 @@ def insertRZP(root, rzp: RZP):
 # -------------- RZP Calculations --------------
 
 def calcTrapezoidAngles(widthA, widthB, height):
-    # Calculate the angles of the isosceles trapezoid
+    # Calculate the angles of the isosceles trapezoid and return in degrees
     # widthA = width of the top side
     # widthB = width of the bottom side
     # height = height of the trapezoid
-    alpha = np.arctan(widthA / height)
-    beta = np.arctan(widthB / height)
+    alpha = math.atan(height / (widthA - widthB))
+    beta = math.atan(height / (widthA + widthB))
+    alpha = math.degrees(alpha)
+    beta = math.degrees(beta)
     return alpha, beta
 
 
-def calculateObjectPos(prevPos: Vec3, w: float, chi: float, iterDirection: int):
+def calculateObjectPos(prevPos: np.array, w: float, chi: float, iterDirection: int):
     # Calculate the world position of the RZP
     # prevPos = previous RZP position
     # w = width of the RZP (middle)
     # chi = top angle of the RZP
     # iterDirection = iteration direction (-1 = left, 1 = right)
-    y = prevPos.y
-    x = prevPos.x - iterDirection * w * np.sin(chi)
-    z = prevPos.z - w * np.cos(chi)
+    x = prevPos[0] - iterDirection * w * np.sin(chi)
+    y = prevPos[1]
+    z = prevPos[2] - w * np.cos(chi)
 
-    return Vec3(x, y, z)
+    return np.array([x, y, z])
 
 
 def calculateObjectDir(prevDir: np.array, alpha: float, iterDirection: int):
+    
     # Rotation matrix around y axis (clockwise)
     rotY = np.array([[np.cos(alpha), 0, np.sin(alpha)],
                      [0, 1, 0],
@@ -557,55 +548,30 @@ def calculateObjectDir(prevDir: np.array, alpha: float, iterDirection: int):
 
     # Apply rotation matrix
     rotatedDirMat = np.matmul(rotY, prevDir)
-
-    dirMat = Direction(Vec3(rotatedDirMat[0][0], rotatedDirMat[0][1], rotatedDirMat[0][2]),
-                       Vec3(rotatedDirMat[1][0], rotatedDirMat[1]
-                            [1], rotatedDirMat[1][2]),
-                       Vec3(rotatedDirMat[2][0], rotatedDirMat[2][1], rotatedDirMat[2][2]))
-
-    return dirMat
-
-
-def dirToNPMat(dir: Direction):
-    # Diretion to np matrix
-    dir = np.array(
-        [[dir.xDir.x, dir.xDir.y, dir.xDir.z],
-         [dir.yDir.x, dir.yDir.y, dir.yDir.z],
-         [dir.zDir.x, dir.zDir.y, dir.zDir.z]])
-    return dir
-
-
-def npMatToDir(dir: np.array):
-    # np matrix to Diretion
-    dir = Direction(Vec3(dir[0][0], dir[0][1], dir[0][2]),
-                    Vec3(dir[1][0], dir[1][1], dir[1][2]),
-                    Vec3(dir[2][0], dir[2][1], dir[2][2]))
+    
+    # print(np.linalg.det(rotatedDirMat))
+    
+    return rotatedDirMat
 
 
 def calcRZPs(numRZPs: int, baseRZP: RZP, iterDirection: int):
-    # Calculate the RZPs on the left side (including middle one if numRZPs is odd)
-    # numRZPs = number of RZPs
-    # w = width of the RZP (middle)
-    # chi = top angle of the RZP
-    # direction = iteration direction (-1 = left, 1 = right)
-
     midWidth = (RZP.totalWidth + RZP.totalWidthB) / 2
     topAngleTrapezoid, _ = calcTrapezoidAngles(
         RZP.totalWidth, RZP.totalWidthB, RZP.totalLength)
     dirDeviationAngle = 180 - topAngleTrapezoid * 2
 
-    positions = [Vec3()] * (math.ceil(numRZPs / 2))
-    directions = [Direction()] * (math.ceil(numRZPs / 2))
+    positions = [np.array([0,0,0])] * (math.ceil(numRZPs / 2))
+    directions = [np.array([[0,0,0],[0,0,0],[0,0,0]])] * (math.ceil(numRZPs / 2))
 
     # number of RZPs even
     if numRZPs % 2 == 0:
         # calculate positions
         pos = calculateObjectPos(
-            Vec3(0, 0, 0), midWidth/2, topAngleTrapezoid, iterDirection)
+            np.array([0,0,0]), midWidth/2, topAngleTrapezoid, iterDirection)
         positions[0] = pos
-        for i in range(1, math.floor(numRZPs/2), 1):
+        for i in range(1, math.floor(numRZPs/2)):
             pos = calculateObjectPos(
-                positions[i], midWidth, topAngleTrapezoid, iterDirection)
+                positions[i-1], midWidth, topAngleTrapezoid, iterDirection)
             positions[i] = pos
 
         # calculate directions
@@ -613,17 +579,17 @@ def calcRZPs(numRZPs: int, baseRZP: RZP, iterDirection: int):
             np.identity(3), dirDeviationAngle/2, -iterDirection)
         for i in range(math.floor(numRZPs/2)):
             dirMat = calculateObjectDir(
-                dirToNPMat(dirMat), dirDeviationAngle, iterDirection)
+                dirMat, dirDeviationAngle, iterDirection)
             directions[i] = dirMat
 
     # number of RZPs odd
     else:
         # calculate positions
-        pos = Vec3(0, 0, 0)
+        pos = np.array([0,0,0])
         positions[0] = pos
-        for i in range(1, numRZPs/2, 1):
+        for i in range(1, numRZPs/2):
             pos = calculateObjectPos(
-                positions[i], midWidth, topAngleTrapezoid, iterDirection)
+                positions[i-1], midWidth, topAngleTrapezoid, iterDirection)
             positions[i] = pos
         # remove duplicate middle element on the right side
         if iterDirection == 1:
@@ -634,7 +600,7 @@ def calcRZPs(numRZPs: int, baseRZP: RZP, iterDirection: int):
         for i in range(math.floor(numRZPs/2)):
             dirMat = calculateObjectDir(
                 dirMat, dirDeviationAngle, iterDirection)
-            directions[i] = npMatToDir(dirMat)
+            directions[i] = dirMat
 
     return positions, directions
 
@@ -662,11 +628,59 @@ def main():
     rzps = [RZP] * meta.numElements
     for i, currRZP in enumerate(rzps):
         currRZP.worldPosition = positions[i]
-        currRZP.worldXdirection = directions[i].xDir
-        currRZP.worldYdirection = directions[i].yDir
-        currRZP.worldZdirection = directions[i].zDir
+        currRZP.worldXdirection = directions[i][0]
+        currRZP.worldYdirection = directions[i][1]
+        currRZP.worldZdirection = directions[i][2]
         # insert RZP parameters
         root = insertRZP(root, currRZP)
+    
+    xPositions = [pos[0] for pos in positions]
+    yPositions = [pos[1] for pos in positions]
+    zPositions = [pos[2] for pos in positions]
+    fig = plt.figure()
+    ax = plt.axes(projection='3d')
+    ax.plot3D(xPositions, yPositions, zPositions, 'o');
+    ax.set_xlabel('X')
+    ax.set_ylabel('Y')
+    ax.set_zlabel('Z')
+    plt.show()
+    fig.savefig('RZPs.png')  
+    
+    # Plot directions
+    xDirectionsx = [dir[0][0] for dir in directions]
+    xDirectionsy = [dir[0][1] for dir in directions]
+    xDirectionsz = [dir[0][2] for dir in directions]
+    fig = plt.figure()
+    ax = plt.axes(projection='3d')
+    ax.plot3D(xDirectionsx, xDirectionsy, xDirectionsz, 'o');
+    ax.set_xlabel('X')
+    ax.set_ylabel('Y')
+    ax.set_zlabel('Z')
+    plt.show()
+    
+    # Plot directions
+    yDirectionsx = [dir[1][0] for dir in directions]
+    yDirectionsy = [dir[1][1] for dir in directions]
+    yDirectionsz = [dir[1][2] for dir in directions]
+    fig = plt.figure()
+    ax = plt.axes(projection='3d')
+    ax.plot3D(yDirectionsx, yDirectionsy, yDirectionsz, 'o');
+    ax.set_xlabel('X')
+    ax.set_ylabel('Y')
+    ax.set_zlabel('Z')
+    plt.show()
+    
+    # Plot directions
+    zDirectionsx = [dir[2][0] for dir in directions]
+    zDirectionsy = [dir[2][1] for dir in directions]
+    zDirectionsz = [dir[2][2] for dir in directions]
+    fig = plt.figure()
+    ax = plt.axes(projection='3d')
+    ax.plot3D(zDirectionsx, zDirectionsy, zDirectionsz, 'o');
+    ax.set_xlabel('X')
+    ax.set_ylabel('Y')
+    ax.set_zlabel('Z')
+    plt.show()
 
     indent(root)
     tmp = ET.tostring(root, encoding='UTF-8', method='xml')
