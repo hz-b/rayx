@@ -46,7 +46,7 @@ Assume \\(l_{S'} \geq m_{S'}\\) and \\(l_{S'} \geq n_{S'}\\) (first case). Then,
 \\[
 \begin{align*}
     ray 
-    &\overset{\text{I}}{=} \begin{bmatrix} x_{S'} \\ y_{S'} \\\\z_{S'} \\\\ \end{bmatrix} + t \begin{bmatrix} 1 \\\\ m_{S'}/l_{S'}\\\\ n_{S'}/l_{S'} \\\\ \end{bmatrix} \\\\
+    &\overset{\text{I}}{=} \begin{bmatrix} x_{S'} \\\\ y_{S'} \\\\z_{S'} \\\\ \end{bmatrix} + t \begin{bmatrix} 1 \\\\ m_{S'}/l_{S'}\\\\ n_{S'}/l_{S'} \\\\ \end{bmatrix} \\\\
     &\overset{\text{II}}{=} \begin{bmatrix} x_{S'}-1\cdot x_{S'} \\\\ y_{S'} - (m_{S'}/l_{S'}) \cdot y_{S'} \\\\z_{S'} - (n_{S'}/l_{S'}) \cdot z_{S'} \\\\ \end{bmatrix} + t \begin{bmatrix} 1 \\\\ m_{S'}/l_{S'}\\\\ n_{S'}/l_{S'} \\\\ \end{bmatrix} \\\\
     &\overset{\text{III}}{=} \begin{bmatrix} 0 \\\\ y \\\\ z \end{bmatrix} + t \begin{bmatrix} 1 \\\\ a_{ml} \\\\ a_{nl} \\\\ \end{bmatrix} 
 \end{align*}
