@@ -1,2 +1,5 @@
 [book]
 title = "RAY-X Wiki"
+
+[output.html]
+mathjax-support = true
