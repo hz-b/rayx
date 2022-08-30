@@ -29,7 +29,9 @@ void RayList::insertVector(const std::vector<Ray>& inRayVector) {
 
 void RayList::push(Ray r) {
     if (m_data.empty() || m_data.back().size() == RAY_MAX_ELEMENTS_IN_VECTOR) {
-        m_data.emplace_back();
+        std::vector<Ray> v;
+        v.reserve(RAY_MAX_ELEMENTS_IN_VECTOR);
+        m_data.emplace_back(v);
     }
     m_data.back().push_back(r);
 }
@@ -41,12 +43,11 @@ void RayList::append(const RayList& other) {
 }
 
 /**
- * @brief size returns the number of vectors in the ray list.
- * @return number of vectors in the ray list.
+ * @brief Get window into raw data of ray list (list of vectors of rays).
+ * @return const ray list data
  */
-size_t RayList::size() const {
-    if (m_data.empty()) return 0;
-    return m_data.size();
+const std::list<std::vector<Ray>>& RayList::getData() const {
+    return m_data;
 }
 
 /**

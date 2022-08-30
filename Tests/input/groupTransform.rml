@@ -66,7 +66,7 @@
     <param id="worldYdirection" enabled="F">
       <x>0</x>
       <y>0</y>
-      <z>1</z>
+      <z>-1</z>
     </param>
     <param id="worldZdirection" enabled="F">
       <x>0</x>

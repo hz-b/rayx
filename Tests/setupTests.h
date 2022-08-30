@@ -195,3 +195,6 @@ void compareRayLists(const RAYX::RayList& rayx, const RAYX::RayList& rayui,
 // out weight = 0 rays from rayx, as they are automatically missing in rayui.
 // This also filters out non-sequential rays to compare to Ray-UI correctly.
 void compareAgainstRayUI(std::string filename, double t = 1e-11);
+
+// updates the material tables of the Cpu Tracer to contain exactly the materials given in the std::vector.
+void updateCpuTracerMaterialTables(std::vector<Material>);

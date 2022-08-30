@@ -39,6 +39,18 @@ struct Element {
     dmat4 elementParameters;
 };
 
+struct PalikEntry {
+    double energy;
+    double n;
+    double k;
+};
+
+struct NffEntry {
+    double energy;
+    double f1;
+    double f2;
+};
+
 // this type intends to mimic the GLSL type T[], this is used for layouts.
 template <typename T>
 struct ShaderArray {
@@ -100,6 +112,15 @@ void fresnel(glm::dvec2 cn1, glm::dvec2 cn2, glm::dvec2 cos_incidence,
              glm::dvec2& complex_P);
 glm::dvec2 cartesian_to_euler(glm::dvec2 complex);
 double hvlam(double);
+
+dvec2 getAtomicMassAndRho(int material);
+int getPalikEntryCount(int material);
+PalikEntry getPalikEntry(int index, int material);
+int getNffEntryCount(int material);
+NffEntry getNffEntry(int index, int material);
+int getPalikEntryCount(int material);
+PalikEntry getPalikEntry(int index, int material);
+dvec2 getRefractiveIndex(double energy, int material);
 }  // namespace CPU_TRACER
 
 }  // namespace RAYX

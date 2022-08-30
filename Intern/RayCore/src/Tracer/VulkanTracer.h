@@ -210,7 +210,7 @@ class RAYX_API VulkanTracer : public Tracer {
     void createBuffers();
     void fillRayBuffer();
     void fillStagingBuffer(uint32_t offset,
-                           std::list<std::vector<Ray>>::iterator raySetIterator,
+                           std::list<std::vector<Ray>>::const_iterator raySetIterator,
                            size_t vectorsPerStagingBuffer);
     void createDescriptorSetLayout();
     void createDescriptorSet();

@@ -1301,14 +1301,7 @@ TEST_F(TestSuite, testGetIncidenceAngle) {
 }
 
 TEST_F(TestSuite, testReflectance) {
-    {  // add copper material to cpu tracer
-        std::array<bool, 92> mats;
-        mats.fill(false);
-        mats[29 - 1] = true;  // copper (i.e. element 29) is relevant!
-        auto materialTables = loadMaterialTables(mats);
-        CPU_TRACER::mat.data = materialTables.materialTable;
-        CPU_TRACER::matIdx.data = materialTables.indexTable;
-    }
+    updateCpuTracerMaterialTables({Material::Cu});
 
     struct InOutPair {
         double in_energy;
@@ -1442,4 +1435,106 @@ TEST_F(TestSuite, testHvlam) {
 
     a = abs(CPU_TRACER::hvlam(hv)) * abs(linedensity) * orderOfDiff * 1e-06;
     CHECK_EQ(a, 0.01239852);
+}
+
+TEST_F(TestSuite, testGetAtomicMassAndRho) {
+    CHECK_EQ(CPU_TRACER::getAtomicMassAndRho(static_cast<int>(Material::H)),
+             glm::dvec2(1.00794, 0.0708));
+    CHECK_EQ(CPU_TRACER::getAtomicMassAndRho(static_cast<int>(Material::He)),
+             glm::dvec2(4.0026, 0.122));
+    CHECK_EQ(CPU_TRACER::getAtomicMassAndRho(static_cast<int>(Material::Li)),
+             glm::dvec2(6.941, 0.533));
+    CHECK_EQ(CPU_TRACER::getAtomicMassAndRho(static_cast<int>(Material::Be)),
+             glm::dvec2(9.01218, 1.845));
+    CHECK_EQ(CPU_TRACER::getAtomicMassAndRho(static_cast<int>(Material::B)),
+             glm::dvec2(10.81, 2.34));
+    CHECK_EQ(CPU_TRACER::getAtomicMassAndRho(static_cast<int>(Material::C)),
+             glm::dvec2(12.011, 2.26));
+    // ...
+    CHECK_EQ(CPU_TRACER::getAtomicMassAndRho(static_cast<int>(Material::Cu)),
+             glm::dvec2(63.546, 8.94));
+    // ...
+    CHECK_EQ(CPU_TRACER::getAtomicMassAndRho(static_cast<int>(Material::U)),
+             glm::dvec2(238.0289, 18.92));
+}
+
+TEST_F(TestSuite, testPalik) {
+    updateCpuTracerMaterialTables({Material::Cu, Material::Au});
+
+    int Cu = static_cast<int>(Material::Cu);
+    CHECK_EQ(CPU_TRACER::getPalikEntryCount(Cu), 324);
+
+    auto Cu0 = CPU_TRACER::getPalikEntry(0, Cu);
+    CHECK_EQ(Cu0.energy, 1.0);
+    CHECK_EQ(Cu0.n, 0.433);
+    CHECK_EQ(Cu0.k, 8.46);
+
+    auto Cu10 = CPU_TRACER::getPalikEntry(10, Cu);
+    CHECK_EQ(Cu10.energy, 2.3);
+    CHECK_EQ(Cu10.n, 1.04);
+    CHECK_EQ(Cu10.k, 2.59);
+
+    int Au = static_cast<int>(Material::Au);
+    CHECK_EQ(CPU_TRACER::getPalikEntryCount(Au), 386);
+
+    auto Au0 = CPU_TRACER::getPalikEntry(0, Au);
+    CHECK_EQ(Au0.energy, 0.04959);
+    CHECK_EQ(Au0.n, 20.3);
+    CHECK_EQ(Au0.k, 76.992);
+
+    auto Au10 = CPU_TRACER::getPalikEntry(10, Au);
+    CHECK_EQ(Au10.energy, 0.11158);
+    CHECK_EQ(Au10.n, 12.963);
+    CHECK_EQ(Au10.k, 57.666);
+}
+
+TEST_F(TestSuite, testNff) {
+    updateCpuTracerMaterialTables({Material::Cu, Material::Au});
+
+    int Cu = static_cast<int>(Material::Cu);
+    CHECK_EQ(CPU_TRACER::getNffEntryCount(Cu), 504);
+
+    auto Cu0 = CPU_TRACER::getNffEntry(0, Cu);
+
+    CHECK_EQ(Cu0.energy, 10.0);
+    CHECK_EQ(Cu0.f1, -9999.0);
+    CHECK_EQ(Cu0.f2, 1.30088);
+
+    auto Cu10 = CPU_TRACER::getNffEntry(10, Cu);
+    CHECK_EQ(Cu10.energy, 11.7404);
+    CHECK_EQ(Cu10.f1, -9999.0);
+    CHECK_EQ(Cu10.f2, 1.66946);
+
+    int Au = static_cast<int>(Material::Au);
+    CHECK_EQ(CPU_TRACER::getNffEntryCount(Au), 506);
+
+    auto Au0 = CPU_TRACER::getNffEntry(0, Au);
+    CHECK_EQ(Au0.energy, 10.0);
+    CHECK_EQ(Au0.f1, -9999.0);
+    CHECK_EQ(Au0.f2, 1.73645);
+
+    auto Au10 = CPU_TRACER::getNffEntry(10, Au);
+    CHECK_EQ(Au10.energy, 11.7404);
+    CHECK_EQ(Au10.f1, -9999.0);
+    CHECK_EQ(Au10.f2, 2.67227);
+}
+
+TEST_F(TestSuite, testRefractiveIndex) {
+    updateCpuTracerMaterialTables({Material::Cu});
+
+    // vacuum
+    CHECK_EQ(CPU_TRACER::getRefractiveIndex(42.0, -1), glm::dvec2(1.0, 0.0));
+
+    // palik tests for Cu
+    // data taken from Data/PALIK
+    CHECK_EQ(CPU_TRACER::getRefractiveIndex(1.0, 29), glm::dvec2(0.433, 8.46));
+    CHECK_EQ(CPU_TRACER::getRefractiveIndex(1.8, 29), glm::dvec2(0.213, 4.05));
+    CHECK_EQ(CPU_TRACER::getRefractiveIndex(1977.980, 29),
+             glm::dvec2(1.000032, 9.4646668E-05));
+
+    // nff tests for Cu
+    // data taken from
+    // https://refractiveindex.info/?shelf=main&book=Cu&page=Hagemann
+    CHECK_EQ(CPU_TRACER::getRefractiveIndex(25146.2, 29),
+             glm::dvec2(1.0, 1.0328e-7), 1e-5);
 }
