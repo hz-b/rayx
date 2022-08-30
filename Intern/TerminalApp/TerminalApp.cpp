@@ -34,7 +34,7 @@ void TerminalApp::handleInputPath(std::filesystem::path path) {
         for (auto p : fs::directory_iterator(path)) {
             handleInputPath(p.path());
         }
-    } else {
+    } else if (path.extension() == ".rml") {
         // Load RML file
         m_Beamline =
             std::make_unique<RAYX::Beamline>(RAYX::importBeamline(path));
@@ -49,6 +49,8 @@ void TerminalApp::handleInputPath(std::filesystem::path path) {
         // Export Debug Matrics.
         exportDebug();
 #endif
+    } else {
+        RAYX_LOG << "ignoring non-rml file: '" << path << "'";
     }
 }
 
@@ -90,9 +92,6 @@ void TerminalApp::run() {
                         .count()
                  << " ms";
     }
-
-    // TODO(Rudi): now the python plotting module needs an input file!
-    // also, for directory runs we may not need to implement plotting.
 
     //  Plot in Python
     if (m_CommandParser->m_args.m_plotFlag) {
