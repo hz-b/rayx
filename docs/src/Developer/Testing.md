@@ -37,28 +37,28 @@ To move the test data to the shader and retrieve the results after applying the 
 - double **extra Parameter**
 
 We can for example encode the test values for the refraction test as:
-- dvec **position** $\leftarrow$ **normal**
-- dvec **direction** $\leftarrow$ **direction**
-- double **energy** $\leftarrow$ **lineDensity**
-- double **weight** $\leftarrow$ **weight**
-- others $\leftarrow$ 0
+- dvec **position** \\(\leftarrow\\) **normal**
+- dvec **direction** \\(\leftarrow\\) **direction**
+- double **energy** \\(\leftarrow\\) **lineDensity**
+- double **weight** \\(\leftarrow\\) **weight**
+- others \\(\leftarrow\\) 0
 
 For this, we can use the function "addTestSetting" that receives the test values in the correct order, creates a ray and adds it to a given ray vector which is in this case the one that will be transferred to the shader (std::vector\<RAYX::Ray\> **testValues**).
 To be able to verify the result that we will later retrieve from the shader, we need to store also the expected direction_out and weight_out. To make the comparison later easier we also store these in a Ray that corresponds to the test case and add it to std::vector\<RAYX::Ray\> **correct** using for example the following encoding:
-- dvec **position** $\leftarrow$ (0,0,0)
-- dvec **direction** $\leftarrow$ **direction_expected**
-- double **energy** $\leftarrow$ 0
-- double **weight** $\leftarrow$ **weight_expected**
-- others $\leftarrow$ 0
+- dvec **position** \\(\leftarrow\\) (0,0,0)
+- dvec **direction** \\(\leftarrow\\) **direction_expected**
+- double **energy** \\(\leftarrow\\) 0
+- double **weight** \\(\leftarrow\\) **weight_expected**
+- others \\(\leftarrow\\) 0
 
 Now we have in both vectors one Ray for each test case, where **testValues** contains the values that we move to the shader and **correct** contains those that we expect to get back. Now, we can move **testValues** as the Ray buffer to the shader.
 
 Then, on the shader side we need to make sure that the test values are "unpacked" correctly from the ray buffer. We can execute the function and store the updated direction and weight in the output ray buffer in the same format as they are stored in **correct** on the C++ side which is:
-- dvec **position** $\leftarrow$ (0,0,0)
-- dvec **direction** $\leftarrow$ **direction_out**
-- double **energy** $\leftarrow$ 0
-- double **weight** $\leftarrow$ **weight_out**
-- others $\leftarrow$ 0
+- dvec **position** \\(\leftarrow\\) (0,0,0)
+- dvec **direction** \\(\leftarrow\\) **direction_out**
+- double **energy** \\(\leftarrow\\) 0
+- double **weight** \\(\leftarrow\\) **weight_out**
+- others \\(\leftarrow\\) 0
 
 These Rays are returned to the C++ test code as **outputRays** where the can be compared with compareFromCorrect(correct, outputRays, tolerance); for a given tolerance.
 
