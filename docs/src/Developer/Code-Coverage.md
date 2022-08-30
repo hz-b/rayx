@@ -1,7 +1,7 @@
 # What is Code Coverage:
 Analyzing your code Coverage is a necessary step in devloping complex big projects.
 
-Getting the code's coverage is simply generating a summary of how much a piece of code executed and "covered".
+Getting the code's coverage is simply generating a summary of how much a piece of code is executed and "covered".
 
 Code Coverage offers line, function, and branch analysis.
 
@@ -9,7 +9,7 @@ Generally, the most reasonable method is to check how much code your Testsuites 
 
 # Requirements 
 
-_Please Note: This has only been on UNIX System (Ubuntu)_ 
+_Please Note: This has only been tested on UNIX System (Ubuntu)_ 
 
 Code Coverage is supported by GNU GCC and LLVM. Make sure that one of these build tools is installed. Gcov, lcov and genhtml are packages that are also needed. For more information, you can check the usage of gcov (GCC) [here](https://gcc.gnu.org/onlinedocs).
 
