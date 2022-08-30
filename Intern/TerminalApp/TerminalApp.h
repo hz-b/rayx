@@ -3,6 +3,7 @@
 #include <Tracer/Tracer.h>
 
 #include <chrono>
+#include <filesystem>
 
 #include "CommandParser.h"
 #include "PythonInterp.h"
@@ -34,7 +35,9 @@ class TerminalApp {
      */
     char** m_argv;
     int m_argc;
-    void exportRays(RAYX::RayList&);
+
+    void handleInputPath(std::filesystem::path);
+    void exportRays(RAYX::RayList&, std::string); // TODO(Rudi) convert to std::filesystem::path later
 #if defined(RAYX_DEBUG_MODE) && not defined(CPP)
     void exportDebug();
 #endif
