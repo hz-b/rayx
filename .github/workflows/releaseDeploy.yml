@@ -1,11 +1,10 @@
 name: ReleaseDeploy
 
 on:
-  workflow_run:
-    workflows: ["BuildAndTest"]
-    types: [completed] #requested
-    branches: master
-    tags: v*
+  push:
+    # Sequence of patterns matched against refs/tags
+    tags:
+      - 'v*' # Push events to matching v*, i.e. v1.0, v20.15.10
 
 
 jobs:
@@ -25,6 +24,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # This token is provided by Actions, you do not need to create your own token
         with:
           release_name: Release ${{ github.ref }}
+          tag_name: ${{ github.ref }}
           body_path: docs/changes/lastChanges.md
           draft: false
           prerelease: false
