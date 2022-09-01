@@ -2,18 +2,37 @@ name: ReleaseDeploy
 
 on:
   workflow_run:
-     workflows: ["BuildAndTest"]
-     types: [completed] #requested
+    workflows: ["BuildAndTest"]
+    types: [completed] #requested
+    branches: master
+    tags: v*
+
 
 jobs:
   on-success:
+    name: Create Release
     runs-on: ubuntu-latest
-    if: ${{ github.event.workflow_run.conclusion == 'success' }}
+    if: github.event.workflow_run.conclusion == 'success'
     steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+        with:
+          ref: master
+      - name: Create Release
+        id: create_release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # This token is provided by Actions, you do not need to create your own token
+        with:
+          tag_name: ${{ github.ref }}
+          release_name: Release ${{ github.ref }}
+          body_path: docs/changes/lastChanges.md
+          draft: false
+          prerelease: false
       - run: echo "First workflow was a success"
 
   on-failure:
     runs-on: ubuntu-latest
-    if: ${{ github.event.workflow_run.conclusion == 'failure' }}
+    if: github.event.workflow_run.conclusion == 'failure'
     steps:
       - run: echo "First workflow was a failure"
