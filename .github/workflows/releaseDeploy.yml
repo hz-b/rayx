@@ -1,22 +1,18 @@
-name: ReleaseDeploy
-
 on:
   push:
     # Sequence of patterns matched against refs/tags
     tags:
       - 'v*' # Push events to matching v*, i.e. v1.0, v20.15.10
 
+name: Create Release
 
 jobs:
-  on-success:
+  build:
     name: Create Release
     runs-on: ubuntu-latest
-    if: github.event.workflow_run.conclusion == 'success'
     steps:
       - name: Checkout code
-        uses: actions/checkout@v3
-        with:
-          ref: master
+        uses: actions/checkout@v2
       - name: Create Release
         id: create_release
         uses: actions/create-release@v1
@@ -28,10 +24,3 @@ jobs:
           body_path: docs/changes/lastChanges.md
           draft: false
           prerelease: false
-      - run: echo "First workflow was a success"
-
-  on-failure:
-    runs-on: ubuntu-latest
-    if: github.event.workflow_run.conclusion == 'failure'
-    steps:
-      - run: echo "First workflow was a failure"
