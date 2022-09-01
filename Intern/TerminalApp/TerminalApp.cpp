@@ -4,6 +4,7 @@
 #include <Tracer/VulkanTracer.h>
 #include <Writer/Writer.h>
 
+#include <filesystem>
 #include <memory>
 #include <stdexcept>
 
@@ -19,6 +20,40 @@ TerminalApp::TerminalApp(int argc, char** argv) : m_argv(argv), m_argc(argc) {
 
 TerminalApp::~TerminalApp() { RAYX_D_LOG << "TerminalApp deleted!"; }
 
+void TerminalApp::handleInputPath(std::filesystem::path path) {
+    namespace fs = std::filesystem;
+    if (!fs::exists(path)) {
+        if (path.empty()) {
+            RAYX_ERR << "No input file provided!";
+        } else {
+            RAYX_ERR << "File '" << path << "' not found!";
+        }
+    }
+
+    if (fs::is_directory(path)) {
+        for (auto p : fs::directory_iterator(path)) {
+            handleInputPath(p.path());
+        }
+    } else if (path.extension() == ".rml") {
+        // Load RML file
+        m_Beamline =
+            std::make_unique<RAYX::Beamline>(RAYX::importBeamline(path));
+
+        // Run RAY-X Core
+        auto rays = m_Tracer->trace(*m_Beamline);
+
+        // Export Rays to external data.
+        exportRays(rays, path);
+
+#if defined(RAYX_DEBUG_MODE) && not defined(CPP)
+        // Export Debug Matrics.
+        exportDebug();
+#endif
+    } else {
+        RAYX_LOG << "ignoring non-rml file: '" << path << "'";
+    }
+}
+
 void TerminalApp::run() {
     RAYX_PROFILE_FUNCTION();
 
@@ -30,41 +65,23 @@ void TerminalApp::run() {
     m_CommandParser->analyzeCommands();
 
     auto start_time = std::chrono::steady_clock::now();
+    if (m_CommandParser->m_args.m_benchmark) {
+        RAYX_D_LOG << "Starting in Benchmark Mode.\n";
+    }
     /////////////////// Argument treatement
     if (m_CommandParser->m_args.m_version) {
         m_CommandParser->getVersion();
         exit(1);
     }
-    // Load RML files
-    if (!m_CommandParser->m_args.m_providedFile.empty()) {
-        // load rml file
-        m_Beamline = std::make_unique<RAYX::Beamline>(
-            RAYX::importBeamline(m_CommandParser->m_args.m_providedFile));
-    } else {
-        RAYX_LOG << "No Pipeline/Beamline provided, exiting..";
-        exit(1);
-    }
 
-    // Chose Hardware
+    // Choose Hardware
     if (m_CommandParser->m_args.m_cpuFlag) {
         m_Tracer = std::make_unique<RAYX::CpuTracer>();
     } else {
         m_Tracer = std::make_unique<RAYX::VulkanTracer>();
     }
 
-    if (m_CommandParser->m_args.m_benchmark) {
-        RAYX_D_LOG << "Starting in Benchmark Mode.\n";
-    }
-    // Run RAY-X Core
-    auto rays = m_Tracer->trace(*m_Beamline);
-
-    // Export Rays to external data.
-    exportRays(rays);
-
-#if defined(RAYX_DEBUG_MODE) && not defined(CPP)
-    // Export Debug Matrics.
-    exportDebug();
-#endif
+    handleInputPath(m_CommandParser->m_args.m_providedFile);
 
     if (m_CommandParser->m_args.m_benchmark) {
         std::chrono::steady_clock::time_point end =
@@ -114,18 +131,23 @@ void TerminalApp::run() {
     }
 }
 
-void TerminalApp::exportRays(RAYX::RayList& rays) {
+void TerminalApp::exportRays(RAYX::RayList& rays, std::string path) {
 #ifdef CI
     bool csv = true;
 #else
     bool csv = m_CommandParser->m_args.m_csvFlag;
 #endif
 
+    // strip .rml
+    if (path.ends_with(".rml")) {
+        path = path.substr(0, path.length() - 4);
+    }
+
     if (csv) {
-        writeCSV(rays, "output.csv");
+        writeCSV(rays, path + ".csv");
     } else {
 #ifndef CI  // writeH5 is not defined in the CI!
-        writeH5(rays, "output.h5");
+        writeH5(rays, path + ".h5");
 #endif
     }
 }

@@ -1,4 +1,4 @@
-name: mdbookDeploy
+name: MDBookDeploy
 
 # Controls when the workflow will run
 on:

@@ -79,7 +79,7 @@ class CommandParser {
           &(m_args.m_plotFlag)}},
         {'x', {OptionType::BOOL, "cpu", "Tracing on CPU", &(m_args.m_cpuFlag)}},
         {'i',
-         {OptionType::STRING, "input", "Input RML File Path.",
+         {OptionType::STRING, "input", "Input RML File or Directory.",
           &(m_args.m_providedFile)}},
         {'v', {OptionType::BOOL, "version", "", &(m_args.m_version)}},
     };

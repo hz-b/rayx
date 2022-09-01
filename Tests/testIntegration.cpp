@@ -84,26 +84,17 @@ TEST_F(TestSuite, Slit) {
     }
 }
 
-TEST_F(TestSuite, toroid_MS) { compareAgainstRayUI("toroid_MS"); }
-/*
-TEST_F(TestSuite, toroid_MS_T) { compareAgainstRayUI("toroid_MS_T"); }
 TEST_F(TestSuite, toroid) { compareAgainstRayUI("toroid"); }
-*/
 
-// TODO(Rudi): fix and re-enable tests, Why do they fail?
-/*
+// this is the same test as above, but xLength and zLength are exchanged. This
+// tests the wasteBox, as not all rays hit the toroid.
+TEST_F(TestSuite, toroid_swapped) { compareAgainstRayUI("toroid_swapped"); }
+
 TEST_F(TestSuite, Ellipsoid_DGIA) { compareAgainstRayUI("Ellipsoid_DGIA"); }
 TEST_F(TestSuite, Ellipsoid_MB) { compareAgainstRayUI("Ellipsoid_MB"); }
+
+// TODO: why is this called Ellipsoid_PM if it contains a PlaneMirror and no
+// Ellipsoid?
 TEST_F(TestSuite, Ellipsoid_PM) { compareAgainstRayUI("Ellipsoid_PM"); }
 
-TEST_F(TestSuite, ellipsoid_ip_200ellipsmis_simpl) { // this is a temporary
-_simpl test, it is the same as the next test but without the ImagePlane.
-    compareAgainstRayUI("ellipsoid_ip_200ellipsmis_simpl");
-}
-TEST_F(TestSuite, ellipsoid_ip_200ellipsmis) {
-    compareAgainstRayUI("ellipsoid_ip_200ellipsmis");
-}
-TEST_F(TestSuite, ellipsoid_ip_200mirrormis) {
-    compareAgainstRayUI("ellipsoid_ip_200mirrormis");
-}
-*/
+TEST_F(TestSuite, ellipsoid_ip_200mirrormis) { compareAgainstRayUI("ellipsoid_ip_200mirrormis"); }

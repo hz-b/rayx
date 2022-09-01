@@ -44,8 +44,8 @@
 
   <object name="Toroid" type="Toroid">
     <param id="geometricalShape" comment="rectangle" enabled="T">0</param>
-    <param id="totalWidth" enabled="T">50</param>
-    <param id="totalLength" enabled="T">200</param>
+    <param id="totalWidth" enabled="T">200</param>
+    <param id="totalLength" enabled="T">50</param>
     <param id="grazingIncAngle" enabled="T">10</param>
     <param id="entranceArmLengthSag" enabled="T">10000</param>
     <param id="exitArmLengthSag" enabled="T">1000</param>
@@ -121,6 +121,31 @@
       <z>0.98480775301220802</z>
     </param>
   </object>
+
+  <object name="ImagePlane" type="ImagePlane">
+    <param id="distanceImagePlane" enabled="T">1000</param>
+    <param id="worldPosition" enabled="F">
+      <x>0</x>
+      <y>342.02014332566864</y>
+      <z>10939.692620785909</z>
+    </param>
+    <param id="worldXdirection" enabled="F">
+      <x>1</x>
+      <y>0</y>
+      <z>0</z>
+    </param>
+    <param id="worldYdirection" enabled="F">
+      <x>0</x>
+      <y>0.93969262078590832</y>
+      <z>-0.34202014332566866</z>
+    </param>
+    <param id="worldZdirection" enabled="F">
+      <x>0</x>
+      <y>0.34202014332566866</y>
+      <z>0.93969262078590832</z>
+    </param>
+  </object>
+
 </beamline>
 
 <ExtraData>

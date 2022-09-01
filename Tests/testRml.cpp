@@ -30,7 +30,7 @@ TEST_F(TestSuite, groupTransform) {
     std::array<double, 4 * 4> correct = {
         1,   0, 0,     0,  //
         0,   0, 1,     0,  //
-        0,   1, 0,     0,  //
+        0,  -1, 0,     0,  //
         -42, 0, -1000, 1,  //
     };
     CHECK_EQ(correct, m);

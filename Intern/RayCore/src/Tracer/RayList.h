@@ -37,16 +37,18 @@ struct ConstRayListIter {
     const Ray& operator*();
 };
 
+/** RayList is a list of vectors of rays. Each vector has a fixed size.
+ *   When a vector is full, a new vector is created. The reason for this
+ *   design is to avoid memory allocation errors.
+ */
 class RayList {
   public:
-    // list of vectors
     RayList();
     ~RayList();
-    // appends vector of Rays to the ray list
+    const std::list<std::vector<Ray>>& getData() const;
     void insertVector(const std::vector<Ray>& inRayVector);
     void push(Ray);
     void append(const RayList& other);
-    size_t size() const;
     size_t rayAmount() const;
     void clean();
 
@@ -75,8 +77,8 @@ class RayList {
         return out;
     }
 
-    // private:
-    std::list<std::vector<Ray>> m_data;  // TODO(Jannis): make private
+  private:
+    std::list<std::vector<Ray>> m_data;
 };
 
 }  // namespace RAYX

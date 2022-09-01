@@ -136,13 +136,14 @@ def plotForEachSubplot(df: pd.DataFrame, title: str, _single_color=False):
     # plt.tight_layout()
     plt.show()
 
-
-def plotOutput(filename: str, title: str, plot_type: int):
+def plotOutput(rml_file: str, plot_type: int):
     """
     Plots output file to a matplotlib figure(s)
     """
 
-    df = importOutput(filename)
+    title = rml_file
+    h5_file = rml_file.replace(".rml", ".h5")
+    df = importOutput(h5_file)
 
     # TODO: Enhance
     _whichPlot = PlotType(plot_type)
@@ -156,4 +157,4 @@ def plotOutput(filename: str, title: str, plot_type: int):
 
 
 if __name__ == '__main__':
-    plotOutput('output.h5', str(sys.argv[1]), int(sys.argv[2]))
+    plotOutput(str(sys.argv[1]), int(sys.argv[2]))

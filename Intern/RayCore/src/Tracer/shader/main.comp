@@ -121,7 +121,7 @@ void dynamicElements() {
 
     int closestElementIndex = -1;
     int lastClosestElementIndex;
-    dvec4 closestHitpoint = dvec4(1.0 / 0.0, 1.0 / 0.0, 1.0 / 0.0, 0.0);
+    dvec4 closestHitpoint = dvec4(undefined(), undefined(), undefined(), 0.0);
     dvec4 closestGlobalHitpoint;
     
     #ifdef RAYX_DEBUG_MODE // Debug Matrix only works in GPU Mode and on DEBUG Build Type
@@ -156,8 +156,8 @@ void dynamicElements() {
         closestElementIndex = -1;
 
         // global coordinates of first intersection point of ray among all elements in beamline
-        closestHitpoint       = dvec4(1.0 / 0.0, 1.0 / 0.0, 1.0 / 0.0, 0);
-        closestGlobalHitpoint = dvec4(1.0 / 0.0, 1.0 / 0.0, 1.0 / 0.0, 0);
+        closestHitpoint       = dvec4(undefined(), undefined(), undefined(), 0);
+        closestGlobalHitpoint = dvec4(undefined(), undefined(), undefined(), 0);
 
         // Find intersection points through all elements
         for (int elementIndex = int(beamlineIndex) * int(numberOfElementsPerBeamline);

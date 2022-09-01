@@ -17,6 +17,7 @@
     - [VSCode recommended Extensions](./Developer/VSCode-recommended-Extensions.md)
     - [Debugging](./Developer/Debugging.md)
     - [Code Coverage](./Developer/Code-Coverage.md)
+    - [Vulkan one stage Compute Pipeline and beyond... A Vulkan Case Study](./Developer/Vulkan-Beyond.md)
 
 - [API User Area](./APIUser/APIUser.md)
     - [How to use RayCore](./APIUser/How-to-use-RayCore.md)
@@ -25,6 +26,7 @@
     - [User vs Model Parameter](./APIUser/User-vs-Model-Parameter.md)
     - [Ray generation](./APIUser/Ray-generation.md)
     - [Vulkan Tracer](./APIUser/VulkanTracer.md)
+
 
 - [App User Area](./AppUser/AppUser.md)
     - [How to use TerminalApp](./AppUser/How-to-use-the-TerminalApp.md)
