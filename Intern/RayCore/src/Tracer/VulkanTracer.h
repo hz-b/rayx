@@ -100,7 +100,6 @@ class RAYX_API VulkanTracer : public Tracer {
 
     // Member functions:
     // Vulkan
-    void prepareVulkan();
     void prepareBuffers();
     void mainLoop();
     uint32_t findMemoryType(uint32_t memoryTypeBits,
@@ -114,7 +113,6 @@ class RAYX_API VulkanTracer : public Tracer {
         uint32_t offset,
         std::list<std::vector<Ray>>::const_iterator raySetIterator,
         size_t vectorsPerStagingBuffer);
-    void createDescriptorSetLayout();
     void createDescriptorSet();
     void createComputePipeline();
     void createCommandBuffer();

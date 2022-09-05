@@ -1,7 +1,7 @@
 #pragma once
 
-#include <vulkan/vulkan.hpp>
 #include <vector>
+#include <vulkan/vulkan.hpp>
 
 #include "RayCore.h"
 
@@ -12,6 +12,8 @@ const bool enableValidationLayers = false;
 #else
 const bool enableValidationLayers = true;
 #endif
+
+using Pipeline = std::vector<VkDescriptorSetLayoutBinding>;
 
 // set debug generation information
 const std::vector<const char*> validationLayers = {
@@ -29,7 +31,10 @@ class RAYX_API VulkanEngine {
     VulkanEngine() = default;
     ~VulkanEngine() = default;
 
-    void initVk();
+    inline void init(Pipeline p) {
+        initVk();
+        initPipeline(p);
+    }
 
     struct Compute {  // Possibilty to add CommandPool, Pipeline etc.. here
         std::vector<uint64_t> m_BufferSizes;
@@ -59,20 +64,28 @@ class RAYX_API VulkanEngine {
     uint32_t m_QueueFamilyIndex;
     QueueFamilyIndices m_QueueFamily;
 
+    ////////////////////////////////////////////////////////////////////////////////////////////
     // private implementation details - they should be kept at the bottom of
     // this file. don't bother reading them.
+    ////////////////////////////////////////////////////////////////////////////////////////////
 
-	// InitVk/CreateInstance.cpp
+    // InitVk/InitVk.cpp
+    void initVk();
+
+    // InitVk/CreateInstance.cpp
     void createInstance();
     void setupDebugMessenger();
 
-	// InitVk/PickDevice.cpp
-	void pickDevice();
-	void pickPhysicalDevice();
-	void createLogicalDevice();
+    // InitVk/PickDevice.cpp
+    void pickDevice();
+    void pickPhysicalDevice();
+    void createLogicalDevice();
 
-	// InitVk/CreateCommandPool.cpp
-	void createCommandPool();
+    // InitVk/CreateCommandPool.cpp
+    void createCommandPool();
+
+    // InitPipeline/InitPipeline.cpp
+    void initPipeline(Pipeline);
 };
 
 // Used for validating return values of Vulkan API calls.
@@ -87,6 +100,5 @@ class RAYX_API VulkanEngine {
                         "1.3-extensions/man/html/VkResult.html";         \
         }                                                                \
     }
-
 
 }  // namespace RAYX

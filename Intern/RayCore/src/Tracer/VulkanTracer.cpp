@@ -86,7 +86,37 @@ VulkanTracer::VulkanTracer() {
     // PS: To Save time and performance, Vulkan is initialized only once
     // throughout the whole trace process. If any of Vulkan resources are bound
     // to change, Vulkan might need to "be prepared again" (potential TODO)
-    prepareVulkan();
+
+    /*
+    Here we specify a descriptor set layout. This allows us to bind our
+    descriptors to resources in the shader.
+    */
+
+    /*
+    Here we specify a binding of type VK_DESCRIPTOR_TYPE_STORAGE_BUFFER to
+    the binding point 0. This binds to layout(std140, binding = 0) buffer
+    ibuf (input) and layout(std140, binding = 1) buffer obuf (output) etc.. in
+    the compute shader.
+    */
+    // bindings 0, 1, 2, 3, 4, 5, 6 are used right now
+    m_engine.init({{0, VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, 1,
+                    VK_SHADER_STAGE_COMPUTE_BIT, nullptr},
+                   {1, VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, 1,
+                    VK_SHADER_STAGE_COMPUTE_BIT, nullptr},
+                   {2, VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, 1,
+                    VK_SHADER_STAGE_COMPUTE_BIT, nullptr},
+                   {3, VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, 1,
+                    VK_SHADER_STAGE_COMPUTE_BIT, nullptr},
+                   {4, VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, 1,
+                    VK_SHADER_STAGE_COMPUTE_BIT, nullptr},
+                   {5, VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, 1,
+                    VK_SHADER_STAGE_COMPUTE_BIT, nullptr},
+#ifdef RAYX_DEBUG_MODE
+                   {6, VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, 1,
+                    VK_SHADER_STAGE_COMPUTE_BIT, nullptr}
+#endif
+    });
+
     // beamline.resize(0);
 }
 
@@ -206,21 +236,6 @@ void VulkanTracer::run() {
 #ifdef RAYX_DEBUG_MODE
     getDebugBuffer();
 #endif
-}
-
-/**
- * @brief Prepares Vulkan for "first" trace sequence.
- * Instance, DebugMessenger(validiation-layers), Physical Device, Logical
- * Device, CommandPool and DescriptorSetLayout are created.
- */
-void VulkanTracer::prepareVulkan() {
-    RAYX_PROFILE_FUNCTION();
-    // a vulkan instance is created
-    m_engine.initVk();
-
-    // creates the descriptors used to bind the buffer to shader access
-    // points (bindings)
-    createDescriptorSetLayout();
 }
 
 void VulkanTracer::prepareBuffers() {
@@ -776,54 +791,6 @@ void VulkanTracer::fillMaterialBuffer() {
     RAYX_LOG << "Done!";
 }
 
-// Create Layout for descriptors that should contain data to/from shader
-void VulkanTracer::createDescriptorSetLayout() {
-    RAYX_PROFILE_FUNCTION();
-    /*
-    Here we specify a descriptor set layout. This allows us to bind our
-    descriptors to resources in the shader.
-    */
-
-    /*
-    Here we specify a binding of type VK_DESCRIPTOR_TYPE_STORAGE_BUFFER to
-    the binding point 0. This binds to layout(std140, binding = 0) buffer
-    ibuf (input) and layout(std140, binding = 1) buffer obuf (output) etc.. in
-    the compute shader.
-    */
-    // bindings 0, 1, 2, 3, 4, 5, 6 are used right now
-    VkDescriptorSetLayoutBinding descriptorSetLayoutBinding[] = {
-        {0, VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, 1, VK_SHADER_STAGE_COMPUTE_BIT,
-         nullptr},
-        {1, VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, 1, VK_SHADER_STAGE_COMPUTE_BIT,
-         nullptr},
-        {2, VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, 1, VK_SHADER_STAGE_COMPUTE_BIT,
-         nullptr},
-        {3, VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, 1, VK_SHADER_STAGE_COMPUTE_BIT,
-         nullptr},
-        {4, VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, 1, VK_SHADER_STAGE_COMPUTE_BIT,
-         nullptr},
-        {5, VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, 1, VK_SHADER_STAGE_COMPUTE_BIT,
-         nullptr},
-#ifdef RAYX_DEBUG_MODE
-        {6, VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, 1, VK_SHADER_STAGE_COMPUTE_BIT,
-         nullptr}
-#endif
-    };
-
-    VkDescriptorSetLayoutCreateInfo descriptorSetLayoutCreateInfo = {};
-    descriptorSetLayoutCreateInfo.sType =
-        VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO;
-    // 7 or 6 bindings are used in this layout
-    descriptorSetLayoutCreateInfo.bindingCount =
-        m_settings.m_computeBuffersCount;
-    descriptorSetLayoutCreateInfo.pBindings =
-        descriptorSetLayoutBinding;  // TODO
-
-    // Create the descriptor set layout.
-    VK_CHECK_RESULT(vkCreateDescriptorSetLayout(
-        m_engine.m_Device, &descriptorSetLayoutCreateInfo, nullptr,
-        &m_engine.m_DescriptorSetLayout));
-}
 /* Descriptor sets need a pool to allocate from, which is crated here. */
 void VulkanTracer::createDescriptorSet() {
     RAYX_PROFILE_FUNCTION();
