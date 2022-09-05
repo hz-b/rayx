@@ -7,9 +7,74 @@ namespace RAYX {
 
 VKAPI_ATTR VkBool32 VKAPI_CALL debugCallback(
     VkDebugUtilsMessageSeverityFlagBitsEXT messageSeverity,
-    [[maybe_unused]] VkDebugUtilsMessageTypeFlagsEXT messageType,
-    const VkDebugUtilsMessengerCallbackDataEXT* pCallbackData,
-    [[maybe_unused]] void* pUserData) {
+    VkDebugUtilsMessageTypeFlagsEXT messageType,
+    const VkDebugUtilsMessengerCallbackDataEXT* pCallbackData, void* pUserData);
+bool checkValidationLayerSupport();
+VkResult CreateDebugUtilsMessengerEXT(
+    VkInstance instance, const VkDebugUtilsMessengerCreateInfoEXT* pCreateInfo,
+    const VkAllocationCallbacks* pAllocator,
+    VkDebugUtilsMessengerEXT* pDebugMessenger);
+std::vector<const char*> getRequiredExtensions();
+void populateDebugMessengerCreateInfo(
+    VkDebugUtilsMessengerCreateInfoEXT& createInfo);
+void setupDebugMessenger(VkInstance& inst);
+
+/* Create a new Vulkan library instance. (Validation layers included) */
+void VulkanEngine::createInstance() {
+    RAYX_PROFILE_FUNCTION();
+    // validation layers are used for debugging
+    if (enableValidationLayers && !checkValidationLayerSupport()) {
+        throw std::runtime_error(
+            "validation layers requested, but not available!");
+    }
+
+    // Add description for instance
+    VkApplicationInfo appInfo{};
+    appInfo.sType = VK_STRUCTURE_TYPE_APPLICATION_INFO;
+    appInfo.pApplicationName = "Terminal App";
+    appInfo.applicationVersion = VK_MAKE_API_VERSION(0, 1, 2, 154);
+    appInfo.pEngineName = "Vulkan RAY-X Engine";
+    appInfo.engineVersion = VK_MAKE_API_VERSION(0, 1, 2, 154);
+    appInfo.apiVersion = VK_API_VERSION_1_2;
+
+    // pointer to description with layer count
+    VkInstanceCreateInfo createInfo{};
+    createInfo.sType = VK_STRUCTURE_TYPE_INSTANCE_CREATE_INFO;
+    createInfo.pApplicationInfo = &appInfo;
+    createInfo.enabledLayerCount = 0;
+
+    auto extensions = getRequiredExtensions();
+    createInfo.enabledExtensionCount = static_cast<uint32_t>(extensions.size());
+    createInfo.ppEnabledExtensionNames = extensions.data();
+
+    // Validation Layer Debug Outpout "handler"
+    VkDebugUtilsMessengerCreateInfoEXT debugCreateInfo;
+    if (enableValidationLayers) {
+        createInfo.enabledLayerCount =
+            static_cast<uint32_t>(validationLayers.size());
+        createInfo.ppEnabledLayerNames = validationLayers.data();
+        populateDebugMessengerCreateInfo(debugCreateInfo);
+        createInfo.pNext =
+            (VkDebugUtilsMessengerCreateInfoEXT*)&debugCreateInfo;
+    } else {
+        createInfo.enabledLayerCount = 0;
+
+        createInfo.pNext = nullptr;
+    }
+
+    // create instance
+    VkResult result = vkCreateInstance(&createInfo, nullptr, &m_Instance);
+    if (result != VK_SUCCESS) {
+        RAYX_LOG << "Failed to create instance! Error Code " << result;
+        throw std::runtime_error("failed to create instance!");
+    }
+}
+
+VKAPI_ATTR VkBool32 VKAPI_CALL
+debugCallback(VkDebugUtilsMessageSeverityFlagBitsEXT messageSeverity,
+              [[maybe_unused]] VkDebugUtilsMessageTypeFlagsEXT messageType,
+              const VkDebugUtilsMessengerCallbackDataEXT* pCallbackData,
+              [[maybe_unused]] void* pUserData) {
     RAYX_PROFILE_FUNCTION();
 
     // Only show Warnings or higher severity bits
@@ -24,9 +89,6 @@ VKAPI_ATTR VkBool32 VKAPI_CALL debugCallback(
 
     return VK_FALSE;  // Should return False
 }
-
-
-
 
 // Checks if all validation layers are supported.
 bool checkValidationLayerSupport() {
@@ -91,57 +153,6 @@ void populateDebugMessengerCreateInfo(
                              VK_DEBUG_UTILS_MESSAGE_TYPE_VALIDATION_BIT_EXT |
                              VK_DEBUG_UTILS_MESSAGE_TYPE_PERFORMANCE_BIT_EXT;
     createInfo.pfnUserCallback = debugCallback;
-}
-
-/* Create a new Vulkan library instance. (Validation layers included) */
-void VulkanEngine::createInstance() {
-    RAYX_PROFILE_FUNCTION();
-    // validation layers are used for debugging
-    if (enableValidationLayers && !checkValidationLayerSupport()) {
-        throw std::runtime_error(
-            "validation layers requested, but not available!");
-    }
-
-    // Add description for instance
-    VkApplicationInfo appInfo{};
-    appInfo.sType = VK_STRUCTURE_TYPE_APPLICATION_INFO;
-    appInfo.pApplicationName = "Terminal App";
-    appInfo.applicationVersion = VK_MAKE_API_VERSION(0, 1, 2, 154);
-    appInfo.pEngineName = "Vulkan RAY-X Engine";
-    appInfo.engineVersion = VK_MAKE_API_VERSION(0, 1, 2, 154);
-    appInfo.apiVersion = VK_API_VERSION_1_2;
-
-    // pointer to description with layer count
-    VkInstanceCreateInfo createInfo{};
-    createInfo.sType = VK_STRUCTURE_TYPE_INSTANCE_CREATE_INFO;
-    createInfo.pApplicationInfo = &appInfo;
-    createInfo.enabledLayerCount = 0;
-
-    auto extensions = getRequiredExtensions();
-    createInfo.enabledExtensionCount = static_cast<uint32_t>(extensions.size());
-    createInfo.ppEnabledExtensionNames = extensions.data();
-
-    // Validation Layer Debug Outpout "handler"
-    VkDebugUtilsMessengerCreateInfoEXT debugCreateInfo;
-    if (enableValidationLayers) {
-        createInfo.enabledLayerCount =
-            static_cast<uint32_t>(validationLayers.size());
-        createInfo.ppEnabledLayerNames = validationLayers.data();
-        populateDebugMessengerCreateInfo(debugCreateInfo);
-        createInfo.pNext =
-            (VkDebugUtilsMessengerCreateInfoEXT*)&debugCreateInfo;
-    } else {
-        createInfo.enabledLayerCount = 0;
-
-        createInfo.pNext = nullptr;
-    }
-
-    // create instance
-    VkResult result = vkCreateInstance(&createInfo, nullptr, &m_Instance);
-    if (result != VK_SUCCESS) {
-        RAYX_LOG << "Failed to create instance! Error Code " << result;
-        throw std::runtime_error("failed to create instance!");
-    }
 }
 
 void VulkanEngine::setupDebugMessenger() {

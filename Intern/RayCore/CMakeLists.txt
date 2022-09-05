@@ -38,7 +38,8 @@ SET(SOURCE
     src/Tracer/RayList.cpp
     src/Tracer/VulkanTracer.cpp
     src/Tracer/CpuTracer.cpp
-    src/VulkanEngine/InitVk.cpp
+    src/VulkanEngine/InitVk/InitVk.cpp
+    src/VulkanEngine/InitVk/CreateInstance.cpp
     src/VulkanEngine/InitPipeline.cpp
     src/VulkanEngine/Run.cpp
     src/VulkanEngine/BufferIO.cpp

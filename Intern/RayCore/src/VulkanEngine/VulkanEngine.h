@@ -16,7 +16,6 @@ const bool enableValidationLayers = true;
 const std::vector<const char*> validationLayers = {
     "VK_LAYER_KHRONOS_validation"};
 
-
 struct QueueFamilyIndices {
     uint32_t computeFamily;
     bool hasvalue;
@@ -29,8 +28,7 @@ class RAYX_API VulkanEngine {
     VulkanEngine() = default;
     ~VulkanEngine() = default;
 
-	void createInstance();
-	void setupDebugMessenger();
+    void initVk();
 
     struct Compute {  // Possibilty to add CommandPool, Pipeline etc.. here
         std::vector<uint64_t> m_BufferSizes;
@@ -59,6 +57,11 @@ class RAYX_API VulkanEngine {
     VkQueue m_ComputeQueue;
     uint32_t m_QueueFamilyIndex;
     QueueFamilyIndices m_QueueFamily;
+
+    // private implementation details - they should be kept at the bottom of
+    // this file. don't bother reading them.
+    void createInstance();
+    void setupDebugMessenger();
 };
 
 }  // namespace RAYX

@@ -216,9 +216,7 @@ void VulkanTracer::run() {
 void VulkanTracer::prepareVulkan() {
     RAYX_PROFILE_FUNCTION();
     // a vulkan instance is created
-    m_engine.createInstance();
-
-    m_engine.setupDebugMessenger();
+    m_engine.initVk();
 
     // physical device for computation is chosen
     pickPhysicalDevice();
