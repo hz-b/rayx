@@ -1,6 +1,3 @@
-#include <vector>
-
-#include "RayCore.h"
 #include "VulkanEngine/VulkanEngine.h"
 
 namespace RAYX {

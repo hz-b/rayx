@@ -1,8 +1,5 @@
 #pragma once
 
-#include "Material/Material.h"
-#include "VulkanEngine/VulkanEngine.h"
-
 #include <cstdlib>
 #include <iostream>
 #include <map>
@@ -10,8 +7,10 @@
 #include <stdexcept>
 
 #include "Core.h"
+#include "Material/Material.h"
 #include "Tracer/RayList.h"
 #include "Tracer/Tracer.h"
+#include "VulkanEngine/VulkanEngine.h"
 #include "vulkan/vulkan.hpp"
 
 // Vulkan to Ray #defines
@@ -52,11 +51,11 @@ class RAYX_API VulkanTracer : public Tracer {
     ~VulkanTracer();
 
     RayList trace(const Beamline&) override;
-    #ifdef RAYX_DEBUG_MODE
+#ifdef RAYX_DEBUG_MODE
     /**
      * @brief Get the Debug List containing the Debug Matrices
      * (Size heavy)
-     * 
+     *
      * @return std::vector<..> of Debug Struct (MAT4x4)
      */
     auto getDebugList() const { return m_debugBufList; }
@@ -96,7 +95,7 @@ class RAYX_API VulkanTracer : public Tracer {
 
   private:
     // Member variables:
-	VulkanEngine m_engine;
+    VulkanEngine m_engine;
     _debugBuf_t m_debug;
 
     // Ray-related vars:
@@ -124,19 +123,6 @@ class RAYX_API VulkanTracer : public Tracer {
     void prepareVulkan();
     void prepareBuffers();
     void mainLoop();
-    std::vector<const char*> getRequiredExtensions();
-    std::vector<const char*> getRequiredDeviceExtensions();
-    static VKAPI_ATTR VkBool32 VKAPI_CALL
-    debugCallback(VkDebugUtilsMessageSeverityFlagBitsEXT messageSeverity,
-                  VkDebugUtilsMessageTypeFlagsEXT messageType,
-                  const VkDebugUtilsMessengerCallbackDataEXT* pCallbackData,
-                  void* pUserData);
-    bool checkValidationLayerSupport();
-    void pickPhysicalDevice();
-    bool isDeviceSuitable(VkPhysicalDevice device);
-    int rateDevice(VkPhysicalDevice device);
-    QueueFamilyIndices findQueueFamilies(VkPhysicalDevice device);
-    void createLogicalDevice();
     uint32_t findMemoryType(uint32_t memoryTypeBits,
                             VkMemoryPropertyFlags properties);
     void createBuffer(VkDeviceSize size, VkBufferUsageFlags usage,
@@ -144,9 +130,10 @@ class RAYX_API VulkanTracer : public Tracer {
                       VkDeviceMemory& bufferMemory);
     void createBuffers();
     void fillRayBuffer();
-    void fillStagingBuffer(uint32_t offset,
-                           std::list<std::vector<Ray>>::const_iterator raySetIterator,
-                           size_t vectorsPerStagingBuffer);
+    void fillStagingBuffer(
+        uint32_t offset,
+        std::list<std::vector<Ray>>::const_iterator raySetIterator,
+        size_t vectorsPerStagingBuffer);
     void createDescriptorSetLayout();
     void createDescriptorSet();
     void createCommandPool();

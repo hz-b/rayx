@@ -1,8 +1,9 @@
 #pragma once
 
 #include <vulkan/vulkan.hpp>
+#include <vector>
 
-#include "Core.h"
+#include "RayCore.h"
 
 namespace RAYX {
 
@@ -62,6 +63,9 @@ class RAYX_API VulkanEngine {
     // this file. don't bother reading them.
     void createInstance();
     void setupDebugMessenger();
+	void pickDevice();
+	void pickPhysicalDevice();
+	void createLogicalDevice();
 };
 
 }  // namespace RAYX
