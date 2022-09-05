@@ -1,6 +1,7 @@
 #pragma once
 
-#include <Material/Material.h>
+#include "Material/Material.h"
+#include "VulkanEngine/VulkanEngine.h"
 
 #include <cstdlib>
 #include <iostream>
@@ -104,61 +105,9 @@ class RAYX_API VulkanTracer : public Tracer {
     const RayList& getRayList() { return m_RayList; }
 
   private:
-    // Member structs:
-    /* not contiguous in memory, shouldn't be used
-    struct Quadric{
-        Quadric() : points(16), inMatrix(16), outMatrix(16) {}
-        Quadric(std::vector<double> inQuadric, std::vector<double>
-    inputInMatrix, std::vector<double> inputOutMatrix){ assert(inQuadric.size()
-    == 16 && inputInMatrix.size() == 16 && inputOutMatrix.size() == 16); points
-    = inQuadric; inMatrix = inputInMatrix; outMatrix = inputOutMatrix;
-        }
-        std::vector<double> points;
-        std::vector<double> inMatrix;
-        std::vector<double> outMatrix;
-    };
-    */
-
-    struct QueueFamilyIndices {
-        uint32_t computeFamily;
-        bool hasvalue;
-
-        bool isComplete() { return hasvalue; }
-    };
-
     // Member variables:
-    VkInstance m_Instance;
-    VkDebugUtilsMessengerEXT m_DebugMessenger;
-    VkPhysicalDevice m_PhysicalDevice = VK_NULL_HANDLE;
-    VkDevice m_Device;
+	VulkanEngine m_engine;
     _debugBuf_t m_debug;
-    struct Compute {  // Possibilty to add CommandPool, Pipeline etc.. here
-        std::vector<uint64_t> m_BufferSizes;
-        std::vector<VkBuffer> m_Buffers;
-        std::vector<VkDeviceMemory> m_BufferMemories;
-    } m_compute;
-
-    struct Graphics {
-        // Placeholder for Graphic rendering (For later steps)
-    } m_graphics;
-
-    struct Staging {
-        std::vector<uint64_t> m_BufferSizes;
-        std::vector<VkBuffer> m_Buffers;
-        std::vector<VkDeviceMemory> m_BufferMemories;
-    } m_staging;
-
-    VkPipeline m_Pipeline;
-    VkPipelineLayout m_PipelineLayout;
-    VkShaderModule m_ComputeShaderModule;
-    VkCommandPool m_CommandPool;
-    VkCommandBuffer m_CommandBuffer;
-    VkDescriptorPool m_DescriptorPool;
-    VkDescriptorSet m_DescriptorSet;
-    VkDescriptorSetLayout m_DescriptorSetLayout;
-    VkQueue m_ComputeQueue;
-    uint32_t m_QueueFamilyIndex;
-    QueueFamilyIndices m_QueueFamily;
 
     // Ray-related vars:
     uint32_t m_numberOfBeamlines;
