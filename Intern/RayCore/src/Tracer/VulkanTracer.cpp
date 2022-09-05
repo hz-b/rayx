@@ -225,7 +225,11 @@ void VulkanTracer::run() {
 
     const clock_t begin_time_getRays = clock();
 
-    mainLoop();
+    const clock_t begin_time_cmdbuf = clock();
+    runCommandBuffer();
+    RAYX_LOG << "CommandBuffer, run time: "
+             << float(clock() - begin_time_cmdbuf) / CLOCKS_PER_SEC * 1000
+             << " ms";
 
     getRays();
 
@@ -256,18 +260,6 @@ void VulkanTracer::prepareBuffers() {
     // the descriptors created earlier will be submitted here
     createComputePipeline();
     createCommandBuffer();
-}
-
-/**
- * @brief Run the command buffer after everything is set.
- *
- */
-void VulkanTracer::mainLoop() {
-    RAYX_PROFILE_FUNCTION();
-    const clock_t begin_time = clock();
-    runCommandBuffer();
-    RAYX_LOG << "CommandBuffer, run time: "
-             << float(clock() - begin_time) / CLOCKS_PER_SEC * 1000 << " ms";
 }
 
 /** Cleans and deletes the whole tracer instance. Do this only if you do not

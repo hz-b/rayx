@@ -101,7 +101,6 @@ class RAYX_API VulkanTracer : public Tracer {
     // Member functions:
     // Vulkan
     void prepareBuffers();
-    void mainLoop();
     uint32_t findMemoryType(uint32_t memoryTypeBits,
                             VkMemoryPropertyFlags properties);
     void createBuffer(VkDeviceSize size, VkBufferUsageFlags usage,
