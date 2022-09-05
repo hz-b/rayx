@@ -1,8 +1,21 @@
 #pragma once
 
-#include "vulkan/vulkan.hpp"
+#include <vulkan/vulkan.hpp>
+
+#include "Core.h"
 
 namespace RAYX {
+
+#ifdef NDEBUG
+const bool enableValidationLayers = false;
+#else
+const bool enableValidationLayers = true;
+#endif
+
+// set debug generation information
+const std::vector<const char*> validationLayers = {
+    "VK_LAYER_KHRONOS_validation"};
+
 
 struct QueueFamilyIndices {
     uint32_t computeFamily;
@@ -15,6 +28,9 @@ class RAYX_API VulkanEngine {
   public:
     VulkanEngine() = default;
     ~VulkanEngine() = default;
+
+	void createInstance();
+	void setupDebugMessenger();
 
     struct Compute {  // Possibilty to add CommandPool, Pipeline etc.. here
         std::vector<uint64_t> m_BufferSizes;

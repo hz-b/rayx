@@ -14,12 +14,6 @@
 #include "Tracer/Tracer.h"
 #include "vulkan/vulkan.hpp"
 
-#ifdef NDEBUG
-const bool enableValidationLayers = false;
-#else
-const bool enableValidationLayers = true;
-#endif
-
 // Vulkan to Ray #defines
 #define VULKANTRACER_RAY_DOUBLE_AMOUNT 16
 #define VULKANTRACER_QUADRIC_DOUBLE_AMOUNT 112  // 7* dmat4 (16)
@@ -29,10 +23,6 @@ const bool enableValidationLayers = true;
 #define VULKANTRACER_DEBUG_ENTRY_DOUBLE_AMOUNT 16
 
 namespace RAYX {
-
-// set debug generation information
-const std::vector<const char*> validationLayers = {
-    "VK_LAYER_KHRONOS_validation"};
 
 // Used for validating return values of Vulkan API calls.
 #define VK_CHECK_RESULT(f)                                               \
@@ -134,10 +124,6 @@ class RAYX_API VulkanTracer : public Tracer {
     void prepareVulkan();
     void prepareBuffers();
     void mainLoop();
-    void createInstance();
-    void populateDebugMessengerCreateInfo(
-        VkDebugUtilsMessengerCreateInfoEXT& createInfo);
-    void setupDebugMessenger();
     std::vector<const char*> getRequiredExtensions();
     std::vector<const char*> getRequiredDeviceExtensions();
     static VKAPI_ATTR VkBool32 VKAPI_CALL

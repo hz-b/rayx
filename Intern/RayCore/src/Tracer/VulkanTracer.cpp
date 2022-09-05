@@ -116,21 +116,6 @@ RayList VulkanTracer::trace(const Beamline& beamline) {
     return out;
 }
 
-//	This function creates a debug messenger
-VkResult CreateDebugUtilsMessengerEXT(
-    VkInstance instance, const VkDebugUtilsMessengerCreateInfoEXT* pCreateInfo,
-    const VkAllocationCallbacks* pAllocator,
-    VkDebugUtilsMessengerEXT* pDebugMessenger) {
-    RAYX_PROFILE_FUNCTION();
-    auto func = (PFN_vkCreateDebugUtilsMessengerEXT)vkGetInstanceProcAddr(
-        instance, "vkCreateDebugUtilsMessengerEXT");
-    if (func != nullptr) {
-        return func(instance, pCreateInfo, pAllocator, pDebugMessenger);
-    } else {
-        return VK_ERROR_EXTENSION_NOT_PRESENT;
-    }
-}
-
 //	This function destroys the debug messenger
 void DestroyDebugUtilsMessengerEXT(VkInstance instance,
                                    VkDebugUtilsMessengerEXT debugMessenger,
@@ -231,9 +216,9 @@ void VulkanTracer::run() {
 void VulkanTracer::prepareVulkan() {
     RAYX_PROFILE_FUNCTION();
     // a vulkan instance is created
-    createInstance();
+    m_engine.createInstance();
 
-    setupDebugMessenger();
+    m_engine.setupDebugMessenger();
 
     // physical device for computation is chosen
     pickPhysicalDevice();
@@ -338,98 +323,6 @@ void VulkanTracer::cleanTracer() {
                           nullptr);
 }
 
-/* Create a new Vulkan library instance. (Validation layers included) */
-void VulkanTracer::createInstance() {
-    RAYX_PROFILE_FUNCTION();
-    // validation layers are used for debugging
-    if (enableValidationLayers && !checkValidationLayerSupport()) {
-        throw std::runtime_error(
-            "validation layers requested, but not available!");
-    }
-
-    // Add description for instance
-    VkApplicationInfo appInfo{};
-    appInfo.sType = VK_STRUCTURE_TYPE_APPLICATION_INFO;
-    appInfo.pApplicationName = "Terminal App";
-    appInfo.applicationVersion = VK_MAKE_API_VERSION(0, 1, 2, 154);
-    appInfo.pEngineName = "Vulkan RAY-X Engine";
-    appInfo.engineVersion = VK_MAKE_API_VERSION(0, 1, 2, 154);
-    appInfo.apiVersion = VK_API_VERSION_1_2;
-
-    // pointer to description with layer count
-    VkInstanceCreateInfo createInfo{};
-    createInfo.sType = VK_STRUCTURE_TYPE_INSTANCE_CREATE_INFO;
-    createInfo.pApplicationInfo = &appInfo;
-    createInfo.enabledLayerCount = 0;
-
-    auto extensions = getRequiredExtensions();
-    createInfo.enabledExtensionCount = static_cast<uint32_t>(extensions.size());
-    createInfo.ppEnabledExtensionNames = extensions.data();
-
-    // Validation Layer Debug Outpout "handler"
-    VkDebugUtilsMessengerCreateInfoEXT debugCreateInfo;
-    if (enableValidationLayers) {
-        createInfo.enabledLayerCount =
-            static_cast<uint32_t>(validationLayers.size());
-        createInfo.ppEnabledLayerNames = validationLayers.data();
-        populateDebugMessengerCreateInfo(debugCreateInfo);
-        createInfo.pNext =
-            (VkDebugUtilsMessengerCreateInfoEXT*)&debugCreateInfo;
-    } else {
-        createInfo.enabledLayerCount = 0;
-
-        createInfo.pNext = nullptr;
-    }
-
-    // create instance
-    VkResult result =
-        vkCreateInstance(&createInfo, nullptr, &m_engine.m_Instance);
-    if (result != VK_SUCCESS) {
-        RAYX_LOG << "Failed to create instance! Error Code " << result;
-        throw std::runtime_error("failed to create instance!");
-    }
-}
-
-void VulkanTracer::populateDebugMessengerCreateInfo(
-    VkDebugUtilsMessengerCreateInfoEXT& createInfo) {
-    RAYX_PROFILE_FUNCTION();
-    createInfo = {};
-    createInfo.sType = VK_STRUCTURE_TYPE_DEBUG_UTILS_MESSENGER_CREATE_INFO_EXT;
-    createInfo.messageSeverity =
-        VK_DEBUG_UTILS_MESSAGE_SEVERITY_VERBOSE_BIT_EXT |
-        VK_DEBUG_UTILS_MESSAGE_SEVERITY_WARNING_BIT_EXT |
-        VK_DEBUG_UTILS_MESSAGE_SEVERITY_ERROR_BIT_EXT;
-    createInfo.messageType = VK_DEBUG_UTILS_MESSAGE_TYPE_GENERAL_BIT_EXT |
-                             VK_DEBUG_UTILS_MESSAGE_TYPE_VALIDATION_BIT_EXT |
-                             VK_DEBUG_UTILS_MESSAGE_TYPE_PERFORMANCE_BIT_EXT;
-    createInfo.pfnUserCallback = debugCallback;
-}
-
-void VulkanTracer::setupDebugMessenger() {
-    RAYX_PROFILE_FUNCTION();
-    if (!enableValidationLayers) return;
-
-    VkDebugUtilsMessengerCreateInfoEXT createInfo;
-    populateDebugMessengerCreateInfo(createInfo);
-
-    if (CreateDebugUtilsMessengerEXT(m_engine.m_Instance, &createInfo, nullptr,
-                                     &m_engine.m_DebugMessenger) !=
-        VK_SUCCESS) {
-        throw std::runtime_error("failed to set up debug messenger!");
-    }
-}
-
-std::vector<const char*> VulkanTracer::getRequiredExtensions() {
-    RAYX_PROFILE_FUNCTION();
-    std::vector<const char*> extensions;
-
-    if (enableValidationLayers) {
-        extensions.push_back(VK_EXT_DEBUG_UTILS_EXTENSION_NAME);
-    }
-
-    return extensions;
-}
-
 // Currently returns a  std::vector<const char*>
 // Can be further enhanced for propoer Window output with glfw.
 std::vector<const char*> VulkanTracer::getRequiredDeviceExtensions() {
@@ -448,50 +341,6 @@ std::vector<const char*> VulkanTracer::getRequiredDeviceExtensions() {
     // }
 
     return extensions;
-}
-
-VKAPI_ATTR VkBool32 VKAPI_CALL VulkanTracer::debugCallback(
-    VkDebugUtilsMessageSeverityFlagBitsEXT messageSeverity,
-    [[maybe_unused]] VkDebugUtilsMessageTypeFlagsEXT messageType,
-    const VkDebugUtilsMessengerCallbackDataEXT* pCallbackData,
-    [[maybe_unused]] void* pUserData) {
-    RAYX_PROFILE_FUNCTION();
-
-    // Only show Warnings or higher severity bits
-    if (messageSeverity == VK_DEBUG_UTILS_MESSAGE_SEVERITY_WARNING_BIT_EXT) {
-        RAYX_WARN << "(ValidationLayer warn): " << pCallbackData->pMessage;
-    } else if (messageSeverity ==
-               VK_DEBUG_UTILS_MESSAGE_SEVERITY_ERROR_BIT_EXT) {
-        RAYX_ERR << "(ValidationLayer error): " << pCallbackData->pMessage;
-    }
-    // TODO consider also showing INFO or even VERBOSE messages under some
-    // circumstances.
-
-    return VK_FALSE;  // Should return False
-}
-
-// Checks if all validation layers are supported.
-bool VulkanTracer::checkValidationLayerSupport() {
-    RAYX_PROFILE_FUNCTION();
-    uint32_t layerCount;
-    vkEnumerateInstanceLayerProperties(&layerCount, nullptr);
-
-    std::vector<VkLayerProperties> availableLayers(layerCount);
-    vkEnumerateInstanceLayerProperties(&layerCount, availableLayers.data());
-
-    // check all validation layers
-    for (const char* layerName : validationLayers) {
-        bool layerFound = false;
-
-        for (const auto& layerProperties : availableLayers) {
-            if (strcmp(layerName, layerProperties.layerName) == 0) {
-                layerFound = true;
-                break;
-            }
-        }
-        if (!layerFound) return false;
-    }
-    return true;
 }
 
 // physical device for computation is chosen
