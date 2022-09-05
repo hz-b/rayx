@@ -38,6 +38,10 @@ SET(SOURCE
     src/Tracer/RayList.cpp
     src/Tracer/VulkanTracer.cpp
     src/Tracer/CpuTracer.cpp
+    src/VulkanEngine/InitVk.cpp
+    src/VulkanEngine/InitPipeline.cpp
+    src/VulkanEngine/Run.cpp
+    src/VulkanEngine/BufferIO.cpp
     src/Writer/CSVWriter.cpp
     src/Writer/H5Writer.cpp
     src/UserParameter/WorldUserParams.cpp
@@ -80,6 +84,7 @@ SET(HEADERS
     src/Writer/CSVWriter.h
     src/Writer/H5Writer.h
     src/Tracer/VulkanTracer.h
+    src/VulkanEngine/VulkanEngine.h
     src/Material/Material.h
     src/Material/NffTable.h
     src/Material/PalikTable.h
