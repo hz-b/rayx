@@ -23,26 +23,6 @@
 
 namespace RAYX {
 
-// Used for validating return values of Vulkan API calls.
-#define VK_CHECK_RESULT(f)                                               \
-    {                                                                    \
-        VkResult res = (f);                                              \
-        if (res != VK_SUCCESS) {                                         \
-            RAYX_WARN << "Fatal : VkResult fail!";                       \
-            RAYX_ERR << "Error code: " << res                            \
-                     << ", look up at "                                  \
-                        "https://www.khronos.org/registry/vulkan/specs/" \
-                        "1.3-extensions/man/html/VkResult.html";         \
-        }                                                                \
-    }
-VkResult CreateDebugUtilsMessengerEXT(
-    VkInstance instance, const VkDebugUtilsMessengerCreateInfoEXT* pCreateInfo,
-    const VkAllocationCallbacks* pAllocator,
-    VkDebugUtilsMessengerEXT* pDebugMessenger);
-void DestroyDebugUtilsMessengerEXT(VkInstance instance,
-                                   VkDebugUtilsMessengerEXT debugMessenger,
-                                   const VkAllocationCallbacks* pAllocator);
-
 const int WORKGROUP_SIZE = 32;
 
 class RAYX_API VulkanTracer : public Tracer {
@@ -136,7 +116,6 @@ class RAYX_API VulkanTracer : public Tracer {
         size_t vectorsPerStagingBuffer);
     void createDescriptorSetLayout();
     void createDescriptorSet();
-    void createCommandPool();
     void createComputePipeline();
     void createCommandBuffer();
     void runCommandBuffer();

@@ -61,11 +61,32 @@ class RAYX_API VulkanEngine {
 
     // private implementation details - they should be kept at the bottom of
     // this file. don't bother reading them.
+
+	// InitVk/CreateInstance.cpp
     void createInstance();
     void setupDebugMessenger();
+
+	// InitVk/PickDevice.cpp
 	void pickDevice();
 	void pickPhysicalDevice();
 	void createLogicalDevice();
+
+	// InitVk/CreateCommandPool.cpp
+	void createCommandPool();
 };
+
+// Used for validating return values of Vulkan API calls.
+#define VK_CHECK_RESULT(f)                                               \
+    {                                                                    \
+        VkResult res = (f);                                              \
+        if (res != VK_SUCCESS) {                                         \
+            RAYX_WARN << "Fatal : VkResult fail!";                       \
+            RAYX_ERR << "Error code: " << res                            \
+                     << ", look up at "                                  \
+                        "https://www.khronos.org/registry/vulkan/specs/" \
+                        "1.3-extensions/man/html/VkResult.html";         \
+        }                                                                \
+    }
+
 
 }  // namespace RAYX
