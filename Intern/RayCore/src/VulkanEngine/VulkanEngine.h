@@ -3,6 +3,7 @@
 #include <vector>
 #include <map>
 #include <vulkan/vulkan.hpp>
+#include <algorithm>
 
 #include "RayCore.h"
 
@@ -24,9 +25,12 @@ struct BufferSpec {
     bool out;
 };
 
+// the inner std::vector has size at most STAGING_SIZE.
+using RawData = std::vector<std::vector<char>>;
+
 struct Buffer {
     const char* name;
-    std::vector<char> data;
+    RawData data;
 };
 
 struct InternalBuffer {
@@ -153,25 +157,50 @@ class RAYX_API VulkanEngine {
     }
 
 // in order to send data to the VulkanEngine, it needs to be converted to raw bytes (i.e. chars).
-// the performance of those encode/deocde can definitely be improved, as a copy is not generally necessary.
+// the performance of those encode/decode can definitely be improved, as a copy is not generally necessary.
+
+// TODO optimize those functions!
 
 template <typename T>
-inline std::vector<char> encode(std::vector<T> in) {
-	const auto bytes = in.size() * sizeof(T);
-	std::vector<char> out(bytes);
-	memcpy(out.data(), in.data(), bytes);
+inline RawData encode(std::vector<T> in) {
+	uint32_t remaining_bytes = in.size() * sizeof(T);
+	char* ptr = (char*) in.data();
+
+	RawData out;
+	while (remaining_bytes > 0) {
+		// number of bytes transferred in this for-loop
+		int localbytes = std::min(STAGING_SIZE, remaining_bytes);
+
+		std::vector<char> subdata(localbytes);
+		memcpy(subdata.data(), ptr, localbytes);
+		out.push_back(subdata);
+
+		ptr += localbytes;
+		remaining_bytes -= localbytes;
+	}
+	return out;
 }
 
 template <typename T>
-inline std::vector<T> decode(std::vector<char> in) {
-	if (in.size() % sizeof(T) != 0) {
-		RAYX_WARN << "data cannot be decoded!";
-		RAYX_WARN << "in.size() = " << in.size();
-		RAYX_ERR << "sizeof(T) = " << sizeof(T);
+inline std::vector<T> decode(RawData in) {
+	std::vector<T> out;
+
+	std::vector<char> tmp;
+	while (!in.empty()) {
+		std::vector<char> f = in[0];
+		tmp.insert(tmp.end(), f.begin(), f.end());
+		in.erase(in.begin());
+		while (tmp.size() >= sizeof(T)) {
+			T t;
+			memcpy(&t, tmp.data(), sizeof(T));
+			tmp.erase(tmp.begin(), tmp.begin() + sizeof(T));
+			out.push_back(t);
+		}
 	}
-	const auto bytes = in.size() / sizeof(T);
-	std::vector<char> out(bytes);
-	memcpy(out.data(), in.data(), bytes);
+	if (!tmp.empty()) {
+		RAYX_ERR << "decode unsuccessful! remaining bytes are not enough to create another element!";
+	}
+	return out;
 }
 
 }  // namespace RAYX
