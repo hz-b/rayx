@@ -226,7 +226,7 @@ void VulkanTracer::run() {
     const clock_t begin_time_getRays = clock();
 
     const clock_t begin_time_cmdbuf = clock();
-    runCommandBuffer();
+    m_engine.runCommandBuffer();
     RAYX_LOG << "CommandBuffer, run time: "
              << float(clock() - begin_time_cmdbuf) / CLOCKS_PER_SEC * 1000
              << " ms";
@@ -1071,46 +1071,6 @@ void VulkanTracer::createCommandBuffer() {
 
     VK_CHECK_RESULT(vkEndCommandBuffer(
         m_engine.m_CommandBuffer));  // end recording commands.
-}
-
-void VulkanTracer::runCommandBuffer() {
-    RAYX_PROFILE_FUNCTION();
-    /*
-    Now we shall finally submit the recorded command buffer to a queue.
-    */
-
-    VkSubmitInfo submitInfo = {};
-    submitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
-    submitInfo.commandBufferCount = 1;  // submit a single command buffer
-    submitInfo.pCommandBuffers =
-        &m_engine.m_CommandBuffer;  // the command buffer to submit.
-
-    /*
-        We create a fence.
-    */
-    VkFence fence;
-    VkFenceCreateInfo fenceCreateInfo = {};
-    fenceCreateInfo.sType = VK_STRUCTURE_TYPE_FENCE_CREATE_INFO;
-    fenceCreateInfo.flags = 0;
-    VK_CHECK_RESULT(
-        vkCreateFence(m_engine.m_Device, &fenceCreateInfo, nullptr, &fence));
-
-    /*
-    We submit the command buffer on the queue, at the same time giving a
-    fence. (Fences are like interrupts and used for async computations)
-    */
-    VK_CHECK_RESULT(
-        vkQueueSubmit(m_engine.m_ComputeQueue, 1, &submitInfo, fence));
-    /*
-    The command will not have finished executing until the fence is
-    signaled. So we wait here. Directly afer this, we read our buffer
-    from the GPU. Fences give us a hint that the Command in the Queue is
-    actually done executing.
-    */
-    VK_CHECK_RESULT(vkWaitForFences(m_engine.m_Device, 1, &fence, VK_TRUE,
-                                    1000000000000000));
-
-    vkDestroyFence(m_engine.m_Device, fence, nullptr);
 }
 
 void VulkanTracer::setBeamlineParameters(uint32_t inNumberOfBeamlines,

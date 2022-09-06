@@ -86,6 +86,9 @@ class RAYX_API VulkanEngine {
 
     // InitPipeline/InitPipeline.cpp
     void initPipeline(Pipeline);
+
+    // Run.cpp
+    void runCommandBuffer();
 };
 
 // Used for validating return values of Vulkan API calls.
