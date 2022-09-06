@@ -10,13 +10,13 @@ void VulkanEngine::storeToStagingBuffer(std::vector<char> data) {
     vkUnmapMemory(m_Device, m_stagingMemory);
 }
 
-std::vector<char> VulkanEngine::loadFromStagingBuffer() {
-    std::vector<char> data(STAGING_SIZE);
+std::vector<char> VulkanEngine::loadFromStagingBuffer(uint32_t bytes) {
+    std::vector<char> data(bytes);
     void* buf;
 
-    vkMapMemory(m_Device, m_stagingMemory, 0, STAGING_SIZE, 0, &buf);
+    vkMapMemory(m_Device, m_stagingMemory, 0, bytes, 0, &buf);
 
-    memcpy(data.data(), buf, STAGING_SIZE);
+    memcpy(data.data(), buf, bytes);
 
     vkUnmapMemory(m_Device, m_stagingMemory);
 

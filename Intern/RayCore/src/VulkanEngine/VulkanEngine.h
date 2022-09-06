@@ -137,7 +137,7 @@ class RAYX_API VulkanEngine {
 
 	// BufferIO.cpp:
     void storeToStagingBuffer(std::vector<char> data);
-    std::vector<char> loadFromStagingBuffer();
+    std::vector<char> loadFromStagingBuffer(uint32_t bytes);
 	void gpuMemcpy(VkBuffer& buffer_src, uint32_t offset_src, VkBuffer& buffer_dst, uint32_t offset_dst, uint32_t bytes);
 
 };
