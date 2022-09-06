@@ -9,6 +9,7 @@
 namespace RAYX {
 
 const int WORKGROUP_SIZE = 32;
+const uint32_t STAGING_SIZE = 134217728; // in bytes, equal to 128MB.
 
 #ifdef NDEBUG
 const bool enableValidationLayers = false;
@@ -81,6 +82,9 @@ class RAYX_API VulkanEngine {
         std::vector<VkBuffer> m_Buffers;
         std::vector<VkDeviceMemory> m_BufferMemories;
     } m_staging;
+
+	VkBuffer m_stagingBuffer;
+	VkDeviceMemory m_stagingMemory;
 
     VkInstance m_Instance;
     VkDebugUtilsMessengerEXT m_DebugMessenger;
