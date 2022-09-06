@@ -18,6 +18,9 @@ const bool enableValidationLayers = false;
 const bool enableValidationLayers = true;
 #endif
 
+template <typename T>
+using dict = std::map<std::string, T>;
+
 struct BufferSpec {
     uint32_t binding;
     bool in;
@@ -31,12 +34,12 @@ struct InternalBuffer {
 
 struct InitSpec {
     const char* shaderfile;
-    std::map<std::string, BufferSpec> bufferSpecs;
+    dict<BufferSpec> bufferSpecs;
 };
 struct RunSpec {
     uint32_t numberOfInvocations;
     uint32_t computeBuffersCount;
-    std::map<std::string, GpuData> buffers;
+    dict<GpuData> buffers;
 };
 
 // set debug generation information
