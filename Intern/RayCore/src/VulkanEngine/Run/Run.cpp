@@ -2,6 +2,13 @@
 
 namespace RAYX {
 
+void VulkanEngine::run(RunSpec r) {
+	createBuffers(r);
+	fillBuffers(r);
+	prepareRun(r);
+	runCommandBuffer();
+}
+
 void VulkanEngine::runCommandBuffer() {
     RAYX_PROFILE_FUNCTION();
     /*

@@ -194,28 +194,6 @@ void VulkanTracer::run() {
     RAYX_LOG << "Buffer sizes initiliazed. Run-time: "
              << float(clock() - begin_time) / CLOCKS_PER_SEC * 1000 << " ms";
 
-    prepareBuffers();
-
-    const clock_t begin_time_getRays = clock();
-
-    const clock_t begin_time_cmdbuf = clock();
-    m_engine.runCommandBuffer();
-    RAYX_LOG << "CommandBuffer, run time: "
-             << float(clock() - begin_time_cmdbuf) / CLOCKS_PER_SEC * 1000
-             << " ms";
-
-    getRays();
-
-    RAYX_LOG << "Got Rays. Run-time: "
-             << float(clock() - begin_time_getRays) / CLOCKS_PER_SEC * 1000
-             << " ms";
-
-#ifdef RAYX_DEBUG_MODE
-    getDebugBuffer();
-#endif
-}
-
-void VulkanTracer::prepareBuffers() {
     // creates buffers to transfer data to and from the shader
     createBuffers();
     const clock_t begin_time_fillBuffer = clock();
@@ -227,10 +205,23 @@ void VulkanTracer::prepareBuffers() {
     fillMaterialBuffer();
     RAYX_LOG << "All buffers filled.";
 
-    m_engine.prepareRun({
+    m_engine.run({
         .numberOfInvocations = m_numberOfRays,
         .computeBuffersCount = m_settings.m_computeBuffersCount,
+        .buffers = {/* TODO */},
     });
+
+    const clock_t begin_time_getRays = clock();
+
+    getRays();
+
+    RAYX_LOG << "Got Rays. Run-time: "
+             << float(clock() - begin_time_getRays) / CLOCKS_PER_SEC * 1000
+             << " ms";
+
+#ifdef RAYX_DEBUG_MODE
+    getDebugBuffer();
+#endif
 }
 
 /** Cleans and deletes the whole tracer instance. Do this only if you do not

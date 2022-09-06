@@ -22,6 +22,11 @@ struct BufferSpec {
     bool out;
 };
 
+struct Buffer {
+    const char* name;
+    std::vector<char> data;
+};
+
 struct InitSpec {
     const char* shaderfile;
     std::vector<BufferSpec> bufferSpecs;
@@ -29,6 +34,7 @@ struct InitSpec {
 struct RunSpec {
     uint32_t numberOfInvocations;
     uint32_t computeBuffersCount;
+    std::vector<Buffer> buffers;
 };
 
 // set debug generation information
@@ -54,8 +60,7 @@ class RAYX_API VulkanEngine {
         m_initSpec = i;
     }
 
-    void prepareRun(RunSpec);
-    void runCommandBuffer();
+    void run(RunSpec r);
 
     struct Compute {  // Possibilty to add CommandPool, Pipeline etc.. here
         std::vector<uint64_t> m_BufferSizes;
@@ -111,9 +116,16 @@ class RAYX_API VulkanEngine {
     void initFromSpec(InitSpec);
 
     // Run/Prepare.cpp
+    void prepareRun(RunSpec);
     void createDescriptorSet(RunSpec);
     void createComputePipeline();
     void createCommandBuffer(RunSpec);
+
+    // Run:
+    void runCommandBuffer();
+	void createBuffers(RunSpec);
+	void fillBuffers(RunSpec);
+
 };
 
 // Used for validating return values of Vulkan API calls.

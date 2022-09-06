@@ -44,6 +44,8 @@ SET(SOURCE
     src/VulkanEngine/InitVk/CreateCommandPool.cpp
     src/VulkanEngine/InitFromSpec.cpp
     src/VulkanEngine/Run/Run.cpp
+    src/VulkanEngine/Run/CreateBuffers.cpp
+    src/VulkanEngine/Run/FillBuffers.cpp
     src/VulkanEngine/Run/Prepare.cpp
     src/VulkanEngine/BufferIO.cpp
     src/Writer/CSVWriter.cpp
