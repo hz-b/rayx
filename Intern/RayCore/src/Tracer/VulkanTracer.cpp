@@ -194,23 +194,27 @@ void VulkanTracer::run() {
     RAYX_LOG << "Buffer sizes initiliazed. Run-time: "
              << float(clock() - begin_time) / CLOCKS_PER_SEC * 1000 << " ms";
 
-    RunSpec r = {
-        .numberOfInvocations = m_numberOfRays,
-        .computeBuffersCount = m_settings.m_computeBuffersCount,
-        .buffers = {/* TODO */},
+    // TODO fix workaround
+    std::vector<Ray> rays;
+    for (auto r : m_RayList) {
+        rays.push_back(r);
+    }
+    std::vector<Buffer> buffers = {
+        {.name = "ray-buffer", .data = encode(rays)},
+        {.name = "quadric-buffer", .data = encode(m_beamlineData)},
+        {.name = "material-index-table",
+         .data = encode(m_MaterialTables.indexTable)},
+        {.name = "material-table",
+         .data = encode(m_MaterialTables.materialTable)},
     };
+
+    RunSpec r = {.numberOfInvocations = m_numberOfRays,
+                 .computeBuffersCount = m_settings.m_computeBuffersCount,
+                 .buffers = buffers};
 
     // creates buffers to transfer data to and from the shader
     m_engine.createBuffers(r);
     m_engine.fillBuffers(r);
-    const clock_t begin_time_fillBuffer = clock();
-    fillRayBuffer();
-    RAYX_LOG << "RayBuffer filled, run time: "
-             << float(clock() - begin_time_fillBuffer) / CLOCKS_PER_SEC * 1000
-             << " ms";
-    fillQuadricBuffer();
-    fillMaterialBuffer();
-    RAYX_LOG << "All buffers filled.";
 
     m_engine.run(r);
 
@@ -225,7 +229,7 @@ void VulkanTracer::run() {
 #ifdef RAYX_DEBUG_MODE
     getDebugBuffer();
 #endif
-}
+}  // namespace RAYX
 
 /** Cleans and deletes the whole tracer instance. Do this only if you do not
  * want to reuse the instance anymore
@@ -282,38 +286,6 @@ void VulkanTracer::cleanTracer() {
                           nullptr);
 }
 
-void VulkanTracer::fillRayBuffer() {
-    RAYX_PROFILE_FUNCTION();
-
-    uint32_t bytesNeeded =
-        m_numberOfRays * VULKANTRACER_RAY_DOUBLE_AMOUNT * sizeof(double);
-    uint32_t numberOfStagingBuffers = std::ceil(
-        (double)bytesNeeded /
-        (double)m_engine.m_staging.m_BufferSizes[0]);  // bufferSizes[0] = 128MB
-    RAYX_LOG << "Number of staging Buffers: " << numberOfStagingBuffers
-             << ", (Bytes needed): " << bytesNeeded << " Bytes";
-    auto raySetIterator = m_RayList.getData().begin();
-    RAYX_LOG << "Staging...";
-    size_t vectorsPerStagingBuffer =
-        std::floor(GPU_MAX_STAGING_SIZE / RAY_VECTOR_SIZE);
-
-    for (uint32_t i = 0; i < numberOfStagingBuffers - 1; i++) {
-        fillStagingBuffer(i, raySetIterator, vectorsPerStagingBuffer);
-        std::advance(raySetIterator, vectorsPerStagingBuffer);
-        copyToRayBuffer(i * GPU_MAX_STAGING_SIZE, GPU_MAX_STAGING_SIZE);
-        RAYX_LOG << "Debug Info: more than 128MB of rays!";
-        bytesNeeded = bytesNeeded - GPU_MAX_STAGING_SIZE;
-    }
-
-    fillStagingBuffer((numberOfStagingBuffers - 1) * GPU_MAX_STAGING_SIZE,
-                      raySetIterator,
-                      std::ceil((double)bytesNeeded / RAY_VECTOR_SIZE));
-
-    copyToRayBuffer((numberOfStagingBuffers - 1) * GPU_MAX_STAGING_SIZE,
-                    ((bytesNeeded - 1) % GPU_MAX_STAGING_SIZE) + 1);
-    RAYX_LOG << "Done.";
-}
-
 // the input buffer is filled with the ray data
 void VulkanTracer::fillStagingBuffer(
     [[maybe_unused]] uint32_t offset,
@@ -345,46 +317,6 @@ void VulkanTracer::fillStagingBuffer(
     RAYX_LOG << "Vector in StagingBuffer insterted! [RayList→StagingBuffer]";
 }
 
-void VulkanTracer::copyToRayBuffer(uint32_t offset,
-                                   uint32_t numberOfBytesToCopy) {
-    RAYX_PROFILE_FUNCTION();
-    VkCommandBufferAllocateInfo allocInfo{};
-    allocInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
-    allocInfo.level = VK_COMMAND_BUFFER_LEVEL_PRIMARY;
-    allocInfo.commandPool = m_engine.m_CommandPool;
-    allocInfo.commandBufferCount = 1;
-
-    VkCommandBuffer commandBuffer;
-    vkAllocateCommandBuffers(m_engine.m_Device, &allocInfo, &commandBuffer);
-
-    VkCommandBufferBeginInfo beginInfo{};
-    beginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
-    beginInfo.flags = VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT;
-
-    vkBeginCommandBuffer(commandBuffer, &beginInfo);
-
-    VkBufferCopy copyRegion{};
-    copyRegion.dstOffset = offset;
-    copyRegion.size = numberOfBytesToCopy;
-    RAYX_LOG << "Copying [StagingBuffer→RayBuffer]: offset: " << offset
-             << " size: " << numberOfBytesToCopy << " Bytes";
-    vkCmdCopyBuffer(commandBuffer, m_engine.m_staging.m_Buffers[0],
-                    m_engine.m_compute.m_Buffers[0], 1, &copyRegion);
-
-    vkEndCommandBuffer(commandBuffer);
-
-    VkSubmitInfo submitInfo{};
-    submitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
-    submitInfo.commandBufferCount = 1;
-    submitInfo.pCommandBuffers = &commandBuffer;
-
-    vkQueueSubmit(m_engine.m_ComputeQueue, 1, &submitInfo, VK_NULL_HANDLE);
-    vkQueueWaitIdle(m_engine.m_ComputeQueue);
-
-    vkFreeCommandBuffers(m_engine.m_Device, m_engine.m_CommandPool, 1,
-                         &commandBuffer);
-    RAYX_LOG << "Done.";
-}
 void VulkanTracer::copyToOutputBuffer(uint32_t offset,
                                       uint32_t numberOfBytesToCopy) {
     RAYX_PROFILE_FUNCTION();
@@ -565,48 +497,6 @@ void VulkanTracer::getDebugBuffer() {
     std::move(data.begin(), data.end(), std::back_inserter(m_debugBufList));
     vkUnmapMemory(m_engine.m_Device, m_engine.m_staging.m_BufferMemories[1]);
     RAYX_LOG << "Done.[StagingBufer→DebugData]";
-}
-
-// the quad buffer is filled with the quadric data
-void VulkanTracer::fillQuadricBuffer() {
-    RAYX_PROFILE_FUNCTION();
-    RAYX_LOG << "Filling QuadricBuffer..";
-    // data is copied to the buffer
-    void* data;
-    vkMapMemory(m_engine.m_Device, m_engine.m_compute.m_BufferMemories[2], 0,
-                m_engine.m_compute.m_BufferSizes[2], 0, &data);
-    memcpy(data, m_beamlineData.data(), m_engine.m_compute.m_BufferSizes[2]);
-    RAYX_LOG << "Done!";
-    vkUnmapMemory(m_engine.m_Device, m_engine.m_compute.m_BufferMemories[2]);
-}
-
-void VulkanTracer::fillMaterialBuffer() {
-    RAYX_LOG << "Filling MaterialBuffer.. (size = "
-             << m_MaterialTables.materialTable.size() << " doubles)";
-
-    // material index buffer
-    {
-        // data is copied to the buffer
-        void* data;
-        vkMapMemory(m_engine.m_Device, m_engine.m_compute.m_BufferMemories[4],
-                    0, m_engine.m_compute.m_BufferSizes[4], 0, &data);
-        memcpy(data, m_MaterialTables.indexTable.data(),
-               m_engine.m_compute.m_BufferSizes[4]);
-        vkUnmapMemory(m_engine.m_Device,
-                      m_engine.m_compute.m_BufferMemories[4]);
-    }
-
-    // material buffer
-    {
-        void* data;
-        vkMapMemory(m_engine.m_Device, m_engine.m_compute.m_BufferMemories[5],
-                    0, m_engine.m_compute.m_BufferSizes[5], 0, &data);
-        memcpy(data, m_MaterialTables.materialTable.data(),
-               m_engine.m_compute.m_BufferSizes[5]);
-        vkUnmapMemory(m_engine.m_Device,
-                      m_engine.m_compute.m_BufferMemories[5]);
-    }
-    RAYX_LOG << "Done!";
 }
 
 void VulkanTracer::setBeamlineParameters(uint32_t inNumberOfBeamlines,
