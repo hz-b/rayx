@@ -81,13 +81,16 @@ VulkanTracer::VulkanTracer() {
          .binding = 3,
          .in = true,
          .out = false},  // TODO what is this buffer?
-        {.name = "material-index-table", .binding = 4, .in = true, .out = false},
+        {.name = "material-index-table",
+         .binding = 4,
+         .in = true,
+         .out = false},
         {.name = "material-table", .binding = 5, .in = true, .out = false},
 #ifdef RAYX_DEBUG_MODE
         {.name = "debug-buffer", .binding = 6, .in = false, .out = true},
 #endif
     };
-    m_engine.init({.bufferSpecs = bs});
+    m_engine.init({.shaderfile = "build/bin/comp.spv", .bufferSpecs = bs});
 }
 
 VulkanTracer::~VulkanTracer() { cleanup(); }

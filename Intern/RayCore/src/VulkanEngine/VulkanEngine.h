@@ -16,14 +16,15 @@ const bool enableValidationLayers = true;
 #endif
 
 struct BufferSpec {
-	const char* name;
-	uint32_t binding;
-	bool in;
-	bool out;
+    const char* name;
+    uint32_t binding;
+    bool in;
+    bool out;
 };
 
 struct InitSpec {
-	std::vector<BufferSpec> bufferSpecs;
+    const char* shaderfile;
+    std::vector<BufferSpec> bufferSpecs;
 };
 struct RunSpec {
     uint32_t numberOfInvocations;
@@ -49,6 +50,8 @@ class RAYX_API VulkanEngine {
     inline void init(InitSpec i) {
         initVk();
         initFromSpec(i);
+
+        m_initSpec = i;
     }
 
     void prepareRun(RunSpec);
@@ -81,6 +84,8 @@ class RAYX_API VulkanEngine {
     VkQueue m_ComputeQueue;
     uint32_t m_QueueFamilyIndex;
     QueueFamilyIndices m_QueueFamily;
+
+    std::optional<InitSpec> m_initSpec;
 
     ////////////////////////////////////////////////////////////////////////////////////////////
     // private implementation details - they should be kept at the bottom of
