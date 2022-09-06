@@ -135,7 +135,11 @@ class RAYX_API VulkanEngine {
     // Run:
     void runCommandBuffer();
 
-    void fillStagingBuffer(std::string bufname, std::vector<char> data);
+	// BufferIO.cpp:
+    void storeToStagingBuffer(std::vector<char> data);
+    std::vector<char> loadFromStagingBuffer();
+	void gpuMemcpy(VkBuffer& buffer_src, uint32_t offset_src, VkBuffer& buffer_dst, uint32_t offset_dst, uint32_t bytes);
+
 };
 
 // Used for validating return values of Vulkan API calls.
