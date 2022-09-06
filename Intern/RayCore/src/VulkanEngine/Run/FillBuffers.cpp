@@ -3,7 +3,7 @@
 namespace RAYX {
 
 void VulkanEngine::fillBuffers(RunSpec r) {
-    for (auto [name, data] : r.buffers) {
+    for (auto [name, data] : r.bufferdata) {
         int offset = 0;
         for (auto dataFragment : data.raw) {
             storeToStagingBuffer(dataFragment);

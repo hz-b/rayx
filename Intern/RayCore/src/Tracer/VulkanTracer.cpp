@@ -21,21 +21,20 @@ VulkanTracer::VulkanTracer() {
     RAYX_LOG << "Initializing Vulkan Tracer..";
     setSettings();
 
-    dict<BufferSpec> bs = {
-        {"ray-buffer", {.binding = 0, .in = true, .out = false}},
-        {"output-buffer", {.binding = 1, .in = false, .out = true}},
-        {"quadric-buffer", {.binding = 2, .in = true, .out = false}},
-        {"xyznull-buffer",
-         {.binding = 3,
-          .in = true,
-          .out = false}},  // TODO what is this buffer?
-        {"material-index-table", {.binding = 4, .in = true, .out = false}},
-        {"material-table", {.binding = 5, .in = true, .out = false}},
+    m_engine.init(
+        InitSpec()
+            .shader("build/bin/comp.spv")
+            .buffer("ray-buffer", {.binding = 0, .in = true, .out = false})
+            .buffer("output-buffer", {.binding = 1, .in = false, .out = true})
+            .buffer("quadric-buffer", {.binding = 2, .in = true, .out = false})
+            .buffer("xyznull-buffer", {.binding = 3, .in = false, .out = false})
+            .buffer("material-index-table",
+                    {.binding = 4, .in = true, .out = false})
+            .buffer("material-table", {.binding = 5, .in = true, .out = false})
 #ifdef RAYX_DEBUG_MODE
-        {"debug-buffer", {.binding = 6, .in = false, .out = true}},
+            .buffer("material-table", {.binding = 6, .in = false, .out = true})
 #endif
-    };
-    m_engine.init({.shaderfile = "build/bin/comp.spv", .bufferSpecs = bs});
+    );
 }
 
 VulkanTracer::~VulkanTracer() { cleanup(); }
@@ -58,25 +57,33 @@ RayList VulkanTracer::trace(const Beamline& beamline) {
     for (auto r : m_RayList) {
         rays.push_back(r);
     }
-    dict<GpuData> buffers = {
-        {"ray-buffer", encode(rays)},
-        {"quadric-buffer", encode(m_beamlineData)},
-        {"material-index-table", encode(m_MaterialTables.indexTable)},
-        {"material-table", encode(m_MaterialTables.materialTable)},
-    };
 
-    RunSpec r = {.numberOfInvocations = m_numberOfRays,
-                 .computeBuffersCount = m_settings.m_computeBuffersCount,
-                 .buffers = buffers};
-
-    auto outputbuffers = m_engine.run(r);
+    auto raydata = encode(rays);
+    auto outputbuffers = m_engine.run(
+        RunSpec()
+            .computeBuffersCount(m_settings.m_computeBuffersCount)
+            .numberOfInvocations(m_numberOfRays)
+            .buffer_with_data("ray-buffer", raydata)
+            .buffer_with_size("output-buffer", raydata.size())
+            .buffer_with_data("quadric-buffer", encode(m_beamlineData))
+            .buffer_with_size("xyznull-buffer", 100)  // TODO how large?
+            .buffer_with_data("material-index-table",
+                              encode(m_MaterialTables.indexTable))
+            .buffer_with_data("material-table",
+                              encode(m_MaterialTables.materialTable))
+#ifdef RAYX_DEBUG_MODE
+            .buffer_with_size("debug-buffer", raydata.size())
+#endif
+    );
     std::vector<Ray> outrays = decode<Ray>(outputbuffers["output-buffer"]);
     RayList outraylist;
     for (auto r : outrays) {
         outraylist.push(r);
     }
 
+#ifdef RAYX_DEBUG_MODE
     m_debugBufList = decode<_debugBuf_t>(outputbuffers["debug-buffer"]);
+#endif
 
     cleanTracer();
 

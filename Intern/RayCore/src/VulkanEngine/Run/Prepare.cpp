@@ -57,7 +57,7 @@ void VulkanEngine::createDescriptorSet(RunSpec r) {
     */
     VkDescriptorPoolSize descriptorPoolSize = {};
     descriptorPoolSize.type = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER;
-    descriptorPoolSize.descriptorCount = r.computeBuffersCount;
+    descriptorPoolSize.descriptorCount = r.m_computeBuffersCount;
 
     VkDescriptorPoolCreateInfo descriptorPoolCreateInfo = {};
     descriptorPoolCreateInfo.sType =
@@ -236,7 +236,7 @@ void VulkanEngine::createCommandBuffer(RunSpec r) {
     OpenGL, this should be nothing new to you.
     */
     auto requiredLocalWorkGroupNo =
-        (uint32_t)ceil(r.numberOfInvocations /
+        (uint32_t)ceil(r.m_numberOfInvocations /
                        float(WORKGROUP_SIZE));  // number of local works groups
 
     // check if there are too many rays

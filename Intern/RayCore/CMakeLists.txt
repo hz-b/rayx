@@ -92,6 +92,8 @@ SET(HEADERS
     src/Tracer/VulkanTracer.h
     src/VulkanEngine/VulkanEngine.h
     src/VulkanEngine/GpuData.h
+    src/VulkanEngine/InitSpec.h
+    src/VulkanEngine/RunSpec.h
     src/Material/Material.h
     src/Material/NffTable.h
     src/Material/PalikTable.h

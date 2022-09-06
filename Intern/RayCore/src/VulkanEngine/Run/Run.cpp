@@ -54,7 +54,7 @@ dict<GpuData> VulkanEngine::generateOutDict(RunSpec r) {
         if (bs.out) {
             GpuData* ref = &out[name];
             VkBuffer& buf = m_internalBuffers[name].m_Buffer;
-            uint32_t remaining_bytes = r.buffers[name].size();
+            uint32_t remaining_bytes = r.buffersizes[name];
             int offset = 0;
             while (remaining_bytes > 0) {
                 int localbytes = std::min(STAGING_SIZE, remaining_bytes);

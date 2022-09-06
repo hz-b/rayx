@@ -7,6 +7,8 @@
 
 #include "RayCore.h"
 #include "VulkanEngine/GpuData.h"
+#include "VulkanEngine/InitSpec.h"
+#include "VulkanEngine/RunSpec.h"
 
 namespace RAYX {
 
@@ -18,28 +20,9 @@ const bool enableValidationLayers = false;
 const bool enableValidationLayers = true;
 #endif
 
-template <typename T>
-using dict = std::map<std::string, T>;
-
-struct BufferSpec {
-    uint32_t binding;
-    bool in;
-    bool out;
-};
-
 struct InternalBuffer {
     VkBuffer m_Buffer;
     VkDeviceMemory m_Memory;
-};
-
-struct InitSpec {
-    const char* shaderfile;
-    dict<BufferSpec> bufferSpecs;
-};
-struct RunSpec {
-    uint32_t numberOfInvocations;
-    uint32_t computeBuffersCount;
-    dict<GpuData> buffers;
 };
 
 // set debug generation information
@@ -68,7 +51,7 @@ class RAYX_API VulkanEngine {
     void createBuffers(RunSpec);
     void fillBuffers(RunSpec);
 
-	// returns the contents of `out=true` buffers.
+    // returns the contents of `out=true` buffers.
     dict<GpuData> run(RunSpec r);
 
     struct Compute {  // Possibilty to add CommandPool, Pipeline etc.. here
@@ -136,13 +119,13 @@ class RAYX_API VulkanEngine {
 
     // Run:
     void runCommandBuffer();
-	dict<GpuData> generateOutDict(RunSpec);
+    dict<GpuData> generateOutDict(RunSpec);
 
-	// BufferIO.cpp:
+    // BufferIO.cpp:
     void storeToStagingBuffer(std::vector<char> data);
     std::vector<char> loadFromStagingBuffer(uint32_t bytes);
-	void gpuMemcpy(VkBuffer& buffer_src, uint32_t offset_src, VkBuffer& buffer_dst, uint32_t offset_dst, uint32_t bytes);
-
+    void gpuMemcpy(VkBuffer& buffer_src, uint32_t offset_src,
+                   VkBuffer& buffer_dst, uint32_t offset_dst, uint32_t bytes);
 };
 
 // Used for validating return values of Vulkan API calls.
