@@ -23,8 +23,6 @@
 
 namespace RAYX {
 
-const int WORKGROUP_SIZE = 32;
-
 class RAYX_API VulkanTracer : public Tracer {
   public:
     VulkanTracer();

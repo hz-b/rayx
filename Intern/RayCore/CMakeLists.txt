@@ -42,8 +42,9 @@ SET(SOURCE
     src/VulkanEngine/InitVk/CreateInstance.cpp
     src/VulkanEngine/InitVk/PickDevice.cpp
     src/VulkanEngine/InitVk/CreateCommandPool.cpp
-    src/VulkanEngine/InitPipeline.cpp
-    src/VulkanEngine/Run.cpp
+    src/VulkanEngine/InitFromSpec.cpp
+    src/VulkanEngine/Run/Run.cpp
+    src/VulkanEngine/Run/Prepare.cpp
     src/VulkanEngine/BufferIO.cpp
     src/Writer/CSVWriter.cpp
     src/Writer/H5Writer.cpp

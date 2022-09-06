@@ -7,13 +7,19 @@
 
 namespace RAYX {
 
+const int WORKGROUP_SIZE = 32;
+
 #ifdef NDEBUG
 const bool enableValidationLayers = false;
 #else
 const bool enableValidationLayers = true;
 #endif
 
-using Pipeline = std::vector<VkDescriptorSetLayoutBinding>;
+using InitSpec = std::vector<VkDescriptorSetLayoutBinding>;
+struct RunSpec {
+    uint32_t numberOfInvocations;
+    uint32_t computeBuffersCount;
+};
 
 // set debug generation information
 const std::vector<const char*> validationLayers = {
@@ -31,10 +37,13 @@ class RAYX_API VulkanEngine {
     VulkanEngine() = default;
     ~VulkanEngine() = default;
 
-    inline void init(Pipeline p) {
+    inline void init(InitSpec i) {
         initVk();
-        initPipeline(p);
+        initFromSpec(i);
     }
+
+    void prepareRun(RunSpec);
+    void runCommandBuffer();
 
     struct Compute {  // Possibilty to add CommandPool, Pipeline etc.. here
         std::vector<uint64_t> m_BufferSizes;
@@ -84,11 +93,13 @@ class RAYX_API VulkanEngine {
     // InitVk/CreateCommandPool.cpp
     void createCommandPool();
 
-    // InitPipeline/InitPipeline.cpp
-    void initPipeline(Pipeline);
+    // InitFromSpec.cpp
+    void initFromSpec(InitSpec);
 
-    // Run.cpp
-    void runCommandBuffer();
+    // Run/Prepare.cpp
+    void createDescriptorSet(RunSpec);
+    void createComputePipeline();
+    void createCommandBuffer(RunSpec);
 };
 
 // Used for validating return values of Vulkan API calls.
