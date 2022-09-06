@@ -7,7 +7,9 @@ dict<GpuData> VulkanEngine::run(RunSpec r) {
     fillBuffers(r);
     prepareRun(r);
     runCommandBuffer();
-    return generateOutDict(r);
+    auto x = generateOutDict(r);
+    postRunCleanup();
+    return x;
 }
 
 void VulkanEngine::runCommandBuffer() {

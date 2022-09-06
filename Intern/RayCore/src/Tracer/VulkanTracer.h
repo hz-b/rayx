@@ -41,11 +41,7 @@ class RAYX_API VulkanTracer : public Tracer {
 
   private:
     // cleans and destroys the whole tracer instance
-    // CALL CLEANTRACER BEFORE CALLING THIS ONE
     void cleanup();
-    // empties raylist, Beamline and output data, etc. so that the tracer
-    // instance can be used again
-    void cleanTracer();
 
     void getRays();
     void getDebugBuffer();

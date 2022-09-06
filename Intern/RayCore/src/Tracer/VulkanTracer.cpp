@@ -84,7 +84,7 @@ RayList VulkanTracer::trace(const Beamline& beamline) {
     m_debugBufList = decode<_debugBuf_t>(outputbuffers["debug-buffer"]);
 #endif
 
-    cleanTracer();
+    m_beamlineData.clear();
 
     return outraylist;
 }
@@ -122,40 +122,6 @@ void VulkanTracer::cleanup() {
         RAYX_PROFILE_SCOPE("vkDestroyInstance");
         vkDestroyInstance(m_engine.m_Instance, nullptr);
     }
-}
-
-/**
- * Use this function if you want to reuse the tracer instance with a new
- * beamline and new rays etc but do not want to initialize everything again
- */
-void VulkanTracer::cleanTracer() {
-    // TODO
-    /*
-    m_RayList.clean();
-    m_beamlineData.clear();
-    vkFreeCommandBuffers(m_engine.m_Device, m_engine.m_CommandPool, 1,
-                         &m_engine.m_CommandBuffer);
-    vkDestroyPipeline(m_engine.m_Device, m_engine.m_Pipeline, nullptr);
-    vkDestroyPipelineLayout(m_engine.m_Device, m_engine.m_PipelineLayout,
-                            nullptr);
-    vkDestroyDescriptorPool(m_engine.m_Device, m_engine.m_DescriptorPool,
-                            nullptr);
-
-    for (uint32_t i = 0; i < m_engine.m_compute.m_Buffers.size(); i++) {
-        vkDestroyBuffer(m_engine.m_Device, m_engine.m_compute.m_Buffers[i],
-                        nullptr);
-        vkFreeMemory(m_engine.m_Device, m_engine.m_compute.m_BufferMemories[i],
-                     nullptr);
-    }
-    for (uint32_t i = 0; i < m_engine.m_staging.m_Buffers.size(); i++) {
-        vkDestroyBuffer(m_engine.m_Device, m_engine.m_staging.m_Buffers[i],
-                        nullptr);
-        vkFreeMemory(m_engine.m_Device, m_engine.m_staging.m_BufferMemories[i],
-                     nullptr);
-    }
-    vkDestroyShaderModule(m_engine.m_Device, m_engine.m_ComputeShaderModule,
-                          nullptr);
-                          */
 }
 
 void VulkanTracer::setBeamlineParameters(uint32_t inNumberOfBeamlines,

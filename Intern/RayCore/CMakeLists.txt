@@ -47,6 +47,7 @@ SET(SOURCE
     src/VulkanEngine/Run/CreateBuffers.cpp
     src/VulkanEngine/Run/FillBuffers.cpp
     src/VulkanEngine/Run/Prepare.cpp
+    src/VulkanEngine/Run/PostRunCleanup.cpp
     src/VulkanEngine/BufferIO.cpp
     src/Writer/CSVWriter.cpp
     src/Writer/H5Writer.cpp

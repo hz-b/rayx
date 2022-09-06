@@ -108,6 +108,7 @@ class RAYX_API VulkanEngine {
     // Run:
     void runCommandBuffer();
     dict<GpuData> generateOutDict(RunSpec);
+    void postRunCleanup();
 
     // BufferIO.cpp:
     void storeToStagingBuffer(std::vector<char> data);
