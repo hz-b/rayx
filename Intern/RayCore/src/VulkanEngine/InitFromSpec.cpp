@@ -6,7 +6,7 @@ void VulkanEngine::initFromSpec(InitSpec i) {
     RAYX_PROFILE_FUNCTION();
 
     std::vector<VkDescriptorSetLayoutBinding> bindings;
-    for (auto b : i.bufferSpecs) {
+    for (const auto& [name, b] : i.bufferSpecs) {
         bindings.push_back({b.binding, VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, 1,
                             VK_SHADER_STAGE_COMPUTE_BIT, nullptr});
     }

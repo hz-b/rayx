@@ -12,20 +12,10 @@ uint32_t findMemoryType(VkPhysicalDevice& physicalDevice,
 void VulkanEngine::createBuffers(RunSpec r) {
     RAYX_PROFILE_FUNCTION();
 
-    const auto getBufferSpec = [&](std::string name) -> BufferSpec {
-        for (auto x : m_initSpec->bufferSpecs) {
-            if (name == std::string(x.name)) {
-                return x;
-            }
-        }
-        RAYX_ERR << "no bufferspec found with name " << name;
-        return {};
-    };
+    for (const auto& [name, data] : r.buffers) {
+        BufferSpec spec = m_initSpec->bufferSpecs[name];
 
-    for (auto b : r.buffers) {
-        BufferSpec spec = getBufferSpec(b.name);
-
-        InternalBuffer* ib = &m_internalBuffers[b.name];
+        InternalBuffer* ib = &m_internalBuffers[name];
         int buffer_usage_flags = VK_BUFFER_USAGE_STORAGE_BUFFER_BIT;
         if (spec.in) {
             buffer_usage_flags |= VK_BUFFER_USAGE_TRANSFER_DST_BIT;
@@ -33,12 +23,12 @@ void VulkanEngine::createBuffers(RunSpec r) {
         if (spec.out) {
             buffer_usage_flags |= VK_BUFFER_USAGE_TRANSFER_SRC_BIT;
         }
-        createBuffer(m_PhysicalDevice, m_Device, b.data.size(),
+        createBuffer(m_PhysicalDevice, m_Device, data.size(),
                      buffer_usage_flags, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT,
                      ib->m_Buffer, ib->m_Memory);
     }
 
-	// create staging buffer
+    // create staging buffer
     createBuffer(m_PhysicalDevice, m_Device, STAGING_SIZE,
                  VK_BUFFER_USAGE_TRANSFER_DST_BIT |
                      VK_BUFFER_USAGE_TRANSFER_SRC_BIT |

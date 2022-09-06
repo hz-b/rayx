@@ -73,21 +73,18 @@ VulkanTracer::VulkanTracer() {
     */
 
     // bindings 0, 1, 2, 3, 4, 5, 6 are used right now
-    std::vector<BufferSpec> bs = {
-        {.name = "ray-buffer", .binding = 0, .in = true, .out = false},
-        {.name = "output-buffer", .binding = 1, .in = false, .out = true},
-        {.name = "quadric-buffer", .binding = 2, .in = true, .out = false},
-        {.name = "xyznull-buffer",
-         .binding = 3,
-         .in = true,
-         .out = false},  // TODO what is this buffer?
-        {.name = "material-index-table",
-         .binding = 4,
-         .in = true,
-         .out = false},
-        {.name = "material-table", .binding = 5, .in = true, .out = false},
+    std::map<std::string, BufferSpec> bs = {
+        {"ray-buffer", {.binding = 0, .in = true, .out = false}},
+        {"output-buffer", {.binding = 1, .in = false, .out = true}},
+        {"quadric-buffer", {.binding = 2, .in = true, .out = false}},
+        {"xyznull-buffer",
+         {.binding = 3,
+          .in = true,
+          .out = false}},  // TODO what is this buffer?
+        {"material-index-table", {.binding = 4, .in = true, .out = false}},
+        {"material-table", {.binding = 5, .in = true, .out = false}},
 #ifdef RAYX_DEBUG_MODE
-        {.name = "debug-buffer", .binding = 6, .in = false, .out = true},
+        {"debug-buffer", {.binding = 6, .in = false, .out = true}},
 #endif
     };
     m_engine.init({.shaderfile = "build/bin/comp.spv", .bufferSpecs = bs});
@@ -199,13 +196,11 @@ void VulkanTracer::run() {
     for (auto r : m_RayList) {
         rays.push_back(r);
     }
-    std::vector<Buffer> buffers = {
-        {.name = "ray-buffer", .data = encode(rays)},
-        {.name = "quadric-buffer", .data = encode(m_beamlineData)},
-        {.name = "material-index-table",
-         .data = encode(m_MaterialTables.indexTable)},
-        {.name = "material-table",
-         .data = encode(m_MaterialTables.materialTable)},
+    std::map<std::string, GpuData> buffers = {
+        {"ray-buffer", encode(rays)},
+        {"quadric-buffer", encode(m_beamlineData)},
+        {"material-index-table", encode(m_MaterialTables.indexTable)},
+        {"material-table", encode(m_MaterialTables.materialTable)},
     };
 
     RunSpec r = {.numberOfInvocations = m_numberOfRays,

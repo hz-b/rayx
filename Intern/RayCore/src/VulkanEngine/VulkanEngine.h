@@ -1,16 +1,16 @@
 #pragma once
 
-#include <vector>
-#include <map>
-#include <vulkan/vulkan.hpp>
 #include <algorithm>
+#include <map>
+#include <vector>
+#include <vulkan/vulkan.hpp>
 
 #include "RayCore.h"
+#include "VulkanEngine/GpuData.h"
 
 namespace RAYX {
 
 const int WORKGROUP_SIZE = 32;
-const uint32_t STAGING_SIZE = 134217728; // in bytes, equal to 128MB.
 
 #ifdef NDEBUG
 const bool enableValidationLayers = false;
@@ -19,33 +19,24 @@ const bool enableValidationLayers = true;
 #endif
 
 struct BufferSpec {
-    const char* name;
     uint32_t binding;
     bool in;
     bool out;
 };
 
-// the inner std::vector has size at most STAGING_SIZE.
-using RawData = std::vector<std::vector<char>>;
-
-struct Buffer {
-    const char* name;
-    RawData data;
-};
-
 struct InternalBuffer {
-	VkBuffer m_Buffer;
-	VkDeviceMemory m_Memory;
+    VkBuffer m_Buffer;
+    VkDeviceMemory m_Memory;
 };
 
 struct InitSpec {
     const char* shaderfile;
-    std::vector<BufferSpec> bufferSpecs;
+    std::map<std::string, BufferSpec> bufferSpecs;
 };
 struct RunSpec {
     uint32_t numberOfInvocations;
     uint32_t computeBuffersCount;
-    std::vector<Buffer> buffers;
+    std::map<std::string, GpuData> buffers;
 };
 
 // set debug generation information
@@ -71,8 +62,8 @@ class RAYX_API VulkanEngine {
         m_initSpec = i;
     }
 
-	void createBuffers(RunSpec);
-	void fillBuffers(RunSpec);
+    void createBuffers(RunSpec);
+    void fillBuffers(RunSpec);
     void run(RunSpec r);
 
     struct Compute {  // Possibilty to add CommandPool, Pipeline etc.. here
@@ -87,8 +78,8 @@ class RAYX_API VulkanEngine {
         std::vector<VkDeviceMemory> m_BufferMemories;
     } m_staging;
 
-	VkBuffer m_stagingBuffer;
-	VkDeviceMemory m_stagingMemory;
+    VkBuffer m_stagingBuffer;
+    VkDeviceMemory m_stagingMemory;
 
     VkInstance m_Instance;
     VkDebugUtilsMessengerEXT m_DebugMessenger;
@@ -105,7 +96,7 @@ class RAYX_API VulkanEngine {
     VkQueue m_ComputeQueue;
     uint32_t m_QueueFamilyIndex;
     QueueFamilyIndices m_QueueFamily;
-	std::map<std::string, InternalBuffer> m_internalBuffers;
+    std::map<std::string, InternalBuffer> m_internalBuffers;
 
     std::optional<InitSpec> m_initSpec;
 
@@ -141,6 +132,7 @@ class RAYX_API VulkanEngine {
     // Run:
     void runCommandBuffer();
 
+    void fillStagingBuffer(std::string bufname, std::vector<char> data);
 };
 
 // Used for validating return values of Vulkan API calls.
@@ -155,52 +147,5 @@ class RAYX_API VulkanEngine {
                         "1.3-extensions/man/html/VkResult.html";         \
         }                                                                \
     }
-
-// in order to send data to the VulkanEngine, it needs to be converted to raw bytes (i.e. chars).
-// the performance of those encode/decode can definitely be improved, as a copy is not generally necessary.
-
-// TODO optimize those functions!
-
-template <typename T>
-inline RawData encode(std::vector<T> in) {
-	uint32_t remaining_bytes = in.size() * sizeof(T);
-	char* ptr = (char*) in.data();
-
-	RawData out;
-	while (remaining_bytes > 0) {
-		// number of bytes transferred in this for-loop
-		int localbytes = std::min(STAGING_SIZE, remaining_bytes);
-
-		std::vector<char> subdata(localbytes);
-		memcpy(subdata.data(), ptr, localbytes);
-		out.push_back(subdata);
-
-		ptr += localbytes;
-		remaining_bytes -= localbytes;
-	}
-	return out;
-}
-
-template <typename T>
-inline std::vector<T> decode(RawData in) {
-	std::vector<T> out;
-
-	std::vector<char> tmp;
-	while (!in.empty()) {
-		std::vector<char> f = in[0];
-		tmp.insert(tmp.end(), f.begin(), f.end());
-		in.erase(in.begin());
-		while (tmp.size() >= sizeof(T)) {
-			T t;
-			memcpy(&t, tmp.data(), sizeof(T));
-			tmp.erase(tmp.begin(), tmp.begin() + sizeof(T));
-			out.push_back(t);
-		}
-	}
-	if (!tmp.empty()) {
-		RAYX_ERR << "decode unsuccessful! remaining bytes are not enough to create another element!";
-	}
-	return out;
-}
 
 }  // namespace RAYX
