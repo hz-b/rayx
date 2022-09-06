@@ -71,26 +71,23 @@ VulkanTracer::VulkanTracer() {
     ibuf (input) and layout(std140, binding = 1) buffer obuf (output) etc.. in
     the compute shader.
     */
-    // bindings 0, 1, 2, 3, 4, 5, 6 are used right now
-    m_engine.init({{0, VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, 1,
-                    VK_SHADER_STAGE_COMPUTE_BIT, nullptr},
-                   {1, VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, 1,
-                    VK_SHADER_STAGE_COMPUTE_BIT, nullptr},
-                   {2, VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, 1,
-                    VK_SHADER_STAGE_COMPUTE_BIT, nullptr},
-                   {3, VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, 1,
-                    VK_SHADER_STAGE_COMPUTE_BIT, nullptr},
-                   {4, VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, 1,
-                    VK_SHADER_STAGE_COMPUTE_BIT, nullptr},
-                   {5, VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, 1,
-                    VK_SHADER_STAGE_COMPUTE_BIT, nullptr},
-#ifdef RAYX_DEBUG_MODE
-                   {6, VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, 1,
-                    VK_SHADER_STAGE_COMPUTE_BIT, nullptr}
-#endif
-    });
 
-    // beamline.resize(0);
+    // bindings 0, 1, 2, 3, 4, 5, 6 are used right now
+    std::vector<BufferSpec> bs = {
+        {.name = "ray-buffer", .binding = 0, .in = true, .out = false},
+        {.name = "output-buffer", .binding = 1, .in = false, .out = true},
+        {.name = "quadric-buffer", .binding = 2, .in = true, .out = false},
+        {.name = "xyznull-buffer",
+         .binding = 3,
+         .in = true,
+         .out = false},  // TODO what is this buffer?
+        {.name = "material-index-table", .binding = 4, .in = true, .out = false},
+        {.name = "material-table", .binding = 5, .in = true, .out = false},
+#ifdef RAYX_DEBUG_MODE
+        {.name = "debug-buffer", .binding = 6, .in = false, .out = true},
+#endif
+    };
+    m_engine.init({.bufferSpecs = bs});
 }
 
 VulkanTracer::~VulkanTracer() { cleanup(); }
@@ -227,10 +224,10 @@ void VulkanTracer::prepareBuffers() {
     fillMaterialBuffer();
     RAYX_LOG << "All buffers filled.";
 
-	m_engine.prepareRun({
-		.numberOfInvocations = m_numberOfRays,
-		.computeBuffersCount = m_settings.m_computeBuffersCount,
-	});
+    m_engine.prepareRun({
+        .numberOfInvocations = m_numberOfRays,
+        .computeBuffersCount = m_settings.m_computeBuffersCount,
+    });
 }
 
 /** Cleans and deletes the whole tracer instance. Do this only if you do not

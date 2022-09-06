@@ -15,7 +15,16 @@ const bool enableValidationLayers = false;
 const bool enableValidationLayers = true;
 #endif
 
-using InitSpec = std::vector<VkDescriptorSetLayoutBinding>;
+struct BufferSpec {
+	const char* name;
+	uint32_t binding;
+	bool in;
+	bool out;
+};
+
+struct InitSpec {
+	std::vector<BufferSpec> bufferSpecs;
+};
 struct RunSpec {
     uint32_t numberOfInvocations;
     uint32_t computeBuffersCount;
