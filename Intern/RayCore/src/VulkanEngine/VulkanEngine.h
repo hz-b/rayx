@@ -54,18 +54,6 @@ class RAYX_API VulkanEngine {
     // returns the contents of `out=true` buffers.
     dict<GpuData> run(RunSpec r);
 
-    struct Compute {  // Possibilty to add CommandPool, Pipeline etc.. here
-        std::vector<uint64_t> m_BufferSizes;
-        std::vector<VkBuffer> m_Buffers;
-        std::vector<VkDeviceMemory> m_BufferMemories;
-    } m_compute;
-
-    struct Staging {
-        std::vector<uint64_t> m_BufferSizes;
-        std::vector<VkBuffer> m_Buffers;
-        std::vector<VkDeviceMemory> m_BufferMemories;
-    } m_staging;
-
     VkBuffer m_stagingBuffer;
     VkDeviceMemory m_stagingMemory;
 

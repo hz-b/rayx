@@ -11,11 +11,6 @@ class RunSpec {
         return *this;
     }
 
-    inline RunSpec computeBuffersCount(uint32_t arg) {
-        m_computeBuffersCount = arg;
-        return *this;
-    }
-
     inline RunSpec buffer_with_data(const char* buffername, GpuData data) {
         buffersizes[buffername] = data.size();
         bufferdata[buffername] = data;
@@ -28,7 +23,6 @@ class RunSpec {
     }
 
     uint32_t m_numberOfInvocations;
-    uint32_t m_computeBuffersCount;
     dict<GpuData>
         bufferdata;  // contains the data of only the initialized buffers
     dict<uint32_t> buffersizes;  // contains the size for *all* buffers.

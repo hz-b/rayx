@@ -32,7 +32,7 @@ VulkanTracer::VulkanTracer() {
                     {.binding = 4, .in = true, .out = false})
             .buffer("material-table", {.binding = 5, .in = true, .out = false})
 #ifdef RAYX_DEBUG_MODE
-            .buffer("material-table", {.binding = 6, .in = false, .out = true})
+            .buffer("debug-buffer", {.binding = 6, .in = false, .out = true})
 #endif
     );
 }
@@ -61,7 +61,6 @@ RayList VulkanTracer::trace(const Beamline& beamline) {
     auto raydata = encode(rays);
     auto outputbuffers = m_engine.run(
         RunSpec()
-            .computeBuffersCount(m_settings.m_computeBuffersCount)
             .numberOfInvocations(m_numberOfRays)
             .buffer_with_data("ray-buffer", raydata)
             .buffer_with_size("output-buffer", raydata.size())
@@ -130,6 +129,8 @@ void VulkanTracer::cleanup() {
  * beamline and new rays etc but do not want to initialize everything again
  */
 void VulkanTracer::cleanTracer() {
+    // TODO
+    /*
     m_RayList.clean();
     m_beamlineData.clear();
     vkFreeCommandBuffers(m_engine.m_Device, m_engine.m_CommandPool, 1,
@@ -154,6 +155,7 @@ void VulkanTracer::cleanTracer() {
     }
     vkDestroyShaderModule(m_engine.m_Device, m_engine.m_ComputeShaderModule,
                           nullptr);
+                          */
 }
 
 void VulkanTracer::setBeamlineParameters(uint32_t inNumberOfBeamlines,

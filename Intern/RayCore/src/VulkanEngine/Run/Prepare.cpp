@@ -57,7 +57,8 @@ void VulkanEngine::createDescriptorSet(RunSpec r) {
     */
     VkDescriptorPoolSize descriptorPoolSize = {};
     descriptorPoolSize.type = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER;
-    descriptorPoolSize.descriptorCount = r.m_computeBuffersCount;
+    descriptorPoolSize.descriptorCount =
+        r.buffersizes.size();  // = number of buffers
 
     VkDescriptorPoolCreateInfo descriptorPoolCreateInfo = {};
     descriptorPoolCreateInfo.sType =
@@ -88,19 +89,19 @@ void VulkanEngine::createDescriptorSet(RunSpec r) {
         m_Device, &descriptorSetAllocateInfo, &m_DescriptorSet));
 
     // Populate every Compute Buffer/Descriptor and configure it.
-    for (uint32_t i = 0; i < m_compute.m_Buffers.size(); i++) {
+    for (auto& [name, size] : r.buffersizes) {
         // specify which buffer to use: input buffer
         VkDescriptorBufferInfo descriptorBufferInfo = {};
-        descriptorBufferInfo.buffer = m_compute.m_Buffers[i];
+        descriptorBufferInfo.buffer = m_internalBuffers[name].m_Buffer;
         descriptorBufferInfo.offset = 0;
-        descriptorBufferInfo.range = m_compute.m_BufferSizes[i];
+        descriptorBufferInfo.range = size;
 
         VkWriteDescriptorSet writeDescriptorSet = {};
         writeDescriptorSet.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
         writeDescriptorSet.pNext = nullptr;
         writeDescriptorSet.dstSet =
-            m_DescriptorSet;                // write to this descriptor set.
-        writeDescriptorSet.dstBinding = i;  // write to the ist binding
+            m_DescriptorSet;  // write to this descriptor set.
+        writeDescriptorSet.dstBinding = m_initSpec->bufferSpecs[name].binding;
         writeDescriptorSet.dstArrayElement = 0;
         writeDescriptorSet.descriptorCount = 1;  // update a single descriptor.
         writeDescriptorSet.descriptorType =
