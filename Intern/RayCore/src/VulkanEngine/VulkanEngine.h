@@ -1,6 +1,7 @@
 #pragma once
 
 #include <vector>
+#include <map>
 #include <vulkan/vulkan.hpp>
 
 #include "RayCore.h"
@@ -25,6 +26,11 @@ struct BufferSpec {
 struct Buffer {
     const char* name;
     std::vector<char> data;
+};
+
+struct InternalBuffer {
+	VkBuffer m_Buffer;
+	VkDeviceMemory m_Memory;
 };
 
 struct InitSpec {
@@ -60,6 +66,8 @@ class RAYX_API VulkanEngine {
         m_initSpec = i;
     }
 
+	void createBuffers(RunSpec);
+	void fillBuffers(RunSpec);
     void run(RunSpec r);
 
     struct Compute {  // Possibilty to add CommandPool, Pipeline etc.. here
@@ -89,6 +97,7 @@ class RAYX_API VulkanEngine {
     VkQueue m_ComputeQueue;
     uint32_t m_QueueFamilyIndex;
     QueueFamilyIndices m_QueueFamily;
+	std::map<std::string, InternalBuffer> m_internalBuffers;
 
     std::optional<InitSpec> m_initSpec;
 
@@ -123,8 +132,6 @@ class RAYX_API VulkanEngine {
 
     // Run:
     void runCommandBuffer();
-	void createBuffers(RunSpec);
-	void fillBuffers(RunSpec);
 
 };
 
@@ -140,5 +147,27 @@ class RAYX_API VulkanEngine {
                         "1.3-extensions/man/html/VkResult.html";         \
         }                                                                \
     }
+
+// in order to send data to the VulkanEngine, it needs to be converted to raw bytes (i.e. chars).
+// the performance of those encode/deocde can definitely be improved, as a copy is not generally necessary.
+
+template <typename T>
+inline std::vector<char> encode(std::vector<T> in) {
+	const auto bytes = in.size() * sizeof(T);
+	std::vector<char> out(bytes);
+	memcpy(out.data(), in.data(), bytes);
+}
+
+template <typename T>
+inline std::vector<T> decode(std::vector<char> in) {
+	if (in.size() % sizeof(T) != 0) {
+		RAYX_WARN << "data cannot be decoded!";
+		RAYX_WARN << "in.size() = " << in.size();
+		RAYX_ERR << "sizeof(T) = " << sizeof(T);
+	}
+	const auto bytes = in.size() / sizeof(T);
+	std::vector<char> out(bytes);
+	memcpy(out.data(), in.data(), bytes);
+}
 
 }  // namespace RAYX

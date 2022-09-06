@@ -3,8 +3,10 @@
 namespace RAYX {
 
 void VulkanEngine::run(RunSpec r) {
-	createBuffers(r);
-	fillBuffers(r);
+
+	// TODO re-add when implemented
+	//    createBuffers(r);
+	//    fillBuffers(r);
 	prepareRun(r);
 	runCommandBuffer();
 }

@@ -194,8 +194,15 @@ void VulkanTracer::run() {
     RAYX_LOG << "Buffer sizes initiliazed. Run-time: "
              << float(clock() - begin_time) / CLOCKS_PER_SEC * 1000 << " ms";
 
+    RunSpec r = {
+        .numberOfInvocations = m_numberOfRays,
+        .computeBuffersCount = m_settings.m_computeBuffersCount,
+        .buffers = {/* TODO */},
+    };
+
     // creates buffers to transfer data to and from the shader
-    createBuffers();
+    m_engine.createBuffers(r);
+    m_engine.fillBuffers(r);
     const clock_t begin_time_fillBuffer = clock();
     fillRayBuffer();
     RAYX_LOG << "RayBuffer filled, run time: "
@@ -205,11 +212,7 @@ void VulkanTracer::run() {
     fillMaterialBuffer();
     RAYX_LOG << "All buffers filled.";
 
-    m_engine.run({
-        .numberOfInvocations = m_numberOfRays,
-        .computeBuffersCount = m_settings.m_computeBuffersCount,
-        .buffers = {/* TODO */},
-    });
+    m_engine.run(r);
 
     const clock_t begin_time_getRays = clock();
 
@@ -277,145 +280,6 @@ void VulkanTracer::cleanTracer() {
     }
     vkDestroyShaderModule(m_engine.m_Device, m_engine.m_ComputeShaderModule,
                           nullptr);
-}
-
-// find memory type with desired properties.
-uint32_t VulkanTracer::findMemoryType(uint32_t memoryTypeBits,
-                                      VkMemoryPropertyFlags properties) {
-    RAYX_PROFILE_FUNCTION();
-    VkPhysicalDeviceMemoryProperties memoryProperties;
-
-    vkGetPhysicalDeviceMemoryProperties(m_engine.m_PhysicalDevice,
-                                        &memoryProperties);
-
-    /*
-    How does this search work?
-    See the documentation of VkPhysicalDeviceMemoryProperties for a detailed
-    description.
-    */
-    for (uint32_t i = 0; i < memoryProperties.memoryTypeCount; ++i) {
-        if ((memoryTypeBits & (1 << i)) &&
-            ((memoryProperties.memoryTypes[i].propertyFlags & properties) ==
-             properties))
-            return i;
-    }
-    return -1;
-}
-
-void VulkanTracer::createBuffers() {
-    RAYX_PROFILE_FUNCTION();
-    // ----COMPUTE
-    // Ray Buffer
-    createBuffer(
-        m_engine.m_compute.m_BufferSizes[0],
-        VK_BUFFER_USAGE_TRANSFER_DST_BIT | VK_BUFFER_USAGE_STORAGE_BUFFER_BIT,
-        VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, m_engine.m_compute.m_Buffers[0],
-        m_engine.m_compute.m_BufferMemories[0]);
-
-    // output Buffer
-    createBuffer(
-        m_engine.m_compute.m_BufferSizes[1],
-        VK_BUFFER_USAGE_TRANSFER_SRC_BIT | VK_BUFFER_USAGE_STORAGE_BUFFER_BIT,
-        VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, m_engine.m_compute.m_Buffers[1],
-        m_engine.m_compute.m_BufferMemories[1]);
-
-    // Quadric Buffer
-    createBuffer(m_engine.m_compute.m_BufferSizes[2],
-                 VK_BUFFER_USAGE_STORAGE_BUFFER_BIT,
-                 VK_MEMORY_PROPERTY_HOST_COHERENT_BIT |
-                     VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT,
-                 m_engine.m_compute.m_Buffers[2],
-                 m_engine.m_compute.m_BufferMemories[2]);
-
-    // buffer for xyznull
-    createBuffer(
-        m_engine.m_compute.m_BufferSizes[3], VK_BUFFER_USAGE_STORAGE_BUFFER_BIT,
-        VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, m_engine.m_compute.m_Buffers[3],
-        m_engine.m_compute.m_BufferMemories[3]);
-    // buffer for material index table
-    createBuffer(m_engine.m_compute.m_BufferSizes[4],
-                 VK_BUFFER_USAGE_STORAGE_BUFFER_BIT,
-                 VK_MEMORY_PROPERTY_HOST_COHERENT_BIT |
-                     VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT,
-                 m_engine.m_compute.m_Buffers[4],
-                 m_engine.m_compute.m_BufferMemories[4]);
-    // buffer for material table
-    createBuffer(m_engine.m_compute.m_BufferSizes[5],
-                 VK_BUFFER_USAGE_STORAGE_BUFFER_BIT,
-                 VK_MEMORY_PROPERTY_HOST_COHERENT_BIT |
-                     VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT,
-                 m_engine.m_compute.m_Buffers[5],
-                 m_engine.m_compute.m_BufferMemories[5]);
-
-    // Buffer for debug
-    if (isDebug())
-        createBuffer(m_engine.m_compute.m_BufferSizes[6],
-                     VK_BUFFER_USAGE_TRANSFER_SRC_BIT |
-                         VK_BUFFER_USAGE_STORAGE_BUFFER_BIT,
-                     VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT,
-                     m_engine.m_compute.m_Buffers[6],
-                     m_engine.m_compute.m_BufferMemories[6]);
-
-    // ----STAGING
-    // staging buffer for rays
-    createBuffer(m_engine.m_staging.m_BufferSizes[0],
-                 VK_BUFFER_USAGE_TRANSFER_DST_BIT |
-                     VK_BUFFER_USAGE_TRANSFER_SRC_BIT |
-                     VK_BUFFER_USAGE_STORAGE_BUFFER_BIT,
-                 VK_MEMORY_PROPERTY_HOST_COHERENT_BIT |
-                     VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT,
-                 m_engine.m_staging.m_Buffers[0],
-                 m_engine.m_staging.m_BufferMemories[0]);
-    // staging buffer for debug
-    if (isDebug())
-        createBuffer(m_engine.m_staging.m_BufferSizes[1],
-                     VK_BUFFER_USAGE_TRANSFER_DST_BIT |
-                         VK_BUFFER_USAGE_STORAGE_BUFFER_BIT,
-                     VK_MEMORY_PROPERTY_HOST_COHERENT_BIT |
-                         VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT,
-                     m_engine.m_staging.m_Buffers[1],
-                     m_engine.m_staging.m_BufferMemories[1]);
-    RAYX_LOG << "All buffers created!";
-}
-
-// Creates a buffer to each given object with a given size.
-// This also allocates memory to the buffer according the requirements of the
-// Physical Device. Sharing is kept to exclusive.
-//
-// More at
-// https://www.khronos.org/registry/vulkan/specs/1.3-extensions/man/html/VkBufferCreateInfo.html
-void VulkanTracer::createBuffer(VkDeviceSize size, VkBufferUsageFlags usage,
-                                VkMemoryPropertyFlags properties,
-                                VkBuffer& buffer,
-                                VkDeviceMemory& bufferMemory) {
-    RAYX_PROFILE_FUNCTION();
-    VkBufferCreateInfo bufferCreateInfo = {};
-    bufferCreateInfo.sType = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO;
-    bufferCreateInfo.size = size;
-    bufferCreateInfo.usage = usage;  // buffer is used as a storage buffer.
-    bufferCreateInfo.sharingMode =
-        VK_SHARING_MODE_EXCLUSIVE;  // buffer is exclusive to a single
-                                    // queue family at a time.
-    VK_CHECK_RESULT(
-        vkCreateBuffer(m_engine.m_Device, &bufferCreateInfo, nullptr, &buffer));
-    VkMemoryRequirements memoryRequirements;
-    vkGetBufferMemoryRequirements(m_engine.m_Device, buffer,
-                                  &memoryRequirements);
-
-    VkMemoryAllocateInfo allocateInfo = {};
-    allocateInfo.sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO;
-    allocateInfo.allocationSize =
-        memoryRequirements.size;  // specify required memory.
-    allocateInfo.memoryTypeIndex =
-        findMemoryType(memoryRequirements.memoryTypeBits, properties);
-    VK_CHECK_RESULT(
-        vkAllocateMemory(m_engine.m_Device, &allocateInfo, NULL,
-                         &bufferMemory));  // allocate memory on device.
-
-    // Now associate that allocated memory with the buffer. With that, the
-    // buffer is backed by actual memory.
-    VK_CHECK_RESULT(
-        vkBindBufferMemory(m_engine.m_Device, buffer, bufferMemory, 0));
 }
 
 void VulkanTracer::fillRayBuffer() {
