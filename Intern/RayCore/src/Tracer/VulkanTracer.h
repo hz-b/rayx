@@ -40,9 +40,6 @@ class RAYX_API VulkanTracer : public Tracer {
 #endif
 
   private:
-    void run();
-    // void addRay(double xpos, double ypos, double zpos, double xdir, double
-    // ydir, double zdir, double weight); void addRay(double* location);
     // cleans and destroys the whole tracer instance
     // CALL CLEANTRACER BEFORE CALLING THIS ONE
     void cleanup();
@@ -82,7 +79,6 @@ class RAYX_API VulkanTracer : public Tracer {
     uint32_t m_numberOfRays;
     uint32_t m_numberOfRaysPerBeamline;
     RayList m_RayList;
-    RayList m_OutputRays;
     std::vector<double> m_beamlineData;
     std::vector<_debugBuf_t> m_debugBufList;
 

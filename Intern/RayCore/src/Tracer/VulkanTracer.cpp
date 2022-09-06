@@ -15,65 +15,13 @@
 #endif
 #endif
 
-/**
- * Compute:
- * buffers[0] = ray buffer
- * buffers[1] = output buffer
- * buffers[2] = quadric buffer
- * buffers[3] = xyznull buffer
- * buffers[4] = material index table
- * buffers[5] = material table
- * buffers[6] = debug buffer
- *
- * Staging:
- * buffers[0] = In/Output Staigng buffer
- * buffers[1] = Debug Staging buffer
- **/
-
-const char* COMPUTE_BUFFER_NAMES[7] = {"ray buffer",           "output buffer",
-                                       "quadric buffer",       "xyznull buffer",
-                                       "material index table", "material table",
-                                       "debug buffer"};
-const char* STAGING_BUFFER_NAMES[2] = {"In/Out staging buffer",
-                                       "Debug staging buffer"};
-
 namespace RAYX {
 VulkanTracer::VulkanTracer() {
     // Set buffer settings (DEBUG OR RELEASE)
     RAYX_LOG << "Initializing Vulkan Tracer..";
     setSettings();
 
-    // until they are added, all materials are considered to be irrelevant.
-    // Compute Buffers (I/O Storage)
-    m_engine.m_compute.m_BufferSizes.resize(m_settings.m_computeBuffersCount);
-    m_engine.m_compute.m_Buffers.resize(m_settings.m_computeBuffersCount);
-    m_engine.m_compute.m_BufferMemories.resize(
-        m_settings.m_computeBuffersCount);
-    // Staging Buffers (COPY)
-    m_engine.m_staging.m_BufferSizes.resize(m_settings.m_stagingBuffersCount);
-    m_engine.m_staging.m_Buffers.resize(m_settings.m_stagingBuffersCount);
-    m_engine.m_staging.m_BufferMemories.resize(
-        m_settings.m_stagingBuffersCount);
-
-    // Vulkan is initialized (from scratch)
-    // PS: To Save time and performance, Vulkan is initialized only once
-    // throughout the whole trace process. If any of Vulkan resources are bound
-    // to change, Vulkan might need to "be prepared again" (potential TODO)
-
-    /*
-    Here we specify a descriptor set layout. This allows us to bind our
-    descriptors to resources in the shader.
-    */
-
-    /*
-    Here we specify a binding of type VK_DESCRIPTOR_TYPE_STORAGE_BUFFER to
-    the binding point 0. This binds to layout(std140, binding = 0) buffer
-    ibuf (input) and layout(std140, binding = 1) buffer obuf (output) etc.. in
-    the compute shader.
-    */
-
-    // bindings 0, 1, 2, 3, 4, 5, 6 are used right now
-    std::map<std::string, BufferSpec> bs = {
+    dict<BufferSpec> bs = {
         {"ray-buffer", {.binding = 0, .in = true, .out = false}},
         {"output-buffer", {.binding = 1, .in = false, .out = true}},
         {"quadric-buffer", {.binding = 2, .in = true, .out = false}},
@@ -106,14 +54,33 @@ RayList VulkanTracer::trace(const Beamline& beamline) {
 
     m_MaterialTables = beamline.calcMinimalMaterialTables();
 
-    run();
+    std::vector<Ray> rays;
+    for (auto r : m_RayList) {
+        rays.push_back(r);
+    }
+    dict<GpuData> buffers = {
+        {"ray-buffer", encode(rays)},
+        {"quadric-buffer", encode(m_beamlineData)},
+        {"material-index-table", encode(m_MaterialTables.indexTable)},
+        {"material-table", encode(m_MaterialTables.materialTable)},
+    };
 
-    RayList out = m_OutputRays;
-    m_OutputRays = {};
+    RunSpec r = {.numberOfInvocations = m_numberOfRays,
+                 .computeBuffersCount = m_settings.m_computeBuffersCount,
+                 .buffers = buffers};
+
+    auto outputbuffers = m_engine.run(r);
+    std::vector<Ray> outrays = decode<Ray>(outputbuffers["output-buffer"]);
+    RayList outraylist;
+    for (auto r : outrays) {
+        outraylist.push(r);
+    }
+
+    m_debugBufList = decode<_debugBuf_t>(outputbuffers["debug-buffer"]);
 
     cleanTracer();
 
-    return out;
+    return outraylist;
 }
 
 //	This function destroys the debug messenger
@@ -127,104 +94,6 @@ void DestroyDebugUtilsMessengerEXT(VkInstance instance,
         func(instance, debugMessenger, pAllocator);
     }
 }
-
-/** Function is used to start the Vulkan tracer
- */
-void VulkanTracer::run() {
-    RAYX_PROFILE_FUNCTION();
-    const clock_t begin_time = clock();
-    RAYX_LOG << "Starting Vulkan Tracer..";
-
-    // the sizes of the input and output buffers are set. The buffers need to be
-    // the size numberOfRays * size of a Ray * the size of a double (a ray
-    // consists of 16 values in double precision, x,y,z for the position and s0,
-    // s1, s2, s3; Weight, direction, energy, stokes, pathLEngth, order,
-    // lastElement and extraParam.
-    // IMPORTANT: The shader size of the buffer needs to be multiples of 32
-    // bytes!
-
-    RAYX_LOG << "Setting compute buffers:";
-
-    // Prepare size of compute storage buffers
-    m_engine.m_compute.m_BufferSizes[0] = (uint64_t)m_numberOfRays *
-                                          VULKANTRACER_RAY_DOUBLE_AMOUNT *
-                                          sizeof(double);
-    m_engine.m_compute.m_BufferSizes[1] = (uint64_t)m_numberOfRays *
-                                          VULKANTRACER_RAY_DOUBLE_AMOUNT *
-                                          sizeof(double);
-    m_engine.m_compute.m_BufferSizes[2] =
-        (VULKANTRACER_QUADRIC_PARAM_DOUBLE_AMOUNT * sizeof(double)) +
-        (m_beamlineData.size() * sizeof(double));  // 4 doubles for parameters
-
-    m_engine.m_compute.m_BufferSizes[3] =
-        (uint64_t)m_numberOfRays * 4 * sizeof(double);
-    m_engine.m_compute.m_BufferSizes[4] =
-        m_MaterialTables.indexTable.size() * sizeof(int);
-    m_engine.m_compute.m_BufferSizes[5] =
-        m_MaterialTables.materialTable.size() * sizeof(double);
-    if (isDebug())
-        m_engine.m_compute.m_BufferSizes[6] =
-            (uint64_t)m_numberOfRays * sizeof(m_debug);
-
-    for (uint32_t i = 0; i < m_engine.m_compute.m_BufferSizes.size(); i++) {
-        RAYX_LOG << "Compute Buffer \"" << COMPUTE_BUFFER_NAMES[i]
-                 << "\" of size: " << m_engine.m_compute.m_BufferSizes[i]
-                 << " Bytes";
-    }
-
-    // Prepare size of staging buffers
-    m_engine.m_staging.m_BufferSizes[0] =
-        std::min((uint64_t)GPU_MAX_STAGING_SIZE,
-                 (uint64_t)m_numberOfRays * VULKANTRACER_RAY_DOUBLE_AMOUNT *
-                     sizeof(double));  // maximum of 128MB
-    if (isDebug())
-        m_engine.m_staging.m_BufferSizes[1] = std::min(
-            (uint64_t)GPU_MAX_STAGING_SIZE,
-            (uint64_t)m_numberOfRays * sizeof(m_debug));  // maximum of 128MB
-
-    for (uint32_t i = 0; i < m_engine.m_staging.m_BufferSizes.size(); i++) {
-        RAYX_LOG << "Staging Buffer \"" << STAGING_BUFFER_NAMES[i]
-                 << "\" of size: " << m_engine.m_staging.m_BufferSizes[i]
-                 << " Bytes";
-    }
-    // initVulkan();
-    RAYX_LOG << "Buffer sizes initiliazed. Run-time: "
-             << float(clock() - begin_time) / CLOCKS_PER_SEC * 1000 << " ms";
-
-    // TODO fix workaround
-    std::vector<Ray> rays;
-    for (auto r : m_RayList) {
-        rays.push_back(r);
-    }
-    std::map<std::string, GpuData> buffers = {
-        {"ray-buffer", encode(rays)},
-        {"quadric-buffer", encode(m_beamlineData)},
-        {"material-index-table", encode(m_MaterialTables.indexTable)},
-        {"material-table", encode(m_MaterialTables.materialTable)},
-    };
-
-    RunSpec r = {.numberOfInvocations = m_numberOfRays,
-                 .computeBuffersCount = m_settings.m_computeBuffersCount,
-                 .buffers = buffers};
-
-    // creates buffers to transfer data to and from the shader
-    m_engine.createBuffers(r);
-    m_engine.fillBuffers(r);
-
-    m_engine.run(r);
-
-    const clock_t begin_time_getRays = clock();
-
-    // getRays();
-
-    RAYX_LOG << "Got Rays. Run-time: "
-             << float(clock() - begin_time_getRays) / CLOCKS_PER_SEC * 1000
-             << " ms";
-
-#ifdef RAYX_DEBUG_MODE
-    // getDebugBuffer();
-#endif
-}  // namespace RAYX
 
 /** Cleans and deletes the whole tracer instance. Do this only if you do not
  * want to reuse the instance anymore
@@ -256,7 +125,6 @@ void VulkanTracer::cleanup() {
 void VulkanTracer::cleanTracer() {
     m_RayList.clean();
     m_beamlineData.clear();
-    m_OutputRays.clean();
     vkFreeCommandBuffers(m_engine.m_Device, m_engine.m_CommandPool, 1,
                          &m_engine.m_CommandBuffer);
     vkDestroyPipeline(m_engine.m_Device, m_engine.m_Pipeline, nullptr);

@@ -67,7 +67,9 @@ class RAYX_API VulkanEngine {
 
     void createBuffers(RunSpec);
     void fillBuffers(RunSpec);
-    void run(RunSpec r);
+
+	// returns the contents of `out=true` buffers.
+    dict<GpuData> run(RunSpec r);
 
     struct Compute {  // Possibilty to add CommandPool, Pipeline etc.. here
         std::vector<uint64_t> m_BufferSizes;
@@ -99,7 +101,7 @@ class RAYX_API VulkanEngine {
     VkQueue m_ComputeQueue;
     uint32_t m_QueueFamilyIndex;
     QueueFamilyIndices m_QueueFamily;
-    std::map<std::string, InternalBuffer> m_internalBuffers;
+    dict<InternalBuffer> m_internalBuffers;
 
     std::optional<InitSpec> m_initSpec;
 
@@ -134,6 +136,7 @@ class RAYX_API VulkanEngine {
 
     // Run:
     void runCommandBuffer();
+	dict<GpuData> generateOutDict(RunSpec);
 
 	// BufferIO.cpp:
     void storeToStagingBuffer(std::vector<char> data);
