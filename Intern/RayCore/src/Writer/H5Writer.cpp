@@ -8,8 +8,6 @@
 
 #include "Debug.h"
 
-#define RAY_DOUBLE_COUNT 16  // Same as in RayList.h
-
 std::string intToString(int x) {
     std::stringstream ss;
     ss << x;

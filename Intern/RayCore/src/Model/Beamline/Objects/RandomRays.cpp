@@ -1,7 +1,5 @@
 #include "RandomRays.h"
 
-#include <Tracer/VulkanTracer.h>
-
 #include <cmath>
 #include <random>
 
@@ -51,28 +49,23 @@ RayList RandomRays::getRays() const {
 
 void RandomRays::compareRays(std::vector<Ray*> input,
                              std::vector<double> output) const {
+    const int RAY_DOUBLE_AMOUNT = sizeof(Ray) / sizeof(double);
     std::list<double> diff;
     std::cout.precision(17);
     // double max = 0;
     for (int i = 0; i < m_numberOfRays; i++) {
         Ray* r1 = input[i];
-        double a1 =
-            atan(r1->m_position.x) - output[i * VULKANTRACER_RAY_DOUBLE_AMOUNT];
+        double a1 = atan(r1->m_position.x) - output[i * RAY_DOUBLE_AMOUNT];
         diff.push_back(a1);
-        double a2 = atan(r1->m_position.y) -
-                    output[i * VULKANTRACER_RAY_DOUBLE_AMOUNT + 1];
+        double a2 = atan(r1->m_position.y) - output[i * RAY_DOUBLE_AMOUNT + 1];
         diff.push_back(a2);
-        double a3 = atan(r1->m_position.z) -
-                    output[i * VULKANTRACER_RAY_DOUBLE_AMOUNT + 2];
+        double a3 = atan(r1->m_position.z) - output[i * RAY_DOUBLE_AMOUNT + 2];
         diff.push_back(a3);
-        double a5 = atan(r1->m_direction.x) -
-                    output[i * VULKANTRACER_RAY_DOUBLE_AMOUNT + 4];
+        double a5 = atan(r1->m_direction.x) - output[i * RAY_DOUBLE_AMOUNT + 4];
         diff.push_back(a5);
-        double a6 = atan(r1->m_direction.y) -
-                    output[i * VULKANTRACER_RAY_DOUBLE_AMOUNT + 5];
+        double a6 = atan(r1->m_direction.y) - output[i * RAY_DOUBLE_AMOUNT + 5];
         diff.push_back(a6);
-        double a7 = atan(r1->m_direction.z) -
-                    output[i * VULKANTRACER_RAY_DOUBLE_AMOUNT + 6];
+        double a7 = atan(r1->m_direction.z) - output[i * RAY_DOUBLE_AMOUNT + 6];
         diff.push_back(a7);
     }
     diff.sort();
