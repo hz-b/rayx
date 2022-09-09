@@ -26,7 +26,7 @@ namespace RAYX {
 class RAYX_API VulkanTracer : public Tracer {
   public:
     VulkanTracer();
-    ~VulkanTracer();
+    ~VulkanTracer() = default;
 
     RayList trace(const Beamline&) override;
 #ifdef RAYX_DEBUG_MODE
@@ -109,9 +109,6 @@ class RAYX_API VulkanTracer : public Tracer {
     void copyToRayBuffer(uint32_t offset, uint32_t numberOfBytesToCopy);
     void copyToOutputBuffer(uint32_t offset, uint32_t numberOfBytesToCopy);
     void copyFromDebugBuffer(uint32_t offset, uint32_t numberOfBytesToCopy);
-
-    // Utils
-    uint32_t* readFile(uint32_t& length, const char* filename);
 
     int main();
 };

@@ -7,10 +7,17 @@
 
 #include "RayCore.h"
 #include "VulkanEngine/GpuData.h"
-#include "VulkanEngine/InitSpec.h"
-#include "VulkanEngine/RunSpec.h"
 
 namespace RAYX {
+
+template <typename T>
+using dict = std::map<std::string, T>;
+
+struct DeclareBufferSpec {
+    uint32_t m_binding;
+    bool m_in;
+    bool m_out;
+};
 
 const int WORKGROUP_SIZE = 32;
 
@@ -20,9 +27,28 @@ const bool enableValidationLayers = false;
 const bool enableValidationLayers = true;
 #endif
 
-struct InternalBuffer {
+enum class EngineState {
+    PREINIT,  // the state before .init() is called. only declareBuffer() is
+              // legal here.
+    PRERUN,   // the state between the between the .init() and .run() calls
+    POSTRUN
+};
+
+struct InitSpec {
+    const char* m_shader;
+};
+
+struct RunSpec {
+    uint32_t m_numberOfInvocations;
+};
+
+struct Buffer {
+    bool m_in;
+    bool m_out;
+    uint32_t m_binding;
     VkBuffer m_Buffer;
     VkDeviceMemory m_Memory;
+    VkDeviceSize m_size;
 };
 
 // set debug generation information
@@ -39,20 +65,29 @@ struct QueueFamilyIndices {
 class RAYX_API VulkanEngine {
   public:
     VulkanEngine() = default;
-    ~VulkanEngine() = default;
+    ~VulkanEngine();
 
-    inline void init(InitSpec i) {
-        initVk();
-        initFromSpec(i);
+    void declareBuffer(const char* bufname, DeclareBufferSpec);
+    void init(InitSpec);
 
-        m_initSpec = i;
+    template <typename T>
+    inline void defineBufferByData(const char* bufname, std::vector<T> vec) {
+        defineBufferByDataRaw(bufname, encode<T>(vec));
+    }
+    void defineBufferBySize(const char* bufname, VkDeviceSize);
+
+    void run(RunSpec);
+
+    template <typename T>
+    inline std::vector<T> readOutBuffer(const char* bufname) {
+        return decode<T>(readOutBufferRaw(bufname));
     }
 
-    void createBuffers(RunSpec);
-    void fillBuffers(RunSpec);
+    void cleanup();
 
-    // returns the contents of `out=true` buffers.
-    dict<GpuData> run(RunSpec r);
+    EngineState m_state;
+    const char* m_shaderfile;
+    uint32_t m_numberOfInvocations;
 
     VkBuffer m_stagingBuffer;
     VkDeviceMemory m_stagingMemory;
@@ -72,45 +107,41 @@ class RAYX_API VulkanEngine {
     VkQueue m_ComputeQueue;
     uint32_t m_QueueFamilyIndex;
     QueueFamilyIndices m_QueueFamily;
-    dict<InternalBuffer> m_internalBuffers;
-
-    std::optional<InitSpec> m_initSpec;
+    dict<Buffer> m_buffers;
 
     ////////////////////////////////////////////////////////////////////////////////////////////
     // private implementation details - they should be kept at the bottom of
     // this file. don't bother reading them.
     ////////////////////////////////////////////////////////////////////////////////////////////
 
-    // InitVk/InitVk.cpp
-    void initVk();
+    // ReadOutBuffer:
+    GpuData readOutBufferRaw(const char* bufname);
 
-    // InitVk/CreateInstance.cpp
+    // Init:
     void createInstance();
     void setupDebugMessenger();
-
-    // InitVk/PickDevice.cpp
     void pickDevice();
     void pickPhysicalDevice();
     void createLogicalDevice();
-
-    // InitVk/CreateCommandPool.cpp
+    void createDescriptorSetLayout();
     void createCommandPool();
-
-    // InitFromSpec.cpp
-    void initFromSpec(InitSpec);
-
-    // Run/Prepare.cpp
-    void prepareRun(RunSpec);
-    void createDescriptorSet(RunSpec);
-    void createComputePipeline();
-    void createCommandBuffer(RunSpec);
+    void createStagingBuffer();
 
     // Run:
     void runCommandBuffer();
-    dict<GpuData> generateOutDict(RunSpec);
-    void postRunCleanup();
+    void createDescriptorSet();
+    void createComputePipeline();
+    void createCommandBuffer();
 
-    // BufferIO.cpp:
+    // DefineBuffer:
+    void defineBufferByDataRaw(const char* bufname, GpuData);
+    void createBuffer(const char* bufname, VkDeviceSize size);
+    void createVkBuffer(VkDeviceSize size, VkBufferUsageFlags usage,
+                        VkMemoryPropertyFlags properties, VkBuffer& buffer,
+                        VkDeviceMemory& bufferMemory);
+    void fillBuffer(const char* bufname, GpuData);
+
+    // BufferIO:
     void storeToStagingBuffer(std::vector<char> data);
     std::vector<char> loadFromStagingBuffer(uint32_t bytes);
     void gpuMemcpy(VkBuffer& buffer_src, uint32_t offset_src,

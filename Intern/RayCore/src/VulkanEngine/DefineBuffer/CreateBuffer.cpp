@@ -2,39 +2,25 @@
 
 namespace RAYX {
 
-void createBuffer(VkPhysicalDevice&, VkDevice&, VkDeviceSize size,
-                  VkBufferUsageFlags usage, VkMemoryPropertyFlags properties,
-                  VkBuffer& buffer, VkDeviceMemory& bufferMemory);
 uint32_t findMemoryType(VkPhysicalDevice& physicalDevice,
                         uint32_t memoryTypeBits,
                         VkMemoryPropertyFlags properties);
 
-void VulkanEngine::createBuffers(RunSpec r) {
+void VulkanEngine::createBuffer(const char* bufname, VkDeviceSize size) {
     RAYX_PROFILE_FUNCTION();
 
-    for (const auto& [name, size] : r.buffersizes) {
-        BufferSpec spec = m_initSpec->bufferSpecs[name];
-        int buffer_usage_flags = VK_BUFFER_USAGE_STORAGE_BUFFER_BIT;
-        if (spec.in) {
-            buffer_usage_flags |= VK_BUFFER_USAGE_TRANSFER_DST_BIT;
-        }
-        if (spec.out) {
-            buffer_usage_flags |= VK_BUFFER_USAGE_TRANSFER_SRC_BIT;
-        }
-        InternalBuffer* ib = &m_internalBuffers[name];
-        createBuffer(m_PhysicalDevice, m_Device, size, buffer_usage_flags,
-                     VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, ib->m_Buffer,
-                     ib->m_Memory);
-    }
+    Buffer& b = m_buffers[bufname];
+    b.m_size = size;
 
-    // create staging buffer
-    createBuffer(m_PhysicalDevice, m_Device, STAGING_SIZE,
-                 VK_BUFFER_USAGE_TRANSFER_DST_BIT |
-                     VK_BUFFER_USAGE_TRANSFER_SRC_BIT |
-                     VK_BUFFER_USAGE_STORAGE_BUFFER_BIT,
-                 VK_MEMORY_PROPERTY_HOST_COHERENT_BIT |
-                     VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT,
-                 m_stagingBuffer, m_stagingMemory);
+    int buffer_usage_flags = VK_BUFFER_USAGE_STORAGE_BUFFER_BIT;
+    if (b.m_in) {
+        buffer_usage_flags |= VK_BUFFER_USAGE_TRANSFER_DST_BIT;
+    }
+    if (b.m_out) {
+        buffer_usage_flags |= VK_BUFFER_USAGE_TRANSFER_SRC_BIT;
+    }
+    createVkBuffer(size, buffer_usage_flags,
+                   VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, b.m_Buffer, b.m_Memory);
 }
 
 // Creates a buffer to each given object with a given size.
@@ -43,10 +29,10 @@ void VulkanEngine::createBuffers(RunSpec r) {
 //
 // More at
 // https://www.khronos.org/registry/vulkan/specs/1.3-extensions/man/html/VkBufferCreateInfo.html
-void createBuffer(VkPhysicalDevice& physicalDevice, VkDevice& device,
-                  VkDeviceSize size, VkBufferUsageFlags usage,
-                  VkMemoryPropertyFlags properties, VkBuffer& buffer,
-                  VkDeviceMemory& bufferMemory) {
+void VulkanEngine::createVkBuffer(VkDeviceSize size, VkBufferUsageFlags usage,
+                                  VkMemoryPropertyFlags properties,
+                                  VkBuffer& buffer,
+                                  VkDeviceMemory& bufferMemory) {
     RAYX_PROFILE_FUNCTION();
     VkBufferCreateInfo bufferCreateInfo = {};
     bufferCreateInfo.sType = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO;
@@ -56,23 +42,23 @@ void createBuffer(VkPhysicalDevice& physicalDevice, VkDevice& device,
         VK_SHARING_MODE_EXCLUSIVE;  // buffer is exclusive to a single
                                     // queue family at a time.
     VK_CHECK_RESULT(
-        vkCreateBuffer(device, &bufferCreateInfo, nullptr, &buffer));
+        vkCreateBuffer(m_Device, &bufferCreateInfo, nullptr, &buffer));
     VkMemoryRequirements memoryRequirements;
-    vkGetBufferMemoryRequirements(device, buffer, &memoryRequirements);
+    vkGetBufferMemoryRequirements(m_Device, buffer, &memoryRequirements);
 
     VkMemoryAllocateInfo allocateInfo = {};
     allocateInfo.sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO;
     allocateInfo.allocationSize =
         memoryRequirements.size;  // specify required memory.
     allocateInfo.memoryTypeIndex = findMemoryType(
-        physicalDevice, memoryRequirements.memoryTypeBits, properties);
+        m_PhysicalDevice, memoryRequirements.memoryTypeBits, properties);
     VK_CHECK_RESULT(
-        vkAllocateMemory(device, &allocateInfo, NULL,
+        vkAllocateMemory(m_Device, &allocateInfo, NULL,
                          &bufferMemory));  // allocate memory on device.
 
     // Now associate that allocated memory with the buffer. With that, the
     // buffer is backed by actual memory.
-    VK_CHECK_RESULT(vkBindBufferMemory(device, buffer, bufferMemory, 0));
+    VK_CHECK_RESULT(vkBindBufferMemory(m_Device, buffer, bufferMemory, 0));
 }
 
 // find memory type with desired properties.

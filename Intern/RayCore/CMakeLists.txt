@@ -38,17 +38,25 @@ SET(SOURCE
     src/Tracer/RayList.cpp
     src/Tracer/VulkanTracer.cpp
     src/Tracer/CpuTracer.cpp
-    src/VulkanEngine/InitVk/InitVk.cpp
-    src/VulkanEngine/InitVk/CreateInstance.cpp
-    src/VulkanEngine/InitVk/PickDevice.cpp
-    src/VulkanEngine/InitVk/CreateCommandPool.cpp
-    src/VulkanEngine/InitFromSpec.cpp
-    src/VulkanEngine/Run/Run.cpp
-    src/VulkanEngine/Run/CreateBuffers.cpp
-    src/VulkanEngine/Run/FillBuffers.cpp
-    src/VulkanEngine/Run/Prepare.cpp
-    src/VulkanEngine/Run/PostRunCleanup.cpp
     src/VulkanEngine/BufferIO.cpp
+    src/VulkanEngine/Cleanup.cpp
+    src/VulkanEngine/DeclareBuffer.cpp
+    src/VulkanEngine/DefineBuffer/CreateBuffer.cpp
+    src/VulkanEngine/DefineBuffer/DefineBuffer.cpp
+    src/VulkanEngine/DefineBuffer/FillBuffer.cpp
+    src/VulkanEngine/Destruct.cpp
+    src/VulkanEngine/Init/CreateCommandPool.cpp
+    src/VulkanEngine/Init/CreateDescriptorSetLayout.cpp
+    src/VulkanEngine/Init/CreateInstance.cpp
+    src/VulkanEngine/Init/CreateStagingBuffer.cpp
+    src/VulkanEngine/Init/Init.cpp
+    src/VulkanEngine/Init/PickDevice.cpp
+    src/VulkanEngine/ReadOutBuffer.cpp
+    src/VulkanEngine/Run/CreateCommandBuffer.cpp
+    src/VulkanEngine/Run/CreateComputePipeline.cpp
+    src/VulkanEngine/Run/CreateDescriptorSet.cpp
+    src/VulkanEngine/Run/RunCommandBuffer.cpp
+    src/VulkanEngine/Run/Run.cpp
     src/Writer/CSVWriter.cpp
     src/Writer/H5Writer.cpp
     src/UserParameter/WorldUserParams.cpp
@@ -93,8 +101,6 @@ SET(HEADERS
     src/Tracer/VulkanTracer.h
     src/VulkanEngine/VulkanEngine.h
     src/VulkanEngine/GpuData.h
-    src/VulkanEngine/InitSpec.h
-    src/VulkanEngine/RunSpec.h
     src/Material/Material.h
     src/Material/NffTable.h
     src/Material/PalikTable.h

@@ -21,23 +21,24 @@ VulkanTracer::VulkanTracer() {
     RAYX_LOG << "Initializing Vulkan Tracer..";
     setSettings();
 
-    m_engine.init(
-        InitSpec()
-            .shader("build/bin/comp.spv")
-            .buffer("ray-buffer", {.binding = 0, .in = true, .out = false})
-            .buffer("output-buffer", {.binding = 1, .in = false, .out = true})
-            .buffer("quadric-buffer", {.binding = 2, .in = true, .out = false})
-            .buffer("xyznull-buffer", {.binding = 3, .in = false, .out = false})
-            .buffer("material-index-table",
-                    {.binding = 4, .in = true, .out = false})
-            .buffer("material-table", {.binding = 5, .in = true, .out = false})
+    m_engine.declareBuffer("ray-buffer",
+                           {.m_binding = 0, .m_in = true, .m_out = false});
+    m_engine.declareBuffer("output-buffer",
+                           {.m_binding = 1, .m_in = false, .m_out = true});
+    m_engine.declareBuffer("quadric-buffer",
+                           {.m_binding = 2, .m_in = true, .m_out = false});
+    m_engine.declareBuffer("xyznull-buffer",
+                           {.m_binding = 3, .m_in = false, .m_out = false});
+    m_engine.declareBuffer("material-index-table",
+                           {.m_binding = 4, .m_in = true, .m_out = false});
+    m_engine.declareBuffer("material-table",
+                           {.m_binding = 5, .m_in = true, .m_out = false});
 #ifdef RAYX_DEBUG_MODE
-            .buffer("debug-buffer", {.binding = 6, .in = false, .out = true})
+    m_engine.declareBuffer("debug-buffer",
+                           {.m_binding = 6, .m_in = false, .m_out = true});
 #endif
-    );
+    m_engine.init({.m_shader = "build/bin/comp.spv"});
 }
-
-VulkanTracer::~VulkanTracer() { cleanup(); }
 
 RayList VulkanTracer::trace(const Beamline& beamline) {
     m_RayList = beamline.getInputRays();
@@ -53,75 +54,39 @@ RayList VulkanTracer::trace(const Beamline& beamline) {
 
     m_MaterialTables = beamline.calcMinimalMaterialTables();
 
-    std::vector<Ray> rays;
+    std::vector<Ray> rays_;
     for (auto r : m_RayList) {
-        rays.push_back(r);
+        rays_.push_back(r);
     }
-
-    auto raydata = encode(rays);
-    auto outputbuffers = m_engine.run(
-        RunSpec()
-            .numberOfInvocations(m_numberOfRays)
-            .buffer_with_data("ray-buffer", raydata)
-            .buffer_with_size("output-buffer", raydata.size())
-            .buffer_with_data("quadric-buffer", encode(m_beamlineData))
-            .buffer_with_size("xyznull-buffer", 100)  // TODO how large?
-            .buffer_with_data("material-index-table",
-                              encode(m_MaterialTables.indexTable))
-            .buffer_with_data("material-table",
-                              encode(m_MaterialTables.materialTable))
+    m_engine.defineBufferByData<Ray>("ray-buffer", rays_);
+    m_engine.defineBufferBySize("output-buffer", m_numberOfRays * sizeof(Ray));
+    m_engine.defineBufferByData<double>("quadric-buffer", m_beamlineData);
+    m_engine.defineBufferBySize("xyznull-buffer", 100);
+    m_engine.defineBufferByData<int>("material-index-table",
+                                     m_MaterialTables.indexTable);
+    m_engine.defineBufferByData<double>("material-table",
+                                        m_MaterialTables.materialTable);
 #ifdef RAYX_DEBUG_MODE
-            .buffer_with_size("debug-buffer", raydata.size())
+    m_engine.defineBufferBySize("debug-buffer",
+                                m_numberOfRays * sizeof(_debugBuf_t));
 #endif
-    );
-    std::vector<Ray> outrays = decode<Ray>(outputbuffers["output-buffer"]);
+
+    m_engine.run({.m_numberOfInvocations = m_numberOfRays});
+
+    std::vector<Ray> _rays = m_engine.readOutBuffer<Ray>("output-buffer");
     RayList outraylist;
-    for (auto r : outrays) {
+    for (auto r : _rays) {
         outraylist.push(r);
     }
 
 #ifdef RAYX_DEBUG_MODE
-    m_debugBufList = decode<_debugBuf_t>(outputbuffers["debug-buffer"]);
+    m_debugBufList = m_engine.readOutBuffer<_debugBuf_t>("debug-buffer");
 #endif
 
     m_beamlineData.clear();
+	m_engine.cleanup();
 
     return outraylist;
-}
-
-//	This function destroys the debug messenger
-void DestroyDebugUtilsMessengerEXT(VkInstance instance,
-                                   VkDebugUtilsMessengerEXT debugMessenger,
-                                   const VkAllocationCallbacks* pAllocator) {
-    RAYX_PROFILE_FUNCTION();
-    auto func = (PFN_vkDestroyDebugUtilsMessengerEXT)vkGetInstanceProcAddr(
-        instance, "vkDestroyDebugUtilsMessengerEXT");
-    if (func != nullptr) {
-        func(instance, debugMessenger, pAllocator);
-    }
-}
-
-/** Cleans and deletes the whole tracer instance. Do this only if you do not
- * want to reuse the instance anymore
- * CALL CLEANTRACER FIRST BEFORE CALLING THIS ONE
- */
-void VulkanTracer::cleanup() {
-    RAYX_PROFILE_FUNCTION();
-    vkDestroyDescriptorSetLayout(m_engine.m_Device,
-                                 m_engine.m_DescriptorSetLayout, nullptr);
-    vkDestroyCommandPool(m_engine.m_Device, m_engine.m_CommandPool, nullptr);
-    {
-        RAYX_PROFILE_SCOPE("vkDestroyDevice");
-        vkDestroyDevice(m_engine.m_Device, nullptr);
-    }
-    if (enableValidationLayers) {
-        DestroyDebugUtilsMessengerEXT(m_engine.m_Instance,
-                                      m_engine.m_DebugMessenger, nullptr);
-    }
-    {
-        RAYX_PROFILE_SCOPE("vkDestroyInstance");
-        vkDestroyInstance(m_engine.m_Instance, nullptr);
-    }
 }
 
 void VulkanTracer::setBeamlineParameters(uint32_t inNumberOfBeamlines,

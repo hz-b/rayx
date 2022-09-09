@@ -2,12 +2,12 @@
 
 namespace RAYX {
 
-void VulkanEngine::initFromSpec(InitSpec i) {
+void VulkanEngine::createDescriptorSetLayout() {
     RAYX_PROFILE_FUNCTION();
 
     std::vector<VkDescriptorSetLayoutBinding> bindings;
-    for (const auto& [name, b] : i.bufferSpecs) {
-        bindings.push_back({b.binding, VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, 1,
+    for (const auto& [name, b] : m_buffers) {
+        bindings.push_back({b.m_binding, VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, 1,
                             VK_SHADER_STAGE_COMPUTE_BIT, nullptr});
     }
 
