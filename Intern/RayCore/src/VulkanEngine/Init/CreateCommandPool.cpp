@@ -15,7 +15,7 @@ void VulkanEngine::createCommandPool() {
     // the queue family of this command pool. All command buffers allocated
     // from this command pool, must be submitted to queues of this family
     // ONLY.
-    commandPoolCreateInfo.queueFamilyIndex = m_QueueFamily.computeFamily;
+    commandPoolCreateInfo.queueFamilyIndex = m_computeFamily;
     VK_CHECK_RESULT(vkCreateCommandPool(m_Device, &commandPoolCreateInfo,
                                         nullptr, &m_CommandPool));
 }

@@ -1,3 +1,5 @@
+#include <optional>
+
 #include "VulkanEngine/VulkanEngine.h"
 
 namespace RAYX {
@@ -5,11 +7,11 @@ namespace RAYX {
 bool isDeviceSuitable(VkPhysicalDevice device);
 int rateDevice(VkPhysicalDevice device);
 std::vector<const char*> getRequiredDeviceExtensions();
-QueueFamilyIndices findQueueFamilies(VkPhysicalDevice device);
+std::optional<uint32_t> findQueueFamilies(VkPhysicalDevice device);
 
 void VulkanEngine::pickDevice() {
-	pickPhysicalDevice();
-	createLogicalDevice();
+    pickPhysicalDevice();
+    createLogicalDevice();
 }
 
 // physical device for computation is chosen
@@ -23,8 +25,7 @@ void VulkanEngine::pickPhysicalDevice() {
 
     // create vector of devices
     std::vector<VkPhysicalDevice> devices(deviceCount);
-    vkEnumeratePhysicalDevices(m_Instance, &deviceCount,
-                               devices.data());
+    vkEnumeratePhysicalDevices(m_Instance, &deviceCount, devices.data());
 
     // pick fastest device
     m_PhysicalDevice = VK_NULL_HANDLE;
@@ -71,8 +72,7 @@ bool isDeviceSuitable(VkPhysicalDevice device) {
     VkPhysicalDeviceFeatures deviceFeatures;
     vkGetPhysicalDeviceFeatures(device, &deviceFeatures);
 
-    QueueFamilyIndices indices = findQueueFamilies(device);
-    return indices.hasvalue;
+    return findQueueFamilies(device).has_value();
 }
 
 // Giving scores to each Physical Device
@@ -111,10 +111,8 @@ std::vector<const char*> getRequiredDeviceExtensions() {
     return extensions;
 }
 
-QueueFamilyIndices findQueueFamilies(VkPhysicalDevice device) {
+std::optional<uint32_t> findQueueFamilies(VkPhysicalDevice device) {
     RAYX_PROFILE_FUNCTION();
-    QueueFamilyIndices indices;
-    indices.hasvalue = 0;
     uint32_t queueFamilyCount = 0;
     vkGetPhysicalDeviceQueueFamilyProperties(device, &queueFamilyCount,
                                              nullptr);
@@ -122,27 +120,23 @@ QueueFamilyIndices findQueueFamilies(VkPhysicalDevice device) {
     vkGetPhysicalDeviceQueueFamilyProperties(device, &queueFamilyCount,
                                              queueFamilies.data());
 
-    int i = 0;
-    for (const auto& queueFamily : queueFamilies) {
-        if (queueFamily.queueFlags & VK_QUEUE_COMPUTE_BIT) {
-            indices.computeFamily = i;
-            indices.hasvalue = 1;
+    for (uint32_t i = 0; i < queueFamilies.size(); i++) {
+        if (queueFamilies[i].queueFlags & VK_QUEUE_COMPUTE_BIT) {
+            return i;
         }
-        if (indices.isComplete()) break;
-        i++;
     }
-    return indices;
+    return {};
 }
 
 // creates a logical device to communicate with the physical device
 void VulkanEngine::createLogicalDevice() {
     RAYX_PROFILE_FUNCTION();
-    m_QueueFamily = findQueueFamilies(m_PhysicalDevice);
+    m_computeFamily = findQueueFamilies(m_PhysicalDevice).value();
 
     // create info about the device queues
     VkDeviceQueueCreateInfo queueCreateInfo{};
     queueCreateInfo.sType = VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO;
-    queueCreateInfo.queueFamilyIndex = m_QueueFamily.computeFamily;
+    queueCreateInfo.queueFamilyIndex = m_computeFamily;
     queueCreateInfo.queueCount = 1;
 
     float queuePriority = 1.0f;
@@ -171,14 +165,13 @@ void VulkanEngine::createLogicalDevice() {
         createInfo.enabledLayerCount = 0;
     }
 
-    if (vkCreateDevice(m_PhysicalDevice, &createInfo, nullptr,
-                       &m_Device) != VK_SUCCESS) {
+    if (vkCreateDevice(m_PhysicalDevice, &createInfo, nullptr, &m_Device) !=
+        VK_SUCCESS) {
         RAYX_LOG << "Failed to create instance!";
         throw std::runtime_error("failed to create logical device!");
     }
 
-    vkGetDeviceQueue(m_Device, m_QueueFamily.computeFamily, 0,
-                     &m_ComputeQueue);
+    vkGetDeviceQueue(m_Device, m_computeFamily, 0, &m_ComputeQueue);
 }
 
-}
+}  // namespace RAYX

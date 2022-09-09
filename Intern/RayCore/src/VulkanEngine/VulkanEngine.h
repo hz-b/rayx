@@ -24,22 +24,6 @@ struct RunSpec {
     uint32_t m_numberOfInvocations;
 };
 
-struct Buffer {
-    bool m_in;
-    bool m_out;
-    uint32_t m_binding;
-    VkBuffer m_Buffer;
-    VkDeviceMemory m_Memory;
-    VkDeviceSize m_size;
-};
-
-struct QueueFamilyIndices {
-    uint32_t computeFamily;
-    bool hasvalue;
-
-    bool isComplete() { return hasvalue; }
-};
-
 class RAYX_API VulkanEngine {
   public:
     VulkanEngine() = default;
@@ -63,6 +47,8 @@ class RAYX_API VulkanEngine {
 
     void cleanup();
 
+    // TYPES
+
     enum class EngineState {
         // the state before .init() is called.
         // legal functions: declareBuffer(), init().
@@ -77,6 +63,15 @@ class RAYX_API VulkanEngine {
         // the state after run() has been called.
         // legal functions: readOutBuffer(), cleanup().
         POSTRUN
+    };
+
+    struct Buffer {
+        bool m_in;
+        bool m_out;
+        uint32_t m_binding;
+        VkBuffer m_Buffer;
+        VkDeviceMemory m_Memory;
+        VkDeviceSize m_size;
     };
 
   private:
@@ -101,8 +96,7 @@ class RAYX_API VulkanEngine {
     VkDescriptorSet m_DescriptorSet;
     VkDescriptorSetLayout m_DescriptorSetLayout;
     VkQueue m_ComputeQueue;
-    uint32_t m_QueueFamilyIndex;
-    QueueFamilyIndices m_QueueFamily;
+    uint32_t m_computeFamily;
 
     ////////////////////////////////////////////////////////////////////////////////////////////
     // private implementation details - they should be kept at the bottom of
