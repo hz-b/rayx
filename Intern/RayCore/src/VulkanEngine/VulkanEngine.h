@@ -33,10 +33,10 @@ class RAYX_API VulkanEngine {
     void init(InitSpec);
 
     template <typename T>
-    inline void defineBufferByData(const char* bufname, std::vector<T> vec) {
-        defineBufferByDataRaw(bufname, encode<T>(vec));
+    inline void createBufferWithData(const char* bufname, std::vector<T> vec) {
+        createBufferWithDataRaw(bufname, encode<T>(vec));
     }
-    void defineBufferBySize(const char* bufname, VkDeviceSize);
+    void createBuffer(const char* bufname, VkDeviceSize);
 
     void run(RunSpec);
 
@@ -57,7 +57,7 @@ class RAYX_API VulkanEngine {
         // PRERUN can be reached by either calling .init() from the PREINIT
         // state,
         // or .cleanup() from the POSTRUN state.
-        // legal functions: defineBuffer*, run().
+        // legal functions: createBuffer*, run().
         PRERUN,
 
         // the state after run() has been called.
@@ -122,9 +122,8 @@ class RAYX_API VulkanEngine {
     void createComputePipeline();
     void createCommandBuffer();
 
-    // DefineBuffer:
-    void defineBufferByDataRaw(const char* bufname, GpuData);
-    void createBuffer(const char* bufname, VkDeviceSize size);
+    // CreateBuffer:
+    void createBufferWithDataRaw(const char* bufname, GpuData);
     void createVkBuffer(VkDeviceSize size, VkBufferUsageFlags usage,
                         VkMemoryPropertyFlags properties, VkBuffer& buffer,
                         VkDeviceMemory& bufferMemory);

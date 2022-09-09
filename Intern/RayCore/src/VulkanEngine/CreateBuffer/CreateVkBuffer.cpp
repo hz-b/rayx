@@ -6,22 +6,6 @@ uint32_t findMemoryType(VkPhysicalDevice& physicalDevice,
                         uint32_t memoryTypeBits,
                         VkMemoryPropertyFlags properties);
 
-void VulkanEngine::createBuffer(const char* bufname, VkDeviceSize size) {
-    RAYX_PROFILE_FUNCTION();
-
-    Buffer& b = m_buffers[bufname];
-    b.m_size = size;
-
-    int buffer_usage_flags = VK_BUFFER_USAGE_STORAGE_BUFFER_BIT;
-    if (b.m_in) {
-        buffer_usage_flags |= VK_BUFFER_USAGE_TRANSFER_DST_BIT;
-    }
-    if (b.m_out) {
-        buffer_usage_flags |= VK_BUFFER_USAGE_TRANSFER_SRC_BIT;
-    }
-    createVkBuffer(size, buffer_usage_flags,
-                   VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, b.m_Buffer, b.m_Memory);
-}
 
 // Creates a buffer to each given object with a given size.
 // This also allocates memory to the buffer according the requirements of the

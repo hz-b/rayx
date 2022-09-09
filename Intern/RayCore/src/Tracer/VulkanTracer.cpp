@@ -65,17 +65,14 @@ RayList VulkanTracer::trace(const Beamline& beamline) {
     for (auto r : rayList) {
         rays_.push_back(r);
     }
-    m_engine.defineBufferByData<Ray>("ray-buffer", rays_);
-    m_engine.defineBufferBySize("output-buffer", numberOfRays * sizeof(Ray));
-    m_engine.defineBufferByData<double>("quadric-buffer", beamlineData);
-    m_engine.defineBufferBySize("xyznull-buffer", 100);
-    m_engine.defineBufferByData<int>("material-index-table",
-                                     materialTables.indexTable);
-    m_engine.defineBufferByData<double>("material-table",
-                                        materialTables.materialTable);
+    m_engine.createBufferWithData<Ray>("ray-buffer", rays_);
+    m_engine.createBuffer("output-buffer", numberOfRays * sizeof(Ray));
+    m_engine.createBufferWithData<double>("quadric-buffer", beamlineData);
+    m_engine.createBuffer("xyznull-buffer", 100);
+    m_engine.createBufferWithData<int>("material-index-table", materialTables.indexTable);
+    m_engine.createBufferWithData<double>("material-table", materialTables.materialTable);
 #ifdef RAYX_DEBUG_MODE
-    m_engine.defineBufferBySize("debug-buffer",
-                                numberOfRays * sizeof(_debugBuf_t));
+    m_engine.createBuffer("debug-buffer", numberOfRays * sizeof(_debugBuf_t));
 #endif
 
     m_engine.run({.m_numberOfInvocations = numberOfRays});

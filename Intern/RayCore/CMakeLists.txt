@@ -41,9 +41,9 @@ SET(SOURCE
     src/VulkanEngine/BufferIO.cpp
     src/VulkanEngine/Cleanup.cpp
     src/VulkanEngine/DeclareBuffer.cpp
-    src/VulkanEngine/DefineBuffer/CreateBuffer.cpp
-    src/VulkanEngine/DefineBuffer/DefineBuffer.cpp
-    src/VulkanEngine/DefineBuffer/FillBuffer.cpp
+    src/VulkanEngine/CreateBuffer/CreateBuffer.cpp
+    src/VulkanEngine/CreateBuffer/CreateVkBuffer.cpp
+    src/VulkanEngine/CreateBuffer/FillBuffer.cpp
     src/VulkanEngine/Destruct.cpp
     src/VulkanEngine/Init/CreateCommandPool.cpp
     src/VulkanEngine/Init/CreateDescriptorSetLayout.cpp
