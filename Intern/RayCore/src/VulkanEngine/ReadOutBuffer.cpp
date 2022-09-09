@@ -3,6 +3,12 @@
 namespace RAYX {
 
 GpuData VulkanEngine::readOutBufferRaw(const char* bufname) {
+    if (m_state != EngineState::POSTRUN) {
+        RAYX_ERR << "you've forgotton to .run() the VulkanEngine. Thats "
+                    "mandatory before reading it's output buffers.";
+    }
+
+
     GpuData out;
     Buffer& b = m_buffers[bufname];
 

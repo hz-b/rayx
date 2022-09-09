@@ -14,21 +14,26 @@ void DestroyDebugUtilsMessengerEXT(VkInstance instance,
     }
 }
 
-
 VulkanEngine::~VulkanEngine() {
+    if (m_state == EngineState::PREINIT) {
+        return; /* nothing to clean up! */
+    }
+    if (m_state == EngineState::POSTRUN) {
+        RAYX_WARN << ".cleanup() was not called after run!";
+        cleanup();
+    }
+
     vkDestroyBuffer(m_Device, m_stagingBuffer, nullptr);
     vkFreeMemory(m_Device, m_stagingMemory, nullptr);
 
-    vkDestroyDescriptorSetLayout(m_Device,
-                                 m_DescriptorSetLayout, nullptr);
+    vkDestroyDescriptorSetLayout(m_Device, m_DescriptorSetLayout, nullptr);
     vkDestroyCommandPool(m_Device, m_CommandPool, nullptr);
     {
         RAYX_PROFILE_SCOPE("vkDestroyDevice");
         vkDestroyDevice(m_Device, nullptr);
     }
     if (enableValidationLayers) {
-        DestroyDebugUtilsMessengerEXT(m_Instance,
-                                      m_DebugMessenger, nullptr);
+        DestroyDebugUtilsMessengerEXT(m_Instance, m_DebugMessenger, nullptr);
     }
     {
         RAYX_PROFILE_SCOPE("vkDestroyInstance");
@@ -36,4 +41,4 @@ VulkanEngine::~VulkanEngine() {
     }
 }
 
-}
+}  // namespace RAYX

@@ -10,28 +10,10 @@
 
 namespace RAYX {
 
-template <typename T>
-using dict = std::map<std::string, T>;
-
 struct DeclareBufferSpec {
     uint32_t m_binding;
     bool m_in;
     bool m_out;
-};
-
-const int WORKGROUP_SIZE = 32;
-
-#ifdef NDEBUG
-const bool enableValidationLayers = false;
-#else
-const bool enableValidationLayers = true;
-#endif
-
-enum class EngineState {
-    PREINIT,  // the state before .init() is called. only declareBuffer() is
-              // legal here.
-    PRERUN,   // the state between the between the .init() and .run() calls
-    POSTRUN
 };
 
 struct InitSpec {
@@ -50,10 +32,6 @@ struct Buffer {
     VkDeviceMemory m_Memory;
     VkDeviceSize m_size;
 };
-
-// set debug generation information
-const std::vector<const char*> validationLayers = {
-    "VK_LAYER_KHRONOS_validation"};
 
 struct QueueFamilyIndices {
     uint32_t computeFamily;
@@ -85,7 +63,25 @@ class RAYX_API VulkanEngine {
 
     void cleanup();
 
-    EngineState m_state;
+    enum class EngineState {
+        // the state before .init() is called.
+        // legal functions: declareBuffer(), init().
+        PREINIT,
+
+        // PRERUN can be reached by either calling .init() from the PREINIT
+        // state,
+        // or .cleanup() from the POSTRUN state.
+        // legal functions: defineBuffer*, run().
+        PRERUN,
+
+        // the state after run() has been called.
+        // legal functions: readOutBuffer(), cleanup().
+        POSTRUN
+    };
+
+  private:
+    EngineState m_state = EngineState::PREINIT;
+    std::map<std::string, Buffer> m_buffers;
     const char* m_shaderfile;
     uint32_t m_numberOfInvocations;
 
@@ -107,7 +103,6 @@ class RAYX_API VulkanEngine {
     VkQueue m_ComputeQueue;
     uint32_t m_QueueFamilyIndex;
     QueueFamilyIndices m_QueueFamily;
-    dict<Buffer> m_buffers;
 
     ////////////////////////////////////////////////////////////////////////////////////////////
     // private implementation details - they should be kept at the bottom of
@@ -160,5 +155,17 @@ class RAYX_API VulkanEngine {
                         "1.3-extensions/man/html/VkResult.html";         \
         }                                                                \
     }
+
+// set debug generation information
+const std::vector<const char*> validationLayers = {
+    "VK_LAYER_KHRONOS_validation"};
+
+const int WORKGROUP_SIZE = 32;
+
+#ifdef NDEBUG
+const bool enableValidationLayers = false;
+#else
+const bool enableValidationLayers = true;
+#endif
 
 }  // namespace RAYX
