@@ -21,8 +21,8 @@ class RZP:
     name = "Reflection Zoneplate"
     type = "Reflection Zoneplate"
     geometricalShape = 0
-    totalWidth = 0.2567627027
-    totalWidthB = 0.1092372974
+    totalWidth = 0.567627027
+    totalWidthB = 0.2092372974
     totalLength = 72.5
     totalWidth = 0.183
     gratingMount = 1
@@ -552,7 +552,7 @@ def calcRZPs(numRZPs: int, baseRZP: RZP, iterDirection: int):
     intersecMidDist = np.sqrt((midWidth**2)/4 + triangleHeight**2)
     
     # Calculate angle between direction vectors
-    dirDeviationAngle = 180 - topAngleTrapezoid * 2
+    dirDeviationAngle = 180 - abs(topAngleTrapezoid * 2)
     
 
     positions = [np.array([0,0,0])] * (math.ceil(numRZPs / 2))
@@ -579,7 +579,8 @@ def calcRZPs(numRZPs: int, baseRZP: RZP, iterDirection: int):
             directions[i] = rotateYDeg(directions[i-1], dirDeviationAngle, iterDirection)
     
     # translate rzps back to origin
-    positions = [pos - [0,0,intersecMidDist] for pos in positions]
+    for pos in positions:
+        pos -= np.array([0,0,intersecMidDist])
     return positions, directions
 
 
@@ -617,7 +618,7 @@ def main():
     plt.scatter(xPositions, zPositions)
     plt.xlabel('x')
     plt.ylabel('z')
-    plt.gca().set_aspect('equal', adjustable='box')
+    # plt.gca().set_aspect('equal', adjustable='box')
     plt.show()
     
     
@@ -628,7 +629,7 @@ def main():
     plt.scatter(xDirectionsx, xDirectionsz)
     plt.xlabel('x')
     plt.ylabel('z')
-    plt.gca().set_aspect('equal', adjustable='box')
+    # plt.gca().set_aspect('equal', adjustable='box')
     plt.show()
     
     # Plot z directions
@@ -637,7 +638,7 @@ def main():
     plt.scatter(zDirectionsx, zDirectionsz)
     plt.xlabel('x')
     plt.ylabel('z')
-    plt.gca().set_aspect('equal', adjustable='box')
+    # plt.gca().set_aspect('equal', adjustable='box')
     plt.show()
 
     indent(root)
