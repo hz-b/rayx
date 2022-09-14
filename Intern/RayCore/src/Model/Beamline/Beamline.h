@@ -1,13 +1,13 @@
 #pragma once
 
 #include <Material/Material.h>
-#include <Tracer/RayList.h>
 
 #include <array>
 #include <memory>
 #include <vector>
 
 #include "Core.h"
+#include "Tracer/Ray.h"
 #include "glm.hpp"
 
 namespace RAYX {
@@ -26,7 +26,7 @@ class RAYX_API Beamline {
     Beamline();
     ~Beamline();
 
-    RayList getInputRays() const;
+    std::vector<Ray> getInputRays() const;
 
     /**
      * @brief Quality-of-life function to calculate the smallest possible

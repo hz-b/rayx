@@ -22,7 +22,7 @@ class RAYX_API MatrixSource : public LightSource {
 
     static std::shared_ptr<MatrixSource> createFromXML(const xml::Parser&);
 
-    virtual RayList getRays() const override;
+    virtual std::vector<Ray> getRays() const override;
 
   private:
     int m_numberOfRays;

@@ -8,34 +8,21 @@
 
 #include "Debug.h"
 
-std::string intToString(int x) {
-    std::stringstream ss;
-    ss << x;
-    std::string s;
-    ss >> s;
-    return s;
-}
-
-void writeH5(RAYX::RayList& rays, std::string filename) {
+void writeH5(std::vector<RAYX::Ray>& rays, std::string filename) {
     HighFive::File file(filename, HighFive::File::ReadWrite |
                                       HighFive::File::Create |
                                       HighFive::File::Truncate);
-    int counter = 0;
 
-    for (auto l : rays.getData()) {
-        try {
-            std::vector<size_t> dims{l.size(),
-                                     16};  // Max size of one chunk is 128MB
-            auto name = intToString(counter);
-            auto dataset =
-                file.createDataSet<double>(name, HighFive::DataSpace(dims));
-            auto* ptr = (double*)l.data();
-            dataset.write_raw(ptr);
-        } catch (HighFive::Exception& err) {
-            RAYX_D_ERR << err.what();
-        }
+    const uint32_t numDoubles =
+        rays.size() * sizeof(RAYX::Ray) / sizeof(double);
 
-        counter += l.size();
+    try {
+        auto dataspace = HighFive::DataSpace({numDoubles});
+        auto dataset = file.createDataSet<double>("0", dataspace);
+        double* ptr = (double*)rays.data();
+        dataset.write_raw(ptr);
+    } catch (HighFive::Exception& err) {
+        RAYX_ERR << err.what();
     }
 }
 

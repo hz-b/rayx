@@ -60,7 +60,7 @@ RAYX::Beamline loadBeamline(std::string filename) {
 }
 
 // will write to Tests/output/<filename>.csv
-void writeToOutputCSV(RAYX::RayList& rays, std::string filename) {
+void writeToOutputCSV(std::vector<RAYX::Ray>& rays, std::string filename) {
     std::string f = resolvePath("Tests/output/" + filename + ".csv");
     writeCSV(rays, f);
 }
@@ -80,23 +80,43 @@ int sequentialExtraParam(int count) {
     return out;
 }
 
-RAYX::RayList traceRML(std::string filename, Filter filter) {
+std::vector<RAYX::Ray> traceRML(std::string filename, Filter filter) {
     auto beamline = loadBeamline(filename);
-    auto rays = tracer->trace(beamline);
-    rays = rays.filter([](Ray& r) { return r.m_weight != 0; });
-    if (filter == Filter::OnlySequentialRays) {
-        auto extra = sequentialExtraParam(beamline.m_OpticalElements.size());
-        rays = rays.filter(
-            [=](Ray& r) { return intclose(r.m_extraParam, extra); });
+
+    // the rays satisfying the weight != 0 test.
+    std::vector<RAYX::Ray> wRays;
+    {
+        auto rays = tracer->trace(beamline);
+        wRays.reserve(rays.size());
+        for (auto r : rays) {
+            if (r.m_weight != 0) {
+                wRays.push_back(r);
+            }
+        }
     }
 
-    return rays;
+    if (filter == Filter::OnlySequentialRays) {
+        auto extra = sequentialExtraParam(beamline.m_OpticalElements.size());
+
+        // the rays satisfying the extraParam test.
+        std::vector<RAYX::Ray> eRays;
+
+        eRays.reserve(wRays.size());
+        for (auto r : wRays) {
+            if (intclose(r.m_extraParam, extra)) {
+                eRays.push_back(r);
+            }
+        }
+        return eRays;
+    } else {
+        return wRays;
+    }
 }
 
 // will look at Tests/input/<filename>.csv
 // the Ray-UI files are to be obtained by Export > RawRaysOutgoing (which are in
 // element coordinates of the relevant element!)
-RAYX::RayList loadCSVRayUI(std::string filename) {
+std::vector<RAYX::Ray> loadCSVRayUI(std::string filename) {
     std::string file = resolvePath("Tests/input/" + filename + ".csv");
 
     std::ifstream f(file);
@@ -107,18 +127,19 @@ RAYX::RayList loadCSVRayUI(std::string filename) {
         std::getline(f, line);
     }
 
-    RAYX::RayList out;
+    std::vector<RAYX::Ray> out;
+    // TODO(Rudi): reserve correct amount here
 
     while (std::getline(f, line)) {
-        out.push(parseCSVline(line));
+        out.push_back(parseCSVline(line));
     }
 
     return out;
 }
 
-void compareRayLists(const RAYX::RayList& rayx_list,
-                     const RAYX::RayList& rayui_list, double t) {
-    CHECK_EQ(rayx_list.rayAmount(), rayui_list.rayAmount());
+void compareRayLists(const std::vector<RAYX::Ray>& rayx_list,
+                     const std::vector<RAYX::Ray>& rayui_list, double t) {
+    CHECK_EQ(rayx_list.size(), rayui_list.size());
 
     auto itRayX = rayx_list.begin();
     auto itRayXEnd = rayx_list.end();

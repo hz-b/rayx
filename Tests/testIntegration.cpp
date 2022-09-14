@@ -65,7 +65,7 @@ TEST_F(TestSuite, Ellipsoid) {
     auto rayx = traceRML("Ellipsoid", Filter::OnlySequentialRays);
 
     writeToOutputCSV(rayx, "Ellipsoid.rayx");
-    CHECK_EQ(rayx.rayAmount(), 92);
+    CHECK_EQ(rayx.size(), 92);
 
     for (auto r : rayx) {
         CHECK_EQ(r.m_position, glm::dvec3(0, 0, 0), 1e-11);
@@ -97,4 +97,6 @@ TEST_F(TestSuite, Ellipsoid_MB) { compareAgainstRayUI("Ellipsoid_MB"); }
 // Ellipsoid?
 TEST_F(TestSuite, Ellipsoid_PM) { compareAgainstRayUI("Ellipsoid_PM"); }
 
-TEST_F(TestSuite, ellipsoid_ip_200mirrormis) { compareAgainstRayUI("ellipsoid_ip_200mirrormis"); }
+TEST_F(TestSuite, ellipsoid_ip_200mirrormis) {
+    compareAgainstRayUI("ellipsoid_ip_200mirrormis");
+}

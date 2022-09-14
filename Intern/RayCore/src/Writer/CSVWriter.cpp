@@ -5,7 +5,6 @@
 #include <sstream>
 
 #include "CSVWriter.h"
-#include "Tracer/RayList.h"
 
 const int CELL_SIZE = 23;
 
@@ -55,7 +54,7 @@ Cell doubleToCell(double x) {
     return strToCell(s.c_str());
 }
 
-void writeCSV(RAYX::RayList& rays, std::string filename) {
+void writeCSV(std::vector<RAYX::Ray>& rays, std::string filename) {
     std::ofstream file(filename);
 
     file << strToCell("Index").buf << " | "        //
@@ -81,7 +80,7 @@ void writeCSV(RAYX::RayList& rays, std::string filename) {
     }
     file << '\n';
 
-    RAYX_D_LOG << "Writing " << rays.rayAmount() << " rays to file...";
+    RAYX_D_LOG << "Writing " << rays.size() << " rays to file...";
 
     int index = 0;
     for (auto ray : rays) {

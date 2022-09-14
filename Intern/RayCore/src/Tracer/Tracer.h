@@ -7,7 +7,7 @@
 
 #include "Core.h"
 #include "Model/Beamline/Beamline.h"
-#include "Tracer/RayList.h"
+#include "Ray.h"
 
 namespace RAYX {
 /**
@@ -22,7 +22,7 @@ class RAYX_API Tracer {
      * @brief Run the tracing on the Beamline object
      *
      */
-    virtual RayList trace(const Beamline&) = 0;
+    virtual std::vector<Ray> trace(const Beamline&) = 0;
 };
 
 }  // namespace RAYX

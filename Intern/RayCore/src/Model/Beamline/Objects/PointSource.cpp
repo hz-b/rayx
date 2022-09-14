@@ -104,14 +104,15 @@ double getCoord(const SourceDist l, const double extent, RandomState& rs) {
  *
  * @returns list of rays
  */
-RayList PointSource::getRays() const {
+std::vector<Ray> PointSource::getRays() const {
     double x, y, z, psi, phi,
         en;  // x,y,z pos, psi,phi direction cosines, en=energy
 
     RandomState rs;
 
     int n = m_numberOfRays;
-    RayList rayList;
+    std::vector<Ray> rayList;
+	rayList.reserve(m_numberOfRays);
     // rayList.reserve(1048576);
     RAYX_D_LOG << "Create " << n << " rays with standard normal deviation...";
 
@@ -140,9 +141,8 @@ RayList PointSource::getRays() const {
 
         Ray r = {position, 1.0, direction, en, stokes, 0.0, 0.0, 0.0, 0.0};
 
-        rayList.push(r);
+        rayList.push_back(r);
     }
-    // rayList.resize(1048576);
     return rayList;
 }
 

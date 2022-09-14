@@ -10,11 +10,16 @@
 #include "Tracer/VulkanTracer.h"
 #include "Writer/Writer.h"
 
-TerminalApp::TerminalApp() = default;
-
 TerminalApp::TerminalApp(int argc, char** argv) : m_argv(argv), m_argc(argc) {
     initPathResolver();
     RAYX_D_LOG << "TerminalApp created!";
+
+    if (sizeof(void*) <= 4) {
+        RAYX_WARN
+            << "This application should be compiled as 64-bit! Using 32-bit"
+               "will make this program run out of memory for larger ray "
+               "numbers!";
+    }
 }
 
 TerminalApp::~TerminalApp() { RAYX_D_LOG << "TerminalApp deleted!"; }
@@ -130,7 +135,7 @@ void TerminalApp::run() {
     }
 }
 
-void TerminalApp::exportRays(RAYX::RayList& rays, std::string path) {
+void TerminalApp::exportRays(std::vector<RAYX::Ray>& rays, std::string path) {
 #ifdef CI
     bool csv = true;
 #else

@@ -13,7 +13,6 @@
 #include "PathResolver.h"
 #include "Tracer/CpuTracer.h"
 #include "Tracer/Ray.h"
-#include "Tracer/RayList.h"
 #include "Tracer/VulkanTracer.h"
 #include "UserParameter/GeometricUserParams.h"
 #include "UserParameter/WorldUserParams.h"
@@ -169,32 +168,33 @@ RAYX::Ray parseCSVline(std::string line);
 RAYX::Beamline loadBeamline(std::string filename);
 
 // will write to Tests/output/<filename>.csv
-void writeToOutputCSV(RAYX::RayList& rays, std::string filename);
+void writeToOutputCSV(std::vector<RAYX::Ray>& rays, std::string filename);
 
 enum class Filter { KeepAllRays, OnlySequentialRays };
 
 // returns rays in element coordinates
 // weight = 0 rays are filtered out.
 // if filter == OnlySequentialRays, then only the sequential rays are returned.
-RAYX::RayList traceRML(std::string filename,
-                       Filter filter = Filter::KeepAllRays);
+std::vector<RAYX::Ray> traceRML(std::string filename,
+                                Filter filter = Filter::KeepAllRays);
 
 // will look at Tests/input/<filename>.csv
 // the Ray-UI files are to be obtained by Export > RawRaysOutgoing (which are in
 // element coordinates of the relevant element!)
-RAYX::RayList loadCSVRayUI(std::string filename);
+std::vector<RAYX::Ray> loadCSVRayUI(std::string filename);
 
 // This only asserts that position, direction, energy are the same
 // yet! many parameters are missing in RayUI and hence cannot be compared. but
 // for example path length could be compared, but tests fail currently if we do
 // so (TODO(rudi)).
-void compareRayLists(const RAYX::RayList& rayx, const RAYX::RayList& rayui,
-                     double t = 1e-11);
+void compareRayLists(const std::vector<RAYX::Ray>& rayx,
+                     const std::vector<RAYX::Ray>& rayui, double t = 1e-11);
 
 // This function automatcaily filters
 // out weight = 0 rays from rayx, as they are automatically missing in rayui.
 // This also filters out non-sequential rays to compare to Ray-UI correctly.
 void compareAgainstRayUI(std::string filename, double t = 1e-11);
 
-// updates the material tables of the Cpu Tracer to contain exactly the materials given in the std::vector.
+// updates the material tables of the Cpu Tracer to contain exactly the
+// materials given in the std::vector.
 void updateCpuTracerMaterialTables(std::vector<Material>);

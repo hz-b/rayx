@@ -1,8 +1,8 @@
 #include "setupTests.h"
 
-void checkDistribution(const RayList& rays, double sourceEnergy,
+void checkDistribution(const std::vector<Ray>& rays, double sourceEnergy,
                        double energySpread) {
-    CHECK_EQ(rays.rayAmount(), 200);
+    CHECK_EQ(rays.size(), 200);
     for (auto r : rays) {
         CHECK_IN(r.m_energy, sourceEnergy - energySpread,
                  sourceEnergy + energySpread);

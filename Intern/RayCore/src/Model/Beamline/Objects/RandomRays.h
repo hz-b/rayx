@@ -12,7 +12,7 @@ class RAYX_API RandomRays : public LightSource {
     RandomRays() = default;
     ~RandomRays();
 
-    RayList getRays() const override;
+    std::vector<Ray> getRays() const override;
     void compareRays(std::vector<Ray*> input, std::vector<double> output) const;
 
   private:

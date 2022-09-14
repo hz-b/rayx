@@ -20,26 +20,22 @@ CpuTracer::CpuTracer() { RAYX_LOG << "Initializing Cpu Tracer.."; }
 
 CpuTracer::~CpuTracer() {}
 
-RayList CpuTracer::trace(const Beamline& beamline) {
+std::vector<Ray> CpuTracer::trace(const Beamline& beamline) {
     auto rayList = beamline.getInputRays();
 
     CPU_TRACER::numberOfBeamlines = 1;
     CPU_TRACER::numberOfElementsPerBeamline = beamline.m_OpticalElements.size();
-    CPU_TRACER::numberOfRays = rayList.rayAmount();
-    CPU_TRACER::numberOfRaysPerBeamLine = rayList.rayAmount();
+    CPU_TRACER::numberOfRays = rayList.size();
+    CPU_TRACER::numberOfRaysPerBeamLine = rayList.size();
 
-    CPU_TRACER::rayData.data.clear();
-    CPU_TRACER::outputData.data.clear();
     CPU_TRACER::quadricData.data.clear();
     CPU_TRACER::xyznull.data.clear();
     CPU_TRACER::matIdx.data.clear();
     CPU_TRACER::mat.data.clear();
 
     // init rayData, outputData
-    for (auto r : rayList) {
-        CPU_TRACER::rayData.data.push_back(r);
-        CPU_TRACER::outputData.data.push_back({});
-    }
+    CPU_TRACER::rayData.data = rayList;
+    CPU_TRACER::outputData.data.resize(rayList.size());
 
     // init quadricData
     for (auto el : beamline.m_OpticalElements) {
@@ -63,11 +59,6 @@ RayList CpuTracer::trace(const Beamline& beamline) {
     }
 
     // Fetch Rays back from the Shader "container"
-    RayList out;
-    for (auto r : CPU_TRACER::outputData.data) {
-        out.push(r);
-    }
-
-    return out;
+    return CPU_TRACER::outputData.data;
 }
 }  // namespace RAYX

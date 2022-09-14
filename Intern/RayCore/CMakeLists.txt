@@ -35,7 +35,6 @@ SET(SOURCE
     src/Material/Material.cpp
     src/Material/NffTable.cpp
     src/Material/PalikTable.cpp
-    src/Tracer/RayList.cpp
     src/Tracer/VulkanTracer.cpp
     src/Tracer/CpuTracer.cpp
     src/VulkanEngine/BufferIO.cpp
@@ -91,7 +90,6 @@ SET(HEADERS
     src/Model/Surface/Quadric.h
     src/Model/Surface/Toroid.h
     src/Model/Surface/Surface.h
-    src/Tracer/RayList.h
     src/Tracer/Ray.h
     src/Tracer/Tracer.h
     src/Tracer/CpuTracer.h

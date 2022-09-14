@@ -38,12 +38,12 @@ VulkanTracer::VulkanTracer() {
     m_engine.init({.m_shader = "build/bin/comp.spv"});
 }
 
-RayList VulkanTracer::trace(const Beamline& beamline) {
+std::vector<Ray> VulkanTracer::trace(const Beamline& beamline) {
     auto rayList = beamline.getInputRays();
 
     uint32_t numberOfBeamlines = 1;
     uint32_t numberOfQuadricsPerBeamline = beamline.m_OpticalElements.size();
-    uint32_t numberOfRays = rayList.rayAmount();
+    uint32_t numberOfRays = rayList.size();
     uint32_t numberOfRaysPerBeamline = numberOfRays;
     std::vector<double> beamlineData = {
         (double)numberOfBeamlines, (double)numberOfQuadricsPerBeamline,
@@ -61,27 +61,21 @@ RayList VulkanTracer::trace(const Beamline& beamline) {
 
     auto materialTables = beamline.calcMinimalMaterialTables();
 
-    std::vector<Ray> rays_;
-    for (auto r : rayList) {
-        rays_.push_back(r);
-    }
-    m_engine.createBufferWithData<Ray>("ray-buffer", rays_);
+    m_engine.createBufferWithData<Ray>("ray-buffer", rayList);
     m_engine.createBuffer("output-buffer", numberOfRays * sizeof(Ray));
     m_engine.createBufferWithData<double>("quadric-buffer", beamlineData);
     m_engine.createBuffer("xyznull-buffer", 100);
-    m_engine.createBufferWithData<int>("material-index-table", materialTables.indexTable);
-    m_engine.createBufferWithData<double>("material-table", materialTables.materialTable);
+    m_engine.createBufferWithData<int>("material-index-table",
+                                       materialTables.indexTable);
+    m_engine.createBufferWithData<double>("material-table",
+                                          materialTables.materialTable);
 #ifdef RAYX_DEBUG_MODE
     m_engine.createBuffer("debug-buffer", numberOfRays * sizeof(_debugBuf_t));
 #endif
 
     m_engine.run({.m_numberOfInvocations = numberOfRays});
 
-    std::vector<Ray> _rays = m_engine.readOutBuffer<Ray>("output-buffer");
-    RayList outraylist;
-    for (auto r : _rays) {
-        outraylist.push(r);
-    }
+    std::vector<Ray> out = m_engine.readOutBuffer<Ray>("output-buffer");
 
 #ifdef RAYX_DEBUG_MODE
     m_debugBufList = m_engine.readOutBuffer<_debugBuf_t>("debug-buffer");
@@ -89,7 +83,7 @@ RayList VulkanTracer::trace(const Beamline& beamline) {
 
     m_engine.cleanup();
 
-    return outraylist;
+    return out;
 }
 
 }  // namespace RAYX

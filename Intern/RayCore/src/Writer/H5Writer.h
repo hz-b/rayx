@@ -2,8 +2,6 @@
 
 #pragma once
 
-#include "Tracer/RayList.h"
-
-void RAYX_API writeH5(RAYX::RayList&, std::string filename);
+void RAYX_API writeH5(std::vector<RAYX::Ray>&, std::string filename);
 
 #endif

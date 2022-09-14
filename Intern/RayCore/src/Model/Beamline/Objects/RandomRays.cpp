@@ -26,12 +26,13 @@ RandomRays::~RandomRays() = default;
  * every parameter is chosen randomly
  * returns list of rays
  */
-RayList RandomRays::getRays() const {
+std::vector<Ray> RandomRays::getRays() const {
     RAYX_PROFILE_FUNCTION();
     std::uniform_real_distribution<double> unif(m_low, m_high);
     std::default_random_engine re;
 
-    RayList rayList;
+    std::vector<Ray> rayList;
+	rayList.reserve(m_numberOfRays);
     RAYX_LOG << "create " << m_numberOfRays << " random rays ";
     // fill the square with rmat1xrmat1 rays
     for (int i = 0; i < m_numberOfRays; i++) {
@@ -42,7 +43,7 @@ RayList RandomRays::getRays() const {
         double en = unif(re);
         glm::dvec4 stokes = glm::dvec4(unif(re), unif(re), unif(re), unif(re));
         Ray r = {position, weight, direction, en, stokes, 0.0, 0.0, 0.0, 0.0};
-        rayList.push(r);
+        rayList.push_back(r);
     }
     return rayList;
 }

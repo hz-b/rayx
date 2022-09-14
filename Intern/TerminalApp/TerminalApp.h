@@ -9,7 +9,6 @@
 #include "PythonInterp.h"
 #include "RayCore.h"
 #include "TerminalAppConfig.h"
-#include "Tracer/RayList.h"
 
 // Virtual python Environment Path
 #ifdef WIN32  // Todo
@@ -20,7 +19,6 @@
 
 class TerminalApp {
   public:
-    TerminalApp();
     TerminalApp(int argc, char** argv);
     ~TerminalApp();
 
@@ -37,7 +35,9 @@ class TerminalApp {
     int m_argc;
 
     void handleInputPath(std::filesystem::path);
-    void exportRays(RAYX::RayList&, std::string); // TODO(Rudi) convert to std::filesystem::path later
+    void exportRays(
+        std::vector<RAYX::Ray>&,
+        std::string);  // TODO(Rudi) convert to std::filesystem::path later
 #if defined(RAYX_DEBUG_MODE) && not defined(CPP)
     void exportDebug();
 #endif
