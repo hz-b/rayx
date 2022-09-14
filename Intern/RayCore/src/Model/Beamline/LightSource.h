@@ -42,9 +42,6 @@ class RAYX_API LightSource {
                 const double sourceDepth, const double sourceHeight,
                 const double sourceWidth, const double horDivergence,
                 const double verDivergence);
-    LightSource(const char* name, EnergyDistribution dist, const double linPol0,
-                const double linPol45, const double circPol,
-                const std::array<double, 6> misalignment);
 
     // Getter
     std::array<double, 6> getMisalignmentParams() const;

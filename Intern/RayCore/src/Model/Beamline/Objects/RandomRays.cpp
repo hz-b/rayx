@@ -15,7 +15,7 @@ namespace RAYX {
 RandomRays::RandomRays(int low, int high, int numberOfRays)
     : LightSource("Random rays",
                   EnergyDistribution(EnergyRange(100., 0.), true), 0, 0, 0,
-                  {0, 0, 0, 0}),
+                  {0, 0, 0, 0}, 0, 0, 0, 0, 0),
       m_low(low),
       m_high(high),
       m_numberOfRays(numberOfRays) {}
