@@ -4,12 +4,9 @@
 
 static std::optional<std::filesystem::path> ROOT;
 
-void initPathResolver(const char* executablePath) {
+void initPathResolver() {
     std::filesystem::path p = std::filesystem::canonical(
-        executablePath);  // ray-x/build/bin/TerminalApp
-    p = p.parent_path();  // ray-x/build/bin/
-    p = p.parent_path();  // ray-x/build
-    p = p.parent_path();  // ray-x
+        PROJECT_DIR);
     ROOT = p;
 }
 

@@ -41,6 +41,8 @@
     } while (0)
 #endif
 
+#define STRING(s) #s
+
 namespace RAYX {
 
 ///////////////////////////////////////////////

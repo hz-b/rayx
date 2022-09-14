@@ -13,7 +13,7 @@
 TerminalApp::TerminalApp() = default;
 
 TerminalApp::TerminalApp(int argc, char** argv) : m_argv(argv), m_argc(argc) {
-    initPathResolver(argv[0]);
+    initPathResolver();
     RAYX_D_LOG << "TerminalApp created!";
 }
 

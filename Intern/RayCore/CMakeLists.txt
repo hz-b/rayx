@@ -124,6 +124,7 @@ endif()
 target_compile_definitions(${PROJECT_NAME}
     PRIVATE RAYX_BUILD_DLL
     PUBLIC ${COMPILE_PLATFORM}
+        PROJECT_DIR="${CMAKE_SOURCE_DIR}"
         $<$<CONFIG:Debug>:RAYX_DEBUG_MODE>
         $<$<CONFIG:RelWithDebInfo>:RAYX_DEBUG_MODE>
 )

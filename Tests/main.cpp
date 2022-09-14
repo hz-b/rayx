@@ -9,7 +9,7 @@ int GLOBAL_ARGC = 0;
 char** GLOBAL_ARGV = nullptr;
 
 int main(int argc, char** argv) {
-    initPathResolver(argv[0]);
+    initPathResolver();
     {
         std::filesystem::path outputDir = resolvePath("Tests/output");
         if (!std::filesystem::is_directory(outputDir) ||
