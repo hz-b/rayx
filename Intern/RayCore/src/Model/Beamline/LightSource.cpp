@@ -23,18 +23,6 @@ LightSource::LightSource(const char* name, EnergyDistribution dist,
       m_linearPol_45(linPol45),
       m_circularPol(circPol) {}
 
-// ! Temporary code clone
-LightSource::LightSource(const char* name, EnergyDistribution dist,
-                         const double linPol0, const double linPol45,
-                         const double circPol,
-                         const std::array<double, 6> misalignment)
-    : m_name(name),
-      m_EnergyDistribution(std::move(dist)),
-      m_misalignmentParams(misalignment),
-      m_linearPol_0(linPol0),
-      m_linearPol_45(linPol45),
-      m_circularPol(circPol) {}
-
 double LightSource::getLinear0() const { return m_linearPol_0; }
 
 double LightSource::getLinear45() const { return m_linearPol_45; }
