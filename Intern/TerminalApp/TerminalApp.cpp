@@ -43,7 +43,7 @@ void TerminalApp::handleInputPath(std::filesystem::path path) {
         auto rays = m_Tracer->trace(*m_Beamline);
 
         // Export Rays to external data.
-        exportRays(rays, path);
+        exportRays(rays, path.string());
 
 #if defined(RAYX_DEBUG_MODE) && not defined(CPP)
         // Export Debug Matrics.
