@@ -3,6 +3,8 @@
 #include <array>
 #include <vector>
 
+#include "Core.h"
+
 /**
  * This enum class is the c++ perspective on the Materials stored in
  * "materials.xmacro".
@@ -26,11 +28,11 @@ enum class Material {
  **/
 bool materialFromString(const char* matname, Material* out);
 
-struct MaterialTables {
+struct RAYX_API MaterialTables {
     std::vector<double> materialTable;
     std::vector<int> indexTable;
 };
 
 // the following function loads the Palik & Nff tables.
 // the tables will later be written to the mat and matIdx buffers of shader.comp
-MaterialTables loadMaterialTables(std::array<bool, 92> relevantMaterials);
+MaterialTables RAYX_API loadMaterialTables(std::array<bool, 92> relevantMaterials);

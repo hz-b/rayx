@@ -4,6 +4,7 @@
 #include <list>
 #include <vector>
 
+#include "Core.h"
 #include "Ray.h"
 
 // Optimal size for a ray vector (only tested on one system). Higher numbers
@@ -17,7 +18,7 @@
 
 namespace RAYX {
 
-struct RayListIter {
+struct RAYX_API RayListIter {
     std::list<std::vector<Ray>>::iterator m_iter;  // iterator over list
     size_t m_offset;                               // index within std::vector
 
@@ -27,7 +28,7 @@ struct RayListIter {
     Ray& operator*();
 };
 
-struct ConstRayListIter {
+struct RAYX_API ConstRayListIter {
     std::list<std::vector<Ray>>::const_iterator m_iter;
     size_t m_offset;
 
@@ -41,7 +42,7 @@ struct ConstRayListIter {
  *   When a vector is full, a new vector is created. The reason for this
  *   design is to avoid memory allocation errors.
  */
-class RayList {
+class RAYX_API RayList {
   public:
     RayList();
     ~RayList();

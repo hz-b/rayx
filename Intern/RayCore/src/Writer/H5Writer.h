@@ -4,6 +4,6 @@
 
 #include "Tracer/RayList.h"
 
-void writeH5(RAYX::RayList&, std::string filename);
+void RAYX_API writeH5(RAYX::RayList&, std::string filename);
 
 #endif

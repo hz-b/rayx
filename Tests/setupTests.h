@@ -89,7 +89,7 @@ inline void checkEq(std::string filename, int line, std::string l,
                     std::string r, const RAYX::Ray& tl, const RAYX::Ray& tr,
                     std::vector<double> vl, std::vector<double> vr,
                     double tolerance) {
-    std::vector<char*> names = {
+    std::vector<std::string> names = {
         ".m_position.x",  ".m_position.y",  ".m_position.z",  ".m_weight",
         ".m_direction.x", ".m_direction.y", ".m_direction.z", ".m_energy",
         ".m_stokes.x",    ".m_stokes.y",    ".m_stokey.z",    ".m_stokes.w",

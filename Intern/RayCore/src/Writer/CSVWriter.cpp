@@ -4,7 +4,8 @@
 #include <fstream>
 #include <sstream>
 
-#include "../Tracer/RayList.h"
+#include "CSVWriter.h"
+#include "Tracer/RayList.h"
 
 const int CELL_SIZE = 23;
 

@@ -1,5 +1,6 @@
 #pragma once
 
+#include "Core.h"
 #include "Tracer/RayList.h"
 
-void writeCSV(RAYX::RayList&, std::string filename);
+void RAYX_API writeCSV(RAYX::RayList&, std::string filename);

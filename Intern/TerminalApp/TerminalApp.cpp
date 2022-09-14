@@ -1,15 +1,14 @@
 #include "TerminalApp.h"
 
-#include <Tracer/CpuTracer.h>
-#include <Tracer/VulkanTracer.h>
-#include <Writer/Writer.h>
-
 #include <filesystem>
 #include <memory>
 #include <stdexcept>
 
 #include "Debug.h"
 #include "PathResolver.h"
+#include "Tracer/CpuTracer.h"
+#include "Tracer/VulkanTracer.h"
+#include "Writer/Writer.h"
 
 TerminalApp::TerminalApp() = default;
 

@@ -22,7 +22,7 @@ glm::dmat4x4 getRotationMatrix(double dpsi, double dphi, double dchi);
 void printDVec4(glm::dvec4 vec);
 void RAYX_API printDMat4(glm::dmat4 matrix);
 void printDMatrix(std::array<double, 4 * 4> matrix);
-bool isIdentMatrix(glm::dmat4x4 matrix);
+bool RAYX_API isIdentMatrix(glm::dmat4x4 matrix);
 
 std::array<double, 4 * 4> glmToArray16(glm::dmat4x4 m);
 glm::dmat4x4 RAYX_API arrayToGlm16(std::array<double, 4 * 4> m);
