@@ -128,11 +128,12 @@ std::vector<RAYX::Ray> loadCSVRayUI(std::string filename) {
     }
 
     std::vector<RAYX::Ray> out;
-    // TODO(Rudi): reserve correct amount here
 
     while (std::getline(f, line)) {
         out.push_back(parseCSVline(line));
     }
+
+    out.shrink_to_fit();
 
     return out;
 }

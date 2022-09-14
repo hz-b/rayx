@@ -9,9 +9,12 @@ Beamline::Beamline() = default;
 Beamline::~Beamline() = default;
 
 std::vector<Ray> Beamline::getInputRays() const {
-	// TODO(Rudi): reserve the correct amount of rays at the beginning.
-	// this is only a problem, if there are multiple light sources.
     std::vector<Ray> list;
+    uint32_t raycount = 0;
+    for (const auto& s : m_LightSources) {
+        raycount += s->m_numberOfRays;
+    }
+    list.reserve(raycount);
 
     for (const auto& s : m_LightSources) {
         auto sub = s->getRays();

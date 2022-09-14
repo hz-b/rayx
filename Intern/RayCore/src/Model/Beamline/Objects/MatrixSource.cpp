@@ -42,10 +42,9 @@ MatrixSource::MatrixSource(const std::string& name, int numberOfRays,
                            const double verDivergence, const double linPol0,
                            const double linPol45, const double circPol,
                            const std::array<double, 6> misalignment)
-    : LightSource(name.c_str(), std::move(dist), linPol0, linPol45, circPol, misalignment,
+    : LightSource(name.c_str(), numberOfRays, std::move(dist), linPol0, linPol45, circPol, misalignment,
                   sourceDepth, sourceHeight, sourceWidth, horDivergence,
-                  verDivergence),
-      m_numberOfRays(numberOfRays) {
+                  verDivergence) {
     RAYX_LOG << "Created.";
 }
 
@@ -114,7 +113,7 @@ std::vector<Ray> MatrixSource::getRays() const {
         }
     }
     // afterwards start from the beginning again
-    for (int i = 0; i < m_numberOfRays - rmat * rmat; i++) {
+    for (uint32_t i = 0; i < m_numberOfRays - rmat * rmat; i++) {
         /*Ray r = rayVector.at(i);
         glm::dvec3 position =
             glm::dvec3(r.m_position.x, r.m_position.y, r.m_position.z);

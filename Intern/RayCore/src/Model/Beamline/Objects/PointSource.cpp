@@ -50,10 +50,9 @@ PointSource::PointSource(const std::string& name, int numberOfRays,
                          const double linPol0, const double linPol45,
                          const double circPol,
                          const std::array<double, 6> misalignment)
-    : LightSource(name.c_str(), std::move(dist), linPol0, linPol45, circPol, misalignment,
+    : LightSource(name.c_str(), numberOfRays, std::move(dist), linPol0, linPol45, circPol, misalignment,
                   sourceDepth, sourceHeight, sourceWidth, horDivergence,
-                  verDivergence),
-      m_numberOfRays(numberOfRays) {
+                  verDivergence) {
     m_widthDist = widthDist;
     m_heightDist = heightDist;
     m_horDist = horDist;

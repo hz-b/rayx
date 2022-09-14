@@ -30,7 +30,6 @@ class RAYX_API PointSource : public LightSource {
     SourceDist m_heightDist;
     SourceDist m_horDist;
     SourceDist m_verDist;
-    int m_numberOfRays;
     // std::vector<SOURCE_LENGTH> m_source_lengths;
 };
 

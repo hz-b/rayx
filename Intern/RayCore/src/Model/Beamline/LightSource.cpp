@@ -4,15 +4,16 @@
 #include <utility>
 
 namespace RAYX {
-LightSource::LightSource(const char* name, EnergyDistribution dist,
-                         const double linPol0, const double linPol45,
-                         const double circPol,
+LightSource::LightSource(const char* name, uint32_t numberOfRays,
+                         EnergyDistribution dist, const double linPol0,
+                         const double linPol45, const double circPol,
                          const std::array<double, 6> misalignment,
                          const double sourceDepth, const double sourceHeight,
                          const double sourceWidth, const double horDivergence,
                          const double verDivergence)
     : m_name(name),
       m_EnergyDistribution(std::move(dist)),
+      m_numberOfRays(numberOfRays),
       m_sourceDepth(sourceDepth),
       m_sourceHeight(sourceHeight),
       m_sourceWidth(sourceWidth),
@@ -50,8 +51,5 @@ glm::dvec3 LightSource::getDirectionFromAngles(const double phi,
 double LightSource::selectEnergy() const {
     return m_EnergyDistribution.selectEnergy();
 }
-LightSource::LightSource() = default;
-
-LightSource::~LightSource() = default;
 
 }  // namespace RAYX
