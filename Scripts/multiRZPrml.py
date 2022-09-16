@@ -3,16 +3,14 @@ from dataclasses import dataclass
 # import re
 import xml.etree.ElementTree as ET
 import math
-from defer import return_value
 import matplotlib.pyplot as plt
 from mpl_toolkits import mplot3d
 import numpy as np
-from pyrsistent import b
 
 
 @dataclass
 class MetaData:
-    numElements = 20
+    numElements = 5
     fileName = "multi_RZP_test"
 
 # Standard RZP Parameters
@@ -21,10 +19,9 @@ class RZP:
     name = "Reflection Zoneplate"
     type = "Reflection Zoneplate"
     geometricalShape = 0
-    totalWidth = 0.567627027
-    totalWidthB = 0.2092372974
+    totalWidth = 0.2567627027
+    totalWidthB = 0.1092372974
     totalLength = 72.5
-    totalWidth = 0.183
     gratingMount = 1
     grazingIncAngle = 2.2
     deviationAngle = 170
@@ -273,7 +270,7 @@ def insertRZP(root, rzp: RZP):
     shortRad.text = str(rzp.shortRadius)
 
     desType = ET.SubElement(xmlRZP, 'param', id="designType",
-                            comment="use Design Angle β", enabled="T")
+                            comment="use Design Angle beta", enabled="T")
     desType.text = str(rzp.designType)
 
     fresZOff = ET.SubElement(xmlRZP, 'param', id="FresnelZOffset", enabled="F")
@@ -515,7 +512,7 @@ def calcTrapezoidAngles(widthA, widthB, height):
     # widthA = width of the top side
     # widthB = width of the bottom side
     # height = height of the trapezoid
-    alpha = math.atan(height / (widthA - widthB))
+    alpha = math.atan(2* height / (widthA - widthB))
     beta = math.atan(height / (widthA + widthB))
     alpha = math.degrees(alpha)
     beta = math.degrees(beta)
@@ -525,9 +522,9 @@ def calcTrapezoidAngles(widthA, widthB, height):
 def rotateYDeg(prevDir: np.array, alpha: float, iterDirection: int):
     
     # Rotation matrix around y axis (clockwise)
-    rotY = np.array([[np.cos(alpha), 0, np.sin(alpha)],
+    rotY = np.array([[np.cos(np.radians(alpha)), 0, np.sin(np.radians(alpha))],
                      [0, 1, 0],
-                     [-np.sin(alpha), 0, np.cos(alpha)]])  # ? sehr starke rotation
+                     [-np.sin(np.radians(alpha)), 0, np.cos(np.radians(alpha))]])  # ? sehr starke rotation
 
     if iterDirection == -1:
         # Transpose the rotation matrix
@@ -618,7 +615,7 @@ def main():
     plt.scatter(xPositions, zPositions)
     plt.xlabel('x')
     plt.ylabel('z')
-    # plt.gca().set_aspect('equal', adjustable='box')
+    #plt.gca().set_aspect('equal', adjustable='box')
     plt.show()
     
     
@@ -629,7 +626,7 @@ def main():
     plt.scatter(xDirectionsx, xDirectionsz)
     plt.xlabel('x')
     plt.ylabel('z')
-    # plt.gca().set_aspect('equal', adjustable='box')
+    #plt.gca().set_aspect('equal', adjustable='box')
     plt.show()
     
     # Plot z directions
@@ -638,7 +635,7 @@ def main():
     plt.scatter(zDirectionsx, zDirectionsz)
     plt.xlabel('x')
     plt.ylabel('z')
-    # plt.gca().set_aspect('equal', adjustable='box')
+    #plt.gca().set_aspect('equal', adjustable='box')
     plt.show()
 
     indent(root)
