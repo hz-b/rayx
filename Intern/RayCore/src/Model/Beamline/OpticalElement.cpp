@@ -6,43 +6,7 @@
 #include "Debug.h"
 
 namespace RAYX {
-
-/**
- * constructor for adding elements to tracer. The given arrays contain the
- * values that will actually be moved to the shader
- * @param name                  name of the element
- * @param surfaceParams         parameters that define the surface of the
- * element
- * @param inputInMatrix         16x16 world coordinate to element coordinate
- * transformation matrix
- * @param inputOutMatrix        16x16 element coordinate to world coordinate
- * transformation matrix
- * @param OParameters           Object parameters (width, height, slopeError..)
- * something all elements have
- * @param EParameters           Element specific parameters, depend on which
- * element it is
- */
-OpticalElement::OpticalElement(const char* name,
-                               const std::array<double, 4 * 4> surfaceParams,
-                               const std::array<double, 4 * 4> OParameters,
-                               const std::array<double, 4 * 4> EParameters)
-    : m_name(name),
-      m_surfaceParams(surfaceParams),
-      m_objectParameters(OParameters),
-      m_elementParameters(EParameters) {
-    m_Geometry = std::make_unique<Geometry>();
-}
-
-OpticalElement::OpticalElement(const char* name,
-                               const std::array<double, 4 * 4> eParameters,
-                               const std::array<double, 7> slopeError,
-                               const Geometry& geometry)
-    : m_name(name), m_Geometry(std::make_unique<Geometry>(geometry)) {
-    m_slopeError = slopeError;
-    m_elementParameters = eParameters;
-    updateObjectParams();
-}
-
+    
 OpticalElement::OpticalElement(const char* name,
                                const std::array<double, 7> slopeError,
                                const Geometry& geometry)

@@ -68,16 +68,6 @@ class RAYX_API OpticalElement {
     };
 
     // needed to add optical elements to tracer
-    OpticalElement(const char* name,
-                   const std::array<double, 4 * 4> surfaceParams,
-                   const std::array<double, 4 * 4> OParameters,
-                   const std::array<double, 4 * 4> EParameters);
-
-    OpticalElement(const char* name,
-                   const std::array<double, 4 * 4> EParameters,
-                   const std::array<double, 7> slopeError,
-                   const Geometry& geometry = Geometry());
-
     OpticalElement(const char* name, const std::array<double, 7> slopeError,
                    const Geometry& geometry = Geometry());
 
