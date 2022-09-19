@@ -37,6 +37,7 @@ class RAYX_API SphereGrating : public OpticalElement {
     double getOrderOfDiffraction() const;
     double getA() const;
     std::array<double, 6> getVls() const;
+    std::array<double, 4*4> getElementParameters() const;
 
   private:
     double m_radius;

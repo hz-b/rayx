@@ -53,15 +53,8 @@ PlaneGrating::PlaneGrating(
     m_Geometry->m_azimuthalAngle = azimuthalAngle;
     m_Geometry->m_position = position;
     m_Geometry->m_orientation = orientation;
-    
-    RAYX_LOG << "design wavelength = " << abs(hvlam(m_designEnergyMounting));
 
-    // set element specific parameters in Optical Element class. will be moved
-    // to shader and are needed for tracing
-    setElementParameters({0, 0, m_lineDensity, m_orderOfDiffraction,
-                          abs(hvlam(m_designEnergyMounting)), 0, m_vls[0],
-                          m_vls[1], m_vls[2], m_vls[3], m_vls[4], m_vls[5], 0,
-                          0, 0, double(m_additionalOrder)});
+    RAYX_LOG << "design wavelength = " << abs(hvlam(m_designEnergyMounting));
 
     // parameters of quadric surface
     auto matd = (double)static_cast<int>(mat);
@@ -69,7 +62,8 @@ PlaneGrating::PlaneGrating(
         0, 0, 0, 0, 1, 0, 0, -1, 0, 0, 0, 0, 1, 0, matd, 0}));
 }
 
-std::shared_ptr<PlaneGrating> PlaneGrating::createFromXML(const xml::Parser& p) {
+std::shared_ptr<PlaneGrating> PlaneGrating::createFromXML(
+    const xml::Parser& p) {
     return std::make_shared<PlaneGrating>(
         p.name(), p.parseGeometricalShape(), p.parseTotalWidth(),
         p.parseTotalLength(), p.parseAzimuthalAngle(), p.parsePosition(),
@@ -83,6 +77,27 @@ double PlaneGrating::getDesignEnergyMounting() const {
     return m_designEnergyMounting;
 }
 double PlaneGrating::getLineDensity() const { return m_lineDensity; }
-double PlaneGrating::getOrderOfDiffraction() const { return m_orderOfDiffraction; }
+double PlaneGrating::getOrderOfDiffraction() const {
+    return m_orderOfDiffraction;
+}
 std::array<double, 6> PlaneGrating::getVls() { return m_vls; }
+
+std::array<double, 4 * 4> PlaneGrating::getElementParameters() const {
+    return {0,
+            0,
+            m_lineDensity,
+            m_orderOfDiffraction,
+            abs(hvlam(m_designEnergyMounting)),
+            0,
+            m_vls[0],
+            m_vls[1],
+            m_vls[2],
+            m_vls[3],
+            m_vls[4],
+            m_vls[5],
+            0,
+            0,
+            0,
+            double(m_additionalOrder)};
+}
 }  // namespace RAYX

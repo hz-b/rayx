@@ -24,6 +24,8 @@ class RAYX_API PlaneGrating : public OpticalElement {
     double getLineDensity() const;
     double getOrderOfDiffraction() const;
     std::array<double, 6> getVls();
+    std::array<double, 4*4> getElementParameters() const;
+    
 
   private:
     int m_additionalOrder;

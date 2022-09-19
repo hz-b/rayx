@@ -49,10 +49,10 @@ Cylinder::Cylinder(const char* name,
     m_Geometry->m_azimuthalAngle = azimuthalAngle;
     m_Geometry->m_position = position;
     m_Geometry->m_orientation = orientation;
-    
+
     RAYX_D_LOG << ((m_direction == CylinderDirection::LongRadiusR)
-                     ? "LONG RADIUS"
-                     : "SHORT RADIUS");
+                       ? "LONG RADIUS"
+                       : "SHORT RADIUS");
     if (m_direction == CylinderDirection::LongRadiusR) {  // X-DIR
         m_a11 = 0;
         m_a33 = 1;
@@ -71,8 +71,6 @@ Cylinder::Cylinder(const char* name,
     auto matd = (double)static_cast<int>(mat);
     setSurface(std::make_unique<Quadric>(std::array<double, 4 * 4>{
         m_a11, 0, 0, 0, icurv, 1, 0, m_a24, 0, 0, m_a33, 0, 0, 0, matd, 0}));
-    // TODO (OS): Add Element parameters?
-    setElementParameters({0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0});
 }
 Cylinder::~Cylinder() = default;
 

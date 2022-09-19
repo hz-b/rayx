@@ -39,13 +39,11 @@ class RAYX_API OpticalElement {
 
     // needed to add optical elements to tracer
     OpticalElement(const char* name, const std::array<double, 7> slopeError,
-                   const Geometry& geometry = Geometry());
+                   const Geometry& geometry = Geometry()); // TODO(Jannis): add surface
 
     virtual ~OpticalElement() = default;
 
-    void setElementParameters(std::array<double, 4 * 4> params);
     void setSurface(std::unique_ptr<Surface> surface);
-    [[maybe_unused]] void updateObjectParamsNoGeometry();
 
     void calcTransformationMatrices(glm::dvec4 position, glm::dmat4 orientation,
                                     glm::dmat4& output,
@@ -58,29 +56,19 @@ class RAYX_API OpticalElement {
     glm::dmat4 getOutMatrix() const;
     glm::dmat4x4 getOrientation() const;
     glm::dvec4 getPosition() const;
+
     std::array<double, 4 * 4> getObjectParameters() const;
-    virtual std::array<double, 4 * 4> getElementParameters() const;
     std::array<double, 4 * 4> getSurfaceParams() const;
+    virtual std::array<double, 4 * 4> getElementParameters() const;
     std::array<double, 7> getSlopeError() const;
 
     [[maybe_unused]] const char* m_name;
 
   protected:
-    // GEOMETRY
-    std::unique_ptr<Geometry> m_Geometry;  // will replace all of the following
-                                           // attributes (up until surface)
-    // SURFACE (eg Quadric or if eg torus something else)
-    std::unique_ptr<Surface> m_surfacePtr;
-    std::array<double, 4 * 4> m_surfaceParams;  // used to be anchor points
+    std::unique_ptr<Geometry> m_Geometry;  ///< Geometry of the element
+    std::unique_ptr<Surface> m_surfacePtr; ///< Surface of the element
 
-    // Geometric Parameter
-    // 7 paramters that specify the slope error, are stored in objectParamters
-    // to give to shader
-    std::array<double, 7> m_slopeError;
-
-    // additional element-specific parameters that are used for tracing (16
-    // entries -> one dmat4x4 in shader)
-    std::array<double, 4 * 4> m_elementParameters;
+    std::array<double, 7> m_slopeError;    // TODO(Jannis): move to geometry
 };
 
 }  // namespace RAYX

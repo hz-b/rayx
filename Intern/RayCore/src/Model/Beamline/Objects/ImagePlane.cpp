@@ -24,10 +24,14 @@ ImagePlane::ImagePlane(const char* name, glm::dvec4 position,
     setSurface(std::make_unique<Quadric>(std::array<double, 4 * 4>{
         0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 5, 0, 0, 0}));
 }
+ImagePlane::~ImagePlane() = default;
 
 std::shared_ptr<ImagePlane> ImagePlane::createFromXML(const xml::Parser& p) {
     return std::make_shared<ImagePlane>(p.name(), p.parsePosition(),
                                         p.parseOrientation());
 }
-ImagePlane::~ImagePlane() = default;
+
+std::array<double, 4*4> ImagePlane::getElementParameters() const {
+    return {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0};
+}
 }  // namespace RAYX

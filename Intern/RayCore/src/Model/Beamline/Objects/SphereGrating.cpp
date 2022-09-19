@@ -52,19 +52,16 @@ SphereGrating::SphereGrating(const char* name, GratingMount mount,
     m_Geometry->m_azimuthalAngle = azimuthalAngle;
     m_Geometry->m_position = position;
     m_Geometry->m_orientation = orientation;
-    
+
     double icurv = 1;
     m_gratingMount = mount;
     auto matd = (double)static_cast<int>(mat);
     setSurface(std::make_unique<Quadric>(std::array<double, 4 * 4>{
         1, 0, 0, 0, icurv, 1, 0, -radius, 0, 0, 1, 0, 2, 0, matd, 0}));
-    setElementParameters({0, 0, m_lineDensity, m_orderOfDiffraction,
-                          abs(hvlam(m_designEnergyMounting)), 0, m_vls[0],
-                          m_vls[1], m_vls[2], m_vls[3], m_vls[4], m_vls[5], 0,
-                          0, 0, 0});
 }
 
-std::shared_ptr<SphereGrating> SphereGrating::createFromXML(const xml::Parser& p) {
+std::shared_ptr<SphereGrating> SphereGrating::createFromXML(
+    const xml::Parser& p) {
     return std::make_shared<SphereGrating>(
         p.name(), p.parseGratingMount(), p.parseGeometricalShape(),
         p.parseTotalWidth(), p.parseTotalLength(), p.parseAzimuthalAngle(),
@@ -72,65 +69,6 @@ std::shared_ptr<SphereGrating> SphereGrating::createFromXML(const xml::Parser& p
         p.parseDesignEnergy(), p.parseLineDensity(), p.parseOrderDiffraction(),
         p.parseVls(), p.parseSlopeError(), p.parseMaterial());
 }
-
-/* TODO (Theresa): how to make radius calculation easier?
-void SphereGrating::calcRadius() {
-    if (m_gratingMount == GratingMount::Deviation) {
-        double theta = m_deviation > 0 ? (PI - m_deviation) / 2 : PI / 2 +
-m_deviation; m_radius = 2.0 / sin(theta) / (1.0 / m_entranceArmLength + 1.0 /
-m_exitArmLength);
-    }
-    else if (m_gratingMount == GratingMount::Incidence) {
-        double ca = cos(getAlpha());
-        double cb = cos(getBeta());
-        m_radius = (ca + cb) / ((ca * ca) / m_entranceArmLength + (cb * cb) /
-m_exitArmLength);
-    }
-}
-
-void SphereGrating::calcAlpha(double deviation, double normalIncidence) {
-    double angle;
-    if (m_gratingMount == GratingMount::Deviation) {
-        angle = deviation;
-    }
-    else if (m_gratingMount == GratingMount::Incidence) {
-        angle = -normalIncidence;
-    }
-    focus(angle);
-}
-
-void SphereGrating::focus(double angle) {
-    // from routine "focus" in RAYX.FOR
-    double theta = degToRad(abs(angle));
-    double alph, bet;
-    if (angle <= 0) { // constant alpha mounting
-        double arg = m_a - sin(theta);
-        if (abs(arg) >= 1) { // cannot calculate alpha & beta
-            alph = 0;
-            bet = 0;
-        }
-        else {
-            alph = theta;
-            bet = asin(arg);
-        }
-    }
-    else {  // constant alpha & beta mounting
-        theta = theta / 2;
-        double arg = m_a / 2 / cos(theta);
-        if (abs(arg) >= 1) {
-            alph = 0;
-            bet = 0;
-        }
-        else {
-            bet = asin(arg) - theta;
-            alph = 2 * theta + bet;
-        }
-    }
-    // grazing incidence
-    setAlpha((PI / 2) - alph);
-    setBeta((PI / 2) - abs(bet));
-
-}*/
 
 double SphereGrating::getRadius() const { return m_radius; }
 
@@ -149,5 +87,24 @@ double SphereGrating::getOrderOfDiffraction() const {
     return m_orderOfDiffraction;
 }
 double SphereGrating::getA() const { return m_a; }
+
+std::array<double, 4 * 4> SphereGrating::getElementParameters() const {
+    return {0,
+            0,
+            m_lineDensity,
+            m_orderOfDiffraction,
+            abs(hvlam(m_designEnergyMounting)),
+            0,
+            m_vls[0],
+            m_vls[1],
+            m_vls[2],
+            m_vls[3],
+            m_vls[4],
+            m_vls[5],
+            0,
+            0,
+            0,
+            0};
+}
 
 }  // namespace RAYX

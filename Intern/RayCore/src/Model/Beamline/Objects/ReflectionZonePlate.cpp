@@ -14,7 +14,8 @@ namespace RAYX {
  * @param geometricalShape              shape of RZP (elliptical vs rectangular)
  * @param curvatureType                 Plane, Sphere, Toroid
  * @param widthA                        total width of the element (x-dimension)
- * @param widthB                        if set then widthA is top width and widthB is bottom width
+ * @param widthB                        if set then widthA is top width and
+ * widthB is bottom width
  * @param height                        height of the element (z- dimensions)
  * @param azimuthalAngle                rotation of element in xy-plane, needed
  * for stokes vector, in rad
@@ -51,8 +52,9 @@ namespace RAYX {
  */
 ReflectionZonePlate::ReflectionZonePlate(
     const char* name, OpticalElement::GeometricalShape geometricalShape,
-    CurvatureType curvatureType, const double widthA, const std::optional<double> widthB,
-    const double height, const double azimuthalAngle, const glm::dvec4 position,
+    CurvatureType curvatureType, const double widthA,
+    const std::optional<double> widthB, const double height,
+    const double azimuthalAngle, const glm::dvec4 position,
     const glm::dmat4x4 orientation, const double designEnergy,
     const double orderOfDiffraction, const double designOrderOfDiffraction,
     const double dAlpha, const double dBeta, const double mEntrance,
@@ -113,13 +115,6 @@ ReflectionZonePlate::ReflectionZonePlate(
     }
 
     printInfo();
-    setElementParameters(
-        {double(m_imageType), double(m_rzpType), double(m_derivationMethod),
-         m_designWavelength, double(m_curvatureType),
-         m_designOrderOfDiffraction, m_orderOfDiffraction, m_fresnelZOffset,
-         m_designSagittalEntranceArmLength, m_designSagittalExitArmLength,
-         m_designMeridionalEntranceArmLength, m_designMeridionalExitArmLength,
-         m_designAlphaAngle, m_designBetaAngle, 0, double(m_additionalOrder)});
     RAYX_LOG << "Created.";
 }
 
@@ -134,7 +129,7 @@ std::shared_ptr<ReflectionZonePlate> ReflectionZonePlate::createFromXML(
         widthBOptional = widthB;
     else
         widthBOptional = std::nullopt;
-    
+
     return std::make_shared<ReflectionZonePlate>(
         p.name(), p.parseGeometricalShape(), p.parseCurvatureType(),
         p.parseTotalWidth(), widthBOptional, p.parseTotalLength(),
@@ -143,9 +138,9 @@ std::shared_ptr<ReflectionZonePlate> ReflectionZonePlate::createFromXML(
         p.parseDesignOrderDiffraction(), p.parseDesignAlphaAngle(),
         p.parseDesignBetaAngle(), p.parseEntranceArmLengthMer(),
         p.parseExitArmLengthMer(), p.parseEntranceArmLengthSag(),
-        p.parseExitArmLengthSag(), p.parseShortRadius(),
-        p.parseLongRadius(), p.parseAdditionalOrder(),
-        p.parseFresnelZOffset(), p.parseSlopeError(), p.parseMaterial());
+        p.parseExitArmLengthSag(), p.parseShortRadius(), p.parseLongRadius(),
+        p.parseAdditionalOrder(), p.parseFresnelZOffset(), p.parseSlopeError(),
+        p.parseMaterial());
 }
 
 void ReflectionZonePlate::printInfo() const {
@@ -585,6 +580,25 @@ double ReflectionZonePlate::getDesignOrderOfDiffraction() const {
 
 double ReflectionZonePlate::getDesignEnergyMounting() const {
     return m_designEnergyMounting;  // derived from source?
+}
+
+std::array<double, 4 * 4> ReflectionZonePlate::getElementParameters() const {
+    return {double(m_imageType),
+            double(m_rzpType),
+            double(m_derivationMethod),
+            m_designWavelength,
+            double(m_curvatureType),
+            m_designOrderOfDiffraction,
+            m_orderOfDiffraction,
+            m_fresnelZOffset,
+            m_designSagittalEntranceArmLength,
+            m_designSagittalExitArmLength,
+            m_designMeridionalEntranceArmLength,
+            m_designMeridionalExitArmLength,
+            m_designAlphaAngle,
+            m_designBetaAngle,
+            0,
+            double(m_additionalOrder)};
 }
 
 }  // namespace RAYX

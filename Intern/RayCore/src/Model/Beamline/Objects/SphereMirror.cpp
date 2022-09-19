@@ -96,7 +96,8 @@ SphereMirror::SphereMirror(const char* name,
         1, 0, 0, 0, 1, 1, 0, -radius, 0, 0, 1, 0, 0, 0, matd, 0}));
 }
 
-std::shared_ptr<SphereMirror> SphereMirror::createFromXML(const xml::Parser& p) {
+std::shared_ptr<SphereMirror> SphereMirror::createFromXML(
+    const xml::Parser& p) {
     return std::make_shared<SphereMirror>(
         p.name(), p.parseGeometricalShape(), p.parseTotalWidth(),
         p.parseTotalLength(), p.parseAzimuthalAngle(), p.parseGrazingIncAngle(),

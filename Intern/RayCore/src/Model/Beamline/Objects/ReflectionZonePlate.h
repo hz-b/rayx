@@ -98,6 +98,8 @@ class RAYX_API ReflectionZonePlate : public OpticalElement {
     double getDesignEnergyMounting() const;  // derived from source?
     void printInfo() const;
 
+    std::array<double, 4*4> getElementParameters() const;
+
   private:
     // User Parameter,
 

@@ -75,7 +75,7 @@ Ellipsoid::Ellipsoid(const char* name,
     }
 
     RAYX_D_LOG << "A= " << m_longHalfAxisA << ", B= " << m_shortHalfAxisB
-             << ", C= " << m_halfAxisC;
+               << ", C= " << m_halfAxisC;
 
     // a33, 34, 44
     // a11 from rml file
@@ -97,7 +97,7 @@ Ellipsoid::Ellipsoid(const char* name,
             pow(m_z0 * m_shortHalfAxisB / m_longHalfAxisA, 2);
 
     RAYX_D_LOG << "alpha1: " << m_tangentAngle
-             << "; in Degree: " << radToDeg(m_tangentAngle);
+               << "; in Degree: " << radToDeg(m_tangentAngle);
     RAYX_D_LOG << "m_y0: " << m_y0;
     RAYX_D_LOG << "m_z0: " << m_z0;
     RAYX_D_LOG << "m_a11: " << m_a11;
@@ -115,11 +115,6 @@ Ellipsoid::Ellipsoid(const char* name,
                                   icurv, m_a22, m_a23, m_a24,  //
                                   0, 0, m_a33, m_a34,          //
                                   7, 0, matd, m_a44}));
-    setElementParameters({sin(m_tangentAngle), cos(m_tangentAngle), m_y0,
-                          m_z0,                               //
-                          double(m_figureRotation), 0, 0, 0,  //
-                          0, 0, 0, 0,                         //
-                          0, 0, 0, 0});
 }
 
 /*
@@ -157,7 +152,7 @@ void Ellipsoid::calculateCenterFromHalfAxes(double angle) {
     }
     m_tangentAngle = (atan(mt));
     RAYX_D_LOG << "Z0 = " << m_z0 << ", Y0= " << m_y0
-             << ", tangentAngle= " << m_tangentAngle;
+               << ", tangentAngle= " << m_tangentAngle;
 }
 
 /**
@@ -201,8 +196,8 @@ void Ellipsoid::calcHalfAxes() {
     }
     m_tangentAngle = angle;
     RAYX_D_LOG << "A= " << m_longHalfAxisA << ", B= " << m_shortHalfAxisB
-             << ", C= " << m_halfAxisC
-             << ", angle = " << radToDeg(m_tangentAngle);
+               << ", C= " << m_halfAxisC
+               << ", angle = " << radToDeg(m_tangentAngle);
 }
 
 double Ellipsoid::getRadius() const { return m_a24; }
@@ -225,9 +220,18 @@ double Ellipsoid::getA33() const { return m_a33; }
 double Ellipsoid::getA44() const { return m_a44; }
 double Ellipsoid::getHalfAxisC() const { return m_halfAxisC; }
 
+std::array<double, 4 * 4> Ellipsoid::getElementParameters() const {
+    return {sin(m_tangentAngle), cos(m_tangentAngle), m_y0,
+                          m_z0,                               //
+                          double(m_figureRotation), 0, 0, 0,  //
+                          0, 0, 0, 0,                         //
+                          0, 0, 0, 0};
+}
+
 // Null if failed
 std::shared_ptr<Ellipsoid> Ellipsoid::createFromXML(const xml::Parser& p) {
-    OpticalElement::GeometricalShape geometricalShape = p.parseGeometricalShape();
+    OpticalElement::GeometricalShape geometricalShape =
+        p.parseGeometricalShape();
     double width = p.parseTotalWidth();
     double height = p.parseTotalLength();
     double incidenceAngle = p.parseGrazingIncAngle();

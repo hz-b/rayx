@@ -55,7 +55,6 @@ Cone::Cone(const char* name, OpticalElement::GeometricalShape geometricalShape,
     }
     setSurface(std::make_unique<Quadric>(std::array<double, 4 * 4>{
         m_a11, 0, 0, 0, icurv, m_a22, m_a23, m_a24, 0, 0, 0, 0, 0, 0, 0, 0}));
-    setElementParameters({0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0});
 }
 /**
  * @brief Construct a new Cone:: Cone object (R and RHO are also given)
@@ -110,7 +109,6 @@ Cone::Cone(const char* name, OpticalElement::GeometricalShape geometricalShape,
     }
     setSurface(std::make_unique<Quadric>(std::array<double, 4 * 4>{
         m_a11, 0, 0, 0, icurv, m_a22, m_a23, m_a24, 0, 0, 0, 0, 0, 0, 0, 0}));
-    setElementParameters({0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0});
 }
 
 Cone::~Cone() = default;

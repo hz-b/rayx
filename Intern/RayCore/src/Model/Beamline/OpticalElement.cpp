@@ -29,11 +29,6 @@ OpticalElement::OpticalElement(const char* name,
                                const Geometry& geometry)
     : m_name(name), m_Geometry(std::make_unique<Geometry>(geometry)) {
     m_slopeError = slopeError;
-    m_elementParameters = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
-}
-
-void OpticalElement::setElementParameters(std::array<double, 4 * 4> params) {
-    m_elementParameters = params;
 }
 
 void OpticalElement::setSurface(std::unique_ptr<Surface> surface) {
@@ -138,10 +133,6 @@ std::array<double, 4 * 4> OpticalElement::getObjectParameters() const {
     return objectParameters;
 }
 
-std::array<double, 4 * 4> OpticalElement::getElementParameters() const {
-    return m_elementParameters;
-}
-
 std::array<double, 4 * 4> OpticalElement::getSurfaceParams() const {
     // assert(m_surfacePtr!=nullptr);
     if (m_surfacePtr != nullptr)
@@ -155,6 +146,8 @@ std::array<double, 4 * 4> OpticalElement::getSurfaceParams() const {
 std::array<double, 7> OpticalElement::getSlopeError() const {
     return m_slopeError;
 }
-[[maybe_unused]] void OpticalElement::updateObjectParamsNoGeometry() {}
 
+std::array<double, 4 * 4> OpticalElement::getElementParameters() const {
+    return {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0};
+}
 }  // namespace RAYX
