@@ -7,6 +7,10 @@
 
 namespace RAYX {
     
+// ! Workaround for a bug in the gcc/clang compiler: https://stackoverflow.com/questions/53408962/try-to-understand-compiler-error-message-default-member-initializer-required-be
+OpticalElement::Geometry::Geometry() = default;
+OpticalElement::Geometry::Geometry(const Geometry& other) = default;
+
 OpticalElement::OpticalElement(const char* name,
                                const std::array<double, 7> slopeError,
                                const Geometry& geometry)

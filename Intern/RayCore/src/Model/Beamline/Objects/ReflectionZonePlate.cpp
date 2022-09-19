@@ -127,14 +127,18 @@ ReflectionZonePlate::ReflectionZonePlate(
 std::shared_ptr<ReflectionZonePlate> ReflectionZonePlate::createFromXML(
     const xml::Parser& p) {
     // ! temporary for testing trapezoid rzp
-    std::optional<double> widthB;
-    bool foundWidthB = xml::paramDouble(p.node, "totalWidthB", &(*widthB));
-    if (!foundWidthB) {
-        widthB = {};
-    }
+    double widthB;
+    bool foundWidthB = xml::paramDouble(p.node, "totalWidthB", &widthB);
+
+    std::optional<double> widthBOptional;
+    if (foundWidthB)
+        widthBOptional = widthB;
+    else
+        widthBOptional = std::nullopt;
+    
     return std::make_shared<ReflectionZonePlate>(
         p.name(), p.parseGeometricalShape(), p.parseCurvatureType(),
-        p.parseTotalWidth(), widthB, p.parseTotalLength(),
+        p.parseTotalWidth(), widthBOptional, p.parseTotalLength(),
         p.parseAzimuthalAngle(), p.parsePosition(), p.parseOrientation(),
         p.parseDesignEnergy(), p.parseOrderDiffraction(),
         p.parseDesignOrderDiffraction(), p.parseDesignAlphaAngle(),

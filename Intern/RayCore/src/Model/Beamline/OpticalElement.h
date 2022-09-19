@@ -32,28 +32,8 @@ class RAYX_API OpticalElement {
         glm::dvec4 m_position = glm::dvec4();
         GeometricalShape m_geometricalShape = GeometricalShape::RECTANGLE;
 
-        // Default CTOR
-        Geometry() {
-            m_widthA = 0.0;          ///< x-dimension of element
-            m_widthB = 0.0;          ///< this width is only used for trapezoid
-            m_height = 0.0;          ///< z-dimension of element
-            m_azimuthalAngle = 0.0;  // rotation of element through xy-plane
-                                     // (needed for stokes vector)
-            m_orientation =
-                glm::dmat4x4();  ///< orientation in world coordinate system
-            m_position = glm::dvec4();  ///< position in world coordinates
-            m_geometricalShape = GeometricalShape::RECTANGLE;
-        }
-        // Copy CTOR
-        Geometry(const Geometry& geometry) {
-            m_widthA = geometry.m_widthA;
-            m_widthB = geometry.m_widthB;
-            m_height = geometry.m_height;
-            m_azimuthalAngle = geometry.m_azimuthalAngle;
-            m_orientation = geometry.m_orientation;
-            m_position = geometry.m_position;
-            m_geometricalShape = geometry.m_geometricalShape;
-        }
+        Geometry();
+        Geometry(const Geometry& other);
 
         void setHeightWidth(double height, double widthA, double widthB = 0.0) {
             m_widthB = widthB;
