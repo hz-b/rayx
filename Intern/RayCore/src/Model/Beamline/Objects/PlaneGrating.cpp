@@ -53,7 +53,6 @@ PlaneGrating::PlaneGrating(
     m_Geometry->m_azimuthalAngle = azimuthalAngle;
     m_Geometry->m_position = position;
     m_Geometry->m_orientation = orientation;
-    updateObjectParams();
     
     RAYX_LOG << "design wavelength = " << abs(hvlam(m_designEnergyMounting));
 

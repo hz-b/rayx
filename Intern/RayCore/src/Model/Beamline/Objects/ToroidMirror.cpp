@@ -43,7 +43,6 @@ ToroidMirror::ToroidMirror(const char* name,
     m_Geometry->m_azimuthalAngle = azimuthalAngle;
     m_Geometry->m_position = position;
     m_Geometry->m_orientation = orientation;
-    updateObjectParams();
 
     // TODO(Theresa): maybe move this function outside of this class (same for
     // spheres) because this can be derived from user parameters

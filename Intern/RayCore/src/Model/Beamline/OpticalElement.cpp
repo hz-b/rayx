@@ -6,10 +6,23 @@
 #include "Debug.h"
 
 namespace RAYX {
-    
-// ! Workaround for a bug in the gcc/clang compiler: https://stackoverflow.com/questions/53408962/try-to-understand-compiler-error-message-default-member-initializer-required-be
+
+// ! Workaround for a bug in the gcc/clang compiler:
+// https://stackoverflow.com/questions/53408962/try-to-understand-compiler-error-message-default-member-initializer-required-be
 OpticalElement::Geometry::Geometry() = default;
 OpticalElement::Geometry::Geometry(const Geometry& other) = default;
+
+void OpticalElement::Geometry::setHeightWidth(double height, double widthA,
+                                              double widthB) {
+    m_widthB = widthB;
+    if (m_geometricalShape == GeometricalShape::ELLIPTICAL) {
+        m_widthA = -widthA;
+        m_height = -height;
+    } else {
+        m_widthA = widthA;
+        m_height = height;
+    }
+}
 
 OpticalElement::OpticalElement(const char* name,
                                const std::array<double, 7> slopeError,
@@ -17,7 +30,6 @@ OpticalElement::OpticalElement(const char* name,
     : m_name(name), m_Geometry(std::make_unique<Geometry>(geometry)) {
     m_slopeError = slopeError;
     m_elementParameters = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
-    updateObjectParams();
 }
 
 void OpticalElement::setElementParameters(std::array<double, 4 * 4> params) {
@@ -32,29 +44,6 @@ void OpticalElement::setSurface(std::unique_ptr<Surface> surface) {
     if (!m_surfacePtr) {
         RAYX_ERR << "m_surfacePtr should NOT be nullptr!";
     }
-}
-
-// ! temporary adjustment for trapezoid (10/11/2021)
-void OpticalElement::updateObjectParams() {
-    double widthA = m_Geometry->m_widthA;
-    double widthB = m_Geometry->m_widthB;
-
-    m_objectParameters = {widthA,                // shader:  [0][0]
-                          m_Geometry->m_height,  // [0][1]
-                          m_slopeError[0],
-                          m_slopeError[1],
-                          m_slopeError[2],  // [1][0]
-                          m_slopeError[3],
-                          m_slopeError[4],
-                          m_slopeError[5],
-                          m_slopeError[6],  // [2][0]
-                          widthB,
-                          m_Geometry->m_azimuthalAngle,
-                          0,
-                          0,  // [3][0]
-                          0,
-                          0,
-                          0};
 }
 
 /**
@@ -128,8 +117,25 @@ glm::dvec4 OpticalElement::getPosition() const {
 glm::dmat4x4 OpticalElement::getOrientation() const {
     return m_Geometry->m_orientation;
 }
-std::array<double, 4 * 4> OpticalElement::getObjectParameters() {
-    return m_objectParameters;
+std::array<double, 4 * 4> OpticalElement::getObjectParameters() const {
+    std::array<double, 4 * 4> objectParameters = {
+        m_Geometry->m_widthA,  // shader: [0][0]
+        m_Geometry->m_height,  // [0][1]
+        m_slopeError[0],       // [0][2]
+        m_slopeError[1],       // [0][3]
+        m_slopeError[2],       // [1][0]
+        m_slopeError[3],
+        m_slopeError[4],
+        m_slopeError[5],
+        m_slopeError[6],  // [2][0]
+        m_Geometry->m_widthB,
+        m_Geometry->m_azimuthalAngle,
+        0,
+        0,  // [3][0]
+        0,
+        0,
+        0};
+    return objectParameters;
 }
 
 std::array<double, 4 * 4> OpticalElement::getElementParameters() const {
@@ -140,8 +146,10 @@ std::array<double, 4 * 4> OpticalElement::getSurfaceParams() const {
     // assert(m_surfacePtr!=nullptr);
     if (m_surfacePtr != nullptr)
         return m_surfacePtr->getParams();
-    else
-        return m_surfaceParams;
+    else {
+        RAYX_ERR << "Object without surface!";
+        exit(1);
+    }
 }
 
 std::array<double, 7> OpticalElement::getSlopeError() const {

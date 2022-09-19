@@ -84,7 +84,6 @@ ReflectionZonePlate::ReflectionZonePlate(
     m_Geometry->m_azimuthalAngle = azimuthalAngle;
     m_Geometry->m_position = position;
     m_Geometry->m_orientation = orientation;
-    updateObjectParams();
 
     // m_designEnergy = designEnergy; // if Auto == true, take energy of Source
     // (param sourceEnergy), else m_designEnergy = designEnergy

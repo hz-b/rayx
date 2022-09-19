@@ -28,23 +28,13 @@ class RAYX_API OpticalElement {
         double m_height = 0.0;
         double m_azimuthalAngle = 0.0;  // rotation of element through xy-plane
                                         // (needed for stokes vector)
-        glm::dmat4x4 m_orientation = glm::dmat4x4();
-        glm::dvec4 m_position = glm::dvec4();
+        glm::dmat4x4 m_orientation = glm::dmat4x4();  //< Orientation matrix of element (is basis)
+        glm::dvec4 m_position = glm::dvec4(); //< Position of element in world coordinates
         GeometricalShape m_geometricalShape = GeometricalShape::RECTANGLE;
 
         Geometry();
         Geometry(const Geometry& other);
-
-        void setHeightWidth(double height, double widthA, double widthB = 0.0) {
-            m_widthB = widthB;
-            if (m_geometricalShape == GeometricalShape::ELLIPTICAL) {
-                m_widthA = -widthA;
-                m_height = -height;
-            } else {
-                m_widthA = widthA;
-                m_height = height;
-            }
-        }
+        void setHeightWidth(double height, double widthA, double widthB = 0.0);
     };
 
     // needed to add optical elements to tracer
@@ -55,7 +45,6 @@ class RAYX_API OpticalElement {
 
     void setElementParameters(std::array<double, 4 * 4> params);
     void setSurface(std::unique_ptr<Surface> surface);
-    void updateObjectParams();
     [[maybe_unused]] void updateObjectParamsNoGeometry();
 
     void calcTransformationMatrices(glm::dvec4 position, glm::dmat4 orientation,
@@ -69,8 +58,8 @@ class RAYX_API OpticalElement {
     glm::dmat4 getOutMatrix() const;
     glm::dmat4x4 getOrientation() const;
     glm::dvec4 getPosition() const;
-    std::array<double, 4 * 4> getObjectParameters();
-    std::array<double, 4 * 4> getElementParameters() const;
+    std::array<double, 4 * 4> getObjectParameters() const;
+    virtual std::array<double, 4 * 4> getElementParameters() const;
     std::array<double, 4 * 4> getSurfaceParams() const;
     std::array<double, 7> getSlopeError() const;
 
@@ -89,9 +78,6 @@ class RAYX_API OpticalElement {
     // to give to shader
     std::array<double, 7> m_slopeError;
 
-    // things every optical element has (e.g. slope error) (16 entries -> one
-    // dmat4x4 in shader) also put to shader
-    std::array<double, 4 * 4> m_objectParameters;
     // additional element-specific parameters that are used for tracing (16
     // entries -> one dmat4x4 in shader)
     std::array<double, 4 * 4> m_elementParameters;

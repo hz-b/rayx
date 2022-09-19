@@ -38,8 +38,7 @@ PlaneMirror::PlaneMirror(const char* name,
     m_Geometry->setHeightWidth(height, width);
     m_Geometry->m_azimuthalAngle = azimuthalAngle;
     m_Geometry->m_position = position;
-    m_Geometry->m_orientation = orientation;    
-    updateObjectParams();
+    m_Geometry->m_orientation = orientation;
 
     auto matd = (double)static_cast<int>(mat);
     setSurface(std::make_unique<Quadric>(std::array<double, 4 * 4>{
@@ -59,7 +58,6 @@ PlaneMirror::PlaneMirror(const char* name,
     m_Geometry->m_azimuthalAngle = azimuthalAngle;
     m_Geometry->m_position = position;
     m_Geometry->m_orientation = orientation;
-    updateObjectParams();
     
     RAYX_LOG << name;
     auto matd = (double)static_cast<int>(mat);

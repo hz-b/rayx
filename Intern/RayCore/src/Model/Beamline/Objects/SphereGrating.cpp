@@ -52,7 +52,6 @@ SphereGrating::SphereGrating(const char* name, GratingMount mount,
     m_Geometry->m_azimuthalAngle = azimuthalAngle;
     m_Geometry->m_position = position;
     m_Geometry->m_orientation = orientation;
-    updateObjectParams();
     
     double icurv = 1;
     m_gratingMount = mount;

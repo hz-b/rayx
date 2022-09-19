@@ -36,7 +36,6 @@ Slit::Slit(const char* name, OpticalElement::GeometricalShape geometricalShape,
     m_Geometry->m_position = position;
     m_Geometry->m_orientation = orientation;
     m_centralBeamstop = beamstop;
-    updateObjectParams();
 
     // if no beamstop -> set to zero
     // if elliptical set width (xStop) to negative value to encode the shape
