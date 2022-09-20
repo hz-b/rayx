@@ -4,7 +4,7 @@
 
 namespace RAYX {
 
-void VulkanEngine::writeBuffer(const char* bufname, char* indata) {
+void VulkanEngine::writeBufferRaw(const char* bufname, char* indata) {
     Buffer& b = m_buffers[bufname];
 
     if (!b.m_in) {
@@ -24,6 +24,15 @@ void VulkanEngine::writeBuffer(const char* bufname, char* indata) {
         offset += localbytes;
         remainingBytes -= localbytes;
     }
+}
+
+void VulkanEngine::storeToStagingBuffer(char* indata, uint32_t bytes) {
+    void* buf;
+    vkMapMemory(m_Device, m_stagingMemory, 0, STAGING_SIZE, 0, &buf);
+
+    memcpy(buf, indata, bytes);
+
+    vkUnmapMemory(m_Device, m_stagingMemory);
 }
 
 }  // namespace RAYX

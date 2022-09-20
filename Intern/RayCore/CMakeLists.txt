@@ -40,9 +40,9 @@ SET(SOURCE
     src/VulkanEngine/Cleanup.cpp
     src/VulkanEngine/DeclareBuffer.cpp
     src/VulkanEngine/CreateBuffer.cpp
-    src/VulkanEngine/BufferIO/BufferIO.cpp
-    src/VulkanEngine/BufferIO/ReadBuffer.cpp
-    src/VulkanEngine/BufferIO/WriteBuffer.cpp
+    src/VulkanEngine/BufferIO/GpuMemcpy.cpp
+    src/VulkanEngine/BufferIO/ReadBufferRaw.cpp
+    src/VulkanEngine/BufferIO/WriteBufferRaw.cpp
     src/VulkanEngine/Destruct.cpp
     src/VulkanEngine/Init/CreateCommandPool.cpp
     src/VulkanEngine/Init/CreateDescriptorSetLayout.cpp

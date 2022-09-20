@@ -4,7 +4,7 @@
 
 namespace RAYX {
 
-void VulkanEngine::readBuffer(const char* bufname, char* outdata) {
+void VulkanEngine::readBufferRaw(const char* bufname, char* outdata) {
     if (m_state != EngineState::POSTRUN) {
         RAYX_ERR << "you've forgotton to .run() the VulkanEngine. Thats "
                     "mandatory before reading it's output buffers.";
@@ -25,6 +25,16 @@ void VulkanEngine::readBuffer(const char* bufname, char* outdata) {
         offset += localbytes;
         remainingBytes -= localbytes;
     }
+}
+
+void VulkanEngine::loadFromStagingBuffer(char* outdata, uint32_t bytes) {
+    void* buf;
+
+    vkMapMemory(m_Device, m_stagingMemory, 0, bytes, 0, &buf);
+
+    memcpy(outdata, buf, bytes);
+
+    vkUnmapMemory(m_Device, m_stagingMemory);
 }
 
 }  // namespace RAYX

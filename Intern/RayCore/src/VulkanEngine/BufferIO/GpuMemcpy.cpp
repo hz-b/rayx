@@ -1,25 +1,6 @@
 #include "VulkanEngine/VulkanEngine.h"
 
 namespace RAYX {
-void VulkanEngine::storeToStagingBuffer(char* indata, uint32_t bytes) {
-    void* buf;
-    vkMapMemory(m_Device, m_stagingMemory, 0, STAGING_SIZE, 0, &buf);
-
-    memcpy(buf, indata, bytes);
-
-    vkUnmapMemory(m_Device, m_stagingMemory);
-}
-
-void VulkanEngine::loadFromStagingBuffer(char* outdata, uint32_t bytes) {
-    void* buf;
-
-    vkMapMemory(m_Device, m_stagingMemory, 0, bytes, 0, &buf);
-
-    memcpy(outdata, buf, bytes);
-
-    vkUnmapMemory(m_Device, m_stagingMemory);
-}
-
 void VulkanEngine::gpuMemcpy(VkBuffer& buffer_src, uint32_t offset_src,
                              VkBuffer& buffer_dst, uint32_t offset_dst,
                              uint32_t bytes) {

@@ -75,10 +75,10 @@ std::vector<Ray> VulkanTracer::trace(const Beamline& beamline) {
 
     m_engine.run({.m_numberOfInvocations = numberOfRays});
 
-    std::vector<Ray> out = m_engine.readOutBuffer<Ray>("output-buffer");
+    std::vector<Ray> out = m_engine.readBuffer<Ray>("output-buffer");
 
 #ifdef RAYX_DEBUG_MODE
-    m_debugBufList = m_engine.readOutBuffer<_debugBuf_t>("debug-buffer");
+    m_debugBufList = m_engine.readBuffer<_debugBuf_t>("debug-buffer");
 #endif
 
     m_engine.cleanup();
