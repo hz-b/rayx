@@ -63,7 +63,7 @@ class RAYX_API VulkanEngine {
         PRERUN,
 
         // the state after run() has been called.
-        // legal functions: readOutBuffer(), cleanup().
+        // legal functions: readBuffer(), cleanup().
         POSTRUN
     };
 
