@@ -8,7 +8,7 @@ void VulkanEngine::writeBufferRaw(const char* bufname, char* indata) {
     Buffer& b = m_buffers[bufname];
 
     if (!b.m_in) {
-        RAYX_ERR << "writeBuffer(\"" << bufname
+        RAYX_ERR << "writeBufferRaw(\"" << bufname
                  << "\", ...) is not allowed, as \"" << bufname
                  << "\" has m_in = false";
     }

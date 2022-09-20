@@ -13,7 +13,7 @@ void VulkanEngine::readBufferRaw(const char* bufname, char* outdata) {
     Buffer& b = m_buffers[bufname];
 
     if (!b.m_out) {
-        RAYX_ERR << "readBuffer(\"" << bufname << "\", ...) is not allowed, as \"" << bufname << "\" has m_out = false";
+        RAYX_ERR << "readBufferRaw(\"" << bufname << "\", ...) is not allowed, as \"" << bufname << "\" has m_out = false";
     }
 
     size_t remainingBytes = b.m_size;

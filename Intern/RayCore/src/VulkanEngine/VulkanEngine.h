@@ -126,12 +126,12 @@ class RAYX_API VulkanEngine {
                         VkMemoryPropertyFlags properties, VkBuffer& buffer,
                         VkDeviceMemory& bufferMemory);
     // BufferIO:
-    void storeToStagingBuffer(char* indata, uint32_t bytes);
-    void loadFromStagingBuffer(char* outdata, uint32_t bytes);
     void gpuMemcpy(VkBuffer& buffer_src, uint32_t offset_src,
                    VkBuffer& buffer_dst, uint32_t offset_dst, uint32_t bytes);
     void readBufferRaw(const char* bufname, char* outdata);
     void writeBufferRaw(const char* bufname, char* indata);
+    void loadFromStagingBuffer(char* outdata, uint32_t bytes);
+    void storeToStagingBuffer(char* indata, uint32_t bytes);
 };
 
 // Used for validating return values of Vulkan API calls.
