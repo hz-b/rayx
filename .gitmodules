@@ -7,3 +7,6 @@
 [submodule "Extern/CLI11"]
 	path = Extern/CLI11
 	url = https://github.com/CLIUtils/CLI11.git
+[submodule "Extern/googletest"]
+	path = Extern/googletest
+	url = git@github.com:google/googletest.git
