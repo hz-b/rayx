@@ -1,11 +1,6 @@
 #include "VulkanEngine/VulkanEngine.h"
 
 namespace RAYX {
-void VulkanEngine::createBufferWithDataRaw(const char* bufname, GpuData data) {
-    createBuffer(bufname, data.size());
-    fillBuffer(bufname, data);
-}
-
 void VulkanEngine::createBuffer(const char* bufname, VkDeviceSize size) {
     if (m_state == EngineState::PREINIT) {
         RAYX_ERR << "you've forgotten to .init() the VulkanEngine";

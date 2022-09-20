@@ -1,28 +1,27 @@
+#include <algorithm>
+
 #include "VulkanEngine/VulkanEngine.h"
 
 namespace RAYX {
 
-GpuData VulkanEngine::readOutBufferRaw(const char* bufname) {
+void VulkanEngine::readOutBufferRaw(const char* bufname, char* outdata,
+                                    uint32_t bytes) {
     if (m_state != EngineState::POSTRUN) {
         RAYX_ERR << "you've forgotton to .run() the VulkanEngine. Thats "
                     "mandatory before reading it's output buffers.";
     }
 
-
-    GpuData out;
     Buffer& b = m_buffers[bufname];
 
-    uint32_t remaining_bytes = b.m_size;
-    int offset = 0;
-    while (remaining_bytes > 0) {
-        int localbytes = std::min(STAGING_SIZE, remaining_bytes);
+    size_t remainingBytes = bytes;
+    size_t offset = 0;
+    while (remainingBytes > 0) {
+        size_t localbytes = std::min((size_t)STAGING_SIZE, remainingBytes);
         gpuMemcpy(b.m_Buffer, offset, m_stagingBuffer, 0, localbytes);
-        out.raw.push_back(loadFromStagingBuffer(localbytes));
+        loadFromStagingBuffer(outdata + offset, localbytes);
         offset += localbytes;
-        remaining_bytes -= localbytes;
+        remainingBytes -= localbytes;
     }
-
-    return out;
 }
 
 }  // namespace RAYX

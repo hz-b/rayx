@@ -6,7 +6,6 @@
 #include <vulkan/vulkan.hpp>
 
 #include "RayCore.h"
-#include "VulkanEngine/GpuData.h"
 
 namespace RAYX {
 
@@ -34,7 +33,9 @@ class RAYX_API VulkanEngine {
 
     template <typename T>
     inline void createBufferWithData(const char* bufname, std::vector<T> vec) {
-        createBufferWithDataRaw(bufname, encode<T>(vec));
+        uint32_t bytes = vec.size() * sizeof(T);
+        createBuffer(bufname, bytes);
+        fillBuffer(bufname, (char*)vec.data(), bytes);
     }
     void createBuffer(const char* bufname, VkDeviceSize);
 
@@ -42,7 +43,10 @@ class RAYX_API VulkanEngine {
 
     template <typename T>
     inline std::vector<T> readOutBuffer(const char* bufname) {
-        return decode<T>(readOutBufferRaw(bufname));
+        uint32_t bytes = m_buffers[bufname].m_size;
+        std::vector<T> out(bytes / sizeof(T));
+        readOutBufferRaw(bufname, (char*)out.data(), bytes);
+        return out;
     }
 
     void cleanup();
@@ -103,9 +107,6 @@ class RAYX_API VulkanEngine {
     // this file. don't bother reading them.
     ////////////////////////////////////////////////////////////////////////////////////////////
 
-    // ReadOutBuffer:
-    GpuData readOutBufferRaw(const char* bufname);
-
     // Init:
     void createInstance();
     void setupDebugMessenger();
@@ -123,17 +124,19 @@ class RAYX_API VulkanEngine {
     void createCommandBuffer();
 
     // CreateBuffer:
-    void createBufferWithDataRaw(const char* bufname, GpuData);
     void createVkBuffer(VkDeviceSize size, VkBufferUsageFlags usage,
                         VkMemoryPropertyFlags properties, VkBuffer& buffer,
                         VkDeviceMemory& bufferMemory);
-    void fillBuffer(const char* bufname, GpuData);
+    void fillBuffer(const char* bufname, char* data, uint32_t bytes);
 
     // BufferIO:
-    void storeToStagingBuffer(std::vector<char> data);
-    std::vector<char> loadFromStagingBuffer(uint32_t bytes);
+    void storeToStagingBuffer(char* data, uint32_t bytes);
+    void loadFromStagingBuffer(char* data, uint32_t bytes);
     void gpuMemcpy(VkBuffer& buffer_src, uint32_t offset_src,
                    VkBuffer& buffer_dst, uint32_t offset_dst, uint32_t bytes);
+
+    // ReadOutBuffer.cpp
+    void readOutBufferRaw(const char* bufname, char* data, uint32_t bytes);
 };
 
 // Used for validating return values of Vulkan API calls.
@@ -154,6 +157,7 @@ const std::vector<const char*> validationLayers = {
     "VK_LAYER_KHRONOS_validation"};
 
 const int WORKGROUP_SIZE = 32;
+const uint32_t STAGING_SIZE = 134217728;  // in bytes, equal to 128MB.
 
 #ifdef NDEBUG
 const bool enableValidationLayers = false;

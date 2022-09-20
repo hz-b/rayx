@@ -98,7 +98,6 @@ SET(HEADERS
     src/Writer/H5Writer.h
     src/Tracer/VulkanTracer.h
     src/VulkanEngine/VulkanEngine.h
-    src/VulkanEngine/GpuData.h
     src/Material/Material.h
     src/Material/NffTable.h
     src/Material/PalikTable.h
