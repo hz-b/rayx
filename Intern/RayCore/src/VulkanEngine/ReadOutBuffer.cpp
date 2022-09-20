@@ -4,8 +4,7 @@
 
 namespace RAYX {
 
-void VulkanEngine::readOutBufferRaw(const char* bufname, char* outdata,
-                                    uint32_t bytes) {
+void VulkanEngine::readOutBufferRaw(const char* bufname, char* outdata) {
     if (m_state != EngineState::POSTRUN) {
         RAYX_ERR << "you've forgotton to .run() the VulkanEngine. Thats "
                     "mandatory before reading it's output buffers.";
@@ -13,7 +12,7 @@ void VulkanEngine::readOutBufferRaw(const char* bufname, char* outdata,
 
     Buffer& b = m_buffers[bufname];
 
-    size_t remainingBytes = bytes;
+    size_t remainingBytes = b.m_size;
     size_t offset = 0;
     while (remainingBytes > 0) {
         size_t localbytes = std::min((size_t)STAGING_SIZE, remainingBytes);

@@ -4,8 +4,8 @@
 
 namespace RAYX {
 
-void VulkanEngine::fillBuffer(const char* bufname, char* data, uint32_t bytes) {
-    size_t remainingBytes = bytes;
+void VulkanEngine::fillBuffer(const char* bufname, char* data) {
+    size_t remainingBytes = m_buffers[bufname].m_size;
     size_t offset = 0;
     while (remainingBytes > 0) {
         size_t localbytes = std::min(remainingBytes, (size_t)STAGING_SIZE);
