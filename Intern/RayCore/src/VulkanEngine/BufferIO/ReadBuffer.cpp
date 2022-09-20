@@ -4,13 +4,17 @@
 
 namespace RAYX {
 
-void VulkanEngine::readOutBufferRaw(const char* bufname, char* outdata) {
+void VulkanEngine::readBuffer(const char* bufname, char* outdata) {
     if (m_state != EngineState::POSTRUN) {
         RAYX_ERR << "you've forgotton to .run() the VulkanEngine. Thats "
                     "mandatory before reading it's output buffers.";
     }
 
     Buffer& b = m_buffers[bufname];
+
+    if (!b.m_out) {
+        RAYX_ERR << "readBuffer(\"" << bufname << "\", ...) is not allowed, as \"" << bufname << "\" has m_out = false";
+    }
 
     size_t remainingBytes = b.m_size;
     size_t offset = 0;

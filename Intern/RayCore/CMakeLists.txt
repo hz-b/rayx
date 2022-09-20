@@ -37,12 +37,12 @@ SET(SOURCE
     src/Material/PalikTable.cpp
     src/Tracer/VulkanTracer.cpp
     src/Tracer/CpuTracer.cpp
-    src/VulkanEngine/BufferIO.cpp
     src/VulkanEngine/Cleanup.cpp
     src/VulkanEngine/DeclareBuffer.cpp
-    src/VulkanEngine/CreateBuffer/CreateBuffer.cpp
-    src/VulkanEngine/CreateBuffer/CreateVkBuffer.cpp
-    src/VulkanEngine/CreateBuffer/FillBuffer.cpp
+    src/VulkanEngine/CreateBuffer.cpp
+    src/VulkanEngine/BufferIO/BufferIO.cpp
+    src/VulkanEngine/BufferIO/ReadBuffer.cpp
+    src/VulkanEngine/BufferIO/WriteBuffer.cpp
     src/VulkanEngine/Destruct.cpp
     src/VulkanEngine/Init/CreateCommandPool.cpp
     src/VulkanEngine/Init/CreateDescriptorSetLayout.cpp
@@ -50,7 +50,6 @@ SET(SOURCE
     src/VulkanEngine/Init/CreateStagingBuffer.cpp
     src/VulkanEngine/Init/Init.cpp
     src/VulkanEngine/Init/PickDevice.cpp
-    src/VulkanEngine/ReadOutBuffer.cpp
     src/VulkanEngine/Run/CreateCommandBuffer.cpp
     src/VulkanEngine/Run/CreateComputePipeline.cpp
     src/VulkanEngine/Run/CreateDescriptorSet.cpp

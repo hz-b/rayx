@@ -34,7 +34,7 @@ class RAYX_API VulkanEngine {
     template <typename T>
     inline void createBufferWithData(const char* bufname, std::vector<T> vec) {
         createBuffer(bufname, vec.size() * sizeof(T));
-        fillBuffer(bufname, (char*)vec.data());
+        writeBuffer(bufname, (char*)vec.data());
     }
     void createBuffer(const char* bufname, VkDeviceSize);
 
@@ -43,7 +43,7 @@ class RAYX_API VulkanEngine {
     template <typename T>
     inline std::vector<T> readOutBuffer(const char* bufname) {
         std::vector<T> out(m_buffers[bufname].m_size / sizeof(T));
-        readOutBufferRaw(bufname, (char*)out.data());
+        readBuffer(bufname, (char*)out.data());
         return out;
     }
 
@@ -125,16 +125,17 @@ class RAYX_API VulkanEngine {
     void createVkBuffer(VkDeviceSize size, VkBufferUsageFlags usage,
                         VkMemoryPropertyFlags properties, VkBuffer& buffer,
                         VkDeviceMemory& bufferMemory);
-    void fillBuffer(const char* bufname, char* data);
+    // ReadBuffer.cpp:
+    void readBuffer(const char* bufname, char* outdata);
+
+    // WriterBuffer.cpp:
+    void writeBuffer(const char* bufname, char* indata);
 
     // BufferIO:
     void storeToStagingBuffer(char* indata, uint32_t bytes);
     void loadFromStagingBuffer(char* outdata, uint32_t bytes);
     void gpuMemcpy(VkBuffer& buffer_src, uint32_t offset_src,
                    VkBuffer& buffer_dst, uint32_t offset_dst, uint32_t bytes);
-
-    // ReadOutBuffer.cpp
-    void readOutBufferRaw(const char* bufname, char* outdata);
 };
 
 // Used for validating return values of Vulkan API calls.
