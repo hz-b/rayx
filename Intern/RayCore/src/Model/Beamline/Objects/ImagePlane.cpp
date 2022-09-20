@@ -21,8 +21,8 @@ ImagePlane::ImagePlane(const char* name, glm::dvec4 position,
     m_Geometry->m_orientation = orientation;
     m_Geometry->m_position = position;
 
-    setSurface(std::make_unique<Quadric>(std::array<double, 4 * 4>{
-        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 5, 0, 0, 0}));
+    setSurface(std::make_unique<Quadric>(
+        glm::dmat4x4{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 5, 0, 0, 0}));
 }
 ImagePlane::~ImagePlane() = default;
 
@@ -31,7 +31,7 @@ std::shared_ptr<ImagePlane> ImagePlane::createFromXML(const xml::Parser& p) {
                                         p.parseOrientation());
 }
 
-std::array<double, 4*4> ImagePlane::getElementParameters() const {
-    return {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0};
+glm::dmat4x4 ImagePlane::getElementParameters() const {
+    return {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 }
 }  // namespace RAYX

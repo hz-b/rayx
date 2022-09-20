@@ -53,7 +53,7 @@ Cone::Cone(const char* name, OpticalElement::GeometricalShape geometricalShape,
     } else if (m_a23 == 0) {
         m_a24 = -m_upstreamRadius_R;
     }
-    setSurface(std::make_unique<Quadric>(std::array<double, 4 * 4>{
+    setSurface(std::make_unique<Quadric>(glm::dmat4x4{
         m_a11, 0, 0, 0, icurv, m_a22, m_a23, m_a24, 0, 0, 0, 0, 0, 0, 0, 0}));
 }
 /**
@@ -107,7 +107,7 @@ Cone::Cone(const char* name, OpticalElement::GeometricalShape geometricalShape,
     } else if (m_a23 == 0) {
         m_a24 = -m_upstreamRadius_R;
     }
-    setSurface(std::make_unique<Quadric>(std::array<double, 4 * 4>{
+    setSurface(std::make_unique<Quadric>(glm::dmat4x4{
         m_a11, 0, 0, 0, icurv, m_a22, m_a23, m_a24, 0, 0, 0, 0, 0, 0, 0, 0}));
 }
 

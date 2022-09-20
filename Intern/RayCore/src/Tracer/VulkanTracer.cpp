@@ -50,12 +50,12 @@ std::vector<Ray> VulkanTracer::trace(const Beamline& beamline) {
         (double)numberOfRays, (double)numberOfRaysPerBeamline};
 
     for (const auto& e : beamline.m_OpticalElements) {
-        std::vector<std::array<double, 4 * 4>> mats = {
-            e->getSurfaceParams(), glmToArray16(e->getInMatrix()),
-            glmToArray16(e->getOutMatrix()), e->getObjectParameters(),
-            e->getElementParameters()};
+        std::vector<glm::dmat4x4> mats = {
+            e->getSurfaceParams(), e->getInMatrix(), e->getOutMatrix(),
+            e->getObjectParameters(), e->getElementParameters()};
         for (auto x : mats) {
-            beamlineData.insert(beamlineData.end(), x.begin(), x.end());
+            auto mat = glmToArray16(x);
+            beamlineData.insert(beamlineData.end(), mat.begin(), mat.end());
         }
     }
 

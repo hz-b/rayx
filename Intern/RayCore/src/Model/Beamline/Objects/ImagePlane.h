@@ -17,6 +17,6 @@ class RAYX_API ImagePlane : public OpticalElement {
     static std::shared_ptr<ImagePlane> createFromXML(const xml::Parser&);
 
     double getDistance();
-    std::array<double, 4*4> getElementParameters() const;
+    glm::dmat4x4 getElementParameters() const;
 };
 }  // namespace RAYX

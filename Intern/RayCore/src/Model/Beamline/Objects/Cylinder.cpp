@@ -69,7 +69,7 @@ Cylinder::Cylinder(const char* name,
     }
 
     auto matd = (double)static_cast<int>(mat);
-    setSurface(std::make_unique<Quadric>(std::array<double, 4 * 4>{
+    setSurface(std::make_unique<Quadric>(glm::dmat4x4{
         m_a11, 0, 0, 0, icurv, 1, 0, m_a24, 0, 0, m_a33, 0, 0, 0, matd, 0}));
 }
 Cylinder::~Cylinder() = default;

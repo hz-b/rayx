@@ -1,7 +1,7 @@
 #pragma once
 
-#include <vector>
 #include <array>
+#include <vector>
 
 #include "Core.h"
 
@@ -15,7 +15,7 @@ namespace RAYX {
  */
 class RAYX_API Surface {
   public:
-    virtual std::array<double, 4*4> getParams() const = 0;
+    virtual glm::dmat4x4 getParams() const = 0;
 
     Surface();
     virtual ~Surface();

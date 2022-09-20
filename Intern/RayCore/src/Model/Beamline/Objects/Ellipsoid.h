@@ -44,7 +44,7 @@ class RAYX_API Ellipsoid : public OpticalElement {
     double getA44() const;
     double getHalfAxisC() const;
 
-    std::array<double, 4*4> getElementParameters() const;
+    glm::dmat4x4 getElementParameters() const;
 
     static std::shared_ptr<Ellipsoid> createFromXML(const xml::Parser&);
 

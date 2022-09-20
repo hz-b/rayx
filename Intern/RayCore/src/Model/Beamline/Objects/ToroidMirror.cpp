@@ -51,8 +51,8 @@ ToroidMirror::ToroidMirror(const char* name,
              << ", short Radius: " << m_shortRadius;
     auto matd = (double)static_cast<int>(mat);
     setSurface(std::make_unique<Toroid>(
-        std::array<double, 4 * 4>{m_longRadius, m_shortRadius, 0, 0, 0, 1, 0, 0,
-                                  0, 0, 1, 0, 6, 0, matd, 0}));
+        glm::dmat4x4{m_longRadius, m_shortRadius, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0,
+                     6, 0, matd, 0}));
     // setSurface(std::make_unique<Toroid>(m_longRadius, m_shortRadius));
 }
 

@@ -41,8 +41,8 @@ PlaneMirror::PlaneMirror(const char* name,
     m_Geometry->m_orientation = orientation;
 
     auto matd = (double)static_cast<int>(mat);
-    setSurface(std::make_unique<Quadric>(std::array<double, 4 * 4>{
-        0, 0, 0, 0, 1, 0, 0, -1, 0, 0, 0, 0, 0, 0, matd, 0}));
+    setSurface(std::make_unique<Quadric>(
+        glm::dmat4x4{0, 0, 0, 0, 1, 0, 0, -1, 0, 0, 0, 0, 0, 0, matd, 0}));
 }
 
 PlaneMirror::PlaneMirror(const char* name,
@@ -61,8 +61,8 @@ PlaneMirror::PlaneMirror(const char* name,
 
     RAYX_LOG << name;
     auto matd = (double)static_cast<int>(mat);
-    setSurface(std::make_unique<Quadric>(std::array<double, 4 * 4>{
-        0, 0, 0, 0, 1, 0, 0, -1, 0, 0, 0, 0, 0, 0, matd, 0}));
+    setSurface(std::make_unique<Quadric>(
+        glm::dmat4x4{0, 0, 0, 0, 1, 0, 0, -1, 0, 0, 0, 0, 0, 0, matd, 0}));
 }
 
 std::shared_ptr<PlaneMirror> PlaneMirror::createFromXML(const xml::Parser& p) {

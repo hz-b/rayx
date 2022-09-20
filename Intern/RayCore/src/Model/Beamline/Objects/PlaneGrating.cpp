@@ -58,8 +58,8 @@ PlaneGrating::PlaneGrating(
 
     // parameters of quadric surface
     auto matd = (double)static_cast<int>(mat);
-    setSurface(std::make_unique<Quadric>(std::array<double, 4 * 4>{
-        0, 0, 0, 0, 1, 0, 0, -1, 0, 0, 0, 0, 1, 0, matd, 0}));
+    setSurface(std::make_unique<Quadric>(
+        glm::dmat4x4{0, 0, 0, 0, 1, 0, 0, -1, 0, 0, 0, 0, 1, 0, matd, 0}));
 }
 
 std::shared_ptr<PlaneGrating> PlaneGrating::createFromXML(
@@ -82,7 +82,7 @@ double PlaneGrating::getOrderOfDiffraction() const {
 }
 std::array<double, 6> PlaneGrating::getVls() { return m_vls; }
 
-std::array<double, 4 * 4> PlaneGrating::getElementParameters() const {
+glm::dmat4x4 PlaneGrating::getElementParameters() const {
     return {0,
             0,
             m_lineDensity,

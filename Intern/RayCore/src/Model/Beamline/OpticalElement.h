@@ -28,8 +28,10 @@ class RAYX_API OpticalElement {
         double m_height = 0.0;
         double m_azimuthalAngle = 0.0;  // rotation of element through xy-plane
                                         // (needed for stokes vector)
-        glm::dmat4x4 m_orientation = glm::dmat4x4();  //< Orientation matrix of element (is basis)
-        glm::dvec4 m_position = glm::dvec4(); //< Position of element in world coordinates
+        glm::dmat4x4 m_orientation =
+            glm::dmat4x4();  //< Orientation matrix of element (is basis)
+        glm::dvec4 m_position =
+            glm::dvec4();  //< Position of element in world coordinates
         GeometricalShape m_geometricalShape = GeometricalShape::RECTANGLE;
 
         Geometry();
@@ -38,8 +40,9 @@ class RAYX_API OpticalElement {
     };
 
     // needed to add optical elements to tracer
-    OpticalElement(const char* name, const std::array<double, 7> slopeError,
-                   const Geometry& geometry = Geometry()); // TODO(Jannis): add surface
+    OpticalElement(
+        const char* name, const std::array<double, 7> slopeError,
+        const Geometry& geometry = Geometry());  // TODO(Jannis): add surface
 
     virtual ~OpticalElement() = default;
 
@@ -57,18 +60,18 @@ class RAYX_API OpticalElement {
     glm::dmat4x4 getOrientation() const;
     glm::dvec4 getPosition() const;
 
-    std::array<double, 4 * 4> getObjectParameters() const;
-    std::array<double, 4 * 4> getSurfaceParams() const;
-    virtual std::array<double, 4 * 4> getElementParameters() const;
+    glm::dmat4x4 getObjectParameters() const;
+    glm::dmat4x4 getSurfaceParams() const;
+    virtual glm::dmat4x4 getElementParameters() const;
     std::array<double, 7> getSlopeError() const;
 
     [[maybe_unused]] const char* m_name;
 
   protected:
-    std::unique_ptr<Geometry> m_Geometry;  ///< Geometry of the element
-    std::unique_ptr<Surface> m_surfacePtr; ///< Surface of the element
+    std::unique_ptr<Geometry> m_Geometry;   ///< Geometry of the element
+    std::unique_ptr<Surface> m_surfacePtr;  ///< Surface of the element
 
-    std::array<double, 7> m_slopeError;    // TODO(Jannis): move to geometry
+    std::array<double, 7> m_slopeError;  // TODO(Jannis): move to geometry
 };
 
 }  // namespace RAYX

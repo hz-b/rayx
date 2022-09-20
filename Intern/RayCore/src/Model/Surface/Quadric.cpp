@@ -9,9 +9,7 @@ namespace RAYX {
  * matrix is symmetrial, can be used for other values
  * @param inputPoints      4x4 Matrix as vector
  */
-Quadric::Quadric(const std::array<double, 4 * 4> inputPoints) {
-    m_parameters = inputPoints;
-}
+Quadric::Quadric(const glm::dmat4x4 inputPoints) { m_parameters = inputPoints; }
 
 Quadric::Quadric() = default;  // TODO
 
@@ -24,7 +22,7 @@ Quadric::~Quadric() = default;
  * @param inputPoints   16 entry vector a_11 to a_44
  * @return void
  */
-[[maybe_unused]] void Quadric::setAnchorPoints(std::array<double, 4 * 4> inputPoints) {
+[[maybe_unused]] void Quadric::setAnchorPoints(glm::dmat4x4 inputPoints) {
     m_parameters = inputPoints;
 }
 
@@ -48,8 +46,6 @@ Quadric::~Quadric() = default;
  *corresponding to the variants of the enum class Material (see Material.h and
  *materials.xmacro)
  **/
-std::array<double, 4 * 4> Quadric::getParams() const {
-    return m_parameters;
-}
+glm::dmat4x4 Quadric::getParams() const { return m_parameters; }
 
 }  // namespace RAYX

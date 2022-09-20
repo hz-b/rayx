@@ -11,15 +11,16 @@ class RAYX_API Quadric : public Surface {
   public:
     // ctor
     Quadric();
-    Quadric(const std::array<double, 4 * 4> inputPoints);
+    Quadric(const glm::dmat4x4 inputPoints);
     // dtor
     ~Quadric();
 
-    [[maybe_unused]] [[maybe_unused]] void setAnchorPoints(std::array<double, 4 * 4> inputPoints);
-    std::array<double, 4 * 4> getParams() const;
+    [[maybe_unused]] [[maybe_unused]] void setAnchorPoints(
+        glm::dmat4x4 inputPoints);
+    glm::dmat4x4 getParams() const;
 
   private:
     // Quadric parameters; will be turned into 4x4 matrix
-    std::array<double, 4 * 4> m_parameters;
+    glm::dmat4x4 m_parameters;
 };
 }  // namespace RAYX

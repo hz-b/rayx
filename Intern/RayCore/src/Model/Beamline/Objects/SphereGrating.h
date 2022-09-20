@@ -12,9 +12,9 @@ class RAYX_API SphereGrating : public OpticalElement {
   public:
     // new, shortened constructor
     SphereGrating(const char* name, GratingMount mount,
-                  OpticalElement::GeometricalShape geometricalShape, double width,
-                  double height, const double azimuthalAngle, double radius,
-                  glm::dvec4 position, glm::dmat4x4 orientation,
+                  OpticalElement::GeometricalShape geometricalShape,
+                  double width, double height, const double azimuthalAngle,
+                  double radius, glm::dvec4 position, glm::dmat4x4 orientation,
                   double designEnergyMounting, double lineDensity,
                   double orderOfDiffraction, std::array<double, 6> vls,
                   std::array<double, 7> slopeError, Material mat);
@@ -37,7 +37,7 @@ class RAYX_API SphereGrating : public OpticalElement {
     double getOrderOfDiffraction() const;
     double getA() const;
     std::array<double, 6> getVls() const;
-    std::array<double, 4*4> getElementParameters() const;
+    glm::dmat4x4 getElementParameters() const;
 
   private:
     double m_radius;

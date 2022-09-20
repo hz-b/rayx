@@ -56,7 +56,7 @@ SphereGrating::SphereGrating(const char* name, GratingMount mount,
     double icurv = 1;
     m_gratingMount = mount;
     auto matd = (double)static_cast<int>(mat);
-    setSurface(std::make_unique<Quadric>(std::array<double, 4 * 4>{
+    setSurface(std::make_unique<Quadric>(glm::dmat4x4{
         1, 0, 0, 0, icurv, 1, 0, -radius, 0, 0, 1, 0, 2, 0, matd, 0}));
 }
 
@@ -88,7 +88,7 @@ double SphereGrating::getOrderOfDiffraction() const {
 }
 double SphereGrating::getA() const { return m_a; }
 
-std::array<double, 4 * 4> SphereGrating::getElementParameters() const {
+glm::dmat4x4 SphereGrating::getElementParameters() const {
     return {0,
             0,
             m_lineDensity,

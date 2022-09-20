@@ -112,28 +112,27 @@ glm::dvec4 OpticalElement::getPosition() const {
 glm::dmat4x4 OpticalElement::getOrientation() const {
     return m_Geometry->m_orientation;
 }
-std::array<double, 4 * 4> OpticalElement::getObjectParameters() const {
-    std::array<double, 4 * 4> objectParameters = {
-        m_Geometry->m_widthA,  // shader: [0][0]
-        m_Geometry->m_height,  // [0][1]
-        m_slopeError[0],       // [0][2]
-        m_slopeError[1],       // [0][3]
-        m_slopeError[2],       // [1][0]
-        m_slopeError[3],
-        m_slopeError[4],
-        m_slopeError[5],
-        m_slopeError[6],  // [2][0]
-        m_Geometry->m_widthB,
-        m_Geometry->m_azimuthalAngle,
-        0,
-        0,  // [3][0]
-        0,
-        0,
-        0};
+glm::dmat4x4 OpticalElement::getObjectParameters() const {
+    glm::dmat4x4 objectParameters = {m_Geometry->m_widthA,  // shader: [0][0]
+                                     m_Geometry->m_height,  // [0][1]
+                                     m_slopeError[0],       // [0][2]
+                                     m_slopeError[1],       // [0][3]
+                                     m_slopeError[2],       // [1][0]
+                                     m_slopeError[3],
+                                     m_slopeError[4],
+                                     m_slopeError[5],
+                                     m_slopeError[6],  // [2][0]
+                                     m_Geometry->m_widthB,
+                                     m_Geometry->m_azimuthalAngle,
+                                     0,
+                                     0,  // [3][0]
+                                     0,
+                                     0,
+                                     0};
     return objectParameters;
 }
 
-std::array<double, 4 * 4> OpticalElement::getSurfaceParams() const {
+glm::dmat4x4 OpticalElement::getSurfaceParams() const {
     // assert(m_surfacePtr!=nullptr);
     if (m_surfacePtr != nullptr)
         return m_surfacePtr->getParams();
@@ -147,7 +146,7 @@ std::array<double, 7> OpticalElement::getSlopeError() const {
     return m_slopeError;
 }
 
-std::array<double, 4 * 4> OpticalElement::getElementParameters() const {
-    return {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0};
+glm::dmat4x4 OpticalElement::getElementParameters() const {
+    return {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 }
 }  // namespace RAYX

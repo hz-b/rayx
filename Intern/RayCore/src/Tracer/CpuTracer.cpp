@@ -40,11 +40,11 @@ std::vector<Ray> CpuTracer::trace(const Beamline& beamline) {
     // init quadricData
     for (auto el : beamline.m_OpticalElements) {
         CPU_TRACER::Element e;
-        e.surfaceParams = arrayToGlm16(el->getSurfaceParams());
+        e.surfaceParams = el->getSurfaceParams();
         e.inTrans = el->getInMatrix();
         e.outTrans = el->getOutMatrix();
-        e.objectParameters = arrayToGlm16(el->getObjectParameters());
-        e.elementParameters = arrayToGlm16(el->getElementParameters());
+        e.objectParameters = el->getObjectParameters();
+        e.elementParameters = el->getElementParameters();
         CPU_TRACER::quadricData.data.push_back(e);
     }
 
