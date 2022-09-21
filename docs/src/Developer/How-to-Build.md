@@ -1,6 +1,8 @@
 # How to Build
 
-For building the project and running the project, we recommend to use [Visual Studio Code](https://code.visualstudio.com/) as your IDE with these extensions: C/C++ and CMake Tools. You can use any IDE you like, but the VSCode extensions make the building process very easy.
+For building the project and running the project, we recommend to use [Visual Studio Code](https://code.visualstudio.com/) as your IDE with these extensions: C/C++ and CMake Tools.
+You can use any IDE you like, but the VSCode extensions make the building process very easy.
+If you are on UNIX you can also use the `compile.sh` script to compile.
 
 Clone the git repository with:
 `git clone --recurse-submodules git@github.com:hz-b/RAY-X.git -b development`
@@ -29,20 +31,5 @@ to get the dev branch and to make sure, you also clone all of it's submodules.
 ## Fedora
 
 ```
-sudo dnf install cmake gcc gdb vulkan vulkan-tools vulkan-validation-layers hdf5-devel
+sudo dnf install cmake gcc gdb vulkan vulkan-tools vulkan-validation-layers hdf5-devel ninja-build gcc-c++ vulkan-loader-devel glslc
 ```
-
-## Building independent of IDE
-
-In case you decide against using VSCode you can setup your build system with the command:
-
-```cmake --no-warn-unused-cli -DCMAKE_EXPORT_COMPILE_COMMANDS:BOOL=TRUE -DCMAKE_BUILD_TYPE:STRING=Debug -B ./build -G Ninja```
-
-and then build with
-
-```cmake --build ./build --config Debug --target all -j 10 --```
-
-
-or for release:
-```cmake --build ./build --config Release --target all -j 10 --``` for setup, and
-```cmake --no-warn-unused-cli -DCMAKE_EXPORT_COMPILE_COMMANDS:BOOL=TRUE -DCMAKE_BUILD_TYPE:STRING=Release -B ./build -G Ninja``` for building.
