@@ -2,6 +2,6 @@
 
 #pragma once
 
-void RAYX_API writeH5(std::vector<RAYX::Ray>&, std::string filename);
+void RAYX_API writeH5(const std::vector<RAYX::Ray>&, std::string filename);
 
 #endif

@@ -54,7 +54,7 @@ Cell doubleToCell(double x) {
     return strToCell(s.c_str());
 }
 
-void writeCSV(std::vector<RAYX::Ray>& rays, std::string filename) {
+void writeCSV(const std::vector<RAYX::Ray>& rays, std::string filename) {
     std::ofstream file(filename);
 
     file << strToCell("Index").buf << " | "        //

@@ -34,10 +34,10 @@ class TerminalApp {
     char** m_argv;
     int m_argc;
 
-    void handleInputPath(std::filesystem::path);
-    void exportRays(
-        std::vector<RAYX::Ray>&,
-        std::string);  // TODO(Rudi) convert to std::filesystem::path later
+    /// if `path` is an RML file, it will trace this file.
+    /// if `path` is a directory, it will call `tracePath(child)` for all children of that directory.
+    void tracePath(std::filesystem::path path);
+    void exportRays(const std::vector<RAYX::Ray>&, std::string);
 #if defined(RAYX_DEBUG_MODE) && not defined(CPP)
     void exportDebug();
 #endif

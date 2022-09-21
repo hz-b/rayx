@@ -24,7 +24,7 @@ TerminalApp::TerminalApp(int argc, char** argv) : m_argv(argv), m_argc(argc) {
 
 TerminalApp::~TerminalApp() { RAYX_D_LOG << "TerminalApp deleted!"; }
 
-void TerminalApp::handleInputPath(std::filesystem::path path) {
+void TerminalApp::tracePath(std::filesystem::path path) {
     namespace fs = std::filesystem;
     if (!fs::exists(path)) {
         if (path.empty()) {
@@ -36,7 +36,7 @@ void TerminalApp::handleInputPath(std::filesystem::path path) {
 
     if (fs::is_directory(path)) {
         for (auto p : fs::directory_iterator(path)) {
-            handleInputPath(p.path());
+            tracePath(p.path());
         }
     } else if (path.extension() == ".rml") {
         // Load RML file
@@ -85,7 +85,7 @@ void TerminalApp::run() {
         m_Tracer = std::make_unique<RAYX::VulkanTracer>();
     }
 
-    handleInputPath(m_CommandParser->m_args.m_providedFile);
+    tracePath(m_CommandParser->m_args.m_providedFile);
 
     if (m_CommandParser->m_args.m_benchmark) {
         std::chrono::steady_clock::time_point end =
@@ -135,7 +135,8 @@ void TerminalApp::run() {
     }
 }
 
-void TerminalApp::exportRays(std::vector<RAYX::Ray>& rays, std::string path) {
+void TerminalApp::exportRays(const std::vector<RAYX::Ray>& rays,
+                             std::string path) {
 #ifdef CI
     bool csv = true;
 #else

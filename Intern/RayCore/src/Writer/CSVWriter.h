@@ -2,4 +2,4 @@
 
 #include "Core.h"
 
-void RAYX_API writeCSV(std::vector<RAYX::Ray>&, std::string filename);
+void RAYX_API writeCSV(const std::vector<RAYX::Ray>&, std::string filename);
