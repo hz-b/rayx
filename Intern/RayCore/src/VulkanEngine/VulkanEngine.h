@@ -49,8 +49,6 @@ class RAYX_API VulkanEngine {
 
     void cleanup();
 
-    // TYPES
-
     enum class EngineState {
         // the state before .init() is called.
         // legal functions: declareBuffer(), init().
@@ -66,6 +64,8 @@ class RAYX_API VulkanEngine {
         // legal functions: readBuffer(), cleanup().
         POSTRUN
     };
+
+    inline EngineState state() { return m_state; }
 
     struct Buffer {
         bool m_in;

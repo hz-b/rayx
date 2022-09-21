@@ -16,29 +16,30 @@
 #endif
 
 namespace RAYX {
-VulkanTracer::VulkanTracer() {
-    // Set buffer settings (DEBUG OR RELEASE)
-    RAYX_LOG << "Initializing Vulkan Tracer..";
-    m_engine.declareBuffer("ray-buffer",
-                           {.m_binding = 0, .m_in = true, .m_out = false});
-    m_engine.declareBuffer("output-buffer",
-                           {.m_binding = 1, .m_in = false, .m_out = true});
-    m_engine.declareBuffer("quadric-buffer",
-                           {.m_binding = 2, .m_in = true, .m_out = false});
-    m_engine.declareBuffer("xyznull-buffer",
-                           {.m_binding = 3, .m_in = false, .m_out = false});
-    m_engine.declareBuffer("material-index-table",
-                           {.m_binding = 4, .m_in = true, .m_out = false});
-    m_engine.declareBuffer("material-table",
-                           {.m_binding = 5, .m_in = true, .m_out = false});
-#ifdef RAYX_DEBUG_MODE
-    m_engine.declareBuffer("debug-buffer",
-                           {.m_binding = 6, .m_in = false, .m_out = true});
-#endif
-    m_engine.init({.m_shader = "build/bin/comp.spv"});
-}
-
 std::vector<Ray> VulkanTracer::trace(const Beamline& beamline) {
+    // init, if not yet initialized.
+    if (m_engine.state() == VulkanEngine::EngineState::PREINIT) {
+        // Set buffer settings (DEBUG OR RELEASE)
+        RAYX_LOG << "Initializing Vulkan Tracer..";
+        m_engine.declareBuffer("ray-buffer",
+                               {.m_binding = 0, .m_in = true, .m_out = false});
+        m_engine.declareBuffer("output-buffer",
+                               {.m_binding = 1, .m_in = false, .m_out = true});
+        m_engine.declareBuffer("quadric-buffer",
+                               {.m_binding = 2, .m_in = true, .m_out = false});
+        m_engine.declareBuffer("xyznull-buffer",
+                               {.m_binding = 3, .m_in = false, .m_out = false});
+        m_engine.declareBuffer("material-index-table",
+                               {.m_binding = 4, .m_in = true, .m_out = false});
+        m_engine.declareBuffer("material-table",
+                               {.m_binding = 5, .m_in = true, .m_out = false});
+    #ifdef RAYX_DEBUG_MODE
+        m_engine.declareBuffer("debug-buffer",
+                               {.m_binding = 6, .m_in = false, .m_out = true});
+    #endif
+        m_engine.init({.m_shader = "build/bin/comp.spv"});
+    }
+
     auto rayList = beamline.getInputRays();
 
     uint32_t numberOfBeamlines = 1;

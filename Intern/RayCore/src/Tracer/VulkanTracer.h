@@ -8,7 +8,7 @@ namespace RAYX {
 
 class RAYX_API VulkanTracer : public Tracer {
   public:
-    VulkanTracer();
+    VulkanTracer() = default;
     ~VulkanTracer() = default;
 
     std::vector<Ray> trace(const Beamline&) override;
