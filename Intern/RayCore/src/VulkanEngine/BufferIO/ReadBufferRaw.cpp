@@ -27,7 +27,7 @@ void VulkanEngine::readBufferRaw(const char* bufname, char* outdata) {
     }
 }
 
-void VulkanEngine::loadFromStagingBuffer(char* outdata, uint32_t bytes) {
+void VulkanEngine::loadFromStagingBuffer(char* outdata, size_t bytes) {
     void* buf;
 
     vkMapMemory(m_Device, m_stagingMemory, 0, bytes, 0, &buf);

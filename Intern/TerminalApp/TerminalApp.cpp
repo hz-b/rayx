@@ -14,6 +14,9 @@ TerminalApp::TerminalApp(int argc, char** argv) : m_argv(argv), m_argc(argc) {
     initPathResolver();
     RAYX_D_LOG << "TerminalApp created!";
 
+    /// warn if the binary is not compiled with 32-bit (i.e. sizeof(void*) == 4)
+    /// or worse.
+    /// 64-bit has sizeof(void*) == 8.
     if (sizeof(void*) <= 4) {
         RAYX_WARN
             << "This application should be compiled as 64-bit! Using 32-bit"

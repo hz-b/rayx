@@ -112,7 +112,8 @@ class RAYX_API VulkanEngine {
     const char* m_shaderfile;
     uint32_t m_numberOfInvocations;
 
-    /// there is only a single staging buffer. This one.
+    /// This is the only staging buffer of the VulkanEngine.
+    /// It's size is STAGING_SIZE.
     VkBuffer m_stagingBuffer;
     /// the memory of the staging buffer above.
     VkDeviceMemory m_stagingMemory;
@@ -163,8 +164,8 @@ class RAYX_API VulkanEngine {
     /// copies data from one buffer to the other with given offsets.
     /// note that gpuMemcpy copies from left to right, unlike the original memcpy.
     /// this is used for the buffer <-> staging buffer communication in {read,write}BufferRaw.
-    void gpuMemcpy(VkBuffer& buffer_src, uint32_t offset_src,
-                   VkBuffer& buffer_dst, uint32_t offset_dst, uint32_t bytes);
+    void gpuMemcpy(VkBuffer& buffer_src, size_t offset_src,
+                   VkBuffer& buffer_dst, size_t offset_dst, size_t bytes);
 
     /// reads a buffer and writes the data to `outdata`.
     /// the full buffer is read (the size is `m_buffers[bufname].m_size`)
@@ -179,10 +180,10 @@ class RAYX_API VulkanEngine {
     void writeBufferRaw(const char* bufname, char* indata);
 
     /// loads `bytes` many bytes from the staging buffer into `outdata`.
-    void loadFromStagingBuffer(char* outdata, uint32_t bytes);
+    void loadFromStagingBuffer(char* outdata, size_t bytes);
 
     /// writes `bytes` many bytes from `indata` into the staging buffer.
-    void storeToStagingBuffer(char* indata, uint32_t bytes);
+    void storeToStagingBuffer(char* indata, size_t bytes);
 };
 
 // Used for validating return values of Vulkan API calls.
@@ -198,12 +199,13 @@ class RAYX_API VulkanEngine {
         }                                                                \
     }
 
-// set debug generation information
 const std::vector<const char*> validationLayers = {
     "VK_LAYER_KHRONOS_validation"};
 
 const int WORKGROUP_SIZE = 32;
-const uint32_t STAGING_SIZE = 134217728;  // in bytes, equal to 128MB.
+
+/// size of the staging buffer in bytes, equal to 128MB.
+const size_t STAGING_SIZE = 134217728;
 
 #ifdef NDEBUG
 const bool enableValidationLayers = false;

@@ -1,9 +1,9 @@
 #include "VulkanEngine/VulkanEngine.h"
 
 namespace RAYX {
-void VulkanEngine::gpuMemcpy(VkBuffer& buffer_src, uint32_t offset_src,
-                             VkBuffer& buffer_dst, uint32_t offset_dst,
-                             uint32_t bytes) {
+void VulkanEngine::gpuMemcpy(VkBuffer& buffer_src, size_t offset_src,
+                             VkBuffer& buffer_dst, size_t offset_dst,
+                             size_t bytes) {
     RAYX_PROFILE_FUNCTION();
     VkCommandBufferAllocateInfo allocInfo{};
     allocInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
