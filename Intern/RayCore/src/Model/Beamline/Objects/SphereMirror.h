@@ -10,7 +10,8 @@ namespace RAYX {
 class RAYX_API SphereMirror : public OpticalElement {
   public:
     // calculate radius in this class
-    SphereMirror(const char* name, OpticalElement::GeometricalShape geometricalShape,
+    SphereMirror(const char* name,
+                 OpticalElement::GeometricalShape geometricalShape,
                  const double width, const double height,
                  const double azimuthalAngle,
                  const double grazingIncidenceAngle, glm::dvec4 position,
@@ -18,7 +19,8 @@ class RAYX_API SphereMirror : public OpticalElement {
                  const double exitArmLength,
                  const std::array<double, 7> slopeError, Material mat);
     // radius is precalculated and given as a parameter
-    SphereMirror(const char* name, OpticalElement::GeometricalShape geometricalShape,
+    SphereMirror(const char* name,
+                 OpticalElement::GeometricalShape geometricalShape,
                  const double width, const double height,
                  const double azimuthalAngle, double radius,
                  glm::dvec4 position, glm::dmat4x4 orientation,

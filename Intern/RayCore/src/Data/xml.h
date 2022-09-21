@@ -57,7 +57,7 @@ bool paramSlopeError(const rapidxml::xml_node<>* node,
                      std::array<double, 7>* out);
 bool paramVls(const rapidxml::xml_node<>* node, std::array<double, 6>* out);
 bool paramEnergyDistribution(const rapidxml::xml_node<>* node,
-                             const std::filesystem::path &rmlFile,
+                             const std::filesystem::path& rmlFile,
                              EnergyDistribution* out);
 
 bool paramPositionAndOrientation(const rapidxml::xml_node<>* node,

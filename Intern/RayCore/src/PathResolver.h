@@ -6,7 +6,8 @@
 
 #include "Core.h"
 
-// the path resolver has to be initialized with the path of the executable: argv[0].
+// the path resolver has to be initialized with the path of the executable:
+// argv[0].
 void RAYX_API initPathResolver();
 
 /** @param path: path relative to the root of the repository.
