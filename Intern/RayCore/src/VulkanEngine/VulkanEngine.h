@@ -48,7 +48,7 @@ class RAYX_API VulkanEngine {
     /// creates a buffer and fill it with the data given in vec.
     /// the buffer will have exactly the size to fit all elements of vec.
     template <typename T>
-    inline void createBufferWithData(const char* bufname, std::vector<T> vec) {
+    inline void createBufferWithData(const char* bufname, const std::vector<T>& vec) {
         createBuffer(bufname, vec.size() * sizeof(T));
         writeBufferRaw(bufname, (char*)vec.data());
     }
