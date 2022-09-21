@@ -18,8 +18,8 @@ do
     fi
     if [[ "$var" == "--help" ]]; then
         echo "Usage:"
-        echo " ./compile"
-        echo " ./compile --release"
+        echo " ./compile.sh"
+        echo " ./compile.sh --release"
         exit
     fi
 done
