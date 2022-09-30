@@ -94,14 +94,14 @@ void PythonInterp::execute() {
     } else {
         PyErr_Print();
         throw std::runtime_error(
-            "Error while running the python module: [ERR010]" +
+            "Error while running the python module: Wrong Func[ERR010]" +
             (std::string)(m_funcName));
     }
 
     if (PyLong_AsLong(m_presult) == 0 || !m_presult) {
         cleanup();
         throw std::runtime_error(
-            "Error while running the python module: [ERR011]" +
+            "Error while running the python module: Bad Res[ERR011]" +
             (std::string)(m_funcName));
     }
     cleanup();
@@ -115,9 +115,9 @@ void PythonInterp::cleanup() {
     // Clean up and free allocated memory
     Py_DECREF(m_pModule);
     Py_DECREF(m_pName);
-    // Py_DECREF(m_pValue);
-    // Py_DECREF(m_pFunc);
-    // Py_DECREF(m_presult);
+    Py_XDECREF(m_pValue);
+    Py_XDECREF(m_pFunc);
+    Py_XDECREF(m_pDict);
 
     // Finish the Python Interpreter
     Py_Finalize();
@@ -137,8 +137,7 @@ void PythonInterp::setPlotName(const char* outputName) {
  *  _plotLikeRAYUI = 1
  *  _plotForEach = 2
  *  _plotForEachSubplot = 3
- * @param plotType Name of input file. Defaults to NULL (Plotting
- * related)
+ * @param plotType Type of plot to generate
  */
 void PythonInterp::setPlotType(int plotType) {
     if (plotType < 1 || plotType > 3) {
