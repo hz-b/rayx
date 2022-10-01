@@ -10,3 +10,6 @@
 [submodule "Extern/googletest"]
 	path = Extern/googletest
 	url = https://github.com/google/googletest
+[submodule "Extern/matplotlib-cpp"]
+	path = Extern/matplotlib-cpp
+	url = https://github.com/lava/matplotlib-cpp
