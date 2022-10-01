@@ -99,9 +99,12 @@ void TerminalApp::run() {
                         .count()
                  << " ms";
     }
-
+    int c; 
     //  Plot in Python
     if (m_CommandParser->m_args.m_plotFlag) {
+        std::shared_ptr<RAYX::Plotter> plotter = std::make_shared<RAYX::Plotter> ();
+        plotter->plot();
+        std::cin >> c ;
         // Setup to create venv if needed
         try {
             std::shared_ptr<PythonInterp> pySetup =

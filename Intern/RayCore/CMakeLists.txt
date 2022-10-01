@@ -59,6 +59,7 @@ SET(SOURCE
     src/Writer/H5Writer.cpp
     src/UserParameter/WorldUserParams.cpp
     src/UserParameter/GeometricUserParams.cpp
+    src/Plotter/Plotter.cpp
 )
 
 SET(HEADERS
@@ -102,6 +103,7 @@ SET(HEADERS
     src/Material/PalikTable.h
     src/UserParameter/WorldUserParams.h
     src/UserParameter/GeometricUserParams.h
+    src/Plotter/Plotter.h
 )
 
 add_library(${PROJECT_NAME} SHARED ${SOURCE} ${HEADERS} )
@@ -186,4 +188,27 @@ endif ()
 
 add_custom_target(COMPILE_SHADER ALL
     DEPENDS ${COMPILED_SHADER}
+)
+# find python libraries
+find_package(Python3 COMPONENTS Interpreter Development NumPy REQUIRED)
+find_package(PythonLibs 3.0 REQUIRED)
+include_directories(${PYTHON3_INCLUDE_DIRS} ${NumPy_INCLUDE_DIRS})
+
+# populate matplotlib repository
+include(FetchContent)
+FetchContent_Declare(
+    matplotlib
+    GIT_REPOSITORY https://github.com/lava/matplotlib-cpp.git
+    GIT_TAG        f23347fca25219d1c42cbb91608b5556814bf572
+)
+FetchContent_GetProperties(matplotlib)
+if(NOT matplotlib_POPULATED)
+    FetchContent_Populate(matplotlib)
+endif()
+include_directories(${PROJECT_NAME} PRIVATE ${matplotlib_SOURCE_DIR})
+# link python and numpy
+target_link_libraries(${PROJECT_NAME}
+    PRIVATE
+        ${PYTHON_LIBRARIES}
+        Python3::NumPy
 )

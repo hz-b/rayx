@@ -9,6 +9,7 @@
 #include "PythonInterp.h"
 #include "RayCore.h"
 #include "TerminalAppConfig.h"
+#include "Plotter/Plotter.h"
 
 // Virtual python Environment Path
 #ifdef WIN32  // Todo
