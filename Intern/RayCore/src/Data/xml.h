@@ -9,7 +9,7 @@
 #include "Material/Material.h"
 #include "Model/Beamline/EnergyDistribution.h"
 #include "Model/Beamline/LightSource.h"
-#include "UserParameter/GeometricUserParams.h"
+#include "Model/Beamline/OpticalElement.h"
 #include "utils.h"
 
 namespace RAYX {

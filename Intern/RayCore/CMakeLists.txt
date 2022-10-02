@@ -57,8 +57,6 @@ SET(SOURCE
     src/VulkanEngine/Run/Run.cpp
     src/Writer/CSVWriter.cpp
     src/Writer/H5Writer.cpp
-    src/UserParameter/WorldUserParams.cpp
-    src/UserParameter/GeometricUserParams.cpp
 )
 
 SET(HEADERS
@@ -100,8 +98,6 @@ SET(HEADERS
     src/Material/Material.h
     src/Material/NffTable.h
     src/Material/PalikTable.h
-    src/UserParameter/WorldUserParams.h
-    src/UserParameter/GeometricUserParams.h
 )
 
 add_library(${PROJECT_NAME} SHARED ${SOURCE} ${HEADERS} )

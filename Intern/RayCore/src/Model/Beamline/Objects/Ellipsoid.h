@@ -5,8 +5,6 @@
 
 #include "Model/Beamline/OpticalElement.h"
 #include "Model/Surface/Quadric.h"
-#include "UserParameter/GeometricUserParams.h"
-#include "UserParameter/WorldUserParams.h"
 
 namespace RAYX {
 enum class FigureRotation { Yes, Plane, A11 };

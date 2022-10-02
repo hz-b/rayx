@@ -1,7 +1,6 @@
 #pragma once
 #include <Data/xml.h>
 #include <Material/Material.h>
-#include <UserParameter/GeometricUserParams.h>
 
 #include "Model/Beamline/OpticalElement.h"
 #include "Model/Surface/Quadric.h"
@@ -21,8 +20,6 @@ class RAYX_API SphereGrating : public OpticalElement {
 
     static std::shared_ptr<SphereGrating> createFromXML(const xml::Parser&);
 
-    // TODO (Theresa): should ideally be removed as soon as radius calculation
-    // is simplified in GeometricUSerParams.cpp
     void calcRadius();
     void calcAlpha(double deviation, double normalIncidence);
     void focus(double angle);

@@ -7,7 +7,6 @@
 #include "Model/Beamline/OpticalElement.h"
 #include "Model/Surface/Quadric.h"
 #include "Model/Surface/Toroid.h"
-#include "UserParameter/GeometricUserParams.h"
 
 namespace RAYX {
 

@@ -14,6 +14,9 @@
 
 namespace RAYX {
 
+enum class GratingMount { Deviation, Incidence };
+enum class ImageType { Point2Point, Astigmatic2Astigmatic };
+
 class RAYX_API OpticalElement {
   public:
     enum class GeometricalShape {

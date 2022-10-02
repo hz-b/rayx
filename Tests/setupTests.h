@@ -14,8 +14,6 @@
 #include "Tracer/CpuTracer.h"
 #include "Tracer/Ray.h"
 #include "Tracer/VulkanTracer.h"
-#include "UserParameter/GeometricUserParams.h"
-#include "UserParameter/WorldUserParams.h"
 #include "Writer/CSVWriter.h"
 #include "gmock/gmock.h"
 #include "gtest/gtest.h"

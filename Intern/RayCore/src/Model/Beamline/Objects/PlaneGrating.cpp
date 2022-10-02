@@ -6,8 +6,8 @@ namespace RAYX {
 
 /**
  * constructor that assumes that incidence and exit angle are already calculated
- * (geometricUserParams.cpp) and the position and orientation has been derived
- * from them already (WorldUserParameters.cpp)
+ * and the position and orientation has been derived
+ * from them already
  *
  * @param name                  name of element
  * @param geometricalShape      0/1 rectangle/elliptical
