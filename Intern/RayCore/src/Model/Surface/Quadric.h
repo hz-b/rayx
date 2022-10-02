@@ -15,8 +15,7 @@ class RAYX_API Quadric : public Surface {
     // dtor
     ~Quadric();
 
-    [[maybe_unused]] [[maybe_unused]] void setAnchorPoints(
-        glm::dmat4x4 inputPoints);
+    [[maybe_unused]] [[maybe_unused]] void setAnchorPoints(glm::dmat4x4 inputPoints);
     glm::dmat4x4 getParams() const;
 
   private:

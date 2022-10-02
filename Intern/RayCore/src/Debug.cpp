@@ -39,9 +39,7 @@ void formatDebugMsg(std::string filename, int line, std::ostream& o) {
     o << "[" << pad << filename << ":" << line_string << "] ";
 }
 
-Log::Log(std::string filename, int line) {
-    formatDebugMsg(std::move(filename), line, std::cout);
-}
+Log::Log(std::string filename, int line) { formatDebugMsg(std::move(filename), line, std::cout); }
 
 Log::~Log() { std::cout << std::endl; }
 
@@ -51,11 +49,11 @@ Warn::Warn(std::string filename, int line) {
 }
 
 Warn::~Warn() {
-    std::cerr << std::endl << "\033[0m";  // color reset
+    std::cerr << std::endl
+              << "\033[0m";  // color reset
 }
 
-Err::Err(const std::string& filename, int line)
-    : filename(filename), line(line) {
+Err::Err(const std::string& filename, int line) : filename(filename), line(line) {
     std::cerr << "\x1B[31m";  // color red
     formatDebugMsg(filename, line, std::cerr);
 }
@@ -73,8 +71,7 @@ void (*error_fn)() = exit1;
 
 const int PREC = 17;
 
-void dbg(const std::string& filename, int line, std::string name,
-         std::vector<double> v) {
+void dbg(const std::string& filename, int line, std::string name, std::vector<double> v) {
     RAYX::Log(filename, line) << std::move(name) << ":";
 
     int counter = 0;  // stores the number of elements in the stringstream
@@ -86,8 +83,7 @@ void dbg(const std::string& filename, int line, std::string name,
         s << std::setprecision(PREC) << v[i];
 
         counter++;
-        if (counter == 4 &&
-            v.size() == 16) {  // 4x4 things should be written in 4 rows
+        if (counter == 4 && v.size() == 16) {  // 4x4 things should be written in 4 rows
             counter = 0;
             RAYX::Log(filename, line) << s.str();
             s = std::stringstream();

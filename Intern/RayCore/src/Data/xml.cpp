@@ -12,14 +12,12 @@
 namespace RAYX::xml {
 
 // general scope functions:
-bool param(const rapidxml::xml_node<>* node, const char* paramname,
-           rapidxml::xml_node<>** out) {
+bool param(const rapidxml::xml_node<>* node, const char* paramname, rapidxml::xml_node<>** out) {
     if (!node || !out) {
         return false;
     }
 
-    for (rapidxml::xml_node<>* p = node->first_node(); p;
-         p = p->next_sibling()) {
+    for (rapidxml::xml_node<>* p = node->first_node(); p; p = p->next_sibling()) {
         if (strcmp(p->name(), "param") != 0) {
             continue;
         }
@@ -31,8 +29,7 @@ bool param(const rapidxml::xml_node<>* node, const char* paramname,
     return false;
 }
 
-bool paramDouble(const rapidxml::xml_node<>* node, const char* paramname,
-                 double* out) {
+bool paramDouble(const rapidxml::xml_node<>* node, const char* paramname, double* out) {
     if (!node || !out) {
         return false;
     }
@@ -48,8 +45,7 @@ bool paramDouble(const rapidxml::xml_node<>* node, const char* paramname,
     return true;
 }
 
-bool paramInt(const rapidxml::xml_node<>* node, const char* paramname,
-              int* out) {
+bool paramInt(const rapidxml::xml_node<>* node, const char* paramname, int* out) {
     if (!node || !out) {
         return false;
     }
@@ -65,8 +61,7 @@ bool paramInt(const rapidxml::xml_node<>* node, const char* paramname,
     return true;
 }
 
-bool paramStr(const rapidxml::xml_node<>* node, const char* paramname,
-              const char** out) {
+bool paramStr(const rapidxml::xml_node<>* node, const char* paramname, const char** out) {
     if (!node || !out) {
         return false;
     }
@@ -79,8 +74,7 @@ bool paramStr(const rapidxml::xml_node<>* node, const char* paramname,
     return true;
 }
 
-bool paramDvec3(const rapidxml::xml_node<>* node, const char* paramname,
-                glm::dvec3* out) {
+bool paramDvec3(const rapidxml::xml_node<>* node, const char* paramname, glm::dvec3* out) {
     if (!node || !out) {
         return false;
     }
@@ -93,8 +87,7 @@ bool paramDvec3(const rapidxml::xml_node<>* node, const char* paramname,
     const char* names[3] = {"x", "y", "z"};
     double* ptrs[3] = {&out->x, &out->y, &out->z};
 
-    for (rapidxml::xml_node<>* p = subnode->first_node(); p;
-         p = p->next_sibling()) {
+    for (rapidxml::xml_node<>* p = subnode->first_node(); p; p = p->next_sibling()) {
         for (uint32_t i = 0; i < 3; i++) {
             if (strcmp(p->name(), names[i]) == 0) {
                 if (sscanf(p->value(), "%le", ptrs[i]) != 1) {
@@ -108,8 +101,7 @@ bool paramDvec3(const rapidxml::xml_node<>* node, const char* paramname,
     return true;
 }
 
-bool paramMisalignment(const rapidxml::xml_node<>* node,
-                       std::array<double, 6>* out) {
+bool paramMisalignment(const rapidxml::xml_node<>* node, std::array<double, 6>* out) {
     if (!node || !out) {
         return false;
     }
@@ -157,8 +149,7 @@ bool paramPositionNoGroup(const rapidxml::xml_node<>* node, glm::dvec4* out) {
     return true;
 }
 
-bool paramOrientationNoGroup(const rapidxml::xml_node<>* node,
-                             glm::dmat4x4* out) {
+bool paramOrientationNoGroup(const rapidxml::xml_node<>* node, glm::dmat4x4* out) {
     if (!node || !out) {
         return false;
     }
@@ -177,8 +168,7 @@ bool paramOrientationNoGroup(const rapidxml::xml_node<>* node,
 #ifdef RAYX_DEBUG_MODE
 
     // check if vectors are a basis (determinant =/= 0)
-    glm::dmat3x3 worldDirections = {worldXdirection, worldYdirection,
-                                    worldZdirection};
+    glm::dmat3x3 worldDirections = {worldXdirection, worldYdirection, worldZdirection};
     double determinant = glm::determinant(worldDirections);
 
     if (determinant == 0) {
@@ -203,8 +193,7 @@ bool paramOrientationNoGroup(const rapidxml::xml_node<>* node,
     return true;
 }
 
-bool paramSlopeError(const rapidxml::xml_node<>* node,
-                     std::array<double, 7>* out) {
+bool paramSlopeError(const rapidxml::xml_node<>* node, std::array<double, 7>* out) {
     if (!node || !out) {
         return false;
     }
@@ -259,20 +248,16 @@ bool paramVls(const rapidxml::xml_node<>* node, std::array<double, 6>* out) {
     return true;
 }
 
-bool paramEnergyDistribution(const rapidxml::xml_node<>* node,
-                             const std::filesystem::path& rmlFile,
-                             EnergyDistribution* out) {
+bool paramEnergyDistribution(const rapidxml::xml_node<>* node, const std::filesystem::path& rmlFile, EnergyDistribution* out) {
     if (!node || !out) {
         return false;
     }
 
     int energyDistributionType_int;
-    if (!xml::paramInt(node, "energyDistributionType",
-                       &energyDistributionType_int)) {
+    if (!xml::paramInt(node, "energyDistributionType", &energyDistributionType_int)) {
         return false;
     }
-    auto energyDistributionType =
-        static_cast<EnergyDistributionType>(energyDistributionType_int);
+    auto energyDistributionType = static_cast<EnergyDistributionType>(energyDistributionType_int);
 
     int spreadType_int;
     if (!xml::paramInt(node, "energySpreadType", &spreadType_int)) {
@@ -288,9 +273,8 @@ bool paramEnergyDistribution(const rapidxml::xml_node<>* node,
             return false;
         }
         std::filesystem::path path = std::filesystem::canonical(rmlFile);
-        path.replace_filename(
-            filename);  // this makes the path `filename` be relative to the
-                        // path of the rml file
+        path.replace_filename(filename);  // this makes the path `filename` be relative to the
+                                          // path of the rml file
 
         DatFile df;
         if (!DatFile::load(path, &df)) {
@@ -311,8 +295,7 @@ bool paramEnergyDistribution(const rapidxml::xml_node<>* node,
             return false;
         }
 
-        *out = EnergyDistribution(EnergyRange(photonEnergy, energySpread),
-                                  continuous);
+        *out = EnergyDistribution(EnergyRange(photonEnergy, energySpread), continuous);
 
         return true;
     } else {
@@ -323,9 +306,8 @@ bool paramEnergyDistribution(const rapidxml::xml_node<>* node,
     }
 }
 
-bool paramPositionAndOrientation(const rapidxml::xml_node<>* node,
-                                 const std::vector<xml::Group>& group_context,
-                                 glm::dvec4* out_pos, glm::dmat4x4* out_ori) {
+bool paramPositionAndOrientation(const rapidxml::xml_node<>* node, const std::vector<xml::Group>& group_context, glm::dvec4* out_pos,
+                                 glm::dmat4x4* out_ori) {
     // Always returns True!
     std::array<double, 6> misalignment{};
     misalignment.fill(0.f);
@@ -334,10 +316,8 @@ bool paramPositionAndOrientation(const rapidxml::xml_node<>* node,
     paramOrientationNoGroup(node, out_ori);
     paramMisalignment(node, &misalignment);
 
-    glm::dmat4x4 misOrientation =
-        getRotationMatrix(-misalignment[3], misalignment[4], misalignment[5]);
-    glm::dvec4 offset =
-        glm::dvec4(misalignment[0], misalignment[1], misalignment[2], 1);
+    glm::dmat4x4 misOrientation = getRotationMatrix(-misalignment[3], misalignment[4], misalignment[5]);
+    glm::dvec4 offset = glm::dvec4(misalignment[0], misalignment[1], misalignment[2], 1);
     // no need to add misalignment again
     if (group_context.empty()) {
         return true;
@@ -395,16 +375,10 @@ bool parseGroup(rapidxml::xml_node<>* node, xml::Group* out) {
 
 // Parser implementation
 
-Parser::Parser(rapidxml::xml_node<>* node,
-               std::vector<xml::Group> group_context,
-               std::filesystem::path rmlFile)
-    : node(node),
-      group_context(std::move(group_context)),
-      rmlFile(std::move(rmlFile)) {}
+Parser::Parser(rapidxml::xml_node<>* node, std::vector<xml::Group> group_context, std::filesystem::path rmlFile)
+    : node(node), group_context(std::move(group_context)), rmlFile(std::move(rmlFile)) {}
 
-const char* Parser::name() const {
-    return node->first_attribute("name")->value();
-}
+const char* Parser::name() const { return node->first_attribute("name")->value(); }
 
 // parsers for fundamental types
 double Parser::parseDouble(const char* paramname) const {
@@ -493,8 +467,7 @@ glm::dmat4x4 Parser::parseOrientation() const {
 Material Parser::parseMaterial() const {
     Material m;
     if (!paramMaterial(node, &m)) {
-        RAYX_D_LOG
-            << "No material specified in RML file: defaulting to copper!";
+        RAYX_D_LOG << "No material specified in RML file: defaulting to copper!";
         return Material::Cu;
     }
     return m;

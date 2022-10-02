@@ -16,50 +16,24 @@ TEST_F(TestSuite, SphereMirrorDefault) {
     compareAgainstRayUI("SphereMirrorDefault",
                         1e-7);  // TODO(Rudi) this tolerance is not so great.
 }
-TEST_F(TestSuite, PlaneGratingDeviationDefault) {
-    compareAgainstRayUI("PlaneGratingDeviationDefault");
-}
-TEST_F(TestSuite, PlaneGratingDeviationAz) {
-    compareAgainstRayUI("PlaneGratingDeviationAz");
-}
-TEST_F(TestSuite, PlaneGratingDeviationAzMis) {
-    compareAgainstRayUI("PlaneGratingDeviationAzMis");
-}
+TEST_F(TestSuite, PlaneGratingDeviationDefault) { compareAgainstRayUI("PlaneGratingDeviationDefault"); }
+TEST_F(TestSuite, PlaneGratingDeviationAz) { compareAgainstRayUI("PlaneGratingDeviationAz"); }
+TEST_F(TestSuite, PlaneGratingDeviationAzMis) { compareAgainstRayUI("PlaneGratingDeviationAzMis"); }
 
 TEST_F(TestSuite, BoringImagePlane) { compareAgainstRayUI("BoringImagePlane"); }
 
-TEST_F(TestSuite, CylinderDefault) {
-    compareAgainstRayUI("CylinderDefault", 1e-7);
-}
+TEST_F(TestSuite, CylinderDefault) { compareAgainstRayUI("CylinderDefault", 1e-7); }
 
-TEST_F(TestSuite, PlaneGratingDevAzMisVLS) {
-    compareAgainstRayUI("PlaneGratingDevAzMisVLS", 1e-7);
-}
-TEST_F(TestSuite, PlaneGratingIncAzMis) {
-    compareAgainstRayUI("PlaneGratingIncAzMis");
-}
-TEST_F(TestSuite, ReflectionZonePlateAzim200) {
-    compareAgainstRayUI("ReflectionZonePlateAzim200", 1e-7);
-}
-TEST_F(TestSuite, ReflectionZonePlateDefault) {
-    compareAgainstRayUI("ReflectionZonePlateDefault");
-}
-TEST_F(TestSuite, ReflectionZonePlateDefault200) {
-    compareAgainstRayUI("ReflectionZonePlateDefault200", 1e-7);
-}
-TEST_F(TestSuite, ReflectionZonePlateDefault200Toroid) {
-    compareAgainstRayUI("ReflectionZonePlateDefault200Toroid", 1e-7);
-}
-TEST_F(TestSuite, ReflectionZonePlateMis) {
-    compareAgainstRayUI("ReflectionZonePlateMis", 1e-7);
-}
+TEST_F(TestSuite, PlaneGratingDevAzMisVLS) { compareAgainstRayUI("PlaneGratingDevAzMisVLS", 1e-7); }
+TEST_F(TestSuite, PlaneGratingIncAzMis) { compareAgainstRayUI("PlaneGratingIncAzMis"); }
+TEST_F(TestSuite, ReflectionZonePlateAzim200) { compareAgainstRayUI("ReflectionZonePlateAzim200", 1e-7); }
+TEST_F(TestSuite, ReflectionZonePlateDefault) { compareAgainstRayUI("ReflectionZonePlateDefault"); }
+TEST_F(TestSuite, ReflectionZonePlateDefault200) { compareAgainstRayUI("ReflectionZonePlateDefault200", 1e-7); }
+TEST_F(TestSuite, ReflectionZonePlateDefault200Toroid) { compareAgainstRayUI("ReflectionZonePlateDefault200Toroid", 1e-7); }
+TEST_F(TestSuite, ReflectionZonePlateMis) { compareAgainstRayUI("ReflectionZonePlateMis", 1e-7); }
 
-TEST_F(TestSuite, globalCoordinates_20rays) {
-    compareAgainstRayUI("globalCoordinates_20rays");
-}
-TEST_F(TestSuite, pm_ell_ip_200mirrormis) {
-    compareAgainstRayUI("pm_ell_ip_200mirrormis");
-}
+TEST_F(TestSuite, globalCoordinates_20rays) { compareAgainstRayUI("globalCoordinates_20rays"); }
+TEST_F(TestSuite, pm_ell_ip_200mirrormis) { compareAgainstRayUI("pm_ell_ip_200mirrormis"); }
 
 TEST_F(TestSuite, Ellipsoid) {
     auto rayx = traceRML("Ellipsoid", Filter::OnlySequentialRays);
@@ -97,6 +71,4 @@ TEST_F(TestSuite, Ellipsoid_MB) { compareAgainstRayUI("Ellipsoid_MB"); }
 // Ellipsoid?
 TEST_F(TestSuite, Ellipsoid_PM) { compareAgainstRayUI("Ellipsoid_PM"); }
 
-TEST_F(TestSuite, ellipsoid_ip_200mirrormis) {
-    compareAgainstRayUI("ellipsoid_ip_200mirrormis");
-}
+TEST_F(TestSuite, ellipsoid_ip_200mirrormis) { compareAgainstRayUI("ellipsoid_ip_200mirrormis"); }

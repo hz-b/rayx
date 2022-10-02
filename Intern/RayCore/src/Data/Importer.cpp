@@ -13,8 +13,7 @@
 
 namespace RAYX {
 
-void addBeamlineObjectFromXML(rapidxml::xml_node<>* node, Beamline* beamline,
-                              const std::vector<xml::Group>& group_context,
+void addBeamlineObjectFromXML(rapidxml::xml_node<>* node, Beamline* beamline, const std::vector<xml::Group>& group_context,
                               std::filesystem::path filename) {
     const char* type = node->first_attribute("type")->value();
 
@@ -24,26 +23,22 @@ void addBeamlineObjectFromXML(rapidxml::xml_node<>* node, Beamline* beamline,
 
     // addLightSource(s, node) is a function adding a light source to the
     // beamline (if it's not nullptr)
-    const auto addLightSource = [&](const std::shared_ptr<LightSource>& s,
-                                    rapidxml::xml_node<>* node) {
+    const auto addLightSource = [&](const std::shared_ptr<LightSource>& s, rapidxml::xml_node<>* node) {
         if (s) {
             beamline->m_LightSources.push_back(s);
         } else {
-            RAYX_ERR << "could not construct LightSource with Name: "
-                     << node->first_attribute("name")->value()
+            RAYX_ERR << "could not construct LightSource with Name: " << node->first_attribute("name")->value()
                      << "; Type: " << node->first_attribute("type")->value();
         }
     };
 
     // addOpticalElement(e, node) is a function adding an optical element to the
     // beamline (if it's not nullptr)
-    const auto addOpticalElement = [&](const std::shared_ptr<OpticalElement>& e,
-                                       rapidxml::xml_node<>* node) {
+    const auto addOpticalElement = [&](const std::shared_ptr<OpticalElement>& e, rapidxml::xml_node<>* node) {
         if (e) {
             beamline->m_OpticalElements.push_back(e);
         } else {
-            RAYX_ERR << "could not construct OpticalElement with Name: "
-                     << node->first_attribute("name")->value()
+            RAYX_ERR << "could not construct OpticalElement with Name: " << node->first_attribute("name")->value()
                      << "; Type: " << node->first_attribute("type")->value();
         }
     };
@@ -79,8 +74,7 @@ void addBeamlineObjectFromXML(rapidxml::xml_node<>* node, Beamline* beamline,
     } else if (strcmp(type, "Cylinder") == 0) {
         addOpticalElement(Cylinder::createFromXML(parser), node);
     } else {
-        RAYX_WARN << "could not classify beamline object with Name: "
-                  << node->first_attribute("name")->value()
+        RAYX_WARN << "could not classify beamline object with Name: " << node->first_attribute("name")->value()
                   << "; Type: " << node->first_attribute("type")->value();
     }
 }
@@ -88,15 +82,11 @@ void addBeamlineObjectFromXML(rapidxml::xml_node<>* node, Beamline* beamline,
 /** `collection` is an xml object, over whose children-objects we want to
  * iterate in order to add them to the beamline.
  * `collection` may either be a <beamline> or a <group>. */
-void handleObjectCollection(rapidxml::xml_node<>* collection,
-                            Beamline* beamline,
-                            std::vector<xml::Group>* group_context,
+void handleObjectCollection(rapidxml::xml_node<>* collection, Beamline* beamline, std::vector<xml::Group>* group_context,
                             const std::filesystem::path& filename) {
-    for (rapidxml::xml_node<>* object = collection->first_node(); object;
-         object = object->next_sibling()) {  // Iterating through objects
+    for (rapidxml::xml_node<>* object = collection->first_node(); object; object = object->next_sibling()) {  // Iterating through objects
         if (strcmp(object->name(), "object") == 0) {
-            addBeamlineObjectFromXML(object, beamline, *group_context,
-                                     filename);
+            addBeamlineObjectFromXML(object, beamline, *group_context, filename);
         } else if (strcmp(object->name(), "group") == 0) {
             xml::Group g{};
             bool success = xml::parseGroup(object, &g);
@@ -126,17 +116,14 @@ Beamline importBeamline(const std::filesystem::path& filename) {
     buffer << t.rdbuf();
     std::string test = buffer.str();
     if (test.empty()) {
-        RAYX_ERR
-            << "importBeamline could not open file! (or it was just empty)";
+        RAYX_ERR << "importBeamline could not open file! (or it was just empty)";
     }
     std::vector<char> cstr(test.c_str(), test.c_str() + test.size() + 1);
     rapidxml::xml_document<> doc;
     doc.parse<0>(cstr.data());
 
-    RAYX_LOG << "\t Version: "
-             << doc.first_node("lab")->first_node("version")->value();
-    rapidxml::xml_node<>* xml_beamline =
-        doc.first_node("lab")->first_node("beamline");
+    RAYX_LOG << "\t Version: " << doc.first_node("lab")->first_node("version")->value();
+    rapidxml::xml_node<>* xml_beamline = doc.first_node("lab")->first_node("beamline");
 
     Beamline beamline;
     std::vector<xml::Group> group_context;

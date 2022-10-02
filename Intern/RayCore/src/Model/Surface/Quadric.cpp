@@ -22,9 +22,7 @@ Quadric::~Quadric() = default;
  * @param inputPoints   16 entry vector a_11 to a_44
  * @return void
  */
-[[maybe_unused]] void Quadric::setAnchorPoints(glm::dmat4x4 inputPoints) {
-    m_parameters = inputPoints;
-}
+[[maybe_unused]] void Quadric::setAnchorPoints(glm::dmat4x4 inputPoints) { m_parameters = inputPoints; }
 
 /**
  * ENCODING:

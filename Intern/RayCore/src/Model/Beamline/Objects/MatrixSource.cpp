@@ -35,29 +35,21 @@ namespace RAYX {
  * @param misalignment      if the source is moved/turned in any direction
  * (affects x,y position and x,y direction)
  */
-MatrixSource::MatrixSource(const std::string& name, int numberOfRays,
-                           EnergyDistribution dist, const double sourceWidth,
-                           const double sourceHeight, const double sourceDepth,
-                           const double horDivergence,
-                           const double verDivergence, const double linPol0,
-                           const double linPol45, const double circPol,
-                           const std::array<double, 6> misalignment)
-    : LightSource(name.c_str(), numberOfRays, std::move(dist), linPol0,
-                  linPol45, circPol, misalignment, sourceDepth, sourceHeight,
-                  sourceWidth, horDivergence, verDivergence) {
+MatrixSource::MatrixSource(const std::string& name, int numberOfRays, EnergyDistribution dist, const double sourceWidth, const double sourceHeight,
+                           const double sourceDepth, const double horDivergence, const double verDivergence, const double linPol0,
+                           const double linPol45, const double circPol, const std::array<double, 6> misalignment)
+    : LightSource(name.c_str(), numberOfRays, std::move(dist), linPol0, linPol45, circPol, misalignment, sourceDepth, sourceHeight, sourceWidth,
+                  horDivergence, verDivergence) {
     RAYX_LOG << "Created.";
 }
 
 MatrixSource::~MatrixSource() = default;
 
 // returns nullptr on error
-std::shared_ptr<MatrixSource> MatrixSource::createFromXML(
-    const xml::Parser& p) {
-    return std::make_shared<MatrixSource>(
-        p.name(), p.parseNumberRays(), p.parseEnergyDistribution(),
-        p.parseSourceWidth(), p.parseSourceHeight(), p.parseSourceDepth(),
-        p.parseHorDiv(), p.parseVerDiv(), p.parseLinearPol0(),
-        p.parseLinearPol45(), p.parseCircularPol(), p.parseMisalignment());
+std::shared_ptr<MatrixSource> MatrixSource::createFromXML(const xml::Parser& p) {
+    return std::make_shared<MatrixSource>(p.name(), p.parseNumberRays(), p.parseEnergyDistribution(), p.parseSourceWidth(), p.parseSourceHeight(),
+                                          p.parseSourceDepth(), p.parseHorDiv(), p.parseVerDiv(), p.parseLinearPol0(), p.parseLinearPol45(),
+                                          p.parseCircularPol(), p.parseMisalignment());
 }
 
 /**
@@ -80,33 +72,25 @@ std::vector<Ray> MatrixSource::getRays() const {
     std::vector<Ray> returnList;
     returnList.reserve(m_numberOfRays);
     // rayVector.reserve(1048576);
-    RAYX_LOG << "create " << rmat << " times " << rmat
-             << " matrix with Matrix Source...";
+    RAYX_LOG << "create " << rmat << " times " << rmat << " matrix with Matrix Source...";
     // fill the square with rmat1xrmat1 rays
     for (int col = 0; col < rmat; col++) {
         for (int row = 0; row < rmat; row++) {
             double rn = unif(re);  // uniform random in [0,1)
-            x = -0.5 * m_sourceWidth + (m_sourceWidth / (rmat - 1)) * row +
-                getMisalignmentParams()[0];
+            x = -0.5 * m_sourceWidth + (m_sourceWidth / (rmat - 1)) * row + getMisalignmentParams()[0];
 
-            y = -0.5 * m_sourceHeight + (m_sourceHeight / (rmat - 1)) * col +
-                getMisalignmentParams()[1];
+            y = -0.5 * m_sourceHeight + (m_sourceHeight / (rmat - 1)) * col + getMisalignmentParams()[1];
 
             z = (rn - 0.5) * m_sourceDepth;
             en = selectEnergy();
             glm::dvec3 position = glm::dvec3(x, y, z);
 
-            phi = -0.5 * m_horDivergence +
-                  (m_horDivergence / (rmat - 1)) * row +
-                  getMisalignmentParams()[2];
+            phi = -0.5 * m_horDivergence + (m_horDivergence / (rmat - 1)) * row + getMisalignmentParams()[2];
 
-            psi = -0.5 * m_verDivergence +
-                  (m_verDivergence / (rmat - 1)) * col +
-                  getMisalignmentParams()[3];
+            psi = -0.5 * m_verDivergence + (m_verDivergence / (rmat - 1)) * col + getMisalignmentParams()[3];
 
             glm::dvec3 direction = getDirectionFromAngles(phi, psi);
-            glm::dvec4 stokes =
-                glm::dvec4(1, getLinear0(), getLinear45(), getCircular());
+            glm::dvec4 stokes = glm::dvec4(1, getLinear0(), getLinear45(), getCircular());
 
             Ray r = {position, 1.0, direction, en, stokes, 0.0, 0.0, 0.0, 0.0};
             // Ray(1, 2, 3, 7, 4, 5, 6, 8, 9, 10, 11, 12, 13, 14, 15, 16);

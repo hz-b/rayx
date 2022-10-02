@@ -16,8 +16,7 @@ void VulkanEngine::createCommandPool() {
     // from this command pool, must be submitted to queues of this family
     // ONLY.
     commandPoolCreateInfo.queueFamilyIndex = m_computeFamily;
-    VK_CHECK_RESULT(vkCreateCommandPool(m_Device, &commandPoolCreateInfo,
-                                        nullptr, &m_CommandPool));
+    VK_CHECK_RESULT(vkCreateCommandPool(m_Device, &commandPoolCreateInfo, nullptr, &m_CommandPool));
 }
 
 }  // namespace RAYX

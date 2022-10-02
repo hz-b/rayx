@@ -12,8 +12,7 @@ TEST_F(TestSuite, loadDatFile) {
     auto b = loadBeamline("loadDatFile");
     CHECK_EQ(b.m_LightSources.size(), 1);
     CHECK_EQ(b.m_OpticalElements.size(), 1);
-    CHECK_EQ(b.m_LightSources[0]->m_EnergyDistribution.getAverage(),
-             (12. + 15. + 17.) / 3, 0.1);
+    CHECK_EQ(b.m_LightSources[0]->m_EnergyDistribution.getAverage(), (12. + 15. + 17.) / 3, 0.1);
 }
 
 TEST_F(TestSuite, loadGroups) {
@@ -28,10 +27,10 @@ TEST_F(TestSuite, groupTransform) {
     CHECK_EQ(b.m_OpticalElements.size(), 1);
     auto m = b.m_OpticalElements[0]->getInMatrix();
     glm::dmat4x4 correct = {
-        1,   0,  0,     0,  //
-        0,   0,  1,     0,  //
-        0,   -1, 0,     0,  //
-        -42, 0,  -1000, 1,  //
+        1, 0, 0, 0,        //
+        0, 0, 1, 0,        //
+        0, -1, 0, 0,       //
+        -42, 0, -1000, 1,  //
     };
     CHECK_EQ(correct, m);
 }
@@ -40,12 +39,10 @@ TEST_F(TestSuite, groupTransform2) {
     auto b = loadBeamline("groupTransform2");
     CHECK_EQ(b.m_LightSources.size(), 1);
     CHECK_EQ(b.m_OpticalElements.size(), 1);
-    glm::dmat4x4 groupOr = glm::dmat4x4(1, 0, 0, 0, 0, 0.985, -0.174, 0, 0,
-                                        0.174, 0.985, 0, 0, 0, 0, 1);
+    glm::dmat4x4 groupOr = glm::dmat4x4(1, 0, 0, 0, 0, 0.985, -0.174, 0, 0, 0.174, 0.985, 0, 0, 0, 0, 1);
     glm::dvec4 elementPos = glm::dvec4(0, 0, 1000, 1);
     glm::dvec4 groupPos = glm::dvec4(42, 2, 4, 0);
-    glm::dmat4x4 elementOr = glm::dmat4x4(1, 0, 0, 0, 0, 0.996, -0.087, 0, 0,
-                                          0.087, 0.996, 0, 0, 0, 0, 1);
+    glm::dmat4x4 elementOr = glm::dmat4x4(1, 0, 0, 0, 0, 0.996, -0.087, 0, 0, 0.087, 0.996, 0, 0, 0, 0, 1);
     glm::dmat4x4 orientationCorrect = groupOr * elementOr;
 
     glm::dvec4 positionCorrect = groupPos + (groupOr * elementPos);
@@ -60,8 +57,7 @@ TEST_F(TestSuite, groupTransformMisalignment) {
     CHECK_EQ(b.m_LightSources.size(), 1);
     CHECK_EQ(b.m_OpticalElements.size(), 1);
 
-    glm::dmat4x4 groupOr = glm::dmat4x4(1, 0, 0, 0, 0, 0.985, -0.174, 0, 0,
-                                        0.174, 0.985, 0, 0, 0, 0, 1);
+    glm::dmat4x4 groupOr = glm::dmat4x4(1, 0, 0, 0, 0, 0.985, -0.174, 0, 0, 0.174, 0.985, 0, 0, 0, 0, 1);
     printDMat4(groupOr);
 
     glm::dvec4 groupPos = glm::dvec4(42, 2, 4, 0);

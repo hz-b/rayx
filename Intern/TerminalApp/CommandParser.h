@@ -41,16 +41,15 @@ class CommandParser {
         ║║║╚╗║╔═╗║  ║║  ╚═══╝╔╝╔╗╚╗
         ╚╝╚═╝╚╝ ╚╝  ╚╝       ╚═╝╚═╝ HZB 2022.
         )";
-        RAYX_LOG << "\t RAY-X Terminal Application "
-                 << TERMINALAPP_VERSION_MAJOR << "."
-                 << TERMINALAPP_VERSION_MINOR << "."
-                 << TERMINALAPP_VERSION_PATCH << "."
-                 << TERMINALAPP_VERSION_TWEAK << "\n \t GIT: " << GIT_REVISION
+        RAYX_LOG << "\t RAY-X Terminal Application " << TERMINALAPP_VERSION_MAJOR << "." << TERMINALAPP_VERSION_MINOR << "."
+                 << TERMINALAPP_VERSION_PATCH << "." << TERMINALAPP_VERSION_TWEAK << "\n \t GIT: " << GIT_REVISION
                  << "\n \t BUILD: " << BUILD_TIMESTAMP;
     };  // TODO: CMake config needed
   private:
     int m_cli11_return;
-    enum OptionType { BOOL, INT, STRING };
+    enum OptionType { BOOL,
+                      INT,
+                      STRING };
     struct Options {
         // CLI::Option cli11_option;
         const OptionType type;
@@ -61,26 +60,13 @@ class CommandParser {
     // Map short arg to its parameters
     // this can also be done with app.get_option()
     std::unordered_map<char, Options> m_ParserCommands = {
-        {'c',
-         {OptionType::BOOL, "ocsv", "Output stored as .csv file.",
-          &(m_args.m_csvFlag)}},
-        {'d',
-         {OptionType::BOOL, "dummy", "Run an in-house built Beamline.",
-          &(m_args.m_dummyFlag)}},
-        {'b',
-         {OptionType::BOOL, "benchmark",
-          "Benchmark application: (RML → Trace → Output)",
-          &(m_args.m_benchmark)}},
-        {'m',
-         {OptionType::BOOL, "mult", "Multiple plots extension at output.",
-          &(m_args.m_multiplePlots)}},
-        {'p',
-         {OptionType::BOOL, "plot", "Plot output footprints and histograms.",
-          &(m_args.m_plotFlag)}},
+        {'c', {OptionType::BOOL, "ocsv", "Output stored as .csv file.", &(m_args.m_csvFlag)}},
+        {'d', {OptionType::BOOL, "dummy", "Run an in-house built Beamline.", &(m_args.m_dummyFlag)}},
+        {'b', {OptionType::BOOL, "benchmark", "Benchmark application: (RML → Trace → Output)", &(m_args.m_benchmark)}},
+        {'m', {OptionType::BOOL, "mult", "Multiple plots extension at output.", &(m_args.m_multiplePlots)}},
+        {'p', {OptionType::BOOL, "plot", "Plot output footprints and histograms.", &(m_args.m_plotFlag)}},
         {'x', {OptionType::BOOL, "cpu", "Tracing on CPU", &(m_args.m_cpuFlag)}},
-        {'i',
-         {OptionType::STRING, "input", "Input RML File or Directory.",
-          &(m_args.m_providedFile)}},
+        {'i', {OptionType::STRING, "input", "Input RML File or Directory.", &(m_args.m_providedFile)}},
         {'v', {OptionType::BOOL, "version", "", &(m_args.m_version)}},
     };
 };

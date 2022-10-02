@@ -32,15 +32,9 @@ namespace RAYX {
  * @param mat                           material (See Material.h)
  *
  */
-SphereGrating::SphereGrating(const char* name, GratingMount mount,
-                             OpticalElement::GeometricalShape geometricalShape,
-                             double width, double height,
-                             const double azimuthalAngle, double radius,
-                             glm::dvec4 position, glm::dmat4x4 orientation,
-                             double designEnergyMounting, double lineDensity,
-                             double orderOfDiffraction,
-                             std::array<double, 6> vls,
-                             std::array<double, 7> slopeError, Material mat)
+SphereGrating::SphereGrating(const char* name, GratingMount mount, OpticalElement::GeometricalShape geometricalShape, double width, double height,
+                             const double azimuthalAngle, double radius, glm::dvec4 position, glm::dmat4x4 orientation, double designEnergyMounting,
+                             double lineDensity, double orderOfDiffraction, std::array<double, 6> vls, std::array<double, 7> slopeError, Material mat)
     : OpticalElement(name, slopeError),
       m_designEnergyMounting(designEnergyMounting),
       m_lineDensity(lineDensity),
@@ -56,36 +50,25 @@ SphereGrating::SphereGrating(const char* name, GratingMount mount,
     double icurv = 1;
     m_gratingMount = mount;
     auto matd = (double)static_cast<int>(mat);
-    setSurface(std::make_unique<Quadric>(glm::dmat4x4{
-        1, 0, 0, 0, icurv, 1, 0, -radius, 0, 0, 1, 0, 2, 0, matd, 0}));
+    setSurface(std::make_unique<Quadric>(glm::dmat4x4{1, 0, 0, 0, icurv, 1, 0, -radius, 0, 0, 1, 0, 2, 0, matd, 0}));
 }
 
-std::shared_ptr<SphereGrating> SphereGrating::createFromXML(
-    const xml::Parser& p) {
-    return std::make_shared<SphereGrating>(
-        p.name(), p.parseGratingMount(), p.parseGeometricalShape(),
-        p.parseTotalWidth(), p.parseTotalLength(), p.parseAzimuthalAngle(),
-        p.parseRadius(), p.parsePosition(), p.parseOrientation(),
-        p.parseDesignEnergy(), p.parseLineDensity(), p.parseOrderDiffraction(),
-        p.parseVls(), p.parseSlopeError(), p.parseMaterial());
+std::shared_ptr<SphereGrating> SphereGrating::createFromXML(const xml::Parser& p) {
+    return std::make_shared<SphereGrating>(p.name(), p.parseGratingMount(), p.parseGeometricalShape(), p.parseTotalWidth(), p.parseTotalLength(),
+                                           p.parseAzimuthalAngle(), p.parseRadius(), p.parsePosition(), p.parseOrientation(), p.parseDesignEnergy(),
+                                           p.parseLineDensity(), p.parseOrderDiffraction(), p.parseVls(), p.parseSlopeError(), p.parseMaterial());
 }
 
 double SphereGrating::getRadius() const { return m_radius; }
 
 double SphereGrating::getExitArmLength() const { return m_exitArmLength; }
-double SphereGrating::getEntranceArmLength() const {
-    return m_entranceArmLength;
-}
+double SphereGrating::getEntranceArmLength() const { return m_entranceArmLength; }
 
 double SphereGrating::getDeviation() const { return m_deviation; }
 GratingMount SphereGrating::getGratingMount() const { return m_gratingMount; }
-double SphereGrating::getDesignEnergyMounting() const {
-    return m_designEnergyMounting;
-}
+double SphereGrating::getDesignEnergyMounting() const { return m_designEnergyMounting; }
 double SphereGrating::getLineDensity() const { return m_lineDensity; }
-double SphereGrating::getOrderOfDiffraction() const {
-    return m_orderOfDiffraction;
-}
+double SphereGrating::getOrderOfDiffraction() const { return m_orderOfDiffraction; }
 double SphereGrating::getA() const { return m_a; }
 
 glm::dmat4x4 SphereGrating::getElementParameters() const {

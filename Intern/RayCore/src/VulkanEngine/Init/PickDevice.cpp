@@ -20,8 +20,7 @@ void VulkanEngine::pickPhysicalDevice() {
     // search for devices
     uint32_t deviceCount = 0;
     vkEnumeratePhysicalDevices(m_Instance, &deviceCount, nullptr);
-    if (deviceCount == 0)
-        throw std::runtime_error("failed to find GPUs with Vulkan Support!");
+    if (deviceCount == 0) throw std::runtime_error("failed to find GPUs with Vulkan Support!");
 
     // create vector of devices
     std::vector<VkPhysicalDevice> devices(deviceCount);
@@ -48,14 +47,10 @@ void VulkanEngine::pickPhysicalDevice() {
     vkGetPhysicalDeviceProperties(m_PhysicalDevice, &deviceProperties);
     RAYX_LOG << "Chose GPU: " << deviceProperties.deviceName;
     RAYX_D_LOG << "==== Compute Info ====";
-    RAYX_D_LOG << "Compute Max workgroup count: "
-               << deviceProperties.limits.maxComputeWorkGroupCount[1];
-    RAYX_D_LOG << "Compute Max workgroup invocations: "
-               << deviceProperties.limits.maxComputeWorkGroupInvocations;
-    RAYX_D_LOG << "Compute Max workgroup Group size :"
-               << deviceProperties.limits.maxComputeWorkGroupSize[0];
-    RAYX_D_LOG << "Compute Max shared memory size: "
-               << deviceProperties.limits.maxComputeSharedMemorySize;
+    RAYX_D_LOG << "Compute Max workgroup count: " << deviceProperties.limits.maxComputeWorkGroupCount[1];
+    RAYX_D_LOG << "Compute Max workgroup invocations: " << deviceProperties.limits.maxComputeWorkGroupInvocations;
+    RAYX_D_LOG << "Compute Max workgroup Group size :" << deviceProperties.limits.maxComputeWorkGroupSize[0];
+    RAYX_D_LOG << "Compute Max shared memory size: " << deviceProperties.limits.maxComputeSharedMemorySize;
     RAYX_D_LOG << "======================";
 }
 
@@ -85,8 +80,7 @@ int rateDevice(VkPhysicalDevice device) {
     // discrete GPUs are usually faster and get a bonus
     // can be extended to choose the best discrete gpu if multiple are
     // available
-    if (deviceProperties.deviceType == VK_PHYSICAL_DEVICE_TYPE_DISCRETE_GPU)
-        score += 100000;
+    if (deviceProperties.deviceType == VK_PHYSICAL_DEVICE_TYPE_DISCRETE_GPU) score += 100000;
     score += deviceProperties.limits.maxComputeSharedMemorySize;
     return score;
 }
@@ -114,11 +108,9 @@ std::vector<const char*> getRequiredDeviceExtensions() {
 std::optional<uint32_t> findQueueFamilies(VkPhysicalDevice device) {
     RAYX_PROFILE_FUNCTION();
     uint32_t queueFamilyCount = 0;
-    vkGetPhysicalDeviceQueueFamilyProperties(device, &queueFamilyCount,
-                                             nullptr);
+    vkGetPhysicalDeviceQueueFamilyProperties(device, &queueFamilyCount, nullptr);
     std::vector<VkQueueFamilyProperties> queueFamilies(queueFamilyCount);
-    vkGetPhysicalDeviceQueueFamilyProperties(device, &queueFamilyCount,
-                                             queueFamilies.data());
+    vkGetPhysicalDeviceQueueFamilyProperties(device, &queueFamilyCount, queueFamilies.data());
 
     for (uint32_t i = 0; i < queueFamilies.size(); i++) {
         if (queueFamilies[i].queueFlags & VK_QUEUE_COMPUTE_BIT) {
@@ -158,15 +150,13 @@ void VulkanEngine::createLogicalDevice() {
 
     // enable validation layers if possible
     if (enableValidationLayers) {
-        createInfo.enabledLayerCount =
-            static_cast<uint32_t>(validationLayers.size());
+        createInfo.enabledLayerCount = static_cast<uint32_t>(validationLayers.size());
         createInfo.ppEnabledLayerNames = validationLayers.data();
     } else {
         createInfo.enabledLayerCount = 0;
     }
 
-    if (vkCreateDevice(m_PhysicalDevice, &createInfo, nullptr, &m_Device) !=
-        VK_SUCCESS) {
+    if (vkCreateDevice(m_PhysicalDevice, &createInfo, nullptr, &m_Device) != VK_SUCCESS) {
         RAYX_LOG << "Failed to create instance!";
         throw std::runtime_error("failed to create logical device!");
     }

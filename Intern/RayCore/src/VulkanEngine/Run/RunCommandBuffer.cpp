@@ -10,9 +10,8 @@ void VulkanEngine::runCommandBuffer() {
 
     VkSubmitInfo submitInfo = {};
     submitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
-    submitInfo.commandBufferCount = 1;  // submit a single command buffer
-    submitInfo.pCommandBuffers =
-        &m_CommandBuffer;  // the command buffer to submit.
+    submitInfo.commandBufferCount = 1;              // submit a single command buffer
+    submitInfo.pCommandBuffers = &m_CommandBuffer;  // the command buffer to submit.
 
     /*
         We create a fence.
@@ -34,8 +33,7 @@ void VulkanEngine::runCommandBuffer() {
     from the GPU. Fences give us a hint that the Command in the Queue is
     actually done executing.
     */
-    VK_CHECK_RESULT(
-        vkWaitForFences(m_Device, 1, &fence, VK_TRUE, 1000000000000000));
+    VK_CHECK_RESULT(vkWaitForFences(m_Device, 1, &fence, VK_TRUE, 1000000000000000));
 
     vkDestroyFence(m_Device, fence, nullptr);
 }

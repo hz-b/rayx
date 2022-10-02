@@ -13,8 +13,7 @@
 /// /home/username/path/to/RAY-X/build/bin/python
 /// - canonicalizeRepositoryPath(Tests/input) =
 /// /home/username/path/to/RAY-X/Tests/input
-std::filesystem::path RAYX_API
-canonicalizeRepositoryPath(const std::filesystem::path& relPath);
+std::filesystem::path RAYX_API canonicalizeRepositoryPath(const std::filesystem::path& relPath);
 
 /// `relPath` is a path relative to the working directory of the user executing
 /// RAY-X at the point of execution. canonicalizeUserPath(relPath) yields an
@@ -26,5 +25,4 @@ canonicalizeRepositoryPath(const std::filesystem::path& relPath);
 ///
 /// This function is used to find the correct path when the user executes
 /// `./TerminalApp -i <relPath>`
-std::filesystem::path RAYX_API
-canonicalizeUserPath(const std::filesystem::path& relPath);
+std::filesystem::path RAYX_API canonicalizeUserPath(const std::filesystem::path& relPath);

@@ -50,18 +50,13 @@ namespace RAYX {
  * bowing amplitude y(5) and radius (6)
  * @param mat                           material (See Material.h)
  */
-ReflectionZonePlate::ReflectionZonePlate(
-    const char* name, OpticalElement::GeometricalShape geometricalShape,
-    CurvatureType curvatureType, const double widthA,
-    const std::optional<double> widthB, const double height,
-    const double azimuthalAngle, const glm::dvec4 position,
-    const glm::dmat4x4 orientation, const double designEnergy,
-    const double orderOfDiffraction, const double designOrderOfDiffraction,
-    const double dAlpha, const double dBeta, const double mEntrance,
-    const double mExit, const double sEntrance, const double sExit,
-    const double shortRadius, const double longRadius,
-    const int additionalZeroOrder, const double fresnelZOffset,
-    const std::array<double, 7> slopeError, Material mat)
+ReflectionZonePlate::ReflectionZonePlate(const char* name, OpticalElement::GeometricalShape geometricalShape, CurvatureType curvatureType,
+                                         const double widthA, const std::optional<double> widthB, const double height, const double azimuthalAngle,
+                                         const glm::dvec4 position, const glm::dmat4x4 orientation, const double designEnergy,
+                                         const double orderOfDiffraction, const double designOrderOfDiffraction, const double dAlpha,
+                                         const double dBeta, const double mEntrance, const double mExit, const double sEntrance, const double sExit,
+                                         const double shortRadius, const double longRadius, const int additionalZeroOrder,
+                                         const double fresnelZOffset, const std::array<double, 7> slopeError, Material mat)
     : OpticalElement(name, slopeError),
       m_fresnelZOffset(fresnelZOffset),
       m_designAlphaAngle(degToRad(dAlpha)),
@@ -102,24 +97,21 @@ ReflectionZonePlate::ReflectionZonePlate(
 
     // set parameters in Quadric class
     if (m_curvatureType == CurvatureType::Plane) {
-        setSurface(std::make_unique<Quadric>(
-            glm::dmat4x4{0, 0, 0, 0, 1, 0, 0, -1, 0, 0, 0, 0, 4, 0, matd, 0}));
+        setSurface(std::make_unique<Quadric>(glm::dmat4x4{0, 0, 0, 0, 1, 0, 0, -1, 0, 0, 0, 0, 4, 0, matd, 0}));
     } else if (m_curvatureType == CurvatureType::Toroidal) {
         m_longRadius = longRadius;    // for sphere and toroidal
         m_shortRadius = shortRadius;  // only for Toroidal
         setSurface(std::make_unique<Toroid>(longRadius, shortRadius, 4, mat));
     } else {
         m_longRadius = longRadius;  // for sphere and toroidal
-        setSurface(std::make_unique<Quadric>(glm::dmat4x4{
-            1, 0, 0, 0, 1, 1, 0, -m_longRadius, 0, 0, 1, 0, 4, 0, matd, 0}));
+        setSurface(std::make_unique<Quadric>(glm::dmat4x4{1, 0, 0, 0, 1, 1, 0, -m_longRadius, 0, 0, 1, 0, 4, 0, matd, 0}));
     }
 
     printInfo();
     RAYX_LOG << "Created.";
 }
 
-std::shared_ptr<ReflectionZonePlate> ReflectionZonePlate::createFromXML(
-    const xml::Parser& p) {
+std::shared_ptr<ReflectionZonePlate> ReflectionZonePlate::createFromXML(const xml::Parser& p) {
     // ! temporary for testing trapezoid rzp
     double widthB;
     bool foundWidthB = xml::paramDouble(p.node, "totalWidthB", &widthB);
@@ -131,16 +123,11 @@ std::shared_ptr<ReflectionZonePlate> ReflectionZonePlate::createFromXML(
         widthBOptional = std::nullopt;
 
     return std::make_shared<ReflectionZonePlate>(
-        p.name(), p.parseGeometricalShape(), p.parseCurvatureType(),
-        p.parseTotalWidth(), widthBOptional, p.parseTotalLength(),
-        p.parseAzimuthalAngle(), p.parsePosition(), p.parseOrientation(),
-        p.parseDesignEnergy(), p.parseOrderDiffraction(),
-        p.parseDesignOrderDiffraction(), p.parseDesignAlphaAngle(),
-        p.parseDesignBetaAngle(), p.parseEntranceArmLengthMer(),
-        p.parseExitArmLengthMer(), p.parseEntranceArmLengthSag(),
-        p.parseExitArmLengthSag(), p.parseShortRadius(), p.parseLongRadius(),
-        p.parseAdditionalOrder(), p.parseFresnelZOffset(), p.parseSlopeError(),
-        p.parseMaterial());
+        p.name(), p.parseGeometricalShape(), p.parseCurvatureType(), p.parseTotalWidth(), widthBOptional, p.parseTotalLength(),
+        p.parseAzimuthalAngle(), p.parsePosition(), p.parseOrientation(), p.parseDesignEnergy(), p.parseOrderDiffraction(),
+        p.parseDesignOrderDiffraction(), p.parseDesignAlphaAngle(), p.parseDesignBetaAngle(), p.parseEntranceArmLengthMer(),
+        p.parseExitArmLengthMer(), p.parseEntranceArmLengthSag(), p.parseExitArmLengthSag(), p.parseShortRadius(), p.parseLongRadius(),
+        p.parseAdditionalOrder(), p.parseFresnelZOffset(), p.parseSlopeError(), p.parseMaterial());
 }
 
 void ReflectionZonePlate::printInfo() const {
@@ -165,11 +152,9 @@ void ReflectionZonePlate::printInfo() const {
     }
 
     if (m_imageType == ImageType::Point2Point) {
-        RAYX_LOG << static_cast<int>(m_imageType)
-                 << ", m_imageType: POINT2POINT";
+        RAYX_LOG << static_cast<int>(m_imageType) << ", m_imageType: POINT2POINT";
     } else if (m_imageType == ImageType::Astigmatic2Astigmatic) {
-        RAYX_LOG << static_cast<int>(m_imageType)
-                 << ", m_imageType: ASTIGMATIC2ASTIGMATIC";
+        RAYX_LOG << static_cast<int>(m_imageType) << ", m_imageType: ASTIGMATIC2ASTIGMATIC";
     } else {
         RAYX_LOG << static_cast<int>(m_imageType);
     }
@@ -197,10 +182,7 @@ void ReflectionZonePlate::Illumination() {
     double b = m_meridionalDivergence / 1000;
     double a = m_grazingIncidenceAngle * PI / 180;
     double f = 2 * m_meridionalDistance;
-    m_illuminationZ =
-        -f * 1 / tan(b) * sin(a) +
-        1 / sin(b) *
-            sqrt(pow(f, 2) * (pow(cos(b) * sin(a), 2) + pow(sin(b), 2)));
+    m_illuminationZ = -f * 1 / tan(b) * sin(a) + 1 / sin(b) * sqrt(pow(f, 2) * (pow(cos(b) * sin(a), 2) + pow(sin(b), 2)));
 }
 
 /**
@@ -211,34 +193,22 @@ double ReflectionZonePlate::calcZOffset() {
     double f = m_meridionalDistance;
     double a = m_grazingIncidenceAngle;
     double IllZ = m_illuminationZ;
-    double sq1 =
-        pow(-4 * f * IllZ * cos(a) + 4 * pow(f, 2) + pow(IllZ, 2), -0.5);
-    double sq2 =
-        pow(4 * f * IllZ * cos(a) + 4 * pow(f, 2) + pow(IllZ, 2), -0.5);
+    double sq1 = pow(-4 * f * IllZ * cos(a) + 4 * pow(f, 2) + pow(IllZ, 2), -0.5);
+    double sq2 = pow(4 * f * IllZ * cos(a) + 4 * pow(f, 2) + pow(IllZ, 2), -0.5);
     double illuminationZoffset;
     if (f == 0 || a == 0) {
         illuminationZoffset = 0;
     } else {
-        illuminationZoffset = -(
-            f *
-            pow(1 - pow(sq1 * (IllZ - 2 * f * cos(a)) -
-                            sq2 * (IllZ + 2 * f * cos(a)),
-                        2) *
-                        pow(pow(fabs(sq1 * (IllZ - 2 * f * cos(a)) -
-                                     sq2 * (IllZ + 2 * f * cos(a))),
-                                2) +
-                                4 * pow(f, 2) * pow(sq1 + sq2, 2) *
-                                    pow(sin(a), 2),
-                            -1),
-                -0.5) *
-            sin(a -
-                acos((-(sq1 * (IllZ - 2 * f * cos(a))) +
-                      sq2 * (IllZ + 2 * f * cos(a))) *
-                     pow(pow(fabs(sq1 * (IllZ - 2 * f * cos(a)) -
-                                  sq2 * (IllZ + 2 * f * cos(a))),
-                             2) +
-                             4 * pow(f, 2) * pow(sq1 + sq2, 2) * pow(sin(a), 2),
-                         -0.5))));
+        illuminationZoffset = -(f *
+                                pow(1 - pow(sq1 * (IllZ - 2 * f * cos(a)) - sq2 * (IllZ + 2 * f * cos(a)), 2) *
+                                            pow(pow(fabs(sq1 * (IllZ - 2 * f * cos(a)) - sq2 * (IllZ + 2 * f * cos(a))), 2) +
+                                                    4 * pow(f, 2) * pow(sq1 + sq2, 2) * pow(sin(a), 2),
+                                                -1),
+                                    -0.5) *
+                                sin(a - acos((-(sq1 * (IllZ - 2 * f * cos(a))) + sq2 * (IllZ + 2 * f * cos(a))) *
+                                             pow(pow(fabs(sq1 * (IllZ - 2 * f * cos(a)) - sq2 * (IllZ + 2 * f * cos(a))), 2) +
+                                                     4 * pow(f, 2) * pow(sq1 + sq2, 2) * pow(sin(a), 2),
+                                                 -0.5))));
     }
     return illuminationZoffset;
 }
@@ -263,8 +233,7 @@ double ReflectionZonePlate::calcDz00() {
     // if imageType == point2pointXstretched ..
 
     // RAYX-UI calls rzpLineDensity function in fortran
-    double DZ =
-        rzpLineDensityDZ(glm::dvec3(0, 0, 0), glm::dvec3(0, 1, 0), wavelength);
+    double DZ = rzpLineDensityDZ(glm::dvec3(0, 0, 0), glm::dvec3(0, 1, 0), wavelength);
     return DZ;
 }
 
@@ -294,14 +263,11 @@ void ReflectionZonePlate::calcFresnelZOffset() {
 void ReflectionZonePlate::calcBeta() {
     if (m_designType == DesignType::ZOffset) {
         VectorR2Center();
-        if (m_fresnelZOffset !=
-            0) {  // m_fresnelZOffset is given by the user as a parameter bc
-                  // DesignType==DesignType::ZOffset
-            m_betaAngle = acos(
-                (-m_R2ArmLength * m_R2ArmLength *
-                 m_designSagittalExitArmLength * m_designSagittalExitArmLength *
-                 m_fresnelZOffset * m_fresnelZOffset) /
-                (2 * m_designSagittalExitArmLength * m_fresnelZOffset));
+        if (m_fresnelZOffset != 0) {  // m_fresnelZOffset is given by the user as a parameter bc
+                                      // DesignType==DesignType::ZOffset
+            m_betaAngle = acos((-m_R2ArmLength * m_R2ArmLength * m_designSagittalExitArmLength * m_designSagittalExitArmLength * m_fresnelZOffset *
+                                m_fresnelZOffset) /
+                               (2 * m_designSagittalExitArmLength * m_fresnelZOffset));
         }
     }
 }
@@ -311,19 +277,13 @@ void ReflectionZonePlate::calcBeta() {
  */
 void ReflectionZonePlate::VectorR1Center() {
     if (m_designType == DesignType::ZOffset) {
-        double param_R1cosZ = m_designSagittalEntranceArmLength *
-                              cos(m_designAlphaAngle) * m_fresnelZOffset;
-        m_R1ArmLength =
-            sqrt(pow(param_R1cosZ, 2) + pow(m_designSagittalEntranceArmLength *
-                                                sin(m_designAlphaAngle),
-                                            2));
+        double param_R1cosZ = m_designSagittalEntranceArmLength * cos(m_designAlphaAngle) * m_fresnelZOffset;
+        m_R1ArmLength = sqrt(pow(param_R1cosZ, 2) + pow(m_designSagittalEntranceArmLength * sin(m_designAlphaAngle), 2));
         m_alpha0Angle = acos(param_R1cosZ / m_R1ArmLength);
     } else if (m_designType == DesignType::Beta) {
-        double RIcosa =
-            m_designSagittalEntranceArmLength * cos(m_designAlphaAngle);
+        double RIcosa = m_designSagittalEntranceArmLength * cos(m_designAlphaAngle);
         double ROcosb = m_designSagittalExitArmLength * cos(m_designBetaAngle);
-        double RIsina =
-            m_designSagittalEntranceArmLength * sin(m_designAlphaAngle);
+        double RIsina = m_designSagittalEntranceArmLength * sin(m_designAlphaAngle);
         double ROsinb = m_designSagittalExitArmLength * sin(m_designBetaAngle);
         m_alpha0Angle = (RIsina + ROsinb) / (RIcosa + ROcosb);
         m_R1ArmLength = RIsina / sin(m_alpha0Angle);
@@ -338,17 +298,13 @@ void ReflectionZonePlate::VectorR2Center() {
         VectorR1Center();
         double R2s = m_designSagittalExitArmLength;
         double alpha = m_alpha0Angle;  // why another alpha angle??
-        m_R2ArmLength =
-            0.5 * (-2 * m_fresnelZOffset * cos(alpha) +
-                   sqrt(pow(2 * R2s, 2) - 2 * pow(m_fresnelZOffset, 2) +
-                        2 * pow(m_fresnelZOffset, 2) * cos(2 * alpha)));
+        m_R2ArmLength = 0.5 * (-2 * m_fresnelZOffset * cos(alpha) +
+                               sqrt(pow(2 * R2s, 2) - 2 * pow(m_fresnelZOffset, 2) + 2 * pow(m_fresnelZOffset, 2) * cos(2 * alpha)));
         m_beta0Angle = m_alpha0Angle;
     } else if (m_designType == DesignType::Beta) {
-        double RIcosa =
-            m_designSagittalEntranceArmLength * cos(m_designAlphaAngle);
+        double RIcosa = m_designSagittalEntranceArmLength * cos(m_designAlphaAngle);
         double ROcosb = m_designSagittalExitArmLength * cos(m_designBetaAngle);
-        double RIsina =
-            m_designSagittalEntranceArmLength * sin(m_designAlphaAngle);
+        double RIsina = m_designSagittalEntranceArmLength * sin(m_designAlphaAngle);
         double ROsinb = m_designSagittalExitArmLength * sin(m_designBetaAngle);
         m_beta0Angle = (RIsina + ROsinb) / (RIcosa + ROcosb);
         m_R2ArmLength = ROsinb / sin(m_beta0Angle);
@@ -361,8 +317,7 @@ void ReflectionZonePlate::VectorR2Center() {
  *
  * @param designOrderOfDiffraction parameter given by user
  */
-void ReflectionZonePlate::calcDesignOrderOfDiffraction(
-    const double designOrderOfDiffraction) {
+void ReflectionZonePlate::calcDesignOrderOfDiffraction(const double designOrderOfDiffraction) {
     int presign = 0;  // TODO should this really be = 0 if m_DesignType is
                       // neither DesignType::ZOffset nor DesignType::Beta?
     if (m_designType == DesignType::ZOffset) {
@@ -383,9 +338,7 @@ void ReflectionZonePlate::calcDesignOrderOfDiffraction(
  * @param WL                    wavelength of ray
  * @return line density on RZP in Z direction for given conditions
  */
-double ReflectionZonePlate::rzpLineDensityDZ(glm::dvec3 intersection,
-                                             glm::dvec3 normal,
-                                             const double WL) {
+double ReflectionZonePlate::rzpLineDensityDZ(glm::dvec3 intersection, glm::dvec3 normal, const double WL) {
     double s_beta = sin(m_designAlphaAngle);
     double c_beta = cos(m_designBetaAngle);
     double s_alpha = sin(m_designAlphaAngle);
@@ -417,27 +370,18 @@ double ReflectionZonePlate::rzpLineDensityDZ(glm::dvec3 intersection,
             ym = rosag * s_beta;
         } else {  // more general case, can be reduced to the plane with normal
                   // = (0,1,0) and y = 0
-            zi = normal.x * normal.z * intersection.x -
-                 (normal.x * normal.x + normal.y * normal.y) *
-                     (intersection.z + risag * c_alpha) +
+            zi = normal.x * normal.z * intersection.x - (normal.x * normal.x + normal.y * normal.y) * (intersection.z + risag * c_alpha) +
                  normal.y * normal.z * (intersection.y - risag * s_alpha);
-            xi = (normal.y * intersection.x - normal.x * intersection.y +
-                  normal.x * risag * s_alpha);
-            yi = -(normal.x * intersection.x) - normal.y * intersection.y -
-                 normal.z * intersection.z - normal.z * risag * c_alpha +
+            xi = (normal.y * intersection.x - normal.x * intersection.y + normal.x * risag * s_alpha);
+            yi = -(normal.x * intersection.x) - normal.y * intersection.y - normal.z * intersection.z - normal.z * risag * c_alpha +
                  normal.y * risag * s_alpha;
-            zm = normal.x * normal.z * intersection.x +
-                 (normal.x * normal.x + normal.y * normal.y) *
-                     (-intersection.z + rosag * c_beta) +
+            zm = normal.x * normal.z * intersection.x + (normal.x * normal.x + normal.y * normal.y) * (-intersection.z + rosag * c_beta) +
                  normal.y * normal.z * (intersection.y - rosag * s_beta);
-            xm = (normal.y * intersection.x - normal.x * intersection.y +
-                  normal.x * rosag * s_beta);
-            ym = -(normal.x * intersection.x) - normal.y * intersection.y -
-                 normal.z * intersection.z + normal.z * rosag * c_beta +
+            xm = (normal.y * intersection.x - normal.x * intersection.y + normal.x * rosag * s_beta);
+            ym = -(normal.x * intersection.x) - normal.y * intersection.y - normal.z * intersection.z + normal.z * rosag * c_beta +
                  normal.y * rosag * s_beta;
         }
-    } else if (m_imageType ==
-               ImageType::Astigmatic2Astigmatic) {  // astigmatic to astigmatix
+    } else if (m_imageType == ImageType::Astigmatic2Astigmatic) {  // astigmatic to astigmatix
         double s_rim = rimer < 0 ? -1 : 1;
         double s_rom = romer < 0 ? -1 : 1;
         double c_2alpha = cos(2 * m_designAlphaAngle);
@@ -445,51 +389,28 @@ double ReflectionZonePlate::rzpLineDensityDZ(glm::dvec3 intersection,
         if (normal.x == 0 && normal.z == 0) {  //   !plane
 
             zi = s_rim * (rimer * c_alpha + intersection.z);
-            xi = (s_rim * intersection.x *
-                  (c_alpha * intersection.z - 2 * s_alpha * s_alpha * rimer +
-                   s_alpha * intersection.y + rimer)) /
-                 (c_alpha * intersection.z - 2 * s_alpha * s_alpha * risag +
-                  s_alpha * intersection.y + risag);
+            xi = (s_rim * intersection.x * (c_alpha * intersection.z - 2 * s_alpha * s_alpha * rimer + s_alpha * intersection.y + rimer)) /
+                 (c_alpha * intersection.z - 2 * s_alpha * s_alpha * risag + s_alpha * intersection.y + risag);
             yi = s_rim * (-rimer * s_alpha + intersection.y);
             zm = s_rom * (romer * c_beta - intersection.z);
-            xm = (s_rom * intersection.x *
-                  (-c_beta * intersection.z - 2 * s_beta * s_beta * romer +
-                   s_beta * intersection.y + romer)) /
-                 (c_beta * intersection.z + 2 * s_beta * s_beta * rosag -
-                  s_beta * intersection.y - rosag);
+            xm = (s_rom * intersection.x * (-c_beta * intersection.z - 2 * s_beta * s_beta * romer + s_beta * intersection.y + romer)) /
+                 (c_beta * intersection.z + 2 * s_beta * s_beta * rosag - s_beta * intersection.y - rosag);
             ym = s_rom * (romer * s_beta - intersection.y);
         } else {
-            double denominator = intersection.z * c_alpha + risag * c_2alpha +
-                                 intersection.y * s_alpha;
-            double nominator =
-                intersection.x * (intersection.z * c_alpha + rimer * c_2alpha +
-                                  intersection.y * s_alpha);
-            zi = s_rim *
-                 ((normal.x * normal.x + normal.y * normal.y) *
-                      (intersection.z + rimer * c_alpha) -
-                  normal.y * normal.z * (intersection.y - rimer * s_alpha) -
-                  (normal.x * normal.z * nominator) / denominator);
-            xi = s_rim *
-                 (-(normal.x * intersection.y) + normal.x * rimer * s_alpha +
-                  (normal.y * nominator) / denominator);
-            yi = s_rim * (normal.z * (intersection.z + rimer * c_alpha) +
-                          normal.y * (intersection.y - rimer * s_alpha) +
+            double denominator = intersection.z * c_alpha + risag * c_2alpha + intersection.y * s_alpha;
+            double nominator = intersection.x * (intersection.z * c_alpha + rimer * c_2alpha + intersection.y * s_alpha);
+            zi = s_rim * ((normal.x * normal.x + normal.y * normal.y) * (intersection.z + rimer * c_alpha) -
+                          normal.y * normal.z * (intersection.y - rimer * s_alpha) - (normal.x * normal.z * nominator) / denominator);
+            xi = s_rim * (-(normal.x * intersection.y) + normal.x * rimer * s_alpha + (normal.y * nominator) / denominator);
+            yi = s_rim * (normal.z * (intersection.z + rimer * c_alpha) + normal.y * (intersection.y - rimer * s_alpha) +
                           (normal.x * nominator) / denominator);
 
-            denominator = (-(intersection.z * c_beta) + rosag * c_2beta +
-                           intersection.y * s_beta);
-            nominator =
-                intersection.x * (-(intersection.z * c_beta) + romer * c_2beta +
-                                  intersection.y * s_beta);
-            zm = s_rom *
-                 ((normal.x * normal.x + normal.y * normal.y) *
-                      (-intersection.z + romer * c_beta) +
-                  normal.y * normal.z * (intersection.y - romer * s_beta) +
-                  (normal.x * normal.z * nominator) / denominator);
-            xm = s_rom * (normal.x * (intersection.y - romer * s_beta) -
-                          (normal.y * nominator) / denominator);
-            ym = s_rom * (normal.z * (-intersection.z + romer * c_beta) +
-                          normal.y * (-intersection.y + romer * s_beta) -
+            denominator = (-(intersection.z * c_beta) + rosag * c_2beta + intersection.y * s_beta);
+            nominator = intersection.x * (-(intersection.z * c_beta) + romer * c_2beta + intersection.y * s_beta);
+            zm = s_rom * ((normal.x * normal.x + normal.y * normal.y) * (-intersection.z + romer * c_beta) +
+                          normal.y * normal.z * (intersection.y - romer * s_beta) + (normal.x * normal.z * nominator) / denominator);
+            xm = s_rom * (normal.x * (intersection.y - romer * s_beta) - (normal.y * nominator) / denominator);
+            ym = s_rom * (normal.z * (-intersection.z + romer * c_beta) + normal.y * (-intersection.y + romer * s_beta) -
                           (normal.x * nominator) / denominator);
         }
         double ris = sqrt(zi * zi + xi * xi + yi * yi);
@@ -523,45 +444,29 @@ double ReflectionZonePlate::rzpLineDensityDZ(glm::dvec3 intersection,
     return DZ;
 }
 
-double ReflectionZonePlate::getDesignAlphaAngle() const {
-    return m_designAlphaAngle;
-}
-double ReflectionZonePlate::getDesignBetaAngle() const {
-    return m_designBetaAngle;
-}
+double ReflectionZonePlate::getDesignAlphaAngle() const { return m_designAlphaAngle; }
+double ReflectionZonePlate::getDesignBetaAngle() const { return m_designBetaAngle; }
 
-GratingMount ReflectionZonePlate::getGratingMount() const {
-    return m_gratingMount;
-}
+GratingMount ReflectionZonePlate::getGratingMount() const { return m_gratingMount; }
 
 double ReflectionZonePlate::getLongRadius() const { return m_longRadius; }
 
 double ReflectionZonePlate::getShortRadius() const { return m_shortRadius; }
 
-double ReflectionZonePlate::getFresnelZOffset() const {
-    return m_fresnelZOffset;
-}
+double ReflectionZonePlate::getFresnelZOffset() const { return m_fresnelZOffset; }
 
 double ReflectionZonePlate::getCalcFresnelZOffset() const {
     return m_calcFresnelZOffset;  // calculated if DesignType==DesignType::Beta
 }
 
 // input and exit vector lengths
-double ReflectionZonePlate::getSagittalEntranceArmLength() const {
-    return m_designSagittalEntranceArmLength;
-}
+double ReflectionZonePlate::getSagittalEntranceArmLength() const { return m_designSagittalEntranceArmLength; }
 
-double ReflectionZonePlate::getSagittalExitArmLength() const {
-    return m_designSagittalExitArmLength;
-}
+double ReflectionZonePlate::getSagittalExitArmLength() const { return m_designSagittalExitArmLength; }
 
-double ReflectionZonePlate::getMeridionalEntranceArmLength() const {
-    return m_designMeridionalEntranceArmLength;
-}
+double ReflectionZonePlate::getMeridionalEntranceArmLength() const { return m_designMeridionalEntranceArmLength; }
 
-double ReflectionZonePlate::getMeridionalExitArmLength() const {
-    return m_designMeridionalExitArmLength;
-}
+double ReflectionZonePlate::getMeridionalExitArmLength() const { return m_designMeridionalExitArmLength; }
 
 double ReflectionZonePlate::getR1ArmLength() const { return m_R1ArmLength; }
 
@@ -570,13 +475,9 @@ double ReflectionZonePlate::getR2ArmLength() const { return m_R2ArmLength; }
 double ReflectionZonePlate::getWaveLength() const { return m_designWavelength; }
 double ReflectionZonePlate::getDesignEnergy() const { return m_designEnergy; }
 
-double ReflectionZonePlate::getOrderOfDiffraction() const {
-    return m_orderOfDiffraction;
-}
+double ReflectionZonePlate::getOrderOfDiffraction() const { return m_orderOfDiffraction; }
 
-double ReflectionZonePlate::getDesignOrderOfDiffraction() const {
-    return m_designOrderOfDiffraction;
-}
+double ReflectionZonePlate::getDesignOrderOfDiffraction() const { return m_designOrderOfDiffraction; }
 
 double ReflectionZonePlate::getDesignEnergyMounting() const {
     return m_designEnergyMounting;  // derived from source?

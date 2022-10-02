@@ -29,14 +29,10 @@ namespace RAYX {
  * @param mat               material (See Material.h)
  *
  */
-Cylinder::Cylinder(const char* name,
-                   OpticalElement::GeometricalShape geometricalShape,
-                   const double radius, CylinderDirection direction,
-                   const double width, const double height,
-                   const double azimuthalAngle, glm::dvec4 position,
-                   glm::dmat4x4 orientation, const double grazingIncidence,
-                   const double entranceArmLength, const double exitArmLength,
-                   const std::array<double, 7> slopeError, Material mat)
+Cylinder::Cylinder(const char* name, OpticalElement::GeometricalShape geometricalShape, const double radius, CylinderDirection direction,
+                   const double width, const double height, const double azimuthalAngle, glm::dvec4 position, glm::dmat4x4 orientation,
+                   const double grazingIncidence, const double entranceArmLength, const double exitArmLength, const std::array<double, 7> slopeError,
+                   Material mat)
     : OpticalElement(name, slopeError),
       m_direction(direction),
       m_radius(radius),
@@ -50,9 +46,7 @@ Cylinder::Cylinder(const char* name,
     m_Geometry->m_position = position;
     m_Geometry->m_orientation = orientation;
 
-    RAYX_D_LOG << ((m_direction == CylinderDirection::LongRadiusR)
-                       ? "LONG RADIUS"
-                       : "SHORT RADIUS");
+    RAYX_D_LOG << ((m_direction == CylinderDirection::LongRadiusR) ? "LONG RADIUS" : "SHORT RADIUS");
     if (m_direction == CylinderDirection::LongRadiusR) {  // X-DIR
         m_a11 = 0;
         m_a33 = 1;
@@ -69,8 +63,7 @@ Cylinder::Cylinder(const char* name,
     }
 
     auto matd = (double)static_cast<int>(mat);
-    setSurface(std::make_unique<Quadric>(glm::dmat4x4{
-        m_a11, 0, 0, 0, icurv, 1, 0, m_a24, 0, 0, m_a33, 0, 0, 0, matd, 0}));
+    setSurface(std::make_unique<Quadric>(glm::dmat4x4{m_a11, 0, 0, 0, icurv, 1, 0, m_a24, 0, 0, m_a33, 0, 0, 0, matd, 0}));
 }
 Cylinder::~Cylinder() = default;
 
@@ -81,15 +74,12 @@ Cylinder::~Cylinder() = default;
 void Cylinder::setRadius() {
     double theta = radToDeg(m_incidence) * glm::pi<double>() / 180.0;
     if (m_direction == CylinderDirection::LongRadiusR) {
-        m_radius = 2.0 / sin(theta) /
-                   (1.0 / m_entranceArmLength + 1.0 / m_exitArmLength);
+        m_radius = 2.0 / sin(theta) / (1.0 / m_entranceArmLength + 1.0 / m_exitArmLength);
     } else {
-        if (m_entranceArmLength == 0.0 || m_exitArmLength == 0.0 ||
-            theta == 0.0) {
+        if (m_entranceArmLength == 0.0 || m_exitArmLength == 0.0 || theta == 0.0) {
             m_radius = 0.0;
         } else {
-            m_radius = 2.0 * sin(theta) /
-                       (1.0 / m_entranceArmLength + 1.0 / m_exitArmLength);
+            m_radius = 2.0 * sin(theta) / (1.0 / m_entranceArmLength + 1.0 / m_exitArmLength);
         }
     }
 
@@ -97,12 +87,10 @@ void Cylinder::setRadius() {
 }
 
 std::shared_ptr<Cylinder> Cylinder::createFromXML(const xml::Parser& p) {
-    return std::make_shared<Cylinder>(
-        p.name(), p.parseGeometricalShape(), p.parseRadius(),
-        p.parseBendingRadius(), p.parseTotalWidth(), p.parseTotalLength(),
-        p.parseAzimuthalAngle(), p.parsePosition(), p.parseOrientation(),
-        p.parseGrazingIncAngle(), p.parseEntranceArmLength(),
-        p.parseExitArmLength(), p.parseSlopeError(), p.parseMaterial());
+    return std::make_shared<Cylinder>(p.name(), p.parseGeometricalShape(), p.parseRadius(), p.parseBendingRadius(), p.parseTotalWidth(),
+                                      p.parseTotalLength(), p.parseAzimuthalAngle(), p.parsePosition(), p.parseOrientation(),
+                                      p.parseGrazingIncAngle(), p.parseEntranceArmLength(), p.parseExitArmLength(), p.parseSlopeError(),
+                                      p.parseMaterial());
 }
 
 CylinderDirection Cylinder::getDirection() const { return m_direction; }

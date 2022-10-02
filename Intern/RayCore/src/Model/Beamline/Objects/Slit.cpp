@@ -22,13 +22,9 @@ namespace RAYX {
  * @param sourceEnergy          energy of source
  *
  */
-Slit::Slit(const char* name, OpticalElement::GeometricalShape geometricalShape,
-           CentralBeamstop beamstop, double width, double height,
-           glm::dvec4 position, glm::dmat4x4 orientation, double beamstopWidth,
-           double beamstopHeight)
-    : OpticalElement(
-          name, {0, 0, 0, 0, 0, 0,
-                 0})  // no azimuthal angle for slit bc no efficiency needed
+Slit::Slit(const char* name, OpticalElement::GeometricalShape geometricalShape, CentralBeamstop beamstop, double width, double height,
+           glm::dvec4 position, glm::dmat4x4 orientation, double beamstopWidth, double beamstopHeight)
+    : OpticalElement(name, {0, 0, 0, 0, 0, 0, 0})  // no azimuthal angle for slit bc no efficiency needed
 {
     // set geometry
     m_Geometry->m_geometricalShape = geometricalShape;
@@ -43,45 +39,20 @@ Slit::Slit(const char* name, OpticalElement::GeometricalShape geometricalShape,
     // none)
     m_beamstopWidth = m_centralBeamstop == CentralBeamstop::None
                           ? 0
-                          : (m_centralBeamstop == CentralBeamstop::Elliptical
-                                 ? -abs(beamstopWidth)
-                                 : abs(beamstopWidth));
-    m_beamstopHeight = m_centralBeamstop == CentralBeamstop::None
-                           ? 0
-                           : abs(beamstopHeight) != 0;
+                          : (m_centralBeamstop == CentralBeamstop::Elliptical ? -abs(beamstopWidth) : abs(beamstopWidth));
+    m_beamstopHeight = m_centralBeamstop == CentralBeamstop::None ? 0 : abs(beamstopHeight) != 0;
 
-    setSurface(std::make_unique<Quadric>(
-        glm::dmat4x4{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -1, 3, 0, 0, 0}));
+    setSurface(std::make_unique<Quadric>(glm::dmat4x4{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -1, 3, 0, 0, 0}));
 }
 
 std::shared_ptr<Slit> Slit::createFromXML(const xml::Parser& p) {
-    return std::make_shared<Slit>(p.name(), p.parseGeometricalShape(),
-                                  p.parseCentralBeamstop(), p.parseTotalWidth(),
-                                  p.parseTotalHeight(), p.parsePosition(),
-                                  p.parseOrientation(), p.parseTotalWidthStop(),
-                                  p.parseTotalHeightStop());
+    return std::make_shared<Slit>(p.name(), p.parseGeometricalShape(), p.parseCentralBeamstop(), p.parseTotalWidth(), p.parseTotalHeight(),
+                                  p.parsePosition(), p.parseOrientation(), p.parseTotalWidthStop(), p.parseTotalHeightStop());
 }
 
 CentralBeamstop Slit::getCentralBeamstop() const { return m_centralBeamstop; }
 double Slit::getBeamstopWidth() const { return m_beamstopWidth; }
 double Slit::getBeamstopHeight() const { return m_beamstopHeight; }
 
-glm::dmat4x4 Slit::getElementParameters() const {
-    return {m_beamstopWidth / 2,
-            m_beamstopHeight / 2,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0};
-}
+glm::dmat4x4 Slit::getElementParameters() const { return {m_beamstopWidth / 2, m_beamstopHeight / 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}; }
 }  // namespace RAYX

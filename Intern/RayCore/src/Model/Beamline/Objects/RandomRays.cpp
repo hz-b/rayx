@@ -13,9 +13,7 @@ namespace RAYX {
  * high] used for testing only as these rays do not make much sense
  */
 RandomRays::RandomRays(int low, int high, int numberOfRays)
-    : LightSource("Random rays", numberOfRays,
-                  EnergyDistribution(EnergyRange(100., 0.), true), 0, 0, 0,
-                  {0, 0, 0, 0}, 0, 0, 0, 0, 0),
+    : LightSource("Random rays", numberOfRays, EnergyDistribution(EnergyRange(100., 0.), true), 0, 0, 0, {0, 0, 0, 0}, 0, 0, 0, 0, 0),
       m_low(low),
       m_high(high) {}
 

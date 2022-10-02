@@ -21,11 +21,9 @@ namespace RAYX {
  * meridional (1), thermal distortion: x (2),y (3),z (4), cylindrical bowing
  * amplitude y(5) and radius (6)
  */
-Cone::Cone(const char* name, OpticalElement::GeometricalShape geometricalShape,
-           const double width, const double height, const double azimuthalAngle,
-           glm::dvec4 position, glm::dmat4x4 orientation,
-           const double grazingIncidence, const double entranceArmLength,
-           const double exitArmLength, const std::array<double, 7> slopeError)
+Cone::Cone(const char* name, OpticalElement::GeometricalShape geometricalShape, const double width, const double height, const double azimuthalAngle,
+           glm::dvec4 position, glm::dmat4x4 orientation, const double grazingIncidence, const double entranceArmLength, const double exitArmLength,
+           const std::array<double, 7> slopeError)
     : OpticalElement(name, slopeError),
       m_incidence(degToRad(grazingIncidence)),
       m_entranceArmLength(entranceArmLength),
@@ -38,8 +36,7 @@ Cone::Cone(const char* name, OpticalElement::GeometricalShape geometricalShape,
     m_Geometry->m_orientation = orientation;
 
     RAYX_LOG << name << " :Auto";
-    calcConePar(width, entranceArmLength, exitArmLength, grazingIncidence,
-                &m_upstreamRadius_R, &m_downstreamRadius_rho);
+    calcConePar(width, entranceArmLength, exitArmLength, grazingIncidence, &m_upstreamRadius_R, &m_downstreamRadius_rho);
 
     m_cm = pow((m_upstreamRadius_R - m_downstreamRadius_rho) / width, 2);
 
@@ -53,8 +50,7 @@ Cone::Cone(const char* name, OpticalElement::GeometricalShape geometricalShape,
     } else if (m_a23 == 0) {
         m_a24 = -m_upstreamRadius_R;
     }
-    setSurface(std::make_unique<Quadric>(glm::dmat4x4{
-        m_a11, 0, 0, 0, icurv, m_a22, m_a23, m_a24, 0, 0, 0, 0, 0, 0, 0, 0}));
+    setSurface(std::make_unique<Quadric>(glm::dmat4x4{m_a11, 0, 0, 0, icurv, m_a22, m_a23, m_a24, 0, 0, 0, 0, 0, 0, 0, 0}));
 }
 /**
  * @brief Construct a new Cone:: Cone object (R and RHO are also given)
@@ -75,12 +71,9 @@ Cone::Cone(const char* name, OpticalElement::GeometricalShape geometricalShape,
  * meridional (1), thermal distortion: x (2),y (3),z (4), cylindrical bowing
  * amplitude y(5) and radius (6)
  */
-Cone::Cone(const char* name, OpticalElement::GeometricalShape geometricalShape,
-           const double upstream_radius_r, const double downstream_radius_rho,
-           const double width, const double height, const double azimuthalAngle,
-           glm::dvec4 position, glm::dmat4x4 orientation,
-           const double grazingIncidence, const double entranceArmLength,
-           const double exitArmLength, const std::array<double, 7> slopeError)
+Cone::Cone(const char* name, OpticalElement::GeometricalShape geometricalShape, const double upstream_radius_r, const double downstream_radius_rho,
+           const double width, const double height, const double azimuthalAngle, glm::dvec4 position, glm::dmat4x4 orientation,
+           const double grazingIncidence, const double entranceArmLength, const double exitArmLength, const std::array<double, 7> slopeError)
     : OpticalElement(name, slopeError),
       m_incidence(degToRad(grazingIncidence)),
       m_entranceArmLength(entranceArmLength),
@@ -107,8 +100,7 @@ Cone::Cone(const char* name, OpticalElement::GeometricalShape geometricalShape,
     } else if (m_a23 == 0) {
         m_a24 = -m_upstreamRadius_R;
     }
-    setSurface(std::make_unique<Quadric>(glm::dmat4x4{
-        m_a11, 0, 0, 0, icurv, m_a22, m_a23, m_a24, 0, 0, 0, 0, 0, 0, 0, 0}));
+    setSurface(std::make_unique<Quadric>(glm::dmat4x4{m_a11, 0, 0, 0, icurv, m_a22, m_a23, m_a24, 0, 0, 0, 0, 0, 0, 0, 0}));
 }
 
 Cone::~Cone() = default;
@@ -125,8 +117,7 @@ Cone::~Cone() = default;
  * @param RHO DownstreamRadius
  * @remark Taken from RAY.FOR
  */
-void Cone::calcConePar(const double zl, const double ra, const double rb,
-                       const double th, double* R, double* RHO) {
+void Cone::calcConePar(const double zl, const double ra, const double rb, const double th, double* R, double* RHO) {
     double zl2 = pow(zl / 2, 2);
     double sth = sin(th);
     double cth = sin(th);

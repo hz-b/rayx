@@ -16,10 +16,8 @@ bool DatFile::load(const std::filesystem::path& filename, DatFile* out) {
 
     // line 2
     std::getline(s, line);
-    if (sscanf(line.c_str(), "%u %le %le %le", &out->m_linecount, &out->m_start,
-               &out->m_end, &out->m_step) != 4) {
-        RAYX_ERR << "Failed to parse DatFile \"" << filename
-                 << "\", at line 2: \"" << line << "\"";
+    if (sscanf(line.c_str(), "%u %le %le %le", &out->m_linecount, &out->m_start, &out->m_end, &out->m_step) != 4) {
+        RAYX_ERR << "Failed to parse DatFile \"" << filename << "\", at line 2: \"" << line << "\"";
         return false;
     }
     out->m_Lines.reserve(out->m_linecount);
@@ -34,8 +32,7 @@ bool DatFile::load(const std::filesystem::path& filename, DatFile* out) {
         DatEntry e{};
 
         if (sscanf(line.c_str(), "%le %le", &e.m_energy, &e.m_weight) != 2) {
-            RAYX_ERR << "Failed to parse DatFile \"" << filename
-                     << "\", at line " << lineidx << ": \"" << line << "\"";
+            RAYX_ERR << "Failed to parse DatFile \"" << filename << "\", at line " << lineidx << ": \"" << line << "\"";
             return false;
         }
         out->m_Lines.push_back(e);
@@ -65,19 +62,15 @@ bool DatFile::load(const std::filesystem::path& filename, DatFile* out) {
 
 double DatFile::selectEnergy(std::mt19937& rng, bool continuous) const {
     if (continuous) {
-        if (m_Lines.size() ==
-            1) {  // weird edge case, which would crash the code below
+        if (m_Lines.size() == 1) {  // weird edge case, which would crash the code below
             return m_Lines[0].m_energy;
         }
         // this first rng() call will be used to find the index `idx`, s.t.
         // we will return an energy between lines[idx].energy and
         // lines[idx+1].energy
         double percentage = ((double)rng()) / std::mt19937::max();  // in [0, 1]
-        double continuousWeightSum = m_weightSum -
-                                     m_Lines.front().m_weight / 2 -
-                                     m_Lines.back().m_weight / 2;
-        double w =
-            percentage * continuousWeightSum;  // in [0, continuousWeightSum]
+        double continuousWeightSum = m_weightSum - m_Lines.front().m_weight / 2 - m_Lines.back().m_weight / 2;
+        double w = percentage * continuousWeightSum;  // in [0, continuousWeightSum]
 
         double counter = 0;
         uint32_t idx = 0;
@@ -92,11 +85,10 @@ double DatFile::selectEnergy(std::mt19937& rng, bool continuous) const {
         // lines[idx].energy and lines[idx+1].energy percentage == 0 will yield
         // lines[idx].energy, and percentage == 1 will yield lines[idx+1].energy
         percentage = ((double)rng()) / std::mt19937::max();  // in [0, 1]
-        return m_Lines[idx].m_energy * (1 - percentage) +
-               m_Lines[idx + 1].m_energy * percentage;
+        return m_Lines[idx].m_energy * (1 - percentage) + m_Lines[idx + 1].m_energy * percentage;
     } else {
         double percentage = ((double)rng()) / std::mt19937::max();  // in [0, 1]
-        double w = percentage * m_weightSum;  // in [0, weightSum]
+        double w = percentage * m_weightSum;                        // in [0, weightSum]
 
         double counter = 0;
         for (auto e : m_Lines) {

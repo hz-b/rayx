@@ -50,8 +50,7 @@ class RAYX_API VulkanEngine {
     /// the buffer will have exactly the size to fit all elements of vec.
     /// only allowed for `m_in = true` buffers.
     template <typename T>
-    inline void createBufferWithData(const char* bufname,
-                                     const std::vector<T>& vec) {
+    inline void createBufferWithData(const char* bufname, const std::vector<T>& vec) {
         createBuffer(bufname, vec.size() * sizeof(T));
         writeBufferRaw(bufname, (char*)vec.data());
     }
@@ -159,8 +158,7 @@ class RAYX_API VulkanEngine {
     /// and a private `createVkBuffer` which constructs an actual `VkBuffer`.
     /// This is merely a helper method for `createBuffer` and
     /// `createStagingBuffer`.
-    void createVkBuffer(VkDeviceSize size, VkBufferUsageFlags usage,
-                        VkMemoryPropertyFlags properties, VkBuffer& buffer,
+    void createVkBuffer(VkDeviceSize size, VkBufferUsageFlags usage, VkMemoryPropertyFlags properties, VkBuffer& buffer,
                         VkDeviceMemory& bufferMemory);
     // BufferIO:
 
@@ -168,8 +166,7 @@ class RAYX_API VulkanEngine {
     /// note that gpuMemcpy copies from left to right, unlike the original
     /// memcpy. this is used for the buffer <-> staging buffer communication in
     /// {read,write}BufferRaw.
-    void gpuMemcpy(VkBuffer& buffer_src, size_t offset_src,
-                   VkBuffer& buffer_dst, size_t offset_dst, size_t bytes);
+    void gpuMemcpy(VkBuffer& buffer_src, size_t offset_src, VkBuffer& buffer_dst, size_t offset_dst, size_t bytes);
 
     /// reads a buffer and writes the data to `outdata`.
     /// the full buffer is read (the size is `m_buffers[bufname].m_size`)
@@ -203,8 +200,7 @@ class RAYX_API VulkanEngine {
         }                                                                \
     }
 
-const std::vector<const char*> validationLayers = {
-    "VK_LAYER_KHRONOS_validation"};
+const std::vector<const char*> validationLayers = {"VK_LAYER_KHRONOS_validation"};
 
 const int WORKGROUP_SIZE = 32;
 

@@ -27,16 +27,10 @@ namespace RAYX {
  * amplitude y(5) and radius (6)
  * @param mat                       material (See Material.h)
  */
-ToroidMirror::ToroidMirror(const char* name,
-                           OpticalElement::GeometricalShape geometricalShape,
-                           const double width, const double height,
-                           const double azimuthalAngle, glm::dvec4 position,
-                           glm::dmat4x4 orientation, const double longRadius,
-                           const double shortRadius,
-                           const std::array<double, 7> slopeError, Material mat)
-    : OpticalElement(name, slopeError),
-      m_longRadius(longRadius),
-      m_shortRadius(shortRadius) {
+ToroidMirror::ToroidMirror(const char* name, OpticalElement::GeometricalShape geometricalShape, const double width, const double height,
+                           const double azimuthalAngle, glm::dvec4 position, glm::dmat4x4 orientation, const double longRadius,
+                           const double shortRadius, const std::array<double, 7> slopeError, Material mat)
+    : OpticalElement(name, slopeError), m_longRadius(longRadius), m_shortRadius(shortRadius) {
     // set geometry
     m_Geometry->m_geometricalShape = geometricalShape;
     m_Geometry->setHeightWidth(height, width);
@@ -47,22 +41,16 @@ ToroidMirror::ToroidMirror(const char* name,
     // TODO(Theresa): maybe move this function outside of this class (same for
     // spheres) because this can be derived from user parameters
 
-    RAYX_LOG << "long Radius: " << m_longRadius
-             << ", short Radius: " << m_shortRadius;
+    RAYX_LOG << "long Radius: " << m_longRadius << ", short Radius: " << m_shortRadius;
     auto matd = (double)static_cast<int>(mat);
-    setSurface(std::make_unique<Toroid>(
-        glm::dmat4x4{m_longRadius, m_shortRadius, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0,
-                     6, 0, matd, 0}));
+    setSurface(std::make_unique<Toroid>(glm::dmat4x4{m_longRadius, m_shortRadius, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 6, 0, matd, 0}));
     // setSurface(std::make_unique<Toroid>(m_longRadius, m_shortRadius));
 }
 
-std::shared_ptr<ToroidMirror> ToroidMirror::createFromXML(
-    const xml::Parser& p) {
-    return std::make_shared<ToroidMirror>(
-        p.name(), p.parseGeometricalShape(), p.parseTotalWidth(),
-        p.parseTotalLength(), p.parseAzimuthalAngle(), p.parsePosition(),
-        p.parseOrientation(), p.parseLongRadius(), p.parseShortRadius(),
-        p.parseSlopeError(), p.parseMaterial());
+std::shared_ptr<ToroidMirror> ToroidMirror::createFromXML(const xml::Parser& p) {
+    return std::make_shared<ToroidMirror>(p.name(), p.parseGeometricalShape(), p.parseTotalWidth(), p.parseTotalLength(), p.parseAzimuthalAngle(),
+                                          p.parsePosition(), p.parseOrientation(), p.parseLongRadius(), p.parseShortRadius(), p.parseSlopeError(),
+                                          p.parseMaterial());
 }
 
 }  // namespace RAYX

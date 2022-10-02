@@ -26,12 +26,9 @@ namespace RAYX {
  * @param mat                   material (See Material.h)
  *
  */
-PlaneMirror::PlaneMirror(const char* name,
-                         OpticalElement::GeometricalShape geometricalShape,
-                         const double width, const double height,
-                         const double azimuthalAngle, glm::dvec4 position,
-                         glm::dmat4x4 orientation,
-                         const std::array<double, 7> slopeError, Material mat)
+PlaneMirror::PlaneMirror(const char* name, OpticalElement::GeometricalShape geometricalShape, const double width, const double height,
+                         const double azimuthalAngle, glm::dvec4 position, glm::dmat4x4 orientation, const std::array<double, 7> slopeError,
+                         Material mat)
     : OpticalElement(name, slopeError) {
     // set geometry
     m_Geometry->m_geometricalShape = geometricalShape;
@@ -41,15 +38,11 @@ PlaneMirror::PlaneMirror(const char* name,
     m_Geometry->m_orientation = orientation;
 
     auto matd = (double)static_cast<int>(mat);
-    setSurface(std::make_unique<Quadric>(
-        glm::dmat4x4{0, 0, 0, 0, 1, 0, 0, -1, 0, 0, 0, 0, 0, 0, matd, 0}));
+    setSurface(std::make_unique<Quadric>(glm::dmat4x4{0, 0, 0, 0, 1, 0, 0, -1, 0, 0, 0, 0, 0, 0, matd, 0}));
 }
 
-PlaneMirror::PlaneMirror(const char* name,
-                         OpticalElement::GeometricalShape geometricalShape,
-                         const double width, const double widthB,
-                         const double height, const double azimuthalAngle,
-                         glm::dvec4 position, glm::dmat4x4 orientation,
+PlaneMirror::PlaneMirror(const char* name, OpticalElement::GeometricalShape geometricalShape, const double width, const double widthB,
+                         const double height, const double azimuthalAngle, glm::dvec4 position, glm::dmat4x4 orientation,
                          const std::array<double, 7> slopeError, Material mat)
     : OpticalElement(name, slopeError) {
     // set geometry
@@ -61,23 +54,19 @@ PlaneMirror::PlaneMirror(const char* name,
 
     RAYX_LOG << name;
     auto matd = (double)static_cast<int>(mat);
-    setSurface(std::make_unique<Quadric>(
-        glm::dmat4x4{0, 0, 0, 0, 1, 0, 0, -1, 0, 0, 0, 0, 0, 0, matd, 0}));
+    setSurface(std::make_unique<Quadric>(glm::dmat4x4{0, 0, 0, 0, 1, 0, 0, -1, 0, 0, 0, 0, 0, 0, matd, 0}));
 }
 
 std::shared_ptr<PlaneMirror> PlaneMirror::createFromXML(const xml::Parser& p) {
     double widthB;
     bool foundWidthB = xml::paramDouble(p.node, "totalWidthB", &widthB);
     if (foundWidthB) {
-        return std::make_shared<PlaneMirror>(
-            p.name(), p.parseGeometricalShape(), p.parseTotalWidth(), widthB,
-            p.parseTotalLength(), p.parseAzimuthalAngle(), p.parsePosition(),
-            p.parseOrientation(), p.parseSlopeError(), p.parseMaterial());
+        return std::make_shared<PlaneMirror>(p.name(), p.parseGeometricalShape(), p.parseTotalWidth(), widthB, p.parseTotalLength(),
+                                             p.parseAzimuthalAngle(), p.parsePosition(), p.parseOrientation(), p.parseSlopeError(),
+                                             p.parseMaterial());
     } else {
-        return std::make_shared<PlaneMirror>(
-            p.name(), p.parseGeometricalShape(), p.parseTotalWidth(),
-            p.parseTotalLength(), p.parseAzimuthalAngle(), p.parsePosition(),
-            p.parseOrientation(), p.parseSlopeError(), p.parseMaterial());
+        return std::make_shared<PlaneMirror>(p.name(), p.parseGeometricalShape(), p.parseTotalWidth(), p.parseTotalLength(), p.parseAzimuthalAngle(),
+                                             p.parsePosition(), p.parseOrientation(), p.parseSlopeError(), p.parseMaterial());
     }
 }
 

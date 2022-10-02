@@ -37,9 +37,7 @@ PythonInterp::PythonInterp() = default;
  * @param pyPath Python 3 Interpreter Path (if NULL, uses default system python3
  * path) (Recommended : Leave as default)
  */
-PythonInterp::PythonInterp(const char* pyName, const char* pyFunc,
-                           const char* pyPath)
-    : m_pyPath(pyPath), m_funcName(pyFunc) {
+PythonInterp::PythonInterp(const char* pyName, const char* pyFunc, const char* pyPath) : m_pyPath(pyPath), m_funcName(pyFunc) {
     // Set custom python interpreter (Not recommended)
     if (m_pyPath) {
         RAYX_D_LOG << "set custom path";
@@ -84,8 +82,7 @@ void PythonInterp::execute() {
         if (!m_outputName.empty()) {
             // If provided input file, parse to python interpreter as bytes
             m_pValue = PyTuple_New(2);
-            PyTuple_SetItem(m_pValue, 0,
-                            PyBytes_FromString(m_outputName.c_str()));
+            PyTuple_SetItem(m_pValue, 0, PyBytes_FromString(m_outputName.c_str()));
             PyTuple_SetItem(m_pValue, 1, PyLong_FromLong(long(m_plotType)));
         }
         PyErr_Print();
@@ -94,16 +91,12 @@ void PythonInterp::execute() {
         PyErr_Print();
     } else {
         PyErr_Print();
-        throw std::runtime_error(
-            "Error while running the python module: Wrong Func[ERR010]" +
-            (std::string)(m_funcName));
+        throw std::runtime_error("Error while running the python module: Wrong Func[ERR010]" + (std::string)(m_funcName));
     }
 
     if (PyLong_AsLong(m_presult) == 0 || !m_presult) {
         cleanup();
-        throw std::runtime_error(
-            "Error while running the python module: Bad Res[ERR011]" +
-            (std::string)(m_funcName));
+        throw std::runtime_error("Error while running the python module: Bad Res[ERR011]" + (std::string)(m_funcName));
     }
     cleanup();
 }
@@ -128,9 +121,7 @@ void PythonInterp::cleanup() {
  * @param outputName Name of input file. Defaults to NULL (Plotting
  * related)
  */
-void PythonInterp::setPlotName(const char* outputName) {
-    m_outputName = std::string(outputName);
-}
+void PythonInterp::setPlotName(const char* outputName) { m_outputName = std::string(outputName); }
 /**
  * @brief Change plot type, call before .execute (1,2,3)
  *

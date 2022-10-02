@@ -9,10 +9,8 @@ void VulkanEngine::createCommandBuffer() {
     Allocate a command buffer from the previously creeated command pool.
     */
     VkCommandBufferAllocateInfo commandBufferAllocateInfo = {};
-    commandBufferAllocateInfo.sType =
-        VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
-    commandBufferAllocateInfo.commandPool =
-        m_CommandPool;  // specify the command pool to allocate from.
+    commandBufferAllocateInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
+    commandBufferAllocateInfo.commandPool = m_CommandPool;  // specify the command pool to allocate from.
 
     /* if the command buffer is primary, it can be directly submitted to
     / queues. A secondary buffer has to be called from some primary command
@@ -20,11 +18,9 @@ void VulkanEngine::createCommandBuffer() {
     / simple, we use a primary command buffer. */
 
     commandBufferAllocateInfo.level = VK_COMMAND_BUFFER_LEVEL_PRIMARY;
-    commandBufferAllocateInfo.commandBufferCount =
-        1;  // allocate a single command buffer.
-    VK_CHECK_RESULT(vkAllocateCommandBuffers(
-        m_Device, &commandBufferAllocateInfo,
-        &m_CommandBuffer));  // allocate command buffer.
+    commandBufferAllocateInfo.commandBufferCount = 1;  // allocate a single command buffer.
+    VK_CHECK_RESULT(vkAllocateCommandBuffers(m_Device, &commandBufferAllocateInfo,
+                                             &m_CommandBuffer));  // allocate command buffer.
 
     /*
     Now we shall start recording commands into the newly allocated command
@@ -32,24 +28,19 @@ void VulkanEngine::createCommandBuffer() {
     */
     VkCommandBufferBeginInfo beginInfo = {};
     beginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
-    beginInfo.flags =
-        VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT;  // the buffer is only
-                                                      // submitted and used
-                                                      // once in this
-                                                      // application.
-    VK_CHECK_RESULT(vkBeginCommandBuffer(
-        m_CommandBuffer, &beginInfo));  // start recording commands.
+    beginInfo.flags = VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT;       // the buffer is only
+                                                                         // submitted and used
+                                                                         // once in this
+                                                                         // application.
+    VK_CHECK_RESULT(vkBeginCommandBuffer(m_CommandBuffer, &beginInfo));  // start recording commands.
 
     /*
     We need to bind a pipeline, AND a descriptor set before we dispatch.
     The validation layer will NOT give warnings if you forget these, so be
     very careful not to forget them.
     */
-    vkCmdBindPipeline(m_CommandBuffer, VK_PIPELINE_BIND_POINT_COMPUTE,
-                      m_Pipeline);
-    vkCmdBindDescriptorSets(m_CommandBuffer, VK_PIPELINE_BIND_POINT_COMPUTE,
-                            m_PipelineLayout, 0, 1, &m_DescriptorSet, 0,
-                            nullptr);
+    vkCmdBindPipeline(m_CommandBuffer, VK_PIPELINE_BIND_POINT_COMPUTE, m_Pipeline);
+    vkCmdBindDescriptorSets(m_CommandBuffer, VK_PIPELINE_BIND_POINT_COMPUTE, m_PipelineLayout, 0, 1, &m_DescriptorSet, 0, nullptr);
     // vkCmdBindDescriptorSets(commandBuffer,
     // VK_PIPELINE_BIND_POINT_COMPUTE, pipelineLayout, 0, 1,
     // &descriptorSets[1], 0, NULL);
@@ -60,9 +51,7 @@ void VulkanEngine::createCommandBuffer() {
     the arguments. If you are already familiar with compute shaders from
     OpenGL, this should be nothing new to you.
     */
-    auto requiredLocalWorkGroupNo =
-        (uint32_t)ceil(m_numberOfInvocations /
-                       float(WORKGROUP_SIZE));  // number of local works groups
+    auto requiredLocalWorkGroupNo = (uint32_t)ceil(m_numberOfInvocations / float(WORKGROUP_SIZE));  // number of local works groups
 
     // check if there are too many rays
     VkPhysicalDeviceProperties deviceProperties;
@@ -82,8 +71,7 @@ void VulkanEngine::createCommandBuffer() {
                     "machine is "
                  << xgroups * ygroups * zgroups;
     } else {
-        RAYX_D_LOG << "your machine supports up to "
-                   << xgroups * ygroups * zgroups * WORKGROUP_SIZE << " rays";
+        RAYX_D_LOG << "your machine supports up to " << xgroups * ygroups * zgroups * WORKGROUP_SIZE << " rays";
     }
 
     // decrease xgroups, ygroups, zgroups so that we get a small number of
@@ -113,12 +101,10 @@ void VulkanEngine::createCommandBuffer() {
 
     RAYX_LOG << "Dispatching commandBuffer...";
     RAYX_D_LOG << "Sending "
-               << "(" << xgroups << ", " << ygroups << ", " << zgroups
-               << ") to the GPU";
+               << "(" << xgroups << ", " << ygroups << ", " << zgroups << ") to the GPU";
     vkCmdDispatch(m_CommandBuffer, xgroups, ygroups, zgroups);
 
-    VK_CHECK_RESULT(
-        vkEndCommandBuffer(m_CommandBuffer));  // end recording commands.
+    VK_CHECK_RESULT(vkEndCommandBuffer(m_CommandBuffer));  // end recording commands.
 }
 
 }  // namespace RAYX

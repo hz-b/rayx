@@ -9,9 +9,7 @@
 #include "Debug.h"
 
 void writeH5(const std::vector<RAYX::Ray>& rays, std::string filename) {
-    HighFive::File file(filename, HighFive::File::ReadWrite |
-                                      HighFive::File::Create |
-                                      HighFive::File::Truncate);
+    HighFive::File file(filename, HighFive::File::ReadWrite | HighFive::File::Create | HighFive::File::Truncate);
 
     const uint32_t numRays = rays.size();
 

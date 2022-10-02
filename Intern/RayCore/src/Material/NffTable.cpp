@@ -12,9 +12,7 @@
 bool NffTable::load(const char* element, NffTable* out) {
     std::string elementString = element;
 
-    std::transform(elementString.begin(), elementString.end(),
-                   elementString.begin(),
-                   [](unsigned char c) { return std::tolower(c); });
+    std::transform(elementString.begin(), elementString.end(), elementString.begin(), [](unsigned char c) { return std::tolower(c); });
 
     std::string f = "Data/nff/" + elementString + ".nff";
     std::ifstream s(canonicalizeRepositoryPath(f));
@@ -36,10 +34,8 @@ bool NffTable::load(const char* element, NffTable* out) {
 
         NffEntry e{};
 
-        if (sscanf(line.c_str(), "%le %le %le", &e.m_energy, &e.m_f1,
-                   &e.m_f2) != 3) {
-            RAYX_ERR << "Failed to parse NffTable\"" << element
-                     << "\", at line " << lineidx << ": \"" << line << "\"";
+        if (sscanf(line.c_str(), "%le %le %le", &e.m_energy, &e.m_f1, &e.m_f2) != 3) {
+            RAYX_ERR << "Failed to parse NffTable\"" << element << "\", at line " << lineidx << ": \"" << line << "\"";
             return false;
         }
         out->m_Lines.push_back(e);

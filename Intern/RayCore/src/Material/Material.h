@@ -35,5 +35,4 @@ struct RAYX_API MaterialTables {
 
 // the following function loads the Palik & Nff tables.
 // the tables will later be written to the mat and matIdx buffers of shader.comp
-MaterialTables RAYX_API
-loadMaterialTables(std::array<bool, 92> relevantMaterials);
+MaterialTables RAYX_API loadMaterialTables(std::array<bool, 92> relevantMaterials);

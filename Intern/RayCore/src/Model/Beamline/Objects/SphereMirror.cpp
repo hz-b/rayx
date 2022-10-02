@@ -27,15 +27,9 @@ namespace RAYX {
  * @param mat                       material (See Material.h)
  *
  */
-SphereMirror::SphereMirror(const char* name,
-                           OpticalElement::GeometricalShape geometricalShape,
-                           const double width, const double height,
-                           const double azimuthalAngle,
-                           const double grazingIncidenceAngle,
-                           glm::dvec4 position, glm::dmat4x4 orientation,
-                           const double entranceArmLength,
-                           const double exitArmLength,
-                           const std::array<double, 7> slopeError, Material mat)
+SphereMirror::SphereMirror(const char* name, OpticalElement::GeometricalShape geometricalShape, const double width, const double height,
+                           const double azimuthalAngle, const double grazingIncidenceAngle, glm::dvec4 position, glm::dmat4x4 orientation,
+                           const double entranceArmLength, const double exitArmLength, const std::array<double, 7> slopeError, Material mat)
     : OpticalElement(name, slopeError),
       m_entranceArmLength(entranceArmLength),
       m_exitArmLength(exitArmLength),
@@ -51,8 +45,7 @@ SphereMirror::SphereMirror(const char* name,
 
     calcRadius();  // calculate the radius
     auto matd = (double)static_cast<int>(mat);
-    setSurface(std::make_unique<Quadric>(glm::dmat4x4{
-        1, 0, 0, 0, 1, 1, 0, -m_radius, 0, 0, 1, 0, 0, 0, matd, 0}));
+    setSurface(std::make_unique<Quadric>(glm::dmat4x4{1, 0, 0, 0, 1, 1, 0, -m_radius, 0, 0, 1, 0, 0, 0, matd, 0}));
 }
 
 /**
@@ -75,11 +68,8 @@ SphereMirror::SphereMirror(const char* name,
  * @param mat                       material (See Material.h)
  *
  */
-SphereMirror::SphereMirror(const char* name,
-                           OpticalElement::GeometricalShape geometricalShape,
-                           const double width, const double height,
-                           const double azimuthalAngle, double radius,
-                           glm::dvec4 position, glm::dmat4x4 orientation,
+SphereMirror::SphereMirror(const char* name, OpticalElement::GeometricalShape geometricalShape, const double width, const double height,
+                           const double azimuthalAngle, double radius, glm::dvec4 position, glm::dmat4x4 orientation,
                            const std::array<double, 7> slopeError, Material mat)
     : OpticalElement(name, slopeError) {
     // set geometry
@@ -92,31 +82,22 @@ SphereMirror::SphereMirror(const char* name,
     RAYX_LOG << "Created.";
 
     auto matd = (double)static_cast<int>(mat);
-    setSurface(std::make_unique<Quadric>(
-        glm::dmat4x4{1, 0, 0, 0, 1, 1, 0, -radius, 0, 0, 1, 0, 0, 0, matd, 0}));
+    setSurface(std::make_unique<Quadric>(glm::dmat4x4{1, 0, 0, 0, 1, 1, 0, -radius, 0, 0, 1, 0, 0, 0, matd, 0}));
 }
 
-std::shared_ptr<SphereMirror> SphereMirror::createFromXML(
-    const xml::Parser& p) {
-    return std::make_shared<SphereMirror>(
-        p.name(), p.parseGeometricalShape(), p.parseTotalWidth(),
-        p.parseTotalLength(), p.parseAzimuthalAngle(), p.parseGrazingIncAngle(),
-        p.parsePosition(), p.parseOrientation(), p.parseEntranceArmLength(),
-        p.parseExitArmLength(), p.parseSlopeError(), p.parseMaterial());
+std::shared_ptr<SphereMirror> SphereMirror::createFromXML(const xml::Parser& p) {
+    return std::make_shared<SphereMirror>(p.name(), p.parseGeometricalShape(), p.parseTotalWidth(), p.parseTotalLength(), p.parseAzimuthalAngle(),
+                                          p.parseGrazingIncAngle(), p.parsePosition(), p.parseOrientation(), p.parseEntranceArmLength(),
+                                          p.parseExitArmLength(), p.parseSlopeError(), p.parseMaterial());
 }
 
 // TODO(Theresa): move this to user params and just give the radius as a
 // parameter to the sphere class?
-void SphereMirror::calcRadius() {
-    m_radius = 2.0 / sin(m_grazingIncidenceAngle) /
-               (1.0 / m_entranceArmLength + 1.0 / m_exitArmLength);
-}
+void SphereMirror::calcRadius() { m_radius = 2.0 / sin(m_grazingIncidenceAngle) / (1.0 / m_entranceArmLength + 1.0 / m_exitArmLength); }
 
 double SphereMirror::getRadius() const { return m_radius; }
 
 double SphereMirror::getExitArmLength() const { return m_exitArmLength; }
 
-double SphereMirror::getEntranceArmLength() const {
-    return m_entranceArmLength;
-}
+double SphereMirror::getEntranceArmLength() const { return m_entranceArmLength; }
 }  // namespace RAYX

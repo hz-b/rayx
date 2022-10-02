@@ -18,30 +18,23 @@ enum class SpreadType {  // default WhiteBand
     WhiteBand,
     ThreeEnergies
 };
-enum class EnergyDistributionType {
-    File,
-    Values,
-    Total,
-    Param
-};  // default ET_VALUES
-enum class SourceDistType {
-    Simultaneous,
-    HardEdge,
-    Gauss
-};  // default simultaneously
+enum class EnergyDistributionType { File,
+                                    Values,
+                                    Total,
+                                    Param };  // default ET_VALUES
+enum class SourceDistType { Simultaneous,
+                            HardEdge,
+                            Gauss };  // default simultaneously
 
 // TODO(rudi): unify!
-enum class SourceDist { Uniform, Gaussian };
+enum class SourceDist { Uniform,
+                        Gaussian };
 
 class RAYX_API LightSource {
   public:
-    LightSource(const char* name, uint32_t numberOfRays,
-                EnergyDistribution dist, const double linPol0,
-                const double linPol45, const double circPol,
-                const std::array<double, 6> misalignment,
-                const double sourceDepth, const double sourceHeight,
-                const double sourceWidth, const double horDivergence,
-                const double verDivergence);
+    LightSource(const char* name, uint32_t numberOfRays, EnergyDistribution dist, const double linPol0, const double linPol45, const double circPol,
+                const std::array<double, 6> misalignment, const double sourceDepth, const double sourceHeight, const double sourceWidth,
+                const double horDivergence, const double verDivergence);
     virtual ~LightSource() = default;
 
     // Getter

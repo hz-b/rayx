@@ -8,9 +8,7 @@ void VulkanEngine::writeBufferRaw(const char* bufname, char* indata) {
     Buffer& b = m_buffers[bufname];
 
     if (!b.m_in) {
-        RAYX_ERR << "writeBufferRaw(\"" << bufname
-                 << "\", ...) is not allowed, as \"" << bufname
-                 << "\" has m_in = false";
+        RAYX_ERR << "writeBufferRaw(\"" << bufname << "\", ...) is not allowed, as \"" << bufname << "\" has m_in = false";
     }
 
     size_t remainingBytes = m_buffers[bufname].m_size;
@@ -18,8 +16,7 @@ void VulkanEngine::writeBufferRaw(const char* bufname, char* indata) {
     while (remainingBytes > 0) {
         size_t localbytes = std::min(remainingBytes, (size_t)STAGING_SIZE);
         storeToStagingBuffer(indata + offset, localbytes);
-        gpuMemcpy(m_stagingBuffer, 0, m_buffers[bufname].m_Buffer, offset,
-                  localbytes);
+        gpuMemcpy(m_stagingBuffer, 0, m_buffers[bufname].m_Buffer, offset, localbytes);
 
         offset += localbytes;
         remainingBytes -= localbytes;

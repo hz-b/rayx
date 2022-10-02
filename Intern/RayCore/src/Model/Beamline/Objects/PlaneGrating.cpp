@@ -34,13 +34,10 @@ namespace RAYX {
  * @param mat                   material (See Material.h)
  *
  */
-PlaneGrating::PlaneGrating(
-    const char* name, OpticalElement::GeometricalShape geometricalShape,
-    const double width, const double height, const double azimuthalAngle,
-    glm::dvec4 position, glm::dmat4x4 orientation, const double designEnergy,
-    const double lineDensity, const double orderOfDiffraction,
-    const int additionalZeroOrder, const std::array<double, 6> vls,
-    const std::array<double, 7> slopeError, Material mat)
+PlaneGrating::PlaneGrating(const char* name, OpticalElement::GeometricalShape geometricalShape, const double width, const double height,
+                           const double azimuthalAngle, glm::dvec4 position, glm::dmat4x4 orientation, const double designEnergy,
+                           const double lineDensity, const double orderOfDiffraction, const int additionalZeroOrder, const std::array<double, 6> vls,
+                           const std::array<double, 7> slopeError, Material mat)
     : OpticalElement(name, slopeError),
       m_additionalOrder(additionalZeroOrder),
       m_designEnergyMounting(designEnergy),
@@ -58,28 +55,18 @@ PlaneGrating::PlaneGrating(
 
     // parameters of quadric surface
     auto matd = (double)static_cast<int>(mat);
-    setSurface(std::make_unique<Quadric>(
-        glm::dmat4x4{0, 0, 0, 0, 1, 0, 0, -1, 0, 0, 0, 0, 1, 0, matd, 0}));
+    setSurface(std::make_unique<Quadric>(glm::dmat4x4{0, 0, 0, 0, 1, 0, 0, -1, 0, 0, 0, 0, 1, 0, matd, 0}));
 }
 
-std::shared_ptr<PlaneGrating> PlaneGrating::createFromXML(
-    const xml::Parser& p) {
-    return std::make_shared<PlaneGrating>(
-        p.name(), p.parseGeometricalShape(), p.parseTotalWidth(),
-        p.parseTotalLength(), p.parseAzimuthalAngle(), p.parsePosition(),
-        p.parseOrientation(), p.parseDesignEnergyMounting(),
-        p.parseLineDensity(), p.parseOrderDiffraction(),
-        p.parseAdditionalOrder(), p.parseVls(), p.parseSlopeError(),
-        p.parseMaterial());
+std::shared_ptr<PlaneGrating> PlaneGrating::createFromXML(const xml::Parser& p) {
+    return std::make_shared<PlaneGrating>(p.name(), p.parseGeometricalShape(), p.parseTotalWidth(), p.parseTotalLength(), p.parseAzimuthalAngle(),
+                                          p.parsePosition(), p.parseOrientation(), p.parseDesignEnergyMounting(), p.parseLineDensity(),
+                                          p.parseOrderDiffraction(), p.parseAdditionalOrder(), p.parseVls(), p.parseSlopeError(), p.parseMaterial());
 }
 
-double PlaneGrating::getDesignEnergyMounting() const {
-    return m_designEnergyMounting;
-}
+double PlaneGrating::getDesignEnergyMounting() const { return m_designEnergyMounting; }
 double PlaneGrating::getLineDensity() const { return m_lineDensity; }
-double PlaneGrating::getOrderOfDiffraction() const {
-    return m_orderOfDiffraction;
-}
+double PlaneGrating::getOrderOfDiffraction() const { return m_orderOfDiffraction; }
 std::array<double, 6> PlaneGrating::getVls() { return m_vls; }
 
 glm::dmat4x4 PlaneGrating::getElementParameters() const {

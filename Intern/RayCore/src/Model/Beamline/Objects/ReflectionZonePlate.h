@@ -16,35 +16,25 @@ enum class CurvatureType {
     Spherical
 };  // influences surface paramters for eg quadric function or (if torus)
     // newton iteration
-enum class DesignType {
-    ZOffset,
-    Beta
-};  // TODO(Jannis): remove (default is Beta)
-enum class ElementOffsetType {
-    Manual,
-    Beamdivergence
-};  // TODO(Jannis): remove (included in world coordinates)
-enum class RZPType { Elliptical, Meriodional };
+enum class DesignType { ZOffset,
+                        Beta };  // TODO(Jannis): remove (default is Beta)
+enum class ElementOffsetType { Manual,
+                               Beamdivergence };  // TODO(Jannis): remove (included in world coordinates)
+enum class RZPType { Elliptical,
+                     Meriodional };
 
 class RAYX_API ReflectionZonePlate : public OpticalElement {
   public:
     // shortened constructor that assumes that the angles are already calculated
     // and the position and orientation in world coordinates is already derived
-    ReflectionZonePlate(
-        const char* name, OpticalElement::GeometricalShape geometricalShape,
-        CurvatureType curvatureType, const double widthA,
-        const std::optional<double> widthB, const double height,
-        const double azimuthalAngle, const glm::dvec4 position,
-        const glm::dmat4x4 orientation, const double designEnergy,
-        const double orderOfDiffraction, const double designOrderOfDiffraction,
-        const double dAlpha, const double dBeta, const double mEntrance,
-        const double mExit, const double sEntrance, const double sExit,
-        const double shortRadius, const double longRadius,
-        const int additionalZeroOrder, const double fresnelZOffset,
-        const std::array<double, 7> slopeError, Material mat);
+    ReflectionZonePlate(const char* name, OpticalElement::GeometricalShape geometricalShape, CurvatureType curvatureType, const double widthA,
+                        const std::optional<double> widthB, const double height, const double azimuthalAngle, const glm::dvec4 position,
+                        const glm::dmat4x4 orientation, const double designEnergy, const double orderOfDiffraction,
+                        const double designOrderOfDiffraction, const double dAlpha, const double dBeta, const double mEntrance, const double mExit,
+                        const double sEntrance, const double sExit, const double shortRadius, const double longRadius, const int additionalZeroOrder,
+                        const double fresnelZOffset, const std::array<double, 7> slopeError, Material mat);
 
-    static std::shared_ptr<ReflectionZonePlate> createFromXML(
-        const xml::Parser&);
+    static std::shared_ptr<ReflectionZonePlate> createFromXML(const xml::Parser&);
 
     // for calculating incidence and exit angle from user parameters
     void calcAlpha();
@@ -61,8 +51,7 @@ class RAYX_API ReflectionZonePlate : public OpticalElement {
     // alpha0Angle and beta0Angle
     void VectorR1Center();
     void VectorR2Center();
-    double rzpLineDensityDZ(glm::dvec3 intersection, glm::dvec3 normal,
-                            const double WL);
+    double rzpLineDensityDZ(glm::dvec3 intersection, glm::dvec3 normal, const double WL);
 
     // order of diffraction can be derived from the design order of diffraction
     // (from user parameter)
@@ -108,11 +97,10 @@ class RAYX_API ReflectionZonePlate : public OpticalElement {
     double m_incidenceMainBeamLength = 0;
     double m_meridionalDistance = 0;
     double m_meridionalDivergence = 0;
-    double m_fresnelZOffset = 0;  ///< parameter given by user in
-                                  ///< DesignType==DesignType::ZOffset
-    double m_calcFresnelZOffset =
-        0;              ///< calculated if DesignType==DesignType::Beta
-    double m_zOff = 0;  ///< zoffset dependant on elementOffSetType
+    double m_fresnelZOffset = 0;      ///< parameter given by user in
+                                      ///< DesignType==DesignType::ZOffset
+    double m_calcFresnelZOffset = 0;  ///< calculated if DesignType==DesignType::Beta
+    double m_zOff = 0;                ///< zoffset dependant on elementOffSetType
     double m_illuminationZ = 0;
     double m_designEnergyMounting = 0;  //? derived from source?
     // TODO(Theresa): include in world coordinates:

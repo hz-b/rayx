@@ -13,8 +13,7 @@ class RAYX_API Toroid : public Surface {
     // ctor
     Toroid();
     Toroid(const glm::dmat4x4 inputPoints);
-    Toroid(double longRadius, double shortRadius, double elementType,
-           Material mat);
+    Toroid(double longRadius, double shortRadius, double elementType, Material mat);
     // dtor
     ~Toroid();
 

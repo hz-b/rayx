@@ -3,11 +3,9 @@
 #include <Debug.h>
 
 /// this function assumes that `base` is already an absolute path
-std::filesystem::path canonicalize(const std::filesystem::path& relPath,
-                                   const std::filesystem::path& base) {
+std::filesystem::path canonicalize(const std::filesystem::path& relPath, const std::filesystem::path& base) {
     if (!base.is_absolute()) {
-        RAYX_ERR << "canonicalize called with non-absolute base path: \""
-                 << base << "\"";
+        RAYX_ERR << "canonicalize called with non-absolute base path: \"" << base << "\"";
     }
     // absolute paths will stay unchanged
     if (relPath.is_absolute()) {
@@ -19,12 +17,8 @@ std::filesystem::path canonicalize(const std::filesystem::path& relPath,
     return base / relPath;
 }
 
-std::filesystem::path RAYX_API
-canonicalizeRepositoryPath(const std::filesystem::path& relPath) {
-    return canonicalize(relPath, PROJECT_DIR);
-}
+std::filesystem::path RAYX_API canonicalizeRepositoryPath(const std::filesystem::path& relPath) { return canonicalize(relPath, PROJECT_DIR); }
 
-std::filesystem::path RAYX_API
-canonicalizeUserPath(const std::filesystem::path& relPath) {
+std::filesystem::path RAYX_API canonicalizeUserPath(const std::filesystem::path& relPath) {
     return canonicalize(relPath, std::filesystem::current_path());
 }

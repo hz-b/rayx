@@ -15,23 +15,17 @@ namespace RAYX {
  * calculating world coordinates
  * does not have an azimuthal angle
  */
-ImagePlane::ImagePlane(const char* name, glm::dvec4 position,
-                       glm::dmat4x4 orientation)
-    : OpticalElement(name, {0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0}) {
+ImagePlane::ImagePlane(const char* name, glm::dvec4 position, glm::dmat4x4 orientation) : OpticalElement(name, {0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0}) {
     m_Geometry->m_orientation = orientation;
     m_Geometry->m_position = position;
 
-    setSurface(std::make_unique<Quadric>(
-        glm::dmat4x4{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 5, 0, 0, 0}));
+    setSurface(std::make_unique<Quadric>(glm::dmat4x4{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 5, 0, 0, 0}));
 }
 ImagePlane::~ImagePlane() = default;
 
 std::shared_ptr<ImagePlane> ImagePlane::createFromXML(const xml::Parser& p) {
-    return std::make_shared<ImagePlane>(p.name(), p.parsePosition(),
-                                        p.parseOrientation());
+    return std::make_shared<ImagePlane>(p.name(), p.parsePosition(), p.parseOrientation());
 }
 
-glm::dmat4x4 ImagePlane::getElementParameters() const {
-    return {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
-}
+glm::dmat4x4 ImagePlane::getElementParameters() const { return {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}; }
 }  // namespace RAYX

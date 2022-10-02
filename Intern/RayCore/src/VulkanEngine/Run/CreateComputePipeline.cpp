@@ -24,8 +24,7 @@ void VulkanEngine::createComputePipeline() {
 
     RAYX_LOG << "Creating compute shader module..";
 
-    VK_CHECK_RESULT(vkCreateShaderModule(m_Device, &createInfo, nullptr,
-                                         &m_ComputeShaderModule));
+    VK_CHECK_RESULT(vkCreateShaderModule(m_Device, &createInfo, nullptr, &m_ComputeShaderModule));
     RAYX_LOG << "Shader module(s) created.";
     delete[] compShaderCode;
 
@@ -37,8 +36,7 @@ void VulkanEngine::createComputePipeline() {
     point(main).
     */
     VkPipelineShaderStageCreateInfo shaderStageCreateInfo = {};
-    shaderStageCreateInfo.sType =
-        VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO;
+    shaderStageCreateInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO;
     shaderStageCreateInfo.stage = VK_SHADER_STAGE_COMPUTE_BIT;
     shaderStageCreateInfo.module = m_ComputeShaderModule;
     shaderStageCreateInfo.pName = "main";
@@ -48,12 +46,10 @@ void VulkanEngine::createComputePipeline() {
     So we just specify the descriptor set layout we created earlier.
     */
     VkPipelineLayoutCreateInfo pipelineLayoutCreateInfo = {};
-    pipelineLayoutCreateInfo.sType =
-        VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO;
+    pipelineLayoutCreateInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO;
     pipelineLayoutCreateInfo.setLayoutCount = 1;
     pipelineLayoutCreateInfo.pSetLayouts = &m_DescriptorSetLayout;
-    VK_CHECK_RESULT(vkCreatePipelineLayout(m_Device, &pipelineLayoutCreateInfo,
-                                           nullptr, &m_PipelineLayout));
+    VK_CHECK_RESULT(vkCreatePipelineLayout(m_Device, &pipelineLayoutCreateInfo, nullptr, &m_PipelineLayout));
 
     VkComputePipelineCreateInfo pipelineCreateInfo = {};
     pipelineCreateInfo.sType = VK_STRUCTURE_TYPE_COMPUTE_PIPELINE_CREATE_INFO;
@@ -62,9 +58,7 @@ void VulkanEngine::createComputePipeline() {
     /*
     Now, we finally create the compute pipeline.
     */
-    VK_CHECK_RESULT(vkCreateComputePipelines(m_Device, VK_NULL_HANDLE, 1,
-                                             &pipelineCreateInfo, nullptr,
-                                             &m_Pipeline));
+    VK_CHECK_RESULT(vkCreateComputePipelines(m_Device, VK_NULL_HANDLE, 1, &pipelineCreateInfo, nullptr, &m_Pipeline));
     RAYX_LOG << "Pipeline created.";
 }
 

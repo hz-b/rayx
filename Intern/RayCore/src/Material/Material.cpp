@@ -48,8 +48,7 @@ bool materialFromString(const char* matname, Material* out) {
             return true;
         }
     }
-    RAYX_ERR << "materialFromString(): material \"" << matname
-             << "\" not found";
+    RAYX_ERR << "materialFromString(): material \"" << matname << "\" not found";
     return false;
 }
 

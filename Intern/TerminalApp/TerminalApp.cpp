@@ -17,10 +17,9 @@ TerminalApp::TerminalApp(int argc, char** argv) : m_argv(argv), m_argc(argc) {
     /// or worse.
     /// 64-bit has sizeof(void*) == 8.
     if (sizeof(void*) <= 4) {
-        RAYX_WARN
-            << "This application should be compiled as 64-bit! Using 32-bit"
-               "will make this program run out of memory for larger ray "
-               "numbers!";
+        RAYX_WARN << "This application should be compiled as 64-bit! Using 32-bit"
+                     "will make this program run out of memory for larger ray "
+                     "numbers!";
     }
 }
 
@@ -42,8 +41,7 @@ void TerminalApp::tracePath(std::filesystem::path path) {
         }
     } else if (path.extension() == ".rml") {
         // Load RML file
-        m_Beamline =
-            std::make_unique<RAYX::Beamline>(RAYX::importBeamline(path));
+        m_Beamline = std::make_unique<RAYX::Beamline>(RAYX::importBeamline(path));
 
         // Run RAY-X Core
         auto rays = m_Tracer->trace(*m_Beamline);
@@ -90,22 +88,15 @@ void TerminalApp::run() {
     tracePath(m_CommandParser->m_args.m_providedFile);
 
     if (m_CommandParser->m_args.m_benchmark) {
-        std::chrono::steady_clock::time_point end =
-            std::chrono::steady_clock::now();
-        RAYX_LOG << "Benchmark: Done in "
-                 << std::chrono::duration_cast<std::chrono::milliseconds>(
-                        end - start_time)
-                        .count()
-                 << " ms";
+        std::chrono::steady_clock::time_point end = std::chrono::steady_clock::now();
+        RAYX_LOG << "Benchmark: Done in " << std::chrono::duration_cast<std::chrono::milliseconds>(end - start_time).count() << " ms";
     }
 
     //  Plot in Python
     if (m_CommandParser->m_args.m_plotFlag) {
         // Setup to create venv if needed
         try {
-            std::shared_ptr<PythonInterp> pySetup =
-                std::make_shared<PythonInterp>("py_setup", "setup",
-                                               (const char*)nullptr);
+            std::shared_ptr<PythonInterp> pySetup = std::make_shared<PythonInterp>("py_setup", "setup", (const char*)nullptr);
             pySetup->execute();
         } catch (std::exception& e) {
             RAYX_ERR << e.what();
@@ -116,12 +107,9 @@ void TerminalApp::run() {
         // *Temporary method (Calls sys python interpreter that calls rayx
         // interpreter) [Python Dynamic linking problem]
         try {
-            std::shared_ptr<PythonInterp> pyPlot =
-                std::make_shared<PythonInterp>("py_plot_entry", "startPlot",
-                                               (const char*)nullptr);
+            std::shared_ptr<PythonInterp> pyPlot = std::make_shared<PythonInterp>("py_plot_entry", "startPlot", (const char*)nullptr);
             if (!m_CommandParser->m_args.m_providedFile.empty()) {
-                std::filesystem::path _providedFile = canonicalizeUserPath(
-                    m_CommandParser->m_args.m_providedFile);
+                std::filesystem::path _providedFile = canonicalizeUserPath(m_CommandParser->m_args.m_providedFile);
                 pyPlot->setPlotName(_providedFile.c_str());
             }
             if (m_CommandParser->m_args.m_dummyFlag) {
@@ -137,8 +125,7 @@ void TerminalApp::run() {
     }
 }
 
-void TerminalApp::exportRays(const std::vector<RAYX::Ray>& rays,
-                             std::string path) {
+void TerminalApp::exportRays(const std::vector<RAYX::Ray>& rays, std::string path) {
 #ifdef CI
     bool csv = true;
 #else

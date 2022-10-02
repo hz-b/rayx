@@ -43,8 +43,7 @@ class RAYX_API Instrumentor {
   public:
     Instrumentor() : m_CurrentSession(nullptr), m_ProfileCount(0) {}
 
-    void BeginSession(const std::string& name,
-                      const std::string& filepath = "results.json") {
+    void BeginSession(const std::string& name, const std::string& filepath = "results.json") {
         m_OutputStream.open(filepath);
         WriteHeader();
         m_CurrentSession = new InstrumentationSession{name};
@@ -95,9 +94,7 @@ class RAYX_API Instrumentor {
 
 class RAYX_API InstrumentationTimer {
   public:
-    InstrumentationTimer(const char* name) : m_Name(name), m_Stopped(false) {
-        m_StartTimepoint = std::chrono::high_resolution_clock::now();
-    }
+    InstrumentationTimer(const char* name) : m_Name(name), m_Stopped(false) { m_StartTimepoint = std::chrono::high_resolution_clock::now(); }
 
     ~InstrumentationTimer() {
         if (!m_Stopped) Stop();
@@ -106,18 +103,10 @@ class RAYX_API InstrumentationTimer {
     void Stop() {
         auto endTimepoint = std::chrono::high_resolution_clock::now();
 
-        long long start =
-            std::chrono::time_point_cast<std::chrono::microseconds>(
-                m_StartTimepoint)
-                .time_since_epoch()
-                .count();
-        long long end = std::chrono::time_point_cast<std::chrono::microseconds>(
-                            endTimepoint)
-                            .time_since_epoch()
-                            .count();
+        long long start = std::chrono::time_point_cast<std::chrono::microseconds>(m_StartTimepoint).time_since_epoch().count();
+        long long end = std::chrono::time_point_cast<std::chrono::microseconds>(endTimepoint).time_since_epoch().count();
 
-        uint32_t threadID =
-            std::hash<std::thread::id>{}(std::this_thread::get_id());
+        uint32_t threadID = std::hash<std::thread::id>{}(std::this_thread::get_id());
         Instrumentor::Get().WriteProfile({m_Name, start, end, threadID});
 
         m_Stopped = true;
@@ -125,8 +114,7 @@ class RAYX_API InstrumentationTimer {
 
   private:
     const char* m_Name;
-    std::chrono::time_point<std::chrono::high_resolution_clock>
-        m_StartTimepoint;
+    std::chrono::time_point<std::chrono::high_resolution_clock> m_StartTimepoint;
     bool m_Stopped;
 };
 
@@ -134,11 +122,9 @@ class RAYX_API InstrumentationTimer {
 
 // Define profiling macros
 #ifdef RAYX_PROFILE
-#define RAYX_PROFILE_BEGIN_SESSION(name, filepath) \
-    ::RAYX::Instrumentor::Get().BeginSession(name, filepath)
+#define RAYX_PROFILE_BEGIN_SESSION(name, filepath) ::RAYX::Instrumentor::Get().BeginSession(name, filepath)
 #define RAYX_PROFILE_END_SESSION() ::RAYX::Instrumentor::Get().EndSession()
-#define RAYX_PROFILE_SCOPE(name) \
-    ::RAYX::InstrumentationTimer timer##__LINE__(name)
+#define RAYX_PROFILE_SCOPE(name) ::RAYX::InstrumentationTimer timer##__LINE__(name)
 #if !defined(__PRETTY_FUNCTION__) && !defined(__GNUC__)
 #define __PRETTY_FUNCTION__ __FUNCSIG__
 #endif
