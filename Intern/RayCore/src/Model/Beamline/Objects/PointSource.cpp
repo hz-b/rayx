@@ -50,9 +50,9 @@ PointSource::PointSource(const std::string& name, int numberOfRays,
                          const double linPol0, const double linPol45,
                          const double circPol,
                          const std::array<double, 6> misalignment)
-    : LightSource(name.c_str(), numberOfRays, std::move(dist), linPol0, linPol45, circPol, misalignment,
-                  sourceDepth, sourceHeight, sourceWidth, horDivergence,
-                  verDivergence) {
+    : LightSource(name.c_str(), numberOfRays, std::move(dist), linPol0,
+                  linPol45, circPol, misalignment, sourceDepth, sourceHeight,
+                  sourceWidth, horDivergence, verDivergence) {
     m_widthDist = widthDist;
     m_heightDist = heightDist;
     m_horDist = horDist;
@@ -62,7 +62,8 @@ PointSource::PointSource(const std::string& name, int numberOfRays,
 PointSource::~PointSource() = default;
 
 // returns nullptr on error
-std::shared_ptr<PointSource> PointSource::createFromXML(const RAYX::xml::Parser& p) {
+std::shared_ptr<PointSource> PointSource::createFromXML(
+    const RAYX::xml::Parser& p) {
     return std::make_shared<PointSource>(
         p.name(), p.parseNumberRays(), p.parseEnergyDistribution(),
         p.parseSourceWidth(), p.parseSourceHeight(), p.parseSourceDepth(),
@@ -111,7 +112,7 @@ std::vector<Ray> PointSource::getRays() const {
 
     int n = m_numberOfRays;
     std::vector<Ray> rayList;
-	rayList.reserve(m_numberOfRays);
+    rayList.reserve(m_numberOfRays);
     // rayList.reserve(1048576);
     RAYX_D_LOG << "Create " << n << " rays with standard normal deviation...";
 

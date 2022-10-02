@@ -1,10 +1,10 @@
+#include "CSVWriter.h"
+
 #include <Debug.h>
 
 #include <cstring>
 #include <fstream>
 #include <sstream>
-
-#include "CSVWriter.h"
 
 const int CELL_SIZE = 23;
 

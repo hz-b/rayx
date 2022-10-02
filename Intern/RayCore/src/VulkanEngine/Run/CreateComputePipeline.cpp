@@ -1,5 +1,5 @@
-#include "VulkanEngine/VulkanEngine.h"
 #include "CanonicalizePath.h"
+#include "VulkanEngine/VulkanEngine.h"
 
 uint32_t* readFile(uint32_t& length, const char* filename);
 
@@ -68,7 +68,7 @@ void VulkanEngine::createComputePipeline() {
     RAYX_LOG << "Pipeline created.";
 }
 
-}
+}  // namespace RAYX
 
 // Read file into array of bytes, and cast to uint32_t*, then return.
 // The data has been padded, so that it fits into an array uint32_t.

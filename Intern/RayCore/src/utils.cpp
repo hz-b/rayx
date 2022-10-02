@@ -145,4 +145,6 @@ std::vector<double>::iterator movingAppend(std::vector<double>&& srcVector,
  * @return true
  * @return false
  */
-bool isIdentMatrix(glm::dmat4x4 matrix) { return (matrix == glm::dmat4x4(1.0)); }
+bool isIdentMatrix(glm::dmat4x4 matrix) {
+    return (matrix == glm::dmat4x4(1.0));
+}

@@ -9,7 +9,8 @@ int GLOBAL_ARGC = 0;
 char** GLOBAL_ARGV = nullptr;
 
 int main(int argc, char** argv) {
-    std::filesystem::path outputDir = canonicalizeRepositoryPath("Tests/output");
+    std::filesystem::path outputDir =
+        canonicalizeRepositoryPath("Tests/output");
     if (!std::filesystem::is_directory(outputDir) ||
         !std::filesystem::exists(outputDir)) {
         std::filesystem::create_directory(outputDir);

@@ -42,16 +42,17 @@ MatrixSource::MatrixSource(const std::string& name, int numberOfRays,
                            const double verDivergence, const double linPol0,
                            const double linPol45, const double circPol,
                            const std::array<double, 6> misalignment)
-    : LightSource(name.c_str(), numberOfRays, std::move(dist), linPol0, linPol45, circPol, misalignment,
-                  sourceDepth, sourceHeight, sourceWidth, horDivergence,
-                  verDivergence) {
+    : LightSource(name.c_str(), numberOfRays, std::move(dist), linPol0,
+                  linPol45, circPol, misalignment, sourceDepth, sourceHeight,
+                  sourceWidth, horDivergence, verDivergence) {
     RAYX_LOG << "Created.";
 }
 
 MatrixSource::~MatrixSource() = default;
 
 // returns nullptr on error
-std::shared_ptr<MatrixSource> MatrixSource::createFromXML(const xml::Parser& p) {
+std::shared_ptr<MatrixSource> MatrixSource::createFromXML(
+    const xml::Parser& p) {
     return std::make_shared<MatrixSource>(
         p.name(), p.parseNumberRays(), p.parseEnergyDistribution(),
         p.parseSourceWidth(), p.parseSourceHeight(), p.parseSourceDepth(),
@@ -77,7 +78,7 @@ std::vector<Ray> MatrixSource::getRays() const {
     int rmat = int(sqrt(m_numberOfRays));
 
     std::vector<Ray> returnList;
-	returnList.reserve(m_numberOfRays);
+    returnList.reserve(m_numberOfRays);
     // rayVector.reserve(1048576);
     RAYX_LOG << "create " << rmat << " times " << rmat
              << " matrix with Matrix Source...";

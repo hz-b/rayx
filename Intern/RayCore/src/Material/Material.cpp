@@ -2,7 +2,7 @@
 
 #include <Debug.h>
 #ifdef _WIN32
-#include <string.h> 
+#include <string.h>
 #else
 #include <strings.h>
 #endif

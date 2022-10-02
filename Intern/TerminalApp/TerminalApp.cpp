@@ -4,8 +4,8 @@
 #include <memory>
 #include <stdexcept>
 
-#include "Debug.h"
 #include "CanonicalizePath.h"
+#include "Debug.h"
 #include "Tracer/CpuTracer.h"
 #include "Tracer/VulkanTracer.h"
 #include "Writer/Writer.h"
@@ -120,8 +120,8 @@ void TerminalApp::run() {
                 std::make_shared<PythonInterp>("py_plot_entry", "startPlot",
                                                (const char*)nullptr);
             if (!m_CommandParser->m_args.m_providedFile.empty()) {
-                std::filesystem::path _providedFile =
-                    canonicalizeUserPath(m_CommandParser->m_args.m_providedFile);
+                std::filesystem::path _providedFile = canonicalizeUserPath(
+                    m_CommandParser->m_args.m_providedFile);
                 pyPlot->setPlotName(_providedFile.c_str());
             }
             if (m_CommandParser->m_args.m_dummyFlag) {

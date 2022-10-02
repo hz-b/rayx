@@ -1,8 +1,8 @@
 #include "PythonInterp.h"
-#include "CanonicalizePath.h"
 
 #include <stdexcept>
 
+#include "CanonicalizePath.h"
 #include "Debug.h"
 
 #if defined(WIN32)

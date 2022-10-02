@@ -40,4 +40,4 @@ void VulkanEngine::runCommandBuffer() {
     vkDestroyFence(m_Device, fence, nullptr);
 }
 
-}
+}  // namespace RAYX

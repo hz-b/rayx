@@ -260,7 +260,7 @@ bool paramVls(const rapidxml::xml_node<>* node, std::array<double, 6>* out) {
 }
 
 bool paramEnergyDistribution(const rapidxml::xml_node<>* node,
-                             const std::filesystem::path &rmlFile,
+                             const std::filesystem::path& rmlFile,
                              EnergyDistribution* out) {
     if (!node || !out) {
         return false;
@@ -398,7 +398,9 @@ bool parseGroup(rapidxml::xml_node<>* node, xml::Group* out) {
 Parser::Parser(rapidxml::xml_node<>* node,
                std::vector<xml::Group> group_context,
                std::filesystem::path rmlFile)
-    : node(node), group_context(std::move(group_context)), rmlFile(std::move(rmlFile)) {}
+    : node(node),
+      group_context(std::move(group_context)),
+      rmlFile(std::move(rmlFile)) {}
 
 const char* Parser::name() const {
     return node->first_attribute("name")->value();
@@ -498,4 +500,4 @@ Material Parser::parseMaterial() const {
     return m;
 }
 
-}  // namespace RAYX
+}  // namespace RAYX::xml

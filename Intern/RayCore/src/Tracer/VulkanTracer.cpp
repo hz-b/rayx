@@ -32,10 +32,10 @@ std::vector<Ray> VulkanTracer::trace(const Beamline& beamline) {
                                {.m_binding = 4, .m_in = true, .m_out = false});
         m_engine.declareBuffer("material-table",
                                {.m_binding = 5, .m_in = true, .m_out = false});
-    #ifdef RAYX_DEBUG_MODE
+#ifdef RAYX_DEBUG_MODE
         m_engine.declareBuffer("debug-buffer",
                                {.m_binding = 6, .m_in = false, .m_out = true});
-    #endif
+#endif
         m_engine.init({.m_shader = "build/bin/comp.spv"});
     }
 

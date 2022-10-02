@@ -21,13 +21,11 @@ void VulkanEngine::createBuffer(const char* bufname, VkDeviceSize size) {
 
     createVkBuffer(size, buffer_usage_flags,
                    VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, b.m_Buffer, b.m_Memory);
-
 }
 
 uint32_t findMemoryType(VkPhysicalDevice& physicalDevice,
                         uint32_t memoryTypeBits,
                         VkMemoryPropertyFlags properties);
-
 
 // Creates a buffer to each given object with a given size.
 // This also allocates memory to the buffer according the requirements of the
