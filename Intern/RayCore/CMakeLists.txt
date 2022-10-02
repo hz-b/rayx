@@ -3,7 +3,7 @@ cmake_minimum_required(VERSION 3.2 FATAL_ERROR)
 project(RayCore)
 
 SET(SOURCE
-    src/PathResolver.cpp
+    src/CanonicalizePath.cpp
     src/Debug.cpp
     src/utils.cpp
     src/Data/Exporter.cpp
@@ -62,7 +62,7 @@ SET(SOURCE
 )
 
 SET(HEADERS
-    src/PathResolver.h
+    src/CanonicalizePath.h
     src/utils.h
     src/Model/Beamline/Beamline.h
     src/Model/Beamline/OpticalElement.h

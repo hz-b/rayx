@@ -7,7 +7,6 @@
 
 #include "Debug.h"
 #include "Debug/Instrumentor.h"
-#include "PathResolver.h"
 
 #ifdef RAYX_PLATFORM_MSVC
 #ifdef USE_NSIGHT_AFTERMATH

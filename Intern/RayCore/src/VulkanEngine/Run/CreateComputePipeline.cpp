@@ -1,5 +1,5 @@
-#include "PathResolver.h"
 #include "VulkanEngine/VulkanEngine.h"
+#include "CanonicalizePath.h"
 
 uint32_t* readFile(uint32_t& length, const char* filename);
 
@@ -15,7 +15,7 @@ void VulkanEngine::createComputePipeline() {
     uint32_t filelength;
     // the code in comp.spv was created by running the command:
     // glslangValidator.exe -V shader.comp
-    std::string path = resolvePath(m_shaderfile);
+    std::string path = canonicalizeRepositoryPath(m_shaderfile);
     uint32_t* compShaderCode = readFile(filelength, path.c_str());
     VkShaderModuleCreateInfo createInfo = {};
     createInfo.sType = VK_STRUCTURE_TYPE_SHADER_MODULE_CREATE_INFO;

@@ -6,7 +6,7 @@
 #include <fstream>
 #include <iostream>
 
-#include "PathResolver.h"
+#include "CanonicalizePath.h"
 
 bool PalikTable::load(const char* element, PalikTable* out) {
     std::string elementString = element;
@@ -15,7 +15,7 @@ bool PalikTable::load(const char* element, PalikTable* out) {
                    [](unsigned char c) { return std::toupper(c); });
 
     std::string f = "Data/PALIK/" + elementString + ".NKP";
-    std::ifstream s(resolvePath(f));
+    std::ifstream s(canonicalizeRepositoryPath(f));
 
     if (s.fail()) {
         return false;

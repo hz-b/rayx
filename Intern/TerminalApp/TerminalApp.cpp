@@ -5,13 +5,12 @@
 #include <stdexcept>
 
 #include "Debug.h"
-#include "PathResolver.h"
+#include "CanonicalizePath.h"
 #include "Tracer/CpuTracer.h"
 #include "Tracer/VulkanTracer.h"
 #include "Writer/Writer.h"
 
 TerminalApp::TerminalApp(int argc, char** argv) : m_argv(argv), m_argc(argc) {
-    initPathResolver();
     RAYX_D_LOG << "TerminalApp created!";
 
     /// warn if the binary is compiled with 32-bit (i.e. sizeof(void*) == 4)
@@ -121,8 +120,8 @@ void TerminalApp::run() {
                 std::make_shared<PythonInterp>("py_plot_entry", "startPlot",
                                                (const char*)nullptr);
             if (!m_CommandParser->m_args.m_providedFile.empty()) {
-                std::string _providedFile =
-                    getFilename(m_CommandParser->m_args.m_providedFile);
+                std::filesystem::path _providedFile =
+                    canonicalizeUserPath(m_CommandParser->m_args.m_providedFile);
                 pyPlot->setPlotName(_providedFile.c_str());
             }
             if (m_CommandParser->m_args.m_dummyFlag) {

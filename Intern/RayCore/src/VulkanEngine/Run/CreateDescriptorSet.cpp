@@ -1,4 +1,3 @@
-#include "PathResolver.h"
 #include "VulkanEngine/VulkanEngine.h"
 
 namespace RAYX {

@@ -1,6 +1,6 @@
 #include <filesystem>
 
-#include "PathResolver.h"
+#include "CanonicalizePath.h"
 #include "gmock/gmock.h"
 #include "gtest/gtest.h"
 #include "setupTests.h"
@@ -9,13 +9,10 @@ int GLOBAL_ARGC = 0;
 char** GLOBAL_ARGV = nullptr;
 
 int main(int argc, char** argv) {
-    initPathResolver();
-    {
-        std::filesystem::path outputDir = resolvePath("Tests/output");
-        if (!std::filesystem::is_directory(outputDir) ||
-            !std::filesystem::exists(outputDir)) {
-            std::filesystem::create_directory(outputDir);
-        }
+    std::filesystem::path outputDir = canonicalizeRepositoryPath("Tests/output");
+    if (!std::filesystem::is_directory(outputDir) ||
+        !std::filesystem::exists(outputDir)) {
+        std::filesystem::create_directory(outputDir);
     }
 
     testing::InitGoogleTest(&argc, argv);

@@ -10,7 +10,7 @@
 #include "Debug.h"
 #include "Material/Material.h"
 #include "Model/Beamline/Objects/Objects.h"
-#include "PathResolver.h"
+#include "CanonicalizePath.h"
 #include "Tracer/CpuTracer.h"
 #include "Tracer/Ray.h"
 #include "Tracer/VulkanTracer.h"

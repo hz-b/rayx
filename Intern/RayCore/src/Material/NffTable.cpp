@@ -7,7 +7,7 @@
 #include <fstream>
 #include <iostream>
 
-#include "PathResolver.h"
+#include "CanonicalizePath.h"
 
 bool NffTable::load(const char* element, NffTable* out) {
     std::string elementString = element;
@@ -17,7 +17,7 @@ bool NffTable::load(const char* element, NffTable* out) {
                    [](unsigned char c) { return std::tolower(c); });
 
     std::string f = "Data/nff/" + elementString + ".nff";
-    std::ifstream s(resolvePath(f));
+    std::ifstream s(canonicalizeRepositoryPath(f));
 
     if (s.fail()) {
         return false;

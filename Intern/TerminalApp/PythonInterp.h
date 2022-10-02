@@ -12,8 +12,6 @@
 #include <Python.h>
 #endif
 
-#include <PathResolver.h>
-
 #include <string>
 
 class PythonInterp {
