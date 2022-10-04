@@ -110,7 +110,7 @@ void TerminalApp::run() {
             std::shared_ptr<PythonInterp> pyPlot = std::make_shared<PythonInterp>("py_plot_entry", "startPlot", (const char*)nullptr);
             if (!m_CommandParser->m_args.m_providedFile.empty()) {
                 std::filesystem::path _providedFile = canonicalizeUserPath(m_CommandParser->m_args.m_providedFile);
-                pyPlot->setPlotName(_providedFile.c_str());
+                pyPlot->setPlotName(_providedFile.string().c_str());
             }
             if (m_CommandParser->m_args.m_dummyFlag) {
                 pyPlot->setPlotName("Dummy Beamline");

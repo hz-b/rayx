@@ -11,8 +11,6 @@ project(RayTests)
 include(CTest)
 enable_testing()
 
-set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
-
 set(BINARY ${CMAKE_PROJECT_NAME}_tst)
 
 file(GLOB_RECURSE TEST_SOURCES LIST_DIRECTORIES false *.h *.cpp)

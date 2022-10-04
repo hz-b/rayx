@@ -54,14 +54,14 @@ RAYX::Ray parseCSVline(std::string line) {
 
 /// will look at Tests/input/<filename>.rml
 RAYX::Beamline loadBeamline(std::string filename) {
-    std::string beamline_file = canonicalizeRepositoryPath("Tests/input/" + filename + ".rml");
+    std::string beamline_file = canonicalizeRepositoryPath("Tests/input/" + filename + ".rml").string();
 
     return RAYX::importBeamline(beamline_file);
 }
 
 /// will write to Tests/output/<filename>.csv
 void writeToOutputCSV(std::vector<RAYX::Ray>& rays, std::string filename) {
-    std::string f = canonicalizeRepositoryPath("Tests/output/" + filename + ".csv");
+    std::string f = canonicalizeRepositoryPath("Tests/output/" + filename + ".csv").string();
     writeCSV(rays, f);
 }
 
@@ -117,7 +117,7 @@ std::vector<RAYX::Ray> traceRML(std::string filename, Filter filter) {
 /// the Ray-UI files are to be obtained by Export > RawRaysOutgoing (which are in
 /// element coordinates of the relevant element!)
 std::vector<RAYX::Ray> loadCSVRayUI(std::string filename) {
-    std::string file = canonicalizeRepositoryPath("Tests/input/" + filename + ".csv");
+    std::string file = canonicalizeRepositoryPath("Tests/input/" + filename + ".csv").string();
 
     std::ifstream f(file);
     std::string line;

@@ -49,7 +49,7 @@ PythonInterp::PythonInterp(const char* pyName, const char* pyFunc, const char* p
     // Set module lookup dir, otherwise Python can't run the files
     PyRun_SimpleString("import os");
     PyRun_SimpleString("import sys");
-    std::string python_dir(canonicalizeRepositoryPath("build/bin/python"));
+    std::string python_dir(canonicalizeRepositoryPath("build/bin/python").string());
     python_dir = "sys.path.append(\"" + python_dir + "\")";
     PyRun_SimpleString(python_dir.c_str());
 
