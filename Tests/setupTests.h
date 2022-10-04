@@ -32,6 +32,11 @@ extern char** GLOBAL_ARGV;
 
 const int PREC = 17;
 
+/// this is the underlying implementation of the CHECK_EQ macro.
+/// asserts that tl and tr are the same up to a given tolerance, and give a fancy print if they mismatch.
+/// filename, line represents where CHECK_EQ is called.
+/// l and r are the printable strings representing tl and tr.
+/// vl and vr represent the doubles contained in tl and tr, obtained with RAYX::formatAsVec
 template <typename TL, typename TR>
 inline void checkEq(std::string filename, int line, std::string l, std::string r, const TL& tl, const TR& tr, std::vector<double> vl,
                     std::vector<double> vr, double tolerance = 1e-10) {
@@ -76,7 +81,7 @@ inline void checkEq(std::string filename, int line, std::string l, std::string r
     ADD_FAILURE();
 }
 
-// specialized handling for rays, better prints!
+/// specialized handling for rays, better prints!
 template <>
 inline void checkEq(std::string filename, int line, std::string l, std::string r, const RAYX::Ray& tl, const RAYX::Ray& tr, std::vector<double> vl,
                     std::vector<double> vr, double tolerance) {
@@ -88,9 +93,11 @@ inline void checkEq(std::string filename, int line, std::string l, std::string r
     }
 }
 
+/// check that L and R contain the same doubles.
 #define CHECK_EQ(L, R, ...) \
     checkEq(__FILE__, __LINE__, #L, #R, L, R, RAYX::formatAsVec(L), RAYX::formatAsVec(R), ##__VA_ARGS__)  // __VA_ARGS__ = tolerance or nothing
 
+/// assert that x holds, and give a fancy print otherwise.
 #define CHECK(x)                                      \
     {                                                 \
         if (!(x)) {                                   \
@@ -98,6 +105,7 @@ inline void checkEq(std::string filename, int line, std::string l, std::string r
         }                                             \
     }
 
+/// check whether low <= expr <= high
 #define CHECK_IN(expr, low, high)                                                       \
     {                                                                                   \
         auto res = expr;                                                                \
@@ -111,8 +119,8 @@ inline void checkEq(std::string filename, int line, std::string l, std::string r
         }                                                                               \
     }
 
-// used to check equalities, where doubles contain integer values
-// i.e. weight == 1, or extraParam == 21.
+/// used to check equalities, where doubles contain integer values
+/// i.e. weight == 1, or extraParam == 21.
 inline bool intclose(double x, double y) { return abs(x - y) < 0.5; }
 
 // ShaderTest
@@ -148,36 +156,36 @@ class TestSuite : public testing::Test {
 
 RAYX::Ray parseCSVline(std::string line);
 
-// will look at Tests/input/<filename>.rml
+/// will look at Tests/input/<filename>.rml
 RAYX::Beamline loadBeamline(std::string filename);
 
-// will write to Tests/output/<filename>.csv
+/// will write to Tests/output/<filename>.csv
 void writeToOutputCSV(std::vector<RAYX::Ray>& rays, std::string filename);
 
 enum class Filter { KeepAllRays,
                     OnlySequentialRays };
 
-// returns rays in element coordinates
-// weight = 0 rays are filtered out.
-// if filter == OnlySequentialRays, then only the sequential rays are returned.
+/// returns rays in element coordinates
+/// weight = 0 rays are filtered out.
+/// if filter == OnlySequentialRays, then only the sequential rays are returned.
 std::vector<RAYX::Ray> traceRML(std::string filename, Filter filter = Filter::KeepAllRays);
 
-// will look at Tests/input/<filename>.csv
-// the Ray-UI files are to be obtained by Export > RawRaysOutgoing (which are in
-// element coordinates of the relevant element!)
+/// will look at Tests/input/<filename>.csv
+/// the Ray-UI files are to be obtained by Export > RawRaysOutgoing (which are in
+/// element coordinates of the relevant element!)
 std::vector<RAYX::Ray> loadCSVRayUI(std::string filename);
 
-// This only asserts that position, direction, energy are the same
-// yet! many parameters are missing in RayUI and hence cannot be compared. but
-// for example path length could be compared, but tests fail currently if we do
-// so (TODO(rudi)).
+/// This only asserts that position, direction, energy are the same
+/// yet! many parameters are missing in RayUI and hence cannot be compared. but
+/// for example path length could be compared, but tests fail currently if we do
+/// so (TODO(rudi)).
 void compareRayLists(const std::vector<RAYX::Ray>& rayx, const std::vector<RAYX::Ray>& rayui, double t = 1e-11);
 
-// This function automatcaily filters
-// out weight = 0 rays from rayx, as they are automatically missing in rayui.
-// This also filters out non-sequential rays to compare to Ray-UI correctly.
+/// This function automatcaily filters
+/// out weight = 0 rays from rayx, as they are automatically missing in rayui.
+/// This also filters out non-sequential rays to compare to Ray-UI correctly.
 void compareAgainstRayUI(std::string filename, double t = 1e-11);
 
-// updates the material tables of the Cpu Tracer to contain exactly the
-// materials given in the std::vector.
+/// updates the material tables of the Cpu Tracer to contain exactly the
+/// materials given in the std::vector.
 void updateCpuTracerMaterialTables(std::vector<Material>);

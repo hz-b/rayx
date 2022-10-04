@@ -52,24 +52,24 @@ RAYX::Ray parseCSVline(std::string line) {
     return ray;
 }
 
-// will look at Tests/input/<filename>.rml
+/// will look at Tests/input/<filename>.rml
 RAYX::Beamline loadBeamline(std::string filename) {
     std::string beamline_file = canonicalizeRepositoryPath("Tests/input/" + filename + ".rml");
 
     return RAYX::importBeamline(beamline_file);
 }
 
-// will write to Tests/output/<filename>.csv
+/// will write to Tests/output/<filename>.csv
 void writeToOutputCSV(std::vector<RAYX::Ray>& rays, std::string filename) {
     std::string f = canonicalizeRepositoryPath("Tests/output/" + filename + ".csv");
     writeCSV(rays, f);
 }
 
-// sequentialExtraParam yields the desired extraParam for rays which went the
-// sequential route through a beamline with `count` OpticalElements.
-// sequentialExtraParam(2) = 21
-// sequentialExtraParam(3) = 321 // i.e. first element 1, then 2 and then 3.
-// ...
+/// sequentialExtraParam yields the desired extraParam for rays which went the
+/// sequential route through a beamline with `count` OpticalElements.
+/// sequentialExtraParam(2) = 21
+/// sequentialExtraParam(3) = 321 // i.e. first element 1, then 2 and then 3.
+/// ...
 int sequentialExtraParam(int count) {
     int out = 0;
     int fac = 1;
@@ -113,9 +113,9 @@ std::vector<RAYX::Ray> traceRML(std::string filename, Filter filter) {
     }
 }
 
-// will look at Tests/input/<filename>.csv
-// the Ray-UI files are to be obtained by Export > RawRaysOutgoing (which are in
-// element coordinates of the relevant element!)
+/// will look at Tests/input/<filename>.csv
+/// the Ray-UI files are to be obtained by Export > RawRaysOutgoing (which are in
+/// element coordinates of the relevant element!)
 std::vector<RAYX::Ray> loadCSVRayUI(std::string filename) {
     std::string file = canonicalizeRepositoryPath("Tests/input/" + filename + ".csv");
 

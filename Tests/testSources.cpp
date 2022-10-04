@@ -14,7 +14,7 @@ TEST_F(TestSuite, MatrixSource) {
     compareRayLists(a, b);
 }
 
-// this tests tracing an only-lightsource beamline. An error-prone edge case.
+/// this tests tracing an only-lightsource beamline. An error-prone edge case.
 TEST_F(TestSuite, MatrixSourceTraced) {
     auto a = traceRML("MatrixSource");
     auto b = loadCSVRayUI("MatrixSource");
