@@ -51,11 +51,15 @@ void TerminalApp::tracePath(std::filesystem::path path) {
 
         // Export Rays to external data.
         exportRays(rays, path.string());
+        std::shared_ptr<RAYX::Plotter> plotter =
+            std::make_shared<RAYX::Plotter>(1, "Beamline C++", &rays);
+        plotter->plot();
 
 #if defined(RAYX_DEBUG_MODE) && not defined(CPP)
         // Export Debug Matrics.
         exportDebug();
 #endif
+
     } else {
         RAYX_LOG << "ignoring non-rml file: '" << path << "'";
     }
@@ -99,12 +103,8 @@ void TerminalApp::run() {
                         .count()
                  << " ms";
     }
-    int c; 
     //  Plot in Python
     if (m_CommandParser->m_args.m_plotFlag) {
-        std::shared_ptr<RAYX::Plotter> plotter = std::make_shared<RAYX::Plotter> ();
-        plotter->plot();
-        std::cin >> c ;
         // Setup to create venv if needed
         try {
             std::shared_ptr<PythonInterp> pySetup =
