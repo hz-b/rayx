@@ -61,7 +61,7 @@ struct Element {
 	struct _debug_struct {
 		dmat4 _dMat; // Can also be used as vectors or scalar
 	};
-#endif 
+#endif
 /* LAYOUTS */
 	layout(std140, binding = 0) buffer ibuf { Ray rayData[]; }; // in global coordinates
 
@@ -123,9 +123,9 @@ void dynamicElements() {
     int lastClosestElementIndex;
     dvec4 closestHitpoint = dvec4(infinity(), infinity(), infinity(), 0.0);
     dvec4 closestGlobalHitpoint;
-    
+
     #ifdef RAYX_DEBUG_MODE // Debug Matrix only works in GPU Mode and on DEBUG Build Type
-    #ifndef CPP  
+    #ifndef CPP
     // Set Debug Struct of current Ray to identity
     d_struct[uint(gl_GlobalInvocationID)]._dMat = dmat4(1);
     #endif
@@ -141,11 +141,12 @@ void dynamicElements() {
     // Printing Example over vkconfig Validation Layers
     if (uint(gl_GlobalInvocationID) == 2 ){
     #ifndef CPP
-        debugPrintfEXT("Hello from GPU. \n"); 
+        // debugPrintfEXT("Hello from GPU. \n");
     #else
-        RAYX_D_LOG << "Tracing on CPU..." ; 
+        // RAYX_D_LOG << "Tracing on CPU..." ;
     #endif
     }
+
     // Iterate through all bounces
     for (int i = 0; i < maxBounces; i++) {
         ray = rayData[uint(gl_GlobalInvocationID)];
