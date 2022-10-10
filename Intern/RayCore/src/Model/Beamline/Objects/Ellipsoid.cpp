@@ -47,7 +47,7 @@ Ellipsoid::Ellipsoid(const char* name, OpticalElement::GeometricalShape geometri
     m_Geometry->m_position = position;
     m_Geometry->m_orientation = orientation;
 
-    RAYX_D_LOG << name;
+    RAYX_VERB << name;
     m_offsetY0 = 0;  // what is this for? RAY.FOR: "only !=0 in case of Monocapillary"
 
     m_figureRotation = figRot;
@@ -67,7 +67,7 @@ Ellipsoid::Ellipsoid(const char* name, OpticalElement::GeometricalShape geometri
         m_halfAxisC = sqrt(pow(m_shortHalfAxisB, 2) / m_a11);
     }
 
-    RAYX_D_LOG << "A= " << m_longHalfAxisA << ", B= " << m_shortHalfAxisB << ", C= " << m_halfAxisC;
+    RAYX_VERB << "A= " << m_longHalfAxisA << ", B= " << m_shortHalfAxisB << ", C= " << m_halfAxisC;
 
     // a33, 34, 44
     // a11 from rml file
@@ -80,16 +80,16 @@ Ellipsoid::Ellipsoid(const char* name, OpticalElement::GeometricalShape geometri
     m_a34 = pow(m_shortHalfAxisB / m_longHalfAxisA, 2) * m_z0 * cos(m_tangentAngle) - m_y0 * sin(m_tangentAngle);
     m_a44 = -pow(m_shortHalfAxisB, 2) + pow(m_y0, 2) + pow(m_z0 * m_shortHalfAxisB / m_longHalfAxisA, 2);
 
-    RAYX_D_LOG << "alpha1: " << m_tangentAngle << "; in Degree: " << radToDeg(m_tangentAngle);
-    RAYX_D_LOG << "m_y0: " << m_y0;
-    RAYX_D_LOG << "m_z0: " << m_z0;
-    RAYX_D_LOG << "m_a11: " << m_a11;
-    RAYX_D_LOG << "m_a22: " << m_a22;
-    RAYX_D_LOG << "m_a23: " << m_a23;
-    RAYX_D_LOG << "m_a24 (m_radius): " << m_a24;
-    RAYX_D_LOG << "m_a33: " << m_a33;
-    RAYX_D_LOG << "m_a34: " << m_a34;
-    RAYX_D_LOG << "m_a44: " << m_a44;
+    RAYX_VERB << "alpha1: " << m_tangentAngle << "; in Degree: " << radToDeg(m_tangentAngle);
+    RAYX_VERB << "m_y0: " << m_y0;
+    RAYX_VERB << "m_z0: " << m_z0;
+    RAYX_VERB << "m_a11: " << m_a11;
+    RAYX_VERB << "m_a22: " << m_a22;
+    RAYX_VERB << "m_a23: " << m_a23;
+    RAYX_VERB << "m_a24 (m_radius): " << m_a24;
+    RAYX_VERB << "m_a33: " << m_a33;
+    RAYX_VERB << "m_a34: " << m_a34;
+    RAYX_VERB << "m_a44: " << m_a44;
 
     double icurv = 1;
     auto matd = (double)static_cast<int>(mat);
@@ -129,7 +129,7 @@ void Ellipsoid::calculateCenterFromHalfAxes(double angle) {
         mt = pow(m_shortHalfAxisB / m_longHalfAxisA, 2) * m_z0 / m_y0;
     }
     m_tangentAngle = (atan(mt));
-    RAYX_D_LOG << "Z0 = " << m_z0 << ", Y0= " << m_y0 << ", tangentAngle= " << m_tangentAngle;
+    RAYX_VERB << "Z0 = " << m_z0 << ", Y0= " << m_y0 << ", tangentAngle= " << m_tangentAngle;
 }
 
 /**
@@ -171,7 +171,7 @@ void Ellipsoid::calcHalfAxes() {
         m_halfAxisC = sqrt(pow(m_shortHalfAxisB, 2) / m_a11);
     }
     m_tangentAngle = angle;
-    RAYX_D_LOG << "A= " << m_longHalfAxisA << ", B= " << m_shortHalfAxisB << ", C= " << m_halfAxisC << ", angle = " << radToDeg(m_tangentAngle);
+    RAYX_VERB << "A= " << m_longHalfAxisA << ", B= " << m_shortHalfAxisB << ", C= " << m_halfAxisC << ", angle = " << radToDeg(m_tangentAngle);
 }
 
 double Ellipsoid::getRadius() const { return m_a24; }

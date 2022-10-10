@@ -51,7 +51,7 @@ PlaneGrating::PlaneGrating(const char* name, OpticalElement::GeometricalShape ge
     m_Geometry->m_position = position;
     m_Geometry->m_orientation = orientation;
 
-    RAYX_LOG << "design wavelength = " << abs(hvlam(m_designEnergyMounting));
+    RAYX_VERB << "design wavelength = " << abs(hvlam(m_designEnergyMounting));
 
     // parameters of quadric surface
     auto matd = (double)static_cast<int>(mat);

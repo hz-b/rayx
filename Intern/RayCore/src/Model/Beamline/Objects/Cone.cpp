@@ -35,7 +35,7 @@ Cone::Cone(const char* name, OpticalElement::GeometricalShape geometricalShape, 
     m_Geometry->m_position = position;
     m_Geometry->m_orientation = orientation;
 
-    RAYX_LOG << name << " :Auto";
+    RAYX_VERB << name << " :Auto";
     calcConePar(width, entranceArmLength, exitArmLength, grazingIncidence, &m_upstreamRadius_R, &m_downstreamRadius_rho);
 
     m_cm = pow((m_upstreamRadius_R - m_downstreamRadius_rho) / width, 2);
@@ -87,7 +87,7 @@ Cone::Cone(const char* name, OpticalElement::GeometricalShape geometricalShape, 
     m_Geometry->m_position = position;
     m_Geometry->m_orientation = orientation;
 
-    RAYX_LOG << name << " :Manual";
+    RAYX_VERB << name << " :Manual";
     m_cm = pow((m_upstreamRadius_R - m_downstreamRadius_rho) / width, 2);
 
     double icurv = 0;

@@ -30,7 +30,7 @@ std::vector<Ray> RandomRays::getRays() const {
 
     std::vector<Ray> rayList;
     rayList.reserve(m_numberOfRays);
-    RAYX_LOG << "create " << m_numberOfRays << " random rays ";
+    RAYX_VERB << "create " << m_numberOfRays << " random rays ";
     // fill the square with rmat1xrmat1 rays
     for (uint32_t i = 0; i < m_numberOfRays; i++) {
         glm::dvec3 position = glm::dvec3(unif(re), unif(re), unif(re));

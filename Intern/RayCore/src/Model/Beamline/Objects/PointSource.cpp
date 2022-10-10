@@ -104,7 +104,7 @@ std::vector<Ray> PointSource::getRays() const {
     std::vector<Ray> rayList;
     rayList.reserve(m_numberOfRays);
     // rayList.reserve(1048576);
-    RAYX_D_LOG << "Create " << n << " rays with standard normal deviation...";
+    RAYX_VERB << "Create " << n << " rays with standard normal deviation...";
 
     // create n rays with random position and divergence within the given span
     // for width, height, depth, horizontal and vertical divergence

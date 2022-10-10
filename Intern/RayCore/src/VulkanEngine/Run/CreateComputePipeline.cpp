@@ -22,13 +22,13 @@ void VulkanEngine::createComputePipeline() {
     createInfo.pCode = compShaderCode;
     createInfo.codeSize = filelength;
 
-    RAYX_LOG << "Creating compute shader module..";
+    RAYX_VERB << "Creating compute shader module..";
 
     VK_CHECK_RESULT(vkCreateShaderModule(m_Device, &createInfo, nullptr, &m_ComputeShaderModule));
-    RAYX_LOG << "Shader module(s) created.";
+    RAYX_VERB << "Shader module(s) created.";
     delete[] compShaderCode;
 
-    RAYX_LOG << "Creating pipeline...";
+    RAYX_VERB << "Creating pipeline...";
     /*
     Now let us actually create the compute pipeline.
     It only consists of a single stage with a compute shader.
@@ -59,7 +59,7 @@ void VulkanEngine::createComputePipeline() {
     Now, we finally create the compute pipeline.
     */
     VK_CHECK_RESULT(vkCreateComputePipelines(m_Device, VK_NULL_HANDLE, 1, &pipelineCreateInfo, nullptr, &m_Pipeline));
-    RAYX_LOG << "Pipeline created.";
+    RAYX_VERB << "Pipeline created.";
 }
 
 }  // namespace RAYX
@@ -88,7 +88,7 @@ uint32_t* readFile(uint32_t& length, const char* filename) {
     char* str = new char[filesizepadded];
     uint32_t readCount = fread(str, sizeof(char), filesize, fp);
     if (readCount != (uint32_t)filesize) {
-        RAYX_D_LOG << readCount << " != " << filesize << "...";
+        RAYX_D_WARN << readCount << " != " << filesize << "...";
         RAYX_D_ERR << "Errors while reading file: " << filename;
     }
     fclose(fp);

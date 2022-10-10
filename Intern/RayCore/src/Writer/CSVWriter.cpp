@@ -80,7 +80,7 @@ void writeCSV(const std::vector<RAYX::Ray>& rays, std::string filename) {
     }
     file << '\n';
 
-    RAYX_D_LOG << "Writing " << rays.size() << " rays to file...";
+    RAYX_VERB << "Writing " << rays.size() << " rays to file...";
 
     int index = 0;
     for (auto ray : rays) {
@@ -104,5 +104,5 @@ void writeCSV(const std::vector<RAYX::Ray>& rays, std::string filename) {
         index++;
     }
 
-    RAYX_D_LOG << "Writing done!";
+    RAYX_VERB << "Writing done!";
 }

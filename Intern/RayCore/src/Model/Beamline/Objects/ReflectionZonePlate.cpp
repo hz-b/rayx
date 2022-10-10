@@ -108,7 +108,7 @@ ReflectionZonePlate::ReflectionZonePlate(const char* name, OpticalElement::Geome
     }
 
     printInfo();
-    RAYX_LOG << "Created.";
+    RAYX_VERB << "Created.";
 }
 
 std::shared_ptr<ReflectionZonePlate> ReflectionZonePlate::createFromXML(const xml::Parser& p) {
@@ -134,45 +134,45 @@ void ReflectionZonePlate::printInfo() const {
     std::cout.precision(17);
 
     if (m_rzpType == RZPType::Elliptical) {
-        RAYX_LOG << static_cast<int>(m_rzpType) << ", type: ELLIPTICAL";
+        RAYX_VERB << static_cast<int>(m_rzpType) << ", type: ELLIPTICAL";
     } else if (m_rzpType == RZPType::Meriodional) {
-        RAYX_LOG << static_cast<int>(m_rzpType) << ", type: MERIDIONAL";
+        RAYX_VERB << static_cast<int>(m_rzpType) << ", type: MERIDIONAL";
     } else {
-        RAYX_LOG << static_cast<int>(m_rzpType);
+        RAYX_VERB << static_cast<int>(m_rzpType);
     }
 
     if (m_curvatureType == CurvatureType::Plane) {
-        RAYX_LOG << m_designAlphaAngle << ", curvature type: PLANE";
+        RAYX_VERB << m_designAlphaAngle << ", curvature type: PLANE";
     } else if (m_curvatureType == CurvatureType::Spherical) {
-        RAYX_LOG << m_designAlphaAngle << ", curvature type: SPHERICAL";
+        RAYX_VERB << m_designAlphaAngle << ", curvature type: SPHERICAL";
     } else if (m_curvatureType == CurvatureType::Toroidal) {
-        RAYX_LOG << m_designAlphaAngle << ", curvature type: TOROIDAL";
+        RAYX_VERB << m_designAlphaAngle << ", curvature type: TOROIDAL";
     } else {
-        RAYX_LOG << static_cast<int>(m_designType);
+        RAYX_VERB << static_cast<int>(m_designType);
     }
 
     if (m_imageType == ImageType::Point2Point) {
-        RAYX_LOG << static_cast<int>(m_imageType) << ", m_imageType: POINT2POINT";
+        RAYX_VERB << static_cast<int>(m_imageType) << ", m_imageType: POINT2POINT";
     } else if (m_imageType == ImageType::Astigmatic2Astigmatic) {
-        RAYX_LOG << static_cast<int>(m_imageType) << ", m_imageType: ASTIGMATIC2ASTIGMATIC";
+        RAYX_VERB << static_cast<int>(m_imageType) << ", m_imageType: ASTIGMATIC2ASTIGMATIC";
     } else {
-        RAYX_LOG << static_cast<int>(m_imageType);
+        RAYX_VERB << static_cast<int>(m_imageType);
     }
 
-    RAYX_LOG << "\t VALUES";
-    RAYX_LOG << "\tm_alpha0Angle: " << m_alpha0Angle;
-    RAYX_LOG << "\tm_beta0Angle: " << m_beta0Angle;
-    RAYX_LOG << "\tm_designAlphaAngle: " << m_designAlphaAngle;
-    RAYX_LOG << "\tm_designBetaAngle: " << m_designBetaAngle;
-    RAYX_LOG << "\tm_zOff: " << m_zOff;
-    RAYX_LOG << "\tm_wavelength: " << m_designWavelength;
-    RAYX_LOG << "\tm_lineDensity: " << m_lineDensity;
-    RAYX_LOG << "\tm_designOrderOfDiffraction: " << m_designOrderOfDiffraction;
-    RAYX_LOG << "\tm_orderOfDiffraction: " << m_orderOfDiffraction;
-    RAYX_LOG << "\tm_designEnergyMounting: " << m_designEnergyMounting;
-    RAYX_LOG << "\tm_fresnelZOffset: " << m_fresnelZOffset;
-    RAYX_LOG << "\tm_shortRadius: " << m_shortRadius;
-    RAYX_LOG << "\tm_longRadius: " << m_longRadius;
+    RAYX_VERB << "\t VALUES";
+    RAYX_VERB << "\tm_alpha0Angle: " << m_alpha0Angle;
+    RAYX_VERB << "\tm_beta0Angle: " << m_beta0Angle;
+    RAYX_VERB << "\tm_designAlphaAngle: " << m_designAlphaAngle;
+    RAYX_VERB << "\tm_designBetaAngle: " << m_designBetaAngle;
+    RAYX_VERB << "\tm_zOff: " << m_zOff;
+    RAYX_VERB << "\tm_wavelength: " << m_designWavelength;
+    RAYX_VERB << "\tm_lineDensity: " << m_lineDensity;
+    RAYX_VERB << "\tm_designOrderOfDiffraction: " << m_designOrderOfDiffraction;
+    RAYX_VERB << "\tm_orderOfDiffraction: " << m_orderOfDiffraction;
+    RAYX_VERB << "\tm_designEnergyMounting: " << m_designEnergyMounting;
+    RAYX_VERB << "\tm_fresnelZOffset: " << m_fresnelZOffset;
+    RAYX_VERB << "\tm_shortRadius: " << m_shortRadius;
+    RAYX_VERB << "\tm_longRadius: " << m_longRadius;
 }
 
 /**
@@ -325,7 +325,7 @@ void ReflectionZonePlate::calcDesignOrderOfDiffraction(const double designOrderO
     } else if (m_designType == DesignType::Beta) {
         presign = (m_fresnelZOffset >= 0) ? -1 : 1;
     }
-    RAYX_LOG << "presign: " << presign;
+    RAYX_VERB << "presign: " << presign;
     m_designOrderOfDiffraction = abs(designOrderOfDiffraction) * presign;
 }  // design order of diffraction is directly given by the user
 

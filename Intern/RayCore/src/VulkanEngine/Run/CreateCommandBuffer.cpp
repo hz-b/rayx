@@ -4,7 +4,7 @@ namespace RAYX {
 
 void VulkanEngine::createCommandBuffer() {
     RAYX_PROFILE_FUNCTION();
-    RAYX_LOG << "Creating commandBuffer..";
+    RAYX_VERB << "Creating commandBuffer..";
     /*
     Allocate a command buffer from the previously creeated command pool.
     */
@@ -71,7 +71,7 @@ void VulkanEngine::createCommandBuffer() {
                     "machine is "
                  << xgroups * ygroups * zgroups;
     } else {
-        RAYX_D_LOG << "your machine supports up to " << xgroups * ygroups * zgroups * WORKGROUP_SIZE << " rays";
+        RAYX_VERB << "your machine supports up to " << xgroups * ygroups * zgroups * WORKGROUP_SIZE << " rays";
     }
 
     // decrease xgroups, ygroups, zgroups so that we get a small number of
@@ -99,9 +99,9 @@ void VulkanEngine::createCommandBuffer() {
         }
     }
 
-    RAYX_LOG << "Dispatching commandBuffer...";
-    RAYX_D_LOG << "Sending "
-               << "(" << xgroups << ", " << ygroups << ", " << zgroups << ") to the GPU";
+    RAYX_VERB << "Dispatching commandBuffer...";
+    RAYX_VERB << "Sending "
+              << "(" << xgroups << ", " << ygroups << ", " << zgroups << ") to the GPU";
     vkCmdDispatch(m_CommandBuffer, xgroups, ygroups, zgroups);
 
     VK_CHECK_RESULT(vkEndCommandBuffer(m_CommandBuffer));  // end recording commands.

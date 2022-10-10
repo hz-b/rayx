@@ -40,7 +40,7 @@ PythonInterp::PythonInterp() = default;
 PythonInterp::PythonInterp(const char* pyName, const char* pyFunc, const char* pyPath) : m_pyPath(pyPath), m_funcName(pyFunc) {
     // Set custom python interpreter (Not recommended)
     if (m_pyPath) {
-        RAYX_D_LOG << "set custom path";
+        RAYX_VERB << "set custom path";
         setenv("PATH", pyPath, 1);
     }
 
@@ -86,7 +86,7 @@ void PythonInterp::execute() {
             PyTuple_SetItem(m_pValue, 1, PyLong_FromLong(long(m_plotType)));
         }
         PyErr_Print();
-        RAYX_D_LOG << "Launching Python3 Interpreter.";
+        RAYX_VERB << "Launching Python3 Interpreter.";
         m_presult = PyObject_CallObject(m_pFunc, m_pValue);
         PyErr_Print();
     } else {

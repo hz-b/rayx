@@ -46,7 +46,7 @@ Cylinder::Cylinder(const char* name, OpticalElement::GeometricalShape geometrica
     m_Geometry->m_position = position;
     m_Geometry->m_orientation = orientation;
 
-    RAYX_D_LOG << ((m_direction == CylinderDirection::LongRadiusR) ? "LONG RADIUS" : "SHORT RADIUS");
+    RAYX_VERB << ((m_direction == CylinderDirection::LongRadiusR) ? "LONG RADIUS" : "SHORT RADIUS");
     if (m_direction == CylinderDirection::LongRadiusR) {  // X-DIR
         m_a11 = 0;
         m_a33 = 1;
@@ -83,7 +83,7 @@ void Cylinder::setRadius() {
         }
     }
 
-    RAYX_LOG << "Radius: " << m_radius;
+    RAYX_VERB << "Radius: " << m_radius;
 }
 
 std::shared_ptr<Cylinder> Cylinder::createFromXML(const xml::Parser& p) {

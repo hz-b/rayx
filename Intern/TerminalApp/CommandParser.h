@@ -29,6 +29,7 @@ class CommandParser {
         bool m_multiplePlots = false;     // -m (Multiple Plots)
         bool m_version = false;           // -v (Version)
         std::string m_providedFile = "";  // -i (Input)
+        bool m_verbose = false;           // --verbose (Verbose)
     } m_args;
 
     inline void getVersion() const {
@@ -68,5 +69,6 @@ class CommandParser {
         {'x', {OptionType::BOOL, "cpu", "Tracing on CPU", &(m_args.m_cpuFlag)}},
         {'i', {OptionType::STRING, "input", "Input RML File or Directory.", &(m_args.m_providedFile)}},
         {'v', {OptionType::BOOL, "version", "", &(m_args.m_version)}},
+        {'V', {OptionType::BOOL, "verbose", "Dump more information", &(m_args.m_verbose)}},
     };
 };

@@ -109,7 +109,7 @@ Beamline importBeamline(const std::filesystem::path& filename) {
     RAYX_PROFILE_FUNCTION();
     // first implementation: stringstreams are slow; this might need
     // optimization
-    RAYX_LOG << "importBeamline is called with file \"" << filename << "\"";
+    RAYX_VERB << "importBeamline is called with file \"" << filename << "\"";
 
     std::ifstream t(filename);
     std::stringstream buffer;
@@ -122,7 +122,7 @@ Beamline importBeamline(const std::filesystem::path& filename) {
     rapidxml::xml_document<> doc;
     doc.parse<0>(cstr.data());
 
-    RAYX_LOG << "\t Version: " << doc.first_node("lab")->first_node("version")->value();
+    RAYX_VERB << "\t Version: " << doc.first_node("lab")->first_node("version")->value();
     rapidxml::xml_node<>* xml_beamline = doc.first_node("lab")->first_node("beamline");
 
     Beamline beamline;

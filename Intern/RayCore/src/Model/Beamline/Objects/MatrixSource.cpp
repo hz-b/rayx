@@ -40,7 +40,7 @@ MatrixSource::MatrixSource(const std::string& name, int numberOfRays, EnergyDist
                            const double linPol45, const double circPol, const std::array<double, 6> misalignment)
     : LightSource(name.c_str(), numberOfRays, std::move(dist), linPol0, linPol45, circPol, misalignment, sourceDepth, sourceHeight, sourceWidth,
                   horDivergence, verDivergence) {
-    RAYX_LOG << "Created.";
+    RAYX_VERB << "Created.";
 }
 
 MatrixSource::~MatrixSource() = default;
@@ -72,7 +72,7 @@ std::vector<Ray> MatrixSource::getRays() const {
     std::vector<Ray> returnList;
     returnList.reserve(m_numberOfRays);
     // rayVector.reserve(1048576);
-    RAYX_LOG << "create " << rmat << " times " << rmat << " matrix with Matrix Source...";
+    RAYX_VERB << "create " << rmat << " times " << rmat << " matrix with Matrix Source...";
     // fill the square with rmat1xrmat1 rays
     for (int col = 0; col < rmat; col++) {
         for (int row = 0; row < rmat; row++) {

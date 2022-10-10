@@ -48,12 +48,6 @@ void OpticalElement::setSurface(std::unique_ptr<Surface> surface) {
  * @return void
  */
 void OpticalElement::calcTransformationMatrices(glm::dvec4 position, glm::dmat4 orientation, glm::dmat4& output, bool calcInMatrix) const {
-    // Uncomment for verbose calculations
-    // RAYX_D_LOG << "Orientation:";
-    // printDMat4(orientation);
-    // RAYX_D_LOG << "Position: ";
-    // printDVec4(position);
-
     glm::dmat4x4 rotation =
         glm::dmat4x4(orientation[0][0], orientation[0][1], orientation[0][2], 0.0, orientation[1][0], orientation[1][1], orientation[1][2], 0.0,
                      orientation[2][0], orientation[2][1], orientation[2][2], 0.0, 0.0, 0.0, 0.0, 1.0);  // o

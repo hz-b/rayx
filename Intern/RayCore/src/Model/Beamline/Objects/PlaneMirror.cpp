@@ -52,7 +52,7 @@ PlaneMirror::PlaneMirror(const char* name, OpticalElement::GeometricalShape geom
     m_Geometry->m_position = position;
     m_Geometry->m_orientation = orientation;
 
-    RAYX_LOG << name;
+    RAYX_VERB << name;
     auto matd = (double)static_cast<int>(mat);
     setSurface(std::make_unique<Quadric>(glm::dmat4x4{0, 0, 0, 0, 1, 0, 0, -1, 0, 0, 0, 0, 0, 0, matd, 0}));
 }

@@ -15,7 +15,7 @@ namespace CPU_TRACER {
 #include "shader/main.comp"
 }  // namespace CPU_TRACER
 
-CpuTracer::CpuTracer() { RAYX_LOG << "Initializing Cpu Tracer.."; }
+CpuTracer::CpuTracer() { RAYX_VERB << "Initializing Cpu Tracer.."; }
 
 CpuTracer::~CpuTracer() {}
 

@@ -11,7 +11,13 @@
 #include "Writer/Writer.h"
 
 TerminalApp::TerminalApp(int argc, char** argv) : m_argv(argv), m_argc(argc) {
-    RAYX_D_LOG << "TerminalApp created!";
+    RAYX_VERB << "TerminalApp created!";
+
+    // This should not be a RAYX_VERB, as it helps a lot to see the git hash
+    // if someone opens an issue.
+    // This uses std::cout instead of RAYX_LOG to not add the debugging thing [TerminalApp.cpp:..],
+    // as this is intended to be read by a user.
+    std::cout << "Starting RAY-X (" << GIT_REVISION << ")" << std::endl;
 
     /// warn if the binary is compiled with 32-bit (i.e. sizeof(void*) == 4)
     /// or worse.
@@ -23,7 +29,7 @@ TerminalApp::TerminalApp(int argc, char** argv) : m_argv(argv), m_argc(argc) {
     }
 }
 
-TerminalApp::~TerminalApp() { RAYX_D_LOG << "TerminalApp deleted!"; }
+TerminalApp::~TerminalApp() { RAYX_VERB << "TerminalApp deleted!"; }
 
 void TerminalApp::tracePath(std::filesystem::path path) {
     namespace fs = std::filesystem;
@@ -54,23 +60,27 @@ void TerminalApp::tracePath(std::filesystem::path path) {
         exportDebug();
 #endif
     } else {
-        RAYX_LOG << "ignoring non-rml file: '" << path << "'";
+        RAYX_VERB << "ignoring non-rml file: '" << path << "'";
     }
 }
 
 void TerminalApp::run() {
     RAYX_PROFILE_FUNCTION();
 
-    RAYX_D_LOG << "TerminalApp running...";
+    RAYX_VERB << "TerminalApp running...";
 
     /////////////////// Argument Parser
     m_CommandParser = std::make_unique<CommandParser>(m_argc, m_argv);
     // Check correct use (This will exit if error)
     m_CommandParser->analyzeCommands();
 
+    if (m_CommandParser->m_args.m_verbose) {
+        RAYX::setDebugVerbose(true);
+    }
+
     auto start_time = std::chrono::steady_clock::now();
     if (m_CommandParser->m_args.m_benchmark) {
-        RAYX_D_LOG << "Starting in Benchmark Mode.\n";
+        RAYX_VERB << "Starting in Benchmark Mode.\n";
     }
     /////////////////// Argument treatement
     if (m_CommandParser->m_args.m_version) {
@@ -101,7 +111,7 @@ void TerminalApp::run() {
         } catch (std::exception& e) {
             RAYX_ERR << e.what();
         }
-        RAYX_D_LOG << "Python Setup OK.";
+        RAYX_VERB << "Python Setup OK.";
 
         // Call PythonInterp from rayx venv:
         // *Temporary method (Calls sys python interpreter that calls rayx
@@ -161,7 +171,7 @@ void TerminalApp::exportDebug() {
     }
     auto d = (const RAYX::VulkanTracer*)(m_Tracer.get());
     int index = 0;
-    RAYX_D_LOG << "Debug Matrix Check...";
+    RAYX_VERB << "Debug Matrix Check...";
     for (auto m : d->getDebugList()) {
         if (isIdentMatrix(m._dMat)) {
             printDMat4(m._dMat);

@@ -58,7 +58,7 @@ Toroid::~Toroid() = default;
  *
  **/
 glm::dmat4x4 Toroid::getParams() const {
-    RAYX_LOG << "Return surface points";
+    RAYX_VERB << "Return surface points";
     return m_parameters;
 }
 

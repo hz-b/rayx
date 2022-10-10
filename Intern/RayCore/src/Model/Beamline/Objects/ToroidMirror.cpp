@@ -41,7 +41,7 @@ ToroidMirror::ToroidMirror(const char* name, OpticalElement::GeometricalShape ge
     // TODO(Theresa): maybe move this function outside of this class (same for
     // spheres) because this can be derived from user parameters
 
-    RAYX_LOG << "long Radius: " << m_longRadius << ", short Radius: " << m_shortRadius;
+    RAYX_VERB << "long Radius: " << m_longRadius << ", short Radius: " << m_shortRadius;
     auto matd = (double)static_cast<int>(mat);
     setSurface(std::make_unique<Toroid>(glm::dmat4x4{m_longRadius, m_shortRadius, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 6, 0, matd, 0}));
     // setSurface(std::make_unique<Toroid>(m_longRadius, m_shortRadius));

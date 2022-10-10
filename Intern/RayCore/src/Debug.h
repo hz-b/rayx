@@ -49,6 +49,9 @@ namespace RAYX {
 // LOGGING SYSTEM
 ///////////////////////////////////////////////
 
+void setDebugVerbose(bool);
+bool getDebugVerbose();
+
 /**
  *
  * In the following we define
@@ -98,6 +101,19 @@ struct RAYX_API Err {
     }
 };
 
+struct RAYX_API Verb {
+    Verb(std::string filename, int line);
+    ~Verb();
+
+    template <typename T>
+    Verb& operator<<(T t) {
+        if (getDebugVerbose()) {
+            std::cout << t;
+        }
+        return *this;
+    }
+};
+
 struct RAYX_API IgnoreLog {
     template <typename T>
     IgnoreLog& operator<<(T) {
@@ -112,6 +128,7 @@ extern void RAYX_API (*error_fn)();
 #define RAYX_LOG RAYX::Log(__FILE__, __LINE__)
 #define RAYX_WARN RAYX::Warn(__FILE__, __LINE__)
 #define RAYX_ERR RAYX::Err(__FILE__, __LINE__)
+#define RAYX_VERB RAYX::Verb(__FILE__, __LINE__)
 
 #ifdef RAYX_DEBUG_MODE
 #define RAYX_D_LOG RAYX_LOG

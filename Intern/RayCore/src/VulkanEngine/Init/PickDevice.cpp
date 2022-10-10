@@ -45,13 +45,13 @@ void VulkanEngine::pickPhysicalDevice() {
 
     VkPhysicalDeviceProperties deviceProperties;
     vkGetPhysicalDeviceProperties(m_PhysicalDevice, &deviceProperties);
-    RAYX_LOG << "Chose GPU: " << deviceProperties.deviceName;
-    RAYX_D_LOG << "==== Compute Info ====";
-    RAYX_D_LOG << "Compute Max workgroup count: " << deviceProperties.limits.maxComputeWorkGroupCount[1];
-    RAYX_D_LOG << "Compute Max workgroup invocations: " << deviceProperties.limits.maxComputeWorkGroupInvocations;
-    RAYX_D_LOG << "Compute Max workgroup Group size :" << deviceProperties.limits.maxComputeWorkGroupSize[0];
-    RAYX_D_LOG << "Compute Max shared memory size: " << deviceProperties.limits.maxComputeSharedMemorySize;
-    RAYX_D_LOG << "======================";
+    RAYX_VERB << "Chose GPU: " << deviceProperties.deviceName;
+    RAYX_VERB << "==== Compute Info ====";
+    RAYX_VERB << "Compute Max workgroup count: " << deviceProperties.limits.maxComputeWorkGroupCount[1];
+    RAYX_VERB << "Compute Max workgroup invocations: " << deviceProperties.limits.maxComputeWorkGroupInvocations;
+    RAYX_VERB << "Compute Max workgroup Group size :" << deviceProperties.limits.maxComputeWorkGroupSize[0];
+    RAYX_VERB << "Compute Max shared memory size: " << deviceProperties.limits.maxComputeSharedMemorySize;
+    RAYX_VERB << "======================";
 }
 
 // checks if given device is suitable for computation
@@ -61,7 +61,7 @@ bool isDeviceSuitable(VkPhysicalDevice device) {
     // get device properties
     VkPhysicalDeviceProperties deviceProperties;
     vkGetPhysicalDeviceProperties(device, &deviceProperties);
-    RAYX_LOG << "Found GPU:" << deviceProperties.deviceName;
+    RAYX_VERB << "Found GPU:" << deviceProperties.deviceName;
 
     // get device features
     VkPhysicalDeviceFeatures deviceFeatures;
@@ -157,7 +157,7 @@ void VulkanEngine::createLogicalDevice() {
     }
 
     if (vkCreateDevice(m_PhysicalDevice, &createInfo, nullptr, &m_Device) != VK_SUCCESS) {
-        RAYX_LOG << "Failed to create instance!";
+        RAYX_WARN << "Failed to create instance!";
         throw std::runtime_error("failed to create logical device!");
     }
 

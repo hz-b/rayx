@@ -19,7 +19,7 @@ std::vector<Ray> VulkanTracer::trace(const Beamline& beamline) {
     // init, if not yet initialized.
     if (m_engine.state() == VulkanEngine::EngineState::PREINIT) {
         // Set buffer settings (DEBUG OR RELEASE)
-        RAYX_LOG << "Initializing Vulkan Tracer..";
+        RAYX_VERB << "Initializing Vulkan Tracer..";
         m_engine.declareBuffer("ray-buffer", {.m_binding = 0, .m_in = true, .m_out = false});
         m_engine.declareBuffer("output-buffer", {.m_binding = 1, .m_in = false, .m_out = true});
         m_engine.declareBuffer("quadric-buffer", {.m_binding = 2, .m_in = true, .m_out = false});

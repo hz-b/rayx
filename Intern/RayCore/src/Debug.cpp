@@ -3,6 +3,7 @@
 #include <utility>
 
 namespace RAYX {
+
 constexpr int PREFIX_LEN = 30;
 
 /**
@@ -66,6 +67,18 @@ Err::~Err() {
     error_fn();
 }
 
+Verb::Verb(std::string filename, int line) {
+    if (getDebugVerbose()) {
+        formatDebugMsg(std::move(filename), line, std::cout);
+    }
+}
+
+Verb::~Verb() {
+    if (getDebugVerbose()) {
+        std::cout << std::endl;
+    }
+}
+
 void exit1() { exit(1); }
 void (*error_fn)() = exit1;
 
@@ -92,6 +105,16 @@ void dbg(const std::string& filename, int line, std::string name, std::vector<do
     if (counter > 0) {
         RAYX::Log(filename, line) << s.str();
     }
+}
+
+static bool VERBOSE = false;
+
+void setDebugVerbose(bool b) {
+    VERBOSE = b;
+}
+
+bool getDebugVerbose() {
+    return VERBOSE;
 }
 
 }  // namespace RAYX
