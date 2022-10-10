@@ -6,22 +6,11 @@ double hvlam(double x) {
     return inm2eV / x;
 }
 
-// This function is to be used instead of 0/0 or nan to represent missing
-// values.
-// Note: you can replace undefined() with
-/*
-double undefined() {
-    double ret;
-    return ret;
-}
-*/
-// for debugging purposes:
-// If at some point such an undefeined() value is read, valgrind will detect it
-// and hence we know there is a bug.
-double undefined() {
-    double f = 0.0;
-    return 1.0 / (f - f); // this is an obsfucated way of writing 0/0 so that we get no warning.
-	// TODO(rudi): 1/0 is not defined behaviour in GLSL so the occurences of this function should be fixed!
+// returns positive infinity
+double infinity() {
+    const double large = 1e+308;
+    const double inf = large * 2.0;
+    return inf;
 }
 
 // multiplies position and direction of ray r with transformation matrix m
@@ -468,7 +457,7 @@ dvec2 cartesian_to_euler(dvec2 complex) {
                        // code?, maybe better bc square root looses precision
     dvec2 euler;
     if (r < 0 || r > 1) {
-        euler = dvec2(undefined(), undefined());
+        euler = dvec2(infinity(), infinity());
         return euler;
     }
     euler = dvec2(r, r8_atan2(complex.y, complex.x));  // phi in rad

@@ -329,7 +329,7 @@ dvec4 getIntersectionPointEnrico(Ray r, dmat4 quadric) {
     if (bbac < 0) {
         w                                        = 0.0;
         xyznull[uint(gl_GlobalInvocationID)][cs] = -xyznull[uint(gl_GlobalInvocationID)][f_131] / params[f_0x1];  // x such that y=0
-        return dvec4(undefined(), undefined(), undefined(), 0);
+        return dvec4(infinity(), infinity(), infinity(), 0);
     } else {
         if (abs(a) > abs(c) * 1e-10) {
             xyznull[uint(gl_GlobalInvocationID)][cs] = (-b + d_sign * sqrt(bbac)) / a;
@@ -344,7 +344,7 @@ dvec4 getIntersectionPointEnrico(Ray r, dmat4 quadric) {
     if (w > 0.0) {
         return dvec4(xyznull[uint(gl_GlobalInvocationID)][0], xyznull[uint(gl_GlobalInvocationID)][1], xyznull[uint(gl_GlobalInvocationID)][2], w);
     } else {
-        return dvec4(undefined(), undefined(), undefined(), 0);
+        return dvec4(infinity(), infinity(), infinity(), 0);
     }
 }
 
@@ -432,7 +432,7 @@ dvec4 getOpticalElementIntersection(Ray r, uint elementIndex) {
 
     dvec4 currentIntersection;
     if (type > 7) {
-        return dvec4(undefined(), undefined(), undefined(), 0);
+        return dvec4(infinity(), infinity(), infinity(), 0);
     }
     if (type == 4) {  // rzp
         r.m_position.z = r.m_position.z - e.elementParameters[3][2];
