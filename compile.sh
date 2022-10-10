@@ -25,6 +25,8 @@ done
 echo Updating git submodules ...
 git submodule update --recursive
 
+[ ! -d build ] && mkdir build
+
 if [ ! -f ./build/mode ] || [[ ! "$(cat ./build/mode)" == "$mode" ]]; then
     echo > ./build/mode
 
