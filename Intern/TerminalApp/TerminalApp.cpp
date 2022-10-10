@@ -13,11 +13,16 @@
 TerminalApp::TerminalApp(int argc, char** argv) : m_argv(argv), m_argc(argc) {
     RAYX_VERB << "TerminalApp created!";
 
-    // This should not be a RAYX_VERB, as it helps a lot to see the git hash
-    // if someone opens an issue.
-    // This uses std::cout instead of RAYX_LOG to not add the debugging thing [TerminalApp.cpp:..],
-    // as this is intended to be read by a user.
-    std::cout << "Starting RAY-X (" << GIT_REVISION << ")" << std::endl;
+// This should not be a RAYX_VERB, as it helps a lot to see the git hash
+// if someone opens an issue.
+// This uses std::cout instead of RAYX_LOG to not add the debugging thing [TerminalApp.cpp:..],
+// as this is intended to be read by a user.
+#ifdef RAYX_DEBUG_MODE
+    std::string mode = "debug";
+#else
+    std::string mode = "release";
+#endif
+    std::cout << "Starting RAY-X (" << GIT_REVISION << ", " << mode << ")" << std::endl;
 
     /// warn if the binary is compiled with 32-bit (i.e. sizeof(void*) == 4)
     /// or worse.
