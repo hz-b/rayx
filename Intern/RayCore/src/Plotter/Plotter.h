@@ -8,13 +8,12 @@ namespace RAYX {
 class Plotter {
   public:
     Plotter() = default;
-    Plotter(int plotType, std::string plotName, std::vector<Ray>* RayList);
     ~Plotter() = default;
-    void plot();
+    void plot(int plotType, std::string plotName,
+              const std::vector<Ray>& RayList);
 
   private:
-    int m_plotType = 0;
-    std::string m_plotName = "";
-    std::vector<Ray>* m_RayList = nullptr;
+    int getBinAmount(std::vector<double>& Pos);
+    enum plotTypes {LikeRAYUI, ForEach, Eachsubplot };
 };
 }  // namespace RAYX
