@@ -50,8 +50,7 @@ Warn::Warn(std::string filename, int line) {
 }
 
 Warn::~Warn() {
-    std::cerr << std::endl
-              << "\033[0m";  // color reset
+    std::cerr << std::endl << "\033[0m";  // color reset
 }
 
 Err::Err(const std::string& filename, int line) : filename(filename), line(line) {
@@ -109,12 +108,8 @@ void dbg(const std::string& filename, int line, std::string name, std::vector<do
 
 static bool VERBOSE = false;
 
-void setDebugVerbose(bool b) {
-    VERBOSE = b;
-}
+void setDebugVerbose(bool b) { VERBOSE = b; }
 
-bool getDebugVerbose() {
-    return VERBOSE;
-}
+bool getDebugVerbose() { return VERBOSE; }
 
 }  // namespace RAYX

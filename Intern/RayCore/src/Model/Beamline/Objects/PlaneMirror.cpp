@@ -65,8 +65,9 @@ std::shared_ptr<PlaneMirror> PlaneMirror::createFromXML(const xml::Parser& p) {
                                              p.parseAzimuthalAngle(), p.parsePosition(), p.parseOrientation(), p.parseSlopeError(),
                                              p.parseMaterial());
     } else {
-        return std::make_shared<PlaneMirror>(p.name(), p.parseGeometricalShape(), p.parseTotalWidth(), p.parseTotalLength(), p.parseAzimuthalAngle(),
-                                             p.parsePosition(), p.parseOrientation(), p.parseSlopeError(), p.parseMaterial());
+        return std::make_shared<PlaneMirror>(p.name(), p.parseGeometricalShape(), p.parseTotalWidth(), p.parseTotalLength(),
+                                             p.parseAzimuthalAngle(), p.parsePosition(), p.parseOrientation(), p.parseSlopeError(),
+                                             p.parseMaterial());
     }
 }
 

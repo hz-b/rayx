@@ -41,12 +41,12 @@ namespace RAYX {
  * (affects x,y position and x,y direction)
  *
  */
-PointSource::PointSource(const std::string& name, int numberOfRays, EnergyDistribution dist, const double sourceWidth, const double sourceHeight,
-                         const double sourceDepth, const double horDivergence, const double verDivergence, SourceDist widthDist,
-                         SourceDist heightDist, SourceDist horDist, SourceDist verDist, const double linPol0, const double linPol45,
-                         const double circPol, const std::array<double, 6> misalignment)
-    : LightSource(name.c_str(), numberOfRays, std::move(dist), linPol0, linPol45, circPol, misalignment, sourceDepth, sourceHeight, sourceWidth,
-                  horDivergence, verDivergence) {
+PointSource::PointSource(const std::string& name, int numberOfRays, EnergyDistribution dist, const double sourceWidth,
+                         const double sourceHeight, const double sourceDepth, const double horDivergence, const double verDivergence,
+                         SourceDist widthDist, SourceDist heightDist, SourceDist horDist, SourceDist verDist, const double linPol0,
+                         const double linPol45, const double circPol, const std::array<double, 6> misalignment)
+    : LightSource(name.c_str(), numberOfRays, std::move(dist), linPol0, linPol45, circPol, misalignment, sourceDepth, sourceHeight,
+                  sourceWidth, horDivergence, verDivergence) {
     m_widthDist = widthDist;
     m_heightDist = heightDist;
     m_horDist = horDist;
@@ -57,10 +57,10 @@ PointSource::~PointSource() = default;
 
 // returns nullptr on error
 std::shared_ptr<PointSource> PointSource::createFromXML(const RAYX::xml::Parser& p) {
-    return std::make_shared<PointSource>(p.name(), p.parseNumberRays(), p.parseEnergyDistribution(), p.parseSourceWidth(), p.parseSourceHeight(),
-                                         p.parseSourceDepth(), p.parseHorDiv(), p.parseVerDiv(), p.parseSourceWidthDistribution(),
-                                         p.parseSourceHeightDistribution(), p.parseHorDivDistribution(), p.parseVerDivDistribution(),
-                                         p.parseLinearPol0(), p.parseLinearPol45(), p.parseCircularPol(), p.parseMisalignment());
+    return std::make_shared<PointSource>(
+        p.name(), p.parseNumberRays(), p.parseEnergyDistribution(), p.parseSourceWidth(), p.parseSourceHeight(), p.parseSourceDepth(),
+        p.parseHorDiv(), p.parseVerDiv(), p.parseSourceWidthDistribution(), p.parseSourceHeightDistribution(), p.parseHorDivDistribution(),
+        p.parseVerDivDistribution(), p.parseLinearPol0(), p.parseLinearPol45(), p.parseCircularPol(), p.parseMisalignment());
 }
 
 struct RandomState {

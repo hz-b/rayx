@@ -16,10 +16,10 @@ Toroid::Toroid(const glm::dmat4x4 inputPoints) { m_parameters = inputPoints; }
  */
 Toroid::Toroid(double longRadius, double shortRadius, double elementType, Material mat) {
     auto matd = (double)static_cast<int>(mat);
-    m_parameters = glm::dmat4x4{longRadius, shortRadius, 0, 0,  //
-                                0, 0, 0, 0,                     //
-                                0, 0, 0, 0,                     //
-                                elementType, 0, matd, 0};
+    m_parameters = glm::dmat4x4{longRadius,  shortRadius, 0,    0,  //
+                                0,           0,           0,    0,  //
+                                0,           0,           0,    0,  //
+                                elementType, 0,           matd, 0};
     m_longRadius = longRadius;
     m_shortRadius = shortRadius;
 }

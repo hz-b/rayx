@@ -15,22 +15,9 @@ TEST_F(TestSuite, testUniformRandom) {
 
 TEST_F(TestSuite, testSin) {
     std::vector<double> args = {
-        -0.5620816275750421,
-        -0.082699735953560394,
-        -0.73692442452247864,
-        -0.93085577907030514,
-        0.038832744045494971,
-        0.86938579245347758,
-        0.35772943348137098,
-        0.059400386282114415,
-        0.86087298993938566,
-        0.3735454248180905,
-        -0.8663155254748649,
-        -0.98460362787680167,
-        0.40238118899835329,
-        0.3078379243610454,
-        0.053857555519812195,
-        0.5128209722651722,
+        -0.5620816275750421, -0.082699735953560394, -0.73692442452247864, -0.93085577907030514, 0.038832744045494971, 0.86938579245347758,
+        0.35772943348137098, 0.059400386282114415,  0.86087298993938566,  0.3735454248180905,   -0.8663155254748649,  -0.98460362787680167,
+        0.40238118899835329, 0.3078379243610454,    0.053857555519812195, 0.5128209722651722,
     };
 
     for (auto x : args) {
@@ -40,22 +27,9 @@ TEST_F(TestSuite, testSin) {
 
 TEST_F(TestSuite, testCos) {
     std::vector<double> args = {
-        -0.5620816275750421,
-        -0.082699735953560394,
-        -0.73692442452247864,
-        -0.93085577907030514,
-        0.038832744045494971,
-        0.86938579245347758,
-        0.35772943348137098,
-        0.059400386282114415,
-        0.86087298993938566,
-        0.3735454248180905,
-        -0.8663155254748649,
-        -0.98460362787680167,
-        0.40238118899835329,
-        0.3078379243610454,
-        0.053857555519812195,
-        0.5128209722651722,
+        -0.5620816275750421, -0.082699735953560394, -0.73692442452247864, -0.93085577907030514, 0.038832744045494971, 0.86938579245347758,
+        0.35772943348137098, 0.059400386282114415,  0.86087298993938566,  0.3735454248180905,   -0.8663155254748649,  -0.98460362787680167,
+        0.40238118899835329, 0.3078379243610454,    0.053857555519812195, 0.5128209722651722,
     };
 
     for (auto x : args) {
@@ -65,22 +39,9 @@ TEST_F(TestSuite, testCos) {
 
 TEST_F(TestSuite, testAtan) {
     std::vector<double> args = {
-        -0.5620816275750421,
-        -0.082699735953560394,
-        -0.73692442452247864,
-        -0.93085577907030514,
-        0.038832744045494971,
-        0.86938579245347758,
-        0.35772943348137098,
-        0.059400386282114415,
-        0.86087298993938566,
-        0.3735454248180905,
-        -0.8663155254748649,
-        -0.98460362787680167,
-        0.40238118899835329,
-        0.3078379243610454,
-        0.053857555519812195,
-        0.5128209722651722,
+        -0.5620816275750421, -0.082699735953560394, -0.73692442452247864, -0.93085577907030514, 0.038832744045494971, 0.86938579245347758,
+        0.35772943348137098, 0.059400386282114415,  0.86087298993938566,  0.3735454248180905,   -0.8663155254748649,  -0.98460362787680167,
+        0.40238118899835329, 0.3078379243610454,    0.053857555519812195, 0.5128209722651722,
     };
 
     for (auto x : args) {
@@ -457,8 +418,8 @@ TEST_F(TestSuite, testRZPLineDensityDefaulParams) {
     for (auto p : inouts) {
         double DX;
         double DZ;
-        CPU_TRACER::RZPLineDensity(p.in_ray, p.in_normal, p.in_imageType, p.in_rzpType, p.in_derivationMethod, p.in_zOffsetCenter, p.in_risag,
-                                   p.in_rosag, p.in_rimer, p.in_romer, p.in_alpha, p.in_beta, p.in_Ord, p.in_WL, DX, DZ);
+        CPU_TRACER::RZPLineDensity(p.in_ray, p.in_normal, p.in_imageType, p.in_rzpType, p.in_derivationMethod, p.in_zOffsetCenter,
+                                   p.in_risag, p.in_rosag, p.in_rimer, p.in_romer, p.in_alpha, p.in_beta, p.in_Ord, p.in_WL, DX, DZ);
         CHECK_EQ(DX, p.out_DX);
         CHECK_EQ(DZ, p.out_DZ);
     }
@@ -572,8 +533,8 @@ TEST_F(TestSuite, testRZPLineDensityAstigmatic) {
     for (auto p : inouts) {
         double DX;
         double DZ;
-        CPU_TRACER::RZPLineDensity(p.in_ray, p.in_normal, p.in_imageType, p.in_rzpType, p.in_derivationMethod, p.in_zOffsetCenter, p.in_risag,
-                                   p.in_rosag, p.in_rimer, p.in_romer, p.in_alpha, p.in_beta, p.in_Ord, p.in_WL, DX, DZ);
+        CPU_TRACER::RZPLineDensity(p.in_ray, p.in_normal, p.in_imageType, p.in_rzpType, p.in_derivationMethod, p.in_zOffsetCenter,
+                                   p.in_risag, p.in_rosag, p.in_rimer, p.in_romer, p.in_alpha, p.in_beta, p.in_Ord, p.in_WL, DX, DZ);
         CHECK_EQ(DX, p.out_DX);
         CHECK_EQ(DZ, p.out_DZ);
     }

@@ -48,9 +48,9 @@ ToroidMirror::ToroidMirror(const char* name, OpticalElement::GeometricalShape ge
 }
 
 std::shared_ptr<ToroidMirror> ToroidMirror::createFromXML(const xml::Parser& p) {
-    return std::make_shared<ToroidMirror>(p.name(), p.parseGeometricalShape(), p.parseTotalWidth(), p.parseTotalLength(), p.parseAzimuthalAngle(),
-                                          p.parsePosition(), p.parseOrientation(), p.parseLongRadius(), p.parseShortRadius(), p.parseSlopeError(),
-                                          p.parseMaterial());
+    return std::make_shared<ToroidMirror>(p.name(), p.parseGeometricalShape(), p.parseTotalWidth(), p.parseTotalLength(),
+                                          p.parseAzimuthalAngle(), p.parsePosition(), p.parseOrientation(), p.parseLongRadius(),
+                                          p.parseShortRadius(), p.parseSlopeError(), p.parseMaterial());
 }
 
 }  // namespace RAYX

@@ -15,8 +15,8 @@ class RAYX_API SphereMirror : public OpticalElement {
                  const double entranceArmLength, const double exitArmLength, const std::array<double, 7> slopeError, Material mat);
     // radius is precalculated and given as a parameter
     SphereMirror(const char* name, OpticalElement::GeometricalShape geometricalShape, const double width, const double height,
-                 const double azimuthalAngle, double radius, glm::dvec4 position, glm::dmat4x4 orientation, const std::array<double, 7> slopeError,
-                 Material mat);
+                 const double azimuthalAngle, double radius, glm::dvec4 position, glm::dmat4x4 orientation,
+                 const std::array<double, 7> slopeError, Material mat);
 
     static std::shared_ptr<SphereMirror> createFromXML(const xml::Parser&);
 

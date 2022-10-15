@@ -6,9 +6,7 @@
 
 namespace RAYX {
 
-enum class CentralBeamstop { None,
-                             Rectangle,
-                             Elliptical };  ///< central beamstop shape
+enum class CentralBeamstop { None, Rectangle, Elliptical };  ///< central beamstop shape
 
 class RAYX_API Slit : public OpticalElement {
   public:

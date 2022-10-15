@@ -27,10 +27,10 @@ TEST_F(TestSuite, groupTransform) {
     CHECK_EQ(b.m_OpticalElements.size(), 1);
     auto m = b.m_OpticalElements[0]->getInMatrix();
     glm::dmat4x4 correct = {
-        1, 0, 0, 0,        //
-        0, 0, 1, 0,        //
-        0, -1, 0, 0,       //
-        -42, 0, -1000, 1,  //
+        1,   0,  0,     0,  //
+        0,   0,  1,     0,  //
+        0,   -1, 0,     0,  //
+        -42, 0,  -1000, 1,  //
     };
     CHECK_EQ(correct, m);
 }

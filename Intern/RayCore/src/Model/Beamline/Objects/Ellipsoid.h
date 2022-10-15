@@ -7,17 +7,15 @@
 #include "Model/Surface/Quadric.h"
 
 namespace RAYX {
-enum class FigureRotation { Yes,
-                            Plane,
-                            A11 };
+enum class FigureRotation { Yes, Plane, A11 };
 
 // TODO(Jannis): rename or turn into surface
 class RAYX_API Ellipsoid : public OpticalElement {
   public:
     Ellipsoid(const char* name, OpticalElement::GeometricalShape geometricalShape, const double width, const double height,
-              const double azimuthalAngle, glm::dvec4 position, const double LongHalfAxisA, const double ShortHalfAxisB, const double DesignAngle,
-              glm::dmat4x4 orientation, const double grazingIncidence, const double entranceArmLength, const double exitArmLength,
-              FigureRotation figRot, const double a_11, const std::array<double, 7> slopeError, Material mat);
+              const double azimuthalAngle, glm::dvec4 position, const double LongHalfAxisA, const double ShortHalfAxisB,
+              const double DesignAngle, glm::dmat4x4 orientation, const double grazingIncidence, const double entranceArmLength,
+              const double exitArmLength, FigureRotation figRot, const double a_11, const std::array<double, 7> slopeError, Material mat);
 
     void calcHalfAxes();
     void calculateCenterFromHalfAxes(double angle);

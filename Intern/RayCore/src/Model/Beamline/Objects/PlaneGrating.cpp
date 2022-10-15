@@ -36,8 +36,8 @@ namespace RAYX {
  */
 PlaneGrating::PlaneGrating(const char* name, OpticalElement::GeometricalShape geometricalShape, const double width, const double height,
                            const double azimuthalAngle, glm::dvec4 position, glm::dmat4x4 orientation, const double designEnergy,
-                           const double lineDensity, const double orderOfDiffraction, const int additionalZeroOrder, const std::array<double, 6> vls,
-                           const std::array<double, 7> slopeError, Material mat)
+                           const double lineDensity, const double orderOfDiffraction, const int additionalZeroOrder,
+                           const std::array<double, 6> vls, const std::array<double, 7> slopeError, Material mat)
     : OpticalElement(name, slopeError),
       m_additionalOrder(additionalZeroOrder),
       m_designEnergyMounting(designEnergy),
@@ -59,9 +59,10 @@ PlaneGrating::PlaneGrating(const char* name, OpticalElement::GeometricalShape ge
 }
 
 std::shared_ptr<PlaneGrating> PlaneGrating::createFromXML(const xml::Parser& p) {
-    return std::make_shared<PlaneGrating>(p.name(), p.parseGeometricalShape(), p.parseTotalWidth(), p.parseTotalLength(), p.parseAzimuthalAngle(),
-                                          p.parsePosition(), p.parseOrientation(), p.parseDesignEnergyMounting(), p.parseLineDensity(),
-                                          p.parseOrderDiffraction(), p.parseAdditionalOrder(), p.parseVls(), p.parseSlopeError(), p.parseMaterial());
+    return std::make_shared<PlaneGrating>(p.name(), p.parseGeometricalShape(), p.parseTotalWidth(), p.parseTotalLength(),
+                                          p.parseAzimuthalAngle(), p.parsePosition(), p.parseOrientation(), p.parseDesignEnergyMounting(),
+                                          p.parseLineDensity(), p.parseOrderDiffraction(), p.parseAdditionalOrder(), p.parseVls(),
+                                          p.parseSlopeError(), p.parseMaterial());
 }
 
 double PlaneGrating::getDesignEnergyMounting() const { return m_designEnergyMounting; }

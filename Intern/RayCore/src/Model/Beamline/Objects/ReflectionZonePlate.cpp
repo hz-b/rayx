@@ -51,12 +51,13 @@ namespace RAYX {
  * @param mat                           material (See Material.h)
  */
 ReflectionZonePlate::ReflectionZonePlate(const char* name, OpticalElement::GeometricalShape geometricalShape, CurvatureType curvatureType,
-                                         const double widthA, const std::optional<double> widthB, const double height, const double azimuthalAngle,
-                                         const glm::dvec4 position, const glm::dmat4x4 orientation, const double designEnergy,
-                                         const double orderOfDiffraction, const double designOrderOfDiffraction, const double dAlpha,
-                                         const double dBeta, const double mEntrance, const double mExit, const double sEntrance, const double sExit,
-                                         const double shortRadius, const double longRadius, const int additionalZeroOrder,
-                                         const double fresnelZOffset, const std::array<double, 7> slopeError, Material mat)
+                                         const double widthA, const std::optional<double> widthB, const double height,
+                                         const double azimuthalAngle, const glm::dvec4 position, const glm::dmat4x4 orientation,
+                                         const double designEnergy, const double orderOfDiffraction, const double designOrderOfDiffraction,
+                                         const double dAlpha, const double dBeta, const double mEntrance, const double mExit,
+                                         const double sEntrance, const double sExit, const double shortRadius, const double longRadius,
+                                         const int additionalZeroOrder, const double fresnelZOffset, const std::array<double, 7> slopeError,
+                                         Material mat)
     : OpticalElement(name, slopeError),
       m_fresnelZOffset(fresnelZOffset),
       m_designAlphaAngle(degToRad(dAlpha)),
@@ -265,8 +266,8 @@ void ReflectionZonePlate::calcBeta() {
         VectorR2Center();
         if (m_fresnelZOffset != 0) {  // m_fresnelZOffset is given by the user as a parameter bc
                                       // DesignType==DesignType::ZOffset
-            m_betaAngle = acos((-m_R2ArmLength * m_R2ArmLength * m_designSagittalExitArmLength * m_designSagittalExitArmLength * m_fresnelZOffset *
-                                m_fresnelZOffset) /
+            m_betaAngle = acos((-m_R2ArmLength * m_R2ArmLength * m_designSagittalExitArmLength * m_designSagittalExitArmLength *
+                                m_fresnelZOffset * m_fresnelZOffset) /
                                (2 * m_designSagittalExitArmLength * m_fresnelZOffset));
         }
     }

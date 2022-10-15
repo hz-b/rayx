@@ -31,7 +31,8 @@ namespace RAYX {
 Ellipsoid::Ellipsoid(const char* name, OpticalElement::GeometricalShape geometricalShape, const double width, const double height,
                      const double azimuthalAngle, glm::dvec4 position, const double LongHalfAxisA, const double ShortHalfAxisB,
                      const double DesignAngle, glm::dmat4x4 orientation, const double grazingIncidence, const double entranceArmLength,
-                     const double exitArmLength, FigureRotation figRot, const double a_11, const std::array<double, 7> slopeError, Material mat)
+                     const double exitArmLength, FigureRotation figRot, const double a_11, const std::array<double, 7> slopeError,
+                     Material mat)
     : OpticalElement(name, slopeError),
       m_incidence(degToRad(grazingIncidence)),
       m_entranceArmLength(entranceArmLength),
@@ -171,7 +172,8 @@ void Ellipsoid::calcHalfAxes() {
         m_halfAxisC = sqrt(pow(m_shortHalfAxisB, 2) / m_a11);
     }
     m_tangentAngle = angle;
-    RAYX_VERB << "A= " << m_longHalfAxisA << ", B= " << m_shortHalfAxisB << ", C= " << m_halfAxisC << ", angle = " << radToDeg(m_tangentAngle);
+    RAYX_VERB << "A= " << m_longHalfAxisA << ", B= " << m_shortHalfAxisB << ", C= " << m_halfAxisC
+              << ", angle = " << radToDeg(m_tangentAngle);
 }
 
 double Ellipsoid::getRadius() const { return m_a24; }
@@ -233,6 +235,7 @@ std::shared_ptr<Ellipsoid> Ellipsoid::createFromXML(const xml::Parser& p) {
     glm::dmat4x4 orientation = p.parseOrientation();
 
     return std::make_shared<Ellipsoid>(p.name(), geometricalShape, width, height, azimuthalAngle, position, longHalfAxisA, shortHalfAxisB,
-                                       designGrazing, orientation, incidenceAngle, entranceArmLength, exitArmLength, figRot, m_a11, slopeError, mat);
+                                       designGrazing, orientation, incidenceAngle, entranceArmLength, exitArmLength, figRot, m_a11,
+                                       slopeError, mat);
 }
 }  // namespace RAYX

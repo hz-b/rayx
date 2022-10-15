@@ -83,19 +83,21 @@ inline void checkEq(std::string filename, int line, std::string l, std::string r
 
 /// specialized handling for rays, better prints!
 template <>
-inline void checkEq(std::string filename, int line, std::string l, std::string r, const RAYX::Ray& tl, const RAYX::Ray& tr, std::vector<double> vl,
-                    std::vector<double> vr, double tolerance) {
-    std::vector<std::string> names = {".m_position.x", ".m_position.y", ".m_position.z", ".m_weight", ".m_direction.x", ".m_direction.y",
-                                      ".m_direction.z", ".m_energy", ".m_stokes.x", ".m_stokes.y", ".m_stokey.z", ".m_stokes.w",
-                                      ".m_pathLength", ".m_order", ".m_lastElement", ".m_extraParam"};
+inline void checkEq(std::string filename, int line, std::string l, std::string r, const RAYX::Ray& tl, const RAYX::Ray& tr,
+                    std::vector<double> vl, std::vector<double> vr, double tolerance) {
+    std::vector<std::string> names = {".m_position.x",  ".m_position.y",  ".m_position.z",  ".m_weight",
+                                      ".m_direction.x", ".m_direction.y", ".m_direction.z", ".m_energy",
+                                      ".m_stokes.x",    ".m_stokes.y",    ".m_stokey.z",    ".m_stokes.w",
+                                      ".m_pathLength",  ".m_order",       ".m_lastElement", ".m_extraParam"};
     for (int i = 0; i < 16; i++) {
         checkEq(filename, line, l + names[i], r + names[i], vl[i], vr[i], {vl[i]}, {vr[i]}, tolerance);
     }
 }
 
 /// check that L and R contain the same doubles.
-#define CHECK_EQ(L, R, ...) \
-    checkEq(__FILE__, __LINE__, #L, #R, L, R, RAYX::formatAsVec(L), RAYX::formatAsVec(R), ##__VA_ARGS__)  // __VA_ARGS__ = tolerance or nothing
+#define CHECK_EQ(L, R, ...)                                                               \
+    checkEq(__FILE__, __LINE__, #L, #R, L, R, RAYX::formatAsVec(L), RAYX::formatAsVec(R), \
+            ##__VA_ARGS__)  // __VA_ARGS__ = tolerance or nothing
 
 /// assert that x holds, and give a fancy print otherwise.
 #define CHECK(x)                                      \
@@ -162,8 +164,7 @@ RAYX::Beamline loadBeamline(std::string filename);
 /// will write to Tests/output/<filename>.csv
 void writeToOutputCSV(std::vector<RAYX::Ray>& rays, std::string filename);
 
-enum class Filter { KeepAllRays,
-                    OnlySequentialRays };
+enum class Filter { KeepAllRays, OnlySequentialRays };
 
 /// returns rays in element coordinates
 /// weight = 0 rays are filtered out.

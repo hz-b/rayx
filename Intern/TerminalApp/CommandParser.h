@@ -48,9 +48,7 @@ class CommandParser {
     };  // TODO: CMake config needed
   private:
     int m_cli11_return;
-    enum OptionType { BOOL,
-                      INT,
-                      STRING };
+    enum OptionType { BOOL, INT, STRING };
     struct Options {
         // CLI::Option cli11_option;
         const OptionType type;

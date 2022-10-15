@@ -15,7 +15,8 @@ namespace RAYX {
  * calculating world coordinates
  * does not have an azimuthal angle
  */
-ImagePlane::ImagePlane(const char* name, glm::dvec4 position, glm::dmat4x4 orientation) : OpticalElement(name, {0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0}) {
+ImagePlane::ImagePlane(const char* name, glm::dvec4 position, glm::dmat4x4 orientation)
+    : OpticalElement(name, {0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0}) {
     m_Geometry->m_orientation = orientation;
     m_Geometry->m_position = position;
 

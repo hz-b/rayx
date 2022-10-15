@@ -94,7 +94,9 @@ class RAYX_API Instrumentor {
 
 class RAYX_API InstrumentationTimer {
   public:
-    InstrumentationTimer(const char* name) : m_Name(name), m_Stopped(false) { m_StartTimepoint = std::chrono::high_resolution_clock::now(); }
+    InstrumentationTimer(const char* name) : m_Name(name), m_Stopped(false) {
+        m_StartTimepoint = std::chrono::high_resolution_clock::now();
+    }
 
     ~InstrumentationTimer() {
         if (!m_Stopped) Stop();

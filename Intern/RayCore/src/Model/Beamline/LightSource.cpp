@@ -5,8 +5,8 @@
 
 namespace RAYX {
 LightSource::LightSource(const char* name, uint32_t numberOfRays, EnergyDistribution dist, const double linPol0, const double linPol45,
-                         const double circPol, const std::array<double, 6> misalignment, const double sourceDepth, const double sourceHeight,
-                         const double sourceWidth, const double horDivergence, const double verDivergence)
+                         const double circPol, const std::array<double, 6> misalignment, const double sourceDepth,
+                         const double sourceHeight, const double sourceWidth, const double horDivergence, const double verDivergence)
     : m_name(name),
       m_EnergyDistribution(std::move(dist)),
       m_numberOfRays(numberOfRays),

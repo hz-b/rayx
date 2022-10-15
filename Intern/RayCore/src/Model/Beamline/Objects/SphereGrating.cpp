@@ -32,9 +32,10 @@ namespace RAYX {
  * @param mat                           material (See Material.h)
  *
  */
-SphereGrating::SphereGrating(const char* name, GratingMount mount, OpticalElement::GeometricalShape geometricalShape, double width, double height,
-                             const double azimuthalAngle, double radius, glm::dvec4 position, glm::dmat4x4 orientation, double designEnergyMounting,
-                             double lineDensity, double orderOfDiffraction, std::array<double, 6> vls, std::array<double, 7> slopeError, Material mat)
+SphereGrating::SphereGrating(const char* name, GratingMount mount, OpticalElement::GeometricalShape geometricalShape, double width,
+                             double height, const double azimuthalAngle, double radius, glm::dvec4 position, glm::dmat4x4 orientation,
+                             double designEnergyMounting, double lineDensity, double orderOfDiffraction, std::array<double, 6> vls,
+                             std::array<double, 7> slopeError, Material mat)
     : OpticalElement(name, slopeError),
       m_designEnergyMounting(designEnergyMounting),
       m_lineDensity(lineDensity),
@@ -54,9 +55,10 @@ SphereGrating::SphereGrating(const char* name, GratingMount mount, OpticalElemen
 }
 
 std::shared_ptr<SphereGrating> SphereGrating::createFromXML(const xml::Parser& p) {
-    return std::make_shared<SphereGrating>(p.name(), p.parseGratingMount(), p.parseGeometricalShape(), p.parseTotalWidth(), p.parseTotalLength(),
-                                           p.parseAzimuthalAngle(), p.parseRadius(), p.parsePosition(), p.parseOrientation(), p.parseDesignEnergy(),
-                                           p.parseLineDensity(), p.parseOrderDiffraction(), p.parseVls(), p.parseSlopeError(), p.parseMaterial());
+    return std::make_shared<SphereGrating>(p.name(), p.parseGratingMount(), p.parseGeometricalShape(), p.parseTotalWidth(),
+                                           p.parseTotalLength(), p.parseAzimuthalAngle(), p.parseRadius(), p.parsePosition(),
+                                           p.parseOrientation(), p.parseDesignEnergy(), p.parseLineDensity(), p.parseOrderDiffraction(),
+                                           p.parseVls(), p.parseSlopeError(), p.parseMaterial());
 }
 
 double SphereGrating::getRadius() const { return m_radius; }

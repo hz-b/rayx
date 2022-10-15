@@ -86,9 +86,9 @@ SphereMirror::SphereMirror(const char* name, OpticalElement::GeometricalShape ge
 }
 
 std::shared_ptr<SphereMirror> SphereMirror::createFromXML(const xml::Parser& p) {
-    return std::make_shared<SphereMirror>(p.name(), p.parseGeometricalShape(), p.parseTotalWidth(), p.parseTotalLength(), p.parseAzimuthalAngle(),
-                                          p.parseGrazingIncAngle(), p.parsePosition(), p.parseOrientation(), p.parseEntranceArmLength(),
-                                          p.parseExitArmLength(), p.parseSlopeError(), p.parseMaterial());
+    return std::make_shared<SphereMirror>(p.name(), p.parseGeometricalShape(), p.parseTotalWidth(), p.parseTotalLength(),
+                                          p.parseAzimuthalAngle(), p.parseGrazingIncAngle(), p.parsePosition(), p.parseOrientation(),
+                                          p.parseEntranceArmLength(), p.parseExitArmLength(), p.parseSlopeError(), p.parseMaterial());
 }
 
 // TODO(Theresa): move this to user params and just give the radius as a
