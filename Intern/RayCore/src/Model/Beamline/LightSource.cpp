@@ -4,6 +4,21 @@
 #include <utility>
 
 namespace RAYX {
+LightSource::LightSource(const DesignObject& dobj) {
+    m_name = dobj.name();
+    m_EnergyDistribution = dobj.parseEnergyDistribution();
+    m_numberOfRays = dobj.parseNumberRays();
+    m_sourceDepth = dobj.parseSourceDepth();
+    m_sourceHeight = dobj.parseSourceHeight();
+    m_sourceWidth = dobj.parseSourceWidth();
+    m_horDivergence = dobj.parseHorDiv();
+    m_verDivergence = dobj.parseVerDiv();
+    m_misalignmentParams = dobj.parseMisalignment();
+    m_linearPol_0 = dobj.parseLinearPol0();
+    m_linearPol_45 = dobj.parseLinearPol45();
+    m_circularPol = dobj.parseCircularPol();
+}
+
 LightSource::LightSource(const char* name, uint32_t numberOfRays, EnergyDistribution dist, const double linPol0, const double linPol45,
                          const double circPol, const std::array<double, 6> misalignment, const double sourceDepth,
                          const double sourceHeight, const double sourceWidth, const double horDivergence, const double verDivergence)

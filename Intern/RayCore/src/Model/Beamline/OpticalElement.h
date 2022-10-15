@@ -8,6 +8,7 @@
 #include <vector>
 
 #include "Core.h"
+#include "Data/xml.h"
 #include "Debug.h"
 #include "Model/Surface/Surface.h"
 #include "utils.h"
@@ -16,11 +17,10 @@ namespace RAYX {
 
 enum class GratingMount { Deviation, Incidence };
 enum class ImageType { Point2Point, Astigmatic2Astigmatic };
+enum class GeometricalShape { RECTANGLE = 0, ELLIPTICAL, TRAPEZOID };  ///< influences wastebox function in shader
 
 class RAYX_API OpticalElement {
   public:
-    enum class GeometricalShape { RECTANGLE = 0, ELLIPTICAL, TRAPEZOID };  ///< influences wastebox function in shader
-
     struct Geometry {
         double m_widthA = 0.0;
         double m_widthB = 0.0;  //< this width is only used for trapezoid

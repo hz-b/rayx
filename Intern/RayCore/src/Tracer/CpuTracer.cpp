@@ -7,6 +7,7 @@
 #include "Debug.h"
 #include "Debug/Instrumentor.h"
 #include "Material/Material.h"
+#include "Model/Beamline/OpticalElement.h"
 
 namespace RAYX {
 

@@ -28,7 +28,7 @@ namespace RAYX {
  *
  */
 // User-defined Parm constructor
-Ellipsoid::Ellipsoid(const char* name, OpticalElement::GeometricalShape geometricalShape, const double width, const double height,
+Ellipsoid::Ellipsoid(const char* name, GeometricalShape geometricalShape, const double width, const double height,
                      const double azimuthalAngle, glm::dvec4 position, const double LongHalfAxisA, const double ShortHalfAxisB,
                      const double DesignAngle, glm::dmat4x4 orientation, const double grazingIncidence, const double entranceArmLength,
                      const double exitArmLength, FigureRotation figRot, const double a_11, const std::array<double, 7> slopeError,
@@ -217,7 +217,7 @@ glm::dmat4x4 Ellipsoid::getElementParameters() const {
 
 // Null if failed
 std::shared_ptr<Ellipsoid> Ellipsoid::createFromXML(const xml::Parser& p) {
-    OpticalElement::GeometricalShape geometricalShape = p.parseGeometricalShape();
+    GeometricalShape geometricalShape = p.parseGeometricalShape();
     double width = p.parseTotalWidth();
     double height = p.parseTotalLength();
     double incidenceAngle = p.parseGrazingIncAngle();

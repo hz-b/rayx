@@ -27,7 +27,7 @@ namespace RAYX {
  * @param mat                       material (See Material.h)
  *
  */
-SphereMirror::SphereMirror(const char* name, OpticalElement::GeometricalShape geometricalShape, const double width, const double height,
+SphereMirror::SphereMirror(const char* name, GeometricalShape geometricalShape, const double width, const double height,
                            const double azimuthalAngle, const double grazingIncidenceAngle, glm::dvec4 position, glm::dmat4x4 orientation,
                            const double entranceArmLength, const double exitArmLength, const std::array<double, 7> slopeError, Material mat)
     : OpticalElement(name, slopeError),
@@ -68,7 +68,7 @@ SphereMirror::SphereMirror(const char* name, OpticalElement::GeometricalShape ge
  * @param mat                       material (See Material.h)
  *
  */
-SphereMirror::SphereMirror(const char* name, OpticalElement::GeometricalShape geometricalShape, const double width, const double height,
+SphereMirror::SphereMirror(const char* name, GeometricalShape geometricalShape, const double width, const double height,
                            const double azimuthalAngle, double radius, glm::dvec4 position, glm::dmat4x4 orientation,
                            const std::array<double, 7> slopeError, Material mat)
     : OpticalElement(name, slopeError) {

@@ -8,8 +8,6 @@
 
 #include "Material/Material.h"
 #include "Model/Beamline/EnergyDistribution.h"
-#include "Model/Beamline/LightSource.h"
-#include "Model/Beamline/OpticalElement.h"
 #include "utils.h"
 
 namespace RAYX {
@@ -18,6 +16,9 @@ enum class CentralBeamstop;
 enum class CurvatureType;
 enum class CylinderDirection;
 enum class FigureRotation;
+enum class GratingMount;
+enum class SourceDist;
+enum class GeometricalShape;
 
 /** The xml namespace defines functions, which help to implement the
  * createFromXML-functions for the beamline objects. All of these functions
@@ -95,9 +96,7 @@ struct Parser {
     inline int parseLinearPol0() const { return parseInt("linearPol_0"); }
     inline int parseLinearPol45() const { return parseInt("linearPol_45"); }
     inline int parseCircularPol() const { return parseInt("circularPol"); }
-    inline OpticalElement::GeometricalShape parseGeometricalShape() const {
-        return static_cast<OpticalElement::GeometricalShape>(parseInt("geometricalShape"));
-    }
+    inline GeometricalShape parseGeometricalShape() const { return static_cast<GeometricalShape>(parseInt("geometricalShape")); }
     inline double parseTotalWidth() const { return parseDouble("totalWidth"); }
     inline double parseTotalLength() const { return parseDouble("totalLength"); }
     inline double parseTotalHeight() const { return parseDouble("totalHeight"); }

@@ -26,7 +26,7 @@ namespace RAYX {
  * @param mat                   material (See Material.h)
  *
  */
-PlaneMirror::PlaneMirror(const char* name, OpticalElement::GeometricalShape geometricalShape, const double width, const double height,
+PlaneMirror::PlaneMirror(const char* name, GeometricalShape geometricalShape, const double width, const double height,
                          const double azimuthalAngle, glm::dvec4 position, glm::dmat4x4 orientation, const std::array<double, 7> slopeError,
                          Material mat)
     : OpticalElement(name, slopeError) {
@@ -41,9 +41,9 @@ PlaneMirror::PlaneMirror(const char* name, OpticalElement::GeometricalShape geom
     setSurface(std::make_unique<Quadric>(glm::dmat4x4{0, 0, 0, 0, 1, 0, 0, -1, 0, 0, 0, 0, 0, 0, matd, 0}));
 }
 
-PlaneMirror::PlaneMirror(const char* name, OpticalElement::GeometricalShape geometricalShape, const double width, const double widthB,
-                         const double height, const double azimuthalAngle, glm::dvec4 position, glm::dmat4x4 orientation,
-                         const std::array<double, 7> slopeError, Material mat)
+PlaneMirror::PlaneMirror(const char* name, GeometricalShape geometricalShape, const double width, const double widthB, const double height,
+                         const double azimuthalAngle, glm::dvec4 position, glm::dmat4x4 orientation, const std::array<double, 7> slopeError,
+                         Material mat)
     : OpticalElement(name, slopeError) {
     // set geometry
     m_Geometry->m_geometricalShape = geometricalShape;

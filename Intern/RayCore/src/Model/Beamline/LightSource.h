@@ -9,6 +9,7 @@
 #include <vector>
 
 #include "Core.h"
+#include "Data/xml.h"
 #include "EnergyDistribution.h"
 #include "Tracer/Ray.h"
 #include "glm.hpp"
@@ -26,6 +27,7 @@ enum class SourceDist { Uniform, Gaussian };
 
 class RAYX_API LightSource {
   public:
+    LightSource(const DesignObject&);
     LightSource(const char* name, uint32_t numberOfRays, EnergyDistribution dist, const double linPol0, const double linPol45,
                 const double circPol, const std::array<double, 6> misalignment, const double sourceDepth, const double sourceHeight,
                 const double sourceWidth, const double horDivergence, const double verDivergence);
@@ -54,8 +56,8 @@ class RAYX_API LightSource {
 
     [[maybe_unused]] const char* m_name;
     /** the energy distribution used when deciding the energies of the rays. */
-    const EnergyDistribution m_EnergyDistribution;
-    const uint32_t m_numberOfRays;
+    EnergyDistribution m_EnergyDistribution;
+    uint32_t m_numberOfRays;
 
   protected:
     // Geometric Parameters

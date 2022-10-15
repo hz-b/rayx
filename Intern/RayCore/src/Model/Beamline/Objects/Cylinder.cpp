@@ -29,7 +29,7 @@ namespace RAYX {
  * @param mat               material (See Material.h)
  *
  */
-Cylinder::Cylinder(const char* name, OpticalElement::GeometricalShape geometricalShape, const double radius, CylinderDirection direction,
+Cylinder::Cylinder(const char* name, GeometricalShape geometricalShape, const double radius, CylinderDirection direction,
                    const double width, const double height, const double azimuthalAngle, glm::dvec4 position, glm::dmat4x4 orientation,
                    const double grazingIncidence, const double entranceArmLength, const double exitArmLength,
                    const std::array<double, 7> slopeError, Material mat)

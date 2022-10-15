@@ -50,7 +50,7 @@ void addBeamlineObjectFromXML(rapidxml::xml_node<>* node, Beamline* beamline, co
     // nullptr) The createFromXML functions use the param* functions declared in
     // <Data/xml.h>
     if (strcmp(type, "Point Source") == 0) {
-        addLightSource(PointSource::createFromXML(parser), node);
+        addLightSource(std::make_shared<PointSource>(parser), node);
     } else if (strcmp(type, "Matrix Source") == 0) {
         addLightSource(MatrixSource::createFromXML(parser), node);
     } else if (strcmp(type, "ImagePlane") == 0) {

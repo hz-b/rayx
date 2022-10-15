@@ -8,6 +8,7 @@ namespace RAYX {
 
 class RAYX_API PointSource : public LightSource {
   public:
+    PointSource(const DesignObject&);
     PointSource(const std::string& name, int numberOfRays, EnergyDistribution dist, const double sourceWidth, const double sourceHeight,
                 const double sourceDepth, const double horDivergence, const double verDivergence, const SourceDist widthDist,
                 const SourceDist heightDist, const SourceDist horDist, const SourceDist verDist, const double linPol0,

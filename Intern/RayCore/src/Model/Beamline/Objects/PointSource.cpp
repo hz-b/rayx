@@ -8,6 +8,13 @@
 
 namespace RAYX {
 
+PointSource::PointSource(const DesignObject& dobj) : LightSource(dobj) {
+    m_widthDist = dobj.parseSourceWidthDistribution();
+    m_heightDist = dobj.parseSourceHeightDistribution();
+    m_horDist = dobj.parseHorDivDistribution();
+    m_verDist = dobj.parseVerDivDistribution();
+}
+
 /**
  * @param name              name of source
  * @param dist              Energy Distribution object, describes which values

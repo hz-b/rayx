@@ -50,7 +50,7 @@ namespace RAYX {
  * bowing amplitude y(5) and radius (6)
  * @param mat                           material (See Material.h)
  */
-ReflectionZonePlate::ReflectionZonePlate(const char* name, OpticalElement::GeometricalShape geometricalShape, CurvatureType curvatureType,
+ReflectionZonePlate::ReflectionZonePlate(const char* name, GeometricalShape geometricalShape, CurvatureType curvatureType,
                                          const double widthA, const std::optional<double> widthB, const double height,
                                          const double azimuthalAngle, const glm::dvec4 position, const glm::dmat4x4 orientation,
                                          const double designEnergy, const double orderOfDiffraction, const double designOrderOfDiffraction,

@@ -27,7 +27,7 @@ namespace RAYX {
  * amplitude y(5) and radius (6)
  * @param mat                       material (See Material.h)
  */
-ToroidMirror::ToroidMirror(const char* name, OpticalElement::GeometricalShape geometricalShape, const double width, const double height,
+ToroidMirror::ToroidMirror(const char* name, GeometricalShape geometricalShape, const double width, const double height,
                            const double azimuthalAngle, glm::dvec4 position, glm::dmat4x4 orientation, const double longRadius,
                            const double shortRadius, const std::array<double, 7> slopeError, Material mat)
     : OpticalElement(name, slopeError), m_longRadius(longRadius), m_shortRadius(shortRadius) {

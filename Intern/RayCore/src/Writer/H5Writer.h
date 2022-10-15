@@ -2,6 +2,8 @@
 
 #pragma once
 
+#include "Tracer/Ray.h"
+
 void RAYX_API writeH5(const std::vector<RAYX::Ray>&, std::string filename);
 
 #endif
