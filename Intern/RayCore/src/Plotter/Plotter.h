@@ -14,6 +14,8 @@ class Plotter {
 
   private:
     int getBinAmount(std::vector<double>& Pos);
-    enum plotTypes {LikeRAYUI, ForEach, Eachsubplot };
+    void plotLikeRAYUI(const std::vector<Ray>& RayList, std::string plotName);
+    void plotforEach(const std::vector<Ray>& RayList, std::string plotName);
+    enum plotTypes { LikeRAYUI, ForEach, Eachsubplot };
 };
 }  // namespace RAYX
