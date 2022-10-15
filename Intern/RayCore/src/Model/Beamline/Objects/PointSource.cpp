@@ -15,61 +15,6 @@ PointSource::PointSource(const DesignObject& dobj) : LightSource(dobj) {
     m_verDist = dobj.parseVerDivDistribution();
 }
 
-/**
- * @param name              name of source
- * @param dist              Energy Distribution object, describes which values
- * the energy of a ray can take. this energy is then chosen randomly for each
- * ray from this distribution
- * @param sourceWidth       width of the source, the x-coordinate of the
- * origin(position) of the ray will be within [-sourceWidth/2, +sourceWidth/2]
- * @param sourceHeight      height of the source, the y-coordinate of the
- * origin(position) of the ray will be within [-sourceHeight/2, +sourceHeight/2]
- * @param sourceDepth       depth of the source, the z-coordinate of the
- * origin(position) of the ray will be within [-sourceDepth/2, +sourceDepth/2],
- * but chosen randomly. if set to 0, the rays are chosen deterministically,
- * which is useful for testing
- * @param horDivergence     divergence span in mrad of the x-direction of the
- * ray.
- * @param verDivergence     divergence span in mrad of the y-direction of the
- * ray, since direction vectors have unit length, the z-direction is derived
- * from the two other angles
- * @param widthDist         distribution for the x-coordinate of the
- * origin(position) 0 = uniform, 1 = standard normal distribution
- * @param heigthDist        distribution for the y-coordinate of the
- * origin(position) 0 = uniform, 1 = standard normal distribution
- * @param horDist           distribution for the x-coordinate of the direction 0
- * = uniform, 1 = standard normal distribution
- * @param verDist           distribution for the y-coordinate of the direction 0
- * = uniform, 1 = standard normal distribution
- * @param linPol0           polarization
- * @param linPol45          polarization
- * @param circPol           polarization
- * @param misalignment      if the source is moved/turned in any direction
- * (affects x,y position and x,y direction)
- *
- */
-PointSource::PointSource(const std::string& name, int numberOfRays, EnergyDistribution dist, const double sourceWidth,
-                         const double sourceHeight, const double sourceDepth, const double horDivergence, const double verDivergence,
-                         SourceDist widthDist, SourceDist heightDist, SourceDist horDist, SourceDist verDist, const double linPol0,
-                         const double linPol45, const double circPol, const std::array<double, 6> misalignment)
-    : LightSource(name.c_str(), numberOfRays, std::move(dist), linPol0, linPol45, circPol, misalignment, sourceDepth, sourceHeight,
-                  sourceWidth, horDivergence, verDivergence) {
-    m_widthDist = widthDist;
-    m_heightDist = heightDist;
-    m_horDist = horDist;
-    m_verDist = verDist;
-}
-
-PointSource::~PointSource() = default;
-
-// returns nullptr on error
-std::shared_ptr<PointSource> PointSource::createFromXML(const RAYX::xml::Parser& p) {
-    return std::make_shared<PointSource>(
-        p.name(), p.parseNumberRays(), p.parseEnergyDistribution(), p.parseSourceWidth(), p.parseSourceHeight(), p.parseSourceDepth(),
-        p.parseHorDiv(), p.parseVerDiv(), p.parseSourceWidthDistribution(), p.parseSourceHeightDistribution(), p.parseHorDivDistribution(),
-        p.parseVerDivDistribution(), p.parseLinearPol0(), p.parseLinearPol45(), p.parseCircularPol(), p.parseMisalignment());
-}
-
 struct RandomState {
     RandomState() : m_uniformDist(0, 1), m_normDist(0, 1) {}
 

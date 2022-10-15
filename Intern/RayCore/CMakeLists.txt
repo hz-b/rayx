@@ -16,7 +16,6 @@ SET(SOURCE
     src/Model/Beamline/EnergyDistribution.cpp
     src/Model/Beamline/Objects/ImagePlane.cpp
     src/Model/Beamline/Objects/MatrixSource.cpp
-    src/Model/Beamline/Objects/RandomRays.cpp
     src/Model/Beamline/Objects/PointSource.cpp
     src/Model/Beamline/Objects/Ellipsoid.cpp
     src/Model/Beamline/Objects/ReflectionZonePlate.cpp
@@ -68,7 +67,6 @@ SET(HEADERS
     src/Model/Beamline/EnergyDistribution.h
     src/Model/Beamline/Objects/ImagePlane.h
     src/Model/Beamline/Objects/MatrixSource.h
-    src/Model/Beamline/Objects/RandomRays.h
     src/Model/Beamline/Objects/PointSource.h
     src/Model/Beamline/Objects/Ellipsoid.h
     src/Model/Beamline/Objects/ReflectionZonePlate.h

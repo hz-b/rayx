@@ -19,22 +19,6 @@ LightSource::LightSource(const DesignObject& dobj) {
     m_circularPol = dobj.parseCircularPol();
 }
 
-LightSource::LightSource(const char* name, uint32_t numberOfRays, EnergyDistribution dist, const double linPol0, const double linPol45,
-                         const double circPol, const std::array<double, 6> misalignment, const double sourceDepth,
-                         const double sourceHeight, const double sourceWidth, const double horDivergence, const double verDivergence)
-    : m_name(name),
-      m_EnergyDistribution(std::move(dist)),
-      m_numberOfRays(numberOfRays),
-      m_sourceDepth(sourceDepth),
-      m_sourceHeight(sourceHeight),
-      m_sourceWidth(sourceWidth),
-      m_horDivergence(horDivergence),
-      m_verDivergence(verDivergence),
-      m_misalignmentParams(misalignment),
-      m_linearPol_0(linPol0),
-      m_linearPol_45(linPol45),
-      m_circularPol(circPol) {}
-
 double LightSource::getLinear0() const { return m_linearPol_0; }
 
 double LightSource::getLinear45() const { return m_linearPol_45; }
