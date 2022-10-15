@@ -56,7 +56,7 @@ void addBeamlineObjectFromXML(rapidxml::xml_node<>* node, Beamline* beamline, co
     } else if (strcmp(type, "ImagePlane") == 0) {
         addOpticalElement(ImagePlane::createFromXML(parser), node);
     } else if (strcmp(type, "Plane Mirror") == 0) {
-        addOpticalElement(PlaneMirror::createFromXML(parser), node);
+        addOpticalElement(std::make_shared<PlaneMirror>(parser), node);
     } else if (strcmp(type, "Toroid") == 0) {
         addOpticalElement(ToroidMirror::createFromXML(parser), node);
     } else if (strcmp(type, "Slit") == 0) {

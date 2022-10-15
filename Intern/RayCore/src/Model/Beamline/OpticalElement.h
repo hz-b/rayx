@@ -36,6 +36,7 @@ class RAYX_API OpticalElement {
         void setHeightWidth(double height, double widthA, double widthB = 0.0);
     };
 
+    OpticalElement(const DesignObject&);
     // needed to add optical elements to tracer
     OpticalElement(const char* name, const std::array<double, 7> slopeError,
                    const Geometry& geometry = Geometry());  // TODO(Jannis): add surface

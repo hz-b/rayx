@@ -7,6 +7,12 @@
 
 namespace RAYX {
 
+OpticalElement::OpticalElement(const DesignObject& dobj) {
+    m_name = dobj.name();
+    m_slopeError = dobj.parseSlopeError();
+    m_Geometry = std::make_unique<Geometry>();
+}
+
 // ! Workaround for a bug in the gcc/clang compiler:
 // https://stackoverflow.com/questions/53408962/try-to-understand-compiler-error-message-default-member-initializer-required-be
 OpticalElement::Geometry::Geometry() = default;
