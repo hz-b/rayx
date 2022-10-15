@@ -8,6 +8,8 @@
 
 namespace RAYX {
 
+MatrixSource::MatrixSource(const DesignObject& dobj) : LightSource(dobj) {}
+
 /**
  * creates floor(sqrt(numberOfRays)) **2 rays (a grid with as many rows as
  * columns, eg amountOfRays=20 -> 4*4=16, rest (4 rays) same position and
