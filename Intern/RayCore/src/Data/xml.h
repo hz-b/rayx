@@ -159,9 +159,11 @@ struct Parser {
 
 /// The DesignObject contains the design parameters. But the actual OpticalElements does not contain them.
 /// The DesignObject is utilized to construct OpticalElements from it's parameters.
+///
 /// For now objects can only be created from XML, but later on - when the GUI is around,
-/// we might want to add an abstract superclass DesignObject,
-/// with it's child classes xml::Parser and gui::ObjectBuilder or something.
+/// we might want to add an abstract superclass DesignObject.
+/// DesignObject would have child classes xml::Parser and gui::ObjectBuilder or something.
+/// This superclass DesignObject could mostly keep the API of the xml::Parser, to make the transition trivial.
 using DesignObject = xml::Parser;
 
 }  // namespace RAYX
