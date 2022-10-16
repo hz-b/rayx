@@ -12,10 +12,7 @@ enum class FigureRotation { Yes, Plane, A11 };
 // TODO(Jannis): rename or turn into surface
 class RAYX_API Ellipsoid : public OpticalElement {
   public:
-    Ellipsoid(const char* name, GeometricalShape geometricalShape, const double width, const double height, const double azimuthalAngle,
-              glm::dvec4 position, const double LongHalfAxisA, const double ShortHalfAxisB, const double DesignAngle,
-              glm::dmat4x4 orientation, const double grazingIncidence, const double entranceArmLength, const double exitArmLength,
-              FigureRotation figRot, const double a_11, const std::array<double, 7> slopeError, Material mat);
+    Ellipsoid(const DesignObject&);
 
     void calcHalfAxes();
     void calculateCenterFromHalfAxes(double angle);
@@ -37,8 +34,6 @@ class RAYX_API Ellipsoid : public OpticalElement {
     double getHalfAxisC() const;
 
     glm::dmat4x4 getElementParameters() const;
-
-    static std::shared_ptr<Ellipsoid> createFromXML(const xml::Parser&);
 
   private:
     // user parameters:

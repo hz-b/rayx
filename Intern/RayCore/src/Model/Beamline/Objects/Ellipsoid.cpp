@@ -4,54 +4,18 @@
 
 namespace RAYX {
 
-/**
- * Angles given in degree and stored in rad. Initializes transformation matrices
- * from position and orientation, and parameters for the quadric in super class
- * (surface). stores mirror-specific parameters in this class.
- *
- * @param width             width of the mirror (x-dimension)
- * @param height            height of the mirror (z-dimension)
- * @param azimuthalAngle        azimuthal angle of object (rotation in xy plane
- * with respect to previous element) in rad
- * @param position          position of the element in world coordinates
- * @param orientation       orientation of the element in world coordinates
- * @param grazingIncidence  desired incidence angle of the main ray
- * @param entranceArmLength length of entrance arm
- * @param exitArmLength     length of exit arm
- * @param figRot            figure of rotation (0 = yes, 1 = plane, 2 = no,
- * short half axis C)??
- * @param a_11              a_11 in quadric equation
- * @param slopeError        7 slope error parameters: x-y sagittal (0), y-z
- * meridional (1), thermal distortion: x (2),y (3),z (4), cylindrical bowing
- * amplitude y(5) and radius (6)
- * @param mat               material (See Material.h)
- *
- */
-// User-defined Parm constructor
-Ellipsoid::Ellipsoid(const char* name, GeometricalShape geometricalShape, const double width, const double height,
-                     const double azimuthalAngle, glm::dvec4 position, const double LongHalfAxisA, const double ShortHalfAxisB,
-                     const double DesignAngle, glm::dmat4x4 orientation, const double grazingIncidence, const double entranceArmLength,
-                     const double exitArmLength, FigureRotation figRot, const double a_11, const std::array<double, 7> slopeError,
-                     Material mat)
-    : OpticalElement(name, slopeError),
-      m_incidence(degToRad(grazingIncidence)),
-      m_entranceArmLength(entranceArmLength),
-      m_exitArmLength(exitArmLength),
-      m_a11(a_11),
-      m_shortHalfAxisB(ShortHalfAxisB),
-      m_longHalfAxisA(LongHalfAxisA),
-      m_designGrazingAngle(degToRad(DesignAngle)) {
+Ellipsoid::Ellipsoid(const DesignObject& dobj) : OpticalElement(dobj) {
+    m_incidence = degToRad(dobj.parseGrazingIncAngle()), m_entranceArmLength = dobj.parseEntranceArmLength();
+    m_exitArmLength = dobj.parseExitArmLength();
+    m_a11 = dobj.parseParameterA11();
+    m_shortHalfAxisB = dobj.parseShortHalfAxisB();
+    m_longHalfAxisA = dobj.parseLongHalfAxisA();
+    m_designGrazingAngle = degToRad(dobj.parseDesignGrazingIncAngle());
     // set geometry
-    m_Geometry->m_geometricalShape = geometricalShape;
-    m_Geometry->setHeightWidth(height, width);
-    m_Geometry->m_azimuthalAngle = azimuthalAngle;
-    m_Geometry->m_position = position;
-    m_Geometry->m_orientation = orientation;
 
-    RAYX_VERB << name;
     m_offsetY0 = 0;  // what is this for? RAY.FOR: "only !=0 in case of Monocapillary"
 
-    m_figureRotation = figRot;
+    m_figureRotation = dobj.parseFigureRotation();
 
     // if design angle not given, take incidenceAngle
     calculateCenterFromHalfAxes(m_designGrazingAngle);
@@ -93,19 +57,13 @@ Ellipsoid::Ellipsoid(const char* name, GeometricalShape geometricalShape, const 
     RAYX_VERB << "m_a44: " << m_a44;
 
     double icurv = 1;
+    Material mat = dobj.parseMaterial();
     auto matd = (double)static_cast<int>(mat);
     setSurface(std::make_unique<Quadric>(glm::dmat4x4{m_a11, 0, 0, 0,              //
                                                       icurv, m_a22, m_a23, m_a24,  //
                                                       0, 0, m_a33, m_a34,          //
                                                       7, 0, matd, m_a44}));
 }
-
-/*
-void Ellipsoid::calcRadius() {
-    double theta = m_alpha; // grazing incidence in rad
-    m_radius = 2.0/sin(theta) / (1.0 / m_entranceArmLength + 1.0 /
-m_exitArmLength);
-}*/
 
 void Ellipsoid::calculateCenterFromHalfAxes(double angle) {
     // TODO: is mt = 0 a good default for the case that it'll never be set?
@@ -215,27 +173,4 @@ glm::dmat4x4 Ellipsoid::getElementParameters() const {
             0};
 }
 
-// Null if failed
-std::shared_ptr<Ellipsoid> Ellipsoid::createFromXML(const xml::Parser& p) {
-    GeometricalShape geometricalShape = p.parseGeometricalShape();
-    double width = p.parseTotalWidth();
-    double height = p.parseTotalLength();
-    double incidenceAngle = p.parseGrazingIncAngle();
-    double entranceArmLength = p.parseEntranceArmLength();
-    double exitArmLength = p.parseExitArmLength();
-    double azimuthalAngle = p.parseAzimuthalAngle();
-    double m_a11 = p.parseParameterA11();
-    FigureRotation figRot = p.parseFigureRotation();
-    std::array<double, 7> slopeError = p.parseSlopeError();
-    Material mat = p.parseMaterial();
-    double designGrazing = p.parseDesignGrazingIncAngle();
-    double longHalfAxisA = p.parseLongHalfAxisA();
-    double shortHalfAxisB = p.parseShortHalfAxisB();
-    glm::dvec4 position = p.parsePosition();
-    glm::dmat4x4 orientation = p.parseOrientation();
-
-    return std::make_shared<Ellipsoid>(p.name(), geometricalShape, width, height, azimuthalAngle, position, longHalfAxisA, shortHalfAxisB,
-                                       designGrazing, orientation, incidenceAngle, entranceArmLength, exitArmLength, figRot, m_a11,
-                                       slopeError, mat);
-}
 }  // namespace RAYX
