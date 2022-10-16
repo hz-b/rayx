@@ -22,16 +22,7 @@ enum class RZPType { Elliptical, Meriodional };
 
 class RAYX_API ReflectionZonePlate : public OpticalElement {
   public:
-    // shortened constructor that assumes that the angles are already calculated
-    // and the position and orientation in world coordinates is already derived
-    ReflectionZonePlate(const char* name, GeometricalShape geometricalShape, CurvatureType curvatureType, const double widthA,
-                        const std::optional<double> widthB, const double height, const double azimuthalAngle, const glm::dvec4 position,
-                        const glm::dmat4x4 orientation, const double designEnergy, const double orderOfDiffraction,
-                        const double designOrderOfDiffraction, const double dAlpha, const double dBeta, const double mEntrance,
-                        const double mExit, const double sEntrance, const double sExit, const double shortRadius, const double longRadius,
-                        const int additionalZeroOrder, const double fresnelZOffset, const std::array<double, 7> slopeError, Material mat);
-
-    static std::shared_ptr<ReflectionZonePlate> createFromXML(const xml::Parser&);
+    ReflectionZonePlate(const DesignObject&);
 
     // for calculating incidence and exit angle from user parameters
     void calcAlpha();

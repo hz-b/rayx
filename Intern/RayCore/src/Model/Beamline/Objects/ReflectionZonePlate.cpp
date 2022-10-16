@@ -5,130 +5,47 @@
 #include "Debug.h"
 
 namespace RAYX {
-/**
- * calculates transformation matrices,
- * sets parameters for the element in super class (optical element).
- * Sets RZP-specific parameters in this class.
- *
- * @param name                          name of optical element
- * @param geometricalShape              shape of RZP (elliptical vs rectangular)
- * @param curvatureType                 Plane, Sphere, Toroid
- * @param widthA                        total width of the element (x-dimension)
- * @param widthB                        if set then widthA is top width and
- * widthB is bottom width
- * @param height                        height of the element (z- dimensions)
- * @param azimuthalAngle                rotation of element in xy-plane, needed
- * for stokes vector, in rad
- * @param position                      position of the RZP in world coordinates
- * @param orientation                   orientation of the RZP in world
- * coordinates
- * @param designEnergy                  given by user, used if auto==false
- * @param orderOfDiffraction            in what order the ray should be
- * reflected
- * @param designEnergy                  energy for which the RZP is designed or
- * the source energy
- * @param orderOfDiffraction            order of diffraction that should be
- * traced
- * @param designOrderOfDiffraction      order of diffraction for which the RZP
- * is designed
- * @param dAlpha                        incidence angle for which the RZP is
- * designed
- * @param dBeta                         exit angle for which the RZP is designed
- * @param mEntrance
- * @param mExit
- * @param sEntrance
- * @param sExit
- * @param shortRadius                   short radius of toroid
- * @param longRadius                    radius of sphere or long radius of
- * toroid
- * @param additionalZeroOrder           if true half of the rays will be
- * refracted in the 0th order (=reflection), if false all will be refracted
- * according to orderOfDiffraction Parameter
- * @param fresnelZOffset
- * @param slopeError                    7 slope error parameters: x-y sagittal
- * (0), y-z meridional (1), thermal distortion x (2),y (3),z (4), cylindrical
- * bowing amplitude y(5) and radius (6)
- * @param mat                           material (See Material.h)
- */
-ReflectionZonePlate::ReflectionZonePlate(const char* name, GeometricalShape geometricalShape, CurvatureType curvatureType,
-                                         const double widthA, const std::optional<double> widthB, const double height,
-                                         const double azimuthalAngle, const glm::dvec4 position, const glm::dmat4x4 orientation,
-                                         const double designEnergy, const double orderOfDiffraction, const double designOrderOfDiffraction,
-                                         const double dAlpha, const double dBeta, const double mEntrance, const double mExit,
-                                         const double sEntrance, const double sExit, const double shortRadius, const double longRadius,
-                                         const int additionalZeroOrder, const double fresnelZOffset, const std::array<double, 7> slopeError,
-                                         Material mat)
-    : OpticalElement(name, slopeError),
-      m_fresnelZOffset(fresnelZOffset),
-      m_designAlphaAngle(degToRad(dAlpha)),
-      m_designBetaAngle(degToRad(dBeta)),
-      m_designOrderOfDiffraction(designOrderOfDiffraction),
-      m_designEnergy(designEnergy),                  // in eV
-      m_designSagittalEntranceArmLength(sEntrance),  // in mm
-      m_designSagittalExitArmLength(sExit),
-      m_designMeridionalEntranceArmLength(mEntrance),
-      m_designMeridionalExitArmLength(mExit),
-      m_orderOfDiffraction(orderOfDiffraction)
 
-{
-    // set geometry
-    m_Geometry->m_geometricalShape = geometricalShape;
-    // setHeightWidth
-    if (widthB) {
-        m_Geometry->setHeightWidth(height, widthA, *widthB);
-    } else {
-        m_Geometry->setHeightWidth(height, widthA);
-    }
-    m_Geometry->m_azimuthalAngle = azimuthalAngle;
-    m_Geometry->m_position = position;
-    m_Geometry->m_orientation = orientation;
+ReflectionZonePlate::ReflectionZonePlate(const DesignObject& dobj) : OpticalElement(dobj) {
+    m_fresnelZOffset = dobj.parseFresnelZOffset();
+    m_designAlphaAngle = degToRad(dobj.parseDesignAlphaAngle());
+    m_designBetaAngle = degToRad(dobj.parseDesignBetaAngle());
+    m_designOrderOfDiffraction = dobj.parseDesignOrderDiffraction();
+    m_designEnergy = dobj.parseDesignEnergy();
+    m_designSagittalEntranceArmLength = dobj.parseEntranceArmLengthSag();
+    m_designSagittalExitArmLength = dobj.parseExitArmLengthSag();
+    m_designMeridionalEntranceArmLength = dobj.parseEntranceArmLengthSag();
+    m_designMeridionalExitArmLength = dobj.parseExitArmLengthMer();
+    m_orderOfDiffraction = dobj.parseOrderDiffraction();
 
     // m_designEnergy = designEnergy; // if Auto == true, take energy of Source
     // (param sourceEnergy), else m_designEnergy = designEnergy
     m_designWavelength = m_designEnergy == 0 ? 0 : hvlam(m_designEnergy);
-    m_additionalOrder = double(additionalZeroOrder);
+    m_additionalOrder = double(dobj.parseAdditionalOrder());
 
-    m_curvatureType = curvatureType;
+    m_curvatureType = dobj.parseCurvatureType();
     m_designType = DesignType::ZOffset;    // DesignType::ZOffset (0) default
     m_derivationMethod = 0;                // DM_FORMULA default
     m_rzpType = RZPType::Elliptical;       // default (0)
     m_imageType = ImageType::Point2Point;  // default (0)
 
+    Material mat = dobj.parseMaterial();
     auto matd = (double)static_cast<int>(mat);
 
     // set parameters in Quadric class
     if (m_curvatureType == CurvatureType::Plane) {
         setSurface(std::make_unique<Quadric>(glm::dmat4x4{0, 0, 0, 0, 1, 0, 0, -1, 0, 0, 0, 0, 4, 0, matd, 0}));
     } else if (m_curvatureType == CurvatureType::Toroidal) {
-        m_longRadius = longRadius;    // for sphere and toroidal
-        m_shortRadius = shortRadius;  // only for Toroidal
-        setSurface(std::make_unique<Toroid>(longRadius, shortRadius, 4, mat));
+        m_longRadius = dobj.parseLongRadius();    // for sphere and toroidal
+        m_shortRadius = dobj.parseShortRadius();  // only for Toroidal
+        setSurface(std::make_unique<Toroid>(m_longRadius, m_shortRadius, 4, mat));
     } else {
-        m_longRadius = longRadius;  // for sphere and toroidal
+        m_longRadius = dobj.parseLongRadius();  // for sphere and toroidal
         setSurface(std::make_unique<Quadric>(glm::dmat4x4{1, 0, 0, 0, 1, 1, 0, -m_longRadius, 0, 0, 1, 0, 4, 0, matd, 0}));
     }
 
     printInfo();
     RAYX_VERB << "Created.";
-}
-
-std::shared_ptr<ReflectionZonePlate> ReflectionZonePlate::createFromXML(const xml::Parser& p) {
-    // ! temporary for testing trapezoid rzp
-    double widthB;
-    bool foundWidthB = xml::paramDouble(p.node, "totalWidthB", &widthB);
-
-    std::optional<double> widthBOptional;
-    if (foundWidthB)
-        widthBOptional = widthB;
-    else
-        widthBOptional = std::nullopt;
-
-    return std::make_shared<ReflectionZonePlate>(
-        p.name(), p.parseGeometricalShape(), p.parseCurvatureType(), p.parseTotalWidth(), widthBOptional, p.parseTotalLength(),
-        p.parseAzimuthalAngle(), p.parsePosition(), p.parseOrientation(), p.parseDesignEnergy(), p.parseOrderDiffraction(),
-        p.parseDesignOrderDiffraction(), p.parseDesignAlphaAngle(), p.parseDesignBetaAngle(), p.parseEntranceArmLengthMer(),
-        p.parseExitArmLengthMer(), p.parseEntranceArmLengthSag(), p.parseExitArmLengthSag(), p.parseShortRadius(), p.parseLongRadius(),
-        p.parseAdditionalOrder(), p.parseFresnelZOffset(), p.parseSlopeError(), p.parseMaterial());
 }
 
 void ReflectionZonePlate::printInfo() const {
