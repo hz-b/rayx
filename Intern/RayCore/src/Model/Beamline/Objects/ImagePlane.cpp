@@ -7,9 +7,6 @@
 namespace RAYX {
 
 ImagePlane::ImagePlane(const DesignObject& dobj) : OpticalElement(dobj) {
-    m_Geometry->m_position = dobj.parsePosition();
-    m_Geometry->m_orientation = dobj.parseOrientation();
-
     setSurface(std::make_unique<Quadric>(glm::dmat4x4{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 5, 0, 0, 0}));
 }
 

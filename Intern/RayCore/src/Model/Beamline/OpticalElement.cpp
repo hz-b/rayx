@@ -2,15 +2,43 @@
 
 #include <cmath>
 #include <glm.hpp>
+#include <optional>
 
 #include "Debug.h"
 
 namespace RAYX {
 
 OpticalElement::OpticalElement(const DesignObject& dobj) {
+    // TODO(Rudi) replace try-catch stuff by std::optionals
     m_name = dobj.name();
     m_slopeError = dobj.parseSlopeError();
     m_Geometry = std::make_unique<Geometry>();
+
+    double widthB = 0.0;
+    xml::paramDouble(dobj.node, "totalWidthB", &widthB);
+    try {
+        m_Geometry->m_geometricalShape = dobj.parseGeometricalShape();
+    } catch (std::runtime_error& e) {
+    }
+    std::optional<double> lengthOrHeight;
+    try {
+        lengthOrHeight = dobj.parseTotalLength();
+    } catch (std::runtime_error& e) {
+        try {
+            lengthOrHeight = dobj.parseTotalHeight();
+        } catch (std::runtime_error& e) {
+        }
+    }
+    if (lengthOrHeight) {
+        m_Geometry->setHeightWidth(lengthOrHeight.value(), dobj.parseTotalWidth(), widthB);
+    }
+    try {
+        m_Geometry->m_azimuthalAngle = dobj.parseAzimuthalAngle();
+    } catch (std::runtime_error& e) {
+    }
+
+    m_Geometry->m_position = dobj.parsePosition();
+    m_Geometry->m_orientation = dobj.parseOrientation();
 }
 
 // ! Workaround for a bug in the gcc/clang compiler:
