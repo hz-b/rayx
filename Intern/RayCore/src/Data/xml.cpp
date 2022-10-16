@@ -423,9 +423,9 @@ std::array<double, 6> Parser::parseMisalignment() const {
 }
 
 std::array<double, 7> Parser::parseSlopeError() const {
-    std::array<double, 7> x{};
+    std::array<double, 7> x;
     if (!paramSlopeError(node, &x)) {
-        throw std::runtime_error("parseSlopeError failed");
+        x.fill(0.0);
     }
     return x;
 }
