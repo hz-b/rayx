@@ -12,7 +12,7 @@ inline bool intclose(double x, double y) {
     return abs(x - y) < std::numeric_limits<double>::epsilon();
 }
 /**
- * @brief Plot the
+ * @brief Plot the Data
  *
  * @param plotType Plot type, please check ENUM
  * @param plotName Plot Name
@@ -58,13 +58,16 @@ int Plotter::getBinAmount(std::vector<double>& vec) {
                  *(std::min_element(vec.begin(), vec.end())), abs_comp);
     return (int)(xymax / binwidth) + 1;
 }
-
+/**
+ * @brief Plot final Image Plane
+ * 
+ * @param RayList Data (Rays)
+ * @param plotName
+ */
 void Plotter::plotLikeRAYUI(const std::vector<Ray>& RayList,
                             std::string plotName) {
     // Sort Data for plotting
-    std::vector<Ray> correctOrderRayList;
     std::vector<double> Xpos, Ypos;
-    correctOrderRayList.reserve(RayList.size());
     Xpos.reserve(RayList.size());
     Ypos.reserve(RayList.size());
     auto max = std::max_element(RayList.begin(), RayList.end(), comp);
@@ -73,7 +76,6 @@ void Plotter::plotLikeRAYUI(const std::vector<Ray>& RayList,
     // Create new RayList with right order
     for (auto r : RayList) {
         if (intclose(r.m_extraParam, max_param)) {
-            correctOrderRayList.push_back(r);
             Xpos.push_back(r.m_position.x);
             Ypos.push_back(r.m_position.y);
         }
@@ -89,7 +91,7 @@ void Plotter::plotLikeRAYUI(const std::vector<Ray>& RayList,
     auto bin_amount_freedman = getBinAmount(Xpos);
     matplotlibcpp::hist(Xpos, bin_amount_freedman, "#0062c3", 0.65, false,
                         {{"density", "False"}});
-    // matplotlibcpp::subplots_adjust()
+
     matplotlibcpp::subplot2grid(4, 4, 1, 0, 3, 3);
     matplotlibcpp::scatter(Xpos, Ypos, 1,
                            {{"color", "#62c300"}, {"label", "Ray"}});
@@ -107,18 +109,16 @@ void Plotter::plotLikeRAYUI(const std::vector<Ray>& RayList,
 
     matplotlibcpp::show();
 }
-
+/**
+ * @brief Plot for each intersection
+ * 
+ * @param RayList Data (Rays)
+ * @param plotName 
+ */
 void Plotter::plotforEach(const std::vector<Ray>& RayList,
                           std::string plotName) {
-    // s is sorted and unique extraParam values
+    // s is sorted and unique extraParam values extracted
     auto s = RayList;
-
-    auto print = [&s](std::string_view const rem) {
-        for (auto a : s) {
-            RAYX_LOG << a.m_extraParam << ' ';
-        }
-        std::cout << ": " << rem << '\n';
-    };
 
     std::sort(s.begin(), s.end(), comp);
     s.erase(std::unique(s.begin(), s.end(),
@@ -132,20 +132,47 @@ void Plotter::plotforEach(const std::vector<Ray>& RayList,
     // Subplot in cols x cols
     int cols = std::ceil(std::sqrt(uniqueCount));
 
-    std::vector<Ray> newRayList(int(
-        RayList.size() / 2));  // size to half, if needed it will be extended
+    std::vector<double> Xpos, Ypos;
+    Xpos.reserve(RayList.size());
+    Ypos.reserve(RayList.size());
 
-    int i = 0, j = 0;
+    double _size = 2.0;
+    int i = 1;
+    matplotlibcpp::figure_size(cols*500, (cols-1)*500);
+    float _percent = 0.0;
+
     for (auto u : s) {
-        auto it = std::copy_if(
-            RayList.begin(), RayList.end(), newRayList.begin(),
-            [&u, &RayList](int i) {
-                intclose(RayList[i].m_extraParam, u.m_extraParam) ? true
-                                                                  : false;
-            });
-        newRayList.resize(std::distance(
-            newRayList.begin(), it));  // Shrink if needed (memory consumption);
+        for (auto r : RayList) {
+            if (intclose(r.m_extraParam, u.m_extraParam)) {
+                Xpos.push_back(r.m_position.x);
+                Ypos.push_back(r.m_position.y);
+            }
+        }
+
+        if (Xpos.size() > 50) {
+            _size = 5.0;
+        }
+
+        _percent = (float)Xpos.size() / (float)RayList.size() * 100;
+
+        matplotlibcpp::subplot(cols, cols, i);
+        matplotlibcpp::scatter(Xpos, Ypos, _size,
+                               {{"color", "#62c300"}, {"label", "Ray"}});
+        matplotlibcpp::xlabel("x / mm");
+        matplotlibcpp::ylabel("y / mm");
+        matplotlibcpp::title(std::to_string((int)u.m_extraParam) + " (" +
+                             std::to_string(_percent) + "%)");
+
+        matplotlibcpp::legend();
+
+        i += 1;
+        Xpos.clear();
+        Ypos.clear();
     }
+    matplotlibcpp::subplots_adjust({{"wspace", 0.2}, {"hspace", 0.2}});
+    //matplotlibcpp::tight_layout();
+    matplotlibcpp::suptitle(plotName);
+    matplotlibcpp::show();
 }
 
 }  // namespace RAYX

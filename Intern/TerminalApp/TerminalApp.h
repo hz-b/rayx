@@ -6,7 +6,6 @@
 #include <filesystem>
 
 #include "CommandParser.h"
-#include "PythonInterp.h"
 #include "RayCore.h"
 #include "TerminalAppConfig.h"
 #include "Plotter/Plotter.h"
