@@ -4,65 +4,18 @@
 
 namespace RAYX {
 
-/**
- * constructor that assumes that incidence and exit angle are already calculated
- * and the position and orientation has been derived
- * from them already
- *
- * @param name                  name of element
- * @param geometricalShape      0/1 rectangle/elliptical
- * @param width                 width of element (x dimension)
- * @param height                height of element (z dimension)
- * @param azimuthalAngle        rotation of element in xy-plane, needed for
- * stokes vector. in rad
- * @param position              position in world coordinate system
- * @param orientation           orientation(rotation) of element in world
- * coordinate system
- * @param designEnergy          the energy for which the grating is designed.
- * design wavelength can be derived from this
- * @param lineDensity           line density of grating
- * @param orderOfDiffraction    the order in which the grating should refract
- * the ray
- * @param additionalZeroOrder   if true half of the rays will be refracted in
- * the 0th order (=reflection), if false all will be refracted according to
- * orderOfDiffraction Parameter
- * @param vls                   vls grating paramters (6) (variable line
- * spacing)
- * @param slopeError            7 slope error parameters: x-y sagittal (0), y-z
- * meridional (1), thermal distortion: x (2),y (3),z (4), cylindrical bowing
- * amplitude y(5) and radius (6)
- * @param mat                   material (See Material.h)
- *
- */
-PlaneGrating::PlaneGrating(const char* name, GeometricalShape geometricalShape, const double width, const double height,
-                           const double azimuthalAngle, glm::dvec4 position, glm::dmat4x4 orientation, const double designEnergy,
-                           const double lineDensity, const double orderOfDiffraction, const int additionalZeroOrder,
-                           const std::array<double, 6> vls, const std::array<double, 7> slopeError, Material mat)
-    : OpticalElement(name, slopeError),
-      m_additionalOrder(additionalZeroOrder),
-      m_designEnergyMounting(designEnergy),
-      m_lineDensity(lineDensity),
-      m_orderOfDiffraction(orderOfDiffraction),
-      m_vls(vls) {
-    // set geometry
-    m_Geometry->m_geometricalShape = geometricalShape;
-    m_Geometry->setHeightWidth(height, width);
-    m_Geometry->m_azimuthalAngle = azimuthalAngle;
-    m_Geometry->m_position = position;
-    m_Geometry->m_orientation = orientation;
-
+PlaneGrating::PlaneGrating(const DesignObject& dobj) : OpticalElement(dobj) {
+    m_additionalOrder = dobj.parseAdditionalOrder();
+    m_designEnergyMounting = dobj.parseDesignEnergyMounting();
+    m_lineDensity = dobj.parseLineDensity();
+    m_orderOfDiffraction = dobj.parseOrderDiffraction();
+    m_vls = dobj.parseVls();
     RAYX_VERB << "design wavelength = " << abs(hvlam(m_designEnergyMounting));
 
     // parameters of quadric surface
+    Material mat = dobj.parseMaterial();
     auto matd = (double)static_cast<int>(mat);
     setSurface(std::make_unique<Quadric>(glm::dmat4x4{0, 0, 0, 0, 1, 0, 0, -1, 0, 0, 0, 0, 1, 0, matd, 0}));
-}
-
-std::shared_ptr<PlaneGrating> PlaneGrating::createFromXML(const xml::Parser& p) {
-    return std::make_shared<PlaneGrating>(p.name(), p.parseGeometricalShape(), p.parseTotalWidth(), p.parseTotalLength(),
-                                          p.parseAzimuthalAngle(), p.parsePosition(), p.parseOrientation(), p.parseDesignEnergyMounting(),
-                                          p.parseLineDensity(), p.parseOrderDiffraction(), p.parseAdditionalOrder(), p.parseVls(),
-                                          p.parseSlopeError(), p.parseMaterial());
 }
 
 double PlaneGrating::getDesignEnergyMounting() const { return m_designEnergyMounting; }
