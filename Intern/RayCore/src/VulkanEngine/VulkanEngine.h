@@ -5,7 +5,8 @@
 #include <vector>
 #include <vulkan/vulkan.hpp>
 
-#include "RayCore.h"
+#include "Debug.h"
+#include "Debug/Instrumentor.h"
 
 namespace RAYX {
 
