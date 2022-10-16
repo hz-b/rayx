@@ -8,7 +8,7 @@ namespace RAYX {
 Cylinder::Cylinder(const DesignObject& dobj) : OpticalElement(dobj) {
     m_direction = dobj.parseBendingRadius();
     m_radius = dobj.parseRadius();
-    m_incidence = degToRad(dobj.parseGrazingIncAngle());
+    m_incidence = dobj.parseGrazingIncAngle();
     m_entranceArmLength = dobj.parseEntranceArmLength();
     m_exitArmLength = dobj.parseExitArmLength();
 

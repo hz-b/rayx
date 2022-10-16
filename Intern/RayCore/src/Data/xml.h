@@ -101,10 +101,7 @@ struct Parser {
     inline double parseTotalLength() const { return parseDouble("totalLength"); }
     inline double parseTotalHeight() const { return parseDouble("totalHeight"); }
     inline double parseAzimuthalAngle() const { return degToRad(parseDouble("azimuthalAngle")); }
-    inline double parseGrazingIncAngle() const {
-        return parseDouble("grazingIncAngle");  // TODO(rudi): is it intentional that we don't
-                                                // do degToRad here?
-    }
+    inline double parseGrazingIncAngle() const { return degToRad(parseDouble("grazingIncAngle")); }
     inline double parseEntranceArmLength() const { return parseDouble("entranceArmLength"); }
     inline double parseExitArmLength() const { return parseDouble("exitArmLength"); }
     inline double parseEntranceArmLengthMer() const { return parseDouble("entranceArmLengthMer"); }
@@ -141,7 +138,7 @@ struct Parser {
     inline double parseParameterA11() const { return parseDouble("parameter_a11"); }
     inline FigureRotation parseFigureRotation() const { return static_cast<FigureRotation>(parseInt("figureRotation")); }
     // TODO: Are values stored as 0.0 if set to AUTO?[RAY-UI]
-    inline double parseDesignGrazingIncAngle() const { return parseDouble("designGrazingIncAngle"); }
+    inline double parseDesignGrazingIncAngle() const { return degToRad(parseDouble("designGrazingIncAngle")); }
     inline double parseLongHalfAxisA() const { return parseDouble("longHalfAxisA"); }
     inline double parseShortHalfAxisB() const { return parseDouble("shortHalfAxisB"); }
     // if old ray ui file, need to recalculate position and orientation because

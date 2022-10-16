@@ -5,12 +5,13 @@
 namespace RAYX {
 
 Ellipsoid::Ellipsoid(const DesignObject& dobj) : OpticalElement(dobj) {
-    m_incidence = degToRad(dobj.parseGrazingIncAngle()), m_entranceArmLength = dobj.parseEntranceArmLength();
+    m_incidence = dobj.parseGrazingIncAngle();
+    m_entranceArmLength = dobj.parseEntranceArmLength();
     m_exitArmLength = dobj.parseExitArmLength();
     m_a11 = dobj.parseParameterA11();
     m_shortHalfAxisB = dobj.parseShortHalfAxisB();
     m_longHalfAxisA = dobj.parseLongHalfAxisA();
-    m_designGrazingAngle = degToRad(dobj.parseDesignGrazingIncAngle());
+    m_designGrazingAngle = dobj.parseDesignGrazingIncAngle();
     // set geometry
 
     m_offsetY0 = 0;  // what is this for? RAY.FOR: "only !=0 in case of Monocapillary"

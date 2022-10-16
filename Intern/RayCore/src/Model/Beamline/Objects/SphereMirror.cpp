@@ -7,7 +7,7 @@ namespace RAYX {
 SphereMirror::SphereMirror(const DesignObject& dobj) : OpticalElement(dobj) {
     m_entranceArmLength = dobj.parseEntranceArmLength();
     m_exitArmLength = dobj.parseExitArmLength();
-    m_grazingIncidenceAngle = degToRad(dobj.parseGrazingIncAngle());
+    m_grazingIncidenceAngle = dobj.parseGrazingIncAngle();
 
     calcRadius();  // calculate the radius
     Material mat = dobj.parseMaterial();
