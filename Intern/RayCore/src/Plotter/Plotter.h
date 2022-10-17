@@ -2,10 +2,11 @@
 #include <string>
 #include <vector>
 
+#include "Core.h"
 #include "RayCore.h"
 #include "matplotlibcpp.h"
 namespace RAYX {
-class Plotter {
+class RAYX_API Plotter {
   public:
     Plotter() = default;
     ~Plotter() = default;

@@ -1,6 +1,7 @@
-#include <Plotter/Plotter.h>
+#include "Plotter/Plotter.h"
 
 #include <algorithm>
+
 namespace RAYX {
 bool comp(Ray const& lhs, Ray const& rhs) {
     return lhs.m_extraParam < rhs.m_extraParam;
@@ -19,7 +20,7 @@ inline bool intclose(double x, double y) {
  * @param RayList Data to be plotted
  */
 void Plotter::plot(int plotType, std::string plotName,
-                   const std::vector<Ray>& RayList) {
+                            const std::vector<Ray>& RayList) {
     RAYX_LOG << "Plotting...";
     if (plotType == plotTypes::LikeRAYUI)  // RAY-UI
         plotLikeRAYUI(RayList, plotName);
@@ -60,7 +61,7 @@ int Plotter::getBinAmount(std::vector<double>& vec) {
 }
 /**
  * @brief Plot final Image Plane
- * 
+ *
  * @param RayList Data (Rays)
  * @param plotName
  */
@@ -111,9 +112,9 @@ void Plotter::plotLikeRAYUI(const std::vector<Ray>& RayList,
 }
 /**
  * @brief Plot for each intersection
- * 
+ *
  * @param RayList Data (Rays)
- * @param plotName 
+ * @param plotName
  */
 void Plotter::plotforEach(const std::vector<Ray>& RayList,
                           std::string plotName) {
@@ -138,7 +139,7 @@ void Plotter::plotforEach(const std::vector<Ray>& RayList,
 
     double _size = 2.0;
     int i = 1;
-    matplotlibcpp::figure_size(cols*500, (cols-1)*500);
+    matplotlibcpp::figure_size(cols * 500, (cols - 1) * 500);
     float _percent = 0.0;
 
     for (auto u : s) {
@@ -170,7 +171,7 @@ void Plotter::plotforEach(const std::vector<Ray>& RayList,
         Ypos.clear();
     }
     matplotlibcpp::subplots_adjust({{"wspace", 0.2}, {"hspace", 0.2}});
-    //matplotlibcpp::tight_layout();
+    // matplotlibcpp::tight_layout();
     matplotlibcpp::suptitle(plotName);
     matplotlibcpp::show();
 }

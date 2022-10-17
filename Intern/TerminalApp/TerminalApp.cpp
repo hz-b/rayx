@@ -57,9 +57,9 @@ void TerminalApp::tracePath(std::filesystem::path path) {
             std::shared_ptr<RAYX::Plotter> plotter =
                 std::make_shared<RAYX::Plotter>();
             if (m_CommandParser->m_args.m_multiplePlots) {
-                plotter->plot(2, path, rays);
+                plotter->plot(2, path.string(), rays);
             } else
-                plotter->plot(0, path, rays);
+                plotter->plot(0, path.string(), rays);
         }
 
 #if defined(RAYX_DEBUG_MODE) && not defined(CPP)
