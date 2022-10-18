@@ -60,7 +60,7 @@ class RAYX_API OpticalElement {
     virtual glm::dmat4x4 getElementParameters() const;
     std::array<double, 7> getSlopeError() const;
 
-    [[maybe_unused]] const char* m_name;
+    std::string m_name;
 
   protected:
     std::unique_ptr<Geometry> m_Geometry;   ///< Geometry of the element

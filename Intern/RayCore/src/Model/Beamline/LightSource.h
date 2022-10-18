@@ -51,7 +51,8 @@ class RAYX_API LightSource {
     // each class that inherits from LightSource
     virtual std::vector<Ray> getRays() const = 0;
 
-    [[maybe_unused]] const char* m_name;
+    std::string m_name;
+
     /** the energy distribution used when deciding the energies of the rays. */
     EnergyDistribution m_EnergyDistribution;
     uint32_t m_numberOfRays;
