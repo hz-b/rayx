@@ -6,11 +6,11 @@ double hvlam(double x) {
     return inm2eV / x;
 }
 
-// returns positive infinity
+// originally we calculcated 1/0, which might be UB (https://stackoverflow.com/questions/5802351/what-happens-when-you-divide-by-0-in-a-shader).
+// `return 1e+308 * 2.0;` correctly returns positive infinity on my machine (Rudi), but we have no guarantee that it always does.
+// So instead we return a sufficiently large number to be used like positive infinity.
 double infinity() {
-    const double large = 1e+308;
-    const double inf = large * 2.0;
-    return inf;
+    return 1e+308;
 }
 
 // multiplies position and direction of ray r with transformation matrix m
