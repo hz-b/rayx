@@ -49,8 +49,8 @@ namespace RAYX {
 // LOGGING SYSTEM
 ///////////////////////////////////////////////
 
-void setDebugVerbose(bool);
-bool getDebugVerbose();
+void RAYX_API setDebugVerbose(bool);
+bool RAYX_API getDebugVerbose();
 
 /**
  *
