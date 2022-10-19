@@ -42,6 +42,12 @@ As longer names can contain more than one word, it can help to have a visual div
 
 The upper case letter indicates a new word and thus improves readability. Every name should be able to stand alone and describe the object, function or variable. Something like "int v;" does not achieve this. This also means only using common abbreviations, like "val" for "value" or "dx" for a distance over x.
 
+Avoid using symbols or variable names from formulas for naming variables in the code. This makes the code a riddle to decipher, without further information.
+The correct ways to do this:
+ - Add a wiki entry for the formula and link to it
+ - Change the variable names to its purpose or type, e.g. "hypotenuse" instead of "c"
+ - Add a link to the formula, so other developers can find it (The other options are better, but at least do this)
+
 Should the name get too long or cryptic, write a comment to clarify what you mean with the name you chose for this variable.
 
 ### Boolean
