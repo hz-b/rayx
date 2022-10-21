@@ -56,6 +56,7 @@ SET(SOURCE
     src/VulkanEngine/Run/Run.cpp
     src/Writer/CSVWriter.cpp
     src/Writer/H5Writer.cpp
+    src/Plotter/Plotter.cpp
 )
 
 SET(HEADERS
@@ -96,6 +97,7 @@ SET(HEADERS
     src/Material/Material.h
     src/Material/NffTable.h
     src/Material/PalikTable.h
+    src/Plotter/Plotter.h
 )
 
 add_library(${PROJECT_NAME} SHARED ${SOURCE} ${HEADERS})
@@ -185,4 +187,18 @@ endif()
 
 add_custom_target(COMPILE_SHADER ALL
     DEPENDS ${COMPILED_SHADER}
+)
+# # find python libraries
+find_package(Python3 COMPONENTS Interpreter Development NumPy REQUIRED)
+find_package(PythonLibs 3.0 REQUIRED)
+include_directories(${PYTHON3_INCLUDE_DIRS} ${NumPy_INCLUDE_DIRS})
+# # endif()
+
+include_directories(${PROJECT_NAME} PRIVATE ${RayCore_SOURCE_DIR}/../../Extern/matplotlib-cpp)
+# message(STATUS ${matplotlib_SOURCE_DIR})
+# # link python and numpy
+target_link_libraries(${PROJECT_NAME}
+    PRIVATE
+        ${PYTHON_LIBRARIES}
+        Python3::NumPy
 )

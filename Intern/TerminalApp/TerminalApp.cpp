@@ -60,10 +60,20 @@ void TerminalApp::tracePath(std::filesystem::path path) {
         // Export Rays to external data.
         exportRays(rays, path.string());
 
+        // Plot
+        if (m_CommandParser->m_args.m_plotFlag) {
+            std::shared_ptr<RAYX::Plotter> plotter = std::make_shared<RAYX::Plotter>();
+            if (m_CommandParser->m_args.m_multiplePlots) {
+                plotter->plot(2, path.string(), rays);
+            } else
+                plotter->plot(0, path.string(), rays);
+        }
+
 #if defined(RAYX_DEBUG_MODE) && not defined(CPP)
         // Export Debug Matrics.
         exportDebug();
 #endif
+
     } else {
         RAYX_VERB << "ignoring non-rml file: '" << path << "'";
     }
@@ -99,44 +109,12 @@ void TerminalApp::run() {
     } else {
         m_Tracer = std::make_unique<RAYX::VulkanTracer>();
     }
-
+    // Trace, export and plot
     tracePath(m_CommandParser->m_args.m_providedFile);
 
     if (m_CommandParser->m_args.m_benchmark) {
         std::chrono::steady_clock::time_point end = std::chrono::steady_clock::now();
         RAYX_LOG << "Benchmark: Done in " << std::chrono::duration_cast<std::chrono::milliseconds>(end - start_time).count() << " ms";
-    }
-
-    //  Plot in Python
-    if (m_CommandParser->m_args.m_plotFlag) {
-        // Setup to create venv if needed
-        try {
-            std::shared_ptr<PythonInterp> pySetup = std::make_shared<PythonInterp>("py_setup", "setup", (const char*)nullptr);
-            pySetup->execute();
-        } catch (std::exception& e) {
-            RAYX_ERR << e.what();
-        }
-        RAYX_VERB << "Python Setup OK.";
-
-        // Call PythonInterp from rayx venv:
-        // *Temporary method (Calls sys python interpreter that calls rayx
-        // interpreter) [Python Dynamic linking problem]
-        try {
-            std::shared_ptr<PythonInterp> pyPlot = std::make_shared<PythonInterp>("py_plot_entry", "startPlot", (const char*)nullptr);
-            if (!m_CommandParser->m_args.m_providedFile.empty()) {
-                std::filesystem::path _providedFile = canonicalizeUserPath(m_CommandParser->m_args.m_providedFile);
-                pyPlot->setPlotName(_providedFile.string().c_str());
-            }
-            if (m_CommandParser->m_args.m_dummyFlag) {
-                pyPlot->setPlotName("Dummy Beamline");
-            }
-            if (m_CommandParser->m_args.m_multiplePlots) {
-                pyPlot->setPlotType(3);
-            }
-            pyPlot->execute();
-        } catch (std::exception& e) {
-            RAYX_ERR << e.what();
-        }
     }
 }
 

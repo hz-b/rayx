@@ -23,7 +23,6 @@ class CommandParser {
     struct Args {
         bool m_plotFlag = false;          // -p (Plot)
         bool m_csvFlag = false;           // -c (.csv Output)
-        bool m_dummyFlag = false;         // -d (Dummy Beamline)
         bool m_cpuFlag = false;           // -x (CPU Tracer)
         bool m_benchmark = false;         // -b (Benchmark)
         bool m_multiplePlots = false;     // -m (Multiple Plots)
@@ -60,7 +59,6 @@ class CommandParser {
     // this can also be done with app.get_option()
     std::unordered_map<char, Options> m_ParserCommands = {
         {'c', {OptionType::BOOL, "ocsv", "Output stored as .csv file.", &(m_args.m_csvFlag)}},
-        {'d', {OptionType::BOOL, "dummy", "Run an in-house built Beamline.", &(m_args.m_dummyFlag)}},
         {'b', {OptionType::BOOL, "benchmark", "Benchmark application: (RML → Trace → Output)", &(m_args.m_benchmark)}},
         {'m', {OptionType::BOOL, "mult", "Multiple plots extension at output.", &(m_args.m_multiplePlots)}},
         {'p', {OptionType::BOOL, "plot", "Plot output footprints and histograms.", &(m_args.m_plotFlag)}},

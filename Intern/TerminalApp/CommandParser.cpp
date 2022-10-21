@@ -33,10 +33,6 @@ CommandParser::CommandParser(int _argc, char* const* _argv) : m_cli11{std::make_
 }
 
 void CommandParser::analyzeCommands() {
-    if (m_args.m_dummyFlag && (!m_args.m_providedFile.empty())) {
-        RAYX_ERR << "Dummy Beamline and RML Beamline cannot be loaded at the "
-                    "same time.";
-    }
     if (m_args.m_multiplePlots && !(m_args.m_plotFlag)) {
         RAYX_ERR << "Please use --mult only when using --plot.";
     }
