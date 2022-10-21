@@ -1,3 +1,5 @@
+#include <vk_mem_alloc.h>
+
 #include "VulkanEngine/VulkanEngine.h"
 
 namespace RAYX {
@@ -20,9 +22,11 @@ VulkanEngine::~VulkanEngine() {
         cleanup();
     }
 
-    vkDestroyBuffer(m_Device, m_stagingBuffer, nullptr);
-    vkFreeMemory(m_Device, m_stagingMemory, nullptr);
+    // vkDestroyBuffer(m_Device, m_stagingBuffer, nullptr);
+    // vkFreeMemory(m_Device, m_stagingMemory, nullptr);
 
+    vmaDestroyBuffer(m_VmaAllocator, m_stagingBuffer.m_Buffer, m_stagingBuffer.m_BufferAllocation);
+    vmaDestroyAllocator(m_VmaAllocator);
     vkDestroyDescriptorSetLayout(m_Device, m_DescriptorSetLayout, nullptr);
     vkDestroyCommandPool(m_Device, m_CommandPool, nullptr);
     {

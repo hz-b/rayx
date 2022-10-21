@@ -8,18 +8,18 @@ void VulkanEngine::runCommandBuffer() {
     Now we shall finally submit the recorded command buffer to a queue.
     */
 
-    VkSubmitInfo submitInfo = {};
-    submitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
-    submitInfo.commandBufferCount = 1;              // submit a single command buffer
-    submitInfo.pCommandBuffers = &m_CommandBuffer;  // the command buffer to submit.
+    VkSubmitInfo submitInfo       = {};
+    submitInfo.sType              = VK_STRUCTURE_TYPE_SUBMIT_INFO;
+    submitInfo.commandBufferCount = 1;                 // submit a single command buffer
+    submitInfo.pCommandBuffers    = &m_CommandBuffer;  // the command buffer to submit.
 
     /*
         We create a fence.
     */
     VkFence fence;
     VkFenceCreateInfo fenceCreateInfo = {};
-    fenceCreateInfo.sType = VK_STRUCTURE_TYPE_FENCE_CREATE_INFO;
-    fenceCreateInfo.flags = 0;
+    fenceCreateInfo.sType             = VK_STRUCTURE_TYPE_FENCE_CREATE_INFO;
+    fenceCreateInfo.flags             = 0;
     VK_CHECK_RESULT(vkCreateFence(m_Device, &fenceCreateInfo, nullptr, &fence));
 
     /*

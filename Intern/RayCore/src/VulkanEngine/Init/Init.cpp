@@ -13,6 +13,7 @@ void VulkanEngine::init(InitSpec spec) {
     pickDevice();
     createCommandPool();
     createDescriptorSetLayout();
+    prepareVma();
     createStagingBuffer();
 
     m_state = EngineState::PRERUN;

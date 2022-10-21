@@ -1,3 +1,5 @@
+#include <vk_mem_alloc.h>
+
 #include "VulkanEngine/VulkanEngine.h"
 
 namespace RAYX {
@@ -13,8 +15,9 @@ void VulkanEngine::cleanup() {
     vkDestroyDescriptorPool(m_Device, m_DescriptorPool, nullptr);
 
     for (auto& [name, buf] : m_buffers) {
-        vkDestroyBuffer(m_Device, buf.m_Buffer, nullptr);
-        vkFreeMemory(m_Device, buf.m_Memory, nullptr);
+        // vkDestroyBuffer(m_Device, buf.m_Buffer, nullptr);
+        // vkFreeMemory(m_Device, buf.m_Memory, nullptr);
+        vmaDestroyBuffer(m_VmaAllocator, buf.m_Buffer, buf.m_BufferAllocation);
     }
 
     vkDestroyShaderModule(m_Device, m_ComputeShaderModule, nullptr);

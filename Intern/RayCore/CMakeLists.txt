@@ -120,8 +120,7 @@ target_compile_definitions(${PROJECT_NAME}
     $<$<CONFIG:RelWithDebInfo>:RAYX_DEBUG_MODE>
 )
 
-# Vulkan
-find_package(Vulkan REQUIRED)
+find_package(Vulkan 1.3.216 REQUIRED)
 target_link_libraries(${PROJECT_NAME}
     PUBLIC Vulkan::Vulkan
 )

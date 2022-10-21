@@ -1,9 +1,10 @@
 #include "VulkanEngine/VulkanEngine.h"
+#define VMA_IMPLEMENTATION
 
+#include "vk_mem_alloc.h"
 namespace RAYX {
 
-VKAPI_ATTR VkBool32 VKAPI_CALL debugCallback(VkDebugUtilsMessageSeverityFlagBitsEXT messageSeverity,
-                                             VkDebugUtilsMessageTypeFlagsEXT messageType,
+VKAPI_ATTR VkBool32 VKAPI_CALL debugCallback(VkDebugUtilsMessageSeverityFlagBitsEXT messageSeverity, VkDebugUtilsMessageTypeFlagsEXT messageType,
                                              const VkDebugUtilsMessengerCallbackDataEXT* pCallbackData, void* pUserData);
 bool checkValidationLayerSupport();
 VkResult CreateDebugUtilsMessengerEXT(VkInstance instance, const VkDebugUtilsMessengerCreateInfoEXT* pCreateInfo,
@@ -22,27 +23,27 @@ void VulkanEngine::createInstance() {
 
     // Add description for instance
     VkApplicationInfo appInfo{};
-    appInfo.sType = VK_STRUCTURE_TYPE_APPLICATION_INFO;
-    appInfo.pApplicationName = "Terminal App";
-    appInfo.applicationVersion = VK_MAKE_API_VERSION(0, 1, 2, 154);
-    appInfo.pEngineName = "Vulkan RAY-X Engine";
-    appInfo.engineVersion = VK_MAKE_API_VERSION(0, 1, 2, 154);
-    appInfo.apiVersion = VK_API_VERSION_1_2;
+    appInfo.sType              = VK_STRUCTURE_TYPE_APPLICATION_INFO;
+    appInfo.pApplicationName   = "Terminal App";
+    appInfo.applicationVersion = VK_MAKE_API_VERSION(0, 1, 3, 216);
+    appInfo.pEngineName        = "Vulkan RAY-X Engine";
+    appInfo.engineVersion      = VK_MAKE_API_VERSION(0, 1, 3, 216);
+    appInfo.apiVersion         = VK_API_VERSION_1_3;
 
     // pointer to description with layer count
     VkInstanceCreateInfo createInfo{};
-    createInfo.sType = VK_STRUCTURE_TYPE_INSTANCE_CREATE_INFO;
-    createInfo.pApplicationInfo = &appInfo;
+    createInfo.sType             = VK_STRUCTURE_TYPE_INSTANCE_CREATE_INFO;
+    createInfo.pApplicationInfo  = &appInfo;
     createInfo.enabledLayerCount = 0;
 
-    auto extensions = getRequiredExtensions();
-    createInfo.enabledExtensionCount = static_cast<uint32_t>(extensions.size());
+    auto extensions                    = getRequiredExtensions();
+    createInfo.enabledExtensionCount   = static_cast<uint32_t>(extensions.size());
     createInfo.ppEnabledExtensionNames = extensions.data();
 
     // Validation Layer Debug Outpout "handler"
     VkDebugUtilsMessengerCreateInfoEXT debugCreateInfo;
     if (enableValidationLayers) {
-        createInfo.enabledLayerCount = static_cast<uint32_t>(validationLayers.size());
+        createInfo.enabledLayerCount   = static_cast<uint32_t>(validationLayers.size());
         createInfo.ppEnabledLayerNames = validationLayers.data();
         populateDebugMessengerCreateInfo(debugCreateInfo);
         createInfo.pNext = (VkDebugUtilsMessengerCreateInfoEXT*)&debugCreateInfo;
@@ -56,6 +57,41 @@ void VulkanEngine::createInstance() {
     VkResult result = vkCreateInstance(&createInfo, nullptr, &m_Instance);
     if (result != VK_SUCCESS) {
         RAYX_ERR << "Failed to create instance! Error Code " << result;
+    }
+}
+
+void VulkanEngine::prepareVma() {
+    // VmaVulkanFunctions vma_vulkan_func{};
+    // vma_vulkan_func.vkAllocateMemory                    = vkAllocateMemory;
+    // vma_vulkan_func.vkBindBufferMemory                  = vkBindBufferMemory;
+    // vma_vulkan_func.vkBindImageMemory                   = vkBindImageMemory;
+    // vma_vulkan_func.vkCreateBuffer                      = vkCreateBuffer;
+    // vma_vulkan_func.vkCreateImage                       = vkCreateImage;
+    // vma_vulkan_func.vkDestroyBuffer                     = vkDestroyBuffer;
+    // vma_vulkan_func.vkDestroyImage                      = vkDestroyImage;
+    // vma_vulkan_func.vkFlushMappedMemoryRanges           = vkFlushMappedMemoryRanges;
+    // vma_vulkan_func.vkFreeMemory                        = vkFreeMemory;
+    // vma_vulkan_func.vkGetBufferMemoryRequirements       = vkGetBufferMemoryRequirements;
+    // vma_vulkan_func.vkGetImageMemoryRequirements        = vkGetImageMemoryRequirements;
+    // vma_vulkan_func.vkGetPhysicalDeviceMemoryProperties = vkGetPhysicalDeviceMemoryProperties;
+    // vma_vulkan_func.vkGetPhysicalDeviceProperties       = vkGetPhysicalDeviceProperties;
+    // vma_vulkan_func.vkInvalidateMappedMemoryRanges      = vkInvalidateMappedMemoryRanges;
+    // vma_vulkan_func.vkMapMemory                         = vkMapMemory;
+    // vma_vulkan_func.vkUnmapMemory                       = vkUnmapMemory;
+    // vma_vulkan_func.vkCmdCopyBuffer                     = vkCmdCopyBuffer;
+
+    VmaAllocatorCreateInfo allocatorInfo{};
+    allocatorInfo.physicalDevice   = m_PhysicalDevice;
+    allocatorInfo.device           = m_Device;
+    allocatorInfo.instance         = m_Instance;
+    allocatorInfo.vulkanApiVersion = VK_API_VERSION_1_3;
+    // allocatorInfo.pVulkanFunctions = &vma_vulkan_func;
+
+    // VmaAllocator allocator;
+    auto result = vmaCreateAllocator(&allocatorInfo, &m_VmaAllocator);
+
+    if (result != VK_SUCCESS) {
+        RAYX_ERR << "Cannot create VMA Allocator!";
     }
 }
 
@@ -125,8 +161,8 @@ std::vector<const char*> getRequiredExtensions() {
 
 void populateDebugMessengerCreateInfo(VkDebugUtilsMessengerCreateInfoEXT& createInfo) {
     RAYX_PROFILE_FUNCTION();
-    createInfo = {};
-    createInfo.sType = VK_STRUCTURE_TYPE_DEBUG_UTILS_MESSENGER_CREATE_INFO_EXT;
+    createInfo                 = {};
+    createInfo.sType           = VK_STRUCTURE_TYPE_DEBUG_UTILS_MESSENGER_CREATE_INFO_EXT;
     createInfo.messageSeverity = VK_DEBUG_UTILS_MESSAGE_SEVERITY_VERBOSE_BIT_EXT | VK_DEBUG_UTILS_MESSAGE_SEVERITY_WARNING_BIT_EXT |
                                  VK_DEBUG_UTILS_MESSAGE_SEVERITY_ERROR_BIT_EXT;
     createInfo.messageType = VK_DEBUG_UTILS_MESSAGE_TYPE_GENERAL_BIT_EXT | VK_DEBUG_UTILS_MESSAGE_TYPE_VALIDATION_BIT_EXT |

@@ -52,7 +52,6 @@ std::vector<Ray> VulkanTracer::trace(const Beamline& beamline) {
     }
 
     auto materialTables = beamline.calcMinimalMaterialTables();
-
     m_engine.createBufferWithData<Ray>("ray-buffer", rayList);
     m_engine.createBuffer("output-buffer", numberOfRays * sizeof(Ray));
     m_engine.createBufferWithData<double>("quadric-buffer", beamlineData);

@@ -16,8 +16,9 @@ def plot(rayx_times, rayui_times, beamlines):
 
 	ind = np.arange(N)
 
-	rects_x = plt.bar(ind, rayx_times, 0.15, color='#6cabe9', label='RAY-X')
-	rects_ui = plt.bar(ind + 0.15, rayui_times, 0.15, color='#d15e57', label='RAY-UI')
+	#HZB Color Scheme
+	rects_x = plt.bar(ind, rayx_times, 0.15, color='#C6D970', label='RAY-X')
+	rects_ui = plt.bar(ind + 0.15, rayui_times, 0.15, color='#9AC6F3', label='RAY-UI')
 
 	plt.xlabel('Beamlines')
 	plt.xticks([r + 0.15/2 for r in range(N)], beamlines)
@@ -25,8 +26,9 @@ def plot(rayx_times, rayui_times, beamlines):
 	#Grid display
 	plt.grid(axis='y', linewidth=.25)
 
-	plt.ylabel('time (ms)')
+	plt.ylabel('time (ms) (logscale)')
 	plt.title("Exectuion time in ms")
+	plt.yscale('log')
 	plt.suptitle("RAY-X vs RAY-UI")
 	plt.legend()
 	plt.show()
@@ -34,8 +36,9 @@ def plot(rayx_times, rayui_times, beamlines):
 
 if __name__ == "__main__":
 	# Change accordingly 
-	_rayx_times = [1, 3, 5, 3, 2]
-	_rayui_times = [2, 4, 6, 3, 3]
-	_beamlines = ["A", "B", "C", "D", "E"]
+	_rayx_times = [1676, 3329, 6477, 12467, 15941, 18653]
+	_rayui_times = [46864, 86773, 171588, 323714 , 485854, 807656]
+	_beamlines = ["250T","500T","1M", "2M", "3M", "5M"]
+
 
 	plot(_rayx_times,_rayui_times,_beamlines)

@@ -1,12 +1,13 @@
 #pragma once
 
+#include <vk_mem_alloc.h>
+
 #include <algorithm>
 #include <map>
 #include <vector>
 #include <vulkan/vulkan.hpp>
 
-#include "Debug.h"
-#include "Debug/Instrumentor.h"
+#include "RayCore.h"
 
 namespace RAYX {
 
@@ -105,6 +106,8 @@ class RAYX_API VulkanEngine {
         VkBuffer m_Buffer;
         VkDeviceMemory m_Memory;
         VkDeviceSize m_size;
+        VmaAllocation m_BufferAllocation;
+        VmaAllocationInfo m_BufferAllocationInfo;
     };
 
   private:
@@ -116,9 +119,11 @@ class RAYX_API VulkanEngine {
 
     /// This is the only staging buffer of the VulkanEngine.
     /// It's size is STAGING_SIZE.
-    VkBuffer m_stagingBuffer;
+    // VkBuffer m_stagingBuffer;
     /// the memory of the staging buffer above.
-    VkDeviceMemory m_stagingMemory;
+    // VkDeviceMemory m_stagingMemory;
+
+    Buffer m_stagingBuffer;
 
     VkInstance m_Instance;
     VkDebugUtilsMessengerEXT m_DebugMessenger;
@@ -134,6 +139,7 @@ class RAYX_API VulkanEngine {
     VkDescriptorSetLayout m_DescriptorSetLayout;
     VkQueue m_ComputeQueue;
     uint32_t m_computeFamily;
+    VmaAllocator m_VmaAllocator;
 
     // implementation details:
 
@@ -146,6 +152,7 @@ class RAYX_API VulkanEngine {
     void createDescriptorSetLayout();
     void createCommandPool();
     void createStagingBuffer();
+    void prepareVma();
 
     // Run:
     void runCommandBuffer();
@@ -161,6 +168,10 @@ class RAYX_API VulkanEngine {
     /// `createStagingBuffer`.
     void createVkBuffer(VkDeviceSize size, VkBufferUsageFlags usage, VkMemoryPropertyFlags properties, VkBuffer& buffer,
                         VkDeviceMemory& bufferMemory);
+    // VMA Verson of createVkBuffer
+    void createVmaBuffer(VkDeviceSize size, VkBufferUsageFlags buffer_usage, VkBuffer& buffer, VmaAllocation& allocation,
+                         VmaAllocationInfo* allocation_info, VmaAllocationCreateFlags flags = VMA_ALLOCATION_CREATE_HOST_ACCESS_RANDOM_BIT,
+                         VmaMemoryUsage memory_usage = VMA_MEMORY_USAGE_AUTO, const std::vector<uint32_t>& queue_family_indices = {});
     // BufferIO:
 
     /// copies data from one buffer to the other with given offsets.

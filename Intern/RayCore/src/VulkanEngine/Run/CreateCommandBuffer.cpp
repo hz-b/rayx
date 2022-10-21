@@ -9,15 +9,15 @@ void VulkanEngine::createCommandBuffer() {
     Allocate a command buffer from the previously creeated command pool.
     */
     VkCommandBufferAllocateInfo commandBufferAllocateInfo = {};
-    commandBufferAllocateInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
-    commandBufferAllocateInfo.commandPool = m_CommandPool;  // specify the command pool to allocate from.
+    commandBufferAllocateInfo.sType                       = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
+    commandBufferAllocateInfo.commandPool                 = m_CommandPool;  // specify the command pool to allocate from.
 
     /* if the command buffer is primary, it can be directly submitted to
     / queues. A secondary buffer has to be called from some primary command
     / buffer, and cannot be directly submitted to a queue. To keep things
     / simple, we use a primary command buffer. */
 
-    commandBufferAllocateInfo.level = VK_COMMAND_BUFFER_LEVEL_PRIMARY;
+    commandBufferAllocateInfo.level              = VK_COMMAND_BUFFER_LEVEL_PRIMARY;
     commandBufferAllocateInfo.commandBufferCount = 1;  // allocate a single command buffer.
     VK_CHECK_RESULT(vkAllocateCommandBuffers(m_Device, &commandBufferAllocateInfo,
                                              &m_CommandBuffer));  // allocate command buffer.
@@ -27,12 +27,12 @@ void VulkanEngine::createCommandBuffer() {
     buffer.
     */
     VkCommandBufferBeginInfo beginInfo = {};
-    beginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
-    beginInfo.flags = VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT;       // the buffer is only
-                                                                         // submitted and used
-                                                                         // once in this
-                                                                         // application.
-    VK_CHECK_RESULT(vkBeginCommandBuffer(m_CommandBuffer, &beginInfo));  // start recording commands.
+    beginInfo.sType                    = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
+    beginInfo.flags                    = VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT;  // the buffer is only
+                                                                                       // submitted and used
+                                                                                       // once in this
+                                                                                       // application.
+    VK_CHECK_RESULT(vkBeginCommandBuffer(m_CommandBuffer, &beginInfo));                // start recording commands.
 
     /*
     We need to bind a pipeline, AND a descriptor set before we dispatch.

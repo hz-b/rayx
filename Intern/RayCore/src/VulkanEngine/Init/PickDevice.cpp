@@ -27,7 +27,7 @@ void VulkanEngine::pickPhysicalDevice() {
     vkEnumeratePhysicalDevices(m_Instance, &deviceCount, devices.data());
 
     // pick fastest device
-    m_PhysicalDevice = VK_NULL_HANDLE;
+    m_PhysicalDevice  = VK_NULL_HANDLE;
     int currentRating = -1;
 
     for (const auto& device : devices) {
@@ -35,7 +35,7 @@ void VulkanEngine::pickPhysicalDevice() {
             int rating = rateDevice(device);
             if (rating > currentRating) {
                 m_PhysicalDevice = device;
-                currentRating = rating;
+                currentRating    = rating;
             }
         }
     }
@@ -127,30 +127,30 @@ void VulkanEngine::createLogicalDevice() {
 
     // create info about the device queues
     VkDeviceQueueCreateInfo queueCreateInfo{};
-    queueCreateInfo.sType = VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO;
+    queueCreateInfo.sType            = VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO;
     queueCreateInfo.queueFamilyIndex = m_computeFamily;
-    queueCreateInfo.queueCount = 1;
+    queueCreateInfo.queueCount       = 1;
 
-    float queuePriority = 1.0f;
+    float queuePriority              = 1.0f;
     queueCreateInfo.pQueuePriorities = &queuePriority;
 
     // create info about the device features
     VkPhysicalDeviceFeatures deviceFeatures{};
     deviceFeatures.shaderFloat64 = true;
-    deviceFeatures.shaderInt64 = true;
+    deviceFeatures.shaderInt64   = true;
     VkDeviceCreateInfo createInfo{};
-    createInfo.sType = VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO;
-    createInfo.pQueueCreateInfos = &queueCreateInfo;
+    createInfo.sType                = VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO;
+    createInfo.pQueueCreateInfos    = &queueCreateInfo;
     createInfo.queueCreateInfoCount = 1;
-    createInfo.pEnabledFeatures = &deviceFeatures;
+    createInfo.pEnabledFeatures     = &deviceFeatures;
 
-    auto extensions = getRequiredDeviceExtensions();
-    createInfo.enabledExtensionCount = static_cast<uint32_t>(extensions.size());
+    auto extensions                    = getRequiredDeviceExtensions();
+    createInfo.enabledExtensionCount   = static_cast<uint32_t>(extensions.size());
     createInfo.ppEnabledExtensionNames = extensions.data();
 
     // enable validation layers if possible
     if (enableValidationLayers) {
-        createInfo.enabledLayerCount = static_cast<uint32_t>(validationLayers.size());
+        createInfo.enabledLayerCount   = static_cast<uint32_t>(validationLayers.size());
         createInfo.ppEnabledLayerNames = validationLayers.data();
     } else {
         createInfo.enabledLayerCount = 0;

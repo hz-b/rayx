@@ -1,5 +1,7 @@
 from cProfile import label
+from multiprocessing.dummy import Array
 from sys import argv, exit, path
+from typing import List
 import matplotlib
 import matplotlib.pyplot as plt
 import xml.etree.ElementTree as ET
@@ -8,6 +10,7 @@ import subprocess
 import time
 import os
 from tqdm import trange
+import csv
 
 """
 ////////////////////////
@@ -25,7 +28,7 @@ settings = {
 }
 
 # CHANGE HERE
-STEPS = 500
+STEPS = 5000
 TRIALS = 30
 
 rayx_cpu_times = []
@@ -42,6 +45,17 @@ def increment_rays():
     amount = settings['AMOUNT']
     settings['AMOUNT'] = settings['AMOUNT'] + STEPS
     return str(amount)
+
+
+def save_in_csv(indices, cpu_times, gpu_time:List):
+    file_name = "GPUvsCPU_BenchResults.csv"
+    header = ['Number of Rays', 'CPU Exec Time', 'GPU Exec Time']
+
+    with open(file_name, 'w') as file:
+        writer = csv.writer(file)
+        writer.writerow(header)
+        for i,indice in indices:
+            writer.writerow([indice,cpu_times[i],gpu_time[i]])
 
 
 def change_rml(root, xmlTree: ET.ElementTree):
@@ -74,21 +88,31 @@ def plot(cpu_times, gpu_times):
     Plot the Beamline time; x, for RAY-X. ui, for RAY-UI
     beamlines is also the chaning variable throughout the beamline
     """
-    assert(len(cpu_times) == len(gpu_times))
+    assert (len(cpu_times) == len(gpu_times))
+
+    print("---------------DATA-----------------")
+
+    print(cpu_times)
+    print(gpu_times)
 
     N = len(cpu_times)
-    assert(N == TRIALS)
+    assert (N == TRIALS)
 
     indices = np.arange(1, N*STEPS+1, step=STEPS)
+    print(indices)
 
-    plt.scatter(indices, cpu_times, label='CPU')
-    plt.scatter(indices, gpu_times, label='GPU')
+    #HZB Color Scheme
+    plt.scatter(indices, cpu_times, label='CPU',c='#9AC6F3')
+    plt.scatter(indices, gpu_times, label='GPU',c='#C6D970')
 
     plt.xlabel('Number of Rays')
     plt.xticks(indices[:len(indices)+1:int(len(indices) / 5)])
 
     # Grid display
     plt.grid(linewidth=.5)
+
+    #save
+    save_in_csv(indices,cpu_times,gpu_times)
 
     plt.ylabel('time (s)')
     plt.title(f"RAY-X: CPU vs GPU(Vulkan) Tracer [Max Rays = {N*STEPS+1}]")
@@ -140,6 +164,7 @@ if __name__ == "__main__":
             for name in dirs:
                 os.rmdir(os.path.join(root, name))
 
-    # plot
+    # plot and save as csv 
     plot(rayx_cpu_times, rayx_gpu_times)
+
     exit()
