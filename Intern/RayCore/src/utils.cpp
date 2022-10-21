@@ -34,11 +34,10 @@ double radToDeg(double rad) { return rad * 180 / PI; }
 
 glm::dmat4x4 getRotationMatrix(double dpsi, double dphi, double dchi) {
     RAYX_PROFILE_FUNCTION();
-    glm::dmat4x4 misalignmentMatrix =
-        glm::dmat4x4(cos(dphi) * cos(dchi), -cos(dpsi) * sin(dchi) - sin(dpsi) * sin(dphi) * cos(dchi),
-                     -sin(dpsi) * sin(dchi) + cos(dpsi) * sin(dphi) * cos(dchi), 0, sin(dchi) * cos(dphi),
-                     cos(dpsi) * cos(dchi) - sin(dpsi) * sin(dphi) * sin(dchi), sin(dpsi) * cos(dchi) + cos(dpsi) * sin(dphi) * sin(dchi),
-                     0, -sin(dphi), -sin(dpsi) * cos(dphi), cos(dpsi) * cos(dphi), 0, 0, 0, 0, 1);
+    glm::dmat4x4 misalignmentMatrix = glm::dmat4x4(
+        cos(dphi) * cos(dchi), -cos(dpsi) * sin(dchi) - sin(dpsi) * sin(dphi) * cos(dchi), -sin(dpsi) * sin(dchi) + cos(dpsi) * sin(dphi) * cos(dchi),
+        0, sin(dchi) * cos(dphi), cos(dpsi) * cos(dchi) - sin(dpsi) * sin(dphi) * sin(dchi),
+        sin(dpsi) * cos(dchi) + cos(dpsi) * sin(dphi) * sin(dchi), 0, -sin(dphi), -sin(dpsi) * cos(dphi), cos(dpsi) * cos(dphi), 0, 0, 0, 0, 1);
     return glm::transpose(misalignmentMatrix);
 }
 
@@ -88,8 +87,7 @@ std::array<double, 4 * 4> glmToArray16(glm::dmat4x4 m) {
 }
 
 glm::dmat4x4 RAYX_API arrayToGlm16(std::array<double, 4 * 4> m) {
-    glm::dmat4x4 matrix =
-        glm::dmat4x4(m[0], m[1], m[2], m[3], m[4], m[5], m[6], m[7], m[8], m[9], m[10], m[11], m[12], m[13], m[14], m[15]);
+    glm::dmat4x4 matrix = glm::dmat4x4(m[0], m[1], m[2], m[3], m[4], m[5], m[6], m[7], m[8], m[9], m[10], m[11], m[12], m[13], m[14], m[15]);
     return matrix;
 }
 
@@ -117,8 +115,8 @@ std::vector<double>::iterator movingAppend(std::vector<double>&& srcVector, std:
         destVector = std::move(srcVector);
         result = std::begin(destVector);
     } else {
-        result = destVector.insert(std::end(destVector), std::make_move_iterator(std::begin(srcVector)),
-                                   std::make_move_iterator(std::end(srcVector)));
+        result =
+            destVector.insert(std::end(destVector), std::make_move_iterator(std::begin(srcVector)), std::make_move_iterator(std::end(srcVector)));
     }
 
     srcVector.clear();
@@ -135,3 +133,25 @@ std::vector<double>::iterator movingAppend(std::vector<double>&& srcVector, std:
  * @return false
  */
 bool isIdentMatrix(glm::dmat4x4 matrix) { return (matrix == glm::dmat4x4(1.0)); }
+
+Timer::Timer() : m_funcName{""} {
+    t1 = std::chrono::steady_clock::now();
+    t2 = t1;
+}
+
+void Timer::TimerStart(const std::string& fn) {
+    m_funcName = fn;
+    t1 = std::chrono::steady_clock::now();
+}
+void Timer::TimerStop() {
+    if (t1 == t2){
+        RAYX_WARN << "Timer not started!";
+        return;
+    }
+
+    t2 = std::chrono::steady_clock::now();
+    if (m_funcName.empty())
+        RAYX_LOG << "Done in " << std::chrono::duration_cast<std::chrono::milliseconds>(t2 - t1).count() << " ms";
+    else
+        RAYX_LOG << m_funcName << " done in " << std::chrono::duration_cast<std::chrono::milliseconds>(t2 - t1).count() << " ms";
+}

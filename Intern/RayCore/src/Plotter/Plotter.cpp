@@ -14,7 +14,7 @@ inline bool intclose(double x, double y) { return abs(x - y) < std::numeric_limi
  * @param plotName Plot Name
  * @param RayList Data to be plotted
  */
-void Plotter::plot(int plotType, std::string plotName, const std::vector<Ray>& RayList) {
+void Plotter::plot(int plotType, const std::string& plotName, const std::vector<Ray>& RayList) {
     RAYX_LOG << "Plotting...";
     if (plotType == plotTypes::LikeRAYUI)  // RAY-UI
         plotLikeRAYUI(RayList, plotName);
@@ -55,7 +55,7 @@ int Plotter::getBinAmount(std::vector<double>& vec) {
  * @param RayList Data (Rays)
  * @param plotName
  */
-void Plotter::plotLikeRAYUI(const std::vector<Ray>& RayList, std::string plotName) {
+void Plotter::plotLikeRAYUI(const std::vector<Ray>& RayList, const std::string& plotName) {
     // Sort Data for plotting
     std::vector<double> Xpos, Ypos;
     Xpos.reserve(RayList.size());
@@ -101,7 +101,7 @@ void Plotter::plotLikeRAYUI(const std::vector<Ray>& RayList, std::string plotNam
  * @param RayList Data (Rays)
  * @param plotName
  */
-void Plotter::plotforEach(const std::vector<Ray>& RayList, std::string plotName) {
+void Plotter::plotforEach(const std::vector<Ray>& RayList, const std::string& plotName) {
     // s is sorted and unique extraParam values extracted
     auto s = RayList;
 
