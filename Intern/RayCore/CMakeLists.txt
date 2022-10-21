@@ -98,45 +98,49 @@ SET(HEADERS
     src/Material/PalikTable.h
 )
 
-add_library(${PROJECT_NAME} SHARED ${SOURCE} ${HEADERS} )
+add_library(${PROJECT_NAME} SHARED ${SOURCE} ${HEADERS})
 
 target_precompile_headers(${PROJECT_NAME} PRIVATE raycorePCH.h)
 set(CMAKE_PCH_INSTANTIATE_TEMPLATES ON)
 
-if (CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
+# Set Compiler
+if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
     set(COMPILE_PLATFORM RAYX_PLATFORM_GCC)
-elseif (CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
+elseif(CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
     set(COMPILE_PLATFORM RAYX_PLATFORM_MSVC)
-else() 
+else()
     set(COMPILE_PLATFORM UNKNOWN)
 endif()
 
 target_compile_definitions(${PROJECT_NAME}
     PRIVATE RAYX_BUILD_DLL
     PUBLIC ${COMPILE_PLATFORM}
-        PROJECT_DIR="${CMAKE_SOURCE_DIR}"
-        $<$<CONFIG:Debug>:RAYX_DEBUG_MODE>
-        $<$<CONFIG:RelWithDebInfo>:RAYX_DEBUG_MODE>
+    PROJECT_DIR="${CMAKE_SOURCE_DIR}"
+    $<$<CONFIG:Debug>:RAYX_DEBUG_MODE>
+    $<$<CONFIG:RelWithDebInfo>:RAYX_DEBUG_MODE>
 )
 
+# Vulkan
 find_package(Vulkan REQUIRED)
 target_link_libraries(${PROJECT_NAME}
     PUBLIC Vulkan::Vulkan
 )
 
-if (NOT "$ENV{CI}" STREQUAL "YES")
-if (UNIX)
-    target_include_directories(${PROJECT_NAME} PUBLIC /usr/include/hdf5/serial)
-    target_link_directories(${PROJECT_NAME} PUBLIC /usr/lib/x86_64-linux-gnu/hdf5/serial)
-    target_link_libraries(${PROJECT_NAME} PUBLIC hdf5)
-else()
-    find_package(HDF5 REQUIRED)
-    target_link_libraries(${PROJECT_NAME}
-    PUBLIC HDF5::HDF5
-    )
-endif()
+# Link H5 Format
+if(NOT "$ENV{CI}" STREQUAL "YES")
+    if(UNIX)
+        target_include_directories(${PROJECT_NAME} PUBLIC /usr/include/hdf5/serial)
+        target_link_directories(${PROJECT_NAME} PUBLIC /usr/lib/x86_64-linux-gnu/hdf5/serial)
+        target_link_libraries(${PROJECT_NAME} PUBLIC hdf5)
+    else()
+        find_package(HDF5 REQUIRED)
+        target_link_libraries(${PROJECT_NAME}
+            PUBLIC HDF5::HDF5
+        )
+    endif()
 endif()
 
+# Add Extern deps
 target_include_directories(${PROJECT_NAME}
     SYSTEM PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/src
     PUBLIC ${RayCore_SOURCE_DIR}/../../Extern/glm/glm/
@@ -147,7 +151,7 @@ target_include_directories(${PROJECT_NAME}
 add_dependencies(${PROJECT_NAME} COMPILE_SHADER)
 
 # If debug or release with debug symbols
-if (CMAKE_BUILD_TYPE STREQUAL "Debug" OR CMAKE_BUILD_TYPE STREQUAL "RelWithDebInfo")
+if(CMAKE_BUILD_TYPE STREQUAL "Debug" OR CMAKE_BUILD_TYPE STREQUAL "RelWithDebInfo")
     message(STATUS "Setting glslc args...")
     set(GLSLC_ARGS "${GLSLC_ARGS} -DRAYX_PLATFORM_WINDOWS")
 endif()
@@ -155,28 +159,30 @@ endif()
 # Compile Shaders
 set(COMPILED_SHADER ${CMAKE_BINARY_DIR}/bin/comp.spv)
 set(COMPILED_SHADER_FAKE ${CMAKE_BINARY_DIR}/bin/___comp.spv) # this exists so file cannot be found -> always execute command
+
 # OS specific
-if (WIN32)
+if(WIN32)
     # The following code is used to always compile the shader.
     # This is most likely not an optimal solution, but it will work
     # until we find a better one.
     add_custom_command(
         OUTPUT
-            ${COMPILED_SHADER}
-            ${COMPILED_SHADER_FAKE}
+        ${COMPILED_SHADER}
+        ${COMPILED_SHADER_FAKE}
         COMMAND "$ENV{VULKAN_SDK}/Bin/glslc.exe"
         ARGS ${RayCore_SOURCE_DIR}/src/Tracer/shader/main-glsl.comp -o ${COMPILED_SHADER}
     )
-elseif (UNIX)
+elseif(UNIX)
     add_custom_command(
         OUTPUT
-            ${COMPILED_SHADER}
-            ${COMPILED_SHADER_FAKE}
+        ${COMPILED_SHADER}
+        ${COMPILED_SHADER_FAKE}
         COMMAND "glslc"
         ARGS ${RayCore_SOURCE_DIR}/src/Tracer/shader/main-glsl.comp -o ${COMPILED_SHADER}
     )
+
     # set_property(TARGET ${PROJECT_NAME} PROPERTY POSITION_INDEPENDENT_CODE ON)
-endif ()
+endif()
 
 add_custom_target(COMPILE_SHADER ALL
     DEPENDS ${COMPILED_SHADER}

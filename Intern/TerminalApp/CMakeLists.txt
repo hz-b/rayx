@@ -1,8 +1,9 @@
 cmake_minimum_required(VERSION 3.2 FATAL_ERROR)
 
-project(TerminalApp VERSION 0.4.0.0)
+project(TerminalApp VERSION 0.5.0.0)
 
-message(STATUS "Resolving GIT Version")
+# GIT Versioning
+message(STATUS "Resolving GIT Version...")
 set(_build_version "unknown")
 
 find_package(Git)
