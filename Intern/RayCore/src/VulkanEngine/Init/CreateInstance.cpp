@@ -1,7 +1,7 @@
 #include "VulkanEngine/VulkanEngine.h"
 #define VMA_IMPLEMENTATION
 
-#include "vk_mem_alloc.h"
+#include <vma/vk_mem_alloc.h>
 namespace RAYX {
 
 VKAPI_ATTR VkBool32 VKAPI_CALL debugCallback(VkDebugUtilsMessageSeverityFlagBitsEXT messageSeverity, VkDebugUtilsMessageTypeFlagsEXT messageType,

@@ -123,9 +123,7 @@ target_compile_definitions(${PROJECT_NAME}
 )
 
 find_package(Vulkan 1.3.216 REQUIRED)
-target_link_libraries(${PROJECT_NAME}
-    PUBLIC Vulkan::Vulkan
-)
+target_link_libraries(${PROJECT_NAME} PUBLIC Vulkan::Vulkan)
 
 # Link H5 Format
 if(NOT "$ENV{CI}" STREQUAL "YES")
