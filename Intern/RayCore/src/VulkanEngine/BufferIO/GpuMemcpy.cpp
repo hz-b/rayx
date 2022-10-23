@@ -4,9 +4,9 @@ namespace RAYX {
 void VulkanEngine::gpuMemcpy(VkBuffer& buffer_src, size_t offset_src, VkBuffer& buffer_dst, size_t offset_dst, size_t bytes) {
     RAYX_PROFILE_FUNCTION();
     VkCommandBufferAllocateInfo allocInfo{};
-    allocInfo.sType              = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
-    allocInfo.level              = VK_COMMAND_BUFFER_LEVEL_PRIMARY;
-    allocInfo.commandPool        = m_CommandPool;
+    allocInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
+    allocInfo.level = VK_COMMAND_BUFFER_LEVEL_PRIMARY;
+    allocInfo.commandPool = m_CommandPool;
     allocInfo.commandBufferCount = 1;
 
     VkCommandBuffer commandBuffer;
@@ -21,16 +21,16 @@ void VulkanEngine::gpuMemcpy(VkBuffer& buffer_src, size_t offset_src, VkBuffer& 
     VkBufferCopy copyRegion{};
     copyRegion.srcOffset = offset_src;
     copyRegion.dstOffset = offset_dst;
-    copyRegion.size      = bytes;
+    copyRegion.size = bytes;
 
     vkCmdCopyBuffer(commandBuffer, buffer_src, buffer_dst, 1, &copyRegion);
 
     vkEndCommandBuffer(commandBuffer);
 
     VkSubmitInfo submitInfo{};
-    submitInfo.sType              = VK_STRUCTURE_TYPE_SUBMIT_INFO;
+    submitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
     submitInfo.commandBufferCount = 1;
-    submitInfo.pCommandBuffers    = &commandBuffer;
+    submitInfo.pCommandBuffers = &commandBuffer;
 
     vkQueueSubmit(m_ComputeQueue, 1, &submitInfo, VK_NULL_HANDLE);
     vkQueueWaitIdle(m_ComputeQueue);

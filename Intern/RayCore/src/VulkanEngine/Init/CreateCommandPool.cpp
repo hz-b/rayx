@@ -10,8 +10,8 @@ void VulkanEngine::createCommandPool() {
     let us do that.
     */
     VkCommandPoolCreateInfo commandPoolCreateInfo = {};
-    commandPoolCreateInfo.sType                   = VK_STRUCTURE_TYPE_COMMAND_POOL_CREATE_INFO;
-    commandPoolCreateInfo.flags                   = 0;
+    commandPoolCreateInfo.sType = VK_STRUCTURE_TYPE_COMMAND_POOL_CREATE_INFO;
+    commandPoolCreateInfo.flags = 0;
     // the queue family of this command pool. All command buffers allocated
     // from this command pool, must be submitted to queues of this family
     // ONLY.

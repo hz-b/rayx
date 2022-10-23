@@ -12,7 +12,7 @@ void VulkanEngine::writeBufferRaw(const char* bufname, char* indata) {
     }
 
     size_t remainingBytes = m_buffers[bufname].m_size;
-    size_t offset         = 0;
+    size_t offset = 0;
     while (remainingBytes > 0) {
         size_t localbytes = std::min(remainingBytes, (size_t)STAGING_SIZE);
         storeToStagingBuffer(indata + offset, localbytes);

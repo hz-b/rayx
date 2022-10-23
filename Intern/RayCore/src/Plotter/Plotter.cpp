@@ -105,7 +105,7 @@ void Plotter::plotforEach(const std::vector<Ray>& RayList, const std::string& pl
     // s is sorted and unique extraParam values extracted
     auto s = RayList;
 
-    std::sort(s.begin(), s.end(), comp); // Should be a fast enough sort 
+    std::sort(s.begin(), s.end(), comp);  // Should be a fast enough sort
     s.erase(
         std::unique(s.begin(), s.end(),
                     [](Ray const& lhs, Ray const& rhs) { return abs(lhs.m_extraParam - rhs.m_extraParam) < std::numeric_limits<double>::epsilon(); }),

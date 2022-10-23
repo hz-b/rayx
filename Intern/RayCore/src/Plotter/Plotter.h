@@ -10,8 +10,7 @@ class RAYX_API Plotter {
   public:
     Plotter() = default;
     ~Plotter() = default;
-    void plot(int plotType, const std::string& plotName,
-              const std::vector<Ray>& RayList);
+    void plot(int plotType, const std::string& plotName, const std::vector<Ray>& RayList);
 
   private:
     static int getBinAmount(std::vector<double>& Pos);

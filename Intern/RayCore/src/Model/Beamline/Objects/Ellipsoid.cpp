@@ -131,8 +131,7 @@ void Ellipsoid::calcHalfAxes() {
         m_halfAxisC = sqrt(pow(m_shortHalfAxisB, 2) / m_a11);
     }
     m_tangentAngle = angle;
-    RAYX_VERB << "A= " << m_longHalfAxisA << ", B= " << m_shortHalfAxisB << ", C= " << m_halfAxisC
-              << ", angle = " << radToDeg(m_tangentAngle);
+    RAYX_VERB << "A= " << m_longHalfAxisA << ", B= " << m_shortHalfAxisB << ", C= " << m_halfAxisC << ", angle = " << radToDeg(m_tangentAngle);
 }
 
 double Ellipsoid::getRadius() const { return m_a24; }

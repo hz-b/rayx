@@ -23,27 +23,27 @@ void VulkanEngine::createInstance() {
 
     // Add description for instance
     VkApplicationInfo appInfo{};
-    appInfo.sType              = VK_STRUCTURE_TYPE_APPLICATION_INFO;
-    appInfo.pApplicationName   = "Terminal App";
+    appInfo.sType = VK_STRUCTURE_TYPE_APPLICATION_INFO;
+    appInfo.pApplicationName = "Terminal App";
     appInfo.applicationVersion = VK_MAKE_API_VERSION(0, 1, 3, 216);
-    appInfo.pEngineName        = "Vulkan RAY-X Engine";
-    appInfo.engineVersion      = VK_MAKE_API_VERSION(0, 1, 3, 216);
-    appInfo.apiVersion         = VK_API_VERSION_1_3;
+    appInfo.pEngineName = "Vulkan RAY-X Engine";
+    appInfo.engineVersion = VK_MAKE_API_VERSION(0, 1, 3, 216);
+    appInfo.apiVersion = VK_API_VERSION_1_3;
 
     // pointer to description with layer count
     VkInstanceCreateInfo createInfo{};
-    createInfo.sType             = VK_STRUCTURE_TYPE_INSTANCE_CREATE_INFO;
-    createInfo.pApplicationInfo  = &appInfo;
+    createInfo.sType = VK_STRUCTURE_TYPE_INSTANCE_CREATE_INFO;
+    createInfo.pApplicationInfo = &appInfo;
     createInfo.enabledLayerCount = 0;
 
-    auto extensions                    = getRequiredExtensions();
-    createInfo.enabledExtensionCount   = static_cast<uint32_t>(extensions.size());
+    auto extensions = getRequiredExtensions();
+    createInfo.enabledExtensionCount = static_cast<uint32_t>(extensions.size());
     createInfo.ppEnabledExtensionNames = extensions.data();
 
     // Validation Layer Debug Outpout "handler"
     VkDebugUtilsMessengerCreateInfoEXT debugCreateInfo;
     if (enableValidationLayers) {
-        createInfo.enabledLayerCount   = static_cast<uint32_t>(validationLayers.size());
+        createInfo.enabledLayerCount = static_cast<uint32_t>(validationLayers.size());
         createInfo.ppEnabledLayerNames = validationLayers.data();
         populateDebugMessengerCreateInfo(debugCreateInfo);
         createInfo.pNext = (VkDebugUtilsMessengerCreateInfoEXT*)&debugCreateInfo;
@@ -81,9 +81,9 @@ void VulkanEngine::prepareVma() {
     // vma_vulkan_func.vkCmdCopyBuffer                     = vkCmdCopyBuffer;
 
     VmaAllocatorCreateInfo allocatorInfo{};
-    allocatorInfo.physicalDevice   = m_PhysicalDevice;
-    allocatorInfo.device           = m_Device;
-    allocatorInfo.instance         = m_Instance;
+    allocatorInfo.physicalDevice = m_PhysicalDevice;
+    allocatorInfo.device = m_Device;
+    allocatorInfo.instance = m_Instance;
     allocatorInfo.vulkanApiVersion = VK_API_VERSION_1_3;
     // allocatorInfo.pVulkanFunctions = &vma_vulkan_func;
 
@@ -161,8 +161,8 @@ std::vector<const char*> getRequiredExtensions() {
 
 void populateDebugMessengerCreateInfo(VkDebugUtilsMessengerCreateInfoEXT& createInfo) {
     RAYX_PROFILE_FUNCTION();
-    createInfo                 = {};
-    createInfo.sType           = VK_STRUCTURE_TYPE_DEBUG_UTILS_MESSENGER_CREATE_INFO_EXT;
+    createInfo = {};
+    createInfo.sType = VK_STRUCTURE_TYPE_DEBUG_UTILS_MESSENGER_CREATE_INFO_EXT;
     createInfo.messageSeverity = VK_DEBUG_UTILS_MESSAGE_SEVERITY_VERBOSE_BIT_EXT | VK_DEBUG_UTILS_MESSAGE_SEVERITY_WARNING_BIT_EXT |
                                  VK_DEBUG_UTILS_MESSAGE_SEVERITY_ERROR_BIT_EXT;
     createInfo.messageType = VK_DEBUG_UTILS_MESSAGE_TYPE_GENERAL_BIT_EXT | VK_DEBUG_UTILS_MESSAGE_TYPE_VALIDATION_BIT_EXT |

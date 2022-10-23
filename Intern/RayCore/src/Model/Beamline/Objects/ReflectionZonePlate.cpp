@@ -183,8 +183,8 @@ void ReflectionZonePlate::calcBeta() {
         VectorR2Center();
         if (m_fresnelZOffset != 0) {  // m_fresnelZOffset is given by the user as a parameter bc
                                       // DesignType==DesignType::ZOffset
-            m_betaAngle = acos((-m_R2ArmLength * m_R2ArmLength * m_designSagittalExitArmLength * m_designSagittalExitArmLength *
-                                m_fresnelZOffset * m_fresnelZOffset) /
+            m_betaAngle = acos((-m_R2ArmLength * m_R2ArmLength * m_designSagittalExitArmLength * m_designSagittalExitArmLength * m_fresnelZOffset *
+                                m_fresnelZOffset) /
                                (2 * m_designSagittalExitArmLength * m_fresnelZOffset));
         }
     }

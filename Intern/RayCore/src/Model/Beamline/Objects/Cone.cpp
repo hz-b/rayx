@@ -22,8 +22,8 @@ namespace RAYX {
  * amplitude y(5) and radius (6)
  */
 Cone::Cone(const char* name, GeometricalShape geometricalShape, const double width, const double height, const double azimuthalAngle,
-           glm::dvec4 position, glm::dmat4x4 orientation, const double grazingIncidence, const double entranceArmLength,
-           const double exitArmLength, const std::array<double, 7> slopeError)
+           glm::dvec4 position, glm::dmat4x4 orientation, const double grazingIncidence, const double entranceArmLength, const double exitArmLength,
+           const std::array<double, 7> slopeError)
     : OpticalElement(name, slopeError),
       m_incidence(degToRad(grazingIncidence)),
       m_entranceArmLength(entranceArmLength),
@@ -73,8 +73,7 @@ Cone::Cone(const char* name, GeometricalShape geometricalShape, const double wid
  */
 Cone::Cone(const char* name, GeometricalShape geometricalShape, const double upstream_radius_r, const double downstream_radius_rho,
            const double width, const double height, const double azimuthalAngle, glm::dvec4 position, glm::dmat4x4 orientation,
-           const double grazingIncidence, const double entranceArmLength, const double exitArmLength,
-           const std::array<double, 7> slopeError)
+           const double grazingIncidence, const double entranceArmLength, const double exitArmLength, const std::array<double, 7> slopeError)
     : OpticalElement(name, slopeError),
       m_incidence(degToRad(grazingIncidence)),
       m_entranceArmLength(entranceArmLength),

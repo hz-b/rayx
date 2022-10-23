@@ -418,8 +418,8 @@ TEST_F(TestSuite, testRZPLineDensityDefaulParams) {
     for (auto p : inouts) {
         double DX;
         double DZ;
-        CPU_TRACER::RZPLineDensity(p.in_ray, p.in_normal, p.in_imageType, p.in_rzpType, p.in_derivationMethod, p.in_zOffsetCenter,
-                                   p.in_risag, p.in_rosag, p.in_rimer, p.in_romer, p.in_alpha, p.in_beta, p.in_Ord, p.in_WL, DX, DZ);
+        CPU_TRACER::RZPLineDensity(p.in_ray, p.in_normal, p.in_imageType, p.in_rzpType, p.in_derivationMethod, p.in_zOffsetCenter, p.in_risag,
+                                   p.in_rosag, p.in_rimer, p.in_romer, p.in_alpha, p.in_beta, p.in_Ord, p.in_WL, DX, DZ);
         CHECK_EQ(DX, p.out_DX);
         CHECK_EQ(DZ, p.out_DZ);
     }
@@ -533,8 +533,8 @@ TEST_F(TestSuite, testRZPLineDensityAstigmatic) {
     for (auto p : inouts) {
         double DX;
         double DZ;
-        CPU_TRACER::RZPLineDensity(p.in_ray, p.in_normal, p.in_imageType, p.in_rzpType, p.in_derivationMethod, p.in_zOffsetCenter,
-                                   p.in_risag, p.in_rosag, p.in_rimer, p.in_romer, p.in_alpha, p.in_beta, p.in_Ord, p.in_WL, DX, DZ);
+        CPU_TRACER::RZPLineDensity(p.in_ray, p.in_normal, p.in_imageType, p.in_rzpType, p.in_derivationMethod, p.in_zOffsetCenter, p.in_risag,
+                                   p.in_rosag, p.in_rimer, p.in_romer, p.in_alpha, p.in_beta, p.in_Ord, p.in_WL, DX, DZ);
         CHECK_EQ(DX, p.out_DX);
         CHECK_EQ(DZ, p.out_DZ);
     }

@@ -144,7 +144,7 @@ void Timer::TimerStart(const std::string& fn) {
     t1 = std::chrono::steady_clock::now();
 }
 void Timer::TimerStop() {
-    if (t1 == t2){
+    if (t1 == t2) {
         RAYX_WARN << "Timer not started!";
         return;
     }
