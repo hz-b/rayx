@@ -120,7 +120,6 @@ void dynamicElements() {
     int type                  = -1;
 
     int closestElementIndex = -1;
-    int lastClosestElementIndex;
     dvec4 closestHitpoint = dvec4(infinity(), infinity(), infinity(), 0.0);
     dvec4 closestGlobalHitpoint;
 
@@ -151,8 +150,6 @@ void dynamicElements() {
     for (int i = 0; i < maxBounces; i++) {
         ray = rayData[uint(gl_GlobalInvocationID)];
 
-        lastClosestElementIndex = closestElementIndex;
-
         // index of element with current closest intersection with ray, initialized with -1
         closestElementIndex = -1;
 
@@ -163,7 +160,9 @@ void dynamicElements() {
         // Find intersection points through all elements
         for (int elementIndex = int(beamlineIndex) * int(numberOfElementsPerBeamline);
              elementIndex < (beamlineIndex + 1) * numberOfElementsPerBeamline; elementIndex++) {
-            if (elementIndex == lastClosestElementIndex) {
+
+            double lastElement = rayData[uint(gl_GlobalInvocationID)].m_lastElement;
+            if (elementIndex + 1 == lastElement) {
                 // TODO: self-intersection
                 // rayData[uint(gl_GlobalInvocationID)].m_weight = 11;
                 continue;
