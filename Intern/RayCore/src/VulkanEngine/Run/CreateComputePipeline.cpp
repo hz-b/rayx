@@ -1,3 +1,4 @@
+#include "Bench.h"
 #include "CanonicalizePath.h"
 #include "VulkanEngine/VulkanEngine.h"
 
@@ -6,6 +7,7 @@ uint32_t* readFile(uint32_t& length, const char* filename);
 namespace RAYX {
 /* We create a compute pipeline here. */
 void VulkanEngine::createComputePipeline() {
+    BENCH;
     RAYX_PROFILE_FUNCTION();
 
     /*

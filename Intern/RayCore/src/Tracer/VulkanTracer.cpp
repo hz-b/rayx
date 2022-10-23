@@ -5,6 +5,7 @@
 #include <chrono>
 #include <cmath>
 
+#include "Bench.h"
 #include "Debug.h"
 #include "Debug/Instrumentor.h"
 #include "RayCore.h"
@@ -17,6 +18,8 @@
 
 namespace RAYX {
 std::vector<Ray> VulkanTracer::trace(const Beamline& beamline) {
+    BENCH;
+
     // init, if not yet initialized.
     if (m_engine.state() == VulkanEngine::EngineState::PREINIT) {
         // Set buffer settings (DEBUG OR RELEASE)

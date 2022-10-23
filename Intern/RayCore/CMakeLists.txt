@@ -5,6 +5,7 @@ project(RayCore)
 SET(SOURCE
     src/CanonicalizePath.cpp
     src/Debug.cpp
+    src/Bench.cpp
     src/utils.cpp
     src/Data/Exporter.cpp
     src/Data/Importer.cpp
@@ -62,6 +63,8 @@ SET(SOURCE
 SET(HEADERS
     src/CanonicalizePath.h
     src/utils.h
+    src/Debug.h
+    src/Bench.h
     src/Model/Beamline/Beamline.h
     src/Model/Beamline/OpticalElement.h
     src/Model/Beamline/LightSource.h

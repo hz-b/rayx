@@ -4,6 +4,7 @@
 #include <chrono>
 #include <cmath>
 
+#include "Bench.h"
 #include "Debug.h"
 #include "Debug/Instrumentor.h"
 #include "Material/Material.h"
@@ -21,6 +22,8 @@ CpuTracer::CpuTracer() { RAYX_VERB << "Initializing Cpu Tracer.."; }
 CpuTracer::~CpuTracer() {}
 
 std::vector<Ray> CpuTracer::trace(const Beamline& beamline) {
+    BENCH;
+
     auto rayList = beamline.getInputRays();
 
     CPU_TRACER::numberOfBeamlines = 1;

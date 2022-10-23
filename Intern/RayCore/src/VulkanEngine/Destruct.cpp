@@ -1,5 +1,6 @@
 #include <vk_mem_alloc.h>
 
+#include "Bench.h"
 #include "VulkanEngine/VulkanEngine.h"
 
 namespace RAYX {
@@ -29,7 +30,10 @@ VulkanEngine::~VulkanEngine() {
     vmaDestroyAllocator(m_VmaAllocator);
     vkDestroyDescriptorSetLayout(m_Device, m_DescriptorSetLayout, nullptr);
     vkDestroyCommandPool(m_Device, m_CommandPool, nullptr);
+
     {
+        BENCH_NAMED("vkDestroyDevice");
+
         RAYX_PROFILE_SCOPE("vkDestroyDevice");
         vkDestroyDevice(m_Device, nullptr);
     }

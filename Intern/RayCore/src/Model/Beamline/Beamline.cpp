@@ -1,5 +1,6 @@
 #include "Beamline.h"
 
+#include "Bench.h"
 #include "Debug/Instrumentor.h"
 #include "Model/Beamline/Objects/Objects.h"
 
@@ -9,6 +10,8 @@ Beamline::Beamline() = default;
 Beamline::~Beamline() = default;
 
 std::vector<Ray> Beamline::getInputRays() const {
+    BENCH;
+
     std::vector<Ray> list;
     uint32_t raycount = 0;
     for (const auto& s : m_LightSources) {

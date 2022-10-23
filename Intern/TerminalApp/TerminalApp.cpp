@@ -4,6 +4,7 @@
 #include <memory>
 #include <stdexcept>
 
+#include "Bench.h"
 #include "CanonicalizePath.h"
 #include "Debug.h"
 #include "Tracer/CpuTracer.h"
@@ -93,9 +94,9 @@ void TerminalApp::run() {
         RAYX::setDebugVerbose(true);
     }
 
-    auto start_time = std::chrono::steady_clock::now();
     if (m_CommandParser->m_args.m_benchmark) {
         RAYX_VERB << "Starting in Benchmark Mode.\n";
+        BENCH_FLAG = true;
     }
     /////////////////// Argument treatement
     if (m_CommandParser->m_args.m_version) {
@@ -109,16 +110,13 @@ void TerminalApp::run() {
     } else {
         m_Tracer = std::make_unique<RAYX::VulkanTracer>();
     }
+
     // Trace, export and plot
     tracePath(m_CommandParser->m_args.m_providedFile);
-
-    if (m_CommandParser->m_args.m_benchmark) {
-        std::chrono::steady_clock::time_point end = std::chrono::steady_clock::now();
-        RAYX_LOG << "Benchmark: Done in " << std::chrono::duration_cast<std::chrono::milliseconds>(end - start_time).count() << " ms";
-    }
 }
 
 void TerminalApp::exportRays(const std::vector<RAYX::Ray>& rays, std::string path) {
+    BENCH;
 #ifdef CI
     bool csv = true;
 #else
