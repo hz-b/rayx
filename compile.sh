@@ -23,7 +23,7 @@ do
 done
 
 echo Updating git submodules ...
-git submodule update --recursive
+git submodule update --recursive --init
 
 [ ! -d build ] && mkdir build
 
