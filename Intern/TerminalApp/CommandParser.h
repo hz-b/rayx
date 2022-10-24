@@ -41,7 +41,7 @@ class CommandParser {
         ║║║╚╗║╔═╗║  ║║  ╚═══╝╔╝╔╗╚╗
         ╚╝╚═╝╚╝ ╚╝  ╚╝       ╚═╝╚═╝ HZB 2022.
         )";
-        RAYX_LOG << "\t RAY-X Terminal Application " << TERMINALAPP_VERSION_MAJOR << "." << TERMINALAPP_VERSION_MINOR << "."
+        RAYX_LOG << "\n\t RAY-X Terminal Application " << TERMINALAPP_VERSION_MAJOR << "." << TERMINALAPP_VERSION_MINOR << "."
                  << TERMINALAPP_VERSION_PATCH << "." << TERMINALAPP_VERSION_TWEAK << "\n \t GIT: " << GIT_REVISION
                  << "\n \t BUILD: " << BUILD_TIMESTAMP;
     };  // TODO: CMake config needed

@@ -91,7 +91,7 @@ target_link_libraries(${PROJECT_NAME}
 
 # Add Extern deps TODO(Jannis): the src include shouldn't be a SYSTEM include
 target_include_directories(${PROJECT_NAME}
-    SYSTEM PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/src
+    SYSTEM PUBLIC ${RayCore_SOURCE_DIR}/src
     PUBLIC ${RayCore_SOURCE_DIR}/../../Extern/glm/glm/
     PUBLIC ${RayCore_SOURCE_DIR}/../../Extern/rapidxml-1.13/
     PUBLIC ${RayCore_SOURCE_DIR}/../../Extern/HighFive/include/
@@ -139,12 +139,12 @@ add_custom_target(COMPILE_SHADER ALL DEPENDS ${COMPILED_SHADER})
 find_package(Python3 COMPONENTS Interpreter Development NumPy REQUIRED)
 find_package(PythonLibs 3.0 REQUIRED)
 target_include_directories(${PROJECT_NAME} 
-    PRIVATE ${RayCore_SOURCE_DIR}/../../Extern/matplotlib-cpp
+    PUBLIC ${RayCore_SOURCE_DIR}/../../Extern/matplotlib-cpp
     PUBLIC ${PYTHON3_INCLUDE_DIRS} 
     PUBLIC ${NumPy_INCLUDE_DIRS}
 )
 target_link_libraries(${PROJECT_NAME}
-    PRIVATE
+    PUBLIC
         ${PYTHON_LIBRARIES}
         Python3::NumPy
 )
