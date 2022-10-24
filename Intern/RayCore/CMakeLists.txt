@@ -129,6 +129,10 @@ find_package(Vulkan 1.3.216 REQUIRED)
 target_link_libraries(${PROJECT_NAME}
     PUBLIC Vulkan::Vulkan
 )
+# Error if VULKAN_SDK is not set
+if(NOT DEFINED ENV{VULKAN_SDK})
+    message(FATAL_ERROR "VULKAN_SDK is not set")
+endif()
 
 # Link H5 Format
 if(NOT "$ENV{CI}" STREQUAL "YES")
@@ -150,7 +154,12 @@ target_include_directories(${PROJECT_NAME}
     PUBLIC ${RayCore_SOURCE_DIR}/../../Extern/glm/glm/
     PUBLIC ${RayCore_SOURCE_DIR}/../../Extern/rapidxml-1.13/
     PUBLIC ${RayCore_SOURCE_DIR}/../../Extern/HighFive/include/
+    PUBLIC $ENV{VULKAN_SDK}/Include/vma
 )
+
+# Print include directories
+get_target_property(INCLUDE_DIRECTORIES ${PROJECT_NAME} INCLUDE_DIRECTORIES)
+message(STATUS "Include directories for ${PROJECT_NAME}: ${INCLUDE_DIRECTORIES}")
 
 add_dependencies(${PROJECT_NAME} COMPILE_SHADER)
 
