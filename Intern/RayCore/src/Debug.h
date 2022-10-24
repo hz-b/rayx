@@ -22,7 +22,7 @@
 #include "Core.h"
 
 // Memory leak detection (RAYX_NEW instead of new allows leaks to be detected)
-#ifdef RAY_DEBUG_MODE
+#ifdef RAYX_DEBUG_MODE
 #ifdef RAYX_PLATFORM_MSVC
 #define _CRTDBG_MAP_ALLOC
 #include <crtdbg.h>

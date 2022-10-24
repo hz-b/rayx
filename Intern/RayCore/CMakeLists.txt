@@ -60,50 +60,7 @@ SET(SOURCE
     src/Plotter/Plotter.cpp
 )
 
-SET(HEADERS
-    src/CanonicalizePath.h
-    src/utils.h
-    src/Debug.h
-    src/Bench.h
-    src/Model/Beamline/Beamline.h
-    src/Model/Beamline/OpticalElement.h
-    src/Model/Beamline/LightSource.h
-    src/Model/Beamline/EnergyDistribution.h
-    src/Model/Beamline/Objects/ImagePlane.h
-    src/Model/Beamline/Objects/MatrixSource.h
-    src/Model/Beamline/Objects/PointSource.h
-    src/Model/Beamline/Objects/Ellipsoid.h
-    src/Model/Beamline/Objects/ReflectionZonePlate.h
-    src/Model/Beamline/Objects/Slit.h
-    src/Model/Beamline/Objects/SphereGrating.h
-    src/Model/Beamline/Objects/PlaneGrating.h
-    src/Model/Beamline/Objects/PlaneMirror.h
-    src/Model/Beamline/Objects/PointSource.h
-    src/Model/Beamline/Objects/SphereMirror.h
-    src/Model/Beamline/Objects/ToroidMirror.h
-    src/Model/Beamline/Objects/Cylinder.h
-    src/Data/Exporter.h
-    src/Data/Importer.h
-    src/Data/xml.h
-    src/Data/DatFile.h
-    src/Model/Surface/Quadric.h
-    src/Model/Surface/Toroid.h
-    src/Model/Surface/Surface.h
-    src/Tracer/Ray.h
-    src/Tracer/Tracer.h
-    src/Tracer/CpuTracer.h
-    src/Writer/Writer.h
-    src/Writer/CSVWriter.h
-    src/Writer/H5Writer.h
-    src/Tracer/VulkanTracer.h
-    src/VulkanEngine/VulkanEngine.h
-    src/Material/Material.h
-    src/Material/NffTable.h
-    src/Material/PalikTable.h
-    src/Plotter/Plotter.h
-)
-
-add_library(${PROJECT_NAME} SHARED ${SOURCE} ${HEADERS})
+add_library(${PROJECT_NAME} SHARED ${SOURCE})
 
 target_precompile_headers(${PROJECT_NAME} PRIVATE raycorePCH.h)
 set(CMAKE_PCH_INSTANTIATE_TEMPLATES ON)
@@ -150,30 +107,28 @@ target_include_directories(${PROJECT_NAME}
     PUBLIC ${RayCore_SOURCE_DIR}/../../Extern/glm/glm/
     PUBLIC ${RayCore_SOURCE_DIR}/../../Extern/rapidxml-1.13/
     PUBLIC ${RayCore_SOURCE_DIR}/../../Extern/HighFive/include/
-    PUBLIC $ENV{VULKAN_SDK}/Include/vma
 )
 
-# Print include directories
-get_target_property(INCLUDE_DIRECTORIES ${PROJECT_NAME} INCLUDE_DIRECTORIES)
-message(STATUS "Include directories for ${PROJECT_NAME}: ${INCLUDE_DIRECTORIES}")
-
-add_dependencies(${PROJECT_NAME} COMPILE_SHADER)
-
-# If debug or release with debug symbols
-if(CMAKE_BUILD_TYPE STREQUAL "Debug" OR CMAKE_BUILD_TYPE STREQUAL "RelWithDebInfo")
-    message(STATUS "Setting glslc args...")
-    set(GLSLC_ARGS "${GLSLC_ARGS} -DRAYX_PLATFORM_WINDOWS")
+# If windows
+if(WIN32)
+    # Check if vulkan sdk env var is set
+    if(NOT DEFINED ENV{VULKAN_SDK})
+        message(FATAL_ERROR "VULKAN_SDK environment variable is not set")
+    endif()
+    # add vma with env variable to include dirs
+    target_include_directories(${PROJECT_NAME}
+        SYSTEM PUBLIC $ENV{VULKAN_SDK}/Include/vma
+    )
 endif()
 
 # Compile Shaders
+#   The following code is used to always compile the shader.
+#   This is most likely not an optimal solution, but it will work
+#   until we find a better one.
+add_dependencies(${PROJECT_NAME} COMPILE_SHADER)
 set(COMPILED_SHADER ${CMAKE_BINARY_DIR}/bin/comp.spv)
 set(COMPILED_SHADER_FAKE ${CMAKE_BINARY_DIR}/bin/___comp.spv) # this exists so file cannot be found -> always execute command
-
-# OS specific
 if(WIN32)
-    # The following code is used to always compile the shader.
-    # This is most likely not an optimal solution, but it will work
-    # until we find a better one.
     add_custom_command(
         OUTPUT
         ${COMPILED_SHADER}
@@ -189,24 +144,23 @@ elseif(UNIX)
         COMMAND "glslc"
         ARGS ${RayCore_SOURCE_DIR}/src/Tracer/shader/main-glsl.comp -o ${COMPILED_SHADER}
     )
-
-    # set_property(TARGET ${PROJECT_NAME} PROPERTY POSITION_INDEPENDENT_CODE ON)
 endif()
+add_custom_target(COMPILE_SHADER ALL DEPENDS ${COMPILED_SHADER})
 
-add_custom_target(COMPILE_SHADER ALL
-    DEPENDS ${COMPILED_SHADER}
-)
-# # find python libraries
+# find python libraries
 find_package(Python3 COMPONENTS Interpreter Development NumPy REQUIRED)
 find_package(PythonLibs 3.0 REQUIRED)
-include_directories(${PYTHON3_INCLUDE_DIRS} ${NumPy_INCLUDE_DIRS})
-# # endif()
-
-include_directories(${PROJECT_NAME} PRIVATE ${RayCore_SOURCE_DIR}/../../Extern/matplotlib-cpp)
-# message(STATUS ${matplotlib_SOURCE_DIR})
-# # link python and numpy
+target_include_directories(${PROJECT_NAME} 
+    PRIVATE ${RayCore_SOURCE_DIR}/../../Extern/matplotlib-cpp
+    PUBLIC ${PYTHON3_INCLUDE_DIRS} 
+    PUBLIC ${NumPy_INCLUDE_DIRS}
+)
 target_link_libraries(${PROJECT_NAME}
     PRIVATE
         ${PYTHON_LIBRARIES}
         Python3::NumPy
 )
+
+# Print include directories
+get_target_property(INCLUDE_DIRECTORIES ${PROJECT_NAME} INCLUDE_DIRECTORIES)
+message(STATUS "Include directories for ${PROJECT_NAME}: ${INCLUDE_DIRECTORIES}")
