@@ -129,10 +129,6 @@ find_package(Vulkan 1.3.216 REQUIRED)
 target_link_libraries(${PROJECT_NAME}
     PUBLIC Vulkan::Vulkan
 )
-# Error if VULKAN_SDK is not set
-if(NOT DEFINED ENV{VULKAN_SDK})
-    message(FATAL_ERROR "VULKAN_SDK is not set")
-endif()
 
 # Link H5 Format
 if(NOT "$ENV{CI}" STREQUAL "YES")
