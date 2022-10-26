@@ -83,11 +83,23 @@ target_compile_definitions(${PROJECT_NAME}
 )
 
 find_package(Vulkan 1.3.216 REQUIRED)
-find_package(HDF5 REQUIRED)
 target_link_libraries(${PROJECT_NAME}
     PUBLIC Vulkan::Vulkan
-    PUBLIC HDF5::HDF5
 )
+
+# Link H5 Format
+if(NOT "$ENV{CI}" STREQUAL "YES")
+    if(UNIX)
+        target_include_directories(${PROJECT_NAME} PUBLIC /usr/include/hdf5/serial)
+        target_link_directories(${PROJECT_NAME} PUBLIC /usr/lib/x86_64-linux-gnu/hdf5/serial)
+        target_link_libraries(${PROJECT_NAME} PUBLIC hdf5)
+    else()
+        find_package(HDF5 REQUIRED)
+        target_link_libraries(${PROJECT_NAME}
+            PUBLIC HDF5::HDF5
+        )
+    endif()
+endif()
 
 # Add Extern deps TODO(Jannis): the src include shouldn't be a SYSTEM include
 target_include_directories(${PROJECT_NAME}

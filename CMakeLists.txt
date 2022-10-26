@@ -4,6 +4,10 @@ project(RAYX)
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
+add_subdirectory(Intern)
+add_subdirectory(Extern)
+add_subdirectory(Tests)
+
 # -------CodeCoverage-------
 option(BUILD_WITH_GCOV "Add Code Coverage to build" FALSE)
 set(CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/Extern/cmake)
@@ -21,8 +25,4 @@ if(CMAKE_COMPILER_IS_GNUCXX AND CMAKE_BUILD_TYPE STREQUAL "Debug" AND BUILD_WITH
 	# setup_target_for_coverage_gcovr_html(NAME ${PROJECT_NAME}_coverage_gcovr_html
 	# EXECUTABLE ${CMAKE_PROJECT_NAME}_tst)
 endif()
-
 # ---------------------------
-add_subdirectory(Intern)
-add_subdirectory(Extern)
-add_subdirectory(Tests)
