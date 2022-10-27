@@ -33,17 +33,3 @@ glm::dvec4 RAYX_API arrayToGlm4(std::array<double, 4> v);
 
 std::vector<double>::iterator movingAppend(std::vector<double>&& srcVector, std::vector<double>& destVector);
 
-// Benchmark/timer class
-// ms precision
-class RAYX_API Timer {
-  public:
-    Timer();
-    void TimerStart(const std::string& fn = "");
-    void TimerStop();
-    ~Timer() = default;
-
-  private:
-    std::string m_funcName;
-    std::chrono::steady_clock::time_point t1;
-    std::chrono::steady_clock::time_point t2;
-};

@@ -2,6 +2,7 @@
 
 #include <chrono>
 #include <iostream>
+#include <map>
 
 #include "Core.h"
 
@@ -11,6 +12,7 @@
 using namespace std::chrono;
 
 extern RAYX_API bool BENCH_FLAG;
+extern RAYX_API std::map<std::string, double> bench_table;
 
 class RAYX_API Bench {
   public:
@@ -27,6 +29,7 @@ class RAYX_API Bench {
             double delta = (double)duration_cast<milliseconds>(end - start).count();
             double delta_s = delta / 1000.0;
             std::cout << "BENCH: \"" << string << "\" took " << delta_s << "s\n";
+            bench_table[string] = delta_s;
         }
     }
 

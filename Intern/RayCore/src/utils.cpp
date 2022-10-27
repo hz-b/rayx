@@ -134,24 +134,3 @@ std::vector<double>::iterator movingAppend(std::vector<double>&& srcVector, std:
  */
 bool isIdentMatrix(glm::dmat4x4 matrix) { return (matrix == glm::dmat4x4(1.0)); }
 
-Timer::Timer() : m_funcName{""} {
-    t1 = std::chrono::steady_clock::now();
-    t2 = t1;
-}
-
-void Timer::TimerStart(const std::string& fn) {
-    m_funcName = fn;
-    t1 = std::chrono::steady_clock::now();
-}
-void Timer::TimerStop() {
-    if (t1 == t2) {
-        RAYX_WARN << "Timer not started!";
-        return;
-    }
-
-    t2 = std::chrono::steady_clock::now();
-    if (m_funcName.empty())
-        RAYX_LOG << "Done in " << std::chrono::duration_cast<std::chrono::milliseconds>(t2 - t1).count() << " ms";
-    else
-        RAYX_LOG << m_funcName << " done in " << std::chrono::duration_cast<std::chrono::milliseconds>(t2 - t1).count() << " ms";
-}
