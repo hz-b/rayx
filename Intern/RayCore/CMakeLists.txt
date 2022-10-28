@@ -109,25 +109,42 @@ target_include_directories(${PROJECT_NAME}
     PUBLIC ${RayCore_SOURCE_DIR}/../../Extern/HighFive/include/
 )
 
+# Vulkan Memory Allocator
+if(NOT EXISTS ${Vulkan_INCLUDE_DIRS}/vk_mem_alloc.h AND NOT EXISTS $ENV{VULKAN_SDK}/Include/vma/vk_mem_alloc.h)
+    if(DEFINED ENV{VULKAN_SDK})
+        set(outptutstr $ENV{VULKAN_SDK}/Include/vma/)
+    else()
+        set(outptutstr)
+    endif()
+
+    message(FATAL_ERROR "Vulkan Memory Allocator(VMA) is not found.\n Nothing found at: \n ${Vulkan_INCLUDE_DIRS} \n ${outptut}")
+endif()
+
 # If windows
 if(WIN32)
     # Check if vulkan sdk env var is set
     if(NOT DEFINED ENV{VULKAN_SDK})
         message(FATAL_ERROR "VULKAN_SDK environment variable is not set")
     endif()
+
     # add vma with env variable to include dirs
+    target_include_directories(${PROJECT_NAME}
+        SYSTEM PUBLIC $ENV{VULKAN_SDK}/Include/vma
+    )
+elseif(UNIX AND DEFINED ENV{VULKAN_SDK})
     target_include_directories(${PROJECT_NAME}
         SYSTEM PUBLIC $ENV{VULKAN_SDK}/Include/vma
     )
 endif()
 
 # Compile Shaders
-#   The following code is used to always compile the shader.
-#   This is most likely not an optimal solution, but it will work
-#   until we find a better one.
+# The following code is used to always compile the shader.
+# This is most likely not an optimal solution, but it will work
+# until we find a better one.
 add_dependencies(${PROJECT_NAME} COMPILE_SHADER)
 set(COMPILED_SHADER ${CMAKE_BINARY_DIR}/bin/comp.spv)
 set(COMPILED_SHADER_FAKE ${CMAKE_BINARY_DIR}/bin/___comp.spv) # this exists so file cannot be found -> always execute command
+
 if(WIN32)
     add_custom_command(
         OUTPUT
@@ -145,20 +162,21 @@ elseif(UNIX)
         ARGS ${RayCore_SOURCE_DIR}/src/Tracer/shader/main-glsl.comp -o ${COMPILED_SHADER}
     )
 endif()
+
 add_custom_target(COMPILE_SHADER ALL DEPENDS ${COMPILED_SHADER})
 
 # find python libraries
 find_package(Python3 COMPONENTS Interpreter Development NumPy REQUIRED)
 find_package(PythonLibs 3.0 REQUIRED)
-target_include_directories(${PROJECT_NAME} 
+target_include_directories(${PROJECT_NAME}
     PUBLIC ${RayCore_SOURCE_DIR}/../../Extern/matplotlib-cpp
-    PUBLIC ${PYTHON3_INCLUDE_DIRS} 
+    PUBLIC ${PYTHON3_INCLUDE_DIRS}
     PUBLIC ${NumPy_INCLUDE_DIRS}
 )
 target_link_libraries(${PROJECT_NAME}
     PUBLIC
-        ${PYTHON_LIBRARIES}
-        Python3::NumPy
+    ${PYTHON_LIBRARIES}
+    Python3::NumPy
 )
 
 # Print include directories
