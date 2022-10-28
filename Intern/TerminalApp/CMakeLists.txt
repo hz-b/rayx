@@ -26,8 +26,10 @@ string(TIMESTAMP _time_stamp)
 
 configure_file(TerminalAppConfig.h.in TerminalAppConfig.h)
 
-# CLI11
-# Command Parser
+# CLI11 (Command Parser)
+# Ray X Core
+# Python
+
 target_link_libraries(${PROJECT_NAME} 
   PRIVATE CLI11::CLI11
   PRIVATE RayCore
