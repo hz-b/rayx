@@ -37,7 +37,7 @@ TerminalApp::TerminalApp(int argc, char** argv) : m_argv(argv), m_argc(argc) {
 
 TerminalApp::~TerminalApp() { RAYX_VERB << "TerminalApp deleted!"; }
 
-void TerminalApp::tracePath(std::filesystem::path path) {
+void TerminalApp::tracePath(const std::filesystem::path& path) {
     namespace fs = std::filesystem;
     if (!fs::exists(path)) {
         if (path.empty()) {
@@ -48,7 +48,7 @@ void TerminalApp::tracePath(std::filesystem::path path) {
     }
 
     if (fs::is_directory(path)) {
-        for (auto p : fs::directory_iterator(path)) {
+        for (const auto& p : fs::directory_iterator(path)) {
             tracePath(p.path());
         }
     } else if (path.extension() == ".rml") {
@@ -65,9 +65,9 @@ void TerminalApp::tracePath(std::filesystem::path path) {
         if (m_CommandParser->m_args.m_plotFlag) {
             std::shared_ptr<RAYX::Plotter> plotter = std::make_shared<RAYX::Plotter>();
             if (m_CommandParser->m_args.m_multiplePlots) {
-                plotter->plot(2, path.string(), rays);
+                plotter->plot(2, path.string(), rays, getBeamlineOpticalElementsNames());
             } else
-                plotter->plot(0, path.string(), rays);
+                plotter->plot(0, path.string(), rays, getBeamlineOpticalElementsNames());
         }
 
 #if defined(RAYX_DEBUG_MODE) && not defined(CPP)
@@ -162,3 +162,35 @@ void TerminalApp::exportDebug() {
     }
 }
 #endif
+
+/**
+ * @brief Get all beamline optical elemet names
+ *
+ * @return std::vector<std::string> list of names
+ */
+std::vector<std::string> TerminalApp::getBeamlineOpticalElementsNames() {
+    std::vector<std::string> names;
+    names.reserve(m_Beamline->m_OpticalElements.size());
+
+    for (const auto& opticalElement : m_Beamline->m_OpticalElements) {
+        names.push_back(opticalElement->m_name);
+    }
+
+    return names;
+}
+
+/**
+ * @brief Get all beamline light sources names
+ *
+ * @return std::vector<std::string> list of names
+ */
+std::vector<std::string> TerminalApp::getBeamlineLightSourcesNames() {
+    std::vector<std::string> names;
+    names.reserve(m_Beamline->m_LightSources.size());
+
+    for (const auto& lightSources : m_Beamline->m_LightSources) {
+        names.push_back(lightSources->m_name);
+    }
+
+    return names;
+}

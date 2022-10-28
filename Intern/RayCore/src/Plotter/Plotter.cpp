@@ -14,14 +14,14 @@ inline bool intclose(double x, double y) { return abs(x - y) < std::numeric_limi
  * @param plotName Plot Name
  * @param RayList Data to be plotted
  */
-void Plotter::plot(int plotType, const std::string& plotName, const std::vector<Ray>& RayList) {
+void Plotter::plot(int plotType, const std::string& plotName, const std::vector<Ray>& RayList, const std::vector<std::string>& OpticalElementNames) {
     RAYX_LOG << "Plotting...";
     if (plotType == plotTypes::LikeRAYUI)  // RAY-UI
         plotLikeRAYUI(RayList, plotName);
     else if (plotType == plotTypes::ForEach)
         RAYX_D_ERR << "Plot Type not supported";
     else if (plotType == plotTypes::Eachsubplot)
-        plotforEach(RayList, plotName);
+        plotforEach(RayList, plotName, OpticalElementNames);
 }
 /**
  * @brief Get the amount of bins for the histogram
@@ -78,7 +78,7 @@ void Plotter::plotLikeRAYUI(const std::vector<Ray>& RayList, const std::string& 
 
     matplotlibcpp::subplot2grid(4, 4, 0, 0, 1, 3);
     auto bin_amount_freedman = getBinAmount(Xpos);
-    matplotlibcpp::hist(Xpos, bin_amount_freedman, "#0062c3", 0.65, false, {{"density", "False"}});
+    matplotlibcpp::hist(Xpos, bin_amount_freedman, "#0062c3", 0.65, false, {{"density", "False"}, {"histtype", "step"}});
 
     matplotlibcpp::subplot2grid(4, 4, 1, 0, 3, 3);
     matplotlibcpp::scatter(Xpos, Ypos, 1, {{"color", "#62c300"}, {"label", "Ray"}});
@@ -90,7 +90,8 @@ void Plotter::plotLikeRAYUI(const std::vector<Ray>& RayList, const std::string& 
 
     matplotlibcpp::subplot2grid(4, 4, 1, 3, 3, 1);
     bin_amount_freedman = getBinAmount(Ypos);
-    matplotlibcpp::hist(Ypos, bin_amount_freedman, "#0062c3", 0.65, false, {{"density", "False"}, {"orientation", "horizontal"}});
+    matplotlibcpp::hist(Ypos, bin_amount_freedman, "#0062c3", 0.65, false,
+                        {{"density", "False"}, {"orientation", "horizontal"}, {"histtype", "step"}});
     matplotlibcpp::title("Intensity");
 
     matplotlibcpp::show();
@@ -101,7 +102,7 @@ void Plotter::plotLikeRAYUI(const std::vector<Ray>& RayList, const std::string& 
  * @param RayList Data (Rays)
  * @param plotName
  */
-void Plotter::plotforEach(const std::vector<Ray>& RayList, const std::string& plotName) {
+void Plotter::plotforEach(const std::vector<Ray>& RayList, const std::string& plotName, const std::vector<std::string>& OpticalElementNames) {
     // s is sorted and unique extraParam values extracted
     auto s = RayList;
 
@@ -121,7 +122,7 @@ void Plotter::plotforEach(const std::vector<Ray>& RayList, const std::string& pl
 
     double _size = 2.0;
     int i = 1;
-    float _percent = 0.0;
+    float _percent;
     matplotlibcpp::figure_size(cols * 500, (cols - 1) * 500);
 
     for (auto u : s) {
@@ -133,7 +134,7 @@ void Plotter::plotforEach(const std::vector<Ray>& RayList, const std::string& pl
         }
 
         if (Xpos.size() > 50) {
-            _size = 5.0;
+            _size = 1.0;
         }
 
         _percent = (float)Xpos.size() / (float)RayList.size() * 100;
@@ -154,8 +155,46 @@ void Plotter::plotforEach(const std::vector<Ray>& RayList, const std::string& pl
     matplotlibcpp::subplots_adjust({{"wspace", 0.35}, {"hspace", 0.35}});
 
     // matplotlibcpp::tight_layout();
-    matplotlibcpp::suptitle(plotName);
+    auto title = plotName;
+    title = title + "Multiplot \n \n";
+    int e = 1;
+    for (const auto& element : OpticalElementNames) {
+        title += " $\\it{" + std::to_string(e) + ": " + element + ((e % 3 != 0) ? " }$ ," : "}$\n");
+        e++;
+    }
+    matplotlibcpp::suptitle(title);
+
     matplotlibcpp::show();
+}
+/**
+ * @brief Plot and save custom benchmarked functions with -b arg
+ *
+ * @param BenchMap
+ */
+void Plotter::plotBenchmarks(const std::map<std::string, double>& BenchMap) {
+    std::vector<double> times;
+    std::vector<std::string> labels;
+    std::vector<int> ticks(BenchMap.size());
+    labels.reserve(BenchMap.size());
+    times.reserve(BenchMap.size());
+
+    std::iota(ticks.begin(), ticks.end(), 0);
+
+    for (const auto& i : BenchMap) {
+        labels.push_back(i.first);
+        times.push_back(i.second);
+    }
+
+    // matplotlibcpp::figure_size(1300, 1000);
+    RAYX_WARN << "plotBenchmarks not fully implemented";
+    return;
+    matplotlibcpp::bar(times);
+    matplotlibcpp::xticks(ticks, labels);
+    matplotlibcpp::xlabel("Function Names");
+    matplotlibcpp::ylabel("Time (ms)");
+    matplotlibcpp::title("Benchmark results");
+
+    matplotlibcpp::save("Benchres");
 }
 
 }  // namespace RAYX

@@ -37,8 +37,11 @@ class TerminalApp {
     /// if `path` is an RML file, it will trace this file.
     /// if `path` is a directory, it will call `tracePath(child)` for all
     /// children of that directory.
-    void tracePath(std::filesystem::path path);
+    void tracePath(const std::filesystem::path& path);
     void exportRays(const std::vector<RAYX::Ray>&, std::string);
+    std::vector<std::string> getBeamlineOpticalElementsNames();
+    std::vector<std::string> getBeamlineLightSourcesNames();
+
 #if defined(RAYX_DEBUG_MODE) && not defined(CPP)
     void exportDebug();
 #endif
