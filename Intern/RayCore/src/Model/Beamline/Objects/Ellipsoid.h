@@ -21,13 +21,13 @@ class RAYX_API Ellipsoid : public OpticalElement {
     double getEntranceArmLength() const;
     double getY0() const;  // center of ellipsoid
     double getZ0() const;  // -"-
-    double getIncidenceAngle() const;
+    Rad getIncidenceAngle() const;
     double getShortHalfAxisB() const;  // b
     double getLongHalfAxisA() const;   // a
     double getOffsetY0() const;        // always = 0?
     double getAlpha1() const;          // from tangent angle and grazing incidence???
     // derived params
-    double getTangentAngle() const;
+    Rad getTangentAngle() const;
     double getA34() const;
     double getA33() const;
     double getA44() const;
@@ -39,16 +39,16 @@ class RAYX_API Ellipsoid : public OpticalElement {
     // user parameters:
     // double m_radius;
     // grazing incidence, in rad
-    double m_incidence;
+    Rad m_incidence;
     double m_entranceArmLength;
     double m_exitArmLength;
     FigureRotation m_figureRotation;
     double m_a11;  // param for quadric funciton, given by user
 
     // derived params, needed on shader
-    double m_tangentAngle;  // == alpha1 (= x-rotational offset to the ellipsoid
-                            // coordianate system
-    double m_a34;           // paramters for quadric equation
+    Rad m_tangentAngle;  // == alpha1 (= x-rotational offset to the ellipsoid
+                         // coordianate system
+    double m_a34;        // paramters for quadric equation
     double m_a33;
     double m_a44;
     double m_a22;
@@ -63,7 +63,7 @@ class RAYX_API Ellipsoid : public OpticalElement {
     double m_longHalfAxisA;  // a
     double m_offsetY0;       // always = 0?
     double m_halfAxisC;      // derived from figure_rotation, a_11 and half axes a, b
-    double m_designGrazingAngle;
+    Rad m_designGrazingAngle;
 };
 
 }  // namespace RAYX

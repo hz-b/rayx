@@ -17,7 +17,7 @@ class RAYX_API Cylinder : public OpticalElement {
     void setRadius();
     CylinderDirection getDirection() const;
 
-    double getIncidenceAngle() const;
+    Rad getIncidenceAngle() const;
     double getExitArmLength() const;
     double getRadius() const;
     double getEntranceArmLength() const;
@@ -27,7 +27,7 @@ class RAYX_API Cylinder : public OpticalElement {
     CylinderDirection m_direction;  // Cylinder in z-/x- Direction
     double m_radius;                // Radius
 
-    double m_incidence;
+    Rad m_incidence;
     double m_entranceArmLength;
     double m_exitArmLength;
 

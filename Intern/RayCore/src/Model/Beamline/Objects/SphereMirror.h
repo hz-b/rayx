@@ -21,7 +21,7 @@ class RAYX_API SphereMirror : public OpticalElement {
     double m_entranceArmLength;
     double m_exitArmLength;
     // grazing incidence, in rad
-    double m_grazingIncidenceAngle;
+    Rad m_grazingIncidenceAngle;
 };
 
 }  // namespace RAYX

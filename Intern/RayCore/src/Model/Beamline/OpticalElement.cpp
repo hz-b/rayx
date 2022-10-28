@@ -133,7 +133,7 @@ glm::dmat4x4 OpticalElement::getObjectParameters() const {
                                      m_slopeError[5],
                                      m_slopeError[6],  // [2][0]
                                      m_Geometry->m_widthB,
-                                     m_Geometry->m_azimuthalAngle,
+                                     m_Geometry->m_azimuthalAngle.rad,
                                      0,
                                      0,  // [3][0]
                                      0,

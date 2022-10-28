@@ -23,14 +23,14 @@ double hvlam(double x) {
  *
  *  @param degree Input in degree, to calculate radians from
  */
-double degToRad(double degree) { return degree * PI / 180; }
+Rad Deg::toRad() { return {.rad = deg * PI / 180}; }
 
 /**
  *  Calculates degree from radians.
  *
  *  @param rad Input in radians, to calculate degree from
  */
-double radToDeg(double rad) { return rad * 180 / PI; }
+Deg Rad::toDeg() { return {.deg = rad * 180 / PI}; }
 
 glm::dmat4x4 getRotationMatrix(double dpsi, double dphi, double dchi) {
     RAYX_PROFILE_FUNCTION();

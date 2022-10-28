@@ -38,7 +38,7 @@ Cylinder::Cylinder(const DesignObject& dobj) : OpticalElement(dobj) {
  *
  */
 void Cylinder::setRadius() {
-    double theta = radToDeg(m_incidence) * glm::pi<double>() / 180.0;
+    double theta = m_incidence.toDeg().deg * glm::pi<double>() / 180.0;
     if (m_direction == CylinderDirection::LongRadiusR) {
         m_radius = 2.0 / sin(theta) / (1.0 / m_entranceArmLength + 1.0 / m_exitArmLength);
     } else {
@@ -54,7 +54,7 @@ void Cylinder::setRadius() {
 
 CylinderDirection Cylinder::getDirection() const { return m_direction; }
 double Cylinder::getRadius() const { return m_radius; }
-double Cylinder::getIncidenceAngle() const { return m_incidence; }
+Rad Cylinder::getIncidenceAngle() const { return m_incidence; }
 double Cylinder::getExitArmLength() const { return m_exitArmLength; }
 double Cylinder::getEntranceArmLength() const { return m_entranceArmLength; }
 }  // namespace RAYX

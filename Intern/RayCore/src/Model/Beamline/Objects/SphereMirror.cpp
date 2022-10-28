@@ -17,7 +17,7 @@ SphereMirror::SphereMirror(const DesignObject& dobj) : OpticalElement(dobj) {
 
 // TODO(Theresa): move this to user params and just give the radius as a
 // parameter to the sphere class?
-void SphereMirror::calcRadius() { m_radius = 2.0 / sin(m_grazingIncidenceAngle) / (1.0 / m_entranceArmLength + 1.0 / m_exitArmLength); }
+void SphereMirror::calcRadius() { m_radius = 2.0 / sin(m_grazingIncidenceAngle.rad) / (1.0 / m_entranceArmLength + 1.0 / m_exitArmLength); }
 
 double SphereMirror::getRadius() const { return m_radius; }
 

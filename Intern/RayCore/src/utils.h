@@ -15,8 +15,22 @@ const double PI = 3.14159265358979323;
 
 // useful functions
 double RAYX_API hvlam(double x);
-double RAYX_API degToRad(double degree);
-double RAYX_API radToDeg(double rad);
+
+struct Rad;
+
+// an angle in degrees.
+struct Deg {
+    double deg;
+
+    Rad toRad();
+};
+
+// an angle in radians
+struct Rad {
+    double rad;
+
+    Deg toDeg();
+};
 
 glm::dmat4x4 getRotationMatrix(double dpsi, double dphi, double dchi);
 

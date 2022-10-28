@@ -46,10 +46,10 @@ class RAYX_API ReflectionZonePlate : public OpticalElement {
     void calcDesignOrderOfDiffraction(const double designOrderOfDiffraction);
 
     // GETTER
-    double getIncidenceAngle() const;
-    double getDiffractionAngle() const;
-    double getDesignAlphaAngle() const;
-    double getDesignBetaAngle() const;
+    Rad getIncidenceAngle() const;
+    Rad getDiffractionAngle() const;
+    Rad getDesignAlphaAngle() const;
+    Rad getDesignBetaAngle() const;
 
     GratingMount getGratingMount() const;
 
@@ -100,9 +100,9 @@ class RAYX_API ReflectionZonePlate : public OpticalElement {
      *  are used to calculate line density. This is important for correctly
      *  simulating light of different wavelengths.
      */
-    double m_designAlphaAngle = 0;
+    Rad m_designAlphaAngle = {.rad = 0};
     /** @see m_designAlphaAngle */
-    double m_designBetaAngle = 0;
+    Rad m_designBetaAngle = {.rad = 0};
     double m_designOrderOfDiffraction = 0;
     /** Wavelength for which m_designBetaAngle
      *  is correct.
@@ -119,10 +119,10 @@ class RAYX_API ReflectionZonePlate : public OpticalElement {
     // needed for calculating incidence and exit angle, this calculation is
     // moved to somewhere else since the angles are only needed to get the world
     // coordinates of the element
-    double m_beta0Angle = 0;
-    double m_alpha0Angle = 0;
-    double m_betaAngle = 0;
-    double m_grazingIncidenceAngle = 0;
+    Rad m_beta0Angle = {.rad = 0};
+    Rad m_alpha0Angle = {.rad = 0};
+    Rad m_betaAngle = {.rad = 0};
+    Rad m_grazingIncidenceAngle = {.rad = 0};
     double m_R1ArmLength = 0;
     double m_R2ArmLength = 0;
     double m_lineDensity = 0;

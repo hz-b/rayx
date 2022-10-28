@@ -21,11 +21,11 @@ namespace RAYX {
  * meridional (1), thermal distortion: x (2),y (3),z (4), cylindrical bowing
  * amplitude y(5) and radius (6)
  */
-Cone::Cone(const char* name, GeometricalShape geometricalShape, const double width, const double height, const double azimuthalAngle,
-           glm::dvec4 position, glm::dmat4x4 orientation, const double grazingIncidence, const double entranceArmLength, const double exitArmLength,
+Cone::Cone(const char* name, GeometricalShape geometricalShape, const double width, const double height, Rad azimuthalAngle, glm::dvec4 position,
+           glm::dmat4x4 orientation, const double grazingIncidence, const double entranceArmLength, const double exitArmLength,
            const std::array<double, 7> slopeError)
     : OpticalElement(name, slopeError),
-      m_incidence(degToRad(grazingIncidence)),
+      m_incidence(Deg{.deg = grazingIncidence}.toRad()),
       m_entranceArmLength(entranceArmLength),
       m_exitArmLength(exitArmLength) {
     // set geometry
@@ -72,10 +72,10 @@ Cone::Cone(const char* name, GeometricalShape geometricalShape, const double wid
  * amplitude y(5) and radius (6)
  */
 Cone::Cone(const char* name, GeometricalShape geometricalShape, const double upstream_radius_r, const double downstream_radius_rho,
-           const double width, const double height, const double azimuthalAngle, glm::dvec4 position, glm::dmat4x4 orientation,
-           const double grazingIncidence, const double entranceArmLength, const double exitArmLength, const std::array<double, 7> slopeError)
+           const double width, const double height, Rad azimuthalAngle, glm::dvec4 position, glm::dmat4x4 orientation, const double grazingIncidence,
+           const double entranceArmLength, const double exitArmLength, const std::array<double, 7> slopeError)
     : OpticalElement(name, slopeError),
-      m_incidence(degToRad(grazingIncidence)),
+      m_incidence(Deg{.deg = grazingIncidence}.toRad()),
       m_entranceArmLength(entranceArmLength),
       m_exitArmLength(exitArmLength),
       m_downstreamRadius_rho(downstream_radius_rho),
@@ -132,7 +132,7 @@ void Cone::calcConePar(const double zl, const double ra, const double rb, const 
     *R = 2 * sthmax / (1 / rmax1 + 1 / rmax2);
     *RHO = 2 * sthmin / (1 / rmin1 + 1 / rmin2);
 }
-double Cone::getIncidenceAngle() const { return m_incidence; }
+Rad Cone::getIncidenceAngle() const { return m_incidence; }
 double Cone::getEntranceArmLength() const { return m_entranceArmLength; }
 double Cone::getExitArmLength() const { return m_exitArmLength; }
 double Cone::getR() const { return m_upstreamRadius_R; }
