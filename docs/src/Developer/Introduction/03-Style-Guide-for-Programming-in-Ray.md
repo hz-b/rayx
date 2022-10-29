@@ -1,4 +1,4 @@
-# Style Guide
+# Style Guide for Programming in RAY
 
 Here you can find a collection of rules for our code base, which developed over the projects lifetime. There are here to make it easier for others on the team, to read your code. Please read them carefully.
 
