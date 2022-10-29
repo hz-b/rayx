@@ -107,18 +107,8 @@ target_include_directories(${PROJECT_NAME}
     PUBLIC ${RayCore_SOURCE_DIR}/../../Extern/glm/glm/
     PUBLIC ${RayCore_SOURCE_DIR}/../../Extern/rapidxml-1.13/
     PUBLIC ${RayCore_SOURCE_DIR}/../../Extern/HighFive/include/
+    PUBLIC ${RayCore_SOURCE_DIR}/../../Extern/VMA/include/
 )
-
-# Vulkan Memory Allocator
-if(NOT EXISTS ${Vulkan_INCLUDE_DIRS}/vk_mem_alloc.h AND NOT EXISTS $ENV{VULKAN_SDK}/Include/vma/vk_mem_alloc.h)
-    if(DEFINED ENV{VULKAN_SDK})
-        set(outptutstr $ENV{VULKAN_SDK}/Include/vma/)
-    else()
-        set(outptutstr)
-    endif()
-
-    message(FATAL_ERROR "Vulkan Memory Allocator(VMA) is not found.\n Nothing found at: \n ${Vulkan_INCLUDE_DIRS} \n ${outptut}")
-endif()
 
 # If windows
 if(WIN32)
@@ -128,10 +118,6 @@ if(WIN32)
     endif()
 
     # add vma with env variable to include dirs
-    target_include_directories(${PROJECT_NAME}
-        SYSTEM PUBLIC $ENV{VULKAN_SDK}/Include/vma
-    )
-elseif(UNIX AND DEFINED ENV{VULKAN_SDK})
     target_include_directories(${PROJECT_NAME}
         SYSTEM PUBLIC $ENV{VULKAN_SDK}/Include/vma
     )

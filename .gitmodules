@@ -10,3 +10,6 @@
 [submodule "Extern/googletest"]
 	path = Extern/googletest
 	url = https://github.com/google/googletest
+[submodule "Extern/VMA"]
+	path = Extern/VMA
+	url = https://github.com/GPUOpen-LibrariesAndSDKs/VulkanMemoryAllocator
