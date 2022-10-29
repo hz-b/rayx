@@ -110,19 +110,6 @@ target_include_directories(${PROJECT_NAME}
     PUBLIC ${RayCore_SOURCE_DIR}/../../Extern/VMA/include/
 )
 
-# If windows
-if(WIN32)
-    # Check if vulkan sdk env var is set
-    if(NOT DEFINED ENV{VULKAN_SDK})
-        message(FATAL_ERROR "VULKAN_SDK environment variable is not set")
-    endif()
-
-    # add vma with env variable to include dirs
-    target_include_directories(${PROJECT_NAME}
-        SYSTEM PUBLIC $ENV{VULKAN_SDK}/Include/vma
-    )
-endif()
-
 # Compile Shaders
 # The following code is used to always compile the shader.
 # This is most likely not an optimal solution, but it will work
