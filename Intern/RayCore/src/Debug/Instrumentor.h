@@ -147,5 +147,7 @@ class RAYX_API InstrumentationTimer {
 #define RAYX_PROFILE_BEGIN_SESSION(name, filepath)
 #define RAYX_PROFILE_END_SESSION()
 #define RAYX_PROFILE_SCOPE(name)
+#define RAYX_PROFILE_SCOPE_STDOUT(name)
 #define RAYX_PROFILE_FUNCTION()
+#define RAYX_PROFILE_FUNCTION_STDOUT()
 #endif
