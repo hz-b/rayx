@@ -6,7 +6,6 @@
 #include <sstream>
 #include <utility>
 
-#include "Bench.h"
 #include "Debug.h"
 #include "Debug/Instrumentor.h"
 #include "Model/Beamline/Objects/Objects.h"
@@ -107,8 +106,7 @@ void handleObjectCollection(rapidxml::xml_node<>* collection, Beamline* beamline
 }
 
 Beamline importBeamline(const std::filesystem::path& filename) {
-    BENCH;
-    RAYX_PROFILE_FUNCTION();
+    RAYX_PROFILE_FUNCTION_STDOUT();
     // first implementation: stringstreams are slow; this might need
     // optimization
     RAYX_VERB << "importBeamline is called with file \"" << filename << "\"";

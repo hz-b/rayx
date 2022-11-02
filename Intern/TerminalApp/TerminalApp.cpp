@@ -4,7 +4,6 @@
 #include <memory>
 #include <stdexcept>
 
-#include "Bench.h"
 #include "CanonicalizePath.h"
 #include "Debug.h"
 #include "Tracer/CpuTracer.h"
@@ -96,7 +95,7 @@ void TerminalApp::run() {
 
     if (m_CommandParser->m_args.m_benchmark) {
         RAYX_VERB << "Starting in Benchmark Mode.\n";
-        BENCH_FLAG = true;
+        RAYX::BENCH_FLAG = true;
     }
     /////////////////// Argument treatement
     if (m_CommandParser->m_args.m_version) {
@@ -116,7 +115,7 @@ void TerminalApp::run() {
 }
 
 void TerminalApp::exportRays(const std::vector<RAYX::Ray>& rays, std::string path) {
-    BENCH;
+    RAYX_PROFILE_FUNCTION_STDOUT();
 #ifdef CI
     bool csv = true;
 #else

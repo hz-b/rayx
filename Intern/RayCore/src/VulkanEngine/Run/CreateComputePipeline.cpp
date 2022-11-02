@@ -1,5 +1,5 @@
-#include "Bench.h"
 #include "CanonicalizePath.h"
+#include "Debug/Instrumentor.h"
 #include "VulkanEngine/VulkanEngine.h"
 
 uint32_t* readFile(uint32_t& length, const char* filename);
@@ -7,8 +7,7 @@ uint32_t* readFile(uint32_t& length, const char* filename);
 namespace RAYX {
 /* We create a compute pipeline here. */
 void VulkanEngine::createComputePipeline() {
-    BENCH;
-    RAYX_PROFILE_FUNCTION();
+    RAYX_PROFILE_FUNCTION_STDOUT();
 
     /*
     Create a shader module. A shader module basically just encapsulates some

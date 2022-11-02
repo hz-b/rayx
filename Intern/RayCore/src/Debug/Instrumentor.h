@@ -92,12 +92,15 @@ class RAYX_API Instrumentor {
     }
 };
 
+extern bool RAYX_API BENCH_FLAG;
 class RAYX_API InstrumentationTimer {
   public:
-    InstrumentationTimer(const char* name) : m_Name(name), m_Stopped(false) { m_StartTimepoint = std::chrono::high_resolution_clock::now(); }
+    InstrumentationTimer(const char* name, bool canPrint) : m_Name(name), m_isStopped(false), m_canPrint(canPrint) {
+        m_StartTimepoint = std::chrono::high_resolution_clock::now();
+    }
 
     ~InstrumentationTimer() {
-        if (!m_Stopped) Stop();
+        if (!m_isStopped) Stop();
     }
 
     void Stop() {
@@ -109,13 +112,20 @@ class RAYX_API InstrumentationTimer {
         uint32_t threadID = std::hash<std::thread::id>{}(std::this_thread::get_id());
         Instrumentor::Get().WriteProfile({m_Name, start, end, threadID});
 
-        m_Stopped = true;
+        if (m_canPrint && BENCH_FLAG) {
+            long long duration = end - start;
+            double seconds = duration * 0.000001;
+            std::cout << "BENCH: " << m_Name << ": " << seconds << "s" << std::endl;
+        }
+
+        m_isStopped = true;
     }
 
   private:
     const char* m_Name;
     std::chrono::time_point<std::chrono::high_resolution_clock> m_StartTimepoint;
-    bool m_Stopped;
+    bool m_isStopped;
+    bool m_canPrint;
 };
 
 }  // namespace RAYX
@@ -124,11 +134,15 @@ class RAYX_API InstrumentationTimer {
 #ifdef RAYX_PROFILE
 #define RAYX_PROFILE_BEGIN_SESSION(name, filepath) ::RAYX::Instrumentor::Get().BeginSession(name, filepath)
 #define RAYX_PROFILE_END_SESSION() ::RAYX::Instrumentor::Get().EndSession()
-#define RAYX_PROFILE_SCOPE(name) ::RAYX::InstrumentationTimer timer##__LINE__(name)
+#define RAYX_PROFILE_SCOPE(name) ::RAYX::InstrumentationTimer timer##__LINE__(name, false)
+// Allows for printing of benchmarking results if BENCH_FLAG is set to true
+#define RAYX_PROFILE_SCOPE_STDOUT(name) ::RAYX::InstrumentationTimer timer##__LINE__(name, true)
 #if !defined(__PRETTY_FUNCTION__) && !defined(__GNUC__)
 #define __PRETTY_FUNCTION__ __FUNCSIG__
 #endif
 #define RAYX_PROFILE_FUNCTION() RAYX_PROFILE_SCOPE(__PRETTY_FUNCTION__)
+// Allows for printing of benchmarking results if BENCH_FLAG is set to true
+#define RAYX_PROFILE_FUNCTION_STDOUT() RAYX_PROFILE_SCOPE_STDOUT(__PRETTY_FUNCTION__)
 #else
 #define RAYX_PROFILE_BEGIN_SESSION(name, filepath)
 #define RAYX_PROFILE_END_SESSION()

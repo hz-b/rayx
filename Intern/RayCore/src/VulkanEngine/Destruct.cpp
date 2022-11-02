@@ -1,13 +1,12 @@
 #include <vk_mem_alloc.h>
 
-#include "Bench.h"
 #include "VulkanEngine/VulkanEngine.h"
 
 namespace RAYX {
 
 //	This function destroys the debug messenger
 void DestroyDebugUtilsMessengerEXT(VkInstance instance, VkDebugUtilsMessengerEXT debugMessenger, const VkAllocationCallbacks* pAllocator) {
-    RAYX_PROFILE_FUNCTION();
+    RAYX_PROFILE_FUNCTION_STDOUT();
     auto func = (PFN_vkDestroyDebugUtilsMessengerEXT)vkGetInstanceProcAddr(instance, "vkDestroyDebugUtilsMessengerEXT");
     if (func != nullptr) {
         func(instance, debugMessenger, pAllocator);
@@ -32,9 +31,7 @@ VulkanEngine::~VulkanEngine() {
     vkDestroyCommandPool(m_Device, m_CommandPool, nullptr);
 
     {
-        BENCH_NAMED("vkDestroyDevice");
-
-        RAYX_PROFILE_SCOPE("vkDestroyDevice");
+        RAYX_PROFILE_SCOPE_STDOUT("vkDestroyDevice");
         vkDestroyDevice(m_Device, nullptr);
     }
     if (enableValidationLayers) {
