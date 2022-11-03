@@ -3,91 +3,15 @@
 #include "Debug.h"
 
 namespace RAYX {
-/**
- * @brief Construct a new Cone:: Cone object (R and RHO are automatically
- * calculated)
- *
- * @param name
- * @param geometricalShape
- * @param width         width of the mirror (x-dimension)
- * @param height        height of the mirror (z-dimension)
- * @param azimuthalAngle
- * @param position      position of the element in world coordinates
- * @param orientation   orientation of the element in world coordinates
- * @param grazingIncidence desired incidence angle of the main ray
- * @param entranceArmLength length of entrance arm
- * @param exitArmLength length of exit arm
- * @param slopeError    7 slope error parameters: x-y sagittal (0), y-z
- * meridional (1), thermal distortion: x (2),y (3),z (4), cylindrical bowing
- * amplitude y(5) and radius (6)
- */
-Cone::Cone(const char* name, GeometricalShape geometricalShape, const double width, const double height, Rad azimuthalAngle, glm::dvec4 position,
-           glm::dmat4x4 orientation, const double grazingIncidence, const double entranceArmLength, const double exitArmLength,
-           const std::array<double, 7> slopeError)
-    : OpticalElement(name, slopeError),
-      m_incidence(Deg(grazingIncidence).toRad()),
-      m_entranceArmLength(entranceArmLength),
-      m_exitArmLength(exitArmLength) {
-    // set geometry
-    m_Geometry->m_geometricalShape = geometricalShape;
-    m_Geometry->setHeightWidth(height, width);
-    m_Geometry->m_azimuthalAngle = azimuthalAngle;
-    m_Geometry->m_position = position;
-    m_Geometry->m_orientation = orientation;
+Cone::Cone(const DesignObject& dobj) : OpticalElement(dobj) {
+    m_incidence = dobj.parseGrazingIncAngle();
+    m_entranceArmLength = dobj.parseEntranceArmLength();
+    m_exitArmLength = dobj.parseExitArmLength();
 
-    RAYX_VERB << name << " :Auto";
-    calcConePar(width, entranceArmLength, exitArmLength, grazingIncidence, &m_upstreamRadius_R, &m_downstreamRadius_rho);
+    double width = dobj.parseTotalWidth();
 
-    m_cm = pow((m_upstreamRadius_R - m_downstreamRadius_rho) / width, 2);
+    calcConePar(width, m_entranceArmLength, m_exitArmLength, m_incidence, &m_upstreamRadius_R, &m_downstreamRadius_rho);
 
-    double icurv = 0;
-    m_a11 = 1 - m_cm;
-    m_a22 = 1 - 2 * m_cm;
-    m_a23 = sqrt(m_cm - m_cm * m_cm);
-    if (m_a22 > 0) icurv = 1;
-    if (m_a23 != 0) {
-        m_a24 = -m_a23 * (m_upstreamRadius_R / sqrt(m_cm) - width / 2);
-    } else if (m_a23 == 0) {
-        m_a24 = -m_upstreamRadius_R;
-    }
-    setSurface(std::make_unique<Quadric>(glm::dmat4x4{m_a11, 0, 0, 0, icurv, m_a22, m_a23, m_a24, 0, 0, 0, 0, 0, 0, 0, 0}));
-}
-/**
- * @brief Construct a new Cone:: Cone object (R and RHO are also given)
- *
- * @param name
- * @param geometricalShape
- * @param upstream_radius_r R upstream Radius
- * @param downstream_radius_rho RHO downstream Radius
- * @param width             width of the mirror (x-dimension)
- * @param height            height of the mirror (z-dimension)
- * @param azimuthalAngle
- * @param position          position of the element in world coordinates
- * @param orientation       orientation of the element in world coordinates
- * @param grazingIncidence  desired incidence angle of the main ray
- * @param entranceArmLength length of entrance arm
- * @param exitArmLength     length of exit arm
- * @param slopeError        7 slope error parameters: x-y sagittal (0), y-z
- * meridional (1), thermal distortion: x (2),y (3),z (4), cylindrical bowing
- * amplitude y(5) and radius (6)
- */
-Cone::Cone(const char* name, GeometricalShape geometricalShape, const double upstream_radius_r, const double downstream_radius_rho,
-           const double width, const double height, Rad azimuthalAngle, glm::dvec4 position, glm::dmat4x4 orientation, const double grazingIncidence,
-           const double entranceArmLength, const double exitArmLength, const std::array<double, 7> slopeError)
-    : OpticalElement(name, slopeError),
-      m_incidence(Deg(grazingIncidence).toRad()),
-      m_entranceArmLength(entranceArmLength),
-      m_exitArmLength(exitArmLength),
-      m_downstreamRadius_rho(downstream_radius_rho),
-      m_upstreamRadius_R(upstream_radius_r) {
-    // set geometry
-    m_Geometry->m_geometricalShape = geometricalShape;
-    m_Geometry->setHeightWidth(height, width);
-    m_Geometry->m_azimuthalAngle = azimuthalAngle;
-    m_Geometry->m_position = position;
-    m_Geometry->m_orientation = orientation;
-
-    RAYX_VERB << name << " :Manual";
     m_cm = pow((m_upstreamRadius_R - m_downstreamRadius_rho) / width, 2);
 
     double icurv = 0;
@@ -117,10 +41,10 @@ Cone::~Cone() = default;
  * @param RHO DownstreamRadius
  * @remark Taken from RAY.FOR
  */
-void Cone::calcConePar(const double zl, const double ra, const double rb, const double th, double* R, double* RHO) {
+void Cone::calcConePar(double zl, double ra, double rb, Rad th, double* R, double* RHO) {
     double zl2 = pow(zl / 2, 2);
-    double sth = sin(th);
-    double cth = sin(th);
+    double sth = th.sin();
+    double cth = th.cos();  // TODO this was originally th.sin() aswell.
     double rmax1 = sqrt(zl2 + pow(ra, 2) - zl * ra * cth);
     double rmax2 = sqrt(zl2 + pow(rb, 2) + zl * rb * cth);
     double rmin1 = sqrt(zl2 + pow(ra, 2) + zl * ra * cth);
@@ -132,6 +56,7 @@ void Cone::calcConePar(const double zl, const double ra, const double rb, const 
     *R = 2 * sthmax / (1 / rmax1 + 1 / rmax2);
     *RHO = 2 * sthmin / (1 / rmin1 + 1 / rmin2);
 }
+
 Rad Cone::getIncidenceAngle() const { return m_incidence; }
 double Cone::getEntranceArmLength() const { return m_entranceArmLength; }
 double Cone::getExitArmLength() const { return m_exitArmLength; }
