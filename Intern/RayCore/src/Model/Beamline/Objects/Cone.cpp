@@ -8,11 +8,11 @@ Cone::Cone(const DesignObject& dobj) : OpticalElement(dobj) {
     m_entranceArmLength = dobj.parseEntranceArmLength();
     m_exitArmLength = dobj.parseExitArmLength();
 
-    double width = dobj.parseTotalWidth();
+    double zl = dobj.parseTotalLength();
 
-    calcConeParams(width);
+    calcConeParams(zl);
 
-    m_cm = pow((m_upstreamRadius_R - m_downstreamRadius_rho) / width, 2);
+    m_cm = pow((m_upstreamRadius_R - m_downstreamRadius_rho) / zl, 2);
 
     double icurv = 0;
     m_a11 = 1 - m_cm;
@@ -20,7 +20,7 @@ Cone::Cone(const DesignObject& dobj) : OpticalElement(dobj) {
     m_a23 = sqrt(m_cm - m_cm * m_cm);
     if (m_a22 > 0) icurv = 1;
     if (m_a23 != 0) {
-        m_a24 = -m_a23 * (m_upstreamRadius_R / sqrt(m_cm) - width / 2);
+        m_a24 = -m_a23 * (m_upstreamRadius_R / sqrt(m_cm) - zl / 2);
     } else if (m_a23 == 0) {
         m_a24 = -m_upstreamRadius_R;
     }
@@ -43,7 +43,7 @@ void Cone::calcConeParams(double zl) {
 
     double zl2 = pow(zl / 2, 2);
     double sth = th.sin();
-    double cth = th.cos();  // TODO this was originally th.sin() aswell.
+    double cth = th.cos();
     double rmax1 = sqrt(zl2 + pow(ra, 2) - zl * ra * cth);
     double rmax2 = sqrt(zl2 + pow(rb, 2) + zl * rb * cth);
     double rmin1 = sqrt(zl2 + pow(ra, 2) + zl * ra * cth);
