@@ -10,7 +10,7 @@ Cone::Cone(const DesignObject& dobj) : OpticalElement(dobj) {
 
     double width = dobj.parseTotalWidth();
 
-    calcConePar(width, m_entranceArmLength, m_exitArmLength, m_incidence, &m_upstreamRadius_R, &m_downstreamRadius_rho);
+    calcConeParams(width);
 
     m_cm = pow((m_upstreamRadius_R - m_downstreamRadius_rho) / width, 2);
 
@@ -34,14 +34,13 @@ Cone::~Cone() = default;
  * arm lengths and length of mirror
  *
  * @param zl Total length
- * @param ra EntranceArmLength
- * @param rb ExitArmLength
- * @param th GrazingIncidenceAngle
- * @param R UpstreamRadius
- * @param RHO DownstreamRadius
  * @remark Taken from RAY.FOR
  */
-void Cone::calcConePar(double zl, double ra, double rb, Rad th, double* R, double* RHO) {
+void Cone::calcConeParams(double zl) {
+    double ra = m_entranceArmLength;
+    double rb = m_exitArmLength;
+    Rad th = m_incidence;
+
     double zl2 = pow(zl / 2, 2);
     double sth = th.sin();
     double cth = th.cos();  // TODO this was originally th.sin() aswell.
@@ -53,8 +52,9 @@ void Cone::calcConePar(double zl, double ra, double rb, Rad th, double* R, doubl
     double thmin = asin(ra * sth / rmin1);
     double sthmax = sin(thmax);
     double sthmin = sin(thmin);
-    *R = 2 * sthmax / (1 / rmax1 + 1 / rmax2);
-    *RHO = 2 * sthmin / (1 / rmin1 + 1 / rmin2);
+
+    m_upstreamRadius_R = 2 * sthmax / (1 / rmax1 + 1 / rmax2);
+    m_downstreamRadius_rho = 2 * sthmin / (1 / rmin1 + 1 / rmin2);
 }
 
 Rad Cone::getIncidenceAngle() const { return m_incidence; }

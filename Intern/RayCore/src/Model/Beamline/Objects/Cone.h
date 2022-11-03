@@ -8,7 +8,7 @@ class RAYX_API Cone : public OpticalElement {
     Cone(const DesignObject&);
 
     ~Cone();
-    void calcConePar(double ZL, double ra, double rb, Rad th, double* R, double* RHO);
+    void calcConeParams(double zl);
     Rad getIncidenceAngle() const;
     double getEntranceArmLength() const;
     double getExitArmLength() const;
