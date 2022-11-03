@@ -23,9 +23,9 @@ struct Deg {
     Deg() = default;
     Deg(double d) : deg(d) {}
 
-    double deg;
+    Rad toRad() const;
 
-    Rad toRad();
+    double deg;
 };
 
 // an angle in radians
@@ -33,9 +33,12 @@ struct Rad {
     Rad() = default;
     Rad(double r) : rad(r) {}
 
-    double rad;
+    Deg toDeg() const;
+    double sin() const;
+    double cos() const;
+    double tan() const;
 
-    Deg toDeg();
+    double rad;
 };
 
 glm::dmat4x4 getRotationMatrix(double dpsi, double dphi, double dchi);

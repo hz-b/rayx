@@ -15,7 +15,7 @@ class RAYX_API Ellipsoid : public OpticalElement {
     Ellipsoid(const DesignObject&);
 
     void calcHalfAxes();
-    void calculateCenterFromHalfAxes(double angle);
+    void calculateCenterFromHalfAxes(Rad angle);
     double getRadius() const;
     double getExitArmLength() const;
     double getEntranceArmLength() const;
@@ -25,7 +25,6 @@ class RAYX_API Ellipsoid : public OpticalElement {
     double getShortHalfAxisB() const;  // b
     double getLongHalfAxisA() const;   // a
     double getOffsetY0() const;        // always = 0?
-    double getAlpha1() const;          // from tangent angle and grazing incidence???
     // derived params
     Rad getTangentAngle() const;
     double getA34() const;

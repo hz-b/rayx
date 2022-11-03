@@ -19,7 +19,7 @@ Ellipsoid::Ellipsoid(const DesignObject& dobj) : OpticalElement(dobj) {
     m_figureRotation = dobj.parseFigureRotation();
 
     // if design angle not given, take incidenceAngle
-    calculateCenterFromHalfAxes(m_designGrazingAngle.rad);
+    calculateCenterFromHalfAxes(m_designGrazingAngle);
 
     // calculate half axis C
     if (m_figureRotation == FigureRotation::Yes) {
@@ -38,12 +38,12 @@ Ellipsoid::Ellipsoid(const DesignObject& dobj) : OpticalElement(dobj) {
     // a33, 34, 44
     // a11 from rml file
 
-    m_a22 = pow(cos(m_tangentAngle.rad), 2) + pow(m_shortHalfAxisB * sin(m_tangentAngle.rad) / m_longHalfAxisA, 2);
-    m_a23 = (pow(m_shortHalfAxisB, 2) - pow(m_longHalfAxisA, 2)) * cos(m_tangentAngle.rad) * sin(m_tangentAngle.rad) / pow(m_longHalfAxisA, 2);
+    m_a22 = pow(m_tangentAngle.cos(), 2) + pow(m_shortHalfAxisB * m_tangentAngle.sin() / m_longHalfAxisA, 2);
+    m_a23 = (pow(m_shortHalfAxisB, 2) - pow(m_longHalfAxisA, 2)) * m_tangentAngle.cos() * m_tangentAngle.sin() / pow(m_longHalfAxisA, 2);
 
-    m_a24 = pow(m_shortHalfAxisB / m_longHalfAxisA, 2) * m_z0 * sin(m_tangentAngle.rad) + m_y0 * cos(m_tangentAngle.rad);
-    m_a33 = pow(sin(m_tangentAngle.rad), 2) + pow(m_shortHalfAxisB * cos(m_tangentAngle.rad) / m_longHalfAxisA, 2);
-    m_a34 = pow(m_shortHalfAxisB / m_longHalfAxisA, 2) * m_z0 * cos(m_tangentAngle.rad) - m_y0 * sin(m_tangentAngle.rad);
+    m_a24 = pow(m_shortHalfAxisB / m_longHalfAxisA, 2) * m_z0 * m_tangentAngle.sin() + m_y0 * m_tangentAngle.cos();
+    m_a33 = pow(m_tangentAngle.sin(), 2) + pow(m_shortHalfAxisB * m_tangentAngle.cos() / m_longHalfAxisA, 2);
+    m_a34 = pow(m_shortHalfAxisB / m_longHalfAxisA, 2) * m_z0 * m_tangentAngle.cos() - m_y0 * m_tangentAngle.sin();
     m_a44 = -pow(m_shortHalfAxisB, 2) + pow(m_y0, 2) + pow(m_z0 * m_shortHalfAxisB / m_longHalfAxisA, 2);
 
     RAYX_VERB << "alpha1: " << m_tangentAngle.rad << "; in Degree: " << m_tangentAngle.toDeg().deg;
@@ -66,12 +66,12 @@ Ellipsoid::Ellipsoid(const DesignObject& dobj) : OpticalElement(dobj) {
                                                       7, 0, matd, m_a44}));
 }
 
-void Ellipsoid::calculateCenterFromHalfAxes(double angle) {
+void Ellipsoid::calculateCenterFromHalfAxes(Rad angle) {
     // TODO: is mt = 0 a good default for the case that it'll never be set?
     double mt = 0;  // tangent slope
     if (m_longHalfAxisA > m_shortHalfAxisB) {
-        if (angle > 0) {
-            m_y0 = -pow(m_shortHalfAxisB, 2) * 1 / tan(angle) / sqrt(pow(m_longHalfAxisA, 2) - pow(m_shortHalfAxisB, 2));
+        if (angle.rad > 0) {
+            m_y0 = -pow(m_shortHalfAxisB, 2) * 1 / angle.tan() / sqrt(pow(m_longHalfAxisA, 2) - pow(m_shortHalfAxisB, 2));
         } else {
             m_y0 = -m_shortHalfAxisB;
         }
@@ -88,7 +88,7 @@ void Ellipsoid::calculateCenterFromHalfAxes(double angle) {
     if (m_longHalfAxisA > 0.0 && m_y0 < 0.0) {
         mt = pow(m_shortHalfAxisB / m_longHalfAxisA, 2) * m_z0 / m_y0;
     }
-    m_tangentAngle.rad = (atan(mt));
+    m_tangentAngle.rad = atan(mt);
     RAYX_VERB << "Z0 = " << m_z0 << ", Y0= " << m_y0 << ", tangentAngle= " << m_tangentAngle.rad;
 }
 
@@ -155,8 +155,8 @@ double Ellipsoid::getA44() const { return m_a44; }
 double Ellipsoid::getHalfAxisC() const { return m_halfAxisC; }
 
 glm::dmat4x4 Ellipsoid::getElementParameters() const {
-    return {sin(m_tangentAngle.rad),
-            cos(m_tangentAngle.rad),
+    return {m_tangentAngle.sin(),
+            m_tangentAngle.cos(),
             m_y0,
             m_z0,  //
             double(m_figureRotation),

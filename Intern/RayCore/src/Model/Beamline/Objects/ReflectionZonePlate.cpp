@@ -166,10 +166,10 @@ void ReflectionZonePlate::calcFresnelZOffset() {
         betaAngle = m_designBetaAngle.rad;
     }
     m_betaAngle = Rad(betaAngle);
-    double RIcosa = m_designSagittalEntranceArmLength * cos(m_designAlphaAngle.rad);
-    double ROcosb = m_designSagittalExitArmLength * cos(m_betaAngle.rad);
-    double RIsina = m_designSagittalEntranceArmLength * sin(m_designAlphaAngle.rad);
-    double ROsinb = m_designSagittalExitArmLength * sin(m_betaAngle.rad);
+    double RIcosa = m_designSagittalEntranceArmLength * m_designAlphaAngle.cos();
+    double ROcosb = m_designSagittalExitArmLength * m_betaAngle.cos();
+    double RIsina = m_designSagittalEntranceArmLength * m_designAlphaAngle.sin();
+    double ROsinb = m_designSagittalExitArmLength * m_betaAngle.sin();
     double tanTheta = (RIsina + ROsinb) / (RIcosa + ROcosb);
     m_calcFresnelZOffset = (RIsina / tanTheta) - RIcosa;
 }
@@ -195,16 +195,16 @@ void ReflectionZonePlate::calcBeta() {
  */
 void ReflectionZonePlate::VectorR1Center() {
     if (m_designType == DesignType::ZOffset) {
-        double param_R1cosZ = m_designSagittalEntranceArmLength * cos(m_designAlphaAngle.rad) * m_fresnelZOffset;
-        m_R1ArmLength = sqrt(pow(param_R1cosZ, 2) + pow(m_designSagittalEntranceArmLength * sin(m_designAlphaAngle.rad), 2));
+        double param_R1cosZ = m_designSagittalEntranceArmLength * m_designAlphaAngle.cos() * m_fresnelZOffset;
+        m_R1ArmLength = sqrt(pow(param_R1cosZ, 2) + pow(m_designSagittalEntranceArmLength * m_designAlphaAngle.sin(), 2));
         m_alpha0Angle.rad = acos(param_R1cosZ / m_R1ArmLength);
     } else if (m_designType == DesignType::Beta) {
-        double RIcosa = m_designSagittalEntranceArmLength * cos(m_designAlphaAngle.rad);
-        double ROcosb = m_designSagittalExitArmLength * cos(m_designBetaAngle.rad);
-        double RIsina = m_designSagittalEntranceArmLength * sin(m_designAlphaAngle.rad);
-        double ROsinb = m_designSagittalExitArmLength * sin(m_designBetaAngle.rad);
+        double RIcosa = m_designSagittalEntranceArmLength * m_designAlphaAngle.cos();
+        double ROcosb = m_designSagittalExitArmLength * m_designBetaAngle.cos();
+        double RIsina = m_designSagittalEntranceArmLength * m_designAlphaAngle.sin();
+        double ROsinb = m_designSagittalExitArmLength * m_designBetaAngle.sin();
         m_alpha0Angle.rad = (RIsina + ROsinb) / (RIcosa + ROcosb);
-        m_R1ArmLength = RIsina / sin(m_alpha0Angle.rad);
+        m_R1ArmLength = RIsina / m_alpha0Angle.sin();
     }
 }
 
@@ -220,12 +220,12 @@ void ReflectionZonePlate::VectorR2Center() {
                                sqrt(pow(2 * R2s, 2) - 2 * pow(m_fresnelZOffset, 2) + 2 * pow(m_fresnelZOffset, 2) * cos(2 * alpha)));
         m_beta0Angle = m_alpha0Angle;
     } else if (m_designType == DesignType::Beta) {
-        double RIcosa = m_designSagittalEntranceArmLength * cos(m_designAlphaAngle.rad);
-        double ROcosb = m_designSagittalExitArmLength * cos(m_designBetaAngle.rad);
-        double RIsina = m_designSagittalEntranceArmLength * sin(m_designAlphaAngle.rad);
-        double ROsinb = m_designSagittalExitArmLength * sin(m_designBetaAngle.rad);
+        double RIcosa = m_designSagittalEntranceArmLength * m_designAlphaAngle.cos();
+        double ROcosb = m_designSagittalExitArmLength * m_designBetaAngle.cos();
+        double RIsina = m_designSagittalEntranceArmLength * m_designAlphaAngle.sin();
+        double ROsinb = m_designSagittalExitArmLength * m_designBetaAngle.sin();
         m_beta0Angle = Rad((RIsina + ROsinb) / (RIcosa + ROcosb));
-        m_R2ArmLength = ROsinb / sin(m_beta0Angle.rad);
+        m_R2ArmLength = ROsinb / m_beta0Angle.sin();
     }
 }
 
@@ -257,10 +257,10 @@ void ReflectionZonePlate::calcDesignOrderOfDiffraction(const double designOrderO
  * @return line density on RZP in Z direction for given conditions
  */
 double ReflectionZonePlate::rzpLineDensityDZ(glm::dvec3 intersection, glm::dvec3 normal, const double WL) {
-    double s_beta = sin(m_designAlphaAngle.rad);
-    double c_beta = cos(m_designBetaAngle.rad);
-    double s_alpha = sin(m_designAlphaAngle.rad);
-    double c_alpha = cos(m_designBetaAngle.rad);
+    double s_beta = m_designAlphaAngle.sin();
+    double c_beta = m_designBetaAngle.cos();
+    double s_alpha = m_designAlphaAngle.sin();
+    double c_alpha = m_designBetaAngle.cos();
 
     double risag = m_designSagittalEntranceArmLength;
     double rosag = m_designSagittalExitArmLength;
