@@ -101,7 +101,7 @@ void Ellipsoid::calcHalfAxes() {
     Rad theta = m_incidence;  // designGrazingIncidenceAngle always equal to
                               // alpha (grazingIncidenceAngle)??
     if (theta.rad > PI / 2) {
-        theta = {.rad = PI / 2};
+        theta = Rad(PI / 2);
     }
     double a = 0.5 * (m_entranceArmLength + m_exitArmLength);
 

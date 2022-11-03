@@ -100,9 +100,9 @@ class RAYX_API ReflectionZonePlate : public OpticalElement {
      *  are used to calculate line density. This is important for correctly
      *  simulating light of different wavelengths.
      */
-    Rad m_designAlphaAngle = {.rad = 0};
+    Rad m_designAlphaAngle = Rad(0);
     /** @see m_designAlphaAngle */
-    Rad m_designBetaAngle = {.rad = 0};
+    Rad m_designBetaAngle = Rad(0);
     double m_designOrderOfDiffraction = 0;
     /** Wavelength for which m_designBetaAngle
      *  is correct.
@@ -119,10 +119,10 @@ class RAYX_API ReflectionZonePlate : public OpticalElement {
     // needed for calculating incidence and exit angle, this calculation is
     // moved to somewhere else since the angles are only needed to get the world
     // coordinates of the element
-    Rad m_beta0Angle = {.rad = 0};
-    Rad m_alpha0Angle = {.rad = 0};
-    Rad m_betaAngle = {.rad = 0};
-    Rad m_grazingIncidenceAngle = {.rad = 0};
+    Rad m_beta0Angle = Rad(0);
+    Rad m_alpha0Angle = Rad(0);
+    Rad m_betaAngle = Rad(0);
+    Rad m_grazingIncidenceAngle = Rad(0);
     double m_R1ArmLength = 0;
     double m_R2ArmLength = 0;
     double m_lineDensity = 0;

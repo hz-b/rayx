@@ -25,7 +25,7 @@ Cone::Cone(const char* name, GeometricalShape geometricalShape, const double wid
            glm::dmat4x4 orientation, const double grazingIncidence, const double entranceArmLength, const double exitArmLength,
            const std::array<double, 7> slopeError)
     : OpticalElement(name, slopeError),
-      m_incidence(Deg{.deg = grazingIncidence}.toRad()),
+      m_incidence(Deg(grazingIncidence).toRad()),
       m_entranceArmLength(entranceArmLength),
       m_exitArmLength(exitArmLength) {
     // set geometry
@@ -75,7 +75,7 @@ Cone::Cone(const char* name, GeometricalShape geometricalShape, const double ups
            const double width, const double height, Rad azimuthalAngle, glm::dvec4 position, glm::dmat4x4 orientation, const double grazingIncidence,
            const double entranceArmLength, const double exitArmLength, const std::array<double, 7> slopeError)
     : OpticalElement(name, slopeError),
-      m_incidence(Deg{.deg = grazingIncidence}.toRad()),
+      m_incidence(Deg(grazingIncidence).toRad()),
       m_entranceArmLength(entranceArmLength),
       m_exitArmLength(exitArmLength),
       m_downstreamRadius_rho(downstream_radius_rho),

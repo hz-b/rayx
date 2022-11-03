@@ -20,6 +20,9 @@ struct Rad;
 
 // an angle in degrees.
 struct Deg {
+    Deg() = default;
+    Deg(double d) : deg(d) {}
+
     double deg;
 
     Rad toRad();
@@ -27,6 +30,9 @@ struct Deg {
 
 // an angle in radians
 struct Rad {
+    Rad() = default;
+    Rad(double r) : rad(r) {}
+
     double rad;
 
     Deg toDeg();
@@ -46,4 +52,3 @@ std::array<double, 4> glmToArray4(glm::dvec4 v);
 glm::dvec4 RAYX_API arrayToGlm4(std::array<double, 4> v);
 
 std::vector<double>::iterator movingAppend(std::vector<double>&& srcVector, std::vector<double>& destVector);
-

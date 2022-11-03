@@ -165,7 +165,7 @@ void ReflectionZonePlate::calcFresnelZOffset() {
     if (m_designType == DesignType::Beta) {
         betaAngle = m_designBetaAngle.rad;
     }
-    m_betaAngle = Rad{.rad = betaAngle};
+    m_betaAngle = Rad(betaAngle);
     double RIcosa = m_designSagittalEntranceArmLength * cos(m_designAlphaAngle.rad);
     double ROcosb = m_designSagittalExitArmLength * cos(m_betaAngle.rad);
     double RIsina = m_designSagittalEntranceArmLength * sin(m_designAlphaAngle.rad);
@@ -224,7 +224,7 @@ void ReflectionZonePlate::VectorR2Center() {
         double ROcosb = m_designSagittalExitArmLength * cos(m_designBetaAngle.rad);
         double RIsina = m_designSagittalEntranceArmLength * sin(m_designAlphaAngle.rad);
         double ROsinb = m_designSagittalExitArmLength * sin(m_designBetaAngle.rad);
-        m_beta0Angle = Rad{.rad = (RIsina + ROsinb) / (RIcosa + ROcosb)};
+        m_beta0Angle = Rad((RIsina + ROsinb) / (RIcosa + ROcosb));
         m_R2ArmLength = ROsinb / sin(m_beta0Angle.rad);
     }
 }
