@@ -51,6 +51,7 @@ void TerminalApp::tracePath(const std::filesystem::path& path) {
             tracePath(p.path());
         }
     } else if (path.extension() == ".rml") {
+        std::cout << "Tracing File: " << path << std::endl;
         // Load RML file
         m_Beamline = std::make_unique<RAYX::Beamline>(RAYX::importBeamline(path));
 
