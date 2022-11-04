@@ -35,10 +35,9 @@ bool DatFile::load(const std::filesystem::path& filename, DatFile* out) {
 
         DatEntry e{};
 #if defined(WIN32)
-
         if (sscanf_s(line.c_str(), "%le %le", &e.m_energy, &e.m_weight) != 2) {
 #else
-        if (scanf(line.c_str(), "%le %le", &e.m_energy, &e.m_weight) != 2) {
+        if (sscanf(line.c_str(), "%le %le", &e.m_energy, &e.m_weight) != 2) {
 #endif
             RAYX_ERR << "Failed to parse DatFile \"" << filename << "\", at line " << lineidx << ": \"" << line << "\"";
             return false;

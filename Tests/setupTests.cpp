@@ -6,7 +6,11 @@ std::unique_ptr<RAYX::Tracer> tracer;
 
 double parseDouble(std::string s) {
     double d;
+#if defined(WIN32)
     if (sscanf_s(s.c_str(), "%le", &d) != 1) {
+#else
+    if (sscanf(s.c_str(), "%le", &d) != 1) {
+#endif
         RAYX_WARN << "parseDouble failed for string:";
         RAYX_ERR << s;
         return false;
