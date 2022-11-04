@@ -1,7 +1,8 @@
 #pragma once
 
+#include <math.h>
+
 #include <array>
-#include <cmath>
 #include <glm.hpp>
 #include <vector>
 
