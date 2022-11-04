@@ -1,15 +1,16 @@
 #include "Importer.h"
 
-#include <Data/xml.h>
-
 #include <cstring>
+#include <memory>
+#include <rapidxml.hpp>
 #include <sstream>
 #include <utility>
 
+#include "Data/xml.h"
 #include "Debug.h"
 #include "Debug/Instrumentor.h"
+#include "Model/Beamline/Beamline.h"
 #include "Model/Beamline/Objects/Objects.h"
-#include "rapidxml.hpp"
 
 namespace RAYX {
 

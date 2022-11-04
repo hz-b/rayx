@@ -1,5 +1,7 @@
 #include "Beamline.h"
 
+#include <array>
+
 #include "Debug/Instrumentor.h"
 #include "Model/Beamline/Objects/Objects.h"
 

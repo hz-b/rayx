@@ -1,7 +1,5 @@
 #pragma once
 
-#include <Data/xml.h>
-
 #include "Model/Beamline/LightSource.h"
 
 namespace RAYX {

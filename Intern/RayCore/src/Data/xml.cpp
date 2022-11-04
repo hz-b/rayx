@@ -1,13 +1,14 @@
 #include "xml.h"
 
-#include <Debug.h>
-#include <Model/Beamline/LightSource.h>
-
 #include <cstdio>
 #include <cstring>
 #include <filesystem>
 #include <iostream>
 #include <utility>
+
+#include "Debug.h"
+#include "Model/Beamline/EnergyDistribution.h"
+#include "Model/Beamline/LightSource.h"
 
 namespace RAYX::xml {
 

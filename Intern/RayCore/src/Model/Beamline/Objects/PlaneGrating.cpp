@@ -1,6 +1,7 @@
 #include "PlaneGrating.h"
 
 #include "Debug.h"
+#include "Model/Surface/Quadric.h"
 
 namespace RAYX {
 

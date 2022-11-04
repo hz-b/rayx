@@ -7,10 +7,10 @@
 #include <vector>
 
 #include "Material/Material.h"
-#include "Model/Beamline/EnergyDistribution.h"
 #include "utils.h"
 
 namespace RAYX {
+class EnergyDistribution;
 // forward declarations:
 enum class CentralBeamstop;
 enum class CurvatureType;

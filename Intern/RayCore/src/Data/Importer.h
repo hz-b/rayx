@@ -1,10 +1,8 @@
 #pragma once
 
 #include <filesystem>
-#include <memory>
 
 #include "Core.h"
-#include "Data/xml.h"
 #include "Model/Beamline/Beamline.h"
 namespace RAYX {
 

@@ -1,9 +1,6 @@
 #include "PointSource.h"
 
-#include <Data/xml.h>
-
-#include <utility>
-
+#include "Data/xml.h"
 #include "Debug.h"
 
 namespace RAYX {

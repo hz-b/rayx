@@ -1,7 +1,4 @@
 #pragma once
-#include <Data/xml.h>
-
-#include <filesystem>
 
 #include "Model/Beamline/LightSource.h"
 

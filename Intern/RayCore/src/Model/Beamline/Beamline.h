@@ -2,13 +2,11 @@
 
 #include <Material/Material.h>
 
-#include <array>
 #include <memory>
 #include <vector>
 
 #include "Core.h"
 #include "Tracer/Ray.h"
-#include "glm.hpp"
 
 namespace RAYX {
 class OpticalElement;

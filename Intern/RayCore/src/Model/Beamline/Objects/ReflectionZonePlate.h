@@ -2,11 +2,7 @@
 
 #include <optional>
 
-#include "Data/xml.h"
-#include "Material/Material.h"
 #include "Model/Beamline/OpticalElement.h"
-#include "Model/Surface/Quadric.h"
-#include "Model/Surface/Toroid.h"
 
 namespace RAYX {
 

@@ -1,8 +1,6 @@
 #include "ImagePlane.h"
 
-#include <Data/xml.h>
-
-#include "Debug.h"
+#include "Model/Surface/Quadric.h"
 
 namespace RAYX {
 

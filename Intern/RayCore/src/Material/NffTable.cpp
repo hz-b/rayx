@@ -1,13 +1,12 @@
 
 #include "NffTable.h"
 
-#include <Debug.h>
-
 #include <algorithm>
 #include <fstream>
 #include <iostream>
 
 #include "CanonicalizePath.h"
+#include "Debug.h"
 
 bool NffTable::load(const char* element, NffTable* out) {
     std::string elementString = element;

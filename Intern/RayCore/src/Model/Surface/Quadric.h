@@ -1,8 +1,9 @@
 #pragma once
 
+#include <glm.hpp>
+
 #include "Core.h"
 #include "Surface.h"
-#include "utils.h"
 // Unused Macro
 #define RAYCORE_QUADRIC_DOUBLE_AMOUNT 48;
 

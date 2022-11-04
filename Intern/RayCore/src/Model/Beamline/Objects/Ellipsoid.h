@@ -1,10 +1,5 @@
 #pragma once
-#include <Data/xml.h>
-#include <Material/Material.h>
-#include <string.h>
-
 #include "Model/Beamline/OpticalElement.h"
-#include "Model/Surface/Quadric.h"
 
 namespace RAYX {
 enum class FigureRotation { Yes, Plane, A11 };

@@ -1,8 +1,7 @@
 #include "PlaneMirror.h"
 
-#include <Data/xml.h>
-
-#include "Debug.h"
+#include "Data/xml.h"
+#include "Model/Surface/Quadric.h"
 
 namespace RAYX {
 

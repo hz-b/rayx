@@ -1,7 +1,6 @@
 #include "LightSource.h"
 
 #include <cmath>
-#include <utility>
 
 namespace RAYX {
 LightSource::LightSource(const DesignObject& dobj) {

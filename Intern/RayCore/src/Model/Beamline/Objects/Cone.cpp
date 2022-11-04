@@ -1,6 +1,7 @@
 #include "Cone.h"
 
 #include "Debug.h"
+#include "Model/Surface/Quadric.h"
 
 namespace RAYX {
 Cone::Cone(const DesignObject& dobj) : OpticalElement(dobj) {

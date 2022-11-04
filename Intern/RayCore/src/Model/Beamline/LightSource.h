@@ -1,29 +1,20 @@
 #pragma once
 #include <array>
-#include <cmath>
-#include <iostream>
+#include <glm.hpp>
 #include <random>
-#include <stdexcept>
 #include <string>
-#include <variant>
 #include <vector>
 
 #include "Core.h"
 #include "Data/xml.h"
 #include "EnergyDistribution.h"
 #include "Tracer/Ray.h"
-#include "glm.hpp"
 
 namespace RAYX {
-enum class SpreadType {  // default WhiteBand
-    WhiteBand,
-    ThreeEnergies
-};
+enum class SpreadType { WhiteBand, ThreeEnergies };                // default WhiteBand
 enum class EnergyDistributionType { File, Values, Total, Param };  // default ET_VALUES
 enum class SourceDistType { Simultaneous, HardEdge, Gauss };       // default simultaneously
-
-// TODO(rudi): unify!
-enum class SourceDist { Uniform, Gaussian };
+enum class SourceDist { Uniform, Gaussian };                       // TODO(rudi): unify!
 
 class RAYX_API LightSource {
   public:

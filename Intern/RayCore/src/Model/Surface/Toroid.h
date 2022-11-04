@@ -1,5 +1,7 @@
 #pragma once
 
+#include <glm.hpp>
+
 #include "Core.h"
 #include "Material/Material.h"
 #include "Surface.h"

@@ -1,6 +1,9 @@
 #include "ToroidMirror.h"
 
+#include "Data/xml.h"
 #include "Debug.h"
+#include "Material/Material.h"
+#include "Model/Surface/Toroid.h"
 
 namespace RAYX {
 ToroidMirror::ToroidMirror(const DesignObject& dobj) : OpticalElement(dobj) {

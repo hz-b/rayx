@@ -2,10 +2,11 @@
 
 // Precompiled headers:
 
-#include <array>
-#include <glm.hpp>
-#include <iostream>
-#include <vector>
+//#include <array>
+//#include <glm.hpp>
+//#include <iostream>
+//#include <string>
+//#include <vector>
 
 #ifdef _MSC_VER
 // not #if defined(_WIN32) || defined(_WIN64) because we have strncasecmp in
@@ -14,5 +15,5 @@
 #define strcasecmp _stricmp
 #endif
 
-#include "Core.h"
-#include "Data/xml.h"
+// #include "Core.h"
+// #include "Data/xml.h"

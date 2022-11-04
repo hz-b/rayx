@@ -1,12 +1,11 @@
 #include "PalikTable.h"
 
-#include <Debug.h>
-
 #include <algorithm>
 #include <fstream>
 #include <iostream>
 
 #include "CanonicalizePath.h"
+#include "Debug.h"
 
 bool PalikTable::load(const char* element, PalikTable* out) {
     std::string elementString = element;

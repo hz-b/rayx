@@ -1,6 +1,5 @@
 #include "EnergyDistribution.h"
 
-#include <ctime>
 namespace RAYX {
 std::mt19937 EnergyDistribution::s_rng((uint32_t)time(nullptr));
 

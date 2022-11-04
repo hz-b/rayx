@@ -2,14 +2,9 @@
 
 #include <array>
 #include <glm.hpp>
-#include <iostream>
-#include <memory>
-#include <stdexcept>
-#include <vector>
 
 #include "Core.h"
 #include "Data/xml.h"
-#include "Debug.h"
 #include "Model/Surface/Surface.h"
 #include "utils.h"
 
