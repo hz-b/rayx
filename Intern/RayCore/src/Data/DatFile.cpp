@@ -16,7 +16,7 @@ bool DatFile::load(const std::filesystem::path& filename, DatFile* out) {
 
     // line 2
     std::getline(s, line);
-    if (sscanf(line.c_str(), "%u %le %le %le", &out->m_linecount, &out->m_start, &out->m_end, &out->m_step) != 4) {
+    if (sscanf_s(line.c_str(), "%u %le %le %le", &out->m_linecount, &out->m_start, &out->m_end, &out->m_step) != 4) {
         RAYX_ERR << "Failed to parse DatFile \"" << filename << "\", at line 2: \"" << line << "\"";
         return false;
     }
@@ -31,7 +31,7 @@ bool DatFile::load(const std::filesystem::path& filename, DatFile* out) {
 
         DatEntry e{};
 
-        if (sscanf(line.c_str(), "%le %le", &e.m_energy, &e.m_weight) != 2) {
+        if (sscanf_s(line.c_str(), "%le %le", &e.m_energy, &e.m_weight) != 2) {
             RAYX_ERR << "Failed to parse DatFile \"" << filename << "\", at line " << lineidx << ": \"" << line << "\"";
             return false;
         }
