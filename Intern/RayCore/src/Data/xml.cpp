@@ -327,7 +327,7 @@ bool paramPositionAndOrientation(const rapidxml::xml_node<>* node, const std::ve
     *out_ori = *out_ori * glm::transpose(misOrientation);
     out_pos->w = 1;
 
-    for (unsigned i = group_context.size(); i-- > 0;) {
+    for (auto i = group_context.size(); i-- > 0;) {
         *out_ori = group_context[i].m_orientation * *out_ori;
         *out_pos = group_context[i].m_orientation * *out_pos;
         *out_pos += group_context[i].m_position;  // this gives us w=2!

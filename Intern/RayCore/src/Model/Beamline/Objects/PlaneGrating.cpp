@@ -5,7 +5,7 @@
 namespace RAYX {
 
 PlaneGrating::PlaneGrating(const DesignObject& dobj) : OpticalElement(dobj) {
-    m_additionalOrder = dobj.parseAdditionalOrder();
+    m_additionalOrder = (int)dobj.parseAdditionalOrder();
     m_designEnergyMounting = dobj.parseDesignEnergyMounting();
     m_lineDensity = dobj.parseLineDensity();
     m_orderOfDiffraction = dobj.parseOrderDiffraction();

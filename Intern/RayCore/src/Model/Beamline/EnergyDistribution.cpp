@@ -2,7 +2,7 @@
 
 #include <ctime>
 namespace RAYX {
-std::mt19937 EnergyDistribution::s_rng(time(nullptr));
+std::mt19937 EnergyDistribution::s_rng((uint32_t)time(nullptr));
 
 EnergyDistribution::EnergyDistribution(DatFile df, bool continuous) : m_isContinuous(continuous), m_Variant(df) {}
 

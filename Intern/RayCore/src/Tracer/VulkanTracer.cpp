@@ -38,8 +38,8 @@ std::vector<Ray> VulkanTracer::trace(const Beamline& beamline) {
     auto rayList = beamline.getInputRays();
 
     uint32_t numberOfBeamlines = 1;
-    uint32_t numberOfQuadricsPerBeamline = beamline.m_OpticalElements.size();
-    uint32_t numberOfRays = rayList.size();
+    uint32_t numberOfQuadricsPerBeamline = (uint32_t)beamline.m_OpticalElements.size();
+    uint32_t numberOfRays = (uint32_t)rayList.size();
     uint32_t numberOfRaysPerBeamline = numberOfRays;
     std::vector<double> beamlineData = {(double)numberOfBeamlines, (double)numberOfQuadricsPerBeamline, (double)numberOfRays,
                                         (double)numberOfRaysPerBeamline};

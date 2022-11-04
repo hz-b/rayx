@@ -114,7 +114,7 @@ void Plotter::plotforEach(const std::vector<Ray>& RayList, const std::string& pl
     auto uniqueCount = s.size();
 
     // Subplot in cols x cols
-    int cols = std::ceil(std::sqrt(uniqueCount));
+    int cols = (int)std::ceil(std::sqrt(uniqueCount));
 
     std::vector<double> Xpos, Ypos;
     Xpos.reserve(RayList.size());
@@ -188,13 +188,12 @@ void Plotter::plotBenchmarks(const std::map<std::string, double>& BenchMap) {
     // matplotlibcpp::figure_size(1300, 1000);
     RAYX_WARN << "plotBenchmarks not fully implemented";
     return;
-    matplotlibcpp::bar(times);
-    matplotlibcpp::xticks(ticks, labels);
-    matplotlibcpp::xlabel("Function Names");
-    matplotlibcpp::ylabel("Time (ms)");
-    matplotlibcpp::title("Benchmark results");
-
-    matplotlibcpp::save("Benchres");
+    // matplotlibcpp::bar(times);
+    // matplotlibcpp::xticks(ticks, labels);
+    // matplotlibcpp::xlabel("Function Names");
+    // matplotlibcpp::ylabel("Time (ms)");
+    // matplotlibcpp::title("Benchmark results");
+    // matplotlibcpp::save("Benchres");
 }
 
 }  // namespace RAYX

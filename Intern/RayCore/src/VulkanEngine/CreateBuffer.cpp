@@ -98,7 +98,7 @@ uint32_t findMemoryType(VkPhysicalDevice& physicalDevice, uint32_t memoryTypeBit
     for (uint32_t i = 0; i < memoryProperties.memoryTypeCount; ++i) {
         if ((memoryTypeBits & (1 << i)) && ((memoryProperties.memoryTypes[i].propertyFlags & properties) == properties)) return i;
     }
-    return -1;
+    return (uint32_t)-1;
 }
 
 }  // namespace RAYX
