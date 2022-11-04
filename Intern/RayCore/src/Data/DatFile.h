@@ -5,6 +5,8 @@
 #include <string>
 #include <vector>
 
+#include "Core.h"
+
 namespace RAYX {
 /** This struct represents one line of a .DAT file.  */
 struct DatEntry {

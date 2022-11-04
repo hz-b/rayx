@@ -1,5 +1,8 @@
 #pragma once
 
+#include <string>
+#include <vector>
+
 #include "Core.h"
 #include "Tracer/Ray.h"
 

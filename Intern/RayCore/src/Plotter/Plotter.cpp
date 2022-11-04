@@ -1,7 +1,11 @@
 #include "Plotter/Plotter.h"
 
+#include <matplotlibcpp.h>
+
 #include <algorithm>
 #include <chrono>
+
+#include "Debug.h"
 
 namespace RAYX {
 bool comp(Ray const& lhs, Ray const& rhs) { return lhs.m_extraParam < rhs.m_extraParam; }

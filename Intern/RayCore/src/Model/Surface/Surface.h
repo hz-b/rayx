@@ -1,6 +1,7 @@
 #pragma once
 
 #include <array>
+#include <glm.hpp>
 #include <vector>
 
 #include "Core.h"

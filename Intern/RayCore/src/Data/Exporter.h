@@ -1,6 +1,6 @@
 #pragma once
 #include "Core.h"
-
+#include "Data/xml.h"
 namespace RAYX {
 
 class RAYX_API Exporter {

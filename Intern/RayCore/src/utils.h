@@ -9,6 +9,8 @@
 #include <stdexcept>
 #include <vector>
 
+#include "Core.h"
+
 // useful constants
 const double inm2eV = 1.239852e3;
 const double PI = 3.14159265358979323;

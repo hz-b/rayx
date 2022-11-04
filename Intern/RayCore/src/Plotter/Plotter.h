@@ -1,12 +1,12 @@
 #pragma once
 
-#include <matplotlibcpp.h>
-
+#include <map>
 #include <string>
 #include <vector>
 
 #include "Core.h"
-#include "RayCore.h"
+#include "Tracer/Ray.h"
+
 namespace RAYX {
 class RAYX_API Plotter {
   public:
