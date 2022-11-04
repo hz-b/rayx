@@ -10,13 +10,6 @@
 #include "RayCore.h"
 #include "TerminalAppConfig.h"
 
-// Virtual python Environment Path
-#ifdef WIN32  // Todo
-#define VENV_PATH ".\\rayxvenv\\bin\\python3"
-#else
-#define VENV_PATH "./rayxvenv/bin/python3"
-#endif
-
 class TerminalApp {
   public:
     TerminalApp(int argc, char** argv);

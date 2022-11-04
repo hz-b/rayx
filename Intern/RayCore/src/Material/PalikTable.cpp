@@ -33,8 +33,11 @@ bool PalikTable::load(const char* element, PalikTable* out) {
         }
 
         PalikEntry e{};
-
+#if defined(WIN32)
         if (sscanf_s(line.c_str(), "%le %le %le", &e.m_energy, &e.m_n, &e.m_k) != 3) {
+#else
+        if (sscanf(line.c_str(), "%le %le %le", &e.m_energy, &e.m_n, &e.m_k) != 3) {
+#endif
             RAYX_ERR << "Failed to parse PalikTable \"" << element << "\", at line " << lineidx << ": \"" << line << "\"";
             return false;
         }
