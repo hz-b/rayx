@@ -1,12 +1,7 @@
 #pragma once
 
-#include <math.h>
-
-#include <chrono>
+#include <cmath>
 #include <glm.hpp>
-#include <iostream>
-#include <memory>
-#include <stdexcept>
 #include <vector>
 
 #include "Core.h"

@@ -9,6 +9,7 @@
 #include "Debug.h"
 #include "Model/Beamline/EnergyDistribution.h"
 #include "Model/Beamline/LightSource.h"
+#include "utils.h"
 
 namespace RAYX::xml {
 
