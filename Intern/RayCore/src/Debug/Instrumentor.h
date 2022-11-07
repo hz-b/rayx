@@ -143,7 +143,7 @@ class RAYX_API InstrumentationTimer {
 #endif
 #define RAYX_PROFILE_FUNCTION() RAYX_PROFILE_SCOPE(__PRETTY_FUNCTION__)
 // Allows for printing of benchmarking results if BENCH_FLAG is set to true
-#define RAYX_PROFILE_FUNCTION_STDOUT() RAYX_PROFILE_SCOPE_STDOUT(__PRETTY_FUNCTION__)
+#define RAYX_PROFILE_FUNCTION_STDOUT() RAYX_PROFILE_SCOPE_STDOUT(__func__)
 #else
 #define RAYX_PROFILE_BEGIN_SESSION(name, filepath)
 #define RAYX_PROFILE_END_SESSION()
