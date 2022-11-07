@@ -4,11 +4,11 @@ project(RayCore)
 
 SET(SOURCE
     src/CanonicalizePath.cpp
-    src/Debug.cpp
     src/utils.cpp
     src/Data/Importer.cpp
     src/Data/xml.cpp
     src/Data/DatFile.cpp
+    src/Debug/Debug.cpp
     src/Debug/Instrumentor.cpp
     src/Model/Beamline/Beamline.cpp
     src/Model/Beamline/OpticalElement.cpp

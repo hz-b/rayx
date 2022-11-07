@@ -3,7 +3,7 @@
 #include <random>
 
 #include "Data/xml.h"
-#include "Debug.h"
+#include "Debug/Debug.h"
 #include "Debug/Instrumentor.h"
 
 namespace RAYX {

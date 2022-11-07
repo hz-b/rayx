@@ -3,7 +3,7 @@
 #include <fstream>
 #include <iostream>
 
-#include "Debug.h"
+#include "Debug/Debug.h"
 
 namespace RAYX {
 bool DatFile::load(const std::filesystem::path& filename, DatFile* out) {

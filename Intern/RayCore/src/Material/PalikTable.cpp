@@ -5,7 +5,7 @@
 #include <iostream>
 
 #include "CanonicalizePath.h"
-#include "Debug.h"
+#include "Debug/Debug.h"
 
 bool PalikTable::load(const char* element, PalikTable* out) {
     std::string elementString = element;

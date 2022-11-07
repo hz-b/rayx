@@ -3,7 +3,7 @@
 #include <glm.hpp>
 #include <optional>
 
-#include "Debug.h"
+#include "Debug/Debug.h"
 
 namespace RAYX {
 

@@ -1,7 +1,7 @@
 #include "ToroidMirror.h"
 
 #include "Data/xml.h"
-#include "Debug.h"
+#include "Debug/Debug.h"
 #include "Material/Material.h"
 #include "Model/Surface/Toroid.h"
 

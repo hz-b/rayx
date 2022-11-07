@@ -8,7 +8,7 @@
 #include "CanonicalizePath.h"
 #include "Core.h"
 #include "Data/Importer.h"
-#include "Debug.h"
+#include "Debug/Debug.h"
 #include "Material/Material.h"
 #include "Model/Beamline/Objects/Objects.h"
 #include "Tracer/CpuTracer.h"

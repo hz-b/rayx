@@ -5,7 +5,7 @@
 #include <algorithm>
 #include <chrono>
 
-#include "Debug.h"
+#include "Debug/Debug.h"
 
 namespace RAYX {
 bool comp(Ray const& lhs, Ray const& rhs) { return lhs.m_extraParam < rhs.m_extraParam; }

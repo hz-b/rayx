@@ -4,7 +4,7 @@
 #include <chrono>
 #include <cmath>
 
-#include "Debug.h"
+#include "Debug/Debug.h"
 #include "Debug/Instrumentor.h"
 #include "Material/Material.h"
 #include "Model/Beamline/OpticalElement.h"

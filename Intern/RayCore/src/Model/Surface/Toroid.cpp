@@ -1,6 +1,6 @@
 #include "Toroid.h"
 
-#include "Debug.h"
+#include "Debug/Debug.h"
 
 namespace RAYX {
 /**

@@ -5,7 +5,7 @@
 #include <stdexcept>
 
 #include "CanonicalizePath.h"
-#include "Debug.h"
+#include "Debug/Debug.h"
 #include "Tracer/CpuTracer.h"
 #include "Tracer/VulkanTracer.h"
 #include "Writer/Writer.h"

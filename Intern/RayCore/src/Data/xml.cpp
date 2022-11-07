@@ -6,7 +6,7 @@
 #include <iostream>
 #include <utility>
 
-#include "Debug.h"
+#include "Debug/Debug.h"
 #include "Model/Beamline/EnergyDistribution.h"
 #include "Model/Beamline/LightSource.h"
 #include "utils.h"

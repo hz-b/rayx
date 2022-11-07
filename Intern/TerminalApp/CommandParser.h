@@ -2,7 +2,7 @@
 
 #include <CLI/CLI.hpp>
 
-#include "Debug.h"
+#include "Debug/Debug.h"
 #include "TerminalAppConfig.h"
 
 class CommandParser {

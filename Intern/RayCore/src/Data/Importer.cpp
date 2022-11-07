@@ -7,7 +7,7 @@
 #include <utility>
 
 #include "Data/xml.h"
-#include "Debug.h"
+#include "Debug/Debug.h"
 #include "Debug/Instrumentor.h"
 #include "Model/Beamline/Beamline.h"
 #include "Model/Beamline/Objects/Objects.h"

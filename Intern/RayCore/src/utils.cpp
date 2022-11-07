@@ -2,7 +2,7 @@
 
 #include <sstream>
 
-#include "Debug.h"
+#include "Debug/Debug.h"
 #include "Debug/Instrumentor.h"
 
 /**

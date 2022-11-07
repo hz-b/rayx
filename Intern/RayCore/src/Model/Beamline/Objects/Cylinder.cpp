@@ -3,7 +3,7 @@
 #include <ext/scalar_constants.hpp>
 
 #include "Data/xml.h"
-#include "Debug.h"
+#include "Debug/Debug.h"
 #include "Material/Material.h"
 #include "Model/Surface/Quadric.h"
 #include "utils.h"

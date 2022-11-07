@@ -1,6 +1,6 @@
 #include "Quadric.h"
 
-#include "Debug.h"
+#include "Debug/Debug.h"
 
 namespace RAYX {
 /** for quadric surfaces: 16 parameters a_11,a_12,a_13,a_14,

@@ -1,6 +1,6 @@
 #include "CanonicalizePath.h"
 
-#include <Debug.h>
+#include "Debug/Debug.h"
 
 /// this function assumes that `base` is already an absolute path
 std::filesystem::path canonicalize(const std::filesystem::path& relPath, const std::filesystem::path& base) {

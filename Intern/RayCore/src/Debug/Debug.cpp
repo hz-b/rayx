@@ -1,4 +1,4 @@
-#include "Debug.h"
+#include "Debug/Debug.h"
 
 #include <sstream>
 #include <utility>

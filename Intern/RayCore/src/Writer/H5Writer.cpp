@@ -6,7 +6,7 @@
 #include <highfive/H5File.hpp>
 #include <string>
 
-#include "Debug.h"
+#include "Debug/Debug.h"
 
 void writeH5(const std::vector<RAYX::Ray>& rays, std::string filename) {
     HighFive::File file(filename, HighFive::File::ReadWrite | HighFive::File::Create | HighFive::File::Truncate);
