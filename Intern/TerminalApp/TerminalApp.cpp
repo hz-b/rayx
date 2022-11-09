@@ -63,11 +63,10 @@ void TerminalApp::tracePath(const std::filesystem::path& path) {
 
         // Plot
         if (m_CommandParser->m_args.m_plotFlag) {
-            std::shared_ptr<RAYX::Plotter> plotter = std::make_shared<RAYX::Plotter>();
             if (m_CommandParser->m_args.m_multiplePlots) {
-                plotter->plot(2, path.string(), rays, getBeamlineOpticalElementsNames());
+                RAYX::Plotter::plot(2, path.string(), rays, getBeamlineOpticalElementsNames());
             } else
-                plotter->plot(0, path.string(), rays, getBeamlineOpticalElementsNames());
+                RAYX::Plotter::plot(0, path.string(), rays, getBeamlineOpticalElementsNames());
         }
 
 #if defined(RAYX_DEBUG_MODE) && not defined(CPP)

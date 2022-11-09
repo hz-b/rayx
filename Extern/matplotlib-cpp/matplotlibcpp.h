@@ -890,7 +890,7 @@ bool arrow(Numeric x, Numeric y, Numeric end_x, Numeric end_y, const std::string
 }
 
 template< typename Numeric>
-bool hist(const std::vector<Numeric>& y, long bins=10,std::string color="b",
+bool hist(const std::vector<Numeric>& y, std::string bins="auto",std::string color="b",
           double alpha=1.0, bool cumulative=false, const std::map<std::string, std::string> & keywords = {})
 {
     detail::_interpreter::get();
@@ -898,7 +898,7 @@ bool hist(const std::vector<Numeric>& y, long bins=10,std::string color="b",
     PyObject* yarray = detail::get_array(y);
 
     PyObject* kwargs = PyDict_New();
-    PyDict_SetItemString(kwargs, "bins", PyLong_FromLong(bins));
+    PyDict_SetItemString(kwargs, "bins", PyString_FromString(bins.c_str()));
     PyDict_SetItemString(kwargs, "color", PyString_FromString(color.c_str()));
     PyDict_SetItemString(kwargs, "alpha", PyFloat_FromDouble(alpha));
     PyDict_SetItemString(kwargs, "cumulative", cumulative ? Py_True : Py_False);
