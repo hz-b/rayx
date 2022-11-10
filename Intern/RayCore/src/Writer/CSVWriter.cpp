@@ -49,11 +49,17 @@ Cell ulongToCell(unsigned long x) {
 
 Cell doubleToCell(double x) {
     std::stringstream ss;
-    ss.precision(17);
     ss.setf(std::ios::fixed);
+
+    ss.precision(CELL_SIZE);
     std::string s;
     ss << x;
     ss >> s;
+
+    // remove digits which do not fit.
+    while (s.size() > CELL_SIZE) {
+        s.pop_back();
+    }
     return strToCell(s.c_str());
 }
 
