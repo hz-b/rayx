@@ -6,6 +6,8 @@
 
 #include "Debug/Debug.h"
 
+// writer:
+
 const int CELL_SIZE = 23;
 
 struct Cell {
@@ -48,6 +50,7 @@ Cell ulongToCell(unsigned long x) {
 Cell doubleToCell(double x) {
     std::stringstream ss;
     ss.precision(17);
+    ss.setf(std::ios::fixed);
     std::string s;
     ss << x;
     ss >> s;
@@ -105,4 +108,42 @@ void writeCSV(const std::vector<RAYX::Ray>& rays, std::string filename) {
     }
 
     RAYX_VERB << "Writing done!";
+}
+
+// loader:
+
+std::vector<RAYX::Ray> loadCSV(std::string filename) {
+    std::ifstream file(filename);
+
+    // ignore two setup lines
+    std::string s;
+    std::getline(file, s);
+    std::getline(file, s);
+
+    std::vector<RAYX::Ray> out;
+
+    while (std::getline(file, s)) {
+        std::vector<double> d;
+        std::stringstream ss(s);
+        std::string num;
+
+        // skip the index.
+        std::getline(ss, num, '|');
+
+        while (std::getline(ss, num, '|')) {
+            d.push_back(std::stod(num));
+        }
+        assert(d.size() == 16);
+        out.push_back(RAYX::Ray{.m_position = {d[0], d[1], d[2]},
+                                .m_weight = d[3],
+                                .m_direction = {d[4], d[5], d[6]},
+                                .m_energy = d[7],
+                                .m_stokes = {d[8], d[9], d[10], d[11]},
+                                .m_pathLength = d[12],
+                                .m_order = d[13],
+                                .m_lastElement = d[14],
+                                .m_extraParam = d[15]});
+    }
+
+    return out;
 }

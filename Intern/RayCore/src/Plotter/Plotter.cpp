@@ -82,7 +82,7 @@ void Plotter::plotLikeRAYUI(const std::vector<Ray>& RayList, const std::string& 
     }
     // Create new RayList with right order
     for (auto r : RayList) {
-        if (int_close(r.m_extraParam,max->m_extraParam)) {
+        if (int_close(r.m_extraParam, max->m_extraParam)) {
             Xpos.push_back(r.m_position.x);
             Ypos.push_back(r.m_position.y);
         }
@@ -154,7 +154,7 @@ void Plotter::plotforEach(const std::vector<Ray>& RayList, const std::string& pl
         }
 
         _percent = (float)Xpos.size() / (float)RayList.size() * 100;
-        //RAYX_LOG << (int)u.m_extraParam << ":" << Xpos.size();
+        // RAYX_LOG << (int)u.m_extraParam << ":" << Xpos.size();
         matplotlibcpp::subplot(cols, cols, i);
         // TODO: A Call to PyObjectCall inside matplotlib-cpp can be slow depending on the data size
         matplotlibcpp::scatter(Xpos, Ypos, _size, {{"color", "#62c300"}, {"label", "Ray"}});

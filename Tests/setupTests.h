@@ -185,6 +185,9 @@ void compareRayLists(const std::vector<RAYX::Ray>& rayx, const std::vector<RAYX:
 /// This also filters out non-sequential rays to compare to Ray-UI correctly.
 void compareAgainstRayUI(std::string filename, double t = 1e-11);
 
+// compares input/<filename>.correct.csv with the trace output.
+void compareAgainstCorrect(std::string filename, double t = 1e-11);
+
 /// updates the material tables of the Cpu Tracer to contain exactly the
 /// materials given in the std::vector.
 void updateCpuTracerMaterialTables(std::vector<Material>);

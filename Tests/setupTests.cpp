@@ -152,10 +152,10 @@ void compareRayLists(const std::vector<RAYX::Ray>& rayx_list, const std::vector<
 
     while (itRayX != itRayXEnd) {
         auto rayx = *itRayX;
-        auto rayui = *itRayUI;
-        CHECK_EQ(rayx.m_position, rayui.m_position, t);
-        CHECK_EQ(rayx.m_direction, rayui.m_direction, t);
-        CHECK_EQ(rayx.m_energy, rayui.m_energy, t);
+        auto correct = *itRayUI;
+        CHECK_EQ(rayx.m_position, correct.m_position, t);
+        CHECK_EQ(rayx.m_direction, correct.m_direction, t);
+        CHECK_EQ(rayx.m_energy, correct.m_energy, t);
 
         ++itRayX;
         ++itRayUI;
@@ -163,13 +163,22 @@ void compareRayLists(const std::vector<RAYX::Ray>& rayx_list, const std::vector<
 }
 
 void compareAgainstRayUI(std::string filename, double tolerance) {
-    auto beamline = loadBeamline(filename);
-
     auto a = traceRML(filename, Filter::OnlySequentialRays);
     auto b = loadCSVRayUI(filename);
 
     writeToOutputCSV(a, filename + ".rayx");
     writeToOutputCSV(b, filename + ".rayui");
+
+    compareRayLists(a, b, tolerance);
+}
+
+void compareAgainstCorrect(std::string filename, double tolerance) {
+    auto a = traceRML(filename, Filter::KeepAllRays);
+
+    std::string f = canonicalizeRepositoryPath("Tests/input/" + filename + ".correct.csv").string();
+    auto b = loadCSV(f);
+
+    writeToOutputCSV(a, filename + ".rayx");
 
     compareRayLists(a, b, tolerance);
 }
