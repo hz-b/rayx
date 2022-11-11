@@ -7,6 +7,7 @@
 
 #include "Debug/Debug.h"
 #define FREEDMAN
+//#define LONGEST_PATH
 
 namespace RAYX {
 inline int last_obj(int extraParam) {
@@ -82,7 +83,11 @@ void Plotter::plotLikeRAYUI(const std::vector<Ray>& RayList, const std::string& 
     }
     // Create new RayList with right order
     for (auto r : RayList) {
+#if defined(LONGEST_PATH)
         if (int_close(r.m_extraParam, max->m_extraParam)) {
+#else
+        if (last_obj(r.m_extraParam) == max_param) {
+#endif
             Xpos.push_back(r.m_position.x);
             Ypos.push_back(r.m_position.y);
         }
@@ -111,7 +116,7 @@ void Plotter::plotLikeRAYUI(const std::vector<Ray>& RayList, const std::string& 
     matplotlibcpp::title("Intensity");
 
     matplotlibcpp::show();
-}
+}  // namespace RAYX
 /**
  * @brief Plot for each intersection
  *
@@ -142,6 +147,7 @@ void Plotter::plotforEach(const std::vector<Ray>& RayList, const std::string& pl
     matplotlibcpp::figure_size(cols * 500, (cols - 1) * 500);
 
     for (auto u : s) {
+        if (i / s.size() > 9 / 10) RAYX_VERB << "Almost there...";  // Wakeup up call (Temp)
         for (auto r : RayList) {
             if (int_close(r.m_extraParam, u.m_extraParam)) {
                 Xpos.push_back(r.m_position.x);
