@@ -6,8 +6,8 @@
 #include <chrono>
 
 #include "Debug/Debug.h"
-#define FREEDMAN
-//#define LONGEST_PATH
+// #define FREEDMAN
+// #define LONGEST_PATH
 
 namespace RAYX {
 inline int last_obj(int extraParam) {
