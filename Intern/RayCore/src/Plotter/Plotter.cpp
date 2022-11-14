@@ -124,15 +124,15 @@ void Plotter::plotLikeRAYUI(const std::vector<Ray>& RayList, const std::string& 
  * @param plotName
  */
 void Plotter::plotforEach(const std::vector<Ray>& RayList, const std::string& plotName, const std::vector<std::string>& OpticalElementNames) {
-    // s is sorted and unique extraParam values extracted
-    auto s = RayList;
+    // sortedRayList is sorted and unique extraParam values extracted
+    auto sortedRayList = RayList;
 
-    std::sort(s.begin(), s.end(), comp);  // Should be a fast enough sort
-    s.erase(
-        std::unique(s.begin(), s.end(),
+    std::sort(sortedRayList.begin(), sortedRayList.end(), comp);  // Should be a fast enough sort
+    sortedRayList.erase(
+        std::unique(sortedRayList.begin(), sortedRayList.end(),
                     [](Ray const& lhs, Ray const& rhs) { return abs(lhs.m_extraParam - rhs.m_extraParam) < std::numeric_limits<double>::epsilon(); }),
-        s.end());
-    auto uniqueCount = s.size();
+        sortedRayList.end());
+    auto uniqueCount = sortedRayList.size();
 
     // Subplot in cols x cols
     int cols = (int)std::ceil(std::sqrt(uniqueCount));
@@ -141,13 +141,13 @@ void Plotter::plotforEach(const std::vector<Ray>& RayList, const std::string& pl
     Xpos.reserve(RayList.size());
     Ypos.reserve(RayList.size());
 
-    double _size = 2.0;
+    double size = 2.0;
     int i = 1;
-    float _percent;
+    float percent;
     matplotlibcpp::figure_size(cols * 500, (cols - 1) * 500);
 
-    for (auto u : s) {
-        if (i / s.size() > 9 / 10) RAYX_VERB << "Almost there...";  // Wakeup up call (Temp)
+    for (auto u : sortedRayList) {
+        if (i / sortedRayList.size() > 9 / 10) RAYX_VERB << "Almost there...";  // Wakeup up call (Temp)
         for (auto r : RayList) {
             if (int_close(r.m_extraParam, u.m_extraParam)) {
                 Xpos.push_back(r.m_position.x);
@@ -156,23 +156,28 @@ void Plotter::plotforEach(const std::vector<Ray>& RayList, const std::string& pl
         }
 
         if (Xpos.size() > 50) {
-            _size = 1.0;
+            size = 1.0;
         }
+        percent = (float)Xpos.size() / (float)RayList.size() * 100;
 
-        _percent = (float)Xpos.size() / (float)RayList.size() * 100;
-        // RAYX_LOG << (int)u.m_extraParam << ":" << Xpos.size();
-        matplotlibcpp::subplot(cols, cols, i);
-        // TODO: A Call to PyObjectCall inside matplotlib-cpp can be slow depending on the data size
-        matplotlibcpp::scatter(Xpos, Ypos, _size, {{"color", "#62c300"}, {"label", "Ray"}});
-        matplotlibcpp::xlabel("x / mm");
-        matplotlibcpp::ylabel("y / mm");
-        matplotlibcpp::title(std::to_string((int)u.m_extraParam) + " (" + std::to_string(_percent) + "%)");
+        try {
+            // RAYX_LOG << (int)u.m_extraParam << ":" << Xpos.size();
+            matplotlibcpp::subplot(cols, cols, i);
+            // TODO: A Call to PyObjectCall inside matplotlib-cpp can be slow depending on the data size
 
-        matplotlibcpp::legend();
+            matplotlibcpp::scatter(Xpos, Ypos, size, {{"color", "#62c300"}, {"label", "Ray"}});
+            matplotlibcpp::xlabel("x / mm");
+            matplotlibcpp::ylabel("y / mm");
+            matplotlibcpp::title(std::to_string((int)u.m_extraParam) + " (" + std::to_string(percent) + "%)");
 
-        i += 1;
-        Xpos.clear();
-        Ypos.clear();
+            matplotlibcpp::legend();
+
+            i += 1;
+            Xpos.clear();
+            Ypos.clear();
+        } catch (const std::exception& e) {
+            RAYX_ERR << "Error in matplotlib-cpp: " << e.what();
+        }
     }
     matplotlibcpp::subplots_adjust({{"wspace", 0.35}, {"hspace", 0.35}});
 
