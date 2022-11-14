@@ -8,4 +8,4 @@
 
 void RAYX_API writeCSV(const std::vector<RAYX::Ray>&, std::string filename);
 
-std::vector<RAYX::Ray> loadCSV(std::string filename);
+std::vector<RAYX::Ray> RAYX_API loadCSV(std::string filename);
