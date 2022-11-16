@@ -5,7 +5,9 @@
 #include <algorithm>
 #include <chrono>
 
+#include "CanonicalizePath.h"
 #include "Debug/Debug.h"
+
 // #define FREEDMAN
 // #define LONGEST_PATH
 
@@ -21,6 +23,26 @@ bool last_comp(Ray const& lhs, Ray const& rhs) { return last_obj(lhs.m_extraPara
 bool comp(Ray const& lhs, Ray const& rhs) { return lhs.m_extraParam < rhs.m_extraParam; }
 bool abs_comp(double const& lhs, double const& rhs) { return abs(lhs) < abs(rhs); }
 inline bool int_close(double x, double y) { return abs(x - y) < std::numeric_limits<double>::epsilon(); }
+
+void testMathGL() {
+    mglData dat(30, 40);  // data to for plotting
+    for (long i = 0; i < 30; i++)
+        for (long j = 0; j < 40; j++) dat.a[i + 30 * j] = 1 / (1 + (i - 15) * (i - 15) / 225. + (j - 20) * (j - 20) / 400.);
+    mglGraph gr;                  // class for plot drawing
+    gr.Rotate(50, 60);            // rotate axis
+    gr.Light(true);               // enable lighting
+    gr.Surf(dat);                 // plot surface
+    gr.Cont(dat, "y");            // plot yellow contour lines
+    gr.Axis();                    // draw axis
+    gr.WriteFrame("sample.svg");  // save it
+    mglData data;
+    std::vector<double> dataVector = {1, 2, 3, 4, 6};
+
+    data.Set(dataVector);
+
+    mglData dataTest(dataVector);
+}
+
 /**
  * @brief Plot the Data
  *
@@ -37,6 +59,7 @@ void Plotter::plot(int plotType, const std::string& plotName, const std::vector<
     else if (plotType == plotTypes::Eachsubplot)
         plotforEach(RayList, plotName, OpticalElementNames);
 }
+
 /**
  * @brief Get the amount of bins for the histogram
  * FREEDMAN is a different method to get the "optimized" amount of bins
@@ -63,6 +86,28 @@ int Plotter::getBinAmount(std::vector<double>& vec) {
     auto xymax = std::max(*(std::max_element(vec.begin(), vec.end())), *(std::min_element(vec.begin(), vec.end())), abs_comp);
     return (int)(xymax / binwidth) + 1;
 }
+// Output Folder Path handling and naming scheme
+std::pair<std::string, std::string> outputPlotPathHandler(void) {
+#ifdef RAYX_DEBUG_MODE
+    std::string mode = "debug";
+#else
+    std::string mode = "release";
+#endif
+    std::string outputFolderName = "build/bin/" + mode + "/Plots";  // Change this if you want to change directory output name
+
+    std::filesystem::path outputDir = canonicalizeRepositoryPath(outputFolderName);
+    if (!std::filesystem::is_directory(outputDir) || !std::filesystem::exists(outputDir)) {
+        RAYX_D_LOG << "Creating directory " << outputDir.c_str();
+        std::filesystem::create_directory(outputDir);
+    }
+    std::string sampleName = "sample1";  // Change filename
+    auto outputSvg = outputDir;
+    auto outputPng = outputDir;
+    outputSvg.append(sampleName + ".svg");
+    outputPng.append(sampleName + ".png");
+    return std::make_pair<std::string, std::string>(outputSvg.c_str(), outputPng.c_str());
+}
+
 /**
  * @brief Plot final Image Plane
  *
@@ -70,7 +115,7 @@ int Plotter::getBinAmount(std::vector<double>& vec) {
  * @param plotName
  */
 void Plotter::plotLikeRAYUI(const std::vector<Ray>& RayList, const std::string& plotName, const std::vector<std::string>& OpticalElementNames) {
-    // Sort Data for plotting
+    ////////////////// Sort Data for plotting
     std::vector<double> Xpos, Ypos;
     Xpos.reserve(RayList.size());
     Ypos.reserve(RayList.size());
@@ -94,29 +139,83 @@ void Plotter::plotLikeRAYUI(const std::vector<Ray>& RayList, const std::string& 
     }
     auto minX = *(std::min_element(Xpos.begin(), Xpos.end()));
     auto minY = *(std::min_element(Ypos.begin(), Ypos.end()));
-    // Start plot
+    auto maxX = *(std::max_element(Xpos.begin(), Xpos.end()));
+    auto maxY = *(std::max_element(Ypos.begin(), Ypos.end()));
+
+    ////////////////// Plotting
+    float margin = 0.05;
+    mglData x, y, h(Xpos.size());
+    x.Link(Xpos.data(), Xpos.size());
+    y.Link(Ypos.data(), Ypos.size());
+
+    // Sanity check
+    for (size_t i = 0; i <= Xpos.size(); i++) {
+        assert((Xpos[i] == x[i]));
+    }
+
+    mglGraph gr;
+
+    //mglData xx = gr.Hist(x, y);
+    mglData yy = gr.Hist(y, y);
+
+    gr.SetSize(1920, 1080);  // TODO : This should be changed once we have Windowing lib
+    gr.SetMarkSize(0.05);
+    // set nice limites according to margin (matplotlib-like)
+    //gr.SetRanges(minX - minX * margin, maxX + maxX * margin, minY - minY * margin, maxY + maxY * margin);
+    gr.Axis();
+    gr.Grid("xyzt", "=h");
+    gr.SetFontSize(2.5);
+
+    // gr.Plot(x, y, " o{x62C300}");  // o-markers  green-yellow
+
+    gr.SetMarkSize(0.5);
+    gr.AddLegend("Ray", " o{x62C300}");
+    gr.Legend(3, "#", "0.05");
+
+    //gr.DensX(x);
+    auto f = x.Hist(Xpos.size()); 
+    //mglData xx = gr.Hist(f, x);
+    auto m = f.Max("x");
+    gr.SetRanges(0,f.nx,0,m[0]);
+    gr.Box();
+    gr.Bars(f);
     std::string title = plotName;
-    matplotlibcpp::figure_size(1920, 1080);
     title += "\n" + OpticalElementNames.back();
+    // Ignore Tex
+    while (title.find("_") != std::string::npos) title = title.replace(title.find("_"), 1, "-");
 
-    matplotlibcpp::suptitle(title);
-    matplotlibcpp::subplot2grid(4, 4, 0, 0, 1, 3);
-    matplotlibcpp::hist(Xpos, "sqrt", "#0062c3", 0.65, false, {{"density", "False"}, {"histtype", "step"}});
+    gr.Title(title.c_str(), "iT", 2.5);
+    auto files = outputPlotPathHandler();
 
-    matplotlibcpp::subplot2grid(4, 4, 1, 0, 3, 3);
-    matplotlibcpp::scatter(Xpos, Ypos, 1, {{"color", "#62c300"}, {"label", "Ray(" + std::to_string(Xpos.size()) + ")"}});
-    matplotlibcpp::text(minX, minY, "Generated by RAY-X.");
-    matplotlibcpp::xlabel("x / mm");
-    matplotlibcpp::ylabel("y / mm");
-    matplotlibcpp::legend();
-    matplotlibcpp::grid(true);
+    gr.WriteFrame((files.first).c_str(), "Generated by RAY-X");  // save it
+    RAYX_VERB << "Saved";
+    RAYX_D_LOG << "in " << files.first << " and " << files.second;
+    gr.WriteFrame((files.second).c_str(), "Generated by RAY-X");  // save it
+    return;
+    // Start plot
+    // std::string title = plotName;
+    // matplotlibcpp::figure_size(1920, 1080);
+    // title += "\n" + OpticalElementNames.back();
 
-    matplotlibcpp::subplot2grid(4, 4, 1, 3, 3, 1);
-    matplotlibcpp::hist(Ypos, "sqrt", "#0062c3", 0.65, false, {{"density", "False"}, {"orientation", "horizontal"}, {"histtype", "step"}});
-    matplotlibcpp::title("Intensity");
+    // matplotlibcpp::suptitle(title);
+    // matplotlibcpp::subplot2grid(4, 4, 0, 0, 1, 3);
+    // matplotlibcpp::hist(Xpos, "sqrt", "#0062c3", 0.65, false, {{"density", "False"}, {"histtype", "step"}});
 
-    matplotlibcpp::show();
-}  // namespace RAYX
+    // matplotlibcpp::subplot2grid(4, 4, 1, 0, 3, 3);
+    // matplotlibcpp::scatter(Xpos, Ypos, 1, {{"color", "#62c300"}, {"label", "Ray(" + std::to_string(Xpos.size()) + ")"}});
+    // matplotlibcpp::text(minX, minY, "Generated by RAY-X.");
+    // matplotlibcpp::xlabel("x / mm");
+    // matplotlibcpp::ylabel("y / mm");
+    // matplotlibcpp::legend();
+    // matplotlibcpp::grid(true);
+
+    // matplotlibcpp::subplot2grid(4, 4, 1, 3, 3, 1);
+    // matplotlibcpp::hist(Ypos, "sqrt", "#0062c3", 0.65, false, {{"density", "False"}, {"orientation", "horizontal"}, {"histtype", "step"}});
+    // matplotlibcpp::title("Intensity");
+
+    // matplotlibcpp::show();
+}
+
 /**
  * @brief Plot for each intersection
  *

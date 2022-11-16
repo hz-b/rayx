@@ -10,7 +10,7 @@ add_subdirectory(Tests)
 
 # -------CodeCoverage-------
 option(BUILD_WITH_GCOV "Add Code Coverage to build" FALSE)
-set(CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/Extern/cmake)
+set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${PROJECT_SOURCE_DIR}/Extern/cmake)
 #set(BUILD_WITH_GCOV TRUE)
 if(CMAKE_COMPILER_IS_GNUCXX AND CMAKE_BUILD_TYPE STREQUAL "Debug" AND BUILD_WITH_GCOV)
 	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O0")

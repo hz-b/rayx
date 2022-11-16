@@ -18,3 +18,5 @@ set(CLI11_CUDA_TESTS OFF)
 set(CLI11_CLANG_TIDY OFF)
 add_subdirectory(CLI11)
 
+#add_subdirectory(matplotplusplus)
+#add_subdirectory(mathgl-8.0.1)

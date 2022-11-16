@@ -1,5 +1,7 @@
 #pragma once
 
+#include <mgl2/mgl.h>
+
 #include <map>
 #include <string>
 #include <vector>

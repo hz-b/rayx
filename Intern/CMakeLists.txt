@@ -9,7 +9,7 @@ if(MSVC)
 	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /W4")
 else()
 	message(STATUS "GCC")
-	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra -Wpedantic") # -Wconversion -Wsign-conversion")
+	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -lmgl -Wall -Wextra -Wpedantic") # -Wconversion -Wsign-conversion")
 endif()
 
 # Warnings are treated as errors on the CI Pipeline

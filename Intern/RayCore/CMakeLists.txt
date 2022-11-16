@@ -100,6 +100,10 @@ if(NOT "$ENV{CI}" STREQUAL "YES")
     endif()
 endif()
 
+# MathGL
+set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${RayCore_SOURCE_DIR}/../../Extern/cmake)
+find_package(MathGL2 REQUIRED mgl)
+
 # Add Extern deps TODO(Jannis): the src include shouldn't be a SYSTEM include
 target_include_directories(${PROJECT_NAME}
     SYSTEM PUBLIC ${RayCore_SOURCE_DIR}/src
@@ -107,6 +111,7 @@ target_include_directories(${PROJECT_NAME}
     PUBLIC ${RayCore_SOURCE_DIR}/../../Extern/rapidxml-1.13/
     PUBLIC ${RayCore_SOURCE_DIR}/../../Extern/HighFive/include/
     PUBLIC ${RayCore_SOURCE_DIR}/../../Extern/VMA/include/
+    PUBLIC ${MATHGL2_INCLUDE_DIRS}
 )
 
 # Compile Shaders
@@ -149,6 +154,7 @@ target_link_libraries(${PROJECT_NAME}
     PUBLIC
     ${PYTHON_LIBRARIES}
     Python3::NumPy
+    ${MATHGL2_LIBRARY}
 )
 
 # Print include directories
