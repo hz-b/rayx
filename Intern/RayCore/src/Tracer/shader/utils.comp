@@ -453,7 +453,7 @@ void reflectance(double energy, double incidence_angle, INOUT(dvec2) complex_S,
 dvec2 cartesian_to_euler(dvec2 complex) {
     double r =
         dot(complex,
-            complex);  // r = sqrt(a**2 + b**"), why not take sqrt in fortran
+            complex);  // r = sqrt(a**2 + b**2), why not take sqrt in fortran
                        // code?, maybe better bc square root looses precision
     dvec2 euler;
     if (r < 0 || r > 1) {

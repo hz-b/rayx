@@ -5,6 +5,7 @@
 #include "Material/Material.h"
 #include "Model/Surface/Quadric.h"
 #include "Model/Surface/Toroid.h"
+#include "Constants.h"
 
 namespace RAYX {
 

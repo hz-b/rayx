@@ -742,7 +742,6 @@ double r8_atan2(double sn, double cs)
     double abscs;
     double abssn;
     double big      = 0.0;
-    const double pi = 3.14159265358979323846264338327950;
     double sml      = 0.0;
     double value;
 
@@ -759,14 +758,14 @@ double r8_atan2(double sn, double cs)
     if (abscs <= abssn) {
         if (abscs < 1.0 && abscs * big <= abssn) {
             if (sn < 0.0) {
-                value = -0.5 * pi;
+                value = -0.5 * PI;
             } else if (sn == 0.0) {
                 // fprintf ( stderr, "\n" );
                 // fprintf ( stderr, "R8_ATAN2 - Fatal error!\n" );
                 // fprintf ( stderr, "  Both arguments are 0.\n" );
                 return 1;
             } else {
-                value = 0.5 * pi;
+                value = 0.5 * PI;
             }
             return value;
         }
@@ -775,7 +774,7 @@ double r8_atan2(double sn, double cs)
             if (0.0 <= cs) {
                 value = 0.0;
             } else {
-                value = pi;
+                value = PI;
             }
             return value;
         }
@@ -783,11 +782,11 @@ double r8_atan2(double sn, double cs)
     value = r8_atan(sn / cs);
 
     if (cs < 0.0) {
-        value = value + pi;
+        value = value + PI;
     }
 
-    if (pi < value) {
-        value = value - 2.0 * pi;
+    if (PI < value) {
+        value = value - 2.0 * PI;
     }
     return value;
 }

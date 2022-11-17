@@ -4,6 +4,7 @@
 #include "Debug/Debug.h"
 #include "Material/Material.h"
 #include "Model/Surface/Quadric.h"
+#include "Constants.h"
 
 namespace RAYX {
 

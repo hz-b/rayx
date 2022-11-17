@@ -17,9 +17,8 @@
 	layout(local_size_x = WORKGROUP_SIZE, local_size_y = 1, local_size_z = 1) in;
 #endif
 
-const double PI       = 3.14159265358979323846264338327950;
+#include "../../Constants.h"
 const uint64_t rngKey = 13; // TODO(rudi) this was the old key, it generated a warning: (0xc8e4fd15 << 32) | 0x4ce32f6d;
-const double inm2eV   = 1.239852e3;
 
 /* STRUCTS */
 // for CPP, the according things are mostly defined in CpuTracer.h
