@@ -1,3 +1,4 @@
+#include "Random.h"
 #include "setupTests.h"
 
 // This module tests beamlines with randomness.
@@ -12,13 +13,27 @@
 // Additionally to randomness tests, there can also be (non-randomized) regression tests in this module.
 // Which compares the current RAY-X the output of a previous RAY-X output which we deemed correct.
 
-TEST_F(TestSuite, PointSource_seeded) { compareAgainstCorrect("PointSource_seeded"); }
+// TODO re-generate *.correct.* files for those tests!
+
+TEST_F(TestSuite, PointSource_seeded) {
+    RAYX::fixSeed(RAYX::FIXED_SEED);
+    compareAgainstCorrect("PointSource_seeded");
+}
 
 // Tests sourceDepth of MatrixSource.
-TEST_F(TestSuite, MatrixSource_seeded) { compareAgainstCorrect("MatrixSource_seeded"); }
+TEST_F(TestSuite, MatrixSource_seeded) {
+    RAYX::fixSeed(RAYX::FIXED_SEED);
+    compareAgainstCorrect("MatrixSource_seeded");
+}
 
 // Tests reflectivity of materials of a PlaneMirror.
-TEST_F(TestSuite, PlaneMirror_refl_seeded) { compareAgainstCorrect("PlaneMirror_refl_seeded"); }
+TEST_F(TestSuite, PlaneMirror_refl_seeded) {
+    RAYX::fixSeed(RAYX::FIXED_SEED);
+    compareAgainstCorrect("PlaneMirror_refl_seeded");
+}
 
 // Tests the Energy Distribution of a MatrixSource.
-TEST_F(TestSuite, MatrixSource_distr_seeded) { compareAgainstCorrect("MatrixSource_distr_seeded"); }
+TEST_F(TestSuite, MatrixSource_distr_seeded) {
+    RAYX::fixSeed(RAYX::FIXED_SEED);
+    compareAgainstCorrect("MatrixSource_distr_seeded");
+}

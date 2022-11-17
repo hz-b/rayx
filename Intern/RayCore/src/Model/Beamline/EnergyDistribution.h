@@ -15,7 +15,7 @@ struct RAYX_API EnergyRange {
 
     EnergyRange(double centerEnergy, double energySpread);
 
-    double selectEnergy(std::mt19937& rng, bool continuous) const;
+    double selectEnergy(bool continuous) const;
     double getAverage() const;
 };
 
@@ -42,9 +42,6 @@ class RAYX_API EnergyDistribution {
   private:
     /** Shows whether the distribution is continuous or discrete */
     bool m_isContinuous;
-
-    /** the device for randomness, call `rng()` to get a random number */
-    static std::mt19937 s_rng;
 
     /** stores either a DatFile or an EnergyRange, depending on the constructor
      * used to create this */

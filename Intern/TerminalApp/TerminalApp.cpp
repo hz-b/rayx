@@ -6,6 +6,7 @@
 
 #include "CanonicalizePath.h"
 #include "Debug/Debug.h"
+#include "Random.h"
 #include "Tracer/CpuTracer.h"
 #include "Tracer/VulkanTracer.h"
 #include "Writer/Writer.h"
@@ -23,6 +24,9 @@ TerminalApp::TerminalApp(int argc, char** argv) : m_argv(argv), m_argc(argc) {
     std::string mode = "release";
 #endif
     std::cout << "Starting RAY-X (" << GIT_REVISION << ", " << mode << ")" << std::endl;
+
+    // TODO allow `RAYX::randomSeed()`.
+    RAYX::fixSeed(RAYX::FIXED_SEED);
 
     /// warn if the binary is compiled with 32-bit (i.e. sizeof(void*) == 4)
     /// or worse.
