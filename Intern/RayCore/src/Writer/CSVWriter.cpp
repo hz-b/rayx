@@ -140,15 +140,18 @@ std::vector<RAYX::Ray> loadCSV(std::string filename) {
             d.push_back(std::stod(num));
         }
         assert(d.size() == 16);
-        out.push_back(RAYX::Ray{.m_position = {d[0], d[1], d[2]},
-                                .m_weight = d[3],
-                                .m_direction = {d[4], d[5], d[6]},
-                                .m_energy = d[7],
-                                .m_stokes = {d[8], d[9], d[10], d[11]},
-                                .m_pathLength = d[12],
-                                .m_order = d[13],
-                                .m_lastElement = d[14],
-                                .m_extraParam = d[15]});
+        RAYX::Ray ray = {.m_position = {d[0], d[1], d[2]},
+                         .m_weight = d[3],
+                         .m_direction = {d[4], d[5], d[6]},
+                         .m_energy = d[7],
+                         .m_stokes = {d[8], d[9], d[10], d[11]},
+                         .m_pathLength = d[12],
+                         .m_order = d[13],
+                         .m_lastElement = d[14],
+                         .m_extraParam = d[15]};
+        if (ray.m_weight != 0) {
+            out.push_back(ray);
+        }
     }
 
     return out;
