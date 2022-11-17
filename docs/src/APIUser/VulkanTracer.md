@@ -28,7 +28,7 @@ mainLoop():
 ---
 # **How the VulkanTracer works**
 
-![vulkan_flow](/docs/src/uploads/fe29b8ceeb1467bec87aed5de3144cad/vulkan_flow.png)
+![vulkan_flow](/docs/src/res/vulkan_flow.png)
 
 ## _Buffer types used:_
 
