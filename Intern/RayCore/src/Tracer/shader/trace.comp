@@ -73,6 +73,7 @@ Ray traceToroid(Ray r, const int elementIndex, INOUT(uint64_t) ctr, ALLOW_UNUSED
     double shortRadius = tor.surfaceParams[0][1];
     // TODO use the given intersection point instead of recalculating it (still need to calculate the normal)
     dvec4 normal = iteratTo(r, longRadius, shortRadius);
+    double azimuthal_angle = tor.objectParameters[2][2];  // chi (azimuthalangle) in rad
 
     double x_extent = tor.objectParameters[0][0];  // width
     double z_extent = tor.objectParameters[0][1];  // length
@@ -97,7 +98,15 @@ Ray traceToroid(Ray r, const int elementIndex, INOUT(uint64_t) ctr, ALLOW_UNUSED
 
     r.m_direction = dvec3(reflect(dvec4(r.m_direction, 0), normal));
 
-    r.m_order = 0;
+    double real_S, real_P, delta;
+    double incidence_angle = getIncidenceAngle(r, normal);  // getTheta
+    int material           = int(quadricData[elementIndex].surfaceParams[3][2]);
+    if (material != -2) {
+        efficiency(r, real_S, real_P, delta, incidence_angle, material);
+
+        update_stokes(r, real_S, real_P, delta, azimuthal_angle, ctr);
+        r.m_order = 0;
+    }
     return r;
 }
 
