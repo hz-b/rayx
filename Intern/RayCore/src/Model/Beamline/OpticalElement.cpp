@@ -45,6 +45,12 @@ OpticalElement::OpticalElement(const DesignObject& dobj) {
 OpticalElement::Geometry::Geometry() = default;
 OpticalElement::Geometry::Geometry(const Geometry& other) = default;
 
+/**
+ * @brief Setting height and width based on geometrical shape
+ * @param height Height of the element
+ * @param widthA Width of the element
+ * @param widthB Only used for trapezoid - Width of the elements edge further to the z-direction
+ */
 void OpticalElement::Geometry::setHeightWidth(double height, double widthA, double widthB) {
     m_widthB = widthB;
     if (m_geometricalShape == GeometricalShape::ELLIPTICAL) {

@@ -129,10 +129,6 @@ double wasteBox(double x, double z, double xLength, double zLength, double w) {
     return w;
 }
 
-double strangeCross(double ax, double ay, double bx, double by) {
-    return ax * by - ay * bx;
-}
-
 // ! temporary for testing purposes (trapezoid)
 double wasteBox(double x, double z, double xLengthA, double xLengthB,
                 double zLength, double w) {
@@ -153,10 +149,10 @@ double wasteBox(double x, double z, double xLengthA, double xLengthB,
             dvec3 PmB = P - B;
             dvec3 CmB = C - B;
 
-            if ((strangeCross(PmA.x, PmA.z, BmA.x, BmA.z) *
-                 strangeCross(PmD.x, PmD.z, CmD.x, CmD.z)) < 0 &&
-                (strangeCross(PmA.x, PmA.z, DmA.x, DmA.z) *
-                 strangeCross(PmB.x, PmB.z, CmB.x, CmB.z)) < 0) {
+            if (((PmA.x * BmA.z - PmA.z * BmA.x)) *
+                 (PmD.x * CmD.z - PmD.z * CmD.x)) < 0 &&
+                ((PmA.x * DmA.z - PmA.z * DmA.x) *
+                 (PmB.x * CmB.z - PmB.z * CmB.x)) < 0) {
                 return w;
             } else {
                 return 0.0;
