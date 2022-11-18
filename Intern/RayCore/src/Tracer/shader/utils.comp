@@ -149,7 +149,7 @@ double wasteBox(double x, double z, double xLengthA, double xLengthB,
             dvec3 PmB = P - B;
             dvec3 CmB = C - B;
 
-            if (((PmA.x * BmA.z - PmA.z * BmA.x)) *
+            if (((PmA.x * BmA.z - PmA.z * BmA.x) *
                  (PmD.x * CmD.z - PmD.z * CmD.x)) < 0 &&
                 ((PmA.x * DmA.z - PmA.z * DmA.x) *
                  (PmB.x * CmB.z - PmB.z * CmB.x)) < 0) {
