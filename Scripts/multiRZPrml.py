@@ -509,16 +509,28 @@ def insertRZP(root, rzp: RZP):
 
 # -------------- RZP Calculations --------------
 
-def calcTrapezoidAngles(widthA, widthB, height):
-    # Calculate the angles of the isosceles trapezoid and return in degrees
-    # widthA = width of the top side
+def calcTrapezoidAngle(widthA, widthB, height):
+    # Calculates the top angle of a isosceles trapezoid and return in degrees
+    # widthA = (longer) width of the top side
     # widthB = width of the bottom side
     # height = height of the trapezoid
-    alpha = math.atan(2 * height / (widthA - widthB))
-    beta = math.atan(height / (widthA + widthB))
+
+    if (widthA <= widthB):
+        print("Error: widthA must be greater than widthB")
+        return
+
+    if (widthA <= 0 or widthB <= 0 or height <= 0):
+        print("Error: widthA, widthB and height must be greater than 0")
+        return
+
+    # Calculate the angle of the trapezoid
+    widthDiff = (widthA - widthB) / 2
+    side = math.sqrt((widthDiff * widthDiff) + (height * height))
+    alpha = math.acos((widthDiff**2 + side**2 - height**2) /
+                      (2 * widthDiff * side))
     alpha = math.degrees(alpha)
-    beta = math.degrees(beta)
-    return alpha, beta
+
+    return alpha
 
 
 def rotateYDeg(prevDir: np.array, alpha: float, iterDirection: int):
@@ -541,14 +553,19 @@ def rotateYDeg(prevDir: np.array, alpha: float, iterDirection: int):
 
 
 def calcRZPs(numRZPs: int, baseRZP: RZP, iterDirection: int):
-    midWidth = (RZP.totalWidth + RZP.totalWidthB) / 2
-    _, topAngleTrapezoid = calcTrapezoidAngles(
+    topAngleTrapezoid = calcTrapezoidAngle(
         RZP.totalWidthB, RZP.totalWidth, RZP.totalLength)
 
     # Calculate distance of intersection point of all z-direction vectors
     # and the midpoints of the trapezoids
-    triangleHeight = midWidth/2 * math.tan(math.radians(topAngleTrapezoid))
-    intersecMidDist = np.sqrt((midWidth**2)/4 + triangleHeight**2)
+    # width in the middle of the trapezoid
+    midWidth = (RZP.totalWidth + RZP.totalWidthB) / 2
+    # width of triangle between two trapezoid midpoints and the top angle
+    triangleWidth = midWidth / 2
+    # height of said triangle
+    triangleHeight = triangleWidth * math.tan(math.radians(topAngleTrapezoid))
+    # distance between intersection point and midpoint of trapezoid
+    intersecMidpointDist = np.sqrt((triangleWidth**2) + triangleHeight**2)
 
     # Calculate angle between direction vectors
     dirDeviationAngle = 180 - abs(topAngleTrapezoid * 2)
@@ -558,7 +575,7 @@ def calcRZPs(numRZPs: int, baseRZP: RZP, iterDirection: int):
                   ] * (math.ceil(numRZPs / 2))
 
     if numRZPs % 2 == 1:  # odd number of RZPs
-        positions[0] = np.array([0, 0, intersecMidDist])
+        positions[0] = np.array([0, 0, intersecMidpointDist])
         directions[0] = np.array([[1, 0, 0], [0, 1, 0], [0, 0, 1]])
         for i in range(1, math.ceil(numRZPs / 2)):
             positions[i] = rotateYDeg(
@@ -571,7 +588,7 @@ def calcRZPs(numRZPs: int, baseRZP: RZP, iterDirection: int):
             directions = directions[1::]
 
     else:  # even number of RZPs
-        pos = np.array([0, 0, intersecMidDist])
+        pos = np.array([0, 0, intersecMidpointDist])
         positions[0] = rotateYDeg(pos, dirDeviationAngle/2, iterDirection)
         direct = np.array([[1, 0, 0], [0, 1, 0], [0, 0, 1]])
         directions[0] = rotateYDeg(direct, dirDeviationAngle/2, iterDirection)
@@ -583,7 +600,7 @@ def calcRZPs(numRZPs: int, baseRZP: RZP, iterDirection: int):
 
     # translate rzps back to origin
     for pos in positions:
-        pos -= np.array([0, 0, intersecMidDist])
+        pos -= np.array([0, 0, intersecMidpointDist])
     return positions, directions
 
 
