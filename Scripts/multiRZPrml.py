@@ -14,13 +14,15 @@ class MetaData:
     fileName = "multi_RZP_test"
 
 # Standard RZP Parameters
+
+
 @dataclass
 class RZP:
     name = "Reflection Zoneplate"
     type = "Reflection Zoneplate"
     geometricalShape = 0
-    totalWidth = 0.2567627027
-    totalWidthB = 0.1092372974
+    totalWidth = 0.1092372974
+    totalWidthB = 0.2567627027
     totalLength = 72.5
     gratingMount = 1
     grazingIncAngle = 2.2
@@ -108,9 +110,9 @@ class RZP:
     cylindricalBowingAmp = 0
     cylindricalBowingRadius = 0
     worldPosition = np.array([0, 0, 90])
-    worldXdirection = np.array([1,   0,          0        ])
+    worldXdirection = np.array([1,   0,          0])
     worldYdirection = np.array([0,   0.999263,  -0.0383878])
-    worldZdirection = np.array([0,   0.0383878,  0.999263 ])
+    worldZdirection = np.array([0,   0.0383878,  0.999263])
 
 # -------------- XML Generation --------------
 
@@ -512,7 +514,7 @@ def calcTrapezoidAngles(widthA, widthB, height):
     # widthA = width of the top side
     # widthB = width of the bottom side
     # height = height of the trapezoid
-    alpha = math.atan(2* height / (widthA - widthB))
+    alpha = math.atan(2 * height / (widthA - widthB))
     beta = math.atan(height / (widthA + widthB))
     alpha = math.degrees(alpha)
     beta = math.degrees(beta)
@@ -520,7 +522,7 @@ def calcTrapezoidAngles(widthA, widthB, height):
 
 
 def rotateYDeg(prevDir: np.array, alpha: float, iterDirection: int):
-    
+
     # Rotation matrix around y axis (clockwise)
     rotY = np.array([[np.cos(np.radians(alpha)), 0, np.sin(np.radians(alpha))],
                      [0, 1, 0],
@@ -532,52 +534,56 @@ def rotateYDeg(prevDir: np.array, alpha: float, iterDirection: int):
 
     # Apply rotation matrix
     rotatedDirMat = np.matmul(rotY, prevDir)
-    
+
     # print(np.linalg.det(rotatedDirMat))
-    
+
     return rotatedDirMat
 
 
 def calcRZPs(numRZPs: int, baseRZP: RZP, iterDirection: int):
     midWidth = (RZP.totalWidth + RZP.totalWidthB) / 2
-    topAngleTrapezoid, _ = calcTrapezoidAngles(
-        RZP.totalWidth, RZP.totalWidthB, RZP.totalLength)
-    
+    _, topAngleTrapezoid = calcTrapezoidAngles(
+        RZP.totalWidthB, RZP.totalWidth, RZP.totalLength)
+
     # Calculate distance of intersection point of all z-direction vectors
     # and the midpoints of the trapezoids
     triangleHeight = midWidth/2 * math.tan(math.radians(topAngleTrapezoid))
     intersecMidDist = np.sqrt((midWidth**2)/4 + triangleHeight**2)
-    
+
     # Calculate angle between direction vectors
     dirDeviationAngle = 180 - abs(topAngleTrapezoid * 2)
-    
 
-    positions = [np.array([0,0,0])] * (math.ceil(numRZPs / 2))
-    directions = [np.array([[0,0,0],[0,0,0],[0,0,0]])] * (math.ceil(numRZPs / 2))
-    
-    if numRZPs % 2 == 1: # odd number of RZPs
-        positions[0] = np.array([0,0,intersecMidDist])
-        directions[0] = np.array([[1,0,0],[0,1,0],[0,0,1]])
+    positions = [np.array([0, 0, 0])] * (math.ceil(numRZPs / 2))
+    directions = [np.array([[0, 0, 0], [0, 0, 0], [0, 0, 0]])
+                  ] * (math.ceil(numRZPs / 2))
+
+    if numRZPs % 2 == 1:  # odd number of RZPs
+        positions[0] = np.array([0, 0, intersecMidDist])
+        directions[0] = np.array([[1, 0, 0], [0, 1, 0], [0, 0, 1]])
         for i in range(1, math.ceil(numRZPs / 2)):
-            positions[i] = rotateYDeg(positions[0], i*dirDeviationAngle, iterDirection)
-            directions[i] = rotateYDeg(directions[i-1], dirDeviationAngle, iterDirection)
-            
+            positions[i] = rotateYDeg(
+                positions[0], i*dirDeviationAngle, iterDirection)
+            directions[i] = rotateYDeg(
+                directions[i-1], dirDeviationAngle, iterDirection)
+
         if iterDirection == -1:
             positions = positions[1::]
             directions = directions[1::]
-            
-    else: # even number of RZPs
-        pos = np.array([0,0,intersecMidDist])
+
+    else:  # even number of RZPs
+        pos = np.array([0, 0, intersecMidDist])
         positions[0] = rotateYDeg(pos, dirDeviationAngle/2, iterDirection)
-        direct = np.array([[1,0,0],[0,1,0],[0,0,1]])
+        direct = np.array([[1, 0, 0], [0, 1, 0], [0, 0, 1]])
         directions[0] = rotateYDeg(direct, dirDeviationAngle/2, iterDirection)
         for i in range(1, math.ceil(numRZPs / 2)):
-            positions[i] = rotateYDeg(positions[0], i*dirDeviationAngle, iterDirection)
-            directions[i] = rotateYDeg(directions[i-1], dirDeviationAngle, iterDirection)
-    
+            positions[i] = rotateYDeg(
+                positions[0], i*dirDeviationAngle, iterDirection)
+            directions[i] = rotateYDeg(
+                directions[i-1], dirDeviationAngle, iterDirection)
+
     # translate rzps back to origin
     for pos in positions:
-        pos -= np.array([0,0,intersecMidDist])
+        pos -= np.array([0, 0, intersecMidDist])
     return positions, directions
 
 
@@ -609,7 +615,7 @@ def main():
         currRZP.worldZdirection = directions[i][2]
         # insert RZP parameters
         root = insertRZP(root, currRZP)
-    
+
     xPositions = [pos[0] for pos in positions]
     zPositions = [pos[2] for pos in positions]
     plt.scatter(xPositions, zPositions)
@@ -617,9 +623,7 @@ def main():
     plt.ylabel('z')
     #plt.gca().set_aspect('equal', adjustable='box')
     plt.show()
-    
-    
-    
+
     # Plot x directions
     xDirectionsx = [dir[0][0] for dir in directions]
     xDirectionsz = [dir[0][2] for dir in directions]
@@ -628,7 +632,7 @@ def main():
     plt.ylabel('z')
     #plt.gca().set_aspect('equal', adjustable='box')
     plt.show()
-    
+
     # Plot z directions
     zDirectionsx = [dir[2][0] for dir in directions]
     zDirectionsz = [dir[2][2] for dir in directions]
