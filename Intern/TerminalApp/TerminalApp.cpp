@@ -25,9 +25,6 @@ TerminalApp::TerminalApp(int argc, char** argv) : m_argv(argv), m_argc(argc) {
 #endif
     std::cout << "Starting RAY-X (" << GIT_REVISION << ", " << mode << ")" << std::endl;
 
-    // TODO allow `RAYX::randomSeed()`.
-    RAYX::fixSeed(RAYX::FIXED_SEED);
-
     /// warn if the binary is compiled with 32-bit (i.e. sizeof(void*) == 4)
     /// or worse.
     /// 64-bit has sizeof(void*) == 8.
@@ -95,6 +92,13 @@ void TerminalApp::run() {
 
     if (m_CommandParser->m_args.m_verbose) {
         RAYX::setDebugVerbose(true);
+    }
+
+    if (m_CommandParser->m_args.m_fix_seed) {
+        // TODO consider letting the user fix an explicitly stated seed.
+        RAYX::fixSeed(RAYX::FIXED_SEED);
+    } else {
+        RAYX::randomSeed();
     }
 
     if (m_CommandParser->m_args.m_benchmark) {

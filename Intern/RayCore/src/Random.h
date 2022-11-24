@@ -7,7 +7,7 @@
 namespace RAYX {
 
 // fixed-seed tests operate on this seed.
-const int FIXED_SEED = 42;
+const uint32_t FIXED_SEED = 42;
 
 // used for fixed-seed testing
 void fixSeed(uint32_t x);

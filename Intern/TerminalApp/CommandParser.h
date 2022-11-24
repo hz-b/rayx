@@ -28,6 +28,7 @@ class CommandParser {
         bool m_multiplePlots = false;     // -m (Multiple Plots)
         bool m_version = false;           // -v (Version)
         std::string m_providedFile = "";  // -i (Input)
+        bool m_fix_seed;                  // -f (Fixed Seed)
         bool m_verbose = false;           // --verbose (Verbose)
     } m_args;
 
@@ -65,6 +66,7 @@ class CommandParser {
         {'x', {OptionType::BOOL, "cpu", "Tracing on CPU", &(m_args.m_cpuFlag)}},
         {'i', {OptionType::STRING, "input", "Input RML File or Directory.", &(m_args.m_providedFile)}},
         {'v', {OptionType::BOOL, "version", "", &(m_args.m_version)}},
+        {'f', {OptionType::BOOL, "fix-seed", "Fix the seed to RAYX::FIXED_SEED", &(m_args.m_fix_seed)}},
         {'V', {OptionType::BOOL, "verbose", "Dump more information", &(m_args.m_verbose)}},
     };
 };
