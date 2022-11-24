@@ -8,7 +8,6 @@
 
 #include "Core.h"
 
-
 // useful functions
 double RAYX_API hvlam(double x);
 
