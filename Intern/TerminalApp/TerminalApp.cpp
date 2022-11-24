@@ -6,6 +6,7 @@
 
 #include "CanonicalizePath.h"
 #include "Debug/Debug.h"
+#include "Random.h"
 #include "Tracer/CpuTracer.h"
 #include "Tracer/VulkanTracer.h"
 #include "Writer/Writer.h"
@@ -91,6 +92,13 @@ void TerminalApp::run() {
 
     if (m_CommandParser->m_args.m_verbose) {
         RAYX::setDebugVerbose(true);
+    }
+
+    if (m_CommandParser->m_args.m_fix_seed) {
+        // TODO consider letting the user fix an explicitly stated seed.
+        RAYX::fixSeed(RAYX::FIXED_SEED);
+    } else {
+        RAYX::randomSeed();
     }
 
     if (m_CommandParser->m_args.m_benchmark) {

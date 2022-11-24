@@ -4,6 +4,7 @@ project(RayCore)
 
 SET(SOURCE
     src/CanonicalizePath.cpp
+    src/Random.cpp
     src/utils.cpp
     src/Data/Importer.cpp
     src/Data/xml.cpp

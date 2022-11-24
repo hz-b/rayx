@@ -1,11 +1,11 @@
 #include "ReflectionZonePlate.h"
 
+#include "Constants.h"
 #include "Data/xml.h"
 #include "Debug/Debug.h"
 #include "Material/Material.h"
 #include "Model/Surface/Quadric.h"
 #include "Model/Surface/Toroid.h"
-#include "Constants.h"
 
 namespace RAYX {
 

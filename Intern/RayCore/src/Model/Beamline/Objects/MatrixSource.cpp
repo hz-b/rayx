@@ -1,10 +1,9 @@
 #include "MatrixSource.h"
 
-#include <random>
-
 #include "Data/xml.h"
 #include "Debug/Debug.h"
 #include "Debug/Instrumentor.h"
+#include "Random.h"
 
 namespace RAYX {
 
@@ -18,11 +17,6 @@ MatrixSource::MatrixSource(const DesignObject& dobj) : LightSource(dobj) {}
  */
 std::vector<Ray> MatrixSource::getRays() const {
     RAYX_PROFILE_FUNCTION();
-    double lower_bound = 0;
-    double upper_bound = 1;
-    std::uniform_real_distribution<double> unif(lower_bound, upper_bound);
-    std::default_random_engine re;
-
     double x, y, z, psi, phi,
         en;  // x,y,z pos, psi,phi direction cosines, en=energy
     int rmat = int(sqrt(m_numberOfRays));
@@ -34,9 +28,8 @@ std::vector<Ray> MatrixSource::getRays() const {
     // fill the square with rmat1xrmat1 rays
     for (int col = 0; col < rmat; col++) {
         for (int row = 0; row < rmat; row++) {
-            double rn = unif(re);  // uniform random in [0,1)
+            double rn = randomDouble();  // in [0, 1]
             x = -0.5 * m_sourceWidth + (m_sourceWidth / (rmat - 1)) * row + getMisalignmentParams()[0];
-
             y = -0.5 * m_sourceHeight + (m_sourceHeight / (rmat - 1)) * col + getMisalignmentParams()[1];
 
             z = (rn - 0.5) * m_sourceDepth;

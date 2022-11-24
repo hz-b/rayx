@@ -1,8 +1,8 @@
 #include "utils.h"
-#include "Constants.h"
 
 #include <sstream>
 
+#include "Constants.h"
 #include "Debug/Debug.h"
 #include "Debug/Instrumentor.h"
 
