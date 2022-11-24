@@ -1,4 +1,5 @@
 #pragma once
+#include "Core.h"
 
 // All C++ randomness should be using this module.
 // Otherwise set-seeding tests will not work.
@@ -10,10 +11,10 @@ namespace RAYX {
 const uint32_t FIXED_SEED = 42;
 
 // used for fixed-seed testing
-void fixSeed(uint32_t x);
+void RAYX_API fixSeed(uint32_t x);
 
 // sets the seed "randomly", depending on system time.
-void randomSeed();
+void RAYX_API randomSeed();
 
 // in [0, 2^32[
 uint32_t randomUint();
