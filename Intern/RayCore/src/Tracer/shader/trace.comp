@@ -400,6 +400,8 @@ Ray traceEllipsoidMirror(Ray r, const int elementIndex, INOUT(uint64_t) ctr, dve
     normal.y = -(r.m_position.y + q.surfaceParams[1][3]) * icurv;
     normal.z = -(q.surfaceParams[2][2] * r.m_position.z + q.surfaceParams[2][3]) * icurv;
     normal = normalize(normal);*/
+    double azimuthal_angle = ell.objectParameters[2][2];  // chi (azimuthalangle) in rad
+
 
     // check if ray hit the element within the boundaries
     double x_extent = ell.objectParameters[0][0];                               // width
@@ -427,7 +429,15 @@ Ray traceEllipsoidMirror(Ray r, const int elementIndex, INOUT(uint64_t) ctr, dve
     // calculate the new direction after the reflection
     r.m_direction = dvec3(reflect(dvec4(r.m_direction, 0), normal));
 
-    r.m_order = 0;
+    double real_S, real_P, delta;
+    double incidence_angle = getIncidenceAngle(r, normal);  // getTheta
+    int material           = int(quadricData[elementIndex].surfaceParams[3][2]);
+    if (material != -2) {
+        efficiency(r, real_S, real_P, delta, incidence_angle, material);
+
+        update_stokes(r, real_S, real_P, delta, azimuthal_angle, ctr);
+        r.m_order = 0;
+    }
     return r;
 }
 
