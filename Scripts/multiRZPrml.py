@@ -534,22 +534,26 @@ def calcTrapezoidAngle(widthA, widthB, height):
 
 
 def rotateYDeg(prevDir: np.array, alpha: float, iterDirection: int):
-
     # Rotation matrix around y axis (clockwise)
-    rotY = np.array([[np.cos(np.radians(alpha)), 0, np.sin(np.radians(alpha))],
-                     [0, 1, 0],
-                     [-np.sin(np.radians(alpha)), 0, np.cos(np.radians(alpha))]])  # ? sehr starke rotation
+    # alpha = angle in degrees
+    # iterDirection = 1 for clockwise, -1 for counter-clockwise
 
-    if iterDirection == -1:
-        # Transpose the rotation matrix
-        rotY = np.transpose(rotY)
+    # Convert alpha to radians
+    alpha = math.radians(alpha)
 
-    # Apply rotation matrix
-    rotatedDirMat = np.matmul(rotY, prevDir)
+    # Rotation matrix
+    rotMat = np.array([[math.cos(alpha), 0, math.sin(alpha)],
+                       [0, 1, 0],
+                       [-math.sin(alpha), 0, math.cos(alpha)]])
 
-    # print(np.linalg.det(rotatedDirMat))
+    if (iterDirection == 1):
+        # Clockwise rotation
+        newDir = np.dot(rotMat, prevDir)
+    elif (iterDirection == -1):
+        # Counter-clockwise rotation
+        newDir = np.dot(rotMat.transpose(), prevDir)
 
-    return rotatedDirMat
+    return newDir
 
 
 def calcRZPs(numRZPs: int, baseRZP: RZP, iterDirection: int):
@@ -574,12 +578,14 @@ def calcRZPs(numRZPs: int, baseRZP: RZP, iterDirection: int):
     directions = [np.array([[0, 0, 0], [0, 0, 0], [0, 0, 0]])
                   ] * (math.ceil(numRZPs / 2))
 
+    # TODO(Jannis): Find out why the positions get rotated the wrong way
+
     if numRZPs % 2 == 1:  # odd number of RZPs
         positions[0] = np.array([0, 0, intersecMidpointDist])
         directions[0] = np.array([[1, 0, 0], [0, 1, 0], [0, 0, 1]])
         for i in range(1, math.ceil(numRZPs / 2)):
             positions[i] = rotateYDeg(
-                positions[0], i*dirDeviationAngle, iterDirection)
+                positions[0], -i*dirDeviationAngle, iterDirection)
             directions[i] = rotateYDeg(
                 directions[i-1], dirDeviationAngle, iterDirection)
 
@@ -589,12 +595,12 @@ def calcRZPs(numRZPs: int, baseRZP: RZP, iterDirection: int):
 
     else:  # even number of RZPs
         pos = np.array([0, 0, intersecMidpointDist])
-        positions[0] = rotateYDeg(pos, dirDeviationAngle/2, iterDirection)
+        positions[0] = rotateYDeg(pos, -dirDeviationAngle/2, iterDirection)
         direct = np.array([[1, 0, 0], [0, 1, 0], [0, 0, 1]])
         directions[0] = rotateYDeg(direct, dirDeviationAngle/2, iterDirection)
         for i in range(1, math.ceil(numRZPs / 2)):
             positions[i] = rotateYDeg(
-                positions[0], i*dirDeviationAngle, iterDirection)
+                positions[0], -i*dirDeviationAngle, iterDirection)
             directions[i] = rotateYDeg(
                 directions[i-1], dirDeviationAngle, iterDirection)
 
@@ -638,7 +644,7 @@ def main():
     plt.scatter(xPositions, zPositions)
     plt.xlabel('x')
     plt.ylabel('z')
-    #plt.gca().set_aspect('equal', adjustable='box')
+    plt.gca().set_aspect('equal', adjustable='box')
     plt.show()
 
     # Plot x directions
@@ -647,7 +653,7 @@ def main():
     plt.scatter(xDirectionsx, xDirectionsz)
     plt.xlabel('x')
     plt.ylabel('z')
-    #plt.gca().set_aspect('equal', adjustable='box')
+    plt.gca().set_aspect('equal', adjustable='box')
     plt.show()
 
     # Plot z directions
@@ -656,7 +662,7 @@ def main():
     plt.scatter(zDirectionsx, zDirectionsz)
     plt.xlabel('x')
     plt.ylabel('z')
-    #plt.gca().set_aspect('equal', adjustable='box')
+    plt.gca().set_aspect('equal', adjustable='box')
     plt.show()
 
     indent(root)
