@@ -32,8 +32,6 @@ class TerminalApp {
     /// children of that directory.
     void tracePath(const std::filesystem::path& path);
     void exportRays(const std::vector<RAYX::Ray>&, std::string);
-    std::vector<std::string> getBeamlineOpticalElementsNames();
-    std::vector<std::string> getBeamlineLightSourcesNames();
 
 #if defined(RAYX_DEBUG_MODE) && not defined(CPP)
     void exportDebug();

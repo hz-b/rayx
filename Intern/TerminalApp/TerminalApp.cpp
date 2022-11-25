@@ -64,9 +64,9 @@ void TerminalApp::tracePath(const std::filesystem::path& path) {
         // Plot
         if (m_CommandParser->m_args.m_plotFlag) {
             if (m_CommandParser->m_args.m_multiplePlots) {
-                RAYX::Plotter::plot(2, path.string(), rays, getBeamlineOpticalElementsNames());
+                RAYX::Plotter::plot(2, path.string(), rays, m_Beamline);
             } else
-                RAYX::Plotter::plot(0, path.string(), rays, getBeamlineOpticalElementsNames());
+                RAYX::Plotter::plot(0, path.string(), rays, m_Beamline);
         }
 
 #if defined(RAYX_DEBUG_MODE) && not defined(CPP)
@@ -162,34 +162,4 @@ void TerminalApp::exportDebug() {
 }
 #endif
 
-/**
- * @brief Get all beamline optical elemet names
- *
- * @return std::vector<std::string> list of names
- */
-std::vector<std::string> TerminalApp::getBeamlineOpticalElementsNames() {
-    std::vector<std::string> names;
-    names.reserve(m_Beamline->m_OpticalElements.size());
 
-    for (const auto& opticalElement : m_Beamline->m_OpticalElements) {
-        names.push_back(opticalElement->m_name);
-    }
-
-    return names;
-}
-
-/**
- * @brief Get all beamline light sources names
- *
- * @return std::vector<std::string> list of names
- */
-std::vector<std::string> TerminalApp::getBeamlineLightSourcesNames() {
-    std::vector<std::string> names;
-    names.reserve(m_Beamline->m_LightSources.size());
-
-    for (const auto& lightSources : m_Beamline->m_LightSources) {
-        names.push_back(lightSources->m_name);
-    }
-
-    return names;
-}
