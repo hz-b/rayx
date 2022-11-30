@@ -129,7 +129,7 @@ void Plotter::plotLikeRAYUI(const std::vector<Ray>& RayList, const std::string& 
  */
 void Plotter::plotforEach(const std::vector<Ray>& RayList, const std::string& plotName, const std::vector<std::string>& OpticalElementNames) {
     RAYX_PROFILE_FUNCTION_STDOUT();
-    
+
     // sortedRayList is sorted and unique extraParam values extracted
     std::vector<double> sortedRayList;
 

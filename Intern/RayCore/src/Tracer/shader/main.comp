@@ -18,8 +18,11 @@
 #endif
 
 // Every shader execution calculates the route for a single ray.
-// `_ray` is that ray. The output will be written to `_out`.
+// `_ray` is that ray, it's always in world coordinates (!).
 #define _ray (rayData[uint(gl_GlobalInvocationID)])
+// The resulting ray will be written to `_out`.
+// It will have some `m_weight` other than `W_IN_COMPUTATION`.
+// The coordinate system of `_out` depends on `m_weight`, see the definition below.
 #define _out (outputData[uint(gl_GlobalInvocationID)])
 
 #include "../../Constants.h"
@@ -28,20 +31,25 @@ const uint64_t rngKey = 13; // TODO(rudi) this was the old key, it generated a w
 /* The meaning of the `m_weight` field of a `Ray` { */
     // The future Path of this Ray does not intersect any elements anymore (in other words `getOpticalElementIntersection` yields w=0 for all elements)
     // This Ray now flies off to infinity.
-    // position & orientation are in world coordinates.
+    //
+    // Ray is in world coordinates.
     const double W_FLY_OFF = 0;
 
     // This Ray is still pathing through objects.
     // When the computation is finished weight shall not be `W_IN_COMPUTATION`.
-    // position & orientation might be in world or element coordinates, depending on the segment of the computation.
+    //
+    // Ray is in world coordinates.
     const double W_IN_COMPUTATION = 1;
 
     // This Ray has hit an ImagePlane, this ImagePlane is `m_lastElement`.
-    // position & orientation are in element coordinates, relative to `m_lastElement`.
+    //
+    // Ray is in element coordinates, relative to `m_lastElement`.
     const double W_HIT_IMAGE_PLANE = 2;
 
     // This Ray was absorbed by `m_lastElement`.
-    // position & orientation are in element coordinates, relative to `m_lastElement`.
+    //
+    // Ray is in element coordinates, relative to `m_lastElement`.
+    // TODO not yet used!
     const double W_ABSORBED = 3;
 /* } */
 
@@ -89,9 +97,11 @@ struct Element {
 	};
 #endif
 /* LAYOUTS */
-	layout(std140, binding = 0) buffer ibuf { Ray rayData[]; }; // in global coordinates
+    // don't use this directly. Use `_ray` instead.
+	layout(std140, binding = 0) buffer ibuf { Ray rayData[]; };
 
-	layout(std140, binding = 1) buffer obuf { Ray outputData[]; }; // in element coordinates, i.e. relative to the last element the ray has collided with.
+    // don't use this directly. Use `_out` instead.
+	layout(std140, binding = 1) buffer obuf { Ray outputData[]; };
 
 	layout(std140, binding = 2) buffer qbuf {
 		double numberOfBeamlines;
@@ -187,7 +197,6 @@ void dynamicElements() {
             double lastElement = _ray.m_lastElement;
             if (elementIndex + 1 == lastElement) {
                 // TODO: self-intersection
-                // _ray.m_weight = 11;
                 continue;
             }
 
@@ -211,56 +220,61 @@ void dynamicElements() {
             }
         }
 
-        if (closestElementIndex == -1) {  // no element was hit. Ray is considered to move forward to inf.
-            _ray.m_weight = W_FLY_OFF;
-            break;
+        if (closestElementIndex == -1) {
+            // no element was hit.
+            // Ray is considered to move forward to inf.
+            // This is the only constellation in which `_out` is in world coordinates.
+
+            _out = _ray;
+            _out.m_weight = W_FLY_OFF;
+            return;
         }
 
         // transform ray and intersection point in ELEMENT coordiantes
         nextElement                          = quadricData[closestElementIndex];
-        _ray = rayMatrixMult(_ray, nextElement.inTrans);
+        Ray elem_ray = rayMatrixMult(_ray, nextElement.inTrans);
 
         // Calculate interaction(reflection,material, absorption etc.) of ray with detected next element
         type = int(nextElement.surfaceParams[3][0]);
         if (type == 0) {  // plane + sphere mirror
-            _ray = traceMirror(_ray, closestElementIndex, ctr, closestHitpoint);
+            elem_ray = traceMirror(elem_ray, closestElementIndex, ctr, closestHitpoint);
 
         } else if (type == 1) {  // plane grating
-            _ray = tracePlaneGrating(_ray, closestElementIndex, ctr, closestHitpoint);
+            elem_ray = tracePlaneGrating(elem_ray, closestElementIndex, ctr, closestHitpoint);
 
         } else if (type == 2) {  // general grating
-            _ray = traceGeneralGrating(_ray, closestElementIndex, ctr, closestHitpoint);
+            elem_ray = traceGeneralGrating(elem_ray, closestElementIndex, ctr, closestHitpoint);
 
         } else if (type == 3) {  // Slit
-            _ray = traceSlit(_ray, closestElementIndex, ctr, closestHitpoint);
+            elem_ray = traceSlit(elem_ray, closestElementIndex, ctr, closestHitpoint);
 
         } else if (type == 4) {  // rzp
-            _ray = traceRZP(_ray, closestElementIndex, ctr, closestHitpoint);
+            elem_ray = traceRZP(elem_ray, closestElementIndex, ctr, closestHitpoint);
 
         } else if (type == 5) {  // image plane
-            _ray.m_extraParam += (closestElementIndex + 1) * bounce;
-            _ray.m_lastElement = closestElementIndex + 1;
-            _ray.m_weight = W_HIT_IMAGE_PLANE;
-            _out = traceImagePlane(_ray, closestElementIndex, closestHitpoint);
+            elem_ray.m_extraParam += (closestElementIndex + 1) * bounce;
+            elem_ray.m_lastElement = closestElementIndex + 1;
+            elem_ray.m_weight = W_HIT_IMAGE_PLANE;
+            _out = traceImagePlane(elem_ray, closestElementIndex, closestHitpoint);
             return;
 
         } else if (type == 6) {  // toroid mirror
-            _ray = traceToroid(_ray, closestElementIndex, ctr, closestHitpoint);
+            elem_ray = traceToroid(elem_ray, closestElementIndex, ctr, closestHitpoint);
 
         } else if (type == 7) {  // ellipsoid mirror
-            _ray = traceEllipsoidMirror(_ray, closestElementIndex, ctr, closestHitpoint);
+            elem_ray = traceEllipsoidMirror(elem_ray, closestElementIndex, ctr, closestHitpoint);
         }
 
         // use extraParameter to store the order in which the ray has hit which optical element (e.g extraParameter = 412 -> first hit element 2, then
         // 1, then 4)
-        _ray.m_extraParam += ((closestElementIndex + 1) * bounce) * int(_ray.m_lastElement == closestElementIndex + 1);
-        bounce *= pow(10, int(_ray.m_lastElement == closestElementIndex + 1));
+        elem_ray.m_extraParam += ((closestElementIndex + 1) * bounce) * int(elem_ray.m_lastElement == closestElementIndex + 1);
+        bounce *= pow(10, int(elem_ray.m_lastElement == closestElementIndex + 1));
 
         // transform back to WORLD coordinates
-        _ray = rayMatrixMult(_ray, nextElement.outTrans);
+        _ray = rayMatrixMult(elem_ray, nextElement.outTrans);
     }
 
-    // outputData should be in element coordinates.
+    // outputData should be in element coordinates. (except for `_out.m_weight == W_FLY_OFF`)
     _out = rayMatrixMult(_ray, nextElement.inTrans);
 }
 
