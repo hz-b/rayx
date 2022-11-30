@@ -22,11 +22,16 @@ bool last_comp(Ray const& lhs, Ray const& rhs) { return last_obj(lhs.m_extraPara
 bool comp(Ray const& lhs, Ray const& rhs) { return lhs.m_extraParam < rhs.m_extraParam; }
 bool abs_comp(double const& lhs, double const& rhs) { return abs(lhs) < abs(rhs); }
 inline bool int_close(double x, double y) { return abs(x - y) < std::numeric_limits<double>::epsilon(); }
-
-struct OpticalElementsMeta {
+/**
+ * @brief Compact Optical Element Description
+ *
+ */
+struct OpticalElementMeta {
     std::string name;
     int type;
     double material;
+    double height;
+    double width;
 };
 
 /**
@@ -34,12 +39,13 @@ struct OpticalElementsMeta {
  *
  * @return std::vector<std::string> list of (names, type etc.)
  */
-std::vector<OpticalElementsMeta> getBeamlineOpticalElementsMeta(const std::unique_ptr<RAYX::Beamline>& beamline) {
-    std::vector<OpticalElementsMeta> meta;
+std::vector<OpticalElementMeta> getBeamlineOpticalElementMeta(const std::unique_ptr<RAYX::Beamline>& beamline) {
+    std::vector<OpticalElementMeta> meta;
     meta.reserve(beamline->m_OpticalElements.size());
 
     for (const auto& opticalElement : beamline->m_OpticalElements) {
-        meta.push_back({opticalElement->m_name, (int)opticalElement->getSurfaceParams()[3][0], (double)opticalElement->getSurfaceParams()[3][2]});
+        meta.push_back({opticalElement->m_name, (int)opticalElement->getSurfaceParams()[3][0], (double)opticalElement->getSurfaceParams()[3][2],
+                        opticalElement->getHeight(), opticalElement->getWidth()});
     }
 
     return meta;
@@ -220,7 +226,41 @@ struct Point {
     int intensity;  // Number of points that are close to this position a.k.a color intensity
 };
 
-//std::vector<std::vector<Point>> plotReducer(const std::vector<Ray>& RayList, const double grid_factor) {}
+/**
+ * @brief Make a grid of pixels with intensity and positions 
+ * 
+ * @param x Original X pos
+ * @param y Original Y pos
+ * @param OpticalElementMeta Object at hand
+ * @param x_offset x offset eg [3,-3.5] -> [6.5, 0]
+ * @param y_offset y offset
+ * @return std::vector<std::vector<Point>> Each cell has the X coordinates and Y coordinates
+ */
+std::vector<std::vector<Point>> plotReducer(const std::vector<double>& x, const std::vector<double>& y, const OpticalElementMeta OpticalElementMeta,
+                                            const double x_offset, const double y_offset) {
+    const int GRID_FACTOR = 1080;
+
+    int grid_w = int(OpticalElementMeta.width * GRID_FACTOR + 1);
+    int grid_h = int(OpticalElementMeta.height * GRID_FACTOR + 1);
+
+    std::vector<std::vector<Point>> grid;
+
+    grid.reserve(grid_w * grid_h);
+
+    for (auto row : grid) {
+        std::fill(row.begin(), row.end(), Point{0.0, 0.0, 0});
+    }
+
+    int cell_x, cell_y;
+
+    for (auto i = 0; i < x.size(); i++) {
+        cell_x = int(x[i] + x_offset * GRID_FACTOR);
+        cell_y = int(y[i] + y_offset * GRID_FACTOR);
+        grid[cell_x][cell_y].xpos = x[i];
+        grid[cell_x][cell_y].ypos = y[i];
+        grid[cell_x][cell_y].intensity++;
+    }
+}
 
 /**
  * @brief Plot for each intersection
@@ -228,7 +268,7 @@ struct Point {
  * @param RayList Data (Rays)
  * @param plotName
  */
-void plotMulti(const std::vector<Ray>& RayList, const std::string& plotName, const std::vector<OpticalElementsMeta>& OpticalElementsMeta) {
+void plotMulti(const std::vector<Ray>& RayList, const std::string& plotName, const std::vector<OpticalElementMeta>& OpticalElementsMeta) {
     // s is sorted and unique extraParam values extracted
     auto s = RayList;
 
@@ -336,7 +376,7 @@ void plotMulti(const std::vector<Ray>& RayList, const std::string& plotName, con
         e++;
     }
     // Ignore Tex symbols
-    while (title.find("_") != std::string::npos) title = title.replace(title.find("_"), 1, "-");
+    while (title.find('_') != std::string::npos) title = title.replace(title.find('_'), 1, "-");
     gr.Title(title.c_str());
 
     auto files = outputPlotPathHandler(plotName);
@@ -358,10 +398,10 @@ void Plotter::plot(int plotType, const std::string& plotName, const std::vector<
     RAYX_LOG << "Plotting...";
 
     // Get Beamline Meta Data (Name, type etc.)
-    auto opticalElementsMeta = getBeamlineOpticalElementsMeta(beamline);
+    auto OpticalElementsMeta = getBeamlineOpticalElementMeta(beamline);
 
     std::vector<std::string> opticalElementNames;
-    for (auto i : opticalElementsMeta) {
+    for (const auto& i : OpticalElementsMeta) {
         opticalElementNames.push_back(i.name);
     }
 
@@ -369,7 +409,7 @@ void Plotter::plot(int plotType, const std::string& plotName, const std::vector<
     if (plotType == plotTypes::SinglePlot)  // RAY-UI
         plotSingle(RayList, plotName, opticalElementNames);
     else if (plotType == plotTypes::MultiPlot)
-        plotMulti(RayList, plotName, opticalElementsMeta);
+        plotMulti(RayList, plotName, OpticalElementsMeta);
     else
         RAYX_D_ERR << "Plot Type not supported";
 }
