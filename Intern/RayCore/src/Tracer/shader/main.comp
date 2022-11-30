@@ -20,6 +20,26 @@
 #include "../../Constants.h"
 const uint64_t rngKey = 13; // TODO(rudi) this was the old key, it generated a warning: (0xc8e4fd15 << 32) | 0x4ce32f6d;
 
+/* The meaning of the `m_weight` field of a `Ray` { */
+    // The future Path of this Ray does not intersect any elements anymore (in other words `getOpticalElementIntersection` yields w=0 for all elements)
+    // This Ray now flies off to infinity.
+    // position & orientation are in world coordinates.
+    const double W_FLY_OFF = 0;
+
+    // This Ray is still pathing through objects.
+    // When the computation is finished weight shall not be `W_IN_COMPUTATION`.
+    // position & orientation might be in world or element coordinates, depending on the segment of the computation.
+    const double W_IN_COMPUTATION = 1;
+
+    // This Ray has hit an ImagePlane, this ImagePlane is `m_lastElement`.
+    // position & orientation are in element coordinates, relative to `m_lastElement`.
+    const double W_HIT_IMAGE_PLANE = 2;
+
+    // This Ray was absorbed by `m_lastElement`.
+    // position & orientation are in element coordinates, relative to `m_lastElement`.
+    const double W_ABSORBED = 3;
+/* } */
+
 /* STRUCTS */
 // for CPP, the according things are mostly defined in CpuTracer.h
 #ifdef CPP
@@ -39,7 +59,9 @@ ShaderArray<double> mat;
 #else
 struct Ray {
     dvec3 m_position;
-    double m_weight;  // status of the ray (e.g if element missed -> 0)
+    // Initially weight is `W_IN_COMPUTATION`.
+    // See the potential values of `m_weight` above.
+    double m_weight;
     dvec3 m_direction;
     double m_energy;
     dvec4 m_stokes;
@@ -187,7 +209,8 @@ void dynamicElements() {
             }
         }
 
-        if (closestElementIndex == -1) {  // no element was hit. Ray is considered to move forward to inf. (With weight == 0)
+        if (closestElementIndex == -1) {  // no element was hit. Ray is considered to move forward to inf.
+            rayData[uint(gl_GlobalInvocationID)].m_weight = W_FLY_OFF;
             break;
         }
 
@@ -216,6 +239,7 @@ void dynamicElements() {
         } else if (type == 5) {  // image plane
             rayData[uint(gl_GlobalInvocationID)].m_extraParam += (closestElementIndex + 1) * bounce;
             rayData[uint(gl_GlobalInvocationID)].m_lastElement = closestElementIndex + 1;
+            rayData[uint(gl_GlobalInvocationID)].m_weight = W_HIT_IMAGE_PLANE;
             outputData[uint(gl_GlobalInvocationID)] = traceImagePlane(rayData[uint(gl_GlobalInvocationID)], closestElementIndex, closestHitpoint);
             return;
 
