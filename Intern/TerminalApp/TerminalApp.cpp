@@ -64,7 +64,7 @@ void TerminalApp::tracePath(const std::filesystem::path& path) {
         // Plot
         if (m_CommandParser->m_args.m_plotFlag) {
             if (m_CommandParser->m_args.m_multiplePlots) {
-                RAYX::Plotter::plot(2, path.string(), rays, m_Beamline);
+                RAYX::Plotter::plot(1, path.string(), rays, m_Beamline);
             } else
                 RAYX::Plotter::plot(0, path.string(), rays, m_Beamline);
         }
@@ -161,5 +161,3 @@ void TerminalApp::exportDebug() {
     }
 }
 #endif
-
-

@@ -23,62 +23,26 @@ bool comp(Ray const& lhs, Ray const& rhs) { return lhs.m_extraParam < rhs.m_extr
 bool abs_comp(double const& lhs, double const& rhs) { return abs(lhs) < abs(rhs); }
 inline bool int_close(double x, double y) { return abs(x - y) < std::numeric_limits<double>::epsilon(); }
 
+struct OpticalElementsMeta {
+    std::string name;
+    int type;
+    double material;
+};
+
 /**
- * @brief Get all beamline optical elemet names
+ * @brief Get all beamline optical elememt meta data
  *
- * @return std::vector<std::string> list of names
+ * @return std::vector<std::string> list of (names, type etc.)
  */
 std::vector<OpticalElementsMeta> getBeamlineOpticalElementsMeta(const std::unique_ptr<RAYX::Beamline>& beamline) {
-    std::vector<OpticalElementsMeta> names;
-    names.reserve(beamline->m_OpticalElements.size());
+    std::vector<OpticalElementsMeta> meta;
+    meta.reserve(beamline->m_OpticalElements.size());
 
     for (const auto& opticalElement : beamline->m_OpticalElements) {
-        names.push_back({opticalElement->m_name, (int)opticalElement->getSurfaceParams()[3][0]});
+        meta.push_back({opticalElement->m_name, (int)opticalElement->getSurfaceParams()[3][0], (double)opticalElement->getSurfaceParams()[3][2]});
     }
 
-    return names;
-}
-
-/**
- * @brief Get all beamline light sources names
- *
- * @return std::vector<std::string> list of names
- */
-std::vector<std::string> getBeamlineLightSourcesNames(const std::unique_ptr<RAYX::Beamline>& beamline) {
-    std::vector<std::string> names;
-    names.reserve(beamline->m_LightSources.size());
-
-    for (const auto& lightSources : beamline->m_LightSources) {
-        names.push_back(lightSources->m_name);
-    }
-
-    return names;
-}
-
-/**
- * @brief Plot the Data
- *
- * @param plotType Plot type, please check ENUM
- * @param plotName Plot Name
- * @param RayList Data to be plotted
- */
-void Plotter::plot(int plotType, const std::string& plotName, const std::vector<Ray>& RayList, const std::unique_ptr<RAYX::Beamline>& beamline) {
-    RAYX_LOG << "Plotting...";
-
-    // Get Beamline Meta Data (Name, type etc.)
-    auto opticalElementsMeta = getBeamlineOpticalElementsMeta(beamline);
-    std::vector<std::string> opticalElementNames;
-    for (auto i : opticalElementsMeta) {
-        opticalElementNames.push_back(i.name);
-    }
-
-    // Plot with correct option
-    if (plotType == plotTypes::LikeRAYUI)  // RAY-UI
-        plotLikeRAYUI(RayList, plotName, opticalElementNames);
-    else if (plotType == plotTypes::ForEach)
-        RAYX_D_ERR << "Plot Type not supported";
-    else if (plotType == plotTypes::Eachsubplot)
-        plotforEach(RayList, plotName, opticalElementsMeta);
+    return meta;
 }
 
 /**
@@ -88,7 +52,7 @@ void Plotter::plot(int plotType, const std::string& plotName, const std::vector<
  * @param vec Input Data Vector
  * @return int Bin Amount
  */
-int Plotter::getBinAmount(std::vector<double>& vec) {
+[[deprecated]] int getBinAmount(std::vector<double>& vec) {
 #ifdef FREEDMAN
     std::vector<double>::iterator b = vec.begin();
     std::vector<double>::iterator e = vec.end();
@@ -141,7 +105,7 @@ std::pair<std::string, std::string> outputPlotPathHandler(const std::string outp
  * @param RayList Data (Rays)
  * @param plotName
  */
-void Plotter::plotLikeRAYUI(const std::vector<Ray>& RayList, const std::string& plotName, const std::vector<std::string>& OpticalElementNames) {
+void plotSingle(const std::vector<Ray>& RayList, const std::string& plotName, const std::vector<std::string>& OpticalElementNames) {
     ////////////////// Sort Data for plotting
     std::vector<double> Xpos, Ypos;
     Xpos.reserve(RayList.size());
@@ -250,13 +214,21 @@ void Plotter::plotLikeRAYUI(const std::vector<Ray>& RayList, const std::string& 
     }
 }
 
+struct Point {
+    double xpos;    // Position at X
+    double ypos;    // Position at Y
+    int intensity;  // Number of points that are close to this position a.k.a color intensity
+};
+
+//std::vector<std::vector<Point>> plotReducer(const std::vector<Ray>& RayList, const double grid_factor) {}
+
 /**
  * @brief Plot for each intersection
  *
  * @param RayList Data (Rays)
  * @param plotName
  */
-void Plotter::plotforEach(const std::vector<Ray>& RayList, const std::string& plotName, const std::vector<OpticalElementsMeta>& OpticalElementsMeta) {
+void plotMulti(const std::vector<Ray>& RayList, const std::string& plotName, const std::vector<OpticalElementsMeta>& OpticalElementsMeta) {
     // s is sorted and unique extraParam values extracted
     auto s = RayList;
 
@@ -292,7 +264,14 @@ void Plotter::plotforEach(const std::vector<Ray>& RayList, const std::string& pl
     gr.SetSize(cols * 400, (cols - 1) * 400);  // TODO : This should be changed once we have Windowing lib
     gr.SetFontSize(2.5);
 
+    enum PlotAxes { XY, XZ };
+    PlotAxes axes;
     for (auto u : s) {
+        if ((last_obj(u.m_extraParam) == 0) || (OpticalElementsMeta[last_obj(u.m_extraParam) - 1].material == -2))
+            axes = XZ;
+        else
+            axes = XY;
+
         for (auto r : RayList) {
             if (int_close(r.m_extraParam, u.m_extraParam)) {
                 Xpos.push_back(r.m_position.x);
@@ -332,12 +311,9 @@ void Plotter::plotforEach(const std::vector<Ray>& RayList, const std::string& pl
         gr.Grid("xyzt", "=h");
         gr.Axis();
 
-        // Element is not a Source and is of type ImagePlane or RZP
-        if ((last_obj(u.m_extraParam) != 0) ||
-            ((OpticalElementsMeta[last_obj(u.m_extraParam) - 1].type == 0) || (OpticalElementsMeta[last_obj(u.m_extraParam) - 1].type == 4))) {
+        // No intersection or is reflective
+        if (axes == XZ) {
             gr.SetRanges(ranges.xmin, ranges.xmax, ranges.zmin, ranges.zmax);
-            RAYX_D_LOG << "last obj " << last_obj(u.m_extraParam);
-            RAYX_D_LOG << "type " << OpticalElementsMeta[last_obj(u.m_extraParam) - 1].type;
             gr.Plot(x, z, " o{x62C300}");  // o-markers  green-yellow
         } else {
             gr.SetRanges(ranges.xmin, ranges.xmax, ranges.ymin, ranges.ymax);
@@ -352,10 +328,11 @@ void Plotter::plotforEach(const std::vector<Ray>& RayList, const std::string& pl
 
     gr.MultiPlot(1, cols, 0, 1, 1, "#");
     auto title = plotName;
-    title = title + "Multiplot \n \n";
+    title = title + "\nMultiplot\n";
     int e = 1;
+    title += "0: No intersection, ";
     for (const auto& element : OpticalElementsMeta) {
-        title += std::to_string(e) + ": " + element.name + ((e % 6 != 0) ? ", " : ",\n");
+        title += std::to_string(e) + ": " + element.name + ((e % 5 != 0) ? ", " : ",\n");
         e++;
     }
     // Ignore Tex symbols
@@ -371,33 +348,30 @@ void Plotter::plotforEach(const std::vector<Ray>& RayList, const std::string& pl
 }
 
 /**
- * @brief Plot and save custom benchmarked functions with -b arg
+ * @brief Plot the Data
  *
- * @param BenchMap
+ * @param plotType Plot type, please check ENUM
+ * @param plotName Plot Name
+ * @param RayList Data to be plotted
  */
-void Plotter::plotBenchmarks(const std::map<std::string, double>& BenchMap) {
-    std::vector<double> times;
-    std::vector<std::string> labels;
-    std::vector<int> ticks(BenchMap.size());
-    labels.reserve(BenchMap.size());
-    times.reserve(BenchMap.size());
+void Plotter::plot(int plotType, const std::string& plotName, const std::vector<Ray>& RayList, const std::unique_ptr<RAYX::Beamline>& beamline) {
+    RAYX_LOG << "Plotting...";
 
-    std::iota(ticks.begin(), ticks.end(), 0);
+    // Get Beamline Meta Data (Name, type etc.)
+    auto opticalElementsMeta = getBeamlineOpticalElementsMeta(beamline);
 
-    for (const auto& i : BenchMap) {
-        labels.push_back(i.first);
-        times.push_back(i.second);
+    std::vector<std::string> opticalElementNames;
+    for (auto i : opticalElementsMeta) {
+        opticalElementNames.push_back(i.name);
     }
 
-    // matplotlibcpp::figure_size(1300, 1000);
-    RAYX_WARN << "plotBenchmarks not fully implemented";
-    return;
-    // matplotlibcpp::bar(times);
-    // matplotlibcpp::xticks(ticks, labels);
-    // matplotlibcpp::xlabel("Function Names");
-    // matplotlibcpp::ylabel("Time (ms)");
-    // matplotlibcpp::title("Benchmark results");
-    // matplotlibcpp::save("Benchres");
+    // Plot with correct option
+    if (plotType == plotTypes::SinglePlot)  // RAY-UI
+        plotSingle(RayList, plotName, opticalElementNames);
+    else if (plotType == plotTypes::MultiPlot)
+        plotMulti(RayList, plotName, opticalElementsMeta);
+    else
+        RAYX_D_ERR << "Plot Type not supported";
 }
 
 }  // namespace RAYX
