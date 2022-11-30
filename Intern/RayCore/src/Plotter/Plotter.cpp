@@ -6,6 +6,8 @@
 #include <chrono>
 
 #include "Debug/Debug.h"
+#include "Debug/Instrumentor.h"
+
 // #define FREEDMAN
 // #define LONGEST_PATH
 
@@ -92,8 +94,10 @@ void Plotter::plotLikeRAYUI(const std::vector<Ray>& RayList, const std::string& 
             Ypos.push_back(r.m_position.y);
         }
     }
+
     auto minX = *(std::min_element(Xpos.begin(), Xpos.end()));
     auto minY = *(std::min_element(Ypos.begin(), Ypos.end()));
+
     // Start plot
     std::string title = plotName;
     matplotlibcpp::figure_size(1920, 1080);
@@ -124,14 +128,21 @@ void Plotter::plotLikeRAYUI(const std::vector<Ray>& RayList, const std::string& 
  * @param plotName
  */
 void Plotter::plotforEach(const std::vector<Ray>& RayList, const std::string& plotName, const std::vector<std::string>& OpticalElementNames) {
+    RAYX_PROFILE_FUNCTION_STDOUT();
+    
     // sortedRayList is sorted and unique extraParam values extracted
-    auto sortedRayList = RayList;
+    std::vector<double> sortedRayList;
 
-    std::sort(sortedRayList.begin(), sortedRayList.end(), comp);  // Should be a fast enough sort
-    sortedRayList.erase(
-        std::unique(sortedRayList.begin(), sortedRayList.end(),
-                    [](Ray const& lhs, Ray const& rhs) { return abs(lhs.m_extraParam - rhs.m_extraParam) < std::numeric_limits<double>::epsilon(); }),
-        sortedRayList.end());
+    sortedRayList.push_back(RayList[0].m_extraParam);
+
+    for (auto ray : RayList) {
+        auto found_ite = std::find(sortedRayList.begin(), sortedRayList.end(), ray.m_extraParam);
+        if (found_ite == sortedRayList.end()) {
+            sortedRayList.push_back(ray.m_extraParam);
+        }
+    }
+
+    std::sort(sortedRayList.begin(), sortedRayList.end());
     auto uniqueCount = sortedRayList.size();
 
     // Subplot in cols x cols
@@ -146,10 +157,11 @@ void Plotter::plotforEach(const std::vector<Ray>& RayList, const std::string& pl
     float percent;
     matplotlibcpp::figure_size(cols * 500, (cols - 1) * 500);
 
+    // U is extraParam in RayList
     for (auto u : sortedRayList) {
         if (i / sortedRayList.size() > 9 / 10) RAYX_VERB << "Almost there...";  // Wakeup up call (Temp)
         for (auto r : RayList) {
-            if (int_close(r.m_extraParam, u.m_extraParam)) {
+            if (int_close(r.m_extraParam, u)) {
                 Xpos.push_back(r.m_position.x);
                 Ypos.push_back(r.m_position.y);
             }
@@ -168,7 +180,7 @@ void Plotter::plotforEach(const std::vector<Ray>& RayList, const std::string& pl
             matplotlibcpp::scatter(Xpos, Ypos, size, {{"color", "#62c300"}, {"label", "Ray"}});
             matplotlibcpp::xlabel("x / mm");
             matplotlibcpp::ylabel("y / mm");
-            matplotlibcpp::title(std::to_string((int)u.m_extraParam) + " (" + std::to_string(percent) + "%)");
+            matplotlibcpp::title(std::to_string((int)u) + " (" + std::to_string(percent) + "%)");
 
             matplotlibcpp::legend();
 
