@@ -1,0 +1,157 @@
+struct Collision {
+    // whether a collision has been found.
+    bool found;
+
+    // The index of the element with which `_ray` collides.
+    int elementIndex;
+
+    // The point where `_ray` hits the element, in element-coordinates.
+    dvec4 hitpoint;
+};
+
+Collision find_collision() {
+    // index of element with current closest intersection with ray, initialized with -1
+    int closestElementIndex = -1;
+
+    // global coordinates of first intersection point of ray among all elements in beamline
+    dvec4 closestHitpoint       = dvec4(infinity(), infinity(), infinity(), 0);
+    dvec4 closestGlobalHitpoint = dvec4(infinity(), infinity(), infinity(), 0);
+
+    const uint beamlineIndex    = uint(double(gl_GlobalInvocationID) / numberOfRaysPerBeamLine);
+
+    // Find intersection points through all elements
+    for (int elementIndex = int(beamlineIndex) * int(numberOfElementsPerBeamline);
+         elementIndex < (beamlineIndex + 1) * numberOfElementsPerBeamline; elementIndex++) {
+
+        double lastElement = _ray.m_lastElement;
+        if (elementIndex + 1 == lastElement) {
+            // TODO: self-intersection
+            continue;
+        }
+
+        dvec4 currentIntersection = getOpticalElementIntersection(_ray, elementIndex);
+        dvec3 currentIntersection_xyz = dvec3(currentIntersection.x, currentIntersection.y, currentIntersection.z);
+
+        // Intersection coordinates in GLOBAL coordinates
+        dvec4 currentGlobalIntersection;
+        dvec3 tmp = dvec3(quadricData[elementIndex].outTrans * dvec4(currentIntersection_xyz, 1));
+        currentGlobalIntersection = dvec4(tmp, currentGlobalIntersection.w);
+        dvec3 currentGlobalIntersection_xyz = dvec3(currentGlobalIntersection.x, currentGlobalIntersection.y, currentGlobalIntersection.z);
+
+        dvec3 closestGlobalHitpoint_xyz = dvec3(closestGlobalHitpoint.x, closestGlobalHitpoint.y, closestGlobalHitpoint.z);
+        // check if current intersection is closer than the closest previous Hitpoint
+        // If yes then update. Since the old intersection is occluded by the old Intersection/Hit point
+        if (length(_ray.m_position - closestGlobalHitpoint_xyz) > length(_ray.m_position - currentGlobalIntersection_xyz) &&
+            currentIntersection.w != 0) {
+            closestHitpoint       = currentIntersection;
+            closestGlobalHitpoint = currentGlobalIntersection;
+            closestElementIndex   = elementIndex;
+        }
+    }
+
+    Collision col;
+    col.found = closestElementIndex != -1;
+    col.hitpoint = closestHitpoint;
+    col.elementIndex = closestElementIndex;
+    return col;
+}
+
+// @brief: Dynamic ray tracing: check which ray hits which element first
+// in this function we need to make sure that rayData ALWAYS remains in GLOBAL coordinates (it can be changed in a function but needs to be changed
+// back before the function returns to this function)
+void dynamicElements() {
+    const int numberOfElements = quadricData.length();
+    // placeholder, info should later be transfered to shader
+    const int maxBounces  = numberOfElements;
+
+    // ray specific "seed" for random numbers -> every ray has a different starting value for the counter that creates the random number
+    uint64_t workerCounterNum = (~(uint64_t(0)) / int(numberOfRays));
+    uint64_t ctr              = uint(gl_GlobalInvocationID) * workerCounterNum;
+    int type                  = -1;
+
+    #ifdef RAYX_DEBUG_MODE // Debug Matrix only works in GPU Mode and on DEBUG Build Type
+    #ifndef CPP
+    // Set Debug Struct of current Ray to identity
+    d_struct[uint(gl_GlobalInvocationID)]._dMat = dmat4(1);
+    #endif
+    #endif
+
+    Element nextElement;
+    // at the end of this function we apply inTrans, if no collision happened (i.e. nextElement undefined), we want this to do nothing.
+    nextElement.inTrans = dmat4(1);
+    nextElement.outTrans = dmat4(1);
+
+    double bounce = 1;
+
+    // Printing Example over vkconfig Validation Layers
+    if (uint(gl_GlobalInvocationID) == 2 ){
+    #ifndef CPP
+        // debugPrintfEXT("Hello from GPU. \n");
+    #else
+        // RAYX_D_LOG << "Tracing on CPU..." ;
+    #endif
+    }
+
+    // Iterate through all bounces
+    for (int i = 0; i < maxBounces; i++) {
+        Collision col = find_collision();
+
+        if (!col.found) {
+            // no element was hit.
+            // Ray is considered to move forward to inf.
+            // This is the only constellation in which `_out` is in world coordinates.
+
+            _out = _ray;
+            _out.m_weight = W_FLY_OFF;
+            return;
+        }
+
+        // transform ray and intersection point in ELEMENT coordiantes
+        nextElement = quadricData[col.elementIndex];
+        Ray elem_ray = rayMatrixMult(_ray, nextElement.inTrans);
+
+        // Calculate interaction(reflection,material, absorption etc.) of ray with detected next element
+        type = int(nextElement.surfaceParams[3][0]);
+        if (type == 0) {  // plane + sphere mirror
+            elem_ray = traceMirror(elem_ray, col.elementIndex, ctr, col.hitpoint);
+
+        } else if (type == 1) {  // plane grating
+            elem_ray = tracePlaneGrating(elem_ray, col.elementIndex, ctr, col.hitpoint);
+
+        } else if (type == 2) {  // general grating
+            elem_ray = traceGeneralGrating(elem_ray, col.elementIndex, ctr, col.hitpoint);
+
+        } else if (type == 3) {  // Slit
+            elem_ray = traceSlit(elem_ray, col.elementIndex, ctr, col.hitpoint);
+
+        } else if (type == 4) {  // rzp
+            elem_ray = traceRZP(elem_ray, col.elementIndex, ctr, col.hitpoint);
+
+        } else if (type == 5) {  // image plane
+            elem_ray.m_extraParam += (col.elementIndex + 1) * bounce;
+            elem_ray.m_lastElement = col.elementIndex + 1;
+            elem_ray.m_weight = W_HIT_IMAGE_PLANE;
+            _out = traceImagePlane(elem_ray, col.elementIndex, col.hitpoint);
+            return;
+
+        } else if (type == 6) {  // toroid mirror
+            elem_ray = traceToroid(elem_ray, col.elementIndex, ctr, col.hitpoint);
+
+        } else if (type == 7) {  // ellipsoid mirror
+            elem_ray = traceEllipsoidMirror(elem_ray, col.elementIndex, ctr, col.hitpoint);
+        }
+
+        // use extraParameter to store the order in which the ray has hit which optical element (e.g extraParameter = 412 -> first hit element 2, then
+        // 1, then 4)
+        elem_ray.m_extraParam += ((col.elementIndex + 1) * bounce) * int(elem_ray.m_lastElement == col.elementIndex + 1);
+        bounce *= pow(10, int(elem_ray.m_lastElement == col.elementIndex + 1));
+
+        // transform back to WORLD coordinates
+        _ray = rayMatrixMult(elem_ray, nextElement.outTrans);
+    }
+
+    // outputData should be in element coordinates. (except for `_out.m_weight == W_FLY_OFF`)
+    _out = rayMatrixMult(_ray, nextElement.inTrans);
+}
+
+
