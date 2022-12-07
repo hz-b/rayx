@@ -105,6 +105,34 @@ std::pair<std::string, std::string> outputPlotPathHandler(const std::string outp
     return std::make_pair<std::string, std::string>(outputSvg.c_str(), outputPng.c_str());
 }
 
+inline void autoPlotReducer(const mglData& x, const mglData& y, std::vector<double>& xV, std::vector<double>& yV, mglData& xD, mglData& yD) {
+    mglData minimalXRepart = x.Hist(x.GetNx());
+    mglData minimalYRepart = y.Hist(y.GetNx());
+
+    double* arrayX = minimalXRepart.a;
+    std::vector<double> minimalXRepartV(arrayX, arrayX + minimalXRepart.GetNx());
+    std::erase_if(minimalXRepartV, [](double x) { return std::abs(x) < std::numeric_limits<double>::epsilon(); });
+
+    double* arrayY = minimalYRepart.a;
+    std::vector<double> minimalYRepartV(arrayY, arrayY + minimalYRepart.GetNx());
+    std::erase_if(minimalYRepartV, [](double y) { return std::abs(y) < std::numeric_limits<double>::epsilon(); });
+
+    mglData* workDataArray = minimalYRepartV.size() >= minimalYRepartV.size() ? &minimalXRepart : &minimalYRepart;
+
+    xV.reserve(workDataArray->GetNx());
+    yV.reserve(workDataArray->GetNx());
+    for (auto t = 0; t <= workDataArray->GetNx(); t++) {
+        if (std::abs(workDataArray->a[t]) > std::numeric_limits<double>::epsilon()) {
+            xV.push_back(x.a[t]);
+            yV.push_back(x.a[t]);
+        }
+    }
+    xV.shrink_to_fit();
+    yV.shrink_to_fit();
+    xD.Link(xV.data(), xV.size());
+    yD.Link(yV.data(), yV.size());
+}
+
 /**
  * @brief Plot final Image Plane
  *
@@ -112,6 +140,7 @@ std::pair<std::string, std::string> outputPlotPathHandler(const std::string outp
  * @param plotName
  */
 void plotSingle(const std::vector<Ray>& RayList, const std::string& plotName, const std::vector<std::string>& OpticalElementNames) {
+    RAYX_PROFILE_FUNCTION_STDOUT();
     ////////////////// Sort Data for plotting
     std::vector<double> Xpos, Ypos;
     Xpos.reserve(RayList.size());
@@ -139,6 +168,42 @@ void plotSingle(const std::vector<Ray>& RayList, const std::string& plotName, co
     auto maxX = *(std::max_element(Xpos.begin(), Xpos.end()));
     auto maxY = *(std::max_element(Ypos.begin(), Ypos.end()));
 
+    ////////////////// Data processing and binning
+
+    mglData x_mgl, y_mgl;
+    x_mgl.Link(Xpos.data(), Xpos.size());
+    y_mgl.Link(Ypos.data(), Ypos.size());
+
+    // Data Distribution
+    mglData minimalXRepart = x_mgl.Hist(Xpos.size());
+    mglData minimalYRepart = y_mgl.Hist(Ypos.size());
+
+    double* arrayX = minimalXRepart.a;
+    std::vector<double> minimalXRepartV(arrayX, arrayX + minimalXRepart.GetNx());
+    std::erase_if(minimalXRepartV, [](double x) { return std::abs(x) < std::numeric_limits<double>::epsilon(); });
+
+    double* arrayY = minimalYRepart.a;
+    std::vector<double> minimalYRepartV(arrayY, arrayY + minimalYRepart.GetNx());
+    std::erase_if(minimalYRepartV, [](double y) { return std::abs(y) < std::numeric_limits<double>::epsilon(); });
+    // Smallest distr as bin default
+    mglData* workData_mgl = minimalYRepartV.size() >= minimalYRepartV.size() ? &minimalXRepart : &minimalYRepart;
+
+    std::vector<double> xminiVec, yminiVec;
+    xminiVec.reserve(workData_mgl->GetNx());
+    yminiVec.reserve(workData_mgl->GetNx());
+    for (auto t = 0; t <= workData_mgl->GetNx(); t++) {
+        if (std::abs(workData_mgl->a[t]) > std::numeric_limits<double>::epsilon()) {
+            xminiVec.push_back(Xpos[t]);
+            yminiVec.push_back(Ypos[t]);
+        }
+    }
+    xminiVec.shrink_to_fit();
+    yminiVec.shrink_to_fit();
+
+    mglData xmini_mgl, ymini_mgl;
+    xmini_mgl.Link(xminiVec.data(), xminiVec.size());
+    ymini_mgl.Link(yminiVec.data(), yminiVec.size());
+
     ////////////////// Plotting
     {
         float margin = 0.05;
@@ -149,10 +214,6 @@ void plotSingle(const std::vector<Ray>& RayList, const std::string& plotName, co
         ranges.xmax = maxX + abs(maxX * margin);
         ranges.ymin = minY - abs(minY * margin);
         ranges.ymax = maxY + abs(maxY * margin);
-
-        mglData x, y;
-        x.Link(Xpos.data(), Xpos.size());
-        y.Link(Ypos.data(), Ypos.size());
 
         // Sanity check
         // for (size_t i = 0; i <= Xpos.size(); i++) {
@@ -174,7 +235,11 @@ void plotSingle(const std::vector<Ray>& RayList, const std::string& plotName, co
         gr.SetFontSize(2.5);
         gr.Axis();
 
-        gr.Plot(x, y, " o{x62C300}");  // o-markers  green-yellow
+        // autoPlotReducer(x,y,xV, yV, xD,yD);
+
+        gr.Plot(xmini_mgl, ymini_mgl, " o{x62C300}");
+
+        // gr.Plot(x, y, " o{x62C300}");  // o-markers  green-yellow
         gr.SetMarkSize(0.9);
         gr.Label('y', "y / mm", 0);
         gr.Label('x', "x / mm", 0);
@@ -182,9 +247,7 @@ void plotSingle(const std::vector<Ray>& RayList, const std::string& plotName, co
 
         gr.MultiPlot(3, 3, 0, 2, 1, "LA");
         // TODO: Find a way to add sqrt(n) bin size
-        float n = Xpos.size();
-        auto fx = x.Hist(n);
-        auto xx = gr.Hist(x, fx);
+        auto xx = gr.Hist(x_mgl, minimalXRepart);
         xx.Norm(0, 1);
         gr.SetRanges(ranges.xmin, ranges.xmax, 0, 1);
         gr.Axis();
@@ -200,8 +263,7 @@ void plotSingle(const std::vector<Ray>& RayList, const std::string& plotName, co
         gr.Title("Intensity", "", 2);
         gr.Rotate(180, 90);  // Bug in Barh..
         gr.SetRanges(ranges.ymin, ranges.ymax, 0, 1);
-        fx = y.Hist(n);
-        xx = gr.Hist(y, fx);
+        xx = gr.Hist(y_mgl, minimalYRepart);
         xx.Norm(0, 1);
         gr.Axis();
         gr.Box();
@@ -227,8 +289,8 @@ struct Point {
 };
 
 /**
- * @brief Make a grid of pixels with intensity and positions 
- * 
+ * @brief Make a grid of pixels with intensity and positions
+ *
  * @param x Original X pos
  * @param y Original Y pos
  * @param OpticalElementMeta Object at hand

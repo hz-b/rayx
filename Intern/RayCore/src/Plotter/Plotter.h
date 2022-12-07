@@ -5,11 +5,13 @@
 #include <map>
 #include <string>
 #include <vector>
+#include <cmath>
 
 #include "Core.h"
 #include "Model/Beamline/Beamline.h"
 #include "Model/Beamline/OpticalElement.h"
 #include "Tracer/Ray.h"
+#include "Debug/Instrumentor.h"
 
 namespace RAYX {
 class RAYX_API Plotter {
