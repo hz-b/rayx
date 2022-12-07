@@ -87,13 +87,13 @@ int sequentialExtraParam(int count) {
 std::vector<RAYX::Ray> traceRML(std::string filename, Filter filter) {
     auto beamline = loadBeamline(filename);
 
-    // the rays satisfying the weight != 0 test.
+    // the rays satisfying the weight != W_FLY_OFF test.
     std::vector<RAYX::Ray> wRays;
     {
         auto rays = tracer->trace(beamline);
         wRays.reserve(rays.size());
         for (auto r : rays) {
-            if (r.m_weight != 0) {
+            if (r.m_weight != W_FLY_OFF) {
                 wRays.push_back(r);
             }
         }

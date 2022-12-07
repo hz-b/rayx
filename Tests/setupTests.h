@@ -6,6 +6,7 @@
 #include <type_traits>
 
 #include "CanonicalizePath.h"
+#include "Constants.h"
 #include "Core.h"
 #include "Data/Importer.h"
 #include "Debug/Debug.h"
@@ -165,7 +166,7 @@ void writeToOutputCSV(std::vector<RAYX::Ray>& rays, std::string filename);
 enum class Filter { KeepAllRays, OnlySequentialRays };
 
 /// returns rays in element coordinates
-/// weight = 0 rays are filtered out.
+/// weight = W_FLY_OFF rays are filtered out.
 /// if filter == OnlySequentialRays, then only the sequential rays are returned.
 std::vector<RAYX::Ray> traceRML(std::string filename, Filter filter = Filter::KeepAllRays);
 
@@ -181,7 +182,7 @@ std::vector<RAYX::Ray> loadCSVRayUI(std::string filename);
 void compareRayLists(const std::vector<RAYX::Ray>& rayx, const std::vector<RAYX::Ray>& rayui, double t = 1e-11);
 
 /// This function automatcaily filters
-/// out weight = 0 rays from rayx, as they are automatically missing in rayui.
+/// out weight = W_FLY_OFF rays from rayx, as they are automatically missing in rayui.
 /// This also filters out non-sequential rays to compare to Ray-UI correctly.
 void compareAgainstRayUI(std::string filename, double t = 1e-11);
 
