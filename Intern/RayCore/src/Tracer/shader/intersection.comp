@@ -435,7 +435,7 @@ dvec4 getOpticalElementIntersection(Ray r, uint elementIndex) {
     if (type > 7) {
         return dvec4(infinity(), infinity(), infinity(), 0);
     }
-    if (type == 4) {  // rzp
+    if (type == TY_RZP) {
         r.m_position.z = r.m_position.z - e.elementParameters[3][2];
     }
 
@@ -444,7 +444,7 @@ dvec4 getOpticalElementIntersection(Ray r, uint elementIndex) {
     // misalignment
     r = rayMatrixMult(r, e.inTrans);  // image plane is the x-y plane of the coordinate system
 
-    if (type == 5) {                       // image plane
+    if (type == TY_IMAGE_PLANE) {
         double offset = 0 - r.m_position.z;  // length between ray origin (intersection point of previous element) and image plane
         currentIntersection.x =
             r.m_position.x + ((r.m_direction.x / r.m_direction.z) * offset);  // scale x-slope of ray (l/n) by z-length between origin and image plane
@@ -457,7 +457,7 @@ dvec4 getOpticalElementIntersection(Ray r, uint elementIndex) {
         r = rayMatrixMult(r, e.outTrans);  // do not know if this is necessary as the ray r is not defined as inout
         return currentIntersection;
 
-    } else if (type == 6 || (type == 4 && e.elementParameters[1][0] == 1)) {  // toroidal mirror or toroidal rzp
+    } else if (type == TY_TOROID_MIRROR || (type == TY_RZP && e.elementParameters[1][0] == 1 /* toroidal RZP */)) {
         double longRadius  = e.surfaceParams[0][0];
         double shortRadius = e.surfaceParams[0][1];
 
