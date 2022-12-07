@@ -34,4 +34,14 @@ const double W_HIT_IMAGE_PLANE = 2;
 const double W_ABSORBED = 3;
 /* } */
 
+// The meaning of surfaceParams[3][0] (i.e. the type of an element):
+const double TY_BASIC_MIRROR = 0;  // plane + sphere mirror
+const double TY_PLANE_GRATING = 1;
+const double TY_GENERAL_GRATING = 2;
+const double TY_SLIT = 3;
+const double TY_RZP = 4;
+const double TY_IMAGE_PLANE = 5;
+const double TY_TOROID_MIRROR = 6;
+const double TY_ELLIPSOID_MIRROR = 7;
+
 #endif

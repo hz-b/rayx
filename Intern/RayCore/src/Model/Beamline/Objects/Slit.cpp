@@ -1,5 +1,6 @@
 #include "Slit.h"
 
+#include "Constants.h"
 #include "Data/xml.h"
 #include "Debug/Debug.h"
 #include "Model/Surface/Quadric.h"
@@ -17,7 +18,7 @@ Slit::Slit(const DesignObject& dobj) : OpticalElement(dobj) {
                           : (m_centralBeamstop == CentralBeamstop::Elliptical ? -abs(beamstopWidth) : abs(beamstopWidth));
     m_beamstopHeight = m_centralBeamstop == CentralBeamstop::None ? 0 : abs(beamstopHeight) != 0;
 
-    setSurface(std::make_unique<Quadric>(glm::dmat4x4{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -1, 3, 0, 0, 0}));
+    setSurface(std::make_unique<Quadric>(glm::dmat4x4{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -1, TY_SLIT, 0, 0, 0}));
 }
 
 CentralBeamstop Slit::getCentralBeamstop() const { return m_centralBeamstop; }

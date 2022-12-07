@@ -2,6 +2,7 @@
 
 #include <ext/scalar_constants.hpp>
 
+#include "Constants.h"
 #include "Data/xml.h"
 #include "Debug/Debug.h"
 #include "Material/Material.h"
@@ -34,7 +35,7 @@ Cylinder::Cylinder(const DesignObject& dobj) : OpticalElement(dobj) {
 
     Material mat = dobj.parseMaterial();
     auto matd = (double)static_cast<int>(mat);
-    setSurface(std::make_unique<Quadric>(glm::dmat4x4{m_a11, 0, 0, 0, icurv, 1, 0, m_a24, 0, 0, m_a33, 0, 0, 0, matd, 0}));
+    setSurface(std::make_unique<Quadric>(glm::dmat4x4{m_a11, 0, 0, 0, icurv, 1, 0, m_a24, 0, 0, m_a33, 0, TY_BASIC_MIRROR, 0, matd, 0}));
 }
 
 /**

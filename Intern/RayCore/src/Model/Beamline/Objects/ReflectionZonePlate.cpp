@@ -37,14 +37,14 @@ ReflectionZonePlate::ReflectionZonePlate(const DesignObject& dobj) : OpticalElem
 
     // set parameters in Quadric class
     if (m_curvatureType == CurvatureType::Plane) {
-        setSurface(std::make_unique<Quadric>(glm::dmat4x4{0, 0, 0, 0, 1, 0, 0, -1, 0, 0, 0, 0, 4, 0, matd, 0}));
+        setSurface(std::make_unique<Quadric>(glm::dmat4x4{0, 0, 0, 0, 1, 0, 0, -1, 0, 0, 0, 0, TY_RZP, 0, matd, 0}));
     } else if (m_curvatureType == CurvatureType::Toroidal) {
         m_longRadius = dobj.parseLongRadius();    // for sphere and toroidal
         m_shortRadius = dobj.parseShortRadius();  // only for Toroidal
-        setSurface(std::make_unique<Toroid>(m_longRadius, m_shortRadius, 4, mat));
+        setSurface(std::make_unique<Toroid>(m_longRadius, m_shortRadius, TY_RZP, mat));
     } else {
         m_longRadius = dobj.parseLongRadius();  // for sphere and toroidal
-        setSurface(std::make_unique<Quadric>(glm::dmat4x4{1, 0, 0, 0, 1, 1, 0, -m_longRadius, 0, 0, 1, 0, 4, 0, matd, 0}));
+        setSurface(std::make_unique<Quadric>(glm::dmat4x4{1, 0, 0, 0, 1, 1, 0, -m_longRadius, 0, 0, 1, 0, TY_RZP, 0, matd, 0}));
     }
 
     printInfo();

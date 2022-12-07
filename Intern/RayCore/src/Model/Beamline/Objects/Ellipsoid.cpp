@@ -67,7 +67,7 @@ Ellipsoid::Ellipsoid(const DesignObject& dobj) : OpticalElement(dobj) {
     setSurface(std::make_unique<Quadric>(glm::dmat4x4{m_a11, 0, 0, 0,              //
                                                       icurv, m_a22, m_a23, m_a24,  //
                                                       0, 0, m_a33, m_a34,          //
-                                                      7, 0, matd, m_a44}));
+                                                      TY_ELLIPSOID_MIRROR, 0, matd, m_a44}));
 }
 
 void Ellipsoid::calculateCenterFromHalfAxes(Rad angle) {

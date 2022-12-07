@@ -112,32 +112,25 @@ void dynamicElements() {
 
         // Calculate interaction(reflection,material, absorption etc.) of ray with detected next element
         type = int(nextElement.surfaceParams[3][0]);
-        if (type == 0) {  // plane + sphere mirror
+        if (type == TY_BASIC_MIRROR) {
             elem_ray = traceMirror(elem_ray, col.elementIndex, ctr, col.hitpoint);
-
-        } else if (type == 1) {  // plane grating
+        } else if (type == TY_PLANE_GRATING) {
             elem_ray = tracePlaneGrating(elem_ray, col.elementIndex, ctr, col.hitpoint);
-
-        } else if (type == 2) {  // general grating
+        } else if (type == TY_GENERAL_GRATING) {
             elem_ray = traceGeneralGrating(elem_ray, col.elementIndex, ctr, col.hitpoint);
-
-        } else if (type == 3) {  // Slit
+        } else if (type == TY_SLIT) {
             elem_ray = traceSlit(elem_ray, col.elementIndex, ctr, col.hitpoint);
-
-        } else if (type == 4) {  // rzp
+        } else if (type == TY_RZP) {
             elem_ray = traceRZP(elem_ray, col.elementIndex, ctr, col.hitpoint);
-
-        } else if (type == 5) {  // image plane
+        } else if (type == TY_IMAGE_PLANE) {
             elem_ray.m_extraParam += (col.elementIndex + 1) * bounce;
             elem_ray.m_lastElement = col.elementIndex + 1;
             elem_ray.m_weight = W_HIT_IMAGE_PLANE;
             _out = traceImagePlane(elem_ray, col.elementIndex, col.hitpoint);
             return;
-
-        } else if (type == 6) {  // toroid mirror
+        } else if (type == TY_TOROID_MIRROR) {
             elem_ray = traceToroid(elem_ray, col.elementIndex, ctr, col.hitpoint);
-
-        } else if (type == 7) {  // ellipsoid mirror
+        } else if (type == TY_ELLIPSOID_MIRROR) {
             elem_ray = traceEllipsoidMirror(elem_ray, col.elementIndex, ctr, col.hitpoint);
         }
 

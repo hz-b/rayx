@@ -1,5 +1,6 @@
 #include "PlaneGrating.h"
 
+#include "Constants.h"
 #include "Debug/Debug.h"
 #include "Model/Surface/Quadric.h"
 
@@ -16,7 +17,7 @@ PlaneGrating::PlaneGrating(const DesignObject& dobj) : OpticalElement(dobj) {
     // parameters of quadric surface
     Material mat = dobj.parseMaterial();
     auto matd = (double)static_cast<int>(mat);
-    setSurface(std::make_unique<Quadric>(glm::dmat4x4{0, 0, 0, 0, 1, 0, 0, -1, 0, 0, 0, 0, 1, 0, matd, 0}));
+    setSurface(std::make_unique<Quadric>(glm::dmat4x4{0, 0, 0, 0, 1, 0, 0, -1, 0, 0, 0, 0, TY_PLANE_GRATING, 0, matd, 0}));
 }
 
 double PlaneGrating::getDesignEnergyMounting() const { return m_designEnergyMounting; }

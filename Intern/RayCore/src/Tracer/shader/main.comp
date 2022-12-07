@@ -48,7 +48,7 @@ ShaderArray<double> mat;
 struct Ray {
     dvec3 m_position;
     // Initially weight is `W_IN_COMPUTATION`.
-    // See the potential values of `m_weight` above.
+    // See the potential values of `m_weight` in `Constants.h`.
     double m_weight;
     dvec3 m_direction;
     double m_energy;
