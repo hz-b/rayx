@@ -1,0 +1,26 @@
+// This module defines functions to access the elements in a practical way.
+
+struct BasicMirror { uint id; };
+struct PlaneGrating { uint id; };
+struct GeneralGrating { uint id; };
+struct Slit { uint id; };
+struct Rzp { uint id; };
+struct ImagePlane { uint id; };
+struct ToroidMirror { uint id; };
+struct EllipsoidMirror { uint id; };
+
+// element-type independent access functions:
+double widthA(uint id) { return quadricData[id].objectParameters[0][0]; }
+double height(uint id) { return quadricData[id].objectParameters[0][1]; }
+double widthB(uint id) { return quadricData[id].objectParameters[2][1]; }
+double type(uint id) { return quadricData[id].surfaceParams[3][0]; }
+dmat4 inTrans(uint id) { return quadricData[id].inTrans; }
+dmat4 outTrans(uint id) { return quadricData[id].outTrans; }
+double longRadius(uint id) { return quadricData[id].surfaceParams[0][0]; }
+double shortRadius(uint id) { return quadricData[id].surfaceParams[0][1]; }
+dmat4 surfaceParams(uint id) { return quadricData[id].surfaceParams; }
+
+// BasicMirror:
+
+// RZP:
+double curvatureType(Rzp id) { return quadricData[id.id].elementParameters[1][0]; }

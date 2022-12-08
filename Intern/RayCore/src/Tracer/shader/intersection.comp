@@ -420,31 +420,30 @@ dvec4 getTorusNormal(Ray r, double shortRadius, double longRadius) {  // unused
  * calculates and returns the intersection of a given ray with a given optical element
  * if element is not hit, return (inf, inf, inf, 0)
  * @param r						current Ray in global coordinates
- * @param elementIndex			index of current optical element in list of all elements
+ * @param id                    index of current optical element in list of all elements
  *
  * @return ELEMENT coordinates of intersection point of ray with optical element
  */
-dvec4 getOpticalElementIntersection(Ray r, uint elementIndex) {
-    int type        = int(quadricData[elementIndex].surfaceParams[3][0]);
-    Element e       = quadricData[elementIndex];
-    double x_extentA = e.objectParameters[0][0];  // width if relevant
-    double x_extentB = e.objectParameters[2][1];  // width if relevant
-    double z_extent = e.objectParameters[0][1];  // height if relevant
+dvec4 getOpticalElementIntersection(Ray r, uint id) {
+    double ty = type(id);
+    double x_extentA = widthA(id);
+    double x_extentB = widthB(id);
+    double z_extent  = height(id);
 
     dvec4 currentIntersection;
-    if (type > 7) {
+    if (ty > 7) {
         return dvec4(infinity(), infinity(), infinity(), 0);
     }
-    if (type == TY_RZP) {
-        r.m_position.z = r.m_position.z - e.elementParameters[3][2];
+    if (ty == TY_RZP) {
+        r.m_position.z = r.m_position.z - quadricData[id].elementParameters[3][2];
     }
 
     // _ray = rayMatrixMult(_ray, q.inTrans); // ray/global to element coordinates,
 
     // misalignment
-    r = rayMatrixMult(r, e.inTrans);  // image plane is the x-y plane of the coordinate system
+    r = rayMatrixMult(r, inTrans(id));  // image plane is the x-y plane of the coordinate system
 
-    if (type == TY_IMAGE_PLANE) {
+    if (ty == TY_IMAGE_PLANE) {
         double offset = 0 - r.m_position.z;  // length between ray origin (intersection point of previous element) and image plane
         currentIntersection.x =
             r.m_position.x + ((r.m_direction.x / r.m_direction.z) * offset);  // scale x-slope of ray (l/n) by z-length between origin and image plane
@@ -454,14 +453,11 @@ dvec4 getOpticalElementIntersection(Ray r, uint elementIndex) {
         // considered in the tracing process also the image plane detects only rays from one side
         currentIntersection.w = r.m_weight * int(r.m_direction.z > 0);
         // * int(r.m_direction.z > 0); // * (1-int((r.m_direction.z > 0 && r.m_position.z > 0) || (r.m_direction.z < 0 && r.m_position.z < 0)));
-        r = rayMatrixMult(r, e.outTrans);  // do not know if this is necessary as the ray r is not defined as inout
+        r = rayMatrixMult(r, outTrans(id));  // do not know if this is necessary as the ray r is not defined as inout
         return currentIntersection;
 
-    } else if (type == TY_TOROID_MIRROR || (type == TY_RZP && e.elementParameters[1][0] == 1 /* toroidal RZP */)) {
-        double longRadius  = e.surfaceParams[0][0];
-        double shortRadius = e.surfaceParams[0][1];
-
-        iteratTo(r, longRadius, shortRadius);
+    } else if (ty == TY_TOROID_MIRROR || (ty == TY_RZP && curvatureType(Rzp(id)) == 1 /* toroidal RZP */)) {
+        iteratTo(r, longRadius(id), shortRadius(id));
         currentIntersection = dvec4(r.m_position, r.m_weight);
 
         // set weight to 0 if element was not hit
@@ -475,17 +471,17 @@ dvec4 getOpticalElementIntersection(Ray r, uint elementIndex) {
             (currentIntersection.z - r.m_position.z) / r.m_direction.z < 0) {
             currentIntersection.w = 0;
         }
-        r = rayMatrixMult(r, e.outTrans);
+        r = rayMatrixMult(r, outTrans(id));
         return currentIntersection;
     }
 
-    currentIntersection = getIntersectionPoint(r, e.surfaceParams);
+    currentIntersection = getIntersectionPoint(r, surfaceParams(id));
     // set weight to 0 if element was not hit
     bool hit = wasteBox(currentIntersection.x, currentIntersection.z, x_extentA, x_extentB, z_extent);
     if (!hit) {
         return dvec4(infinity(), infinity(), infinity(), 0);
     }
 
-    r = rayMatrixMult(r, e.outTrans);
+    r = rayMatrixMult(r, outTrans(id));
     return currentIntersection;  // in element coordinate system
 }

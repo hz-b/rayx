@@ -107,6 +107,7 @@ struct Element {
 
 // Order in #include is IMPROTANT, do not change.
 // clang-format off
+#include "elements.comp"
 #include "approx.comp"
 #include "complex.comp"
 #include "random.comp"
