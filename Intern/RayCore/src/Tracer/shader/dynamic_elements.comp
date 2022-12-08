@@ -113,11 +113,11 @@ void dynamicElements() {
         // Calculate interaction(reflection,material, absorption etc.) of ray with detected next element
         type = int(nextElement.surfaceParams[3][0]);
         if (type == TY_BASIC_MIRROR) {
-            elem_ray = traceMirror(elem_ray, col.elementIndex, ctr, col.hitpoint);
+            elem_ray = traceMirror(elem_ray, BasicMirror(col.elementIndex), ctr, col.hitpoint);
         } else if (type == TY_PLANE_GRATING) {
             elem_ray = tracePlaneGrating(elem_ray, PlaneGrating(col.elementIndex), ctr, col.hitpoint);
         } else if (type == TY_GENERAL_GRATING) {
-            elem_ray = traceGeneralGrating(elem_ray, col.elementIndex, ctr, col.hitpoint);
+            elem_ray = traceGeneralGrating(elem_ray, GeneralGrating(col.elementIndex), ctr, col.hitpoint);
         } else if (type == TY_SLIT) {
             elem_ray = traceSlit(elem_ray, Slit(col.elementIndex), ctr, col.hitpoint);
         } else if (type == TY_RZP) {

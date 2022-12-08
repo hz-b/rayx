@@ -253,18 +253,16 @@ Ray tracePlaneGrating(Ray r, PlaneGrating pg, INOUT(uint64_t) ctr, dvec4 interse
  * @param intersection	intersection point in ELEMENT coordinates
  * @return reflected Ray with intersection point as position, reflection as direction in ELEMENT coordinates and possibly modified weight
  */
-Ray traceGeneralGrating(Ray r, const int elementIndex, INOUT(uint64_t) ctr, dvec4 intersection) {
-    Element grt = quadricData[elementIndex];
-
+Ray traceGeneralGrating(Ray r, GeneralGrating gg, INOUT(uint64_t) ctr, dvec4 intersection) {
     // store old position, needed for pathlength calculation
     dvec3 old_position = r.m_position;
 
-    dvec4 normal = setIntersectionPoint(r, grt.surfaceParams, intersection);
+    dvec4 normal = setIntersectionPoint(r, surfaceParams(gg), intersection);
     // normal = normalize(dvec4(-r.m_position.x, -radius - r.m_position[1]*ISIG, -r.m_position[2], 0));
 
     // check if element was hit
-    double x_extent = grt.objectParameters[0][0];
-    double z_extent = grt.objectParameters[0][1];
+    double x_extent = width(gg);
+    double z_extent = height(gg);
     bool hit      = wasteBox(r.m_position.x, r.m_position.z, x_extent, z_extent);
 
     // if ray missed the surface, stop the tracing here and return the ray in world coordinates
@@ -277,19 +275,17 @@ Ray traceGeneralGrating(Ray r, const int elementIndex, INOUT(uint64_t) ctr, dvec
     // add the travelled distance from the previous position to the new intersection to pathlength (both are in the same coordinate system so we do
     // not need to transform back to world coordinates??)
     r.m_pathLength += length(old_position - r.m_position);
-    r.m_lastElement = elementIndex + 1;
+    r.m_lastElement = gg.id + 1;
 
     // modify normal according to slope error
-    double slopeX = grt.objectParameters[0][2];
-    double slopeZ = grt.objectParameters[0][3];
-    normal        = tanger(normal, slopeX, slopeZ, 0, ctr);
+    normal        = tanger(normal, slopeX(gg), slopeZ(gg), 0, ctr);
 
     // vls parameters passed in q.elementParameters
+    dmat4 e = elementParams(gg);
     double WL                 = hvlam(r.m_energy);
-    double lineDensity        = grt.elementParameters[0][2];
-    double orderOfDiffraction = grt.elementParameters[0][3];
-    double b_params[6] = {grt.elementParameters[1][2], grt.elementParameters[1][3], grt.elementParameters[2][0], grt.elementParameters[2][1],
-                                   grt.elementParameters[2][2], grt.elementParameters[2][3]};
+    double lineDensity        = e[0][2];
+    double orderOfDiffraction = e[0][3];
+    double b_params[6] = {e[1][2], e[1][3], e[2][0], e[2][1], e[2][2], e[2][3]};
 
     // linedensity = WL * default_linedensity * order * 1e-06
     double linedensity = vlsGrating(lineDensity, r.m_position.z, b_params) * WL * orderOfDiffraction * 1e-06;
@@ -311,20 +307,18 @@ Ray traceGeneralGrating(Ray r, const int elementIndex, INOUT(uint64_t) ctr, dvec
  *
  * output: reflected Ray with intersection point as position, reflection as direction in ELEMENT coordinates and possibly modified weight
  */
-Ray traceMirror(Ray r, const int elementIndex, INOUT(uint64_t) ctr, dvec4 intersection) {
-    Element mrr = quadricData[elementIndex];
-
+Ray traceMirror(Ray r, BasicMirror m, INOUT(uint64_t) ctr, dvec4 intersection) {
     // store old position, needed for pathlength calculation
     dvec3 old_position = r.m_position;
 
     // calculate intersection point and normal at intersection point
-    dvec4 normal           = setIntersectionPoint(r, mrr.surfaceParams, intersection);
-    double azimuthal_angle = mrr.objectParameters[2][2];  // chi (azimuthalangle) in rad
+    dvec4 normal           = setIntersectionPoint(r, surfaceParams(m), intersection);
+    double azimuthal_angle = azimuthalAngle(m);
 
     // check if ray hit the element within the boundaries
-    double x_extent = mrr.objectParameters[0][0];  // width
-    double x_extentB = mrr.objectParameters[2][1];  // widthB for trapezoid
-    double z_extent = mrr.objectParameters[0][1];  // height
+    double x_extent = widthA(m);
+    double x_extentB = widthB(m);
+    double z_extent = height(m);
     bool hit      = wasteBox(r.m_position.x, r.m_position.z, x_extent, x_extentB, z_extent);
 
     // if ray missed the surface, stop the tracing here and return the ray in world coordinates
@@ -337,19 +331,17 @@ Ray traceMirror(Ray r, const int elementIndex, INOUT(uint64_t) ctr, dvec4 inters
     // add the travelled distance from the previous position to the new intersection to pathlength (both are in the same coordinate system so we do
     // not need to transform back to world coordinates??)
     r.m_pathLength += length(old_position - r.m_position);
-    r.m_lastElement = elementIndex + 1;
+    r.m_lastElement = m.id + 1;
 
     // take the slope error into account for the normal
-    double slopeX = mrr.objectParameters[0][2];
-    double slopeZ = mrr.objectParameters[0][3];
-    normal        = tanger(normal, slopeX, slopeZ, 0, ctr);  // option 0 = default, cartesian normal
+    normal        = tanger(normal, slopeX(m), slopeZ(m), 0, ctr);  // option 0 = default, cartesian normal
 
     // calculate the new direction after the reflection
     r.m_direction = dvec3(reflect(dvec4(r.m_direction, 0), normal));
 
     double real_S, real_P, delta;
     double incidence_angle = getIncidenceAngle(r, normal);  // getTheta
-    int mat = int(quadricData[elementIndex].surfaceParams[3][2]);
+    int mat = int(material(m));
     if (mat != -2) {
         efficiency(r, real_S, real_P, delta, incidence_angle, mat);
 

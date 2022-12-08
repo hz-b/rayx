@@ -72,3 +72,21 @@ double height(PlaneGrating e) { return param_o(e.id, 0, 1); }
 double slopeX(PlaneGrating e) { return param_o(e.id, 0, 2); }
 double slopeZ(PlaneGrating e) { return param_o(e.id, 0, 3); }
 dmat4 elementParams(PlaneGrating e) { return quadricData[e.id].elementParameters; }
+
+// GeneralGrating:
+dmat4 surfaceParams(GeneralGrating e) { return quadricData[e.id].surfaceParams; }
+double width(GeneralGrating e) { return param_o(e.id, 0, 0); }
+double height(GeneralGrating e) { return param_o(e.id, 0, 1); }
+double slopeX(GeneralGrating e) { return param_o(e.id, 0, 2); }
+double slopeZ(GeneralGrating e) { return param_o(e.id, 0, 3); }
+dmat4 elementParams(GeneralGrating e) { return quadricData[e.id].elementParameters; }
+
+// BasicMirror:
+dmat4 surfaceParams(BasicMirror e) { return quadricData[e.id].surfaceParams; }
+double azimuthalAngle(BasicMirror e) { return param_o(e.id, 2, 2); }
+double widthA(BasicMirror e) { return param_o(e.id, 0, 0); }
+double widthB(BasicMirror e) { return param_o(e.id, 2, 1); }
+double height(BasicMirror e) { return param_o(e.id, 0, 1); }
+double slopeX(BasicMirror e) { return param_o(e.id, 0, 2); }
+double slopeZ(BasicMirror e) { return param_o(e.id, 0, 3); }
+double material(BasicMirror e) { return param_s(e.id, 3, 2); }
