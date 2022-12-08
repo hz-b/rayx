@@ -115,7 +115,7 @@ void dynamicElements() {
         if (type == TY_BASIC_MIRROR) {
             elem_ray = traceMirror(elem_ray, col.elementIndex, ctr, col.hitpoint);
         } else if (type == TY_PLANE_GRATING) {
-            elem_ray = tracePlaneGrating(elem_ray, col.elementIndex, ctr, col.hitpoint);
+            elem_ray = tracePlaneGrating(elem_ray, PlaneGrating(col.elementIndex), ctr, col.hitpoint);
         } else if (type == TY_GENERAL_GRATING) {
             elem_ray = traceGeneralGrating(elem_ray, col.elementIndex, ctr, col.hitpoint);
         } else if (type == TY_SLIT) {

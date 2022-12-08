@@ -64,3 +64,11 @@ double height(EllipsoidMirror e) { return param_o(e.id, 0, 1); }
 double slopeX(EllipsoidMirror e) { return param_o(e.id, 0, 2); }
 double slopeZ(EllipsoidMirror e) { return param_o(e.id, 0, 3); }
 double material(EllipsoidMirror e) { return param_s(e.id, 3, 2); }
+
+// PlaneGrating:
+dmat4 surfaceParams(PlaneGrating e) { return quadricData[e.id].surfaceParams; }
+double width(PlaneGrating e) { return param_o(e.id, 0, 0); }
+double height(PlaneGrating e) { return param_o(e.id, 0, 1); }
+double slopeX(PlaneGrating e) { return param_o(e.id, 0, 2); }
+double slopeZ(PlaneGrating e) { return param_o(e.id, 0, 3); }
+dmat4 elementParams(PlaneGrating e) { return quadricData[e.id].elementParameters; }

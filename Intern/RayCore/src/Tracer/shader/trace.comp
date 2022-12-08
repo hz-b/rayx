@@ -196,18 +196,16 @@ Ray traceRZP(Ray r, Rzp rzp, INOUT(uint64_t) ctr, dvec4 intersection) {
  * @param intersection	intersection point in ELEMENT coordinates
  * @return				reflected Ray with intersection point as position, reflection as direction in ELEMENT coordinates and possibly modified weight
  */
-Ray tracePlaneGrating(Ray r, const int elementIndex, INOUT(uint64_t) ctr, dvec4 intersection) {
-    Element plgrt = quadricData[elementIndex];
-
+Ray tracePlaneGrating(Ray r, PlaneGrating pg, INOUT(uint64_t) ctr, dvec4 intersection) {
     // store old position, needed for pathlength calculation
     dvec3 old_position = r.m_position;
 
     // calculate intersection point with element surface and return surface normal at this point
-    dvec4 normal = setIntersectionPoint(r, plgrt.surfaceParams, intersection);
+    dvec4 normal = setIntersectionPoint(r, surfaceParams(pg), intersection);
 
     // check if element was hit
-    double x_extent = plgrt.objectParameters[0][0];
-    double z_extent = plgrt.objectParameters[0][1];
+    double x_extent = width(pg);
+    double z_extent = height(pg);
     bool hit      = wasteBox(r.m_position.x, r.m_position.z, x_extent, z_extent);
 
     if (!hit) {
@@ -216,17 +214,15 @@ Ray tracePlaneGrating(Ray r, const int elementIndex, INOUT(uint64_t) ctr, dvec4 
         return r;
     }
     // modify normal according to slope error
-    double slopeX = plgrt.objectParameters[0][2];
-    double slopeZ = plgrt.objectParameters[0][3];
-    normal        = tanger(normal, slopeX, slopeZ, 0, ctr);
+    normal = tanger(normal, slopeX(pg), slopeZ(pg), 0, ctr);
 
     // vls parameters passed in q.elementParameters
+    dmat4 e = elementParams(pg);
     double WL                 = hvlam(r.m_energy);
-    double lineDensity        = plgrt.elementParameters[0][2];
-    double orderOfDiffraction = plgrt.elementParameters[0][3];
-    double b_params[6]        = {plgrt.elementParameters[1][2], plgrt.elementParameters[1][3], plgrt.elementParameters[2][0],
-                                   plgrt.elementParameters[2][1], plgrt.elementParameters[2][2], plgrt.elementParameters[2][3]};
-    int additional_order      = int(plgrt.elementParameters[3][3]);
+    double lineDensity        = e[0][2];
+    double orderOfDiffraction = e[0][3];
+    double b_params[6]        = {e[1][2], e[1][3], e[2][0],e[2][1], e[2][2], e[2][3]};
+    int additional_order      = int(e[3][3]);
 
     // a = WL * linedensity * order * 1e-06
     double a = vlsGrating(lineDensity, r.m_position.z, b_params) * WL * orderOfDiffraction * 1e-06;
@@ -241,7 +237,7 @@ Ray tracePlaneGrating(Ray r, const int elementIndex, INOUT(uint64_t) ctr, dvec4 
     // add the travelled distance from the previous position to the new intersection to pathlength (both are in the same coordinate system so we do
     // not need to transform back to world coordinates??)
     r.m_pathLength += length(old_position - r.m_position);
-    r.m_lastElement = elementIndex + 1;
+    r.m_lastElement = pg.id + 1;
 
     // calculate refracted ray
     r = refrac_plane(r, normal, a);
