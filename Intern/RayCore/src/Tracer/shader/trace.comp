@@ -110,9 +110,8 @@ Ray traceToroid(Ray r, ToroidMirror tor, INOUT(uint64_t) ctr, ALLOW_UNUSED dvec4
  *
  * output: reflected Ray with intersection point as position, reflection as direction in ELEMENT coordinates and possibly modified weight
  */
-Ray traceRZP(Ray r, const int elementIndex, INOUT(uint64_t) ctr, dvec4 intersection) {
-    Element rzp             = quadricData[elementIndex];
-    double element_offset_z = rzp.elementParameters[3][2];
+Ray traceRZP(Ray r, Rzp rzp, INOUT(uint64_t) ctr, dvec4 intersection) {
+    double element_offset_z = elementOffsetZ(rzp);
     r.m_position.z            = r.m_position.z - element_offset_z;
 
     // store old position, needed for pathlength calculation
@@ -120,19 +119,17 @@ Ray traceRZP(Ray r, const int elementIndex, INOUT(uint64_t) ctr, dvec4 intersect
 
     dvec4 normal;
     // RZP can be plane, toroidal or spherical curvature type. Use intersectionPoint for all except toroidal
-    int CURVATURE_TYPE = int(rzp.elementParameters[1][0]);
+    int CURVATURE_TYPE = int(curvatureType(rzp));
     if (CURVATURE_TYPE != 1) {
-        normal = setIntersectionPoint(r, rzp.surfaceParams, intersection);
+        normal = setIntersectionPoint(r, surfaceParams(rzp), intersection);
     } else {
-        double longRadius  = rzp.surfaceParams[0][0];
-        double shortRadius = rzp.surfaceParams[0][1];
-        normal             = iteratTo(r, longRadius, shortRadius);
+        normal             = iteratTo(r, longRadius(rzp), shortRadius(rzp));
     }
 
     // ! temporary change to test the trapezoid
-    double x_extentA = rzp.objectParameters[0][0];  // widthA
-    double x_extentB = rzp.objectParameters[2][1];  // widthB for trapezoid
-    double z_extent  = rzp.objectParameters[0][1];  // height
+    double x_extentA = widthA(rzp);
+    double x_extentB = widthB(rzp);
+    double z_extent  = height(rzp);
     bool hit       = wasteBox(r.m_position[0], r.m_position[2], x_extentA, x_extentB, z_extent);
 
     if (!hit) {
@@ -145,24 +142,25 @@ Ray traceRZP(Ray r, const int elementIndex, INOUT(uint64_t) ctr, dvec4 intersect
     // add the travelled distance from the previous position to the new intersection to pathlength (both are in the same coordinate system so we do
     // not need to transform back to world coordinates??)
     r.m_pathLength += length(old_position - r.m_position);
-    r.m_lastElement = elementIndex + 1;
+    r.m_lastElement = rzp.id + 1;
 
-    int IMAGE_TYPE        = int(rzp.elementParameters[0][0]);
-    int RZP_TYPE          = int(rzp.elementParameters[0][1]);
-    int DERIVATION_METHOD = int(rzp.elementParameters[0][2]);
-    double risag          = rzp.elementParameters[2][0];
-    double rosag          = rzp.elementParameters[2][1];
-    double rimer          = rzp.elementParameters[2][2];
-    double romer          = rzp.elementParameters[2][3];
-    double d_alpha        = rzp.elementParameters[3][0];
-    double d_beta         = rzp.elementParameters[3][1];
-    double d_ord          = rzp.elementParameters[1][1];
-    double zOffsetCenter  = rzp.elementParameters[1][3];
+    dmat4 e = elementParams(rzp);
+    int IMAGE_TYPE        = int(e[0][0]);
+    int RZP_TYPE          = int(e[0][1]);
+    int DERIVATION_METHOD = int(e[0][2]);
+    double risag          = e[2][0];
+    double rosag          = e[2][1];
+    double rimer          = e[2][2];
+    double romer          = e[2][3];
+    double d_alpha        = e[3][0];
+    double d_beta         = e[3][1];
+    double d_ord          = e[1][1];
+    double zOffsetCenter  = e[1][3];
     ;  // fresnel center z offset
     double WL            = hvlam(r.m_energy);
-    double WL0           = 1e-06 * rzp.elementParameters[0][3];  // source energy/design energy
-    double Ord           = rzp.elementParameters[1][2];
-    int additional_order = int(rzp.elementParameters[3][3]);
+    double WL0           = 1e-06 * e[0][3];  // source energy/design energy
+    double Ord           = e[1][2];
+    int additional_order = int(e[3][3]);
 
     // calculate the RZP line density for the position of the intersection on the RZP
     double DX, DZ;
@@ -170,9 +168,7 @@ Ray traceRZP(Ray r, const int elementIndex, INOUT(uint64_t) ctr, dvec4 intersect
                    DZ);
 
     // tanger/slope Error
-    double slopeX = rzp.objectParameters[0][2];
-    double slopeZ = rzp.objectParameters[0][3];
-    normal        = tanger(normal, slopeX, slopeZ, 0, ctr);
+    normal        = tanger(normal, slopeX(rzp), slopeZ(rzp), 0, ctr);
 
     // if additional zero order should be traced, approx. half of the rays are randomly chosen to be traced in order 0 (= ordinary reflection) instead
     // of the given order

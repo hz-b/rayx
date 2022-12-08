@@ -121,7 +121,7 @@ void dynamicElements() {
         } else if (type == TY_SLIT) {
             elem_ray = traceSlit(elem_ray, Slit(col.elementIndex), ctr, col.hitpoint);
         } else if (type == TY_RZP) {
-            elem_ray = traceRZP(elem_ray, col.elementIndex, ctr, col.hitpoint);
+            elem_ray = traceRZP(elem_ray, Rzp(col.elementIndex), ctr, col.hitpoint);
         } else if (type == TY_IMAGE_PLANE) {
             elem_ray.m_extraParam += (col.elementIndex + 1) * bounce;
             elem_ray.m_lastElement = col.elementIndex + 1;

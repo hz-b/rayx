@@ -44,3 +44,12 @@ double material(ToroidMirror tor) { return param_s(tor.id, 3, 2); }
 // Rzp:
 double curvatureType(Rzp rzp) { return param_e(rzp.id, 1, 0); }
 double elementOffsetZ(Rzp rzp) { return param_e(rzp.id, 3, 2); }
+dmat4 surfaceParams(Rzp rzp) { return quadricData[rzp.id].surfaceParams; }
+double longRadius(Rzp rzp) { return param_s(rzp.id, 0, 0); }
+double shortRadius(Rzp rzp) { return param_s(rzp.id, 0, 1); }
+double widthA(Rzp rzp) { return param_o(rzp.id, 0, 0); }
+double widthB(Rzp rzp) { return param_o(rzp.id, 2, 1); }
+double height(Rzp rzp) { return param_o(rzp.id, 0, 1); }
+double slopeX(Rzp rzp) { return param_o(rzp.id, 0, 2); }
+double slopeZ(Rzp rzp) { return param_o(rzp.id, 0, 3); }
+dmat4 elementParams(Rzp rzp) { return quadricData[rzp.id].elementParameters; }
