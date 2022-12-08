@@ -112,26 +112,22 @@ void cosini(INOUT(Ray) r, double phi, double psi) {
  * returns: unchanged weight if intersection point is within surface boundaries,
  * 0.0 if not.
  */
-double wasteBox(double x, double z, double xLength, double zLength, double w) {
+bool wasteBox(double x, double z, double xLength, double zLength) {
     if (xLength >= 0) {  // Rectangular shape
         double x_min = -xLength / 2.0;
         double x_max = xLength / 2.0;
         double z_min = -zLength / 2.0;
         double z_max = zLength / 2.0;
-        w *= int(x > x_min) * int(x < x_max) * int(z > z_min) *
-             int(z < z_max);  // This sets w to zero, if (x <= x_min || x >=
-                              // x_max || z <= z_min || z >= z_max)
+        return x > x_min && x < x_max && z > z_min && z < z_max;
     } else {                  // Ring shape
         double rd2 = (x / (xLength / 2.0)) * (x / (xLength / 2.0)) +
                      (z / (zLength / 2.0)) * (z / (zLength / 2.0));
-        w *= int(rd2 <= 1.0);  // This sets w to zero, if (rd > 1.0)
+        return rd2 <= 1.0;  // This sets w to zero, if (rd > 1.0)
     }
-    return w;
 }
 
 // ! temporary for testing purposes (trapezoid)
-double wasteBox(double x, double z, double xLengthA, double xLengthB,
-                double zLength, double w) {
+bool wasteBox(double x, double z, double xLengthA, double xLengthB, double zLength) {
     if (xLengthA >= 0) {     // Rectangular shape
         if (xLengthB > 0) {  // Trapezoid shape
             // Check point is within the trapezoid
@@ -149,32 +145,22 @@ double wasteBox(double x, double z, double xLengthA, double xLengthB,
             dvec3 PmB = P - B;
             dvec3 CmB = C - B;
 
-            if (((PmA.x * BmA.z - PmA.z * BmA.x) *
-                 (PmD.x * CmD.z - PmD.z * CmD.x)) < 0 &&
-                ((PmA.x * DmA.z - PmA.z * DmA.x) *
-                 (PmB.x * CmB.z - PmB.z * CmB.x)) < 0) {
-                return w;
-            } else {
-                return 0.0;
-            }
+            double l1 = ((PmA.x * BmA.z - PmA.z * BmA.x) * (PmD.x * CmD.z - PmD.z * CmD.x));
+            double l2 = ((PmA.x * DmA.z - PmA.z * DmA.x) * (PmB.x * CmB.z - PmB.z * CmB.x));
+            return l1 < 0 && l2 < 0;
         } else {
             double x_min = -xLengthA / 2.0;
             double x_max = xLengthA / 2.0;
             double z_min = -zLength / 2.0;
             double z_max = zLength / 2.0;
 
-            if (x <= x_min || x >= x_max || z <= z_min || z >= z_max) {
-                return 0.0;
-            }
+            return !(x <= x_min || x >= x_max || z <= z_min || z >= z_max);
         }
     } else {  // Ring shape
         double rd2 = (x / (xLengthA / 2.0)) * (x / (xLengthA / 2.0)) +
                      (z / (zLength / 2.0)) * (z / (zLength / 2.0));
-        if (rd2 > 1.0) {
-            return 0.0;
-        }
+        return rd2 <= 1.0;
     }
-    return w;
 }
 
 // returns dvec2(atomic mass, density) extracted from materials.xmacro
@@ -902,21 +888,14 @@ stopped
 @return
     new weight
 */
-double stopBox(double x, double y, double xStop, double yStop, double weight) {
-    double w = weight;
-    // if w == 0 return
-    if (w != 0) {
-        if (xStop > 0) {
-            if (abs(x) < xStop && abs(y) < yStop) {
-                w = 0;
-            }
-        } else {
-            double radius =
-                sqrt((x / xStop) * (x / xStop) + (y / yStop) * (y / yStop));
-            if (radius <= 1) w = 0;
-        }
+bool stopBox(double x, double y, double xStop, double yStop) {
+    if (xStop > 0) {
+        return abs(x) >= xStop || abs(y) >= yStop;
+    } else {
+        double radius =
+            sqrt((x / xStop) * (x / xStop) + (y / yStop) * (y / yStop));
+        return radius > 1;
     }
-    return w;
 }
 
 /**returns first bessel function of parameter v*/

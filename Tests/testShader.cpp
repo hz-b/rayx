@@ -268,7 +268,7 @@ TEST_F(TestSuite, testWasteBox) {
         double in_zLength;
         double in_w;
 
-        double out;
+        bool out;
     };
 
     std::vector<InOutPair> inouts = {{
@@ -276,36 +276,25 @@ TEST_F(TestSuite, testWasteBox) {
                                          .in_z = 28.760236725599515,
                                          .in_xLength = 50,
                                          .in_zLength = 200,
-                                         .in_w = 1,
-                                         .out = 1,
+                                         .out = true,
                                      },
                                      {
                                          .in_x = -5.0466620698997637,
                                          .in_z = 28.760236725599515,
                                          .in_xLength = 5,
                                          .in_zLength = 20,
-                                         .in_w = 1,
-                                         .out = 0,
+                                         .out = false,
                                      },
                                      {
                                          .in_x = -1.6822205656320104,
                                          .in_z = 28.760233508097873,
                                          .in_xLength = 5,
                                          .in_zLength = 20,
-                                         .in_w = 1,
-                                         .out = 0,
-                                     },
-                                     {
-                                         .in_x = -5.0466620698997637,
-                                         .in_z = 28.760236725599515,
-                                         .in_xLength = 50,
-                                         .in_zLength = 200,
-                                         .in_w = 0,
-                                         .out = 0,
+                                         .out = false,
                                      }};
 
     for (auto p : inouts) {
-        auto out = CPU_TRACER::wasteBox(p.in_x, p.in_z, p.in_xLength, p.in_zLength, p.in_w);
+        auto out = CPU_TRACER::wasteBox(p.in_x, p.in_z, p.in_xLength, p.in_zLength);
 
         CHECK_EQ(out, p.out);
     }

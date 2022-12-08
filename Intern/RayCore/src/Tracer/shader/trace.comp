@@ -23,11 +23,10 @@ Ray traceSlit(Ray r, const int elementIndex, INOUT(uint64_t) ctr, dvec4 intersec
     double xStop    = slit.elementParameters[0][0];  // beamstop width
     double yStop    = slit.elementParameters[0][1];  // beamstop heigth
     // slit lies in x-y plane instead of x-z plane as other elements
-    r.m_weight = wasteBox(r.m_position[0], r.m_position[1], x_extent, y_extent, r.m_weight);
-    r.m_weight = stopBox(r.m_position[0], r.m_position[1], xStop, yStop, r.m_weight);
+    bool hit = wasteBox(r.m_position[0], r.m_position[1], x_extent, y_extent);
+    bool stop_box = stopBox(r.m_position[0], r.m_position[1], xStop, yStop);
 
-    if (r.m_weight < 1.0) {
-        // rays that missed an element get weight 2
+    if (!hit || !stop_box) {
         r.m_weight = 2;
         return r;
     }
@@ -77,10 +76,10 @@ Ray traceToroid(Ray r, const int elementIndex, INOUT(uint64_t) ctr, ALLOW_UNUSED
 
     double x_extent = tor.objectParameters[0][0];  // width
     double z_extent = tor.objectParameters[0][1];  // length
-    r.m_weight        = wasteBox(r.m_position[0], r.m_position[2], x_extent, z_extent, r.m_weight);
+    bool hit        = wasteBox(r.m_position[0], r.m_position[2], x_extent, z_extent);
 
     // element missed
-    if (r.m_weight < 1.0) {
+    if (!hit) {
         // rays that missed an element get weight 2
         r.m_weight = 2;
         return r;
@@ -142,9 +141,9 @@ Ray traceRZP(Ray r, const int elementIndex, INOUT(uint64_t) ctr, dvec4 intersect
     double x_extentA = rzp.objectParameters[0][0];  // widthA
     double x_extentB = rzp.objectParameters[2][1];  // widthB for trapezoid
     double z_extent  = rzp.objectParameters[0][1];  // height
-    double hit       = wasteBox(r.m_position[0], r.m_position[2], x_extentA, x_extentB, z_extent, r.m_weight);
+    bool hit       = wasteBox(r.m_position[0], r.m_position[2], x_extentA, x_extentB, z_extent);
 
-    if (hit < 1.0) {
+    if (!hit) {
         r.m_position.z += element_offset_z;
         // rays that missed an element get weight 2
         r.m_weight = 2;
@@ -221,9 +220,9 @@ Ray tracePlaneGrating(Ray r, const int elementIndex, INOUT(uint64_t) ctr, dvec4 
     // check if element was hit
     double x_extent = plgrt.objectParameters[0][0];
     double z_extent = plgrt.objectParameters[0][1];
-    double hit      = wasteBox(r.m_position.x, r.m_position.z, x_extent, z_extent, r.m_weight);
+    bool hit      = wasteBox(r.m_position.x, r.m_position.z, x_extent, z_extent);
 
-    if (hit < 1.0) {
+    if (!hit) {
         // rays that missed an element get weight 2
         r.m_weight = 2;
         return r;
@@ -282,10 +281,10 @@ Ray traceGeneralGrating(Ray r, const int elementIndex, INOUT(uint64_t) ctr, dvec
     // check if element was hit
     double x_extent = grt.objectParameters[0][0];
     double z_extent = grt.objectParameters[0][1];
-    double hit      = wasteBox(r.m_position.x, r.m_position.z, x_extent, z_extent, r.m_weight);
+    bool hit      = wasteBox(r.m_position.x, r.m_position.z, x_extent, z_extent);
 
     // if ray missed the surface, stop the tracing here and return the ray in world coordinates
-    if (hit < 1.0) {
+    if (!hit) {
         // rays that missed an element get weight 2
         r.m_weight = 2;
         return r;
@@ -342,10 +341,10 @@ Ray traceMirror(Ray r, const int elementIndex, INOUT(uint64_t) ctr, dvec4 inters
     double x_extent = mrr.objectParameters[0][0];  // width
     double x_extentB = mrr.objectParameters[2][1];  // widthB for trapezoid
     double z_extent = mrr.objectParameters[0][1];  // height
-    double hit      = wasteBox(r.m_position.x, r.m_position.z, x_extent, x_extentB, z_extent, r.m_weight);
+    bool hit      = wasteBox(r.m_position.x, r.m_position.z, x_extent, x_extentB, z_extent);
 
     // if ray missed the surface, stop the tracing here and return the ray in world coordinates
-    if (hit < 1.0) {
+    if (!hit) {
         // rays that missed an element get weight 2
         r.m_weight = 2;
         return r;
@@ -407,12 +406,13 @@ Ray traceEllipsoidMirror(Ray r, const int elementIndex, INOUT(uint64_t) ctr, dve
     double x_extent = ell.objectParameters[0][0];                               // width
     double z_extent = ell.objectParameters[0][1];                               // height
     r               = rotationAroundX(r, -sin_tangentAngle, cos_tangentAngle);  // change to coordinate system of mirror
-    double hit      = wasteBox(r.m_position.x, r.m_position.z, x_extent, z_extent, r.m_weight);
+    bool hit      = wasteBox(r.m_position.x, r.m_position.z, x_extent, z_extent);
     r               = rotationAroundX(r, sin_tangentAngle, cos_tangentAngle);  // change to coordinate system of curvation
 
     // if ray missed the surface, stop the tracing here and return the ray in world coordinates
-    if (hit < 1.0) {
+    if (!hit) {
         // rays that missed an element get weight 2
+        r.m_weight = 2;
         return r;
     }
 
