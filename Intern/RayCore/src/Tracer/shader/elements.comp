@@ -25,31 +25,42 @@ double shortRadius(uint id) { return param_s(id, 0, 1); }
 dmat4 surfaceParams(uint id) { return quadricData[id].surfaceParams; }
 
 // Slit:
-double width(Slit slit) { return param_o(slit.id, 0, 0); }
-double height(Slit slit) { return param_o(slit.id, 0, 1); }
-double beamstopWidth(Slit slit) { return param_e(slit.id, 0, 0); }
-double beamstopHeight(Slit slit) { return param_e(slit.id, 0, 1); }
-dmat4 surfaceParams(Slit slit) { return quadricData[slit.id].surfaceParams; }
+double width(Slit e) { return param_o(e.id, 0, 0); }
+double height(Slit e) { return param_o(e.id, 0, 1); }
+double beamstopWidth(Slit e) { return param_e(e.id, 0, 0); }
+double beamstopHeight(Slit e) { return param_e(e.id, 0, 1); }
+dmat4 surfaceParams(Slit e) { return quadricData[e.id].surfaceParams; }
 
 // ToroidMirror:
-double width(ToroidMirror tor) { return param_o(tor.id, 0, 0); }
-double height(ToroidMirror tor) { return param_o(tor.id, 0, 1); }
-double longRadius(ToroidMirror tor) { return param_s(tor.id, 0, 0); }
-double shortRadius(ToroidMirror tor) { return param_s(tor.id, 0, 1); }
-double slopeX(ToroidMirror tor) { return param_o(tor.id, 0, 2); }
-double slopeZ(ToroidMirror tor) { return param_o(tor.id, 0, 3); }
-double azimuthalAngle(ToroidMirror tor) { return param_o(tor.id, 2, 2); }
-double material(ToroidMirror tor) { return param_s(tor.id, 3, 2); }
+double width(ToroidMirror e) { return param_o(e.id, 0, 0); }
+double height(ToroidMirror e) { return param_o(e.id, 0, 1); }
+double longRadius(ToroidMirror e) { return param_s(e.id, 0, 0); }
+double shortRadius(ToroidMirror e) { return param_s(e.id, 0, 1); }
+double slopeX(ToroidMirror e) { return param_o(e.id, 0, 2); }
+double slopeZ(ToroidMirror e) { return param_o(e.id, 0, 3); }
+double azimuthalAngle(ToroidMirror e) { return param_o(e.id, 2, 2); }
+double material(ToroidMirror e) { return param_s(e.id, 3, 2); }
 
 // Rzp:
-double curvatureType(Rzp rzp) { return param_e(rzp.id, 1, 0); }
-double elementOffsetZ(Rzp rzp) { return param_e(rzp.id, 3, 2); }
-dmat4 surfaceParams(Rzp rzp) { return quadricData[rzp.id].surfaceParams; }
-double longRadius(Rzp rzp) { return param_s(rzp.id, 0, 0); }
-double shortRadius(Rzp rzp) { return param_s(rzp.id, 0, 1); }
-double widthA(Rzp rzp) { return param_o(rzp.id, 0, 0); }
-double widthB(Rzp rzp) { return param_o(rzp.id, 2, 1); }
-double height(Rzp rzp) { return param_o(rzp.id, 0, 1); }
-double slopeX(Rzp rzp) { return param_o(rzp.id, 0, 2); }
-double slopeZ(Rzp rzp) { return param_o(rzp.id, 0, 3); }
-dmat4 elementParams(Rzp rzp) { return quadricData[rzp.id].elementParameters; }
+double curvatureType(Rzp e) { return param_e(e.id, 1, 0); }
+double elementOffsetZ(Rzp e) { return param_e(e.id, 3, 2); }
+dmat4 surfaceParams(Rzp e) { return quadricData[e.id].surfaceParams; }
+double longRadius(Rzp e) { return param_s(e.id, 0, 0); }
+double shortRadius(Rzp e) { return param_s(e.id, 0, 1); }
+double widthA(Rzp e) { return param_o(e.id, 0, 0); }
+double widthB(Rzp e) { return param_o(e.id, 2, 1); }
+double height(Rzp e) { return param_o(e.id, 0, 1); }
+double slopeX(Rzp e) { return param_o(e.id, 0, 2); }
+double slopeZ(Rzp e) { return param_o(e.id, 0, 3); }
+dmat4 elementParams(Rzp e) { return quadricData[e.id].elementParameters; }
+
+// EllipsoidMirror:
+double sinTangentAngle(EllipsoidMirror e) { return param_e(e.id, 0, 0); }
+double cosTangentAngle(EllipsoidMirror e) { return param_e(e.id, 0, 1); }
+dmat4 surfaceParams(EllipsoidMirror e) { return quadricData[e.id].surfaceParams; }
+double azimuthalAngle(EllipsoidMirror e) { return param_o(e.id, 2, 2); }
+double width(EllipsoidMirror e) { return param_o(e.id, 0, 0); }
+double height(EllipsoidMirror e) { return param_o(e.id, 0, 1); }
+double slopeX(EllipsoidMirror e) { return param_o(e.id, 0, 2); }
+double slopeZ(EllipsoidMirror e) { return param_o(e.id, 0, 3); }
+double material(EllipsoidMirror e) { return param_s(e.id, 3, 2); }
