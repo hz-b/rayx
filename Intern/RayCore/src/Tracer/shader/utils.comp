@@ -107,10 +107,8 @@ void cosini(INOUT(Ray) r, double phi, double psi) {
  * @param x, z			 	x- and z-coordinates of the intersection point in
  * element coordinates
  * @param xLength, zLength	width and length of the optical element
- * @param w 					current weight of the ray
  *
- * returns: unchanged weight if intersection point is within surface boundaries,
- * 0.0 if not.
+ * returns `true` if intersection point is within surface boundaries.
  */
 bool wasteBox(double x, double z, double xLength, double zLength) {
     if (xLength >= 0) {  // Rectangular shape
@@ -122,7 +120,7 @@ bool wasteBox(double x, double z, double xLength, double zLength) {
     } else {                  // Ring shape
         double rd2 = (x / (xLength / 2.0)) * (x / (xLength / 2.0)) +
                      (z / (zLength / 2.0)) * (z / (zLength / 2.0));
-        return rd2 <= 1.0;  // This sets w to zero, if (rd > 1.0)
+        return rd2 <= 1.0;
     }
 }
 
