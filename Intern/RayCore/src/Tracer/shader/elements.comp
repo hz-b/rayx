@@ -20,7 +20,22 @@ double longRadius(uint id) { return quadricData[id].surfaceParams[0][0]; }
 double shortRadius(uint id) { return quadricData[id].surfaceParams[0][1]; }
 dmat4 surfaceParams(uint id) { return quadricData[id].surfaceParams; }
 
-// BasicMirror:
+// Slit:
+double width(Slit slit) { return quadricData[slit.id].objectParameters[0][0]; }
+double height(Slit slit) { return quadricData[slit.id].objectParameters[0][0]; }
+double beamstopWidth(Slit slit) { return quadricData[slit.id].elementParameters[0][0]; }
+double beamstopHeight(Slit slit) { return quadricData[slit.id].elementParameters[0][0]; }
+dmat4 surfaceParams(Slit slit) { return quadricData[slit.id].surfaceParams; }
 
-// RZP:
+// ToroidMirror:
+double width(ToroidMirror tor) { return quadricData[tor.id].objectParameters[0][0]; }
+double height(ToroidMirror tor) { return quadricData[tor.id].objectParameters[0][1]; }
+double longRadius(ToroidMirror tor) { return quadricData[tor.id].surfaceParams[0][0]; }
+double shortRadius(ToroidMirror tor) { return quadricData[tor.id].surfaceParams[0][1]; }
+double slopeX(ToroidMirror tor) { return quadricData[tor.id].objectParameters[0][2]; }
+double slopeZ(ToroidMirror tor) { return quadricData[tor.id].objectParameters[0][3]; }
+double azimuthalAngle(ToroidMirror tor) { return quadricData[tor.id].objectParameters[2][2]; }
+double material(ToroidMirror tor) { return quadricData[tor.id].surfaceParams[3][2]; }
+
+// Rzp:
 double curvatureType(Rzp id) { return quadricData[id.id].elementParameters[1][0]; }

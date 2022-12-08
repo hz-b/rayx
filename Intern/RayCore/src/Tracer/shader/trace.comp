@@ -8,20 +8,18 @@
  * output: diffracted Ray with intersection point as position, reflection as direction in beam coordinates and possibly modified weight in ELEMENT
  * coordinates
  */
-Ray traceSlit(Ray r, const int elementIndex, INOUT(uint64_t) ctr, dvec4 intersection) {
-    Element slit = quadricData[elementIndex];
-
+Ray traceSlit(Ray r, Slit slit, INOUT(uint64_t) ctr, dvec4 intersection) {
     // store old position, needed for pathlength calculation
     dvec3 old_position = r.m_position;
 
     // dvec4 normal = intersectionPoint(r, q.surfaceParams); // if it is not sure whether the given intersection is correct, use this (recalculate the
     // intersection)
-    setIntersectionPoint(r, slit.surfaceParams, intersection);
+    setIntersectionPoint(r, surfaceParams(slit), intersection);
 
-    double x_extent = slit.objectParameters[0][0];   // width
-    double y_extent = slit.objectParameters[0][1];   // height
-    double xStop    = slit.elementParameters[0][0];  // beamstop width
-    double yStop    = slit.elementParameters[0][1];  // beamstop heigth
+    double x_extent = width(slit);
+    double y_extent = height(slit);
+    double xStop    = beamstopWidth(slit);
+    double yStop    = beamstopHeight(slit);
     // slit lies in x-y plane instead of x-z plane as other elements
     bool hit = wasteBox(r.m_position[0], r.m_position[1], x_extent, y_extent);
     bool stop_box = stopBox(r.m_position[0], r.m_position[1], xStop, yStop);
@@ -34,7 +32,7 @@ Ray traceSlit(Ray r, const int elementIndex, INOUT(uint64_t) ctr, dvec4 intersec
     // add the travelled distance from the previous position to the new intersection to pathlength (both are in the same coordinate system so we do
     // not need to transform back to world coordinates??)
     r.m_pathLength += length(old_position - r.m_position);
-    r.m_lastElement = elementIndex + 1;
+    r.m_lastElement = slit.id + 1;
 
     double psi        = -r8_asin(r.m_direction.y);
     double phi        = r8_asin(r.m_direction.x / r8_cos(psi));
@@ -62,20 +60,16 @@ Ray traceSlit(Ray r, const int elementIndex, INOUT(uint64_t) ctr, dvec4 intersec
  *
  * output: reflected Ray with intersection point as position, reflection as direction in ELEMENT coordinates and possibly modified weight
  */
-Ray traceToroid(Ray r, const int elementIndex, INOUT(uint64_t) ctr, ALLOW_UNUSED dvec4 intersectionPoint) { // TODO fix unused var
-    Element tor = quadricData[elementIndex];
-
+Ray traceToroid(Ray r, ToroidMirror tor, INOUT(uint64_t) ctr, ALLOW_UNUSED dvec4 intersectionPoint) { // TODO fix unused var
     // store old position, needed for pathlength calculation
     dvec3 old_position = r.m_position;
 
-    double longRadius  = tor.surfaceParams[0][0];
-    double shortRadius = tor.surfaceParams[0][1];
     // TODO use the given intersection point instead of recalculating it (still need to calculate the normal)
-    dvec4 normal = iteratTo(r, longRadius, shortRadius);
-    double azimuthal_angle = tor.objectParameters[2][2];  // chi (azimuthalangle) in rad
+    dvec4 normal = iteratTo(r, longRadius(tor), shortRadius(tor));
+    double azimuthal_angle = azimuthalAngle(tor);
 
-    double x_extent = tor.objectParameters[0][0];  // width
-    double z_extent = tor.objectParameters[0][1];  // length
+    double x_extent = width(tor);
+    double z_extent = height(tor);
     bool hit        = wasteBox(r.m_position[0], r.m_position[2], x_extent, z_extent);
 
     // element missed
@@ -88,20 +82,18 @@ Ray traceToroid(Ray r, const int elementIndex, INOUT(uint64_t) ctr, ALLOW_UNUSED
     // add the travelled distance from the previous position to the new intersection to pathlength (both are in the same coordinate system so we do
     // not need to transform back to world coordinates??)
     r.m_pathLength += length(old_position - r.m_position);
-    r.m_lastElement = elementIndex + 1;
+    r.m_lastElement = tor.id + 1;
 
     // tanger/slope Error
-    double slopeX = tor.objectParameters[0][2];
-    double slopeZ = tor.objectParameters[0][3];
-    normal        = tanger(normal, slopeX, slopeZ, 0, ctr);
+    normal        = tanger(normal, slopeX(tor), slopeZ(tor), 0, ctr);
 
     r.m_direction = dvec3(reflect(dvec4(r.m_direction, 0), normal));
 
     double real_S, real_P, delta;
     double incidence_angle = getIncidenceAngle(r, normal);  // getTheta
-    int material           = int(quadricData[elementIndex].surfaceParams[3][2]);
-    if (material != -2) {
-        efficiency(r, real_S, real_P, delta, incidence_angle, material);
+    int mat = int(material(tor));
+    if (mat != -2) {
+        efficiency(r, real_S, real_P, delta, incidence_angle, mat);
 
         update_stokes(r, real_S, real_P, delta, azimuthal_angle, ctr);
         r.m_order = 0;

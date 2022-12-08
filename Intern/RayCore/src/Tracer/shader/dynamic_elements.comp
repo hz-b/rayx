@@ -119,7 +119,7 @@ void dynamicElements() {
         } else if (type == TY_GENERAL_GRATING) {
             elem_ray = traceGeneralGrating(elem_ray, col.elementIndex, ctr, col.hitpoint);
         } else if (type == TY_SLIT) {
-            elem_ray = traceSlit(elem_ray, col.elementIndex, ctr, col.hitpoint);
+            elem_ray = traceSlit(elem_ray, Slit(col.elementIndex), ctr, col.hitpoint);
         } else if (type == TY_RZP) {
             elem_ray = traceRZP(elem_ray, col.elementIndex, ctr, col.hitpoint);
         } else if (type == TY_IMAGE_PLANE) {
@@ -129,7 +129,7 @@ void dynamicElements() {
             _out = traceImagePlane(elem_ray, col.elementIndex, col.hitpoint);
             return;
         } else if (type == TY_TOROID_MIRROR) {
-            elem_ray = traceToroid(elem_ray, col.elementIndex, ctr, col.hitpoint);
+            elem_ray = traceToroid(elem_ray, ToroidMirror(col.elementIndex), ctr, col.hitpoint);
         } else if (type == TY_ELLIPSOID_MIRROR) {
             elem_ray = traceEllipsoidMirror(elem_ray, col.elementIndex, ctr, col.hitpoint);
         }
