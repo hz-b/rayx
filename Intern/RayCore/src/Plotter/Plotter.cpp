@@ -105,6 +105,55 @@ std::pair<std::string, std::string> outputPlotPathHandler(const std::string outp
     return std::make_pair<std::string, std::string>(outputSvg.c_str(), outputPng.c_str());
 }
 
+/**
+ * @brief Grid Struct used for manual data binning
+ *
+ */
+struct myGrid {
+    std::vector<double> xGrid;
+    std::vector<double> yGrid;
+    std::vector<int> intensity;
+};
+
+/**
+ * @brief Make a grid of pixels with intensity and positions
+ *
+ * @param x Original X pos
+ * @param y Original Y pos
+ * @param width width of grid / figure
+ * @param height height
+ * @param x_offset x offset eg [3,-3.5] -> [6.5, 0]
+ * @param y_offset y offset
+ * @param grid The Grid to be reproduced
+ */
+void plotReducer(const std::vector<double>& x, const std::vector<double>& y, double width, double height, double x_offset, double y_offset,
+                 myGrid& grid) {
+    const int GRIDX_FACTOR = 50;
+    const int GRIDY_FACTOR = 30;
+
+    /**
+     * Stored row-wise grid W*H, For X, Y and intensity
+     */
+    int GRID_W = int(width * GRIDX_FACTOR + 1);
+    int GRID_H = int(height * GRIDY_FACTOR + 1);
+    RAYX_D_LOG << "Grid size[W*H]: " << GRID_W << " x " << GRID_H;
+
+    grid.xGrid.resize(GRID_H * GRID_W);
+    grid.yGrid.resize(GRID_H * GRID_W);
+    grid.intensity.resize(GRID_H * GRID_W);
+
+    int cell_x, cell_y;
+
+    for (auto i = 0; i < (int)x.size(); i++) {
+        cell_x = int((x[i] + x_offset) * GRIDX_FACTOR);
+        cell_y = int((y[i] + y_offset) * GRIDY_FACTOR);
+        assert(cell_x + cell_y * GRID_W <= GRID_H * GRID_W);
+        grid.xGrid[cell_x + cell_y * GRID_W] = x[i];
+        grid.yGrid[cell_x + cell_y * GRID_W] = y[i];
+        grid.intensity[cell_x + cell_y * GRID_W]++;
+    }
+}
+
 inline void autoPlotReducer(const mglData& x, const mglData& y, std::vector<double>& xV, std::vector<double>& yV, mglData& xD, mglData& yD) {
     mglData minimalXRepart = x.Hist(x.GetNx());
     mglData minimalYRepart = y.Hist(y.GetNx());
@@ -124,7 +173,7 @@ inline void autoPlotReducer(const mglData& x, const mglData& y, std::vector<doub
     for (auto t = 0; t <= workDataArray->GetNx(); t++) {
         if (std::abs(workDataArray->a[t]) > std::numeric_limits<double>::epsilon()) {
             xV.push_back(x.a[t]);
-            yV.push_back(x.a[t]);
+            yV.push_back(y.a[t]);
         }
     }
     xV.shrink_to_fit();
@@ -139,18 +188,25 @@ inline void autoPlotReducer(const mglData& x, const mglData& y, std::vector<doub
  * @param RayList Data (Rays)
  * @param plotName
  */
-void plotSingle(const std::vector<Ray>& RayList, const std::string& plotName, const std::vector<std::string>& OpticalElementNames) {
+void plotSingle(const std::vector<Ray>& RayList, const std::string& plotName, const std::vector<OpticalElementMeta>& OpticalElementsMeta) {
     RAYX_PROFILE_FUNCTION_STDOUT();
     ////////////////// Sort Data for plotting
     std::vector<double> Xpos, Ypos;
     Xpos.reserve(RayList.size());
     Ypos.reserve(RayList.size());
+
+    // Fetch names
+    std::vector<std::string> opticalElementNames;
+    for (const auto& i : OpticalElementsMeta) {
+        opticalElementNames.push_back(i.name);
+    }
+
     // Get elements that met Image plane (Last Element)
     auto max = std::max_element(RayList.begin(), RayList.end(), comp);
 
     auto max_param = last_obj(max->m_extraParam);
-    if (max_param != (int)OpticalElementNames.size()) {
-        RAYX_ERR << "No ray has hit the final optical element : " << OpticalElementNames.back();
+    if (max_param != (int)opticalElementNames.size()) {
+        RAYX_ERR << "No ray has hit the final optical element : " << opticalElementNames.back();
     }
     // Create new RayList with right order
     for (auto r : RayList) {
@@ -177,32 +233,17 @@ void plotSingle(const std::vector<Ray>& RayList, const std::string& plotName, co
     // Data Distribution
     mglData minimalXRepart = x_mgl.Hist(Xpos.size());
     mglData minimalYRepart = y_mgl.Hist(Ypos.size());
-
-    double* arrayX = minimalXRepart.a;
-    std::vector<double> minimalXRepartV(arrayX, arrayX + minimalXRepart.GetNx());
-    std::erase_if(minimalXRepartV, [](double x) { return std::abs(x) < std::numeric_limits<double>::epsilon(); });
-
-    double* arrayY = minimalYRepart.a;
-    std::vector<double> minimalYRepartV(arrayY, arrayY + minimalYRepart.GetNx());
-    std::erase_if(minimalYRepartV, [](double y) { return std::abs(y) < std::numeric_limits<double>::epsilon(); });
-    // Smallest distr as bin default
-    mglData* workData_mgl = minimalYRepartV.size() >= minimalYRepartV.size() ? &minimalXRepart : &minimalYRepart;
-
-    std::vector<double> xminiVec, yminiVec;
-    xminiVec.reserve(workData_mgl->GetNx());
-    yminiVec.reserve(workData_mgl->GetNx());
-    for (auto t = 0; t <= workData_mgl->GetNx(); t++) {
-        if (std::abs(workData_mgl->a[t]) > std::numeric_limits<double>::epsilon()) {
-            xminiVec.push_back(Xpos[t]);
-            yminiVec.push_back(Ypos[t]);
-        }
-    }
-    xminiVec.shrink_to_fit();
-    yminiVec.shrink_to_fit();
-
+    // Binning
     mglData xmini_mgl, ymini_mgl;
-    xmini_mgl.Link(xminiVec.data(), xminiVec.size());
-    ymini_mgl.Link(yminiVec.data(), yminiVec.size());
+    myGrid grid;
+    plotReducer(Xpos, Ypos, abs(minX) + abs(maxX), abs(minY) + abs(maxY), abs(minX), abs(minY), grid);
+    // autoPlotReducer(x_mgl,y_mgl,xminiVec, yminiVec, xmini_mgl,ymini_mgl);
+
+    xmini_mgl.Link(&grid.xGrid[0], grid.xGrid.size());
+    ymini_mgl.Link(&grid.yGrid[0], grid.yGrid.size());
+
+    // xmini_mgl.Link(xminiVec.data(), xminiVec.size());
+    // ymini_mgl.Link(yminiVec.data(), yminiVec.size());
 
     ////////////////// Plotting
     {
@@ -234,12 +275,9 @@ void plotSingle(const std::vector<Ray>& RayList, const std::string& plotName, co
         gr.Grid("xyzt", "=h");
         gr.SetFontSize(2.5);
         gr.Axis();
-
-        // autoPlotReducer(x,y,xV, yV, xD,yD);
-
         gr.Plot(xmini_mgl, ymini_mgl, " o{x62C300}");
 
-        // gr.Plot(x, y, " o{x62C300}");  // o-markers  green-yellow
+        // gr.Plot(x, y, " o{x62C300}");  // o-markers  green-yellow [Full Plot]
         gr.SetMarkSize(0.9);
         gr.Label('y', "y / mm", 0);
         gr.Label('x', "x / mm", 0);
@@ -256,7 +294,7 @@ void plotSingle(const std::vector<Ray>& RayList, const std::string& plotName, co
         // gr.Area(xx, "E{x62C300}");
 
         gr.MultiPlot(3, 3, 2, 1, 1, "UR");
-        auto outString = "Numbers of rays hit :" + std::to_string(Xpos.size()) + "\nImage Plane Name: " + OpticalElementNames.back();
+        auto outString = "Numbers of rays hit :" + std::to_string(Xpos.size()) + "\nImage Plane Name: " + opticalElementNames.back();
         gr.Puts(mglPoint(0, 0.5), outString.c_str(), "@", 4);
 
         gr.MultiPlot(3, 3, 5, 1, 2, "UR");
@@ -279,48 +317,6 @@ void plotSingle(const std::vector<Ray>& RayList, const std::string& plotName, co
         gr.WriteFrame((files.second).c_str(), "Generated by RAY-X");  // save it
         RAYX_VERB << "Saved";
         RAYX_D_LOG << "in \"" << files.first << "\" and \"" << files.second << "\"";
-    }
-}
-
-struct Point {
-    double xpos;    // Position at X
-    double ypos;    // Position at Y
-    int intensity;  // Number of points that are close to this position a.k.a color intensity
-};
-
-/**
- * @brief Make a grid of pixels with intensity and positions
- *
- * @param x Original X pos
- * @param y Original Y pos
- * @param OpticalElementMeta Object at hand
- * @param x_offset x offset eg [3,-3.5] -> [6.5, 0]
- * @param y_offset y offset
- * @return std::vector<std::vector<Point>> Each cell has the X coordinates and Y coordinates
- */
-std::vector<std::vector<Point>> plotReducer(const std::vector<double>& x, const std::vector<double>& y, const OpticalElementMeta OpticalElementMeta,
-                                            const double x_offset, const double y_offset) {
-    const int GRID_FACTOR = 1080;
-
-    int grid_w = int(OpticalElementMeta.width * GRID_FACTOR + 1);
-    int grid_h = int(OpticalElementMeta.height * GRID_FACTOR + 1);
-
-    std::vector<std::vector<Point>> grid;
-
-    grid.reserve(grid_w * grid_h);
-
-    for (auto row : grid) {
-        std::fill(row.begin(), row.end(), Point{0.0, 0.0, 0});
-    }
-
-    int cell_x, cell_y;
-
-    for (auto i = 0; i < x.size(); i++) {
-        cell_x = int(x[i] + x_offset * GRID_FACTOR);
-        cell_y = int(y[i] + y_offset * GRID_FACTOR);
-        grid[cell_x][cell_y].xpos = x[i];
-        grid[cell_x][cell_y].ypos = y[i];
-        grid[cell_x][cell_y].intensity++;
     }
 }
 
@@ -462,14 +458,9 @@ void Plotter::plot(int plotType, const std::string& plotName, const std::vector<
     // Get Beamline Meta Data (Name, type etc.)
     auto OpticalElementsMeta = getBeamlineOpticalElementMeta(beamline);
 
-    std::vector<std::string> opticalElementNames;
-    for (const auto& i : OpticalElementsMeta) {
-        opticalElementNames.push_back(i.name);
-    }
-
     // Plot with correct option
     if (plotType == plotTypes::SinglePlot)  // RAY-UI
-        plotSingle(RayList, plotName, opticalElementNames);
+        plotSingle(RayList, plotName, OpticalElementsMeta);
     else if (plotType == plotTypes::MultiPlot)
         plotMulti(RayList, plotName, OpticalElementsMeta);
     else
