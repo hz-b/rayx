@@ -8,6 +8,7 @@
 #include "Debug/Instrumentor.h"
 #include "Material/Material.h"
 #include "Model/Beamline/OpticalElement.h"
+#include "Random.h"
 
 namespace RAYX {
 
@@ -25,10 +26,7 @@ std::vector<Ray> CpuTracer::trace(const Beamline& beamline) {
 
     auto rayList = beamline.getInputRays();
 
-    CPU_TRACER::numberOfBeamlines = 1;
-    CPU_TRACER::numberOfElementsPerBeamline = (double)beamline.m_OpticalElements.size();
-    CPU_TRACER::numberOfRays = (double)rayList.size();
-    CPU_TRACER::numberOfRaysPerBeamLine = (double)rayList.size();
+    CPU_TRACER::randomSeed = randomDouble();
 
     CPU_TRACER::quadricData.data.clear();
     CPU_TRACER::xyznull.data.clear();

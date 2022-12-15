@@ -7,6 +7,7 @@
 
 #include "Debug/Debug.h"
 #include "Debug/Instrumentor.h"
+#include "Random.h"
 #include "RayCore.h"
 
 #ifdef RAYX_PLATFORM_MSVC
@@ -36,13 +37,10 @@ std::vector<Ray> VulkanTracer::trace(const Beamline& beamline) {
     }
 
     auto rayList = beamline.getInputRays();
+    const uint32_t numberOfRays = rayList.size();
 
-    uint32_t numberOfBeamlines = 1;
-    uint32_t numberOfQuadricsPerBeamline = (uint32_t)beamline.m_OpticalElements.size();
-    uint32_t numberOfRays = (uint32_t)rayList.size();
-    uint32_t numberOfRaysPerBeamline = numberOfRays;
-    std::vector<double> beamlineData = {(double)numberOfBeamlines, (double)numberOfQuadricsPerBeamline, (double)numberOfRays,
-                                        (double)numberOfRaysPerBeamline};
+    double randomSeed = randomDouble();
+    std::vector<double> beamlineData = {randomSeed, 0, 0, 0};
 
     for (const auto& e : beamline.m_OpticalElements) {
         std::vector<glm::dmat4x4> mats = {e->getSurfaceParams(), e->getInMatrix(), e->getOutMatrix(), e->getObjectParameters(),
