@@ -21,11 +21,10 @@ Ray traceSlit(Ray r, Slit slit, INOUT(uint64_t) ctr, dvec4 intersection) {
     double xStop    = beamstopWidth(slit);
     double yStop    = beamstopHeight(slit);
     // slit lies in x-y plane instead of x-z plane as other elements
-    bool hit = wasteBox(r.m_position[0], r.m_position[1], x_extent, y_extent);
     bool stop_box = stopBox(r.m_position[0], r.m_position[1], xStop, yStop);
 
-    if (!hit || !stop_box) {
-        r.m_weight = 2;
+    if (!stop_box) {
+        r.m_weight = 2; // TODO what does weight = 2 mean?
         return r;
     }
 
@@ -67,17 +66,6 @@ Ray traceToroid(Ray r, ToroidMirror tor, INOUT(uint64_t) ctr, ALLOW_UNUSED dvec4
     // TODO use the given intersection point instead of recalculating it (still need to calculate the normal)
     dvec4 normal = iteratTo(r, longRadius(tor), shortRadius(tor));
     double azimuthal_angle = azimuthalAngle(tor);
-
-    double x_extent = width(tor);
-    double z_extent = height(tor);
-    bool hit        = wasteBox(r.m_position[0], r.m_position[2], x_extent, z_extent);
-
-    // element missed
-    if (!hit) {
-        // rays that missed an element get weight 2
-        r.m_weight = 2;
-        return r;
-    }
 
     // add the travelled distance from the previous position to the new intersection to pathlength (both are in the same coordinate system so we do
     // not need to transform back to world coordinates??)
@@ -124,19 +112,6 @@ Ray traceRZP(Ray r, Rzp rzp, INOUT(uint64_t) ctr, dvec4 intersection) {
         normal = setIntersectionPoint(r, surfaceParams(rzp), intersection);
     } else {
         normal             = iteratTo(r, longRadius(rzp), shortRadius(rzp));
-    }
-
-    // ! temporary change to test the trapezoid
-    double x_extentA = widthA(rzp);
-    double x_extentB = widthB(rzp);
-    double z_extent  = height(rzp);
-    bool hit       = wasteBox(r.m_position[0], r.m_position[2], x_extentA, x_extentB, z_extent);
-
-    if (!hit) {
-        r.m_position.z += element_offset_z;
-        // rays that missed an element get weight 2
-        r.m_weight = 2;
-        return r;
     }
 
     // add the travelled distance from the previous position to the new intersection to pathlength (both are in the same coordinate system so we do
@@ -203,16 +178,6 @@ Ray tracePlaneGrating(Ray r, PlaneGrating pg, INOUT(uint64_t) ctr, dvec4 interse
     // calculate intersection point with element surface and return surface normal at this point
     dvec4 normal = setIntersectionPoint(r, surfaceParams(pg), intersection);
 
-    // check if element was hit
-    double x_extent = width(pg);
-    double z_extent = height(pg);
-    bool hit      = wasteBox(r.m_position.x, r.m_position.z, x_extent, z_extent);
-
-    if (!hit) {
-        // rays that missed an element get weight 2
-        r.m_weight = 2;
-        return r;
-    }
     // modify normal according to slope error
     normal = tanger(normal, slopeX(pg), slopeZ(pg), 0, ctr);
 
@@ -260,18 +225,6 @@ Ray traceGeneralGrating(Ray r, GeneralGrating gg, INOUT(uint64_t) ctr, dvec4 int
     dvec4 normal = setIntersectionPoint(r, surfaceParams(gg), intersection);
     // normal = normalize(dvec4(-r.m_position.x, -radius - r.m_position[1]*ISIG, -r.m_position[2], 0));
 
-    // check if element was hit
-    double x_extent = width(gg);
-    double z_extent = height(gg);
-    bool hit      = wasteBox(r.m_position.x, r.m_position.z, x_extent, z_extent);
-
-    // if ray missed the surface, stop the tracing here and return the ray in world coordinates
-    if (!hit) {
-        // rays that missed an element get weight 2
-        r.m_weight = 2;
-        return r;
-    }
-
     // add the travelled distance from the previous position to the new intersection to pathlength (both are in the same coordinate system so we do
     // not need to transform back to world coordinates??)
     r.m_pathLength += length(old_position - r.m_position);
@@ -314,19 +267,6 @@ Ray traceMirror(Ray r, BasicMirror m, INOUT(uint64_t) ctr, dvec4 intersection) {
     // calculate intersection point and normal at intersection point
     dvec4 normal           = setIntersectionPoint(r, surfaceParams(m), intersection);
     double azimuthal_angle = azimuthalAngle(m);
-
-    // check if ray hit the element within the boundaries
-    double x_extent = widthA(m);
-    double x_extentB = widthB(m);
-    double z_extent = height(m);
-    bool hit      = wasteBox(r.m_position.x, r.m_position.z, x_extent, x_extentB, z_extent);
-
-    // if ray missed the surface, stop the tracing here and return the ray in world coordinates
-    if (!hit) {
-        // rays that missed an element get weight 2
-        r.m_weight = 2;
-        return r;
-    }
 
     // add the travelled distance from the previous position to the new intersection to pathlength (both are in the same coordinate system so we do
     // not need to transform back to world coordinates??)
@@ -371,19 +311,8 @@ Ray traceEllipsoidMirror(Ray r, EllipsoidMirror ell, INOUT(uint64_t) ctr, dvec4 
     dvec4 normal = setIntersectionPoint(r, surfaceParams(ell), intersection);
     double azimuthal_angle = azimuthalAngle(ell);
 
-    // check if ray hit the element within the boundaries
-    double x_extent = width(ell);
-    double z_extent = height(ell);
-    r               = rotationAroundX(r, -sin_tangentAngle, cos_tangentAngle);  // change to coordinate system of mirror
-    bool hit      = wasteBox(r.m_position.x, r.m_position.z, x_extent, z_extent);
-    r               = rotationAroundX(r, sin_tangentAngle, cos_tangentAngle);  // change to coordinate system of curvation
-
-    // if ray missed the surface, stop the tracing here and return the ray in world coordinates
-    if (!hit) {
-        // rays that missed an element get weight 2
-        r.m_weight = 2;
-        return r;
-    }
+    r = rotationAroundX(r, -sin_tangentAngle, cos_tangentAngle);  // change to coordinate system of mirror
+    r = rotationAroundX(r, sin_tangentAngle, cos_tangentAngle);  // change to coordinate system of curvation
 
     // add the travelled distance from the previous position to the new intersection to pathlength (both are in the same
     // coordinate system so we do not need to transform back to world coordinates??)
