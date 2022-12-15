@@ -26,7 +26,6 @@
 #define _out (outputData[uint(gl_GlobalInvocationID)])
 
 #include "../../Constants.h"
-const uint64_t rngKey = 13; // TODO(rudi) this was the old key, it generated a warning: (0xc8e4fd15 << 32) | 0x4ce32f6d;
 
 /* STRUCTS */
 // for CPP, the according things are mostly defined in CpuTracer.h
@@ -35,10 +34,7 @@ int gl_GlobalInvocationID;
 
 ShaderArray<Ray> rayData;
 ShaderArray<Ray> outputData;
-double numberOfBeamlines;
-double numberOfElementsPerBeamline;
-double numberOfRays;
-double numberOfRaysPerBeamLine;
+double randomSeed;
 ShaderArray<Element> quadricData;
 ShaderArray<dvec4> xyznull;
 ShaderArray<int> matIdx;
@@ -79,10 +75,13 @@ struct Element {
 	layout(std140, binding = 1) buffer obuf { Ray outputData[]; };
 
 	layout(std140, binding = 2) buffer qbuf {
-		double numberOfBeamlines;
-		double numberOfElementsPerBeamline;
-		double numberOfRays;
-		double numberOfRaysPerBeamLine;
+		double randomSeed;
+
+		// these are probably necessary here for the correct alignment.
+		// TODO we should probably replace `randomSeed` with a push constant.
+		double _unused1;
+		double _unused2;
+		double _unused3;
 		Element quadricData[];
 	};
 

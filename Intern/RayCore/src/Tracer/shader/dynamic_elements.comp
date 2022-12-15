@@ -17,11 +17,8 @@ Collision find_collision() {
     dvec4 closestHitpoint       = dvec4(infinity(), infinity(), infinity(), 0);
     dvec4 closestGlobalHitpoint = dvec4(infinity(), infinity(), infinity(), 0);
 
-    const uint beamlineIndex    = uint(double(gl_GlobalInvocationID) / numberOfRaysPerBeamLine);
-
     // Find intersection points through all elements
-    for (int elementIndex = int(beamlineIndex) * int(numberOfElementsPerBeamline);
-         elementIndex < (beamlineIndex + 1) * numberOfElementsPerBeamline; elementIndex++) {
+    for (uint elementIndex = 0; elementIndex < uint(quadricData.length()); elementIndex++) {
 
         double lastElement = _ray.m_lastElement;
         if (elementIndex + 1 == lastElement) {
@@ -45,7 +42,7 @@ Collision find_collision() {
             currentIntersection.w != 0) {
             closestHitpoint       = currentIntersection;
             closestGlobalHitpoint = currentGlobalIntersection;
-            closestElementIndex   = elementIndex;
+            closestElementIndex   = int(elementIndex);
         }
     }
 
@@ -60,13 +57,13 @@ Collision find_collision() {
 // in this function we need to make sure that rayData ALWAYS remains in GLOBAL coordinates (it can be changed in a function but needs to be changed
 // back before the function returns to this function)
 void dynamicElements() {
-    const int numberOfElements = quadricData.length();
     // placeholder, info should later be transfered to shader
-    const int maxBounces  = numberOfElements;
+    const int maxBounces = quadricData.length();
 
     // ray specific "seed" for random numbers -> every ray has a different starting value for the counter that creates the random number
-    uint64_t workerCounterNum = (~(uint64_t(0)) / int(numberOfRays));
-    uint64_t ctr              = uint(gl_GlobalInvocationID) * workerCounterNum;
+    const uint64_t MAX_UINT64 = ~(uint64_t(0));
+    uint64_t workerCounterNum = MAX_UINT64 / int(rayData.length());
+    uint64_t ctr              = uint64_t(gl_GlobalInvocationID) * workerCounterNum; // TODO `+ uint64_t(randomSeed * MAX_UINT64)`;
     int type                  = -1;
 
     #ifdef RAYX_DEBUG_MODE // Debug Matrix only works in GPU Mode and on DEBUG Build Type
