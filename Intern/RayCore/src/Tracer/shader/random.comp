@@ -1,4 +1,4 @@
-const uint64_t rngKey = 13; // TODO: use (uint64_t(0xc8e4fd15) << 32) | uint64_t(0x4ce32f6d);
+const uint64_t rngKey = (uint64_t(0xc8e4fd15) << 32) | uint64_t(0x4ce32f6d);
 
 // ------------ Random Numbers --------------
 /*
