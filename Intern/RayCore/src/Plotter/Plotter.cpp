@@ -22,25 +22,14 @@ bool last_comp(Ray const& lhs, Ray const& rhs) { return last_obj(lhs.m_extraPara
 bool comp(Ray const& lhs, Ray const& rhs) { return lhs.m_extraParam < rhs.m_extraParam; }
 bool abs_comp(double const& lhs, double const& rhs) { return abs(lhs) < abs(rhs); }
 inline bool int_close(double x, double y) { return abs(x - y) < std::numeric_limits<double>::epsilon(); }
-/**
- * @brief Compact Optical Element Description
- *
- */
-struct OpticalElementMeta {
-    std::string name;
-    int type;
-    double material;
-    double height;
-    double width;
-};
 
 /**
  * @brief Get all beamline optical elememt meta data
  *
  * @return std::vector<std::string> list of (names, type etc.)
  */
-std::vector<OpticalElementMeta> getBeamlineOpticalElementMeta(const std::unique_ptr<RAYX::Beamline>& beamline) {
-    std::vector<OpticalElementMeta> meta;
+std::vector<Plotter::OpticalElementMeta> getBeamlineOpticalElementMeta(const std::unique_ptr<RAYX::Beamline>& beamline) {
+    std::vector<Plotter::OpticalElementMeta> meta;
     meta.reserve(beamline->m_OpticalElements.size());
 
     for (const auto& opticalElement : beamline->m_OpticalElements) {
@@ -106,14 +95,115 @@ std::pair<std::string, std::string> outputPlotPathHandler(const std::string outp
 }
 
 /**
- * @brief Grid Struct used for manual data binning
+ * @brief Import settings for plotting from .cfg file
  *
+ * @param filename <filename.cfg>
+ * @return true if conversion pass
+ * @return false
  */
-struct myGrid {
-    std::vector<double> xGrid;
-    std::vector<double> yGrid;
-    std::vector<int> intensity;
-};
+bool Plotter::importPlotSettings(const std::string& filename) {
+    std::ifstream file(filename);
+    auto validBool = [](std::string& str) {
+        if (str == "true" or str == "false")
+            return true;
+        else
+            return false;
+    };
+
+    auto clearEmptySpace = [](std::string str) {
+        str.erase(std::remove_if(str.begin(), str.end(),
+                                 [](char c) {
+                                     if (c == ' ')
+                                         return true;
+                                     else
+                                         return false;
+                                 }),
+                  str.end());
+        return str;
+    };
+
+    if (!file) {
+        RAYX_WARN << "Could not find plotSettings.cfg, using default.";
+        return true;
+    }
+
+    for (std::string line; getline(file, line);) {
+        if (line[0] == '#') continue;  // Comment
+        auto pos = line.find('=');
+        if (pos == std::string::npos) {  // Invalid key
+            continue;
+        }
+        std::string key = clearEmptySpace(line.substr(0, pos));
+        std::string val = clearEmptySpace(line.substr(pos + 1));
+
+        // Handle Content
+        if (strcmp(key.c_str(), "scatterColor") == 0) {
+            m_plotSettings[key] = val;
+        } else if (strcmp(key.c_str(), "factorX") == 0) {
+            try {
+                m_plotSettings[key] = stoi(val);
+            } catch (std::invalid_argument const& ex) {
+                RAYX_WARN << "Invalid value for " << key << "(" << ex.what() << ")";
+            }
+
+        } else if (strcmp(key.c_str(), "factorY") == 0) {
+            try {
+                m_plotSettings[key] = stoi(val);
+            } catch (std::invalid_argument const& ex) {
+                RAYX_WARN << "Invalid value for " << key << "(" << ex.what() << ")";
+            }
+
+        } else if (strcmp(key.c_str(), "automaticBinning") == 0) {
+            if (!validBool(val)) {
+                RAYX_WARN << "Invalid value " << val << ".Expected true or false.";
+                return false;
+            }
+            m_plotSettings[key] = (val == "true");
+
+        } else if (strcmp(key.c_str(), "coloredIntensity") == 0) {
+            if (!validBool(val)) {
+                RAYX_WARN << "Invalid value " << val << ".Expected true or false.";
+                return false;
+            }
+
+            m_plotSettings[key] = (val == "true");
+
+        } else if (strcmp(key.c_str(), "Plot3D") == 0) {
+            if (!validBool(val)) {
+                RAYX_WARN << "Invalid value " << val << ".Expected true or false.";
+                return false;
+            }
+
+            m_plotSettings[key] = (val == "true");
+        } else if (strcmp(key.c_str(), "colorBar") == 0) {
+            if (!validBool(val)) {
+                RAYX_WARN << "Invalid value " << val << ".Expected true or false.";
+                return false;
+            }
+
+            m_plotSettings[key] = (val == "true");
+
+        } else if (strcmp(key.c_str(), "plot3D") == 0) {
+            if (!validBool(val)) {
+                RAYX_WARN << "Invalid value " << val << ".Expected true or false.";
+                return false;
+            }
+
+            m_plotSettings[key] = (val == "true");
+
+        } else if (strcmp(key.c_str(), "histArea") == 0) {
+            if (!validBool(val)) {
+                RAYX_WARN << "Invalid value " << val << ".Expected true or false.";
+                return false;
+            }
+
+            m_plotSettings[key] = (val == "true");
+        } else {
+            RAYX_WARN << "Unknown parameter:" << key;
+        }
+    }
+    return true;
+}
 
 /**
  * @brief Make a grid of pixels with intensity and positions
@@ -126,10 +216,10 @@ struct myGrid {
  * @param y_offset y offset
  * @param grid The Grid to be reproduced
  */
-void plotReducer(const std::vector<double>& x, const std::vector<double>& y, double width, double height, double x_offset, double y_offset,
-                 myGrid& grid) {
-    const int GRIDX_FACTOR = 50;
-    const int GRIDY_FACTOR = 30;
+void Plotter::plotReducer(const std::vector<double>& x, const std::vector<double>& y, double width, double height, double x_offset, double y_offset,
+                          Plotter::myGrid& grid) {
+    int GRIDX_FACTOR = std::get<int>(m_plotSettings["factorX"]);
+    int GRIDY_FACTOR = std::get<int>(m_plotSettings["factorY"]);
 
     /**
      * Stored row-wise grid W*H, For X, Y and intensity
@@ -188,7 +278,8 @@ inline void autoPlotReducer(const mglData& x, const mglData& y, std::vector<doub
  * @param RayList Data (Rays)
  * @param plotName
  */
-void plotSingle(const std::vector<Ray>& RayList, const std::string& plotName, const std::vector<OpticalElementMeta>& OpticalElementsMeta) {
+void Plotter::plotSingle(const std::vector<Ray>& RayList, const std::string& plotName,
+                         const std::vector<Plotter::OpticalElementMeta>& OpticalElementsMeta) {
     RAYX_PROFILE_FUNCTION_STDOUT();
     ////////////////// Sort Data for plotting
     std::vector<double> Xpos, Ypos;
@@ -234,16 +325,20 @@ void plotSingle(const std::vector<Ray>& RayList, const std::string& plotName, co
     mglData minimalXRepart = x_mgl.Hist(Xpos.size());
     mglData minimalYRepart = y_mgl.Hist(Ypos.size());
     // Binning
-    mglData xmini_mgl, ymini_mgl;
-    myGrid grid;
-    plotReducer(Xpos, Ypos, abs(minX) + abs(maxX), abs(minY) + abs(maxY), abs(minX), abs(minY), grid);
-    // autoPlotReducer(x_mgl,y_mgl,xminiVec, yminiVec, xmini_mgl,ymini_mgl);
+    mglData xmini_mgl, ymini_mgl, intensity_mgl;
+    Plotter::myGrid grid;
+    std::vector<double> xminiVec, yminiVec;
 
-    xmini_mgl.Link(&grid.xGrid[0], grid.xGrid.size());
-    ymini_mgl.Link(&grid.yGrid[0], grid.yGrid.size());
-
-    // xmini_mgl.Link(xminiVec.data(), xminiVec.size());
-    // ymini_mgl.Link(yminiVec.data(), yminiVec.size());
+    if (std::get<bool>(m_plotSettings["automaticBinning"])) {
+        autoPlotReducer(x_mgl, y_mgl, xminiVec, yminiVec, xmini_mgl, ymini_mgl);
+        xmini_mgl.Link(xminiVec.data(), xminiVec.size());
+        ymini_mgl.Link(yminiVec.data(), yminiVec.size());
+    } else {
+        plotReducer(Xpos, Ypos, abs(minX) + abs(maxX), abs(minY) + abs(maxY), abs(minX), abs(minY), grid);
+        xmini_mgl.Link(&grid.xGrid[0], grid.xGrid.size());
+        ymini_mgl.Link(&grid.yGrid[0], grid.yGrid.size());
+        intensity_mgl.Link(&grid.intensity[0], grid.intensity.size());
+    }
 
     ////////////////// Plotting
     {
@@ -270,15 +365,32 @@ void plotSingle(const std::vector<Ray>& RayList, const std::string& plotName, co
         gr.SetSize(1920, 1080);  // TODO : This should be changed once we have Windowing lib
 
         gr.MultiPlot(3, 3, 3, 2, 2, "UL");
-        gr.SetRanges(ranges.xmin, ranges.xmax, ranges.ymin, ranges.ymax);
+
+        auto pen = " o{" + std::get<std::string>(m_plotSettings["scatterColor"]) + "}";  // Circles with color
         gr.SetMarkSize(0.1);
-        gr.Grid("xyzt", "=h");
         gr.SetFontSize(2.5);
+
+        if (!std::get<bool>(m_plotSettings["coloredIntensity"])) {
+            gr.SetRanges(ranges.xmin, ranges.xmax, ranges.ymin, ranges.ymax);
+            gr.Plot(xmini_mgl, ymini_mgl, pen.c_str());
+        } else {
+            if (std::get<bool>(m_plotSettings["plot3D"])) {
+                gr.Rotate(50, 60);
+                gr.Light(true);
+                gr.Alpha(true);
+            }
+            gr.SetRanges(ranges.xmin, ranges.xmax, ranges.ymin, ranges.ymax, 0, *(std::max_element(grid.intensity.begin(), grid.intensity.end())));
+            gr.Dots(xmini_mgl, ymini_mgl, intensity_mgl, "ogGk");
+            gr.SetRange('c', 1, *(std::max_element(grid.intensity.begin(), grid.intensity.end())));
+            if (std::get<bool>(m_plotSettings["colorBar"])) {
+                gr.Colorbar("gGk<");
+            }
+        }
+        gr.Grid("xyzt", "=h");
         gr.Axis();
-        gr.Plot(xmini_mgl, ymini_mgl, " o{x62C300}");
 
         // gr.Plot(x, y, " o{x62C300}");  // o-markers  green-yellow [Full Plot]
-        gr.SetMarkSize(0.9);
+        //gr.SetMarkSize(0.9);
         gr.Label('y', "y / mm", 0);
         gr.Label('x', "x / mm", 0);
         gr.Puts(mglPoint(maxX, minY), "Generated by RAY-X.^{2022}", ":C", 1);
@@ -290,8 +402,12 @@ void plotSingle(const std::vector<Ray>& RayList, const std::string& plotName, co
         gr.SetRanges(ranges.xmin, ranges.xmax, 0, 1);
         gr.Axis();
         gr.Box();
-        gr.Step(xx);
-        // gr.Area(xx, "E{x62C300}");
+
+        if (std::get<bool>(m_plotSettings["histArea"])) {
+            gr.Area(xx, "cbgGyr");
+        } else {
+            gr.Step(xx);
+        }
 
         gr.MultiPlot(3, 3, 2, 1, 1, "UR");
         auto outString = "Numbers of rays hit :" + std::to_string(Xpos.size()) + "\nImage Plane Name: " + opticalElementNames.back();
@@ -305,8 +421,11 @@ void plotSingle(const std::vector<Ray>& RayList, const std::string& plotName, co
         xx.Norm(0, 1);
         gr.Axis();
         gr.Box();
-        gr.Step(xx);
-        // gr.Area(xx, "E{x62C300}");
+        if (std::get<bool>(m_plotSettings["histArea"])) {
+            gr.Area(xx, "E{x62C300}");
+        } else {
+            gr.Step(xx);
+        }
 
         gr.MultiPlot(3, 3, 1, 3, 1, "#");
         gr.Puts(mglPoint(0, 0.92), title.c_str());
@@ -326,7 +445,7 @@ void plotSingle(const std::vector<Ray>& RayList, const std::string& plotName, co
  * @param RayList Data (Rays)
  * @param plotName
  */
-void plotMulti(const std::vector<Ray>& RayList, const std::string& plotName, const std::vector<OpticalElementMeta>& OpticalElementsMeta) {
+void plotMulti(const std::vector<Ray>& RayList, const std::string& plotName, const std::vector<Plotter::OpticalElementMeta>& OpticalElementsMeta) {
     // s is sorted and unique extraParam values extracted
     auto s = RayList;
 
@@ -465,6 +584,19 @@ void Plotter::plot(int plotType, const std::string& plotName, const std::vector<
         plotMulti(RayList, plotName, OpticalElementsMeta);
     else
         RAYX_D_ERR << "Plot Type not supported";
+}
+
+Plotter::Plotter() {
+#ifdef RAYX_DEBUG_MODE
+    std::string mode = "debug";
+#else
+    std::string mode = "release";
+#endif
+    std::string plotSettingsFilename = "build/bin/" + mode + "/plotSettings.cfg";  // Settings resides near exec
+    std::filesystem::path path = canonicalizeRepositoryPath(plotSettingsFilename);
+
+    bool t = importPlotSettings(path);
+    if (!t) RAYX_ERR << "Error importing plotting settings.";
 }
 
 }  // namespace RAYX

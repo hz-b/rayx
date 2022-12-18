@@ -63,10 +63,11 @@ void TerminalApp::tracePath(const std::filesystem::path& path) {
 
         // Plot
         if (m_CommandParser->m_args.m_plotFlag) {
+            auto plotter = std::make_unique<RAYX::Plotter>();
             if (m_CommandParser->m_args.m_multiplePlots) {
-                RAYX::Plotter::plot(1, path.string(), rays, m_Beamline);
+                plotter->plot(1, path.string(), rays, m_Beamline);
             } else
-                RAYX::Plotter::plot(0, path.string(), rays, m_Beamline);
+                plotter->plot(0, path.string(), rays, m_Beamline);
         }
 
 #if defined(RAYX_DEBUG_MODE) && not defined(CPP)
