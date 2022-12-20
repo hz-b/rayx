@@ -18,9 +18,9 @@ inline int last_obj(int extraParam) {
     }
     return extraParam;
 }
-bool last_comp(Ray const& lhs, Ray const& rhs) { return last_obj(lhs.m_extraParam) < last_obj(rhs.m_extraParam); }
+// bool last_comp(Ray const& lhs, Ray const& rhs) { return last_obj(lhs.m_extraParam) < last_obj(rhs.m_extraParam); }
 bool comp(Ray const& lhs, Ray const& rhs) { return lhs.m_extraParam < rhs.m_extraParam; }
-bool abs_comp(double const& lhs, double const& rhs) { return abs(lhs) < abs(rhs); }
+// bool abs_comp(double const& lhs, double const& rhs) { return abs(lhs) < abs(rhs); }
 inline bool int_close(double x, double y) { return abs(x - y) < std::numeric_limits<double>::epsilon(); }
 
 /**
@@ -39,36 +39,8 @@ std::vector<Plotter::OpticalElementMeta> getBeamlineOpticalElementMeta(const std
 
     return meta;
 }
-
-/**
- * @brief Get the amount of bins for the histogram
- * FREEDMAN is a different method to get the "optimized" amount of bins
- *
- * @param vec Input Data Vector
- * @return int Bin Amount
- */
-[[deprecated]] int getBinAmount(std::vector<double>& vec) {
-#ifdef FREEDMAN
-    std::vector<double>::iterator b = vec.begin();
-    std::vector<double>::iterator e = vec.end();
-    std::vector<double>::iterator n3 = b;
-    std::vector<double>::iterator n1 = b;
-    const std::size_t q1 = 0.25 * std::distance(b, e);
-    const std::size_t q3 = 0.75 * std::distance(b, e);
-    std::advance(n1, q1);
-    std::advance(n3, q3);
-
-    double width = 2 * (*n3 - *n1) / std::pow(vec.size(), 1.0 / 3);
-    return (int)std::ceil((*(std::max_element(vec.begin(), vec.end())) - *(std::min_element(vec.begin(), vec.end()))) / width);
-#endif
-
-    const double binwidth = 0.00125;
-    auto xymax = std::max(*(std::max_element(vec.begin(), vec.end())), *(std::min_element(vec.begin(), vec.end())), abs_comp);
-    return (int)(xymax / binwidth) + 1;
-}
-
 // Output Folder Path handling and naming scheme
-std::pair<std::string, std::string> outputPlotPathHandler(const std::string outputPath) {
+std::pair<std::string, std::string> outputPlotPathHandler(const std::string& outputPath) {
 #ifdef RAYX_DEBUG_MODE
     std::string mode = "debug";
 #else
@@ -84,7 +56,7 @@ std::pair<std::string, std::string> outputPlotPathHandler(const std::string outp
 
     std::filesystem::path filePath = outputPath;
     auto outFileName = filePath.filename();
-    auto pos = ((std::string)(outFileName)).find(".");
+    auto pos = ((std::string)(outFileName)).find('.');
     auto rawName = (std::string::npos == pos) ? ((std::string)(outFileName)) : ((std::string)(outFileName)).substr(0, pos);
     std::string sampleName = rawName + "_plot";
     auto outputSvg = outputDir;
@@ -96,6 +68,7 @@ std::pair<std::string, std::string> outputPlotPathHandler(const std::string outp
 
 /**
  * @brief Import settings for plotting from .cfg file
+ * File CFG Parser
  *
  * @param filename <filename.cfg>
  * @return true if conversion pass
@@ -139,7 +112,7 @@ bool Plotter::importPlotSettings(const std::string& filename) {
         // Handle Content
         if (strcmp(key.c_str(), "scatterColor") == 0) {
             m_plotSettings[key] = val;
-        } else if (strcmp(key.c_str(), "factorX") == 0) {
+        } else if (strcmp(key.c_str(), "factorX" ) == 0) {
             try {
                 m_plotSettings[key] = stoi(val);
             } catch (std::invalid_argument const& ex) {
@@ -268,8 +241,8 @@ inline void autoPlotReducer(const mglData& x, const mglData& y, std::vector<doub
     }
     xV.shrink_to_fit();
     yV.shrink_to_fit();
-    xD.Link(xV.data(), xV.size());
-    yD.Link(yV.data(), yV.size());
+    xD.Link(xV.data(), (long)xV.size());
+    yD.Link(yV.data(), (long)yV.size());
 }
 
 /**
@@ -295,7 +268,7 @@ void Plotter::plotSingle(const std::vector<Ray>& RayList, const std::string& plo
     // Get elements that met Image plane (Last Element)
     auto max = std::max_element(RayList.begin(), RayList.end(), comp);
 
-    auto max_param = last_obj(max->m_extraParam);
+    auto max_param = last_obj((int)max->m_extraParam);
     if (max_param != (int)opticalElementNames.size()) {
         RAYX_ERR << "No ray has hit the final optical element : " << opticalElementNames.back();
     }
@@ -304,7 +277,7 @@ void Plotter::plotSingle(const std::vector<Ray>& RayList, const std::string& plo
 #if defined(LONGEST_PATH)
         if (int_close(r.m_extraParam, max->m_extraParam)) {
 #else
-        if (last_obj(r.m_extraParam) == max_param) {
+        if (last_obj((int)r.m_extraParam) == max_param) {
 #endif
             Xpos.push_back(r.m_position.x);
             Ypos.push_back(r.m_position.y);
@@ -318,12 +291,12 @@ void Plotter::plotSingle(const std::vector<Ray>& RayList, const std::string& plo
     ////////////////// Data processing and binning
 
     mglData x_mgl, y_mgl;
-    x_mgl.Link(Xpos.data(), Xpos.size());
-    y_mgl.Link(Ypos.data(), Ypos.size());
+    x_mgl.Link(Xpos.data(), (long)Xpos.size());
+    y_mgl.Link(Ypos.data(), (long)Ypos.size());
 
     // Data Distribution
-    mglData minimalXRepart = x_mgl.Hist(Xpos.size());
-    mglData minimalYRepart = y_mgl.Hist(Ypos.size());
+    mglData minimalXRepart = x_mgl.Hist((long)Xpos.size());
+    mglData minimalYRepart = y_mgl.Hist((long)Ypos.size());
     // Binning
     mglData xmini_mgl, ymini_mgl, intensity_mgl;
     Plotter::myGrid grid;
@@ -331,20 +304,20 @@ void Plotter::plotSingle(const std::vector<Ray>& RayList, const std::string& plo
 
     if (std::get<bool>(m_plotSettings["automaticBinning"])) {
         autoPlotReducer(x_mgl, y_mgl, xminiVec, yminiVec, xmini_mgl, ymini_mgl);
-        xmini_mgl.Link(xminiVec.data(), xminiVec.size());
-        ymini_mgl.Link(yminiVec.data(), yminiVec.size());
+        xmini_mgl.Link(xminiVec.data(), (long)xminiVec.size());
+        ymini_mgl.Link(yminiVec.data(), (long)yminiVec.size());
     } else {
         plotReducer(Xpos, Ypos, abs(minX) + abs(maxX), abs(minY) + abs(maxY), abs(minX), abs(minY), grid);
-        xmini_mgl.Link(&grid.xGrid[0], grid.xGrid.size());
-        ymini_mgl.Link(&grid.yGrid[0], grid.yGrid.size());
-        intensity_mgl.Link(&grid.intensity[0], grid.intensity.size());
+        xmini_mgl.Link(&grid.xGrid[0], (long)grid.xGrid.size());
+        ymini_mgl.Link(&grid.yGrid[0], (long)grid.yGrid.size());
+        intensity_mgl.Link(&grid.intensity[0], (long)grid.intensity.size());
     }
 
     ////////////////// Plotting
     {
         float margin = 0.05;
         struct Ranges {
-            float xmin, xmax, ymin, ymax;
+            double xmin, xmax, ymin, ymax;
         } ranges;  // set nice limites according to margin (matplotlib-like)
         ranges.xmin = minX - abs(minX * margin);
         ranges.xmax = maxX + abs(maxX * margin);
@@ -360,7 +333,7 @@ void Plotter::plotSingle(const std::vector<Ray>& RayList, const std::string& plo
         std::string title = plotName;
 
         // Ignore Tex symbols
-        while (title.find("_") != std::string::npos) title = title.replace(title.find("_"), 1, "-");
+        while (title.find('_') != std::string::npos) title = title.replace(title.find('_'), 1, "-");
         // gr.SetQuality(8);
         gr.SetSize(1920, 1080);  // TODO : This should be changed once we have Windowing lib
 
@@ -390,7 +363,7 @@ void Plotter::plotSingle(const std::vector<Ray>& RayList, const std::string& plo
         gr.Axis();
 
         // gr.Plot(x, y, " o{x62C300}");  // o-markers  green-yellow [Full Plot]
-        //gr.SetMarkSize(0.9);
+        // gr.SetMarkSize(0.9);
         gr.Label('y', "y / mm", 0);
         gr.Label('x', "x / mm", 0);
         gr.Puts(mglPoint(maxX, minY), "Generated by RAY-X.^{2022}", ":C", 1);
@@ -467,13 +440,12 @@ void plotMulti(const std::vector<Ray>& RayList, const std::string& plotName, con
     double _size = 0.5;
     int i = 0;
     float _percent;
-    // matplotlibcpp::figure_size(cols * 500, (cols - 1) * 500);
 
     double minX, minY, minZ, maxX, maxY, maxZ;
 
     float margin = 0.05;
     struct Ranges {
-        float xmin, xmax, ymin, ymax, zmin, zmax;
+        double xmin, xmax, ymin, ymax, zmin, zmax;
     } ranges;  // set nice limites according to margin (matplotlib-like)
 
     mglData x, y, z;
@@ -484,7 +456,7 @@ void plotMulti(const std::vector<Ray>& RayList, const std::string& plotName, con
     enum PlotAxes { XY, XZ };
     PlotAxes axes;
     for (auto u : s) {
-        if ((last_obj(u.m_extraParam) == 0) || (OpticalElementsMeta[last_obj(u.m_extraParam) - 1].material == -2))
+        if ((last_obj((int) u.m_extraParam) == 0) || (OpticalElementsMeta[last_obj((int)u.m_extraParam) - 1].material == -2))
             axes = XZ;
         else
             axes = XY;
@@ -518,9 +490,9 @@ void plotMulti(const std::vector<Ray>& RayList, const std::string& plotName, con
         ranges.zmin = minZ - abs(minZ * margin);
         ranges.zmax = maxZ + abs(maxZ * margin);
 
-        x.Link(Xpos.data(), Xpos.size());
-        y.Link(Ypos.data(), Ypos.size());
-        z.Link(Zpos.data(), Zpos.size());
+        x.Link(Xpos.data(), (long)Xpos.size());
+        y.Link(Ypos.data(), (long)Ypos.size());
+        z.Link(Zpos.data(), (long)Zpos.size());
 
         gr.SubPlot(cols, cols, cols + i, "_");
         gr.Title(std::string(std::to_string((int)u.m_extraParam) + " (" + std::to_string(_percent) + "%)").c_str(), "", 4);

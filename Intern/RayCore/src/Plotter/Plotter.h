@@ -50,6 +50,7 @@ class RAYX_API Plotter {
                      myGrid& grid);
 
     enum plotTypes { SinglePlot, MultiPlot };
+
     std::map<std::string, std::variant<std::string, int, bool>> m_plotSettings{
         {"factorX", 10},   {"factorY", 10},    {"scatterColor", "x62C300"}, {"automaticBinning", false}, {"coloredIntensity", false},
         {"plot3D", false}, {"colorBar", true}, {"histArea", false}};
