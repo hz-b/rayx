@@ -20,10 +20,6 @@
 // Every shader execution calculates the route for a single ray.
 // `_ray` is that ray, it's always in world coordinates (!).
 #define _ray (rayData[uint(gl_GlobalInvocationID)])
-// The resulting ray will be written to `_out`.
-// It will have some `m_weight` other than `W_IN_COMPUTATION`.
-// The coordinate system of `_out` depends on `m_weight`, see the definition below.
-#define _out (outputData[uint(gl_GlobalInvocationID)])
 
 #include "../../Constants.h"
 
@@ -35,6 +31,7 @@ int gl_GlobalInvocationID;
 ShaderArray<Ray> rayData;
 ShaderArray<Ray> outputData;
 double randomSeed;
+double maxSnapshots; // each ray will take multiple snapshots (copies) while tracing, those are then sent to the CPU for further processing.
 ShaderArray<Element> quadricData;
 ShaderArray<dvec4> xyznull;
 ShaderArray<int> matIdx;
@@ -43,7 +40,7 @@ ShaderArray<double> mat;
 #else
 struct Ray {
     dvec3 m_position;
-    // Initially weight is `W_IN_COMPUTATION`.
+    // Initially weight for _ray is `W_IN_COMPUTATION`.
     // See the potential values of `m_weight` in `Constants.h`.
     double m_weight;
     dvec3 m_direction;
@@ -71,17 +68,17 @@ struct Element {
     // don't use this directly. Use `_ray` instead.
 	layout(std140, binding = 0) buffer ibuf { Ray rayData[]; };
 
-    // don't use this directly. Use `_out` instead.
+    // don't use this directly. Use `takeSnapshot` instead.
 	layout(std140, binding = 1) buffer obuf { Ray outputData[]; };
 
 	layout(std140, binding = 2) buffer qbuf {
 		double randomSeed;
+		double maxSnapshots;
 
 		// these are probably necessary here for the correct alignment.
-		// TODO we should probably replace `randomSeed` with a push constant.
+		// TODO we should probably replace the above items with a push constant.
 		double _unused1;
 		double _unused2;
-		double _unused3;
 		Element quadricData[];
 	};
 
@@ -104,6 +101,30 @@ struct Element {
 	#endif
 #endif
 
+// `i in [0, maxSnapshots]`.
+// Will return the index in outputData to access the `i'th` output ray belonging to this shader call.
+// Typically used as `outputData[output_index(i)]`.
+uint output_index(uint i) {
+    return uint(gl_GlobalInvocationID) * uint(maxSnapshots) + i;
+}
+
+// take a snapshot and store it in the next free spot in outputData.
+// `r` will typically be _ray, or some related ray.
+void takeSnapshot(Ray r) {
+    for (uint i = 0; i < maxSnapshots; i++) {
+        uint idx = output_index(i);
+        if (outputData[idx].m_weight == W_UNINIT) { // checks whether this spot is free
+            outputData[idx] = r;
+            return;
+        }
+    }
+
+    // no spots were found.
+    #ifdef CPP
+    RAYX_WARN << "takeSnapshot failed: no free spots!";
+    #endif
+}
+
 // Order in #include is IMPROTANT, do not change.
 // clang-format off
 #include "elements.comp"
@@ -116,9 +137,14 @@ struct Element {
 #include "dynamic_elements.comp"
 // clang-format on
 
-void main() {
-	dynamicElements();
+// sets all output rays controlled by this shader call to W_UNINIT.
+void uninitRays() {
+    for (uint i = 0; i < maxSnapshots; i++) {
+        outputData[output_index(i)].m_weight = W_UNINIT;
+    }
+}
 
-    // output = input:
-    // _out = _ray;
+void main() {
+    uninitRays();
+	dynamicElements();
 }

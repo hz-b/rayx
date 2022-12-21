@@ -32,6 +32,11 @@ const double W_HIT_IMAGE_PLANE = 2;
 // Ray is in element coordinates, relative to `m_lastElement`.
 // TODO not yet used!
 const double W_ABSORBED = 3;
+
+// This is a yet uninitialized ray from outputData.
+// This is the initial weight within outputData, and if less snapshots than `maxSnapshots` are taken,
+// the remaining weights in outputData will stay W_UNINIT even when returned to the CPU.
+const double W_UNINIT = 4;
 /* } */
 
 // The meaning of surfaceParams[3][0] (i.e. the type of an element):

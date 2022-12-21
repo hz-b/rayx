@@ -96,10 +96,10 @@ void dynamicElements() {
         if (!col.found) {
             // no element was hit.
             // Ray is considered to move forward to inf.
-            // This is the only constellation in which `_out` is in world coordinates.
-
-            _out = _ray;
-            _out.m_weight = W_FLY_OFF;
+            // This is the only constellation in which a snapshot is in world coordinates.
+            Ray r = _ray;
+            r.m_weight = W_FLY_OFF;
+            takeSnapshot(r);
             return;
         }
 
@@ -123,7 +123,8 @@ void dynamicElements() {
             elem_ray.m_extraParam += (col.elementIndex + 1) * bounce;
             elem_ray.m_lastElement = col.elementIndex + 1;
             elem_ray.m_weight = W_HIT_IMAGE_PLANE;
-            _out = traceImagePlane(elem_ray, ImagePlane(col.elementIndex), col.hitpoint);
+            Ray r = traceImagePlane(elem_ray, ImagePlane(col.elementIndex), col.hitpoint);
+            takeSnapshot(r);
             return;
         } else if (type == TY_TOROID_MIRROR) {
             elem_ray = traceToroid(elem_ray, ToroidMirror(col.elementIndex), ctr, col.hitpoint);
@@ -140,8 +141,10 @@ void dynamicElements() {
         _ray = rayMatrixMult(elem_ray, nextElement.outTrans);
     }
 
-    // outputData should be in element coordinates. (except for `_out.m_weight == W_FLY_OFF`)
-    _out = rayMatrixMult(_ray, nextElement.inTrans);
+    // TODO coming to this point in the shader means that maxBounces was set to a too low number. This should be an error.
+
+    // outputData should be in element coordinates. (except for `outputData[_].m_weight == W_FLY_OFF`)
+    takeSnapshot(rayMatrixMult(_ray, nextElement.inTrans));
 }
 
 
