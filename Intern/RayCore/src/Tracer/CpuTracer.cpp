@@ -21,12 +21,13 @@ CpuTracer::CpuTracer() { RAYX_VERB << "Initializing Cpu Tracer.."; }
 
 CpuTracer::~CpuTracer() {}
 
-std::vector<Ray> CpuTracer::trace(const Beamline& beamline) {
+std::vector<Ray> CpuTracer::traceRaw(const TraceRawConfig& cfg) {
     RAYX_PROFILE_FUNCTION_STDOUT();
 
-    auto rayList = beamline.getInputRays();
+    auto rayList = cfg.m_rays;
 
-    CPU_TRACER::randomSeed = randomDouble();
+    CPU_TRACER::randomSeed = cfg.m_randomSeed;
+    CPU_TRACER::maxSnapshots = cfg.m_maxSnapshots;
 
     CPU_TRACER::quadricData.data.clear();
     CPU_TRACER::xyznull.data.clear();
@@ -35,10 +36,10 @@ std::vector<Ray> CpuTracer::trace(const Beamline& beamline) {
 
     // init rayData, outputData
     CPU_TRACER::rayData.data = rayList;
-    CPU_TRACER::outputData.data.resize(rayList.size());
+    CPU_TRACER::outputData.data.resize(rayList.size() * cfg.m_maxSnapshots);
 
     // init quadricData
-    for (auto el : beamline.m_OpticalElements) {
+    for (auto el : cfg.m_OpticalElements) {
         CPU_TRACER::Element e;
         e.surfaceParams = el->getSurfaceParams();
         e.inTrans = el->getInMatrix();
@@ -48,7 +49,7 @@ std::vector<Ray> CpuTracer::trace(const Beamline& beamline) {
         CPU_TRACER::quadricData.data.push_back(e);
     }
 
-    auto materialTables = beamline.calcMinimalMaterialTables();
+    auto materialTables = cfg.m_materialTables;
     CPU_TRACER::mat.data = materialTables.materialTable;
     CPU_TRACER::matIdx.data = materialTables.indexTable;
 

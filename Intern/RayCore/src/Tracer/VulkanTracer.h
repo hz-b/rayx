@@ -11,7 +11,7 @@ class RAYX_API VulkanTracer : public Tracer {
     VulkanTracer() = default;
     ~VulkanTracer() = default;
 
-    std::vector<Ray> trace(const Beamline&) override;
+    std::vector<Ray> traceRaw(const TraceRawConfig&) override;
 #ifdef RAYX_DEBUG_MODE
     /**
      * @brief Get the Debug List containing the Debug Matrices

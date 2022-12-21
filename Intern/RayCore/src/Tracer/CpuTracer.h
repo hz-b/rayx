@@ -19,7 +19,7 @@ class RAYX_API CpuTracer : public Tracer {
     CpuTracer();
     ~CpuTracer();
 
-    std::vector<Ray> trace(const Beamline&) override;
+    std::vector<Ray> traceRaw(const TraceRawConfig&) override;
 };
 
 namespace CPU_TRACER {

@@ -17,7 +17,7 @@
 #endif
 
 namespace RAYX {
-std::vector<Ray> VulkanTracer::trace(const Beamline& beamline) {
+std::vector<Ray> VulkanTracer::traceRaw(const TraceRawConfig& cfg) {
     RAYX_PROFILE_FUNCTION_STDOUT();
 
     // init, if not yet initialized.
@@ -36,13 +36,12 @@ std::vector<Ray> VulkanTracer::trace(const Beamline& beamline) {
         m_engine.init({.m_shader = "build/bin/comp.spv"});
     }
 
-    auto rayList = beamline.getInputRays();
+    auto rayList = cfg.m_rays;
     const uint32_t numberOfRays = rayList.size();
 
-    double randomSeed = randomDouble();
-    std::vector<double> beamlineData = {randomSeed, 0, 0, 0};
+    std::vector<double> beamlineData = {cfg.m_randomSeed, cfg.m_maxSnapshots, 0, 0};
 
-    for (const auto& e : beamline.m_OpticalElements) {
+    for (const auto& e : cfg.m_OpticalElements) {
         std::vector<glm::dmat4x4> mats = {e->getSurfaceParams(), e->getInMatrix(), e->getOutMatrix(), e->getObjectParameters(),
                                           e->getElementParameters()};
         for (auto x : mats) {
@@ -51,9 +50,9 @@ std::vector<Ray> VulkanTracer::trace(const Beamline& beamline) {
         }
     }
 
-    auto materialTables = beamline.calcMinimalMaterialTables();
+    auto materialTables = cfg.m_materialTables;
     m_engine.createBufferWithData<Ray>("ray-buffer", rayList);
-    m_engine.createBuffer("output-buffer", numberOfRays * sizeof(Ray));
+    m_engine.createBuffer("output-buffer", numberOfRays * sizeof(Ray) * cfg.m_maxSnapshots);
     m_engine.createBufferWithData<double>("quadric-buffer", beamlineData);
     m_engine.createBuffer("xyznull-buffer", 100);
     m_engine.createBufferWithData<int>("material-index-table", materialTables.indexTable);

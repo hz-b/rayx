@@ -35,6 +35,7 @@ SET(SOURCE
     src/Material/Material.cpp
     src/Material/NffTable.cpp
     src/Material/PalikTable.cpp
+    src/Tracer/Tracer.cpp
     src/Tracer/VulkanTracer.cpp
     src/Tracer/CpuTracer.cpp
     src/VulkanEngine/Cleanup.cpp
