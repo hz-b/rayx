@@ -14,6 +14,8 @@ std::vector<Ray> Tracer::trace(const Beamline& b) {
 
     TraceRawConfig cfg = {
         .m_rays = rays,
+        .m_rayIdStart = 0,
+        .m_numRays = (double)rays.size(),
         .m_randomSeed = randomSeed,
         .m_maxSnapshots = (double)maxSnapshots,
         .m_materialTables = materialTables,

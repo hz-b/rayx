@@ -26,6 +26,8 @@ std::vector<Ray> CpuTracer::traceRaw(const TraceRawConfig& cfg) {
 
     auto rayList = cfg.m_rays;
 
+    CPU_TRACER::rayIdStart = cfg.m_rayIdStart;
+    CPU_TRACER::numRays = cfg.m_numRays;
     CPU_TRACER::randomSeed = cfg.m_randomSeed;
     CPU_TRACER::maxSnapshots = cfg.m_maxSnapshots;
 

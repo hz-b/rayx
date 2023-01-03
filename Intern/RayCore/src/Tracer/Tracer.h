@@ -14,6 +14,8 @@ namespace RAYX {
 
 struct TraceRawConfig {
     std::vector<Ray> m_rays;
+    double m_rayIdStart;
+    double m_numRays;
     double m_randomSeed;
     double m_maxSnapshots;
     MaterialTables m_materialTables;

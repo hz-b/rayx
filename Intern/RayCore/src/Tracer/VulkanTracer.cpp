@@ -39,7 +39,7 @@ std::vector<Ray> VulkanTracer::traceRaw(const TraceRawConfig& cfg) {
     auto rayList = cfg.m_rays;
     const uint32_t numberOfRays = rayList.size();
 
-    std::vector<double> beamlineData = {cfg.m_randomSeed, cfg.m_maxSnapshots, 0, 0};
+    std::vector<double> beamlineData = {cfg.m_rayIdStart, cfg.m_numRays, cfg.m_randomSeed, cfg.m_maxSnapshots};
 
     for (const auto& e : cfg.m_OpticalElements) {
         std::vector<glm::dmat4x4> mats = {e->getSurfaceParams(), e->getInMatrix(), e->getOutMatrix(), e->getObjectParameters(),

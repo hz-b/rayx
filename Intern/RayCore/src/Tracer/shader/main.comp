@@ -30,8 +30,19 @@ int gl_GlobalInvocationID;
 
 ShaderArray<Ray> rayData;
 ShaderArray<Ray> outputData;
+
+// the ray id of the first ray of the batch.
+// See `rayId` to access the ray id of the current ray.
+double rayIdStart;
+
+// The total number of rays in this tracing process.
+// (not only this batch)
+double numRays;
 double randomSeed;
-double maxSnapshots; // each ray will take multiple snapshots (copies) while tracing, those are then sent to the CPU for further processing.
+
+// each ray will take multiple snapshots (copies) while tracing, those are then sent to the CPU for further processing.
+double maxSnapshots;
+
 ShaderArray<Element> quadricData;
 ShaderArray<dvec4> xyznull;
 ShaderArray<int> matIdx;
@@ -72,13 +83,11 @@ struct Element {
 	layout(std140, binding = 1) buffer obuf { Ray outputData[]; };
 
 	layout(std140, binding = 2) buffer qbuf {
-		double randomSeed;
-		double maxSnapshots;
+        double rayIdStart;
+        double numRays;
+        double randomSeed;
+        double maxSnapshots;
 
-		// these are probably necessary here for the correct alignment.
-		// TODO we should probably replace the above items with a push constant.
-		double _unused1;
-		double _unused2;
 		Element quadricData[];
 	};
 
@@ -100,6 +109,10 @@ struct Element {
 		};
 	#endif
 #endif
+
+uint64_t rayId() {
+    return uint64_t(rayIdStart) + uint64_t(gl_GlobalInvocationID);
+}
 
 // `i in [0, maxSnapshots]`.
 // Will return the index in outputData to access the `i'th` output ray belonging to this shader call.
