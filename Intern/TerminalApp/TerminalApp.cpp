@@ -60,14 +60,14 @@ void TerminalApp::tracePath(const std::filesystem::path& path) {
         auto rays = m_Tracer->trace(*m_Beamline);
 
         // Export Rays to external data.
-        exportRays(rays, path.string());
+        exportRays(extractLastSnapshot(rays), path.string());
 
         // Plot
         if (m_CommandParser->m_args.m_plotFlag) {
             if (m_CommandParser->m_args.m_multiplePlots) {
-                RAYX::Plotter::plot(2, path.string(), rays, getBeamlineOpticalElementsNames());
+                RAYX::Plotter::plot(2, path.string(), extractLastSnapshot(rays), getBeamlineOpticalElementsNames());
             } else
-                RAYX::Plotter::plot(0, path.string(), rays, getBeamlineOpticalElementsNames());
+                RAYX::Plotter::plot(0, path.string(), extractLastSnapshot(rays), getBeamlineOpticalElementsNames());
         }
 
 #if defined(RAYX_DEBUG_MODE) && not defined(CPP)

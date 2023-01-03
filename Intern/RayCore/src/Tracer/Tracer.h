@@ -22,6 +22,13 @@ struct TraceRawConfig {
     const std::vector<std::shared_ptr<OpticalElement>>& m_OpticalElements;
 };
 
+/// Contains all the snapshots of a single Ray.
+using Snapshots = std::vector<Ray>;
+
+/// Contains the snapshots of all the rays
+/// TraceResult[i][j] is the j'th snapshot of the i'th ray.
+using Rays = std::vector<Snapshots>;
+
 class RAYX_API Tracer {
   public:
     Tracer() {}
@@ -29,13 +36,16 @@ class RAYX_API Tracer {
 
     // This will call traceRaw.
     // Everything happening in each traceRaw implementation should be extracted to this function instead.
-    // std::vector<Ray> will only contain the last snapshot for each ray.
-    std::vector<Ray> trace(const Beamline&);
+    // See `TraceResult` for information about the return value.
+    Rays trace(const Beamline&);
 
   protected:
     // where the actual tracing happens.
     // std::vector<Ray> will contain all snapshots for all Rays (and also the W_UNINIT rays).
     virtual std::vector<Ray> traceRaw(const TraceRawConfig&) = 0;
 };
+
+// TODO deprecate this function and all of it's uses.
+std::vector<Ray> extractLastSnapshot(const Rays& rays);
 
 }  // namespace RAYX

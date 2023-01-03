@@ -92,7 +92,7 @@ std::vector<RAYX::Ray> traceRML(std::string filename, Filter filter) {
     {
         auto rays = tracer->trace(beamline);
         wRays.reserve(rays.size());
-        for (auto r : rays) {
+        for (auto r : extractLastSnapshot(rays)) {
             if (r.m_weight != W_FLY_OFF) {
                 wRays.push_back(r);
             }
