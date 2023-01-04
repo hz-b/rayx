@@ -14,9 +14,8 @@ class MetaData:
     numElements = 5
     fileName = "multi_RZP_test"
 
+
 # Standard RZP Parameters
-
-
 @dataclass
 class RZP:
     name = "Reflection Zoneplate"
@@ -510,30 +509,6 @@ def insertRZP(root, rzp: RZP):
 
 # -------------- RZP Calculations --------------
 
-def calcTrapezoidAngle(widthA, widthB, height):
-    # Calculates the top angle of a isosceles trapezoid and return in degrees
-    # widthA = (longer) width of the top side
-    # widthB = width of the bottom side
-    # height = height of the trapezoid
-
-    if (widthA <= widthB):
-        print("Error: widthA must be greater than widthB")
-        return
-
-    if (widthA <= 0 or widthB <= 0 or height <= 0):
-        print("Error: widthA, widthB and height must be greater than 0")
-        return
-
-    # Calculate the angle of the trapezoid
-    widthDiff = (widthA - widthB) / 2
-    side = math.sqrt((widthDiff * widthDiff) + (height * height))
-    alpha = math.acos((widthDiff**2 + side**2 - height**2) /
-                      (2 * widthDiff * side))
-    alpha = math.degrees(alpha)
-
-    return alpha
-
-
 def rotateYDeg(prevDir: np.array, alpha: float, iterDirection: int):
     # Rotation matrix around y axis (clockwise)
     # alpha = angle in degrees
@@ -557,84 +532,174 @@ def rotateYDeg(prevDir: np.array, alpha: float, iterDirection: int):
     return newDir
 
 
-def calcRZPs(numRZPs: int, baseRZP: RZP, iterDirection: int, dirDeviationAngle: float, intersecMidpointDist: float):
-    if dirDeviationAngle == 0 and intersecMidpointDist == 0:
-        topAngleTrapezoid = calcTrapezoidAngle(
-            RZP.totalWidthB, RZP.totalWidth, RZP.totalLength)
+def reflectPointOverLine(point: np.array, linePoint: np.array, lineDir: np.array):
+    # Reflects a point over a line
+    # point = point to be reflected
+    # linePoint = point on the line
+    # lineDir = direction of the line
 
-        # Calculate distance of intersection point of all z-direction vectors
-        # and the midpoints of the trapezoids
-        # width in the middle of the trapezoid
-        midWidth = (RZP.totalWidth + RZP.totalWidthB) / 2
-        # width of triangle between two trapezoid midpoints and the top angle
-        triangleWidth = midWidth / 2
-        # height of said triangle
-        triangleHeight = triangleWidth * \
-            math.tan(math.radians(topAngleTrapezoid))
-        # distance between intersection point and midpoint of trapezoid
-        intersecMidpointDist = np.sqrt((triangleWidth**2) + triangleHeight**2)
+    # Calculate the distance from the point to the line
+    dist = np.dot(lineDir, point - linePoint)
 
-        # Calculate angle between direction vectors
-        dirDeviationAngle = 180 - abs(topAngleTrapezoid * 2)
+    # Calculate the reflected point
+    newPoint = point - 2 * dist * lineDir
 
-    positions = [np.array([0, 0, 0])] * (math.ceil(numRZPs / 2))
-    directions = [np.array([[0, 0, 0], [0, 0, 0], [0, 0, 0]])
-                  ] * (math.ceil(numRZPs / 2))
+    return newPoint
 
-    # TODO(Jannis): Find out why the positions get rotated the wrong way
 
-    if numRZPs % 2 == 1:  # odd number of RZPs
-        positions[0] = np.array([0, 0, intersecMidpointDist])
-        directions[0] = np.array([[1, 0, 0], [0, 1, 0], [0, 0, 1]])
-        for i in range(1, math.ceil(numRZPs / 2)):
-            positions[i] = rotateYDeg(
-                positions[0], -i*dirDeviationAngle, iterDirection)
-            directions[i] = rotateYDeg(
-                directions[i-1], dirDeviationAngle, iterDirection)
+def getOrthogonalVector(vector: np.array):
+    # Returns an orthogonal vector to the input vector in 3D space
+    # vector = input vector
 
-        if iterDirection == -1:
-            positions = positions[1::]
-            directions = directions[1::]
+    k = np.random.randn(3)
+    k -= k.dot(vector) * vector / np.linalg.norm(vector)**2
 
-    else:  # even number of RZPs
-        pos = np.array([0, 0, intersecMidpointDist])
-        positions[0] = rotateYDeg(pos, -dirDeviationAngle/2, iterDirection)
-        direct = np.array([[1, 0, 0], [0, 1, 0], [0, 0, 1]])
-        directions[0] = rotateYDeg(direct, dirDeviationAngle/2, iterDirection)
-        for i in range(1, math.ceil(numRZPs / 2)):
-            positions[i] = rotateYDeg(
-                positions[0], -i*dirDeviationAngle, iterDirection)
-            directions[i] = rotateYDeg(
-                directions[i-1], dirDeviationAngle, iterDirection)
+    return k
 
-    # translate rzps back to origin
-    for pos in positions:
-        pos -= np.array([0, 0, intersecMidpointDist])
-    return positions, directions
+
+def getParallelLine(dist: float, linePoint: np.array, lineDir: np.array):
+    # Calculates a parallel line to a given line in 3D space
+    # dist = distance between the lines
+    # linePoint = point on the line
+    # lineDir = direction of the line
+
+    # Calculate orthogonal vector to the line (solve dot product = 0)
+    orthoDir = getOrthogonalVector(lineDir)
+
+    # Calculate the new point on the line
+    newPoint = linePoint + dist * orthoDir
+
+    return newPoint
+
+
+def getAngleBetweenVectors(vector1: np.array, vector2: np.array):
+    # Calculates the angle in degrees between two vectors in 3D space
+    # vector1 = first vector
+    # vector2 = second vector
+
+    # Calculate the angle between the vectors
+    angle = math.acos(np.dot(vector1, vector2) /
+                      (np.linalg.norm(vector1) * np.linalg.norm(vector2)))
+
+    # Convert the angle to degrees
+    angle = math.degrees(angle)
+
+    return angle
+
+
+def reflectRZP(baseRZP: RZP, iterDirection: int, dist: float):
+    newRZP = RZP()
+    rzpPos = np.array([baseRZP.worldPosition[0],
+                       baseRZP.worldPosition[1],
+                       baseRZP.worldPosition[2]])
+    rzpDir = np.array([baseRZP.worldXdirection,
+                       baseRZP.worldYdirection,
+                       baseRZP.worldZdirection])
+
+    if (iterDirection == 1):
+        B = np.array([rzpPos[0] - baseRZP.totalWidth / 2,
+                      rzpPos[1],
+                      rzpPos[2] + baseRZP.totalLength / 2])
+        C = np.array([rzpPos[0] + baseRZP.totalWidth / 2,
+                      rzpPos[1],
+                      rzpPos[2] + baseRZP.totalLength / 2])
+        dir = B - C
+        pointBC = (B + C) / 2
+        reflectionLine = getParallelLine(dist, pointBC, dir)
+    else:
+        A = np.array([rzpPos[0] - baseRZP.totalWidthB / 2,
+                      rzpPos[1],
+                      rzpPos[2] + baseRZP.totalLength / 2])
+        D = np.array([rzpPos[0] + baseRZP.totalWidthB / 2,
+                      rzpPos[1],
+                      rzpPos[2] + baseRZP.totalLength / 2])
+        dir = A - D
+        pointAD = (A + D) / 2
+        reflectionLine = getParallelLine(dist, pointAD, dir)
+
+    # Normalize reflection vector
+    reflectionLine = reflectionLine / np.linalg.norm(reflectionLine)
+
+    newRZP.worldPosition = reflectPointOverLine(
+        rzpPos, reflectionLine, dir)
+
+    rotation = getAngleBetweenVectors(rzpDir[2], reflectionLine) * 2
+    newRZPDir = rotateYDeg(rzpDir, rotation, iterDirection)
+    newRZP.worldXDirection = newRZPDir[0]
+    newRZP.worldYDirection = newRZPDir[1]
+    newRZP.worldZDirection = newRZPDir[2]
+
+    # Check if still basis
+    check1 = np.dot(newRZP.worldZdirection, newRZP.worldYdirection)
+    check2 = np.dot(newRZP.worldZdirection, newRZP.worldXdirection)
+    check3 = np.dot(newRZP.worldYdirection, newRZP.worldXdirection)
+    if (check1 >= 0.0001 or check2 >= 0.0001 or check3 >= 0.0001):
+        print("ERROR: RZP is not basis anymore!")
+
+    return newRZP
+
+
+def calcRZPs(numRZPs: int, baseRZP: RZP, iterDirection: int, extraSpace: float = 0.0):
+    # Calculates the positions and directions of the RZPs
+    # numRZPs = number of RZPs
+    # baseRZP = base RZP
+    # iterDirection = 1 for clockwise, -1 for counter-clockwise
+    # extraSpace = extra space between the RZPs
+
+    rzps = []
+
+    if (numRZPs % 2 == 0):
+        # Even number of RZPs
+        # Calculate temporary RZP to orient the rest
+        # TODO(Jannis)
+        print("Even number of RZPs not implemented yet")
+    else:
+        # Odd number of RZPs
+        rzps.append(baseRZP)
+        for i in range(1, numRZPs):
+            rzps.append(reflectRZP(
+                rzps[i - 1], iterDirection, extraSpace))
+        if (iterDirection == -1):
+            rzps.pop(0)
+            rzps.reverse()
+
+    return rzps
 
 
 def main():
-    # Check if angle is given
-    if len(sys.argv) == 3:
-        angle = float(sys.argv[1])
-        dist = float(sys.argv[2])
-    else:
-        angle = 0
-        dist = 0
-
     # RZP Data
     meta = MetaData()
     baseRZP = RZP()
+
+    # Optionally define extra space between RZPs (choose one)
+    # -s    millimeters, for distance between elements
+    # -r    radians, for increased angle    ! not implemented yet !
+    # -d    degrees, for increased angle    ! not implemented yet !
+    isAngle = False
+    extraSpace = 0.0
+    if (len(sys.argv) == 3):
+        if (sys.argv[1] == "-s"):
+            extraSpace = float(sys.argv[2])
+        elif (sys.argv[1] == "-r"):
+            isAngle = True
+            extraSpace = float(sys.argv[2])
+        elif (sys.argv[1] == "-d"):
+            isAngle = True
+            extraSpace = math.radians(float(sys.argv[2]))
+        else:
+            print("Error: Unknown argument")
+            return
 
     # create RZP Group
     root = ET.Element('group')
     root = insertGroupPostion(baseRZP, root)
 
     # calculate positions and directions
-    leftPositions, leftDirections = calcRZPs(
-        meta.numElements, baseRZP, -1, angle, dist)
-    rightPositions, rightDirections = calcRZPs(
-        meta.numElements, baseRZP, 1, angle, dist)
+    if not (isAngle):
+        leftPositions, leftDirections = calcRZPs(
+            meta.numElements, baseRZP, -1, extraSpace)
+        rightPositions, rightDirections = calcRZPs(
+            meta.numElements, baseRZP, 1, extraSpace)
 
     # concatenate left and right positions and directions
     leftPositions.reverse()
@@ -652,31 +717,31 @@ def main():
         # insert RZP parameters
         root = insertRZP(root, currRZP)
 
-    xPositions = [pos[0] for pos in positions]
-    zPositions = [pos[2] for pos in positions]
-    plt.scatter(xPositions, zPositions)
-    plt.xlabel('x')
-    plt.ylabel('z')
-    plt.gca().set_aspect('equal', adjustable='box')
-    plt.show()
+    # xPositions = [pos[0] for pos in positions]
+    # zPositions = [pos[2] for pos in positions]
+    # plt.scatter(xPositions, zPositions)
+    # plt.xlabel('x')
+    # plt.ylabel('z')
+    # # plt.gca().set_aspect('equal', adjustable='box')
+    # plt.show()
 
     # Plot x directions
-    xDirectionsx = [dir[0][0] for dir in directions]
-    xDirectionsz = [dir[0][2] for dir in directions]
-    plt.scatter(xDirectionsx, xDirectionsz)
-    plt.xlabel('x')
-    plt.ylabel('z')
-    plt.gca().set_aspect('equal', adjustable='box')
-    plt.show()
+    # xDirectionsx = [dir[0][0] for dir in directions]
+    # xDirectionsz = [dir[0][2] for dir in directions]
+    # plt.scatter(xDirectionsx, xDirectionsz)
+    # plt.xlabel('x')
+    # plt.ylabel('z')
+    # # plt.gca().set_aspect('equal', adjustable='box')
+    # plt.show()
 
     # Plot z directions
-    zDirectionsx = [dir[2][0] for dir in directions]
-    zDirectionsz = [dir[2][2] for dir in directions]
-    plt.scatter(zDirectionsx, zDirectionsz)
-    plt.xlabel('x')
-    plt.ylabel('z')
-    plt.gca().set_aspect('equal', adjustable='box')
-    plt.show()
+    # zDirectionsx = [dir[2][0] for dir in directions]
+    # zDirectionsz = [dir[2][2] for dir in directions]
+    # plt.scatter(zDirectionsx, zDirectionsz)
+    # plt.xlabel('x')
+    # plt.ylabel('z')
+    # # plt.gca().set_aspect('equal', adjustable='box')
+    # plt.show()
 
     indent(root)
     tmp = ET.tostring(root, encoding='UTF-8', method='xml')
