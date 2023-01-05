@@ -1,7 +1,10 @@
 #include "Tracer.h"
 
+#include <algorithm>
+
 #include "Constants.h"
 #include "Debug/Debug.h"
+#include "Debug/Instrumentor.h"
 #include "Random.h"
 
 namespace RAYX {
@@ -9,6 +12,8 @@ namespace RAYX {
 const uint64_t BATCH_SIZE = 1000;
 
 Rays Tracer::trace(const Beamline& b) {
+    RAYX_PROFILE_FUNCTION_STDOUT();
+
     auto rays = b.getInputRays();
     auto randomSeed = randomDouble();
     auto maxSnapshots = (b.m_OpticalElements.size() * 2 + 1);
@@ -23,9 +28,8 @@ Rays Tracer::trace(const Beamline& b) {
         auto batch_size = (BATCH_SIZE < remaining_rays) ? BATCH_SIZE : remaining_rays;
 
         std::vector<Ray> batch;
-        for (uint64_t j = 0; j < batch_size; j++) {
-            batch.push_back(rays[j + rayIdStart]);
-        }
+        batch.reserve(batch_size);
+        std::copy(rays.begin() + rayIdStart, rays.begin() + rayIdStart + batch_size, std::back_inserter(batch));
 
         TraceRawConfig cfg = {
             .m_rays = batch,

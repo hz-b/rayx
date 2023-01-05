@@ -32,6 +32,7 @@ class CommandParser {
         std::string m_providedFile = "";  // -i (Input)
         bool m_isFixSeed = false;         // -f (Fixed Seed)
         int m_seed = -1;                  // -s (Provided Seed)
+        int m_BatchSize = 0;              // -b (Vk batch size )
         bool m_verbose = false;           // --verbose (Verbose)
     } m_args;
 
@@ -64,7 +65,8 @@ class CommandParser {
     // this can also be done with app.get_option()
     std::unordered_map<char, Options> m_ParserCommands = {
         {'c', {OptionType::BOOL, "ocsv", "Output stored as .csv file.", &(m_args.m_csvFlag)}},
-        {'b', {OptionType::BOOL, "benchmark", "Benchmark application: (RML → Trace → Output)", &(m_args.m_benchmark)}},
+        {'B', {OptionType::BOOL, "benchmark", "Benchmark application: (RML → Trace → Output)", &(m_args.m_benchmark)}},
+        {'b', {OptionType::INT, "batch", "Batch size for Vulkan tracing", &(m_args.m_BatchSize)}},
         {'m', {OptionType::BOOL, "mult", "Multiple plots extension at output.", &(m_args.m_multiplePlots)}},
         {'p', {OptionType::BOOL, "plot", "Plot output footprints and histograms.", &(m_args.m_plotFlag)}},
         {'x', {OptionType::BOOL, "cpu", "Tracing on CPU", &(m_args.m_cpuFlag)}},

@@ -52,6 +52,10 @@ void CommandParser::analyzeCommands() {
     if (m_args.m_isFixSeed && m_args.m_seed <= 0) {
         RAYX_ERR << "Unsupported seed <= 0";
     }
+
+    if (m_args.m_cpuFlag && m_args.m_BatchSize != 0) {
+        RAYX_WARN << "Batching is not supported in CPU mode";
+    }
 }
 
 CommandParser::~CommandParser() = default;
