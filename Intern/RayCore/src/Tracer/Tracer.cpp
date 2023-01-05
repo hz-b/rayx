@@ -9,14 +9,14 @@
 
 namespace RAYX {
 
-const uint64_t BATCH_SIZE = 1000;
+const uint64_t BATCH_SIZE = 100000;
 
 Rays Tracer::trace(const Beamline& b) {
     RAYX_PROFILE_FUNCTION_STDOUT();
 
     auto rays = b.getInputRays();
     auto randomSeed = randomDouble();
-    auto maxSnapshots = (b.m_OpticalElements.size() * 2 + 1);
+    auto maxSnapshots = b.m_OpticalElements.size() + 2;
     auto materialTables = b.calcMinimalMaterialTables();
 
     Rays result;
