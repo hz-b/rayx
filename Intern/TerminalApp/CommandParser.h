@@ -1,5 +1,4 @@
 #pragma once
-
 #include <CLI/CLI.hpp>
 
 #include "Debug/Debug.h"
@@ -13,7 +12,10 @@ class CommandParser {
     CommandParser(int _argc, char* const* _argv);
 
     ~CommandParser();
-
+    /**
+     * @brief Set command restrictions here (for ex int intervals etc.)
+     *
+     */
     void analyzeCommands();
 
     std::shared_ptr<CLI::App> m_cli11;
@@ -28,7 +30,8 @@ class CommandParser {
         bool m_multiplePlots = false;     // -m (Multiple Plots)
         bool m_version = false;           // -v (Version)
         std::string m_providedFile = "";  // -i (Input)
-        bool m_fix_seed;                  // -f (Fixed Seed)
+        bool m_isFixSeed = false;         // -f (Fixed Seed)
+        int m_seed = -1;                  // -s (Provided Seed)
         bool m_verbose = false;           // --verbose (Verbose)
     } m_args;
 
@@ -40,15 +43,16 @@ class CommandParser {
         ║╚═╝║║║ ║║╚╗╚╝╔╝      ╚╗╔╝ 
         ║╔╗╔╝║╚═╝║ ╚╗╔╝ ╔═══╗ ╔╝╚╗ 
         ║║║╚╗║╔═╗║  ║║  ╚═══╝╔╝╔╗╚╗
-        ╚╝╚═╝╚╝ ╚╝  ╚╝       ╚═╝╚═╝ HZB 2022.
+        ╚╝╚═╝╚╝ ╚╝  ╚╝       ╚═╝╚═╝ HZB 2023.
         )";
         RAYX_LOG << "\n\t RAY-X Terminal Application " << TERMINALAPP_VERSION_MAJOR << "." << TERMINALAPP_VERSION_MINOR << "."
                  << TERMINALAPP_VERSION_PATCH << "." << TERMINALAPP_VERSION_TWEAK << "\n \t GIT: " << GIT_REVISION
                  << "\n \t BUILD: " << BUILD_TIMESTAMP;
-    };  // TODO: CMake config needed
+    };
+
   private:
     int m_cli11_return;
-    enum OptionType { BOOL, INT, STRING };
+    enum OptionType { BOOL, INT, STRING, BOOL_STRING };
     struct Options {
         // CLI::Option cli11_option;
         const OptionType type;
@@ -66,7 +70,8 @@ class CommandParser {
         {'x', {OptionType::BOOL, "cpu", "Tracing on CPU", &(m_args.m_cpuFlag)}},
         {'i', {OptionType::STRING, "input", "Input RML File or Directory.", &(m_args.m_providedFile)}},
         {'v', {OptionType::BOOL, "version", "", &(m_args.m_version)}},
-        {'f', {OptionType::BOOL, "fix-seed", "Fix the seed to RAYX::FIXED_SEED", &(m_args.m_fix_seed)}},
+        {'f', {OptionType::BOOL, "", "Fix the seed to RAYX::FIXED_SEED (Uses default)", &(m_args.m_isFixSeed)}},
+        {'s', {OptionType::INT, "seed", "Provided user seed", &(m_args.m_seed)}},
         {'V', {OptionType::BOOL, "verbose", "Dump more information", &(m_args.m_verbose)}},
     };
 };

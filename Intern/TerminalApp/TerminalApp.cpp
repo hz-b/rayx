@@ -89,14 +89,17 @@ void TerminalApp::run() {
     m_CommandParser = std::make_unique<CommandParser>(m_argc, m_argv);
     // Check correct use (This will exit if error)
     m_CommandParser->analyzeCommands();
-
     if (m_CommandParser->m_args.m_verbose) {
         RAYX::setDebugVerbose(true);
     }
 
-    if (m_CommandParser->m_args.m_fix_seed) {
+    if (m_CommandParser->m_args.m_isFixSeed) {
         // TODO consider letting the user fix an explicitly stated seed.
-        RAYX::fixSeed(RAYX::FIXED_SEED);
+        if (m_CommandParser->m_args.m_seed != -1) {
+            RAYX::fixSeed(m_CommandParser->m_args.m_seed);
+        } else
+            RAYX::fixSeed(RAYX::FIXED_SEED);
+
     } else {
         RAYX::randomSeed();
     }
