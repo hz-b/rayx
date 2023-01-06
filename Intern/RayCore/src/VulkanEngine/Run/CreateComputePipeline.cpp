@@ -30,6 +30,17 @@ void VulkanEngine::createComputePipeline() {
     delete[] compShaderCode;
 
     RAYX_VERB << "Creating pipeline...";
+
+    // Specialization constants
+    std::array<VkSpecializationMapEntry, 3> specializationMapEntries = {{
+        {0, offsetof(SpecializationData, constanti0), sizeof(uint32_t)},
+        {1, offsetof(SpecializationData, constanti1), sizeof(uint32_t)},
+        {2, offsetof(SpecializationData, constantf0), sizeof(float)},
+    }};
+
+    VkSpecializationInfo specialization_info(static_cast<uint32_t>(specializationMapEntries.size()), specializationMapEntries.data(),
+                                             sizeof(m_specilizationData), &m_specilizationData);
+
     /*
     Now let us actually create the compute pipeline.
     It only consists of a single stage with a compute shader.
@@ -41,6 +52,7 @@ void VulkanEngine::createComputePipeline() {
     shaderStageCreateInfo.stage = VK_SHADER_STAGE_COMPUTE_BIT;
     shaderStageCreateInfo.module = m_ComputeShaderModule;
     shaderStageCreateInfo.pName = "main";
+    shaderStageCreateInfo.pSpecializationInfo = &specialization_info;
 
     /*
     The pipeline layout allows the pipeline to access descriptor sets.

@@ -112,11 +112,23 @@ class RAYX_API VulkanEngine {
 
     // PushConstants are "constants" updated on each Dispatch Call (or similar) in the pipeline
     // Please pay attention to alignment rules
+    // You can change this struct (also in shader)
     struct PushConstants {
         glm::vec4 push_vector;
         glm::mat4 push_matrix;
         double push_double;
     };
+
+    // Shader parameters via specialization constants (Literal constants)
+    // You can change this struct
+    struct SpecializationData {
+        uint32_t constanti0;  // Like workgroup_size?
+        uint32_t constanti1;
+        float constantf0;
+    };
+
+    /// Set SpecilizationData
+    bool setSpecializationData(SpecializationData spData);
 
   private:
     EngineState m_state = EngineState::PREINIT;
@@ -132,6 +144,7 @@ class RAYX_API VulkanEngine {
     // VkDeviceMemory m_stagingMemory;
 
     Buffer m_stagingBuffer;
+    SpecializationData m_specilizationData = {0, 0, 0.0};
 
     VkInstance m_Instance;
     VkDebugUtilsMessengerEXT m_DebugMessenger;

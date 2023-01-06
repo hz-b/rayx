@@ -51,7 +51,11 @@ void VulkanEngine::pickPhysicalDevice() {
     RAYX_VERB << "Compute Max workgroup invocations: " << deviceProperties.limits.maxComputeWorkGroupInvocations;
     RAYX_VERB << "Compute Max workgroup Group size :" << deviceProperties.limits.maxComputeWorkGroupSize[0];
     RAYX_VERB << "Compute Max shared memory size: " << deviceProperties.limits.maxComputeSharedMemorySize;
+    RAYX_VERB << "Max pushConstants : " << deviceProperties.limits.maxPushConstantsSize;
     RAYX_VERB << "======================";
+    if (sizeof(PushConstants) > deviceProperties.limits.maxPushConstantsSize) {
+        RAYX_WARN << "Warning: User-defined push constants overflow! Please reduce size";
+    }
 }
 
 // checks if given device is suitable for computation
