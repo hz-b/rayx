@@ -110,6 +110,14 @@ class RAYX_API VulkanEngine {
         VmaAllocationInfo m_BufferAllocationInfo;
     };
 
+    // PushConstants are "constants" updated on each Dispatch Call (or similar) in the pipeline
+    // Please pay attention to alignment rules
+    struct PushConstants {
+        glm::vec4 push_vector;
+        glm::mat4 push_matrix;
+        double push_double;
+    };
+
   private:
     EngineState m_state = EngineState::PREINIT;
     /// stores the Buffers by name.
@@ -168,7 +176,7 @@ class RAYX_API VulkanEngine {
     /// `createStagingBuffer`.
     void createVkBuffer(VkDeviceSize size, VkBufferUsageFlags usage, VkMemoryPropertyFlags properties, VkBuffer& buffer,
                         VkDeviceMemory& bufferMemory);
-    // VMA Verson of createVkBuffer
+    // VMA Version of createVkBuffer
     void createVmaBuffer(VkDeviceSize size, VkBufferUsageFlags buffer_usage, VkBuffer& buffer, VmaAllocation& allocation,
                          VmaAllocationInfo* allocation_info, VmaAllocationCreateFlags flags = VMA_ALLOCATION_CREATE_HOST_ACCESS_RANDOM_BIT,
                          VmaMemoryUsage memory_usage = VMA_MEMORY_USAGE_AUTO, const std::vector<uint32_t>& queue_family_indices = {});

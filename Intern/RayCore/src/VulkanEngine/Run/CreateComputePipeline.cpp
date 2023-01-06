@@ -50,6 +50,18 @@ void VulkanEngine::createComputePipeline() {
     pipelineLayoutCreateInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO;
     pipelineLayoutCreateInfo.setLayoutCount = 1;
     pipelineLayoutCreateInfo.pSetLayouts = &m_DescriptorSetLayout;
+
+    /*
+        Add push constants to the Pipeline
+    */
+    VkPushConstantRange pushConstant;
+    pushConstant.offset = 0;  // Can change this of some of the struct is to be ignored
+    pushConstant.size = sizeof(PushConstants);
+    pushConstant.stageFlags = VK_SHADER_STAGE_COMPUTE_BIT;
+
+    pipelineLayoutCreateInfo.pPushConstantRanges = &pushConstant;
+    pipelineLayoutCreateInfo.pushConstantRangeCount = 1;  // One struct of pushConstants
+
     VK_CHECK_RESULT(vkCreatePipelineLayout(m_Device, &pipelineLayoutCreateInfo, nullptr, &m_PipelineLayout));
 
     VkComputePipelineCreateInfo pipelineCreateInfo = {};

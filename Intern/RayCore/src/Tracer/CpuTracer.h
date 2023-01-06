@@ -60,6 +60,16 @@ struct ShaderArray {
     inline T& operator[](int i) { return data[i]; }
 };
 
+template <typename T1, typename T2, typename T3>
+struct PushConstants_t{
+  public:
+    T1 push_vector;
+    T2 push_matrix;
+    T3 push_double;
+
+    inline size_t length() { return sizeof(T1) + sizeof(T2) + sizeof(T3); }
+};
+
 extern int gl_GlobalInvocationID;
 extern ShaderArray<Ray> rayData;
 extern ShaderArray<Ray> outputData;

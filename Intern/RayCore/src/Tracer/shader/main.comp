@@ -47,6 +47,7 @@ ShaderArray<Element> quadricData;
 ShaderArray<dvec4> xyznull;
 ShaderArray<int> matIdx;
 ShaderArray<double> mat;
+PushConstants_t<dvec4,dmat4,double> PushConstants;
 
 #else
 struct Ray {
@@ -75,6 +76,7 @@ struct Element {
 		dmat4 _dMat; // Can also be used as vectors or scalar
 	};
 #endif
+
 /* LAYOUTS */
     // don't use this directly. Use `_ray` instead.
 	layout(std140, binding = 0) buffer ibuf { Ray rayData[]; };
@@ -108,6 +110,14 @@ struct Element {
 			_debug_struct d_struct[];  // contains nff table of all materials concatenated together
 		};
 	#endif
+
+    //push constants block
+    layout( push_constant ) uniform constants
+    {
+	    dvec4 push_vector;
+	    dmat4 push_matrix;
+        double push_double;
+    } PushConstants;
 #endif
 
 uint64_t rayId() {
