@@ -101,8 +101,10 @@ if(NOT "$ENV{CI}" STREQUAL "YES")
 endif()
 
 # MathGL
-set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${RayCore_SOURCE_DIR}/../../Extern/cmake)
+set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${RayCore_SOURCE_DIR}/../../Extern/mathgl-8.0.1/scripts)
 find_package(MathGL2 REQUIRED mgl)
+# set(MATHGL2_INCLUDE_DIRS ${RayCore_SOURCE_DIR}/../../Extern/mathgl-8.0.1/include/mgl2)
+# message(STATUS ${MATHGL2_INCLUDE_DIRS})
 
 # Add Extern deps TODO(Jannis): the src include shouldn't be a SYSTEM include
 target_include_directories(${PROJECT_NAME}
@@ -111,8 +113,15 @@ target_include_directories(${PROJECT_NAME}
     PUBLIC ${RayCore_SOURCE_DIR}/../../Extern/rapidxml-1.13/
     PUBLIC ${RayCore_SOURCE_DIR}/../../Extern/HighFive/include/
     PUBLIC ${RayCore_SOURCE_DIR}/../../Extern/VMA/include/
-    PUBLIC ${MATHGL2_INCLUDE_DIRS}
+    PUBLIC ${RayCore_SOURCE_DIR}/../../Extern/mathgl-8.0.1/include/mgl2
 )
+
+target_link_libraries(${PROJECT_NAME}
+    INTERFACE
+    mgl
+)
+message(STATUS ${MATHGL2_LIBRARY})
+
 
 # Compile Shaders
 # The following code is used to always compile the shader.
@@ -143,19 +152,19 @@ endif()
 add_custom_target(COMPILE_SHADER ALL DEPENDS ${COMPILED_SHADER})
 
 # find python libraries
-find_package(Python3 COMPONENTS Interpreter Development NumPy REQUIRED)
-find_package(PythonLibs 3.0 REQUIRED)
-target_include_directories(${PROJECT_NAME}
-    PUBLIC ${RayCore_SOURCE_DIR}/../../Extern/matplotlib-cpp
-    PUBLIC ${PYTHON3_INCLUDE_DIRS}
-    PUBLIC ${NumPy_INCLUDE_DIRS}
-)
-target_link_libraries(${PROJECT_NAME}
-    PUBLIC
-    ${PYTHON_LIBRARIES}
-    Python3::NumPy
-    ${MATHGL2_LIBRARY}
-)
+# find_package(Python3 COMPONENTS Interpreter Development NumPy REQUIRED)
+# find_package(PythonLibs 3.0 REQUIRED)
+# target_include_directories(${PROJECT_NAME}
+#     PUBLIC ${RayCore_SOURCE_DIR}/../../Extern/matplotlib-cpp
+#     PUBLIC ${PYTHON3_INCLUDE_DIRS}
+#     PUBLIC ${NumPy_INCLUDE_DIRS}
+# )
+# target_link_libraries(${PROJECT_NAME}
+#     PUBLIC
+#     ${PYTHON_LIBRARIES}
+#     Python3::NumPy
+#     ${MATHGL2_LIBRARY}
+# )
 
 # Print include directories
 get_target_property(INCLUDE_DIRECTORIES ${PROJECT_NAME} INCLUDE_DIRECTORIES)

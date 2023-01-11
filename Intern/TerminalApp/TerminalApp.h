@@ -2,7 +2,6 @@
 
 #include <Tracer/Tracer.h>
 
-#include <chrono>
 #include <filesystem>
 
 #include "CommandParser.h"

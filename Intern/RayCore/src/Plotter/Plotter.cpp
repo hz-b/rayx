@@ -1,7 +1,5 @@
 #include "Plotter/Plotter.h"
 
-#include <matplotlibcpp.h>
-
 #include <algorithm>
 
 #include "CanonicalizePath.h"
@@ -112,7 +110,7 @@ bool Plotter::importPlotSettings(const std::string& filename) {
         // Handle Content
         if (strcmp(key.c_str(), "scatterColor") == 0) {
             m_plotSettings[key] = val;
-        } else if (strcmp(key.c_str(), "factorX" ) == 0) {
+        } else if (strcmp(key.c_str(), "factorX") == 0) {
             try {
                 m_plotSettings[key] = stoi(val);
             } catch (std::invalid_argument const& ex) {
@@ -456,7 +454,7 @@ void plotMulti(const std::vector<Ray>& RayList, const std::string& plotName, con
     enum PlotAxes { XY, XZ };
     PlotAxes axes;
     for (auto u : s) {
-        if ((last_obj((int) u.m_extraParam) == 0) || (OpticalElementsMeta[last_obj((int)u.m_extraParam) - 1].material == -2))
+        if ((last_obj((int)u.m_extraParam) == 0) || (OpticalElementsMeta[last_obj((int)u.m_extraParam) - 1].material == -2))
             axes = XZ;
         else
             axes = XY;
