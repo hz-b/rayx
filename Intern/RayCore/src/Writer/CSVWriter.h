@@ -5,7 +5,8 @@
 
 #include "Core.h"
 #include "Tracer/Ray.h"
+#include "Tracer/Tracer.h"
 
-void RAYX_API writeCSV(const std::vector<RAYX::Ray>&, std::string filename);
+void RAYX_API writeCSV(const RAYX::Rays&, std::string filename);
 
-std::vector<RAYX::Ray> RAYX_API loadCSV(std::string filename);
+RAYX::Rays RAYX_API loadCSV(std::string filename);

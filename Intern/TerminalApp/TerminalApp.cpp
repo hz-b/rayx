@@ -60,7 +60,7 @@ void TerminalApp::tracePath(const std::filesystem::path& path) {
         auto rays = m_Tracer->trace(*m_Beamline);
 
         // Export Rays to external data.
-        exportRays(extractLastSnapshot(rays), path.string());
+        exportRays(rays, path.string());
 
         // Plot
         if (m_CommandParser->m_args.m_plotFlag) {
@@ -125,7 +125,7 @@ void TerminalApp::run() {
     tracePath(m_CommandParser->m_args.m_providedFile);
 }
 
-void TerminalApp::exportRays(const std::vector<RAYX::Ray>& rays, std::string path) {
+void TerminalApp::exportRays(const RAYX::Rays& rays, std::string path) {
     RAYX_PROFILE_FUNCTION_STDOUT();
 #ifdef CI
     bool csv = true;
@@ -142,7 +142,7 @@ void TerminalApp::exportRays(const std::vector<RAYX::Ray>& rays, std::string pat
         writeCSV(rays, path + ".csv");
     } else {
 #ifndef CI  // writeH5 is not defined in the CI!
-        writeH5(rays, path + ".h5");
+        writeH5(extractLastSnapshot(rays), path + ".h5");
 #endif
     }
 }

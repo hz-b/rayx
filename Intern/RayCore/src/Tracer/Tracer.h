@@ -45,7 +45,8 @@ class RAYX_API Tracer {
     virtual std::vector<Ray> traceRaw(const TraceRawConfig&) = 0;
 };
 
-// TODO deprecate this function and all of it's uses.
+// TODO deprecate these functions and all of their uses.
 std::vector<Ray> extractLastSnapshot(const Rays& rays);
+Rays convertToRays(const std::vector<Ray>& rays);
 
 }  // namespace RAYX

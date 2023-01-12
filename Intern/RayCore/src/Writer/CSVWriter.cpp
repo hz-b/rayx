@@ -63,10 +63,11 @@ Cell doubleToCell(double x) {
     return strToCell(s.c_str());
 }
 
-void writeCSV(const std::vector<RAYX::Ray>& rays, std::string filename) {
+void writeCSV(const RAYX::Rays& rays, std::string filename) {
     std::ofstream file(filename);
 
-    file << strToCell("Index").buf << " | "        //
+    file << strToCell("Ray ID").buf << " | "       //
+         << strToCell("Snapshot ID").buf << " | "  //
          << strToCell("X position").buf << " | "   //
          << strToCell("Y position").buf << " | "   //
          << strToCell("Z position").buf << " | "   //
@@ -91,34 +92,36 @@ void writeCSV(const std::vector<RAYX::Ray>& rays, std::string filename) {
 
     RAYX_VERB << "Writing " << rays.size() << " rays to file...";
 
-    int index = 0;
-    for (auto ray : rays) {
-        file << ulongToCell(index).buf << " | "               //
-             << doubleToCell(ray.m_position.x).buf << " | "   //
-             << doubleToCell(ray.m_position.y).buf << " | "   //
-             << doubleToCell(ray.m_position.z).buf << " | "   //
-             << doubleToCell(ray.m_weight).buf << " | "       //
-             << doubleToCell(ray.m_direction.x).buf << " | "  //
-             << doubleToCell(ray.m_direction.y).buf << " | "  //
-             << doubleToCell(ray.m_direction.z).buf << " | "  //
-             << doubleToCell(ray.m_energy).buf << " | "       //
-             << doubleToCell(ray.m_stokes.x).buf << " | "     //
-             << doubleToCell(ray.m_stokes.y).buf << " | "     //
-             << doubleToCell(ray.m_stokes.z).buf << " | "     //
-             << doubleToCell(ray.m_stokes.w).buf << " | "     //
-             << doubleToCell(ray.m_pathLength).buf << " | "   //
-             << doubleToCell(ray.m_order).buf << " | "        //
-             << doubleToCell(ray.m_lastElement).buf << " | "  //
-             << doubleToCell(ray.m_extraParam).buf << '\n';
-        index++;
+    for (unsigned long ray_id = 0; ray_id < rays.size(); ray_id++) {
+        const auto& snapshots = rays[ray_id];
+        for (unsigned long snapshot_id = 0; snapshot_id < snapshots.size(); snapshot_id++) {
+            const auto& ray = snapshots[snapshot_id];
+            file << ulongToCell(ray_id).buf << " | "              //
+                 << ulongToCell(snapshot_id).buf << " | "         //
+                 << doubleToCell(ray.m_position.x).buf << " | "   //
+                 << doubleToCell(ray.m_position.y).buf << " | "   //
+                 << doubleToCell(ray.m_position.z).buf << " | "   //
+                 << doubleToCell(ray.m_weight).buf << " | "       //
+                 << doubleToCell(ray.m_direction.x).buf << " | "  //
+                 << doubleToCell(ray.m_direction.y).buf << " | "  //
+                 << doubleToCell(ray.m_direction.z).buf << " | "  //
+                 << doubleToCell(ray.m_energy).buf << " | "       //
+                 << doubleToCell(ray.m_stokes.x).buf << " | "     //
+                 << doubleToCell(ray.m_stokes.y).buf << " | "     //
+                 << doubleToCell(ray.m_stokes.z).buf << " | "     //
+                 << doubleToCell(ray.m_stokes.w).buf << " | "     //
+                 << doubleToCell(ray.m_pathLength).buf << " | "   //
+                 << doubleToCell(ray.m_order).buf << " | "        //
+                 << doubleToCell(ray.m_lastElement).buf << " | "  //
+                 << doubleToCell(ray.m_extraParam).buf << '\n';
+        }
     }
-
     RAYX_VERB << "Writing done!";
 }
 
 // loader:
 
-std::vector<RAYX::Ray> loadCSV(std::string filename) {
+RAYX::Rays RAYX_API loadCSV(std::string filename) {
     std::ifstream file(filename);
 
     // ignore two setup lines
@@ -126,15 +129,18 @@ std::vector<RAYX::Ray> loadCSV(std::string filename) {
     std::getline(file, s);
     std::getline(file, s);
 
-    std::vector<RAYX::Ray> out;
+    RAYX::Rays out;
 
     while (std::getline(file, s)) {
         std::vector<double> d;
         std::stringstream ss(s);
         std::string num;
 
-        // skip the index.
         std::getline(ss, num, '|');
+        unsigned long ray_id = std::stoi(num);
+
+        std::getline(ss, num, '|');
+        unsigned long snapshot_id = std::stoi(num);
 
         while (std::getline(ss, num, '|')) {
             d.push_back(std::stod(num));
@@ -149,9 +155,12 @@ std::vector<RAYX::Ray> loadCSV(std::string filename) {
                          .m_order = d[13],
                          .m_lastElement = d[14],
                          .m_extraParam = d[15]};
-        if (ray.m_weight != 0) {
-            out.push_back(ray);
+        if (out.size() >= ray_id) {
+            out.push_back({});
         }
+        assert(ray_id + 1 == out.size());
+        assert(snapshot_id == out[ray_id].size());
+        out[ray_id].push_back(ray);
     }
 
     return out;

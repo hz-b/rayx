@@ -66,7 +66,7 @@ RAYX::Beamline loadBeamline(std::string filename) {
 /// will write to Tests/output/<filename>.csv
 void writeToOutputCSV(std::vector<RAYX::Ray>& rays, std::string filename) {
     std::string f = canonicalizeRepositoryPath("Tests/output/" + filename + ".csv").string();
-    writeCSV(rays, f);
+    writeCSV(convertToRays(rays), f);
 }
 
 /// sequentialExtraParam yields the desired extraParam for rays which went the
@@ -88,6 +88,7 @@ std::vector<RAYX::Ray> traceRML(std::string filename, Filter filter) {
     auto beamline = loadBeamline(filename);
 
     // the rays satisfying the weight != W_FLY_OFF test.
+    // TODO remove this W_FLY_OFF filter
     std::vector<RAYX::Ray> wRays;
     {
         auto rays = tracer->trace(beamline);
@@ -176,11 +177,19 @@ void compareAgainstCorrect(std::string filename, double tolerance) {
     auto a = traceRML(filename, Filter::KeepAllRays);
 
     std::string f = canonicalizeRepositoryPath("Tests/input/" + filename + ".correct.csv").string();
-    auto b = loadCSV(f);
+    auto b = extractLastSnapshot(loadCSV(f));
 
     writeToOutputCSV(a, filename + ".rayx");
 
-    compareRayLists(a, b, tolerance);
+    // TODO this filter shouldn't be here!
+    std::vector<RAYX::Ray> b_;
+    for (auto x : b) {
+        if (x.m_weight != 0) {
+            b_.push_back(x);
+        }
+    }
+
+    compareRayLists(a, b_, tolerance);
 }
 
 void updateCpuTracerMaterialTables(std::vector<Material> mats_vec) {

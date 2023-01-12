@@ -69,4 +69,12 @@ std::vector<Ray> extractLastSnapshot(const Rays& rays) {
     return out;
 }
 
+Rays convertToRays(const std::vector<Ray>& rays) {
+    Rays out;
+    for (auto r : rays) {
+        out.push_back({r});
+    }
+    return out;
+}
+
 }  // namespace RAYX

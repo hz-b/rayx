@@ -61,7 +61,7 @@ struct ShaderArray {
 };
 
 template <typename T1, typename T2, typename T3>
-struct PushConstants_t{
+struct PushConstants_t {
   public:
     T1 push_vector;
     T2 push_matrix;
