@@ -158,8 +158,12 @@ RAYX::Rays RAYX_API loadCSV(std::string filename) {
         if (out.size() <= ray_id) {
             out.push_back({});
         }
-        assert(ray_id + 1 == out.size());
-        assert(snapshot_id == out[ray_id].size());
+        if (ray_id + 1 != out.size()) {
+            RAYX_ERR << "loadCSV failed: rays out of order";
+        }
+        if (snapshot_id != out[ray_id].size()) {
+            RAYX_ERR << "loadCSV failed: snapshots out of order";
+        }
         out[ray_id].push_back(ray);
     }
 
