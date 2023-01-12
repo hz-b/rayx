@@ -58,7 +58,7 @@ Collision find_collision() {
 // back before the function returns to this function)
 void dynamicElements() {
     // placeholder, info should later be transfered to shader
-    const int maxBounces = quadricData.length()==0? 1: quadricData.length();
+    const int maxBounces = quadricData.length();
 
     // ray specific "seed" for random numbers -> every ray has a different starting value for the counter that creates the random number
     const uint64_t MAX_UINT64 = ~(uint64_t(0));
@@ -138,6 +138,16 @@ void dynamicElements() {
 
         // transform back to WORLD coordinates
         _ray = rayMatrixMult(elem_ray, nextElement.outTrans);
+    }
+
+    if (find_collision().found) {
+        Ray r = _ray;
+        r.m_weight = W_NOT_ENOUGH_BOUNCES;
+        takeSnapshot(r);
+    } else {
+        Ray r = _ray;
+        r.m_weight = W_FLY_OFF;
+        takeSnapshot(r);
     }
 
     // TODO coming to this point in the shader means that maxBounces was set to a too low number.

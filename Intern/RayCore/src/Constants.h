@@ -21,6 +21,9 @@ const double W_FLY_OFF = 0;
 // Ray is in element coordinates of the hit element.
 const double W_JUST_HIT_ELEM = 1;
 
+// The ray has found another collision, but the `maxBounces` cap was reached.
+const double W_NOT_ENOUGH_BOUNCES = 2;
+
 // This Ray was absorbed by `m_lastElement`.
 //
 // Ray is in element coordinates, relative to `m_lastElement`.
