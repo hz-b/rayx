@@ -155,7 +155,7 @@ RAYX::Rays RAYX_API loadCSV(std::string filename) {
                          .m_order = d[13],
                          .m_lastElement = d[14],
                          .m_extraParam = d[15]};
-        if (out.size() >= ray_id) {
+        if (out.size() <= ray_id) {
             out.push_back({});
         }
         assert(ray_id + 1 == out.size());

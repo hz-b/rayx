@@ -120,6 +120,7 @@ void dynamicElements() {
         } else if (type == TY_RZP) {
             elem_ray = traceRZP(elem_ray, Rzp(col.elementIndex), ctr, col.hitpoint);
         } else if (type == TY_IMAGE_PLANE) {
+            // TODO don't stop tracing after this
             elem_ray.m_extraParam += (col.elementIndex + 1) * bounce;
             elem_ray.m_lastElement = col.elementIndex + 1;
             elem_ray.m_weight = W_HIT_IMAGE_PLANE;
@@ -131,11 +132,12 @@ void dynamicElements() {
         } else if (type == TY_ELLIPSOID_MIRROR) {
             elem_ray = traceEllipsoidMirror(elem_ray, EllipsoidMirror(col.elementIndex), ctr, col.hitpoint);
         }
-
         // use extraParameter to store the order in which the ray has hit which optical element (e.g extraParameter = 412 -> first hit element 2, then
         // 1, then 4)
         elem_ray.m_extraParam += ((col.elementIndex + 1) * bounce) * int(elem_ray.m_lastElement == col.elementIndex + 1);
         bounce *= pow(10, int(elem_ray.m_lastElement == col.elementIndex + 1));
+
+        takeSnapshot(elem_ray);
 
         // transform back to WORLD coordinates
         _ray = rayMatrixMult(elem_ray, nextElement.outTrans);
