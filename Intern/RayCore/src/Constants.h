@@ -16,16 +16,10 @@ const double PI = 3.14159265358979323846264338327950;
 // Ray is in world coordinates.
 const double W_FLY_OFF = 0;
 
-// This Ray is still pathing through objects.
-// When the computation is finished weight shall not be `W_IN_COMPUTATION`.
-//
-// Ray is in world coordinates.
-const double W_IN_COMPUTATION = 1;
-
-// This Ray has hit an ImagePlane, this ImagePlane is `m_lastElement`.
-//
-// Ray is in element coordinates, relative to `m_lastElement`.
-const double W_HIT_IMAGE_PLANE = 2;
+// This Ray has just hit `m_lastElement`.
+// And will continue tracing afterwards.
+// Ray is in element coordinates of the hit element.
+const double W_JUST_HIT_ELEM = 1;
 
 // This Ray was absorbed by `m_lastElement`.
 //

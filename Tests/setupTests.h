@@ -155,36 +155,30 @@ class TestSuite : public testing::Test {
 
 // helper functions for writing tests
 
-RAYX::Ray parseCSVline(std::string line);
-
 /// will look at Tests/input/<filename>.rml
 RAYX::Beamline loadBeamline(std::string filename);
 
 /// will write to Tests/output/<filename>.csv
-void writeToOutputCSV(std::vector<RAYX::Ray>& rays, std::string filename);
+void writeToOutputCSV(const RAYX::Rays& rays, std::string filename);
 
-enum class Filter { KeepAllRays, OnlySequentialRays };
+/// Returns all traced rays
+RAYX::Rays traceRML(std::string filename);
 
-/// returns rays in element coordinates
-/// weight = W_FLY_OFF rays are filtered out.
-/// if filter == OnlySequentialRays, then only the sequential rays are returned.
-std::vector<RAYX::Ray> traceRML(std::string filename, Filter filter = Filter::KeepAllRays);
+// extracts the last W_JUST_HIT_ELEM for each ray.
+std::vector<RAYX::Ray> extractLastHit(const RAYX::Rays&);
 
 /// will look at Tests/input/<filename>.csv
 /// the Ray-UI files are to be obtained by Export > RawRaysOutgoing (which are in
 /// element coordinates of the relevant element!)
 std::vector<RAYX::Ray> loadCSVRayUI(std::string filename);
 
-/// This only asserts that position, direction, energy are the same
-/// yet! many parameters are missing in RayUI and hence cannot be compared. but
-/// for example path length could be compared, but tests fail currently if we do
-/// so (TODO(rudi)).
-void compareRayLists(const std::vector<RAYX::Ray>& rayx, const std::vector<RAYX::Ray>& rayui, double t = 1e-11);
+/// Checks for equality up to the tolerance `t`.
+void compareRays(const RAYX::Rays& r1, const RAYX::Rays& r2, double t = 1e-11);
 
-/// This function automatcaily filters
-/// out weight = W_FLY_OFF rays from rayx, as they are automatically missing in rayui.
+/// Only cares for the rays hitting the last object of the beamline, and check whether they are the same as their RayUI counter part.
+/// Ray UI rays are obtained Export > RawRaysOutgoing.
 /// This also filters out non-sequential rays to compare to Ray-UI correctly.
-void compareAgainstRayUI(std::string filename, double t = 1e-11);
+void compareLastAgainstRayUI(std::string filename, double t = 1e-11);
 
 // compares input/<filename>.correct.csv with the trace output.
 void compareAgainstCorrect(std::string filename, double t = 1e-11);

@@ -350,5 +350,6 @@ Ray traceImagePlane(Ray r, ALLOW_UNUSED ImagePlane ip, dvec4 intersection) { // 
     dvec3 intersection_xyz = dvec3(intersection);
     r.m_pathLength += length(r.m_position - intersection_xyz);
     r.m_position = intersection_xyz;
+    r.m_lastElement = ip.id + 1;
     return r;
 }

@@ -58,7 +58,7 @@ Collision find_collision() {
 // back before the function returns to this function)
 void dynamicElements() {
     // placeholder, info should later be transfered to shader
-    const int maxBounces = quadricData.length();
+    const int maxBounces = quadricData.length()==0? 1: quadricData.length();
 
     // ray specific "seed" for random numbers -> every ray has a different starting value for the counter that creates the random number
     const uint64_t MAX_UINT64 = ~(uint64_t(0));
@@ -120,13 +120,7 @@ void dynamicElements() {
         } else if (type == TY_RZP) {
             elem_ray = traceRZP(elem_ray, Rzp(col.elementIndex), ctr, col.hitpoint);
         } else if (type == TY_IMAGE_PLANE) {
-            // TODO don't stop tracing after this
-            elem_ray.m_extraParam += (col.elementIndex + 1) * bounce;
-            elem_ray.m_lastElement = col.elementIndex + 1;
-            elem_ray.m_weight = W_HIT_IMAGE_PLANE;
-            Ray r = traceImagePlane(elem_ray, ImagePlane(col.elementIndex), col.hitpoint);
-            takeSnapshot(r);
-            return;
+            elem_ray = traceImagePlane(elem_ray, ImagePlane(col.elementIndex), col.hitpoint);
         } else if (type == TY_TOROID_MIRROR) {
             elem_ray = traceToroid(elem_ray, ToroidMirror(col.elementIndex), ctr, col.hitpoint);
         } else if (type == TY_ELLIPSOID_MIRROR) {
@@ -137,16 +131,15 @@ void dynamicElements() {
         elem_ray.m_extraParam += ((col.elementIndex + 1) * bounce) * int(elem_ray.m_lastElement == col.elementIndex + 1);
         bounce *= pow(10, int(elem_ray.m_lastElement == col.elementIndex + 1));
 
-        takeSnapshot(elem_ray);
+        // TODO can't we just change _ray's weight?
+        Ray elem_ray2 = elem_ray;
+        elem_ray2.m_weight = W_JUST_HIT_ELEM;
+        takeSnapshot(elem_ray2);
 
         // transform back to WORLD coordinates
         _ray = rayMatrixMult(elem_ray, nextElement.outTrans);
     }
 
-    // TODO coming to this point in the shader means that maxBounces was set to a too low number. This should be an error.
-
-    // outputData should be in element coordinates. (except for `outputData[_].m_weight == W_FLY_OFF`)
-    takeSnapshot(rayMatrixMult(_ray, nextElement.inTrans));
+    // TODO coming to this point in the shader means that maxBounces was set to a too low number.
+    // This should be an error.
 }
-
-

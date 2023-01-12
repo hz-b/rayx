@@ -7,18 +7,28 @@ void checkDistribution(const std::vector<Ray>& rays, double sourceEnergy, double
     }
 }
 
+void roughCompare(std::vector<RAYX::Ray> l, std::vector<RAYX::Ray> r) {
+    CHECK_EQ(l.size(), r.size());
+    // TODO maybe compare more?
+    for (int i = 0; i < l.size(); i++) {
+        CHECK_EQ(l[i].m_position, r[i].m_position);
+        CHECK_EQ(l[i].m_direction, r[i].m_direction);
+        CHECK_EQ(l[i].m_energy, r[i].m_energy);
+    }
+}
+
 TEST_F(TestSuite, MatrixSource) {
     auto beamline = loadBeamline("MatrixSource");
     auto a = beamline.getInputRays();
     auto b = loadCSVRayUI("MatrixSource");
-    compareRayLists(a, b);
+    roughCompare(a, b);
 }
 
 /// this tests tracing an only-lightsource beamline. An error-prone edge case.
 TEST_F(TestSuite, MatrixSourceTraced) {
-    auto a = traceRML("MatrixSource");
+    auto a = extractLastSnapshot(traceRML("MatrixSource"));
     auto b = loadCSVRayUI("MatrixSource");
-    compareRayLists(a, b);
+    roughCompare(a, b);
 }
 
 TEST_F(TestSuite, PointSourceHardEdge) {
