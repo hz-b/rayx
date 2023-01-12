@@ -97,9 +97,7 @@ void dynamicElements() {
             // no element was hit.
             // Ray is considered to move forward to inf.
             // This is the only constellation in which a snapshot is in world coordinates.
-            Ray r = _ray;
-            r.m_weight = W_FLY_OFF;
-            takeSnapshot(r);
+            takeSnapshot(_ray, W_FLY_OFF);
             return;
         }
 
@@ -131,23 +129,16 @@ void dynamicElements() {
         elem_ray.m_extraParam += ((col.elementIndex + 1) * bounce) * int(elem_ray.m_lastElement == col.elementIndex + 1);
         bounce *= pow(10, int(elem_ray.m_lastElement == col.elementIndex + 1));
 
-        // TODO can't we just change _ray's weight?
-        Ray elem_ray2 = elem_ray;
-        elem_ray2.m_weight = W_JUST_HIT_ELEM;
-        takeSnapshot(elem_ray2);
+        takeSnapshot(elem_ray, W_JUST_HIT_ELEM);
 
         // transform back to WORLD coordinates
         _ray = rayMatrixMult(elem_ray, nextElement.outTrans);
     }
 
     if (find_collision().found) {
-        Ray r = _ray;
-        r.m_weight = W_NOT_ENOUGH_BOUNCES;
-        takeSnapshot(r);
+        takeSnapshot(_ray, W_NOT_ENOUGH_BOUNCES);
     } else {
-        Ray r = _ray;
-        r.m_weight = W_FLY_OFF;
-        takeSnapshot(r);
+        takeSnapshot(_ray, W_FLY_OFF);
     }
 
     // TODO coming to this point in the shader means that maxBounces was set to a too low number.

@@ -137,11 +137,18 @@ uint output_index(uint i) {
 
 // take a snapshot and store it in the next free spot in outputData.
 // `r` will typically be _ray, or some related ray.
-void takeSnapshot(Ray r) {
+void takeSnapshot(Ray r, double w) {
+    #ifdef CPP
+    if (w == W_UNINIT) {
+        RAYX_ERR << "takeSnapshot called with W_UNINIT";
+    }
+    #endif
+
     for (uint i = 0; i < maxSnapshots; i++) {
         uint idx = output_index(i);
         if (outputData[idx].m_weight == W_UNINIT) { // checks whether this spot is free
             outputData[idx] = r;
+            outputData[idx].m_weight = w;
             return;
         }
     }
