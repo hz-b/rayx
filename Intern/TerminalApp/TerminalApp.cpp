@@ -142,7 +142,7 @@ void TerminalApp::exportRays(const RAYX::Rays& rays, std::string path) {
         writeCSV(rays, path + ".csv");
     } else {
 #ifndef CI  // writeH5 is not defined in the CI!
-        writeH5(extractLastSnapshot(rays), path + ".h5");
+        writeH5(rays, path + ".h5");
 #endif
     }
 }
