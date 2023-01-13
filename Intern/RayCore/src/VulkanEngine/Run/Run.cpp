@@ -19,14 +19,5 @@ void VulkanEngine::run(RunSpec spec) {
     m_state = EngineState::POSTRUN;
 }
 
-bool VulkanEngine::setSpecializationData(SpecializationData spData) {
-    if (m_state != EngineState::POSTRUN) {
-        m_specilizationData = spData;
-        return true;
-    } else {
-        RAYX_WARN << "No effect";
-        return false;
-    }
-}
 
 }  // namespace RAYX

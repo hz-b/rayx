@@ -118,16 +118,6 @@ class RAYX_API VulkanEngine {
         size_t size;
     } m_pushConstants;
 
-    // Shader parameters via specialization constants (Literal constants)
-    // You can change this struct
-    struct SpecializationData {
-        uint32_t constanti0;  // Like workgroup_size?
-        float constantf0;
-    };
-
-    /// Set SpecilizationData
-    bool setSpecializationData(SpecializationData spData);
-
   private:
     EngineState m_state = EngineState::PREINIT;
     /// stores the Buffers by name.
@@ -142,7 +132,6 @@ class RAYX_API VulkanEngine {
     // VkDeviceMemory m_stagingMemory;
 
     Buffer m_stagingBuffer;
-    SpecializationData m_specilizationData = {0, 0.0};
 
     VkInstance m_Instance;
     VkDebugUtilsMessengerEXT m_DebugMessenger;

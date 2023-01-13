@@ -113,19 +113,14 @@ struct Element {
 
 #endif
 
-// PushConstants and SpecializationMap
+// PushConstants 
 #ifdef CPP
     pushConstants_t pushConstants;
-    const int CONSTANTi_0 = 0;
-    const float CONSTANTf_0 = 0.0;
 #else 
     layout( push_constant ) uniform constants
     {
 	    dmat4 pushMatrix;
     } PushConstants;
-
-    layout (constant_id = 0) const int CONSTANTi_0 = 0;
-    layout (constant_id = 1) const float CONSTANTf_0 = 0.0;
 #endif
 
 uint64_t rayId() {
