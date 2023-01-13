@@ -79,15 +79,7 @@ void dynamicElements() {
     nextElement.outTrans = dmat4(1);
 
     double bounce = 1;
-
-    // Printing Example over vkconfig Validation Layers
-    if (uint(gl_GlobalInvocationID) == 2 ){
-    #ifndef CPP
-        // debugPrintfEXT("Hello from GPU. \n");
-    #else
-        // RAYX_D_LOG << "Tracing on CPU..." ;
-    #endif
-    }
+    
 
     // Iterate through all bounces
     for (int i = 0; i < maxBounces; i++) {

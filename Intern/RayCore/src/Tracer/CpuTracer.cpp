@@ -64,4 +64,6 @@ std::vector<Ray> CpuTracer::traceRaw(const TraceRawConfig& cfg) {
     // Fetch Rays back from the Shader "container"
     return CPU_TRACER::outputData.data;
 }
+
+void CpuTracer::setPushConstants(PushConstants* p) { CPU_TRACER::pushConstants.pushMatrix = p->pushMatrix; }
 }  // namespace RAYX

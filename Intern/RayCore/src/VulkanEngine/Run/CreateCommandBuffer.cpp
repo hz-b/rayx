@@ -102,11 +102,7 @@ void VulkanEngine::createCommandBuffer() {
     /**
      * Update push constants
      */
-    PushConstants constants;
-    constants.push_double = 0.0;
-    constants.push_vector = glm::dvec4(0);
-    constants.push_matrix = glm::dmat4(0);
-    vkCmdPushConstants(m_CommandBuffer, m_PipelineLayout, VK_SHADER_STAGE_COMPUTE_BIT, 0, sizeof(PushConstants), &constants);
+    vkCmdPushConstants(m_CommandBuffer, m_PipelineLayout, VK_SHADER_STAGE_COMPUTE_BIT, 0, m_pushConstants.size, m_pushConstants.m_pushConstants_ptr);
 
     RAYX_VERB << "Dispatching commandBuffer...";
     RAYX_VERB << "Sending "

@@ -40,10 +40,15 @@ class RAYX_API Tracer {
     // See `Rays` for information about the return value.
     Rays trace(const Beamline&);
 
+    struct PushConstants {
+        glm::dmat4 pushMatrix;
+    };
+
   protected:
     // where the actual tracing happens.
     // std::vector<Ray> will contain all snapshots for all Rays (and also the W_UNINIT rays).
     virtual std::vector<Ray> traceRaw(const TraceRawConfig&) = 0;
+    virtual void setPushConstants(PushConstants*) = 0;
 };
 
 // TODO deprecate these functions and all of their uses.

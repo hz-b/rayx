@@ -40,7 +40,8 @@ Rays Tracer::trace(const Beamline& b) {
             .m_materialTables = materialTables,
             .m_OpticalElements = b.m_OpticalElements,
         };
-
+        PushConstants pushConsants = {glm::dmat4(0.0)};
+        setPushConstants(&pushConsants);
         auto rawBatchRays = traceRaw(cfg);
         assert(rawBatchRays.size() == batch_size * maxSnapshots);
 

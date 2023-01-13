@@ -47,7 +47,6 @@ ShaderArray<Element> quadricData;
 ShaderArray<dvec4> xyznull;
 ShaderArray<int> matIdx;
 ShaderArray<double> mat;
-PushConstants_t<dvec4,dmat4,double> PushConstants;
 
 #else
 struct Ray {
@@ -111,17 +110,22 @@ struct Element {
 		};
 	#endif
 
-    //push constants block
+
+#endif
+
+// PushConstants and SpecializationMap
+#ifdef CPP
+    pushConstants_t pushConstants;
+    const int CONSTANTi_0 = 0;
+    const float CONSTANTf_0 = 0.0;
+#else 
     layout( push_constant ) uniform constants
     {
-	    dvec4 push_vector;
-	    dmat4 push_matrix;
-        double push_double;
+	    dmat4 pushMatrix;
     } PushConstants;
 
     layout (constant_id = 0) const int CONSTANTi_0 = 0;
-    layout (constant_id = 1) const int CONSTANTi_1 = 0;
-    layout (constant_id = 2) const float CONSTANTf_0 = 0.0;
+    layout (constant_id = 1) const float CONSTANTf_0 = 0.0;
 #endif
 
 uint64_t rayId() {
@@ -180,5 +184,15 @@ void uninitRays() {
 
 void main() {
     uninitRays();
+
+    // Printing ~DEBUG~ Example over vkconfig Validation Layers
+    // if (uint(gl_GlobalInvocationID) == 2 ){
+    // #ifndef CPP
+    //     // debugPrintfEXT("Hello from GPU. \n");
+    // #else
+    //     // RAYX_D_LOG << "Tracing on CPU..." ;
+    //     // RAYX_D_LOG << pushConstants.pushMatrix[0][0];
+    // #endif
+    // }
 	dynamicElements();
 }

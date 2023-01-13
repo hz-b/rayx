@@ -31,11 +31,10 @@ void VulkanEngine::createComputePipeline() {
 
     RAYX_VERB << "Creating pipeline...";
 
-    // Specialization constants
-    std::array<VkSpecializationMapEntry, 3> specializationMapEntries = {{
+    // Specialization constants (Look at shader for default values)
+    std::array<VkSpecializationMapEntry, 2> specializationMapEntries = {{
         {0, offsetof(SpecializationData, constanti0), sizeof(uint32_t)},
-        {1, offsetof(SpecializationData, constanti1), sizeof(uint32_t)},
-        {2, offsetof(SpecializationData, constantf0), sizeof(float)},
+        {1, offsetof(SpecializationData, constantf0), sizeof(float)},
     }};
 
     VkSpecializationInfo specialization_info(static_cast<uint32_t>(specializationMapEntries.size()), specializationMapEntries.data(),
@@ -68,7 +67,7 @@ void VulkanEngine::createComputePipeline() {
     */
     VkPushConstantRange pushConstant;
     pushConstant.offset = 0;  // Can change this of some of the struct is to be ignored
-    pushConstant.size = sizeof(PushConstants);
+    pushConstant.size = m_pushConstants.size;
     pushConstant.stageFlags = VK_SHADER_STAGE_COMPUTE_BIT;
 
     pipelineLayoutCreateInfo.pPushConstantRanges = &pushConstant;

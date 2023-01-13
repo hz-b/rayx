@@ -20,6 +20,7 @@ class RAYX_API CpuTracer : public Tracer {
     ~CpuTracer();
 
     std::vector<Ray> traceRaw(const TraceRawConfig&) override;
+    void setPushConstants(PushConstants*) override;
 };
 
 namespace CPU_TRACER {
@@ -29,6 +30,9 @@ using dvec4 = glm::dvec4;
 using dmat3 = glm::dmat3;
 using dmat4 = glm::dmat4;
 using uint = unsigned int;
+
+using pushConstants_t = CpuTracer::PushConstants;
+extern pushConstants_t pushConstants;
 
 struct Element {
     dmat4 surfaceParams;
@@ -58,16 +62,6 @@ struct ShaderArray {
 
     inline int length() { return data.size(); }
     inline T& operator[](int i) { return data[i]; }
-};
-
-template <typename T1, typename T2, typename T3>
-struct PushConstants_t {
-  public:
-    T1 push_vector;
-    T2 push_matrix;
-    T3 push_double;
-
-    inline size_t length() { return sizeof(T1) + sizeof(T2) + sizeof(T3); }
 };
 
 extern int gl_GlobalInvocationID;
