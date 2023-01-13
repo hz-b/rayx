@@ -49,7 +49,7 @@ void CommandParser::analyzeCommands() {
         RAYX_ERR << "Cannot use user-defined seed without -f, try -f-seed <seed>";
     }
 
-    if (m_args.m_isFixSeed && m_args.m_seed <= 0) {
+    if (m_args.m_isFixSeed && m_args.m_seed < -1 ) {
         RAYX_ERR << "Unsupported seed <= 0";
     }
 
