@@ -26,7 +26,8 @@ struct TraceRawConfig {
 using Snapshots = std::vector<Ray>;
 
 /// Contains the snapshots of all the rays
-/// TraceResult[i][j] is the j'th snapshot of the i'th ray.
+/// Given a `Rays rays;`
+/// rays[i][j] is the j'th snapshot of the i'th ray.
 using Rays = std::vector<Snapshots>;
 
 class RAYX_API Tracer {
@@ -36,7 +37,7 @@ class RAYX_API Tracer {
 
     // This will call traceRaw.
     // Everything happening in each traceRaw implementation should be extracted to this function instead.
-    // See `TraceResult` for information about the return value.
+    // See `Rays` for information about the return value.
     Rays trace(const Beamline&);
 
   protected:

@@ -140,7 +140,4 @@ void dynamicElements() {
     } else {
         takeSnapshot(_ray, W_FLY_OFF);
     }
-
-    // TODO coming to this point in the shader means that maxBounces was set to a too low number.
-    // This should be an error.
 }
