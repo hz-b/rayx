@@ -1,12 +1,12 @@
 struct Collision {
-    // whether a collision has been found.
-    bool found;
+    // The point where `_ray` hits the element, in element-coordinates.
+    dvec4 hitpoint;
 
     // The index of the element with which `_ray` collides.
     int elementIndex;
 
-    // The point where `_ray` hits the element, in element-coordinates.
-    dvec4 hitpoint;
+    // whether a collision has been found.
+    bool found;
 };
 
 Collision find_collision() {
@@ -27,18 +27,15 @@ Collision find_collision() {
         }
 
         dvec4 currentIntersection = getOpticalElementIntersection(_ray, elementIndex);
-        dvec3 currentIntersection_xyz = dvec3(currentIntersection.x, currentIntersection.y, currentIntersection.z);
 
         // Intersection coordinates in GLOBAL coordinates
         dvec4 currentGlobalIntersection;
-        dvec3 tmp = dvec3(quadricData[elementIndex].outTrans * dvec4(currentIntersection_xyz, 1));
-        currentGlobalIntersection = dvec4(tmp, currentGlobalIntersection.w);
-        dvec3 currentGlobalIntersection_xyz = dvec3(currentGlobalIntersection.x, currentGlobalIntersection.y, currentGlobalIntersection.z);
+        dvec3 currentGlobalIntersection_xyz = dvec3(quadricData[elementIndex].outTrans * dvec4(currentIntersection.x, currentIntersection.y, currentIntersection.z, 1));
+        currentGlobalIntersection = dvec4(currentGlobalIntersection_xyz, currentGlobalIntersection.w);
 
-        dvec3 closestGlobalHitpoint_xyz = dvec3(closestGlobalHitpoint.x, closestGlobalHitpoint.y, closestGlobalHitpoint.z);
         // check if current intersection is closer than the closest previous Hitpoint
         // If yes then update. Since the old intersection is occluded by the old Intersection/Hit point
-        if (length(_ray.m_position - closestGlobalHitpoint_xyz) > length(_ray.m_position - currentGlobalIntersection_xyz) &&
+        if (length(_ray.m_position - dvec3(closestGlobalHitpoint)) > length(_ray.m_position - currentGlobalIntersection_xyz) &&
             currentIntersection.w != 0) {
             closestHitpoint       = currentIntersection;
             closestGlobalHitpoint = currentGlobalIntersection;

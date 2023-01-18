@@ -9,7 +9,14 @@ const double inm2eV = 1.239852e3;
 const double PI = 3.14159265358979323846264338327950;
 // 141592653589793238462643383279502884197169399
 
-/* The meaning of the `m_weight` field of a `Ray` { */
+
+// -----------------------------------------
+//
+//    WEIGHT STATUS
+//
+// -----------------------------------------
+
+// The meaning of the `m_weight` field of a `Ray` 
 // The future Path of this Ray does not intersect any elements anymore (in other words `getOpticalElementIntersection` yields w=0 for all elements)
 // This Ray now flies off to infinity.
 //
@@ -34,7 +41,12 @@ const double W_ABSORBED = 3;
 // This is the initial weight within outputData, and if less snapshots than `maxSnapshots` are taken,
 // the remaining weights in outputData will stay W_UNINIT even when returned to the CPU.
 const double W_UNINIT = 4;
-/* } */
+
+// -----------------------------------------
+//
+//    OBJECT TYPES
+//
+// -----------------------------------------
 
 // The meaning of surfaceParams[3][0] (i.e. the type of an element):
 const double TY_BASIC_MIRROR = 0;  // plane + sphere mirror

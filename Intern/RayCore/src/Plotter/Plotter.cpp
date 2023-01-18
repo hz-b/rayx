@@ -22,6 +22,7 @@ inline int last_obj(int extraParam) {
 bool last_comp(Ray const& lhs, Ray const& rhs) { return last_obj(lhs.m_extraParam) < last_obj(rhs.m_extraParam); }
 bool comp(Ray const& lhs, Ray const& rhs) { return lhs.m_extraParam < rhs.m_extraParam; }
 bool abs_comp(double const& lhs, double const& rhs) { return abs(lhs) < abs(rhs); }
+// bool ray_snapshot_comp(Ray const& lhs, Ray const& rhs) { if lhs. < rhs.m_extraParam; }
 inline bool int_close(double x, double y) { return abs(x - y) < std::numeric_limits<double>::epsilon(); }
 /**
  * @brief Plot the Data
@@ -76,16 +77,17 @@ void Plotter::plotLikeRAYUI(const std::vector<Ray>& RayList, const std::string& 
     std::vector<double> Xpos, Ypos;
     Xpos.reserve(RayList.size());
     Ypos.reserve(RayList.size());
+
     // Get elements that met Image plane (Last Element)
     auto max = std::max_element(RayList.begin(), RayList.end(), comp);
+    auto max_param = last_obj(max->m_extraParam);  // Looking for ImagePlane Index using the max param
 
-    auto max_param = last_obj(max->m_extraParam);
     if (max_param != (int)OpticalElementNames.size()) {
         RAYX_ERR << "No ray has hit the final optical element : " << OpticalElementNames.back();
     }
     // Create new RayList with right order
     for (auto r : RayList) {
-#if defined(LONGEST_PATH)
+#if defined(LONGEST_PATH)  // Only sequential or all rays that hit the last IP
         if (int_close(r.m_extraParam, max->m_extraParam)) {
 #else
         if (last_obj(r.m_extraParam) == max_param) {
@@ -182,7 +184,7 @@ void Plotter::plotforEach(const std::vector<Ray>& RayList, const std::string& pl
             matplotlibcpp::ylabel("y / mm");
             matplotlibcpp::title(std::to_string((int)u) + " (" + std::to_string(percent) + "%)");
 
-            matplotlibcpp::legend();
+            // matplotlibcpp::legend();
 
             i += 1;
             Xpos.clear();
@@ -198,9 +200,10 @@ void Plotter::plotforEach(const std::vector<Ray>& RayList, const std::string& pl
     title = title + "Multiplot \n \n";
     int e = 1;
     for (const auto& element : OpticalElementNames) {
-        title += " $\\it{" + std::to_string(e) + ": " + element + ((e % 3 != 0) ? " }$ ," : "}$\n");
+        title += " $\\it{" + std::to_string(e) + ": " + element + ((e % 5 != 0) ? " }$ ," : "}$\n");
         e++;
     }
+    title = title + "\n";
     matplotlibcpp::suptitle(title);
 
     matplotlibcpp::show();
