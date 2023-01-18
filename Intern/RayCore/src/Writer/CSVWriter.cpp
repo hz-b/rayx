@@ -65,30 +65,25 @@ Cell doubleToCell(double x) {
 
 void writeCSV(const RAYX::Rays& rays, std::string filename) {
     std::ofstream file(filename);
-
-    file << strToCell("Ray ID").buf << " | "       //
-         << strToCell("Snapshot ID").buf << " | "  //
-         << strToCell("X position").buf << " | "   //
-         << strToCell("Y position").buf << " | "   //
-         << strToCell("Z position").buf << " | "   //
-         << strToCell("Weight").buf << " | "       //
-         << strToCell("X direction").buf << " | "  //
-         << strToCell("Y direction").buf << " | "  //
-         << strToCell("Z direction").buf << " | "  //
-         << strToCell("Energy").buf << " | "       //
-         << strToCell("Stokes0").buf << " | "      //
-         << strToCell("Stokes1").buf << " | "      //
-         << strToCell("Stokes2").buf << " | "      //
-         << strToCell("Stokes3").buf << " | "      //
-         << strToCell("pathLength").buf << " | "   //
-         << strToCell("order").buf << " | "        //
-         << strToCell("lastElement").buf << " | "  //
+    const char delimiter = ',';
+    file << strToCell("Ray ID").buf << delimiter       //
+         << strToCell("Snapshot ID").buf << delimiter  //
+         << strToCell("X position").buf << delimiter   //
+         << strToCell("Y position").buf << delimiter   //
+         << strToCell("Z position").buf << delimiter   //
+         << strToCell("Weight").buf << delimiter       //
+         << strToCell("X direction").buf << delimiter  //
+         << strToCell("Y direction").buf << delimiter  //
+         << strToCell("Z direction").buf << delimiter  //
+         << strToCell("Energy").buf << delimiter       //
+         << strToCell("Stokes0").buf << delimiter      //
+         << strToCell("Stokes1").buf << delimiter      //
+         << strToCell("Stokes2").buf << delimiter      //
+         << strToCell("Stokes3").buf << delimiter      //
+         << strToCell("pathLength").buf << delimiter   //
+         << strToCell("order").buf << delimiter        //
+         << strToCell("lastElement").buf << delimiter  //
          << strToCell("extraParam").buf << '\n';
-
-    for (int i = 0; i < 320; i++) {
-        file << '-';
-    }
-    file << '\n';
 
     RAYX_VERB << "Writing " << rays.size() << " rays to file...";
 
@@ -96,23 +91,23 @@ void writeCSV(const RAYX::Rays& rays, std::string filename) {
         const auto& snapshots = rays[ray_id];
         for (unsigned long snapshot_id = 0; snapshot_id < snapshots.size(); snapshot_id++) {
             const auto& ray = snapshots[snapshot_id];
-            file << ulongToCell(ray_id).buf << " | "              //
-                 << ulongToCell(snapshot_id).buf << " | "         //
-                 << doubleToCell(ray.m_position.x).buf << " | "   //
-                 << doubleToCell(ray.m_position.y).buf << " | "   //
-                 << doubleToCell(ray.m_position.z).buf << " | "   //
-                 << doubleToCell(ray.m_weight).buf << " | "       //
-                 << doubleToCell(ray.m_direction.x).buf << " | "  //
-                 << doubleToCell(ray.m_direction.y).buf << " | "  //
-                 << doubleToCell(ray.m_direction.z).buf << " | "  //
-                 << doubleToCell(ray.m_energy).buf << " | "       //
-                 << doubleToCell(ray.m_stokes.x).buf << " | "     //
-                 << doubleToCell(ray.m_stokes.y).buf << " | "     //
-                 << doubleToCell(ray.m_stokes.z).buf << " | "     //
-                 << doubleToCell(ray.m_stokes.w).buf << " | "     //
-                 << doubleToCell(ray.m_pathLength).buf << " | "   //
-                 << doubleToCell(ray.m_order).buf << " | "        //
-                 << doubleToCell(ray.m_lastElement).buf << " | "  //
+            file << ulongToCell(ray_id).buf << delimiter              //
+                 << ulongToCell(snapshot_id).buf << delimiter         //
+                 << doubleToCell(ray.m_position.x).buf << delimiter   //
+                 << doubleToCell(ray.m_position.y).buf << delimiter   //
+                 << doubleToCell(ray.m_position.z).buf << delimiter   //
+                 << doubleToCell(ray.m_weight).buf << delimiter       //
+                 << doubleToCell(ray.m_direction.x).buf << delimiter  //
+                 << doubleToCell(ray.m_direction.y).buf << delimiter  //
+                 << doubleToCell(ray.m_direction.z).buf << delimiter  //
+                 << doubleToCell(ray.m_energy).buf << delimiter       //
+                 << doubleToCell(ray.m_stokes.x).buf << delimiter     //
+                 << doubleToCell(ray.m_stokes.y).buf << delimiter     //
+                 << doubleToCell(ray.m_stokes.z).buf << delimiter     //
+                 << doubleToCell(ray.m_stokes.w).buf << delimiter     //
+                 << doubleToCell(ray.m_pathLength).buf << delimiter   //
+                 << doubleToCell(ray.m_order).buf << delimiter        //
+                 << doubleToCell(ray.m_lastElement).buf << delimiter  //
                  << doubleToCell(ray.m_extraParam).buf << '\n';
         }
     }
