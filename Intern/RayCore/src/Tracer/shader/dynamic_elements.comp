@@ -65,8 +65,8 @@ void dynamicElements() {
 
     #ifdef RAYX_DEBUG_MODE // Debug Matrix only works in GPU Mode and on DEBUG Build Type
     #ifndef CPP
-    // Set Debug Struct of current Ray to identity
-    d_struct[uint(gl_GlobalInvocationID)]._dMat = dmat4(1);
+        // Set Debug Struct of current Ray to identity
+        d_struct[uint(gl_GlobalInvocationID)]._dMat = dmat4(1);
     #endif
     #endif
 
@@ -75,10 +75,8 @@ void dynamicElements() {
     nextElement.inTrans = dmat4(1);
     nextElement.outTrans = dmat4(1);
 
-    double bounce = 1;
-    
-
     // Iterate through all bounces
+    double bounce = 1;
     for (int i = 0; i < maxBounces; i++) {
         Collision col = find_collision();
 
@@ -96,22 +94,31 @@ void dynamicElements() {
 
         // Calculate interaction(reflection,material, absorption etc.) of ray with detected next element
         type = int(nextElement.surfaceParams[3][0]);
-        if (type == TY_BASIC_MIRROR) {
-            elem_ray = traceMirror(elem_ray, BasicMirror(col.elementIndex), ctr, col.hitpoint);
-        } else if (type == TY_PLANE_GRATING) {
-            elem_ray = tracePlaneGrating(elem_ray, PlaneGrating(col.elementIndex), ctr, col.hitpoint);
-        } else if (type == TY_GENERAL_GRATING) {
-            elem_ray = traceGeneralGrating(elem_ray, GeneralGrating(col.elementIndex), ctr, col.hitpoint);
-        } else if (type == TY_SLIT) {
-            elem_ray = traceSlit(elem_ray, Slit(col.elementIndex), ctr, col.hitpoint);
-        } else if (type == TY_RZP) {
-            elem_ray = traceRZP(elem_ray, Rzp(col.elementIndex), ctr, col.hitpoint);
-        } else if (type == TY_IMAGE_PLANE) {
-            elem_ray = traceImagePlane(elem_ray, ImagePlane(col.elementIndex), col.hitpoint);
-        } else if (type == TY_TOROID_MIRROR) {
-            elem_ray = traceToroid(elem_ray, ToroidMirror(col.elementIndex), ctr, col.hitpoint);
-        } else if (type == TY_ELLIPSOID_MIRROR) {
-            elem_ray = traceEllipsoidMirror(elem_ray, EllipsoidMirror(col.elementIndex), ctr, col.hitpoint);
+        switch(type){
+            case (TY_BASIC_MIRROR) :
+                elem_ray = traceMirror(elem_ray, BasicMirror(col.elementIndex), ctr, col.hitpoint);
+                break;
+            case(TY_PLANE_GRATING) :
+                elem_ray = tracePlaneGrating(elem_ray, PlaneGrating(col.elementIndex), ctr, col.hitpoint);
+                break;
+            case (TY_GENERAL_GRATING) :
+                elem_ray = traceGeneralGrating(elem_ray, GeneralGrating(col.elementIndex), ctr, col.hitpoint);
+                break;
+            case (TY_SLIT) :
+                elem_ray = traceSlit(elem_ray, Slit(col.elementIndex), ctr, col.hitpoint);
+                break;
+            case (TY_RZP) :
+                elem_ray = traceRZP(elem_ray, Rzp(col.elementIndex), ctr, col.hitpoint);
+                break;
+            case (TY_IMAGE_PLANE) :
+                elem_ray = traceImagePlane(elem_ray, ImagePlane(col.elementIndex), col.hitpoint);
+                break;
+            case (TY_TOROID_MIRROR) :
+                elem_ray = traceToroid(elem_ray, ToroidMirror(col.elementIndex), ctr, col.hitpoint);
+                break;
+            case (TY_ELLIPSOID_MIRROR) :
+                elem_ray = traceEllipsoidMirror(elem_ray, EllipsoidMirror(col.elementIndex), ctr, col.hitpoint);
+                break;
         }
         // use extraParameter to store the order in which the ray has hit which optical element (e.g extraParameter = 412 -> first hit element 2, then
         // 1, then 4)

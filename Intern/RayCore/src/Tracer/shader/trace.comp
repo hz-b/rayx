@@ -24,7 +24,7 @@ Ray traceSlit(Ray r, Slit slit, INOUT(uint64_t) ctr, dvec4 intersection) {
     bool stop_box = stopBox(r.m_position[0], r.m_position[1], xStop, yStop);
 
     if (!stop_box) {
-        r.m_weight = 2; // TODO what does weight = 2 mean?
+        r.m_weight = W_ABSORBED; // TODO what does weight = 2 mean?
         return r;
     }
 

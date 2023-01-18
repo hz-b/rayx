@@ -125,7 +125,7 @@ if(WIN32)
         ${COMPILED_SHADER}
         ${COMPILED_SHADER_FAKE}
         COMMAND "$ENV{VULKAN_SDK}/Bin/glslc.exe"
-        ARGS ${RayCore_SOURCE_DIR}/src/Tracer/shader/main-glsl.comp -o ${COMPILED_SHADER}
+        ARGS ${RayCore_SOURCE_DIR}/src/Tracer/shader/main-glsl.comp -o ${COMPILED_SHADER} -fshader-stage=compute
     )
 elseif(UNIX)
     add_custom_command(
@@ -133,7 +133,7 @@ elseif(UNIX)
         ${COMPILED_SHADER}
         ${COMPILED_SHADER_FAKE}
         COMMAND "glslc"
-        ARGS ${RayCore_SOURCE_DIR}/src/Tracer/shader/main-glsl.comp -o ${COMPILED_SHADER}
+        ARGS ${RayCore_SOURCE_DIR}/src/Tracer/shader/main-glsl.comp -o ${COMPILED_SHADER} -fshader-stage=compute
     )
 endif()
 
