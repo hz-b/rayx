@@ -60,13 +60,48 @@ Rays Tracer::trace(const Beamline& b) {
 
     return result;
 }
-
+/**
+ * @brief Get Rays in last snapshot
+ *
+ * @param rays
+ * @return std::vector<Ray>
+ */
 std::vector<Ray> extractLastSnapshot(const Rays& rays) {
     std::vector<Ray> out;
     for (auto& snapshots : rays) {
         out.push_back(snapshots.back());
     }
 
+    return out;
+}
+/**
+ * @brief Get Rays in first snapshot
+ *
+ * @param rays
+ * @return std::vector<Ray>
+ */
+std::vector<Ray> extracFirstSnapshot(const Rays& rays) {
+    std::vector<Ray> out;
+    for (auto& snapshots : rays) {
+        out.push_back(snapshots.front());
+    }
+
+    return out;
+}
+/***
+ * Get Rays Nth snapshot
+ */
+std::vector<Ray> extracNthSnapshot(const Rays& rays, int snapshotID) {
+    std::vector<Ray> out;
+    int skipped = 0;
+    for (auto& snapshots : rays) {
+        if ((int)snapshots.size() - 1 >= snapshotID) {
+            out.push_back(snapshots[snapshotID]);
+        } else {
+            skipped++;
+        }
+    }
+    RAYX_VERB << "Skipped " << skipped << " snapshots while extracting.";
     return out;
 }
 
