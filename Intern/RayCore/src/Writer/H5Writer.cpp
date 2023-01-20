@@ -8,6 +8,8 @@
 
 #include "Debug/Debug.h"
 
+using uint = unsigned int;
+
 /// writeH5 stores the rays as 18 doubles: ray_id, snapshot_id, [... contents of the RAYX::Ray struct]
 struct SerializedRay {
     double ray_id;

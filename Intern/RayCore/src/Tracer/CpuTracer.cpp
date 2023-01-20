@@ -10,6 +10,8 @@
 #include "Model/Beamline/OpticalElement.h"
 #include "Random.h"
 
+using uint = unsigned int;
+
 namespace RAYX {
 
 namespace CPU_TRACER {

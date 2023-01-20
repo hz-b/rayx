@@ -52,9 +52,9 @@ class RAYX_API Tracer {
 };
 
 // TODO deprecate these functions and all of their uses.
-std::vector<Ray> extractLastSnapshot(const Rays& rays);
+RAYX_API std::vector<Ray> extractLastSnapshot(const Rays& rays);
 std::vector<Ray> extracFirstSnapshot(const Rays& rays);
 std::vector<Ray> extracNthSnapshot(const Rays& rays, int snapshotID);
-Rays convertToRays(const std::vector<Ray>& rays);
+RAYX_API Rays convertToRays(const std::vector<Ray>& rays);
 
 }  // namespace RAYX

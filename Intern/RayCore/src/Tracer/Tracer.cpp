@@ -7,6 +7,8 @@
 #include "Debug/Instrumentor.h"
 #include "Random.h"
 
+using uint = unsigned int;
+
 namespace RAYX {
 
 const uint64_t BATCH_SIZE = 100000;
