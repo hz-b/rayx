@@ -19,4 +19,10 @@ set(CLI11_CLANG_TIDY OFF)
 add_subdirectory(CLI11)
 
 #add_subdirectory(matplotplusplus)
-#add_subdirectory(mathgl-8.0.1)
+
+set(enable-lgpl OFF)
+set(enable-mgl2 ON)
+set(enable-mpi OFF)
+set(enable-all-docs OFF)
+set(MathGL2alsExternPATH ${CMAKE_SOURCE_DIR}/Extern/mathgl-8.0.1)
+add_subdirectory(mathgl-8.0.1)

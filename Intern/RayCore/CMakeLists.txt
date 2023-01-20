@@ -84,6 +84,7 @@ target_compile_definitions(${PROJECT_NAME}
 find_package(Vulkan 1.3.216 REQUIRED)
 target_link_libraries(${PROJECT_NAME}
     PUBLIC Vulkan::Vulkan
+    mgl
 )
 
 # Link H5 Format
@@ -101,10 +102,27 @@ if(NOT "$ENV{CI}" STREQUAL "YES")
 endif()
 
 # MathGL
-set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${RayCore_SOURCE_DIR}/../../Extern/mathgl-8.0.1/scripts)
-find_package(MathGL2 REQUIRED mgl)
-# set(MATHGL2_INCLUDE_DIRS ${RayCore_SOURCE_DIR}/../../Extern/mathgl-8.0.1/include/mgl2)
-# message(STATUS ${MATHGL2_INCLUDE_DIRS})
+
+#include(ExternalProject)
+# ExternalProject_Add(MathGL2
+#     SOURCE_DIR  ${CMAKE_SOURCE_DIR}/Extern/mathgl-8.0.1/
+#     DOWNLOAD_COMMAND ""
+#     UPDATE_COMMAND ""
+#     BINARY_DIR  ${CMAKE_SOURCE_DIR}/Extern/mathgl-8.0.1/build/
+#     BUILD_COMMAND make
+#     CMAKE_ARGS -DCMAKE_INSTALL_PREFIX=${CMAKE_INSTALL_PREFIX} -DMATHGL_BUILD_SHARED=ON -DMATHGL_BUILD_STATIC=OFF -DCMAKE_BUILD_TYPE=Relase
+#     INSTALL_COMMAND make install
+#     DEPENDS ${PROJECT_NAME}
+# )
+#set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${CMAKE_SOURCE_DIR}/Extern/mathgl-8.0.1/scripts)
+#find_package(MathGL2)
+
+#ExternalProject_Get_Property(MathGL2 install_dir)
+#find_package(MathGL2 REQUIRED mgl)
+#target_link_libraries(${PROJECT_NAME} MathGL2)
+#set(MATHGL2_INCLUDE_DIRS ${install_dir}/include)
+#message(STATUS ${MATHGL2_INCLUDE_DIRS})
+#message(STATUS ${MATHGL2_LIBRARY})
 
 # Add Extern deps TODO(Jannis): the src include shouldn't be a SYSTEM include
 target_include_directories(${PROJECT_NAME}
@@ -113,14 +131,14 @@ target_include_directories(${PROJECT_NAME}
     PUBLIC ${RayCore_SOURCE_DIR}/../../Extern/rapidxml-1.13/
     PUBLIC ${RayCore_SOURCE_DIR}/../../Extern/HighFive/include/
     PUBLIC ${RayCore_SOURCE_DIR}/../../Extern/VMA/include/
-    PUBLIC ${RayCore_SOURCE_DIR}/../../Extern/mathgl-8.0.1/include/mgl2
+    PUBLIC ${RayCore_SOURCE_DIR}/../../Extern/mathgl-8.0.1/include
 )
 
-target_link_libraries(${PROJECT_NAME}
-    INTERFACE
-    mgl
-)
-message(STATUS ${MATHGL2_LIBRARY})
+# target_link_libraries(${PROJECT_NAME}
+#     INTERFACE
+#     mgl
+# )
+#message(STATUS ${MATHGL2_LIBRARY})
 
 
 # Compile Shaders

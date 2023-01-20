@@ -287,6 +287,8 @@ MGL_DEPENDENT_OPTION(enable-octave "Enable octave interface" OFF "NOT enable-lgp
 MGL_DEPENDENT_OPTION(enable-octave-install "Octave interface will install for all users" ON "NOT enable-lgpl" ON "NOT enable-all-swig" ON)
 
 include_directories( ${MathGL2_SOURCE_DIR}/include ${MathGL2_BINARY_DIR}/include)
+message(STATUS ${MathGL2_SOURCE_DIR} ${MathGL2_BINARY_DIR})
+
 set(MGL_INCLUDE_PATH "${CMAKE_INSTALL_PREFIX}/include/mgl2")
 set(MGL_CGI_PATH_INSTALL "lib/cgi-bin" CACHE STRING "Set CGI install directory")
 #set(MGL_CGI_PATH_INSTALL "share/mathgl" CACHE STRING "Set CGI install directory")

@@ -9,8 +9,9 @@ if(MSVC)
 	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /W4")
 else()
 	message(STATUS "GCC")
-	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -lmgl -Wall -Wextra -Wpedantic") # -Wconversion -Wsign-conversion")
-endif()
+	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra -Wpedantic ") # -Wconversion -Wsign-conversion")
+	set(CMAKE_VERBOSE_MAKEFILE ON)
+	endif()
 
 # Warnings are treated as errors on the CI Pipeline
 if("$ENV{CI}" STREQUAL "YES")
