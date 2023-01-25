@@ -158,6 +158,9 @@ class RAYX_API VulkanEngine {
     void createLogicalDevice();
     void createDescriptorSetLayout();
     void createCommandPool();
+    void createCommandBuffer();
+    void createCommandBuffers();
+
     void createStagingBuffer();
     void prepareVma();
 
@@ -165,7 +168,8 @@ class RAYX_API VulkanEngine {
     void runCommandBuffer();
     void createDescriptorSet();
     void createComputePipeline();
-    void createCommandBuffer();
+
+    VkCommandBuffer createOneTimeCommandBuffer();
 
     // CreateBuffer.cpp:
 

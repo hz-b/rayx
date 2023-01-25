@@ -9,9 +9,6 @@ void VulkanEngine::cleanup() {
         RAYX_ERR << "cleanup() only needs to be called after .run()!";
     }
 
-    vkFreeCommandBuffers(m_Device, m_CommandPool, 1, &m_ComputeCommandBuffer);
-    vkFreeCommandBuffers(m_Device, m_CommandPool, 1, &m_TransferCommandBuffer);
-
     vkDestroyPipeline(m_Device, m_Pipeline, nullptr);
     vkDestroyPipelineLayout(m_Device, m_PipelineLayout, nullptr);
     vkDestroyDescriptorPool(m_Device, m_DescriptorPool, nullptr);

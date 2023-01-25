@@ -9,7 +9,7 @@
     #define OUT(x) out x
     #define ALLOW_UNUSED
 
-    #extension GL_EXT_debug_printf : disable
+    #extension GL_EXT_debug_printf : enable
 	#extension GL_ARB_separate_shader_objects : enable
 	#extension GL_ARB_gpu_shader_int64 : enable
 	#extension GL_GOOGLE_include_directive : enable

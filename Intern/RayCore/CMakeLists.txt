@@ -51,9 +51,9 @@ SET(SOURCE
     src/VulkanEngine/Init/StagingBuffer.cpp
     src/VulkanEngine/Init/Init.cpp
     src/VulkanEngine/Init/PickDevice.cpp
-    src/VulkanEngine/Run/CreateCommandBuffer.cpp
-    src/VulkanEngine/Run/CreateComputePipeline.cpp
-    src/VulkanEngine/Run/CreateDescriptorSet.cpp
+    src/VulkanEngine/Run/CommandBuffer.cpp
+    src/VulkanEngine/Run/ComputePipeline.cpp
+    src/VulkanEngine/Run/DescriptorSet.cpp
     src/VulkanEngine/Run/RunCommandBuffer.cpp
     src/VulkanEngine/Run/Run.cpp
     src/Writer/CSVWriter.cpp

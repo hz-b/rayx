@@ -12,6 +12,7 @@ void VulkanEngine::init(VulkanEngineInitSpec_t spec) {
     setupDebugMessenger();
     pickDevice();
     createCommandPool();
+    createCommandBuffers();
     createDescriptorSetLayout();
     prepareVma();
     createStagingBuffer();
