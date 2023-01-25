@@ -11,29 +11,29 @@
 
 namespace RAYX {
 
-/// the argument type of `VulkanEngine::declareBuffer(_)`
-struct DeclareBufferSpec {
+// the argument type of `VulkanEngine::declareBuffer(_)`
+struct BufferDeclarationSpec_t {
     /// used to map the vulkan buffers to the shader buffers.
     /// Lines like `layout (binding = _)` declare buffers in the shader.
-    uint32_t m_binding;
+    uint32_t binding;
 
     /// expresses whether the buffer is allowed to be initialized with CPU-data.
-    bool m_in;
+    bool isInput;
 
     /// expresses whether the buffer is allowed to be read out to the CPU after
     /// the computation.
-    bool m_out;
+    bool isOutput;
 };
 
 /// the argument type of `VulkanEngine::init(_)`
-struct InitSpec {
+struct VulkanEngineInitSpec_t {
     /// the name of the shaderfile, as relative path - relative to the root of
     /// the repository
-    const char* m_shader;
+    const char* shaderFileName;
 };
 
 /// the argument type of `VulkanEngine::run(_)`
-struct RunSpec {
+struct VulkanEngineRunSpec_t {
     uint32_t m_numberOfInvocations;
 };
 
@@ -43,10 +43,10 @@ class RAYX_API VulkanEngine {
     ~VulkanEngine();
 
     /// buffers need to be declared before init() is called.
-    void declareBuffer(const char* bufname, DeclareBufferSpec);
+    void declareBuffer(const char* bufname, BufferDeclarationSpec_t);
 
     /// changes the state from PREINIT to PRERUN.
-    void init(InitSpec);
+    void init(VulkanEngineInitSpec_t);
 
     /// create a buffer and fill it with the data given in vec.
     /// the buffer will have exactly the size to fit all elements of vec.
@@ -61,13 +61,13 @@ class RAYX_API VulkanEngine {
 
     /// changes the state from PRERUN to POSTRUN
     /// This function runs the shader.
-    void run(RunSpec);
+    void run(VulkanEngineRunSpec_t);
 
     /// after run(_) is finished (i.e. in POSTRUN state)
     /// we can read the contents of `m_out = true`-buffers.
     template <typename T>
     inline std::vector<T> readBuffer(const char* bufname) {
-        std::vector<T> out(m_buffers[bufname].m_size / sizeof(T));
+        std::vector<T> out(m_buffers[bufname].size / sizeof(T));
         readBufferRaw(bufname, (char*)out.data());
         return out;
     }
@@ -78,7 +78,7 @@ class RAYX_API VulkanEngine {
 
     /// There are 3 basic states for the VulkanEngine. Described below.
     /// the variable m_state stores that state.
-    enum class EngineState {
+    enum class VulkanEngineStates_t {
         // the state before .init() is called.
         // legal functions: declareBuffer(), init().
         PREINIT,
@@ -94,60 +94,59 @@ class RAYX_API VulkanEngine {
         POSTRUN
     };
 
-    inline EngineState state() { return m_state; }
+    inline VulkanEngineStates_t state() { return m_state; }
 
     /// the internal representation of a buffer.
     /// m_in, m_out, m_binding are taken from DeclareBufferSpec.
     /// the other ones are initialized in createBuffer.
-    struct Buffer {
-        bool m_in;
-        bool m_out;
-        uint32_t m_binding;
-        VkBuffer m_Buffer;
-        VkDeviceMemory m_Memory;
-        VkDeviceSize m_size;
-        VmaAllocation m_BufferAllocation;
-        VmaAllocationInfo m_BufferAllocationInfo;
+    struct Buffer_t {
+        bool              isInput;
+        bool              isOutput;
+        uint32_t          binding;
+        VkBuffer          buf;
+        VkDeviceMemory    mem;
+        VkDeviceSize      size;
+        VmaAllocation     alloca;
+        VmaAllocationInfo allocaInfo;
     };
 
     // PushConstants are "constants" updated on each Dispatch Call (or similar) in the pipeline
     // Please pay attention to alignment rules
     // You can change this struct (also in shader)
-    struct pushConstant {
-        void* m_pushConstants_ptr;
+    struct pushConstants_t {
+        void*  pushConstPtr;
         size_t size;
     } m_pushConstants;
 
   private:
-    EngineState m_state = EngineState::PREINIT;
+    VulkanEngineStates_t m_state = VulkanEngineStates_t::PREINIT;
+    const char*          m_shaderfile;
+    uint32_t             m_numberOfInvocations;
+
     /// stores the Buffers by name.
-    std::map<std::string, Buffer> m_buffers;
-    const char* m_shaderfile;
-    uint32_t m_numberOfInvocations;
+    std::map<std::string, Buffer_t> m_buffers;
 
     /// This is the only staging buffer of the VulkanEngine.
     /// It's size is STAGING_SIZE.
-    // VkBuffer m_stagingBuffer;
-    /// the memory of the staging buffer above.
-    // VkDeviceMemory m_stagingMemory;
+    Buffer_t m_stagingBuffer;
 
-    Buffer m_stagingBuffer;
-
-    VkInstance m_Instance;
+    VkInstance               m_Instance;
     VkDebugUtilsMessengerEXT m_DebugMessenger;
-    VkPhysicalDevice m_PhysicalDevice = VK_NULL_HANDLE;
-    VkDevice m_Device;
-    VkPipeline m_Pipeline;
-    VkPipelineLayout m_PipelineLayout;
-    VkShaderModule m_ComputeShaderModule;
-    VkCommandPool m_CommandPool;
-    VkCommandBuffer m_CommandBuffer;
-    VkDescriptorPool m_DescriptorPool;
-    VkDescriptorSet m_DescriptorSet;
-    VkDescriptorSetLayout m_DescriptorSetLayout;
-    VkQueue m_ComputeQueue;
-    uint32_t m_computeFamily;
-    VmaAllocator m_VmaAllocator;
+    VkPhysicalDevice         m_PhysicalDevice = VK_NULL_HANDLE;
+    VkDevice                 m_Device;
+    VkPipeline               m_Pipeline;
+    VkPipelineLayout         m_PipelineLayout;
+    VkShaderModule           m_ComputeShaderModule;
+    VkCommandPool            m_CommandPool;
+    VkCommandBuffer          m_ComputeCommandBuffer;
+    VkCommandBuffer          m_TransferCommandBuffer;
+    VkQueue                  m_ComputeQueue;
+    VkQueue                  m_TransferQueue;
+    VkDescriptorPool         m_DescriptorPool;
+    VkDescriptorSet          m_DescriptorSet;
+    VkDescriptorSetLayout    m_DescriptorSetLayout;
+    uint32_t                 m_computeFamily;
+    VmaAllocator             m_VmaAllocator;
 
     // implementation details:
 
@@ -183,10 +182,9 @@ class RAYX_API VulkanEngine {
     // BufferIO:
 
     /// copies data from one buffer to the other with given offsets.
-    /// note that gpuMemcpy copies from left to right, unlike the original
-    /// memcpy. this is used for the buffer <-> staging buffer communication in
+    /// this is used for the buffer <-> staging buffer communication in
     /// {read,write}BufferRaw.
-    void gpuMemcpy(VkBuffer& buffer_src, size_t offset_src, VkBuffer& buffer_dst, size_t offset_dst, size_t bytes);
+    void gpuMemcpy(VkBuffer& buffer_dst, size_t offset_dst, VkBuffer& buffer_src, size_t offset_src, size_t bytes);
 
     /// reads a buffer and writes the data to `outdata`.
     /// the full buffer is read (the size is `m_buffers[bufname].m_size`)

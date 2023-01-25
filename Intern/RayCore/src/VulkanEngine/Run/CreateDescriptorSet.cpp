@@ -36,15 +36,15 @@ void VulkanEngine::createDescriptorSet() {
     for (auto& [name, b] : m_buffers) {
         // specify which buffer to use: input buffer
         VkDescriptorBufferInfo descriptorBufferInfo = {};
-        descriptorBufferInfo.buffer = b.m_Buffer;
+        descriptorBufferInfo.buffer = b.buf;
         descriptorBufferInfo.offset = 0;
-        descriptorBufferInfo.range = b.m_size;
+        descriptorBufferInfo.range = b.size;
 
         VkWriteDescriptorSet writeDescriptorSet = {};
         writeDescriptorSet.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
         writeDescriptorSet.pNext = nullptr;
         writeDescriptorSet.dstSet = m_DescriptorSet;  // write to this descriptor set.
-        writeDescriptorSet.dstBinding = b.m_binding;
+        writeDescriptorSet.dstBinding = b.binding;
         writeDescriptorSet.dstArrayElement = 0;
         writeDescriptorSet.descriptorCount = 1;                                 // update a single descriptor.
         writeDescriptorSet.descriptorType = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER;  // storage buffer.

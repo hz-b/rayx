@@ -2,10 +2,10 @@
 
 namespace RAYX {
 
-void VulkanEngine::run(RunSpec spec) {
-    if (m_state == EngineState::PREINIT) {
+void VulkanEngine::run(VulkanEngineRunSpec_t spec) {
+    if (m_state == VulkanEngineStates_t::PREINIT) {
         RAYX_ERR << "you've forgotton to .init() the VulkanEngine";
-    } else if (m_state == EngineState::POSTRUN) {
+    } else if (m_state == VulkanEngineStates_t::POSTRUN) {
         RAYX_ERR << "you've forgotton to .cleanup() the VulkanEngine";
     }
 
@@ -16,7 +16,7 @@ void VulkanEngine::run(RunSpec spec) {
     createCommandBuffer();
     runCommandBuffer();
 
-    m_state = EngineState::POSTRUN;
+    m_state = VulkanEngineStates_t::POSTRUN;
 }
 
 

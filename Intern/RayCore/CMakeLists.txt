@@ -39,16 +39,16 @@ SET(SOURCE
     src/Tracer/VulkanTracer.cpp
     src/Tracer/CpuTracer.cpp
     src/VulkanEngine/Cleanup.cpp
-    src/VulkanEngine/DeclareBuffer.cpp
-    src/VulkanEngine/CreateBuffer.cpp
-    src/VulkanEngine/BufferIO/GpuMemcpy.cpp
-    src/VulkanEngine/BufferIO/ReadBufferRaw.cpp
-    src/VulkanEngine/BufferIO/WriteBufferRaw.cpp
+    src/VulkanEngine/Buffer/DeclareBuffer.cpp
+    src/VulkanEngine/Buffer/CreateBuffer.cpp
+    src/VulkanEngine/Buffer/IO/GpuMemcpy.cpp
+    src/VulkanEngine/Buffer/IO/ReadBufferRaw.cpp
+    src/VulkanEngine/Buffer/IO/WriteBufferRaw.cpp
     src/VulkanEngine/Destruct.cpp
-    src/VulkanEngine/Init/CreateCommandPool.cpp
-    src/VulkanEngine/Init/CreateDescriptorSetLayout.cpp
-    src/VulkanEngine/Init/CreateInstance.cpp
-    src/VulkanEngine/Init/CreateStagingBuffer.cpp
+    src/VulkanEngine/Init/CommandPool.cpp
+    src/VulkanEngine/Init/DescriptorSetLayout.cpp
+    src/VulkanEngine/Init/Instance.cpp
+    src/VulkanEngine/Init/StagingBuffer.cpp
     src/VulkanEngine/Init/Init.cpp
     src/VulkanEngine/Init/PickDevice.cpp
     src/VulkanEngine/Run/CreateCommandBuffer.cpp

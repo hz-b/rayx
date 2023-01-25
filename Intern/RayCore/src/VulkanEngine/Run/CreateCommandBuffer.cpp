@@ -20,7 +20,7 @@ void VulkanEngine::createCommandBuffer() {
     commandBufferAllocateInfo.level = VK_COMMAND_BUFFER_LEVEL_PRIMARY;
     commandBufferAllocateInfo.commandBufferCount = 1;  // allocate a single command buffer.
     VK_CHECK_RESULT(vkAllocateCommandBuffers(m_Device, &commandBufferAllocateInfo,
-                                             &m_CommandBuffer));  // allocate command buffer.
+                                             &m_ComputeCommandBuffer));  // allocate command buffer.
 
     /*
     Now we shall start recording commands into the newly allocated command
@@ -32,15 +32,15 @@ void VulkanEngine::createCommandBuffer() {
                                                                          // submitted and used
                                                                          // once in this
                                                                          // application.
-    VK_CHECK_RESULT(vkBeginCommandBuffer(m_CommandBuffer, &beginInfo));  // start recording commands.
+    VK_CHECK_RESULT(vkBeginCommandBuffer(m_ComputeCommandBuffer, &beginInfo));  // start recording commands.
 
     /*
     We need to bind a pipeline, AND a descriptor set before we dispatch.
     The validation layer will NOT give warnings if you forget these, so be
     very careful not to forget them.
     */
-    vkCmdBindPipeline(m_CommandBuffer, VK_PIPELINE_BIND_POINT_COMPUTE, m_Pipeline);
-    vkCmdBindDescriptorSets(m_CommandBuffer, VK_PIPELINE_BIND_POINT_COMPUTE, m_PipelineLayout, 0, 1, &m_DescriptorSet, 0, nullptr);
+    vkCmdBindPipeline(m_ComputeCommandBuffer, VK_PIPELINE_BIND_POINT_COMPUTE, m_Pipeline);
+    vkCmdBindDescriptorSets(m_ComputeCommandBuffer, VK_PIPELINE_BIND_POINT_COMPUTE, m_PipelineLayout, 0, 1, &m_DescriptorSet, 0, nullptr);
     // vkCmdBindDescriptorSets(commandBuffer,
     // VK_PIPELINE_BIND_POINT_COMPUTE, pipelineLayout, 0, 1,
     // &descriptorSets[1], 0, NULL);
@@ -102,14 +102,14 @@ void VulkanEngine::createCommandBuffer() {
     /**
      * Update push constants
      */
-    vkCmdPushConstants(m_CommandBuffer, m_PipelineLayout, VK_SHADER_STAGE_COMPUTE_BIT, 0, m_pushConstants.size, m_pushConstants.m_pushConstants_ptr);
+    vkCmdPushConstants(m_ComputeCommandBuffer, m_PipelineLayout, VK_SHADER_STAGE_COMPUTE_BIT, 0, m_pushConstants.size, m_pushConstants.pushConstPtr);
 
     RAYX_VERB << "Dispatching commandBuffer...";
     RAYX_VERB << "Sending "
               << "(" << xgroups << ", " << ygroups << ", " << zgroups << ") to the GPU";
-    vkCmdDispatch(m_CommandBuffer, xgroups, ygroups, zgroups);
+    vkCmdDispatch(m_ComputeCommandBuffer, xgroups, ygroups, zgroups);
 
-    VK_CHECK_RESULT(vkEndCommandBuffer(m_CommandBuffer));  // end recording commands.
+    VK_CHECK_RESULT(vkEndCommandBuffer(m_ComputeCommandBuffer));  // end recording commands.
 }
 
 }  // namespace RAYX

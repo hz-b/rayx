@@ -5,11 +5,13 @@
 namespace RAYX {
 
 void VulkanEngine::cleanup() {
-    if (m_state != EngineState::POSTRUN) {
+    if (m_state != VulkanEngineStates_t::POSTRUN) {
         RAYX_ERR << "cleanup() only needs to be called after .run()!";
     }
 
-    vkFreeCommandBuffers(m_Device, m_CommandPool, 1, &m_CommandBuffer);
+    vkFreeCommandBuffers(m_Device, m_CommandPool, 1, &m_ComputeCommandBuffer);
+    vkFreeCommandBuffers(m_Device, m_CommandPool, 1, &m_TransferCommandBuffer);
+
     vkDestroyPipeline(m_Device, m_Pipeline, nullptr);
     vkDestroyPipelineLayout(m_Device, m_PipelineLayout, nullptr);
     vkDestroyDescriptorPool(m_Device, m_DescriptorPool, nullptr);
@@ -17,12 +19,12 @@ void VulkanEngine::cleanup() {
     for (auto& [name, buf] : m_buffers) {
         // vkDestroyBuffer(m_Device, buf.m_Buffer, nullptr);
         // vkFreeMemory(m_Device, buf.m_Memory, nullptr);
-        vmaDestroyBuffer(m_VmaAllocator, buf.m_Buffer, buf.m_BufferAllocation);
+        vmaDestroyBuffer(m_VmaAllocator, buf.buf, buf.alloca);
     }
 
     vkDestroyShaderModule(m_Device, m_ComputeShaderModule, nullptr);
 
-    m_state = EngineState::PRERUN;
+    m_state = VulkanEngineStates_t::PRERUN;
 }
 
 }  // namespace RAYX

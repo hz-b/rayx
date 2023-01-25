@@ -4,25 +4,25 @@
 
 namespace RAYX {
 void VulkanEngine::createBuffer(const char* bufname, VkDeviceSize size) {
-    if (m_state == EngineState::PREINIT) {
+    if (m_state == VulkanEngineStates_t::PREINIT) {
         RAYX_ERR << "you've forgotten to .init() the VulkanEngine";
-    } else if (m_state == EngineState::POSTRUN) {
+    } else if (m_state == VulkanEngineStates_t::POSTRUN) {
         RAYX_ERR << "you've forgotten to .cleanup() the VulkanEngine";
     }
 
-    Buffer& b = m_buffers[bufname];
-    b.m_size = size;
+    Buffer_t& b = m_buffers[bufname];
+    b.size      = size;
 
     int buffer_usage_flags = VK_BUFFER_USAGE_STORAGE_BUFFER_BIT;
-    if (b.m_in) {
+    if (b.isInput) {
         buffer_usage_flags |= VK_BUFFER_USAGE_TRANSFER_DST_BIT;
     }
-    if (b.m_out) {
+    if (b.isOutput) {
         buffer_usage_flags |= VK_BUFFER_USAGE_TRANSFER_SRC_BIT;
     }
 
     // createVkBuffer(size, buffer_usage_flags, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, b.m_Buffer, b.m_Memory);
-    createVmaBuffer(size, buffer_usage_flags, b.m_Buffer, b.m_BufferAllocation, &b.m_BufferAllocationInfo);
+    createVmaBuffer(size, buffer_usage_flags, b.buf, b.alloca, &b.allocaInfo);
 }
 
 uint32_t findMemoryType(VkPhysicalDevice& physicalDevice, uint32_t memoryTypeBits, VkMemoryPropertyFlags properties);
@@ -37,19 +37,19 @@ void VulkanEngine::createVkBuffer(VkDeviceSize size, VkBufferUsageFlags usage, V
                                   VkDeviceMemory& bufferMemory) {
     RAYX_PROFILE_FUNCTION();
     VkBufferCreateInfo bufferCreateInfo = {};
-    bufferCreateInfo.sType = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO;
-    bufferCreateInfo.size = size;
-    bufferCreateInfo.usage = usage;                            // buffer is used as a storage buffer.
-    bufferCreateInfo.sharingMode = VK_SHARING_MODE_EXCLUSIVE;  // buffer is exclusive to a single
-                                                               // queue family at a time.
+    bufferCreateInfo.sType              = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO;
+    bufferCreateInfo.size               = size;
+    bufferCreateInfo.usage              = usage;                      // buffer is used as a storage buffer.
+    bufferCreateInfo.sharingMode        = VK_SHARING_MODE_EXCLUSIVE;  // buffer is exclusive to a single
+                                                                      // queue family at a time.
     VK_CHECK_RESULT(vkCreateBuffer(m_Device, &bufferCreateInfo, nullptr, &buffer));
     VkMemoryRequirements memoryRequirements;
     vkGetBufferMemoryRequirements(m_Device, buffer, &memoryRequirements);
 
     VkMemoryAllocateInfo allocateInfo = {};
-    allocateInfo.sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO;
-    allocateInfo.allocationSize = memoryRequirements.size;  // specify required memory.
-    allocateInfo.memoryTypeIndex = findMemoryType(m_PhysicalDevice, memoryRequirements.memoryTypeBits, properties);
+    allocateInfo.sType                = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO;
+    allocateInfo.allocationSize       = memoryRequirements.size;  // specify required memory.
+    allocateInfo.memoryTypeIndex      = findMemoryType(m_PhysicalDevice, memoryRequirements.memoryTypeBits, properties);
     VK_CHECK_RESULT(vkAllocateMemory(m_Device, &allocateInfo, NULL,
                                      &bufferMemory));  // allocate memory on device.
 
@@ -63,14 +63,14 @@ void VulkanEngine::createVmaBuffer(VkDeviceSize size, VkBufferUsageFlags buffer_
                                    const std::vector<uint32_t>& queue_family_indices) {
     // Vulkan Buffer
     VkBufferCreateInfo bufferCreateinfo{};
-    bufferCreateinfo.sType = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO;
-    bufferCreateinfo.usage = buffer_usage;
-    bufferCreateinfo.size = size;
+    bufferCreateinfo.sType       = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO;
+    bufferCreateinfo.usage       = buffer_usage;
+    bufferCreateinfo.size        = size;
     bufferCreateinfo.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
     if (queue_family_indices.size() >= 2) {
-        bufferCreateinfo.sharingMode = VK_SHARING_MODE_CONCURRENT;
+        bufferCreateinfo.sharingMode           = VK_SHARING_MODE_CONCURRENT;
         bufferCreateinfo.queueFamilyIndexCount = static_cast<uint32_t>(queue_family_indices.size());
-        bufferCreateinfo.pQueueFamilyIndices = queue_family_indices.data();
+        bufferCreateinfo.pQueueFamilyIndices   = queue_family_indices.data();
     }
 
     VmaAllocationCreateInfo VmaBufferAllocationMemoryInfo{};

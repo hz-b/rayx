@@ -7,7 +7,7 @@ void VulkanEngine::createDescriptorSetLayout() {
 
     std::vector<VkDescriptorSetLayoutBinding> bindings;
     for (const auto& [name, b] : m_buffers) {
-        bindings.push_back({b.m_binding, VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, 1, VK_SHADER_STAGE_COMPUTE_BIT, nullptr});
+        bindings.push_back({b.binding, VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, 1, VK_SHADER_STAGE_COMPUTE_BIT, nullptr});
     }
 
     VkDescriptorSetLayoutCreateInfo descriptorSetLayoutCreateInfo = {};
