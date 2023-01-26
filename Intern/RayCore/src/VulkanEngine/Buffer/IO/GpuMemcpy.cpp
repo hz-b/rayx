@@ -34,7 +34,7 @@ void VulkanEngine::gpuMemcpy(VkBuffer& buffer_dst, size_t offset_dst, VkBuffer& 
     vkQueueSubmit(m_ComputeQueue, 1, &submitInfo, VK_NULL_HANDLE);
     vkQueueWaitIdle(m_ComputeQueue);
 
-    //vkFreeCommandBuffers(m_Device, m_CommandPool, 1, &commandBuffer);
+    // vkFreeCommandBuffers(m_Device, m_CommandPool, 1, &commandBuffer);
 }
 
 }  // namespace RAYX

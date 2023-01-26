@@ -10,7 +10,7 @@ void VulkanEngine::runCommandBuffer() {
 
     VkSubmitInfo submitInfo = {};
     submitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
-    submitInfo.commandBufferCount = 1;              // submit a single command buffer
+    submitInfo.commandBufferCount = 1;                     // submit a single command buffer
     submitInfo.pCommandBuffers = &m_ComputeCommandBuffer;  // the command buffer to submit.
 
     /*

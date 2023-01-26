@@ -84,7 +84,7 @@ void dynamicElements() {
             // no element was hit.
             // Ray is considered to move forward to inf.
             // This is the only constellation in which a snapshot is in world coordinates.
-            takeSnapshot(_ray, W_FLY_OFF);
+            takeFinalSnapshot(_ray, W_FLY_OFF);
             return;
         }
 
@@ -132,8 +132,8 @@ void dynamicElements() {
     }
 
     if (find_collision().found) {
-        takeSnapshot(_ray, W_NOT_ENOUGH_BOUNCES);
+        takeFinalSnapshot(_ray, W_NOT_ENOUGH_BOUNCES);
     } else {
-        takeSnapshot(_ray, W_FLY_OFF);
+        takeFinalSnapshot(_ray, W_FLY_OFF);
     }
 }

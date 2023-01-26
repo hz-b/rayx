@@ -113,6 +113,8 @@ struct Element {
 
 #endif
 
+bool finalized;
+
 // PushConstants 
 #ifdef CPP
     pushConstants_t pushConstants;
@@ -137,6 +139,8 @@ uint output_index(uint i) {
 // take a snapshot and store it in the next free spot in outputData.
 // `r` will typically be _ray, or some related ray.
 void takeSnapshot(Ray r, double w) {
+    if (finalized) { return; }
+
     #ifdef CPP
     if (w == W_UNINIT) {
         RAYX_ERR << "takeSnapshot called with W_UNINIT";
@@ -158,6 +162,14 @@ void takeSnapshot(Ray r, double w) {
     #endif
 }
 
+// like `takeSnapshot` above, but it will prevent taking more snapshots after this.
+// Is used for snapshots terminating the path of the ray.
+void takeFinalSnapshot(Ray r, double w) {
+    takeSnapshot(r, w);
+    finalized = true;
+}
+
+
 // Order in #include is IMPROTANT, do not change.
 // clang-format off
 #include "elements.comp"
@@ -178,6 +190,7 @@ void uninitRays() {
 }
 
 void main() {
+    finalized = false;
     uninitRays();
 
     // Printing ~DEBUG~ Example over vkconfig Validation Layers

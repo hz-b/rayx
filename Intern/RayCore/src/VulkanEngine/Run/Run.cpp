@@ -19,5 +19,4 @@ void VulkanEngine::run(VulkanEngineRunSpec_t spec) {
     m_state = VulkanEngineStates_t::POSTRUN;
 }
 
-
 }  // namespace RAYX

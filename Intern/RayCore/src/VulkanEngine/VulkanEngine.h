@@ -100,13 +100,13 @@ class RAYX_API VulkanEngine {
     /// m_in, m_out, m_binding are taken from DeclareBufferSpec.
     /// the other ones are initialized in createBuffer.
     struct Buffer_t {
-        bool              isInput;
-        bool              isOutput;
-        uint32_t          binding;
-        VkBuffer          buf;
-        VkDeviceMemory    mem;
-        VkDeviceSize      size;
-        VmaAllocation     alloca;
+        bool isInput;
+        bool isOutput;
+        uint32_t binding;
+        VkBuffer buf;
+        VkDeviceMemory mem;
+        VkDeviceSize size;
+        VmaAllocation alloca;
         VmaAllocationInfo allocaInfo;
     };
 
@@ -114,14 +114,14 @@ class RAYX_API VulkanEngine {
     // Please pay attention to alignment rules
     // You can change this struct (also in shader)
     struct pushConstants_t {
-        void*  pushConstPtr;
+        void* pushConstPtr;
         size_t size;
     } m_pushConstants;
 
   private:
     VulkanEngineStates_t m_state = VulkanEngineStates_t::PREINIT;
-    const char*          m_shaderfile;
-    uint32_t             m_numberOfInvocations;
+    const char* m_shaderfile;
+    uint32_t m_numberOfInvocations;
 
     /// stores the Buffers by name.
     std::map<std::string, Buffer_t> m_buffers;
@@ -130,23 +130,23 @@ class RAYX_API VulkanEngine {
     /// It's size is STAGING_SIZE.
     Buffer_t m_stagingBuffer;
 
-    VkInstance               m_Instance;
+    VkInstance m_Instance;
     VkDebugUtilsMessengerEXT m_DebugMessenger;
-    VkPhysicalDevice         m_PhysicalDevice = VK_NULL_HANDLE;
-    VkDevice                 m_Device;
-    VkPipeline               m_Pipeline;
-    VkPipelineLayout         m_PipelineLayout;
-    VkShaderModule           m_ComputeShaderModule;
-    VkCommandPool            m_CommandPool;
-    VkCommandBuffer          m_ComputeCommandBuffer;
-    VkCommandBuffer          m_TransferCommandBuffer;
-    VkQueue                  m_ComputeQueue;
-    VkQueue                  m_TransferQueue;
-    VkDescriptorPool         m_DescriptorPool;
-    VkDescriptorSet          m_DescriptorSet;
-    VkDescriptorSetLayout    m_DescriptorSetLayout;
-    uint32_t                 m_computeFamily;
-    VmaAllocator             m_VmaAllocator;
+    VkPhysicalDevice m_PhysicalDevice = VK_NULL_HANDLE;
+    VkDevice m_Device;
+    VkPipeline m_Pipeline;
+    VkPipelineLayout m_PipelineLayout;
+    VkShaderModule m_ComputeShaderModule;
+    VkCommandPool m_CommandPool;
+    VkCommandBuffer m_ComputeCommandBuffer;
+    VkCommandBuffer m_TransferCommandBuffer;
+    VkQueue m_ComputeQueue;
+    VkQueue m_TransferQueue;
+    VkDescriptorPool m_DescriptorPool;
+    VkDescriptorSet m_DescriptorSet;
+    VkDescriptorSetLayout m_DescriptorSetLayout;
+    uint32_t m_computeFamily;
+    VmaAllocator m_VmaAllocator;
 
     // implementation details:
 
