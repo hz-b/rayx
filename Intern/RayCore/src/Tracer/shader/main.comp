@@ -193,6 +193,9 @@ void main() {
     finalized = false;
     uninitRays();
 
+    // this is required as sometimes error codes are transmitted using _ray.m_weight
+    _ray.m_weight = W_UNINIT;
+
     // Printing ~DEBUG~ Example over vkconfig Validation Layers
     // if (uint(gl_GlobalInvocationID) == 2 ){
     // #ifndef CPP
