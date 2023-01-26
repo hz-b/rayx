@@ -13,7 +13,6 @@
 // Additionally to randomness tests, there can also be (non-randomized) regression tests in this module.
 // Which compares the current RAY-X the output of a previous RAY-X output which we deemed correct.
 
-/*
 TEST_F(TestSuite, PointSource_seeded) {
     RAYX::fixSeed(RAYX::FIXED_SEED);
     compareAgainstCorrect("PointSource_seeded");
@@ -36,5 +35,3 @@ TEST_F(TestSuite, MatrixSource_distr_seeded) {
     RAYX::fixSeed(RAYX::FIXED_SEED);
     compareAgainstCorrect("MatrixSource_distr_seeded");
 }
-*/
-// TODO

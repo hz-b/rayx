@@ -139,7 +139,7 @@ void compareRays(const RAYX::Rays& r1, const RAYX::Rays& r2, double t) {
 
     auto it2 = r2.begin();
 
-    while (it1 != it2) {
+    while (it1 != it1end) {
         auto& rr1 = *it1;
         auto& rr2 = *it2;
 
@@ -150,7 +150,7 @@ void compareRays(const RAYX::Rays& r1, const RAYX::Rays& r2, double t) {
 
         auto itr2 = rr2.begin();
 
-        while (itr1 != itr2) {
+        while (itr1 != itr1end) {
             auto ray1 = *itr1;
             auto ray2 = *itr2;
 
