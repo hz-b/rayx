@@ -84,6 +84,9 @@ Ray traceToroid(Ray r, ToroidMirror tor, INOUT(uint64_t) ctr, ALLOW_UNUSED dvec4
         efficiency(r, real_S, real_P, delta, incidence_angle, mat);
 
         update_stokes(r, real_S, real_P, delta, azimuthal_angle, ctr);
+        if (r.m_weight == W_THROWN_AWAY) {
+            takeFinalSnapshot(r, W_THROWN_AWAY);
+        }
         r.m_order = 0;
     }
     return r;
@@ -155,6 +158,11 @@ Ray traceRZP(Ray r, Rzp rzp, INOUT(uint64_t) ctr, dvec4 intersection) {
     double az = WL * DZ * Ord * 1e-6;
     double ax = WL * DX * Ord * 1e-6;
     r         = refrac2D(r, normal, az, ax);
+
+    if (r.m_weight == W_BEYOND_HORIZON) {
+        takeFinalSnapshot(r, W_BEYOND_HORIZON);
+    }
+
     r.m_order   = Ord;
 
     r.m_position.z += element_offset_z;
@@ -207,6 +215,10 @@ Ray tracePlaneGrating(Ray r, PlaneGrating pg, INOUT(uint64_t) ctr, dvec4 interse
     // calculate refracted ray
     r = refrac_plane(r, normal, a);
 
+    if (r.m_weight == W_BEYOND_HORIZON) {
+        takeFinalSnapshot(r, W_BEYOND_HORIZON);
+    }
+
     return r;
 }
 
@@ -248,6 +260,10 @@ Ray traceGeneralGrating(Ray r, GeneralGrating gg, INOUT(uint64_t) ctr, dvec4 int
     // refraction
     r = refrac(r, normal, linedensity);
 
+    if (r.m_weight == W_BEYOND_HORIZON) {
+        takeFinalSnapshot(r, W_BEYOND_HORIZON);
+    }
+
     return r;
 }
 
@@ -286,6 +302,9 @@ Ray traceMirror(Ray r, BasicMirror m, INOUT(uint64_t) ctr, dvec4 intersection) {
         efficiency(r, real_S, real_P, delta, incidence_angle, mat);
 
         update_stokes(r, real_S, real_P, delta, azimuthal_angle, ctr);
+        if (r.m_weight == W_THROWN_AWAY) {
+            takeFinalSnapshot(r, W_THROWN_AWAY);
+        }
         r.m_order = 0;
     }
     return r;
@@ -332,6 +351,9 @@ Ray traceEllipsoidMirror(Ray r, EllipsoidMirror ell, INOUT(uint64_t) ctr, dvec4 
         efficiency(r, real_S, real_P, delta, incidence_angle, mat);
 
         update_stokes(r, real_S, real_P, delta, azimuthal_angle, ctr);
+        if (r.m_weight == W_THROWN_AWAY) {
+            takeFinalSnapshot(r, W_THROWN_AWAY);
+        }
         r.m_order = 0;
     }
     return r;

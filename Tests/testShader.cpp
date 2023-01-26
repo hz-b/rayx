@@ -103,10 +103,10 @@ TEST_F(TestSuite, testRefrac2D) {
     correct[0].m_weight = 1;
     correct[0].m_direction = glm::dvec3(-0.012664171360811521, 0.021648721107426414, 0.99968542634078494);
 
-    correct[1].m_weight = 0;
+    correct[1].m_weight = W_BEYOND_HORIZON;
     correct[1].m_direction = glm::dvec3(0.00049999999722222276, -0.017285762731583675, 0.99985046502305308);
 
-    correct[2].m_weight = 0;
+    correct[2].m_weight = W_BEYOND_HORIZON;
     correct[2].m_direction = glm::dvec3(0.0001666666635802469, -0.017619047234249029, 0.99984475864845179);
 
     correct[3].m_weight = 1;
@@ -244,7 +244,7 @@ TEST_F(TestSuite, testRefrac) {
     correct[2].m_weight = 1;
     correct[2].m_direction = glm::dvec3(0.0049947959329671825, 0.99709586573547515, 0.07599267429701162);
 
-    correct[3].m_weight = 0;
+    correct[3].m_weight = W_BEYOND_HORIZON;
     correct[3].m_direction = glm::dvec3(-0.99991341437509562, 0.013149667401360443, -0.00049999997222215965);
 
     CHECK_EQ(input.size(), correct.size());

@@ -41,6 +41,14 @@ const double W_ABSORBED = 3;
 // the remaining weights in outputData will stay W_UNINIT even when returned to the CPU.
 const double W_UNINIT = 4;
 
+// This is an error code.
+// Functions like refrac2D can error due to "ray beyond horizon", see utils.comp.
+// In that case this is returned as final snapshot.
+const double W_BEYOND_HORIZON = 5;
+
+// Ray was thrown away, see `update_stokes`.
+const double W_THROWN_AWAY = 6;
+
 // -----------------------------------------
 //
 //    OBJECT TYPES
