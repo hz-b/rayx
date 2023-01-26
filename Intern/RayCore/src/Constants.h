@@ -31,9 +31,7 @@ const double W_JUST_HIT_ELEM = 1;
 const double W_NOT_ENOUGH_BOUNCES = 2;
 
 // This Ray was absorbed by `m_lastElement`.
-//
 // Ray is in element coordinates, relative to `m_lastElement`.
-// TODO not yet used!
 const double W_ABSORBED = 3;
 
 // This is a yet uninitialized ray from outputData.
@@ -45,9 +43,6 @@ const double W_UNINIT = 4;
 // Functions like refrac2D can error due to "ray beyond horizon", see utils.comp.
 // In that case this is returned as final snapshot.
 const double W_BEYOND_HORIZON = 5;
-
-// Ray was thrown away, see `update_stokes`.
-const double W_THROWN_AWAY = 6;
 
 // -----------------------------------------
 //

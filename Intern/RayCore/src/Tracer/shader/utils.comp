@@ -523,7 +523,7 @@ void update_stokes(INOUT(Ray) r, double real_S, double real_P, double delta,
 
     double rn = squaresDoubleRNG(ctr);
     // throw ray away with certain probability
-    if ((r.m_stokes.x / stokes_old.x) - rn <= 0) r.m_weight = W_THROWN_AWAY;
+    if ((r.m_stokes.x / stokes_old.x) - rn <= 0) r.m_weight = W_ABSORBED;
 }
 
 /**

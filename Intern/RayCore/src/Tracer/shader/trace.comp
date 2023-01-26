@@ -84,8 +84,8 @@ Ray traceToroid(Ray r, ToroidMirror tor, INOUT(uint64_t) ctr, ALLOW_UNUSED dvec4
         efficiency(r, real_S, real_P, delta, incidence_angle, mat);
 
         update_stokes(r, real_S, real_P, delta, azimuthal_angle, ctr);
-        if (r.m_weight == W_THROWN_AWAY) {
-            takeFinalSnapshot(r, W_THROWN_AWAY);
+        if (r.m_weight == W_ABSORBED) {
+            takeFinalSnapshot(r, W_ABSORBED);
         }
         r.m_order = 0;
     }
@@ -302,8 +302,8 @@ Ray traceMirror(Ray r, BasicMirror m, INOUT(uint64_t) ctr, dvec4 intersection) {
         efficiency(r, real_S, real_P, delta, incidence_angle, mat);
 
         update_stokes(r, real_S, real_P, delta, azimuthal_angle, ctr);
-        if (r.m_weight == W_THROWN_AWAY) {
-            takeFinalSnapshot(r, W_THROWN_AWAY);
+        if (r.m_weight == W_ABSORBED) {
+            takeFinalSnapshot(r, W_ABSORBED);
         }
         r.m_order = 0;
     }
@@ -351,8 +351,8 @@ Ray traceEllipsoidMirror(Ray r, EllipsoidMirror ell, INOUT(uint64_t) ctr, dvec4 
         efficiency(r, real_S, real_P, delta, incidence_angle, mat);
 
         update_stokes(r, real_S, real_P, delta, azimuthal_angle, ctr);
-        if (r.m_weight == W_THROWN_AWAY) {
-            takeFinalSnapshot(r, W_THROWN_AWAY);
+        if (r.m_weight == W_ABSORBED) {
+            takeFinalSnapshot(r, W_ABSORBED);
         }
         r.m_order = 0;
     }
