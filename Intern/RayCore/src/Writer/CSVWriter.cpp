@@ -9,6 +9,7 @@
 // writer:
 
 const int CELL_SIZE = 23;
+const char DELIMITER = ',';
 
 struct Cell {
     char buf[CELL_SIZE + 1];
@@ -65,24 +66,23 @@ Cell doubleToCell(double x) {
 
 void writeCSV(const RAYX::Rays& rays, std::string filename) {
     std::ofstream file(filename);
-    const char delimiter = ',';
-    file << strToCell("Ray ID").buf << delimiter       //
-         << strToCell("Snapshot ID").buf << delimiter  //
-         << strToCell("X position").buf << delimiter   //
-         << strToCell("Y position").buf << delimiter   //
-         << strToCell("Z position").buf << delimiter   //
-         << strToCell("Weight").buf << delimiter       //
-         << strToCell("X direction").buf << delimiter  //
-         << strToCell("Y direction").buf << delimiter  //
-         << strToCell("Z direction").buf << delimiter  //
-         << strToCell("Energy").buf << delimiter       //
-         << strToCell("Stokes0").buf << delimiter      //
-         << strToCell("Stokes1").buf << delimiter      //
-         << strToCell("Stokes2").buf << delimiter      //
-         << strToCell("Stokes3").buf << delimiter      //
-         << strToCell("pathLength").buf << delimiter   //
-         << strToCell("order").buf << delimiter        //
-         << strToCell("lastElement").buf << delimiter  //
+    file << strToCell("Ray ID").buf << DELIMITER       //
+         << strToCell("Snapshot ID").buf << DELIMITER  //
+         << strToCell("X position").buf << DELIMITER   //
+         << strToCell("Y position").buf << DELIMITER   //
+         << strToCell("Z position").buf << DELIMITER   //
+         << strToCell("Weight").buf << DELIMITER       //
+         << strToCell("X direction").buf << DELIMITER  //
+         << strToCell("Y direction").buf << DELIMITER  //
+         << strToCell("Z direction").buf << DELIMITER  //
+         << strToCell("Energy").buf << DELIMITER       //
+         << strToCell("Stokes0").buf << DELIMITER      //
+         << strToCell("Stokes1").buf << DELIMITER      //
+         << strToCell("Stokes2").buf << DELIMITER      //
+         << strToCell("Stokes3").buf << DELIMITER      //
+         << strToCell("pathLength").buf << DELIMITER   //
+         << strToCell("order").buf << DELIMITER        //
+         << strToCell("lastElement").buf << DELIMITER  //
          << strToCell("extraParam").buf << '\n';
 
     RAYX_VERB << "Writing " << rays.size() << " rays to file...";
@@ -91,23 +91,23 @@ void writeCSV(const RAYX::Rays& rays, std::string filename) {
         const auto& snapshots = rays[ray_id];
         for (unsigned long snapshot_id = 0; snapshot_id < snapshots.size(); snapshot_id++) {
             const auto& ray = snapshots[snapshot_id];
-            file << ulongToCell(ray_id).buf << delimiter              //
-                 << ulongToCell(snapshot_id).buf << delimiter         //
-                 << doubleToCell(ray.m_position.x).buf << delimiter   //
-                 << doubleToCell(ray.m_position.y).buf << delimiter   //
-                 << doubleToCell(ray.m_position.z).buf << delimiter   //
-                 << doubleToCell(ray.m_weight).buf << delimiter       //
-                 << doubleToCell(ray.m_direction.x).buf << delimiter  //
-                 << doubleToCell(ray.m_direction.y).buf << delimiter  //
-                 << doubleToCell(ray.m_direction.z).buf << delimiter  //
-                 << doubleToCell(ray.m_energy).buf << delimiter       //
-                 << doubleToCell(ray.m_stokes.x).buf << delimiter     //
-                 << doubleToCell(ray.m_stokes.y).buf << delimiter     //
-                 << doubleToCell(ray.m_stokes.z).buf << delimiter     //
-                 << doubleToCell(ray.m_stokes.w).buf << delimiter     //
-                 << doubleToCell(ray.m_pathLength).buf << delimiter   //
-                 << doubleToCell(ray.m_order).buf << delimiter        //
-                 << doubleToCell(ray.m_lastElement).buf << delimiter  //
+            file << ulongToCell(ray_id).buf << DELIMITER              //
+                 << ulongToCell(snapshot_id).buf << DELIMITER         //
+                 << doubleToCell(ray.m_position.x).buf << DELIMITER   //
+                 << doubleToCell(ray.m_position.y).buf << DELIMITER   //
+                 << doubleToCell(ray.m_position.z).buf << DELIMITER   //
+                 << doubleToCell(ray.m_weight).buf << DELIMITER       //
+                 << doubleToCell(ray.m_direction.x).buf << DELIMITER  //
+                 << doubleToCell(ray.m_direction.y).buf << DELIMITER  //
+                 << doubleToCell(ray.m_direction.z).buf << DELIMITER  //
+                 << doubleToCell(ray.m_energy).buf << DELIMITER       //
+                 << doubleToCell(ray.m_stokes.x).buf << DELIMITER     //
+                 << doubleToCell(ray.m_stokes.y).buf << DELIMITER     //
+                 << doubleToCell(ray.m_stokes.z).buf << DELIMITER     //
+                 << doubleToCell(ray.m_stokes.w).buf << DELIMITER     //
+                 << doubleToCell(ray.m_pathLength).buf << DELIMITER   //
+                 << doubleToCell(ray.m_order).buf << DELIMITER        //
+                 << doubleToCell(ray.m_lastElement).buf << DELIMITER  //
                  << doubleToCell(ray.m_extraParam).buf << '\n';
         }
     }
@@ -119,9 +119,8 @@ void writeCSV(const RAYX::Rays& rays, std::string filename) {
 RAYX::Rays RAYX_API loadCSV(std::string filename) {
     std::ifstream file(filename);
 
-    // ignore two setup lines
+    // ignore setup line
     std::string s;
-    std::getline(file, s);
     std::getline(file, s);
 
     RAYX::Rays out;
@@ -131,13 +130,13 @@ RAYX::Rays RAYX_API loadCSV(std::string filename) {
         std::stringstream ss(s);
         std::string num;
 
-        std::getline(ss, num, '|');
+        std::getline(ss, num, DELIMITER);
         unsigned long ray_id = std::stoi(num);
 
-        std::getline(ss, num, '|');
+        std::getline(ss, num, DELIMITER);
         unsigned long snapshot_id = std::stoi(num);
 
-        while (std::getline(ss, num, '|')) {
+        while (std::getline(ss, num, DELIMITER)) {
             d.push_back(std::stod(num));
         }
         assert(d.size() == 16);
