@@ -16,6 +16,11 @@ Ray traceSlit(Ray r, Slit slit, INOUT(uint64_t) ctr, dvec4 intersection) {
     // intersection)
     setIntersectionPoint(r, surfaceParams(slit), intersection);
 
+    // add the travelled distance from the previous position to the new intersection to pathlength (both are in the same coordinate system so we do
+    // not need to transform back to world coordinates??)
+    r.m_pathLength += length(old_position - r.m_position);
+    r.m_lastElement = slit.id + 1;
+
     double x_extent = width(slit);
     double y_extent = height(slit);
     double xStop    = beamstopWidth(slit);
@@ -27,11 +32,6 @@ Ray traceSlit(Ray r, Slit slit, INOUT(uint64_t) ctr, dvec4 intersection) {
         takeFinalSnapshot(r, W_ABSORBED);
         return r;
     }
-
-    // add the travelled distance from the previous position to the new intersection to pathlength (both are in the same coordinate system so we do
-    // not need to transform back to world coordinates??)
-    r.m_pathLength += length(old_position - r.m_position);
-    r.m_lastElement = slit.id + 1;
 
     double psi        = -r8_asin(r.m_direction.y);
     double phi        = r8_asin(r.m_direction.x / r8_cos(psi));

@@ -120,6 +120,10 @@ void dynamicElements() {
                 elem_ray = traceEllipsoidMirror(elem_ray, EllipsoidMirror(col.elementIndex), ctr, col.hitpoint);
                 break;
         }
+
+        // the ray might finalize due to being absorbed, or because an error occured while tracing!
+        if (finalized) { return; }
+
         // use extraParameter to store the order in which the ray has hit which optical element (e.g extraParameter = 412 -> first hit element 2, then
         // 1, then 4)
         elem_ray.m_extraParam += ((col.elementIndex + 1) * bounce) * int(elem_ray.m_lastElement == col.elementIndex + 1);
