@@ -881,10 +881,7 @@ checks whether the ray is hit by a central beam stopper which may be rectangular
 negative, then a circular shape of radius xStop is assumed (from RAY.FOR)
 @params		x,y				x/y-coord. of ray direction
             xStop, yStop	shape of beam stopper
-            weight			current weight of the ray, is changed if ray is
-stopped
-@return
-    new weight
+@returns `false` if the ray is stopped, and `true` otherwise
 */
 bool stopBox(double x, double y, double xStop, double yStop) {
     if (xStop > 0) {

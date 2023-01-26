@@ -57,18 +57,35 @@ TEST_F(TestSuite, Ellipsoid) {
 }
 
 TEST_F(TestSuite, Slit) {
-    // TODO
-    /*
-        auto rays = extractLastHit(traceRML("slit"));
-        for (auto r : rays) {
-            if (!intclose(r.m_weight, 1)) {
-                continue;
-            }
+    auto rays = traceRML("slit");
 
-            CHECK_IN(abs(r.m_position.x), 0, 6);
-            CHECK_IN(abs(r.m_position.y), 0.5, 1.3);
+    int absorbed = 0;      // number of rays absorbed by the slit.
+    int pass_through = 0;  // number of rays passing through the slit.
+
+    const auto SLIT_ID = 1;
+    const auto IMAGE_PLANE_ID = 2;
+
+    for (auto snapshots : rays) {
+        if (snapshots.size() == 1) {  // matrix source -> slit absorbed
+            CHECK(snapshots[0].m_lastElement == SLIT_ID);
+            CHECK(snapshots[0].m_weight == W_ABSORBED);
+            absorbed++;
+        } else if (snapshots.size() == 3) {  // matrix source -> slit -> image plane -> fly off
+            CHECK(snapshots[0].m_lastElement == SLIT_ID);
+            CHECK(snapshots[0].m_weight == W_JUST_HIT_ELEM);
+
+            CHECK(snapshots[1].m_lastElement == IMAGE_PLANE_ID);
+            CHECK(snapshots[1].m_weight == W_JUST_HIT_ELEM);
+
+            CHECK(snapshots[2].m_weight == W_FLY_OFF);
+            pass_through++;
+        } else {
+            CHECK(false);
         }
-    */
+    }
+
+    CHECK_EQ(absorbed, 8);
+    CHECK_EQ(pass_through, 92);
 }
 
 TEST_F(TestSuite, toroid) { compareLastAgainstRayUI("toroid"); }

@@ -13,10 +13,16 @@ Slit::Slit(const DesignObject& dobj) : OpticalElement(dobj) {
 
     m_centralBeamstop = dobj.parseCentralBeamstop();
 
-    m_beamstopWidth = m_centralBeamstop == CentralBeamstop::None
-                          ? 0
-                          : (m_centralBeamstop == CentralBeamstop::Elliptical ? -abs(beamstopWidth) : abs(beamstopWidth));
-    m_beamstopHeight = m_centralBeamstop == CentralBeamstop::None ? 0 : abs(beamstopHeight) != 0;
+    if (m_centralBeamstop == CentralBeamstop::None) {
+        m_beamstopWidth = 0;
+        m_beamstopHeight = 0;
+    } else if (m_centralBeamstop == CentralBeamstop::Elliptical) {
+        m_beamstopWidth = -abs(beamstopWidth);  // negative width expresses that beamstop it elliptical.
+        m_beamstopHeight = abs(beamstopHeight);
+    } else if (m_centralBeamstop == CentralBeamstop::Rectangle) {
+        m_beamstopWidth = beamstopWidth;
+        m_beamstopHeight = beamstopHeight;
+    }
 
     setSurface(std::make_unique<Quadric>(glm::dmat4x4{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -1, TY_SLIT, 0, 0, 0}));
 }
