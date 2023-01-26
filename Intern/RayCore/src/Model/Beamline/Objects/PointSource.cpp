@@ -1,5 +1,6 @@
 #include "PointSource.h"
 
+#include "Constants.h"
 #include "Data/xml.h"
 #include "Debug/Debug.h"
 #include "Random.h"
@@ -64,7 +65,7 @@ std::vector<Ray> PointSource::getRays() const {
         glm::dvec3 direction = getDirectionFromAngles(phi, psi);
         glm::dvec4 stokes = glm::dvec4(1, getLinear0(), getLinear45(), getCircular());
 
-        Ray r = {position, 1.0, direction, en, stokes, 0.0, 0.0, 0.0, 0.0};
+        Ray r = {position, W_UNINIT, direction, en, stokes, 0.0, 0.0, 0.0, 0.0};
 
         rayList.push_back(r);
     }

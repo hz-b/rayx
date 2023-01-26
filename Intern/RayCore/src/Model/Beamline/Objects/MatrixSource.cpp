@@ -1,5 +1,6 @@
 #include "MatrixSource.h"
 
+#include "Constants.h"
 #include "Data/xml.h"
 #include "Debug/Debug.h"
 #include "Debug/Instrumentor.h"
@@ -43,7 +44,7 @@ std::vector<Ray> MatrixSource::getRays() const {
             glm::dvec3 direction = getDirectionFromAngles(phi, psi);
             glm::dvec4 stokes = glm::dvec4(1, getLinear0(), getLinear45(), getCircular());
 
-            Ray r = {position, 1.0, direction, en, stokes, 0.0, 0.0, 0.0, 0.0};
+            Ray r = {position, W_UNINIT, direction, en, stokes, 0.0, 0.0, 0.0, 0.0};
             // Ray(1, 2, 3, 7, 4, 5, 6, 8, 9, 10, 11, 12, 13, 14, 15, 16);
             returnList.push_back(r);
         }
