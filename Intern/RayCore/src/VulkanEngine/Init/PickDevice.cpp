@@ -121,8 +121,10 @@ std::optional<uint32_t> findQueueFamilies(VkPhysicalDevice device) {
     return {};
 }
 
-// creates a logical device to communicate with the physical device
-// Create Queues to send commands too
+/**
+ * @brief Create Logical Device and extensions (also Compute Family and Queues)
+ *
+ */
 void VulkanEngine::createLogicalDevice() {
     RAYX_PROFILE_FUNCTION();
     m_computeFamily = findQueueFamilies(m_PhysicalDevice).value();

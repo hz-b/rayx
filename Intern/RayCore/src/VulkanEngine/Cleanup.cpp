@@ -11,7 +11,6 @@ void VulkanEngine::cleanup() {
 
     vkDestroyPipeline(m_Device, m_Pipeline, nullptr);
     vkDestroyPipelineLayout(m_Device, m_PipelineLayout, nullptr);
-    vkDestroyDescriptorPool(m_Device, m_DescriptorPool, nullptr);
 
     for (auto& [name, buf] : m_buffers) {
         // vkDestroyBuffer(m_Device, buf.m_Buffer, nullptr);

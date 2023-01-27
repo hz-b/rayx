@@ -30,8 +30,9 @@ VulkanEngine::~VulkanEngine() {
 
     vmaDestroyBuffer(m_VmaAllocator, m_stagingBuffer.buf, m_stagingBuffer.alloca);
     vmaDestroyAllocator(m_VmaAllocator);
-    vkDestroyDescriptorSetLayout(m_Device, m_DescriptorSetLayout, nullptr);
     vkDestroyCommandPool(m_Device, m_CommandPool, nullptr);
+    vkDestroyDescriptorSetLayout(m_Device, m_DescriptorSetLayout, nullptr);
+    vkDestroyDescriptorPool(m_Device, m_DescriptorPool, nullptr);
 
     {
         RAYX_PROFILE_SCOPE_STDOUT("vkDestroyDevice");

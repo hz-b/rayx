@@ -11,10 +11,10 @@ void VulkanEngine::run(VulkanEngineRunSpec_t spec) {
 
     m_numberOfInvocations = spec.m_numberOfInvocations;
 
-    createDescriptorSet();
+    updteDescriptorSets();
     createComputePipeline();
-    createCommandBuffer();
-    runCommandBuffer();
+    recordInComputeCommandBuffer();
+    submitCommandBuffer();
 
     m_state = VulkanEngineStates_t::POSTRUN;
 }

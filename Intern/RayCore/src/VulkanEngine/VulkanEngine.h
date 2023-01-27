@@ -157,16 +157,17 @@ class RAYX_API VulkanEngine {
     void pickPhysicalDevice();
     void createLogicalDevice();
     void createDescriptorSetLayout();
+    void createAllocateDescriptorPool(uint32_t);
     void createCommandPool();
-    void createCommandBuffer();
     void createCommandBuffers();
+    void recordInComputeCommandBuffer();
 
     void createStagingBuffer();
     void prepareVma();
 
     // Run:
-    void runCommandBuffer();
-    void createDescriptorSet();
+    void submitCommandBuffer();
+    void updteDescriptorSets();
     void createComputePipeline();
 
     VkCommandBuffer createOneTimeCommandBuffer();

@@ -53,10 +53,10 @@ void VulkanEngine::createComputePipeline() {
     pipelineLayoutCreateInfo.pSetLayouts = &m_DescriptorSetLayout;
 
     /*
-        Add push constants to the Pipeline
+    Add push constants to the Pipeline
     */
     VkPushConstantRange pushConstant;
-    pushConstant.offset = 0;  // Can change this of some of the struct is to be ignored
+    pushConstant.offset = 0;  // Can change this if some of the struct is to be ignored
     pushConstant.size = m_pushConstants.size;
     pushConstant.stageFlags = VK_SHADER_STAGE_COMPUTE_BIT;
 

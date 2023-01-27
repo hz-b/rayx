@@ -14,6 +14,7 @@ void VulkanEngine::init(VulkanEngineInitSpec_t spec) {
     createCommandPool();
     createCommandBuffers();
     createDescriptorSetLayout();
+    createAllocateDescriptorPool(m_buffers.size());
     prepareVma();
     createStagingBuffer();
 
