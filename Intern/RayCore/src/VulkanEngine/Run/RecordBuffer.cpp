@@ -14,10 +14,6 @@ void VulkanEngine::recordInComputeCommandBuffer() {
     */
     VkCommandBufferBeginInfo beginInfo = {};
     beginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
-    // beginInfo.flags = VK_COMMAND_BUFFER_USAGE_SIMULTANEOUS_USE_BIT;  // the buffer is only
-    // // //                                                                                    // submitted and used
-    // // //                                                                                    // once in this
-    // // //                                                                                    // application.
     VK_CHECK_RESULT(vkBeginCommandBuffer(m_ComputeCommandBuffer, &beginInfo));  // start recording commands.
 
     /*

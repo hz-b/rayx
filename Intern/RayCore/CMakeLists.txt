@@ -52,6 +52,7 @@ SET(SOURCE
     src/VulkanEngine/Init/Init.cpp
     src/VulkanEngine/Init/PickDevice.cpp
     src/VulkanEngine/Init/CommandBuffer.cpp
+    src/VulkanEngine/Init/Cache.cpp
     src/VulkanEngine/Run/RecordBuffer.cpp
     src/VulkanEngine/Run/ComputePipeline.cpp
     src/VulkanEngine/Run/DescriptorSet.cpp
