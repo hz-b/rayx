@@ -32,9 +32,12 @@ void inline storePipelineCache(VkDevice& device, VkPipelineCache& cache) {
 
         // Cache is stored in OS TEMP
         auto tmpDir = std::filesystem::temp_directory_path();
-
-        /* Write pipeline cache data to a file in binary format */
-        writeFile(data, tmpDir / "pipeline_cache.data");
+        try {
+            /* Write pipeline cache data to a file in binary format */
+            writeFile(data, tmpDir / "pipeline_cache.data");
+        } catch (std::runtime_error& ex) {
+            RAYX_WARN << "No pipeline cache written.";
+        }
 
         /* Destroy Vulkan pipeline cache */
         vkDestroyPipelineCache(device, cache, nullptr);
@@ -61,6 +64,10 @@ VulkanEngine::~VulkanEngine() {
     vkDestroyCommandPool(m_Device, m_CommandPool, nullptr);
     vkDestroyDescriptorSetLayout(m_Device, m_DescriptorSetLayout, nullptr);
     vkDestroyDescriptorPool(m_Device, m_DescriptorPool, nullptr);
+
+    vkDestroySemaphore(m_Device, m_Semaphores.computeSemaphore, nullptr);
+    vkDestroySemaphore(m_Device, m_Semaphores.transferSemaphore, nullptr);
+
     vkDestroyShaderModule(m_Device, m_ComputeShaderModule, nullptr);
     storePipelineCache(m_Device, m_PipelineCache);
 

@@ -13,6 +13,7 @@ void VulkanEngine::init(VulkanEngineInitSpec_t spec) {
     pickDevice();
     createCommandPool();
     createCommandBuffers();
+    createSemaphores();
     createDescriptorSetLayout();
     createAllocateDescriptorPool(m_buffers.size());
     prepareVma();

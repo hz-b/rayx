@@ -163,8 +163,9 @@ class RAYX_API VulkanEngine {
     void createCommandPool();
     void createCommandBuffers();
     void createShaderModule();
+    void recordFullCommand();
     void recordInComputeCommandBuffer();
-
+    void createSemaphores();
     void createStagingBuffer();
     void prepareVma();
 
@@ -172,6 +173,12 @@ class RAYX_API VulkanEngine {
     void submitCommandBuffer();
     void updteDescriptorSets();
     void createComputePipeline();
+
+    // Sync:
+    struct {
+        VkSemaphore computeSemaphore;
+        VkSemaphore transferSemaphore;
+    } m_Semaphores;
 
     VkCommandBuffer createOneTimeCommandBuffer();
 

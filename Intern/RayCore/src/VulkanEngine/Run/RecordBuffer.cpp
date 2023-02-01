@@ -7,7 +7,12 @@ namespace RAYX {
 void VulkanEngine::recordInComputeCommandBuffer() {
     RAYX_PROFILE_FUNCTION();
     RAYX_VERB << "Recording commandBuffer..";
-
+    static uint32_t requiredGroup = 0;
+    static struct {
+        uint32_t x = 0;
+        uint32_t y = 0;
+        uint32_t z = 0;
+    } group;
     /*
     Now we shall start recording commands into the newly allocated command
     buffer.
@@ -34,7 +39,6 @@ void VulkanEngine::recordInComputeCommandBuffer() {
     OpenGL, this should be nothing new to you.
     */
     auto requiredLocalWorkGroupNo = (uint32_t)ceil(m_numberOfInvocations / float(WORKGROUP_SIZE));  // number of local works groups
-
     // check if there are too many rays
     VkPhysicalDeviceProperties deviceProperties;
     vkGetPhysicalDeviceProperties(m_PhysicalDevice, &deviceProperties);
@@ -55,30 +59,35 @@ void VulkanEngine::recordInComputeCommandBuffer() {
     } else {
         RAYX_VERB << "your machine supports up to " << xgroups * ygroups * zgroups * WORKGROUP_SIZE << " rays";
     }
+    
+    if (requiredGroup != requiredLocalWorkGroupNo) {
+        // decrease xgroups, ygroups, zgroups so that we get a small number of
+        // workgroups stlil covering requiredLocalWorkGroupNo
+        {
+            while (xgroups * ygroups * (zgroups / 2) >= requiredLocalWorkGroupNo) {
+                zgroups /= 2;
+            }
+            while (xgroups * ygroups * (zgroups - 1) >= requiredLocalWorkGroupNo) {
+                zgroups--;
+            }
 
-    // decrease xgroups, ygroups, zgroups so that we get a small number of
-    // workgroups stlil covering requiredLocalWorkGroupNo
-    {
-        while (xgroups * ygroups * (zgroups / 2) >= requiredLocalWorkGroupNo) {
-            zgroups /= 2;
-        }
-        while (xgroups * ygroups * (zgroups - 1) >= requiredLocalWorkGroupNo) {
-            zgroups--;
-        }
+            while (xgroups * (ygroups / 2) * zgroups >= requiredLocalWorkGroupNo) {
+                ygroups /= 2;
+            }
+            while (xgroups * (ygroups - 1) * zgroups >= requiredLocalWorkGroupNo) {
+                ygroups--;
+            }
 
-        while (xgroups * (ygroups / 2) * zgroups >= requiredLocalWorkGroupNo) {
-            ygroups /= 2;
+            while ((xgroups / 2) * ygroups * zgroups >= requiredLocalWorkGroupNo) {
+                xgroups /= 2;
+            }
+            while ((xgroups - 1) * ygroups * zgroups >= requiredLocalWorkGroupNo) {
+                xgroups--;
+            }
         }
-        while (xgroups * (ygroups - 1) * zgroups >= requiredLocalWorkGroupNo) {
-            ygroups--;
-        }
-
-        while ((xgroups / 2) * ygroups * zgroups >= requiredLocalWorkGroupNo) {
-            xgroups /= 2;
-        }
-        while ((xgroups - 1) * ygroups * zgroups >= requiredLocalWorkGroupNo) {
-            xgroups--;
-        }
+        group.x = xgroups;
+        group.y = ygroups;
+        group.z = zgroups;
     }
 
     /**
@@ -88,10 +97,33 @@ void VulkanEngine::recordInComputeCommandBuffer() {
 
     RAYX_VERB << "Dispatching commandBuffer...";
     RAYX_VERB << "Sending "
-              << "(" << xgroups << ", " << ygroups << ", " << zgroups << ") to the GPU";
-    vkCmdDispatch(m_ComputeCommandBuffer, xgroups, ygroups, zgroups);
+              << "(" << group.x << ", " << group.z << ", " << group.y << ") to the GPU";
+    vkCmdDispatch(m_ComputeCommandBuffer, group.x, group.z, group.y);
 
     VK_CHECK_RESULT(vkEndCommandBuffer(m_ComputeCommandBuffer));  // end recording commands.
+}
+/**
+ * @brief Records a transfer to GPU, Compute, and transfer back from GPU command.
+ * WARNING: Make sure to update descriptorSets, offsets, and PushConstants beforehand!
+ */
+void VulkanEngine::recordFullCommand() {
+    RAYX_PROFILE_FUNCTION();
+    RAYX_VERB << "Recording full commandBuffer..";
+
+    /*
+    Start with transfer to GPU
+    */
+    VkCommandBufferBeginInfo beginInfo{};
+    beginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
+
+    vkBeginCommandBuffer(m_TransferCommandBuffer, &beginInfo);
+
+    // VkBufferCopy copyRegion{};
+    // copyRegion.srcOffset = offset_src;
+    // copyRegion.dstOffset = offset_dst;
+    // copyRegion.size = bytes;
+
+    // vkCmdCopyBuffer(m_TransferCommandBuffer, buffer_src, buffer_dst, 1, &copyRegion);
 }
 
 }  // namespace RAYX
