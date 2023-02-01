@@ -18,6 +18,7 @@ void VulkanEngine::init(VulkanEngineInitSpec_t spec) {
     prepareVma();
     createStagingBuffer();
     createCache();
+    createShaderModule();
 
     m_state = VulkanEngineStates_t::PRERUN;
 }

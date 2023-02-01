@@ -162,6 +162,7 @@ class RAYX_API VulkanEngine {
     void createAllocateDescriptorPool(uint32_t);
     void createCommandPool();
     void createCommandBuffers();
+    void createShaderModule();
     void recordInComputeCommandBuffer();
 
     void createStagingBuffer();

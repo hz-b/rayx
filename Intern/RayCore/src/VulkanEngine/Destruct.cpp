@@ -61,6 +61,7 @@ VulkanEngine::~VulkanEngine() {
     vkDestroyCommandPool(m_Device, m_CommandPool, nullptr);
     vkDestroyDescriptorSetLayout(m_Device, m_DescriptorSetLayout, nullptr);
     vkDestroyDescriptorPool(m_Device, m_DescriptorPool, nullptr);
+    vkDestroyShaderModule(m_Device, m_ComputeShaderModule, nullptr);
     storePipelineCache(m_Device, m_PipelineCache);
 
     {
