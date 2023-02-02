@@ -30,8 +30,14 @@ def plot(filename: str):
     fig.suptitle("Ray Density")
     for e, ax in zip(elems, axs):
         d = df[df["lastElement"] == e]
-        ax.hist2d(d["Xloc"], d["Yloc"], bins=200)
+        # we don't know whether the element is in the XY or XZ plane,
+        # this `relevance` tests which axis is more important.
+        relevance = lambda v: max(v) - min(v)
+        Y = relevance(d["Yloc"]) > relevance(d["Zloc"])
+        ax.hist2d(d["Xloc"], d["Yloc"] if Y else d["Zloc"], bins=200)
         ax.set_title("Footprint of element " + str(int(e)))
+        ax.set_xlabel("x")
+        ax.set_ylabel("y" if Y else "z")
     plt.show()
 
 if __name__ == "__main__":
