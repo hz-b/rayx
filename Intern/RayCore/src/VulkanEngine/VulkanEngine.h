@@ -169,6 +169,9 @@ class RAYX_API VulkanEngine {
     void createStagingBuffer();
     void prepareVma();
 
+    void getAllMemories();
+    VkDeviceSize getStagingBufferSize();
+
     // Run:
     void submitCommandBuffer();
     void updteDescriptorSets();
