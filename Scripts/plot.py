@@ -27,6 +27,7 @@ def plot(filename: str):
     df = importOutput(filename)
     elems = df["lastElement"].unique()
     fig, axs = plt.subplots(len(elems))
+    if len(elems) == 1: axs = [axs]
     fig.suptitle("Ray Density")
     for e, ax in zip(elems, axs):
         d = df[df["lastElement"] == e]
