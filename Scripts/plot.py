@@ -1,3 +1,5 @@
+#!/usr/bin/python3 -B
+
 import h5py
 import sys
 import pandas as pd
