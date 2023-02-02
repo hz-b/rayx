@@ -45,11 +45,10 @@ void writeH5(const RAYX::Rays& rays, std::string filename) {
 
     HighFive::File file(filename, HighFive::File::ReadWrite | HighFive::File::Create | HighFive::File::Truncate);
 
-    const uint32_t numRays = rays.size();
     auto srays = serialize(rays);
 
     try {
-        auto dataspace = HighFive::DataSpace({numRays, 18});
+        auto dataspace = HighFive::DataSpace({srays.size(), 18});
         auto dataset = file.createDataSet<double>("0", dataspace);
         auto ptr = (double*)srays.data();
         dataset.write_raw(ptr);
