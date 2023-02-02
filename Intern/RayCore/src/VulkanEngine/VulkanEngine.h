@@ -134,7 +134,9 @@ class RAYX_API VulkanEngine {
     VkDebugUtilsMessengerEXT m_DebugMessenger;
     VkPhysicalDevice m_PhysicalDevice = VK_NULL_HANDLE;
     VkDevice m_Device;
+    uint32_t m_computeFamily;
     VkPipeline m_Pipeline;
+    VkPipelineCache m_PipelineCache;
     VkPipelineLayout m_PipelineLayout;
     VkShaderModule m_ComputeShaderModule;
     VkCommandPool m_CommandPool;
@@ -145,29 +147,41 @@ class RAYX_API VulkanEngine {
     VkDescriptorPool m_DescriptorPool;
     VkDescriptorSet m_DescriptorSet;
     VkDescriptorSetLayout m_DescriptorSetLayout;
-    uint32_t m_computeFamily;
     VmaAllocator m_VmaAllocator;
 
     // implementation details:
 
     // Init:
     void createInstance();
+    void createCache();
     void setupDebugMessenger();
     void pickDevice();
     void pickPhysicalDevice();
     void createLogicalDevice();
     void createDescriptorSetLayout();
+    void createAllocateDescriptorPool(uint32_t);
     void createCommandPool();
-    void createCommandBuffer();
     void createCommandBuffers();
-
+    void createShaderModule();
+    void recordFullCommand();
+    void recordInComputeCommandBuffer();
+    void createSemaphores();
     void createStagingBuffer();
     void prepareVma();
 
+    void getAllMemories();
+    VkDeviceSize getStagingBufferSize();
+
     // Run:
-    void runCommandBuffer();
-    void createDescriptorSet();
+    void submitCommandBuffer();
+    void updteDescriptorSets();
     void createComputePipeline();
+
+    // Sync:
+    struct {
+        VkSemaphore computeSemaphore;
+        VkSemaphore transferSemaphore;
+    } m_Semaphores;
 
     VkCommandBuffer createOneTimeCommandBuffer();
 

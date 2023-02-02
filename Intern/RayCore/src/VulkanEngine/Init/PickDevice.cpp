@@ -121,8 +121,10 @@ std::optional<uint32_t> findQueueFamilies(VkPhysicalDevice device) {
     return {};
 }
 
-// creates a logical device to communicate with the physical device
-// Create Queues to send commands too
+/**
+ * @brief Create Logical Device and extensions (also Compute Family and Queues)
+ *
+ */
 void VulkanEngine::createLogicalDevice() {
     RAYX_PROFILE_FUNCTION();
     m_computeFamily = findQueueFamilies(m_PhysicalDevice).value();
@@ -165,6 +167,61 @@ void VulkanEngine::createLogicalDevice() {
 
     vkGetDeviceQueue(m_Device, m_computeFamily, 0, &m_ComputeQueue);
     vkGetDeviceQueue(m_Device, m_computeFamily, 0, &m_TransferQueue);
+}
+// Create Semaphores for Queue synchronization between commands
+void VulkanEngine::createSemaphores() {
+    VkSemaphoreCreateInfo semaphoreCreateInfo = {};
+    semaphoreCreateInfo.sType = VK_STRUCTURE_TYPE_SEMAPHORE_CREATE_INFO;
+
+    vkCreateSemaphore(m_Device, &semaphoreCreateInfo, nullptr, &m_Semaphores.computeSemaphore);
+    vkCreateSemaphore(m_Device, &semaphoreCreateInfo, nullptr, &m_Semaphores.transferSemaphore);
+}
+
+/**
+ * @brief Use to print memories on device.
+ * Only in DEBUG
+ *
+ */
+void VulkanEngine::getAllMemories() {
+    VkPhysicalDeviceMemoryProperties memoryProperties;
+    vkGetPhysicalDeviceMemoryProperties(m_PhysicalDevice, &memoryProperties);
+
+    RAYX_D_LOG << "Number of memory heaps: " << memoryProperties.memoryHeapCount;
+    for (uint32_t i = 0; i < memoryProperties.memoryHeapCount; i++) {
+        RAYX_D_LOG << "Memory heap " << i << ": "
+                   << "Size: " << memoryProperties.memoryHeaps[i].size << " bytes "
+                   << "Flags: " << memoryProperties.memoryHeaps[i].flags;
+    }
+    RAYX_D_LOG << "Number of memory types: " << memoryProperties.memoryTypeCount;
+    for (uint32_t j = 0; j < memoryProperties.memoryTypeCount; j++) {
+        RAYX_D_LOG << "Memory type " << j << ": "
+                   << "Heap index: " << memoryProperties.memoryTypes[j].heapIndex << " "
+                   << "Properties: " << memoryProperties.memoryTypes[j].propertyFlags;
+    }
+}
+/**
+ * @brief Get Max Staging Buffer size, if not found return default STAGING_SIZE
+ *
+ * @return VkDeviceSize
+ */
+VkDeviceSize VulkanEngine::getStagingBufferSize() {
+    VkPhysicalDeviceMemoryProperties memoryProperties;
+    vkGetPhysicalDeviceMemoryProperties(m_PhysicalDevice, &memoryProperties);
+
+    VkMemoryPropertyFlags stageMemoryType =
+        VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT | VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT;
+    //std::cout << stageMemoryType;
+    for (uint32_t j = 0; j < memoryProperties.memoryTypeCount; j++) {
+        auto heapFlag = memoryProperties.memoryHeaps[memoryProperties.memoryTypes[j].heapIndex].flags;
+        auto typeProperties = memoryProperties.memoryTypes[j].propertyFlags;
+        //RAYX_D_LOG << heapFlag << " " << typeProperties << "@ " << ;
+        if (((heapFlag & VK_MEMORY_HEAP_DEVICE_LOCAL_BIT) == VK_MEMORY_HEAP_DEVICE_LOCAL_BIT) &&
+            ((typeProperties & stageMemoryType) == stageMemoryType)) {
+            return memoryProperties.memoryHeaps[memoryProperties.memoryTypes[j].heapIndex].size;
+        }
+    }
+    // Stage default size
+    return STAGING_SIZE;
 }
 
 }  // namespace RAYX

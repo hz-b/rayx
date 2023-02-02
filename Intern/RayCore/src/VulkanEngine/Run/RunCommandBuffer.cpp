@@ -1,8 +1,12 @@
 #include "VulkanEngine/VulkanEngine.h"
 
 namespace RAYX {
-
-void VulkanEngine::runCommandBuffer() {
+/**
+ * @brief Submit/Send Commands to Device through Queue
+ * Wait until Fence
+ * 
+ */
+void VulkanEngine::submitCommandBuffer() {
     RAYX_PROFILE_FUNCTION();
     /*
     Now we shall finally submit the recorded command buffer to a queue.

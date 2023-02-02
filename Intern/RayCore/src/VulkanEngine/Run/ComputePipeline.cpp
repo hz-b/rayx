@@ -2,33 +2,13 @@
 #include "Debug/Instrumentor.h"
 #include "VulkanEngine/VulkanEngine.h"
 
-uint32_t* readFile(uint32_t& length, const char* filename);
-
 namespace RAYX {
-/* We create a compute pipeline here. */
+/**
+ * @brief Create Compute pipeline with PushConstants bound
+ *
+ */
 void VulkanEngine::createComputePipeline() {
     RAYX_PROFILE_FUNCTION_STDOUT();
-
-    /*
-    Create a shader module. A shader module basically just encapsulates some
-    shader code.
-    */
-    uint32_t filelength;
-    // the code in comp.spv was created by running the command:
-    // glslangValidator.exe -V shader.comp
-    std::string path = canonicalizeRepositoryPath(m_shaderfile).string();
-    uint32_t* compShaderCode = readFile(filelength, path.c_str());
-    VkShaderModuleCreateInfo createInfo = {};
-    createInfo.sType = VK_STRUCTURE_TYPE_SHADER_MODULE_CREATE_INFO;
-    createInfo.pCode = compShaderCode;
-    createInfo.codeSize = filelength;
-
-    RAYX_VERB << "Creating compute shader module..";
-
-    VK_CHECK_RESULT(vkCreateShaderModule(m_Device, &createInfo, nullptr, &m_ComputeShaderModule));
-    RAYX_VERB << "Shader module(s) created.";
-    delete[] compShaderCode;
-
     RAYX_VERB << "Creating pipeline...";
 
     /*
@@ -53,10 +33,10 @@ void VulkanEngine::createComputePipeline() {
     pipelineLayoutCreateInfo.pSetLayouts = &m_DescriptorSetLayout;
 
     /*
-        Add push constants to the Pipeline
+    Add push constants to the Pipeline
     */
     VkPushConstantRange pushConstant;
-    pushConstant.offset = 0;  // Can change this of some of the struct is to be ignored
+    pushConstant.offset = 0;  // Can change this if some of the struct is to be ignored
     pushConstant.size = m_pushConstants.size;
     pushConstant.stageFlags = VK_SHADER_STAGE_COMPUTE_BIT;
 
@@ -72,46 +52,8 @@ void VulkanEngine::createComputePipeline() {
     /*
     Now, we finally create the compute pipeline.
     */
-    VK_CHECK_RESULT(vkCreateComputePipelines(m_Device, VK_NULL_HANDLE, 1, &pipelineCreateInfo, nullptr, &m_Pipeline));
+    VK_CHECK_RESULT(vkCreateComputePipelines(m_Device, m_PipelineCache, 1, &pipelineCreateInfo, nullptr, &m_Pipeline));
     RAYX_VERB << "Pipeline created.";
 }
 
 }  // namespace RAYX
-
-// Read file into array of bytes, and cast to uint32_t*, then return.
-// The data has been padded, so that it fits into an array uint32_t.
-uint32_t* readFile(uint32_t& length, const char* filename) {
-    RAYX_PROFILE_FUNCTION();
-    FILE* fp = fopen(filename, "rb");
-    if (fp == nullptr) {
-        printf("Could not find or open file: %s\n", filename);
-    }
-
-    // get file size.
-    fseek(fp, 0, SEEK_END);
-    long filesize = ftell(fp);
-    if (filesize == -1) {
-        RAYX_D_ERR << "Could not get file size.";
-        return nullptr;
-    }
-    fseek(fp, 0, SEEK_SET);
-
-    uint32_t filesizepadded = uint32_t(ceil(filesize / 4.0)) * 4;
-
-    // read file contents.
-    char* str = new char[filesizepadded];
-    uint32_t readCount = fread(str, sizeof(char), filesize, fp);
-    if (readCount != (uint32_t)filesize) {
-        RAYX_D_WARN << readCount << " != " << filesize << "...";
-        RAYX_D_ERR << "Errors while reading file: " << filename;
-    }
-    fclose(fp);
-
-    // data padding.
-    for (uint32_t i = filesize; i < filesizepadded; i++) {
-        str[i] = 0;
-    }
-
-    length = filesizepadded;
-    return (uint32_t*)str;
-}

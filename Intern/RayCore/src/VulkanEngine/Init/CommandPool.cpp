@@ -1,6 +1,10 @@
 #include "VulkanEngine/VulkanEngine.h"
 
 namespace RAYX {
+/**
+ * @brief Creates Command Pool for Command Buffers
+ *
+ */
 void VulkanEngine::createCommandPool() {
     RAYX_PROFILE_FUNCTION();
     /*

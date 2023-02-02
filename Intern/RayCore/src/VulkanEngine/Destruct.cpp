@@ -1,5 +1,6 @@
 #include <vk_mem_alloc.h>
 
+#include "CanonicalizePath.h"
 #include "VulkanEngine/VulkanEngine.h"
 
 namespace RAYX {
@@ -10,6 +11,36 @@ void DestroyDebugUtilsMessengerEXT(VkInstance instance, VkDebugUtilsMessengerEXT
     auto func = (PFN_vkDestroyDebugUtilsMessengerEXT)vkGetInstanceProcAddr(instance, "vkDestroyDebugUtilsMessengerEXT");
     if (func != nullptr) {
         func(instance, debugMessenger, pAllocator);
+    }
+}
+
+/**
+ * @brief Store and destroy Cache
+ *
+ * @param cache Cache Object
+ * @param device Vulkan Logical device
+ */
+void inline storePipelineCache(VkDevice& device, VkPipelineCache& cache) {
+    if (cache != VK_NULL_HANDLE) {
+        /* Get size of pipeline cache */
+        size_t size{};
+        VK_CHECK_RESULT(vkGetPipelineCacheData(device, cache, &size, nullptr));
+
+        /* Get data of pipeline cache */
+        std::vector<uint8_t> data(size);
+        VK_CHECK_RESULT(vkGetPipelineCacheData(device, cache, &size, data.data()));
+
+        // Cache is stored in OS TEMP
+        auto tmpDir = std::filesystem::temp_directory_path();
+        try {
+            /* Write pipeline cache data to a file in binary format */
+            writeFile(data, tmpDir / "pipeline_cache.data");
+        } catch (std::runtime_error& ex) {
+            RAYX_WARN << "No pipeline cache written.";
+        }
+
+        /* Destroy Vulkan pipeline cache */
+        vkDestroyPipelineCache(device, cache, nullptr);
     }
 }
 
@@ -30,8 +61,15 @@ VulkanEngine::~VulkanEngine() {
 
     vmaDestroyBuffer(m_VmaAllocator, m_stagingBuffer.buf, m_stagingBuffer.alloca);
     vmaDestroyAllocator(m_VmaAllocator);
-    vkDestroyDescriptorSetLayout(m_Device, m_DescriptorSetLayout, nullptr);
     vkDestroyCommandPool(m_Device, m_CommandPool, nullptr);
+    vkDestroyDescriptorSetLayout(m_Device, m_DescriptorSetLayout, nullptr);
+    vkDestroyDescriptorPool(m_Device, m_DescriptorPool, nullptr);
+
+    vkDestroySemaphore(m_Device, m_Semaphores.computeSemaphore, nullptr);
+    vkDestroySemaphore(m_Device, m_Semaphores.transferSemaphore, nullptr);
+
+    vkDestroyShaderModule(m_Device, m_ComputeShaderModule, nullptr);
+    storePipelineCache(m_Device, m_PipelineCache);
 
     {
         RAYX_PROFILE_SCOPE_STDOUT("vkDestroyDevice");

@@ -3,15 +3,6 @@
 namespace RAYX {
 void VulkanEngine::gpuMemcpy(VkBuffer& buffer_dst, size_t offset_dst, VkBuffer& buffer_src, size_t offset_src, size_t bytes) {
     RAYX_PROFILE_FUNCTION();
-    // VkCommandBufferAllocateInfo allocInfo{};
-    // allocInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
-    // allocInfo.level = VK_COMMAND_BUFFER_LEVEL_PRIMARY;
-    // allocInfo.commandPool = m_CommandPool;
-    // allocInfo.commandBufferCount = 1;
-
-    // VkCommandBuffer commandBuffer;
-    // vkAllocateCommandBuffers(m_Device, &allocInfo, &commandBuffer);
-
     VkCommandBufferBeginInfo beginInfo{};
     beginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
 
@@ -31,10 +22,8 @@ void VulkanEngine::gpuMemcpy(VkBuffer& buffer_dst, size_t offset_dst, VkBuffer& 
     submitInfo.commandBufferCount = 1;
     submitInfo.pCommandBuffers = &m_TransferCommandBuffer;
 
-    vkQueueSubmit(m_ComputeQueue, 1, &submitInfo, VK_NULL_HANDLE);
-    vkQueueWaitIdle(m_ComputeQueue);
-
-    // vkFreeCommandBuffers(m_Device, m_CommandPool, 1, &commandBuffer);
+    vkQueueSubmit(m_TransferQueue, 1, &submitInfo, VK_NULL_HANDLE);
+    vkQueueWaitIdle(m_TransferQueue);
 }
 
 }  // namespace RAYX
