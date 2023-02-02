@@ -27,7 +27,7 @@ VkCommandBuffer VulkanEngine::createOneTimeCommandBuffer() {
 }
 /**
  * @brief Create and allocate required command buffers (Compute and Transfer)
- * 
+ *
  */
 void VulkanEngine::createCommandBuffers() {
     RAYX_PROFILE_FUNCTION();

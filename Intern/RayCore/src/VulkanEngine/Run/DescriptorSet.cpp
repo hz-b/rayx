@@ -7,7 +7,7 @@ namespace RAYX {
  */
 void VulkanEngine::updteDescriptorSets() {
     RAYX_PROFILE_FUNCTION();
-    
+
     // Populate every Compute Buffer/Descriptor and configure it.
     for (auto& [name, b] : m_buffers) {
         // specify which buffer to use: input buffer

@@ -17,7 +17,7 @@ void VulkanEngine::cleanup() {
         // vkFreeMemory(m_Device, buf.m_Memory, nullptr);
         vmaDestroyBuffer(m_VmaAllocator, buf.buf, buf.alloca);
     }
-    
+
     m_state = VulkanEngineStates_t::PRERUN;
 }
 

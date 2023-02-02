@@ -59,7 +59,7 @@ void VulkanEngine::recordInComputeCommandBuffer() {
     } else {
         RAYX_VERB << "your machine supports up to " << xgroups * ygroups * zgroups * WORKGROUP_SIZE << " rays";
     }
-    
+
     if (requiredGroup != requiredLocalWorkGroupNo) {
         // decrease xgroups, ygroups, zgroups so that we get a small number of
         // workgroups stlil covering requiredLocalWorkGroupNo

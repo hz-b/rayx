@@ -4,7 +4,7 @@ namespace RAYX {
 /**
  * @brief Submit/Send Commands to Device through Queue
  * Wait until Fence
- * 
+ *
  */
 void VulkanEngine::submitCommandBuffer() {
     RAYX_PROFILE_FUNCTION();

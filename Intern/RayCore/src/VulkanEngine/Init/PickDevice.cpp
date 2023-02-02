@@ -210,11 +210,11 @@ VkDeviceSize VulkanEngine::getStagingBufferSize() {
 
     VkMemoryPropertyFlags stageMemoryType =
         VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT | VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT;
-    //std::cout << stageMemoryType;
+    // std::cout << stageMemoryType;
     for (uint32_t j = 0; j < memoryProperties.memoryTypeCount; j++) {
         auto heapFlag = memoryProperties.memoryHeaps[memoryProperties.memoryTypes[j].heapIndex].flags;
         auto typeProperties = memoryProperties.memoryTypes[j].propertyFlags;
-        //RAYX_D_LOG << heapFlag << " " << typeProperties << "@ " << ;
+        // RAYX_D_LOG << heapFlag << " " << typeProperties << "@ " << ;
         if (((heapFlag & VK_MEMORY_HEAP_DEVICE_LOCAL_BIT) == VK_MEMORY_HEAP_DEVICE_LOCAL_BIT) &&
             ((typeProperties & stageMemoryType) == stageMemoryType)) {
             return memoryProperties.memoryHeaps[memoryProperties.memoryTypes[j].heapIndex].size;
