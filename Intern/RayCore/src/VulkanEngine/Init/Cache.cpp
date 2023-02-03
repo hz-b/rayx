@@ -12,7 +12,7 @@ void VulkanEngine::createCache() {
     // Cache is stored in OS TEMP
     auto tmpDir = std::filesystem::temp_directory_path();
     try {
-        pipeline_data = readFile(tmpDir / "pipeline_cache.data");
+        pipeline_data = readFile((tmpDir / "pipeline_cache.data").string());
     } catch (std::runtime_error& ex) {
         RAYX_WARN << "No pipeline cache found.";
     }
