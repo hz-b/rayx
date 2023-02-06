@@ -84,7 +84,7 @@ TEST_F(TestSuite, Slit) {
         }
     }
 
-    CHECK_EQ(absorbed, 8);
+    CHECK_EQ(absorbed, 108);
     CHECK_EQ(pass_through, 92);
 }
 

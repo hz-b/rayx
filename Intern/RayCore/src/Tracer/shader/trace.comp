@@ -25,10 +25,12 @@ Ray traceSlit(Ray r, Slit slit, INOUT(uint64_t) ctr, dvec4 intersection) {
     double y_extent = height(slit);
     double xStop    = beamstopWidth(slit);
     double yStop    = beamstopHeight(slit);
-    // slit lies in x-y plane instead of x-z plane as other elements
-    bool stop_box = stopBox(r.m_position[0], r.m_position[1], xStop, yStop);
 
-    if (!stop_box) {
+    // slit lies in x-y plane instead of x-z plane as other elements
+    bool withinSlitBounds = wasteBox(r.m_position[0], r.m_position[1], x_extent, y_extent);
+    bool outsideOfBeamstop = stopBox(r.m_position[0], r.m_position[1], xStop, yStop);
+
+    if (!withinSlitBounds || !outsideOfBeamstop) {
         takeFinalSnapshot(r, W_ABSORBED);
         return r;
     }

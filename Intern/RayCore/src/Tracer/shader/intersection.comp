@@ -443,19 +443,21 @@ dvec4 getOpticalElementIntersection(Ray r, uint id) {
     // misalignment
     r = rayMatrixMult(r, inTrans(id));  // image plane is the x-y plane of the coordinate system
 
-    if (ty == TY_IMAGE_PLANE) {
-        double offset = 0 - r.m_position.z;  // length between ray origin (intersection point of previous element) and image plane
-        currentIntersection.x =
-            r.m_position.x + ((r.m_direction.x / r.m_direction.z) * offset);  // scale x-slope of ray (l/n) by z-length between origin and image plane
-        currentIntersection.y = r.m_position.y + ((r.m_direction.y / r.m_direction.z) * offset);
+    if (ty == TY_IMAGE_PLANE || ty == TY_SLIT) { // these elements are infinite X-Y planes!
+        double offset = abs(r.m_position.z / r.m_direction.z);
+
+        // scale x-slope of ray (l/n) by z-length between origin and image plane
+        currentIntersection.x = r.m_position.x + r.m_direction.x * offset;
+        currentIntersection.y = r.m_position.y + r.m_direction.y * offset;
         currentIntersection.z = 0;
         // the ray should not face away from the image plane. If that is the case, set the weight of the intersection to 0 so that it is not
         // considered in the tracing process also the image plane detects only rays from one side
-        currentIntersection.w = r.m_weight * int(r.m_direction.z > 0);
-        // * int(r.m_direction.z > 0); // * (1-int((r.m_direction.z > 0 && r.m_position.z > 0) || (r.m_direction.z < 0 && r.m_position.z < 0)));
-        r = rayMatrixMult(r, outTrans(id));  // do not know if this is necessary as the ray r is not defined as inout
-        return currentIntersection;
 
+        bool hit = r.m_direction.z > 0 && r.m_position.z < 0;
+        // backward hits are excluded? i.e. if a ray with negative direction and positive z coordinate hits the plane?
+
+        currentIntersection.w = r.m_weight * int(hit);
+        return currentIntersection;
     } else if (ty == TY_TOROID_MIRROR || (ty == TY_RZP && curvatureType(Rzp(id)) == 1 /* toroidal RZP */)) {
         iteratTo(r, longRadius(id), shortRadius(id));
         currentIntersection = dvec4(r.m_position, r.m_weight);
