@@ -35,7 +35,8 @@ def plot(filename: str):
         # this `relevance` tests which axis is more important.
         relevance = lambda v: max(v) - min(v)
         Y = relevance(d["Yloc"]) > relevance(d["Zloc"])
-        ax.hist2d(d["Xloc"], d["Yloc"] if Y else d["Zloc"], bins=200)
+        h = ax.hist2d(d["Xloc"], d["Yloc"] if Y else d["Zloc"], bins=200)
+        fig.colorbar(h[3], ax=ax)
         ax.set_title("Footprint of element " + str(int(e)))
         ax.set_xlabel("x")
         ax.set_ylabel("y" if Y else "z")
