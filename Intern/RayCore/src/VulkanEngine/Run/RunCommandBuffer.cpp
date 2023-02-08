@@ -3,7 +3,7 @@
 namespace RAYX {
 /**
  * @brief Submit/Send Commands to Device through Queue
- * Wait until Fence
+ *  NO Waitfor fence!
  *
  */
 void VulkanEngine::submitCommandBuffer() {
@@ -16,6 +16,7 @@ void VulkanEngine::submitCommandBuffer() {
     submitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
     submitInfo.commandBufferCount = 1;                     // submit a single command buffer
     submitInfo.pCommandBuffers = &m_ComputeCommandBuffer;  // the command buffer to submit.
+    VK_CHECK_RESULT(m_Fences.compute->forceReset())
     auto f = m_Fences.compute->fence();
     /*
     We submit the command buffer on the queue, at the same time giving a
@@ -28,7 +29,7 @@ void VulkanEngine::submitCommandBuffer() {
     from the GPU. Fences give us a hint that the Command in the Queue is
     actually done executing.
     */
-    m_Fences.compute->wait();
+    // m_Fences.compute->wait();
 }
 
 }  // namespace RAYX
