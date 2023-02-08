@@ -56,6 +56,7 @@ class RAYX_API VulkanEngine {
         createBuffer(bufname, vec.size() * sizeof(T));
         writeBufferRaw(bufname, (char*)vec.data());
     }
+
     /// create a buffer with the given size, it's data is uninitialized.
     void createBuffer(const char* bufname, VkDeviceSize);
 
@@ -105,8 +106,8 @@ class RAYX_API VulkanEngine {
         uint32_t binding;
         VkBuffer buf;
         VkDeviceMemory mem;
-        VkDeviceSize size;
-        VmaAllocation alloca;
+        VkDeviceSize size = 0;
+        VmaAllocation alloca = nullptr;
         VmaAllocationInfo allocaInfo;
     };
 
@@ -201,6 +202,8 @@ class RAYX_API VulkanEngine {
         std::unique_ptr<Fence> compute;
     } m_Fences;
 
+    uint64_t m_runs = 0;
+
     VkCommandBuffer createOneTimeCommandBuffer();
 
     // CreateBuffer.cpp:
@@ -219,7 +222,7 @@ class RAYX_API VulkanEngine {
     size_t STAGING_SIZE = 0;
     /// copies data from one buffer to the other with given offsets.
     /// this is used for the buffer <-> staging buffer communication in
-    /// Careful : This is not an awaiting command so make sure to check the according fence transfer 
+    /// Careful : This is not an awaiting command so make sure to check the according fence transfer
     /// or Queue Idle before copying again
     /// {read,write}BufferRaw.
     void gpuMemcpy(VkBuffer& buffer_dst, size_t offset_dst, VkBuffer& buffer_src, size_t offset_src, size_t bytes);

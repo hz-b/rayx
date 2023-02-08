@@ -12,12 +12,6 @@ void VulkanEngine::cleanup() {
     vkDestroyPipeline(m_Device, m_Pipeline, nullptr);
     vkDestroyPipelineLayout(m_Device, m_PipelineLayout, nullptr);
 
-    for (auto& [name, buf] : m_buffers) {
-        // vkDestroyBuffer(m_Device, buf.m_Buffer, nullptr);
-        // vkFreeMemory(m_Device, buf.m_Memory, nullptr);
-        vmaDestroyBuffer(m_VmaAllocator, buf.buf, buf.alloca);
-    }
-
     m_state = VulkanEngineStates_t::PRERUN;
 }
 

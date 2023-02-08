@@ -15,6 +15,7 @@ void VulkanEngine::run(VulkanEngineRunSpec_t spec) {
     createComputePipeline();
     recordInComputeCommandBuffer();
     submitCommandBuffer();
+    m_runs++;
 
     m_state = VulkanEngineStates_t::POSTRUN;
 }
