@@ -219,6 +219,8 @@ class RAYX_API VulkanEngine {
     size_t STAGING_SIZE = 0;
     /// copies data from one buffer to the other with given offsets.
     /// this is used for the buffer <-> staging buffer communication in
+    /// Careful : This is not an awaiting command so make sure to check the according fence transfer 
+    /// or Queue Idle before copying again
     /// {read,write}BufferRaw.
     void gpuMemcpy(VkBuffer& buffer_dst, size_t offset_dst, VkBuffer& buffer_src, size_t offset_src, size_t bytes);
 

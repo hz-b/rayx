@@ -1,6 +1,8 @@
 #include "VulkanEngine/VulkanEngine.h"
 
 namespace RAYX {
+const uint64_t DEFAULT_TIMEOUT = 1000000000;  // 1 Second
+
 VulkanEngine::Fence::Fence(VkDevice& device) : device(device) {
     VkFenceCreateInfo fenceCreateInfo = {};
     fenceCreateInfo.sType = VK_STRUCTURE_TYPE_FENCE_CREATE_INFO;
@@ -11,7 +13,7 @@ VulkanEngine::Fence::Fence(VkDevice& device) : device(device) {
 // Timeout ~1 sec
 // Fence is usable again after this.
 VkResult VulkanEngine::Fence::wait() {
-    auto res = vkWaitForFences(device, 1, &f, VK_TRUE, 1000000000);
+    auto res = vkWaitForFences(device, 1, &f, VK_TRUE, DEFAULT_TIMEOUT);
     res = vkResetFences(device, 1, &f);
     return res;
 }

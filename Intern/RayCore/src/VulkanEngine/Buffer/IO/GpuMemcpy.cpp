@@ -24,7 +24,6 @@ void VulkanEngine::gpuMemcpy(VkBuffer& buffer_dst, size_t offset_dst, VkBuffer& 
     auto f = m_Fences.transfer->fence();
     vkQueueSubmit(m_TransferQueue, 1, &submitInfo, *f);
     // vkQueueWaitIdle(m_TransferQueue);
-    m_Fences.transfer->wait();
 }
 
 }  // namespace RAYX
