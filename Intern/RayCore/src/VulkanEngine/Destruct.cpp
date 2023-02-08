@@ -68,6 +68,10 @@ VulkanEngine::~VulkanEngine() {
     vkDestroySemaphore(m_Device, m_Semaphores.computeSemaphore, nullptr);
     vkDestroySemaphore(m_Device, m_Semaphores.transferSemaphore, nullptr);
 
+    // Destroy Fences
+    m_Fences.computeFence.reset();
+    m_Fences.transferFence.reset();
+
     vkDestroyShaderModule(m_Device, m_ComputeShaderModule, nullptr);
     storePipelineCache(m_Device, m_PipelineCache);
 

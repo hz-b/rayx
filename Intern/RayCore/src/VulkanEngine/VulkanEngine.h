@@ -164,6 +164,7 @@ class RAYX_API VulkanEngine {
     void createCommandBuffers();
     void createShaderModule();
     void recordFullCommand();
+    void createFences();
     void recordInComputeCommandBuffer();
     void createSemaphores();
     void createStagingBuffer();
@@ -182,6 +183,22 @@ class RAYX_API VulkanEngine {
         VkSemaphore computeSemaphore;
         VkSemaphore transferSemaphore;
     } m_Semaphores;
+
+    class Fence {
+      public:
+        Fence(VkDevice& device);
+        ~Fence();
+        VkResult wait();
+        VkResult forceReset();
+
+      private:
+        VkFence f;
+        VkDevice device;
+    };
+    struct {
+        std::unique_ptr<Fence> transferFence;
+        std::unique_ptr<Fence> computeFence;
+    } m_Fences;
 
     VkCommandBuffer createOneTimeCommandBuffer();
 

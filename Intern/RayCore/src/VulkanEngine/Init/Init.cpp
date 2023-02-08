@@ -16,6 +16,7 @@ void VulkanEngine::init(VulkanEngineInitSpec_t spec) {
     createSemaphores();
     createDescriptorSetLayout();
     createAllocateDescriptorPool(m_buffers.size());
+    createFences();
     prepareVma();
     createStagingBuffer();
     createCache();
