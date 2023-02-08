@@ -7,6 +7,7 @@ VulkanEngine::Fence::Fence(VkDevice& device) : device(device) {
     fenceCreateInfo.flags = 0;
     VK_CHECK_RESULT(vkCreateFence(device, &fenceCreateInfo, nullptr, &f));
 }
+
 // Timeout ~1 sec
 // Fence is usable again after this.
 VkResult VulkanEngine::Fence::wait() {
@@ -14,6 +15,9 @@ VkResult VulkanEngine::Fence::wait() {
     res = vkResetFences(device, 1, &f);
     return res;
 }
+
+VkFence* VulkanEngine::Fence::fence() { return &f; }
+
 VkResult VulkanEngine::Fence::forceReset() {
     auto res = vkResetFences(device, 1, &f);
     return res;
@@ -22,8 +26,8 @@ VkResult VulkanEngine::Fence::forceReset() {
 VulkanEngine::Fence::~Fence() { vkDestroyFence(device, f, nullptr); }
 
 void VulkanEngine::createFences() {
-    m_Fences.computeFence = std::make_unique<Fence>(m_Device);
-    m_Fences.transferFence = std::make_unique<Fence>(m_Device);
+    m_Fences.compute = std::make_unique<Fence>(m_Device);
+    m_Fences.transfer = std::make_unique<Fence>(m_Device);
 }
 
 }  // namespace RAYX

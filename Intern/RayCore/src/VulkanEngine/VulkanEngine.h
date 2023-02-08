@@ -188,6 +188,7 @@ class RAYX_API VulkanEngine {
       public:
         Fence(VkDevice& device);
         ~Fence();
+        VkFence* fence();
         VkResult wait();
         VkResult forceReset();
 
@@ -196,8 +197,8 @@ class RAYX_API VulkanEngine {
         VkDevice device;
     };
     struct {
-        std::unique_ptr<Fence> transferFence;
-        std::unique_ptr<Fence> computeFence;
+        std::unique_ptr<Fence> transfer;
+        std::unique_ptr<Fence> compute;
     } m_Fences;
 
     VkCommandBuffer createOneTimeCommandBuffer();
