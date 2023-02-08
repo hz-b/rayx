@@ -12,6 +12,8 @@ std::optional<uint32_t> findQueueFamilies(VkPhysicalDevice device);
 void VulkanEngine::pickDevice() {
     pickPhysicalDevice();
     createLogicalDevice();
+    // Fetch best staging size
+    STAGING_SIZE = getStagingBufferSize();
 }
 
 // physical device for computation is chosen
@@ -200,7 +202,7 @@ void VulkanEngine::getAllMemories() {
     }
 }
 /**
- * @brief Get Max Staging Buffer size, if not found return default STAGING_SIZE
+ * @brief Get Max Staging Buffer size (Bytes), if not found return default STAGING_SIZE
  *
  * @return VkDeviceSize
  */
@@ -210,18 +212,22 @@ VkDeviceSize VulkanEngine::getStagingBufferSize() {
 
     VkMemoryPropertyFlags stageMemoryType =
         VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT | VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT;
-    // std::cout << stageMemoryType;
     for (uint32_t j = 0; j < memoryProperties.memoryTypeCount; j++) {
         auto heapFlag = memoryProperties.memoryHeaps[memoryProperties.memoryTypes[j].heapIndex].flags;
         auto typeProperties = memoryProperties.memoryTypes[j].propertyFlags;
-        // RAYX_D_LOG << heapFlag << " " << typeProperties << "@ " << ;
         if (((heapFlag & VK_MEMORY_HEAP_DEVICE_LOCAL_BIT) == VK_MEMORY_HEAP_DEVICE_LOCAL_BIT) &&
             ((typeProperties & stageMemoryType) == stageMemoryType)) {
-            return memoryProperties.memoryHeaps[memoryProperties.memoryTypes[j].heapIndex].size;
+            auto size = memoryProperties.memoryHeaps[memoryProperties.memoryTypes[j].heapIndex].size;
+            if (size >= 512 * (1024 * 1024)) {
+                size = 512 * (1024 * 1024);  // 512MB as max (for RADEON AMD Integrated)
+            } else {
+                size -= (1024 * 1024) * 16;  // 16 MB extra headroom removal
+            }
+            return size;
         }
     }
     // Stage default size
-    return STAGING_SIZE;
+    return DEFAULT_STAGING_SIZE;
 }
 
 }  // namespace RAYX

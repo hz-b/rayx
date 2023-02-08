@@ -43,7 +43,7 @@ void VulkanEngine::createComputePipeline() {
     pipelineLayoutCreateInfo.pPushConstantRanges = &pushConstant;
     pipelineLayoutCreateInfo.pushConstantRangeCount = 1;  // One struct of pushConstants
 
-    VK_CHECK_RESULT(vkCreatePipelineLayout(m_Device, &pipelineLayoutCreateInfo, nullptr, &m_PipelineLayout));
+    VK_CHECK_RESULT(vkCreatePipelineLayout(m_Device, &pipelineLayoutCreateInfo, nullptr, &m_PipelineLayout))
 
     VkComputePipelineCreateInfo pipelineCreateInfo = {};
     pipelineCreateInfo.sType = VK_STRUCTURE_TYPE_COMPUTE_PIPELINE_CREATE_INFO;
@@ -52,7 +52,7 @@ void VulkanEngine::createComputePipeline() {
     /*
     Now, we finally create the compute pipeline.
     */
-    VK_CHECK_RESULT(vkCreateComputePipelines(m_Device, m_PipelineCache, 1, &pipelineCreateInfo, nullptr, &m_Pipeline));
+    VK_CHECK_RESULT(vkCreateComputePipelines(m_Device, m_PipelineCache, 1, &pipelineCreateInfo, nullptr, &m_Pipeline))
     RAYX_VERB << "Pipeline created.";
 }
 
