@@ -1,6 +1,7 @@
 #include <optional>
 
 #include "VulkanEngine/VulkanEngine.h"
+#define VULKAN_VERSION_3_OR_HIGHER (VK_HEADER_VERSION >= VK_API_VERSION_3_0)
 
 namespace RAYX {
 
@@ -95,7 +96,7 @@ std::vector<const char*> getRequiredDeviceExtensions() {
     std::vector<const char*> extensions;
 
     if (enableValidationLayers) {
-#ifdef RAYX_DEBUG_MODE
+#if !VULKAN_VERSION_3_OR_HIGHER
         extensions.push_back("VK_KHR_shader_non_semantic_info");
 #endif
     }
@@ -141,8 +142,9 @@ void VulkanEngine::createLogicalDevice() {
 
     // create info about the device features
     VkPhysicalDeviceFeatures deviceFeatures{};
-    deviceFeatures.shaderFloat64 = true;
-    deviceFeatures.shaderInt64 = true;
+    deviceFeatures.shaderFloat64 = VK_TRUE;
+    deviceFeatures.shaderInt64 = VK_TRUE;
+    deviceFeatures.robustBufferAccess = VK_TRUE;
 
     VkDeviceCreateInfo createInfo{};
     createInfo.sType = VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO;

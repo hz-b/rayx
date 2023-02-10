@@ -10,7 +10,7 @@ namespace RAYX {
 void VulkanEngine::createComputePipeline() {
     RAYX_PROFILE_FUNCTION_STDOUT();
     RAYX_VERB << "Creating pipeline...";
-
+    // Todo: validtation layer warning : Consider adding VK_KHR_maintenance4  to support SPIR-V 1.6's localsizeid instead of WorkgroupSizesdsdsdsdDS
     /*
     Now let us actually create the compute pipeline.
     It only consists of a single stage with a compute shader.
