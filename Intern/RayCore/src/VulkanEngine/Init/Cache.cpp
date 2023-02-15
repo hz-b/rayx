@@ -14,7 +14,7 @@ void VulkanEngine::createCache() {
     try {
         pipeline_data = readFile((tmpDir / "pipeline_cache.data").string());
     } catch (std::runtime_error& ex) {
-        RAYX_WARN << "No pipeline cache found.";
+        RAYX_LOG << "No pipeline cache found.";
     }
 
     /* Add initial pipeline cache data from the cached file */
