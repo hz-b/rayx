@@ -60,14 +60,17 @@ void TerminalApp::tracePath(const std::filesystem::path& path) {
         auto rays = m_Tracer->trace(*m_Beamline);
 
         // Export Rays to external data.
-        exportRays(rays, path.string());
+        auto file = exportRays(rays, path.string());
 
         // Plot
         if (m_CommandParser->m_args.m_plotFlag) {
-            if (m_CommandParser->m_args.m_multiplePlots) {
-                RAYX::Plotter::plot(2, path.string(), extractLastSnapshot(rays), getBeamlineOpticalElementsNames());
-            } else
-                RAYX::Plotter::plot(0, path.string(), extractLastSnapshot(rays), getBeamlineOpticalElementsNames());
+            if (!file.ends_with(".h5")) {
+                RAYX_WARN << "You can only plot .h5 files!";
+                RAYX_ERR << "Have you selected .csv exporting?";
+            }
+
+            auto cmd = std::string("python ") + std::string(canonicalizeRepositoryPath(std::string("Scripts/plot.py"))) + " " + file;
+            system(cmd.c_str());
         }
 
 #if defined(RAYX_DEBUG_MODE) && not defined(CPP)
@@ -125,7 +128,7 @@ void TerminalApp::run() {
     tracePath(m_CommandParser->m_args.m_providedFile);
 }
 
-void TerminalApp::exportRays(const RAYX::Rays& rays, std::string path) {
+std::string TerminalApp::exportRays(const RAYX::Rays& rays, std::string path) {
     RAYX_PROFILE_FUNCTION_STDOUT();
 #ifdef CI
     bool csv = true;
@@ -136,15 +139,20 @@ void TerminalApp::exportRays(const RAYX::Rays& rays, std::string path) {
     // strip .rml
     if (path.ends_with(".rml")) {
         path = path.substr(0, path.length() - 4);
+    } else {
+        RAYX_ERR << "invalid input file!";
     }
 
     if (csv) {
+        path += ".csv";
         writeCSV(rays, path + ".csv");
     } else {
+        path += ".h5";
 #ifndef CI  // writeH5 is not defined in the CI!
         writeH5(rays, path + ".h5");
 #endif
     }
+    return path;
 }
 
 #if defined(RAYX_DEBUG_MODE) && not defined(CPP)

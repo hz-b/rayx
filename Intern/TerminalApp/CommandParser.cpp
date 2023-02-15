@@ -41,10 +41,6 @@ CommandParser::CommandParser(int _argc, char* const* _argv) : m_cli11{std::make_
 }
 
 void CommandParser::analyzeCommands() {
-    if (m_args.m_multiplePlots && !(m_args.m_plotFlag)) {
-        RAYX_ERR << "Please use --mult only when using --plot.";
-    }
-
     if (!m_args.m_isFixSeed && m_args.m_seed != -1) {
         RAYX_ERR << "Cannot use user-defined seed without -f, try -f-seed <seed>";
     }

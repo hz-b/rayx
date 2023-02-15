@@ -27,7 +27,6 @@ class CommandParser {
         bool m_csvFlag = false;           // -c (.csv Output)
         bool m_cpuFlag = false;           // -x (CPU Tracer)
         bool m_benchmark = false;         // -b (Benchmark)
-        bool m_multiplePlots = false;     // -m (Multiple Plots)
         bool m_version = false;           // -v (Version)
         std::string m_providedFile = "";  // -i (Input)
         bool m_isFixSeed = false;         // -f (Fixed Seed)
@@ -67,7 +66,6 @@ class CommandParser {
         {'c', {OptionType::BOOL, "ocsv", "Output stored as .csv file.", &(m_args.m_csvFlag)}},
         {'B', {OptionType::BOOL, "benchmark", "Benchmark application: (RML → Trace → Output)", &(m_args.m_benchmark)}},
         {'b', {OptionType::INT, "batch", "Batch size for Vulkan tracing", &(m_args.m_BatchSize)}},
-        {'m', {OptionType::BOOL, "mult", "Multiple plots extension at output.", &(m_args.m_multiplePlots)}},
         {'p', {OptionType::BOOL, "plot", "Plot output footprints and histograms.", &(m_args.m_plotFlag)}},
         {'x', {OptionType::BOOL, "cpu", "Tracing on CPU", &(m_args.m_cpuFlag)}},
         {'i', {OptionType::STRING, "input", "Input RML File or Directory.", &(m_args.m_providedFile)}},

@@ -6,7 +6,6 @@
 #include <filesystem>
 
 #include "CommandParser.h"
-#include "Plotter/Plotter.h"
 #include "RayCore.h"
 #include "TerminalAppConfig.h"
 
@@ -31,7 +30,8 @@ class TerminalApp {
     /// if `path` is a directory, it will call `tracePath(child)` for all
     /// children of that directory.
     void tracePath(const std::filesystem::path& path);
-    void exportRays(const RAYX::Rays&, std::string);
+    // returns the output filename (either .csv or .h5)
+    std::string exportRays(const RAYX::Rays&, std::string);
     std::vector<std::string> getBeamlineOpticalElementsNames();
     std::vector<std::string> getBeamlineLightSourcesNames();
 

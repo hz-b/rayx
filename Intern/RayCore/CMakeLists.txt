@@ -62,7 +62,6 @@ SET(SOURCE
     src/VulkanEngine/Run/Run.cpp
     src/Writer/CSVWriter.cpp
     src/Writer/H5Writer.cpp
-    src/Plotter/Plotter.cpp
 )
 
 add_library(${PROJECT_NAME} SHARED ${SOURCE})
