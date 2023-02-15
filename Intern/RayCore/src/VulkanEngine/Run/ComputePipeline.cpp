@@ -10,7 +10,7 @@ namespace RAYX {
 void VulkanEngine::createComputePipeline() {
     RAYX_PROFILE_FUNCTION_STDOUT();
     RAYX_VERB << "Creating pipeline...";
-
+    // Todo: validtation layer warning : Consider adding VK_KHR_maintenance4  to support SPIR-V 1.6's localsizeid instead of WorkgroupSizesdsdsdsdDS
     /*
     Now let us actually create the compute pipeline.
     It only consists of a single stage with a compute shader.
@@ -43,7 +43,7 @@ void VulkanEngine::createComputePipeline() {
     pipelineLayoutCreateInfo.pPushConstantRanges = &pushConstant;
     pipelineLayoutCreateInfo.pushConstantRangeCount = 1;  // One struct of pushConstants
 
-    VK_CHECK_RESULT(vkCreatePipelineLayout(m_Device, &pipelineLayoutCreateInfo, nullptr, &m_PipelineLayout));
+    VK_CHECK_RESULT(vkCreatePipelineLayout(m_Device, &pipelineLayoutCreateInfo, nullptr, &m_PipelineLayout))
 
     VkComputePipelineCreateInfo pipelineCreateInfo = {};
     pipelineCreateInfo.sType = VK_STRUCTURE_TYPE_COMPUTE_PIPELINE_CREATE_INFO;
@@ -52,7 +52,7 @@ void VulkanEngine::createComputePipeline() {
     /*
     Now, we finally create the compute pipeline.
     */
-    VK_CHECK_RESULT(vkCreateComputePipelines(m_Device, m_PipelineCache, 1, &pipelineCreateInfo, nullptr, &m_Pipeline));
+    VK_CHECK_RESULT(vkCreateComputePipelines(m_Device, m_PipelineCache, 1, &pipelineCreateInfo, nullptr, &m_Pipeline))
     RAYX_VERB << "Pipeline created.";
 }
 

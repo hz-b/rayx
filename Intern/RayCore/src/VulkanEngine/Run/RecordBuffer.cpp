@@ -19,6 +19,7 @@ void VulkanEngine::recordInComputeCommandBuffer() {
     */
     VkCommandBufferBeginInfo beginInfo = {};
     beginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
+    beginInfo.flags = VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT;
     VK_CHECK_RESULT(vkBeginCommandBuffer(m_ComputeCommandBuffer, &beginInfo));  // start recording commands.
 
     /*
@@ -101,29 +102,6 @@ void VulkanEngine::recordInComputeCommandBuffer() {
     vkCmdDispatch(m_ComputeCommandBuffer, group.x, group.z, group.y);
 
     VK_CHECK_RESULT(vkEndCommandBuffer(m_ComputeCommandBuffer));  // end recording commands.
-}
-/**
- * @brief Records a transfer to GPU, Compute, and transfer back from GPU command.
- * WARNING: Make sure to update descriptorSets, offsets, and PushConstants beforehand!
- */
-void VulkanEngine::recordFullCommand() {
-    RAYX_PROFILE_FUNCTION();
-    RAYX_VERB << "Recording full commandBuffer..";
-
-    /*
-    Start with transfer to GPU
-    */
-    VkCommandBufferBeginInfo beginInfo{};
-    beginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
-
-    vkBeginCommandBuffer(m_TransferCommandBuffer, &beginInfo);
-
-    // VkBufferCopy copyRegion{};
-    // copyRegion.srcOffset = offset_src;
-    // copyRegion.dstOffset = offset_dst;
-    // copyRegion.size = bytes;
-
-    // vkCmdCopyBuffer(m_TransferCommandBuffer, buffer_src, buffer_dst, 1, &copyRegion);
 }
 
 }  // namespace RAYX

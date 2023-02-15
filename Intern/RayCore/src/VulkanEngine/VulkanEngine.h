@@ -56,6 +56,7 @@ class RAYX_API VulkanEngine {
         createBuffer(bufname, vec.size() * sizeof(T));
         writeBufferRaw(bufname, (char*)vec.data());
     }
+
     /// create a buffer with the given size, it's data is uninitialized.
     void createBuffer(const char* bufname, VkDeviceSize);
 
@@ -105,8 +106,8 @@ class RAYX_API VulkanEngine {
         uint32_t binding;
         VkBuffer buf;
         VkDeviceMemory mem;
-        VkDeviceSize size;
-        VmaAllocation alloca;
+        VkDeviceSize size = 0;
+        VmaAllocation alloca = nullptr;
         VmaAllocationInfo allocaInfo;
     };
 
@@ -164,6 +165,7 @@ class RAYX_API VulkanEngine {
     void createCommandBuffers();
     void createShaderModule();
     void recordFullCommand();
+    void createFences();
     void recordInComputeCommandBuffer();
     void createSemaphores();
     void createStagingBuffer();
@@ -183,6 +185,25 @@ class RAYX_API VulkanEngine {
         VkSemaphore transferSemaphore;
     } m_Semaphores;
 
+    class Fence {
+      public:
+        Fence(VkDevice& device);
+        ~Fence();
+        VkFence* fence();
+        VkResult wait();
+        VkResult forceReset();
+
+      private:
+        VkFence f;
+        VkDevice device;
+    };
+    struct {
+        std::unique_ptr<Fence> transfer;
+        std::unique_ptr<Fence> compute;
+    } m_Fences;
+
+    uint64_t m_runs = 0;
+
     VkCommandBuffer createOneTimeCommandBuffer();
 
     // CreateBuffer.cpp:
@@ -198,9 +219,11 @@ class RAYX_API VulkanEngine {
                          VmaAllocationInfo* allocation_info, VmaAllocationCreateFlags flags = VMA_ALLOCATION_CREATE_HOST_ACCESS_RANDOM_BIT,
                          VmaMemoryUsage memory_usage = VMA_MEMORY_USAGE_AUTO, const std::vector<uint32_t>& queue_family_indices = {});
     // BufferIO:
-
+    size_t STAGING_SIZE = 0;
     /// copies data from one buffer to the other with given offsets.
     /// this is used for the buffer <-> staging buffer communication in
+    /// Careful : This is not an awaiting command so make sure to check the according fence transfer
+    /// or Queue Idle before copying again
     /// {read,write}BufferRaw.
     void gpuMemcpy(VkBuffer& buffer_dst, size_t offset_dst, VkBuffer& buffer_src, size_t offset_src, size_t bytes);
 
@@ -241,7 +264,7 @@ const std::vector<const char*> validationLayers = {"VK_LAYER_KHRONOS_validation"
 const int WORKGROUP_SIZE = 32;
 
 /// size of the staging buffer in bytes, equal to 128MB.
-const size_t STAGING_SIZE = 134217728;
+const size_t DEFAULT_STAGING_SIZE = 134217728;  // = 128MB
 
 #ifdef NDEBUG
 const bool enableValidationLayers = false;

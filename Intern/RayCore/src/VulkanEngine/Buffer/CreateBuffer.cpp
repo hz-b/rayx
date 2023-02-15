@@ -9,8 +9,16 @@ void VulkanEngine::createBuffer(const char* bufname, VkDeviceSize size) {
     } else if (m_state == VulkanEngineStates_t::POSTRUN) {
         RAYX_ERR << "you've forgotten to .cleanup() the VulkanEngine";
     }
-
     Buffer_t& b = m_buffers[bufname];
+
+    // No need to recreate buffers if target is already there
+    if (b.size == size && m_runs > 0) {
+        return;
+    } else if (b.size != size && b.alloca != nullptr) {
+        // Destroy current buffer to create a new one
+        vmaDestroyBuffer(m_VmaAllocator, b.buf, b.alloca);
+    }
+
     b.size = size;
 
     int buffer_usage_flags = VK_BUFFER_USAGE_STORAGE_BUFFER_BIT;
