@@ -13,6 +13,26 @@
 // Additionally to randomness tests, there can also be (non-randomized) regression tests in this module.
 // Which compares the current RAY-X the output of a previous RAY-X output which we deemed correct.
 
+TEST_F(TestSuite, randomNumbers) {
+    RAYX::fixSeed(RAYX::FIXED_SEED);
+    CHECK_EQ(randomDouble(), 0.37454011439684315);
+    CHECK_EQ(randomDouble(), 0.95071431178383392);
+    CHECK_EQ(randomDouble(), 0.73199393850099159);
+    CHECK_EQ(randomDouble(), 0.59865848640880048);
+    CHECK_EQ(randomDouble(), 0.1560186385540335);
+    CHECK_EQ(randomDouble(), 0.15599452381860338);
+    CHECK_EQ(randomDouble(), 0.05808361108835871);
+    CHECK_EQ(randomDouble(), 0.86617614884538952);
+    CHECK_EQ(randomDouble(), 0.60111501151721813);
+    CHECK_EQ(randomDouble(), 0.70807257846651428);
+}
+
+TEST_F(TestSuite, randomNumbers2) {
+    RAYX::fixSeed(RAYX::FIXED_SEED);
+    // TODO fix this!
+    // CHECK_EQ(randomNormal(0, 1), -0.55023449442049355);
+}
+
 TEST_F(TestSuite, PointSource_seeded) {
     RAYX::fixSeed(RAYX::FIXED_SEED);
     compareAgainstCorrect("PointSource_seeded");
