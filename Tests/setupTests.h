@@ -102,6 +102,7 @@ inline void checkEq(std::string filename, int line, std::string l, std::string r
 }
 
 /// check that L and R contain the same doubles.
+// TODO check_eq calls L and R multiple times if they are expressions with side-effects!
 #define CHECK_EQ(L, R, ...) \
     checkEq(__FILE__, __LINE__, #L, #R, L, R, RAYX::formatAsVec(L), RAYX::formatAsVec(R), ##__VA_ARGS__)  // __VA_ARGS__ = tolerance or nothing
 

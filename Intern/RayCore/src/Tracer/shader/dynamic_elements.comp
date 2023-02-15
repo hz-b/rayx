@@ -29,9 +29,8 @@ Collision find_collision() {
         dvec4 currentIntersection = getOpticalElementIntersection(_ray, elementIndex);
 
         // Intersection coordinates in GLOBAL coordinates
-        dvec4 currentGlobalIntersection;
         dvec3 currentGlobalIntersection_xyz = dvec3(quadricData[elementIndex].outTrans * dvec4(currentIntersection.x, currentIntersection.y, currentIntersection.z, 1));
-        currentGlobalIntersection = dvec4(currentGlobalIntersection_xyz, currentGlobalIntersection.w);
+        dvec4 currentGlobalIntersection = dvec4(currentGlobalIntersection_xyz, currentIntersection.w);
 
         // check if current intersection is closer than the closest previous Hitpoint
         // If yes then update. Since the old intersection is occluded by the old Intersection/Hit point
