@@ -70,7 +70,10 @@ void TerminalApp::tracePath(const std::filesystem::path& path) {
             }
 
             auto cmd = std::string("python ") + std::string(canonicalizeRepositoryPath(std::string("Scripts/plot.py"))) + " " + file;
-            system(cmd.c_str());
+            auto ret = system(cmd.c_str());
+            if (ret != 0) {
+                RAYX_WARN << "received error code while printing";
+            }
         }
 
 #if defined(RAYX_DEBUG_MODE) && not defined(CPP)

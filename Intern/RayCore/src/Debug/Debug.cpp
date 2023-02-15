@@ -46,7 +46,7 @@ Log::Log(std::string filename, int line) { formatDebugMsg(std::move(filename), l
 Log::~Log() { std::cout << std::endl; }
 
 Warn::Warn(std::string filename, int line) {
-    std::cerr << "\x1B[31m";   // color red
+    std::cerr << "\x1B[31m";  // color red
     formatDebugMsg(std::move(filename), line, std::cerr);
 }
 
