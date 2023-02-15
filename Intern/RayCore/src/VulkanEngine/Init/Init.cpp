@@ -16,11 +16,11 @@ void VulkanEngine::init(VulkanEngineInitSpec_t spec) {
     createSemaphores();
     createDescriptorSetLayout();
     createAllocateDescriptorPool(m_buffers.size());
+    createFences();
     prepareVma();
     createStagingBuffer();
     createCache();
     createShaderModule();
-    RAYX_D_LOG << "Max stage buffer :" << getStagingBufferSize() / 1048576.0 << " MB";
     m_state = VulkanEngineStates_t::PRERUN;
 }
 

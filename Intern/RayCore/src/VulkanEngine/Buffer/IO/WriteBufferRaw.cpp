@@ -20,6 +20,7 @@ void VulkanEngine::writeBufferRaw(const char* bufname, char* indata) {
 
         offset += localbytes;
         remainingBytes -= localbytes;
+        m_Fences.transfer->wait();
     }
 }
 

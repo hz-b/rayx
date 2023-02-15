@@ -153,7 +153,9 @@ std::vector<const char*> getRequiredExtensions() {
     std::vector<const char*> extensions;
 
     if (enableValidationLayers) {
+#ifdef RAYX_DEBUG_MODE
         extensions.push_back(VK_EXT_DEBUG_UTILS_EXTENSION_NAME);
+#endif
     }
 
     return extensions;

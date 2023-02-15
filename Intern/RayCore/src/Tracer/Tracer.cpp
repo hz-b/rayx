@@ -44,19 +44,27 @@ Rays Tracer::trace(const Beamline& b) {
         };
         PushConstants pushConsants = {glm::dmat4(0.0)};
         setPushConstants(&pushConsants);
-        auto rawBatchRays = traceRaw(cfg);
-        assert(rawBatchRays.size() == batch_size * maxSnapshots);
+        RAYX::Snapshots rawBatchRays;
+        {
+            RAYX_PROFILE_SCOPE_STDOUT("Tracing");
+            rawBatchRays = traceRaw(cfg);
+            assert(rawBatchRays.size() == batch_size * maxSnapshots);
+        }
 
-        for (uint i = 0; i < batch_size; i++) {
-            Snapshots snapshots;
-            for (uint j = 0; j < maxSnapshots; j++) {
-                uint idx = i * maxSnapshots + j;
-                Ray r = rawBatchRays[idx];
-                if (r.m_weight != W_UNINIT) {
-                    snapshots.push_back(r);
+        {
+            RAYX_PROFILE_SCOPE_STDOUT("Snapshoto");
+
+            for (uint i = 0; i < batch_size; i++) {
+                Snapshots snapshots;
+                for (uint j = 0; j < maxSnapshots; j++) {
+                    uint idx = i * maxSnapshots + j;
+                    Ray r = rawBatchRays[idx];
+                    if (r.m_weight != W_UNINIT) {
+                        snapshots.push_back(r);
+                    }
                 }
+                result.push_back(snapshots);
             }
-            result.push_back(snapshots);
         }
     }
 

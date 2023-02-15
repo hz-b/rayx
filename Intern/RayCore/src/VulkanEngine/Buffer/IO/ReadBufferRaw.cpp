@@ -18,9 +18,11 @@ void VulkanEngine::readBufferRaw(const char* bufname, char* outdata) {
 
     size_t remainingBytes = b.size;
     size_t offset = 0;
+    vkQueueWaitIdle(m_ComputeQueue);
     while (remainingBytes > 0) {
         size_t localbytes = std::min((size_t)STAGING_SIZE, remainingBytes);
         gpuMemcpy(m_stagingBuffer.buf, 0, b.buf, offset, localbytes);
+        m_Fences.transfer->wait();
         loadFromStagingBuffer(outdata + offset, localbytes);
         offset += localbytes;
         remainingBytes -= localbytes;
