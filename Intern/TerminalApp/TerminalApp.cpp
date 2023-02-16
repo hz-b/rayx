@@ -69,7 +69,7 @@ void TerminalApp::tracePath(const std::filesystem::path& path) {
                 RAYX_ERR << "Have you selected .csv exporting?";
             }
 
-            auto cmd = std::string("python ") + std::string(canonicalizeRepositoryPath(std::string("Scripts/plot.py"))) + " " + file;
+            auto cmd = std::string("python ") + canonicalizeRepositoryPath(std::string("Scripts/plot.py")).string() + " " + file;
             auto ret = system(cmd.c_str());
             if (ret != 0) {
                 RAYX_WARN << "received error code while printing";

@@ -3,6 +3,8 @@
 #include <algorithm>
 #include <random>
 
+#include "Constants.h"
+
 static std::mt19937 RNG;
 
 namespace RAYX {
@@ -32,7 +34,7 @@ double randomDoubleInRange(double a, double b) {
 // https://stackoverflow.com/questions/38532927/why-gcc-and-msvc-stdnormal-distribution-are-different
 double randomNormal(double mu, double sigma) {
     constexpr double epsilon = std::numeric_limits<double>::epsilon();
-    constexpr double two_pi = 2.0 * M_PI;
+    constexpr double two_pi = 2.0 * PI;
 
     // create two random numbers, make sure u1 is greater than epsilon
     double u1, u2;
