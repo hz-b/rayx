@@ -148,11 +148,11 @@ std::string TerminalApp::exportRays(const RAYX::Rays& rays, std::string path) {
 
     if (csv) {
         path += ".csv";
-        writeCSV(rays, path + ".csv");
+        writeCSV(rays, path);
     } else {
         path += ".h5";
 #ifndef CI  // writeH5 is not defined in the CI!
-        writeH5(rays, path + ".h5");
+        writeH5(rays, path);
 #endif
     }
     return path;
