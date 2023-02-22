@@ -1,3 +1,5 @@
+#ifndef NO_VULKAN
+
 #include "VulkanEngine/VulkanEngine.h"
 
 namespace RAYX {
@@ -60,3 +62,5 @@ void VulkanEngine::createAllocateDescriptorPool(uint32_t size) {
 }
 
 }  // namespace RAYX
+
+#endif

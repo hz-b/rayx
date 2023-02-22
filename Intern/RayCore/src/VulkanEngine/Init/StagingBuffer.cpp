@@ -1,3 +1,5 @@
+#ifndef NO_VULKAN
+
 #include "VulkanEngine/VulkanEngine.h"
 
 namespace RAYX {
@@ -12,3 +14,5 @@ void VulkanEngine::createStagingBuffer() {
 }
 
 }  // namespace RAYX
+
+#endif

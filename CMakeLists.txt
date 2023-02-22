@@ -8,6 +8,10 @@ add_subdirectory(Intern)
 add_subdirectory(Extern)
 add_subdirectory(Tests)
 
+option(WERROR "add -Werror option" "NO") # inactive per default
+option(VULKAN "include the VulkanTracer" "YES") # activated per default
+option(H5 "include the H5Writer" "YES") # active per default
+
 # -------CodeCoverage-------
 option(BUILD_WITH_GCOV "Add Code Coverage to build" FALSE)
 set(CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/Extern/cmake)

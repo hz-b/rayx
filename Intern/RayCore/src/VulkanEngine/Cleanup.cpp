@@ -1,3 +1,5 @@
+#ifndef NO_VULKAN
+
 #include <vk_mem_alloc.h>
 
 #include "VulkanEngine/VulkanEngine.h"
@@ -16,3 +18,5 @@ void VulkanEngine::cleanup() {
 }
 
 }  // namespace RAYX
+
+#endif

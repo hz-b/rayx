@@ -1,3 +1,5 @@
+#ifndef NO_VULKAN
+
 #include "VulkanEngine/VulkanEngine.h"
 #define VMA_IMPLEMENTATION
 
@@ -185,3 +187,5 @@ void VulkanEngine::setupDebugMessenger() {
 }
 
 }  // namespace RAYX
+
+#endif

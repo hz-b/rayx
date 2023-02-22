@@ -154,7 +154,11 @@ class TestSuite : public testing::Test {
         if (cpu) {
             tracer = std::make_unique<RAYX::CpuTracer>();
         } else {
+#ifdef NO_VULKAN
+            RAYX_ERR << "can't create VulkanTracer due to NO_VULKAN";
+#else
             tracer = std::make_unique<RAYX::VulkanTracer>();
+#endif
         }
     }
     virtual void SetUp() {}

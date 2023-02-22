@@ -1,4 +1,4 @@
-#ifndef CI  // highfive doesn't work in CI
+#ifndef NO_H5
 
 #pragma once
 

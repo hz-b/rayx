@@ -1,3 +1,5 @@
+#ifndef NO_VULKAN
+
 #pragma once
 
 #include <vk_mem_alloc.h>
@@ -273,3 +275,5 @@ const bool enableValidationLayers = true;
 #endif
 
 }  // namespace RAYX
+
+#endif

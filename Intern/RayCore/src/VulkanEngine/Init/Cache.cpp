@@ -1,3 +1,5 @@
+#ifndef NO_VULKAN
+
 #include <filesystem>
 #include <vector>
 
@@ -27,3 +29,5 @@ void VulkanEngine::createCache() {
     VK_CHECK_RESULT(vkCreatePipelineCache(m_Device, &create_info, nullptr, &m_PipelineCache));
 }
 }  // namespace RAYX
+
+#endif

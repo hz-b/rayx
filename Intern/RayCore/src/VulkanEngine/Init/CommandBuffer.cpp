@@ -1,3 +1,5 @@
+#ifndef NO_VULKAN
+
 #include "VulkanEngine/VulkanEngine.h"
 
 namespace RAYX {
@@ -54,3 +56,5 @@ void VulkanEngine::createCommandBuffers() {
 }
 
 }  // namespace RAYX
+
+#endif

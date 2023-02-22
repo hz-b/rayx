@@ -1,3 +1,5 @@
+#ifndef NO_VULKAN
+
 #include "VulkanEngine/VulkanEngine.h"
 
 namespace RAYX {
@@ -33,3 +35,5 @@ void VulkanEngine::createFences() {
 }
 
 }  // namespace RAYX
+
+#endif

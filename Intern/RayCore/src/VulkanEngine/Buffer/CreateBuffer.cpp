@@ -1,3 +1,5 @@
+#ifndef NO_VULKAN
+
 #include <vk_mem_alloc.h>
 
 #include "VulkanEngine/VulkanEngine.h"
@@ -110,3 +112,5 @@ uint32_t findMemoryType(VkPhysicalDevice& physicalDevice, uint32_t memoryTypeBit
 }
 
 }  // namespace RAYX
+
+#endif

@@ -1,3 +1,5 @@
+#ifndef NO_VULKAN
+
 #include "VulkanTracer.h"
 
 #include <Material/Material.h>
@@ -80,3 +82,5 @@ void VulkanTracer::setPushConstants(PushConstants* p) {
     m_engine.m_pushConstants.size = sizeof(*p);
 }
 }  // namespace RAYX
+
+#endif

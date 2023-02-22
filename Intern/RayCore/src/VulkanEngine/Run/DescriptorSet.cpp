@@ -1,3 +1,5 @@
+#ifndef NO_VULKAN
+
 #include "VulkanEngine/VulkanEngine.h"
 
 namespace RAYX {
@@ -32,3 +34,5 @@ void VulkanEngine::updteDescriptorSets() {
 }
 
 }  // namespace RAYX
+
+#endif

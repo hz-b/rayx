@@ -12,10 +12,19 @@ else()
 	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra -Wpedantic") # -Wconversion -Wsign-conversion")
 endif()
 
-# Warnings are treated as errors on the CI Pipeline
-if("$ENV{CI}" STREQUAL "YES")
-	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O3 -Werror -D CI") # -O3 finds more errors!
-	message(STATUS "CI mode")
+if(WERROR STREQUAL "YES")
+	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O3 -Werror") # -O3 finds more errors!
+	message(STATUS "-Werror mode")
+endif()
+
+if(VULKAN STREQUAL "NO")
+	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -D NO_VULKAN")
+	message(STATUS "Vulkan disabled")
+endif()
+
+if(H5 STREQUAL "NO")
+	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -D NO_H5")
+	message(STATUS "H5 disabled")
 endif()
 
 # Release repo

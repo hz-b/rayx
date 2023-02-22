@@ -1,3 +1,5 @@
+#ifndef NO_VULKAN
+
 #include <algorithm>
 
 #include "VulkanEngine/VulkanEngine.h"
@@ -40,3 +42,5 @@ void VulkanEngine::loadFromStagingBuffer(char* outdata, size_t bytes) {
 }
 
 }  // namespace RAYX
+
+#endif

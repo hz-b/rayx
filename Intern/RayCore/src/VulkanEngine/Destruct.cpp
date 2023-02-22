@@ -1,3 +1,5 @@
+#ifndef NO_VULKAN
+
 #include <vk_mem_alloc.h>
 
 #include "CanonicalizePath.h"
@@ -95,3 +97,5 @@ VulkanEngine::~VulkanEngine() {
 }
 
 }  // namespace RAYX
+
+#endif

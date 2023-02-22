@@ -1,3 +1,5 @@
+#ifndef NO_VULKAN
+
 #include "VulkanEngine/VulkanEngine.h"
 
 namespace RAYX {
@@ -13,3 +15,5 @@ void VulkanEngine::declareBuffer(const char* bufname, BufferDeclarationSpec_t sp
     b.binding = spec.binding;
 }
 }  // namespace RAYX
+
+#endif

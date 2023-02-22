@@ -40,3 +40,20 @@ if(CMAKE_COMPILER_IS_GNUCXX AND CMAKE_BUILD_TYPE STREQUAL "Debug" AND BUILD_WITH
     set_property(TARGET ${BINARY}
         APPEND PROPERTY ADDITIONAL_CLEAN_FILES ${TARGET} ${GCNO_FILES} ${GCDA_FILES})
 endif()
+
+
+# TODO combine this with the Intern/CMakeFiles.txt, it does the same.
+if(WERROR STREQUAL "YES")
+	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O3 -Werror") # -O3 finds more errors!
+	message(STATUS "-Werror mode")
+endif()
+
+if(VULKAN STREQUAL "NO")
+	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -D NO_VULKAN")
+	message(STATUS "Vulkan disabled")
+endif()
+
+if(H5 STREQUAL "NO")
+	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -D NO_H5")
+	message(STATUS "H5 disabled")
+endif()

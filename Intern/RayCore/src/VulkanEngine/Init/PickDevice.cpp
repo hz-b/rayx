@@ -1,3 +1,5 @@
+#ifndef NO_VULKAN
+
 #include <optional>
 
 #include "VulkanEngine/VulkanEngine.h"
@@ -233,3 +235,5 @@ VkDeviceSize VulkanEngine::getStagingBufferSize() {
 }
 
 }  // namespace RAYX
+
+#endif

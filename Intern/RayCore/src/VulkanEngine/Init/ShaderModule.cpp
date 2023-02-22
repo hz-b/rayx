@@ -1,3 +1,5 @@
+#ifndef NO_VULKAN
+
 #include "CanonicalizePath.h"
 #include "Debug/Instrumentor.h"
 #include "VulkanEngine/VulkanEngine.h"
@@ -30,3 +32,5 @@ void VulkanEngine::createShaderModule() {
     delete[] compShaderCode;
 }
 }  // namespace RAYX
+
+#endif

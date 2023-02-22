@@ -124,7 +124,11 @@ void TerminalApp::run() {
     if (m_CommandParser->m_args.m_cpuFlag) {
         m_Tracer = std::make_unique<RAYX::CpuTracer>();
     } else {
+#ifdef NO_VULKAN
+        RAYX_ERR << "NO_VULKAN: trying to construct VulkanTracer!";
+#else
         m_Tracer = std::make_unique<RAYX::VulkanTracer>();
+#endif
     }
 
     // Trace, export and plot
@@ -133,11 +137,7 @@ void TerminalApp::run() {
 
 std::string TerminalApp::exportRays(const RAYX::Rays& rays, std::string path) {
     RAYX_PROFILE_FUNCTION_STDOUT();
-#ifdef CI
-    bool csv = true;
-#else
     bool csv = m_CommandParser->m_args.m_csvFlag;
-#endif
 
     // strip .rml
     if (path.ends_with(".rml")) {
@@ -150,8 +150,10 @@ std::string TerminalApp::exportRays(const RAYX::Rays& rays, std::string path) {
         path += ".csv";
         writeCSV(rays, path);
     } else {
+#ifdef NO_H5
+        RAYX_ERR << "writeH5 called during NO_H5";
+#else
         path += ".h5";
-#ifndef CI  // writeH5 is not defined in the CI!
         writeH5(rays, path, getBeamlineOpticalElementsNames());
 #endif
     }
@@ -168,6 +170,7 @@ std::string TerminalApp::exportRays(const RAYX::Rays& rays, std::string path) {
  *
  */
 void TerminalApp::exportDebug() {
+#ifndef NO_VULKAN
     if (m_CommandParser->m_args.m_cpuFlag) {
         return;
     }
@@ -181,6 +184,7 @@ void TerminalApp::exportDebug() {
         }
         index += 1;
     }
+#endif
 }
 #endif
 

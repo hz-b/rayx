@@ -1,3 +1,5 @@
+#ifndef NO_VULKAN
+
 #pragma once
 
 #include "Core.h"
@@ -34,3 +36,5 @@ class RAYX_API VulkanTracer : public Tracer {
     std::vector<debugBuffer_t> m_debugBufList;
 };
 }  // namespace RAYX
+
+#endif

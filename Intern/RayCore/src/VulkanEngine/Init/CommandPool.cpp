@@ -1,3 +1,5 @@
+#ifndef NO_VULKAN
+
 #include "VulkanEngine/VulkanEngine.h"
 
 namespace RAYX {
@@ -24,3 +26,5 @@ void VulkanEngine::createCommandPool() {
 }
 
 }  // namespace RAYX
+
+#endif

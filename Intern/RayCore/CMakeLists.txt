@@ -86,13 +86,15 @@ target_compile_definitions(${PROJECT_NAME}
     $<$<CONFIG:RelWithDebInfo>:RAYX_DEBUG_MODE>
 )
 
-find_package(Vulkan 1.3.216 REQUIRED)
-target_link_libraries(${PROJECT_NAME}
-    PUBLIC Vulkan::Vulkan
-)
+if(NOT VULKAN STREQUAL "NO")
+    find_package(Vulkan 1.3.216 REQUIRED)
+    target_link_libraries(${PROJECT_NAME}
+        PUBLIC Vulkan::Vulkan
+    )
+endif()
 
 # Link H5 Format
-if(NOT "$ENV{CI}" STREQUAL "YES")
+if(NOT H5 STREQUAL "NO")
     if(UNIX)
         target_include_directories(${PROJECT_NAME} PUBLIC /usr/include/hdf5/serial)
         target_link_directories(${PROJECT_NAME} PUBLIC /usr/lib/x86_64-linux-gnu/hdf5/serial)
@@ -114,47 +116,35 @@ target_include_directories(${PROJECT_NAME}
     PUBLIC ${RayCore_SOURCE_DIR}/../../Extern/VMA/include/
 )
 
-# Compile Shaders
-# The following code is used to always compile the shader.
-# This is most likely not an optimal solution, but it will work
-# until we find a better one.
-add_dependencies(${PROJECT_NAME} COMPILE_SHADER)
-set(COMPILED_SHADER ${CMAKE_BINARY_DIR}/bin/comp.spv)
-set(COMPILED_SHADER_FAKE ${CMAKE_BINARY_DIR}/bin/___comp.spv) # this exists so file cannot be found -> always execute command
+if(NOT VULKAN STREQUAL "NO")
+    # Compile Shaders
+    # The following code is used to always compile the shader.
+    # This is most likely not an optimal solution, but it will work
+    # until we find a better one.
+    add_dependencies(${PROJECT_NAME} COMPILE_SHADER)
+    set(COMPILED_SHADER ${CMAKE_BINARY_DIR}/bin/comp.spv)
+    set(COMPILED_SHADER_FAKE ${CMAKE_BINARY_DIR}/bin/___comp.spv) # this exists so file cannot be found -> always execute command
 
-if(WIN32)
-    add_custom_command(
-        OUTPUT
-        ${COMPILED_SHADER}
-        ${COMPILED_SHADER_FAKE}
-        COMMAND "$ENV{VULKAN_SDK}/Bin/glslc.exe"
-        ARGS ${RayCore_SOURCE_DIR}/src/Tracer/shader/main-glsl.comp -o ${COMPILED_SHADER} -fshader-stage=compute
-    )
-elseif(UNIX)
-    add_custom_command(
-        OUTPUT
-        ${COMPILED_SHADER}
-        ${COMPILED_SHADER_FAKE}
-        COMMAND "glslc"
-        ARGS ${RayCore_SOURCE_DIR}/src/Tracer/shader/main-glsl.comp -o ${COMPILED_SHADER} -fshader-stage=compute
-    )
+    if(WIN32)
+        add_custom_command(
+            OUTPUT
+            ${COMPILED_SHADER}
+            ${COMPILED_SHADER_FAKE}
+            COMMAND "$ENV{VULKAN_SDK}/Bin/glslc.exe"
+            ARGS ${RayCore_SOURCE_DIR}/src/Tracer/shader/main-glsl.comp -o ${COMPILED_SHADER} -fshader-stage=compute
+        )
+    elseif(UNIX)
+        add_custom_command(
+            OUTPUT
+            ${COMPILED_SHADER}
+            ${COMPILED_SHADER_FAKE}
+            COMMAND "glslc"
+            ARGS ${RayCore_SOURCE_DIR}/src/Tracer/shader/main-glsl.comp -o ${COMPILED_SHADER} -fshader-stage=compute
+        )
+    endif()
+
+    add_custom_target(COMPILE_SHADER ALL DEPENDS ${COMPILED_SHADER})
 endif()
-
-add_custom_target(COMPILE_SHADER ALL DEPENDS ${COMPILED_SHADER})
-
-# find python libraries
-find_package(Python3 COMPONENTS Interpreter Development NumPy REQUIRED)
-find_package(PythonLibs 3.0 REQUIRED)
-target_include_directories(${PROJECT_NAME}
-    PUBLIC ${RayCore_SOURCE_DIR}/../../Extern/matplotlib-cpp
-    PUBLIC ${PYTHON3_INCLUDE_DIRS}
-    PUBLIC ${NumPy_INCLUDE_DIRS}
-)
-target_link_libraries(${PROJECT_NAME}
-    PUBLIC
-    ${PYTHON_LIBRARIES}
-    Python3::NumPy
-)
 
 # Print include directories
 get_target_property(INCLUDE_DIRECTORIES ${PROJECT_NAME} INCLUDE_DIRECTORIES)

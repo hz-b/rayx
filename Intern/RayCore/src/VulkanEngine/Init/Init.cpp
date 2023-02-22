@@ -1,3 +1,5 @@
+#ifndef NO_VULKAN
+
 #include "VulkanEngine/VulkanEngine.h"
 
 namespace RAYX {
@@ -25,3 +27,5 @@ void VulkanEngine::init(VulkanEngineInitSpec_t spec) {
 }
 
 }  // namespace RAYX
+
+#endif
