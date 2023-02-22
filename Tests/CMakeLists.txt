@@ -44,8 +44,12 @@ endif()
 
 # TODO combine this with the Intern/CMakeFiles.txt, it does the same.
 if(WERROR STREQUAL "YES")
-	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O3 -Werror") # -O3 finds more errors!
-	message(STATUS "-Werror mode")
+	if(MSVC)
+	else()
+		set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O3 -Werror") # -O3 finds more errors!
+	endif()
+
+	message(STATUS "Werror mode")
 endif()
 
 if(VULKAN STREQUAL "NO")
