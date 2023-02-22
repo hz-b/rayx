@@ -40,7 +40,7 @@ std::vector<SerializedRay> serialize(const RAYX::Rays& rays) {
     return serialized;
 }
 
-void writeH5(const RAYX::Rays& rays, std::string filename) {
+void writeH5(const RAYX::Rays& rays, std::string filename, std::vector<std::string> elementNames) {
     static_assert(sizeof(SerializedRay) == 18 * sizeof(double));
 
     HighFive::File file(filename, HighFive::File::ReadWrite | HighFive::File::Create | HighFive::File::Truncate);
@@ -49,9 +49,17 @@ void writeH5(const RAYX::Rays& rays, std::string filename) {
 
     try {
         auto dataspace = HighFive::DataSpace({srays.size(), 18});
-        auto dataset = file.createDataSet<double>("0", dataspace);
+        auto dataset = file.createDataSet<double>("rays", dataspace);
         auto ptr = (double*)srays.data();
         dataset.write_raw(ptr);
+
+        for (unsigned int i = 0; i < elementNames.size(); i++) {
+            auto& e = elementNames[i];
+            auto dataspace = HighFive::DataSpace({e.size()});
+            auto dataset = file.createDataSet<char>(std::to_string(i + 1), dataspace);
+            auto ptr = e.c_str();
+            dataset.write_raw(ptr);
+        }
     } catch (HighFive::Exception& err) {
         RAYX_ERR << err.what();
     }

@@ -8,6 +8,6 @@
 #include "Tracer/Ray.h"
 #include "Tracer/Tracer.h"
 
-void RAYX_API writeH5(const RAYX::Rays&, std::string filename);
+void RAYX_API writeH5(const RAYX::Rays&, std::string filename, std::vector<std::string> elementNames);
 
 #endif

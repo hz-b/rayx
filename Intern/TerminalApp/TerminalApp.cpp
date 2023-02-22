@@ -152,7 +152,7 @@ std::string TerminalApp::exportRays(const RAYX::Rays& rays, std::string path) {
     } else {
         path += ".h5";
 #ifndef CI  // writeH5 is not defined in the CI!
-        writeH5(rays, path);
+        writeH5(rays, path, getBeamlineOpticalElementsNames());
 #endif
     }
     return path;

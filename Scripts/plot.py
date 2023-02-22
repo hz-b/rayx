@@ -16,31 +16,38 @@ def importOutput(filename: str):
     """
     # file will be closed when we exit from WITH scope
     with h5py.File(filename, 'r') as h5f:
-        dataset = h5f["0"]
+        names = []
+        for x in h5f.keys():
+            if x == "rays": continue
+            x = "".join([chr(y) for y in h5f[x]])
+            names.append(x)
+
+        dataset = h5f["rays"]
         df = pd.DataFrame(dataset, columns=['RayId', 'SnapshotID', 'Xloc', 'Yloc', 'Zloc', 'Weight', 'Xdir', 'Ydir', 'Zdir', 'Energy',
                                              'Stokes0', 'Stokes1', 'Stokes2', 'Stokes3', 'pathLength', 'order',
                                              'lastElement', 'extraParam'])
     df = df[df["Weight"] == W_JUST_HIT_ELEM]
     df = df[["Xloc", "Yloc", "Zloc", "lastElement"]]
-    return df
+    return df, names
 
 
 BAR = None
 
 def plot(filename: str):
-    df = importOutput(filename)
+    df, names = importOutput(filename)
     elems = df["lastElement"].unique()
-    int_elems = list(map(int, elems))
 
     fig, ax = plt.subplots()
 
-    rax = fig.add_axes([0.02, 0.7, 0.1, 0.15])
-    radio = RadioButtons(rax, int_elems)
+    rax = fig.add_axes([0.02, 0.7, 0.15, 0.15])
+    radio = RadioButtons(rax, names)
 
-    def react(e):
+    def react(name):
         global BAR
+
+        i = names.index(name)
+        e = elems[i]
         ax.clear()
-        e = float(e)
         d = df[df["lastElement"] == e]
 
         # we don't know whether the element is in the XY or XZ plane,
@@ -54,12 +61,12 @@ def plot(filename: str):
         BAR = plt.colorbar(h[3], ax=ax)
         ax.set_title("Footprint of element " + str(int(e)))
         ax.set_xlabel("x in mm")
-        ax.set_ylabel(("y" if Y else "z") + "in mm")
+        ax.set_ylabel(("y" if Y else "z") + " in mm")
         plt.draw()
 
     radio.on_clicked(react)
 
-    react(int_elems[0])
+    react(names[0])
 
     plt.show()
 
