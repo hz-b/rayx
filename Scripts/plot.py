@@ -16,10 +16,15 @@ def importOutput(filename: str):
     """
     # file will be closed when we exit from WITH scope
     with h5py.File(filename, 'r') as h5f:
-        names = []
+        keys = []
         for x in h5f.keys():
             if x == "rays": continue
-            x = "".join([chr(y) for y in h5f[x]])
+            keys.append(int(x))
+        keys = sorted(keys)
+
+        names = []
+        for x in keys:
+            x = "".join([chr(y) for y in h5f[str(x)]])
             names.append(x)
 
         dataset = h5f["rays"]
@@ -30,12 +35,10 @@ def importOutput(filename: str):
     df = df[["Xloc", "Yloc", "Zloc", "lastElement"]]
     return df, names
 
-
 BAR = None
 
 def plot(filename: str):
     df, names = importOutput(filename)
-    elems = df["lastElement"].unique()
 
     fig, ax = plt.subplots()
 
@@ -45,14 +48,13 @@ def plot(filename: str):
     def react(name):
         global BAR
 
-        i = names.index(name)
-        e = elems[i]
+        e = float(names.index(name) + 1)
         ax.clear()
         d = df[df["lastElement"] == e]
 
         # we don't know whether the element is in the XY or XZ plane,
         # this `relevance` tests which axis is more important.
-        relevance = lambda v: max(v) - min(v)
+        relevance = lambda v: v.max() - v.min()
         Y = relevance(d["Yloc"]) > relevance(d["Zloc"])
         h = ax.hist2d(d["Xloc"], d["Yloc"] if Y else d["Zloc"], bins=200)
         if BAR:
