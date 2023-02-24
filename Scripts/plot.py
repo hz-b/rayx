@@ -62,8 +62,8 @@ def plot(filename: str):
             BAR = None
         BAR = plt.colorbar(h[3], ax=ax)
         ax.set_title("Footprint of element " + str(int(e)))
-        ax.set_xlabel("x in mm")
-        ax.set_ylabel(("y" if Y else "z") + " in mm")
+        ax.set_xlabel("x/mm")
+        ax.set_ylabel(("y" if Y else "z") + "/mm")
         plt.draw()
 
     radio.on_clicked(react)
