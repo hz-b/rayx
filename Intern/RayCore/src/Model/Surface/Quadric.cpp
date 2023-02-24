@@ -11,7 +11,7 @@ namespace RAYX {
  */
 Quadric::Quadric(const glm::dmat4x4 inputPoints) { m_parameters = inputPoints; }
 
-Quadric::Quadric() = default;  // TODO
+Quadric::Quadric() = default;
 
 Quadric::~Quadric() = default;
 

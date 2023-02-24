@@ -61,7 +61,7 @@ class RAYX_API OpticalElement {
     std::unique_ptr<Geometry> m_Geometry;   ///< Geometry of the element
     std::unique_ptr<Surface> m_surfacePtr;  ///< Surface of the element
 
-    std::array<double, 7> m_slopeError;  // TODO(Jannis): move to geometry
+    std::array<double, 7> m_slopeError;
 };
 
 }  // namespace RAYX

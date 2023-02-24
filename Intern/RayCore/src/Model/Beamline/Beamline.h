@@ -16,9 +16,6 @@ class LightSource;
  * The Beamline class is a container for OpticalElements and LightSources.
  * It represents a central structure in our simulation process.
  */
-// TODO(Jannis): after we reworked the beamlineobjects we want to have
-// m_OpticalElements and m_LightSources private again and have a sensible
-// constructor for this class.
 class RAYX_API Beamline {
   public:
     Beamline();

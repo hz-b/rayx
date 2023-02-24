@@ -112,7 +112,6 @@ double OpticalElement::getWidth() { return m_Geometry->m_widthA; }
 
 double OpticalElement::getHeight() { return m_Geometry->m_height; }
 
-// TODO(Jannis): make these return a glm::dvec4
 glm::dmat4 OpticalElement::getInMatrix() const {
     // return glmToArray16(m_Geometry->m_inMatrix);,
     glm::dmat4 inMatrix = glm::dmat4();

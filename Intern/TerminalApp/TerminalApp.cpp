@@ -100,7 +100,6 @@ void TerminalApp::run() {
     }
 
     if (m_CommandParser->m_args.m_isFixSeed) {
-        // TODO consider letting the user fix an explicitly stated seed.
         if (m_CommandParser->m_args.m_seed != -1) {
             RAYX::fixSeed(m_CommandParser->m_args.m_seed);
         } else
