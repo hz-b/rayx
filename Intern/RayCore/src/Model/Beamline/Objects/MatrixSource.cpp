@@ -31,9 +31,12 @@ std::vector<Ray> MatrixSource::getRays() const {
         for (int row = 0; row < rmat; row++) {
             double rn = randomDouble();  // in [0, 1]
             x = -0.5 * m_sourceWidth + (m_sourceWidth / (rmat - 1)) * row + getMisalignmentParams()[0];
+            x += m_position.x;
             y = -0.5 * m_sourceHeight + (m_sourceHeight / (rmat - 1)) * col + getMisalignmentParams()[1];
+            y += m_position.y;
 
             z = (rn - 0.5) * m_sourceDepth;
+            z += m_position.z;
             en = selectEnergy();
             glm::dvec3 position = glm::dvec3(x, y, z);
 
@@ -42,6 +45,8 @@ std::vector<Ray> MatrixSource::getRays() const {
             psi = -0.5 * m_verDivergence + (m_verDivergence / (rmat - 1)) * col + getMisalignmentParams()[3];
 
             glm::dvec3 direction = getDirectionFromAngles(phi, psi);
+            glm::dvec4 tempDir = m_orientation * glm::dvec4(direction, 0.0);
+            direction = glm::dvec3(tempDir.x, tempDir.y, tempDir.z);
             glm::dvec4 stokes = glm::dvec4(1, getLinear0(), getLinear45(), getCircular());
 
             Ray r = {position, W_UNINIT, direction, en, stokes, 0.0, 0.0, 0.0, 0.0};

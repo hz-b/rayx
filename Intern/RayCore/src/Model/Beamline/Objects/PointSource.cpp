@@ -51,8 +51,11 @@ std::vector<Ray> PointSource::getRays() const {
     // for width, height, depth, horizontal and vertical divergence
     for (int i = 0; i < n; i++) {
         x = getCoord(m_widthDist, m_sourceWidth) + getMisalignmentParams()[0];
+        x += m_position.x;
         y = getCoord(m_heightDist, m_sourceHeight) + getMisalignmentParams()[1];
+        y += m_position.y;
         z = (randomDouble() - 0.5) * m_sourceDepth;
+        z += m_position.z;
         en = selectEnergy();  // LightSource.cpp
         // double z = (rn[2] - 0.5) * m_sourceDepth;
         glm::dvec3 position = glm::dvec3(x, y, z);
@@ -63,6 +66,8 @@ std::vector<Ray> PointSource::getRays() const {
         // get corresponding angles based on distribution and deviation from
         // main ray (main ray: xDir=0,yDir=0,zDir=1 for phi=psi=0)
         glm::dvec3 direction = getDirectionFromAngles(phi, psi);
+        glm::dvec4 tempDir = m_orientation * glm::dvec4(direction, 0.0);
+        direction = glm::dvec3(tempDir.x, tempDir.y, tempDir.z);
         glm::dvec4 stokes = glm::dvec4(1, getLinear0(), getLinear45(), getCircular());
 
         Ray r = {position, W_UNINIT, direction, en, stokes, 0.0, 0.0, 0.0, 0.0};

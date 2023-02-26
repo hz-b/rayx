@@ -16,6 +16,8 @@ LightSource::LightSource(const DesignObject& dobj) {
     m_linearPol_0 = dobj.parseLinearPol0();
     m_linearPol_45 = dobj.parseLinearPol45();
     m_circularPol = dobj.parseCircularPol();
+    m_orientation = dobj.parseOrientation();
+    m_position = dobj.parsePosition();
 }
 
 double LightSource::getLinear0() const { return m_linearPol_0; }
