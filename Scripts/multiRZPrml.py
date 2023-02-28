@@ -20,15 +20,14 @@ class RMLParams:
 
 def getArgs():
     params = RMLParams()
-    # params.file = sys.argv[1]
-    # params.numRZPs = int(sys.argv[2])
-    # params.gamma = float(sys.argv[3])
+    params.file = sys.argv[1]
+    params.numRZPs = int(sys.argv[2])
+    params.gamma = float(sys.argv[3])
 
     # Temporary dummy
-    # TODO: get rml file from Pete
-    params.file = "C:\Projects\HZB\RAY-X\Scripts\RZP.rml"
-    params.numRZPs = 5
-    params.gamma = 0.1
+    # params.file = "C:\Projects\HZB\RAY-X\Scripts\RZP.rml"
+    # params.numRZPs = 5
+    # params.gamma = 0.1
     return params
 
 
@@ -65,18 +64,19 @@ def projectPointOntoPlane(point: np.array, planeNormal: np.array, planeOrigin: n
 
 def rotateAroundPoint(origin: np.array, angle: float, point: np.array):
     # Rotate point around origin and y-axis by angle
-    s = np.sin(angle)
-    c = np.cos(angle)
+    rotMatY = np.array([
+        [np.cos(angle), 0, np.sin(angle)],
+        [0, 1, 0],
+        [-np.sin(angle), 0, np.cos(angle)]
+    ])
 
     # Translate point back to origin
     point = point - origin
-
+    
     # Rotate point
-    xnew = point[0] * c - point[2] * s
-    znew = point[0] * s + point[2] * c
+    point = np.matmul(rotMatY, point)
 
     # Translate point back
-    point = np.array([xnew, point[1], znew])
     point = point + origin
 
     return point
@@ -150,7 +150,7 @@ def calculateRZP(rmlRZP, numRZPs, gamma):
         for i in range(1, numRZPs):
             # left
             if i % 2 == 0:
-                angle = (1 + int(i/2)) * -gamma
+                angle = (int(i/2)) * -gamma
                 positions.append(rotateAroundPoint(
                     rzpOrigin, angle, projectedSourceOrigin))
                 directions.append(rotateMatrix(rzpDirMat, angle))
