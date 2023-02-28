@@ -55,31 +55,28 @@ def getVec(rmlParam):
 # Project point onto plane
 def projectPointOntoPlane(point: np.array, planeNormal: np.array, planeOrigin: np.array):
     # Make sure planeNormal is a unit vector
-    planeNormal = planeNormal / np.linalg.norm(planeNormal) 
+    planeNormal = planeNormal / np.linalg.norm(planeNormal)
     v = point - planeOrigin
     d = np.dot(v, planeNormal)
     projectedPoint = point - d * planeNormal
     return projectedPoint
 
 
-def rotateAroundPoint(origin: np.array, angle: float, point: np.array):
-    # Rotate point around origin and y-axis by angle
-    rotMatY = np.array([
-        [np.cos(angle), 0, np.sin(angle)],
-        [0, 1, 0],
-        [-np.sin(angle), 0, np.cos(angle)]
-    ])
-
-    # Translate point back to origin
+def rotateAroundNormal(point: np.array, angle: float, normal: np.array, origin: np.array):
+    # Make sure normal is a unit vector
+    normal = normal / np.linalg.norm(normal)
+    # Translate point to origin
     point = point - origin
-    
-    # Rotate point
-    point = np.matmul(rotMatY, point)
-
-    # Translate point back
-    point = point + origin
-
-    return point
+    # Rotation matrix
+    rotMat = np.array([
+        [np.cos(angle) + normal[0]**2 * (1 - np.cos(angle)), normal[0] * normal[1] * (1 - np.cos(angle)) - normal[2] * np.sin(angle), normal[0] * normal[2] * (1 - np.cos(angle)) + normal[1] * np.sin(angle)],
+        [normal[1] * normal[0] * (1 - np.cos(angle)) + normal[2] * np.sin(angle), np.cos(angle) + normal[1]**2 * (1 - np.cos(angle)), normal[1] * normal[2] * (1 - np.cos(angle)) - normal[0] * np.sin(angle)],
+        [normal[2] * normal[0] * (1 - np.cos(angle)) - normal[1] * np.sin(angle), normal[2] * normal[1] * (1 - np.cos(angle)) + normal[0] * np.sin(angle), np.cos(angle) + normal[2]**2 * (1 - np.cos(angle))]
+    ])
+    rotatedPoint = np.matmul(rotMat, point)
+    # Translate back
+    rotatedPoint = rotatedPoint + origin
+    return rotatedPoint
 
 
 def rotateMatrix(mat, angle):
@@ -138,7 +135,7 @@ def calculateRZP(rmlRZP, numRZPs, gamma):
     rzpDirMat = np.array([rzpXDirection, rzpYDirection, rzpZDirection])
     projectedSourceOrigin = projectPointOntoPlane(
         [0, 0, 0], rzpYDirection, rzpOrigin)
-    distanceProjection = np.linalg.norm(projectedSourceOrigin - rzpOrigin)
+    # distanceProjection = np.linalg.norm(projectedSourceOrigin - rzpOrigin)
 
     if RMLParams.numRZPs % 2 == 0:
         print("Error: Number of RZPs must be odd")
@@ -151,15 +148,16 @@ def calculateRZP(rmlRZP, numRZPs, gamma):
             # left
             if i % 2 == 0:
                 angle = (int(i/2)) * -gamma
-                positions.append(rotateAroundPoint(
-                    rzpOrigin, angle, projectedSourceOrigin))
-                directions.append(rotateMatrix(rzpDirMat, angle))
             # right
             else:
                 angle = (1 + int(i/2)) * gamma
-                positions.append(rotateAroundPoint(
-                    rzpOrigin, angle, projectedSourceOrigin))
-                directions.append(rotateMatrix(rzpDirMat, angle))
+            
+            position = rotateAroundNormal(
+                rzpOrigin, angle, rzpYDirection, projectedSourceOrigin)
+            # Back to element coordinates
+            position = position - rzpOrigin 
+            positions.append(position)
+            directions.append(rotateMatrix(rzpDirMat, angle))
 
     return positions, directions
 
