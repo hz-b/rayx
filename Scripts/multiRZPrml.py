@@ -27,7 +27,7 @@ def getArgs():
     # Temporary dummy
     # params.file = "C:\Projects\HZB\RAY-X\Scripts\RZP.rml"
     # params.numRZPs = 5
-    # params.gamma = 0.1
+    # params.gamma = 0.00203483
     return params
 
 
@@ -62,16 +62,14 @@ def projectPointOntoPlane(point: np.array, planeNormal: np.array, planeOrigin: n
     return projectedPoint
 
 
-def rotateAroundNormal(point: np.array, angle: float, normal: np.array, origin: np.array):
-    # Make sure normal is a unit vector
-    normal = normal / np.linalg.norm(normal)
+def rotateAroundPoint(point: np.array, angle: float, origin: np.array):
     # Translate point to origin
     point = point - origin
     # Rotation matrix
     rotMat = np.array([
-        [np.cos(angle) + normal[0]**2 * (1 - np.cos(angle)), normal[0] * normal[1] * (1 - np.cos(angle)) - normal[2] * np.sin(angle), normal[0] * normal[2] * (1 - np.cos(angle)) + normal[1] * np.sin(angle)],
-        [normal[1] * normal[0] * (1 - np.cos(angle)) + normal[2] * np.sin(angle), np.cos(angle) + normal[1]**2 * (1 - np.cos(angle)), normal[1] * normal[2] * (1 - np.cos(angle)) - normal[0] * np.sin(angle)],
-        [normal[2] * normal[0] * (1 - np.cos(angle)) - normal[1] * np.sin(angle), normal[2] * normal[1] * (1 - np.cos(angle)) + normal[0] * np.sin(angle), np.cos(angle) + normal[2]**2 * (1 - np.cos(angle))]
+        [np.cos(angle), 0, np.sin(angle)],
+        [0, 1, 0],
+        [-np.sin(angle), 0, np.cos(angle)]
     ])
     rotatedPoint = np.matmul(rotMat, point)
     # Translate back
@@ -79,7 +77,7 @@ def rotateAroundNormal(point: np.array, angle: float, normal: np.array, origin: 
     return rotatedPoint
 
 
-def rotateMatrix(mat, angle):
+def rotateBasisY(mat, angle):
     # Rotation matrix
     rotMatY = np.array([
         [np.cos(angle), 0, np.sin(angle)],
@@ -152,12 +150,11 @@ def calculateRZP(rmlRZP, numRZPs, gamma):
             else:
                 angle = (1 + int(i/2)) * gamma
             
-            position = rotateAroundNormal(
-                rzpOrigin, angle, rzpYDirection, projectedSourceOrigin)
-            # Back to element coordinates
-            position = position - rzpOrigin 
+            relativeOrigin = projectedSourceOrigin - rzpOrigin
+            position = rotateAroundPoint(
+                [0, 0, 0], angle, relativeOrigin)
             positions.append(position)
-            directions.append(rotateMatrix(rzpDirMat, angle))
+            directions.append(rotateBasisY([[1, 0, 0], [0, 1, 0], [0, 0, 1]], angle))
 
     return positions, directions
 
