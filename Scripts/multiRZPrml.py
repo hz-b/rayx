@@ -26,7 +26,7 @@ def getArgs():
 
     # Temporary dummy
     params.file = "C:\Projects\HZB\RAY-X\Scripts\RZP.rml"
-    params.numRZPs = 5
+    params.numRZPs = 6
     params.gamma = 0.00203483
     return params
 
@@ -126,7 +126,7 @@ def calculateRZP(rmlRZP, numRZPs, gamma):
     directions = []
 
     # Get RZP parameters
-    distancePreceding, grazingIncAngle, rzpOrigin, rzpXDirection, rzpYDirection, rzpZDirection = getRZPParams(
+    _, _, rzpOrigin, rzpXDirection, rzpYDirection, rzpZDirection = getRZPParams(
         rmlRZP)
 
     # Calculate RZP positions and directions
@@ -135,9 +135,36 @@ def calculateRZP(rmlRZP, numRZPs, gamma):
         [0, 0, 0], rzpYDirection, rzpOrigin)
     # distanceProjection = np.linalg.norm(projectedSourceOrigin - rzpOrigin)
 
-    if RMLParams.numRZPs % 2 == 0:
-        print("Error: Number of RZPs must be odd")
-        exit(1)
+    if numRZPs % 2 == 0:
+        relativeOrigin = projectedSourceOrigin - rzpOrigin
+
+        # Calculate positions and directions of the left center RZP
+        positions.append(rotateAroundPoint(
+            [0, 0, 0], -gamma/2, relativeOrigin))
+        directions.append(rotateBasisY(
+            [[1, 0, 0], [0, 1, 0], [0, 0, 1]], gamma/2))
+
+        # Calculate positions and directions of the right center RZP
+        positions.append(rotateAroundPoint(
+            [0, 0, 0], gamma/2, relativeOrigin))
+        directions.append(rotateBasisY(
+            [[1, 0, 0], [0, 1, 0], [0, 0, 1]], -gamma/2))
+
+        # Now we calculate the positions and directions of the RZPs left and right of the central ones
+        for i in range(2, numRZPs):
+            # left
+            if i % 2 == 0:
+                angle = (1+i)/2 * -gamma
+            # right
+            else:
+                angle = i/2 * gamma
+            relativeOrigin = projectedSourceOrigin - rzpOrigin
+            position = rotateAroundPoint(
+                [0, 0, 0], -angle, relativeOrigin)
+            positions.append(position)
+            directions.append(rotateBasisY(
+                [[1, 0, 0], [0, 1, 0], [0, 0, 1]], angle))
+
     else:
         positions.append([0, 0, 0])
         directions.append([[1, 0, 0], [0, 1, 0], [0, 0, 1]])
@@ -145,16 +172,17 @@ def calculateRZP(rmlRZP, numRZPs, gamma):
         for i in range(1, numRZPs):
             # left
             if i % 2 == 0:
-                angle = (int(i/2)) * -gamma
+                angle = i/2 * -gamma
             # right
             else:
                 angle = (1 + int(i/2)) * gamma
-            
+
             relativeOrigin = projectedSourceOrigin - rzpOrigin
             position = rotateAroundPoint(
                 [0, 0, 0], -angle, relativeOrigin)
             positions.append(position)
-            directions.append(rotateBasisY([[1, 0, 0], [0, 1, 0], [0, 0, 1]], angle))
+            directions.append(rotateBasisY(
+                [[1, 0, 0], [0, 1, 0], [0, 0, 1]], angle))
 
     return positions, directions
 
