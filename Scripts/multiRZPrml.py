@@ -20,14 +20,14 @@ class RMLParams:
 
 def getArgs():
     params = RMLParams()
-    params.file = sys.argv[1]
-    params.numRZPs = int(sys.argv[2])
-    params.gamma = float(sys.argv[3])
+    # params.file = sys.argv[1]
+    # params.numRZPs = int(sys.argv[2])
+    # params.gamma = float(sys.argv[3])
 
     # Temporary dummy
-    # params.file = "C:\Projects\HZB\RAY-X\Scripts\RZP.rml"
-    # params.numRZPs = 5
-    # params.gamma = 0.00203483
+    params.file = "C:\Projects\HZB\RAY-X\Scripts\RZP.rml"
+    params.numRZPs = 5
+    params.gamma = 0.00203483
     return params
 
 
@@ -152,7 +152,7 @@ def calculateRZP(rmlRZP, numRZPs, gamma):
             
             relativeOrigin = projectedSourceOrigin - rzpOrigin
             position = rotateAroundPoint(
-                [0, 0, 0], angle, relativeOrigin)
+                [0, 0, 0], -angle, relativeOrigin)
             positions.append(position)
             directions.append(rotateBasisY([[1, 0, 0], [0, 1, 0], [0, 0, 1]], angle))
 
