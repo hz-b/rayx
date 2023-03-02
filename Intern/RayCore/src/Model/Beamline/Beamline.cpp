@@ -32,7 +32,7 @@ MaterialTables Beamline::calcMinimalMaterialTables() const {
     relevantMaterials.fill(false);
 
     for (const auto& e : m_OpticalElements) {
-        int material = (int)e->getSurfaceParams()[3][2];  // in [1, 92]
+        int material = (int)e->m_material;  // in [1, 92]
         if (1 <= material && material <= 92) {
             relevantMaterials[material - 1] = true;
         }

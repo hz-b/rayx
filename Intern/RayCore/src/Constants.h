@@ -85,7 +85,7 @@ struct Element {
 //
 // -----------------------------------------
 
-// The meaning of surfaceParams[3][0] (i.e. the type of an element):
+// element types
 const int TY_BASIC_MIRROR = 0;  // plane + sphere mirror
 const int TY_PLANE_GRATING = 1;
 const int TY_GENERAL_GRATING = 2;
@@ -94,5 +94,9 @@ const int TY_RZP = 4;
 const int TY_IMAGE_PLANE = 5;
 const int TY_TOROID_MIRROR = 6;
 const int TY_ELLIPSOID_MIRROR = 7;
+
+// surface types:
+const int STY_QUADRIC = 0;
+const int STY_TOROID = 1;
 
 #endif

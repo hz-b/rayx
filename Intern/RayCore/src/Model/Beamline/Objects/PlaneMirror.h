@@ -6,6 +6,8 @@ namespace RAYX {
 class RAYX_API PlaneMirror : public OpticalElement {
   public:
     PlaneMirror(const DesignObject&);
+
+    inline int getElementType() const { return TY_BASIC_MIRROR; }
 };
 
 }  // namespace RAYX

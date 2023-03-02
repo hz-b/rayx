@@ -62,12 +62,10 @@ Ellipsoid::Ellipsoid(const DesignObject& dobj) : OpticalElement(dobj) {
     RAYX_VERB << "m_a44: " << m_a44;
 
     double icurv = 1;
-    Material mat = dobj.parseMaterial();
-    auto matd = (double)static_cast<int>(mat);
     setSurface(std::make_unique<Quadric>(glm::dmat4x4{m_a11, 0, 0, 0,              //
                                                       icurv, m_a22, m_a23, m_a24,  //
                                                       0, 0, m_a33, m_a34,          //
-                                                      TY_ELLIPSOID_MIRROR, 0, matd, m_a44}));
+                                                      0, 0, 0, m_a44}));
 }
 
 void Ellipsoid::calculateCenterFromHalfAxes(Rad angle) {

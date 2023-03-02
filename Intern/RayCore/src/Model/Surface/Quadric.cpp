@@ -1,5 +1,6 @@
 #include "Quadric.h"
 
+#include "Constants.h"
 #include "Debug/Debug.h"
 
 namespace RAYX {
@@ -10,6 +11,8 @@ namespace RAYX {
  * @param inputPoints      4x4 Matrix as vector
  */
 Quadric::Quadric(const glm::dmat4x4 inputPoints) { m_parameters = inputPoints; }
+
+int Quadric::getSurfaceType() const { return STY_QUADRIC; }
 
 Quadric::Quadric() = default;
 
@@ -27,22 +30,15 @@ Quadric::~Quadric() = default;
 /**
  * ENCODING:
  *
- * {a_11,  a_12,     a_13,      a_14,
- *  icurv, a_22,     a_23,      a_24,
- *  0.0,   0.0,      a_33,      a_34,
- *  type,  settings, material,  a_44}
+ * {a_11,    a_12,     a_13,      a_14,
+ *  0.0,     a_22,     a_23,      a_24,
+ *  0.0,     0.0,      a_33,      a_34,
+ *  icurv,   0.0,      0.0,       a_44}
  *
- * @param type = what kind of optical element (mirror, plane grating, spherical
- *grating, toroid mirror, rzp, slit..)
- * @param setting = how to interpret the input of these params. During normal
- *tracing always = 0 but when testing, this parameter defines which test to run
  * @param icurv = whether to take the first or second intersection of a ray with
  *a quadric surface
  * @param a_11, .., a_44 parameters of the quadric equation to find the
  *intersection point. Depend on the element (plane, sphere, ellipsoid,..)
- * @param material = which material the surface has, stored as a number
- *corresponding to the variants of the enum class Material (see Material.h and
- *materials.xmacro)
  **/
 glm::dmat4x4 Quadric::getParams() const { return m_parameters; }
 

@@ -12,6 +12,7 @@ OpticalElement::OpticalElement(const DesignObject& dobj) {
     m_name = dobj.name();
     m_slopeError = dobj.parseSlopeError();
     m_Geometry = std::make_unique<Geometry>();
+    m_material = dobj.parseMaterial();
 
     double widthB = 0.0;
     xml::paramDouble(dobj.node, "totalWidthB", &widthB);
@@ -46,14 +47,14 @@ Element OpticalElement::intoElement() const {
         .m_outTrans = getOutMatrix(),
         .m_elementParameters = getElementParameters(),
         .m_surfaceParams = getSurfaceParams(),
-        .m_type = getSurfaceParams()[3][0],  // TODO
-        .m_surfaceType = 0,                  // TODO
+        .m_type = (double)getElementType(),
+        .m_surfaceType = (double)m_surfacePtr->getSurfaceType(),
         .m_widthA = m_Geometry->m_widthA,
         .m_widthB = m_Geometry->m_widthB,
         .m_height = m_Geometry->m_height,
         .m_slopeError = {m_slopeError[0], m_slopeError[1], m_slopeError[2], m_slopeError[3], m_slopeError[4], m_slopeError[5], m_slopeError[6]},
         .m_azimuthalAngle = m_Geometry->m_azimuthalAngle.rad,
-        .m_material = getSurfaceParams()[3][2],  // TODO
+        .m_material = (double)static_cast<int>(m_material),
         .m_padding = {0.0, 0.0},
     };
 }

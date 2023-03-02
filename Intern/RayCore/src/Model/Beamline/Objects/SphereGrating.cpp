@@ -15,10 +15,8 @@ SphereGrating::SphereGrating(const DesignObject& dobj) : OpticalElement(dobj) {
     m_vls = dobj.parseVls();
 
     m_gratingMount = dobj.parseGratingMount();
-    Material mat = dobj.parseMaterial();
-    auto matd = (double)static_cast<int>(mat);
     auto radius = dobj.parseRadius();
-    setSurface(std::make_unique<Quadric>(glm::dmat4x4{1, 0, 0, 0, 1, 1, 0, -radius, 0, 0, 1, 0, TY_GENERAL_GRATING, 0, matd, 0}));
+    setSurface(std::make_unique<Quadric>(glm::dmat4x4{1, 0, 0, 0, 1, 1, 0, -radius, 0, 0, 1, 0, 0, 0, 0, 0}));
 }
 
 double SphereGrating::getRadius() const { return m_radius; }

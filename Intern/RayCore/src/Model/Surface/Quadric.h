@@ -13,6 +13,9 @@ class RAYX_API Quadric : public Surface {
     // ctor
     Quadric();
     Quadric(const glm::dmat4x4 inputPoints);
+
+    int getSurfaceType() const;
+
     // dtor
     ~Quadric();
 

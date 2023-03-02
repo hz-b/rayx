@@ -27,10 +27,7 @@ Cone::Cone(const DesignObject& dobj) : OpticalElement(dobj) {
         m_a24 = -m_upstreamRadius_R;
     }
 
-    Material mat = dobj.parseMaterial();
-    auto matd = (double)static_cast<int>(mat);
-
-    setSurface(std::make_unique<Quadric>(glm::dmat4x4{m_a11, 0, 0, 0, icurv, m_a22, m_a23, m_a24, 0, 0, 0, 0, TY_BASIC_MIRROR, 0, matd, 0}));
+    setSurface(std::make_unique<Quadric>(glm::dmat4x4{m_a11, 0, 0, 0, icurv, m_a22, m_a23, m_a24, 0, 0, 0, 0, 0, 0, 0, 0}));
 }
 
 Cone::~Cone() = default;

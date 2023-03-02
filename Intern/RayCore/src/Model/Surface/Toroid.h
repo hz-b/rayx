@@ -14,12 +14,12 @@ class RAYX_API Toroid : public Surface {
   public:
     // ctor
     Toroid();
-    Toroid(const glm::dmat4x4 inputPoints);
-    Toroid(double longRadius, double shortRadius, double elementType, Material mat);
+    Toroid(double longRadius, double shortRadius);
+
+    int getSurfaceType() const;
+
     // dtor
     ~Toroid();
-
-    [[maybe_unused]] void setParameters(glm::dmat4x4 inputPoints);
 
     glm::dmat4x4 getParams() const;
 
@@ -27,7 +27,5 @@ class RAYX_API Toroid : public Surface {
     // 16 values that store the 2 surface params for the toroid and also some
     // settings for the shader to know how to interpret the input
     glm::dmat4x4 m_parameters;
-    double m_longRadius;
-    double m_shortRadius;
 };
 }  // namespace RAYX

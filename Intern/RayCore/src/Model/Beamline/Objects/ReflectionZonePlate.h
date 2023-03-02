@@ -20,6 +20,8 @@ class RAYX_API ReflectionZonePlate : public OpticalElement {
   public:
     ReflectionZonePlate(const DesignObject&);
 
+    inline int getElementType() const { return TY_RZP; }
+
     // for calculating incidence and exit angle from user parameters
     void calcAlpha();
     void calcBeta2();

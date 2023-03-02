@@ -7,6 +7,8 @@ class RAYX_API PlaneGrating : public OpticalElement {
   public:
     PlaneGrating(const DesignObject&);
 
+    inline int getElementType() const { return TY_PLANE_GRATING; }
+
     double getFixFocusConstantCFF();
     double getDesignEnergyMounting() const;
     double getLineDensity() const;

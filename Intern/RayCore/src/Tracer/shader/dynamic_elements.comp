@@ -92,7 +92,7 @@ void dynamicElements() {
         Ray elem_ray = rayMatrixMult(_ray, nextElement.m_inTrans);
 
         // Calculate interaction(reflection,material, absorption etc.) of ray with detected next element
-        type = int(nextElement.m_surfaceParams[3][0]);
+        type = int(nextElement.m_type);
         switch(type){
             case (TY_BASIC_MIRROR) :
                 elem_ray = traceMirror(elem_ray, BasicMirror(col.elementIndex), ctr, col.hitpoint);

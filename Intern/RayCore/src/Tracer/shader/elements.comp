@@ -46,7 +46,7 @@ double shortRadius(ToroidMirror e) { return shortRadius(e.id); }
 double slopeX(ToroidMirror e) { return slopeX(e.id); }
 double slopeZ(ToroidMirror e) { return slopeZ(e.id); }
 double azimuthalAngle(ToroidMirror e) { return azimuthalAngle(e.id); }
-double material(ToroidMirror e) { return param_s(e.id, 3, 2); }
+double material(ToroidMirror e) { return material(e.id); }
 
 // Rzp:
 double curvatureType(Rzp e) { return param_e(e.id, 1, 0); }

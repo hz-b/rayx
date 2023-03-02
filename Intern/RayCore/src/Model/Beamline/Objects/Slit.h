@@ -9,6 +9,8 @@ class RAYX_API Slit : public OpticalElement {
   public:
     Slit(const DesignObject&);
 
+    inline int getElementType() const { return TY_SLIT; }
+
     CentralBeamstop getCentralBeamstop() const;
     double getBeamstopWidth() const;
     double getBeamstopHeight() const;
