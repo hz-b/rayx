@@ -3,6 +3,7 @@
 #include <array>
 #include <glm.hpp>
 
+#include "Constants.h"
 #include "Core.h"
 #include "Data/xml.h"
 #include "Model/Surface/Surface.h"
@@ -36,6 +37,9 @@ class RAYX_API OpticalElement {
     OpticalElement(const char* name, const std::array<double, 7> slopeError,
                    const Geometry& geometry = Geometry());  // TODO(Jannis): add surface
 
+    /// Converts `this` into an Element.
+    Element intoElement() const;
+
     virtual ~OpticalElement() = default;
 
     void setSurface(std::unique_ptr<Surface> surface);
@@ -50,7 +54,6 @@ class RAYX_API OpticalElement {
     glm::dmat4x4 getOrientation() const;
     glm::dvec4 getPosition() const;
 
-    glm::dmat4x4 getObjectParameters() const;
     glm::dmat4x4 getSurfaceParams() const;
     virtual glm::dmat4x4 getElementParameters() const;
     std::array<double, 7> getSlopeError() const;

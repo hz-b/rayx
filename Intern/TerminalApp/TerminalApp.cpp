@@ -76,7 +76,7 @@ void TerminalApp::tracePath(const std::filesystem::path& path) {
             }
         }
 
-#if defined(RAYX_DEBUG_MODE) && not defined(CPP)
+#if defined(RAYX_DEBUG_MODE)
         // Export Debug Matrics.
         exportDebug();
 #endif
@@ -159,7 +159,7 @@ std::string TerminalApp::exportRays(const RAYX::Rays& rays, std::string path) {
     return path;
 }
 
-#if defined(RAYX_DEBUG_MODE) && not defined(CPP)
+#if defined(RAYX_DEBUG_MODE)
 /**
  * @brief Gets All Debug Buffers and check if they are the identity matrix.
  * This is a default function to show how the implemented Debug Buffer works.

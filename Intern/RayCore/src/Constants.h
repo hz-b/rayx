@@ -44,6 +44,41 @@ const double W_UNINIT = 4;
 // In that case this is returned as final snapshot.
 const double W_BEYOND_HORIZON = 5;
 
+// TODO extract this somewhere else
+#ifndef GLSL
+
+#include <glm.hpp>
+using dmat4 = glm::dmat4;
+
+#endif
+
+struct Element {
+    // for alignment reasons, the dmat4s are at the beginning of the struct.
+    dmat4 m_inTrans;
+    dmat4 m_outTrans;
+
+    // how this data is interpreted, depends on `type`
+    dmat4 m_elementParameters;
+
+    // how this data is interpreted, depends on the surfaceType.
+    dmat4 m_surfaceParams;
+
+    // the type of this element, see the TY constants above
+    double m_type;
+
+    // TODO unused so far!
+    double m_surfaceType;  // Quadric = 0, Toroid = 1
+
+    // general object information
+    double m_widthA;
+    double m_widthB;
+    double m_height;
+    double m_slopeError[7];
+    double m_azimuthalAngle;
+    double m_material;
+    double m_padding[2];
+};
+
 // -----------------------------------------
 //
 //    OBJECT TYPES

@@ -5,6 +5,7 @@
 #include "Constants.h"
 #include "Debug/Debug.h"
 #include "Debug/Instrumentor.h"
+#include "Model/Beamline/OpticalElement.h"
 #include "Random.h"
 
 using uint = unsigned int;
@@ -33,6 +34,11 @@ Rays Tracer::trace(const Beamline& b) {
         batch.reserve(batch_size);
         std::copy(rays.begin() + rayIdStart, rays.begin() + rayIdStart + batch_size, std::back_inserter(batch));
 
+        std::vector<Element> elements;
+        for (auto e : b.m_OpticalElements) {
+            elements.push_back(e->intoElement());
+        }
+
         TraceRawConfig cfg = {
             .m_rays = batch,
             .m_rayIdStart = (double)rayIdStart,
@@ -40,7 +46,7 @@ Rays Tracer::trace(const Beamline& b) {
             .m_randomSeed = randomSeed,
             .m_maxSnapshots = (double)maxSnapshots,
             .m_materialTables = materialTables,
-            .m_OpticalElements = b.m_OpticalElements,
+            .m_elements = elements,
         };
         PushConstants pushConsants = {glm::dmat4(0.0)};
         setPushConstants(&pushConsants);

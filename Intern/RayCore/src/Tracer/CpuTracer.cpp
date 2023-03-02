@@ -15,7 +15,6 @@ using uint = unsigned int;
 namespace RAYX {
 
 namespace CPU_TRACER {
-#define CPP
 #include "shader/main.comp"
 }  // namespace CPU_TRACER
 
@@ -43,13 +42,7 @@ std::vector<Ray> CpuTracer::traceRaw(const TraceRawConfig& cfg) {
     CPU_TRACER::outputData.data.resize(rayList.size() * cfg.m_maxSnapshots);
 
     // init quadricData
-    for (auto el : cfg.m_OpticalElements) {
-        CPU_TRACER::Element e;
-        e.surfaceParams = el->getSurfaceParams();
-        e.inTrans = el->getInMatrix();
-        e.outTrans = el->getOutMatrix();
-        e.objectParameters = el->getObjectParameters();
-        e.elementParameters = el->getElementParameters();
+    for (auto e : cfg.m_elements) {
         CPU_TRACER::quadricData.data.push_back(e);
     }
 

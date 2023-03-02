@@ -170,14 +170,14 @@ dvec2 getAtomicMassAndRho(int material) {
 #include "../../Material/materials.xmacro"
 #undef X
     }
-#ifdef CPP
+#ifndef GLSL
     RAYX_ERR << "invalid material in getAtomicMassAndRho";
 #endif
     return dvec2(0.0, 0.0);
 }
 
 // for cpp it's already defined in CpuTracer.h
-#ifndef CPP
+#ifdef GLSL
 struct PalikEntry {
     double energy;
     double n;
@@ -242,7 +242,7 @@ dvec2 getRefractiveIndex(double energy, int material) {
 
     // out of range check
     if (material < 1 || material > 92) {
-#ifdef CPP
+#ifndef GLSL
         RAYX_ERR << "getRefractiveIndex material " << material
                  << " out of range!";
 #endif
@@ -308,7 +308,7 @@ dvec2 getRefractiveIndex(double energy, int material) {
     }
 
 // error, no matching entry found.
-#ifdef CPP
+#ifndef GLSL
     RAYX_ERR << "getRefractiveIndex: no matching entry found!";
 #endif
     return dvec2(-1.0, -1.0);

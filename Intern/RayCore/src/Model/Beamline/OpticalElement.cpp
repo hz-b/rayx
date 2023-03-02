@@ -40,6 +40,24 @@ OpticalElement::OpticalElement(const DesignObject& dobj) {
     m_Geometry->m_orientation = dobj.parseOrientation();
 }
 
+Element OpticalElement::intoElement() const {
+    return Element{
+        .m_inTrans = getInMatrix(),
+        .m_outTrans = getOutMatrix(),
+        .m_elementParameters = getElementParameters(),
+        .m_surfaceParams = getSurfaceParams(),
+        .m_type = getSurfaceParams()[3][0],  // TODO
+        .m_surfaceType = 0,                  // TODO
+        .m_widthA = m_Geometry->m_widthA,
+        .m_widthB = m_Geometry->m_widthB,
+        .m_height = m_Geometry->m_height,
+        .m_slopeError = {m_slopeError[0], m_slopeError[1], m_slopeError[2], m_slopeError[3], m_slopeError[4], m_slopeError[5], m_slopeError[6]},
+        .m_azimuthalAngle = m_Geometry->m_azimuthalAngle.rad,
+        .m_material = getSurfaceParams()[3][2],  // TODO
+        .m_padding = {0.0, 0.0},
+    };
+}
+
 // ! Workaround for a bug in the gcc/clang compiler:
 // https://stackoverflow.com/questions/53408962/try-to-understand-compiler-error-message-default-member-initializer-required-be
 OpticalElement::Geometry::Geometry() = default;
@@ -126,25 +144,6 @@ glm::dmat4 OpticalElement::getOutMatrix() const {
 }
 glm::dvec4 OpticalElement::getPosition() const { return m_Geometry->m_position; }
 glm::dmat4x4 OpticalElement::getOrientation() const { return m_Geometry->m_orientation; }
-glm::dmat4x4 OpticalElement::getObjectParameters() const {
-    glm::dmat4x4 objectParameters = {m_Geometry->m_widthA,  // shader: [0][0]
-                                     m_Geometry->m_height,  // [0][1]
-                                     m_slopeError[0],       // [0][2]
-                                     m_slopeError[1],       // [0][3]
-                                     m_slopeError[2],       // [1][0]
-                                     m_slopeError[3],
-                                     m_slopeError[4],
-                                     m_slopeError[5],
-                                     m_slopeError[6],  // [2][0]
-                                     m_Geometry->m_widthB,
-                                     m_Geometry->m_azimuthalAngle.rad,
-                                     0,
-                                     0,  // [3][0]
-                                     0,
-                                     0,
-                                     0};
-    return objectParameters;
-}
 
 glm::dmat4x4 OpticalElement::getSurfaceParams() const {
     // assert(m_surfacePtr!=nullptr);

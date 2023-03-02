@@ -34,14 +34,6 @@ using uint = unsigned int;
 using pushConstants_t = CpuTracer::PushConstants;
 extern pushConstants_t pushConstants;
 
-struct Element {
-    dmat4 surfaceParams;
-    dmat4 inTrans;
-    dmat4 outTrans;
-    dmat4 objectParameters;
-    dmat4 elementParameters;
-};
-
 struct PalikEntry {
     double energy;
     double n;

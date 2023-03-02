@@ -5,6 +5,7 @@
 #include <string>
 #include <vector>
 
+#include "Constants.h"
 #include "Core.h"
 #include "Model/Beamline/Beamline.h"
 #include "Ray.h"
@@ -19,7 +20,7 @@ struct TraceRawConfig {
     double m_randomSeed;
     double m_maxSnapshots;
     MaterialTables m_materialTables;
-    const std::vector<std::shared_ptr<OpticalElement>>& m_OpticalElements;
+    std::vector<Element> m_elements;
 };
 
 /// Contains all the snapshots of a single Ray.

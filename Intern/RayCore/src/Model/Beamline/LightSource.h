@@ -58,6 +58,7 @@ class RAYX_API LightSource {
 
     glm::dmat4x4 m_orientation = glm::dmat4x4();
     glm::dvec4 m_position = glm::dvec4();
+
   private:
     // User/Design Parameter
     std::array<double, 6> m_misalignmentParams;  // x, y, psi, phi
@@ -67,7 +68,6 @@ class RAYX_API LightSource {
     double m_linearPol_0;
     double m_linearPol_45;
     double m_circularPol;
-
 
     // TODO(Jannis): move to children
     SourceDistType m_sourceDistributionType;

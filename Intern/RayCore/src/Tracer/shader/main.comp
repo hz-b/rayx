@@ -1,6 +1,6 @@
 #define WORKGROUP_SIZE 32
 
-#ifdef CPP
+#ifndef GLSL
     #define INOUT(x) x&
     #define OUT(x) x&
     #define ALLOW_UNUSED [[maybe_unused]]
@@ -25,7 +25,7 @@
 
 /* STRUCTS */
 // for CPP, the according things are mostly defined in CpuTracer.h
-#ifdef CPP
+#ifndef GLSL
 int gl_GlobalInvocationID;
 
 ShaderArray<Ray> rayData;
@@ -62,13 +62,6 @@ struct Ray {
     double m_lastElement;
     double m_extraParam;
 };
-struct Element {
-    dmat4 surfaceParams;
-    dmat4 inTrans;
-    dmat4 outTrans;
-    dmat4 objectParameters;
-    dmat4 elementParameters;
-};
 
 #ifdef RAYX_DEBUG_MODE
 	struct _debug_struct {
@@ -83,7 +76,9 @@ struct Element {
     // don't use this directly. Use `takeSnapshot` instead.
 	layout(std140, binding = 1) buffer obuf { Ray outputData[]; };
 
-	layout(std140, binding = 2) buffer qbuf {
+    // std430 is required so that Element is layouted like in C++.
+    // see https://www.khronos.org/opengl/wiki/Interface_Block_(GLSL) for more details on layouting.
+	layout(std430, binding = 2) buffer qbuf {
         double rayIdStart;
         double numRays;
         double randomSeed;
@@ -116,7 +111,7 @@ struct Element {
 bool finalized;
 
 // PushConstants 
-#ifdef CPP
+#ifndef GLSL
     pushConstants_t pushConstants;
 #else 
     layout( push_constant ) uniform constants
@@ -141,7 +136,7 @@ uint output_index(uint i) {
 void takeSnapshot(Ray r, double w) {
     if (finalized) { return; }
 
-    #ifdef CPP
+    #ifndef GLSL
     if (w == W_UNINIT) {
         RAYX_ERR << "takeSnapshot called with W_UNINIT";
     }
@@ -157,7 +152,7 @@ void takeSnapshot(Ray r, double w) {
     }
 
     // no spots were found.
-    #ifdef CPP
+    #ifndef GLSL
     RAYX_WARN << "takeSnapshot failed: no free spots!";
     #endif
 }
@@ -198,7 +193,7 @@ void main() {
 
     // Printing ~DEBUG~ Example over vkconfig Validation Layers
     // if (uint(gl_GlobalInvocationID) == 2 ){
-    // #ifndef CPP
+    // #ifdef GLSL
     //     // debugPrintfEXT("Hello from GPU. \n");
     // #else
     //     // RAYX_D_LOG << "Tracing on CPU..." ;

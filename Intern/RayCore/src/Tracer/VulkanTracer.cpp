@@ -43,12 +43,13 @@ std::vector<Ray> VulkanTracer::traceRaw(const TraceRawConfig& cfg) {
 
     std::vector<double> beamlineData = {cfg.m_rayIdStart, cfg.m_numRays, cfg.m_randomSeed, cfg.m_maxSnapshots};
 
-    for (const auto& e : cfg.m_OpticalElements) {
-        std::vector<glm::dmat4x4> mats = {e->getSurfaceParams(), e->getInMatrix(), e->getOutMatrix(), e->getObjectParameters(),
-                                          e->getElementParameters()};
-        for (auto x : mats) {
-            auto mat = glmToArray16(x);
-            beamlineData.insert(beamlineData.end(), mat.begin(), mat.end());
+    for (Element e : cfg.m_elements) {
+        auto ptr = (double*)&e;
+        const size_t len = sizeof(Element) / sizeof(double);
+        // the number of doubles needs to be divisible by 16, otherwise it might introduce padding.
+        static_assert(len % 16 == 0);
+        for (unsigned int i = 0; i < len; i++) {
+            beamlineData.push_back(ptr[i]);
         }
     }
 

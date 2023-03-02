@@ -435,7 +435,7 @@ dvec4 getOpticalElementIntersection(Ray r, uint id) {
         return dvec4(infinity(), infinity(), infinity(), 0);
     }
     if (ty == TY_RZP) {
-        r.m_position.z = r.m_position.z - quadricData[id].elementParameters[3][2];
+        r.m_position.z = r.m_position.z - quadricData[id].m_elementParameters[3][2];
     }
 
     // _ray = rayMatrixMult(_ray, q.inTrans); // ray/global to element coordinates,

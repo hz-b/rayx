@@ -29,7 +29,7 @@ Collision find_collision() {
         dvec4 currentIntersection = getOpticalElementIntersection(_ray, elementIndex);
 
         // Intersection coordinates in GLOBAL coordinates
-        dvec3 currentGlobalIntersection_xyz = dvec3(quadricData[elementIndex].outTrans * dvec4(currentIntersection.x, currentIntersection.y, currentIntersection.z, 1));
+        dvec3 currentGlobalIntersection_xyz = dvec3(quadricData[elementIndex].m_outTrans * dvec4(currentIntersection.x, currentIntersection.y, currentIntersection.z, 1));
         dvec4 currentGlobalIntersection = dvec4(currentGlobalIntersection_xyz, currentIntersection.w);
 
         // check if current intersection is closer than the closest previous Hitpoint
@@ -63,7 +63,7 @@ void dynamicElements() {
     int type                  = -1;
 
     #ifdef RAYX_DEBUG_MODE // Debug Matrix only works in GPU Mode and on DEBUG Build Type
-    #ifndef CPP
+    #ifdef GLSL
         // Set Debug Struct of current Ray to identity
         d_struct[uint(gl_GlobalInvocationID)]._dMat = dmat4(1);
     #endif
@@ -71,8 +71,8 @@ void dynamicElements() {
 
     Element nextElement;
     // at the end of this function we apply inTrans, if no collision happened (i.e. nextElement undefined), we want this to do nothing.
-    nextElement.inTrans = dmat4(1);
-    nextElement.outTrans = dmat4(1);
+    nextElement.m_inTrans = dmat4(1);
+    nextElement.m_outTrans = dmat4(1);
 
     // Iterate through all bounces
     double bounce = 1;
@@ -89,10 +89,10 @@ void dynamicElements() {
 
         // transform ray and intersection point in ELEMENT coordiantes
         nextElement = quadricData[col.elementIndex];
-        Ray elem_ray = rayMatrixMult(_ray, nextElement.inTrans);
+        Ray elem_ray = rayMatrixMult(_ray, nextElement.m_inTrans);
 
         // Calculate interaction(reflection,material, absorption etc.) of ray with detected next element
-        type = int(nextElement.surfaceParams[3][0]);
+        type = int(nextElement.m_surfaceParams[3][0]);
         switch(type){
             case (TY_BASIC_MIRROR) :
                 elem_ray = traceMirror(elem_ray, BasicMirror(col.elementIndex), ctr, col.hitpoint);
@@ -131,7 +131,7 @@ void dynamicElements() {
         takeSnapshot(elem_ray, W_JUST_HIT_ELEM);
 
         // transform back to WORLD coordinates
-        _ray = rayMatrixMult(elem_ray, nextElement.outTrans);
+        _ray = rayMatrixMult(elem_ray, nextElement.m_outTrans);
     }
 
     if (find_collision().found) {
