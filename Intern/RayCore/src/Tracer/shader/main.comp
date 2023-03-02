@@ -43,7 +43,7 @@ double randomSeed;
 // each ray will take multiple snapshots (copies) while tracing, those are then sent to the CPU for further processing.
 double maxSnapshots;
 
-ShaderArray<Element> quadricData;
+ShaderArray<Element> elements;
 ShaderArray<dvec4> xyznull;
 ShaderArray<int> matIdx;
 ShaderArray<double> mat;
@@ -84,7 +84,7 @@ struct Ray {
         double randomSeed;
         double maxSnapshots;
 
-		Element quadricData[];
+		Element elements[];
 	};
 
 	layout(std140, binding = 3) buffer xyzbuf { dvec4 xyznull[]; };

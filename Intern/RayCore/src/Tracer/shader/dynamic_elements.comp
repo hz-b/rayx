@@ -18,7 +18,7 @@ Collision find_collision() {
     dvec4 closestGlobalHitpoint = dvec4(infinity(), infinity(), infinity(), 0);
 
     // Find intersection points through all elements
-    for (uint elementIndex = 0; elementIndex < uint(quadricData.length()); elementIndex++) {
+    for (uint elementIndex = 0; elementIndex < uint(elements.length()); elementIndex++) {
 
         double lastElement = _ray.m_lastElement;
         if (elementIndex + 1 == lastElement) {
@@ -29,7 +29,7 @@ Collision find_collision() {
         dvec4 currentIntersection = getOpticalElementIntersection(_ray, elementIndex);
 
         // Intersection coordinates in GLOBAL coordinates
-        dvec3 currentGlobalIntersection_xyz = dvec3(quadricData[elementIndex].m_outTrans * dvec4(currentIntersection.x, currentIntersection.y, currentIntersection.z, 1));
+        dvec3 currentGlobalIntersection_xyz = dvec3(elements[elementIndex].m_outTrans * dvec4(currentIntersection.x, currentIntersection.y, currentIntersection.z, 1));
         dvec4 currentGlobalIntersection = dvec4(currentGlobalIntersection_xyz, currentIntersection.w);
 
         // check if current intersection is closer than the closest previous Hitpoint
@@ -54,7 +54,7 @@ Collision find_collision() {
 // back before the function returns to this function)
 void dynamicElements() {
     // placeholder, info should later be transfered to shader
-    const int maxBounces = quadricData.length();
+    const int maxBounces = elements.length();
 
     // ray specific "seed" for random numbers -> every ray has a different starting value for the counter that creates the random number
     const uint64_t MAX_UINT64 = ~(uint64_t(0));
@@ -88,7 +88,7 @@ void dynamicElements() {
         }
 
         // transform ray and intersection point in ELEMENT coordiantes
-        nextElement = quadricData[col.elementIndex];
+        nextElement = elements[col.elementIndex];
         Ray elem_ray = rayMatrixMult(_ray, nextElement.m_inTrans);
 
         // Calculate interaction(reflection,material, absorption etc.) of ray with detected next element

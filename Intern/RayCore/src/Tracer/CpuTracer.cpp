@@ -32,7 +32,7 @@ std::vector<Ray> CpuTracer::traceRaw(const TraceRawConfig& cfg) {
     CPU_TRACER::randomSeed = cfg.m_randomSeed;
     CPU_TRACER::maxSnapshots = cfg.m_maxSnapshots;
 
-    CPU_TRACER::quadricData.data.clear();
+    CPU_TRACER::elements.data.clear();
     CPU_TRACER::xyznull.data.clear();
     CPU_TRACER::matIdx.data.clear();
     CPU_TRACER::mat.data.clear();
@@ -41,9 +41,9 @@ std::vector<Ray> CpuTracer::traceRaw(const TraceRawConfig& cfg) {
     CPU_TRACER::rayData.data = rayList;
     CPU_TRACER::outputData.data.resize(rayList.size() * cfg.m_maxSnapshots);
 
-    // init quadricData
+    // init elements
     for (auto e : cfg.m_elements) {
-        CPU_TRACER::quadricData.data.push_back(e);
+        CPU_TRACER::elements.data.push_back(e);
     }
 
     auto materialTables = cfg.m_materialTables;
