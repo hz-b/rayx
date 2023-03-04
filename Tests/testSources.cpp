@@ -24,6 +24,16 @@ TEST_F(TestSuite, MatrixSource) {
     roughCompare(a, b);
 }
 
+TEST_F(TestSuite, MatrixSourceMoved) {
+    auto beamline = loadBeamline("MatrixSourceMoved");
+    auto a = beamline.getInputRays();
+    auto b = loadCSVRayUI("MatrixSource");
+    for (auto& r : b) {
+        r.m_position += glm::dvec3(5, -5, 3);
+    }
+    roughCompare(a, b);
+}
+
 /// this tests tracing an only-lightsource beamline. An error-prone edge case.
 TEST_F(TestSuite, MatrixSourceTraced) {
     auto a = extractLastSnapshot(traceRML("MatrixSource"));
