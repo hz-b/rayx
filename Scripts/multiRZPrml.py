@@ -13,22 +13,20 @@ import copy
 
 @dataclass
 class RMLParams:
-    file: str = ""
-    numRZPs: int = 1
-    gamma: float = 0.0
+    file: str
+    numRZPs: int
+    gamma: float
 
 
 def getArgs():
-    params = RMLParams()
-    # params.file = sys.argv[1]
-    # params.numRZPs = int(sys.argv[2])
-    # params.gamma = float(sys.argv[3])
+    RMLParams.file = sys.argv[1]
+    RMLParams.numRZPs = int(sys.argv[2])
+    RMLParams.gamma = float(sys.argv[3])
 
     # Temporary dummy
-    params.file = "C:\Projects\HZB\RAY-X\Scripts\RZP.rml"
-    params.numRZPs = 6
-    params.gamma = 0.00203483
-    return params
+    # RMLParams.file = "C:\Projects\HZB\RAY-X\Scripts\RZP.rml"
+    # RMLParams.numRZPs = 6
+    # RMLParams.gamma = 0.00203483
 
 
 def readRML(file):
@@ -43,11 +41,11 @@ def readRML(file):
     exit(1)
 
 
-def getVec(rmlParam):
+def getVec(RMLParams):
     origin = np.array([
-        float(rmlParam.find("x").text),
-        float(rmlParam.find("y").text),
-        float(rmlParam.find("z").text)
+        float(RMLParams.find("x").text),
+        float(RMLParams.find("y").text),
+        float(RMLParams.find("z").text)
     ])
     return origin
 
@@ -89,17 +87,10 @@ def rotateBasisY(mat, angle):
 
 def getRZPParams(rmlRZP):
     params = rmlRZP.findall("param")
-    paramsFound = 6
+    paramsFound = 4
     for param in params:
-        if param.attrib["id"] == "distancePreceding":
-            distancePreceding = float(param.text)
-            paramsFound -= 1
-        # grazingIncAngle
-        elif param.attrib["id"] == "grazingIncAngle":
-            grazingIncAngle = float(param.text)
-            paramsFound -= 1
         # rzp origin
-        elif param.attrib["id"] == "worldPosition":
+        if param.attrib["id"] == "worldPosition":
             rzpOrigin = getVec(param)
             paramsFound -= 1
         # rzp source
@@ -117,16 +108,16 @@ def getRZPParams(rmlRZP):
         print("Error: Not all RZP parameters found")
         exit(1)
 
-    return distancePreceding, grazingIncAngle, rzpOrigin, rzpXDirection, rzpYDirection, rzpZDirection
+    return rzpOrigin, rzpXDirection, rzpYDirection, rzpZDirection
 
 
 # TODO(Jannis): implement for variable source position
-def calculateRZP(rmlRZP, numRZPs, gamma):
+def calculateRZP(rmlRZP):
     positions = []
     directions = []
 
     # Get RZP parameters
-    _, _, rzpOrigin, rzpXDirection, rzpYDirection, rzpZDirection = getRZPParams(
+    rzpOrigin, rzpXDirection, rzpYDirection, rzpZDirection = getRZPParams(
         rmlRZP)
 
     # Calculate RZP positions and directions
@@ -135,29 +126,29 @@ def calculateRZP(rmlRZP, numRZPs, gamma):
         [0, 0, 0], rzpYDirection, rzpOrigin)
     # distanceProjection = np.linalg.norm(projectedSourceOrigin - rzpOrigin)
 
-    if numRZPs % 2 == 0:
+    if RMLParams.numRZPs % 2 == 0:
         relativeOrigin = projectedSourceOrigin - rzpOrigin
 
         # Calculate positions and directions of the left center RZP
         positions.append(rotateAroundPoint(
-            [0, 0, 0], -gamma/2, relativeOrigin))
+            [0, 0, 0], -RMLParams.gamma/2, relativeOrigin))
         directions.append(rotateBasisY(
-            [[1, 0, 0], [0, 1, 0], [0, 0, 1]], gamma/2))
+            [[1, 0, 0], [0, 1, 0], [0, 0, 1]], RMLParams.gamma/2))
 
         # Calculate positions and directions of the right center RZP
         positions.append(rotateAroundPoint(
-            [0, 0, 0], gamma/2, relativeOrigin))
+            [0, 0, 0], RMLParams.gamma/2, relativeOrigin))
         directions.append(rotateBasisY(
-            [[1, 0, 0], [0, 1, 0], [0, 0, 1]], -gamma/2))
+            [[1, 0, 0], [0, 1, 0], [0, 0, 1]], -RMLParams.gamma/2))
 
         # Now we calculate the positions and directions of the RZPs left and right of the central ones
-        for i in range(2, numRZPs):
+        for i in range(2, RMLParams.numRZPs):
             # left
             if i % 2 == 0:
-                angle = (1+i)/2 * -gamma
+                angle = (1+i)/2 * -RMLParams.gamma
             # right
             else:
-                angle = i/2 * gamma
+                angle = i/2 * RMLParams.gamma
             relativeOrigin = projectedSourceOrigin - rzpOrigin
             position = rotateAroundPoint(
                 [0, 0, 0], -angle, relativeOrigin)
@@ -169,13 +160,13 @@ def calculateRZP(rmlRZP, numRZPs, gamma):
         positions.append([0, 0, 0])
         directions.append([[1, 0, 0], [0, 1, 0], [0, 0, 1]])
         # Now we calculate the positions and directions of the RZPs left and right of the central one
-        for i in range(1, numRZPs):
+        for i in range(1, RMLParams.numRZPs):
             # left
             if i % 2 == 0:
-                angle = i/2 * -gamma
+                angle = i/2 * -RMLParams.gamma
             # right
             else:
-                angle = (1 + int(i/2)) * gamma
+                angle = (1 + int(i/2)) * RMLParams.gamma
 
             relativeOrigin = projectedSourceOrigin - rzpOrigin
             position = rotateAroundPoint(
@@ -224,7 +215,7 @@ def writeRML(root, rmlRZP, positions, directions):
     assert len(positions) == len(directions)
 
     beamline = root.find("beamline")
-    _, _, rzpOrigin, rzpXDirection, rzpYDirection, rzpZDirection = getRZPParams(
+    rzpOrigin, rzpXDirection, rzpYDirection, rzpZDirection = getRZPParams(
         rmlRZP)
 
     # Add group for rzps
@@ -277,17 +268,17 @@ def writeRML(root, rmlRZP, positions, directions):
 
 def main():
     # Get parameters
-    params = getArgs()
-    if params.gamma <= 0:
+    getArgs()
+    if RMLParams.gamma <= 0:
         print("Gamma is less/equal 0. Nothing to do...")
         return
-    if params.numRZPs <= 1:
+    if RMLParams.numRZPs <= 1:
         print("Number of RZPs is less/equal 1. Nothing to do...")
         return
     # Read RML file
-    rmlRZP, root = readRML(params.file)
+    rmlRZP, root = readRML(RMLParams.file)
     # Calculate RZP positions and directions
-    positions, directions = calculateRZP(rmlRZP, params.numRZPs, params.gamma)
+    positions, directions = calculateRZP(rmlRZP)
     # Write RML file
     writeRML(root, rmlRZP, positions, directions)
 
