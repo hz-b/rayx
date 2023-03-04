@@ -5,6 +5,7 @@
 #include <array>
 #include <glm.hpp>
 #include <iostream>
+#include <string>
 #include <vector>
 
 #ifdef _MSC_VER

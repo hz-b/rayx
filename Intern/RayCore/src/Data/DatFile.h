@@ -5,6 +5,8 @@
 #include <string>
 #include <vector>
 
+#include "Core.h"
+
 namespace RAYX {
 /** This struct represents one line of a .DAT file.  */
 struct DatEntry {
@@ -32,7 +34,7 @@ struct DatFile {
     [[maybe_unused]] std::string dump();
 
     /** samples from the distribution given by the .DAT file */
-    double selectEnergy(std::mt19937& rng, bool continuous) const;
+    double selectEnergy(bool continuous) const;
 
     /** yields the expected value of the underlying distribution */
     double getAverage() const;

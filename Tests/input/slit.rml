@@ -5,11 +5,11 @@
 
   <object name="Matrix Source" type="Matrix Source">
     <param id="numberRays" enabled="T">200</param>
-    <param id="sourceWidth" enabled="T">0.065</param>
-    <param id="sourceHeight" enabled="T">0.04</param>
+    <param id="sourceWidth" enabled="T">14</param>
+    <param id="sourceHeight" enabled="T">14</param>
     <param id="sourceDepth" enabled="T">0</param>
-    <param id="horDiv" enabled="T">1</param>
-    <param id="verDiv" enabled="T">1</param>
+    <param id="horDiv" enabled="T">0</param>
+    <param id="verDiv" enabled="T">0</param>
     <param id="energyDistributionType" comment="Values" enabled="T">1</param>
     <param id="photonEnergyDistributionFile" absolute="" enabled="F"></param>
     <param id="photonEnergy" enabled="T">100</param>
@@ -44,11 +44,11 @@
 
   <object name="Slit" type="Slit">
     <param id="geometricalShape" comment="rectangle" enabled="T">0</param>
-    <param id="totalWidth" enabled="T">20</param>
-    <param id="totalHeight" enabled="T">2</param>
+    <param id="totalWidth" enabled="T">10</param>
+    <param id="totalHeight" enabled="T">10</param>
     <param id="centralBeamstop" comment="rectangle" enabled="T">1</param>
-    <param id="totalWidthStop" enabled="T">20</param>
-    <param id="totalHeightStop" enabled="T">1</param>
+    <param id="totalWidthStop" enabled="T">5</param>
+    <param id="totalHeightStop" enabled="T">2</param>
     <param id="distancePreceding" enabled="T">10000</param>
     <param id="azimuthalAngle" enabled="T">0</param>
     <param id="alignmentError" comment="No" enabled="T">1</param>

@@ -19,7 +19,8 @@ class RAYX_API CpuTracer : public Tracer {
     CpuTracer();
     ~CpuTracer();
 
-    std::vector<Ray> trace(const Beamline&) override;
+    std::vector<Ray> traceRaw(const TraceRawConfig&) override;
+    void setPushConstants(PushConstants*) override;
 };
 
 namespace CPU_TRACER {
@@ -30,13 +31,8 @@ using dmat3 = glm::dmat3;
 using dmat4 = glm::dmat4;
 using uint = unsigned int;
 
-struct Element {
-    dmat4 surfaceParams;
-    dmat4 inTrans;
-    dmat4 outTrans;
-    dmat4 objectParameters;
-    dmat4 elementParameters;
-};
+using pushConstants_t = CpuTracer::PushConstants;
+extern pushConstants_t pushConstants;
 
 struct PalikEntry {
     double energy;
@@ -63,10 +59,10 @@ struct ShaderArray {
 extern int gl_GlobalInvocationID;
 extern ShaderArray<Ray> rayData;
 extern ShaderArray<Ray> outputData;
-extern double numberOfBeamlines;
-extern double numberOfElementsPerBeamline;
-extern double numberOfRays;
-extern double numberOfRaysPerBeamLine;
+extern double rayIdStart;
+extern double numRays;
+extern double randomSeed;
+extern double maxSnapshots;
 extern ShaderArray<Element> quadricData;
 extern ShaderArray<dvec4> xyznull;
 extern RAYX_API ShaderArray<int> matIdx;
@@ -85,13 +81,9 @@ Ray RAYX_API refrac2D(Ray, glm::dvec4, double, double);
 Ray RAYX_API refrac(Ray, glm::dvec4, double);
 glm::dvec4 RAYX_API normal_cartesian(glm::dvec4, double, double);
 glm::dvec4 RAYX_API normal_cylindrical(glm::dvec4, double, double);
-double RAYX_API wasteBox(double, double, double, double, double);
-void RAYX_API RZPLineDensity(Ray r, glm::dvec4 normal, int IMAGE_TYPE,
-                             int RZP_TYPE, int DERIVATION_METHOD,
-                             double zOffsetCenter, double risag, double rosag,
-                             double rimer, double romer, double alpha,
-                             double beta, double Ord, double WL, double& DX,
-                             double& DZ);
+bool RAYX_API wasteBox(double, double, double, double);
+void RAYX_API RZPLineDensity(Ray r, glm::dvec4 normal, int IMAGE_TYPE, int RZP_TYPE, int DERIVATION_METHOD, double zOffsetCenter, double risag,
+                             double rosag, double rimer, double romer, double alpha, double beta, double Ord, double WL, double& DX, double& DZ);
 Ray RAYX_API rayMatrixMult(Ray, glm::dmat4);
 void RAYX_API cosini(Ray&, double, double);
 double RAYX_API dpow(double, int);
@@ -101,18 +93,13 @@ double RAYX_API r8_sin(double);
 double RAYX_API r8_cos(double);
 double RAYX_API r8_atan(double);
 double RAYX_API vlsGrating(double, double, double[6]);
-void RAYX_API diffraction(int iopt, double xLength, double yLength, double wl,
-                          double& dPhi, double& dPsi, uint64_t& ctr);
+void RAYX_API diffraction(int iopt, double xLength, double yLength, double wl, double& dPhi, double& dPsi, uint64_t& ctr);
 Ray RAYX_API refrac_plane(Ray, glm::dvec4, double);
 glm::dvec4 RAYX_API iteratTo(Ray& r, double longRadius, double shortRadius);
 double RAYX_API getIncidenceAngle(Ray r, glm::dvec4 normal);
-void RAYX_API reflectance(double energy, double incidence_angle,
-                          glm::dvec2& complex_S, glm::dvec2& complex_P,
-                          int material);
-glm::dvec2 RAYX_API snell(glm::dvec2 cos_incidence, glm::dvec2 cn1,
-                          glm::dvec2 cn2);
-void RAYX_API fresnel(glm::dvec2 cn1, glm::dvec2 cn2, glm::dvec2 cos_incidence,
-                      glm::dvec2 cos_transmittance, glm::dvec2& complex_S,
+void RAYX_API reflectance(double energy, double incidence_angle, glm::dvec2& complex_S, glm::dvec2& complex_P, int material);
+glm::dvec2 RAYX_API snell(glm::dvec2 cos_incidence, glm::dvec2 cn1, glm::dvec2 cn2);
+void RAYX_API fresnel(glm::dvec2 cn1, glm::dvec2 cn2, glm::dvec2 cos_incidence, glm::dvec2 cos_transmittance, glm::dvec2& complex_S,
                       glm::dvec2& complex_P);
 glm::dvec2 RAYX_API cartesian_to_euler(glm::dvec2 complex);
 double RAYX_API hvlam(double);

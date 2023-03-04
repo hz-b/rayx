@@ -2,7 +2,7 @@
 
 // For use by RAYX applications
 #include "Core.h"
-#include "Debug.h"
+#include "Debug/Debug.h"
 #include "Debug/Instrumentor.h"
 
 // Model

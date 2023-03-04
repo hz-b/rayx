@@ -2,12 +2,7 @@
 
 #include <optional>
 
-#include "Data/xml.h"
-#include "Material/Material.h"
 #include "Model/Beamline/OpticalElement.h"
-#include "Model/Surface/Quadric.h"
-#include "Model/Surface/Toroid.h"
-#include "UserParameter/GeometricUserParams.h"
 
 namespace RAYX {
 
@@ -17,35 +12,15 @@ enum class CurvatureType {
     Spherical
 };  // influences surface paramters for eg quadric function or (if torus)
     // newton iteration
-enum class DesignType {
-    ZOffset,
-    Beta
-};  // TODO(Jannis): remove (default is Beta)
-enum class ElementOffsetType {
-    Manual,
-    Beamdivergence
-};  // TODO(Jannis): remove (included in world coordinates)
+enum class DesignType { ZOffset, Beta };                  // TODO(Jannis): remove (default is Beta)
+enum class ElementOffsetType { Manual, Beamdivergence };  // TODO(Jannis): remove (included in world coordinates)
 enum class RZPType { Elliptical, Meriodional };
 
 class RAYX_API ReflectionZonePlate : public OpticalElement {
   public:
-    // shortened constructor that assumes that the angles are already calculated
-    // and the position and orientation in world coordinates is already derived
-    ReflectionZonePlate(
-        const char* name, OpticalElement::GeometricalShape geometricalShape,
-        CurvatureType curvatureType, const double widthA,
-        const std::optional<double> widthB, const double height,
-        const double azimuthalAngle, const glm::dvec4 position,
-        const glm::dmat4x4 orientation, const double designEnergy,
-        const double orderOfDiffraction, const double designOrderOfDiffraction,
-        const double dAlpha, const double dBeta, const double mEntrance,
-        const double mExit, const double sEntrance, const double sExit,
-        const double shortRadius, const double longRadius,
-        const int additionalZeroOrder, const double fresnelZOffset,
-        const std::array<double, 7> slopeError, Material mat);
+    ReflectionZonePlate(const DesignObject&);
 
-    static std::shared_ptr<ReflectionZonePlate> createFromXML(
-        const xml::Parser&);
+    inline int getElementType() const { return TY_RZP; }
 
     // for calculating incidence and exit angle from user parameters
     void calcAlpha();
@@ -62,18 +37,17 @@ class RAYX_API ReflectionZonePlate : public OpticalElement {
     // alpha0Angle and beta0Angle
     void VectorR1Center();
     void VectorR2Center();
-    double rzpLineDensityDZ(glm::dvec3 intersection, glm::dvec3 normal,
-                            const double WL);
+    double rzpLineDensityDZ(glm::dvec3 intersection, glm::dvec3 normal, const double WL);
 
     // order of diffraction can be derived from the design order of diffraction
     // (from user parameter)
     void calcDesignOrderOfDiffraction(const double designOrderOfDiffraction);
 
     // GETTER
-    double getIncidenceAngle() const;
-    double getDiffractionAngle() const;
-    double getDesignAlphaAngle() const;
-    double getDesignBetaAngle() const;
+    Rad getIncidenceAngle() const;
+    Rad getDiffractionAngle() const;
+    Rad getDesignAlphaAngle() const;
+    Rad getDesignBetaAngle() const;
 
     GratingMount getGratingMount() const;
 
@@ -109,11 +83,10 @@ class RAYX_API ReflectionZonePlate : public OpticalElement {
     double m_incidenceMainBeamLength = 0;
     double m_meridionalDistance = 0;
     double m_meridionalDivergence = 0;
-    double m_fresnelZOffset = 0;  ///< parameter given by user in
-                                  ///< DesignType==DesignType::ZOffset
-    double m_calcFresnelZOffset =
-        0;              ///< calculated if DesignType==DesignType::Beta
-    double m_zOff = 0;  ///< zoffset dependant on elementOffSetType
+    double m_fresnelZOffset = 0;      ///< parameter given by user in
+                                      ///< DesignType==DesignType::ZOffset
+    double m_calcFresnelZOffset = 0;  ///< calculated if DesignType==DesignType::Beta
+    double m_zOff = 0;                ///< zoffset dependant on elementOffSetType
     double m_illuminationZ = 0;
     double m_designEnergyMounting = 0;  //? derived from source?
     // TODO(Theresa): include in world coordinates:
@@ -125,9 +98,9 @@ class RAYX_API ReflectionZonePlate : public OpticalElement {
      *  are used to calculate line density. This is important for correctly
      *  simulating light of different wavelengths.
      */
-    double m_designAlphaAngle = 0;
+    Rad m_designAlphaAngle = Rad(0);
     /** @see m_designAlphaAngle */
-    double m_designBetaAngle = 0;
+    Rad m_designBetaAngle = Rad(0);
     double m_designOrderOfDiffraction = 0;
     /** Wavelength for which m_designBetaAngle
      *  is correct.
@@ -144,10 +117,10 @@ class RAYX_API ReflectionZonePlate : public OpticalElement {
     // needed for calculating incidence and exit angle, this calculation is
     // moved to somewhere else since the angles are only needed to get the world
     // coordinates of the element
-    double m_beta0Angle = 0;
-    double m_alpha0Angle = 0;
-    double m_betaAngle = 0;
-    double m_grazingIncidenceAngle = 0;
+    Rad m_beta0Angle = Rad(0);
+    Rad m_alpha0Angle = Rad(0);
+    Rad m_betaAngle = Rad(0);
+    Rad m_grazingIncidenceAngle = Rad(0);
     double m_R1ArmLength = 0;
     double m_R2ArmLength = 0;
     double m_lineDensity = 0;

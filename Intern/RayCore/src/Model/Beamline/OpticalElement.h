@@ -2,36 +2,29 @@
 
 #include <array>
 #include <glm.hpp>
-#include <iostream>
-#include <memory>
-#include <stdexcept>
-#include <vector>
 
+#include "Constants.h"
 #include "Core.h"
-#include "Debug.h"
+#include "Data/xml.h"
 #include "Model/Surface/Surface.h"
 #include "utils.h"
 
 namespace RAYX {
 
+enum class GratingMount { Deviation, Incidence };
+enum class ImageType { Point2Point, Astigmatic2Astigmatic };
+enum class GeometricalShape { RECTANGLE = 0, ELLIPTICAL, TRAPEZOID };  ///< influences wastebox function in shader
+
 class RAYX_API OpticalElement {
   public:
-    enum class GeometricalShape {
-        RECTANGLE = 0,
-        ELLIPTICAL,
-        TRAPEZOID
-    };  ///< influences wastebox function in shader
-
     struct Geometry {
         double m_widthA = 0.0;
         double m_widthB = 0.0;  //< this width is only used for trapezoid
         double m_height = 0.0;
-        double m_azimuthalAngle = 0.0;  // rotation of element through xy-plane
-                                        // (needed for stokes vector)
-        glm::dmat4x4 m_orientation =
-            glm::dmat4x4();  //< Orientation matrix of element (is basis)
-        glm::dvec4 m_position =
-            glm::dvec4();  //< Position of element in world coordinates
+        Rad m_azimuthalAngle = Rad(0);                // rotation of element through xy-plane
+                                                      // (needed for stokes vector)
+        glm::dmat4x4 m_orientation = glm::dmat4x4();  //< Orientation matrix of element (is basis)
+        glm::dvec4 m_position = glm::dvec4();         //< Position of element in world coordinates
         GeometricalShape m_geometricalShape = GeometricalShape::RECTANGLE;
 
         Geometry();
@@ -39,18 +32,19 @@ class RAYX_API OpticalElement {
         void setHeightWidth(double height, double widthA, double widthB = 0.0);
     };
 
+    OpticalElement(const DesignObject&);
     // needed to add optical elements to tracer
-    OpticalElement(
-        const char* name, const std::array<double, 7> slopeError,
-        const Geometry& geometry = Geometry());  // TODO(Jannis): add surface
+    OpticalElement(const char* name, const std::array<double, 7> slopeError,
+                   const Geometry& geometry = Geometry());  // TODO(Jannis): add surface
+
+    /// Converts `this` into an Element.
+    Element intoElement() const;
 
     virtual ~OpticalElement() = default;
 
     void setSurface(std::unique_ptr<Surface> surface);
 
-    void calcTransformationMatrices(glm::dvec4 position, glm::dmat4 orientation,
-                                    glm::dmat4& output,
-                                    bool calcInMatrix = true) const;
+    void calcTransformationMatrices(glm::dvec4 position, glm::dmat4 orientation, glm::dmat4& output, bool calcInMatrix = true) const;
 
     double getWidth();
     double getHeight();
@@ -60,18 +54,19 @@ class RAYX_API OpticalElement {
     glm::dmat4x4 getOrientation() const;
     glm::dvec4 getPosition() const;
 
-    glm::dmat4x4 getObjectParameters() const;
     glm::dmat4x4 getSurfaceParams() const;
     virtual glm::dmat4x4 getElementParameters() const;
+    virtual int getElementType() const = 0;
     std::array<double, 7> getSlopeError() const;
 
-    [[maybe_unused]] const char* m_name;
+    std::string m_name;
+    Material m_material;
 
   protected:
     std::unique_ptr<Geometry> m_Geometry;   ///< Geometry of the element
     std::unique_ptr<Surface> m_surfacePtr;  ///< Surface of the element
 
-    std::array<double, 7> m_slopeError;  // TODO(Jannis): move to geometry
+    std::array<double, 7> m_slopeError;
 };
 
 }  // namespace RAYX

@@ -1,3 +1,5 @@
+#ifndef NO_VULKAN
+
 #include "VulkanTracer.h"
 
 #include <Material/Material.h>
@@ -5,9 +7,10 @@
 #include <chrono>
 #include <cmath>
 
-#include "Debug.h"
+#include "Debug/Debug.h"
 #include "Debug/Instrumentor.h"
-#include "PathResolver.h"
+#include "Random.h"
+#include "RayCore.h"
 
 #ifdef RAYX_PLATFORM_MSVC
 #ifdef USE_NSIGHT_AFTERMATH
@@ -16,62 +19,49 @@
 #endif
 
 namespace RAYX {
-std::vector<Ray> VulkanTracer::trace(const Beamline& beamline) {
+std::vector<Ray> VulkanTracer::traceRaw(const TraceRawConfig& cfg) {
+    RAYX_PROFILE_FUNCTION_STDOUT();
+
     // init, if not yet initialized.
-    if (m_engine.state() == VulkanEngine::EngineState::PREINIT) {
+    if (m_engine.state() == VulkanEngine::VulkanEngineStates_t::PREINIT) {
         // Set buffer settings (DEBUG OR RELEASE)
-        RAYX_LOG << "Initializing Vulkan Tracer..";
-        m_engine.declareBuffer("ray-buffer",
-                               {.m_binding = 0, .m_in = true, .m_out = false});
-        m_engine.declareBuffer("output-buffer",
-                               {.m_binding = 1, .m_in = false, .m_out = true});
-        m_engine.declareBuffer("quadric-buffer",
-                               {.m_binding = 2, .m_in = true, .m_out = false});
-        m_engine.declareBuffer("xyznull-buffer",
-                               {.m_binding = 3, .m_in = false, .m_out = false});
-        m_engine.declareBuffer("material-index-table",
-                               {.m_binding = 4, .m_in = true, .m_out = false});
-        m_engine.declareBuffer("material-table",
-                               {.m_binding = 5, .m_in = true, .m_out = false});
-    #ifdef RAYX_DEBUG_MODE
-        m_engine.declareBuffer("debug-buffer",
-                               {.m_binding = 6, .m_in = false, .m_out = true});
-    #endif
-        m_engine.init({.m_shader = "build/bin/comp.spv"});
+        RAYX_VERB << "Initializing Vulkan Tracer..";
+        m_engine.declareBuffer("ray-buffer", {.binding = 0, .isInput = true, .isOutput = false});
+        m_engine.declareBuffer("output-buffer", {.binding = 1, .isInput = false, .isOutput = true});
+        m_engine.declareBuffer("quadric-buffer", {.binding = 2, .isInput = true, .isOutput = false});
+        m_engine.declareBuffer("xyznull-buffer", {.binding = 3, .isInput = false, .isOutput = false});
+        m_engine.declareBuffer("material-index-table", {.binding = 4, .isInput = true, .isOutput = false});
+        m_engine.declareBuffer("material-table", {.binding = 5, .isInput = true, .isOutput = false});
+#ifdef RAYX_DEBUG_MODE
+        m_engine.declareBuffer("debug-buffer", {.binding = 6, .isInput = false, .isOutput = true});
+#endif
+        m_engine.init({.shaderFileName = "build/bin/comp.spv"});
     }
 
-    auto rayList = beamline.getInputRays();
+    auto rayList = cfg.m_rays;
+    const uint32_t numberOfRays = rayList.size();
 
-    uint32_t numberOfBeamlines = 1;
-    uint32_t numberOfQuadricsPerBeamline = beamline.m_OpticalElements.size();
-    uint32_t numberOfRays = rayList.size();
-    uint32_t numberOfRaysPerBeamline = numberOfRays;
-    std::vector<double> beamlineData = {
-        (double)numberOfBeamlines, (double)numberOfQuadricsPerBeamline,
-        (double)numberOfRays, (double)numberOfRaysPerBeamline};
+    std::vector<double> beamlineData = {cfg.m_rayIdStart, cfg.m_numRays, cfg.m_randomSeed, cfg.m_maxSnapshots};
 
-    for (const auto& e : beamline.m_OpticalElements) {
-        std::vector<glm::dmat4x4> mats = {
-            e->getSurfaceParams(), e->getInMatrix(), e->getOutMatrix(),
-            e->getObjectParameters(), e->getElementParameters()};
-        for (auto x : mats) {
-            auto mat = glmToArray16(x);
-            beamlineData.insert(beamlineData.end(), mat.begin(), mat.end());
+    for (Element e : cfg.m_elements) {
+        auto ptr = (double*)&e;
+        const size_t len = sizeof(Element) / sizeof(double);
+        // the number of doubles needs to be divisible by 16, otherwise it might introduce padding.
+        static_assert(len % 16 == 0);
+        for (unsigned int i = 0; i < len; i++) {
+            beamlineData.push_back(ptr[i]);
         }
     }
 
-    auto materialTables = beamline.calcMinimalMaterialTables();
-
+    auto materialTables = cfg.m_materialTables;
     m_engine.createBufferWithData<Ray>("ray-buffer", rayList);
-    m_engine.createBuffer("output-buffer", numberOfRays * sizeof(Ray));
+    m_engine.createBuffer("output-buffer", numberOfRays * sizeof(Ray) * cfg.m_maxSnapshots);
     m_engine.createBufferWithData<double>("quadric-buffer", beamlineData);
     m_engine.createBuffer("xyznull-buffer", 100);
-    m_engine.createBufferWithData<int>("material-index-table",
-                                       materialTables.indexTable);
-    m_engine.createBufferWithData<double>("material-table",
-                                          materialTables.materialTable);
+    m_engine.createBufferWithData<int>("material-index-table", materialTables.indexTable);
+    m_engine.createBufferWithData<double>("material-table", materialTables.materialTable);
 #ifdef RAYX_DEBUG_MODE
-    m_engine.createBuffer("debug-buffer", numberOfRays * sizeof(_debugBuf_t));
+    m_engine.createBuffer("debug-buffer", numberOfRays * sizeof(debugBuffer_t));
 #endif
 
     m_engine.run({.m_numberOfInvocations = numberOfRays});
@@ -79,7 +69,7 @@ std::vector<Ray> VulkanTracer::trace(const Beamline& beamline) {
     std::vector<Ray> out = m_engine.readBuffer<Ray>("output-buffer");
 
 #ifdef RAYX_DEBUG_MODE
-    m_debugBufList = m_engine.readBuffer<_debugBuf_t>("debug-buffer");
+    m_debugBufList = m_engine.readBuffer<debugBuffer_t>("debug-buffer");
 #endif
 
     m_engine.cleanup();
@@ -87,4 +77,11 @@ std::vector<Ray> VulkanTracer::trace(const Beamline& beamline) {
     return out;
 }
 
+void VulkanTracer::setPushConstants(PushConstants* p) {
+    if (sizeof(*p) > 128) RAYX_WARN << "Using pushConstants bigger than 128 Bytes might be unsupported on your GPU. Check Compute Info";
+    m_engine.m_pushConstants.pushConstPtr = static_cast<PushConstants*>(p);
+    m_engine.m_pushConstants.size = sizeof(*p);
+}
 }  // namespace RAYX
+
+#endif

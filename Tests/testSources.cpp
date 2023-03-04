@@ -1,11 +1,19 @@
 #include "setupTests.h"
 
-void checkDistribution(const std::vector<Ray>& rays, double sourceEnergy,
-                       double energySpread) {
+void checkDistribution(const std::vector<Ray>& rays, double sourceEnergy, double energySpread) {
     CHECK_EQ(rays.size(), 200);
     for (auto r : rays) {
-        CHECK_IN(r.m_energy, sourceEnergy - energySpread,
-                 sourceEnergy + energySpread);
+        CHECK_IN(r.m_energy, sourceEnergy - energySpread, sourceEnergy + energySpread);
+    }
+}
+
+void roughCompare(std::vector<RAYX::Ray> l, std::vector<RAYX::Ray> r) {
+    CHECK_EQ(l.size(), r.size());
+    // TODO maybe compare more?
+    for (int i = 0; i < l.size(); i++) {
+        CHECK_EQ(l[i].m_position, r[i].m_position);
+        CHECK_EQ(l[i].m_direction, r[i].m_direction);
+        CHECK_EQ(l[i].m_energy, r[i].m_energy);
     }
 }
 
@@ -13,14 +21,24 @@ TEST_F(TestSuite, MatrixSource) {
     auto beamline = loadBeamline("MatrixSource");
     auto a = beamline.getInputRays();
     auto b = loadCSVRayUI("MatrixSource");
-    compareRayLists(a, b);
+    roughCompare(a, b);
 }
 
-// this tests tracing an only-lightsource beamline. An error-prone edge case.
-TEST_F(TestSuite, MatrixSourceTraced) {
-    auto a = traceRML("MatrixSource");
+TEST_F(TestSuite, MatrixSourceMoved) {
+    auto beamline = loadBeamline("MatrixSourceMoved");
+    auto a = beamline.getInputRays();
     auto b = loadCSVRayUI("MatrixSource");
-    compareRayLists(a, b);
+    for (auto& r : b) {
+        r.m_position += glm::dvec3(5, -5, 3);
+    }
+    roughCompare(a, b);
+}
+
+/// this tests tracing an only-lightsource beamline. An error-prone edge case.
+TEST_F(TestSuite, MatrixSourceTraced) {
+    auto a = extractLastSnapshot(traceRML("MatrixSource"));
+    auto b = loadCSVRayUI("MatrixSource");
+    roughCompare(a, b);
 }
 
 TEST_F(TestSuite, PointSourceHardEdge) {

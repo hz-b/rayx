@@ -1,47 +1,23 @@
 #pragma once
 #include <array>
-#include <cmath>
-#include <iostream>
-#include <random>
-#include <stdexcept>
+#include <glm.hpp>
 #include <string>
-#include <variant>
 #include <vector>
 
 #include "Core.h"
+#include "Data/xml.h"
 #include "EnergyDistribution.h"
 #include "Tracer/Ray.h"
-#include "glm.hpp"
 
 namespace RAYX {
-enum class SpreadType {  // default WhiteBand
-    WhiteBand,
-    ThreeEnergies
-};
-enum class EnergyDistributionType {
-    File,
-    Values,
-    Total,
-    Param
-};  // default ET_VALUES
-enum class SourceDistType {
-    Simultaneous,
-    HardEdge,
-    Gauss
-};  // default simultaneously
-
-// TODO(rudi): unify!
-enum class SourceDist { Uniform, Gaussian };
+enum class SpreadType { WhiteBand, ThreeEnergies };                // default WhiteBand
+enum class EnergyDistributionType { File, Values, Total, Param };  // default ET_VALUES
+enum class SourceDistType { Simultaneous, HardEdge, Gauss };       // default simultaneously
+enum class SourceDist { Uniform, Gaussian };                       // TODO(rudi): unify!
 
 class RAYX_API LightSource {
   public:
-    LightSource(const char* name, uint32_t numberOfRays,
-                EnergyDistribution dist, const double linPol0,
-                const double linPol45, const double circPol,
-                const std::array<double, 6> misalignment,
-                const double sourceDepth, const double sourceHeight,
-                const double sourceWidth, const double horDivergence,
-                const double verDivergence);
+    LightSource(const DesignObject&);
     virtual ~LightSource() = default;
 
     // Getter
@@ -65,10 +41,11 @@ class RAYX_API LightSource {
     // each class that inherits from LightSource
     virtual std::vector<Ray> getRays() const = 0;
 
-    [[maybe_unused]] const char* m_name;
+    std::string m_name;
+
     /** the energy distribution used when deciding the energies of the rays. */
-    const EnergyDistribution m_EnergyDistribution;
-    const uint32_t m_numberOfRays;
+    EnergyDistribution m_EnergyDistribution;
+    uint32_t m_numberOfRays;
 
   protected:
     // Geometric Parameters
@@ -78,6 +55,9 @@ class RAYX_API LightSource {
     // in rad:
     double m_horDivergence;
     double m_verDivergence;
+
+    glm::dmat4x4 m_orientation = glm::dmat4x4();
+    glm::dvec4 m_position = glm::dvec4();
 
   private:
     // User/Design Parameter

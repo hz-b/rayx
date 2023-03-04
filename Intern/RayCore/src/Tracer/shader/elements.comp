@@ -1,0 +1,99 @@
+// This module defines functions to access the elements in a practical way.
+
+struct BasicMirror { uint id; };
+struct PlaneGrating { uint id; };
+struct GeneralGrating { uint id; };
+struct Slit { uint id; };
+struct Rzp { uint id; };
+struct ImagePlane { uint id; };
+struct ToroidMirror { uint id; };
+struct EllipsoidMirror { uint id; };
+
+double param_e(uint id, uint x, uint y) { return elements[id].m_elementParameters[x][y]; }
+double param_s(uint id, uint x, uint y) { return elements[id].m_surfaceParams[x][y]; }
+
+// element-type independent access functions:
+double widthA(uint id) { return elements[id].m_widthA; }
+double width(uint id) { return elements[id].m_widthA; }
+
+double height(uint id) { return elements[id].m_height; }
+double widthB(uint id) { return elements[id].m_widthB; }
+double type(uint id) { return elements[id].m_type; }
+double material(uint id) { return elements[id].m_material; }
+double azimuthalAngle(uint id) { return elements[id].m_azimuthalAngle; }
+dmat4 inTrans(uint id) { return elements[id].m_inTrans; }
+dmat4 outTrans(uint id) { return elements[id].m_outTrans; }
+double longRadius(uint id) { return param_s(id, 0, 0); }
+double shortRadius(uint id) { return param_s(id, 0, 1); }
+
+double slopeX(uint id) { return elements[id].m_slopeError[0]; }
+double slopeZ(uint id) { return elements[id].m_slopeError[1]; }
+
+dmat4 surfaceParams(uint id) { return elements[id].m_surfaceParams; }
+
+// Slit:
+double width(Slit e) { return width(e.id); }
+double height(Slit e) { return height(e.id); }
+double beamstopWidth(Slit e) { return param_e(e.id, 0, 0); }
+double beamstopHeight(Slit e) { return param_e(e.id, 0, 1); }
+dmat4 surfaceParams(Slit e) { return surfaceParams(e.id); }
+
+// ToroidMirror:
+double width(ToroidMirror e) { return width(e.id); }
+double height(ToroidMirror e) { return height(e.id); }
+double longRadius(ToroidMirror e) { return longRadius(e.id); }
+double shortRadius(ToroidMirror e) { return shortRadius(e.id); }
+double slopeX(ToroidMirror e) { return slopeX(e.id); }
+double slopeZ(ToroidMirror e) { return slopeZ(e.id); }
+double azimuthalAngle(ToroidMirror e) { return azimuthalAngle(e.id); }
+double material(ToroidMirror e) { return material(e.id); }
+
+// Rzp:
+double curvatureType(Rzp e) { return param_e(e.id, 1, 0); }
+double elementOffsetZ(Rzp e) { return param_e(e.id, 3, 2); }
+dmat4 surfaceParams(Rzp e) { return elements[e.id].m_surfaceParams; }
+double longRadius(Rzp e) { return param_s(e.id, 0, 0); }
+double shortRadius(Rzp e) { return param_s(e.id, 0, 1); }
+double widthA(Rzp e) { return width(e.id); }
+double widthB(Rzp e) { return widthB(e.id); }
+double height(Rzp e) { return height(e.id); }
+double slopeX(Rzp e) { return slopeX(e.id); }
+double slopeZ(Rzp e) { return slopeZ(e.id); }
+dmat4 elementParams(Rzp e) { return elements[e.id].m_elementParameters; }
+
+// EllipsoidMirror:
+double sinTangentAngle(EllipsoidMirror e) { return param_e(e.id, 0, 0); }
+double cosTangentAngle(EllipsoidMirror e) { return param_e(e.id, 0, 1); }
+dmat4 surfaceParams(EllipsoidMirror e) { return elements[e.id].m_surfaceParams; }
+double azimuthalAngle(EllipsoidMirror e) { return elements[e.id].m_azimuthalAngle; }
+double width(EllipsoidMirror e) { return width(e.id); }
+double height(EllipsoidMirror e) { return height(e.id); }
+double slopeX(EllipsoidMirror e) { return slopeX(e.id); }
+double slopeZ(EllipsoidMirror e) { return slopeZ(e.id); }
+double material(EllipsoidMirror e) { return material(e.id); }
+
+// PlaneGrating:
+dmat4 surfaceParams(PlaneGrating e) { return elements[e.id].m_surfaceParams; }
+double width(PlaneGrating e) { return width(e.id); }
+double height(PlaneGrating e) { return height(e.id); }
+double slopeX(PlaneGrating e) { return slopeX(e.id); }
+double slopeZ(PlaneGrating e) { return slopeZ(e.id); }
+dmat4 elementParams(PlaneGrating e) { return elements[e.id].m_elementParameters; }
+
+// GeneralGrating:
+dmat4 surfaceParams(GeneralGrating e) { return elements[e.id].m_surfaceParams; }
+double width(GeneralGrating e) { return width(e.id); }
+double height(GeneralGrating e) { return height(e.id); }
+double slopeX(GeneralGrating e) { return slopeX(e.id); }
+double slopeZ(GeneralGrating e) { return slopeZ(e.id); }
+dmat4 elementParams(GeneralGrating e) { return elements[e.id].m_elementParameters; }
+
+// BasicMirror:
+dmat4 surfaceParams(BasicMirror e) { return elements[e.id].m_surfaceParams; }
+double azimuthalAngle(BasicMirror e) { return azimuthalAngle(e.id); }
+double widthA(BasicMirror e) { return widthA(e.id); }
+double widthB(BasicMirror e) { return widthB(e.id); }
+double height(BasicMirror e) { return height(e.id); }
+double slopeX(BasicMirror e) { return slopeX(e.id); }
+double slopeZ(BasicMirror e) { return slopeZ(e.id); }
+double material(BasicMirror e) { return material(e.id); }

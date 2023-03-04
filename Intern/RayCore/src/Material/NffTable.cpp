@@ -1,23 +1,20 @@
 
 #include "NffTable.h"
 
-#include <Debug.h>
-
 #include <algorithm>
 #include <fstream>
 #include <iostream>
 
-#include "PathResolver.h"
+#include "CanonicalizePath.h"
+#include "Debug/Debug.h"
 
 bool NffTable::load(const char* element, NffTable* out) {
     std::string elementString = element;
 
-    std::transform(elementString.begin(), elementString.end(),
-                   elementString.begin(),
-                   [](unsigned char c) { return std::tolower(c); });
+    std::transform(elementString.begin(), elementString.end(), elementString.begin(), [](unsigned char c) { return std::tolower(c); });
 
     std::string f = "Data/nff/" + elementString + ".nff";
-    std::ifstream s(resolvePath(f));
+    std::ifstream s(canonicalizeRepositoryPath(f));
 
     if (s.fail()) {
         return false;
@@ -35,11 +32,12 @@ bool NffTable::load(const char* element, NffTable* out) {
         }
 
         NffEntry e{};
-
-        if (sscanf(line.c_str(), "%le %le %le", &e.m_energy, &e.m_f1,
-                   &e.m_f2) != 3) {
-            RAYX_ERR << "Failed to parse NffTable\"" << element
-                     << "\", at line " << lineidx << ": \"" << line << "\"";
+#if defined(WIN32)
+        if (sscanf_s(line.c_str(), "%le %le %le", &e.m_energy, &e.m_f1, &e.m_f2) != 3) {
+#else
+        if (sscanf(line.c_str(), "%le %le %le", &e.m_energy, &e.m_f1, &e.m_f2) != 3) {
+#endif
+            RAYX_ERR << "Failed to parse NffTable\"" << element << "\", at line " << lineidx << ": \"" << line << "\"";
             return false;
         }
         out->m_Lines.push_back(e);

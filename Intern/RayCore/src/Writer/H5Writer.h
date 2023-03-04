@@ -1,7 +1,13 @@
-#ifndef CI  // highfive doesn't work in CI
+#ifndef NO_H5
 
 #pragma once
 
-void RAYX_API writeH5(const std::vector<RAYX::Ray>&, std::string filename);
+#include <string>
+#include <vector>
+
+#include "Tracer/Ray.h"
+#include "Tracer/Tracer.h"
+
+void RAYX_API writeH5(const RAYX::Rays&, std::string filename, std::vector<std::string> elementNames);
 
 #endif

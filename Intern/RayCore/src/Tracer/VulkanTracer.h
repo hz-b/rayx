@@ -1,3 +1,5 @@
+#ifndef NO_VULKAN
+
 #pragma once
 
 #include "Core.h"
@@ -11,7 +13,8 @@ class RAYX_API VulkanTracer : public Tracer {
     VulkanTracer() = default;
     ~VulkanTracer() = default;
 
-    std::vector<Ray> trace(const Beamline&) override;
+    std::vector<Ray> traceRaw(const TraceRawConfig&) override;
+    void setPushConstants(PushConstants*) override;
 #ifdef RAYX_DEBUG_MODE
     /**
      * @brief Get the Debug List containing the Debug Matrices
@@ -27,9 +30,11 @@ class RAYX_API VulkanTracer : public Tracer {
 
     // https://www.khronos.org/registry/OpenGL/extensions/ARB/ARB_uniform_buffer_object.txt
     // stf140 align rules (Stick to only 1 matrix for simplicity)
-    struct _debugBuf_t {
+    struct debugBuffer_t {
         glm::dmat4x4 _dMat;  // Set to identiy matrix in shader.
     };
-    std::vector<_debugBuf_t> m_debugBufList;
+    std::vector<debugBuffer_t> m_debugBufList;
 };
 }  // namespace RAYX
+
+#endif

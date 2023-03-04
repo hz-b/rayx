@@ -1,21 +1,31 @@
+#ifndef NO_VULKAN
+
 #include "VulkanEngine/VulkanEngine.h"
 
 namespace RAYX {
-void VulkanEngine::init(InitSpec spec) {
-    if (m_state != EngineState::PREINIT) {
+void VulkanEngine::init(VulkanEngineInitSpec_t spec) {
+    if (m_state != VulkanEngineStates_t::PREINIT) {
         RAYX_ERR << "VulkanEngine was already initialized!";
     }
 
-    m_shaderfile = spec.m_shader;
+    m_shaderfile = spec.shaderFileName;
 
     createInstance();
     setupDebugMessenger();
     pickDevice();
     createCommandPool();
+    createCommandBuffers();
+    createSemaphores();
     createDescriptorSetLayout();
+    createAllocateDescriptorPool(m_buffers.size());
+    createFences();
+    prepareVma();
     createStagingBuffer();
-
-    m_state = EngineState::PRERUN;
+    createCache();
+    createShaderModule();
+    m_state = VulkanEngineStates_t::PRERUN;
 }
 
 }  // namespace RAYX
+
+#endif

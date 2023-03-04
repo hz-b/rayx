@@ -1,44 +1,27 @@
 #include "Toroid.h"
 
-#include "Debug.h"
+#include "Constants.h"
+#include "Debug/Debug.h"
 
 namespace RAYX {
-/**
- * @param inputPoints           16 entry vector that contains the parameters for
- * a toroidal surface
- */
-Toroid::Toroid(const glm::dmat4x4 inputPoints) { m_parameters = inputPoints; }
 
 /**
  * @param longRadius            long radius of the toroidal shape
  * @param shortRadius           short radius of the toroidal shape
  * @param elementType           6=toroid mirror, 4=toroid rzp
  */
-Toroid::Toroid(double longRadius, double shortRadius, double elementType,
-               Material mat) {
-    auto matd = (double)static_cast<int>(mat);
-    m_parameters = glm::dmat4x4{longRadius,  shortRadius, 0,    0,  //
-                                0,           0,           0,    0,  //
-                                0,           0,           0,    0,  //
-                                elementType, 0,           matd, 0};
-    m_longRadius = longRadius;
-    m_shortRadius = shortRadius;
+Toroid::Toroid(double longRadius, double shortRadius) {
+    m_parameters = glm::dmat4x4{longRadius, shortRadius, 0, 0,  //
+                                0,          0,           0, 0,  //
+                                0,          0,           0, 0,  //
+                                0,          0,           0, 0};
 }
+
+int Toroid::getSurfaceType() const { return STY_TOROID; }
 
 Toroid::Toroid() = default;
 
 Toroid::~Toroid() = default;
-
-/**
- * sets the parameters of the toroidal surface to the given 16 entry vector
- * @param inputPoints   16 entry vector
- * @return void
- */
-[[maybe_unused]] void Toroid::setParameters(const glm::dmat4x4 inputPoints) {
-    m_parameters = inputPoints;
-    m_longRadius = inputPoints[0][0];
-    m_shortRadius = inputPoints[0][1];
-}
 
 /**
  * ENCODING:
@@ -59,7 +42,7 @@ Toroid::~Toroid() = default;
  *
  **/
 glm::dmat4x4 Toroid::getParams() const {
-    RAYX_LOG << "Return surface points";
+    RAYX_VERB << "Return surface points";
     return m_parameters;
 }
 

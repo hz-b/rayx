@@ -6,7 +6,11 @@ std::unique_ptr<RAYX::Tracer> tracer;
 
 double parseDouble(std::string s) {
     double d;
+#if defined(WIN32)
+    if (sscanf_s(s.c_str(), "%le", &d) != 1) {
+#else
     if (sscanf(s.c_str(), "%le", &d) != 1) {
+#endif
         RAYX_WARN << "parseDouble failed for string:";
         RAYX_ERR << s;
         return false;
@@ -52,24 +56,24 @@ RAYX::Ray parseCSVline(std::string line) {
     return ray;
 }
 
-// will look at Tests/input/<filename>.rml
+/// will look at Tests/input/<filename>.rml
 RAYX::Beamline loadBeamline(std::string filename) {
-    std::string beamline_file = resolvePath("Tests/input/" + filename + ".rml");
+    std::string beamline_file = canonicalizeRepositoryPath("Tests/input/" + filename + ".rml").string();
 
     return RAYX::importBeamline(beamline_file);
 }
 
-// will write to Tests/output/<filename>.csv
-void writeToOutputCSV(std::vector<RAYX::Ray>& rays, std::string filename) {
-    std::string f = resolvePath("Tests/output/" + filename + ".csv");
+/// will write to Tests/output/<filename>.csv
+void writeToOutputCSV(const RAYX::Rays& rays, std::string filename) {
+    std::string f = canonicalizeRepositoryPath("Tests/output/" + filename + ".csv").string();
     writeCSV(rays, f);
 }
 
-// sequentialExtraParam yields the desired extraParam for rays which went the
-// sequential route through a beamline with `count` OpticalElements.
-// sequentialExtraParam(2) = 21
-// sequentialExtraParam(3) = 321 // i.e. first element 1, then 2 and then 3.
-// ...
+/// sequentialExtraParam yields the desired extraParam for rays which went the
+/// sequential route through a beamline with `count` OpticalElements.
+/// sequentialExtraParam(2) = 21
+/// sequentialExtraParam(3) = 321 // i.e. first element 1, then 2 and then 3.
+/// ...
 int sequentialExtraParam(int count) {
     int out = 0;
     int fac = 1;
@@ -80,44 +84,33 @@ int sequentialExtraParam(int count) {
     return out;
 }
 
-std::vector<RAYX::Ray> traceRML(std::string filename, Filter filter) {
+RAYX::Rays traceRML(std::string filename) {
     auto beamline = loadBeamline(filename);
-
-    // the rays satisfying the weight != 0 test.
-    std::vector<RAYX::Ray> wRays;
-    {
-        auto rays = tracer->trace(beamline);
-        wRays.reserve(rays.size());
-        for (auto r : rays) {
-            if (r.m_weight != 0) {
-                wRays.push_back(r);
-            }
-        }
-    }
-
-    if (filter == Filter::OnlySequentialRays) {
-        auto extra = sequentialExtraParam(beamline.m_OpticalElements.size());
-
-        // the rays satisfying the extraParam test.
-        std::vector<RAYX::Ray> eRays;
-
-        eRays.reserve(wRays.size());
-        for (auto r : wRays) {
-            if (intclose(r.m_extraParam, extra)) {
-                eRays.push_back(r);
-            }
-        }
-        return eRays;
-    } else {
-        return wRays;
-    }
+    return tracer->trace(beamline);
 }
 
-// will look at Tests/input/<filename>.csv
-// the Ray-UI files are to be obtained by Export > RawRaysOutgoing (which are in
-// element coordinates of the relevant element!)
+std::vector<RAYX::Ray> extractLastHit(const RAYX::Rays& rays) {
+    std::vector<RAYX::Ray> outs;
+    for (auto rr : rays) {
+        Ray out;
+        out.m_weight = W_UNINIT;
+        for (auto r : rr) {
+            if (r.m_weight == W_JUST_HIT_ELEM) {
+                out = r;
+            }
+        }
+        if (out.m_weight != W_UNINIT) {
+            outs.push_back(out);
+        }
+    }
+    return outs;
+}
+
+/// will look at Tests/input/<filename>.csv
+/// the Ray-UI files are to be obtained by Export > RawRaysOutgoing (which are in
+/// element coordinates of the relevant element!)
 std::vector<RAYX::Ray> loadCSVRayUI(std::string filename) {
-    std::string file = resolvePath("Tests/input/" + filename + ".csv");
+    std::string file = canonicalizeRepositoryPath("Tests/input/" + filename + ".csv").string();
 
     std::ifstream f(file);
     std::string line;
@@ -138,8 +131,75 @@ std::vector<RAYX::Ray> loadCSVRayUI(std::string filename) {
     return out;
 }
 
-void compareRayLists(const std::vector<RAYX::Ray>& rayx_list,
-                     const std::vector<RAYX::Ray>& rayui_list, double t) {
+void compareRays(const RAYX::Rays& r1, const RAYX::Rays& r2, double t) {
+    CHECK_EQ(r1.size(), r2.size());
+
+    auto it1 = r1.begin();
+    auto it1end = r1.end();
+
+    auto it2 = r2.begin();
+
+    while (it1 != it1end) {
+        auto& rr1 = *it1;
+        auto& rr2 = *it2;
+
+        CHECK_EQ(rr1.size(), rr2.size());
+
+        auto itr1 = rr1.begin();
+        auto itr1end = rr1.end();
+
+        auto itr2 = rr2.begin();
+
+        while (itr1 != itr1end) {
+            auto ray1 = *itr1;
+            auto ray2 = *itr2;
+
+            CHECK_EQ(ray1, ray2);
+
+            ++itr1;
+            ++itr2;
+        }
+
+        ++it1;
+        ++it2;
+    }
+}
+
+// returns the Ray-X rays converted to be ray-UI compatible.
+std::vector<RAYX::Ray> rayUiCompat(std::string filename) {
+    auto beamline = loadBeamline(filename);
+    auto rays = tracer->trace(beamline);
+
+    int seq = sequentialExtraParam(beamline.m_OpticalElements.size());
+
+    std::vector<RAYX::Ray> out;
+
+    for (auto rr : rays) {
+        for (auto r : rr) {
+            // The ray has to be sequential (and it must finally end up at the last element of beamline)
+            if (!intclose(r.m_extraParam, seq)) {
+                continue;
+            }
+
+            // The ray has to have weight != W_FLY_OFF
+            if (r.m_weight != W_JUST_HIT_ELEM) {
+                continue;
+            }
+
+            out.push_back(r);
+        }
+    }
+
+    return out;
+}
+
+void compareLastAgainstRayUI(std::string filename, double t) {
+    auto rayx_list = rayUiCompat(filename);
+    auto rayui_list = loadCSVRayUI(filename);
+
+    writeToOutputCSV(convertToRays(rayx_list), filename + ".rayx");
+    writeToOutputCSV(convertToRays(rayui_list), filename + ".rayui");
+
     CHECK_EQ(rayx_list.size(), rayui_list.size());
 
     auto itRayX = rayx_list.begin();
@@ -149,26 +209,26 @@ void compareRayLists(const std::vector<RAYX::Ray>& rayx_list,
 
     while (itRayX != itRayXEnd) {
         auto rayx = *itRayX;
-        auto rayui = *itRayUI;
-        CHECK_EQ(rayx.m_position, rayui.m_position, t);
-        CHECK_EQ(rayx.m_direction, rayui.m_direction, t);
-        CHECK_EQ(rayx.m_energy, rayui.m_energy, t);
+        auto correct = *itRayUI;
+
+        // TODO: make more properties of the rays work the same!
+        CHECK_EQ(rayx.m_position, correct.m_position, t);
+        CHECK_EQ(rayx.m_direction, correct.m_direction, t);
+        CHECK_EQ(rayx.m_energy, correct.m_energy, t);
 
         ++itRayX;
         ++itRayUI;
     }
 }
 
-void compareAgainstRayUI(std::string filename, double tolerance) {
-    auto beamline = loadBeamline(filename);
+void compareAgainstCorrect(std::string filename, double tolerance) {
+    auto a = traceRML(filename);
 
-    auto a = traceRML(filename, Filter::OnlySequentialRays);
-    auto b = loadCSVRayUI(filename);
+    std::string f = canonicalizeRepositoryPath("Tests/input/" + filename + ".correct.csv").string();
+    auto b = loadCSV(f);
 
     writeToOutputCSV(a, filename + ".rayx");
-    writeToOutputCSV(b, filename + ".rayui");
-
-    compareRayLists(a, b, tolerance);
+    compareRays(a, b, tolerance);
 }
 
 void updateCpuTracerMaterialTables(std::vector<Material> mats_vec) {

@@ -1,25 +1,15 @@
 #pragma once
-#include <Data/xml.h>
-
 #include "Model/Beamline/OpticalElement.h"
-#include "Model/Surface/Quadric.h"
 
 namespace RAYX {
 
-enum class CentralBeamstop {
-    None,
-    Rectangle,
-    Elliptical
-};  ///< central beamstop shape
+enum class CentralBeamstop { None, Rectangle, Elliptical };  ///< central beamstop shape
 
 class RAYX_API Slit : public OpticalElement {
   public:
-    Slit(const char* name, OpticalElement::GeometricalShape geometricalShape,
-         CentralBeamstop beamstop, double width, double height,
-         glm::dvec4 position, glm::dmat4x4 orientation, double beamstopWidth,
-         double beamstopHeight);
+    Slit(const DesignObject&);
 
-    static std::shared_ptr<Slit> createFromXML(const xml::Parser&);
+    inline int getElementType() const { return TY_SLIT; }
 
     CentralBeamstop getCentralBeamstop() const;
     double getBeamstopWidth() const;

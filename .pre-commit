@@ -1,0 +1,16 @@
+#!/bin/sh
+
+# add this pre-commit hook with
+# 
+# cd .git/hooks
+# ln -s ../../.pre-commit pre-commit
+# 
+
+echo formatting hook ..
+
+while [[ ! -d .git ]]
+do
+cd ..
+done
+
+exec ./format.sh

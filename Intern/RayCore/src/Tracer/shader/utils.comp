@@ -6,22 +6,11 @@ double hvlam(double x) {
     return inm2eV / x;
 }
 
-// This function is to be used instead of 0/0 or nan to represent missing
-// values.
-// Note: you can replace undefined() with
-/*
-double undefined() {
-    double ret;
-    return ret;
-}
-*/
-// for debugging purposes:
-// If at some point such an undefeined() value is read, valgrind will detect it
-// and hence we know there is a bug.
-double undefined() {
-    double f = 0.0;
-    return 1.0 / (f - f); // this is an obsfucated way of writing 0/0 so that we get no warning.
-	// TODO(rudi): 1/0 is not defined behaviour in GLSL so the occurences of this function should be fixed!
+// originally we calculcated 1/0, which might be UB (https://stackoverflow.com/questions/5802351/what-happens-when-you-divide-by-0-in-a-shader).
+// `return 1e+308 * 2.0;` correctly returns positive infinity on my machine (Rudi), but we have no guarantee that it always does.
+// So instead we return a sufficiently large number to be used like positive infinity.
+double infinity() {
+    return 1e+308;
 }
 
 // multiplies position and direction of ray r with transformation matrix m
@@ -118,35 +107,25 @@ void cosini(INOUT(Ray) r, double phi, double psi) {
  * @param x, z			 	x- and z-coordinates of the intersection point in
  * element coordinates
  * @param xLength, zLength	width and length of the optical element
- * @param w 					current weight of the ray
  *
- * returns: unchanged weight if intersection point is within surface boundaries,
- * 0.0 if not.
+ * returns `true` if intersection point is within surface boundaries.
  */
-double wasteBox(double x, double z, double xLength, double zLength, double w) {
+bool wasteBox(double x, double z, double xLength, double zLength) {
     if (xLength >= 0) {  // Rectangular shape
         double x_min = -xLength / 2.0;
         double x_max = xLength / 2.0;
         double z_min = -zLength / 2.0;
         double z_max = zLength / 2.0;
-        w *= int(x > x_min) * int(x < x_max) * int(z > z_min) *
-             int(z < z_max);  // This sets w to zero, if (x <= x_min || x >=
-                              // x_max || z <= z_min || z >= z_max)
+        return x > x_min && x < x_max && z > z_min && z < z_max;
     } else {                  // Ring shape
         double rd2 = (x / (xLength / 2.0)) * (x / (xLength / 2.0)) +
                      (z / (zLength / 2.0)) * (z / (zLength / 2.0));
-        w *= int(rd2 <= 1.0);  // This sets w to zero, if (rd > 1.0)
+        return rd2 <= 1.0;
     }
-    return w;
-}
-
-double strangeCross(double ax, double ay, double bx, double by) {
-    return ax * by - ay * bx;
 }
 
 // ! temporary for testing purposes (trapezoid)
-double wasteBox(double x, double z, double xLengthA, double xLengthB,
-                double zLength, double w) {
+bool wasteBox(double x, double z, double xLengthA, double xLengthB, double zLength) {
     if (xLengthA >= 0) {     // Rectangular shape
         if (xLengthB > 0) {  // Trapezoid shape
             // Check point is within the trapezoid
@@ -164,32 +143,22 @@ double wasteBox(double x, double z, double xLengthA, double xLengthB,
             dvec3 PmB = P - B;
             dvec3 CmB = C - B;
 
-            if ((strangeCross(PmA.x, PmA.z, BmA.x, BmA.z) *
-                 strangeCross(PmD.x, PmD.z, CmD.x, CmD.z)) < 0 &&
-                (strangeCross(PmA.x, PmA.z, DmA.x, DmA.z) *
-                 strangeCross(PmB.x, PmB.z, CmB.x, CmB.z)) < 0) {
-                return w;
-            } else {
-                return 0.0;
-            }
+            double l1 = ((PmA.x * BmA.z - PmA.z * BmA.x) * (PmD.x * CmD.z - PmD.z * CmD.x));
+            double l2 = ((PmA.x * DmA.z - PmA.z * DmA.x) * (PmB.x * CmB.z - PmB.z * CmB.x));
+            return l1 < 0 && l2 < 0;
         } else {
             double x_min = -xLengthA / 2.0;
             double x_max = xLengthA / 2.0;
             double z_min = -zLength / 2.0;
             double z_max = zLength / 2.0;
 
-            if (x <= x_min || x >= x_max || z <= z_min || z >= z_max) {
-                return 0.0;
-            }
+            return !(x <= x_min || x >= x_max || z <= z_min || z >= z_max);
         }
     } else {  // Ring shape
         double rd2 = (x / (xLengthA / 2.0)) * (x / (xLengthA / 2.0)) +
                      (z / (zLength / 2.0)) * (z / (zLength / 2.0));
-        if (rd2 > 1.0) {
-            return 0.0;
-        }
+        return rd2 <= 1.0;
     }
-    return w;
 }
 
 // returns dvec2(atomic mass, density) extracted from materials.xmacro
@@ -201,14 +170,14 @@ dvec2 getAtomicMassAndRho(int material) {
 #include "../../Material/materials.xmacro"
 #undef X
     }
-#ifdef CPP
+#ifndef GLSL
     RAYX_ERR << "invalid material in getAtomicMassAndRho";
 #endif
     return dvec2(0.0, 0.0);
 }
 
 // for cpp it's already defined in CpuTracer.h
-#ifndef CPP
+#ifdef GLSL
 struct PalikEntry {
     double energy;
     double n;
@@ -273,7 +242,7 @@ dvec2 getRefractiveIndex(double energy, int material) {
 
     // out of range check
     if (material < 1 || material > 92) {
-#ifdef CPP
+#ifndef GLSL
         RAYX_ERR << "getRefractiveIndex material " << material
                  << " out of range!";
 #endif
@@ -339,7 +308,7 @@ dvec2 getRefractiveIndex(double energy, int material) {
     }
 
 // error, no matching entry found.
-#ifdef CPP
+#ifndef GLSL
     RAYX_ERR << "getRefractiveIndex: no matching entry found!";
 #endif
     return dvec2(-1.0, -1.0);
@@ -464,11 +433,11 @@ void reflectance(double energy, double incidence_angle, INOUT(dvec2) complex_S,
 dvec2 cartesian_to_euler(dvec2 complex) {
     double r =
         dot(complex,
-            complex);  // r = sqrt(a**2 + b**"), why not take sqrt in fortran
+            complex);  // r = sqrt(a**2 + b**2), why not take sqrt in fortran
                        // code?, maybe better bc square root looses precision
     dvec2 euler;
     if (r < 0 || r > 1) {
-        euler = dvec2(undefined(), undefined());
+        euler = dvec2(infinity(), infinity());
         return euler;
     }
     euler = dvec2(r, r8_atan2(complex.y, complex.x));  // phi in rad
@@ -537,9 +506,10 @@ dmat4 muller_matrix(double R_s, double R_p, double delta) {
  * @param delta		phase difference between complex s and p polarization
  * @param azimuthal	angle of rotation of element in xy plane (chi + dchi
  * (misalignment))
- * @returns updated stokes vector of ray, updates weight of ray
+ * updates stokes vector of ray
+ * @returns `true`, if ray should be absorbed
  */
-void update_stokes(INOUT(Ray) r, double real_S, double real_P, double delta,
+bool update_stokes(INOUT(Ray) r, double real_S, double real_P, double delta,
                    double azimuthal, INOUT(uint64_t) ctr) {
     dvec4 stokes_old = r.m_stokes;
     double c_chi = r8_cos(azimuthal);
@@ -554,8 +524,7 @@ void update_stokes(INOUT(Ray) r, double real_S, double real_P, double delta,
 
     double rn = squaresDoubleRNG(ctr);
     // throw ray away with certain probability
-    if ((r.m_stokes.x / stokes_old.x) - rn <= 0) r.m_weight = 0;
-    return;
+    return (r.m_stokes.x / stokes_old.x) - rn <= 0;
 }
 
 /**
@@ -786,7 +755,7 @@ calculates refracted ray
             normal: normal at intersection point of ray and element
             az: line spacing in z direction
             ax: line spacing in x direction
-@returns: refracted ray (position unchanged, direction changed), weight = 0 if
+@returns: refracted ray (position unchanged, direction changed), weight = W_BEYOND_HORIZON if
 "ray beyond horizon"
 */
 Ray refrac2D(Ray r, dvec4 normal, double az, double ax) {
@@ -814,7 +783,7 @@ Ray refrac2D(Ray r, dvec4 normal, double az, double ax) {
         r.m_direction.y = y1;
         r.m_direction.z = z1;
     } else {  // beyond horizon - when divergence too large
-        r.m_weight = 0.0;
+        r.m_weight = W_BEYOND_HORIZON;
     }
     r.m_direction = inv_rot * r.m_direction;
     return r;
@@ -854,7 +823,7 @@ Ray refrac(Ray r, dvec4 normal, double linedensity) {
         r.m_direction[1] = y1;
         r.m_direction[2] -= a1;
     } else {
-        r.m_weight = 0.0;
+        r.m_weight = W_BEYOND_HORIZON;
     }
     r.m_direction = dvec3(inv_rot * dvec4(r.m_direction, 0));
     return r;
@@ -901,7 +870,7 @@ Ray refrac_plane(Ray r, ALLOW_UNUSED dvec4 normal,
         r.m_direction[1] = y1;
         r.m_direction[2] = r.m_direction[2] - a;
     } else {
-        r.m_weight = 0.0;  // status?
+        r.m_weight = W_BEYOND_HORIZON;
     }
     return r;
 }
@@ -912,26 +881,16 @@ checks whether the ray is hit by a central beam stopper which may be rectangular
 negative, then a circular shape of radius xStop is assumed (from RAY.FOR)
 @params		x,y				x/y-coord. of ray direction
             xStop, yStop	shape of beam stopper
-            weight			current weight of the ray, is changed if ray is
-stopped
-@return
-    new weight
+@returns `false` if the ray is stopped, and `true` otherwise
 */
-double stopBox(double x, double y, double xStop, double yStop, double weight) {
-    double w = weight;
-    // if w == 0 return
-    if (w != 0) {
-        if (xStop > 0) {
-            if (abs(x) < xStop && abs(y) < yStop) {
-                w = 0;
-            }
-        } else {
-            double radius =
-                sqrt((x / xStop) * (x / xStop) + (y / yStop) * (y / yStop));
-            if (radius <= 1) w = 0;
-        }
+bool stopBox(double x, double y, double xStop, double yStop) {
+    if (xStop > 0) {
+        return abs(x) >= xStop || abs(y) >= yStop;
+    } else {
+        double radius =
+            sqrt((x / xStop) * (x / xStop) + (y / yStop) * (y / yStop));
+        return radius > 1;
     }
-    return w;
 }
 
 /**returns first bessel function of parameter v*/

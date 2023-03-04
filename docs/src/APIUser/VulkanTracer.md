@@ -2,15 +2,15 @@
 
 The VulkanTracer is a ray tracing module using VULKAN by KHRONOS GROUP to efficiently trace rays with hardware acceleration.
 
-In the current version the VulkanTracer class is simply called using the run() function. In future versions information about the rays and optical elements will be transfered.
+In the current version the Vulkan Engine is a Compute Class that runs as much parallel as possible on the GPU.
 
 Current procedure:
 
 * generate rays
 * create input and output buffers
-* initialize Vulkan using initVulkan()
-* run the main loop using mainLoop()
-* clean up (free the memory allocated)
+* initialize Vulkan
+* run the main loop
+* clean up
 
 initVulkan():
 
@@ -28,7 +28,7 @@ mainLoop():
 ---
 # **How the VulkanTracer works**
 
-![vulkan_flow](/docs/src/uploads/fe29b8ceeb1467bec87aed5de3144cad/vulkan_flow.png)
+![vulkan_flow](/docs/src/res/vulkan_flow.png)
 
 ## _Buffer types used:_
 
@@ -37,27 +37,21 @@ mainLoop():
 **A storage buffer** (`VK_DESCRIPTOR_TYPE_STORAGE_BUFFER`) is a descriptor type associated with a buffer resource directly, described in a shader as a structure with various members that load, store, and atomic operations can be performed on.
 
 ---
-
-
-**Vulkan commands (Recording and pushing to pipeline):**
-
-![CommandBuffers](/docs/src/uploads/ed43760242d13d1004607fef0131747e/CommandBuffers.png)
-
----
-
-**Layout concept (applied on "Sets" using `storage buffer|uniform buffer`):**
-
-![DescriptorLayouts](/docs/src/uploads/090e2e5c162e12db1f5a93a1b30dbb79/DescriptorLayouts.png)
-
----
 # Buffers:
-| Buffers | Size ( in Double)                 | Usage                        | Memory Property   | Name               |
-|---------|-----------------------------------|------------------------------|-------------------|--------------------|
-| 0       | NumverOfRays*RAY_DOUBLE_AMOUNT    | Transfer_DST\|STORAGE_BUFFER | DEVICE_LOCAL      | Ray Buffer         |
-| 1       | NumberOfRays*RAY_DOUBLE_AMOUNT    | Transfer_SRC\|STORAGE_BUFFER | DEVICE_LOCAL      | Output Buffer      |
-| 2       | Quadric_parm+beamlineSize         | STORAGE_BUFFER               | COHERANT\|VISIBLE | Quadric Buffer     |
-| 3       | min(GPU_MAX_STAGING,numberOfRays) | STORAGE\|DST\|SRC            | COHERANT\|VISIBLE | Staging Buffer     |
-| 4       | numberofRays*4                    | STORAGE_BUFFER               | DEVICE_LOCAL      | Buffer for xyznull |
+| Buffers | Size ( vkDeviceSize)              | Usage                        | Name               |
+|---------|-----------------------------------|------------------------------|--------------------|
+| 0       | NumverOfRays*RAY_DOUBLE_AMOUNT    | Transfer_DST\|STORAGE_BUFFER | Ray Buffer         |
+| 1       | NumberOfRays*RAY_DOUBLE_AMOUNT    | Transfer_SRC\|STORAGE_BUFFER | Output Buffer      |
+| 2       | Quadric_parm+beamlineSize         | STORAGE_BUFFER               | Quadric Buffer     |
+| 3       | 100                               | STORAGE_BUFFER               | Buffer for xyznull |
+| 4       | xxxxxxxxxxxxxxx                   | STORAGE_BUFFER               | materialIndexBuf   |
+| 5       | xxxxxxxxxxxxxxx                   | STORAGE_BUFFER               | materialBuf        |
+| 6       | xxxxxxxxxxxxxxx                   | STORAGE_BUFFER               | debugBuffer        |
+| X       | min(GPU_MAX_STAGING,numberOfRays) | STORAGE\|DST\|SRC            | Staging Buffer     |
+
+
+
+
 
 ## Buffer Usages:
 

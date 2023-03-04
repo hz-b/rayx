@@ -1,5 +1,7 @@
 #include "Beamline.h"
 
+#include <array>
+
 #include "Debug/Instrumentor.h"
 #include "Model/Beamline/Objects/Objects.h"
 
@@ -9,6 +11,7 @@ Beamline::Beamline() = default;
 Beamline::~Beamline() = default;
 
 std::vector<Ray> Beamline::getInputRays() const {
+    RAYX_PROFILE_FUNCTION_STDOUT();
     std::vector<Ray> list;
     uint32_t raycount = 0;
     for (const auto& s : m_LightSources) {
@@ -29,7 +32,7 @@ MaterialTables Beamline::calcMinimalMaterialTables() const {
     relevantMaterials.fill(false);
 
     for (const auto& e : m_OpticalElements) {
-        int material = (int)e->getSurfaceParams()[3][2];  // in [1, 92]
+        int material = (int)e->m_material;  // in [1, 92]
         if (1 <= material && material <= 92) {
             relevantMaterials[material - 1] = true;
         }

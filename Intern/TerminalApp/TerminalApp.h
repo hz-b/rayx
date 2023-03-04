@@ -6,16 +6,8 @@
 #include <filesystem>
 
 #include "CommandParser.h"
-#include "PythonInterp.h"
 #include "RayCore.h"
 #include "TerminalAppConfig.h"
-
-// Virtual python Environment Path
-#ifdef WIN32  // Todo
-#define VENV_PATH ".\\rayxvenv\\bin\\python3"
-#else
-#define VENV_PATH "./rayxvenv/bin/python3"
-#endif
 
 class TerminalApp {
   public:
@@ -37,9 +29,13 @@ class TerminalApp {
     /// if `path` is an RML file, it will trace this file.
     /// if `path` is a directory, it will call `tracePath(child)` for all
     /// children of that directory.
-    void tracePath(std::filesystem::path path);
-    void exportRays(const std::vector<RAYX::Ray>&, std::string);
-#if defined(RAYX_DEBUG_MODE) && not defined(CPP)
+    void tracePath(const std::filesystem::path& path);
+    // returns the output filename (either .csv or .h5)
+    std::string exportRays(const RAYX::Rays&, std::string);
+    std::vector<std::string> getBeamlineOpticalElementsNames();
+    std::vector<std::string> getBeamlineLightSourcesNames();
+
+#if defined(RAYX_DEBUG_MODE)
     void exportDebug();
 #endif
     std::string providedFile;

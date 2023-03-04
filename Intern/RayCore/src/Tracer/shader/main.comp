@@ -1,6 +1,6 @@
 #define WORKGROUP_SIZE 32
 
-#ifdef CPP
+#ifndef GLSL
     #define INOUT(x) x&
     #define OUT(x) x&
     #define ALLOW_UNUSED [[maybe_unused]]
@@ -17,22 +17,33 @@
 	layout(local_size_x = WORKGROUP_SIZE, local_size_y = 1, local_size_z = 1) in;
 #endif
 
-const double PI       = 3.14159265358979323846264338327950;
-const uint64_t rngKey = 13; // TODO(rudi) this was the old key, it generated a warning: (0xc8e4fd15 << 32) | 0x4ce32f6d;
-const double inm2eV   = 1.239852e3;
+// Every shader execution calculates the route for a single ray.
+// `_ray` is that ray, it's always in world coordinates (!).
+#define _ray (rayData[uint(gl_GlobalInvocationID)])
+
+#include "../../Constants.h"
 
 /* STRUCTS */
 // for CPP, the according things are mostly defined in CpuTracer.h
-#ifdef CPP
+#ifndef GLSL
 int gl_GlobalInvocationID;
 
 ShaderArray<Ray> rayData;
 ShaderArray<Ray> outputData;
-double numberOfBeamlines;
-double numberOfElementsPerBeamline;
-double numberOfRays;
-double numberOfRaysPerBeamLine;
-ShaderArray<Element> quadricData;
+
+// the ray id of the first ray of the batch.
+// See `rayId` to access the ray id of the current ray.
+double rayIdStart;
+
+// The total number of rays in this tracing process.
+// (not only this batch)
+double numRays;
+double randomSeed;
+
+// each ray will take multiple snapshots (copies) while tracing, those are then sent to the CPU for further processing.
+double maxSnapshots;
+
+ShaderArray<Element> elements;
 ShaderArray<dvec4> xyznull;
 ShaderArray<int> matIdx;
 ShaderArray<double> mat;
@@ -40,7 +51,9 @@ ShaderArray<double> mat;
 #else
 struct Ray {
     dvec3 m_position;
-    double m_weight;  // status of the ray (e.g if element missed -> 0)
+    // Initially weight for _ray is `W_IN_COMPUTATION`.
+    // See the potential values of `m_weight` in `Constants.h`.
+    double m_weight;
     dvec3 m_direction;
     double m_energy;
     dvec4 m_stokes;
@@ -49,30 +62,29 @@ struct Ray {
     double m_lastElement;
     double m_extraParam;
 };
-struct Element {
-    dmat4 surfaceParams;
-    dmat4 inTrans;
-    dmat4 outTrans;
-    dmat4 objectParameters;
-    dmat4 elementParameters;
-};
 
 #ifdef RAYX_DEBUG_MODE
 	struct _debug_struct {
 		dmat4 _dMat; // Can also be used as vectors or scalar
 	};
-#endif 
+#endif
+
 /* LAYOUTS */
-	layout(std140, binding = 0) buffer ibuf { Ray rayData[]; }; // in global coordinates
+    // don't use this directly. Use `_ray` instead.
+	layout(std140, binding = 0) buffer ibuf { Ray rayData[]; };
 
-	layout(std140, binding = 1) buffer obuf { Ray outputData[]; }; // in element coordinates, i.e. relative to the last element the ray has collided with.
+    // don't use this directly. Use `takeSnapshot` instead.
+	layout(std140, binding = 1) buffer obuf { Ray outputData[]; };
 
-	layout(std140, binding = 2) buffer qbuf {
-		double numberOfBeamlines;
-		double numberOfElementsPerBeamline;
-		double numberOfRays;
-		double numberOfRaysPerBeamLine;
-		Element quadricData[];
+    // std430 is required so that Element is layouted like in C++.
+    // see https://www.khronos.org/opengl/wiki/Interface_Block_(GLSL) for more details on layouting.
+	layout(std430, binding = 2) buffer qbuf {
+        double rayIdStart;
+        double numRays;
+        double randomSeed;
+        double maxSnapshots;
+
+		Element elements[];
 	};
 
 	layout(std140, binding = 3) buffer xyzbuf { dvec4 xyznull[]; };
@@ -92,159 +104,101 @@ struct Element {
 			_debug_struct d_struct[];  // contains nff table of all materials concatenated together
 		};
 	#endif
+
+
 #endif
+
+bool finalized;
+
+// PushConstants 
+#ifndef GLSL
+    pushConstants_t pushConstants;
+#else 
+    layout( push_constant ) uniform constants
+    {
+	    dmat4 pushMatrix;
+    } PushConstants;
+#endif
+
+uint64_t rayId() {
+    return uint64_t(rayIdStart) + uint64_t(gl_GlobalInvocationID);
+}
+
+// `i in [0, maxSnapshots]`.
+// Will return the index in outputData to access the `i'th` output ray belonging to this shader call.
+// Typically used as `outputData[output_index(i)]`.
+uint output_index(uint i) {
+    return uint(gl_GlobalInvocationID) * uint(maxSnapshots) + i;
+}
+
+// take a snapshot and store it in the next free spot in outputData.
+// `r` will typically be _ray, or some related ray.
+void takeSnapshot(Ray r, double w) {
+    if (finalized) { return; }
+
+    #ifndef GLSL
+    if (w == W_UNINIT) {
+        RAYX_ERR << "takeSnapshot called with W_UNINIT";
+    }
+    #endif
+
+    for (uint i = 0; i < maxSnapshots; i++) {
+        uint idx = output_index(i);
+        if (outputData[idx].m_weight == W_UNINIT) { // checks whether this spot is free
+            outputData[idx] = r;
+            outputData[idx].m_weight = w;
+            return;
+        }
+    }
+
+    // no spots were found.
+    #ifndef GLSL
+    RAYX_WARN << "takeSnapshot failed: no free spots!";
+    #endif
+}
+
+// like `takeSnapshot` above, but it will prevent taking more snapshots after this.
+// Is used for snapshots terminating the path of the ray.
+void takeFinalSnapshot(Ray r, double w) {
+    takeSnapshot(r, w);
+    finalized = true;
+}
+
 
 // Order in #include is IMPROTANT, do not change.
 // clang-format off
+#include "elements.comp"
 #include "approx.comp"
 #include "complex.comp"
 #include "random.comp"
 #include "utils.comp"
 #include "intersection.comp"
 #include "trace.comp"
+#include "dynamic_elements.comp"
 // clang-format on
 
-// @brief: Dynamic ray tracing: check which ray hits which element first
-// in this function we need to make sure that rayData ALWAYS remains in GLOBAL coordinates (it can be changed in a function but needs to be changed
-// back before the function returns to this function)
-void dynamicElements() {
-    const int numberOfElements = quadricData.length();
-    // placeholder, info should later be transfered to shader
-    const int maxBounces  = numberOfElements;
-    Ray ray               = rayData[uint(gl_GlobalInvocationID)];
-    uint beamlineIndex    = uint(double(gl_GlobalInvocationID) / numberOfRaysPerBeamLine);
-
-    // ray specific "seed" for random numbers -> every ray has a different starting value for the counter that creates the random number
-    uint64_t workerCounterNum = (~(uint64_t(0)) / int(numberOfRays));
-    uint64_t ctr              = uint(gl_GlobalInvocationID) * workerCounterNum;
-    int type                  = -1;
-
-    int closestElementIndex = -1;
-    int lastClosestElementIndex;
-    dvec4 closestHitpoint = dvec4(undefined(), undefined(), undefined(), 0.0);
-    dvec4 closestGlobalHitpoint;
-    
-    #ifdef RAYX_DEBUG_MODE // Debug Matrix only works in GPU Mode and on DEBUG Build Type
-    #ifndef CPP  
-    // Set Debug Struct of current Ray to identity
-    d_struct[uint(gl_GlobalInvocationID)]._dMat = dmat4(1);
-    #endif
-    #endif
-
-    Element nextElement;
-    // at the end of this function we apply inTrans, if no collision happened (i.e. nextElement undefined), we want this to do nothing.
-    nextElement.inTrans = dmat4(1);
-    nextElement.outTrans = dmat4(1);
-
-    double bounce = 1;
-
-    // Printing Example over vkconfig Validation Layers
-    if (uint(gl_GlobalInvocationID) == 2 ){
-    #ifndef CPP
-        debugPrintfEXT("Hello from GPU. \n"); 
-    #else
-        RAYX_D_LOG << "Tracing on CPU..." ; 
-    #endif
+// sets all output rays controlled by this shader call to W_UNINIT.
+void uninitRays() {
+    for (uint i = 0; i < maxSnapshots; i++) {
+        outputData[output_index(i)].m_weight = W_UNINIT;
     }
-    // Iterate through all bounces
-    for (int i = 0; i < maxBounces; i++) {
-        ray = rayData[uint(gl_GlobalInvocationID)];
-
-        lastClosestElementIndex = closestElementIndex;
-
-        // index of element with current closest intersection with ray, initialized with -1
-        closestElementIndex = -1;
-
-        // global coordinates of first intersection point of ray among all elements in beamline
-        closestHitpoint       = dvec4(undefined(), undefined(), undefined(), 0);
-        closestGlobalHitpoint = dvec4(undefined(), undefined(), undefined(), 0);
-
-        // Find intersection points through all elements
-        for (int elementIndex = int(beamlineIndex) * int(numberOfElementsPerBeamline);
-             elementIndex < (beamlineIndex + 1) * numberOfElementsPerBeamline; elementIndex++) {
-            if (elementIndex == lastClosestElementIndex) {
-                // TODO: self-intersection
-                // rayData[uint(gl_GlobalInvocationID)].m_weight = 11;
-                continue;
-            }
-
-            dvec4 currentIntersection = getOpticalElementIntersection(ray, elementIndex);
-            dvec3 currentIntersection_xyz = dvec3(currentIntersection.x, currentIntersection.y, currentIntersection.z);
-
-            // Intersection coordinates in GLOBAL coordinates
-            dvec4 currentGlobalIntersection;
-            dvec3 tmp = dvec3(quadricData[elementIndex].outTrans * dvec4(currentIntersection_xyz, 1));
-            currentGlobalIntersection = dvec4(tmp, currentGlobalIntersection.w);
-            dvec3 currentGlobalIntersection_xyz = dvec3(currentGlobalIntersection.x, currentGlobalIntersection.y, currentGlobalIntersection.z);
-
-            dvec3 closestGlobalHitpoint_xyz = dvec3(closestGlobalHitpoint.x, closestGlobalHitpoint.y, closestGlobalHitpoint.z);
-            // check if current intersection is closer than the closest previous Hitpoint
-            // If yes then update. Since the old intersection is occluded by the old Intersection/Hit point
-            if (length(ray.m_position - closestGlobalHitpoint_xyz) > length(ray.m_position - currentGlobalIntersection_xyz) &&
-                currentIntersection.w != 0) {
-                closestHitpoint       = currentIntersection;
-                closestGlobalHitpoint = currentGlobalIntersection;
-                closestElementIndex   = elementIndex;
-            }
-        }
-
-        if (closestElementIndex == -1) {  // no element was hit. Ray is considered to move forward to inf. (With weight == 0)
-            break;
-        }
-
-        // transform ray and intersection point in ELEMENT coordiantes
-        nextElement                          = quadricData[closestElementIndex];
-        rayData[uint(gl_GlobalInvocationID)] = rayMatrixMult(rayData[uint(gl_GlobalInvocationID)], nextElement.inTrans);
-
-        // Calculate interaction(reflection,material, absorption etc.) of ray with detected next element
-        type = int(nextElement.surfaceParams[3][0]);
-        if (type == 0) {  // plane + sphere mirror
-            rayData[uint(gl_GlobalInvocationID)] = traceMirror(rayData[uint(gl_GlobalInvocationID)], closestElementIndex, ctr, closestHitpoint);
-
-        } else if (type == 1) {  // plane grating
-            rayData[uint(gl_GlobalInvocationID)] = tracePlaneGrating(rayData[uint(gl_GlobalInvocationID)], closestElementIndex, ctr, closestHitpoint);
-
-        } else if (type == 2) {  // general grating
-            rayData[uint(gl_GlobalInvocationID)] =
-                traceGeneralGrating(rayData[uint(gl_GlobalInvocationID)], closestElementIndex, ctr, closestHitpoint);
-
-        } else if (type == 3) {  // Slit
-            rayData[uint(gl_GlobalInvocationID)] = traceSlit(rayData[uint(gl_GlobalInvocationID)], closestElementIndex, ctr, closestHitpoint);
-
-        } else if (type == 4) {  // rzp
-            rayData[uint(gl_GlobalInvocationID)] = traceRZP(rayData[uint(gl_GlobalInvocationID)], closestElementIndex, ctr, closestHitpoint);
-
-        } else if (type == 5) {  // image plane
-            rayData[uint(gl_GlobalInvocationID)].m_extraParam += (closestElementIndex + 1) * bounce;
-            rayData[uint(gl_GlobalInvocationID)].m_lastElement = closestElementIndex + 1;
-            outputData[uint(gl_GlobalInvocationID)] = traceImagePlane(rayData[uint(gl_GlobalInvocationID)], closestElementIndex, closestHitpoint);
-            return;
-
-        } else if (type == 6) {  // toroid mirror
-            rayData[uint(gl_GlobalInvocationID)] = traceToroid(rayData[uint(gl_GlobalInvocationID)], closestElementIndex, ctr, closestHitpoint);
-
-        } else if (type == 7) {  // ellipsoid mirror
-            rayData[uint(gl_GlobalInvocationID)] =
-                traceEllipsoidMirror(rayData[uint(gl_GlobalInvocationID)], closestElementIndex, ctr, closestHitpoint);
-        }
-
-        // use extraParameter to store the order in which the ray has hit which optical element (e.g extraParameter = 412 -> first hit element 2, then
-        // 1, then 4)
-        rayData[uint(gl_GlobalInvocationID)].m_extraParam +=
-            ((closestElementIndex + 1) * bounce) * int(rayData[uint(gl_GlobalInvocationID)].m_lastElement == closestElementIndex + 1);
-        bounce *= pow(10, int(rayData[uint(gl_GlobalInvocationID)].m_lastElement == closestElementIndex + 1));
-
-        // transform back to WORLD coordinates
-        rayData[uint(gl_GlobalInvocationID)] = rayMatrixMult(rayData[uint(gl_GlobalInvocationID)], nextElement.outTrans);
-    }
-
-    // outputData should be in element coordinates.
-    outputData[uint(gl_GlobalInvocationID)] = rayMatrixMult(rayData[uint(gl_GlobalInvocationID)], nextElement.inTrans);
 }
 
 void main() {
-	dynamicElements();
+    finalized = false;
+    uninitRays();
 
-    // output = input:
-    // outputData[uint(gl_GlobalInvocationID)] = rayData[uint(gl_GlobalInvocationID)];
+    // this is required as sometimes error codes are transmitted using _ray.m_weight
+    _ray.m_weight = W_UNINIT;
+
+    // Printing ~DEBUG~ Example over vkconfig Validation Layers
+    // if (uint(gl_GlobalInvocationID) == 2 ){
+    // #ifdef GLSL
+    //     // debugPrintfEXT("Hello from GPU. \n");
+    // #else
+    //     // RAYX_D_LOG << "Tracing on CPU..." ;
+    //     // RAYX_D_LOG << pushConstants.pushMatrix[0][0];
+    // #endif
+    // }
+	dynamicElements();
 }

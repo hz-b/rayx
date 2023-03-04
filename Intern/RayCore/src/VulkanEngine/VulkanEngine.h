@@ -1,4 +1,8 @@
+#ifndef NO_VULKAN
+
 #pragma once
+
+#include <vk_mem_alloc.h>
 
 #include <algorithm>
 #include <map>
@@ -9,29 +13,29 @@
 
 namespace RAYX {
 
-/// the argument type of `VulkanEngine::declareBuffer(_)`
-struct DeclareBufferSpec {
+// the argument type of `VulkanEngine::declareBuffer(_)`
+struct BufferDeclarationSpec_t {
     /// used to map the vulkan buffers to the shader buffers.
     /// Lines like `layout (binding = _)` declare buffers in the shader.
-    uint32_t m_binding;
+    uint32_t binding;
 
     /// expresses whether the buffer is allowed to be initialized with CPU-data.
-    bool m_in;
+    bool isInput;
 
     /// expresses whether the buffer is allowed to be read out to the CPU after
     /// the computation.
-    bool m_out;
+    bool isOutput;
 };
 
 /// the argument type of `VulkanEngine::init(_)`
-struct InitSpec {
+struct VulkanEngineInitSpec_t {
     /// the name of the shaderfile, as relative path - relative to the root of
     /// the repository
-    const char* m_shader;
+    const char* shaderFileName;
 };
 
 /// the argument type of `VulkanEngine::run(_)`
-struct RunSpec {
+struct VulkanEngineRunSpec_t {
     uint32_t m_numberOfInvocations;
 };
 
@@ -41,32 +45,32 @@ class RAYX_API VulkanEngine {
     ~VulkanEngine();
 
     /// buffers need to be declared before init() is called.
-    void declareBuffer(const char* bufname, DeclareBufferSpec);
+    void declareBuffer(const char* bufname, BufferDeclarationSpec_t);
 
     /// changes the state from PREINIT to PRERUN.
-    void init(InitSpec);
+    void init(VulkanEngineInitSpec_t);
 
     /// create a buffer and fill it with the data given in vec.
     /// the buffer will have exactly the size to fit all elements of vec.
     /// only allowed for `m_in = true` buffers.
     template <typename T>
-    inline void createBufferWithData(const char* bufname,
-                                     const std::vector<T>& vec) {
+    inline void createBufferWithData(const char* bufname, const std::vector<T>& vec) {
         createBuffer(bufname, vec.size() * sizeof(T));
         writeBufferRaw(bufname, (char*)vec.data());
     }
+
     /// create a buffer with the given size, it's data is uninitialized.
     void createBuffer(const char* bufname, VkDeviceSize);
 
     /// changes the state from PRERUN to POSTRUN
     /// This function runs the shader.
-    void run(RunSpec);
+    void run(VulkanEngineRunSpec_t);
 
     /// after run(_) is finished (i.e. in POSTRUN state)
     /// we can read the contents of `m_out = true`-buffers.
     template <typename T>
     inline std::vector<T> readBuffer(const char* bufname) {
-        std::vector<T> out(m_buffers[bufname].m_size / sizeof(T));
+        std::vector<T> out(m_buffers[bufname].size / sizeof(T));
         readBufferRaw(bufname, (char*)out.data());
         return out;
     }
@@ -77,7 +81,7 @@ class RAYX_API VulkanEngine {
 
     /// There are 3 basic states for the VulkanEngine. Described below.
     /// the variable m_state stores that state.
-    enum class EngineState {
+    enum class VulkanEngineStates_t {
         // the state before .init() is called.
         // legal functions: declareBuffer(), init().
         PREINIT,
@@ -93,65 +97,116 @@ class RAYX_API VulkanEngine {
         POSTRUN
     };
 
-    inline EngineState state() { return m_state; }
+    inline VulkanEngineStates_t state() { return m_state; }
 
     /// the internal representation of a buffer.
     /// m_in, m_out, m_binding are taken from DeclareBufferSpec.
     /// the other ones are initialized in createBuffer.
-    struct Buffer {
-        bool m_in;
-        bool m_out;
-        uint32_t m_binding;
-        VkBuffer m_Buffer;
-        VkDeviceMemory m_Memory;
-        VkDeviceSize m_size;
+    struct Buffer_t {
+        bool isInput;
+        bool isOutput;
+        uint32_t binding;
+        VkBuffer buf;
+        VkDeviceMemory mem;
+        VkDeviceSize size = 0;
+        VmaAllocation alloca = nullptr;
+        VmaAllocationInfo allocaInfo;
     };
 
+    // PushConstants are "constants" updated on each Dispatch Call (or similar) in the pipeline
+    // Please pay attention to alignment rules
+    // You can change this struct (also in shader)
+    struct pushConstants_t {
+        void* pushConstPtr;
+        size_t size;
+    } m_pushConstants;
+
   private:
-    EngineState m_state = EngineState::PREINIT;
-    /// stores the Buffers by name.
-    std::map<std::string, Buffer> m_buffers;
+    VulkanEngineStates_t m_state = VulkanEngineStates_t::PREINIT;
     const char* m_shaderfile;
     uint32_t m_numberOfInvocations;
 
+    /// stores the Buffers by name.
+    std::map<std::string, Buffer_t> m_buffers;
+
     /// This is the only staging buffer of the VulkanEngine.
     /// It's size is STAGING_SIZE.
-    VkBuffer m_stagingBuffer;
-    /// the memory of the staging buffer above.
-    VkDeviceMemory m_stagingMemory;
+    Buffer_t m_stagingBuffer;
 
     VkInstance m_Instance;
     VkDebugUtilsMessengerEXT m_DebugMessenger;
     VkPhysicalDevice m_PhysicalDevice = VK_NULL_HANDLE;
     VkDevice m_Device;
+    uint32_t m_computeFamily;
     VkPipeline m_Pipeline;
+    VkPipelineCache m_PipelineCache;
     VkPipelineLayout m_PipelineLayout;
     VkShaderModule m_ComputeShaderModule;
     VkCommandPool m_CommandPool;
-    VkCommandBuffer m_CommandBuffer;
+    VkCommandBuffer m_ComputeCommandBuffer;
+    VkCommandBuffer m_TransferCommandBuffer;
+    VkQueue m_ComputeQueue;
+    VkQueue m_TransferQueue;
     VkDescriptorPool m_DescriptorPool;
     VkDescriptorSet m_DescriptorSet;
     VkDescriptorSetLayout m_DescriptorSetLayout;
-    VkQueue m_ComputeQueue;
-    uint32_t m_computeFamily;
+    VmaAllocator m_VmaAllocator;
 
     // implementation details:
 
     // Init:
     void createInstance();
+    void createCache();
     void setupDebugMessenger();
     void pickDevice();
     void pickPhysicalDevice();
     void createLogicalDevice();
     void createDescriptorSetLayout();
+    void createAllocateDescriptorPool(uint32_t);
     void createCommandPool();
+    void createCommandBuffers();
+    void createShaderModule();
+    void recordFullCommand();
+    void createFences();
+    void recordInComputeCommandBuffer();
+    void createSemaphores();
     void createStagingBuffer();
+    void prepareVma();
+
+    void getAllMemories();
+    VkDeviceSize getStagingBufferSize();
 
     // Run:
-    void runCommandBuffer();
-    void createDescriptorSet();
+    void submitCommandBuffer();
+    void updteDescriptorSets();
     void createComputePipeline();
-    void createCommandBuffer();
+
+    // Sync:
+    struct {
+        VkSemaphore computeSemaphore;
+        VkSemaphore transferSemaphore;
+    } m_Semaphores;
+
+    class Fence {
+      public:
+        Fence(VkDevice& device);
+        ~Fence();
+        VkFence* fence();
+        VkResult wait();
+        VkResult forceReset();
+
+      private:
+        VkFence f;
+        VkDevice device;
+    };
+    struct {
+        std::unique_ptr<Fence> transfer;
+        std::unique_ptr<Fence> compute;
+    } m_Fences;
+
+    uint64_t m_runs = 0;
+
+    VkCommandBuffer createOneTimeCommandBuffer();
 
     // CreateBuffer.cpp:
 
@@ -159,17 +214,20 @@ class RAYX_API VulkanEngine {
     /// and a private `createVkBuffer` which constructs an actual `VkBuffer`.
     /// This is merely a helper method for `createBuffer` and
     /// `createStagingBuffer`.
-    void createVkBuffer(VkDeviceSize size, VkBufferUsageFlags usage,
-                        VkMemoryPropertyFlags properties, VkBuffer& buffer,
+    void createVkBuffer(VkDeviceSize size, VkBufferUsageFlags usage, VkMemoryPropertyFlags properties, VkBuffer& buffer,
                         VkDeviceMemory& bufferMemory);
+    // VMA Version of createVkBuffer
+    void createVmaBuffer(VkDeviceSize size, VkBufferUsageFlags buffer_usage, VkBuffer& buffer, VmaAllocation& allocation,
+                         VmaAllocationInfo* allocation_info, VmaAllocationCreateFlags flags = VMA_ALLOCATION_CREATE_HOST_ACCESS_RANDOM_BIT,
+                         VmaMemoryUsage memory_usage = VMA_MEMORY_USAGE_AUTO, const std::vector<uint32_t>& queue_family_indices = {});
     // BufferIO:
-
+    size_t STAGING_SIZE = 0;
     /// copies data from one buffer to the other with given offsets.
-    /// note that gpuMemcpy copies from left to right, unlike the original
-    /// memcpy. this is used for the buffer <-> staging buffer communication in
+    /// this is used for the buffer <-> staging buffer communication in
+    /// Careful : This is not an awaiting command so make sure to check the according fence transfer
+    /// or Queue Idle before copying again
     /// {read,write}BufferRaw.
-    void gpuMemcpy(VkBuffer& buffer_src, size_t offset_src,
-                   VkBuffer& buffer_dst, size_t offset_dst, size_t bytes);
+    void gpuMemcpy(VkBuffer& buffer_dst, size_t offset_dst, VkBuffer& buffer_src, size_t offset_src, size_t bytes);
 
     /// reads a buffer and writes the data to `outdata`.
     /// the full buffer is read (the size is `m_buffers[bufname].m_size`)
@@ -203,13 +261,12 @@ class RAYX_API VulkanEngine {
         }                                                                \
     }
 
-const std::vector<const char*> validationLayers = {
-    "VK_LAYER_KHRONOS_validation"};
+const std::vector<const char*> validationLayers = {"VK_LAYER_KHRONOS_validation"};
 
 const int WORKGROUP_SIZE = 32;
 
 /// size of the staging buffer in bytes, equal to 128MB.
-const size_t STAGING_SIZE = 134217728;
+const size_t DEFAULT_STAGING_SIZE = 134217728;  // = 128MB
 
 #ifdef NDEBUG
 const bool enableValidationLayers = false;
@@ -218,3 +275,5 @@ const bool enableValidationLayers = true;
 #endif
 
 }  // namespace RAYX
+
+#endif
