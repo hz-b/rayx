@@ -1,12 +1,20 @@
 # Changes
 
-- Introduce SemVer
-- Introduced new Testsuite, improvements include
-    - performance
-    - readability
-    - some bug fixes
-- Bugfix wiki math display
-- Bugfix Metrix Beamline Tracing
-- Bugfix Toroid & Ellipsoid
-- Bugfix multi rzp script
-- Minor code reworks
+- Major shader and VULKAN reworks for:
+  - More stability and readability
+  - Adding Snapshot system to save all ray paths
+- Plotting rework
+  - Adding a new plotting system
+  - Adding footprints for all objects
+  - Plotting now uses python script, which can be run from command line without RAY-X
+- MultiRZP script now produces correct rml files 
+  - takes in file with a single RZP, number of rzps and angle
+- Beamline elements:
+  - Slit now has a colliding surface (infinite)
+  - Lightsources now correctly apply their position and direction
+- CLI
+  - random seed can now be set
+- Build
+  - Can now be built without VULKAN
+- Bugfixing and stability improvements
+  - Fixed some bugs with METRIX beamline
