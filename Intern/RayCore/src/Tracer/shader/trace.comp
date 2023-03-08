@@ -124,60 +124,6 @@ Ray traceRZP(Ray r, Rzp rzp, INOUT(uint64_t) ctr, Collision col) {
 }
 
 /**
- * calculates resulting ray for plane grating element
- * separate from "generalGratingElement" because normal is always (0,-1,0). Therefore, the refrac function can be simplified such that it does not use
- * trigonom. functions
- * @param r				ray to trace in element coordinates
- * @param elementIndex	index of element in data buffer
- * @param ctr			counter for random number generator, always inout
- * @param intersection	intersection point in ELEMENT coordinates
- * @return				reflected Ray with intersection point as position, reflection as direction in ELEMENT coordinates and possibly modified weight
- */
-Ray tracePlaneGrating(Ray r, PlaneGrating pg, INOUT(uint64_t) ctr, Collision col) {
-    // store old position, needed for pathlength calculation
-    dvec3 old_position = r.m_position;
-
-    // calculate intersection point with element surface and return surface normal at this point
-    dvec4 normal = dvec4(col.normal, 0);
-    r.m_position = col.hitpoint;
-
-    // modify normal according to slope error
-    normal = tanger(normal, slopeX(pg), slopeZ(pg), 0, ctr);
-
-    // vls parameters passed in q.elementParameters
-    dmat4 e = elementParams(pg);
-    double WL                 = hvlam(r.m_energy);
-    double lineDensity        = e[0][2];
-    double orderOfDiffraction = e[0][3];
-    double b_params[6]        = {e[1][2], e[1][3], e[2][0],e[2][1], e[2][2], e[2][3]};
-    int additional_order      = int(e[3][3]);
-
-    // a = WL * linedensity * order * 1e-06
-    double a = vlsGrating(lineDensity, r.m_position.z, b_params) * WL * orderOfDiffraction * 1e-06;
-    r.m_order  = orderOfDiffraction;
-
-    // if additional zero order should be traced, approx. half of the rays are randomly chosen to be traced in order 0 (= ordinary reflection) instead
-    // of the given order
-    if (additional_order == 1) {
-        if (squaresDoubleRNG(ctr) > 0.5) a = 0;
-    }
-
-    // add the travelled distance from the previous position to the new intersection to pathlength (both are in the same coordinate system so we do
-    // not need to transform back to world coordinates??)
-    r.m_pathLength += length(old_position - r.m_position);
-    r.m_lastElement = pg.id + 1;
-
-    // calculate refracted ray
-    r = refrac_plane(r, normal, a);
-
-    if (r.m_weight == W_BEYOND_HORIZON) {
-        takeFinalSnapshot(r, W_BEYOND_HORIZON);
-    }
-
-    return r;
-}
-
-/**
  * calculates resulting ray for general grating element
  * @param r				ray to trace in element coordinates
  * @param elementIndex	index of element in data buffer
@@ -185,7 +131,7 @@ Ray tracePlaneGrating(Ray r, PlaneGrating pg, INOUT(uint64_t) ctr, Collision col
  * @param intersection	intersection point in ELEMENT coordinates
  * @return reflected Ray with intersection point as position, reflection as direction in ELEMENT coordinates and possibly modified weight
  */
-Ray traceGeneralGrating(Ray r, GeneralGrating gg, INOUT(uint64_t) ctr, Collision col) {
+Ray traceGrating(Ray r, Grating gg, INOUT(uint64_t) ctr, Collision col) {
     // store old position, needed for pathlength calculation
     dvec3 old_position = r.m_position;
 

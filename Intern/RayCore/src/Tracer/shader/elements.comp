@@ -1,8 +1,7 @@
 // This module defines functions to access the elements in a practical way.
 
 struct Mirror { uint id; };
-struct PlaneGrating { uint id; };
-struct GeneralGrating { uint id; };
+struct Grating { uint id; };
 struct Slit { uint id; };
 struct Rzp { uint id; };
 struct ImagePlane { uint id; };
@@ -50,21 +49,13 @@ double slopeX(Rzp e) { return slopeX(e.id); }
 double slopeZ(Rzp e) { return slopeZ(e.id); }
 dmat4 elementParams(Rzp e) { return elements[e.id].m_elementParameters; }
 
-// PlaneGrating:
-dmat4 surfaceParams(PlaneGrating e) { return elements[e.id].m_surfaceParams; }
-double width(PlaneGrating e) { return width(e.id); }
-double height(PlaneGrating e) { return height(e.id); }
-double slopeX(PlaneGrating e) { return slopeX(e.id); }
-double slopeZ(PlaneGrating e) { return slopeZ(e.id); }
-dmat4 elementParams(PlaneGrating e) { return elements[e.id].m_elementParameters; }
-
-// GeneralGrating:
-dmat4 surfaceParams(GeneralGrating e) { return elements[e.id].m_surfaceParams; }
-double width(GeneralGrating e) { return width(e.id); }
-double height(GeneralGrating e) { return height(e.id); }
-double slopeX(GeneralGrating e) { return slopeX(e.id); }
-double slopeZ(GeneralGrating e) { return slopeZ(e.id); }
-dmat4 elementParams(GeneralGrating e) { return elements[e.id].m_elementParameters; }
+// Grating:
+dmat4 surfaceParams(Grating e) { return elements[e.id].m_surfaceParams; }
+double width(Grating e) { return width(e.id); }
+double height(Grating e) { return height(e.id); }
+double slopeX(Grating e) { return slopeX(e.id); }
+double slopeZ(Grating e) { return slopeZ(e.id); }
+dmat4 elementParams(Grating e) { return elements[e.id].m_elementParameters; }
 
 // Mirror:
 dmat4 surfaceParams(Mirror e) { return elements[e.id].m_surfaceParams; }
