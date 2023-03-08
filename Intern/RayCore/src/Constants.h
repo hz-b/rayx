@@ -98,5 +98,6 @@ const int TY_ELLIPSOID_MIRROR = 7;
 // surface types:
 const int STY_QUADRIC = 0;
 const int STY_TOROID = 1;
+const int STY_INF_PLANE = 2;  // an infinite X-Y plane.
 
 #endif

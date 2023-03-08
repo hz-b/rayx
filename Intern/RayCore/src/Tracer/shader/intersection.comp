@@ -426,6 +426,7 @@ dvec4 getTorusNormal(Ray r, double shortRadius, double longRadius) {  // unused
  */
 dvec4 getOpticalElementIntersection(Ray r, uint id) {
     double ty = type(id);
+    double sty = surfaceType(id);
     double x_extentA = widthA(id);
     double x_extentB = widthB(id);
     double z_extent  = height(id);
@@ -443,7 +444,7 @@ dvec4 getOpticalElementIntersection(Ray r, uint id) {
     // misalignment
     r = rayMatrixMult(r, inTrans(id));  // image plane is the x-y plane of the coordinate system
 
-    if (ty == TY_IMAGE_PLANE || ty == TY_SLIT) { // these elements are infinite X-Y planes!
+    if (sty == STY_INF_PLANE) {
         double offset = abs(r.m_position.z / r.m_direction.z);
 
         // scale x-slope of ray (l/n) by z-length between origin and image plane
@@ -458,7 +459,7 @@ dvec4 getOpticalElementIntersection(Ray r, uint id) {
 
         currentIntersection.w = r.m_weight * int(hit);
         return currentIntersection;
-    } else if (ty == TY_TOROID_MIRROR || (ty == TY_RZP && curvatureType(Rzp(id)) == 1 /* toroidal RZP */)) {
+    } else if (sty == STY_TOROID) {
         iteratTo(r, longRadius(id), shortRadius(id));
         currentIntersection = dvec4(r.m_position, r.m_weight);
 
@@ -475,15 +476,20 @@ dvec4 getOpticalElementIntersection(Ray r, uint id) {
         }
         r = rayMatrixMult(r, outTrans(id));
         return currentIntersection;
-    }
+    } else if (sty == STY_QUADRIC) {
+        currentIntersection = getIntersectionPoint(r, surfaceParams(id));
+        // set weight to 0 if element was not hit
+        bool hit = wasteBox(currentIntersection.x, currentIntersection.z, x_extentA, x_extentB, z_extent);
+        if (!hit) {
+            return dvec4(infinity(), infinity(), infinity(), 0);
+        }
 
-    currentIntersection = getIntersectionPoint(r, surfaceParams(id));
-    // set weight to 0 if element was not hit
-    bool hit = wasteBox(currentIntersection.x, currentIntersection.z, x_extentA, x_extentB, z_extent);
-    if (!hit) {
+        r = rayMatrixMult(r, outTrans(id));
+        return currentIntersection;
+    } else {
+        #ifndef GLSL
+        RAYX_ERR << "invalid surfaceType!";
+        #endif
         return dvec4(infinity(), infinity(), infinity(), 0);
     }
-
-    r = rayMatrixMult(r, outTrans(id));
-    return currentIntersection;  // in element coordinate system
 }

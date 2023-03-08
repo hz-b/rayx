@@ -19,6 +19,7 @@ double width(uint id) { return elements[id].m_widthA; }
 double height(uint id) { return elements[id].m_height; }
 double widthB(uint id) { return elements[id].m_widthB; }
 double type(uint id) { return elements[id].m_type; }
+double surfaceType(uint id) { return elements[id].m_surfaceType; }
 double material(uint id) { return elements[id].m_material; }
 double azimuthalAngle(uint id) { return elements[id].m_azimuthalAngle; }
 dmat4 inTrans(uint id) { return elements[id].m_inTrans; }

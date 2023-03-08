@@ -1,13 +1,11 @@
 #include "ImagePlane.h"
 
 #include "Constants.h"
-#include "Model/Surface/Quadric.h"
+#include "Model/Surface/InfPlane.h"
 
 namespace RAYX {
 
-ImagePlane::ImagePlane(const DesignObject& dobj) : OpticalElement(dobj) {
-    setSurface(std::make_unique<Quadric>(glm::dmat4x4{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}));
-}
+ImagePlane::ImagePlane(const DesignObject& dobj) : OpticalElement(dobj) { setSurface(std::make_unique<InfPlane>()); }
 
 glm::dmat4x4 ImagePlane::getElementParameters() const { return {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}; }
 }  // namespace RAYX
