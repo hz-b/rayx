@@ -44,7 +44,7 @@ void dynamicElements() {
         type = int(nextElement.m_type);
         switch(type){
             case (TY_MIRROR) :
-                elem_ray = traceMirror(elem_ray, BasicMirror(col.elementIndex), ctr, col);
+                elem_ray = traceMirror(elem_ray, Mirror(col.elementIndex), ctr, col);
                 break;
             case(TY_PLANE_GRATING) :
                 elem_ray = tracePlaneGrating(elem_ray, PlaneGrating(col.elementIndex), ctr, col);
@@ -60,9 +60,6 @@ void dynamicElements() {
                 break;
             case (TY_IMAGE_PLANE) :
                 elem_ray = traceImagePlane(elem_ray, ImagePlane(col.elementIndex), col);
-                break;
-            case (TY_ELLIPSOID_MIRROR) :
-                elem_ray = traceEllipsoidMirror(elem_ray, EllipsoidMirror(col.elementIndex), ctr, col);
                 break;
         }
 

@@ -92,7 +92,6 @@ const int TY_GENERAL_GRATING = 2;
 const int TY_SLIT = 3;
 const int TY_RZP = 4;
 const int TY_IMAGE_PLANE = 5;
-const int TY_ELLIPSOID_MIRROR = 6;
 
 // surface types:
 const int STY_QUADRIC = 0;
