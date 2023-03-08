@@ -8,13 +8,13 @@
  * output: diffracted Ray with intersection point as position, reflection as direction in beam coordinates and possibly modified weight in ELEMENT
  * coordinates
  */
-Ray traceSlit(Ray r, Slit slit, INOUT(uint64_t) ctr, dvec4 intersection) {
+Ray traceSlit(Ray r, Slit slit, INOUT(uint64_t) ctr, Collision col) {
     // store old position, needed for pathlength calculation
     dvec3 old_position = r.m_position;
 
     // dvec4 normal = intersectionPoint(r, q.surfaceParams); // if it is not sure whether the given intersection is correct, use this (recalculate the
     // intersection)
-    setIntersectionPoint(r, surfaceParams(slit), intersection);
+    r.m_position = col.hitpoint;
 
     // add the travelled distance from the previous position to the new intersection to pathlength (both are in the same coordinate system so we do
     // not need to transform back to world coordinates??)
@@ -175,12 +175,13 @@ Ray traceRZP(Ray r, Rzp rzp, INOUT(uint64_t) ctr, Collision col) {
  * @param intersection	intersection point in ELEMENT coordinates
  * @return				reflected Ray with intersection point as position, reflection as direction in ELEMENT coordinates and possibly modified weight
  */
-Ray tracePlaneGrating(Ray r, PlaneGrating pg, INOUT(uint64_t) ctr, dvec4 intersection) {
+Ray tracePlaneGrating(Ray r, PlaneGrating pg, INOUT(uint64_t) ctr, Collision col) {
     // store old position, needed for pathlength calculation
     dvec3 old_position = r.m_position;
 
     // calculate intersection point with element surface and return surface normal at this point
-    dvec4 normal = setIntersectionPoint(r, surfaceParams(pg), intersection);
+    dvec4 normal = dvec4(col.normal, 0);
+    r.m_position = col.hitpoint;
 
     // modify normal according to slope error
     normal = tanger(normal, slopeX(pg), slopeZ(pg), 0, ctr);
@@ -226,11 +227,12 @@ Ray tracePlaneGrating(Ray r, PlaneGrating pg, INOUT(uint64_t) ctr, dvec4 interse
  * @param intersection	intersection point in ELEMENT coordinates
  * @return reflected Ray with intersection point as position, reflection as direction in ELEMENT coordinates and possibly modified weight
  */
-Ray traceGeneralGrating(Ray r, GeneralGrating gg, INOUT(uint64_t) ctr, dvec4 intersection) {
+Ray traceGeneralGrating(Ray r, GeneralGrating gg, INOUT(uint64_t) ctr, Collision col) {
     // store old position, needed for pathlength calculation
     dvec3 old_position = r.m_position;
 
-    dvec4 normal = setIntersectionPoint(r, surfaceParams(gg), intersection);
+    dvec4 normal = dvec4(col.normal, 0);
+    r.m_position = col.hitpoint;
     // normal = normalize(dvec4(-r.m_position.x, -radius - r.m_position[1]*ISIG, -r.m_position[2], 0));
 
     // add the travelled distance from the previous position to the new intersection to pathlength (both are in the same coordinate system so we do
@@ -272,12 +274,13 @@ Ray traceGeneralGrating(Ray r, GeneralGrating gg, INOUT(uint64_t) ctr, dvec4 int
  *
  * output: reflected Ray with intersection point as position, reflection as direction in ELEMENT coordinates and possibly modified weight
  */
-Ray traceMirror(Ray r, BasicMirror m, INOUT(uint64_t) ctr, dvec4 intersection) {
+Ray traceMirror(Ray r, BasicMirror m, INOUT(uint64_t) ctr, Collision col) {
     // store old position, needed for pathlength calculation
     dvec3 old_position = r.m_position;
 
     // calculate intersection point and normal at intersection point
-    dvec4 normal           = setIntersectionPoint(r, surfaceParams(m), intersection);
+    dvec4 normal = dvec4(col.normal, 0);
+    r.m_position = col.hitpoint;
     double azimuthal_angle = azimuthalAngle(m);
 
     // add the travelled distance from the previous position to the new intersection to pathlength (both are in the same coordinate system so we do
@@ -315,7 +318,7 @@ Ray traceMirror(Ray r, BasicMirror m, INOUT(uint64_t) ctr, dvec4 intersection) {
  *
  * @return reflected Ray with intersection point as position, reflection as direction in ELEMENT coordinates and possibly modified weight
  */
-Ray traceEllipsoidMirror(Ray r, EllipsoidMirror ell, INOUT(uint64_t) ctr, dvec4 intersection) {
+Ray traceEllipsoidMirror(Ray r, EllipsoidMirror ell, INOUT(uint64_t) ctr, Collision col) {
     double sin_tangentAngle = sinTangentAngle(ell);
     double cos_tangentAngle = cosTangentAngle(ell);
 
@@ -323,7 +326,8 @@ Ray traceEllipsoidMirror(Ray r, EllipsoidMirror ell, INOUT(uint64_t) ctr, dvec4 
     dvec3 old_position = r.m_position;
 
     // calculate intersection point and normal at intersection point
-    dvec4 normal = setIntersectionPoint(r, surfaceParams(ell), intersection);
+    dvec4 normal = dvec4(col.normal, 0);
+    r.m_position = col.hitpoint;
     double azimuthal_angle = azimuthalAngle(ell);
 
     r = rotationAroundX(r, -sin_tangentAngle, cos_tangentAngle);  // change to coordinate system of mirror
@@ -363,11 +367,10 @@ Ray traceEllipsoidMirror(Ray r, EllipsoidMirror ell, INOUT(uint64_t) ctr, dvec4 
  * @param intersection	intersection point of ray with optical element in ELMENT coordinates
  * @return  reflected Ray with intersection point as position in ELEMENT coordinates
  */
-Ray traceImagePlane(Ray r, ALLOW_UNUSED ImagePlane ip, dvec4 intersection) { // TODO fix unused var
+Ray traceImagePlane(Ray r, ALLOW_UNUSED ImagePlane ip, Collision col) {
     // path length in element coordinates
-    dvec3 intersection_xyz = dvec3(intersection);
-    r.m_pathLength += length(r.m_position - intersection_xyz);
-    r.m_position = intersection_xyz;
+    r.m_pathLength += length(r.m_position - col.hitpoint);
+    r.m_position = col.hitpoint;
     r.m_lastElement = ip.id + 1;
     return r;
 }

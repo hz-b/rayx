@@ -42,31 +42,30 @@ void dynamicElements() {
 
         // Calculate interaction(reflection,material, absorption etc.) of ray with detected next element
         type = int(nextElement.m_type);
-        dvec4 tmp_hitpoint = dvec4(col.hitpoint, 1);
         switch(type){
             case (TY_BASIC_MIRROR) :
-                elem_ray = traceMirror(elem_ray, BasicMirror(col.elementIndex), ctr, tmp_hitpoint);
+                elem_ray = traceMirror(elem_ray, BasicMirror(col.elementIndex), ctr, col);
                 break;
             case(TY_PLANE_GRATING) :
-                elem_ray = tracePlaneGrating(elem_ray, PlaneGrating(col.elementIndex), ctr, tmp_hitpoint);
+                elem_ray = tracePlaneGrating(elem_ray, PlaneGrating(col.elementIndex), ctr, col);
                 break;
             case (TY_GENERAL_GRATING) :
-                elem_ray = traceGeneralGrating(elem_ray, GeneralGrating(col.elementIndex), ctr, tmp_hitpoint);
+                elem_ray = traceGeneralGrating(elem_ray, GeneralGrating(col.elementIndex), ctr, col);
                 break;
             case (TY_SLIT) :
-                elem_ray = traceSlit(elem_ray, Slit(col.elementIndex), ctr, tmp_hitpoint);
+                elem_ray = traceSlit(elem_ray, Slit(col.elementIndex), ctr, col);
                 break;
             case (TY_RZP) :
                 elem_ray = traceRZP(elem_ray, Rzp(col.elementIndex), ctr, col);
                 break;
             case (TY_IMAGE_PLANE) :
-                elem_ray = traceImagePlane(elem_ray, ImagePlane(col.elementIndex), tmp_hitpoint);
+                elem_ray = traceImagePlane(elem_ray, ImagePlane(col.elementIndex), col);
                 break;
             case (TY_TOROID_MIRROR) :
                 elem_ray = traceToroid(elem_ray, ToroidMirror(col.elementIndex), ctr, col);
                 break;
             case (TY_ELLIPSOID_MIRROR) :
-                elem_ray = traceEllipsoidMirror(elem_ray, EllipsoidMirror(col.elementIndex), ctr, tmp_hitpoint);
+                elem_ray = traceEllipsoidMirror(elem_ray, EllipsoidMirror(col.elementIndex), ctr, col);
                 break;
         }
 
