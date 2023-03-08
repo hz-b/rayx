@@ -95,7 +95,6 @@ double RAYX_API r8_atan(double);
 double RAYX_API vlsGrating(double, double, double[6]);
 void RAYX_API diffraction(int iopt, double xLength, double yLength, double wl, double& dPhi, double& dPsi, uint64_t& ctr);
 Ray RAYX_API refrac_plane(Ray, glm::dvec4, double);
-glm::dvec4 RAYX_API ToroidIteratTo(Ray& r, double longRadius, double shortRadius);
 double RAYX_API getIncidenceAngle(Ray r, glm::dvec4 normal);
 void RAYX_API reflectance(double energy, double incidence_angle, glm::dvec2& complex_S, glm::dvec2& complex_P, int material);
 glm::dvec2 RAYX_API snell(glm::dvec2 cos_incidence, glm::dvec2 cn1, glm::dvec2 cn2);

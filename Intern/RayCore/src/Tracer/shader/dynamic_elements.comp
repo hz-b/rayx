@@ -57,13 +57,13 @@ void dynamicElements() {
                 elem_ray = traceSlit(elem_ray, Slit(col.elementIndex), ctr, tmp_hitpoint);
                 break;
             case (TY_RZP) :
-                elem_ray = traceRZP(elem_ray, Rzp(col.elementIndex), ctr, tmp_hitpoint);
+                elem_ray = traceRZP(elem_ray, Rzp(col.elementIndex), ctr, col);
                 break;
             case (TY_IMAGE_PLANE) :
                 elem_ray = traceImagePlane(elem_ray, ImagePlane(col.elementIndex), tmp_hitpoint);
                 break;
             case (TY_TOROID_MIRROR) :
-                elem_ray = traceToroid(elem_ray, ToroidMirror(col.elementIndex), ctr, tmp_hitpoint);
+                elem_ray = traceToroid(elem_ray, ToroidMirror(col.elementIndex), ctr, col);
                 break;
             case (TY_ELLIPSOID_MIRROR) :
                 elem_ray = traceEllipsoidMirror(elem_ray, EllipsoidMirror(col.elementIndex), ctr, tmp_hitpoint);

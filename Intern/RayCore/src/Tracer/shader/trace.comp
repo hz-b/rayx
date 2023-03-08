@@ -61,12 +61,12 @@ Ray traceSlit(Ray r, Slit slit, INOUT(uint64_t) ctr, dvec4 intersection) {
  *
  * output: reflected Ray with intersection point as position, reflection as direction in ELEMENT coordinates and possibly modified weight
  */
-Ray traceToroid(Ray r, ToroidMirror tor, INOUT(uint64_t) ctr, ALLOW_UNUSED dvec4 intersectionPoint) { // TODO fix unused var
+Ray traceToroid(Ray r, ToroidMirror tor, INOUT(uint64_t) ctr, Collision col) {
     // store old position, needed for pathlength calculation
     dvec3 old_position = r.m_position;
 
-    // TODO use the given intersection point instead of recalculating it (still need to calculate the normal)
-    dvec4 normal = ToroidIteratTo(r, longRadius(tor), shortRadius(tor));
+    dvec4 normal = dvec4(col.normal, 0);
+    r.m_position = col.hitpoint;
     double azimuthal_angle = azimuthalAngle(tor);
 
     // add the travelled distance from the previous position to the new intersection to pathlength (both are in the same coordinate system so we do
@@ -103,21 +103,15 @@ Ray traceToroid(Ray r, ToroidMirror tor, INOUT(uint64_t) ctr, ALLOW_UNUSED dvec4
  *
  * output: reflected Ray with intersection point as position, reflection as direction in ELEMENT coordinates and possibly modified weight
  */
-Ray traceRZP(Ray r, Rzp rzp, INOUT(uint64_t) ctr, dvec4 intersection) {
+Ray traceRZP(Ray r, Rzp rzp, INOUT(uint64_t) ctr, Collision col) {
     double element_offset_z = elementOffsetZ(rzp);
     r.m_position.z            = r.m_position.z - element_offset_z;
 
     // store old position, needed for pathlength calculation
     dvec3 old_position = r.m_position;
 
-    dvec4 normal;
-    // RZP can be plane, toroidal or spherical curvature type. Use intersectionPoint for all except toroidal
-    int CURVATURE_TYPE = int(curvatureType(rzp));
-    if (CURVATURE_TYPE != 1) {
-        normal = setIntersectionPoint(r, surfaceParams(rzp), intersection);
-    } else {
-        normal             = ToroidIteratTo(r, longRadius(rzp), shortRadius(rzp));
-    }
+    dvec4 normal = dvec4(col.normal, 0);
+    r.m_position = col.hitpoint;
 
     // add the travelled distance from the previous position to the new intersection to pathlength (both are in the same coordinate system so we do
     // not need to transform back to world coordinates??)
