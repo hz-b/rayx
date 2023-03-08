@@ -1,52 +1,34 @@
-struct Collision {
-    // The point where `_ray` hits the element, in element-coordinates.
-    dvec4 hitpoint;
-
-    // The index of the element with which `_ray` collides.
-    int elementIndex;
-
-    // whether a collision has been found.
-    bool found;
-};
-
 Collision find_collision() {
-    // index of element with current closest intersection with ray, initialized with -1
-    int closestElementIndex = -1;
-
     // global coordinates of first intersection point of ray among all elements in beamline
-    dvec4 closestHitpoint       = dvec4(infinity(), infinity(), infinity(), 0);
-    dvec4 closestGlobalHitpoint = dvec4(infinity(), infinity(), infinity(), 0);
+    Collision best_col;
+    best_col.found = false;
+
+    // the distance the ray has to travel to reach `best_col`.
+    double best_dist = infinity();
 
     // Find intersection points through all elements
     for (uint elementIndex = 0; elementIndex < uint(elements.length()); elementIndex++) {
-
         double lastElement = _ray.m_lastElement;
         if (elementIndex + 1 == lastElement) {
             // TODO: self-intersection
             continue;
         }
 
-        dvec4 currentIntersection = getOpticalElementIntersection(_ray, elementIndex);
+        Collision current_col = find_collision_with(_ray, elementIndex);
+        if (!current_col.found) {
+            continue;
+        }
 
-        // Intersection coordinates in GLOBAL coordinates
-        dvec3 currentGlobalIntersection_xyz = dvec3(elements[elementIndex].m_outTrans * dvec4(currentIntersection.x, currentIntersection.y, currentIntersection.z, 1));
-        dvec4 currentGlobalIntersection = dvec4(currentGlobalIntersection_xyz, currentIntersection.w);
+        dvec3 global_hitpoint = dvec3(elements[elementIndex].m_outTrans * dvec4(current_col.hitpoint, 1));
+        double current_dist = length(global_hitpoint - _ray.m_position);
 
-        // check if current intersection is closer than the closest previous Hitpoint
-        // If yes then update. Since the old intersection is occluded by the old Intersection/Hit point
-        if (length(_ray.m_position - dvec3(closestGlobalHitpoint)) > length(_ray.m_position - currentGlobalIntersection_xyz) &&
-            currentIntersection.w != 0) {
-            closestHitpoint       = currentIntersection;
-            closestGlobalHitpoint = currentGlobalIntersection;
-            closestElementIndex   = int(elementIndex);
+        if (current_dist < best_dist) {
+            best_col = current_col;
+            best_dist = current_dist;
         }
     }
 
-    Collision col;
-    col.found = closestElementIndex != -1;
-    col.hitpoint = closestHitpoint;
-    col.elementIndex = closestElementIndex;
-    return col;
+    return best_col;
 }
 
 // @brief: Dynamic ray tracing: check which ray hits which element first
@@ -93,30 +75,31 @@ void dynamicElements() {
 
         // Calculate interaction(reflection,material, absorption etc.) of ray with detected next element
         type = int(nextElement.m_type);
+        dvec4 tmp_hitpoint = dvec4(col.hitpoint, 1);
         switch(type){
             case (TY_BASIC_MIRROR) :
-                elem_ray = traceMirror(elem_ray, BasicMirror(col.elementIndex), ctr, col.hitpoint);
+                elem_ray = traceMirror(elem_ray, BasicMirror(col.elementIndex), ctr, tmp_hitpoint);
                 break;
             case(TY_PLANE_GRATING) :
-                elem_ray = tracePlaneGrating(elem_ray, PlaneGrating(col.elementIndex), ctr, col.hitpoint);
+                elem_ray = tracePlaneGrating(elem_ray, PlaneGrating(col.elementIndex), ctr, tmp_hitpoint);
                 break;
             case (TY_GENERAL_GRATING) :
-                elem_ray = traceGeneralGrating(elem_ray, GeneralGrating(col.elementIndex), ctr, col.hitpoint);
+                elem_ray = traceGeneralGrating(elem_ray, GeneralGrating(col.elementIndex), ctr, tmp_hitpoint);
                 break;
             case (TY_SLIT) :
-                elem_ray = traceSlit(elem_ray, Slit(col.elementIndex), ctr, col.hitpoint);
+                elem_ray = traceSlit(elem_ray, Slit(col.elementIndex), ctr, tmp_hitpoint);
                 break;
             case (TY_RZP) :
-                elem_ray = traceRZP(elem_ray, Rzp(col.elementIndex), ctr, col.hitpoint);
+                elem_ray = traceRZP(elem_ray, Rzp(col.elementIndex), ctr, tmp_hitpoint);
                 break;
             case (TY_IMAGE_PLANE) :
-                elem_ray = traceImagePlane(elem_ray, ImagePlane(col.elementIndex), col.hitpoint);
+                elem_ray = traceImagePlane(elem_ray, ImagePlane(col.elementIndex), tmp_hitpoint);
                 break;
             case (TY_TOROID_MIRROR) :
-                elem_ray = traceToroid(elem_ray, ToroidMirror(col.elementIndex), ctr, col.hitpoint);
+                elem_ray = traceToroid(elem_ray, ToroidMirror(col.elementIndex), ctr, tmp_hitpoint);
                 break;
             case (TY_ELLIPSOID_MIRROR) :
-                elem_ray = traceEllipsoidMirror(elem_ray, EllipsoidMirror(col.elementIndex), ctr, col.hitpoint);
+                elem_ray = traceEllipsoidMirror(elem_ray, EllipsoidMirror(col.elementIndex), ctr, tmp_hitpoint);
                 break;
         }
 

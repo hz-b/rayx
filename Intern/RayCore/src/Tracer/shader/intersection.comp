@@ -1,3 +1,14 @@
+struct Collision {
+    // The point where `_ray` hits the element, in element-coordinates.
+    dvec3 hitpoint;
+
+    // The index of the element with which `_ray` collides.
+    int elementIndex;
+
+    // whether a collision has been found.
+    bool found;
+};
+
 /**
  * calculates the intersection point of a ray with a quadric surface defined by a_11..a_44
  * @param r				ray for which the intersection is fount
@@ -223,17 +234,17 @@ dvec4 ToroidGetNormal(Ray r, double shortRadius, double longRadius) {  // unused
  *
  * @return ELEMENT coordinates of intersection point of ray with optical element
  */
-dvec4 getOpticalElementIntersection(Ray r, uint id) {
+Collision find_collision_with(Ray r, uint id) {
+    Collision col;
+    col.found = false;
+    col.elementIndex = int(id);
+
     double ty = type(id);
     double sty = surfaceType(id);
     double x_extentA = widthA(id);
     double x_extentB = widthB(id);
     double z_extent  = height(id);
 
-    dvec4 currentIntersection;
-    if (ty > 7) {
-        return dvec4(infinity(), infinity(), infinity(), 0);
-    }
     if (ty == TY_RZP) {
         r.m_position.z = r.m_position.z - elements[id].m_elementParameters[3][2];
     }
@@ -247,48 +258,39 @@ dvec4 getOpticalElementIntersection(Ray r, uint id) {
         double offset = abs(r.m_position.z / r.m_direction.z);
 
         // scale x-slope of ray (l/n) by z-length between origin and image plane
-        currentIntersection.x = r.m_position.x + r.m_direction.x * offset;
-        currentIntersection.y = r.m_position.y + r.m_direction.y * offset;
-        currentIntersection.z = 0;
+        col.hitpoint.x = r.m_position.x + r.m_direction.x * offset;
+        col.hitpoint.y = r.m_position.y + r.m_direction.y * offset;
+        col.hitpoint.z = 0;
         // the ray should not face away from the image plane. If that is the case, set the weight of the intersection to 0 so that it is not
         // considered in the tracing process also the image plane detects only rays from one side
 
-        bool hit = r.m_direction.z > 0 && r.m_position.z < 0;
+        col.found = r.m_direction.z > 0 && r.m_position.z < 0;
         // backward hits are excluded? i.e. if a ray with negative direction and positive z coordinate hits the plane?
 
-        currentIntersection.w = r.m_weight * int(hit);
-        return currentIntersection;
+        return col;
     } else if (sty == STY_TOROID) {
         ToroidIteratTo(r, longRadius(id), shortRadius(id));
-        currentIntersection = dvec4(r.m_position, r.m_weight);
+        col.hitpoint = r.m_position;
 
         // set weight to 0 if element was not hit
-        bool hit = wasteBox(currentIntersection.x, currentIntersection.z, x_extentA, x_extentB, z_extent);
-        if (!hit) {
-            return dvec4(infinity(), infinity(), infinity(), 0);
-        }
+        col.found = wasteBox(col.hitpoint.x, col.hitpoint.z, x_extentA, x_extentB, z_extent);
 
         // intersection point is in the negative direction (behind the position when the direction is followed forwards), set weight to 0
-        if ((currentIntersection.x - r.m_position.x) / r.m_direction.x < 0 || (currentIntersection.y - r.m_position.y) / r.m_direction.y < 0 ||
-            (currentIntersection.z - r.m_position.z) / r.m_direction.z < 0) {
-            currentIntersection.w = 0;
+        if ((col.hitpoint.x - r.m_position.x) / r.m_direction.x < 0 || (col.hitpoint.y - r.m_position.y) / r.m_direction.y < 0 ||
+            (col.hitpoint.z - r.m_position.z) / r.m_direction.z < 0) {
+            col.found = false;
         }
-        r = rayMatrixMult(r, outTrans(id));
-        return currentIntersection;
+        return col;
     } else if (sty == STY_QUADRIC) {
-        currentIntersection = QuadricGetIntersectionPoint(r, surfaceParams(id));
+        dvec4 tmp = QuadricGetIntersectionPoint(r, surfaceParams(id));
+        col.hitpoint = dvec3(tmp);
         // set weight to 0 if element was not hit
-        bool hit = wasteBox(currentIntersection.x, currentIntersection.z, x_extentA, x_extentB, z_extent);
-        if (!hit) {
-            return dvec4(infinity(), infinity(), infinity(), 0);
-        }
-
-        r = rayMatrixMult(r, outTrans(id));
-        return currentIntersection;
+        col.found = tmp.w != 0 && wasteBox(col.hitpoint.x, col.hitpoint.z, x_extentA, x_extentB, z_extent);
+        return col;
     } else {
         #ifndef GLSL
         RAYX_ERR << "invalid surfaceType!";
         #endif
-        return dvec4(infinity(), infinity(), infinity(), 0);
+        return col; // has found = false
     }
 }
