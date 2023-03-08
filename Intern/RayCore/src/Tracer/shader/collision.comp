@@ -2,6 +2,9 @@ struct Collision {
     // The point where `_ray` hits the element, in element-coordinates.
     dvec3 hitpoint;
 
+    // The normal in element-coordinates.
+    dvec3 normal;
+
     // The index of the element with which `_ray` collides.
     int elementIndex;
 
@@ -17,7 +20,12 @@ struct Collision {
  *
  * output: reflected Ray with intersection point as position and reflection as direction
  */
-dvec4 QuadricGetIntersectionPoint(Ray r, dmat4 quadric) {
+Collision getQuadricCollision(Ray r, uint id) {
+    Collision col;
+    col.found = true;
+    col.elementIndex = int(id);
+    dmat4 quadric = surfaceParams(id);
+
     double a_11 = quadric[0][0];
     double a_12 = quadric[0][1];
     double a_13 = quadric[0][2];
@@ -30,7 +38,6 @@ dvec4 QuadricGetIntersectionPoint(Ray r, dmat4 quadric) {
     double a_44 = quadric[3][3];
     int icurv   = int(quadric[1][0]);
 
-    double w   = r.m_weight;
     int cs     = 1;
     int d_sign = icurv;
     if (abs(r.m_direction[1]) >= abs(r.m_direction[0]) && abs(r.m_direction[1]) >= abs(r.m_direction[2])) {
@@ -59,8 +66,7 @@ dvec4 QuadricGetIntersectionPoint(Ray r, dmat4 quadric) {
 
         double bbac = b * b - a * c;
         if (bbac < 0) {
-            w = 0.0;
-            x = -y / aml;  // x such that y=0
+            col.found = false;
         } else {
             if (abs(a) > abs(c) * 1e-10) {
                 x = (-b + d_sign * sqrt(bbac)) / a;
@@ -83,8 +89,7 @@ dvec4 QuadricGetIntersectionPoint(Ray r, dmat4 quadric) {
 
         double bbac = b * b - a * c;
         if (bbac < 0) {
-            w = 0.0;
-            y = 0;
+            col.found = false;
         } else {
             if (abs(a) > abs(c) * 1e-10) {
                 y = (-b + d_sign * sqrt(bbac)) / a;
@@ -110,8 +115,7 @@ dvec4 QuadricGetIntersectionPoint(Ray r, dmat4 quadric) {
 
         double bbac = b * b - a * c;
         if (bbac < 0) {
-            w = 0.0;
-            z = -y / amn;
+            col.found = false;
         } else {
             if (abs(a) > abs(c) * 1e-10) {  // pow(10, double(-10))) {
                 z = (-b + d_sign * sqrt(bbac)) / a;
@@ -126,10 +130,11 @@ dvec4 QuadricGetIntersectionPoint(Ray r, dmat4 quadric) {
 
     // intersection point is in the negative direction (behind the position when the direction is followed forwards), set weight to 0
     if ((x - r.m_position.x) / r.m_direction.x < 0 || (y - r.m_position.y) / r.m_direction.y < 0 || (z - r.m_position.z) / r.m_direction.z < 0) {
-        w = 0;
+        col.found = false;
     }
 
-    return dvec4(x, y, z, w);
+    col.hitpoint = dvec3(x, y, z);
+    return col;
 }
 
 dvec4 setIntersectionPoint(INOUT(Ray) r, dmat4 quadric, dvec4 closestHitpoint) {
@@ -201,7 +206,6 @@ dvec4 ToroidIteratTo(INOUT(Ray) r, double longRadius, double shortRadius) {
         dz          = func / df;
         n += 1;
         if (n >= 50) {
-            normal   = QuadricGetIntersectionPoint(r, dmat4(0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, -1, 0, 0, 0, 0));
             r.m_weight = 0;  // -4 in old ray. thrown away or still in use?
             return normal;
         }
@@ -235,10 +239,6 @@ dvec4 ToroidGetNormal(Ray r, double shortRadius, double longRadius) {  // unused
  * @return ELEMENT coordinates of intersection point of ray with optical element
  */
 Collision find_collision_with(Ray r, uint id) {
-    Collision col;
-    col.found = false;
-    col.elementIndex = int(id);
-
     double ty = type(id);
     double sty = surfaceType(id);
     double x_extentA = widthA(id);
@@ -255,6 +255,9 @@ Collision find_collision_with(Ray r, uint id) {
     r = rayMatrixMult(r, inTrans(id));  // image plane is the x-y plane of the coordinate system
 
     if (sty == STY_INF_PLANE) {
+        Collision col;
+        col.found = false;
+        col.elementIndex = int(id);
         double offset = abs(r.m_position.z / r.m_direction.z);
 
         // scale x-slope of ray (l/n) by z-length between origin and image plane
@@ -269,25 +272,27 @@ Collision find_collision_with(Ray r, uint id) {
 
         return col;
     } else if (sty == STY_TOROID) {
+        Collision col;
+        col.found = false;
+        col.elementIndex = int(id);
         ToroidIteratTo(r, longRadius(id), shortRadius(id));
         col.hitpoint = r.m_position;
 
         // set weight to 0 if element was not hit
         col.found = wasteBox(col.hitpoint.x, col.hitpoint.z, x_extentA, x_extentB, z_extent);
 
-        // intersection point is in the negative direction (behind the position when the direction is followed forwards), set weight to 0
-        if ((col.hitpoint.x - r.m_position.x) / r.m_direction.x < 0 || (col.hitpoint.y - r.m_position.y) / r.m_direction.y < 0 ||
-            (col.hitpoint.z - r.m_position.z) / r.m_direction.z < 0) {
+        return col;
+    } else if (sty == STY_QUADRIC) {
+        Collision col = getQuadricCollision(r, id);
+        if (!wasteBox(col.hitpoint.x, col.hitpoint.z, x_extentA, x_extentB, z_extent)) {
             col.found = false;
         }
         return col;
-    } else if (sty == STY_QUADRIC) {
-        dvec4 tmp = QuadricGetIntersectionPoint(r, surfaceParams(id));
-        col.hitpoint = dvec3(tmp);
-        // set weight to 0 if element was not hit
-        col.found = tmp.w != 0 && wasteBox(col.hitpoint.x, col.hitpoint.z, x_extentA, x_extentB, z_extent);
-        return col;
     } else {
+        Collision col;
+        col.found = false;
+        col.elementIndex = int(id);
+
         #ifndef GLSL
         RAYX_ERR << "invalid surfaceType!";
         #endif
