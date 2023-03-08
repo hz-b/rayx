@@ -26,7 +26,7 @@ void dynamicElements() {
     // Iterate through all bounces
     double bounce = 1;
     for (int i = 0; i < maxBounces; i++) {
-        Collision col = find_collision();
+        Collision col = findCollision();
 
         if (!col.found) {
             // no element was hit.
@@ -74,7 +74,7 @@ void dynamicElements() {
         _ray = rayMatrixMult(elem_ray, nextElement.m_outTrans);
     }
 
-    if (find_collision().found) {
+    if (findCollision().found) {
         takeFinalSnapshot(_ray, W_NOT_ENOUGH_BOUNCES);
     } else {
         takeFinalSnapshot(_ray, W_FLY_OFF);

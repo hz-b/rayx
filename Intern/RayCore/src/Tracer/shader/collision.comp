@@ -193,9 +193,9 @@ Collision getToroidCollision(Ray r, uint id) {
     return col;
 }
 
-// checks whether `_ray` collides with the element of the given `id`,
+// checks whether `r` collides with the element of the given `id`,
 // and returns a Collision accordingly.
-Collision find_collision_with(uint id) {
+Collision findCollisionWith(Ray r, uint id) {
     double ty = type(id);
     double sty = surfaceType(id);
     double x_extentA = widthA(id);
@@ -203,7 +203,7 @@ Collision find_collision_with(uint id) {
     double z_extent  = height(id);
 
     if (ty == TY_RZP) {
-        r.m_position.z = r.m_position.z - elements[id].m_elementParameters[3][2];
+        r.m_position.z = r.m_position.z - elements[id].m_elementParameters[3][2]; // TODO
     }
 
     // _ray = rayMatrixMult(_ray, q.inTrans); // ray/global to element coordinates,
@@ -254,7 +254,7 @@ Collision find_collision_with(uint id) {
 }
 
 // Returns the next collision for the ray `_ray`.
-Collision find_collision() {
+Collision findCollision() {
     // global coordinates of first intersection point of ray among all elements in beamline
     Collision best_col;
     best_col.found = false;
@@ -270,7 +270,7 @@ Collision find_collision() {
             continue;
         }
 
-        Collision current_col = find_collision_with(_ray, elementIndex);
+        Collision current_col = findCollisionWith(_ray, elementIndex);
         if (!current_col.found) {
             continue;
         }
