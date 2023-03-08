@@ -66,7 +66,7 @@ Ray traceToroid(Ray r, ToroidMirror tor, INOUT(uint64_t) ctr, ALLOW_UNUSED dvec4
     dvec3 old_position = r.m_position;
 
     // TODO use the given intersection point instead of recalculating it (still need to calculate the normal)
-    dvec4 normal = iteratTo(r, longRadius(tor), shortRadius(tor));
+    dvec4 normal = ToroidIteratTo(r, longRadius(tor), shortRadius(tor));
     double azimuthal_angle = azimuthalAngle(tor);
 
     // add the travelled distance from the previous position to the new intersection to pathlength (both are in the same coordinate system so we do
@@ -116,7 +116,7 @@ Ray traceRZP(Ray r, Rzp rzp, INOUT(uint64_t) ctr, dvec4 intersection) {
     if (CURVATURE_TYPE != 1) {
         normal = setIntersectionPoint(r, surfaceParams(rzp), intersection);
     } else {
-        normal             = iteratTo(r, longRadius(rzp), shortRadius(rzp));
+        normal             = ToroidIteratTo(r, longRadius(rzp), shortRadius(rzp));
     }
 
     // add the travelled distance from the previous position to the new intersection to pathlength (both are in the same coordinate system so we do

@@ -1107,7 +1107,7 @@ TEST_F(TestSuite, testPlaneRefrac) {
     }
 }
 
-TEST_F(TestSuite, testIteratTo) {
+TEST_F(TestSuite, testToroidIteratTo) {
     struct InOutPair {
         Ray in_ray;
         double in_longRadius;
@@ -1138,7 +1138,7 @@ TEST_F(TestSuite, testIteratTo) {
 
     for (auto p : inouts) {
         Ray r = p.in_ray;
-        auto out_vec = CPU_TRACER::iteratTo(r, p.in_longRadius, p.in_shortRadius);
+        auto out_vec = CPU_TRACER::ToroidIteratTo(r, p.in_longRadius, p.in_shortRadius);
         CHECK_EQ(out_vec, p.out_vec);
         CHECK_EQ(r, p.out_ray);
     }
