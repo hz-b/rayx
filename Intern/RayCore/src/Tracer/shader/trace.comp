@@ -53,48 +53,6 @@ Ray traceSlit(Ray r, Slit slit, INOUT(uint64_t) ctr, Collision col) {
 }
 
 /**
- * calculates resulting ray for a toroid
- * @param r				ray to trace in element coordinates
- * @param elementIndex	index of element in data buffer
- * @param ctr			counter for random number generator, always inout
- * @param intersection	intersection point in ELEMENT coordinates
- *
- * output: reflected Ray with intersection point as position, reflection as direction in ELEMENT coordinates and possibly modified weight
- */
-Ray traceToroid(Ray r, ToroidMirror tor, INOUT(uint64_t) ctr, Collision col) {
-    // store old position, needed for pathlength calculation
-    dvec3 old_position = r.m_position;
-
-    dvec4 normal = dvec4(col.normal, 0);
-    r.m_position = col.hitpoint;
-    double azimuthal_angle = azimuthalAngle(tor);
-
-    // add the travelled distance from the previous position to the new intersection to pathlength (both are in the same coordinate system so we do
-    // not need to transform back to world coordinates??)
-    r.m_pathLength += length(old_position - r.m_position);
-    r.m_lastElement = tor.id + 1;
-
-    // tanger/slope Error
-    normal        = tanger(normal, slopeX(tor), slopeZ(tor), 0, ctr);
-
-    r.m_direction = dvec3(reflect(dvec4(r.m_direction, 0), normal));
-
-    double real_S, real_P, delta;
-    double incidence_angle = getIncidenceAngle(r, normal);  // getTheta
-    int mat = int(material(tor));
-    if (mat != -2) {
-        efficiency(r, real_S, real_P, delta, incidence_angle, mat);
-
-        bool absorbed = update_stokes(r, real_S, real_P, delta, azimuthal_angle, ctr);
-        if (absorbed) {
-            takeFinalSnapshot(r, W_ABSORBED);
-        }
-        r.m_order = 0;
-    }
-    return r;
-}
-
-/**
  * calculates resulting ray for an RZP
  * @param r				ray to trace in element coordinates
  * @param elementIndex	index of element in data buffer
@@ -289,7 +247,7 @@ Ray traceMirror(Ray r, BasicMirror m, INOUT(uint64_t) ctr, Collision col) {
     r.m_lastElement = m.id + 1;
 
     // take the slope error into account for the normal
-    normal        = tanger(normal, slopeX(m), slopeZ(m), 0, ctr);  // option 0 = default, cartesian normal
+    normal = tanger(normal, slopeX(m), slopeZ(m), 0, ctr);  // option 0 = default, cartesian normal
 
     // calculate the new direction after the reflection
     r.m_direction = dvec3(reflect(dvec4(r.m_direction, 0), normal));

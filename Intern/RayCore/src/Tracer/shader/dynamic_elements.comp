@@ -43,7 +43,7 @@ void dynamicElements() {
         // Calculate interaction(reflection,material, absorption etc.) of ray with detected next element
         type = int(nextElement.m_type);
         switch(type){
-            case (TY_BASIC_MIRROR) :
+            case (TY_MIRROR) :
                 elem_ray = traceMirror(elem_ray, BasicMirror(col.elementIndex), ctr, col);
                 break;
             case(TY_PLANE_GRATING) :
@@ -60,9 +60,6 @@ void dynamicElements() {
                 break;
             case (TY_IMAGE_PLANE) :
                 elem_ray = traceImagePlane(elem_ray, ImagePlane(col.elementIndex), col);
-                break;
-            case (TY_TOROID_MIRROR) :
-                elem_ray = traceToroid(elem_ray, ToroidMirror(col.elementIndex), ctr, col);
                 break;
             case (TY_ELLIPSOID_MIRROR) :
                 elem_ray = traceEllipsoidMirror(elem_ray, EllipsoidMirror(col.elementIndex), ctr, col);
