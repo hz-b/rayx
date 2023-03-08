@@ -172,7 +172,7 @@ void takeFinalSnapshot(Ray r, double w) {
 #include "complex.comp"
 #include "random.comp"
 #include "utils.comp"
-#include "intersection.comp"
+#include "collision.comp"
 #include "trace.comp"
 #include "dynamic_elements.comp"
 // clang-format on

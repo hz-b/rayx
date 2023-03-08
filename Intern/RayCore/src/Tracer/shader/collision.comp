@@ -294,3 +294,36 @@ Collision find_collision_with(Ray r, uint id) {
         return col; // has found = false
     }
 }
+
+Collision find_collision() {
+    // global coordinates of first intersection point of ray among all elements in beamline
+    Collision best_col;
+    best_col.found = false;
+
+    // the distance the ray has to travel to reach `best_col`.
+    double best_dist = infinity();
+
+    // Find intersection points through all elements
+    for (uint elementIndex = 0; elementIndex < uint(elements.length()); elementIndex++) {
+        double lastElement = _ray.m_lastElement;
+        if (elementIndex + 1 == lastElement) {
+            // TODO: self-intersection
+            continue;
+        }
+
+        Collision current_col = find_collision_with(_ray, elementIndex);
+        if (!current_col.found) {
+            continue;
+        }
+
+        dvec3 global_hitpoint = dvec3(elements[elementIndex].m_outTrans * dvec4(current_col.hitpoint, 1));
+        double current_dist = length(global_hitpoint - _ray.m_position);
+
+        if (current_dist < best_dist) {
+            best_col = current_col;
+            best_dist = current_dist;
+        }
+    }
+
+    return best_col;
+}
