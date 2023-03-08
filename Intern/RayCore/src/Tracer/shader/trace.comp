@@ -1,13 +1,16 @@
-/**
- * calculates resulting ray for a slit
- * @param r				ray to trace in element coordinates
- * @param elementIndex	index of element in data buffer
- * @param ctr			counter for random number generator, always inout
- * @param intersection	intersection point in ELEMENT coordinates
- *
- * output: diffracted Ray with intersection point as position, reflection as direction in beam coordinates and possibly modified weight in ELEMENT
- * coordinates
- */
+/// Each `trace*` function gets a `Ray r` (in element-coords), the element itself, a randomness counter and the `Collision col`.
+/// `col.hitpoint` expresses where the given ray r will hit the element (in element-coords).
+/// `col.normal` expresses the normal of the surface, at `col.hitpoint` (in element-coords).
+///
+/// The `trace*` functions, will
+/// - change the rays direction, typically by reflecting using the normal
+/// - change the rays stokes vector
+/// - potentially absorb the ray (by calling `takeFinalSnapshot(_, W_ABSORBED)`)
+// TODO(rudi) all of the following things could be done before calling the `trace*` function, it's the same everywhere, I think.
+/// - move the ray to the `col.hitpoint`
+/// - update the rays `lastElement`
+/// - increase the rays `pathLength`
+
 Ray traceSlit(Ray r, Slit slit, INOUT(uint64_t) ctr, Collision col) {
     // store old position, needed for pathlength calculation
     dvec3 old_position = r.m_position;
@@ -52,15 +55,6 @@ Ray traceSlit(Ray r, Slit slit, INOUT(uint64_t) ctr, Collision col) {
     return r;
 }
 
-/**
- * calculates resulting ray for an RZP
- * @param r				ray to trace in element coordinates
- * @param elementIndex	index of element in data buffer
- * @param ctr			counter for random number generator, always inout
- * @param intersection	intersection point in ELEMENT coordinates
- *
- * output: reflected Ray with intersection point as position, reflection as direction in ELEMENT coordinates and possibly modified weight
- */
 Ray traceRZP(Ray r, Rzp rzp, INOUT(uint64_t) ctr, Collision col) {
     double element_offset_z = elementOffsetZ(rzp);
     r.m_position.z            = r.m_position.z - element_offset_z;
@@ -123,14 +117,6 @@ Ray traceRZP(Ray r, Rzp rzp, INOUT(uint64_t) ctr, Collision col) {
     return r;
 }
 
-/**
- * calculates resulting ray for general grating element
- * @param r				ray to trace in element coordinates
- * @param elementIndex	index of element in data buffer
- * @param ctr			counter for random number generator, always inout
- * @param intersection	intersection point in ELEMENT coordinates
- * @return reflected Ray with intersection point as position, reflection as direction in ELEMENT coordinates and possibly modified weight
- */
 Ray traceGrating(Ray r, Grating gg, INOUT(uint64_t) ctr, Collision col) {
     // store old position, needed for pathlength calculation
     dvec3 old_position = r.m_position;
@@ -169,15 +155,6 @@ Ray traceGrating(Ray r, Grating gg, INOUT(uint64_t) ctr, Collision col) {
     return r;
 }
 
-/**
- * calculates resulting ray for a mirror element
- * @param r				ray to trace in element coordinates
- * @param elementIndex	index of element in data buffer
- * @param ctr			counter for RNG
- * @param intersection	intersection point in ELEMENT coordinates
- *
- * output: reflected Ray with intersection point as position, reflection as direction in ELEMENT coordinates and possibly modified weight
- */
 Ray traceMirror(Ray r, Mirror m, INOUT(uint64_t) ctr, Collision col) {
     // store old position, needed for pathlength calculation
     dvec3 old_position = r.m_position;
@@ -213,14 +190,6 @@ Ray traceMirror(Ray r, Mirror m, INOUT(uint64_t) ctr, Collision col) {
     return r;
 }
 
-/**
- * the image plane is always parallel to x-y-plane of ray coordinate system in which the rays are when they leave the previous element
- * -> defined by distance to that element
- * @param r		ray to trace in element coordinates
- * @param elementIndex	index of element in data buffer
- * @param intersection	intersection point of ray with optical element in ELMENT coordinates
- * @return  reflected Ray with intersection point as position in ELEMENT coordinates
- */
 Ray traceImagePlane(Ray r, ALLOW_UNUSED ImagePlane ip, Collision col) {
     // path length in element coordinates
     r.m_pathLength += length(r.m_position - col.hitpoint);
