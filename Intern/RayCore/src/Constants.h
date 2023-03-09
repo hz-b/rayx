@@ -63,11 +63,11 @@ struct Element {
     // how this data is interpreted, depends on the surfaceType.
     dmat4 m_surfaceParams;
 
-    // the type of this element, see the TY constants above
+    // the type of this element, see the TY constants
     double m_type;
 
-    // TODO unused so far!
-    double m_surfaceType;  // Quadric = 0, Toroid = 1
+    // the surface type of this element, see the STY constants
+    double m_surfaceType;
 
     // general object information
     double m_widthA;
@@ -76,6 +76,9 @@ struct Element {
     double m_slopeError[7];
     double m_azimuthalAngle;
     double m_material;
+
+    // This field is unused, it's only there to guarantee that sizeof(Element) is divisible by sizeof(dmat4).
+    // Should guarantee that std430 in GLSL and c++ have the same memory layout for `Element`.
     double m_padding[2];
 };
 
