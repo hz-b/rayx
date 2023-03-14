@@ -31,5 +31,7 @@ CentralBeamstop Slit::getCentralBeamstop() const { return m_centralBeamstop; }
 double Slit::getBeamstopWidth() const { return m_beamstopWidth; }
 double Slit::getBeamstopHeight() const { return m_beamstopHeight; }
 
-glm::dmat4x4 Slit::getElementParams() const { return {m_beamstopWidth / 2, m_beamstopHeight / 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}; }
+std::array<double, 16> Slit::getElementParams() const {
+    return {m_beamstopWidth / 2, m_beamstopHeight / 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+}
 }  // namespace RAYX

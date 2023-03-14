@@ -62,10 +62,10 @@ Ellipsoid::Ellipsoid(const DesignObject& dobj) : OpticalElement(dobj) {
     RAYX_VERB << "m_a44: " << m_a44;
 
     double icurv = 1;
-    setSurface(std::make_unique<Quadric>(glm::dmat4x4{m_a11, 0, 0, 0,              //
-                                                      icurv, m_a22, m_a23, m_a24,  //
-                                                      0, 0, m_a33, m_a34,          //
-                                                      0, 0, 0, m_a44}));
+    setSurface(std::make_unique<Quadric>(std::array<double, 16>{m_a11, 0, 0, 0,              //
+                                                                icurv, m_a22, m_a23, m_a24,  //
+                                                                0, 0, m_a33, m_a34,          //
+                                                                0, 0, 0, m_a44}));
 }
 
 void Ellipsoid::calculateCenterFromHalfAxes(Rad angle) {
@@ -156,7 +156,7 @@ double Ellipsoid::getA33() const { return m_a33; }
 double Ellipsoid::getA44() const { return m_a44; }
 double Ellipsoid::getHalfAxisC() const { return m_halfAxisC; }
 
-glm::dmat4x4 Ellipsoid::getElementParams() const {
+std::array<double, 16> Ellipsoid::getElementParams() const {
     return {m_tangentAngle.sin(),
             m_tangentAngle.cos(),
             m_y0,

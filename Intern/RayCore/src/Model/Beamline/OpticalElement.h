@@ -54,8 +54,8 @@ class RAYX_API OpticalElement {
     glm::dmat4x4 getOrientation() const;
     glm::dvec4 getPosition() const;
 
-    glm::dmat4x4 getSurfaceParams() const;
-    virtual glm::dmat4x4 getElementParams() const;
+    std::array<double, 16> getSurfaceParams() const;
+    virtual std::array<double, 16> getElementParams() const;
     virtual int getElementType() const = 0;
     std::array<double, 7> getSlopeError() const;
 

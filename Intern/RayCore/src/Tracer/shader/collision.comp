@@ -27,19 +27,17 @@ Collision getQuadricCollision(Ray r, uint id) {
     col.hitpoint = dvec3(0, 0, 0);
     col.normal = dvec3(0, 0, 0);
 
-    dmat4 quadric = surfaceParams(id);
-
-    double a_11 = quadric[0][0];
-    double a_12 = quadric[0][1];
-    double a_13 = quadric[0][2];
-    double a_14 = quadric[0][3];
-    double a_22 = quadric[1][1];
-    double a_23 = quadric[1][2];
-    double a_24 = quadric[1][3];
-    double a_33 = quadric[2][2];
-    double a_34 = quadric[2][3];
-    double a_44 = quadric[3][3];
-    int icurv   = int(quadric[1][0]);
+    double a_11 = param_s(id, 0);
+    double a_12 = param_s(id, 1);
+    double a_13 = param_s(id, 2);
+    double a_14 = param_s(id, 3);
+    double a_22 = param_s(id, 5);
+    double a_23 = param_s(id, 6);
+    double a_24 = param_s(id, 7);
+    double a_33 = param_s(id, 10);
+    double a_34 = param_s(id, 11);
+    double a_44 = param_s(id, 15);
+    int icurv   = int(param_s(id, 4));
 
     int cs     = 1;
     int d_sign = icurv;
@@ -217,7 +215,7 @@ Collision findCollisionWith(Ray r, uint id) {
     double z_extent  = height(id);
 
     if (ty == TY_RZP) {
-        r.m_position.z = r.m_position.z - elements[id].m_elementParams[3][2]; // TODO
+        r.m_position.z = r.m_position.z - param_e(id, 14); // TODO what is at index 14 ?
     }
 
     // _ray = rayMatrixMult(_ray, q.inTrans); // ray/global to element coordinates,

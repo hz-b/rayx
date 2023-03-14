@@ -11,10 +11,10 @@ namespace RAYX {
  * @param elementType           6=toroid mirror, 4=toroid rzp
  */
 Toroid::Toroid(double longRadius, double shortRadius) {
-    m_parameters = glm::dmat4x4{longRadius, shortRadius, 0, 0,  //
-                                0,          0,           0, 0,  //
-                                0,          0,           0, 0,  //
-                                0,          0,           0, 0};
+    m_parameters = {longRadius, shortRadius, 0, 0,  //
+                    0,          0,           0, 0,  //
+                    0,          0,           0, 0,  //
+                    0,          0,           0, 0};
 }
 
 int Toroid::getSurfaceType() const { return STY_TOROID; }
@@ -41,7 +41,7 @@ Toroid::~Toroid() = default;
  *materials.xmacro)
  *
  **/
-glm::dmat4x4 Toroid::getParams() const {
+std::array<double, 16> Toroid::getParams() const {
     RAYX_VERB << "Return surface points";
     return m_parameters;
 }

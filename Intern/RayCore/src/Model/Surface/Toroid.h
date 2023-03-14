@@ -21,11 +21,11 @@ class RAYX_API Toroid : public Surface {
     // dtor
     ~Toroid();
 
-    glm::dmat4x4 getParams() const;
+    std::array<double, 16> getParams() const;
 
   private:
     // 16 values that store the 2 surface params for the toroid and also some
     // settings for the shader to know how to interpret the input
-    glm::dmat4x4 m_parameters;
+    std::array<double, 16> m_parameters;
 };
 }  // namespace RAYX

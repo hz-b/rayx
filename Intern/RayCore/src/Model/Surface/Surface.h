@@ -16,7 +16,7 @@ namespace RAYX {
  */
 class RAYX_API Surface {
   public:
-    virtual glm::dmat4x4 getParams() const = 0;
+    virtual std::array<double, 16> getParams() const = 0;
     virtual int getSurfaceType() const = 0;
 
     Surface();

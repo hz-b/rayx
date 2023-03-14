@@ -17,9 +17,6 @@ class RAYX_API InfPlane : public Surface {
     // dtor
     ~InfPlane() = default;
 
-    inline glm::dmat4x4 getParams() const {
-        glm::dmat4x4 x(0);
-        return x;
-    }
+    inline std::array<double, 16> getParams() const { return std::array<double, 16>{0}; }
 };
 }  // namespace RAYX

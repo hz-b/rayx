@@ -34,14 +34,14 @@ ReflectionZonePlate::ReflectionZonePlate(const DesignObject& dobj) : OpticalElem
 
     // set parameters in Quadric class
     if (m_curvatureType == CurvatureType::Plane) {
-        setSurface(std::make_unique<Quadric>(glm::dmat4x4{0, 0, 0, 0, 1, 0, 0, -1, 0, 0, 0, 0, 0, 0, 0, 0}));
+        setSurface(std::make_unique<Quadric>(std::array<double, 16>{0, 0, 0, 0, 1, 0, 0, -1, 0, 0, 0, 0, 0, 0, 0, 0}));
     } else if (m_curvatureType == CurvatureType::Toroidal) {
         m_longRadius = dobj.parseLongRadius();    // for sphere and toroidal
         m_shortRadius = dobj.parseShortRadius();  // only for Toroidal
         setSurface(std::make_unique<Toroid>(m_longRadius, m_shortRadius));
     } else {
         m_longRadius = dobj.parseLongRadius();  // for sphere and toroidal
-        setSurface(std::make_unique<Quadric>(glm::dmat4x4{1, 0, 0, 0, 1, 1, 0, -m_longRadius, 0, 0, 1, 0, 0, 0, 0, 0}));
+        setSurface(std::make_unique<Quadric>(std::array<double, 16>{1, 0, 0, 0, 1, 1, 0, -m_longRadius, 0, 0, 1, 0, 0, 0, 0, 0}));
     }
 
     printInfo();
@@ -401,7 +401,7 @@ double ReflectionZonePlate::getDesignEnergyMounting() const {
     return m_designEnergyMounting;  // derived from source?
 }
 
-glm::dmat4x4 ReflectionZonePlate::getElementParams() const {
+std::array<double, 16> ReflectionZonePlate::getElementParams() const {
     return {double(m_imageType),
             double(m_rzpType),
             double(m_derivationMethod),

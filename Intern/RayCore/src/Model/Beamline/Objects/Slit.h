@@ -14,7 +14,7 @@ class RAYX_API Slit : public OpticalElement {
     CentralBeamstop getCentralBeamstop() const;
     double getBeamstopWidth() const;
     double getBeamstopHeight() const;
-    glm::dmat4x4 getElementParams() const;
+    std::array<double, 16> getElementParams() const;
 
   private:
     CentralBeamstop m_centralBeamstop;

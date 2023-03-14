@@ -12,6 +12,6 @@ class RAYX_API ImagePlane : public OpticalElement {
     inline int getElementType() const { return TY_IMAGE_PLANE; }
 
     double getDistance();
-    glm::dmat4x4 getElementParams() const;
+    std::array<double, 16> getElementParams() const;
 };
 }  // namespace RAYX

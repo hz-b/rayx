@@ -42,13 +42,13 @@ OpticalElement::OpticalElement(const DesignObject& dobj) {
 }
 
 Element OpticalElement::intoElement() const {
-    return Element{
+    Element e = Element{
         .m_inTrans = getInMatrix(),
         .m_outTrans = getOutMatrix(),
-        .m_elementParams = getElementParams(),
-        .m_surfaceParams = getSurfaceParams(),
         .m_type = (double)getElementType(),
+        .m_elementParams = {0},  // initialized below
         .m_surfaceType = (double)m_surfacePtr->getSurfaceType(),
+        .m_surfaceParams = {0},  // initialized below
         .m_widthA = m_Geometry->m_widthA,
         .m_widthB = m_Geometry->m_widthB,
         .m_height = m_Geometry->m_height,
@@ -57,6 +57,12 @@ Element OpticalElement::intoElement() const {
         .m_material = (double)static_cast<int>(m_material),
         .m_padding = {0.0, 0.0},
     };
+    for (int i = 0; i < 16; i++) {
+        e.m_elementParams[i] = getElementParams().data()[i];
+        e.m_surfaceParams[i] = getSurfaceParams().data()[i];
+    }
+
+    return e;
 }
 
 // ! Workaround for a bug in the gcc/clang compiler:
@@ -146,7 +152,7 @@ glm::dmat4 OpticalElement::getOutMatrix() const {
 glm::dvec4 OpticalElement::getPosition() const { return m_Geometry->m_position; }
 glm::dmat4x4 OpticalElement::getOrientation() const { return m_Geometry->m_orientation; }
 
-glm::dmat4x4 OpticalElement::getSurfaceParams() const {
+std::array<double, 16> OpticalElement::getSurfaceParams() const {
     // assert(m_surfacePtr!=nullptr);
     if (m_surfacePtr != nullptr)
         return m_surfacePtr->getParams();
@@ -158,5 +164,5 @@ glm::dmat4x4 OpticalElement::getSurfaceParams() const {
 
 std::array<double, 7> OpticalElement::getSlopeError() const { return m_slopeError; }
 
-glm::dmat4x4 OpticalElement::getElementParams() const { return {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}; }
+std::array<double, 16> OpticalElement::getElementParams() const { return {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}; }
 }  // namespace RAYX

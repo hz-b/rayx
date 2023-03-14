@@ -57,17 +57,15 @@ struct Element {
     dmat4 m_inTrans;
     dmat4 m_outTrans;
 
-    // how this data is interpreted, depends on `type`
-    dmat4 m_elementParams;
-
-    // how this data is interpreted, depends on the surfaceType.
-    dmat4 m_surfaceParams;
-
-    // the type of this element, see the TY constants
+    // the type of this element, see the TY constants.
+    // the type describes how the elementParams need to be interpreted.
     double m_type;
+    double m_elementParams[16];
 
-    // the surface type of this element, see the STY constants
+    // the surface type of this element, see the STY constants.
+    // the surface type describes how the surfaceParams need to be inerpreted.
     double m_surfaceType;
+    double m_surfaceParams[16];
 
     // general object information
     double m_widthA;

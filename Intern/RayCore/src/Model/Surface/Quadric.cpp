@@ -10,7 +10,7 @@ namespace RAYX {
  * matrix is symmetrial, can be used for other values
  * @param inputPoints      4x4 Matrix as vector
  */
-Quadric::Quadric(const glm::dmat4x4 inputPoints) { m_parameters = inputPoints; }
+Quadric::Quadric(const std::array<double, 16> inputPoints) { m_parameters = inputPoints; }
 
 int Quadric::getSurfaceType() const { return STY_QUADRIC; }
 
@@ -25,7 +25,7 @@ Quadric::~Quadric() = default;
  * @param inputPoints   16 entry vector a_11 to a_44
  * @return void
  */
-[[maybe_unused]] void Quadric::setAnchorPoints(glm::dmat4x4 inputPoints) { m_parameters = inputPoints; }
+[[maybe_unused]] void Quadric::setAnchorPoints(std::array<double, 16> inputPoints) { m_parameters = inputPoints; }
 
 /**
  * ENCODING:
@@ -40,6 +40,6 @@ Quadric::~Quadric() = default;
  * @param a_11, .., a_44 parameters of the quadric equation to find the
  *intersection point. Depend on the element (plane, sphere, ellipsoid,..)
  **/
-glm::dmat4x4 Quadric::getParams() const { return m_parameters; }
+std::array<double, 16> Quadric::getParams() const { return m_parameters; }
 
 }  // namespace RAYX

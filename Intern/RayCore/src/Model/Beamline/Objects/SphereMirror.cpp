@@ -14,7 +14,7 @@ SphereMirror::SphereMirror(const DesignObject& dobj) : OpticalElement(dobj) {
     m_grazingIncidenceAngle = dobj.parseGrazingIncAngle();
 
     calcRadius();  // calculate the radius
-    setSurface(std::make_unique<Quadric>(glm::dmat4x4{1, 0, 0, 0, 1, 1, 0, -m_radius, 0, 0, 1, 0, 0, 0, 0, 0}));
+    setSurface(std::make_unique<Quadric>(std::array<double, 16>{1, 0, 0, 0, 1, 1, 0, -m_radius, 0, 0, 1, 0, 0, 0, 0, 0}));
 }
 
 // TODO(Theresa): move this to user params and just give the radius as a

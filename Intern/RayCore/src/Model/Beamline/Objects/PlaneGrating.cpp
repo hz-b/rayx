@@ -15,7 +15,7 @@ PlaneGrating::PlaneGrating(const DesignObject& dobj) : OpticalElement(dobj) {
     RAYX_VERB << "design wavelength = " << abs(hvlam(m_designEnergyMounting));
 
     // parameters of quadric surface
-    setSurface(std::make_unique<Quadric>(glm::dmat4x4{0, 0, 0, 0, 1, 0, 0, -1, 0, 0, 0, 0, 0, 0, 0, 0}));
+    setSurface(std::make_unique<Quadric>(std::array<double, 16>{0, 0, 0, 0, 1, 0, 0, -1, 0, 0, 0, 0, 0, 0, 0, 0}));
 }
 
 double PlaneGrating::getDesignEnergyMounting() const { return m_designEnergyMounting; }
@@ -23,7 +23,7 @@ double PlaneGrating::getLineDensity() const { return m_lineDensity; }
 double PlaneGrating::getOrderOfDiffraction() const { return m_orderOfDiffraction; }
 std::array<double, 6> PlaneGrating::getVls() { return m_vls; }
 
-glm::dmat4x4 PlaneGrating::getElementParams() const {
+std::array<double, 16> PlaneGrating::getElementParams() const {
     return {0,
             0,
             m_lineDensity,
