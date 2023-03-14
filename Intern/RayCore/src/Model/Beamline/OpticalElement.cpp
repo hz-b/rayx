@@ -45,7 +45,7 @@ Element OpticalElement::intoElement() const {
     return Element{
         .m_inTrans = getInMatrix(),
         .m_outTrans = getOutMatrix(),
-        .m_elementParameters = getElementParameters(),
+        .m_elementParams = getElementParams(),
         .m_surfaceParams = getSurfaceParams(),
         .m_type = (double)getElementType(),
         .m_surfaceType = (double)m_surfacePtr->getSurfaceType(),
@@ -158,5 +158,5 @@ glm::dmat4x4 OpticalElement::getSurfaceParams() const {
 
 std::array<double, 7> OpticalElement::getSlopeError() const { return m_slopeError; }
 
-glm::dmat4x4 OpticalElement::getElementParameters() const { return {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}; }
+glm::dmat4x4 OpticalElement::getElementParams() const { return {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}; }
 }  // namespace RAYX

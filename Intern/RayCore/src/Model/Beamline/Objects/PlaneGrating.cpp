@@ -23,7 +23,7 @@ double PlaneGrating::getLineDensity() const { return m_lineDensity; }
 double PlaneGrating::getOrderOfDiffraction() const { return m_orderOfDiffraction; }
 std::array<double, 6> PlaneGrating::getVls() { return m_vls; }
 
-glm::dmat4x4 PlaneGrating::getElementParameters() const {
+glm::dmat4x4 PlaneGrating::getElementParams() const {
     return {0,
             0,
             m_lineDensity,

@@ -13,7 +13,7 @@ class RAYX_API PointSource : public LightSource {
     std::vector<Ray> getRays() const override;
 
   private:
-    // Geometric Parameters
+    // Geometric Params
     SourceDist m_widthDist;
     SourceDist m_heightDist;
     SourceDist m_horDist;

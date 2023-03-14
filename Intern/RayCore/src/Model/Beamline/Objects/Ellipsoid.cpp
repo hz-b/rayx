@@ -156,7 +156,7 @@ double Ellipsoid::getA33() const { return m_a33; }
 double Ellipsoid::getA44() const { return m_a44; }
 double Ellipsoid::getHalfAxisC() const { return m_halfAxisC; }
 
-glm::dmat4x4 Ellipsoid::getElementParameters() const {
+glm::dmat4x4 Ellipsoid::getElementParams() const {
     return {m_tangentAngle.sin(),
             m_tangentAngle.cos(),
             m_y0,

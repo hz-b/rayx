@@ -133,7 +133,7 @@ Ray traceGrating(Ray r, Grating gg, INOUT(uint64_t) ctr, Collision col) {
     // modify normal according to slope error
     normal        = tanger(normal, slopeX(gg), slopeZ(gg), 0, ctr);
 
-    // vls parameters passed in q.elementParameters
+    // vls parameters passed in q.elementParams
     dmat4 e = elementParams(gg);
     double WL                 = hvlam(r.m_energy);
     double lineDensity        = e[0][2];

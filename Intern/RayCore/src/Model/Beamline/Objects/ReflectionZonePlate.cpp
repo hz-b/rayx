@@ -401,7 +401,7 @@ double ReflectionZonePlate::getDesignEnergyMounting() const {
     return m_designEnergyMounting;  // derived from source?
 }
 
-glm::dmat4x4 ReflectionZonePlate::getElementParameters() const {
+glm::dmat4x4 ReflectionZonePlate::getElementParams() const {
     return {double(m_imageType),
             double(m_rzpType),
             double(m_derivationMethod),

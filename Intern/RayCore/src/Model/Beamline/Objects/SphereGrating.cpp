@@ -31,7 +31,7 @@ double SphereGrating::getLineDensity() const { return m_lineDensity; }
 double SphereGrating::getOrderOfDiffraction() const { return m_orderOfDiffraction; }
 double SphereGrating::getA() const { return m_a; }
 
-glm::dmat4x4 SphereGrating::getElementParameters() const {
+glm::dmat4x4 SphereGrating::getElementParams() const {
     return {0,
             0,
             m_lineDensity,

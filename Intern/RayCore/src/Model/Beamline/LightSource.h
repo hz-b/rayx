@@ -48,7 +48,7 @@ class RAYX_API LightSource {
     uint32_t m_numberOfRays;
 
   protected:
-    // Geometric Parameters
+    // Geometric Params
     double m_sourceDepth;
     double m_sourceHeight;
     double m_sourceWidth;
@@ -63,7 +63,7 @@ class RAYX_API LightSource {
     // User/Design Parameter
     std::array<double, 6> m_misalignmentParams;  // x, y, psi, phi
 
-    // Physics Parameters
+    // Physics Params
     // point source & matrix source
     double m_linearPol_0;
     double m_linearPol_45;

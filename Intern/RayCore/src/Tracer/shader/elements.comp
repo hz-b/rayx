@@ -11,7 +11,7 @@ struct Slit { uint id; };
 struct Rzp { uint id; };
 struct ImagePlane { uint id; };
 
-double param_e(uint id, uint x, uint y) { return elements[id].m_elementParameters[x][y]; }
+double param_e(uint id, uint x, uint y) { return elements[id].m_elementParams[x][y]; }
 double param_s(uint id, uint x, uint y) { return elements[id].m_surfaceParams[x][y]; }
 
 /**************************************************************
@@ -58,7 +58,7 @@ double widthB(Rzp e) { return widthB(e.id); }
 double height(Rzp e) { return height(e.id); }
 double slopeX(Rzp e) { return slopeX(e.id); }
 double slopeZ(Rzp e) { return slopeZ(e.id); }
-dmat4 elementParams(Rzp e) { return elements[e.id].m_elementParameters; }
+dmat4 elementParams(Rzp e) { return elements[e.id].m_elementParams; }
 
 /**************************************************************
  *                    Grating
@@ -68,7 +68,7 @@ double width(Grating e) { return width(e.id); }
 double height(Grating e) { return height(e.id); }
 double slopeX(Grating e) { return slopeX(e.id); }
 double slopeZ(Grating e) { return slopeZ(e.id); }
-dmat4 elementParams(Grating e) { return elements[e.id].m_elementParameters; }
+dmat4 elementParams(Grating e) { return elements[e.id].m_elementParams; }
 
 /**************************************************************
  *                    Mirror

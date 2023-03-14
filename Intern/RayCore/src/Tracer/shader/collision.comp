@@ -217,7 +217,7 @@ Collision findCollisionWith(Ray r, uint id) {
     double z_extent  = height(id);
 
     if (ty == TY_RZP) {
-        r.m_position.z = r.m_position.z - elements[id].m_elementParameters[3][2]; // TODO
+        r.m_position.z = r.m_position.z - elements[id].m_elementParams[3][2]; // TODO
     }
 
     // _ray = rayMatrixMult(_ray, q.inTrans); // ray/global to element coordinates,

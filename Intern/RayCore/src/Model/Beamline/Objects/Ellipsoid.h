@@ -28,7 +28,7 @@ class RAYX_API Ellipsoid : public OpticalElement {
     double getA44() const;
     double getHalfAxisC() const;
 
-    glm::dmat4x4 getElementParameters() const;
+    glm::dmat4x4 getElementParams() const;
 
   private:
     // user parameters:

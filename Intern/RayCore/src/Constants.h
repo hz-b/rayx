@@ -58,7 +58,7 @@ struct Element {
     dmat4 m_outTrans;
 
     // how this data is interpreted, depends on `type`
-    dmat4 m_elementParameters;
+    dmat4 m_elementParams;
 
     // how this data is interpreted, depends on the surfaceType.
     dmat4 m_surfaceParams;

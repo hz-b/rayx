@@ -26,7 +26,7 @@ CpuTracer::~CpuTracer() {}
 std::vector<Ray> CpuTracer::traceRaw(const TraceRawConfig& cfg) {
     RAYX_PROFILE_FUNCTION_STDOUT();
 
-    auto rayList = cfg.m_rays;  
+    auto rayList = cfg.m_rays;
 
     // CFG meta passed through pushConstants
 
