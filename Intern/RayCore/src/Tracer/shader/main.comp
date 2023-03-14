@@ -1,5 +1,7 @@
 #define WORKGROUP_SIZE 32
-
+/**************************************************************
+ *                    Header & #define
+ **************************************************************/
 #ifndef GLSL
     #define INOUT(x) x&
     #define OUT(x) x&
@@ -23,25 +25,29 @@
 
 #include "../../Constants.h"
 
-/* STRUCTS */
-// for CPP, the according things are mostly defined in CpuTracer.h
+/**************************************************************
+ *                    Structs
+ **************************************************************/
+ 
+// for non GLSL(CPP), the according things are mostly defined in CpuTracer.h
 #ifndef GLSL
 int gl_GlobalInvocationID;
 
 ShaderArray<Ray> rayData;
 ShaderArray<Ray> outputData;
 
-// the ray id of the first ray of the batch.
-// See `rayId` to access the ray id of the current ray.
-double rayIdStart;
+// // the ray id of the first ray of the batch.
+// // // See `rayId` to access the ray id of the current ray.
+// double rayIdStart;
 
-// The total number of rays in this tracing process.
-// (not only this batch)
-double numRays;
-double randomSeed;
+// // The total number of rays in this tracing process.
+// // (not only this batch)
+// double numRays;
 
-// each ray will take multiple snapshots (copies) while tracing, those are then sent to the CPU for further processing.
-double maxSnapshots;
+// double randomSeed;
+
+// // each ray will take multiple snapshots (copies) while tracing, those are then sent to the CPU for further processing.
+// double maxSnapshots;
 
 ShaderArray<Element> elements;
 ShaderArray<dvec4> xyznull;
@@ -69,7 +75,10 @@ struct Ray {
 	};
 #endif
 
-/* LAYOUTS */
+/**************************************************************
+ *                    SHADER LAYOUT (GPU-ONLY)
+ **************************************************************/
+
     // don't use this directly. Use `_ray` instead.
 	layout(std140, binding = 0) buffer ibuf { Ray rayData[]; };
 
@@ -79,11 +88,6 @@ struct Ray {
     // std430 is required so that Element is layouted like in C++.
     // see https://www.khronos.org/opengl/wiki/Interface_Block_(GLSL) for more details on layouting.
 	layout(std430, binding = 2) buffer qbuf {
-        double rayIdStart;
-        double numRays;
-        double randomSeed;
-        double maxSnapshots;
-
 		Element elements[];
 	};
 
@@ -108,27 +112,42 @@ struct Ray {
 
 #endif
 
-bool finalized;
-
-// PushConstants 
+/**************************************************************
+ *                    PushConstants
+ **************************************************************/
 #ifndef GLSL
     pushConstants_t pushConstants;
 #else 
     layout( push_constant ) uniform constants
-    {
-	    dmat4 pushMatrix;
-    } PushConstants;
+    {   
+        double rayIdStart;
+        double numRays;
+        double randomSeed;
+        double maxSnapshots;
+    } pushConstants;
 #endif
 
+/**************************************************************
+ *                    Functions && vars
+ **************************************************************/
 uint64_t rayId() {
-    return uint64_t(rayIdStart) + uint64_t(gl_GlobalInvocationID);
+    return uint64_t(pushConstants.rayIdStart) + uint64_t(gl_GlobalInvocationID);
 }
+
+bool finalized;
 
 // `i in [0, maxSnapshots]`.
 // Will return the index in outputData to access the `i'th` output ray belonging to this shader call.
 // Typically used as `outputData[output_index(i)]`.
 uint output_index(uint i) {
-    return uint(gl_GlobalInvocationID) * uint(maxSnapshots) + i;
+    return uint(gl_GlobalInvocationID) * uint(pushConstants.maxSnapshots) + i;
+}
+
+// sets all output rays controlled by this shader call to W_UNINIT.
+void uninitRays() {
+    for (uint i = 0; i < pushConstants.maxSnapshots; i++) {
+        outputData[output_index(i)].m_weight = W_UNINIT;
+    }
 }
 
 // take a snapshot and store it in the next free spot in outputData.
@@ -142,7 +161,7 @@ void takeSnapshot(Ray r, double w) {
     }
     #endif
 
-    for (uint i = 0; i < maxSnapshots; i++) {
+    for (uint i = 0; i < pushConstants.maxSnapshots; i++) {
         uint idx = output_index(i);
         if (outputData[idx].m_weight == W_UNINIT) { // checks whether this spot is free
             outputData[idx] = r;
@@ -164,6 +183,9 @@ void takeFinalSnapshot(Ray r, double w) {
     finalized = true;
 }
 
+/**************************************************************
+ *                    Shader INCLUDEs
+ **************************************************************/
 
 // Order in #include is IMPROTANT, do not change.
 // clang-format off
@@ -177,20 +199,17 @@ void takeFinalSnapshot(Ray r, double w) {
 #include "dynamic_elements.comp"
 // clang-format on
 
-// sets all output rays controlled by this shader call to W_UNINIT.
-void uninitRays() {
-    for (uint i = 0; i < maxSnapshots; i++) {
-        outputData[output_index(i)].m_weight = W_UNINIT;
-    }
-}
-
+/**************************************************************
+ *                    MAIN
+ **************************************************************/
 void main() {
     finalized = false;
     uninitRays();
 
     // this is required as sometimes error codes are transmitted using _ray.m_weight
     _ray.m_weight = W_UNINIT;
-
+    
+    // ~~~~~~~~~~~~~~ PRINT EXAMPLE ~~~~~~~~~~~~~~
     // Printing ~DEBUG~ Example over vkconfig Validation Layers
     // if (uint(gl_GlobalInvocationID) == 2 ){
     // #ifdef GLSL
@@ -200,5 +219,6 @@ void main() {
     //     // RAYX_D_LOG << pushConstants.pushMatrix[0][0];
     // #endif
     // }
+    // ~~~~~~~~~~~~~~ PRINT EXAMPLE ~~~~~~~~~~~~~~
 	dynamicElements();
 }

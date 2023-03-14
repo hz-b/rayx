@@ -41,8 +41,12 @@ class RAYX_API Tracer {
     // See `Rays` for information about the return value.
     Rays trace(const Beamline&);
 
+    // Useful for GPU Tracing
     struct PushConstants {
-        glm::dmat4 pushMatrix;
+        double rayIdStart;
+        double numRays;
+        double randomSeed;
+        double maxSnapshots;
     };
 
   protected:

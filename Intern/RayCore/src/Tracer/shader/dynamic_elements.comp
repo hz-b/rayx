@@ -7,8 +7,8 @@ void dynamicElements() {
 
     // ray specific "seed" for random numbers -> every ray has a different starting value for the counter that creates the random number
     const uint64_t MAX_UINT64 = ~(uint64_t(0));
-    uint64_t workerCounterNum = MAX_UINT64 / uint64_t(numRays);
-    uint64_t ctr              = rayId() * workerCounterNum + uint64_t(randomSeed * MAX_UINT64);
+    uint64_t workerCounterNum = MAX_UINT64 / uint64_t(pushConstants.numRays);
+    uint64_t ctr              = rayId() * workerCounterNum + uint64_t(pushConstants.randomSeed * MAX_UINT64);
     int type                  = -1;
 
     #ifdef RAYX_DEBUG_MODE // Debug Matrix only works in GPU Mode and on DEBUG Build Type

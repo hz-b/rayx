@@ -41,7 +41,8 @@ std::vector<Ray> VulkanTracer::traceRaw(const TraceRawConfig& cfg) {
     auto rayList = cfg.m_rays;
     const uint32_t numberOfRays = rayList.size();
 
-    std::vector<double> beamlineData = {cfg.m_rayIdStart, cfg.m_numRays, cfg.m_randomSeed, cfg.m_maxSnapshots};
+    std::vector<double> beamlineData;
+    beamlineData.reserve(cfg.m_elements.size());
 
     for (Element e : cfg.m_elements) {
         auto ptr = (double*)&e;

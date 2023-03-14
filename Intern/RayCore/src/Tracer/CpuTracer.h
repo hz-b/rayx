@@ -59,10 +59,7 @@ struct ShaderArray {
 extern int gl_GlobalInvocationID;
 extern ShaderArray<Ray> rayData;
 extern ShaderArray<Ray> outputData;
-extern double rayIdStart;
-extern double numRays;
-extern double randomSeed;
-extern double maxSnapshots;
+
 extern ShaderArray<Element> quadricData;
 extern ShaderArray<dvec4> xyznull;
 extern RAYX_API ShaderArray<int> matIdx;

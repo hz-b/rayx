@@ -1,5 +1,10 @@
+//////////////////////////////////////////////////////////////////
 // This module defines functions to access the elements in a practical way.
+//////////////////////////////////////////////////////////////////
 
+/**************************************************************
+ *                    Helper Structs
+ **************************************************************/
 struct Mirror { uint id; };
 struct Grating { uint id; };
 struct Slit { uint id; };
@@ -9,7 +14,9 @@ struct ImagePlane { uint id; };
 double param_e(uint id, uint x, uint y) { return elements[id].m_elementParameters[x][y]; }
 double param_s(uint id, uint x, uint y) { return elements[id].m_surfaceParams[x][y]; }
 
-// element-type independent access functions:
+/**************************************************************
+ *      element-type independent access functions:
+ **************************************************************/
 double widthA(uint id) { return elements[id].m_widthA; }
 double width(uint id) { return elements[id].m_widthA; }
 
@@ -29,14 +36,18 @@ double slopeZ(uint id) { return elements[id].m_slopeError[1]; }
 
 dmat4 surfaceParams(uint id) { return elements[id].m_surfaceParams; }
 
-// Slit:
+/**************************************************************
+ *                    Slit
+ **************************************************************/
 double width(Slit e) { return width(e.id); }
 double height(Slit e) { return height(e.id); }
 double beamstopWidth(Slit e) { return param_e(e.id, 0, 0); }
 double beamstopHeight(Slit e) { return param_e(e.id, 0, 1); }
 dmat4 surfaceParams(Slit e) { return surfaceParams(e.id); }
 
-// Rzp:
+/**************************************************************
+ *                    RZP
+ **************************************************************/
 double curvatureType(Rzp e) { return param_e(e.id, 1, 0); }
 double elementOffsetZ(Rzp e) { return param_e(e.id, 3, 2); }
 dmat4 surfaceParams(Rzp e) { return elements[e.id].m_surfaceParams; }
@@ -49,7 +60,9 @@ double slopeX(Rzp e) { return slopeX(e.id); }
 double slopeZ(Rzp e) { return slopeZ(e.id); }
 dmat4 elementParams(Rzp e) { return elements[e.id].m_elementParameters; }
 
-// Grating:
+/**************************************************************
+ *                    Grating
+ **************************************************************/
 dmat4 surfaceParams(Grating e) { return elements[e.id].m_surfaceParams; }
 double width(Grating e) { return width(e.id); }
 double height(Grating e) { return height(e.id); }
@@ -57,7 +70,9 @@ double slopeX(Grating e) { return slopeX(e.id); }
 double slopeZ(Grating e) { return slopeZ(e.id); }
 dmat4 elementParams(Grating e) { return elements[e.id].m_elementParameters; }
 
-// Mirror:
+/**************************************************************
+ *                    Mirror
+ **************************************************************/
 dmat4 surfaceParams(Mirror e) { return elements[e.id].m_surfaceParams; }
 double azimuthalAngle(Mirror e) { return azimuthalAngle(e.id); }
 double widthA(Mirror e) { return widthA(e.id); }

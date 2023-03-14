@@ -1,4 +1,8 @@
 // A "ray-element" collision.
+
+/**************************************************************
+ *                    Cllision Struct
+ **************************************************************/
 struct Collision {
     // The point where `_ray` hits the element, in element-coordinates.
     dvec3 hitpoint;
@@ -13,6 +17,9 @@ struct Collision {
     bool found;
 };
 
+/**************************************************************
+ *                    Quadric collision
+ **************************************************************/
 Collision getQuadricCollision(Ray r, uint id) {
     Collision col;
     col.found = true;
@@ -138,6 +145,9 @@ Collision getQuadricCollision(Ray r, uint id) {
     return col;
 }
 
+/**************************************************************
+ *                    Toroid Collision
+ **************************************************************/
 // this uses newton to approximate a solution.
 Collision getToroidCollision(Ray r, uint id) {
     double longRad = longRadius(id);
@@ -192,6 +202,10 @@ Collision getToroidCollision(Ray r, uint id) {
     col.hitpoint = dvec3(xx, yy, zz);
     return col;
 }
+
+/**************************************************************
+ *                    Collision Finder
+ **************************************************************/
 
 // checks whether `r` collides with the element of the given `id`,
 // and returns a Collision accordingly.

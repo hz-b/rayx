@@ -48,8 +48,11 @@ Rays Tracer::trace(const Beamline& b) {
             .m_materialTables = materialTables,
             .m_elements = elements,
         };
-        PushConstants pushConsants = {glm::dmat4(0.0)};
+
+        PushConstants pushConsants = {
+            .rayIdStart = (double)rayIdStart, .numRays = (double)rays.size(), .randomSeed = randomSeed, .maxSnapshots = (double)maxSnapshots};
         setPushConstants(&pushConsants);
+
         RAYX::Snapshots rawBatchRays;
         {
             RAYX_PROFILE_SCOPE_STDOUT("Tracing");
@@ -58,10 +61,10 @@ Rays Tracer::trace(const Beamline& b) {
         }
 
         {
-            RAYX_PROFILE_SCOPE_STDOUT("Snapshoto");
-
+            RAYX_PROFILE_SCOPE_STDOUT("Snapshoting");
             for (uint i = 0; i < batch_size; i++) {
                 Snapshots snapshots;
+                snapshots.reserve(maxSnapshots);
                 for (uint j = 0; j < maxSnapshots; j++) {
                     uint idx = i * maxSnapshots + j;
                     Ray r = rawBatchRays[idx];

@@ -3,6 +3,7 @@
 
 #include <chrono>
 #include <cmath>
+#include <cstring>
 
 #include "Debug/Debug.h"
 #include "Debug/Instrumentor.h"
@@ -25,12 +26,9 @@ CpuTracer::~CpuTracer() {}
 std::vector<Ray> CpuTracer::traceRaw(const TraceRawConfig& cfg) {
     RAYX_PROFILE_FUNCTION_STDOUT();
 
-    auto rayList = cfg.m_rays;
+    auto rayList = cfg.m_rays;  
 
-    CPU_TRACER::rayIdStart = cfg.m_rayIdStart;
-    CPU_TRACER::numRays = cfg.m_numRays;
-    CPU_TRACER::randomSeed = cfg.m_randomSeed;
-    CPU_TRACER::maxSnapshots = cfg.m_maxSnapshots;
+    // CFG meta passed through pushConstants
 
     CPU_TRACER::elements.data.clear();
     CPU_TRACER::xyznull.data.clear();
@@ -60,5 +58,5 @@ std::vector<Ray> CpuTracer::traceRaw(const TraceRawConfig& cfg) {
     return CPU_TRACER::outputData.data;
 }
 
-void CpuTracer::setPushConstants(PushConstants* p) { CPU_TRACER::pushConstants.pushMatrix = p->pushMatrix; }
+void CpuTracer::setPushConstants(PushConstants* p) { std::memcpy(&CPU_TRACER::pushConstants, p, sizeof(CPU_TRACER::pushConstants_t)); }
 }  // namespace RAYX
