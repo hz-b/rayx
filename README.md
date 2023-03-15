@@ -1,4 +1,10 @@
 # RAY-X
-RAY-X is a simulation and design tool for beamlines at electron storage rings. It traces synchrotron radiation through a series of mirrors, gratings and more and gives the user helpful insights, how a given beamline performs. 
+RAY-X is a simulation tool for beamlines at electron storage rings. At this stage, it still is intended to be used alongside [RAY-UI](https://www.helmholtz-berlin.de/forschung/oe/wi/optik-strahlrohre/arbeitsgebiete/ray_en.html). Our primary concern for RAY-X is high-performance tracing, which we achieve by utilizing GPUs via the Vulkan API. 
+
+## New Features for RAY-X
+- Global (not sequential) tracing of beamlines
+- GPU utilization for faster tracing
+- Multiple beamlines can easily be traced in succession
+- Groups of objects can be added for easy group transforms (e.g., Reflection Zone Plates)
 
 You can find our [Wiki here](https://hz-b.github.io/RAY-X/)
