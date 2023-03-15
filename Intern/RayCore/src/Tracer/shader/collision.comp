@@ -221,10 +221,10 @@ Collision findCollisionWith(Ray r, uint id) {
     r = rayMatrixMult(r, inTrans(id));  // image plane is the x-y plane of the coordinate system
 
     Collision col;
-    if (sty == STY_INF_PLANE) {
+    if (sty == STY_PLANE_XY) {
         col.found = false;
         col.elementIndex = int(id);
-        col.normal = dvec3(0, -1, 0);
+        col.normal = dvec3(0, 0, -1);
         double offset = abs(r.m_position.z / r.m_direction.z);
 
         // scale x-slope of ray (l/n) by z-length between origin and image plane

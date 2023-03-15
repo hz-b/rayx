@@ -32,7 +32,7 @@ Slit::Slit(const DesignObject& dobj) : OpticalElement(dobj) {
 
     m_excerptType = XTY_UNLIMITED;
 
-    m_surfaceType = STY_INF_PLANE;
+    m_surfaceType = STY_PLANE_XY;
     m_surfaceParams = {0.0};
 }
 

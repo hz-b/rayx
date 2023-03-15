@@ -100,14 +100,14 @@ const int TY_IMAGE_PLANE = 4;
 // constants)
 const int STY_QUADRIC = 0;
 const int STY_TOROID = 1;
-const int STY_INF_PLANE = 2;  // an infinite X-Y plane.
+const int STY_PLANE_XY = 2;  // an infinite X-Y plane.
 
 // excerpt types:
 // a subset of points in the 2d plane. used to limited the potentially infinite surfaces.
 // note that the first 3 need to be RECT; ELLIPTICAL; TRAPEZOID in order to be compatible with Ray-UI.
-const int XTY_RECT = 0;
+const int XTY_RECT = 0;  // excerpt parameters are (width, 0, length).
 const int XTY_ELLIPTICAL = 1;
 const int XTY_TRAPEZOID = 2;
-const int XTY_UNLIMITED = 3;
+const int XTY_UNLIMITED = 3;  // excerpt parameters are (0, 0, 0).
 
 #endif
