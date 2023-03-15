@@ -29,9 +29,19 @@ double slopeX(uint id) { return elements[id].m_slopeError[0]; }
 double slopeZ(uint id) { return elements[id].m_slopeError[1]; }
 
 // only usable for STY_TOROID.
-// TODO add checks
-double longRadius(uint id) { return param_s(id, 0); }
-double shortRadius(uint id) { return param_s(id, 1); }
+double longRadius(uint id) {
+    if (surfaceType(id) != STY_TOROID) {
+        throw("You cannot use longRadius on this surface!");
+    }
+    return param_s(id, 0);
+}
+
+double shortRadius(uint id) {
+    if (surfaceType(id) != STY_TOROID) {
+        throw("You cannot use shortRadius on this surface!");
+    }
+    return param_s(id, 1);
+}
 
 /**************************************************************
  *                    Slit

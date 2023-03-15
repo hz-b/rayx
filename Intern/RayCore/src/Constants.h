@@ -44,6 +44,10 @@ const double W_UNINIT = 4;
 // In that case this is returned as final snapshot.
 const double W_BEYOND_HORIZON = 5;
 
+// This is a general error code that means some assertion failed in the shader.
+// This error code is typically generated using `throw`.
+const double W_FATAL_ERROR = 6;
+
 // TODO extract this somewhere else
 #ifndef GLSL
 
