@@ -15,20 +15,7 @@ enum class ImageType { Point2Point, Astigmatic2Astigmatic };
 
 class RAYX_API OpticalElement {
   public:
-    struct Geometry {
-        Rad m_azimuthalAngle = Rad(0);                // rotation of element through xy-plane
-                                                      // (needed for stokes vector)
-        glm::dmat4x4 m_orientation = glm::dmat4x4();  //< Orientation matrix of element (is basis)
-        glm::dvec4 m_position = glm::dvec4();         //< Position of element in world coordinates
-
-        Geometry();
-        Geometry(const Geometry& other);
-    };
-
     OpticalElement(const DesignObject&);
-    // needed to add optical elements to tracer
-    OpticalElement(const char* name, const std::array<double, 7> slopeError,
-                   const Geometry& geometry = Geometry());  // TODO(Jannis): add surface
 
     /// Converts `this` into an Element.
     Element intoElement() const;
@@ -50,7 +37,10 @@ class RAYX_API OpticalElement {
     Material m_material;
 
   protected:
-    std::unique_ptr<Geometry> m_Geometry;  ///< Geometry of the element
+    Rad m_azimuthalAngle = Rad(0);                // rotation of element through xy-plane
+                                                  // (needed for stokes vector)
+    glm::dmat4x4 m_orientation = glm::dmat4x4();  //< Orientation matrix of element (is basis)
+    glm::dvec4 m_position = glm::dvec4();         //< Position of element in world coordinates
 
     int m_surfaceType;
     std::array<double, 16> m_surfaceParams;

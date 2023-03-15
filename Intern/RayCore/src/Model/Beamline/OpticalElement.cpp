@@ -8,23 +8,22 @@
 namespace RAYX {
 
 OpticalElement::OpticalElement(const DesignObject& dobj) {
-    // TODO(Rudi) replace try-catch stuff by std::optionals
     m_name = dobj.name();
     m_slopeError = dobj.parseSlopeError();
-    m_Geometry = std::make_unique<Geometry>();
     m_material = dobj.parseMaterial();
 
     auto [excerptTy, excerptParams] = dobj.parseExcerpt();
     m_excerptType = excerptTy;
     m_excerptParams = excerptParams;
 
+    // TODO(Rudi) replace try-catch stuff by std::optionals
     try {
-        m_Geometry->m_azimuthalAngle = dobj.parseAzimuthalAngle();
+        m_azimuthalAngle = dobj.parseAzimuthalAngle();
     } catch (std::runtime_error& e) {
     }
 
-    m_Geometry->m_position = dobj.parsePosition();
-    m_Geometry->m_orientation = dobj.parseOrientation();
+    m_position = dobj.parsePosition();
+    m_orientation = dobj.parseOrientation();
 }
 
 Element OpticalElement::intoElement() const {
@@ -38,7 +37,7 @@ Element OpticalElement::intoElement() const {
         .m_excerptType = (double)m_excerptType,
         .m_excerptParams = {m_excerptParams[0], m_excerptParams[1], m_excerptParams[2]},
         .m_slopeError = {m_slopeError[0], m_slopeError[1], m_slopeError[2], m_slopeError[3], m_slopeError[4], m_slopeError[5], m_slopeError[6]},
-        .m_azimuthalAngle = m_Geometry->m_azimuthalAngle.rad,
+        .m_azimuthalAngle = m_azimuthalAngle.rad,
         .m_material = (double)static_cast<int>(m_material),
         .m_padding = {0.0},
     };
@@ -48,16 +47,6 @@ Element OpticalElement::intoElement() const {
     }
 
     return e;
-}
-
-// ! Workaround for a bug in the gcc/clang compiler:
-// https://stackoverflow.com/questions/53408962/try-to-understand-compiler-error-message-default-member-initializer-required-be
-OpticalElement::Geometry::Geometry() = default;
-OpticalElement::Geometry::Geometry(const Geometry& other) = default;
-
-OpticalElement::OpticalElement(const char* name, const std::array<double, 7> slopeError, const Geometry& geometry)
-    : m_name(name), m_Geometry(std::make_unique<Geometry>(geometry)) {
-    m_slopeError = slopeError;
 }
 
 /**
@@ -91,19 +80,19 @@ void OpticalElement::calcTransformationMatrices(glm::dvec4 position, glm::dmat4 
 }
 
 glm::dmat4 OpticalElement::getInMatrix() const {
-    // return glmToArray16(m_Geometry->m_inMatrix);,
+    // return glmToArray16(m_inMatrix);,
     glm::dmat4 inMatrix = glm::dmat4();
-    calcTransformationMatrices(m_Geometry->m_position, m_Geometry->m_orientation, inMatrix);
+    calcTransformationMatrices(m_position, m_orientation, inMatrix);
     return inMatrix;
 }
 glm::dmat4 OpticalElement::getOutMatrix() const {
-    // return glmToArray16(m_Geometry->m_outMatrix);
+    // return glmToArray16(m_outMatrix);
     glm::dmat4 outMatrix = glm::dmat4();
-    calcTransformationMatrices(m_Geometry->m_position, m_Geometry->m_orientation, outMatrix, false);
+    calcTransformationMatrices(m_position, m_orientation, outMatrix, false);
     return outMatrix;
 }
-glm::dvec4 OpticalElement::getPosition() const { return m_Geometry->m_position; }
-glm::dmat4x4 OpticalElement::getOrientation() const { return m_Geometry->m_orientation; }
+glm::dvec4 OpticalElement::getPosition() const { return m_position; }
+glm::dmat4x4 OpticalElement::getOrientation() const { return m_orientation; }
 
 std::array<double, 7> OpticalElement::getSlopeError() const { return m_slopeError; }
 
