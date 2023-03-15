@@ -244,9 +244,7 @@ Collision findCollisionWith(Ray r, uint id) {
         col.found = false;
         col.elementIndex = int(id);
 
-        #ifndef GLSL
-        RAYX_ERR << "invalid surfaceType!";
-        #endif
+        throw("invalid surfaceType!");
         return col; // has found = false
     }
 

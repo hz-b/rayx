@@ -161,9 +161,7 @@ bool inExcerpt(double excerptTy, double x, double z, double excerptParams[3]) {
                      (z / (zLength / 2.0)) * (z / (zLength / 2.0));
         return rd2 <= 1.0;
     } else {
-        #ifndef GLSL
-        RAYX_ERR << "invalid excerptTy in wasteBox!";
-        #endif
+        throw("invalid excerptTy in wasteBox!");
         return false;
     }
 }
@@ -177,9 +175,7 @@ dvec2 getAtomicMassAndRho(int material) {
 #include "../../Material/materials.xmacro"
 #undef X
     }
-#ifndef GLSL
-    RAYX_ERR << "invalid material in getAtomicMassAndRho";
-#endif
+    throw("invalid material in getAtomicMassAndRho");
     return dvec2(0.0, 0.0);
 }
 
@@ -249,10 +245,7 @@ dvec2 getRefractiveIndex(double energy, int material) {
 
     // out of range check
     if (material < 1 || material > 92) {
-#ifndef GLSL
-        RAYX_ERR << "getRefractiveIndex material " << material
-                 << " out of range!";
-#endif
+        throw("getRefractiveIndex material out of range!");
         return dvec2(-1.0, -1.0);
     }
 
@@ -314,10 +307,7 @@ dvec2 getRefractiveIndex(double energy, int material) {
         return dvec2(n, k);
     }
 
-// error, no matching entry found.
-#ifndef GLSL
-    RAYX_ERR << "getRefractiveIndex: no matching entry found!";
-#endif
+    throw("getRefractiveIndex: no matching entry found!");
     return dvec2(-1.0, -1.0);
 }
 

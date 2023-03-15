@@ -130,6 +130,7 @@ struct Ray {
 /**************************************************************
  *                    Functions && vars
  **************************************************************/
+
 uint64_t rayId() {
     return uint64_t(pushConstants.rayIdStart) + uint64_t(gl_GlobalInvocationID);
 }
@@ -155,11 +156,11 @@ void uninitRays() {
 void takeSnapshot(Ray r, double w) {
     if (finalized) { return; }
 
-    #ifndef GLSL
     if (w == W_UNINIT) {
-        RAYX_ERR << "takeSnapshot called with W_UNINIT";
+        #ifndef GLSL
+        RAYX_ERR << "takeSnapshot failed: no free spots!";
+        #endif
     }
-    #endif
 
     for (uint i = 0; i < pushConstants.maxSnapshots; i++) {
         uint idx = output_index(i);
@@ -171,6 +172,7 @@ void takeSnapshot(Ray r, double w) {
     }
 
     // no spots were found.
+    // this shouldn't be using `throw`, as otherwise we might end up in infinite recursion.
     #ifndef GLSL
     RAYX_WARN << "takeSnapshot failed: no free spots!";
     #endif
@@ -182,6 +184,13 @@ void takeFinalSnapshot(Ray r, double w) {
     takeSnapshot(r, w);
     finalized = true;
 }
+
+// throws an error, and termiantes the program
+#ifdef GLSL
+#define throw(string) takeFinalSnapshot(_ray, W_FATAL_ERROR)
+#else
+#define throw(string) RAYX_ERR << string
+#endif
 
 /**************************************************************
  *                    Shader INCLUDEs
