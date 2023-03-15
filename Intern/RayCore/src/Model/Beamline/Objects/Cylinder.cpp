@@ -6,7 +6,6 @@
 #include "Data/xml.h"
 #include "Debug/Debug.h"
 #include "Material/Material.h"
-#include "Model/Surface/Quadric.h"
 #include "utils.h"
 
 namespace RAYX {
@@ -33,7 +32,8 @@ Cylinder::Cylinder(const DesignObject& dobj) : OpticalElement(dobj) {
         setRadius();
     }
 
-    setSurface(std::make_unique<Quadric>(std::array<double, 16>{m_a11, 0, 0, 0, icurv, 1, 0, m_a24, 0, 0, m_a33, 0, 0, 0, 0, 0}));
+    m_surfaceType = STY_QUADRIC;
+    m_surfaceParams = {m_a11, 0, 0, 0, icurv, 1, 0, m_a24, 0, 0, m_a33, 0, 0, 0, 0, 0};
 }
 
 /**

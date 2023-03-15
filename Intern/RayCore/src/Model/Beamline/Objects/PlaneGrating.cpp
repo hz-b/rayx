@@ -2,7 +2,6 @@
 
 #include "Constants.h"
 #include "Debug/Debug.h"
-#include "Model/Surface/Quadric.h"
 
 namespace RAYX {
 
@@ -14,8 +13,8 @@ PlaneGrating::PlaneGrating(const DesignObject& dobj) : OpticalElement(dobj) {
     m_vls = dobj.parseVls();
     RAYX_VERB << "design wavelength = " << abs(hvlam(m_designEnergyMounting));
 
-    // parameters of quadric surface
-    setSurface(std::make_unique<Quadric>(std::array<double, 16>{0, 0, 0, 0, 1, 0, 0, -1, 0, 0, 0, 0, 0, 0, 0, 0}));
+    m_surfaceType = STY_QUADRIC;
+    m_surfaceParams = {0, 0, 0, 0, 1, 0, 0, -1, 0, 0, 0, 0, 0, 0, 0, 0};
 }
 
 double PlaneGrating::getDesignEnergyMounting() const { return m_designEnergyMounting; }

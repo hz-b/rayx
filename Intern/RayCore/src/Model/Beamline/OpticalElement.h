@@ -6,7 +6,6 @@
 #include "Constants.h"
 #include "Core.h"
 #include "Data/xml.h"
-#include "Model/Surface/Surface.h"
 #include "utils.h"
 
 namespace RAYX {
@@ -36,8 +35,6 @@ class RAYX_API OpticalElement {
 
     virtual ~OpticalElement() = default;
 
-    void setSurface(std::unique_ptr<Surface> surface);
-
     void calcTransformationMatrices(glm::dvec4 position, glm::dmat4 orientation, glm::dmat4& output, bool calcInMatrix = true) const;
 
     glm::dmat4 getInMatrix() const;
@@ -45,7 +42,6 @@ class RAYX_API OpticalElement {
     glm::dmat4x4 getOrientation() const;
     glm::dvec4 getPosition() const;
 
-    std::array<double, 16> getSurfaceParams() const;
     virtual std::array<double, 16> getElementParams() const;
     virtual int getElementType() const = 0;
     std::array<double, 7> getSlopeError() const;
@@ -54,8 +50,10 @@ class RAYX_API OpticalElement {
     Material m_material;
 
   protected:
-    std::unique_ptr<Geometry> m_Geometry;   ///< Geometry of the element
-    std::unique_ptr<Surface> m_surfacePtr;  ///< Surface of the element
+    std::unique_ptr<Geometry> m_Geometry;  ///< Geometry of the element
+
+    int m_surfaceType;
+    std::array<double, 16> m_surfaceParams;
 
     std::array<double, 7> m_slopeError;
     int m_excerptType;

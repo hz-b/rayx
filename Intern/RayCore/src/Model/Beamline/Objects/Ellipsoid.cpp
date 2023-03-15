@@ -4,7 +4,6 @@
 #include "Data/xml.h"
 #include "Debug/Debug.h"
 #include "Material/Material.h"
-#include "Model/Surface/Quadric.h"
 
 namespace RAYX {
 
@@ -62,10 +61,11 @@ Ellipsoid::Ellipsoid(const DesignObject& dobj) : OpticalElement(dobj) {
     RAYX_VERB << "m_a44: " << m_a44;
 
     double icurv = 1;
-    setSurface(std::make_unique<Quadric>(std::array<double, 16>{m_a11, 0, 0, 0,              //
-                                                                icurv, m_a22, m_a23, m_a24,  //
-                                                                0, 0, m_a33, m_a34,          //
-                                                                0, 0, 0, m_a44}));
+    m_surfaceType = STY_QUADRIC;
+    m_surfaceParams = {m_a11, 0,     0,     0,      //
+                       icurv, m_a22, m_a23, m_a24,  //
+                       0,     0,     m_a33, m_a34,  //
+                       0,     0,     0,     m_a44};
 }
 
 void Ellipsoid::calculateCenterFromHalfAxes(Rad angle) {

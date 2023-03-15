@@ -4,8 +4,6 @@
 #include "Data/xml.h"
 #include "Debug/Debug.h"
 #include "Material/Material.h"
-#include "Model/Surface/Quadric.h"
-
 namespace RAYX {
 
 SphereGrating::SphereGrating(const DesignObject& dobj) : OpticalElement(dobj) {
@@ -16,7 +14,8 @@ SphereGrating::SphereGrating(const DesignObject& dobj) : OpticalElement(dobj) {
 
     m_gratingMount = dobj.parseGratingMount();
     auto radius = dobj.parseRadius();
-    setSurface(std::make_unique<Quadric>(std::array<double, 16>{1, 0, 0, 0, 1, 1, 0, -radius, 0, 0, 1, 0, 0, 0, 0, 0}));
+    m_surfaceType = STY_QUADRIC;
+    m_surfaceParams = {1, 0, 0, 0, 1, 1, 0, -radius, 0, 0, 1, 0, 0, 0, 0, 0};
 }
 
 double SphereGrating::getRadius() const { return m_radius; }

@@ -29,9 +29,6 @@ SET(SOURCE
     src/Model/Beamline/Objects/ToroidMirror.cpp
     src/Model/Beamline/Objects/Cylinder.cpp
     src/Model/Beamline/Objects/Cone.cpp
-    src/Model/Surface/Quadric.cpp
-    src/Model/Surface/Toroid.cpp
-    src/Model/Surface/Surface.cpp
     src/Material/Material.cpp
     src/Material/NffTable.cpp
     src/Material/PalikTable.cpp

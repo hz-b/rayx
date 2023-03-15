@@ -4,7 +4,6 @@
 #include "Data/xml.h"
 #include "Debug/Debug.h"
 #include "Material/Material.h"
-#include "Model/Surface/Quadric.h"
 
 namespace RAYX {
 
@@ -14,7 +13,8 @@ SphereMirror::SphereMirror(const DesignObject& dobj) : OpticalElement(dobj) {
     m_grazingIncidenceAngle = dobj.parseGrazingIncAngle();
 
     calcRadius();  // calculate the radius
-    setSurface(std::make_unique<Quadric>(std::array<double, 16>{1, 0, 0, 0, 1, 1, 0, -m_radius, 0, 0, 1, 0, 0, 0, 0, 0}));
+    m_surfaceType = STY_QUADRIC;
+    m_surfaceParams = {1, 0, 0, 0, 1, 1, 0, -m_radius, 0, 0, 1, 0, 0, 0, 0, 0};
 }
 
 // TODO(Theresa): move this to user params and just give the radius as a

@@ -2,7 +2,6 @@
 
 #include "Constants.h"
 #include "Debug/Debug.h"
-#include "Model/Surface/Quadric.h"
 
 namespace RAYX {
 Cone::Cone(const DesignObject& dobj) : OpticalElement(dobj) {
@@ -27,7 +26,8 @@ Cone::Cone(const DesignObject& dobj) : OpticalElement(dobj) {
         m_a24 = -m_upstreamRadius_R;
     }
 
-    setSurface(std::make_unique<Quadric>(std::array<double, 16>{m_a11, 0, 0, 0, icurv, m_a22, m_a23, m_a24, 0, 0, 0, 0, 0, 0, 0, 0}));
+    m_surfaceType = STY_QUADRIC;
+    m_surfaceParams = {m_a11, 0, 0, 0, icurv, m_a22, m_a23, m_a24, 0, 0, 0, 0, 0, 0, 0, 0};
 }
 
 Cone::~Cone() = default;

@@ -3,8 +3,6 @@
 #include "Constants.h"
 #include "Data/xml.h"
 #include "Debug/Debug.h"
-#include "Model/Surface/InfPlane.h"
-
 namespace RAYX {
 
 Slit::Slit(const DesignObject& dobj) : OpticalElement(dobj) {
@@ -33,7 +31,9 @@ Slit::Slit(const DesignObject& dobj) : OpticalElement(dobj) {
     m_excerptParams[2] = 0;
 
     m_excerptType = XTY_UNLIMITED;
-    setSurface(std::make_unique<InfPlane>());
+
+    m_surfaceType = STY_INF_PLANE;
+    m_surfaceParams = {0.0};
 }
 
 CentralBeamstop Slit::getCentralBeamstop() const { return m_centralBeamstop; }

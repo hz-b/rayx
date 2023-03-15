@@ -33,7 +33,7 @@ Element OpticalElement::intoElement() const {
         .m_outTrans = getOutMatrix(),
         .m_type = (double)getElementType(),
         .m_elementParams = {0},  // initialized below
-        .m_surfaceType = (double)m_surfacePtr->getSurfaceType(),
+        .m_surfaceType = (double)m_surfaceType,
         .m_surfaceParams = {0},  // initialized below
         .m_excerptType = (double)m_excerptType,
         .m_excerptParams = {m_excerptParams[0], m_excerptParams[1], m_excerptParams[2]},
@@ -44,7 +44,7 @@ Element OpticalElement::intoElement() const {
     };
     for (int i = 0; i < 16; i++) {
         e.m_elementParams[i] = getElementParams().data()[i];
-        e.m_surfaceParams[i] = getSurfaceParams().data()[i];
+        e.m_surfaceParams[i] = m_surfaceParams.data()[i];
     }
 
     return e;
@@ -58,16 +58,6 @@ OpticalElement::Geometry::Geometry(const Geometry& other) = default;
 OpticalElement::OpticalElement(const char* name, const std::array<double, 7> slopeError, const Geometry& geometry)
     : m_name(name), m_Geometry(std::make_unique<Geometry>(geometry)) {
     m_slopeError = slopeError;
-}
-
-void OpticalElement::setSurface(std::unique_ptr<Surface> surface) {
-    m_surfacePtr = std::move(surface);
-    if (surface) {
-        RAYX_ERR << "surface should be nullptr after move!";
-    }
-    if (!m_surfacePtr) {
-        RAYX_ERR << "m_surfacePtr should NOT be nullptr!";
-    }
 }
 
 /**
@@ -114,16 +104,6 @@ glm::dmat4 OpticalElement::getOutMatrix() const {
 }
 glm::dvec4 OpticalElement::getPosition() const { return m_Geometry->m_position; }
 glm::dmat4x4 OpticalElement::getOrientation() const { return m_Geometry->m_orientation; }
-
-std::array<double, 16> OpticalElement::getSurfaceParams() const {
-    // assert(m_surfacePtr!=nullptr);
-    if (m_surfacePtr != nullptr)
-        return m_surfacePtr->getParams();
-    else {
-        RAYX_ERR << "Object without surface!";
-        exit(1);
-    }
-}
 
 std::array<double, 7> OpticalElement::getSlopeError() const { return m_slopeError; }
 

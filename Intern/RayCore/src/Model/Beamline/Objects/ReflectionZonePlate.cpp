@@ -4,8 +4,6 @@
 #include "Data/xml.h"
 #include "Debug/Debug.h"
 #include "Material/Material.h"
-#include "Model/Surface/Quadric.h"
-#include "Model/Surface/Toroid.h"
 
 namespace RAYX {
 
@@ -34,14 +32,17 @@ ReflectionZonePlate::ReflectionZonePlate(const DesignObject& dobj) : OpticalElem
 
     // set parameters in Quadric class
     if (m_curvatureType == CurvatureType::Plane) {
-        setSurface(std::make_unique<Quadric>(std::array<double, 16>{0, 0, 0, 0, 1, 0, 0, -1, 0, 0, 0, 0, 0, 0, 0, 0}));
+        m_surfaceType = STY_QUADRIC;
+        m_surfaceParams = {0, 0, 0, 0, 1, 0, 0, -1, 0, 0, 0, 0, 0, 0, 0, 0};
     } else if (m_curvatureType == CurvatureType::Toroidal) {
         m_longRadius = dobj.parseLongRadius();    // for sphere and toroidal
         m_shortRadius = dobj.parseShortRadius();  // only for Toroidal
-        setSurface(std::make_unique<Toroid>(m_longRadius, m_shortRadius));
+        m_surfaceType = STY_TOROID;
+        m_surfaceParams = {m_longRadius, m_shortRadius};
     } else {
         m_longRadius = dobj.parseLongRadius();  // for sphere and toroidal
-        setSurface(std::make_unique<Quadric>(std::array<double, 16>{1, 0, 0, 0, 1, 1, 0, -m_longRadius, 0, 0, 1, 0, 0, 0, 0, 0}));
+        m_surfaceType = STY_QUADRIC;
+        m_surfaceParams = {1, 0, 0, 0, 1, 1, 0, -m_longRadius, 0, 0, 1, 0, 0, 0, 0, 0};
     }
 
     printInfo();
