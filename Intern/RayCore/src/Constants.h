@@ -63,21 +63,22 @@ struct Element {
     double m_elementParams[16];
 
     // the surface type of this element, see the STY constants.
-    // the surface type describes how the surfaceParams need to be inerpreted.
+    // the surface type describes how the surfaceParams need to be interpreted.
     double m_surfaceType;
     double m_surfaceParams[16];
 
+    // describes how excerptParams are interpreted, see the XTY constants.
+    double m_excerptType;
+    double m_excerptParams[3];
+
     // general object information
-    double m_widthA;
-    double m_widthB;
-    double m_height;
     double m_slopeError[7];
     double m_azimuthalAngle;
     double m_material;
 
     // This field is unused, it's only there to guarantee that sizeof(Element) is divisible by sizeof(dmat4).
     // Should guarantee that std430 in GLSL and c++ have the same memory layout for `Element`.
-    double m_padding[2];
+    double m_padding[1];
 };
 
 // -----------------------------------------
@@ -94,8 +95,19 @@ const int TY_RZP = 3;
 const int TY_IMAGE_PLANE = 4;
 
 // surface types:
+// a surface is a potentially infinite curved surface in 3d space.
+// as our elements are mostly finite in size, they are represented by a (potentially infinite) surface in combination with a finite excerpt (see XTY
+// constants)
 const int STY_QUADRIC = 0;
 const int STY_TOROID = 1;
 const int STY_INF_PLANE = 2;  // an infinite X-Y plane.
+
+// excerpt types:
+// a subset of points in the 2d plane. used to limited the potentially infinite surfaces.
+// note that the first 3 need to be RECT; ELLIPTICAL; TRAPEZOID in order to be compatible with Ray-UI.
+const int XTY_RECT = 0;
+const int XTY_ELLIPTICAL = 1;
+const int XTY_TRAPEZOID = 2;
+const int XTY_UNLIMITED = 3;
 
 #endif

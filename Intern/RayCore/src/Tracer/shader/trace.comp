@@ -24,8 +24,8 @@ Ray traceSlit(Ray r, Slit slit, INOUT(uint64_t) ctr, Collision col) {
     r.m_pathLength += length(old_position - r.m_position);
     r.m_lastElement = slit.id + 1;
 
-    double x_extent = width(slit);
-    double y_extent = height(slit);
+    double x_extent = gapWidthA(slit);
+    double y_extent = gapHeight(slit);
     double xStop    = beamstopWidth(slit);
     double yStop    = beamstopHeight(slit);
 

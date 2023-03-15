@@ -124,40 +124,47 @@ bool wasteBox(double x, double z, double xLength, double zLength) {
     }
 }
 
-// ! temporary for testing purposes (trapezoid)
-bool wasteBox(double x, double z, double xLengthA, double xLengthB, double zLength) {
-    if (xLengthA >= 0) {     // Rectangular shape
-        if (xLengthB > 0) {  // Trapezoid shape
-            // Check point is within the trapezoid
-            dvec3 P = dvec3(x, 0, z);
-            dvec3 A = dvec3(-xLengthA / 2.0, 0, -zLength / 2.0);
-            dvec3 B = dvec3(xLengthA / 2.0, 0, -zLength / 2.0);
-            dvec3 C = dvec3(xLengthB / 2.0, 0, zLength / 2.0);
-            dvec3 D = dvec3(-xLengthB / 2.0, 0, zLength / 2.0);
+bool inExcerpt(double excerptTy, double x, double z, double excerptParams[3]) {
+    double xLengthA = excerptParams[0];
+    double xLengthB = excerptParams[1];
+    double zLength = excerptParams[2];
+    if (excerptTy == XTY_UNLIMITED) {
+        return true;
+    } else if (excerptTy == XTY_RECT) {
+        double x_min = -xLengthA / 2.0;
+        double x_max = xLengthA / 2.0;
+        double z_min = -zLength / 2.0;
+        double z_max = zLength / 2.0;
 
-            dvec3 PmA = P - A;
-            dvec3 BmA = B - A;
-            dvec3 PmD = P - D;
-            dvec3 CmD = C - D;
-            dvec3 DmA = D - A;
-            dvec3 PmB = P - B;
-            dvec3 CmB = C - B;
+        return !(x <= x_min || x >= x_max || z <= z_min || z >= z_max);
+    } else if (excerptTy == XTY_TRAPEZOID) {
+        // Check point is within the trapezoid
+        dvec3 P = dvec3(x, 0, z);
+        dvec3 A = dvec3(-xLengthA / 2.0, 0, -zLength / 2.0);
+        dvec3 B = dvec3(xLengthA / 2.0, 0, -zLength / 2.0);
+        dvec3 C = dvec3(xLengthB / 2.0, 0, zLength / 2.0);
+        dvec3 D = dvec3(-xLengthB / 2.0, 0, zLength / 2.0);
 
-            double l1 = ((PmA.x * BmA.z - PmA.z * BmA.x) * (PmD.x * CmD.z - PmD.z * CmD.x));
-            double l2 = ((PmA.x * DmA.z - PmA.z * DmA.x) * (PmB.x * CmB.z - PmB.z * CmB.x));
-            return l1 < 0 && l2 < 0;
-        } else {
-            double x_min = -xLengthA / 2.0;
-            double x_max = xLengthA / 2.0;
-            double z_min = -zLength / 2.0;
-            double z_max = zLength / 2.0;
+        dvec3 PmA = P - A;
+        dvec3 BmA = B - A;
+        dvec3 PmD = P - D;
+        dvec3 CmD = C - D;
+        dvec3 DmA = D - A;
+        dvec3 PmB = P - B;
+        dvec3 CmB = C - B;
 
-            return !(x <= x_min || x >= x_max || z <= z_min || z >= z_max);
-        }
-    } else {  // Ring shape
+        double l1 = ((PmA.x * BmA.z - PmA.z * BmA.x) * (PmD.x * CmD.z - PmD.z * CmD.x));
+        double l2 = ((PmA.x * DmA.z - PmA.z * DmA.x) * (PmB.x * CmB.z - PmB.z * CmB.x));
+        return l1 < 0 && l2 < 0;
+    } else if (excerptTy == XTY_ELLIPTICAL) {
         double rd2 = (x / (xLengthA / 2.0)) * (x / (xLengthA / 2.0)) +
                      (z / (zLength / 2.0)) * (z / (zLength / 2.0));
         return rd2 <= 1.0;
+    } else {
+        #ifndef GLSL
+        RAYX_ERR << "invalid excerptTy in wasteBox!";
+        #endif
+        return false;
     }
 }
 

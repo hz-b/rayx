@@ -13,32 +13,32 @@ struct ImagePlane { uint id; };
 
 double param_e(uint id, uint i) { return elements[id].m_elementParams[i]; }
 double param_s(uint id, uint i) { return elements[id].m_surfaceParams[i]; }
+double param_x(uint id, uint i) { return elements[id].m_excerptParams[i]; }
 
 /**************************************************************
  *      element-type independent access functions:
  **************************************************************/
-double widthA(uint id) { return elements[id].m_widthA; }
-double width(uint id) { return elements[id].m_widthA; }
-
-double height(uint id) { return elements[id].m_height; }
-double widthB(uint id) { return elements[id].m_widthB; }
 double type(uint id) { return elements[id].m_type; }
 double surfaceType(uint id) { return elements[id].m_surfaceType; }
+double excerptType(uint id) { return elements[id].m_excerptType; }
 double material(uint id) { return elements[id].m_material; }
 double azimuthalAngle(uint id) { return elements[id].m_azimuthalAngle; }
 dmat4 inTrans(uint id) { return elements[id].m_inTrans; }
 dmat4 outTrans(uint id) { return elements[id].m_outTrans; }
-double longRadius(uint id) { return param_s(id, 0); }
-double shortRadius(uint id) { return param_s(id, 1); }
-
 double slopeX(uint id) { return elements[id].m_slopeError[0]; }
 double slopeZ(uint id) { return elements[id].m_slopeError[1]; }
+
+// only usable for STY_TOROID.
+// TODO add checks
+double longRadius(uint id) { return param_s(id, 0); }
+double shortRadius(uint id) { return param_s(id, 1); }
 
 /**************************************************************
  *                    Slit
  **************************************************************/
-double width(Slit e) { return width(e.id); }
-double height(Slit e) { return height(e.id); }
+double gapWidthA(Slit e) { return param_e(e.id, 2); }
+double gapWidthB(Slit e) { return param_e(e.id, 3); }
+double gapHeight(Slit e) { return param_e(e.id, 4); }
 double beamstopWidth(Slit e) { return param_e(e.id, 0); }
 double beamstopHeight(Slit e) { return param_e(e.id, 1); }
 
@@ -49,17 +49,12 @@ double curvatureType(Rzp e) { return param_e(e.id, 4); }
 double elementOffsetZ(Rzp e) { return param_e(e.id, 14); }
 double longRadius(Rzp e) { return param_s(e.id, 0); }
 double shortRadius(Rzp e) { return param_s(e.id, 1); }
-double widthA(Rzp e) { return width(e.id); }
-double widthB(Rzp e) { return widthB(e.id); }
-double height(Rzp e) { return height(e.id); }
 double slopeX(Rzp e) { return slopeX(e.id); }
 double slopeZ(Rzp e) { return slopeZ(e.id); }
 
 /**************************************************************
  *                    Grating
  **************************************************************/
-double width(Grating e) { return width(e.id); }
-double height(Grating e) { return height(e.id); }
 double slopeX(Grating e) { return slopeX(e.id); }
 double slopeZ(Grating e) { return slopeZ(e.id); }
 
@@ -67,9 +62,6 @@ double slopeZ(Grating e) { return slopeZ(e.id); }
  *                    Mirror
  **************************************************************/
 double azimuthalAngle(Mirror e) { return azimuthalAngle(e.id); }
-double widthA(Mirror e) { return widthA(e.id); }
-double widthB(Mirror e) { return widthB(e.id); }
-double height(Mirror e) { return height(e.id); }
 double slopeX(Mirror e) { return slopeX(e.id); }
 double slopeZ(Mirror e) { return slopeZ(e.id); }
 double material(Mirror e) { return material(e.id); }

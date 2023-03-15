@@ -24,6 +24,15 @@ Slit::Slit(const DesignObject& dobj) : OpticalElement(dobj) {
         m_beamstopHeight = beamstopHeight;
     }
 
+    m_gapWidthA = m_excerptParams[0];
+    m_gapWidthB = m_excerptParams[1];
+    m_gapHeight = m_excerptParams[2];
+
+    m_excerptParams[0] = 0;
+    m_excerptParams[1] = 0;
+    m_excerptParams[2] = 0;
+
+    m_excerptType = XTY_UNLIMITED;
     setSurface(std::make_unique<InfPlane>());
 }
 
@@ -32,6 +41,6 @@ double Slit::getBeamstopWidth() const { return m_beamstopWidth; }
 double Slit::getBeamstopHeight() const { return m_beamstopHeight; }
 
 std::array<double, 16> Slit::getElementParams() const {
-    return {m_beamstopWidth / 2, m_beamstopHeight / 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+    return {m_beamstopWidth / 2, m_beamstopHeight / 2, m_gapWidthA, m_gapWidthB, m_gapHeight, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 }
 }  // namespace RAYX

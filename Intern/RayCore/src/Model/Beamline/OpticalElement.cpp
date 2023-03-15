@@ -14,24 +14,10 @@ OpticalElement::OpticalElement(const DesignObject& dobj) {
     m_Geometry = std::make_unique<Geometry>();
     m_material = dobj.parseMaterial();
 
-    double widthB = 0.0;
-    xml::paramDouble(dobj.node, "totalWidthB", &widthB);
-    try {
-        m_Geometry->m_geometricalShape = dobj.parseGeometricalShape();
-    } catch (std::runtime_error& e) {
-    }
-    std::optional<double> lengthOrHeight;
-    try {
-        lengthOrHeight = dobj.parseTotalLength();
-    } catch (std::runtime_error& e) {
-        try {
-            lengthOrHeight = dobj.parseTotalHeight();
-        } catch (std::runtime_error& e) {
-        }
-    }
-    if (lengthOrHeight) {
-        m_Geometry->setHeightWidth(lengthOrHeight.value(), dobj.parseTotalWidth(), widthB);
-    }
+    auto [excerptTy, excerptParams] = dobj.parseExcerpt();
+    m_excerptType = excerptTy;
+    m_excerptParams = excerptParams;
+
     try {
         m_Geometry->m_azimuthalAngle = dobj.parseAzimuthalAngle();
     } catch (std::runtime_error& e) {
@@ -49,13 +35,12 @@ Element OpticalElement::intoElement() const {
         .m_elementParams = {0},  // initialized below
         .m_surfaceType = (double)m_surfacePtr->getSurfaceType(),
         .m_surfaceParams = {0},  // initialized below
-        .m_widthA = m_Geometry->m_widthA,
-        .m_widthB = m_Geometry->m_widthB,
-        .m_height = m_Geometry->m_height,
+        .m_excerptType = (double)m_excerptType,
+        .m_excerptParams = {m_excerptParams[0], m_excerptParams[1], m_excerptParams[2]},
         .m_slopeError = {m_slopeError[0], m_slopeError[1], m_slopeError[2], m_slopeError[3], m_slopeError[4], m_slopeError[5], m_slopeError[6]},
         .m_azimuthalAngle = m_Geometry->m_azimuthalAngle.rad,
         .m_material = (double)static_cast<int>(m_material),
-        .m_padding = {0.0, 0.0},
+        .m_padding = {0.0},
     };
     for (int i = 0; i < 16; i++) {
         e.m_elementParams[i] = getElementParams().data()[i];
@@ -69,23 +54,6 @@ Element OpticalElement::intoElement() const {
 // https://stackoverflow.com/questions/53408962/try-to-understand-compiler-error-message-default-member-initializer-required-be
 OpticalElement::Geometry::Geometry() = default;
 OpticalElement::Geometry::Geometry(const Geometry& other) = default;
-
-/**
- * @brief Setting height and width based on geometrical shape
- * @param height Height of the element
- * @param widthA Width of the element
- * @param widthB Only used for trapezoid - Width of the elements edge further to the z-direction
- */
-void OpticalElement::Geometry::setHeightWidth(double height, double widthA, double widthB) {
-    m_widthB = widthB;
-    if (m_geometricalShape == GeometricalShape::ELLIPTICAL) {
-        m_widthA = -widthA;
-        m_height = -height;
-    } else {
-        m_widthA = widthA;
-        m_height = height;
-    }
-}
 
 OpticalElement::OpticalElement(const char* name, const std::array<double, 7> slopeError, const Geometry& geometry)
     : m_name(name), m_Geometry(std::make_unique<Geometry>(geometry)) {
@@ -131,11 +99,6 @@ void OpticalElement::calcTransformationMatrices(glm::dvec4 position, glm::dmat4 
         return;
     }
 }
-
-// ! temporary adjustment for trapezoid (10/11/2021)
-double OpticalElement::getWidth() { return m_Geometry->m_widthA; }
-
-double OpticalElement::getHeight() { return m_Geometry->m_height; }
 
 glm::dmat4 OpticalElement::getInMatrix() const {
     // return glmToArray16(m_Geometry->m_inMatrix);,

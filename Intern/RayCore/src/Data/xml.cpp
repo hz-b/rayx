@@ -6,6 +6,7 @@
 #include <iostream>
 #include <utility>
 
+#include "Constants.h"
 #include "Debug/Debug.h"
 #include "Model/Beamline/EnergyDistribution.h"
 #include "Model/Beamline/LightSource.h"
@@ -486,6 +487,40 @@ Material Parser::parseMaterial() const {
         return Material::Cu;
     }
     return m;
+}
+
+std::tuple<int, std::array<double, 3>> Parser::parseExcerpt() const {
+    int geom_shape;
+    if (!paramInt(node, "geometricalShape", &geom_shape)) {
+        return {XTY_UNLIMITED, {0.0, 0.0, 0.0}};
+    }
+
+    if (geom_shape == XTY_RECT) {
+        double width = parseTotalWidth();
+        double len;
+        // TODO why is this inconsistent in the .rml files?
+        try {
+            len = parseTotalLength();
+        } catch (std::runtime_error& e) {
+            len = parseTotalHeight();
+        }
+        return {XTY_RECT, {width, 0.0, len}};
+    } else if (geom_shape == XTY_ELLIPTICAL) {
+        // TODO test this!
+        double width = parseTotalWidth();
+        double height = parseTotalHeight();
+        return {XTY_RECT, {width, 0.0, height}};
+    } else if (geom_shape == XTY_TRAPEZOID) {
+        // TODO test this!
+        double widthB = parseDouble("totalWidthB");
+        double length = parseTotalWidth();
+        double height = parseTotalHeight();
+
+        return {XTY_TRAPEZOID, {length, widthB, height}};
+    } else {
+        RAYX_ERR << "invalid geom_shape!";
+        return {0, {0.0, 0.0, 0.0}};
+    }
 }
 
 }  // namespace RAYX::xml
