@@ -2,6 +2,7 @@
 
 
 - [App Area](./App/App.md)
+    - [Getting Started](./App/Getting-Started.md)
     - [How to use TerminalApp](./App/How-to-use-the-TerminalApp.md)
     - [Literature](./App/Literature.md)
 
@@ -17,8 +18,7 @@
 - [Developer Area](./Developer/Developer.md)
     - [Introduction](./Developer/Introduction/00-Introduction.md)
         - [How to Build](./Developer/Introduction/01-How-to-Build.md)
-        - [Getting Started](./Developer/Introduction/02-Getting-Started.md)
-        - [Style Guide for Programming in RAY](./Developer/Introduction/03-Style-Guide-for-Programming-in-Ray.md)
+        - [Style Guide for Programming in RAY](./Developer/Introduction/02-Style-Guide-for-Programming-in-Ray.md)
     - [Model](./Developer/Model/Model.md)
         - [Objects](./Developer/Model/Objects/Objects.md)
             - [Reflection Zone Plate (RZP)](./Developer/Model/Objects/RZP.md)

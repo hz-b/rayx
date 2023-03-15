@@ -4,9 +4,7 @@ Here you can find a collection of rules for our code base, which developed over 
 
 ## General
 
-Keep collective ownership of the code in mind, when writing it (write code to be read by your team mates, not the compiler). 
-
-So keep it stupid simple. In most places it is not necessary or sensible to optimise the runtime of code to the last CPU cycle. Often the compiler does it better than the programmer anyways.
+Keep collective ownership of the code in mind, when writing it (write code to be read by your team mates, not the compiler). Remember to KISS (Keep it stupid simple).
 
 ## Includes
 As an easy step towards readability we divide includes in the following way: 
@@ -26,7 +24,7 @@ Write comments often and as precise as possible. Comments should contain what yo
 
 ```c++
 /**
-* a desctription (should be helpful)
+* a desctription (don't just repeat the function name)
 * @param value1 	what the parameter value1 does
 * @param value2 	what the parameter value2 does
 * @see related function
@@ -40,7 +38,7 @@ This is how a comment before a function should look. It contains a brief descrip
 
 As longer names can contain more than one word, it can help to have a visual divider. In the case of Ray-UI we use "camelCase" and "PascalCase". When to use what, will be in the next section. 
 
-The upper case letter indicates a new word and thus improves readability. Every name should be able to stand alone and describe the object, function or variable. Something like "int v;" does not achieve this. This also means only using common abbreviations, like "val" for "value" or "dx" for a distance over x.
+The upper case letter indicates a new word and thus improves readability. Every name should be able to stand alone and describe the object, function or variable. Something like "int v;" does not achieve this. This also means to avoid using abbreviations, besides the most common ones ("val" for "value" or "dx" for a distance over x).
 
 Avoid using symbols or variable names from formulas for naming variables in the code. This makes the code a riddle to decipher, without further information.
 The correct ways to do this:
