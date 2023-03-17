@@ -71,9 +71,9 @@ struct Element {
     double m_surfaceType;
     double m_surfaceParams[16];
 
-    // describes how excerptParams are interpreted, see the XTY constants.
-    double m_excerptType;
-    double m_excerptParams[3];
+    // describes how cutoutParams are interpreted, see the CTY constants.
+    double m_cutoutType;
+    double m_cutoutParams[3];
 
     // general object information
     double m_slopeError[7];
@@ -100,18 +100,18 @@ const int TY_IMAGE_PLANE = 4;
 
 // surface types:
 // a surface is a potentially infinite curved surface in 3d space.
-// as our elements are mostly finite in size, they are represented by a (potentially infinite) surface in combination with a finite excerpt (see XTY
+// as our elements are mostly finite in size, they are represented by a (potentially infinite) surface in combination with a finite cutout (see CTY
 // constants)
 const int STY_QUADRIC = 0;
 const int STY_TOROID = 1;
 const int STY_PLANE_XY = 2;  // an infinite X-Y plane.
 
-// excerpt types:
+// cutout types:
 // a subset of points in the 2d plane. used to limited the potentially infinite surfaces.
 // note that the first 3 need to be RECT; ELLIPTICAL; TRAPEZOID in order to be compatible with Ray-UI.
-const int XTY_RECT = 0;  // excerpt parameters are (width, 0, length).
-const int XTY_ELLIPTICAL = 1;
-const int XTY_TRAPEZOID = 2;
-const int XTY_UNLIMITED = 3;  // excerpt parameters are (0, 0, 0).
+const int CTY_RECT = 0;  // cutout parameters are (width, 0, length).
+const int CTY_ELLIPTICAL = 1;
+const int CTY_TRAPEZOID = 2;
+const int CTY_UNLIMITED = 3;  // cutout parameters are (0, 0, 0).
 
 #endif

@@ -13,14 +13,14 @@ struct ImagePlane { uint id; };
 
 double param_e(uint id, uint i) { return elements[id].m_elementParams[i]; }
 double param_s(uint id, uint i) { return elements[id].m_surfaceParams[i]; }
-double param_x(uint id, uint i) { return elements[id].m_excerptParams[i]; }
+double param_x(uint id, uint i) { return elements[id].m_cutoutParams[i]; }
 
 /**************************************************************
  *      element-type independent access functions:
  **************************************************************/
 double type(uint id) { return elements[id].m_type; }
 double surfaceType(uint id) { return elements[id].m_surfaceType; }
-double excerptType(uint id) { return elements[id].m_excerptType; }
+double cutoutType(uint id) { return elements[id].m_cutoutType; }
 double material(uint id) { return elements[id].m_material; }
 double azimuthalAngle(uint id) { return elements[id].m_azimuthalAngle; }
 dmat4 inTrans(uint id) { return elements[id].m_inTrans; }

@@ -248,7 +248,7 @@ Collision findCollisionWith(Ray r, uint id) {
         return col; // has found = false
     }
 
-    if (!inExcerpt(excerptType(id), col.hitpoint.x, col.hitpoint.z, elements[id].m_excerptParams)) {
+    if (!inCutout(cutoutType(id), col.hitpoint.x, col.hitpoint.z, elements[id].m_cutoutParams)) {
         col.found = false;
     }
     return col;

@@ -22,15 +22,15 @@ Slit::Slit(const DesignObject& dobj) : OpticalElement(dobj) {
         m_beamstopHeight = beamstopHeight;
     }
 
-    m_gapWidthA = m_excerptParams[0];
-    m_gapWidthB = m_excerptParams[1];
-    m_gapHeight = m_excerptParams[2];
+    m_gapWidthA = m_cutoutParams[0];
+    m_gapWidthB = m_cutoutParams[1];
+    m_gapHeight = m_cutoutParams[2];
 
-    m_excerptParams[0] = 0;
-    m_excerptParams[1] = 0;
-    m_excerptParams[2] = 0;
+    m_cutoutParams[0] = 0;
+    m_cutoutParams[1] = 0;
+    m_cutoutParams[2] = 0;
 
-    m_excerptType = XTY_UNLIMITED;
+    m_cutoutType = CTY_UNLIMITED;
 
     m_surfaceType = STY_PLANE_XY;
     m_surfaceParams = {0.0};

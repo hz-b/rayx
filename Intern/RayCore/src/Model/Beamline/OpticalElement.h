@@ -46,8 +46,8 @@ class RAYX_API OpticalElement {
     std::array<double, 16> m_surfaceParams;
 
     std::array<double, 7> m_slopeError;
-    int m_excerptType;
-    std::array<double, 3> m_excerptParams;
+    int m_cutoutType;
+    std::array<double, 3> m_cutoutParams;
 };
 
 }  // namespace RAYX

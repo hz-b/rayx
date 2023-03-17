@@ -81,9 +81,9 @@ struct Parser {
     glm::dvec4 parsePosition() const;
     glm::dmat4x4 parseOrientation() const;
     Material parseMaterial() const;
-    // The `int` represents an XTY, and the double array are it's 3 params.
+    // The `int` represents an CTY, and the double array are it's 3 params.
     // Sadly, the int can't be an enum to be compatible with glsl.
-    std::tuple<int, std::array<double, 3>> parseExcerpt() const;
+    std::tuple<int, std::array<double, 3>> parseCutout() const;
 
     // parsers for trivial derived parameters
     inline int parseNumberRays() const { return parseInt("numberRays"); }
