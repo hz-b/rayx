@@ -78,7 +78,6 @@ Ray RAYX_API refrac2D(Ray, glm::dvec4, double, double);
 Ray RAYX_API refrac(Ray, glm::dvec4, double);
 glm::dvec4 RAYX_API normal_cartesian(glm::dvec4, double, double);
 glm::dvec4 RAYX_API normal_cylindrical(glm::dvec4, double, double);
-bool RAYX_API wasteBox(double, double, double, double);
 void RAYX_API RZPLineDensity(Ray r, glm::dvec4 normal, int IMAGE_TYPE, int RZP_TYPE, int DERIVATION_METHOD, double zOffsetCenter, double risag,
                              double rosag, double rimer, double romer, double alpha, double beta, double Ord, double WL, double& DX, double& DZ);
 Ray RAYX_API rayMatrixMult(Ray, glm::dmat4);
@@ -90,7 +89,6 @@ double RAYX_API r8_sin(double);
 double RAYX_API r8_cos(double);
 double RAYX_API r8_atan(double);
 double RAYX_API vlsGrating(double, double, double[6]);
-void RAYX_API diffraction(int iopt, double xLength, double yLength, double wl, double& dPhi, double& dPsi, uint64_t& ctr);
 Ray RAYX_API refrac_plane(Ray, glm::dvec4, double);
 double RAYX_API getIncidenceAngle(Ray r, glm::dvec4 normal);
 void RAYX_API reflectance(double energy, double incidence_angle, glm::dvec2& complex_S, glm::dvec2& complex_P, int material);

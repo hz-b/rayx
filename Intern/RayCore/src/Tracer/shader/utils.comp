@@ -102,28 +102,7 @@ void cosini(INOUT(Ray) r, double phi, double psi) {
     r.m_direction.z = cos_psi * cos_phi;
 }
 
-/**
- * checks whether the intersection point is within the extent of the surface
- * @param x, z			 	x- and z-coordinates of the intersection point in
- * element coordinates
- * @param xLength, zLength	width and length of the optical element
- *
- * returns `true` if intersection point is within surface boundaries.
- */
-bool wasteBox(double x, double z, double xLength, double zLength) {
-    if (xLength >= 0) {  // Rectangular shape
-        double x_min = -xLength / 2.0;
-        double x_max = xLength / 2.0;
-        double z_min = -zLength / 2.0;
-        double z_max = zLength / 2.0;
-        return x > x_min && x < x_max && z > z_min && z < z_max;
-    } else {                  // Ring shape
-        double rd2 = (x / (xLength / 2.0)) * (x / (xLength / 2.0)) +
-                     (z / (zLength / 2.0)) * (z / (zLength / 2.0));
-        return rd2 <= 1.0;
-    }
-}
-
+// checks whether the point (x, z) is within the cutout given by (cutoutTy, cutoutParams).
 bool inCutout(double cutoutTy, double x, double z, double cutoutParams[3]) {
     double xLengthA = cutoutParams[0];
     double xLengthB = cutoutParams[1];
@@ -977,30 +956,5 @@ void fraun_diff(double dim, double wl, INOUT(double) dAngle,
             wd = wd * wd;
         }
         c = wd - rna[1];
-    }
-}
-
-void diffraction(int iopt, double xLength, double yLength, double wl,
-                 INOUT(double) dPhi, INOUT(double) dPsi, INOUT(uint64_t) ctr) {
-    if (wl <= 0) return;
-
-    double yl = yLength;
-    double xl = xLength;
-
-    if (xLength > 0) {          // rectangular slit, zoneplate
-        if (iopt == 3) {        // zoneplate
-            if (yLength > 0) {  // in x direction
-                yl = 0;
-            } else if (yLength < 0) {  // in y direction, what about ==0?
-                xl = 0;
-            }
-        }
-        fraun_diff(xl, wl, dPhi, ctr);
-        fraun_diff(yl, wl, dPsi, ctr);
-    } else {  // circular slit
-        if (iopt == 1) {
-            xl = yLength;  // SL R_max
-        }
-        bessel_diff(xl, wl, dPhi, dPsi, ctr);
     }
 }

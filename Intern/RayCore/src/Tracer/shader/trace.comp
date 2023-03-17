@@ -24,13 +24,12 @@ Ray traceSlit(Ray r, Slit slit, INOUT(uint64_t) ctr, Collision col) {
     r.m_pathLength += length(old_position - r.m_position);
     r.m_lastElement = slit.id + 1;
 
-    double x_extent = gapWidthA(slit);
-    double y_extent = gapHeight(slit);
     double xStop    = beamstopWidth(slit);
     double yStop    = beamstopHeight(slit);
 
     // slit lies in x-y plane instead of x-z plane as other elements
-    bool withinSlitBounds = wasteBox(r.m_position[0], r.m_position[1], x_extent, y_extent);
+    double params[3] = {gapCutoutParam0(slit), gapCutoutParam1(slit), gapCutoutParam2(slit)};
+    bool withinSlitBounds = inCutout(gapCutoutType(slit), r.m_position[0], r.m_position[1], params);
     bool outsideOfBeamstop = stopBox(r.m_position[0], r.m_position[1], xStop, yStop);
 
     if (!withinSlitBounds || !outsideOfBeamstop) {
@@ -40,13 +39,27 @@ Ray traceSlit(Ray r, Slit slit, INOUT(uint64_t) ctr, Collision col) {
 
     double psi        = -r8_asin(r.m_direction.y);
     double phi        = r8_asin(r.m_direction.x / r8_cos(psi));
-    double delPhi     = 0;
-    double delPsi     = 0;
-    int iopt          = 1;                             // 1 = slit, 3 = zone plate
+    double dPhi     = 0;
+    double dPsi     = 0;
     double wavelength = hvlam(r.m_energy);
-    diffraction(iopt, x_extent, y_extent, wavelength, delPhi, delPsi, ctr);
-    phi = phi + delPhi;
-    psi = psi + delPsi;
+
+    // this was previously called "diffraction"
+    if (wavelength > 0) {
+        double yl = gapCutoutParam0(slit);
+        double xl = gapCutoutParam2(slit);
+        if (gapCutoutType(slit) == CTY_RECT) {
+            fraun_diff(xl, wavelength, dPhi, ctr);
+            fraun_diff(yl, wavelength, dPsi, ctr);
+        } else if (gapCutoutType(slit) == CTY_ELLIPTICAL) {
+            xl = gapCutoutParam2(slit);
+            bessel_diff(xl, wavelength, dPhi, dPsi, ctr);
+        } else {
+            throw("encountered Slit with unsupported gapCutoutType");
+        }
+    }
+
+    phi = phi + dPhi;
+    psi = psi + dPsi;
 
     // new direction from angles
     cosini(r, phi, psi);

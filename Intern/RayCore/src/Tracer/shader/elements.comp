@@ -46,11 +46,12 @@ double shortRadius(uint id) {
 /**************************************************************
  *                    Slit
  **************************************************************/
-double gapWidthA(Slit e) { return param_e(e.id, 2); }
-double gapWidthB(Slit e) { return param_e(e.id, 3); }
-double gapHeight(Slit e) { return param_e(e.id, 4); }
 double beamstopWidth(Slit e) { return param_e(e.id, 0); }
 double beamstopHeight(Slit e) { return param_e(e.id, 1); }
+double gapCutoutType(Slit e) { return param_e(e.id, 2); }
+double gapCutoutParam0(Slit e) { return param_e(e.id, 3); }
+double gapCutoutParam1(Slit e) { return param_e(e.id, 4); }
+double gapCutoutParam2(Slit e) { return param_e(e.id, 5); }
 
 /**************************************************************
  *                    RZP
