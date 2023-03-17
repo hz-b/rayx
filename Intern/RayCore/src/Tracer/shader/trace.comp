@@ -1,29 +1,14 @@
 /// Each `trace*` function gets a `Ray r` (in element-coords), the element itself, a randomness counter and the `Collision col`.
 /// `col.hitpoint` expresses where the given ray r will hit the element (in element-coords).
 /// `col.normal` expresses the normal of the surface, at `col.hitpoint` (in element-coords).
+/// The ray has already been moved to the hitpoint, and it's lastElement has been set accordingly.
 ///
 /// The `trace*` functions, will
 /// - change the rays direction, typically by reflecting using the normal
 /// - change the rays stokes vector
 /// - potentially absorb the ray (by calling `takeFinalSnapshot(_, W_ABSORBED)`)
-// TODO(rudi) all of the following things could be done before calling the `trace*` function, it's the same everywhere, I think.
-/// - move the ray to the `col.hitpoint`
-/// - update the rays `lastElement`
-/// - increase the rays `pathLength`
 
-Ray traceSlit(Ray r, Slit slit, INOUT(uint64_t) ctr, Collision col) {
-    // store old position, needed for pathlength calculation
-    dvec3 old_position = r.m_position;
-
-    // dvec4 normal = intersectionPoint(r, q.surfaceParams); // if it is not sure whether the given intersection is correct, use this (recalculate the
-    // intersection)
-    r.m_position = col.hitpoint;
-
-    // add the travelled distance from the previous position to the new intersection to pathlength (both are in the same coordinate system so we do
-    // not need to transform back to world coordinates??)
-    r.m_pathLength += length(old_position - r.m_position);
-    r.m_lastElement = slit.id + 1;
-
+Ray traceSlit(Ray r, Slit slit, INOUT(uint64_t) ctr, ALLOW_UNUSED Collision col) {
     double xStop    = beamstopWidth(slit);
     double yStop    = beamstopHeight(slit);
 
@@ -72,16 +57,7 @@ Ray traceRZP(Ray r, Rzp rzp, INOUT(uint64_t) ctr, Collision col) {
     double element_offset_z = elementOffsetZ(rzp);
     r.m_position.z            = r.m_position.z - element_offset_z;
 
-    // store old position, needed for pathlength calculation
-    dvec3 old_position = r.m_position;
-
     dvec4 normal = dvec4(col.normal, 0);
-    r.m_position = col.hitpoint;
-
-    // add the travelled distance from the previous position to the new intersection to pathlength (both are in the same coordinate system so we do
-    // not need to transform back to world coordinates??)
-    r.m_pathLength += length(old_position - r.m_position);
-    r.m_lastElement = rzp.id + 1;
 
     int IMAGE_TYPE        = int(param_e(rzp.id, 0));
     int RZP_TYPE          = int(param_e(rzp.id, 1));
@@ -129,17 +105,8 @@ Ray traceRZP(Ray r, Rzp rzp, INOUT(uint64_t) ctr, Collision col) {
 }
 
 Ray traceGrating(Ray r, Grating gg, INOUT(uint64_t) ctr, Collision col) {
-    // store old position, needed for pathlength calculation
-    dvec3 old_position = r.m_position;
-
     dvec4 normal = dvec4(col.normal, 0);
-    r.m_position = col.hitpoint;
     // normal = normalize(dvec4(-r.m_position.x, -radius - r.m_position[1]*ISIG, -r.m_position[2], 0));
-
-    // add the travelled distance from the previous position to the new intersection to pathlength (both are in the same coordinate system so we do
-    // not need to transform back to world coordinates??)
-    r.m_pathLength += length(old_position - r.m_position);
-    r.m_lastElement = gg.id + 1;
 
     // modify normal according to slope error
     normal        = tanger(normal, slopeX(gg), slopeZ(gg), 0, ctr);
@@ -166,18 +133,9 @@ Ray traceGrating(Ray r, Grating gg, INOUT(uint64_t) ctr, Collision col) {
 }
 
 Ray traceMirror(Ray r, Mirror m, INOUT(uint64_t) ctr, Collision col) {
-    // store old position, needed for pathlength calculation
-    dvec3 old_position = r.m_position;
-
     // calculate intersection point and normal at intersection point
     dvec4 normal = dvec4(col.normal, 0);
-    r.m_position = col.hitpoint;
     double azimuthal_angle = azimuthalAngle(m);
-
-    // add the travelled distance from the previous position to the new intersection to pathlength (both are in the same coordinate system so we do
-    // not need to transform back to world coordinates??)
-    r.m_pathLength += length(old_position - r.m_position);
-    r.m_lastElement = m.id + 1;
 
     // take the slope error into account for the normal
     normal = tanger(normal, slopeX(m), slopeZ(m), 0, ctr);  // option 0 = default, cartesian normal
@@ -200,10 +158,7 @@ Ray traceMirror(Ray r, Mirror m, INOUT(uint64_t) ctr, Collision col) {
     return r;
 }
 
-Ray traceImagePlane(Ray r, ALLOW_UNUSED ImagePlane ip, Collision col) {
-    // path length in element coordinates
-    r.m_pathLength += length(r.m_position - col.hitpoint);
-    r.m_position = col.hitpoint;
-    r.m_lastElement = ip.id + 1;
+Ray traceImagePlane(Ray r, ALLOW_UNUSED ImagePlane ip, ALLOW_UNUSED Collision col) {
+    // doesn't need to do anything.
     return r;
 }

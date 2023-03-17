@@ -42,6 +42,11 @@ void dynamicElements() {
 
         // Calculate interaction(reflection,material, absorption etc.) of ray with detected next element
         type = int(nextElement.m_type);
+
+        elem_ray.m_pathLength += length(elem_ray.m_position - col.hitpoint);
+        elem_ray.m_position = col.hitpoint;
+        elem_ray.m_lastElement = col.elementIndex + 1; // TODO remove this "+1", element ids should consistently start at 0.
+
         switch(type){
             case (TY_MIRROR):
                 elem_ray = traceMirror(elem_ray, Mirror(col.elementIndex), ctr, col);
