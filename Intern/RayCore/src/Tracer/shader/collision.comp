@@ -205,6 +205,17 @@ Collision getToroidCollision(Ray r, uint id) {
  *                    Collision Finder
  **************************************************************/
 
+// Most surfaceTypes lie in the XZ plane, but some of them lie in the XY plane.
+// This function projects a point into the corresponding plane.
+//
+// The cutout is applied in the primary plane.
+dvec2 projectToPrimaryPlane(double surfaceType, dvec3 point) {
+    if (surfaceType == STY_PLANE_XY) {
+        return dvec2(point.x, point.y);
+    }
+    return dvec2(point.x, point.z);
+}
+
 // checks whether `r` collides with the element of the given `id`,
 // and returns a Collision accordingly.
 Collision findCollisionWith(Ray r, uint id) {
@@ -248,7 +259,12 @@ Collision findCollisionWith(Ray r, uint id) {
         return col; // has found = false
     }
 
-    if (!inCutout(cutoutType(id), col.hitpoint.x, col.hitpoint.z, elements[id].m_cutoutParams)) {
+    dvec2 x1x2 = projectToPrimaryPlane(sty, col.hitpoint);
+
+    double x1 = x1x2.x;
+    double x2 = x1x2.y;
+
+    if (!inCutout(cutoutType(id), x1, x2, elements[id].m_cutoutParams)) {
         col.found = false;
     }
     return col;
