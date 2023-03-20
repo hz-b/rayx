@@ -12,9 +12,13 @@ to get the dev branch and to make sure, you also clone all of it's submodules.
 ## On Windows
 - Install [CMake](https://cmake.org/download/)
 - Install [Vulkan](https://vulkan.lunarg.com/) for Windows (1.3 or newer)
+  - Make sure to check the Vulkan Memory Allocator option (not used yet, but likely in the future)
 - Install [HDF5](https://www.hdfgroup.org/downloads/hdf5/) library 
 - Install python3, python3-dev and python3-matplotlib 
 - We also recommend to use the MSVC compiler for Windows [Visual Studio](https://visualstudio.microsoft.com/de/downloads/) (2019 or newer)
+
+Known Issues:
+- Sometimes installing the VulkanSDK in the root directory of your drive causes problems. If you have problems with the VulkanSDK, try installing it in a different directory.
 
 ### VSCode
 - Open the project in VSCode, where you will be asked to select a build kit (gcc, etc.)
