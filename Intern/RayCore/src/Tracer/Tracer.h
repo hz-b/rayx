@@ -42,7 +42,7 @@ class RAYX_API Tracer {
     Rays trace(const Beamline&);
 
     // Useful for GPU Tracing
-    struct PushConstants {
+    struct PushConstants { // TODO(Jannis): PushConstants is not an expressive name. Rename to something like TracerConfig
         double rayIdStart;
         double numRays;
         double randomSeed;
@@ -53,7 +53,7 @@ class RAYX_API Tracer {
     // where the actual tracing happens.
     // std::vector<Ray> will contain all snapshots for all Rays (and also the W_UNINIT rays).
     virtual std::vector<Ray> traceRaw(const TraceRawConfig&) = 0;
-    virtual void setPushConstants(PushConstants*) = 0;
+    virtual void setPushConstants(const PushConstants*) = 0;
 };
 
 // TODO deprecate these functions and all of their uses.

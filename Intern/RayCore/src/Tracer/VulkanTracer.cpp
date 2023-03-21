@@ -78,9 +78,9 @@ std::vector<Ray> VulkanTracer::traceRaw(const TraceRawConfig& cfg) {
     return out;
 }
 
-void VulkanTracer::setPushConstants(PushConstants* p) {
-    if (sizeof(*p) > 128) RAYX_WARN << "Using pushConstants bigger than 128 Bytes might be unsupported on your GPU. Check Compute Info";
-    m_engine.m_pushConstants.pushConstPtr = static_cast<PushConstants*>(p);
+void VulkanTracer::setPushConstants(const PushConstants* p) {
+    if (sizeof(*p) > 128) RAYX_WARN << "Using pushConstants bigger than 128 Bytes might be unsupported on some GPUs. Check Compute Info";
+    m_engine.m_pushConstants.pushConstPtr = static_cast<const PushConstants*>(p);
     m_engine.m_pushConstants.size = sizeof(*p);
 }
 }  // namespace RAYX
