@@ -53,7 +53,7 @@ Rays Tracer::trace(const Beamline& b) {
             .rayIdStart = (double)rayIdStart, .numRays = (double)rays.size(), .randomSeed = randomSeed, .maxSnapshots = (double)maxSnapshots};
         setPushConstants(&pushConsants);
 
-        RAYX::Snapshots rawBatchRays;
+        Snapshots rawBatchRays;
         {
             RAYX_PROFILE_SCOPE_STDOUT("Tracing");
             rawBatchRays = traceRaw(cfg);

@@ -61,7 +61,7 @@ Ellipsoid::Ellipsoid(const DesignObject& dobj) : OpticalElement(dobj) {
     RAYX_VERB << "m_a44: " << m_a44;
 
     double icurv = 1;
-    m_surfaceType = STY_QUADRIC;
+    m_surfaceType = STYPE_QUADRIC;
     m_surfaceParams = {m_a11, 0,     0,     0,      //
                        icurv, m_a22, m_a23, m_a24,  //
                        0,     0,     m_a33, m_a34,  //

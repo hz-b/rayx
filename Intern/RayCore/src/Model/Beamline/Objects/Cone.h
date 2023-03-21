@@ -6,7 +6,7 @@ class RAYX_API Cone : public OpticalElement {
   public:
     Cone(const DesignObject&);
 
-    inline int getElementType() const { return TY_MIRROR; }
+    inline int getElementType() const { return TYPE_MIRROR; }
 
     ~Cone();
     void calcConeParams(double zl);

@@ -13,7 +13,7 @@ PlaneGrating::PlaneGrating(const DesignObject& dobj) : OpticalElement(dobj) {
     m_vls = dobj.parseVls();
     RAYX_VERB << "design wavelength = " << abs(hvlam(m_designEnergyMounting));
 
-    m_surfaceType = STY_QUADRIC;
+    m_surfaceType = STYPE_QUADRIC;
     m_surfaceParams = {0, 0, 0, 0, 1, 0, 0, -1, 0, 0, 0, 0, 0, 0, 0, 0};
 }
 

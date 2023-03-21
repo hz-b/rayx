@@ -32,7 +32,7 @@ Cylinder::Cylinder(const DesignObject& dobj) : OpticalElement(dobj) {
         setRadius();
     }
 
-    m_surfaceType = STY_QUADRIC;
+    m_surfaceType = STYPE_QUADRIC;
     m_surfaceParams = {m_a11, 0, 0, 0, icurv, 1, 0, m_a24, 0, 0, m_a33, 0, 0, 0, 0, 0};
 }
 

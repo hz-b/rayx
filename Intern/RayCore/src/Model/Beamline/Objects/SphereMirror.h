@@ -8,7 +8,7 @@ class RAYX_API SphereMirror : public OpticalElement {
   public:
     SphereMirror(const DesignObject&);
 
-    inline int getElementType() const { return TY_MIRROR; }
+    inline int getElementType() const { return TYPE_MIRROR; }
 
     void calcRadius();
     double getRadius() const;

@@ -92,26 +92,26 @@ struct Element {
 // -----------------------------------------
 
 // element types
-const int TY_MIRROR = 0;
-const int TY_GRATING = 1;
-const int TY_SLIT = 2;
-const int TY_RZP = 3;
-const int TY_IMAGE_PLANE = 4;
+const int TYPE_MIRROR = 0;
+const int TYPE_GRATING = 1;
+const int TYPE_SLIT = 2;
+const int TYPE_RZP = 3;
+const int TYPE_IMAGE_PLANE = 4;
 
 // surface types:
 // a surface is a potentially infinite curved surface in 3d space.
 // as our elements are mostly finite in size, they are represented by a (potentially infinite) surface in combination with a finite cutout (see CTY
 // constants)
-const int STY_QUADRIC = 0;
-const int STY_TOROID = 1;
-const int STY_PLANE_XY = 2;  // an infinite X-Y plane.
+const int STYPE_QUADRIC = 0;
+const int STYPE_TOROID = 1;
+const int STYPE_PLANE_XY = 2;  // an infinite X-Y plane.
 
 // cutout types:
 // a subset of points in the 2d plane. used to limited the potentially infinite surfaces.
 // note that the first 3 need to be RECT; ELLIPTICAL; TRAPEZOID in order to be compatible with Ray-UI.
-const int CTY_RECT = 0;  // cutout parameters are (width, 0, length).
-const int CTY_ELLIPTICAL = 1;
-const int CTY_TRAPEZOID = 2;
-const int CTY_UNLIMITED = 3;  // cutout parameters are (0, 0, 0).
+const int CTYPE_RECT = 0;  // cutout parameters are (width, 0, length).
+const int CTYPE_ELLIPTICAL = 1;
+const int CTYPE_TRAPEZOID = 2;
+const int CTYPE_UNLIMITED = 3;  // cutout parameters are (0, 0, 0).
 
 #endif

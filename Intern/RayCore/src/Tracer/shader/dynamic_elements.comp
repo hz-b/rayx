@@ -48,19 +48,19 @@ void dynamicElements() {
         elem_ray.m_lastElement = col.elementIndex + 1; // TODO remove this "+1", element ids should consistently start at 0.
 
         switch(type){
-            case (TY_MIRROR):
+            case (TYPE_MIRROR):
                 elem_ray = traceMirror(elem_ray, Mirror(col.elementIndex), ctr, col);
                 break;
-            case (TY_GRATING):
+            case (TYPE_GRATING):
                 elem_ray = traceGrating(elem_ray, Grating(col.elementIndex), ctr, col);
                 break;
-            case (TY_SLIT) :
+            case (TYPE_SLIT) :
                 elem_ray = traceSlit(elem_ray, Slit(col.elementIndex), ctr, col);
                 break;
-            case (TY_RZP):
+            case (TYPE_RZP):
                 elem_ray = traceRZP(elem_ray, Rzp(col.elementIndex), ctr, col);
                 break;
-            case (TY_IMAGE_PLANE):
+            case (TYPE_IMAGE_PLANE):
                 elem_ray = traceImagePlane(elem_ray, ImagePlane(col.elementIndex), col);
                 break;
         }

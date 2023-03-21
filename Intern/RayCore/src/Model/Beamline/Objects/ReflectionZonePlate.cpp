@@ -32,16 +32,16 @@ ReflectionZonePlate::ReflectionZonePlate(const DesignObject& dobj) : OpticalElem
 
     // set parameters in Quadric class
     if (m_curvatureType == CurvatureType::Plane) {
-        m_surfaceType = STY_QUADRIC;
+        m_surfaceType = STYPE_QUADRIC;
         m_surfaceParams = {0, 0, 0, 0, 1, 0, 0, -1, 0, 0, 0, 0, 0, 0, 0, 0};
     } else if (m_curvatureType == CurvatureType::Toroidal) {
         m_longRadius = dobj.parseLongRadius();    // for sphere and toroidal
         m_shortRadius = dobj.parseShortRadius();  // only for Toroidal
-        m_surfaceType = STY_TOROID;
+        m_surfaceType = STYPE_TOROID;
         m_surfaceParams = {m_longRadius, m_shortRadius};
     } else {
         m_longRadius = dobj.parseLongRadius();  // for sphere and toroidal
-        m_surfaceType = STY_QUADRIC;
+        m_surfaceType = STYPE_QUADRIC;
         m_surfaceParams = {1, 0, 0, 0, 1, 1, 0, -m_longRadius, 0, 0, 1, 0, 0, 0, 0, 0};
     }
 

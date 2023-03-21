@@ -107,16 +107,16 @@ bool inCutout(double cutoutTy, double x, double z, double cutoutParams[3]) {
     double xLengthA = cutoutParams[0];
     double xLengthB = cutoutParams[1];
     double zLength = cutoutParams[2];
-    if (cutoutTy == CTY_UNLIMITED) {
+    if (cutoutTy == CTYPE_UNLIMITED) {
         return true;
-    } else if (cutoutTy == CTY_RECT) {
+    } else if (cutoutTy == CTYPE_RECT) {
         double x_min = -xLengthA / 2.0;
         double x_max = xLengthA / 2.0;
         double z_min = -zLength / 2.0;
         double z_max = zLength / 2.0;
 
         return !(x <= x_min || x >= x_max || z <= z_min || z >= z_max);
-    } else if (cutoutTy == CTY_TRAPEZOID) {
+    } else if (cutoutTy == CTYPE_TRAPEZOID) {
         // Check point is within the trapezoid
         dvec3 P = dvec3(x, 0, z);
         dvec3 A = dvec3(-xLengthA / 2.0, 0, -zLength / 2.0);
@@ -135,7 +135,7 @@ bool inCutout(double cutoutTy, double x, double z, double cutoutParams[3]) {
         double l1 = ((PmA.x * BmA.z - PmA.z * BmA.x) * (PmD.x * CmD.z - PmD.z * CmD.x));
         double l2 = ((PmA.x * DmA.z - PmA.z * DmA.x) * (PmB.x * CmB.z - PmB.z * CmB.x));
         return l1 < 0 && l2 < 0;
-    } else if (cutoutTy == CTY_ELLIPTICAL) {
+    } else if (cutoutTy == CTYPE_ELLIPTICAL) {
         double rd2 = (x / (xLengthA / 2.0)) * (x / (xLengthA / 2.0)) +
                      (z / (zLength / 2.0)) * (z / (zLength / 2.0));
         return rd2 <= 1.0;

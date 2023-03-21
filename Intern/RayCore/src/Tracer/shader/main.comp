@@ -145,7 +145,7 @@ uint output_index(uint i) {
 }
 
 // sets all output rays controlled by this shader call to W_UNINIT.
-void uninitRays() {
+void uninitOutRays() {
     for (uint i = 0; i < pushConstants.maxSnapshots; i++) {
         outputData[output_index(i)].m_weight = W_UNINIT;
     }
@@ -213,7 +213,7 @@ void takeFinalSnapshot(Ray r, double w) {
  **************************************************************/
 void main() {
     finalized = false;
-    uninitRays();
+    uninitOutRays();
 
     // this is required as sometimes error codes are transmitted using _ray.m_weight
     _ray.m_weight = W_UNINIT;

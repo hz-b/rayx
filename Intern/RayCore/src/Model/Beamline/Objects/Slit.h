@@ -10,7 +10,7 @@ class RAYX_API Slit : public OpticalElement {
   public:
     Slit(const DesignObject&);
 
-    inline int getElementType() const { return TY_SLIT; }
+    inline int getElementType() const { return TYPE_SLIT; }
 
     CentralBeamstop getCentralBeamstop() const;
     double getBeamstopWidth() const;
@@ -22,7 +22,7 @@ class RAYX_API Slit : public OpticalElement {
     double m_beamstopWidth;
     double m_beamstopHeight;
 
-    // the cutout for a slit is always CTY_UNLIMITED (as rays should only be able to bypass a slit by going through it - not around)
+    // the cutout for a slit is always CTYPE_UNLIMITED (as rays should only be able to bypass a slit by going through it - not around)
     // Hence the cutout of the gap (i.e. the "hole", the part of the Slit where rays actually go through) needs to be stored separately:
     double m_gapCutoutType;
     std::array<double, 3> m_gapCutoutParams;

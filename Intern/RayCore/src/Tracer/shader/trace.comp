@@ -32,10 +32,10 @@ Ray traceSlit(Ray r, Slit slit, INOUT(uint64_t) ctr, ALLOW_UNUSED Collision col)
     if (wavelength > 0) {
         double yl = gapCutoutParam0(slit);
         double xl = gapCutoutParam2(slit);
-        if (gapCutoutType(slit) == CTY_RECT) {
+        if (gapCutoutType(slit) == CTYPE_RECT) {
             fraun_diff(xl, wavelength, dPhi, ctr);
             fraun_diff(yl, wavelength, dPsi, ctr);
-        } else if (gapCutoutType(slit) == CTY_ELLIPTICAL) {
+        } else if (gapCutoutType(slit) == CTYPE_ELLIPTICAL) {
             xl = gapCutoutParam2(slit);
             bessel_diff(xl, wavelength, dPhi, dPsi, ctr);
         } else {

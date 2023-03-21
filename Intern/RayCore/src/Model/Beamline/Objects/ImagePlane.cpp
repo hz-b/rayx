@@ -5,7 +5,7 @@
 namespace RAYX {
 
 ImagePlane::ImagePlane(const DesignObject& dobj) : OpticalElement(dobj) {
-    m_surfaceType = STY_PLANE_XY;
+    m_surfaceType = STYPE_PLANE_XY;
     m_surfaceParams = {0.0};
 }
 

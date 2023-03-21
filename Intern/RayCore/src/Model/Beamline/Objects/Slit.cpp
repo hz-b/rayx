@@ -22,14 +22,14 @@ Slit::Slit(const DesignObject& dobj) : OpticalElement(dobj) {
         m_beamstopHeight = beamstopHeight;
     }
 
-    m_surfaceType = STY_PLANE_XY;
+    m_surfaceType = STYPE_PLANE_XY;
     m_surfaceParams = {0.0};
 
     m_gapCutoutType = m_cutoutType;
     m_gapCutoutParams = {m_cutoutParams[0], m_cutoutParams[1], m_cutoutParams[2]};
 
     m_cutoutParams.fill(0);
-    m_cutoutType = CTY_UNLIMITED;
+    m_cutoutType = CTYPE_UNLIMITED;
 }
 
 CentralBeamstop Slit::getCentralBeamstop() const { return m_centralBeamstop; }

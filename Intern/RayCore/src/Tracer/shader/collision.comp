@@ -210,7 +210,7 @@ Collision getToroidCollision(Ray r, uint id) {
 //
 // The cutout is applied in the primary plane.
 dvec2 projectToPrimaryPlane(double surfaceType, dvec3 point) {
-    if (surfaceType == STY_PLANE_XY) {
+    if (surfaceType == STYPE_PLANE_XY) {
         return dvec2(point.x, point.y);
     }
     return dvec2(point.x, point.z);
@@ -222,7 +222,7 @@ Collision findCollisionWith(Ray r, uint id) {
     double ty = type(id);
     double sty = surfaceType(id);
 
-    if (ty == TY_RZP) {
+    if (ty == TYPE_RZP) {
         r.m_position.z = r.m_position.z - param_e(id, 14); // TODO what is at index 14 ?
     }
 
@@ -232,7 +232,7 @@ Collision findCollisionWith(Ray r, uint id) {
     r = rayMatrixMult(r, inTrans(id));  // image plane is the x-y plane of the coordinate system
 
     Collision col;
-    if (sty == STY_PLANE_XY) {
+    if (sty == STYPE_PLANE_XY) {
         col.found = false;
         col.elementIndex = int(id);
         col.normal = dvec3(0, 0, -1);
@@ -247,9 +247,9 @@ Collision findCollisionWith(Ray r, uint id) {
 
         col.found = r.m_direction.z > 0 && r.m_position.z < 0;
         // backward hits are excluded? i.e. if a ray with negative direction and positive z coordinate hits the plane?
-    } else if (sty == STY_TOROID) {
+    } else if (sty == STYPE_TOROID) {
         col = getToroidCollision(r, id);
-    } else if (sty == STY_QUADRIC) {
+    } else if (sty == STYPE_QUADRIC) {
         col = getQuadricCollision(r, id);
     } else {
         col.found = false;

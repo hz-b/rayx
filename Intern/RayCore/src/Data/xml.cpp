@@ -492,10 +492,10 @@ Material Parser::parseMaterial() const {
 std::tuple<int, std::array<double, 3>> Parser::parseCutout() const {
     int geom_shape;
     if (!paramInt(node, "geometricalShape", &geom_shape)) {
-        return {CTY_UNLIMITED, {0.0, 0.0, 0.0}};
+        return {CTYPE_UNLIMITED, {0.0, 0.0, 0.0}};
     }
 
-    if (geom_shape == CTY_RECT) {
+    if (geom_shape == CTYPE_RECT) {
         double width = parseTotalWidth();
         double len;
         // TODO why is this inconsistent in the .rml files?
@@ -504,19 +504,19 @@ std::tuple<int, std::array<double, 3>> Parser::parseCutout() const {
         } catch (std::runtime_error& e) {
             len = parseTotalHeight();
         }
-        return {CTY_RECT, {width, 0.0, len}};
-    } else if (geom_shape == CTY_ELLIPTICAL) {
+        return {CTYPE_RECT, {width, 0.0, len}};
+    } else if (geom_shape == CTYPE_ELLIPTICAL) {
         // TODO test this!
         double width = parseTotalWidth();
         double height = parseTotalHeight();
-        return {CTY_RECT, {width, 0.0, height}};
-    } else if (geom_shape == CTY_TRAPEZOID) {
+        return {CTYPE_RECT, {width, 0.0, height}};
+    } else if (geom_shape == CTYPE_TRAPEZOID) {
         // TODO test this!
         double widthB = parseDouble("totalWidthB");
         double length = parseTotalWidth();
         double height = parseTotalHeight();
 
-        return {CTY_TRAPEZOID, {length, widthB, height}};
+        return {CTYPE_TRAPEZOID, {length, widthB, height}};
     } else {
         RAYX_ERR << "invalid geom_shape!";
         return {0, {0.0, 0.0, 0.0}};

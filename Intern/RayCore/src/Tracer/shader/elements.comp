@@ -28,16 +28,16 @@ dmat4 outTrans(uint id) { return elements[id].m_outTrans; }
 double slopeX(uint id) { return elements[id].m_slopeError[0]; }
 double slopeZ(uint id) { return elements[id].m_slopeError[1]; }
 
-// only usable for STY_TOROID.
+// only usable for STYPE_TOROID.
 double longRadius(uint id) {
-    if (surfaceType(id) != STY_TOROID) {
+    if (surfaceType(id) != STYPE_TOROID) {
         throw("You cannot use longRadius on this surface!");
     }
     return param_s(id, 0);
 }
 
 double shortRadius(uint id) {
-    if (surfaceType(id) != STY_TOROID) {
+    if (surfaceType(id) != STYPE_TOROID) {
         throw("You cannot use shortRadius on this surface!");
     }
     return param_s(id, 1);

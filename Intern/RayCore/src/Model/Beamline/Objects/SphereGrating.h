@@ -6,7 +6,7 @@ namespace RAYX {
 class RAYX_API SphereGrating : public OpticalElement {
   public:
     SphereGrating(const DesignObject&);
-    inline int getElementType() const { return TY_GRATING; }
+    inline int getElementType() const { return TYPE_GRATING; }
 
     void calcRadius();
     void calcAlpha(double deviation, double normalIncidence);

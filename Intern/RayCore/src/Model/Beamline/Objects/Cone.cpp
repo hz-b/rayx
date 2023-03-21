@@ -26,7 +26,7 @@ Cone::Cone(const DesignObject& dobj) : OpticalElement(dobj) {
         m_a24 = -m_upstreamRadius_R;
     }
 
-    m_surfaceType = STY_QUADRIC;
+    m_surfaceType = STYPE_QUADRIC;
     m_surfaceParams = {m_a11, 0, 0, 0, icurv, m_a22, m_a23, m_a24, 0, 0, 0, 0, 0, 0, 0, 0};
 }
 

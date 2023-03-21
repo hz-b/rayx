@@ -6,7 +6,7 @@
 namespace RAYX {
 
 PlaneMirror::PlaneMirror(const DesignObject& dobj) : OpticalElement(dobj) {
-    m_surfaceType = STY_QUADRIC;
+    m_surfaceType = STYPE_QUADRIC;
     m_surfaceParams = {0, 0, 0, 0, 1, 0, 0, -1, 0, 0, 0, 0, 0, 0, 0, 0};
 }
 
