@@ -138,10 +138,10 @@ class RAYX_API InstrumentationTimer {
 #define RAYX_PROFILE_SCOPE(name) ::RAYX::InstrumentationTimer timer##__LINE__(name, false)
 // Allows for printing of benchmarking results if BENCH_FLAG is set to true
 #define RAYX_PROFILE_SCOPE_STDOUT(name) ::RAYX::InstrumentationTimer timer##__LINE__(name, true)
-#if !defined(__PRETTYPE_FUNCTION__) && !defined(__GNUC__)
-#define __PRETTYPE_FUNCTION__ __FUNCSIG__
+#if !defined(__PRETTY_FUNCTION__) && !defined(__GNUC__)
+#define __PRETTY_FUNCTION__ __FUNCSIG__
 #endif
-#define RAYX_PROFILE_FUNCTION() RAYX_PROFILE_SCOPE(__PRETTYPE_FUNCTION__)
+#define RAYX_PROFILE_FUNCTION() RAYX_PROFILE_SCOPE(__PRETTY_FUNCTION__)
 // Allows for printing of benchmarking results if BENCH_FLAG is set to true
 #define RAYX_PROFILE_FUNCTION_STDOUT() RAYX_PROFILE_SCOPE_STDOUT(__func__)
 #else

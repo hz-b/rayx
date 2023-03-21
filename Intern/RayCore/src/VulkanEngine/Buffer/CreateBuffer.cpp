@@ -31,7 +31,7 @@ void VulkanEngine::createBuffer(const char* bufname, VkDeviceSize size) {
         buffer_usage_flags |= VK_BUFFER_USAGE_TRANSFER_SRC_BIT;
     }
 
-    // createVkBuffer(size, buffer_usage_flags, VK_MEMORY_PROPERTYPE_DEVICE_LOCAL_BIT, b.m_Buffer, b.m_Memory);
+    // createVkBuffer(size, buffer_usage_flags, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, b.m_Buffer, b.m_Memory);
     createVmaBuffer(size, buffer_usage_flags, b.buf, b.alloca, &b.allocaInfo);
 }
 
