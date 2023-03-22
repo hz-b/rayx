@@ -23,7 +23,7 @@
 // `_ray` is that ray, it's always in world coordinates (!).
 #define _ray (rayData[uint(gl_GlobalInvocationID)])
 
-#include "../../Constants.h"
+#include "../../Shared/Constants.h"
 
 /**************************************************************
  *                    Structs

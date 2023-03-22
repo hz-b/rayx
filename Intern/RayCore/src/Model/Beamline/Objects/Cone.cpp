@@ -1,7 +1,7 @@
 #include "Cone.h"
 
-#include "Constants.h"
 #include "Debug/Debug.h"
+#include "Shared/Constants.h"
 
 namespace RAYX {
 Cone::Cone(const DesignObject& dobj) : OpticalElement(dobj) {

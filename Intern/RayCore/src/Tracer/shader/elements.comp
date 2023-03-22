@@ -13,14 +13,12 @@ struct ImagePlane { uint id; };
 
 double param_e(uint id, uint i) { return elements[id].m_elementParams[i]; }
 double param_s(uint id, uint i) { return elements[id].m_surfaceParams[i]; }
-double param_x(uint id, uint i) { return elements[id].m_cutoutParams[i]; }
 
 /**************************************************************
  *      element-type independent access functions:
  **************************************************************/
 double type(uint id) { return elements[id].m_type; }
 double surfaceType(uint id) { return elements[id].m_surfaceType; }
-double cutoutType(uint id) { return elements[id].m_cutoutType; }
 double material(uint id) { return elements[id].m_material; }
 double azimuthalAngle(uint id) { return elements[id].m_azimuthalAngle; }
 dmat4 inTrans(uint id) { return elements[id].m_inTrans; }
@@ -48,10 +46,15 @@ double shortRadius(uint id) {
  **************************************************************/
 double beamstopWidth(Slit e) { return param_e(e.id, 0); }
 double beamstopHeight(Slit e) { return param_e(e.id, 1); }
-double gapCutoutType(Slit e) { return param_e(e.id, 2); }
-double gapCutoutParam0(Slit e) { return param_e(e.id, 3); }
-double gapCutoutParam1(Slit e) { return param_e(e.id, 4); }
-double gapCutoutParam2(Slit e) { return param_e(e.id, 5); }
+
+CutoutSerialized gapCutout(Slit e) {
+    CutoutSerialized ser;
+    ser.m_type = param_e(e.id, 2);
+    ser.m_params[0] = param_e(e.id, 3);
+    ser.m_params[1] = param_e(e.id, 4);
+    ser.m_params[2] = param_e(e.id, 5);
+    return ser;
+}
 
 /**************************************************************
  *                    RZP

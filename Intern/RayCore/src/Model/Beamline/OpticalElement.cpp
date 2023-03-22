@@ -12,9 +12,7 @@ OpticalElement::OpticalElement(const DesignObject& dobj) {
     m_slopeError = dobj.parseSlopeError();
     m_material = dobj.parseMaterial();
 
-    auto [cutoutTy, cutoutParams] = dobj.parseCutout();
-    m_cutoutType = cutoutTy;
-    m_cutoutParams = cutoutParams;
+    m_cutout = dobj.parseCutout();
 
     // TODO(Rudi) replace try-catch stuff by std::optionals
     try {
@@ -34,8 +32,7 @@ Element OpticalElement::intoElement() const {
         .m_elementParams = {0},  // initialized below
         .m_surfaceType = (double)m_surfaceType,
         .m_surfaceParams = {0},  // initialized below
-        .m_cutoutType = (double)m_cutoutType,
-        .m_cutoutParams = {m_cutoutParams[0], m_cutoutParams[1], m_cutoutParams[2]},
+        .m_cutout = m_cutout,
         .m_slopeError = {m_slopeError[0], m_slopeError[1], m_slopeError[2], m_slopeError[3], m_slopeError[4], m_slopeError[5], m_slopeError[6]},
         .m_azimuthalAngle = m_azimuthalAngle.rad,
         .m_material = (double)static_cast<int>(m_material),

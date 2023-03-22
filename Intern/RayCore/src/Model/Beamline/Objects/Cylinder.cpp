@@ -2,10 +2,10 @@
 
 #include <ext/scalar_constants.hpp>
 
-#include "Constants.h"
 #include "Data/xml.h"
 #include "Debug/Debug.h"
 #include "Material/Material.h"
+#include "Shared/Constants.h"
 #include "utils.h"
 
 namespace RAYX {

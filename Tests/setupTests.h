@@ -6,12 +6,12 @@
 #include <type_traits>
 
 #include "CanonicalizePath.h"
-#include "Constants.h"
 #include "Core.h"
 #include "Data/Importer.h"
 #include "Debug/Debug.h"
 #include "Material/Material.h"
 #include "Model/Beamline/Objects/Objects.h"
+#include "Shared/Constants.h"
 #include "Tracer/CpuTracer.h"
 #include "Tracer/Ray.h"
 #include "Tracer/VulkanTracer.h"

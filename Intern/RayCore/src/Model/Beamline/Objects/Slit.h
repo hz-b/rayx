@@ -24,8 +24,7 @@ class RAYX_API Slit : public OpticalElement {
 
     // the cutout for a slit is always CTYPE_UNLIMITED (as rays should only be able to bypass a slit by going through it - not around)
     // Hence the cutout of the gap (i.e. the "hole", the part of the Slit where rays actually go through) needs to be stored separately:
-    double m_gapCutoutType;
-    std::array<double, 3> m_gapCutoutParams;
+    CutoutSerialized m_gapCutout;
 };
 
 }  // namespace RAYX

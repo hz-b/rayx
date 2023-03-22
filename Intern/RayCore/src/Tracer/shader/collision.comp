@@ -264,7 +264,7 @@ Collision findCollisionWith(Ray r, uint id) {
     double x1 = x1x2.x;
     double x2 = x1x2.y;
 
-    if (!inCutout(cutoutType(id), x1, x2, elements[id].m_cutoutParams)) {
+    if (!inCutout(elements[id].m_cutout, x1, x2)) {
         col.found = false;
     }
     return col;

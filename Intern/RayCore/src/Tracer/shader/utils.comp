@@ -102,23 +102,26 @@ void cosini(INOUT(Ray) r, double phi, double psi) {
     r.m_direction.z = cos_psi * cos_phi;
 }
 
-// checks whether the point (x, z) is within the cutout given by (cutoutTy, cutoutParams).
-bool inCutout(double cutoutTy, double x, double z, double cutoutParams[3]) {
-    double xLengthA = cutoutParams[0];
-    double xLengthB = cutoutParams[1];
-    double zLength = cutoutParams[2];
-    if (cutoutTy == CTYPE_UNLIMITED) {
+// checks whether the point (x1, x2) is within the cutout.
+bool inCutout(CutoutSerialized cutout, double x1, double x2) {
+    if (cutout.m_type == CTYPE_UNLIMITED) {
         return true;
-    } else if (cutoutTy == CTYPE_RECT) {
-        double x_min = -xLengthA / 2.0;
-        double x_max = xLengthA / 2.0;
-        double z_min = -zLength / 2.0;
-        double z_max = zLength / 2.0;
+    } else if (cutout.m_type == CTYPE_RECT) {
+        RectCutout rect = deserializeRect(cutout);
+        double x1_min = -rect.m_width / 2.0;
+        double x1_max = rect.m_width / 2.0;
+        double x2_min = -rect.m_height / 2.0;
+        double x2_max = rect.m_height / 2.0;
 
-        return !(x <= x_min || x >= x_max || z <= z_min || z >= z_max);
-    } else if (cutoutTy == CTYPE_TRAPEZOID) {
+        return !(x1 <= x1_min || x1 >= x1_max || x2 <= x2_min || x2 >= x2_max);
+    } else if (cutout.m_type == CTYPE_TRAPEZOID) {
+        TrapezoidCutout trapezoid = deserializeTrapezoid(cutout);
+        double xLengthA = trapezoid.m_param1;
+        double xLengthB = trapezoid.m_param2;
+        double zLength = trapezoid.m_param3;
+
         // Check point is within the trapezoid
-        dvec3 P = dvec3(x, 0, z);
+        dvec3 P = dvec3(x1, 0, x2);
         dvec3 A = dvec3(-xLengthA / 2.0, 0, -zLength / 2.0);
         dvec3 B = dvec3(xLengthA / 2.0, 0, -zLength / 2.0);
         dvec3 C = dvec3(xLengthB / 2.0, 0, zLength / 2.0);
@@ -135,12 +138,15 @@ bool inCutout(double cutoutTy, double x, double z, double cutoutParams[3]) {
         double l1 = ((PmA.x * BmA.z - PmA.z * BmA.x) * (PmD.x * CmD.z - PmD.z * CmD.x));
         double l2 = ((PmA.x * DmA.z - PmA.z * DmA.x) * (PmB.x * CmB.z - PmB.z * CmB.x));
         return l1 < 0 && l2 < 0;
-    } else if (cutoutTy == CTYPE_ELLIPTICAL) {
-        double rd2 = (x / (xLengthA / 2.0)) * (x / (xLengthA / 2.0)) +
-                     (z / (zLength / 2.0)) * (z / (zLength / 2.0));
+    } else if (cutout.m_type == CTYPE_ELLIPTICAL) {
+        EllipticalCutout elliptical = deserializeElliptical(cutout);
+        double xLengthA = elliptical.m_param1;
+        double zLength = elliptical.m_param2;
+        double rd2 = (x1 / (xLengthA / 2.0)) * (x1 / (xLengthA / 2.0)) +
+                     (x2 / (zLength / 2.0)) * (x2 / (zLength / 2.0));
         return rd2 <= 1.0;
     } else {
-        throw("invalid cutoutTy in wasteBox!");
+        throw("invalid cutout type in inCutout!");
         return false;
     }
 }

@@ -5,10 +5,10 @@
 #include <string>
 #include <vector>
 
-#include "Constants.h"
 #include "Core.h"
 #include "Model/Beamline/Beamline.h"
 #include "Ray.h"
+#include "Shared/Constants.h"
 
 // Abstract Tracer base class.
 namespace RAYX {
@@ -42,7 +42,7 @@ class RAYX_API Tracer {
     Rays trace(const Beamline&);
 
     // Useful for GPU Tracing
-    struct PushConstants { // TODO(Jannis): PushConstants is not an expressive name. Rename to something like TracerConfig
+    struct PushConstants {  // TODO(Jannis): PushConstants is not an expressive name. Rename to something like TracerConfig
         double rayIdStart;
         double numRays;
         double randomSeed;

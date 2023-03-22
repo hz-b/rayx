@@ -1,9 +1,9 @@
 #include "ReflectionZonePlate.h"
 
-#include "Constants.h"
 #include "Data/xml.h"
 #include "Debug/Debug.h"
 #include "Material/Material.h"
+#include "Shared/Constants.h"
 
 namespace RAYX {
 

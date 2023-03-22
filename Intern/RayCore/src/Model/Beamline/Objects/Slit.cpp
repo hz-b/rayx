@@ -1,8 +1,8 @@
 #include "Slit.h"
 
-#include "Constants.h"
 #include "Data/xml.h"
 #include "Debug/Debug.h"
+#include "Shared/Constants.h"
 namespace RAYX {
 
 Slit::Slit(const DesignObject& dobj) : OpticalElement(dobj) {
@@ -25,11 +25,8 @@ Slit::Slit(const DesignObject& dobj) : OpticalElement(dobj) {
     m_surfaceType = STYPE_PLANE_XY;
     m_surfaceParams = {0.0};
 
-    m_gapCutoutType = m_cutoutType;
-    m_gapCutoutParams = {m_cutoutParams[0], m_cutoutParams[1], m_cutoutParams[2]};
-
-    m_cutoutParams.fill(0);
-    m_cutoutType = CTYPE_UNLIMITED;
+    m_gapCutout = m_cutout;
+    m_cutout = serializeUnlimited();
 }
 
 CentralBeamstop Slit::getCentralBeamstop() const { return m_centralBeamstop; }
@@ -39,10 +36,10 @@ double Slit::getBeamstopHeight() const { return m_beamstopHeight; }
 std::array<double, 16> Slit::getElementParams() const {
     return {m_beamstopWidth / 2,
             m_beamstopHeight / 2,
-            m_gapCutoutType,
-            m_gapCutoutParams[0],
-            m_gapCutoutParams[1],
-            m_gapCutoutParams[2],
+            m_gapCutout.m_type,
+            m_gapCutout.m_params[0],
+            m_gapCutout.m_params[1],
+            m_gapCutout.m_params[2],
             0,
             0,
             0,

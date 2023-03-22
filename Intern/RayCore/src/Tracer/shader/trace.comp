@@ -13,8 +13,8 @@ Ray traceSlit(Ray r, Slit slit, INOUT(uint64_t) ctr, ALLOW_UNUSED Collision col)
     double yStop    = beamstopHeight(slit);
 
     // slit lies in x-y plane instead of x-z plane as other elements
-    double params[3] = {gapCutoutParam0(slit), gapCutoutParam1(slit), gapCutoutParam2(slit)};
-    bool withinSlitBounds = inCutout(gapCutoutType(slit), r.m_position[0], r.m_position[1], params);
+    CutoutSerialized gapCut = gapCutout(slit);
+    bool withinSlitBounds = inCutout(gapCut, r.m_position[0], r.m_position[1]);
     bool outsideOfBeamstop = stopBox(r.m_position[0], r.m_position[1], xStop, yStop);
 
     if (!withinSlitBounds || !outsideOfBeamstop) {
@@ -30,16 +30,16 @@ Ray traceSlit(Ray r, Slit slit, INOUT(uint64_t) ctr, ALLOW_UNUSED Collision col)
 
     // this was previously called "diffraction"
     if (wavelength > 0) {
-        double yl = gapCutoutParam0(slit);
-        double xl = gapCutoutParam2(slit);
-        if (gapCutoutType(slit) == CTYPE_RECT) {
+        double yl = gapCut.m_params[0];
+        double xl = gapCut.m_params[2];
+        if (gapCut.m_type == CTYPE_RECT) {
             fraun_diff(xl, wavelength, dPhi, ctr);
             fraun_diff(yl, wavelength, dPsi, ctr);
-        } else if (gapCutoutType(slit) == CTYPE_ELLIPTICAL) {
-            xl = gapCutoutParam2(slit);
+        } else if (gapCut.m_type == CTYPE_ELLIPTICAL) {
+            // xl = gapCutoutParam2(slit);
             bessel_diff(xl, wavelength, dPhi, dPsi, ctr);
         } else {
-            throw("encountered Slit with unsupported gapCutoutType");
+            throw("encountered Slit with unsupported gapCutout");
         }
     }
 

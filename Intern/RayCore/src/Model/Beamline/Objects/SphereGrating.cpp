@@ -1,9 +1,9 @@
 #include "SphereGrating.h"
 
-#include "Constants.h"
 #include "Data/xml.h"
 #include "Debug/Debug.h"
 #include "Material/Material.h"
+#include "Shared/Constants.h"
 namespace RAYX {
 
 SphereGrating::SphereGrating(const DesignObject& dobj) : OpticalElement(dobj) {

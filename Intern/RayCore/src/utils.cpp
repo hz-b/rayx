@@ -2,9 +2,9 @@
 
 #include <sstream>
 
-#include "Constants.h"
 #include "Debug/Debug.h"
 #include "Debug/Instrumentor.h"
+#include "Shared/Constants.h"
 
 /**
  * Calculates photon wavelength (nm) from its energy (eV) or

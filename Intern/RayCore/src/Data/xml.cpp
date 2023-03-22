@@ -6,10 +6,10 @@
 #include <iostream>
 #include <utility>
 
-#include "Constants.h"
 #include "Debug/Debug.h"
 #include "Model/Beamline/EnergyDistribution.h"
 #include "Model/Beamline/LightSource.h"
+#include "Shared/Constants.h"
 #include "utils.h"
 
 namespace RAYX::xml {
@@ -489,34 +489,36 @@ Material Parser::parseMaterial() const {
     return m;
 }
 
-std::tuple<int, std::array<double, 3>> Parser::parseCutout() const {
+CutoutSerialized Parser::parseCutout() const {
     int geom_shape;
     if (!paramInt(node, "geometricalShape", &geom_shape)) {
-        return {CTYPE_UNLIMITED, {0.0, 0.0, 0.0}};
+        return serializeUnlimited();
     }
 
     if (geom_shape == CTYPE_RECT) {
-        double width = parseTotalWidth();
-        double len;
+        RectCutout rect;
+        rect.m_width = parseTotalWidth();
         // TODO why is this inconsistent in the .rml files?
         try {
-            len = parseTotalLength();
+            rect.m_height = parseTotalLength();
         } catch (std::runtime_error& e) {
-            len = parseTotalHeight();
+            rect.m_height = parseTotalHeight();
         }
-        return {CTYPE_RECT, {width, 0.0, len}};
+        return serializeRect(rect);
     } else if (geom_shape == CTYPE_ELLIPTICAL) {
         // TODO test this!
-        double width = parseTotalWidth();
-        double height = parseTotalHeight();
-        return {CTYPE_RECT, {width, 0.0, height}};
+        EllipticalCutout elliptical;
+        elliptical.m_param1 = parseTotalWidth();
+        elliptical.m_param2 = parseTotalHeight();
+        return serializeElliptical(elliptical);
     } else if (geom_shape == CTYPE_TRAPEZOID) {
         // TODO test this!
-        double widthB = parseDouble("totalWidthB");
-        double length = parseTotalWidth();
-        double height = parseTotalHeight();
+        TrapezoidCutout trapezoid;
+        trapezoid.m_param1 = parseTotalWidth();
+        trapezoid.m_param2 = parseDouble("totalWidthB");
+        trapezoid.m_param3 = parseTotalHeight();
 
-        return {CTYPE_TRAPEZOID, {length, widthB, height}};
+        return serializeTrapezoid(trapezoid);
     } else {
         RAYX_ERR << "invalid geom_shape!";
         return {0, {0.0, 0.0, 0.0}};

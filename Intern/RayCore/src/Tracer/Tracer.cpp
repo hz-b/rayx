@@ -2,11 +2,11 @@
 
 #include <algorithm>
 
-#include "Constants.h"
 #include "Debug/Debug.h"
 #include "Debug/Instrumentor.h"
 #include "Model/Beamline/OpticalElement.h"
 #include "Random.h"
+#include "Shared/Constants.h"
 
 using uint = unsigned int;
 

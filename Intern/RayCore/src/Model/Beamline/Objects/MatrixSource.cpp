@@ -1,10 +1,10 @@
 #include "MatrixSource.h"
 
-#include "Constants.h"
 #include "Data/xml.h"
 #include "Debug/Debug.h"
 #include "Debug/Instrumentor.h"
 #include "Random.h"
+#include "Shared/Constants.h"
 
 namespace RAYX {
 

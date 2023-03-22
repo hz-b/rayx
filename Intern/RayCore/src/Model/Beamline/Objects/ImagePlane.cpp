@@ -1,6 +1,6 @@
 #include "ImagePlane.h"
 
-#include "Constants.h"
+#include "Shared/Constants.h"
 
 namespace RAYX {
 

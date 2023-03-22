@@ -1,7 +1,7 @@
 #include "PlaneGrating.h"
 
-#include "Constants.h"
 #include "Debug/Debug.h"
+#include "Shared/Constants.h"
 
 namespace RAYX {
 

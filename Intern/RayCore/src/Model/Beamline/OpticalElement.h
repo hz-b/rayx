@@ -3,9 +3,9 @@
 #include <array>
 #include <glm.hpp>
 
-#include "Constants.h"
 #include "Core.h"
 #include "Data/xml.h"
+#include "Shared/Constants.h"
 #include "utils.h"
 
 namespace RAYX {
@@ -46,8 +46,8 @@ class RAYX_API OpticalElement {
     std::array<double, 16> m_surfaceParams;
 
     std::array<double, 7> m_slopeError;
-    int m_cutoutType;
-    std::array<double, 3> m_cutoutParams;
+
+    CutoutSerialized m_cutout;
 };
 
 }  // namespace RAYX
