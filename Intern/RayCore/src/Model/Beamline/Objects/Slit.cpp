@@ -22,8 +22,7 @@ Slit::Slit(const DesignObject& dobj) : OpticalElement(dobj) {
         m_beamstopHeight = beamstopHeight;
     }
 
-    m_surfaceType = STYPE_PLANE_XY;
-    m_surfaceParams = {0.0};
+    m_surface = serializePlaneXY();
 
     m_gapCutout = m_cutout;
     m_cutout = serializeUnlimited();

@@ -15,7 +15,7 @@ Cone::Cone(const DesignObject& dobj) : OpticalElement(dobj) {
 
     m_cm = pow((m_upstreamRadius_R - m_downstreamRadius_rho) / zl, 2);
 
-    double icurv = 0;
+    int icurv = 0;
     m_a11 = 1 - m_cm;
     m_a22 = 1 - 2 * m_cm;
     m_a23 = sqrt(m_cm - m_cm * m_cm);
@@ -26,8 +26,19 @@ Cone::Cone(const DesignObject& dobj) : OpticalElement(dobj) {
         m_a24 = -m_upstreamRadius_R;
     }
 
-    m_surfaceType = STYPE_QUADRIC;
-    m_surfaceParams = {m_a11, 0, 0, 0, icurv, m_a22, m_a23, m_a24, 0, 0, 0, 0, 0, 0, 0, 0};
+    m_surface = serializeQuadric({
+        .m_icurv = icurv,
+        .m_a11 = m_a11,
+        .m_a12 = 0,
+        .m_a13 = 0,
+        .m_a14 = 0,
+        .m_a22 = m_a22,
+        .m_a23 = m_a23,
+        .m_a24 = m_a24,
+        .m_a33 = 0,
+        .m_a34 = 0,
+        .m_a44 = 0,
+    });
 }
 
 Cone::~Cone() = default;

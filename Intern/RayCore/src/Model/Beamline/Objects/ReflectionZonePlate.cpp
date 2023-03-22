@@ -32,17 +32,41 @@ ReflectionZonePlate::ReflectionZonePlate(const DesignObject& dobj) : OpticalElem
 
     // set parameters in Quadric class
     if (m_curvatureType == CurvatureType::Plane) {
-        m_surfaceType = STYPE_QUADRIC;
-        m_surfaceParams = {0, 0, 0, 0, 1, 0, 0, -1, 0, 0, 0, 0, 0, 0, 0, 0};
+        m_surface = serializeQuadric({
+            .m_icurv = 1,
+            .m_a11 = 0,
+            .m_a12 = 0,
+            .m_a13 = 0,
+            .m_a14 = 0,
+            .m_a22 = 0,
+            .m_a23 = 0,
+            .m_a24 = -1,
+            .m_a33 = 0,
+            .m_a34 = 0,
+            .m_a44 = 0,
+        });
     } else if (m_curvatureType == CurvatureType::Toroidal) {
-        m_longRadius = dobj.parseLongRadius();    // for sphere and toroidal
-        m_shortRadius = dobj.parseShortRadius();  // only for Toroidal
-        m_surfaceType = STYPE_TOROID;
-        m_surfaceParams = {m_longRadius, m_shortRadius};
+        m_longRadius = dobj.parseLongRadius();
+        m_shortRadius = dobj.parseShortRadius();
+        m_surface = serializeToroid({
+            m_longRadius = m_longRadius,
+            m_shortRadius = m_shortRadius,
+        });
     } else {
         m_longRadius = dobj.parseLongRadius();  // for sphere and toroidal
-        m_surfaceType = STYPE_QUADRIC;
-        m_surfaceParams = {1, 0, 0, 0, 1, 1, 0, -m_longRadius, 0, 0, 1, 0, 0, 0, 0, 0};
+        m_surface = serializeQuadric({
+            .m_icurv = 1,
+            .m_a11 = 1,
+            .m_a12 = 0,
+            .m_a13 = 0,
+            .m_a14 = 0,
+            .m_a22 = 1,
+            .m_a23 = 0,
+            .m_a24 = -m_longRadius,
+            .m_a33 = 1,
+            .m_a34 = 0,
+            .m_a44 = 0,
+        });
     }
 
     printInfo();

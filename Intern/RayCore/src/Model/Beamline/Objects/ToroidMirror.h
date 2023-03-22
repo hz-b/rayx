@@ -8,11 +8,6 @@ class RAYX_API ToroidMirror : public OpticalElement {
     ToroidMirror(const DesignObject&);
 
     inline int getElementType() const { return TYPE_MIRROR; }
-    double getRadius() const;
-
-  private:
-    double m_longRadius = 1000;
-    double m_shortRadius = 1000;
 };
 
 }  // namespace RAYX

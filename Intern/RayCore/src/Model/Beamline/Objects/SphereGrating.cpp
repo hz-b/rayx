@@ -14,8 +14,20 @@ SphereGrating::SphereGrating(const DesignObject& dobj) : OpticalElement(dobj) {
 
     m_gratingMount = dobj.parseGratingMount();
     auto radius = dobj.parseRadius();
-    m_surfaceType = STYPE_QUADRIC;
-    m_surfaceParams = {1, 0, 0, 0, 1, 1, 0, -radius, 0, 0, 1, 0, 0, 0, 0, 0};
+    m_surface = serializeQuadric({
+        .m_icurv = 1,
+        .m_a11 = 1,
+        .m_a12 = 0,
+        .m_a13 = 0,
+        .m_a14 = 0,
+
+        .m_a22 = 1,
+        .m_a23 = 0,
+        .m_a24 = -radius,
+        .m_a33 = 1,
+        .m_a34 = 0,
+        .m_a44 = 0,
+    });
 }
 
 double SphereGrating::getRadius() const { return m_radius; }

@@ -2,6 +2,7 @@
 #define ELEMENTS_H
 
 #include "Cutout.h"
+#include "Surface.h"
 
 // TODO extract this somewhere else
 #ifndef GLSL
@@ -21,11 +22,7 @@ struct Element {
     double m_type;
     double m_elementParams[16];
 
-    // the surface type of this element, see the STY constants.
-    // the surface type describes how the surfaceParams need to be interpreted.
-    double m_surfaceType;
-    double m_surfaceParams[16];
-
+    SurfaceSerialized m_surface;
     CutoutSerialized m_cutout;
 
     // general object information
@@ -46,16 +43,5 @@ const int TYPE_GRATING = 1;
 const int TYPE_SLIT = 2;
 const int TYPE_RZP = 3;
 const int TYPE_IMAGE_PLANE = 4;
-
-///////////////////
-// surface types
-///////////////////
-
-// a surface is a potentially infinite curved surface in 3d space.
-// as our elements are mostly finite in size, they are represented by a (potentially infinite) surface in combination with a finite cutout (see CTY
-// constants)
-const int STYPE_QUADRIC = 0;
-const int STYPE_TOROID = 1;
-const int STYPE_PLANE_XY = 2;  // an infinite X-Y plane.
 
 #endif

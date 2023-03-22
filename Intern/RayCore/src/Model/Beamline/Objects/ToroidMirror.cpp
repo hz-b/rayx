@@ -7,11 +7,10 @@
 
 namespace RAYX {
 ToroidMirror::ToroidMirror(const DesignObject& dobj) : OpticalElement(dobj) {
-    m_longRadius = dobj.parseLongRadius();
-    m_shortRadius = dobj.parseShortRadius();
-
-    m_surfaceType = STYPE_TOROID;
-    m_surfaceParams = {m_longRadius, m_shortRadius};
+    m_surface = serializeToroid({
+        .m_longRadius = dobj.parseLongRadius(),
+        .m_shortRadius = dobj.parseShortRadius(),
+    });
 }
 
 }  // namespace RAYX

@@ -30,8 +30,7 @@ Element OpticalElement::intoElement() const {
         .m_outTrans = getOutMatrix(),
         .m_type = (double)getElementType(),
         .m_elementParams = {0},  // initialized below
-        .m_surfaceType = (double)m_surfaceType,
-        .m_surfaceParams = {0},  // initialized below
+        .m_surface = m_surface,
         .m_cutout = m_cutout,
         .m_slopeError = {m_slopeError[0], m_slopeError[1], m_slopeError[2], m_slopeError[3], m_slopeError[4], m_slopeError[5], m_slopeError[6]},
         .m_azimuthalAngle = m_azimuthalAngle.rad,
@@ -40,7 +39,6 @@ Element OpticalElement::intoElement() const {
     };
     for (int i = 0; i < 16; i++) {
         e.m_elementParams[i] = getElementParams().data()[i];
-        e.m_surfaceParams[i] = m_surfaceParams.data()[i];
     }
 
     return e;

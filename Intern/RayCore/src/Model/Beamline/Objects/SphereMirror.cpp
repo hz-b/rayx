@@ -13,8 +13,20 @@ SphereMirror::SphereMirror(const DesignObject& dobj) : OpticalElement(dobj) {
     m_grazingIncidenceAngle = dobj.parseGrazingIncAngle();
 
     calcRadius();  // calculate the radius
-    m_surfaceType = STYPE_QUADRIC;
-    m_surfaceParams = {1, 0, 0, 0, 1, 1, 0, -m_radius, 0, 0, 1, 0, 0, 0, 0, 0};
+
+    m_surface = serializeQuadric({
+        .m_icurv = 1,
+        .m_a11 = 1,
+        .m_a12 = 0,
+        .m_a13 = 0,
+        .m_a14 = 0,
+        .m_a22 = 1,
+        .m_a23 = 0,
+        .m_a24 = -m_radius,
+        .m_a33 = 1,
+        .m_a34 = 0,
+        .m_a44 = 0,
+    });
 }
 
 // TODO(Theresa): move this to user params and just give the radius as a

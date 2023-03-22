@@ -26,14 +26,25 @@ Cylinder::Cylinder(const DesignObject& dobj) : OpticalElement(dobj) {
         m_a33 = 0;
         m_a24 = -m_radius;
     }
-    double icurv = 1;
+    int icurv = 1;
     if (m_a24 > 0) icurv = -1;  // Translated from RAY.FOR
     if (m_radius == 0) {
         setRadius();
     }
 
-    m_surfaceType = STYPE_QUADRIC;
-    m_surfaceParams = {m_a11, 0, 0, 0, icurv, 1, 0, m_a24, 0, 0, m_a33, 0, 0, 0, 0, 0};
+    m_surface = serializeQuadric({
+        .m_icurv = icurv,
+        .m_a11 = m_a11,
+        .m_a12 = 0,
+        .m_a13 = 0,
+        .m_a14 = 0,
+        .m_a22 = 1,
+        .m_a23 = 0,
+        .m_a24 = m_a24,
+        .m_a33 = m_a33,
+        .m_a34 = 0,
+        .m_a44 = 0,
+    });
 }
 
 /**

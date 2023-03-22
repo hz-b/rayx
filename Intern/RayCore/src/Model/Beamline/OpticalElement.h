@@ -42,11 +42,8 @@ class RAYX_API OpticalElement {
     glm::dmat4x4 m_orientation = glm::dmat4x4();  //< Orientation matrix of element (is basis)
     glm::dvec4 m_position = glm::dvec4();         //< Position of element in world coordinates
 
-    int m_surfaceType;
-    std::array<double, 16> m_surfaceParams;
-
     std::array<double, 7> m_slopeError;
-
+    SurfaceSerialized m_surface;
     CutoutSerialized m_cutout;
 };
 

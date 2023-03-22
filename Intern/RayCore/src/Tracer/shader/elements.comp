@@ -12,34 +12,17 @@ struct Rzp { uint id; };
 struct ImagePlane { uint id; };
 
 double param_e(uint id, uint i) { return elements[id].m_elementParams[i]; }
-double param_s(uint id, uint i) { return elements[id].m_surfaceParams[i]; }
 
 /**************************************************************
  *      element-type independent access functions:
  **************************************************************/
 double type(uint id) { return elements[id].m_type; }
-double surfaceType(uint id) { return elements[id].m_surfaceType; }
 double material(uint id) { return elements[id].m_material; }
 double azimuthalAngle(uint id) { return elements[id].m_azimuthalAngle; }
 dmat4 inTrans(uint id) { return elements[id].m_inTrans; }
 dmat4 outTrans(uint id) { return elements[id].m_outTrans; }
 double slopeX(uint id) { return elements[id].m_slopeError[0]; }
 double slopeZ(uint id) { return elements[id].m_slopeError[1]; }
-
-// only usable for STYPE_TOROID.
-double longRadius(uint id) {
-    if (surfaceType(id) != STYPE_TOROID) {
-        throw("You cannot use longRadius on this surface!");
-    }
-    return param_s(id, 0);
-}
-
-double shortRadius(uint id) {
-    if (surfaceType(id) != STYPE_TOROID) {
-        throw("You cannot use shortRadius on this surface!");
-    }
-    return param_s(id, 1);
-}
 
 /**************************************************************
  *                    Slit
@@ -61,8 +44,6 @@ CutoutSerialized gapCutout(Slit e) {
  **************************************************************/
 double curvatureType(Rzp e) { return param_e(e.id, 4); }
 double elementOffsetZ(Rzp e) { return param_e(e.id, 14); }
-double longRadius(Rzp e) { return param_s(e.id, 0); }
-double shortRadius(Rzp e) { return param_s(e.id, 1); }
 double slopeX(Rzp e) { return slopeX(e.id); }
 double slopeZ(Rzp e) { return slopeZ(e.id); }
 

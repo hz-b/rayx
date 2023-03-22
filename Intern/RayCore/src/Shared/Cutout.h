@@ -101,6 +101,7 @@ INLINE TrapezoidCutout deserializeTrapezoid(CutoutSerialized ser) {
 /////////////////////////
 
 // Unlimited doesn't have any data so it doesn't need a struct.
+
 INLINE CutoutSerialized serializeUnlimited() {
     CutoutSerialized ser;
     ser.m_type = CTYPE_UNLIMITED;
