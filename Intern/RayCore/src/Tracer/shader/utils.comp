@@ -103,7 +103,7 @@ void cosini(INOUT(Ray) r, double phi, double psi) {
 }
 
 // checks whether the point (x1, x2) is within the cutout.
-bool inCutout(CutoutSerialized cutout, double x1, double x2) {
+bool inCutout(Cutout cutout, double x1, double x2) {
     if (cutout.m_type == CTYPE_UNLIMITED) {
         return true;
     } else if (cutout.m_type == CTYPE_RECT) {

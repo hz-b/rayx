@@ -43,8 +43,8 @@ class RAYX_API OpticalElement {
     glm::dvec4 m_position = glm::dvec4();         //< Position of element in world coordinates
 
     std::array<double, 7> m_slopeError;
-    SurfaceSerialized m_surface;
-    CutoutSerialized m_cutout;
+    Surface m_surface;
+    Cutout m_cutout;
 };
 
 }  // namespace RAYX

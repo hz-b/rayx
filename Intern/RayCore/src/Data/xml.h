@@ -82,7 +82,7 @@ struct Parser {
     glm::dvec4 parsePosition() const;
     glm::dmat4x4 parseOrientation() const;
     Material parseMaterial() const;
-    CutoutSerialized parseCutout() const;
+    Cutout parseCutout() const;
 
     // parsers for trivial derived parameters
     inline int parseNumberRays() const { return parseInt("numberRays"); }

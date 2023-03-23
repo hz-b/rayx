@@ -13,7 +13,7 @@ Ray traceSlit(Ray r, Slit slit, INOUT(uint64_t) ctr, ALLOW_UNUSED Collision col)
     double yStop    = beamstopHeight(slit);
 
     // slit lies in x-y plane instead of x-z plane as other elements
-    CutoutSerialized gapCut = gapCutout(slit);
+    Cutout gapCut = gapCutout(slit);
     bool withinSlitBounds = inCutout(gapCut, r.m_position[0], r.m_position[1]);
     bool outsideOfBeamstop = stopBox(r.m_position[0], r.m_position[1], xStop, yStop);
 

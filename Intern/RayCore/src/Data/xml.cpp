@@ -489,7 +489,7 @@ Material Parser::parseMaterial() const {
     return m;
 }
 
-CutoutSerialized Parser::parseCutout() const {
+Cutout Parser::parseCutout() const {
     int geom_shape;
     if (!paramInt(node, "geometricalShape", &geom_shape)) {
         return serializeUnlimited();

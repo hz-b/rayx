@@ -14,7 +14,7 @@ const int STYPE_QUADRIC = 0;
 const int STYPE_TOROID = 1;
 const int STYPE_PLANE_XY = 2;  // an infinite X-Y plane.
 
-struct SurfaceSerialized {
+struct Surface {
     double m_type;
     double m_params[16];
 };
@@ -37,8 +37,8 @@ struct QuadricSurface {
     double m_a44;
 };
 
-INLINE SurfaceSerialized serializeQuadric(QuadricSurface surface) {
-    SurfaceSerialized ser;
+INLINE Surface serializeQuadric(QuadricSurface surface) {
+    Surface ser;
     ser.m_type = STYPE_QUADRIC;
     ser.m_params[0] = double(surface.m_icurv);
     ser.m_params[1] = surface.m_a11;
@@ -54,7 +54,7 @@ INLINE SurfaceSerialized serializeQuadric(QuadricSurface surface) {
     return ser;
 }
 
-INLINE QuadricSurface deserializeQuadric(SurfaceSerialized ser) {
+INLINE QuadricSurface deserializeQuadric(Surface ser) {
     QuadricSurface surface;
     surface.m_icurv = int(ser.m_params[0]);
     surface.m_a11 = ser.m_params[1];
@@ -79,15 +79,15 @@ struct ToroidSurface {
     double m_shortRadius;
 };
 
-INLINE SurfaceSerialized serializeToroid(ToroidSurface surface) {
-    SurfaceSerialized ser;
+INLINE Surface serializeToroid(ToroidSurface surface) {
+    Surface ser;
     ser.m_type = STYPE_TOROID;
     ser.m_params[0] = surface.m_longRadius;
     ser.m_params[1] = surface.m_shortRadius;
     return ser;
 }
 
-INLINE ToroidSurface deserializeToroid(SurfaceSerialized ser) {
+INLINE ToroidSurface deserializeToroid(Surface ser) {
     ToroidSurface surface;
     surface.m_longRadius = ser.m_params[0];
     surface.m_shortRadius = ser.m_params[1];
@@ -100,8 +100,8 @@ INLINE ToroidSurface deserializeToroid(SurfaceSerialized ser) {
 
 // `PlaneXY` doesn't have any data so it doesn't need a struct.
 
-INLINE SurfaceSerialized serializePlaneXY() {
-    SurfaceSerialized ser;
+INLINE Surface serializePlaneXY() {
+    Surface ser;
     ser.m_type = STYPE_PLANE_XY;
     return ser;
 }

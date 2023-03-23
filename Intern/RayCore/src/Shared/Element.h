@@ -22,8 +22,8 @@ struct Element {
     double m_type;
     double m_elementParams[16];
 
-    SurfaceSerialized m_surface;
-    CutoutSerialized m_cutout;
+    Surface m_surface;
+    Cutout m_cutout;
 
     // general object information
     double m_slopeError[7];

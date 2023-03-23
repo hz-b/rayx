@@ -15,7 +15,7 @@ const int CTYPE_ELLIPTICAL = 1;
 const int CTYPE_TRAPEZOID = 2;
 const int CTYPE_UNLIMITED = 3;  // cutout parameters are (0, 0, 0).
 
-struct CutoutSerialized {
+struct Cutout {
     double m_type;
     double m_params[3];
 };
@@ -29,15 +29,15 @@ struct RectCutout {
     double m_height;
 };
 
-INLINE CutoutSerialized serializeRect(RectCutout cut) {
-    CutoutSerialized ser;
+INLINE Cutout serializeRect(RectCutout cut) {
+    Cutout ser;
     ser.m_type = CTYPE_RECT;
     ser.m_params[0] = cut.m_width;
     ser.m_params[1] = cut.m_height;
     return ser;
 }
 
-INLINE RectCutout deserializeRect(CutoutSerialized ser) {
+INLINE RectCutout deserializeRect(Cutout ser) {
     RectCutout cut;
     cut.m_width = ser.m_params[0];
     cut.m_height = ser.m_params[1];
@@ -54,15 +54,15 @@ struct EllipticalCutout {
     double m_param2;
 };
 
-INLINE CutoutSerialized serializeElliptical(EllipticalCutout cut) {
-    CutoutSerialized ser;
+INLINE Cutout serializeElliptical(EllipticalCutout cut) {
+    Cutout ser;
     ser.m_type = CTYPE_ELLIPTICAL;
     ser.m_params[0] = cut.m_param1;
     ser.m_params[1] = cut.m_param2;
     return ser;
 }
 
-INLINE EllipticalCutout deserializeElliptical(CutoutSerialized ser) {
+INLINE EllipticalCutout deserializeElliptical(Cutout ser) {
     EllipticalCutout cut;
     cut.m_param1 = ser.m_params[0];
     cut.m_param2 = ser.m_params[1];
@@ -79,8 +79,8 @@ struct TrapezoidCutout {
     double m_param3;
 };
 
-INLINE CutoutSerialized serializeTrapezoid(TrapezoidCutout cut) {
-    CutoutSerialized ser;
+INLINE Cutout serializeTrapezoid(TrapezoidCutout cut) {
+    Cutout ser;
     ser.m_type = CTYPE_TRAPEZOID;
     ser.m_params[0] = cut.m_param1;
     ser.m_params[1] = cut.m_param2;
@@ -88,7 +88,7 @@ INLINE CutoutSerialized serializeTrapezoid(TrapezoidCutout cut) {
     return ser;
 }
 
-INLINE TrapezoidCutout deserializeTrapezoid(CutoutSerialized ser) {
+INLINE TrapezoidCutout deserializeTrapezoid(Cutout ser) {
     TrapezoidCutout cut;
     cut.m_param1 = ser.m_params[0];
     cut.m_param2 = ser.m_params[1];
@@ -102,8 +102,8 @@ INLINE TrapezoidCutout deserializeTrapezoid(CutoutSerialized ser) {
 
 // Unlimited doesn't have any data so it doesn't need a struct.
 
-INLINE CutoutSerialized serializeUnlimited() {
-    CutoutSerialized ser;
+INLINE Cutout serializeUnlimited() {
+    Cutout ser;
     ser.m_type = CTYPE_UNLIMITED;
     return ser;
 }

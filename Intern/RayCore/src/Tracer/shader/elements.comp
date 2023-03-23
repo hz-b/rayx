@@ -30,8 +30,8 @@ double slopeZ(uint id) { return elements[id].m_slopeError[1]; }
 double beamstopWidth(Slit e) { return param_e(e.id, 0); }
 double beamstopHeight(Slit e) { return param_e(e.id, 1); }
 
-CutoutSerialized gapCutout(Slit e) {
-    CutoutSerialized ser;
+Cutout gapCutout(Slit e) {
+    Cutout ser;
     ser.m_type = param_e(e.id, 2);
     ser.m_params[0] = param_e(e.id, 3);
     ser.m_params[1] = param_e(e.id, 4);
