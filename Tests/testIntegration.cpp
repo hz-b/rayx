@@ -56,8 +56,6 @@ TEST_F(TestSuite, Ellipsoid) {
     CHECK(found_atleast_one);
 }
 
-// TODO(Rudi) re-enable test!
-/*
 TEST_F(TestSuite, Slit) {
     auto rays = traceRML("slit");
 
@@ -89,7 +87,6 @@ TEST_F(TestSuite, Slit) {
     CHECK_EQ(absorbed, 108);
     CHECK_EQ(pass_through, 92);
 }
-*/
 
 TEST_F(TestSuite, toroid) { compareLastAgainstRayUI("toroid"); }
 

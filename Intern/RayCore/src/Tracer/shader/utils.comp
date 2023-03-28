@@ -108,10 +108,10 @@ bool inCutout(Cutout cutout, double x1, double x2) {
         return true;
     } else if (cutout.m_type == CTYPE_RECT) {
         RectCutout rect = deserializeRect(cutout);
-        double x1_min = -rect.m_width / 2.0;
-        double x1_max = rect.m_width / 2.0;
-        double x2_min = -rect.m_height / 2.0;
-        double x2_max = rect.m_height / 2.0;
+        double x1_min = -rect.m_size_x1 / 2.0;
+        double x1_max = rect.m_size_x1 / 2.0;
+        double x2_min = -rect.m_size_x2 / 2.0;
+        double x2_max = rect.m_size_x2 / 2.0;
 
         return !(x1 <= x1_min || x1 >= x1_max || x2 <= x2_min || x2 >= x2_max);
     } else if (cutout.m_type == CTYPE_TRAPEZOID) {
@@ -142,8 +142,9 @@ bool inCutout(Cutout cutout, double x1, double x2) {
         EllipticalCutout elliptical = deserializeElliptical(cutout);
         double xLengthA = elliptical.m_param1;
         double zLength = elliptical.m_param2;
-        double rd2 = (x1 / (xLengthA / 2.0)) * (x1 / (xLengthA / 2.0)) +
-                     (x2 / (zLength / 2.0)) * (x2 / (zLength / 2.0));
+        double val1 = (x1 / (xLengthA / 2.0));
+        double val2 = (x2 / (zLength / 2.0));
+        double rd2 = val1*val1 + val2*val2;
         return rd2 <= 1.0;
     } else {
         throw("invalid cutout type in inCutout!");

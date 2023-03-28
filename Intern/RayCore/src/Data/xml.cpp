@@ -497,12 +497,12 @@ Cutout Parser::parseCutout() const {
 
     if (geom_shape == CTYPE_RECT) {
         RectCutout rect;
-        rect.m_width = parseTotalWidth();
+        rect.m_size_x1 = parseTotalWidth();
         // TODO why is this inconsistent in the .rml files?
         try {
-            rect.m_height = parseTotalLength();
+            rect.m_size_x2 = parseTotalLength();
         } catch (std::runtime_error& e) {
-            rect.m_height = parseTotalHeight();
+            rect.m_size_x2 = parseTotalHeight();
         }
         return serializeRect(rect);
     } else if (geom_shape == CTYPE_ELLIPTICAL) {

@@ -15,6 +15,10 @@ const int CTYPE_ELLIPTICAL = 1;
 const int CTYPE_TRAPEZOID = 2;
 const int CTYPE_UNLIMITED = 3;  // cutout parameters are (0, 0, 0).
 
+// The two dimensions in a cutout are called x1 and x2.
+// How they map to the three dimensions of an element depends on the "primary plane".
+// typically it's (x1, x2) = (X, Y) or (x1, x2) = (X, Z).
+
 struct Cutout {
     double m_type;
     double m_params[3];
@@ -25,22 +29,22 @@ struct Cutout {
 ///////////////////////////////////
 
 struct RectCutout {
-    double m_width;
-    double m_height;
+    double m_size_x1;
+    double m_size_x2;
 };
 
 INLINE Cutout serializeRect(RectCutout cut) {
     Cutout ser;
     ser.m_type = CTYPE_RECT;
-    ser.m_params[0] = cut.m_width;
-    ser.m_params[1] = cut.m_height;
+    ser.m_params[0] = cut.m_size_x1;
+    ser.m_params[1] = cut.m_size_x2;
     return ser;
 }
 
 INLINE RectCutout deserializeRect(Cutout ser) {
     RectCutout cut;
-    cut.m_width = ser.m_params[0];
-    cut.m_height = ser.m_params[1];
+    cut.m_size_x1 = ser.m_params[0];
+    cut.m_size_x2 = ser.m_params[1];
     return cut;
 }
 
