@@ -36,7 +36,8 @@ Ray traceSlit(Ray r, Slit slit, INOUT(uint64_t) ctr, ALLOW_UNUSED Collision col)
             fraun_diff(r.m_size_x2, wavelength, dPsi, ctr);
         } else if (gapCut.m_type == CTYPE_ELLIPTICAL) {
             EllipticalCutout e = deserializeElliptical(gapCut);
-            bessel_diff(e.m_param2, wavelength, dPhi, dPsi, ctr);
+            // TODO why m_diameter_x2 and not m_diameter_x1?
+            bessel_diff(e.m_diameter_x2, wavelength, dPhi, dPsi, ctr);
         } else {
             throw("encountered Slit with unsupported gapCutout");
         }

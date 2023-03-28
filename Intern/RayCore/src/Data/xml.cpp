@@ -508,8 +508,8 @@ Cutout Parser::parseCutout() const {
     } else if (geom_shape == CTYPE_ELLIPTICAL) {
         // TODO test this!
         EllipticalCutout elliptical;
-        elliptical.m_param1 = parseTotalWidth();
-        elliptical.m_param2 = parseTotalHeight();
+        elliptical.m_diameter_x1 = parseTotalWidth();
+        elliptical.m_diameter_x2 = parseTotalHeight();
         return serializeElliptical(elliptical);
     } else if (geom_shape == CTYPE_TRAPEZOID) {
         // TODO test this!

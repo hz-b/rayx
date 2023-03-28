@@ -54,22 +54,22 @@ INLINE RectCutout deserializeRect(Cutout ser) {
 
 // what are the parameters?
 struct EllipticalCutout {
-    double m_param1;
-    double m_param2;
+    double m_diameter_x1;
+    double m_diameter_x2;
 };
 
 INLINE Cutout serializeElliptical(EllipticalCutout cut) {
     Cutout ser;
     ser.m_type = CTYPE_ELLIPTICAL;
-    ser.m_params[0] = cut.m_param1;
-    ser.m_params[1] = cut.m_param2;
+    ser.m_params[0] = cut.m_diameter_x1;
+    ser.m_params[1] = cut.m_diameter_x2;
     return ser;
 }
 
 INLINE EllipticalCutout deserializeElliptical(Cutout ser) {
     EllipticalCutout cut;
-    cut.m_param1 = ser.m_params[0];
-    cut.m_param2 = ser.m_params[1];
+    cut.m_diameter_x1 = ser.m_params[0];
+    cut.m_diameter_x2 = ser.m_params[1];
     return cut;
 }
 
