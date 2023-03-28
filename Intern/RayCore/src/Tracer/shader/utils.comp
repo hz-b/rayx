@@ -116,9 +116,9 @@ bool inCutout(Cutout cutout, double x1, double x2) {
         return !(x1 <= x1_min || x1 >= x1_max || x2 <= x2_min || x2 >= x2_max);
     } else if (cutout.m_type == CTYPE_TRAPEZOID) {
         TrapezoidCutout trapezoid = deserializeTrapezoid(cutout);
-        double xLengthA = trapezoid.m_param1;
-        double xLengthB = trapezoid.m_param2;
-        double zLength = trapezoid.m_param3;
+        double xLengthA = trapezoid.m_sizeA_x1;
+        double xLengthB = trapezoid.m_sizeB_x1;
+        double zLength = trapezoid.m_size_x2;
 
         // Check point is within the trapezoid
         dvec3 P = dvec3(x1, 0, x2);

@@ -514,9 +514,9 @@ Cutout Parser::parseCutout() const {
     } else if (geom_shape == CTYPE_TRAPEZOID) {
         // TODO test this!
         TrapezoidCutout trapezoid;
-        trapezoid.m_param1 = parseTotalWidth();
-        trapezoid.m_param2 = parseDouble("totalWidthB");
-        trapezoid.m_param3 = parseTotalHeight();
+        trapezoid.m_sizeA_x1 = parseTotalWidth();
+        trapezoid.m_sizeB_x1 = parseDouble("totalWidthB");
+        trapezoid.m_size_x2 = parseTotalHeight();
 
         return serializeTrapezoid(trapezoid);
     } else {
