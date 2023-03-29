@@ -10,12 +10,9 @@ class RAYX_API Slit : public OpticalElement {
   public:
     Slit(const DesignObject&);
 
-    inline int getBehaviourType() const { return BTYPE_SLIT; }
-
     CentralBeamstop getCentralBeamstop() const;
     double getBeamstopWidth() const;
     double getBeamstopHeight() const;
-    std::array<double, 16> getBehaviourParams() const;
 
   private:
     CentralBeamstop m_centralBeamstop;

@@ -26,28 +26,16 @@ Slit::Slit(const DesignObject& dobj) : OpticalElement(dobj) {
 
     m_gapCutout = m_cutout;
     m_cutout = serializeUnlimited();
+
+    m_behaviour = serializeSlit({
+        .m_beamstopWidth = m_beamstopWidth,
+        .m_beamstopHeight = m_beamstopHeight,
+        .m_gapCutout = m_gapCutout,
+    });
 }
 
 CentralBeamstop Slit::getCentralBeamstop() const { return m_centralBeamstop; }
 double Slit::getBeamstopWidth() const { return m_beamstopWidth; }
 double Slit::getBeamstopHeight() const { return m_beamstopHeight; }
 
-std::array<double, 16> Slit::getBehaviourParams() const {
-    return {m_beamstopWidth / 2,
-            m_beamstopHeight / 2,
-            m_gapCutout.m_type,
-            m_gapCutout.m_params[0],
-            m_gapCutout.m_params[1],
-            m_gapCutout.m_params[2],
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0};
-}
 }  // namespace RAYX
