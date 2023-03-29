@@ -48,19 +48,19 @@ void dynamicElements() {
 
         switch(btype) {
             case (BTYPE_MIRROR):
-                elem_ray = traceMirror(elem_ray, Mirror(col.elementIndex), ctr, col);
+                elem_ray = traceMirror(elem_ray, col.elementIndex, ctr, col);
                 break;
             case (BTYPE_GRATING):
-                elem_ray = traceGrating(elem_ray, Grating(col.elementIndex), ctr, col);
+                elem_ray = traceGrating(elem_ray, col.elementIndex, ctr, col);
                 break;
             case (BTYPE_SLIT) :
-                elem_ray = traceSlit(elem_ray, Slit(col.elementIndex), ctr, col);
+                elem_ray = traceSlit(elem_ray, col.elementIndex, ctr, col);
                 break;
             case (BTYPE_RZP):
-                elem_ray = traceRZP(elem_ray, Rzp(col.elementIndex), ctr, col);
+                elem_ray = traceRZP(elem_ray, col.elementIndex, ctr, col);
                 break;
             case (BTYPE_IMAGE_PLANE):
-                elem_ray = traceImagePlane(elem_ray, ImagePlane(col.elementIndex), col);
+                elem_ray = traceImagePlane(elem_ray, col.elementIndex, col);
                 break;
         }
 

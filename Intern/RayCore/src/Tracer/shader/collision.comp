@@ -209,17 +209,10 @@ dvec2 projectToPrimaryPlane(double surfaceType, dvec3 point) {
 // checks whether `r` collides with the element of the given `id`,
 // and returns a Collision accordingly.
 Collision findCollisionWith(Ray r, uint id) {
-    double bty = elements[id].m_behaviour.m_type;
     double sty = elements[id].m_surface.m_type;
 
-    if (bty == BTYPE_RZP) {
-        r.m_position.z = r.m_position.z - param_e(id, 14); // TODO what is at index 14 ?
-    }
-
-    // _ray = rayMatrixMult(_ray, q.inTrans); // ray/global to element coordinates,
-
     // misalignment
-    r = rayMatrixMult(r, inTrans(id));  // image plane is the x-y plane of the coordinate system
+    r = rayMatrixMult(r, elements[id].m_inTrans);  // image plane is the x-y plane of the coordinate system
 
     Collision col;
     if (sty == STYPE_PLANE_XY) {

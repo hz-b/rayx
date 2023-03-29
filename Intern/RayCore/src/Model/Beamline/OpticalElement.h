@@ -29,8 +29,6 @@ class RAYX_API OpticalElement {
     glm::dmat4x4 getOrientation() const;
     glm::dvec4 getPosition() const;
 
-    virtual std::array<double, 16> getBehaviourParams() const;
-    virtual int getBehaviourType() const { return 42; }
     std::array<double, 7> getSlopeError() const;
 
     std::string m_name;

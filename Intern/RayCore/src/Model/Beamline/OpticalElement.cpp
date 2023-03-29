@@ -28,20 +28,10 @@ OpticalElement::OpticalElement(const DesignObject& dobj) {
 }
 
 Element OpticalElement::intoElement() const {
-    Behaviour b = m_behaviour;
-    // TODO remove later
-    if (b.m_type == 42) {
-        b.m_type = getBehaviourType();
-        for (int i = 0; i < 16; i++) {
-            auto params = getBehaviourParams();
-            b.m_params[i] = params[i];
-        }
-    }
-
     Element e = Element{
         .m_inTrans = getInMatrix(),
         .m_outTrans = getOutMatrix(),
-        .m_behaviour = b,
+        .m_behaviour = m_behaviour,
         .m_surface = m_surface,
         .m_cutout = m_cutout,
         .m_slopeError = {m_slopeError[0], m_slopeError[1], m_slopeError[2], m_slopeError[3], m_slopeError[4], m_slopeError[5], m_slopeError[6]},
@@ -100,5 +90,4 @@ glm::dmat4x4 OpticalElement::getOrientation() const { return m_orientation; }
 
 std::array<double, 7> OpticalElement::getSlopeError() const { return m_slopeError; }
 
-std::array<double, 16> OpticalElement::getBehaviourParams() const { return {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}; }
 }  // namespace RAYX
