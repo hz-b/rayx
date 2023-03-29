@@ -32,12 +32,6 @@ double slopeX(Rzp e) { return slopeX(e.id); }
 double slopeZ(Rzp e) { return slopeZ(e.id); }
 
 /**************************************************************
- *                    Grating
- **************************************************************/
-double slopeX(Grating e) { return slopeX(e.id); }
-double slopeZ(Grating e) { return slopeZ(e.id); }
-
-/**************************************************************
  *                    Mirror
  **************************************************************/
 double azimuthalAngle(Mirror e) { return azimuthalAngle(e.id); }

@@ -36,6 +36,43 @@ INLINE Behaviour serializeMirror() {
     return b;
 }
 
+////////////////
+// GRATING
+////////////////
+
+struct GratingBehaviour {
+    double m_vls[6];
+    double m_lineDensity;
+    double m_orderOfDiffraction;
+};
+
+INLINE Behaviour serializeGrating(GratingBehaviour g) {
+    Behaviour b;
+    b.m_type = BTYPE_GRATING;
+    b.m_params[0] = g.m_vls[0];
+    b.m_params[1] = g.m_vls[1];
+    b.m_params[2] = g.m_vls[2];
+    b.m_params[3] = g.m_vls[3];
+    b.m_params[4] = g.m_vls[4];
+    b.m_params[5] = g.m_vls[5];
+    b.m_params[6] = g.m_lineDensity;
+    b.m_params[7] = g.m_orderOfDiffraction;
+    return b;
+}
+
+INLINE GratingBehaviour deserializeGrating(Behaviour b) {
+    GratingBehaviour g;
+    g.m_vls[0] = b.m_params[0];
+    g.m_vls[1] = b.m_params[1];
+    g.m_vls[2] = b.m_params[2];
+    g.m_vls[3] = b.m_params[3];
+    g.m_vls[4] = b.m_params[4];
+    g.m_vls[5] = b.m_params[5];
+    g.m_lineDensity = b.m_params[6];
+    g.m_orderOfDiffraction = b.m_params[7];
+    return g;
+}
+
 ///////////////////
 // Slit
 ///////////////////

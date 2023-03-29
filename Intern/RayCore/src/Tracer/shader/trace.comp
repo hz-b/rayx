@@ -107,19 +107,19 @@ Ray traceRZP(Ray r, Rzp rzp, INOUT(uint64_t) ctr, Collision col) {
 
 Ray traceGrating(Ray r, Grating gg, INOUT(uint64_t) ctr, Collision col) {
     dvec4 normal = dvec4(col.normal, 0);
-    // normal = normalize(dvec4(-r.m_position.x, -radius - r.m_position[1]*ISIG, -r.m_position[2], 0));
 
+    // normal = normalize(dvec4(-r.m_position.x, -radius - r.m_position[1]*ISIG, -r.m_position[2], 0));
+    GratingBehaviour g = deserializeGrating(elements[gg.id].m_behaviour);
     // modify normal according to slope error
-    normal        = tanger(normal, slopeX(gg), slopeZ(gg), 0, ctr);
+    normal        = tanger(normal, slopeX(gg.id), slopeZ(gg.id), 0, ctr);
 
     // vls parameters passed in q.elementParams
     double WL                 = hvlam(r.m_energy);
-    double lineDensity        = param_e(gg.id, 2);
-    double orderOfDiffraction = param_e(gg.id, 3);
-    double b_params[6] = {param_e(gg.id, 6), param_e(gg.id, 7), param_e(gg.id, 8), param_e(gg.id, 9), param_e(gg.id, 10), param_e(gg.id, 11)};
+    double lineDensity        = g.m_lineDensity;
+    double orderOfDiffraction = g.m_orderOfDiffraction;
 
     // linedensity = WL * default_linedensity * order * 1e-06
-    double linedensity = vlsGrating(lineDensity, r.m_position.z, b_params) * WL * orderOfDiffraction * 1e-06;
+    double linedensity = vlsGrating(lineDensity, r.m_position.z, g.m_vls) * WL * orderOfDiffraction * 1e-06;
     r.m_order            = orderOfDiffraction;
     // no additional zero order here?
 

@@ -28,6 +28,12 @@ SphereGrating::SphereGrating(const DesignObject& dobj) : OpticalElement(dobj) {
         .m_a34 = 0,
         .m_a44 = 0,
     });
+
+    m_behaviour = serializeGrating({
+        .m_vls = {m_vls[0], m_vls[1], m_vls[2], m_vls[3], m_vls[4], m_vls[5]},
+        .m_lineDensity = m_lineDensity,
+        .m_orderOfDiffraction = m_orderOfDiffraction,
+    });
 }
 
 double SphereGrating::getRadius() const { return m_radius; }
@@ -41,24 +47,5 @@ double SphereGrating::getDesignEnergyMounting() const { return m_designEnergyMou
 double SphereGrating::getLineDensity() const { return m_lineDensity; }
 double SphereGrating::getOrderOfDiffraction() const { return m_orderOfDiffraction; }
 double SphereGrating::getA() const { return m_a; }
-
-std::array<double, 16> SphereGrating::getBehaviourParams() const {
-    return {0,
-            0,
-            m_lineDensity,
-            m_orderOfDiffraction,
-            abs(hvlam(m_designEnergyMounting)),
-            0,
-            m_vls[0],
-            m_vls[1],
-            m_vls[2],
-            m_vls[3],
-            m_vls[4],
-            m_vls[5],
-            0,
-            0,
-            0,
-            0};
-}
 
 }  // namespace RAYX

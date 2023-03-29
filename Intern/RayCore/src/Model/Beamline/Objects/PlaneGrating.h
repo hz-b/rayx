@@ -7,14 +7,11 @@ class RAYX_API PlaneGrating : public OpticalElement {
   public:
     PlaneGrating(const DesignObject&);
 
-    inline int getBehaviourType() const { return BTYPE_GRATING; }
-
     double getFixFocusConstantCFF();
     double getDesignEnergyMounting() const;
     double getLineDensity() const;
     double getOrderOfDiffraction() const;
     std::array<double, 6> getVls();
-    std::array<double, 16> getBehaviourParams() const;
 
   private:
     int m_additionalOrder;

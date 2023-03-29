@@ -26,6 +26,11 @@ PlaneGrating::PlaneGrating(const DesignObject& dobj) : OpticalElement(dobj) {
         .m_a34 = 0,
         .m_a44 = 0,
     });
+    m_behaviour = serializeGrating({
+        .m_vls = {m_vls[0], m_vls[1], m_vls[2], m_vls[3], m_vls[4], m_vls[5]},
+        .m_lineDensity = m_lineDensity,
+        .m_orderOfDiffraction = m_orderOfDiffraction,
+    });
 }
 
 double PlaneGrating::getDesignEnergyMounting() const { return m_designEnergyMounting; }
@@ -33,22 +38,4 @@ double PlaneGrating::getLineDensity() const { return m_lineDensity; }
 double PlaneGrating::getOrderOfDiffraction() const { return m_orderOfDiffraction; }
 std::array<double, 6> PlaneGrating::getVls() { return m_vls; }
 
-std::array<double, 16> PlaneGrating::getBehaviourParams() const {
-    return {0,
-            0,
-            m_lineDensity,
-            m_orderOfDiffraction,
-            abs(hvlam(m_designEnergyMounting)),
-            0,
-            m_vls[0],
-            m_vls[1],
-            m_vls[2],
-            m_vls[3],
-            m_vls[4],
-            m_vls[5],
-            0,
-            0,
-            0,
-            double(m_additionalOrder)};
-}
 }  // namespace RAYX
