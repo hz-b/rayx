@@ -115,28 +115,31 @@ bool inCutout(Cutout cutout, double x1, double x2) {
 
         return !(x1 <= x1_min || x1 >= x1_max || x2 <= x2_min || x2 >= x2_max);
     } else if (cutout.m_type == CTYPE_TRAPEZOID) {
-        TrapezoidCutout trapezoid = deserializeTrapezoid(cutout);
-        double xLengthA = trapezoid.m_sizeA_x1;
-        double xLengthB = trapezoid.m_sizeB_x1;
-        double zLength = trapezoid.m_size_x2;
+        TrapezoidCutout t = deserializeTrapezoid(cutout);
 
         // Check point is within the trapezoid
-        dvec3 P = dvec3(x1, 0, x2);
-        dvec3 A = dvec3(-xLengthA / 2.0, 0, -zLength / 2.0);
-        dvec3 B = dvec3(xLengthA / 2.0, 0, -zLength / 2.0);
-        dvec3 C = dvec3(xLengthB / 2.0, 0, zLength / 2.0);
-        dvec3 D = dvec3(-xLengthB / 2.0, 0, zLength / 2.0);
+        dvec2 P = dvec2(x1, x2);
 
-        dvec3 PmA = P - A;
-        dvec3 BmA = B - A;
-        dvec3 PmD = P - D;
-        dvec3 CmD = C - D;
-        dvec3 DmA = D - A;
-        dvec3 PmB = P - B;
-        dvec3 CmB = C - B;
+        // A, B, C, D are the four points on the trapezoid.
+        //
+        //    A--B    //
+        //   /    \   //
+        //  C------D  //
+        dvec2 A = dvec2(-t.m_sizeA_x1 / 2.0, -t.m_size_x2 / 2.0);
+        dvec2 B = dvec2(t.m_sizeA_x1 / 2.0, -t.m_size_x2 / 2.0);
+        dvec2 C = dvec2(t.m_sizeB_x1 / 2.0, t.m_size_x2 / 2.0);
+        dvec2 D = dvec2(-t.m_sizeB_x1 / 2.0, t.m_size_x2 / 2.0);
 
-        double l1 = ((PmA.x * BmA.z - PmA.z * BmA.x) * (PmD.x * CmD.z - PmD.z * CmD.x));
-        double l2 = ((PmA.x * DmA.z - PmA.z * DmA.x) * (PmB.x * CmB.z - PmB.z * CmB.x));
+        dvec2 PmA = P - A;
+        dvec2 BmA = B - A;
+        dvec2 PmD = P - D;
+        dvec2 CmD = C - D;
+        dvec2 DmA = D - A;
+        dvec2 PmB = P - B;
+        dvec2 CmB = C - B;
+
+        double l1 = (PmA.x * BmA.y - PmA.y * BmA.x) * (PmD.x * CmD.y - PmD.y * CmD.x);
+        double l2 = (PmA.x * DmA.y - PmA.y * DmA.x) * (PmB.x * CmB.y - PmB.y * CmB.x);
         return l1 < 0 && l2 < 0;
     } else if (cutout.m_type == CTYPE_ELLIPTICAL) {
         EllipticalCutout ell = deserializeElliptical(cutout);

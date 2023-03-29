@@ -26,6 +26,7 @@ struct Cutout {
 
     // Parameters that hold information about the cutout.
     // What they mean depends on `m_type`.
+    // These parameters shouldn't be accessed manually, use the `serialize` and `deserialize` functions below instead.
     double m_params[3];
 };
 
@@ -33,7 +34,7 @@ struct Cutout {
 // Rect
 ///////////////////////////////////
 
-// A rectangle with "width" `m_size_x1` and "height" `m_size_x2`.
+// A rectangle with "width" `m_size_x1` and "height" `m_size_x2` centered at (0, 0).
 struct RectCutout {
     double m_size_x1;
     double m_size_x2;
@@ -62,6 +63,7 @@ INLINE RectCutout deserializeRect(Cutout ser) {
 //
 // An elliptical shape given by two diameters.
 // It can be understood as a circle with individual stretch-factors for both dimensions.
+// The point (0, 0) lies at the center of the ellipse.
 struct EllipticalCutout {
     double m_diameter_x1;
     double m_diameter_x2;
@@ -87,8 +89,10 @@ INLINE EllipticalCutout deserializeElliptical(Cutout ser) {
 ////////////////////////
 
 // https://en.wikipedia.org/wiki/Trapezoid
+//
 // A trapezoid consists of two lines with lengths `m_sizeA_x1` and `m_sizeB_x1`, both parallel to the x1 axis.
 // These lines have a distance of `m_size_x2`.
+// The point (0, 0) lies at the center of the trapezoid.
 struct TrapezoidCutout {
     double m_sizeA_x1;
     double m_sizeB_x1;
