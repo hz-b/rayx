@@ -9,9 +9,6 @@ class RAYX_API ImagePlane : public OpticalElement {
     ImagePlane(const DesignObject&);
     ~ImagePlane() = default;
 
-    inline int getBehaviourType() const { return BTYPE_IMAGE_PLANE; }
-
     double getDistance();
-    std::array<double, 16> getBehaviourParams() const;
 };
 }  // namespace RAYX

@@ -30,7 +30,7 @@ class RAYX_API OpticalElement {
     glm::dvec4 getPosition() const;
 
     virtual std::array<double, 16> getBehaviourParams() const;
-    virtual int getBehaviourType() const = 0;
+    virtual int getBehaviourType() const { return 42; }
     std::array<double, 7> getSlopeError() const;
 
     std::string m_name;
@@ -43,6 +43,8 @@ class RAYX_API OpticalElement {
     glm::dvec4 m_position = glm::dvec4();         //< Position of element in world coordinates
 
     std::array<double, 7> m_slopeError;
+
+    Behaviour m_behaviour;
     Surface m_surface;
     Cutout m_cutout;
 };

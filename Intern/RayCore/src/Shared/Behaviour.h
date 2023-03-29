@@ -1,6 +1,12 @@
 #ifndef BEHAVIOUR_H
 #define BEHAVIOUR_H
 
+#ifdef GLSL
+#define INLINE
+#else
+#define INLINE inline
+#endif
+
 // A behaviour decides what happens whenever a ray hits the surface of this element.
 // Each behaviour type has its own `trace` function.
 const int BTYPE_MIRROR = 0;
@@ -15,5 +21,16 @@ struct Behaviour {
     double m_type;
     double m_params[16];
 };
+
+/////////////////
+// ImagePlane
+////////////////
+
+// ImagePlane holds no data so it doesn't need a struct or a deserialize function.
+INLINE Behaviour serializeImagePlane() {
+    Behaviour b;
+    b.m_type = BTYPE_IMAGE_PLANE;
+    return b;
+}
 
 #endif
