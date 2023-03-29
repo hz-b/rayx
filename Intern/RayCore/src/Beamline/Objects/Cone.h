@@ -1,5 +1,5 @@
 #pragma once
-#include "Model/Beamline/OpticalElement.h"
+#include "Beamline/OpticalElement.h"
 
 namespace RAYX {
 class RAYX_API Cone : public OpticalElement {

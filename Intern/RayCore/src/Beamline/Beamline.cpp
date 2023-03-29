@@ -3,7 +3,7 @@
 #include <array>
 
 #include "Debug/Instrumentor.h"
-#include "Model/Beamline/Objects/Objects.h"
+#include "Beamline/Objects/Objects.h"
 
 namespace RAYX {
 Beamline::Beamline() = default;

@@ -9,8 +9,8 @@
 #include "Data/xml.h"
 #include "Debug/Debug.h"
 #include "Debug/Instrumentor.h"
-#include "Model/Beamline/Beamline.h"
-#include "Model/Beamline/Objects/Objects.h"
+#include "Beamline/Beamline.h"
+#include "Beamline/Objects/Objects.h"
 
 namespace RAYX {
 

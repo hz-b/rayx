@@ -2,7 +2,7 @@
 
 #include <optional>
 
-#include "Model/Beamline/OpticalElement.h"
+#include "Beamline/OpticalElement.h"
 
 namespace RAYX {
 

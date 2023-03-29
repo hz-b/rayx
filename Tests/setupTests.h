@@ -10,7 +10,7 @@
 #include "Data/Importer.h"
 #include "Debug/Debug.h"
 #include "Material/Material.h"
-#include "Model/Beamline/Objects/Objects.h"
+#include "Beamline/Objects/Objects.h"
 #include "Shared/Constants.h"
 #include "Tracer/CpuTracer.h"
 #include "Tracer/Ray.h"

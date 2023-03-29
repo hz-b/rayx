@@ -1,5 +1,5 @@
 #pragma once
-#include "Model/Beamline/OpticalElement.h"
+#include "Beamline/OpticalElement.h"
 
 namespace RAYX {
 enum class FigureRotation { Yes, Plane, A11 };

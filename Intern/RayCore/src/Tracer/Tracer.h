@@ -6,7 +6,7 @@
 #include <vector>
 
 #include "Core.h"
-#include "Model/Beamline/Beamline.h"
+#include "Beamline/Beamline.h"
 #include "Ray.h"
 #include "Shared/Constants.h"
 

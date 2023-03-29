@@ -6,8 +6,8 @@
 #include "Debug/Instrumentor.h"
 
 // Model
-#include "Model/Beamline/Beamline.h"
-#include "Model/Beamline/Objects/Objects.h"
+#include "Beamline/Beamline.h"
+#include "Beamline/Objects/Objects.h"
 
 // Data infrastructure
 #include "Data/Importer.h"

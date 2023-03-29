@@ -7,8 +7,8 @@
 #include <utility>
 
 #include "Debug/Debug.h"
-#include "Model/Beamline/EnergyDistribution.h"
-#include "Model/Beamline/LightSource.h"
+#include "Beamline/EnergyDistribution.h"
+#include "Beamline/LightSource.h"
 #include "Shared/Constants.h"
 #include "utils.h"
 
