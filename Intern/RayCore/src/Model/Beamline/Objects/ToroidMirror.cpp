@@ -11,6 +11,7 @@ ToroidMirror::ToroidMirror(const DesignObject& dobj) : OpticalElement(dobj) {
         .m_longRadius = dobj.parseLongRadius(),
         .m_shortRadius = dobj.parseShortRadius(),
     });
+    m_behaviour = serializeMirror();
 }
 
 }  // namespace RAYX

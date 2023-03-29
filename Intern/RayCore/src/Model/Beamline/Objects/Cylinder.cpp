@@ -45,6 +45,7 @@ Cylinder::Cylinder(const DesignObject& dobj) : OpticalElement(dobj) {
         .m_a34 = 0,
         .m_a44 = 0,
     });
+    m_behaviour = serializeMirror();
 }
 
 /**

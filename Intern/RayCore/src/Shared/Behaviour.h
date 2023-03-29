@@ -22,6 +22,18 @@ struct Behaviour {
     double m_params[16];
 };
 
+////////////////////
+// Mirror
+////////////////////
+
+// Mirror holds no data so it doesn't need a struct or a deserialize function.
+// TODO should contain Material!
+INLINE Behaviour serializeMirror() {
+    Behaviour b;
+    b.m_type = BTYPE_MIRROR;
+    return b;
+}
+
 /////////////////
 // ImagePlane
 ////////////////

@@ -8,7 +8,6 @@ enum class FigureRotation { Yes, Plane, A11 };
 class RAYX_API Ellipsoid : public OpticalElement {
   public:
     Ellipsoid(const DesignObject&);
-    inline int getBehaviourType() const { return BTYPE_MIRROR; }
 
     void calcHalfAxes();
     void calculateCenterFromHalfAxes(Rad angle);
@@ -27,8 +26,6 @@ class RAYX_API Ellipsoid : public OpticalElement {
     double getA33() const;
     double getA44() const;
     double getHalfAxisC() const;
-
-    std::array<double, 16> getBehaviourParams() const;
 
   private:
     // user parameters:

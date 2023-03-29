@@ -27,6 +27,7 @@ SphereMirror::SphereMirror(const DesignObject& dobj) : OpticalElement(dobj) {
         .m_a34 = 0,
         .m_a44 = 0,
     });
+    m_behaviour = serializeMirror();
 }
 
 // TODO(Theresa): move this to user params and just give the radius as a

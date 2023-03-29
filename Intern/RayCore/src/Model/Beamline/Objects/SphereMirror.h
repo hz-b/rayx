@@ -8,8 +8,6 @@ class RAYX_API SphereMirror : public OpticalElement {
   public:
     SphereMirror(const DesignObject&);
 
-    inline int getBehaviourType() const { return BTYPE_MIRROR; }
-
     void calcRadius();
     double getRadius() const;
     double getEntranceArmLength() const;

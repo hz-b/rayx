@@ -73,6 +73,7 @@ Ellipsoid::Ellipsoid(const DesignObject& dobj) : OpticalElement(dobj) {
         .m_a34 = m_a34,
         .m_a44 = m_a44,
     });
+    m_behaviour = serializeMirror();
 }
 
 void Ellipsoid::calculateCenterFromHalfAxes(Rad angle) {
@@ -141,6 +142,8 @@ void Ellipsoid::calcHalfAxes() {
     }
     m_tangentAngle.rad = angle;
     RAYX_VERB << "A= " << m_longHalfAxisA << ", B= " << m_shortHalfAxisB << ", C= " << m_halfAxisC << ", angle = " << m_tangentAngle.toDeg().deg;
+
+    m_behaviour = serializeMirror();
 }
 
 double Ellipsoid::getRadius() const { return m_a24; }
@@ -162,24 +165,5 @@ double Ellipsoid::getA34() const { return m_a34; }
 double Ellipsoid::getA33() const { return m_a33; }
 double Ellipsoid::getA44() const { return m_a44; }
 double Ellipsoid::getHalfAxisC() const { return m_halfAxisC; }
-
-std::array<double, 16> Ellipsoid::getBehaviourParams() const {
-    return {m_tangentAngle.sin(),
-            m_tangentAngle.cos(),
-            m_y0,
-            m_z0,  //
-            double(m_figureRotation),
-            0,
-            0,
-            0,  //
-            0,
-            0,
-            0,
-            0,  //
-            0,
-            0,
-            0,
-            0};
-}
 
 }  // namespace RAYX
