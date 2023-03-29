@@ -209,10 +209,10 @@ dvec2 projectToPrimaryPlane(double surfaceType, dvec3 point) {
 // checks whether `r` collides with the element of the given `id`,
 // and returns a Collision accordingly.
 Collision findCollisionWith(Ray r, uint id) {
-    double ty = type(id);
+    double bty = elements[id].m_behaviour.m_type;
     double sty = elements[id].m_surface.m_type;
 
-    if (ty == TYPE_RZP) {
+    if (bty == BTYPE_RZP) {
         r.m_position.z = r.m_position.z - param_e(id, 14); // TODO what is at index 14 ?
     }
 

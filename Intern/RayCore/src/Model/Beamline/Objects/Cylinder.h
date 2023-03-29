@@ -9,7 +9,7 @@ class RAYX_API Cylinder : public OpticalElement {
     Cylinder(const DesignObject&);
     ~Cylinder() = default;
 
-    inline int getElementType() const { return TYPE_MIRROR; }
+    inline int getBehaviourType() const { return BTYPE_MIRROR; }
 
     void setRadius();
     CylinderDirection getDirection() const;

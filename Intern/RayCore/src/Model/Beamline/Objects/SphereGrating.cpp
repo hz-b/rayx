@@ -42,7 +42,7 @@ double SphereGrating::getLineDensity() const { return m_lineDensity; }
 double SphereGrating::getOrderOfDiffraction() const { return m_orderOfDiffraction; }
 double SphereGrating::getA() const { return m_a; }
 
-std::array<double, 16> SphereGrating::getElementParams() const {
+std::array<double, 16> SphereGrating::getBehaviourParams() const {
     return {0,
             0,
             m_lineDensity,

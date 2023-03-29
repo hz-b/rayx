@@ -6,7 +6,7 @@ namespace RAYX {
 class RAYX_API SphereGrating : public OpticalElement {
   public:
     SphereGrating(const DesignObject&);
-    inline int getElementType() const { return TYPE_GRATING; }
+    inline int getBehaviourType() const { return BTYPE_GRATING; }
 
     void calcRadius();
     void calcAlpha(double deviation, double normalIncidence);
@@ -22,7 +22,7 @@ class RAYX_API SphereGrating : public OpticalElement {
     double getOrderOfDiffraction() const;
     double getA() const;
     std::array<double, 6> getVls() const;
-    std::array<double, 16> getElementParams() const;
+    std::array<double, 16> getBehaviourParams() const;
 
   private:
     double m_radius;

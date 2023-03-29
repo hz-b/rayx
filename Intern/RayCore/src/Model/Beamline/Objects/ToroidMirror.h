@@ -7,7 +7,7 @@ class RAYX_API ToroidMirror : public OpticalElement {
   public:
     ToroidMirror(const DesignObject&);
 
-    inline int getElementType() const { return TYPE_MIRROR; }
+    inline int getBehaviourType() const { return BTYPE_MIRROR; }
 };
 
 }  // namespace RAYX

@@ -1,6 +1,7 @@
 #ifndef ELEMENTS_H
 #define ELEMENTS_H
 
+#include "Behaviour.h"
 #include "Cutout.h"
 #include "Surface.h"
 
@@ -17,10 +18,7 @@ struct Element {
     dmat4 m_inTrans;
     dmat4 m_outTrans;
 
-    // the type of this element, see the TY constants.
-    // the type describes how the elementParams need to be interpreted.
-    double m_type;
-    double m_elementParams[16];
+    Behaviour m_behaviour;
 
     Surface m_surface;
     Cutout m_cutout;
@@ -34,14 +32,5 @@ struct Element {
     // Should guarantee that std430 in GLSL and c++ have the same memory layout for `Element`.
     double m_padding[1];
 };
-
-///////////////////
-// element types
-///////////////////
-const int TYPE_MIRROR = 0;
-const int TYPE_GRATING = 1;
-const int TYPE_SLIT = 2;
-const int TYPE_RZP = 3;
-const int TYPE_IMAGE_PLANE = 4;
 
 #endif

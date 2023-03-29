@@ -426,7 +426,7 @@ double ReflectionZonePlate::getDesignEnergyMounting() const {
     return m_designEnergyMounting;  // derived from source?
 }
 
-std::array<double, 16> ReflectionZonePlate::getElementParams() const {
+std::array<double, 16> ReflectionZonePlate::getBehaviourParams() const {
     return {double(m_imageType),
             double(m_rzpType),
             double(m_derivationMethod),

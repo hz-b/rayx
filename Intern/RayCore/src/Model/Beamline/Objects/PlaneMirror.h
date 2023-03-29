@@ -7,7 +7,7 @@ class RAYX_API PlaneMirror : public OpticalElement {
   public:
     PlaneMirror(const DesignObject&);
 
-    inline int getElementType() const { return TYPE_MIRROR; }
+    inline int getBehaviourType() const { return BTYPE_MIRROR; }
 };
 
 }  // namespace RAYX

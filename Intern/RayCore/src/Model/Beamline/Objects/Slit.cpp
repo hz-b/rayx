@@ -32,7 +32,7 @@ CentralBeamstop Slit::getCentralBeamstop() const { return m_centralBeamstop; }
 double Slit::getBeamstopWidth() const { return m_beamstopWidth; }
 double Slit::getBeamstopHeight() const { return m_beamstopHeight; }
 
-std::array<double, 16> Slit::getElementParams() const {
+std::array<double, 16> Slit::getBehaviourParams() const {
     return {m_beamstopWidth / 2,
             m_beamstopHeight / 2,
             m_gapCutout.m_type,

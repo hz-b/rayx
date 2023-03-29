@@ -20,7 +20,7 @@ class RAYX_API ReflectionZonePlate : public OpticalElement {
   public:
     ReflectionZonePlate(const DesignObject&);
 
-    inline int getElementType() const { return TYPE_RZP; }
+    inline int getBehaviourType() const { return BTYPE_RZP; }
 
     // for calculating incidence and exit angle from user parameters
     void calcAlpha();
@@ -72,7 +72,7 @@ class RAYX_API ReflectionZonePlate : public OpticalElement {
     double getDesignEnergyMounting() const;  // derived from source?
     void printInfo() const;
 
-    std::array<double, 16> getElementParams() const;
+    std::array<double, 16> getBehaviourParams() const;
 
   private:
     // User Parameter,

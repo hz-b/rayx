@@ -9,7 +9,6 @@ void dynamicElements() {
     const uint64_t MAX_UINT64 = ~(uint64_t(0));
     uint64_t workerCounterNum = MAX_UINT64 / uint64_t(pushConstants.numRays);
     uint64_t ctr              = rayId() * workerCounterNum + uint64_t(pushConstants.randomSeed * MAX_UINT64);
-    int type                  = -1;
 
     #ifdef RAYX_DEBUG_MODE // Debug Matrix only works in GPU Mode and on DEBUG Build Type
     #ifdef GLSL
@@ -41,26 +40,26 @@ void dynamicElements() {
         Ray elem_ray = rayMatrixMult(_ray, nextElement.m_inTrans);
 
         // Calculate interaction(reflection,material, absorption etc.) of ray with detected next element
-        type = int(nextElement.m_type);
+        int btype = int(nextElement.m_behaviour.m_type);
 
         elem_ray.m_pathLength += length(elem_ray.m_position - col.hitpoint);
         elem_ray.m_position = col.hitpoint;
         elem_ray.m_lastElement = col.elementIndex + 1; // TODO remove this "+1", element ids should consistently start at 0.
 
-        switch(type){
-            case (TYPE_MIRROR):
+        switch(btype) {
+            case (BTYPE_MIRROR):
                 elem_ray = traceMirror(elem_ray, Mirror(col.elementIndex), ctr, col);
                 break;
-            case (TYPE_GRATING):
+            case (BTYPE_GRATING):
                 elem_ray = traceGrating(elem_ray, Grating(col.elementIndex), ctr, col);
                 break;
-            case (TYPE_SLIT) :
+            case (BTYPE_SLIT) :
                 elem_ray = traceSlit(elem_ray, Slit(col.elementIndex), ctr, col);
                 break;
-            case (TYPE_RZP):
+            case (BTYPE_RZP):
                 elem_ray = traceRZP(elem_ray, Rzp(col.elementIndex), ctr, col);
                 break;
-            case (TYPE_IMAGE_PLANE):
+            case (BTYPE_IMAGE_PLANE):
                 elem_ray = traceImagePlane(elem_ray, ImagePlane(col.elementIndex), col);
                 break;
         }
