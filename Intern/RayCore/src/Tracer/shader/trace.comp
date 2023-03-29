@@ -55,34 +55,35 @@ Ray traceSlit(Ray r, Slit slit, INOUT(uint64_t) ctr, ALLOW_UNUSED Collision col)
 }
 
 Ray traceRZP(Ray r, Rzp rzp, INOUT(uint64_t) ctr, Collision col) {
-    double element_offset_z = elementOffsetZ(rzp);
+    RZPBehaviour b = deserializeRZP(elements[rzp.id].m_behaviour);
+    double element_offset_z = 0;
     r.m_position.z            = r.m_position.z - element_offset_z;
 
     dvec4 normal = dvec4(col.normal, 0);
 
-    int IMAGE_TYPE        = int(param_e(rzp.id, 0));
-    int RZP_TYPE          = int(param_e(rzp.id, 1));
-    int DERIVATION_METHOD = int(param_e(rzp.id, 2));
-    double risag          = param_e(rzp.id, 8);
-    double rosag          = param_e(rzp.id, 9);
-    double rimer          = param_e(rzp.id, 10);
-    double romer          = param_e(rzp.id, 11);
-    double d_alpha        = param_e(rzp.id, 12);
-    double d_beta         = param_e(rzp.id, 13);
-    double d_ord          = param_e(rzp.id, 5);
-    double zOffsetCenter  = param_e(rzp.id, 7);
+    int IMAGE_TYPE        = int(b.m_imageType);
+    int RZP_TYPE          = int(b.m_rzpType);
+    int DERIVATION_METHOD = int(b.m_derivationMethod);
+    double risag          = b.m_designSagittalEntranceArmLength;
+    double rosag          = b.m_designSagittalExitArmLength;
+    double rimer          = b.m_designMeridionalEntranceArmLength;
+    double romer          = b.m_designMeridionalExitArmLength;
+    double d_alpha        = b.m_designAlphaAngle;
+    double d_beta         = b.m_designBetaAngle;
+    double d_ord          = b.m_designOrderOfDiffraction;
+    double zOffsetCenter  = b.m_fresnelZOffset;
     ;  // fresnel center z offset
     double WL            = hvlam(r.m_energy);
-    double WL0           = 1e-06 * param_e(rzp.id, 3);  // source energy/design energy
-    double Ord           = param_e(rzp.id, 6);
-    int additional_order = int(param_e(rzp.id, 14));
+    double WL0           = 1e-06 * b.m_designWavelength;  // source energy/design energy
+    double Ord           = b.m_orderOfDiffraction;
+    int additional_order = int(b.m_additionalOrder);
 
     // calculate the RZP line density for the position of the intersection on the RZP
     double DX, DZ;
     RZPLineDensity(r, normal, IMAGE_TYPE, RZP_TYPE, DERIVATION_METHOD, zOffsetCenter, risag, rosag, rimer, romer, d_alpha, d_beta, d_ord, WL0, DX, DZ);
 
     // tanger/slope Error
-    normal        = tanger(normal, slopeX(rzp), slopeZ(rzp), 0, ctr);
+    normal        = tanger(normal, slopeX(rzp.id), slopeZ(rzp.id), 0, ctr);
 
     // if additional zero order should be traced, approx. half of the rays are randomly chosen to be traced in order 0 (= ordinary reflection) instead
     // of the given order

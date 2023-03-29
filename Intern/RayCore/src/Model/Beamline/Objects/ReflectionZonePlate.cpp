@@ -71,6 +71,22 @@ ReflectionZonePlate::ReflectionZonePlate(const DesignObject& dobj) : OpticalElem
 
     printInfo();
     RAYX_VERB << "Created.";
+
+    m_behaviour = serializeRZP({.m_imageType = (double)m_imageType,
+                                .m_rzpType = (double)m_rzpType,
+                                .m_derivationMethod = (double)m_derivationMethod,
+                                .m_designWavelength = m_designWavelength,
+                                .m_curvatureType = (double)m_curvatureType,
+                                .m_designOrderOfDiffraction = m_designOrderOfDiffraction,
+                                .m_orderOfDiffraction = m_orderOfDiffraction,
+                                .m_fresnelZOffset = m_fresnelZOffset,
+                                .m_designSagittalEntranceArmLength = m_designSagittalEntranceArmLength,
+                                .m_designSagittalExitArmLength = m_designSagittalExitArmLength,
+                                .m_designMeridionalEntranceArmLength = m_designMeridionalEntranceArmLength,
+                                .m_designMeridionalExitArmLength = m_designMeridionalExitArmLength,
+                                .m_designAlphaAngle = m_designAlphaAngle.rad,
+                                .m_designBetaAngle = m_designBetaAngle.rad,
+                                .m_additionalOrder = (double)m_additionalOrder});
 }
 
 void ReflectionZonePlate::printInfo() const {
@@ -425,24 +441,4 @@ double ReflectionZonePlate::getDesignOrderOfDiffraction() const { return m_desig
 double ReflectionZonePlate::getDesignEnergyMounting() const {
     return m_designEnergyMounting;  // derived from source?
 }
-
-std::array<double, 16> ReflectionZonePlate::getBehaviourParams() const {
-    return {double(m_imageType),
-            double(m_rzpType),
-            double(m_derivationMethod),
-            m_designWavelength,
-            double(m_curvatureType),
-            m_designOrderOfDiffraction,
-            m_orderOfDiffraction,
-            m_fresnelZOffset,
-            m_designSagittalEntranceArmLength,
-            m_designSagittalExitArmLength,
-            m_designMeridionalEntranceArmLength,
-            m_designMeridionalExitArmLength,
-            m_designAlphaAngle.rad,
-            m_designBetaAngle.rad,
-            0,
-            double(m_additionalOrder)};
-}
-
 }  // namespace RAYX
