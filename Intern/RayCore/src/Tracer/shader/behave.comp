@@ -1,9 +1,9 @@
-/// Each `trace*` function gets a `Ray r` (in element-coords), the element itself, a randomness counter and the `Collision col`.
+/// Each `behave*` function gets a `Ray r` (in element-coords), the element itself, a randomness counter and the `Collision col`.
 /// `col.hitpoint` expresses where the given ray r will hit the element (in element-coords).
 /// `col.normal` expresses the normal of the surface, at `col.hitpoint` (in element-coords).
 /// The ray has already been moved to the hitpoint, and it's lastElement has been set accordingly.
 ///
-/// The `trace*` functions, will
+/// The `behave*` functions, will
 /// - change the rays direction, typically by reflecting using the normal
 /// - change the rays stokes vector
 /// - potentially absorb the ray (by calling `takeFinalSnapshot(_, W_ABSORBED)`)
@@ -12,7 +12,7 @@
 double slopeX(int id) { return elements[id].m_slopeError[0]; }
 double slopeZ(int id) { return elements[id].m_slopeError[1]; }
 
-Ray traceSlit(Ray r, int id, INOUT(uint64_t) ctr, ALLOW_UNUSED Collision col) {
+Ray behaveSlit(Ray r, int id, INOUT(uint64_t) ctr, ALLOW_UNUSED Collision col) {
     SlitBehaviour b = deserializeSlit(elements[id].m_behaviour);
     double xStop    = b.m_beamstopWidth / 2;
     double yStop    = b.m_beamstopHeight / 2;
@@ -59,7 +59,7 @@ Ray traceSlit(Ray r, int id, INOUT(uint64_t) ctr, ALLOW_UNUSED Collision col) {
 }
 
 // TODO clean this up!
-Ray traceRZP(Ray r, int id, INOUT(uint64_t) ctr, Collision col) {
+Ray behaveRZP(Ray r, int id, INOUT(uint64_t) ctr, Collision col) {
     RZPBehaviour b = deserializeRZP(elements[id].m_behaviour);
 
     dvec4 normal = dvec4(col.normal, 0);
@@ -88,7 +88,7 @@ Ray traceRZP(Ray r, int id, INOUT(uint64_t) ctr, Collision col) {
     // tanger/slope Error
     normal        = tanger(normal, slopeX(id), slopeZ(id), 0, ctr);
 
-    // if additional zero order should be traced, approx. half of the rays are randomly chosen to be traced in order 0 (= ordinary reflection) instead
+    // if additional zero order should be behaved, approx. half of the rays are randomly chosen to be behaved in order 0 (= ordinary reflection) instead
     // of the given order
     if (additional_order == 1) {
         if (squaresDoubleRNG(ctr) > 0.5) Ord = 0;
@@ -107,7 +107,7 @@ Ray traceRZP(Ray r, int id, INOUT(uint64_t) ctr, Collision col) {
     return r;
 }
 
-Ray traceGrating(Ray r, int id, INOUT(uint64_t) ctr, Collision col) {
+Ray behaveGrating(Ray r, int id, INOUT(uint64_t) ctr, Collision col) {
     dvec4 normal = dvec4(col.normal, 0);
 
     GratingBehaviour b = deserializeGrating(elements[id].m_behaviour);
@@ -135,7 +135,7 @@ Ray traceGrating(Ray r, int id, INOUT(uint64_t) ctr, Collision col) {
     return r;
 }
 
-Ray traceMirror(Ray r, int id, INOUT(uint64_t) ctr, Collision col) {
+Ray behaveMirror(Ray r, int id, INOUT(uint64_t) ctr, Collision col) {
     // calculate intersection point and normal at intersection point
     dvec4 normal = dvec4(col.normal, 0);
     double azimuthal_angle = elements[id].m_azimuthalAngle;
@@ -161,7 +161,7 @@ Ray traceMirror(Ray r, int id, INOUT(uint64_t) ctr, Collision col) {
     return r;
 }
 
-Ray traceImagePlane(Ray r, ALLOW_UNUSED int id, ALLOW_UNUSED Collision col) {
+Ray behaveImagePlane(Ray r, ALLOW_UNUSED int id, ALLOW_UNUSED Collision col) {
     // doesn't need to do anything.
     return r;
 }
