@@ -12,23 +12,33 @@ to get the dev branch and to make sure, you also clone all of it's submodules.
 ## On Windows
 - Install [CMake](https://cmake.org/download/)
 - Install [Vulkan](https://vulkan.lunarg.com/) for Windows (1.3 or newer)
+  - Make sure to check the Vulkan Memory Allocator option (not used yet, but likely in the future)
 - Install [HDF5](https://www.hdfgroup.org/downloads/hdf5/) library 
 - Install python3, python3-dev and python3-matplotlib 
+- We also recommend to use the MSVC compiler for Windows [Visual Studio](https://visualstudio.microsoft.com/de/downloads/) (2019 or newer)
+
+Known Issues:
+- Sometimes installing the VulkanSDK in the root directory of your drive causes problems. If you have problems with the VulkanSDK, try installing it in a different directory.
+
+### VSCode
 - Open the project in VSCode, where you will be asked to select a build kit (gcc, etc.)
 - Also allow the CMake Extension to configure the project
 - Then you can click build in the bottom panel
 
-## On Linux
+### Manually
+- Open a terminal in the project folder
+- Run `cmake -S . -B build -G "Visual Studio 16 2019" -A x64 -DCMAKE_BUILD_TYPE=Release` (Replace with your Visual Studio version)
+
+## On Ubuntu
 - Make sure you have cmake, gcc, gdb and make installed and on the latest version
-- Download Vulkan SDK from [https://vulkan.lunarg.com/sdk/home](https://vulkan.lunarg.com/sdk/home)
-- run `source setup-env.sh` in terminal in the downloaded folder and run `vkcube` to test it (!now only in this specific terminal available!)
-- add: `source "path/to/dir/setup-env.sh" `to `~/.profile` file to have vulkan available in any terminal/IDE... (e.g: `source "$HOME/Downloads/1.3.xxx./setup-env.sh"`)
-- test again with vkcube in any terminal/IDE
-- see also [https://vulkan.lunarg.com/doc/sdk/1.3.224.1/linux/getting_started.html](https://vulkan.lunarg.com/doc/sdk/1.3.224.1/linux/getting_started.html)
+- Install Vulkan SDK from [here](https://vulkan.lunarg.com/sdk/home) (Under Linux -> Ubuntu Packages you can select a version)
 - Install python3, python3-dev and python3-matplotlib 
-- in usr/bin/ `ln -s "/path/to/vulkansdk/x86_64/bin/glslc" glslc`
 - The project also uses [libhdf5](https://github.com/BlueBrain/HighFive). Make sure that you have the correct libraries _(Ubuntu and debian-based Distros)_ :  `apt update && apt -y install libblas-dev liblapack-dev libhdf5-dev`
 - Make sure that the libraries are installed at `/usr/include/hdf5/serial` and `/usr/lib/x86_64-linux-gnu/hdf5/serial`
+
+## On Arch Linux
+- You can get all packages through pacman/yay/...
+- Specific instructions will be added later
 
 ## Fedora
 

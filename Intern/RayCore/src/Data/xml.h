@@ -7,6 +7,7 @@
 #include <vector>
 
 #include "Material/Material.h"
+#include "Shared/Constants.h"
 #include "utils.h"
 
 namespace RAYX {
@@ -81,6 +82,7 @@ struct Parser {
     glm::dvec4 parsePosition() const;
     glm::dmat4x4 parseOrientation() const;
     Material parseMaterial() const;
+    Cutout parseCutout() const;
 
     // parsers for trivial derived parameters
     inline int parseNumberRays() const { return parseInt("numberRays"); }
@@ -96,7 +98,6 @@ struct Parser {
     inline int parseLinearPol0() const { return parseInt("linearPol_0"); }
     inline int parseLinearPol45() const { return parseInt("linearPol_45"); }
     inline int parseCircularPol() const { return parseInt("circularPol"); }
-    inline GeometricalShape parseGeometricalShape() const { return static_cast<GeometricalShape>(parseInt("geometricalShape")); }
     inline double parseTotalWidth() const { return parseDouble("totalWidth"); }
     inline double parseTotalLength() const { return parseDouble("totalLength"); }
     inline double parseTotalHeight() const { return parseDouble("totalHeight"); }

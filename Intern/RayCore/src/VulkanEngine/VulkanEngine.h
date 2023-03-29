@@ -117,7 +117,7 @@ class RAYX_API VulkanEngine {
     // Please pay attention to alignment rules
     // You can change this struct (also in shader)
     struct pushConstants_t {
-        void* pushConstPtr;
+        const void* pushConstPtr;
         size_t size;
     } m_pushConstants;
 

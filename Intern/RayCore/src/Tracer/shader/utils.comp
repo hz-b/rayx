@@ -102,62 +102,59 @@ void cosini(INOUT(Ray) r, double phi, double psi) {
     r.m_direction.z = cos_psi * cos_phi;
 }
 
-/**
- * checks whether the intersection point is within the extent of the surface
- * @param x, z			 	x- and z-coordinates of the intersection point in
- * element coordinates
- * @param xLength, zLength	width and length of the optical element
- *
- * returns `true` if intersection point is within surface boundaries.
- */
-bool wasteBox(double x, double z, double xLength, double zLength) {
-    if (xLength >= 0) {  // Rectangular shape
-        double x_min = -xLength / 2.0;
-        double x_max = xLength / 2.0;
-        double z_min = -zLength / 2.0;
-        double z_max = zLength / 2.0;
-        return x > x_min && x < x_max && z > z_min && z < z_max;
-    } else {                  // Ring shape
-        double rd2 = (x / (xLength / 2.0)) * (x / (xLength / 2.0)) +
-                     (z / (zLength / 2.0)) * (z / (zLength / 2.0));
+// checks whether the point (x1, x2) is within the cutout.
+bool inCutout(Cutout cutout, double x1, double x2) {
+    if (cutout.m_type == CTYPE_UNLIMITED) {
+        return true;
+    } else if (cutout.m_type == CTYPE_RECT) {
+        RectCutout rect = deserializeRect(cutout);
+        double x1_min = -rect.m_size_x1 / 2.0;
+        double x1_max = rect.m_size_x1 / 2.0;
+        double x2_min = -rect.m_size_x2 / 2.0;
+        double x2_max = rect.m_size_x2 / 2.0;
+
+        return !(x1 <= x1_min || x1 >= x1_max || x2 <= x2_min || x2 >= x2_max);
+    } else if (cutout.m_type == CTYPE_TRAPEZOID) {
+        TrapezoidCutout t = deserializeTrapezoid(cutout);
+
+        // Check point is within the trapezoid
+        dvec2 P = dvec2(x1, x2);
+
+        // A, B, C, D are the four points on the trapezoid.
+        //
+        //    A--B    //
+        //   /    \   //
+        //  C------D  //
+        dvec2 A = dvec2(-t.m_sizeA_x1 / 2.0, -t.m_size_x2 / 2.0);
+        dvec2 B = dvec2(t.m_sizeA_x1 / 2.0, -t.m_size_x2 / 2.0);
+        dvec2 C = dvec2(t.m_sizeB_x1 / 2.0, t.m_size_x2 / 2.0);
+        dvec2 D = dvec2(-t.m_sizeB_x1 / 2.0, t.m_size_x2 / 2.0);
+
+        dvec2 PmA = P - A;
+        dvec2 BmA = B - A;
+        dvec2 PmD = P - D;
+        dvec2 CmD = C - D;
+        dvec2 DmA = D - A;
+        dvec2 PmB = P - B;
+        dvec2 CmB = C - B;
+
+        double l1 = (PmA.x * BmA.y - PmA.y * BmA.x) * (PmD.x * CmD.y - PmD.y * CmD.x);
+        double l2 = (PmA.x * DmA.y - PmA.y * DmA.x) * (PmB.x * CmB.y - PmB.y * CmB.x);
+        return l1 < 0 && l2 < 0;
+    } else if (cutout.m_type == CTYPE_ELLIPTICAL) {
+        EllipticalCutout ell = deserializeElliptical(cutout);
+
+        double radius_x1 = ell.m_diameter_x1 / 2.0;
+        double radius_x2 = ell.m_diameter_x2 / 2.0;
+
+        double val1 = x1 / radius_x1;
+        double val2 = x2 / radius_x2;
+
+        double rd2 = val1*val1 + val2*val2;
         return rd2 <= 1.0;
-    }
-}
-
-// ! temporary for testing purposes (trapezoid)
-bool wasteBox(double x, double z, double xLengthA, double xLengthB, double zLength) {
-    if (xLengthA >= 0) {     // Rectangular shape
-        if (xLengthB > 0) {  // Trapezoid shape
-            // Check point is within the trapezoid
-            dvec3 P = dvec3(x, 0, z);
-            dvec3 A = dvec3(-xLengthA / 2.0, 0, -zLength / 2.0);
-            dvec3 B = dvec3(xLengthA / 2.0, 0, -zLength / 2.0);
-            dvec3 C = dvec3(xLengthB / 2.0, 0, zLength / 2.0);
-            dvec3 D = dvec3(-xLengthB / 2.0, 0, zLength / 2.0);
-
-            dvec3 PmA = P - A;
-            dvec3 BmA = B - A;
-            dvec3 PmD = P - D;
-            dvec3 CmD = C - D;
-            dvec3 DmA = D - A;
-            dvec3 PmB = P - B;
-            dvec3 CmB = C - B;
-
-            double l1 = ((PmA.x * BmA.z - PmA.z * BmA.x) * (PmD.x * CmD.z - PmD.z * CmD.x));
-            double l2 = ((PmA.x * DmA.z - PmA.z * DmA.x) * (PmB.x * CmB.z - PmB.z * CmB.x));
-            return l1 < 0 && l2 < 0;
-        } else {
-            double x_min = -xLengthA / 2.0;
-            double x_max = xLengthA / 2.0;
-            double z_min = -zLength / 2.0;
-            double z_max = zLength / 2.0;
-
-            return !(x <= x_min || x >= x_max || z <= z_min || z >= z_max);
-        }
-    } else {  // Ring shape
-        double rd2 = (x / (xLengthA / 2.0)) * (x / (xLengthA / 2.0)) +
-                     (z / (zLength / 2.0)) * (z / (zLength / 2.0));
-        return rd2 <= 1.0;
+    } else {
+        throw("invalid cutout type in inCutout!");
+        return false;
     }
 }
 
@@ -170,9 +167,7 @@ dvec2 getAtomicMassAndRho(int material) {
 #include "../../Material/materials.xmacro"
 #undef X
     }
-#ifndef GLSL
-    RAYX_ERR << "invalid material in getAtomicMassAndRho";
-#endif
+    throw("invalid material in getAtomicMassAndRho");
     return dvec2(0.0, 0.0);
 }
 
@@ -242,10 +237,7 @@ dvec2 getRefractiveIndex(double energy, int material) {
 
     // out of range check
     if (material < 1 || material > 92) {
-#ifndef GLSL
-        RAYX_ERR << "getRefractiveIndex material " << material
-                 << " out of range!";
-#endif
+        throw("getRefractiveIndex material out of range!");
         return dvec2(-1.0, -1.0);
     }
 
@@ -307,10 +299,7 @@ dvec2 getRefractiveIndex(double energy, int material) {
         return dvec2(n, k);
     }
 
-// error, no matching entry found.
-#ifndef GLSL
-    RAYX_ERR << "getRefractiveIndex: no matching entry found!";
-#endif
+    throw("getRefractiveIndex: no matching entry found!");
     return dvec2(-1.0, -1.0);
 }
 
@@ -980,30 +969,5 @@ void fraun_diff(double dim, double wl, INOUT(double) dAngle,
             wd = wd * wd;
         }
         c = wd - rna[1];
-    }
-}
-
-void diffraction(int iopt, double xLength, double yLength, double wl,
-                 INOUT(double) dPhi, INOUT(double) dPsi, INOUT(uint64_t) ctr) {
-    if (wl <= 0) return;
-
-    double yl = yLength;
-    double xl = xLength;
-
-    if (xLength > 0) {          // rectangular slit, zoneplate
-        if (iopt == 3) {        // zoneplate
-            if (yLength > 0) {  // in x direction
-                yl = 0;
-            } else if (yLength < 0) {  // in y direction, what about ==0?
-                xl = 0;
-            }
-        }
-        fraun_diff(xl, wl, dPhi, ctr);
-        fraun_diff(yl, wl, dPsi, ctr);
-    } else {  // circular slit
-        if (iopt == 1) {
-            xl = yLength;  // SL R_max
-        }
-        bessel_diff(xl, wl, dPhi, dPsi, ctr);
     }
 }

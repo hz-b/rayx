@@ -260,46 +260,6 @@ TEST_F(TestSuite, testRefrac) {
     }
 }
 
-TEST_F(TestSuite, testWasteBox) {
-    struct InOutPair {
-        double in_x;
-        double in_z;
-        double in_xLength;
-        double in_zLength;
-        double in_w;
-
-        bool out;
-    };
-
-    std::vector<InOutPair> inouts = {{
-                                         .in_x = -5.0466620698997637,
-                                         .in_z = 28.760236725599515,
-                                         .in_xLength = 50,
-                                         .in_zLength = 200,
-                                         .out = true,
-                                     },
-                                     {
-                                         .in_x = -5.0466620698997637,
-                                         .in_z = 28.760236725599515,
-                                         .in_xLength = 5,
-                                         .in_zLength = 20,
-                                         .out = false,
-                                     },
-                                     {
-                                         .in_x = -1.6822205656320104,
-                                         .in_z = 28.760233508097873,
-                                         .in_xLength = 5,
-                                         .in_zLength = 20,
-                                         .out = false,
-                                     }};
-
-    for (auto p : inouts) {
-        auto out = CPU_TRACER::wasteBox(p.in_x, p.in_z, p.in_xLength, p.in_zLength);
-
-        CHECK_EQ(out, p.out);
-    }
-}
-
 TEST_F(TestSuite, testRZPLineDensityDefaulParams) {
     struct InOutPair {
         Ray in_ray;
@@ -878,102 +838,6 @@ TEST_F(TestSuite, testBessel1) {
     }
 }
 
-TEST_F(TestSuite, testDiffraction) {
-    struct In {
-        int in_iopt;
-        double in_xLength;
-        double in_yLength;
-        double in_wl;
-        uint64_t in_ctr;
-    };
-
-    std::vector<In> ins = {{
-                               .in_iopt = 1,
-                               .in_xLength = 20,
-                               .in_yLength = 2,
-                               .in_wl = 12.39852,
-                               .in_ctr = 0UL,
-                           },
-                           {
-                               .in_iopt = 1,
-                               .in_xLength = 20,
-                               .in_yLength = 2,
-                               .in_wl = 12.39852,
-                               .in_ctr = 1844674407370955161UL,
-                           },
-                           {
-                               .in_iopt = 1,
-                               .in_xLength = 20,
-                               .in_yLength = 2,
-                               .in_wl = 12.39852,
-                               .in_ctr = 3689348814741910322UL,
-                           },
-                           {
-                               .in_iopt = 1,
-                               .in_xLength = 20,
-                               .in_yLength = 2,
-                               .in_wl = 12.39852,
-                               .in_ctr = 5534023222112865483UL,
-                           },
-                           {
-                               .in_iopt = 1,
-                               .in_xLength = 20,
-                               .in_yLength = 2,
-                               .in_wl = 12.39852,
-                               .in_ctr = 7378697629483820644UL,
-                           },
-                           {
-                               .in_iopt = 1,
-                               .in_xLength = 20,
-                               .in_yLength = 2,
-                               .in_wl = 12.39852,
-                               .in_ctr = 9223372036854775805UL,
-                           },
-                           {
-                               .in_iopt = 1,
-                               .in_xLength = 20,
-                               .in_yLength = 2,
-                               .in_wl = 12.39852,
-                               .in_ctr = 11068046444225730966UL,
-                           },
-                           {
-                               .in_iopt = 1,
-                               .in_xLength = 20,
-                               .in_yLength = 2,
-                               .in_wl = 12.39852,
-                               .in_ctr = 12912720851596686127UL,
-                           },
-                           {
-                               .in_iopt = 1,
-                               .in_xLength = 20,
-                               .in_yLength = 2,
-                               .in_wl = 12.39852,
-                               .in_ctr = 14757395258967641288UL,
-                           },
-                           {
-                               .in_iopt = 1,
-                               .in_xLength = 20,
-                               .in_yLength = 2,
-                               .in_wl = 12.39852,
-                               .in_ctr = 16602069666338596449UL,
-                           }
-
-    };
-
-    const double lowerDphi = 1e-11;
-    const double upperDphi = 1e-05;
-    const double lowerDpsi = 1e-09;
-    const double upperDpsi = 1e-04;
-
-    for (auto i : ins) {
-        double dphi = 0;
-        double dpsi = 0;
-        CPU_TRACER::diffraction(i.in_iopt, i.in_xLength, i.in_yLength, i.in_wl, dphi, dpsi, i.in_ctr);
-        CHECK_IN(abs(dphi), lowerDphi, upperDphi);
-        CHECK_IN(abs(dpsi), lowerDpsi, upperDpsi);
-    }
-}
-
 TEST_F(TestSuite, testVlsGrating) {
     struct InOutPair {
         double in_lineDensity;
@@ -1104,43 +968,6 @@ TEST_F(TestSuite, testPlaneRefrac) {
     for (auto p : inouts) {
         auto out_ray = CPU_TRACER::refrac_plane(p.in_ray, p.in_normal, p.in_a);
         CHECK_EQ(out_ray, p.out_ray);
-    }
-}
-
-TEST_F(TestSuite, testIteratTo) {
-    struct InOutPair {
-        Ray in_ray;
-        double in_longRadius;
-        double in_shortRadius;
-
-        Ray out_ray;
-        glm::dvec4 out_vec;
-    };
-
-    std::vector<InOutPair> inouts = {
-        {.in_ray =
-             {
-                 .m_position = glm::dvec3(-0.017500000000000002, 1736.4751598838836, -9848.1551798768887),
-                 .m_weight = 1,
-                 .m_direction = glm::dvec3(-0.00026923073232438285, -0.17315574581145807, 0.984894418304465),
-             },
-         .in_longRadius = 10470.491787499999,
-         .in_shortRadius = 315.72395939400002,
-         .out_ray =
-             {
-                 .m_position = glm::dvec3(-2.7173752216893443, 0.050407875158271054, 28.473736158432885),
-                 .m_weight = 1,
-                 .m_direction = glm::dvec3(-0.00026923073232438285, -0.17315574581145807, 0.984894418304465),
-             },
-         .out_vec = glm::dvec4(0.0086068071179840333, 0.99995926323042061, -0.0027193291283604047, 0)},
-
-    };
-
-    for (auto p : inouts) {
-        Ray r = p.in_ray;
-        auto out_vec = CPU_TRACER::iteratTo(r, p.in_longRadius, p.in_shortRadius);
-        CHECK_EQ(out_vec, p.out_vec);
-        CHECK_EQ(r, p.out_ray);
     }
 }
 

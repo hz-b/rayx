@@ -7,8 +7,9 @@
 #include <utility>
 
 #include "Debug/Debug.h"
-#include "Model/Beamline/EnergyDistribution.h"
-#include "Model/Beamline/LightSource.h"
+#include "Beamline/EnergyDistribution.h"
+#include "Beamline/LightSource.h"
+#include "Shared/Constants.h"
 #include "utils.h"
 
 namespace RAYX::xml {
@@ -486,6 +487,42 @@ Material Parser::parseMaterial() const {
         return Material::Cu;
     }
     return m;
+}
+
+Cutout Parser::parseCutout() const {
+    int geom_shape;
+    if (!paramInt(node, "geometricalShape", &geom_shape)) {
+        return serializeUnlimited();
+    }
+
+    if (geom_shape == CTYPE_RECT) {
+        RectCutout rect;
+        rect.m_size_x1 = parseTotalWidth();
+        // TODO why is this inconsistent in the .rml files?
+        try {
+            rect.m_size_x2 = parseTotalLength();
+        } catch (std::runtime_error& e) {
+            rect.m_size_x2 = parseTotalHeight();
+        }
+        return serializeRect(rect);
+    } else if (geom_shape == CTYPE_ELLIPTICAL) {
+        // TODO test this!
+        EllipticalCutout elliptical;
+        elliptical.m_diameter_x1 = parseTotalWidth();
+        elliptical.m_diameter_x2 = parseTotalHeight();
+        return serializeElliptical(elliptical);
+    } else if (geom_shape == CTYPE_TRAPEZOID) {
+        // TODO test this!
+        TrapezoidCutout trapezoid;
+        trapezoid.m_sizeA_x1 = parseTotalWidth();
+        trapezoid.m_sizeB_x1 = parseDouble("totalWidthB");
+        trapezoid.m_size_x2 = parseTotalHeight();
+
+        return serializeTrapezoid(trapezoid);
+    } else {
+        RAYX_ERR << "invalid geom_shape!";
+        return {0, {0.0, 0.0, 0.0}};
+    }
 }
 
 }  // namespace RAYX::xml

@@ -89,7 +89,7 @@ void VulkanEngine::createVmaBuffer(VkDeviceSize size, VkBufferUsageFlags buffer_
 
     auto result = vmaCreateBuffer(m_VmaAllocator, &bufferCreateinfo, &VmaBufferAllocationMemoryInfo, &buffer, &allocation, allocation_info);
     if (result != VK_SUCCESS) {
-        RAYX_ERR << "Cannot Create Buffer";
+        RAYX_ERR << "Cannot Create Buffer of " << size << " bytes";
     }
 }
 

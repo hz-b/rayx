@@ -1,54 +1,3 @@
-struct Collision {
-    // The point where `_ray` hits the element, in element-coordinates.
-    dvec4 hitpoint;
-
-    // The index of the element with which `_ray` collides.
-    int elementIndex;
-
-    // whether a collision has been found.
-    bool found;
-};
-
-Collision find_collision() {
-    // index of element with current closest intersection with ray, initialized with -1
-    int closestElementIndex = -1;
-
-    // global coordinates of first intersection point of ray among all elements in beamline
-    dvec4 closestHitpoint       = dvec4(infinity(), infinity(), infinity(), 0);
-    dvec4 closestGlobalHitpoint = dvec4(infinity(), infinity(), infinity(), 0);
-
-    // Find intersection points through all elements
-    for (uint elementIndex = 0; elementIndex < uint(elements.length()); elementIndex++) {
-
-        double lastElement = _ray.m_lastElement;
-        if (elementIndex + 1 == lastElement) {
-            // TODO: self-intersection
-            continue;
-        }
-
-        dvec4 currentIntersection = getOpticalElementIntersection(_ray, elementIndex);
-
-        // Intersection coordinates in GLOBAL coordinates
-        dvec3 currentGlobalIntersection_xyz = dvec3(elements[elementIndex].m_outTrans * dvec4(currentIntersection.x, currentIntersection.y, currentIntersection.z, 1));
-        dvec4 currentGlobalIntersection = dvec4(currentGlobalIntersection_xyz, currentIntersection.w);
-
-        // check if current intersection is closer than the closest previous Hitpoint
-        // If yes then update. Since the old intersection is occluded by the old Intersection/Hit point
-        if (length(_ray.m_position - dvec3(closestGlobalHitpoint)) > length(_ray.m_position - currentGlobalIntersection_xyz) &&
-            currentIntersection.w != 0) {
-            closestHitpoint       = currentIntersection;
-            closestGlobalHitpoint = currentGlobalIntersection;
-            closestElementIndex   = int(elementIndex);
-        }
-    }
-
-    Collision col;
-    col.found = closestElementIndex != -1;
-    col.hitpoint = closestHitpoint;
-    col.elementIndex = closestElementIndex;
-    return col;
-}
-
 // @brief: Dynamic ray tracing: check which ray hits which element first
 // in this function we need to make sure that rayData ALWAYS remains in GLOBAL coordinates (it can be changed in a function but needs to be changed
 // back before the function returns to this function)
@@ -58,9 +7,8 @@ void dynamicElements() {
 
     // ray specific "seed" for random numbers -> every ray has a different starting value for the counter that creates the random number
     const uint64_t MAX_UINT64 = ~(uint64_t(0));
-    uint64_t workerCounterNum = MAX_UINT64 / uint64_t(numRays);
-    uint64_t ctr              = rayId() * workerCounterNum + uint64_t(randomSeed * MAX_UINT64);
-    int type                  = -1;
+    uint64_t workerCounterNum = MAX_UINT64 / uint64_t(pushConstants.numRays);
+    uint64_t ctr              = rayId() * workerCounterNum + uint64_t(pushConstants.randomSeed * MAX_UINT64);
 
     #ifdef RAYX_DEBUG_MODE // Debug Matrix only works in GPU Mode and on DEBUG Build Type
     #ifdef GLSL
@@ -77,7 +25,7 @@ void dynamicElements() {
     // Iterate through all bounces
     double bounce = 1;
     for (int i = 0; i < maxBounces; i++) {
-        Collision col = find_collision();
+        Collision col = findCollision();
 
         if (!col.found) {
             // no element was hit.
@@ -92,31 +40,27 @@ void dynamicElements() {
         Ray elem_ray = rayMatrixMult(_ray, nextElement.m_inTrans);
 
         // Calculate interaction(reflection,material, absorption etc.) of ray with detected next element
-        type = int(nextElement.m_type);
-        switch(type){
-            case (TY_BASIC_MIRROR) :
-                elem_ray = traceMirror(elem_ray, BasicMirror(col.elementIndex), ctr, col.hitpoint);
+        int btype = int(nextElement.m_behaviour.m_type);
+
+        elem_ray.m_pathLength += length(elem_ray.m_position - col.hitpoint);
+        elem_ray.m_position = col.hitpoint;
+        elem_ray.m_lastElement = col.elementIndex + 1; // TODO remove this "+1", element ids should consistently start at 0.
+
+        switch(btype) {
+            case (BTYPE_MIRROR):
+                elem_ray = behaveMirror(elem_ray, col.elementIndex, ctr, col);
                 break;
-            case(TY_PLANE_GRATING) :
-                elem_ray = tracePlaneGrating(elem_ray, PlaneGrating(col.elementIndex), ctr, col.hitpoint);
+            case (BTYPE_GRATING):
+                elem_ray = behaveGrating(elem_ray, col.elementIndex, ctr, col);
                 break;
-            case (TY_GENERAL_GRATING) :
-                elem_ray = traceGeneralGrating(elem_ray, GeneralGrating(col.elementIndex), ctr, col.hitpoint);
+            case (BTYPE_SLIT) :
+                elem_ray = behaveSlit(elem_ray, col.elementIndex, ctr, col);
                 break;
-            case (TY_SLIT) :
-                elem_ray = traceSlit(elem_ray, Slit(col.elementIndex), ctr, col.hitpoint);
+            case (BTYPE_RZP):
+                elem_ray = behaveRZP(elem_ray, col.elementIndex, ctr, col);
                 break;
-            case (TY_RZP) :
-                elem_ray = traceRZP(elem_ray, Rzp(col.elementIndex), ctr, col.hitpoint);
-                break;
-            case (TY_IMAGE_PLANE) :
-                elem_ray = traceImagePlane(elem_ray, ImagePlane(col.elementIndex), col.hitpoint);
-                break;
-            case (TY_TOROID_MIRROR) :
-                elem_ray = traceToroid(elem_ray, ToroidMirror(col.elementIndex), ctr, col.hitpoint);
-                break;
-            case (TY_ELLIPSOID_MIRROR) :
-                elem_ray = traceEllipsoidMirror(elem_ray, EllipsoidMirror(col.elementIndex), ctr, col.hitpoint);
+            case (BTYPE_IMAGE_PLANE):
+                elem_ray = behaveImagePlane(elem_ray, col.elementIndex, col);
                 break;
         }
 
@@ -134,7 +78,7 @@ void dynamicElements() {
         _ray = rayMatrixMult(elem_ray, nextElement.m_outTrans);
     }
 
-    if (find_collision().found) {
+    if (findCollision().found) {
         takeFinalSnapshot(_ray, W_NOT_ENOUGH_BOUNCES);
     } else {
         takeFinalSnapshot(_ray, W_FLY_OFF);

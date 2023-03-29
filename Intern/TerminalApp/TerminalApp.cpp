@@ -124,7 +124,7 @@ void TerminalApp::run() {
         m_Tracer = std::make_unique<RAYX::CpuTracer>();
     } else {
 #ifdef NO_VULKAN
-        RAYX_ERR << "NO_VULKAN: trying to construct VulkanTracer!";
+        RAYX_ERR << "NO_VULKAN: trying to construct VulkanTracer with Vulkan disabled. Use -x to use CPU tracer or enable Vulkan when building.";
 #else
         m_Tracer = std::make_unique<RAYX::VulkanTracer>();
 #endif
@@ -142,7 +142,7 @@ std::string TerminalApp::exportRays(const RAYX::Rays& rays, std::string path) {
     if (path.ends_with(".rml")) {
         path = path.substr(0, path.length() - 4);
     } else {
-        RAYX_ERR << "invalid input file!";
+        RAYX_ERR << "Input file is not an *.rml file!";
     }
 
     if (csv) {
@@ -150,7 +150,7 @@ std::string TerminalApp::exportRays(const RAYX::Rays& rays, std::string path) {
         writeCSV(rays, path);
     } else {
 #ifdef NO_H5
-        RAYX_ERR << "writeH5 called during NO_H5";
+        RAYX_ERR << "writeH5 called during NO_H5 (HDF5 disabled during build))";
 #else
         path += ".h5";
         writeH5(rays, path, getBeamlineOpticalElementsNames());

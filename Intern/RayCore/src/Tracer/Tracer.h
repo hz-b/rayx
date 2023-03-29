@@ -5,10 +5,10 @@
 #include <string>
 #include <vector>
 
-#include "Constants.h"
 #include "Core.h"
-#include "Model/Beamline/Beamline.h"
+#include "Beamline/Beamline.h"
 #include "Ray.h"
+#include "Shared/Constants.h"
 
 // Abstract Tracer base class.
 namespace RAYX {
@@ -41,15 +41,19 @@ class RAYX_API Tracer {
     // See `Rays` for information about the return value.
     Rays trace(const Beamline&);
 
-    struct PushConstants {
-        glm::dmat4 pushMatrix;
+    // Useful for GPU Tracing
+    struct PushConstants {  // TODO(Jannis): PushConstants is not an expressive name. Rename to something like TracerConfig
+        double rayIdStart;
+        double numRays;
+        double randomSeed;
+        double maxSnapshots;
     };
 
   protected:
     // where the actual tracing happens.
     // std::vector<Ray> will contain all snapshots for all Rays (and also the W_UNINIT rays).
     virtual std::vector<Ray> traceRaw(const TraceRawConfig&) = 0;
-    virtual void setPushConstants(PushConstants*) = 0;
+    virtual void setPushConstants(const PushConstants*) = 0;
 };
 
 // TODO deprecate these functions and all of their uses.

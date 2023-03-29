@@ -11,27 +11,24 @@ SET(SOURCE
     src/Data/DatFile.cpp
     src/Debug/Debug.cpp
     src/Debug/Instrumentor.cpp
-    src/Model/Beamline/Beamline.cpp
-    src/Model/Beamline/OpticalElement.cpp
-    src/Model/Beamline/LightSource.cpp
-    src/Model/Beamline/EnergyDistribution.cpp
-    src/Model/Beamline/Objects/ImagePlane.cpp
-    src/Model/Beamline/Objects/MatrixSource.cpp
-    src/Model/Beamline/Objects/PointSource.cpp
-    src/Model/Beamline/Objects/Ellipsoid.cpp
-    src/Model/Beamline/Objects/ReflectionZonePlate.cpp
-    src/Model/Beamline/Objects/Slit.cpp
-    src/Model/Beamline/Objects/SphereGrating.cpp
-    src/Model/Beamline/Objects/PlaneGrating.cpp
-    src/Model/Beamline/Objects/PlaneMirror.cpp
-    src/Model/Beamline/Objects/PointSource.cpp
-    src/Model/Beamline/Objects/SphereMirror.cpp
-    src/Model/Beamline/Objects/ToroidMirror.cpp
-    src/Model/Beamline/Objects/Cylinder.cpp
-    src/Model/Beamline/Objects/Cone.cpp
-    src/Model/Surface/Quadric.cpp
-    src/Model/Surface/Toroid.cpp
-    src/Model/Surface/Surface.cpp
+    src/Beamline/Beamline.cpp
+    src/Beamline/OpticalElement.cpp
+    src/Beamline/LightSource.cpp
+    src/Beamline/EnergyDistribution.cpp
+    src/Beamline/Objects/ImagePlane.cpp
+    src/Beamline/Objects/MatrixSource.cpp
+    src/Beamline/Objects/PointSource.cpp
+    src/Beamline/Objects/Ellipsoid.cpp
+    src/Beamline/Objects/ReflectionZonePlate.cpp
+    src/Beamline/Objects/Slit.cpp
+    src/Beamline/Objects/SphereGrating.cpp
+    src/Beamline/Objects/PlaneGrating.cpp
+    src/Beamline/Objects/PlaneMirror.cpp
+    src/Beamline/Objects/PointSource.cpp
+    src/Beamline/Objects/SphereMirror.cpp
+    src/Beamline/Objects/ToroidMirror.cpp
+    src/Beamline/Objects/Cylinder.cpp
+    src/Beamline/Objects/Cone.cpp
     src/Material/Material.cpp
     src/Material/NffTable.cpp
     src/Material/PalikTable.cpp
