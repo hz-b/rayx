@@ -22,9 +22,6 @@ OpticalElement::OpticalElement(const DesignObject& dobj) {
 
     m_position = dobj.parsePosition();
     m_orientation = dobj.parseOrientation();
-
-    // TODO remove later! 42 means uninitialized.
-    m_behaviour.m_type = 42;
 }
 
 Element OpticalElement::intoElement() const {

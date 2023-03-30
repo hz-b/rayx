@@ -2,8 +2,8 @@
 
 #include <array>
 
-#include "Debug/Instrumentor.h"
 #include "Beamline/Objects/Objects.h"
+#include "Debug/Instrumentor.h"
 
 namespace RAYX {
 Beamline::Beamline() = default;
