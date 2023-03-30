@@ -5,10 +5,10 @@
 #include <cmath>
 #include <cstring>
 
+#include "Beamline/OpticalElement.h"
 #include "Debug/Debug.h"
 #include "Debug/Instrumentor.h"
 #include "Material/Material.h"
-#include "Beamline/OpticalElement.h"
 #include "Random.h"
 
 using uint = unsigned int;

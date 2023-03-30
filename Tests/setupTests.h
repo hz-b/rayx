@@ -5,12 +5,12 @@
 #include <sstream>
 #include <type_traits>
 
+#include "Beamline/Objects/Objects.h"
 #include "CanonicalizePath.h"
 #include "Core.h"
 #include "Data/Importer.h"
 #include "Debug/Debug.h"
 #include "Material/Material.h"
-#include "Beamline/Objects/Objects.h"
 #include "Shared/Constants.h"
 #include "Tracer/CpuTracer.h"
 #include "Tracer/Ray.h"

@@ -6,9 +6,9 @@
 #include <iostream>
 #include <utility>
 
-#include "Debug/Debug.h"
 #include "Beamline/EnergyDistribution.h"
 #include "Beamline/LightSource.h"
+#include "Debug/Debug.h"
 #include "Shared/Constants.h"
 #include "utils.h"
 

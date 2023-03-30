@@ -5,8 +5,8 @@
 #include <string>
 #include <vector>
 
-#include "Core.h"
 #include "Beamline/Beamline.h"
+#include "Core.h"
 #include "Ray.h"
 #include "Shared/Constants.h"
 
