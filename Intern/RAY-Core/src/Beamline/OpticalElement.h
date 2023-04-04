@@ -22,8 +22,6 @@ class RAYX_API OpticalElement {
 
     virtual ~OpticalElement() = default;
 
-    void calcTransformationMatrices(glm::dvec4 position, glm::dmat4 orientation, glm::dmat4& output, bool calcInMatrix = true) const;
-
     glm::dmat4 getInMatrix() const;
     glm::dmat4 getOutMatrix() const;
     glm::dmat4x4 getOrientation() const;
@@ -51,5 +49,9 @@ struct RAYX_API OpticalElement2 {
     Element m_element;
     std::string m_name;
 };
+
+glm::dmat4 calcTransformationMatrices(glm::dvec4 position, glm::dmat4 orientation, bool calcInMatrix = true);
+glm::dmat4 defaultInMatrix(const DesignObject& dobj);
+glm::dmat4 defaultOutMatrix(const DesignObject& dobj);
 
 }  // namespace RAYX

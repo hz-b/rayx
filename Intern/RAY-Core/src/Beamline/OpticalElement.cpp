@@ -40,6 +40,13 @@ Element OpticalElement::intoElement() const {
     return e;
 }
 
+glm::dmat4 OpticalElement::getInMatrix() const { return calcTransformationMatrices(m_position, m_orientation); }
+glm::dmat4 OpticalElement::getOutMatrix() const { return calcTransformationMatrices(m_position, m_orientation, false); }
+glm::dvec4 OpticalElement::getPosition() const { return m_position; }
+glm::dmat4x4 OpticalElement::getOrientation() const { return m_orientation; }
+
+std::array<double, 7> OpticalElement::getSlopeError() const { return m_slopeError; }
+
 /**
  * calculates element to world coordinates transformation matrix and its
  * inverse
@@ -47,9 +54,9 @@ Element OpticalElement::intoElement() const {
  * of the element in world coordinates
  * @param   orientation  4x4 matrix that describes the orientation of
  * the surface with respect to the world coordinate system
- * @return void
+ * @return the in or out matrix according to `calcInMatrix`
  */
-void OpticalElement::calcTransformationMatrices(glm::dvec4 position, glm::dmat4 orientation, glm::dmat4& output, bool calcInMatrix) const {
+glm::dmat4 calcTransformationMatrices(glm::dvec4 position, glm::dmat4 orientation, bool calcInMatrix) {
     glm::dmat4x4 rotation =
         glm::dmat4x4(orientation[0][0], orientation[0][1], orientation[0][2], 0.0, orientation[1][0], orientation[1][1], orientation[1][2], 0.0,
                      orientation[2][0], orientation[2][1], orientation[2][2], 0.0, 0.0, 0.0, 0.0, 1.0);  // o
@@ -59,32 +66,17 @@ void OpticalElement::calcTransformationMatrices(glm::dvec4 position, glm::dmat4 
         glm::dmat4x4 translation = glm::dmat4x4(1, 0, 0, -position[0], 0, 1, 0, -position[1], 0, 0, 1, -position[2], 0, 0, 0, 1);  // o
         // ray = tran * rot * ray
         glm::dmat4x4 g2e = translation * rotation;
-        output = glm::transpose(g2e);
-        return;
+        return glm::transpose(g2e);
     } else {
         glm::dmat4x4 inv_translation = glm::dmat4x4(1, 0, 0, position[0], 0, 1, 0, position[1], 0, 0, 1, position[2], 0, 0, 0, 1);  // o
         // inverse of m_inMatrix
         glm::dmat4x4 e2g = inv_rotation * inv_translation;
-        output = glm::transpose(e2g);
-        return;
+        return glm::transpose(e2g);
     }
 }
 
-glm::dmat4 OpticalElement::getInMatrix() const {
-    // return glmToArray16(m_inMatrix);,
-    glm::dmat4 inMatrix = glm::dmat4();
-    calcTransformationMatrices(m_position, m_orientation, inMatrix);
-    return inMatrix;
-}
-glm::dmat4 OpticalElement::getOutMatrix() const {
-    // return glmToArray16(m_outMatrix);
-    glm::dmat4 outMatrix = glm::dmat4();
-    calcTransformationMatrices(m_position, m_orientation, outMatrix, false);
-    return outMatrix;
-}
-glm::dvec4 OpticalElement::getPosition() const { return m_position; }
-glm::dmat4x4 OpticalElement::getOrientation() const { return m_orientation; }
+glm::dmat4x4 defaultInMatrix(const DesignObject& dobj) { return calcTransformationMatrices(dobj.parsePosition(), dobj.parseOrientation(), true); }
 
-std::array<double, 7> OpticalElement::getSlopeError() const { return m_slopeError; }
+glm::dmat4x4 defaultOutMatrix(const DesignObject& dobj) { return calcTransformationMatrices(dobj.parsePosition(), dobj.parseOrientation(), false); }
 
 }  // namespace RAYX

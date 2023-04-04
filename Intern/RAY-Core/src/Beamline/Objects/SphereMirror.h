@@ -21,4 +21,6 @@ class RAYX_API SphereMirror : public OpticalElement {
     Rad m_grazingIncidenceAngle;
 };
 
+Element makeSphereMirror(const DesignObject&);
+
 }  // namespace RAYX
