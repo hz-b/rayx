@@ -49,6 +49,15 @@ void addBeamlineObjectFromXML(rapidxml::xml_node<>* node, Beamline* beamline, co
         }
     };
 
+    const auto addOpticalElement2 = [&](Element e, rapidxml::xml_node<>* node) {
+        OpticalElement2 e2 = {
+            .m_element = e,
+            .m_name = node->first_attribute("name")->value(),
+        };
+
+        beamline->m_OpticalElements.push_back(e2);
+    };
+
     RAYX::xml::Parser parser(node, group_context, std::move(filename));
 
     // every beamline object has a function createFromXML which constructs the
@@ -72,7 +81,7 @@ void addBeamlineObjectFromXML(rapidxml::xml_node<>* node, Beamline* beamline, co
     } else if (strcmp(type, "Plane Grating") == 0) {
         addOpticalElement(std::make_shared<PlaneGrating>(parser), node);
     } else if (strcmp(type, "Sphere") == 0) {
-        addOpticalElement(std::make_shared<SphereMirror>(parser), node);
+        addOpticalElement2(makeSphereMirror(parser), node);
     } else if (strcmp(type, "Reflection Zoneplate") == 0) {
         addOpticalElement(std::make_shared<ReflectionZonePlate>(parser), node);
     } else if (strcmp(type, "Ellipsoid") == 0) {
