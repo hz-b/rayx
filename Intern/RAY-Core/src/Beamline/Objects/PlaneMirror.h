@@ -3,9 +3,6 @@
 
 namespace RAYX {
 
-class RAYX_API PlaneMirror : public OpticalElement {
-  public:
-    PlaneMirror(const DesignObject&);
-};
+Element makePlaneMirror(DesignObject& dobj);
 
 }  // namespace RAYX

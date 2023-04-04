@@ -106,8 +106,10 @@ Element defaultElement(const DesignObject& dobj) {
     return Element{
         .m_inTrans = defaultInMatrix(dobj),
         .m_outTrans = defaultOutMatrix(dobj),
+        // TODO behaviour & surface shouldn't have default values!
         .m_behaviour = serializeMirror(),
         .m_surface = surface,
+
         .m_cutout = dobj.parseCutout(),
         .m_slopeError = {slopeError[0], slopeError[1], slopeError[2], slopeError[3], slopeError[4], slopeError[5], slopeError[6]},
         .m_azimuthalAngle = defaultAzimuthalAngle(dobj).rad,
