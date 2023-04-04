@@ -86,4 +86,34 @@ Rad defaultAzimuthalAngle(const DesignObject& dobj) {
     return azim;
 }
 
+Element defaultElement(const DesignObject& dobj) {
+    // default element is a plane mirror
+    auto surface = serializeQuadric({
+        .m_icurv = 1,
+        .m_a11 = 0,
+        .m_a12 = 0,
+        .m_a13 = 0,
+        .m_a14 = 0,
+        .m_a22 = 0,
+        .m_a23 = 0,
+        .m_a24 = -1,
+        .m_a33 = 0,
+        .m_a34 = 0,
+        .m_a44 = 0,
+    });
+    auto slopeError = dobj.parseSlopeError();
+
+    return Element{
+        .m_inTrans = defaultInMatrix(dobj),
+        .m_outTrans = defaultOutMatrix(dobj),
+        .m_behaviour = serializeMirror(),
+        .m_surface = surface,
+        .m_cutout = dobj.parseCutout(),
+        .m_slopeError = {slopeError[0], slopeError[1], slopeError[2], slopeError[3], slopeError[4], slopeError[5], slopeError[6]},
+        .m_azimuthalAngle = defaultAzimuthalAngle(dobj).rad,
+        .m_material = defaultMaterial(dobj),
+        .m_padding = {0.0},
+    };
+}
+
 }  // namespace RAYX
