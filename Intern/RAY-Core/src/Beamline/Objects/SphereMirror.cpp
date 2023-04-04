@@ -27,12 +27,6 @@ Element makeSphereMirror(const DesignObject& dobj) {
         .m_a44 = 0,
     });
     auto m_slopeError = dobj.parseSlopeError();
-    double azim;
-    try {
-        azim = dobj.parseAzimuthalAngle().rad;
-    } catch (std::runtime_error& err) {
-        azim = 0;
-    }
 
     return Element{
         .m_inTrans = defaultInMatrix(dobj),
@@ -41,8 +35,8 @@ Element makeSphereMirror(const DesignObject& dobj) {
         .m_surface = surface,
         .m_cutout = dobj.parseCutout(),
         .m_slopeError = {m_slopeError[0], m_slopeError[1], m_slopeError[2], m_slopeError[3], m_slopeError[4], m_slopeError[5], m_slopeError[6]},
-        .m_azimuthalAngle = azim,
-        .m_material = (double)static_cast<int>(dobj.parseMaterial()),
+        .m_azimuthalAngle = defaultAzimuthalAngle(dobj).rad,
+        .m_material = defaultMaterial(dobj),
         .m_padding = {0.0},
     };
 }

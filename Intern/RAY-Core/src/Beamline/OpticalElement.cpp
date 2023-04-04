@@ -11,15 +11,8 @@ OpticalElement::OpticalElement(const DesignObject& dobj) {
     m_name = dobj.name();
     m_slopeError = dobj.parseSlopeError();
     m_material = dobj.parseMaterial();
-
     m_cutout = dobj.parseCutout();
-
-    // TODO(Rudi) replace try-catch stuff by std::optionals
-    try {
-        m_azimuthalAngle = dobj.parseAzimuthalAngle();
-    } catch (std::runtime_error& e) {
-    }
-
+    m_azimuthalAngle = defaultAzimuthalAngle(dobj);
     m_position = dobj.parsePosition();
     m_orientation = dobj.parseOrientation();
 }
@@ -78,5 +71,19 @@ glm::dmat4 calcTransformationMatrices(glm::dvec4 position, glm::dmat4 orientatio
 glm::dmat4x4 defaultInMatrix(const DesignObject& dobj) { return calcTransformationMatrices(dobj.parsePosition(), dobj.parseOrientation(), true); }
 
 glm::dmat4x4 defaultOutMatrix(const DesignObject& dobj) { return calcTransformationMatrices(dobj.parsePosition(), dobj.parseOrientation(), false); }
+
+double defaultMaterial(const DesignObject& dobj) { return (double)static_cast<int>(dobj.parseMaterial()); }
+
+Rad defaultAzimuthalAngle(const DesignObject& dobj) {
+    Rad azim;
+
+    // TODO(Rudi) replace try-catch stuff by std::optionals
+    try {
+        azim = dobj.parseAzimuthalAngle();
+    } catch (std::runtime_error& e) {
+        azim.rad = 0;
+    }
+    return azim;
+}
 
 }  // namespace RAYX
