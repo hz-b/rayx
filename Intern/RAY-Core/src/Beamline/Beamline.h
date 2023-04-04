@@ -9,7 +9,7 @@
 #include "Tracer/Ray.h"
 
 namespace RAYX {
-class OpticalElement;
+class OpticalElement2;
 class LightSource;
 
 /*
@@ -31,7 +31,7 @@ class RAYX_API Beamline {
      */
     MaterialTables calcMinimalMaterialTables() const;
 
-    std::vector<std::shared_ptr<OpticalElement>> m_OpticalElements;
+    std::vector<OpticalElement2> m_OpticalElements;
     std::vector<std::shared_ptr<LightSource>> m_LightSources;
 };
 

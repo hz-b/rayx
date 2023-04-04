@@ -197,7 +197,7 @@ std::vector<std::string> TerminalApp::getBeamlineOpticalElementsNames() {
     names.reserve(m_Beamline->m_OpticalElements.size());
 
     for (const auto& opticalElement : m_Beamline->m_OpticalElements) {
-        names.push_back(opticalElement->m_name);
+        names.push_back(opticalElement.m_name);
     }
 
     return names;

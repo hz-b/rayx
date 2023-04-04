@@ -47,4 +47,9 @@ class RAYX_API OpticalElement {
     Cutout m_cutout;
 };
 
+struct RAYX_API OpticalElement2 {
+    Element m_element;
+    std::string m_name;
+};
+
 }  // namespace RAYX

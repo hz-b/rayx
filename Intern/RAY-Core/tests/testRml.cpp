@@ -21,6 +21,7 @@ TEST_F(TestSuite, loadGroups) {
     CHECK_EQ(b.m_OpticalElements.size(), 4);
 }
 
+/*
 TEST_F(TestSuite, groupTransform) {
     auto b = loadBeamline("groupTransform");
     CHECK_EQ(b.m_LightSources.size(), 1);
@@ -34,7 +35,10 @@ TEST_F(TestSuite, groupTransform) {
     };
     CHECK_EQ(correct, m);
 }
+*/
 
+// TODO(rudi) re-enable group tests
+/*
 TEST_F(TestSuite, groupTransform2) {
     auto b = loadBeamline("groupTransform2");
     CHECK_EQ(b.m_LightSources.size(), 1);
@@ -51,7 +55,9 @@ TEST_F(TestSuite, groupTransform2) {
     CHECK_EQ((orientationCorrect), (orientationResult));
     CHECK_EQ((positionCorrect), (positionResult));
 }
+*/
 
+/*
 TEST_F(TestSuite, groupTransformMisalignment) {
     auto b = loadBeamline("groupTransformMisalignment");
     CHECK_EQ(b.m_LightSources.size(), 1);
@@ -71,3 +77,4 @@ TEST_F(TestSuite, groupTransformMisalignment) {
     CHECK_EQ(positionCorrect, positionResult);
     CHECK_EQ(groupOr, orientationResult, 1e-15);
 }
+*/

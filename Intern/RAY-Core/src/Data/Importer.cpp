@@ -37,7 +37,12 @@ void addBeamlineObjectFromXML(rapidxml::xml_node<>* node, Beamline* beamline, co
     // beamline (if it's not nullptr)
     const auto addOpticalElement = [&](const std::shared_ptr<OpticalElement>& e, rapidxml::xml_node<>* node) {
         if (e) {
-            beamline->m_OpticalElements.push_back(e);
+            OpticalElement2 e2 = {
+                .m_element = e->intoElement(),
+                .m_name = e->m_name,
+            };
+
+            beamline->m_OpticalElements.push_back(e2);
         } else {
             RAYX_ERR << "could not construct OpticalElement with Name: " << node->first_attribute("name")->value()
                      << "; Type: " << node->first_attribute("type")->value();

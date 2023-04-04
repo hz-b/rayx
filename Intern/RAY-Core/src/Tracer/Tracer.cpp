@@ -36,7 +36,7 @@ Rays Tracer::trace(const Beamline& b) {
 
         std::vector<Element> elements;
         for (auto e : b.m_OpticalElements) {
-            elements.push_back(e->intoElement());
+            elements.push_back(e.m_element);
         }
 
         TraceRawConfig cfg = {
