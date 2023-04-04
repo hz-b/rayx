@@ -5,11 +5,12 @@
 #include <memory>
 #include <vector>
 
+#include "Beamline/OpticalElement.h"
 #include "Core.h"
 #include "Tracer/Ray.h"
 
 namespace RAYX {
-class OpticalElement2;
+struct OpticalElement2;
 class LightSource;
 
 /*
