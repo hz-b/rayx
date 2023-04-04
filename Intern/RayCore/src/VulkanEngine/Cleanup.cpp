@@ -7,14 +7,12 @@
 namespace RAYX {
 
 void VulkanEngine::cleanup() {
-    if (m_state != VulkanEngineStates_t::POSTRUN) {
-        RAYX_ERR << "cleanup() only needs to be called after .run()!";
-    }
+    IS_ENGINE_CLEANABLE
 
     vkDestroyPipeline(m_Device, m_Pipeline, nullptr);
     vkDestroyPipelineLayout(m_Device, m_PipelineLayout, nullptr);
 
-    m_state = VulkanEngineStates_t::PRERUN;
+    m_state = EngineStates_t::PRERUN;
 }
 
 }  // namespace RAYX

@@ -23,7 +23,7 @@ std::vector<Ray> VulkanTracer::traceRaw(const TraceRawConfig& cfg) {
     RAYX_PROFILE_FUNCTION_STDOUT();
 
     // init, if not yet initialized.
-    if (m_engine.state() == VulkanEngine::VulkanEngineStates_t::PREINIT) {
+    if (m_engine.state() == VulkanEngine::EngineStates_t::PREINIT) {
         // Set buffer settings (DEBUG OR RELEASE)
         RAYX_VERB << "Initializing Vulkan Tracer..";
         m_engine.declareBuffer("ray-buffer", {.binding = 0, .isInput = true, .isOutput = false});

@@ -6,9 +6,9 @@
 
 namespace RAYX {
 void VulkanEngine::createBuffer(const char* bufname, VkDeviceSize size) {
-    if (m_state == VulkanEngineStates_t::PREINIT) {
+    if (m_state == EngineStates_t::PREINIT) {
         RAYX_ERR << "you've forgotten to .init() the VulkanEngine";
-    } else if (m_state == VulkanEngineStates_t::POSTRUN) {
+    } else if (m_state == EngineStates_t::POSTRUN) {
         RAYX_ERR << "you've forgotten to .cleanup() the VulkanEngine";
     }
     Buffer_t& b = m_buffers[bufname];

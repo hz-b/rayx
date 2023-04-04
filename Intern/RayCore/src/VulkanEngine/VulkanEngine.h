@@ -10,13 +10,34 @@
 #include <vulkan/vulkan.hpp>
 
 #include "RayCore.h"
+#include "VulkanEngine/Buffer/VulkanBuffer.h"
+
+#define IS_ENGINE_PREINIT                                    \
+    if (m_state != EngineStates_t::PREINIT) {                \
+        RAYX_ERR << "VulkanEngine was already initialized!"; \
+    }
+
+#define IS_ENGINE_POSTRUN                                                 \
+    if (m_state != EngineStates_t::POSTRUN) {                             \
+        RAYX_ERR << "you've forgotton to .run() the VulkanEngine. Thats " \
+                    "mandatory before reading it's output buffers.";      \
+    }
+
+#define IS_ENGINE_CLEAN                                                \
+    if (m_state == EngineStates_t::PREINIT) {                          \
+        RAYX_ERR << "you've forgotten to .init() the VulkanEngine";    \
+    } else if (m_state == EngineStates_t::POSTRUN) {                   \
+        RAYX_ERR << "you've forgotten to .cleanup() the VulkanEngine"; \
+    }
+#define IS_ENGINE_CLEANABLE                                            \
+    if (m_state != EngineStates_t::POSTRUN) {                          \
+        RAYX_ERR << "cleanup() only needs to be called after .run()!"; \
+    }
 
 namespace RAYX {
 
 // the argument type of `VulkanEngine::declareBuffer(_)`
 struct BufferDeclarationSpec_t {
-    /// used to map the vulkan buffers to the shader buffers.
-    /// Lines like `layout (binding = _)` declare buffers in the shader.
     uint32_t binding;
 
     /// expresses whether the buffer is allowed to be initialized with CPU-data.
@@ -76,12 +97,12 @@ class RAYX_API VulkanEngine {
     }
 
     /// changes the state from POSTRUN to PRERUN.
-    /// after this all buffers are deleted and hence readBuffer will fail.
+    /// after this all buffers are deleted (and hence readBuffer will fail.)
     void cleanup();
 
     /// There are 3 basic states for the VulkanEngine. Described below.
     /// the variable m_state stores that state.
-    enum class VulkanEngineStates_t {
+    enum class EngineStates_t {
         // the state before .init() is called.
         // legal functions: declareBuffer(), init().
         PREINIT,
@@ -97,7 +118,7 @@ class RAYX_API VulkanEngine {
         POSTRUN
     };
 
-    inline VulkanEngineStates_t state() { return m_state; }
+    inline EngineStates_t state() { return m_state; }
 
     /// the internal representation of a buffer.
     /// m_in, m_out, m_binding are taken from DeclareBufferSpec.
@@ -113,6 +134,12 @@ class RAYX_API VulkanEngine {
         VmaAllocationInfo allocaInfo;
     };
 
+    const VkDevice& getDevice() const { return m_Device; };
+    const VkPhysicalDevice& getPhysicalDevice() const { return m_PhysicalDevice; };
+    const VkPipeline& getPipeline() const { return m_Pipeline; };
+    const VkQueue& getComputeQueue() const { return m_ComputeQueue; };
+    const VkQueue& getTransferQueue() const { return m_TransferQueue; };
+
     // PushConstants are "constants" updated on each Dispatch Call (or similar) in the pipeline
     // Please pay attention to alignment rules
     // You can change this struct (also in shader)
@@ -121,8 +148,31 @@ class RAYX_API VulkanEngine {
         size_t size;
     } m_pushConstants;
 
+    // Sync:
+    struct {
+        VkSemaphore computeSemaphore;
+        VkSemaphore transferSemaphore;
+    } m_Semaphores;
+
+    class Fence {
+      public:
+        Fence(VkDevice& device);
+        ~Fence();
+        VkFence* fence();
+        VkResult wait();
+        VkResult forceReset();
+
+      private:
+        VkFence f;
+        VkDevice device;
+    };
+    struct {
+        std::unique_ptr<Fence> transfer;
+        std::unique_ptr<Fence> compute;
+    } m_Fences;
+
   private:
-    VulkanEngineStates_t m_state = VulkanEngineStates_t::PREINIT;
+    EngineStates_t m_state = EngineStates_t::PREINIT;
     const char* m_shaderfile;
     uint32_t m_numberOfInvocations;
 
@@ -180,29 +230,6 @@ class RAYX_API VulkanEngine {
     void submitCommandBuffer();
     void updteDescriptorSets();
     void createComputePipeline();
-
-    // Sync:
-    struct {
-        VkSemaphore computeSemaphore;
-        VkSemaphore transferSemaphore;
-    } m_Semaphores;
-
-    class Fence {
-      public:
-        Fence(VkDevice& device);
-        ~Fence();
-        VkFence* fence();
-        VkResult wait();
-        VkResult forceReset();
-
-      private:
-        VkFence f;
-        VkDevice device;
-    };
-    struct {
-        std::unique_ptr<Fence> transfer;
-        std::unique_ptr<Fence> compute;
-    } m_Fences;
 
     uint64_t m_runs = 0;
 

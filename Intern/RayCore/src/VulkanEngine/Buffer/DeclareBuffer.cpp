@@ -5,7 +5,7 @@
 namespace RAYX {
 
 void VulkanEngine::declareBuffer(const char* bufname, BufferDeclarationSpec_t spec) {
-    if (m_state != VulkanEngineStates_t::PREINIT) {
+    if (m_state != EngineStates_t::PREINIT) {
         RAYX_ERR << "VulkanEngine was already initialized!";
     }
 

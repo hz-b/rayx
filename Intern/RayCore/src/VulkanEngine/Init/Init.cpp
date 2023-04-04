@@ -4,7 +4,7 @@
 
 namespace RAYX {
 void VulkanEngine::init(VulkanEngineInitSpec_t spec) {
-    if (m_state != VulkanEngineStates_t::PREINIT) {
+    if (m_state != EngineStates_t::PREINIT) {
         RAYX_ERR << "VulkanEngine was already initialized!";
     }
 
@@ -23,7 +23,7 @@ void VulkanEngine::init(VulkanEngineInitSpec_t spec) {
     createStagingBuffer();
     createCache();
     createShaderModule();
-    m_state = VulkanEngineStates_t::PRERUN;
+    m_state = EngineStates_t::PRERUN;
 }
 
 }  // namespace RAYX

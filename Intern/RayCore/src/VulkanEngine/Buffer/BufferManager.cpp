@@ -1,0 +1,94 @@
+#ifndef NO_VULKAN
+
+#include "BufferManager.h"
+namespace RAYX {
+BufferManager::BufferManager(const VkQueue& transferQueue, const VkCommandBuffer& transferCmdBuffer,
+                             const std::unique_ptr<VulkanEngine::Fence>& fence, size_t stagingSize, VmaAllocator& vma)
+    : m_TransferQueue(transferQueue), m_TransferCommandBuffer(transferCmdBuffer), m_Fence(fence), STAGING_SIZE(stagingSize), m_VmaAllocator(vma) {
+    createStagingBuffer();
+};
+
+void BufferManager::gpuMemcpy(VulkanBuffer& buffer_dst, size_t offset_dst, VulkanBuffer& buffer_src, size_t offset_src, size_t bytes) {
+    RAYX_PROFILE_FUNCTION();
+    VkCommandBufferBeginInfo beginInfo{};
+    beginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
+    beginInfo.flags = VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT;
+
+    vkBeginCommandBuffer(m_TransferCommandBuffer, &beginInfo);
+
+    VkBufferCopy copyRegion{};
+    copyRegion.srcOffset = offset_src;
+    copyRegion.dstOffset = offset_dst;
+    copyRegion.size = bytes;
+
+    vkCmdCopyBuffer(m_TransferCommandBuffer, buffer_src.getBuffer(), buffer_dst.getBuffer(), 1, &copyRegion);
+
+    vkEndCommandBuffer(m_TransferCommandBuffer);
+
+    VkSubmitInfo submitInfo{};
+    submitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
+    submitInfo.commandBufferCount = 1;
+    submitInfo.pCommandBuffers = &m_TransferCommandBuffer;
+    auto f = m_Fence->fence();
+    vkQueueSubmit(m_TransferQueue, 1, &submitInfo, *f);
+}
+
+void BufferManager::loadFromStagingBuffer(char* outdata, size_t bytes) {
+    memcpy(outdata, m_StagingBuffer.getMappedMemory(), bytes);
+    m_StagingBuffer.UnmapMemory();
+}
+
+void BufferManager::storeToStagingBuffer(char* indata, size_t bytes) {
+    memcpy(m_StagingBuffer.getMappedMemory(), indata, bytes);
+    m_StagingBuffer.UnmapMemory();
+}
+
+void BufferManager::createStagingBuffer() {
+    m_StagingBuffer.m_VmaAllocator = m_VmaAllocator;
+    VulkanBufferCreateInfo createInfo = {};
+    createInfo.bufName = "Staging-buffer";
+    createInfo.accessType = VKBUFFER_INOUT;
+    createInfo.size = STAGING_SIZE;
+    createInfo.binding = 0;
+
+    m_StagingBuffer.m_createInfo = createInfo;
+    m_StagingBuffer.createVmaBuffer(
+        STAGING_SIZE, VK_BUFFER_USAGE_TRANSFER_DST_BIT | VK_BUFFER_USAGE_TRANSFER_SRC_BIT | VK_BUFFER_USAGE_STORAGE_BUFFER_BIT,
+        m_StagingBuffer.m_Buffer, m_StagingBuffer.m_Alloca, &m_StagingBuffer.m_AllocaInfo,
+        VMA_ALLOCATION_CREATE_HOST_ACCESS_RANDOM_BIT | VMA_ALLOCATION_CREATE_MAPPED_BIT, VMA_MEMORY_USAGE_AUTO_PREFER_HOST);
+}
+void BufferManager::waitTransferQueueIdle() { vkQueueWaitIdle(m_TransferQueue); }
+
+void BufferManager::readBufferRaw(const char* bufname, char* outdata, const VkQueue& computeQueue) {
+    // if (m_state != EngineStates_t::POSTRUN) {
+    //     RAYX_ERR << "you've forgotton to .run() the VulkanEngine. Thats "
+    //                 "mandatory before reading it's output buffers.";
+    // }
+
+    auto b = m_Buffers[bufname];
+
+    if (b.m_createInfo.accessType != VKBUFFER_OUT || b.m_createInfo.accessType != VKBUFFER_INOUT) {
+        RAYX_ERR << "readBufferRaw(\"" << bufname << "\", ...) is not allowed, as \"" << bufname << "\" is not an output buffer";
+    }
+
+    size_t remainingBytes = b.getSize();
+    size_t offset = 0;
+    if (computeQueue != nullptr) {
+        vkQueueWaitIdle(computeQueue);
+    } else {
+        vkQueueWaitIdle(m_TransferQueue);
+    }
+
+    while (remainingBytes > 0) {
+        size_t localbytes = std::min((size_t)STAGING_SIZE, remainingBytes);
+        gpuMemcpy(m_StagingBuffer, 0, b, offset, localbytes);
+        m_Fence->wait();
+        loadFromStagingBuffer(outdata + offset, localbytes);
+        offset += localbytes;
+        remainingBytes -= localbytes;
+    }
+}
+
+}  // namespace RAYX
+
+#endif
