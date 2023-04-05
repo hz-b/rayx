@@ -22,7 +22,7 @@ else()
 
     # Enable werror if requested (mostly used for CI)
     if(WERROR STREQUAL "YES")
-        set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O3 -Werror") # -O3 finds more errors!
+        target_compile_options(${PROJECT_NAME} PRIVATE -O3 -Werror)
         message(STATUS "Werror mode")
     endif()
 endif()
