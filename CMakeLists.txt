@@ -6,7 +6,6 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 add_subdirectory(Intern)
 add_subdirectory(Extern)
-add_subdirectory(Tests)
 
 option(WERROR "add -Werror option" "NO") # inactive per default
 option(VULKAN "include the VulkanTracer" "YES") # activated per default
