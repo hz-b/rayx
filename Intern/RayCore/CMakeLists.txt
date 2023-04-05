@@ -63,10 +63,12 @@ endif()
 # Add Extern deps TODO(Jannis): the src include shouldn't be a SYSTEM include
 target_include_directories(${PROJECT_NAME}
     PUBLIC ${RayCore_SOURCE_DIR}/src
-    PUBLIC ${RayCore_SOURCE_DIR}/../../Extern/glm/glm/
-    PUBLIC ${RayCore_SOURCE_DIR}/../../Extern/rapidxml-1.13/
-    PUBLIC ${RayCore_SOURCE_DIR}/../../Extern/HighFive/include/
-    PUBLIC ${RayCore_SOURCE_DIR}/../../Extern/VMA/include/
+)
+target_include_directories(${PROJECT_NAME} PUBLIC
+    SYSTEM ${RayCore_SOURCE_DIR}/../../Extern/glm/glm/
+    SYSTEM ${RayCore_SOURCE_DIR}/../../Extern/rapidxml-1.13/
+    SYSTEM ${RayCore_SOURCE_DIR}/../../Extern/HighFive/include/
+    SYSTEM ${RayCore_SOURCE_DIR}/../../Extern/VMA/include/
 )
 
 if(NOT VULKAN STREQUAL "NO")
