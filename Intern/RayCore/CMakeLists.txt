@@ -1,72 +1,69 @@
 cmake_minimum_required(VERSION 3.2 FATAL_ERROR)
 
+# ---- Add tests ----
+add_subdirectory(tests)
+# -------------------
+
+
+# ---- Project ----
 project(RayCore)
-
-SET(SOURCE
-    src/CanonicalizePath.cpp
-    src/Random.cpp
-    src/utils.cpp
-    src/Data/Importer.cpp
-    src/Data/xml.cpp
-    src/Data/DatFile.cpp
-    src/Debug/Debug.cpp
-    src/Debug/Instrumentor.cpp
-    src/Beamline/Beamline.cpp
-    src/Beamline/OpticalElement.cpp
-    src/Beamline/LightSource.cpp
-    src/Beamline/EnergyDistribution.cpp
-    src/Beamline/Objects/ImagePlane.cpp
-    src/Beamline/Objects/MatrixSource.cpp
-    src/Beamline/Objects/PointSource.cpp
-    src/Beamline/Objects/Ellipsoid.cpp
-    src/Beamline/Objects/ReflectionZonePlate.cpp
-    src/Beamline/Objects/Slit.cpp
-    src/Beamline/Objects/SphereGrating.cpp
-    src/Beamline/Objects/PlaneGrating.cpp
-    src/Beamline/Objects/PlaneMirror.cpp
-    src/Beamline/Objects/PointSource.cpp
-    src/Beamline/Objects/SphereMirror.cpp
-    src/Beamline/Objects/ToroidMirror.cpp
-    src/Beamline/Objects/Cylinder.cpp
-    src/Beamline/Objects/Cone.cpp
-    src/Material/Material.cpp
-    src/Material/NffTable.cpp
-    src/Material/PalikTable.cpp
-    src/Tracer/Tracer.cpp
-    src/Tracer/VulkanTracer.cpp
-    src/Tracer/CpuTracer.cpp
-    src/VulkanEngine/Cleanup.cpp
-    src/VulkanEngine/Buffer/DeclareBuffer.cpp
-    src/VulkanEngine/Buffer/CreateBuffer.cpp
-    src/VulkanEngine/Buffer/IO/GpuMemcpy.cpp
-    src/VulkanEngine/Buffer/IO/ReadBufferRaw.cpp
-    src/VulkanEngine/Buffer/IO/WriteBufferRaw.cpp
-    src/VulkanEngine/Destruct.cpp
-    src/VulkanEngine/Init/CommandPool.cpp
-    src/VulkanEngine/Init/DescriptorSetLayout.cpp
-    src/VulkanEngine/Init/Instance.cpp
-    src/VulkanEngine/Init/StagingBuffer.cpp
-    src/VulkanEngine/Init/Init.cpp
-    src/VulkanEngine/Init/PickDevice.cpp
-    src/VulkanEngine/Init/CommandBuffer.cpp
-    src/VulkanEngine/Init/Cache.cpp
-    src/VulkanEngine/Init/Fence.cpp
-    src/VulkanEngine/Init/ShaderModule.cpp
-    src/VulkanEngine/Run/RecordBuffer.cpp
-    src/VulkanEngine/Run/ComputePipeline.cpp
-    src/VulkanEngine/Run/DescriptorSet.cpp
-    src/VulkanEngine/Run/RunCommandBuffer.cpp
-    src/VulkanEngine/Run/Run.cpp
-    src/Writer/CSVWriter.cpp
-    src/Writer/H5Writer.cpp
-)
-
+file(GLOB_RECURSE SOURCE ${RayCore_SOURCE_DIR}/src/*.cpp)
 add_library(${PROJECT_NAME} SHARED ${SOURCE})
+# -----------------
 
-target_precompile_headers(${PROJECT_NAME} PRIVATE raycorePCH.h)
+
+# ---- Warnings ----
+if(MSVC)
+	message(STATUS "MSVC")
+    target_compile_options(${PROJECT_NAME} PRIVATE /W4) # /WX)
+else()
+	message(STATUS "GCC")
+    target_compile_options(${PROJECT_NAME} PRIVATE -Wall -Wextra -pedantic) #-Werror)
+
+    # Enable werror if requested (mostly used for CI)
+    if(WERROR STREQUAL "YES")
+        set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O3 -Werror") # -O3 finds more errors!
+        message(STATUS "Werror mode")
+    endif()
+endif()
+# ------------------
+
+
+# ---- Disable Vulkan/H5 ----
+if(VULKAN STREQUAL "NO")
+    target_compile_definitions(${PROJECT_NAME} PUBLIC NO_VULKAN)
+    message(STATUS "Vulkan disabled")
+else()
+    find_package(Vulkan 1.3.216 REQUIRED)
+    target_link_libraries(${PROJECT_NAME}
+        PUBLIC Vulkan::Vulkan
+    )
+endif()
+if(H5 STREQUAL "NO")
+    target_compile_definitions(${PROJECT_NAME} PUBLIC NO_H5)
+    message(STATUS "H5 disabled")
+else()
+    if(UNIX)
+        target_include_directories(${PROJECT_NAME} PUBLIC /usr/include/hdf5/serial)
+        target_link_directories(${PROJECT_NAME} PUBLIC /usr/lib/x86_64-linux-gnu/hdf5/serial)
+        target_link_libraries(${PROJECT_NAME} PUBLIC hdf5)
+    else()
+        find_package(HDF5 REQUIRED)
+        target_link_libraries(${PROJECT_NAME}
+            PUBLIC HDF5::HDF5
+        )
+    endif()
+endif()
+# -------------------------
+
+
+# ---- PCH ----
+target_precompile_headers(${PROJECT_NAME} PUBLIC raycorePCH.h)
 set(CMAKE_PCH_INSTANTIATE_TEMPLATES ON)
+# -------------
 
-# Set Compiler
+
+# ---- Defines ----
 if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
     set(COMPILE_PLATFORM RAYX_PLATFORM_GCC)
 elseif(CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
@@ -82,39 +79,23 @@ target_compile_definitions(${PROJECT_NAME}
     $<$<CONFIG:Debug>:RAYX_DEBUG_MODE>
     $<$<CONFIG:RelWithDebInfo>:RAYX_DEBUG_MODE>
 )
+# -----------------
 
-if(NOT VULKAN STREQUAL "NO")
-    find_package(Vulkan 1.3.216 REQUIRED)
-    target_link_libraries(${PROJECT_NAME}
-        PUBLIC Vulkan::Vulkan
-    )
-endif()
 
-# Link H5 Format
-if(NOT H5 STREQUAL "NO")
-    if(UNIX)
-        target_include_directories(${PROJECT_NAME} PUBLIC /usr/include/hdf5/serial)
-        target_link_directories(${PROJECT_NAME} PUBLIC /usr/lib/x86_64-linux-gnu/hdf5/serial)
-        target_link_libraries(${PROJECT_NAME} PUBLIC hdf5)
-    else()
-        find_package(HDF5 REQUIRED)
-        target_link_libraries(${PROJECT_NAME}
-            PUBLIC HDF5::HDF5
-        )
-    endif()
-endif()
-
-# Add Extern deps TODO(Jannis): the src include shouldn't be a SYSTEM include
-target_include_directories(${PROJECT_NAME}
-    SYSTEM PUBLIC ${RayCore_SOURCE_DIR}/src
-    PUBLIC ${RayCore_SOURCE_DIR}/../../Extern/glm/glm/
-    PUBLIC ${RayCore_SOURCE_DIR}/../../Extern/rapidxml-1.13/
-    PUBLIC ${RayCore_SOURCE_DIR}/../../Extern/HighFive/include/
-    PUBLIC ${RayCore_SOURCE_DIR}/../../Extern/VMA/include/
+# ---- Dependencies ----
+target_include_directories(${PROJECT_NAME} PRIVATE ${RayCore_SOURCE_DIR}/src)
+target_include_directories(${PROJECT_NAME} SYSTEM INTERFACE ${RayCore_SOURCE_DIR}/src)
+target_include_directories(${PROJECT_NAME} SYSTEM PUBLIC
+    ${RayCore_SOURCE_DIR}/../../Extern/glm/glm/
+    ${RayCore_SOURCE_DIR}/../../Extern/rapidxml-1.13/
+    ${RayCore_SOURCE_DIR}/../../Extern/HighFive/include/
+    ${RayCore_SOURCE_DIR}/../../Extern/VMA/include/
 )
+# ----------------------
 
+
+# ---- Compile Shaders ----
 if(NOT VULKAN STREQUAL "NO")
-    # Compile Shaders
     # The following code is used to always compile the shader.
     # This is most likely not an optimal solution, but it will work
     # until we find a better one.
@@ -122,27 +103,14 @@ if(NOT VULKAN STREQUAL "NO")
     set(COMPILED_SHADER ${CMAKE_BINARY_DIR}/bin/comp.spv)
     set(COMPILED_SHADER_FAKE ${CMAKE_BINARY_DIR}/bin/___comp.spv) # this exists so file cannot be found -> always execute command
 
-    if(WIN32)
-        add_custom_command(
-            OUTPUT
-            ${COMPILED_SHADER}
-            ${COMPILED_SHADER_FAKE}
-            COMMAND "$ENV{VULKAN_SDK}/Bin/glslc.exe"
-            ARGS ${RayCore_SOURCE_DIR}/src/Tracer/shader/main-glsl.comp -o ${COMPILED_SHADER} -fshader-stage=compute
-        )
-    elseif(UNIX)
-        add_custom_command(
-            OUTPUT
-            ${COMPILED_SHADER}
-            ${COMPILED_SHADER_FAKE}
-            COMMAND "glslc"
-            ARGS ${RayCore_SOURCE_DIR}/src/Tracer/shader/main-glsl.comp -o ${COMPILED_SHADER} -fshader-stage=compute
-        )
-    endif()
+    add_custom_command(
+        OUTPUT
+        ${COMPILED_SHADER}
+        ${COMPILED_SHADER_FAKE}
+        COMMAND "glslc"
+        ARGS ${RayCore_SOURCE_DIR}/src/Tracer/shader/main-glsl.comp -o ${COMPILED_SHADER} -fshader-stage=compute
+    )
 
     add_custom_target(COMPILE_SHADER ALL DEPENDS ${COMPILED_SHADER})
 endif()
-
-# Print include directories
-get_target_property(INCLUDE_DIRECTORIES ${PROJECT_NAME} INCLUDE_DIRECTORIES)
-message(STATUS "Include directories for ${PROJECT_NAME}: ${INCLUDE_DIRECTORIES}")
+# ------------------------
