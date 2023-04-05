@@ -4,25 +4,66 @@ cmake_minimum_required(VERSION 3.2 FATAL_ERROR)
 add_subdirectory(tests)
 # -------------------
 
-# ---- RayCore ----
+
+# ---- Project ----
 project(RayCore)
 file(GLOB_RECURSE SOURCE ${RayCore_SOURCE_DIR}/src/*.cpp)
 add_library(${PROJECT_NAME} SHARED ${SOURCE})
+# -----------------
 
-# Enable all warnings
+
+# ---- Warnings ----
 if(MSVC)
 	message(STATUS "MSVC")
     target_compile_options(${PROJECT_NAME} PRIVATE /W4) # /WX)
 else()
 	message(STATUS "GCC")
-    target_compile_options(${PROJECT_NAME} PRIVATE -Wall -Wextra -pedantic -Werror)
+    target_compile_options(${PROJECT_NAME} PRIVATE -Wall -Wextra -pedantic) #-Werror)
+
+    # Enable werror if requested (mostly used for CI)
+    if(WERROR STREQUAL "YES")
+        set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O3 -Werror") # -O3 finds more errors!
+        message(STATUS "Werror mode")
+    endif()
 endif()
+# ------------------
 
 
+# ---- Disable Vulkan/H5 ----
+if(VULKAN STREQUAL "NO")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -D NO_VULKAN")
+    message(STATUS "Vulkan disabled")
+else()
+    find_package(Vulkan 1.3.216 REQUIRED)
+    target_link_libraries(${PROJECT_NAME}
+        PUBLIC Vulkan::Vulkan
+    )
+endif()
+if(H5 STREQUAL "NO")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -D NO_H5")
+    message(STATUS "H5 disabled")
+else()
+    if(UNIX)
+        target_include_directories(${PROJECT_NAME} PUBLIC /usr/include/hdf5/serial)
+        target_link_directories(${PROJECT_NAME} PUBLIC /usr/lib/x86_64-linux-gnu/hdf5/serial)
+        target_link_libraries(${PROJECT_NAME} PUBLIC hdf5)
+    else()
+        find_package(HDF5 REQUIRED)
+        target_link_libraries(${PROJECT_NAME}
+            PUBLIC HDF5::HDF5
+        )
+    endif()
+endif()
+# -------------------------
+
+
+# ---- PCH ----
 target_precompile_headers(${PROJECT_NAME} PUBLIC raycorePCH.h)
 set(CMAKE_PCH_INSTANTIATE_TEMPLATES ON)
+# -------------
 
-# Set Compiler
+
+# ---- Defines ----
 if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
     set(COMPILE_PLATFORM RAYX_PLATFORM_GCC)
 elseif(CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
@@ -38,29 +79,10 @@ target_compile_definitions(${PROJECT_NAME}
     $<$<CONFIG:Debug>:RAYX_DEBUG_MODE>
     $<$<CONFIG:RelWithDebInfo>:RAYX_DEBUG_MODE>
 )
+# -----------------
 
-if(NOT VULKAN STREQUAL "NO")
-    find_package(Vulkan 1.3.216 REQUIRED)
-    target_link_libraries(${PROJECT_NAME}
-        PUBLIC Vulkan::Vulkan
-    )
-endif()
 
-# Link H5 Format
-if(NOT H5 STREQUAL "NO")
-    if(UNIX)
-        target_include_directories(${PROJECT_NAME} PUBLIC /usr/include/hdf5/serial)
-        target_link_directories(${PROJECT_NAME} PUBLIC /usr/lib/x86_64-linux-gnu/hdf5/serial)
-        target_link_libraries(${PROJECT_NAME} PUBLIC hdf5)
-    else()
-        find_package(HDF5 REQUIRED)
-        target_link_libraries(${PROJECT_NAME}
-            PUBLIC HDF5::HDF5
-        )
-    endif()
-endif()
-
-# Add Extern deps TODO(Jannis): the src include shouldn't be a SYSTEM include
+# ---- Dependencies ----
 target_include_directories(${PROJECT_NAME} PRIVATE ${RayCore_SOURCE_DIR}/src)
 target_include_directories(${PROJECT_NAME} SYSTEM INTERFACE ${RayCore_SOURCE_DIR}/src)
 target_include_directories(${PROJECT_NAME} SYSTEM PUBLIC
@@ -69,9 +91,11 @@ target_include_directories(${PROJECT_NAME} SYSTEM PUBLIC
     ${RayCore_SOURCE_DIR}/../../Extern/HighFive/include/
     ${RayCore_SOURCE_DIR}/../../Extern/VMA/include/
 )
+# ----------------------
 
+
+# ---- Compile Shaders ----
 if(NOT VULKAN STREQUAL "NO")
-    # Compile Shaders
     # The following code is used to always compile the shader.
     # This is most likely not an optimal solution, but it will work
     # until we find a better one.
@@ -89,3 +113,4 @@ if(NOT VULKAN STREQUAL "NO")
 
     add_custom_target(COMPILE_SHADER ALL DEPENDS ${COMPILED_SHADER})
 endif()
+# ------------------------
