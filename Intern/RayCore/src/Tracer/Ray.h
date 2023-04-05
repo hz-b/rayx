@@ -1,6 +1,7 @@
 #pragma once
 #pragma pack(16)
 
+#define GLM_ENABLE_EXPERIMENTAL
 #include <glm.hpp>
 
 #include "Core.h"

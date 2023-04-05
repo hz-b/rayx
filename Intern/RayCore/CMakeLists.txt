@@ -15,7 +15,7 @@ add_library(${PROJECT_NAME} SHARED ${SOURCE})
 # ---- Warnings ----
 if(MSVC)
 	message(STATUS "MSVC")
-    target_compile_options(${PROJECT_NAME} PRIVATE /W4) # /WX)
+    target_compile_options(${PROJECT_NAME} PRIVATE /W2 /wd4251) # /WX)
 else()
 	message(STATUS "GCC")
     target_compile_options(${PROJECT_NAME} PRIVATE -Wall -Wextra -pedantic) #-Werror)
