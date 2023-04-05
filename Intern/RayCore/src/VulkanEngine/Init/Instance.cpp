@@ -2,20 +2,8 @@
 
 #include "VulkanEngine/VulkanEngine.h"
 #define VMA_IMPLEMENTATION
+#include "vk_mem_alloc.h"
 
-// Disable all warning for VMA include
-#ifdef _MSC_VER
-    #pragma warning(push, 0)
-    #include "vk_mem_alloc.h"
-    #pragma warning(pop)
-#else
-    #pragma GCC diagnostic push
-    #pragma GCC diagnostic ignored "-Wall"
-    #pragma GCC diagnostic ignored "-Wextra"
-    #pragma GCC diagnostic ignored "-Wpedantic"
-    #include "vk_mem_alloc.h"
-    #pragma GCC diagnostic pop
-#endif
 namespace RAYX {
 
 VKAPI_ATTR VkBool32 VKAPI_CALL debugCallback(VkDebugUtilsMessageSeverityFlagBitsEXT messageSeverity, VkDebugUtilsMessageTypeFlagsEXT messageType,
