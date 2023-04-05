@@ -4,13 +4,20 @@ cmake_minimum_required(VERSION 3.2 FATAL_ERROR)
 add_subdirectory(tests)
 # -------------------
 
+# ---- RayCore ----
 project(RayCore)
-
-
-# Source file globbing
 file(GLOB_RECURSE SOURCE ${RayCore_SOURCE_DIR}/src/*.cpp)
-
 add_library(${PROJECT_NAME} SHARED ${SOURCE})
+
+# Enable all warnings
+if(MSVC)
+	message(STATUS "MSVC")
+    target_compile_options(${PROJECT_NAME} PRIVATE /W4) # /WX)
+else()
+	message(STATUS "GCC")
+    target_compile_options(${PROJECT_NAME} PRIVATE -Wall -Wextra -pedantic -Werror)
+endif()
+
 
 target_precompile_headers(${PROJECT_NAME} PUBLIC raycorePCH.h)
 set(CMAKE_PCH_INSTANTIATE_TEMPLATES ON)
