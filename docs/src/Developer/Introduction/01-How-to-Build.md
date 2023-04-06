@@ -25,6 +25,9 @@ Known Issues:
 - Also allow the CMake Extension to configure the project
 - Then you can click build in the bottom panel
 
+You can also set a custom generator for cmake in the .vscode/settings.json file. Ninja is recommended for faster builds. In the following image you can see an example config for the generator in vscode.
+![](../../res/vscode_ninja_config.png)
+
 ### Manually
 - Open a terminal in the project folder
 - Run `cmake -S . -B build -G "Visual Studio 16 2019" -A x64 -DCMAKE_BUILD_TYPE=Release` (Replace with your Visual Studio version)
