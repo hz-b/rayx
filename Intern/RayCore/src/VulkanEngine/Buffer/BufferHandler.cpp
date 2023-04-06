@@ -1,14 +1,29 @@
 #ifndef NO_VULKAN
 
-#include "BufferManager.h"
+#include "BufferHandler.h"
 namespace RAYX {
-BufferManager::BufferManager(const VkQueue& transferQueue, const VkCommandBuffer& transferCmdBuffer,
-                             const std::unique_ptr<VulkanEngine::Fence>& fence, size_t stagingSize, VmaAllocator& vma)
-    : m_TransferQueue(transferQueue), m_TransferCommandBuffer(transferCmdBuffer), m_Fence(fence), STAGING_SIZE(stagingSize), m_VmaAllocator(vma) {
+BufferHandler::BufferHandler() {
+    createTransferCommandBuffer();
+    createTransferQueue();
     createStagingBuffer();
 };
 
-void BufferManager::gpuMemcpy(VulkanBuffer& buffer_dst, size_t offset_dst, VulkanBuffer& buffer_src, size_t offset_src, size_t bytes) {
+void BufferHandler::createTransferCommandBuffer() {
+    /*
+    Allocate a command buffer from the previously creeated command pool.
+    */
+    VkCommandBufferAllocateInfo commandBufferAllocateInfo = {};
+    commandBufferAllocateInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
+    commandBufferAllocateInfo.commandPool = m_CommandPool;  // specify the command pool to allocate from.
+
+    commandBufferAllocateInfo.level = VK_COMMAND_BUFFER_LEVEL_PRIMARY;
+    commandBufferAllocateInfo.commandBufferCount = 1;
+    VK_CHECK_RESULT(vkAllocateCommandBuffers(m_Device, &commandBufferAllocateInfo, &m_TransferCommandBuffer));
+}
+
+void BufferHandler::createTransferQueue() { vkGetDeviceQueue(m_Device, m_computeFamily, 0, &m_TransferQueue); }
+
+void BufferHandler::gpuMemcpy(VulkanBuffer& buffer_dst, size_t offset_dst, VulkanBuffer& buffer_src, size_t offset_src, size_t bytes) {
     RAYX_PROFILE_FUNCTION();
     VkCommandBufferBeginInfo beginInfo{};
     beginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
@@ -29,22 +44,23 @@ void BufferManager::gpuMemcpy(VulkanBuffer& buffer_dst, size_t offset_dst, Vulka
     submitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
     submitInfo.commandBufferCount = 1;
     submitInfo.pCommandBuffers = &m_TransferCommandBuffer;
-    auto f = m_Fence->fence();
+    auto f = m_Fences.transfer->fence();
     vkQueueSubmit(m_TransferQueue, 1, &submitInfo, *f);
 }
 
-void BufferManager::loadFromStagingBuffer(char* outdata, size_t bytes) {
+void BufferHandler::loadFromStagingBuffer(char* outdata, size_t bytes) {
     memcpy(outdata, m_StagingBuffer.getMappedMemory(), bytes);
     m_StagingBuffer.UnmapMemory();
 }
 
-void BufferManager::storeToStagingBuffer(char* indata, size_t bytes) {
+void BufferHandler::storeToStagingBuffer(char* indata, size_t bytes) {
     memcpy(m_StagingBuffer.getMappedMemory(), indata, bytes);
     m_StagingBuffer.UnmapMemory();
 }
 
-void BufferManager::createStagingBuffer() {
+void BufferHandler::createStagingBuffer() {
     m_StagingBuffer.m_VmaAllocator = m_VmaAllocator;
+    
     VulkanBufferCreateInfo createInfo = {};
     createInfo.bufName = "Staging-buffer";
     createInfo.accessType = VKBUFFER_INOUT;
@@ -57,9 +73,9 @@ void BufferManager::createStagingBuffer() {
         m_StagingBuffer.m_Buffer, m_StagingBuffer.m_Alloca, &m_StagingBuffer.m_AllocaInfo,
         VMA_ALLOCATION_CREATE_HOST_ACCESS_RANDOM_BIT | VMA_ALLOCATION_CREATE_MAPPED_BIT, VMA_MEMORY_USAGE_AUTO_PREFER_HOST);
 }
-void BufferManager::waitTransferQueueIdle() { vkQueueWaitIdle(m_TransferQueue); }
+void BufferHandler::waitTransferQueueIdle() { vkQueueWaitIdle(m_TransferQueue); }
 
-void BufferManager::readBufferRaw(const char* bufname, char* outdata, const VkQueue& computeQueue) {
+void BufferHandler::readBufferRaw(const char* bufname, char* outdata, const VkQueue& computeQueue) {
     // if (m_state != EngineStates_t::POSTRUN) {
     //     RAYX_ERR << "you've forgotton to .run() the VulkanEngine. Thats "
     //                 "mandatory before reading it's output buffers.";
@@ -82,10 +98,47 @@ void BufferManager::readBufferRaw(const char* bufname, char* outdata, const VkQu
     while (remainingBytes > 0) {
         size_t localbytes = std::min((size_t)STAGING_SIZE, remainingBytes);
         gpuMemcpy(m_StagingBuffer, 0, b, offset, localbytes);
-        m_Fence->wait();
+        m_Fences.transfer->wait();
         loadFromStagingBuffer(outdata + offset, localbytes);
         offset += localbytes;
         remainingBytes -= localbytes;
+    }
+}
+
+void BufferHandler::writeBufferRaw(const char* bufname, char* indata) {
+    auto b = m_Buffers[bufname];
+
+    if (b.m_createInfo.accessType != VKBUFFER_IN || b.m_createInfo.accessType != VKBUFFER_INOUT) {
+        RAYX_ERR << "writeBufferRaw(\"" << bufname << "\", ...) is not allowed, as \"" << bufname << "\" has m_in = false";
+    }
+
+    size_t remainingBytes = b.getSize();
+    size_t offset = 0;
+    while (remainingBytes > 0) {
+        size_t localbytes = std::min(remainingBytes, (size_t)STAGING_SIZE);
+        storeToStagingBuffer(indata + offset, localbytes);
+        gpuMemcpy(b, offset, m_StagingBuffer, 0, localbytes);
+
+        offset += localbytes;
+        remainingBytes -= localbytes;
+        m_Fences.transfer->wait();
+    }
+}
+
+template <typename T>
+void BufferHandler::createBuffer(VulkanBufferCreateInfo createInfo, const std::vector<T>& vec) {
+    auto name = createInfo.bufName;
+    if (m_Buffers.find(name) != m_Buffers.end()) {
+        RAYX_ERR << "Buffer " << name << " already exists.";
+        return;
+    }
+
+    auto newBuffer = VulkanBuffer(m_VmaAllocator, createInfo);
+
+    m_Buffers[name] = newBuffer;
+
+    if (vec) {
+        writeBufferRaw(name, (char*)vec.data());
     }
 }
 

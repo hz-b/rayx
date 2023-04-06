@@ -22,20 +22,24 @@ typedef enum BufferAccessFlags {
  *
  */
 struct VulkanBufferCreateInfo {
+    // Unique Buffer name
     const char* bufName;
+    // Access type to Buffer
     BufferAccessFlags accessType;
+    // Size
     VkDeviceSize size;
-    /// used to map the vulkan buffers to the shader buffers.
-    /// Lines like `layout (binding = _)` declare buffers in the shader.
+    // used to map the vulkan buffers to the shader buffers.
+    // Lines like `layout (binding = _)` declare buffers in the shader.
     uint32_t binding;
 };
+
 class VulkanEngine;
 /**
  * @brief Vulkan Storage Buffer Class. Used for Buffer allocation, creation and update
  *
  */
 class RAYX_API VulkanBuffer {
-    friend class BufferManager;
+    friend class BufferHandler;
 
   public:
     VulkanBuffer() = default;
@@ -45,6 +49,7 @@ class RAYX_API VulkanBuffer {
     VkDeviceSize getSize() const { return m_createInfo.size; }
     const VkBuffer& getBuffer() const { return m_Buffer; };
     const char* getName() const { return m_createInfo.bufName; }
+    const VkDeviceMemory& GetBufferMemory() const { return m_Memory; }
 
     void* getMappedMemory();
     void UnmapMemory();

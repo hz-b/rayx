@@ -60,7 +60,8 @@ SET(SOURCE
     src/Writer/CSVWriter.cpp
     src/Writer/H5Writer.cpp
     src/VulkanEngine/Buffer/VulkanBuffer.cpp
-    src/VulkanEngine/Buffer/BufferManager.cpp
+    src/VulkanEngine/Buffer/BufferHandler.cpp
+    src/VulkanEngine/Run/Pipeline.cpp
     )
 
 add_library(${PROJECT_NAME} SHARED ${SOURCE})

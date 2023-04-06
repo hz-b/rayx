@@ -29,6 +29,7 @@
     } else if (m_state == EngineStates_t::POSTRUN) {                   \
         RAYX_ERR << "you've forgotten to .cleanup() the VulkanEngine"; \
     }
+
 #define IS_ENGINE_CLEANABLE                                            \
     if (m_state != EngineStates_t::POSTRUN) {                          \
         RAYX_ERR << "cleanup() only needs to be called after .run()!"; \
@@ -148,6 +149,13 @@ class RAYX_API VulkanEngine {
         size_t size;
     } m_pushConstants;
 
+  protected:
+    VkPhysicalDevice m_PhysicalDevice = VK_NULL_HANDLE;
+    VkDevice m_Device;
+    uint32_t m_computeFamily;
+    VkCommandPool m_CommandPool;
+    VmaAllocator m_VmaAllocator;
+    size_t STAGING_SIZE = 0;
     // Sync:
     struct {
         VkSemaphore computeSemaphore;
@@ -185,14 +193,11 @@ class RAYX_API VulkanEngine {
 
     VkInstance m_Instance;
     VkDebugUtilsMessengerEXT m_DebugMessenger;
-    VkPhysicalDevice m_PhysicalDevice = VK_NULL_HANDLE;
-    VkDevice m_Device;
-    uint32_t m_computeFamily;
+
     VkPipeline m_Pipeline;
     VkPipelineCache m_PipelineCache;
     VkPipelineLayout m_PipelineLayout;
     VkShaderModule m_ComputeShaderModule;
-    VkCommandPool m_CommandPool;
     VkCommandBuffer m_ComputeCommandBuffer;
     VkCommandBuffer m_TransferCommandBuffer;
     VkQueue m_ComputeQueue;
@@ -200,7 +205,6 @@ class RAYX_API VulkanEngine {
     VkDescriptorPool m_DescriptorPool;
     VkDescriptorSet m_DescriptorSet;
     VkDescriptorSetLayout m_DescriptorSetLayout;
-    VmaAllocator m_VmaAllocator;
 
     // implementation details:
 
@@ -248,7 +252,6 @@ class RAYX_API VulkanEngine {
                          VmaAllocationInfo* allocation_info, VmaAllocationCreateFlags flags = VMA_ALLOCATION_CREATE_HOST_ACCESS_RANDOM_BIT,
                          VmaMemoryUsage memory_usage = VMA_MEMORY_USAGE_AUTO, const std::vector<uint32_t>& queue_family_indices = {});
     // BufferIO:
-    size_t STAGING_SIZE = 0;
     /// copies data from one buffer to the other with given offsets.
     /// this is used for the buffer <-> staging buffer communication in
     /// Careful : This is not an awaiting command so make sure to check the according fence transfer
@@ -273,6 +276,8 @@ class RAYX_API VulkanEngine {
 
     /// writes `bytes` many bytes from `indata` into the staging buffer.
     void storeToStagingBuffer(char* indata, size_t bytes);
+
+  protected:
 };
 
 // Used for validating return values of Vulkan API calls.
