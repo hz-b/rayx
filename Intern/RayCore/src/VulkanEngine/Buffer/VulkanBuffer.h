@@ -46,6 +46,8 @@ class RAYX_API VulkanBuffer {
     VulkanBuffer(const VmaAllocator&, VulkanBufferCreateInfo createInfo);
     ~VulkanBuffer();
 
+    // TODO(OS): Move/Copy constructor maybe needed
+
     VkDeviceSize getSize() const { return m_createInfo.size; }
     const VkBuffer& getBuffer() const { return m_Buffer; };
     const char* getName() const { return m_createInfo.bufName; }

@@ -8,6 +8,20 @@ BufferHandler::BufferHandler() {
     createStagingBuffer();
 };
 
+BufferHandler::~BufferHandler() {
+    if (m_TransferCommandBuffer) {
+        vkFreeCommandBuffers(m_Device, m_CommandPool, 1, &m_TransferCommandBuffer);
+    }
+
+    // Destroy staging buffer
+    vmaDestroyBuffer(m_VmaAllocator, m_StagingBuffer.getBuffer(), m_StagingBuffer.m_Alloca);
+
+    // Destroy user-defined buffers
+    for (auto& [name, buf] : m_Buffers) {
+        vmaDestroyBuffer(m_VmaAllocator, buf.getBuffer(), buf.m_Alloca);
+    }
+}
+
 void BufferHandler::createTransferCommandBuffer() {
     /*
     Allocate a command buffer from the previously creeated command pool.
@@ -48,19 +62,9 @@ void BufferHandler::gpuMemcpy(VulkanBuffer& buffer_dst, size_t offset_dst, Vulka
     vkQueueSubmit(m_TransferQueue, 1, &submitInfo, *f);
 }
 
-void BufferHandler::loadFromStagingBuffer(char* outdata, size_t bytes) {
-    memcpy(outdata, m_StagingBuffer.getMappedMemory(), bytes);
-    m_StagingBuffer.UnmapMemory();
-}
-
-void BufferHandler::storeToStagingBuffer(char* indata, size_t bytes) {
-    memcpy(m_StagingBuffer.getMappedMemory(), indata, bytes);
-    m_StagingBuffer.UnmapMemory();
-}
-
 void BufferHandler::createStagingBuffer() {
     m_StagingBuffer.m_VmaAllocator = m_VmaAllocator;
-    
+
     VulkanBufferCreateInfo createInfo = {};
     createInfo.bufName = "Staging-buffer";
     createInfo.accessType = VKBUFFER_INOUT;
@@ -73,6 +77,17 @@ void BufferHandler::createStagingBuffer() {
         m_StagingBuffer.m_Buffer, m_StagingBuffer.m_Alloca, &m_StagingBuffer.m_AllocaInfo,
         VMA_ALLOCATION_CREATE_HOST_ACCESS_RANDOM_BIT | VMA_ALLOCATION_CREATE_MAPPED_BIT, VMA_MEMORY_USAGE_AUTO_PREFER_HOST);
 }
+
+void BufferHandler::loadFromStagingBuffer(char* outdata, size_t bytes) {
+    memcpy(outdata, m_StagingBuffer.getMappedMemory(), bytes);
+    m_StagingBuffer.UnmapMemory();
+}
+
+void BufferHandler::storeToStagingBuffer(char* indata, size_t bytes) {
+    memcpy(m_StagingBuffer.getMappedMemory(), indata, bytes);
+    m_StagingBuffer.UnmapMemory();
+}
+
 void BufferHandler::waitTransferQueueIdle() { vkQueueWaitIdle(m_TransferQueue); }
 
 void BufferHandler::readBufferRaw(const char* bufname, char* outdata, const VkQueue& computeQueue) {
@@ -91,9 +106,8 @@ void BufferHandler::readBufferRaw(const char* bufname, char* outdata, const VkQu
     size_t offset = 0;
     if (computeQueue != nullptr) {
         vkQueueWaitIdle(computeQueue);
-    } else {
-        vkQueueWaitIdle(m_TransferQueue);
     }
+    vkQueueWaitIdle(m_TransferQueue);
 
     while (remainingBytes > 0) {
         size_t localbytes = std::min((size_t)STAGING_SIZE, remainingBytes);
@@ -129,17 +143,53 @@ template <typename T>
 void BufferHandler::createBuffer(VulkanBufferCreateInfo createInfo, const std::vector<T>& vec) {
     auto name = createInfo.bufName;
     if (m_Buffers.find(name) != m_Buffers.end()) {
-        RAYX_ERR << "Buffer " << name << " already exists.";
+        RAYX_ERR << "Buffer " << name << " already exists. Try update func.";
         return;
     }
 
     auto newBuffer = VulkanBuffer(m_VmaAllocator, createInfo);
 
-    m_Buffers[name] = newBuffer;
+    m_Buffers[name] = std::move(newBuffer);
 
     if (vec) {
         writeBufferRaw(name, (char*)vec.data());
     }
+}
+
+template <typename T>
+inline std::vector<T> BufferHandler::readBuffer(const char* bufname, bool indirect) {
+    std::vector<T> out(m_buffers[bufname].size / sizeof(T));
+    if (indirect) {
+        readBufferRaw(bufname, (char*)out.data(), m_ComputeQueue);
+    } else {
+        readBufferRaw(bufname, (char*)out.data());
+    }
+    return out;
+}
+
+template <typename T>
+void BufferHandler::updateBuffer(const char* bufname, const std::vector<T>& vec) {
+    if (m_Buffers.find(bufname) == m_Buffers.end()) {
+        RAYX_ERR << "Buffer " << bufname << " does not exist.";
+        return;
+    }
+
+    if (vec) {
+        writeBufferRaw(bufname, (char*)vec.data());
+    }
+}
+
+void BufferHandler::freeBuffer(const char* bufname) {
+    if (m_Buffers.find(bufname) == m_Buffers.end()) {
+        RAYX_ERR << "Buffer " << bufname << " does not exist.";
+        return;
+    }
+    vmaDestroyBuffer(m_VmaAllocator, m_Buffers[bufname].getBuffer(), m_Buffers[bufname].m_Alloca);
+}
+
+void BufferHandler::deleteBuffer(const char* bufname) {
+    freeBuffer(bufname);
+    m_Buffers.erase(bufname);
 }
 
 }  // namespace RAYX
