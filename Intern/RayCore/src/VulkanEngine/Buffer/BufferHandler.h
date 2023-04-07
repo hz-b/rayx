@@ -46,8 +46,8 @@ class RAYX_API BufferHandler : protected VulkanEngine {
     void gpuMemcpy(VulkanBuffer& buffer_dst, size_t offset_dst, VulkanBuffer& buffer_src, size_t offset_src, size_t bytes);
 
     // Used only for transfer
-    VkQueue m_TransferQueue = nullptr;
-    VkCommandBuffer m_TransferCommandBuffer = nullptr;
+    VkQueue m_TransferQueue = VK_NULL_HANDLE;
+    VkCommandBuffer m_TransferCommandBuffer = VK_NULL_HANDLE;
     VulkanBuffer m_StagingBuffer;
     std::map<std::string, VulkanBuffer> m_Buffers;
 };

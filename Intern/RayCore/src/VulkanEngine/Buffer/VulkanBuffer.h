@@ -64,9 +64,9 @@ class RAYX_API VulkanBuffer {
     VmaAllocator m_VmaAllocator;
     VulkanBufferCreateInfo m_createInfo;
     VmaAllocationCreateFlags m_VmaFlags;
-    VkBuffer m_Buffer = nullptr;
-    VkDeviceMemory m_Memory = nullptr;
-    VmaAllocation m_Alloca = nullptr;
+    VkBuffer m_Buffer = VK_NULL_HANDLE;
+    VkDeviceMemory m_Memory = VK_NULL_HANDLE;
+    VmaAllocation m_Alloca = VK_NULL_HANDLE;
     VmaAllocationInfo m_AllocaInfo;
 };  // namespace RAYX
 
