@@ -10,7 +10,7 @@
 #include "Debug/Debug.h"
 #include "Debug/Instrumentor.h"
 #include "Random.h"
-#include "RayCore.h"
+#include "RAY-Core.h"
 
 #ifdef RAYX_PLATFORM_MSVC
 #ifdef USE_NSIGHT_AFTERMATH

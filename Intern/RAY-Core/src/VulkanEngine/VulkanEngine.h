@@ -9,7 +9,7 @@
 #include <vector>
 #include <vulkan/vulkan.hpp>
 
-#include "RayCore.h"
+#include "RAY-Core.h"
 
 namespace RAYX {
 

@@ -13,4 +13,4 @@ add_executable(${PROJECT_NAME} ${SOURCE})
 
 
 # ---- Dependencies ----
-target_include_directories(${PROJECT_NAME} PRIVATE RAY-Core)
+target_link_libraries(${PROJECT_NAME} PRIVATE RAY-Core)

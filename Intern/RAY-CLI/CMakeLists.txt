@@ -3,7 +3,8 @@ cmake_minimum_required(VERSION 3.15 FATAL_ERROR)
 
 # ---- Project ----
 project(RAY-CLI VERSION 0.5.0.0)
-add_executable(${PROJECT_NAME} main.cpp TerminalApp.cpp CommandParser.cpp)
+file(GLOB_RECURSE SOURCE ${PROJECT_SOURCE_DIR}/*.cpp)
+add_executable(${PROJECT_NAME} ${SOURCE})
 # ------------------
 
 

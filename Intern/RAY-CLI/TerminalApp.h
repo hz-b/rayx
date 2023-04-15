@@ -6,7 +6,7 @@
 #include <filesystem>
 
 #include "CommandParser.h"
-#include "RayCore.h"
+#include "RAY-Core.h"
 #include "TerminalAppConfig.h"
 
 class TerminalApp {
