@@ -3,6 +3,7 @@ cmake_minimum_required(VERSION 3.2 FATAL_ERROR)
 set(gtest_force_shared_crt ON CACHE BOOL "Always use msvcrt.dll" FORCE)
 
 add_subdirectory(googletest)
+# add_subdirectory(glfw)
 
 # CLI11
 set(CLI11_SANITIZERS OFF)
