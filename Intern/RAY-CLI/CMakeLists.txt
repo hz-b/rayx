@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.15 FATAL_ERROR)
 
 
 # ---- Project ----
-project(TerminalApp VERSION 0.5.0.0)
+project(RAY-CLI VERSION 0.5.0.0)
 add_executable(${PROJECT_NAME} main.cpp TerminalApp.cpp TerminalApp.h CommandParser.cpp)
 # ------------------
 
@@ -31,7 +31,7 @@ configure_file(TerminalAppConfig.h.in TerminalAppConfig.h)
 # ---- Dependencies ----
 target_link_libraries(${PROJECT_NAME} PRIVATE
   CLI11::CLI11
-  RayCore
+  RAY-Core
   ${PYTHON_LIBRARIES}
 )
 target_include_directories(${PROJECT_NAME} PRIVATE 

@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.15 FATAL_ERROR)
 
 # ---- Project ----
-project(RayTests)
+project(RAY-Core_Tests)
 include(CTest)
 enable_testing()
 set(BINARY ${CMAKE_PROJECT_NAME}_tst)
@@ -19,7 +19,7 @@ set(CMAKE_PCH_INSTANTIATE_TEMPLATES ON)
 
 
 # ---- Dependencies ----
-target_link_libraries(${BINARY} PUBLIC RayCore gtest gmock)
+target_link_libraries(${BINARY} PUBLIC RAY-Core gtest gmock)
 # ----------------------
 
 

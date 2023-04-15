@@ -17,6 +17,7 @@ set(CMAKE_LIBRARY_OUTPUT_DIRECTORY_DEBUG ${CMAKE_BINARY_DIR}/lib/debug)
 
 
 # ---- Subdirectories ----
-add_subdirectory(RayCore)
-add_subdirectory(TerminalApp)
+add_subdirectory(RAY-Core)
+add_subdirectory(RAY-CLI)
+add_subdirectory(RAY-X)
 # ------------------------

@@ -6,8 +6,8 @@ add_subdirectory(tests)
 
 
 # ---- Project ----
-project(RayCore)
-file(GLOB_RECURSE SOURCE ${RayCore_SOURCE_DIR}/src/*.cpp)
+project(RAY-Core)
+file(GLOB_RECURSE SOURCE ${PROJECT_SOURCE_DIR}/src/*.cpp)
 add_library(${PROJECT_NAME} SHARED ${SOURCE})
 # -----------------
 
@@ -83,13 +83,13 @@ target_compile_definitions(${PROJECT_NAME}
 
 
 # ---- Dependencies ----
-target_include_directories(${PROJECT_NAME} PRIVATE ${RayCore_SOURCE_DIR}/src)
-target_include_directories(${PROJECT_NAME} SYSTEM INTERFACE ${RayCore_SOURCE_DIR}/src)
+target_include_directories(${PROJECT_NAME} PRIVATE ${PROJECT_SOURCE_DIR}/src)
+target_include_directories(${PROJECT_NAME} SYSTEM INTERFACE ${PROJECT_SOURCE_DIR}/src)
 target_include_directories(${PROJECT_NAME} SYSTEM PUBLIC
-    ${RayCore_SOURCE_DIR}/../../Extern/glm/glm/
-    ${RayCore_SOURCE_DIR}/../../Extern/rapidxml-1.13/
-    ${RayCore_SOURCE_DIR}/../../Extern/HighFive/include/
-    ${RayCore_SOURCE_DIR}/../../Extern/VMA/include/
+    ${PROJECT_SOURCE_DIR}/../../Extern/glm/glm/
+    ${PROJECT_SOURCE_DIR}/../../Extern/rapidxml-1.13/
+    ${PROJECT_SOURCE_DIR}/../../Extern/HighFive/include/
+    ${PROJECT_SOURCE_DIR}/../../Extern/VMA/include/
 )
 # ----------------------
 
@@ -108,7 +108,7 @@ if(NOT VULKAN STREQUAL "NO")
         ${COMPILED_SHADER}
         ${COMPILED_SHADER_FAKE}
         COMMAND "glslc"
-        ARGS ${RayCore_SOURCE_DIR}/src/Tracer/shader/main-glsl.comp -o ${COMPILED_SHADER} -fshader-stage=compute
+        ARGS ${PROJECT_SOURCE_DIR}/src/Tracer/shader/main-glsl.comp -o ${COMPILED_SHADER} -fshader-stage=compute
     )
 
     add_custom_target(COMPILE_SHADER ALL DEPENDS ${COMPILED_SHADER})
