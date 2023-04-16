@@ -21,6 +21,14 @@ BufferHandler::~BufferHandler() {
         vmaDestroyBuffer(m_VmaAllocator, buf.getBuffer(), buf.m_Alloca);
     }
 }
+std::vector<VkDescriptorSetLayoutBinding> BufferHandler::getVulkanBufferBindings() {
+    std::vector<VkDescriptorSetLayoutBinding> result;
+    result.reserve(m_Buffers.size());
+    for (auto x : m_Buffers) {
+        result.push_back(x.second.m_DescriptorSetLayoutBinding);
+    }
+    return result;
+}
 
 void BufferHandler::createTransferCommandBuffer() {
     /*

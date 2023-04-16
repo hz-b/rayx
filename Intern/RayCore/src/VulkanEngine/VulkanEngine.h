@@ -156,6 +156,10 @@ class RAYX_API VulkanEngine {
     VkCommandPool m_CommandPool;
     VmaAllocator m_VmaAllocator;
     size_t STAGING_SIZE = 0;
+
+    // New
+    BufferHandler m_BufferHandler;
+    
     // Sync:
     struct {
         VkSemaphore computeSemaphore;

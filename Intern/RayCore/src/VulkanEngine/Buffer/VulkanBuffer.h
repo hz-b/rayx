@@ -31,6 +31,9 @@ struct VulkanBufferCreateInfo {
     // used to map the vulkan buffers to the shader buffers.
     // Lines like `layout (binding = _)` declare buffers in the shader.
     uint32_t binding;
+
+    // What kind of buffer is it (Storage, Image, Uniform etc.)
+    VkDescriptorType bufferType = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER;
 };
 
 class VulkanEngine;
@@ -61,6 +64,7 @@ class RAYX_API VulkanBuffer {
     void createVmaBuffer(VkDeviceSize size, VkBufferUsageFlags buffer_usage, VkBuffer& buffer, VmaAllocation& allocation,
                          VmaAllocationInfo* allocation_info, VmaAllocationCreateFlags flags = VMA_ALLOCATION_CREATE_HOST_ACCESS_RANDOM_BIT,
                          VmaMemoryUsage memory_usage = VMA_MEMORY_USAGE_AUTO, const std::vector<uint32_t>& queue_family_indices = {});
+
     VmaAllocator m_VmaAllocator;
     VulkanBufferCreateInfo m_createInfo;
     VmaAllocationCreateFlags m_VmaFlags;
@@ -68,6 +72,7 @@ class RAYX_API VulkanBuffer {
     VkDeviceMemory m_Memory = VK_NULL_HANDLE;
     VmaAllocation m_Alloca = VK_NULL_HANDLE;
     VmaAllocationInfo m_AllocaInfo;
+    VkDescriptorSetLayoutBinding m_DescriptorSetLayoutBinding;
 };  // namespace RAYX
 
 }  // namespace RAYX

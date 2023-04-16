@@ -3,6 +3,16 @@
 #include "VulkanBuffer.h"
 
 namespace RAYX {
+
+inline VkDescriptorSetLayoutBinding descriptorSetLayoutBinding(VkDescriptorType type, VkShaderStageFlags flags, uint32_t binding,
+                                                               uint32_t count = 1) {
+    VkDescriptorSetLayoutBinding set_layout_binding{};
+    set_layout_binding.descriptorType = type;
+    set_layout_binding.stageFlags = flags;
+    set_layout_binding.binding = binding;
+    set_layout_binding.descriptorCount = count;
+    return set_layout_binding;
+}
 VulkanBuffer::VulkanBuffer(const VmaAllocator& vmaAllocator, VulkanBufferCreateInfo createInfo)
     : m_VmaAllocator(vmaAllocator), m_createInfo(createInfo) {
     int bufferUsageFlags = VK_BUFFER_USAGE_STORAGE_BUFFER_BIT;  // Always storage buffer;
@@ -14,6 +24,9 @@ VulkanBuffer::VulkanBuffer(const VmaAllocator& vmaAllocator, VulkanBufferCreateI
         bufferUsageFlags |= VK_BUFFER_USAGE_TRANSFER_SRC_BIT | VK_BUFFER_USAGE_TRANSFER_DST_BIT;
     }
     createVmaBuffer(m_createInfo.size, bufferUsageFlags, m_Buffer, m_Alloca, &m_AllocaInfo);
+
+    // Defaults to compute buffers! TODO(OS): Once multiple pipelines are available implement more flagBITs!
+    m_DescriptorSetLayoutBinding = descriptorSetLayoutBinding(createInfo.bufferType, VK_SHADER_STAGE_COMPUTE_BIT, createInfo.binding);
 };
 
 VulkanBuffer::~VulkanBuffer() { vmaDestroyBuffer(m_VmaAllocator, m_Buffer, m_Alloca); };
@@ -87,5 +100,6 @@ void VulkanBuffer::UnmapMemory() {
     }
     return;
 }
+
 }  // namespace RAYX
 #endif

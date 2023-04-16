@@ -32,6 +32,9 @@ class RAYX_API BufferHandler : protected VulkanEngine {
     void waitTransferQueueIdle();
 
     const VulkanBuffer& getStagingBuffer() const { return m_StagingBuffer; };
+    // TODO(OS): This function should be almost illegal...
+    const VulkanBuffer& getVulkanBuffer(std::string bufferName) { return m_Buffers[bufferName]; };
+    std::vector<VkDescriptorSetLayoutBinding> getVulkanBufferBindings();
 
   private:
     void createStagingBuffer();
@@ -50,6 +53,10 @@ class RAYX_API BufferHandler : protected VulkanEngine {
     VkCommandBuffer m_TransferCommandBuffer = VK_NULL_HANDLE;
     VulkanBuffer m_StagingBuffer;
     std::map<std::string, VulkanBuffer> m_Buffers;
+
+    // TODO(OS): Use this instead of m_Buffers once ready
+    std::map<std::string, VulkanBuffer> m_ComputeBuffers;
+    std::map<std::string, VulkanBuffer> m_GraphicsBuffers;
 };
 }  // namespace RAYX
 #endif
