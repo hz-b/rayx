@@ -6,7 +6,7 @@ BufferHandler::BufferHandler() {
     createTransferCommandBuffer();
     createTransferQueue();
     createStagingBuffer();
-};
+}
 
 BufferHandler::~BufferHandler() {
     if (m_TransferCommandBuffer) {
@@ -24,7 +24,7 @@ BufferHandler::~BufferHandler() {
 std::vector<VkDescriptorSetLayoutBinding> BufferHandler::getVulkanBufferBindings() {
     std::vector<VkDescriptorSetLayoutBinding> result;
     result.reserve(m_Buffers.size());
-    for (auto x : m_Buffers) {
+    for (const auto& x : m_Buffers) {
         result.push_back(x.second.m_DescriptorSetLayoutBinding);
     }
     return result;

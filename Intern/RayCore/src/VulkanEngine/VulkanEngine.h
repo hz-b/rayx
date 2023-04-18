@@ -2,6 +2,7 @@
 
 #pragma once
 
+//#include <VulkanEngine/Buffer/BufferHandler.h>
 #include <vk_mem_alloc.h>
 
 #include <algorithm>
@@ -10,7 +11,6 @@
 #include <vulkan/vulkan.hpp>
 
 #include "RayCore.h"
-#include "VulkanEngine/Buffer/VulkanBuffer.h"
 
 #define IS_ENGINE_PREINIT                                    \
     if (m_state != EngineStates_t::PREINIT) {                \
@@ -158,7 +158,7 @@ class RAYX_API VulkanEngine {
     size_t STAGING_SIZE = 0;
 
     // New
-    BufferHandler m_BufferHandler;
+    //std::unique_ptr<BufferHandler> m_BufferHandler;
     
     // Sync:
     struct {

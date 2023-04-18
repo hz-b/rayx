@@ -27,9 +27,9 @@ VulkanBuffer::VulkanBuffer(const VmaAllocator& vmaAllocator, VulkanBufferCreateI
 
     // Defaults to compute buffers! TODO(OS): Once multiple pipelines are available implement more flagBITs!
     m_DescriptorSetLayoutBinding = descriptorSetLayoutBinding(createInfo.bufferType, VK_SHADER_STAGE_COMPUTE_BIT, createInfo.binding);
-};
+}
 
-VulkanBuffer::~VulkanBuffer() { vmaDestroyBuffer(m_VmaAllocator, m_Buffer, m_Alloca); };
+VulkanBuffer::~VulkanBuffer() { vmaDestroyBuffer(m_VmaAllocator, m_Buffer, m_Alloca); }
 
 uint32_t findMemoryType(VkPhysicalDevice& physicalDevice, uint32_t memoryTypeBits, VkMemoryPropertyFlags properties);
 

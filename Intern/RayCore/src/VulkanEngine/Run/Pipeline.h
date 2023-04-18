@@ -5,6 +5,7 @@
 
 #include "RayCore.h"
 #include "VulkanEngine/VulkanEngine.h"
+#include "VulkanEngine/Init/ShaderStage.h"
 namespace RAYX {
 // General Pipeline
 // -------------------------------------------------------------------------------------------------------
@@ -20,6 +21,7 @@ class RAYX_API Pipeline : protected VulkanEngine {
     struct Pipeline_t {
         VkPipeline pipeline;
         VkPipelineLayout pipelineLayout;
+        ShaderStage& shaderStage;
     };
     void bind(const VkCommandBuffer& commandBuffer, int stage) const { vkCmdBindPipeline(commandBuffer, getPipelineBindPoint(), getPipeline(stage)); }
 
@@ -38,8 +40,7 @@ class RAYX_API Pipeline : protected VulkanEngine {
  */
 struct ComputePipelineCreateInfo {
     const char* passName;
-    std::vector<std::filesystem::path> computeShaderPaths;
-    std::vector<const char*> entryPoints;
+    std::vector<ShaderStageCreateInfo> shaderStagesCreateInfos = {};
 };
 
 /**
@@ -51,16 +52,19 @@ struct ComputePipelineCreateInfo {
  * -The computePipeline Class can have multiple Vkpipeline stages, i.e A compute class has a pass that can be a series of
  *  shader stages with barriers in between.
  * [Stage0->(Barrier)->Stage1 ..]
+ * TODO(OS): Move what can be moved to Pipeline General Class
  */
 class RAYX_API ComputePipeline : public Pipeline {
   public:
-    explicit ComputePipeline(ComputePipelineCreateInfo);
+    explicit ComputePipeline(const ComputePipelineCreateInfo&);
     ~ComputePipeline();
 
     const VkPipelineBindPoint& getPipelineBindPoint() const { return m_PipelineBindPoint; }
     const std::vector<Pipeline_t>& getPipelines() const { return m_Pipelines; }
     const VkPipeline getPipeline(int stage) { return m_Pipelines[stage].pipeline; };
     const VkPipelineLayout getPipelineLayout(int stage) { return m_Pipelines[stage].pipelineLayout; };
+    void addShaderStage(const ShaderStageCreateInfo&);
+    void addShaderStage(const ShaderStage& newStage);
 
   private:
     const char* m_name = nullptr;
@@ -79,7 +83,8 @@ class RAYX_API ComputePipeline : public Pipeline {
 
     uint32_t m_stagesCount;
 
-    std::vector<ComputeShader_t> m_shaderModules;
+    std::vector<std::shared_ptr<ShaderStage>> m_shaderStages;
+    // Pipeline Pass
     std::vector<Pipeline_t> m_Pipelines;
 
     VkDescriptorSetLayout m_DescriptorSetLayout = VK_NULL_HANDLE;

@@ -2,12 +2,12 @@
 
 #pragma once
 
-#include <VulkanEngine/VulkanEngine.h>
 #include <vk_mem_alloc.h>
 
 #include <vulkan/vulkan.hpp>
 
 #include "RayCore.h"
+#include "VulkanEngine/VulkanEngine.h"
 
 namespace RAYX {
 
@@ -36,7 +36,7 @@ struct VulkanBufferCreateInfo {
     VkDescriptorType bufferType = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER;
 };
 
-class VulkanEngine;
+//class VulkanEngine;
 /**
  * @brief Vulkan Storage Buffer Class. Used for Buffer allocation, creation and update
  *

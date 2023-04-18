@@ -6,9 +6,9 @@
 
 #include "RayCore.h"
 #include "VulkanBuffer.h"
-#include "VulkanEngine/VulkanEngine.h"
 
 namespace RAYX {
+class VulkanEngine;
 /**
  * @brief Controls Buffer allocation, creation and IO
  *
@@ -34,6 +34,7 @@ class RAYX_API BufferHandler : protected VulkanEngine {
     const VulkanBuffer& getStagingBuffer() const { return m_StagingBuffer; };
     // TODO(OS): This function should be almost illegal...
     const VulkanBuffer& getVulkanBuffer(std::string bufferName) { return m_Buffers[bufferName]; };
+
     std::vector<VkDescriptorSetLayoutBinding> getVulkanBufferBindings();
 
   private:

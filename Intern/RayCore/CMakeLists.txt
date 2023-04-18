@@ -52,6 +52,8 @@ SET(SOURCE
     src/VulkanEngine/Init/Cache.cpp
     src/VulkanEngine/Init/Fence.cpp
     src/VulkanEngine/Init/ShaderModule.cpp
+    src/VulkanEngine/Init/ShaderStage.cpp
+    src/VulkanEngine/Init/Descriptor.cpp
     src/VulkanEngine/Run/RecordBuffer.cpp
     src/VulkanEngine/Run/ComputePipeline.cpp
     src/VulkanEngine/Run/DescriptorSet.cpp
@@ -61,8 +63,7 @@ SET(SOURCE
     src/Writer/H5Writer.cpp
     src/VulkanEngine/Buffer/VulkanBuffer.cpp
     src/VulkanEngine/Buffer/BufferHandler.cpp
-    src/VulkanEngine/Run/Pipeline.cpp
-    )
+    src/VulkanEngine/Run/Pipeline.cpp)
 
 add_library(${PROJECT_NAME} SHARED ${SOURCE})
 
