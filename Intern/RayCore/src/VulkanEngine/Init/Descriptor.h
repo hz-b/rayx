@@ -10,7 +10,7 @@ class RAYX_API DescriptorPool {
     class RAYX_API Builder {
       public:
         Builder(VkDevice& device) : m_Device{device} {}
-
+        //Count is usually size of the total buffers needed.
         Builder& addPoolSize(VkDescriptorType descriptorType, uint32_t count);
         Builder& setPoolFlags(VkDescriptorPoolCreateFlags flags);
         Builder& setMaxSets(uint32_t count);
@@ -29,8 +29,9 @@ class RAYX_API DescriptorPool {
     DescriptorPool(const DescriptorPool&) = delete;
     DescriptorPool& operator=(const DescriptorPool&) = delete;
 
+    // Allocates a Descriptor Set
     void allocateDescriptor(const VkDescriptorSetLayout descriptorSetLayout, VkDescriptorSet& descriptor) const;
-
+    // Frees a Descriptor Set
     void freeDescriptors(std::vector<VkDescriptorSet>& descriptors) const;
 
     void resetPool();
@@ -46,10 +47,14 @@ class RAYX_API DescriptorWriter {
   public:
     DescriptorWriter(VkDescriptorSetLayout& setLayout, DescriptorPool& pool);
 
+    // Write Buffer with correct binding. Wrigin can be understood as pointing or binding.
+    // BufferInfo contains indication about the actual Vulkan Buffer
     DescriptorWriter& writeBuffer(uint32_t binding, VkDescriptorBufferInfo* bufferInfo);
     DescriptorWriter& writeImage(uint32_t binding, VkDescriptorImageInfo* imageInfo);
 
-    bool build(VkDescriptorSet& set);
+    // Allocate and update a Descriptor Set from Pool
+    void build(VkDescriptorSet& set);
+    // Update a Descriptor Set
     void overwrite(VkDescriptorSet& set);
 
   private:

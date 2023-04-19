@@ -22,6 +22,7 @@ BufferHandler::~BufferHandler() {
     }
 }
 std::vector<VkDescriptorSetLayoutBinding> BufferHandler::getVulkanBufferBindings() {
+    // TODO(OS) We need correct bindings and not all so enhance this by moving it to Shader
     std::vector<VkDescriptorSetLayoutBinding> result;
     result.reserve(m_Buffers.size());
     for (const auto& x : m_Buffers) {

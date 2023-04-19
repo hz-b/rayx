@@ -37,10 +37,11 @@ class RAYX_API ShaderStage {
     VkPipelineShaderStageCreateInfo getPipelineShaderCreateInfo();
 
     // Used in Buffer binding
-    void setDescriptorSetLayout();
+    // TODO(OS): We need to somhow let the Shader Stage control this by only providing which buffers bind to which set.
+    void setDescriptorSetLayout(const std::vector<VkDescriptorSetLayoutBinding>&);
 
     // Used in command recording
-    void updateDescriptorSetLayout();
+    void updateDescriptorSetLayout(std::vector<VkWriteDescriptorSet>);
 
   private:
     void createShaderModule();
@@ -50,7 +51,7 @@ class RAYX_API ShaderStage {
     const char* m_entryPoint = nullptr;
     std::filesystem::path m_path;
     VkShaderModule m_shaderModule = VK_NULL_HANDLE;
-    std::vector<VkDescriptorSetLayout> descriptorSetLayout;
+    VkDescriptorSetLayout m_DescriptorSetLayout;
 };
 }  // namespace RAYX
 #endif

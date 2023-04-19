@@ -66,15 +66,9 @@ void DescriptorPool::resetPool() { vkResetDescriptorPool(m_Device, m_DescriptorP
 DescriptorWriter::DescriptorWriter(VkDescriptorSetLayout& setLayout, DescriptorPool& pool) : setLayout{setLayout}, pool{pool} {}
 
 DescriptorWriter& DescriptorWriter::writeBuffer(uint32_t binding, VkDescriptorBufferInfo* bufferInfo) {
-    assert(setLayout.bindings.count(binding) == 1 && "Layout does not contain specified binding");
-
-    auto& bindingDescription = setLayout.bindings[binding];
-
-    assert(bindingDescription.descriptorCount == 1 && "Binding single descriptor info, but binding expects multiple");
-
     VkWriteDescriptorSet write{};
     write.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
-    write.descriptorType = bindingDescription.descriptorType;
+    write.descriptorType = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER;
     write.dstBinding = binding;
     write.pBufferInfo = bufferInfo;
     write.descriptorCount = 1;
@@ -84,15 +78,9 @@ DescriptorWriter& DescriptorWriter::writeBuffer(uint32_t binding, VkDescriptorBu
 }
 
 DescriptorWriter& DescriptorWriter::writeImage(uint32_t binding, VkDescriptorImageInfo* imageInfo) {
-    assert(setLayout.bindings.count(binding) == 1 && "Layout does not contain specified binding");
-
-    auto& bindingDescription = setLayout.bindings[binding];
-
-    assert(bindingDescription.descriptorCount == 1 && "Binding single descriptor info, but binding expects multiple");
-
     VkWriteDescriptorSet write{};
     write.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
-    write.descriptorType = bindingDescription.descriptorType;
+    write.descriptorType = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER;  // FIXME(OS): This is actually incorrect, as we are writing an image
     write.dstBinding = binding;
     write.pImageInfo = imageInfo;
     write.descriptorCount = 1;
@@ -101,13 +89,10 @@ DescriptorWriter& DescriptorWriter::writeImage(uint32_t binding, VkDescriptorIma
     return *this;
 }
 
-bool DescriptorWriter::build(VkDescriptorSet& set) {
-    bool success = pool.allocateDescriptor(setLayout.getDescriptorSetLayout(), set);
-    if (!success) {
-        return false;
-    }
+void DescriptorWriter::build(VkDescriptorSet& set) {
+    pool.allocateDescriptor(setLayout, set));
+
     overwrite(set);
-    return true;
 }
 
 void DescriptorWriter::overwrite(VkDescriptorSet& set) {

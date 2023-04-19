@@ -13,6 +13,7 @@ ShaderStage::ShaderStage(VkDevice& device, const ShaderStageCreateInfo& createIn
 
 ShaderStage::~ShaderStage() {
     vkDestroyShaderModule(m_Device, m_shaderModule, nullptr);
+    vkDestroyDescriptorSetLayout(m_Device, m_DescriptorSetLayout, nullptr);
 }
 
 void ShaderStage::createShaderModule() {
@@ -47,6 +48,18 @@ VkPipelineShaderStageCreateInfo ShaderStage::getPipelineShaderCreateInfo() {
     shaderStageCreateInfo.pName = m_entryPoint;
     return shaderStageCreateInfo;
 }
+
+void ShaderStage::setDescriptorSetLayout(const std::vector<VkDescriptorSetLayoutBinding>& bindings) {
+    VkDescriptorSetLayoutCreateInfo descriptorSetLayoutCreateInfo = {};
+    descriptorSetLayoutCreateInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO;
+    descriptorSetLayoutCreateInfo.bindingCount = bindings.size();
+    descriptorSetLayoutCreateInfo.pBindings = bindings.data();
+
+    // Create the descriptor set layout.
+    VK_CHECK_RESULT(vkCreateDescriptorSetLayout(m_Device, &descriptorSetLayoutCreateInfo, nullptr, &m_DescriptorSetLayout));
+}
+
+void updateDescriptorSetLayout(std::vector<VkWriteDescriptorSet>) {}
 
 }  // namespace RAYX
 #endif

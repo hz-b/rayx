@@ -109,8 +109,10 @@ ComputePipeline::ComputePipeline() {
 
 ComputePipeline::~ComputePipeline() {
 
-    vkDestroyDescriptorSetLayout(m_Device, m_DescriptorSetLayout, nullptr);
-    vkDestroyDescriptorPool(m_Device, m_DescriptorPool, nullptr);
+    // Controlled by shadeStage
+    //vkDestroyDescriptorSetLayout(m_Device, m_DescriptorSetLayout, nullptr);
+    // Controlled by DescriptorPool
+    //vkDestroyDescriptorPool(m_Device, m_DescriptorPool, nullptr);
 
     for (auto pipeline : m_Pipelines) {
         vkDestroyPipeline(m_Device, pipeline.pipeline, nullptr);
