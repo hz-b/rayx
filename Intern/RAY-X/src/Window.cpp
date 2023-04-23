@@ -1,23 +1,22 @@
 #include "Window.h"
 
-Window::Window(GLFWerrorfun cbfun)
-{
-    glfwSetErrorCallback(cbfun);
-    if (!glfwInit())
-        exit(1);
+Window::Window(/* args */) {}
+
+Window::~Window() {}
+
+void glfw_error_callback(int error, const char* description) { fprintf(stderr, "GLFW Error %d: %s\n", error, description); }
+
+void Window::init(WindowProps props) {
+    glfwSetErrorCallback(glfw_error_callback);
+    if (!glfwInit()) exit(1);
+
     // Create window with Vulkan context
     glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);
-    m_Window = glfwCreateWindow(1920, 1080, "Dear ImGui GLFW+Vulkan example", NULL, NULL);
-    if (!glfwVulkanSupported())
-    {
+    GLFWwindow* window = glfwCreateWindow(props.Width, props.Height, props.Title.c_str(), NULL, NULL);
+    if (!glfwVulkanSupported()) {
         printf("GLFW: Vulkan Not Supported\n");
         exit(1);
     }
-}
 
-// TODO(Jannis): Vulkan uses m_Window -> maybe life time issues
-Window::~Window()
-{
-    free(m_Window);
+    // glfwSetFramebufferSizeCallback(m_Window, framebufferResizeCallback);
 }
-

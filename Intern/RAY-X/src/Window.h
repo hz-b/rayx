@@ -1,21 +1,27 @@
 #pragma once
 
-#define GLFW_INCLUDE_NONE
-#define GLFW_INCLUDE_VULKAN
-
-#include "imgui.h"
-#include "imgui_impl_glfw.h"
-#include "imgui_impl_vulkan.h"
 #include <GLFW/glfw3.h>
 
-class Window
-{
-public:
-    Window(GLFWerrorfun cbfun);
+#include <memory>
+
+struct WindowProps {
+    std::string Title;
+    uint32_t Width;
+    uint32_t Height;
+
+    WindowProps(const std::string& title = "Hazel Engine", uint32_t width = 1600, uint32_t height = 900)
+        : Title(title), Width(width), Height(height) {}
+};
+
+class Window {
+  public:
+    Window(/* args */);
     ~Window();
+
+    void init(WindowProps props);
 
     GLFWwindow* m_Window;
 
-private:
-    void glfwSetErrorCallback(GLFWerrorfun cbfun);
+  private:
+    WindowProps m_Props;
 };
