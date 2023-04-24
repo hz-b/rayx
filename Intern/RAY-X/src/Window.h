@@ -1,5 +1,6 @@
 #pragma once
 
+#define GLFW_INCLUDE_VULKAN
 #include <GLFW/glfw3.h>
 
 #include <memory>
@@ -19,6 +20,7 @@ class Window {
     ~Window();
 
     void init(WindowProps props);
+    void createSurface(VkInstance instance, VkAllocationCallbacks* allocator, VkSurfaceKHR* surface);
 
     GLFWwindow* m_Window;
 

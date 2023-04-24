@@ -9,7 +9,6 @@
 #include <memory>
 
 #include "ImGuiLayer.h"
-#include "Renderer.h"
 #include "Window.h"
 
 // const char* VALIDATION_LAYERS = "VK_LAYER_KHRONOS_validation";
@@ -30,33 +29,37 @@ class Application {
 
   private:
     Window m_Window;
-    ImGuiLayer m_ImGuiLayer;
-    Renderer m_Renderer;
-
+    VkAllocationCallbacks* m_Allocator;
+    VkInstance m_Instance;
     VkSurfaceKHR m_Surface;
+    VkDebugUtilsMessengerEXT m_DebugMessenger;
 
-    void initWindow();
-    void initRenderer();
-    void initImGuiLayer();
 
-    // Helper functions for InitVulkan
+    ImGuiLayer m_ImGuiLayer;
+
+    VkPhysicalDevice m_PhysicalDevice;
+    VkDevice m_Device;
+    uint32_t m_QueueFamily;
+    VkQueue m_Queue;
+    VkDebugReportCallbackEXT m_DebugReport;
+    VkPipelineCache m_PipelineCache;
+    VkDescriptorPool m_DescriptorPool;
+
+    void initVulkan();
+
     void createInstance();
     void setupDebugMessenger();
-    void pickPhysicalDevice();
-    void selectGraphicsQueueFamily();
-    void createLogicalDevice();
-    void createDescriptorPool();
     void createSurface();
-    void createFramebuffers();
-
+    void pickPhysicalDevice();
+    void createLogicalDevice();
     void createSwapChain();
     void createImageViews();
     void createRenderPass();
     void createGraphicsPipeline();
+    void createFramebuffers();
     void createCommandPool();
     void createCommandBuffers();
     void createSyncObjects();
 
-    // Helper functions for InitVulkan
     void drawFrame();
 };

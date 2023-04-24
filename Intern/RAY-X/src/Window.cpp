@@ -1,5 +1,7 @@
 #include "Window.h"
 
+#include "utils.h"
+
 Window::Window(/* args */) {}
 
 Window::~Window() {}
@@ -19,4 +21,9 @@ void Window::init(WindowProps props) {
     }
 
     // glfwSetFramebufferSizeCallback(m_Window, framebufferResizeCallback);
+}
+
+void Window::createSurface(VkInstance instance, VkAllocationCallbacks* allocator, VkSurfaceKHR* surface) {
+    VkResult err = glfwCreateWindowSurface(instance, m_Window, allocator, surface);
+    check_vk_result(err);
 }
