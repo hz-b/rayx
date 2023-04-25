@@ -12,8 +12,10 @@
 namespace RAYX {
 enum class SpreadType { WhiteBand, ThreeEnergies };                // default WhiteBand
 enum class EnergyDistributionType { File, Values, Total, Param };  // default ET_VALUES
-enum class SourceDistType { Simultaneous, HardEdge, Gauss };       // default simultaneously
+enum class SourcePulseType { Simultaneous, HardEdge, Gauss, Autorelativistic };       // default simultaneously
 enum class SourceDist { Uniform, Gaussian };                       // TODO(rudi): unify!
+enum class ElectronEnergyOrientation { Clockwise, Counterclockwise };
+
 
 class RAYX_API LightSource {
   public:
@@ -21,7 +23,6 @@ class RAYX_API LightSource {
     virtual ~LightSource() = default;
 
     // Getter
-    std::array<double, 6> getMisalignmentParams() const;
     double getLinear0() const;
     double getLinear45() const;
     double getCircular() const;
@@ -61,8 +62,7 @@ class RAYX_API LightSource {
 
   private:
     // User/Design Parameter
-    std::array<double, 6> m_misalignmentParams;  // x, y, psi, phi
-
+    
     // Physics Params
     // point source & matrix source
     double m_linearPol_0;
@@ -70,7 +70,7 @@ class RAYX_API LightSource {
     double m_circularPol;
 
     // TODO(Jannis): move to children
-    SourceDistType m_sourceDistributionType;
+    //SourceDistType m_sourceDistributionType;
 };
 
 }  // namespace RAYX

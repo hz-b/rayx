@@ -51,4 +51,36 @@ const double W_BEYOND_HORIZON = 5;
 // This error code is typically generated using `throw`.
 const double W_FATAL_ERROR = 6;
 
+
+//DipoleSource Constants
+
+/// \f$eV_J\f$. ElectronVolt to Joule.
+const double eV_J = 1.602176634e-19;
+
+/// \f$c_0\f$ [m/s]. speed of light in vacuum.
+const double c_0 = 299792458;            // Checked 2019-7-25, PB, NIST (exact): speed of light in vacuo [m/s]
+
+/// \f$e_0\f$ [As]. elementary charge.
+const double e_0 = 1.602176634e-19;     // Checked 2019-7-25, PB, NIST (exact): minus charge of electron [As] or [C]
+
+const double Planck = 6.62607015e-34;    // Checked 2019-7-25, PB, NIST (exact): Planck constant [Js]
+
+/// \f$\hbar\f$ [Js]. Planck's bar constant.
+const double Planck_bar = Planck/(2*PI);
+
+/// \f$m_e\f$ [kg]. electron mass.
+const double m_e = 9.1093837015e-31;		// Checked 2019-7-25, PB, NIST: mass of electron [kg];
+    
+
+/*
+
+double get_factorMagneticField(){
+    return eV_J/(c_0*e_0)*1.0e9;
+} 
+
+double get_factorCriticalEnergy(){
+    return 3*Planck_bar ( 2*pow(e_0,5) * pow(m_e,3)) * pow(eV_J,2) * 1.0e24;
+}
+*/
+
 #endif

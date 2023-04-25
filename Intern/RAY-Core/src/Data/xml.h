@@ -20,6 +20,8 @@ enum class FigureRotation;
 enum class GratingMount;
 enum class SourceDist;
 enum class GeometricalShape;
+enum class ElectronEnergyOrientation;
+enum class SourcePulseType;
 
 /** The xml namespace defines functions, which help to implement the
  * createFromXML-functions for the beamline objects. All of these functions
@@ -52,6 +54,9 @@ bool paramSlopeError(const rapidxml::xml_node<>* node, std::array<double, 7>* ou
 bool paramVls(const rapidxml::xml_node<>* node, std::array<double, 6>* out);
 bool paramEnergyDistribution(const rapidxml::xml_node<>* node, const std::filesystem::path& rmlFile, EnergyDistribution* out);
 
+bool paramElectronEnergyOrientation(const rapidxml::xml_node<>* node, ElectronEnergyOrientation* out);
+bool paramSourcePulseType(const rapidxml::xml_node<>* node, SourcePulseType* out);
+
 bool paramPositionAndOrientation(const rapidxml::xml_node<>* node, const std::vector<xml::Group>& group_context, glm::dvec4* out_pos,
                                  glm::dmat4x4* out_ori);
 bool paramMaterial(const rapidxml::xml_node<>* node, Material* out);
@@ -83,6 +88,8 @@ struct Parser {
     glm::dmat4x4 parseOrientation() const;
     Material parseMaterial() const;
     Cutout parseCutout() const;
+    ElectronEnergyOrientation parseElectronEnergyOrientation() const;
+    SourcePulseType parseSourcePulseType() const;
 
     // parsers for trivial derived parameters
     inline int parseNumberRays() const { return parseInt("numberRays"); }
@@ -136,6 +143,7 @@ struct Parser {
     inline double parseLongRadius() const { return parseDouble("longRadius"); }
     inline double parseFresnelZOffset() const { return parseDouble("FresnelZOffset"); }
     inline CylinderDirection parseBendingRadius() const { return static_cast<CylinderDirection>(parseInt("bendingRadius")); }
+    inline double parseBendingRadiusDouble() const { return parseDouble("bendingRadius"); }
     inline double parseParameterA11() const { return parseDouble("parameter_a11"); }
     inline FigureRotation parseFigureRotation() const { return static_cast<FigureRotation>(parseInt("figureRotation")); }
     // TODO: Are values stored as 0.0 if set to AUTO?[RAY-UI]
@@ -147,6 +155,10 @@ struct Parser {
     // and orientation is stored
     inline double parseDistancePreceding() const { return parseDouble("distancePreceding"); }
     inline int parseMisalignmentCoordinateSystem() const { return parseInt("misalignmentCoordinateSystem"); }
+    inline double parseVerEbeamDivergence() const { return parseDouble("verEbeamDiv"); }
+    inline double parseElectronEnergy() const { return parseDouble("electronEnergy"); }
+    inline int parseAlignmentError() const { return parseInt("alignmentError"); }
+    inline double parsePhotonFlux() const { return parseDouble("photonFlux"); }
 
     rapidxml::xml_node<>* node;
     std::vector<xml::Group> group_context;

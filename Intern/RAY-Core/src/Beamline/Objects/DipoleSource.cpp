@@ -1,4 +1,4 @@
-#include "PointSource.h"
+#include "DipoleSource.h"
 
 #include "Data/xml.h"
 #include "Debug/Debug.h"
@@ -7,13 +7,12 @@
 
 namespace RAYX {
 
-PointSource::PointSource(const DesignObject& dobj) : LightSource(dobj) {
-    m_widthDist = dobj.parseSourceWidthDistribution();
-    m_heightDist = dobj.parseSourceHeightDistribution();
-    m_horDist = dobj.parseHorDivDistribution();
-    m_verDist = dobj.parseVerDivDistribution();
-    m_misalignmentParams = dobj.parseMisalignment();
-    
+DipoleSource::DipoleSource(const DesignObject& dobj) : LightSource(dobj) {
+    m_energySpreadType = dobj.parseEnergyDistribution();
+    m_photonFlux = dobj.parsePhotonFlux();
+    m_electronEnergyOrientation = dobj.parseElectronEnergyOrientation();
+    m_sourcePulseType = dobj.parseSourcePulseType();
+    m_bendingRadius = dobj.parseBendingRadiusDouble();
 }
 
 /**
@@ -21,7 +20,7 @@ PointSource::PointSource(const DesignObject& dobj) : LightSource(dobj) {
  * hard edge, gaussian if soft edge)) and extent (eg specified width/height of
  * source)
  */
-double getCoord(const SourceDist l, const double extent) {
+double getCoord(const double extent) {
     if (l == SourceDist::Uniform) {
         return (randomDouble() - 0.5) * extent;
     } else {
@@ -30,7 +29,7 @@ double getCoord(const SourceDist l, const double extent) {
 }
 
 /**
- * Creates random rays from point source with specified width and height
+ * Creates random rays from dipole source with specified width and height
  * distributed according to either uniform or gaussian distribution across width
  * & height of source the deviation of the direction of each ray from the main
  * ray (0,0,1, phi=psi=0) can also be specified to be uniform or gaussian within
@@ -39,9 +38,10 @@ double getCoord(const SourceDist l, const double extent) {
  *
  * @returns list of rays
  */
-std::vector<Ray> PointSource::getRays() const {
-    double x, y, z, psi, phi,
+std::vector<Ray> DipoleSource::getRays() const {
+    double x, x1, y, z, psi, phi,
         en;  // x,y,z pos, psi,phi direction cosines, en=energy
+    double sourceWidth2 = 9 * m_sourceWidth; //RAYUI Fortran
 
     int n = m_numberOfRays;
     std::vector<Ray> rayList;
@@ -52,9 +52,10 @@ std::vector<Ray> PointSource::getRays() const {
     // create n rays with random position and divergence within the given span
     // for width, height, depth, horizontal and vertical divergence
     for (int i = 0; i < n; i++) {
-        x = getCoord(m_widthDist, m_sourceWidth) + m_misalignmentParams[0];
+
+        x = getMisalignmentParams()[0];
         x += m_position.x;
-        y = getCoord(m_heightDist, m_sourceHeight) + m_misalignmentParams[1];
+        y = getCoord(m_heightDist, m_sourceHeight) + getMisalignmentParams()[1];
         y += m_position.y;
         z = (randomDouble() - 0.5) * m_sourceDepth;
         z += m_position.z;
@@ -63,8 +64,8 @@ std::vector<Ray> PointSource::getRays() const {
         glm::dvec3 position = glm::dvec3(x, y, z);
 
         // get random deviation from main ray based on distribution
-        psi = getCoord(m_verDist, m_verDivergence) + m_misalignmentParams[2];
-        phi = getCoord(m_horDist, m_horDivergence) + m_misalignmentParams[3];
+        psi = getCoord(m_verDist, m_verDivergence) + getMisalignmentParams()[2];
+        phi = getCoord(m_horDist, m_horDivergence) + getMisalignmentParams()[3];
         // get corresponding angles based on distribution and deviation from
         // main ray (main ray: xDir=0,yDir=0,zDir=1 for phi=psi=0)
         glm::dvec3 direction = getDirectionFromAngles(phi, psi);

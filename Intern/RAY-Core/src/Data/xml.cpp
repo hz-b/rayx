@@ -322,6 +322,35 @@ bool paramEnergyDistribution(const rapidxml::xml_node<>* node, const std::filesy
     }
 }
 
+bool paramElectronEnergyOrientation(const rapidxml::xml_node<>* node, ElectronEnergyOrientation* out){
+    if (!node || !out) {
+        return false;
+    }
+    int energyOrientation_int;
+    if (!xml::paramInt(node, "electronEnergyOrientation", &energyOrientation_int)) {
+        return false;
+    }
+    *out = static_cast<ElectronEnergyOrientation>(energyOrientation_int);
+   
+    
+    return false;
+}
+
+bool paramSourcePulseType(const rapidxml::xml_node<>* node, SourcePulseType* out){
+     if (!node || !out) {
+        return false;
+    }
+    int spreadType_int;
+    if (!xml::paramInt(node, "sourcePulseType", &spreadType_int)) {
+        return false;
+    }
+    *out = static_cast<SourcePulseType>(spreadType_int);
+   
+    
+    return false;
+}
+
+
 bool paramPositionAndOrientation(const rapidxml::xml_node<>* node, const std::vector<xml::Group>& group_context, glm::dvec4* out_pos,
                                  glm::dmat4x4* out_ori) {
     // Always returns True!
@@ -523,6 +552,25 @@ Cutout Parser::parseCutout() const {
         RAYX_ERR << "invalid geom_shape!";
         return {0, {0.0, 0.0, 0.0}};
     }
+}
+
+
+ElectronEnergyOrientation Parser::parseElectronEnergyOrientation() const {
+    ElectronEnergyOrientation orientation;
+    if(!paramElectronEnergyOrientation(node, &orientation)){
+        return orientation;
+    }
+
+    return orientation;
+}
+
+SourcePulseType Parser::parseSourcePulseType() const {
+    SourcePulseType spreadType;
+    if(!paramSourcePulseType(node, &spreadType)){
+        return spreadType;
+    }
+
+    return spreadType;
 }
 
 }  // namespace RAYX::xml

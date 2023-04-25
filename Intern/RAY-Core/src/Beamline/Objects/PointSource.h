@@ -18,6 +18,8 @@ class RAYX_API PointSource : public LightSource {
     SourceDist m_heightDist;
     SourceDist m_horDist;
     SourceDist m_verDist;
+    SourcePulseType m_sourceDistributionType;
+    std::array<double, 6> m_misalignmentParams;
     // std::vector<SOURCE_LENGTH> m_source_lengths;
 };
 
