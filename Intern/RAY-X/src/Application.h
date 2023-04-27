@@ -3,22 +3,9 @@
 #define GLFW_INCLUDE_VULKAN
 #include <GLFW/glfw3.h>
 
-#include <algorithm>
-#include <cstdint>
-#include <cstdlib>
-#include <cstring>
-#include <fstream>
-#include <iostream>
-#include <limits>
-#include <optional>
-#include <set>
-#include <stdexcept>
 #include <vector>
 
-const uint32_t WIDTH = 800;
-const uint32_t HEIGHT = 600;
-
-const int MAX_FRAMES_IN_FLIGHT = 2;
+#include "ImGuiLayer.h"
 
 const std::vector<const char*> validationLayers = {"VK_LAYER_KHRONOS_validation"};
 
@@ -49,10 +36,14 @@ class Application {
 
   private:
     GLFWwindow* m_Window;
+    uint32_t m_windowWidth = 1920;
+    uint32_t m_windowHeight = 1080;
+    uint32_t m_maxFramesInFlight = 2;
 
     VkInstance m_Instance;
     VkDebugUtilsMessengerEXT m_DebugMessenger;
     VkSurfaceKHR m_Surface;
+    ImGuiLayer m_ImGuiLayer;
 
     VkPhysicalDevice m_PhysicalDevice = VK_NULL_HANDLE;
     VkDevice m_Device;
@@ -63,18 +54,18 @@ class Application {
     VkDescriptorPool m_ImGuiDescrPool;
 
     VkSwapchainKHR m_SwapChain;
-    std::vector<VkImage> m_swapChainImages;
+    std::vector<VkImage> m_SwapChainImages;
     VkFormat m_SwapChainImageFormat;
     VkExtent2D m_SwapChainExtent;
-    std::vector<VkImageView> m_swapChainImageViews;
-    std::vector<VkFramebuffer> m_swapChainFramebuffers;
+    std::vector<VkImageView> m_SwapChainImageViews;
+    std::vector<VkFramebuffer> m_SwapChainFramebuffers;
 
     VkRenderPass m_RenderPass;
     VkPipelineLayout m_PipelineLayout;
     VkPipeline m_GraphicsPipeline;
 
     VkCommandPool m_CommandPool;
-    std::vector<VkCommandBuffer> m_commandBuffers;
+    std::vector<VkCommandBuffer> m_CommandBuffers;
 
     std::vector<VkSemaphore> m_imageAvailableSemaphores;
     std::vector<VkSemaphore> m_renderFinishedSemaphores;
@@ -82,6 +73,8 @@ class Application {
     uint32_t m_currentFrame = 0;
 
     bool m_framebufferResized = false;
+
+    void recreateSwapChain();
 
     void initWindow();
     void initVulkan();
@@ -92,7 +85,6 @@ class Application {
 
     static void framebufferResizeCallback(GLFWwindow* window, int width, int height);
 
-    void recreateSwapChain();
     void createInstance();
     void populateDebugMessengerCreateInfo(VkDebugUtilsMessengerCreateInfoEXT& createInfo);
     void setupDebugMessenger();
