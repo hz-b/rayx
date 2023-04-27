@@ -30,7 +30,7 @@ struct VulkanBufferCreateInfo {
     VkDeviceSize size;
     // used to map the vulkan buffers to the shader buffers.
     // Lines like `layout (binding = _)` declare buffers in the shader.
-    uint32_t binding;
+    [[deprecated]] uint32_t binding; 
 
     // What kind of buffer is it (Storage, Image, Uniform etc.)
     VkDescriptorType bufferType = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER;

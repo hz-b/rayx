@@ -47,7 +47,7 @@ class RAYX_API DescriptorWriter {
   public:
     DescriptorWriter(VkDescriptorSetLayout& setLayout, DescriptorPool& pool);
 
-    // Write Buffer with correct binding. Wrigin can be understood as pointing or binding.
+    // Write Buffer with correct binding. Writing can be understood as pointing or binding.
     // BufferInfo contains indication about the actual Vulkan Buffer
     DescriptorWriter& writeBuffer(uint32_t binding, VkDescriptorBufferInfo* bufferInfo);
     DescriptorWriter& writeImage(uint32_t binding, VkDescriptorImageInfo* imageInfo);

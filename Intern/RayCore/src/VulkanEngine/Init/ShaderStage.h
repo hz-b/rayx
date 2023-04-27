@@ -8,17 +8,21 @@
 #include "VulkanEngine/VulkanEngine.h"
 
 namespace RAYX {
-/**
- * @brief A Shade node/Stage
- *
- */
 
+// Used for ShaderStage creation
 struct ShaderStageCreateInfo {
+    // ShaderStage name
     std::string name;
+    // Path of the shader stage
     std::filesystem::path shaderPath;
+    // Entry Point inside the shader file
     std::string entryPoint;
+    // Used for buffer Bindings
+    std::vector<const char*> buffers;
 };
-
+/**
+ * @brief A Shade node/Stage inside a pipelineStage
+ */
 class RAYX_API ShaderStage {
   public:
     ShaderStage(VkDevice& device, const ShaderStageCreateInfo& createInfo);
@@ -29,29 +33,27 @@ class RAYX_API ShaderStage {
           m_entryPoint(std::move(other.m_entryPoint)),
           m_path(std::move(other.m_path)),
           m_shaderModule(std::move(other.m_shaderModule)),
-          descriptorSetLayout(std::move(other.descriptorSetLayout)) {}
+          m_DescriptorBindings(std::move(other.m_DescriptorBindings)) {}
 
     const VkShaderModule& getShaderModule() const { return m_shaderModule; }
 
-    // Used in Pipeline creation
+    // Used for Pipeline creation
     VkPipelineShaderStageCreateInfo getPipelineShaderCreateInfo();
-
-    // Used in Buffer binding
-    // TODO(OS): We need to somhow let the Shader Stage control this by only providing which buffers bind to which set.
-    void setDescriptorSetLayout(const std::vector<VkDescriptorSetLayoutBinding>&);
-
-    // Used in command recording
-    void updateDescriptorSetLayout(std::vector<VkWriteDescriptorSet>);
+    // Get bindings associated with the current Shader Module
+    std::vector<VkDescriptorSetLayoutBinding> getDescriptorBindings();
+    // Add/replace a binding
+    // The buffer has to be an existent buffer!
+    void addBufferBinding(uint32_t binding, const char* buffer);
 
   private:
-    void createShaderModule();
-
     VkDevice& m_Device;
     const char* m_name = nullptr;
     const char* m_entryPoint = nullptr;
     std::filesystem::path m_path;
     VkShaderModule m_shaderModule = VK_NULL_HANDLE;
-    VkDescriptorSetLayout m_DescriptorSetLayout;
+    std::map<uint32_t, const char*> m_DescriptorBindings;
+
+    void createShaderModule();
 };
 }  // namespace RAYX
 #endif

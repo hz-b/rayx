@@ -90,7 +90,7 @@ DescriptorWriter& DescriptorWriter::writeImage(uint32_t binding, VkDescriptorIma
 }
 
 void DescriptorWriter::build(VkDescriptorSet& set) {
-    pool.allocateDescriptor(setLayout, set));
+    pool.allocateDescriptor(setLayout, set);
 
     overwrite(set);
 }

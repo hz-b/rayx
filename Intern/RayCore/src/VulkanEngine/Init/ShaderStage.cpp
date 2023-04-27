@@ -7,8 +7,14 @@
 namespace RAYX {
 ShaderStage::ShaderStage(VkDevice& device, const ShaderStageCreateInfo& createInfo)
     : m_Device(device), m_name(createInfo.name.c_str()), m_entryPoint(createInfo.entryPoint.c_str()), m_path(createInfo.shaderPath) {
-    RAYX_LOG << "Creating shader stage";
+    RAYX_LOG << "Creating shader stage...";
+    // Create Vulkan Shader Module
     createShaderModule();
+
+    // Fill bindings
+    for (int i = 0; i < createInfo.buffers.size(); i++) {
+        addBufferBinding(i, createInfo.buffers[i]);
+    }
 }
 
 ShaderStage::~ShaderStage() {
@@ -37,6 +43,21 @@ void ShaderStage::createShaderModule() {
     delete[] compShaderCode;
 }
 
+// Add a buffer binding or update binding if existent
+void ShaderStage::addBufferBinding(uint32_t binding, const char* buffer) {
+    m_DescriptorBindings.insert(std::pair<uint32_t, const char*>(binding, buffer));
+}
+
+std::vector<VkDescriptorSetLayoutBinding> ShaderStage::getDescriptorBindings() {
+    RAYX_PROFILE_FUNCTION();
+    std::vector<VkDescriptorSetLayoutBinding> bindings;
+    bindings.reserve(m_DescriptorBindings.size());
+    for (const auto& [binding, b] : m_DescriptorBindings) {
+        bindings.push_back({binding, VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, 1, VK_SHADER_STAGE_COMPUTE_BIT, nullptr});
+    }
+    return bindings;
+}
+
 VkPipelineShaderStageCreateInfo ShaderStage::getPipelineShaderCreateInfo() {
     /* we specify the compute shader stage, and it's entry
     point(main).
@@ -49,17 +70,6 @@ VkPipelineShaderStageCreateInfo ShaderStage::getPipelineShaderCreateInfo() {
     return shaderStageCreateInfo;
 }
 
-void ShaderStage::setDescriptorSetLayout(const std::vector<VkDescriptorSetLayoutBinding>& bindings) {
-    VkDescriptorSetLayoutCreateInfo descriptorSetLayoutCreateInfo = {};
-    descriptorSetLayoutCreateInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO;
-    descriptorSetLayoutCreateInfo.bindingCount = bindings.size();
-    descriptorSetLayoutCreateInfo.pBindings = bindings.data();
-
-    // Create the descriptor set layout.
-    VK_CHECK_RESULT(vkCreateDescriptorSetLayout(m_Device, &descriptorSetLayoutCreateInfo, nullptr, &m_DescriptorSetLayout));
-}
-
-void updateDescriptorSetLayout(std::vector<VkWriteDescriptorSet>) {}
 
 }  // namespace RAYX
 #endif
