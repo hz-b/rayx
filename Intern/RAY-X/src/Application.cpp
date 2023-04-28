@@ -75,19 +75,19 @@ void Application::initVulkan() {
 }
 
 void Application::initImGui() {
-    ImGui_ImplVulkan_InitInfo init_info = {};
-    init_info.Instance = m_Instance;
-    init_info.PhysicalDevice = m_PhysicalDevice;
-    init_info.Device = m_Device;
-    init_info.QueueFamily = m_QueueFamilyIndices.graphicsFamily.value();
-    init_info.Queue = m_GraphicsQueue;
-    init_info.PipelineCache = VK_NULL_HANDLE;
-    init_info.DescriptorPool = m_ImGuiDescrPool;
-    init_info.Allocator = nullptr;
-    init_info.MinImageCount = m_SwapChainImages.size();
-    init_info.ImageCount = m_SwapChainImages.size();
-    init_info.CheckVkResultFn = nullptr;
-    m_ImGuiLayer.init(m_Window, std::move(init_info), m_RenderPass);
+    ImGui_ImplVulkan_InitInfo initInfo = {};
+    initInfo.Instance = m_Instance;
+    initInfo.PhysicalDevice = m_PhysicalDevice;
+    initInfo.Device = m_Device;
+    initInfo.QueueFamily = m_QueueFamilyIndices.graphicsFamily.value();
+    initInfo.Queue = m_GraphicsQueue;
+    initInfo.PipelineCache = VK_NULL_HANDLE;
+    initInfo.DescriptorPool = VK_NULL_HANDLE;
+    initInfo.Allocator = nullptr;
+    initInfo.MinImageCount = m_SwapChainImages.size();
+    initInfo.ImageCount = m_SwapChainImages.size();
+    initInfo.CheckVkResultFn = nullptr;
+    m_ImGuiLayer.init(m_Window, std::move(initInfo), m_RenderPass);
 }
 
 void Application::mainLoop() {
@@ -117,7 +117,7 @@ void Application::cleanupSwapChain() {
 void Application::cleanup() {
     m_ImGuiLayer.cleanupImGui();
 
-    vkDestroyDescriptorPool(m_Device, m_ImGuiDescrPool, nullptr);
+    vkDestroyDescriptorPool(m_Device, m_GlobalDescriptorPool, nullptr);
 
     cleanupSwapChain();
 

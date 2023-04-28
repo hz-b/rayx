@@ -22,9 +22,10 @@ void ImGuiLayer::init(GLFWwindow* window, ImGui_ImplVulkan_InitInfo&& initInfo, 
     poolInfo.poolSizeCount = std::size(poolSizes);
     poolInfo.pPoolSizes = poolSizes;
 
-    if (vkCreateDescriptorPool(m_InitInfo.Device, &poolInfo, nullptr, &m_InitInfo.DescriptorPool) != VK_SUCCESS) {
+    if (vkCreateDescriptorPool(m_InitInfo.Device, &poolInfo, nullptr, &m_DescriptorPool) != VK_SUCCESS) {
         throw std::runtime_error("Failed to create imgui descriptor pool");
     }
+    m_InitInfo.DescriptorPool = m_DescriptorPool;
 
     IMGUI_CHECKVERSION();
     ImGui::CreateContext();

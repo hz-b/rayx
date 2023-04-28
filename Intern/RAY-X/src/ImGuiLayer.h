@@ -7,7 +7,6 @@
 
 class ImGuiLayer {
   public:
-
     void init(GLFWwindow* window, ImGui_ImplVulkan_InitInfo&& initInfo, VkRenderPass renderPass);
     void updateImGui();
     void drawImGui();

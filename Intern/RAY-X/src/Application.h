@@ -51,7 +51,7 @@ class Application {
     VkQueue m_GraphicsQueue;
     VkQueue m_PresentQueue;
     QueueFamilyIndices m_QueueFamilyIndices;
-    VkDescriptorPool m_ImGuiDescrPool;
+    VkDescriptorPool m_GlobalDescriptorPool;
 
     VkSwapchainKHR m_SwapChain;
     std::vector<VkImage> m_SwapChainImages;
