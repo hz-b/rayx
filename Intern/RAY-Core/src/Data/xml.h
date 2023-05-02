@@ -159,6 +159,7 @@ struct Parser {
     inline double parseElectronEnergy() const { return parseDouble("electronEnergy"); }
     inline int parseAlignmentError() const { return parseInt("alignmentError"); }
     inline double parsePhotonFlux() const { return parseDouble("photonFlux"); }
+    inline double parsePhotonEnergy() const { return parseDouble("photonEnergy"); }
 
     rapidxml::xml_node<>* node;
     std::vector<xml::Group> group_context;

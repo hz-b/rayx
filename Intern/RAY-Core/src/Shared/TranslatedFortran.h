@@ -2,6 +2,7 @@
 // Copied from RAY-UI/LightSource/dipolesource.cpp
 //
 
+
 double DipoleSource::vDivergence(double eel, double ec, double hv, double sigv){
     double gamma = fabs(eel)*get_factorElectronEnergy();
     if( gamma == 0.0 || ec == 0.0) {
@@ -11,7 +12,7 @@ double DipoleSource::vDivergence(double eel, double ec, double hv, double sigv){
     return sqrt(pow(psi, 2) + pow(sigv * 0.001, 2) );
 }
 
-List<double> DipoleSource::syn(double eel, double ec, double hv, double psi1, double psi2){
+std::list<double> DipoleSource::syn(double eel, double ec, double hv, double psi1, double psi2){
     double fak = get_factorDistribution();
 
 
@@ -27,7 +28,7 @@ List<double> DipoleSource::syn(double eel, double ec, double hv, double psi1, do
         dpsi = 0.001;
     }
 
-    QList<double> result;
+    std::list<double> result;
     for(int i = 0; i < 6; i++){
         result << 0.0;
     }

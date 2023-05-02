@@ -4,6 +4,7 @@
 // TODO this is a large include. It's probably not required everywhere
 #include "Element.h"
 
+
 // useful constants
 
 // inverse nanometer-electron volt relationship / reziprocal factor
@@ -54,33 +55,25 @@ const double W_FATAL_ERROR = 6;
 
 //DipoleSource Constants
 
-/// \f$eV_J\f$. ElectronVolt to Joule.
-const double eV_J = 1.602176634e-19;
+/// \f$c_ElectronVolt\f$. ElectronVolt to Joule.
+const double c_electronVolt = 1.602176634e-19;
 
-/// \f$c_0\f$ [m/s]. speed of light in vacuum.
-const double c_0 = 299792458;            // Checked 2019-7-25, PB, NIST (exact): speed of light in vacuo [m/s]
+/// \f$c_speedOfLight\f$ [m/s]. speed of light in vacuum.
+const double c_speedOfLight = 299792458;            // Checked 2019-7-25, PB, NIST (exact): speed of light in vacuo [m/s]
 
-/// \f$e_0\f$ [As]. elementary charge.
-const double e_0 = 1.602176634e-19;     // Checked 2019-7-25, PB, NIST (exact): minus charge of electron [As] or [C]
+/// \f$c_elementaryCharge\f$ [As]. elementary charge.
+const double c_elementaryCharge = 1.602176634e-19;     // Checked 2019-7-25, PB, NIST (exact): minus charge of electron [As] or [C]
 
 const double Planck = 6.62607015e-34;    // Checked 2019-7-25, PB, NIST (exact): Planck constant [Js]
 
 /// \f$\hbar\f$ [Js]. Planck's bar constant.
 const double Planck_bar = Planck/(2*PI);
 
-/// \f$m_e\f$ [kg]. electron mass.
-const double m_e = 9.1093837015e-31;		// Checked 2019-7-25, PB, NIST: mass of electron [kg];
+/// \f$c_electronMass\f$ [kg]. electron mass.
+const double c_electronMass = 9.1093837015e-31;		// Checked 2019-7-25, PB, NIST: mass of electron [kg];
     
+const double alpha = 7.2973525693e-3;
 
-/*
 
-double get_factorMagneticField(){
-    return eV_J/(c_0*e_0)*1.0e9;
-} 
-
-double get_factorCriticalEnergy(){
-    return 3*Planck_bar ( 2*pow(e_0,5) * pow(m_e,3)) * pow(eV_J,2) * 1.0e24;
-}
-*/
 
 #endif

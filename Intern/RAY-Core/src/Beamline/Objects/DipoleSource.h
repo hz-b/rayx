@@ -2,6 +2,8 @@
 
 #include "Beamline/LightSource.h"
 
+#include<list> 
+
 namespace RAYX {
 
 class RAYX_API DipoleSource : public LightSource {
@@ -12,13 +14,30 @@ class RAYX_API DipoleSource : public LightSource {
 
     std::vector<Ray> getRays() const override;
 
+
   private:
     // Geometric Params
     double m_bendingRadius;
     ElectronEnergyOrientation m_electronEnergyOrientation;
     SourcePulseType m_sourcePulseType;
     double m_photonFlux;
-    SpreadType m_energySpreadType;
+    EnergyDistribution m_energySpreadType;
+    double d_sourceWidth;
+
+    double d_sigpsi;
+    std::array<double, 6> d_syn;
+    double m_electronEnergy;
+    double d_criticalEnergy;
+    double m_photonEnergy;
+    double m_verEbeamDivergence;
+    double d_flux;
+
+    double vDivergence(double eel, double ec, double hv, double sigv);
+    std::array<double, 6> syn(double eel, double ec, double hv, double psi1, double psi2);
+    double bessel(double hnue,double zeta);
+    void getMaxIntensity();
+    std::array<double, 6> dipoleFold(double psi, double eel, double ec, double hv, double sigpsi);
+    
     // std::vector<SOURCE_LENGTH> m_source_lengths;
 };
 
