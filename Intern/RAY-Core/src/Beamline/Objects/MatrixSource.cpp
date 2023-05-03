@@ -10,6 +10,10 @@ namespace RAYX {
 
 MatrixSource::MatrixSource(const DesignObject& dobj) : LightSource(dobj) {
     m_misalignmentParams = dobj.parseMisalignment();
+
+    m_linearPol_0 = dobj.parseLinearPol0();
+    m_linearPol_45 = dobj.parseLinearPol45();
+    m_circularPol = dobj.parseCircularPol();
 }
 
 /**
@@ -49,7 +53,7 @@ std::vector<Ray> MatrixSource::getRays() const {
             glm::dvec3 direction = getDirectionFromAngles(phi, psi);
             glm::dvec4 tempDir = m_orientation * glm::dvec4(direction, 0.0);
             direction = glm::dvec3(tempDir.x, tempDir.y, tempDir.z);
-            glm::dvec4 stokes = glm::dvec4(1, getLinear0(), getLinear45(), getCircular());
+            glm::dvec4 stokes = glm::dvec4(1, m_linearPol_0, m_linearPol_45, m_circularPol);
 
             Ray r = {position, W_UNINIT, direction, en, stokes, 0.0, 0.0, 0.0, 0.0};
             // Ray(1, 2, 3, 7, 4, 5, 6, 8, 9, 10, 11, 12, 13, 14, 15, 16);

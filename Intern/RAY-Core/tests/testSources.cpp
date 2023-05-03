@@ -55,3 +55,9 @@ TEST_F(TestSuite, MatrixSourceEnergyDistribution) {
     auto rays = loadBeamline("MatrixSourceSpreaded").getInputRays();
     checkDistribution(rays, 42, 10);
 }
+
+TEST_F(TestSuite, DipoleSourceRun) {
+    auto rays = loadBeamline("dipolesource").getInputRays();
+    auto raysui = loadCSVRayUI("Dipole-FootprintAllRays");
+    roughCompare(rays, raysui);
+}

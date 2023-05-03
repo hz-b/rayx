@@ -23,9 +23,7 @@ class RAYX_API LightSource {
     virtual ~LightSource() = default;
 
     // Getter
-    double getLinear0() const;
-    double getLinear45() const;
-    double getCircular() const;
+
     double getVerDivergence() const { return m_verDivergence; }
     double getHorDivergence() const { return m_horDivergence; }
     double getSourceDepth() const { return m_sourceDepth; }
@@ -65,9 +63,9 @@ class RAYX_API LightSource {
     
     // Physics Params
     // point source & matrix source
-    double m_linearPol_0;
-    double m_linearPol_45;
-    double m_circularPol;
+    //double m_linearPol_0;
+    //double m_linearPol_45;
+    //double m_circularPol;
 
     // TODO(Jannis): move to children
     //SourceDistType m_sourceDistributionType;

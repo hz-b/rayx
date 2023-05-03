@@ -5,6 +5,7 @@
 // Light Sources
 #include "Beamline/Objects/MatrixSource.h"
 #include "Beamline/Objects/PointSource.h"
+#include "Beamline/Objects/DipoleSource.h"
 
 // Optical Elements
 #include "Beamline/Objects/Cone.h"

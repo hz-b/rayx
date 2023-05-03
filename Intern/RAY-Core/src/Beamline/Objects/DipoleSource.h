@@ -25,12 +25,17 @@ class RAYX_API DipoleSource : public LightSource {
     double d_sourceWidth;
 
     double d_sigpsi;
-    std::array<double, 6> d_syn;
+    std::array<double, 6> d_synStokes;
     double m_electronEnergy;
     double d_criticalEnergy;
     double m_photonEnergy;
     double m_verEbeamDivergence;
     double d_flux;
+    double d_totalPower;
+    double d_bandwidth;         //default bandwidth
+    double d_magneticFieldStrength;
+    double m_gamma;
+    double m_beta;
 
     double vDivergence(double eel, double ec, double hv, double sigv);
     std::array<double, 6> syn(double eel, double ec, double hv, double psi1, double psi2);
@@ -38,6 +43,7 @@ class RAYX_API DipoleSource : public LightSource {
     void getMaxIntensity();
     std::array<double, 6> dipoleFold(double psi, double eel, double ec, double hv, double sigpsi);
     
+    void calcMagneticField();
     // std::vector<SOURCE_LENGTH> m_source_lengths;
 };
 

@@ -15,6 +15,28 @@ double get_factorCriticalEnergy(){
     return 3 * planc * pow(c_electronVolt,2) * 1.0e24; //nach RAY-UI 
 }
 
+
+double get_factorMagneticField(){
+    return c_electronVolt/(c_speedOfLight*c_elementaryCharge)*1.0e9;
+} 
+
+double get_factorElectronEnergy(){
+    return c_electronVolt *1.0e9 / (c_electronMass * pow(c_speedOfLight,2));
+}
+
+double get_factorOmega(){
+    return 3 * alpha / (4.0 * pow(M_PI,2) * c_elementaryCharge * pow(c_speedOfLight,4) * pow(c_electronMass,2) / pow(c_electronVolt * 1.0e9,2));
+}
+
+double get_factorDistribution(){
+    return 3 * alpha / (4.0 * pow(M_PI,2) * c_elementaryCharge);
+}
+
+double get_factorTotalPowerDipol() {
+    return pow(c_elementaryCharge,2) / (3 * c_electricPermittivity * pow(c_speedOfLight,8) * pow(c_electronMass,4) ) * pow (c_electronVolt*1.0E9,3)
+                / (2 * M_PI)/(c_electronVolt/(c_speedOfLight*c_elementaryCharge));
+}
+
 DipoleSource::DipoleSource(const DesignObject& dobj) : LightSource(dobj) {
     m_energySpreadType = dobj.parseEnergyDistribution();
     m_photonFlux = dobj.parsePhotonFlux();
@@ -27,10 +49,11 @@ DipoleSource::DipoleSource(const DesignObject& dobj) : LightSource(dobj) {
 
     d_sourceWidth = -0.5 * m_sourceWidth * m_sourceWidth;
     d_criticalEnergy = RAYX::get_factorCriticalEnergy();
+    d_bandwidth = 1.0e-3;
     d_sigpsi = DipoleSource::vDivergence(m_electronEnergy, d_criticalEnergy, m_photonEnergy, m_verEbeamDivergence);
-    d_syn = DipoleSource::syn(m_electronEnergy, d_criticalEnergy, m_photonEnergy, -3*d_sigpsi, 3*d_sigpsi);
-
-    d_flux = d_syn[5] * m_horDivergence * 1.0e-3 * 1.0e2;
+    d_synStokes = DipoleSource::syn(m_electronEnergy, d_criticalEnergy, m_photonEnergy, -3*d_sigpsi, 3*d_sigpsi);
+    
+    d_flux = d_synStokes[5] * m_horDivergence * 1.0e-3 * 1.0e2;         //EnergyDistribution Values
 
 }
 
@@ -72,7 +95,8 @@ std::vector<Ray> DipoleSource::getRays() const {
     // for width, height, depth, horizontal and vertical divergence
     for (int i = 0; i < n; i++) {
         
-        phi = getRandom( m_horDivergence);
+
+        phi = getRandom(m_horDivergence);
 
         x1 = getRandom(sourceWidth2);
 
@@ -95,30 +119,13 @@ std::vector<Ray> DipoleSource::getRays() const {
         glm::dvec3 direction = getDirectionFromAngles(phi, psi);
         glm::dvec4 tempDir = m_orientation * glm::dvec4(direction, 0.0);
         direction = glm::dvec3(tempDir.x, tempDir.y, tempDir.z);
-        glm::dvec4 stokes = glm::dvec4(1, getLinear0(), getLinear45(), getCircular());
+        glm::dvec4 stokes = glm::dvec4(1, d_synStokes[1], d_synStokes[2], d_synStokes[3]);
 
         Ray r = {position, W_UNINIT, direction, en, stokes, 0.0, 0.0, 0.0, 0.0};
 
         rayList.push_back(r);
     }
     return rayList;
-}
-
-
-double get_factorMagneticField(){
-    return c_electronVolt/(c_speedOfLight*c_elementaryCharge)*1.0e9;
-} 
-
-double get_factorElectronEnergy(){
-    return c_electronVolt *1.0e9 / (c_electronMass * pow(c_speedOfLight,2));
-}
-
-double get_factorOmega(){
-    return 3 * alpha / (4.0 * pow(M_PI,2) * c_elementaryCharge * pow(c_speedOfLight,4) * pow(c_electronMass,2) / pow(c_electronVolt * 1.0e9,2));
-}
-
-double get_factorDistribution(){
-    return 3 * alpha / (4.0 * pow(M_PI,2) * c_elementaryCharge);
 }
 
 double DipoleSource::vDivergence(double eel, double ec, double hv, double sigv){
@@ -200,15 +207,26 @@ double DipoleSource::bessel(double hnue,double zeta){
     return result;
 }
 
-
 void DipoleSource::getMaxIntensity(){
     double psi;
+    double smax = 0;
+    
+    std::array<double, 6> S;
+
     psi = -d_sigpsi;
     d_sigpsi = 6*d_sigpsi;
 
     for( int i = 1; i<250; i++){
         psi = psi + 0.05;
+        S = dipoleFold(psi, m_electronEnergy, d_criticalEnergy, m_photonEnergy, d_sigpsi);
+        if(smax < S[5]){
+            smax = S[5];
+        }else{
+            if(d_bandwidth > 0.1){
 
+            }
+
+        }
         
         
     }
@@ -264,5 +282,25 @@ std::array<double, 6> DipoleSource::dipoleFold(double psi, double eel, double ec
     psi = psi1;
 
 }
+
+void DipoleSource::calcMagneticField(){
+    if (m_bendingRadius > 1.e-99) {
+        d_magneticFieldStrength = get_factorMagneticField() * fabs( m_electronEnergy ) / m_bendingRadius;
+        d_criticalEnergy = get_factorCriticalEnergy() * pow( fabs( m_electronEnergy ), 3 ) / m_bendingRadius;
+    } else {
+        d_magneticFieldStrength = get_factorMagneticField() * fabs( m_electronEnergy ) / 1.e-99;
+        d_criticalEnergy = get_factorCriticalEnergy() * pow( fabs( m_electronEnergy ), 3 ) / 1.e-99;
+    }
+
+    d_totalPower = get_factorTotalPowerDipol() * 0.1 * pow( fabs( m_electronEnergy ), 3 ) * d_magneticFieldStrength * fabs( m_horDivergence )/1000.0;
+    m_gamma = m_electronEnergy/(c_electronMass*pow(c_speedOfLight,2)/(c_electronVolt)*1.e-9);
+    
+    if (m_gamma >= 1) {
+        m_beta = sqrt(pow(m_gamma,2)-1)/m_gamma;
+    } else {
+        m_beta = 1;
+    }
+}
+
 
 }  // namespace RAYX
