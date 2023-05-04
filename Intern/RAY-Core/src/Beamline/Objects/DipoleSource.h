@@ -36,6 +36,12 @@ class RAYX_API DipoleSource : public LightSource {
     double d_magneticFieldStrength;
     double m_gamma;
     double m_beta;
+    double d_photonWaveLength;
+    double m_sourcePulseLength;
+    double d_sourcePathLength;
+    double d_phaseJitter;
+    double d_horDivDegrees;
+    double d_horDivSeconds;
 
     double vDivergence(double eel, double ec, double hv, double sigv);
     std::array<double, 6> syn(double eel, double ec, double hv, double psi1, double psi2);
@@ -44,6 +50,10 @@ class RAYX_API DipoleSource : public LightSource {
     std::array<double, 6> dipoleFold(double psi, double eel, double ec, double hv, double sigpsi);
     
     void calcMagneticField();
+    void calcWorldCoordinates();
+    void calcSourcePath();
+    void calcHorDivDegSec();      // horizontal Divergence as degree and seconds
+    void calcPhotonWavelength();
     // std::vector<SOURCE_LENGTH> m_source_lengths;
 };
 

@@ -15,7 +15,6 @@ double get_factorCriticalEnergy(){
     return 3 * planc * pow(c_electronVolt,2) * 1.0e24; //nach RAY-UI 
 }
 
-
 double get_factorMagneticField(){
     return c_electronVolt/(c_speedOfLight*c_elementaryCharge)*1.0e9;
 } 
@@ -302,5 +301,20 @@ void DipoleSource::calcMagneticField(){
     }
 }
 
+void DipoleSource::calcPhotonWavelength(){
+    // Energy Distribution Type : Values only
+    d_photonWaveLength = m_photonEnergy == 0.0 ? 0 : inm2eV / m_photonEnergy;
+
+}
+
+void DipoleSource::calcSourcePath(){
+    d_sourcePathLength = fabs( m_sourcePulseLength ) * 1000 * 0.3;
+    d_phaseJitter = m_photonEnergy == 0 ? 0 : fabs( m_sourcePulseLength * 0.3 ) / d_photonWaveLength * 2000000 * M_PI;
+}
+
+void DipoleSource::calcHorDivDegSec() {
+    d_horDivDegrees = m_horDivergence * 0.180 / M_PI;
+    d_horDivSeconds = m_horDivergence * 0.180 / M_PI * 3600;
+}
 
 }  // namespace RAYX
