@@ -5,6 +5,7 @@ bin/
 bin-int/
 build/
 Intern/RayCore/doc/*/
+Intern/RayCore/tests/output/**
 out/
 
 # Files
