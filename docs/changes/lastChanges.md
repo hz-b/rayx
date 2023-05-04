@@ -1,9 +1,5 @@
 # Changes
 
-- API
-  - Added PushConstant support to VulkanEngine
-  - Cutouts and curvatures are now modular and any one can be added to any object
-- Documentation
-  - Some general documentation improvements
-- Improved Windows stability
-- General bufixes and improvements
+- Jupyter notebook for visualizing tracing footprints
+- CMake updates and fixes
+- Documentation refactor and updates
