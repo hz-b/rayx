@@ -54,6 +54,7 @@ SET(SOURCE
     src/VulkanEngine/Init/ShaderModule.cpp
     src/VulkanEngine/Init/ShaderStage.cpp
     src/VulkanEngine/Init/Descriptor.cpp
+    src/VulkanEngine/Init/Initializers.cpp
     src/VulkanEngine/Run/RecordBuffer.cpp
     src/VulkanEngine/Run/ComputePipeline.cpp
     src/VulkanEngine/Run/DescriptorSet.cpp

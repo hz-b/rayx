@@ -7,6 +7,7 @@
 
 #include "CanonicalizePath.h"
 #include "VulkanEngine/Buffer/BufferHandler.h"
+#include "VulkanEngine/Init/Initializers.h"
 
 namespace RAYX {
 
@@ -23,10 +24,8 @@ void Pipeline::PipelineStage::createDescriptorSetLayout() {
     auto bindings = shaderStage->getDescriptorBindings();
 
     // TODO(OS): Only one Set supported
-    VkDescriptorSetLayoutCreateInfo descriptorSetLayoutCreateInfo = {};
-    descriptorSetLayoutCreateInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO;
-    descriptorSetLayoutCreateInfo.bindingCount = bindings.size();
-    descriptorSetLayoutCreateInfo.pBindings = bindings.data();
+    auto descriptorSetLayoutCreateInfo = VKINIT::Descriptor::descriptor_set_layout_create_info(bindings);
+
     // Create the descriptor set layout.
     VK_CHECK_RESULT(vkCreateDescriptorSetLayout(m_device, &descriptorSetLayoutCreateInfo, nullptr, &m_descriptorSetLayouts[0]));
 }
@@ -37,18 +36,15 @@ void Pipeline::PipelineStage::createPipelineLayout() {
         The pipeline layout allows the pipeline to access descriptor sets.
         So we just specify the descriptor set layout we created earlier.
         */
-        VkPipelineLayoutCreateInfo pipelineLayoutCreateInfo = {};
-        pipelineLayoutCreateInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO;
-        pipelineLayoutCreateInfo.setLayoutCount = static_cast<uint32_t>(m_descriptorSetLayouts.size());
-        pipelineLayoutCreateInfo.pSetLayouts = &m_descriptorSetLayouts[0];  // TODO(OS): Only one Set supported
+        // TODO(OS): Only one Set supported
+        auto pipelineLayoutCreateInfo =
+            VKINIT::Pipeline::pipeline_layout_create_info(&m_descriptorSetLayouts[0], static_cast<uint32_t>(m_descriptorSetLayouts.size()));
 
         /*
         Add push constants to the Pipeline
         */
-        VkPushConstantRange pushConstant;
-        pushConstant.offset = 0;  // Can change this if some of the struct is to be ignored
-        pushConstant.size = pushConstants.size;
-        pushConstant.stageFlags = VK_SHADER_STAGE_COMPUTE_BIT;
+        auto pushConstant = VKINIT::misc::push_constant_range(VK_SHADER_STAGE_COMPUTE_BIT, pushConstants.size,
+                                                              0);  // Can change Offset if some of the struct is to be ignored
 
         pipelineLayoutCreateInfo.pPushConstantRanges = &pushConstant;
         pipelineLayoutCreateInfo.pushConstantRangeCount = 1;  // One struct of pushConstants
@@ -62,10 +58,7 @@ void Pipeline::PipelineStage::createPipeline() {
         /*
         Now, we finally create the compute pipeline.
         */
-        VkComputePipelineCreateInfo pipelineCreateInfo = {};
-        pipelineCreateInfo.sType = VK_STRUCTURE_TYPE_COMPUTE_PIPELINE_CREATE_INFO;
-        pipelineCreateInfo.stage = shaderStage->getPipelineShaderCreateInfo();
-        pipelineCreateInfo.layout = m_pipelineLayout;
+        auto pipelineCreateInfo = VKINIT::Pipeline::compute_pipeline_create_info(m_pipelineLayout, shaderStage->getPipelineShaderCreateInfo());
         /*
         Now, we finally create the compute pipeline.
         */
@@ -129,7 +122,7 @@ void inline Pipeline::PipelineStage::storePipelineCache(VkDevice& device) {
 
 // -------------------------------------------------------------------------------------------------------
 
-ComputePipeline::ComputePipeline(const ComputePipelineCreateInfo& createInfo) : m_name(createInfo.passName) {
+ComputePipeline::ComputePipeline(VkDevice& device, const ComputePipelineCreateInfo& createInfo) : m_Device(device), m_name(createInfo.passName) {
     m_stagesCount = createInfo.shaderStagesCreateInfos.size();
     m_pass.reserve(m_stagesCount);
 
@@ -151,7 +144,8 @@ void ComputePipeline::createPipelines() {
     RAYX_PROFILE_FUNCTION_STDOUT();
     RAYX_VERB << "Creating pipelines...";
 
-    // Todo: validtation layer warning : Consider adding VK_KHR_maintenance4  to support SPIR-V 1.6's localsizeid instead of WorkgroupSize
+    // Todo: validtation layer warning : Consider adding VK_KHR_maintenance4  to support SPIR-V 1.6's localsizeid instead of
+    // WorkgroupSize
     for (const auto& stage : m_pass) {
         stage->createPipelineLayout();
         stage->createPipeline();

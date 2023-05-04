@@ -4,9 +4,9 @@
 #include <vulkan/vulkan.hpp>
 
 #include "RayCore.h"
+#include "VulkanEngine/Init/Descriptor.h"
 #include "VulkanEngine/Init/ShaderStage.h"
 #include "VulkanEngine/VulkanEngine.h"
-#include "VulkanEngine/Init/Descriptor.h"
 namespace RAYX {
 // General Pipeline
 // -------------------------------------------------------------------------------------------------------
@@ -15,7 +15,7 @@ namespace RAYX {
  * @brief General Vulkan Pipeline
  *
  */
-class RAYX_API Pipeline : protected VulkanEngine {
+class RAYX_API Pipeline {
   public:
     // A series of Pipeline Stages makes a Pipeline pass.
     // This is the node that contributes to creating a Pass
@@ -68,7 +68,7 @@ class RAYX_API Pipeline : protected VulkanEngine {
     virtual const VkPipeline getPipeline(int stage) const = 0;
     virtual const VkPipelineLayout getPipelineLayout(int stage) const = 0;
     virtual const ShaderStage& getShaderStage(int stage) const = 0;
-    virtual void createDescriptorPool();
+    virtual void createDescriptorPool() const = 0;
 };
 
 // Compute Pipeline
@@ -95,7 +95,7 @@ struct ComputePipelineCreateInfo {
  */
 class RAYX_API ComputePipeline : public Pipeline {
   public:
-    explicit ComputePipeline(const ComputePipelineCreateInfo&);
+    explicit ComputePipeline(VkDevice& device, const ComputePipelineCreateInfo&);
     ~ComputePipeline();
 
     const VkPipelineBindPoint& getPipelineBindPoint() const { return m_PipelineBindPoint; }
@@ -112,6 +112,9 @@ class RAYX_API ComputePipeline : public Pipeline {
     void createDescriptorSetLayout(int);
     void createDescriptorSetLayouts();
     void createPipelines();
+
+    const char* m_name;
+    VkDevice& m_Device;
 
     VkDescriptorPool m_DescriptorPool = VK_NULL_HANDLE;
     VkPipelineBindPoint m_PipelineBindPoint = VK_PIPELINE_BIND_POINT_COMPUTE;  // Always compute

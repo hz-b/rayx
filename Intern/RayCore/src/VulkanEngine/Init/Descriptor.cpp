@@ -3,6 +3,7 @@
 #include "VulkanEngine/Init/Descriptor.h"
 
 #include "RayCore.h"
+#include "VulkanEngine/Init/Initializers.h"
 #include "VulkanEngine/VulkanEngine.h"
 
 namespace RAYX {
@@ -31,24 +32,17 @@ std::unique_ptr<DescriptorPool> DescriptorPool::Builder::build() const {
 DescriptorPool::DescriptorPool(VkDevice& device, uint32_t maxSets, VkDescriptorPoolCreateFlags poolFlags,
                                const std::vector<VkDescriptorPoolSize>& poolSizes)
     : m_Device{device} {
-    VkDescriptorPoolCreateInfo descriptorPoolInfo{};
-    descriptorPoolInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_POOL_CREATE_INFO;
-    descriptorPoolInfo.poolSizeCount = static_cast<uint32_t>(poolSizes.size());
-    descriptorPoolInfo.pPoolSizes = poolSizes.data();
-    descriptorPoolInfo.maxSets = maxSets;
-    descriptorPoolInfo.flags = poolFlags;
+    auto info =
+        VKINIT::Descriptor::descriptor_pool_create_info(static_cast<uint32_t>(poolSizes.size()), poolSizes.data(), maxSets);
+    info.flags = poolFlags;
 
-    VK_CHECK_RESULT(vkCreateDescriptorPool(device, &descriptorPoolInfo, nullptr, &m_DescriptorPool));
+    VK_CHECK_RESULT(vkCreateDescriptorPool(device, &info, nullptr, &m_DescriptorPool));
 }
 
 DescriptorPool::~DescriptorPool() { vkDestroyDescriptorPool(m_Device, m_DescriptorPool, nullptr); }
 
 void DescriptorPool::allocateDescriptor(const VkDescriptorSetLayout descriptorSetLayout, VkDescriptorSet& descriptor) const {
-    VkDescriptorSetAllocateInfo allocInfo{};
-    allocInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO;
-    allocInfo.descriptorPool = m_DescriptorPool;
-    allocInfo.pSetLayouts = &descriptorSetLayout;
-    allocInfo.descriptorSetCount = 1;
+    auto allocInfo = VKINIT::Descriptor::descriptor_set_allocate_info(m_DescriptorPool, &descriptorSetLayout, 1);
 
     // Might want to create a "DescriptorPoolManager" class that handles this case, and builds
     // a new pool whenever an old pool fills up. But this is beyond our current scope
@@ -63,29 +57,23 @@ void DescriptorPool::resetPool() { vkResetDescriptorPool(m_Device, m_DescriptorP
 
 // *************** Descriptor Writer *********************
 
-DescriptorWriter::DescriptorWriter(VkDescriptorSetLayout& setLayout, DescriptorPool& pool) : setLayout{setLayout}, pool{pool} {}
+DescriptorWriter::DescriptorWriter(VkDescriptorSetLayout& setLayout, DescriptorPool& pool)
+    : setLayout{setLayout}, pool{pool} {}
 
 DescriptorWriter& DescriptorWriter::writeBuffer(uint32_t binding, VkDescriptorBufferInfo* bufferInfo) {
-    VkWriteDescriptorSet write{};
-    write.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
-    write.descriptorType = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER;
-    write.dstBinding = binding;
-    write.pBufferInfo = bufferInfo;
-    write.descriptorCount = 1;
+    // The Destination Set is filled @overwrite
+    auto writeDescriptorSet =
+        VKINIT::Descriptor::write_descriptor_set(nullptr, VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, binding, bufferInfo, 1);
 
-    writes.push_back(write);
+    writes.push_back(writeDescriptorSet);
     return *this;
 }
 
 DescriptorWriter& DescriptorWriter::writeImage(uint32_t binding, VkDescriptorImageInfo* imageInfo) {
-    VkWriteDescriptorSet write{};
-    write.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
-    write.descriptorType = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER;  // FIXME(OS): This is actually incorrect, as we are writing an image
-    write.dstBinding = binding;
-    write.pImageInfo = imageInfo;
-    write.descriptorCount = 1;
+    auto writeDescriptorSet =
+        VKINIT::Descriptor::write_descriptor_set(nullptr, VK_DESCRIPTOR_TYPE_SAMPLED_IMAGE, binding, imageInfo, 1);
 
-    writes.push_back(write);
+    writes.push_back(writeDescriptorSet);
     return *this;
 }
 

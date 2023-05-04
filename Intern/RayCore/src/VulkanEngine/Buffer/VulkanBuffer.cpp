@@ -94,11 +94,10 @@ void* VulkanBuffer::getMappedMemory() {
 }
 void VulkanBuffer::UnmapMemory() {
     if (m_VmaFlags & VMA_ALLOCATION_CREATE_MAPPED_BIT) {
-        ;
+        std::nullopt;
     } else {
         vmaUnmapMemory(m_VmaAllocator, m_Alloca);
     }
-    return;
 }
 
 }  // namespace RAYX
