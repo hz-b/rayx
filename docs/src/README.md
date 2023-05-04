@@ -7,3 +7,10 @@ RAY-X is a simulation and design tool for beamlines at electron storage rings. I
 This software is the successor of [RAY-UI](https://www.helmholtz-berlin.de/forschung/oe/wi/optik-strahlrohre/arbeitsgebiete/ray_en.html) and aims to reengineer a valuable tool for physicists, engineers and others working on beamlines for electron storage rings.
 
 Currently, we only provide a CLI application for the RayCore-library, enabling you to trace beamlines created through RAY-UI efficiently. The main reason for the faster simulations is that we utilize GPUs for the tracing process.
+
+
+We divide this wiki into three main parts. They are designed for App Users, API Users, and Developer. The areas are not exclusive to these audiences, and an API User might need to look at some pages in the App User Area. A Developer might find interesting info in all three parts.
+
+- [App Area](./AppUser/AppUser.md)
+- [API Area](./APIUser/APIUser.md)
+- [Developer Area](./Developer/Developer.md)

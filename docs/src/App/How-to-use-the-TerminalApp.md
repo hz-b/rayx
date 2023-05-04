@@ -1,24 +1,22 @@
-# RAY-CLI 
+# TerminalApp 
 After a successful build, type `-h` or `--help` for a summary of all known commands.
 
 > Hint: `-c` or `--command` are accepted. But `-command` can result in errors.
 
 ```
-Terminal application for RAY-X
-Usage: ./RAY-CLI [OPTIONS]
+Terminal Application for RAY-X
+Usage: ./TerminalApp [OPTIONS]
 
 Options:
   -h,--help                   Print this help message and exit
-  -c,--ocsv                   Output stored as .csv file.
-  -b,--batch INT              Batch size for Vulkan tracing
-  -B,--benchmark              Benchmark application: (RML -> Trace -> Output)
+  -v,--version                
+  -i,--input TEXT             Input RML File Path.
   -x,--cpu                    Tracing on CPU
+  -m,--mult                   Multiple plots extension at output.
+  -b,--benchmark              Benchmark application:     (RML Parse → Trace → Output Storage)
+  -d,--dummy                  Run an in-house built Beamline.
+  -c,--ocsv                   Output stored as .csv file.
   -p,--plot                   Plot output footprints and histograms.
-  -i,--input TEXT             Input RML File or Directory.
-  -f                          Fix the seed to RAYX::FIXED_SEED (Uses default)
-  -v,--version
-  -s,--seed INT               Provided user seed
-  -V,--verbose                Dump more information
 ```
 
 
@@ -32,4 +30,5 @@ Options:
 | `--input` | Path to the RML file to be used as imported beamline. |
 | `--cpu` | Run Tracing on CPU, instead of using the GPU. |
 | `--version` | Prints the application's meta info. | 
+| `--dummy` | Run a dummy beamline with some optical elements, useful for testing. | 
 | `--help` | Prints the help message. | 
