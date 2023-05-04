@@ -30,6 +30,15 @@ struct SwapChainSupportDetails {
     std::vector<VkPresentModeKHR> presentModes;
 };
 
+struct SwapChain {
+  VkSwapchainKHR self;
+  std::vector<VkImage> images;
+  VkFormat ImageFormat;
+  VkExtent2D Extent;
+  std::vector<VkImageView> imageViews;
+  std::vector<VkFramebuffer> framebuffers;
+};
+
 class Application {
   public:
     void run();
@@ -52,12 +61,7 @@ class Application {
     VkQueue m_PresentQueue;
     QueueFamilyIndices m_QueueFamilyIndices;
 
-    VkSwapchainKHR m_SwapChain;
-    std::vector<VkImage> m_SwapChainImages;
-    VkFormat m_SwapChainImageFormat;
-    VkExtent2D m_SwapChainExtent;
-    std::vector<VkImageView> m_SwapChainImageViews;
-    std::vector<VkFramebuffer> m_SwapChainFramebuffers;
+    SwapChain m_SwapChain;
 
     VkRenderPass m_RenderPass;
     VkPipelineLayout m_PipelineLayout;

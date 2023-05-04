@@ -80,10 +80,10 @@ void Application::initImGui() {
     initInfo.PipelineCache = VK_NULL_HANDLE;
     initInfo.DescriptorPool = VK_NULL_HANDLE;
     initInfo.Allocator = nullptr;
-    initInfo.MinImageCount = m_SwapChainImages.size();
-    initInfo.ImageCount = m_SwapChainImages.size();
+    initInfo.MinImageCount = m_SwapChain.images.size();
+    initInfo.ImageCount = m_SwapChain.images.size();
     initInfo.CheckVkResultFn = nullptr;
-    m_ImGuiLayer.init(m_Window, std::move(initInfo), m_SwapChainImageFormat);
+    m_ImGuiLayer.init(m_Window, std::move(initInfo), m_SwapChain.ImageFormat);
 }
 
 void Application::mainLoop() {
@@ -103,15 +103,15 @@ void Application::mainLoop() {
 }
 
 void Application::cleanupSwapChain() {
-    for (auto framebuffer : m_SwapChainFramebuffers) {
+    for (auto framebuffer : m_SwapChain.framebuffers) {
         vkDestroyFramebuffer(m_Device, framebuffer, nullptr);
     }
 
-    for (auto imageView : m_SwapChainImageViews) {
+    for (auto imageView : m_SwapChain.imageViews) {
         vkDestroyImageView(m_Device, imageView, nullptr);
     }
 
-    vkDestroySwapchainKHR(m_Device, m_SwapChain, nullptr);
+    vkDestroySwapchainKHR(m_Device, m_SwapChain.self, nullptr);
 }
 
 void Application::cleanup() {
@@ -334,27 +334,27 @@ void Application::createSwapChain() {
     createInfo.presentMode = presentMode;
     createInfo.clipped = VK_TRUE;
 
-    if (vkCreateSwapchainKHR(m_Device, &createInfo, nullptr, &m_SwapChain) != VK_SUCCESS) {
+    if (vkCreateSwapchainKHR(m_Device, &createInfo, nullptr, &m_SwapChain.self) != VK_SUCCESS) {
         throw std::runtime_error("failed to create swap chain!");
     }
 
-    vkGetSwapchainImagesKHR(m_Device, m_SwapChain, &imageCount, nullptr);
-    m_SwapChainImages.resize(imageCount);
-    vkGetSwapchainImagesKHR(m_Device, m_SwapChain, &imageCount, m_SwapChainImages.data());
+    vkGetSwapchainImagesKHR(m_Device, m_SwapChain.self, &imageCount, nullptr);
+    m_SwapChain.images.resize(imageCount);
+    vkGetSwapchainImagesKHR(m_Device, m_SwapChain.self, &imageCount, m_SwapChain.images.data());
 
-    m_SwapChainImageFormat = surfaceFormat.format;
-    m_SwapChainExtent = extent;
+    m_SwapChain.ImageFormat = surfaceFormat.format;
+    m_SwapChain.Extent = extent;
 }
 
 void Application::createImageViews() {
-    m_SwapChainImageViews.resize(m_SwapChainImages.size());
+    m_SwapChain.imageViews.resize(m_SwapChain.images.size());
 
-    for (size_t i = 0; i < m_SwapChainImages.size(); i++) {
+    for (size_t i = 0; i < m_SwapChain.images.size(); i++) {
         VkImageViewCreateInfo createInfo{};
         createInfo.sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO;
-        createInfo.image = m_SwapChainImages[i];
+        createInfo.image = m_SwapChain.images[i];
         createInfo.viewType = VK_IMAGE_VIEW_TYPE_2D;
-        createInfo.format = m_SwapChainImageFormat;
+        createInfo.format = m_SwapChain.ImageFormat;
         createInfo.components.r = VK_COMPONENT_SWIZZLE_IDENTITY;
         createInfo.components.g = VK_COMPONENT_SWIZZLE_IDENTITY;
         createInfo.components.b = VK_COMPONENT_SWIZZLE_IDENTITY;
@@ -365,7 +365,7 @@ void Application::createImageViews() {
         createInfo.subresourceRange.baseArrayLayer = 0;
         createInfo.subresourceRange.layerCount = 1;
 
-        if (vkCreateImageView(m_Device, &createInfo, nullptr, &m_SwapChainImageViews[i]) != VK_SUCCESS) {
+        if (vkCreateImageView(m_Device, &createInfo, nullptr, &m_SwapChain.imageViews[i]) != VK_SUCCESS) {
             throw std::runtime_error("failed to create image views!");
         }
     }
@@ -373,7 +373,7 @@ void Application::createImageViews() {
 
 void Application::createRenderPass() {
     VkAttachmentDescription colorAttachment{};
-    colorAttachment.format = m_SwapChainImageFormat;
+    colorAttachment.format = m_SwapChain.ImageFormat;
     colorAttachment.samples = VK_SAMPLE_COUNT_1_BIT;
     colorAttachment.loadOp = VK_ATTACHMENT_LOAD_OP_CLEAR;
     colorAttachment.storeOp = VK_ATTACHMENT_STORE_OP_STORE;
@@ -519,21 +519,21 @@ void Application::createGraphicsPipeline() {
 }
 
 void Application::createFramebuffers() {
-    m_SwapChainFramebuffers.resize(m_SwapChainImageViews.size());
+    m_SwapChain.framebuffers.resize(m_SwapChain.imageViews.size());
 
-    for (size_t i = 0; i < m_SwapChainImageViews.size(); i++) {
-        VkImageView attachments[] = {m_SwapChainImageViews[i]};
+    for (size_t i = 0; i < m_SwapChain.imageViews.size(); i++) {
+        VkImageView attachments[] = {m_SwapChain.imageViews[i]};
 
         VkFramebufferCreateInfo framebufferInfo{};
         framebufferInfo.sType = VK_STRUCTURE_TYPE_FRAMEBUFFER_CREATE_INFO;
         framebufferInfo.renderPass = m_RenderPass;
         framebufferInfo.attachmentCount = 1;
         framebufferInfo.pAttachments = attachments;
-        framebufferInfo.width = m_SwapChainExtent.width;
-        framebufferInfo.height = m_SwapChainExtent.height;
+        framebufferInfo.width = m_SwapChain.Extent.width;
+        framebufferInfo.height = m_SwapChain.Extent.height;
         framebufferInfo.layers = 1;
 
-        if (vkCreateFramebuffer(m_Device, &framebufferInfo, nullptr, &m_SwapChainFramebuffers[i]) != VK_SUCCESS) {
+        if (vkCreateFramebuffer(m_Device, &framebufferInfo, nullptr, &m_SwapChain.framebuffers[i]) != VK_SUCCESS) {
             throw std::runtime_error("failed to create framebuffer!");
         }
     }
@@ -577,9 +577,9 @@ void Application::recordCommandBuffer(VkCommandBuffer commandBuffer, uint32_t im
     VkRenderPassBeginInfo renderPassInfo{};
     renderPassInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
     renderPassInfo.renderPass = m_RenderPass;
-    renderPassInfo.framebuffer = m_SwapChainFramebuffers[imageIndex];
+    renderPassInfo.framebuffer = m_SwapChain.framebuffers[imageIndex];
     renderPassInfo.renderArea.offset = {0, 0};
-    renderPassInfo.renderArea.extent = m_SwapChainExtent;
+    renderPassInfo.renderArea.extent = m_SwapChain.Extent;
 
     VkClearValue clearColor = {{{0.0f, 0.0f, 0.0f, 1.0f}}};
     renderPassInfo.clearValueCount = 1;
@@ -592,15 +592,15 @@ void Application::recordCommandBuffer(VkCommandBuffer commandBuffer, uint32_t im
     VkViewport viewport{};
     viewport.x = 0.0f;
     viewport.y = 0.0f;
-    viewport.width = (float)m_SwapChainExtent.width;
-    viewport.height = (float)m_SwapChainExtent.height;
+    viewport.width = (float)m_SwapChain.Extent.width;
+    viewport.height = (float)m_SwapChain.Extent.height;
     viewport.minDepth = 0.0f;
     viewport.maxDepth = 1.0f;
     vkCmdSetViewport(commandBuffer, 0, 1, &viewport);
 
     VkRect2D scissor{};
     scissor.offset = {0, 0};
-    scissor.extent = m_SwapChainExtent;
+    scissor.extent = m_SwapChain.Extent;
     vkCmdSetScissor(commandBuffer, 0, 1, &scissor);
 
     vkCmdDraw(commandBuffer, 3, 1, 0, 0);
@@ -638,7 +638,7 @@ void Application::drawFrame() {
 
     uint32_t imageIndex;
     VkResult result =
-        vkAcquireNextImageKHR(m_Device, m_SwapChain, UINT64_MAX, m_imageAvailableSemaphores[m_currentFrame], VK_NULL_HANDLE, &imageIndex);
+        vkAcquireNextImageKHR(m_Device, m_SwapChain.self, UINT64_MAX, m_imageAvailableSemaphores[m_currentFrame], VK_NULL_HANDLE, &imageIndex);
 
     if (result == VK_ERROR_OUT_OF_DATE_KHR) {
         recreateSwapChain();
@@ -652,7 +652,7 @@ void Application::drawFrame() {
     // Render Frame
     vkResetCommandBuffer(m_CommandBuffers[m_currentFrame], /*VkCommandBufferResetFlagBits*/ 0);
     recordCommandBuffer(m_CommandBuffers[m_currentFrame], imageIndex);
-    auto ImGuiCmdBuffer = m_ImGuiLayer.recordImGuiCommands(m_currentFrame, m_SwapChainFramebuffers[m_currentFrame], m_SwapChainExtent);
+    auto ImGuiCmdBuffer = m_ImGuiLayer.recordImGuiCommands(m_currentFrame, m_SwapChain.framebuffers[m_currentFrame], m_SwapChain.Extent);
 
     VkSubmitInfo submitInfo{};
     submitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
@@ -682,7 +682,7 @@ void Application::drawFrame() {
     presentInfo.waitSemaphoreCount = 1;
     presentInfo.pWaitSemaphores = signalSemaphores;
 
-    VkSwapchainKHR swapChains[] = {m_SwapChain};
+    VkSwapchainKHR swapChains[] = {m_SwapChain.self};
     presentInfo.swapchainCount = 1;
     presentInfo.pSwapchains = swapChains;
 
