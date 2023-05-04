@@ -18,15 +18,16 @@ class ImGuiLayer {
     GLFWwindow* m_Window;
     ImGui_ImplVulkan_InitInfo m_InitInfo;
 
-    bool m_ImGuiEnabled = true;
-    bool m_ImGuiShowDemoWindow = true;
-    bool m_ImGuiShowAnotherWindow = false;
-    float m_ImGuiClearColor[4] = {0.45f, 0.55f, 0.60f, 1.00f};
+    bool m_LayerEnabled = true;
+    bool m_ShowDemoWindow = true;
+    bool m_ShowAnotherWindow = false;
+    float m_ClearColor[4] = {0.45f, 0.55f, 0.60f, 1.00f};
 
     VkRenderPass m_RenderPass;
     VkDescriptorPool m_DescriptorPool;
     VkCommandPool m_CommandPool;
     std::vector<VkCommandBuffer> m_CommandBuffers;
+    ImGuiIO m_IO;
 
     void createCommandPool();
     void createCommandBuffers(uint32_t cmdBufferCount);

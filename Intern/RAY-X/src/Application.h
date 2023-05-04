@@ -45,9 +45,9 @@ class Application {
 
   private:
     GLFWwindow* m_Window;
-    uint32_t m_windowWidth = 1920;
-    uint32_t m_windowHeight = 1080;
-    uint32_t m_maxFramesInFlight = 3;
+    const uint32_t m_windowWidth = 1920;
+    const uint32_t m_windowHeight = 1080;
+    const uint32_t m_maxFramesInFlight = 3;
 
     VkInstance m_Instance;
     VkDebugUtilsMessengerEXT m_DebugMessenger;
