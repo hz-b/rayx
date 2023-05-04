@@ -7,15 +7,15 @@
 
 class ImGuiLayer {
   public:
-    void init(GLFWwindow* window, ImGui_ImplVulkan_InitInfo&& initInfo, VkRenderPass renderPass);
+    void init(GLFWwindow* window, ImGui_ImplVulkan_InitInfo&& initInfo, VkFormat format);
     void updateImGui();
-    void drawImGui();
+    VkCommandBuffer recordImGuiCommands(uint32_t currentImage, const VkFramebuffer framebuffer, const VkExtent2D& extent);
     void cleanupImGui();
 
-    void createCommandPool();
-    void createCommandBuffers();
+    VkCommandBuffer getCommandBuffer(uint32_t index) const { return m_CommandBuffers[index]; }
 
   private:
+    GLFWwindow* m_Window;
     ImGui_ImplVulkan_InitInfo m_InitInfo;
 
     bool m_ImGuiEnabled = true;
@@ -23,7 +23,11 @@ class ImGuiLayer {
     bool m_ImGuiShowAnotherWindow = false;
     float m_ImGuiClearColor[4] = {0.45f, 0.55f, 0.60f, 1.00f};
 
+    VkRenderPass m_RenderPass;
     VkDescriptorPool m_DescriptorPool;
     VkCommandPool m_CommandPool;
-    VkCommandBuffer m_CommandBuffer;
+    std::vector<VkCommandBuffer> m_CommandBuffers;
+
+    void createCommandPool();
+    void createCommandBuffers(uint32_t cmdBufferCount);
 };

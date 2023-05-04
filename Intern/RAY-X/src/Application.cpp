@@ -1,9 +1,5 @@
 #include "Application.h"
 
-#include <imgui.h>
-#include <imgui_impl_glfw.h>
-#include <imgui_impl_vulkan.h>
-
 #include <algorithm>
 #include <cstdint>
 #include <cstdlib>
@@ -87,7 +83,7 @@ void Application::initImGui() {
     initInfo.MinImageCount = m_SwapChainImages.size();
     initInfo.ImageCount = m_SwapChainImages.size();
     initInfo.CheckVkResultFn = nullptr;
-    m_ImGuiLayer.init(m_Window, std::move(initInfo), m_RenderPass);
+    m_ImGuiLayer.init(m_Window, std::move(initInfo), m_SwapChainImageFormat);
 }
 
 void Application::mainLoop() {
@@ -95,6 +91,10 @@ void Application::mainLoop() {
         glfwPollEvents();
 
         m_ImGuiLayer.updateImGui();
+
+        // memcpy(&wd->ClearValue.color.float32[0], &clear_color, 4 * sizeof(float));
+        // FrameRender(wd);
+        // FramePresent(wd);
 
         drawFrame();
     }
@@ -116,8 +116,6 @@ void Application::cleanupSwapChain() {
 
 void Application::cleanup() {
     m_ImGuiLayer.cleanupImGui();
-
-    vkDestroyDescriptorPool(m_Device, m_GlobalDescriptorPool, nullptr);
 
     cleanupSwapChain();
 
@@ -382,7 +380,7 @@ void Application::createRenderPass() {
     colorAttachment.stencilLoadOp = VK_ATTACHMENT_LOAD_OP_DONT_CARE;
     colorAttachment.stencilStoreOp = VK_ATTACHMENT_STORE_OP_DONT_CARE;
     colorAttachment.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
-    colorAttachment.finalLayout = VK_IMAGE_LAYOUT_PRESENT_SRC_KHR;
+    colorAttachment.finalLayout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
 
     VkAttachmentReference colorAttachmentRef{};
     colorAttachmentRef.attachment = 0;
@@ -605,9 +603,6 @@ void Application::recordCommandBuffer(VkCommandBuffer commandBuffer, uint32_t im
     scissor.extent = m_SwapChainExtent;
     vkCmdSetScissor(commandBuffer, 0, 1, &scissor);
 
-    // ImGui
-    m_ImGuiLayer.drawImGui();
-
     vkCmdDraw(commandBuffer, 3, 1, 0, 0);
 
     vkCmdEndRenderPass(commandBuffer);
@@ -639,7 +634,6 @@ void Application::createSyncObjects() {
 }
 
 void Application::drawFrame() {
-    ImGui::Render();
     vkWaitForFences(m_Device, 1, &m_inFlightFences[m_currentFrame], VK_TRUE, UINT64_MAX);
 
     uint32_t imageIndex;
@@ -655,8 +649,10 @@ void Application::drawFrame() {
 
     vkResetFences(m_Device, 1, &m_inFlightFences[m_currentFrame]);
 
+    // Render Frame
     vkResetCommandBuffer(m_CommandBuffers[m_currentFrame], /*VkCommandBufferResetFlagBits*/ 0);
     recordCommandBuffer(m_CommandBuffers[m_currentFrame], imageIndex);
+    auto ImGuiCmdBuffer = m_ImGuiLayer.recordImGuiCommands(m_currentFrame, m_SwapChainFramebuffers[m_currentFrame], m_SwapChainExtent);
 
     VkSubmitInfo submitInfo{};
     submitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
@@ -667,9 +663,10 @@ void Application::drawFrame() {
     submitInfo.pWaitSemaphores = waitSemaphores;
     submitInfo.pWaitDstStageMask = waitStages;
 
-    submitInfo.commandBufferCount = 1;
-    submitInfo.pCommandBuffers = &m_CommandBuffers[m_currentFrame];
-
+    std::array<VkCommandBuffer, 2> submitCommandBuffers = {m_CommandBuffers[m_currentFrame], ImGuiCmdBuffer};
+    submitInfo.commandBufferCount = 2;
+    submitInfo.pCommandBuffers = submitCommandBuffers.data();
+    
     VkSemaphore signalSemaphores[] = {m_renderFinishedSemaphores[m_currentFrame]};
     submitInfo.signalSemaphoreCount = 1;
     submitInfo.pSignalSemaphores = signalSemaphores;
@@ -678,6 +675,7 @@ void Application::drawFrame() {
         throw std::runtime_error("failed to submit draw command buffer!");
     }
 
+    // Present Frame
     VkPresentInfoKHR presentInfo{};
     presentInfo.sType = VK_STRUCTURE_TYPE_PRESENT_INFO_KHR;
 

@@ -38,7 +38,7 @@ class Application {
     GLFWwindow* m_Window;
     uint32_t m_windowWidth = 1920;
     uint32_t m_windowHeight = 1080;
-    uint32_t m_maxFramesInFlight = 2;
+    uint32_t m_maxFramesInFlight = 3;
 
     VkInstance m_Instance;
     VkDebugUtilsMessengerEXT m_DebugMessenger;
@@ -51,7 +51,6 @@ class Application {
     VkQueue m_GraphicsQueue;
     VkQueue m_PresentQueue;
     QueueFamilyIndices m_QueueFamilyIndices;
-    VkDescriptorPool m_GlobalDescriptorPool;
 
     VkSwapchainKHR m_SwapChain;
     std::vector<VkImage> m_SwapChainImages;
@@ -100,6 +99,7 @@ class Application {
     void createCommandBuffers();
     void recordCommandBuffer(VkCommandBuffer commandBuffer, uint32_t imageIndex);
     void createSyncObjects();
+
     void drawFrame();
 
     VkShaderModule createShaderModule(const std::vector<char>& code);
