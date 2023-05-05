@@ -6,118 +6,123 @@
 #include "RayCore.h"
 #include "VulkanEngine/Init/Descriptor.h"
 #include "VulkanEngine/Init/ShaderStage.h"
-#include "VulkanEngine/VulkanEngine.h"
 namespace RAYX {
-// General Pipeline
+// General Pass
 // -------------------------------------------------------------------------------------------------------
-
 /**
- * @brief General Vulkan Pipeline
+ * @brief General Vulkan Pass (A group of Pipelines)
  *
  */
-class RAYX_API Pipeline {
+class RAYX_API Pass {
   public:
-    // A series of Pipeline Stages makes a Pipeline pass.
+    // A series of Pipelines makes a Pass.
     // This is the node that contributes to creating a Pass
-    class PipelineStage {
+    class Pipeline {
       public:
-        PipelineStage(std::string name, VkDevice& dev, const ShaderStageCreateInfo&, int descriptorSetAmount = 1);
-        ~PipelineStage();
+        Pipeline(std::string name, VkDevice& dev, const ShaderStageCreateInfo&);
+        ~Pipeline();
 
-        std::string m_name;
-        VkPipeline m_pipeline = VK_NULL_HANDLE;
-        VkPipelineLayout m_pipelineLayout = VK_NULL_HANDLE;
-        VkPipelineCache m_pipelineCache = VK_NULL_HANDLE;
-        std::vector<VkDescriptorSetLayout> m_descriptorSetLayouts = {VK_NULL_HANDLE};  // For now, only one [0]
-        std::vector<VkDescriptorSet> descriptorSets = {VK_NULL_HANDLE};                // For now, only one [0]
-        VulkanEngine::pushConstants_t pushConstants = {nullptr};  // TODO (OS): Not really like this as every shader has its own push_t
-        std::shared_ptr<ShaderStage> shaderStage{};
-        VkDevice& m_device;
-
-        void createDescriptorSetLayout();
         void createPipelineLayout();
         void createPipeline();
         void inline readPipelineCache();
         void inline storePipelineCache(VkDevice& device);
-        void cleanPipeline(VkDevice& device) {
-            vkDestroyPipeline(device, m_pipeline, nullptr);
-            vkDestroyPipelineLayout(device, m_pipelineLayout, nullptr);
-            storePipelineCache(device);
-        }
-    };
+        void cleanPipeline(VkDevice& device);
 
-    Pipeline() = default;
-    ~Pipeline() = default;
-    const char* m_name;
+        std::string m_name;
+        VkDevice& m_device;
+
+        VkPipeline m_pipeline = VK_NULL_HANDLE;
+        VkPipelineLayout m_pipelineLayout = VK_NULL_HANDLE;
+        VkPipelineCache m_pipelineCache = VK_NULL_HANDLE;
+
+        std::shared_ptr<ShaderStage> shaderStage{};
+    };
+    using Pipelines = std::vector<std::shared_ptr<Pipeline>>;
+
+    Pass() = default;
+    ~Pass() = default;
 
     void bind(const VkCommandBuffer& commandBuffer, int stage) const { vkCmdBindPipeline(commandBuffer, getPipelineBindPoint(), getPipeline(stage)); }
 
-    const std::vector<std::shared_ptr<PipelineStage>>& getPass() const { return m_pass; }
     const char* getName() const { return m_name; }
+    const Pipelines& getPass() const { return m_pass; }
     uint32_t getStageAmount() const { return m_stagesCount; }
-
-    // How many stages does the pass have?
-    uint32_t m_stagesCount;
-
-    // The pass itself (PipelineStages)
-    std::vector<std::shared_ptr<PipelineStage>> m_pass = {VK_NULL_HANDLE};
-
-    std::unique_ptr<DescriptorPool> globalPool{};
+    const VkPipeline getPipeline(int stage) const { return m_pass[stage]->m_pipeline; }
+    const VkPipelineLayout getPipelineLayout(int stage) { return m_pass[stage]->m_pipelineLayout; }
+    const ShaderStage& getShaderStage(int stage) const { return *(m_pass[stage]->shaderStage); }
 
     virtual const VkPipelineBindPoint& getPipelineBindPoint() const = 0;
-    virtual const VkPipeline getPipeline(int stage) const = 0;
-    virtual const VkPipelineLayout getPipelineLayout(int stage) const = 0;
-    virtual const ShaderStage& getShaderStage(int stage) const = 0;
-    virtual void createDescriptorPool() const = 0;
+
+  protected:
+    // How many stages in the Pass
+    uint32_t m_stagesCount;
+    const char* m_name;
+    // The pass itself (Pipelines)
+    Pipelines m_pass = {VK_NULL_HANDLE};
+
+    std::unique_ptr<DescriptorPool> globalDescriptorPool{};
 };
 
-// Compute Pipeline
+// Compute Pass
 // -------------------------------------------------------------------------------------------------------
 
 /**
  * @brief Use ComputePipelineCreateInfo to build a new computePipeline
  *
  */
-struct ComputePipelineCreateInfo {
+struct ComputePassCreateInfo {
     const char* passName;
     std::vector<ShaderStageCreateInfo> shaderStagesCreateInfos = {};
+    int descriptorSetAmount = 1
 };
 
 /**
- * @brief Compute specified Pipeline
+ * @brief Compute specified Pass:
  *
- * A compute Pipeline is the main class for executing a compute Program(Shader).
+ * A compute Pass is the main class for executing a compute Program(Shader).
  * It mainly consists of which shader(s) to execute and each In-Output/Binding(s) corresponding to each stage stage*. \n
  *
- * - The computePipeline Class can have multiple Vkpipeline stages, i.e A compute class has a pass that can be a series of
- *  shader stages with barriers in between.
- * [Stage0->(Barrier)->Stage1 ..]
+ * - The ComputePass Class can have multiple Vkpipeline stages, i.e A ComputePass has a series of
+ *  shader stages with barriers and other sync. methods in between.
+ *  [Stage0->(Barrier)->Stage1 ..]
  */
-class RAYX_API ComputePipeline : public Pipeline {
+class RAYX_API ComputePass : public Pass {
   public:
-    explicit ComputePipeline(VkDevice& device, const ComputePipelineCreateInfo&);
-    ~ComputePipeline();
+    explicit ComputePass(VkDevice& device, const ComputePassCreateInfo&);
+    ~ComputePass();
 
     const VkPipelineBindPoint& getPipelineBindPoint() const { return m_PipelineBindPoint; }
-    const VkPipeline getPipeline(int stage) const { return m_pass[stage]->m_pipeline; }
-    const VkPipelineLayout getPipelineLayout(int stage) { return m_pass[stage]->m_pipelineLayout; }
-    const ShaderStage& getShaderStage(int stage) const { return *(m_pass[stage]->shaderStage); }
 
     // Adding a new PipelineStage is the same as extending the Pass with a new Stage
     void addPipelineStage(const ShaderStageCreateInfo&);
-    void addPipelineStage(const PipelineStage& newStage);
+    void addPipelineStage(const Pass& newStage);
+
+    // Get bindings associated with the current Shader Module
+    std::vector<VkDescriptorSetLayoutBinding> getDescriptorBindings();
+    // Add/replace a binding
+    // The buffer has to be an existent buffer!
+    void addBufferBinding(uint32_t binding, const char* buffer);
 
   private:
     void createDescriptorPool();
-    void createDescriptorSetLayout(int);
-    void createDescriptorSetLayouts();
+
+    // Currently only one DescriptorSetLayout is offered per Pass
+    void createDescriptorSetLayout();
+
     void createPipelines();
 
-    const char* m_name;
     VkDevice& m_Device;
+    const char* m_name;
 
     VkDescriptorPool m_DescriptorPool = VK_NULL_HANDLE;
     VkPipelineBindPoint m_PipelineBindPoint = VK_PIPELINE_BIND_POINT_COMPUTE;  // Always compute
+
+    std::map<uint32_t, VkDescriptorSetLayoutBinding> m_DescriptorBindings;
+
+    std::vector<VkDescriptorSetLayout> m_descriptorSetLayouts = {VK_NULL_HANDLE};  // For now, only one [0]
+    std::vector<VkDescriptorSet> descriptorSets = {VK_NULL_HANDLE};                // For now, only one [0]
+    VulkanEngine::pushConstants_t pushConstants = {nullptr};  // TODO (OS): Not really like this as every shader has its own push_t
+
     // TODO(OS): Add missing memory barriers
 };
 }  // namespace RAYX

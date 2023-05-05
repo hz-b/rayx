@@ -58,8 +58,8 @@ VulkanEngine::~VulkanEngine() {
     // vkDestroyBuffer(m_Device, m_stagingBuffer, nullptr);
     // vkFreeMemory(m_Device, m_stagingMemory, nullptr);
 
-    vkFreeCommandBuffers(m_Device, m_CommandPool, 1, &m_ComputeCommandBuffer);
-    vkFreeCommandBuffers(m_Device, m_CommandPool, 1, &m_TransferCommandBuffer);
+    vkFreeCommandBuffers(m_Device, m_GlobalCommandPool, 1, &m_ComputeCommandBuffer);
+    vkFreeCommandBuffers(m_Device, m_GlobalCommandPool, 1, &m_TransferCommandBuffer);
 
     for (auto& [name, buf] : m_buffers) {
         // vkDestroyBuffer(m_Device, buf.m_Buffer, nullptr);
@@ -69,7 +69,7 @@ VulkanEngine::~VulkanEngine() {
 
     vmaDestroyBuffer(m_VmaAllocator, m_stagingBuffer.buf, m_stagingBuffer.alloca);
     vmaDestroyAllocator(m_VmaAllocator);
-    vkDestroyCommandPool(m_Device, m_CommandPool, nullptr);
+    vkDestroyCommandPool(m_Device, m_GlobalCommandPool, nullptr);
     vkDestroyDescriptorSetLayout(m_Device, m_DescriptorSetLayout, nullptr);
     vkDestroyDescriptorPool(m_Device, m_DescriptorPool, nullptr);
 

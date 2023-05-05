@@ -23,7 +23,7 @@ class RAYX_API BufferHandler {
 
     template <typename T>
     void createBuffer(VulkanBufferCreateInfo createInfo, const std::vector<T>& vec = nullptr);
-
+    void createBuffer(VulkanBufferCreateInfo createInfo);
     template <typename T>
     inline std::vector<T> readBuffer(const char* bufname, bool indirect);
 
@@ -76,6 +76,7 @@ class RAYX_API BufferHandler {
     std::map<std::string, VulkanBuffer> m_GraphicsBuffers;
 
     std::unique_ptr<Fence> m_TransferFence;
+    VkSemaphore m_TransferSemaphore;
 };
 }  // namespace RAYX
 #endif

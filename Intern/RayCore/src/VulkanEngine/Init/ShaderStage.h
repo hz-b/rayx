@@ -18,7 +18,7 @@ struct ShaderStageCreateInfo {
     // Entry Point inside the shader file
     std::string entryPoint;
     // Used for buffer Bindings
-    std::vector<const char*> buffers;
+    std::vector<const char*> bufferBindings;
 };
 /**
  * @brief A Shade node/Stage inside a pipelineStage
@@ -32,18 +32,12 @@ class RAYX_API ShaderStage {
           m_name(std::move(other.m_name)),
           m_entryPoint(std::move(other.m_entryPoint)),
           m_path(std::move(other.m_path)),
-          m_shaderModule(std::move(other.m_shaderModule)),
-          m_DescriptorBindings(std::move(other.m_DescriptorBindings)) {}
+          m_shaderModule(std::move(other.m_shaderModule)) {}
 
     const VkShaderModule& getShaderModule() const { return m_shaderModule; }
 
     // Used for Pipeline creation
     VkPipelineShaderStageCreateInfo getPipelineShaderCreateInfo();
-    // Get bindings associated with the current Shader Module
-    std::vector<VkDescriptorSetLayoutBinding> getDescriptorBindings();
-    // Add/replace a binding
-    // The buffer has to be an existent buffer!
-    void addBufferBinding(uint32_t binding, const char* buffer);
 
   private:
     VkDevice& m_Device;
@@ -51,7 +45,6 @@ class RAYX_API ShaderStage {
     const char* m_entryPoint = nullptr;
     std::filesystem::path m_path;
     VkShaderModule m_shaderModule = VK_NULL_HANDLE;
-    std::map<uint32_t, const char*> m_DescriptorBindings;
 
     void createShaderModule();
 };

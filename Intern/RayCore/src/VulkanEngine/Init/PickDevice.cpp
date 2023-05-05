@@ -183,6 +183,17 @@ void VulkanEngine::createSemaphores() {
     vkCreateSemaphore(m_Device, &semaphoreCreateInfo, nullptr, &m_Semaphores.transferSemaphore);
 }
 
+// Create Semaphores for Queue synchronization between commands
+void VulkanEngine::newCreateSemaphores(int count) {
+    VkSemaphoreCreateInfo semaphoreCreateInfo = {};
+    semaphoreCreateInfo.sType = VK_STRUCTURE_TYPE_SEMAPHORE_CREATE_INFO;
+
+    m_newSemaphores.reserve(count);
+    for (auto i = 0; i < count; i++) {
+        vkCreateSemaphore(m_Device, &semaphoreCreateInfo, nullptr, &m_newSemaphores[i]);
+    }
+}
+
 /**
  * @brief Use to print memories on device.
  * Only in DEBUG

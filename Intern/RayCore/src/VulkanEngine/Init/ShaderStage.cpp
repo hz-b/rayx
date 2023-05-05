@@ -12,15 +12,12 @@ ShaderStage::ShaderStage(VkDevice& device, const ShaderStageCreateInfo& createIn
     createShaderModule();
 
     // Fill bindings
-    for (int i = 0; i < createInfo.buffers.size(); i++) {
-        addBufferBinding(i, createInfo.buffers[i]);
+    for (int i = 0; i < createInfo.bufferBindings.size(); i++) {
+        addBufferBinding(i, createInfo.bufferBindings[i]);
     }
 }
 
-ShaderStage::~ShaderStage() {
-    vkDestroyShaderModule(m_Device, m_shaderModule, nullptr);
-    vkDestroyDescriptorSetLayout(m_Device, m_DescriptorSetLayout, nullptr);
-}
+ShaderStage::~ShaderStage() { vkDestroyShaderModule(m_Device, m_shaderModule, nullptr); }
 
 void ShaderStage::createShaderModule() {
     RAYX_PROFILE_FUNCTION_STDOUT();
@@ -32,31 +29,17 @@ void ShaderStage::createShaderModule() {
     // the code in comp.spv was created by running the command:
     // glslangValidator.exe -V shader.comp
     std::string path = canonicalizeRepositoryPath(m_path).string();
-    uint32_t* compShaderCode = readFile(filelength, path.c_str());
+    uint32_t* shaderCode = readFile(filelength, path.c_str());
     VkShaderModuleCreateInfo createInfo = {};
     createInfo.sType = VK_STRUCTURE_TYPE_SHADER_MODULE_CREATE_INFO;
-    createInfo.pCode = compShaderCode;
+    createInfo.pCode = shaderCode;
     createInfo.codeSize = filelength;
 
     VK_CHECK_RESULT(vkCreateShaderModule(m_Device, &createInfo, nullptr, &m_shaderModule));
     RAYX_VERB << "Shader module " << m_name << " created.";
-    delete[] compShaderCode;
+    delete[] shaderCode;
 }
 
-// Add a buffer binding or update binding if existent
-void ShaderStage::addBufferBinding(uint32_t binding, const char* buffer) {
-    m_DescriptorBindings.insert(std::pair<uint32_t, const char*>(binding, buffer));
-}
-
-std::vector<VkDescriptorSetLayoutBinding> ShaderStage::getDescriptorBindings() {
-    RAYX_PROFILE_FUNCTION();
-    std::vector<VkDescriptorSetLayoutBinding> bindings;
-    bindings.reserve(m_DescriptorBindings.size());
-    for (const auto& [binding, b] : m_DescriptorBindings) {
-        bindings.push_back({binding, VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, 1, VK_SHADER_STAGE_COMPUTE_BIT, nullptr});
-    }
-    return bindings;
-}
 
 VkPipelineShaderStageCreateInfo ShaderStage::getPipelineShaderCreateInfo() {
     /* we specify the compute shader stage, and it's entry
@@ -69,7 +52,6 @@ VkPipelineShaderStageCreateInfo ShaderStage::getPipelineShaderCreateInfo() {
     shaderStageCreateInfo.pName = m_entryPoint;
     return shaderStageCreateInfo;
 }
-
 
 }  // namespace RAYX
 #endif

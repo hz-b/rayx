@@ -6,8 +6,7 @@
 namespace RAYX {
 BufferHandler::BufferHandler(VkDevice& device, VmaAllocator allocator, uint32_t queueFamilyIndex, size_t stagingSize)
     : m_Device(device), m_FamilyIndex(queueFamilyIndex), m_VmaAllocator(allocator), m_StagingSize(stagingSize) {
-    VKINIT::Command::create_command_pool(device, VK_COMMAND_POOL_CREATE_RESET_COMMAND_BUFFER_BIT, m_FamilyIndex,
-                                         m_CommandPool);
+    VKINIT::Command::create_command_pool(device, VK_COMMAND_POOL_CREATE_RESET_COMMAND_BUFFER_BIT, m_FamilyIndex, m_CommandPool);
     createTransferCommandBuffer();
     createTransferQueue();
     createStagingBuffer();
@@ -54,8 +53,7 @@ void BufferHandler::createTransferFence() { m_TransferFence = std::make_unique<F
 
 void BufferHandler::createTransferQueue() { vkGetDeviceQueue(m_Device, m_FamilyIndex, 0, &m_TransferQueue); }
 
-void BufferHandler::gpuMemcpy(VulkanBuffer& buffer_dst, size_t offset_dst, VulkanBuffer& buffer_src, size_t offset_src,
-                              size_t bytes) {
+void BufferHandler::gpuMemcpy(VulkanBuffer& buffer_dst, size_t offset_dst, VulkanBuffer& buffer_src, size_t offset_src, size_t bytes) {
     RAYX_PROFILE_FUNCTION();
     VkCommandBufferBeginInfo beginInfo{};
     beginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
@@ -90,8 +88,7 @@ void BufferHandler::createStagingBuffer() {
 
     m_StagingBuffer.m_createInfo = createInfo;
     m_StagingBuffer.createVmaBuffer(
-        m_StagingSize,
-        VK_BUFFER_USAGE_TRANSFER_DST_BIT | VK_BUFFER_USAGE_TRANSFER_SRC_BIT | VK_BUFFER_USAGE_STORAGE_BUFFER_BIT,
+        m_StagingSize, VK_BUFFER_USAGE_TRANSFER_DST_BIT | VK_BUFFER_USAGE_TRANSFER_SRC_BIT | VK_BUFFER_USAGE_STORAGE_BUFFER_BIT,
         m_StagingBuffer.m_Buffer, m_StagingBuffer.m_Alloca, &m_StagingBuffer.m_AllocaInfo,
         VMA_ALLOCATION_CREATE_HOST_ACCESS_RANDOM_BIT | VMA_ALLOCATION_CREATE_MAPPED_BIT, VMA_MEMORY_USAGE_AUTO_PREFER_HOST);
 }
@@ -117,8 +114,7 @@ void BufferHandler::readBufferRaw(const char* bufname, char* outdata, const VkQu
     auto b = m_Buffers[bufname];
 
     if (b.m_createInfo.accessType != VKBUFFER_OUT || b.m_createInfo.accessType != VKBUFFER_INOUT) {
-        RAYX_ERR << "readBufferRaw(\"" << bufname << "\", ...) is not allowed, as \"" << bufname
-                 << "\" is not an output buffer";
+        RAYX_ERR << "readBufferRaw(\"" << bufname << "\", ...) is not allowed, as \"" << bufname << "\" is not an output buffer";
     }
 
     size_t remainingBytes = b.getSize();
@@ -157,7 +153,13 @@ void BufferHandler::writeBufferRaw(const char* bufname, char* indata) {
         m_TransferFence->wait();
     }
 }
-
+/**
+ * @brief Create a buffer a fill it
+ * 
+ * @tparam T 
+ * @param createInfo Buffer creation Info 
+ * @param vec Vector to fill Buffer with
+ */
 template <typename T>
 void BufferHandler::createBuffer(VulkanBufferCreateInfo createInfo, const std::vector<T>& vec) {
     auto name = createInfo.bufName;
@@ -173,6 +175,22 @@ void BufferHandler::createBuffer(VulkanBufferCreateInfo createInfo, const std::v
     if (vec) {
         writeBufferRaw(name, (char*)vec.data());
     }
+}
+/**
+ * @brief  Creates an "empty" buffer
+ * 
+ * @param createInfo 
+ */
+void BufferHandler::createBuffer(VulkanBufferCreateInfo createInfo) {
+    auto name = createInfo.bufName;
+    if (m_Buffers.find(name) != m_Buffers.end()) {
+        RAYX_ERR << "Buffer " << name << " already exists. Try update func.";
+        return;
+    }
+
+    auto newBuffer = VulkanBuffer(m_VmaAllocator, createInfo);
+
+    m_Buffers[name] = newBuffer;
 }
 
 template <typename T>

@@ -16,7 +16,7 @@ VkCommandBuffer VulkanEngine::createOneTimeCommandBuffer() {
     VkCommandBuffer cmdBuffer;
     VkCommandBufferAllocateInfo commandBufferAllocateInfo = {};
     commandBufferAllocateInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
-    commandBufferAllocateInfo.commandPool = m_CommandPool;
+    commandBufferAllocateInfo.commandPool = m_GlobalCommandPool;
     commandBufferAllocateInfo.level = VK_COMMAND_BUFFER_LEVEL_PRIMARY;
     commandBufferAllocateInfo.commandBufferCount = 1;
     VK_CHECK_RESULT(vkAllocateCommandBuffers(m_Device, &commandBufferAllocateInfo, &cmdBuffer));
@@ -39,7 +39,7 @@ void VulkanEngine::createCommandBuffers() {
     */
     VkCommandBufferAllocateInfo commandBufferAllocateInfo = {};
     commandBufferAllocateInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
-    commandBufferAllocateInfo.commandPool = m_CommandPool;  // specify the command pool to allocate from.
+    commandBufferAllocateInfo.commandPool = m_GlobalCommandPool;  // specify the command pool to allocate from.
 
     /* if the command buffer is primary, it can be directly submitted to
     / queues. A secondary buffer has to be called from some primary command
@@ -53,6 +53,30 @@ void VulkanEngine::createCommandBuffers() {
     commandBufferAllocateInfo.level = VK_COMMAND_BUFFER_LEVEL_PRIMARY;
     commandBufferAllocateInfo.commandBufferCount = 1;
     VK_CHECK_RESULT(vkAllocateCommandBuffers(m_Device, &commandBufferAllocateInfo, &m_TransferCommandBuffer));
+}
+
+void VulkanEngine::createCommandBuffers(int commandBuffersCount) {
+    RAYX_PROFILE_FUNCTION();
+    RAYX_VERB << "Creating commandBuffers..";
+
+    m_CommandBuffers.reserve(commandBuffersCount);
+    /*
+    Allocate a command buffer from the previously creeated command pool.
+    */
+    VkCommandBufferAllocateInfo commandBufferAllocateInfo = {};
+    commandBufferAllocateInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
+    commandBufferAllocateInfo.commandPool = m_GlobalCommandPool;  // specify the command pool to allocate from.
+
+    for (auto i = 0; i < commandBuffersCount; i++) {
+        /* if the command buffer is primary, it can be directly submitted to
+        / queues. A secondary buffer has to be called from some primary command
+        / buffer, and cannot be directly submitted to a queue. To keep things
+        / simple, we use a primary command buffer. */
+        commandBufferAllocateInfo.level = VK_COMMAND_BUFFER_LEVEL_PRIMARY;
+        commandBufferAllocateInfo.commandBufferCount = 1;  // allocate a single command buffer.
+        VK_CHECK_RESULT(vkAllocateCommandBuffers(m_Device, &commandBufferAllocateInfo,
+                                                 &m_CommandBuffers[i]));  // allocate command buffer.
+    }
 }
 
 }  // namespace RAYX

@@ -2,7 +2,6 @@
 
 #pragma once
 
-//#include <VulkanEngine/Buffer/BufferHandler.h>
 #include <vk_mem_alloc.h>
 
 #include <algorithm>
@@ -11,29 +10,10 @@
 #include <vulkan/vulkan.hpp>
 
 #include "RayCore.h"
-
-#define IS_ENGINE_PREINIT                                    \
-    if (m_state != EngineStates_t::PREINIT) {                \
-        RAYX_ERR << "VulkanEngine was already initialized!"; \
-    }
-
-#define IS_ENGINE_POSTRUN                                                 \
-    if (m_state != EngineStates_t::POSTRUN) {                             \
-        RAYX_ERR << "you've forgotton to .run() the VulkanEngine. Thats " \
-                    "mandatory before reading it's output buffers.";      \
-    }
-
-#define IS_ENGINE_CLEAN                                                \
-    if (m_state == EngineStates_t::PREINIT) {                          \
-        RAYX_ERR << "you've forgotten to .init() the VulkanEngine";    \
-    } else if (m_state == EngineStates_t::POSTRUN) {                   \
-        RAYX_ERR << "you've forgotten to .cleanup() the VulkanEngine"; \
-    }
-
-#define IS_ENGINE_CLEANABLE                                            \
-    if (m_state != EngineStates_t::POSTRUN) {                          \
-        RAYX_ERR << "cleanup() only needs to be called after .run()!"; \
-    }
+#include "VulkanEngine/Buffer/BufferHandler.h"
+#include "VulkanEngine/Common.h"
+#include "VulkanEngine/Init/Initializers.h"
+#include "VulkanEngine/Run/Pipeline.h"
 
 namespace RAYX {
 
@@ -71,6 +51,12 @@ class RAYX_API VulkanEngine {
 
     /// changes the state from PREINIT to PRERUN.
     void init(VulkanEngineInitSpec_t);
+    void newInit();
+
+    // TODO (OS): Add the Vulkan state FSM Controls
+    void initBufferHandler();
+    void createComputePipelinePass(const ComputePassCreateInfo&);
+    BufferHandler* getBufferHandler() const { return m_BufferHandler.get(); }
 
     /// create a buffer and fill it with the data given in vec.
     /// the buffer will have exactly the size to fit all elements of vec.
@@ -149,44 +135,14 @@ class RAYX_API VulkanEngine {
         size_t size;
     } m_pushConstants;
 
-  protected:
-    VkPhysicalDevice m_PhysicalDevice = VK_NULL_HANDLE;
-    VkDevice m_Device;
-    uint32_t m_computeFamily;
-    VkCommandPool m_CommandPool;
-    VmaAllocator m_VmaAllocator;
-    size_t STAGING_SIZE = 0;
-
-    // New
-    //std::unique_ptr<BufferHandler> m_BufferHandler;
-    
-    // Sync:
-    struct {
-        VkSemaphore computeSemaphore;
-        VkSemaphore transferSemaphore;
-    } m_Semaphores;
-
-    class Fence {
-      public:
-        Fence(VkDevice& device);
-        ~Fence();
-        VkFence* fence();
-        VkResult wait();
-        VkResult forceReset();
-
-      private:
-        VkFence f;
-        VkDevice device;
-    };
-    struct {
-        std::unique_ptr<Fence> transfer;
-        std::unique_ptr<Fence> compute;
-    } m_Fences;
-
   private:
     EngineStates_t m_state = EngineStates_t::PREINIT;
     const char* m_shaderfile;
     uint32_t m_numberOfInvocations;
+
+    std::unique_ptr<BufferHandler> m_BufferHandler;  // new
+    std::unique_ptr<ComputePass> m_ComputePass;      // New
+    std::unique_ptr<Pass> m_Pass;                    // New
 
     /// stores the Buffers by name.
     std::map<std::string, Buffer_t> m_buffers;
@@ -204,6 +160,7 @@ class RAYX_API VulkanEngine {
     VkShaderModule m_ComputeShaderModule;
     VkCommandBuffer m_ComputeCommandBuffer;
     VkCommandBuffer m_TransferCommandBuffer;
+    std::vector<VkCommandBuffer> m_CommandBuffers = {};
     VkQueue m_ComputeQueue;
     VkQueue m_TransferQueue;
     VkDescriptorPool m_DescriptorPool;
@@ -211,6 +168,36 @@ class RAYX_API VulkanEngine {
     VkDescriptorSetLayout m_DescriptorSetLayout;
 
     // implementation details:
+    VkPhysicalDevice m_PhysicalDevice = VK_NULL_HANDLE;
+    VkDevice m_Device;
+    uint32_t m_computeFamily;
+    VkCommandPool m_GlobalCommandPool;
+    VmaAllocator m_VmaAllocator;
+    size_t STAGING_SIZE = 0;
+
+    // Sync:
+    struct {
+        VkSemaphore computeSemaphore;
+        VkSemaphore transferSemaphore;
+    } m_Semaphores;
+
+    std::vector<VkSemaphore> m_newSemaphores = {};
+    class Fence {
+      public:
+        Fence(VkDevice& device);
+        ~Fence();
+        VkFence* fence();
+        VkResult wait();
+        VkResult forceReset();
+
+      private:
+        VkFence f;
+        VkDevice device;
+    };
+    struct {
+        std::unique_ptr<Fence> transfer;
+        std::unique_ptr<Fence> compute;
+    } m_Fences;
 
     // Init:
     void createInstance();
@@ -223,11 +210,13 @@ class RAYX_API VulkanEngine {
     void createAllocateDescriptorPool(uint32_t);
     void createCommandPool();
     void createCommandBuffers();
+    void createCommandBuffers(int commandBuffersCount);
     void createShaderModule();
     void recordFullCommand();
     void createFences();
     void recordInComputeCommandBuffer();
     void createSemaphores();
+    void newCreateSemaphores(int count);
     void createStagingBuffer();
     void prepareVma();
 
@@ -283,19 +272,6 @@ class RAYX_API VulkanEngine {
 
   protected:
 };
-
-// Used for validating return values of Vulkan API calls.
-#define VK_CHECK_RESULT(f)                                               \
-    {                                                                    \
-        VkResult res = (f);                                              \
-        if (res != VK_SUCCESS) {                                         \
-            RAYX_WARN << "Fatal : VkResult fail!";                       \
-            RAYX_ERR << "Error code: " << res                            \
-                     << ", look up at "                                  \
-                        "https://www.khronos.org/registry/vulkan/specs/" \
-                        "1.3-extensions/man/html/VkResult.html";         \
-        }                                                                \
-    }
 
 const std::vector<const char*> validationLayers = {"VK_LAYER_KHRONOS_validation"};
 

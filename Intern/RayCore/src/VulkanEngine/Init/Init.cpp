@@ -26,6 +26,34 @@ void VulkanEngine::init(VulkanEngineInitSpec_t spec) {
     m_state = EngineStates_t::PRERUN;
 }
 
+/**
+ * @brief This Function initilizes primordial Vulkan things (Instance, Device, etc.)
+ *
+ */
+void VulkanEngine::newInit() {
+    createInstance();
+    setupDebugMessenger();
+    pickDevice();
+    createCommandPool();      // FIXME(OS) So far we need one GlobalPool and
+    createCommandBuffers(1);  // 1 Command Buffer
+    newCreateSemaphores(1);   // FIXME(OS) We only need one Sempahore (+1 for Transfer in handler)
+    prepareVma();
+    createCache();
+    initBufferHandler();
+}
+/**
+ * @brief Initializes the Buffer Handler
+ * Call after 'init'
+ *
+ */
+void VulkanEngine::initBufferHandler() {
+    m_BufferHandler = std::make_unique<BufferHandler>(m_Device, m_VmaAllocator, m_computeFamily, getStagingBufferSize());
+}
+
+void VulkanEngine::createComputePipelinePass(const ComputePassCreateInfo& createInfo) {
+    m_ComputePass = std::make_unique<ComputePass>(m_Device, createInfo);
+}
+
 }  // namespace RAYX
 
 #endif

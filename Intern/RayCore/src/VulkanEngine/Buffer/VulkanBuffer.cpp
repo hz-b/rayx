@@ -4,15 +4,6 @@
 
 namespace RAYX {
 
-inline VkDescriptorSetLayoutBinding descriptorSetLayoutBinding(VkDescriptorType type, VkShaderStageFlags flags, uint32_t binding,
-                                                               uint32_t count = 1) {
-    VkDescriptorSetLayoutBinding set_layout_binding{};
-    set_layout_binding.descriptorType = type;
-    set_layout_binding.stageFlags = flags;
-    set_layout_binding.binding = binding;
-    set_layout_binding.descriptorCount = count;
-    return set_layout_binding;
-}
 VulkanBuffer::VulkanBuffer(const VmaAllocator& vmaAllocator, VulkanBufferCreateInfo createInfo)
     : m_VmaAllocator(vmaAllocator), m_createInfo(createInfo) {
     int bufferUsageFlags = VK_BUFFER_USAGE_STORAGE_BUFFER_BIT;  // Always storage buffer;
@@ -23,10 +14,13 @@ VulkanBuffer::VulkanBuffer(const VmaAllocator& vmaAllocator, VulkanBufferCreateI
     } else {
         bufferUsageFlags |= VK_BUFFER_USAGE_TRANSFER_SRC_BIT | VK_BUFFER_USAGE_TRANSFER_DST_BIT;
     }
-    createVmaBuffer(m_createInfo.size, bufferUsageFlags, m_Buffer, m_Alloca, &m_AllocaInfo);
-
-    // Defaults to compute buffers! TODO(OS): Once multiple pipelines are available implement more flagBITs!
-    m_DescriptorSetLayoutBinding = descriptorSetLayoutBinding(createInfo.bufferType, VK_SHADER_STAGE_COMPUTE_BIT, createInfo.binding);
+    if (createInfo.size != 0) {
+        createVmaBuffer(m_createInfo.size, bufferUsageFlags, m_Buffer, m_Alloca, &m_AllocaInfo);
+    }
+    // Defaults to compute buffers!
+    // TODO(OS): Once multiple pipelines are available implement more flagBITs!
+    m_DescriptorSetLayoutBinding =
+        VKINIT::Descriptor::descriptor_set_layout_binding(createInfo.bufferType, VK_SHADER_STAGE_COMPUTE_BIT, createInfo.newBinding.binding);
 }
 
 VulkanBuffer::~VulkanBuffer() { vmaDestroyBuffer(m_VmaAllocator, m_Buffer, m_Alloca); }
@@ -64,24 +58,6 @@ void VulkanBuffer::createVmaBuffer(VkDeviceSize size, VkBufferUsageFlags buffer_
     }
     m_VmaFlags = flags;
 }
-
-// // find memory type with desired properties.
-// uint32_t findMemoryType(VkPhysicalDevice& physicalDevice, uint32_t memoryTypeBits, VkMemoryPropertyFlags properties) {
-//     RAYX_PROFILE_FUNCTION();
-//     VkPhysicalDeviceMemoryProperties memoryProperties;
-
-//     vkGetPhysicalDeviceMemoryProperties(physicalDevice, &memoryProperties);
-
-//     /*
-//     How does this search work?
-//     See the documentation of VkPhysicalDeviceMemoryProperties for a detailed
-//     description.
-//     */
-//     for (uint32_t i = 0; i < memoryProperties.memoryTypeCount; ++i) {
-//         if ((memoryTypeBits & (1 << i)) && ((memoryProperties.memoryTypes[i].propertyFlags & properties) == properties)) return i;
-//     }
-//     return (uint32_t)-1;
-// }
 
 void* VulkanBuffer::getMappedMemory() {
     void* buf;

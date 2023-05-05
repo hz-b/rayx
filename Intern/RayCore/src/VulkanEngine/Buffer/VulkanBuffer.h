@@ -22,6 +22,11 @@ typedef enum BufferAccessFlags {
  *
  */
 struct VulkanBufferCreateInfo {
+    struct BufferToShaderDescriptorBinding {
+        std::string shaderName;
+        uint32_t binding;
+    };
+
     // Unique Buffer name
     const char* bufName;
     // Access type to Buffer
@@ -30,13 +35,13 @@ struct VulkanBufferCreateInfo {
     VkDeviceSize size;
     // used to map the vulkan buffers to the shader buffers.
     // Lines like `layout (binding = _)` declare buffers in the shader.
-    [[deprecated]] uint32_t binding; 
+    BufferToShaderDescriptorBinding newBinding;
 
     // What kind of buffer is it (Storage, Image, Uniform etc.)
     VkDescriptorType bufferType = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER;
 };
 
-//class VulkanEngine;
+// class VulkanEngine;
 /**
  * @brief Vulkan Storage Buffer Class. Used for Buffer allocation, creation and update
  *
@@ -45,7 +50,6 @@ class RAYX_API VulkanBuffer {
     friend class BufferHandler;
 
   public:
-    VulkanBuffer() = default;
     VulkanBuffer(const VmaAllocator&, VulkanBufferCreateInfo createInfo);
     ~VulkanBuffer();
 
@@ -72,7 +76,6 @@ class RAYX_API VulkanBuffer {
     VkDeviceMemory m_Memory = VK_NULL_HANDLE;
     VmaAllocation m_Alloca = VK_NULL_HANDLE;
     VmaAllocationInfo m_AllocaInfo;
-    VkDescriptorSetLayoutBinding m_DescriptorSetLayoutBinding;
 };  // namespace RAYX
 
 }  // namespace RAYX

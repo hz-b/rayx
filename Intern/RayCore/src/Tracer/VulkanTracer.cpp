@@ -77,6 +77,28 @@ std::vector<Ray> VulkanTracer::traceRaw(const TraceRawConfig& cfg) {
 
     return out;
 }
+/**
+ * @brief New Tracing Function to replace TraceRaw
+ *
+ * @param cfg
+ */
+std::vector<Ray> VulkanTracer::newTraceRaw(const TraceRawConfig& cfg) {
+    // init, if not yet initialized.
+    if (m_engine.state() == VulkanEngine::EngineStates_t::PREINIT) {
+        m_engine.newInit();
+        {
+            // Compute Buffers Meta
+            VulkanBufferCreateInfo bufferCreateInfo = {"ray-buffer", VKBUFFER_IN, cfg.m_rays.size(), {"FullTracer", 0}};
+            m_engine.getBufferHandler()->createBuffer(bufferCreateInfo);
+        }
+        ShaderStageCreateInfo shaderCreateInfo = {.name = "FullTracer", .shaderPath = "build/bin/comp.spv", .entryPoint = "main"};
+
+        std::vector<ShaderStageCreateInfo> shaderStages[1];
+        shaderList[0] = {.}
+
+                        m_engine.createComputePipelinePass({.passName = "Beamline Trace Pass", .shaderStagesCreateInfos})
+    }
+}  // namespace RAYX
 
 void VulkanTracer::setPushConstants(const PushConstants* p) {
     if (sizeof(*p) > 128) RAYX_WARN << "Using pushConstants bigger than 128 Bytes might be unsupported on some GPUs. Check Compute Info";
