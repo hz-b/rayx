@@ -19,21 +19,32 @@ BufferHandler::~BufferHandler() {
     }
 
     // Destroy staging buffer
-    vmaDestroyBuffer(m_VmaAllocator, m_StagingBuffer.getBuffer(), m_StagingBuffer.m_Alloca);
+    vmaDestroyBuffer(m_VmaAllocator, m_StagingBuffer->getBuffer(), m_StagingBuffer->m_Alloca);
 
     // Destroy user-defined buffers
     for (auto& [name, buf] : m_Buffers) {
         vmaDestroyBuffer(m_VmaAllocator, buf.getBuffer(), buf.m_Alloca);
     }
 }
-std::vector<VkDescriptorSetLayoutBinding> BufferHandler::getVulkanBufferBindings() {
-    // TODO(OS) We need correct bindings and not all so enhance this by moving it to Shader
-    std::vector<VkDescriptorSetLayoutBinding> result;
-    result.reserve(m_Buffers.size());
-    for (const auto& x : m_Buffers) {
-        result.push_back(x.second.m_DescriptorSetLayoutBinding);
+// std::vector<VkDescriptorSetLayoutBinding> BufferHandler::getVulkanBufferBindings() {
+//     // TODO(OS) We need correct bindings and not all so enhance this by moving it to Shader
+//     std::vector<VkDescriptorSetLayoutBinding> result;
+//     result.reserve(m_Buffers.size());
+//     for (const auto& x : m_Buffers) {
+//         result.push_back(x.second.m_DescriptorSetLayoutBinding);
+//     }
+//     return result;
+// }
+
+std::vector<VkDescriptorSetLayoutBinding> BufferHandler::getDescriptorBindings(Pass* pass) {
+    RAYX_PROFILE_FUNCTION();
+    std::vector<VkDescriptorSetLayoutBinding> bindings;
+
+    bindings.reserve(m_DescriptorBindings.size());
+    for (const auto& [binding, b] : m_DescriptorBindings) {
+        bindings.push_back({binding, VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, 1, VK_SHADER_STAGE_COMPUTE_BIT, nullptr});
     }
-    return result;
+    return bindings;
 }
 
 void BufferHandler::createTransferCommandBuffer() {
@@ -79,28 +90,28 @@ void BufferHandler::gpuMemcpy(VulkanBuffer& buffer_dst, size_t offset_dst, Vulka
 }
 
 void BufferHandler::createStagingBuffer() {
-    m_StagingBuffer.m_VmaAllocator = m_VmaAllocator;
+    m_StagingBuffer->m_VmaAllocator = m_VmaAllocator;
 
     VulkanBufferCreateInfo createInfo = {};
     createInfo.bufName = "Staging-buffer";
     createInfo.accessType = VKBUFFER_INOUT;
     createInfo.size = m_StagingSize;
 
-    m_StagingBuffer.m_createInfo = createInfo;
-    m_StagingBuffer.createVmaBuffer(
+    m_StagingBuffer->m_createInfo = createInfo;
+    m_StagingBuffer->createVmaBuffer(
         m_StagingSize, VK_BUFFER_USAGE_TRANSFER_DST_BIT | VK_BUFFER_USAGE_TRANSFER_SRC_BIT | VK_BUFFER_USAGE_STORAGE_BUFFER_BIT,
-        m_StagingBuffer.m_Buffer, m_StagingBuffer.m_Alloca, &m_StagingBuffer.m_AllocaInfo,
+        m_StagingBuffer->m_Buffer, m_StagingBuffer->m_Alloca, &m_StagingBuffer->m_AllocaInfo,
         VMA_ALLOCATION_CREATE_HOST_ACCESS_RANDOM_BIT | VMA_ALLOCATION_CREATE_MAPPED_BIT, VMA_MEMORY_USAGE_AUTO_PREFER_HOST);
 }
 
 void BufferHandler::loadFromStagingBuffer(char* outdata, size_t bytes) {
-    memcpy(outdata, m_StagingBuffer.getMappedMemory(), bytes);
-    m_StagingBuffer.UnmapMemory();
+    memcpy(outdata, m_StagingBuffer->getMappedMemory(), bytes);
+    m_StagingBuffer->UnmapMemory();
 }
 
 void BufferHandler::storeToStagingBuffer(char* indata, size_t bytes) {
-    memcpy(m_StagingBuffer.getMappedMemory(), indata, bytes);
-    m_StagingBuffer.UnmapMemory();
+    memcpy(m_StagingBuffer->getMappedMemory(), indata, bytes);
+    m_StagingBuffer->UnmapMemory();
 }
 
 void BufferHandler::waitTransferQueueIdle() { vkQueueWaitIdle(m_TransferQueue); }
@@ -126,7 +137,7 @@ void BufferHandler::readBufferRaw(const char* bufname, char* outdata, const VkQu
 
     while (remainingBytes > 0) {
         size_t localbytes = std::min((size_t)m_StagingSize, remainingBytes);
-        gpuMemcpy(m_StagingBuffer, 0, b, offset, localbytes);
+        gpuMemcpy(*m_StagingBuffer, 0, b, offset, localbytes);
         m_TransferFence->wait();
         loadFromStagingBuffer(outdata + offset, localbytes);
         offset += localbytes;
@@ -146,7 +157,7 @@ void BufferHandler::writeBufferRaw(const char* bufname, char* indata) {
     while (remainingBytes > 0) {
         size_t localbytes = std::min(remainingBytes, (size_t)m_StagingSize);
         storeToStagingBuffer(indata + offset, localbytes);
-        gpuMemcpy(b, offset, m_StagingBuffer, 0, localbytes);
+        gpuMemcpy(b, offset, *m_StagingBuffer, 0, localbytes);
 
         offset += localbytes;
         remainingBytes -= localbytes;
@@ -155,19 +166,19 @@ void BufferHandler::writeBufferRaw(const char* bufname, char* indata) {
 }
 /**
  * @brief Create a buffer a fill it
- * 
- * @tparam T 
- * @param createInfo Buffer creation Info 
+ *
+ * @tparam T
+ * @param createInfo Buffer creation Info
  * @param vec Vector to fill Buffer with
  */
 template <typename T>
-void BufferHandler::createBuffer(VulkanBufferCreateInfo createInfo, const std::vector<T>& vec) {
+VulkanBuffer* BufferHandler::createBuffer(VulkanBufferCreateInfo createInfo, const std::vector<T>& vec) {
     auto name = createInfo.bufName;
     if (m_Buffers.find(name) != m_Buffers.end()) {
         RAYX_ERR << "Buffer " << name << " already exists. Try update func.";
         return;
     }
-
+    createInfo.size = vec.size() * sizeof(T);
     auto newBuffer = VulkanBuffer(m_VmaAllocator, createInfo);
 
     m_Buffers[name] = newBuffer;
@@ -178,10 +189,10 @@ void BufferHandler::createBuffer(VulkanBufferCreateInfo createInfo, const std::v
 }
 /**
  * @brief  Creates an "empty" buffer
- * 
- * @param createInfo 
+ *
+ * @param createInfo
  */
-void BufferHandler::createBuffer(VulkanBufferCreateInfo createInfo) {
+VulkanBuffer* BufferHandler::createBuffer(VulkanBufferCreateInfo createInfo) {
     auto name = createInfo.bufName;
     if (m_Buffers.find(name) != m_Buffers.end()) {
         RAYX_ERR << "Buffer " << name << " already exists. Try update func.";
@@ -191,6 +202,7 @@ void BufferHandler::createBuffer(VulkanBufferCreateInfo createInfo) {
     auto newBuffer = VulkanBuffer(m_VmaAllocator, createInfo);
 
     m_Buffers[name] = newBuffer;
+    return &m_Buffers[name];
 }
 
 template <typename T>

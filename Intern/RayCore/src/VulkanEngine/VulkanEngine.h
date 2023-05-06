@@ -135,14 +135,14 @@ class RAYX_API VulkanEngine {
         size_t size;
     } m_pushConstants;
 
+    std::unique_ptr<BufferHandler> m_BufferHandler;  // new
+    std::unique_ptr<ComputePass> m_ComputePass;      // New
+    std::unique_ptr<Pass> m_Pass;                    // New
+
   private:
     EngineStates_t m_state = EngineStates_t::PREINIT;
     const char* m_shaderfile;
     uint32_t m_numberOfInvocations;
-
-    std::unique_ptr<BufferHandler> m_BufferHandler;  // new
-    std::unique_ptr<ComputePass> m_ComputePass;      // New
-    std::unique_ptr<Pass> m_Pass;                    // New
 
     /// stores the Buffers by name.
     std::map<std::string, Buffer_t> m_buffers;

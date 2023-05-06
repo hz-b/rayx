@@ -7,6 +7,7 @@
 #include <vulkan/vulkan.hpp>
 
 #include "RayCore.h"
+#include "VulkanEngine/Run/Pipeline.h"
 #include "VulkanEngine/VulkanEngine.h"
 
 namespace RAYX {
@@ -22,20 +23,12 @@ typedef enum BufferAccessFlags {
  *
  */
 struct VulkanBufferCreateInfo {
-    struct BufferToShaderDescriptorBinding {
-        std::string shaderName;
-        uint32_t binding;
-    };
-
     // Unique Buffer name
     const char* bufName;
     // Access type to Buffer
     BufferAccessFlags accessType;
     // Size
-    VkDeviceSize size;
-    // used to map the vulkan buffers to the shader buffers.
-    // Lines like `layout (binding = _)` declare buffers in the shader.
-    BufferToShaderDescriptorBinding newBinding;
+    VkDeviceSize size = 0;
 
     // What kind of buffer is it (Storage, Image, Uniform etc.)
     VkDescriptorType bufferType = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER;
@@ -63,6 +56,8 @@ class RAYX_API VulkanBuffer {
     void* getMappedMemory();
     void UnmapMemory();
 
+    void addDescriptorSetPerPassBinding(Pass*, uint32_t);
+
   private:
     // VMA Version of createVkBuffer
     void createVmaBuffer(VkDeviceSize size, VkBufferUsageFlags buffer_usage, VkBuffer& buffer, VmaAllocation& allocation,
@@ -76,6 +71,7 @@ class RAYX_API VulkanBuffer {
     VkDeviceMemory m_Memory = VK_NULL_HANDLE;
     VmaAllocation m_Alloca = VK_NULL_HANDLE;
     VmaAllocationInfo m_AllocaInfo;
+    std::map<Pass*, VkDescriptorSetLayoutBinding> m_DescriptorSetBindings;
 };  // namespace RAYX
 
 }  // namespace RAYX

@@ -73,7 +73,7 @@ class RAYX_API Pass {
 struct ComputePassCreateInfo {
     const char* passName;
     std::vector<ShaderStageCreateInfo> shaderStagesCreateInfos = {};
-    int descriptorSetAmount = 1
+    int descriptorSetAmount = 1;
 };
 
 /**
@@ -99,9 +99,6 @@ class RAYX_API ComputePass : public Pass {
 
     // Get bindings associated with the current Shader Module
     std::vector<VkDescriptorSetLayoutBinding> getDescriptorBindings();
-    // Add/replace a binding
-    // The buffer has to be an existent buffer!
-    void addBufferBinding(uint32_t binding, const char* buffer);
 
   private:
     void createDescriptorPool();
@@ -116,8 +113,6 @@ class RAYX_API ComputePass : public Pass {
 
     VkDescriptorPool m_DescriptorPool = VK_NULL_HANDLE;
     VkPipelineBindPoint m_PipelineBindPoint = VK_PIPELINE_BIND_POINT_COMPUTE;  // Always compute
-
-    std::map<uint32_t, VkDescriptorSetLayoutBinding> m_DescriptorBindings;
 
     std::vector<VkDescriptorSetLayout> m_descriptorSetLayouts = {VK_NULL_HANDLE};  // For now, only one [0]
     std::vector<VkDescriptorSet> descriptorSets = {VK_NULL_HANDLE};                // For now, only one [0]

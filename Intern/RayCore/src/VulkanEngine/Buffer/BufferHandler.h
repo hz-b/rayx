@@ -22,8 +22,8 @@ class RAYX_API BufferHandler {
     ~BufferHandler();
 
     template <typename T>
-    void createBuffer(VulkanBufferCreateInfo createInfo, const std::vector<T>& vec = nullptr);
-    void createBuffer(VulkanBufferCreateInfo createInfo);
+    VulkanBuffer* createBuffer(VulkanBufferCreateInfo createInfo, const std::vector<T>& vec = nullptr);
+    VulkanBuffer* createBuffer(VulkanBufferCreateInfo createInfo);
     template <typename T>
     inline std::vector<T> readBuffer(const char* bufname, bool indirect);
 
@@ -34,13 +34,13 @@ class RAYX_API BufferHandler {
     void freeBuffer(const char* bufname);
     void waitTransferQueueIdle();
 
-    const VulkanBuffer& getStagingBuffer() const { return m_StagingBuffer; }
+    std::vector<VkDescriptorSetLayoutBinding> getDescriptorBindings(Pass* pass);
+
+    const VulkanBuffer& getStagingBuffer() const { return *m_StagingBuffer; }
     // TODO(OS): This function should be almost illegal...
     const VulkanBuffer& getVulkanBuffer(std::string bufferName) { return m_Buffers[bufferName]; }
 
     const VkFence* getTransferFence() const { return m_TransferFence->fence(); }
-
-    std::vector<VkDescriptorSetLayoutBinding> getVulkanBufferBindings();
 
   private:
     void createStagingBuffer();
@@ -66,10 +66,12 @@ class RAYX_API BufferHandler {
 
     VmaAllocator m_VmaAllocator;
 
-    VulkanBuffer m_StagingBuffer;
+    std::unique_ptr<VulkanBuffer> m_StagingBuffer;
     size_t m_StagingSize;
 
-    std::map<std::string, VulkanBuffer> m_Buffers;
+    std::map<std::string, VulkanBuffer> m_Buffers = {};
+
+    std::map<Pass&, std::vector<VulkanBuffer&>> m_passToBufferBindings = {};
 
     // TODO(OS): Use this instead of m_Buffers once ready
     std::map<std::string, VulkanBuffer> m_ComputeBuffers;

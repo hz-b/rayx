@@ -6,15 +6,14 @@
 #include "Debug/Instrumentor.h"
 namespace RAYX {
 ShaderStage::ShaderStage(VkDevice& device, const ShaderStageCreateInfo& createInfo)
-    : m_Device(device), m_name(createInfo.name.c_str()), m_entryPoint(createInfo.entryPoint.c_str()), m_path(createInfo.shaderPath) {
+    : m_Device(device),
+      m_name(createInfo.name.c_str()),
+      m_entryPoint(createInfo.entryPoint.c_str()),
+      m_path(createInfo.shaderPath),
+      m_shaderType(createInfo.shaderType) {
     RAYX_LOG << "Creating shader stage...";
     // Create Vulkan Shader Module
     createShaderModule();
-
-    // Fill bindings
-    for (int i = 0; i < createInfo.bufferBindings.size(); i++) {
-        addBufferBinding(i, createInfo.bufferBindings[i]);
-    }
 }
 
 ShaderStage::~ShaderStage() { vkDestroyShaderModule(m_Device, m_shaderModule, nullptr); }
@@ -39,7 +38,6 @@ void ShaderStage::createShaderModule() {
     RAYX_VERB << "Shader module " << m_name << " created.";
     delete[] shaderCode;
 }
-
 
 VkPipelineShaderStageCreateInfo ShaderStage::getPipelineShaderCreateInfo() {
     /* we specify the compute shader stage, and it's entry

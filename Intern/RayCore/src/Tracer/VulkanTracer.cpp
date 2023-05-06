@@ -83,20 +83,71 @@ std::vector<Ray> VulkanTracer::traceRaw(const TraceRawConfig& cfg) {
  * @param cfg
  */
 std::vector<Ray> VulkanTracer::newTraceRaw(const TraceRawConfig& cfg) {
-    // init, if not yet initialized.
+    // Fetch CFG Data
+    auto rayList = cfg.m_rays;
+    const uint32_t numberOfRays = rayList.size();
+
+    std::vector<double> beamlineData;
+    beamlineData.reserve(cfg.m_elements.size());
+
+    for (Element e : cfg.m_elements) {
+        auto ptr = (double*)&e;
+        const size_t len = sizeof(Element) / sizeof(double);
+        // the number of doubles needs to be divisible by 16, otherwise it might introduce padding.
+        static_assert(len % 16 == 0);
+        for (unsigned int i = 0; i < len; i++) {
+            beamlineData.push_back(ptr[i]);
+        }
+    }
+
+    auto materialTables = cfg.m_materialTables;
+
+    // Init Vulkan, if not yet initialized.
     if (m_engine.state() == VulkanEngine::EngineStates_t::PREINIT) {
         m_engine.newInit();
-        {
-            // Compute Buffers Meta
-            VulkanBufferCreateInfo bufferCreateInfo = {"ray-buffer", VKBUFFER_IN, cfg.m_rays.size(), {"FullTracer", 0}};
-            m_engine.getBufferHandler()->createBuffer(bufferCreateInfo);
-        }
+
+        // Create first Shader Stage
         ShaderStageCreateInfo shaderCreateInfo = {.name = "FullTracer", .shaderPath = "build/bin/comp.spv", .entryPoint = "main"};
+        // Merge all stages
+        std::vector<ShaderStageCreateInfo> shaderStages = {shaderCreateInfo};
 
-        std::vector<ShaderStageCreateInfo> shaderStages[1];
-        shaderList[0] = {.}
+        // Create Compute Pass
+        m_engine.createComputePipelinePass({.passName = "Beamline Trace Pass", .shaderStagesCreateInfos = shaderStages});
 
-                        m_engine.createComputePipelinePass({.passName = "Beamline Trace Pass", .shaderStagesCreateInfos})
+        // Create Buffers and bind them to Pass through Descriptors
+        {
+            auto pass = m_engine.m_ComputePass.get();
+            // Compute Buffers Meta
+            // Bindings are *IN ORDER*
+            m_engine.getBufferHandler()
+                ->createBuffer<Ray>({"ray-buffer", VKBUFFER_IN}, rayList)  // Input Ray Buffer
+                ->addDescriptorSetPerPassBinding(pass, 0);
+
+            m_engine.getBufferHandler()
+                ->createBuffer({"output-buffer", VKBUFFER_OUT, (numberOfRays * sizeof(Ray) * cfg.m_maxSnapshots)})  // Output Ray Buffer
+                ->addDescriptorSetPerPassBinding(pass, 1);
+
+            m_engine.getBufferHandler()
+                ->createBuffer<double>({"quadric-buffer", VKBUFFER_IN}, beamlineData)  // Beamline quadric info
+                ->addDescriptorSetPerPassBinding(pass, 2);
+
+            m_engine.getBufferHandler()
+                ->createBuffer({"xyznull-buffer", VKBUFFER_IN, 100})  // FIXME(OS): This buffer is not needed?
+                ->addDescriptorSetPerPassBinding(pass, 3);
+
+            m_engine.getBufferHandler()
+                ->createBuffer<int>({"material-index-table", VKBUFFER_IN}, materialTables.indexTable)  /// Material info
+                ->addDescriptorSetPerPassBinding(pass, 4);
+
+            m_engine.getBufferHandler()
+                ->createBuffer<double>({"material-table", VKBUFFER_IN}, materialTables.materialTable)  // Material info
+                ->addDescriptorSetPerPassBinding(pass, 5);
+#ifdef RAYX_DEBUG_MODE
+            m_engine.getBufferHandler()
+                ->createBuffer({"debug-buffer", VKBUFFER_OUT, numberOfRays * sizeof(debugBuffer_t)})  // Debug Matrix Buffer
+                ->addDescriptorSetPerPassBinding(pass, 6);
+#endif
+        }
     }
 }  // namespace RAYX
 

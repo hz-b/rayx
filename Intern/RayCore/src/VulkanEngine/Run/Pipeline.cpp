@@ -11,33 +11,32 @@
 
 namespace RAYX {
 
-Pass::Pipeline::Pipeline(std::string name, VkDevice& dev, const ShaderStageCreateInfo& shaderCreateInfo)
-    : m_name(std::move(name)), m_device(dev) {
+Pass::Pipeline::Pipeline(std::string name, VkDevice& dev, const ShaderStageCreateInfo& shaderCreateInfo) : m_name(std::move(name)), m_device(dev) {
     // TODO(OS): Don't reserve 1 for the descriptors
     shaderStage = std::make_shared<ShaderStage>(m_device, shaderCreateInfo);
 }
 Pass::Pipeline::~Pipeline() { cleanPipeline(m_device); };
 
 void Pass::Pipeline::createPipelineLayout() {
-    //if (!m_descriptorSetLayouts.empty()) {
-        /*
-        The pipeline layout allows the pipeline to access descriptor sets.
-        So we just specify the descriptor set layout we created earlier.
-        */
-        // TODO(OS): Only one Set supported
-        auto pipelineLayoutCreateInfo =
-            VKINIT::Pipeline::pipeline_layout_create_info(&m_descriptorSetLayouts[0], static_cast<uint32_t>(m_descriptorSetLayouts.size()));
+    // if (!m_descriptorSetLayouts.empty()) {
+    /*
+    The pipeline layout allows the pipeline to access descriptor sets.
+    So we just specify the descriptor set layout we created earlier.
+    */
+    // TODO(OS): Only one Set supported
+    auto pipelineLayoutCreateInfo =
+        VKINIT::Pipeline::pipeline_layout_create_info(&m_descriptorSetLayouts[0], static_cast<uint32_t>(m_descriptorSetLayouts.size()));
 
-        /*
-        Add push constants to the Pipeline
-        */
-        auto pushConstant = VKINIT::misc::push_constant_range(VK_SHADER_STAGE_COMPUTE_BIT, pushConstants.size,
-                                                              0);  // Can change Offset if some of the struct is to be ignored
+    /*
+    Add push constants to the Pipeline
+    */
+    auto pushConstant = VKINIT::misc::push_constant_range(VK_SHADER_STAGE_COMPUTE_BIT, pushConstants.size,
+                                                          0);  // Can change Offset if some of the struct is to be ignored
 
-        pipelineLayoutCreateInfo.pPushConstantRanges = &pushConstant;
-        pipelineLayoutCreateInfo.pushConstantRangeCount = 1;  // One struct of pushConstants
+    pipelineLayoutCreateInfo.pPushConstantRanges = &pushConstant;
+    pipelineLayoutCreateInfo.pushConstantRangeCount = 1;  // One struct of pushConstants
 
-        VK_CHECK_RESULT(vkCreatePipelineLayout(m_device, &pipelineLayoutCreateInfo, nullptr, &m_pipelineLayout))
+    VK_CHECK_RESULT(vkCreatePipelineLayout(m_device, &pipelineLayoutCreateInfo, nullptr, &m_pipelineLayout))
     //}
 }
 
@@ -175,11 +174,6 @@ std::vector<VkDescriptorSetLayoutBinding> ComputePass::getDescriptorBindings() {
         bindings.push_back({binding, VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, 1, VK_SHADER_STAGE_COMPUTE_BIT, nullptr});
     }
     return bindings;
-}
-
-// Add a buffer binding or update binding if existent
-void ComputePass::addBufferBinding(uint32_t binding, const char* buffer) {
-    m_DescriptorBindings.insert(std::pair<uint32_t, const char*>(binding, buffer));
 }
 
 void ComputePass::addPipelineStage(const ShaderStageCreateInfo& createInfo) {

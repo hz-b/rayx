@@ -2,6 +2,7 @@
 
 #include "VulkanBuffer.h"
 
+#include "VulkanEngine/Init/ShaderStage.h"
 namespace RAYX {
 
 VulkanBuffer::VulkanBuffer(const VmaAllocator& vmaAllocator, VulkanBufferCreateInfo createInfo)
@@ -17,10 +18,6 @@ VulkanBuffer::VulkanBuffer(const VmaAllocator& vmaAllocator, VulkanBufferCreateI
     if (createInfo.size != 0) {
         createVmaBuffer(m_createInfo.size, bufferUsageFlags, m_Buffer, m_Alloca, &m_AllocaInfo);
     }
-    // Defaults to compute buffers!
-    // TODO(OS): Once multiple pipelines are available implement more flagBITs!
-    m_DescriptorSetLayoutBinding =
-        VKINIT::Descriptor::descriptor_set_layout_binding(createInfo.bufferType, VK_SHADER_STAGE_COMPUTE_BIT, createInfo.newBinding.binding);
 }
 
 VulkanBuffer::~VulkanBuffer() { vmaDestroyBuffer(m_VmaAllocator, m_Buffer, m_Alloca); }
@@ -74,6 +71,12 @@ void VulkanBuffer::UnmapMemory() {
     } else {
         vmaUnmapMemory(m_VmaAllocator, m_Alloca);
     }
+}
+
+void VulkanBuffer::addDescriptorSetPerPassBinding(Pass* pass, uint32_t binding) {
+    auto shaderStageFlag = pass->getShaderStage(0).getShaderStageFlagBits();
+    auto b = VKINIT::Descriptor::descriptor_set_layout_binding(m_createInfo.bufferType, shaderStageFlag, binding);
+    m_DescriptorSetBindings.insert(std::pair<Pass*, VkDescriptorSetLayoutBinding>(pass, b));
 }
 
 }  // namespace RAYX

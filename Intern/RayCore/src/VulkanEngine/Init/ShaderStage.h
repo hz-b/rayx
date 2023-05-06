@@ -17,8 +17,8 @@ struct ShaderStageCreateInfo {
     std::filesystem::path shaderPath;
     // Entry Point inside the shader file
     std::string entryPoint;
-    // Used for buffer Bindings
-    std::vector<const char*> bufferBindings;
+
+    VkShaderStageFlagBits shaderType = VK_SHADER_STAGE_COMPUTE_BIT;
 };
 /**
  * @brief A Shade node/Stage inside a pipelineStage
@@ -39,11 +39,14 @@ class RAYX_API ShaderStage {
     // Used for Pipeline creation
     VkPipelineShaderStageCreateInfo getPipelineShaderCreateInfo();
 
+    const VkShaderStageFlagBits getShaderStageFlagBits() const { return m_shaderType; }
+
   private:
     VkDevice& m_Device;
     const char* m_name = nullptr;
     const char* m_entryPoint = nullptr;
     std::filesystem::path m_path;
+    VkShaderStageFlagBits m_shaderType;
     VkShaderModule m_shaderModule = VK_NULL_HANDLE;
 
     void createShaderModule();
