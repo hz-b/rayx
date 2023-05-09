@@ -55,6 +55,7 @@ glm::dmat4 defaultInMatrix(const DesignObject& dobj);
 glm::dmat4 defaultOutMatrix(const DesignObject& dobj);
 double defaultMaterial(const DesignObject& dobj);
 Rad defaultAzimuthalAngle(const DesignObject& dobj);
-Element defaultElement(const DesignObject& dobj);
+Element defaultElement(const DesignObject& dobj, Behaviour behaviour, Surface surface);
+Surface makePlane();
 
 }  // namespace RAYX

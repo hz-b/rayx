@@ -86,9 +86,8 @@ Rad defaultAzimuthalAngle(const DesignObject& dobj) {
     return azim;
 }
 
-Element defaultElement(const DesignObject& dobj) {
-    // default element is a plane mirror
-    auto surface = serializeQuadric({
+Surface makePlane() {
+    return serializeQuadric({
         .m_icurv = 1,
         .m_a11 = 0,
         .m_a12 = 0,
@@ -101,15 +100,16 @@ Element defaultElement(const DesignObject& dobj) {
         .m_a34 = 0,
         .m_a44 = 0,
     });
+}
+
+Element defaultElement(const DesignObject& dobj, Behaviour behaviour, Surface surface) {
     auto slopeError = dobj.parseSlopeError();
 
     return Element{
         .m_inTrans = defaultInMatrix(dobj),
         .m_outTrans = defaultOutMatrix(dobj),
-        // TODO behaviour & surface shouldn't have default values!
-        .m_behaviour = serializeMirror(),
+        .m_behaviour = behaviour,
         .m_surface = surface,
-
         .m_cutout = dobj.parseCutout(),
         .m_slopeError = {slopeError[0], slopeError[1], slopeError[2], slopeError[3], slopeError[4], slopeError[5], slopeError[6]},
         .m_azimuthalAngle = defaultAzimuthalAngle(dobj).rad,

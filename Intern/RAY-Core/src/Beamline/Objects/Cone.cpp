@@ -5,8 +5,6 @@
 
 namespace RAYX {
 Element makeCone(const DesignObject& dobj) {
-    auto element = defaultElement(dobj);
-
     auto incidence = dobj.parseGrazingIncAngle();
     double entranceArmLength = dobj.parseEntranceArmLength();
     double exitArmLength = dobj.parseExitArmLength();
@@ -46,7 +44,8 @@ Element makeCone(const DesignObject& dobj) {
         a24 = -upstreamRadius_R;
     }
 
-    element.m_surface = serializeQuadric({
+    auto behaviour = serializeMirror();
+    auto surface = serializeQuadric({
         .m_icurv = icurv,
         .m_a11 = a11,
         .m_a12 = 0,
@@ -59,7 +58,6 @@ Element makeCone(const DesignObject& dobj) {
         .m_a34 = 0,
         .m_a44 = 0,
     });
-    element.m_behaviour = serializeMirror();
-    return element;
+    return defaultElement(dobj, behaviour, surface);
 }
 }  // namespace RAYX

@@ -14,8 +14,8 @@ Element makeSphereMirror(const DesignObject& dobj) {
     auto grazingIncidenceAngle = dobj.parseGrazingIncAngle();
     auto radius = 2.0 / grazingIncidenceAngle.sin() / (1.0 / entranceArmLength + 1.0 / exitArmLength);
 
-    auto element = defaultElement(dobj);
-    element.m_surface = serializeQuadric({
+    auto behaviour = serializeMirror();
+    auto surface = serializeQuadric({
         .m_icurv = 1,
         .m_a11 = 1,
         .m_a12 = 0,
@@ -28,7 +28,7 @@ Element makeSphereMirror(const DesignObject& dobj) {
         .m_a34 = 0,
         .m_a44 = 0,
     });
-    return element;
+    return defaultElement(dobj, behaviour, surface);
 }
 
 }  // namespace RAYX
