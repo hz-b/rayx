@@ -8,10 +8,7 @@
 namespace RAYX {
 
 Element makeToroidMirror(const DesignObject& dobj) {
-    auto surface = serializeToroid({
-        .m_longRadius = dobj.parseLongRadius(),
-        .m_shortRadius = dobj.parseShortRadius(),
-    });
+    auto surface = makeToroid(dobj);
     auto behaviour = serializeMirror();
     return makeElement(dobj, behaviour, surface);
 }
