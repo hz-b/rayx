@@ -33,22 +33,6 @@ void addBeamlineObjectFromXML(rapidxml::xml_node<>* node, Beamline* beamline, co
         }
     };
 
-    // addOpticalElement(e, node) is a function adding an optical element to the
-    // beamline (if it's not nullptr)
-    const auto addOpticalElement = [&](const std::shared_ptr<OpticalElement>& e, rapidxml::xml_node<>* node) {
-        if (e) {
-            OpticalElement2 e2 = {
-                .m_element = e->intoElement(),
-                .m_name = e->m_name,
-            };
-
-            beamline->m_OpticalElements.push_back(e2);
-        } else {
-            RAYX_ERR << "could not construct OpticalElement with Name: " << node->first_attribute("name")->value()
-                     << "; Type: " << node->first_attribute("type")->value();
-        }
-    };
-
     const auto addOpticalElement2 = [&](Element e, rapidxml::xml_node<>* node) {
         OpticalElement2 e2 = {
             .m_element = e,
@@ -83,7 +67,7 @@ void addBeamlineObjectFromXML(rapidxml::xml_node<>* node, Beamline* beamline, co
     } else if (strcmp(type, "Sphere") == 0) {
         addOpticalElement2(makeSphereMirror(parser), node);
     } else if (strcmp(type, "Reflection Zoneplate") == 0) {
-        addOpticalElement(std::make_shared<ReflectionZonePlate>(parser), node);
+        addOpticalElement2(makeReflectionZonePlate(parser), node);
     } else if (strcmp(type, "Ellipsoid") == 0) {
         addOpticalElement2(makeEllipsoid(parser), node);
     } else if (strcmp(type, "Cylinder") == 0) {

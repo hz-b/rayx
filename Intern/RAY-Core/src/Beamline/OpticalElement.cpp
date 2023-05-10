@@ -118,6 +118,13 @@ Surface makeSphere(double radius) {
     });
 }
 
+Surface makeToroid(const DesignObject& dobj) {
+    return serializeToroid({
+        .m_longRadius = dobj.parseLongRadius(),
+        .m_shortRadius = dobj.parseShortRadius(),
+    });
+}
+
 Behaviour makeGrating(const DesignObject& dobj) {
     auto vls = dobj.parseVls();
     return serializeGrating({

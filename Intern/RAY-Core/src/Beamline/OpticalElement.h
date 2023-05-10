@@ -56,6 +56,7 @@ glm::dmat4 defaultOutMatrix(const DesignObject& dobj);
 double defaultMaterial(const DesignObject& dobj);
 Rad defaultAzimuthalAngle(const DesignObject& dobj);
 Element makeElement(const DesignObject& dobj, Behaviour behaviour, Surface surface);
+Surface makeToroid(const DesignObject& dobj);
 Surface makeSphere(double radius);
 Surface makePlane();
 Behaviour makeGrating(const DesignObject& dobj);
