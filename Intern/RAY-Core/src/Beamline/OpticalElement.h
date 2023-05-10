@@ -13,7 +13,7 @@ namespace RAYX {
 enum class GratingMount { Deviation, Incidence };
 enum class ImageType { Point2Point, Astigmatic2Astigmatic };
 
-struct RAYX_API OpticalElement2 {
+struct RAYX_API OpticalElement {
     Element m_element;
     std::string m_name;
 };
