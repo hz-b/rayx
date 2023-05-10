@@ -118,6 +118,15 @@ Surface makeSphere(double radius) {
     });
 }
 
+Behaviour makeGrating(const DesignObject& dobj) {
+    auto vls = dobj.parseVls();
+    return serializeGrating({
+        .m_vls = {vls[0], vls[1], vls[2], vls[3], vls[4], vls[5]},
+        .m_lineDensity = dobj.parseLineDensity(),
+        .m_orderOfDiffraction = dobj.parseOrderDiffraction(),
+    });
+}
+
 Element defaultElement(const DesignObject& dobj, Behaviour behaviour, Surface surface) {
     auto slopeError = dobj.parseSlopeError();
 

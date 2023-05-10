@@ -8,21 +8,8 @@
 namespace RAYX {
 
 Element makeSphereGrating(const DesignObject& dobj) {
-    // auto designEnergyMounting = dobj.parseDesignEnergy();
-    auto lineDensity = dobj.parseLineDensity();
-    auto orderOfDiffraction = dobj.parseOrderDiffraction();
-    auto vls = dobj.parseVls();
-
-    // auto gratingMount = dobj.parseGratingMount();
-    auto radius = dobj.parseRadius();
-    auto surface = makeSphere(radius);
-
-    auto behaviour = serializeGrating({
-        .m_vls = {vls[0], vls[1], vls[2], vls[3], vls[4], vls[5]},
-        .m_lineDensity = lineDensity,
-        .m_orderOfDiffraction = orderOfDiffraction,
-    });
-
+    auto surface = makeSphere(dobj.parseRadius());
+    auto behaviour = makeGrating(dobj);
     return defaultElement(dobj, behaviour, surface);
 }
 

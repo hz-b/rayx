@@ -58,5 +58,6 @@ Rad defaultAzimuthalAngle(const DesignObject& dobj);
 Element defaultElement(const DesignObject& dobj, Behaviour behaviour, Surface surface);
 Surface makeSphere(double radius);
 Surface makePlane();
+Behaviour makeGrating(const DesignObject& dobj);
 
 }  // namespace RAYX
