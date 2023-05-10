@@ -7,38 +7,8 @@
 
 namespace RAYX {
 
-OpticalElement::OpticalElement(const DesignObject& dobj) {
-    m_name = dobj.name();
-    m_slopeError = dobj.parseSlopeError();
-    m_material = dobj.parseMaterial();
-    m_cutout = dobj.parseCutout();
-    m_azimuthalAngle = defaultAzimuthalAngle(dobj);
-    m_position = dobj.parsePosition();
-    m_orientation = dobj.parseOrientation();
-}
-
-Element OpticalElement::intoElement() const {
-    Element e = Element{
-        .m_inTrans = getInMatrix(),
-        .m_outTrans = getOutMatrix(),
-        .m_behaviour = m_behaviour,
-        .m_surface = m_surface,
-        .m_cutout = m_cutout,
-        .m_slopeError = {m_slopeError[0], m_slopeError[1], m_slopeError[2], m_slopeError[3], m_slopeError[4], m_slopeError[5], m_slopeError[6]},
-        .m_azimuthalAngle = m_azimuthalAngle.rad,
-        .m_material = (double)static_cast<int>(m_material),
-        .m_padding = {0.0},
-    };
-
-    return e;
-}
-
-glm::dmat4 OpticalElement::getInMatrix() const { return calcTransformationMatrices(m_position, m_orientation); }
-glm::dmat4 OpticalElement::getOutMatrix() const { return calcTransformationMatrices(m_position, m_orientation, false); }
-glm::dvec4 OpticalElement::getPosition() const { return m_position; }
-glm::dmat4x4 OpticalElement::getOrientation() const { return m_orientation; }
-
-std::array<double, 7> OpticalElement::getSlopeError() const { return m_slopeError; }
+glm::dmat4x4 defaultInMatrix(const DesignObject& dobj) { return calcTransformationMatrices(dobj.parsePosition(), dobj.parseOrientation(), true); }
+glm::dmat4x4 defaultOutMatrix(const DesignObject& dobj) { return calcTransformationMatrices(dobj.parsePosition(), dobj.parseOrientation(), false); }
 
 /**
  * calculates element to world coordinates transformation matrix and its
@@ -67,10 +37,6 @@ glm::dmat4 calcTransformationMatrices(glm::dvec4 position, glm::dmat4 orientatio
         return glm::transpose(e2g);
     }
 }
-
-glm::dmat4x4 defaultInMatrix(const DesignObject& dobj) { return calcTransformationMatrices(dobj.parsePosition(), dobj.parseOrientation(), true); }
-
-glm::dmat4x4 defaultOutMatrix(const DesignObject& dobj) { return calcTransformationMatrices(dobj.parsePosition(), dobj.parseOrientation(), false); }
 
 double defaultMaterial(const DesignObject& dobj) { return (double)static_cast<int>(dobj.parseMaterial()); }
 
