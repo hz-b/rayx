@@ -4,35 +4,26 @@
 #include "Debug/Debug.h"
 #include "Material/Material.h"
 #include "Shared/Constants.h"
+
 namespace RAYX {
 
-SphereGrating::SphereGrating(const DesignObject& dobj) : OpticalElement(dobj) {
-    m_designEnergyMounting = dobj.parseDesignEnergy();
-    m_lineDensity = dobj.parseLineDensity();
-    m_orderOfDiffraction = dobj.parseOrderDiffraction();
-    m_vls = dobj.parseVls();
+Element makeSphereGrating(const DesignObject& dobj) {
+    // auto designEnergyMounting = dobj.parseDesignEnergy();
+    auto lineDensity = dobj.parseLineDensity();
+    auto orderOfDiffraction = dobj.parseOrderDiffraction();
+    auto vls = dobj.parseVls();
 
-    m_gratingMount = dobj.parseGratingMount();
+    // auto gratingMount = dobj.parseGratingMount();
     auto radius = dobj.parseRadius();
-    m_surface = makeSphere(radius);
+    auto surface = makeSphere(radius);
 
-    m_behaviour = serializeGrating({
-        .m_vls = {m_vls[0], m_vls[1], m_vls[2], m_vls[3], m_vls[4], m_vls[5]},
-        .m_lineDensity = m_lineDensity,
-        .m_orderOfDiffraction = m_orderOfDiffraction,
+    auto behaviour = serializeGrating({
+        .m_vls = {vls[0], vls[1], vls[2], vls[3], vls[4], vls[5]},
+        .m_lineDensity = lineDensity,
+        .m_orderOfDiffraction = orderOfDiffraction,
     });
+
+    return defaultElement(dobj, behaviour, surface);
 }
-
-double SphereGrating::getRadius() const { return m_radius; }
-
-double SphereGrating::getExitArmLength() const { return m_exitArmLength; }
-double SphereGrating::getEntranceArmLength() const { return m_entranceArmLength; }
-
-double SphereGrating::getDeviation() const { return m_deviation; }
-GratingMount SphereGrating::getGratingMount() const { return m_gratingMount; }
-double SphereGrating::getDesignEnergyMounting() const { return m_designEnergyMounting; }
-double SphereGrating::getLineDensity() const { return m_lineDensity; }
-double SphereGrating::getOrderOfDiffraction() const { return m_orderOfDiffraction; }
-double SphereGrating::getA() const { return m_a; }
 
 }  // namespace RAYX
