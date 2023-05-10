@@ -7,163 +7,79 @@
 
 namespace RAYX {
 
-Ellipsoid::Ellipsoid(const DesignObject& dobj) : OpticalElement(dobj) {
-    m_incidence = dobj.parseGrazingIncAngle();
-    m_entranceArmLength = dobj.parseEntranceArmLength();
-    m_exitArmLength = dobj.parseExitArmLength();
-    m_a11 = dobj.parseParameterA11();
-    m_shortHalfAxisB = dobj.parseShortHalfAxisB();
-    m_longHalfAxisA = dobj.parseLongHalfAxisA();
-    m_designGrazingAngle = dobj.parseDesignGrazingIncAngle();
-    // set geometry
-
-    m_offsetY0 = 0;  // what is this for? RAY.FOR: "only !=0 in case of Monocapillary"
-
-    m_figureRotation = dobj.parseFigureRotation();
+Element makeEllipsoid(const DesignObject& dobj) {
+    auto entranceArmLength = dobj.parseEntranceArmLength();
+    auto exitArmLength = dobj.parseExitArmLength();
+    auto shortHalfAxisB = dobj.parseShortHalfAxisB();
+    auto longHalfAxisA = dobj.parseLongHalfAxisA();
+    auto designGrazingAngle = dobj.parseDesignGrazingIncAngle();
 
     // if design angle not given, take incidenceAngle
-    calculateCenterFromHalfAxes(m_designGrazingAngle);
-
-    // calculate half axis C
-    if (m_figureRotation == FigureRotation::Yes) {
-        m_halfAxisC = m_shortHalfAxisB;  // sqrt(pow(m_shortHalfAxisB, 2) / 1);
-                                         // devided by 1??
-        m_a11 = 1;
-    } else if (m_figureRotation == FigureRotation::Plane) {
-        m_halfAxisC = INFINITY;
-        m_a11 = 0;
+    // calc y0
+    double y0 = 0.0;
+    if (longHalfAxisA > shortHalfAxisB) {
+        if (designGrazingAngle.rad > 0) {
+            y0 = -pow(shortHalfAxisB, 2) * 1 / designGrazingAngle.tan() / sqrt(pow(longHalfAxisA, 2) - pow(shortHalfAxisB, 2));
+        } else {
+            y0 = -shortHalfAxisB;
+        }
     } else {
-        m_halfAxisC = sqrt(pow(m_shortHalfAxisB, 2) / m_a11);
+        y0 = 0.0;
     }
 
-    RAYX_VERB << "A= " << m_longHalfAxisA << ", B= " << m_shortHalfAxisB << ", C= " << m_halfAxisC;
+    // calc z0
+    double z0 = 0.0;
+    if (entranceArmLength > exitArmLength && -shortHalfAxisB < y0) {
+        z0 = longHalfAxisA * sqrt(pow(shortHalfAxisB, 2) - pow(y0, 2)) / shortHalfAxisB;
+    } else if (entranceArmLength < exitArmLength && -shortHalfAxisB < y0) {
+        z0 = -longHalfAxisA * sqrt(pow(shortHalfAxisB, 2) - pow(y0, 2)) / shortHalfAxisB;
+    } else {
+        z0 = 0.0;
+    }
+
+    // calc mt
+    double mt = 0;  // tangent slope
+    if (longHalfAxisA > 0.0 && y0 < 0.0) {
+        mt = pow(shortHalfAxisB / longHalfAxisA, 2) * z0 / y0;
+    }
+
+    auto figureRotation = dobj.parseFigureRotation();
+
+    // calculate a11
+    auto a11 = dobj.parseParameterA11();
+    if (figureRotation == FigureRotation::Yes) {
+        a11 = 1;
+    } else if (figureRotation == FigureRotation::Plane) {
+        a11 = 0;
+    }
 
     // a33, 34, 44
     // a11 from rml file
 
-    m_a22 = pow(m_tangentAngle.cos(), 2) + pow(m_shortHalfAxisB * m_tangentAngle.sin() / m_longHalfAxisA, 2);
-    m_a23 = (pow(m_shortHalfAxisB, 2) - pow(m_longHalfAxisA, 2)) * m_tangentAngle.cos() * m_tangentAngle.sin() / pow(m_longHalfAxisA, 2);
+    auto tangentAngle = Rad(atan(mt));
+    auto a22 = pow(tangentAngle.cos(), 2) + pow(shortHalfAxisB * tangentAngle.sin() / longHalfAxisA, 2);
+    auto a23 = (pow(shortHalfAxisB, 2) - pow(longHalfAxisA, 2)) * tangentAngle.cos() * tangentAngle.sin() / pow(longHalfAxisA, 2);
 
-    m_a24 = pow(m_shortHalfAxisB / m_longHalfAxisA, 2) * m_z0 * m_tangentAngle.sin() + m_y0 * m_tangentAngle.cos();
-    m_a33 = pow(m_tangentAngle.sin(), 2) + pow(m_shortHalfAxisB * m_tangentAngle.cos() / m_longHalfAxisA, 2);
-    m_a34 = pow(m_shortHalfAxisB / m_longHalfAxisA, 2) * m_z0 * m_tangentAngle.cos() - m_y0 * m_tangentAngle.sin();
-    m_a44 = -pow(m_shortHalfAxisB, 2) + pow(m_y0, 2) + pow(m_z0 * m_shortHalfAxisB / m_longHalfAxisA, 2);
+    auto a24 = pow(shortHalfAxisB / longHalfAxisA, 2) * z0 * tangentAngle.sin() + y0 * tangentAngle.cos();
+    auto a33 = pow(tangentAngle.sin(), 2) + pow(shortHalfAxisB * tangentAngle.cos() / longHalfAxisA, 2);
+    auto a34 = pow(shortHalfAxisB / longHalfAxisA, 2) * z0 * tangentAngle.cos() - y0 * tangentAngle.sin();
+    auto a44 = -pow(shortHalfAxisB, 2) + pow(y0, 2) + pow(z0 * shortHalfAxisB / longHalfAxisA, 2);
 
-    RAYX_VERB << "alpha1: " << m_tangentAngle.rad << "; in Degree: " << m_tangentAngle.toDeg().deg;
-    RAYX_VERB << "m_y0: " << m_y0;
-    RAYX_VERB << "m_z0: " << m_z0;
-    RAYX_VERB << "m_a11: " << m_a11;
-    RAYX_VERB << "m_a22: " << m_a22;
-    RAYX_VERB << "m_a23: " << m_a23;
-    RAYX_VERB << "m_a24 (m_radius): " << m_a24;
-    RAYX_VERB << "m_a33: " << m_a33;
-    RAYX_VERB << "m_a34: " << m_a34;
-    RAYX_VERB << "m_a44: " << m_a44;
-
-    m_surface = serializeQuadric({
+    auto surface = serializeQuadric({
         .m_icurv = 1,
-        .m_a11 = m_a11,
+        .m_a11 = a11,
         .m_a12 = 0,
         .m_a13 = 0,
         .m_a14 = 0,
-        .m_a22 = m_a22,
-        .m_a23 = m_a23,
-        .m_a24 = m_a24,
-        .m_a33 = m_a33,
-        .m_a34 = m_a34,
-        .m_a44 = m_a44,
+        .m_a22 = a22,
+        .m_a23 = a23,
+        .m_a24 = a24,
+        .m_a33 = a33,
+        .m_a34 = a34,
+        .m_a44 = a44,
     });
-    m_behaviour = serializeMirror();
+    auto behaviour = serializeMirror();
+    return defaultElement(dobj, behaviour, surface);
 }
-
-void Ellipsoid::calculateCenterFromHalfAxes(Rad angle) {
-    // TODO: is mt = 0 a good default for the case that it'll never be set?
-    double mt = 0;  // tangent slope
-    if (m_longHalfAxisA > m_shortHalfAxisB) {
-        if (angle.rad > 0) {
-            m_y0 = -pow(m_shortHalfAxisB, 2) * 1 / angle.tan() / sqrt(pow(m_longHalfAxisA, 2) - pow(m_shortHalfAxisB, 2));
-        } else {
-            m_y0 = -m_shortHalfAxisB;
-        }
-    } else {
-        m_y0 = 0.0;
-    }
-    if (m_entranceArmLength > m_exitArmLength && -m_shortHalfAxisB < m_y0) {
-        m_z0 = m_longHalfAxisA * sqrt(pow(m_shortHalfAxisB, 2) - pow(m_y0, 2)) / m_shortHalfAxisB;
-    } else if (m_entranceArmLength < m_exitArmLength && -m_shortHalfAxisB < m_y0) {
-        m_z0 = -m_longHalfAxisA * sqrt(pow(m_shortHalfAxisB, 2) - pow(m_y0, 2)) / m_shortHalfAxisB;
-    } else {
-        m_z0 = 0.0;
-    }
-    if (m_longHalfAxisA > 0.0 && m_y0 < 0.0) {
-        mt = pow(m_shortHalfAxisB / m_longHalfAxisA, 2) * m_z0 / m_y0;
-    }
-    m_tangentAngle.rad = atan(mt);
-    RAYX_VERB << "Z0 = " << m_z0 << ", Y0= " << m_y0 << ", tangentAngle= " << m_tangentAngle.rad;
-}
-
-/**
- *  caclulates the half axes, tangent angle and the center of the ellipsoid (z0,
- * y0) from the incidence angle, entrance and exit arm lengths, see ELLPARAM in
- * RAYX.FOR
- */
-void Ellipsoid::calcHalfAxes() {
-    Rad theta = m_incidence;  // designGrazingIncidenceAngle always equal to
-                              // alpha (grazingIncidenceAngle)??
-    if (theta.rad > PI / 2) {
-        theta = Rad(PI / 2);
-    }
-    double a = 0.5 * (m_entranceArmLength + m_exitArmLength);
-
-    double angle = atan(tan(theta.rad) * (m_entranceArmLength - m_exitArmLength) / (m_entranceArmLength + m_exitArmLength));
-    m_y0 = m_entranceArmLength * sin(theta.rad - angle);
-    double b = a * m_y0 * tan(angle);
-    b = 0.25 * pow(m_y0, 4) + pow(b, 2);
-    b = sqrt(0.5 * m_y0 * m_y0 + sqrt(b));
-
-    m_z0 = 0;  // center of ellipsoid y0,z0
-    if (b != 0) {
-        m_z0 = (a / b) * (a / b) * m_y0 * tan(angle);
-    }
-
-    // << ellparam in RAY.for to calculate long and short half axis A and B
-    m_longHalfAxisA = a;
-    m_shortHalfAxisB = b;
-
-    // calculate half axis C
-    if (m_figureRotation == FigureRotation::Yes) {
-        m_halfAxisC = sqrt(pow(m_shortHalfAxisB, 2) / 1);  // devided by 1??
-        m_a11 = 1;
-    } else if (m_figureRotation == FigureRotation::Plane) {
-        m_halfAxisC = INFINITY;
-        m_a11 = 0;
-    } else {
-        m_halfAxisC = sqrt(pow(m_shortHalfAxisB, 2) / m_a11);
-    }
-    m_tangentAngle.rad = angle;
-    RAYX_VERB << "A= " << m_longHalfAxisA << ", B= " << m_shortHalfAxisB << ", C= " << m_halfAxisC << ", angle = " << m_tangentAngle.toDeg().deg;
-
-    m_behaviour = serializeMirror();
-}
-
-double Ellipsoid::getRadius() const { return m_a24; }
-
-double Ellipsoid::getExitArmLength() const { return m_exitArmLength; }
-
-double Ellipsoid::getEntranceArmLength() const { return m_entranceArmLength; }
-
-double Ellipsoid::getY0() const { return m_y0; }
-
-double Ellipsoid::getZ0() const { return m_z0; }
-Rad Ellipsoid::getIncidenceAngle() const { return m_incidence; }
-
-double Ellipsoid::getShortHalfAxisB() const { return m_shortHalfAxisB; }
-double Ellipsoid::getLongHalfAxisA() const { return m_longHalfAxisA; }
-double Ellipsoid::getOffsetY0() const { return m_offsetY0; }
-Rad Ellipsoid::getTangentAngle() const { return m_tangentAngle; }
-double Ellipsoid::getA34() const { return m_a34; }
-double Ellipsoid::getA33() const { return m_a33; }
-double Ellipsoid::getA44() const { return m_a44; }
-double Ellipsoid::getHalfAxisC() const { return m_halfAxisC; }
 
 }  // namespace RAYX

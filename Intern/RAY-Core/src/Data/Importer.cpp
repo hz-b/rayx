@@ -85,7 +85,7 @@ void addBeamlineObjectFromXML(rapidxml::xml_node<>* node, Beamline* beamline, co
     } else if (strcmp(type, "Reflection Zoneplate") == 0) {
         addOpticalElement(std::make_shared<ReflectionZonePlate>(parser), node);
     } else if (strcmp(type, "Ellipsoid") == 0) {
-        addOpticalElement(std::make_shared<Ellipsoid>(parser), node);
+        addOpticalElement2(makeEllipsoid(parser), node);
     } else if (strcmp(type, "Cylinder") == 0) {
         addOpticalElement(std::make_shared<Cylinder>(parser), node);
     } else if (strcmp(type, "Cone") == 0) {
