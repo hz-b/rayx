@@ -102,6 +102,22 @@ Surface makePlane() {
     });
 }
 
+Surface makeSphere(double radius) {
+    return serializeQuadric({
+        .m_icurv = 1,
+        .m_a11 = 1,
+        .m_a12 = 0,
+        .m_a13 = 0,
+        .m_a14 = 0,
+        .m_a22 = 1,
+        .m_a23 = 0,
+        .m_a24 = -radius,
+        .m_a33 = 1,
+        .m_a34 = 0,
+        .m_a44 = 0,
+    });
+}
+
 Element defaultElement(const DesignObject& dobj, Behaviour behaviour, Surface surface) {
     auto slopeError = dobj.parseSlopeError();
 
