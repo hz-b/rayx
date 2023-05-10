@@ -3,9 +3,6 @@
 
 namespace RAYX {
 
-class RAYX_API ToroidMirror : public OpticalElement {
-  public:
-    ToroidMirror(const DesignObject&);
-};
+Element makeToroidMirror(const DesignObject& dobj);
 
 }  // namespace RAYX
