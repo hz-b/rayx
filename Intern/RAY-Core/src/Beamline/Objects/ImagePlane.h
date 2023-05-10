@@ -3,12 +3,6 @@
 
 namespace RAYX {
 
-class RAYX_API ImagePlane : public OpticalElement {
-  public:
-    ImagePlane() = default;
-    ImagePlane(const DesignObject&);
-    ~ImagePlane() = default;
+Element makeImagePlane(const DesignObject& dobj);
 
-    double getDistance();
-};
 }  // namespace RAYX

@@ -4,9 +4,10 @@
 
 namespace RAYX {
 
-ImagePlane::ImagePlane(const DesignObject& dobj) : OpticalElement(dobj) {
-    m_surface = serializePlaneXY();
-    m_behaviour = serializeImagePlane();
+Element makeImagePlane(const DesignObject& dobj) {
+    auto behaviour = serializeImagePlane();
+    auto surface = serializePlaneXY();
+    return makeElement(dobj, behaviour, surface);
 }
 
 }  // namespace RAYX
