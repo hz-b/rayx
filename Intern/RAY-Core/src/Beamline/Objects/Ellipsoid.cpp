@@ -79,7 +79,7 @@ Element makeEllipsoid(const DesignObject& dobj) {
         .m_a44 = a44,
     });
     auto behaviour = serializeMirror();
-    return defaultElement(dobj, behaviour, surface);
+    return makeElement(dobj, behaviour, surface);
 }
 
 }  // namespace RAYX

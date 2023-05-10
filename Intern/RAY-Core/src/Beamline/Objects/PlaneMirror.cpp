@@ -8,7 +8,7 @@ namespace RAYX {
 Element makePlaneMirror(DesignObject& dobj) {
     auto behaviour = serializeMirror();
     auto surface = makePlane();
-    return defaultElement(dobj, behaviour, surface);
+    return makeElement(dobj, behaviour, surface);
 }
 
 }  // namespace RAYX

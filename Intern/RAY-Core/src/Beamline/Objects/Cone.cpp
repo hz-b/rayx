@@ -58,6 +58,6 @@ Element makeCone(const DesignObject& dobj) {
         .m_a34 = 0,
         .m_a44 = 0,
     });
-    return defaultElement(dobj, behaviour, surface);
+    return makeElement(dobj, behaviour, surface);
 }
 }  // namespace RAYX

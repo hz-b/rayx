@@ -16,7 +16,7 @@ Element makeSphereMirror(const DesignObject& dobj) {
 
     auto behaviour = serializeMirror();
     auto surface = makeSphere(radius);
-    return defaultElement(dobj, behaviour, surface);
+    return makeElement(dobj, behaviour, surface);
 }
 
 }  // namespace RAYX

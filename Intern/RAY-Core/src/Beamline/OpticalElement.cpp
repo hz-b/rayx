@@ -127,7 +127,7 @@ Behaviour makeGrating(const DesignObject& dobj) {
     });
 }
 
-Element defaultElement(const DesignObject& dobj, Behaviour behaviour, Surface surface) {
+Element makeElement(const DesignObject& dobj, Behaviour behaviour, Surface surface) {
     auto slopeError = dobj.parseSlopeError();
 
     return Element{

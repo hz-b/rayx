@@ -10,7 +10,7 @@ namespace RAYX {
 Element makeSphereGrating(const DesignObject& dobj) {
     auto surface = makeSphere(dobj.parseRadius());
     auto behaviour = makeGrating(dobj);
-    return defaultElement(dobj, behaviour, surface);
+    return makeElement(dobj, behaviour, surface);
 }
 
 }  // namespace RAYX
