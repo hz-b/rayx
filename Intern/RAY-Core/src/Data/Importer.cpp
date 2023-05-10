@@ -75,7 +75,7 @@ void addBeamlineObjectFromXML(rapidxml::xml_node<>* node, Beamline* beamline, co
     } else if (strcmp(type, "Toroid") == 0) {
         addOpticalElement2(makeToroidMirror(parser), node);
     } else if (strcmp(type, "Slit") == 0) {
-        addOpticalElement(std::make_shared<Slit>(parser), node);
+        addOpticalElement2(makeSlit(parser), node);
     } else if (strcmp(type, "Spherical Grating") == 0) {
         addOpticalElement2(makeSphereGrating(parser), node);
     } else if (strcmp(type, "Plane Grating") == 0) {

@@ -5,23 +5,6 @@ namespace RAYX {
 
 // TODO CentralBeamstop could also be stored as a cutout, might be good for code re-use
 enum class CentralBeamstop { None, Rectangle, Elliptical };  ///< central beamstop shape
-
-class RAYX_API Slit : public OpticalElement {
-  public:
-    Slit(const DesignObject&);
-
-    CentralBeamstop getCentralBeamstop() const;
-    double getBeamstopWidth() const;
-    double getBeamstopHeight() const;
-
-  private:
-    CentralBeamstop m_centralBeamstop;
-    double m_beamstopWidth;
-    double m_beamstopHeight;
-
-    // the cutout for a slit is always CTYPE_UNLIMITED (as rays should only be able to bypass a slit by going through it - not around)
-    // Hence the cutout of the gap (i.e. the "hole", the part of the Slit where rays actually go through) needs to be stored separately:
-    Cutout m_gapCutout;
-};
+Element makeSlit(const DesignObject& dobj);
 
 }  // namespace RAYX
