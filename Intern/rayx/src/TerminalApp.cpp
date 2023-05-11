@@ -23,7 +23,7 @@ TerminalApp::TerminalApp(int argc, char** argv) : m_argv(argv), m_argc(argc) {
 #else
     std::string mode = "release";
 #endif
-    std::cout << "Starting RAY-X (" << GIT_REVISION << ", " << mode << ")" << std::endl;
+    std::cout << "Starting rayx (" << GIT_REVISION << ", " << mode << ")" << std::endl;
 
     /// warn if the binary is compiled with 32-bit (i.e. sizeof(void*) == 4)
     /// or worse.
@@ -56,7 +56,7 @@ void TerminalApp::tracePath(const std::filesystem::path& path) {
         // Load RML file
         m_Beamline = std::make_unique<RAYX::Beamline>(RAYX::importBeamline(path));
 
-        // Run RAY-X Core
+        // Run rayx core
         auto rays = m_Tracer->trace(*m_Beamline);
 
         // Export Rays to external data.

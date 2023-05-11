@@ -1,4 +1,4 @@
-# How to use RayCore
+# How to use rayx-core
 
 --- This page is outdated ---
 

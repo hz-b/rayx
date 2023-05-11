@@ -4,7 +4,7 @@
 
 // CommandParser::CommandParser()  {}
 
-CommandParser::CommandParser(int _argc, char* const* _argv) : m_cli11{std::make_shared<CLI::App>("Terminal Application for RAY-X")} {
+CommandParser::CommandParser(int _argc, char* const* _argv) : m_cli11{std::make_shared<CLI::App>("Terminal Application for rayx")} {
     for (const std::pair<char, Options> option : m_ParserCommands) {
         // Full name string
         std::string _name;

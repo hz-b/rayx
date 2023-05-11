@@ -34,7 +34,7 @@ TRIALS = 30
 rayx_cpu_times = []
 rayx_gpu_times = []
 
-# MAKE SURE THAT RAY-X IS CORRECTLY BUILT
+# MAKE SURE THAT rayx IS CORRECTLY BUILT
 rayxdir = os.path.join(cwd, "build/bin")
 
 
@@ -85,7 +85,7 @@ def change_rml(root, xmlTree: ET.ElementTree):
 
 def plot(cpu_times, gpu_times):
     """
-    Plot the Beamline time; x, for RAY-X. ui, for RAY-UI
+    Plot the Beamline time; x, for rayx. ui, for RAY-UI
     beamlines is also the chaning variable throughout the beamline
     """
     assert (len(cpu_times) == len(gpu_times))
@@ -115,7 +115,7 @@ def plot(cpu_times, gpu_times):
     save_in_csv(indices,cpu_times,gpu_times)
 
     plt.ylabel('time (s)')
-    plt.title(f"RAY-X: CPU vs GPU(Vulkan) Tracer [Max Rays = {N*STEPS+1}]")
+    plt.title(f"rayx: CPU vs GPU(Vulkan) Tracer [Max Rays = {N*STEPS+1}]")
     plt.legend()
     plt.show()
 

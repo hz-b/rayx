@@ -165,7 +165,7 @@ void compareRays(const RAYX::Rays& r1, const RAYX::Rays& r2, double t) {
     }
 }
 
-// returns the Ray-X rays converted to be ray-UI compatible.
+// returns the rayx rays converted to be ray-UI compatible.
 std::vector<RAYX::Ray> rayUiCompat(std::string filename) {
     auto beamline = loadBeamline(filename);
     auto rays = tracer->trace(beamline);

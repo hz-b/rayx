@@ -1,14 +1,14 @@
-# Benchmark script to test RAY-X Execution Time.
+# Benchmark script to test rayx Execution Time.
 # To run use chmod or bash or sh
 
 # HELP
 if [ "$1" == "-h" ]; then
-  echo "Benchmark script to test RAY-X Execution time."
+  echo "Benchmark script to test rayx Execution time."
   echo "Usage: `basename $0` filename.rml number_of_trials"
   echo "	-h Print this message"
   echo "args:"
   echo "filename.rml: RML File name, make sure that it's in TerminalApp directory."
-  echo "number_of_trials: Loop number of RAY-X, the bigger the more precise."
+  echo "number_of_trials: Loop number of rayx, the bigger the more precise."
   
   exit 0
 fi
@@ -22,15 +22,15 @@ function _sqrt(){
 #BENCHMARK
 RAYX=./../../../build/bin/TerminalApp 
 
-echo "Running RAY-X Benchmark..."
+echo "Running rayx Benchmark..."
 if [ -f "$RAYX" ]; then
 
 # if file exist the it will be printed 
-echo "RAY-X Terminal APP found."
+echo "rayx Terminal APP found."
 else
 
 # is it is not exist then it will be printed
-echo "RAY-X Terminal APP not found, make sure already built!"
+echo "rayx Terminal APP not found, make sure already built!"
 exit 1
 fi
 

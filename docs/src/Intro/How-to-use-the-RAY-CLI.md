@@ -4,7 +4,7 @@ After a successful build, type `-h` or `--help` for a summary of all known comma
 > Hint: `-c` or `--command` are accepted. But `-command` can result in errors.
 
 ```
-Terminal application for RAY-X
+Terminal application for rayx
 Usage: ./RAY-CLI [OPTIONS]
 
 Options:

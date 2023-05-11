@@ -1,3 +1,3 @@
-# RAY-Core documentation
+# Rayx-core documentation
 
-RAY-Core is the core library of the RAY-X project.
+Rayx-core is the library the rayx project is built on.

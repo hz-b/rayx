@@ -28,7 +28,7 @@ void VulkanEngine::createInstance() {
     appInfo.sType = VK_STRUCTURE_TYPE_APPLICATION_INFO;
     appInfo.pApplicationName = "Terminal App";
     appInfo.applicationVersion = VK_MAKE_API_VERSION(0, 1, 3, 216);
-    appInfo.pEngineName = "Vulkan RAY-X Engine";
+    appInfo.pEngineName = "Vulkan Rayx Engine";
     appInfo.engineVersion = VK_MAKE_API_VERSION(0, 1, 3, 216);
     appInfo.apiVersion = VK_API_VERSION_1_3;
 

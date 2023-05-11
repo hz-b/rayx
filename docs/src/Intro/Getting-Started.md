@@ -140,7 +140,7 @@ Here is an example for a simple beamline file "PlaneMirror.rml":
 
 In it we have a matrix source that sends rays onto a plane mirror. 
 Assuming the beamline file is in the same directory as the binary
-you can run the CLI of RAY-X as follows:
+you can run the CLI of rayx as follows:
 ```
 ./TerminalApp -i PlaneMirror.rml
 ```

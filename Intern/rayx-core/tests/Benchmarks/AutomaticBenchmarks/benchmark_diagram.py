@@ -7,7 +7,7 @@ import numpy as np
 
 def plot(rayx_times, rayui_times, beamlines):
 	"""
-	Plot the Beamline time; x, for RAY-X. ui, for RAY-UI
+	Plot the Beamline time; x, for rayx. ui, for RAY-UI
 	beamlines is also the chaning variable throughout the beamline
 	"""
 	assert(len(rayx_times) == len(rayui_times))
@@ -17,7 +17,7 @@ def plot(rayx_times, rayui_times, beamlines):
 	ind = np.arange(N)
 
 	#HZB Color Scheme
-	rects_x = plt.bar(ind, rayx_times, 0.15, color='#C6D970', label='RAY-X')
+	rects_x = plt.bar(ind, rayx_times, 0.15, color='#C6D970', label='rayx')
 	rects_ui = plt.bar(ind + 0.15, rayui_times, 0.15, color='#9AC6F3', label='RAY-UI')
 
 	plt.xlabel('Beamlines')
@@ -29,7 +29,7 @@ def plot(rayx_times, rayui_times, beamlines):
 	plt.ylabel('time (ms) (logscale)')
 	plt.title("Exectuion time in ms")
 	plt.yscale('log')
-	plt.suptitle("RAY-X vs RAY-UI")
+	plt.suptitle("rayx vs RAY-UI")
 	plt.legend()
 	plt.show()
 

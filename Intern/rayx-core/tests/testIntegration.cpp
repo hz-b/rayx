@@ -1,6 +1,6 @@
 #include "setupTests.h"
 
-// in this module tests mostly compare RAY-X's output with RAY-UI.
+// in this module tests mostly compare rayx's output with RAY-UI.
 // The output of Ray-UI is mostly generated using RawRaysOutgoing.
 
 TEST_F(TestSuite, PlaneMirror) { compareLastAgainstRayUI("PlaneMirror"); }
