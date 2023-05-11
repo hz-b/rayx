@@ -32,4 +32,4 @@ jobs:
 
       - name: Test
         working-directory: ${{github.workspace}}/build/bin/release
-        run: ./RAYX_tst -x
+        run: ./rayx-core-tst -x
