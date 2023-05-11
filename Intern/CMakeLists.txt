@@ -19,5 +19,8 @@ set(CMAKE_LIBRARY_OUTPUT_DIRECTORY_DEBUG ${CMAKE_BINARY_DIR}/lib/debug)
 # ---- Subdirectories ----
 add_subdirectory(RAY-Core)
 add_subdirectory(RAY-CLI)
-add_subdirectory(RAY-X)
+# Don't build rayx in CI/CD
+if(VULKAN STREQUAL "YES")
+    add_subdirectory(RAY-X)
+endif()
 # ------------------------
