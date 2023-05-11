@@ -7,6 +7,7 @@ cmake_minimum_required(VERSION 3.15 FATAL_ERROR)
 
 # ---- Project ----
 project(RAY-X)
+set(CMAKE_CXX_STANDARD 20)
 
 set(IMGUI_DIR ../../Extern/imgui/)
 set(GLFW_DIR ../../Extern/glfw)
