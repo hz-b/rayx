@@ -7,6 +7,7 @@
 #include "RayCore.h"
 #include "VulkanBuffer.h"
 #include "VulkanEngine/Init/Fence.h"
+#include "VulkanEngine/Run/Pipeline.h"
 
 namespace RAYX {
 
@@ -71,13 +72,11 @@ class RAYX_API BufferHandler {
 
     std::map<std::string, VulkanBuffer> m_Buffers = {};
 
-    std::map<Pass&, std::vector<VulkanBuffer&>> m_passToBufferBindings = {};
-
     // TODO(OS): Use this instead of m_Buffers once ready
     std::map<std::string, VulkanBuffer> m_ComputeBuffers;
     std::map<std::string, VulkanBuffer> m_GraphicsBuffers;
 
-    std::unique_ptr<Fence> m_TransferFence;
+    std::unique_ptr<NewFence> m_TransferFence;
     VkSemaphore m_TransferSemaphore;
 };
 }  // namespace RAYX

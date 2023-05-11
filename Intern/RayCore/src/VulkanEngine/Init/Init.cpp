@@ -40,7 +40,9 @@ void VulkanEngine::newInit() {
     prepareVma();
     createCache();
     initBufferHandler();
+    m_state = EngineStates_t::PRERUN;
 }
+
 /**
  * @brief Initializes the Buffer Handler
  * Call after 'init'

@@ -40,10 +40,10 @@ std::vector<VkDescriptorSetLayoutBinding> BufferHandler::getDescriptorBindings(P
     RAYX_PROFILE_FUNCTION();
     std::vector<VkDescriptorSetLayoutBinding> bindings;
 
-    bindings.reserve(m_DescriptorBindings.size());
-    for (const auto& [binding, b] : m_DescriptorBindings) {
-        bindings.push_back({binding, VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, 1, VK_SHADER_STAGE_COMPUTE_BIT, nullptr});
+    for (auto& [name, buf] : m_Buffers) {
+        bindings.push_back(buf.m_DescriptorSetBindings[pass]);
     }
+
     return bindings;
 }
 

@@ -32,7 +32,7 @@ VulkanEngine::Fence::~Fence() { vkDestroyFence(device, f, nullptr); }
 
 ////////////////////////////////////////////////////////////////////////////
 
-Fence::Fence(VkDevice& device) : device(device) {
+NewFence::NewFence(VkDevice& device) : device(device) {
     VkFenceCreateInfo fenceCreateInfo = {};
     fenceCreateInfo.sType = VK_STRUCTURE_TYPE_FENCE_CREATE_INFO;
     fenceCreateInfo.flags = 0;
@@ -41,20 +41,20 @@ Fence::Fence(VkDevice& device) : device(device) {
 
 // Timeout ~1 sec
 // Fence is usable again after this.
-VkResult Fence::wait() {
+VkResult NewFence::wait() {
     auto res = vkWaitForFences(device, 1, &f, VK_TRUE, DEFAULT_TIMEOUT);
     res = vkResetFences(device, 1, &f);
     return res;
 }
 
-VkFence* Fence::fence() { return &f; }
+VkFence* NewFence::fence() { return &f; }
 
-VkResult Fence::forceReset() {
+VkResult NewFence::forceReset() {
     auto res = vkResetFences(device, 1, &f);
     return res;
 }
 
-Fence::~Fence() { vkDestroyFence(device, f, nullptr); }
+NewFence::~NewFence() { vkDestroyFence(device, f, nullptr); }
 
 void VulkanEngine::createFences() {
     m_Fences.compute = std::make_unique<Fence>(m_Device);

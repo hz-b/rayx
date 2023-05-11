@@ -106,6 +106,7 @@ std::vector<Ray> VulkanTracer::newTraceRaw(const TraceRawConfig& cfg) {
     if (m_engine.state() == VulkanEngine::EngineStates_t::PREINIT) {
         m_engine.newInit();
 
+    } else {  // For now we recreate everything TODO (OS) : Only change buffers and not all pass!
         // Create first Shader Stage
         ShaderStageCreateInfo shaderCreateInfo = {.name = "FullTracer", .shaderPath = "build/bin/comp.spv", .entryPoint = "main"};
         // Merge all stages
@@ -124,7 +125,8 @@ std::vector<Ray> VulkanTracer::newTraceRaw(const TraceRawConfig& cfg) {
                 ->addDescriptorSetPerPassBinding(pass, 0);
 
             m_engine.getBufferHandler()
-                ->createBuffer({"output-buffer", VKBUFFER_OUT, (numberOfRays * sizeof(Ray) * cfg.m_maxSnapshots)})  // Output Ray Buffer
+                ->createBuffer(
+                    {"output-buffer", VKBUFFER_OUT, static_cast<VkDeviceSize>(numberOfRays * sizeof(Ray) * cfg.m_maxSnapshots)})  // Output Ray Buffer
                 ->addDescriptorSetPerPassBinding(pass, 1);
 
             m_engine.getBufferHandler()
@@ -148,6 +150,8 @@ std::vector<Ray> VulkanTracer::newTraceRaw(const TraceRawConfig& cfg) {
                 ->addDescriptorSetPerPassBinding(pass, 6);
 #endif
         }
+        // Create Pipeline layouts and Descriptor Layouts. Everytime buffer formation (not data) changes we need to prepare again
+        m_engine.m_ComputePass->prepare(m_engine.getBufferHandler());
     }
 }  // namespace RAYX
 

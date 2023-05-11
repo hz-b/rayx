@@ -6,6 +6,7 @@
 #include "RayCore.h"
 #include "VulkanEngine/Init/Descriptor.h"
 #include "VulkanEngine/Init/ShaderStage.h"
+#include "VulkanEngine/VulkanEngine.h"
 namespace RAYX {
 // General Pass
 // -------------------------------------------------------------------------------------------------------
@@ -13,6 +14,8 @@ namespace RAYX {
  * @brief General Vulkan Pass (A group of Pipelines)
  *
  */
+class BufferHandler;
+class VulkanEngine;
 class RAYX_API Pass {
   public:
     // A series of Pipelines makes a Pass.
@@ -22,10 +25,11 @@ class RAYX_API Pass {
         Pipeline(std::string name, VkDevice& dev, const ShaderStageCreateInfo&);
         ~Pipeline();
 
-        void createPipelineLayout();
+        void createPipelineLayout(const VkDescriptorSetLayout setLayouts, int pushConstantSize);
         void createPipeline();
         void inline readPipelineCache();
         void inline storePipelineCache(VkDevice& device);
+        void updatePushConstants(void* data, size_t size);
         void cleanPipeline(VkDevice& device);
 
         std::string m_name;
@@ -36,6 +40,7 @@ class RAYX_API Pass {
         VkPipelineCache m_pipelineCache = VK_NULL_HANDLE;
 
         std::shared_ptr<ShaderStage> shaderStage{};
+        VulkanEngine::pushConstants_t m_pushConstants = {};
     };
     using Pipelines = std::vector<std::shared_ptr<Pipeline>>;
 
@@ -52,6 +57,7 @@ class RAYX_API Pass {
     const ShaderStage& getShaderStage(int stage) const { return *(m_pass[stage]->shaderStage); }
 
     virtual const VkPipelineBindPoint& getPipelineBindPoint() const = 0;
+    virtual void prepare(const BufferHandler&) const = 0;
 
   protected:
     // How many stages in the Pass
@@ -97,14 +103,13 @@ class RAYX_API ComputePass : public Pass {
     void addPipelineStage(const ShaderStageCreateInfo&);
     void addPipelineStage(const Pass& newStage);
 
-    // Get bindings associated with the current Shader Module
-    std::vector<VkDescriptorSetLayoutBinding> getDescriptorBindings();
+    void prepare(BufferHandler&);
 
   private:
     void createDescriptorPool();
 
     // Currently only one DescriptorSetLayout is offered per Pass
-    void createDescriptorSetLayout();
+    void createDescriptorSetLayout(std::vector<VkDescriptorSetLayoutBinding>& bindings);
 
     void createPipelines();
 
@@ -115,8 +120,8 @@ class RAYX_API ComputePass : public Pass {
     VkPipelineBindPoint m_PipelineBindPoint = VK_PIPELINE_BIND_POINT_COMPUTE;  // Always compute
 
     std::vector<VkDescriptorSetLayout> m_descriptorSetLayouts = {VK_NULL_HANDLE};  // For now, only one [0]
-    std::vector<VkDescriptorSet> descriptorSets = {VK_NULL_HANDLE};                // For now, only one [0]
-    VulkanEngine::pushConstants_t pushConstants = {nullptr};  // TODO (OS): Not really like this as every shader has its own push_t
+    std::vector<VkDescriptorSet> m_descriptorSets = {VK_NULL_HANDLE};              // For now, only one [0]
+    VulkanEngine::pushConstants_t m_pushConstants = {nullptr};  // TODO (OS): Not really like this as every shader has its own push_t
 
     // TODO(OS): Add missing memory barriers
 };

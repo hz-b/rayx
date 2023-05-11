@@ -34,16 +34,29 @@ void VulkanEngine::pickPhysicalDevice() {
     // pick fastest device
     m_PhysicalDevice = VK_NULL_HANDLE;
     int currentRating = -1;
-
+    //std::vector<std::pair<VkPhysicalDevice, int>> suitableDevices;
     for (const auto& device : devices) {
         if (isDeviceSuitable(device)) {
             int rating = rateDevice(device);
+            //suitableDevices.push_back(std::pair(device, rating));
             if (rating > currentRating) {
                 m_PhysicalDevice = device;
                 currentRating = rating;
             }
         }
     }
+    // RAYX_VERB << "Pick Device please.(DEVICE NAME | RATING)";
+    // for (auto i = 0; i < suitableDevices.size(); i++) {
+    //     VkPhysicalDeviceProperties deviceProperties;
+    //     vkGetPhysicalDeviceProperties(suitableDevices[i].first, &deviceProperties);
+    //     RAYX_VERB << deviceProperties.deviceName << " | " << suitableDevices[i].second;
+    // }
+
+    // int n;
+    // std::cin >> n;
+
+    // m_PhysicalDevice = suitableDevices[n].first;
+
     if (m_PhysicalDevice == VK_NULL_HANDLE) {
         throw std::runtime_error("failed to find a suitable GPU!");
     }

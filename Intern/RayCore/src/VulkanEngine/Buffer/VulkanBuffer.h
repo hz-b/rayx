@@ -8,7 +8,6 @@
 
 #include "RayCore.h"
 #include "VulkanEngine/Run/Pipeline.h"
-#include "VulkanEngine/VulkanEngine.h"
 
 namespace RAYX {
 

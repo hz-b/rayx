@@ -17,20 +17,19 @@ Pass::Pipeline::Pipeline(std::string name, VkDevice& dev, const ShaderStageCreat
 }
 Pass::Pipeline::~Pipeline() { cleanPipeline(m_device); };
 
-void Pass::Pipeline::createPipelineLayout() {
+void Pass::Pipeline::createPipelineLayout(const VkDescriptorSetLayout setLayouts, int pushConstantSize) {
     // if (!m_descriptorSetLayouts.empty()) {
     /*
     The pipeline layout allows the pipeline to access descriptor sets.
     So we just specify the descriptor set layout we created earlier.
     */
     // TODO(OS): Only one Set supported
-    auto pipelineLayoutCreateInfo =
-        VKINIT::Pipeline::pipeline_layout_create_info(&m_descriptorSetLayouts[0], static_cast<uint32_t>(m_descriptorSetLayouts.size()));
+    auto pipelineLayoutCreateInfo = VKINIT::Pipeline::pipeline_layout_create_info(&setLayouts);
 
     /*
     Add push constants to the Pipeline
     */
-    auto pushConstant = VKINIT::misc::push_constant_range(VK_SHADER_STAGE_COMPUTE_BIT, pushConstants.size,
+    auto pushConstant = VKINIT::misc::push_constant_range(VK_SHADER_STAGE_COMPUTE_BIT, pushConstantSize,
                                                           0);  // Can change Offset if some of the struct is to be ignored
 
     pipelineLayoutCreateInfo.pPushConstantRanges = &pushConstant;
@@ -117,6 +116,10 @@ void Pass::Pipeline::cleanPipeline(VkDevice& device) {
     vkDestroyPipelineLayout(device, m_pipelineLayout, nullptr);
     storePipelineCache(device);
 }
+void Pass::Pipeline::updatePushConstants(void* data, size_t size) {
+    m_pushConstants.pushConstPtr = data;
+    m_pushConstants.size = size;
+}
 
 // -------------------------------------------------------------------------------------------------------
 
@@ -125,7 +128,7 @@ ComputePass::ComputePass(VkDevice& device, const ComputePassCreateInfo& createIn
     m_pass.reserve(m_stagesCount);
 
     m_descriptorSetLayouts.reserve(createInfo.descriptorSetAmount);
-    descriptorSets.reserve(createInfo.descriptorSetAmount);
+    m_descriptorSets.reserve(createInfo.descriptorSetAmount);
 
     // Fill compute Piplines
     for (uint32_t i = 0; i < m_stagesCount; i++) {
@@ -144,21 +147,9 @@ ComputePass::~ComputePass() {
     }
 }
 
-void ComputePass::createPipelines() {
-    RAYX_PROFILE_FUNCTION_STDOUT();
-    RAYX_VERB << "Creating pipelines...";
+void ComputePass::createPipelines() { RAYX_PROFILE_FUNCTION_STDOUT(); }
 
-    // Todo: validtation layer warning : Consider adding VK_KHR_maintenance4  to support SPIR-V 1.6's localsizeid instead of
-    // WorkgroupSize
-    for (const auto& stage : m_pass) {
-        stage->createPipelineLayout();
-        stage->createPipeline();
-    }
-    RAYX_VERB << "Pass created...";
-}
-void ComputePass::createDescriptorSetLayout() {
-    auto bindings = getDescriptorBindings();
-
+void ComputePass::createDescriptorSetLayout(std::vector<VkDescriptorSetLayoutBinding>& bindings) {
     // TODO(OS): Only one Set supported
     auto descriptorSetLayoutCreateInfo = VKINIT::Descriptor::descriptor_set_layout_create_info(bindings);
 
@@ -166,14 +157,20 @@ void ComputePass::createDescriptorSetLayout() {
     VK_CHECK_RESULT(vkCreateDescriptorSetLayout(m_Device, &descriptorSetLayoutCreateInfo, nullptr, &m_descriptorSetLayouts[0]));
 }
 
-std::vector<VkDescriptorSetLayoutBinding> ComputePass::getDescriptorBindings() {
-    RAYX_PROFILE_FUNCTION();
-    std::vector<VkDescriptorSetLayoutBinding> bindings;
-    bindings.reserve(m_DescriptorBindings.size());
-    for (const auto& [binding, b] : m_DescriptorBindings) {
-        bindings.push_back({binding, VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, 1, VK_SHADER_STAGE_COMPUTE_BIT, nullptr});
+// Prepare Compute Pass according to buffers and layout
+// TODO(OS): Find a way to pass bufferHandler easily
+void ComputePass::prepare(BufferHandler& bufferHandler) {
+    RAYX_VERB << "Preparing pipelines...";
+
+    auto bindings = bufferHandler.getDescriptorBindings(this);
+    createDescriptorSetLayout(bindings);
+
+    // Todo: validtation layer warning : Consider adding VK_KHR_maintenance4  to support SPIR-V 1.6's localsizeid instead of
+    // WorkgroupSize
+    for (const auto& stage : m_pass) {
+        stage->createPipelineLayout(m_descriptorSetLayouts[0], m_pushConstants.size);
+        stage->createPipeline();
     }
-    return bindings;
 }
 
 void ComputePass::addPipelineStage(const ShaderStageCreateInfo& createInfo) {

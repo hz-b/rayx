@@ -133,8 +133,8 @@ class RAYX_API VulkanEngine {
     struct pushConstants_t {
         const void* pushConstPtr;
         size_t size;
-    } m_pushConstants;
-
+    };
+    pushConstants_t m_pushConstants;
     std::unique_ptr<BufferHandler> m_BufferHandler;  // new
     std::unique_ptr<ComputePass> m_ComputePass;      // New
     std::unique_ptr<Pass> m_Pass;                    // New
