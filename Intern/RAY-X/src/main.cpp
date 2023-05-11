@@ -1,11 +1,14 @@
-// This is currently just to establish the base structure of the project.
+#include "Application.h"
 
-#include <iostream>
-#include <RAY-Core.h>
-#include <Random.h>
+int main() {
+    Application app;
 
-int main()
-{
-    RAYX::randomSeed();
-    std::cout << RAYX::randomDouble() << std::endl;
+    try {
+        app.run();
+    } catch (const std::exception& e) {
+        std::cerr << e.what() << std::endl;
+        return EXIT_FAILURE;
+    }
+
+    return EXIT_SUCCESS;
 }

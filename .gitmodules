@@ -13,3 +13,9 @@
 [submodule "Extern/VMA"]
 	path = Extern/VMA
 	url = https://github.com/GPUOpen-LibrariesAndSDKs/VulkanMemoryAllocator
+[submodule "Extern/imgui"]
+	path = Extern/imgui
+	url = https://github.com/ocornut/imgui
+[submodule "Extern/glfw"]
+	path = Extern/glfw
+	url = https://github.com/glfw/glfw
