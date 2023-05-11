@@ -49,7 +49,7 @@ void Application::initWindow() {
 
     glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);
 
-    m_Window = glfwCreateWindow(m_windowWidth, m_windowHeight, "RAY-X", nullptr, nullptr);
+    m_Window = glfwCreateWindow(m_windowWidth, m_windowHeight, "rayx-ui", nullptr, nullptr);
     glfwSetWindowUserPointer(m_Window, this);
     glfwSetFramebufferSizeCallback(m_Window, framebufferResizeCallback);
 }
@@ -414,8 +414,8 @@ void Application::createRenderPass() {
 }
 
 void Application::createGraphicsPipeline() {
-    auto vertShaderCode = readFile("../../../Intern/RAY-X/src/Shaders/vert.spv");
-    auto fragShaderCode = readFile("../../../Intern/RAY-X/src/Shaders/frag.spv");
+    auto vertShaderCode = readFile("../../../Intern/rayx-ui/src/Shaders/vert.spv");
+    auto fragShaderCode = readFile("../../../Intern/rayx-ui/src/Shaders/frag.spv");
 
     VkShaderModule vertShaderModule = createShaderModule(vertShaderCode);
     VkShaderModule fragShaderModule = createShaderModule(fragShaderCode);
