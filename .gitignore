@@ -4,8 +4,8 @@
 bin/
 bin-int/
 build/
-Intern/RAY-Core/doc/*/
-Intern/RAY-Core/tests/output/**
+Intern/rayx-core/doc/*/
+Intern/rayx-core/tests/output/**
 out/
 
 # Files

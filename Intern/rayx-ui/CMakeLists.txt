@@ -6,7 +6,7 @@ cmake_minimum_required(VERSION 3.15 FATAL_ERROR)
 
 
 # ---- Project ----
-project(RAY-X)
+project(rayx-ui)
 set(CMAKE_CXX_STANDARD 20)
 
 set(IMGUI_DIR ../../Extern/imgui/)
@@ -29,7 +29,7 @@ option(GLFW_DOCUMENT_INTERNALS "Include internals in documentation" OFF)
 
 
 # ---- Dependencies ----
-target_link_libraries(${PROJECT_NAME} PRIVATE RAY-Core glfw)
+target_link_libraries(${PROJECT_NAME} PRIVATE rayx-core glfw)
 target_include_directories(${PROJECT_NAME} PRIVATE
     ${GLFW_DIR}/include
     ${GLFW_DIR}/deps

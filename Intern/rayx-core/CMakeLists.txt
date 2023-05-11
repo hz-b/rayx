@@ -6,7 +6,7 @@ add_subdirectory(tests)
 
 
 # ---- Project ----
-project(RAY-Core)
+project(rayx-core)
 file(GLOB_RECURSE SOURCE ${PROJECT_SOURCE_DIR}/src/*.cpp)
 add_library(${PROJECT_NAME} SHARED ${SOURCE})
 # -----------------

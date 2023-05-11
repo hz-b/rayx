@@ -2,8 +2,8 @@ cmake_minimum_required(VERSION 3.15 FATAL_ERROR)
 
 
 # ---- Project ----
-project(RAY-CLI VERSION 0.5.0.0)
-file(GLOB_RECURSE SOURCE ${PROJECT_SOURCE_DIR}/*.cpp)
+project(rayx VERSION 0.5.0.0)
+file(GLOB_RECURSE SOURCE ${PROJECT_SOURCE_DIR}/src/*.cpp)
 add_executable(${PROJECT_NAME} ${SOURCE})
 # ------------------
 
@@ -32,7 +32,7 @@ configure_file(TerminalAppConfig.h.in TerminalAppConfig.h)
 # ---- Dependencies ----
 target_link_libraries(${PROJECT_NAME} PRIVATE
   CLI11::CLI11
-  RAY-Core
+  rayx-core
   ${PYTHON_LIBRARIES}
 )
 target_include_directories(${PROJECT_NAME} PRIVATE ${PROJECT_BINARY_DIR})

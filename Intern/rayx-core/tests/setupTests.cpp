@@ -56,16 +56,16 @@ RAYX::Ray parseCSVline(std::string line) {
     return ray;
 }
 
-/// will look at Intern/RAY-Core/tests/input/<filename>.rml
+/// will look at Intern/rayx-core/tests/input/<filename>.rml
 RAYX::Beamline loadBeamline(std::string filename) {
-    std::string beamline_file = canonicalizeRepositoryPath("Intern/RAY-Core/tests/input/" + filename + ".rml").string();
+    std::string beamline_file = canonicalizeRepositoryPath("Intern/rayx-core/tests/input/" + filename + ".rml").string();
 
     return RAYX::importBeamline(beamline_file);
 }
 
-/// will write to Intern/RAY-Core/tests/output<filename>.csv
+/// will write to Intern/rayx-core/tests/output<filename>.csv
 void writeToOutputCSV(const RAYX::Rays& rays, std::string filename) {
-    std::string f = canonicalizeRepositoryPath("Intern/RAY-Core/tests/output/" + filename + ".csv").string();
+    std::string f = canonicalizeRepositoryPath("Intern/rayx-core/tests/output/" + filename + ".csv").string();
     writeCSV(rays, f);
 }
 
@@ -106,11 +106,11 @@ std::vector<RAYX::Ray> extractLastHit(const RAYX::Rays& rays) {
     return outs;
 }
 
-/// will look at Intern/RAY-Core/tests/input/<filename>.csv
+/// will look at Intern/rayx-core/tests/input/<filename>.csv
 /// the Ray-UI files are to be obtained by Export > RawRaysOutgoing (which are in
 /// element coordinates of the relevant element!)
 std::vector<RAYX::Ray> loadCSVRayUI(std::string filename) {
-    std::string file = canonicalizeRepositoryPath("Intern/RAY-Core/tests/input/" + filename + ".csv").string();
+    std::string file = canonicalizeRepositoryPath("Intern/rayx-core/tests/input/" + filename + ".csv").string();
 
     std::ifstream f(file);
     std::string line;
@@ -224,7 +224,7 @@ void compareLastAgainstRayUI(std::string filename, double t) {
 void compareAgainstCorrect(std::string filename, double tolerance) {
     auto a = traceRML(filename);
 
-    std::string f = canonicalizeRepositoryPath("Intern/RAY-Core/tests/input/" + filename + ".correct.csv").string();
+    std::string f = canonicalizeRepositoryPath("Intern/rayx-core/tests/input/" + filename + ".correct.csv").string();
     auto b = loadCSV(f);
 
     writeToOutputCSV(a, filename + ".rayx");

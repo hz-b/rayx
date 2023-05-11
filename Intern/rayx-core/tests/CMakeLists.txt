@@ -19,7 +19,7 @@ set(CMAKE_PCH_INSTANTIATE_TEMPLATES ON)
 
 
 # ---- Dependencies ----
-target_link_libraries(${BINARY} PUBLIC RAY-Core gtest gmock)
+target_link_libraries(${BINARY} PUBLIC rayx-core gtest gmock)
 # ----------------------
 
 
