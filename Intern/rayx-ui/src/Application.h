@@ -42,7 +42,7 @@ struct SwapChain {
 };
 
 struct Vertex {
-    glm::vec2 pos;
+    glm::vec3 pos;
     glm::vec3 color;
 
     static VkVertexInputBindingDescription getBindingDescription() {
@@ -58,7 +58,7 @@ struct Vertex {
 
         attributeDescriptions[0].binding = 0;
         attributeDescriptions[0].location = 0;
-        attributeDescriptions[0].format = VK_FORMAT_R32G32_SFLOAT;
+        attributeDescriptions[0].format = VK_FORMAT_R32G32B32_SFLOAT;
         attributeDescriptions[0].offset = offsetof(Vertex, pos);
 
         attributeDescriptions[1].binding = 0;
@@ -111,9 +111,9 @@ class Application {
     VkBuffer m_VertexBuffer;
     VkDeviceMemory m_VertexBufferMemory;
     const std::array<Vertex, 3> m_Vertices = {
-        Vertex{{0.0f, -0.5f}, {1.0f, 0.0f, 0.0f}},  //
-        Vertex{{0.5f, 0.5f}, {0.0f, 1.0f, 0.0f}},   //
-        Vertex{{-0.5f, 0.5f}, {0.0f, 0.0f, 1.0f}}   //
+        Vertex{{0.0f, -0.5f, 0.0f}, {1.0f, 0.0f, 0.0f}},  //
+        Vertex{{0.5f, 0.5f, 0.0f}, {0.0f, 1.0f, 0.0f}},   //
+        Vertex{{-0.5f, 0.5f, 0.0f}, {0.0f, 0.0f, 1.0f}}   //
     };
 
     void recreateSwapChain();
