@@ -6,16 +6,18 @@
 #include "RayCore.h"
 #include "VulkanEngine/Init/Descriptor.h"
 #include "VulkanEngine/Init/ShaderStage.h"
-#include "VulkanEngine/VulkanEngine.h"
 namespace RAYX {
+struct tempPushConstant_t {
+    const void* pushConstPtr = nullptr;
+    size_t size = 0;
+};
+
 // General Pass
 // -------------------------------------------------------------------------------------------------------
 /**
- * @brief General Vulkan Pass (A group of Pipelines)
+ * @brief General Vulkan Pass (A grouSp of Pipelines)
  *
  */
-class BufferHandler;
-class VulkanEngine;
 class RAYX_API Pass {
   public:
     // A series of Pipelines makes a Pass.
@@ -25,7 +27,7 @@ class RAYX_API Pass {
         Pipeline(std::string name, VkDevice& dev, const ShaderStageCreateInfo&);
         ~Pipeline();
 
-        void createPipelineLayout(const VkDescriptorSetLayout setLayouts, int pushConstantSize);
+        void createPipelineLayout(const VkDescriptorSetLayout setLayouts);
         void createPipeline();
         void inline readPipelineCache();
         void inline storePipelineCache(VkDevice& device);
@@ -40,8 +42,9 @@ class RAYX_API Pass {
         VkPipelineCache m_pipelineCache = VK_NULL_HANDLE;
 
         std::shared_ptr<ShaderStage> shaderStage{};
-        VulkanEngine::pushConstants_t m_pushConstants = {};
+        tempPushConstant_t m_pushConstants = {};
     };
+
     using Pipelines = std::vector<std::shared_ptr<Pipeline>>;
 
     Pass() = default;
@@ -52,17 +55,18 @@ class RAYX_API Pass {
     const char* getName() const { return m_name; }
     const Pipelines& getPass() const { return m_pass; }
     uint32_t getStageAmount() const { return m_stagesCount; }
+
     const VkPipeline getPipeline(int stage) const { return m_pass[stage]->m_pipeline; }
     const VkPipelineLayout getPipelineLayout(int stage) { return m_pass[stage]->m_pipelineLayout; }
     const ShaderStage& getShaderStage(int stage) const { return *(m_pass[stage]->shaderStage); }
 
     virtual const VkPipelineBindPoint& getPipelineBindPoint() const = 0;
-    virtual void prepare(const BufferHandler&) const = 0;
+    virtual void prepare(std::vector<VkDescriptorSetLayoutBinding>) const = 0;
 
   protected:
+    const char* m_name;
     // How many stages in the Pass
     uint32_t m_stagesCount;
-    const char* m_name;
     // The pass itself (Pipelines)
     Pipelines m_pass = {VK_NULL_HANDLE};
 
@@ -103,7 +107,7 @@ class RAYX_API ComputePass : public Pass {
     void addPipelineStage(const ShaderStageCreateInfo&);
     void addPipelineStage(const Pass& newStage);
 
-    void prepare(BufferHandler&);
+    void prepare(std::vector<VkDescriptorSetLayoutBinding> bindings);
 
   private:
     void createDescriptorPool();
@@ -121,7 +125,7 @@ class RAYX_API ComputePass : public Pass {
 
     std::vector<VkDescriptorSetLayout> m_descriptorSetLayouts = {VK_NULL_HANDLE};  // For now, only one [0]
     std::vector<VkDescriptorSet> m_descriptorSets = {VK_NULL_HANDLE};              // For now, only one [0]
-    VulkanEngine::pushConstants_t m_pushConstants = {nullptr};  // TODO (OS): Not really like this as every shader has its own push_t
+    // VulkanEngine::pushConstants_t m_pushConstants = {nullptr};  // TODO (OS): Not really like this as every shader has its own push_t
 
     // TODO(OS): Add missing memory barriers
 };

@@ -1,10 +1,10 @@
 #ifndef NO_VULKAN
 #include "vulkan/vulkan.hpp"
 namespace RAYX {
-class NewFence {
+class Fence {
   public:
-    NewFence(VkDevice& device);
-    ~NewFence();
+    Fence(VkDevice& device);
+    ~Fence();
     VkFence* fence();
     VkResult wait();
     VkResult forceReset();

@@ -7,7 +7,6 @@
 #include <vulkan/vulkan.hpp>
 
 #include "RayCore.h"
-#include "VulkanEngine/Run/Pipeline.h"
 
 namespace RAYX {
 
@@ -55,7 +54,7 @@ class RAYX_API VulkanBuffer {
     void* getMappedMemory();
     void UnmapMemory();
 
-    void addDescriptorSetPerPassBinding(Pass*, uint32_t);
+    void addDescriptorSetPerPassBinding(std::string passName, uint32_t binding, VkShaderStageFlags shaderStageFlag);
 
   private:
     // VMA Version of createVkBuffer
@@ -70,7 +69,7 @@ class RAYX_API VulkanBuffer {
     VkDeviceMemory m_Memory = VK_NULL_HANDLE;
     VmaAllocation m_Alloca = VK_NULL_HANDLE;
     VmaAllocationInfo m_AllocaInfo;
-    std::map<Pass*, VkDescriptorSetLayoutBinding> m_DescriptorSetBindings;
+    std::map<std::string, VkDescriptorSetLayoutBinding> m_DescriptorSetBindings;
 };  // namespace RAYX
 
 }  // namespace RAYX

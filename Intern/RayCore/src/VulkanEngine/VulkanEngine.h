@@ -11,12 +11,13 @@
 
 #include "RayCore.h"
 #include "VulkanEngine/Buffer/BufferHandler.h"
+#include "VulkanEngine/Buffer/VulkanBuffer.h"
 #include "VulkanEngine/Common.h"
+#include "VulkanEngine/Init/Fence.h"
 #include "VulkanEngine/Init/Initializers.h"
 #include "VulkanEngine/Run/Pipeline.h"
 
 namespace RAYX {
-
 // the argument type of `VulkanEngine::declareBuffer(_)`
 struct BufferDeclarationSpec_t {
     uint32_t binding;
@@ -56,6 +57,7 @@ class RAYX_API VulkanEngine {
     // TODO (OS): Add the Vulkan state FSM Controls
     void initBufferHandler();
     void createComputePipelinePass(const ComputePassCreateInfo&);
+    void prepareComputePipelinePass();
     BufferHandler* getBufferHandler() const { return m_BufferHandler.get(); }
 
     /// create a buffer and fill it with the data given in vec.
@@ -131,8 +133,8 @@ class RAYX_API VulkanEngine {
     // Please pay attention to alignment rules
     // You can change this struct (also in shader)
     struct pushConstants_t {
-        const void* pushConstPtr;
-        size_t size;
+        const void* pushConstPtr = nullptr;
+        size_t size = 0;
     };
     pushConstants_t m_pushConstants;
     std::unique_ptr<BufferHandler> m_BufferHandler;  // new
@@ -182,18 +184,18 @@ class RAYX_API VulkanEngine {
     } m_Semaphores;
 
     std::vector<VkSemaphore> m_newSemaphores = {};
-    class Fence {
-      public:
-        Fence(VkDevice& device);
-        ~Fence();
-        VkFence* fence();
-        VkResult wait();
-        VkResult forceReset();
+    // class Fence {
+    //   public:
+    //     Fence(VkDevice& device);
+    //     ~Fence();
+    //     VkFence* fence();
+    //     VkResult wait();
+    //     VkResult forceReset();
 
-      private:
-        VkFence f;
-        VkDevice device;
-    };
+    //   private:
+    //     VkFence f;
+    //     VkDevice device;
+    // };
     struct {
         std::unique_ptr<Fence> transfer;
         std::unique_ptr<Fence> compute;

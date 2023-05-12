@@ -56,6 +56,13 @@ void VulkanEngine::createComputePipelinePass(const ComputePassCreateInfo& create
     m_ComputePass = std::make_unique<ComputePass>(m_Device, createInfo);
 }
 
+// Buffer Descriptor binding
+void VulkanEngine::prepareComputePipelinePass() {
+    auto handler = getBufferHandler();
+    auto bindings = handler->getDescriptorBindings(m_ComputePass->getName());
+    m_ComputePass->prepare(bindings);
+}
+
 }  // namespace RAYX
 
 #endif

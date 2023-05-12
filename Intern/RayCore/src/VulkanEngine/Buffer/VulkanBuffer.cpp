@@ -2,12 +2,13 @@
 
 #include "VulkanBuffer.h"
 
+#include "VulkanEngine/Init/Initializers.h"
 #include "VulkanEngine/Init/ShaderStage.h"
 namespace RAYX {
 
 VulkanBuffer::VulkanBuffer(const VmaAllocator& vmaAllocator, VulkanBufferCreateInfo createInfo)
     : m_VmaAllocator(vmaAllocator), m_createInfo(createInfo) {
-    int bufferUsageFlags = VK_BUFFER_USAGE_STORAGE_BUFFER_BIT;  // Always storage buffer;
+    int bufferUsageFlags = createInfo.bufferType;  // Usually target storage buffer
     if (createInfo.accessType == VKBUFFER_IN) {
         bufferUsageFlags |= VK_BUFFER_USAGE_TRANSFER_DST_BIT;
     } else if (createInfo.accessType == VKBUFFER_OUT) {
@@ -15,6 +16,7 @@ VulkanBuffer::VulkanBuffer(const VmaAllocator& vmaAllocator, VulkanBufferCreateI
     } else {
         bufferUsageFlags |= VK_BUFFER_USAGE_TRANSFER_SRC_BIT | VK_BUFFER_USAGE_TRANSFER_DST_BIT;
     }
+
     if (createInfo.size != 0) {
         createVmaBuffer(m_createInfo.size, bufferUsageFlags, m_Buffer, m_Alloca, &m_AllocaInfo);
     }
@@ -73,10 +75,9 @@ void VulkanBuffer::UnmapMemory() {
     }
 }
 
-void VulkanBuffer::addDescriptorSetPerPassBinding(Pass* pass, uint32_t binding) {
-    auto shaderStageFlag = pass->getShaderStage(0).getShaderStageFlagBits();
+void VulkanBuffer::addDescriptorSetPerPassBinding(std::string passName, uint32_t binding, VkShaderStageFlags shaderStageFlag) {
     auto b = VKINIT::Descriptor::descriptor_set_layout_binding(m_createInfo.bufferType, shaderStageFlag, binding);
-    m_DescriptorSetBindings.insert(std::pair<Pass*, VkDescriptorSetLayoutBinding>(pass, b));
+    m_DescriptorSetBindings.insert(std::pair<std::string, VkDescriptorSetLayoutBinding>(passName, b));
 }
 
 }  // namespace RAYX

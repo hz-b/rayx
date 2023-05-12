@@ -17,7 +17,7 @@ Pass::Pipeline::Pipeline(std::string name, VkDevice& dev, const ShaderStageCreat
 }
 Pass::Pipeline::~Pipeline() { cleanPipeline(m_device); };
 
-void Pass::Pipeline::createPipelineLayout(const VkDescriptorSetLayout setLayouts, int pushConstantSize) {
+void Pass::Pipeline::createPipelineLayout(const VkDescriptorSetLayout setLayouts) {
     // if (!m_descriptorSetLayouts.empty()) {
     /*
     The pipeline layout allows the pipeline to access descriptor sets.
@@ -29,7 +29,7 @@ void Pass::Pipeline::createPipelineLayout(const VkDescriptorSetLayout setLayouts
     /*
     Add push constants to the Pipeline
     */
-    auto pushConstant = VKINIT::misc::push_constant_range(VK_SHADER_STAGE_COMPUTE_BIT, pushConstantSize,
+    auto pushConstant = VKINIT::misc::push_constant_range(VK_SHADER_STAGE_COMPUTE_BIT, m_pushConstants.size,
                                                           0);  // Can change Offset if some of the struct is to be ignored
 
     pipelineLayoutCreateInfo.pPushConstantRanges = &pushConstant;
@@ -116,6 +116,7 @@ void Pass::Pipeline::cleanPipeline(VkDevice& device) {
     vkDestroyPipelineLayout(device, m_pipelineLayout, nullptr);
     storePipelineCache(device);
 }
+
 void Pass::Pipeline::updatePushConstants(void* data, size_t size) {
     m_pushConstants.pushConstPtr = data;
     m_pushConstants.size = size;
@@ -158,17 +159,15 @@ void ComputePass::createDescriptorSetLayout(std::vector<VkDescriptorSetLayoutBin
 }
 
 // Prepare Compute Pass according to buffers and layout
-// TODO(OS): Find a way to pass bufferHandler easily
-void ComputePass::prepare(BufferHandler& bufferHandler) {
+void ComputePass::prepare(std::vector<VkDescriptorSetLayoutBinding> bindings) {
     RAYX_VERB << "Preparing pipelines...";
 
-    auto bindings = bufferHandler.getDescriptorBindings(this);
     createDescriptorSetLayout(bindings);
 
     // Todo: validtation layer warning : Consider adding VK_KHR_maintenance4  to support SPIR-V 1.6's localsizeid instead of
     // WorkgroupSize
     for (const auto& stage : m_pass) {
-        stage->createPipelineLayout(m_descriptorSetLayouts[0], m_pushConstants.size);
+        stage->createPipelineLayout(m_descriptorSetLayouts[0]);
         stage->createPipeline();
     }
 }

@@ -26,6 +26,7 @@ BufferHandler::~BufferHandler() {
         vmaDestroyBuffer(m_VmaAllocator, buf.getBuffer(), buf.m_Alloca);
     }
 }
+
 // std::vector<VkDescriptorSetLayoutBinding> BufferHandler::getVulkanBufferBindings() {
 //     // TODO(OS) We need correct bindings and not all so enhance this by moving it to Shader
 //     std::vector<VkDescriptorSetLayoutBinding> result;
@@ -36,7 +37,7 @@ BufferHandler::~BufferHandler() {
 //     return result;
 // }
 
-std::vector<VkDescriptorSetLayoutBinding> BufferHandler::getDescriptorBindings(Pass* pass) {
+std::vector<VkDescriptorSetLayoutBinding> BufferHandler::getDescriptorBindings(std::string pass) {
     RAYX_PROFILE_FUNCTION();
     std::vector<VkDescriptorSetLayoutBinding> bindings;
 
@@ -60,7 +61,7 @@ void BufferHandler::createTransferCommandBuffer() {
     VK_CHECK_RESULT(vkAllocateCommandBuffers(m_Device, &commandBufferAllocateInfo, &m_TransferCommandBuffer))
 }
 
-void BufferHandler::createTransferFence() { m_TransferFence = std::make_unique<Fence>(m_Device); }
+void BufferHandler::createTransferFence() { m_TransferFence = std::make_unique<NewFence>(m_Device); }
 
 void BufferHandler::createTransferQueue() { vkGetDeviceQueue(m_Device, m_FamilyIndex, 0, &m_TransferQueue); }
 

@@ -5,7 +5,6 @@
 #include <vulkan/vulkan.hpp>
 
 #include "RayCore.h"
-#include "VulkanEngine/VulkanEngine.h"
 
 namespace RAYX {
 

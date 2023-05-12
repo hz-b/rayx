@@ -118,42 +118,45 @@ std::vector<Ray> VulkanTracer::newTraceRaw(const TraceRawConfig& cfg) {
         // Create Buffers and bind them to Pass through Descriptors
         {
             auto pass = m_engine.m_ComputePass.get();
+            auto shaderFlag = pass->getShaderStage(0).getShaderStageFlagBits();  // Should return only compute now
+            auto passName = pass->getName();
             // Compute Buffers Meta
             // Bindings are *IN ORDER*
+
             m_engine.getBufferHandler()
                 ->createBuffer<Ray>({"ray-buffer", VKBUFFER_IN}, rayList)  // Input Ray Buffer
-                ->addDescriptorSetPerPassBinding(pass, 0);
+                ->addDescriptorSetPerPassBinding(passName, 0, shaderFlag);
 
             m_engine.getBufferHandler()
                 ->createBuffer(
                     {"output-buffer", VKBUFFER_OUT, static_cast<VkDeviceSize>(numberOfRays * sizeof(Ray) * cfg.m_maxSnapshots)})  // Output Ray Buffer
-                ->addDescriptorSetPerPassBinding(pass, 1);
+                ->addDescriptorSetPerPassBinding(passName, 1, shaderFlag);
 
             m_engine.getBufferHandler()
                 ->createBuffer<double>({"quadric-buffer", VKBUFFER_IN}, beamlineData)  // Beamline quadric info
-                ->addDescriptorSetPerPassBinding(pass, 2);
+                ->addDescriptorSetPerPassBinding(passName, 2, shaderFlag);
 
             m_engine.getBufferHandler()
                 ->createBuffer({"xyznull-buffer", VKBUFFER_IN, 100})  // FIXME(OS): This buffer is not needed?
-                ->addDescriptorSetPerPassBinding(pass, 3);
+                ->addDescriptorSetPerPassBinding(passName, 3, shaderFlag);
 
             m_engine.getBufferHandler()
                 ->createBuffer<int>({"material-index-table", VKBUFFER_IN}, materialTables.indexTable)  /// Material info
-                ->addDescriptorSetPerPassBinding(pass, 4);
+                ->addDescriptorSetPerPassBinding(passName, 4, shaderFlag);
 
             m_engine.getBufferHandler()
                 ->createBuffer<double>({"material-table", VKBUFFER_IN}, materialTables.materialTable)  // Material info
-                ->addDescriptorSetPerPassBinding(pass, 5);
+                ->addDescriptorSetPerPassBinding(passName, 5, shaderFlag);
 #ifdef RAYX_DEBUG_MODE
             m_engine.getBufferHandler()
                 ->createBuffer({"debug-buffer", VKBUFFER_OUT, numberOfRays * sizeof(debugBuffer_t)})  // Debug Matrix Buffer
-                ->addDescriptorSetPerPassBinding(pass, 6);
+                ->addDescriptorSetPerPassBinding(passName, 6, shaderFlag);
 #endif
         }
         // Create Pipeline layouts and Descriptor Layouts. Everytime buffer formation (not data) changes we need to prepare again
-        m_engine.m_ComputePass->prepare(m_engine.getBufferHandler());
+        m_engine.prepareComputePipelinePass();
     }
-}  // namespace RAYX
+}
 
 void VulkanTracer::setPushConstants(const PushConstants* p) {
     if (sizeof(*p) > 128) RAYX_WARN << "Using pushConstants bigger than 128 Bytes might be unsupported on some GPUs. Check Compute Info";

@@ -7,7 +7,6 @@
 #include "RayCore.h"
 #include "VulkanBuffer.h"
 #include "VulkanEngine/Init/Fence.h"
-#include "VulkanEngine/Run/Pipeline.h"
 
 namespace RAYX {
 
@@ -24,7 +23,9 @@ class RAYX_API BufferHandler {
 
     template <typename T>
     VulkanBuffer* createBuffer(VulkanBufferCreateInfo createInfo, const std::vector<T>& vec = nullptr);
+
     VulkanBuffer* createBuffer(VulkanBufferCreateInfo createInfo);
+
     template <typename T>
     inline std::vector<T> readBuffer(const char* bufname, bool indirect);
 
@@ -35,7 +36,7 @@ class RAYX_API BufferHandler {
     void freeBuffer(const char* bufname);
     void waitTransferQueueIdle();
 
-    std::vector<VkDescriptorSetLayoutBinding> getDescriptorBindings(Pass* pass);
+    std::vector<VkDescriptorSetLayoutBinding> getDescriptorBindings(std::string passName);
 
     const VulkanBuffer& getStagingBuffer() const { return *m_StagingBuffer; }
     // TODO(OS): This function should be almost illegal...
@@ -76,7 +77,7 @@ class RAYX_API BufferHandler {
     std::map<std::string, VulkanBuffer> m_ComputeBuffers;
     std::map<std::string, VulkanBuffer> m_GraphicsBuffers;
 
-    std::unique_ptr<NewFence> m_TransferFence;
+    std::unique_ptr<Fence> m_TransferFence;
     VkSemaphore m_TransferSemaphore;
 };
 }  // namespace RAYX
