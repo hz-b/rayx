@@ -10,7 +10,8 @@ project(rayx-ui)
 set(CMAKE_CXX_STANDARD 20)
 
 set(IMGUI_DIR ../../Extern/imgui/)
-set(GLFW_DIR ../../Extern/glfw)
+set(GLFW_DIR ../../Extern/glfw/)
+set(GLM_DIR ../../Extern/glm/)
 add_subdirectory(${GLFW_DIR} binary_dir EXCLUDE_FROM_ALL)
 
 file(GLOB_RECURSE SOURCE ${PROJECT_SOURCE_DIR}/src/*.cpp)
@@ -35,6 +36,7 @@ target_include_directories(${PROJECT_NAME} PRIVATE
     ${GLFW_DIR}/deps
     ${IMGUI_DIR} 
     ${IMGUI_DIR}/backends 
+    ${GLM_DIR}
     ..
 )
 # ----------------------
