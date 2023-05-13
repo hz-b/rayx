@@ -4,6 +4,7 @@
 
 #include <vk_mem_alloc.h>
 
+#include <map>
 #include <vulkan/vulkan.hpp>
 
 #include "RayCore.h"
@@ -21,16 +22,13 @@ typedef enum BufferAccessFlags {
  *
  */
 struct VulkanBufferCreateInfo {
-    // Unique Buffer name
-    const char* bufName;
-    // Access type to Buffer
-    BufferAccessFlags accessType;
-    // Size
-    VkDeviceSize size = 0;
-
-    // What kind of buffer is it (Storage, Image, Uniform etc.)
-    VkDescriptorType bufferType = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER;
+    const char* bufName;                                              // Unique Buffer name
+    BufferAccessFlags accessType;                                     // Access type to Buffer
+    VkDeviceSize size = 0;                                            // Size
+    VkDescriptorType bufferType = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER;  // What kind of buffer is it (Storage, Image, Uniform etc.)
 };
+
+class BufferHandler;
 
 // class VulkanEngine;
 /**
@@ -45,6 +43,8 @@ class RAYX_API VulkanBuffer {
     ~VulkanBuffer();
 
     // TODO(OS): Move/Copy constructor maybe needed
+    // VulkanBuffer(const VulkanBuffer&) = delete;
+    // VulkanBuffer& operator=(const VulkanBuffer&) = delete;
 
     VkDeviceSize getSize() const { return m_createInfo.size; }
     const VkBuffer& getBuffer() const { return m_Buffer; };
@@ -54,7 +54,7 @@ class RAYX_API VulkanBuffer {
     void* getMappedMemory();
     void UnmapMemory();
 
-    void addDescriptorSetPerPassBinding(std::string passName, uint32_t binding, VkShaderStageFlags shaderStageFlag);
+    void addDescriptorSetPerPassBinding(const std::string& passName, uint32_t binding, VkShaderStageFlags shaderStageFlag);
 
   private:
     // VMA Version of createVkBuffer

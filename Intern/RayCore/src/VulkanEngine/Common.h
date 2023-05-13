@@ -1,6 +1,6 @@
 #ifndef NO_VULKAN
 #pragma once
-
+#include "RayCore.h"
 #define IS_ENGINE_PREINIT                                    \
     if (m_state != EngineStates_t::PREINIT) {                \
         RAYX_ERR << "VulkanEngine was already initialized!"; \

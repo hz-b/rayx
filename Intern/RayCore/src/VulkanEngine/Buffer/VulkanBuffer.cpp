@@ -3,7 +3,6 @@
 #include "VulkanBuffer.h"
 
 #include "VulkanEngine/Init/Initializers.h"
-#include "VulkanEngine/Init/ShaderStage.h"
 namespace RAYX {
 
 VulkanBuffer::VulkanBuffer(const VmaAllocator& vmaAllocator, VulkanBufferCreateInfo createInfo)
@@ -68,14 +67,12 @@ void* VulkanBuffer::getMappedMemory() {
     return buf;
 }
 void VulkanBuffer::UnmapMemory() {
-    if (m_VmaFlags & VMA_ALLOCATION_CREATE_MAPPED_BIT) {
-        std::nullopt;
-    } else {
+    if (!(m_VmaFlags & VMA_ALLOCATION_CREATE_MAPPED_BIT)) {
         vmaUnmapMemory(m_VmaAllocator, m_Alloca);
     }
 }
 
-void VulkanBuffer::addDescriptorSetPerPassBinding(std::string passName, uint32_t binding, VkShaderStageFlags shaderStageFlag) {
+void VulkanBuffer::addDescriptorSetPerPassBinding(const std::string& passName, uint32_t binding, VkShaderStageFlags shaderStageFlag) {
     auto b = VKINIT::Descriptor::descriptor_set_layout_binding(m_createInfo.bufferType, shaderStageFlag, binding);
     m_DescriptorSetBindings.insert(std::pair<std::string, VkDescriptorSetLayoutBinding>(passName, b));
 }

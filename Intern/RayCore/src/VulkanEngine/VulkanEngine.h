@@ -58,7 +58,7 @@ class RAYX_API VulkanEngine {
     void initBufferHandler();
     void createComputePipelinePass(const ComputePassCreateInfo&);
     void prepareComputePipelinePass();
-    BufferHandler* getBufferHandler() const { return m_BufferHandler.get(); }
+    BufferHandler& getBufferHandler() const { return *m_BufferHandler; }
 
     /// create a buffer and fill it with the data given in vec.
     /// the buffer will have exactly the size to fit all elements of vec.
@@ -137,7 +137,7 @@ class RAYX_API VulkanEngine {
         size_t size = 0;
     };
     pushConstants_t m_pushConstants;
-    std::unique_ptr<BufferHandler> m_BufferHandler;  // new
+    std::shared_ptr<BufferHandler> m_BufferHandler;  // new
     std::unique_ptr<ComputePass> m_ComputePass;      // New
     std::unique_ptr<Pass> m_Pass;                    // New
 
@@ -215,7 +215,11 @@ class RAYX_API VulkanEngine {
     void createCommandBuffers(int commandBuffersCount);
     void createShaderModule();
     void recordFullCommand();
-    void createFences();
+    void createFences() {
+        m_Fences.compute = std::make_unique<Fence>(m_Device);
+        m_Fences.transfer = std::make_unique<Fence>(m_Device);
+    }
+
     void recordInComputeCommandBuffer();
     void createSemaphores();
     void newCreateSemaphores(int count);

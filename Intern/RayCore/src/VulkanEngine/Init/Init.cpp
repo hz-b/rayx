@@ -49,7 +49,7 @@ void VulkanEngine::newInit() {
  *
  */
 void VulkanEngine::initBufferHandler() {
-    m_BufferHandler = std::make_unique<BufferHandler>(m_Device, m_VmaAllocator, m_computeFamily, getStagingBufferSize());
+    m_BufferHandler = std::make_shared<BufferHandler>(m_Device, m_VmaAllocator, m_computeFamily, getStagingBufferSize());
 }
 
 void VulkanEngine::createComputePipelinePass(const ComputePassCreateInfo& createInfo) {
@@ -58,8 +58,7 @@ void VulkanEngine::createComputePipelinePass(const ComputePassCreateInfo& create
 
 // Buffer Descriptor binding
 void VulkanEngine::prepareComputePipelinePass() {
-    auto handler = getBufferHandler();
-    auto bindings = handler->getDescriptorBindings(m_ComputePass->getName());
+    auto bindings = getBufferHandler().getDescriptorBindings(m_ComputePass->getName());
     m_ComputePass->prepare(bindings);
 }
 

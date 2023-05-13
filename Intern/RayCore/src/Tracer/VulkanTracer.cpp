@@ -4,12 +4,9 @@
 
 #include <Material/Material.h>
 
-#include <chrono>
-#include <cmath>
 
 #include "Debug/Debug.h"
 #include "Debug/Instrumentor.h"
-#include "Random.h"
 #include "RayCore.h"
 
 #ifdef RAYX_PLATFORM_MSVC
@@ -124,38 +121,39 @@ std::vector<Ray> VulkanTracer::newTraceRaw(const TraceRawConfig& cfg) {
             // Bindings are *IN ORDER*
 
             m_engine.getBufferHandler()
-                ->createBuffer<Ray>({"ray-buffer", VKBUFFER_IN}, rayList)  // Input Ray Buffer
-                ->addDescriptorSetPerPassBinding(passName, 0, shaderFlag);
+                .createBuffer<Ray>({"ray-buffer", VKBUFFER_IN}, rayList)  // Input Ray Buffer
+                .addDescriptorSetPerPassBinding(passName, 0, shaderFlag);
 
             m_engine.getBufferHandler()
-                ->createBuffer(
-                    {"output-buffer", VKBUFFER_OUT, static_cast<VkDeviceSize>(numberOfRays * sizeof(Ray) * cfg.m_maxSnapshots)})  // Output Ray Buffer
-                ->addDescriptorSetPerPassBinding(passName, 1, shaderFlag);
+                .createBuffer(
+                    {"output-buffer", VKBUFFER_OUT, (numberOfRays * sizeof(Ray) * (int)cfg.m_maxSnapshots)})  // Output Ray Buffer
+                .addDescriptorSetPerPassBinding(passName, 1, shaderFlag);
 
             m_engine.getBufferHandler()
-                ->createBuffer<double>({"quadric-buffer", VKBUFFER_IN}, beamlineData)  // Beamline quadric info
-                ->addDescriptorSetPerPassBinding(passName, 2, shaderFlag);
+                .createBuffer<double>({"quadric-buffer", VKBUFFER_IN}, beamlineData)  // Beamline quadric info
+                .addDescriptorSetPerPassBinding(passName, 2, shaderFlag);
 
             m_engine.getBufferHandler()
-                ->createBuffer({"xyznull-buffer", VKBUFFER_IN, 100})  // FIXME(OS): This buffer is not needed?
-                ->addDescriptorSetPerPassBinding(passName, 3, shaderFlag);
+                .createBuffer({"xyznull-buffer", VKBUFFER_IN, 100})  // FIXME(OS): This buffer is not needed?
+                .addDescriptorSetPerPassBinding(passName, 3, shaderFlag);
 
             m_engine.getBufferHandler()
-                ->createBuffer<int>({"material-index-table", VKBUFFER_IN}, materialTables.indexTable)  /// Material info
-                ->addDescriptorSetPerPassBinding(passName, 4, shaderFlag);
+                .createBuffer<int>({"material-index-table", VKBUFFER_IN}, materialTables.indexTable)  /// Material info
+                .addDescriptorSetPerPassBinding(passName, 4, shaderFlag);
 
             m_engine.getBufferHandler()
-                ->createBuffer<double>({"material-table", VKBUFFER_IN}, materialTables.materialTable)  // Material info
-                ->addDescriptorSetPerPassBinding(passName, 5, shaderFlag);
+                .createBuffer<double>({"material-table", VKBUFFER_IN}, materialTables.materialTable)  // Material info
+                .addDescriptorSetPerPassBinding(passName, 5, shaderFlag);
 #ifdef RAYX_DEBUG_MODE
             m_engine.getBufferHandler()
-                ->createBuffer({"debug-buffer", VKBUFFER_OUT, numberOfRays * sizeof(debugBuffer_t)})  // Debug Matrix Buffer
-                ->addDescriptorSetPerPassBinding(passName, 6, shaderFlag);
+                .createBuffer({"debug-buffer", VKBUFFER_OUT, numberOfRays * sizeof(debugBuffer_t)})  // Debug Matrix Buffer
+                .addDescriptorSetPerPassBinding(passName, 6, shaderFlag);
 #endif
         }
         // Create Pipeline layouts and Descriptor Layouts. Everytime buffer formation (not data) changes we need to prepare again
         m_engine.prepareComputePipelinePass();
     }
+    return rayList;
 }
 
 void VulkanTracer::setPushConstants(const PushConstants* p) {

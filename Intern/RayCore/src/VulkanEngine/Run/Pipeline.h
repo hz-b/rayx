@@ -61,7 +61,7 @@ class RAYX_API Pass {
     const ShaderStage& getShaderStage(int stage) const { return *(m_pass[stage]->shaderStage); }
 
     virtual const VkPipelineBindPoint& getPipelineBindPoint() const = 0;
-    virtual void prepare(std::vector<VkDescriptorSetLayoutBinding>) const = 0;
+    virtual void prepare(std::vector<VkDescriptorSetLayoutBinding>) = 0;
 
   protected:
     const char* m_name;
@@ -102,20 +102,17 @@ class RAYX_API ComputePass : public Pass {
     ~ComputePass();
 
     const VkPipelineBindPoint& getPipelineBindPoint() const { return m_PipelineBindPoint; }
+    void prepare(std::vector<VkDescriptorSetLayoutBinding> bindings);
 
     // Adding a new PipelineStage is the same as extending the Pass with a new Stage
     void addPipelineStage(const ShaderStageCreateInfo&);
-    void addPipelineStage(const Pass& newStage);
-
-    void prepare(std::vector<VkDescriptorSetLayoutBinding> bindings);
+    //void addPipelineStage(const Pass& newStage);
 
   private:
     void createDescriptorPool();
 
     // Currently only one DescriptorSetLayout is offered per Pass
     void createDescriptorSetLayout(std::vector<VkDescriptorSetLayoutBinding>& bindings);
-
-    void createPipelines();
 
     VkDevice& m_Device;
     const char* m_name;

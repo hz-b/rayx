@@ -1,9 +1,10 @@
 #ifndef NO_VULKAN
-#pragma once
+
 #include "VulkanEngine/Init/ShaderStage.h"
 
 #include "CanonicalizePath.h"
 #include "Debug/Instrumentor.h"
+#include "VulkanEngine/Common.h"
 namespace RAYX {
 ShaderStage::ShaderStage(VkDevice& device, const ShaderStageCreateInfo& createInfo)
     : m_Device(device),
@@ -34,7 +35,7 @@ void ShaderStage::createShaderModule() {
     createInfo.pCode = shaderCode;
     createInfo.codeSize = filelength;
 
-    VK_CHECK_RESULT(vkCreateShaderModule(m_Device, &createInfo, nullptr, &m_shaderModule));
+    VK_CHECK_RESULT(vkCreateShaderModule(m_Device, &createInfo, nullptr, &m_shaderModule))
     RAYX_VERB << "Shader module " << m_name << " created.";
     delete[] shaderCode;
 }

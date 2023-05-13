@@ -59,12 +59,13 @@ SET(SOURCE
     src/VulkanEngine/Run/ComputePipeline.cpp
     src/VulkanEngine/Run/DescriptorSet.cpp
     src/VulkanEngine/Run/RunCommandBuffer.cpp
+    src/VulkanEngine/Buffer/VulkanBuffer.cpp
+    src/VulkanEngine/Buffer/BufferHandler.cpp
+    src/VulkanEngine/Run/Pipeline.cpp
     src/VulkanEngine/Run/Run.cpp
     src/Writer/CSVWriter.cpp
     src/Writer/H5Writer.cpp
-    src/VulkanEngine/Buffer/VulkanBuffer.cpp
-    src/VulkanEngine/Buffer/BufferHandler.cpp
-    src/VulkanEngine/Run/Pipeline.cpp)
+)
 
 add_library(${PROJECT_NAME} SHARED ${SOURCE})
 

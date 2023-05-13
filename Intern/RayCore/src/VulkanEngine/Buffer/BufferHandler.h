@@ -2,15 +2,13 @@
 
 #pragma once
 
+#include <map>
 #include <vulkan/vulkan.hpp>
 
-#include "RayCore.h"
-#include "VulkanBuffer.h"
+#include "VulkanEngine/Buffer/VulkanBuffer.h"
 #include "VulkanEngine/Init/Fence.h"
 
 namespace RAYX {
-
-class VulkanEngine;
 
 /**
  * @brief Controls Buffer allocation, creation and IO
@@ -21,13 +19,44 @@ class RAYX_API BufferHandler {
     BufferHandler(VkDevice& device, VmaAllocator allocator, uint32_t queueFamilyIndex, size_t stagingSize);
     ~BufferHandler();
 
-    template <typename T>
-    VulkanBuffer* createBuffer(VulkanBufferCreateInfo createInfo, const std::vector<T>& vec = nullptr);
+    VulkanBuffer& createBuffer(VulkanBufferCreateInfo createInfo);
 
-    VulkanBuffer* createBuffer(VulkanBufferCreateInfo createInfo);
-
+    /**
+     * @brief Create a buffer and fill it with vec
+     *
+     * @tparam T
+     * @param createInfo Buffer creation Info
+     * @param vec Vector to fill Buffer with
+     */
     template <typename T>
-    inline std::vector<T> readBuffer(const char* bufname, bool indirect);
+    VulkanBuffer& createBuffer(VulkanBufferCreateInfo createInfo, const std::vector<T>& vec = nullptr) {
+        createInfo.size = vec.size() * sizeof(T);
+        if (!vec.empty()) {
+            writeBufferRaw(createBuffer(createInfo).getName(), (char*)vec.data());
+        } else {
+            RAYX_WARN << "No fill data provided for." << createInfo.bufName;
+            createBuffer(createInfo);
+        }
+        return *m_Buffers[createInfo.bufName];
+    }
+    /**
+     * @brief Read Buffer
+     *
+     * @tparam T
+     * @param bufname
+     * @param indirect
+     * @return std::vector<T>
+     */
+    template <typename T>
+    inline std::vector<T> readBuffer(const char* bufname, bool indirect) {
+        std::vector<T> out(m_Buffers[bufname]->getSize() / sizeof(T));
+        if (indirect) {
+            readBufferRaw(bufname, (char*)out.data(), m_TransferQueue);
+        } else {
+            readBufferRaw(bufname, (char*)out.data());
+        }
+        return out;
+    }
 
     template <typename T>
     void updateBuffer(const char* bufname, const std::vector<T>& vec);
@@ -36,13 +65,19 @@ class RAYX_API BufferHandler {
     void freeBuffer(const char* bufname);
     void waitTransferQueueIdle();
 
-    std::vector<VkDescriptorSetLayoutBinding> getDescriptorBindings(std::string passName);
+    std::vector<VkDescriptorSetLayoutBinding> getDescriptorBindings(const std::string& passName);
 
     const VulkanBuffer& getStagingBuffer() const { return *m_StagingBuffer; }
+
     // TODO(OS): This function should be almost illegal...
-    const VulkanBuffer& getVulkanBuffer(std::string bufferName) { return m_Buffers[bufferName]; }
+    // const VulkanBuffer& getVulkanBuffer(std::string bufferName) {
+    //     auto b = m_Buffers[bufferName];
+    //     return *b:
+    // }
 
     const VkFence* getTransferFence() const { return m_TransferFence->fence(); }
+
+    using Buffer = std::unique_ptr<VulkanBuffer>;
 
   private:
     void createStagingBuffer();
@@ -56,6 +91,7 @@ class RAYX_API BufferHandler {
     void readBufferRaw(const char* bufname, char* outdata, const VkQueue& queue = nullptr);
     void writeBufferRaw(const char* bufname, char* indata);
     void gpuMemcpy(VulkanBuffer& buffer_dst, size_t offset_dst, VulkanBuffer& buffer_src, size_t offset_src, size_t bytes);
+    inline VulkanBuffer* getBuffer(const std::string& name);
 
   private:
     VkDevice& m_Device;
@@ -68,14 +104,14 @@ class RAYX_API BufferHandler {
 
     VmaAllocator m_VmaAllocator;
 
-    std::unique_ptr<VulkanBuffer> m_StagingBuffer;
+    Buffer m_StagingBuffer;
     size_t m_StagingSize;
 
-    std::map<std::string, VulkanBuffer> m_Buffers = {};
+    std::map<std::string, Buffer> m_Buffers = {};
 
     // TODO(OS): Use this instead of m_Buffers once ready
-    std::map<std::string, VulkanBuffer> m_ComputeBuffers;
-    std::map<std::string, VulkanBuffer> m_GraphicsBuffers;
+    std::map<std::string, Buffer> m_ComputeBuffers;
+    std::map<std::string, Buffer> m_GraphicsBuffers;
 
     std::unique_ptr<Fence> m_TransferFence;
     VkSemaphore m_TransferSemaphore;

@@ -3,6 +3,13 @@
 #include "BufferHandler.h"
 
 #include "VulkanEngine/Init/Initializers.h"
+
+#define HANDLER_CHECK_BUFFER_EXIST(name)                                          \
+    {                                                                             \
+        if (m_Buffers.find(name) != m_Buffers.end()) {                            \
+            RAYX_ERR << "Buffer " << name << " already exists. Try update func."; \
+        }                                                                         \
+    }
 namespace RAYX {
 BufferHandler::BufferHandler(VkDevice& device, VmaAllocator allocator, uint32_t queueFamilyIndex, size_t stagingSize)
     : m_Device(device), m_FamilyIndex(queueFamilyIndex), m_VmaAllocator(allocator), m_StagingSize(stagingSize) {
@@ -11,6 +18,11 @@ BufferHandler::BufferHandler(VkDevice& device, VmaAllocator allocator, uint32_t 
     createTransferQueue();
     createStagingBuffer();
     createTransferFence();
+
+    VkSemaphoreCreateInfo semaphoreCreateInfo = {};
+    semaphoreCreateInfo.sType = VK_STRUCTURE_TYPE_SEMAPHORE_CREATE_INFO;
+    vkCreateSemaphore(m_Device, &semaphoreCreateInfo, nullptr, &m_TransferSemaphore);
+
 }
 
 BufferHandler::~BufferHandler() {
@@ -23,7 +35,7 @@ BufferHandler::~BufferHandler() {
 
     // Destroy user-defined buffers
     for (auto& [name, buf] : m_Buffers) {
-        vmaDestroyBuffer(m_VmaAllocator, buf.getBuffer(), buf.m_Alloca);
+        vmaDestroyBuffer(m_VmaAllocator, buf->getBuffer(), buf->m_Alloca);
     }
 }
 
@@ -37,12 +49,12 @@ BufferHandler::~BufferHandler() {
 //     return result;
 // }
 
-std::vector<VkDescriptorSetLayoutBinding> BufferHandler::getDescriptorBindings(std::string pass) {
+std::vector<VkDescriptorSetLayoutBinding> BufferHandler::getDescriptorBindings(const std::string& pass) {
     RAYX_PROFILE_FUNCTION();
     std::vector<VkDescriptorSetLayoutBinding> bindings;
 
     for (auto& [name, buf] : m_Buffers) {
-        bindings.push_back(buf.m_DescriptorSetBindings[pass]);
+        bindings.push_back(buf->m_DescriptorSetBindings[pass]);
     }
 
     return bindings;
@@ -61,7 +73,7 @@ void BufferHandler::createTransferCommandBuffer() {
     VK_CHECK_RESULT(vkAllocateCommandBuffers(m_Device, &commandBufferAllocateInfo, &m_TransferCommandBuffer))
 }
 
-void BufferHandler::createTransferFence() { m_TransferFence = std::make_unique<NewFence>(m_Device); }
+void BufferHandler::createTransferFence() { m_TransferFence = std::make_unique<Fence>(m_Device); }
 
 void BufferHandler::createTransferQueue() { vkGetDeviceQueue(m_Device, m_FamilyIndex, 0, &m_TransferQueue); }
 
@@ -117,19 +129,23 @@ void BufferHandler::storeToStagingBuffer(char* indata, size_t bytes) {
 
 void BufferHandler::waitTransferQueueIdle() { vkQueueWaitIdle(m_TransferQueue); }
 
+VulkanBuffer* BufferHandler::getBuffer(const std::string& name) {
+    HANDLER_CHECK_BUFFER_EXIST(name)
+    return (VulkanBuffer*)&m_Buffers[name];
+}
+
 void BufferHandler::readBufferRaw(const char* bufname, char* outdata, const VkQueue& queue) {
     // if (m_state != EngineStates_t::POSTRUN) {
     //     RAYX_ERR << "you've forgotton to .run() the VulkanEngine. Thats "
     //                 "mandatory before reading it's output buffers.";
     // }
 
-    auto b = m_Buffers[bufname];
-
-    if (b.m_createInfo.accessType != VKBUFFER_OUT || b.m_createInfo.accessType != VKBUFFER_INOUT) {
+    auto buffer = getBuffer(bufname);
+    if (buffer->m_createInfo.accessType != VKBUFFER_OUT) {
         RAYX_ERR << "readBufferRaw(\"" << bufname << "\", ...) is not allowed, as \"" << bufname << "\" is not an output buffer";
     }
 
-    size_t remainingBytes = b.getSize();
+    size_t remainingBytes = buffer->getSize();
     size_t offset = 0;
     if (queue != nullptr) {
         vkQueueWaitIdle(queue);
@@ -138,7 +154,7 @@ void BufferHandler::readBufferRaw(const char* bufname, char* outdata, const VkQu
 
     while (remainingBytes > 0) {
         size_t localbytes = std::min((size_t)m_StagingSize, remainingBytes);
-        gpuMemcpy(*m_StagingBuffer, 0, b, offset, localbytes);
+        gpuMemcpy(*m_StagingBuffer, 0, *m_Buffers[bufname], offset, localbytes);
         m_TransferFence->wait();
         loadFromStagingBuffer(outdata + offset, localbytes);
         offset += localbytes;
@@ -147,94 +163,59 @@ void BufferHandler::readBufferRaw(const char* bufname, char* outdata, const VkQu
 }
 
 void BufferHandler::writeBufferRaw(const char* bufname, char* indata) {
-    auto b = m_Buffers[bufname];
+    auto b = getBuffer(bufname);
 
-    if (b.m_createInfo.accessType != VKBUFFER_IN || b.m_createInfo.accessType != VKBUFFER_INOUT) {
+    if (b->m_createInfo.accessType != VKBUFFER_IN || b->m_createInfo.accessType != VKBUFFER_INOUT) {
         RAYX_ERR << "writeBufferRaw(\"" << bufname << "\", ...) is not allowed, as \"" << bufname << "\" has m_in = false";
     }
 
-    size_t remainingBytes = b.getSize();
+    size_t remainingBytes = b->getSize();
     size_t offset = 0;
     while (remainingBytes > 0) {
         size_t localbytes = std::min(remainingBytes, (size_t)m_StagingSize);
         storeToStagingBuffer(indata + offset, localbytes);
-        gpuMemcpy(b, offset, *m_StagingBuffer, 0, localbytes);
+        gpuMemcpy(*b, offset, *m_StagingBuffer, 0, localbytes);
 
         offset += localbytes;
         remainingBytes -= localbytes;
         m_TransferFence->wait();
     }
 }
-/**
- * @brief Create a buffer a fill it
- *
- * @tparam T
- * @param createInfo Buffer creation Info
- * @param vec Vector to fill Buffer with
- */
-template <typename T>
-VulkanBuffer* BufferHandler::createBuffer(VulkanBufferCreateInfo createInfo, const std::vector<T>& vec) {
-    auto name = createInfo.bufName;
-    if (m_Buffers.find(name) != m_Buffers.end()) {
-        RAYX_ERR << "Buffer " << name << " already exists. Try update func.";
-        return;
-    }
-    createInfo.size = vec.size() * sizeof(T);
-    auto newBuffer = VulkanBuffer(m_VmaAllocator, createInfo);
 
-    m_Buffers[name] = newBuffer;
-
-    if (vec) {
-        writeBufferRaw(name, (char*)vec.data());
-    }
-}
 /**
  * @brief  Creates an "empty" buffer
  *
  * @param createInfo
  */
-VulkanBuffer* BufferHandler::createBuffer(VulkanBufferCreateInfo createInfo) {
+VulkanBuffer& BufferHandler::createBuffer(VulkanBufferCreateInfo createInfo) {
     auto name = createInfo.bufName;
-    if (m_Buffers.find(name) != m_Buffers.end()) {
-        RAYX_ERR << "Buffer " << name << " already exists. Try update func.";
-        return;
-    }
-
-    auto newBuffer = VulkanBuffer(m_VmaAllocator, createInfo);
-
-    m_Buffers[name] = newBuffer;
-    return &m_Buffers[name];
+    HANDLER_CHECK_BUFFER_EXIST(name)
+    m_Buffers[name] = std::make_unique<VulkanBuffer>(m_VmaAllocator, createInfo);
+    return *m_Buffers[name];
 }
 
-template <typename T>
-inline std::vector<T> BufferHandler::readBuffer(const char* bufname, bool indirect) {
-    std::vector<T> out(m_Buffers[bufname].getSize() / sizeof(T));
-    if (indirect) {
-        readBufferRaw(bufname, (char*)out.data(), m_TransferQueue);
-    } else {
-        readBufferRaw(bufname, (char*)out.data());
-    }
-    return out;
-}
+// template <typename T>
+// inline std::vector<T> BufferHandler::readBuffer(const char* bufname, bool indirect) {
+//     std::vector<T> out(m_Buffers[bufname]->getSize() / sizeof(T));
+//     if (indirect) {
+//         readBufferRaw(bufname, (char*)out.data(), m_TransferQueue);
+//     } else {
+//         readBufferRaw(bufname, (char*)out.data());
+//     }
+//     return out;
+// }
 
 template <typename T>
 void BufferHandler::updateBuffer(const char* bufname, const std::vector<T>& vec) {
-    if (m_Buffers.find(bufname) == m_Buffers.end()) {
-        RAYX_ERR << "Buffer " << bufname << " does not exist.";
-        return;
-    }
-
+    HANDLER_CHECK_BUFFER_EXIST(bufname)
     if (vec) {
         writeBufferRaw(bufname, (char*)vec.data());
     }
 }
 
 void BufferHandler::freeBuffer(const char* bufname) {
-    if (m_Buffers.find(bufname) == m_Buffers.end()) {
-        RAYX_ERR << "Buffer " << bufname << " does not exist.";
-        return;
-    }
-    vmaDestroyBuffer(m_VmaAllocator, m_Buffers[bufname].getBuffer(), m_Buffers[bufname].m_Alloca);
+    HANDLER_CHECK_BUFFER_EXIST(bufname)
+    vmaDestroyBuffer(m_VmaAllocator, m_Buffers[bufname]->getBuffer(), m_Buffers[bufname]->m_Alloca);
 }
 
 void BufferHandler::deleteBuffer(const char* bufname) {
