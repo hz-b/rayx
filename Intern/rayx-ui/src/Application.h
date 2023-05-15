@@ -70,6 +70,12 @@ struct Vertex {
     }
 };
 
+struct Camera {
+    alignas(16) glm::mat4 model;
+    alignas(16) glm::mat4 view;
+    alignas(16) glm::mat4 proj;
+};
+
 class Application {
   public:
     void run();
@@ -95,11 +101,15 @@ class Application {
     SwapChain m_SwapChain;
 
     VkRenderPass m_RenderPass;
+    VkDescriptorSetLayout m_DescriptorSetLayout;
     VkPipelineLayout m_PipelineLayout;
     VkPipeline m_GraphicsPipeline;
 
     VkCommandPool m_CommandPool;
     std::vector<VkCommandBuffer> m_CommandBuffers;
+
+    VkDescriptorPool m_DescriptorPool;
+    std::vector<VkDescriptorSet> m_DescriptorSets;
 
     std::vector<VkSemaphore> m_imageAvailableSemaphores;
     std::vector<VkSemaphore> m_renderFinishedSemaphores;
@@ -110,11 +120,20 @@ class Application {
 
     VkBuffer m_VertexBuffer;
     VkDeviceMemory m_VertexBufferMemory;
-    const std::array<Vertex, 3> m_Vertices = {
-        Vertex{{0.0f, -0.5f, 0.0f}, {1.0f, 0.0f, 0.0f}},  //
-        Vertex{{0.5f, 0.5f, 0.0f}, {0.0f, 1.0f, 0.0f}},   //
-        Vertex{{-0.5f, 0.5f, 0.0f}, {0.0f, 0.0f, 1.0f}}   //
-    };
+
+    const std::vector<Vertex> m_Vertices = {{{-0.5f, -0.5f, 0.0f}, {1.0f, 0.0f, 0.0f}},
+                                            {{0.5f, -0.5f, 0.0f}, {0.0f, 1.0f, 0.0f}},
+                                            {{0.5f, 0.5f, 0.0f}, {0.0f, 0.0f, 1.0f}},
+                                            {{-0.5f, 0.5f, 0.0f}, {1.0f, 1.0f, 1.0f}}};
+
+    const std::vector<uint16_t> m_Indices = {0, 1, 2, 2, 3, 0};
+
+    VkBuffer m_IndexBuffer;
+    VkDeviceMemory m_IndexBufferMemory;
+
+    std::vector<VkBuffer> m_UniformBuffers;
+    std::vector<VkDeviceMemory> m_UniformBuffersMemory;
+    std::vector<void*> m_UniformBuffersMapped;
 
     void recreateSwapChain();
 
@@ -136,17 +155,25 @@ class Application {
     void createSwapChain();
     void createImageViews();
     void createRenderPass();
+    void createDescriptorSetLayout();
     void createGraphicsPipeline();
     void createFramebuffers();
     void createCommandPool();
 
     uint32_t findMemoryType(uint32_t typeFilter, VkMemoryPropertyFlags properties) const;
+    void createBuffer(VkDeviceSize size, VkBufferUsageFlags usage, VkMemoryPropertyFlags properties, VkBuffer& buffer, VkDeviceMemory& bufferMemory);
+    void copyBuffer(VkBuffer srcBuffer, VkBuffer dstBuffer, VkDeviceSize size);
     void createVertexBuffer();
+    void createIndexBuffer();
+    void createUniformBuffers();
+    void createDescriptorPool();
+    void createDescriptorSets();
 
     void createCommandBuffers();
     void recordCommandBuffer(VkCommandBuffer commandBuffer, uint32_t imageIndex);
     void createSyncObjects();
 
+    void updateUniformBuffer(uint32_t currentImage);
     void drawFrame();
 
     VkShaderModule createShaderModule(const std::vector<char>& code);
