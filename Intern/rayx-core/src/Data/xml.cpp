@@ -209,12 +209,12 @@ bool paramOrientationNoGroup(const rapidxml::xml_node<>* node, glm::dmat4x4* out
     return true;
 }
 
-bool paramSlopeError(const rapidxml::xml_node<>* node, std::array<double, 7>* out) {
+bool paramSlopeError(const rapidxml::xml_node<>* node, SlopeError* out) {
     if (!node || !out) {
         return false;
     }
 
-    out->fill(0.f);
+    *out = {0, 0, 0, 0, 0, 0, 0};
 
     rapidxml::xml_node<>* p;
     if (!param(node, "slopeError", &p)) {
@@ -225,13 +225,13 @@ bool paramSlopeError(const rapidxml::xml_node<>* node, std::array<double, 7>* ou
         // all slopeError-values will be left at 0 if they are missing.
         // Hence we ignore the return values of the upcoming
         // paramDouble-calls.
-        xml::paramDouble(node, "slopeErrorSag", &((*out)[0]));
-        xml::paramDouble(node, "slopeErrorMer", &((*out)[1]));
-        xml::paramDouble(node, "thermalDistortionAmp", &((*out)[2]));
-        xml::paramDouble(node, "thermalDistortionSigmaX", &((*out)[3]));
-        xml::paramDouble(node, "thermalDistortionSigmaZ", &((*out)[4]));
-        xml::paramDouble(node, "cylindricalBowingAmp", &((*out)[5]));
-        xml::paramDouble(node, "cylindricalBowingRadius", &((*out)[6]));
+        xml::paramDouble(node, "slopeErrorSag", &out->m_sag);
+        xml::paramDouble(node, "slopeErrorMer", &out->m_mer);
+        xml::paramDouble(node, "thermalDistortionAmp", &out->m_thermalDistortionAmp);
+        xml::paramDouble(node, "thermalDistortionSigmaX", &out->m_thermalDistortionSigmaX);
+        xml::paramDouble(node, "thermalDistortionSigmaZ", &out->m_thermalDistortionSigmaZ);
+        xml::paramDouble(node, "cylindricalBowingAmp", &out->m_cylindricalBowingAmp);
+        xml::paramDouble(node, "cylindricalBowingRadius", &out->m_cylindricalBowingRadius);
     }
 
     return true;
@@ -438,10 +438,10 @@ std::array<double, 6> Parser::parseMisalignment() const {
     return x;
 }
 
-std::array<double, 7> Parser::parseSlopeError() const {
-    std::array<double, 7> x;
+SlopeError Parser::parseSlopeError() const {
+    SlopeError x;
     if (!paramSlopeError(node, &x)) {
-        x.fill(0.0);
+        x = {0, 0, 0, 0, 0, 0, 0};
     }
     return x;
 }

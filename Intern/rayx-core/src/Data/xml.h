@@ -48,7 +48,7 @@ bool paramDvec3(const rapidxml::xml_node<>* node, const char* paramname, glm::dv
 bool paramMisalignment(const rapidxml::xml_node<>* node, std::array<double, 6>* out);
 bool paramPositionNoGroup(const rapidxml::xml_node<>* node, glm::dvec4* out);
 bool paramOrientationNoGroup(const rapidxml::xml_node<>* node, glm::dmat4x4* out);
-bool paramSlopeError(const rapidxml::xml_node<>* node, std::array<double, 7>* out);
+bool paramSlopeError(const rapidxml::xml_node<>* node, SlopeError* out);
 bool paramVls(const rapidxml::xml_node<>* node, std::array<double, 6>* out);
 bool paramEnergyDistribution(const rapidxml::xml_node<>* node, const std::filesystem::path& rmlFile, EnergyDistribution* out);
 
@@ -76,7 +76,7 @@ struct Parser {
 
     // parsers for derived parameters
     std::array<double, 6> parseMisalignment() const;
-    std::array<double, 7> parseSlopeError() const;
+    SlopeError parseSlopeError() const;
     std::array<double, 6> parseVls() const;
     EnergyDistribution parseEnergyDistribution() const;
     glm::dvec4 parsePosition() const;

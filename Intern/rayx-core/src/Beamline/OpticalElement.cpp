@@ -101,15 +101,13 @@ Behaviour makeGrating(const DesignObject& dobj) {
 }
 
 Element makeElement(const DesignObject& dobj, Behaviour behaviour, Surface surface) {
-    auto slopeError = dobj.parseSlopeError();
-
     return Element{
         .m_inTrans = defaultInMatrix(dobj),
         .m_outTrans = defaultOutMatrix(dobj),
         .m_behaviour = behaviour,
         .m_surface = surface,
         .m_cutout = dobj.parseCutout(),
-        .m_slopeError = {slopeError[0], slopeError[1], slopeError[2], slopeError[3], slopeError[4], slopeError[5], slopeError[6]},
+        .m_slopeError = dobj.parseSlopeError(),
         .m_azimuthalAngle = defaultAzimuthalAngle(dobj).rad,
         .m_material = defaultMaterial(dobj),
         .m_padding = {0.0},

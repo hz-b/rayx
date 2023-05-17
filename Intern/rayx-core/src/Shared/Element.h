@@ -13,6 +13,16 @@ using dmat4 = glm::dmat4;
 
 #endif
 
+struct SlopeError {
+    double m_sag;  // aka `slopeErrorX`
+    double m_mer;  // aka `slopeErrorZ`
+    double m_thermalDistortionAmp;
+    double m_thermalDistortionSigmaX;
+    double m_thermalDistortionSigmaZ;
+    double m_cylindricalBowingAmp;
+    double m_cylindricalBowingRadius;
+};
+
 struct Element {
     // for alignment reasons, the dmat4s are at the beginning of the struct.
     dmat4 m_inTrans;
@@ -24,7 +34,7 @@ struct Element {
     Cutout m_cutout;
 
     // general object information
-    double m_slopeError[7];
+    SlopeError m_slopeError;
     double m_azimuthalAngle;
     double m_material;
 

@@ -8,10 +8,6 @@
 /// - change the rays stokes vector
 /// - potentially absorb the ray (by calling `takeFinalSnapshot(_, W_ABSORBED)`)
 
-// TODO maybe slopeError shouldn't be an array, but a struct!
-double slopeX(int id) { return elements[id].m_slopeError[0]; }
-double slopeZ(int id) { return elements[id].m_slopeError[1]; }
-
 Ray behaveSlit(Ray r, int id, INOUT(uint64_t) ctr, ALLOW_UNUSED Collision col) {
     SlitBehaviour b = deserializeSlit(elements[id].m_behaviour);
     double xStop    = b.m_beamstopWidth / 2;
@@ -86,7 +82,8 @@ Ray behaveRZP(Ray r, int id, INOUT(uint64_t) ctr, Collision col) {
     RZPLineDensity(r, normal, IMAGE_TYPE, RZP_TYPE, DERIVATION_METHOD, zOffsetCenter, risag, rosag, rimer, romer, d_alpha, d_beta, d_ord, WL0, DX, DZ);
 
     // tanger/slope Error
-    normal        = tanger(normal, slopeX(id), slopeZ(id), 0, ctr);
+    SlopeError slope_error = elements[id].m_slopeError;;
+    normal = tanger(normal, slope_error.m_sag, slope_error.m_mer, 0, ctr);
 
     // if additional zero order should be behaved, approx. half of the rays are randomly chosen to be behaved in order 0 (= ordinary reflection) instead
     // of the given order
@@ -113,7 +110,8 @@ Ray behaveGrating(Ray r, int id, INOUT(uint64_t) ctr, Collision col) {
     GratingBehaviour b = deserializeGrating(elements[id].m_behaviour);
 
     // modify normal according to slope error
-    normal        = tanger(normal, slopeX(id), slopeZ(id), 0, ctr);
+    SlopeError slope_error = elements[id].m_slopeError;;
+    normal = tanger(normal, slope_error.m_sag, slope_error.m_mer, 0, ctr);
 
     // vls parameters passed in q.elementParams
     double WL                 = hvlam(r.m_energy);
@@ -141,7 +139,8 @@ Ray behaveMirror(Ray r, int id, INOUT(uint64_t) ctr, Collision col) {
     double azimuthal_angle = elements[id].m_azimuthalAngle;
 
     // take the slope error into account for the normal
-    normal = tanger(normal, slopeX(id), slopeZ(id), 0, ctr);  // option 0 = default, cartesian normal
+    SlopeError slope_error = elements[id].m_slopeError;;
+    normal = tanger(normal, slope_error.m_sag, slope_error.m_mer, 0, ctr);
 
     // calculate the new direction after the reflection
     r.m_direction = dvec3(reflect(dvec4(r.m_direction, 0), normal));
