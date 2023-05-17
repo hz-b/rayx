@@ -4,7 +4,7 @@
 
 changed=0
 
-for f in $(find Intern Tests -name "*.cpp" -or -name "*.h")
+for f in $(find Intern -name "*.cpp" -or -name "*.h")
 do
     oldhash=$(md5sum "$f")
     clang-format -i "$f"

@@ -10,6 +10,9 @@
 #include "Ray.h"
 #include "Shared/Constants.h"
 
+// if no `--batch` option is given, this it the batch size.
+const uint64_t DEFAULT_BATCH_SIZE = 100000;
+
 // Abstract Tracer base class.
 namespace RAYX {
 
@@ -39,7 +42,7 @@ class RAYX_API Tracer {
     // This will call traceRaw.
     // Everything happening in each traceRaw implementation should be extracted to this function instead.
     // See `Rays` for information about the return value.
-    Rays trace(const Beamline&);
+    Rays trace(const Beamline&, uint64_t max_batch_size);
 
     // Useful for GPU Tracing
     struct PushConstants {  // TODO(Jannis): PushConstants is not an expressive name. Rename to something like TracerConfig

@@ -12,9 +12,7 @@ using uint = unsigned int;
 
 namespace RAYX {
 
-const uint64_t BATCH_SIZE = 100000;
-
-Rays Tracer::trace(const Beamline& b) {
+Rays Tracer::trace(const Beamline& b, uint64_t max_batch_size) {
     RAYX_PROFILE_FUNCTION_STDOUT();
 
     auto rays = b.getInputRays();
@@ -24,11 +22,11 @@ Rays Tracer::trace(const Beamline& b) {
 
     Rays result;
 
-    for (int batch_id = 0; batch_id * BATCH_SIZE < rays.size(); batch_id++) {
-        auto rayIdStart = batch_id * BATCH_SIZE;
+    for (int batch_id = 0; batch_id * max_batch_size < rays.size(); batch_id++) {
+        auto rayIdStart = batch_id * max_batch_size;
 
-        auto remaining_rays = rays.size() - batch_id * BATCH_SIZE;
-        auto batch_size = (BATCH_SIZE < remaining_rays) ? BATCH_SIZE : remaining_rays;
+        auto remaining_rays = rays.size() - batch_id * max_batch_size;
+        auto batch_size = (max_batch_size < remaining_rays) ? max_batch_size : remaining_rays;
 
         std::vector<Ray> batch;
         batch.reserve(batch_size);

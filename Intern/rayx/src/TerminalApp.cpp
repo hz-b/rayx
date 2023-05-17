@@ -56,8 +56,14 @@ void TerminalApp::tracePath(const std::filesystem::path& path) {
         // Load RML file
         m_Beamline = std::make_unique<RAYX::Beamline>(RAYX::importBeamline(path));
 
+        // calculate max batch size
+        uint64_t max_batch_size = DEFAULT_BATCH_SIZE;
+        if (m_CommandParser->m_args.m_BatchSize != 0) {
+            max_batch_size = m_CommandParser->m_args.m_BatchSize;
+        }
+
         // Run rayx core
-        auto rays = m_Tracer->trace(*m_Beamline);
+        auto rays = m_Tracer->trace(*m_Beamline, max_batch_size);
 
         // Export Rays to external data.
         auto file = exportRays(rays, path.string());

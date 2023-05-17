@@ -86,7 +86,7 @@ int sequentialExtraParam(int count) {
 
 RAYX::Rays traceRML(std::string filename) {
     auto beamline = loadBeamline(filename);
-    return tracer->trace(beamline);
+    return tracer->trace(beamline, DEFAULT_BATCH_SIZE);
 }
 
 std::vector<RAYX::Ray> extractLastHit(const RAYX::Rays& rays) {
@@ -168,7 +168,7 @@ void compareRays(const RAYX::Rays& r1, const RAYX::Rays& r2, double t) {
 // returns the rayx rays converted to be ray-UI compatible.
 std::vector<RAYX::Ray> rayUiCompat(std::string filename) {
     auto beamline = loadBeamline(filename);
-    auto rays = tracer->trace(beamline);
+    auto rays = tracer->trace(beamline, DEFAULT_BATCH_SIZE);
 
     int seq = sequentialExtraParam(beamline.m_OpticalElements.size());
 
