@@ -50,9 +50,9 @@ std::vector<Ray> PointSource::getRays() const {
     // create n rays with random position and divergence within the given span
     // for width, height, depth, horizontal and vertical divergence
     for (int i = 0; i < n; i++) {
-        x = getCoord(m_widthDist, m_sourceWidth) + getMisalignmentParams()[0];
+        x = getCoord(m_widthDist, m_sourceWidth) + getMisalignmentParams().m_translationXerror;
         x += m_position.x;
-        y = getCoord(m_heightDist, m_sourceHeight) + getMisalignmentParams()[1];
+        y = getCoord(m_heightDist, m_sourceHeight) + getMisalignmentParams().m_translationYerror;
         y += m_position.y;
         z = (randomDouble() - 0.5) * m_sourceDepth;
         z += m_position.z;
@@ -61,8 +61,9 @@ std::vector<Ray> PointSource::getRays() const {
         glm::dvec3 position = glm::dvec3(x, y, z);
 
         // get random deviation from main ray based on distribution
-        psi = getCoord(m_verDist, m_verDivergence) + getMisalignmentParams()[2];
-        phi = getCoord(m_horDist, m_horDivergence) + getMisalignmentParams()[3];
+        // TODO correct misalignments?
+        psi = getCoord(m_verDist, m_verDivergence) + getMisalignmentParams().m_rotationXerror.rad;
+        phi = getCoord(m_horDist, m_horDivergence) + getMisalignmentParams().m_rotationYerror.rad;
         // get corresponding angles based on distribution and deviation from
         // main ray (main ray: xDir=0,yDir=0,zDir=1 for phi=psi=0)
         glm::dvec3 direction = getDirectionFromAngles(phi, psi);

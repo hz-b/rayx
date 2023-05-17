@@ -26,7 +26,7 @@ double LightSource::getLinear45() const { return m_linearPol_45; }
 
 double LightSource::getCircular() const { return m_circularPol; }
 
-std::array<double, 6> LightSource::getMisalignmentParams() const { return m_misalignmentParams; }
+Misalignment LightSource::getMisalignmentParams() const { return m_misalignmentParams; }
 
 [[maybe_unused]] double LightSource::getPhotonEnergy() const { return m_EnergyDistribution.getAverage(); }
 

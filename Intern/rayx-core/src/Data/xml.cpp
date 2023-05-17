@@ -117,14 +117,14 @@ bool paramDvec3(const rapidxml::xml_node<>* node, const char* paramname, glm::dv
     return true;
 }
 
-bool paramMisalignment(const rapidxml::xml_node<>* node, std::array<double, 6>* out) {
+bool paramMisalignment(const rapidxml::xml_node<>* node, Misalignment* out) {
     if (!node || !out) {
         return false;
     }
 
     rapidxml::xml_node<>* p;
 
-    out->fill(0.f);
+    *out = {0, 0, 0, Rad(0), Rad(0), Rad(0)};
 
     if (!param(node, "alignmentError", &p)) {
         return true;  // if error is not given, it'll be zero.
@@ -134,18 +134,21 @@ bool paramMisalignment(const rapidxml::xml_node<>* node, std::array<double, 6>* 
         // all misalignment-values will be left at 0 if they are missing.
         // Hence we ignore the return values of the upcoming
         // paramDouble-calls.
-        xml::paramDouble(node, "translationXerror", &((*out)[0]));
-        xml::paramDouble(node, "translationYerror", &((*out)[1]));
-        xml::paramDouble(node, "translationZerror", &((*out)[2]));
+        xml::paramDouble(node, "translationXerror", &out->m_translationXerror);
+        xml::paramDouble(node, "translationYerror", &out->m_translationYerror);
+        xml::paramDouble(node, "translationZerror", &out->m_translationZerror);
 
-        xml::paramDouble(node, "rotationXerror", &((*out)[3]));
-        (*out)[3] /= 1000.f;  // mrad -> rad conversion
+        double x_mrad = 0;
+        xml::paramDouble(node, "rotationXerror", &x_mrad);
+        out->m_rotationXerror = Rad(x_mrad / 1000.0);  // convert mrad to rad.
 
-        xml::paramDouble(node, "rotationYerror", &((*out)[4]));
-        (*out)[4] /= 1000.f;
+        double y_mrad = 0;
+        xml::paramDouble(node, "rotationYerror", &y_mrad);
+        out->m_rotationYerror = Rad(y_mrad / 1000.0);
 
-        xml::paramDouble(node, "rotationZerror", &((*out)[5]));
-        (*out)[5] /= 1000.f;
+        double z_mrad = 0;
+        xml::paramDouble(node, "rotationZerror", &z_mrad);
+        out->m_rotationZerror = Rad(z_mrad / 1000.0);
     }
 
     return true;
@@ -325,15 +328,15 @@ bool paramEnergyDistribution(const rapidxml::xml_node<>* node, const std::filesy
 bool paramPositionAndOrientation(const rapidxml::xml_node<>* node, const std::vector<xml::Group>& group_context, glm::dvec4* out_pos,
                                  glm::dmat4x4* out_ori) {
     // Always returns True!
-    std::array<double, 6> misalignment{};
-    misalignment.fill(0.f);
+    Misalignment misalignment = {0, 0, 0, Rad(0), Rad(0), Rad(0)};
 
     paramPositionNoGroup(node, out_pos);
     paramOrientationNoGroup(node, out_ori);
     paramMisalignment(node, &misalignment);
 
-    glm::dmat4x4 misOrientation = getRotationMatrix(-misalignment[3], misalignment[4], misalignment[5]);
-    glm::dvec4 offset = glm::dvec4(misalignment[0], misalignment[1], misalignment[2], 1);
+    glm::dmat4x4 misOrientation =
+        getRotationMatrix(-misalignment.m_rotationXerror.rad, misalignment.m_rotationYerror.rad, misalignment.m_rotationZerror.rad);
+    glm::dvec4 offset = glm::dvec4(misalignment.m_translationXerror, misalignment.m_translationYerror, misalignment.m_translationZerror, 1);
     // no need to add misalignment again
     if (group_context.empty()) {
         return true;
@@ -430,8 +433,8 @@ glm::dvec3 Parser::parseDvec3(const char* paramname) const {
 }
 
 // parsers for derived parameters
-std::array<double, 6> Parser::parseMisalignment() const {
-    std::array<double, 6> x{};
+Misalignment Parser::parseMisalignment() const {
+    Misalignment x;
     if (!paramMisalignment(node, &x)) {
         throw std::runtime_error("parseMisalignment failed");
     }

@@ -21,6 +21,15 @@ enum class GratingMount;
 enum class SourceDist;
 enum class GeometricalShape;
 
+struct Misalignment {
+    double m_translationXerror;
+    double m_translationYerror;
+    double m_translationZerror;
+    Rad m_rotationXerror;
+    Rad m_rotationYerror;
+    Rad m_rotationZerror;
+};
+
 /** The xml namespace defines functions, which help to implement the
  * createFromXML-functions for the beamline objects. All of these functions
  * return a boolean indicating whether they were successful. In-case of success
@@ -45,7 +54,7 @@ bool paramDvec3(const rapidxml::xml_node<>* node, const char* paramname, glm::dv
 
 // These functions parse more complex parts of beamline objects, and are used by
 // multiple createFromXML functions.
-bool paramMisalignment(const rapidxml::xml_node<>* node, std::array<double, 6>* out);
+bool paramMisalignment(const rapidxml::xml_node<>* node, Misalignment* out);
 bool paramPositionNoGroup(const rapidxml::xml_node<>* node, glm::dvec4* out);
 bool paramOrientationNoGroup(const rapidxml::xml_node<>* node, glm::dmat4x4* out);
 bool paramSlopeError(const rapidxml::xml_node<>* node, SlopeError* out);
@@ -75,7 +84,7 @@ struct Parser {
     glm::dvec3 parseDvec3(const char* paramname) const;
 
     // parsers for derived parameters
-    std::array<double, 6> parseMisalignment() const;
+    Misalignment parseMisalignment() const;
     SlopeError parseSlopeError() const;
     std::array<double, 6> parseVls() const;
     EnergyDistribution parseEnergyDistribution() const;
