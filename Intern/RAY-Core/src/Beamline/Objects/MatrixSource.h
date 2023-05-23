@@ -18,6 +18,9 @@ class RAYX_API MatrixSource : public LightSource {
   double m_linearPol_0;
   double m_linearPol_45;
   double m_circularPol;
+
+  double m_verDivergence;
+  double m_sourceDepth;
 };
 
 }  // namespace RAYX

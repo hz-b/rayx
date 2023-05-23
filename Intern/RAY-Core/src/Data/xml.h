@@ -22,6 +22,7 @@ enum class SourceDist;
 enum class GeometricalShape;
 enum class ElectronEnergyOrientation;
 enum class SourcePulseType;
+enum class EnergySpreadUnit;
 
 /** The xml namespace defines functions, which help to implement the
  * createFromXML-functions for the beamline objects. All of these functions
@@ -160,6 +161,9 @@ struct Parser {
     inline int parseAlignmentError() const { return parseInt("alignmentError"); }
     inline double parsePhotonFlux() const { return parseDouble("photonFlux"); }
     inline double parsePhotonEnergy() const { return parseDouble("photonEnergy"); }
+    inline double parseEnergySpread() const { return parseDouble("energySpread"); }
+    inline EnergySpreadUnit parseEnergySpreadUnit() const { return static_cast<EnergySpreadUnit>(parseInt("energySpreadUnit")); }
+    
 
     rapidxml::xml_node<>* node;
     std::vector<xml::Group> group_context;

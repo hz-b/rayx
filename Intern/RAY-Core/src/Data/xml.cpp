@@ -350,7 +350,6 @@ bool paramSourcePulseType(const rapidxml::xml_node<>* node, SourcePulseType* out
     return false;
 }
 
-
 bool paramPositionAndOrientation(const rapidxml::xml_node<>* node, const std::vector<xml::Group>& group_context, glm::dvec4* out_pos,
                                  glm::dmat4x4* out_ori) {
     // Always returns True!

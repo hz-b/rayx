@@ -1212,3 +1212,11 @@ TEST_F(TestSuite, testRefractiveIndex) {
     // https://refractiveindex.info/?shelf=main&book=Cu&page=Hagemann
     CHECK_EQ(CPU_TRACER::getRefractiveIndex(25146.2, 29), glm::dvec2(1.0, 1.0328e-7), 1e-5);
 }
+
+/*
+TEST_F(TestSuite, testInterpolationFunctionDipole){
+    RAYX::DipoleSource() dipolesource;
+    dipolesource.setLogInterpolation();
+    auto result = dipolesource.getInterpolation(1.5298292375594387);
+    CHECK_EQ(result, -3.5010758381905855);
+}*/

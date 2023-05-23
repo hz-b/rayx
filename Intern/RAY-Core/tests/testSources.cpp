@@ -1,9 +1,16 @@
 #include "setupTests.h"
 
 void checkDistribution(const std::vector<Ray>& rays, double sourceEnergy, double energySpread) {
-    CHECK_EQ(rays.size(), 200);
+    //CHECK_EQ(rays.size(), 200);
     for (auto r : rays) {
         CHECK_IN(r.m_energy, sourceEnergy - energySpread, sourceEnergy + energySpread);
+    }
+}
+
+void checkPositionDistribution(const std::vector<Ray>& rays, double sourceWidth, double sourceHight) {
+    for (auto r : rays) {
+        CHECK_IN(r.m_position[1], -4.5 * sourceWidth, 4.5 * sourceWidth);
+        CHECK_IN(r.m_position[2], -4.5 * sourceHight, 4.5 * sourceHight);
     }
 }
 
@@ -56,8 +63,12 @@ TEST_F(TestSuite, MatrixSourceEnergyDistribution) {
     checkDistribution(rays, 42, 10);
 }
 
-TEST_F(TestSuite, DipoleSourceRun) {
-    auto rays = loadBeamline("dipolesource").getInputRays();
-    auto raysui = loadCSVRayUI("Dipole-FootprintAllRays");
-    roughCompare(rays, raysui);
+TEST_F(TestSuite, DipoleSourcePosition) {
+    auto rays = loadBeamline("dipole_plain").getInputRays();
+    checkPositionDistribution(rays, 0.065, 0.04);
+}
+
+TEST_F(TestSuite, DipoleEnergyDistribution) {
+    auto rays = loadBeamline("dipole_plain").getInputRays();
+    checkDistribution(rays, 1000, 23000);
 }

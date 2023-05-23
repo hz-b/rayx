@@ -11,8 +11,9 @@
 namespace RAYX {
 
 double get_factorCriticalEnergy(){
-    double planc = Planck_bar / (2*pow(c_elementaryCharge, 5) * pow(c_electronMass,3));
-    return 3 * planc * pow(c_electronVolt,2) * 1.0e24; //nach RAY-UI 
+    //double planc = Planck_bar / (2*pow(c_elementaryCharge, 5) * pow(c_electronMass,3));
+    // 3 * planc * pow(c_electronVolt,2) * 1.0e24; //nach RAY-UI 
+    return 2.5050652873563215;
 }
 
 double get_factorMagneticField(){
@@ -36,6 +37,7 @@ double get_factorTotalPowerDipol() {
                 / (2 * M_PI)/(c_electronVolt/(c_speedOfLight*c_elementaryCharge));
 }
 
+
 DipoleSource::DipoleSource(const DesignObject& dobj) : LightSource(dobj) {
     m_energySpreadType = dobj.parseEnergyDistribution();
     m_photonFlux = dobj.parsePhotonFlux();
@@ -45,15 +47,23 @@ DipoleSource::DipoleSource(const DesignObject& dobj) : LightSource(dobj) {
     m_electronEnergy = dobj.parseElectronEnergy();
     m_photonEnergy = dobj.parsePhotonEnergy();
     m_verEbeamDivergence = dobj.parseVerEbeamDivergence();
+    m_energySpread = dobj.parseEnergySpread();
+    m_energySpreadUnit = dobj.parseEnergySpreadUnit();
 
-    d_sourceWidth = -0.5 * m_sourceWidth * m_sourceWidth;
-    d_criticalEnergy = RAYX::get_factorCriticalEnergy();
-    d_bandwidth = 1.0e-3;
-    d_sigpsi = DipoleSource::vDivergence(m_electronEnergy, d_criticalEnergy, m_photonEnergy, m_verEbeamDivergence);
-    d_synStokes = DipoleSource::syn(m_electronEnergy, d_criticalEnergy, m_photonEnergy, -3*d_sigpsi, 3*d_sigpsi);
+    m_criticalEnergy = RAYX::get_factorCriticalEnergy();
+    m_bandwidth = 1.0e-3;
+    m_verDivergence = DipoleSource::vDivergence(m_electronEnergy, m_criticalEnergy, m_photonEnergy, m_verEbeamDivergence);
+    m_synStokes = DipoleSource::syn(m_electronEnergy, m_criticalEnergy, m_photonEnergy, -3*m_verDivergence, 3*m_verDivergence);
     
-    d_flux = d_synStokes[5] * m_horDivergence * 1.0e-3 * 1.0e2;         //EnergyDistribution Values
-
+    m_flux = m_synStokes[5] * m_horDivergence * 1.0e-3 * 1.0e2;         //EnergyDistribution Values
+    m_gamma = m_electronEnergy * get_factorElectronEnergy();
+    calcFluxOrg();
+    calcHorDivDegSec();
+    //calcMagneticField();
+    calcPhotonWavelength();
+    calcSourcePath();
+    setMaxEnergy();
+    setLogInterpolation();
 }
 
 /**
@@ -61,11 +71,11 @@ DipoleSource::DipoleSource(const DesignObject& dobj) : LightSource(dobj) {
  * hard edge, gaussian if soft edge)) and extent (eg specified width/height of
  * source)
  */
-double getRandom(const double extent) {
-    if (extent>0) {
+double getRandom(bool normal, const double extent) {
+    if (!normal) {
         return (randomDouble() - 0.5) * extent;
     } else {
-        return randomNormal(0, 1) * extent;
+        return (randomNormal(0, 1)) * extent;
     }
 }
 
@@ -80,10 +90,8 @@ double getRandom(const double extent) {
  * @returns list of rays
  */
 std::vector<Ray> DipoleSource::getRays() const {
-    double x, x1, y, z, psi, phi,
-        en;  // x,y,z pos, psi,phi direction cosines, en=energy
-    double sourceWidth2 = 9 * m_sourceWidth; //RAYUI Fortran
-
+    double x1, x, y, z, psi, phi, en;  // x,y,z pos, psi,phi direction cosines, en=energy
+    
     int n = m_numberOfRays;
     std::vector<Ray> rayList;
     rayList.reserve(m_numberOfRays);
@@ -95,22 +103,21 @@ std::vector<Ray> DipoleSource::getRays() const {
     for (int i = 0; i < n; i++) {
         
 
-        phi = getRandom(m_horDivergence);
+        phi = getRandom(false, m_horDivergence);
+        psi = getRandom(false, m_verDivergence);
 
-        x1 = getRandom(sourceWidth2);
-
-
-
-        x = cos(phi) + m_bendingRadius * (1 - cos(phi)) ;
-        x += m_position.x;
-        y = getRandom( m_sourceHeight);
+        x1 = getRandom(true, m_sourceWidth);
+        x = x1 + m_position.x;
+       // x =  
+        y = getRandom(true, m_sourceHeight);
         y += m_position.y;
-        z = (randomDouble() - 0.5) * m_sourceDepth;
+        z = 0.0;
         z += m_position.z;
-        en = selectEnergy();  // LightSource.cpp
-        // double z = (rn[2] - 0.5) * m_sourceDepth;
+
+        en = DipoleSource::getEnergy();       //Verteilung nach Schwingerfunktion
         glm::dvec3 position = glm::dvec3(x, y, z);
 
+        
         // get random deviation from main ray based on distribution
         
         // get corresponding angles based on distribution and deviation from
@@ -118,13 +125,25 @@ std::vector<Ray> DipoleSource::getRays() const {
         glm::dvec3 direction = getDirectionFromAngles(phi, psi);
         glm::dvec4 tempDir = m_orientation * glm::dvec4(direction, 0.0);
         direction = glm::dvec3(tempDir.x, tempDir.y, tempDir.z);
-        glm::dvec4 stokes = glm::dvec4(1, d_synStokes[1], d_synStokes[2], d_synStokes[3]);
+        glm::dvec4 stokes = glm::dvec4(1, m_synStokes[1], m_synStokes[2], m_synStokes[3]);
 
         Ray r = {position, W_UNINIT, direction, en, stokes, 0.0, 0.0, 0.0, 0.0};
 
         rayList.push_back(r);
     }
     return rayList;
+}
+
+double DipoleSource::getEnergy() const {
+    double photonenZahl = 0.0;
+    double energy = 0.0;
+    double random = randomDouble();
+    do{
+        double randomtwo = getRandom(false, m_energySpread);
+        energy = m_photonEnergy + randomtwo;
+        photonenZahl = Schwinger(energy);
+    } while ((photonenZahl / m_maxFlux - random) < 0);
+    return energy;
 }
 
 double DipoleSource::vDivergence(double eel, double ec, double hv, double sigv){
@@ -206,22 +225,60 @@ double DipoleSource::bessel(double hnue,double zeta){
     return result;
 }
 
+void DipoleSource::setLogInterpolation(){
+    for (int i = 0; i < m_schwingerX.size(); i++)
+    {
+        m_schwingerY[i] = m_schwingerX[i] * m_schwingerY[i];
+        m_schwingerX[i] = log(m_schwingerX[i]);
+        m_schwingerY[i] = log(m_schwingerY[i]);                
+    }
+}
+
+
+double DipoleSource::Schwinger(double energy)const{
+    double vorfaktor = factorSchwinger_RAY * 1.e-3;
+    
+    double Y0 = energy / m_criticalEnergy;
+    Y0 = Y0 / 1000;
+    int i = 0;
+    double yg0 = 0.0;
+    double flux;
+
+    if(Y0 > 0){
+        if(Y0 > 10){
+            yg0 = sqrt(PI/2) * sqrt(energy) *pow(-energy, 2);        //sqrt(PI(T)/2.)*sqrt(z)*exp(-z)
+        }
+        if(Y0 < 1.e-4){
+            yg0 =  2.1495282415 * pow(energy, (1.0/3.0));
+        }
+        else{
+            yg0 = exp(getInterpolation(log(Y0)));
+        }
+        //yg0 = linear oder diaboli
+    }
+
+    flux = vorfaktor * m_gamma * yg0;
+
+    return  flux;
+
+}
+
 void DipoleSource::getMaxIntensity(){
     double psi;
     double smax = 0;
+    double sigma = 6 *m_verDivergence;
     
     std::array<double, 6> S;
 
-    psi = -d_sigpsi;
-    d_sigpsi = 6*d_sigpsi;
+    psi = -m_verDivergence;
 
     for( int i = 1; i<250; i++){
         psi = psi + 0.05;
-        S = dipoleFold(psi, m_electronEnergy, d_criticalEnergy, m_photonEnergy, d_sigpsi);
+        S = dipoleFold(psi, m_electronEnergy, m_criticalEnergy, m_photonEnergy, sigma);
         if(smax < S[5]){
             smax = S[5];
         }else{
-            if(d_bandwidth > 0.1){
+            if(m_bandwidth > 0.1){
 
             }
 
@@ -267,7 +324,7 @@ std::array<double, 6> DipoleSource::dipoleFold(double psi, double eel, double ec
         }
 
         psi1 = psi + sy;
-        S = syn(m_electronEnergy, d_criticalEnergy, m_photonEnergy, psi1, psi1);
+        S = syn(m_electronEnergy, m_criticalEnergy, m_photonEnergy, psi1, psi1);
         
         for( int i = 0; i<6; i++){
             ST[i] = ST[i] + S[i];
@@ -283,15 +340,12 @@ std::array<double, 6> DipoleSource::dipoleFold(double psi, double eel, double ec
 }
 
 void DipoleSource::calcMagneticField(){
-    if (m_bendingRadius > 1.e-99) {
-        d_magneticFieldStrength = get_factorMagneticField() * fabs( m_electronEnergy ) / m_bendingRadius;
-        d_criticalEnergy = get_factorCriticalEnergy() * pow( fabs( m_electronEnergy ), 3 ) / m_bendingRadius;
-    } else {
-        d_magneticFieldStrength = get_factorMagneticField() * fabs( m_electronEnergy ) / 1.e-99;
-        d_criticalEnergy = get_factorCriticalEnergy() * pow( fabs( m_electronEnergy ), 3 ) / 1.e-99;
-    }
+    
+    m_magneticFieldStrength = get_factorMagneticField() * fabs( m_electronEnergy ) / m_bendingRadius;
+    m_criticalEnergy = get_factorCriticalEnergy() * pow( fabs( m_electronEnergy ), 3 ) / m_bendingRadius;
+    
 
-    d_totalPower = get_factorTotalPowerDipol() * 0.1 * pow( fabs( m_electronEnergy ), 3 ) * d_magneticFieldStrength * fabs( m_horDivergence )/1000.0;
+    m_totalPower = get_factorTotalPowerDipol() * 0.1 * pow( fabs( m_electronEnergy ), 3 ) * m_magneticFieldStrength * fabs( m_horDivergence )/1000.0;
     m_gamma = m_electronEnergy/(c_electronMass*pow(c_speedOfLight,2)/(c_electronVolt)*1.e-9);
     
     if (m_gamma >= 1) {
@@ -303,18 +357,80 @@ void DipoleSource::calcMagneticField(){
 
 void DipoleSource::calcPhotonWavelength(){
     // Energy Distribution Type : Values only
-    d_photonWaveLength = m_photonEnergy == 0.0 ? 0 : inm2eV / m_photonEnergy;
+    m_photonWaveLength = m_photonEnergy == 0.0 ? 0 : inm2eV / m_photonEnergy;
 
 }
 
 void DipoleSource::calcSourcePath(){
-    d_sourcePathLength = fabs( m_sourcePulseLength ) * 1000 * 0.3;
-    d_phaseJitter = m_photonEnergy == 0 ? 0 : fabs( m_sourcePulseLength * 0.3 ) / d_photonWaveLength * 2000000 * M_PI;
+    m_sourcePathLength = fabs( m_sourcePulseLength ) * 1000 * 0.3;
+    m_phaseJitter = m_photonEnergy == 0 ? 0 : fabs( m_sourcePulseLength * 0.3 ) / m_photonWaveLength * 2000000 * M_PI;
 }
 
 void DipoleSource::calcHorDivDegSec() {
-    d_horDivDegrees = m_horDivergence * 0.180 / M_PI;
-    d_horDivSeconds = m_horDivergence * 0.180 / M_PI * 3600;
+    m_horDivDegrees = m_horDivergence * 0.180 / M_PI;
+    m_horDivSeconds = m_horDivergence * 0.180 / M_PI * 3600;
+}
+
+void DipoleSource::calcFluxOrg(){
+    double phi0 = m_horDivergence * 1.e-3;
+    double m_magneticField = m_magneticFieldStrength / 1000;
+    double bandwidth = 0.001;
+
+    if(m_energySpread != 0.0){
+        bandwidth = m_energySpread / 100;
+    }
+
+    m_flux = m_synStokes[5] * (m_horDivergence * 1e-3) * bandwidth * 100.0;
+
+}
+
+void DipoleSource::setMaxEnergy(){
+    double EMAXS = 285.81224786 * m_criticalEnergy;
+    double Emax = m_electronEnergy + m_energySpread / 2;
+    double Emin = m_electronEnergy - m_energySpread / 2;
+    
+    if(Emax < EMAXS){
+        m_maxFlux = Emax;
+    }
+    else if (Emin > EMAXS){
+        m_maxFlux = Emin;
+    }
+    else{
+        m_maxFlux = EMAXS;
+    }
+}
+
+
+double DipoleSource::getInterpolation(double energy)const{
+    double functionOne = 0.0;
+    double functionTwo = 0.0;
+
+    double dx1;
+    double dx2;
+    double dx0;
+    double result = 0.0;
+
+    int x0Position = 0;
+
+    for (int i = 0; i < int(m_schwingerX.size()); i++)
+    {
+        dx0 = energy - m_schwingerX[i];
+        
+        if(dx0 < 0){ break; }
+        x0Position++;
+    }
+    
+    dx0 = energy - m_schwingerX[x0Position-1];
+    dx1 = energy - m_schwingerX[x0Position];
+    dx2 = energy - m_schwingerX[x0Position+1];
+
+    
+    functionOne = (dx0 * m_schwingerY[x0Position] - dx1 * m_schwingerY[x0Position-1])/(dx0-dx1);
+    functionTwo = (dx0 * m_schwingerY[x0Position + 1] - dx2 * m_schwingerY[x0Position-1])/(dx0-dx2);
+
+    result = (dx1 * functionTwo - dx2*functionOne) / (dx1-dx2);
+
+    return result;
 }
 
 }  // namespace RAYX

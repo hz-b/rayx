@@ -15,7 +15,7 @@ enum class EnergyDistributionType { File, Values, Total, Param };  // default ET
 enum class SourcePulseType { Simultaneous, HardEdge, Gauss, Autorelativistic };       // default simultaneously
 enum class SourceDist { Uniform, Gaussian };                       // TODO(rudi): unify!
 enum class ElectronEnergyOrientation { Clockwise, Counterclockwise };
-
+enum class EnergySpreadUnit { EU_PERCENT , EU_eV};
 
 class RAYX_API LightSource {
   public:
@@ -24,9 +24,7 @@ class RAYX_API LightSource {
 
     // Getter
 
-    double getVerDivergence() const { return m_verDivergence; }
     double getHorDivergence() const { return m_horDivergence; }
-    double getSourceDepth() const { return m_sourceDepth; }
     double getSourceHeight() const { return m_sourceHeight; }
     double getSourceWidth() const { return m_sourceWidth; }
 
@@ -48,12 +46,10 @@ class RAYX_API LightSource {
 
   protected:
     // Geometric Params
-    double m_sourceDepth;
     double m_sourceHeight;
     double m_sourceWidth;
     // in rad:
     double m_horDivergence;
-    double m_verDivergence;
 
     glm::dmat4x4 m_orientation = glm::dmat4x4();
     glm::dvec4 m_position = glm::dvec4();
