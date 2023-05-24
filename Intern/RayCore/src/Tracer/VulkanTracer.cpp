@@ -4,7 +4,6 @@
 
 #include <Material/Material.h>
 
-
 #include "Debug/Debug.h"
 #include "Debug/Instrumentor.h"
 #include "RayCore.h"
@@ -80,6 +79,7 @@ std::vector<Ray> VulkanTracer::traceRaw(const TraceRawConfig& cfg) {
  * @param cfg
  */
 std::vector<Ray> VulkanTracer::newTraceRaw(const TraceRawConfig& cfg) {
+    RAYX_PROFILE_FUNCTION_STDOUT();
     // Fetch CFG Data
     auto rayList = cfg.m_rays;
     const uint32_t numberOfRays = rayList.size();
@@ -104,6 +104,7 @@ std::vector<Ray> VulkanTracer::newTraceRaw(const TraceRawConfig& cfg) {
         m_engine.newInit();
 
     } else {  // For now we recreate everything TODO (OS) : Only change buffers and not all pass!
+
         // Create first Shader Stage
         ShaderStageCreateInfo shaderCreateInfo = {.name = "FullTracer", .shaderPath = "build/bin/comp.spv", .entryPoint = "main"};
         // Merge all stages
@@ -125,8 +126,7 @@ std::vector<Ray> VulkanTracer::newTraceRaw(const TraceRawConfig& cfg) {
                 .addDescriptorSetPerPassBinding(passName, 0, shaderFlag);
 
             m_engine.getBufferHandler()
-                .createBuffer(
-                    {"output-buffer", VKBUFFER_OUT, (numberOfRays * sizeof(Ray) * (int)cfg.m_maxSnapshots)})  // Output Ray Buffer
+                .createBuffer({"output-buffer", VKBUFFER_OUT, (numberOfRays * sizeof(Ray) * (int)cfg.m_maxSnapshots)})  // Output Ray Buffer
                 .addDescriptorSetPerPassBinding(passName, 1, shaderFlag);
 
             m_engine.getBufferHandler()
@@ -152,6 +152,16 @@ std::vector<Ray> VulkanTracer::newTraceRaw(const TraceRawConfig& cfg) {
         }
         // Create Pipeline layouts and Descriptor Layouts. Everytime buffer formation (not data) changes we need to prepare again
         m_engine.prepareComputePipelinePass();
+        m_engine.run({.m_numberOfInvocations = numberOfRays});
+
+        std::vector<Ray> out = m_engine.readBuffer<Ray>("output-buffer");
+
+#ifdef RAYX_DEBUG_MODE
+        m_debugBufList = m_engine.readBuffer<debugBuffer_t>("debug-buffer");
+#endif
+
+        m_engine.newCleanup();
+        return out;
     }
     return rayList;
 }
@@ -161,6 +171,7 @@ void VulkanTracer::setPushConstants(const PushConstants* p) {
     m_engine.m_pushConstants.pushConstPtr = static_cast<const PushConstants*>(p);
     m_engine.m_pushConstants.size = sizeof(*p);
 }
+
 }  // namespace RAYX
 
 #endif

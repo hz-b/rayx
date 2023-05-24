@@ -22,7 +22,6 @@ BufferHandler::BufferHandler(VkDevice& device, VmaAllocator allocator, uint32_t 
     VkSemaphoreCreateInfo semaphoreCreateInfo = {};
     semaphoreCreateInfo.sType = VK_STRUCTURE_TYPE_SEMAPHORE_CREATE_INFO;
     vkCreateSemaphore(m_Device, &semaphoreCreateInfo, nullptr, &m_TransferSemaphore);
-
 }
 
 BufferHandler::~BufferHandler() {
@@ -221,6 +220,33 @@ void BufferHandler::freeBuffer(const char* bufname) {
 void BufferHandler::deleteBuffer(const char* bufname) {
     freeBuffer(bufname);
     m_Buffers.erase(bufname);
+}
+
+// TODO(OS) : Only 1 Set is currently supported
+void BufferHandler::updteDescriptorSets(std::vector<VkDescriptorSetLayout>& descriptorSetLayout, std::vector<VkDescriptorSet>& descriptorSets,
+                                        DescriptorPool& pool, std::string pass) {
+    auto writer = DescriptorWriter(descriptorSetLayout[0], pool);
+    for (auto& [name, b] : m_Buffers) {
+        auto descInfo = b->getDescriptorInfo();
+        writer.writeBuffer(b->getPassDescriptorBinding(pass), &descInfo);
+    }
+
+    writer.build(descriptorSets[0]);
+}
+
+void BufferHandler::insertBufferMemoryBarrier(std::string bufferName, const VkCommandBuffer& commandBuffer, VkAccessFlags srcAccessMask,
+                                              VkAccessFlags dstAccessMask, VkPipelineStageFlags srcStageMask, VkPipelineStageFlags dstStageMask,
+                                              VkDeviceSize offset) {
+    auto buffer = getBuffer(bufferName);
+
+    VkBufferMemoryBarrier bufferMemoryBarrier = VKINIT::Sync::buffer_memory_barrier();
+    bufferMemoryBarrier.sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER;
+    bufferMemoryBarrier.srcAccessMask = srcAccessMask;
+    bufferMemoryBarrier.dstAccessMask = dstAccessMask;
+    bufferMemoryBarrier.buffer = buffer->m_Buffer;
+    bufferMemoryBarrier.offset = offset;
+    bufferMemoryBarrier.size = buffer->getSize();  // FIXME(OS): Only available size is bound
+    vkCmdPipelineBarrier(commandBuffer, srcStageMask, dstStageMask, 0, 0, nullptr, 1, &bufferMemoryBarrier, 0, nullptr);
 }
 
 }  // namespace RAYX

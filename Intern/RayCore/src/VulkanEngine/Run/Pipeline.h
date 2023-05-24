@@ -4,6 +4,7 @@
 #include <vulkan/vulkan.hpp>
 
 #include "RayCore.h"
+#include "VulkanEngine/Buffer/BufferHandler.h"
 #include "VulkanEngine/Init/Descriptor.h"
 #include "VulkanEngine/Init/ShaderStage.h"
 namespace RAYX {
@@ -60,6 +61,8 @@ class RAYX_API Pass {
     const VkPipelineLayout getPipelineLayout(int stage) { return m_pass[stage]->m_pipelineLayout; }
     const ShaderStage& getShaderStage(int stage) const { return *(m_pass[stage]->shaderStage); }
 
+    DescriptorPool* getDesriptorPool() { return globalDescriptorPool.get(); }
+
     virtual const VkPipelineBindPoint& getPipelineBindPoint() const = 0;
     virtual void prepare(std::vector<VkDescriptorSetLayoutBinding>) = 0;
 
@@ -103,27 +106,31 @@ class RAYX_API ComputePass : public Pass {
 
     const VkPipelineBindPoint& getPipelineBindPoint() const { return m_PipelineBindPoint; }
     void prepare(std::vector<VkDescriptorSetLayoutBinding> bindings);
+    void createDescriptorPool(uint32_t maxSets, uint32_t bufferCount);
+
+    const std::vector<VkDescriptorSetLayout>& getDescriptorSetLayouts() const { return m_descriptorSetLayouts; }
+    const std::vector<VkDescriptorSet>& getDescriptorSets() const { return m_descriptorSets; }
 
     // Adding a new PipelineStage is the same as extending the Pass with a new Stage
     void addPipelineStage(const ShaderStageCreateInfo&);
-    //void addPipelineStage(const Pass& newStage);
+
+    // void addPipelineStage(const Pass& newStage);
+    void updateDescriptorSets(BufferHandler* bufferHandler);
+    void bindDescriptorSet(VkCommandBuffer cmdBuffer, int stage);
+    void cleanPipeline(int stage);
 
   private:
-    void createDescriptorPool();
-
     // Currently only one DescriptorSetLayout is offered per Pass
     void createDescriptorSetLayout(std::vector<VkDescriptorSetLayoutBinding>& bindings);
 
     VkDevice& m_Device;
     const char* m_name;
 
-    VkDescriptorPool m_DescriptorPool = VK_NULL_HANDLE;
+    VkDescriptorPool m_DescriptorPool = VK_NULL_HANDLE;                        // FIXME(OS): Possibly not used
     VkPipelineBindPoint m_PipelineBindPoint = VK_PIPELINE_BIND_POINT_COMPUTE;  // Always compute
 
     std::vector<VkDescriptorSetLayout> m_descriptorSetLayouts = {VK_NULL_HANDLE};  // For now, only one [0]
     std::vector<VkDescriptorSet> m_descriptorSets = {VK_NULL_HANDLE};              // For now, only one [0]
-    // VulkanEngine::pushConstants_t m_pushConstants = {nullptr};  // TODO (OS): Not really like this as every shader has its own push_t
-
     // TODO(OS): Add missing memory barriers
 };
 }  // namespace RAYX

@@ -6,6 +6,7 @@
 #include <vulkan/vulkan.hpp>
 
 #include "VulkanEngine/Buffer/VulkanBuffer.h"
+#include "VulkanEngine/Init/Descriptor.h"
 #include "VulkanEngine/Init/Fence.h"
 
 namespace RAYX {
@@ -65,17 +66,23 @@ class RAYX_API BufferHandler {
     void freeBuffer(const char* bufname);
     void waitTransferQueueIdle();
 
+    std::map<std::string, std::unique_ptr<VulkanBuffer>>* getBuffers() { return &m_Buffers; }
+
     std::vector<VkDescriptorSetLayoutBinding> getDescriptorBindings(const std::string& passName);
+
+    void updteDescriptorSets(std::vector<VkDescriptorSetLayout>& descriptorSetLayout, std::vector<VkDescriptorSet>& descriptorSets,
+                             DescriptorPool& pool, std::string pass);
 
     const VulkanBuffer& getStagingBuffer() const { return *m_StagingBuffer; }
 
     // TODO(OS): This function should be almost illegal...
-    // const VulkanBuffer& getVulkanBuffer(std::string bufferName) {
-    //     auto b = m_Buffers[bufferName];
-    //     return *b:
-    // }
+    inline VulkanBuffer* getBuffer(const std::string& name);
 
     const VkFence* getTransferFence() const { return m_TransferFence->fence(); }
+
+    void insertBufferMemoryBarrier(std::string bufferName, const VkCommandBuffer& commandBuffer, VkAccessFlags srcAccessMask,
+                                   VkAccessFlags dstAccessMask, VkPipelineStageFlags srcStageMask, VkPipelineStageFlags dstStageMask,
+                                   VkDeviceSize offset = 0);
 
     using Buffer = std::unique_ptr<VulkanBuffer>;
 
@@ -91,7 +98,6 @@ class RAYX_API BufferHandler {
     void readBufferRaw(const char* bufname, char* outdata, const VkQueue& queue = nullptr);
     void writeBufferRaw(const char* bufname, char* indata);
     void gpuMemcpy(VulkanBuffer& buffer_dst, size_t offset_dst, VulkanBuffer& buffer_src, size_t offset_src, size_t bytes);
-    inline VulkanBuffer* getBuffer(const std::string& name);
 
   private:
     VkDevice& m_Device;

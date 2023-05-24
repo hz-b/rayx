@@ -77,5 +77,13 @@ void VulkanBuffer::addDescriptorSetPerPassBinding(const std::string& passName, u
     m_DescriptorSetBindings.insert(std::pair<std::string, VkDescriptorSetLayoutBinding>(passName, b));
 }
 
+VkDescriptorBufferInfo VulkanBuffer::getDescriptorInfo(VkDeviceSize offset) {
+    return VkDescriptorBufferInfo{
+        m_Buffer,
+        offset,
+        m_createInfo.size,
+    };
+}
+
 }  // namespace RAYX
 #endif

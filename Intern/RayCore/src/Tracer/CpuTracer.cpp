@@ -58,5 +58,7 @@ std::vector<Ray> CpuTracer::traceRaw(const TraceRawConfig& cfg) {
     return CPU_TRACER::outputData.data;
 }
 
+std::vector<Ray> CpuTracer::newTraceRaw(const TraceRawConfig& cfg) { return traceRaw(cfg); };
+
 void CpuTracer::setPushConstants(const PushConstants* p) { std::memcpy(&CPU_TRACER::pushConstants, p, sizeof(CPU_TRACER::pushConstants_t)); }
 }  // namespace RAYX

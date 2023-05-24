@@ -15,6 +15,14 @@ void VulkanEngine::cleanup() {
     m_state = EngineStates_t::PRERUN;
 }
 
+void VulkanEngine::newCleanup() {
+    IS_ENGINE_CLEANABLE
+    for (auto& pipeline : m_ComputePass->getPass()) {
+        pipeline->cleanPipeline(m_Device);
+    }
+    m_state = EngineStates_t::PRERUN;
+}
+
 }  // namespace RAYX
 
 #endif

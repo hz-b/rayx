@@ -38,9 +38,10 @@ void VulkanEngine::newInit() {
     createCommandBuffers(1);  // 1 Command Buffer
     newCreateSemaphores(1);   // FIXME(OS) We only need one Sempahore (+1 for Transfer in handler)
     prepareVma();
-    createCache();
+    //createCache();
     initBufferHandler();
     m_state = EngineStates_t::PRERUN;
+    RAYX_D_LOG << "hLLO";
 }
 
 /**

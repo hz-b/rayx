@@ -41,12 +41,12 @@ DescriptorPool::DescriptorPool(VkDevice& device, uint32_t maxSets, VkDescriptorP
 
 DescriptorPool::~DescriptorPool() { vkDestroyDescriptorPool(m_Device, m_DescriptorPool, nullptr); }
 
-void DescriptorPool::allocateDescriptor(const VkDescriptorSetLayout descriptorSetLayout, VkDescriptorSet& descriptor) const {
+void DescriptorPool::allocateDescriptor(const VkDescriptorSetLayout descriptorSetLayout, VkDescriptorSet& descriptorSet) const {
     auto allocInfo = VKINIT::Descriptor::descriptor_set_allocate_info(m_DescriptorPool, &descriptorSetLayout, 1);
 
     // Might want to create a "DescriptorPoolManager" class that handles this case, and builds
     // a new pool whenever an old pool fills up. But this is beyond our current scope
-    VK_CHECK_RESULT(vkAllocateDescriptorSets(m_Device, &allocInfo, &descriptor))
+    VK_CHECK_RESULT(vkAllocateDescriptorSets(m_Device, &allocInfo, &descriptorSet))
 }
 
 void DescriptorPool::freeDescriptors(std::vector<VkDescriptorSet>& descriptors) const {

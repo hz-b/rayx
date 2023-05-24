@@ -30,7 +30,7 @@ class RAYX_API DescriptorPool {
     DescriptorPool& operator=(const DescriptorPool&) = delete;
 
     // Allocates a Descriptor Set
-    void allocateDescriptor(const VkDescriptorSetLayout descriptorSetLayout, VkDescriptorSet& descriptor) const;
+    void allocateDescriptor(const VkDescriptorSetLayout descriptorSetLayout, VkDescriptorSet& descriptorSet) const;
     // Frees a Descriptor Set
     void freeDescriptors(std::vector<VkDescriptorSet>& descriptors) const;
 

@@ -55,6 +55,8 @@ class RAYX_API VulkanBuffer {
     void UnmapMemory();
 
     void addDescriptorSetPerPassBinding(const std::string& passName, uint32_t binding, VkShaderStageFlags shaderStageFlag);
+    VkDescriptorBufferInfo getDescriptorInfo(VkDeviceSize offset = 0);
+    uint32_t getPassDescriptorBinding(std::string passName) { return m_DescriptorSetBindings[passName].binding; }
 
   private:
     // VMA Version of createVkBuffer

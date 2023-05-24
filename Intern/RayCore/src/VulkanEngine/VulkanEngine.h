@@ -76,6 +76,8 @@ class RAYX_API VulkanEngine {
     /// This function runs the shader.
     void run(VulkanEngineRunSpec_t);
 
+    void newRun(VulkanEngineRunSpec_t);
+
     /// after run(_) is finished (i.e. in POSTRUN state)
     /// we can read the contents of `m_out = true`-buffers.
     template <typename T>
@@ -88,6 +90,7 @@ class RAYX_API VulkanEngine {
     /// changes the state from POSTRUN to PRERUN.
     /// after this all buffers are deleted (and hence readBuffer will fail.)
     void cleanup();
+    void newCleanup();
 
     /// There are 3 basic states for the VulkanEngine. Described below.
     /// the variable m_state stores that state.
@@ -221,6 +224,7 @@ class RAYX_API VulkanEngine {
     }
 
     void recordInComputeCommandBuffer();
+    void newRecordInCommandBuffer(ComputePass& computePass);
     void createSemaphores();
     void newCreateSemaphores(int count);
     void createStagingBuffer();
@@ -232,6 +236,7 @@ class RAYX_API VulkanEngine {
     // Run:
     void submitCommandBuffer();
     void updteDescriptorSets();
+    void newUpdateDescriptorSets();
     void createComputePipeline();
 
     uint64_t m_runs = 0;

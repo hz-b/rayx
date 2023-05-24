@@ -14,7 +14,10 @@ Pass::Pipeline::Pipeline(std::string name, VkDevice& dev, const ShaderStageCreat
     // TODO(OS): Don't reserve 1 for the descriptors
     shaderStage = std::make_shared<ShaderStage>(m_device, shaderCreateInfo);
 }
-Pass::Pipeline::~Pipeline() { cleanPipeline(m_device); }
+Pass::Pipeline::~Pipeline() {
+    cleanPipeline(m_device);
+    storePipelineCache(m_device);
+}
 
 void Pass::Pipeline::createPipelineLayout(const VkDescriptorSetLayout setLayouts) {
     // if (!m_descriptorSetLayouts.empty()) {
@@ -37,7 +40,7 @@ void Pass::Pipeline::createPipelineLayout(const VkDescriptorSetLayout setLayouts
     VK_CHECK_RESULT(vkCreatePipelineLayout(m_device, &pipelineLayoutCreateInfo, nullptr, &m_pipelineLayout))
     //}
 }
-
+// FIXME(OS): Currently only creating compute pipelines. Pipeline, should be general for also other pipelines. Move this somewhere else.
 void Pass::Pipeline::createPipeline() {
     if (m_pipelineLayout != nullptr) {
         /*
@@ -113,7 +116,6 @@ void inline Pass::Pipeline::storePipelineCache(VkDevice& device) {
 void Pass::Pipeline::cleanPipeline(VkDevice& device) {
     vkDestroyPipeline(device, m_pipeline, nullptr);
     vkDestroyPipelineLayout(device, m_pipelineLayout, nullptr);
-    storePipelineCache(device);
 }
 
 void Pass::Pipeline::updatePushConstants(void* data, size_t size) {
@@ -135,6 +137,7 @@ ComputePass::ComputePass(VkDevice& device, const ComputePassCreateInfo& createIn
         // TODO(OS): Add missing pushconstants
         m_pass[i] = std::make_shared<Pipeline>(createInfo.shaderStagesCreateInfos[i].name, m_Device, createInfo.shaderStagesCreateInfos[i]);
     }
+    createDescriptorPool(10, 10);
 }
 
 ComputePass::~ComputePass() {
@@ -158,6 +161,10 @@ void ComputePass::createDescriptorSetLayout(std::vector<VkDescriptorSetLayoutBin
 // Prepare Compute Pass according to buffers and layout
 void ComputePass::prepare(std::vector<VkDescriptorSetLayoutBinding> bindings) {
     RAYX_VERB << "Preparing pipelines...";
+    // Create Pool if non existent! (Pool sets DO NOT CHANGE) FIXME(OS)
+    if (globalDescriptorPool != nullptr) {
+        createDescriptorPool(1, bindings.size());
+    }
 
     createDescriptorSetLayout(bindings);
 
@@ -180,10 +187,28 @@ void ComputePass::addPipelineStage(const ShaderStageCreateInfo& createInfo) {
 //     m_stagesCount++;
 // }
 
-void ComputePass::createDescriptorPool() {
+void ComputePass::createDescriptorPool(uint32_t maxSets, uint32_t bufferCount) {
     // TODO(OS): This should change once we need more sets
-    globalDescriptorPool = DescriptorPool::Builder(m_Device).setMaxSets(1).addPoolSize(VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, 1).build();
+    globalDescriptorPool = DescriptorPool::Builder(m_Device).setMaxSets(maxSets).addPoolSize(VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, bufferCount).build();
 }
+
+void ComputePass::updateDescriptorSets(BufferHandler* bufferHandler) {
+    auto writer = DescriptorWriter(m_descriptorSetLayouts[0], *globalDescriptorPool);
+    auto buffers = bufferHandler->getBuffers();
+
+    for (auto& [name, b] : *buffers) {
+        auto descInfo = b->getDescriptorInfo();
+        writer.writeBuffer(b->getPassDescriptorBinding(m_name), &descInfo);
+    }
+
+    writer.build(m_descriptorSets[0]);
+}
+
+void ComputePass::bindDescriptorSet(VkCommandBuffer cmdBuffer, int stage) {
+    vkCmdBindDescriptorSets(cmdBuffer, getPipelineBindPoint(), getPipelineLayout(stage), 0, 1, &m_descriptorSets[0], 0, nullptr);
+}
+
+void ComputePass::cleanPipeline(int stage) { m_pass[stage]->cleanPipeline(m_Device); }
 
 }  // namespace RAYX
 #endif
