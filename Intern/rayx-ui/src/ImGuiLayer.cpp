@@ -104,14 +104,21 @@ void ImGuiLayer::updateImGui() {
         static float f = 0.0f;
         static int counter = 0;
 
-        ImGui::Begin("Hello, world!");  // Create a window called "Hello, world!" and append into it.
+        ImGui::Begin("Properties Manager");  // Create a window called "Hello, world!" and append into it.
 
-        ImGui::Text("This is some useful text.");           // Display some text (you can use a format strings too)
-        ImGui::Checkbox("Demo Window", &m_ShowDemoWindow);  // Edit bools storing our window open/close state
-        ImGui::Checkbox("Another Window", &m_ShowAnotherWindow);
+        ImGui::Text("Background");           // Display some text (you can use a format strings too)
+        ImGui::ColorEdit3("Color", (float*)&m_ClearColor);  // Edit 3 floats representing a color
 
-        ImGui::SliderFloat("float", &f, 0.0f, 1.0f);              // Edit 1 float using a slider from 0.0f to 1.0f
-        ImGui::ColorEdit3("clear color", (float*)&m_ClearColor);  // Edit 3 floats representing a color
+        ImGui::Text("Camera");
+        ImGui::SliderFloat("FOV", &m_Camera.FOV, 0.0f, 180.0f);
+        ImGui::SliderFloat("Pitch", &m_Camera.Pitch, -90.0f, 90.0f);
+        ImGui::SliderFloat("Yaw", &m_Camera.Yaw, -180.0f, 180.0f);
+        ImGui::SliderFloat("Roll", &m_Camera.Roll, -180.0f, 180.0f);
+        ImGui::SliderFloat("X", &m_Camera.Position.x, -10.0f, 10.0f);
+        ImGui::SliderFloat("Y", &m_Camera.Position.y, -10.0f, 10.0f);
+        ImGui::SliderFloat("Z", &m_Camera.Position.z, -10.0f, 10.0f);
+        ImGui::SliderFloat("Near", &m_Camera.Near, 0.0f, 100.0f);
+        ImGui::SliderFloat("Far", &m_Camera.Far, 0.0f, 100.0f);
 
         if (ImGui::Button("Button"))  // Buttons return true when clicked (most widgets return true when edited/activated)
             counter++;
@@ -122,14 +129,6 @@ void ImGuiLayer::updateImGui() {
         ImGui::End();
     }
 
-    // 3. Show another simple window.
-    if (m_ShowAnotherWindow) {
-        ImGui::Begin("Another Window", &m_ShowAnotherWindow);  // Pass a pointer to our bool variable (the window will have a closing button that will
-                                                               // clear the bool when clicked)
-        ImGui::Text("Hello from another window!");
-        if (ImGui::Button("Close Me")) m_ShowAnotherWindow = false;
-        ImGui::End();
-    }
     ImGui::Render();
 }
 

@@ -818,7 +818,7 @@ void Application::recordCommandBuffer(VkCommandBuffer commandBuffer, uint32_t im
     renderPassInfo.renderArea.offset = {0, 0};
     renderPassInfo.renderArea.extent = m_SwapChain.Extent;
 
-    VkClearValue clearColor = {{{0.0f, 0.0f, 0.0f, 1.0f}}};
+    VkClearValue clearColor = m_ImGuiLayer.getClearValue();
     renderPassInfo.clearValueCount = 1;
     renderPassInfo.pClearValues = &clearColor;
 
@@ -879,16 +879,12 @@ void Application::createSyncObjects() {
 }
 
 void Application::updateUniformBuffer(uint32_t currentImage) {
-    static auto startTime = std::chrono::high_resolution_clock::now();
-
-    auto currentTime = std::chrono::high_resolution_clock::now();
-    float time = std::chrono::duration<float, std::chrono::seconds::period>(currentTime - startTime).count();
+    auto cameraSettings = m_ImGuiLayer.getCameraSettings();
 
     Camera cam{};
-    cam.model = glm::rotate(glm::mat4(1.0f), time * glm::radians(90.0f), glm::vec3(0.0f, 0.0f, 1.0f));
-    cam.view = glm::lookAt(glm::vec3(2.0f, 2.0f, 2.0f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 0.0f, 1.0f));
-    cam.proj = glm::perspective(glm::radians(45.0f), m_windowWidth / (float)m_windowHeight, 0.1f, 10.0f);
-    cam.proj[1][1] *= -1;
+    cam.model = cameraSettings.getModelMatrix();
+    cam.view = cameraSettings.getViewMatrix();
+    cam.proj = cameraSettings.getProjectionMatrix((float)m_windowWidth / (float)m_windowHeight);
 
     memcpy(m_UniformBuffersMapped[currentImage], &cam, sizeof(cam));
 }
