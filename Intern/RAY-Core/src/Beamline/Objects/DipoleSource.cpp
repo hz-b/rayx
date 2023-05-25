@@ -132,7 +132,7 @@ double DipoleSource::getEnergy() const {
     double energy = 0.0;
 
     do {
-        energy = m_photonEnergy + (randomDouble() - 0,5) * m_energySpread;
+        energy = m_photonEnergy + (randomDouble() - 0.5) * m_energySpread;
         flux = schwinger(energy);
     } while ((flux / m_maxFlux - randomDouble()) < 0);
     return energy;
@@ -165,7 +165,7 @@ glm::dvec4 DipoleSource::getStokesSyn(double hv, double psi1, double psi2) const
     //std::array<double, 6> result = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
     glm::dvec4 stokes = {0.0, 0.0, 0.0, 0.0};
     while (psi <= psi2) {
-        double sign1 = DipoleSource::m_electronEnergyOrientation == ElectronEnergyOrientation::Clockwise ? PI_2 : -PI_2;
+        double sign1 = DipoleSource::m_electronEnergyOrientation == ElectronEnergyOrientation::Clockwise ? PI : -PI;
         double sign2 = psi >= 0.0 ? 1.0 : -1.0;
         double phase = -(sign1 * sign2);
         double x = gamma * psi * 0.001;
@@ -222,7 +222,6 @@ double DipoleSource::schwinger(double energy) const {
 
     double Y0 = energy / m_criticalEnergy;
     Y0 = Y0 / 1000;
-    int i = 0;
     double yg0 = 0.0;
     double flux;
 
