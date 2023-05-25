@@ -15,7 +15,7 @@ PointSource::PointSource(const DesignObject& dobj) : LightSource(dobj) {
     m_misalignmentParams = dobj.parseMisalignment();
     m_verDivergence = dobj.parseVerDiv();
     m_sourceDepth = dobj.parseSourceDepth();
-    
+
     m_linearPol_0 = dobj.parseLinearPol0();
     m_linearPol_45 = dobj.parseLinearPol45();
     m_circularPol = dobj.parseCircularPol();

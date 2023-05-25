@@ -11,16 +11,17 @@ class RAYX_API MatrixSource : public LightSource {
     virtual ~MatrixSource() = default;
 
     virtual std::vector<Ray> getRays() const override;
+
   private:
-  std::array<double, 6> m_misalignmentParams;
-  SourcePulseType m_sourceDistributionType;  //TODO: wo muss der name angepasst werden?
+    std::array<double, 6> m_misalignmentParams;
+    SourcePulseType m_sourceDistributionType;  // TODO: wo muss der name angepasst werden?
 
-  double m_linearPol_0;
-  double m_linearPol_45;
-  double m_circularPol;
+    double m_linearPol_0;
+    double m_linearPol_45;
+    double m_circularPol;
 
-  double m_verDivergence;
-  double m_sourceDepth;
+    double m_verDivergence;
+    double m_sourceDepth;
 };
 
 }  // namespace RAYX

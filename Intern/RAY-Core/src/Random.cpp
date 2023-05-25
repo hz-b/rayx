@@ -50,8 +50,4 @@ double randomNormal(double mu, double sigma) {
     return z0;
 }
 
-
-
-
-
 }  // namespace RAYX

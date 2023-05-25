@@ -10,11 +10,10 @@ LightSource::LightSource(const DesignObject& dobj) {
     m_sourceHeight = dobj.parseSourceHeight();
     m_sourceWidth = dobj.parseSourceWidth();
     m_horDivergence = dobj.parseHorDiv();
-    //m_verDivergence = dobj.parseVerDiv();
+    // m_verDivergence = dobj.parseVerDiv();
     m_orientation = dobj.parseOrientation();
     m_position = dobj.parsePosition();
 }
-
 
 [[maybe_unused]] double LightSource::getPhotonEnergy() const { return m_EnergyDistribution.getAverage(); }
 

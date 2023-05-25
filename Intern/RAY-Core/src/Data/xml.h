@@ -163,7 +163,6 @@ struct Parser {
     inline double parsePhotonEnergy() const { return parseDouble("photonEnergy"); }
     inline double parseEnergySpread() const { return parseDouble("energySpread"); }
     inline EnergySpreadUnit parseEnergySpreadUnit() const { return static_cast<EnergySpreadUnit>(parseInt("energySpreadUnit")); }
-    
 
     rapidxml::xml_node<>* node;
     std::vector<xml::Group> group_context;

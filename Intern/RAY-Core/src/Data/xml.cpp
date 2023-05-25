@@ -322,7 +322,7 @@ bool paramEnergyDistribution(const rapidxml::xml_node<>* node, const std::filesy
     }
 }
 
-bool paramElectronEnergyOrientation(const rapidxml::xml_node<>* node, ElectronEnergyOrientation* out){
+bool paramElectronEnergyOrientation(const rapidxml::xml_node<>* node, ElectronEnergyOrientation* out) {
     if (!node || !out) {
         return false;
     }
@@ -331,13 +331,12 @@ bool paramElectronEnergyOrientation(const rapidxml::xml_node<>* node, ElectronEn
         return false;
     }
     *out = static_cast<ElectronEnergyOrientation>(energyOrientation_int);
-   
-    
+
     return false;
 }
 
-bool paramSourcePulseType(const rapidxml::xml_node<>* node, SourcePulseType* out){
-     if (!node || !out) {
+bool paramSourcePulseType(const rapidxml::xml_node<>* node, SourcePulseType* out) {
+    if (!node || !out) {
         return false;
     }
     int spreadType_int;
@@ -345,8 +344,7 @@ bool paramSourcePulseType(const rapidxml::xml_node<>* node, SourcePulseType* out
         return false;
     }
     *out = static_cast<SourcePulseType>(spreadType_int);
-   
-    
+
     return false;
 }
 
@@ -553,10 +551,9 @@ Cutout Parser::parseCutout() const {
     }
 }
 
-
 ElectronEnergyOrientation Parser::parseElectronEnergyOrientation() const {
     ElectronEnergyOrientation orientation;
-    if(!paramElectronEnergyOrientation(node, &orientation)){
+    if (!paramElectronEnergyOrientation(node, &orientation)) {
         return orientation;
     }
 
@@ -565,7 +562,7 @@ ElectronEnergyOrientation Parser::parseElectronEnergyOrientation() const {
 
 SourcePulseType Parser::parseSourcePulseType() const {
     SourcePulseType spreadType;
-    if(!paramSourcePulseType(node, &spreadType)){
+    if (!paramSourcePulseType(node, &spreadType)) {
         return spreadType;
     }
 
