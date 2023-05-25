@@ -31,8 +31,7 @@ void Pass::Pipeline::createPipelineLayout(const VkDescriptorSetLayout setLayouts
     /*
     Add push constants to the Pipeline
     */
-    auto pushConstant = VKINIT::misc::push_constant_range(VK_SHADER_STAGE_COMPUTE_BIT, m_pushConstants.size,
-                                                          0);  // Can change Offset if some of the struct is to be ignored
+    auto pushConstant = m_pushConstant.getVkPushConstantRange(shaderStage->getShaderStageFlagBits());
 
     pipelineLayoutCreateInfo.pPushConstantRanges = &pushConstant;
     pipelineLayoutCreateInfo.pushConstantRangeCount = 1;  // One struct of pushConstants
@@ -118,10 +117,11 @@ void Pass::Pipeline::cleanPipeline(VkDevice& device) {
     vkDestroyPipelineLayout(device, m_pipelineLayout, nullptr);
 }
 
-void Pass::Pipeline::updatePushConstants(void* data, size_t size) {
-    m_pushConstants.pushConstPtr = data;
-    m_pushConstants.size = size;
-}
+void Pass::Pipeline::updatePushConstants(void* data, size_t size) { m_pushConstant.update(data, size); }
+
+// -------------------------------------------------------------------------------------------------------
+
+void Pass::updatePushConstant(int stage, void* data, uint32_t size) { m_pass[stage]->m_pushConstant.update(data, size); }
 
 // -------------------------------------------------------------------------------------------------------
 
@@ -160,7 +160,7 @@ void ComputePass::createDescriptorSetLayout(std::vector<VkDescriptorSetLayoutBin
 
 // Prepare Compute Pass according to buffers and layout
 void ComputePass::prepare(std::vector<VkDescriptorSetLayoutBinding> bindings) {
-    RAYX_VERB << "Preparing pipelines...";
+    RAYX_D_LOG << "Preparing pipelines...";
     // Create Pool if non existent! (Pool sets DO NOT CHANGE) FIXME(OS)
     if (globalDescriptorPool != nullptr) {
         createDescriptorPool(1, bindings.size());
@@ -174,6 +174,7 @@ void ComputePass::prepare(std::vector<VkDescriptorSetLayoutBinding> bindings) {
         stage->createPipelineLayout(m_descriptorSetLayouts[0]);
         stage->createPipeline();
     }
+    RAYX_D_LOG << "Done";
 }
 
 void ComputePass::addPipelineStage(const ShaderStageCreateInfo& createInfo) {

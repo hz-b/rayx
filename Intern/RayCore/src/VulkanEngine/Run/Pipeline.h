@@ -5,6 +5,7 @@
 
 #include "RayCore.h"
 #include "VulkanEngine/Buffer/BufferHandler.h"
+#include "VulkanEngine/Buffer/PushConstant.h"
 #include "VulkanEngine/Init/Descriptor.h"
 #include "VulkanEngine/Init/ShaderStage.h"
 namespace RAYX {
@@ -41,9 +42,9 @@ class RAYX_API Pass {
         VkPipeline m_pipeline = VK_NULL_HANDLE;
         VkPipelineLayout m_pipelineLayout = VK_NULL_HANDLE;
         VkPipelineCache m_pipelineCache = VK_NULL_HANDLE;
-
+        PushConstant m_pushConstant;
         std::shared_ptr<ShaderStage> shaderStage{};
-        tempPushConstant_t m_pushConstants = {};
+        // tempPushConstant_t m_pushConstants = {};
     };
 
     using Pipelines = std::vector<std::shared_ptr<Pipeline>>;
@@ -62,6 +63,8 @@ class RAYX_API Pass {
     const ShaderStage& getShaderStage(int stage) const { return *(m_pass[stage]->shaderStage); }
 
     DescriptorPool* getDesriptorPool() { return globalDescriptorPool.get(); }
+
+    void updatePushConstant(int stage, void* data, uint32_t size);
 
     virtual const VkPipelineBindPoint& getPipelineBindPoint() const = 0;
     virtual void prepare(std::vector<VkDescriptorSetLayoutBinding>) = 0;

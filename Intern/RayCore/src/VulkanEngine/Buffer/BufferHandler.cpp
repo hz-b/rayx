@@ -4,12 +4,20 @@
 
 #include "VulkanEngine/Init/Initializers.h"
 
-#define HANDLER_CHECK_BUFFER_EXIST(name)                                          \
+#define CHECK_BUFFER_OVERWRITE(name)                                              \
     {                                                                             \
         if (m_Buffers.find(name) != m_Buffers.end()) {                            \
             RAYX_ERR << "Buffer " << name << " already exists. Try update func."; \
         }                                                                         \
     }
+
+#define CHECK_BUFFER_EXIST(name)                                 \
+    {                                                            \
+        if (m_Buffers.find(name) == m_Buffers.end()) {           \
+            RAYX_ERR << "Buffer " << name << " does not exist!"; \
+        }                                                        \
+    }
+
 namespace RAYX {
 BufferHandler::BufferHandler(VkDevice& device, VmaAllocator allocator, uint32_t queueFamilyIndex, size_t stagingSize)
     : m_Device(device), m_FamilyIndex(queueFamilyIndex), m_VmaAllocator(allocator), m_StagingSize(stagingSize) {
@@ -102,14 +110,14 @@ void BufferHandler::gpuMemcpy(VulkanBuffer& buffer_dst, size_t offset_dst, Vulka
 }
 
 void BufferHandler::createStagingBuffer() {
-    m_StagingBuffer->m_VmaAllocator = m_VmaAllocator;
-
     VulkanBufferCreateInfo createInfo = {};
     createInfo.bufName = "Staging-buffer";
     createInfo.accessType = VKBUFFER_INOUT;
-    createInfo.size = m_StagingSize;
+    createInfo.size = 0;  // Setting size to 0 to avoid unwanted creation
 
-    m_StagingBuffer->m_createInfo = createInfo;
+    m_StagingBuffer = std::make_unique<VulkanBuffer>(m_VmaAllocator, createInfo);
+
+    // Manual creation
     m_StagingBuffer->createVmaBuffer(
         m_StagingSize, VK_BUFFER_USAGE_TRANSFER_DST_BIT | VK_BUFFER_USAGE_TRANSFER_SRC_BIT | VK_BUFFER_USAGE_STORAGE_BUFFER_BIT,
         m_StagingBuffer->m_Buffer, m_StagingBuffer->m_Alloca, &m_StagingBuffer->m_AllocaInfo,
@@ -129,8 +137,8 @@ void BufferHandler::storeToStagingBuffer(char* indata, size_t bytes) {
 void BufferHandler::waitTransferQueueIdle() { vkQueueWaitIdle(m_TransferQueue); }
 
 VulkanBuffer* BufferHandler::getBuffer(const std::string& name) {
-    HANDLER_CHECK_BUFFER_EXIST(name)
-    return (VulkanBuffer*)&m_Buffers[name];
+    CHECK_BUFFER_EXIST(name)
+    return m_Buffers[name].get();
 }
 
 void BufferHandler::readBufferRaw(const char* bufname, char* outdata, const VkQueue& queue) {
@@ -162,10 +170,11 @@ void BufferHandler::readBufferRaw(const char* bufname, char* outdata, const VkQu
 }
 
 void BufferHandler::writeBufferRaw(const char* bufname, char* indata) {
-    auto b = getBuffer(bufname);
+    VulkanBuffer* b = getBuffer(bufname);
 
-    if (b->m_createInfo.accessType != VKBUFFER_IN || b->m_createInfo.accessType != VKBUFFER_INOUT) {
-        RAYX_ERR << "writeBufferRaw(\"" << bufname << "\", ...) is not allowed, as \"" << bufname << "\" has m_in = false";
+    auto access = b->m_createInfo.accessType;
+    if (access != VKBUFFER_IN && access != VKBUFFER_INOUT) {
+        RAYX_ERR << "writeBufferRaw(\"" << bufname << "\", ...) is not allowed, as \"" << bufname << "\" is not an input Buffer";
     }
 
     size_t remainingBytes = b->getSize();
@@ -188,7 +197,7 @@ void BufferHandler::writeBufferRaw(const char* bufname, char* indata) {
  */
 VulkanBuffer& BufferHandler::createBuffer(VulkanBufferCreateInfo createInfo) {
     auto name = createInfo.bufName;
-    HANDLER_CHECK_BUFFER_EXIST(name)
+    CHECK_BUFFER_OVERWRITE(name)
     m_Buffers[name] = std::make_unique<VulkanBuffer>(m_VmaAllocator, createInfo);
     return *m_Buffers[name];
 }
@@ -206,14 +215,14 @@ VulkanBuffer& BufferHandler::createBuffer(VulkanBufferCreateInfo createInfo) {
 
 template <typename T>
 void BufferHandler::updateBuffer(const char* bufname, const std::vector<T>& vec) {
-    HANDLER_CHECK_BUFFER_EXIST(bufname)
+    CHECK_BUFFER_EXIST(bufname)
     if (vec) {
         writeBufferRaw(bufname, (char*)vec.data());
     }
 }
 
 void BufferHandler::freeBuffer(const char* bufname) {
-    HANDLER_CHECK_BUFFER_EXIST(bufname)
+    CHECK_BUFFER_OVERWRITE(bufname)
     vmaDestroyBuffer(m_VmaAllocator, m_Buffers[bufname]->getBuffer(), m_Buffers[bufname]->m_Alloca);
 }
 

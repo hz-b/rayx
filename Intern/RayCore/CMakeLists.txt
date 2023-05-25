@@ -38,6 +38,7 @@ SET(SOURCE
     src/VulkanEngine/Cleanup.cpp
     src/VulkanEngine/Buffer/DeclareBuffer.cpp
     src/VulkanEngine/Buffer/CreateBuffer.cpp
+    src/VulkanEngine/Buffer/PushConstant.cpp
     src/VulkanEngine/Buffer/IO/GpuMemcpy.cpp
     src/VulkanEngine/Buffer/IO/ReadBufferRaw.cpp
     src/VulkanEngine/Buffer/IO/WriteBufferRaw.cpp

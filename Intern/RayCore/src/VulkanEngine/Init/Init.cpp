@@ -38,10 +38,10 @@ void VulkanEngine::newInit() {
     createCommandBuffers(1);  // 1 Command Buffer
     newCreateSemaphores(1);   // FIXME(OS) We only need one Sempahore (+1 for Transfer in handler)
     prepareVma();
-    //createCache();
+    // createCache();
     initBufferHandler();
     m_state = EngineStates_t::PRERUN;
-    RAYX_D_LOG << "hLLO";
+    RAYX_D_LOG << "newInit";
 }
 
 /**
@@ -51,16 +51,19 @@ void VulkanEngine::newInit() {
  */
 void VulkanEngine::initBufferHandler() {
     m_BufferHandler = std::make_shared<BufferHandler>(m_Device, m_VmaAllocator, m_computeFamily, getStagingBufferSize());
+    RAYX_D_LOG << "BufferHandler initialized.";
 }
 
 void VulkanEngine::createComputePipelinePass(const ComputePassCreateInfo& createInfo) {
     m_ComputePass = std::make_unique<ComputePass>(m_Device, createInfo);
+    RAYX_D_LOG << "ComputePipelinePass initialized.";
 }
 
 // Buffer Descriptor binding
 void VulkanEngine::prepareComputePipelinePass() {
     auto bindings = getBufferHandler().getDescriptorBindings(m_ComputePass->getName());
     m_ComputePass->prepare(bindings);
+    RAYX_D_LOG << "ComputePipelinePass prepared.";
 }
 
 }  // namespace RAYX

@@ -102,74 +102,82 @@ std::vector<Ray> VulkanTracer::newTraceRaw(const TraceRawConfig& cfg) {
     // Init Vulkan, if not yet initialized.
     if (m_engine.state() == VulkanEngine::EngineStates_t::PREINIT) {
         m_engine.newInit();
-
-    } else {  // For now we recreate everything TODO (OS) : Only change buffers and not all pass!
-
-        // Create first Shader Stage
-        ShaderStageCreateInfo shaderCreateInfo = {.name = "FullTracer", .shaderPath = "build/bin/comp.spv", .entryPoint = "main"};
-        // Merge all stages
-        std::vector<ShaderStageCreateInfo> shaderStages = {shaderCreateInfo};
-
-        // Create Compute Pass
-        m_engine.createComputePipelinePass({.passName = "Beamline Trace Pass", .shaderStagesCreateInfos = shaderStages});
-
-        // Create Buffers and bind them to Pass through Descriptors
-        {
-            auto pass = m_engine.m_ComputePass.get();
-            auto shaderFlag = pass->getShaderStage(0).getShaderStageFlagBits();  // Should return only compute now
-            auto passName = pass->getName();
-            // Compute Buffers Meta
-            // Bindings are *IN ORDER*
-
-            m_engine.getBufferHandler()
-                .createBuffer<Ray>({"ray-buffer", VKBUFFER_IN}, rayList)  // Input Ray Buffer
-                .addDescriptorSetPerPassBinding(passName, 0, shaderFlag);
-
-            m_engine.getBufferHandler()
-                .createBuffer({"output-buffer", VKBUFFER_OUT, (numberOfRays * sizeof(Ray) * (int)cfg.m_maxSnapshots)})  // Output Ray Buffer
-                .addDescriptorSetPerPassBinding(passName, 1, shaderFlag);
-
-            m_engine.getBufferHandler()
-                .createBuffer<double>({"quadric-buffer", VKBUFFER_IN}, beamlineData)  // Beamline quadric info
-                .addDescriptorSetPerPassBinding(passName, 2, shaderFlag);
-
-            m_engine.getBufferHandler()
-                .createBuffer({"xyznull-buffer", VKBUFFER_IN, 100})  // FIXME(OS): This buffer is not needed?
-                .addDescriptorSetPerPassBinding(passName, 3, shaderFlag);
-
-            m_engine.getBufferHandler()
-                .createBuffer<int>({"material-index-table", VKBUFFER_IN}, materialTables.indexTable)  /// Material info
-                .addDescriptorSetPerPassBinding(passName, 4, shaderFlag);
-
-            m_engine.getBufferHandler()
-                .createBuffer<double>({"material-table", VKBUFFER_IN}, materialTables.materialTable)  // Material info
-                .addDescriptorSetPerPassBinding(passName, 5, shaderFlag);
-#ifdef RAYX_DEBUG_MODE
-            m_engine.getBufferHandler()
-                .createBuffer({"debug-buffer", VKBUFFER_OUT, numberOfRays * sizeof(debugBuffer_t)})  // Debug Matrix Buffer
-                .addDescriptorSetPerPassBinding(passName, 6, shaderFlag);
-#endif
-        }
-        // Create Pipeline layouts and Descriptor Layouts. Everytime buffer formation (not data) changes we need to prepare again
-        m_engine.prepareComputePipelinePass();
-        m_engine.run({.m_numberOfInvocations = numberOfRays});
-
-        std::vector<Ray> out = m_engine.readBuffer<Ray>("output-buffer");
-
-#ifdef RAYX_DEBUG_MODE
-        m_debugBufList = m_engine.readBuffer<debugBuffer_t>("debug-buffer");
-#endif
-
-        m_engine.newCleanup();
-        return out;
     }
+    // For now we recreate everything
+    // TODO (OS) : Only change buffers and not all pass!
+
+    // Create first Shader Stage
+    ShaderStageCreateInfo shaderCreateInfo = {.name = "FullTracer", .shaderPath = "build/bin/comp.spv", .entryPoint = "main"};
+    // Merge all stages
+    std::vector<ShaderStageCreateInfo> shaderStages = {shaderCreateInfo};
+
+    // Create Compute Pass
+    m_engine.createComputePipelinePass({.passName = "Beamline Trace Pass", .shaderStagesCreateInfos = shaderStages});
+
+    // Create Buffers and bind them to Pass through Descriptors
+    {
+        auto pass = m_engine.m_ComputePass.get();
+        auto shaderFlag = pass->getShaderStage(0).getShaderStageFlagBits();  // Should return only compute now
+        auto passName = pass->getName();
+        // Compute Buffers Meta
+        // Bindings are *IN ORDER*
+
+        m_engine.getBufferHandler()
+            .createBuffer<Ray>({"ray-buffer", VKBUFFER_IN}, rayList)  // Input Ray Buffer
+            .addDescriptorSetPerPassBinding(passName, 0, shaderFlag);
+
+        m_engine.getBufferHandler()
+            .createBuffer({"output-buffer", VKBUFFER_OUT, (numberOfRays * sizeof(Ray) * (int)cfg.m_maxSnapshots)})  // Output Ray Buffer
+            .addDescriptorSetPerPassBinding(passName, 1, shaderFlag);
+
+        m_engine.getBufferHandler()
+            .createBuffer<double>({"quadric-buffer", VKBUFFER_IN}, beamlineData)  // Beamline quadric info
+            .addDescriptorSetPerPassBinding(passName, 2, shaderFlag);
+
+        m_engine.getBufferHandler()
+            .createBuffer({"xyznull-buffer", VKBUFFER_IN, 100})  // FIXME(OS): This buffer is not needed?
+            .addDescriptorSetPerPassBinding(passName, 3, shaderFlag);
+
+        m_engine.getBufferHandler()
+            .createBuffer<int>({"material-index-table", VKBUFFER_IN}, materialTables.indexTable)  /// Material info
+            .addDescriptorSetPerPassBinding(passName, 4, shaderFlag);
+
+        m_engine.getBufferHandler()
+            .createBuffer<double>({"material-table", VKBUFFER_IN}, materialTables.materialTable)  // Material info
+            .addDescriptorSetPerPassBinding(passName, 5, shaderFlag);
+#ifdef RAYX_DEBUG_MODE
+        m_engine.getBufferHandler()
+            .createBuffer({"debug-buffer", VKBUFFER_OUT, numberOfRays * sizeof(debugBuffer_t)})  // Debug Matrix Buffer
+            .addDescriptorSetPerPassBinding(passName, 6, shaderFlag);
+#endif
+    }
+    // FIXME(OS) Weird pushconstant update
+    m_engine.m_ComputePass->updatePushConstant(0, const_cast<void*>(m_engine.m_pushConstants.pushConstPtr), m_engine.m_pushConstants.size);
+
+    // Create Pipeline layouts and Descriptor Layouts. Everytime buffer formation (not data) changes we need to prepare again
+    m_engine.prepareComputePipelinePass();
+
+    m_engine.run({.m_numberOfInvocations = numberOfRays});
+
+    std::vector<Ray> out = m_engine.readBuffer<Ray>("output-buffer");
+
+#ifdef RAYX_DEBUG_MODE
+    m_debugBufList = m_engine.readBuffer<debugBuffer_t>("debug-buffer");
+#endif
+
+    m_engine.newCleanup();
+    return out;
+
     return rayList;
-}
+}  // namespace RAYX
 
 void VulkanTracer::setPushConstants(const PushConstants* p) {
     if (sizeof(*p) > 128) RAYX_WARN << "Using pushConstants bigger than 128 Bytes might be unsupported on some GPUs. Check Compute Info";
     m_engine.m_pushConstants.pushConstPtr = static_cast<const PushConstants*>(p);
     m_engine.m_pushConstants.size = sizeof(*p);
+
+    // TODO (OS) Temp fix, pushconstants need to be updated deeper
+    // m_engine.m_ComputePass->updatePushConstant(0, const_cast<PushConstants*>(p), sizeof(*p));
 }
 
 }  // namespace RAYX

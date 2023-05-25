@@ -72,7 +72,7 @@ class RAYX_API VulkanBuffer {
     VmaAllocation m_Alloca = VK_NULL_HANDLE;
     VmaAllocationInfo m_AllocaInfo;
     std::map<std::string, VkDescriptorSetLayoutBinding> m_DescriptorSetBindings;
-};  // namespace RAYX
+};
 
 }  // namespace RAYX
 #endif
