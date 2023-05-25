@@ -22,14 +22,14 @@ double get_factorElectronEnergy() {
 }
 
 double get_factorOmega() {
-    return 3 * c_alpha / (4.0 * pow(M_PI, 2) * c_elementaryCharge * pow(c_speedOfLight, 4) * pow(c_electronMass, 2) / pow(c_electronVolt * 1.0e9, 2));
+    return 3 * c_alpha / (4.0 * pow(PI, 2) * c_elementaryCharge * pow(c_speedOfLight, 4) * pow(c_electronMass, 2) / pow(c_electronVolt * 1.0e9, 2));
 }
 
-double get_factorDistribution() { return 3 * c_alpha / (4.0 * pow(M_PI, 2) * c_elementaryCharge); }
+double get_factorDistribution() { return 3 * c_alpha / (4.0 * pow(PI, 2) * c_elementaryCharge); }
 
 double get_factorTotalPowerDipol() {
     return pow(c_elementaryCharge, 2) / (3 * c_electricPermittivity * pow(c_speedOfLight, 8) * pow(c_electronMass, 4)) *
-           pow(c_electronVolt * 1.0E9, 3) / (2 * M_PI) / (c_electronVolt / (c_speedOfLight * c_elementaryCharge));
+           pow(c_electronVolt * 1.0E9, 3) / (2 * PI) / (c_electronVolt / (c_speedOfLight * c_elementaryCharge));
 }
 
 DipoleSource::DipoleSource(const DesignObject& dobj) : LightSource(dobj) {
@@ -165,7 +165,7 @@ glm::dvec4 DipoleSource::getStokesSyn(double hv, double psi1, double psi2) const
     //std::array<double, 6> result = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
     glm::dvec4 stokes = {0.0, 0.0, 0.0, 0.0};
     while (psi <= psi2) {
-        double sign1 = DipoleSource::m_electronEnergyOrientation == ElectronEnergyOrientation::Clockwise ? M_PI_2 : -M_PI_2;
+        double sign1 = DipoleSource::m_electronEnergyOrientation == ElectronEnergyOrientation::Clockwise ? PI_2 : -PI_2;
         double sign2 = psi >= 0.0 ? 1.0 : -1.0;
         double phase = -(sign1 * sign2);
         double x = gamma * psi * 0.001;
@@ -330,12 +330,12 @@ void DipoleSource::calcPhotonWavelength() {
 
 void DipoleSource::calcSourcePath() {
     m_sourcePathLength = fabs(m_sourcePulseLength) * 1000 * 0.3;
-    m_phaseJitter = m_photonEnergy == 0 ? 0 : fabs(m_sourcePulseLength * 0.3) / m_photonWaveLength * 2000000 * M_PI;
+    m_phaseJitter = m_photonEnergy == 0 ? 0 : fabs(m_sourcePulseLength * 0.3) / m_photonWaveLength * 2000000 * PI;
 }
 
 void DipoleSource::calcHorDivDegSec() {
-    m_horDivDegrees = m_horDivergence * 0.180 / M_PI;
-    m_horDivSeconds = m_horDivergence * 0.180 / M_PI * 3600;
+    m_horDivDegrees = m_horDivergence * 0.180 / PI;
+    m_horDivSeconds = m_horDivergence * 0.180 / PI * 3600;
 }
 
 void DipoleSource::calcFluxOrg() {
