@@ -8,6 +8,7 @@
 #include <vector>
 
 #include "ImGuiLayer.h"
+#include "Window.h"
 
 const std::vector<const char*> validationLayers = {"VK_LAYER_KHRONOS_validation"};
 
@@ -81,9 +82,7 @@ class Application {
     void run();
 
   private:
-    GLFWwindow* m_Window;
-    const uint32_t m_windowWidth = 1920;
-    const uint32_t m_windowHeight = 1080;
+    Window m_Window;
     const uint32_t m_maxFramesInFlight = 3;
 
     VkInstance m_Instance;
@@ -116,8 +115,6 @@ class Application {
     std::vector<VkFence> m_inFlightFences;
     uint32_t m_currentFrame = 0;
 
-    bool m_framebufferResized = false;
-
     VkBuffer m_VertexBuffer;
     VkDeviceMemory m_VertexBufferMemory;
 
@@ -143,8 +140,6 @@ class Application {
     void mainLoop();
     void cleanupSwapChain();
     void cleanup();
-
-    static void framebufferResizeCallback(GLFWwindow* window, int width, int height);
 
     void createInstance();
     void populateDebugMessengerCreateInfo(VkDebugUtilsMessengerCreateInfoEXT& createInfo);

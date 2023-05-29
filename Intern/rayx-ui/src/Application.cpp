@@ -32,11 +32,6 @@ void DestroyDebugUtilsMessengerEXT(VkInstance instance, VkDebugUtilsMessengerEXT
     }
 }
 
-void Application::framebufferResizeCallback(GLFWwindow* window, int width, int height) {
-    auto app = reinterpret_cast<Application*>(glfwGetWindowUserPointer(window));
-    app->m_framebufferResized = true;
-}
-
 // --------- Start of Application code --------- //
 void Application::run() {
     initWindow();
@@ -47,13 +42,7 @@ void Application::run() {
 }
 
 void Application::initWindow() {
-    glfwInit();
-
-    glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);
-
-    m_Window = glfwCreateWindow(m_windowWidth, m_windowHeight, "rayx-ui", nullptr, nullptr);
-    glfwSetWindowUserPointer(m_Window, this);
-    glfwSetFramebufferSizeCallback(m_Window, framebufferResizeCallback);
+    m_Window.initWindow(1920, 1080, "Rayx-UI");
 }
 
 void Application::initVulkan() {
@@ -91,11 +80,11 @@ void Application::initImGui() {
     initInfo.MinImageCount = m_SwapChain.images.size();
     initInfo.ImageCount = m_SwapChain.images.size();
     initInfo.CheckVkResultFn = nullptr;
-    m_ImGuiLayer.init(m_Window, std::move(initInfo), m_SwapChain.ImageFormat);
+    m_ImGuiLayer.init(m_Window.get(), std::move(initInfo), m_SwapChain.ImageFormat);
 }
 
 void Application::mainLoop() {
-    while (!glfwWindowShouldClose(m_Window)) {
+    while (!glfwWindowShouldClose(m_Window.get())) {
         glfwPollEvents();
 
         m_ImGuiLayer.updateImGui();
@@ -164,17 +153,15 @@ void Application::cleanup() {
     vkDestroySurfaceKHR(m_Instance, m_Surface, nullptr);
     vkDestroyInstance(m_Instance, nullptr);
 
-    glfwDestroyWindow(m_Window);
-
-    glfwTerminate();
+    // We don't need to destroy the window, its destructor will be called automatically
 }
 
 void Application::recreateSwapChain() {
     exit(1);  // TODO: implement
     int width = 0, height = 0;
-    glfwGetFramebufferSize(m_Window, &width, &height);
+    glfwGetFramebufferSize(m_Window.get(), &width, &height);
     while (width == 0 || height == 0) {
-        glfwGetFramebufferSize(m_Window, &width, &height);
+        glfwGetFramebufferSize(m_Window.get(), &width, &height);
         glfwWaitEvents();
     }
 
@@ -248,8 +235,8 @@ void Application::setupDebugMessenger() {
 }
 
 void Application::createSurface() {
-    if (glfwCreateWindowSurface(m_Instance, m_Window, nullptr, &m_Surface) != VK_SUCCESS) {
-        throw std::runtime_error("failed to create m_Window surface!");
+    if (glfwCreateWindowSurface(m_Instance, m_Window.get(), nullptr, &m_Surface) != VK_SUCCESS) {
+        throw std::runtime_error("failed to create window surface!");
     }
 }
 
@@ -884,7 +871,8 @@ void Application::updateUniformBuffer(uint32_t currentImage) {
     Camera cam{};
     cam.model = cameraSettings.getModelMatrix();
     cam.view = cameraSettings.getViewMatrix();
-    cam.proj = cameraSettings.getProjectionMatrix((float)m_windowWidth / (float)m_windowHeight);
+    Extent2D extent = m_Window.getExtent();
+    cam.proj = cameraSettings.getProjectionMatrix((float)extent.width / (float)extent.height);
 
     memcpy(m_UniformBuffersMapped[currentImage], &cam, sizeof(cam));
 }
@@ -948,8 +936,8 @@ void Application::drawFrame() {
 
     result = vkQueuePresentKHR(m_PresentQueue, &presentInfo);
 
-    if (result == VK_ERROR_OUT_OF_DATE_KHR || result == VK_SUBOPTIMAL_KHR || m_framebufferResized) {
-        m_framebufferResized = false;
+    if (result == VK_ERROR_OUT_OF_DATE_KHR || result == VK_SUBOPTIMAL_KHR || m_Window.m_framebufferResized) {
+        m_Window.m_framebufferResized = false;
         recreateSwapChain();
     } else if (result != VK_SUCCESS) {
         throw std::runtime_error("failed to present swap chain image!");
@@ -997,7 +985,7 @@ VkExtent2D Application::chooseSwapExtent(const VkSurfaceCapabilitiesKHR& capabil
         return capabilities.currentExtent;
     } else {
         int width, height;
-        glfwGetFramebufferSize(m_Window, &width, &height);
+        glfwGetFramebufferSize(m_Window.get(), &width, &height);
 
         VkExtent2D actualExtent = {static_cast<uint32_t>(width), static_cast<uint32_t>(height)};
 
