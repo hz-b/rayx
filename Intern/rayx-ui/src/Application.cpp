@@ -157,13 +157,7 @@ void Application::cleanup() {
 }
 
 void Application::recreateSwapChain() {
-    exit(1);  // TODO: implement
-    int width = 0, height = 0;
-    glfwGetFramebufferSize(m_Window.get(), &width, &height);
-    while (width == 0 || height == 0) {
-        glfwGetFramebufferSize(m_Window.get(), &width, &height);
-        glfwWaitEvents();
-    }
+    m_Window.updateWindowSize();
 
     vkDeviceWaitIdle(m_Device);
 
@@ -971,11 +965,11 @@ VkSurfaceFormatKHR Application::chooseSwapSurfaceFormat(const std::vector<VkSurf
 }
 
 VkPresentModeKHR Application::chooseSwapPresentMode(const std::vector<VkPresentModeKHR>& availablePresentModes) {
-    for (const auto& availablePresentMode : availablePresentModes) {
-        if (availablePresentMode == VK_PRESENT_MODE_MAILBOX_KHR) {
-            return availablePresentMode;
-        }
-    }
+    // for (const auto& availablePresentMode : availablePresentModes) {
+    //     if (availablePresentMode == VK_PRESENT_MODE_MAILBOX_KHR) {
+    //         return availablePresentMode;
+    //     }
+    // }
 
     return VK_PRESENT_MODE_FIFO_KHR;
 }

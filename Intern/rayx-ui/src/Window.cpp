@@ -30,3 +30,14 @@ void Window::framebufferResizeCallback(GLFWwindow* window, int width, int height
     auto app = reinterpret_cast<Window*>(glfwGetWindowUserPointer(window));
     app->m_framebufferResized = true;
 }
+
+void Window::updateWindowSize() {
+    int width = 0, height = 0;
+    glfwGetFramebufferSize(m_Window, &width, &height);
+    while (width == 0 || height == 0) {
+        glfwGetFramebufferSize(m_Window, &width, &height);
+        glfwWaitEvents();
+    }
+    m_width = width;
+    m_height = height;
+}

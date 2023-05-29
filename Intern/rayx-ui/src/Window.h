@@ -17,6 +17,7 @@ class Window {
 
     GLFWwindow* get() const { return m_Window; }
     Extent2D getExtent() const { return {m_width, m_height}; }
+    void updateWindowSize();
     
     bool m_framebufferResized = false;
 
