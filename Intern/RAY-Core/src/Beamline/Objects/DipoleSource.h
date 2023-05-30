@@ -20,12 +20,13 @@ class RAYX_API DipoleSource : public LightSource {
     void calcPhotonWavelength();
     void calcFluxOrg();
     double schwinger(double) const;
-    void setMaxEnergy();
+    void setMaxFlux();
     void setLogInterpolation();
     double getInterpolation(double) const;
     double getEnergy() const;
     double getPsi(double) const;
-    double getMaxIntensity();
+    void setMaxIntensity();
+    glm::dvec3 getXYZPosition(double)const;
 
   private:
     // Geometric Params
@@ -34,7 +35,6 @@ class RAYX_API DipoleSource : public LightSource {
     SourcePulseType m_sourcePulseType;
     double m_photonFlux;
     EnergyDistribution m_energySpreadType;
-    double m_sourceWidth;
 
     double m_sigpsi;
     glm::dvec4 m_stokes;

@@ -9,8 +9,8 @@ void checkDistribution(const std::vector<Ray>& rays, double sourceEnergy, double
 
 void checkPositionDistribution(const std::vector<Ray>& rays, double sourceWidth, double sourceHight) {
     for (auto r : rays) {
-        CHECK_IN(r.m_position[1], -4.5 * sourceWidth, 4.5 * sourceWidth);
-        CHECK_IN(r.m_position[2], -4.5 * sourceHight, 4.5 * sourceHight);
+        CHECK_IN(r.m_position[0], -4.5 * sourceWidth, 4.5 * sourceWidth);
+        CHECK_IN(r.m_position[1], -4.5 * sourceHight, 4.5 * sourceHight);
     }
 }
 

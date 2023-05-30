@@ -70,7 +70,8 @@ const double Planck_bar = Planck / (2 * PI);
 /// m_e [kg]. electron mass.
 const double c_electronMass = 9.1093837015e-31;  // Checked 2019-7-25, PB, NIST: mass of electron [kg];
 
-const double c_alpha = 7.2973525693e-3;
+//
+const double c_fineStructureConstant = 7.2973525693e-3; // Checked 2020-2-18, PB, NIST: fine-structure constant, no units
 
 /// \f$\epsilon_0\f$ [As/Vm]. vacuum electric permittivity.
 const double c_electricPermittivity = 8.8541878128e-12;  // Checked 2019-7-25, PB, NIST: dielectricity of vacuum, or vacuum electric permittivity
