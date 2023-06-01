@@ -9,6 +9,7 @@
 
 #include "ImGuiLayer.h"
 #include "Window.h"
+#include "Scene.h"
 
 const std::vector<const char*> validationLayers = {"VK_LAYER_KHRONOS_validation"};
 
@@ -42,35 +43,6 @@ struct SwapChain {
     std::vector<VkFramebuffer> framebuffers;
 };
 
-struct Vertex {
-    glm::vec3 pos;
-    glm::vec3 color;
-
-    static VkVertexInputBindingDescription getBindingDescription() {
-        VkVertexInputBindingDescription bindingDescription{};
-        bindingDescription.binding = 0;
-        bindingDescription.stride = sizeof(Vertex);
-        bindingDescription.inputRate = VK_VERTEX_INPUT_RATE_VERTEX;
-        return bindingDescription;
-    }
-
-    static std::array<VkVertexInputAttributeDescription, 2> getAttributeDescriptions() {
-        std::array<VkVertexInputAttributeDescription, 2> attributeDescriptions{};
-
-        attributeDescriptions[0].binding = 0;
-        attributeDescriptions[0].location = 0;
-        attributeDescriptions[0].format = VK_FORMAT_R32G32B32_SFLOAT;
-        attributeDescriptions[0].offset = offsetof(Vertex, pos);
-
-        attributeDescriptions[1].binding = 0;
-        attributeDescriptions[1].location = 1;
-        attributeDescriptions[1].format = VK_FORMAT_R32G32B32_SFLOAT;
-        attributeDescriptions[1].offset = offsetof(Vertex, color);
-
-        return attributeDescriptions;
-    }
-};
-
 struct Camera {
     alignas(16) glm::mat4 model;
     alignas(16) glm::mat4 view;
@@ -102,7 +74,8 @@ class Application {
     VkRenderPass m_RenderPass;
     VkDescriptorSetLayout m_DescriptorSetLayout;
     VkPipelineLayout m_PipelineLayout;
-    VkPipeline m_GraphicsPipeline;
+    VkPipeline m_TrianglePipeline;
+    VkPipeline m_LinePipeline;
 
     VkCommandPool m_CommandPool;
     std::vector<VkCommandBuffer> m_CommandBuffers;
@@ -118,12 +91,7 @@ class Application {
     VkBuffer m_VertexBuffer;
     VkDeviceMemory m_VertexBufferMemory;
 
-    const std::vector<Vertex> m_Vertices = {{{-0.5f, -0.5f, 0.0f}, {1.0f, 0.0f, 0.0f}},
-                                            {{0.5f, -0.5f, 0.0f}, {0.0f, 1.0f, 0.0f}},
-                                            {{0.5f, 0.5f, 0.0f}, {0.0f, 0.0f, 1.0f}},
-                                            {{-0.5f, 0.5f, 0.0f}, {1.0f, 1.0f, 1.0f}}};
-
-    const std::vector<uint16_t> m_Indices = {0, 1, 2, 2, 3, 0};
+    Scene m_Scene;
 
     VkBuffer m_IndexBuffer;
     VkDeviceMemory m_IndexBufferMemory;

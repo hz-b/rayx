@@ -121,7 +121,7 @@ void Application::cleanup() {
 
     vkDestroyDescriptorSetLayout(m_Device, m_DescriptorSetLayout, nullptr);
 
-    vkDestroyPipeline(m_Device, m_GraphicsPipeline, nullptr);
+    vkDestroyPipeline(m_Device, m_TrianglePipeline, nullptr);
     vkDestroyPipelineLayout(m_Device, m_PipelineLayout, nullptr);
     vkDestroyRenderPass(m_Device, m_RenderPass, nullptr);
 
@@ -538,7 +538,7 @@ void Application::createGraphicsPipeline() {
     pipelineInfo.subpass = 0;
     pipelineInfo.basePipelineHandle = VK_NULL_HANDLE;
 
-    if (vkCreateGraphicsPipelines(m_Device, VK_NULL_HANDLE, 1, &pipelineInfo, nullptr, &m_GraphicsPipeline) != VK_SUCCESS) {
+    if (vkCreateGraphicsPipelines(m_Device, VK_NULL_HANDLE, 1, &pipelineInfo, nullptr, &m_TrianglePipeline) != VK_SUCCESS) {
         throw std::runtime_error("failed to create graphics pipeline!");
     }
 
@@ -614,7 +614,7 @@ void Application::copyBuffer(VkBuffer srcBuffer, VkBuffer dstBuffer, VkDeviceSiz
 }
 
 void Application::createIndexBuffer() {
-    VkDeviceSize bufferSize = sizeof(m_Indices[0]) * m_Indices.size();
+    VkDeviceSize bufferSize = sizeof(m_Scene.getIndices()[0]) * m_Scene.getIndices().size();
 
     VkBuffer stagingBuffer;
     VkDeviceMemory stagingBufferMemory;
@@ -623,7 +623,7 @@ void Application::createIndexBuffer() {
 
     void* data;
     vkMapMemory(m_Device, stagingBufferMemory, 0, bufferSize, 0, &data);
-    memcpy(data, m_Indices.data(), (size_t)bufferSize);
+    memcpy(data, m_Scene.getIndices().data(), (size_t)bufferSize);
     vkUnmapMemory(m_Device, stagingBufferMemory);
 
     createBuffer(bufferSize, VK_BUFFER_USAGE_TRANSFER_DST_BIT | VK_BUFFER_USAGE_INDEX_BUFFER_BIT, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, m_IndexBuffer,
@@ -651,7 +651,7 @@ uint32_t Application::findMemoryType(uint32_t typeFilter, VkMemoryPropertyFlags 
 void Application::createVertexBuffer() {
     VkBufferCreateInfo bufferInfo{};
     bufferInfo.sType = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO;
-    bufferInfo.size = sizeof(m_Vertices[0]) * m_Vertices.size();
+    bufferInfo.size = sizeof(m_Scene.getVertices()[0]) * m_Scene.getVertices().size();
     bufferInfo.usage = VK_BUFFER_USAGE_VERTEX_BUFFER_BIT;
     bufferInfo.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
 
@@ -676,7 +676,7 @@ void Application::createVertexBuffer() {
 
     void* data;
     vkMapMemory(m_Device, m_VertexBufferMemory, 0, bufferInfo.size, 0, &data);
-    memcpy(data, m_Vertices.data(), (size_t)bufferInfo.size);
+    memcpy(data, m_Scene.getVertices().data(), (size_t)bufferInfo.size);
     vkUnmapMemory(m_Device, m_VertexBufferMemory);
 }
 
@@ -805,7 +805,7 @@ void Application::recordCommandBuffer(VkCommandBuffer commandBuffer, uint32_t im
 
     vkCmdBeginRenderPass(commandBuffer, &renderPassInfo, VK_SUBPASS_CONTENTS_INLINE);
 
-    vkCmdBindPipeline(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, m_GraphicsPipeline);
+    vkCmdBindPipeline(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, m_TrianglePipeline);
 
     VkViewport viewport{};
     viewport.x = 0.0f;
@@ -829,7 +829,7 @@ void Application::recordCommandBuffer(VkCommandBuffer commandBuffer, uint32_t im
 
     vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, m_PipelineLayout, 0, 1, &m_DescriptorSets[m_currentFrame], 0, nullptr);
 
-    vkCmdDrawIndexed(commandBuffer, static_cast<uint32_t>(m_Indices.size()), 1, 0, 0, 0);
+    vkCmdDrawIndexed(commandBuffer, static_cast<uint32_t>(m_Scene.getIndices().size()), 1, 0, 0, 0);
 
     vkCmdEndRenderPass(commandBuffer);
 
