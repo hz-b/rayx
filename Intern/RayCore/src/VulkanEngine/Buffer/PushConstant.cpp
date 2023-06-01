@@ -6,8 +6,8 @@
 namespace RAYX {
 
 void PushConstant::update(void* data, uint32_t size) {
-    if (size < 258) {
-        RAYX_WARN << "Using pushConstants bigger than 128 Bytes might be unsupported on some GPUs. Check Compute Info";
+    if (size > 258) {
+        RAYX_WARN << "Using pushConstants bigger than 128 Bytes(" << size << ") might be unsupported on some GPUs. Check Compute Info";
     }
     m_data = data;
     m_size = size;

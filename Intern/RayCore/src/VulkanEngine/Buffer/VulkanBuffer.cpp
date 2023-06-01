@@ -7,7 +7,11 @@ namespace RAYX {
 
 VulkanBuffer::VulkanBuffer(const VmaAllocator& vmaAllocator, VulkanBufferCreateInfo createInfo)
     : m_VmaAllocator(vmaAllocator), m_createInfo(createInfo) {
-    int bufferUsageFlags = createInfo.bufferType;  // Usually target storage buffer
+    int bufferUsageFlags = VK_BUFFER_USAGE_STORAGE_BUFFER_BIT;  // Usually target storage buffer
+    if (createInfo.bufferType == VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER) {
+        bufferUsageFlags = VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT;
+    }
+
     if (createInfo.accessType == VKBUFFER_IN) {
         bufferUsageFlags |= VK_BUFFER_USAGE_TRANSFER_DST_BIT;
     } else if (createInfo.accessType == VKBUFFER_OUT) {

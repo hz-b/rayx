@@ -13,9 +13,7 @@ void VulkanEngine::submitCommandBuffer() {
     /*
     Now we shall finally submit the recorded command buffer to a queue.
     */
-
-    VkSubmitInfo submitInfo = {};
-    submitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
+    VkSubmitInfo submitInfo = VKINIT::misc::submit_info();
     submitInfo.commandBufferCount = 1;                     // submit a single command buffer
     submitInfo.pCommandBuffers = &m_ComputeCommandBuffer;  // the command buffer to submit.
     VK_CHECK_RESULT(m_Fences.compute->forceReset())
@@ -31,7 +29,7 @@ void VulkanEngine::submitCommandBuffer() {
     from the GPU. Fences give us a hint that the Command in the Queue is
     actually done executing.
     */
-    // m_Fences.compute->wait();
+    m_Fences.compute->wait();
 }
 
 }  // namespace RAYX

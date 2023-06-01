@@ -11,16 +11,15 @@
 namespace RAYX {
 
 Pass::Pipeline::Pipeline(std::string name, VkDevice& dev, const ShaderStageCreateInfo& shaderCreateInfo) : m_name(std::move(name)), m_device(dev) {
-    // TODO(OS): Don't reserve 1 for the descriptors
     shaderStage = std::make_shared<ShaderStage>(m_device, shaderCreateInfo);
 }
+
 Pass::Pipeline::~Pipeline() {
     cleanPipeline(m_device);
     storePipelineCache(m_device);
 }
 
 void Pass::Pipeline::createPipelineLayout(const VkDescriptorSetLayout setLayouts) {
-    // if (!m_descriptorSetLayouts.empty()) {
     /*
     The pipeline layout allows the pipeline to access descriptor sets.
     So we just specify the descriptor set layout we created earlier.
@@ -37,8 +36,8 @@ void Pass::Pipeline::createPipelineLayout(const VkDescriptorSetLayout setLayouts
     pipelineLayoutCreateInfo.pushConstantRangeCount = 1;  // One struct of pushConstants
 
     VK_CHECK_RESULT(vkCreatePipelineLayout(m_device, &pipelineLayoutCreateInfo, nullptr, &m_pipelineLayout))
-    //}
 }
+
 // FIXME(OS): Currently only creating compute pipelines. Pipeline, should be general for also other pipelines. Move this somewhere else.
 void Pass::Pipeline::createPipeline() {
     if (m_pipelineLayout != nullptr) {
@@ -50,6 +49,8 @@ void Pass::Pipeline::createPipeline() {
         Now, we finally create the compute pipeline.
         */
         VK_CHECK_RESULT(vkCreateComputePipelines(m_device, m_pipelineCache, 1, &pipelineCreateInfo, nullptr, &m_pipeline))
+    } else {
+        RAYX_ERR << "Failed creating pipeline, pipelineLayout is empty.";
     }
 }
 
@@ -125,7 +126,7 @@ void Pass::updatePushConstant(int stage, void* data, uint32_t size) { m_pass[sta
 
 // -------------------------------------------------------------------------------------------------------
 
-ComputePass::ComputePass(VkDevice& device, const ComputePassCreateInfo& createInfo) : m_Device(device), m_name(createInfo.passName) {
+ComputePass::ComputePass(VkDevice& device, const ComputePassCreateInfo& createInfo) : m_Device(device), m_name(std::string(createInfo.passName)) {
     m_stagesCount = createInfo.shaderStagesCreateInfos.size();
     m_pass.reserve(m_stagesCount);
 

@@ -4,20 +4,6 @@
 
 #include "VulkanEngine/Init/Initializers.h"
 
-#define CHECK_BUFFER_OVERWRITE(name)                                              \
-    {                                                                             \
-        if (m_Buffers.find(name) != m_Buffers.end()) {                            \
-            RAYX_ERR << "Buffer " << name << " already exists. Try update func."; \
-        }                                                                         \
-    }
-
-#define CHECK_BUFFER_EXIST(name)                                 \
-    {                                                            \
-        if (m_Buffers.find(name) == m_Buffers.end()) {           \
-            RAYX_ERR << "Buffer " << name << " does not exist!"; \
-        }                                                        \
-    }
-
 namespace RAYX {
 BufferHandler::BufferHandler(VkDevice& device, VmaAllocator allocator, uint32_t queueFamilyIndex, size_t stagingSize)
     : m_Device(device), m_FamilyIndex(queueFamilyIndex), m_VmaAllocator(allocator), m_StagingSize(stagingSize) {
@@ -43,6 +29,7 @@ BufferHandler::~BufferHandler() {
     // Destroy user-defined buffers
     for (auto& [name, buf] : m_Buffers) {
         vmaDestroyBuffer(m_VmaAllocator, buf->getBuffer(), buf->m_Alloca);
+        RAYX_D_LOG << "destroying";
     }
 }
 
@@ -137,7 +124,9 @@ void BufferHandler::storeToStagingBuffer(char* indata, size_t bytes) {
 void BufferHandler::waitTransferQueueIdle() { vkQueueWaitIdle(m_TransferQueue); }
 
 VulkanBuffer* BufferHandler::getBuffer(const std::string& name) {
-    CHECK_BUFFER_EXIST(name)
+    if (!isBufferPresent(std::string(name))) {
+        RAYX_ERR << "Buffer " << name << " does not exist";
+    }
     return m_Buffers[name].get();
 }
 
@@ -147,7 +136,7 @@ void BufferHandler::readBufferRaw(const char* bufname, char* outdata, const VkQu
     //                 "mandatory before reading it's output buffers.";
     // }
 
-    auto buffer = getBuffer(bufname);
+    VulkanBuffer* buffer = getBuffer(bufname);
     if (buffer->m_createInfo.accessType != VKBUFFER_OUT) {
         RAYX_ERR << "readBufferRaw(\"" << bufname << "\", ...) is not allowed, as \"" << bufname << "\" is not an output buffer";
     }
@@ -191,13 +180,17 @@ void BufferHandler::writeBufferRaw(const char* bufname, char* indata) {
 }
 
 /**
- * @brief  Creates an "empty" buffer
+ * @brief  Creates an "empty" buffer and return it
  *
  * @param createInfo
  */
 VulkanBuffer& BufferHandler::createBuffer(VulkanBufferCreateInfo createInfo) {
     auto name = createInfo.bufName;
-    CHECK_BUFFER_OVERWRITE(name)
+
+    if (isBufferPresent(std::string(name))) {
+        return *m_Buffers[name];
+    }
+
     m_Buffers[name] = std::make_unique<VulkanBuffer>(m_VmaAllocator, createInfo);
     return *m_Buffers[name];
 }
@@ -215,14 +208,18 @@ VulkanBuffer& BufferHandler::createBuffer(VulkanBufferCreateInfo createInfo) {
 
 template <typename T>
 void BufferHandler::updateBuffer(const char* bufname, const std::vector<T>& vec) {
-    CHECK_BUFFER_EXIST(bufname)
+    if (!isBufferPresent(std::string(bufname))) {
+        RAYX_ERR << "Buffer " << bufname << " does not exist";
+    }
     if (vec) {
         writeBufferRaw(bufname, (char*)vec.data());
     }
 }
 
 void BufferHandler::freeBuffer(const char* bufname) {
-    CHECK_BUFFER_OVERWRITE(bufname)
+    if (!isBufferPresent(std::string(bufname))) {
+        RAYX_ERR << "Buffer " << bufname << " does not exist";
+    }
     vmaDestroyBuffer(m_VmaAllocator, m_Buffers[bufname]->getBuffer(), m_Buffers[bufname]->m_Alloca);
 }
 
@@ -257,6 +254,8 @@ void BufferHandler::insertBufferMemoryBarrier(std::string bufferName, const VkCo
     bufferMemoryBarrier.size = buffer->getSize();  // FIXME(OS): Only available size is bound
     vkCmdPipelineBarrier(commandBuffer, srcStageMask, dstStageMask, 0, 0, nullptr, 1, &bufferMemoryBarrier, 0, nullptr);
 }
+
+bool BufferHandler::isBufferPresent(std::string name) { return m_Buffers.find(name) != m_Buffers.end(); }
 
 }  // namespace RAYX
 

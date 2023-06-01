@@ -36,8 +36,8 @@ void VulkanEngine::newRun(VulkanEngineRunSpec_t spec) {
     newUpdateDescriptorSets();
     m_ComputePass->getPass()[0]->updatePushConstants(const_cast<void*>(m_pushConstants.pushConstPtr),
                                                      m_pushConstants.size);  // TODO : Why is the cast happeing?
-    prepareComputePipelinePass();
-    recordInComputeCommandBuffer();
+    // prepareComputePipelinePass();
+    newRecordInCommandBuffer(*m_ComputePass);
     submitCommandBuffer();
     m_runs++;
     m_state = EngineStates_t::POSTRUN;

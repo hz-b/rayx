@@ -54,7 +54,6 @@ class RAYX_API Pass {
 
     void bind(const VkCommandBuffer& commandBuffer, int stage) const { vkCmdBindPipeline(commandBuffer, getPipelineBindPoint(), getPipeline(stage)); }
 
-    const char* getName() const { return m_name; }
     const Pipelines& getPass() const { return m_pass; }
     uint32_t getStageAmount() const { return m_stagesCount; }
 
@@ -70,7 +69,7 @@ class RAYX_API Pass {
     virtual void prepare(std::vector<VkDescriptorSetLayoutBinding>) = 0;
 
   protected:
-    const char* m_name;
+    // const char* m_name;
     // How many stages in the Pass
     uint32_t m_stagesCount;
     // The pass itself (Pipelines)
@@ -113,7 +112,8 @@ class RAYX_API ComputePass : public Pass {
 
     const std::vector<VkDescriptorSetLayout>& getDescriptorSetLayouts() const { return m_descriptorSetLayouts; }
     const std::vector<VkDescriptorSet>& getDescriptorSets() const { return m_descriptorSets; }
-
+    std::string getName() const { return m_name; }
+    
     // Adding a new PipelineStage is the same as extending the Pass with a new Stage
     void addPipelineStage(const ShaderStageCreateInfo&);
 
@@ -127,7 +127,7 @@ class RAYX_API ComputePass : public Pass {
     void createDescriptorSetLayout(std::vector<VkDescriptorSetLayoutBinding>& bindings);
 
     VkDevice& m_Device;
-    const char* m_name;
+    std::string m_name;  // TODO(OS): Consider moving this to Pass parent class
 
     VkDescriptorPool m_DescriptorPool = VK_NULL_HANDLE;                        // FIXME(OS): Possibly not used
     VkPipelineBindPoint m_PipelineBindPoint = VK_PIPELINE_BIND_POINT_COMPUTE;  // Always compute

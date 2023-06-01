@@ -31,15 +31,30 @@ class RAYX_API BufferHandler {
      */
     template <typename T>
     VulkanBuffer& createBuffer(VulkanBufferCreateInfo createInfo, const std::vector<T>& vec = nullptr) {
+        auto bufName = std::string(createInfo.bufName);
+
+        if (isBufferPresent(std::string(bufName))) { // If buffer already exist, update if same size
+            VulkanBuffer* b = getBuffer(bufName);
+            if (b->m_createInfo.size == vec.size() * sizeof(T)) {
+                writeBufferRaw(bufName.c_str(), (char*)vec.data());
+                return *m_Buffers[bufName];
+            } else {
+                deleteBuffer(bufName.c_str());
+            }
+        }
+
         createInfo.size = vec.size() * sizeof(T);
         if (!vec.empty()) {
             writeBufferRaw(createBuffer(createInfo).getName(), (char*)vec.data());
         } else {
-            RAYX_WARN << "No fill data provided for." << createInfo.bufName;
+            RAYX_WARN << "No fill data provided for." << bufName;
             createBuffer(createInfo);
         }
-        return *m_Buffers[createInfo.bufName];
+        return *m_Buffers[bufName];
     }
+
+    template <typename T>
+    void updateBuffer(const char* bufname, const std::vector<T>& vec);
     /**
      * @brief Read Buffer
      *
@@ -58,9 +73,6 @@ class RAYX_API BufferHandler {
         }
         return out;
     }
-
-    template <typename T>
-    void updateBuffer(const char* bufname, const std::vector<T>& vec);
 
     void deleteBuffer(const char* bufname);
     void freeBuffer(const char* bufname);
@@ -98,6 +110,8 @@ class RAYX_API BufferHandler {
     void readBufferRaw(const char* bufname, char* outdata, const VkQueue& queue = nullptr);
     void writeBufferRaw(const char* bufname, char* indata);
     void gpuMemcpy(VulkanBuffer& buffer_dst, size_t offset_dst, VulkanBuffer& buffer_src, size_t offset_src, size_t bytes);
+
+    bool isBufferPresent(std::string);
 
   private:
     VkDevice& m_Device;

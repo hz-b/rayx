@@ -32,8 +32,7 @@ std::unique_ptr<DescriptorPool> DescriptorPool::Builder::build() const {
 DescriptorPool::DescriptorPool(VkDevice& device, uint32_t maxSets, VkDescriptorPoolCreateFlags poolFlags,
                                const std::vector<VkDescriptorPoolSize>& poolSizes)
     : m_Device{device} {
-    auto info =
-        VKINIT::Descriptor::descriptor_pool_create_info(static_cast<uint32_t>(poolSizes.size()), poolSizes.data(), maxSets);
+    auto info = VKINIT::Descriptor::descriptor_pool_create_info(static_cast<uint32_t>(poolSizes.size()), poolSizes.data(), maxSets);
     info.flags = poolFlags;
 
     VK_CHECK_RESULT(vkCreateDescriptorPool(device, &info, nullptr, &m_DescriptorPool));
@@ -57,21 +56,18 @@ void DescriptorPool::resetPool() { vkResetDescriptorPool(m_Device, m_DescriptorP
 
 // *************** Descriptor Writer *********************
 
-DescriptorWriter::DescriptorWriter(VkDescriptorSetLayout& setLayout, DescriptorPool& pool)
-    : setLayout{setLayout}, pool{pool} {}
+DescriptorWriter::DescriptorWriter(VkDescriptorSetLayout& setLayout, DescriptorPool& pool) : setLayout{setLayout}, pool{pool} {}
 
 DescriptorWriter& DescriptorWriter::writeBuffer(uint32_t binding, VkDescriptorBufferInfo* bufferInfo) {
     // The Destination Set is filled @overwrite
-    auto writeDescriptorSet =
-        VKINIT::Descriptor::write_descriptor_set(nullptr, VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, binding, bufferInfo, 1);
+    auto writeDescriptorSet = VKINIT::Descriptor::write_descriptor_set(nullptr, VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, binding, bufferInfo, 1);
 
     writes.push_back(writeDescriptorSet);
     return *this;
 }
 
 DescriptorWriter& DescriptorWriter::writeImage(uint32_t binding, VkDescriptorImageInfo* imageInfo) {
-    auto writeDescriptorSet =
-        VKINIT::Descriptor::write_descriptor_set(nullptr, VK_DESCRIPTOR_TYPE_SAMPLED_IMAGE, binding, imageInfo, 1);
+    auto writeDescriptorSet = VKINIT::Descriptor::write_descriptor_set(nullptr, VK_DESCRIPTOR_TYPE_SAMPLED_IMAGE, binding, imageInfo, 1);
 
     writes.push_back(writeDescriptorSet);
     return *this;
