@@ -614,7 +614,7 @@ void Application::copyBuffer(VkBuffer srcBuffer, VkBuffer dstBuffer, VkDeviceSiz
 }
 
 void Application::createIndexBuffer() {
-    VkDeviceSize bufferSize = sizeof(m_Scene.getIndices()[0]) * m_Scene.getIndices().size();
+    VkDeviceSize bufferSize = sizeof(m_Scene.getIndices(Scene::TRI_TOPOGRAPHY)[0]) * m_Scene.getIndices(Scene::TRI_TOPOGRAPHY).size();
 
     VkBuffer stagingBuffer;
     VkDeviceMemory stagingBufferMemory;
@@ -623,7 +623,7 @@ void Application::createIndexBuffer() {
 
     void* data;
     vkMapMemory(m_Device, stagingBufferMemory, 0, bufferSize, 0, &data);
-    memcpy(data, m_Scene.getIndices().data(), (size_t)bufferSize);
+    memcpy(data, m_Scene.getIndices(Scene::TRI_TOPOGRAPHY).data(), (size_t)bufferSize);
     vkUnmapMemory(m_Device, stagingBufferMemory);
 
     createBuffer(bufferSize, VK_BUFFER_USAGE_TRANSFER_DST_BIT | VK_BUFFER_USAGE_INDEX_BUFFER_BIT, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, m_IndexBuffer,
@@ -829,7 +829,7 @@ void Application::recordCommandBuffer(VkCommandBuffer commandBuffer, uint32_t im
 
     vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, m_PipelineLayout, 0, 1, &m_DescriptorSets[m_currentFrame], 0, nullptr);
 
-    vkCmdDrawIndexed(commandBuffer, static_cast<uint32_t>(m_Scene.getIndices().size()), 1, 0, 0, 0);
+    vkCmdDrawIndexed(commandBuffer, static_cast<uint32_t>(m_Scene.getIndices(Scene::TRI_TOPOGRAPHY).size()), 1, 0, 0, 0);
 
     vkCmdEndRenderPass(commandBuffer);
 
