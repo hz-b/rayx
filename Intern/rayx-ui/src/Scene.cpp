@@ -1,21 +1,22 @@
 #include "Scene.h"
 
+// TODO(Jannis): Change this so handling the triangles and lines is easier. Avoiding duplicate vertices is currently unneccessary.
 Scene::Scene() {
-    addTriangle({{-0.5f, -0.5f, 0.0f}, {1.0f, 0.0f, 0.0f}}, {{0.5f, -0.5f, 0.0f}, {0.0f, 1.0f, 0.0f}}, {{0.5f, 0.5f, 0.0f}, {0.0f, 0.0f, 1.0f}});
-    addTriangle({{0.5f, 0.5f, 0.0f}, {0.0f, 0.0f, 1.0f}}, {{-0.5f, 0.5f, 0.0f}, {1.0f, 1.0f, 1.0f}}, {{-0.5f, -0.5f, 0.0f}, {1.0f, 0.0f, 0.0f}});
-    addLine({{-0.5f, -0.5f, 0.0f}, {1.0f, 0.0f, 0.0f}}, {{0.5f, 0.5f, 0.0f}, {0.0f, 0.0f, 1.0f}});
-    addLine({{0.5f, -0.5f, 0.0f}, {0.0f, 1.0f, 0.0f}}, {{-0.5f, 0.5f, 0.0f}, {1.0f, 1.0f, 1.0f}});
+    addTriangle({{-0.5f, 0.5f, -0.5f}, {0.1f, 0.1f, 0.1f}}, {{-0.5f, -0.5f, 0.5f}, {0.1f, 0.1f, 0.1f}}, {{0.5f, -0.5f, 0.5f}, {0.1f, 0.1f, 0.1f}});
+    addTriangle({{0.5f, 0.5f, -0.5f}, {0.1f, 0.1f, 0.1f}}, {{-0.5f, 0.5f, -0.5f}, {0.1f, 0.1f, 0.1f}}, {{0.5f, -0.5f, 0.5f}, {0.1f, 0.1f, 0.1f}});
+    addLine({{0.0f, 0.0f, -1.0f}, {1.0f, 1.0f, 0.0f}}, {{0.0f, 0.0f, 0.0f}, {1.0f, 1.0f, 0.0f}});
+    addLine({{0.0f, 0.0f, 0.0f}, {1.0f, 1.0f, 0.0f}}, {{0.0f, -1.0f, 0.0f}, {1.0f, 1.0f, 0.0f}});
 }
 
 void Scene::addTriangle(const Vertex v1, const Vertex v2, const Vertex v3) {
-    addVertex(v1, TRI_TOPOGRAPHY);
-    addVertex(v2, TRI_TOPOGRAPHY);
-    addVertex(v3, TRI_TOPOGRAPHY);
+    addVertex(v1, TRIA_TOPOGRAPHY);
+    addVertex(v2, TRIA_TOPOGRAPHY);
+    addVertex(v3, TRIA_TOPOGRAPHY);
 }
 
 void Scene::addLine(const Vertex v1, const Vertex v2) {
-    addVertex(v1, LIN_TOPOGRAPHY);
-    addVertex(v2, LIN_TOPOGRAPHY);
+    addVertex(v1, LINE_TOPOGRAPHY);
+    addVertex(v2, LINE_TOPOGRAPHY);
 }
 
 // Function that adds vertex to scene if it doesn't exist, otherwise adds index of existing vertex

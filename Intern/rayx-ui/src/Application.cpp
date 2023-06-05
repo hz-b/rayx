@@ -41,9 +41,7 @@ void Application::run() {
     cleanup();
 }
 
-void Application::initWindow() {
-    m_Window.initWindow(1920, 1080, "Rayx-UI");
-}
+void Application::initWindow() { m_Window.initWindow(1920, 1080, "Rayx-UI"); }
 
 void Application::initVulkan() {
     createInstance();
@@ -122,6 +120,7 @@ void Application::cleanup() {
     vkDestroyDescriptorSetLayout(m_Device, m_DescriptorSetLayout, nullptr);
 
     vkDestroyPipeline(m_Device, m_TrianglePipeline, nullptr);
+    vkDestroyPipeline(m_Device, m_LinePipeline, nullptr);
     vkDestroyPipelineLayout(m_Device, m_PipelineLayout, nullptr);
     vkDestroyRenderPass(m_Device, m_RenderPass, nullptr);
 
@@ -130,8 +129,11 @@ void Application::cleanup() {
         vkFreeMemory(m_Device, m_UniformBuffersMemory[i], nullptr);
     }
 
-    vkDestroyBuffer(m_Device, m_IndexBuffer, nullptr);
-    vkFreeMemory(m_Device, m_IndexBufferMemory, nullptr);
+    vkDestroyBuffer(m_Device, m_TriangleIndexBuffer, nullptr);
+    vkFreeMemory(m_Device, m_TriangleIndexBufferMemory, nullptr);
+
+    vkDestroyBuffer(m_Device, m_LineIndexBuffer, nullptr);
+    vkFreeMemory(m_Device, m_LineIndexBufferMemory, nullptr);
 
     vkDestroyBuffer(m_Device, m_VertexBuffer, nullptr);
     vkFreeMemory(m_Device, m_VertexBufferMemory, nullptr);
@@ -274,6 +276,14 @@ void Application::createLogicalDevice() {
     }
 
     VkPhysicalDeviceFeatures deviceFeatures{};
+    vkGetPhysicalDeviceFeatures(m_PhysicalDevice, &deviceFeatures);
+    if (!deviceFeatures.fillModeNonSolid) {
+        throw std::runtime_error("Device does not support non-solid fill modes!");
+    }
+    // Set all features to false
+    memset(&deviceFeatures, 0, sizeof(deviceFeatures));
+    // Enable only the fillModeNonSolid feature
+    deviceFeatures.fillModeNonSolid = VK_TRUE;
 
     VkDeviceCreateInfo createInfo{};
     createInfo.sType = VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO;
@@ -542,6 +552,33 @@ void Application::createGraphicsPipeline() {
         throw std::runtime_error("failed to create graphics pipeline!");
     }
 
+    // Input assembly for line pipeline
+    VkPipelineInputAssemblyStateCreateInfo lineInputAssembly{};
+    lineInputAssembly.sType = VK_STRUCTURE_TYPE_PIPELINE_INPUT_ASSEMBLY_STATE_CREATE_INFO;
+    lineInputAssembly.topology = VK_PRIMITIVE_TOPOLOGY_LINE_LIST;  // For line pipeline
+    lineInputAssembly.primitiveRestartEnable = VK_FALSE;
+
+    // Rasterization state for line pipeline
+    VkPipelineRasterizationStateCreateInfo lineRasterizer{};
+    lineRasterizer.sType = VK_STRUCTURE_TYPE_PIPELINE_RASTERIZATION_STATE_CREATE_INFO;
+    lineRasterizer.depthClampEnable = VK_FALSE;
+    lineRasterizer.rasterizerDiscardEnable = VK_FALSE;
+    lineRasterizer.polygonMode = VK_POLYGON_MODE_LINE;  // For line pipeline
+    lineRasterizer.lineWidth = 1.0f;                    // Adjust this if you want thicker lines and your GPU supports it
+    lineRasterizer.cullMode = VK_CULL_MODE_BACK_BIT;
+    lineRasterizer.frontFace = VK_FRONT_FACE_COUNTER_CLOCKWISE;
+    lineRasterizer.depthBiasEnable = VK_FALSE;
+
+    VkGraphicsPipelineCreateInfo linePipelineInfo = pipelineInfo;  // Copy the original pipelineInfo
+    linePipelineInfo.basePipelineHandle = m_TrianglePipeline;      // Set the base pipeline
+    linePipelineInfo.basePipelineIndex = -1;
+    linePipelineInfo.pInputAssemblyState = &lineInputAssembly;  // Use the new input assembly
+    linePipelineInfo.pRasterizationState = &lineRasterizer;     // Use the new rasterization state
+
+    if (vkCreateGraphicsPipelines(m_Device, VK_NULL_HANDLE, 1, &linePipelineInfo, nullptr, &m_LinePipeline) != VK_SUCCESS) {
+        throw std::runtime_error("failed to create line graphics pipeline!");
+    }
+
     vkDestroyShaderModule(m_Device, fragShaderModule, nullptr);
     vkDestroyShaderModule(m_Device, vertShaderModule, nullptr);
 }
@@ -614,7 +651,8 @@ void Application::copyBuffer(VkBuffer srcBuffer, VkBuffer dstBuffer, VkDeviceSiz
 }
 
 void Application::createIndexBuffer() {
-    VkDeviceSize bufferSize = sizeof(m_Scene.getIndices(Scene::TRI_TOPOGRAPHY)[0]) * m_Scene.getIndices(Scene::TRI_TOPOGRAPHY).size();
+    // Triangle indices
+    VkDeviceSize bufferSize = sizeof(m_Scene.getIndices(Scene::TRIA_TOPOGRAPHY)[0]) * m_Scene.getIndices(Scene::TRIA_TOPOGRAPHY).size();
 
     VkBuffer stagingBuffer;
     VkDeviceMemory stagingBufferMemory;
@@ -623,13 +661,31 @@ void Application::createIndexBuffer() {
 
     void* data;
     vkMapMemory(m_Device, stagingBufferMemory, 0, bufferSize, 0, &data);
-    memcpy(data, m_Scene.getIndices(Scene::TRI_TOPOGRAPHY).data(), (size_t)bufferSize);
+    memcpy(data, m_Scene.getIndices(Scene::TRIA_TOPOGRAPHY).data(), (size_t)bufferSize);
     vkUnmapMemory(m_Device, stagingBufferMemory);
 
-    createBuffer(bufferSize, VK_BUFFER_USAGE_TRANSFER_DST_BIT | VK_BUFFER_USAGE_INDEX_BUFFER_BIT, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, m_IndexBuffer,
-                 m_IndexBufferMemory);
+    createBuffer(bufferSize, VK_BUFFER_USAGE_TRANSFER_DST_BIT | VK_BUFFER_USAGE_INDEX_BUFFER_BIT, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, m_TriangleIndexBuffer,
+                 m_TriangleIndexBufferMemory);
 
-    copyBuffer(stagingBuffer, m_IndexBuffer, bufferSize);
+    copyBuffer(stagingBuffer, m_TriangleIndexBuffer, bufferSize);
+
+    vkDestroyBuffer(m_Device, stagingBuffer, nullptr);
+    vkFreeMemory(m_Device, stagingBufferMemory, nullptr);
+
+    // Line indices
+    bufferSize = sizeof(m_Scene.getIndices(Scene::LINE_TOPOGRAPHY)[0]) * m_Scene.getIndices(Scene::LINE_TOPOGRAPHY).size();
+
+    createBuffer(bufferSize, VK_BUFFER_USAGE_TRANSFER_SRC_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT,
+                 stagingBuffer, stagingBufferMemory);
+
+    vkMapMemory(m_Device, stagingBufferMemory, 0, bufferSize, 0, &data);
+    memcpy(data, m_Scene.getIndices(Scene::LINE_TOPOGRAPHY).data(), (size_t)bufferSize);
+    vkUnmapMemory(m_Device, stagingBufferMemory);
+
+    createBuffer(bufferSize, VK_BUFFER_USAGE_TRANSFER_DST_BIT | VK_BUFFER_USAGE_INDEX_BUFFER_BIT, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, m_LineIndexBuffer,
+                 m_LineIndexBufferMemory);
+
+    copyBuffer(stagingBuffer, m_LineIndexBuffer, bufferSize);
 
     vkDestroyBuffer(m_Device, stagingBuffer, nullptr);
     vkFreeMemory(m_Device, stagingBufferMemory, nullptr);
@@ -803,6 +859,7 @@ void Application::recordCommandBuffer(VkCommandBuffer commandBuffer, uint32_t im
     renderPassInfo.clearValueCount = 1;
     renderPassInfo.pClearValues = &clearColor;
 
+    // Triangle pipeline
     vkCmdBeginRenderPass(commandBuffer, &renderPassInfo, VK_SUBPASS_CONTENTS_INLINE);
 
     vkCmdBindPipeline(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, m_TrianglePipeline);
@@ -825,11 +882,17 @@ void Application::recordCommandBuffer(VkCommandBuffer commandBuffer, uint32_t im
     VkDeviceSize offsets[] = {0};
     vkCmdBindVertexBuffers(commandBuffer, 0, 1, vertexBuffers, offsets);
 
-    vkCmdBindIndexBuffer(commandBuffer, m_IndexBuffer, 0, VK_INDEX_TYPE_UINT16);
+    vkCmdBindIndexBuffer(commandBuffer, m_TriangleIndexBuffer, 0, VK_INDEX_TYPE_UINT16);
 
     vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, m_PipelineLayout, 0, 1, &m_DescriptorSets[m_currentFrame], 0, nullptr);
 
-    vkCmdDrawIndexed(commandBuffer, static_cast<uint32_t>(m_Scene.getIndices(Scene::TRI_TOPOGRAPHY).size()), 1, 0, 0, 0);
+    vkCmdDrawIndexed(commandBuffer, static_cast<uint32_t>(m_Scene.getIndices(Scene::TRIA_TOPOGRAPHY).size()), 1, 0, 0, 0);
+
+    // Line pipeline
+    vkCmdBindPipeline(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, m_LinePipeline);
+    vkCmdBindIndexBuffer(commandBuffer, m_LineIndexBuffer, 0, VK_INDEX_TYPE_UINT16);
+
+    vkCmdDrawIndexed(commandBuffer, static_cast<uint32_t>(m_Scene.getIndices(Scene::LINE_TOPOGRAPHY).size()), 1, 0, 0, 0);
 
     vkCmdEndRenderPass(commandBuffer);
 

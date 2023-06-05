@@ -38,7 +38,7 @@ struct Vertex {
 
 class Scene {
   public:
-    enum Topography { TRI_TOPOGRAPHY = 0, LIN_TOPOGRAPHY = 1 };
+    enum Topography { TRIA_TOPOGRAPHY = 0, LINE_TOPOGRAPHY = 1 };
 
   public:
     Scene();

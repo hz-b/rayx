@@ -93,8 +93,10 @@ class Application {
 
     Scene m_Scene;
 
-    VkBuffer m_IndexBuffer;
-    VkDeviceMemory m_IndexBufferMemory;
+    VkBuffer m_TriangleIndexBuffer;
+    VkDeviceMemory m_TriangleIndexBufferMemory;
+    VkBuffer m_LineIndexBuffer;
+    VkDeviceMemory m_LineIndexBufferMemory;
 
     std::vector<VkBuffer> m_UniformBuffers;
     std::vector<VkDeviceMemory> m_UniformBuffersMemory;
