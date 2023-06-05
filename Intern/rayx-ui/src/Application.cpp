@@ -34,17 +34,26 @@ void DestroyDebugUtilsMessengerEXT(VkInstance instance, VkDebugUtilsMessengerEXT
 
 // --------- Start of Application code --------- //
 Application::Application(uint32_t width, uint32_t height, const char* name) : m_Window(width, height, name) {
-    // A lot of components begin in invalid states
-    m_VertexBuffer = nullptr;
+    initVulkan();
+    initImGui();
 }
 
 Application::~Application() { cleanup(); }
 
-// TODO(Jannis): Run should only be the main loop
 void Application::run() {
-    initVulkan();
-    initImGui();
-    mainLoop();
+    while (!glfwWindowShouldClose(m_Window.get())) {
+        glfwPollEvents();
+
+        m_ImGuiLayer.updateImGui();
+
+        // memcpy(&wd->ClearValue.color.float32[0], &clear_color, 4 * sizeof(float));
+        // FrameRender(wd);
+        // FramePresent(wd);
+
+        drawFrame();
+    }
+
+    vkDeviceWaitIdle(m_Device);
 }
 
 void Application::initVulkan() {
@@ -85,22 +94,6 @@ void Application::initImGui() {
     m_ImGuiLayer.init(m_Window.get(), std::move(initInfo), m_SwapChain.ImageFormat);
 }
 
-void Application::mainLoop() {
-    while (!glfwWindowShouldClose(m_Window.get())) {
-        glfwPollEvents();
-
-        m_ImGuiLayer.updateImGui();
-
-        // memcpy(&wd->ClearValue.color.float32[0], &clear_color, 4 * sizeof(float));
-        // FrameRender(wd);
-        // FramePresent(wd);
-
-        drawFrame();
-    }
-
-    vkDeviceWaitIdle(m_Device);
-}
-
 void Application::cleanupSwapChain() {
     for (auto framebuffer : m_SwapChain.framebuffers) {
         vkDestroyFramebuffer(m_Device, framebuffer, nullptr);
@@ -132,6 +125,8 @@ void Application::cleanup() {
         vkDestroyBuffer(m_Device, m_UniformBuffers[i], nullptr);
         vkFreeMemory(m_Device, m_UniformBuffersMemory[i], nullptr);
     }
+
+    m_VertexBuffer->~VertexBuffer();
 
     vkDestroyBuffer(m_Device, m_TriangleIndexBuffer, nullptr);
     vkFreeMemory(m_Device, m_TriangleIndexBufferMemory, nullptr);

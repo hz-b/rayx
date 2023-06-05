@@ -106,11 +106,9 @@ class Application {
     std::vector<void*> m_UniformBuffersMapped;
 
     void recreateSwapChain();
-
-    void initWindow();
+    
     void initVulkan();
     void initImGui();
-    void mainLoop();
     void cleanupSwapChain();
     void cleanup();
 
