@@ -10,10 +10,8 @@ struct Extent2D {
 
 class Window {
   public:
-    Window();
+    Window(uint32_t width, uint32_t height, const char* const title);
     ~Window();
-
-    void initWindow(uint32_t width, uint32_t height, const char* const title);
 
     GLFWwindow* get() const { return m_Window; }
     Extent2D getExtent() const { return {m_width, m_height}; }
@@ -22,8 +20,6 @@ class Window {
     bool m_framebufferResized = false;
 
   private:
-    void createWindow();
-
     static void framebufferResizeCallback(GLFWwindow* window, int width, int height);
 
     const GLFWwindow* window;

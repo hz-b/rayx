@@ -33,15 +33,19 @@ void DestroyDebugUtilsMessengerEXT(VkInstance instance, VkDebugUtilsMessengerEXT
 }
 
 // --------- Start of Application code --------- //
+Application::Application(uint32_t width, uint32_t height, const char* name) : m_Window(width, height, name) {
+    // A lot of components begin in invalid states
+    m_VertexBuffer = nullptr;
+}
+
+Application::~Application() { cleanup(); }
+
+// TODO(Jannis): Run should only be the main loop
 void Application::run() {
-    initWindow();
     initVulkan();
     initImGui();
     mainLoop();
-    cleanup();
 }
-
-void Application::initWindow() { m_Window.initWindow(1920, 1080, "Rayx-UI"); }
 
 void Application::initVulkan() {
     createInstance();
@@ -134,9 +138,6 @@ void Application::cleanup() {
 
     vkDestroyBuffer(m_Device, m_LineIndexBuffer, nullptr);
     vkFreeMemory(m_Device, m_LineIndexBufferMemory, nullptr);
-
-    vkDestroyBuffer(m_Device, m_VertexBuffer, nullptr);
-    vkFreeMemory(m_Device, m_VertexBufferMemory, nullptr);
 
     for (size_t i = 0; i < m_maxFramesInFlight; i++) {
         vkDestroySemaphore(m_Device, m_renderFinishedSemaphores[i], nullptr);
@@ -664,8 +665,8 @@ void Application::createIndexBuffer() {
     memcpy(data, m_Scene.getIndices(Scene::TRIA_TOPOGRAPHY).data(), (size_t)bufferSize);
     vkUnmapMemory(m_Device, stagingBufferMemory);
 
-    createBuffer(bufferSize, VK_BUFFER_USAGE_TRANSFER_DST_BIT | VK_BUFFER_USAGE_INDEX_BUFFER_BIT, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, m_TriangleIndexBuffer,
-                 m_TriangleIndexBufferMemory);
+    createBuffer(bufferSize, VK_BUFFER_USAGE_TRANSFER_DST_BIT | VK_BUFFER_USAGE_INDEX_BUFFER_BIT, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT,
+                 m_TriangleIndexBuffer, m_TriangleIndexBufferMemory);
 
     copyBuffer(stagingBuffer, m_TriangleIndexBuffer, bufferSize);
 
@@ -682,8 +683,8 @@ void Application::createIndexBuffer() {
     memcpy(data, m_Scene.getIndices(Scene::LINE_TOPOGRAPHY).data(), (size_t)bufferSize);
     vkUnmapMemory(m_Device, stagingBufferMemory);
 
-    createBuffer(bufferSize, VK_BUFFER_USAGE_TRANSFER_DST_BIT | VK_BUFFER_USAGE_INDEX_BUFFER_BIT, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, m_LineIndexBuffer,
-                 m_LineIndexBufferMemory);
+    createBuffer(bufferSize, VK_BUFFER_USAGE_TRANSFER_DST_BIT | VK_BUFFER_USAGE_INDEX_BUFFER_BIT, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT,
+                 m_LineIndexBuffer, m_LineIndexBufferMemory);
 
     copyBuffer(stagingBuffer, m_LineIndexBuffer, bufferSize);
 
@@ -705,35 +706,9 @@ uint32_t Application::findMemoryType(uint32_t typeFilter, VkMemoryPropertyFlags 
 }
 
 void Application::createVertexBuffer() {
-    VkBufferCreateInfo bufferInfo{};
-    bufferInfo.sType = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO;
-    bufferInfo.size = sizeof(m_Scene.getVertices()[0]) * m_Scene.getVertices().size();
-    bufferInfo.usage = VK_BUFFER_USAGE_VERTEX_BUFFER_BIT;
-    bufferInfo.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
-
-    if (vkCreateBuffer(m_Device, &bufferInfo, nullptr, &m_VertexBuffer) != VK_SUCCESS) {
-        throw std::runtime_error("failed to create vertex buffer!");
-    }
-
-    VkMemoryRequirements memRequirements;
-    vkGetBufferMemoryRequirements(m_Device, m_VertexBuffer, &memRequirements);
-
-    VkMemoryAllocateInfo allocInfo{};
-    allocInfo.sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO;
-    allocInfo.allocationSize = memRequirements.size;
-    allocInfo.memoryTypeIndex =
-        findMemoryType(memRequirements.memoryTypeBits, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT);
-
-    if (vkAllocateMemory(m_Device, &allocInfo, nullptr, &m_VertexBufferMemory) != VK_SUCCESS) {
-        throw std::runtime_error("failed to allocate vertex buffer memory!");
-    }
-
-    vkBindBufferMemory(m_Device, m_VertexBuffer, m_VertexBufferMemory, 0);
-
-    void* data;
-    vkMapMemory(m_Device, m_VertexBufferMemory, 0, bufferInfo.size, 0, &data);
-    memcpy(data, m_Scene.getVertices().data(), (size_t)bufferInfo.size);
-    vkUnmapMemory(m_Device, m_VertexBufferMemory);
+    m_VertexBuffer = std::make_unique<VertexBuffer>(m_Device, m_PhysicalDevice);
+    std::vector<Vertex> vertices = m_Scene.getVertices();
+    m_VertexBuffer->createVertexBuffer(vertices.data(), vertices.size() * sizeof(Vertex));
 }
 
 void Application::createBuffer(VkDeviceSize size, VkBufferUsageFlags usage, VkMemoryPropertyFlags properties, VkBuffer& buffer,
@@ -878,7 +853,7 @@ void Application::recordCommandBuffer(VkCommandBuffer commandBuffer, uint32_t im
     scissor.extent = m_SwapChain.Extent;
     vkCmdSetScissor(commandBuffer, 0, 1, &scissor);
 
-    VkBuffer vertexBuffers[] = {m_VertexBuffer};
+    VkBuffer vertexBuffers[] = {m_VertexBuffer->getVertexBuffer()};
     VkDeviceSize offsets[] = {0};
     vkCmdBindVertexBuffers(commandBuffer, 0, 1, vertexBuffers, offsets);
 

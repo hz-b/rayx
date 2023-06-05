@@ -1,7 +1,7 @@
 #include "Application.h"
 
 int main() {
-    Application app;
+    Application app(1920, 1080, "RayX-UI");
 
     try {
         app.run();

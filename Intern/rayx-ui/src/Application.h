@@ -8,8 +8,9 @@
 #include <vector>
 
 #include "ImGuiLayer.h"
-#include "Window.h"
 #include "Scene.h"
+#include "Window.h"
+#include "VertexBuffer.h"
 
 const std::vector<const char*> validationLayers = {"VK_LAYER_KHRONOS_validation"};
 
@@ -51,6 +52,9 @@ struct Camera {
 
 class Application {
   public:
+    Application(uint32_t width, uint32_t height, const char* name);
+    ~Application();
+
     void run();
 
   private:
@@ -88,8 +92,7 @@ class Application {
     std::vector<VkFence> m_inFlightFences;
     uint32_t m_currentFrame = 0;
 
-    VkBuffer m_VertexBuffer;
-    VkDeviceMemory m_VertexBufferMemory;
+    std::unique_ptr<VertexBuffer> m_VertexBuffer;
 
     Scene m_Scene;
 
