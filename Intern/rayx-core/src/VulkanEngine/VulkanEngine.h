@@ -159,6 +159,7 @@ class RAYX_API VulkanEngine {
     void createCache();
     void setupDebugMessenger();
     void pickDevice();
+    std::vector<VkPhysicalDevice> getPhysicalDevices(VkInstance instance);
     void pickPhysicalDevice();
     void createLogicalDevice();
     void createDescriptorSetLayout();

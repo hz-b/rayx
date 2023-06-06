@@ -19,17 +19,22 @@ void VulkanEngine::pickDevice() {
     STAGING_SIZE = getStagingBufferSize();
 }
 
-// physical device for computation is chosen
-void VulkanEngine::pickPhysicalDevice() {
-    RAYX_PROFILE_FUNCTION();
-    // search for devices
+// scan for devices
+std::vector<VkPhysicalDevice> VulkanEngine::getPhysicalDevices(VkInstance instance) {
     uint32_t deviceCount = 0;
-    vkEnumeratePhysicalDevices(m_Instance, &deviceCount, nullptr);
+    vkEnumeratePhysicalDevices(instance, &deviceCount, nullptr);
     if (deviceCount == 0) throw std::runtime_error("failed to find GPUs with Vulkan Support!");
 
     // create vector of devices
     std::vector<VkPhysicalDevice> devices(deviceCount);
-    vkEnumeratePhysicalDevices(m_Instance, &deviceCount, devices.data());
+    vkEnumeratePhysicalDevices(instance, &deviceCount, devices.data());
+}
+
+// physical device for computation is chosen
+void VulkanEngine::pickPhysicalDevice() {
+    RAYX_PROFILE_FUNCTION();
+    // search for devices
+    auto devices = getPhysicalDevices(m_Instance);
 
     // pick fastest device
     m_PhysicalDevice = VK_NULL_HANDLE;
