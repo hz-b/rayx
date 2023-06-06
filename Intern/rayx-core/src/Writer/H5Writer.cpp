@@ -40,7 +40,8 @@ std::vector<SerializedRay> serialize(const RAYX::Rays& rays) {
     return serialized;
 }
 
-void writeH5(const RAYX::Rays& rays, std::string filename, std::vector<std::string> elementNames) {
+void writeH5(const RAYX::Rays& rays, std::string filename, const Format& format, std::vector<std::string> elementNames) {
+    // TODO use format!
     static_assert(sizeof(SerializedRay) == 18 * sizeof(double));
 
     HighFive::File file(filename, HighFive::File::ReadWrite | HighFive::File::Create | HighFive::File::Truncate);

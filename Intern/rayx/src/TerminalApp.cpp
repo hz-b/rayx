@@ -151,15 +151,17 @@ std::string TerminalApp::exportRays(const RAYX::Rays& rays, std::string path) {
         RAYX_ERR << "Input file is not an *.rml file!";
     }
 
+    Format fmt = formatFromString(m_CommandParser->m_args.m_format);
+
     if (csv) {
         path += ".csv";
-        writeCSV(rays, path);
+        writeCSV(rays, path, fmt);
     } else {
 #ifdef NO_H5
         RAYX_ERR << "writeH5 called during NO_H5 (HDF5 disabled during build))";
 #else
         path += ".h5";
-        writeH5(rays, path, getBeamlineOpticalElementsNames());
+        writeH5(rays, path, fmt, getBeamlineOpticalElementsNames());
 #endif
     }
     return path;

@@ -64,7 +64,9 @@ Cell doubleToCell(double x) {
     return strToCell(s.c_str());
 }
 
-void writeCSV(const RAYX::Rays& rays, std::string filename) {
+void writeCSV(const RAYX::Rays& rays, std::string filename, const Format& format) {
+    // TODO use format!
+
     std::ofstream file(filename);
     file << strToCell("Ray ID").buf << DELIMITER       //
          << strToCell("Snapshot ID").buf << DELIMITER  //

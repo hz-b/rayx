@@ -3,6 +3,7 @@
 
 #include "Debug/Debug.h"
 #include "TerminalAppConfig.h"
+#include "Writer/Writer.h"
 
 class CommandParser {
   public:
@@ -23,16 +24,17 @@ class CommandParser {
     // Flags initialize to DISABLED
     // Set options in .cpp file
     struct Args {
-        bool m_plotFlag = false;          // -p (Plot)
-        bool m_csvFlag = false;           // -c (.csv Output)
-        bool m_cpuFlag = false;           // -x (CPU Tracer)
-        bool m_benchmark = false;         // -b (Benchmark)
-        bool m_version = false;           // -v (Version)
-        std::string m_providedFile = "";  // -i (Input)
-        bool m_isFixSeed = false;         // -f (Fixed Seed)
-        int m_seed = -1;                  // -s (Provided Seed)
-        int m_BatchSize = 0;              // -b (Vk batch size )
-        bool m_verbose = false;           // --verbose (Verbose)
+        bool m_plotFlag = false;                       // -p (Plot)
+        bool m_csvFlag = false;                        // -c (.csv Output)
+        bool m_cpuFlag = false;                        // -x (CPU Tracer)
+        bool m_benchmark = false;                      // -b (Benchmark)
+        bool m_version = false;                        // -v (Version)
+        std::string m_providedFile = "";               // -i (Input)
+        bool m_isFixSeed = false;                      // -f (Fixed Seed)
+        int m_seed = -1;                               // -s (Provided Seed)
+        int m_BatchSize = 0;                           // -b (Vk batch size )
+        bool m_verbose = false;                        // --verbose (Verbose)
+        std::string m_format = defaultFormatString();  // --format
     } m_args;
 
     inline void getVersion() const {
@@ -73,5 +75,6 @@ class CommandParser {
         {'f', {OptionType::BOOL, "", "Fix the seed to RAYX::FIXED_SEED (Uses default)", &(m_args.m_isFixSeed)}},
         {'s', {OptionType::INT, "seed", "Provided user seed", &(m_args.m_seed)}},
         {'V', {OptionType::BOOL, "verbose", "Dump more information", &(m_args.m_verbose)}},
+        {'F', {OptionType::STRING, "format", "Format output CSV / H5 data", &(m_args.m_format)}},
     };
 };
