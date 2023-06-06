@@ -26,6 +26,7 @@ class CommandParser {
         bool m_plotFlag = false;          // -p (Plot)
         bool m_csvFlag = false;           // -c (.csv Output)
         bool m_cpuFlag = false;           // -x (CPU Tracer)
+        int m_deviceID = -1;              // -d (Device)
         bool m_benchmark = false;         // -b (Benchmark)
         bool m_version = false;           // -v (Version)
         std::string m_providedFile = "";  // -i (Input)
