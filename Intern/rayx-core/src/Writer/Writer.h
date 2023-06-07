@@ -2,6 +2,8 @@
 
 #include "Tracer/Ray.h"
 
+using uint = unsigned int;
+
 // When writing a Ray to CSV / H5, one needs to specify a way in which to format the ray.
 // A format consists of multiple components - each component corresponds to a single double of data.
 // Example: "Ray-ID|Snapshot-ID". This simple format has two components.
@@ -17,10 +19,10 @@ struct FormatComponent {
 using Format = std::vector<FormatComponent>;
 
 // The default format string. It corresponds to FULL_FORMAT, see below.
-std::string defaultFormatString();
+std::string RAYX_API defaultFormatString();
 
 // throws an error if it is unable to understand the format.
-Format formatFromString(std::string);
+Format RAYX_API formatFromString(std::string);
 
 // The "full" format, consisting of all components that rays support.
 // All other formats are derived by picking a subset of these components, and potentially reordering them.
