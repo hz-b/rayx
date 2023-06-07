@@ -2,19 +2,23 @@
 
 #include "Tracer/Ray.h"
 
-// A format consists of multiple components.
-// Example: "Ray ID|Snapshot ID". This simple format has two components.
+// When writing a Ray to CSV / H5, one needs to specify a way in which to format the ray.
+// A format consists of multiple components - each component corresponds to a single double of data.
+// Example: "Ray-ID|Snapshot-ID". This simple format has two components.
+// A ray formatted with this format only stores its ray-id and its snapshot-id.
 struct FormatComponent {
-    // The name of the component, example: "X position".
+    // The name of the component, example: "X-position".
     const char* name;
-    // A function expressing how to access this component given an actual RAYX::Ray.
-    double (*get_double)(uint, uint, RAYX::Ray);
+    // A function pointer expressing how to access this component given an actual RAYX::Ray.
+    double (*get_double)(uint ray_id, uint snapshot_id, RAYX::Ray ray);
 };
 
 // Again, a format is simply a list of components!
 using Format = std::vector<FormatComponent>;
 
+// The default format string. It corresponds to FULL_FORMAT, see below.
 std::string defaultFormatString();
+
 // throws an error if it is unable to understand the format.
 Format formatFromString(std::string);
 
