@@ -9,48 +9,29 @@ BufferHandler::BufferHandler(VkDevice& device, VmaAllocator allocator, uint32_t 
     : m_Device(device), m_FamilyIndex(queueFamilyIndex), m_VmaAllocator(allocator), m_StagingSize(stagingSize) {
     VKINIT::Command::create_command_pool(device, VK_COMMAND_POOL_CREATE_RESET_COMMAND_BUFFER_BIT, m_FamilyIndex, m_CommandPool);
     createTransferCommandBuffer();
-    createTransferQueue();
+    createTransferQueue();  // Simply get a new queue similar to src queue for transfers
     createStagingBuffer();
     createTransferFence();
-
-    VkSemaphoreCreateInfo semaphoreCreateInfo = {};
-    semaphoreCreateInfo.sType = VK_STRUCTURE_TYPE_SEMAPHORE_CREATE_INFO;
-    vkCreateSemaphore(m_Device, &semaphoreCreateInfo, nullptr, &m_TransferSemaphore);
+    createTransferSemaphore();
 }
 
 BufferHandler::~BufferHandler() {
-    if (m_TransferCommandBuffer) {
-        vkFreeCommandBuffers(m_Device, m_CommandPool, 1, &m_TransferCommandBuffer);
-    }
+    vkFreeCommandBuffers(m_Device, m_CommandPool, 1, &m_TransferCommandBuffer);
 
     // Destroy staging buffer
-    vmaDestroyBuffer(m_VmaAllocator, m_StagingBuffer->getBuffer(), m_StagingBuffer->m_Alloca);
-
+    deleteBuffer(m_StagingBuffer->getName());
     // Destroy user-defined buffers
     for (auto& [name, buf] : m_Buffers) {
-        vmaDestroyBuffer(m_VmaAllocator, buf->getBuffer(), buf->m_Alloca);
-        RAYX_D_LOG << "destroying";
+        deleteBuffer(name.c_str());
     }
 }
-
-// std::vector<VkDescriptorSetLayoutBinding> BufferHandler::getVulkanBufferBindings() {
-//     // TODO(OS) We need correct bindings and not all so enhance this by moving it to Shader
-//     std::vector<VkDescriptorSetLayoutBinding> result;
-//     result.reserve(m_Buffers.size());
-//     for (const auto& x : m_Buffers) {
-//         result.push_back(x.second.m_DescriptorSetLayoutBinding);
-//     }
-//     return result;
-// }
 
 std::vector<VkDescriptorSetLayoutBinding> BufferHandler::getDescriptorBindings(const std::string& pass) {
     RAYX_PROFILE_FUNCTION();
     std::vector<VkDescriptorSetLayoutBinding> bindings;
-
     for (auto& [name, buf] : m_Buffers) {
         bindings.push_back(buf->m_DescriptorSetBindings[pass]);
     }
-
     return bindings;
 }
 
@@ -71,12 +52,18 @@ void BufferHandler::createTransferFence() { m_TransferFence = std::make_unique<F
 
 void BufferHandler::createTransferQueue() { vkGetDeviceQueue(m_Device, m_FamilyIndex, 0, &m_TransferQueue); }
 
+void BufferHandler::createTransferSemaphore() {
+    VkSemaphoreCreateInfo semaphoreCreateInfo = {};
+    semaphoreCreateInfo.sType = VK_STRUCTURE_TYPE_SEMAPHORE_CREATE_INFO;
+    vkCreateSemaphore(m_Device, &semaphoreCreateInfo, nullptr, &m_TransferSemaphore);
+}
+
 void BufferHandler::gpuMemcpy(VulkanBuffer& buffer_dst, size_t offset_dst, VulkanBuffer& buffer_src, size_t offset_src, size_t bytes) {
     RAYX_PROFILE_FUNCTION();
+
     VkCommandBufferBeginInfo beginInfo{};
     beginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
     beginInfo.flags = VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT;
-
     vkBeginCommandBuffer(m_TransferCommandBuffer, &beginInfo);
 
     VkBufferCopy copyRegion{};
@@ -94,6 +81,7 @@ void BufferHandler::gpuMemcpy(VulkanBuffer& buffer_dst, size_t offset_dst, Vulka
     submitInfo.pCommandBuffers = &m_TransferCommandBuffer;
     auto f = m_TransferFence->fence();
     vkQueueSubmit(m_TransferQueue, 1, &submitInfo, *f);
+    m_TransferFence->wait();
 }
 
 void BufferHandler::createStagingBuffer() {
@@ -121,7 +109,10 @@ void BufferHandler::storeToStagingBuffer(char* indata, size_t bytes) {
     m_StagingBuffer->UnmapMemory();
 }
 
-void BufferHandler::waitTransferQueueIdle() { vkQueueWaitIdle(m_TransferQueue); }
+void BufferHandler::waitTransferQueueIdle() {
+    RAYX_D_LOG << "Waiting for transfer Queue...";
+    vkQueueWaitIdle(m_TransferQueue);
+}
 
 VulkanBuffer* BufferHandler::getBuffer(const std::string& name) {
     if (!isBufferPresent(std::string(name))) {
@@ -135,9 +126,8 @@ void BufferHandler::readBufferRaw(const char* bufname, char* outdata, const VkQu
     //     RAYX_ERR << "you've forgotton to .run() the VulkanEngine. Thats "
     //                 "mandatory before reading it's output buffers.";
     // }
-
     VulkanBuffer* buffer = getBuffer(bufname);
-    if (buffer->m_createInfo.accessType != VKBUFFER_OUT) {
+    if (buffer->m_createInfo.accessType != VKBUFFER_OUT && buffer->m_createInfo.accessType != VKBUFFER_INOUT) {
         RAYX_ERR << "readBufferRaw(\"" << bufname << "\", ...) is not allowed, as \"" << bufname << "\" is not an output buffer";
     }
 
@@ -146,12 +136,12 @@ void BufferHandler::readBufferRaw(const char* bufname, char* outdata, const VkQu
     if (queue != nullptr) {
         vkQueueWaitIdle(queue);
     }
+
     vkQueueWaitIdle(m_TransferQueue);
 
     while (remainingBytes > 0) {
         size_t localbytes = std::min((size_t)m_StagingSize, remainingBytes);
         gpuMemcpy(*m_StagingBuffer, 0, *m_Buffers[bufname], offset, localbytes);
-        m_TransferFence->wait();
         loadFromStagingBuffer(outdata + offset, localbytes);
         offset += localbytes;
         remainingBytes -= localbytes;
@@ -165,9 +155,9 @@ void BufferHandler::writeBufferRaw(const char* bufname, char* indata) {
     if (access != VKBUFFER_IN && access != VKBUFFER_INOUT) {
         RAYX_ERR << "writeBufferRaw(\"" << bufname << "\", ...) is not allowed, as \"" << bufname << "\" is not an input Buffer";
     }
-
     size_t remainingBytes = b->getSize();
     size_t offset = 0;
+
     while (remainingBytes > 0) {
         size_t localbytes = std::min(remainingBytes, (size_t)m_StagingSize);
         storeToStagingBuffer(indata + offset, localbytes);
@@ -195,23 +185,12 @@ VulkanBuffer& BufferHandler::createBuffer(VulkanBufferCreateInfo createInfo) {
     return *m_Buffers[name];
 }
 
-// template <typename T>
-// inline std::vector<T> BufferHandler::readBuffer(const char* bufname, bool indirect) {
-//     std::vector<T> out(m_Buffers[bufname]->getSize() / sizeof(T));
-//     if (indirect) {
-//         readBufferRaw(bufname, (char*)out.data(), m_TransferQueue);
-//     } else {
-//         readBufferRaw(bufname, (char*)out.data());
-//     }
-//     return out;
-// }
-
 template <typename T>
 void BufferHandler::updateBuffer(const char* bufname, const std::vector<T>& vec) {
     if (!isBufferPresent(std::string(bufname))) {
         RAYX_ERR << "Buffer " << bufname << " does not exist";
     }
-    if (vec) {
+    if (vec && m_Buffers[std::string(bufname)]->getSize() == vec.size()) {
         writeBufferRaw(bufname, (char*)vec.data());
     }
 }
@@ -220,6 +199,7 @@ void BufferHandler::freeBuffer(const char* bufname) {
     if (!isBufferPresent(std::string(bufname))) {
         RAYX_ERR << "Buffer " << bufname << " does not exist";
     }
+    RAYX_D_LOG << "Freeing " << std::string(bufname);
     vmaDestroyBuffer(m_VmaAllocator, m_Buffers[bufname]->getBuffer(), m_Buffers[bufname]->m_Alloca);
 }
 
@@ -228,19 +208,7 @@ void BufferHandler::deleteBuffer(const char* bufname) {
     m_Buffers.erase(bufname);
 }
 
-// TODO(OS) : Only 1 Set is currently supported
-void BufferHandler::updteDescriptorSets(std::vector<VkDescriptorSetLayout>& descriptorSetLayout, std::vector<VkDescriptorSet>& descriptorSets,
-                                        DescriptorPool& pool, std::string pass) {
-    auto writer = DescriptorWriter(descriptorSetLayout[0], pool);
-    for (auto& [name, b] : m_Buffers) {
-        auto descInfo = b->getDescriptorInfo();
-        writer.writeBuffer(b->getPassDescriptorBinding(pass), &descInfo);
-    }
-
-    writer.build(descriptorSets[0]);
-}
-
-void BufferHandler::insertBufferMemoryBarrier(std::string bufferName, const VkCommandBuffer& commandBuffer, VkAccessFlags srcAccessMask,
+void BufferHandler::insertBufferMemoryBarrier(const std::string& bufferName, const VkCommandBuffer& commandBuffer, VkAccessFlags srcAccessMask,
                                               VkAccessFlags dstAccessMask, VkPipelineStageFlags srcStageMask, VkPipelineStageFlags dstStageMask,
                                               VkDeviceSize offset) {
     auto buffer = getBuffer(bufferName);
@@ -255,7 +223,7 @@ void BufferHandler::insertBufferMemoryBarrier(std::string bufferName, const VkCo
     vkCmdPipelineBarrier(commandBuffer, srcStageMask, dstStageMask, 0, 0, nullptr, 1, &bufferMemoryBarrier, 0, nullptr);
 }
 
-bool BufferHandler::isBufferPresent(std::string name) { return m_Buffers.find(name) != m_Buffers.end(); }
+bool BufferHandler::isBufferPresent(const std::string& name) { return m_Buffers.find(name) != m_Buffers.end(); }
 
 }  // namespace RAYX
 

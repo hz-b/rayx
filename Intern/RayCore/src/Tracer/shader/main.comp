@@ -216,6 +216,13 @@ void main() {
 
     // this is required as sometimes error codes are transmitted using _ray.m_weight
     _ray.m_weight = W_UNINIT;
+
+    #ifdef GLSL
+    if (uint(gl_GlobalInvocationID) == 2 ){
+        debugPrintfEXT("Hello from GPU. \n");
+        debugPrintfEXT("numrays: %d\n",uint64_t(pushConstants.numRays));
+    }
+    #endif
     
     // ~~~~~~~~~~~~~~ PRINT EXAMPLE ~~~~~~~~~~~~~~
     // Printing ~DEBUG~ Example over vkconfig Validation Layers
@@ -226,7 +233,7 @@ void main() {
     //     // RAYX_D_LOG << "Tracing on CPU..." ;
     //     // RAYX_D_LOG << pushConstants.pushMatrix[0][0];
     // #endif
-    // }
+    //}
     // ~~~~~~~~~~~~~~ PRINT EXAMPLE ~~~~~~~~~~~~~~
 	dynamicElements();
 }

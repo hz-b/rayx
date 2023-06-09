@@ -22,7 +22,10 @@ void VulkanEngine::run(VulkanEngineRunSpec_t spec) {
     m_state = EngineStates_t::POSTRUN;
 }
 
-void VulkanEngine::newUpdateDescriptorSets() { m_ComputePass->updateDescriptorSets(m_BufferHandler.get()); }
+void VulkanEngine::newUpdateDescriptorSets() {
+    //m_ComputePass->updateDescriptorSets(m_BufferHandler.get());
+    m_ComputePass->simpleupdate(m_BufferHandler.get());
+}
 
 void VulkanEngine::newRun(VulkanEngineRunSpec_t spec) {
     if (m_state == EngineStates_t::PREINIT) {

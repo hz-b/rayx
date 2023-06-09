@@ -111,9 +111,9 @@ namespace Descriptor {
 inline VkDescriptorPoolCreateInfo descriptor_pool_create_info(uint32_t count, const VkDescriptorPoolSize* pool_sizes, uint32_t max_sets) {
     VkDescriptorPoolCreateInfo descriptor_pool_info{};
     descriptor_pool_info.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_POOL_CREATE_INFO;
+    descriptor_pool_info.maxSets = max_sets;
     descriptor_pool_info.poolSizeCount = count;
     descriptor_pool_info.pPoolSizes = pool_sizes;
-    descriptor_pool_info.maxSets = max_sets;
     return descriptor_pool_info;
 }
 
@@ -172,9 +172,11 @@ inline VkWriteDescriptorSet write_descriptor_set(VkDescriptorSet dst_set, VkDesc
                                                  VkDescriptorBufferInfo* buffer_info, uint32_t descriptor_count = 1) {
     VkWriteDescriptorSet write_descriptor_set{};
     write_descriptor_set.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
+    write_descriptor_set.pNext = nullptr;
     write_descriptor_set.dstSet = dst_set;
     write_descriptor_set.descriptorType = type;
     write_descriptor_set.dstBinding = binding;
+    write_descriptor_set.dstArrayElement = 0;
     write_descriptor_set.pBufferInfo = buffer_info;
     write_descriptor_set.descriptorCount = descriptor_count;
     return write_descriptor_set;

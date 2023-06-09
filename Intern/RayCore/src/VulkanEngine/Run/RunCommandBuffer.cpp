@@ -30,6 +30,7 @@ void VulkanEngine::submitCommandBuffer() {
     actually done executing.
     */
     m_Fences.compute->wait();
+    vkQueueWaitIdle(m_ComputeQueue);
 }
 
 }  // namespace RAYX

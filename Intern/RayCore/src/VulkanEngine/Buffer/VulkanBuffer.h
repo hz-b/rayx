@@ -18,7 +18,7 @@ typedef enum BufferAccessFlags {
 } BufferAccessFlags;
 
 /**
- * @brief Pass to VulkanBuffer for buffer creation
+ * @brief Pass to VulkanBuffer Class for buffer creation
  *
  */
 struct VulkanBufferCreateInfo {

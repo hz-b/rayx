@@ -42,8 +42,8 @@ class RAYX_API ShaderStage {
 
   private:
     VkDevice& m_Device;
-    const char* m_name = nullptr;
-    const char* m_entryPoint = nullptr;
+    std::string m_name;
+    std::string m_entryPoint;
     std::filesystem::path m_path;
     VkShaderStageFlagBits m_shaderType;
     VkShaderModule m_shaderModule = VK_NULL_HANDLE;

@@ -3,6 +3,13 @@
 #include "VulkanEngine/VulkanEngine.h"
 namespace RAYX {
 
+struct {
+    double d1 = 1.000;
+    double d2 = 1.000;
+    double d3 = 1.000;
+    double d4 = 1.000;
+} test;
+
 /*+
  * Record Commands for Compute and Dispatch
  */
@@ -108,7 +115,7 @@ void VulkanEngine::recordInComputeCommandBuffer() {
 
 void VulkanEngine::newRecordInCommandBuffer(ComputePass& computePass) {
     RAYX_PROFILE_FUNCTION();
-    RAYX_VERB << "Recording commandBuffer..";
+    RAYX_VERB << "Recording new commandBuffer..";
     static uint32_t requiredGroup = 0;
     static struct {
         uint32_t x = 0;
@@ -129,8 +136,13 @@ void VulkanEngine::newRecordInCommandBuffer(ComputePass& computePass) {
     The validation layer will NOT give warnings if you forget these, so be
     very careful not to forget them.
     */
-    computePass.bind(m_ComputeCommandBuffer, 0);  // TODO(OS) Add multi stage support if needed
-    computePass.bindDescriptorSet(m_ComputeCommandBuffer, 0);
+    vkCmdBindPipeline(m_ComputeCommandBuffer, VK_PIPELINE_BIND_POINT_COMPUTE, m_ComputePass->m_pass[0]->m_pipeline);
+
+    vkCmdBindDescriptorSets(m_ComputeCommandBuffer, VK_PIPELINE_BIND_POINT_COMPUTE, m_ComputePass->m_pass[0]->m_pipelineLayout, 0, 1,
+                            &m_ComputePass->m_oneDescSet, 0, nullptr);
+
+    // computePass.bind(m_ComputeCommandBuffer, 0);  // TODO(OS) Add multi stage support if needed
+    // computePass.bindDescriptorSet(m_ComputeCommandBuffer, 0);
 
     /*
     Calling vkCmdDispatch basically starts the compute pipeline, and
@@ -189,12 +201,11 @@ void VulkanEngine::newRecordInCommandBuffer(ComputePass& computePass) {
         group.y = ygroups;
         group.z = zgroups;
     }
-
     /**
      * Update push constants
      */
-    vkCmdPushConstants(m_ComputeCommandBuffer, computePass.getPipelineLayout(0), computePass.getShaderStage(0).getShaderStageFlagBits(), 0,
-                       m_pushConstants.size, m_pushConstants.pushConstPtr);
+    vkCmdPushConstants(m_ComputeCommandBuffer, m_ComputePass->m_pass[0]->m_pipelineLayout, VK_SHADER_STAGE_COMPUTE_BIT, 0,
+                       m_ComputePass->m_pass[0]->m_pushConstant.getSize(), m_ComputePass->m_pass[0]->m_pushConstant.getData());
 
     RAYX_VERB << "Dispatching commandBuffer...";
     RAYX_VERB << "Sending "

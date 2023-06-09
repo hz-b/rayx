@@ -33,7 +33,7 @@ class RAYX_API BufferHandler {
     VulkanBuffer& createBuffer(VulkanBufferCreateInfo createInfo, const std::vector<T>& vec = nullptr) {
         auto bufName = std::string(createInfo.bufName);
 
-        if (isBufferPresent(std::string(bufName))) { // If buffer already exist, update if same size
+        if (isBufferPresent(std::string(bufName))) {  // If buffer already exists, update if it still has the same size
             VulkanBuffer* b = getBuffer(bufName);
             if (b->m_createInfo.size == vec.size() * sizeof(T)) {
                 writeBufferRaw(bufName.c_str(), (char*)vec.data());
@@ -45,7 +45,8 @@ class RAYX_API BufferHandler {
 
         createInfo.size = vec.size() * sizeof(T);
         if (!vec.empty()) {
-            writeBufferRaw(createBuffer(createInfo).getName(), (char*)vec.data());
+            createBuffer(createInfo);
+            writeBufferRaw(createInfo.bufName, (char*)vec.data());
         } else {
             RAYX_WARN << "No fill data provided for." << bufName;
             createBuffer(createInfo);
@@ -55,6 +56,7 @@ class RAYX_API BufferHandler {
 
     template <typename T>
     void updateBuffer(const char* bufname, const std::vector<T>& vec);
+
     /**
      * @brief Read Buffer
      *
@@ -82,9 +84,6 @@ class RAYX_API BufferHandler {
 
     std::vector<VkDescriptorSetLayoutBinding> getDescriptorBindings(const std::string& passName);
 
-    void updteDescriptorSets(std::vector<VkDescriptorSetLayout>& descriptorSetLayout, std::vector<VkDescriptorSet>& descriptorSets,
-                             DescriptorPool& pool, std::string pass);
-
     const VulkanBuffer& getStagingBuffer() const { return *m_StagingBuffer; }
 
     // TODO(OS): This function should be almost illegal...
@@ -92,7 +91,7 @@ class RAYX_API BufferHandler {
 
     const VkFence* getTransferFence() const { return m_TransferFence->fence(); }
 
-    void insertBufferMemoryBarrier(std::string bufferName, const VkCommandBuffer& commandBuffer, VkAccessFlags srcAccessMask,
+    void insertBufferMemoryBarrier(const std::string& bufferName, const VkCommandBuffer& commandBuffer, VkAccessFlags srcAccessMask,
                                    VkAccessFlags dstAccessMask, VkPipelineStageFlags srcStageMask, VkPipelineStageFlags dstStageMask,
                                    VkDeviceSize offset = 0);
 
@@ -103,6 +102,7 @@ class RAYX_API BufferHandler {
     void createTransferCommandBuffer();
     void createTransferQueue();
     void createTransferFence();
+    void createTransferSemaphore();
 
     void loadFromStagingBuffer(char* outdata, size_t bytes);
     void storeToStagingBuffer(char* indata, size_t bytes);
@@ -111,7 +111,7 @@ class RAYX_API BufferHandler {
     void writeBufferRaw(const char* bufname, char* indata);
     void gpuMemcpy(VulkanBuffer& buffer_dst, size_t offset_dst, VulkanBuffer& buffer_src, size_t offset_src, size_t bytes);
 
-    bool isBufferPresent(std::string);
+    bool isBufferPresent(const std::string&);
 
   private:
     VkDevice& m_Device;

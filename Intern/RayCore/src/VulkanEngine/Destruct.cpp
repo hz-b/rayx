@@ -47,8 +47,9 @@ void inline storePipelineCache(VkDevice& device, VkPipelineCache& cache) {
 }
 
 VulkanEngine::~VulkanEngine() {
+    RAYX_D_LOG << "~Destruct vulkanengine";
     if (m_state == EngineStates_t::PREINIT) {
-        return; /* nothing to clean up! */
+        // return; /* nothing to clean up! */
     }
     if (m_state == EngineStates_t::POSTRUN) {
         RAYX_WARN << ".cleanup() was not called after run!";
@@ -66,6 +67,14 @@ VulkanEngine::~VulkanEngine() {
         // vkFreeMemory(m_Device, buf.m_Memory, nullptr);
         vmaDestroyBuffer(m_VmaAllocator, buf.buf, buf.alloca);
     }
+
+    //auto bufs = getBufferHandler().getBuffers();
+
+    // for (auto& buf : bufs) {
+    //     // vkDestroyBuffer(m_Device, buf.m_Buffer, nullptr);
+    //     // vkFreeMemory(m_Device, buf.m_Memory, nullptr);
+    //     vmaDestroyBuffer(m_VmaAllocator, buf.buf, buf.alloca);
+    // }
 
     vmaDestroyBuffer(m_VmaAllocator, m_stagingBuffer.buf, m_stagingBuffer.alloca);
     vmaDestroyAllocator(m_VmaAllocator);

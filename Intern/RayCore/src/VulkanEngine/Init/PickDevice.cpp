@@ -185,7 +185,7 @@ void VulkanEngine::createLogicalDevice() {
     }
 
     vkGetDeviceQueue(m_Device, m_computeFamily, 0, &m_ComputeQueue);
-    vkGetDeviceQueue(m_Device, m_computeFamily, 0, &m_TransferQueue);
+    //vkGetDeviceQueue(m_Device, m_computeFamily, 0, &m_TransferQueue);
 }
 // Create Semaphores for Queue synchronization between commands
 void VulkanEngine::createSemaphores() {

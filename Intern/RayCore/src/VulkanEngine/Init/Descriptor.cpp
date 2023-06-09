@@ -74,7 +74,7 @@ DescriptorWriter& DescriptorWriter::writeImage(uint32_t binding, VkDescriptorIma
 }
 
 void DescriptorWriter::build(VkDescriptorSet& set) {
-    pool.allocateDescriptor(setLayout, set);
+    //pool.allocateDescriptor(setLayout, set);
 
     overwrite(set);
 }
@@ -82,8 +82,8 @@ void DescriptorWriter::build(VkDescriptorSet& set) {
 void DescriptorWriter::overwrite(VkDescriptorSet& set) {
     for (auto& write : writes) {
         write.dstSet = set;
+        vkUpdateDescriptorSets(pool.m_Device, 1, &write, 0, nullptr);
     }
-    vkUpdateDescriptorSets(pool.m_Device, writes.size(), writes.data(), 0, nullptr);
 }
 }  // namespace RAYX
 

@@ -12,7 +12,8 @@ ShaderStage::ShaderStage(VkDevice& device, const ShaderStageCreateInfo& createIn
       m_entryPoint(createInfo.entryPoint.c_str()),
       m_path(createInfo.shaderPath),
       m_shaderType(createInfo.shaderType) {
-    RAYX_LOG << "Creating shader stage...";
+    RAYX_D_LOG << "Creating shader stage...";
+    RAYX_D_LOG << "EntryPoint: " << m_entryPoint;
     // Create Vulkan Shader Module
     createShaderModule();
 }
@@ -46,9 +47,9 @@ VkPipelineShaderStageCreateInfo ShaderStage::getPipelineShaderCreateInfo() {
     */
     VkPipelineShaderStageCreateInfo shaderStageCreateInfo = {};
     shaderStageCreateInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO;
-    shaderStageCreateInfo.stage = VK_SHADER_STAGE_COMPUTE_BIT;
+    shaderStageCreateInfo.stage = m_shaderType;
     shaderStageCreateInfo.module = m_shaderModule;
-    shaderStageCreateInfo.pName = m_entryPoint;
+    shaderStageCreateInfo.pName = m_entryPoint.c_str();
     return shaderStageCreateInfo;
 }
 

@@ -12,7 +12,6 @@ void VulkanEngine::writeBufferRaw(const char* bufname, char* indata) {
     if (!b.isInput) {
         RAYX_ERR << "writeBufferRaw(\"" << bufname << "\", ...) is not allowed, as \"" << bufname << "\" has m_in = false";
     }
-
     size_t remainingBytes = m_buffers[bufname].size;
     size_t offset = 0;
     while (remainingBytes > 0) {

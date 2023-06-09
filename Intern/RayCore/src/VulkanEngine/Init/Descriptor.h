@@ -9,7 +9,7 @@ class RAYX_API DescriptorPool {
   public:
     class RAYX_API Builder {
       public:
-        Builder(VkDevice& device) : m_Device{device} {}
+         Builder(VkDevice& device) : m_Device{device} {}
         //Count is usually size of the total buffers needed.
         Builder& addPoolSize(VkDescriptorType descriptorType, uint32_t count);
         Builder& setPoolFlags(VkDescriptorPoolCreateFlags flags);

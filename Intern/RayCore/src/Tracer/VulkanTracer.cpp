@@ -122,7 +122,7 @@ std::vector<Ray> VulkanTracer::newTraceRaw(const TraceRawConfig& cfg) {
         // Compute Buffers Meta
         // Bindings are *IN ORDER*
         m_engine.getBufferHandler()
-            .createBuffer<Ray>({"ray-buffer", VKBUFFER_IN}, rayList)  // Input Ray Buffer
+            .createBuffer<Ray>({"ray-buffer", VKBUFFER_INOUT}, rayList)  // Input Ray Buffer
             .addDescriptorSetPerPassBinding(passName, 0, shaderFlag);
 
         m_engine.getBufferHandler()
@@ -150,15 +150,20 @@ std::vector<Ray> VulkanTracer::newTraceRaw(const TraceRawConfig& cfg) {
             .addDescriptorSetPerPassBinding(passName, 6, shaderFlag);
 #endif
     }
+    m_engine.getBufferHandler().waitTransferQueueIdle();
+
     // FIXME(OS) Weird pushconstant update
     m_engine.m_ComputePass->updatePushConstant(0, const_cast<void*>(m_engine.m_pushConstants.pushConstPtr), m_engine.m_pushConstants.size);
 
     // Create Pipeline layouts and Descriptor Layouts. Everytime buffer formation (not data) changes we need to prepare again
     m_engine.prepareComputePipelinePass();
 
+    std::vector<Ray> outtest = m_engine.getBufferHandler().readBuffer<Ray>("ray-buffer", true);
+
     // m_engine.run({.m_numberOfInvocations = numberOfRays});
     m_engine.newRun({.m_numberOfInvocations = numberOfRays});
-
+    //outtest = m_engine.getBufferHandler().readBuffer<Ray>("ray-buffer", true);
+    
     std::vector<Ray> out = m_engine.getBufferHandler().readBuffer<Ray>("output-buffer", true);
 
 #ifdef RAYX_DEBUG_MODE
