@@ -9,8 +9,8 @@
 
 #include "ImGuiLayer.h"
 #include "Scene.h"
-#include "Window.h"
 #include "VertexBuffer.h"
+#include "Window.h"
 
 const std::vector<const char*> validationLayers = {"VK_LAYER_KHRONOS_validation"};
 
@@ -106,7 +106,7 @@ class Application {
     std::vector<void*> m_UniformBuffersMapped;
 
     void recreateSwapChain();
-    
+
     void initVulkan();
     void initImGui();
     void cleanupSwapChain();

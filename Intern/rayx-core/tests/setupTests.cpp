@@ -66,7 +66,7 @@ RAYX::Beamline loadBeamline(std::string filename) {
 /// will write to Intern/rayx-core/tests/output<filename>.csv
 void writeToOutputCSV(const RAYX::Rays& rays, std::string filename) {
     std::string f = canonicalizeRepositoryPath("Intern/rayx-core/tests/output/" + filename + ".csv").string();
-    writeCSV(rays, f);
+    writeCSV(rays, f, FULL_FORMAT);
 }
 
 /// sequentialExtraParam yields the desired extraParam for rays which went the

@@ -40,14 +40,6 @@ Cell strToCell(const char* x) {
     return out;
 }
 
-Cell ulongToCell(unsigned long x) {
-    std::stringstream ss;
-    std::string s;
-    ss << x;
-    ss >> s;
-    return strToCell(s.c_str());
-}
-
 Cell doubleToCell(double x) {
     std::stringstream ss;
     ss.setf(std::ios::fixed);
@@ -64,51 +56,32 @@ Cell doubleToCell(double x) {
     return strToCell(s.c_str());
 }
 
-void writeCSV(const RAYX::Rays& rays, std::string filename) {
+void writeCSV(const RAYX::Rays& rays, std::string filename, const Format& format) {
     std::ofstream file(filename);
-    file << strToCell("Ray ID").buf << DELIMITER       //
-         << strToCell("Snapshot ID").buf << DELIMITER  //
-         << strToCell("X position").buf << DELIMITER   //
-         << strToCell("Y position").buf << DELIMITER   //
-         << strToCell("Z position").buf << DELIMITER   //
-         << strToCell("Weight").buf << DELIMITER       //
-         << strToCell("X direction").buf << DELIMITER  //
-         << strToCell("Y direction").buf << DELIMITER  //
-         << strToCell("Z direction").buf << DELIMITER  //
-         << strToCell("Energy").buf << DELIMITER       //
-         << strToCell("Stokes0").buf << DELIMITER      //
-         << strToCell("Stokes1").buf << DELIMITER      //
-         << strToCell("Stokes2").buf << DELIMITER      //
-         << strToCell("Stokes3").buf << DELIMITER      //
-         << strToCell("pathLength").buf << DELIMITER   //
-         << strToCell("order").buf << DELIMITER        //
-         << strToCell("lastElement").buf << DELIMITER  //
-         << strToCell("extraParam").buf << '\n';
+
+    // write header:
+    for (uint i = 0; i < format.size(); i++) {
+        if (i > 0) {
+            file << DELIMITER;
+        }
+        file << strToCell(format[i].name).buf;
+    }
+    file << '\n';
 
     RAYX_VERB << "Writing " << rays.size() << " rays to file...";
 
+    // write data:
     for (unsigned long ray_id = 0; ray_id < rays.size(); ray_id++) {
         const auto& snapshots = rays[ray_id];
         for (unsigned long snapshot_id = 0; snapshot_id < snapshots.size(); snapshot_id++) {
             const auto& ray = snapshots[snapshot_id];
-            file << ulongToCell(ray_id).buf << DELIMITER              //
-                 << ulongToCell(snapshot_id).buf << DELIMITER         //
-                 << doubleToCell(ray.m_position.x).buf << DELIMITER   //
-                 << doubleToCell(ray.m_position.y).buf << DELIMITER   //
-                 << doubleToCell(ray.m_position.z).buf << DELIMITER   //
-                 << doubleToCell(ray.m_weight).buf << DELIMITER       //
-                 << doubleToCell(ray.m_direction.x).buf << DELIMITER  //
-                 << doubleToCell(ray.m_direction.y).buf << DELIMITER  //
-                 << doubleToCell(ray.m_direction.z).buf << DELIMITER  //
-                 << doubleToCell(ray.m_energy).buf << DELIMITER       //
-                 << doubleToCell(ray.m_stokes.x).buf << DELIMITER     //
-                 << doubleToCell(ray.m_stokes.y).buf << DELIMITER     //
-                 << doubleToCell(ray.m_stokes.z).buf << DELIMITER     //
-                 << doubleToCell(ray.m_stokes.w).buf << DELIMITER     //
-                 << doubleToCell(ray.m_pathLength).buf << DELIMITER   //
-                 << doubleToCell(ray.m_order).buf << DELIMITER        //
-                 << doubleToCell(ray.m_lastElement).buf << DELIMITER  //
-                 << doubleToCell(ray.m_extraParam).buf << '\n';
+            for (uint i = 0; i < format.size(); i++) {
+                if (i > 0) {
+                    file << DELIMITER;
+                }
+                file << doubleToCell(format[i].get_double(ray_id, snapshot_id, ray)).buf;
+            }
+            file << '\n';
         }
     }
     RAYX_VERB << "Writing done!";

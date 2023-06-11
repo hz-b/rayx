@@ -106,7 +106,7 @@ void ImGuiLayer::updateImGui() {
 
         ImGui::Begin("Properties Manager");  // Create a window called "Hello, world!" and append into it.
 
-        ImGui::Text("Background");           // Display some text (you can use a format strings too)
+        ImGui::Text("Background");                          // Display some text (you can use a format strings too)
         ImGui::ColorEdit3("Color", (float*)&m_ClearColor);  // Edit 3 floats representing a color
 
         ImGui::Text("Camera");
