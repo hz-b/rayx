@@ -66,6 +66,10 @@ class RAYX_API VulkanEngine {
     /// This function runs the shader.
     void run(VulkanEngineRunSpec_t);
 
+    /// @brief  returns all physical devices of the current instance.
+    /// @return a vector of VkPhysicalDevice
+    std::vector<VkPhysicalDevice> getPhysicalDevices();
+
     /// after run(_) is finished (i.e. in POSTRUN state)
     /// we can read the contents of `m_out = true`-buffers.
     template <typename T>
@@ -159,7 +163,6 @@ class RAYX_API VulkanEngine {
     void createCache();
     void setupDebugMessenger();
     void pickDevice();
-    std::vector<VkPhysicalDevice> getPhysicalDevices(VkInstance instance);
     void pickPhysicalDevice();
     void createLogicalDevice();
     void createDescriptorSetLayout();

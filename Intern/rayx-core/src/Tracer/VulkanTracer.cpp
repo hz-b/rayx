@@ -19,23 +19,28 @@
 #endif
 
 namespace RAYX {
+void VulkanTracer::listPhysicalDevices() {
+    // init, if not yet initialized.
+    if (m_engine.state() == VulkanEngine::VulkanEngineStates_t::PREINIT) {
+        initEngine();
+    }
+    auto deviceList = m_engine.getPhysicalDevices();
+    unsigned int deviceIndex = 0;
+    for (const auto& device : deviceList) {
+        VkPhysicalDeviceProperties deviceProperties;
+        vkGetPhysicalDeviceProperties(device, &deviceProperties);
+        RAYX_VERB << "Device: " << deviceProperties.deviceName;
+        RAYX_VERB << "Device Index: " << deviceIndex++;
+        RAYX_VERB << "VendorID: " << deviceProperties.vendorID;
+    }
+}
+
 std::vector<Ray> VulkanTracer::traceRaw(const TraceRawConfig& cfg) {
     RAYX_PROFILE_FUNCTION_STDOUT();
 
     // init, if not yet initialized.
     if (m_engine.state() == VulkanEngine::VulkanEngineStates_t::PREINIT) {
-        // Set buffer settings (DEBUG OR RELEASE)
-        RAYX_VERB << "Initializing Vulkan Tracer..";
-        m_engine.declareBuffer("ray-buffer", {.binding = 0, .isInput = true, .isOutput = false});
-        m_engine.declareBuffer("output-buffer", {.binding = 1, .isInput = false, .isOutput = true});
-        m_engine.declareBuffer("quadric-buffer", {.binding = 2, .isInput = true, .isOutput = false});
-        m_engine.declareBuffer("xyznull-buffer", {.binding = 3, .isInput = false, .isOutput = false});
-        m_engine.declareBuffer("material-index-table", {.binding = 4, .isInput = true, .isOutput = false});
-        m_engine.declareBuffer("material-table", {.binding = 5, .isInput = true, .isOutput = false});
-#ifdef RAYX_DEBUG_MODE
-        m_engine.declareBuffer("debug-buffer", {.binding = 6, .isInput = false, .isOutput = true});
-#endif
-        m_engine.init({.shaderFileName = "build/bin/comp.spv"});
+        initEngine();
     }
 
     auto rayList = cfg.m_rays;
@@ -82,6 +87,20 @@ void VulkanTracer::setPushConstants(const PushConstants* p) {
     if (sizeof(*p) > 128) RAYX_WARN << "Using pushConstants bigger than 128 Bytes might be unsupported on some GPUs. Check Compute Info";
     m_engine.m_pushConstants.pushConstPtr = static_cast<const PushConstants*>(p);
     m_engine.m_pushConstants.size = sizeof(*p);
+}
+void VulkanTracer::initEngine() {
+    // Set buffer settings (DEBUG OR RELEASE)
+    RAYX_VERB << "Initializing Vulkan Tracer..";
+    m_engine.declareBuffer("ray-buffer", {.binding = 0, .isInput = true, .isOutput = false});
+    m_engine.declareBuffer("output-buffer", {.binding = 1, .isInput = false, .isOutput = true});
+    m_engine.declareBuffer("quadric-buffer", {.binding = 2, .isInput = true, .isOutput = false});
+    m_engine.declareBuffer("xyznull-buffer", {.binding = 3, .isInput = false, .isOutput = false});
+    m_engine.declareBuffer("material-index-table", {.binding = 4, .isInput = true, .isOutput = false});
+    m_engine.declareBuffer("material-table", {.binding = 5, .isInput = true, .isOutput = false});
+#ifdef RAYX_DEBUG_MODE
+    m_engine.declareBuffer("debug-buffer", {.binding = 6, .isInput = false, .isOutput = true});
+#endif
+    m_engine.init({.shaderFileName = "build/bin/comp.spv"});
 }
 }  // namespace RAYX
 
