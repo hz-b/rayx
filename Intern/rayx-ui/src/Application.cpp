@@ -13,7 +13,9 @@
 #include <set>
 #include <stdexcept>
 
+#include "Data/Importer.h"
 #include "ImGuiLayer.h"
+#include "Writer/H5Writer.h"
 
 VkResult CreateDebugUtilsMessengerEXT(VkInstance instance, const VkDebugUtilsMessengerCreateInfoEXT* pCreateInfo,
                                       const VkAllocationCallbacks* pAllocator, VkDebugUtilsMessengerEXT* pDebugMessenger) {
@@ -34,6 +36,9 @@ void DestroyDebugUtilsMessengerEXT(VkInstance instance, VkDebugUtilsMessengerEXT
 
 // --------- Start of Application code --------- //
 Application::Application(uint32_t width, uint32_t height, const char* name) : m_Window(width, height, name) {
+    m_Beamline = RAYX::importBeamline("PlaneMirror.rml");
+    std::vector<std::string> elementNames;
+    readH5(m_Rays, "PlaneMirror.h5", FULL_FORMAT, elementNames);
     initVulkan();
     initImGui();
 }

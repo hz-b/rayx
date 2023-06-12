@@ -47,5 +47,24 @@ struct RAYX_API Ray {
         ray.m_extraParam = extraParam;
         return ray;
     }
+
+    // ! This needs to be changed everytime the order or the number of elements in the struct changes
+    static Ray makeRayFromDoubles(const std::vector<double>& doubles) {
+        if (doubles.size() != 16) { 
+            throw std::invalid_argument("Expected 15 values in doubles");
+        }
+        glm::dvec3 m_position(doubles[0], doubles[1], doubles[2]);
+        double m_weight = doubles[3];
+        glm::dvec3 m_direction(doubles[4], doubles[5], doubles[6]);
+        double m_energy = doubles[7];
+        glm::dvec4 m_stokes(doubles[8], doubles[9], doubles[10], doubles[11]);
+        double m_pathLength = doubles[12];
+        double m_order = doubles[13];
+        double m_lastElement = doubles[14];
+        double m_extraParam = doubles[15];
+        
+        return makeRayFrom(m_position, m_direction, m_stokes, m_energy, m_weight,
+                           m_pathLength, m_order, m_lastElement, m_extraParam);
+    }
 };
 }  // namespace RAYX

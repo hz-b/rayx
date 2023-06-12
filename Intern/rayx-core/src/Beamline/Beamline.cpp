@@ -7,7 +7,6 @@
 
 namespace RAYX {
 Beamline::Beamline() = default;
-
 Beamline::~Beamline() = default;
 
 std::vector<Ray> Beamline::getInputRays() const {

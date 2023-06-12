@@ -7,8 +7,10 @@
 #include <optional>
 #include <vector>
 
+#include "Beamline/Beamline.h"
 #include "ImGuiLayer.h"
 #include "Scene.h"
+#include "Tracer/Tracer.h"
 #include "VertexBuffer.h"
 #include "Window.h"
 
@@ -58,6 +60,9 @@ class Application {
     void run();
 
   private:
+    RAYX::Beamline m_Beamline;
+    RAYX::Rays m_Rays;
+
     Window m_Window;
     const uint32_t m_maxFramesInFlight = 3;
 
