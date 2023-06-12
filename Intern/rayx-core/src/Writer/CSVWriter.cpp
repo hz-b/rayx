@@ -89,7 +89,7 @@ void writeCSV(const RAYX::Rays& rays, std::string filename, const Format& format
 
 // loader:
 
-RAYX::Rays  loadCSV(std::string filename) {
+RAYX::Rays loadCSV(std::string filename) {
     std::ifstream file(filename);
 
     // ignore setup line
