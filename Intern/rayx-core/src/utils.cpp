@@ -71,7 +71,7 @@ void printDVec4(glm::dvec4 vec) {
     RAYX_LOG << s.str();
 }
 
-void RAYX_API printDMat4(glm::dmat4 matrix) {
+void  printDMat4(glm::dmat4 matrix) {
     RAYX_PROFILE_FUNCTION();
     std::stringstream s;
     s.precision(17);
@@ -91,7 +91,7 @@ std::array<double, 4 * 4> glmToArray16(glm::dmat4x4 m) {
     return matrix;
 }
 
-glm::dmat4x4 RAYX_API arrayToGlm16(std::array<double, 4 * 4> m) {
+glm::dmat4x4  arrayToGlm16(std::array<double, 4 * 4> m) {
     glm::dmat4x4 matrix = glm::dmat4x4(m[0], m[1], m[2], m[3], m[4], m[5], m[6], m[7], m[8], m[9], m[10], m[11], m[12], m[13], m[14], m[15]);
     return matrix;
 }
@@ -101,7 +101,7 @@ std::array<double, 4> glmToArray4(glm::dvec4 v) {
     return a;
 }
 
-glm::dvec4 RAYX_API arrayToGlm4(std::array<double, 4> v) { return {v[0], v[1], v[2], v[3]}; }
+glm::dvec4  arrayToGlm4(std::array<double, 4> v) { return {v[0], v[1], v[2], v[3]}; }
 
 /**
  * @brief Moves Source Vector at the end of destination Vector.

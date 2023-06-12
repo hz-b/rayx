@@ -2,7 +2,7 @@
 
 #include "Debug/Debug.h"
 
-std::string RAYX_API defaultFormatString() {
+std::string  defaultFormatString() {
     std::string output = "";
     for (auto arg : FULL_FORMAT) {
         if (output.size() > 0) {
@@ -13,7 +13,7 @@ std::string RAYX_API defaultFormatString() {
     return output;
 }
 
-FormatComponent RAYX_API componentFromString(std::string comp) {
+FormatComponent  componentFromString(std::string comp) {
     for (auto c : FULL_FORMAT) {
         if (comp == c.name) {
             return c;
@@ -24,7 +24,7 @@ FormatComponent RAYX_API componentFromString(std::string comp) {
     return {};
 }
 
-Format RAYX_API formatFromString(std::string s) {
+Format  formatFromString(std::string s) {
     Format output = {};
     std::stringstream ss(s);
     std::string comp = "";
