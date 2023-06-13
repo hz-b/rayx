@@ -100,7 +100,7 @@ void VulkanTracer::initEngine() {
 #ifdef RAYX_DEBUG_MODE
     m_engine.declareBuffer("debug-buffer", {.binding = 6, .isInput = false, .isOutput = true});
 #endif
-    m_engine.init({.shaderFileName = "build/bin/comp.spv"});
+    m_engine.init({.shaderFileName = "build/bin/comp.spv", .deviceID = m_deviceID});
 }
 }  // namespace RAYX
 

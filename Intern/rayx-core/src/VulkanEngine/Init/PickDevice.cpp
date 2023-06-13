@@ -37,18 +37,26 @@ void VulkanEngine::pickPhysicalDevice() {
     // search for devices
     auto devices = getPhysicalDevices();
 
-    // pick fastest device
-    m_PhysicalDevice = VK_NULL_HANDLE;
-    int currentRating = -1;
+    if (m_deviceID >= devices.size() || m_deviceID < -1) {
+        throw std::runtime_error("Device index out of range!");
+    }
+    if (m_deviceID == -1) {
+        // pick fastest device
+        m_PhysicalDevice = VK_NULL_HANDLE;
+        int currentRating = -1;
 
-    for (const auto& device : devices) {
-        if (isDeviceSuitable(device)) {
-            int rating = rateDevice(device);
-            if (rating > currentRating) {
-                m_PhysicalDevice = device;
-                currentRating = rating;
+        for (const auto& device : devices) {
+            if (isDeviceSuitable(device)) {
+                int rating = rateDevice(device);
+                if (rating > currentRating) {
+                    m_PhysicalDevice = device;
+                    currentRating = rating;
+                }
             }
         }
+    } else {
+        // pick device with given index
+        m_PhysicalDevice = devices[m_deviceID];
     }
     if (m_PhysicalDevice == VK_NULL_HANDLE) {
         throw std::runtime_error("failed to find a suitable GPU!");

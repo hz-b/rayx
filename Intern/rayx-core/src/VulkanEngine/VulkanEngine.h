@@ -32,6 +32,7 @@ struct VulkanEngineInitSpec_t {
     /// the name of the shaderfile, as relative path - relative to the root of
     /// the repository
     const char* shaderFileName;
+    int deviceID;
 };
 
 /// the argument type of `VulkanEngine::run(_)`
@@ -128,6 +129,7 @@ class RAYX_API VulkanEngine {
   private:
     VulkanEngineStates_t m_state = VulkanEngineStates_t::PREINIT;
     const char* m_shaderfile;
+    int m_deviceID;
     uint32_t m_numberOfInvocations;
 
     /// stores the Buffers by name.

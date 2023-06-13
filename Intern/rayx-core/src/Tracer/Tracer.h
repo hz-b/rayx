@@ -44,6 +44,8 @@ class RAYX_API Tracer {
     // See `Rays` for information about the return value.
     Rays trace(const Beamline&, uint64_t max_batch_size);
 
+    void setDevice(int deviceID);
+
     // Useful for GPU Tracing
     struct PushConstants {  // TODO(Jannis): PushConstants is not an expressive name. Rename to something like TracerConfig
         double rayIdStart;
@@ -57,6 +59,8 @@ class RAYX_API Tracer {
     // std::vector<Ray> will contain all snapshots for all Rays (and also the W_UNINIT rays).
     virtual std::vector<Ray> traceRaw(const TraceRawConfig&) = 0;
     virtual void setPushConstants(const PushConstants*) = 0;
+    // -1 means no device is selected.
+    int m_deviceID = -1;
 };
 
 // TODO deprecate these functions and all of their uses.
