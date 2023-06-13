@@ -29,9 +29,11 @@ void VulkanTracer::listPhysicalDevices() {
     for (const auto& device : deviceList) {
         VkPhysicalDeviceProperties deviceProperties;
         vkGetPhysicalDeviceProperties(device, &deviceProperties);
-        RAYX_VERB << "Device: " << deviceProperties.deviceName;
-        RAYX_VERB << "Device Index: " << deviceIndex++;
-        RAYX_VERB << "VendorID: " << deviceProperties.vendorID;
+
+        // Is there a better option than using cout?
+        std::cout << "Device: " << deviceProperties.deviceName << std::endl;
+        std::cout << "Device Index: " << deviceIndex++ << std::endl;
+        std::cout << "VendorID: " << deviceProperties.vendorID << std::endl;
     }
 }
 

@@ -36,9 +36,8 @@ void VulkanEngine::pickPhysicalDevice() {
     RAYX_PROFILE_FUNCTION();
     // search for devices
     auto devices = getPhysicalDevices();
-
-    if (m_deviceID >= devices.size() || m_deviceID < -1) {
-        throw std::runtime_error("Device index out of range!");
+    if (m_deviceID >= (int)devices.size() || m_deviceID < -1) {
+        RAYX_ERR << "Device index out of range!";
     }
     if (m_deviceID == -1) {
         // pick fastest device

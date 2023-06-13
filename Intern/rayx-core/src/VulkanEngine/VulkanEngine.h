@@ -129,7 +129,7 @@ class RAYX_API VulkanEngine {
   private:
     VulkanEngineStates_t m_state = VulkanEngineStates_t::PREINIT;
     const char* m_shaderfile;
-    int m_deviceID;
+    int m_deviceID = -1;
     uint32_t m_numberOfInvocations;
 
     /// stores the Buffers by name.
