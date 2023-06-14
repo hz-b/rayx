@@ -21,22 +21,23 @@ struct TraceRawConfig {
     double m_rayIdStart;
     double m_numRays;
     double m_randomSeed;
-    double m_maxSnapshots;
+    double m_maxEvents;
     MaterialTables m_materialTables;
     std::vector<Element> m_elements;
 };
 
 /// A 'snapshot' of a ray, at the time where it undergoes some event.
 /// The event type is specified by `m_weight`.
+// TODO: split Event and Ray into separate types, because `Event` needs an eventType (aka m_weight), whereas Ray does not.
 using Event = Ray;
 
-/// Contains all the snapshots of a single Ray.
-using Snapshots = std::vector<Event>;
+/// Contains all the events of a single Ray in chronological order.
+using RayHistory = std::vector<Event>;
 
-/// Contains the snapshots of all the rays
+/// Contains the events of all the rays
 /// Given a `Rays rays;`
-/// rays[i][j] is the j'th snapshot of the i'th ray.
-using Rays = std::vector<Snapshots>;
+/// rays[i][j] is the j'th event of the i'th ray.
+using Rays = std::vector<RayHistory>;
 
 class RAYX_API Tracer {
   public:
@@ -53,7 +54,7 @@ class RAYX_API Tracer {
         double rayIdStart;
         double numRays;
         double randomSeed;
-        double maxSnapshots;
+        double maxEvents;
     };
 
   protected:

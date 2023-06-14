@@ -17,7 +17,7 @@ Rays Tracer::trace(const Beamline& b, uint64_t max_batch_size) {
 
     auto rays = b.getInputRays();
     auto randomSeed = randomDouble();
-    auto maxSnapshots = b.m_OpticalElements.size() + 2;
+    auto maxEvents = b.m_OpticalElements.size() + 2;
     auto materialTables = b.calcMinimalMaterialTables();
 
     Rays result;
@@ -42,35 +42,35 @@ Rays Tracer::trace(const Beamline& b, uint64_t max_batch_size) {
             .m_rayIdStart = (double)rayIdStart,
             .m_numRays = (double)rays.size(),
             .m_randomSeed = randomSeed,
-            .m_maxSnapshots = (double)maxSnapshots,
+            .m_maxEvents = (double)maxEvents,
             .m_materialTables = materialTables,
             .m_elements = elements,
         };
 
         PushConstants pushConsants = {
-            .rayIdStart = (double)rayIdStart, .numRays = (double)rays.size(), .randomSeed = randomSeed, .maxSnapshots = (double)maxSnapshots};
+            .rayIdStart = (double)rayIdStart, .numRays = (double)rays.size(), .randomSeed = randomSeed, .maxEvents = (double)maxEvents};
         setPushConstants(&pushConsants);
 
-        Snapshots rawBatchRays;
+        RayHistory rawBatchHistory;
         {
             RAYX_PROFILE_SCOPE_STDOUT("Tracing");
-            rawBatchRays = traceRaw(cfg);
-            assert(rawBatchRays.size() == batch_size * maxSnapshots);
+            rawBatchHistory = traceRaw(cfg);
+            assert(rawBatchHistory.size() == batch_size * maxEvents);
         }
 
         {
             RAYX_PROFILE_SCOPE_STDOUT("Snapshoting");
             for (uint i = 0; i < batch_size; i++) {
-                Snapshots snapshots;
-                snapshots.reserve(maxSnapshots);
-                for (uint j = 0; j < maxSnapshots; j++) {
-                    uint idx = i * maxSnapshots + j;
-                    Ray r = rawBatchRays[idx];
+                RayHistory hist;
+                hist.reserve(maxEvents);
+                for (uint j = 0; j < maxEvents; j++) {
+                    uint idx = i * maxEvents + j;
+                    Ray r = rawBatchHistory[idx];
                     if (r.m_weight != W_UNINIT) {
-                        snapshots.push_back(r);
+                        hist.push_back(r);
                     }
                 }
-                result.push_back(snapshots);
+                result.push_back(hist);
             }
         }
     }

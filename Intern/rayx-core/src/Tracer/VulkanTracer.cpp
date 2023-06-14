@@ -56,7 +56,7 @@ std::vector<Ray> VulkanTracer::traceRaw(const TraceRawConfig& cfg) {
 
     auto materialTables = cfg.m_materialTables;
     m_engine.createBufferWithData<Ray>("ray-buffer", rayList);
-    m_engine.createBuffer("output-buffer", numberOfRays * sizeof(Ray) * (size_t)cfg.m_maxSnapshots);
+    m_engine.createBuffer("output-buffer", numberOfRays * sizeof(Ray) * (size_t)cfg.m_maxEvents);
     m_engine.createBufferWithData<double>("quadric-buffer", beamlineData);
     m_engine.createBuffer("xyznull-buffer", 100);
     m_engine.createBufferWithData<int>("material-index-table", materialTables.indexTable);

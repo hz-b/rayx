@@ -35,20 +35,6 @@ int gl_GlobalInvocationID;
 
 ShaderArray<Ray> rayData;
 ShaderArray<Ray> outputData;
-
-// // the ray id of the first ray of the batch.
-// // // See `rayId` to access the ray id of the current ray.
-// double rayIdStart;
-
-// // The total number of rays in this tracing process.
-// // (not only this batch)
-// double numRays;
-
-// double randomSeed;
-
-// // each ray will take multiple snapshots (copies) while tracing, those are then sent to the CPU for further processing.
-// double maxSnapshots;
-
 ShaderArray<Element> elements;
 ShaderArray<dvec4> xyznull;
 ShaderArray<int> matIdx;
@@ -123,7 +109,7 @@ struct Ray {
         double rayIdStart;
         double numRays;
         double randomSeed;
-        double maxSnapshots;
+        double maxEvents;
     } pushConstants;
 #endif
 
@@ -137,16 +123,16 @@ uint64_t rayId() {
 
 bool finalized;
 
-// `i in [0, maxSnapshots]`.
+// `i in [0, maxEvents]`.
 // Will return the index in outputData to access the `i'th` output ray belonging to this shader call.
 // Typically used as `outputData[output_index(i)]`.
 uint output_index(uint i) {
-    return uint(gl_GlobalInvocationID) * uint(pushConstants.maxSnapshots) + i;
+    return uint(gl_GlobalInvocationID) * uint(pushConstants.maxEvents) + i;
 }
 
 // sets all output rays controlled by this shader call to W_UNINIT.
 void uninitOutRays() {
-    for (uint i = 0; i < pushConstants.maxSnapshots; i++) {
+    for (uint i = 0; i < pushConstants.maxEvents; i++) {
         outputData[output_index(i)].m_weight = W_UNINIT;
     }
 }
@@ -162,7 +148,7 @@ void takeSnapshot(Ray r, double w) {
         #endif
     }
 
-    for (uint i = 0; i < pushConstants.maxSnapshots; i++) {
+    for (uint i = 0; i < pushConstants.maxEvents; i++) {
         uint idx = output_index(i);
         if (outputData[idx].m_weight == W_UNINIT) { // checks whether this spot is free
             outputData[idx] = r;
