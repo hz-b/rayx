@@ -49,7 +49,7 @@ RAYX::Ray parseCSVline(std::string line) {
 
     // otherwise uninitialized:
     ray.m_extraParam = -1;
-    ray.m_weight = -1;
+    ray.m_eventType = -1;
     ray.m_lastElement = -1;
     ray.m_order = -1;
 
@@ -93,13 +93,13 @@ std::vector<RAYX::Event> extractLastHit(const RAYX::BundleHistory& hist) {
     std::vector<RAYX::Event> outs;
     for (auto rr : hist) {
         Ray out;
-        out.m_weight = W_UNINIT;
+        out.m_eventType = ETYPE_UNINIT;
         for (auto r : rr) {
-            if (r.m_weight == W_JUST_HIT_ELEM) {
+            if (r.m_eventType == ETYPE_JUST_HIT_ELEM) {
                 out = r;
             }
         }
-        if (out.m_weight != W_UNINIT) {
+        if (out.m_eventType != ETYPE_UNINIT) {
             outs.push_back(out);
         }
     }
@@ -181,8 +181,8 @@ std::vector<RAYX::Ray> rayUiCompat(std::string filename) {
                 continue;
             }
 
-            // The ray has to have weight != W_FLY_OFF
-            if (r.m_weight != W_JUST_HIT_ELEM) {
+            // The ray has to have weight != ETYPE_FLY_OFF
+            if (r.m_eventType != ETYPE_JUST_HIT_ELEM) {
                 continue;
             }
 

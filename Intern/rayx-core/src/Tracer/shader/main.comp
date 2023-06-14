@@ -43,9 +43,9 @@ ShaderArray<double> mat;
 #else
 struct Ray {
     dvec3 m_position;
-    // Initially weight for _ray is `W_IN_COMPUTATION`.
-    // See the potential values of `m_weight` in `Constants.h`.
-    double m_weight;
+    // Initially weight for _ray is `ETYPE_IN_COMPUTATION`.
+    // See the potential values of `m_eventType` in `Constants.h`.
+    double m_eventType;
     dvec3 m_direction;
     double m_energy;
     dvec4 m_stokes;
@@ -130,10 +130,10 @@ uint output_index(uint i) {
     return uint(gl_GlobalInvocationID) * uint(pushConstants.maxEvents) + i;
 }
 
-// sets all output rays controlled by this shader call to W_UNINIT.
+// sets all output rays controlled by this shader call to ETYPE_UNINIT.
 void uninitOutRays() {
     for (uint i = 0; i < pushConstants.maxEvents; i++) {
-        outputData[output_index(i)].m_weight = W_UNINIT;
+        outputData[output_index(i)].m_eventType = ETYPE_UNINIT;
     }
 }
 
@@ -142,7 +142,7 @@ void uninitOutRays() {
 void recordEvent(Ray r, double w) {
     if (finalized) { return; }
 
-    if (w == W_UNINIT) {
+    if (w == ETYPE_UNINIT) {
         #ifndef GLSL
         RAYX_ERR << "recordEvent failed: no free spots!";
         #endif
@@ -150,9 +150,9 @@ void recordEvent(Ray r, double w) {
 
     for (uint i = 0; i < pushConstants.maxEvents; i++) {
         uint idx = output_index(i);
-        if (outputData[idx].m_weight == W_UNINIT) { // checks whether this spot is free
+        if (outputData[idx].m_eventType == ETYPE_UNINIT) { // checks whether this spot is free
             outputData[idx] = r;
-            outputData[idx].m_weight = w;
+            outputData[idx].m_eventType = w;
             return;
         }
     }
@@ -173,7 +173,7 @@ void recordFinalEvent(Ray r, double w) {
 
 // throws an error, and termiantes the program
 #ifdef GLSL
-#define throw(string) recordFinalEvent(_ray, W_FATAL_ERROR)
+#define throw(string) recordFinalEvent(_ray, ETYPE_FATAL_ERROR)
 #else
 #define throw(string) RAYX_ERR << string
 #endif
@@ -199,9 +199,6 @@ void recordFinalEvent(Ray r, double w) {
 void main() {
     finalized = false;
     uninitOutRays();
-
-    // this is required as sometimes error codes are transmitted using _ray.m_weight
-    _ray.m_weight = W_UNINIT;
     
     // ~~~~~~~~~~~~~~ PRINT EXAMPLE ~~~~~~~~~~~~~~
     // Printing ~DEBUG~ Example over vkconfig Validation Layers

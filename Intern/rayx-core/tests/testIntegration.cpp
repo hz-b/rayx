@@ -68,16 +68,16 @@ TEST_F(TestSuite, Slit) {
     for (auto snapshots : rays) {
         if (snapshots.size() == 1) {  // matrix source -> slit absorbed
             CHECK(snapshots[0].m_lastElement == SLIT_ID);
-            CHECK(snapshots[0].m_weight == W_ABSORBED);
+            CHECK(snapshots[0].m_eventType == ETYPE_ABSORBED);
             absorbed++;
         } else if (snapshots.size() == 3) {  // matrix source -> slit -> image plane -> fly off
             CHECK(snapshots[0].m_lastElement == SLIT_ID);
-            CHECK(snapshots[0].m_weight == W_JUST_HIT_ELEM);
+            CHECK(snapshots[0].m_eventType == ETYPE_JUST_HIT_ELEM);
 
             CHECK(snapshots[1].m_lastElement == IMAGE_PLANE_ID);
-            CHECK(snapshots[1].m_weight == W_JUST_HIT_ELEM);
+            CHECK(snapshots[1].m_eventType == ETYPE_JUST_HIT_ELEM);
 
-            CHECK(snapshots[2].m_weight == W_FLY_OFF);
+            CHECK(snapshots[2].m_eventType == ETYPE_FLY_OFF);
             pass_through++;
         } else {
             CHECK(false);

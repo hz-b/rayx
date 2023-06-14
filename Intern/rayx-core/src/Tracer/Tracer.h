@@ -27,8 +27,8 @@ struct TraceRawConfig {
 };
 
 /// A 'snapshot' of a ray, at the time where it undergoes some event.
-/// The event type is specified by `m_weight`.
-// TODO: split Event and Ray into separate types, because `Event` needs an eventType (aka m_weight), whereas Ray does not.
+/// The event type is specified by `m_eventType`.
+// TODO: split Event and Ray into separate types, because `Event` needs an m_eventType (aka m_weight), whereas Ray does not.
 using Event = Ray;
 
 /// Contains all the events of a single Ray in chronological order.
@@ -59,7 +59,7 @@ class RAYX_API Tracer {
 
   protected:
     // where the actual tracing happens.
-    // std::vector<Ray> will contain all events for all Rays (and also the W_UNINIT events).
+    // std::vector<Ray> will contain all events for all Rays (and also the ETYPE_UNINIT events).
     virtual std::vector<Ray> traceRaw(const TraceRawConfig&) = 0;
     virtual void setPushConstants(const PushConstants*) = 0;
 };

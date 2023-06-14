@@ -48,8 +48,8 @@ static Format FULL_FORMAT = {
         .get_double = [](uint, uint, RAYX::Ray ray) { return ray.m_position.z; },
     },
     FormatComponent{
-        .name = "Weight",
-        .get_double = [](uint, uint, RAYX::Ray ray) { return ray.m_weight; },
+        .name = "Event-type",
+        .get_double = [](uint, uint, RAYX::Ray ray) { return ray.m_eventType; },
     },
     FormatComponent{
         .name = "X-direction",

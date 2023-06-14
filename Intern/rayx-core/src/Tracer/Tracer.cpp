@@ -66,7 +66,7 @@ BundleHistory Tracer::trace(const Beamline& b, uint64_t max_batch_size) {
                 for (uint j = 0; j < maxEvents; j++) {
                     uint idx = i * maxEvents + j;
                     Ray r = rawBatchHistory[idx];
-                    if (r.m_weight != W_UNINIT) {
+                    if (r.m_eventType != ETYPE_UNINIT) {
                         hist.push_back(r);
                     }
                 }

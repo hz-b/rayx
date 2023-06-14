@@ -744,7 +744,7 @@ calculates refracted ray
             normal: normal at intersection point of ray and element
             az: line spacing in z direction
             ax: line spacing in x direction
-@returns: refracted ray (position unchanged, direction changed), weight = W_BEYOND_HORIZON if
+@returns: refracted ray (position unchanged, direction changed), weight = ETYPE_BEYOND_HORIZON if
 "ray beyond horizon"
 */
 Ray refrac2D(Ray r, dvec4 normal, double az, double ax) {
@@ -771,10 +771,10 @@ Ray refrac2D(Ray r, dvec4 normal, double az, double ax) {
         r.m_direction.x = x1;
         r.m_direction.y = y1;
         r.m_direction.z = z1;
+        r.m_direction = inv_rot * r.m_direction;
     } else {  // beyond horizon - when divergence too large
-        r.m_weight = W_BEYOND_HORIZON;
+        recordFinalEvent(r, ETYPE_BEYOND_HORIZON);
     }
-    r.m_direction = inv_rot * r.m_direction;
     return r;
 }
 
@@ -811,10 +811,10 @@ Ray refrac(Ray r, dvec4 normal, double linedensity) {
         y1 = sqrt(y1);
         r.m_direction[1] = y1;
         r.m_direction[2] -= a1;
+        r.m_direction = dvec3(inv_rot * dvec4(r.m_direction, 0));
     } else {
-        r.m_weight = W_BEYOND_HORIZON;
+        recordFinalEvent(r, ETYPE_BEYOND_HORIZON);
     }
-    r.m_direction = dvec3(inv_rot * dvec4(r.m_direction, 0));
     return r;
 }
 
@@ -859,7 +859,7 @@ Ray refrac_plane(Ray r, ALLOW_UNUSED dvec4 normal,
         r.m_direction[1] = y1;
         r.m_direction[2] = r.m_direction[2] - a;
     } else {
-        r.m_weight = W_BEYOND_HORIZON;
+        recordFinalEvent(r, ETYPE_BEYOND_HORIZON);
     }
     return r;
 }
