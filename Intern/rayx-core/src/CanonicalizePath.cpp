@@ -19,11 +19,9 @@ std::filesystem::path canonicalize(const std::filesystem::path& relPath, const s
     return base / relPath;
 }
 
-std::filesystem::path  canonicalizeRepositoryPath(const std::filesystem::path& relPath) { return canonicalize(relPath, PROJECT_DIR); }
+std::filesystem::path canonicalizeRepositoryPath(const std::filesystem::path& relPath) { return canonicalize(relPath, PROJECT_DIR); }
 
-std::filesystem::path  canonicalizeUserPath(const std::filesystem::path& relPath) {
-    return canonicalize(relPath, std::filesystem::current_path());
-}
+std::filesystem::path canonicalizeUserPath(const std::filesystem::path& relPath) { return canonicalize(relPath, std::filesystem::current_path()); }
 
 // Read file into array of bytes, and cast to uint32_t*, then return.
 // The data has been padded, so that it fits into an array uint32_t.
