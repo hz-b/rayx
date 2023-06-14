@@ -6,7 +6,7 @@
 /// The `behave*` functions, will
 /// - change the rays direction, typically by reflecting using the normal
 /// - change the rays stokes vector
-/// - potentially absorb the ray (by calling `takeFinalSnapshot(_, W_ABSORBED)`)
+/// - potentially absorb the ray (by calling `recordFinalEvent(_, W_ABSORBED)`)
 
 Ray behaveSlit(Ray r, int id, INOUT(uint64_t) ctr, ALLOW_UNUSED Collision col) {
     SlitBehaviour b = deserializeSlit(elements[id].m_behaviour);
@@ -19,7 +19,7 @@ Ray behaveSlit(Ray r, int id, INOUT(uint64_t) ctr, ALLOW_UNUSED Collision col) {
     bool outsideOfBeamstop = stopBox(r.m_position[0], r.m_position[1], xStop, yStop);
 
     if (!withinSlitBounds || !outsideOfBeamstop) {
-        takeFinalSnapshot(r, W_ABSORBED);
+        recordFinalEvent(r, W_ABSORBED);
         return r;
     }
 
@@ -97,7 +97,7 @@ Ray behaveRZP(Ray r, int id, INOUT(uint64_t) ctr, Collision col) {
     r         = refrac2D(r, normal, az, ax);
 
     if (r.m_weight == W_BEYOND_HORIZON) {
-        takeFinalSnapshot(r, W_BEYOND_HORIZON);
+        recordFinalEvent(r, W_BEYOND_HORIZON);
     }
 
     r.m_order = Ord;
@@ -127,7 +127,7 @@ Ray behaveGrating(Ray r, int id, INOUT(uint64_t) ctr, Collision col) {
     r = refrac(r, normal, linedensity);
 
     if (r.m_weight == W_BEYOND_HORIZON) {
-        takeFinalSnapshot(r, W_BEYOND_HORIZON);
+        recordFinalEvent(r, W_BEYOND_HORIZON);
     }
 
     return r;
@@ -153,7 +153,7 @@ Ray behaveMirror(Ray r, int id, INOUT(uint64_t) ctr, Collision col) {
 
         bool absorbed = update_stokes(r, real_S, real_P, delta, azimuthal_angle, ctr);
         if (absorbed) {
-            takeFinalSnapshot(r, W_ABSORBED);
+            recordFinalEvent(r, W_ABSORBED);
         }
         r.m_order = 0;
     }

@@ -23,11 +23,11 @@ std::vector<double> toDoubles(const RAYX::BundleHistory& hist, const Format& for
     output.reserve(count(hist) * format.size());
 
     for (uint ray_id = 0; ray_id < hist.size(); ray_id++) {
-        auto& snapshots = hist[ray_id];
-        for (uint snapshot_id = 0; snapshot_id < snapshots.size(); snapshot_id++) {
-            auto& ray = snapshots[snapshot_id];
+        const RAYX::RayHistory& ray_hist = hist[ray_id];
+        for (uint event_id = 0; event_id < ray_hist.size(); event_id++) {
+            const RAYX::Event& event = ray_hist[event_id];
             for (uint i = 0; i < format.size(); i++) {
-                double next = format[i].get_double(ray_id, snapshot_id, ray);
+                double next = format[i].get_double(ray_id, event_id, event);
                 output.push_back(next);
             }
         }

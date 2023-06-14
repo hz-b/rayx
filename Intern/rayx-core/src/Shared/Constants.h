@@ -38,13 +38,13 @@ const double W_NOT_ENOUGH_BOUNCES = 2;
 const double W_ABSORBED = 3;
 
 // This is a yet uninitialized ray from outputData.
-// This is the initial weight within outputData, and if less snapshots than `maxSnapshots` are taken,
+// This is the initial weight within outputData, and if less events than `maxEvents` are taken,
 // the remaining weights in outputData will stay W_UNINIT even when returned to the CPU.
 const double W_UNINIT = 4;
 
 // This is an error code.
 // Functions like refrac2D can error due to "ray beyond horizon", see utils.comp.
-// In that case this is returned as final snapshot.
+// In that case this is returned as final event.
 const double W_BEYOND_HORIZON = 5;
 
 // This is a general error code that means some assertion failed in the shader.

@@ -30,8 +30,8 @@ void dynamicElements() {
         if (!col.found) {
             // no element was hit.
             // Ray is considered to move forward to inf.
-            // This is the only constellation in which a snapshot is in world coordinates.
-            takeFinalSnapshot(_ray, W_FLY_OFF);
+            // This is the only constellation in which an event is in world coordinates.
+            recordFinalEvent(_ray, W_FLY_OFF);
             return;
         }
 
@@ -72,15 +72,15 @@ void dynamicElements() {
         elem_ray.m_extraParam += ((col.elementIndex + 1) * bounce) * int(elem_ray.m_lastElement == col.elementIndex + 1);
         bounce *= pow(10, int(elem_ray.m_lastElement == col.elementIndex + 1));
 
-        takeSnapshot(elem_ray, W_JUST_HIT_ELEM);
+        recordEvent(elem_ray, W_JUST_HIT_ELEM);
 
         // transform back to WORLD coordinates
         _ray = rayMatrixMult(elem_ray, nextElement.m_outTrans);
     }
 
     if (findCollision().found) {
-        takeFinalSnapshot(_ray, W_NOT_ENOUGH_BOUNCES);
+        recordFinalEvent(_ray, W_NOT_ENOUGH_BOUNCES);
     } else {
-        takeFinalSnapshot(_ray, W_FLY_OFF);
+        recordFinalEvent(_ray, W_FLY_OFF);
     }
 }

@@ -68,7 +68,7 @@ struct Ray {
     // don't use this directly. Use `_ray` instead.
 	layout(std140, binding = 0) buffer ibuf { Ray rayData[]; };
 
-    // don't use this directly. Use `takeSnapshot` instead.
+    // don't use this directly. Use `recordEvent` instead.
 	layout(std140, binding = 1) buffer obuf { Ray outputData[]; };
 
     // std430 is required so that Element is layouted like in C++.
@@ -137,14 +137,14 @@ void uninitOutRays() {
     }
 }
 
-// take a snapshot and store it in the next free spot in outputData.
+// record an event and store it in the next free spot in outputData.
 // `r` will typically be _ray, or some related ray.
-void takeSnapshot(Ray r, double w) {
+void recordEvent(Ray r, double w) {
     if (finalized) { return; }
 
     if (w == W_UNINIT) {
         #ifndef GLSL
-        RAYX_ERR << "takeSnapshot failed: no free spots!";
+        RAYX_ERR << "recordEvent failed: no free spots!";
         #endif
     }
 
@@ -160,20 +160,20 @@ void takeSnapshot(Ray r, double w) {
     // no spots were found.
     // this shouldn't be using `throw`, as otherwise we might end up in infinite recursion.
     #ifndef GLSL
-    RAYX_WARN << "takeSnapshot failed: no free spots!";
+    RAYX_WARN << "recordEvent failed: no free spots!";
     #endif
 }
 
-// like `takeSnapshot` above, but it will prevent taking more snapshots after this.
-// Is used for snapshots terminating the path of the ray.
-void takeFinalSnapshot(Ray r, double w) {
-    takeSnapshot(r, w);
+// Like `recordEvent` above, but it will prevent recording more events after this.
+// Is used for events terminating the path of the ray.
+void recordFinalEvent(Ray r, double w) {
+    recordEvent(r, w);
     finalized = true;
 }
 
 // throws an error, and termiantes the program
 #ifdef GLSL
-#define throw(string) takeFinalSnapshot(_ray, W_FATAL_ERROR)
+#define throw(string) recordFinalEvent(_ray, W_FATAL_ERROR)
 #else
 #define throw(string) RAYX_ERR << string
 #endif

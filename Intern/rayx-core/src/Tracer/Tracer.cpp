@@ -59,7 +59,7 @@ BundleHistory Tracer::trace(const Beamline& b, uint64_t max_batch_size) {
         }
 
         {
-            RAYX_PROFILE_SCOPE_STDOUT("Snapshoting");
+            RAYX_PROFILE_SCOPE_STDOUT("BundleHistory-calculation");
             for (uint i = 0; i < batch_size; i++) {
                 RayHistory hist;
                 hist.reserve(maxEvents);

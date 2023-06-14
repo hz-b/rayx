@@ -72,14 +72,14 @@ void writeCSV(const RAYX::BundleHistory& hist, std::string filename, const Forma
 
     // write data:
     for (unsigned long ray_id = 0; ray_id < hist.size(); ray_id++) {
-        const auto& snapshots = hist[ray_id];
-        for (unsigned long snapshot_id = 0; snapshot_id < snapshots.size(); snapshot_id++) {
-            const auto& ray = snapshots[snapshot_id];
+        const RAYX::RayHistory& ray_hist = hist[ray_id];
+        for (unsigned long event_id = 0; event_id < ray_hist.size(); event_id++) {
+            const RAYX::Event& event = ray_hist[event_id];
             for (uint i = 0; i < format.size(); i++) {
                 if (i > 0) {
                     file << DELIMITER;
                 }
-                file << doubleToCell(format[i].get_double(ray_id, snapshot_id, ray)).buf;
+                file << doubleToCell(format[i].get_double(ray_id, event_id, event)).buf;
             }
             file << '\n';
         }
@@ -107,7 +107,7 @@ RAYX::BundleHistory loadCSV(std::string filename) {
         unsigned long ray_id = std::stoi(num);
 
         std::getline(ss, num, DELIMITER);
-        unsigned long snapshot_id = std::stoi(num);
+        unsigned long event_id = std::stoi(num);
 
         while (std::getline(ss, num, DELIMITER)) {
             d.push_back(std::stod(num));
@@ -128,8 +128,8 @@ RAYX::BundleHistory loadCSV(std::string filename) {
         if (ray_id + 1 != out.size()) {
             RAYX_ERR << "loadCSV failed: rays out of order";
         }
-        if (snapshot_id != out[ray_id].size()) {
-            RAYX_ERR << "loadCSV failed: snapshots out of order";
+        if (event_id != out[ray_id].size()) {
+            RAYX_ERR << "loadCSV failed: events out of order";
         }
         out[ray_id].push_back(ray);
     }

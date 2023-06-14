@@ -6,13 +6,13 @@ using uint = unsigned int;
 
 // When writing a Ray to CSV / H5, one needs to specify a way in which to format the ray.
 // A format consists of multiple components - each component corresponds to a single double of data.
-// Example: "Ray-ID|Snapshot-ID". This simple format has two components.
-// A ray formatted with this format only stores its ray-id and its snapshot-id.
+// Example: "Ray-ID|Event-ID". This simple format has two components.
+// A ray formatted with this format only stores its ray-id and its event-id.
 struct FormatComponent {
     // The name of the component, example: "X-position".
     const char* name;
     // A function pointer expressing how to access this component given an actual RAYX::Ray.
-    double (*get_double)(uint ray_id, uint snapshot_id, RAYX::Ray ray);
+    double (*get_double)(uint ray_id, uint event_id, RAYX::Ray ray);
 };
 
 // Again, a format is simply a list of components!
@@ -32,8 +32,8 @@ static Format FULL_FORMAT = {
         .get_double = [](uint ray_id, uint, RAYX::Ray) { return (double)ray_id; },
     },
     FormatComponent{
-        .name = "Snapshot-ID",
-        .get_double = [](uint, uint snapshot_id, RAYX::Ray) { return (double)snapshot_id; },
+        .name = "Event-ID",
+        .get_double = [](uint, uint event_id, RAYX::Ray) { return (double)event_id; },
     },
     FormatComponent{
         .name = "X-position",
