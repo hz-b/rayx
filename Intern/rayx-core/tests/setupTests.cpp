@@ -181,7 +181,7 @@ std::vector<RAYX::Ray> rayUiCompat(std::string filename) {
                 continue;
             }
 
-            // The ray has to have weight != ETYPE_FLY_OFF
+            // The ray has to have eventType != ETYPE_FLY_OFF
             if (r.m_eventType != ETYPE_JUST_HIT_ELEM) {
                 continue;
             }

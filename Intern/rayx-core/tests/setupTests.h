@@ -93,7 +93,7 @@ inline void checkEq(std::string filename, int line, std::string l, std::string r
         auto t = tolerance;
 
         // integer tolerance for integer values.
-        if (i == 3 /*weight*/ || i == 14 /*lastElem*/ || i == 15 /*extraParam*/) {
+        if (i == 3 /*eventType*/ || i == 14 /*lastElem*/ || i == 15 /*extraParam*/) {
             t = 0.5;
         }
 
@@ -129,7 +129,7 @@ inline void checkEq(std::string filename, int line, std::string l, std::string r
     }
 
 /// used to check equalities, where doubles contain integer values
-/// i.e. weight == 1, or extraParam == 21.
+/// i.e. eventType == 1, or extraParam == 21.
 inline bool intclose(double x, double y) { return abs(x - y) < 0.5; }
 
 // ShaderTest

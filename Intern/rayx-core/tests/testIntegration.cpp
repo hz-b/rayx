@@ -57,7 +57,7 @@ TEST_F(TestSuite, Ellipsoid) {
 }
 
 TEST_F(TestSuite, Slit) {
-    auto rays = traceRML("slit");
+    auto hist = traceRML("slit");
 
     int absorbed = 0;      // number of rays absorbed by the slit.
     int pass_through = 0;  // number of rays passing through the slit.
@@ -65,19 +65,19 @@ TEST_F(TestSuite, Slit) {
     const auto SLIT_ID = 1;
     const auto IMAGE_PLANE_ID = 2;
 
-    for (auto snapshots : rays) {
-        if (snapshots.size() == 1) {  // matrix source -> slit absorbed
-            CHECK(snapshots[0].m_lastElement == SLIT_ID);
-            CHECK(snapshots[0].m_eventType == ETYPE_ABSORBED);
+    for (auto ray_hist : hist) {
+        if (ray_hist.size() == 1) {  // matrix source -> slit absorbed
+            CHECK(ray_hist[0].m_lastElement == SLIT_ID);
+            CHECK(ray_hist[0].m_eventType == ETYPE_ABSORBED);
             absorbed++;
-        } else if (snapshots.size() == 3) {  // matrix source -> slit -> image plane -> fly off
-            CHECK(snapshots[0].m_lastElement == SLIT_ID);
-            CHECK(snapshots[0].m_eventType == ETYPE_JUST_HIT_ELEM);
+        } else if (ray_hist.size() == 3) {  // matrix source -> slit -> image plane -> fly off
+            CHECK(ray_hist[0].m_lastElement == SLIT_ID);
+            CHECK(ray_hist[0].m_eventType == ETYPE_JUST_HIT_ELEM);
 
-            CHECK(snapshots[1].m_lastElement == IMAGE_PLANE_ID);
-            CHECK(snapshots[1].m_eventType == ETYPE_JUST_HIT_ELEM);
+            CHECK(ray_hist[1].m_lastElement == IMAGE_PLANE_ID);
+            CHECK(ray_hist[1].m_eventType == ETYPE_JUST_HIT_ELEM);
 
-            CHECK(snapshots[2].m_eventType == ETYPE_FLY_OFF);
+            CHECK(ray_hist[2].m_eventType == ETYPE_FLY_OFF);
             pass_through++;
         } else {
             CHECK(false);
