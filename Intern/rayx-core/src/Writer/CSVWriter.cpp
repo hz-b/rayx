@@ -56,7 +56,7 @@ Cell doubleToCell(double x) {
     return strToCell(s.c_str());
 }
 
-void writeCSV(const RAYX::Rays& rays, std::string filename, const Format& format) {
+void writeCSV(const RAYX::BundleHistory& hist, std::string filename, const Format& format) {
     std::ofstream file(filename);
 
     // write header:
@@ -68,11 +68,11 @@ void writeCSV(const RAYX::Rays& rays, std::string filename, const Format& format
     }
     file << '\n';
 
-    RAYX_VERB << "Writing " << rays.size() << " rays to file...";
+    RAYX_VERB << "Writing " << hist.size() << " rays to file...";
 
     // write data:
-    for (unsigned long ray_id = 0; ray_id < rays.size(); ray_id++) {
-        const auto& snapshots = rays[ray_id];
+    for (unsigned long ray_id = 0; ray_id < hist.size(); ray_id++) {
+        const auto& snapshots = hist[ray_id];
         for (unsigned long snapshot_id = 0; snapshot_id < snapshots.size(); snapshot_id++) {
             const auto& ray = snapshots[snapshot_id];
             for (uint i = 0; i < format.size(); i++) {
@@ -89,14 +89,14 @@ void writeCSV(const RAYX::Rays& rays, std::string filename, const Format& format
 
 // loader:
 
-RAYX::Rays loadCSV(std::string filename) {
+RAYX::BundleHistory loadCSV(std::string filename) {
     std::ifstream file(filename);
 
     // ignore setup line
     std::string s;
     std::getline(file, s);
 
-    RAYX::Rays out;
+    RAYX::BundleHistory out;
 
     while (std::getline(file, s)) {
         std::vector<double> d;

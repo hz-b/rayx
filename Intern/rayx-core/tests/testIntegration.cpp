@@ -8,7 +8,7 @@ TEST_F(TestSuite, PlaneMirrorDef) {
     compareLastAgainstRayUI("PlaneMirrorDef");
 
     // additional path length test
-    auto rays = extractLastSnapshot(traceRML("PlaneMirrorDef"));
+    auto rays = extractLastEvents(traceRML("PlaneMirrorDef"));
     for (auto r : rays) {
         CHECK_IN(r.m_pathLength, 11000, 11001);
     }

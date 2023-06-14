@@ -140,7 +140,7 @@ void TerminalApp::run() {
     tracePath(m_CommandParser->m_args.m_providedFile);
 }
 
-std::string TerminalApp::exportRays(const RAYX::Rays& rays, std::string path) {
+std::string TerminalApp::exportRays(const RAYX::BundleHistory& hist, std::string path) {
     RAYX_PROFILE_FUNCTION_STDOUT();
     bool csv = m_CommandParser->m_args.m_csvFlag;
 
@@ -155,13 +155,13 @@ std::string TerminalApp::exportRays(const RAYX::Rays& rays, std::string path) {
 
     if (csv) {
         path += ".csv";
-        writeCSV(rays, path, fmt);
+        writeCSV(hist, path, fmt);
     } else {
 #ifdef NO_H5
         RAYX_ERR << "writeH5 called during NO_H5 (HDF5 disabled during build))";
 #else
         path += ".h5";
-        writeH5(rays, path, fmt, getBeamlineOpticalElementsNames());
+        writeH5(hist, path, fmt, getBeamlineOpticalElementsNames());
 #endif
     }
     return path;

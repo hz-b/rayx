@@ -12,7 +12,7 @@ using uint = unsigned int;
 
 namespace RAYX {
 
-Rays Tracer::trace(const Beamline& b, uint64_t max_batch_size) {
+BundleHistory Tracer::trace(const Beamline& b, uint64_t max_batch_size) {
     RAYX_PROFILE_FUNCTION_STDOUT();
 
     auto rays = b.getInputRays();
@@ -20,7 +20,7 @@ Rays Tracer::trace(const Beamline& b, uint64_t max_batch_size) {
     auto maxEvents = b.m_OpticalElements.size() + 2;
     auto materialTables = b.calcMinimalMaterialTables();
 
-    Rays result;
+    BundleHistory result;
 
     for (int batch_id = 0; batch_id * max_batch_size < rays.size(); batch_id++) {
         auto rayIdStart = batch_id * max_batch_size;
@@ -77,53 +77,19 @@ Rays Tracer::trace(const Beamline& b, uint64_t max_batch_size) {
 
     return result;
 }
-/**
- * @brief Get Rays in last snapshot
- *
- * @param rays
- * @return std::vector<Ray>
- */
-std::vector<Ray> extractLastSnapshot(const Rays& rays) {
-    std::vector<Ray> out;
-    for (auto& snapshots : rays) {
-        out.push_back(snapshots.back());
+
+/// Get the last event for each ray of the bundle.
+std::vector<Event> extractLastEvents(const BundleHistory& hist) {
+    std::vector<Event> out;
+    for (auto& ray_hist : hist) {
+        out.push_back(ray_hist.back());
     }
 
     return out;
 }
-/**
- * @brief Get Rays in first snapshot
- *
- * @param rays
- * @return std::vector<Ray>
- */
-std::vector<Ray> extracFirstSnapshot(const Rays& rays) {
-    std::vector<Ray> out;
-    for (auto& snapshots : rays) {
-        out.push_back(snapshots.front());
-    }
 
-    return out;
-}
-/***
- * Get Rays Nth snapshot
- */
-std::vector<Ray> extracNthSnapshot(const Rays& rays, int snapshotID) {
-    std::vector<Ray> out;
-    int skipped = 0;
-    for (auto& snapshots : rays) {
-        if ((int)snapshots.size() - 1 >= snapshotID) {
-            out.push_back(snapshots[snapshotID]);
-        } else {
-            skipped++;
-        }
-    }
-    RAYX_VERB << "Skipped " << skipped << " snapshots while extracting.";
-    return out;
-}
-
-Rays convertToRays(const std::vector<Ray>& rays) {
-    Rays out;
+BundleHistory convertToBundleHistory(const std::vector<Ray>& rays) {
+    BundleHistory out;
     for (auto r : rays) {
         out.push_back({r});
     }

@@ -10,20 +10,20 @@
 
 using uint = unsigned int;
 
-int count(const RAYX::Rays& rays) {
+int count(const RAYX::BundleHistory& hist) {
     int c = 0;
-    for (auto& r : rays) {
-        c += r.size();
+    for (auto& ray_hist : hist) {
+        c += ray_hist.size();
     }
     return c;
 }
 
-std::vector<double> toDoubles(const RAYX::Rays& rays, const Format& format) {
+std::vector<double> toDoubles(const RAYX::BundleHistory& hist, const Format& format) {
     std::vector<double> output;
-    output.reserve(count(rays) * format.size());
+    output.reserve(count(hist) * format.size());
 
-    for (uint ray_id = 0; ray_id < rays.size(); ray_id++) {
-        auto& snapshots = rays[ray_id];
+    for (uint ray_id = 0; ray_id < hist.size(); ray_id++) {
+        auto& snapshots = hist[ray_id];
         for (uint snapshot_id = 0; snapshot_id < snapshots.size(); snapshot_id++) {
             auto& ray = snapshots[snapshot_id];
             for (uint i = 0; i < format.size(); i++) {
@@ -35,10 +35,10 @@ std::vector<double> toDoubles(const RAYX::Rays& rays, const Format& format) {
     return output;
 }
 
-void writeH5(const RAYX::Rays& rays, std::string filename, const Format& format, std::vector<std::string> elementNames) {
+void writeH5(const RAYX::BundleHistory& hist, std::string filename, const Format& format, std::vector<std::string> elementNames) {
     HighFive::File file(filename, HighFive::File::ReadWrite | HighFive::File::Create | HighFive::File::Truncate);
 
-    auto doubles = toDoubles(rays, format);
+    auto doubles = toDoubles(hist, format);
 
     try {
         // write data

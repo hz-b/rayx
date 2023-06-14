@@ -64,9 +64,9 @@ RAYX::Beamline loadBeamline(std::string filename) {
 }
 
 /// will write to Intern/rayx-core/tests/output<filename>.csv
-void writeToOutputCSV(const RAYX::Rays& rays, std::string filename) {
+void writeToOutputCSV(const RAYX::BundleHistory& hist, std::string filename) {
     std::string f = canonicalizeRepositoryPath("Intern/rayx-core/tests/output/" + filename + ".csv").string();
-    writeCSV(rays, f, FULL_FORMAT);
+    writeCSV(hist, f, FULL_FORMAT);
 }
 
 /// sequentialExtraParam yields the desired extraParam for rays which went the
@@ -84,14 +84,14 @@ int sequentialExtraParam(int count) {
     return out;
 }
 
-RAYX::Rays traceRML(std::string filename) {
+RAYX::BundleHistory traceRML(std::string filename) {
     auto beamline = loadBeamline(filename);
     return tracer->trace(beamline, DEFAULT_BATCH_SIZE);
 }
 
-std::vector<RAYX::Ray> extractLastHit(const RAYX::Rays& rays) {
-    std::vector<RAYX::Ray> outs;
-    for (auto rr : rays) {
+std::vector<RAYX::Event> extractLastHit(const RAYX::BundleHistory& hist) {
+    std::vector<RAYX::Event> outs;
+    for (auto rr : hist) {
         Ray out;
         out.m_weight = W_UNINIT;
         for (auto r : rr) {
@@ -131,7 +131,7 @@ std::vector<RAYX::Ray> loadCSVRayUI(std::string filename) {
     return out;
 }
 
-void compareRays(const RAYX::Rays& r1, const RAYX::Rays& r2, double t) {
+void compareBundleHistories(const RAYX::BundleHistory& r1, const RAYX::BundleHistory& r2, double t) {
     CHECK_EQ(r1.size(), r2.size());
 
     auto it1 = r1.begin();
@@ -197,8 +197,8 @@ void compareLastAgainstRayUI(std::string filename, double t) {
     auto rayx_list = rayUiCompat(filename);
     auto rayui_list = loadCSVRayUI(filename);
 
-    writeToOutputCSV(convertToRays(rayx_list), filename + ".rayx");
-    writeToOutputCSV(convertToRays(rayui_list), filename + ".rayui");
+    writeToOutputCSV(convertToBundleHistory(rayx_list), filename + ".rayx");
+    writeToOutputCSV(convertToBundleHistory(rayui_list), filename + ".rayui");
 
     CHECK_EQ(rayx_list.size(), rayui_list.size());
 
@@ -228,7 +228,7 @@ void compareAgainstCorrect(std::string filename, double tolerance) {
     auto b = loadCSV(f);
 
     writeToOutputCSV(a, filename + ".rayx");
-    compareRays(a, b, tolerance);
+    compareBundleHistories(a, b, tolerance);
 }
 
 void updateCpuTracerMaterialTables(std::vector<Material> mats_vec) {

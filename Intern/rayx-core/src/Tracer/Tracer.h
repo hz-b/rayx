@@ -34,10 +34,10 @@ using Event = Ray;
 /// Contains all the events of a single Ray in chronological order.
 using RayHistory = std::vector<Event>;
 
-/// Contains the events of all the rays
-/// Given a `Rays rays;`
-/// rays[i][j] is the j'th event of the i'th ray.
-using Rays = std::vector<RayHistory>;
+/// Contains all events for some bundle of rays.
+/// Given a `BundleHistory hist;`
+/// hist[i][j] is the j'th event of the i'th ray of the bundle.
+using BundleHistory = std::vector<RayHistory>;
 
 class RAYX_API Tracer {
   public:
@@ -46,8 +46,8 @@ class RAYX_API Tracer {
 
     // This will call traceRaw.
     // Everything happening in each traceRaw implementation should be extracted to this function instead.
-    // See `Rays` for information about the return value.
-    Rays trace(const Beamline&, uint64_t max_batch_size);
+    // See `BundleHistory` for information about the return value.
+    BundleHistory trace(const Beamline&, uint64_t max_batch_size);
 
     // Useful for GPU Tracing
     struct PushConstants {  // TODO(Jannis): PushConstants is not an expressive name. Rename to something like TracerConfig
@@ -65,9 +65,7 @@ class RAYX_API Tracer {
 };
 
 // TODO deprecate these functions and all of their uses.
-RAYX_API std::vector<Ray> extractLastSnapshot(const Rays& rays);
-std::vector<Ray> extracFirstSnapshot(const Rays& rays);
-std::vector<Ray> extracNthSnapshot(const Rays& rays, int snapshotID);
-RAYX_API Rays convertToRays(const std::vector<Ray>& rays);
+RAYX_API std::vector<Ray> extractLastEvents(const BundleHistory& hist);
+RAYX_API BundleHistory convertToBundleHistory(const std::vector<Ray>& rays);
 
 }  // namespace RAYX

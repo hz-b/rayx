@@ -171,13 +171,13 @@ class TestSuite : public testing::Test {
 RAYX::Beamline loadBeamline(std::string filename);
 
 /// will write to Tests/output/<filename>.csv
-void writeToOutputCSV(const RAYX::Rays& rays, std::string filename);
+void writeToOutputCSV(const RAYX::BundleHistory& hist, std::string filename);
 
 /// Returns all traced rays
-RAYX::Rays traceRML(std::string filename);
+RAYX::BundleHistory traceRML(std::string filename);
 
 // extracts the last W_JUST_HIT_ELEM for each ray.
-std::vector<RAYX::Ray> extractLastHit(const RAYX::Rays&);
+std::vector<RAYX::Event> extractLastHit(const RAYX::BundleHistory&);
 
 /// will look at Tests/input/<filename>.csv
 /// the Ray-UI files are to be obtained by Export > RawRaysOutgoing (which are in
@@ -185,7 +185,7 @@ std::vector<RAYX::Ray> extractLastHit(const RAYX::Rays&);
 std::vector<RAYX::Ray> loadCSVRayUI(std::string filename);
 
 /// Checks for equality up to the tolerance `t`.
-void compareRays(const RAYX::Rays& r1, const RAYX::Rays& r2, double t = 1e-11);
+void compareBundleHistories(const RAYX::BundleHistory& r1, const RAYX::BundleHistory& r2, double t = 1e-11);
 
 /// Only cares for the rays hitting the last object of the beamline, and check whether they are the same as their RayUI counter part.
 /// Ray UI rays are obtained Export > RawRaysOutgoing.
