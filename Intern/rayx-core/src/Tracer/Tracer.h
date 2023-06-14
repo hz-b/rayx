@@ -26,8 +26,12 @@ struct TraceRawConfig {
     std::vector<Element> m_elements;
 };
 
+/// A 'snapshot' of a ray, at the time where it undergoes some event.
+/// The event type is specified by `m_weight`.
+using Event = Ray;
+
 /// Contains all the snapshots of a single Ray.
-using Snapshots = std::vector<Ray>;
+using Snapshots = std::vector<Event>;
 
 /// Contains the snapshots of all the rays
 /// Given a `Rays rays;`
