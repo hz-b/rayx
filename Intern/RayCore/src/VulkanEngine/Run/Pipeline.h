@@ -46,7 +46,7 @@ class RAYX_API Pass {
     using Pipelines = std::vector<std::shared_ptr<Pipeline>>;
 
     Pass() = default;
-    ~Pass() = default;
+    virtual ~Pass(){};
 
     void bind(const VkCommandBuffer& commandBuffer, int stage) const { vkCmdBindPipeline(commandBuffer, getPipelineBindPoint(), getPipeline(stage)); }
 
@@ -119,12 +119,6 @@ class RAYX_API ComputePass : public Pass {
     void bindDescriptorSet(const VkCommandBuffer& cmdBuffer, int stage);
     void cleanPipeline(int stage);
 
-    std::vector<VkDescriptorSetLayout> m_descriptorSetLayouts = {VK_NULL_HANDLE};  // For now, only one [0]
-    std::vector<VkDescriptorSet> m_descriptorSets = {VK_NULL_HANDLE};              // For now, only one [0]
-
-    VkDescriptorSetLayout m_oneDescSetLayout;
-    VkDescriptorSet m_oneDescSet;
-
   private:
     // Currently only one DescriptorSetLayout is offered per Pass
     void createDescriptorSetLayout(std::vector<VkDescriptorSetLayoutBinding>& bindings);
@@ -134,6 +128,9 @@ class RAYX_API ComputePass : public Pass {
 
     // VkDescriptorPool m_DescriptorPool = VK_NULL_HANDLE;                        // FIXME(OS): Possibly not used
     VkPipelineBindPoint m_PipelineBindPoint = VK_PIPELINE_BIND_POINT_COMPUTE;  // Always compute
+
+    std::vector<VkDescriptorSetLayout> m_descriptorSetLayouts = {VK_NULL_HANDLE};  // For now, only one [0]
+    std::vector<VkDescriptorSet> m_descriptorSets = {VK_NULL_HANDLE};              // For now, only one [0]
 
     // TODO(OS): Add missing memory barriers
 };

@@ -1,6 +1,7 @@
 #ifndef NO_VULKAN
 
 #include "VulkanEngine/Init/Fence.h"
+
 #include "RayCore.h"
 #include "VulkanEngine/Common.h"
 namespace RAYX {
@@ -55,11 +56,6 @@ VkResult Fence::forceReset() {
 }
 
 Fence::~Fence() { vkDestroyFence(device, f, nullptr); }
-
-// void VulkanEngine::createFences() {
-//     m_Fences.compute = std::make_unique<Fence>(m_Device);
-//     m_Fences.transfer = std::make_unique<Fence>(m_Device);
-// }
 
 }  // namespace RAYX
 

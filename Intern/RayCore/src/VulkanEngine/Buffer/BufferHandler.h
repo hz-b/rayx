@@ -77,7 +77,6 @@ class RAYX_API BufferHandler {
     }
 
     void deleteBuffer(const char* bufname);
-    void freeBuffer(const char* bufname);
     void waitTransferQueueIdle();
 
     std::map<std::string, std::unique_ptr<VulkanBuffer>>* getBuffers() { return &m_Buffers; }

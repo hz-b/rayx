@@ -15,16 +15,7 @@ BufferHandler::BufferHandler(VkDevice& device, VmaAllocator allocator, uint32_t 
     createTransferSemaphore();
 }
 
-BufferHandler::~BufferHandler() {
-    vkFreeCommandBuffers(m_Device, m_CommandPool, 1, &m_TransferCommandBuffer);
-
-    // Destroy staging buffer
-    deleteBuffer(m_StagingBuffer->getName());
-    // Destroy user-defined buffers
-    for (auto& [name, buf] : m_Buffers) {
-        deleteBuffer(name.c_str());
-    }
-}
+BufferHandler::~BufferHandler() { vkFreeCommandBuffers(m_Device, m_CommandPool, 1, &m_TransferCommandBuffer); }
 
 std::vector<VkDescriptorSetLayoutBinding> BufferHandler::getDescriptorBindings(const std::string& pass) {
     RAYX_PROFILE_FUNCTION();
@@ -195,16 +186,10 @@ void BufferHandler::updateBuffer(const char* bufname, const std::vector<T>& vec)
     }
 }
 
-void BufferHandler::freeBuffer(const char* bufname) {
+void BufferHandler::deleteBuffer(const char* bufname) {
     if (!isBufferPresent(std::string(bufname))) {
         RAYX_ERR << "Buffer " << bufname << " does not exist";
     }
-    RAYX_D_LOG << "Freeing " << std::string(bufname);
-    vmaDestroyBuffer(m_VmaAllocator, m_Buffers[bufname]->getBuffer(), m_Buffers[bufname]->m_Alloca);
-}
-
-void BufferHandler::deleteBuffer(const char* bufname) {
-    freeBuffer(bufname);
     m_Buffers.erase(bufname);
 }
 

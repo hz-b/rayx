@@ -136,13 +136,8 @@ void VulkanEngine::newRecordInCommandBuffer(ComputePass& computePass) {
     The validation layer will NOT give warnings if you forget these, so be
     very careful not to forget them.
     */
-    vkCmdBindPipeline(m_ComputeCommandBuffer, VK_PIPELINE_BIND_POINT_COMPUTE, m_ComputePass->m_pass[0]->m_pipeline);
-
-    vkCmdBindDescriptorSets(m_ComputeCommandBuffer, VK_PIPELINE_BIND_POINT_COMPUTE, m_ComputePass->m_pass[0]->m_pipelineLayout, 0, 1,
-                            &m_ComputePass->m_oneDescSet, 0, nullptr);
-
-    // computePass.bind(m_ComputeCommandBuffer, 0);  // TODO(OS) Add multi stage support if needed
-    // computePass.bindDescriptorSet(m_ComputeCommandBuffer, 0);
+    computePass.bind(m_ComputeCommandBuffer, 0);  // TODO(OS) Add multi stage support if needed
+    computePass.bindDescriptorSet(m_ComputeCommandBuffer, 0);
 
     /*
     Calling vkCmdDispatch basically starts the compute pipeline, and
@@ -204,8 +199,8 @@ void VulkanEngine::newRecordInCommandBuffer(ComputePass& computePass) {
     /**
      * Update push constants
      */
-    vkCmdPushConstants(m_ComputeCommandBuffer, m_ComputePass->m_pass[0]->m_pipelineLayout, VK_SHADER_STAGE_COMPUTE_BIT, 0,
-                       m_ComputePass->m_pass[0]->m_pushConstant.getSize(), m_ComputePass->m_pass[0]->m_pushConstant.getData());
+    vkCmdPushConstants(m_ComputeCommandBuffer, m_ComputePass->getPipelineLayout(0), VK_SHADER_STAGE_COMPUTE_BIT, 0,
+                       m_ComputePass->getPass()[0]->m_pushConstant.getSize(), m_ComputePass->getPass()[0]->m_pushConstant.getData());
 
     RAYX_VERB << "Dispatching commandBuffer...";
     RAYX_VERB << "Sending "

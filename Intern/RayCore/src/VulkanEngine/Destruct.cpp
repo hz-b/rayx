@@ -47,7 +47,6 @@ void inline storePipelineCache(VkDevice& device, VkPipelineCache& cache) {
 }
 
 VulkanEngine::~VulkanEngine() {
-    RAYX_D_LOG << "~Destruct vulkanengine";
     if (m_state == EngineStates_t::PREINIT) {
         // return; /* nothing to clean up! */
     }
@@ -56,42 +55,23 @@ VulkanEngine::~VulkanEngine() {
         cleanup();
     }
 
-    // vkDestroyBuffer(m_Device, m_stagingBuffer, nullptr);
-    // vkFreeMemory(m_Device, m_stagingMemory, nullptr);
-
     vkFreeCommandBuffers(m_Device, m_GlobalCommandPool, 1, &m_ComputeCommandBuffer);
-    vkFreeCommandBuffers(m_Device, m_GlobalCommandPool, 1, &m_TransferCommandBuffer);
 
-    for (auto& [name, buf] : m_buffers) {
-        // vkDestroyBuffer(m_Device, buf.m_Buffer, nullptr);
-        // vkFreeMemory(m_Device, buf.m_Memory, nullptr);
-        vmaDestroyBuffer(m_VmaAllocator, buf.buf, buf.alloca);
-    }
-
-    //auto bufs = getBufferHandler().getBuffers();
-
-    // for (auto& buf : bufs) {
-    //     // vkDestroyBuffer(m_Device, buf.m_Buffer, nullptr);
-    //     // vkFreeMemory(m_Device, buf.m_Memory, nullptr);
-    //     vmaDestroyBuffer(m_VmaAllocator, buf.buf, buf.alloca);
-    // }
-
-    vmaDestroyBuffer(m_VmaAllocator, m_stagingBuffer.buf, m_stagingBuffer.alloca);
-    vmaDestroyAllocator(m_VmaAllocator);
+    // vmaDestroyAllocator(m_VmaAllocator);
     vkDestroyCommandPool(m_Device, m_GlobalCommandPool, nullptr);
-    vkDestroyDescriptorSetLayout(m_Device, m_DescriptorSetLayout, nullptr);
-    vkDestroyDescriptorPool(m_Device, m_DescriptorPool, nullptr);
 
-    vkDestroySemaphore(m_Device, m_Semaphores.computeSemaphore, nullptr);
-    vkDestroySemaphore(m_Device, m_Semaphores.transferSemaphore, nullptr);
+    for (auto& sem : m_newSemaphores) {
+        vkDestroySemaphore(m_Device, sem, nullptr);
+    }
 
     // Destroy Fences
     m_Fences.compute.reset();
     m_Fences.transfer.reset();
 
-    vkDestroyShaderModule(m_Device, m_ComputeShaderModule, nullptr);
-    storePipelineCache(m_Device, m_PipelineCache);
-
+     // TODO: Maybe like this:
+    delete m_BufferHandler;
+    delete m_ComputePass;
+    // storePipelineCache(m_Device, m_PipelineCache);
     {
         RAYX_PROFILE_SCOPE_STDOUT("vkDestroyDevice");
         vkDestroyDevice(m_Device, nullptr);
@@ -103,6 +83,7 @@ VulkanEngine::~VulkanEngine() {
         RAYX_PROFILE_SCOPE("vkDestroyInstance");
         vkDestroyInstance(m_Instance, nullptr);
     }
+
 }
 
 }  // namespace RAYX

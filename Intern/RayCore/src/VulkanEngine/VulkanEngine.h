@@ -140,9 +140,8 @@ class RAYX_API VulkanEngine {
         size_t size = 0;
     };
     pushConstants_t m_pushConstants;
-    std::unique_ptr<BufferHandler> m_BufferHandler;  // new
-    std::unique_ptr<ComputePass> m_ComputePass;      // New
-    std::unique_ptr<Pass> m_Pass;                    // New
+    BufferHandler* m_BufferHandler;  // new
+    ComputePass* m_ComputePass;      // New
 
   private:
     EngineStates_t m_state = EngineStates_t::PREINIT;

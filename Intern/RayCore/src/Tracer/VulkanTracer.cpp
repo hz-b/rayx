@@ -104,25 +104,23 @@ std::vector<Ray> VulkanTracer::newTraceRaw(const TraceRawConfig& cfg) {
         m_engine.newInit();
         // For now we recreate everything
         // TODO (OS) : Only change buffers and not all pass!
-
         // Create first Shader Stage
         ShaderStageCreateInfo shaderCreateInfo = {.name = "FullTracer", .shaderPath = "build/bin/comp.spv", .entryPoint = "main"};
         // Merge all stages
         std::vector<ShaderStageCreateInfo> shaderStages = {shaderCreateInfo};
-
         // Create Compute Pass
         m_engine.createComputePipelinePass({.passName = "BeamlineTracePass", .shaderStagesCreateInfos = shaderStages});
     }
 
     // Create Buffers and bind them to Pass through Descriptors
     {
-        auto pass = m_engine.m_ComputePass.get();
+        auto pass = m_engine.m_ComputePass;
         auto shaderFlag = pass->getShaderStage(0).getShaderStageFlagBits();  // Should return only compute now
         auto passName = std::string(pass->getName());
         // Compute Buffers Meta
         // Bindings are *IN ORDER*
         m_engine.getBufferHandler()
-            .createBuffer<Ray>({"ray-buffer", VKBUFFER_INOUT}, rayList)  // Input Ray Buffer
+            .createBuffer<Ray>({"ray-buffer", VKBUFFER_IN}, rayList)  // Input Ray Buffer
             .addDescriptorSetPerPassBinding(passName, 0, shaderFlag);
 
         m_engine.getBufferHandler()
@@ -158,19 +156,15 @@ std::vector<Ray> VulkanTracer::newTraceRaw(const TraceRawConfig& cfg) {
     // Create Pipeline layouts and Descriptor Layouts. Everytime buffer formation (not data) changes we need to prepare again
     m_engine.prepareComputePipelinePass();
 
-    std::vector<Ray> outtest = m_engine.getBufferHandler().readBuffer<Ray>("ray-buffer", true);
-
-    // m_engine.run({.m_numberOfInvocations = numberOfRays});
     m_engine.newRun({.m_numberOfInvocations = numberOfRays});
-    //outtest = m_engine.getBufferHandler().readBuffer<Ray>("ray-buffer", true);
-    
+
     std::vector<Ray> out = m_engine.getBufferHandler().readBuffer<Ray>("output-buffer", true);
 
 #ifdef RAYX_DEBUG_MODE
     m_debugBufList = m_engine.getBufferHandler().readBuffer<debugBuffer_t>("debug-buffer", true);
 #endif
 
-    m_engine.newCleanup();
+    // m_engine.newCleanup();
     RAYX_D_LOG << "Done Trace run";
     return out;
 }  // namespace RAYX

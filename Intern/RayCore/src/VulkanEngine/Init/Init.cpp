@@ -51,12 +51,12 @@ void VulkanEngine::newInit() {
  *
  */
 void VulkanEngine::initBufferHandler() {
-    m_BufferHandler = std::make_unique<BufferHandler>(m_Device, m_VmaAllocator, m_computeFamily, getStagingBufferSize());
+    m_BufferHandler = new BufferHandler(m_Device, m_VmaAllocator, m_computeFamily, getStagingBufferSize());
     RAYX_D_LOG << "BufferHandler initialized.";
 }
 
 void VulkanEngine::createComputePipelinePass(const ComputePassCreateInfo& createInfo) {
-    m_ComputePass = std::make_unique<ComputePass>(m_Device, createInfo);
+    m_ComputePass = new ComputePass(m_Device, createInfo);
     RAYX_D_LOG << m_ComputePass->getName() << " ComputePipelinePass created.";
 }
 

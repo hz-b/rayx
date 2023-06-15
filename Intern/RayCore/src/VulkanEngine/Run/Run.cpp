@@ -23,8 +23,7 @@ void VulkanEngine::run(VulkanEngineRunSpec_t spec) {
 }
 
 void VulkanEngine::newUpdateDescriptorSets() {
-    //m_ComputePass->updateDescriptorSets(m_BufferHandler.get());
-    m_ComputePass->simpleupdate(m_BufferHandler.get());
+    m_ComputePass->simpleupdate(m_BufferHandler);
 }
 
 void VulkanEngine::newRun(VulkanEngineRunSpec_t spec) {

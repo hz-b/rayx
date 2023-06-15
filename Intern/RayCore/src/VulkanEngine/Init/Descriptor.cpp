@@ -40,7 +40,7 @@ DescriptorPool::DescriptorPool(VkDevice& device, uint32_t maxSets, VkDescriptorP
 
 DescriptorPool::~DescriptorPool() { vkDestroyDescriptorPool(m_Device, m_DescriptorPool, nullptr); }
 
-void DescriptorPool::allocateDescriptor(const VkDescriptorSetLayout descriptorSetLayout, VkDescriptorSet& descriptorSet) const {
+void DescriptorPool::allocateDescriptor(VkDescriptorSetLayout& descriptorSetLayout, VkDescriptorSet& descriptorSet) const {
     auto allocInfo = VKINIT::Descriptor::descriptor_set_allocate_info(m_DescriptorPool, &descriptorSetLayout, 1);
 
     // Might want to create a "DescriptorPoolManager" class that handles this case, and builds

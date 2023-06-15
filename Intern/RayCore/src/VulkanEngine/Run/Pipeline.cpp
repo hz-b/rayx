@@ -17,7 +17,7 @@ Pass::Pipeline::Pipeline(std::string name, VkDevice& dev, const ShaderStageCreat
 
 Pass::Pipeline::~Pipeline() {
     cleanPipeline(m_device);
-    storePipelineCache(m_device);
+    // storePipelineCache(m_device);
 }
 
 void Pass::Pipeline::createPipelineLayout(VkDescriptorSetLayout* setLayouts) {
@@ -48,7 +48,6 @@ void Pass::Pipeline::createPipeline() {
     auto pipelineCreateInfo = VKINIT::Pipeline::compute_pipeline_create_info(m_pipelineLayout, shaderStage->getPipelineShaderCreateInfo());
 
     VK_CHECK_RESULT(vkCreateComputePipelines(m_device, nullptr, 1, &pipelineCreateInfo, nullptr, &m_pipeline))
-    RAYX_D_LOG << "Pipeline created";
 }
 
 /**
@@ -134,17 +133,9 @@ ComputePass::ComputePass(VkDevice& device, const ComputePassCreateInfo& createIn
     for (uint32_t i = 0; i < m_stagesCount; i++) {
         m_pass[i] = std::make_shared<Pipeline>(createInfo.shaderStagesCreateInfos[i].name, m_Device, createInfo.shaderStagesCreateInfos[i]);
     }
-    // Global Desc. Pool
-    // createDescriptorPool(10, 10);
-
-    RAYX_D_LOG << "Pass " << m_name << " created";
 }
 
 ComputePass::~ComputePass() {
-    for (const auto& pipeline : m_pass) {
-        pipeline->cleanPipeline(m_Device);
-    }
-
     for (auto layout : m_descriptorSetLayouts) {
         vkDestroyDescriptorSetLayout(m_Device, layout, nullptr);
     }
@@ -155,7 +146,7 @@ void ComputePass::createDescriptorSetLayout(std::vector<VkDescriptorSetLayoutBin
     auto descriptorSetLayoutCreateInfo = VKINIT::Descriptor::descriptor_set_layout_create_info(bindings);
 
     // Create the descriptor set layout.
-    VK_CHECK_RESULT(vkCreateDescriptorSetLayout(m_Device, &descriptorSetLayoutCreateInfo, nullptr, &m_oneDescSetLayout))
+    VK_CHECK_RESULT(vkCreateDescriptorSetLayout(m_Device, &descriptorSetLayoutCreateInfo, nullptr, &m_descriptorSetLayouts[0]))
     RAYX_D_LOG << "DescriptorSetLayout created";
 }
 
@@ -171,7 +162,7 @@ void ComputePass::prepare(std::vector<VkDescriptorSetLayoutBinding> bindings) {
     createDescriptorPool(1, bindings.size());
 
     for (const auto& stage : m_pass) {
-        stage->createPipelineLayout(&m_oneDescSetLayout);
+        stage->createPipelineLayout(&m_descriptorSetLayouts[0]);
         stage->createPipeline();
     }
     RAYX_D_LOG << "Done";
@@ -190,8 +181,8 @@ void ComputePass::addPipelineStage(const ShaderStageCreateInfo& createInfo) {
 
 void ComputePass::createDescriptorPool(uint32_t maxSets, uint32_t bufferCount) {
     // TODO(OS): This should change once we need more sets
-    // globalDescriptorPool = DescriptorPool::Builder(m_Device).setMaxSets(maxSets).addPoolSize(VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, bufferCount).build();
-    // globalDescriptorPool->allocateDescriptor(m_oneDescSetLayout, m_oneDescSet);
+    globalDescriptorPool = DescriptorPool::Builder(m_Device).setMaxSets(maxSets).addPoolSize(VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, bufferCount).build();
+    globalDescriptorPool->allocateDescriptor(m_descriptorSetLayouts[0], m_descriptorSets[0]);
 
     /*
     one descriptor for each buffer
@@ -212,20 +203,20 @@ void ComputePass::createDescriptorPool(uint32_t maxSets, uint32_t bufferCount) {
     /*
     With the pool allocated, we can now allocate the descriptor set.
     */
-    VkDescriptorSetAllocateInfo descriptorSetAllocateInfo = {};
-    descriptorSetAllocateInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO;
-    descriptorSetAllocateInfo.descriptorPool = m_simpleDescPool;  // pool to allocate from.
-    descriptorSetAllocateInfo.descriptorSetCount = 1;             // allocate a single descriptor set.
-    descriptorSetAllocateInfo.pSetLayouts = &m_oneDescSetLayout;
+    // VkDescriptorSetAllocateInfo descriptorSetAllocateInfo = {};
+    // descriptorSetAllocateInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO;
+    // descriptorSetAllocateInfo.descriptorPool = globalDescriptorPool->m_DescriptorPool;  // pool to allocate from.
+    // descriptorSetAllocateInfo.descriptorSetCount = 1;                                   // allocate a single descriptor set.
+    // descriptorSetAllocateInfo.pSetLayouts = &m_descriptorSetLayouts[0];
 
-    // allocate descriptor set.
-    VK_CHECK_RESULT(vkAllocateDescriptorSets(m_Device, &descriptorSetAllocateInfo, &m_oneDescSet));
+    // // allocate descriptor set.
+    // VK_CHECK_RESULT(vkAllocateDescriptorSets(m_Device, &descriptorSetAllocateInfo, &m_descriptorSets[0]));
 
     RAYX_D_LOG << "Global pool created ,max sets = " << maxSets << " buffer count = " << bufferCount;
 }
 
 void ComputePass::updateDescriptorSets(BufferHandler* bufferHandler) {
-    auto writer = DescriptorWriter(m_oneDescSetLayout, *globalDescriptorPool);
+    auto writer = DescriptorWriter(m_descriptorSetLayouts[0], *globalDescriptorPool);
     auto buffers = bufferHandler->getBuffers();
 
     for (auto& [name, b] : *buffers) {
@@ -233,12 +224,14 @@ void ComputePass::updateDescriptorSets(BufferHandler* bufferHandler) {
         writer.writeBuffer(b->getPassDescriptorBinding(m_name), &descInfo);
     }
 
-    writer.build(m_oneDescSet);
+    writer.build(m_descriptorSets[0]);
 }
 
 void ComputePass::simpleupdate(BufferHandler* bufferHandler) {
     auto buffers = bufferHandler->getBuffers();
     RAYX_D_LOG << "Simple update";
+    std::vector<VkWriteDescriptorSet> writes;
+
     for (auto& [name, b] : *buffers) {
         // specify which buffer to use: input buffer
         VkDescriptorBufferInfo descriptorBufferInfo = {};
@@ -249,17 +242,18 @@ void ComputePass::simpleupdate(BufferHandler* bufferHandler) {
         VkWriteDescriptorSet writeDescriptorSet = {};
         writeDescriptorSet.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
         writeDescriptorSet.pNext = nullptr;
-        writeDescriptorSet.dstSet = m_oneDescSet;  // write to this descriptor set.
+        writeDescriptorSet.dstSet = m_descriptorSets[0];  // write to this descriptor set.
         writeDescriptorSet.dstBinding = b->getPassDescriptorBinding(m_name);
         writeDescriptorSet.dstArrayElement = 0;
         writeDescriptorSet.descriptorCount = 1;                                 // update a single descriptor.
         writeDescriptorSet.descriptorType = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER;  // storage buffer.
         writeDescriptorSet.pBufferInfo = &descriptorBufferInfo;
-        ;
-
-        // perform the update of the descriptor set.
+        writes.push_back(writeDescriptorSet);
+        // RAYX_D_LOG << writes.size();
         vkUpdateDescriptorSets(m_Device, 1, &writeDescriptorSet, 0, nullptr);
     }
+    // perform the update of the descriptor set.
+    // vkUpdateDescriptorSets(m_Device, writes.size(), writes.data(), 0, nullptr);
 }
 
 void ComputePass::bindDescriptorSet(const VkCommandBuffer& cmdBuffer, int stage) {
