@@ -154,7 +154,7 @@ void compareBundleHistories(const RAYX::BundleHistory& r1, const RAYX::BundleHis
             auto ray1 = *itr1;
             auto ray2 = *itr2;
 
-            CHECK_EQ(ray1, ray2);
+            CHECK_EQ(ray1, ray2, t);
 
             ++itr1;
             ++itr2;

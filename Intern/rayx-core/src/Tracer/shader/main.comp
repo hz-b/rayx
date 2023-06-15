@@ -41,6 +41,9 @@ ShaderArray<int> matIdx;
 ShaderArray<double> mat;
 
 #else
+// Note: A `dvec3` needs an alignment of 4 * sizeof(double), hence two dvec3s can never be directly after each other (without padding).
+// Further, the number of doubles in a Ray need to be divisible by four at all times, as we want to store multiple Rays after each other without padding in `rayData`.
+// This is why we need m_extraParam.
 struct Ray {
     dvec3 m_position;
     // Initially weight for _ray is `ETYPE_IN_COMPUTATION`.
