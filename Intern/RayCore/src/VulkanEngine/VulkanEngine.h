@@ -18,25 +18,6 @@
 #include "VulkanEngine/Run/Pipeline.h"
 
 namespace RAYX {
-// the argument type of `VulkanEngine::declareBuffer(_)`
-struct BufferDeclarationSpec_t {
-    uint32_t binding;
-
-    /// expresses whether the buffer is allowed to be initialized with CPU-data.
-    bool isInput;
-
-    /// expresses whether the buffer is allowed to be read out to the CPU after
-    /// the computation.
-    bool isOutput;
-};
-
-/// the argument type of `VulkanEngine::init(_)`
-struct VulkanEngineInitSpec_t {
-    /// the name of the shaderfile, as relative path - relative to the root of
-    /// the repository
-    const char* shaderFileName;
-};
-
 /// the argument type of `VulkanEngine::run(_)`
 struct VulkanEngineRunSpec_t {
     uint32_t m_numberOfInvocations;
@@ -48,7 +29,7 @@ class RAYX_API VulkanEngine {
     ~VulkanEngine();
 
     /// changes the state from PREINIT to PRERUN.
-    void newInit();
+    void init();
 
     // TODO (OS): Add the Vulkan state FSM Controls
     void initBufferHandler();
@@ -56,12 +37,12 @@ class RAYX_API VulkanEngine {
     void prepareComputePipelinePass();
     BufferHandler& getBufferHandler() const { return *m_BufferHandler; }
 
-    void newRun(VulkanEngineRunSpec_t);
+    void run(VulkanEngineRunSpec_t);
 
     /// changes the state from POSTRUN to PRERUN.
     /// after this all buffers are deleted (and hence readBuffer will fail.)
-    //void cleanup();
-    void newCleanup();
+    // void cleanup();
+    void cleanup();
 
     /// There are 3 basic states for the VulkanEngine. Described below.
     /// the variable m_state stores that state.
@@ -101,66 +82,50 @@ class RAYX_API VulkanEngine {
   private:
     EngineStates_t m_state = EngineStates_t::PREINIT;
     uint32_t m_numberOfInvocations;
+    uint64_t m_runs = 0;
+
     VkInstance m_Instance;
     VkDebugUtilsMessengerEXT m_DebugMessenger;
-    VkCommandBuffer m_ComputeCommandBuffer;
-    VkCommandBuffer m_TransferCommandBuffer;
-    std::vector<VkCommandBuffer> m_CommandBuffers = {};
-    VkQueue m_ComputeQueue;
-    VkQueue m_TransferQueue;
-    VkDescriptorPool m_DescriptorPool;
     VkPhysicalDevice m_PhysicalDevice = VK_NULL_HANDLE;
     VkDevice m_Device;
     uint32_t m_computeFamily;
     VkCommandPool m_GlobalCommandPool;
+    std::vector<VkCommandBuffer> m_CommandBuffers = {};
+    VkQueue m_ComputeQueue;
+    VkQueue m_TransferQueue;
+    VkDescriptorPool m_DescriptorPool;
     VmaAllocator m_VmaAllocator;
     size_t STAGING_SIZE = 0;
 
     // Sync:
-    struct {
-        VkSemaphore computeSemaphore;
-        VkSemaphore transferSemaphore;
-    } m_Semaphores;
 
-    std::vector<VkSemaphore> m_newSemaphores = {};
+    std::vector<VkSemaphore> m_Semaphores = {};
     struct {
-        std::unique_ptr<Fence> transfer;
         std::unique_ptr<Fence> compute;
     } m_Fences;
 
     // Init:
     void createInstance();
-    void createCache();
+    // void createCache();
     void setupDebugMessenger();
     void pickDevice();
     void pickPhysicalDevice();
     void createLogicalDevice();
     void createCommandPool();
-    void createCommandBuffers();
     void createCommandBuffers(int commandBuffersCount);
     void recordFullCommand();
-    void createFences() {
-        m_Fences.compute = std::make_unique<Fence>(m_Device);
-        m_Fences.transfer = std::make_unique<Fence>(m_Device);
-    }
+    void createFences() { m_Fences.compute = std::make_unique<Fence>(m_Device); }
 
-    void recordInComputeCommandBuffer();
-    void newRecordInCommandBuffer(ComputePass& computePass);
-    void createSemaphores();
-    void newCreateSemaphores(int count);
+    void recordInCommandBuffer(ComputePass& computePass, int cmdBufIndex);
+    void createSemaphores(int count);
     void prepareVma();
 
     void getAllMemories();
     VkDeviceSize getStagingBufferSize();
 
     // Run:
-    void submitCommandBuffer();
-    void updteDescriptorSets();
-    void newUpdateDescriptorSets();
-    void createComputePipeline();
-
-    uint64_t m_runs = 0;
-
+    void submitCommandBuffer(int cmdBufIndex);
+    void updateDescriptorSets();
     VkCommandBuffer createOneTimeCommandBuffer();
 };
 

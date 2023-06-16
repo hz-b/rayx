@@ -19,7 +19,7 @@ namespace RAYX {
  * @brief Trace Batch from cfg
  * @param cfg
  */
-std::vector<Ray> VulkanTracer::newTraceRaw(const TraceRawConfig& cfg) {
+std::vector<Ray> VulkanTracer::traceRaw(const TraceRawConfig& cfg) {
     RAYX_PROFILE_FUNCTION_STDOUT();
     // Fetch CFG Data
     auto rayList = cfg.m_rays;
@@ -42,7 +42,7 @@ std::vector<Ray> VulkanTracer::newTraceRaw(const TraceRawConfig& cfg) {
 
     // Init Vulkan, if not yet initialized.
     if (m_engine.state() == VulkanEngine::EngineStates_t::PREINIT) {
-        m_engine.newInit();
+        m_engine.init();
         // For now we recreate everything
         // TODO (OS) : Only change buffers and not all pass!
         // Create first Shader Stage
@@ -90,15 +90,15 @@ std::vector<Ray> VulkanTracer::newTraceRaw(const TraceRawConfig& cfg) {
 #endif
     }
     // Optional
-    //m_engine.getBufferHandler().waitTransferQueueIdle();
+    // m_engine.getBufferHandler().waitTransferQueueIdle();
 
-    // FIXME(OS) Weird pushconstant update
+    // FIXME(OS): Weird pushconstant update
     m_engine.m_ComputePass->updatePushConstant(0, const_cast<void*>(m_engine.m_pushConstants.pushConstPtr), m_engine.m_pushConstants.size);
 
     // Create Pipeline layouts and Descriptor Layouts. Everytime buffer formation (not data) changes we need to prepare again
     m_engine.prepareComputePipelinePass();
 
-    m_engine.newRun({.m_numberOfInvocations = numberOfRays});
+    m_engine.run({.m_numberOfInvocations = numberOfRays});
 
     std::vector<Ray> out = m_engine.getBufferHandler().readBuffer<Ray>("output-buffer", true);
 
@@ -106,10 +106,9 @@ std::vector<Ray> VulkanTracer::newTraceRaw(const TraceRawConfig& cfg) {
     m_debugBufList = m_engine.getBufferHandler().readBuffer<debugBuffer_t>("debug-buffer", true);
 #endif
 
-    m_engine.newCleanup();
-    RAYX_D_LOG << "Done Trace run";
+    m_engine.cleanup();
     return out;
-}  // namespace RAYX
+}
 
 void VulkanTracer::setPushConstants(const PushConstants* p) {
     if (sizeof(*p) > 128) RAYX_WARN << "Using pushConstants bigger than 128 Bytes might be unsupported on some GPUs. Check Compute Info";

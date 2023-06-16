@@ -3,7 +3,7 @@
 #include "VulkanEngine/VulkanEngine.h"
 namespace RAYX {
 
-void VulkanEngine::newRecordInCommandBuffer(ComputePass& computePass) {
+void VulkanEngine::recordInCommandBuffer(ComputePass& computePass, int cmdBufIndex) {
     RAYX_PROFILE_FUNCTION();
     RAYX_VERB << "Recording new commandBuffer..";
     static uint32_t requiredGroup = 0;
@@ -12,6 +12,7 @@ void VulkanEngine::newRecordInCommandBuffer(ComputePass& computePass) {
         uint32_t y = 0;
         uint32_t z = 0;
     } group;
+    auto cmdBuffer = &m_CommandBuffers[cmdBufIndex];
     /*
     Now we shall start recording commands into the newly allocated command
     buffer.
@@ -19,15 +20,15 @@ void VulkanEngine::newRecordInCommandBuffer(ComputePass& computePass) {
     VkCommandBufferBeginInfo beginInfo = VKINIT::Command::command_buffer_begin_info();
     beginInfo.flags = VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT;
 
-    VK_CHECK_RESULT(vkBeginCommandBuffer(m_ComputeCommandBuffer, &beginInfo));  // start recording commands.
+    VK_CHECK_RESULT(vkBeginCommandBuffer(*cmdBuffer, &beginInfo));  // start recording commands.
 
     /*
     We need to bind a pipeline, AND a descriptor set before we dispatch.
     The validation layer will NOT give warnings if you forget these, so be
     very careful not to forget them.
     */
-    computePass.bind(m_ComputeCommandBuffer, 0);  // TODO(OS) Add multi stage support if needed
-    computePass.bindDescriptorSet(m_ComputeCommandBuffer, 0);
+    computePass.bind(*cmdBuffer, 0);  // TODO(OS) Add multi stage support if needed
+    computePass.bindDescriptorSet(*cmdBuffer, 0);
 
     /*
     Calling vkCmdDispatch basically starts the compute pipeline, and
@@ -89,15 +90,15 @@ void VulkanEngine::newRecordInCommandBuffer(ComputePass& computePass) {
     /**
      * Update push constants
      */
-    vkCmdPushConstants(m_ComputeCommandBuffer, m_ComputePass->getPipelineLayout(0), VK_SHADER_STAGE_COMPUTE_BIT, 0,
-                       m_ComputePass->getPass()[0]->m_pushConstant.getSize(), m_ComputePass->getPass()[0]->m_pushConstant.getData());
+    vkCmdPushConstants(*cmdBuffer, computePass.getPipelineLayout(0), VK_SHADER_STAGE_COMPUTE_BIT, 0,
+                       computePass.getPass()[0]->m_pushConstant.getSize(), computePass.getPass()[0]->m_pushConstant.getData());
 
     RAYX_VERB << "Dispatching commandBuffer...";
     RAYX_VERB << "Sending "
               << "(" << group.x << ", " << group.z << ", " << group.y << ") to the GPU";
-    vkCmdDispatch(m_ComputeCommandBuffer, group.x, group.z, group.y);
+    vkCmdDispatch(*cmdBuffer, group.x, group.z, group.y);
 
-    VK_CHECK_RESULT(vkEndCommandBuffer(m_ComputeCommandBuffer));  // end recording commands.
+    VK_CHECK_RESULT(vkEndCommandBuffer(*cmdBuffer));  // end recording commands.
 }
 
 }  // namespace RAYX

@@ -6,7 +6,7 @@
 
 namespace RAYX {
 
-void VulkanEngine::newCleanup() {
+void VulkanEngine::cleanup() {
     IS_ENGINE_CLEANABLE
     for (auto& pipeline : m_ComputePass->getPass()) {
         pipeline->cleanPipeline(m_Device);

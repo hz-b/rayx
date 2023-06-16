@@ -56,8 +56,7 @@ Rays Tracer::trace(const Beamline& b) {
         Snapshots rawBatchRays;
         {
             RAYX_PROFILE_SCOPE_STDOUT("Tracing");
-            //rawBatchRays = traceRaw(cfg); // OLD ENGINE VERSION
-            rawBatchRays = newTraceRaw(cfg); // NEW ENGINE VERSION
+            rawBatchRays = traceRaw(cfg);
             assert(rawBatchRays.size() == batch_size * maxSnapshots);
         }
 

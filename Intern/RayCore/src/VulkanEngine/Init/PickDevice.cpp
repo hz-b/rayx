@@ -34,11 +34,11 @@ void VulkanEngine::pickPhysicalDevice() {
     // pick fastest device
     m_PhysicalDevice = VK_NULL_HANDLE;
     int currentRating = -1;
-    //std::vector<std::pair<VkPhysicalDevice, int>> suitableDevices;
+    // std::vector<std::pair<VkPhysicalDevice, int>> suitableDevices;
     for (const auto& device : devices) {
         if (isDeviceSuitable(device)) {
             int rating = rateDevice(device);
-            //suitableDevices.push_back(std::pair(device, rating));
+            // suitableDevices.push_back(std::pair(device, rating));
             if (rating > currentRating) {
                 m_PhysicalDevice = device;
                 currentRating = rating;
@@ -185,25 +185,15 @@ void VulkanEngine::createLogicalDevice() {
     }
 
     vkGetDeviceQueue(m_Device, m_computeFamily, 0, &m_ComputeQueue);
-    //vkGetDeviceQueue(m_Device, m_computeFamily, 0, &m_TransferQueue);
 }
 // Create Semaphores for Queue synchronization between commands
-void VulkanEngine::createSemaphores() {
+void VulkanEngine::createSemaphores(int count) {
     VkSemaphoreCreateInfo semaphoreCreateInfo = {};
     semaphoreCreateInfo.sType = VK_STRUCTURE_TYPE_SEMAPHORE_CREATE_INFO;
-
-    vkCreateSemaphore(m_Device, &semaphoreCreateInfo, nullptr, &m_Semaphores.computeSemaphore);
-    vkCreateSemaphore(m_Device, &semaphoreCreateInfo, nullptr, &m_Semaphores.transferSemaphore);
-}
-
-// Create Semaphores for Queue synchronization between commands
-void VulkanEngine::newCreateSemaphores(int count) {
-    VkSemaphoreCreateInfo semaphoreCreateInfo = {};
-    semaphoreCreateInfo.sType = VK_STRUCTURE_TYPE_SEMAPHORE_CREATE_INFO;
-
-    m_newSemaphores.reserve(count);
     for (auto i = 0; i < count; i++) {
-        vkCreateSemaphore(m_Device, &semaphoreCreateInfo, nullptr, &m_newSemaphores[i]);
+        VkSemaphore semaphore;
+        vkCreateSemaphore(m_Device, &semaphoreCreateInfo, nullptr, &semaphore);
+        m_Semaphores.push_back(semaphore);
     }
 }
 

@@ -23,7 +23,11 @@ BufferHandler::BufferHandler(VkDevice& device, VmaAllocator allocator, uint32_t 
     createTransferSemaphore();
 }
 
-BufferHandler::~BufferHandler() { vkFreeCommandBuffers(m_Device, m_CommandPool, 1, &m_TransferCommandBuffer); }
+BufferHandler::~BufferHandler() {
+    vkFreeCommandBuffers(m_Device, m_CommandPool, 1, &m_TransferCommandBuffer);
+    vkDestroyCommandPool(m_Device, m_CommandPool, nullptr);
+    vkDestroySemaphore(m_Device, m_TransferSemaphore, nullptr);
+}
 
 std::vector<VkDescriptorSetLayoutBinding> BufferHandler::getDescriptorBindings(const std::string& pass) {
     RAYX_PROFILE_FUNCTION();

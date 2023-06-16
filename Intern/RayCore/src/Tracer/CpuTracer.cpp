@@ -23,7 +23,7 @@ CpuTracer::CpuTracer() { RAYX_VERB << "Initializing Cpu Tracer.."; }
 
 CpuTracer::~CpuTracer() {}
 
-std::vector<Ray> traceRaw(const TraceRawConfig& cfg) {
+std::vector<Ray> CpuTracer::traceRaw(const TraceRawConfig& cfg) {
     RAYX_PROFILE_FUNCTION_STDOUT();
 
     auto rayList = cfg.m_rays;
@@ -57,8 +57,6 @@ std::vector<Ray> traceRaw(const TraceRawConfig& cfg) {
     // Fetch Rays back from the Shader "container"
     return CPU_TRACER::outputData.data;
 }
-
-std::vector<Ray> CpuTracer::newTraceRaw(const TraceRawConfig& cfg) { return traceRaw(cfg); };
 
 void CpuTracer::setPushConstants(const PushConstants* p) { std::memcpy(&CPU_TRACER::pushConstants, p, sizeof(CPU_TRACER::pushConstants_t)); }
 }  // namespace RAYX

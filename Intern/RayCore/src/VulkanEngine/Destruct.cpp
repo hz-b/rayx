@@ -47,43 +47,38 @@ void inline storePipelineCache(VkDevice& device, VkPipelineCache& cache) {
 }
 
 VulkanEngine::~VulkanEngine() {
-    if (m_state == EngineStates_t::PREINIT) {
-        // return; /* nothing to clean up! */
-    }
-    if (m_state == EngineStates_t::POSTRUN) {
-        RAYX_WARN << ".cleanup() was not called after run!";
-        newCleanup();
+    RAYX_PROFILE_FUNCTION_STDOUT();
+    for (auto& cmdBuf : m_CommandBuffers) {
+        vkFreeCommandBuffers(m_Device, m_GlobalCommandPool, 1, &cmdBuf);
     }
 
-    vkFreeCommandBuffers(m_Device, m_GlobalCommandPool, 1, &m_ComputeCommandBuffer);
-
-    // vmaDestroyAllocator(m_VmaAllocator);
     vkDestroyCommandPool(m_Device, m_GlobalCommandPool, nullptr);
 
-    for (auto& sem : m_newSemaphores) {
+    for (auto& sem : m_Semaphores) {
         vkDestroySemaphore(m_Device, sem, nullptr);
     }
 
     // Destroy Fences
     m_Fences.compute.reset();
-    m_Fences.transfer.reset();
 
-     // TODO: Maybe like this:
+    // Delete BufferHandler and compute Pass
+    // TODO: Needs better interface
     delete m_BufferHandler;
     delete m_ComputePass;
-    // storePipelineCache(m_Device, m_PipelineCache);
+    vmaDestroyAllocator(m_VmaAllocator);
     {
         RAYX_PROFILE_SCOPE_STDOUT("vkDestroyDevice");
         vkDestroyDevice(m_Device, nullptr);
     }
+
     if (enableValidationLayers) {
         DestroyDebugUtilsMessengerEXT(m_Instance, m_DebugMessenger, nullptr);
     }
+
     {
         RAYX_PROFILE_SCOPE("vkDestroyInstance");
         vkDestroyInstance(m_Instance, nullptr);
     }
-
 }
 
 }  // namespace RAYX

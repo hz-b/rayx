@@ -7,13 +7,13 @@ namespace RAYX {
  * @brief This Function initilizes primordial Vulkan things (Instance, Device, etc.)
  *
  */
-void VulkanEngine::newInit() {
+void VulkanEngine::init() {
     createInstance();
     setupDebugMessenger();
     pickDevice();
     createCommandPool();      // FIXME(OS) So far we need one GlobalPool and
     createCommandBuffers(1);  // 1 Command Buffer
-    newCreateSemaphores(1);   // FIXME(OS) We only need one Sempahore (+1 for Transfer in handler)
+    createSemaphores(1);   // FIXME(OS) We only need one Sempahore (+1 for Transfer in handler)
     prepareVma();
     createFences();
     // createCache();

@@ -8,14 +8,14 @@ namespace RAYX {
  *  NO Waitfor fence!
  *
  */
-void VulkanEngine::submitCommandBuffer() {
+void VulkanEngine::submitCommandBuffer(int cmdBufIndex) {
     RAYX_PROFILE_FUNCTION();
     /*
     Now we shall finally submit the recorded command buffer to a queue.
     */
     VkSubmitInfo submitInfo = VKINIT::misc::submit_info();
-    submitInfo.commandBufferCount = 1;                     // submit a single command buffer
-    submitInfo.pCommandBuffers = &m_ComputeCommandBuffer;  // the command buffer to submit.
+    submitInfo.commandBufferCount = 1;                            // submit a single command buffer
+    submitInfo.pCommandBuffers = &m_CommandBuffers[cmdBufIndex];  // the command buffer to submit.
     VK_CHECK_RESULT(m_Fences.compute->forceReset())
     auto f = m_Fences.compute->fence();
     /*
@@ -30,7 +30,6 @@ void VulkanEngine::submitCommandBuffer() {
     actually done executing.
     */
     m_Fences.compute->wait();
-    vkQueueWaitIdle(m_ComputeQueue);
 }
 
 }  // namespace RAYX
