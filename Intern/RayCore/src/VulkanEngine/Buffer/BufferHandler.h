@@ -31,6 +31,11 @@ class RAYX_API BufferHandler {
      */
     template <typename T>
     VulkanBuffer& createBuffer(VulkanBufferCreateInfo createInfo, const std::vector<T>& vec = nullptr) {
+    //         if (m_state == EngineStates_t::PREINIT) {
+    //     RAYX_ERR << "you've forgotten to .init() the VulkanEngine";
+    // } else if (m_state == EngineStates_t::POSTRUN) {
+    //     RAYX_ERR << "you've forgotten to .cleanup() the VulkanEngine";
+    // }
         auto bufName = std::string(createInfo.bufName);
 
         if (isBufferPresent(std::string(bufName))) {  // If buffer already exists, update if it still has the same size
@@ -62,7 +67,7 @@ class RAYX_API BufferHandler {
      *
      * @tparam T
      * @param bufname
-     * @param indirect
+     * @param indirect wait for transfer queue before read or not
      * @return std::vector<T>
      */
     template <typename T>
@@ -80,14 +85,9 @@ class RAYX_API BufferHandler {
     void waitTransferQueueIdle();
 
     std::map<std::string, std::unique_ptr<VulkanBuffer>>* getBuffers() { return &m_Buffers; }
-
-    std::vector<VkDescriptorSetLayoutBinding> getDescriptorBindings(const std::string& passName);
-
     const VulkanBuffer& getStagingBuffer() const { return *m_StagingBuffer; }
-
-    // TODO(OS): This function should be almost illegal...
     inline VulkanBuffer* getBuffer(const std::string& name);
-
+    std::vector<VkDescriptorSetLayoutBinding> getDescriptorBindings(const std::string& passName);
     const VkFence* getTransferFence() const { return m_TransferFence->fence(); }
 
     void insertBufferMemoryBarrier(const std::string& bufferName, const VkCommandBuffer& commandBuffer, VkAccessFlags srcAccessMask,

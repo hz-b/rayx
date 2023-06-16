@@ -42,9 +42,9 @@ class RAYX_API VulkanBuffer {
     VulkanBuffer(const VmaAllocator&, VulkanBufferCreateInfo createInfo);
     ~VulkanBuffer();
 
-    // TODO(OS): Move/Copy constructor maybe needed
-    // VulkanBuffer(const VulkanBuffer&) = delete;
-    // VulkanBuffer& operator=(const VulkanBuffer&) = delete;
+    // Move/Copy of a VulkanBuffer is not alloawed
+    VulkanBuffer(const VulkanBuffer&) = delete;
+    VulkanBuffer& operator=(const VulkanBuffer&) = delete;
 
     VkDeviceSize getSize() const { return m_createInfo.size; }
     const VkBuffer& getBuffer() const { return m_Buffer; };
@@ -71,6 +71,7 @@ class RAYX_API VulkanBuffer {
     VkDeviceMemory m_Memory = VK_NULL_HANDLE;
     VmaAllocation m_Alloca = VK_NULL_HANDLE;
     VmaAllocationInfo m_AllocaInfo;
+
     std::map<std::string, VkDescriptorSetLayoutBinding> m_DescriptorSetBindings;
 };
 

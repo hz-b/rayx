@@ -23,7 +23,7 @@ CpuTracer::CpuTracer() { RAYX_VERB << "Initializing Cpu Tracer.."; }
 
 CpuTracer::~CpuTracer() {}
 
-std::vector<Ray> CpuTracer::traceRaw(const TraceRawConfig& cfg) {
+std::vector<Ray> traceRaw(const TraceRawConfig& cfg) {
     RAYX_PROFILE_FUNCTION_STDOUT();
 
     auto rayList = cfg.m_rays;

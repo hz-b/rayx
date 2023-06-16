@@ -36,29 +36,18 @@ SET(SOURCE
     src/Tracer/VulkanTracer.cpp
     src/Tracer/CpuTracer.cpp
     src/VulkanEngine/Cleanup.cpp
-    src/VulkanEngine/Buffer/DeclareBuffer.cpp
-    src/VulkanEngine/Buffer/CreateBuffer.cpp
     src/VulkanEngine/Buffer/PushConstant.cpp
-    src/VulkanEngine/Buffer/IO/GpuMemcpy.cpp
-    src/VulkanEngine/Buffer/IO/ReadBufferRaw.cpp
-    src/VulkanEngine/Buffer/IO/WriteBufferRaw.cpp
     src/VulkanEngine/Destruct.cpp
     src/VulkanEngine/Init/CommandPool.cpp
-    src/VulkanEngine/Init/DescriptorSetLayout.cpp
     src/VulkanEngine/Init/Instance.cpp
-    src/VulkanEngine/Init/StagingBuffer.cpp
     src/VulkanEngine/Init/Init.cpp
     src/VulkanEngine/Init/PickDevice.cpp
     src/VulkanEngine/Init/CommandBuffer.cpp
-    src/VulkanEngine/Init/Cache.cpp
     src/VulkanEngine/Init/Fence.cpp
-    src/VulkanEngine/Init/ShaderModule.cpp
     src/VulkanEngine/Init/ShaderStage.cpp
     src/VulkanEngine/Init/Descriptor.cpp
     src/VulkanEngine/Init/Initializers.cpp
     src/VulkanEngine/Run/RecordBuffer.cpp
-    src/VulkanEngine/Run/ComputePipeline.cpp
-    src/VulkanEngine/Run/DescriptorSet.cpp
     src/VulkanEngine/Run/RunCommandBuffer.cpp
     src/VulkanEngine/Buffer/VulkanBuffer.cpp
     src/VulkanEngine/Buffer/BufferHandler.cpp

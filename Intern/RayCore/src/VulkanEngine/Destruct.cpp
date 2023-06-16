@@ -52,7 +52,7 @@ VulkanEngine::~VulkanEngine() {
     }
     if (m_state == EngineStates_t::POSTRUN) {
         RAYX_WARN << ".cleanup() was not called after run!";
-        cleanup();
+        newCleanup();
     }
 
     vkFreeCommandBuffers(m_Device, m_GlobalCommandPool, 1, &m_ComputeCommandBuffer);

@@ -5,6 +5,14 @@
 #include "VulkanEngine/Init/Initializers.h"
 
 namespace RAYX {
+/**
+ * @brief Construct a new Buffer Handler object (It is recommended to have one Handler/Vulk.Instance)
+ *
+ * @param device
+ * @param allocator
+ * @param queueFamilyIndex
+ * @param stagingSize use getStagingSize
+ */
 BufferHandler::BufferHandler(VkDevice& device, VmaAllocator allocator, uint32_t queueFamilyIndex, size_t stagingSize)
     : m_Device(device), m_FamilyIndex(queueFamilyIndex), m_VmaAllocator(allocator), m_StagingSize(stagingSize) {
     VKINIT::Command::create_command_pool(device, VK_COMMAND_POOL_CREATE_RESET_COMMAND_BUFFER_BIT, m_FamilyIndex, m_CommandPool);
@@ -25,11 +33,10 @@ std::vector<VkDescriptorSetLayoutBinding> BufferHandler::getDescriptorBindings(c
     }
     return bindings;
 }
-
+/*
+Allocate a command buffer from the creeated command pool.
+*/
 void BufferHandler::createTransferCommandBuffer() {
-    /*
-    Allocate a command buffer from the previously creeated command pool.
-    */
     VkCommandBufferAllocateInfo commandBufferAllocateInfo = {};
     commandBufferAllocateInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
     commandBufferAllocateInfo.commandPool = m_CommandPool;  // specify the command pool to allocate from.
@@ -48,7 +55,11 @@ void BufferHandler::createTransferSemaphore() {
     semaphoreCreateInfo.sType = VK_STRUCTURE_TYPE_SEMAPHORE_CREATE_INFO;
     vkCreateSemaphore(m_Device, &semaphoreCreateInfo, nullptr, &m_TransferSemaphore);
 }
-
+/// Copies data from one buffer to the other with given offsets.
+/// This is used for the buffer <-> staging buffer communication
+/// Careful : This is not an awaiting command so make sure to check the according fence transfer
+/// or Queue Idle before copying again
+/// {read,write}BufferRaw.
 void BufferHandler::gpuMemcpy(VulkanBuffer& buffer_dst, size_t offset_dst, VulkanBuffer& buffer_src, size_t offset_src, size_t bytes) {
     RAYX_PROFILE_FUNCTION();
 
@@ -72,7 +83,21 @@ void BufferHandler::gpuMemcpy(VulkanBuffer& buffer_dst, size_t offset_dst, Vulka
     submitInfo.pCommandBuffers = &m_TransferCommandBuffer;
     auto f = m_TransferFence->fence();
     vkQueueSubmit(m_TransferQueue, 1, &submitInfo, *f);
-    m_TransferFence->wait();
+}
+
+void BufferHandler::insertBufferMemoryBarrier(const std::string& bufferName, const VkCommandBuffer& commandBuffer, VkAccessFlags srcAccessMask,
+                                              VkAccessFlags dstAccessMask, VkPipelineStageFlags srcStageMask, VkPipelineStageFlags dstStageMask,
+                                              VkDeviceSize offset) {
+    auto buffer = getBuffer(bufferName);
+
+    VkBufferMemoryBarrier bufferMemoryBarrier = VKINIT::Sync::buffer_memory_barrier();
+    bufferMemoryBarrier.sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER;
+    bufferMemoryBarrier.srcAccessMask = srcAccessMask;
+    bufferMemoryBarrier.dstAccessMask = dstAccessMask;
+    bufferMemoryBarrier.buffer = buffer->m_Buffer;
+    bufferMemoryBarrier.offset = offset;
+    bufferMemoryBarrier.size = buffer->getSize();  // FIXME(OS): Only available size is bound
+    vkCmdPipelineBarrier(commandBuffer, srcStageMask, dstStageMask, 0, 0, nullptr, 1, &bufferMemoryBarrier, 0, nullptr);
 }
 
 void BufferHandler::createStagingBuffer() {
@@ -90,11 +115,13 @@ void BufferHandler::createStagingBuffer() {
         VMA_ALLOCATION_CREATE_HOST_ACCESS_RANDOM_BIT | VMA_ALLOCATION_CREATE_MAPPED_BIT, VMA_MEMORY_USAGE_AUTO_PREFER_HOST);
 }
 
+/// loads `bytes` many bytes from the staging buffer into `outdata`.
 void BufferHandler::loadFromStagingBuffer(char* outdata, size_t bytes) {
     memcpy(outdata, m_StagingBuffer->getMappedMemory(), bytes);
     m_StagingBuffer->UnmapMemory();
 }
 
+/// writes `bytes` many bytes from `indata` into the staging buffer.
 void BufferHandler::storeToStagingBuffer(char* indata, size_t bytes) {
     memcpy(m_StagingBuffer->getMappedMemory(), indata, bytes);
     m_StagingBuffer->UnmapMemory();
@@ -104,7 +131,12 @@ void BufferHandler::waitTransferQueueIdle() {
     RAYX_D_LOG << "Waiting for transfer Queue...";
     vkQueueWaitIdle(m_TransferQueue);
 }
-
+/**
+ * @brief Get defined/allocated buffer
+ *
+ * @param name buffer name
+ * @return VulkanBuffer*
+ */
 VulkanBuffer* BufferHandler::getBuffer(const std::string& name) {
     if (!isBufferPresent(std::string(name))) {
         RAYX_ERR << "Buffer " << name << " does not exist";
@@ -112,6 +144,11 @@ VulkanBuffer* BufferHandler::getBuffer(const std::string& name) {
     return m_Buffers[name].get();
 }
 
+/// Reads a buffer and writes the data to `outdata`.
+/// The full buffer is read.
+/// This function uses the staging Buffer to read the data in chunks of
+/// STAGING_SIZE. Only allowed for buffers with as OUT usage.
+/// If queue -> Wait for queue to finish before reading
 void BufferHandler::readBufferRaw(const char* bufname, char* outdata, const VkQueue& queue) {
     // if (m_state != EngineStates_t::POSTRUN) {
     //     RAYX_ERR << "you've forgotton to .run() the VulkanEngine. Thats "
@@ -133,12 +170,16 @@ void BufferHandler::readBufferRaw(const char* bufname, char* outdata, const VkQu
     while (remainingBytes > 0) {
         size_t localbytes = std::min((size_t)m_StagingSize, remainingBytes);
         gpuMemcpy(*m_StagingBuffer, 0, *m_Buffers[bufname], offset, localbytes);
+        m_TransferFence->wait();
         loadFromStagingBuffer(outdata + offset, localbytes);
         offset += localbytes;
         remainingBytes -= localbytes;
     }
 }
-
+/// writes the `indata` to the buffer.
+/// It will write the full buffer size bytes.
+/// this function uses staging buffer to write the data in chunks of
+/// STAGING_SIZE. only allowed for buffers with `IN as usage.
 void BufferHandler::writeBufferRaw(const char* bufname, char* indata) {
     VulkanBuffer* b = getBuffer(bufname);
 
@@ -191,21 +232,6 @@ void BufferHandler::deleteBuffer(const char* bufname) {
         RAYX_ERR << "Buffer " << bufname << " does not exist";
     }
     m_Buffers.erase(bufname);
-}
-
-void BufferHandler::insertBufferMemoryBarrier(const std::string& bufferName, const VkCommandBuffer& commandBuffer, VkAccessFlags srcAccessMask,
-                                              VkAccessFlags dstAccessMask, VkPipelineStageFlags srcStageMask, VkPipelineStageFlags dstStageMask,
-                                              VkDeviceSize offset) {
-    auto buffer = getBuffer(bufferName);
-
-    VkBufferMemoryBarrier bufferMemoryBarrier = VKINIT::Sync::buffer_memory_barrier();
-    bufferMemoryBarrier.sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER;
-    bufferMemoryBarrier.srcAccessMask = srcAccessMask;
-    bufferMemoryBarrier.dstAccessMask = dstAccessMask;
-    bufferMemoryBarrier.buffer = buffer->m_Buffer;
-    bufferMemoryBarrier.offset = offset;
-    bufferMemoryBarrier.size = buffer->getSize();  // FIXME(OS): Only available size is bound
-    vkCmdPipelineBarrier(commandBuffer, srcStageMask, dstStageMask, 0, 0, nullptr, 1, &bufferMemoryBarrier, 0, nullptr);
 }
 
 bool BufferHandler::isBufferPresent(const std::string& name) { return m_Buffers.find(name) != m_Buffers.end(); }
