@@ -53,13 +53,17 @@ void VulkanEngine::pickPhysicalDevice() {
                 }
             }
         }
+        if (m_PhysicalDevice == VK_NULL_HANDLE) {
+            RAYX_ERR << "failed to find a suitable GPU!";
+        }
     } else {
         // pick device with given index
         m_PhysicalDevice = devices[m_deviceID];
+        if (!isDeviceSuitable(m_PhysicalDevice)) {
+            RAYX_ERR << "selected device not suitable!";
+        }
     }
-    if (m_PhysicalDevice == VK_NULL_HANDLE) {
-        throw std::runtime_error("failed to find a suitable GPU!");
-    }
+    
 
     VkPhysicalDeviceProperties deviceProperties;
     vkGetPhysicalDeviceProperties(m_PhysicalDevice, &deviceProperties);
@@ -180,8 +184,7 @@ void VulkanEngine::createLogicalDevice() {
     }
 
     if (vkCreateDevice(m_PhysicalDevice, &createInfo, nullptr, &m_Device) != VK_SUCCESS) {
-        RAYX_WARN << "Failed to create device!";
-        throw std::runtime_error("failed to create logical device!");
+        RAYX_ERR << "failed to create logical device!";
     }
 
     vkGetDeviceQueue(m_Device, m_computeFamily, 0, &m_ComputeQueue);

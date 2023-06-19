@@ -26,14 +26,14 @@ void VulkanTracer::listPhysicalDevices() {
     }
     auto deviceList = m_engine.getPhysicalDevices();
     unsigned int deviceIndex = 0;
+    std::cout << "Listing Vulkan Devices:" << std::endl;
     for (const auto& device : deviceList) {
         VkPhysicalDeviceProperties deviceProperties;
         vkGetPhysicalDeviceProperties(device, &deviceProperties);
 
-        // Is there a better option than using cout?
         std::cout << "Device: " << deviceProperties.deviceName << std::endl;
         std::cout << "Device Index: " << deviceIndex++ << std::endl;
-        std::cout << "VendorID: " << deviceProperties.vendorID << std::endl;
+        std::cout << "VendorID: " << deviceProperties.vendorID << std::endl << std::endl;
     }
 }
 

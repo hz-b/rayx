@@ -136,9 +136,8 @@ void TerminalApp::run() {
 
         /// list physical devices
         if (m_CommandParser->m_args.m_listDevices) {
-            std::cout << "Listing Vulkan Devices:" << std::endl;
             dynamic_cast<RAYX::VulkanTracer*>(m_Tracer.get())->listPhysicalDevices();
-            exit(1);
+            exit(0);
         }
         /// select physical device
         if (m_CommandParser->m_args.m_deviceID >= 0) {
