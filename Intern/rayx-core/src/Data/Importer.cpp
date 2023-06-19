@@ -80,6 +80,50 @@ void addBeamlineObjectFromXML(rapidxml::xml_node<>* node, Beamline* beamline, co
     }
 }
 
+RenderDataVec getRenderData(const std::filesystem::path& filename) {
+    RenderDataVec data;
+
+    // TODO(Jannis): This (creating the doc) is duplicated code from importBeamline. If this stays importer should be refactored. Keep in
+    // mind: cstr is state that needs to stay in scope during parsing.
+    std::ifstream fileStream(filename);
+    if (!fileStream) RAYX_ERR << "importBeamline could not open file!";
+
+    std::stringstream buffer;
+    buffer << fileStream.rdbuf();
+
+    std::string fileContents = buffer.str();
+    if (fileContents.empty()) RAYX_ERR << "importBeamline file is empty!";
+
+    std::vector<char> fileContentsCstr(fileContents.c_str(), fileContents.c_str() + fileContents.size() + 1);
+    rapidxml::xml_document<> doc;
+    doc.parse<0>(fileContentsCstr.data());
+
+    RAYX_VERB << "\t Version: " << doc.first_node("lab")->first_node("version")->value();
+    rapidxml::xml_node<>* xml_beamline = doc.first_node("lab")->first_node("beamline");
+
+    for (rapidxml::xml_node<>* object = xml_beamline->first_node(); object; object = object->next_sibling()) {  // Iterating through objects
+        const char* type = object->first_attribute("type")->value();
+
+        // Skip lightsources
+        if (strcmp(type, "Point Source") == 0 ||
+            strcmp(type, "Matrix Source") == 0) {  // TODO(Jannis): The should be a better check for this. Adding a new lightsource would break this.
+            continue;
+        } else {
+            RAYX::xml::Parser parser(object, std::vector<xml::Group>(), std::move(filename));
+
+            RenderData d;
+            d.name = parser.name();
+            d.position = parser.parsePosition();
+            d.orientation = parser.parseOrientation();
+            d.cutout = parser.parseCutout();
+
+            data.push_back(d);
+        }
+    }
+
+    return data;
+}
+
 /** `collection` is an xml object, over whose children-objects we want to
  * iterate in order to add them to the beamline.
  * `collection` may either be a <beamline> or a <group>. */

@@ -8,6 +8,7 @@
 #include <vector>
 
 #include "Beamline/Beamline.h"
+#include "Data/Importer.h"
 #include "ImGuiLayer.h"
 #include "Scene.h"
 #include "Tracer/Tracer.h"
@@ -60,7 +61,7 @@ class Application {
     void run();
 
   private:
-    RAYX::Beamline m_Beamline;
+    RAYX::RenderDataVec m_RenderDataVec;
     RAYX::Rays m_Rays;
 
     Window m_Window;
