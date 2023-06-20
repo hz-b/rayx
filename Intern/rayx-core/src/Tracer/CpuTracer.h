@@ -1,5 +1,6 @@
 #pragma once
 
+#include "../Shared/NffPalik.h"
 #include "Core.h"
 #include "Tracer/Tracer.h"
 
@@ -29,18 +30,6 @@ using uint = unsigned int;
 
 using pushConstants_t = CpuTracer::PushConstants;
 extern pushConstants_t pushConstants;
-
-struct PalikEntry {
-    double energy;
-    double n;
-    double k;
-};
-
-struct NffEntry {
-    double energy;
-    double f1;
-    double f2;
-};
 
 extern int gl_GlobalInvocationID;
 extern ShaderArray<Ray> rayData;

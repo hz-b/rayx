@@ -3,12 +3,7 @@
 #include <string>
 #include <vector>
 
-/** This struct represents one line of a .nff file.  */
-struct NffEntry {
-    double m_energy;
-    double m_f1;
-    double m_f2;
-};
+#include "../Shared/NffPalik.h"
 
 /** This struct represents the contents of a .NKP file.
  *

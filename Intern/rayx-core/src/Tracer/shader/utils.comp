@@ -171,20 +171,7 @@ dvec2 getAtomicMassAndRho(int material) {
     return dvec2(0.0, 0.0);
 }
 
-// for cpp it's already defined in CpuTracer.h
-#ifdef GLSL
-struct PalikEntry {
-    double energy;
-    double n;
-    double k;
-};
-
-struct NffEntry {
-    double energy;
-    double f1;
-    double f2;
-};
-#endif
+#include "../../Shared/NffPalik.h"
 
 int getPalikEntryCount(int material) {
     int m = material - 1;  // in [0, 91]
@@ -208,9 +195,9 @@ PalikEntry getPalikEntry(int index, int material) {
     int i = matIdx[m] + 3 * index;
 
     PalikEntry e;
-    e.energy = mat[i];
-    e.n = mat[i + 1];
-    e.k = mat[i + 2];
+    e.m_energy = mat[i];
+    e.m_n = mat[i + 1];
+    e.m_k = mat[i + 2];
 
     return e;
 }
@@ -222,9 +209,9 @@ NffEntry getNffEntry(int index, int material) {
     int i = matIdx[92 + m] + 3 * index;
 
     NffEntry e;
-    e.energy = mat[i];
-    e.f1 = mat[i + 1];
-    e.f2 = mat[i + 2];
+    e.m_energy = mat[i];
+    e.m_f1 = mat[i + 1];
+    e.m_f2 = mat[i + 2];
 
     return e;
 }
@@ -250,15 +237,15 @@ dvec2 getRefractiveIndex(double energy, int material) {
         PalikEntry low_entry = getPalikEntry(low, material);
         PalikEntry high_entry = getPalikEntry(high, material);
 
-        if (low_entry.energy <= energy &&
+        if (low_entry.m_energy <= energy &&
             energy <=
                 high_entry
-                    .energy) {  // if 'energy' is in range of tha PalikTable
+                    .m_energy) {  // if 'energy' is in range of tha PalikTable
             // binary search
             while (high - low > 1) {
                 int center = (low + high) / 2;
                 PalikEntry center_entry = getPalikEntry(center, material);
-                if (energy < center_entry.energy) {
+                if (energy < center_entry.m_energy) {
                     high = center;
                 } else {
                     low = center;
@@ -266,7 +253,7 @@ dvec2 getRefractiveIndex(double energy, int material) {
             }
 
             PalikEntry entry = getPalikEntry(low, material);
-            return dvec2(entry.n, entry.k);
+            return dvec2(entry.m_n, entry.m_k);
         }
     }
 
@@ -280,7 +267,7 @@ dvec2 getRefractiveIndex(double energy, int material) {
         while (high - low > 1) {
             int center = (low + high) / 2;
             NffEntry center_entry = getNffEntry(center, material);
-            if (energy < center_entry.energy) {
+            if (energy < center_entry.m_energy) {
                 high = center;
             } else {
                 low = center;
@@ -292,9 +279,9 @@ dvec2 getRefractiveIndex(double energy, int material) {
         double rho = massAndRho.y;
 
         NffEntry entry = getNffEntry(low, material);
-        double e = entry.energy;
-        double n = 1 - (415.252 * rho * entry.f1) / (e * e * mass);
-        double k = (415.252 * rho * entry.f2) / (e * e * mass);
+        double e = entry.m_energy;
+        double n = 1 - (415.252 * rho * entry.m_f1) / (e * e * mass);
+        double k = (415.252 * rho * entry.m_f2) / (e * e * mass);
 
         return dvec2(n, k);
     }

@@ -1024,27 +1024,27 @@ TEST_F(TestSuite, testPalik) {
     CHECK_EQ(CPU_TRACER::getPalikEntryCount(Cu), 324);
 
     auto Cu0 = CPU_TRACER::getPalikEntry(0, Cu);
-    CHECK_EQ(Cu0.energy, 1.0);
-    CHECK_EQ(Cu0.n, 0.433);
-    CHECK_EQ(Cu0.k, 8.46);
+    CHECK_EQ(Cu0.m_energy, 1.0);
+    CHECK_EQ(Cu0.m_n, 0.433);
+    CHECK_EQ(Cu0.m_k, 8.46);
 
     auto Cu10 = CPU_TRACER::getPalikEntry(10, Cu);
-    CHECK_EQ(Cu10.energy, 2.3);
-    CHECK_EQ(Cu10.n, 1.04);
-    CHECK_EQ(Cu10.k, 2.59);
+    CHECK_EQ(Cu10.m_energy, 2.3);
+    CHECK_EQ(Cu10.m_n, 1.04);
+    CHECK_EQ(Cu10.m_k, 2.59);
 
     int Au = static_cast<int>(Material::Au);
     CHECK_EQ(CPU_TRACER::getPalikEntryCount(Au), 386);
 
     auto Au0 = CPU_TRACER::getPalikEntry(0, Au);
-    CHECK_EQ(Au0.energy, 0.04959);
-    CHECK_EQ(Au0.n, 20.3);
-    CHECK_EQ(Au0.k, 76.992);
+    CHECK_EQ(Au0.m_energy, 0.04959);
+    CHECK_EQ(Au0.m_n, 20.3);
+    CHECK_EQ(Au0.m_k, 76.992);
 
     auto Au10 = CPU_TRACER::getPalikEntry(10, Au);
-    CHECK_EQ(Au10.energy, 0.11158);
-    CHECK_EQ(Au10.n, 12.963);
-    CHECK_EQ(Au10.k, 57.666);
+    CHECK_EQ(Au10.m_energy, 0.11158);
+    CHECK_EQ(Au10.m_n, 12.963);
+    CHECK_EQ(Au10.m_k, 57.666);
 }
 
 TEST_F(TestSuite, testNff) {
@@ -1055,27 +1055,27 @@ TEST_F(TestSuite, testNff) {
 
     auto Cu0 = CPU_TRACER::getNffEntry(0, Cu);
 
-    CHECK_EQ(Cu0.energy, 10.0);
-    CHECK_EQ(Cu0.f1, -9999.0);
-    CHECK_EQ(Cu0.f2, 1.30088);
+    CHECK_EQ(Cu0.m_energy, 10.0);
+    CHECK_EQ(Cu0.m_f1, -9999.0);
+    CHECK_EQ(Cu0.m_f2, 1.30088);
 
     auto Cu10 = CPU_TRACER::getNffEntry(10, Cu);
-    CHECK_EQ(Cu10.energy, 11.7404);
-    CHECK_EQ(Cu10.f1, -9999.0);
-    CHECK_EQ(Cu10.f2, 1.66946);
+    CHECK_EQ(Cu10.m_energy, 11.7404);
+    CHECK_EQ(Cu10.m_f1, -9999.0);
+    CHECK_EQ(Cu10.m_f2, 1.66946);
 
     int Au = static_cast<int>(Material::Au);
     CHECK_EQ(CPU_TRACER::getNffEntryCount(Au), 506);
 
     auto Au0 = CPU_TRACER::getNffEntry(0, Au);
-    CHECK_EQ(Au0.energy, 10.0);
-    CHECK_EQ(Au0.f1, -9999.0);
-    CHECK_EQ(Au0.f2, 1.73645);
+    CHECK_EQ(Au0.m_energy, 10.0);
+    CHECK_EQ(Au0.m_f1, -9999.0);
+    CHECK_EQ(Au0.m_f2, 1.73645);
 
     auto Au10 = CPU_TRACER::getNffEntry(10, Au);
-    CHECK_EQ(Au10.energy, 11.7404);
-    CHECK_EQ(Au10.f1, -9999.0);
-    CHECK_EQ(Au10.f2, 2.67227);
+    CHECK_EQ(Au10.m_energy, 11.7404);
+    CHECK_EQ(Au10.m_f1, -9999.0);
+    CHECK_EQ(Au10.m_f2, 2.67227);
 }
 
 TEST_F(TestSuite, testRefractiveIndex) {
