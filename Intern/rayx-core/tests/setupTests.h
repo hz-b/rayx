@@ -16,6 +16,7 @@
 #include "Tracer/CpuTracer.h"
 #include "Tracer/VulkanTracer.h"
 #include "Writer/CSVWriter.h"
+#include "cpuAccess.h"
 #include "gmock/gmock.h"
 #include "gtest/gtest.h"
 

@@ -52,7 +52,6 @@ struct _debug_struct {
 SHADER_ARRAY(_debug_struct, d_struct, 6, debugBuf);
 #endif
 
-// for non GLSL(CPP), the according things are mostly defined in CpuTracer.h
 #ifndef GLSL
 int gl_GlobalInvocationID;
 #endif
