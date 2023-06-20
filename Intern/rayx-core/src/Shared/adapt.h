@@ -36,4 +36,12 @@ using dvec3 = glm::dvec3;
 #define ALLOW_UNUSED
 #endif
 
+// define SHADER_ARRAY
+#ifdef GLSL
+#define SHADER_ARRAY(T, ident, binding_id, bufname) \
+    layout(std430, binding = binding_id) buffer bufname { T ident[]; }
+#else
+#define SHADER_ARRAY(T, ident, binding_id, bufname) ShaderArray<T> ident
+#endif
+
 #endif

@@ -24,6 +24,7 @@ class RAYX_API CpuTracer : public Tracer {
 };
 
 namespace CPU_TRACER {
+// TODO can this be merged with adapt.h somehow?
 using dvec2 = glm::dvec2;
 using dvec3 = glm::dvec3;
 using dvec4 = glm::dvec4;
