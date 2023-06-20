@@ -1,11 +1,7 @@
 #ifndef SURFACE_H
 #define SURFACE_H
 
-#ifdef GLSL
-#define INLINE
-#else
-#define INLINE inline
-#endif
+#include "adapt.h"
 
 // a surface is a potentially infinite curved surface in 3d space.
 // as our elements are mostly finite in size, they are represented by a (potentially infinite) surface in combination with a finite cutout (see CTYPE

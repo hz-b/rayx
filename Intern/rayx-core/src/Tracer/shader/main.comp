@@ -2,20 +2,11 @@
 /**************************************************************
  *                    Header & #define
  **************************************************************/
-#ifndef GLSL
-    #define INOUT(x) x&
-    #define OUT(x) x&
-    #define ALLOW_UNUSED [[maybe_unused]]
-#else
-    #define INOUT(x) inout x
-    #define OUT(x) out x
-    #define ALLOW_UNUSED
-
+#ifdef GLSL
     #extension GL_EXT_debug_printf : enable
 	#extension GL_ARB_separate_shader_objects : enable
 	#extension GL_ARB_gpu_shader_int64 : enable
 	#extension GL_GOOGLE_include_directive : enable
-
 	layout(local_size_x = WORKGROUP_SIZE, local_size_y = 1, local_size_z = 1) in;
 #endif
 
@@ -23,6 +14,7 @@
 // `_ray` is that ray, it's always in world coordinates (!).
 #define _ray (rayData[uint(gl_GlobalInvocationID)])
 
+#include "../../Shared/adapt.h"
 #include "../../Shared/Constants.h"
 #include "../../Shared/Ray.h"
 

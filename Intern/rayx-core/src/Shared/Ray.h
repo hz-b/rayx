@@ -1,17 +1,10 @@
+#ifndef RAY_H
+#define RAY_H
+
+#include "adapt.h"
+
 #ifndef GLSL
-#pragma once
-#pragma pack(16)
-
-#define GLM_ENABLE_EXPERIMENTAL
-#include <glm.hpp>
-
-#include "Core.h"
-using dvec3 = glm::dvec3;
-using dvec4 = glm::dvec4;
-
 namespace RAYX {
-#else
-#define RAYX_API
 #endif
 
 // Note: A `dvec3` needs an alignment of 4 * sizeof(double), hence two dvec3s can never be directly after each other (without padding).
@@ -33,4 +26,6 @@ struct RAYX_API Ray {
 
 #ifndef GLSL
 }  // namespace RAYX
+#endif
+
 #endif
