@@ -42,16 +42,6 @@ struct NffEntry {
     double f2;
 };
 
-// this type intends to mimic the GLSL type T[], this is used for layouts.
-template <typename T>
-struct ShaderArray {
-  public:
-    std::vector<T> data;
-
-    inline int length() { return data.size(); }
-    inline T& operator[](int i) { return data[i]; }
-};
-
 extern int gl_GlobalInvocationID;
 extern ShaderArray<Ray> rayData;
 extern ShaderArray<Ray> outputData;

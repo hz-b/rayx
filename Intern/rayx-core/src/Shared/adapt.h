@@ -43,7 +43,19 @@ using dmat4 = glm::dmat4;
 #define SHADER_ARRAY(T, ident, binding_id, bufname) \
     layout(std430, binding = binding_id) buffer bufname { T ident[]; }
 #else
+
 #define SHADER_ARRAY(T, ident, binding_id, bufname) ShaderArray<T> ident
+
+// this type intends to mimic the GLSL type T[], this is used for layouts.
+template <typename T>
+struct ShaderArray {
+  public:
+    std::vector<T> data;
+
+    inline int length() { return data.size(); }
+    inline T& operator[](int i) { return data[i]; }
+};
+
 #endif
 
 // These functions are per default provided by GLSL.
