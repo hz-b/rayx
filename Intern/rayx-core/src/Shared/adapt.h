@@ -44,7 +44,7 @@ using dmat4 = glm::dmat4;
     layout(std430, binding = binding_id) buffer bufname { T ident[]; }
 #else
 
-#define SHADER_ARRAY(T, ident, binding_id, bufname) ShaderArray<T> ident
+#define SHADER_ARRAY(T, ident, binding_id, bufname) ShaderArray<T> RAYX_API ident
 
 // this type intends to mimic the GLSL type T[], this is used for layouts.
 template <typename T>
