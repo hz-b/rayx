@@ -15,9 +15,11 @@
 
 #define GLM_ENABLE_EXPERIMENTAL
 #include <glm.hpp>
-using dmat4 = glm::dmat4;
-using dvec4 = glm::dvec4;
+using dvec2 = glm::dvec2;
 using dvec3 = glm::dvec3;
+using dvec4 = glm::dvec4;
+using dmat3 = glm::dmat3;
+using dmat4 = glm::dmat4;
 #endif
 
 // RAYX_API can be ignored in glsl.
@@ -42,6 +44,13 @@ using dvec3 = glm::dvec3;
     layout(std430, binding = binding_id) buffer bufname { T ident[]; }
 #else
 #define SHADER_ARRAY(T, ident, binding_id, bufname) ShaderArray<T> ident
+#endif
+
+// These functions are per default provided by GLSL.
+#ifndef GLSL
+inline double length(dvec2 v) { return sqrt(v.x * v.x + v.y * v.y); }
+inline double mod(double x, double y) { return glm::mod(x, y); }
+inline double sign(double x) { return glm::sign(x); }
 #endif
 
 #endif

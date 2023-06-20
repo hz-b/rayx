@@ -25,11 +25,6 @@ class RAYX_API CpuTracer : public Tracer {
 
 namespace CPU_TRACER {
 // TODO can this be merged with adapt.h somehow?
-using dvec2 = glm::dvec2;
-using dvec3 = glm::dvec3;
-using dvec4 = glm::dvec4;
-using dmat3 = glm::dmat3;
-using dmat4 = glm::dmat4;
 using uint = unsigned int;
 
 using pushConstants_t = CpuTracer::PushConstants;
@@ -65,10 +60,6 @@ extern ShaderArray<Element> quadricData;
 extern ShaderArray<dvec4> xyznull;
 extern RAYX_API ShaderArray<int> matIdx;
 extern RAYX_API ShaderArray<double> mat;
-
-inline double length(dvec2 v) { return sqrt(v.x * v.x + v.y * v.y); }
-inline double mod(double x, double y) { return glm::mod(x, y); }
-inline double sign(double x) { return glm::sign(x); }
 
 // forward declarations for shader functions
 
