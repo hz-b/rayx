@@ -26,6 +26,14 @@ struct TraceRawConfig {
     std::vector<Element> m_elements;
 };
 
+// Useful for GPU Tracing
+struct PushConstants {  // TODO(Jannis): PushConstants is not an expressive name. Rename to something like TracerConfig
+    double rayIdStart;
+    double numRays;
+    double randomSeed;
+    double maxEvents;
+};
+
 /// A 'snapshot' of a ray, at the time where it undergoes some event.
 /// The event type is specified by `m_eventType`.
 // TODO: split Event and Ray into separate types, because `Event` needs an m_eventType (aka m_weight), whereas Ray does not.
@@ -48,14 +56,6 @@ class RAYX_API Tracer {
     // Everything happening in each traceRaw implementation should be extracted to this function instead.
     // See `BundleHistory` for information about the return value.
     BundleHistory trace(const Beamline&, uint64_t max_batch_size);
-
-    // Useful for GPU Tracing
-    struct PushConstants {  // TODO(Jannis): PushConstants is not an expressive name. Rename to something like TracerConfig
-        double rayIdStart;
-        double numRays;
-        double randomSeed;
-        double maxEvents;
-    };
 
   protected:
     // where the actual tracing happens.

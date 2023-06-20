@@ -28,8 +28,7 @@ namespace CPU_TRACER {
 // TODO can this be merged with adapt.h somehow?
 using uint = unsigned int;
 
-using pushConstants_t = CpuTracer::PushConstants;
-extern pushConstants_t pushConstants;
+extern PushConstants pushConstants;
 
 extern int gl_GlobalInvocationID;
 extern ShaderArray<Ray> rayData;

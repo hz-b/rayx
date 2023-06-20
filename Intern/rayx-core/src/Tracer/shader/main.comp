@@ -61,7 +61,7 @@ int gl_GlobalInvocationID;
  *                    PushConstants
  **************************************************************/
 #ifndef GLSL
-    pushConstants_t pushConstants;
+    PushConstants pushConstants;
 #else 
     layout( push_constant ) uniform constants
     {   
