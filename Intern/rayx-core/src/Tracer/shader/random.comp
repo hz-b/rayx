@@ -8,7 +8,7 @@ const uint64_t rngKey = (uint64_t(0xc8e4fd15) << 32) | uint64_t(0x4ce32f6d);
  * URL: https://arxiv.org/pdf/2004.06278.pdf
  */
 // generates 64-Bit random integers
-uint64_t squares64(INOUT(uint64_t) ctr) {
+uint64_t RAYX_API squares64(INOUT(uint64_t) ctr) {
     uint64_t x, y, z, t;
     y = x = ctr * rngKey;
     z = y + rngKey;
@@ -27,7 +27,7 @@ uint64_t squares64(INOUT(uint64_t) ctr) {
 
 // generates uniformly distributed doubles between 0 and 1 from one 64-Bit
 // random integer
-double squaresDoubleRNG(INOUT(uint64_t) ctr) {
+double RAYX_API squaresDoubleRNG(INOUT(uint64_t) ctr) {
     double a = double(squares64(ctr));
     double div = double(uint64_t(0) - 1);
     return a / div;
@@ -35,7 +35,7 @@ double squaresDoubleRNG(INOUT(uint64_t) ctr) {
 
 // creates (via the Box-Muller transform) a normal distributed double with mean
 // mu and standard deviation sigma
-double squaresNormalRNG(INOUT(uint64_t) ctr, double mu, double sigma) {
+double RAYX_API squaresNormalRNG(INOUT(uint64_t) ctr, double mu, double sigma) {
     double U, V, R, Z;
     double two_pi = 2.0 * PI;
 
