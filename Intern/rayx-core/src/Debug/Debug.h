@@ -9,7 +9,7 @@
  *
  */
 
-#include <Tracer/Ray.h>
+#include <Shared/Ray.h>
 
 #include <array>
 #include <glm.hpp>

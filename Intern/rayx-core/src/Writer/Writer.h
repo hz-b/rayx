@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Tracer/Ray.h"
+#include "Shared/Ray.h"
 
 using uint = unsigned int;
 

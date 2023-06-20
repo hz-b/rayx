@@ -7,8 +7,8 @@
 
 #include "Beamline/Beamline.h"
 #include "Core.h"
-#include "Ray.h"
 #include "Shared/Constants.h"
+#include "Shared/Ray.h"
 
 // if no `--batch` option is given, this it the batch size.
 const uint64_t DEFAULT_BATCH_SIZE = 100000;

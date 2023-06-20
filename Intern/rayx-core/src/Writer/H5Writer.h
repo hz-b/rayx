@@ -5,7 +5,7 @@
 #include <string>
 #include <vector>
 
-#include "Tracer/Ray.h"
+#include "Shared/Ray.h"
 #include "Tracer/Tracer.h"
 #include "Writer/Writer.h"
 

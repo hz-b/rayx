@@ -7,7 +7,7 @@
 #include "Core.h"
 #include "Data/xml.h"
 #include "EnergyDistribution.h"
-#include "Tracer/Ray.h"
+#include "Shared/Ray.h"
 
 namespace RAYX {
 enum class SpreadType { WhiteBand, ThreeEnergies };                // default WhiteBand
