@@ -102,7 +102,7 @@ void writeH5(const RAYX::Rays& rays, std::string filename, const Format& format,
     }
 }
 
-void readH5(RAYX::Rays& rays, std::string filename, const Format& format, std::vector<std::string>& elementNames) {
+void readH5(RAYX::Rays& rays, std::string filename, const Format& format) {
     HighFive::File file(filename, HighFive::File::ReadOnly);
 
     std::vector<double> doubles;
@@ -114,8 +114,7 @@ void readH5(RAYX::Rays& rays, std::string filename, const Format& format, std::v
         doubles.resize(dims[0] * dims[1]);
         dataset.read(doubles.data());
 
-        rays = fromDoubles(doubles, format);  // assuming fromDoubles function exists to convert back to RAYX::Rays
-
+        rays = fromDoubles(doubles, format);
         // read element names
         // int i = 0;
         // while (true) {

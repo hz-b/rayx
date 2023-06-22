@@ -7,7 +7,7 @@
 #include <optional>
 #include <vector>
 
-#include "Beamline/Beamline.h"
+#include "Data/Importer.h"
 
 struct Vertex {
     glm::vec3 pos;
@@ -44,10 +44,12 @@ class Scene {
 
   public:
     Scene();
+    Scene(const RAYX::RenderObjectVec& renderObjects);
     ~Scene() = default;
 
     void addTriangle(const Vertex v1, const Vertex v2, const Vertex v3);
     void addLine(const Vertex v1, const Vertex v2);
+    void fromRenderObject(const RAYX::RenderObject& renderObject);
 
     const std::vector<Vertex>& getVertices() const { return m_vertices; }
     const std::vector<uint16_t>& getIndices(Topography topography) const { return m_indices[topography]; }

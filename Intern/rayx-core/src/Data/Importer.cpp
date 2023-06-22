@@ -80,8 +80,8 @@ void addBeamlineObjectFromXML(rapidxml::xml_node<>* node, Beamline* beamline, co
     }
 }
 
-RenderDataVec getRenderData(const std::filesystem::path& filename) {
-    RenderDataVec data;
+RenderObjectVec getRenderData(const std::filesystem::path& filename) {
+    RenderObjectVec data;
 
     // TODO(Jannis): This (creating the doc) is duplicated code from importBeamline. If this stays importer should be refactored. Keep in
     // mind: cstr is state that needs to stay in scope during parsing.
@@ -111,7 +111,7 @@ RenderDataVec getRenderData(const std::filesystem::path& filename) {
         } else {
             RAYX::xml::Parser parser(object, std::vector<xml::Group>(), std::move(filename));
 
-            RenderData d;
+            RenderObject d;
             d.name = parser.name();
             d.position = parser.parsePosition();
             d.orientation = parser.parseOrientation();

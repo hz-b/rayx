@@ -61,7 +61,7 @@ class Application {
     void run();
 
   private:
-    RAYX::RenderDataVec m_RenderDataVec;
+    RAYX::RenderObjectVec m_RenderObjectVec;
     RAYX::Rays m_Rays;
 
     Window m_Window;

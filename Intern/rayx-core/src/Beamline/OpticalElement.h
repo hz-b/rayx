@@ -16,8 +16,6 @@ enum class ImageType { Point2Point, Astigmatic2Astigmatic };
 struct RAYX_API OpticalElement {
     Element m_element;
     std::string m_name;
-    glm::dmat4 m_orientation;
-    glm::dvec4 m_position;
 };
 
 glm::dmat4 calcTransformationMatrices(glm::dvec4 position, glm::dmat4 orientation, bool calcInMatrix = true);
