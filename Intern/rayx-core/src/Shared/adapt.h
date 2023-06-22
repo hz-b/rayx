@@ -1,4 +1,4 @@
-// This file is inteded to bridge the gap between the GLSL and the c++ languages by defining a common API for both languages.
+// This file is intended to bridge the gap between the GLSL and the c++ languages by defining a common API for both languages.
 
 #ifndef ADAPT_H
 #define ADAPT_H
