@@ -45,58 +45,80 @@ std::vector<Ray> VulkanTracer::traceRaw(const TraceRawConfig& cfg) {
         m_engine.init();
         // For now we recreate everything
         // TODO (OS) : Only change buffers and not all pass!
+
         // Create first Shader Stage
         ShaderStageCreateInfo shaderCreateInfo = {.name = "FullTracer", .shaderPath = "build/bin/comp.spv", .entryPoint = "main"};
+
         // Merge all stages
         std::vector<ShaderStageCreateInfo> shaderStages = {shaderCreateInfo};
+
+        // todo: Idea is to have Preloop-> first loop --loop(inCPU)--> until max bounces
+        std::vector<ShaderStageCreateInfo> splitShaderStages0 = {
+            {.name = "PreLoopStage", .shaderPath = "build/bin/main1.spv", .entryPoint = "main"},
+            {.name = "LoopBodyStage", .shaderPath = "build/bin/main2.spv", .entryPoint = "main"},
+        };
+        //{.name = "PostLoopStage", .shaderPath = "build/bin/main3.spv", .entryPoint = "main"}};
+
+        std::vector<ShaderStageCreateInfo> splitShaderStages1 = {
+            {.name = "LoopBodyStage", .shaderPath = "build/bin/main2.spv", .entryPoint = "main"}};
+
         // Create Compute Pass
         m_engine.createComputePipelinePass({.passName = "BeamlineTracePass", .shaderStagesCreateInfos = shaderStages});
+
+        // Create Compute passes
+        m_engine.createComputePipelinePass({.passName = "InitTracePass", .shaderStagesCreateInfos = splitShaderStages0});
+        m_engine.createComputePipelinePass({.passName = "TracePass", .shaderStagesCreateInfos = splitShaderStages1});
     }
 
     // Create Buffers and bind them to Pass through Descriptors
     {
-        auto pass = m_engine.m_ComputePass;
+        auto pass = m_engine.getComputePass("passName");                     // TODO : Fill
         auto shaderFlag = pass->getShaderStage(0).getShaderStageFlagBits();  // Should return only compute now
         auto passName = std::string(pass->getName());
         // Compute Buffers Meta
         // Bindings are *IN ORDER*
         m_engine.getBufferHandler()
             .createBuffer<Ray>({"ray-buffer", VKBUFFER_IN}, rayList)  // Input Ray Buffer
+            .addDescriptorSetPerPassBinding(passName, 0, shaderFlag)
             .addDescriptorSetPerPassBinding(passName, 0, shaderFlag);
 
         m_engine.getBufferHandler()
-            .createBuffer({"output-buffer", VKBUFFER_OUT, (numberOfRays * sizeof(Ray) * (int)cfg.m_maxSnapshots)})  // Output Ray Buffer
+            .createBuffer({"ray-meta-buffer", VKBUFFER_OUT, rayList.size()*sizeof(RayMeta)})  // Meta Ray Buffer
             .addDescriptorSetPerPassBinding(passName, 1, shaderFlag);
 
         m_engine.getBufferHandler()
-            .createBuffer<double>({"quadric-buffer", VKBUFFER_IN}, beamlineData)  // Beamline quadric info
+            .createBuffer({"output-buffer", VKBUFFER_OUT, (numberOfRays * sizeof(Ray) * (int)cfg.m_maxSnapshots)})  // Output Ray Buffer
             .addDescriptorSetPerPassBinding(passName, 2, shaderFlag);
 
         m_engine.getBufferHandler()
-            .createBuffer({"xyznull-buffer", VKBUFFER_IN, 100})  // FIXME(OS): This buffer is not needed?
+            .createBuffer<double>({"quadric-buffer", VKBUFFER_IN}, beamlineData)  // Beamline quadric info
             .addDescriptorSetPerPassBinding(passName, 3, shaderFlag);
 
         m_engine.getBufferHandler()
-            .createBuffer<int>({"material-index-table", VKBUFFER_IN}, materialTables.indexTable)  /// Material info
+            .createBuffer({"xyznull-buffer", VKBUFFER_IN, 100})  // FIXME(OS): This buffer is not needed?
             .addDescriptorSetPerPassBinding(passName, 4, shaderFlag);
 
         m_engine.getBufferHandler()
-            .createBuffer<double>({"material-table", VKBUFFER_IN}, materialTables.materialTable)  // Material info
+            .createBuffer<int>({"material-index-table", VKBUFFER_IN}, materialTables.indexTable)  /// Material info
             .addDescriptorSetPerPassBinding(passName, 5, shaderFlag);
+
+        m_engine.getBufferHandler()
+            .createBuffer<double>({"material-table", VKBUFFER_IN}, materialTables.materialTable)  // Material info
+            .addDescriptorSetPerPassBinding(passName, 6, shaderFlag);
 #ifdef RAYX_DEBUG_MODE
         m_engine.getBufferHandler()
             .createBuffer({"debug-buffer", VKBUFFER_OUT, numberOfRays * sizeof(debugBuffer_t)})  // Debug Matrix Buffer
-            .addDescriptorSetPerPassBinding(passName, 6, shaderFlag);
+            .addDescriptorSetPerPassBinding(passName, 7, shaderFlag);
 #endif
     }
     // Optional
     // m_engine.getBufferHandler().waitTransferQueueIdle();
 
     // FIXME(OS): Weird pushconstant update
-    m_engine.m_ComputePass->updatePushConstant(0, const_cast<void*>(m_engine.m_pushConstants.pushConstPtr), m_engine.m_pushConstants.size);
+    m_engine.getComputePass("todo")->updatePushConstant(0, const_cast<void*>(m_engine.m_pushConstants.pushConstPtr), m_engine.m_pushConstants.size);
 
     // Create Pipeline layouts and Descriptor Layouts. Everytime buffer formation (not data) changes we need to prepare again
-    m_engine.prepareComputePipelinePass();
+    m_engine.prepareComputePipelinePasses();  // TODO
 
     m_engine.run({.m_numberOfInvocations = numberOfRays});
 

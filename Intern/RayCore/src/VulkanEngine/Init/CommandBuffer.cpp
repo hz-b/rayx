@@ -43,8 +43,6 @@ void VulkanEngine::createCommandBuffers(int commandBuffersCount) {
     commandBufferAllocateInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
     commandBufferAllocateInfo.commandPool = m_GlobalCommandPool;  // specify the command pool to allocate from.
 
-    // for (auto i = 0; i < commandBuffersCount; i++) {
-    //     VkCommandBuffer cmdBuf;
     /* if the command buffer is primary, it can be directly submitted to
     / queues. A secondary buffer has to be called from some primary command
     / buffer, and cannot be directly submitted to a queue. To keep things

@@ -1,0 +1,250 @@
+#define WORKGROUP_SIZE 32
+/**************************************************************
+ *                    Header & #define
+ **************************************************************/
+#ifndef GLSL
+#define INOUT(x) x&
+#define OUT(x) x&
+#define ALLOW_UNUSED [[maybe_unused]]
+#else
+#define INOUT(x) inout x
+#define OUT(x) out x
+#define ALLOW_UNUSED
+
+#extension GL_EXT_debug_printf : enable
+#extension GL_ARB_separate_shader_objects : enable
+#extension GL_ARB_gpu_shader_int64 : enable
+#extension GL_GOOGLE_include_directive : enable
+
+layout(local_size_x = WORKGROUP_SIZE, local_size_y = 1, local_size_z = 1) in;
+#endif
+
+// Every shader execution calculates the route for a single ray.
+// `_ray` is that ray, it's always in world coordinates (!).
+#define _ray (rayData[uint(gl_GlobalInvocationID)])
+#define _rayMeta (rayMetaData[uint(gl_GlobalInvocationID)])
+
+#include "../../Shared/Constants.h"
+
+/**************************************************************
+ *                    Structs
+ **************************************************************/
+
+// for non GLSL(CPP), the according things are mostly defined in CpuTracer.h
+#ifndef GLSL
+int gl_GlobalInvocationID;
+
+ShaderArray<Ray> rayData;
+ShaderArray<RayMeta> rayMetaData;
+ShaderArray<Ray> outputData;
+ShaderArray<Element> elements;
+ShaderArray<dvec4> xyznull;
+ShaderArray<int> matIdx;
+ShaderArray<double> mat;
+
+#else
+struct Ray {
+    dvec3 m_position;
+    // Initially weight for _ray is `W_IN_COMPUTATION`.
+    // See the potential values of `m_weight` in `Constants.h`.
+    double m_weight;
+    dvec3 m_direction;
+    double m_energy;
+    dvec4 m_stokes;
+    double m_pathLength;
+    double m_order;
+    double m_lastElement;
+    double m_extraParam;
+};
+
+struct RayMeta {
+    uint64_t nextElementId;
+    double ctr;
+    bool finalized;
+};
+
+#ifdef RAYX_DEBUG_MODE
+struct _debug_struct {
+    dmat4 _dMat;  // Can also be used as vectors or scalar
+};
+#endif
+
+/**************************************************************
+ *                    SHADER LAYOUT (GPU-ONLY)
+ **************************************************************/
+
+// don't use this directly. Use `_ray` instead.
+layout(std140, binding = 0) buffer ibuf { Ray rayData[]; };
+
+layout(std140, binding = 1) buffer ibufm { RayMeta rayMetaData[]; };
+
+// don't use this directly. Use `takeSnapshot` instead.
+layout(std140, binding = 2) buffer obuf { Ray outputData[]; };
+
+// std430 is required so that Element is layouted like in C++.
+// see https://www.khronos.org/opengl/wiki/Interface_Block_(GLSL) for more details on layouting.
+layout(std430, binding = 3) buffer qbuf { Element elements[]; };
+
+layout(std140, binding = 4) buffer xyzbuf { dvec4 xyznull[]; };
+
+layout(binding = 5) buffer materialIndexBuf {
+    int matIdx[];  // matIdx[0..91] contains the indices of the Palik Table, whereas matIdx[92..92+91] contains the indices of the NffTable.
+                   // generally, an entry of matIdx tells you the index you need to look up in the 'mat'-table below.
+};
+
+layout(binding = 6) buffer materialBuf {
+    double mat[];  // contains: (Palik tables of all materials concatenated together) concatenated with (Nff tables of all materials concatenated
+                   // together) use the matIdx-table to determine the relevant indices for when which table starts and stops.
+};
+
+#ifdef RAYX_DEBUG_MODE
+layout(binding = 7) buffer debugBuf {
+    _debug_struct d_struct[];  // contains nff table of all materials concatenated together
+};
+#endif
+
+#endif
+
+/**************************************************************
+ *                    PushConstants
+ **************************************************************/
+#ifndef GLSL
+pushConstants_t pushConstants;
+#else
+layout(push_constant) uniform constants {
+    double rayIdStart;  // the ray id of the first ray of the batch.
+    double numRays;     // The total number of rays in this tracing process.
+    double randomSeed;
+    double maxSnapshots;  // each ray will take multiple snapshots (copies) while tracing, those are then sent to the CPU for further processing.
+}
+pushConstants;
+#endif
+
+/**************************************************************
+ *                    Functions && vars
+ **************************************************************/
+
+uint64_t rayId() { return uint64_t(pushConstants.rayIdStart) + uint64_t(gl_GlobalInvocationID); }
+
+bool finalized;
+
+// `i in [0, maxSnapshots]`.
+// Will return the index in outputData to access the `i'th` output ray belonging to this shader call.
+// Typically used as `outputData[output_index(i)]`.
+uint output_index(uint i) { return uint(gl_GlobalInvocationID) * uint(pushConstants.maxSnapshots) + i; }
+
+
+// take a snapshot and store it in the next free spot in outputData.
+// `r` will typically be _ray, or some related ray.
+void takeSnapshot(Ray r, double w) {
+    if (_rayMeta.finalized) {
+        return;
+    }
+
+    if (w == W_UNINIT) {
+#ifndef GLSL
+        RAYX_ERR << "takeSnapshot failed: no free spots!";
+#endif
+    }
+
+    for (uint i = 0; i < pushConstants.maxSnapshots; i++) {
+        uint idx = output_index(i);
+        if (outputData[idx].m_weight == W_UNINIT) {  // checks whether this spot is free
+            outputData[idx] = r;
+            outputData[idx].m_weight = w;
+            return;
+        }
+    }
+
+// no spots were found.
+// this shouldn't be using `throw`, as otherwise we might end up in infinite recursion.
+#ifndef GLSL
+    RAYX_WARN << "takeSnapshot failed: no free spots!";
+#endif
+}
+
+// like `takeSnapshot` above, but it will prevent taking more snapshots after this.
+// Is used for snapshots terminating the path of the ray.
+void takeFinalSnapshot(Ray r, double w) {
+    takeSnapshot(r, w);
+    _rayMeta.finalized = true;
+}
+
+// throws an error, and termiantes the program
+#ifdef GLSL
+#define throw(string) takeFinalSnapshot(_ray, W_FATAL_ERROR)
+#else
+#define throw(string) RAYX_ERR << string
+#endif
+
+/**************************************************************
+ *                    MAIN
+ **************************************************************/
+
+// @brief: Dynamic ray tracing: check which ray hits which element first. **This happens for only bounce**
+// in this function we need to make sure that rayData ALWAYS remains in GLOBAL coordinates (it can be changed in a function but needs to be changed
+// back before the function returns to this function)
+void main() {
+    // for (int i = 0; i < maxBounces; i++) {
+    Collision col = findCollision();
+
+    if (!col.found) {
+        // no element was hit.
+        // Ray is considered to move forward to inf.
+        // This is the only constellation in which a snapshot is in world coordinates.
+        takeFinalSnapshot(_ray, W_FLY_OFF);  ///////////////////////TODO CHANGE THIS
+        return;                              // RETURN "EMPTY"
+    }
+
+    // transform ray and intersection point in ELEMENT coordiantes
+    nextElement = elements[col.elementIndex];
+    Ray elem_ray = rayMatrixMult(_ray, nextElement.m_inTrans);
+
+    // Calculate interaction(reflection,material, absorption etc.) of ray with detected next element
+    int btype = int(nextElement.m_behaviour.m_type);
+
+    elem_ray.m_pathLength += length(elem_ray.m_position - col.hitpoint);
+    elem_ray.m_position = col.hitpoint;
+    elem_ray.m_lastElement = col.elementIndex + 1;  // TODO remove this "+1", element ids should consistently start at 0.
+
+    switch (btype) {
+        case (BTYPE_MIRROR):
+            elem_ray = behaveMirror(elem_ray, col.elementIndex, ctr, col);
+            break;
+        case (BTYPE_GRATING):
+            elem_ray = behaveGrating(elem_ray, col.elementIndex, ctr, col);
+            break;
+        case (BTYPE_SLIT):
+            elem_ray = behaveSlit(elem_ray, col.elementIndex, ctr, col);
+            break;
+        case (BTYPE_RZP):
+            elem_ray = behaveRZP(elem_ray, col.elementIndex, ctr, col);
+            break;
+        case (BTYPE_IMAGE_PLANE):
+            elem_ray = behaveImagePlane(elem_ray, col.elementIndex, col);
+            break;
+    }
+
+    // the ray might finalize due to being absorbed, or because an error occured while tracing!
+    if (_rayMeta.finalized) {
+        return;  // RETURN FINALIZED
+    }
+
+    // use extraParameter to store the order in which the ray has hit which optical element (e.g extraParameter = 412 -> first hit element 2, then
+    // 1, then 4)
+    elem_ray.m_extraParam += ((col.elementIndex + 1) * bounce) * int(elem_ray.m_lastElement == col.elementIndex + 1);
+    bounce *= pow(10, int(elem_ray.m_lastElement == col.elementIndex + 1));
+
+    takeSnapshot(elem_ray, W_JUST_HIT_ELEM);  // TODO: SNAPSHOT
+
+    // transform back to WORLD coordinates
+    _ray = rayMatrixMult(elem_ray, nextElement.m_outTrans);
+    //}
+
+    ///////END OF LOOP
+    if (findCollision().found) {
+        takeFinalSnapshot(_ray, W_NOT_ENOUGH_BOUNCES);
+    } else {
+        takeFinalSnapshot(_ray, W_FLY_OFF);
+    }
+}

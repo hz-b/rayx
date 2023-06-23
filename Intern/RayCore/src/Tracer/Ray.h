@@ -47,4 +47,10 @@ struct RAYX_API Ray {
         return ray;
     }
 };
+
+struct RAYX_API RayMeta {
+    uint64_t nextElementId = 0;
+    double ctr = 0.0;
+    bool finalized = false;
+};
 }  // namespace RAYX

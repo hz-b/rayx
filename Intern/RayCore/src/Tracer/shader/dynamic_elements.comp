@@ -2,12 +2,6 @@
 // in this function we need to make sure that rayData ALWAYS remains in GLOBAL coordinates (it can be changed in a function but needs to be changed
 // back before the function returns to this function)
 void dynamicElements() {
-    // #ifdef GLSL
-    // // debugPrintfEXT("Hello from GPU. numrays %lf\n", pushConstants.maxSnapshots);
-    // if(_ray.m_energy != 0.0) {
-    //     debugPrintfEXT("Hello from GPU. energy %f\n", _ray.m_energy);}
-    // #endif
-
     // placeholder, info should later be transfered to shader
     const int maxBounces = elements.length();
     // ray specific "seed" for random numbers -> every ray has a different starting value for the counter that creates the random number

@@ -13,7 +13,7 @@ void VulkanEngine::init() {
     pickDevice();
     createCommandPool();      // FIXME(OS) So far we need one GlobalPool and
     createCommandBuffers(1);  // 1 Command Buffer
-    createSemaphores(1);   // FIXME(OS) We only need one Sempahore (+1 for Transfer in handler)
+    createSemaphores(1);      // FIXME(OS) We only need one Sempahore (+1 for Transfer in handler)
     prepareVma();
     createFences();
     // createCache();
@@ -31,16 +31,57 @@ void VulkanEngine::initBufferHandler() {
     RAYX_D_LOG << "BufferHandler initialized.";
 }
 
+ComputePass* VulkanEngine::getComputePass(std::string passName) {
+    for (auto p : m_computePasses) {
+        if (p->getName() == passName) {
+            return p;
+        }
+    }
+    RAYX_ERR << "Pass " << passName << " not found.";
+    return nullptr;
+}
+/**
+ * @brief Adds a new Compute Pass to the engine
+ *
+ * @param createInfo
+ */
 void VulkanEngine::createComputePipelinePass(const ComputePassCreateInfo& createInfo) {
-    m_ComputePass = new ComputePass(m_Device, createInfo);
-    RAYX_D_LOG << m_ComputePass->getName() << " ComputePipelinePass created.";
+    auto pass = new ComputePass(m_Device, createInfo);
+    m_computePasses.push_back(pass);
+    RAYX_D_LOG << pass->getName() << " ComputePipelinePass created.";
 }
 
-// Buffer Descriptor binding
-void VulkanEngine::prepareComputePipelinePass() {
-    auto bindings = getBufferHandler().getDescriptorBindings(m_ComputePass->getName());
-    m_ComputePass->prepare(bindings);
+/**
+ * @brief Prepare a compute Pass (Buffer Descriptor binding)
+ *
+ * @param index pass index
+ */
+void VulkanEngine::prepareComputePipelinePass(int index) {
+    auto bindings = getBufferHandler().getDescriptorBindings(m_computePasses[index]->getName());
+    m_computePasses[index]->prepare(bindings);
     RAYX_D_LOG << "ComputePipelinePass prepared.";
+}
+/**
+ * @brief Prepare a compute Pass (Buffer Descriptor binding)
+ *
+ * @param passName Compute Pass name (if exists)
+ */
+void VulkanEngine::prepareComputePipelinePass(std::string passName) {
+    ComputePass* pass = getComputePass(passName);
+    auto bindings = getBufferHandler().getDescriptorBindings(pass->getName());
+    pass->prepare(bindings);
+    RAYX_D_LOG << "ComputePipelinePass prepared.";
+}
+/**
+ * @brief  Prepares all compute Passes (Buffer Descriptor binding)
+ *
+ */
+void VulkanEngine::prepareComputePipelinePasses() {
+    for (auto pass : m_computePasses) {
+        auto bindings = getBufferHandler().getDescriptorBindings(pass->getName());
+        pass->prepare(bindings);
+    }
+    RAYX_D_LOG << "ComputePipelinePass(s) prepared.";
 }
 
 }  // namespace RAYX

@@ -1,0 +1,174 @@
+#define WORKGROUP_SIZE 32
+/**************************************************************
+ *                    Header & #define
+ **************************************************************/
+#ifndef GLSL
+#define INOUT(x) x&
+#define OUT(x) x&
+#define ALLOW_UNUSED [[maybe_unused]]
+#else
+#define INOUT(x) inout x
+#define OUT(x) out x
+#define ALLOW_UNUSED
+
+#extension GL_EXT_debug_printf : enable
+#extension GL_ARB_separate_shader_objects : enable
+#extension GL_ARB_gpu_shader_int64 : enable
+#extension GL_GOOGLE_include_directive : enable
+
+layout(local_size_x = WORKGROUP_SIZE, local_size_y = 1, local_size_z = 1) in;
+#endif
+
+// Every shader execution calculates the route for a single ray.
+// `_ray` is that ray, it's always in world coordinates (!).
+#define _ray (rayData[uint(gl_GlobalInvocationID)])
+
+#include "../../Shared/Constants.h"
+
+/**************************************************************
+ *                    Structs
+ **************************************************************/
+
+// for non GLSL(CPP), the according things are mostly defined in CpuTracer.h
+#ifndef GLSL
+int gl_GlobalInvocationID;
+
+ShaderArray<Ray> rayData;
+ShaderArray<RayMeta> rayMetaData;
+ShaderArray<Ray> outputData;
+ShaderArray<Element> elements;
+ShaderArray<dvec4> xyznull;
+ShaderArray<int> matIdx;
+ShaderArray<double> mat;
+
+#else
+struct Ray {
+    dvec3 m_position;
+    // Initially weight for _ray is `W_IN_COMPUTATION`.
+    // See the potential values of `m_weight` in `Constants.h`.
+    double m_weight;
+    dvec3 m_direction;
+    double m_energy;
+    dvec4 m_stokes;
+    double m_pathLength;
+    double m_order;
+    double m_lastElement;
+    double m_extraParam;
+};
+
+struct RayMeta {
+    uint64_t nextElementId;
+    double ctr;
+    bool finalized;
+};
+
+#ifdef RAYX_DEBUG_MODE
+struct _debug_struct {
+    dmat4 _dMat;  // Can also be used as vectors or scalar
+};
+#endif
+
+/**************************************************************
+ *                    SHADER LAYOUT (GPU-ONLY)
+ **************************************************************/
+
+// don't use this directly. Use `_ray` instead.
+layout(std140, binding = 0) buffer ibuf { Ray rayData[]; };
+
+layout(std140, binding = 1) buffer ibufm { RayMeta rayMetaData[]; };
+
+// don't use this directly. Use `takeSnapshot` instead.
+layout(std140, binding = 2) buffer obuf { Ray outputData[]; };
+
+// std430 is required so that Element is layouted like in C++.
+// see https://www.khronos.org/opengl/wiki/Interface_Block_(GLSL) for more details on layouting.
+layout(std430, binding = 3) buffer qbuf { Element elements[]; };
+
+layout(std140, binding = 4) buffer xyzbuf { dvec4 xyznull[]; };
+
+layout(binding = 5) buffer materialIndexBuf {
+    int matIdx[];  // matIdx[0..91] contains the indices of the Palik Table, whereas matIdx[92..92+91] contains the indices of the NffTable.
+                   // generally, an entry of matIdx tells you the index you need to look up in the 'mat'-table below.
+};
+
+layout(binding = 6) buffer materialBuf {
+    double mat[];  // contains: (Palik tables of all materials concatenated together) concatenated with (Nff tables of all materials concatenated
+                   // together) use the matIdx-table to determine the relevant indices for when which table starts and stops.
+};
+
+#ifdef RAYX_DEBUG_MODE
+layout(binding = 7) buffer debugBuf {
+    _debug_struct d_struct[];  // contains nff table of all materials concatenated together
+};
+#endif
+
+#endif
+
+/**************************************************************
+ *                    PushConstants
+ **************************************************************/
+#ifndef GLSL
+pushConstants_t pushConstants;
+#else
+layout(push_constant) uniform constants {
+    double rayIdStart;  // the ray id of the first ray of the batch.
+    double numRays;     // The total number of rays in this tracing process.
+    double randomSeed;
+    double maxSnapshots;  // each ray will take multiple snapshots (copies) while tracing, those are then sent to the CPU for further processing.
+}
+pushConstants;
+#endif
+
+/**************************************************************
+ *                    Functions && vars
+ **************************************************************/
+
+uint64_t rayId() { return uint64_t(pushConstants.rayIdStart) + uint64_t(gl_GlobalInvocationID); }
+
+// `i in [0, maxSnapshots]`.
+// Will return the index in outputData to access the `i'th` output ray belonging to this shader call.
+// Typically used as `outputData[output_index(i)]`.
+uint output_index(uint i) { return uint(gl_GlobalInvocationID) * uint(pushConstants.maxSnapshots) + i; }
+
+// sets all output rays controlled by this shader call to W_UNINIT.
+void uninitOutRays() {
+    for (uint i = 0; i < pushConstants.maxSnapshots; i++) {
+        outputData[output_index(i)].m_weight = W_UNINIT;
+    }
+}
+
+/**************************************************************
+ *                    MAIN
+ **************************************************************/
+void main() {
+    rayMetaData[uint(gl_GlobalInvocationID)].finalized = false;
+    uninitOutRays();
+
+#ifdef GLSL
+    if (uint(gl_GlobalInvocationID) == 2) {
+        debugPrintfEXT("Hello from GPU. \n");
+    }
+#endif
+
+    // placeholder, info should later be transfered to shader
+    const int maxBounces = elements.length();
+    // ray specific "seed" for random numbers -> every ray has a different starting value for the counter that creates the random number
+    const uint64_t MAX_UINT64 = ~(uint64_t(0));
+    uint64_t workerCounterNum = MAX_UINT64 / uint64_t(pushConstants.numRays);
+    uint64_t rayMetaData[uint(gl_GlobalInvocationID)].ctr =
+        rayId() * workerCounterNum + uint64_t(pushConstants.randomSeed * MAX_UINT64);  
+
+#ifdef RAYX_DEBUG_MODE  // Debug Matrix only works in GPU Mode and on DEBUG Build Type
+#ifdef GLSL
+    // Set Debug Struct of current Ray to identity
+    d_struct[uint(gl_GlobalInvocationID)]._dMat = dmat4(1);
+#endif
+#endif
+
+    /////////////////////////TODO : THIS AT THEN END ? ////////////
+    Element nextElement;
+    // at the end of this function we apply inTrans, if no collision happened (i.e. nextElement undefined), we want this to do nothing.
+    nextElement.m_inTrans = dmat4(1);
+    nextElement.m_outTrans = dmat4(1);
+    return;
+}

@@ -76,9 +76,10 @@ void VulkanBuffer::UnmapMemory() {
     }
 }
 
-void VulkanBuffer::addDescriptorSetPerPassBinding(const std::string& passName, uint32_t binding, VkShaderStageFlags shaderStageFlag) {
+VulkanBuffer& VulkanBuffer::addDescriptorSetPerPassBinding(const std::string& passName, uint32_t binding, VkShaderStageFlags shaderStageFlag) {
     auto b = VKINIT::Descriptor::descriptor_set_layout_binding(m_createInfo.bufferType, shaderStageFlag, binding);
     m_DescriptorSetBindings.insert(std::pair<std::string, VkDescriptorSetLayoutBinding>(passName, b));
+    return *this;
 }
 
 VkDescriptorBufferInfo VulkanBuffer::getDescriptorInfo(VkDeviceSize offset) { return VkDescriptorBufferInfo{m_Buffer, offset, m_createInfo.size}; }

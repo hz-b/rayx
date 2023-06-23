@@ -64,7 +64,10 @@ VulkanEngine::~VulkanEngine() {
     // Delete BufferHandler and compute Pass
     // TODO: Needs better interface
     delete m_BufferHandler;
-    delete m_ComputePass;
+    for (auto pass : m_computePasses) {
+        delete pass;
+    }
+
     vmaDestroyAllocator(m_VmaAllocator);
     {
         RAYX_PROFILE_SCOPE_STDOUT("vkDestroyDevice");

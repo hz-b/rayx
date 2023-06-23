@@ -4,9 +4,9 @@
 
 namespace RAYX {
 
-void VulkanEngine::updateDescriptorSets() {
-    //m_ComputePass->updateDescriptorSets(m_BufferHandler);
-    m_ComputePass->simpleupdate(m_BufferHandler);
+void VulkanEngine::updateDescriptorSets(std::string passName) {
+    // m_ComputePass->updateDescriptorSets(m_BufferHandler);
+    getComputePass(passName)->simpleupdate(m_BufferHandler);
 }
 
 void VulkanEngine::run(VulkanEngineRunSpec_t spec) {
@@ -17,12 +17,15 @@ void VulkanEngine::run(VulkanEngineRunSpec_t spec) {
     }
     m_numberOfInvocations = spec.m_numberOfInvocations;
 
+    // TODO! Implement loop here
     // Using new descriptor manager
-    updateDescriptorSets();
-    m_ComputePass->getPass()[0]->updatePushConstants(const_cast<void*>(m_pushConstants.pushConstPtr),
-                                                     m_pushConstants.size);  // TODO : Why is the cast happeing?
+    updateDescriptorSets("PassName");
+    getComputePass("PassName")
+        ->getPass()[0]
+        ->updatePushConstants(const_cast<void*>(m_pushConstants.pushConstPtr),
+                              m_pushConstants.size);  // TODO : Why is the cast happeing?
     // prepareComputePipelinePass();
-    recordInCommandBuffer(*m_ComputePass, 0);
+    recordInCommandBuffer(*getComputePass("PassName"), 0);
     submitCommandBuffer(0);
     m_runs++;
     m_state = EngineStates_t::POSTRUN;

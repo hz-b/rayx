@@ -34,7 +34,9 @@ class RAYX_API VulkanEngine {
     // TODO (OS): Add the Vulkan state FSM Controls
     void initBufferHandler();
     void createComputePipelinePass(const ComputePassCreateInfo&);
-    void prepareComputePipelinePass();
+    void prepareComputePipelinePass(int index);
+    void prepareComputePipelinePass(std::string passName);
+    void prepareComputePipelinePasses();
     BufferHandler& getBufferHandler() const { return *m_BufferHandler; }
 
     void run(VulkanEngineRunSpec_t);
@@ -67,6 +69,7 @@ class RAYX_API VulkanEngine {
     const VkPhysicalDevice& getPhysicalDevice() const { return m_PhysicalDevice; };
     const VkQueue& getComputeQueue() const { return m_ComputeQueue; };
     const VkQueue& getTransferQueue() const { return m_TransferQueue; };
+    ComputePass* getComputePass(std::string passName);
 
     // PushConstants are "constants" updated on each Dispatch Call (or similar) in the pipeline
     // Please pay attention to alignment rules
@@ -77,7 +80,8 @@ class RAYX_API VulkanEngine {
     };
     pushConstants_t m_pushConstants;
     BufferHandler* m_BufferHandler;  // new
-    ComputePass* m_ComputePass;      // New
+    std::vector<ComputePass*> m_computePasses;
+    // ComputePass* m_ComputePass;  // New
 
   private:
     EngineStates_t m_state = EngineStates_t::PREINIT;
@@ -125,7 +129,7 @@ class RAYX_API VulkanEngine {
 
     // Run:
     void submitCommandBuffer(int cmdBufIndex);
-    void updateDescriptorSets();
+    void updateDescriptorSets(std::string passName);
     VkCommandBuffer createOneTimeCommandBuffer();
 };
 
