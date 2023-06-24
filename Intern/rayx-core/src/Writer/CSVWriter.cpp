@@ -112,7 +112,7 @@ RAYX::BundleHistory loadCSV(std::string filename) {
         while (std::getline(ss, num, DELIMITER)) {
             d.push_back(std::stod(num));
         }
-        assert(d.size() == 16);
+        assert(d.size() == 15);
         RAYX::Ray ray = {.m_position = {d[0], d[1], d[2]},
                          .m_eventType = d[3],
                          .m_direction = {d[4], d[5], d[6]},
