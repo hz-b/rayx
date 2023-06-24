@@ -39,19 +39,17 @@ TEST_F(TestSuite, globalCoordinates_20rays) { compareLastAgainstRayUI("globalCoo
 TEST_F(TestSuite, pm_ell_ip_200mirrormis) { compareLastAgainstRayUI("pm_ell_ip_200mirrormis"); }
 
 TEST_F(TestSuite, Ellipsoid) {
-    auto rayx_raw = traceRML("Ellipsoid");
+    auto rayx = traceRML("Ellipsoid");
 
-    writeToOutputCSV(rayx_raw, "Ellipsoid.rayx");
-    auto rayx = extractLastHit(rayx_raw);
+    writeToOutputCSV(rayx, "Ellipsoid.rayx");
 
     bool found_atleast_one = false;
-    for (auto r : rayx) {
-        if (!intclose(r.m_extraParam, 21)) {
-            continue;
+    for (auto ray_hist : rayx) {
+        auto opt = lastSequentialHit(ray_hist, 2);
+        if (opt) {
+            CHECK_EQ(opt->m_position, glm::dvec3(0, 0, 0), 1e-11);
+            found_atleast_one = true;
         }
-
-        CHECK_EQ(r.m_position, glm::dvec3(0, 0, 0), 1e-11);
-        found_atleast_one = true;
     }
     CHECK(found_atleast_one);
 }

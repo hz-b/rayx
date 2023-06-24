@@ -121,7 +121,7 @@ RAYX::BundleHistory loadCSV(std::string filename) {
                          .m_pathLength = d[12],
                          .m_order = d[13],
                          .m_lastElement = d[14],
-                         .m_extraParam = d[15]};
+                         .m_padding = -1.0};
         if (out.size() <= ray_id) {
             out.push_back({});
         }

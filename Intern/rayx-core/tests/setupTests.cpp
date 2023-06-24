@@ -48,7 +48,7 @@ RAYX::Ray parseCSVline(std::string line) {
     ray.m_stokes = {vec[11], vec[12], vec[13], vec[14]};
 
     // otherwise uninitialized:
-    ray.m_extraParam = -1;
+    ray.m_padding = -1;
     ray.m_eventType = -1;
     ray.m_lastElement = -1;
     ray.m_order = -1;
@@ -67,21 +67,6 @@ RAYX::Beamline loadBeamline(std::string filename) {
 void writeToOutputCSV(const RAYX::BundleHistory& hist, std::string filename) {
     std::string f = canonicalizeRepositoryPath("Intern/rayx-core/tests/output/" + filename + ".csv").string();
     writeCSV(hist, f, FULL_FORMAT);
-}
-
-/// sequentialExtraParam yields the desired extraParam for rays which went the
-/// sequential route through a beamline with `count` OpticalElements.
-/// sequentialExtraParam(2) = 21
-/// sequentialExtraParam(3) = 321 // i.e. first element 1, then 2 and then 3.
-/// ...
-int sequentialExtraParam(int count) {
-    int out = 0;
-    int fac = 1;
-    for (int i = 1; i <= count; i++) {  // i goes from 1 to count
-        out += i * fac;
-        fac *= 10;
-    }
-    return out;
 }
 
 RAYX::BundleHistory traceRML(std::string filename) {
@@ -165,28 +150,38 @@ void compareBundleHistories(const RAYX::BundleHistory& r1, const RAYX::BundleHis
     }
 }
 
+// If the ray from `ray_hist` went through the whole beamline sequentially, we return its last hit event.
+// Otherwise we return `{}`, aka None.
+std::optional<RAYX::Ray> lastSequentialHit(RayHistory ray_hist, unsigned int beamline_len) {
+    // The ray should hit every element from the beamline once, plus one FLY_OFF event.
+    if (ray_hist.size() != beamline_len + 1) {
+        return {};
+    }
+
+    for (int i = 0; i < beamline_len; i++) {
+        if (ray_hist[i].m_lastElement != i + 1) {  // TODO get rid of this +1 eventually
+            return {};
+        }
+        if (ray_hist[i].m_eventType != ETYPE_JUST_HIT_ELEM) {
+            return {};
+        }
+    }
+
+    // this returns the last 'hit' event.
+    return ray_hist[ray_hist.size() - 2];
+}
+
 // returns the rayx rays converted to be ray-UI compatible.
 std::vector<RAYX::Ray> rayUiCompat(std::string filename) {
     auto beamline = loadBeamline(filename);
-    auto rays = tracer->trace(beamline, DEFAULT_BATCH_SIZE);
-
-    int seq = sequentialExtraParam(beamline.m_OpticalElements.size());
+    BundleHistory hist = tracer->trace(beamline, DEFAULT_BATCH_SIZE);
 
     std::vector<RAYX::Ray> out;
 
-    for (auto rr : rays) {
-        for (auto r : rr) {
-            // The ray has to be sequential (and it must finally end up at the last element of beamline)
-            if (!intclose(r.m_extraParam, seq)) {
-                continue;
-            }
-
-            // The ray has to have eventType != ETYPE_FLY_OFF
-            if (r.m_eventType != ETYPE_JUST_HIT_ELEM) {
-                continue;
-            }
-
-            out.push_back(r);
+    for (auto ray_hist : hist) {
+        auto opt_ray = lastSequentialHit(ray_hist, beamline.m_OpticalElements.size());
+        if (opt_ray) {
+            out.push_back(*opt_ray);
         }
     }
 

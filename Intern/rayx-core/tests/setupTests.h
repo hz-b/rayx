@@ -188,6 +188,10 @@ std::vector<RAYX::Ray> loadCSVRayUI(std::string filename);
 /// Checks for equality up to the tolerance `t`.
 void compareBundleHistories(const RAYX::BundleHistory& r1, const RAYX::BundleHistory& r2, double t = 1e-11);
 
+// If the ray from `ray_hist` went through the whole beamline sequentially, we return its last hit event.
+// Otherwise we return `{}`, aka None.
+std::optional<RAYX::Ray> lastSequentialHit(RayHistory ray_hist, unsigned int beamline_len);
+
 /// Only cares for the rays hitting the last object of the beamline, and check whether they are the same as their RayUI counter part.
 /// Ray UI rays are obtained Export > RawRaysOutgoing.
 /// This also filters out non-sequential rays to compare to Ray-UI correctly.

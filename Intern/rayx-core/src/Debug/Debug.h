@@ -184,9 +184,9 @@ inline std::vector<double> formatAsVec(std::array<double, N> arg) {
 inline std::vector<double> formatAsVec(double arg) { return {arg}; }
 
 inline std::vector<double> formatAsVec(Ray arg) {
-    return {arg.m_position.x,  arg.m_position.y, arg.m_position.z,  arg.m_eventType, arg.m_direction.x, arg.m_direction.y,
-            arg.m_direction.z, arg.m_energy,     arg.m_stokes.x,    arg.m_stokes.y,  arg.m_stokes.z,    arg.m_stokes.w,
-            arg.m_pathLength,  arg.m_order,      arg.m_lastElement, arg.m_extraParam};
+    return {arg.m_position.x,  arg.m_position.y,  arg.m_position.z, arg.m_eventType, arg.m_direction.x,
+            arg.m_direction.y, arg.m_direction.z, arg.m_energy,     arg.m_stokes.x,  arg.m_stokes.y,
+            arg.m_stokes.z,    arg.m_stokes.w,    arg.m_pathLength, arg.m_order,     arg.m_lastElement};
 }
 
 void dbg(const std::string& filename, int line, std::string name, std::vector<double> v);

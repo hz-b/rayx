@@ -21,7 +21,10 @@ struct RAYX_API Ray {
     double m_pathLength;
     double m_order;
     double m_lastElement;
-    double m_extraParam;
+
+    // This double only exists, so that sizeof(Ray) is divisble by sizeof(dvec4) for alignment reasons.
+    // This should never be read or written.
+    double m_padding;
 };
 
 #ifndef GLSL

@@ -95,10 +95,6 @@ static Format FULL_FORMAT = {
         .name = "lastElement",
         .get_double = [](uint, uint, RAYX::Ray ray) { return ray.m_lastElement; },
     },
-    FormatComponent{
-        .name = "extraParam",
-        .get_double = [](uint, uint, RAYX::Ray ray) { return ray.m_extraParam; },
-    },
 };
 
 // These includes allow the user to just import Writer.h and still access
