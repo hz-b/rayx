@@ -11,6 +11,7 @@
 #include "Data/Importer.h"
 #include "Debug/Debug.h"
 #include "Material/Material.h"
+#include "Random.h"
 #include "Shared/Constants.h"
 #include "Shared/Ray.h"
 #include "Tracer/CpuTracer.h"
@@ -162,7 +163,10 @@ class TestSuite : public testing::Test {
 #endif
         }
     }
-    virtual void SetUp() {}
+
+    // called before every test invocation.
+    virtual void SetUp() { RAYX::fixSeed(RAYX::FIXED_SEED); }
+
     static void TearDownTestSuite() { tracer = nullptr; }
 };
 

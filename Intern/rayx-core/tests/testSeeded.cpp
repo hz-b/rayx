@@ -49,25 +49,13 @@ TEST_F(TestSuite, randomNumbers_normal) {
     CHECK_EQ(r, -0.83114042984660008);
 }
 
-TEST_F(TestSuite, PointSource_seeded) {
-    RAYX::fixSeed(RAYX::FIXED_SEED);
-    compareAgainstCorrect("PointSource_seeded");
-}
+TEST_F(TestSuite, PointSource_seeded) { compareAgainstCorrect("PointSource_seeded"); }
 
 // Tests sourceDepth of MatrixSource.
-TEST_F(TestSuite, MatrixSource_seeded) {
-    RAYX::fixSeed(RAYX::FIXED_SEED);
-    compareAgainstCorrect("MatrixSource_seeded");
-}
+TEST_F(TestSuite, MatrixSource_seeded) { compareAgainstCorrect("MatrixSource_seeded"); }
 
 // Tests reflectivity of materials of a PlaneMirror.
-TEST_F(TestSuite, PlaneMirror_refl_seeded) {
-    RAYX::fixSeed(RAYX::FIXED_SEED);
-    compareAgainstCorrect("PlaneMirror_refl_seeded");
-}
+TEST_F(TestSuite, PlaneMirror_refl_seeded) { compareAgainstCorrect("PlaneMirror_refl_seeded"); }
 
 // Tests the Energy Distribution of a MatrixSource.
-TEST_F(TestSuite, MatrixSource_distr_seeded) {
-    RAYX::fixSeed(RAYX::FIXED_SEED);
-    compareAgainstCorrect("MatrixSource_distr_seeded");
-}
+TEST_F(TestSuite, MatrixSource_distr_seeded) { compareAgainstCorrect("MatrixSource_distr_seeded"); }
