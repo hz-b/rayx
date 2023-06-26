@@ -7,4 +7,4 @@ Rayx is a simulation tool for beamlines at electron storage rings. At this stage
 - Multiple beamlines can easily be traced in succession
 - Groups of objects can be added for easy group transforms (e.g., Reflection Zone Plates)
 
-You can find our [Wiki here](https://hz-b.github.io/RAY-X/)
+You can find our [Wiki here](https://hz-b.github.io/rayx/)
