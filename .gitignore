@@ -16,7 +16,4 @@ CMakeCache.txt
 cmake.check_cache
 
 #VSCode Debugger files
-Intern/rayx/src/results.json
-Intern/rayx-core/src/Tracer/results.json
-Intern/rayx-core/src/VulkanEngine/results.json
-Intern/rayx-core/src/VulkanEngine/Init/results.json
+**/results.json
