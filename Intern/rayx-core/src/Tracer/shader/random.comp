@@ -1,0 +1,56 @@
+const uint64_t rngKey = (uint64_t(0xc8e4fd15) << 32) | uint64_t(0x4ce32f6d);
+
+// ------------ Random Numbers --------------
+/*
+ * Title: "Squares: A Fast Counter-Based RNG"
+ * Author: Bernard Widynski
+ * Date: November 24, 2020
+ * URL: https://arxiv.org/pdf/2004.06278.pdf
+ */
+// generates 64-Bit random integers
+uint64_t RAYX_API squares64(INOUT(uint64_t) ctr) {
+    uint64_t x, y, z, t;
+    y = x = ctr * rngKey;
+    z = y + rngKey;
+    ctr++;
+
+    x = x * x + y;
+    x = (x >> 32) | (x << 32); /* round 1 */
+    x = x * x + z;
+    x = (x >> 32) | (x << 32); /* round 2 */
+    x = x * x + y;
+    x = (x >> 32) | (x << 32); /* round 3 */
+    t = x = (x * x + z);
+    x = (x >> 32) | (x << 32); /* round 4 */
+    return t ^ ((x * x + y) >> 32);
+}
+
+// generates uniformly distributed doubles between 0 and 1 from one 64-Bit
+// random integer
+double RAYX_API squaresDoubleRNG(INOUT(uint64_t) ctr) {
+    double a = double(squares64(ctr));
+    double div = double(uint64_t(0) - 1);
+    return a / div;
+}
+
+// creates (via the Box-Muller transform) a normal distributed double with mean
+// mu and standard deviation sigma
+double RAYX_API squaresNormalRNG(INOUT(uint64_t) ctr, double mu, double sigma) {
+    double U, V, R, Z;
+    double two_pi = 2.0 * PI;
+
+    U = squaresDoubleRNG(ctr);
+    V = squaresDoubleRNG(ctr);
+    R = squaresDoubleRNG(ctr);
+    Z = sqrt(-2.0 * r8_log(U));
+
+    if (R < 0.5)
+        Z *= r8_sin(two_pi * V);
+    else
+        Z *= r8_cos(two_pi * V);
+
+    Z = Z * sigma + mu;
+
+    return Z;
+}
+// -----------------------------------------------

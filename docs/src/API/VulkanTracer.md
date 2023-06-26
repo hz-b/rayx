@@ -1,4 +1,4 @@
-# VulkanTracer (RAY-X)
+# VulkanTracer (rayx)
 
 The VulkanTracer is a ray tracing module using VULKAN by KHRONOS GROUP to efficiently trace rays with hardware acceleration.
 

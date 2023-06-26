@@ -49,7 +49,7 @@ Thus, we have coordinate systems for optical elements, that are identical for ea
 </details>
 
 The following sections describe how to calculate the transformation matrices from beam coordinates to element coordinates and again to (new) beam coordinates based on the given distance and angles in the sequential setup.
-This is relevant for RAY-X if you need to calculate the world coordinates from the user parameters that describe the sequential setup yourself and cannot directly use the world coordinates from the rml file: 
+This is relevant for rayx if you need to calculate the world coordinates from the user parameters that describe the sequential setup yourself and cannot directly use the world coordinates from the rml file: 
 
 
 <details><summary>Positioning of elements in sequential setup</summary>
@@ -190,7 +190,7 @@ The inverse misalignment matrix is then calculated as follows:
 
 Since rotation matrices are orthogonal, the inverse of \\((R^x_{-\psi} R^y_{\phi} R^z_{\chi})\\) is the same as the transpose. The inverse of the translation matrix is the same but with negative offsets.
 
-\\(M_{mis}\\), \\(M_{mis}^{-1}\\) are multiplied with \\(M_{b/g2e}\\) and \\(M_{e2g/b}\\), respectively, to form the final transformation matrices which could be given to the shader if we would still use the sequential approach in RAY-X. However, we use a global coordinate system instead of the beam coordinate system but don't worry you didn't just read all of that for nothing, it will be important in the derivation of the transformation from global to element coordinates and back.
+\\(M_{mis}\\), \\(M_{mis}^{-1}\\) are multiplied with \\(M_{b/g2e}\\) and \\(M_{e2g/b}\\), respectively, to form the final transformation matrices which could be given to the shader if we would still use the sequential approach in rayx. However, we use a global coordinate system instead of the beam coordinate system but don't worry you didn't just read all of that for nothing, it will be important in the derivation of the transformation from global to element coordinates and back.
 </details>
 
 The next section describes how to replace the beam coordinate system that is used in the sequential approach with the global coordinate system and how to calculate the position and orientation.

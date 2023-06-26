@@ -3,7 +3,7 @@ import os
 import subprocess 
 import tempfile
 
-#Only execute inside IDE with RAY-X as root
+#Only execute inside IDE with rayx as root
 def checkForTerminal():
     cwd = os.getcwd()
     TerminalApp_Path = 'build/bin/TerminalApp'

@@ -1,0 +1,80 @@
+// @brief: Dynamic ray tracing: check which ray hits which element first
+// in this function we need to make sure that rayData ALWAYS remains in GLOBAL coordinates (it can be changed in a function but needs to be changed
+// back before the function returns to this function)
+void dynamicElements() {
+    // placeholder, info should later be transfered to shader
+    const int maxBounces = elements.length();
+
+    // ray specific "seed" for random numbers -> every ray has a different starting value for the counter that creates the random number
+    const uint64_t MAX_UINT64 = ~(uint64_t(0));
+    uint64_t workerCounterNum = MAX_UINT64 / uint64_t(pushConstants.numRays);
+    uint64_t ctr              = rayId() * workerCounterNum + uint64_t(pushConstants.randomSeed * MAX_UINT64);
+
+    #ifdef RAYX_DEBUG_MODE // Debug Matrix only works in GPU Mode and on DEBUG Build Type
+    #ifdef GLSL
+        // Set Debug Struct of current Ray to identity
+        d_struct[uint(gl_GlobalInvocationID)]._dMat = dmat4(1);
+    #endif
+    #endif
+
+    Element nextElement;
+    // at the end of this function we apply inTrans, if no collision happened (i.e. nextElement undefined), we want this to do nothing.
+    nextElement.m_inTrans = dmat4(1);
+    nextElement.m_outTrans = dmat4(1);
+
+    // Iterate through all bounces
+    for (int i = 0; i < maxBounces; i++) {
+        Collision col = findCollision();
+
+        if (!col.found) {
+            // no element was hit.
+            // Ray is considered to move forward to inf.
+            // This is the only constellation in which an event is in world coordinates.
+            recordFinalEvent(_ray, ETYPE_FLY_OFF);
+            return;
+        }
+
+        // transform ray and intersection point in ELEMENT coordiantes
+        nextElement = elements[col.elementIndex];
+        Ray elem_ray = rayMatrixMult(_ray, nextElement.m_inTrans);
+
+        // Calculate interaction(reflection,material, absorption etc.) of ray with detected next element
+        int btype = int(nextElement.m_behaviour.m_type);
+
+        elem_ray.m_pathLength += length(elem_ray.m_position - col.hitpoint);
+        elem_ray.m_position = col.hitpoint;
+        elem_ray.m_lastElement = col.elementIndex + 1; // TODO remove this "+1", element ids should consistently start at 0.
+
+        switch(btype) {
+            case (BTYPE_MIRROR):
+                elem_ray = behaveMirror(elem_ray, col.elementIndex, ctr, col);
+                break;
+            case (BTYPE_GRATING):
+                elem_ray = behaveGrating(elem_ray, col.elementIndex, ctr, col);
+                break;
+            case (BTYPE_SLIT) :
+                elem_ray = behaveSlit(elem_ray, col.elementIndex, ctr, col);
+                break;
+            case (BTYPE_RZP):
+                elem_ray = behaveRZP(elem_ray, col.elementIndex, ctr, col);
+                break;
+            case (BTYPE_IMAGE_PLANE):
+                elem_ray = behaveImagePlane(elem_ray, col.elementIndex, col);
+                break;
+        }
+
+        // the ray might finalize due to being absorbed, or because an error occured while tracing!
+        if (finalized) { return; }
+
+        recordEvent(elem_ray, ETYPE_JUST_HIT_ELEM);
+
+        // transform back to WORLD coordinates
+        _ray = rayMatrixMult(elem_ray, nextElement.m_outTrans);
+    }
+
+    if (findCollision().found) {
+        recordFinalEvent(_ray, ETYPE_NOT_ENOUGH_BOUNCES);
+    } else {
+        recordFinalEvent(_ray, ETYPE_FLY_OFF);
+    }
+}

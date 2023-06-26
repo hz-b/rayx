@@ -1,6 +1,6 @@
 # How to use our formatter
 
-In Ray-X we decided on using a formatter to keep our code clean and organized. Here you can read how to use it.
+In rayx we decided on using a formatter to keep our code clean and organized. Here you can read how to use it.
 
 ## General
 
