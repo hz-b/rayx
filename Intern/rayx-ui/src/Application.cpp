@@ -124,7 +124,8 @@ void Application::cleanup() {
     vkDestroyPipeline(m_Device, m_TrianglePipeline, nullptr);
     vkDestroyPipeline(m_Device, m_LinePipeline, nullptr);
     vkDestroyPipelineLayout(m_Device, m_PipelineLayout, nullptr);
-    vkDestroyRenderPass(m_Device, m_RenderPass, nullptr);
+    vkDestroyRenderPass(m_Device, m_TriangleRenderPass, nullptr);
+    vkDestroyRenderPass(m_Device, m_LineRenderPass, nullptr);
 
     for (size_t i = 0; i < m_maxFramesInFlight; i++) {
         vkDestroyBuffer(m_Device, m_UniformBuffers[i], nullptr);
@@ -424,7 +425,42 @@ void Application::createRenderPass() {
     renderPassInfo.dependencyCount = 1;
     renderPassInfo.pDependencies = &dependency;
 
-    if (vkCreateRenderPass(m_Device, &renderPassInfo, nullptr, &m_RenderPass) != VK_SUCCESS) {
+    if (vkCreateRenderPass(m_Device, &renderPassInfo, nullptr, &m_TriangleRenderPass) != VK_SUCCESS) {
+        throw std::runtime_error("failed to create render pass!");
+    }
+
+    // Line Render Pass
+    // Define the color attachment.
+    colorAttachment = {};
+    colorAttachment.format = m_SwapChain.ImageFormat;
+    colorAttachment.samples = VK_SAMPLE_COUNT_1_BIT;
+    colorAttachment.loadOp = VK_ATTACHMENT_LOAD_OP_LOAD;
+    colorAttachment.storeOp = VK_ATTACHMENT_STORE_OP_STORE;
+    colorAttachment.stencilLoadOp = VK_ATTACHMENT_LOAD_OP_DONT_CARE;
+    colorAttachment.stencilStoreOp = VK_ATTACHMENT_STORE_OP_DONT_CARE;
+    colorAttachment.initialLayout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
+    colorAttachment.finalLayout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
+
+    // Define the color attachment reference.
+    colorAttachmentRef = {};
+    colorAttachmentRef.attachment = 0;
+    colorAttachmentRef.layout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
+
+    // Define the subpass.
+    subpass = {};
+    subpass.pipelineBindPoint = VK_PIPELINE_BIND_POINT_GRAPHICS;
+    subpass.colorAttachmentCount = 1;
+    subpass.pColorAttachments = &colorAttachmentRef;
+
+    // Define the render pass.
+    renderPassInfo = {};
+    renderPassInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_CREATE_INFO;
+    renderPassInfo.attachmentCount = 1;
+    renderPassInfo.pAttachments = &colorAttachment;
+    renderPassInfo.subpassCount = 1;
+    renderPassInfo.pSubpasses = &subpass;
+
+    if (vkCreateRenderPass(m_Device, &renderPassInfo, nullptr, &m_LineRenderPass) != VK_SUCCESS) {
         throw std::runtime_error("failed to create render pass!");
     }
 }
@@ -545,7 +581,7 @@ void Application::createGraphicsPipeline() {
     pipelineInfo.pColorBlendState = &colorBlending;
     pipelineInfo.pDynamicState = &dynamicState;
     pipelineInfo.layout = m_PipelineLayout;
-    pipelineInfo.renderPass = m_RenderPass;
+    pipelineInfo.renderPass = m_TriangleRenderPass;
     pipelineInfo.subpass = 0;
     pipelineInfo.basePipelineHandle = VK_NULL_HANDLE;
 
@@ -575,6 +611,7 @@ void Application::createGraphicsPipeline() {
     linePipelineInfo.basePipelineIndex = -1;
     linePipelineInfo.pInputAssemblyState = &lineInputAssembly;  // Use the new input assembly
     linePipelineInfo.pRasterizationState = &lineRasterizer;     // Use the new rasterization state
+    linePipelineInfo.renderPass = m_LineRenderPass;
 
     if (vkCreateGraphicsPipelines(m_Device, VK_NULL_HANDLE, 1, &linePipelineInfo, nullptr, &m_LinePipeline) != VK_SUCCESS) {
         throw std::runtime_error("failed to create line graphics pipeline!");
@@ -592,7 +629,7 @@ void Application::createFramebuffers() {
 
         VkFramebufferCreateInfo framebufferInfo{};
         framebufferInfo.sType = VK_STRUCTURE_TYPE_FRAMEBUFFER_CREATE_INFO;
-        framebufferInfo.renderPass = m_RenderPass;
+        framebufferInfo.renderPass = m_TriangleRenderPass;
         framebufferInfo.attachmentCount = 1;
         framebufferInfo.pAttachments = attachments;
         framebufferInfo.width = m_SwapChain.Extent.width;
@@ -825,7 +862,7 @@ void Application::recordCommandBuffer(VkCommandBuffer commandBuffer, uint32_t im
 
     VkRenderPassBeginInfo renderPassInfo{};
     renderPassInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
-    renderPassInfo.renderPass = m_RenderPass;
+    renderPassInfo.renderPass = m_TriangleRenderPass;
     renderPassInfo.framebuffer = m_SwapChain.framebuffers[imageIndex];
     renderPassInfo.renderArea.offset = {0, 0};
     renderPassInfo.renderArea.extent = m_SwapChain.Extent;
@@ -863,13 +900,20 @@ void Application::recordCommandBuffer(VkCommandBuffer commandBuffer, uint32_t im
 
     vkCmdDrawIndexed(commandBuffer, static_cast<uint32_t>(m_Scene.getIndices(Scene::TRIA_TOPOGRAPHY).size()), 1, 0, 0, 0);
 
+    vkCmdEndRenderPass(commandBuffer);
+
     // Line pipeline
+    renderPassInfo.renderPass = m_LineRenderPass;
+    renderPassInfo.framebuffer = m_SwapChain.framebuffers[imageIndex];
+    renderPassInfo.renderArea.offset = {0, 0};
+    renderPassInfo.renderArea.extent = m_SwapChain.Extent;
+
+    vkCmdBeginRenderPass(commandBuffer, &renderPassInfo, VK_SUBPASS_CONTENTS_INLINE);
+
     vkCmdBindPipeline(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, m_LinePipeline);
     vkCmdBindIndexBuffer(commandBuffer, m_LineIndexBuffer, 0, VK_INDEX_TYPE_UINT16);
 
     vkCmdDrawIndexed(commandBuffer, static_cast<uint32_t>(m_Scene.getIndices(Scene::LINE_TOPOGRAPHY).size()), 1, 0, 0, 0);
-
-    vkCmdEndRenderPass(commandBuffer);
 
     if (vkEndCommandBuffer(commandBuffer) != VK_SUCCESS) {
         throw std::runtime_error("failed to record command buffer!");
