@@ -57,11 +57,14 @@ class RAYX_API Tracer {
     // See `BundleHistory` for information about the return value.
     BundleHistory trace(const Beamline&, uint64_t max_batch_size);
 
+    void setDevice(int deviceID);
   protected:
     // where the actual tracing happens.
     // std::vector<Ray> will contain all events for all Rays (and also the ETYPE_UNINIT events).
     virtual std::vector<Ray> traceRaw(const TraceRawConfig&) = 0;
     virtual void setPushConstants(const PushConstants*) = 0;
+    // -1 means no device is selected.
+    int m_deviceID = -1;
 };
 
 // TODO deprecate these functions and all of their uses.

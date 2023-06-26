@@ -27,6 +27,8 @@ class CommandParser {
         bool m_plotFlag = false;                       // -p (Plot)
         bool m_csvFlag = false;                        // -c (.csv Output)
         bool m_cpuFlag = false;                        // -x (CPU Tracer)
+        int m_deviceID = -1;                           // -d (Device)
+        bool m_listDevices = false;                    // -l (List Devices)
         bool m_benchmark = false;                      // -b (Benchmark)
         bool m_version = false;                        // -v (Version)
         std::string m_providedFile = "";               // -i (Input)
@@ -70,6 +72,8 @@ class CommandParser {
         {'b', {OptionType::INT, "batch", "Batch size for Vulkan tracing", &(m_args.m_BatchSize)}},
         {'p', {OptionType::BOOL, "plot", "Plot output footprints and histograms.", &(m_args.m_plotFlag)}},
         {'x', {OptionType::BOOL, "cpu", "Tracing on CPU", &(m_args.m_cpuFlag)}},
+        {'d', {OptionType::INT, "device", "Device ID", &(m_args.m_deviceID)}},
+        {'l', {OptionType::BOOL, "list", "List available devices", &(m_args.m_listDevices)}},
         {'i', {OptionType::STRING, "input", "Input RML File or Directory.", &(m_args.m_providedFile)}},
         {'v', {OptionType::BOOL, "version", "", &(m_args.m_version)}},
         {'f', {OptionType::BOOL, "", "Fix the seed to RAYX::FIXED_SEED (Uses default)", &(m_args.m_isFixSeed)}},

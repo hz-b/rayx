@@ -9,6 +9,7 @@ void VulkanEngine::init(VulkanEngineInitSpec_t spec) {
     }
 
     m_shaderfile = spec.shaderFileName;
+    m_deviceID = spec.deviceID;
 
     createInstance();
     setupDebugMessenger();

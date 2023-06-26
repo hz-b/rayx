@@ -133,6 +133,17 @@ void TerminalApp::run() {
         RAYX_ERR << "NO_VULKAN: trying to construct VulkanTracer with Vulkan disabled. Use -x to use CPU tracer or enable Vulkan when building.";
 #else
         m_Tracer = std::make_unique<RAYX::VulkanTracer>();
+
+        /// list physical devices
+        if (m_CommandParser->m_args.m_listDevices) {
+            dynamic_cast<RAYX::VulkanTracer*>(m_Tracer.get())->listPhysicalDevices();
+            exit(0);
+        }
+        /// select physical device
+        if (m_CommandParser->m_args.m_deviceID >= 0) {
+            m_Tracer->setDevice(m_CommandParser->m_args.m_deviceID);
+        }
+
 #endif
     }
 

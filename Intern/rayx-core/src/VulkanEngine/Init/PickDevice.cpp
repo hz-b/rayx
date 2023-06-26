@@ -19,10 +19,8 @@ void VulkanEngine::pickDevice() {
     STAGING_SIZE = getStagingBufferSize();
 }
 
-// physical device for computation is chosen
-void VulkanEngine::pickPhysicalDevice() {
-    RAYX_PROFILE_FUNCTION();
-    // search for devices
+// scan for devices
+std::vector<VkPhysicalDevice> VulkanEngine::getPhysicalDevices() {
     uint32_t deviceCount = 0;
     vkEnumeratePhysicalDevices(m_Instance, &deviceCount, nullptr);
     if (deviceCount == 0) throw std::runtime_error("failed to find GPUs with Vulkan Support!");
@@ -30,23 +28,42 @@ void VulkanEngine::pickPhysicalDevice() {
     // create vector of devices
     std::vector<VkPhysicalDevice> devices(deviceCount);
     vkEnumeratePhysicalDevices(m_Instance, &deviceCount, devices.data());
+    return devices;
+}
 
-    // pick fastest device
-    m_PhysicalDevice = VK_NULL_HANDLE;
-    int currentRating = -1;
+// physical device for computation is chosen
+void VulkanEngine::pickPhysicalDevice() {
+    RAYX_PROFILE_FUNCTION();
+    // search for devices
+    auto devices = getPhysicalDevices();
+    if (m_deviceID >= (int)devices.size() || m_deviceID < -1) {
+        RAYX_ERR << "Device index out of range!";
+    }
+    if (m_deviceID == -1) {
+        // pick fastest device
+        m_PhysicalDevice = VK_NULL_HANDLE;
+        int currentRating = -1;
 
-    for (const auto& device : devices) {
-        if (isDeviceSuitable(device)) {
-            int rating = rateDevice(device);
-            if (rating > currentRating) {
-                m_PhysicalDevice = device;
-                currentRating = rating;
+        for (const auto& device : devices) {
+            if (isDeviceSuitable(device)) {
+                int rating = rateDevice(device);
+                if (rating > currentRating) {
+                    m_PhysicalDevice = device;
+                    currentRating = rating;
+                }
             }
         }
+        if (m_PhysicalDevice == VK_NULL_HANDLE) {
+            RAYX_ERR << "failed to find a suitable GPU!";
+        }
+    } else {
+        // pick device with given index
+        m_PhysicalDevice = devices[m_deviceID];
+        if (!isDeviceSuitable(m_PhysicalDevice)) {
+            RAYX_ERR << "selected device not suitable!";
+        }
     }
-    if (m_PhysicalDevice == VK_NULL_HANDLE) {
-        throw std::runtime_error("failed to find a suitable GPU!");
-    }
+    
 
     VkPhysicalDeviceProperties deviceProperties;
     vkGetPhysicalDeviceProperties(m_PhysicalDevice, &deviceProperties);
@@ -167,8 +184,7 @@ void VulkanEngine::createLogicalDevice() {
     }
 
     if (vkCreateDevice(m_PhysicalDevice, &createInfo, nullptr, &m_Device) != VK_SUCCESS) {
-        RAYX_WARN << "Failed to create device!";
-        throw std::runtime_error("failed to create logical device!");
+        RAYX_ERR << "failed to create logical device!";
     }
 
     vkGetDeviceQueue(m_Device, m_computeFamily, 0, &m_ComputeQueue);

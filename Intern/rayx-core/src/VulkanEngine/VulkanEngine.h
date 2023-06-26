@@ -32,6 +32,7 @@ struct VulkanEngineInitSpec_t {
     /// the name of the shaderfile, as relative path - relative to the root of
     /// the repository
     const char* shaderFileName;
+    int deviceID;
 };
 
 /// the argument type of `VulkanEngine::run(_)`
@@ -65,6 +66,10 @@ class RAYX_API VulkanEngine {
     /// changes the state from PRERUN to POSTRUN
     /// This function runs the shader.
     void run(VulkanEngineRunSpec_t);
+
+    /// @brief  returns all physical devices of the current instance.
+    /// @return a vector of VkPhysicalDevice
+    std::vector<VkPhysicalDevice> getPhysicalDevices();
 
     /// after run(_) is finished (i.e. in POSTRUN state)
     /// we can read the contents of `m_out = true`-buffers.
@@ -124,6 +129,7 @@ class RAYX_API VulkanEngine {
   private:
     VulkanEngineStates_t m_state = VulkanEngineStates_t::PREINIT;
     const char* m_shaderfile;
+    int m_deviceID = -1;
     uint32_t m_numberOfInvocations;
 
     /// stores the Buffers by name.
