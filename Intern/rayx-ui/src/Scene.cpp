@@ -16,6 +16,8 @@ Scene::Scene(const RAYX::RenderObjectVec& renderObjects) {
     for (const auto& renderObject : renderObjects) {
         fromRenderObject(renderObject);
     }
+    addLine({{0.0f, 0.0f, -1.0f}, {1.0f, 1.0f, 0.0f}}, {{0.0f, 0.0f, 0.0f}, {1.0f, 1.0f, 0.0f}});  // TODO: Rendering without rays should be possible
+    addLine({{0.0f, 0.0f, 0.0f}, {1.0f, 1.0f, 0.0f}}, {{0.0f, -1.0f, 0.0f}, {1.0f, 1.0f, 0.0f}});
 }
 
 void Scene::addTriangle(const Vertex v1, const Vertex v2, const Vertex v3) {
@@ -49,9 +51,13 @@ void Scene::fromRenderObject(const RAYX::RenderObject& renderObject) {
 
     // Then, transform them to the world space using the position and orientation
     glm::vec4 worldTopLeft = renderObject.orientation * topLeft + renderObject.position;
+    RAYX_LOG << "World top left: " << worldTopLeft.x << ", " << worldTopLeft.y << ", " << worldTopLeft.z;
     glm::vec4 worldTopRight = renderObject.orientation * topRight + renderObject.position;
+    RAYX_LOG << "World top right: " << worldTopRight.x << ", " << worldTopRight.y << ", " << worldTopRight.z;
     glm::vec4 worldBottomLeft = renderObject.orientation * bottomLeft + renderObject.position;
+    RAYX_LOG << "World bottom left: " << worldBottomLeft.x << ", " << worldBottomLeft.y << ", " << worldBottomLeft.z;
     glm::vec4 worldBottomRight = renderObject.orientation * bottomRight + renderObject.position;
+    RAYX_LOG << "World bottom right: " << worldBottomRight.x << ", " << worldBottomRight.y << ", " << worldBottomRight.z;
 
     // Create the random engine
     std::random_device rd;   // Will be used to obtain a seed for the random number engine
@@ -70,6 +76,7 @@ void Scene::fromRenderObject(const RAYX::RenderObject& renderObject) {
     Vertex v3(worldBottomRight, random_color_3);
     addTriangle(v1, v2, v3);
     Vertex v4(worldTopRight, random_color_4);
+    addTriangle(v2, v3, v4);
 }
 
 // Function that adds vertex to scene if it doesn't exist, otherwise adds index of existing vertex
