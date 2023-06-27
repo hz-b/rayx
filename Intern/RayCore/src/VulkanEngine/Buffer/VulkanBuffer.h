@@ -10,12 +10,11 @@
 #include "RayCore.h"
 
 namespace RAYX {
-
-typedef enum BufferAccessFlags {
+enum BufferAccessFlags {
     VKBUFFER_IN,
     VKBUFFER_OUT,
     VKBUFFER_INOUT,
-} BufferAccessFlags;
+};
 
 /**
  * @brief Pass to VulkanBuffer Class for buffer creation
@@ -26,6 +25,12 @@ struct VulkanBufferCreateInfo {
     BufferAccessFlags accessType;                                     // Access type to Buffer
     VkDeviceSize size = 0;                                            // Size
     VkDescriptorType bufferType = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER;  // What kind of buffer is it (Storage, Image, Uniform etc.)
+};
+
+struct PassBinding {
+    std::string passName;
+    uint32_t binding;
+    VkShaderStageFlags shaderStageFlag;
 };
 
 class BufferHandler;
@@ -47,7 +52,7 @@ class RAYX_API VulkanBuffer {
     VulkanBuffer& operator=(const VulkanBuffer&) = delete;
 
     VkDeviceSize getSize() const { return m_createInfo.size; }
-    const VkBuffer& getBuffer() const { return m_Buffer; };
+    const VkBuffer& getBuffer() const { return m_Buffer; }
     const char* getName() const { return m_createInfo.bufName; }
     const VkDeviceMemory& GetBufferMemory() const { return m_Memory; }
 
@@ -55,6 +60,7 @@ class RAYX_API VulkanBuffer {
     void UnmapMemory();
 
     VulkanBuffer& addDescriptorSetPerPassBinding(const std::string& passName, uint32_t binding, VkShaderStageFlags shaderStageFlag);
+    VulkanBuffer& addDescriptorSetPerPassBindings(const std::vector<PassBinding>&);
     VkDescriptorBufferInfo getDescriptorInfo(VkDeviceSize offset = 0);
     uint32_t getPassDescriptorBinding(std::string passName) { return m_DescriptorSetBindings[passName].binding; }
 

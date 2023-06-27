@@ -37,7 +37,7 @@ class RAYX_API VulkanEngine {
     void prepareComputePipelinePass(int index);
     void prepareComputePipelinePass(std::string passName);
     void prepareComputePipelinePasses();
-    BufferHandler& getBufferHandler() const { return *m_BufferHandler; }
+    BufferHandler* getBufferHandler() { return m_BufferHandler; }
 
     void run(VulkanEngineRunSpec_t);
 
@@ -79,9 +79,6 @@ class RAYX_API VulkanEngine {
         size_t size = 0;
     };
     pushConstants_t m_pushConstants;
-    BufferHandler* m_BufferHandler;  // new
-    std::vector<ComputePass*> m_computePasses;
-    // ComputePass* m_ComputePass;  // New
 
   private:
     EngineStates_t m_state = EngineStates_t::PREINIT;
@@ -100,6 +97,10 @@ class RAYX_API VulkanEngine {
     VkDescriptorPool m_DescriptorPool;
     VmaAllocator m_VmaAllocator;
     size_t STAGING_SIZE = 0;
+
+    BufferHandler* m_BufferHandler;  // new
+    std::vector<ComputePass*> m_computePasses;
+    // ComputePass* m_ComputePass;  // New
 
     // Sync:
 

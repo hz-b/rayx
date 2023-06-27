@@ -31,11 +31,11 @@ class RAYX_API BufferHandler {
      */
     template <typename T>
     VulkanBuffer& createBuffer(VulkanBufferCreateInfo createInfo, const std::vector<T>& vec = nullptr) {
-    //         if (m_state == EngineStates_t::PREINIT) {
-    //     RAYX_ERR << "you've forgotten to .init() the VulkanEngine";
-    // } else if (m_state == EngineStates_t::POSTRUN) {
-    //     RAYX_ERR << "you've forgotten to .cleanup() the VulkanEngine";
-    // }
+        //         if (m_state == EngineStates_t::PREINIT) {
+        //     RAYX_ERR << "you've forgotten to .init() the VulkanEngine";
+        // } else if (m_state == EngineStates_t::POSTRUN) {
+        //     RAYX_ERR << "you've forgotten to .cleanup() the VulkanEngine";
+        // }
         auto bufName = std::string(createInfo.bufName);
 
         if (isBufferPresent(std::string(bufName))) {  // If buffer already exists, update if it still has the same size

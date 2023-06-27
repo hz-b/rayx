@@ -57,7 +57,7 @@ void VulkanEngine::createComputePipelinePass(const ComputePassCreateInfo& create
  * @param index pass index
  */
 void VulkanEngine::prepareComputePipelinePass(int index) {
-    auto bindings = getBufferHandler().getDescriptorBindings(m_computePasses[index]->getName());
+    auto bindings = getBufferHandler()->getDescriptorBindings(m_computePasses[index]->getName());
     m_computePasses[index]->prepare(bindings);
     RAYX_D_LOG << "ComputePipelinePass prepared.";
 }
@@ -68,7 +68,7 @@ void VulkanEngine::prepareComputePipelinePass(int index) {
  */
 void VulkanEngine::prepareComputePipelinePass(std::string passName) {
     ComputePass* pass = getComputePass(passName);
-    auto bindings = getBufferHandler().getDescriptorBindings(pass->getName());
+    auto bindings = getBufferHandler()->getDescriptorBindings(pass->getName());
     pass->prepare(bindings);
     RAYX_D_LOG << "ComputePipelinePass prepared.";
 }
@@ -78,7 +78,7 @@ void VulkanEngine::prepareComputePipelinePass(std::string passName) {
  */
 void VulkanEngine::prepareComputePipelinePasses() {
     for (auto pass : m_computePasses) {
-        auto bindings = getBufferHandler().getDescriptorBindings(pass->getName());
+        auto bindings = getBufferHandler()->getDescriptorBindings(pass->getName());
         pass->prepare(bindings);
     }
     RAYX_D_LOG << "ComputePipelinePass(s) prepared.";

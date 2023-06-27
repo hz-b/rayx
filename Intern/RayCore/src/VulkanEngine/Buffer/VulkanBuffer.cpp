@@ -82,6 +82,13 @@ VulkanBuffer& VulkanBuffer::addDescriptorSetPerPassBinding(const std::string& pa
     return *this;
 }
 
+VulkanBuffer& VulkanBuffer::addDescriptorSetPerPassBindings(const std::vector<PassBinding>& descriptorPassBindings) {
+    for (const auto& b : descriptorPassBindings) {
+        addDescriptorSetPerPassBinding(b.passName, b.binding, b.shaderStageFlag);
+    }
+    return *this;
+}
+
 VkDescriptorBufferInfo VulkanBuffer::getDescriptorInfo(VkDeviceSize offset) { return VkDescriptorBufferInfo{m_Buffer, offset, m_createInfo.size}; }
 
 }  // namespace RAYX

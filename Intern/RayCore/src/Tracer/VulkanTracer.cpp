@@ -70,44 +70,47 @@ std::vector<Ray> VulkanTracer::traceRaw(const TraceRawConfig& cfg) {
         m_engine.createComputePipelinePass({.passName = "TracePass", .shaderStagesCreateInfos = splitShaderStages1});
     }
 
+    auto bufferHandler = m_engine.getBufferHandler();
     // Create Buffers and bind them to Pass through Descriptors
     {
         auto pass = m_engine.getComputePass("passName");                     // TODO : Fill
         auto shaderFlag = pass->getShaderStage(0).getShaderStageFlagBits();  // Should return only compute now
         auto passName = std::string(pass->getName());
+
         // Compute Buffers Meta
         // Bindings are *IN ORDER*
-        m_engine.getBufferHandler()
-            .createBuffer<Ray>({"ray-buffer", VKBUFFER_IN}, rayList)  // Input Ray Buffer
+        bufferHandler
+            ->createBuffer<Ray>({"ray-buffer", VKBUFFER_IN}, rayList)  // Input Ray Buffer
+            .addDescriptorSetPerPassBindings({})                       // TODO: Change this!
             .addDescriptorSetPerPassBinding(passName, 0, shaderFlag)
             .addDescriptorSetPerPassBinding(passName, 0, shaderFlag);
 
-        m_engine.getBufferHandler()
-            .createBuffer({"ray-meta-buffer", VKBUFFER_OUT, rayList.size()*sizeof(RayMeta)})  // Meta Ray Buffer
+        bufferHandler
+            ->createBuffer({"ray-meta-buffer", VKBUFFER_OUT, rayList.size() * sizeof(RayMeta)})  // Meta Ray Buffer
             .addDescriptorSetPerPassBinding(passName, 1, shaderFlag);
 
-        m_engine.getBufferHandler()
-            .createBuffer({"output-buffer", VKBUFFER_OUT, (numberOfRays * sizeof(Ray) * (int)cfg.m_maxSnapshots)})  // Output Ray Buffer
+        bufferHandler
+            ->createBuffer({"output-buffer", VKBUFFER_OUT, (numberOfRays * sizeof(Ray) * (int)cfg.m_maxSnapshots)})  // Output Ray Buffer
             .addDescriptorSetPerPassBinding(passName, 2, shaderFlag);
 
-        m_engine.getBufferHandler()
-            .createBuffer<double>({"quadric-buffer", VKBUFFER_IN}, beamlineData)  // Beamline quadric info
+        bufferHandler
+            ->createBuffer<double>({"quadric-buffer", VKBUFFER_IN}, beamlineData)  // Beamline quadric info
             .addDescriptorSetPerPassBinding(passName, 3, shaderFlag);
 
-        m_engine.getBufferHandler()
-            .createBuffer({"xyznull-buffer", VKBUFFER_IN, 100})  // FIXME(OS): This buffer is not needed?
+        bufferHandler
+            ->createBuffer({"xyznull-buffer", VKBUFFER_IN, 100})  // FIXME(OS): This buffer is not needed?
             .addDescriptorSetPerPassBinding(passName, 4, shaderFlag);
 
-        m_engine.getBufferHandler()
-            .createBuffer<int>({"material-index-table", VKBUFFER_IN}, materialTables.indexTable)  /// Material info
+        bufferHandler
+            ->createBuffer<int>({"material-index-table", VKBUFFER_IN}, materialTables.indexTable)  /// Material info
             .addDescriptorSetPerPassBinding(passName, 5, shaderFlag);
 
-        m_engine.getBufferHandler()
-            .createBuffer<double>({"material-table", VKBUFFER_IN}, materialTables.materialTable)  // Material info
+        bufferHandler
+            ->createBuffer<double>({"material-table", VKBUFFER_IN}, materialTables.materialTable)  // Material info
             .addDescriptorSetPerPassBinding(passName, 6, shaderFlag);
 #ifdef RAYX_DEBUG_MODE
-        m_engine.getBufferHandler()
-            .createBuffer({"debug-buffer", VKBUFFER_OUT, numberOfRays * sizeof(debugBuffer_t)})  // Debug Matrix Buffer
+        bufferHandler
+            ->createBuffer({"debug-buffer", VKBUFFER_OUT, numberOfRays * sizeof(debugBuffer_t)})  // Debug Matrix Buffer
             .addDescriptorSetPerPassBinding(passName, 7, shaderFlag);
 #endif
     }
@@ -122,10 +125,10 @@ std::vector<Ray> VulkanTracer::traceRaw(const TraceRawConfig& cfg) {
 
     m_engine.run({.m_numberOfInvocations = numberOfRays});
 
-    std::vector<Ray> out = m_engine.getBufferHandler().readBuffer<Ray>("output-buffer", true);
+    std::vector<Ray> out = bufferHandler->readBuffer<Ray>("output-buffer", true);
 
 #ifdef RAYX_DEBUG_MODE
-    m_debugBufList = m_engine.getBufferHandler().readBuffer<debugBuffer_t>("debug-buffer", true);
+    m_debugBufList = bufferHandler->readBuffer<debugBuffer_t>("debug-buffer", true);
 #endif
 
     m_engine.cleanup();
