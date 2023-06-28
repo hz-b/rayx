@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 [[ ! -d .git ]] && echo "You need to be in the root directory of the repo" && exit
 

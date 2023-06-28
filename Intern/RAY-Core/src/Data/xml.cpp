@@ -426,6 +426,7 @@ const char* Parser::name() const { return node->first_attribute("name")->value()
 double Parser::parseDouble(const char* paramname) const {
     double d;
     if (!paramDouble(node, paramname, &d)) {
+        std::cout << paramname << std::endl;
         throw std::runtime_error("parseDouble failed");
     }
     return d;

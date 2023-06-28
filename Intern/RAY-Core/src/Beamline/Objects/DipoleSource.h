@@ -27,7 +27,7 @@ class RAYX_API DipoleSource : public LightSource {
     double getPsi(double) const;
     void setMaxIntensity();
     glm::dvec3 getXYZPosition(double)const;
-
+    double vDivergence(double hv, double sigv) const;
   private:
     // Geometric Params
     double m_bendingRadius;
@@ -61,7 +61,7 @@ class RAYX_API DipoleSource : public LightSource {
     double m_maxFlux;
     double m_maxIntensity;
 
-    double vDivergence(double hv, double sigv) const;
+    
     glm::dvec4 getStokesSyn(double hv, double psi1, double psi2) const;
     double bessel(double hnue, double zeta) const;
     glm::dvec4 dipoleFold(double psi, double hv, double sigpsi) const;
@@ -78,7 +78,5 @@ class RAYX_API DipoleSource : public LightSource {
                                            4.286e-2, 3.175e-2, 2.362e-2, 1.764e-2, 1.321e-2, 9.915e-3, 7.461e-3, 5.626e-3, 4.25e-3,  2.436e-3,
                                            1.404e-3, 8.131e-4, 4.842e-4, 2.755e-4, 1.611e-4, 9.439e-5, 5.543e-5, 3.262e-5, 1.922e-5};
 
-    // std::vector<SOURCE_LENGTH> m_source_lengths;
 };
-
 }  // namespace RAYX

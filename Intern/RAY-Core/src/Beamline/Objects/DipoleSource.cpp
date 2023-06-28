@@ -4,8 +4,9 @@
 #include "Debug/Debug.h"
 #include "Random.h"
 #include "Shared/Constants.h"
-#include <fstream>
 //#include "Shared/TranslatedFortran.h"
+
+#include <fstream>
 
 namespace RAYX {
 
@@ -50,7 +51,7 @@ DipoleSource::DipoleSource(const DesignObject& dobj) : LightSource(dobj) {
     m_verDivergence = DipoleSource::vDivergence(m_photonEnergy, m_verEbeamDivergence);
     m_stokes = DipoleSource::getStokesSyn(m_photonEnergy, -3 * m_verDivergence, 3 * m_verDivergence);
 
-    m_flux = (m_stokes[2] + m_stokes[3]) * m_horDivergence * 1.0e-3 * 1.0e2;  // EnergyDistribution Values
+    //m_flux = (m_stokes[2] + m_stokes[3]) * m_horDivergence *  1.0e2;  // EnergyDistribution Values
     m_gamma = std::fabs(m_electronEnergy) * get_factorElectronEnergy();
     
     
@@ -86,19 +87,18 @@ std::vector<Ray> DipoleSource::getRays() const {
     // rayList.reserve(1048576);
     RAYX_VERB << "Create " << n << " rays with standard normal deviation...";
 
-    //std::ofstream datei("psi.txt");
+    
     // create n rays with random position and divergence within the given span
     // for width, height, depth, horizontal and vertical divergence
     for (int i = 0; i < n; i++) {
 
-        phi = (randomDouble() - 0.5) * m_horDivergence * 1.e-3; //horDivergence in rad
+        phi = (randomDouble() - 0.5) * m_horDivergence; //horDivergence in rad
 
         glm::dvec3 position = getXYZPosition(phi);
         
         en = getEnergy();  // Verteilung nach Schwingerfunktion
         
         psi = getPsi(en);
-        //datei << en << std::endl;
         
         // get corresponding angles based on distribution and deviation from
         // main ray (main ray: xDir=0,yDir=0,zDir=1 for phi=psi=0)
@@ -108,26 +108,24 @@ std::vector<Ray> DipoleSource::getRays() const {
         glm::dvec4 stokes = glm::dvec4(1, 0, m_stokes[1], m_stokes[2]);
 
         Ray r = {position, W_UNINIT, direction, en, stokes, 0.0, 0.0, 0.0, 0.0};
-
+        
         rayList.push_back(r);
     }
-    //datei.close();
-
     return rayList;
 }
 
 glm::dvec3 DipoleSource::getXYZPosition(double phi)const{
     double XDistribution, YDistribution;
     double x1, y, z;
-    double width = -0.5/m_sourceWidth/m_sourceWidth;
+    double width = -0.5/(m_sourceWidth * m_sourceWidth);
     do{   
-        x1 = randomDouble() * -0.5 * 9 * m_sourceWidth;
+        x1 = randomDouble() - 0.5 * 9 * m_sourceWidth;
         XDistribution = exp(width * x1 * x1);
     } while (XDistribution < randomDouble());
     
     //TODO: *-1 if left hand revolution (ElectronEnergyOrientation)
     double sign = DipoleSource::m_electronEnergyOrientation == ElectronEnergyOrientation::Clockwise ? 1.0 : -1.0;
-
+    
     double x = sign * x1 * cos(phi) + (m_bendingRadius * (1 - cos(phi)));
     x = x + m_position.x;
 
@@ -139,7 +137,7 @@ glm::dvec3 DipoleSource::getXYZPosition(double phi)const{
     } while (YDistribution < randomDouble());
     y = y + m_position.y;
 
-    z = sign * m_bendingRadius - x1 * sin(phi);
+    z = sign * ((m_bendingRadius*1000 - x1) * sin(phi));
     
     return glm::dvec3(x, y, z);
 }
@@ -153,7 +151,7 @@ double DipoleSource::getPsi(double en) const {
         psi =  (randomDouble() -0.5) * 6 * m_verDivergence;
         S = dipoleFold(psi, en, m_verEbeamDivergence);
 
-    } while ((S[2] + S[3]) / m_maxIntensity < randomDouble() );
+    } while ((S[2] + S[3]) / m_maxIntensity < randomDouble());
 
     return psi * 1.e-3; //psi in rad
 }
@@ -168,8 +166,9 @@ double DipoleSource::getEnergy() const {
     } while ((flux / m_maxFlux - randomDouble()) < 0);
     return energy;
 }
+
 double DipoleSource::vDivergence(double photonEnergy, double sigv) const {
-    double gamma = fabs(m_electronEnergy) * 1957;  // factorElectronEnergy
+    double gamma = fabs(m_electronEnergy) * get_factorElectronEnergy();  // factorElectronEnergy
     if (gamma == 0.0 || m_criticalEnergy == 0.0) {
         return 0;
     }
@@ -192,7 +191,6 @@ glm::dvec4 DipoleSource::getStokesSyn(double photonEnergy, double psi1, double p
         dpsi = 0.001;
     }
 
-    //std::array<double, 6> result = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
     glm::dvec4 stokes = glm::dvec4(0.0, 0.0, 0.0, 0.0);
     while (psi <= psi2) {
         double sign1 = DipoleSource::m_electronEnergyOrientation == ElectronEnergyOrientation::Clockwise ? PI : -PI;
@@ -248,7 +246,7 @@ void DipoleSource::setLogInterpolation() {
 }
 
 double DipoleSource::schwinger(double energy) const {
-    double vorfaktor = factorSchwinger_RAY * 1.e-3;
+    double preFactor = factorSchwinger_RAY * 1.e-3;
 
     double Y0 = energy / m_criticalEnergy;
     Y0 = Y0 / 1000;
@@ -268,7 +266,7 @@ double DipoleSource::schwinger(double energy) const {
         // yg0 = linear oder diaboli
     }
 
-    flux = vorfaktor * m_gamma * yg0;
+    flux = preFactor * m_gamma * yg0;
 
     return flux;
 }
@@ -374,6 +372,11 @@ void DipoleSource::calcFluxOrg() {
     double bandwidth = 0.001;
 
     if (m_energySpread != 0.0) {
+        if (m_energySpreadUnit == RAYX::EnergySpreadUnit::EU_PERCENT) {
+            bandwidth = m_energySpread/100.0;
+        } else if (m_energySpreadUnit == RAYX::EnergySpreadUnit::EU_eV) {
+            bandwidth = m_energySpread / m_photonEnergy;
+        }
         bandwidth = m_energySpread / 100;
     }
 
