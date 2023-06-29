@@ -108,35 +108,48 @@ target_include_directories(${PROJECT_NAME}
     PUBLIC ${RayCore_SOURCE_DIR}/../../Extern/HighFive/include/
     PUBLIC ${RayCore_SOURCE_DIR}/../../Extern/VMA/include/
 )
+# Compile Shaders
+set(SHADER_SOURCES_DIR ${RayCore_SOURCE_DIR}/src/Tracer/shader)
+
+set(SHADER_SOURCES
+    main-glsl.comp
+    main_1-glsl.comp)
+    #main_2-glsl.comp)
 
 if(NOT VULKAN STREQUAL "NO")
-    # Compile Shaders
-    # The following code is used to always compile the shader.
+    # The following code is used to always compile the shaders.
     # This is most likely not an optimal solution, but it will work
     # until we find a better one.
     add_dependencies(${PROJECT_NAME} COMPILE_SHADER)
-    set(COMPILED_SHADER ${CMAKE_BINARY_DIR}/bin/comp.spv)
-    set(COMPILED_SHADER_FAKE ${CMAKE_BINARY_DIR}/bin/___comp.spv) # this exists so file cannot be found -> always execute command
+    set(COMPILED_SHADER_OUTPUT_DIR ${CMAKE_BINARY_DIR}/bin)
+    set(COMPILED_SHADERS_LIST "") 
 
     if(WIN32)
-        add_custom_command(
-            OUTPUT
-            ${COMPILED_SHADER}
-            ${COMPILED_SHADER_FAKE}
-            COMMAND "$ENV{VULKAN_SDK}/Bin/glslc.exe"
-            ARGS ${RayCore_SOURCE_DIR}/src/Tracer/shader/main-glsl.comp -o ${COMPILED_SHADER} -fshader-stage=compute
-        )
+        set(SHADER_COMPILER_COMMAND "$ENV{VULKAN_SDK}/Bin/glslc.exe")
     elseif(UNIX)
+        set(SHADER_COMPILER_COMMAND "glslc")
+    endif()
+    
+    foreach(SHADER_SOURCE ${SHADER_SOURCES})
+        get_filename_component(SHADER_NAME ${SHADER_SOURCE} NAME_WE)
+        # Remove "-glsl" suffix using regular expression replacement
+        string(REGEX REPLACE "-glsl$" "" SHADER_NAME ${SHADER_NAME})
+        set(COMPILED_SHADER_OUTPUT_FILE ${COMPILED_SHADER_OUTPUT_DIR}/${SHADER_NAME}.spv)
+        set(COMPILED_SHADER_FAKE ${COMPILED_SHADER_OUTPUT_DIR}/___${SHADER_NAME}.spv)
+
         add_custom_command(
             OUTPUT
-            ${COMPILED_SHADER}
+            ${COMPILED_SHADER_OUTPUT_FILE}
             ${COMPILED_SHADER_FAKE}
-            COMMAND "glslc"
-            ARGS ${RayCore_SOURCE_DIR}/src/Tracer/shader/main-glsl.comp -o ${COMPILED_SHADER} -fshader-stage=compute
+            COMMAND ${SHADER_COMPILER_COMMAND}
+            ARGS ${SHADER_SOURCES_DIR}/${SHADER_SOURCE} -o ${COMPILED_SHADER_OUTPUT_FILE} -fshader-stage=compute
+            COMMENT "Compiling shader: ${SHADER_NAME}"
         )
-    endif()
 
-    add_custom_target(COMPILE_SHADER ALL DEPENDS ${COMPILED_SHADER})
+        list(APPEND COMPILED_SHADERS_LIST ${COMPILED_SHADER_OUTPUT_FILE})
+    endforeach()
+
+    add_custom_target(COMPILE_SHADER ALL DEPENDS ${COMPILED_SHADERS_LIST})
 endif()
 
 # Print include directories

@@ -3,45 +3,15 @@
 #include "VulkanEngine/VulkanEngine.h"
 namespace RAYX {
 
-void VulkanEngine::recordInCommandBuffer(ComputePass& computePass, int cmdBufIndex) {
-    RAYX_PROFILE_FUNCTION();
-    RAYX_VERB << "Recording new commandBuffer..";
+struct Workgroup_t {
+    uint32_t x = 0;
+    uint32_t y = 0;
+    uint32_t z = 0;
+};
+
+Workgroup_t guessWorkGroupNo(uint32_t requiredLocalWorkGroupNo, VkPhysicalDeviceLimits limits) {
     static uint32_t requiredGroup = 0;
-    static struct {
-        uint32_t x = 0;
-        uint32_t y = 0;
-        uint32_t z = 0;
-    } group;
-    auto cmdBuffer = &m_CommandBuffers[cmdBufIndex];
-    /*
-    Now we shall start recording commands into the newly allocated command
-    buffer.
-    */
-    VkCommandBufferBeginInfo beginInfo = VKINIT::Command::command_buffer_begin_info();
-    beginInfo.flags = VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT;
-
-    VK_CHECK_RESULT(vkBeginCommandBuffer(*cmdBuffer, &beginInfo));  // start recording commands.
-
-    /*
-    We need to bind a pipeline, AND a descriptor set before we dispatch.
-    The validation layer will NOT give warnings if you forget these, so be
-    very careful not to forget them.
-    */
-    computePass.bind(*cmdBuffer, 0);  // TODO(OS) Add multi stage support if needed
-    computePass.bindDescriptorSet(*cmdBuffer, 0);
-
-    /*
-    Calling vkCmdDispatch basically starts the compute pipeline, and
-    executes the compute shader. The number of workgroups is specified in
-    the arguments. If you are already familiar with compute shaders from
-    OpenGL, this should be nothing new to you.
-    */
-    auto requiredLocalWorkGroupNo = (uint32_t)ceil(m_numberOfInvocations / float(WORKGROUP_SIZE));  // number of local works groups
-    // check if there are too many rays
-    VkPhysicalDeviceProperties deviceProperties;
-    vkGetPhysicalDeviceProperties(m_PhysicalDevice, &deviceProperties);
-
-    auto limits = deviceProperties.limits;
+    static struct Workgroup_t group;
 
     auto xgroups = limits.maxComputeWorkGroupCount[0];
     auto ygroups = limits.maxComputeWorkGroupCount[1];
@@ -87,6 +57,42 @@ void VulkanEngine::recordInCommandBuffer(ComputePass& computePass, int cmdBufInd
         group.y = ygroups;
         group.z = zgroups;
     }
+    return group;
+}
+
+void VulkanEngine::recordInCommandBuffer(ComputePass& computePass, int cmdBufIndex) {
+    RAYX_PROFILE_FUNCTION();
+    RAYX_VERB << "Recording new commandBuffer..";
+    auto cmdBuffer = &m_CommandBuffers[cmdBufIndex];
+    /*
+    Now we shall start recording commands into the newly allocated command
+    buffer.
+    */
+    VkCommandBufferBeginInfo beginInfo = VKINIT::Command::command_buffer_begin_info();
+    beginInfo.flags = VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT;
+
+    VK_CHECK_RESULT(vkBeginCommandBuffer(*cmdBuffer, &beginInfo));  // start recording commands.
+
+    /*
+    We need to bind a pipeline, AND a descriptor set before we dispatch.
+    The validation layer will NOT give warnings if you forget these, so be
+    very careful not to forget them.
+    */
+    computePass.bind(*cmdBuffer, 0);  // TODO(OS) Add multi stage support if needed
+    computePass.bindDescriptorSet(*cmdBuffer, 0);
+
+    /*
+    Calling vkCmdDispatch basically starts the compute pipeline, and
+    executes the compute shader. The number of workgroups is specified in
+    the arguments. If you are already familiar with compute shaders from
+    OpenGL, this should be nothing new to you.
+    */
+    auto requiredLocalWorkGroupNo = (uint32_t)ceil(m_numberOfInvocations / float(WORKGROUP_SIZE));  // number of local works groups
+    // check if there are too many rays
+    VkPhysicalDeviceProperties deviceProperties;
+    vkGetPhysicalDeviceProperties(m_PhysicalDevice, &deviceProperties);
+
+    auto group = guessWorkGroupNo(requiredLocalWorkGroupNo, deviceProperties.limits);
     /**
      * Update push constants
      */
@@ -99,6 +105,50 @@ void VulkanEngine::recordInCommandBuffer(ComputePass& computePass, int cmdBufInd
     vkCmdDispatch(*cmdBuffer, group.x, group.z, group.y);
 
     VK_CHECK_RESULT(vkEndCommandBuffer(*cmdBuffer));  // end recording commands.
+}
+
+void VulkanEngine::recordFullCommand() {
+    RAYX_PROFILE_FUNCTION();
+    RAYX_VERB << "Recording new commandBuffer..";
+
+    // TODO: ADD memory barrier if needed
+
+    // First stage: PreLoopStage
+    // -------------------------------------------------------------------------------------------------------
+    auto pass0 = getComputePass("InitTracePass");
+    auto cmdBuffer0 = &m_CommandBuffers[0];
+    VkCommandBufferBeginInfo beginInfo = VKINIT::Command::command_buffer_begin_info();
+    beginInfo.flags = VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT;
+    // start recording commands
+    VK_CHECK_RESULT(vkBeginCommandBuffer(*cmdBuffer0, &beginInfo));
+    pass0->bind(*cmdBuffer0, 0);
+    pass0->bindDescriptorSet(*cmdBuffer0, 0);
+
+    auto requiredLocalWorkGroupNo = (uint32_t)ceil(m_numberOfInvocations / float(WORKGROUP_SIZE));  // number of local works groups
+    VkPhysicalDeviceProperties deviceProperties;
+    vkGetPhysicalDeviceProperties(m_PhysicalDevice, &deviceProperties);
+    auto group = guessWorkGroupNo(requiredLocalWorkGroupNo, deviceProperties.limits);
+    pass0->cmdPushConstants(*cmdBuffer0, 0);
+
+    // vkCmdPushConstants(*cmdBuffer0, pass0->getPipelineLayout(0), VK_SHADER_STAGE_COMPUTE_BIT, 0, pass0->getPass()[0]->m_pushConstant.getSize(),
+    //                    pass0->getPass()[0]->m_pushConstant.getData());
+
+    vkCmdDispatch(*cmdBuffer0, group.x, group.z, group.y);
+
+    // Memory barrier (Init->Loop(i=0)) // TODO: First shader (output) is still output in second shader
+    m_BufferHandler->insertBufferMemoryBarrier("output-buffer", *cmdBuffer0, VK_ACCESS_SHADER_WRITE_BIT, VK_ACCESS_SHADER_READ_BIT,
+                                               VK_PIPELINE_STAGE_COMPUTE_SHADER_BIT, VK_PIPELINE_STAGE_COMPUTE_SHADER_BIT);
+
+    // Second sage: LoopBodyStage
+    // -------------------------------------------------------------------------------------------------------
+    pass0->bind(*cmdBuffer0, 1);
+    pass0->bindDescriptorSet(*cmdBuffer0, 1);
+    pass0->cmdPushConstants(*cmdBuffer0, 1);
+
+    vkCmdDispatch(*cmdBuffer0, group.x, group.z, group.y);
+    VK_CHECK_RESULT(vkEndCommandBuffer(*cmdBuffer0));  // end recording commands.
+
+    // TODO: ADD memory barrier if needed
 }
 
 }  // namespace RAYX

@@ -135,7 +135,7 @@ ComputePass::ComputePass(VkDevice& device, const ComputePassCreateInfo& createIn
 
     // Fill compute Piplines
     for (uint32_t i = 0; i < m_stagesCount; i++) {
-        m_pass[i] = std::make_shared<Pipeline>(createInfo.shaderStagesCreateInfos[i].name, m_Device, createInfo.shaderStagesCreateInfos[i]);
+        m_pass.push_back(std::make_shared<Pipeline>(createInfo.shaderStagesCreateInfos[i].name, m_Device, createInfo.shaderStagesCreateInfos[i]));
     }
 }
 
@@ -249,6 +249,11 @@ void ComputePass::simpleupdate(BufferHandler* bufferHandler) {
 
 void ComputePass::bindDescriptorSet(const VkCommandBuffer& cmdBuffer, int stage) {
     vkCmdBindDescriptorSets(cmdBuffer, getPipelineBindPoint(), getPipelineLayout(stage), 0, 1, &m_descriptorSets[0], 0, nullptr);
+}
+
+void ComputePass::cmdPushConstants(const VkCommandBuffer& cmdBuffer, int stage) {
+    vkCmdPushConstants(cmdBuffer, m_pass[stage]->m_pipelineLayout, VK_SHADER_STAGE_COMPUTE_BIT, 0, m_pass[stage]->m_pushConstant.getSize(),
+                       m_pass[stage]->m_pushConstant.getData());
 }
 
 void ComputePass::cleanPipeline(int stage) { m_pass[stage]->cleanPipeline(m_Device); }

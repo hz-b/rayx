@@ -30,13 +30,15 @@ class RAYX_API VulkanEngine {
 
     /// changes the state from PREINIT to PRERUN.
     void init();
+    void initBufferHandler();
 
     // TODO (OS): Add the Vulkan state FSM Controls
-    void initBufferHandler();
     void createComputePipelinePass(const ComputePassCreateInfo&);
     void prepareComputePipelinePass(int index);
     void prepareComputePipelinePass(std::string passName);
     void prepareComputePipelinePasses();
+    void printPasses();
+
     BufferHandler* getBufferHandler() { return m_BufferHandler; }
 
     void run(VulkanEngineRunSpec_t);

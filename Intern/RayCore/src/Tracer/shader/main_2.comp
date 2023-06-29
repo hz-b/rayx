@@ -178,6 +178,21 @@ void takeFinalSnapshot(Ray r, double w) {
 #endif
 
 /**************************************************************
+ *                    Shader INCLUDEs
+ **************************************************************/
+
+// Order in #include is IMPROTANT, do not change.
+// clang-format off
+#include "approx.comp"
+#include "complex.comp"
+#include "random.comp"
+#include "utils.comp"
+#include "collision.comp"
+#include "behave.comp"
+#include "dynamic_elements.comp"
+// clang-format on
+
+/**************************************************************
  *                    MAIN
  **************************************************************/
 

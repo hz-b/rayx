@@ -67,7 +67,7 @@ class RAYX_API Pass {
     // How many stages in the Pass
     uint32_t m_stagesCount;
     // The pass itself (Pipelines)
-    Pipelines m_pass = {VK_NULL_HANDLE};
+    Pipelines m_pass = {};
 
     std::unique_ptr<DescriptorPool> globalDescriptorPool{};
 };
@@ -115,6 +115,7 @@ class RAYX_API ComputePass : public Pass {
     void simpleupdate(BufferHandler* bufferHandler);
 
     void bindDescriptorSet(const VkCommandBuffer& cmdBuffer, int stage);
+    void cmdPushConstants(const VkCommandBuffer& cmdBuffer, int stage);
     void cleanPipeline(int stage);
 
   private:

@@ -12,8 +12,6 @@ ShaderStage::ShaderStage(VkDevice& device, const ShaderStageCreateInfo& createIn
       m_entryPoint(createInfo.entryPoint.c_str()),
       m_path(createInfo.shaderPath),
       m_shaderType(createInfo.shaderType) {
-    RAYX_D_LOG << "Creating shader stage...";
-    RAYX_D_LOG << "EntryPoint: " << m_entryPoint;
     // Create Vulkan Shader Module
     createShaderModule();
 }
