@@ -120,7 +120,8 @@ class RAYX_API VulkanEngine {
     void createLogicalDevice();
     void createCommandPool();
     void createCommandBuffers(int commandBuffersCount);
-    void recordFullCommand();
+    void recordFirstCommand();
+    void recordSecondCommand();
     void createFences() { m_Fences.compute = std::make_unique<Fence>(m_Device); }
 
     void recordInCommandBuffer(ComputePass& computePass, int cmdBufIndex);

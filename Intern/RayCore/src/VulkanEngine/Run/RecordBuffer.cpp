@@ -107,9 +107,9 @@ void VulkanEngine::recordInCommandBuffer(ComputePass& computePass, int cmdBufInd
     VK_CHECK_RESULT(vkEndCommandBuffer(*cmdBuffer));  // end recording commands.
 }
 
-void VulkanEngine::recordFullCommand() {
+void VulkanEngine::recordFirstCommand() {
     RAYX_PROFILE_FUNCTION();
-    RAYX_VERB << "Recording new commandBuffer..";
+    RAYX_VERB << "Recording first new commandBuffer..";
 
     // TODO: ADD memory barrier if needed
 
@@ -130,12 +130,10 @@ void VulkanEngine::recordFullCommand() {
     auto group = guessWorkGroupNo(requiredLocalWorkGroupNo, deviceProperties.limits);
     pass0->cmdPushConstants(*cmdBuffer0, 0);
 
-    // vkCmdPushConstants(*cmdBuffer0, pass0->getPipelineLayout(0), VK_SHADER_STAGE_COMPUTE_BIT, 0, pass0->getPass()[0]->m_pushConstant.getSize(),
-    //                    pass0->getPass()[0]->m_pushConstant.getData());
-
     vkCmdDispatch(*cmdBuffer0, group.x, group.z, group.y);
 
-    // Memory barrier (Init->Loop(i=0)) // TODO: First shader (output) is still output in second shader
+    // Memory barrier (Init->Loop(i=0))
+    // TODO: First shader (output) is still output in second shader
     m_BufferHandler->insertBufferMemoryBarrier("output-buffer", *cmdBuffer0, VK_ACCESS_SHADER_WRITE_BIT, VK_ACCESS_SHADER_READ_BIT,
                                                VK_PIPELINE_STAGE_COMPUTE_SHADER_BIT, VK_PIPELINE_STAGE_COMPUTE_SHADER_BIT);
 
@@ -149,6 +147,31 @@ void VulkanEngine::recordFullCommand() {
     VK_CHECK_RESULT(vkEndCommandBuffer(*cmdBuffer0));  // end recording commands.
 
     // TODO: ADD memory barrier if needed
+}
+
+void VulkanEngine::recordSecondCommand() {
+    RAYX_PROFILE_FUNCTION();
+    RAYX_VERB << "Recording second new commandBuffer..";
+
+    // TODO: add memory barrier
+    auto pass1 = getComputePass("TracePass");
+    auto cmdBuffer1 = &m_CommandBuffers[1];
+    VkCommandBufferBeginInfo beginInfo = VKINIT::Command::command_buffer_begin_info();
+    beginInfo.flags = VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT;
+
+    // start recording commands
+    VK_CHECK_RESULT(vkBeginCommandBuffer(*cmdBuffer1, &beginInfo));
+    pass1->bind(*cmdBuffer1, 0);
+    pass1->bindDescriptorSet(*cmdBuffer1, 0);
+
+    auto requiredLocalWorkGroupNo = (uint32_t)ceil(m_numberOfInvocations / float(WORKGROUP_SIZE));  // number of local works groups
+    VkPhysicalDeviceProperties deviceProperties;
+    vkGetPhysicalDeviceProperties(m_PhysicalDevice, &deviceProperties);
+    auto group = guessWorkGroupNo(requiredLocalWorkGroupNo, deviceProperties.limits);
+    pass1->cmdPushConstants(*cmdBuffer1, 0);
+
+    vkCmdDispatch(*cmdBuffer1, group.x, group.z, group.y);
+    VK_CHECK_RESULT(vkEndCommandBuffer(*cmdBuffer1));  // end recording commands.
 }
 
 }  // namespace RAYX

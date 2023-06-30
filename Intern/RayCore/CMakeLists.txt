@@ -113,8 +113,8 @@ set(SHADER_SOURCES_DIR ${RayCore_SOURCE_DIR}/src/Tracer/shader)
 
 set(SHADER_SOURCES
     main-glsl.comp
-    main_1-glsl.comp)
-    #main_2-glsl.comp)
+    main_1-glsl.comp
+    main_2-glsl.comp)
 
 if(NOT VULKAN STREQUAL "NO")
     # The following code is used to always compile the shaders.

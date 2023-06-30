@@ -22,6 +22,7 @@ layout(local_size_x = WORKGROUP_SIZE, local_size_y = 1, local_size_z = 1) in;
 // Every shader execution calculates the route for a single ray.
 // `_ray` is that ray, it's always in world coordinates (!).
 #define _ray (rayData[uint(gl_GlobalInvocationID)])
+#define _rayMeta (rayMetaData[uint(gl_GlobalInvocationID)])
 
 #include "../../Shared/Constants.h"
 
@@ -58,7 +59,8 @@ struct Ray {
 
 struct RayMeta {
     uint64_t nextElementId;
-    double ctr;
+    uint64_t ctr;
+    double bounce;
     bool finalized;
 };
 
@@ -73,31 +75,28 @@ struct _debug_struct {
  **************************************************************/
 
 // don't use this directly. Use `_ray` instead.
-layout(std140, binding = 0) buffer ibuf { Ray rayData[]; };
+layout(std140, binding = 0) buffer iobuf { Ray rayData[]; };
 
 layout(std140, binding = 1) buffer ibufm { RayMeta rayMetaData[]; };
 
-// don't use this directly. Use `takeSnapshot` instead.
-layout(std140, binding = 2) buffer obuf { Ray outputData[]; };
-
 // std430 is required so that Element is layouted like in C++.
 // see https://www.khronos.org/opengl/wiki/Interface_Block_(GLSL) for more details on layouting.
-layout(std430, binding = 3) buffer qbuf { Element elements[]; };
+layout(std430, binding = 2) buffer qbuf { Element elements[]; };
 
-layout(std140, binding = 4) buffer xyzbuf { dvec4 xyznull[]; };
+layout(std140, binding = 3) buffer xyzbuf { dvec4 xyznull[]; };
 
-layout(binding = 5) buffer materialIndexBuf {
+layout(binding = 4) buffer materialIndexBuf {
     int matIdx[];  // matIdx[0..91] contains the indices of the Palik Table, whereas matIdx[92..92+91] contains the indices of the NffTable.
                    // generally, an entry of matIdx tells you the index you need to look up in the 'mat'-table below.
 };
 
-layout(binding = 6) buffer materialBuf {
+layout(binding = 5) buffer materialBuf {
     double mat[];  // contains: (Palik tables of all materials concatenated together) concatenated with (Nff tables of all materials concatenated
                    // together) use the matIdx-table to determine the relevant indices for when which table starts and stops.
 };
 
 #ifdef RAYX_DEBUG_MODE
-layout(binding = 7) buffer debugBuf {
+layout(binding = 6) buffer debugBuf {
     _debug_struct d_struct[];  // contains nff table of all materials concatenated together
 };
 #endif
@@ -114,7 +113,6 @@ layout(push_constant) uniform constants {
     double rayIdStart;  // the ray id of the first ray of the batch.
     double numRays;     // The total number of rays in this tracing process.
     double randomSeed;
-    double maxSnapshots;  // each ray will take multiple snapshots (copies) while tracing, those are then sent to the CPU for further processing.
 }
 pushConstants;
 #endif
@@ -125,16 +123,12 @@ pushConstants;
 
 uint64_t rayId() { return uint64_t(pushConstants.rayIdStart) + uint64_t(gl_GlobalInvocationID); }
 
-// `i in [0, maxSnapshots]`.
-// Will return the index in outputData to access the `i'th` output ray belonging to this shader call.
-// Typically used as `outputData[output_index(i)]`.
-uint output_index(uint i) { return uint(gl_GlobalInvocationID) * uint(pushConstants.maxSnapshots) + i; }
-
 // sets all output rays controlled by this shader call to W_UNINIT.
 void uninitOutRays() {
-    for (uint i = 0; i < pushConstants.maxSnapshots; i++) {
-        outputData[output_index(i)].m_weight = W_UNINIT;
-    }
+    // for (uint i = 0; i < pushConstants.maxSnapshots; i++) {
+    //     outputData[output_index(i)].m_weight = W_UNINIT;
+    // }
+    _ray.m_weight = W_UNINIT;
 }
 
 /**************************************************************
@@ -150,12 +144,10 @@ void main() {
     }
 #endif
 
-    // placeholder, info should later be transfered to shader
-    const int maxBounces = elements.length();
     // ray specific "seed" for random numbers -> every ray has a different starting value for the counter that creates the random number
     const uint64_t MAX_UINT64 = ~(uint64_t(0));
     uint64_t workerCounterNum = MAX_UINT64 / uint64_t(pushConstants.numRays);
-    rayMetaData[uint(gl_GlobalInvocationID)].ctr = rayId() * workerCounterNum + uint64_t(pushConstants.randomSeed * MAX_UINT64);
+    _rayMeta.ctr = rayId() * workerCounterNum + uint64_t(pushConstants.randomSeed * MAX_UINT64);
 
 #ifdef RAYX_DEBUG_MODE  // Debug Matrix only works in GPU Mode and on DEBUG Build Type
 #ifdef GLSL

@@ -46,7 +46,8 @@ class RAYX_API Tracer {
         double rayIdStart;
         double numRays;
         double randomSeed;
-        double maxSnapshots;
+        int i_bounce = 0;
+        // double maxSnapshots;
     };
 
   protected:

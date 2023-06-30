@@ -72,7 +72,7 @@ std::vector<Ray> VulkanTracer::traceRaw(const TraceRawConfig& cfg) {
         // Bindings are *IN ORDER*
         // PS: You can also call addDescriptorSetPerPassBindings once!
         bufferHandler
-            ->createBuffer<Ray>({"ray-buffer", VKBUFFER_IN}, rayList)  // Input Ray Buffer
+            ->createBuffer<Ray>({"ray-buffer", VKBUFFER_INOUT}, rayList)  // Input Ray Buffer
             .addDescriptorSetPerPassBinding(passName0, 0, shaderFlag)
             .addDescriptorSetPerPassBinding(passName1, 0, shaderFlag);
 
@@ -81,35 +81,35 @@ std::vector<Ray> VulkanTracer::traceRaw(const TraceRawConfig& cfg) {
             .addDescriptorSetPerPassBinding(passName0, 1, shaderFlag)
             .addDescriptorSetPerPassBinding(passName1, 1, shaderFlag);
 
+        // bufferHandler [deprecated]
+        //     ->createBuffer({"output-buffer", VKBUFFER_OUT, (numberOfRays * sizeof(Ray) * (int)cfg.m_maxSnapshots)})  // Output Ray Buffer
+        //     .addDescriptorSetPerPassBinding(passName0, 2, shaderFlag)
+        //     .addDescriptorSetPerPassBinding(passName1, 2, shaderFlag);
+
         bufferHandler
-            ->createBuffer({"output-buffer", VKBUFFER_OUT, (numberOfRays * sizeof(Ray) * (int)cfg.m_maxSnapshots)})  // Output Ray Buffer
+            ->createBuffer<double>({"quadric-buffer", VKBUFFER_IN}, beamlineData)  // Beamline quadric info
             .addDescriptorSetPerPassBinding(passName0, 2, shaderFlag)
             .addDescriptorSetPerPassBinding(passName1, 2, shaderFlag);
 
         bufferHandler
-            ->createBuffer<double>({"quadric-buffer", VKBUFFER_IN}, beamlineData)  // Beamline quadric info
+            ->createBuffer({"xyznull-buffer", VKBUFFER_IN, 100})  // FIXME(OS): This buffer is not needed?
             .addDescriptorSetPerPassBinding(passName0, 3, shaderFlag)
             .addDescriptorSetPerPassBinding(passName1, 3, shaderFlag);
 
         bufferHandler
-            ->createBuffer({"xyznull-buffer", VKBUFFER_IN, 100})  // FIXME(OS): This buffer is not needed?
+            ->createBuffer<int>({"material-index-table", VKBUFFER_IN}, materialTables.indexTable)  /// Material info
             .addDescriptorSetPerPassBinding(passName0, 4, shaderFlag)
             .addDescriptorSetPerPassBinding(passName1, 4, shaderFlag);
 
         bufferHandler
-            ->createBuffer<int>({"material-index-table", VKBUFFER_IN}, materialTables.indexTable)  /// Material info
+            ->createBuffer<double>({"material-table", VKBUFFER_IN}, materialTables.materialTable)  // Material info
             .addDescriptorSetPerPassBinding(passName0, 5, shaderFlag)
             .addDescriptorSetPerPassBinding(passName1, 5, shaderFlag);
-
-        bufferHandler
-            ->createBuffer<double>({"material-table", VKBUFFER_IN}, materialTables.materialTable)  // Material info
-            .addDescriptorSetPerPassBinding(passName0, 6, shaderFlag)
-            .addDescriptorSetPerPassBinding(passName1, 6, shaderFlag);
 #ifdef RAYX_DEBUG_MODE
         bufferHandler
             ->createBuffer({"debug-buffer", VKBUFFER_OUT, numberOfRays * sizeof(debugBuffer_t)})  // Debug Matrix Buffer
-            .addDescriptorSetPerPassBinding(passName0, 7, shaderFlag)
-            .addDescriptorSetPerPassBinding(passName1, 7, shaderFlag);
+            .addDescriptorSetPerPassBinding(passName0, 6, shaderFlag)
+            .addDescriptorSetPerPassBinding(passName1, 6, shaderFlag);
 #endif
     }
     // Optional

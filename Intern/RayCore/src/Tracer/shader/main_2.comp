@@ -59,7 +59,8 @@ struct Ray {
 
 struct RayMeta {
     uint64_t nextElementId;
-    double ctr;
+    uint64_t ctr;
+    double bounce;
     bool finalized;
 };
 
@@ -74,31 +75,28 @@ struct _debug_struct {
  **************************************************************/
 
 // don't use this directly. Use `_ray` instead.
-layout(std140, binding = 0) buffer ibuf { Ray rayData[]; };
+layout(std140, binding = 0) buffer iobuf { Ray rayData[]; };
 
 layout(std140, binding = 1) buffer ibufm { RayMeta rayMetaData[]; };
 
-// don't use this directly. Use `takeSnapshot` instead.
-layout(std140, binding = 2) buffer obuf { Ray outputData[]; };
-
 // std430 is required so that Element is layouted like in C++.
 // see https://www.khronos.org/opengl/wiki/Interface_Block_(GLSL) for more details on layouting.
-layout(std430, binding = 3) buffer qbuf { Element elements[]; };
+layout(std430, binding = 2) buffer qbuf { Element elements[]; };
 
-layout(std140, binding = 4) buffer xyzbuf { dvec4 xyznull[]; };
+layout(std140, binding = 3) buffer xyzbuf { dvec4 xyznull[]; };
 
-layout(binding = 5) buffer materialIndexBuf {
+layout(binding = 4) buffer materialIndexBuf {
     int matIdx[];  // matIdx[0..91] contains the indices of the Palik Table, whereas matIdx[92..92+91] contains the indices of the NffTable.
                    // generally, an entry of matIdx tells you the index you need to look up in the 'mat'-table below.
 };
 
-layout(binding = 6) buffer materialBuf {
+layout(binding = 5) buffer materialBuf {
     double mat[];  // contains: (Palik tables of all materials concatenated together) concatenated with (Nff tables of all materials concatenated
                    // together) use the matIdx-table to determine the relevant indices for when which table starts and stops.
 };
 
 #ifdef RAYX_DEBUG_MODE
-layout(binding = 7) buffer debugBuf {
+layout(binding = 6) buffer debugBuf {
     _debug_struct d_struct[];  // contains nff table of all materials concatenated together
 };
 #endif
@@ -115,7 +113,7 @@ layout(push_constant) uniform constants {
     double rayIdStart;  // the ray id of the first ray of the batch.
     double numRays;     // The total number of rays in this tracing process.
     double randomSeed;
-    double maxSnapshots;  // each ray will take multiple snapshots (copies) while tracing, those are then sent to the CPU for further processing.
+    int i_bounce;
 }
 pushConstants;
 #endif
@@ -124,43 +122,14 @@ pushConstants;
  *                    Functions && vars
  **************************************************************/
 
-uint64_t rayId() { return uint64_t(pushConstants.rayIdStart) + uint64_t(gl_GlobalInvocationID); }
-
-bool finalized;
-
-// `i in [0, maxSnapshots]`.
-// Will return the index in outputData to access the `i'th` output ray belonging to this shader call.
-// Typically used as `outputData[output_index(i)]`.
-uint output_index(uint i) { return uint(gl_GlobalInvocationID) * uint(pushConstants.maxSnapshots) + i; }
-
-
 // take a snapshot and store it in the next free spot in outputData.
 // `r` will typically be _ray, or some related ray.
 void takeSnapshot(Ray r, double w) {
     if (_rayMeta.finalized) {
         return;
     }
-
-    if (w == W_UNINIT) {
-#ifndef GLSL
-        RAYX_ERR << "takeSnapshot failed: no free spots!";
-#endif
-    }
-
-    for (uint i = 0; i < pushConstants.maxSnapshots; i++) {
-        uint idx = output_index(i);
-        if (outputData[idx].m_weight == W_UNINIT) {  // checks whether this spot is free
-            outputData[idx] = r;
-            outputData[idx].m_weight = w;
-            return;
-        }
-    }
-
-// no spots were found.
-// this shouldn't be using `throw`, as otherwise we might end up in infinite recursion.
-#ifndef GLSL
-    RAYX_WARN << "takeSnapshot failed: no free spots!";
-#endif
+    _ray.m_weight = w;
+    return;
 }
 
 // like `takeSnapshot` above, but it will prevent taking more snapshots after this.
@@ -189,7 +158,6 @@ void takeFinalSnapshot(Ray r, double w) {
 #include "utils.comp"
 #include "collision.comp"
 #include "behave.comp"
-#include "dynamic_elements.comp"
 // clang-format on
 
 /**************************************************************
@@ -200,7 +168,6 @@ void takeFinalSnapshot(Ray r, double w) {
 // in this function we need to make sure that rayData ALWAYS remains in GLOBAL coordinates (it can be changed in a function but needs to be changed
 // back before the function returns to this function)
 void main() {
-    // for (int i = 0; i < maxBounces; i++) {
     Collision col = findCollision();
 
     if (!col.found) {
@@ -212,11 +179,12 @@ void main() {
     }
 
     // transform ray and intersection point in ELEMENT coordiantes
-    nextElement = elements[col.elementIndex];
+    Element nextElement = elements[col.elementIndex];
     Ray elem_ray = rayMatrixMult(_ray, nextElement.m_inTrans);
 
     // Calculate interaction(reflection,material, absorption etc.) of ray with detected next element
     int btype = int(nextElement.m_behaviour.m_type);
+    uint64_t ctr = _rayMeta.ctr;
 
     elem_ray.m_pathLength += length(elem_ray.m_position - col.hitpoint);
     elem_ray.m_position = col.hitpoint;
@@ -247,8 +215,8 @@ void main() {
 
     // use extraParameter to store the order in which the ray has hit which optical element (e.g extraParameter = 412 -> first hit element 2, then
     // 1, then 4)
-    elem_ray.m_extraParam += ((col.elementIndex + 1) * bounce) * int(elem_ray.m_lastElement == col.elementIndex + 1);
-    bounce *= pow(10, int(elem_ray.m_lastElement == col.elementIndex + 1));
+    elem_ray.m_extraParam += ((col.elementIndex + 1) * _rayMeta.bounce) * int(elem_ray.m_lastElement == col.elementIndex + 1);
+    _rayMeta.bounce *= pow(10, int(elem_ray.m_lastElement == col.elementIndex + 1));
 
     takeSnapshot(elem_ray, W_JUST_HIT_ELEM);  // TODO: SNAPSHOT
 
@@ -256,10 +224,14 @@ void main() {
     _ray = rayMatrixMult(elem_ray, nextElement.m_outTrans);
     //}
 
-    ///////END OF LOOP
-    if (findCollision().found) {
-        takeFinalSnapshot(_ray, W_NOT_ENOUGH_BOUNCES);
-    } else {
-        takeFinalSnapshot(_ray, W_FLY_OFF);
+    // Make final check on ray
+    // placeholder, info should later be transfered to shader
+    const int maxBounces = elements.length();
+    if (pushConstants.i_bounce == maxBounces - 1) {
+        if (findCollision().found) {
+            takeFinalSnapshot(_ray, W_NOT_ENOUGH_BOUNCES);
+        } else {
+            takeFinalSnapshot(_ray, W_FLY_OFF);
+        }
     }
 }
