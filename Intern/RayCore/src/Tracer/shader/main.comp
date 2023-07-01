@@ -123,7 +123,8 @@ struct Ray {
         double rayIdStart;
         double numRays;
         double randomSeed;
-        double maxSnapshots;
+        double maxSnapshots;  // FIXME(OS) : Only used by CPU
+        int i_bounce;
     } pushConstants;
 #endif
 

@@ -49,7 +49,8 @@ Rays Tracer::trace(const Beamline& b) {
             .m_elements = elements,
         };
 
-        PushConstants pushConsants = {.rayIdStart = (double)rayIdStart, .numRays = (double)rays.size(), .randomSeed = randomSeed};
+        PushConstants pushConsants = {
+            .rayIdStart = (double)rayIdStart, .numRays = (double)rays.size(), .randomSeed = randomSeed, .maxSnapshots = (double)maxSnapshots};
         setPushConstants(&pushConsants);
 
         Snapshots rawBatchRays;

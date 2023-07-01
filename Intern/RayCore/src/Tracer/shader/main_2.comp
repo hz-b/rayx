@@ -110,9 +110,10 @@ layout(binding = 6) buffer debugBuf {
 pushConstants_t pushConstants;
 #else
 layout(push_constant) uniform constants {
-    double rayIdStart;  // the ray id of the first ray of the batch.
-    double numRays;     // The total number of rays in this tracing process.
+    double rayIdStart;
+    double numRays;
     double randomSeed;
+    double maxSnapshots;  // FIXME(OS) : Only used by CPU
     int i_bounce;
 }
 pushConstants;

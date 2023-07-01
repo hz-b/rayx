@@ -46,8 +46,8 @@ class RAYX_API Tracer {
         double rayIdStart;
         double numRays;
         double randomSeed;
+        double maxSnapshots;  // FIXME(OS) : Only used by CPU
         int i_bounce = 0;
-        // double maxSnapshots;
     };
 
   protected:

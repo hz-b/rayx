@@ -51,7 +51,7 @@ std::vector<Ray> CpuTracer::traceRaw(const TraceRawConfig& cfg) {
     // Run the tracing by for all rays
     for (uint i = 0; i < rayList.size(); i++) {
         CPU_TRACER::gl_GlobalInvocationID = i;
-        CPU_TRACER::main();
+        //CPU_TRACER::main();
     }
 
     // Fetch Rays back from the Shader "container"
