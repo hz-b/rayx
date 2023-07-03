@@ -11,11 +11,13 @@
 #include "Data/Importer.h"
 #include "Debug/Debug.h"
 #include "Material/Material.h"
+#include "Random.h"
 #include "Shared/Constants.h"
+#include "Shared/Ray.h"
 #include "Tracer/CpuTracer.h"
-#include "Tracer/Ray.h"
 #include "Tracer/VulkanTracer.h"
 #include "Writer/CSVWriter.h"
+#include "cpuAccess.h"
 #include "gmock/gmock.h"
 #include "gtest/gtest.h"
 
@@ -86,14 +88,14 @@ inline void checkEq(std::string filename, int line, std::string l, std::string r
 template <>
 inline void checkEq(std::string filename, int line, std::string l, std::string r, const RAYX::Ray& tl, const RAYX::Ray& tr, std::vector<double> vl,
                     std::vector<double> vr, double tolerance) {
-    std::vector<std::string> names = {".m_position.x",  ".m_position.y", ".m_position.z",  ".m_weight",    ".m_direction.x", ".m_direction.y",
+    std::vector<std::string> names = {".m_position.x",  ".m_position.y", ".m_position.z",  ".m_eventType", ".m_direction.x", ".m_direction.y",
                                       ".m_direction.z", ".m_energy",     ".m_stokes.x",    ".m_stokes.y",  ".m_stokes.z",    ".m_stokes.w",
                                       ".m_pathLength",  ".m_order",      ".m_lastElement", ".m_extraParam"};
     for (int i = 0; i < 14; i++) {
         auto t = tolerance;
 
         // integer tolerance for integer values.
-        if (i == 3 /*weight*/ || i == 14 /*lastElem*/ || i == 15 /*extraParam*/) {
+        if (i == 3 /*eventType*/ || i == 14 /*lastElem*/ || i == 15 /*extraParam*/) {
             t = 0.5;
         }
 
@@ -129,7 +131,7 @@ inline void checkEq(std::string filename, int line, std::string l, std::string r
     }
 
 /// used to check equalities, where doubles contain integer values
-/// i.e. weight == 1, or extraParam == 21.
+/// i.e. eventType == 1, or extraParam == 21.
 inline bool intclose(double x, double y) { return abs(x - y) < 0.5; }
 
 // ShaderTest
@@ -161,7 +163,10 @@ class TestSuite : public testing::Test {
 #endif
         }
     }
-    virtual void SetUp() {}
+
+    // called before every test invocation.
+    virtual void SetUp() { RAYX::fixSeed(RAYX::FIXED_SEED); }
+
     static void TearDownTestSuite() { tracer = nullptr; }
 };
 
@@ -171,13 +176,13 @@ class TestSuite : public testing::Test {
 RAYX::Beamline loadBeamline(std::string filename);
 
 /// will write to Tests/output/<filename>.csv
-void writeToOutputCSV(const RAYX::Rays& rays, std::string filename);
+void writeToOutputCSV(const RAYX::BundleHistory& hist, std::string filename);
 
 /// Returns all traced rays
-RAYX::Rays traceRML(std::string filename);
+RAYX::BundleHistory traceRML(std::string filename);
 
-// extracts the last W_JUST_HIT_ELEM for each ray.
-std::vector<RAYX::Ray> extractLastHit(const RAYX::Rays&);
+// extracts the last ETYPE_JUST_HIT_ELEM for each ray.
+std::vector<RAYX::Event> extractLastHit(const RAYX::BundleHistory&);
 
 /// will look at Tests/input/<filename>.csv
 /// the Ray-UI files are to be obtained by Export > RawRaysOutgoing (which are in
@@ -185,7 +190,11 @@ std::vector<RAYX::Ray> extractLastHit(const RAYX::Rays&);
 std::vector<RAYX::Ray> loadCSVRayUI(std::string filename);
 
 /// Checks for equality up to the tolerance `t`.
-void compareRays(const RAYX::Rays& r1, const RAYX::Rays& r2, double t = 1e-11);
+void compareBundleHistories(const RAYX::BundleHistory& r1, const RAYX::BundleHistory& r2, double t = 1e-11);
+
+// If the ray from `ray_hist` went through the whole beamline sequentially, we return its last hit event.
+// Otherwise we return `{}`, aka None.
+std::optional<RAYX::Ray> lastSequentialHit(RayHistory ray_hist, unsigned int beamline_len);
 
 /// Only cares for the rays hitting the last object of the beamline, and check whether they are the same as their RayUI counter part.
 /// Ray UI rays are obtained Export > RawRaysOutgoing.

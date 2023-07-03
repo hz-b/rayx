@@ -4,14 +4,7 @@
 #include "Behaviour.h"
 #include "Cutout.h"
 #include "Surface.h"
-
-// TODO extract this somewhere else
-#ifndef GLSL
-
-#include <glm.hpp>
-using dmat4 = glm::dmat4;
-
-#endif
+#include "adapt.h"
 
 struct SlopeError {
     double m_sag;  // aka `slopeErrorX`

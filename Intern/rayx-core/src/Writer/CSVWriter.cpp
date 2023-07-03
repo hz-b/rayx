@@ -56,7 +56,7 @@ Cell doubleToCell(double x) {
     return strToCell(s.c_str());
 }
 
-void writeCSV(const RAYX::Rays& rays, std::string filename, const Format& format) {
+void writeCSV(const RAYX::BundleHistory& hist, std::string filename, const Format& format) {
     std::ofstream file(filename);
 
     // write header:
@@ -68,18 +68,18 @@ void writeCSV(const RAYX::Rays& rays, std::string filename, const Format& format
     }
     file << '\n';
 
-    RAYX_VERB << "Writing " << rays.size() << " rays to file...";
+    RAYX_VERB << "Writing " << hist.size() << " rays to file...";
 
     // write data:
-    for (unsigned long ray_id = 0; ray_id < rays.size(); ray_id++) {
-        const auto& snapshots = rays[ray_id];
-        for (unsigned long snapshot_id = 0; snapshot_id < snapshots.size(); snapshot_id++) {
-            const auto& ray = snapshots[snapshot_id];
+    for (unsigned long ray_id = 0; ray_id < hist.size(); ray_id++) {
+        const RAYX::RayHistory& ray_hist = hist[ray_id];
+        for (unsigned long event_id = 0; event_id < ray_hist.size(); event_id++) {
+            const RAYX::Event& event = ray_hist[event_id];
             for (uint i = 0; i < format.size(); i++) {
                 if (i > 0) {
                     file << DELIMITER;
                 }
-                file << doubleToCell(format[i].get_double(ray_id, snapshot_id, ray)).buf;
+                file << doubleToCell(format[i].get_double(ray_id, event_id, event)).buf;
             }
             file << '\n';
         }
@@ -89,14 +89,14 @@ void writeCSV(const RAYX::Rays& rays, std::string filename, const Format& format
 
 // loader:
 
-RAYX::Rays loadCSV(std::string filename) {
+RAYX::BundleHistory loadCSV(std::string filename) {
     std::ifstream file(filename);
 
     // ignore setup line
     std::string s;
     std::getline(file, s);
 
-    RAYX::Rays out;
+    RAYX::BundleHistory out;
 
     while (std::getline(file, s)) {
         std::vector<double> d;
@@ -107,29 +107,29 @@ RAYX::Rays loadCSV(std::string filename) {
         unsigned long ray_id = std::stoi(num);
 
         std::getline(ss, num, DELIMITER);
-        unsigned long snapshot_id = std::stoi(num);
+        unsigned long event_id = std::stoi(num);
 
         while (std::getline(ss, num, DELIMITER)) {
             d.push_back(std::stod(num));
         }
-        assert(d.size() == 16);
+        assert(d.size() == 15);
         RAYX::Ray ray = {.m_position = {d[0], d[1], d[2]},
-                         .m_weight = d[3],
+                         .m_eventType = d[3],
                          .m_direction = {d[4], d[5], d[6]},
                          .m_energy = d[7],
                          .m_stokes = {d[8], d[9], d[10], d[11]},
                          .m_pathLength = d[12],
                          .m_order = d[13],
                          .m_lastElement = d[14],
-                         .m_extraParam = d[15]};
+                         .m_padding = -1.0};
         if (out.size() <= ray_id) {
             out.push_back({});
         }
         if (ray_id + 1 != out.size()) {
             RAYX_ERR << "loadCSV failed: rays out of order";
         }
-        if (snapshot_id != out[ray_id].size()) {
-            RAYX_ERR << "loadCSV failed: snapshots out of order";
+        if (event_id != out[ray_id].size()) {
+            RAYX_ERR << "loadCSV failed: events out of order";
         }
         out[ray_id].push_back(ray);
     }

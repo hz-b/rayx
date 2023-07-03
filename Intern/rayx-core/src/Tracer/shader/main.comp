@@ -2,20 +2,11 @@
 /**************************************************************
  *                    Header & #define
  **************************************************************/
-#ifndef GLSL
-    #define INOUT(x) x&
-    #define OUT(x) x&
-    #define ALLOW_UNUSED [[maybe_unused]]
-#else
-    #define INOUT(x) inout x
-    #define OUT(x) out x
-    #define ALLOW_UNUSED
-
+#ifdef GLSL
     #extension GL_EXT_debug_printf : enable
 	#extension GL_ARB_separate_shader_objects : enable
 	#extension GL_ARB_gpu_shader_int64 : enable
 	#extension GL_GOOGLE_include_directive : enable
-
 	layout(local_size_x = WORKGROUP_SIZE, local_size_y = 1, local_size_z = 1) in;
 #endif
 
@@ -23,107 +14,60 @@
 // `_ray` is that ray, it's always in world coordinates (!).
 #define _ray (rayData[uint(gl_GlobalInvocationID)])
 
+#include "../../Shared/adapt.h"
 #include "../../Shared/Constants.h"
+#include "../../Shared/Ray.h"
 
 /**************************************************************
- *                    Structs
+ *                    SHADER ARRAYS
  **************************************************************/
- 
-// for non GLSL(CPP), the according things are mostly defined in CpuTracer.h
-#ifndef GLSL
-int gl_GlobalInvocationID;
 
-ShaderArray<Ray> rayData;
-ShaderArray<Ray> outputData;
+// don't use this directly. Use `_ray` instead.
+SHADER_ARRAY(Ray, rayData, 0, ibuf);
 
-// // the ray id of the first ray of the batch.
-// // // See `rayId` to access the ray id of the current ray.
-// double rayIdStart;
+// don't use this directly. Use `recordEvent` instead.
+SHADER_ARRAY(Ray, outputData, 1, obuf);
 
-// // The total number of rays in this tracing process.
-// // (not only this batch)
-// double numRays;
+// std430 is required so that Element is layouted like in C++.
+// see https://www.khronos.org/opengl/wiki/Interface_Block_(GLSL) for more details on layouting.
+SHADER_ARRAY(Element, elements, 2, qbuf);
 
-// double randomSeed;
+// TODO unused!
+SHADER_ARRAY(dvec4, xyznull, 3, xyzbuf);
 
-// // each ray will take multiple snapshots (copies) while tracing, those are then sent to the CPU for further processing.
-// double maxSnapshots;
+// matIdx[0..91] contains the indices of the Palik Table, whereas matIdx[92..92+91] contains the indices of the NffTable.
+// generally, an entry of matIdx tells you the index you need to look up in the 'mat'-table below.
+SHADER_ARRAY(int, matIdx, 4, materialIndexBuf);
 
-ShaderArray<Element> elements;
-ShaderArray<dvec4> xyznull;
-ShaderArray<int> matIdx;
-ShaderArray<double> mat;
+// contains: (Palik tables of all materials concatenated together) concatenated with (Nff tables of all materials concatenated together)
+// use the matIdx-table to determine the relevant indices for when which table starts and stops.
+SHADER_ARRAY(double, mat, 5, materialBuf);
 
-#else
-struct Ray {
-    dvec3 m_position;
-    // Initially weight for _ray is `W_IN_COMPUTATION`.
-    // See the potential values of `m_weight` in `Constants.h`.
-    double m_weight;
-    dvec3 m_direction;
-    double m_energy;
-    dvec4 m_stokes;
-    double m_pathLength;
-    double m_order;
-    double m_lastElement;
-    double m_extraParam;
-};
 
 #ifdef RAYX_DEBUG_MODE
-	struct _debug_struct {
-		dmat4 _dMat; // Can also be used as vectors or scalar
-	};
+struct _debug_struct {
+    dmat4 _dMat; // Can also be used as vectors or scalar
+};
+
+SHADER_ARRAY(_debug_struct, d_struct, 6, debugBuf);
 #endif
 
-/**************************************************************
- *                    SHADER LAYOUT (GPU-ONLY)
- **************************************************************/
-
-    // don't use this directly. Use `_ray` instead.
-	layout(std140, binding = 0) buffer ibuf { Ray rayData[]; };
-
-    // don't use this directly. Use `takeSnapshot` instead.
-	layout(std140, binding = 1) buffer obuf { Ray outputData[]; };
-
-    // std430 is required so that Element is layouted like in C++.
-    // see https://www.khronos.org/opengl/wiki/Interface_Block_(GLSL) for more details on layouting.
-	layout(std430, binding = 2) buffer qbuf {
-		Element elements[];
-	};
-
-	layout(std140, binding = 3) buffer xyzbuf { dvec4 xyznull[]; };
-
-	layout(binding = 4) buffer materialIndexBuf {
-		int matIdx[]; // matIdx[0..91] contains the indices of the Palik Table, whereas matIdx[92..92+91] contains the indices of the NffTable.
-					  // generally, an entry of matIdx tells you the index you need to look up in the 'mat'-table below.
-	};
-
-	layout(binding = 5) buffer materialBuf {
-		double mat[];  // contains: (Palik tables of all materials concatenated together) concatenated with (Nff tables of all materials concatenated together)
-					   // use the matIdx-table to determine the relevant indices for when which table starts and stops.
-	};
-
-	#ifdef RAYX_DEBUG_MODE
-		layout(binding = 6) buffer debugBuf {
-			_debug_struct d_struct[];  // contains nff table of all materials concatenated together
-		};
-	#endif
-
-
+#ifndef GLSL
+int gl_GlobalInvocationID;
 #endif
 
 /**************************************************************
  *                    PushConstants
  **************************************************************/
 #ifndef GLSL
-    pushConstants_t pushConstants;
+    PushConstants pushConstants;
 #else 
     layout( push_constant ) uniform constants
     {   
         double rayIdStart;
         double numRays;
         double randomSeed;
-        double maxSnapshots;
+        double maxEvents;
     } pushConstants;
 #endif
 
@@ -137,36 +81,36 @@ uint64_t rayId() {
 
 bool finalized;
 
-// `i in [0, maxSnapshots]`.
+// `i in [0, maxEvents]`.
 // Will return the index in outputData to access the `i'th` output ray belonging to this shader call.
 // Typically used as `outputData[output_index(i)]`.
 uint output_index(uint i) {
-    return uint(gl_GlobalInvocationID) * uint(pushConstants.maxSnapshots) + i;
+    return uint(gl_GlobalInvocationID) * uint(pushConstants.maxEvents) + i;
 }
 
-// sets all output rays controlled by this shader call to W_UNINIT.
+// sets all output rays controlled by this shader call to ETYPE_UNINIT.
 void uninitOutRays() {
-    for (uint i = 0; i < pushConstants.maxSnapshots; i++) {
-        outputData[output_index(i)].m_weight = W_UNINIT;
+    for (uint i = 0; i < pushConstants.maxEvents; i++) {
+        outputData[output_index(i)].m_eventType = ETYPE_UNINIT;
     }
 }
 
-// take a snapshot and store it in the next free spot in outputData.
+// record an event and store it in the next free spot in outputData.
 // `r` will typically be _ray, or some related ray.
-void takeSnapshot(Ray r, double w) {
+void recordEvent(Ray r, double w) {
     if (finalized) { return; }
 
-    if (w == W_UNINIT) {
+    if (w == ETYPE_UNINIT) {
         #ifndef GLSL
-        RAYX_ERR << "takeSnapshot failed: no free spots!";
+        RAYX_ERR << "recordEvent failed: no free spots!";
         #endif
     }
 
-    for (uint i = 0; i < pushConstants.maxSnapshots; i++) {
+    for (uint i = 0; i < pushConstants.maxEvents; i++) {
         uint idx = output_index(i);
-        if (outputData[idx].m_weight == W_UNINIT) { // checks whether this spot is free
+        if (outputData[idx].m_eventType == ETYPE_UNINIT) { // checks whether this spot is free
             outputData[idx] = r;
-            outputData[idx].m_weight = w;
+            outputData[idx].m_eventType = w;
             return;
         }
     }
@@ -174,20 +118,20 @@ void takeSnapshot(Ray r, double w) {
     // no spots were found.
     // this shouldn't be using `throw`, as otherwise we might end up in infinite recursion.
     #ifndef GLSL
-    RAYX_WARN << "takeSnapshot failed: no free spots!";
+    RAYX_WARN << "recordEvent failed: no free spots!";
     #endif
 }
 
-// like `takeSnapshot` above, but it will prevent taking more snapshots after this.
-// Is used for snapshots terminating the path of the ray.
-void takeFinalSnapshot(Ray r, double w) {
-    takeSnapshot(r, w);
+// Like `recordEvent` above, but it will prevent recording more events after this.
+// Is used for events terminating the path of the ray.
+void recordFinalEvent(Ray r, double w) {
+    recordEvent(r, w);
     finalized = true;
 }
 
 // throws an error, and termiantes the program
 #ifdef GLSL
-#define throw(string) takeFinalSnapshot(_ray, W_FATAL_ERROR)
+#define throw(string) recordFinalEvent(_ray, ETYPE_FATAL_ERROR)
 #else
 #define throw(string) RAYX_ERR << string
 #endif
@@ -213,9 +157,6 @@ void takeFinalSnapshot(Ray r, double w) {
 void main() {
     finalized = false;
     uninitOutRays();
-
-    // this is required as sometimes error codes are transmitted using _ray.m_weight
-    _ray.m_weight = W_UNINIT;
     
     // ~~~~~~~~~~~~~~ PRINT EXAMPLE ~~~~~~~~~~~~~~
     // Printing ~DEBUG~ Example over vkconfig Validation Layers

@@ -2,12 +2,7 @@
 #define BEHAVIOUR_H
 
 #include "Cutout.h"
-
-#ifdef GLSL
-#define INLINE
-#else
-#define INLINE inline
-#endif
+#include "adapt.h"
 
 // A behaviour decides what happens whenever a ray hits the surface of this element.
 // Each behaviour type has its own `behave` function in `behave.comp`.

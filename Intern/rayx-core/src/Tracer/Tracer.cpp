@@ -12,15 +12,15 @@ using uint = unsigned int;
 
 namespace RAYX {
 
-Rays Tracer::trace(const Beamline& b, uint64_t max_batch_size) {
+BundleHistory Tracer::trace(const Beamline& b, uint64_t max_batch_size) {
     RAYX_PROFILE_FUNCTION_STDOUT();
 
     auto rays = b.getInputRays();
     auto randomSeed = randomDouble();
-    auto maxSnapshots = b.m_OpticalElements.size() + 2;
+    auto maxEvents = b.m_OpticalElements.size() + 2;
     auto materialTables = b.calcMinimalMaterialTables();
 
-    Rays result;
+    BundleHistory result;
 
     for (int batch_id = 0; batch_id * max_batch_size < rays.size(); batch_id++) {
         auto rayIdStart = batch_id * max_batch_size;
@@ -42,88 +42,55 @@ Rays Tracer::trace(const Beamline& b, uint64_t max_batch_size) {
             .m_rayIdStart = (double)rayIdStart,
             .m_numRays = (double)rays.size(),
             .m_randomSeed = randomSeed,
-            .m_maxSnapshots = (double)maxSnapshots,
+            .m_maxEvents = (double)maxEvents,
             .m_materialTables = materialTables,
             .m_elements = elements,
         };
 
         PushConstants pushConsants = {
-            .rayIdStart = (double)rayIdStart, .numRays = (double)rays.size(), .randomSeed = randomSeed, .maxSnapshots = (double)maxSnapshots};
+            .rayIdStart = (double)rayIdStart, .numRays = (double)rays.size(), .randomSeed = randomSeed, .maxEvents = (double)maxEvents};
         setPushConstants(&pushConsants);
 
-        Snapshots rawBatchRays;
+        RayHistory rawBatchHistory;
         {
             RAYX_PROFILE_SCOPE_STDOUT("Tracing");
-            rawBatchRays = traceRaw(cfg);
-            assert(rawBatchRays.size() == batch_size * maxSnapshots);
+            rawBatchHistory = traceRaw(cfg);
+            assert(rawBatchHistory.size() == batch_size * maxEvents);
         }
 
         {
-            RAYX_PROFILE_SCOPE_STDOUT("Snapshoting");
+            RAYX_PROFILE_SCOPE_STDOUT("BundleHistory-calculation");
             for (uint i = 0; i < batch_size; i++) {
-                Snapshots snapshots;
-                snapshots.reserve(maxSnapshots);
-                for (uint j = 0; j < maxSnapshots; j++) {
-                    uint idx = i * maxSnapshots + j;
-                    Ray r = rawBatchRays[idx];
-                    if (r.m_weight != W_UNINIT) {
-                        snapshots.push_back(r);
+                RayHistory hist;
+                hist.reserve(maxEvents);
+                for (uint j = 0; j < maxEvents; j++) {
+                    uint idx = i * maxEvents + j;
+                    Ray r = rawBatchHistory[idx];
+                    if (r.m_eventType != ETYPE_UNINIT) {
+                        hist.push_back(r);
                     }
                 }
-                result.push_back(snapshots);
+                result.push_back(hist);
             }
         }
     }
 
     return result;
 }
-/**
- * @brief Get Rays in last snapshot
- *
- * @param rays
- * @return std::vector<Ray>
- */
-std::vector<Ray> extractLastSnapshot(const Rays& rays) {
-    std::vector<Ray> out;
-    for (auto& snapshots : rays) {
-        out.push_back(snapshots.back());
+void Tracer::setDevice(int deviceID) { m_deviceID = deviceID; }
+
+/// Get the last event for each ray of the bundle.
+std::vector<Event> extractLastEvents(const BundleHistory& hist) {
+    std::vector<Event> out;
+    for (auto& ray_hist : hist) {
+        out.push_back(ray_hist.back());
     }
 
     return out;
 }
-/**
- * @brief Get Rays in first snapshot
- *
- * @param rays
- * @return std::vector<Ray>
- */
-std::vector<Ray> extracFirstSnapshot(const Rays& rays) {
-    std::vector<Ray> out;
-    for (auto& snapshots : rays) {
-        out.push_back(snapshots.front());
-    }
 
-    return out;
-}
-/***
- * Get Rays Nth snapshot
- */
-std::vector<Ray> extracNthSnapshot(const Rays& rays, int snapshotID) {
-    std::vector<Ray> out;
-    int skipped = 0;
-    for (auto& snapshots : rays) {
-        if ((int)snapshots.size() - 1 >= snapshotID) {
-            out.push_back(snapshots[snapshotID]);
-        } else {
-            skipped++;
-        }
-    }
-    RAYX_VERB << "Skipped " << skipped << " snapshots while extracting.";
-    return out;
-}
-
-Rays convertToRays(const std::vector<Ray>& rays) {
-    Rays out;
+BundleHistory convertToBundleHistory(const std::vector<Ray>& rays) {
+    BundleHistory out;
     for (auto r : rays) {
         out.push_back({r});
     }

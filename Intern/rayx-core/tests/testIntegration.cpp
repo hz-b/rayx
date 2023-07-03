@@ -8,7 +8,7 @@ TEST_F(TestSuite, PlaneMirrorDef) {
     compareLastAgainstRayUI("PlaneMirrorDef");
 
     // additional path length test
-    auto rays = extractLastSnapshot(traceRML("PlaneMirrorDef"));
+    auto rays = extractLastEvents(traceRML("PlaneMirrorDef"));
     for (auto r : rays) {
         CHECK_IN(r.m_pathLength, 11000, 11001);
     }
@@ -39,25 +39,23 @@ TEST_F(TestSuite, globalCoordinates_20rays) { compareLastAgainstRayUI("globalCoo
 TEST_F(TestSuite, pm_ell_ip_200mirrormis) { compareLastAgainstRayUI("pm_ell_ip_200mirrormis"); }
 
 TEST_F(TestSuite, Ellipsoid) {
-    auto rayx_raw = traceRML("Ellipsoid");
+    auto rayx = traceRML("Ellipsoid");
 
-    writeToOutputCSV(rayx_raw, "Ellipsoid.rayx");
-    auto rayx = extractLastHit(rayx_raw);
+    writeToOutputCSV(rayx, "Ellipsoid.rayx");
 
     bool found_atleast_one = false;
-    for (auto r : rayx) {
-        if (!intclose(r.m_extraParam, 21)) {
-            continue;
+    for (auto ray_hist : rayx) {
+        auto opt = lastSequentialHit(ray_hist, 2);
+        if (opt) {
+            CHECK_EQ(opt->m_position, glm::dvec3(0, 0, 0), 1e-11);
+            found_atleast_one = true;
         }
-
-        CHECK_EQ(r.m_position, glm::dvec3(0, 0, 0), 1e-11);
-        found_atleast_one = true;
     }
     CHECK(found_atleast_one);
 }
 
 TEST_F(TestSuite, Slit) {
-    auto rays = traceRML("slit");
+    auto hist = traceRML("slit");
 
     int absorbed = 0;      // number of rays absorbed by the slit.
     int pass_through = 0;  // number of rays passing through the slit.
@@ -65,19 +63,19 @@ TEST_F(TestSuite, Slit) {
     const auto SLIT_ID = 1;
     const auto IMAGE_PLANE_ID = 2;
 
-    for (auto snapshots : rays) {
-        if (snapshots.size() == 1) {  // matrix source -> slit absorbed
-            CHECK(snapshots[0].m_lastElement == SLIT_ID);
-            CHECK(snapshots[0].m_weight == W_ABSORBED);
+    for (auto ray_hist : hist) {
+        if (ray_hist.size() == 1) {  // matrix source -> slit absorbed
+            CHECK(ray_hist[0].m_lastElement == SLIT_ID);
+            CHECK(ray_hist[0].m_eventType == ETYPE_ABSORBED);
             absorbed++;
-        } else if (snapshots.size() == 3) {  // matrix source -> slit -> image plane -> fly off
-            CHECK(snapshots[0].m_lastElement == SLIT_ID);
-            CHECK(snapshots[0].m_weight == W_JUST_HIT_ELEM);
+        } else if (ray_hist.size() == 3) {  // matrix source -> slit -> image plane -> fly off
+            CHECK(ray_hist[0].m_lastElement == SLIT_ID);
+            CHECK(ray_hist[0].m_eventType == ETYPE_JUST_HIT_ELEM);
 
-            CHECK(snapshots[1].m_lastElement == IMAGE_PLANE_ID);
-            CHECK(snapshots[1].m_weight == W_JUST_HIT_ELEM);
+            CHECK(ray_hist[1].m_lastElement == IMAGE_PLANE_ID);
+            CHECK(ray_hist[1].m_eventType == ETYPE_JUST_HIT_ELEM);
 
-            CHECK(snapshots[2].m_weight == W_FLY_OFF);
+            CHECK(ray_hist[2].m_eventType == ETYPE_FLY_OFF);
             pass_through++;
         } else {
             CHECK(false);

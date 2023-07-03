@@ -48,8 +48,8 @@ RAYX::Ray parseCSVline(std::string line) {
     ray.m_stokes = {vec[11], vec[12], vec[13], vec[14]};
 
     // otherwise uninitialized:
-    ray.m_extraParam = -1;
-    ray.m_weight = -1;
+    ray.m_padding = -1;
+    ray.m_eventType = -1;
     ray.m_lastElement = -1;
     ray.m_order = -1;
 
@@ -64,42 +64,27 @@ RAYX::Beamline loadBeamline(std::string filename) {
 }
 
 /// will write to Intern/rayx-core/tests/output<filename>.csv
-void writeToOutputCSV(const RAYX::Rays& rays, std::string filename) {
+void writeToOutputCSV(const RAYX::BundleHistory& hist, std::string filename) {
     std::string f = canonicalizeRepositoryPath("Intern/rayx-core/tests/output/" + filename + ".csv").string();
-    writeCSV(rays, f, FULL_FORMAT);
+    writeCSV(hist, f, FULL_FORMAT);
 }
 
-/// sequentialExtraParam yields the desired extraParam for rays which went the
-/// sequential route through a beamline with `count` OpticalElements.
-/// sequentialExtraParam(2) = 21
-/// sequentialExtraParam(3) = 321 // i.e. first element 1, then 2 and then 3.
-/// ...
-int sequentialExtraParam(int count) {
-    int out = 0;
-    int fac = 1;
-    for (int i = 1; i <= count; i++) {  // i goes from 1 to count
-        out += i * fac;
-        fac *= 10;
-    }
-    return out;
-}
-
-RAYX::Rays traceRML(std::string filename) {
+RAYX::BundleHistory traceRML(std::string filename) {
     auto beamline = loadBeamline(filename);
     return tracer->trace(beamline, DEFAULT_BATCH_SIZE);
 }
 
-std::vector<RAYX::Ray> extractLastHit(const RAYX::Rays& rays) {
-    std::vector<RAYX::Ray> outs;
-    for (auto rr : rays) {
+std::vector<RAYX::Event> extractLastHit(const RAYX::BundleHistory& hist) {
+    std::vector<RAYX::Event> outs;
+    for (auto rr : hist) {
         Ray out;
-        out.m_weight = W_UNINIT;
+        out.m_eventType = ETYPE_UNINIT;
         for (auto r : rr) {
-            if (r.m_weight == W_JUST_HIT_ELEM) {
+            if (r.m_eventType == ETYPE_JUST_HIT_ELEM) {
                 out = r;
             }
         }
-        if (out.m_weight != W_UNINIT) {
+        if (out.m_eventType != ETYPE_UNINIT) {
             outs.push_back(out);
         }
     }
@@ -131,7 +116,7 @@ std::vector<RAYX::Ray> loadCSVRayUI(std::string filename) {
     return out;
 }
 
-void compareRays(const RAYX::Rays& r1, const RAYX::Rays& r2, double t) {
+void compareBundleHistories(const RAYX::BundleHistory& r1, const RAYX::BundleHistory& r2, double t) {
     CHECK_EQ(r1.size(), r2.size());
 
     auto it1 = r1.begin();
@@ -154,7 +139,7 @@ void compareRays(const RAYX::Rays& r1, const RAYX::Rays& r2, double t) {
             auto ray1 = *itr1;
             auto ray2 = *itr2;
 
-            CHECK_EQ(ray1, ray2);
+            CHECK_EQ(ray1, ray2, t);
 
             ++itr1;
             ++itr2;
@@ -165,28 +150,38 @@ void compareRays(const RAYX::Rays& r1, const RAYX::Rays& r2, double t) {
     }
 }
 
+// If the ray from `ray_hist` went through the whole beamline sequentially, we return its last hit event.
+// Otherwise we return `{}`, aka None.
+std::optional<RAYX::Ray> lastSequentialHit(RayHistory ray_hist, unsigned int beamline_len) {
+    // The ray should hit every element from the beamline once, plus one FLY_OFF event.
+    if (ray_hist.size() != beamline_len + 1) {
+        return {};
+    }
+
+    for (int i = 0; i < beamline_len; i++) {
+        if (ray_hist[i].m_lastElement != i + 1) {  // TODO get rid of this +1 eventually
+            return {};
+        }
+        if (ray_hist[i].m_eventType != ETYPE_JUST_HIT_ELEM) {
+            return {};
+        }
+    }
+
+    // this returns the last 'hit' event.
+    return ray_hist[ray_hist.size() - 2];
+}
+
 // returns the rayx rays converted to be ray-UI compatible.
 std::vector<RAYX::Ray> rayUiCompat(std::string filename) {
     auto beamline = loadBeamline(filename);
-    auto rays = tracer->trace(beamline, DEFAULT_BATCH_SIZE);
-
-    int seq = sequentialExtraParam(beamline.m_OpticalElements.size());
+    BundleHistory hist = tracer->trace(beamline, DEFAULT_BATCH_SIZE);
 
     std::vector<RAYX::Ray> out;
 
-    for (auto rr : rays) {
-        for (auto r : rr) {
-            // The ray has to be sequential (and it must finally end up at the last element of beamline)
-            if (!intclose(r.m_extraParam, seq)) {
-                continue;
-            }
-
-            // The ray has to have weight != W_FLY_OFF
-            if (r.m_weight != W_JUST_HIT_ELEM) {
-                continue;
-            }
-
-            out.push_back(r);
+    for (auto ray_hist : hist) {
+        auto opt_ray = lastSequentialHit(ray_hist, beamline.m_OpticalElements.size());
+        if (opt_ray) {
+            out.push_back(*opt_ray);
         }
     }
 
@@ -197,8 +192,8 @@ void compareLastAgainstRayUI(std::string filename, double t) {
     auto rayx_list = rayUiCompat(filename);
     auto rayui_list = loadCSVRayUI(filename);
 
-    writeToOutputCSV(convertToRays(rayx_list), filename + ".rayx");
-    writeToOutputCSV(convertToRays(rayui_list), filename + ".rayui");
+    writeToOutputCSV(convertToBundleHistory(rayx_list), filename + ".rayx");
+    writeToOutputCSV(convertToBundleHistory(rayui_list), filename + ".rayui");
 
     CHECK_EQ(rayx_list.size(), rayui_list.size());
 
@@ -228,7 +223,7 @@ void compareAgainstCorrect(std::string filename, double tolerance) {
     auto b = loadCSV(f);
 
     writeToOutputCSV(a, filename + ".rayx");
-    compareRays(a, b, tolerance);
+    compareBundleHistories(a, b, tolerance);
 }
 
 void updateCpuTracerMaterialTables(std::vector<Material> mats_vec) {

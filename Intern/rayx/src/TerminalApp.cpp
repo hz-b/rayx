@@ -133,6 +133,17 @@ void TerminalApp::run() {
         RAYX_ERR << "NO_VULKAN: trying to construct VulkanTracer with Vulkan disabled. Use -x to use CPU tracer or enable Vulkan when building.";
 #else
         m_Tracer = std::make_unique<RAYX::VulkanTracer>();
+
+        /// list physical devices
+        if (m_CommandParser->m_args.m_listDevices) {
+            dynamic_cast<RAYX::VulkanTracer*>(m_Tracer.get())->listPhysicalDevices();
+            exit(0);
+        }
+        /// select physical device
+        if (m_CommandParser->m_args.m_deviceID >= 0) {
+            m_Tracer->setDevice(m_CommandParser->m_args.m_deviceID);
+        }
+
 #endif
     }
 
@@ -140,7 +151,7 @@ void TerminalApp::run() {
     tracePath(m_CommandParser->m_args.m_providedFile);
 }
 
-std::string TerminalApp::exportRays(const RAYX::Rays& rays, std::string path) {
+std::string TerminalApp::exportRays(const RAYX::BundleHistory& hist, std::string path) {
     RAYX_PROFILE_FUNCTION_STDOUT();
     bool csv = m_CommandParser->m_args.m_csvFlag;
 
@@ -155,13 +166,13 @@ std::string TerminalApp::exportRays(const RAYX::Rays& rays, std::string path) {
 
     if (csv) {
         path += ".csv";
-        writeCSV(rays, path, fmt);
+        writeCSV(hist, path, fmt);
     } else {
 #ifdef NO_H5
         RAYX_ERR << "writeH5 called during NO_H5 (HDF5 disabled during build))";
 #else
         path += ".h5";
-        writeH5(rays, path, fmt, getBeamlineOpticalElementsNames());
+        writeH5(hist, path, fmt, getBeamlineOpticalElementsNames());
 #endif
     }
     return path;

@@ -1,11 +1,7 @@
 #ifndef CUTOUT_H
 #define CUTOUT_H
 
-#ifdef GLSL
-#define INLINE
-#else
-#define INLINE inline
-#endif
+#include "adapt.h"
 
 // Cutout types:
 // a subset of points in the 2d plane. used to limited the potentially infinite surfaces.

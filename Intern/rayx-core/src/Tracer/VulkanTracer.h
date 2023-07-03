@@ -13,6 +13,7 @@ class RAYX_API VulkanTracer : public Tracer {
     VulkanTracer() = default;
     ~VulkanTracer() = default;
 
+    void listPhysicalDevices();
     std::vector<Ray> traceRaw(const TraceRawConfig&) override;
     void setPushConstants(const PushConstants*) override;
 #ifdef RAYX_DEBUG_MODE
@@ -34,6 +35,8 @@ class RAYX_API VulkanTracer : public Tracer {
         glm::dmat4x4 _dMat;  // Set to identiy matrix in shader.
     };
     std::vector<debugBuffer_t> m_debugBufList;
+
+    void initEngine();
 };
 }  // namespace RAYX
 

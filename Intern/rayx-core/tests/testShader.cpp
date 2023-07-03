@@ -65,67 +65,6 @@ TEST_F(TestSuite, testLog) {
     }
 }
 
-TEST_F(TestSuite, testRefrac2D) {
-    std::vector<Ray> input = {
-        {
-            .m_position = glm::dvec3(0, 1, 0),
-            .m_weight = 1,
-            .m_direction = glm::dvec3(0.0001666666635802469, -0.017285764670739875, 0.99985057611723738),
-            .m_energy = 0,
-            .m_stokes = glm::dvec4(0.00016514977645243345, 0.012830838024391771, 0, 0),
-        },
-        {
-            .m_position = glm::dvec3(0, 1, 0),
-            .m_weight = 1,
-            .m_direction = glm::dvec3(0.00049999999722222276, -0.017285762731583675, 0.99985046502305308),
-            .m_energy = 0,
-            .m_stokes = glm::dvec4(-6.2949352042540596e-05, 0.038483898782123105, 0, 0),
-        },
-        {
-            .m_position = glm::dvec3(0, 1, 0),
-            .m_weight = 1,
-            .m_direction = glm::dvec3(0.0001666666635802469, -0.017619047234249029, 0.99984475864845179),
-            .m_energy = 0,
-            .m_stokes = glm::dvec4(-0.077169530850327184, 0.2686127340088395, 0, 0),
-        },
-        {
-            .m_position = glm::dvec3(0.050470500672820856, 0.95514062789960541, -0.29182033770349547),
-            .m_weight = 1,
-            .m_direction = glm::dvec3(-0.00049999991666666705, -0.016952478247434233, 0.99985617139734351),
-            .m_energy = 0,
-            .m_stokes = glm::dvec4(0.0021599283476277926, -0.050153240660177005, 0, 0),
-        },
-    };
-
-    // the correct rays should only be altered in weight & direction.
-    std::vector<Ray> correct = input;
-
-    correct[0].m_weight = 1;
-    correct[0].m_direction = glm::dvec3(-0.012664171360811521, 0.021648721107426414, 0.99968542634078494);
-
-    correct[1].m_weight = W_BEYOND_HORIZON;
-    correct[1].m_direction = glm::dvec3(0.00049999999722222276, -0.017285762731583675, 0.99985046502305308);
-
-    correct[2].m_weight = W_BEYOND_HORIZON;
-    correct[2].m_direction = glm::dvec3(0.0001666666635802469, -0.017619047234249029, 0.99984475864845179);
-
-    correct[3].m_weight = 1;
-    correct[3].m_direction = glm::dvec3(0.080765992839840872, 0.57052382524991363, 0.81730007905468893);
-
-    CHECK_EQ(input.size(), correct.size());
-    for (uint32_t i = 0; i < input.size(); i++) {
-        auto r = input[i];
-
-        glm::dvec4 normal = glm::dvec4(r.m_position, 0);
-        double az = r.m_stokes.x;
-        double ax = r.m_stokes.y;
-
-        auto out = CPU_TRACER::refrac2D(r, normal, az, ax);
-
-        CHECK_EQ(out, correct[i]);
-    }
-}
-
 TEST_F(TestSuite, testNormalCartesian) {
     struct InOutPair {
         glm::dvec4 in_normal;
@@ -201,62 +140,6 @@ TEST_F(TestSuite, testNormalCylindrical) {
     for (auto p : inouts) {
         auto out = CPU_TRACER::normal_cylindrical(p.in_normal, p.in_slopeX, p.in_slopeZ);
         CHECK_EQ(out, p.out);
-    }
-}
-
-TEST_F(TestSuite, testRefrac) {
-    std::vector<Ray> input = {
-        {
-            .m_position = glm::dvec3(0, 1, 0),
-            .m_weight = 1,
-            .m_direction = glm::dvec3(-0.00049999991666667084, -0.99558611855684065, 0.093851108341926226),
-            .m_energy = 0.01239852,
-        },
-        {
-            .m_position = glm::dvec3(0, 1, 0),
-            .m_weight = 1,
-            .m_direction = glm::dvec3(-1.6666664506172892e-05, -0.995586229182718, 0.093851118714515264),
-            .m_energy = 0.01239852,
-        },
-        {
-            .m_position = glm::dvec3(0.0027574667592826954, 0.99999244446428082, -0.0027399619384214182),
-            .m_weight = 1,
-            .m_direction = glm::dvec3(-0.00049999991666667084, -0.99558611855684065, 0.093851108341926226),
-            .m_energy = 0.01239852,
-        },
-        {
-            .m_position = glm::dvec3(0, 1, 0),
-            .m_weight = 1,
-            .m_direction = glm::dvec3(-0.99991341437509562, 0.013149667401360443, -0.00049999997222215965),
-            .m_energy = -0.038483898782123105,
-        },
-    };
-
-    // the correct rays should only be altered in weight & direction.
-    std::vector<Ray> correct = input;
-
-    correct[0].m_weight = 1;
-    correct[0].m_direction = glm::dvec3(-0.00049999991666667084, 0.99667709206767885, 0.08145258834192623);
-
-    correct[1].m_weight = 1;
-    correct[1].m_direction = glm::dvec3(-1.6666664506160695e-05, 0.9966772027014974, 0.081452598714515267);
-
-    correct[2].m_weight = 1;
-    correct[2].m_direction = glm::dvec3(0.0049947959329671825, 0.99709586573547515, 0.07599267429701162);
-
-    correct[3].m_weight = W_BEYOND_HORIZON;
-    correct[3].m_direction = glm::dvec3(-0.99991341437509562, 0.013149667401360443, -0.00049999997222215965);
-
-    CHECK_EQ(input.size(), correct.size());
-    for (uint32_t i = 0; i < input.size(); i++) {
-        auto r = input[i];
-
-        glm::dvec4 normal = glm::dvec4(r.m_position, 0);
-        double a = r.m_energy;
-
-        auto out = CPU_TRACER::refrac(r, normal, a);
-
-        CHECK_EQ(out, correct[i]);
     }
 }
 
@@ -881,7 +764,7 @@ TEST_F(TestSuite, testPlaneRefrac) {
                 {.in_ray =
                      {
                          .m_position = glm::dvec3(0, 1, 0),
-                         .m_weight = 0.01239852,
+                         .m_eventType = 0.01239852,
                          .m_direction = glm::dvec3(0, -0.99558611855684065, 0.093851108341926615),
                      },
                  .in_normal = glm::dvec4(0, 1, 0, 0),
@@ -889,13 +772,13 @@ TEST_F(TestSuite, testPlaneRefrac) {
                  .out_ray =
                      {
                          .m_position = glm::dvec3(0, 1, 0),
-                         .m_weight = 0.01239852,
+                         .m_eventType = 0.01239852,
                          .m_direction = glm::dvec3(0, 0.99667709206767885, 0.081452588341926618),
                      }},
                 {.in_ray =
                      {
                          .m_position = glm::dvec3(0, 1, 0),
-                         .m_weight = 0.01239852,
+                         .m_eventType = 0.01239852,
                          .m_direction = glm::dvec3(0.01239852, -0.99558611855684065, 0.093851108341926615),
                      },
                  .in_normal = glm::dvec4(0, 1, 0, 0),
@@ -903,13 +786,13 @@ TEST_F(TestSuite, testPlaneRefrac) {
                  .out_ray =
                      {
                          .m_position = glm::dvec3(0, 1, 0),
-                         .m_weight = 0.01239852,
+                         .m_eventType = 0.01239852,
                          .m_direction = glm::dvec3(0.01239852, 0.99667709206767885, 0.081452588341926618),
                      }},
                 {.in_ray =
                      {
                          .m_position = glm::dvec3(0, 1, 0),
-                         .m_weight = 0.01239852,
+                         .m_eventType = 0.01239852,
                          .m_direction = glm::dvec3(0.01239852, -0.99567947186812988, 0.0928554753392902),
                      },
                  .in_normal = glm::dvec4(0, 1, 0, 0),
@@ -917,13 +800,13 @@ TEST_F(TestSuite, testPlaneRefrac) {
                  .out_ray =
                      {
                          .m_position = glm::dvec3(0, 1, 0),
-                         .m_weight = 0.01239852,
+                         .m_eventType = 0.01239852,
                          .m_direction = glm::dvec3(0.01239852, 0.99675795875308415, 0.080456955339290204),
                      }},
                 {.in_ray =
                      {
                          .m_position = glm::dvec3(0, 1, 0),
-                         .m_weight = 0.01239852,
+                         .m_eventType = 0.01239852,
                          .m_direction = glm::dvec3(0.01239852, -0.99567947186812988, 0.0928554753392902),
                      },
                  .in_normal = glm::dvec4(0, 1, 0, 0),
@@ -931,13 +814,13 @@ TEST_F(TestSuite, testPlaneRefrac) {
                  .out_ray =
                      {
                          .m_position = glm::dvec3(0, 1, 0),
-                         .m_weight = 0.01239852,
+                         .m_eventType = 0.01239852,
                          .m_direction = glm::dvec3(0.01239852, 0.99675795875308415, 0.080456955339290204),
                      }},
                 {.in_ray =
                      {
                          .m_position = glm::dvec3(0, 1, 0),
-                         .m_weight = 0.01239852,
+                         .m_eventType = 0.01239852,
                          .m_direction = glm::dvec3(-0.00049999991666660004, -0.99558611855684065, 0.093851108341926226),
                      },
                  .in_normal = glm::dvec4(0, 1, 0, 0),
@@ -945,13 +828,13 @@ TEST_F(TestSuite, testPlaneRefrac) {
                  .out_ray =
                      {
                          .m_position = glm::dvec3(0, 1, 0),
-                         .m_weight = 0.01239852,
+                         .m_eventType = 0.01239852,
                          .m_direction = glm::dvec3(-0.00049999991666660004, 0.99667709206767885, 0.08145258834192623),
                      }},
                 {.in_ray =
                      {
                          .m_position = glm::dvec3(0, 1, 0),
-                         .m_weight = 0.01239852,
+                         .m_eventType = 0.01239852,
                          .m_direction = glm::dvec3(-0.00049999991666660004, -0.995586229182718, 0.093851118714515264),
                      },
                  .in_normal = glm::dvec4(0, 1, 0, 0),
@@ -959,7 +842,7 @@ TEST_F(TestSuite, testPlaneRefrac) {
                  .out_ray =
                      {
                          .m_position = glm::dvec3(0, 1, 0),
-                         .m_weight = 0.01239852,
+                         .m_eventType = 0.01239852,
                          .m_direction = glm::dvec3(-0.00049999991666660004, 0.9966772027014974, 0.081452598714515267),
                      }},
 
@@ -1141,27 +1024,27 @@ TEST_F(TestSuite, testPalik) {
     CHECK_EQ(CPU_TRACER::getPalikEntryCount(Cu), 324);
 
     auto Cu0 = CPU_TRACER::getPalikEntry(0, Cu);
-    CHECK_EQ(Cu0.energy, 1.0);
-    CHECK_EQ(Cu0.n, 0.433);
-    CHECK_EQ(Cu0.k, 8.46);
+    CHECK_EQ(Cu0.m_energy, 1.0);
+    CHECK_EQ(Cu0.m_n, 0.433);
+    CHECK_EQ(Cu0.m_k, 8.46);
 
     auto Cu10 = CPU_TRACER::getPalikEntry(10, Cu);
-    CHECK_EQ(Cu10.energy, 2.3);
-    CHECK_EQ(Cu10.n, 1.04);
-    CHECK_EQ(Cu10.k, 2.59);
+    CHECK_EQ(Cu10.m_energy, 2.3);
+    CHECK_EQ(Cu10.m_n, 1.04);
+    CHECK_EQ(Cu10.m_k, 2.59);
 
     int Au = static_cast<int>(Material::Au);
     CHECK_EQ(CPU_TRACER::getPalikEntryCount(Au), 386);
 
     auto Au0 = CPU_TRACER::getPalikEntry(0, Au);
-    CHECK_EQ(Au0.energy, 0.04959);
-    CHECK_EQ(Au0.n, 20.3);
-    CHECK_EQ(Au0.k, 76.992);
+    CHECK_EQ(Au0.m_energy, 0.04959);
+    CHECK_EQ(Au0.m_n, 20.3);
+    CHECK_EQ(Au0.m_k, 76.992);
 
     auto Au10 = CPU_TRACER::getPalikEntry(10, Au);
-    CHECK_EQ(Au10.energy, 0.11158);
-    CHECK_EQ(Au10.n, 12.963);
-    CHECK_EQ(Au10.k, 57.666);
+    CHECK_EQ(Au10.m_energy, 0.11158);
+    CHECK_EQ(Au10.m_n, 12.963);
+    CHECK_EQ(Au10.m_k, 57.666);
 }
 
 TEST_F(TestSuite, testNff) {
@@ -1172,27 +1055,27 @@ TEST_F(TestSuite, testNff) {
 
     auto Cu0 = CPU_TRACER::getNffEntry(0, Cu);
 
-    CHECK_EQ(Cu0.energy, 10.0);
-    CHECK_EQ(Cu0.f1, -9999.0);
-    CHECK_EQ(Cu0.f2, 1.30088);
+    CHECK_EQ(Cu0.m_energy, 10.0);
+    CHECK_EQ(Cu0.m_f1, -9999.0);
+    CHECK_EQ(Cu0.m_f2, 1.30088);
 
     auto Cu10 = CPU_TRACER::getNffEntry(10, Cu);
-    CHECK_EQ(Cu10.energy, 11.7404);
-    CHECK_EQ(Cu10.f1, -9999.0);
-    CHECK_EQ(Cu10.f2, 1.66946);
+    CHECK_EQ(Cu10.m_energy, 11.7404);
+    CHECK_EQ(Cu10.m_f1, -9999.0);
+    CHECK_EQ(Cu10.m_f2, 1.66946);
 
     int Au = static_cast<int>(Material::Au);
     CHECK_EQ(CPU_TRACER::getNffEntryCount(Au), 506);
 
     auto Au0 = CPU_TRACER::getNffEntry(0, Au);
-    CHECK_EQ(Au0.energy, 10.0);
-    CHECK_EQ(Au0.f1, -9999.0);
-    CHECK_EQ(Au0.f2, 1.73645);
+    CHECK_EQ(Au0.m_energy, 10.0);
+    CHECK_EQ(Au0.m_f1, -9999.0);
+    CHECK_EQ(Au0.m_f2, 1.73645);
 
     auto Au10 = CPU_TRACER::getNffEntry(10, Au);
-    CHECK_EQ(Au10.energy, 11.7404);
-    CHECK_EQ(Au10.f1, -9999.0);
-    CHECK_EQ(Au10.f2, 2.67227);
+    CHECK_EQ(Au10.m_energy, 11.7404);
+    CHECK_EQ(Au10.m_f1, -9999.0);
+    CHECK_EQ(Au10.m_f2, 2.67227);
 }
 
 TEST_F(TestSuite, testRefractiveIndex) {

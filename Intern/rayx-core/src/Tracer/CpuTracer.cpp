@@ -37,7 +37,7 @@ std::vector<Ray> CpuTracer::traceRaw(const TraceRawConfig& cfg) {
 
     // init rayData, outputData
     CPU_TRACER::rayData.data = rayList;
-    CPU_TRACER::outputData.data.resize(rayList.size() * (size_t)cfg.m_maxSnapshots);
+    CPU_TRACER::outputData.data.resize(rayList.size() * (size_t)cfg.m_maxEvents);
 
     // init elements
     for (auto e : cfg.m_elements) {
@@ -58,5 +58,5 @@ std::vector<Ray> CpuTracer::traceRaw(const TraceRawConfig& cfg) {
     return CPU_TRACER::outputData.data;
 }
 
-void CpuTracer::setPushConstants(const PushConstants* p) { std::memcpy(&CPU_TRACER::pushConstants, p, sizeof(CPU_TRACER::pushConstants_t)); }
+void CpuTracer::setPushConstants(const PushConstants* p) { std::memcpy(&CPU_TRACER::pushConstants, p, sizeof(PushConstants)); }
 }  // namespace RAYX

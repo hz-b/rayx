@@ -1,5 +1,5 @@
 // converts energy in eV to wavelength in nm
-double hvlam(double x) {
+double RAYX_API hvlam(double x) {
     if (x == 0) {
         return 0.0;
     }
@@ -15,7 +15,7 @@ double infinity() {
 
 // multiplies position and direction of ray r with transformation matrix m
 // r = dot(m, r)
-Ray rayMatrixMult(Ray r, const dmat4 m) {
+Ray RAYX_API rayMatrixMult(Ray r, const dmat4 m) {
     r.m_position = dvec3(m * dvec4(r.m_position, 1));
     r.m_direction = dvec3(m * dvec4(r.m_direction, 0));
     return r;
@@ -74,7 +74,7 @@ double deg2rad(double degree) {
 }
 
 // returns forial of a (from RAYLIB.for) (a!)
-double fact(int a) {
+double RAYX_API fact(int a) {
     if (a < 0) {
         return a;
     }
@@ -91,7 +91,7 @@ calculates direction cosini from angles phi,psi given in rad
         phi		horizontal angle in x-z-plane (pos.rotation, counterclockwise)
         phi		vertical angle in y-z-plane (pos.rotation, counterclockwise)
 */
-void cosini(INOUT(Ray) r, double phi, double psi) {
+void RAYX_API cosini(INOUT(Ray) r, double phi, double psi) {
     double cos_psi = r8_cos(psi);
     double cos_phi = r8_cos(phi);
     double sin_psi = r8_sin(psi);
@@ -159,7 +159,7 @@ bool inCutout(Cutout cutout, double x1, double x2) {
 }
 
 // returns dvec2(atomic mass, density) extracted from materials.xmacro
-dvec2 getAtomicMassAndRho(int material) {
+dvec2 RAYX_API getAtomicMassAndRho(int material) {
     switch (material) {
 #define X(e, z, a, rho) \
     case z:             \
@@ -171,22 +171,9 @@ dvec2 getAtomicMassAndRho(int material) {
     return dvec2(0.0, 0.0);
 }
 
-// for cpp it's already defined in CpuTracer.h
-#ifdef GLSL
-struct PalikEntry {
-    double energy;
-    double n;
-    double k;
-};
+#include "../../Shared/NffPalik.h"
 
-struct NffEntry {
-    double energy;
-    double f1;
-    double f2;
-};
-#endif
-
-int getPalikEntryCount(int material) {
+int RAYX_API getPalikEntryCount(int material) {
     int m = material - 1;  // in [0, 91]
     // this counts how many doubles are in between the materials index, and the
     // next index in the table. division by 3, because each entry has 3 members
@@ -194,43 +181,43 @@ int getPalikEntryCount(int material) {
     return (matIdx[m + 1] - matIdx[m]) / 3;
 }
 
-int getNffEntryCount(int material) {
+int RAYX_API getNffEntryCount(int material) {
     int m = material - 1;  // in [0, 91]
     // the offset of 92 (== number of materials), skips the palik table and
     // reaches into the nff table. the rest of the logic is as above.
     return (matIdx[92 + m + 1] - matIdx[92 + m]) / 3;
 }
 
-PalikEntry getPalikEntry(int index, int material) {
+PalikEntry RAYX_API getPalikEntry(int index, int material) {
     int m = material - 1;  // in [0, 91]
     // matIdx[m] is the start of the Palik table of material m.
     // 3*index skips 'index'-many entries.
     int i = matIdx[m] + 3 * index;
 
     PalikEntry e;
-    e.energy = mat[i];
-    e.n = mat[i + 1];
-    e.k = mat[i + 2];
+    e.m_energy = mat[i];
+    e.m_n = mat[i + 1];
+    e.m_k = mat[i + 2];
 
     return e;
 }
 
-NffEntry getNffEntry(int index, int material) {
+NffEntry RAYX_API getNffEntry(int index, int material) {
     int m = material - 1;  // in [0, 91]
     // matIdx[92+m] is the start of the Nff table of material m.
     // 3*index skips 'index'-many entries.
     int i = matIdx[92 + m] + 3 * index;
 
     NffEntry e;
-    e.energy = mat[i];
-    e.f1 = mat[i + 1];
-    e.f2 = mat[i + 2];
+    e.m_energy = mat[i];
+    e.m_f1 = mat[i + 1];
+    e.m_f2 = mat[i + 2];
 
     return e;
 }
 
 // returns dvec2 to represent a complex number
-dvec2 getRefractiveIndex(double energy, int material) {
+dvec2 RAYX_API getRefractiveIndex(double energy, int material) {
     if (material == -1) {  // vacuum
         return dvec2(1., 0.);
     }
@@ -250,15 +237,15 @@ dvec2 getRefractiveIndex(double energy, int material) {
         PalikEntry low_entry = getPalikEntry(low, material);
         PalikEntry high_entry = getPalikEntry(high, material);
 
-        if (low_entry.energy <= energy &&
+        if (low_entry.m_energy <= energy &&
             energy <=
                 high_entry
-                    .energy) {  // if 'energy' is in range of tha PalikTable
+                    .m_energy) {  // if 'energy' is in range of tha PalikTable
             // binary search
             while (high - low > 1) {
                 int center = (low + high) / 2;
                 PalikEntry center_entry = getPalikEntry(center, material);
-                if (energy < center_entry.energy) {
+                if (energy < center_entry.m_energy) {
                     high = center;
                 } else {
                     low = center;
@@ -266,7 +253,7 @@ dvec2 getRefractiveIndex(double energy, int material) {
             }
 
             PalikEntry entry = getPalikEntry(low, material);
-            return dvec2(entry.n, entry.k);
+            return dvec2(entry.m_n, entry.m_k);
         }
     }
 
@@ -280,7 +267,7 @@ dvec2 getRefractiveIndex(double energy, int material) {
         while (high - low > 1) {
             int center = (low + high) / 2;
             NffEntry center_entry = getNffEntry(center, material);
-            if (energy < center_entry.energy) {
+            if (energy < center_entry.m_energy) {
                 high = center;
             } else {
                 low = center;
@@ -292,9 +279,9 @@ dvec2 getRefractiveIndex(double energy, int material) {
         double rho = massAndRho.y;
 
         NffEntry entry = getNffEntry(low, material);
-        double e = entry.energy;
-        double n = 1 - (415.252 * rho * entry.f1) / (e * e * mass);
-        double k = (415.252 * rho * entry.f2) / (e * e * mass);
+        double e = entry.m_energy;
+        double n = 1 - (415.252 * rho * entry.m_f1) / (e * e * mass);
+        double k = (415.252 * rho * entry.m_f2) / (e * e * mass);
 
         return dvec2(n, k);
     }
@@ -304,7 +291,7 @@ dvec2 getRefractiveIndex(double energy, int material) {
 }
 
 // returns angle between ray direction and surface normal at intersection point
-double getIncidenceAngle(Ray r, dvec4 normal) {
+double RAYX_API getIncidenceAngle(Ray r, dvec4 normal) {
     normal = normalize(normal);
     double ar = dot(dvec3(normal), r.m_direction);
     // cut to interval [-1,1]
@@ -334,7 +321,7 @@ double getIncidenceAngle(Ray r, dvec4 normal) {
  * the ray is going
  * @return cos_transmittance 	cosinus of complex transmittance angle
  */
-dvec2 snell(dvec2 cos_incidence, dvec2 cn1, dvec2 cn2) {
+dvec2 RAYX_API snell(dvec2 cos_incidence, dvec2 cn1, dvec2 cn2) {
     /*dvec2 sin_incidence = cx_sqrt( cx_sub(dvec2(1.0,0.0),
     cx_mul(cos_incidence, cos_incidence)) ); dvec2 refractive_ratio =
     cx_div(cn1, cn2); dvec2 sin_transmittance = cx_mul(sin_incidence,
@@ -365,7 +352,7 @@ dvec2 snell(dvec2 cos_incidence, dvec2 cn1, dvec2 cn2) {
  * @return complex_P			complex p-polarization
  *
  */
-void fresnel(dvec2 cn1, dvec2 cn2, dvec2 cos_incidence, dvec2 cos_transmittance,
+void RAYX_API fresnel(dvec2 cn1, dvec2 cn2, dvec2 cos_incidence, dvec2 cos_transmittance,
              INOUT(dvec2) complex_S, INOUT(dvec2) complex_P) {
     dvec2 mat1_incidence =
         cx_mul(cn1, cos_incidence);  // material one (incoming side)
@@ -389,7 +376,7 @@ void fresnel(dvec2 cn1, dvec2 cn2, dvec2 cos_incidence, dvec2 cos_transmittance,
  * @return complex_S			complex s-polarization
  * @return complex_P			complex p-polarization
  */
-void reflectance(double energy, double incidence_angle, INOUT(dvec2) complex_S,
+void RAYX_API reflectance(double energy, double incidence_angle, INOUT(dvec2) complex_S,
                  INOUT(dvec2) complex_P, int material) {
     dvec2 cos_incidence =
         dvec2(r8_cos(incidence_angle),
@@ -419,7 +406,7 @@ void reflectance(double energy, double incidence_angle, INOUT(dvec2) complex_S,
  * euler = r * e^(i * phi) where r = sqrt(a**2 + b**2) = radius and phi =
  * atan2(a,b) = (absolute) phase
  */
-dvec2 cartesian_to_euler(dvec2 complex) {
+dvec2 RAYX_API cartesian_to_euler(dvec2 complex) {
     double r =
         dot(complex,
             complex);  // r = sqrt(a**2 + b**2), why not take sqrt in fortran
@@ -523,7 +510,7 @@ turn the normal vector through x_rad and z_rad
             z_rad: angle in rad for z-axis
 returns modified normal vector
 */
-dvec4 normal_cartesian(dvec4 normal, double x_rad, double z_rad) {
+dvec4 RAYX_API normal_cartesian(dvec4 normal, double x_rad, double z_rad) {
     double FX = normal[0];
     double FY = normal[1];
     double FZ = normal[2];
@@ -549,7 +536,7 @@ turn the normal vector through x_rad and z_rad
             z_rad: angle in rad for z-axis
 returns modified normal vector
 */
-dvec4 normal_cylindrical(dvec4 normal, double x_rad, double z_rad) {
+dvec4 RAYX_API normal_cylindrical(dvec4 normal, double x_rad, double z_rad) {
     double normFXFY = sqrt(normal[0] * normal[0] + normal[1] * normal[1]);
     double arcTanFXFY = r8_atan2(normal[1], normal[0]);
     double sinz = r8_sin(z_rad);
@@ -605,7 +592,7 @@ given direction on the grating
 @params: lots
 @returns: (inplace) DX, DZ
 */
-void RZPLineDensity(Ray r, dvec4 normal, int IMAGE_TYPE, int RZP_TYPE,
+void RAYX_API RZPLineDensity(Ray r, dvec4 normal, int IMAGE_TYPE, int RZP_TYPE,
                     ALLOW_UNUSED int DERIVATION_METHOD,
                     ALLOW_UNUSED double zOffsetCenter, double risag,
                     double rosag, double rimer, double romer, double alpha,
@@ -744,7 +731,7 @@ calculates refracted ray
             normal: normal at intersection point of ray and element
             az: line spacing in z direction
             ax: line spacing in x direction
-@returns: refracted ray (position unchanged, direction changed), weight = W_BEYOND_HORIZON if
+@returns: refracted ray (position unchanged, direction changed), weight = ETYPE_BEYOND_HORIZON if
 "ray beyond horizon"
 */
 Ray refrac2D(Ray r, dvec4 normal, double az, double ax) {
@@ -771,10 +758,10 @@ Ray refrac2D(Ray r, dvec4 normal, double az, double ax) {
         r.m_direction.x = x1;
         r.m_direction.y = y1;
         r.m_direction.z = z1;
+        r.m_direction = inv_rot * r.m_direction;
     } else {  // beyond horizon - when divergence too large
-        r.m_weight = W_BEYOND_HORIZON;
+        recordFinalEvent(r, ETYPE_BEYOND_HORIZON);
     }
-    r.m_direction = inv_rot * r.m_direction;
     return r;
 }
 
@@ -811,10 +798,10 @@ Ray refrac(Ray r, dvec4 normal, double linedensity) {
         y1 = sqrt(y1);
         r.m_direction[1] = y1;
         r.m_direction[2] -= a1;
+        r.m_direction = dvec3(inv_rot * dvec4(r.m_direction, 0));
     } else {
-        r.m_weight = W_BEYOND_HORIZON;
+        recordFinalEvent(r, ETYPE_BEYOND_HORIZON);
     }
-    r.m_direction = dvec3(inv_rot * dvec4(r.m_direction, 0));
     return r;
 }
 
@@ -825,7 +812,7 @@ Ray refrac(Ray r, dvec4 normal, double linedensity) {
     vls[6]: 6 vls parameters given by user
 @returns line density specifically for this z-coordinate
 */
-double vlsGrating(double lineDensity, double z, double vls[6]) {
+double RAYX_API vlsGrating(double lineDensity, double z, double vls[6]) {
     // lineDensity = lineDensity * (1 + 2*b2*z + 3*b3*z**2 + 4*b4*z**3 +
     // 5*b5*z**4 + 6*b6*z**5 + 7*b7*z**6)
     double z2 = z * z;
@@ -849,7 +836,7 @@ double vlsGrating(double lineDensity, double z, double vls[6]) {
  * @param a			a = WL * D0 * ORD * 1.e-6  with D0: line density (l/mm);
  * WL:wavelength (nm); ORD order of diffraction
  */
-Ray refrac_plane(Ray r, ALLOW_UNUSED dvec4 normal,
+Ray RAYX_API refrac_plane(Ray r, ALLOW_UNUSED dvec4 normal,
                  double a) {  // TODO fix unused var
     double y1 = r.m_direction[1] * r.m_direction[1] +
                 r.m_direction[2] * r.m_direction[2] -
@@ -859,7 +846,7 @@ Ray refrac_plane(Ray r, ALLOW_UNUSED dvec4 normal,
         r.m_direction[1] = y1;
         r.m_direction[2] = r.m_direction[2] - a;
     } else {
-        r.m_weight = W_BEYOND_HORIZON;
+        recordFinalEvent(r, ETYPE_BEYOND_HORIZON);
     }
     return r;
 }
@@ -883,7 +870,7 @@ bool stopBox(double x, double y, double xStop, double yStop) {
 }
 
 /**returns first bessel function of parameter v*/
-double bessel1(double v) {
+double RAYX_API bessel1(double v) {
     if (v < 0.0 || v > 20.0) {
         return 0.0;
     }
