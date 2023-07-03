@@ -81,8 +81,7 @@ class Application {
 
     SwapChain m_SwapChain;
 
-    VkRenderPass m_TriangleRenderPass;
-    VkRenderPass m_LineRenderPass;
+    VkRenderPass m_RenderPass;
     VkDescriptorSetLayout m_DescriptorSetLayout;
     VkPipelineLayout m_PipelineLayout;
     VkPipeline m_TrianglePipeline;
