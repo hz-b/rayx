@@ -62,7 +62,7 @@ class Application {
 
   private:
     RAYX::RenderObjectVec m_RenderObjectVec;
-    RAYX::Rays m_Rays;
+    RAYX::BundleHistory m_Rays;
 
     Window m_Window;
     const uint32_t m_maxFramesInFlight = 3;
