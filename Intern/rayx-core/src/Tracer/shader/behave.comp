@@ -8,7 +8,7 @@
 /// - change the rays stokes vector
 /// - potentially absorb the ray (by calling `recordFinalEvent(_, ETYPE_ABSORBED)`)
 
-Ray behaveSlit(Ray r, int id, MY_INOUT(uint64_t) ctr, ALLOW_UNUSED Collision col) {
+Ray behaveSlit(Ray r, int id, RAYX_INOUT(uint64_t) ctr, ALLOW_UNUSED Collision col) {
     SlitBehaviour b = deserializeSlit(elements[id].m_behaviour);
     double xStop    = b.m_beamstopWidth / 2;
     double yStop    = b.m_beamstopHeight / 2;
@@ -55,7 +55,7 @@ Ray behaveSlit(Ray r, int id, MY_INOUT(uint64_t) ctr, ALLOW_UNUSED Collision col
 }
 
 // TODO clean this up!
-Ray behaveRZP(Ray r, int id, MY_INOUT(uint64_t) ctr, Collision col) {
+Ray behaveRZP(Ray r, int id, RAYX_INOUT(uint64_t) ctr, Collision col) {
     RZPBehaviour b = deserializeRZP(elements[id].m_behaviour);
 
     dvec4 normal = dvec4(col.normal, 0);
@@ -100,7 +100,7 @@ Ray behaveRZP(Ray r, int id, MY_INOUT(uint64_t) ctr, Collision col) {
     return r;
 }
 
-Ray behaveGrating(Ray r, int id, MY_INOUT(uint64_t) ctr, Collision col) {
+Ray behaveGrating(Ray r, int id, RAYX_INOUT(uint64_t) ctr, Collision col) {
     dvec4 normal = dvec4(col.normal, 0);
 
     GratingBehaviour b = deserializeGrating(elements[id].m_behaviour);
@@ -125,7 +125,7 @@ Ray behaveGrating(Ray r, int id, MY_INOUT(uint64_t) ctr, Collision col) {
     return r;
 }
 
-Ray behaveMirror(Ray r, int id, MY_INOUT(uint64_t) ctr, Collision col) {
+Ray behaveMirror(Ray r, int id, RAYX_INOUT(uint64_t) ctr, Collision col) {
     // calculate intersection point and normal at intersection point
     dvec4 normal = dvec4(col.normal, 0);
     double azimuthal_angle = elements[id].m_azimuthalAngle;

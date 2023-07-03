@@ -39,7 +39,7 @@ Ray rotationAroundX(Ray r, double sin_psi, double cos_psi) {
  *
  * output: nothing. changes r in place
  */
-void inTransformation(MY_INOUT(Ray) r, const dmat4 misalignment,
+void inTransformation(RAYX_INOUT(Ray) r, const dmat4 misalignment,
                       const dmat4 inTrans) {
     r.m_position = dvec3(misalignment * (inTrans * dvec4(r.m_position, 1)));
     r.m_direction = dvec3(misalignment * (inTrans * dvec4(r.m_direction, 0)));
@@ -59,7 +59,7 @@ void inTransformation(MY_INOUT(Ray) r, const dmat4 misalignment,
  *
  * output: nothing. changes r in place
  */
-void outTransformation(MY_INOUT(Ray) r, const dmat4 invMisalignment,
+void outTransformation(RAYX_INOUT(Ray) r, const dmat4 invMisalignment,
                        const dmat4 outTrans) {
     r.m_position = dvec3(outTrans * (invMisalignment * dvec4(r.m_position, 1)));
     r.m_direction =
@@ -91,7 +91,7 @@ calculates direction cosini from angles phi,psi given in rad
         phi		horizontal angle in x-z-plane (pos.rotation, counterclockwise)
         phi		vertical angle in y-z-plane (pos.rotation, counterclockwise)
 */
-void RAYX_API cosini(MY_INOUT(Ray) r, double phi, double psi) {
+void RAYX_API cosini(RAYX_INOUT(Ray) r, double phi, double psi) {
     double cos_psi = r8_cos(psi);
     double cos_phi = r8_cos(phi);
     double sin_psi = r8_sin(psi);
@@ -353,7 +353,7 @@ dvec2 RAYX_API snell(dvec2 cos_incidence, dvec2 cn1, dvec2 cn2) {
  *
  */
 void RAYX_API fresnel(dvec2 cn1, dvec2 cn2, dvec2 cos_incidence, dvec2 cos_transmittance,
-             MY_INOUT(dvec2) complex_S, MY_INOUT(dvec2) complex_P) {
+             RAYX_INOUT(dvec2) complex_S, RAYX_INOUT(dvec2) complex_P) {
     dvec2 mat1_incidence =
         cx_mul(cn1, cos_incidence);  // material one (incoming side)
     dvec2 mat1_transmittance = cx_mul(cn1, cos_transmittance);
@@ -376,8 +376,8 @@ void RAYX_API fresnel(dvec2 cn1, dvec2 cn2, dvec2 cos_incidence, dvec2 cos_trans
  * @return complex_S			complex s-polarization
  * @return complex_P			complex p-polarization
  */
-void RAYX_API reflectance(double energy, double incidence_angle, MY_INOUT(dvec2) complex_S,
-                 MY_INOUT(dvec2) complex_P, int material) {
+void RAYX_API reflectance(double energy, double incidence_angle, RAYX_INOUT(dvec2) complex_S,
+                 RAYX_INOUT(dvec2) complex_P, int material) {
     dvec2 cos_incidence =
         dvec2(r8_cos(incidence_angle),
               0.0);  // complex number, initialization only for first layer, the
@@ -447,8 +447,8 @@ double phase_difference(dvec2 euler1, dvec2 euler2) {
  * @param material				material the photon collides with
  * @param others
  */
-void efficiency(Ray r, MY_OUT(double) real_S, MY_OUT(double) real_P,
-                MY_OUT(double) delta, double incidence_angle, int material) {
+void efficiency(Ray r, RAYX_OUT(double) real_S, RAYX_OUT(double) real_P,
+                RAYX_OUT(double) delta, double incidence_angle, int material) {
     dvec2 complex_S, complex_P;
     reflectance(r.m_energy, incidence_angle, complex_S, complex_P, material);
 
@@ -485,8 +485,8 @@ dmat4 muller_matrix(double R_s, double R_p, double delta) {
  * updates stokes vector of ray
  * @returns `true`, if ray should be absorbed
  */
-bool update_stokes(MY_INOUT(Ray) r, double real_S, double real_P, double delta,
-                   double azimuthal, MY_INOUT(uint64_t) ctr) {
+bool update_stokes(RAYX_INOUT(Ray) r, double real_S, double real_P, double delta,
+                   double azimuthal, RAYX_INOUT(uint64_t) ctr) {
     dvec4 stokes_old = r.m_stokes;
     double c_chi = r8_cos(azimuthal);
     double s_chi = r8_sin(azimuthal);
@@ -562,7 +562,7 @@ adds slope error to the normal
 slope error in either x or z direction or the unmodified normal otherwise.
 */
 dvec4 tanger(dvec4 normal, double slopeX, double slopeZ, int O_type,
-             MY_INOUT(uint64_t) ctr) {
+             RAYX_INOUT(uint64_t) ctr) {
     // only calculate the random number if at least one slope error is not 0,
     // since the calculation is costly (sin, cos, log involved)
     if (slopeX != 0 || slopeZ != 0) {
@@ -596,8 +596,8 @@ void RAYX_API RZPLineDensity(Ray r, dvec4 normal, int IMAGE_TYPE, int RZP_TYPE,
                     ALLOW_UNUSED int DERIVATION_METHOD,
                     ALLOW_UNUSED double zOffsetCenter, double risag,
                     double rosag, double rimer, double romer, double alpha,
-                    double beta, double Ord, double WL, MY_INOUT(double) DX,
-                    MY_INOUT(double) DZ) {  // TODO fix unused var
+                    double beta, double Ord, double WL, RAYX_INOUT(double) DX,
+                    RAYX_INOUT(double) DZ) {  // TODO fix unused var
     double FX = normal.x;
     double FY = normal.y;
     double FZ = normal.z;
@@ -899,8 +899,8 @@ zoneplates
 @returns
     results stored in dphi, dpsi (inout)
 */
-void bessel_diff(double radius, double wl, MY_INOUT(double) dphi,
-                 MY_INOUT(double) dpsi, MY_INOUT(uint64_t) ctr) {
+void bessel_diff(double radius, double wl, RAYX_INOUT(double) dphi,
+                 RAYX_INOUT(double) dpsi, RAYX_INOUT(uint64_t) ctr) {
     double b = abs(radius) * 1e06;
     double ximax = 5.0 * wl / b;
 
@@ -936,8 +936,8 @@ void bessel_diff(double radius, double wl, MY_INOUT(double) dphi,
  * @param ctr		counter for random number generator
  * @return result stored in dAngle
  */
-void fraun_diff(double dim, double wl, MY_INOUT(double) dAngle,
-                MY_INOUT(uint64_t) ctr) {
+void fraun_diff(double dim, double wl, RAYX_INOUT(double) dAngle,
+                RAYX_INOUT(uint64_t) ctr) {
     if (dim == 0) return;        // no diffraction in this direction
     double b = dim * 1e06;       // slit opening
     double div = 10.0 * wl / b;  // up to 2nd maximum
