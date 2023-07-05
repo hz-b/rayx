@@ -1,5 +1,6 @@
 import pandas as pd
 from jinja2 import Environment, FileSystemLoader
+import os
 
 
 def read_csv(file):
@@ -78,7 +79,7 @@ def main():
     output_html(
         comparison,
         hardware_info,
-        filenames,
+        [os.path.basename(filename) for filename in filenames],
         "Scripts/benchmark-outputs/comparison.html",
     )
 
