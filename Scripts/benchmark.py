@@ -105,8 +105,8 @@ def get_hardware_info():
 
     info = {
         "CPU model": get_cpu_info(),
-        "Total RAM": f"{psutil.virtual_memory().total / (1024 ** 3):.2f}GB",
         "CPU cores": psutil.cpu_count(),
+        "Total RAM": f"{psutil.virtual_memory().total / (1024 ** 3):.2f}GB",
     }
     info.update(gpu_info)
     return info
