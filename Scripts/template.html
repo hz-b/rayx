@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Benchmark Comparison</title>
+    <style>
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th,
+        td {
+            border: 1px solid #000;
+            padding: 5px;
+            text-align: left;
+        }
+
+        .faster {
+            background-color: green;
+            color: white;
+        }
+    </style>
+</head>
+
+<body>
+    <h1>Benchmark Comparison</h1>
+    <h2>{{ filenames[0] }} vs {{ filenames[1] }}</h2>
+    <h3>Hardware Info</h3>
+    <table>
+        <thead>
+            <tr>
+                <th>Parameter</th>
+                <th>{{ filenames[0] }}</th>
+                <th>{{ filenames[1] }}</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for index, row in hardware_info.iterrows() %}
+            <tr>
+                <td>{{ row['parameter'] }}</td>
+                <td>{{ row['value_1'] }}</td>
+                <td>{{ row['value_2'] }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <h3>Benchmark Results</h3>
+    {% for test_name, test_data in data.groupby('test_name') %}
+    <h4>{{ test_name }}</h4>
+    <table>
+        <thead>
+            <tr>
+                <th>Operation</th>
+                <th>{{ filenames[0] }}</th>
+                <th>{{ filenames[1] }}</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for index, row in test_data.iterrows() %}
+            <tr>
+                <td>{{ row['operation'] }}</td>
+                <td class="{{ 'faster' if row['highlight'] and row['diff'] > 0 else '' }}">{{ row['mean_1'] }} {% if
+                    row['highlight'] and row['diff'] > 0 %} (-{{
+                    row['diff'] }}%) {% endif %}</td>
+                <td class="{{ 'faster' if row['highlight'] and row['diff'] < 0 else '' }}">{{ row['mean_2'] }} {% if
+                    row['highlight'] and row['diff'] < 0 %} (-{{ row['diff'] }}%) {% endif %}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% endfor %}
+</body>
+
+</html>

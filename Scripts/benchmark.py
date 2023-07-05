@@ -1,5 +1,5 @@
 # To install all necessary python modules:
-# python -m pip install openpyxl, progress, pandas, numpy, psutil, GPUtil, matplotlib
+# python -m pip install openpyxl, progress, pandas, numpy, psutil, GPUtil, jinja2
 
 import sys
 import os
