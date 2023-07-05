@@ -1,5 +1,5 @@
 # To install all necessary python modules:
-# python -m pip install openpyxl, progress, pandas, numpy, psutil, GPUtil
+# python -m pip install openpyxl, progress, pandas, numpy, psutil, GPUtil, matplotlib
 
 import sys
 import os
@@ -124,14 +124,14 @@ def save_statistics(statistics, file_names):
         hardware_info, orient="index", columns=["Value"]
     )
 
-    # Combine all statistics into one dataframe
-    all_statistics = [hardware_df, pd.DataFrame([""], columns=["Value"], index=[""])]
+    all_statistics = [hardware_df]
     for i, (file_name, file_statistics) in enumerate(zip(file_names, statistics)):
         df = pd.DataFrame(file_statistics).T
-        all_statistics.append(pd.DataFrame([file_name], columns=["Value"], index=[""]))
+        df.index = pd.MultiIndex.from_product([[file_name], df.index])
+        df.index.rename(["File", "Value"], inplace=True)
+        df.reset_index(inplace=True)
+        df.set_index(["File"], inplace=True)
         all_statistics.append(df)
-        all_statistics.append(pd.DataFrame([""], columns=["Value"], index=[""]))
-
     result_df = pd.concat(all_statistics)
 
     # Save as CSV
