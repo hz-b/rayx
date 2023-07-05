@@ -8,6 +8,7 @@
 #include <vector>
 
 #include "Data/Importer.h"
+#include "Tracer/Tracer.h"
 
 struct Vertex {
     glm::vec3 pos;
@@ -44,7 +45,7 @@ class Scene {
 
   public:
     Scene();
-    Scene(const RAYX::RenderObjectVec& renderObjects);
+    Scene(const RAYX::RenderObjectVec& renderObjects, const RAYX::BundleHistory& bundleHistory);
     ~Scene() = default;
 
     void addTriangle(const Vertex v1, const Vertex v2, const Vertex v3);

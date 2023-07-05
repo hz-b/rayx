@@ -12,12 +12,18 @@ Scene::Scene() {
     addLine({{0.0f, 0.0f, 0.0f}, {1.0f, 1.0f, 0.0f}}, {{0.0f, -1.0f, 0.0f}, {1.0f, 1.0f, 0.0f}});
 }
 
-Scene::Scene(const RAYX::RenderObjectVec& renderObjects) {
+Scene::Scene(const RAYX::RenderObjectVec& renderObjects, const RAYX::BundleHistory& bundleHistory) {
     for (const auto& renderObject : renderObjects) {
         fromRenderObject(renderObject);
     }
-    addLine({{0.0f, 0.0f, -1.0f}, {1.0f, 1.0f, 0.0f}}, {{0.0f, 0.0f, 0.0f}, {1.0f, 1.0f, 0.0f}});  // TODO: Rendering without rays should be possible
-    addLine({{0.0f, 0.0f, 0.0f}, {1.0f, 1.0f, 0.0f}}, {{0.0f, -1.0f, 0.0f}, {1.0f, 1.0f, 0.0f}});
+
+    for (const auto& bundle : bundleHistory) {
+        for (const auto& intersection : bundle) {
+            Vertex origin = {{0.0f, 0.0f, 0.0f}, {1.0f, 0.0f, 0.0f}};  // ! Only one bounce is supported for now
+            Vertex point = {{intersection.m_position.x, intersection.m_position.y, intersection.m_position.z}, {1.0f, 0.0f, 0.0f}};
+            addLine(origin, point);
+        }
+    }
 }
 
 void Scene::addTriangle(const Vertex v1, const Vertex v2, const Vertex v3) {
