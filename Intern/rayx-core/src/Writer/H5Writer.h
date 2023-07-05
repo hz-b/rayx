@@ -9,6 +9,7 @@
 #include "Tracer/Tracer.h"
 #include "Writer/Writer.h"
 
-void RAYX_API writeH5(const RAYX::BundleHistory&, std::string filename, const Format& format, std::vector<std::string> elementNames);
+RAYX_API void writeH5(const RAYX::BundleHistory&, std::string filename, const Format& format, std::vector<std::string> elementNames);
+RAYX_API void readH5(RAYX::BundleHistory&, std::string filename, const Format& format);
 
 #endif

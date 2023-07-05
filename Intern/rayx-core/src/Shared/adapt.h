@@ -27,14 +27,14 @@ using dmat4 = glm::dmat4;
 #define RAYX_API
 #endif
 
-// define INOUT, OUT, ALLOW_UNUSED
+// define RAYX_INOUT, RAYX_OUT, ALLOW_UNUSED
 #ifndef GLSL
-#define INOUT(x) x&
-#define OUT(x) x&
+#define RAYX_INOUT(x) x&
+#define RAYX_OUT(x) x&
 #define ALLOW_UNUSED [[maybe_unused]]
 #else
-#define INOUT(x) inout x
-#define OUT(x) out x
+#define RAYX_INOUT(x) inout x
+#define RAYX_OUT(x) out x
 #define ALLOW_UNUSED
 #endif
 

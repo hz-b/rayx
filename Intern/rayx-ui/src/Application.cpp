@@ -13,7 +13,9 @@
 #include <set>
 #include <stdexcept>
 
+#include "Data/Importer.h"
 #include "ImGuiLayer.h"
+#include "Writer/H5Writer.h"
 
 VkResult CreateDebugUtilsMessengerEXT(VkInstance instance, const VkDebugUtilsMessengerCreateInfoEXT* pCreateInfo,
                                       const VkAllocationCallbacks* pAllocator, VkDebugUtilsMessengerEXT* pDebugMessenger) {
@@ -34,6 +36,9 @@ void DestroyDebugUtilsMessengerEXT(VkInstance instance, VkDebugUtilsMessengerEXT
 
 // --------- Start of Application code --------- //
 Application::Application(uint32_t width, uint32_t height, const char* name) : m_Window(width, height, name) {
+    m_RenderObjectVec = RAYX::getRenderData("PlaneMirror.rml");
+    readH5(m_Rays, "PlaneMirror.h5", FULL_FORMAT);
+    m_Scene = Scene(m_RenderObjectVec);
     initVulkan();
     initImGui();
 }
@@ -309,7 +314,6 @@ void Application::createLogicalDevice() {
 
 void Application::createSwapChain() {
     SwapChainSupportDetails swapChainSupport = querySwapChainSupport(m_PhysicalDevice);
-
     VkSurfaceFormatKHR surfaceFormat = chooseSwapSurfaceFormat(swapChainSupport.formats);
     VkPresentModeKHR presentMode = chooseSwapPresentMode(swapChainSupport.presentModes);
     VkExtent2D extent = chooseSwapExtent(swapChainSupport.capabilities);
@@ -570,6 +574,7 @@ void Application::createGraphicsPipeline() {
     linePipelineInfo.basePipelineIndex = -1;
     linePipelineInfo.pInputAssemblyState = &lineInputAssembly;  // Use the new input assembly
     linePipelineInfo.pRasterizationState = &lineRasterizer;     // Use the new rasterization state
+    linePipelineInfo.renderPass = m_RenderPass;
 
     if (vkCreateGraphicsPipelines(m_Device, VK_NULL_HANDLE, 1, &linePipelineInfo, nullptr, &m_LinePipeline) != VK_SUCCESS) {
         throw std::runtime_error("failed to create line graphics pipeline!");
@@ -818,20 +823,19 @@ void Application::recordCommandBuffer(VkCommandBuffer commandBuffer, uint32_t im
         throw std::runtime_error("failed to begin recording command buffer!");
     }
 
+    VkClearValue clearColor = m_ImGuiLayer.getClearValue();
     VkRenderPassBeginInfo renderPassInfo{};
     renderPassInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
     renderPassInfo.renderPass = m_RenderPass;
     renderPassInfo.framebuffer = m_SwapChain.framebuffers[imageIndex];
     renderPassInfo.renderArea.offset = {0, 0};
     renderPassInfo.renderArea.extent = m_SwapChain.Extent;
-
-    VkClearValue clearColor = m_ImGuiLayer.getClearValue();
     renderPassInfo.clearValueCount = 1;
     renderPassInfo.pClearValues = &clearColor;
 
-    // Triangle pipeline
     vkCmdBeginRenderPass(commandBuffer, &renderPassInfo, VK_SUBPASS_CONTENTS_INLINE);
 
+    // Triangle pipeline
     vkCmdBindPipeline(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, m_TrianglePipeline);
 
     VkViewport viewport{};
@@ -852,16 +856,13 @@ void Application::recordCommandBuffer(VkCommandBuffer commandBuffer, uint32_t im
     VkDeviceSize offsets[] = {0};
     vkCmdBindVertexBuffers(commandBuffer, 0, 1, vertexBuffers, offsets);
 
-    vkCmdBindIndexBuffer(commandBuffer, m_TriangleIndexBuffer, 0, VK_INDEX_TYPE_UINT16);
-
     vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, m_PipelineLayout, 0, 1, &m_DescriptorSets[m_currentFrame], 0, nullptr);
-
+    vkCmdBindIndexBuffer(commandBuffer, m_TriangleIndexBuffer, 0, VK_INDEX_TYPE_UINT16);
     vkCmdDrawIndexed(commandBuffer, static_cast<uint32_t>(m_Scene.getIndices(Scene::TRIA_TOPOGRAPHY).size()), 1, 0, 0, 0);
 
     // Line pipeline
     vkCmdBindPipeline(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, m_LinePipeline);
     vkCmdBindIndexBuffer(commandBuffer, m_LineIndexBuffer, 0, VK_INDEX_TYPE_UINT16);
-
     vkCmdDrawIndexed(commandBuffer, static_cast<uint32_t>(m_Scene.getIndices(Scene::LINE_TOPOGRAPHY).size()), 1, 0, 0, 0);
 
     vkCmdEndRenderPass(commandBuffer);
