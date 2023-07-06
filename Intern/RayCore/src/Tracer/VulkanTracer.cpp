@@ -15,6 +15,17 @@
 #endif
 
 namespace RAYX {
+std::vector<Ray> flatten(std::vector<std::vector<Ray>>& allRays) {
+    std::vector<Ray> flattRays;
+    flattRays.reserve(allRays.size() * allRays[0].size());
+
+    for (const auto& row : allRays) {
+        for (auto& r : row) {
+            flattRays.push_back(r);
+        }
+    }
+    return flattRays;
+}
 /**
  * @brief Trace Batch from cfg
  * @param cfg
@@ -42,44 +53,46 @@ std::vector<Ray> VulkanTracer::traceRaw(const TraceRawConfig& cfg) {
 
     // Init Vulkan, if not yet initialized.
     if (m_engine.state() == VulkanEngine::EngineStates_t::PREINIT) {
-        m_engine.init();
-        // For now we recreate everything
         // TODO (OS) : Only change buffers and not all pass!
+        m_engine.init();  // For now we recreate everything
 
-        // todo: Idea is to have Preloop-> first loop --loop(inCPU)--> until max bounces
-        std::vector<ShaderStageCreateInfo> splitShaderStages0 = {
-            {.name = "PreLoopStage", .shaderPath = "build/bin/main_1.spv", .entryPoint = "main"},
-            {.name = "LoopBodyStage", .shaderPath = "build/bin/main_2.spv", .entryPoint = "main"},
-        };
-
-        std::vector<ShaderStageCreateInfo> splitShaderStages1 = {
-            {.name = "LoopBodyStage", .shaderPath = "build/bin/main_2.spv", .entryPoint = "main"}};
+        // TODO: Idea is to have Preloop-> first loop --loop(inCPU)--> until max bounces
+        std::vector<ShaderStageCreateInfo> splitShaderStages0 = {{.name = "TraceStage", .shaderPath = "build/bin/singleBounce.spv", .entryPoint = "main"}};
 
         // Create Compute passes
-        m_engine.createComputePipelinePass({.passName = "InitTracePass", .shaderStagesCreateInfos = splitShaderStages0});
-        m_engine.createComputePipelinePass({.passName = "TracePass", .shaderStagesCreateInfos = splitShaderStages1});
+        m_engine.createComputePipelinePass({.passName = "singleTracePass", .shaderStagesCreateInfos = splitShaderStages0});
+        m_engine.printPasses();
     }
 
-    m_engine.printPasses();
     auto bufferHandler = m_engine.getBufferHandler();
     // Create Buffers and bind them to Pass through Descriptors
     {
         // Should return only compute now. Important when mixing different shader types to chose right stage flag!
-        auto shaderFlag = m_engine.getComputePass("InitTracePass")->getShaderStage(0).getShaderStageFlagBits();
-        auto passName0 = std::string(m_engine.getComputePass("InitTracePass")->getName());
-        auto passName1 = std::string(m_engine.getComputePass("TracePass")->getName());
+        auto shaderFlag = m_engine.getComputePass("singleTracePass")->getShaderStage(0).getShaderStageFlagBits();
+        auto passName0 = std::string(m_engine.getComputePass("singleTracePass")->getName());
+
+        // Prepare rayMeta
+        std::vector<RayMeta> rayMeta;
+        rayMeta.reserve(cfg.m_numRays);
+        {
+            const uint64_t MAX_UINT64 = ~(uint64_t(0));
+            uint64_t workerCounterNum = MAX_UINT64 / uint64_t(cfg.m_numRays);
+            for (auto i = 0; i < cfg.m_numRays; i++) {
+                rayMeta.push_back({.nextElementId = 0,  // Intersection element unknown
+                                   .ctr = ((uint64_t)cfg.m_rayIdStart + (uint64_t)i) * workerCounterNum + uint64_t(cfg.m_randomSeed * MAX_UINT64),
+                                   .finalized = false});  // Not started
+            }
+        }
 
         // Bindings are *IN ORDER*
         // PS: You can also call addDescriptorSetPerPassBindings once!
         bufferHandler
-            ->createBuffer<Ray>({"ray-buffer", VKBUFFER_INOUT}, rayList)  // Input Ray Buffer
-            .addDescriptorSetPerPassBinding(passName0, 0, shaderFlag)
-            .addDescriptorSetPerPassBinding(passName1, 0, shaderFlag);
+            ->createBuffer<Ray>({"ray-buffer", VKBUFFER_INOUT}, rayList)  // Input Ray Buffer TODO(OS): remove wait for async
+            .addDescriptorSetPerPassBinding(passName0, 0, shaderFlag);
 
         bufferHandler
-            ->createBuffer({"ray-meta-buffer", VKBUFFER_OUT, rayList.size() * sizeof(RayMeta)})  // Meta Ray Buffer
-            .addDescriptorSetPerPassBinding(passName0, 1, shaderFlag)
-            .addDescriptorSetPerPassBinding(passName1, 1, shaderFlag);
+            ->createBuffer({"ray-meta-buffer", VKBUFFER_INOUT}, rayMeta)  // Meta Ray Buffer
+            .addDescriptorSetPerPassBinding(passName0, 1, shaderFlag);
 
         // bufferHandler [deprecated]
         //     ->createBuffer({"output-buffer", VKBUFFER_OUT, (numberOfRays * sizeof(Ray) * (int)cfg.m_maxSnapshots)})  // Output Ray Buffer
@@ -88,63 +101,54 @@ std::vector<Ray> VulkanTracer::traceRaw(const TraceRawConfig& cfg) {
 
         bufferHandler
             ->createBuffer<double>({"quadric-buffer", VKBUFFER_IN}, beamlineData)  // Beamline quadric info
-            .addDescriptorSetPerPassBinding(passName0, 2, shaderFlag)
-            .addDescriptorSetPerPassBinding(passName1, 2, shaderFlag);
+            .addDescriptorSetPerPassBinding(passName0, 2, shaderFlag);
 
         bufferHandler
             ->createBuffer({"xyznull-buffer", VKBUFFER_IN, 100})  // FIXME(OS): This buffer is not needed?
-            .addDescriptorSetPerPassBinding(passName0, 3, shaderFlag)
-            .addDescriptorSetPerPassBinding(passName1, 3, shaderFlag);
+            .addDescriptorSetPerPassBinding(passName0, 3, shaderFlag);
 
         bufferHandler
             ->createBuffer<int>({"material-index-table", VKBUFFER_IN}, materialTables.indexTable)  /// Material info
-            .addDescriptorSetPerPassBinding(passName0, 4, shaderFlag)
-            .addDescriptorSetPerPassBinding(passName1, 4, shaderFlag);
+            .addDescriptorSetPerPassBinding(passName0, 4, shaderFlag);
 
         bufferHandler
             ->createBuffer<double>({"material-table", VKBUFFER_IN}, materialTables.materialTable)  // Material info
-            .addDescriptorSetPerPassBinding(passName0, 5, shaderFlag)
-            .addDescriptorSetPerPassBinding(passName1, 5, shaderFlag);
+            .addDescriptorSetPerPassBinding(passName0, 5, shaderFlag);
 #ifdef RAYX_DEBUG_MODE
         bufferHandler
             ->createBuffer({"debug-buffer", VKBUFFER_OUT, numberOfRays * sizeof(debugBuffer_t)})  // Debug Matrix Buffer
-            .addDescriptorSetPerPassBinding(passName0, 6, shaderFlag)
-            .addDescriptorSetPerPassBinding(passName1, 6, shaderFlag);
+            .addDescriptorSetPerPassBinding(passName0, 6, shaderFlag);
 #endif
     }
     // Optional
     // m_engine.getBufferHandler().waitTransferQueueIdle();
 
     // FIXME(OS): Weird pushconstant update
-    m_engine.getComputePass("InitTracePass")
-        ->updatePushConstant(0, const_cast<void*>(m_engine.m_pushConstants.pushConstPtr), m_engine.m_pushConstants.size);
-    m_engine.getComputePass("InitTracePass")
-        ->updatePushConstant(1, const_cast<void*>(m_engine.m_pushConstants.pushConstPtr), m_engine.m_pushConstants.size);
-    m_engine.getComputePass("TracePass")
+    m_engine.getComputePass("singleTracePass")
         ->updatePushConstant(0, const_cast<void*>(m_engine.m_pushConstants.pushConstPtr), m_engine.m_pushConstants.size);
 
     // Create Pipeline layouts and Descriptor Layouts. Everytime buffer formation (not data) changes we need to prepare again
     m_engine.prepareComputePipelinePasses();
+    // Run multiple bounces
+    auto out = m_engine.run({.m_numberOfInvocations = numberOfRays, .maxBounces = (int) cfg.m_elements.size()});
 
-    m_engine.run({.m_numberOfInvocations = numberOfRays});
-
-    std::vector<Ray> out = bufferHandler->readBuffer<Ray>("output-buffer", true);
+    // std::vector<Ray> out = bufferHandler->readBuffer<Ray>("output-buffer", true);
 
 #ifdef RAYX_DEBUG_MODE
     m_debugBufList = bufferHandler->readBuffer<debugBuffer_t>("debug-buffer", true);
 #endif
 
     m_engine.cleanup();
-    return out;
+
+    // Flatten
+    return flatten(out);
 }
 
+// TODO(OS): Multi extern pushConstant content update is not supported
 void VulkanTracer::setPushConstants(const PushConstants* p) {
     if (sizeof(*p) > 128) RAYX_WARN << "Using pushConstants bigger than 128 Bytes might be unsupported on some GPUs. Check Compute Info";
     m_engine.m_pushConstants.pushConstPtr = static_cast<const PushConstants*>(p);
     m_engine.m_pushConstants.size = sizeof(*p);
-
-    // TODO (OS) Temp fix, pushconstants need to be updated deeper
-    // m_engine.m_ComputePass->updatePushConstant(0, const_cast<PushConstants*>(p), sizeof(*p));
 }
 
 }  // namespace RAYX

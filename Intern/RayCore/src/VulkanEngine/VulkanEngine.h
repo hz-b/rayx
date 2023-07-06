@@ -5,6 +5,7 @@
 #include <vk_mem_alloc.h>
 
 #include <algorithm>
+#include <functional>
 #include <map>
 #include <vector>
 #include <vulkan/vulkan.hpp>
@@ -21,6 +22,7 @@ namespace RAYX {
 /// the argument type of `VulkanEngine::run(_)`
 struct VulkanEngineRunSpec_t {
     uint32_t m_numberOfInvocations;
+    int maxBounces;
 };
 
 class RAYX_API VulkanEngine {
@@ -41,7 +43,7 @@ class RAYX_API VulkanEngine {
 
     BufferHandler* getBufferHandler() { return m_BufferHandler; }
 
-    void run(VulkanEngineRunSpec_t);
+    std::vector<std::vector<Ray>> run(VulkanEngineRunSpec_t);
 
     /// changes the state from POSTRUN to PRERUN.
     /// after this all buffers are deleted (and hence readBuffer will fail.)
@@ -122,6 +124,10 @@ class RAYX_API VulkanEngine {
     void createCommandBuffers(int commandBuffersCount);
     void recordFirstCommand();
     void recordSecondCommand();
+    void traceCommand(VkCommandBuffer& cmdBuffer);
+    void recordSimpleTraceCommand(VkCommandBuffer& commandBuffer);
+    // template <typename Lambda, typename... Args>
+    // void recordCommand(std::string passName, VkCommandBuffer& commandBuffer, Lambda&& commandLambda, Args&&... args, int stage = 0);
     void createFences() { m_Fences.compute = std::make_unique<Fence>(m_Device); }
 
     void recordInCommandBuffer(ComputePass& computePass, int cmdBufIndex);
@@ -134,6 +140,7 @@ class RAYX_API VulkanEngine {
     // Run:
     void submitCommandBuffer(int cmdBufIndex);
     void updateDescriptorSets(std::string passName);
+    void updateAllDescriptorSets();
     VkCommandBuffer createOneTimeCommandBuffer();
 };
 

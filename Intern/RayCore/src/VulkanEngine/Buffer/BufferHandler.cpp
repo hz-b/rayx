@@ -165,11 +165,10 @@ void BufferHandler::readBufferRaw(const char* bufname, char* outdata, const VkQu
 
     size_t remainingBytes = buffer->getSize();
     size_t offset = 0;
+
     if (queue != nullptr) {
         vkQueueWaitIdle(queue);
     }
-
-    vkQueueWaitIdle(m_TransferQueue);
 
     while (remainingBytes > 0) {
         size_t localbytes = std::min((size_t)m_StagingSize, remainingBytes);

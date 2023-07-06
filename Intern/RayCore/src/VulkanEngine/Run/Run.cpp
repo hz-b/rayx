@@ -9,40 +9,67 @@ void VulkanEngine::updateDescriptorSets(std::string passName) {
     getComputePass(passName)->simpleupdate(m_BufferHandler);
 }
 
-void VulkanEngine::run(VulkanEngineRunSpec_t spec) {
+void VulkanEngine::updateAllDescriptorSets() {
+    for (const auto pass : m_computePasses) {
+        updateDescriptorSets(pass->getName());
+    }
+}
+
+bool allFinalized(const std::vector<RayMeta>& vector) {
+    for (const auto& element : vector) {
+        if (!element.finalized) {
+            return false;
+        }
+    }
+    return true;
+}
+
+std::vector<std::vector<Ray>> VulkanEngine::run(VulkanEngineRunSpec_t spec) {
     if (m_state == EngineStates_t::PREINIT) {
         RAYX_ERR << "you've forgotton to .init() the VulkanEngine";
     } else if (m_state == EngineStates_t::POSTRUN) {
         // RAYX_ERR << "you've forgotton to .cleanup() the VulkanEngine";
     }
     m_numberOfInvocations = spec.m_numberOfInvocations;
+    const int maxBounces = spec.maxBounces;  // TODO: Not here
 
     // Using new descriptor manager (TODO: Fix new desc. manager)
-    updateDescriptorSets("InitTracePass");
-    updateDescriptorSets("TracePass");
-    // TODO: If needed, update pushconstants again
+    updateAllDescriptorSets();
 
-    int maxBounces = UINT_MAX; // TODO: Undefined
-    recordFirstCommand();  // Init and trace 1 bounce
-    submitCommandBuffer(0);
-    m_Fences.compute->wait();  // FIXME: Can be solved by another memory barrier in CommandBuffer
+    std::vector<std::vector<Ray>> snapshot;
 
-    // Call snapshot on res/out vector with mem. barrier (srcMask : compute and destMask : transfer)
-    // Something like this (With the barrier, the transfer will only start once the previous compute(pipeline) is done)
-    // std::vector<Ray> out = bufferHandler->readBuffer<Ray>("output-buffer", true);
-    // {
-    // void takeSnapshot(Ray r, double w) <-- On all 'out' vector 
-    // PS: It is possible to copy 'out', start second command and dispatch and then manage snapshot (async : avoid idle time)
-    //}
+    // TODO (OS) : Remove this
+    struct push_constant_t {
+        double rayIdStart;
+        double numRays;
+        double randomSeed;
+        double maxSnapshots;  // FIXME(OS) : Only used by CPU
+        int i_bounce;
+    };
 
-    for (int i = 1; i < maxBounces; i++) {
-        recordSecondCommand(); 
-        submitCommandBuffer(1);
+    for (int i = 0; i < maxBounces; i++) {
+        RAYX_D_LOG << "Bounce : "<< i;
+        // HACK (TODO(OS): Remove this)
+        auto push = m_computePasses[0]->getPass()[0]->m_pushConstant.getData();
+        push_constant_t* pushPtr = const_cast<push_constant_t*>(static_cast<const push_constant_t*>(push));
+        pushPtr->i_bounce = i;
+
+        recordSimpleTraceCommand(m_CommandBuffers[0]);
+        submitCommandBuffer(0);
         m_Fences.compute->wait();  // FIXME: Can be solved by another memory barrier in CommandBuffer
-        // Another snapshot! (Same procedure with possibility to start next loop index)
+
+        auto rayOut = m_BufferHandler->readBuffer<Ray>("ray-buffer", true);
+        auto rayMeta = m_BufferHandler->readBuffer<RayMeta>("ray-meta-buffer", true);
+
+        snapshot.push_back(rayOut);
+        if (allFinalized(rayMeta)) {  // Are all rays finished?
+            RAYX_VERB << "All finalized";
+            break;
+        }
     }
     m_runs++;
     m_state = EngineStates_t::POSTRUN;
+    return snapshot;
 }
 
 }  // namespace RAYX

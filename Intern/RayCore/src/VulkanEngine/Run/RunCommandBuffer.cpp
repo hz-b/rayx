@@ -29,7 +29,6 @@ void VulkanEngine::submitCommandBuffer(int cmdBufIndex) {
     from the GPU. Fences give us a hint that the Command in the Queue is
     actually done executing.
     */
-    m_Fences.compute->wait(); // TODO:Remove sepahore wait 
 }
 
 }  // namespace RAYX

@@ -50,7 +50,7 @@ struct RAYX_API Ray {
 
 struct RAYX_API RayMeta {
     uint64_t nextElementId = 0;
-    double ctr = 0.0;
+    uint64_t ctr = 0;
     bool finalized = false;
 };
 }  // namespace RAYX

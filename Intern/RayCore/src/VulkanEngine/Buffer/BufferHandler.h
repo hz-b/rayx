@@ -71,9 +71,9 @@ class RAYX_API BufferHandler {
      * @return std::vector<T>
      */
     template <typename T>
-    inline std::vector<T> readBuffer(const char* bufname, bool indirect) {
+    inline std::vector<T> readBuffer(const char* bufname, bool waitForQueue) {
         std::vector<T> out(m_Buffers[bufname]->getSize() / sizeof(T));
-        if (indirect) {
+        if (waitForQueue) {
             readBufferRaw(bufname, (char*)out.data(), m_TransferQueue);
         } else {
             readBufferRaw(bufname, (char*)out.data());

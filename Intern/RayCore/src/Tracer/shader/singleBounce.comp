@@ -54,13 +54,12 @@ struct Ray {
     double m_pathLength;
     double m_order;
     double m_lastElement;
-    double m_extraParam;
+    double m_extraParam;  // Deprecated
 };
 
 struct RayMeta {
     uint64_t nextElementId;
     uint64_t ctr;
-    double bounce;
     bool finalized;
 };
 
@@ -169,6 +168,9 @@ void takeFinalSnapshot(Ray r, double w) {
 // in this function we need to make sure that rayData ALWAYS remains in GLOBAL coordinates (it can be changed in a function but needs to be changed
 // back before the function returns to this function)
 void main() {
+    if (_rayMeta.finalized) {
+        return;  // RETURN FINALIZED
+    }
     Collision col = findCollision();
 
     if (!col.found) {
@@ -213,11 +215,6 @@ void main() {
     if (_rayMeta.finalized) {
         return;  // RETURN FINALIZED
     }
-
-    // use extraParameter to store the order in which the ray has hit which optical element (e.g extraParameter = 412 -> first hit element 2, then
-    // 1, then 4)
-    elem_ray.m_extraParam += ((col.elementIndex + 1) * _rayMeta.bounce) * int(elem_ray.m_lastElement == col.elementIndex + 1);
-    _rayMeta.bounce *= pow(10, int(elem_ray.m_lastElement == col.elementIndex + 1));
 
     takeSnapshot(elem_ray, W_JUST_HIT_ELEM);  // TODO: SNAPSHOT
 

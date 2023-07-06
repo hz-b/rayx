@@ -1,4 +1,0 @@
-#version 450
-#define GLSL
-#include "main_2.comp"
-

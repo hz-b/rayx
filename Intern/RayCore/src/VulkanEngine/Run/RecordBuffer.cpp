@@ -133,8 +133,7 @@ void VulkanEngine::recordFirstCommand() {
     vkCmdDispatch(*cmdBuffer0, group.x, group.z, group.y);
 
     // Memory barrier (Init->Loop(i=0))
-    // TODO: First shader (output) is still output in second shader
-    m_BufferHandler->insertBufferMemoryBarrier("output-buffer", *cmdBuffer0, VK_ACCESS_SHADER_WRITE_BIT, VK_ACCESS_SHADER_READ_BIT,
+    m_BufferHandler->insertBufferMemoryBarrier("ray-buffer", *cmdBuffer0, VK_ACCESS_SHADER_WRITE_BIT, VK_ACCESS_SHADER_READ_BIT,
                                                VK_PIPELINE_STAGE_COMPUTE_SHADER_BIT, VK_PIPELINE_STAGE_COMPUTE_SHADER_BIT);
 
     // Second sage: LoopBodyStage
@@ -164,6 +163,8 @@ void VulkanEngine::recordSecondCommand() {
     pass1->bind(*cmdBuffer1, 0);
     pass1->bindDescriptorSet(*cmdBuffer1, 0);
 
+    // auto traceCommand = [](VkCOmmandBuffer & command)
+
     auto requiredLocalWorkGroupNo = (uint32_t)ceil(m_numberOfInvocations / float(WORKGROUP_SIZE));  // number of local works groups
     VkPhysicalDeviceProperties deviceProperties;
     vkGetPhysicalDeviceProperties(m_PhysicalDevice, &deviceProperties);
@@ -174,6 +175,47 @@ void VulkanEngine::recordSecondCommand() {
     VK_CHECK_RESULT(vkEndCommandBuffer(*cmdBuffer1));  // end recording commands.
 }
 
+void VulkanEngine::traceCommand(VkCommandBuffer& cmdBuffer) {
+    static auto requiredLocalWorkGroupNo = (uint32_t)ceil(m_numberOfInvocations / float(WORKGROUP_SIZE));  // number of local works groups
+    VkPhysicalDeviceProperties deviceProperties;
+    vkGetPhysicalDeviceProperties(m_PhysicalDevice, &deviceProperties);
+    static auto group = guessWorkGroupNo(requiredLocalWorkGroupNo, deviceProperties.limits);
+    vkCmdDispatch(cmdBuffer, group.x, group.z, group.y);
+}
+
+void VulkanEngine::recordSimpleTraceCommand(VkCommandBuffer& commandBuffer) {
+    RAYX_PROFILE_FUNCTION();
+    auto pass0 = getComputePass("singleTracePass");
+    VkCommandBufferBeginInfo beginInfo = VKINIT::Command::command_buffer_begin_info();
+    beginInfo.flags = VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT;
+
+    // start recording commands
+    VK_CHECK_RESULT(vkBeginCommandBuffer(commandBuffer, &beginInfo));
+    pass0->bind(commandBuffer, 0);
+    pass0->bindDescriptorSet(commandBuffer, 0);
+    pass0->cmdPushConstants(commandBuffer, 0);  // Bind push constants
+
+    traceCommand(commandBuffer);
+    VK_CHECK_RESULT(vkEndCommandBuffer(commandBuffer));  // end recording commands.
+}
+
+// template <typename Lambda, typename... Args>
+// void VulkanEngine::recordCommand(std::string passName, VkCommandBuffer& commandBuffer, Lambda&& commandLambda, Args&&... args, int stage) {
+//     RAYX_PROFILE_FUNCTION();
+//     auto pass1 = getComputePass("TracePass");
+//     VkCommandBufferBeginInfo beginInfo = VKINIT::Command::command_buffer_begin_info();
+//     beginInfo.flags = VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT;
+
+//     // start recording commands
+//     VK_CHECK_RESULT(vkBeginCommandBuffer(commandBuffer, &beginInfo));
+//     pass1->bind(commandBuffer, 0);
+//     pass1->bindDescriptorSet(commandBuffer, 0);
+
+//     command(commandBuffer);  // Record command
+
+//     pass1->cmdPushConstants(commandBuffer, 0);           // Bind push constants
+//     VK_CHECK_RESULT(vkEndCommandBuffer(commandBuffer));  // end recording commands.
+// }
 }  // namespace RAYX
 
 #endif
