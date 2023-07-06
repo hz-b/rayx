@@ -4,11 +4,6 @@
 
 #include <array>
 #include <glm/glm.hpp>
-#include <optional>
-#include <vector>
-
-#include "Data/Importer.h"
-#include "Tracer/Tracer.h"
 
 struct Vertex {
     glm::vec3 pos;
@@ -37,31 +32,4 @@ struct Vertex {
 
         return attributeDescriptions;
     }
-};
-
-class Scene {
-  public:
-    enum Topography { TRIA_TOPOGRAPHY = 0, LINE_TOPOGRAPHY = 1 };
-
-  public:
-    Scene();
-    Scene(const RAYX::RenderObjectVec& renderObjects, const RAYX::BundleHistory& bundleHistory);
-    ~Scene() = default;
-
-    void addTriangle(const Vertex v1, const Vertex v2, const Vertex v3);
-    void addLine(const Vertex v1, const Vertex v2);
-    void fromRenderObject(const RAYX::RenderObject& renderObject);
-
-    const std::vector<Vertex>& getVertices() const { return m_vertices; }
-    const std::vector<uint16_t>& getIndices(Topography topography) const { return m_indices[topography]; }
-
-  private:
-    std::vector<Vertex> m_vertices;
-    // Array of vectors of indices for each topography
-    // 0 = triangles
-    // 1 = lines
-    std::array<std::vector<uint16_t>, 2> m_indices;
-
-    uint16_t addVertex(const Vertex v, Topography topography);
-    std::optional<uint16_t> vertexExists(const Vertex v) const;
 };

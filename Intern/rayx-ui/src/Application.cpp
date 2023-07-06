@@ -13,7 +13,9 @@
 #include <set>
 #include <stdexcept>
 
+#include "Data/Importer.h"
 #include "ImGuiLayer.h"
+#include "Writer/H5Writer.h"
 
 VkResult CreateDebugUtilsMessengerEXT(VkInstance instance, const VkDebugUtilsMessengerCreateInfoEXT* pCreateInfo,
                                       const VkAllocationCallbacks* pAllocator, VkDebugUtilsMessengerEXT* pDebugMessenger) {
@@ -34,11 +36,64 @@ void DestroyDebugUtilsMessengerEXT(VkInstance instance, VkDebugUtilsMessengerEXT
 
 // --------- Start of Application code --------- //
 Application::Application(uint32_t width, uint32_t height, const char* name) : m_Window(width, height, name) {
+    m_RenderObjectVec = RAYX::getRenderData("PlaneMirror.rml");
+    readH5(m_Rays, "PlaneMirror.h5", FULL_FORMAT);
+    m_Scene = Scene(m_RenderObjectVec, m_Rays);
     initVulkan();
     initImGui();
 }
 
-Application::~Application() { cleanup(); }
+Application::~Application() {
+    m_ImGuiLayer.cleanupImGui();
+
+    cleanupSwapChain();
+
+    vkDestroyDescriptorPool(m_Device, m_DescriptorPool, nullptr);
+
+    vkDestroyDescriptorSetLayout(m_Device, m_DescriptorSetLayout, nullptr);
+
+    m_TrianglePipelineLayout->~PipelineLayout();
+    m_LinePipelineLayout->~PipelineLayout();
+    m_GridPipelineLayout->~PipelineLayout();
+
+    m_TrianglePipeline->~GraphicsPipeline();
+    m_LinePipeline->~GraphicsPipeline();
+    m_GridPipeline->~GraphicsPipeline();
+
+    vkDestroyRenderPass(m_Device, m_RenderPass, nullptr);
+
+    for (size_t i = 0; i < m_maxFramesInFlight; i++) {
+        vkDestroyBuffer(m_Device, m_UniformBuffers[i], nullptr);
+        vkFreeMemory(m_Device, m_UniformBuffersMemory[i], nullptr);
+    }
+
+    m_VertexBuffer->~VertexBuffer();
+
+    vkDestroyBuffer(m_Device, m_TriangleIndexBuffer, nullptr);
+    vkFreeMemory(m_Device, m_TriangleIndexBufferMemory, nullptr);
+
+    vkDestroyBuffer(m_Device, m_LineIndexBuffer, nullptr);
+    vkFreeMemory(m_Device, m_LineIndexBufferMemory, nullptr);
+
+    for (size_t i = 0; i < m_maxFramesInFlight; i++) {
+        vkDestroySemaphore(m_Device, m_renderFinishedSemaphores[i], nullptr);
+        vkDestroySemaphore(m_Device, m_imageAvailableSemaphores[i], nullptr);
+        vkDestroyFence(m_Device, m_inFlightFences[i], nullptr);
+    }
+
+    vkDestroyCommandPool(m_Device, m_CommandPool, nullptr);
+
+    vkDestroyDevice(m_Device, nullptr);
+
+    if (enableValidationLayers) {
+        DestroyDebugUtilsMessengerEXT(m_Instance, m_DebugMessenger, nullptr);
+    }
+
+    vkDestroySurfaceKHR(m_Instance, m_Surface, nullptr);
+    vkDestroyInstance(m_Instance, nullptr);
+
+    // We don't need to destroy the window, its destructor will be called automatically
+}
 
 void Application::run() {
     while (!glfwWindowShouldClose(m_Window.get())) {
@@ -66,7 +121,7 @@ void Application::initVulkan() {
     createImageViews();
     createRenderPass();
     createDescriptorSetLayout();
-    createGraphicsPipeline();
+    createGraphicsPipelines();
     createFramebuffers();
     createCommandPool();
     createVertexBuffer();
@@ -104,54 +159,6 @@ void Application::cleanupSwapChain() {
     }
 
     vkDestroySwapchainKHR(m_Device, m_SwapChain.self, nullptr);
-}
-
-// TODO(Jannis): creating your own vulkan objects would make the cleanup easier (destructors called when they run out of scope)
-void Application::cleanup() {
-    m_ImGuiLayer.cleanupImGui();
-
-    cleanupSwapChain();
-
-    vkDestroyDescriptorPool(m_Device, m_DescriptorPool, nullptr);
-
-    vkDestroyDescriptorSetLayout(m_Device, m_DescriptorSetLayout, nullptr);
-
-    vkDestroyPipeline(m_Device, m_TrianglePipeline, nullptr);
-    vkDestroyPipeline(m_Device, m_LinePipeline, nullptr);
-    vkDestroyPipelineLayout(m_Device, m_PipelineLayout, nullptr);
-    vkDestroyRenderPass(m_Device, m_RenderPass, nullptr);
-
-    for (size_t i = 0; i < m_maxFramesInFlight; i++) {
-        vkDestroyBuffer(m_Device, m_UniformBuffers[i], nullptr);
-        vkFreeMemory(m_Device, m_UniformBuffersMemory[i], nullptr);
-    }
-
-    m_VertexBuffer->~VertexBuffer();
-
-    vkDestroyBuffer(m_Device, m_TriangleIndexBuffer, nullptr);
-    vkFreeMemory(m_Device, m_TriangleIndexBufferMemory, nullptr);
-
-    vkDestroyBuffer(m_Device, m_LineIndexBuffer, nullptr);
-    vkFreeMemory(m_Device, m_LineIndexBufferMemory, nullptr);
-
-    for (size_t i = 0; i < m_maxFramesInFlight; i++) {
-        vkDestroySemaphore(m_Device, m_renderFinishedSemaphores[i], nullptr);
-        vkDestroySemaphore(m_Device, m_imageAvailableSemaphores[i], nullptr);
-        vkDestroyFence(m_Device, m_inFlightFences[i], nullptr);
-    }
-
-    vkDestroyCommandPool(m_Device, m_CommandPool, nullptr);
-
-    vkDestroyDevice(m_Device, nullptr);
-
-    if (enableValidationLayers) {
-        DestroyDebugUtilsMessengerEXT(m_Instance, m_DebugMessenger, nullptr);
-    }
-
-    vkDestroySurfaceKHR(m_Instance, m_Surface, nullptr);
-    vkDestroyInstance(m_Instance, nullptr);
-
-    // We don't need to destroy the window, its destructor will be called automatically
 }
 
 void Application::recreateSwapChain() {
@@ -309,7 +316,6 @@ void Application::createLogicalDevice() {
 
 void Application::createSwapChain() {
     SwapChainSupportDetails swapChainSupport = querySwapChainSupport(m_PhysicalDevice);
-
     VkSurfaceFormatKHR surfaceFormat = chooseSwapSurfaceFormat(swapChainSupport.formats);
     VkPresentModeKHR presentMode = chooseSwapPresentMode(swapChainSupport.presentModes);
     VkExtent2D extent = chooseSwapExtent(swapChainSupport.capabilities);
@@ -442,27 +448,7 @@ void Application::createDescriptorSetLayout() {
     }
 }
 
-void Application::createGraphicsPipeline() {
-    auto vertShaderCode = readFile("../../../Intern/rayx-ui/src/Shaders/vert.spv");
-    auto fragShaderCode = readFile("../../../Intern/rayx-ui/src/Shaders/frag.spv");
-
-    VkShaderModule vertShaderModule = createShaderModule(vertShaderCode);
-    VkShaderModule fragShaderModule = createShaderModule(fragShaderCode);
-
-    VkPipelineShaderStageCreateInfo vertShaderStageInfo{};
-    vertShaderStageInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO;
-    vertShaderStageInfo.stage = VK_SHADER_STAGE_VERTEX_BIT;
-    vertShaderStageInfo.module = vertShaderModule;
-    vertShaderStageInfo.pName = "main";
-
-    VkPipelineShaderStageCreateInfo fragShaderStageInfo{};
-    fragShaderStageInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO;
-    fragShaderStageInfo.stage = VK_SHADER_STAGE_FRAGMENT_BIT;
-    fragShaderStageInfo.module = fragShaderModule;
-    fragShaderStageInfo.pName = "main";
-
-    VkPipelineShaderStageCreateInfo shaderStages[] = {vertShaderStageInfo, fragShaderStageInfo};
-
+void Application::createGraphicsPipelines() {
     VkPipelineVertexInputStateCreateInfo vertexInputInfo{};
     vertexInputInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO;
     auto bindingDescription = Vertex::getBindingDescription();
@@ -472,111 +458,27 @@ void Application::createGraphicsPipeline() {
     vertexInputInfo.pVertexBindingDescriptions = &bindingDescription;
     vertexInputInfo.pVertexAttributeDescriptions = attributeDescriptions.data();
 
-    VkPipelineInputAssemblyStateCreateInfo inputAssembly{};
-    inputAssembly.sType = VK_STRUCTURE_TYPE_PIPELINE_INPUT_ASSEMBLY_STATE_CREATE_INFO;
-    inputAssembly.topology = VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST;
-    inputAssembly.primitiveRestartEnable = VK_FALSE;
+    m_TrianglePipelineLayout = std::make_unique<PipelineLayout>(m_Device, m_DescriptorSetLayout);
+    m_TrianglePipeline = std::make_unique<GraphicsPipeline>(
+        m_Device, m_RenderPass, *m_TrianglePipelineLayout, "../../../Intern/rayx-ui/src/Shaders/vert.spv",
+        "../../../Intern/rayx-ui/src/Shaders/frag.spv", VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST, VK_POLYGON_MODE_FILL, vertexInputInfo);
 
-    VkPipelineViewportStateCreateInfo viewportState{};
-    viewportState.sType = VK_STRUCTURE_TYPE_PIPELINE_VIEWPORT_STATE_CREATE_INFO;
-    viewportState.viewportCount = 1;
-    viewportState.scissorCount = 1;
+    m_LinePipelineLayout = std::make_unique<PipelineLayout>(m_Device, m_DescriptorSetLayout);
+    m_LinePipeline = std::make_unique<GraphicsPipeline>(m_Device, m_RenderPass, *m_LinePipelineLayout, "../../../Intern/rayx-ui/src/Shaders/vert.spv",
+                                                        "../../../Intern/rayx-ui/src/Shaders/frag.spv", VK_PRIMITIVE_TOPOLOGY_LINE_LIST,
+                                                        VK_POLYGON_MODE_LINE, vertexInputInfo);
 
-    VkPipelineRasterizationStateCreateInfo rasterizer{};
-    rasterizer.sType = VK_STRUCTURE_TYPE_PIPELINE_RASTERIZATION_STATE_CREATE_INFO;
-    rasterizer.depthClampEnable = VK_FALSE;
-    rasterizer.rasterizerDiscardEnable = VK_FALSE;
-    rasterizer.polygonMode = VK_POLYGON_MODE_FILL;
-    rasterizer.lineWidth = 1.0f;
-    rasterizer.cullMode = VK_CULL_MODE_BACK_BIT;
-    rasterizer.frontFace = VK_FRONT_FACE_COUNTER_CLOCKWISE;
-    rasterizer.depthBiasEnable = VK_FALSE;
-
-    VkPipelineMultisampleStateCreateInfo multisampling{};
-    multisampling.sType = VK_STRUCTURE_TYPE_PIPELINE_MULTISAMPLE_STATE_CREATE_INFO;
-    multisampling.sampleShadingEnable = VK_FALSE;
-    multisampling.rasterizationSamples = VK_SAMPLE_COUNT_1_BIT;
-
-    VkPipelineColorBlendAttachmentState colorBlendAttachment{};
-    colorBlendAttachment.colorWriteMask = VK_COLOR_COMPONENT_R_BIT | VK_COLOR_COMPONENT_G_BIT | VK_COLOR_COMPONENT_B_BIT | VK_COLOR_COMPONENT_A_BIT;
-    colorBlendAttachment.blendEnable = VK_FALSE;
-
-    VkPipelineColorBlendStateCreateInfo colorBlending{};
-    colorBlending.sType = VK_STRUCTURE_TYPE_PIPELINE_COLOR_BLEND_STATE_CREATE_INFO;
-    colorBlending.logicOpEnable = VK_FALSE;
-    colorBlending.logicOp = VK_LOGIC_OP_COPY;
-    colorBlending.attachmentCount = 1;
-    colorBlending.pAttachments = &colorBlendAttachment;
-    colorBlending.blendConstants[0] = 0.0f;
-    colorBlending.blendConstants[1] = 0.0f;
-    colorBlending.blendConstants[2] = 0.0f;
-    colorBlending.blendConstants[3] = 0.0f;
-
-    std::vector<VkDynamicState> dynamicStates = {VK_DYNAMIC_STATE_VIEWPORT, VK_DYNAMIC_STATE_SCISSOR};
-    VkPipelineDynamicStateCreateInfo dynamicState{};
-    dynamicState.sType = VK_STRUCTURE_TYPE_PIPELINE_DYNAMIC_STATE_CREATE_INFO;
-    dynamicState.dynamicStateCount = static_cast<uint32_t>(dynamicStates.size());
-    dynamicState.pDynamicStates = dynamicStates.data();
-
-    VkPipelineLayoutCreateInfo pipelineLayoutInfo{};
-    pipelineLayoutInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO;
-    pipelineLayoutInfo.setLayoutCount = 1;
-    pipelineLayoutInfo.pSetLayouts = &m_DescriptorSetLayout;
-    pipelineLayoutInfo.pushConstantRangeCount = 0;
-
-    if (vkCreatePipelineLayout(m_Device, &pipelineLayoutInfo, nullptr, &m_PipelineLayout) != VK_SUCCESS) {
-        throw std::runtime_error("failed to create pipeline layout!");
-    }
-
-    VkGraphicsPipelineCreateInfo pipelineInfo{};
-    pipelineInfo.sType = VK_STRUCTURE_TYPE_GRAPHICS_PIPELINE_CREATE_INFO;
-    pipelineInfo.stageCount = 2;
-    pipelineInfo.pStages = shaderStages;
-    pipelineInfo.pVertexInputState = &vertexInputInfo;
-    pipelineInfo.pInputAssemblyState = &inputAssembly;
-    pipelineInfo.pViewportState = &viewportState;
-    pipelineInfo.pRasterizationState = &rasterizer;
-    pipelineInfo.pMultisampleState = &multisampling;
-    pipelineInfo.pColorBlendState = &colorBlending;
-    pipelineInfo.pDynamicState = &dynamicState;
-    pipelineInfo.layout = m_PipelineLayout;
-    pipelineInfo.renderPass = m_RenderPass;
-    pipelineInfo.subpass = 0;
-    pipelineInfo.basePipelineHandle = VK_NULL_HANDLE;
-
-    if (vkCreateGraphicsPipelines(m_Device, VK_NULL_HANDLE, 1, &pipelineInfo, nullptr, &m_TrianglePipeline) != VK_SUCCESS) {
-        throw std::runtime_error("failed to create graphics pipeline!");
-    }
-
-    // Input assembly for line pipeline
-    VkPipelineInputAssemblyStateCreateInfo lineInputAssembly{};
-    lineInputAssembly.sType = VK_STRUCTURE_TYPE_PIPELINE_INPUT_ASSEMBLY_STATE_CREATE_INFO;
-    lineInputAssembly.topology = VK_PRIMITIVE_TOPOLOGY_LINE_LIST;  // For line pipeline
-    lineInputAssembly.primitiveRestartEnable = VK_FALSE;
-
-    // Rasterization state for line pipeline
-    VkPipelineRasterizationStateCreateInfo lineRasterizer{};
-    lineRasterizer.sType = VK_STRUCTURE_TYPE_PIPELINE_RASTERIZATION_STATE_CREATE_INFO;
-    lineRasterizer.depthClampEnable = VK_FALSE;
-    lineRasterizer.rasterizerDiscardEnable = VK_FALSE;
-    lineRasterizer.polygonMode = VK_POLYGON_MODE_LINE;  // For line pipeline
-    lineRasterizer.lineWidth = 1.0f;                    // Adjust this if you want thicker lines and your GPU supports it
-    lineRasterizer.cullMode = VK_CULL_MODE_BACK_BIT;
-    lineRasterizer.frontFace = VK_FRONT_FACE_COUNTER_CLOCKWISE;
-    lineRasterizer.depthBiasEnable = VK_FALSE;
-
-    VkGraphicsPipelineCreateInfo linePipelineInfo = pipelineInfo;  // Copy the original pipelineInfo
-    linePipelineInfo.basePipelineHandle = m_TrianglePipeline;      // Set the base pipeline
-    linePipelineInfo.basePipelineIndex = -1;
-    linePipelineInfo.pInputAssemblyState = &lineInputAssembly;  // Use the new input assembly
-    linePipelineInfo.pRasterizationState = &lineRasterizer;     // Use the new rasterization state
-
-    if (vkCreateGraphicsPipelines(m_Device, VK_NULL_HANDLE, 1, &linePipelineInfo, nullptr, &m_LinePipeline) != VK_SUCCESS) {
-        throw std::runtime_error("failed to create line graphics pipeline!");
-    }
-
-    vkDestroyShaderModule(m_Device, fragShaderModule, nullptr);
-    vkDestroyShaderModule(m_Device, vertShaderModule, nullptr);
+    // No vertex bindings for the grid pipeline
+    vertexInputInfo = {};
+    vertexInputInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO;
+    vertexInputInfo.vertexBindingDescriptionCount = 0;       // No vertex bindings
+    vertexInputInfo.pVertexBindingDescriptions = nullptr;    // No vertex bindings
+    vertexInputInfo.vertexAttributeDescriptionCount = 0;     // No vertex attributes
+    vertexInputInfo.pVertexAttributeDescriptions = nullptr;  // No vertex attributes
+    m_GridPipelineLayout = std::make_unique<PipelineLayout>(m_Device, m_DescriptorSetLayout);
+    m_GridPipeline = std::make_unique<GraphicsPipeline>(
+        m_Device, m_RenderPass, *m_GridPipelineLayout, "../../../Intern/rayx-ui/src/Shaders/vertGrid.spv",
+        "../../../Intern/rayx-ui/src/Shaders/fragGrid.spv", VK_PRIMITIVE_TOPOLOGY_LINE_LIST, VK_POLYGON_MODE_LINE, vertexInputInfo);
 }
 
 void Application::createFramebuffers() {
@@ -818,21 +720,20 @@ void Application::recordCommandBuffer(VkCommandBuffer commandBuffer, uint32_t im
         throw std::runtime_error("failed to begin recording command buffer!");
     }
 
+    VkClearValue clearColor = m_ImGuiLayer.getClearValue();
     VkRenderPassBeginInfo renderPassInfo{};
     renderPassInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
     renderPassInfo.renderPass = m_RenderPass;
     renderPassInfo.framebuffer = m_SwapChain.framebuffers[imageIndex];
     renderPassInfo.renderArea.offset = {0, 0};
     renderPassInfo.renderArea.extent = m_SwapChain.Extent;
-
-    VkClearValue clearColor = m_ImGuiLayer.getClearValue();
     renderPassInfo.clearValueCount = 1;
     renderPassInfo.pClearValues = &clearColor;
 
-    // Triangle pipeline
     vkCmdBeginRenderPass(commandBuffer, &renderPassInfo, VK_SUBPASS_CONTENTS_INLINE);
 
-    vkCmdBindPipeline(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, m_TrianglePipeline);
+    // Triangle pipeline
+    vkCmdBindPipeline(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, m_TrianglePipeline->getHandle());
 
     VkViewport viewport{};
     viewport.x = 0.0f;
@@ -852,17 +753,19 @@ void Application::recordCommandBuffer(VkCommandBuffer commandBuffer, uint32_t im
     VkDeviceSize offsets[] = {0};
     vkCmdBindVertexBuffers(commandBuffer, 0, 1, vertexBuffers, offsets);
 
+    vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, m_TrianglePipelineLayout->getHandle(), 0, 1,
+                            &m_DescriptorSets[m_currentFrame], 0, nullptr);
     vkCmdBindIndexBuffer(commandBuffer, m_TriangleIndexBuffer, 0, VK_INDEX_TYPE_UINT16);
-
-    vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, m_PipelineLayout, 0, 1, &m_DescriptorSets[m_currentFrame], 0, nullptr);
-
     vkCmdDrawIndexed(commandBuffer, static_cast<uint32_t>(m_Scene.getIndices(Scene::TRIA_TOPOGRAPHY).size()), 1, 0, 0, 0);
 
     // Line pipeline
-    vkCmdBindPipeline(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, m_LinePipeline);
+    vkCmdBindPipeline(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, m_LinePipeline->getHandle());
     vkCmdBindIndexBuffer(commandBuffer, m_LineIndexBuffer, 0, VK_INDEX_TYPE_UINT16);
-
     vkCmdDrawIndexed(commandBuffer, static_cast<uint32_t>(m_Scene.getIndices(Scene::LINE_TOPOGRAPHY).size()), 1, 0, 0, 0);
+
+    // Grid pipeline
+    vkCmdBindPipeline(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, m_GridPipeline->getHandle());
+    vkCmdDraw(commandBuffer, 6, 1, 0, 0);
 
     vkCmdEndRenderPass(commandBuffer);
 

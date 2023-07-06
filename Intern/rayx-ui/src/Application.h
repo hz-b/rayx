@@ -7,8 +7,12 @@
 #include <optional>
 #include <vector>
 
+#include "Beamline/Beamline.h"
+#include "Data/Importer.h"
+#include "GraphicsPipeline.h"
 #include "ImGuiLayer.h"
 #include "Scene.h"
+#include "Tracer/Tracer.h"
 #include "VertexBuffer.h"
 #include "Window.h"
 
@@ -58,6 +62,9 @@ class Application {
     void run();
 
   private:
+    RAYX::RenderObjectVec m_RenderObjectVec;
+    RAYX::BundleHistory m_Rays;
+
     Window m_Window;
     const uint32_t m_maxFramesInFlight = 3;
 
@@ -77,9 +84,14 @@ class Application {
 
     VkRenderPass m_RenderPass;
     VkDescriptorSetLayout m_DescriptorSetLayout;
-    VkPipelineLayout m_PipelineLayout;
-    VkPipeline m_TrianglePipeline;
-    VkPipeline m_LinePipeline;
+
+    std::unique_ptr<PipelineLayout> m_TrianglePipelineLayout;
+    std::unique_ptr<PipelineLayout> m_LinePipelineLayout;
+    std::unique_ptr<PipelineLayout> m_GridPipelineLayout;
+
+    std::unique_ptr<GraphicsPipeline> m_TrianglePipeline;
+    std::unique_ptr<GraphicsPipeline> m_LinePipeline;
+    std::unique_ptr<GraphicsPipeline> m_GridPipeline;
 
     VkCommandPool m_CommandPool;
     std::vector<VkCommandBuffer> m_CommandBuffers;
@@ -122,7 +134,7 @@ class Application {
     void createImageViews();
     void createRenderPass();
     void createDescriptorSetLayout();
-    void createGraphicsPipeline();
+    void createGraphicsPipelines();
     void createFramebuffers();
     void createCommandPool();
 

@@ -54,7 +54,7 @@ class ImGuiLayer {
 
     bool m_LayerEnabled = true;
     bool m_ShowDemoWindow = false;
-    float m_ClearColor[4] = {0.45f, 0.55f, 0.60f, 1.00f};
+    float m_ClearColor[4] = {0.01f, 0.01f, 0.01f, 1.00f};
 
     VkRenderPass m_RenderPass;
     VkDescriptorPool m_DescriptorPool;

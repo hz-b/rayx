@@ -1,5 +1,7 @@
 #include "VertexBuffer.h"
 
+#include <cstring>
+
 VertexBuffer::VertexBuffer(VkDevice device, VkPhysicalDevice physicalDevice) : m_Device(device), m_PhysicalDevice(physicalDevice) {}
 
 VertexBuffer::~VertexBuffer() {
