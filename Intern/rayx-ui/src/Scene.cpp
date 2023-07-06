@@ -19,8 +19,9 @@ Scene::Scene(const RAYX::RenderObjectVec& renderObjects, const RAYX::BundleHisto
 
     for (const auto& bundle : bundleHistory) {
         for (const auto& intersection : bundle) {
-            Vertex origin = {{0.0f, 0.0f, 0.0f}, {1.0f, 0.0f, 0.0f}};  // ! Only one bounce is supported for now
-            Vertex point = {{intersection.m_position.x, intersection.m_position.y, intersection.m_position.z}, {1.0f, 0.0f, 0.0f}};
+            glm::vec3 yellow = {1.0f, 1.0f, 0.0f};
+            Vertex origin = {{0.0f, 0.0f, 0.0f}, yellow};  // ! Only one bounce is supported for now
+            Vertex point = {{intersection.m_position.x, intersection.m_position.y, intersection.m_position.z}, yellow};
             addLine(origin, point);
         }
     }
