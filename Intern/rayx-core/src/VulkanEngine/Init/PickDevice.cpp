@@ -63,7 +63,6 @@ void VulkanEngine::pickPhysicalDevice() {
             RAYX_ERR << "selected device not suitable!";
         }
     }
-    
 
     VkPhysicalDeviceProperties deviceProperties;
     vkGetPhysicalDeviceProperties(m_PhysicalDevice, &deviceProperties);

@@ -58,6 +58,7 @@ class RAYX_API Tracer {
     BundleHistory trace(const Beamline&, uint64_t max_batch_size);
 
     void setDevice(int deviceID);
+
   protected:
     // where the actual tracing happens.
     // std::vector<Ray> will contain all events for all Rays (and also the ETYPE_UNINIT events).
