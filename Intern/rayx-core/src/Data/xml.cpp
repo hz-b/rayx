@@ -327,30 +327,29 @@ bool paramEnergyDistribution(const rapidxml::xml_node<>* node, const std::filesy
 
 bool paramPositionAndOrientation(const rapidxml::xml_node<>* node, const std::vector<xml::Group>& group_context, glm::dvec4* out_pos,
                                  glm::dmat4x4* out_ori) {
-    // Always returns True!
     Misalignment misalignment = {0, 0, 0, Rad(0), Rad(0), Rad(0)};
 
+    // Always returns True!
     paramPositionNoGroup(node, out_pos);
     paramOrientationNoGroup(node, out_ori);
     paramMisalignment(node, &misalignment);
 
-    glm::dmat4x4 misOrientation =
-        getRotationMatrix(-misalignment.m_rotationXerror.rad, misalignment.m_rotationYerror.rad, misalignment.m_rotationZerror.rad);
-    glm::dvec4 offset = glm::dvec4(misalignment.m_translationXerror, misalignment.m_translationYerror, misalignment.m_translationZerror, 1);
-    // no need to add misalignment again
-    if (group_context.empty()) {
-        return true;
-    }
-    // remove misalignment from element
-    *out_pos -= *out_ori * offset;
-    *out_ori = *out_ori * glm::transpose(misOrientation);
-    out_pos->w = 1;
+    // TODO: What do we want to do with misalignment?
+    // Currently, the world-position & world-orientation as given by the RML file already incorporates the misalignment.
 
-    for (auto i = group_context.size(); i-- > 0;) {
-        *out_ori = group_context[i].m_orientation * *out_ori;
-        *out_pos = group_context[i].m_orientation * *out_pos;
-        *out_pos += group_context[i].m_position;  // this gives us w=2!
-        out_pos->w = 1;
+    // This was the old approach: We remove the misalignment from the position&orientation to obtain the non-misaligned position&orientation.
+
+    // glm::dmat4x4 misOrientation = getRotationMatrix(-misalignment.m_rotationXerror.rad, misalignment.m_rotationYerror.rad,
+    // misalignment.m_rotationZerror.rad); glm::dvec4 offset = glm::dvec4(misalignment.m_translationXerror, misalignment.m_translationYerror,
+    // misalignment.m_translationZerror, 1); *out_pos -= *out_ori * offset; *out_ori = *out_ori * glm::transpose(misOrientation); out_pos->w = 1;
+
+    if (!group_context.empty()) {
+        for (auto i = group_context.size(); i-- > 0;) {
+            *out_ori = group_context[i].m_orientation * *out_ori;
+            *out_pos = group_context[i].m_orientation * *out_pos;
+            *out_pos += group_context[i].m_position;  // this gives us w=2!
+            out_pos->w = 1;
+        }
     }
     return true;
 }
