@@ -9,30 +9,13 @@
 
 struct CameraSettings {
     float FOV = 90.0f;
-    float Pitch = 0.0f;
-    float Yaw = 90.0f;
-    float Roll = 0.0f;
+    glm::vec3 Position = glm::vec3(0.0f, 0.0f, -2.0f);
+    glm::vec3 Target = glm::vec3(0.0f, 0.0f, 0.0f);
+    glm::vec3 Up = glm::vec3(0.0f, 1.0f, 0.0f);  // Add Up vector
     float Near = 0.1f;
     float Far = 100.0f;
-    glm::vec3 Position = glm::vec3(0.0f, 0.0f, -2.0f);
 
-    // Helper functions to calculate model, view and projection matrices
-    glm::mat4 getModelMatrix() const {
-        glm::mat4 model = glm::mat4(1.0f);
-        model = glm::rotate(model, glm::radians(Roll), glm::vec3(0.0f, 0.0f, 1.0f));
-        model = glm::rotate(model, glm::radians(Pitch), glm::vec3(1.0f, 0.0f, 0.0f));
-        model = glm::rotate(model, glm::radians(Yaw), glm::vec3(0.0f, 1.0f, 0.0f));
-        return model;
-    }
-
-    glm::mat4 getViewMatrix() const {
-        glm::mat4 view = glm::mat4(1.0f);
-        view = glm::translate(view, Position);
-        view = glm::rotate(view, glm::radians(Roll), glm::vec3(0.0f, 0.0f, 1.0f));
-        view = glm::rotate(view, glm::radians(Pitch), glm::vec3(1.0f, 0.0f, 0.0f));
-        view = glm::rotate(view, glm::radians(Yaw), glm::vec3(0.0f, 1.0f, 0.0f));
-        return view;
-    }
+    glm::mat4 getViewMatrix() const { return glm::lookAt(Position, Target, Up); }
 
     glm::mat4 getProjectionMatrix(float aspectRatio) const { return glm::perspective(glm::radians(FOV), aspectRatio, Near, Far); }
 };

@@ -96,7 +96,7 @@ Application::~Application() {
 }
 
 void Application::run() {
-    while (!glfwWindowShouldClose(m_Window.get())) {
+    while (!m_Window.shouldClose()) {
         glfwPollEvents();
 
         m_ImGuiLayer.updateImGui();
@@ -478,7 +478,7 @@ void Application::createGraphicsPipelines() {
     m_GridPipelineLayout = std::make_unique<PipelineLayout>(m_Device, m_DescriptorSetLayout);
     m_GridPipeline = std::make_unique<GraphicsPipeline>(
         m_Device, m_RenderPass, *m_GridPipelineLayout, "../../../Intern/rayx-ui/src/Shaders/vertGrid.spv",
-        "../../../Intern/rayx-ui/src/Shaders/fragGrid.spv", VK_PRIMITIVE_TOPOLOGY_LINE_LIST, VK_POLYGON_MODE_LINE, vertexInputInfo);
+        "../../../Intern/rayx-ui/src/Shaders/fragGrid.spv", VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST, VK_POLYGON_MODE_FILL, vertexInputInfo);
 }
 
 void Application::createFramebuffers() {
@@ -639,8 +639,8 @@ void Application::createUniformBuffers() {
     VkDeviceSize bufferSize = sizeof(Camera);
 
     m_UniformBuffers.resize(m_maxFramesInFlight);
-    m_UniformBuffersMemory.resize(m_maxFramesInFlight);
     m_UniformBuffersMapped.resize(m_maxFramesInFlight);
+    m_UniformBuffersMemory.resize(m_maxFramesInFlight);
 
     for (size_t i = 0; i < m_maxFramesInFlight; i++) {
         createBuffer(bufferSize, VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT,
@@ -799,10 +799,12 @@ void Application::updateUniformBuffer(uint32_t currentImage) {
     auto cameraSettings = m_ImGuiLayer.getCameraSettings();
 
     Camera cam{};
-    cam.model = cameraSettings.getModelMatrix();
+    cam.model = glm::mat4(1.0f);
     cam.view = cameraSettings.getViewMatrix();
     Extent2D extent = m_Window.getExtent();
     cam.proj = cameraSettings.getProjectionMatrix((float)extent.width / (float)extent.height);
+    cam.n = cameraSettings.Near;
+    cam.f = cameraSettings.Far;
 
     memcpy(m_UniformBuffersMapped[currentImage], &cam, sizeof(cam));
 }

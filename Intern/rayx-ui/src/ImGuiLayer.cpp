@@ -150,14 +150,17 @@ void ImGuiLayer::updateImGui() {
 
         ImGui::Text("Camera");
         ImGui::SliderFloat("FOV", &m_Camera.FOV, 0.0f, 180.0f);
-        ImGui::SliderFloat("Pitch", &m_Camera.Pitch, -90.0f, 90.0f);
-        ImGui::SliderFloat("Yaw", &m_Camera.Yaw, -180.0f, 180.0f);
-        ImGui::SliderFloat("Roll", &m_Camera.Roll, -180.0f, 180.0f);
-        ImGui::SliderFloat("X", &m_Camera.Position.x, -10.0f, 10.0f);
-        ImGui::SliderFloat("Y", &m_Camera.Position.y, -10.0f, 10.0f);
-        ImGui::SliderFloat("Z", &m_Camera.Position.z, -10.0f, 10.0f);
+        ImGui::SliderFloat("Target X", &m_Camera.Target.x, -10.0f, 10.0f);
+        ImGui::SliderFloat("Target Y", &m_Camera.Target.y, -10.0f, 10.0f);
+        ImGui::SliderFloat("Target Z", &m_Camera.Target.z, -10.0f, 10.0f);
+        ImGui::SliderFloat("Position X", &m_Camera.Position.x, -10.0f, 10.0f);
+        ImGui::SliderFloat("Position Y", &m_Camera.Position.y, -10.0f, 10.0f);
+        ImGui::SliderFloat("Position Z", &m_Camera.Position.z, -10.0f, 10.0f);
+        ImGui::SliderFloat("Up X", &m_Camera.Up.x, -1.0f, 1.0f);  // Slider for Up vector x-coordinate
+        ImGui::SliderFloat("Up Y", &m_Camera.Up.y, -1.0f, 1.0f);  // Slider for Up vector y-coordinate
+        ImGui::SliderFloat("Up Z", &m_Camera.Up.z, -1.0f, 1.0f);  // Slider for Up vector z-coordinate
         ImGui::SliderFloat("Near", &m_Camera.Near, 0.0f, 100.0f);
-        ImGui::SliderFloat("Far", &m_Camera.Far, 0.0f, 100.0f);
+        ImGui::SliderFloat("Far", &m_Camera.Far, 0.0f, 10000.0f);
 
         if (ImGui::Button("Button"))  // Buttons return true when clicked (most widgets return true when edited/activated)
             counter++;
