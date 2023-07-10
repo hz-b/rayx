@@ -48,7 +48,7 @@ Rays CpuTracer::traceRaw(const TraceRawConfig& cfg) {
 
     // init rayData, outputData, rayMeta
     CPU_TRACER::rayData.data = rayList;
-    //CPU_TRACER::outputData.data.resize(rayList.size() * cfg.m_maxSnapshots);
+    // CPU_TRACER::outputData.data.resize(rayList.size() * cfg.m_maxSnapshots);
     for (size_t i = 0; i < rayList.size(); i++) {
         const uint64_t MAX_UINT64 = ~(uint64_t(0));
         uint64_t workerCounterNum = MAX_UINT64 / uint64_t(cfg.m_numRays);
@@ -86,7 +86,40 @@ Rays CpuTracer::traceRaw(const TraceRawConfig& cfg) {
         auto rayOut = CPU_TRACER::rayData.data;
         auto rayMeta = CPU_TRACER::rayMetaData.data;
 
-        //std::erase_if(rayOut, [](auto r) { return r.m_weight != W_UNINIT; });
+        int _hit = 0;
+        int _abs = 0;
+        int _fly = 0;
+        int _unin = 0;
+        int _not = 0;
+
+        for (const auto& r : rayOut) {
+            if ((int)r.m_weight == (int)W_JUST_HIT_ELEM) {
+                _hit++;
+            } else if ((int)r.m_weight == (int)W_ABSORBED) {
+                _abs++;
+            } else if ((int)r.m_weight == (int)W_FLY_OFF) {
+                _fly++;
+            } else if ((int)r.m_weight == (int)W_UNINIT) {
+                _unin++;
+            } else if ((int)r.m_weight == (int)W_NOT_ENOUGH_BOUNCES) {
+                _not++;
+            }
+        }
+        // std::erase_if(rayOut, [&](auto& r) { return r.m_weight == W_UNINIT; });
+        double hit = static_cast<double>(_hit) / rayOut.size();
+        double abs = static_cast<double>(_abs) / rayOut.size();
+        double fly = static_cast<double>(_fly) / rayOut.size();
+        double unin = static_cast<double>(_unin) / rayOut.size();
+        double notx = static_cast<double>(_not) / rayOut.size();
+
+        RAYX_D_LOG << "_hit: " << hit;
+        RAYX_D_LOG << "_abs: " << abs;
+        RAYX_D_LOG << "_fly: " << fly;
+        RAYX_D_LOG << "_unin: " << unin;
+        RAYX_D_LOG << "_not: " << notx;
+        RAYX_D_LOG << "===============";
+
+        // std::erase_if(rayOut, [](auto r) { return r.m_weight != W_UNINIT; });
         _checkpoints.push_back(rayOut);
         RAYX_DBG(rayOut.size());
         if (_allFinalized(rayMeta)) {  // Are all rays finished?
