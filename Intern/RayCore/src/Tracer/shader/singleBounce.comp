@@ -128,7 +128,14 @@ void takeSnapshot(Ray r, double w) {
     if (_rayMeta.finalized) {
         return;
     }
+    _ray = r;
     _ray.m_weight = w;
+
+#ifdef GLSL
+    if (uint(gl_GlobalInvocationID) == 10 || uint(gl_GlobalInvocationID) == 259) {
+        debugPrintfEXT("GPU :(%d) %d\n", uint(gl_GlobalInvocationID), int(_ray.m_weight));
+    }
+#endif
     return;
 }
 
@@ -168,17 +175,20 @@ void takeFinalSnapshot(Ray r, double w) {
 // in this function we need to make sure that rayData ALWAYS remains in GLOBAL coordinates (it can be changed in a function but needs to be changed
 // back before the function returns to this function)
 void main() {
+    _ray.m_weight = W_UNINIT;
+
     if (_rayMeta.finalized) {
         return;  // RETURN FINALIZED
     }
+
     Collision col = findCollision();
 
     if (!col.found) {
         // no element was hit.
         // Ray is considered to move forward to inf.
         // This is the only constellation in which a snapshot is in world coordinates.
-        takeFinalSnapshot(_ray, W_FLY_OFF);  ///////////////////////TODO CHANGE THIS
-        return;                              // RETURN "EMPTY"
+        takeFinalSnapshot(_ray, W_FLY_OFF);
+        return;  // RETURN "EMPTY"
     }
 
     // transform ray and intersection point in ELEMENT coordiantes
@@ -192,6 +202,13 @@ void main() {
     elem_ray.m_pathLength += length(elem_ray.m_position - col.hitpoint);
     elem_ray.m_position = col.hitpoint;
     elem_ray.m_lastElement = col.elementIndex + 1;  // TODO remove this "+1", element ids should consistently start at 0.
+
+#ifdef GLSL
+    if (uint(gl_GlobalInvocationID) == 10) {
+        debugPrintfEXT("GPU i. %d \n", pushConstants.i_bounce);
+        debugPrintfEXT("GPU type. %d \n", btype);
+    }
+#endif
 
     switch (btype) {
         case (BTYPE_MIRROR):
@@ -219,13 +236,23 @@ void main() {
     takeSnapshot(elem_ray, W_JUST_HIT_ELEM);  // TODO: SNAPSHOT
 
     // transform back to WORLD coordinates
-    _ray = rayMatrixMult(elem_ray, nextElement.m_outTrans);
+    rayMatrixMult_InP(_ray, elem_ray, nextElement.m_outTrans);
     //}
 
+#ifdef GLSL
+    if (uint(gl_GlobalInvocationID) == 10) {
+        debugPrintfEXT("END\n");
+    }
+#endif
     // Make final check on ray
     // placeholder, info should later be transfered to shader
     const int maxBounces = elements.length();
     if (pushConstants.i_bounce == maxBounces - 1) {
+#ifdef GLSL
+        if (uint(gl_GlobalInvocationID) == 10) {
+            debugPrintfEXT("Final check\n");
+        }
+#endif
         if (findCollision().found) {
             takeFinalSnapshot(_ray, W_NOT_ENOUGH_BOUNCES);
         } else {

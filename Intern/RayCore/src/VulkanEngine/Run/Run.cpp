@@ -36,7 +36,7 @@ std::vector<std::vector<Ray>> VulkanEngine::run(VulkanEngineRunSpec_t spec) {
     // Using new descriptor manager (TODO: Fix new desc. manager)
     updateAllDescriptorSets();
 
-    std::vector<std::vector<Ray>> snapshot;
+    std::vector<std::vector<Ray>> _checkpoints;
 
     // TODO (OS) : Remove this
     struct push_constant_t {
@@ -48,7 +48,7 @@ std::vector<std::vector<Ray>> VulkanEngine::run(VulkanEngineRunSpec_t spec) {
     };
 
     for (int i = 0; i < maxBounces; i++) {
-        RAYX_D_LOG << "Bounce : "<< i;
+        // RAYX_D_LOG << "Bounce : " << i;
         // HACK (TODO(OS): Remove this)
         auto push = m_computePasses[0]->getPass()[0]->m_pushConstant.getData();
         push_constant_t* pushPtr = const_cast<push_constant_t*>(static_cast<const push_constant_t*>(push));
@@ -56,12 +56,34 @@ std::vector<std::vector<Ray>> VulkanEngine::run(VulkanEngineRunSpec_t spec) {
 
         recordSimpleTraceCommand(m_CommandBuffers[0]);
         submitCommandBuffer(0);
-        m_Fences.compute->wait();  // FIXME: Can be solved by another memory barrier in CommandBuffer
+
+        m_Fences.compute->wait();  // FIXME: Can be solved by another memory barrier in CommandBuffer ( Fence is not working?...)
+        m_Fences.compute->forceReset();
+
+        vkQueueWaitIdle(m_ComputeQueue);
 
         auto rayOut = m_BufferHandler->readBuffer<Ray>("ray-buffer", true);
         auto rayMeta = m_BufferHandler->readBuffer<RayMeta>("ray-meta-buffer", true);
 
-        snapshot.push_back(rayOut);
+        int t = 0;
+        int y = 0;
+        int f = 0;
+        for (const auto& r : rayOut) {
+            if ((int)r.m_weight == (int)W_JUST_HIT_ELEM) {
+                t++;
+            } else if ((int)r.m_weight == (int)W_ABSORBED) {
+                y++;
+            } else if ((int)r.m_weight == (int)W_FLY_OFF) {
+                f++;
+            }
+        }
+
+        RAYX_D_LOG << (double)t / (double)rayOut.size() << " " << (double)y / (double)rayOut.size() << " " << (double)f / (double)rayOut.size();
+
+        //std::erase_if(rayOut, [](auto r) { return r.m_weight != W_UNINIT; });
+
+        _checkpoints.push_back(rayOut);
+        RAYX_DBG(rayOut.size());
         if (allFinalized(rayMeta)) {  // Are all rays finished?
             RAYX_VERB << "All finalized";
             break;
@@ -69,7 +91,7 @@ std::vector<std::vector<Ray>> VulkanEngine::run(VulkanEngineRunSpec_t spec) {
     }
     m_runs++;
     m_state = EngineStates_t::POSTRUN;
-    return snapshot;
+    return _checkpoints;
 }
 
 }  // namespace RAYX

@@ -30,7 +30,7 @@ std::vector<Ray> flatten(std::vector<std::vector<Ray>>& allRays) {
  * @brief Trace Batch from cfg
  * @param cfg
  */
-std::vector<Ray> VulkanTracer::traceRaw(const TraceRawConfig& cfg) {
+Rays VulkanTracer::traceRaw(const TraceRawConfig& cfg) {
     RAYX_PROFILE_FUNCTION_STDOUT();
     // Fetch CFG Data
     auto rayList = cfg.m_rays;
@@ -57,7 +57,8 @@ std::vector<Ray> VulkanTracer::traceRaw(const TraceRawConfig& cfg) {
         m_engine.init();  // For now we recreate everything
 
         // TODO: Idea is to have Preloop-> first loop --loop(inCPU)--> until max bounces
-        std::vector<ShaderStageCreateInfo> splitShaderStages0 = {{.name = "TraceStage", .shaderPath = "build/bin/singleBounce.spv", .entryPoint = "main"}};
+        std::vector<ShaderStageCreateInfo> splitShaderStages0 = {
+            {.name = "TraceStage", .shaderPath = "build/bin/singleBounce.spv", .entryPoint = "main"}};
 
         // Create Compute passes
         m_engine.createComputePipelinePass({.passName = "singleTracePass", .shaderStagesCreateInfos = splitShaderStages0});
@@ -130,7 +131,7 @@ std::vector<Ray> VulkanTracer::traceRaw(const TraceRawConfig& cfg) {
     // Create Pipeline layouts and Descriptor Layouts. Everytime buffer formation (not data) changes we need to prepare again
     m_engine.prepareComputePipelinePasses();
     // Run multiple bounces
-    auto out = m_engine.run({.m_numberOfInvocations = numberOfRays, .maxBounces = (int) cfg.m_elements.size()});
+    auto out = m_engine.run({.m_numberOfInvocations = numberOfRays, .maxBounces = (int)cfg.m_elements.size()});
 
     // std::vector<Ray> out = bufferHandler->readBuffer<Ray>("output-buffer", true);
 
@@ -140,8 +141,8 @@ std::vector<Ray> VulkanTracer::traceRaw(const TraceRawConfig& cfg) {
 
     m_engine.cleanup();
 
-    // Flatten
-    return flatten(out);
+    // Vector of vectors 
+    return out;
 }
 
 // TODO(OS): Multi extern pushConstant content update is not supported

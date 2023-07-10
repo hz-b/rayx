@@ -38,7 +38,7 @@ Rays Tracer::trace(const Beamline& b) {
         for (auto e : b.m_OpticalElements) {
             elements.push_back(e->intoElement());
         }
-
+        // auto maxSnapshots = b.m_OpticalElements.size();
         TraceRawConfig cfg = {
             .m_rays = batch,
             .m_rayIdStart = (double)rayIdStart,
@@ -53,30 +53,28 @@ Rays Tracer::trace(const Beamline& b) {
             .rayIdStart = (double)rayIdStart, .numRays = (double)rays.size(), .randomSeed = randomSeed, .maxSnapshots = (double)maxSnapshots};
         setPushConstants(&pushConsants);
 
-        Snapshots rawBatchRays;
+        Rays rawBatchRays;
         {
             RAYX_PROFILE_SCOPE_STDOUT("Tracing");
             rawBatchRays = traceRaw(cfg);
+            RAYX_D_LOG << "Size: raw" << rawBatchRays.size() << " " << rawBatchRays[0].size();
             // assert(rawBatchRays.size() == batch_size * maxSnapshots); TODO (MAX SNAPSHOT no longer required)
         }
 
         {
             RAYX_PROFILE_SCOPE_STDOUT("Snapshoting");
+            auto _maxSnapshot = rawBatchRays.size();
             for (uint i = 0; i < batch_size; i++) {
                 Snapshots snapshots;
-                snapshots.reserve(maxSnapshots);
-                for (uint j = 0; j < maxSnapshots; j++) {
-                    uint idx = i * maxSnapshots + j;
-                    Ray r = rawBatchRays[idx];
-                    if (r.m_weight != W_UNINIT) {
-                        snapshots.push_back(r);
-                    }
+                snapshots.reserve(_maxSnapshot);
+                for (uint j = 0; j < _maxSnapshot; j++) {
+                    Ray r = rawBatchRays[j][i];
+                    snapshots.push_back(r);
                 }
                 result.push_back(snapshots);
             }
         }
     }
-
     return result;
 }
 /**

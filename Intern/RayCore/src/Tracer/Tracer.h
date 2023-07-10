@@ -53,7 +53,7 @@ class RAYX_API Tracer {
   protected:
     // where the actual tracing happens.
     // std::vector<Ray> will contain all snapshots for all Rays (and also the W_UNINIT rays).
-    virtual std::vector<Ray> traceRaw(const TraceRawConfig&) = 0;
+    virtual Rays traceRaw(const TraceRawConfig&) = 0;
 
     virtual void setPushConstants(const PushConstants*) = 0;
 };

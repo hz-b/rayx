@@ -176,10 +176,10 @@ void VulkanEngine::recordSecondCommand() {
 }
 
 void VulkanEngine::traceCommand(VkCommandBuffer& cmdBuffer) {
-    static auto requiredLocalWorkGroupNo = (uint32_t)ceil(m_numberOfInvocations / float(WORKGROUP_SIZE));  // number of local works groups
+    auto requiredLocalWorkGroupNo = (uint32_t)ceil(m_numberOfInvocations / float(WORKGROUP_SIZE));  // number of local works groups
     VkPhysicalDeviceProperties deviceProperties;
     vkGetPhysicalDeviceProperties(m_PhysicalDevice, &deviceProperties);
-    static auto group = guessWorkGroupNo(requiredLocalWorkGroupNo, deviceProperties.limits);
+    auto group = guessWorkGroupNo(requiredLocalWorkGroupNo, deviceProperties.limits);
     vkCmdDispatch(cmdBuffer, group.x, group.z, group.y);
 }
 

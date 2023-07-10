@@ -13,12 +13,31 @@ double infinity() {
     return 1e+308;
 }
 
-// multiplies position and direction of ray r with transformation matrix m
-// r = dot(m, r)
+/**
+ * @brief multiplies position and direction of ray r with transformation matrix m 
+ * r = dot(m,r)
+ * 
+ * @param r position and direction source
+ * @param m transformation matrix
+ * @return Ray new ray (The rest of the values are uninitialized)
+ */
 Ray rayMatrixMult(Ray r, const dmat4 m) {
     r.m_position = dvec3(m * dvec4(r.m_position, 1));
     r.m_direction = dvec3(m * dvec4(r.m_direction, 0));
     return r;
+}
+
+/**
+ * @brief multiplies position and direction of ray in_ray with transformation matrix m  and store in r (Inplace)
+ * r = dot(m,in_r)
+ * 
+ * @param in_r 
+ * @param r (& / Inout) [Pass by Ref.]
+ * @param m 
+ */
+void rayMatrixMult_InP(INOUT(Ray) r, Ray in_r, const dmat4 m) {
+    r.m_position = dvec3(m * dvec4(in_r.m_position, 1));
+    r.m_direction = dvec3(m * dvec4(in_r.m_direction, 0));
 }
 
 Ray rotationAroundX(Ray r, double sin_psi, double cos_psi) {
