@@ -255,16 +255,23 @@
                 {% for index, row in test_data.iterrows() %}
                 <tr>
                     <td>{{ row['operation'] }}</td>
-                    <td class="{{ 'faster' if row['highlight'] and row['diff'] > 0 else '' }}">{{ row['mean_1'] }} {% if
-                        row['highlight'] and row['diff'] > 0 %} (-{{ row['diff'] }}%) {% endif %}</td>
-                    <td class="{{ 'faster' if row['highlight'] and row['diff'] < 0 else '' }}">{{ row['mean_2'] }} {% if
-                        row['highlight'] and row['diff'] < 0 %} (-{{ row['diff'] }}%) {% endif %}</td>
+                    <td class="{{ 'faster' if row['highlight_1'] and row['mean_2_diff'] < 0 else '' }}">
+                        {{ row['mean_1'] }}
+                        {% if row['highlight_1'] and row['mean_2_diff'] < 0 %} ({{ row['mean_2_diff'] }}%) {% endif %}
+                            </td>
+                    <td class="{{ 'faster' if row['highlight_2'] and row['mean_1_diff'] < 0 else '' }}">
+                        {{ row['mean_2'] }}
+                        {% if row['highlight_2'] and row['mean_1_diff'] < 0 %} ({{ row['mean_1_diff'] }}%) {% endif %}
+                            </td>
                 </tr>
                 {% endfor %}
             </tbody>
         </table>
         {% endfor %}
     </div>
+
+
+
 </body>
 
 </html>
