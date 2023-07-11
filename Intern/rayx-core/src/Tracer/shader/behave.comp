@@ -54,7 +54,6 @@ Ray behaveSlit(Ray r, int id, RAYX_INOUT(uint64_t) ctr, ALLOW_UNUSED Collision c
     return r;
 }
 
-// TODO clean this up!
 Ray behaveRZP(Ray r, int id, RAYX_INOUT(uint64_t) ctr, Collision col) {
     RZPBehaviour b = deserializeRZP(elements[id].m_behaviour);
 

@@ -9,7 +9,6 @@
 
 #include "Debug/Debug.h"
 #include "Debug/Instrumentor.h"
-#include "RAY-Core.h"
 #include "Random.h"
 
 #ifdef RAYX_PLATFORM_MSVC
