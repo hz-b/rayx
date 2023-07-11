@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Benchmark Comparison</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 0;
+            margin: 0;
+            background-color: #f5f5f5;
+        }
+
+        .header {
+            text-align: center;
+            margin: 20px 0;
+        }
+
+        .header h1 {
+            font-size: 2em;
+            color: #444;
+            margin: 0;
+        }
+
+        .header h2 {
+            font-size: 1.5em;
+            color: #888;
+            margin: 0;
+        }
+
+        .scoreRow {
+            display: flex;
+            justify-content: space-around;
+            margin: 20px 0;
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.2);
+        }
+
+        .scoreBox h1 {
+            font-size: 2em;
+            color: #444;
+            margin: 0;
+        }
+
+        .scoreBox .result-header-by {
+            color: #888;
+        }
+
+        .scoreBox .result-header-name {
+            color: #008000;
+        }
+
+        .dataBox {
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.2);
+            margin-bottom: 20px;
+        }
+
+        .dataBox.main {
+            margin-bottom: 0;
+        }
+
+        .dataBox.main h3 {
+            font-size: 1.5em;
+            color: #444;
+            margin-bottom: 10px;
+        }
+
+        .dataBox dl {
+            margin-bottom: 20px;
+        }
+
+        .dataBox dt {
+            color: #444;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        .dataBox dd {
+            margin-bottom: 10px;
+            color: #666;
+        }
+
+        .faster {
+            background-color: green;
+            color: white;
+        }
+
+        .table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        .table th,
+        .table td {
+            border: 1px solid #ccc;
+            padding: 10px;
+            text-align: left;
+        }
+
+        .padside {
+            padding: 0 10px;
+        }
+
+        .subtle {
+            color: #999;
+            font-style: italic;
+        }
+
+        .icon {
+            font-family: "Font Awesome 5 Free";
+            font-weight: 900;
+        }
+
+        .icon.cpu:before {
+            content: "\f276";
+            color: #008000;
+        }
+
+        .icon.gpu:before {
+            content: "\f11b";
+            color: #008000;
+        }
+
+        .icon.name:before {
+            content: "\f2b5";
+            color: #008000;
+        }
+
+        .dataBox.main {
+            background-color: transparent;
+            padding: 0;
+            box-shadow: none;
+            margin-bottom: 0;
+        }
+
+        .dataBox.main h3 {
+            font-size: 1.5em;
+            color: #444;
+            margin-bottom: 10px;
+        }
+
+        .hardware-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .hardware-table th,
+        .hardware-table td {
+            padding: 10px;
+            text-align: left;
+        }
+
+        .hardware-table th {
+            background-color: #f5f5f5;
+            color: #444;
+            font-weight: bold;
+            border-bottom: 1px solid #ccc;
+        }
+
+        .hardware-table td {
+            background-color: #fff;
+            color: #444;
+            border-bottom: 1px solid #ccc;
+        }
+
+        .hardware-table td span.subtle {
+            font-size: 0.9em;
+            color: #888;
+        }
+
+        .hardware-table td:first-child {
+            font-weight: bold;
+        }
+
+        .hardware-table td.icon {
+            padding-right: 5px;
+        }
+
+        .icon.cpu:before {
+            content: "\f276";
+            font-family: "Font Awesome 5 Free";
+            font-weight: 900;
+            color: #008000;
+        }
+
+        .icon.gpu:before {
+            content: "\f11b";
+            font-family: "Font Awesome 5 Free";
+            font-weight: 900;
+            color: #008000;
+        }
+
+        .icon.name:before {
+            content: "\f2b5";
+            font-family: "Font Awesome 5 Free";
+            font-weight: 900;
+            color: #008000;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="header">
+        <h1>Benchmark Comparison</h1>
+        <h2>{{ filenames[0] }} vs {{ filenames[1] }}</h2>
+    </div>
+    <div class="dataBox main">
+        <h3>Hardware Info</h3>
+        <table class="hardware-table">
+            <thead>
+                <tr>
+                    <th>Parameter</th>
+                    <th>Value 1</th>
+                    <th>Value 2</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for index, row in hardware_info.iterrows() %}
+                <tr>
+                    <td>
+                        <span class="icon {{ row['icon_class'] }}"></span>{{ row['parameter'] }}
+                    </td>
+                    <td>
+                        {{ row['value_1'] }}<span class="subtle">{{ row['subtle_1'] }}</span>
+                    </td>
+                    <td>
+                        {{ row['value_2'] }}<span class="subtle">{{ row['subtle_2'] }}</span>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <div class="dataBox">
+        <h3>Benchmark Results</h3>
+        {% for test_name, test_data in data.groupby('test_name') %}
+        <h4>{{ test_name }}</h4>
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Operation</th>
+                    <th>{{ filenames[0] }}</th>
+                    <th>{{ filenames[1] }}</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for index, row in test_data.iterrows() %}
+                <tr>
+                    <td>{{ row['operation'] }}</td>
+                    <td class="{{ 'faster' if row['highlight_1'] and row['mean_2_diff'] < 0 else '' }}">
+                        {{ row['mean_1'] }}
+                        {% if row['highlight_1'] and row['mean_2_diff'] < 0 %} ({{ row['mean_2_diff'] }}%) {% endif %}
+                            </td>
+                    <td class="{{ 'faster' if row['highlight_2'] and row['mean_1_diff'] < 0 else '' }}">
+                        {{ row['mean_2'] }}
+                        {% if row['highlight_2'] and row['mean_1_diff'] < 0 %} ({{ row['mean_1_diff'] }}%) {% endif %}
+                            </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% endfor %}
+    </div>
+
+
+
+</body>
+
+</html>
