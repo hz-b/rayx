@@ -60,26 +60,13 @@ Ray behaveRZP(Ray r, int id, RAYX_INOUT(uint64_t) ctr, Collision col) {
 
     dvec4 normal = dvec4(col.normal, 0);
 
-    int IMAGE_TYPE        = int(b.m_imageType);
-    int RZP_TYPE          = int(b.m_rzpType);
-    int DERIVATION_METHOD = int(b.m_derivationMethod);
-    double risag          = b.m_designSagittalEntranceArmLength;
-    double rosag          = b.m_designSagittalExitArmLength;
-    double rimer          = b.m_designMeridionalEntranceArmLength;
-    double romer          = b.m_designMeridionalExitArmLength;
-    double d_alpha        = b.m_designAlphaAngle;
-    double d_beta         = b.m_designBetaAngle;
-    double d_ord          = b.m_designOrderOfDiffraction;
-    double zOffsetCenter  = b.m_fresnelZOffset;
-    ;  // fresnel center z offset
     double WL            = hvlam(r.m_energy);
-    double WL0           = 1e-06 * b.m_designWavelength;  // source energy/design energy
     double Ord           = b.m_orderOfDiffraction;
     int additional_order = int(b.m_additionalOrder);
 
     // calculate the RZP line density for the position of the intersection on the RZP
     double DX, DZ;
-    RZPLineDensity(r, normal, IMAGE_TYPE, RZP_TYPE, DERIVATION_METHOD, zOffsetCenter, risag, rosag, rimer, romer, d_alpha, d_beta, d_ord, WL0, DX, DZ);
+    RZPLineDensity(r, normal, b, DX, DZ);
 
     // tanger/slope Error
     SlopeError slope_error = elements[id].m_slopeError;;
