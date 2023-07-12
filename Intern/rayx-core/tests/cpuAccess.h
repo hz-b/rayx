@@ -27,8 +27,7 @@ Ray RAYX_API refrac2D(Ray, glm::dvec4, double, double);
 Ray RAYX_API refrac(Ray, glm::dvec4, double);
 glm::dvec4 RAYX_API normal_cartesian(glm::dvec4, double, double);
 glm::dvec4 RAYX_API normal_cylindrical(glm::dvec4, double, double);
-void RAYX_API RZPLineDensity(Ray r, glm::dvec4 normal, int IMAGE_TYPE, int RZP_TYPE, int DERIVATION_METHOD, double zOffsetCenter, double risag,
-                             double rosag, double rimer, double romer, double alpha, double beta, double Ord, double WL, double& DX, double& DZ);
+void RAYX_API RZPLineDensity(Ray r, glm::dvec4 normal, RZPBehaviour b, double& DX, double& DZ);
 Ray RAYX_API rayMatrixMult(Ray, glm::dmat4);
 void RAYX_API cosini(Ray&, double, double);
 double RAYX_API dpow(double, int);
