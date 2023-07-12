@@ -16,9 +16,10 @@ class Window {
 
     ~Window();
 
-    GLFWwindow* get() const { return m_Window; }
-    Extent2D getExtent() const { return {m_width, m_height}; }
+    GLFWwindow* window() const { return m_Window; }
+    VkExtent2D getExtent() const { return {m_width, m_height}; }
     void updateWindowSize();
+    void createSurface(VkInstance instance, VkSurfaceKHR* surface);
     bool shouldClose() const { return glfwWindowShouldClose(m_Window); }
 
     bool m_framebufferResized = false;
@@ -31,5 +32,4 @@ class Window {
     const char* m_title;
 
     GLFWwindow* m_Window;
-    VkSurfaceKHR m_Surface;
 };

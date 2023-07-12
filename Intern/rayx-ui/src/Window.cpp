@@ -1,6 +1,5 @@
 #include "Window.h"
 
-// TODO(Jannis): add state to check if window is initialized
 Window::Window(uint32_t width, uint32_t height, const char* const title) {
     m_width = width;
     m_height = height;
@@ -34,4 +33,10 @@ void Window::updateWindowSize() {
     }
     m_width = width;
     m_height = height;
+}
+
+void Window::createSurface(VkInstance instance, VkSurfaceKHR* surface) {
+    if (glfwCreateWindowSurface(instance, m_Window, nullptr, surface) != VK_SUCCESS) {
+        throw std::runtime_error("failed to create window surface!");
+    }
 }

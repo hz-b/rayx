@@ -35,15 +35,12 @@ std::vector<char> readFile(const std::string& filename) {
 
     return buffer;
 }
-GraphicsPipeline::GraphicsPipeline(VkDevice device, VkRenderPass renderPass, PipelineLayout& pipelineLayout, const std::string& vertShaderPath,
-                                   const std::string& fragShaderPath, VkPrimitiveTopology topology, VkPolygonMode polygonMode,
-                                   VkPipelineVertexInputStateCreateInfo vertexInputInfo)
-    : m_Device(device) {
-    auto vertShaderCode = readFile(vertShaderPath);
-    auto fragShaderCode = readFile(fragShaderPath);
+GraphicsPipeline::GraphicsPipeline(Device& device, const GraphicsPipelineCreateInfo& createInfo) : m_Device(device.device()) {
+    auto vertShaderCode = readFile(createInfo.vertShaderPath);
+    auto fragShaderCode = readFile(createInfo.fragShaderPath);
 
-    VkShaderModule vertShaderModule = createShaderModule(device, vertShaderCode);
-    VkShaderModule fragShaderModule = createShaderModule(device, fragShaderCode);
+    VkShaderModule vertShaderModule = createShaderModule(device.device(), vertShaderCode);
+    VkShaderModule fragShaderModule = createShaderModule(device.device(), fragShaderCode);
 
     VkPipelineShaderStageCreateInfo vertShaderStageInfo{};
     vertShaderStageInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO;
@@ -61,7 +58,7 @@ GraphicsPipeline::GraphicsPipeline(VkDevice device, VkRenderPass renderPass, Pip
 
     VkPipelineInputAssemblyStateCreateInfo inputAssembly{};
     inputAssembly.sType = VK_STRUCTURE_TYPE_PIPELINE_INPUT_ASSEMBLY_STATE_CREATE_INFO;
-    inputAssembly.topology = topology;
+    inputAssembly.topology = createInfo.topology;
     inputAssembly.primitiveRestartEnable = VK_FALSE;
 
     VkPipelineViewportStateCreateInfo viewportState{};
@@ -73,7 +70,7 @@ GraphicsPipeline::GraphicsPipeline(VkDevice device, VkRenderPass renderPass, Pip
     rasterizer.sType = VK_STRUCTURE_TYPE_PIPELINE_RASTERIZATION_STATE_CREATE_INFO;
     rasterizer.depthClampEnable = VK_FALSE;
     rasterizer.rasterizerDiscardEnable = VK_FALSE;
-    rasterizer.polygonMode = polygonMode;
+    rasterizer.polygonMode = createInfo.polygonMode;
     rasterizer.lineWidth = 1.0f;
     rasterizer.cullMode = VK_CULL_MODE_NONE;
     rasterizer.frontFace = VK_FRONT_FACE_COUNTER_CLOCKWISE;
@@ -105,19 +102,28 @@ GraphicsPipeline::GraphicsPipeline(VkDevice device, VkRenderPass renderPass, Pip
     dynamicState.dynamicStateCount = static_cast<uint32_t>(dynamicStates.size());
     dynamicState.pDynamicStates = dynamicStates.data();
 
+    VkPipelineDepthStencilStateCreateInfo depthStencil = {};
+    depthStencil.sType = VK_STRUCTURE_TYPE_PIPELINE_DEPTH_STENCIL_STATE_CREATE_INFO;
+    depthStencil.depthTestEnable = VK_TRUE;
+    depthStencil.depthWriteEnable = VK_TRUE;
+    depthStencil.depthCompareOp = VK_COMPARE_OP_LESS;
+    depthStencil.depthBoundsTestEnable = VK_FALSE;
+    depthStencil.stencilTestEnable = VK_FALSE;
+
     VkGraphicsPipelineCreateInfo pipelineInfo{};
     pipelineInfo.sType = VK_STRUCTURE_TYPE_GRAPHICS_PIPELINE_CREATE_INFO;
     pipelineInfo.stageCount = 2;
     pipelineInfo.pStages = shaderStages;
-    pipelineInfo.pVertexInputState = &vertexInputInfo;
+    pipelineInfo.pVertexInputState = &createInfo.vertexInputInfo;
     pipelineInfo.pInputAssemblyState = &inputAssembly;
     pipelineInfo.pViewportState = &viewportState;
     pipelineInfo.pRasterizationState = &rasterizer;
     pipelineInfo.pMultisampleState = &multisampling;
     pipelineInfo.pColorBlendState = &colorBlending;
+    pipelineInfo.pDepthStencilState = &depthStencil;
     pipelineInfo.pDynamicState = &dynamicState;
-    pipelineInfo.layout = pipelineLayout.getHandle();
-    pipelineInfo.renderPass = renderPass;
+    pipelineInfo.layout = createInfo.pipelineLayout;
+    pipelineInfo.renderPass = createInfo.renderPass;
     pipelineInfo.subpass = 0;
     pipelineInfo.basePipelineHandle = VK_NULL_HANDLE;
 

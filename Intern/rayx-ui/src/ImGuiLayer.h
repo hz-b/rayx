@@ -7,33 +7,40 @@
 
 #include <glm/gtx/transform.hpp>
 
+#include "Device.h"
+#include "Swapchain.h"
+
 struct CameraSettings {
     float FOV = 90.0f;
-    glm::vec3 Position = glm::vec3(0.0f, 0.0f, -2.0f);
-    glm::vec3 Target = glm::vec3(0.0f, 0.0f, 0.0f);
-    glm::vec3 Up = glm::vec3(0.0f, 1.0f, 0.0f);  // Add Up vector
-    float Near = 0.1f;
-    float Far = 100.0f;
+    glm::vec3 position = glm::vec3(0.0f, 0.0f, -2.0f);
+    glm::vec3 target = glm::vec3(0.0f, 0.0f, 0.0f);
+    glm::vec3 up = glm::vec3(0.0f, 1.0f, 0.0f);  // Add Up vector
+    float near = 0.1f;
+    float far = 100.0f;
 
-    glm::mat4 getViewMatrix() const { return glm::lookAt(Position, Target, Up); }
+    glm::mat4 getViewMatrix() const { return glm::lookAt(position, target, up); }
 
-    glm::mat4 getProjectionMatrix(float aspectRatio) const { return glm::perspective(glm::radians(FOV), aspectRatio, Near, Far); }
+    glm::mat4 getProjectionMatrix(float aspectRatio) const { return glm::perspective(glm::radians(FOV), aspectRatio, near, far); }
 };
 
 class ImGuiLayer {
   public:
-    void init(GLFWwindow* window, ImGui_ImplVulkan_InitInfo&& initInfo, VkFormat format);
+    ImGuiLayer(const Window& window, const Device& device, const SwapChain& swapchain);
+    ImGuiLayer(const ImGuiLayer&) = delete;
+    ImGuiLayer& operator=(const ImGuiLayer&) = delete;
+    ~ImGuiLayer();
+
     void updateImGui();
     VkCommandBuffer recordImGuiCommands(uint32_t currentImage, const VkFramebuffer framebuffer, const VkExtent2D& extent);
-    void cleanupImGui();
 
     VkCommandBuffer getCommandBuffer(uint32_t index) const { return m_CommandBuffers[index]; }
     VkClearValue getClearValue() const { return {m_ClearColor[0], m_ClearColor[1], m_ClearColor[2], m_ClearColor[3]}; }
     CameraSettings getCameraSettings() const { return m_Camera; }
 
   private:
-    GLFWwindow* m_Window;
-    ImGui_ImplVulkan_InitInfo m_InitInfo;
+    const Window& m_Window;
+    const Device& m_Device;
+    const SwapChain& m_SwapChain;
 
     bool m_LayerEnabled = true;
     bool m_ShowDemoWindow = false;

@@ -2,18 +2,19 @@
 
 #include <vulkan/vulkan.h>
 
+#include "Device.h"
+
 class VertexBuffer {
   public:
-    VertexBuffer(VkDevice device, VkPhysicalDevice physicalDevice);
+    VertexBuffer(Device& device);
     ~VertexBuffer();
 
     void createVertexBuffer(const void* data, VkDeviceSize size);
-    uint32_t findMemoryType(uint32_t typeFilter, VkMemoryPropertyFlags properties);
 
     VkBuffer getVertexBuffer() const { return m_VertexBuffer; }
 
   private:
-    VkDevice m_Device;
+    Device& m_Device;
     VkPhysicalDevice m_PhysicalDevice;
 
     VkBuffer m_VertexBuffer;
