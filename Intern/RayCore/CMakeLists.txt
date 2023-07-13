@@ -133,9 +133,9 @@ if(NOT VULKAN STREQUAL "NO")
         get_filename_component(SHADER_NAME ${SHADER_SOURCE} NAME_WE)
         
         #Shader Header
-        set(output_file ${SHADER_SOURCES_DIR}/${SHADER_NAME}-glsl.comp)
-        set(output_content "#version 450\n#define GLSL\n#include \"${SHADER_NAME}.comp\"\n")
-        file(WRITE "${output_file}" "${output_content}")
+        set(HEADER_FILE ${SHADER_SOURCES_DIR}/${SHADER_NAME}-glsl.comp)
+        set(HEADER_CONTENT "#version 450\n#define GLSL\n#include \"${SHADER_NAME}.comp\"\n")
+        file(WRITE "${HEADER_FILE}" "${HEADER_CONTENT}")
 
         set(COMPILED_SHADER_OUTPUT_FILE ${COMPILED_SHADER_OUTPUT_DIR}/${SHADER_NAME}.spv)
         set(COMPILED_SHADER_FAKE ${COMPILED_SHADER_OUTPUT_DIR}/___${SHADER_NAME}.spv)
@@ -145,7 +145,7 @@ if(NOT VULKAN STREQUAL "NO")
             ${COMPILED_SHADER_OUTPUT_FILE}
             ${COMPILED_SHADER_FAKE}
             COMMAND ${SHADER_COMPILER_COMMAND}
-            ARGS ${SHADER_SOURCES_DIR}/${SHADER_SOURCE} -o ${COMPILED_SHADER_OUTPUT_FILE} -fshader-stage=compute
+            ARGS ${HEADER_FILE} -o ${COMPILED_SHADER_OUTPUT_FILE} -fshader-stage=compute
             COMMENT "Compiling shader: ${SHADER_NAME}"
         )
 
