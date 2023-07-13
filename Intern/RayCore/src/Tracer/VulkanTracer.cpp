@@ -140,10 +140,10 @@ Rays VulkanTracer::traceRaw(const TraceRawConfig& cfg) {
 }
 
 // TODO(OS): Multi extern pushConstant content update is not supported
-void VulkanTracer::setPushConstants(const PushConstants* p) {
+void VulkanTracer::setPushConstants(const PushConstants_t* p) {
     if (sizeof(*p) > 128) RAYX_WARN << "Using pushConstants bigger than 128 Bytes might be unsupported on some GPUs. Check Compute Info";
 
-    m_engine.m_pushConstants.pushConstPtr = (void*)(PushConstants*)(p);
+    m_engine.m_pushConstants.pushConstPtr = (void*)(PushConstants_t*)(p);
     m_engine.m_pushConstants.size = sizeof(*p);
 }
 

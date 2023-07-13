@@ -14,7 +14,7 @@ class RAYX_API VulkanTracer : public Tracer {
     ~VulkanTracer() = default;
 
     Rays traceRaw(const TraceRawConfig&) override;
-    void setPushConstants(const PushConstants*) override;
+    void setPushConstants(const PushConstants_t*) override;
 #ifdef RAYX_DEBUG_MODE
     /**
      * @brief Get the Debug List containing the Debug Matrices

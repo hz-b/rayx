@@ -9,6 +9,7 @@
 #include "Core.h"
 #include "Ray.h"
 #include "Shared/Constants.h"
+#include "Tracer/TracerConfig.h"
 
 // Abstract Tracer base class.
 namespace RAYX {
@@ -41,21 +42,12 @@ class RAYX_API Tracer {
     // See `Rays` for information about the return value.
     Rays trace(const Beamline&);
 
-    // Useful for GPU Tracing
-    struct PushConstants {  // TODO(Jannis): PushConstants is not an expressive name. Rename to something like TracerConfig
-        double rayIdStart;
-        double numRays;
-        double randomSeed;
-        double maxSnapshots;  // FIXME(OS) : Only used by CPU
-        int i_bounce = 0;
-    };
-
   protected:
     // where the actual tracing happens.
     // std::vector<Ray> will contain all snapshots for all Rays (and also the W_UNINIT rays).
     virtual Rays traceRaw(const TraceRawConfig&) = 0;
 
-    virtual void setPushConstants(const PushConstants*) = 0;
+    virtual void setPushConstants(const TracerConfig_t*) = 0;
 };
 
 // TODO deprecate these functions and all of their uses.

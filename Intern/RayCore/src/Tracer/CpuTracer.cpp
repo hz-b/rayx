@@ -16,7 +16,6 @@ using uint = unsigned int;
 namespace RAYX {
 
 namespace CPU_TRACER {
-//#include "shader/main.comp"
 #include "shader/singleBounce.comp"
 
 }  // namespace CPU_TRACER
@@ -46,9 +45,9 @@ Rays CpuTracer::traceRaw(const TraceRawConfig& cfg) {
     CPU_TRACER::matIdx.data.clear();
     CPU_TRACER::mat.data.clear();
 
-    // init rayData, outputData, rayMeta
+    // init rayData, rayMeta
     CPU_TRACER::rayData.data = rayList;
-    // CPU_TRACER::outputData.data.resize(rayList.size() * cfg.m_maxSnapshots);
+
     for (size_t i = 0; i < rayList.size(); i++) {
         const uint64_t MAX_UINT64 = ~(uint64_t(0));
         uint64_t workerCounterNum = MAX_UINT64 / uint64_t(cfg.m_numRays);
@@ -131,5 +130,5 @@ Rays CpuTracer::traceRaw(const TraceRawConfig& cfg) {
     return _checkpoints;
 }
 
-void CpuTracer::setPushConstants(const PushConstants* p) { std::memcpy(&CPU_TRACER::pushConstants, p, sizeof(CPU_TRACER::pushConstants_t)); }
+void CpuTracer::setPushConstants(const PushConstants_t* p) { std::memcpy(&CPU_TRACER::pushConstants, p, sizeof(CPU_TRACER::pushConstants)); }
 }  // namespace RAYX

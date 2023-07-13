@@ -50,7 +50,7 @@ Rays Tracer::trace(const Beamline& b) {
             .m_elements = elements,
         };
 
-        PushConstants pushConsants = {
+        TracerConfig_t pushConsants = {
             .rayIdStart = (double)rayIdStart, .numRays = (double)rays.size(), .randomSeed = randomSeed, .maxSnapshots = (double)maxSnapshots};
         setPushConstants(&pushConsants);
 
@@ -58,7 +58,7 @@ Rays Tracer::trace(const Beamline& b) {
         {
             RAYX_PROFILE_SCOPE_STDOUT("Tracing");
             rawBatchRays = traceRaw(cfg);
-            for (const auto& _events : rawBatchRays) { // Sanity Check
+            for (const auto& _events : rawBatchRays) {  // Sanity Check
                 assert(_events.size() == batch_size);
             }
         }

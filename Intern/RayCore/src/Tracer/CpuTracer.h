@@ -21,7 +21,7 @@ class RAYX_API CpuTracer : public Tracer {
 
     Rays traceRaw(const TraceRawConfig&) override;
 
-    void setPushConstants(const PushConstants*) override;
+    void setPushConstants(const PushConstants_t*) override;
 };
 
 namespace CPU_TRACER {
@@ -32,8 +32,7 @@ using dmat3 = glm::dmat3;
 using dmat4 = glm::dmat4;
 using uint = unsigned int;
 
-using pushConstants_t = CpuTracer::PushConstants;
-extern pushConstants_t pushConstants;
+extern PushConstants_t pushConstants;
 
 struct PalikEntry {
     double energy;

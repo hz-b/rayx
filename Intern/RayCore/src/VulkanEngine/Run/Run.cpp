@@ -3,6 +3,7 @@
 #include <algorithm>
 #include <ranges>
 
+#include "Tracer/TracerConfig.h"
 #include "VulkanEngine/VulkanEngine.h"
 namespace RAYX {
 
@@ -42,17 +43,12 @@ void printRayStats(const std::vector<Ray>& rayOut) {
         }
     }
     // std::erase_if(rayOut, [&](auto& r) { return r.m_weight == W_UNINIT; });
-    double hit = static_cast<double>(_hit) / rayOut.size();
-    double abs = static_cast<double>(_abs) / rayOut.size();
-    double fly = static_cast<double>(_fly) / rayOut.size();
-    double unin = static_cast<double>(_unin) / rayOut.size();
-    double notx = static_cast<double>(_not) / rayOut.size();
-
-    RAYX_D_LOG << "_hit: " << hit;
-    RAYX_D_LOG << "_abs: " << abs;
-    RAYX_D_LOG << "_fly: " << fly;
-    RAYX_D_LOG << "_unin: " << unin;
-    RAYX_D_LOG << "_not: " << notx;
+    double hit = (double)(_hit) / rayOut.size();
+    double abs = (double)(_abs) / rayOut.size();
+    double fly = (double)(_fly) / rayOut.size();
+    double unin = (double)(_unin) / rayOut.size();
+    double notx = (double)(_not) / rayOut.size();
+    RAYX_D_LOG << "_hit: " << hit << " _abs: " << abs << " _fly: " << fly << " _unin: " << unin << " _not: " << notx;
     RAYX_D_LOG << "===============";
 }
 
@@ -70,20 +66,11 @@ std::vector<std::vector<Ray>> VulkanEngine::run(VulkanEngineRunSpec_t spec) {
 
     std::vector<std::vector<Ray>> _checkpoints;
 
-    // TODO (OS) : Remove this
-    struct push_constant_t {
-        double rayIdStart;
-        double numRays;
-        double randomSeed;
-        double maxSnapshots;  // FIXME(OS) : Only used by CPU
-        int i_bounce;
-    };
-
+    // TODO (OS) : Maybe move this out of VulkanEngine.Run
     for (int i = 0; i < maxBounces; i++) {
-        // HACK (TODO(OS): Remove this)
-        auto push = m_computePasses[0]->getPass()[0]->m_pushConstant.getData();
-        push_constant_t* pushPtr = static_cast<push_constant_t*>(push);
-        pushPtr->i_bounce = i;
+        // Update PushConstant content
+        auto push = m_computePasses[0]->getPass()[0]->m_pushConstant.getActualPushConstant<PushConstants_t>();
+        push->i_bounce = i;
 
         recordSimpleTraceCommand("singleTracePass", m_CommandBuffers[0], 0);
         submitCommandBuffer(0);
@@ -92,9 +79,9 @@ std::vector<std::vector<Ray>> VulkanEngine::run(VulkanEngineRunSpec_t spec) {
 
         auto rayOut = m_BufferHandler->readBuffer<Ray>("ray-buffer", true);
         auto rayMeta = m_BufferHandler->readBuffer<RayMeta>("ray-meta-buffer", true);
-        
+
 #ifdef RAYX_DEBUG
-        printRayStats(rayOut);
+        //printRayStats(rayOut);
 #endif
 
         _checkpoints.push_back(rayOut);
