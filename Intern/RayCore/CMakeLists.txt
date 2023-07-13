@@ -112,12 +112,13 @@ target_include_directories(${PROJECT_NAME}
 set(SHADER_SOURCES_DIR ${RayCore_SOURCE_DIR}/src/Tracer/shader)
 
 set(SHADER_SOURCES
-    singleBounce-glsl.comp)
+    singleBounce.comp)
 
 if(NOT VULKAN STREQUAL "NO")
     # The following code is used to always compile the shaders.
     # This is most likely not an optimal solution, but it will work
     # until we find a better one.
+
     add_dependencies(${PROJECT_NAME} COMPILE_SHADER)
     set(COMPILED_SHADER_OUTPUT_DIR ${CMAKE_BINARY_DIR}/bin)
     set(COMPILED_SHADERS_LIST "") 
@@ -130,8 +131,12 @@ if(NOT VULKAN STREQUAL "NO")
     
     foreach(SHADER_SOURCE ${SHADER_SOURCES})
         get_filename_component(SHADER_NAME ${SHADER_SOURCE} NAME_WE)
-        # Remove "-glsl" suffix using regular expression replacement
-        string(REGEX REPLACE "-glsl$" "" SHADER_NAME ${SHADER_NAME})
+        
+        #Shader Header
+        set(output_file ${SHADER_SOURCES_DIR}/${SHADER_NAME}-glsl.comp)
+        set(output_content "#version 450\n#define GLSL\n#include \"${SHADER_NAME}.comp\"\n")
+        file(WRITE "${output_file}" "${output_content}")
+
         set(COMPILED_SHADER_OUTPUT_FILE ${COMPILED_SHADER_OUTPUT_DIR}/${SHADER_NAME}.spv)
         set(COMPILED_SHADER_FAKE ${COMPILED_SHADER_OUTPUT_DIR}/___${SHADER_NAME}.spv)
 
