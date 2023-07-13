@@ -6,10 +6,10 @@
 #include "Debug/Instrumentor.h"
 #include "VulkanEngine/Common.h"
 namespace RAYX {
-ShaderStage::ShaderStage(VkDevice& device, const ShaderStageCreateInfo& createInfo)
+ShaderStage::ShaderStage(VkDevice& device, const ShaderStageCreateInfo_t& createInfo)
     : m_Device(device),
-      m_name(createInfo.name.c_str()),
-      m_entryPoint(createInfo.entryPoint.c_str()),
+      m_name(createInfo.name),
+      m_entryPoint(createInfo.entryPoint),
       m_path(createInfo.shaderPath),
       m_shaderType(createInfo.shaderType) {
     // Create Vulkan Shader Module
@@ -21,12 +21,10 @@ ShaderStage::~ShaderStage() { vkDestroyShaderModule(m_Device, m_shaderModule, nu
 void ShaderStage::createShaderModule() {
     RAYX_PROFILE_FUNCTION_STDOUT();
     /*
-    Create a shader module. A shader module basically just encapsulates some
-    shader code.
+    Create a shader module. A shader module basically just encapsulates some shader code.
     */
     uint32_t filelength;
-    // the code in comp.spv was created by running the command:
-    // glslangValidator.exe -V shader.comp
+    // the code  was created by running the command: glslangValidator.exe -V <shaderFile>.comp
     std::string path = canonicalizeRepositoryPath(m_path).string();
     uint32_t* shaderCode = readFile(filelength, path.c_str());
     VkShaderModuleCreateInfo createInfo = {};
@@ -40,9 +38,7 @@ void ShaderStage::createShaderModule() {
 }
 
 VkPipelineShaderStageCreateInfo ShaderStage::getPipelineShaderCreateInfo() {
-    /* we specify the compute shader stage, and it's entry
-    point(main).
-    */
+    /* we specify the compute shader stage, and it's entry point(main) */
     VkPipelineShaderStageCreateInfo shaderStageCreateInfo = {};
     shaderStageCreateInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO;
     shaderStageCreateInfo.stage = m_shaderType;

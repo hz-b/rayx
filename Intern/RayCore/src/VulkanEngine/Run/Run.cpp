@@ -1,12 +1,14 @@
 #ifndef NO_VULKAN
 
-#include "VulkanEngine/VulkanEngine.h"
+#include <algorithm>
+#include <ranges>
 
+#include "VulkanEngine/VulkanEngine.h"
 namespace RAYX {
 
 void VulkanEngine::updateDescriptorSets(std::string passName) {
     // m_ComputePass->updateDescriptorSets(m_BufferHandler);
-    getComputePass(passName)->simpleupdate(m_BufferHandler);
+    getComputePass(passName)->simpleUpdateDescriptorSets(m_BufferHandler);
 }
 
 void VulkanEngine::updateAllDescriptorSets() {
@@ -16,12 +18,42 @@ void VulkanEngine::updateAllDescriptorSets() {
 }
 
 bool allFinalized(const std::vector<RayMeta>& vector) {
-    for (const auto& element : vector) {
-        if (!element.finalized) {
-            return false;
+    return std::ranges::all_of(vector, [](const RayMeta& element) { return element.finalized; });
+}
+
+void printRayStats(const std::vector<Ray>& rayOut) {
+    int _hit = 0;
+    int _abs = 0;
+    int _fly = 0;
+    int _unin = 0;
+    int _not = 0;
+
+    for (const auto& r : rayOut) {
+        if ((int)r.m_weight == (int)W_JUST_HIT_ELEM) {
+            _hit++;
+        } else if ((int)r.m_weight == (int)W_ABSORBED) {
+            _abs++;
+        } else if ((int)r.m_weight == (int)W_FLY_OFF) {
+            _fly++;
+        } else if ((int)r.m_weight == (int)W_UNINIT) {
+            _unin++;
+        } else if ((int)r.m_weight == (int)W_NOT_ENOUGH_BOUNCES) {
+            _not++;
         }
     }
-    return true;
+    // std::erase_if(rayOut, [&](auto& r) { return r.m_weight == W_UNINIT; });
+    double hit = static_cast<double>(_hit) / rayOut.size();
+    double abs = static_cast<double>(_abs) / rayOut.size();
+    double fly = static_cast<double>(_fly) / rayOut.size();
+    double unin = static_cast<double>(_unin) / rayOut.size();
+    double notx = static_cast<double>(_not) / rayOut.size();
+
+    RAYX_D_LOG << "_hit: " << hit;
+    RAYX_D_LOG << "_abs: " << abs;
+    RAYX_D_LOG << "_fly: " << fly;
+    RAYX_D_LOG << "_unin: " << unin;
+    RAYX_D_LOG << "_not: " << notx;
+    RAYX_D_LOG << "===============";
 }
 
 std::vector<std::vector<Ray>> VulkanEngine::run(VulkanEngineRunSpec_t spec) {
@@ -31,9 +63,9 @@ std::vector<std::vector<Ray>> VulkanEngine::run(VulkanEngineRunSpec_t spec) {
         // RAYX_ERR << "you've forgotton to .cleanup() the VulkanEngine";
     }
     m_numberOfInvocations = spec.m_numberOfInvocations;
-    const int maxBounces = spec.maxBounces;  // TODO: Not here
+    const int maxBounces = spec.maxBounces;  // TODO(OS): Not here
 
-    // Using new descriptor manager (TODO: Fix new desc. manager)
+    // Using new descriptor manager (TODO(OS): Fix new desc. manager)
     updateAllDescriptorSets();
 
     std::vector<std::vector<Ray>> _checkpoints;
@@ -48,42 +80,25 @@ std::vector<std::vector<Ray>> VulkanEngine::run(VulkanEngineRunSpec_t spec) {
     };
 
     for (int i = 0; i < maxBounces; i++) {
-        // RAYX_D_LOG << "Bounce : " << i;
         // HACK (TODO(OS): Remove this)
         auto push = m_computePasses[0]->getPass()[0]->m_pushConstant.getData();
-        push_constant_t* pushPtr = const_cast<push_constant_t*>(static_cast<const push_constant_t*>(push));
+        push_constant_t* pushPtr = static_cast<push_constant_t*>(push);
         pushPtr->i_bounce = i;
 
-        recordSimpleTraceCommand(m_CommandBuffers[0]);
+        recordSimpleTraceCommand("singleTracePass", m_CommandBuffers[0], 0);
         submitCommandBuffer(0);
 
-        m_Fences.compute->wait();  // FIXME: Can be solved by another memory barrier in CommandBuffer ( Fence is not working?...)
-        m_Fences.compute->forceReset();
-
-        vkQueueWaitIdle(m_ComputeQueue);
+        VK_CHECK_RESULT(m_Fences.compute->wait())  // FIXME: Can be solved by another memory barrier in CommandBuffer
 
         auto rayOut = m_BufferHandler->readBuffer<Ray>("ray-buffer", true);
         auto rayMeta = m_BufferHandler->readBuffer<RayMeta>("ray-meta-buffer", true);
-
-        int t = 0;
-        int y = 0;
-        int f = 0;
-        for (const auto& r : rayOut) {
-            if ((int)r.m_weight == (int)W_JUST_HIT_ELEM) {
-                t++;
-            } else if ((int)r.m_weight == (int)W_ABSORBED) {
-                y++;
-            } else if ((int)r.m_weight == (int)W_FLY_OFF) {
-                f++;
-            }
-        }
-
-        RAYX_D_LOG << (double)t / (double)rayOut.size() << " " << (double)y / (double)rayOut.size() << " " << (double)f / (double)rayOut.size();
-
-        //std::erase_if(rayOut, [](auto r) { return r.m_weight != W_UNINIT; });
+        
+#ifdef RAYX_DEBUG
+        printRayStats(rayOut);
+#endif
 
         _checkpoints.push_back(rayOut);
-        RAYX_DBG(rayOut.size());
+
         if (allFinalized(rayMeta)) {  // Are all rays finished?
             RAYX_VERB << "All finalized";
             break;

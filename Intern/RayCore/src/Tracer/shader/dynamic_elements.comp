@@ -72,7 +72,7 @@ void dynamicElements() {
         bounce *= pow(10, int(elem_ray.m_lastElement == col.elementIndex + 1));
 
         takeSnapshot(elem_ray, W_JUST_HIT_ELEM);
-
+        
         // transform back to WORLD coordinates
         _ray = rayMatrixMult(elem_ray, nextElement.m_outTrans);
     }

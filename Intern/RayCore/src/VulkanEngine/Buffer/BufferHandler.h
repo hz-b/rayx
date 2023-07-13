@@ -12,7 +12,7 @@
 namespace RAYX {
 
 /**
- * @brief Controls Buffer allocation, creation and IO
+ * @brief Controls Buffer creation, allocation and, IO operations
  *
  */
 class RAYX_API BufferHandler {
@@ -38,22 +38,23 @@ class RAYX_API BufferHandler {
         // }
         auto bufName = std::string(createInfo.bufName);
 
-        if (isBufferPresent(std::string(bufName))) {  // If buffer already exists, update if it still has the same size
+        if (isBufferPresent(std::string(bufName))) {  // If buffer already exists, update (if it still has the same size)
             VulkanBuffer* b = getBuffer(bufName);
             if (b->m_createInfo.size == vec.size() * sizeof(T)) {
                 writeBufferRaw(bufName.c_str(), (char*)vec.data());
                 return *m_Buffers[bufName];
             } else {
-                deleteBuffer(bufName.c_str());
+                deleteBuffer(bufName.c_str());  // If size is different, delete and repeat
             }
         }
 
         createInfo.size = vec.size() * sizeof(T);
+
         if (!vec.empty()) {
             createBuffer(createInfo);
             writeBufferRaw(createInfo.bufName, (char*)vec.data());
         } else {
-            RAYX_WARN << "No fill data provided for." << bufName;
+            RAYX_WARN << "No fill data provided for " << bufName;
             createBuffer(createInfo);
         }
         return *m_Buffers[bufName];
@@ -114,26 +115,20 @@ class RAYX_API BufferHandler {
 
   private:
     VkDevice& m_Device;
-    // Used only for transfer
-    VkQueue m_TransferQueue = VK_NULL_HANDLE;
+    VkQueue m_TransferQueue = VK_NULL_HANDLE;  // Used only for transfer
     uint32_t m_FamilyIndex;
-
     VkCommandPool m_CommandPool = VK_NULL_HANDLE;
     VkCommandBuffer m_TransferCommandBuffer = VK_NULL_HANDLE;
-
     VmaAllocator m_VmaAllocator;
-
     Buffer m_StagingBuffer;
     size_t m_StagingSize;
+    std::unique_ptr<Fence> m_TransferFence;
+    VkSemaphore m_TransferSemaphore{} ;
 
     std::map<std::string, Buffer> m_Buffers = {};
-
     // TODO(OS): Use this instead of m_Buffers once ready
     std::map<std::string, Buffer> m_ComputeBuffers;
     std::map<std::string, Buffer> m_GraphicsBuffers;
-
-    std::unique_ptr<Fence> m_TransferFence;
-    VkSemaphore m_TransferSemaphore;
 };
 }  // namespace RAYX
 #endif

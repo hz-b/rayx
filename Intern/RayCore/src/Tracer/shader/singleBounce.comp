@@ -181,7 +181,7 @@ void main() {
         return;  // RETURN FINALIZED
     }
     _ray.m_weight = W_UNINIT;
-    
+
     if (pushConstants.i_bounce != 0) {
         _ray.m_position = _rayMeta.worldPosition;
         _ray.m_direction = _rayMeta.worldDirection;
@@ -239,7 +239,7 @@ void main() {
         return;  // RETURN FINALIZED
     }
 
-    takeSnapshot(elem_ray, W_JUST_HIT_ELEM);  // TODO: SNAPSHOT
+    takeSnapshot(elem_ray, W_JUST_HIT_ELEM);
 
     // transform back to WORLD coordinates
     _rayMeta.worldPosition = dvec3(nextElement.m_outTrans * dvec4(elem_ray.m_position, 1));
@@ -247,15 +247,15 @@ void main() {
 
     // Make final check on ray
     // placeholder, info should later be transfered to shader
-    const int maxBounces = elements.length();
-    if (pushConstants.i_bounce == maxBounces - 1) {
-#ifdef GLSL
-        if (uint(gl_GlobalInvocationID) == 10) debugPrintfEXT("Final check\n");
-#endif
-        if (findCollision().found) {
-            takeFinalSnapshot(_ray, W_NOT_ENOUGH_BOUNCES);
-        } else {
-            takeFinalSnapshot(_ray, W_FLY_OFF);
-        }
-    }
+//     const int maxBounces = elements.length();
+//     if (pushConstants.i_bounce == maxBounces - 1) {
+// #ifdef GLSL
+//         if (uint(gl_GlobalInvocationID) == 10) debugPrintfEXT("Final check\n");
+// #endif
+//         if (findCollision().found) {
+//             takeFinalSnapshot(_ray, W_NOT_ENOUGH_BOUNCES);
+//         } else {
+//             takeFinalSnapshot(_ray, W_FLY_OFF);
+//         }
+//     }
 }

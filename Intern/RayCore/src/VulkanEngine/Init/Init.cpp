@@ -11,9 +11,9 @@ void VulkanEngine::init() {
     createInstance();
     setupDebugMessenger();
     pickDevice();
-    createCommandPool();      // FIXME(OS) So far we need one GlobalPool and
+    createCommandPool();      // FIXME(OS) So far, we need one GlobalPool and
     createCommandBuffers(1);  // 1 Command Buffer
-    createSemaphores(1);      // FIXME(OS) We only need one Sempahore (+1 for Transfer in handler)
+    createSemaphores(1);      // FIXME(OS) We only need one Semaphore (+1 for Transfer in handler)
     prepareVma();
     createFences();
     // createCache();
@@ -40,12 +40,13 @@ ComputePass* VulkanEngine::getComputePass(std::string passName) {
     RAYX_ERR << "Pass " << passName << " not found.";
     return nullptr;
 }
+
 /**
  * @brief Adds a new Compute Pass to the engine
  *
- * @param createInfo
+ * @param createInfo Creation information
  */
-void VulkanEngine::createComputePipelinePass(const ComputePassCreateInfo& createInfo) {
+void VulkanEngine::createComputePipelinePass(const ComputePassCreateInfo_t& createInfo) {
     auto pass = new ComputePass(m_Device, createInfo);
     m_computePasses.push_back(pass);
     RAYX_D_LOG << pass->getName() << " pass created.";
@@ -71,7 +72,7 @@ void VulkanEngine::prepareComputePipelinePass(std::string passName) {
     pass->prepare(bindings);
 }
 /**
- * @brief  Prepares all compute Passes (Buffer Descriptor binding)
+ * @brief Prepares all compute Passes (Buffer Descriptor binding)
  *
  */
 void VulkanEngine::prepareComputePipelinePasses() {

@@ -28,7 +28,7 @@ VkCommandBuffer VulkanEngine::createOneTimeCommandBuffer() {
     return cmdBuffer;
 }
 /**
- * @brief Create and allocate required command buffers (Compute and Transfer)
+ * @brief Create and allocate required command buffers
  *
  */
 void VulkanEngine::createCommandBuffers(int commandBuffersCount) {
@@ -48,10 +48,8 @@ void VulkanEngine::createCommandBuffers(int commandBuffersCount) {
     / buffer, and cannot be directly submitted to a queue. To keep things
     / simple, we use a primary command buffer. */
     commandBufferAllocateInfo.level = VK_COMMAND_BUFFER_LEVEL_PRIMARY;
-    commandBufferAllocateInfo.commandBufferCount = commandBuffersCount;  // allocate a single command buffer.
-    VK_CHECK_RESULT(vkAllocateCommandBuffers(m_Device, &commandBufferAllocateInfo,
-                                             m_CommandBuffers.data()));  // allocate command buffer.
-    //}
+    commandBufferAllocateInfo.commandBufferCount = commandBuffersCount;
+    VK_CHECK_RESULT(vkAllocateCommandBuffers(m_Device, &commandBufferAllocateInfo, m_CommandBuffers.data()));
 }
 
 }  // namespace RAYX

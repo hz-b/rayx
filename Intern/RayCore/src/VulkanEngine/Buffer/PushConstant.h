@@ -12,10 +12,8 @@ class RAYX_API PushConstant {
     ~PushConstant() = default;
 
     void update(void* data, uint32_t size);
-
-    const void* getData() const { return m_data; }
+    void* getData() const { return m_data; }
     uint32_t getSize() { return m_size; }
-
     VkPushConstantRange getVkPushConstantRange(VkShaderStageFlagBits flag, uint32_t offset = 0);
 
   private:

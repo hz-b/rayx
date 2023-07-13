@@ -35,7 +35,7 @@ class RAYX_API VulkanEngine {
     void initBufferHandler();
 
     // TODO (OS): Add the Vulkan state FSM Controls
-    void createComputePipelinePass(const ComputePassCreateInfo&);
+    void createComputePipelinePass(const ComputePassCreateInfo_t&);
     void prepareComputePipelinePass(int index);
     void prepareComputePipelinePass(std::string passName);
     void prepareComputePipelinePasses();
@@ -79,7 +79,7 @@ class RAYX_API VulkanEngine {
     // Please pay attention to alignment rules
     // You can change this struct (also in shader)
     struct pushConstants_t {
-        const void* pushConstPtr = nullptr;
+        void* pushConstPtr = nullptr;
         size_t size = 0;
     };
     pushConstants_t m_pushConstants;
@@ -125,9 +125,7 @@ class RAYX_API VulkanEngine {
     void recordFirstCommand();
     void recordSecondCommand();
     void traceCommand(VkCommandBuffer& cmdBuffer);
-    void recordSimpleTraceCommand(VkCommandBuffer& commandBuffer);
-    // template <typename Lambda, typename... Args>
-    // void recordCommand(std::string passName, VkCommandBuffer& commandBuffer, Lambda&& commandLambda, Args&&... args, int stage = 0);
+    void recordSimpleTraceCommand(std::string passName, VkCommandBuffer& commandBuffer, int stage);
     void createFences() { m_Fences.compute = std::make_unique<Fence>(m_Device); }
 
     void recordInCommandBuffer(ComputePass& computePass, int cmdBufIndex);

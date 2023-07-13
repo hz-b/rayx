@@ -13,7 +13,7 @@ namespace RAYX {
 // General Pass
 // -------------------------------------------------------------------------------------------------------
 /**
- * @brief General Vulkan Pass (A grouSp of Pipelines)
+ * @brief General Vulkan Pass (A group of Pipelines)
  *
  */
 class RAYX_API Pass {
@@ -22,7 +22,7 @@ class RAYX_API Pass {
     // This is the node that contributes to creating a Pass
     class Pipeline {
       public:
-        Pipeline(std::string name, VkDevice& dev, const ShaderStageCreateInfo&);
+        Pipeline(std::string name, VkDevice& dev, const ShaderStageCreateInfo_t&);
         ~Pipeline();
 
         void createPipelineLayout(VkDescriptorSetLayout* setLayouts);
@@ -40,10 +40,10 @@ class RAYX_API Pass {
         VkPipelineCache m_pipelineCache = VK_NULL_HANDLE;
 
         PushConstant m_pushConstant;
-        std::unique_ptr<ShaderStage> shaderStage{};
+        std::shared_ptr<ShaderStage> shaderStage{};
     };
 
-    using Pipelines = std::vector<std::shared_ptr<Pipeline>>;
+    using Pipelines = std::vector<std::unique_ptr<Pipeline>>;
 
     Pass() = default;
     virtual ~Pass(){};
@@ -55,7 +55,7 @@ class RAYX_API Pass {
     const VkPipeline& getPipeline(int stage) const { return m_pass[stage]->m_pipeline; }
     const VkPipelineLayout& getPipelineLayout(int stage) { return m_pass[stage]->m_pipelineLayout; }
     const ShaderStage& getShaderStage(int stage) const { return *m_pass[stage]->shaderStage.get(); }
-    DescriptorPool* getDesriptorPool() { return globalDescriptorPool.get(); }
+    DescriptorPool* getDesriptorPool() { return m_globalDescriptorPool.get(); }
 
     void updatePushConstant(int stage, void* data, uint32_t size);
 
@@ -63,13 +63,9 @@ class RAYX_API Pass {
     virtual void prepare(std::vector<VkDescriptorSetLayoutBinding>) = 0;
 
   protected:
-    // const char* m_name;
-    // How many stages in the Pass
     uint32_t m_stagesCount;
-    // The pass itself (Pipelines)
-    Pipelines m_pass = {};
-
-    std::unique_ptr<DescriptorPool> globalDescriptorPool{};
+    Pipelines m_pass = {};  // The pass itself (Pipelines)
+    std::unique_ptr<DescriptorPool> m_globalDescriptorPool{};
 };
 
 // Compute Pass
@@ -79,9 +75,9 @@ class RAYX_API Pass {
  * @brief Use ComputePipelineCreateInfo to build a new computePipeline
  *
  */
-struct ComputePassCreateInfo {
+struct ComputePassCreateInfo_t {
     const char* passName;
-    std::vector<ShaderStageCreateInfo> shaderStagesCreateInfos = {};
+    std::vector<ShaderStageCreateInfo_t> shaderStagesCreateInfos = {};
     int descriptorSetAmount = 1;
 };
 
@@ -91,13 +87,13 @@ struct ComputePassCreateInfo {
  * A compute Pass is the main class for executing a compute Program(Shader).
  * It mainly consists of which shader(s) to execute and each In-Output/Binding(s) corresponding to each stage stage*. \n
  *
- * - The ComputePass Class can have multiple Vkpipeline stages, i.e A ComputePass has a series of
+ * - The ComputePass Class can have multiple VkPipeline stages, i.e A ComputePass has a series of
  *  shader stages with barriers and other sync. methods in between.
  *  [Stage0->(Barrier)->Stage1 ..]
  */
 class RAYX_API ComputePass : public Pass {
   public:
-    explicit ComputePass(VkDevice& device, const ComputePassCreateInfo&);
+    explicit ComputePass(VkDevice& device, const ComputePassCreateInfo_t&);
     ~ComputePass();
 
     void prepare(std::vector<VkDescriptorSetLayoutBinding> bindings);
@@ -108,12 +104,9 @@ class RAYX_API ComputePass : public Pass {
     const std::vector<VkDescriptorSetLayout>& getDescriptorSetLayouts() const { return m_descriptorSetLayouts; }
     std::string getName() const { return m_name; }
 
-    // Adding a new PipelineStage is the same as extending the Pass with a new Stage
-    void addPipelineStage(const ShaderStageCreateInfo&);
-
+    void addPipelineStage(const ShaderStageCreateInfo_t&);
     void updateDescriptorSets(BufferHandler* bufferHandler);
-    void simpleupdate(BufferHandler* bufferHandler);
-
+    void simpleUpdateDescriptorSets(BufferHandler* bufferHandler);
     void bindDescriptorSet(const VkCommandBuffer& cmdBuffer, int stage);
     void cmdPushConstants(const VkCommandBuffer& cmdBuffer, int stage);
     void cleanPipeline(int stage);
@@ -125,11 +118,10 @@ class RAYX_API ComputePass : public Pass {
     VkDevice& m_Device;
     std::string m_name;  // TODO(OS): Consider moving this to Pass parent class
 
-    // VkDescriptorPool m_DescriptorPool = VK_NULL_HANDLE;                        // FIXME(OS): Possibly not used
     VkPipelineBindPoint m_PipelineBindPoint = VK_PIPELINE_BIND_POINT_COMPUTE;  // Always compute
 
-    std::vector<VkDescriptorSetLayout> m_descriptorSetLayouts;  // For now, only one [0]
-    std::vector<VkDescriptorSet> m_descriptorSets;              // For now, only one [0]
+    std::vector<VkDescriptorSetLayout> m_descriptorSetLayouts;  // TODO(OS): For now, only one [0]
+    std::vector<VkDescriptorSet> m_descriptorSets;              // TODO(OS): For now, only one [0]
 
     // TODO(OS): Add missing memory barriers
 };

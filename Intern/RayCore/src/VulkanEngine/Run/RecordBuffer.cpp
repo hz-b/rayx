@@ -1,5 +1,7 @@
 #ifndef NO_VULKAN
 
+#include <utility>
+
 #include "VulkanEngine/VulkanEngine.h"
 namespace RAYX {
 
@@ -9,7 +11,7 @@ struct Workgroup_t {
     uint32_t z = 0;
 };
 
-Workgroup_t guessWorkGroupNo(uint32_t requiredLocalWorkGroupNo, VkPhysicalDeviceLimits limits) {
+static Workgroup_t guessWorkGroupNo(uint32_t requiredLocalWorkGroupNo, VkPhysicalDeviceLimits limits) {
     static uint32_t requiredGroup = 0;
     static struct Workgroup_t group;
 
@@ -147,7 +149,6 @@ void VulkanEngine::recordFirstCommand() {
 
     // TODO: ADD memory barrier if needed
 }
-
 void VulkanEngine::recordSecondCommand() {
     RAYX_PROFILE_FUNCTION();
     RAYX_VERB << "Recording second new commandBuffer..";
@@ -165,57 +166,40 @@ void VulkanEngine::recordSecondCommand() {
 
     // auto traceCommand = [](VkCOmmandBuffer & command)
 
-    auto requiredLocalWorkGroupNo = (uint32_t)ceil(m_numberOfInvocations / float(WORKGROUP_SIZE));  // number of local works groups
+    auto requiredLocalWorkGroupNo = (uint32_t)ceil((float)m_numberOfInvocations / float(WORKGROUP_SIZE));  // number of local works groups
     VkPhysicalDeviceProperties deviceProperties;
     vkGetPhysicalDeviceProperties(m_PhysicalDevice, &deviceProperties);
     auto group = guessWorkGroupNo(requiredLocalWorkGroupNo, deviceProperties.limits);
     pass1->cmdPushConstants(*cmdBuffer1, 0);
 
     vkCmdDispatch(*cmdBuffer1, group.x, group.z, group.y);
-    VK_CHECK_RESULT(vkEndCommandBuffer(*cmdBuffer1));  // end recording commands.
+    VK_CHECK_RESULT(vkEndCommandBuffer(*cmdBuffer1))  // end recording commands.
 }
 
 void VulkanEngine::traceCommand(VkCommandBuffer& cmdBuffer) {
-    auto requiredLocalWorkGroupNo = (uint32_t)ceil(m_numberOfInvocations / float(WORKGROUP_SIZE));  // number of local works groups
+    auto requiredLocalWorkGroupNo = (uint32_t)ceil((float)m_numberOfInvocations / float(WORKGROUP_SIZE));  // number of local works groups
     VkPhysicalDeviceProperties deviceProperties;
     vkGetPhysicalDeviceProperties(m_PhysicalDevice, &deviceProperties);
     auto group = guessWorkGroupNo(requiredLocalWorkGroupNo, deviceProperties.limits);
     vkCmdDispatch(cmdBuffer, group.x, group.z, group.y);
 }
 
-void VulkanEngine::recordSimpleTraceCommand(VkCommandBuffer& commandBuffer) {
+void VulkanEngine::recordSimpleTraceCommand(std::string passName, VkCommandBuffer& commandBuffer, int stage) {
     RAYX_PROFILE_FUNCTION();
-    auto pass0 = getComputePass("singleTracePass");
+    auto pass0 = getComputePass(std::move(passName));
     VkCommandBufferBeginInfo beginInfo = VKINIT::Command::command_buffer_begin_info();
     beginInfo.flags = VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT;
 
     // start recording commands
-    VK_CHECK_RESULT(vkBeginCommandBuffer(commandBuffer, &beginInfo));
-    pass0->bind(commandBuffer, 0);
-    pass0->bindDescriptorSet(commandBuffer, 0);
-    pass0->cmdPushConstants(commandBuffer, 0);  // Bind push constants
+    VK_CHECK_RESULT(vkBeginCommandBuffer(commandBuffer, &beginInfo))
+    pass0->bind(commandBuffer, stage);
+    pass0->bindDescriptorSet(commandBuffer, stage);
+    pass0->cmdPushConstants(commandBuffer, stage);  // Bind push constants
 
     traceCommand(commandBuffer);
-    VK_CHECK_RESULT(vkEndCommandBuffer(commandBuffer));  // end recording commands.
+    VK_CHECK_RESULT(vkEndCommandBuffer(commandBuffer))  // end recording commands.
 }
 
-// template <typename Lambda, typename... Args>
-// void VulkanEngine::recordCommand(std::string passName, VkCommandBuffer& commandBuffer, Lambda&& commandLambda, Args&&... args, int stage) {
-//     RAYX_PROFILE_FUNCTION();
-//     auto pass1 = getComputePass("TracePass");
-//     VkCommandBufferBeginInfo beginInfo = VKINIT::Command::command_buffer_begin_info();
-//     beginInfo.flags = VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT;
-
-//     // start recording commands
-//     VK_CHECK_RESULT(vkBeginCommandBuffer(commandBuffer, &beginInfo));
-//     pass1->bind(commandBuffer, 0);
-//     pass1->bindDescriptorSet(commandBuffer, 0);
-
-//     command(commandBuffer);  // Record command
-
-//     pass1->cmdPushConstants(commandBuffer, 0);           // Bind push constants
-//     VK_CHECK_RESULT(vkEndCommandBuffer(commandBuffer));  // end recording commands.
-// }
 }  // namespace RAYX
 
 #endif

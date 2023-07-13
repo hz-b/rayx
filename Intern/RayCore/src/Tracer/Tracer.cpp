@@ -19,7 +19,7 @@ Rays Tracer::trace(const Beamline& b) {
 
     auto rays = b.getInputRays();
     auto randomSeed = randomDouble();
-    auto maxSnapshots = b.m_OpticalElements.size() + 2;
+    auto maxSnapshots = b.m_OpticalElements.size() + 2;  // TODO(OS): Remove
     auto materialTables = b.calcMinimalMaterialTables();
 
     Rays result;
@@ -35,7 +35,8 @@ Rays Tracer::trace(const Beamline& b) {
         std::copy(rays.begin() + rayIdStart, rays.begin() + rayIdStart + batch_size, std::back_inserter(batch));
 
         std::vector<Element> elements;
-        for (auto e : b.m_OpticalElements) {
+        elements.reserve(b.m_OpticalElements.size());
+        for (const auto& e : b.m_OpticalElements) {
             elements.push_back(e->intoElement());
         }
         // auto maxSnapshots = b.m_OpticalElements.size();
@@ -57,8 +58,9 @@ Rays Tracer::trace(const Beamline& b) {
         {
             RAYX_PROFILE_SCOPE_STDOUT("Tracing");
             rawBatchRays = traceRaw(cfg);
-            RAYX_D_LOG << "Size: raw" << rawBatchRays.size() << " " << rawBatchRays[0].size();
-            // assert(rawBatchRays.size() == batch_size * maxSnapshots); TODO (MAX SNAPSHOT no longer required)
+            for (const auto& _events : rawBatchRays) { // Sanity Check
+                assert(_events.size() == batch_size);
+            }
         }
 
         {

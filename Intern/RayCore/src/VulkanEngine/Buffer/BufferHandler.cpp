@@ -37,14 +37,13 @@ std::vector<VkDescriptorSetLayoutBinding> BufferHandler::getDescriptorBindings(c
     }
     return bindings;
 }
-/*
-Allocate a command buffer from the creeated command pool.
-*/
+/**
+ * @brief Allocate a command buffer from the created command pool.
+ */
 void BufferHandler::createTransferCommandBuffer() {
     VkCommandBufferAllocateInfo commandBufferAllocateInfo = {};
     commandBufferAllocateInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
     commandBufferAllocateInfo.commandPool = m_CommandPool;  // specify the command pool to allocate from.
-
     commandBufferAllocateInfo.level = VK_COMMAND_BUFFER_LEVEL_PRIMARY;
     commandBufferAllocateInfo.commandBufferCount = 1;
     VK_CHECK_RESULT(vkAllocateCommandBuffers(m_Device, &commandBufferAllocateInfo, &m_TransferCommandBuffer))
@@ -59,6 +58,7 @@ void BufferHandler::createTransferSemaphore() {
     semaphoreCreateInfo.sType = VK_STRUCTURE_TYPE_SEMAPHORE_CREATE_INFO;
     vkCreateSemaphore(m_Device, &semaphoreCreateInfo, nullptr, &m_TransferSemaphore);
 }
+
 /// Copies data from one buffer to the other with given offsets.
 /// This is used for the buffer <-> staging buffer communication
 /// Careful : This is not an awaiting command so make sure to check the according fence transfer
@@ -159,7 +159,8 @@ void BufferHandler::readBufferRaw(const char* bufname, char* outdata, const VkQu
     //                 "mandatory before reading it's output buffers.";
     // }
     VulkanBuffer* buffer = getBuffer(bufname);
-    if (buffer->m_createInfo.accessType != VKBUFFER_OUT && buffer->m_createInfo.accessType != VKBUFFER_INOUT) {
+    auto access = buffer->m_createInfo.accessType;
+    if (access != VKBUFFER_OUT && access != VKBUFFER_INOUT) {
         RAYX_ERR << "readBufferRaw(\"" << bufname << "\", ...) is not allowed, as \"" << bufname << "\" is not an output buffer";
     }
 
@@ -171,12 +172,12 @@ void BufferHandler::readBufferRaw(const char* bufname, char* outdata, const VkQu
     }
 
     while (remainingBytes > 0) {
-        size_t localbytes = std::min((size_t)m_StagingSize, remainingBytes);
-        gpuMemcpy(*m_StagingBuffer, 0, *m_Buffers[bufname], offset, localbytes);
+        size_t localBytes = std::min((size_t)m_StagingSize, remainingBytes);
+        gpuMemcpy(*m_StagingBuffer, 0, *m_Buffers[bufname], offset, localBytes);
         m_TransferFence->wait();
-        loadFromStagingBuffer(outdata + offset, localbytes);
-        offset += localbytes;
-        remainingBytes -= localbytes;
+        loadFromStagingBuffer(outdata + offset, localBytes);
+        offset += localBytes;
+        remainingBytes -= localBytes;
     }
 }
 /// writes the `indata` to the buffer.
@@ -184,22 +185,21 @@ void BufferHandler::readBufferRaw(const char* bufname, char* outdata, const VkQu
 /// this function uses staging buffer to write the data in chunks of
 /// STAGING_SIZE. only allowed for buffers with `IN as usage.
 void BufferHandler::writeBufferRaw(const char* bufname, char* indata) {
-    VulkanBuffer* b = getBuffer(bufname);
+    VulkanBuffer* buffer = getBuffer(bufname);
 
-    auto access = b->m_createInfo.accessType;
+    auto access = buffer->m_createInfo.accessType;
     if (access != VKBUFFER_IN && access != VKBUFFER_INOUT) {
         RAYX_ERR << "writeBufferRaw(\"" << bufname << "\", ...) is not allowed, as \"" << bufname << "\" is not an input Buffer";
     }
-    size_t remainingBytes = b->getSize();
+    size_t remainingBytes = buffer->getSize();
     size_t offset = 0;
 
     while (remainingBytes > 0) {
-        size_t localbytes = std::min(remainingBytes, (size_t)m_StagingSize);
-        storeToStagingBuffer(indata + offset, localbytes);
-        gpuMemcpy(*b, offset, *m_StagingBuffer, 0, localbytes);
-
-        offset += localbytes;
-        remainingBytes -= localbytes;
+        size_t localBytes = std::min(remainingBytes, (size_t)m_StagingSize);
+        storeToStagingBuffer(indata + offset, localBytes);
+        gpuMemcpy(*buffer, offset, *m_StagingBuffer, 0, localBytes);
+        offset += localBytes;
+        remainingBytes -= localBytes;
         m_TransferFence->wait();
     }
 }
@@ -227,7 +227,8 @@ void BufferHandler::updateBuffer(const char* bufname, const std::vector<T>& vec)
     }
     if (vec && m_Buffers[std::string(bufname)]->getSize() == vec.size()) {
         writeBufferRaw(bufname, (char*)vec.data());
-    }
+    } else
+        RAYX_WARN << "Size mismatch";
 }
 
 void BufferHandler::deleteBuffer(const char* bufname) {

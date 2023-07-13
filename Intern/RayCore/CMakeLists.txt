@@ -112,8 +112,6 @@ target_include_directories(${PROJECT_NAME}
 set(SHADER_SOURCES_DIR ${RayCore_SOURCE_DIR}/src/Tracer/shader)
 
 set(SHADER_SOURCES
-    main-glsl.comp
-    main_1-glsl.comp
     singleBounce-glsl.comp)
 
 if(NOT VULKAN STREQUAL "NO")
