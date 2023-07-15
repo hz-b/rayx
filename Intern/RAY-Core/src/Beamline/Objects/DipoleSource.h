@@ -6,6 +6,12 @@
 
 namespace RAYX {
 
+struct PsiAndStokes{
+    glm::dvec4 stokes;
+    double psi; 
+};
+
+
 class RAYX_API DipoleSource : public LightSource {
   public:
     DipoleSource(const DesignObject&);
@@ -24,7 +30,7 @@ class RAYX_API DipoleSource : public LightSource {
     void setLogInterpolation();
     double getInterpolation(double) const;
     double getEnergy() const;
-    double getPsi(double) const;
+    PsiAndStokes getPsiandStokes(double) const;
     void setMaxIntensity();
     glm::dvec3 getXYZPosition(double)const;
     double vDivergence(double hv, double sigv) const;
