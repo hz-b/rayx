@@ -120,16 +120,16 @@ std::vector<Ray> DipoleSource::getRays() const {
 glm::dvec3 DipoleSource::getXYZPosition(double phi)const{
     double XDistribution, YDistribution;
     double x1, y, z;
-    double width = -0.5/(m_sourceWidth * m_sourceWidth);
-
+    double width = -0.5/m_sourceWidth / m_sourceWidth;
+    phi = phi * PI / 180;
     do{   
-        x1 = randomDouble() - 0.5 * 9 * m_sourceWidth;
+        x1 = (randomDouble() - 0.5) * 9 * m_sourceWidth;
         XDistribution = exp(width * x1 * x1);
     } while (XDistribution < randomDouble());
     
     double sign = DipoleSource::m_electronEnergyOrientation == ElectronEnergyOrientation::Clockwise ? 1.0 : -1.0;
     
-    double x = sign * x1 * cos(phi) + (m_bendingRadius * (1 - cos(phi)));
+    double x = sign * (x1 * cos(phi) + (m_bendingRadius * (1 - cos(phi))));
     x = x + m_position.x;
 
     double height = -0.5/m_sourceHeight/m_sourceHeight;
