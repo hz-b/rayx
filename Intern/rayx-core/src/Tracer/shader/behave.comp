@@ -62,13 +62,13 @@ Ray behaveRZP(Ray r, int id, RAYX_INOUT(uint64_t) ctr, Collision col) {
     double Ord           = b.m_orderOfDiffraction;
     int additional_order = int(b.m_additionalOrder);
 
-    r = subtractMisalignment(r, b.m_misalignment);
+    r = addMisalignment(r, b.m_misalignment);
 
     // calculate the RZP line density for the position of the intersection on the RZP
     double DX, DZ;
     RZPLineDensity(r, normal, b, DX, DZ);
 
-    r = addMisalignment(r, b.m_misalignment);
+    r = subtractMisalignment(r, b.m_misalignment);
 
     // tanger/slope Error
     SlopeError slope_error = elements[id].m_slopeError;;
