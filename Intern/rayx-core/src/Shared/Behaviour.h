@@ -3,6 +3,7 @@
 
 #include "Cutout.h"
 #include "adapt.h"
+#include "Misalignment.h"
 
 // A behaviour decides what happens whenever a ray hits the surface of this element.
 // Each behaviour type has its own `behave` function in `behave.comp`.
@@ -16,7 +17,7 @@ struct Behaviour {
     // the type of this behaviour, see the BTYPE constants.
     // the type describes how the m_params need to be interpreted.
     double m_type;
-    double m_params[16];
+    double m_params[32];
 };
 
 ////////////////////
@@ -132,6 +133,7 @@ struct RZPBehaviour {
     double m_designAlphaAngle;
     double m_designBetaAngle;
     double m_additionalOrder;
+    Misalignment m_misalignment;
 };
 
 INLINE Behaviour serializeRZP(RZPBehaviour r) {
@@ -153,6 +155,13 @@ INLINE Behaviour serializeRZP(RZPBehaviour r) {
     b.m_params[12] = r.m_designAlphaAngle;
     b.m_params[13] = r.m_designBetaAngle;
     b.m_params[14] = r.m_additionalOrder;
+
+    b.m_params[15] = r.m_misalignment.m_translationXerror;
+    b.m_params[16] = r.m_misalignment.m_translationYerror;
+    b.m_params[17] = r.m_misalignment.m_translationZerror;
+    b.m_params[18] = r.m_misalignment.m_rotationXerror;
+    b.m_params[19] = r.m_misalignment.m_rotationYerror;
+    b.m_params[20] = r.m_misalignment.m_rotationZerror;
     return b;
 }
 
@@ -173,6 +182,13 @@ INLINE RZPBehaviour deserializeRZP(Behaviour b) {
     r.m_designAlphaAngle = b.m_params[12];
     r.m_designBetaAngle = b.m_params[13];
     r.m_additionalOrder = b.m_params[14];
+
+    r.m_misalignment.m_translationXerror = b.m_params[15];
+    r.m_misalignment.m_translationYerror = b.m_params[16];
+    r.m_misalignment.m_translationZerror = b.m_params[17];
+    r.m_misalignment.m_rotationXerror = b.m_params[18];
+    r.m_misalignment.m_rotationYerror = b.m_params[19];
+    r.m_misalignment.m_rotationZerror = b.m_params[20];
     return r;
 }
 

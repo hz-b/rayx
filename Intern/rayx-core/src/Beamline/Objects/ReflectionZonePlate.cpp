@@ -39,6 +39,7 @@ Element makeReflectionZonePlate(const DesignObject& dobj) {
     }
 
     auto imageType = dobj.parseImageType();
+    auto misalignment = dobj.parseMisalignment();
 
     auto behaviour = serializeRZP({.m_imageType = (double) imageType,
                                    .m_rzpType = (double)RZPType::Elliptical,
@@ -54,7 +55,9 @@ Element makeReflectionZonePlate(const DesignObject& dobj) {
                                    .m_designMeridionalExitArmLength = designMeridionalExitArmLength,
                                    .m_designAlphaAngle = designAlphaAngle.rad,
                                    .m_designBetaAngle = designBetaAngle.rad,
-                                   .m_additionalOrder = (double)additionalOrder});
+                                   .m_additionalOrder = (double)additionalOrder,
+                                   .m_misalignment = misalignment
+                                    });
     return makeElement(dobj, behaviour, surface);
 }
 
