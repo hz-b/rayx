@@ -46,9 +46,9 @@ std::vector<Ray> MatrixSource::getRays() const {
             en = selectEnergy();
             glm::dvec3 position = glm::dvec3(x, y, z);
 
-            phi = -0.5 * m_horDivergence + (m_horDivergence / (rmat - 1)) * row + getMisalignmentParams().m_rotationXerror.rad;
-
-            psi = -0.5 * m_verDivergence + (m_verDivergence / (rmat - 1)) * col + getMisalignmentParams().m_rotationYerror.rad;
+            // TODO are these misalignments correct?
+            phi = -0.5 * m_horDivergence + (m_horDivergence / (rmat - 1)) * row + getMisalignmentParams().m_rotationXerror;
+            psi = -0.5 * m_verDivergence + (m_verDivergence / (rmat - 1)) * col + getMisalignmentParams().m_rotationYerror;
 
             glm::dvec3 direction = getDirectionFromAngles(phi, psi);
             glm::dvec4 tempDir = m_orientation * glm::dvec4(direction, 0.0);

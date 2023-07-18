@@ -9,6 +9,7 @@
 #include "Material/Material.h"
 #include "Shared/Constants.h"
 #include "Shared/Element.h"
+#include "Shared/Misalignment.h"
 #include "utils.h"
 
 namespace RAYX {
@@ -24,15 +25,6 @@ enum class GeometricalShape;
 enum class ElectronEnergyOrientation;
 enum class SourcePulseType;
 enum class EnergySpreadUnit;
-
-struct Misalignment {
-    double m_translationXerror;
-    double m_translationYerror;
-    double m_translationZerror;
-    Rad m_rotationXerror;
-    Rad m_rotationYerror;
-    Rad m_rotationZerror;
-};
 
 /** The xml namespace defines functions, which help to implement the
  * createFromXML-functions for the beamline objects. All of these functions

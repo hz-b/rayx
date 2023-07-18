@@ -124,7 +124,7 @@ bool paramMisalignment(const rapidxml::xml_node<>* node, Misalignment* out) {
 
     rapidxml::xml_node<>* p;
 
-    *out = {0, 0, 0, Rad(0), Rad(0), Rad(0)};
+    *out = {0, 0, 0, 0, 0, 0};
 
     if (!param(node, "alignmentError", &p)) {
         return true;  // if error is not given, it'll be zero.
@@ -140,15 +140,15 @@ bool paramMisalignment(const rapidxml::xml_node<>* node, Misalignment* out) {
 
         double x_mrad = 0;
         xml::paramDouble(node, "rotationXerror", &x_mrad);
-        out->m_rotationXerror = Rad(x_mrad / 1000.0);  // convert mrad to rad.
+        out->m_rotationXerror = x_mrad / 1000.0;  // convert mrad to rad.
 
         double y_mrad = 0;
         xml::paramDouble(node, "rotationYerror", &y_mrad);
-        out->m_rotationYerror = Rad(y_mrad / 1000.0);
+        out->m_rotationYerror = y_mrad / 1000.0;
 
         double z_mrad = 0;
         xml::paramDouble(node, "rotationZerror", &z_mrad);
-        out->m_rotationZerror = Rad(z_mrad / 1000.0);
+        out->m_rotationZerror = z_mrad / 1000.0;
     }
 
     return true;
@@ -353,7 +353,7 @@ bool paramSourcePulseType(const rapidxml::xml_node<>* node, SourcePulseType* out
 
 bool paramPositionAndOrientation(const rapidxml::xml_node<>* node, const std::vector<xml::Group>& group_context, glm::dvec4* out_pos,
                                  glm::dmat4x4* out_ori) {
-    Misalignment misalignment = {0, 0, 0, Rad(0), Rad(0), Rad(0)};
+    Misalignment misalignment = {0, 0, 0, 0, 0, 0};
 
     // Always returns True!
     paramPositionNoGroup(node, out_pos);

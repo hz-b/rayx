@@ -68,8 +68,8 @@ std::vector<Ray> PointSource::getRays() const {
 
         // get random deviation from main ray based on distribution
         // TODO correct misalignments?
-        psi = getCoord(m_verDist, m_verDivergence) + getMisalignmentParams().m_rotationXerror.rad;
-        phi = getCoord(m_horDist, m_horDivergence) + getMisalignmentParams().m_rotationYerror.rad;
+        psi = getCoord(m_verDist, m_verDivergence) + getMisalignmentParams().m_rotationXerror;
+        phi = getCoord(m_horDist, m_horDivergence) + getMisalignmentParams().m_rotationYerror;
         // get corresponding angles based on distribution and deviation from
         // main ray (main ray: xDir=0,yDir=0,zDir=1 for phi=psi=0)
         glm::dvec3 direction = getDirectionFromAngles(phi, psi);

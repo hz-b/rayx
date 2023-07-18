@@ -109,9 +109,9 @@ std::vector<Ray> DipoleSource::getRays() const {
         
         psiandstokes = getPsiandStokes(en);
         
-        phi = phi + getMisalignmentParams().m_rotationXerror.rad;
+        phi = phi + getMisalignmentParams().m_rotationXerror;
                 
-        psiandstokes.psi = psiandstokes.psi + getMisalignmentParams().m_rotationYerror.rad;
+        psiandstokes.psi = psiandstokes.psi + getMisalignmentParams().m_rotationYerror;
 
         // get corresponding angles based on distribution and deviation from
         // main ray (main ray: xDir=0,yDir=0,zDir=1 for phi=psi=0)
