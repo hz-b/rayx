@@ -23,7 +23,7 @@ class RAYX_API LightSource {
     virtual ~LightSource() = default;
 
     // Getter
-    //Misalignment getMisalignmentParams() const;
+    Misalignment getMisalignmentParams() const;
     //double getLinear0() const;
     //double getLinear45() const;
     //double getCircular() const;
@@ -63,7 +63,7 @@ class RAYX_API LightSource {
 
   private:
     // User/Design Parameter
-    //Misalignment m_misalignmentParams;  // x, y, psi, phi
+    Misalignment m_misalignmentParams;  // x, y, psi, phi
 
     // Physics Params
     // point source & matrix source

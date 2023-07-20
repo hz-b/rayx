@@ -109,6 +109,9 @@ std::vector<Ray> DipoleSource::getRays() const {
         
         psiandstokes = getPsiandStokes(en);
         
+        phi = phi + getMisalignmentParams().m_rotationXerror.rad;
+        psiandstokes.psi = psiandstokes.psi + getMisalignmentParams().m_rotationYerror.rad;
+
         // get corresponding angles based on distribution and deviation from
         // main ray (main ray: xDir=0,yDir=0,zDir=1 for phi=psi=0)
         glm::dvec3 direction = getDirectionFromAngles(phi, psiandstokes.psi);
@@ -148,10 +151,10 @@ glm::dvec3 DipoleSource::getXYZPosition(double phi)const{
     double sign = DipoleSource::m_electronEnergyOrientation == ElectronEnergyOrientation::Clockwise ? 1.0 : -1.0;
     
     double x = sign * (x1 * cos(phi) + (m_bendingRadius * (1 - cos(phi))));
-    x = x + m_position.x;
+    x = x + m_position.x + getMisalignmentParams().m_translationXerror;
 
     double y = getNormalFromRange(m_sourceHeight);
-    y = y + m_position.y;
+    y = y + m_position.y + getMisalignmentParams().m_translationYerror;
 
     double z = sign * ((m_bendingRadius*1000 - x1) * sin(phi));
     

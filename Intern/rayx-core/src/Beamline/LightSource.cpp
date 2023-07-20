@@ -6,6 +6,7 @@ namespace RAYX {
 LightSource::LightSource(const DesignObject& dobj) {
     m_name = dobj.name();
     m_EnergyDistribution = dobj.parseEnergyDistribution();
+    m_misalignmentParams = dobj.parseMisalignment();
     m_numberOfRays = dobj.parseNumberRays();
     m_sourceHeight = dobj.parseSourceHeight();
     m_sourceWidth = dobj.parseSourceWidth();
@@ -13,6 +14,8 @@ LightSource::LightSource(const DesignObject& dobj) {
     m_orientation = dobj.parseOrientation();
     m_position = dobj.parsePosition();
 }
+
+Misalignment LightSource::getMisalignmentParams() const { return m_misalignmentParams; }
 
 [[maybe_unused]] double LightSource::getPhotonEnergy() const { return m_EnergyDistribution.getAverage(); }
 

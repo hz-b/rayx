@@ -13,7 +13,6 @@ class RAYX_API MatrixSource : public LightSource {
     virtual std::vector<Ray> getRays() const override;
 
   private:
-    Misalignment m_misalignmentParams;
     SourcePulseType m_sourceDistributionType;  // TODO: wo muss der name angepasst werden?
 
     double m_linearPol_0;
