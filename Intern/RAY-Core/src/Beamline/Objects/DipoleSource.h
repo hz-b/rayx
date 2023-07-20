@@ -34,6 +34,8 @@ class RAYX_API DipoleSource : public LightSource {
     void setMaxIntensity();
     glm::dvec3 getXYZPosition(double)const;
     double vDivergence(double hv, double sigv) const;
+    double getNormalFromRange(double range) const;
+
   private:
     // Geometric Params
     double m_bendingRadius;

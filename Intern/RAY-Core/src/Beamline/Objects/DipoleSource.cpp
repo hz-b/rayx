@@ -2,6 +2,7 @@
 
 #include "Data/xml.h"
 #include "Debug/Debug.h"
+#include "Debug/Instrumentor.h"
 #include "Random.h"
 #include "Shared/Constants.h"
 //#include "Shared/TranslatedFortran.h"
@@ -11,12 +12,14 @@
 namespace RAYX {
 
 double get_factorCriticalEnergy() {
-    // double planc = Planck_bar / (2*pow(c_elementaryCharge, 5) * pow(c_electronMass,3));
-    //  3 * planc * pow(c_electronVolt,2) * 1.0e24; //nach RAY-UI
-    return 2.5050652873563215;
+    double planc = 3 * Planck_bar / (2 * pow(c_speedOfLight, 5) * pow(c_electronMass,3)) * pow(c_electronVolt,2) * 1.0e24; //nach RAY-UI
+    return planc; //2.5050652873563215 , 2.2182868570172918
 }
 
-double get_factorMagneticField() { return c_electronVolt / (c_speedOfLight * c_elementaryCharge) * 1.0e9; }
+double get_factorMagneticField() { 
+    double magField = c_electronVolt / (c_speedOfLight * c_elementaryCharge) * 1.0e9; 
+    return magField;
+}
 
 double get_factorElectronEnergy() {
     double factorElectronEnergy = c_electronVolt * 1.0e9 / (c_electronMass * pow(c_speedOfLight, 2));
@@ -81,6 +84,7 @@ DipoleSource::DipoleSource(const DesignObject& dobj) : LightSource(dobj) {
  */
 
 std::vector<Ray> DipoleSource::getRays() const {
+    RAYX_PROFILE_SCOPE("getRays");
     double phi, en;  // psi,phi direction cosines, en=energy
 
     PsiAndStokes psiandstokes;
@@ -117,34 +121,44 @@ std::vector<Ray> DipoleSource::getRays() const {
     return rayList;
 }
 
-glm::dvec3 DipoleSource::getXYZPosition(double phi)const{
-    double XDistribution, YDistribution;
-    double x1, y, z;
-    double width = -0.5/m_sourceWidth / m_sourceWidth;
-    phi = phi * PI / 180;
+
+// monte-Carlo-method to get normal-distributed x and y Values for getXYZPosition()
+double DipoleSource::getNormalFromRange(double range) const {
+    double value;
+    double Distribution;
+
+    double expanse = -0.5 / range / range;
+    
     do{   
-        x1 = (randomDouble() - 0.5) * 9 * m_sourceWidth;
-        XDistribution = exp(width * x1 * x1);
-    } while (XDistribution < randomDouble());
+        value = (randomDouble() - 0.5) * 9 * range;
+        Distribution = exp(expanse * value * value);
+    } while (Distribution < randomDouble());
+
+    return value;
+}
+
+glm::dvec3 DipoleSource::getXYZPosition(double phi)const{
+    RAYX_PROFILE_SCOPE("getxyz");
+
+    phi = phi * PI / 180;        // DEG to RAD conversion
+    
+    double x1 = getDistribution(m_sourceWidth);
     
     double sign = DipoleSource::m_electronEnergyOrientation == ElectronEnergyOrientation::Clockwise ? 1.0 : -1.0;
     
     double x = sign * (x1 * cos(phi) + (m_bendingRadius * (1 - cos(phi))));
     x = x + m_position.x;
 
-    double height = -0.5/m_sourceHeight/m_sourceHeight;
-    do{
-        y = randomDouble() -0.5 * m_sourceHeight * 9;
-        YDistribution = exp(height * y * y);
-    } while (YDistribution < randomDouble());
-
+    double y = getDistribution(m_sourceHeight);
     y = y + m_position.y;
-    z = sign * ((m_bendingRadius*1000 - x1) * sin(phi));
+
+    double z = sign * ((m_bendingRadius*1000 - x1) * sin(phi));
     
     return glm::dvec3(x, y, z);
 }
 
 PsiAndStokes DipoleSource::getPsiandStokes(double en) const {
+    RAYX_PROFILE_SCOPE("getPsiStokes");
 
     PsiAndStokes psiandstokes;
 
@@ -159,6 +173,8 @@ PsiAndStokes DipoleSource::getPsiandStokes(double en) const {
 }
 
 double DipoleSource::getEnergy() const {
+    RAYX_PROFILE_SCOPE("getEnergy");
+
     double flux = 0.0;
     double energy = 0.0;
 
@@ -179,6 +195,8 @@ double DipoleSource::vDivergence(double energy, double sigv) const {
 }
 
 glm::dvec4 DipoleSource::getStokesSyn(double energy, double psi1, double psi2) const {
+    RAYX_PROFILE_SCOPE("getStokesSyn");
+
     double fak = 3453345200000000.0;  // getFactorDistribution
 
     double gamma = fabs(m_electronEnergy) * 1957;  // getFactorElectronEnergy
@@ -215,8 +233,6 @@ glm::dvec4 DipoleSource::getStokesSyn(double energy, double psi1, double psi2) c
         stokes[3] = stokes[3] + xints;
         psi = psi + dpsi;
     }
-
-
     return stokes;
 }
 
@@ -247,6 +263,8 @@ void DipoleSource::setLogInterpolation() {
 }
 
 double DipoleSource::schwinger(double energy) const {
+    RAYX_PROFILE_SCOPE("schwinger");
+
     double preFactor = factorSchwinger_RAY * 1.e-3;
 
     double Y0 = energy / m_criticalEnergy;
@@ -289,6 +307,8 @@ void DipoleSource::setMaxIntensity() {
 }
 
 glm::dvec4 DipoleSource::dipoleFold(double psi, double photonEnergy, double sigpsi) const {
+    RAYX_PROFILE_SCOPE("dipolefold");
+
     int ln = (int)sigpsi;
     double trsgyp = 0.0;
     double sgyp = 0.0;
@@ -402,6 +422,8 @@ void DipoleSource::setMaxFlux() {
 }
 
 double DipoleSource::getInterpolation(double energy) const {
+    RAYX_PROFILE_SCOPE("getInterpolation");
+
     //TODO: Interpolation benchmarken 
     double functionOne = 0.0;
     double functionTwo = 0.0;
