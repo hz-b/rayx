@@ -19,7 +19,7 @@ class RAYX_API PointSource : public LightSource {
     SourceDist m_horDist;
     SourceDist m_verDist;
     SourcePulseType m_sourceDistributionType;
-    std::array<double, 6> m_misalignmentParams;
+    Misalignment m_misalignmentParams;
 
     double m_linearPol_0;
     double m_linearPol_45;

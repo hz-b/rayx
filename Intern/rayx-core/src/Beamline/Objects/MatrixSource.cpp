@@ -38,9 +38,9 @@ std::vector<Ray> MatrixSource::getRays() const {
     for (int col = 0; col < rmat; col++) {
         for (int row = 0; row < rmat; row++) {
             double rn = randomDouble();  // in [0, 1]
-            x = -0.5 * m_sourceWidth + (m_sourceWidth / (rmat - 1)) * row + m_misalignmentParams[0];
+            x = -0.5 * m_sourceWidth + (m_sourceWidth / (rmat - 1)) * row + m_misalignmentParams.m_translationXerror;
             x += m_position.x;
-            y = -0.5 * m_sourceHeight + (m_sourceHeight / (rmat - 1)) * col + m_misalignmentParams[1];
+            y = -0.5 * m_sourceHeight + (m_sourceHeight / (rmat - 1)) * col + m_misalignmentParams.m_translationYerror;
             y += m_position.y;
 
             z = (rn - 0.5) * m_sourceDepth;
@@ -48,9 +48,9 @@ std::vector<Ray> MatrixSource::getRays() const {
             en = selectEnergy();
             glm::dvec3 position = glm::dvec3(x, y, z);
 
-            phi = -0.5 * m_horDivergence + (m_horDivergence / (rmat - 1)) * row + getMisa m_misalignmentParams[2];
+            phi = -0.5 * m_horDivergence + (m_horDivergence / (rmat - 1)) * row + m_misalignmentParams.m_rotationXerror.rad;
 
-            psi = -0.5 * m_verDivergence + (m_verDivergence / (rmat - 1)) * col + m_misalignmentParams[3];
+            psi = -0.5 * m_verDivergence + (m_verDivergence / (rmat - 1)) * col + m_misalignmentParams.m_rotationYerror.rad;
 
             glm::dvec3 direction = getDirectionFromAngles(phi, psi);
             glm::dvec4 tempDir = m_orientation * glm::dvec4(direction, 0.0);

@@ -65,7 +65,6 @@ class RAYX_API DipoleSource : public LightSource {
     double m_energySpread;
     EnergySpreadUnit m_energySpreadUnit;
     double m_photonFluxOrg;
-    double m_verDivergence;
     double m_maxFlux;
     double m_maxIntensity;
 

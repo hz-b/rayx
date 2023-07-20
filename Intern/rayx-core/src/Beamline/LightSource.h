@@ -14,6 +14,8 @@ enum class SpreadType { WhiteBand, ThreeEnergies };                // default Wh
 enum class EnergyDistributionType { File, Values, Total, Param };  // default ET_VALUES
 enum class SourceDistType { Simultaneous, HardEdge, Gauss };       // default simultaneously
 enum class SourceDist { Uniform, Gaussian };                       // TODO(rudi): unify!
+enum class ElectronEnergyOrientation { Clockwise, Counterclockwise };
+enum class EnergySpreadUnit { EU_PERCENT, EU_eV };
 
 class RAYX_API LightSource {
   public:
@@ -21,13 +23,13 @@ class RAYX_API LightSource {
     virtual ~LightSource() = default;
 
     // Getter
-    Misalignment getMisalignmentParams() const;
-    double getLinear0() const;
-    double getLinear45() const;
-    double getCircular() const;
-    double getVerDivergence() const { return m_verDivergence; }
+    //Misalignment getMisalignmentParams() const;
+    //double getLinear0() const;
+    //double getLinear45() const;
+    //double getCircular() const;
+    //double getVerDivergence() const { return m_verDivergence; }
     double getHorDivergence() const { return m_horDivergence; }
-    double getSourceDepth() const { return m_sourceDepth; }
+    //double getSourceDepth() const { return m_sourceDepth; }
     double getSourceHeight() const { return m_sourceHeight; }
     double getSourceWidth() const { return m_sourceWidth; }
 
@@ -49,7 +51,7 @@ class RAYX_API LightSource {
 
   protected:
     // Geometric Params
-    double m_sourceDepth;
+    //double m_sourceDepth;
     double m_sourceHeight;
     double m_sourceWidth;
     // in rad:
@@ -61,16 +63,16 @@ class RAYX_API LightSource {
 
   private:
     // User/Design Parameter
-    Misalignment m_misalignmentParams;  // x, y, psi, phi
+    //Misalignment m_misalignmentParams;  // x, y, psi, phi
 
     // Physics Params
     // point source & matrix source
-    double m_linearPol_0;
-    double m_linearPol_45;
-    double m_circularPol;
+    //double m_linearPol_0;
+    //double m_linearPol_45;
+    //double m_circularPol;
 
     // TODO(Jannis): move to children
-    SourceDistType m_sourceDistributionType;
+    //SourceDistType m_sourceDistributionType;
 };
 
 }  // namespace RAYX

@@ -5,13 +5,15 @@
 #include "Debug/Instrumentor.h"
 #include "Random.h"
 #include "Shared/Constants.h"
+#include "Shared/EventType.h"
+
 
 #include <fstream>
 
 namespace RAYX {
 
 double get_factorCriticalEnergy() {
-    double planc = 3 * Planck_bar / (2 * pow(c_speedOfLight, 5) * pow(c_electronMass,3)) * pow(c_electronVolt,2) * 1.0e24; //nach RAY-UI
+    double planc = 3 * c_Planck_bar / (2 * pow(c_speedOfLight, 5) * pow(c_electronMass,3)) * pow(c_electronVolt,2) * 1.0e24; //nach RAY-UI
     return planc; //2.5050652873563215 , 2.2182868570172918
 }
 
@@ -113,7 +115,7 @@ std::vector<Ray> DipoleSource::getRays() const {
         glm::dvec4 tempDir = m_orientation * glm::dvec4(direction, 0.0);
         direction = glm::dvec3(tempDir.x, tempDir.y, tempDir.z);
 
-        Ray r = {position, W_UNINIT, direction, en, psiandstokes.stokes, 0.0, 0.0, 0.0, 0.0};
+        Ray r = {position, ETYPE_UNINIT, direction, en, psiandstokes.stokes, 0.0, 0.0, 0.0, 0.0};
         
         rayList.push_back(r);
     }
@@ -264,7 +266,7 @@ void DipoleSource::setLogInterpolation() {
 double DipoleSource::schwinger(double energy) const {
     RAYX_PROFILE_SCOPE("schwinger");
 
-    double preFactor = factorSchwinger_RAY * 1.e-3;
+    double preFactor = c_factorSchwinger_RAY * 1.e-3;
 
     double Y0 = energy / m_criticalEnergy;
     Y0 = Y0 / 1000;

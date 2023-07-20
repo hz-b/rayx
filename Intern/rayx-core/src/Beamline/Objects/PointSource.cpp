@@ -12,6 +12,13 @@ PointSource::PointSource(const DesignObject& dobj) : LightSource(dobj) {
     m_heightDist = dobj.parseSourceHeightDistribution();
     m_horDist = dobj.parseHorDivDistribution();
     m_verDist = dobj.parseVerDivDistribution();
+    m_misalignmentParams = dobj.parseMisalignment();
+    m_verDivergence = dobj.parseVerDiv();
+    m_sourceDepth = dobj.parseSourceDepth();
+
+    m_linearPol_0 = dobj.parseLinearPol0();
+    m_linearPol_45 = dobj.parseLinearPol45();
+    m_circularPol = dobj.parseCircularPol();
 }
 
 /**
@@ -50,9 +57,9 @@ std::vector<Ray> PointSource::getRays() const {
     // create n rays with random position and divergence within the given span
     // for width, height, depth, horizontal and vertical divergence
     for (int i = 0; i < n; i++) {
-        x = getCoord(m_widthDist, m_sourceWidth) + m_misalignmentParams[0];
+        x = getCoord(m_widthDist, m_sourceWidth) + m_misalignmentParams.m_translationXerror;
         x += m_position.x;
-        y = getCoord(m_heightDist, m_sourceHeight) + m_misalignmentParams[1];
+        y = getCoord(m_heightDist, m_sourceHeight) + m_misalignmentParams.m_translationYerror;
         y += m_position.y;
         z = (randomDouble() - 0.5) * m_sourceDepth;
         z += m_position.z;
@@ -62,8 +69,8 @@ std::vector<Ray> PointSource::getRays() const {
 
         // get random deviation from main ray based on distribution
         // TODO correct misalignments?
-        psi = getCoord(m_verDist, m_verDivergence) + getMisalignmentParams().m_rotationXerror.rad;
-        phi = getCoord(m_horDist, m_horDivergence) + getMisalignmentParams().m_rotationYerror.rad;
+        psi = getCoord(m_verDist, m_verDivergence) + m_misalignmentParams.m_rotationXerror.rad;
+        phi = getCoord(m_horDist, m_horDivergence) + m_misalignmentParams.m_rotationYerror.rad;
         // get corresponding angles based on distribution and deviation from
         // main ray (main ray: xDir=0,yDir=0,zDir=1 for phi=psi=0)
         glm::dvec3 direction = getDirectionFromAngles(phi, psi);
