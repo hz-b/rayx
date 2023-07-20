@@ -142,14 +142,14 @@ glm::dvec3 DipoleSource::getXYZPosition(double phi)const{
 
     phi = phi * PI / 180;        // DEG to RAD conversion
     
-    double x1 = getDistribution(m_sourceWidth);
+    double x1 = getNormalFromRange(m_sourceWidth);
     
     double sign = DipoleSource::m_electronEnergyOrientation == ElectronEnergyOrientation::Clockwise ? 1.0 : -1.0;
     
     double x = sign * (x1 * cos(phi) + (m_bendingRadius * (1 - cos(phi))));
     x = x + m_position.x;
 
-    double y = getDistribution(m_sourceHeight);
+    double y = getNormalFromRange(m_sourceHeight);
     y = y + m_position.y;
 
     double z = sign * ((m_bendingRadius*1000 - x1) * sin(phi));
