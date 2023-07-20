@@ -174,7 +174,7 @@ void BufferHandler::readBufferRaw(const char* bufname, char* outdata, const VkQu
     while (remainingBytes > 0) {
         size_t localBytes = std::min((size_t)m_StagingSize, remainingBytes);
         gpuMemcpy(*m_StagingBuffer, 0, *m_Buffers[bufname], offset, localBytes);
-        m_TransferFence->wait();
+        m_TransferFence->waitAndReset();
         loadFromStagingBuffer(outdata + offset, localBytes);
         offset += localBytes;
         remainingBytes -= localBytes;
@@ -200,7 +200,7 @@ void BufferHandler::writeBufferRaw(const char* bufname, char* indata) {
         gpuMemcpy(*buffer, offset, *m_StagingBuffer, 0, localBytes);
         offset += localBytes;
         remainingBytes -= localBytes;
-        m_TransferFence->wait();
+        m_TransferFence->waitAndReset();
     }
 }
 

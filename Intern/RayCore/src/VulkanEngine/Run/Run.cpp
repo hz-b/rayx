@@ -65,32 +65,40 @@ std::vector<std::vector<Ray>> VulkanEngine::run(VulkanEngineRunSpec_t spec) {
     updateAllDescriptorSets();
 
     std::vector<std::vector<Ray>> _checkpoints;
-
-    // TODO (OS) : Maybe move this out of VulkanEngine.Run
+    auto push0 = m_computePasses[0]->getPass()[0]->m_pushConstant.getActualPushConstant<PushConstants_t>();
+    // TODO(OS): Maybe move this out of VulkanEngine.Run
     for (int i = 0; i < maxBounces; i++) {
         // Update PushConstant content
-        auto push = m_computePasses[0]->getPass()[0]->m_pushConstant.getActualPushConstant<PushConstants_t>();
-        push->i_bounce = i;
+        push0->i_bounce = i;
 
         recordSimpleTraceCommand("singleTracePass", m_CommandBuffers[0], 0);
         submitCommandBuffer(0);
-
-        VK_CHECK_RESULT(m_Fences.compute->wait())  // FIXME: Can be solved by another memory barrier in CommandBuffer
+        VK_CHECK_RESULT(m_Fences.compute->waitAndReset())  // FIXME: Can be solved by another memory barrier in CommandBuffer
 
         auto rayOut = m_BufferHandler->readBuffer<Ray>("ray-buffer", true);
         auto rayMeta = m_BufferHandler->readBuffer<RayMeta>("ray-meta-buffer", true);
 
-#ifdef RAYX_DEBUG
-        //printRayStats(rayOut);
-#endif
-
         _checkpoints.push_back(rayOut);
+
+        printRayStats(rayOut);
 
         if (allFinalized(rayMeta)) {  // Are all rays finished?
             RAYX_VERB << "All finalized";
             break;
         }
     }
+
+    auto push1 = m_computePasses[1]->getPass()[0]->m_pushConstant.getActualPushConstant<PushConstants_t>();
+    push1->i_bounce = push0->i_bounce;
+
+    recordSimpleTraceCommand("finalCollisionPass", m_CommandBuffers[0], 0);
+    submitCommandBuffer(0);
+    VK_CHECK_RESULT(m_Fences.compute->waitAndReset())
+    auto rayOut = m_BufferHandler->readBuffer<Ray>("ray-buffer", true);
+    RAYX_D_LOG << "Last:";
+    printRayStats(rayOut);
+    _checkpoints.push_back(rayOut);
+
     m_runs++;
     m_state = EngineStates_t::POSTRUN;
     return _checkpoints;

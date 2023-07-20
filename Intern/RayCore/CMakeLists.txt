@@ -112,6 +112,7 @@ target_include_directories(${PROJECT_NAME}
 set(SHADER_SOURCES_DIR ${RayCore_SOURCE_DIR}/src/Tracer/shader)
 
 set(SHADER_SOURCES
+    finalCollision.comp
     singleBounce.comp)
 
 if(NOT VULKAN STREQUAL "NO")

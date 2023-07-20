@@ -132,12 +132,6 @@ void takeSnapshot(Ray r, double w) {
     }
     _ray = r;
     _ray.m_weight = w;
-
-#ifdef GLSL
-    if (uint(gl_GlobalInvocationID) == 10 || uint(gl_GlobalInvocationID) == 259) {
-        debugPrintfEXT("GPU :(%d) %d\n", uint(gl_GlobalInvocationID), int(_ray.m_weight));
-    }
-#endif
     return;
 }
 
@@ -172,76 +166,21 @@ void takeFinalSnapshot(Ray r, double w) {
 /**************************************************************
  *                    MAIN
  **************************************************************/
-
-// @brief: Dynamic ray tracing: check which ray hits which element first. **This happens for only bounce**
-// in this function we need to make sure that rayData ALWAYS remains in GLOBAL coordinates (it can be changed in a function but needs to be changed
-// back before the function returns to this function)
 void main() {
     if (_rayMeta.finalized) {
         return;  // RETURN FINALIZED
     }
-    _ray.m_weight = W_UNINIT;
 
     if (pushConstants.i_bounce != 0) {
         _ray.m_position = _rayMeta.worldPosition;
         _ray.m_direction = _rayMeta.worldDirection;
     }
 
-    Collision col = findCollision();
-
-    if (!col.found) {
-        // no element was hit.
-        // Ray is considered to move forward to inf.
-        // This is the only constellation in which a snapshot is in world coordinates.
+    // Make final check on ray
+    // placeholder, info should later be transfered to shader
+    if (findCollision().found) {
+        takeFinalSnapshot(_ray, W_NOT_ENOUGH_BOUNCES);
+    } else {
         takeFinalSnapshot(_ray, W_FLY_OFF);
-        return;  // RETURN "EMPTY"
     }
-
-    // transform ray and intersection point in ELEMENT coordiantes
-    Element nextElement = elements[col.elementIndex];
-    Ray elem_ray = rayMatrixMult(_ray, nextElement.m_inTrans);
-
-    // Calculate interaction(reflection, material, absorption etc.) of ray with detected next element
-    int btype = int(nextElement.m_behaviour.m_type);
-    uint64_t ctr = _rayMeta.ctr;
-
-    elem_ray.m_pathLength += length(elem_ray.m_position - col.hitpoint);
-    elem_ray.m_position = col.hitpoint;
-    elem_ray.m_lastElement = col.elementIndex + 1;  // TODO remove this "+1", element ids should consistently start at 0.
-
-#ifdef GLSL
-    if (uint(gl_GlobalInvocationID) == 10) {
-        debugPrintfEXT("GPU i. %d \n", pushConstants.i_bounce);
-        debugPrintfEXT("GPU type. %d \n", btype);
-    }
-#endif
-
-    switch (btype) {
-        case (BTYPE_MIRROR):
-            elem_ray = behaveMirror(elem_ray, col.elementIndex, ctr, col);
-            break;
-        case (BTYPE_GRATING):
-            elem_ray = behaveGrating(elem_ray, col.elementIndex, ctr, col);
-            break;
-        case (BTYPE_SLIT):
-            elem_ray = behaveSlit(elem_ray, col.elementIndex, ctr, col);
-            break;
-        case (BTYPE_RZP):
-            elem_ray = behaveRZP(elem_ray, col.elementIndex, ctr, col);
-            break;
-        case (BTYPE_IMAGE_PLANE):
-            elem_ray = behaveImagePlane(elem_ray, col.elementIndex, col);
-            break;
-    }
-
-    // the ray might finalize due to being absorbed, or because an error occured while tracing!
-    if (_rayMeta.finalized) {
-        return;  // RETURN FINALIZED
-    }
-
-    takeSnapshot(elem_ray, W_JUST_HIT_ELEM);
-
-    // transform back to WORLD coordinates
-    _rayMeta.worldPosition = dvec3(nextElement.m_outTrans * dvec4(elem_ray.m_position, 1));
-    _rayMeta.worldDirection = dvec3(nextElement.m_outTrans * dvec4(elem_ray.m_direction, 0));
 }

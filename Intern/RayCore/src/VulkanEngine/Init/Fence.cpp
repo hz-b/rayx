@@ -16,7 +16,7 @@ Fence::Fence(VkDevice& device) : device(device) {
 
 // Timeout : DEFAULT_TIMEOUT (1s)
 // Fence is usable again after this call.
-VkResult Fence::wait() {
+VkResult Fence::waitAndReset() {
     auto res = vkWaitForFences(device, 1, &f, VK_TRUE, DEFAULT_TIMEOUT);
     res = vkResetFences(device, 1, &f);
     return res;

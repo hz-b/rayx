@@ -7,7 +7,7 @@ class Fence {
     Fence(VkDevice& device);
     ~Fence();
     VkFence* fence();
-    VkResult wait();
+    VkResult waitAndReset();
     VkResult forceReset();
 
   private:
