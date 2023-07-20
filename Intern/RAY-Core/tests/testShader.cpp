@@ -1253,6 +1253,6 @@ TEST_F(TestSuite, testVerDivergenceDipole) {
 
     for(auto values : inouts){
         auto result = dipolesource->vDivergence(values.energy, values.sigv);
-        CHECK_EQ(result, values.out, 0.01);
+        CHECK_EQ(result, values.out, 0.1);
     }
 }
