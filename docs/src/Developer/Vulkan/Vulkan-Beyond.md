@@ -4,10 +4,10 @@
 _Please note that this page has been written from a Vulkan beginner's perspective. All information and facts are bound to change and tend to be misleading at times._
 
 # Introduction
-We have followed an extensive research on RAY-X Execution Model on the GPU side and found plenty of rabbit holes and possible bottlenecks that might lead to future misbehaviours or loss in performance. In this blog-like post, we explain some of the mentioned issues and possible solutions to overcome them. When needed, this post can be a starting point to a code refraction in RAY-X.
+We have followed an extensive research on rayx Execution Model on the GPU side and found plenty of rabbit holes and possible bottlenecks that might lead to future misbehaviours or loss in performance. In this blog-like post, we explain some of the mentioned issues and possible solutions to overcome them. When needed, this post can be a starting point to a code refraction in rayx.
 
 ## What is Vulkan?
-The GPU is a massive die on Chip that has plenty of processing cores (Similar to a CPU Core but only with very basic Arithmetic Operations FP/INT32). The GPU excels in SIMD (Single Instrct. Multiple Data) operations. It is basically a huge parallel machine that tries to execute the same operation (Pixel coloring, coordinate calculation etc.) on a wide range of data. For this purpose, GPUs are used in a more abstract field other than simply "graphics"; General Purpose Compute on GPU (GPGPU), which is mainly what RAY-X on Vulkan relies on. Vulkan? WHO?
+The GPU is a massive die on Chip that has plenty of processing cores (Similar to a CPU Core but only with very basic Arithmetic Operations FP/INT32). The GPU excels in SIMD (Single Instrct. Multiple Data) operations. It is basically a huge parallel machine that tries to execute the same operation (Pixel coloring, coordinate calculation etc.) on a wide range of data. For this purpose, GPUs are used in a more abstract field other than simply "graphics"; General Purpose Compute on GPU (GPGPU), which is mainly what rayx on Vulkan relies on. Vulkan? WHO?
 
 Nvidia and AMD are the main GPU manufacturers. As both GPU architectures slightly differ and Nvidia ... isn't a fan of open-source... we decided to use an All-in-One compatible tool to talk to the GPU. *Enter Vulkan*. A "new" API used to control the GPU for all (Not really, we'll talk about this later) purposes developed to compete against OpenGL and alike. But most of all, open-source! Vulkan is increasingly gaining popularity and is the new state of the art for developing GPU Solutions. However it is the most NOT beginner-friendly API that you can learn. Vulkan is created to give the user the uttermost control over hardware at the price of complexity and low-level execution. It can be very fast and performant but to reach that level you need to cover all aspects and gotchas that vulkan(the dev) might fall into.
 
@@ -47,7 +47,7 @@ If the code to be executed has if clauses then some threads inside the warp have
 
 # The current Vulkan Execution Pipeline
 ## vkDispatch()
-The current RAY-X Tracer uses 1 Vulkan Pipeline consisting of 1 Shader Module. The Shader module is dispatched once with the amount of needed threads (Rays) through 1 Compute Queue and the GPU would handle the rest. 
+The current rayx Tracer uses 1 Vulkan Pipeline consisting of 1 Shader Module. The Shader module is dispatched once with the amount of needed threads (Rays) through 1 Compute Queue and the GPU would handle the rest. 
 
 ![image0](/docs/src/res/vulkan-beyond0.png)
 
@@ -70,10 +70,10 @@ The divergence and the need to schedule each divergence is a waste of SMs. Our m
 One thing to consider is that usually most ray bundles react the same way in very small finite surfaces. The divergence only happens at the extremeties of said surfaces/objects or wasteboxes. 
 
 ### Creating Shader Modules
-To create a pipeline for anything-vulkan, we need to first upload the shader code to the GPU. The shader code is created inside a shader module with the main function as it's entry point. The GLSL code files in RAY-X are all packed together and uploaded once. This bundle is too big for standard shader codes and it causes setup speed-loss as vulkan usually hangs in this step waiting for all instructions to be streamed to the GPU. 
+To create a pipeline for anything-vulkan, we need to first upload the shader code to the GPU. The shader code is created inside a shader module with the main function as it's entry point. The GLSL code files in rayx are all packed together and uploaded once. This bundle is too big for standard shader codes and it causes setup speed-loss as vulkan usually hangs in this step waiting for all instructions to be streamed to the GPU. 
 
 ## Nsight Graphics Metrics
-Nvidia Nsight Graphics is a developer profiling tool that can run GPU Traces (And many other Profiling traces). It supports Vulkan natively which makes it the perfect candidate. The only problem is that RAY-X still does not have a Vulkan Window as we only do compute. So Nsight Graphics is very limited and cannot catch "frames" for tracing. The GPU Trace produces a resource usage timeline and can also name the possible bottlenecks and reasons for low throughput if any. So what does Nsight Graphics say about RAY-X Application?
+Nvidia Nsight Graphics is a developer profiling tool that can run GPU Traces (And many other Profiling traces). It supports Vulkan natively which makes it the perfect candidate. The only problem is that rayx still does not have a Vulkan Window as we only do compute. So Nsight Graphics is very limited and cannot catch "frames" for tracing. The GPU Trace produces a resource usage timeline and can also name the possible bottlenecks and reasons for low throughput if any. So what does Nsight Graphics say about rayx Application?
 
 ### Metrics 
 Well, not good stuff.. 

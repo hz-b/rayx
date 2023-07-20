@@ -1,10 +1,10 @@
 # Approximation of Ray Object Intersection in the Case of Quadric Surfaces
 
-The following illustration intends to aid your intuition concerning the intersection point calculation for rays. Quadrics in Ray-X have the origin \\((0, 0, 0)\\) in the object coordinate system. 
+The following illustration intends to aid your intuition concerning the intersection point calculation for rays. Quadrics in rayx have the origin \\((0, 0, 0)\\) in the object coordinate system. 
 
 ## Geometric Shape of Objects
 
-Beamline objects in Ray-X can have the following shapes:
+Beamline objects in rayx can have the following shapes:
 
 - Rectangle
 - Ellipse

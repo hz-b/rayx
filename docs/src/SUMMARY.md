@@ -6,9 +6,10 @@
     - [How to use TerminalApp](./App/How-to-use-the-TerminalApp.md)
     - [Literature](./App/Literature.md)
 
-- [API  Area](./API/API.md)
-    - [How to use RayCore](./API/How-to-use-RayCore.md)
-    - [RAY-X Profiling](./API/RAYX-Profiling.md)
+- [API](./API/API.md)
+    - [How to use RayCore](./API/How-to-use-rayx-core.md)
+    - [Rayx Profiling](./API/Rayx-Profiling.md)
+    - [How to use Doxygen](./API/How-to-use-Doxygen.md)
     - [Object Coordinate System](./API/Object-Coordinate-System.md)
     - [User vs Model Parameter](./API/User-vs-Model-Parameter.md)
     - [Ray generation](./API/Ray-generation.md)

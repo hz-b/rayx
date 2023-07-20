@@ -1,8 +1,8 @@
 
-RAY-X uses a number of languages but mainly C++ and GLSL. 
+Rayx uses a number of languages but mainly C++ and GLSL. 
 
 # Debugging the application's C++
-If you are using VS Code, you may create a new Debugging Setting to launch RAY-X through gdb. [More here](https://code.visualstudio.com/Docs/editor/debugging)
+If you are using VS Code, you may create a new Debugging Setting to launch rayx through gdb. [More here](https://code.visualstudio.com/Docs/editor/debugging)
 
 Once the setting file (launch.json) is ready, you can change and add arguments for VSCode/gdb to parse. 
 - set "program" : "${workspaceFolder}/build/bin/TerminalApp" (For TerminalApp)

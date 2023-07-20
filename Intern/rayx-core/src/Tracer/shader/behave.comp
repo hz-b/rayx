@@ -1,0 +1,144 @@
+/// Each `behave*` function gets a `Ray r` (in element-coords), the element itself, a randomness counter and the `Collision col`.
+/// `col.hitpoint` expresses where the given ray r will hit the element (in element-coords).
+/// `col.normal` expresses the normal of the surface, at `col.hitpoint` (in element-coords).
+/// The ray has already been moved to the hitpoint, and it's lastElement has been set accordingly.
+///
+/// The `behave*` functions, will
+/// - change the rays direction, typically by reflecting using the normal
+/// - change the rays stokes vector
+/// - potentially absorb the ray (by calling `recordFinalEvent(_, ETYPE_ABSORBED)`)
+
+Ray behaveSlit(Ray r, int id, RAYX_INOUT(uint64_t) ctr, ALLOW_UNUSED Collision col) {
+    SlitBehaviour b = deserializeSlit(elements[id].m_behaviour);
+    double xStop    = b.m_beamstopWidth / 2;
+    double yStop    = b.m_beamstopHeight / 2;
+
+    // slit lies in x-y plane instead of x-z plane as other elements
+    Cutout gapCut = b.m_gapCutout;
+    bool withinSlitBounds = inCutout(gapCut, r.m_position[0], r.m_position[1]);
+    bool outsideOfBeamstop = stopBox(r.m_position[0], r.m_position[1], xStop, yStop);
+
+    if (!withinSlitBounds || !outsideOfBeamstop) {
+        recordFinalEvent(r, ETYPE_ABSORBED);
+        return r;
+    }
+
+    double psi        = -r8_asin(r.m_direction.y);
+    double phi        = r8_asin(r.m_direction.x / r8_cos(psi));
+    double dPhi     = 0;
+    double dPsi     = 0;
+    double wavelength = hvlam(r.m_energy);
+
+    // this was previously called "diffraction"
+    if (wavelength > 0) {
+        if (gapCut.m_type == CTYPE_RECT) {
+            RectCutout r = deserializeRect(gapCut);
+            fraun_diff(r.m_size_x1, wavelength, dPhi, ctr);
+            fraun_diff(r.m_size_x2, wavelength, dPsi, ctr);
+        } else if (gapCut.m_type == CTYPE_ELLIPTICAL) {
+            EllipticalCutout e = deserializeElliptical(gapCut);
+            // TODO why m_diameter_x2 and not m_diameter_x1?
+            bessel_diff(e.m_diameter_x2, wavelength, dPhi, dPsi, ctr);
+        } else {
+            throw("encountered Slit with unsupported gapCutout");
+        }
+    }
+
+    phi = phi + dPhi;
+    psi = psi + dPsi;
+
+    // new direction from angles
+    cosini(r, phi, psi);
+
+    r.m_order = 0;
+    return r;
+}
+
+Ray behaveRZP(Ray r, int id, RAYX_INOUT(uint64_t) ctr, Collision col) {
+    RZPBehaviour b = deserializeRZP(elements[id].m_behaviour);
+
+    dvec4 normal = dvec4(col.normal, 0);
+
+    double WL            = hvlam(r.m_energy);
+    double Ord           = b.m_orderOfDiffraction;
+    int additional_order = int(b.m_additionalOrder);
+
+    // calculate the RZP line density for the position of the intersection on the RZP
+    double DX, DZ;
+    RZPLineDensity(r, normal, b, DX, DZ);
+
+    // tanger/slope Error
+    SlopeError slope_error = elements[id].m_slopeError;;
+    normal = tanger(normal, slope_error.m_sag, slope_error.m_mer, 0, ctr);
+
+    // if additional zero order should be behaved, approx. half of the rays are randomly chosen to be behaved in order 0 (= ordinary reflection) instead
+    // of the given order
+    if (additional_order == 1) {
+        if (squaresDoubleRNG(ctr) > 0.5) Ord = 0;
+    }
+
+    // only 2D case, not 2 1D gratings with 90 degree rotation as in old RAY
+    double az = WL * DZ * Ord * 1e-6;
+    double ax = WL * DX * Ord * 1e-6;
+    r         = refrac2D(r, normal, az, ax);
+
+    r.m_order = Ord;
+    return r;
+}
+
+Ray behaveGrating(Ray r, int id, RAYX_INOUT(uint64_t) ctr, Collision col) {
+    dvec4 normal = dvec4(col.normal, 0);
+
+    GratingBehaviour b = deserializeGrating(elements[id].m_behaviour);
+
+    // modify normal according to slope error
+    SlopeError slope_error = elements[id].m_slopeError;;
+    normal = tanger(normal, slope_error.m_sag, slope_error.m_mer, 0, ctr);
+
+    // vls parameters passed in q.elementParams
+    double WL                 = hvlam(r.m_energy);
+    double lineDensity        = b.m_lineDensity;
+    double orderOfDiffraction = b.m_orderOfDiffraction;
+
+    // linedensity = WL * default_linedensity * order * 1e-06
+    double linedensity = vlsGrating(lineDensity, r.m_position.z, b.m_vls) * WL * orderOfDiffraction * 1e-06;
+    r.m_order            = orderOfDiffraction;
+    // no additional zero order here?
+
+    // refraction
+    r = refrac(r, normal, linedensity);
+
+    return r;
+}
+
+Ray behaveMirror(Ray r, int id, RAYX_INOUT(uint64_t) ctr, Collision col) {
+    // calculate intersection point and normal at intersection point
+    dvec4 normal = dvec4(col.normal, 0);
+    double azimuthal_angle = elements[id].m_azimuthalAngle;
+
+    // take the slope error into account for the normal
+    SlopeError slope_error = elements[id].m_slopeError;;
+    normal = tanger(normal, slope_error.m_sag, slope_error.m_mer, 0, ctr);
+
+    // calculate the new direction after the reflection
+    r.m_direction = dvec3(reflect(dvec4(r.m_direction, 0), normal));
+
+    double real_S, real_P, delta;
+    double incidence_angle = getIncidenceAngle(r, normal);  // getTheta
+    int mat = int(elements[id].m_material);
+    if (mat != -2) {
+        efficiency(r, real_S, real_P, delta, incidence_angle, mat);
+
+        bool absorbed = update_stokes(r, real_S, real_P, delta, azimuthal_angle, ctr);
+        if (absorbed) {
+            recordFinalEvent(r, ETYPE_ABSORBED);
+        }
+        r.m_order = 0;
+    }
+    return r;
+}
+
+Ray behaveImagePlane(Ray r, ALLOW_UNUSED int id, ALLOW_UNUSED Collision col) {
+    // doesn't need to do anything.
+    return r;
+}

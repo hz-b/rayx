@@ -1,11 +1,11 @@
-# TerminalApp 
+# TerminalApp
 After a successful build, type `-h` or `--help` for a summary of all known commands.
 
 > Hint: `-c` or `--command` are accepted. But `-command` can result in errors.
 
 ```
-Terminal Application for RAY-X
-Usage: ./TerminalApp [OPTIONS]
+Terminal application for rayx
+Usage: ./RAY-CLI [OPTIONS]
 
 Options:
   -h,--help                   Print this help message and exit

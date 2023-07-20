@@ -1,6 +1,6 @@
 # APP Area
 
-RAY-X is a simulation software for scientific work on beamlines in electron storage rings.
+Rayx is a simulation software for scientific work on beamlines in electron storage rings.
 In this part of the documentation you will find everything you need to know about:
 - How to use the application
 - What to do if you encounter errors

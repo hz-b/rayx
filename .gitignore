@@ -4,7 +4,8 @@
 bin/
 bin-int/
 build/
-Intern/RayCore/doc/*/
+Intern/rayx-core/doc/*/
+Intern/rayx-core/tests/output/**
 out/
 
 # Files
@@ -20,3 +21,6 @@ out/
 /Tests/.ipynb_checkpoints/*
 CMakeCache.txt
 cmake.check_cache
+
+#VSCode Debugger files
+**/results.json

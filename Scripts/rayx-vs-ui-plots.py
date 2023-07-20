@@ -10,14 +10,14 @@ import random
 cwd = os.getcwd()
 
 
-# This Script works only when you set the correct paths to RAY-UI and RAY-X
+# This Script works only when you set the correct paths to RAY-UI and rayx
 
 # add RML Files for testing here
 # These are the original RML Files to generate the randoms from.
 rmls = [tuple(['Ellips/test_0.rml', 'Ellips']),
         tuple(['Toroid/test_0.rml', 'Toroid'])]
 
-# MAKE SURE THAT RAY-X IS CORRECTLY BUILT
+# MAKE SURE THAT rayx IS CORRECTLY BUILT
 rayxdir = os.path.join(cwd, 'build/bin')
 
 # CHANGE HERE
@@ -114,7 +114,7 @@ if __name__ == '__main__':
     for i in trange(TRIALS):
         print(f'Generating new values..')
         _rml = change_value(root, xmlTree)
-        print(f'Running RAY-X...')
+        print(f'Running rayx...')
         ray_x_proc = subprocess.Popen(
             rayxdir+'/TerminalApp -i ' + _rml+' -p', shell=True, cwd=rayxdir, stdin=subprocess.PIPE)
         # ray_x_proc.wait()
