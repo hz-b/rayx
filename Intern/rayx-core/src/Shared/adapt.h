@@ -65,4 +65,9 @@ inline double mod(double x, double y) { return glm::mod(x, y); }
 inline double sign(double x) { return glm::sign(x); }
 #endif
 
+#ifndef GLSL
+inline double r8_sin(double x) { return std::sin(x); }
+inline double r8_cos(double x) { return std::cos(x); }
+#endif
+
 #endif

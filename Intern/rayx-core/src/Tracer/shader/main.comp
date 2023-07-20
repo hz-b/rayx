@@ -16,6 +16,7 @@
 
 #include "../../Shared/adapt.h"
 #include "../../Shared/Constants.h"
+#include "approx.comp"
 #include "../../Shared/Ray.h"
 #include "../../Shared/Element.h"
 
@@ -144,7 +145,6 @@ void recordFinalEvent(Ray r, double w) {
 
 // Order in #include is IMPROTANT, do not change.
 // clang-format off
-#include "approx.comp"
 #include "complex.comp"
 #include "random.comp"
 #include "utils.comp"

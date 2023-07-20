@@ -37,15 +37,6 @@ double Rad::sin() const { return std::sin(rad); }
 double Rad::cos() const { return std::cos(rad); }
 double Rad::tan() const { return std::tan(rad); }
 
-glm::dmat4x4 getRotationMatrix(double dpsi, double dphi, double dchi) {
-    RAYX_PROFILE_FUNCTION();
-    glm::dmat4x4 misalignmentMatrix = glm::dmat4x4(
-        cos(dphi) * cos(dchi), -cos(dpsi) * sin(dchi) - sin(dpsi) * sin(dphi) * cos(dchi), -sin(dpsi) * sin(dchi) + cos(dpsi) * sin(dphi) * cos(dchi),
-        0, sin(dchi) * cos(dphi), cos(dpsi) * cos(dchi) - sin(dpsi) * sin(dphi) * sin(dchi),
-        sin(dpsi) * cos(dchi) + cos(dpsi) * sin(dphi) * sin(dchi), 0, -sin(dphi), -sin(dpsi) * cos(dphi), cos(dpsi) * cos(dphi), 0, 0, 0, 0, 1);
-    return glm::transpose(misalignmentMatrix);
-}
-
 void printDMatrix(std::array<double, 4 * 4> matrix) {
     RAYX_PROFILE_FUNCTION();
     std::stringstream s;
