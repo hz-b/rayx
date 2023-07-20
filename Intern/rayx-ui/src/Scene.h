@@ -61,7 +61,7 @@ class Scene {
     void draw(VkCommandBuffer commandBuffer, Topography topography) const;
 
     const std::vector<Vertex>& getVertices() const { return m_vertices; }
-    const std::vector<uint16_t>& getIndices(Topography topography) const { return m_indices[topography]; }
+    const std::vector<uint32_t>& getIndices(Topography topography) const { return m_indices[topography]; }
     const size_t getIndexCount(Topography topography) const { return m_indices[topography].size(); }
     VkBuffer getVertexBuffer() const { return m_vertexBuffer->getBuffer(); }
     VkBuffer getIndexBuffer(Topography topography) const { return m_indexBuffers[topography]->getBuffer(); }
@@ -70,13 +70,13 @@ class Scene {
     Device& m_Device;
 
     std::vector<Vertex> m_vertices;
-    std::array<std::vector<uint16_t>, 2> m_indices;  // 0 = triangles, 1 = lines
+    std::array<std::vector<uint32_t>, 2> m_indices;  // 0 = triangles, 1 = lines
 
     std::unique_ptr<Buffer> m_vertexBuffer = nullptr;
     std::array<std::unique_ptr<Buffer>, 2> m_indexBuffers = {nullptr, nullptr};  // 0 = triangles, 1 = lines
 
-    uint16_t addVertex(const Vertex v, Topography topography);
-    std::optional<uint16_t> vertexExists(const Vertex v) const;
+    uint32_t addVertex(const Vertex v, Topography topography);
+    std::optional<uint32_t> vertexExists(const Vertex v) const;
 
     void createVertexBuffers();
     void createIndexBuffers();

@@ -10,19 +10,6 @@
 #include "Device.h"
 #include "Swapchain.h"
 
-struct CameraSettings {
-    float FOV = 90.0f;
-    glm::vec3 position = glm::vec3(0.0f, 0.0f, -2.0f);
-    glm::vec3 target = glm::vec3(0.0f, 0.0f, 0.0f);
-    glm::vec3 up = glm::vec3(0.0f, 1.0f, 0.0f);  // Add Up vector
-    float near = 0.1f;
-    float far = 100.0f;
-
-    glm::mat4 getViewMatrix() const { return glm::lookAt(position, target, up); }
-
-    glm::mat4 getProjectionMatrix(float aspectRatio) const { return glm::perspective(glm::radians(FOV), aspectRatio, near, far); }
-};
-
 class ImGuiLayer {
   public:
     ImGuiLayer(const Window& window, const Device& device, const SwapChain& swapchain);
@@ -35,7 +22,6 @@ class ImGuiLayer {
 
     VkCommandBuffer getCommandBuffer(uint32_t index) const { return m_CommandBuffers[index]; }
     VkClearValue getClearValue() const { return {m_ClearColor[0], m_ClearColor[1], m_ClearColor[2], m_ClearColor[3]}; }
-    CameraSettings getCameraSettings() const { return m_Camera; }
 
   private:
     const Window& m_Window;
@@ -51,8 +37,6 @@ class ImGuiLayer {
     VkCommandPool m_CommandPool;
     std::vector<VkCommandBuffer> m_CommandBuffers;
     ImGuiIO m_IO;
-
-    CameraSettings m_Camera;
 
     void createCommandPool();
     void createCommandBuffers(uint32_t cmdBufferCount);

@@ -29,17 +29,17 @@ void Scene::setup(const RAYX::RenderObjectVec& renderObjects, const RAYX::Bundle
     m_vertexBuffer->unmap();
 
     // Create the index buffers
-    m_indexBuffers[0] = std::make_unique<Buffer>(m_Device, sizeof(uint16_t), (uint32_t)m_indices[0].size(), VK_BUFFER_USAGE_INDEX_BUFFER_BIT,
+    m_indexBuffers[0] = std::make_unique<Buffer>(m_Device, sizeof(uint32_t), (uint32_t)m_indices[0].size(), VK_BUFFER_USAGE_INDEX_BUFFER_BIT,
                                                  VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT);
     m_indexBuffers[0]->map();
-    m_indexBuffers[0]->writeToBuffer(m_indices[0].data(), m_indices.size() * sizeof(uint16_t));
+    m_indexBuffers[0]->writeToBuffer(m_indices[0].data(), m_indices.size() * sizeof(uint32_t));
     m_indexBuffers[0]->flush();
     m_indexBuffers[0]->unmap();
 
-    m_indexBuffers[1] = std::make_unique<Buffer>(m_Device, sizeof(uint16_t), (uint32_t)m_indices[1].size(), VK_BUFFER_USAGE_INDEX_BUFFER_BIT,
+    m_indexBuffers[1] = std::make_unique<Buffer>(m_Device, sizeof(uint32_t), (uint32_t)m_indices[1].size(), VK_BUFFER_USAGE_INDEX_BUFFER_BIT,
                                                  VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT);
     m_indexBuffers[1]->map();
-    m_indexBuffers[1]->writeToBuffer(m_indices[1].data(), m_indices.size() * sizeof(uint16_t));
+    m_indexBuffers[1]->writeToBuffer(m_indices[1].data(), m_indices.size() * sizeof(uint32_t));
     m_indexBuffers[1]->flush();
     m_indexBuffers[1]->unmap();
 }
@@ -122,7 +122,7 @@ void Scene::bind(VkCommandBuffer commandBuffer, Topography topography) const {
 }
 
 // Function that adds vertex to scene if it doesn't exist, otherwise adds index of existing vertex
-uint16_t Scene::addVertex(const Vertex v, Topography topography) {
+uint32_t Scene::addVertex(const Vertex v, Topography topography) {
     auto index = vertexExists(v);
     if (index.has_value()) {
         m_indices[topography].push_back(index.value());
@@ -135,7 +135,7 @@ uint16_t Scene::addVertex(const Vertex v, Topography topography) {
 }
 
 // Function that returns index of vertex if it exists, otherwise returns none
-std::optional<uint16_t> Scene::vertexExists(const Vertex v) const {
+std::optional<uint32_t> Scene::vertexExists(const Vertex v) const {
     for (int i = 0; i < m_vertices.size(); i++) {
         if (m_vertices[i].pos == v.pos && m_vertices[i].color == v.color) {
             return i;

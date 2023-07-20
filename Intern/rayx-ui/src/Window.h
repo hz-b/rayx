@@ -22,13 +22,15 @@ class Window {
     void createSurface(VkInstance instance, VkSurfaceKHR* surface);
     bool shouldClose() const { return glfwWindowShouldClose(m_Window); }
 
-    bool m_framebufferResized = false;
+    bool wasWindowResized() { return m_framebufferResized; }
+    void resetWindowResizedFlag() { m_framebufferResized = false; }
 
   private:
-    static void framebufferResizeCallback(GLFWwindow* window, int width, int height);
+    static void framebufferResizeCallback(GLFWwindow* rawWindow, int width, int height);
 
     uint32_t m_width;
     uint32_t m_height;
+    bool m_framebufferResized = false;
     const char* m_title;
 
     GLFWwindow* m_Window;

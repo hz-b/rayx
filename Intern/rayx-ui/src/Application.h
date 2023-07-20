@@ -11,6 +11,7 @@
 #include "Descriptors.h"
 #include "GraphicsPipeline.h"
 #include "ImGuiLayer.h"
+#include "Renderer.h"
 #include "Scene.h"
 #include "Swapchain.h"
 #include "Tracer/Tracer.h"
@@ -48,22 +49,6 @@ const bool enableValidationLayers = true;
 //     std::vector<VkFramebuffer> framebuffers;
 // };
 
-struct Camera {
-    alignas(16) glm::mat4 model;
-    alignas(16) glm::mat4 view;
-    alignas(16) glm::mat4 proj;
-    alignas(4) float n;
-    alignas(4) float f;
-};
-
-struct FrameInfo {
-    uint32_t frameIndex;
-    float frameTime;
-    VkCommandBuffer commandBuffer;
-    Camera& camera;
-    VkDescriptorSet descriptorSet;
-};
-
 class Application {
   public:
     Application(uint32_t width, uint32_t height, const char* name);
@@ -78,41 +63,9 @@ class Application {
     // --- Order matters ---
     Window m_Window;
     Device m_Device;
-    SwapChain m_SwapChain;
-    ImGuiLayer m_ImGuiLayer;
+    Renderer m_Renderer;
 
     std::unique_ptr<DescriptorPool> m_DescriptorPool{nullptr};
     // ----------------------
     Scene m_Scene;
-
-    uint32_t m_CurrentFrame = 0;
-
-    // TODO: remove
-    std::unique_ptr<DescriptorSetLayout> m_DescriptorSetLayout;
-
-    VkPipelineLayout m_TrianglePipelineLayout;
-    VkPipelineLayout m_LinePipelineLayout;
-    VkPipelineLayout m_GridPipelineLayout;
-
-    std::unique_ptr<GraphicsPipeline> m_TrianglePipeline;
-    std::unique_ptr<GraphicsPipeline> m_LinePipeline;
-    std::unique_ptr<GraphicsPipeline> m_GridPipeline;
-
-    std::vector<VkCommandBuffer> m_CommandBuffers;
-
-    std::vector<VkDescriptorSet> m_DescriptorSets;
-    std::unique_ptr<VertexBuffer> m_VertexBuffer;
-
-    void initVulkan();
-
-    void createGraphicsPipelineLayouts();
-    void createGraphicsPipelines();
-
-    void createBuffer(VkDeviceSize size, VkBufferUsageFlags usage, VkMemoryPropertyFlags properties, VkBuffer& buffer, VkDeviceMemory& bufferMemory);
-    void copyBuffer(VkBuffer srcBuffer, VkBuffer dstBuffer, VkDeviceSize size);
-
-    void createCommandBuffers();
-    void recordCommandBuffer(VkCommandBuffer commandBuffer, uint32_t imageIndex);
-
-    void drawFrame();
 };

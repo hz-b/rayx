@@ -14,6 +14,7 @@ class SwapChain {
     static constexpr int MAX_FRAMES_IN_FLIGHT = 2;
 
     SwapChain(Device& deviceRef, VkExtent2D windowExtent);
+    SwapChain(Device& deviceRef, VkExtent2D windowExtent, std::shared_ptr<SwapChain> previous);
     ~SwapChain();
 
     SwapChain(const SwapChain&) = delete;
@@ -32,9 +33,12 @@ class SwapChain {
     VkFormat findDepthFormat();
 
     VkResult acquireNextImage(uint32_t* imageIndex);
-    VkResult submitCommandBuffers(const VkCommandBuffer* buffers, uint32_t* imageIndex);
+    VkResult submitCommandBuffers(const VkCommandBuffer* buffers, uint32_t* imageIndex);  // TODO: imageIndex -> why ptr?
+
+    bool compareSwapFormats(const SwapChain& other) const { return other.m_DepthFormat == m_DepthFormat && other.m_ImageFormat == m_ImageFormat; }
 
   private:
+    void init();
     void createSwapChain();
     void createImageViews();
     void createDepthResources();
@@ -48,6 +52,7 @@ class SwapChain {
     VkExtent2D chooseSwapExtent(const VkSurfaceCapabilitiesKHR& capabilities);
 
     VkFormat m_ImageFormat;
+    VkFormat m_DepthFormat;
     VkExtent2D m_Extent;
 
     std::vector<VkFramebuffer> m_framebuffers;
@@ -63,6 +68,7 @@ class SwapChain {
     VkExtent2D m_WindowExtent;
 
     VkSwapchainKHR m_SwapChain;
+    std::shared_ptr<SwapChain> m_oldSwapChain;
 
     std::vector<VkSemaphore> m_imageAvailableSemaphores;
     std::vector<VkSemaphore> m_renderFinishedSemaphores;

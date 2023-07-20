@@ -7,40 +7,6 @@ void checkVkResult(VkResult result, const char* message) {
     }
 }
 
-VkCommandBuffer beginSingleTimeCommands(VkDevice device, VkCommandPool commandPool) {
-    VkCommandBufferAllocateInfo allocInfo{};
-    allocInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
-    allocInfo.commandPool = commandPool;
-    allocInfo.level = VK_COMMAND_BUFFER_LEVEL_PRIMARY;
-    allocInfo.commandBufferCount = 1;
-
-    VkCommandBuffer commandBuffer;
-    checkVkResult(vkAllocateCommandBuffers(device, &allocInfo, &commandBuffer), "Failed to allocate command buffers!");
-
-    VkCommandBufferBeginInfo beginInfo{};
-    beginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
-    beginInfo.flags = VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT;
-
-    checkVkResult(vkBeginCommandBuffer(commandBuffer, &beginInfo), "Failed to begin command buffer!");
-
-    return commandBuffer;
-}
-
-void endSingleTimeCommands(VkDevice device, VkCommandPool commandPool, VkQueue graphicsQueue, VkCommandBuffer commandBuffer) {
-    vkEndCommandBuffer(commandBuffer);
-
-    VkSubmitInfo submitInfo{};
-    submitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
-    submitInfo.commandBufferCount = 1;
-    submitInfo.pCommandBuffers = &commandBuffer;
-
-    checkVkResult(vkQueueSubmit(graphicsQueue, 1, &submitInfo, VK_NULL_HANDLE), "Failed to submit queue!");
-
-    vkQueueWaitIdle(graphicsQueue);
-
-    vkFreeCommandBuffers(device, commandPool, 1, &commandBuffer);
-}
-
 ImGuiLayer::ImGuiLayer(const Window& window, const Device& device, const SwapChain& swapchain)
     : m_Window(window), m_Device(device), m_SwapChain(swapchain) {
     // Create descriptor pool for IMGUI
@@ -134,9 +100,9 @@ ImGuiLayer::ImGuiLayer(const Window& window, const Device& device, const SwapCha
 
     // Upload fonts
     {
-        auto tmpCommandBuffer = beginSingleTimeCommands(m_Device.device(), m_CommandPool);
+        auto tmpCommandBuffer = m_Device.beginSingleTimeCommands();
         ImGui_ImplVulkan_CreateFontsTexture(tmpCommandBuffer);
-        endSingleTimeCommands(m_Device.device(), m_CommandPool, m_Device.graphicsQueue(), tmpCommandBuffer);
+        m_Device.endSingleTimeCommands(tmpCommandBuffer);
         ImGui_ImplVulkan_DestroyFontUploadObjects();
     }
 }
@@ -168,18 +134,18 @@ void ImGuiLayer::updateImGui() {
         ImGui::ColorEdit3("Color", (float*)&m_ClearColor);  // Edit 3 floats representing a color
 
         ImGui::Text("Camera");
-        ImGui::SliderFloat("FOV", &m_Camera.FOV, 0.0f, 180.0f);
-        ImGui::SliderFloat("Target X", &m_Camera.target.x, -10.0f, 10.0f);
-        ImGui::SliderFloat("Target Y", &m_Camera.target.y, -10.0f, 10.0f);
-        ImGui::SliderFloat("Target Z", &m_Camera.target.z, -10.0f, 10.0f);
-        ImGui::SliderFloat("Position X", &m_Camera.position.x, -10.0f, 10.0f);
-        ImGui::SliderFloat("Position Y", &m_Camera.position.y, -10.0f, 10.0f);
-        ImGui::SliderFloat("Position Z", &m_Camera.position.z, -10.0f, 10.0f);
-        ImGui::SliderFloat("Up X", &m_Camera.up.x, -1.0f, 1.0f);  // Slider for Up vector x-coordinate
-        ImGui::SliderFloat("Up Y", &m_Camera.up.y, -1.0f, 1.0f);  // Slider for Up vector y-coordinate
-        ImGui::SliderFloat("Up Z", &m_Camera.up.z, -1.0f, 1.0f);  // Slider for Up vector z-coordinate
-        ImGui::SliderFloat("Near", &m_Camera.near, 0.0f, 100.0f);
-        ImGui::SliderFloat("Far", &m_Camera.far, 0.0f, 10000.0f);
+        // ImGui::SliderFloat("FOV", &m_Camera.FOV, 0.0f, 180.0f);
+        // ImGui::SliderFloat("Target X", &m_Camera.target.x, -10.0f, 10.0f);
+        // ImGui::SliderFloat("Target Y", &m_Camera.target.y, -10.0f, 10.0f);
+        // ImGui::SliderFloat("Target Z", &m_Camera.target.z, -10.0f, 10.0f);
+        // ImGui::SliderFloat("Position X", &m_Camera.position.x, -10.0f, 10.0f);
+        // ImGui::SliderFloat("Position Y", &m_Camera.position.y, -10.0f, 10.0f);
+        // ImGui::SliderFloat("Position Z", &m_Camera.position.z, -10.0f, 10.0f);
+        // ImGui::SliderFloat("Up X", &m_Camera.up.x, -1.0f, 1.0f);  // Slider for Up vector x-coordinate
+        // ImGui::SliderFloat("Up Y", &m_Camera.up.y, -1.0f, 1.0f);  // Slider for Up vector y-coordinate
+        // ImGui::SliderFloat("Up Z", &m_Camera.up.z, -1.0f, 1.0f);  // Slider for Up vector z-coordinate
+        // ImGui::SliderFloat("Near", &m_Camera.near, 0.0f, 100.0f);
+        // ImGui::SliderFloat("Far", &m_Camera.far, 0.0f, 10000.0f);
 
         if (ImGui::Button("Button"))  // Buttons return true when clicked (most widgets return true when edited/activated)
             counter++;

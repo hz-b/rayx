@@ -9,7 +9,15 @@
 #include <set>
 #include <stdexcept>
 
-SwapChain::SwapChain(Device& deviceRef, VkExtent2D extent) : m_Device{deviceRef}, m_WindowExtent{extent} {
+SwapChain::SwapChain(Device& deviceRef, VkExtent2D extent) : m_Device{deviceRef}, m_WindowExtent{extent} { init(); }
+
+SwapChain::SwapChain(Device& deviceRef, VkExtent2D extent, std::shared_ptr<SwapChain> previous)
+    : m_Device{deviceRef}, m_WindowExtent{extent}, m_oldSwapChain{previous} {
+    init();
+    m_oldSwapChain = nullptr;
+}
+
+void SwapChain::init() {
     createSwapChain();
     createImageViews();
     createRenderPass();
@@ -147,7 +155,7 @@ void SwapChain::createSwapChain() {
     createInfo.presentMode = presentMode;
     createInfo.clipped = VK_TRUE;
 
-    createInfo.oldSwapchain = VK_NULL_HANDLE;
+    createInfo.oldSwapchain = m_oldSwapChain == nullptr ? VK_NULL_HANDLE : m_oldSwapChain->m_SwapChain;
 
     if (vkCreateSwapchainKHR(m_Device.device(), &createInfo, nullptr, &m_SwapChain) != VK_SUCCESS) {
         throw std::runtime_error("failed to create swap chain!");
@@ -266,6 +274,7 @@ void SwapChain::createFramebuffers() {
 
 void SwapChain::createDepthResources() {
     VkFormat depthFormat = findDepthFormat();
+    m_DepthFormat = depthFormat;
     VkExtent2D swapChainExtent = getExtent();
 
     m_depthImages.resize(imageCount());
