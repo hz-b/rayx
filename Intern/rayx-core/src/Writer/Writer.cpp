@@ -1,4 +1,5 @@
 #include "Writer.h"
+#include <sstream>
 
 #include "Debug/Debug.h"
 

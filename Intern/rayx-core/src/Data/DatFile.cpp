@@ -2,6 +2,7 @@
 
 #include <fstream>
 #include <iostream>
+#include <sstream> 
 
 #include "Debug/Debug.h"
 #include "Random.h"
