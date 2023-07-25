@@ -15,7 +15,6 @@
 #include "Scene.h"
 #include "Swapchain.h"
 #include "Tracer/Tracer.h"
-#include "VertexBuffer.h"
 #include "Window.h"
 
 const std::vector<const char*> validationLayers = {"VK_LAYER_KHRONOS_validation"};

@@ -16,7 +16,8 @@ struct SimplePushConstantData {
     glm::mat4 normalMatrix{1.f};
 };
 
-TriangleRenderSystem::TriangleRenderSystem(Device& device, VkRenderPass renderPass, VkDescriptorSetLayout globalSetLayout) : m_Device{device} {
+TriangleRenderSystem::TriangleRenderSystem(Device& device, Scene& scene, VkRenderPass renderPass, VkDescriptorSetLayout globalSetLayout)
+    : m_Device{device}, m_Scene{scene} {
     createPipelineLayout(globalSetLayout);
     createPipeline(renderPass);
 }
@@ -49,25 +50,15 @@ void TriangleRenderSystem::createPipeline(VkRenderPass renderPass) {
     GraphicsPipeline::defaultPipelineConfigInfo(pipelineConfig);
     pipelineConfig.renderPass = renderPass;
     pipelineConfig.pipelineLayout = pipelineLayout;
-    m_Pipeline = std::make_unique<GraphicsPipeline>(m_Device, "shaders/vert.spv", "shaders/frag.spv", pipelineConfig);
+    m_Pipeline = std::make_unique<GraphicsPipeline>(m_Device, "../../../Intern/rayx-ui/src/Shaders/vert.spv",
+                                                    "../../../Intern/rayx-ui/src/Shaders/frag.spv", pipelineConfig);
 }
 
-void TriangleRenderSystem::renderGameObjects(FrameInfo& frameInfo) {
+void TriangleRenderSystem::render(FrameInfo& frameInfo) {
     m_Pipeline->bind(frameInfo.commandBuffer);
 
     vkCmdBindDescriptorSets(frameInfo.commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pipelineLayout, 0, 1, &frameInfo.descriptorSet, 0, nullptr);
 
-    // TODO: replace with Scene
-    // for (auto& kv : frameInfo.gameObjects) {
-    //     auto& obj = kv.second;
-    //     if (obj.model == nullptr) continue;
-    //     SimplePushConstantData push{};
-    //     push.modelMatrix = obj.transform.mat4();
-    //     push.normalMatrix = obj.transform.normalMatrix();
-
-    //     vkCmdPushConstants(frameInfo.commandBuffer, pipelineLayout, VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT, 0,
-    //                        sizeof(SimplePushConstantData), &push);
-    //     obj.model->bind(frameInfo.commandBuffer);
-    //     obj.model->draw(frameInfo.commandBuffer);
-    // }
+    m_Scene.bind(frameInfo.commandBuffer, Scene::Topography::TRIA_TOPOGRAPHY);
+    m_Scene.draw(frameInfo.commandBuffer, Scene::Topography::TRIA_TOPOGRAPHY);
 }
