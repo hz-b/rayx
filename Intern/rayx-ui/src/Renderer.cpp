@@ -7,6 +7,7 @@
 Renderer::Renderer(Window& window, Device& device) : m_Window{window}, m_Device{device} {
     recreateSwapChain();
     createCommandBuffers();
+    m_ImGuiLayer = std::make_unique<ImGuiLayer>(m_Window, m_Device, *m_SwapChain);
 }
 
 Renderer::~Renderer() { freeCommandBuffers(); }
@@ -58,6 +59,8 @@ VkCommandBuffer Renderer::beginFrame() {
         recreateSwapChain();
         return nullptr;
     }
+    m_ImGuiLayer->updateImGui();
+    m_ImGuiLayer->recordImGuiCommands(m_currentImageIndex, m_SwapChain->getFrameBuffer(m_currentImageIndex), m_SwapChain->getExtent());
 
     if (result != VK_SUCCESS && result != VK_SUBOPTIMAL_KHR) {
         throw std::runtime_error("failed to acquire swap chain image!");
@@ -77,6 +80,7 @@ VkCommandBuffer Renderer::beginFrame() {
 
 void Renderer::endFrame() {
     assert(m_isFrameStarted && "Can't call endFrame while frame is not in progress");
+
     auto commandBuffer = getCurrentCommandBuffer();
     if (vkEndCommandBuffer(commandBuffer) != VK_SUCCESS) {
         throw std::runtime_error("failed to record command buffer!");

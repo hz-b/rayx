@@ -36,6 +36,12 @@ class Renderer {
     void beginSwapChainRenderPass(VkCommandBuffer commandBuffer);
     void endSwapChainRenderPass(VkCommandBuffer commandBuffer);
 
+    // ImGui
+    void updateImGui() { m_ImGuiLayer->updateImGui(); }
+    void recordImGuiCommands() {
+        m_ImGuiLayer->recordImGuiCommands(m_currentImageIndex, m_SwapChain->getFrameBuffer(m_currentImageIndex), m_SwapChain->getExtent());
+    }
+
   private:
     void createCommandBuffers();
     void freeCommandBuffers();
@@ -43,7 +49,8 @@ class Renderer {
 
     Window& m_Window;
     Device& m_Device;
-    // ImGuiLayer m_ImGuiLayer;
+    std::unique_ptr<ImGuiLayer> m_ImGuiLayer;
+
     std::unique_ptr<SwapChain> m_SwapChain;
     std::vector<VkCommandBuffer> m_commandBuffers;
 

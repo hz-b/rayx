@@ -7,8 +7,7 @@ void checkVkResult(VkResult result, const char* message) {
     }
 }
 
-ImGuiLayer::ImGuiLayer(const Window& window, const Device& device, const SwapChain& swapchain)
-    : m_Window(window), m_Device(device), m_SwapChain(swapchain) {
+ImGuiLayer::ImGuiLayer(const Window& window, const Device& device, const SwapChain& swapchain) : m_Window(window), m_Device(device) {
     // Create descriptor pool for IMGUI
     VkDescriptorPoolSize poolSizes[] = {{VK_DESCRIPTOR_TYPE_SAMPLER, 1000},
                                         {VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 1000},
@@ -34,41 +33,58 @@ ImGuiLayer::ImGuiLayer(const Window& window, const Device& device, const SwapCha
     }
 
     // Create render pass for IMGUI
-    VkAttachmentDescription attachment = {};
-    attachment.format = m_SwapChain.getImageFormat();
-    attachment.samples = VK_SAMPLE_COUNT_1_BIT;
-    attachment.loadOp = VK_ATTACHMENT_LOAD_OP_LOAD;
-    attachment.storeOp = VK_ATTACHMENT_STORE_OP_STORE;
-    attachment.stencilLoadOp = VK_ATTACHMENT_LOAD_OP_DONT_CARE;
-    attachment.stencilStoreOp = VK_ATTACHMENT_STORE_OP_DONT_CARE;
-    attachment.initialLayout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
-    attachment.finalLayout = VK_IMAGE_LAYOUT_PRESENT_SRC_KHR;
+    VkAttachmentDescription colorAttachment = {};
+    colorAttachment.format = swapchain.getImageFormat();  // same as in main render pass
+    colorAttachment.samples = VK_SAMPLE_COUNT_1_BIT;
+    colorAttachment.loadOp = VK_ATTACHMENT_LOAD_OP_LOAD;
+    colorAttachment.storeOp = VK_ATTACHMENT_STORE_OP_STORE;
+    colorAttachment.stencilLoadOp = VK_ATTACHMENT_LOAD_OP_DONT_CARE;
+    colorAttachment.stencilStoreOp = VK_ATTACHMENT_STORE_OP_DONT_CARE;
+    colorAttachment.initialLayout = VK_IMAGE_LAYOUT_PRESENT_SRC_KHR;  // same as in main render pass
+    colorAttachment.finalLayout = VK_IMAGE_LAYOUT_PRESENT_SRC_KHR;    // same as in main render pass
 
-    VkAttachmentReference color_attachment = {};
-    color_attachment.attachment = 0;
-    color_attachment.layout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
+    VkAttachmentDescription depthAttachment = {};
+    depthAttachment.format = swapchain.findDepthFormat();  // same as in main render pass
+    depthAttachment.samples = VK_SAMPLE_COUNT_1_BIT;
+    depthAttachment.loadOp = VK_ATTACHMENT_LOAD_OP_CLEAR;
+    depthAttachment.storeOp = VK_ATTACHMENT_STORE_OP_DONT_CARE;
+    depthAttachment.stencilLoadOp = VK_ATTACHMENT_LOAD_OP_DONT_CARE;
+    depthAttachment.stencilStoreOp = VK_ATTACHMENT_STORE_OP_DONT_CARE;
+    depthAttachment.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;                       // same as in main render pass
+    depthAttachment.finalLayout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL;  // same as in main render pass
+
+    VkAttachmentReference colorAttachmentRef = {};
+    colorAttachmentRef.attachment = 0;
+    colorAttachmentRef.layout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
+
+    VkAttachmentReference depthAttachmentRef = {};
+    depthAttachmentRef.attachment = 1;
+    depthAttachmentRef.layout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL;
 
     VkSubpassDescription subpass = {};
     subpass.pipelineBindPoint = VK_PIPELINE_BIND_POINT_GRAPHICS;
     subpass.colorAttachmentCount = 1;
-    subpass.pColorAttachments = &color_attachment;
+    subpass.pColorAttachments = &colorAttachmentRef;
+    subpass.pDepthStencilAttachment = &depthAttachmentRef;
 
     VkSubpassDependency dependency = {};
     dependency.srcSubpass = VK_SUBPASS_EXTERNAL;
     dependency.dstSubpass = 0;
-    dependency.srcStageMask = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT;
-    dependency.dstStageMask = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT;
-    dependency.srcAccessMask = 0;  // or VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT;
-    dependency.dstAccessMask = VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT;
+    dependency.srcStageMask = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT | VK_PIPELINE_STAGE_EARLY_FRAGMENT_TESTS_BIT;
+    dependency.dstStageMask = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT | VK_PIPELINE_STAGE_EARLY_FRAGMENT_TESTS_BIT;
+    dependency.srcAccessMask = 0;
+    dependency.dstAccessMask = VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT | VK_ACCESS_DEPTH_STENCIL_ATTACHMENT_WRITE_BIT;
 
+    std::array<VkAttachmentDescription, 2> attachments = {colorAttachment, depthAttachment};
     VkRenderPassCreateInfo info = {};
     info.sType = VK_STRUCTURE_TYPE_RENDER_PASS_CREATE_INFO;
-    info.attachmentCount = 1;
-    info.pAttachments = &attachment;
+    info.attachmentCount = static_cast<uint32_t>(attachments.size());
+    info.pAttachments = attachments.data();
     info.subpassCount = 1;
     info.pSubpasses = &subpass;
     info.dependencyCount = 1;
     info.pDependencies = &dependency;
+
     if (vkCreateRenderPass(m_Device.device(), &info, nullptr, &m_RenderPass) != VK_SUCCESS) {
         throw std::runtime_error("Could not create Dear ImGui's render pass");
     }
@@ -88,15 +104,15 @@ ImGuiLayer::ImGuiLayer(const Window& window, const Device& device, const SwapCha
     initInfo.PipelineCache = VK_NULL_HANDLE;
     initInfo.DescriptorPool = m_DescriptorPool;
     initInfo.Allocator = nullptr;
-    initInfo.MinImageCount = (uint32_t)m_SwapChain.imageCount();
-    initInfo.ImageCount = (uint32_t)m_SwapChain.imageCount();
+    initInfo.MinImageCount = (uint32_t)swapchain.imageCount();
+    initInfo.ImageCount = (uint32_t)swapchain.imageCount();
     initInfo.CheckVkResultFn = nullptr;
 
     ImGui_ImplGlfw_InitForVulkan(m_Window.window(), true);
     ImGui_ImplVulkan_Init(&initInfo, m_RenderPass);
 
     createCommandPool();
-    createCommandBuffers((uint32_t)m_SwapChain.imageCount());
+    createCommandBuffers((uint32_t)swapchain.imageCount());
 
     // Upload fonts
     {
@@ -167,15 +183,18 @@ VkCommandBuffer ImGuiLayer::recordImGuiCommands(uint32_t currentImage, const VkF
         throw std::runtime_error("Failed to begin command buffer");
     }
 
-    VkClearValue clearValue = {{0.0f, 0.0f, 0.0f, 1.0f}};
+    VkClearValue clearValues[2];
+    clearValues[0].color = {{0.0f, 0.0f, 0.0f, 1.0f}};  // Clear color
+    clearValues[1].depthStencil = {1.0f, 0};            // Clear depth and stencil values
+
     VkRenderPassBeginInfo info = {};
     info.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
     info.renderPass = m_RenderPass;
     info.framebuffer = framebuffer;
     info.renderArea.offset = {0, 0};
     info.renderArea.extent = extent;
-    info.clearValueCount = 1;
-    info.pClearValues = &clearValue;
+    info.clearValueCount = 2;
+    info.pClearValues = clearValues;
     vkCmdBeginRenderPass(m_CommandBuffers[currentImage], &info, VK_SUBPASS_CONTENTS_INLINE);
     ImGui_ImplVulkan_RenderDrawData(ImGui::GetDrawData(), m_CommandBuffers[currentImage]);
     vkCmdEndRenderPass(m_CommandBuffers[currentImage]);

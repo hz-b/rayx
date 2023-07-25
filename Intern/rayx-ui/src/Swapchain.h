@@ -30,7 +30,7 @@ class SwapChain {
     uint32_t height() const { return m_Extent.height; }
 
     float extentAspectRatio() { return static_cast<float>(m_Extent.width) / static_cast<float>(m_Extent.height); }
-    VkFormat findDepthFormat();
+    VkFormat findDepthFormat() const;
 
     VkResult acquireNextImage(uint32_t* imageIndex);
     VkResult submitCommandBuffers(const VkCommandBuffer* buffers, uint32_t* imageIndex);  // TODO: imageIndex -> why ptr?

@@ -26,7 +26,6 @@ class ImGuiLayer {
   private:
     const Window& m_Window;
     const Device& m_Device;
-    const SwapChain& m_SwapChain;
 
     bool m_LayerEnabled = true;
     bool m_ShowDemoWindow = false;
