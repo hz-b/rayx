@@ -130,10 +130,6 @@ inline void checkEq(std::string filename, int line, std::string l, std::string r
         }                                                                               \
     }
 
-/// used to check equalities, where doubles contain integer values
-/// i.e. eventType == 1, or extraParam == 21.
-inline bool intclose(double x, double y) { return abs(x - y) < 0.5; }
-
 // ShaderTest
 
 extern std::unique_ptr<RAYX::Tracer> tracer;
