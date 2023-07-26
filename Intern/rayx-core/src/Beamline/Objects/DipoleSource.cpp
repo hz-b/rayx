@@ -118,7 +118,7 @@ std::vector<Ray> DipoleSource::getRays() const {
         glm::dvec4 tempDir = m_orientation * glm::dvec4(direction, 0.0);
         direction = glm::dvec3(tempDir.x, tempDir.y, tempDir.z);
 
-        Ray r = {position, ETYPE_UNINIT, direction, en, psiandstokes.stokes, 0.0, 0.0, 0.0, 0.0};
+        Ray r = {position, ETYPE_UNINIT, direction, en, psiandstokes.stokes, 0.0, 0.0, -1.0, -1.0};
         
         rayList.push_back(r);
     }

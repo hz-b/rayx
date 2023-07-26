@@ -60,8 +60,8 @@ TEST_F(TestSuite, Slit) {
     int absorbed = 0;      // number of rays absorbed by the slit.
     int pass_through = 0;  // number of rays passing through the slit.
 
-    const auto SLIT_ID = 1;
-    const auto IMAGE_PLANE_ID = 2;
+    const auto SLIT_ID = 0;
+    const auto IMAGE_PLANE_ID = 1;
 
     for (auto ray_hist : hist) {
         if (ray_hist.size() == 1) {  // matrix source -> slit absorbed

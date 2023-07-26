@@ -77,7 +77,7 @@ std::vector<Ray> PointSource::getRays() const {
         direction = glm::dvec3(tempDir.x, tempDir.y, tempDir.z);
         glm::dvec4 stokes = glm::dvec4(1, m_linearPol_0, m_linearPol_45, m_circularPol);
 
-        Ray r = {position, ETYPE_UNINIT, direction, en, stokes, 0.0, 0.0, 0.0, 0.0};
+        Ray r = {position, ETYPE_UNINIT, direction, en, stokes, 0.0, 0.0, -1.0, -1.0};
 
         rayList.push_back(r);
     }

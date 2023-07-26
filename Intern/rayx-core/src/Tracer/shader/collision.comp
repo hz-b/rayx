@@ -265,7 +265,7 @@ Collision findCollision() {
     // Find intersection points through all elements
     for (uint elementIndex = 0; elementIndex < uint(elements.length()); elementIndex++) {
         double lastElement = _ray.m_lastElement;
-        if (elementIndex + 1 == lastElement) {
+        if (elementIndex == lastElement) {
             // TODO: self-intersection
             continue;
         }

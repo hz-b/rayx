@@ -159,7 +159,7 @@ std::optional<RAYX::Ray> lastSequentialHit(RayHistory ray_hist, unsigned int bea
     }
 
     for (int i = 0; i < beamline_len; i++) {
-        if (ray_hist[i].m_lastElement != i + 1) {  // TODO get rid of this +1 eventually
+        if (ray_hist[i].m_lastElement != i) {
             return {};
         }
         if (ray_hist[i].m_eventType != ETYPE_JUST_HIT_ELEM) {

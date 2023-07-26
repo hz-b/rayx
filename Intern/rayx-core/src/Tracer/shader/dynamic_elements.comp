@@ -43,7 +43,7 @@ void dynamicElements() {
 
         elem_ray.m_pathLength += length(elem_ray.m_position - col.hitpoint);
         elem_ray.m_position = col.hitpoint;
-        elem_ray.m_lastElement = col.elementIndex + 1; // TODO remove this "+1", element ids should consistently start at 0.
+        elem_ray.m_lastElement = col.elementIndex;
 
         switch(btype) {
             case (BTYPE_MIRROR):
