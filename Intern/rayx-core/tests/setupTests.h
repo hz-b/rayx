@@ -90,12 +90,12 @@ inline void checkEq(std::string filename, int line, std::string l, std::string r
                     std::vector<double> vr, double tolerance) {
     std::vector<std::string> names = {".m_position.x",  ".m_position.y", ".m_position.z",  ".m_eventType", ".m_direction.x", ".m_direction.y",
                                       ".m_direction.z", ".m_energy",     ".m_stokes.x",    ".m_stokes.y",  ".m_stokes.z",    ".m_stokes.w",
-                                      ".m_pathLength",  ".m_order",      ".m_lastElement", ".m_extraParam"};
-    for (int i = 0; i < 14; i++) {
+                                      ".m_pathLength",  ".m_order",      ".m_lastElement"};
+    for (int i = 0; i < names.size(); i++) {
         auto t = tolerance;
 
         // integer tolerance for integer values.
-        if (i == 3 /*eventType*/ || i == 14 /*lastElem*/ || i == 15 /*extraParam*/) {
+        if (i == 3 /*eventType*/ || i == 14 /*lastElem*/) {
             t = 0.5;
         }
 
