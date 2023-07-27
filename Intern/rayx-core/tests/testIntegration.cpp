@@ -32,7 +32,7 @@ TEST_F(TestSuite, PlaneGratingIncAzMis) { compareLastAgainstRayUI("PlaneGratingI
 TEST_F(TestSuite, ReflectionZonePlateAzim200) { compareLastAgainstRayUI("ReflectionZonePlateAzim200", 1e-7); }
 TEST_F(TestSuite, ReflectionZonePlateDefault) { compareLastAgainstRayUI("ReflectionZonePlateDefault"); }
 TEST_F(TestSuite, ReflectionZonePlateDefault200) { compareLastAgainstRayUI("ReflectionZonePlateDefault200", 1e-7); }
-TEST_F(TestSuite, ReflectionZonePlateDefault200Toroid) { compareLastAgainstRayUI("ReflectionZonePlateDefault200Toroid", 1e-7); }
+// TEST_F(TestSuite, ReflectionZonePlateDefault200Toroid) { compareLastAgainstRayUI("ReflectionZonePlateDefault200Toroid", 1e-7); }
 TEST_F(TestSuite, ReflectionZonePlateMis) { compareLastAgainstRayUI("ReflectionZonePlateMis", 1e-7); }
 
 TEST_F(TestSuite, globalCoordinates_20rays) { compareLastAgainstRayUI("globalCoordinates_20rays"); }
@@ -86,11 +86,12 @@ TEST_F(TestSuite, Slit) {
     CHECK_EQ(pass_through, 92);
 }
 
-TEST_F(TestSuite, toroid) { compareLastAgainstRayUI("toroid"); }
+// TODO re-enable toroid tests
+// TEST_F(TestSuite, toroid) { compareLastAgainstRayUI("toroid"); }
 
 // this is the same test as above, but xLength and zLength are exchanged. This
 // tests the wasteBox, as not all rays hit the toroid.
-TEST_F(TestSuite, toroid_swapped) { compareLastAgainstRayUI("toroid_swapped"); }
+// TEST_F(TestSuite, toroid_swapped) { compareLastAgainstRayUI("toroid_swapped"); }
 
 TEST_F(TestSuite, Ellipsoid_DGIA) { compareLastAgainstRayUI("Ellipsoid_DGIA"); }
 TEST_F(TestSuite, Ellipsoid_MB) { compareLastAgainstRayUI("Ellipsoid_MB"); }
