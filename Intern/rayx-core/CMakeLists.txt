@@ -1,5 +1,15 @@
 cmake_minimum_required(VERSION 3.15 FATAL_ERROR)
 
+
+# ---- Code Coverage ----
+option(BUILD_WITH_COV "Add Code Coverage to build" TRUE)
+if (CMAKE_CXX_COMPILER_ID STREQUAL "Clang" AND CMAKE_BUILD_TYPE STREQUAL "Debug" AND BUILD_WITH_COV)
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fprofile-instr-generate -fcoverage-mapping")
+    message("Building with llvm-cov support")
+endif()
+# -----------------------
+
+
 # ---- Add tests ----
 add_subdirectory(tests)
 # -------------------
