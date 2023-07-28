@@ -22,7 +22,7 @@ bool allFinalized(const std::vector<RayMeta>& vector) {
     return std::ranges::all_of(vector, [](const RayMeta& element) { return element.finalized; });
 }
 
-void printRayStats(const std::vector<Ray>& rayOut) {
+static void printRayStats(const std::vector<Ray>& rayOut) {
     int _hit = 0;
     int _abs = 0;
     int _fly = 0;

@@ -49,10 +49,8 @@ struct RAYX_API Ray {
 };
 
 struct RAYX_API RayMeta {
-    glm::dvec3 worldPosition = glm::dvec3(1.0);
-    glm::dvec3 worldDirection = glm::dvec3(1.0);
-    uint64_t nextElementId = 0;
     uint64_t ctr = 0;
+    int nextElementId = 0;
     bool finalized = false;
 };
 }  // namespace RAYX

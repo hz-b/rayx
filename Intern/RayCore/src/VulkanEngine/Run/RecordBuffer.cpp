@@ -181,7 +181,9 @@ void VulkanEngine::traceCommand(VkCommandBuffer& cmdBuffer) {
     VkPhysicalDeviceProperties deviceProperties;
     vkGetPhysicalDeviceProperties(m_PhysicalDevice, &deviceProperties);
     auto group = guessWorkGroupNo(requiredLocalWorkGroupNo, deviceProperties.limits);
-    vkCmdDispatch(cmdBuffer, group.x, group.z, group.y);
+    RAYX_D_LOG << "Sending "
+               << "(" << group.x << ", " << group.y << ", " << group.z << ") to the GPU";
+    vkCmdDispatch(cmdBuffer, group.x, group.y, group.z);
 }
 
 void VulkanEngine::recordSimpleTraceCommand(std::string passName, VkCommandBuffer& commandBuffer, int stage) {

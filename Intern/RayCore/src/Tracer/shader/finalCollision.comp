@@ -58,10 +58,8 @@ struct Ray {
 };
 
 struct RayMeta {
-    dvec3 worldPosition;
-    dvec3 worldDirection;
-    uint64_t nextElementId;
     uint64_t ctr;
+    int nextElementId;
     bool finalized;
 };
 
@@ -170,17 +168,20 @@ void main() {
     if (_rayMeta.finalized) {
         return;  // RETURN FINALIZED
     }
-
-    if (pushConstants.i_bounce != 0) {
-        _ray.m_position = _rayMeta.worldPosition;
-        _ray.m_direction = _rayMeta.worldDirection;
+    // Transform Ray into world coordinates
+    if (_rayMeta.nextElementId != 0) {
+        _ray = rayMatrixMult(_ray, elements[_rayMeta.nextElementId].m_outTrans);
     }
+    _ray.m_weight = W_UNINIT;
 
     // Make final check on ray
     // placeholder, info should later be transfered to shader
-    if (findCollision().found) {
+    Collision col = findCollision();
+    if (col.found) {
         takeFinalSnapshot(_ray, W_NOT_ENOUGH_BOUNCES);
+        _rayMeta.nextElementId = col.elementIndex;
     } else {
         takeFinalSnapshot(_ray, W_FLY_OFF);
+        _rayMeta.nextElementId = 0;
     }
 }

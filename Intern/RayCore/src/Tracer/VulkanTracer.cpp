@@ -52,14 +52,12 @@ Rays VulkanTracer::traceRaw(const TraceRawConfig& cfg) {
     // Prepare rayMeta data
     std::vector<RayMeta> rayMeta;
     rayMeta.reserve((size_t)cfg.m_numRays);
-    {
-        const uint64_t MAX_UINT64 = ~(uint64_t(0));
-        uint64_t workerCounterNum = MAX_UINT64 / uint64_t(cfg.m_numRays);
-        for (auto i = 0; i < cfg.m_numRays; i++) {
-            rayMeta.push_back({.nextElementId = 0,  // Intersection element unknown
-                               .ctr = ((uint64_t)cfg.m_rayIdStart + (uint64_t)i) * workerCounterNum + uint64_t(cfg.m_randomSeed * MAX_UINT64),
-                               .finalized = false});  // Not started
-        }
+    const uint64_t MAX_UINT64 = ~(uint64_t(0));
+    uint64_t workerCounterNum = MAX_UINT64 / uint64_t(cfg.m_numRays);
+    for (auto i = 0; i < cfg.m_numRays; i++) {
+        rayMeta.push_back({.ctr = ((uint64_t)cfg.m_rayIdStart + (uint64_t)i) * workerCounterNum + uint64_t(cfg.m_randomSeed * MAX_UINT64),
+                           .nextElementId = 0,    // Intersection element unknown / does not exist
+                           .finalized = false});  // Not started
     }
 
     auto materialTables = cfg.m_materialTables;
@@ -71,7 +69,7 @@ Rays VulkanTracer::traceRaw(const TraceRawConfig& cfg) {
 
         std::vector<ShaderStageCreateInfo_t> splitShaderStages0 = {
             {.name = "TraceStage", .shaderPath = "build/bin/singleBounce.spv", .entryPoint = "main"}};
-            
+
         std::vector<ShaderStageCreateInfo_t> splitShaderStages1 = {
             {.name = "FinalCollision", .shaderPath = "build/bin/finalCollision.spv", .entryPoint = "main"}};
 

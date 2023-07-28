@@ -24,6 +24,20 @@ layout(local_size_x = WORKGROUP_SIZE, local_size_y = 1, local_size_z = 1) in;
 #define _ray (rayData[uint(gl_GlobalInvocationID)])
 #define _rayMeta (rayMetaData[uint(gl_GlobalInvocationID)])
 
+#ifdef GLSL
+#define SHADER_PRINT(msg) debugPrintfEXT(msg)
+#define SHADER_PRINT1(msg, arg1) debugPrintfEXT(msg, arg1)
+#define SHADER_PRINT2(msg, arg1, arg2) debugPrintfEXT(msg, arg1, arg2)
+#define SHADER_PRINT3(msg, arg1, arg2, arg3) debugPrintfEXT(msg, arg1, arg2, arg3)
+
+#else
+#define SHADER_PRINT(msg) printf(msg)
+#define SHADER_PRINT1(msg, arg1) printf(msg, arg1)
+#define SHADER_PRINT2(msg, arg1, arg2) printf(msg, arg1, arg2)
+#define SHADER_PRINT3(msg, arg1, arg2, arg3) printf(msg, arg1, arg2, arg3)
+
+#endif
+
 #include "../../Shared/Constants.h"
 
 /**************************************************************
@@ -58,10 +72,8 @@ struct Ray {
 };
 
 struct RayMeta {
-    dvec3 worldPosition;
-    dvec3 worldDirection;
-    uint64_t nextElementId;
     uint64_t ctr;
+    int nextElementId;
     bool finalized;
 };
 
@@ -123,21 +135,23 @@ pushConstants;
 /**************************************************************
  *                    Functions && vars
  **************************************************************/
+bool snapshotTaken = false;
 
 // take a snapshot and store it in the next free spot in outputData.
 // `r` will typically be _ray, or some related ray.
 void takeSnapshot(Ray r, double w) {
+    if (snapshotTaken) {
+        SHADER_PRINT("Warning snapshot already taken!\n");
+    } else {
+        snapshotTaken = true;
+    }
+
     if (_rayMeta.finalized) {
         return;
     }
+
     _ray = r;
     _ray.m_weight = w;
-
-#ifdef GLSL
-    if (uint(gl_GlobalInvocationID) == 10 || uint(gl_GlobalInvocationID) == 259) {
-        debugPrintfEXT("GPU :(%d) %d\n", uint(gl_GlobalInvocationID), int(_ray.m_weight));
-    }
-#endif
     return;
 }
 
@@ -178,23 +192,31 @@ void takeFinalSnapshot(Ray r, double w) {
 // back before the function returns to this function)
 void main() {
     if (_rayMeta.finalized) {
-        return;  // RETURN FINALIZED
+        return;  // Ray is done, no need to trace
     }
-    _ray.m_weight = W_UNINIT;
 
-    if (pushConstants.i_bounce != 0) {
-        _ray.m_position = _rayMeta.worldPosition;
-        _ray.m_direction = _rayMeta.worldDirection;
+    // Transform Ray back into world coordinates
+    if (_rayMeta.nextElementId != 0) {
+        if (uint(gl_GlobalInvocationID) == 10) SHADER_PRINT1("Element %d \n", _rayMeta.nextElementId);
+        _ray = rayMatrixMult(_ray, elements[_rayMeta.nextElementId].m_outTrans);
     }
+
+    _ray.m_weight = W_UNINIT;
 
     Collision col = findCollision();
 
     if (!col.found) {
+        // Store collision ID as 0
+        _rayMeta.nextElementId = 0;
+
         // no element was hit.
         // Ray is considered to move forward to inf.
         // This is the only constellation in which a snapshot is in world coordinates.
         takeFinalSnapshot(_ray, W_FLY_OFF);
-        return;  // RETURN "EMPTY"
+        return;
+    } else {
+        // Store collision ID
+        _rayMeta.nextElementId = col.elementIndex;
     }
 
     // transform ray and intersection point in ELEMENT coordiantes
@@ -208,13 +230,6 @@ void main() {
     elem_ray.m_pathLength += length(elem_ray.m_position - col.hitpoint);
     elem_ray.m_position = col.hitpoint;
     elem_ray.m_lastElement = col.elementIndex + 1;  // TODO remove this "+1", element ids should consistently start at 0.
-
-#ifdef GLSL
-    if (uint(gl_GlobalInvocationID) == 10) {
-        debugPrintfEXT("GPU i. %d \n", pushConstants.i_bounce);
-        debugPrintfEXT("GPU type. %d \n", btype);
-    }
-#endif
 
     switch (btype) {
         case (BTYPE_MIRROR):
@@ -236,12 +251,8 @@ void main() {
 
     // the ray might finalize due to being absorbed, or because an error occured while tracing!
     if (_rayMeta.finalized) {
-        return;  // RETURN FINALIZED
+        return;
     }
 
     takeSnapshot(elem_ray, W_JUST_HIT_ELEM);
-
-    // transform back to WORLD coordinates
-    _rayMeta.worldPosition = dvec3(nextElement.m_outTrans * dvec4(elem_ray.m_position, 1));
-    _rayMeta.worldDirection = dvec3(nextElement.m_outTrans * dvec4(elem_ray.m_direction, 0));
 }
