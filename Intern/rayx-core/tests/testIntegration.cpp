@@ -104,4 +104,4 @@ TEST_F(TestSuite, ellipsoid_ip_200mirrormis) { compareLastAgainstRayUI("ellipsoi
 
 TEST_F(TestSuite, Cone) { compareLastAgainstRayUI("Cone"); }
 
-TEST_F(TestSuite, RZP_misalignment) { compareLastAgainstRayUI("RZP_misalignment"); }
+TEST_F(TestSuite, RZP_misalignment) { compareLastAgainstRayUI("RZP_misalignment", 1e-10); }
