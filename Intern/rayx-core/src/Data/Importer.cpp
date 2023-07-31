@@ -42,7 +42,7 @@ void addBeamlineObjectFromXML(rapidxml::xml_node<>* node, Beamline* beamline, co
         beamline->m_OpticalElements.push_back(e2);
     };
 
-    RAYX::xml::Parser parser(node, group_context, std::move(filename));
+    RAYX::xml::Parser parser(node, group_context, filename);
 
     // every beamline object has a function createFromXML which constructs the
     // object from a given xml-node if possible (otherwise it will return a
@@ -113,7 +113,7 @@ RenderObjectVec getRenderData(const std::filesystem::path& filename) {
             strcmp(type, "Matrix Source") == 0) {  // TODO(Jannis): The should be a better check for this. Adding a new lightsource would break this.
             continue;
         } else {
-            RAYX::xml::Parser parser(object, std::vector<xml::Group>(), std::move(filename));
+            RAYX::xml::Parser parser(object, std::vector<xml::Group>(), filename);
 
             RenderObject d;
             d.name = parser.name();

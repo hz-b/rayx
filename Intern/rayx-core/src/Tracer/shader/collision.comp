@@ -143,6 +143,10 @@ Collision getToroidCollision(Ray r, uint id) {
     double longRad = toroid.m_longRadius;
     double shortRad = toroid.m_shortRadius;
 
+    if (toroid.m_toroidType == TOROID_TYPE_CONVEX) {
+        shortRad *= -1.0;
+    }
+
     Collision col;
     col.found = true;
     col.elementIndex = int(id);

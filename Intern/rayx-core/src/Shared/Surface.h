@@ -70,9 +70,14 @@ INLINE QuadricSurface deserializeQuadric(Surface ser) {
 // Toroid
 /////////////
 
+#define ToroidType double
+const ToroidType TOROID_TYPE_CONVEX = 0;
+const ToroidType TOROID_TYPE_CONCAVE = 1;
+
 struct ToroidSurface {
     double m_longRadius;
     double m_shortRadius;
+    ToroidType m_toroidType;
 };
 
 INLINE Surface serializeToroid(ToroidSurface surface) {
@@ -80,6 +85,7 @@ INLINE Surface serializeToroid(ToroidSurface surface) {
     ser.m_type = STYPE_TOROID;
     ser.m_params[0] = surface.m_longRadius;
     ser.m_params[1] = surface.m_shortRadius;
+    ser.m_params[2] = surface.m_toroidType;
     return ser;
 }
 
@@ -87,6 +93,7 @@ INLINE ToroidSurface deserializeToroid(Surface ser) {
     ToroidSurface surface;
     surface.m_longRadius = ser.m_params[0];
     surface.m_shortRadius = ser.m_params[1];
+    surface.m_toroidType = ser.m_params[2];
     return surface;
 }
 
