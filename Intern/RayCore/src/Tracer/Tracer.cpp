@@ -1,7 +1,5 @@
 #include "Tracer.h"
 
-#include <algorithm>
-
 #include "Beamline/OpticalElement.h"
 #include "Debug/Debug.h"
 #include "Debug/Instrumentor.h"
@@ -50,28 +48,32 @@ Rays Tracer::trace(const Beamline& b) {
             .m_elements = elements,
         };
 
-        TracerConfig_t pushConsants = {
+        TracerConfig_t pushConstants = {
             .rayIdStart = (double)rayIdStart, .numRays = (double)rays.size(), .randomSeed = randomSeed, .maxSnapshots = (double)maxSnapshots};
-        setPushConstants(&pushConsants);
+        setPushConstants(&pushConstants);
 
         Rays rawBatchRays;
         {
             RAYX_PROFILE_SCOPE_STDOUT("Tracing");
             rawBatchRays = traceRaw(cfg);
             for (const auto& _events : rawBatchRays) {  // Sanity Check
-                assert(_events.size() == batch_size);
+                assert(batch_size == _events.size());
             }
         }
 
         {
-            RAYX_PROFILE_SCOPE_STDOUT("Snapshoting");
+            RAYX_PROFILE_SCOPE_STDOUT("Snapshotting");
             auto _maxSnapshot = rawBatchRays.size();
+            result.reserve(batch_size);
+
             for (uint i = 0; i < batch_size; i++) {
                 Snapshots snapshots;
                 snapshots.reserve(_maxSnapshot);
                 for (uint j = 0; j < _maxSnapshot; j++) {
                     Ray r = rawBatchRays[j][i];
-                    snapshots.push_back(r);
+                    if (r.m_weight != W_UNINIT) {
+                        snapshots.push_back(r);
+                    }
                 }
                 result.push_back(snapshots);
             }

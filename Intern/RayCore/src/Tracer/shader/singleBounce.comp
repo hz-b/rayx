@@ -191,17 +191,16 @@ void takeFinalSnapshot(Ray r, double w) {
 // in this function we need to make sure that rayData ALWAYS remains in GLOBAL coordinates (it can be changed in a function but needs to be changed
 // back before the function returns to this function)
 void main() {
+    _ray.m_weight = W_UNINIT;
+
     if (_rayMeta.finalized) {
         return;  // Ray is done, no need to trace
     }
 
     // Transform Ray back into world coordinates
     if (_rayMeta.nextElementId != 0) {
-        if (uint(gl_GlobalInvocationID) == 10) SHADER_PRINT1("Element %d \n", _rayMeta.nextElementId);
         _ray = rayMatrixMult(_ray, elements[_rayMeta.nextElementId].m_outTrans);
     }
-
-    _ray.m_weight = W_UNINIT;
 
     Collision col = findCollision();
 
