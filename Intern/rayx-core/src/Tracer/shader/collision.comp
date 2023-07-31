@@ -149,13 +149,6 @@ Collision getToroidCollision(Ray r, uint id) {
     col.hitpoint = dvec3(0, 0, 0);
     col.normal = dvec3(0, 0, 0);
 
-    // if ray points away from the toroid, no collision can be found.
-    // TODO This ignores the curvature of the toroid, and might not work in all cases.
-    if (sign(r.m_position.z) == sign(r.m_direction.z)) {
-        col.found = false;
-        return col;
-    }
-
     double isigro = sign(shortRad);
     // sign radius: +1 = concave, -1 = convex
 
@@ -197,6 +190,14 @@ Collision getToroidCollision(Ray r, uint id) {
 
     col.normal = normalize(dvec3(normal));
     col.hitpoint = dvec3(xx, yy, zz);
+
+    dvec3 rayToHitpoint = col.hitpoint - r.m_position;
+
+    // if ray points away from the hitpoint, no collision can be found.
+    if (dot(rayToHitpoint, r.m_direction) > 0.0) {
+        col.found = false;
+    }
+
     return col;
 }
 
