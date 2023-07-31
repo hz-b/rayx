@@ -170,23 +170,29 @@ std::vector<RAYX::Ray> rayUiCompat(std::string filename) {
     auto beamline = loadBeamline(filename);
     auto rays = tracer->trace(beamline);
 
-    int seq = sequentialExtraParam(beamline.m_OpticalElements.size());
-
     std::vector<RAYX::Ray> out;
 
-    for (auto rr : rays) {
-        for (auto r : rr) {
-            // The ray has to be sequential (and it must finally end up at the last element of beamline)
-            if (!intclose(r.m_extraParam, seq)) {
-                continue;
+    for (auto ray_hist : rays) {
+        std::vector<RAYX::Ray> ray_hist_only_hits;
+        for (auto r : ray_hist) {
+            if (r.m_weight == W_JUST_HIT_ELEM) {
+                ray_hist_only_hits.push_back(r);
             }
+        }
 
-            // The ray has to have weight != W_FLY_OFF
-            if (r.m_weight != W_JUST_HIT_ELEM) {
-                continue;
+        // valid == ray_hist hits every element in the correct order.
+        bool valid = ray_hist_only_hits.size() == beamline.m_OpticalElements.size();
+        if (valid) {
+            for (int i = 0; i < ray_hist_only_hits.size(); i++) {
+                if (ray_hist_only_hits[i].m_lastElement - 1 != i) { // the -1 happens, as there is a +1 whenever lastElement gets set.
+                    valid = false;
+                    break;
+                }
             }
+        }
 
-            out.push_back(r);
+        if (valid) {
+            out.push_back(ray_hist_only_hits.back());
         }
     }
 
