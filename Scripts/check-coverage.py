@@ -2,16 +2,10 @@
 ######################################################################
 # HOW TO USE:
 
-# Install all necessary python modules:
-# python -m pip install openpyxl, progress, pandas, numpy, psutil, GPUtil, jinja2
-
-# Compile RAYX in Release mode
-# Close all other programs
-# Make sure the Device is plugged in (Laptops not on battery power)
-# Make sure Power Mode is on Max Performance
-# Run this script
-# A csv file will be created in the benchmark-outputs folder
-# 2 csv files can be compared using the compare-benchmarks.py script
+# Compile RAYX in DEBUG mode with Clang (Ideally 14)
+# Run this script from the root of the project
+# A folder will be created in Scripts/coverage-outputs containg the coverage report
+# Open index.html in your browser to view the report
 
 ######################################################################
 ######################################################################
