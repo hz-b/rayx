@@ -43,7 +43,7 @@ class RAYX_API VulkanEngine {
 
     BufferHandler* getBufferHandler() { return m_BufferHandler; }
 
-    std::vector<Ray> run(VulkanEngineRunSpec_t);
+    std::vector<std::vector<Ray>> run(VulkanEngineRunSpec_t);
 
     /// changes the state from POSTRUN to PRERUN.
     /// after this all buffers are deleted (and hence readBuffer will fail.)

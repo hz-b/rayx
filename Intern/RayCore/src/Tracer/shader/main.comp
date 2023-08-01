@@ -22,7 +22,7 @@
 // Every shader execution calculates the route for a single ray.
 // `_ray` is that ray, it's always in world coordinates (!).
 #define _ray (rayData[uint(gl_GlobalInvocationID)])
-
+#define _rayMeta (rayMetaData[uint(gl_GlobalInvocationID)])
 
 #include "../../Shared/Constants.h"
 
@@ -179,6 +179,8 @@ void takeSnapshot(Ray r, double w) {
         if (outputData[idx].m_weight == W_UNINIT) { // checks whether this spot is free
             outputData[idx] = r;
             outputData[idx].m_weight = w;
+            _ray = r;
+            _ray.m_weight = w;
             return;
         }
     }

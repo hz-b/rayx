@@ -198,15 +198,15 @@ void main() {
     }
 
     // Transform Ray back into world coordinates
-    if (_rayMeta.nextElementId != 0) {
-        _ray = rayMatrixMult(_ray, elements[_rayMeta.nextElementId].m_outTrans);
+    if (_rayMeta.nextElementId != -1) {
+        rayMatrixMult_InP(_ray, _ray, elements[_rayMeta.nextElementId].m_outTrans);
     }
 
     Collision col = findCollision();
 
     if (!col.found) {
         // Store collision ID as 0
-        _rayMeta.nextElementId = 0;
+        _rayMeta.nextElementId = -1;
 
         // no element was hit.
         // Ray is considered to move forward to inf.

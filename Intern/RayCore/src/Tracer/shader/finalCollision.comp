@@ -171,7 +171,7 @@ void main() {
         return;  // RETURN FINALIZED
     }
     // Transform Ray into world coordinates
-    if (_rayMeta.nextElementId != 0) {
+    if (_rayMeta.nextElementId != -1) {
         _ray = rayMatrixMult(_ray, elements[_rayMeta.nextElementId].m_outTrans);
     }
 
@@ -183,6 +183,6 @@ void main() {
         _rayMeta.nextElementId = col.elementIndex;
     } else {
         takeFinalSnapshot(_ray, W_FLY_OFF);
-        _rayMeta.nextElementId = 0;
+        _rayMeta.nextElementId = -1;
     }
 }

@@ -30,7 +30,7 @@ std::vector<Ray> flatten(std::vector<std::vector<Ray>>& allRays) {
  * @brief Trace Batch from cfg
  * @param cfg
  */
-std::vector<Ray> VulkanTracer::traceRaw(const TraceRawConfig& cfg) {
+Rays VulkanTracer::traceRaw(const TraceRawConfig& cfg) {
     RAYX_PROFILE_FUNCTION_STDOUT();
     // Fetch CFG Data
     auto rayList = cfg.m_rays;
@@ -56,7 +56,7 @@ std::vector<Ray> VulkanTracer::traceRaw(const TraceRawConfig& cfg) {
     uint64_t workerCounterNum = MAX_UINT64 / uint64_t(cfg.m_numRays);
     for (auto i = 0; i < cfg.m_numRays; i++) {
         rayMeta.push_back({.ctr = ((uint64_t)cfg.m_rayIdStart + (uint64_t)i) * workerCounterNum + uint64_t(cfg.m_randomSeed * MAX_UINT64),
-                           .nextElementId = 0,    // Intersection element unknown / does not exist
+                           .nextElementId = -1,    // Intersection element unknown / does not exist
                            .finalized = false});  // Not started
     }
 
@@ -100,7 +100,7 @@ std::vector<Ray> VulkanTracer::traceRaw(const TraceRawConfig& cfg) {
         // Bindings (Vulkan Buffer <- Descriptors (sets))
         // PS: You can also call addDescriptorSetPerPassBindings once!
         bufferHandler
-            ->createBuffer<Ray>({"ray-buffer", VKBUFFER_IN}, rayList)  // Input/Output Ray Buffer TODO(OS): remove wait for async
+            ->createBuffer<Ray>({"ray-buffer", VKBUFFER_INOUT}, rayList)  // Input/Output Ray Buffer TODO(OS): remove wait for async
             .addDescriptorSetPerPassBinding(passName0, 0, shaderFlag)
             .addDescriptorSetPerPassBinding(passName1, 0, shaderFlag)
             .addDescriptorSetPerPassBinding(passName2, 0, shaderFlag);
