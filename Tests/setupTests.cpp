@@ -197,6 +197,30 @@ std::vector<RAYX::Ray> rayUiCompat(std::string filename) {
     }
 
     return out;
+    //     auto beamline = loadBeamline(filename);
+    // auto rays = tracer->trace(beamline);
+
+    // int seq = sequentialExtraParam(beamline.m_OpticalElements.size());
+
+    // std::vector<RAYX::Ray> out;
+
+    // for (auto rr : rays) {
+    //     for (auto r : rr) {
+    //         // The ray has to be sequential (and it must finally end up at the last element of beamline)
+    //         if (!intclose(r.m_extraParam, seq)) {
+    //             continue;
+    //         }
+
+    //         // The ray has to have weight != W_FLY_OFF
+    //         if (r.m_weight != W_JUST_HIT_ELEM) {
+    //             continue;
+    //         }
+
+    //         out.push_back(r);
+    //     }
+    // }
+
+    // return out;
 }
 
 void compareLastAgainstRayUI(std::string filename, double t) {
