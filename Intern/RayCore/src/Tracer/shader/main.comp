@@ -36,6 +36,7 @@ int gl_GlobalInvocationID;
 
 ShaderArray<Ray> rayData;
 ShaderArray<Ray> outputData;
+ShaderArray<RayMeta> rayMetaData;
 
 // // the ray id of the first ray of the batch.
 // // // See `rayId` to access the ray id of the current ray.
@@ -70,6 +71,12 @@ struct Ray {
     double m_extraParam;
 };
 
+struct RayMeta {
+    uint64_t ctr;
+    int nextElementId;
+    bool finalized;
+};
+
 #ifdef RAYX_DEBUG_MODE
 	struct _debug_struct {
 		dmat4 _dMat; // Can also be used as vectors or scalar
@@ -86,26 +93,29 @@ struct Ray {
     // don't use this directly. Use `takeSnapshot` instead.
 	layout(std140, binding = 1) buffer obuf { Ray outputData[]; };
 
+    layout(std140, binding = 2) buffer iobufm { RayMeta rayMetaData[]; };
+
+
     // std430 is required so that Element is layouted like in C++.
     // see https://www.khronos.org/opengl/wiki/Interface_Block_(GLSL) for more details on layouting.
-	layout(std430, binding = 2) buffer qbuf {
+	layout(std430, binding = 3) buffer qbuf {
 		Element elements[];
 	};
 
-	layout(std140, binding = 3) buffer xyzbuf { dvec4 xyznull[]; };
+	layout(std140, binding = 4) buffer xyzbuf { dvec4 xyznull[]; };
 
-	layout(binding = 4) buffer materialIndexBuf {
+	layout(binding = 5) buffer materialIndexBuf {
 		int matIdx[]; // matIdx[0..91] contains the indices of the Palik Table, whereas matIdx[92..92+91] contains the indices of the NffTable.
 					  // generally, an entry of matIdx tells you the index you need to look up in the 'mat'-table below.
 	};
 
-	layout(binding = 5) buffer materialBuf {
+	layout(binding = 6) buffer materialBuf {
 		double mat[];  // contains: (Palik tables of all materials concatenated together) concatenated with (Nff tables of all materials concatenated together)
 					   // use the matIdx-table to determine the relevant indices for when which table starts and stops.
 	};
 
 	#ifdef RAYX_DEBUG_MODE
-		layout(binding = 6) buffer debugBuf {
+		layout(binding = 7) buffer debugBuf {
 			_debug_struct d_struct[];  // contains nff table of all materials concatenated together
 		};
 	#endif
@@ -117,7 +127,7 @@ struct Ray {
  *                    PushConstants
  **************************************************************/
 #ifndef GLSL
-    pushConstants_t pushConstants;
+PushConstants_t pushConstants;
 #else 
     layout( push_constant ) uniform constants
     {   
@@ -219,23 +229,23 @@ void main() {
     // this is required as sometimes error codes are transmitted using _ray.m_weight
     _ray.m_weight = W_UNINIT;
 
-    #ifdef GLSL
-    if (uint(gl_GlobalInvocationID) == 2 ){
-        debugPrintfEXT("Hello from GPU. \n");
-        debugPrintfEXT("numrays: %d\n",uint64_t(pushConstants.numRays));
-    }
-    #endif
+    // #ifdef GLSL
+    // if (uint(gl_GlobalInvocationID) == 2 ){
+    //     debugPrintfEXT("Hello from GPU. \n");
+    //     debugPrintfEXT("numrays: %d\n",uint64_t(pushConstants.numRays));
+    // }
+    // #endif
     
     // ~~~~~~~~~~~~~~ PRINT EXAMPLE ~~~~~~~~~~~~~~
     // Printing ~DEBUG~ Example over vkconfig Validation Layers
-    // if (uint(gl_GlobalInvocationID) == 2 ){
+    // if (uint(gl_GlobalInvocationID) == 1 ){
     // #ifdef GLSL
-    //     // debugPrintfEXT("Hello from GPU. \n");
+    //     debugPrintfEXT("GPU: %d. \n",uint(pushConstants.maxSnapshots));
     // #else
     //     // RAYX_D_LOG << "Tracing on CPU..." ;
     //     // RAYX_D_LOG << pushConstants.pushMatrix[0][0];
     // #endif
-    //}
+    // }
     // ~~~~~~~~~~~~~~ PRINT EXAMPLE ~~~~~~~~~~~~~~
 	dynamicElements();
 }

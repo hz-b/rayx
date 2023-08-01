@@ -200,6 +200,9 @@ void ComputePass::simpleUpdateDescriptorSets(BufferHandler* bufferHandler) {
     std::vector<VkWriteDescriptorSet> writes;
 
     for (auto& [name, b] : *buffers) {
+        if (!b->hasPassDescriptorBinding(m_name)) {
+            continue;
+        }
         // specify which buffer to use: input buffer
         VkDescriptorBufferInfo descriptorBufferInfo = {};
         descriptorBufferInfo.buffer = b->getBuffer();

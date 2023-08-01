@@ -33,7 +33,9 @@ std::vector<VkDescriptorSetLayoutBinding> BufferHandler::getDescriptorBindings(c
     RAYX_PROFILE_FUNCTION();
     std::vector<VkDescriptorSetLayoutBinding> bindings;
     for (auto& [name, buf] : m_Buffers) {
-        bindings.push_back(buf->m_DescriptorSetBindings[pass]);
+        if (buf->hasPassDescriptorBinding(pass)) {
+            bindings.push_back(buf->m_DescriptorSetBindings[pass]);
+        }
     }
     return bindings;
 }
@@ -210,10 +212,15 @@ void BufferHandler::writeBufferRaw(const char* bufname, char* indata) {
  * @param createInfo
  */
 VulkanBuffer& BufferHandler::createBuffer(VulkanBufferCreateInfo createInfo) {
-    auto name = createInfo.bufName;
+    auto name = std::string(createInfo.bufName);
 
     if (isBufferPresent(std::string(name))) {
-        return *m_Buffers[name];
+        VulkanBuffer* b = getBuffer(name);
+        if (b->m_createInfo.size == createInfo.size) {
+            return *m_Buffers[name];
+        } else {
+            deleteBuffer(name.c_str());  // If size is different, delete and repeat
+        }
     }
 
     m_Buffers[name] = std::make_unique<VulkanBuffer>(m_VmaAllocator, createInfo);

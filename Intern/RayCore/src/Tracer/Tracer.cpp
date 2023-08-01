@@ -51,32 +51,45 @@ Rays Tracer::trace(const Beamline& b) {
         TracerConfig_t pushConstants = {
             .rayIdStart = (double)rayIdStart, .numRays = (double)rays.size(), .randomSeed = randomSeed, .maxSnapshots = (double)maxSnapshots};
         setPushConstants(&pushConstants);
-
-        Rays rawBatchRays;
+        std::vector<Ray> rawBatchRays;
         {
             RAYX_PROFILE_SCOPE_STDOUT("Tracing");
             rawBatchRays = traceRaw(cfg);
-            for (const auto& _events : rawBatchRays) {  // Sanity Check
-                assert(batch_size == _events.size());
-            }
+            assert(rawBatchRays.size() == cfg.m_maxSnapshots * batch_size);
+            // for (const auto& _events : rawBatchRays) {  // Sanity Check
+            //     assert(batch_size == _events.size());
+            // }
         }
 
         {
             RAYX_PROFILE_SCOPE_STDOUT("Snapshotting");
-            auto _maxSnapshot = rawBatchRays.size();
-            result.reserve(batch_size);
-
             for (uint i = 0; i < batch_size; i++) {
-                Snapshots snapshots;
-                snapshots.reserve(_maxSnapshot);
-                for (uint j = 0; j < _maxSnapshot; j++) {
-                    Ray r = rawBatchRays[j][i];
+                Snapshots hist;
+                hist.reserve(maxSnapshots);
+                for (uint j = 0; j < maxSnapshots; j++) {
+                    uint idx = i * maxSnapshots + j;
+                    Ray r = rawBatchRays[idx];
                     if (r.m_weight != W_UNINIT) {
-                        snapshots.push_back(r);
+                        hist.push_back(r);
                     }
                 }
-                result.push_back(snapshots);
+                result.push_back(hist);
             }
+            //            auto _maxSnapshot = rawBatchRays.size();
+            //            result.reserve(batch_size);
+            //
+            //            for (uint i = 0; i < batch_size; i++) {
+            //                Snapshots snapshots;
+            //                snapshots.reserve(_maxSnapshot);
+            //                for (uint j = 0; j < _maxSnapshot; j++) {
+            //                    Ray r = rawBatchRays[j][i];
+            //                    if (r.m_weight != W_UNINIT) {
+            //                        snapshots.push_back(r);
+            //                    }
+            //                    snapshots.shrink_to_fit();
+            //                }
+            //                result.push_back(snapshots);
+            //            }
         }
     }
     return result;

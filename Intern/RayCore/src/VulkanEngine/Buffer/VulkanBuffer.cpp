@@ -91,5 +91,16 @@ VulkanBuffer& VulkanBuffer::addDescriptorSetPerPassBindings(const std::vector<Pa
 
 VkDescriptorBufferInfo VulkanBuffer::getDescriptorInfo(VkDeviceSize offset) { return VkDescriptorBufferInfo{m_Buffer, offset, m_createInfo.size}; }
 
+uint32_t VulkanBuffer::getPassDescriptorBinding(std::string passName) {
+    if (hasPassDescriptorBinding(passName)) {
+        return m_DescriptorSetBindings[passName].binding;
+    } else {
+        RAYX_D_WARN << m_createInfo.bufName << " has no binding to " << passName;
+        return -1;
+    }
+}
+
+bool VulkanBuffer::hasPassDescriptorBinding(std::string passName) { return m_DescriptorSetBindings.find(passName) != m_DescriptorSetBindings.end(); }
+
 }  // namespace RAYX
 #endif

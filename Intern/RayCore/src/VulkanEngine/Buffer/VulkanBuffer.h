@@ -55,14 +55,14 @@ class RAYX_API VulkanBuffer {
     const VkBuffer& getBuffer() const { return m_Buffer; }
     const char* getName() const { return m_createInfo.bufName; }
     const VkDeviceMemory& GetBufferMemory() const { return m_Memory; }
-
+    bool hasPassDescriptorBinding(std::string passName);
     void* getMappedMemory();
     void UnmapMemory();
 
     VulkanBuffer& addDescriptorSetPerPassBinding(const std::string& passName, uint32_t binding, VkShaderStageFlags shaderStageFlag);
     VulkanBuffer& addDescriptorSetPerPassBindings(const std::vector<PassBinding>&);
     VkDescriptorBufferInfo getDescriptorInfo(VkDeviceSize offset = 0);
-    uint32_t getPassDescriptorBinding(std::string passName) { return m_DescriptorSetBindings[passName].binding; }
+    uint32_t getPassDescriptorBinding(std::string passName);
 
   private:
     // VMA Version of createVkBuffer

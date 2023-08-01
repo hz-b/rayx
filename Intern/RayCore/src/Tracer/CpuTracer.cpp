@@ -15,7 +15,8 @@ using uint = unsigned int;
 namespace RAYX {
 
 namespace CPU_TRACER {
-#include "shader/singleBounce.comp"
+//#include "shader/singleBounce.comp"
+#include "shader/main.comp"
 
 }  // namespace CPU_TRACER
 
@@ -62,7 +63,7 @@ void _printRayStats(const std::vector<Ray>& rayOut) {
     RAYX_D_LOG << "===============";
 }
 
-Rays CpuTracer::traceRaw(const TraceRawConfig& cfg) {
+std::vector<Ray> CpuTracer::traceRaw(const TraceRawConfig& cfg) {
     RAYX_PROFILE_FUNCTION_STDOUT();
 
     auto rayList = cfg.m_rays;
@@ -73,6 +74,7 @@ Rays CpuTracer::traceRaw(const TraceRawConfig& cfg) {
     CPU_TRACER::xyznull.data.clear();
     CPU_TRACER::matIdx.data.clear();
     CPU_TRACER::mat.data.clear();
+    CPU_TRACER::outputData.data.resize(rayList.size() * (size_t)cfg.m_maxSnapshots);
 
     // init rayData, rayMeta
     CPU_TRACER::rayData.data = rayList;
@@ -100,32 +102,32 @@ Rays CpuTracer::traceRaw(const TraceRawConfig& cfg) {
     const int maxBounces = CPU_TRACER::elements.data.size();
     std::vector<std::vector<Ray>> _checkpoints;
 
-    for (int b = 0; b < maxBounces; b++) {
-        // Run the tracing by for all rays
-        CPU_TRACER::pushConstants.i_bounce = b;
-        
-        // SHADER START
-        for (uint i = 0; i < rayList.size(); i++) {
-            CPU_TRACER::gl_GlobalInvocationID = i;
-            CPU_TRACER::snapshotTaken = false;
-            CPU_TRACER::main();
-        }  // SHADER END
+    // for (int b = 0; b < maxBounces; b++) {
+    // Run the tracing by for all rays
+    // CPU_TRACER::pushConstants.i_bounce = b;
 
-        auto rayOut = CPU_TRACER::rayData.data;
-        auto rayMeta = CPU_TRACER::rayMetaData.data;
+    // SHADER START
+    for (uint i = 0; i < rayList.size(); i++) {
+        CPU_TRACER::gl_GlobalInvocationID = i;
+        // CPU_TRACER::snapshotTaken = false;
+        CPU_TRACER::main();
+    }  // SHADER END
 
-        _printRayStats(rayOut);
+    auto rayOut = CPU_TRACER::outputData.data;
+    auto rayMeta = CPU_TRACER::rayMetaData.data;
 
-        // std::erase_if(rayOut, [](auto r) { return r.m_weight != W_UNINIT; });
-        _checkpoints.push_back(rayOut);
-        RAYX_DBG(rayOut.size());
-        if (_allFinalized(rayMeta)) {  // Are all rays finished?
-            RAYX_VERB << "All finalized";
-            break;
-        }
-    }
+    //     _printRayStats(rayOut);
 
-    return _checkpoints;
+    //     // std::erase_if(rayOut, [](auto r) { return r.m_weight != W_UNINIT; });
+    //     _checkpoints.push_back(rayOut);
+    //     RAYX_DBG(rayOut.size());
+    //     if (_allFinalized(rayMeta)) {  // Are all rays finished?
+    //         RAYX_VERB << "All finalized";
+    //         break;
+    //     }
+    // }
+
+    return rayOut;
 }
 
 void CpuTracer::setPushConstants(const PushConstants_t* p) { std::memcpy(&CPU_TRACER::pushConstants, p, sizeof(CPU_TRACER::pushConstants)); }
