@@ -11,6 +11,8 @@ out/
 # Files
 *.user
 *.code-workspace
+*.profdata
+*.profraw
 /CMakeSettings.json
 CMakeCache.txt
 cmake.check_cache
