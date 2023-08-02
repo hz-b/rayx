@@ -92,6 +92,7 @@ def main():
         success, output = run_command('llvm-profdata merge -sparse cpu.profraw gpu.profraw -o default.profdata')
         if not success:
             print("Failed to merge profraw: " + output)
+            print("\nMake sure that you have selected the Clang 14 compiler in your CMake settings")
             return
 
         timestamp = datetime.datetime.now().strftime('%Y%m%d-%H%M%S')
