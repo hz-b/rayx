@@ -33,7 +33,7 @@ class SwapChain {
     VkFormat findDepthFormat() const;
 
     VkResult acquireNextImage(uint32_t* imageIndex);
-    VkResult submitCommandBuffers(const VkCommandBuffer* buffers, uint32_t* imageIndex);  // TODO: imageIndex -> why ptr?
+    VkResult submitCommandBuffers(const std::vector<VkCommandBuffer>& buffers, uint32_t imageIndex);
 
     bool compareSwapFormats(const SwapChain& other) const { return other.m_DepthFormat == m_DepthFormat && other.m_ImageFormat == m_ImageFormat; }
 

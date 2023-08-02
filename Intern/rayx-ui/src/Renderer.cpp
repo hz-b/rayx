@@ -59,8 +59,6 @@ VkCommandBuffer Renderer::beginFrame() {
         recreateSwapChain();
         return nullptr;
     }
-    m_ImGuiLayer->updateImGui();
-    m_ImGuiLayer->recordImGuiCommands(m_currentImageIndex, m_SwapChain->getFrameBuffer(m_currentImageIndex), m_SwapChain->getExtent());
 
     if (result != VK_SUCCESS && result != VK_SUBOPTIMAL_KHR) {
         throw std::runtime_error("failed to acquire swap chain image!");
@@ -86,7 +84,12 @@ void Renderer::endFrame() {
         throw std::runtime_error("failed to record command buffer!");
     }
 
-    auto result = m_SwapChain->submitCommandBuffers(&commandBuffer, &m_currentImageIndex);
+    m_ImGuiLayer->updateImGui();
+    m_ImGuiLayer->recordImGuiCommands(m_currentImageIndex, m_SwapChain->getFrameBuffer(m_currentImageIndex), m_SwapChain->getExtent());
+
+    std::vector<VkCommandBuffer> submitCommandBuffers = {commandBuffer, m_ImGuiLayer->getCommandBuffer(m_currentImageIndex)};
+
+    auto result = m_SwapChain->submitCommandBuffers(submitCommandBuffers, m_currentImageIndex);
     if (result == VK_ERROR_OUT_OF_DATE_KHR || result == VK_SUBOPTIMAL_KHR || m_Window.wasWindowResized()) {
         m_Window.resetWindowResizedFlag();
         recreateSwapChain();

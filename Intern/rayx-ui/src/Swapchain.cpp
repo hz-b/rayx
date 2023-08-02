@@ -67,11 +67,11 @@ VkResult SwapChain::acquireNextImage(uint32_t* imageIndex) {
     return result;
 }
 
-VkResult SwapChain::submitCommandBuffers(const VkCommandBuffer* buffers, uint32_t* imageIndex) {
-    if (m_imagesInFlight[*imageIndex] != VK_NULL_HANDLE) {
-        vkWaitForFences(m_Device.device(), 1, &m_imagesInFlight[*imageIndex], VK_TRUE, UINT64_MAX);
+VkResult SwapChain::submitCommandBuffers(const std::vector<VkCommandBuffer>& buffers, uint32_t imageIndex) {
+    if (m_imagesInFlight[imageIndex] != VK_NULL_HANDLE) {
+        vkWaitForFences(m_Device.device(), 1, &m_imagesInFlight[imageIndex], VK_TRUE, UINT64_MAX);
     }
-    m_imagesInFlight[*imageIndex] = m_inFlightFences[m_currentFrame];
+    m_imagesInFlight[imageIndex] = m_inFlightFences[m_currentFrame];
 
     VkSubmitInfo submitInfo = {};
     submitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
@@ -82,8 +82,8 @@ VkResult SwapChain::submitCommandBuffers(const VkCommandBuffer* buffers, uint32_
     submitInfo.pWaitSemaphores = waitSemaphores;
     submitInfo.pWaitDstStageMask = waitStages;
 
-    submitInfo.commandBufferCount = 1;
-    submitInfo.pCommandBuffers = buffers;
+    submitInfo.commandBufferCount = (uint32_t)buffers.size();
+    submitInfo.pCommandBuffers = buffers.data();
 
     VkSemaphore signalSemaphores[] = {m_renderFinishedSemaphores[m_currentFrame]};
     submitInfo.signalSemaphoreCount = 1;
@@ -104,7 +104,7 @@ VkResult SwapChain::submitCommandBuffers(const VkCommandBuffer* buffers, uint32_
     presentInfo.swapchainCount = 1;
     presentInfo.pSwapchains = swapChains;
 
-    presentInfo.pImageIndices = imageIndex;
+    presentInfo.pImageIndices = &imageIndex;
 
     auto result = vkQueuePresentKHR(m_Device.presentQueue(), &presentInfo);
 
