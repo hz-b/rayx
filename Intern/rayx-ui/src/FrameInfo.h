@@ -31,5 +31,6 @@ struct FrameInfo {
     float frameTime;
     VkCommandBuffer commandBuffer;
     Camera& camera;
+    CameraSettings& cameraSettings;  // TODO(Jannis): remove this
     VkDescriptorSet descriptorSet;
 };

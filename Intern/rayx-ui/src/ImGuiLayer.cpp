@@ -132,16 +132,16 @@ ImGuiLayer::~ImGuiLayer() {
     ImGui::DestroyContext();
 }
 
-void ImGuiLayer::updateImGui() {
+void ImGuiLayer::updateImGui(FrameInfo& frameInfo) {
     ImGui_ImplVulkan_NewFrame();
     ImGui_ImplGlfw_NewFrame();
     ImGui::NewFrame();
+
     // 1. Show the big demo window (Most of the sample code is in ImGui::ShowDemoWindow()! You can browse its code to learn more about Dear ImGui!).
     if (m_ShowDemoWindow) ImGui::ShowDemoWindow(&m_ShowDemoWindow);
 
     // 2. Show a simple window that we create ourselves. We use a Begin/End pair to create a named window.
     {
-        static float f = 0.0f;
         static int counter = 0;
 
         ImGui::Begin("Properties Manager");  // Create a window called "Hello, world!" and append into it.
@@ -150,25 +150,25 @@ void ImGuiLayer::updateImGui() {
         ImGui::ColorEdit3("Color", (float*)&m_ClearColor);  // Edit 3 floats representing a color
 
         ImGui::Text("Camera");
-        // ImGui::SliderFloat("FOV", &m_Camera.FOV, 0.0f, 180.0f);
-        // ImGui::SliderFloat("Target X", &m_Camera.target.x, -10.0f, 10.0f);
-        // ImGui::SliderFloat("Target Y", &m_Camera.target.y, -10.0f, 10.0f);
-        // ImGui::SliderFloat("Target Z", &m_Camera.target.z, -10.0f, 10.0f);
-        // ImGui::SliderFloat("Position X", &m_Camera.position.x, -10.0f, 10.0f);
-        // ImGui::SliderFloat("Position Y", &m_Camera.position.y, -10.0f, 10.0f);
-        // ImGui::SliderFloat("Position Z", &m_Camera.position.z, -10.0f, 10.0f);
-        // ImGui::SliderFloat("Up X", &m_Camera.up.x, -1.0f, 1.0f);  // Slider for Up vector x-coordinate
-        // ImGui::SliderFloat("Up Y", &m_Camera.up.y, -1.0f, 1.0f);  // Slider for Up vector y-coordinate
-        // ImGui::SliderFloat("Up Z", &m_Camera.up.z, -1.0f, 1.0f);  // Slider for Up vector z-coordinate
-        // ImGui::SliderFloat("Near", &m_Camera.near, 0.0f, 100.0f);
-        // ImGui::SliderFloat("Far", &m_Camera.far, 0.0f, 10000.0f);
+        ImGui::SliderFloat("FOV", &frameInfo.cameraSettings.FOV, 0.0f, 180.0f);
+        ImGui::SliderFloat("Target X", &frameInfo.cameraSettings.target.x, -10.0f, 10.0f);
+        ImGui::SliderFloat("Target Y", &frameInfo.cameraSettings.target.y, -10.0f, 10.0f);
+        ImGui::SliderFloat("Target Z", &frameInfo.cameraSettings.target.z, -10.0f, 10.0f);
+        ImGui::SliderFloat("Position X", &frameInfo.cameraSettings.position.x, -10.0f, 10.0f);
+        ImGui::SliderFloat("Position Y", &frameInfo.cameraSettings.position.y, -10.0f, 10.0f);
+        ImGui::SliderFloat("Position Z", &frameInfo.cameraSettings.position.z, -10.0f, 10.0f);
+        ImGui::SliderFloat("Up X", &frameInfo.cameraSettings.up.x, -1.0f, 1.0f);  // Slider for Up vector x-coordinate
+        ImGui::SliderFloat("Up Y", &frameInfo.cameraSettings.up.y, -1.0f, 1.0f);  // Slider for Up vector y-coordinate
+        ImGui::SliderFloat("Up Z", &frameInfo.cameraSettings.up.z, -1.0f, 1.0f);  // Slider for Up vector z-coordinate
+        ImGui::SliderFloat("Near", &frameInfo.cameraSettings.near, 0.0f, 100.0f);
+        ImGui::SliderFloat("Far", &frameInfo.cameraSettings.far, 0.0f, 10000.0f);
 
         if (ImGui::Button("Button"))  // Buttons return true when clicked (most widgets return true when edited/activated)
             counter++;
         ImGui::SameLine();
         ImGui::Text("counter = %d", counter);
 
-        ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / m_IO.Framerate, m_IO.Framerate);
+        ImGui::Text("Application average %.6f ms/frame", frameInfo.frameTime);
         ImGui::End();
     }
 

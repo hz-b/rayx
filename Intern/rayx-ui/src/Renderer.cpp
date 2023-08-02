@@ -83,8 +83,6 @@ void Renderer::endFrame() {
     if (vkEndCommandBuffer(commandBuffer) != VK_SUCCESS) {
         throw std::runtime_error("failed to record command buffer!");
     }
-
-    m_ImGuiLayer->updateImGui();
     m_ImGuiLayer->recordImGuiCommands(m_currentImageIndex, m_SwapChain->getFrameBuffer(m_currentImageIndex), m_SwapChain->getExtent());
 
     std::vector<VkCommandBuffer> submitCommandBuffers = {commandBuffer, m_ImGuiLayer->getCommandBuffer(m_currentImageIndex)};

@@ -64,6 +64,8 @@ void Application::run() {
     TriangleRenderSystem triangleRenderSystem(m_Device, m_Scene, m_Renderer.getSwapChainRenderPass(),
                                               setLayout->getDescriptorSetLayout());  // TODO: application doesn't need the scene
 
+    CameraSettings cameraSettings;
+
     auto currentTime = std::chrono::high_resolution_clock::now();
     while (!m_Window.shouldClose()) {
         glfwPollEvents();
@@ -74,7 +76,6 @@ void Application::run() {
         float frameTime = std::chrono::duration<float, std::chrono::seconds::period>(newTime - currentTime).count();
         currentTime = newTime;
 
-        CameraSettings cameraSettings;
         Camera camera = {
             .model = glm::mat4(1.0f),
             .view = cameraSettings.getViewMatrix(),
@@ -85,7 +86,8 @@ void Application::run() {
 
         if (auto commandBuffer = m_Renderer.beginFrame()) {
             uint32_t frameIndex = m_Renderer.getFrameIndex();
-            FrameInfo frameInfo{frameIndex, frameTime, commandBuffer, camera, descriptorSets[frameIndex]};
+            FrameInfo frameInfo{frameIndex, frameTime, commandBuffer, camera, cameraSettings, descriptorSets[frameIndex]};
+            m_Renderer.updateImGui(frameInfo);
 
             // Update ubo
             uboBuffers[frameIndex]->writeToBuffer(&camera);

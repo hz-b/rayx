@@ -26,28 +26,6 @@ const bool enableValidationLayers = false;
 const bool enableValidationLayers = true;
 #endif
 
-// struct QueueFamilyIndices {
-//     std::optional<uint32_t> graphicsFamily;
-//     std::optional<uint32_t> presentFamily;
-
-//     bool isComplete() { return graphicsFamily.has_value() && presentFamily.has_value(); }
-// };
-
-// struct SwapChainSupportDetails {
-//     VkSurfaceCapabilitiesKHR capabilities;
-//     std::vector<VkSurfaceFormatKHR> formats;
-//     std::vector<VkPresentModeKHR> presentModes;
-// };
-
-// struct SwapChain {
-//     VkSwapchainKHR self;
-//     std::vector<VkImage> images;
-//     VkFormat ImageFormat;
-//     VkExtent2D Extent;
-//     std::vector<VkImageView> imageViews;
-//     std::vector<VkFramebuffer> framebuffers;
-// };
-
 class Application {
   public:
     Application(uint32_t width, uint32_t height, const char* name);

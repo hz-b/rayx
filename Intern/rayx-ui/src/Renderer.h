@@ -37,10 +37,7 @@ class Renderer {
     void endSwapChainRenderPass(VkCommandBuffer commandBuffer);
 
     // ImGui
-    void updateImGui() { m_ImGuiLayer->updateImGui(); }
-    void recordImGuiCommands() {
-        m_ImGuiLayer->recordImGuiCommands(m_currentImageIndex, m_SwapChain->getFrameBuffer(m_currentImageIndex), m_SwapChain->getExtent());
-    }
+    void updateImGui(FrameInfo& info) { m_ImGuiLayer->updateImGui(info); }
 
   private:
     void createCommandBuffers();
