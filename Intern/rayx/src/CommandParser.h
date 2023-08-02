@@ -1,5 +1,6 @@
 #pragma once
 #include <CLI/CLI.hpp>
+#include <unordered_map>
 
 #include "Debug/Debug.h"
 #include "TerminalAppConfig.h"

@@ -21,13 +21,3 @@ set(CMAKE_PCH_INSTANTIATE_TEMPLATES ON)
 # ---- Dependencies ----
 target_link_libraries(${BINARY} PUBLIC rayx-core gtest gmock)
 # ----------------------
-
-
-# ---- Code Coverage ----
-if(CMAKE_COMPILER_IS_GNUCXX AND CMAKE_BUILD_TYPE STREQUAL "Debug" AND BUILD_WITH_GCOV)
-    FILE(GLOB_RECURSE GCNO_FILES ${CMAKE_BINARY_DIR}/*/*.gcno)
-    FILE(GLOB_RECURSE GCDA_FILES ${CMAKE_BINARY_DIR}/*/*.gcda)
-    set_property(TARGET ${BINARY}
-        APPEND PROPERTY ADDITIONAL_CLEAN_FILES ${TARGET} ${GCNO_FILES} ${GCDA_FILES})
-endif()
-# -----------------------
