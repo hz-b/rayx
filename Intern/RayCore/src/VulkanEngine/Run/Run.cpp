@@ -8,7 +8,7 @@
 namespace RAYX {
 
 void VulkanEngine::updateDescriptorSets(std::string passName) {
-    // m_ComputePass->updateDescriptorSets(m_BufferHandler);
+    // getComputePass(passName)->updateDescriptorSets(m_BufferHandler);
     getComputePass(passName)->simpleUpdateDescriptorSets(m_BufferHandler);
 }
 
@@ -22,7 +22,7 @@ bool allFinalized(const std::vector<RayMeta>& vector) {
     return std::ranges::all_of(vector, [](const RayMeta& element) { return element.finalized; });
 }
 
-static void printRayStats(const std::vector<Ray>& rayOut) {
+[[maybe_unused]] static void printRayStats(const std::vector<Ray>& rayOut) {
     int _hit = 0;
     int _abs = 0;
     int _fly = 0;
@@ -52,19 +52,19 @@ static void printRayStats(const std::vector<Ray>& rayOut) {
     RAYX_D_LOG << "===============";
 }
 
-std::vector<std::vector<Ray>> VulkanEngine::run(VulkanEngineRunSpec_t spec) {
+std::vector<std::vector<Ray>> VulkanEngine::runTraceComputeTask(ComputeRunSpec_t spec) {
     if (m_state == EngineStates_t::PREINIT) {
         RAYX_ERR << "you've forgotton to .init() the VulkanEngine";
     } else if (m_state == EngineStates_t::POSTRUN) {
         // RAYX_ERR << "you've forgotton to .cleanup() the VulkanEngine";
     }
     m_numberOfInvocations = spec.m_numberOfInvocations;
-    const int maxBounces = spec.maxBounces;  // TODO(OS): Not here
+    const int maxBounces = spec.maxBounces;
 
     // Using new descriptor manager (TODO(OS): Fix new desc. manager)
     updateAllDescriptorSets();
 
-    // FULL TRACER ONLY NOW
+    ////////////// FULL TRACER ONLY
     // recordSimpleTraceCommand("OldFullTracingPass", m_CommandBuffers[0], 0);
     // submitCommandBuffer(0);
     // vkQueueWaitIdle(m_ComputeQueue);
@@ -73,46 +73,46 @@ std::vector<std::vector<Ray>> VulkanEngine::run(VulkanEngineRunSpec_t spec) {
     // m_runs++;
     // m_state = EngineStates_t::POSTRUN;
     // return out;
-
-    // // END
+    ////////////// END
 
     std::vector<std::vector<Ray>> _checkpoints;
     auto push0 = m_computePasses[0]->getPass()[0]->m_pushConstant.getActualPushConstant<PushConstants_t>();
-    // TODO(OS): Maybe move this out of VulkanEngine.Run
-    for (int i = 0; i < maxBounces; i++) {
-        // Update PushConstant content
-        push0->i_bounce = i;
 
-        recordSimpleTraceCommand("singleTracePass", m_CommandBuffers[0], 0);
-        submitCommandBuffer(0);
-        // VK_CHECK_RESULT(m_Fences.compute->waitAndReset())  // FIXME: Can be solved by another memory barrier in CommandBuffer
-        vkQueueWaitIdle(m_ComputeQueue);
-        auto rayOut = m_BufferHandler->readBuffer<Ray>("ray-buffer", true);
-        auto rayMeta = m_BufferHandler->readBuffer<RayMeta>("ray-meta-buffer", true);
+    // First stage: Single Trace until max Bounce
+    // -------------------------------------------------------------------------------------------------------
+    {
+        RAYX_PROFILE_SCOPE_STDOUT("singleTracePass");
+        for (int i = 0; i < maxBounces; i++) {
+            // Update PushConstant content
+            push0->i_bounce = i;
 
-        _checkpoints.push_back(rayOut);
+            recordSimpleTraceCommand("singleTracePass", m_CommandBuffers[0], 0);
+            submitCommandBuffer(0);
+            // VK_CHECK_RESULT(m_Fences.compute->waitAndReset())  // FIXME: Can be solved by another memory barrier in CommandBuffer
+            vkQueueWaitIdle(m_ComputeQueue);
+            auto rayOut = m_BufferHandler->readBuffer<Ray>("ray-buffer", true);
+            auto rayMeta = m_BufferHandler->readBuffer<RayMeta>("ray-meta-buffer", true);
 
-        printRayStats(rayOut);
-
-        if (allFinalized(rayMeta)) {  // Are all rays finished?
-            RAYX_VERB << "All finalized";
-            break;
+            _checkpoints.push_back(rayOut);
+            if (allFinalized(rayMeta)) {  // Are all rays finished?
+                RAYX_D_LOG << "All finalized";
+                break;
+            }
         }
     }
-
-    auto push1 = m_computePasses[1]->getPass()[0]->m_pushConstant.getActualPushConstant<PushConstants_t>();
-    push1->i_bounce = push0->i_bounce;
-
-    recordSimpleTraceCommand("finalCollisionPass", m_CommandBuffers[0], 0);
-    submitCommandBuffer(0);
-    // VK_CHECK_RESULT(m_Fences.compute->waitAndReset())
-    vkQueueWaitIdle(m_ComputeQueue);  // TODO : Valgrind Support not working with fences
-
-    auto rayOut = m_BufferHandler->readBuffer<Ray>("ray-buffer", true);
-    RAYX_D_LOG << "Last:";
-    printRayStats(rayOut);
-    _checkpoints.push_back(rayOut);
-
+    // Second stage: Final collision only check
+    // -------------------------------------------------------------------------------------------------------
+    {
+        RAYX_PROFILE_SCOPE_STDOUT("finalCollisionPass");
+        auto push1 = m_computePasses[1]->getPass()[0]->m_pushConstant.getActualPushConstant<PushConstants_t>();
+        push1->i_bounce = push0->i_bounce;
+        recordSimpleTraceCommand("finalCollisionPass", m_CommandBuffers[0], 0);
+        submitCommandBuffer(0);
+        // VK_CHECK_RESULT(m_Fences.compute->waitAndReset())
+        vkQueueWaitIdle(m_ComputeQueue);  // TODO : Valgrind Support not working with fences
+        auto rayOut = m_BufferHandler->readBuffer<Ray>("ray-buffer", true);
+        _checkpoints.push_back(rayOut);
+    }
     m_runs++;
     m_state = EngineStates_t::POSTRUN;
     return _checkpoints;

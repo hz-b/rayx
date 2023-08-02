@@ -14,7 +14,7 @@ namespace RAYX {
 // -------------------------------------------------------------------------------------------------------
 /**
  * @brief General Vulkan Pass (A group of Pipelines)
- *
+ * Not to be used directly, look at ComputePass/GraphicsPass
  */
 class RAYX_API Pass {
   public:
@@ -64,6 +64,7 @@ class RAYX_API Pass {
 
   protected:
     uint32_t m_stagesCount;
+    std::string m_name;
     Pipelines m_pass = {};  // The pass itself (Pipelines)
     std::unique_ptr<DescriptorPool> m_globalDescriptorPool{};
 };
@@ -99,7 +100,7 @@ class RAYX_API ComputePass : public Pass {
     void prepare(std::vector<VkDescriptorSetLayoutBinding> bindings);
     void createDescriptorPool(uint32_t maxSets, uint32_t bufferCount);
 
-    const VkPipelineBindPoint& getPipelineBindPoint() const { return m_PipelineBindPoint; }
+    const VkPipelineBindPoint& getPipelineBindPoint() const  { return m_PipelineBindPoint; }
     const std::vector<VkDescriptorSet>& getDescriptorSets() const { return m_descriptorSets; }
     const std::vector<VkDescriptorSetLayout>& getDescriptorSetLayouts() const { return m_descriptorSetLayouts; }
     std::string getName() const { return m_name; }
@@ -116,14 +117,12 @@ class RAYX_API ComputePass : public Pass {
     void createDescriptorSetLayout(std::vector<VkDescriptorSetLayoutBinding>& bindings);
 
     VkDevice& m_Device;
-    std::string m_name;  // TODO(OS): Consider moving this to Pass parent class
-
     VkPipelineBindPoint m_PipelineBindPoint = VK_PIPELINE_BIND_POINT_COMPUTE;  // Always compute
 
     std::vector<VkDescriptorSetLayout> m_descriptorSetLayouts;  // TODO(OS): For now, only one [0]
     std::vector<VkDescriptorSet> m_descriptorSets;              // TODO(OS): For now, only one [0]
 
-    // TODO(OS): Add missing memory barriers
+    // TODO(OS): Add missing memory barriers, if needed
 };
 }  // namespace RAYX
 #endif

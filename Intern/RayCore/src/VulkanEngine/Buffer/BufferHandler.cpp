@@ -157,7 +157,7 @@ VulkanBuffer* BufferHandler::getBuffer(const std::string& name) {
 /// If queue -> Wait for queue to finish before reading
 void BufferHandler::readBufferRaw(const char* bufname, char* outdata, const VkQueue& queue) {
     // if (m_state != EngineStates_t::POSTRUN) {
-    //     RAYX_ERR << "you've forgotton to .run() the VulkanEngine. Thats "
+    //     RAYX_ERR << "you've forgotton to .runTraceComputeTask() the VulkanEngine. Thats "
     //                 "mandatory before reading it's output buffers.";
     // }
     VulkanBuffer* buffer = getBuffer(bufname);
@@ -234,8 +234,9 @@ void BufferHandler::updateBuffer(const char* bufname, const std::vector<T>& vec)
     }
     if (vec && m_Buffers[std::string(bufname)]->getSize() == vec.size()) {
         writeBufferRaw(bufname, (char*)vec.data());
-    } else
+    } else {
         RAYX_WARN << "Size mismatch";
+    }
 }
 
 void BufferHandler::deleteBuffer(const char* bufname) {

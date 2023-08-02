@@ -20,7 +20,7 @@
 
 namespace RAYX {
 /// the argument type of `VulkanEngine::run(_)`
-struct VulkanEngineRunSpec_t {
+struct ComputeRunSpec_t {
     uint32_t m_numberOfInvocations;
     int maxBounces;
 };
@@ -43,7 +43,7 @@ class RAYX_API VulkanEngine {
 
     BufferHandler* getBufferHandler() { return m_BufferHandler; }
 
-    std::vector<std::vector<Ray>> run(VulkanEngineRunSpec_t);
+    std::vector<std::vector<Ray>> runTraceComputeTask(ComputeRunSpec_t);
 
     /// changes the state from POSTRUN to PRERUN.
     /// after this all buffers are deleted (and hence readBuffer will fail.)
@@ -72,7 +72,6 @@ class RAYX_API VulkanEngine {
     const VkDevice& getDevice() const { return m_Device; };
     const VkPhysicalDevice& getPhysicalDevice() const { return m_PhysicalDevice; };
     const VkQueue& getComputeQueue() const { return m_ComputeQueue; };
-    const VkQueue& getTransferQueue() const { return m_TransferQueue; };
     ComputePass* getComputePass(std::string passName);
 
     // PushConstants are "constants" updated on each Dispatch Call (or similar) in the pipeline
@@ -97,17 +96,14 @@ class RAYX_API VulkanEngine {
     VkCommandPool m_GlobalCommandPool;
     std::vector<VkCommandBuffer> m_CommandBuffers = {};
     VkQueue m_ComputeQueue;
-    VkQueue m_TransferQueue;
     VkDescriptorPool m_DescriptorPool;
     VmaAllocator m_VmaAllocator;
     size_t STAGING_SIZE = 0;
 
-    BufferHandler* m_BufferHandler;  // new
-    std::vector<ComputePass*> m_computePasses;
-    // ComputePass* m_ComputePass;  // New
+    BufferHandler* m_BufferHandler;             // Buffer management
+    std::vector<ComputePass*> m_computePasses;  // Passes for compute operations
 
     // Sync:
-
     std::vector<VkSemaphore> m_Semaphores = {};
     struct {
         std::unique_ptr<Fence> compute;

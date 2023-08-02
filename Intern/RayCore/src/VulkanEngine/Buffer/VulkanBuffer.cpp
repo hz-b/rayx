@@ -7,11 +7,14 @@ namespace RAYX {
 
 VulkanBuffer::VulkanBuffer(const VmaAllocator& vmaAllocator, VulkanBufferCreateInfo createInfo)
     : m_VmaAllocator(vmaAllocator), m_createInfo(createInfo) {
-    int bufferUsageFlags = VK_BUFFER_USAGE_STORAGE_BUFFER_BIT;  // Usually target storage buffer
+    int bufferUsageFlags;
+    // Type definition
     if (createInfo.bufferType == VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER) {
         bufferUsageFlags = VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT;
+    } else if (createInfo.bufferType == VK_DESCRIPTOR_TYPE_STORAGE_BUFFER) {
+        bufferUsageFlags = VK_BUFFER_USAGE_STORAGE_BUFFER_BIT;
     }
-
+    // Access definition
     if (createInfo.accessType == VKBUFFER_IN) {
         bufferUsageFlags |= VK_BUFFER_USAGE_TRANSFER_DST_BIT;
     } else if (createInfo.accessType == VKBUFFER_OUT) {
@@ -26,8 +29,6 @@ VulkanBuffer::VulkanBuffer(const VmaAllocator& vmaAllocator, VulkanBufferCreateI
 }
 
 VulkanBuffer::~VulkanBuffer() { vmaDestroyBuffer(m_VmaAllocator, m_Buffer, m_Alloca); }
-
-uint32_t findMemoryType(VkPhysicalDevice& physicalDevice, uint32_t memoryTypeBits, VkMemoryPropertyFlags properties);
 
 // Creates a buffer to each given object with a given size.
 // This also allocates memory to the buffer according the requirements of the
@@ -82,14 +83,14 @@ VulkanBuffer& VulkanBuffer::addDescriptorSetPerPassBinding(const std::string& pa
     return *this;
 }
 
-VulkanBuffer& VulkanBuffer::addDescriptorSetPerPassBindings(const std::vector<PassBinding>& descriptorPassBindings) {
+VulkanBuffer& VulkanBuffer::addDescriptorSetPerPassBindings(const std::vector<PassBindingInfo>& descriptorPassBindings) {
     for (const auto& b : descriptorPassBindings) {
         addDescriptorSetPerPassBinding(b.passName, b.binding, b.shaderStageFlag);
     }
     return *this;
 }
 
-VkDescriptorBufferInfo VulkanBuffer::getDescriptorInfo(VkDeviceSize offset) { return VkDescriptorBufferInfo{m_Buffer, offset, m_createInfo.size}; }
+VkDescriptorBufferInfo VulkanBuffer::getVkDescriptorBufferInfo(VkDeviceSize offset) { return VkDescriptorBufferInfo{m_Buffer, offset, m_createInfo.size}; }
 
 uint32_t VulkanBuffer::getPassDescriptorBinding(std::string passName) {
     if (hasPassDescriptorBinding(passName)) {

@@ -126,10 +126,10 @@ void Pass::updatePushConstant(int stage, void* data, uint32_t size) { m_pass[sta
 
 // -------------------------------------------------------------------------------------------------------
 
-ComputePass::ComputePass(VkDevice& device, const ComputePassCreateInfo_t& createInfo) : m_Device(device), m_name(std::string(createInfo.passName)) {
+ComputePass::ComputePass(VkDevice& device, const ComputePassCreateInfo_t& createInfo) : m_Device(device) {
+    m_name = std::string(createInfo.passName);
     m_stagesCount = createInfo.shaderStagesCreateInfos.size();
     m_pass.reserve(m_stagesCount);
-
     m_descriptorSets.reserve(createInfo.descriptorSetAmount);
 
     // Fill compute Pipelines
@@ -188,7 +188,10 @@ void ComputePass::updateDescriptorSets(BufferHandler* bufferHandler) {
     auto buffers = bufferHandler->getBuffers();
 
     for (auto& [name, b] : *buffers) {
-        auto descInfo = b->getDescriptorInfo();
+        if (!b->hasPassDescriptorBinding(m_name)) {
+            continue;
+        }
+        auto descInfo = b->getVkDescriptorBufferInfo();
         writer.writeBuffer(b->getPassDescriptorBinding(m_name), &descInfo);
     }
 
@@ -223,7 +226,7 @@ void ComputePass::simpleUpdateDescriptorSets(BufferHandler* bufferHandler) {
         vkUpdateDescriptorSets(m_Device, 1, &writeDescriptorSet, 0, nullptr);
     }
     // FIXME: Not working..
-    // perform the update of the descriptor set.
+    // perform the update of the descriptor set all at once
     // vkUpdateDescriptorSets(m_Device, writes.size(), writes.data(), 0, nullptr);
 }
 

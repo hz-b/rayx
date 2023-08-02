@@ -56,7 +56,7 @@ Rays VulkanTracer::traceRaw(const TraceRawConfig& cfg) {
     uint64_t workerCounterNum = MAX_UINT64 / uint64_t(cfg.m_numRays);
     for (auto i = 0; i < cfg.m_numRays; i++) {
         rayMeta.push_back({.ctr = ((uint64_t)cfg.m_rayIdStart + (uint64_t)i) * workerCounterNum + uint64_t(cfg.m_randomSeed * MAX_UINT64),
-                           .nextElementId = -1,    // Intersection element unknown / does not exist
+                           .nextElementId = -1,   // Intersection element unknown / does not exist
                            .finalized = false});  // Not started
     }
 
@@ -95,8 +95,8 @@ Rays VulkanTracer::traceRaw(const TraceRawConfig& cfg) {
         std::string passName2 = "OldFullTracingPass";
 
         // Should return only compute now. Important when mixing different shader types to chose right stage flag!
-        auto shaderFlag = m_engine.getComputePass(passName2)->getShaderStage(0).getShaderStageFlagBits();
-        RAYX_D_LOG << "Allocating buffers...";
+        auto shaderFlag = m_engine.getComputePass(passName0)->getShaderStage(0).getShaderStageFlagBits();
+
         // Bindings (Vulkan Buffer <- Descriptors (sets))
         // PS: You can also call addDescriptorSetPerPassBindings once!
         bufferHandler
@@ -106,7 +106,8 @@ Rays VulkanTracer::traceRaw(const TraceRawConfig& cfg) {
             .addDescriptorSetPerPassBinding(passName2, 0, shaderFlag);
 
         bufferHandler
-            ->createBuffer({"output-buffer", VKBUFFER_OUT, numberOfRays * sizeof(Ray) * (size_t)cfg.m_maxSnapshots})  // Beamline quadric info
+            ->createBuffer(
+                {"output-buffer", VKBUFFER_OUT, numberOfRays * sizeof(Ray) * (size_t)cfg.m_maxSnapshots})  // OUTOUT DATA only for main.comp
             .addDescriptorSetPerPassBinding(passName2, 1, shaderFlag);
 
         bufferHandler
@@ -117,7 +118,7 @@ Rays VulkanTracer::traceRaw(const TraceRawConfig& cfg) {
 
         bufferHandler
             ->createBuffer<double>({"quadric-buffer", VKBUFFER_IN}, beamlineData)  // Beamline quadric info
-            .addDescriptorSetPerPassBinding(passName0, 2, shaderFlag)              // TODO : Wrong binding number
+            .addDescriptorSetPerPassBinding(passName0, 2, shaderFlag)
             .addDescriptorSetPerPassBinding(passName1, 2, shaderFlag)
             .addDescriptorSetPerPassBinding(passName2, 3, shaderFlag);
 
@@ -146,18 +147,18 @@ Rays VulkanTracer::traceRaw(const TraceRawConfig& cfg) {
             .addDescriptorSetPerPassBinding(passName1, 6, shaderFlag)
             .addDescriptorSetPerPassBinding(passName2, 7, shaderFlag);
 #endif
-
     }
-
-    // FIXME(OS): Weird pushConstant update
+    // FIXME: Push Constants still support only one shader code! (If two shaders require two structs then Tracer needs to also change to carry a
+    // vector of structs or similar)
     m_engine.getComputePass("singleTracePass")->updatePushConstant(0, m_engine.m_pushConstants.pushConstPtr, m_engine.m_pushConstants.size);
     m_engine.getComputePass("finalCollisionPass")->updatePushConstant(0, m_engine.m_pushConstants.pushConstPtr, m_engine.m_pushConstants.size);
     m_engine.getComputePass("OldFullTracingPass")->updatePushConstant(0, m_engine.m_pushConstants.pushConstPtr, m_engine.m_pushConstants.size);
 
     // Create Pipeline layouts and Descriptor Layouts. Everytime buffer formation (not data) changes, we need to prepare again
     m_engine.prepareComputePipelinePasses();
+
     // Run multiple bounces
-    auto out = m_engine.run({.m_numberOfInvocations = numberOfRays, .maxBounces = (int)cfg.m_elements.size()});
+    auto out = m_engine.runTraceComputeTask({.m_numberOfInvocations = numberOfRays, .maxBounces = (int)cfg.m_elements.size()});
 
 #ifdef RAYX_DEBUG_MODE
     m_debugBufList = bufferHandler->readBuffer<debugBuffer_t>("debug-buffer", true);
@@ -165,8 +166,7 @@ Rays VulkanTracer::traceRaw(const TraceRawConfig& cfg) {
 
     m_engine.cleanup();
 
-    // Vector of vectors
-
+    // 2D Data
     return out;
 }
 

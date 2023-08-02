@@ -56,26 +56,13 @@ Rays Tracer::trace(const Beamline& b) {
         {
             RAYX_PROFILE_SCOPE_STDOUT("Tracing");
             rawBatchRays = traceRaw(cfg);
-            //assert(rawBatchRays.size() == cfg.m_maxSnapshots * batch_size);
-            for (const auto& _events : rawBatchRays) {  // Sanity Check
+            for ([[maybe_unused]] const auto& _events : rawBatchRays) {  // Sanity Check
                 assert(batch_size == _events.size());
             }
         }
 
         {
             RAYX_PROFILE_SCOPE_STDOUT("Snapshotting");
-            // for (uint i = 0; i < batch_size; i++) {
-            //     Snapshots hist;
-            //     hist.reserve(maxSnapshots);
-            //     for (uint j = 0; j < maxSnapshots; j++) {
-            //         uint idx = i * maxSnapshots + j;
-            //         Ray r = rawBatchRays[idx];
-            //         if (r.m_weight != W_UNINIT) {
-            //             hist.push_back(r);
-            //         }
-            //     }
-            //     result.push_back(hist);
-            // }
             auto _maxSnapshot = rawBatchRays.size();
             result.reserve(batch_size);
 

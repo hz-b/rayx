@@ -16,10 +16,6 @@ enum BufferAccessFlags {
     VKBUFFER_INOUT,
 };
 
-/**
- * @brief Pass to VulkanBuffer Class for buffer creation
- *
- */
 struct VulkanBufferCreateInfo {
     const char* bufName;                                              // Unique Buffer name
     BufferAccessFlags accessType;                                     // Access type to Buffer
@@ -27,7 +23,7 @@ struct VulkanBufferCreateInfo {
     VkDescriptorType bufferType = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER;  // What kind of buffer is it (Storage, Image, Uniform etc.)
 };
 
-struct PassBinding {
+struct PassBindingInfo {
     std::string passName;
     uint32_t binding;
     VkShaderStageFlags shaderStageFlag;
@@ -35,7 +31,6 @@ struct PassBinding {
 
 class BufferHandler;
 
-// class VulkanEngine;
 /**
  * @brief Vulkan Storage Buffer Class. Used for Buffer allocation, creation and update
  *
@@ -47,7 +42,7 @@ class RAYX_API VulkanBuffer {
     VulkanBuffer(const VmaAllocator&, VulkanBufferCreateInfo createInfo);
     ~VulkanBuffer();
 
-    // Move/Copy of a VulkanBuffer is not alloawed
+    // Move/Copy of a VulkanBuffer are not alloawed
     VulkanBuffer(const VulkanBuffer&) = delete;
     VulkanBuffer& operator=(const VulkanBuffer&) = delete;
 
@@ -60,16 +55,18 @@ class RAYX_API VulkanBuffer {
     void UnmapMemory();
 
     VulkanBuffer& addDescriptorSetPerPassBinding(const std::string& passName, uint32_t binding, VkShaderStageFlags shaderStageFlag);
-    VulkanBuffer& addDescriptorSetPerPassBindings(const std::vector<PassBinding>&);
-    VkDescriptorBufferInfo getDescriptorInfo(VkDeviceSize offset = 0);
+    VulkanBuffer& addDescriptorSetPerPassBindings(const std::vector<PassBindingInfo>&);
+    VkDescriptorBufferInfo getVkDescriptorBufferInfo(VkDeviceSize offset = 0);
     uint32_t getPassDescriptorBinding(std::string passName);
 
   private:
-    // VMA Version of createVkBuffer
+    /**
+     * @brief Create a Vma Buffer object (VMA version of classical Vulkan createBuffer)
+
+     */
     void createVmaBuffer(VkDeviceSize size, VkBufferUsageFlags buffer_usage, VkBuffer& buffer, VmaAllocation& allocation,
                          VmaAllocationInfo* allocation_info, VmaAllocationCreateFlags flags = VMA_ALLOCATION_CREATE_HOST_ACCESS_RANDOM_BIT,
                          VmaMemoryUsage memory_usage = VMA_MEMORY_USAGE_AUTO, const std::vector<uint32_t>& queue_family_indices = {});
-
     VmaAllocator m_VmaAllocator;
     VulkanBufferCreateInfo m_createInfo;
     VmaAllocationCreateFlags m_VmaFlags;

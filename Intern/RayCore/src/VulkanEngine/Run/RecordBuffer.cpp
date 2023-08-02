@@ -164,8 +164,6 @@ void VulkanEngine::recordSecondCommand() {
     pass1->bind(*cmdBuffer1, 0);
     pass1->bindDescriptorSet(*cmdBuffer1, 0);
 
-    // auto traceCommand = [](VkCOmmandBuffer & command)
-
     auto requiredLocalWorkGroupNo = (uint32_t)ceil((float)m_numberOfInvocations / float(WORKGROUP_SIZE));  // number of local works groups
     VkPhysicalDeviceProperties deviceProperties;
     vkGetPhysicalDeviceProperties(m_PhysicalDevice, &deviceProperties);
