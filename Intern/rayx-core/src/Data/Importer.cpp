@@ -42,7 +42,7 @@ void addBeamlineObjectFromXML(rapidxml::xml_node<>* node, Beamline* beamline, co
         beamline->m_OpticalElements.push_back(e2);
     };
 
-    RAYX::xml::Parser parser(node, group_context, filename);
+    RAYX::xml::Parser parser(node, group_context, std::move(filename));
 
     // every beamline object has a function createFromXML which constructs the
     // object from a given xml-node if possible (otherwise it will return a
@@ -52,10 +52,6 @@ void addBeamlineObjectFromXML(rapidxml::xml_node<>* node, Beamline* beamline, co
         addLightSource(std::make_shared<PointSource>(parser), node);
     } else if (strcmp(type, "Matrix Source") == 0) {
         addLightSource(std::make_shared<MatrixSource>(parser), node);
-    } else if (strcmp(type, "Dipole") == 0) {
-        addLightSource(std::make_shared<DipoleSource>(parser), node);
-    } else if (strcmp(type, "Dipole Source") == 0) {
-        addLightSource(std::make_shared<DipoleSource>(parser), node);
     } else if (strcmp(type, "ImagePlane") == 0) {
         addOpticalElement(makeImagePlane(parser), node);
     } else if (strcmp(type, "Plane Mirror") == 0) {
@@ -113,7 +109,7 @@ RenderObjectVec getRenderData(const std::filesystem::path& filename) {
             strcmp(type, "Matrix Source") == 0) {  // TODO(Jannis): The should be a better check for this. Adding a new lightsource would break this.
             continue;
         } else {
-            RAYX::xml::Parser parser(object, std::vector<xml::Group>(), filename);
+            RAYX::xml::Parser parser(object, std::vector<xml::Group>(), std::move(filename));
 
             RenderObject d;
             d.name = parser.name();

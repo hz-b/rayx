@@ -11,27 +11,22 @@ struct Extent2D {
 class Window {
   public:
     Window(uint32_t width, uint32_t height, const char* const title);
-    Window(const Window&) = delete;
-    Window& operator=(const Window&) = delete;
-
     ~Window();
 
-    GLFWwindow* window() const { return m_Window; }
-    VkExtent2D getExtent() const { return {m_width, m_height}; }
+    GLFWwindow* get() const { return m_Window; }
+    Extent2D getExtent() const { return {m_width, m_height}; }
     void updateWindowSize();
-    void createSurface(VkInstance instance, VkSurfaceKHR* surface);
-    bool shouldClose() const { return glfwWindowShouldClose(m_Window); }
 
-    bool wasWindowResized() { return m_framebufferResized; }
-    void resetWindowResizedFlag() { m_framebufferResized = false; }
+    bool m_framebufferResized = false;
 
   private:
-    static void framebufferResizeCallback(GLFWwindow* rawWindow, int width, int height);
+    static void framebufferResizeCallback(GLFWwindow* window, int width, int height);
 
+    const GLFWwindow* window;
     uint32_t m_width;
     uint32_t m_height;
-    bool m_framebufferResized = false;
     const char* m_title;
 
     GLFWwindow* m_Window;
+    VkSurfaceKHR m_Surface;
 };

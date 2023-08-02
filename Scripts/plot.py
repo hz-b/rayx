@@ -48,7 +48,7 @@ def plot(filename: str):
     def react(name):
         global BAR
 
-        e = float(names.index(name))
+        e = float(names.index(name) + 1)
         ax.clear()
         d = df[df["lastElement"] == e]
 

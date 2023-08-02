@@ -7,7 +7,44 @@ void checkVkResult(VkResult result, const char* message) {
     }
 }
 
-ImGuiLayer::ImGuiLayer(const Window& window, const Device& device, const SwapChain& swapchain) : m_Window(window), m_Device(device) {
+VkCommandBuffer beginSingleTimeCommands(VkDevice device, VkCommandPool commandPool) {
+    VkCommandBufferAllocateInfo allocInfo{};
+    allocInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
+    allocInfo.commandPool = commandPool;
+    allocInfo.level = VK_COMMAND_BUFFER_LEVEL_PRIMARY;
+    allocInfo.commandBufferCount = 1;
+
+    VkCommandBuffer commandBuffer;
+    checkVkResult(vkAllocateCommandBuffers(device, &allocInfo, &commandBuffer), "Failed to allocate command buffers!");
+
+    VkCommandBufferBeginInfo beginInfo{};
+    beginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
+    beginInfo.flags = VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT;
+
+    checkVkResult(vkBeginCommandBuffer(commandBuffer, &beginInfo), "Failed to begin command buffer!");
+
+    return commandBuffer;
+}
+
+void endSingleTimeCommands(VkDevice device, VkCommandPool commandPool, VkQueue graphicsQueue, VkCommandBuffer commandBuffer) {
+    vkEndCommandBuffer(commandBuffer);
+
+    VkSubmitInfo submitInfo{};
+    submitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
+    submitInfo.commandBufferCount = 1;
+    submitInfo.pCommandBuffers = &commandBuffer;
+
+    checkVkResult(vkQueueSubmit(graphicsQueue, 1, &submitInfo, VK_NULL_HANDLE), "Failed to submit queue!");
+
+    vkQueueWaitIdle(graphicsQueue);
+
+    vkFreeCommandBuffers(device, commandPool, 1, &commandBuffer);
+}
+
+void ImGuiLayer::init(GLFWwindow* window, ImGui_ImplVulkan_InitInfo&& initInfo, VkFormat imageFormat) {
+    m_Window = window;
+    m_InitInfo = initInfo;
+
     // Create descriptor pool for IMGUI
     VkDescriptorPoolSize poolSizes[] = {{VK_DESCRIPTOR_TYPE_SAMPLER, 1000},
                                         {VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 1000},
@@ -25,67 +62,51 @@ ImGuiLayer::ImGuiLayer(const Window& window, const Device& device, const SwapCha
     poolInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_POOL_CREATE_INFO;
     poolInfo.flags = VK_DESCRIPTOR_POOL_CREATE_FREE_DESCRIPTOR_SET_BIT;
     poolInfo.maxSets = 1000;
-    poolInfo.poolSizeCount = (uint32_t)std::size(poolSizes);
+    poolInfo.poolSizeCount = std::size(poolSizes);
     poolInfo.pPoolSizes = poolSizes;
 
-    if (vkCreateDescriptorPool(m_Device.device(), &poolInfo, nullptr, &m_DescriptorPool) != VK_SUCCESS) {
+    if (vkCreateDescriptorPool(m_InitInfo.Device, &poolInfo, nullptr, &m_DescriptorPool) != VK_SUCCESS) {
         throw std::runtime_error("Failed to create imgui descriptor pool");
     }
+    m_InitInfo.DescriptorPool = m_DescriptorPool;
 
     // Create render pass for IMGUI
-    VkAttachmentDescription colorAttachment = {};
-    colorAttachment.format = swapchain.getImageFormat();  // same as in main render pass
-    colorAttachment.samples = VK_SAMPLE_COUNT_1_BIT;
-    colorAttachment.loadOp = VK_ATTACHMENT_LOAD_OP_LOAD;
-    colorAttachment.storeOp = VK_ATTACHMENT_STORE_OP_STORE;
-    colorAttachment.stencilLoadOp = VK_ATTACHMENT_LOAD_OP_DONT_CARE;
-    colorAttachment.stencilStoreOp = VK_ATTACHMENT_STORE_OP_DONT_CARE;
-    colorAttachment.initialLayout = VK_IMAGE_LAYOUT_PRESENT_SRC_KHR;  // same as in main render pass
-    colorAttachment.finalLayout = VK_IMAGE_LAYOUT_PRESENT_SRC_KHR;    // same as in main render pass
+    VkAttachmentDescription attachment = {};
+    attachment.format = imageFormat;
+    attachment.samples = VK_SAMPLE_COUNT_1_BIT;
+    attachment.loadOp = VK_ATTACHMENT_LOAD_OP_LOAD;
+    attachment.storeOp = VK_ATTACHMENT_STORE_OP_STORE;
+    attachment.stencilLoadOp = VK_ATTACHMENT_LOAD_OP_DONT_CARE;
+    attachment.stencilStoreOp = VK_ATTACHMENT_STORE_OP_DONT_CARE;
+    attachment.initialLayout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
+    attachment.finalLayout = VK_IMAGE_LAYOUT_PRESENT_SRC_KHR;
 
-    VkAttachmentDescription depthAttachment = {};
-    depthAttachment.format = swapchain.findDepthFormat();  // same as in main render pass
-    depthAttachment.samples = VK_SAMPLE_COUNT_1_BIT;
-    depthAttachment.loadOp = VK_ATTACHMENT_LOAD_OP_CLEAR;
-    depthAttachment.storeOp = VK_ATTACHMENT_STORE_OP_DONT_CARE;
-    depthAttachment.stencilLoadOp = VK_ATTACHMENT_LOAD_OP_DONT_CARE;
-    depthAttachment.stencilStoreOp = VK_ATTACHMENT_STORE_OP_DONT_CARE;
-    depthAttachment.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;                       // same as in main render pass
-    depthAttachment.finalLayout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL;  // same as in main render pass
-
-    VkAttachmentReference colorAttachmentRef = {};
-    colorAttachmentRef.attachment = 0;
-    colorAttachmentRef.layout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
-
-    VkAttachmentReference depthAttachmentRef = {};
-    depthAttachmentRef.attachment = 1;
-    depthAttachmentRef.layout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL;
+    VkAttachmentReference color_attachment = {};
+    color_attachment.attachment = 0;
+    color_attachment.layout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
 
     VkSubpassDescription subpass = {};
     subpass.pipelineBindPoint = VK_PIPELINE_BIND_POINT_GRAPHICS;
     subpass.colorAttachmentCount = 1;
-    subpass.pColorAttachments = &colorAttachmentRef;
-    subpass.pDepthStencilAttachment = &depthAttachmentRef;
+    subpass.pColorAttachments = &color_attachment;
 
     VkSubpassDependency dependency = {};
     dependency.srcSubpass = VK_SUBPASS_EXTERNAL;
     dependency.dstSubpass = 0;
-    dependency.srcStageMask = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT | VK_PIPELINE_STAGE_EARLY_FRAGMENT_TESTS_BIT;
-    dependency.dstStageMask = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT | VK_PIPELINE_STAGE_EARLY_FRAGMENT_TESTS_BIT;
-    dependency.srcAccessMask = 0;
-    dependency.dstAccessMask = VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT | VK_ACCESS_DEPTH_STENCIL_ATTACHMENT_WRITE_BIT;
+    dependency.srcStageMask = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT;
+    dependency.dstStageMask = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT;
+    dependency.srcAccessMask = 0;  // or VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT;
+    dependency.dstAccessMask = VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT;
 
-    std::array<VkAttachmentDescription, 2> attachments = {colorAttachment, depthAttachment};
     VkRenderPassCreateInfo info = {};
     info.sType = VK_STRUCTURE_TYPE_RENDER_PASS_CREATE_INFO;
-    info.attachmentCount = static_cast<uint32_t>(attachments.size());
-    info.pAttachments = attachments.data();
+    info.attachmentCount = 1;
+    info.pAttachments = &attachment;
     info.subpassCount = 1;
     info.pSubpasses = &subpass;
     info.dependencyCount = 1;
     info.pDependencies = &dependency;
-
-    if (vkCreateRenderPass(m_Device.device(), &info, nullptr, &m_RenderPass) != VK_SUCCESS) {
+    if (vkCreateRenderPass(m_InitInfo.Device, &info, nullptr, &m_RenderPass) != VK_SUCCESS) {
         throw std::runtime_error("Could not create Dear ImGui's render pass");
     }
 
@@ -95,41 +116,19 @@ ImGuiLayer::ImGuiLayer(const Window& window, const Device& device, const SwapCha
 
     ImGui::StyleColorsDark();
 
-    ImGui_ImplVulkan_InitInfo initInfo = {};
-    initInfo.Instance = m_Device.instance();
-    initInfo.PhysicalDevice = m_Device.physicalDevice();
-    initInfo.Device = m_Device.device();
-    initInfo.QueueFamily = m_Device.findPhysicalQueueFamilies().graphicsFamily;
-    initInfo.Queue = m_Device.graphicsQueue();
-    initInfo.PipelineCache = VK_NULL_HANDLE;
-    initInfo.DescriptorPool = m_DescriptorPool;
-    initInfo.Allocator = nullptr;
-    initInfo.MinImageCount = (uint32_t)swapchain.imageCount();
-    initInfo.ImageCount = (uint32_t)swapchain.imageCount();
-    initInfo.CheckVkResultFn = nullptr;
-
-    ImGui_ImplGlfw_InitForVulkan(m_Window.window(), true);
-    ImGui_ImplVulkan_Init(&initInfo, m_RenderPass);
+    ImGui_ImplGlfw_InitForVulkan(window, true);
+    ImGui_ImplVulkan_Init(&m_InitInfo, m_RenderPass);
 
     createCommandPool();
-    createCommandBuffers((uint32_t)swapchain.imageCount());
+    createCommandBuffers(m_InitInfo.ImageCount);
 
     // Upload fonts
     {
-        auto tmpCommandBuffer = m_Device.beginSingleTimeCommands();
+        auto tmpCommandBuffer = beginSingleTimeCommands(m_InitInfo.Device, m_CommandPool);
         ImGui_ImplVulkan_CreateFontsTexture(tmpCommandBuffer);
-        m_Device.endSingleTimeCommands(tmpCommandBuffer);
+        endSingleTimeCommands(m_InitInfo.Device, m_CommandPool, m_InitInfo.Queue, tmpCommandBuffer);
         ImGui_ImplVulkan_DestroyFontUploadObjects();
     }
-}
-
-ImGuiLayer::~ImGuiLayer() {
-    vkDestroyCommandPool(m_Device.device(), m_CommandPool, nullptr);
-    vkDestroyRenderPass(m_Device.device(), m_RenderPass, nullptr);
-    vkDestroyDescriptorPool(m_Device.device(), m_DescriptorPool, nullptr);
-    ImGui_ImplVulkan_Shutdown();
-    ImGui_ImplGlfw_Shutdown();
-    ImGui::DestroyContext();
 }
 
 void ImGuiLayer::updateImGui() {
@@ -150,18 +149,15 @@ void ImGuiLayer::updateImGui() {
         ImGui::ColorEdit3("Color", (float*)&m_ClearColor);  // Edit 3 floats representing a color
 
         ImGui::Text("Camera");
-        // ImGui::SliderFloat("FOV", &m_Camera.FOV, 0.0f, 180.0f);
-        // ImGui::SliderFloat("Target X", &m_Camera.target.x, -10.0f, 10.0f);
-        // ImGui::SliderFloat("Target Y", &m_Camera.target.y, -10.0f, 10.0f);
-        // ImGui::SliderFloat("Target Z", &m_Camera.target.z, -10.0f, 10.0f);
-        // ImGui::SliderFloat("Position X", &m_Camera.position.x, -10.0f, 10.0f);
-        // ImGui::SliderFloat("Position Y", &m_Camera.position.y, -10.0f, 10.0f);
-        // ImGui::SliderFloat("Position Z", &m_Camera.position.z, -10.0f, 10.0f);
-        // ImGui::SliderFloat("Up X", &m_Camera.up.x, -1.0f, 1.0f);  // Slider for Up vector x-coordinate
-        // ImGui::SliderFloat("Up Y", &m_Camera.up.y, -1.0f, 1.0f);  // Slider for Up vector y-coordinate
-        // ImGui::SliderFloat("Up Z", &m_Camera.up.z, -1.0f, 1.0f);  // Slider for Up vector z-coordinate
-        // ImGui::SliderFloat("Near", &m_Camera.near, 0.0f, 100.0f);
-        // ImGui::SliderFloat("Far", &m_Camera.far, 0.0f, 10000.0f);
+        ImGui::SliderFloat("FOV", &m_Camera.FOV, 0.0f, 180.0f);
+        ImGui::SliderFloat("Pitch", &m_Camera.Pitch, -90.0f, 90.0f);
+        ImGui::SliderFloat("Yaw", &m_Camera.Yaw, -180.0f, 180.0f);
+        ImGui::SliderFloat("Roll", &m_Camera.Roll, -180.0f, 180.0f);
+        ImGui::SliderFloat("X", &m_Camera.Position.x, -10.0f, 10.0f);
+        ImGui::SliderFloat("Y", &m_Camera.Position.y, -10.0f, 10.0f);
+        ImGui::SliderFloat("Z", &m_Camera.Position.z, -10.0f, 10.0f);
+        ImGui::SliderFloat("Near", &m_Camera.Near, 0.0f, 100.0f);
+        ImGui::SliderFloat("Far", &m_Camera.Far, 0.0f, 100.0f);
 
         if (ImGui::Button("Button"))  // Buttons return true when clicked (most widgets return true when edited/activated)
             counter++;
@@ -183,18 +179,15 @@ VkCommandBuffer ImGuiLayer::recordImGuiCommands(uint32_t currentImage, const VkF
         throw std::runtime_error("Failed to begin command buffer");
     }
 
-    VkClearValue clearValues[2];
-    clearValues[0].color = {{0.0f, 0.0f, 0.0f, 1.0f}};  // Clear color
-    clearValues[1].depthStencil = {1.0f, 0};            // Clear depth and stencil values
-
+    VkClearValue clearValue = {{0.0f, 0.0f, 0.0f, 1.0f}};
     VkRenderPassBeginInfo info = {};
     info.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
     info.renderPass = m_RenderPass;
     info.framebuffer = framebuffer;
     info.renderArea.offset = {0, 0};
     info.renderArea.extent = extent;
-    info.clearValueCount = 2;
-    info.pClearValues = clearValues;
+    info.clearValueCount = 1;
+    info.pClearValues = &clearValue;
     vkCmdBeginRenderPass(m_CommandBuffers[currentImage], &info, VK_SUBPASS_CONTENTS_INLINE);
     ImGui_ImplVulkan_RenderDrawData(ImGui::GetDrawData(), m_CommandBuffers[currentImage]);
     vkCmdEndRenderPass(m_CommandBuffers[currentImage]);
@@ -206,13 +199,22 @@ VkCommandBuffer ImGuiLayer::recordImGuiCommands(uint32_t currentImage, const VkF
     return m_CommandBuffers[currentImage];
 }
 
+void ImGuiLayer::cleanupImGui() {
+    ImGui_ImplVulkan_Shutdown();
+    ImGui_ImplGlfw_Shutdown();
+    ImGui::DestroyContext();
+    vkDestroyCommandPool(m_InitInfo.Device, m_CommandPool, nullptr);
+    vkDestroyRenderPass(m_InitInfo.Device, m_RenderPass, nullptr);
+    vkDestroyDescriptorPool(m_InitInfo.Device, m_InitInfo.DescriptorPool, nullptr);
+}
+
 void ImGuiLayer::createCommandPool() {
     VkCommandPoolCreateInfo poolInfo = {};
     poolInfo.sType = VK_STRUCTURE_TYPE_COMMAND_POOL_CREATE_INFO;
     poolInfo.queueFamilyIndex = 0;
     poolInfo.flags = VK_COMMAND_POOL_CREATE_RESET_COMMAND_BUFFER_BIT;
 
-    if (vkCreateCommandPool(m_Device.device(), &poolInfo, nullptr, &m_CommandPool) != VK_SUCCESS) {
+    if (vkCreateCommandPool(m_InitInfo.Device, &poolInfo, nullptr, &m_CommandPool) != VK_SUCCESS) {
         throw std::runtime_error("Failed to create command pool");
     }
 }
@@ -226,7 +228,7 @@ void ImGuiLayer::createCommandBuffers(uint32_t cmdBufferCount) {
     allocInfo.level = VK_COMMAND_BUFFER_LEVEL_PRIMARY;
     allocInfo.commandBufferCount = cmdBufferCount;
 
-    if (vkAllocateCommandBuffers(m_Device.device(), &allocInfo, m_CommandBuffers.data()) != VK_SUCCESS) {
+    if (vkAllocateCommandBuffers(m_InitInfo.Device, &allocInfo, m_CommandBuffers.data()) != VK_SUCCESS) {
         throw std::runtime_error("Failed to allocate command buffers");
     }
 }

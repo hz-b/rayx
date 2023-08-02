@@ -32,7 +32,7 @@ TEST_F(TestSuite, PlaneGratingIncAzMis) { compareLastAgainstRayUI("PlaneGratingI
 TEST_F(TestSuite, ReflectionZonePlateAzim200) { compareLastAgainstRayUI("ReflectionZonePlateAzim200", 1e-7); }
 TEST_F(TestSuite, ReflectionZonePlateDefault) { compareLastAgainstRayUI("ReflectionZonePlateDefault"); }
 TEST_F(TestSuite, ReflectionZonePlateDefault200) { compareLastAgainstRayUI("ReflectionZonePlateDefault200", 1e-7); }
-// TEST_F(TestSuite, ReflectionZonePlateDefault200Toroid) { compareLastAgainstRayUI("ReflectionZonePlateDefault200Toroid", 1e-7); }
+TEST_F(TestSuite, ReflectionZonePlateDefault200Toroid) { compareLastAgainstRayUI("ReflectionZonePlateDefault200Toroid", 1e-7); }
 TEST_F(TestSuite, ReflectionZonePlateMis) { compareLastAgainstRayUI("ReflectionZonePlateMis", 1e-7); }
 
 TEST_F(TestSuite, globalCoordinates_20rays) { compareLastAgainstRayUI("globalCoordinates_20rays"); }
@@ -60,8 +60,8 @@ TEST_F(TestSuite, Slit) {
     int absorbed = 0;      // number of rays absorbed by the slit.
     int pass_through = 0;  // number of rays passing through the slit.
 
-    const auto SLIT_ID = 0;
-    const auto IMAGE_PLANE_ID = 1;
+    const auto SLIT_ID = 1;
+    const auto IMAGE_PLANE_ID = 2;
 
     for (auto ray_hist : hist) {
         if (ray_hist.size() == 1) {  // matrix source -> slit absorbed
@@ -86,12 +86,11 @@ TEST_F(TestSuite, Slit) {
     CHECK_EQ(pass_through, 92);
 }
 
-// TODO re-enable toroid tests
-// TEST_F(TestSuite, toroid) { compareLastAgainstRayUI("toroid"); }
+TEST_F(TestSuite, toroid) { compareLastAgainstRayUI("toroid"); }
 
 // this is the same test as above, but xLength and zLength are exchanged. This
 // tests the wasteBox, as not all rays hit the toroid.
-// TEST_F(TestSuite, toroid_swapped) { compareLastAgainstRayUI("toroid_swapped"); }
+TEST_F(TestSuite, toroid_swapped) { compareLastAgainstRayUI("toroid_swapped"); }
 
 TEST_F(TestSuite, Ellipsoid_DGIA) { compareLastAgainstRayUI("Ellipsoid_DGIA"); }
 TEST_F(TestSuite, Ellipsoid_MB) { compareLastAgainstRayUI("Ellipsoid_MB"); }
@@ -104,4 +103,4 @@ TEST_F(TestSuite, ellipsoid_ip_200mirrormis) { compareLastAgainstRayUI("ellipsoi
 
 TEST_F(TestSuite, Cone) { compareLastAgainstRayUI("Cone"); }
 
-TEST_F(TestSuite, RZP_misalignment) { compareLastAgainstRayUI("RZP_misalignment", 1e-10); }
+TEST_F(TestSuite, RZP_misalignment) { compareLastAgainstRayUI("RZP_misalignment"); }

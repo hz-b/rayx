@@ -9,7 +9,7 @@ namespace RAYX {
 
 // Note: A `dvec3` needs an alignment of 4 * sizeof(double), hence two dvec3s can never be directly after each other (without padding).
 // Further, the number of doubles in a Ray need to be divisible by four at all times, as we want to store multiple Rays after each other without
-// padding in `rayData`. This is why we need m_padding.
+// padding in `rayData`. This is why we need m_extraParam.
 struct RAYX_API Ray {
     dvec3 m_position;
     // The m_eventType is only required for Rays stored as part of a RayHistory or BundleHistory. It then expresses the type of event that occured at

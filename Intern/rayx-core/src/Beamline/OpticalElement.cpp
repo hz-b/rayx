@@ -88,7 +88,6 @@ Surface makeToroid(const DesignObject& dobj) {
     return serializeToroid({
         .m_longRadius = dobj.parseLongRadius(),
         .m_shortRadius = dobj.parseShortRadius(),
-        .m_toroidType = TOROID_TYPE_CONCAVE,
     });
 }
 

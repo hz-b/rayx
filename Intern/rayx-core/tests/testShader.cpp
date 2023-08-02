@@ -147,7 +147,18 @@ TEST_F(TestSuite, testRZPLineDensityDefaulParams) {
     struct InOutPair {
         Ray in_ray;
         glm::dvec4 in_normal;
-        RZPBehaviour in_b;
+        int in_imageType;
+        int in_rzpType;
+        int in_derivationMethod;
+        double in_zOffsetCenter;
+        double in_risag;
+        double in_rosag;
+        double in_rimer;
+        double in_romer;
+        double in_alpha;
+        double in_beta;
+        double in_Ord;
+        double in_WL;
 
         double out_DX;
         double out_DZ;
@@ -156,94 +167,82 @@ TEST_F(TestSuite, testRZPLineDensityDefaulParams) {
     std::vector<InOutPair> inouts = {
         {
             .in_ray =
-                Ray{
+                {
                     .m_position = glm::dvec3(-5.0805095016939532, 0, 96.032788311782269),
                     .m_direction = glm::dvec3(0, 1, 0),
                 },
             .in_normal = glm::dvec4(0, 1, 0, 0),
-            .in_b =
-                RZPBehaviour{
-                    .m_imageType = 0,
-                    .m_rzpType = 0,
-                    .m_derivationMethod = 0,
-                    .m_designWavelength = 1.239852e-05 * 1e6,
-                    .m_orderOfDiffraction = -1,
-                    .m_fresnelZOffset = 0,
-                    .m_designSagittalEntranceArmLength = 100,
-                    .m_designSagittalExitArmLength = 500,
-                    .m_designMeridionalEntranceArmLength = 100,
-                    .m_designMeridionalExitArmLength = 500,
-                    .m_designAlphaAngle = 0.017453292519943295,
-                    .m_designBetaAngle = 0.017453292519943295,
-                },
+            .in_imageType = 0,
+            .in_rzpType = 0,
+            .in_derivationMethod = 0,
+            .in_zOffsetCenter = 0,
+            .in_risag = 100,
+            .in_rosag = 500,
+            .in_rimer = 100,
+            .in_romer = 500,
+            .in_alpha = 0.017453292519943295,
+            .in_beta = 0.017453292519943295,
+            .in_Ord = -1,
+            .in_WL = 1.239852e-05,
 
             .out_DX = 3103.9106911246749,
             .out_DZ = 5.0771666330055218,
         },
         {.in_ray =
-             Ray{
+             {
                  .m_position = glm::dvec3(-1.6935030407867075, 0, 96.032777495754004),
                  .m_direction = glm::dvec3(0, 1, 0),
              },
          .in_normal = glm::dvec4(0, 1, 0, 0),
-         .in_b =
-             RZPBehaviour{
-                 .m_imageType = 0,
-                 .m_rzpType = 0,
-                 .m_derivationMethod = 0,
-                 .m_designWavelength = 1.239852e-05 * 1e6,
-                 .m_orderOfDiffraction = -1,
-                 .m_fresnelZOffset = 0,
-                 .m_designSagittalEntranceArmLength = 100,
-                 .m_designSagittalExitArmLength = 500,
-                 .m_designMeridionalEntranceArmLength = 100,
-                 .m_designMeridionalExitArmLength = 500,
-                 .m_designAlphaAngle = 0.017453292519943295,
-                 .m_designBetaAngle = 0.017453292519943295,
-             },
+         .in_imageType = 0,
+         .in_rzpType = 0,
+         .in_derivationMethod = 0,
+         .in_zOffsetCenter = 0,
+         .in_risag = 100,
+         .in_rosag = 500,
+         .in_rimer = 100,
+         .in_romer = 500,
+         .in_alpha = 0.017453292519943295,
+         .in_beta = 0.017453292519943295,
+         .in_Ord = -1,
+         .in_WL = 1.239852e-05,
          .out_DX = 1034.8685185321938,
          .out_DZ = -13.320120179862876},
-        {.in_ray = Ray{.m_position = glm::dvec3(-5.047050067282087, 4.4859372100394515, 29.182033770349552),
-                       .m_direction = glm::dvec3(0.05047050067282087, 0.95514062789960552, -0.29182033770349552)},
+        {.in_ray = {.m_position = glm::dvec3(-5.047050067282087, 4.4859372100394515, 29.182033770349552),
+                    .m_direction = glm::dvec3(0.05047050067282087, 0.95514062789960552, -0.29182033770349552)},
          .in_normal = glm::dvec4(0.05047050067282087, 0.95514062789960552, -0.29182033770349552, 0),
-         .in_b =
-             RZPBehaviour{
-                 .m_imageType = 0,
-                 .m_rzpType = 0,
-                 .m_derivationMethod = 0,
-                 .m_designWavelength = 1.239852e-05 * 1e6,
-                 .m_orderOfDiffraction = -1,
-                 .m_fresnelZOffset = 0,
-                 .m_designSagittalEntranceArmLength = 100,
-                 .m_designSagittalExitArmLength = 500,
-                 .m_designMeridionalEntranceArmLength = 100,
-                 .m_designMeridionalExitArmLength = 500,
-                 .m_designAlphaAngle = 0.017453292519943295,
-                 .m_designBetaAngle = 0.017453292519943295,
-             },
+         .in_imageType = 0,
+         .in_rzpType = 0,
+         .in_derivationMethod = 0,
+         .in_zOffsetCenter = 0,
+         .in_risag = 100,
+         .in_rosag = 500,
+         .in_rimer = 100,
+         .in_romer = 500,
+         .in_alpha = 0.017453292519943295,
+         .in_beta = 0.017453292519943295,
+         .in_Ord = -1,
+         .in_WL = 1.239852e-05,
          .out_DX = 4045.0989844091882,
          .out_DZ = -174.2085626048659},
         {.in_ray =
-             Ray{
+             {
                  .m_position = glm::dvec3(-1.6802365843267262, 1.3759250917712356, 16.445931214643075),
                  .m_direction = glm::dvec3(0.016802365843267261, 0.98624074908228765, -0.16445931214643075),
              },
          .in_normal = glm::dvec4(0.016802365843267261, 0.98624074908228765, -0.16445931214643075, 0),
-         .in_b =
-             RZPBehaviour{
-                 .m_imageType = 0,
-                 .m_rzpType = 0,
-                 .m_derivationMethod = 0,
-                 .m_designWavelength = 1.239852e-05 * 1e6,
-                 .m_orderOfDiffraction = -1,
-                 .m_fresnelZOffset = 0,
-                 .m_designSagittalEntranceArmLength = 100,
-                 .m_designSagittalExitArmLength = 500,
-                 .m_designMeridionalEntranceArmLength = 100,
-                 .m_designMeridionalExitArmLength = 500,
-                 .m_designAlphaAngle = 0.017453292519943295,
-                 .m_designBetaAngle = 0.017453292519943295,
-             },
+         .in_imageType = 0,
+         .in_rzpType = 0,
+         .in_derivationMethod = 0,
+         .in_zOffsetCenter = 0,
+         .in_risag = 100,
+         .in_rosag = 500,
+         .in_rimer = 100,
+         .in_romer = 500,
+         .in_alpha = 0.017453292519943295,
+         .in_beta = 0.017453292519943295,
+         .in_Ord = -1,
+         .in_WL = 1.239852e-05,
          .out_DX = 1418.1004208892475,
          .out_DZ = 253.09836635775162},
     };
@@ -251,7 +250,8 @@ TEST_F(TestSuite, testRZPLineDensityDefaulParams) {
     for (auto p : inouts) {
         double DX;
         double DZ;
-        CPU_TRACER::RZPLineDensity(p.in_ray, p.in_normal, p.in_b, DX, DZ);
+        CPU_TRACER::RZPLineDensity(p.in_ray, p.in_normal, p.in_imageType, p.in_rzpType, p.in_derivationMethod, p.in_zOffsetCenter, p.in_risag,
+                                   p.in_rosag, p.in_rimer, p.in_romer, p.in_alpha, p.in_beta, p.in_Ord, p.in_WL, DX, DZ);
         CHECK_EQ(DX, p.out_DX);
         CHECK_EQ(DZ, p.out_DZ);
     }
@@ -261,7 +261,18 @@ TEST_F(TestSuite, testRZPLineDensityAstigmatic) {
     struct InOutPair {
         Ray in_ray;
         glm::dvec4 in_normal;
-        RZPBehaviour in_b;
+        int in_imageType;
+        int in_rzpType;
+        int in_derivationMethod;
+        double in_zOffsetCenter;
+        double in_risag;
+        double in_rosag;
+        double in_rimer;
+        double in_romer;
+        double in_alpha;
+        double in_beta;
+        double in_Ord;
+        double in_WL;
 
         double out_DX;
         double out_DZ;
@@ -276,21 +287,18 @@ TEST_F(TestSuite, testRZPLineDensityAstigmatic) {
                     .m_direction = glm::dvec3(0, 1, 0),
                 },
             .in_normal = glm::dvec4(0, 1, 0, 0),
-            .in_b =
-                {
-                    .m_imageType = 0,
-                    .m_rzpType = 0,
-                    .m_derivationMethod = 0,
-                    .m_designWavelength = 1.239852e-05 * 1e6,
-                    .m_orderOfDiffraction = -1,
-                    .m_fresnelZOffset = 0,
-                    .m_designSagittalEntranceArmLength = 100,
-                    .m_designSagittalExitArmLength = 500,
-                    .m_designMeridionalEntranceArmLength = 100,
-                    .m_designMeridionalExitArmLength = 500,
-                    .m_designAlphaAngle = 0.017453292519943295,
-                    .m_designBetaAngle = 0.017453292519943295,
-                },
+            .in_imageType = 0,
+            .in_rzpType = 0,
+            .in_derivationMethod = 0,
+            .in_zOffsetCenter = 0,
+            .in_risag = 100,
+            .in_rosag = 500,
+            .in_rimer = 100,
+            .in_romer = 500,
+            .in_alpha = 0.017453292519943295,
+            .in_beta = 0.017453292519943295,
+            .in_Ord = -1,
+            .in_WL = 1.239852e-05,
 
             .out_DX = 3103.9106911246749,
             .out_DZ = 5.0771666330055218,
@@ -301,41 +309,35 @@ TEST_F(TestSuite, testRZPLineDensityAstigmatic) {
                  .m_direction = glm::dvec3(0, 1, 0),
              },
          .in_normal = glm::dvec4(0, 1, 0, 0),
-         .in_b =
-             {
-                 .m_imageType = 0,
-                 .m_rzpType = 0,
-                 .m_derivationMethod = 0,
-                 .m_designWavelength = 1.239852e-05 * 1e6,
-                 .m_orderOfDiffraction = -1,
-                 .m_fresnelZOffset = 0,
-                 .m_designSagittalEntranceArmLength = 100,
-                 .m_designSagittalExitArmLength = 500,
-                 .m_designMeridionalEntranceArmLength = 100,
-                 .m_designMeridionalExitArmLength = 500,
-                 .m_designAlphaAngle = 0.017453292519943295,
-                 .m_designBetaAngle = 0.017453292519943295,
-             },
+         .in_imageType = 0,
+         .in_rzpType = 0,
+         .in_derivationMethod = 0,
+         .in_zOffsetCenter = 0,
+         .in_risag = 100,
+         .in_rosag = 500,
+         .in_rimer = 100,
+         .in_romer = 500,
+         .in_alpha = 0.017453292519943295,
+         .in_beta = 0.017453292519943295,
+         .in_Ord = -1,
+         .in_WL = 1.239852e-05,
          .out_DX = 1034.8685185321938,
          .out_DZ = -13.320120179862876},
         {.in_ray = {.m_position = glm::dvec3(-5.047050067282087, 4.4859372100394515, 29.182033770349552),
                     .m_direction = glm::dvec3(0.05047050067282087, 0.95514062789960552, -0.29182033770349552)},
          .in_normal = glm::dvec4(0.05047050067282087, 0.95514062789960552, -0.29182033770349552, 0),
-         .in_b =
-             {
-                 .m_imageType = 0,
-                 .m_rzpType = 0,
-                 .m_derivationMethod = 0,
-                 .m_designWavelength = 1.239852e-05 * 1e6,
-                 .m_orderOfDiffraction = -1,
-                 .m_fresnelZOffset = 0,
-                 .m_designSagittalEntranceArmLength = 100,
-                 .m_designSagittalExitArmLength = 500,
-                 .m_designMeridionalEntranceArmLength = 100,
-                 .m_designMeridionalExitArmLength = 500,
-                 .m_designAlphaAngle = 0.017453292519943295,
-                 .m_designBetaAngle = 0.017453292519943295,
-             },
+         .in_imageType = 0,
+         .in_rzpType = 0,
+         .in_derivationMethod = 0,
+         .in_zOffsetCenter = 0,
+         .in_risag = 100,
+         .in_rosag = 500,
+         .in_rimer = 100,
+         .in_romer = 500,
+         .in_alpha = 0.017453292519943295,
+         .in_beta = 0.017453292519943295,
+         .in_Ord = -1,
+         .in_WL = 1.239852e-05,
          .out_DX = 4045.0989844091882,
          .out_DZ = -174.2085626048659},
         {.in_ray =
@@ -344,21 +346,18 @@ TEST_F(TestSuite, testRZPLineDensityAstigmatic) {
                  .m_direction = glm::dvec3(0.016802365843267261, 0.98624074908228765, -0.16445931214643075),
              },
          .in_normal = glm::dvec4(0.016802365843267261, 0.98624074908228765, -0.16445931214643075, 0),
-         .in_b =
-             {
-                 .m_imageType = 0,
-                 .m_rzpType = 0,
-                 .m_derivationMethod = 0,
-                 .m_designWavelength = 1.239852e-05 * 1e6,
-                 .m_orderOfDiffraction = -1,
-                 .m_fresnelZOffset = 0,
-                 .m_designSagittalEntranceArmLength = 100,
-                 .m_designSagittalExitArmLength = 500,
-                 .m_designMeridionalEntranceArmLength = 100,
-                 .m_designMeridionalExitArmLength = 500,
-                 .m_designAlphaAngle = 0.017453292519943295,
-                 .m_designBetaAngle = 0.017453292519943295,
-             },
+         .in_imageType = 0,
+         .in_rzpType = 0,
+         .in_derivationMethod = 0,
+         .in_zOffsetCenter = 0,
+         .in_risag = 100,
+         .in_rosag = 500,
+         .in_rimer = 100,
+         .in_romer = 500,
+         .in_alpha = 0.017453292519943295,
+         .in_beta = 0.017453292519943295,
+         .in_Ord = -1,
+         .in_WL = 1.239852e-05,
          .out_DX = 1418.1004208892475,
          .out_DZ = 253.09836635775162},
     };
@@ -366,7 +365,8 @@ TEST_F(TestSuite, testRZPLineDensityAstigmatic) {
     for (auto p : inouts) {
         double DX;
         double DZ;
-        CPU_TRACER::RZPLineDensity(p.in_ray, p.in_normal, p.in_b, DX, DZ);
+        CPU_TRACER::RZPLineDensity(p.in_ray, p.in_normal, p.in_imageType, p.in_rzpType, p.in_derivationMethod, p.in_zOffsetCenter, p.in_risag,
+                                   p.in_rosag, p.in_rimer, p.in_romer, p.in_alpha, p.in_beta, p.in_Ord, p.in_WL, DX, DZ);
         CHECK_EQ(DX, p.out_DX);
         CHECK_EQ(DZ, p.out_DZ);
     }
@@ -1094,48 +1094,4 @@ TEST_F(TestSuite, testRefractiveIndex) {
     // data taken from
     // https://refractiveindex.info/?shelf=main&book=Cu&page=Hagemann
     CHECK_EQ(CPU_TRACER::getRefractiveIndex(25146.2, 29), glm::dvec2(1.0, 1.0328e-7), 1e-5);
-}
-
-TEST_F(TestSuite, testInterpolationFunctionDipole) {
-    struct InOutPair{
-        double in;
-        double out;
-    };
-    std::vector<InOutPair> inouts = {{
-                                         .in = 1.5298292375594387,
-                                         .out = -3.5010758381905855,
-                                     }
-    };
-
-    auto beamline = loadBeamline("dipole_plain");
-    std::shared_ptr<LightSource> src = beamline.m_LightSources[0];
-    DipoleSource* dipolesource = dynamic_cast<DipoleSource*>(&*src);
-
-    for(auto values : inouts){
-        auto result = dipolesource->getInterpolation(values.in);
-        CHECK_EQ(result, values.out, 0.01);
-    }
-}
-
-TEST_F(TestSuite, testVerDivergenceDipole) {
-    struct InOutPair{
-        double energy;
-        double sigv;
-        double out;
-    };
-    std::vector<InOutPair> inouts = {{
-                                         .energy = 100,
-                                         .sigv = 1,
-                                         .out = 1.591581814000419,//1.5917477218305678
-                                     }
-    };
-
-    auto beamline = loadBeamline("dipole_plain");
-    std::shared_ptr<LightSource> src = beamline.m_LightSources[0];
-    DipoleSource* dipolesource = dynamic_cast<DipoleSource*>(&*src);
-
-    for(auto values : inouts){
-        auto result = dipolesource->vDivergence(values.energy, values.sigv);
-        CHECK_EQ(result, values.out, 0.1);
-    }
 }

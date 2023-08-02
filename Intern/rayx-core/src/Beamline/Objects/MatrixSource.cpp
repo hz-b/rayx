@@ -8,14 +8,7 @@
 
 namespace RAYX {
 
-MatrixSource::MatrixSource(const DesignObject& dobj) : LightSource(dobj) {
-
-    m_linearPol_0 = dobj.parseLinearPol0();
-    m_linearPol_45 = dobj.parseLinearPol45();
-    m_circularPol = dobj.parseCircularPol();
-    m_verDivergence = dobj.parseVerDiv();
-    m_sourceDepth = dobj.parseSourceDepth();
-}
+MatrixSource::MatrixSource(const DesignObject& dobj) : LightSource(dobj) {}
 
 /**
  * creates floor(sqrt(numberOfRays)) **2 rays (a grid with as many rows as
@@ -47,6 +40,7 @@ std::vector<Ray> MatrixSource::getRays() const {
             en = selectEnergy();
             glm::dvec3 position = glm::dvec3(x, y, z);
 
+            // TODO are these misalignments correct?
             phi = -0.5 * m_horDivergence + (m_horDivergence / (rmat - 1)) * row + getMisalignmentParams().m_rotationXerror.rad;
 
             psi = -0.5 * m_verDivergence + (m_verDivergence / (rmat - 1)) * col + getMisalignmentParams().m_rotationYerror.rad;
@@ -54,9 +48,9 @@ std::vector<Ray> MatrixSource::getRays() const {
             glm::dvec3 direction = getDirectionFromAngles(phi, psi);
             glm::dvec4 tempDir = m_orientation * glm::dvec4(direction, 0.0);
             direction = glm::dvec3(tempDir.x, tempDir.y, tempDir.z);
-            glm::dvec4 stokes = glm::dvec4(1, m_linearPol_0, m_linearPol_45, m_circularPol);
+            glm::dvec4 stokes = glm::dvec4(1, getLinear0(), getLinear45(), getCircular());
 
-            Ray r = {position, ETYPE_UNINIT, direction, en, stokes, 0.0, 0.0, -1.0, -1.0};
+            Ray r = {position, ETYPE_UNINIT, direction, en, stokes, 0.0, 0.0, 0.0, 0.0};
             // Ray(1, 2, 3, 7, 4, 5, 6, 8, 9, 10, 11, 12, 13, 14, 15, 16);
             returnList.push_back(r);
         }

@@ -18,14 +18,6 @@ class RAYX_API PointSource : public LightSource {
     SourceDist m_heightDist;
     SourceDist m_horDist;
     SourceDist m_verDist;
-    SourcePulseType m_sourceDistributionType;
-
-    double m_linearPol_0;
-    double m_linearPol_45;
-    double m_circularPol;
-
-    double m_verDivergence;
-    double m_sourceDepth;
     // std::vector<SOURCE_LENGTH> m_source_lengths;
 };
 

@@ -9,12 +9,6 @@ cmake_minimum_required(VERSION 3.15 FATAL_ERROR)
 project(rayx-ui)
 set(CMAKE_CXX_STANDARD 20)
 
-if(MSVC)
-    add_compile_options(/W3 /WX)
-else()
-    add_compile_options(-Wall -Wextra -pedantic)
-endif()
-
 set(IMGUI_DIR ../../Extern/imgui/)
 set(GLFW_DIR ../../Extern/glfw/)
 set(GLM_DIR ../../Extern/glm/)

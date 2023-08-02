@@ -12,12 +12,6 @@ PointSource::PointSource(const DesignObject& dobj) : LightSource(dobj) {
     m_heightDist = dobj.parseSourceHeightDistribution();
     m_horDist = dobj.parseHorDivDistribution();
     m_verDist = dobj.parseVerDivDistribution();
-    m_verDivergence = dobj.parseVerDiv();
-    m_sourceDepth = dobj.parseSourceDepth();
-
-    m_linearPol_0 = dobj.parseLinearPol0();
-    m_linearPol_45 = dobj.parseLinearPol45();
-    m_circularPol = dobj.parseCircularPol();
 }
 
 /**
@@ -75,9 +69,9 @@ std::vector<Ray> PointSource::getRays() const {
         glm::dvec3 direction = getDirectionFromAngles(phi, psi);
         glm::dvec4 tempDir = m_orientation * glm::dvec4(direction, 0.0);
         direction = glm::dvec3(tempDir.x, tempDir.y, tempDir.z);
-        glm::dvec4 stokes = glm::dvec4(1, m_linearPol_0, m_linearPol_45, m_circularPol);
+        glm::dvec4 stokes = glm::dvec4(1, getLinear0(), getLinear45(), getCircular());
 
-        Ray r = {position, ETYPE_UNINIT, direction, en, stokes, 0.0, 0.0, -1.0, -1.0};
+        Ray r = {position, ETYPE_UNINIT, direction, en, stokes, 0.0, 0.0, 0.0, 0.0};
 
         rayList.push_back(r);
     }

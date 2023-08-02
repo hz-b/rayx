@@ -51,7 +51,7 @@ void writeH5(const RAYX::BundleHistory& hist, std::string filename, const Format
         for (unsigned int i = 0; i < elementNames.size(); i++) {
             auto& e = elementNames[i];
             auto dataspace = HighFive::DataSpace({e.size()});
-            auto dataset = file.createDataSet<char>(std::to_string(i), dataspace);
+            auto dataset = file.createDataSet<char>(std::to_string(i + 1), dataspace);
             auto ptr = e.c_str();
             dataset.write_raw(ptr);
         }

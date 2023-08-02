@@ -9,8 +9,7 @@
 #include <vector>
 #include <vulkan/vulkan.hpp>
 
-#include "Debug/Debug.h"
-#include "Debug/Instrumentor.h"
+#include "RAY-Core.h"
 
 namespace RAYX {
 

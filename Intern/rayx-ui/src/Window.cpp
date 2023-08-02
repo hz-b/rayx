@@ -1,5 +1,6 @@
 #include "Window.h"
 
+// TODO(Jannis): add state to check if window is initialized
 Window::Window(uint32_t width, uint32_t height, const char* const title) {
     m_width = width;
     m_height = height;
@@ -19,11 +20,9 @@ Window::~Window() {
     glfwTerminate();
 }
 
-void Window::framebufferResizeCallback(GLFWwindow* rawWindow, int width, int height) {
-    auto window = reinterpret_cast<Window*>(glfwGetWindowUserPointer(rawWindow));
-    window->m_framebufferResized = true;
-    window->m_width = width;
-    window->m_height = height;
+void Window::framebufferResizeCallback(GLFWwindow* window, int width, int height) {
+    auto app = reinterpret_cast<Window*>(glfwGetWindowUserPointer(window));
+    app->m_framebufferResized = true;
 }
 
 void Window::updateWindowSize() {
@@ -35,10 +34,4 @@ void Window::updateWindowSize() {
     }
     m_width = width;
     m_height = height;
-}
-
-void Window::createSurface(VkInstance instance, VkSurfaceKHR* surface) {
-    if (glfwCreateWindowSurface(instance, m_Window, nullptr, surface) != VK_SUCCESS) {
-        throw std::runtime_error("failed to create window surface!");
-    }
 }

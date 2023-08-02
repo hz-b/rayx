@@ -592,18 +592,12 @@ given direction on the grating
 @params: lots
 @returns: (inplace) DX, DZ
 */
-void RAYX_API RZPLineDensity(Ray r, dvec4 normal, RZPBehaviour b, RAYX_INOUT(double) DX, RAYX_INOUT(double) DZ) {
-    int IMAGE_TYPE        = int(b.m_imageType);
-    int RZP_TYPE          = int(b.m_rzpType);
-    double risag          = b.m_designSagittalEntranceArmLength;
-    double rosag          = b.m_designSagittalExitArmLength;
-    double rimer          = b.m_designMeridionalEntranceArmLength;
-    double romer          = b.m_designMeridionalExitArmLength;
-    double alpha        = b.m_designAlphaAngle;
-    double beta         = b.m_designBetaAngle;
-    double WL            = 1e-06 * b.m_designWavelength;  // source energy/design energy
-    double Ord           = b.m_orderOfDiffraction;
-
+void RAYX_API RZPLineDensity(Ray r, dvec4 normal, int IMAGE_TYPE, int RZP_TYPE,
+                    ALLOW_UNUSED int DERIVATION_METHOD,
+                    ALLOW_UNUSED double zOffsetCenter, double risag,
+                    double rosag, double rimer, double romer, double alpha,
+                    double beta, double Ord, double WL, RAYX_INOUT(double) DX,
+                    RAYX_INOUT(double) DZ) {  // TODO fix unused var
     double FX = normal.x;
     double FY = normal.y;
     double FZ = normal.z;
