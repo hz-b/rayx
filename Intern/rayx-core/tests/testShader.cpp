@@ -13,6 +13,41 @@ TEST_F(TestSuite, testUniformRandom) {
     }
 }
 
+TEST_F(TestSuite, testNormalRandom) {
+    uint64_t ctr = 13; // seed value
+    double mu = 0.0;   // mean
+    double sigma = 1.0; // standard deviation
+
+    // Vectors to store the generated random numbers and their z-scores
+    std::vector<double> random_numbers;
+    std::vector<double> z_scores;
+
+    for (int i = 0; i < 1000; i++) {
+        double Z = CPU_TRACER::squaresNormalRNG(ctr, mu, sigma);
+        random_numbers.push_back(Z);
+        
+        // Calculate z-score and store
+        double z_score = (Z - mu) / sigma;
+        z_scores.push_back(z_score);
+    }
+
+    // Calculate mean and standard deviation of the generated random numbers
+    double sum = std::accumulate(random_numbers.begin(), random_numbers.end(), 0.0);
+    double mean = sum / random_numbers.size();
+
+    double sq_sum = std::inner_product(random_numbers.begin(), random_numbers.end(), random_numbers.begin(), 0.0);
+    double std_dev = std::sqrt(sq_sum / random_numbers.size() - mean * mean);
+
+    // Check if mean is close to 0 and standard deviation is close to 1
+    CHECK_EQ(mean, mu, 0.1);
+    CHECK_EQ(std_dev, sigma, 0.1);
+
+    // Check the distribution by checking if the absolute value of z-scores for majority of elements is less than 2
+    int count = std::count_if(z_scores.begin(), z_scores.end(), [](double d) { return std::abs(d) <= 2.0; });
+    CHECK(count > int(0.95 * z_scores.size()));
+}
+
+
 TEST_F(TestSuite, testSin) {
     std::vector<double> args = {
         -0.5620816275750421, -0.082699735953560394, -0.73692442452247864, -0.93085577907030514, 0.038832744045494971, 0.86938579245347758,
