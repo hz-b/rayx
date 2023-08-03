@@ -3,7 +3,7 @@
  <version>1.12</version>
  <beamline>
   <object name="Dipole Source" type="Dipole Source">
-   <param id="numberRays" enabled="T">20000</param>
+   <param id="numberRays" enabled="T">200</param>
    <param id="sourceWidth" enabled="T">0.065</param>
    <param id="sourceHeight" enabled="T">0.14</param>
    <param id="sourceDepth" enabled="T">0</param>
