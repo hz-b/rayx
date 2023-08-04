@@ -10,8 +10,10 @@
 
 namespace RAYX {
 
-Pass::Pipeline::Pipeline(std::string name, VkDevice& dev, const ShaderStageCreateInfo& shaderCreateInfo) : m_name(std::move(name)), m_device(dev) {
-    shaderStage = std::make_shared<ShaderStage>(m_device, shaderCreateInfo);
+Pass::Pipeline::Pipeline(VkDevice& dev, const PipelineCreateInfo& shaderCreateInfo) : m_name(std::move(shaderCreateInfo.name)), m_device(dev) {
+    m_shader.path = shaderCreateInfo.shaderPath;
+    m_shader.shaderType = shaderCreateInfo.shaderType;
+    createShaderModule();
     RAYX_D_LOG << "Pipeline " << m_name << " created";
 }
 
@@ -31,7 +33,7 @@ void Pass::Pipeline::createPipelineLayout(VkDescriptorSetLayout* setLayouts) {
     /*
     Add push constants to the Pipeline
     */
-    auto pushConstant = m_pushConstant.getVkPushConstantRange(shaderStage->getShaderStageFlagBits());
+    auto pushConstant = m_pushConstant.getVkPushConstantRange(m_shader.shaderType);
     pipelineLayoutCreateInfo.pPushConstantRanges = &pushConstant;
     pipelineLayoutCreateInfo.pushConstantRangeCount = 1;  // One struct of pushConstants
 
@@ -42,7 +44,7 @@ void Pass::Pipeline::createPipeline() {
     /*
     Now, we finally create the compute pipeline.
     */
-    auto pipelineCreateInfo = VKINIT::Pipeline::compute_pipeline_create_info(m_pipelineLayout, shaderStage->getPipelineShaderCreateInfo());
+    auto pipelineCreateInfo = VKINIT::Pipeline::compute_pipeline_create_info(m_pipelineLayout, getPipelineShaderCreateInfo());
     // FIXME(OS): Currently only creates compute pipelines. Pipeline should be general for also other types (E.g Graphics). Move this somewhere else!
     VK_CHECK_RESULT(vkCreateComputePipelines(m_device, nullptr, 1, &pipelineCreateInfo, nullptr, &m_pipeline))
 }
@@ -101,6 +103,7 @@ void inline Pass::Pipeline::storePipelineCache(VkDevice& device) {
         vkDestroyPipelineCache(device, m_pipelineCache, nullptr);
     }
 }
+
 /**
  * @brief Vulkan cleanup, destroying all VkPipeline related members. Stores cache at the end (TODO: Cache broken).
  *
@@ -115,6 +118,37 @@ void Pass::Pipeline::cleanPipeline(VkDevice& device) {
         vkDestroyPipelineLayout(device, m_pipelineLayout, nullptr);
         m_pipelineLayout = VK_NULL_HANDLE;
     }
+
+    vkDestroyShaderModule(device, m_shader.module, nullptr);
+}
+
+/*
+Create a shader module. A shader module basically just encapsulates some shader code.
+*/
+void Pass::Pipeline::createShaderModule() {
+    RAYX_PROFILE_FUNCTION_STDOUT();
+    uint32_t filelength;
+    // the code  was created by running the command: glslangValidator.exe -V <shaderFile>.comp
+    std::string path = canonicalizeRepositoryPath(m_shader.path).string();
+    uint32_t* shaderCode = readFile(filelength, path.c_str());
+    VkShaderModuleCreateInfo createInfo = {};
+    createInfo.sType = VK_STRUCTURE_TYPE_SHADER_MODULE_CREATE_INFO;
+    createInfo.pCode = shaderCode;
+    createInfo.codeSize = filelength;
+
+    VK_CHECK_RESULT(vkCreateShaderModule(m_device, &createInfo, nullptr, &m_shader.module))
+    RAYX_VERB << "Shader module " << m_name << " created.";
+    delete[] shaderCode;
+}
+
+VkPipelineShaderStageCreateInfo Pass::Pipeline::getPipelineShaderCreateInfo() {
+    /* we specify the compute shader stage, and it's entry point(main) */
+    VkPipelineShaderStageCreateInfo shaderStageCreateInfo = {};
+    shaderStageCreateInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO;
+    shaderStageCreateInfo.stage = m_shader.shaderType;
+    shaderStageCreateInfo.module = m_shader.module;
+    shaderStageCreateInfo.pName = m_shader.entryPoint.c_str();
+    return shaderStageCreateInfo;
 }
 
 void Pass::Pipeline::updatePushConstant(void* data, size_t size) { m_pushConstant.update(data, size); }
@@ -127,13 +161,13 @@ void Pass::updatePushConstant(int stage, void* data, uint32_t size) { m_pass[sta
 
 ComputePass::ComputePass(VkDevice& device, const ComputePassCreateInfo& createInfo) : m_Device(device) {
     m_name = std::string(createInfo.passName);
-    m_stagesCount = createInfo.shaderStagesCreateInfos.size();
+    m_stagesCount = createInfo.pipelineCreateInfos.size();
     m_pass.reserve(m_stagesCount);
     m_descriptorSets.reserve(createInfo.descriptorSetAmount);
 
     // Fill compute Pipelines
     for (uint32_t i = 0; i < m_stagesCount; i++) {
-        m_pass.push_back(std::make_unique<Pipeline>(createInfo.shaderStagesCreateInfos[i].name, m_Device, createInfo.shaderStagesCreateInfos[i]));
+        m_pass.push_back(std::make_unique<Pipeline>(m_Device, createInfo.pipelineCreateInfos[i]));
     }
 }
 
@@ -169,8 +203,8 @@ void ComputePass::prepare(std::vector<VkDescriptorSetLayoutBinding> bindings) {
     }
 }
 
-void ComputePass::addPipelineStage(const ShaderStageCreateInfo& createInfo) {
-    m_pass.push_back(std::make_unique<Pipeline>(createInfo.name, m_Device, createInfo));
+void ComputePass::addPipelineStage(const PipelineCreateInfo& createInfo) {
+    m_pass.push_back(std::make_unique<Pipeline>(m_Device, createInfo));
     m_stagesCount++;
 }
 
@@ -246,8 +280,8 @@ void ComputePass::bindDescriptorSet(const VkCommandBuffer& cmdBuffer, int stage)
  * @param stage Index of stage/Pipeline
  */
 void ComputePass::cmdPushConstants(const VkCommandBuffer& cmdBuffer, int stage) {
-    vkCmdPushConstants(cmdBuffer, getPipelineLayout(stage), m_pass[stage]->shaderStage->getShaderStageFlagBits(), 0,
-                       m_pass[stage]->m_pushConstant.getSize(), m_pass[stage]->m_pushConstant.getData());
+    vkCmdPushConstants(cmdBuffer, getPipelineLayout(stage), m_pass[stage]->getShaderStageFlagBits(), 0, m_pass[stage]->m_pushConstant.getSize(),
+                       m_pass[stage]->m_pushConstant.getData());
 }
 
 void ComputePass::cleanPipeline(int stage) { m_pass[stage]->cleanPipeline(m_Device); }

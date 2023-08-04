@@ -7,7 +7,6 @@
 #include "VulkanEngine/Buffer/BufferHandler.h"
 #include "VulkanEngine/Buffer/PushConstant.h"
 #include "VulkanEngine/Init/Descriptor.h"
-#include "VulkanEngine/Init/ShaderStage.h"
 namespace RAYX {
 
 // General Pass
@@ -18,6 +17,12 @@ namespace RAYX {
  */
 class RAYX_API Pass {
   public:
+    // Used for ShaderStage creation
+    struct PipelineCreateInfo {
+        std::string name;                  // Pipeline name
+        std::filesystem::path shaderPath;  // Path of the shader stage
+        VkShaderStageFlagBits shaderType = VK_SHADER_STAGE_COMPUTE_BIT;
+    };
     // A series of Pipelines makes a Pass.
     // This is the node that contributes to creating a Pass
     // We can refer to a pipeline also as ´stage´
@@ -25,7 +30,7 @@ class RAYX_API Pass {
     // It is highly recommended to use Pipelines inside Pass objects!
     class RAYX_API Pipeline {
       public:
-        Pipeline(std::string name, VkDevice& dev, const ShaderStageCreateInfo&);
+        Pipeline(VkDevice& dev, const PipelineCreateInfo&);
         ~Pipeline();
 
         void createPipelineLayout(VkDescriptorSetLayout* setLayouts);
@@ -35,6 +40,9 @@ class RAYX_API Pass {
         void updatePushConstant(void* data, size_t size);
         void cleanPipeline(VkDevice& device);
 
+        const VkShaderModule& getShaderModule() const { return m_shader.module; }
+        VkShaderStageFlagBits getShaderStageFlagBits() const { return m_shader.shaderType; }
+
         std::string m_name;
         VkDevice& m_device;
 
@@ -43,7 +51,16 @@ class RAYX_API Pass {
         VkPipelineCache m_pipelineCache = VK_NULL_HANDLE;
 
         PushConstant m_pushConstant;
-        std::shared_ptr<ShaderStage> shaderStage{};
+
+      private:
+        VkPipelineShaderStageCreateInfo getPipelineShaderCreateInfo();
+        struct Shader {
+            std::string entryPoint = "main";
+            std::filesystem::path path;
+            VkShaderStageFlagBits shaderType;
+            VkShaderModule module = VK_NULL_HANDLE;
+        } m_shader;
+        void createShaderModule();
     };
 
     using Pipelines = std::vector<std::unique_ptr<Pipeline>>;
@@ -57,7 +74,6 @@ class RAYX_API Pass {
     uint32_t getStageAmount() const { return m_stagesCount; }
     const VkPipeline& getPipeline(int stage) const { return m_pass[stage]->m_pipeline; }
     const VkPipelineLayout& getPipelineLayout(int stage) { return m_pass[stage]->m_pipelineLayout; }
-    const ShaderStage& getShaderStage(int stage) const { return *m_pass[stage]->shaderStage; }
     DescriptorPool* getDescriptorPool() { return m_globalDescriptorPool.get(); }
 
     void updatePushConstant(int stage, void* data, uint32_t size);
@@ -81,7 +97,7 @@ class RAYX_API Pass {
  */
 struct ComputePassCreateInfo {
     const char* passName;
-    std::vector<ShaderStageCreateInfo> shaderStagesCreateInfos = {};
+    std::vector<Pass::PipelineCreateInfo> pipelineCreateInfos = {};
     int descriptorSetAmount = 1;
 };
 
@@ -108,7 +124,7 @@ class RAYX_API ComputePass : public Pass {
     const std::vector<VkDescriptorSetLayout>& getDescriptorSetLayouts() const { return m_descriptorSetLayouts; }
     std::string getName() const { return m_name; }
 
-    void addPipelineStage(const ShaderStageCreateInfo&);
+    void addPipelineStage(const PipelineCreateInfo&);
     void updateDescriptorSets(BufferHandler* bufferHandler);
     void simpleUpdateDescriptorSets(BufferHandler* bufferHandler);
     void bindDescriptorSet(const VkCommandBuffer& cmdBuffer, int stage);

@@ -24,7 +24,7 @@ Ray RAYX_API rayMatrixMult(Ray r, const dmat4 m) {
 
 // multiplies position and direction of ray in_ray with transformation matrix m  and store in r (Inplace)
 // r = dot(m,in_r)
-void rayMatrixMult_InP(INOUT(Ray) r, Ray in_r, const dmat4 m) {
+void rayMatrixMult_InP(RAYX_INOUT(Ray) r, Ray in_r, const dmat4 m) {
     r.m_position = dvec3(m * dvec4(in_r.m_position, 1));
     r.m_direction = dvec3(m * dvec4(in_r.m_direction, 0));
 }
