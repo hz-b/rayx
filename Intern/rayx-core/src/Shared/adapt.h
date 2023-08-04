@@ -46,6 +46,18 @@ using dmat4 = glm::dmat4;
 
 #define SHADER_ARRAY(T, ident, binding_id, bufname) ShaderArray<T> RAYX_API ident
 
+#ifdef GLSL
+#define SHADER_PRINT(msg) debugPrintfEXT(msg)
+#define SHADER_PRINT1(msg, arg1) debugPrintfEXT(msg, arg1)
+#define SHADER_PRINT2(msg, arg1, arg2) debugPrintfEXT(msg, arg1, arg2)
+#define SHADER_PRINT3(msg, arg1, arg2, arg3) debugPrintfEXT(msg, arg1, arg2, arg3)
+#else
+#define SHADER_PRINT(msg) printf(msg)
+#define SHADER_PRINT1(msg, arg1) printf(msg, arg1)
+#define SHADER_PRINT2(msg, arg1, arg2) printf(msg, arg1, arg2)
+#define SHADER_PRINT3(msg, arg1, arg2, arg3) printf(msg, arg1, arg2, arg3)
+#endif
+
 // this type intends to mimic the GLSL type T[], this is used for layouts.
 template <typename T>
 struct ShaderArray {

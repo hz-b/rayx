@@ -27,6 +27,12 @@ struct RAYX_API Ray {
     double m_padding;
 };
 
+struct RAYX_API RayMeta {
+    uint64_t ctr;
+    int nextElementId;
+    bool finalized;
+};
+
 #ifndef GLSL
 }  // namespace RAYX
 #endif
