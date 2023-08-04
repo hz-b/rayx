@@ -11,6 +11,7 @@
 
 #include "Debug/Debug.h"
 #include "Debug/Instrumentor.h"
+#include "VulkanEngine/Common.h"
 
 namespace RAYX {
 
@@ -254,19 +255,6 @@ class RAYX_API VulkanEngine {
     /// writes `bytes` many bytes from `indata` into the staging buffer.
     void storeToStagingBuffer(char* indata, size_t bytes);
 };
-
-// Used for validating return values of Vulkan API calls.
-#define VK_CHECK_RESULT(f)                                               \
-    {                                                                    \
-        VkResult res = (f);                                              \
-        if (res != VK_SUCCESS) {                                         \
-            RAYX_WARN << "Fatal : VkResult fail!";                       \
-            RAYX_ERR << "Error code: " << res                            \
-                     << ", look up at "                                  \
-                        "https://www.khronos.org/registry/vulkan/specs/" \
-                        "1.3-extensions/man/html/VkResult.html";         \
-        }                                                                \
-    }
 
 const std::vector<const char*> validationLayers = {"VK_LAYER_KHRONOS_validation"};
 
