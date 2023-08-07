@@ -16,13 +16,13 @@ void VulkanEngine::submitCommandBuffer(int cmdBufIndex) {
     VkSubmitInfo submitInfo = VKINIT::misc::submit_info();
     submitInfo.commandBufferCount = 1;                            // submit a single command buffer
     submitInfo.pCommandBuffers = &m_CommandBuffers[cmdBufIndex];  // the command buffer to submit.
-    VK_CHECK_RESULT(m_computeFence->forceReset())
+    checkVkResult(m_computeFence->forceReset());
     auto f = m_computeFence->fence();
     /*
     We submit the command buffer on the queue, at the same time giving a
     fence. (Fences are like interrupts and used for async computations)
     */
-    VK_CHECK_RESULT(vkQueueSubmit(m_ComputeQueue, 1, &submitInfo, *f));
+    checkVkResult(vkQueueSubmit(m_ComputeQueue, 1, &submitInfo, *f));
     /*
     The command will not have finished executing until the fence is
     signaled. So we wait here. Directly afer this, we read our buffer

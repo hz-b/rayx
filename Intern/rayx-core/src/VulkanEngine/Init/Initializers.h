@@ -1,8 +1,9 @@
 #ifndef NO_VULKAN
 
 #pragma once
-#include "VulkanEngine/VulkanEngine.h"
 #include "vulkan/vulkan.hpp"
+#include "VulkanEngine/Common.h"
+
 namespace RAYX {
 /**
  * @brief Useful initializers for Vulkan to enhance readability.
@@ -22,7 +23,7 @@ inline void create_command_pool(VkDevice device, VkCommandPoolCreateFlags flag, 
     auto info = command_pool_create_info();
     info.flags = flag;
     info.queueFamilyIndex = queueFamilyIndex;
-    VK_CHECK_RESULT(vkCreateCommandPool(device, &info, nullptr, &commandPool));
+    checkVkResult(vkCreateCommandPool(device, &info, nullptr, &commandPool));
 }
 
 inline VkCommandBufferBeginInfo command_buffer_begin_info() {

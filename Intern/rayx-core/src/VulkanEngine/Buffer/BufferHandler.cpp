@@ -42,7 +42,7 @@ void BufferHandler::createTransferCommandBuffer() {
     commandBufferAllocateInfo.commandPool = m_CommandPool;  // specify the command pool to allocate from.
     commandBufferAllocateInfo.level = VK_COMMAND_BUFFER_LEVEL_PRIMARY;
     commandBufferAllocateInfo.commandBufferCount = 1;
-    VK_CHECK_RESULT(vkAllocateCommandBuffers(m_Device, &commandBufferAllocateInfo, &m_TransferCommandBuffer))
+    checkVkResult(vkAllocateCommandBuffers(m_Device, &commandBufferAllocateInfo, &m_TransferCommandBuffer));
 }
 
 void BufferHandler::createTransferFence() { m_TransferFence = std::make_unique<Fence>(m_Device); }

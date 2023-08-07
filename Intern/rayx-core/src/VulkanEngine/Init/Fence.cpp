@@ -11,7 +11,7 @@ Fence::Fence(VkDevice& device) : device(device) {
     VkFenceCreateInfo fenceCreateInfo = {};
     fenceCreateInfo.sType = VK_STRUCTURE_TYPE_FENCE_CREATE_INFO;
     fenceCreateInfo.flags = 0;
-    VK_CHECK_RESULT(vkCreateFence(device, &fenceCreateInfo, nullptr, &f))
+    checkVkResult(vkCreateFence(device, &fenceCreateInfo, nullptr, &f));
 }
 
 // Timeout : DEFAULT_TIMEOUT (1s)

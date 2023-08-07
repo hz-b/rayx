@@ -1,9 +1,7 @@
 #ifndef NO_VULKAN
 
 #include "VulkanEngine/Init/Descriptor.h"
-
 #include "VulkanEngine/Init/Initializers.h"
-#include "VulkanEngine/VulkanEngine.h"
 
 namespace RAYX {
 // *************** Descriptor Pool Builder *********************
@@ -34,7 +32,7 @@ DescriptorPool::DescriptorPool(VkDevice& device, uint32_t maxSets, VkDescriptorP
     auto info = VKINIT::Descriptor::descriptor_pool_create_info(static_cast<uint32_t>(poolSizes.size()), poolSizes.data(), maxSets);
     info.flags = poolFlags;
 
-    VK_CHECK_RESULT(vkCreateDescriptorPool(device, &info, nullptr, &m_DescriptorPool));
+    checkVkResult(vkCreateDescriptorPool(device, &info, nullptr, &m_DescriptorPool));
 }
 
 DescriptorPool::~DescriptorPool() { vkDestroyDescriptorPool(m_Device, m_DescriptorPool, nullptr); }
@@ -44,7 +42,7 @@ void DescriptorPool::allocateDescriptor(VkDescriptorSetLayout& descriptorSetLayo
 
     // Might want to create a "DescriptorPoolManager" class that handles this case, and builds
     // a new pool whenever an old pool fills up. But this is beyond our current scope
-    VK_CHECK_RESULT(vkAllocateDescriptorSets(m_Device, &allocInfo, &descriptorSet))
+    checkVkResult(vkAllocateDescriptorSets(m_Device, &allocInfo, &descriptorSet));
 }
 
 void DescriptorPool::freeDescriptors(std::vector<VkDescriptorSet>& descriptors) const {

@@ -11,7 +11,6 @@
 
 #include "Debug/Debug.h"
 #include "Debug/Instrumentor.h"
-#include "VulkanEngine/Common.h"
 #include "VulkanEngine/Init/Initializers.h"
 #include "VulkanEngine/Run/Pass.h"
 

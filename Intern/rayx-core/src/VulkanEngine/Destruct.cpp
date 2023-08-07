@@ -26,11 +26,11 @@ void inline storePipelineCache(VkDevice& device, VkPipelineCache& cache) {
     if (cache != VK_NULL_HANDLE) {
         /* Get size of pipeline cache */
         size_t size{};
-        VK_CHECK_RESULT(vkGetPipelineCacheData(device, cache, &size, nullptr));
+        checkVkResult(vkGetPipelineCacheData(device, cache, &size, nullptr));
 
         /* Get data of pipeline cache */
         std::vector<uint8_t> data(size);
-        VK_CHECK_RESULT(vkGetPipelineCacheData(device, cache, &size, data.data()));
+        checkVkResult(vkGetPipelineCacheData(device, cache, &size, data.data()));
 
         // Cache is stored in OS TEMP
         auto tmpDir = std::filesystem::temp_directory_path();

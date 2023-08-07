@@ -37,7 +37,7 @@ void Pass::Pipeline::createPipelineLayout(VkDescriptorSetLayout* setLayouts) {
     pipelineLayoutCreateInfo.pPushConstantRanges = &pushConstant;
     pipelineLayoutCreateInfo.pushConstantRangeCount = 1;  // One struct of pushConstants
 
-    VK_CHECK_RESULT(vkCreatePipelineLayout(m_device, &pipelineLayoutCreateInfo, nullptr, &m_pipelineLayout))
+    checkVkResult(vkCreatePipelineLayout(m_device, &pipelineLayoutCreateInfo, nullptr, &m_pipelineLayout));
 }
 
 void Pass::Pipeline::createPipeline() {
@@ -46,7 +46,7 @@ void Pass::Pipeline::createPipeline() {
     */
     auto pipelineCreateInfo = VKINIT::Pipeline::compute_pipeline_create_info(m_pipelineLayout, getPipelineShaderCreateInfo());
     // FIXME(OS): Currently only creates compute pipelines. Pipeline should be general for also other types (E.g Graphics). Move this somewhere else!
-    VK_CHECK_RESULT(vkCreateComputePipelines(m_device, nullptr, 1, &pipelineCreateInfo, nullptr, &m_pipeline))
+    checkVkResult(vkCreateComputePipelines(m_device, nullptr, 1, &pipelineCreateInfo, nullptr, &m_pipeline));
 }
 
 /**
@@ -71,7 +71,7 @@ void inline Pass::Pipeline::readPipelineCache() {
     create_info.pInitialData = pipeline_data.data();
 
     /* Create Vulkan pipeline cache */
-    VK_CHECK_RESULT(vkCreatePipelineCache(m_device, &create_info, nullptr, &m_pipelineCache))
+    checkVkResult(vkCreatePipelineCache(m_device, &create_info, nullptr, &m_pipelineCache));
 }
 
 /**
@@ -84,11 +84,11 @@ void inline Pass::Pipeline::storePipelineCache(VkDevice& device) {
     if (m_pipelineCache != VK_NULL_HANDLE) {
         /* Get size of pipeline cache */
         size_t size{};
-        VK_CHECK_RESULT(vkGetPipelineCacheData(device, m_pipelineCache, &size, nullptr))
+        checkVkResult(vkGetPipelineCacheData(device, m_pipelineCache, &size, nullptr));
 
         /* Get data of pipeline cache */
         std::vector<uint8_t> data(size);
-        VK_CHECK_RESULT(vkGetPipelineCacheData(device, m_pipelineCache, &size, data.data()))
+        checkVkResult(vkGetPipelineCacheData(device, m_pipelineCache, &size, data.data()));
 
         // Cache is stored in OS TEMP
         auto tmpDir = std::filesystem::temp_directory_path();
@@ -136,7 +136,7 @@ void Pass::Pipeline::createShaderModule() {
     createInfo.pCode = shaderCode;
     createInfo.codeSize = filelength;
 
-    VK_CHECK_RESULT(vkCreateShaderModule(m_device, &createInfo, nullptr, &m_shader.module))
+    checkVkResult(vkCreateShaderModule(m_device, &createInfo, nullptr, &m_shader.module));
     RAYX_VERB << "Shader module " << m_name << " created.";
     delete[] shaderCode;
 }
@@ -183,7 +183,7 @@ void ComputePass::createDescriptorSetLayout(std::vector<VkDescriptorSetLayoutBin
 
     // Create the descriptor set layout.
     VkDescriptorSetLayout descriptorSetLayout;
-    VK_CHECK_RESULT(vkCreateDescriptorSetLayout(m_Device, &descriptorSetLayoutCreateInfo, nullptr, &descriptorSetLayout))
+    checkVkResult(vkCreateDescriptorSetLayout(m_Device, &descriptorSetLayoutCreateInfo, nullptr, &descriptorSetLayout));
     m_descriptorSetLayouts.push_back(descriptorSetLayout);
 }
 

@@ -79,13 +79,13 @@ void VulkanEngine::recordSimpleTraceCommand(std::string passName, VkCommandBuffe
     beginInfo.flags = VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT;
 
     // start recording commands
-    VK_CHECK_RESULT(vkBeginCommandBuffer(commandBuffer, &beginInfo))
+    checkVkResult(vkBeginCommandBuffer(commandBuffer, &beginInfo));
     pass->bind(commandBuffer, stage);
     pass->bindDescriptorSet(commandBuffer, stage);
     pass->cmdPushConstants(commandBuffer, stage);  // Bind push constants
 
     traceCommand(commandBuffer);
-    VK_CHECK_RESULT(vkEndCommandBuffer(commandBuffer))  // end recording commands.
+    checkVkResult(vkEndCommandBuffer(commandBuffer));  // end recording commands.
 }
 
 }  // namespace RAYX

@@ -87,7 +87,7 @@ std::vector<std::vector<Ray>> VulkanEngine::runTraceComputeTask(ComputeRunSpec s
 
             recordSimpleTraceCommand("singleTracePass", m_CommandBuffers[0], 0);
             submitCommandBuffer(0);
-            VK_CHECK_RESULT(m_computeFence->waitAndReset())  // FIXME: Can be solved by another memory barrier in CommandBuffer
+            checkVkResult(m_computeFence->waitAndReset());  // FIXME: Can be solved by another memory barrier in CommandBuffer
             auto rayOut = m_BufferHandler->readBuffer<Ray>("ray-buffer", true);
             auto rayMeta = m_BufferHandler->readBuffer<RayMeta>("ray-meta-buffer", true);
 
@@ -109,7 +109,7 @@ std::vector<std::vector<Ray>> VulkanEngine::runTraceComputeTask(ComputeRunSpec s
         push1->i_bounce = push0->i_bounce;
         recordSimpleTraceCommand("finalCollisionPass", m_CommandBuffers[0], 0);
         submitCommandBuffer(0);
-        VK_CHECK_RESULT(m_computeFence->waitAndReset())
+        checkVkResult(m_computeFence->waitAndReset());
         vkQueueWaitIdle(m_ComputeQueue);  // TODO : Valgrind Support not working with fences
         auto rayOut = m_BufferHandler->readBuffer<Ray>("ray-buffer", true);
         events.push_back(rayOut);
