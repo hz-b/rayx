@@ -269,7 +269,7 @@ void ComputePass::simpleUpdateDescriptorSets(BufferHandler* bufferHandler) {
  * @param stage Index of stage/Pipeline
  */
 void ComputePass::bindDescriptorSet(const VkCommandBuffer& cmdBuffer, int stage) {
-    vkCmdBindDescriptorSets(cmdBuffer, getPipelineBindPoint(), getPipelineLayout(stage), 0, 1, &m_descriptorSets[0], 0, nullptr);
+    vkCmdBindDescriptorSets(cmdBuffer, getPipelineBindPoint(), getVkPipelineLayout(stage), 0, 1, &m_descriptorSets[0], 0, nullptr);
 }
 
 /**
@@ -280,7 +280,7 @@ void ComputePass::bindDescriptorSet(const VkCommandBuffer& cmdBuffer, int stage)
  * @param stage Index of stage/Pipeline
  */
 void ComputePass::cmdPushConstants(const VkCommandBuffer& cmdBuffer, int stage) {
-    vkCmdPushConstants(cmdBuffer, getPipelineLayout(stage), m_pass[stage]->getShaderStageFlagBits(), 0, m_pass[stage]->m_pushConstant.getSize(),
+    vkCmdPushConstants(cmdBuffer, getVkPipelineLayout(stage), m_pass[stage]->getShaderStageFlagBits(), 0, m_pass[stage]->m_pushConstant.getSize(),
                        m_pass[stage]->m_pushConstant.getData());
 }
 

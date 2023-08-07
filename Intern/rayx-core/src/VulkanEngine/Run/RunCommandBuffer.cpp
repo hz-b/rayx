@@ -8,18 +8,16 @@ namespace RAYX {
  *  NO Waitfor fence!
  *
  */
-void VulkanEngine::submitCommandBuffer() {
+void VulkanEngine::submitCommandBuffer(int cmdBufIndex) {
     RAYX_PROFILE_FUNCTION();
     /*
     Now we shall finally submit the recorded command buffer to a queue.
     */
-
-    VkSubmitInfo submitInfo = {};
-    submitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
-    submitInfo.commandBufferCount = 1;                     // submit a single command buffer
-    submitInfo.pCommandBuffers = &m_ComputeCommandBuffer;  // the command buffer to submit.
-    VK_CHECK_RESULT(m_Fences.compute->forceReset())
-    auto f = m_Fences.compute->fence();
+    VkSubmitInfo submitInfo = VKINIT::misc::submit_info();
+    submitInfo.commandBufferCount = 1;                            // submit a single command buffer
+    submitInfo.pCommandBuffers = &m_CommandBuffers[cmdBufIndex];  // the command buffer to submit.
+    VK_CHECK_RESULT(m_computeFence->forceReset())
+    auto f = m_computeFence->fence();
     /*
     We submit the command buffer on the queue, at the same time giving a
     fence. (Fences are like interrupts and used for async computations)
@@ -31,7 +29,6 @@ void VulkanEngine::submitCommandBuffer() {
     from the GPU. Fences give us a hint that the Command in the Queue is
     actually done executing.
     */
-    // m_Fences.compute->wait();
 }
 
 }  // namespace RAYX

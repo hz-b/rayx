@@ -9,6 +9,7 @@
 #include "Core.h"
 #include "Shared/Constants.h"
 #include "Shared/Ray.h"
+//#include "TracerConfig.h"
 
 // if no `--batch` option is given, this it the batch size.
 const uint64_t DEFAULT_BATCH_SIZE = 100000;
@@ -62,7 +63,7 @@ class RAYX_API Tracer {
   protected:
     // where the actual tracing happens.
     // std::vector<Ray> will contain all events for all Rays (and also the ETYPE_UNINIT events).
-    virtual std::vector<Ray> traceRaw(const TraceRawConfig&) = 0;
+    virtual BundleHistory traceRaw(const TraceRawConfig&) = 0;
     virtual void setPushConstants(const PushConstants*) = 0;
     // -1 means no device is selected.
     int m_deviceID = -1;

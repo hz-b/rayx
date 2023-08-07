@@ -1,25 +1,122 @@
 #ifndef NO_VULKAN
 
-#include "VulkanEngine/VulkanEngine.h"
+#include <algorithm>
+#include <ranges>
 
+#include "Tracer/TracerConfig.h"
+#include "VulkanEngine/VulkanEngine.h"
 namespace RAYX {
 
-void VulkanEngine::run(VulkanEngineRunSpec_t spec) {
-    if (m_state == VulkanEngineStates_t::PREINIT) {
-        RAYX_ERR << "you've forgotton to .init() the VulkanEngine";
-    } else if (m_state == VulkanEngineStates_t::POSTRUN) {
-        RAYX_ERR << "you've forgotton to .cleanup() the VulkanEngine";
+void VulkanEngine::updateDescriptorSets(std::string passName) {
+    // getComputePass(passName)->updateDescriptorSets(m_BufferHandler);
+    getComputePass(passName)->simpleUpdateDescriptorSets(m_BufferHandler);
+}
+
+void VulkanEngine::updateAllDescriptorSets() {
+    for (const auto pass : m_computePasses) {
+        updateDescriptorSets(pass->getName());
     }
+}
 
+bool allFinalized(const std::vector<RayMeta>& vector) {
+    return std::ranges::all_of(vector, [](const RayMeta& element) { return element.finalized; });
+}
+
+[[maybe_unused]] static void printRayStats(const std::vector<Ray>& rayOut) {
+    int _hit = 0;
+    int _abs = 0;
+    int _fly = 0;
+    int _unin = 0;
+    int _not = 0;
+
+    for (const auto& r : rayOut) {
+        if ((int)r.m_eventType == (int)ETYPE_JUST_HIT_ELEM) {
+            _hit++;
+        } else if ((int)r.m_eventType == (int)ETYPE_ABSORBED) {
+            _abs++;
+        } else if ((int)r.m_eventType == (int)ETYPE_FLY_OFF) {
+            _fly++;
+        } else if ((int)r.m_eventType == (int)ETYPE_UNINIT) {
+            _unin++;
+        } else if ((int)r.m_eventType == (int)ETYPE_NOT_ENOUGH_BOUNCES) {
+            _not++;
+        }
+    }
+    double hit = (double)(_hit) / rayOut.size();
+    double abs = (double)(_abs) / rayOut.size();
+    double fly = (double)(_fly) / rayOut.size();
+    double unin = (double)(_unin) / rayOut.size();
+    double notx = (double)(_not) / rayOut.size();
+    RAYX_D_LOG << "_hit: " << hit << " _abs: " << abs << " _fly: " << fly << " _unin: " << unin << " _not: " << notx;
+    RAYX_D_LOG << "===============";
+}
+
+std::vector<std::vector<Ray>> VulkanEngine::runTraceComputeTask(ComputeRunSpec spec) {
+    if (m_state == EngineStates::PREINIT) {
+        RAYX_ERR << "you've forgotton to .init() the VulkanEngine";
+    } else if (m_state == EngineStates::POSTRUN) {
+        // RAYX_ERR << "you've forgotton to .cleanup() the VulkanEngine";
+    }
     m_numberOfInvocations = spec.m_numberOfInvocations;
+    const int maxBounces = spec.maxBounces;
 
-    updteDescriptorSets();
-    createComputePipeline();
-    recordInComputeCommandBuffer();
-    submitCommandBuffer();
+    // Using new descriptor manager (TODO(OS): Fix new desc. manager)
+    updateAllDescriptorSets();
+
+    ////////////// FULL TRACER ONLY
+    // recordSimpleTraceCommand("OldFullTracingPass", m_CommandBuffers[0], 0);
+    // submitCommandBuffer(0);
+    // vkQueueWaitIdle(m_ComputeQueue);
+
+    // auto out = m_BufferHandler->readBuffer<Ray>("output-buffer", true);
+    // m_runs++;
+    // m_state = EngineStates_t::POSTRUN;
+    // return out;
+    ////////////// END
+
+    std::vector<std::vector<Ray>> events;
+    auto push0 = m_computePasses[0]->getPipelines()[0]->m_pushConstant.getActualPushConstant<PushConstants>();
+
+    // First stage: Single Trace until max Bounce
+    // -------------------------------------------------------------------------------------------------------
+    {
+        RAYX_PROFILE_SCOPE_STDOUT("singleTracePass");
+        for (int i = 0; i < maxBounces; i++) {
+            // Update PushConstants content
+            push0->i_bounce = i;
+
+            recordSimpleTraceCommand("singleTracePass", m_CommandBuffers[0], 0);
+            submitCommandBuffer(0);
+            VK_CHECK_RESULT(m_computeFence->waitAndReset())  // FIXME: Can be solved by another memory barrier in CommandBuffer
+            auto rayOut = m_BufferHandler->readBuffer<Ray>("ray-buffer", true);
+            auto rayMeta = m_BufferHandler->readBuffer<RayMeta>("ray-meta-buffer", true);
+
+            events.push_back(rayOut);
+            if (allFinalized(rayMeta)) {  // Are all rays finished?
+                RAYX_D_LOG << "All finalized";
+                break;
+            }
+
+
+
+        }
+    }
+    // Second stage: Final collision only check
+    // -------------------------------------------------------------------------------------------------------
+    {
+        RAYX_PROFILE_SCOPE_STDOUT("finalCollisionPass");
+        auto push1 = m_computePasses[1]->getPipelines()[0]->m_pushConstant.getActualPushConstant<PushConstants>();
+        push1->i_bounce = push0->i_bounce;
+        recordSimpleTraceCommand("finalCollisionPass", m_CommandBuffers[0], 0);
+        submitCommandBuffer(0);
+        VK_CHECK_RESULT(m_computeFence->waitAndReset())
+        vkQueueWaitIdle(m_ComputeQueue);  // TODO : Valgrind Support not working with fences
+        auto rayOut = m_BufferHandler->readBuffer<Ray>("ray-buffer", true);
+        events.push_back(rayOut);
+    }
     m_runs++;
-
-    m_state = VulkanEngineStates_t::POSTRUN;
+    m_state = EngineStates::POSTRUN;
+    return events;
 }
 
 }  // namespace RAYX

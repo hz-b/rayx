@@ -187,15 +187,6 @@ void VulkanEngine::createLogicalDevice() {
     }
 
     vkGetDeviceQueue(m_Device, m_computeFamily, 0, &m_ComputeQueue);
-    vkGetDeviceQueue(m_Device, m_computeFamily, 0, &m_TransferQueue);
-}
-// Create Semaphores for Queue synchronization between commands
-void VulkanEngine::createSemaphores() {
-    VkSemaphoreCreateInfo semaphoreCreateInfo = {};
-    semaphoreCreateInfo.sType = VK_STRUCTURE_TYPE_SEMAPHORE_CREATE_INFO;
-
-    vkCreateSemaphore(m_Device, &semaphoreCreateInfo, nullptr, &m_Semaphores.computeSemaphore);
-    vkCreateSemaphore(m_Device, &semaphoreCreateInfo, nullptr, &m_Semaphores.transferSemaphore);
 }
 
 /**

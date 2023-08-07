@@ -58,6 +58,7 @@ int gl_GlobalInvocationID;
 
 /**************************************************************
  *                    PushConstants
+ *  TODO: Change naming of pushConstants --> ComputeParams 
  **************************************************************/
 #ifndef GLSL
     PushConstants pushConstants;
@@ -68,7 +69,7 @@ int gl_GlobalInvocationID;
         double numRays;
         double randomSeed;
         double maxEvents;
-    } pushConstants;
+    } pushConstants; 
 #endif
 
 /**************************************************************

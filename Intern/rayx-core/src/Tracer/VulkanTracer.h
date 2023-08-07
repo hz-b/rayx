@@ -14,7 +14,7 @@ class RAYX_API VulkanTracer : public Tracer {
     ~VulkanTracer() = default;
 
     void listPhysicalDevices();
-    std::vector<Ray> traceRaw(const TraceRawConfig&) override;
+    BundleHistory traceRaw(const TraceRawConfig&) override;
     void setPushConstants(const PushConstants*) override;
 #ifdef RAYX_DEBUG_MODE
     /**

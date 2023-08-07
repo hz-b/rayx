@@ -9,10 +9,10 @@ namespace RAYX {
  * @brief Specialized pushConsant Class
  *
  */
-class RAYX_API PushConstant {
+class RAYX_API PushConstantHandler {
   public:
-    PushConstant() = default;
-    ~PushConstant() = default;
+    PushConstantHandler() = default;
+    ~PushConstantHandler() = default;
 
     void update(void* data, uint32_t size);
     void* getData() const { return m_data; }

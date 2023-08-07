@@ -23,7 +23,7 @@ CpuTracer::CpuTracer() { RAYX_VERB << "Initializing Cpu Tracer.."; }
 
 CpuTracer::~CpuTracer() {}
 
-std::vector<Ray> CpuTracer::traceRaw(const TraceRawConfig& cfg) {
+BundleHistory CpuTracer::traceRaw(const TraceRawConfig& cfg) {
     RAYX_PROFILE_FUNCTION_STDOUT();
 
     auto rayList = cfg.m_rays;
@@ -55,7 +55,9 @@ std::vector<Ray> CpuTracer::traceRaw(const TraceRawConfig& cfg) {
     }
 
     // Fetch Rays back from the Shader "container"
-    return CPU_TRACER::outputData.data;
+    BundleHistory _vec;
+    return _vec;
+    //return CPU_TRACER::outputData.data;
 }
 
 void CpuTracer::setPushConstants(const PushConstants* p) { std::memcpy(&CPU_TRACER::pushConstants, p, sizeof(PushConstants)); }

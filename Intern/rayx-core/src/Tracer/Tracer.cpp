@@ -51,26 +51,31 @@ BundleHistory Tracer::trace(const Beamline& b, uint64_t max_batch_size) {
             .rayIdStart = (double)rayIdStart, .numRays = (double)rays.size(), .randomSeed = randomSeed, .maxEvents = (double)maxEvents};
         setPushConstants(&pushConsants);
 
-        RayHistory rawBatchHistory;
+        BundleHistory rawBatchHistory;
         {
             RAYX_PROFILE_SCOPE_STDOUT("Tracing");
             rawBatchHistory = traceRaw(cfg);
-            assert(rawBatchHistory.size() == batch_size * maxEvents);
+            for ([[maybe_unused]] const auto& _events : rawBatchHistory) {  // Sanity Check
+                assert(batch_size == _events.size());
+            }
         }
 
         {
-            RAYX_PROFILE_SCOPE_STDOUT("BundleHistory-calculation");
+            RAYX_PROFILE_SCOPE_STDOUT("Snapshotting");
+            auto _maxSnapshot = rawBatchHistory.size();
+            result.reserve(batch_size);
+
             for (uint i = 0; i < batch_size; i++) {
-                RayHistory hist;
-                hist.reserve(maxEvents);
-                for (uint j = 0; j < maxEvents; j++) {
-                    uint idx = i * maxEvents + j;
-                    Ray r = rawBatchHistory[idx];
-                    if (r.m_eventType != ETYPE_UNINIT) {
-                        hist.push_back(r);
+                RayHistory snapshots;
+                snapshots.reserve(_maxSnapshot);
+                for (uint j = 0; j < _maxSnapshot; j++) {
+                    Ray r = rawBatchHistory[j][i];
+                    if (r.m_eventType != ETYPE_NOT_ENOUGH_BOUNCES) {
+                        snapshots.push_back(r);
                     }
+                    snapshots.shrink_to_fit();
                 }
-                result.push_back(hist);
+                result.push_back(snapshots);
             }
         }
     }

@@ -1,52 +1,19 @@
 #ifndef NO_VULKAN
 
+#include <utility>
+
 #include "VulkanEngine/VulkanEngine.h"
 namespace RAYX {
 
-/*+
- * Record Commands for Compute and Dispatch
- */
-void VulkanEngine::recordInComputeCommandBuffer() {
-    RAYX_PROFILE_FUNCTION();
-    RAYX_VERB << "Recording commandBuffer..";
+struct Workgroup_t {
+    uint32_t x = 0;
+    uint32_t y = 0;
+    uint32_t z = 0;
+};
+
+static Workgroup_t guessWorkGroupNo(uint32_t requiredLocalWorkGroupNo, VkPhysicalDeviceLimits limits) {
     static uint32_t requiredGroup = 0;
-    static struct {
-        uint32_t x = 0;
-        uint32_t y = 0;
-        uint32_t z = 0;
-    } group;
-    /*
-    Now we shall start recording commands into the newly allocated command
-    buffer.
-    */
-    VkCommandBufferBeginInfo beginInfo = {};
-    beginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
-    beginInfo.flags = VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT;
-    VK_CHECK_RESULT(vkBeginCommandBuffer(m_ComputeCommandBuffer, &beginInfo));  // start recording commands.
-
-    /*
-    We need to bind a pipeline, AND a descriptor set before we dispatch.
-    The validation layer will NOT give warnings if you forget these, so be
-    very careful not to forget them.
-    */
-    vkCmdBindPipeline(m_ComputeCommandBuffer, VK_PIPELINE_BIND_POINT_COMPUTE, m_Pipeline);
-    vkCmdBindDescriptorSets(m_ComputeCommandBuffer, VK_PIPELINE_BIND_POINT_COMPUTE, m_PipelineLayout, 0, 1, &m_DescriptorSet, 0, nullptr);
-    // vkCmdBindDescriptorSets(commandBuffer,
-    // VK_PIPELINE_BIND_POINT_COMPUTE, pipelineLayout, 0, 1,
-    // &descriptorSets[1], 0, NULL);
-
-    /*
-    Calling vkCmdDispatch basically starts the compute pipeline, and
-    executes the compute shader. The number of workgroups is specified in
-    the arguments. If you are already familiar with compute shaders from
-    OpenGL, this should be nothing new to you.
-    */
-    auto requiredLocalWorkGroupNo = (uint32_t)ceil(m_numberOfInvocations / float(WORKGROUP_SIZE));  // number of local works groups
-    // check if there are too many rays
-    VkPhysicalDeviceProperties deviceProperties;
-    vkGetPhysicalDeviceProperties(m_PhysicalDevice, &deviceProperties);
-
-    auto limits = deviceProperties.limits;
+    static struct Workgroup_t group;
 
     auto xgroups = limits.maxComputeWorkGroupCount[0];
     auto ygroups = limits.maxComputeWorkGroupCount[1];
@@ -92,18 +59,33 @@ void VulkanEngine::recordInComputeCommandBuffer() {
         group.y = ygroups;
         group.z = zgroups;
     }
+    return group;
+}
 
-    /**
-     * Update push constants
-     */
-    vkCmdPushConstants(m_ComputeCommandBuffer, m_PipelineLayout, VK_SHADER_STAGE_COMPUTE_BIT, 0, m_pushConstants.size, m_pushConstants.pushConstPtr);
+void VulkanEngine::traceCommand(VkCommandBuffer& cmdBuffer) {
+    auto requiredLocalWorkGroupNo = (uint32_t)ceil((float)m_numberOfInvocations / float(WORKGROUP_SIZE));  // number of local works groups
+    VkPhysicalDeviceProperties deviceProperties;
+    vkGetPhysicalDeviceProperties(m_PhysicalDevice, &deviceProperties);
+    auto group = guessWorkGroupNo(requiredLocalWorkGroupNo, deviceProperties.limits);
+    RAYX_D_LOG << "Sending "
+               << "(" << group.x << ", " << group.y << ", " << group.z << ") to the GPU";
+    vkCmdDispatch(cmdBuffer, group.x, group.y, group.z);
+}
 
-    RAYX_VERB << "Dispatching commandBuffer...";
-    RAYX_VERB << "Sending "
-              << "(" << group.x << ", " << group.z << ", " << group.y << ") to the GPU";
-    vkCmdDispatch(m_ComputeCommandBuffer, group.x, group.z, group.y);
+void VulkanEngine::recordSimpleTraceCommand(std::string passName, VkCommandBuffer& commandBuffer, int stage) {
+    RAYX_PROFILE_FUNCTION();
+    auto pass = getComputePass(std::move(passName));
+    VkCommandBufferBeginInfo beginInfo = VKINIT::Command::command_buffer_begin_info();
+    beginInfo.flags = VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT;
 
-    VK_CHECK_RESULT(vkEndCommandBuffer(m_ComputeCommandBuffer));  // end recording commands.
+    // start recording commands
+    VK_CHECK_RESULT(vkBeginCommandBuffer(commandBuffer, &beginInfo))
+    pass->bind(commandBuffer, stage);
+    pass->bindDescriptorSet(commandBuffer, stage);
+    pass->cmdPushConstants(commandBuffer, stage);  // Bind push constants
+
+    traceCommand(commandBuffer);
+    VK_CHECK_RESULT(vkEndCommandBuffer(commandBuffer))  // end recording commands.
 }
 
 }  // namespace RAYX

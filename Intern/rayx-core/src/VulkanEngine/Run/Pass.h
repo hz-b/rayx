@@ -33,6 +33,9 @@ class RAYX_API Pass {
         Pipeline(VkDevice& dev, const PipelineCreateInfo&);
         ~Pipeline();
 
+        Pipeline(const Pipeline&) = delete;
+        Pipeline& operator=(const Pipeline&) = delete;
+
         void createPipelineLayout(VkDescriptorSetLayout* setLayouts);
         void createPipeline();
         void inline readPipelineCache();
@@ -50,7 +53,7 @@ class RAYX_API Pass {
         VkPipelineLayout m_pipelineLayout = VK_NULL_HANDLE;
         VkPipelineCache m_pipelineCache = VK_NULL_HANDLE;
 
-        PushConstant m_pushConstant;
+        PushConstantHandler m_pushConstant;
 
       private:
         VkPipelineShaderStageCreateInfo getPipelineShaderCreateInfo();
@@ -68,13 +71,15 @@ class RAYX_API Pass {
     Pass() = default;
     virtual ~Pass() = default;
 
-    void bind(const VkCommandBuffer& commandBuffer, int stage) const { vkCmdBindPipeline(commandBuffer, getPipelineBindPoint(), getPipeline(stage)); }
+    void bind(const VkCommandBuffer& commandBuffer, int stage) const {
+        vkCmdBindPipeline(commandBuffer, getPipelineBindPoint(), getVkPipeline(stage));
+    }
 
-    const Pipelines& getPass() const { return m_pass; }
+    Pipelines& getPipelines() { return m_pass; }
     uint32_t getStageAmount() const { return m_stagesCount; }
-    const VkPipeline& getPipeline(int stage) const { return m_pass[stage]->m_pipeline; }
-    const VkPipelineLayout& getPipelineLayout(int stage) { return m_pass[stage]->m_pipelineLayout; }
-    DescriptorPool* getDescriptorPool() { return m_globalDescriptorPool.get(); }
+    VkPipeline getVkPipeline(int stage) const { return m_pass[stage]->m_pipeline; }
+    VkPipelineLayout getVkPipelineLayout(int stage) { return m_pass[stage]->m_pipelineLayout; }
+    DescriptorPool& getDescriptorPool() { return *m_globalDescriptorPool.get(); }
 
     void updatePushConstant(int stage, void* data, uint32_t size);
 

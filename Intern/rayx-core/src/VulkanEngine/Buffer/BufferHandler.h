@@ -6,7 +6,7 @@
 #include <vulkan/vulkan.hpp>
 
 #include "VulkanEngine/Buffer/VulkanBuffer.h"
-#include "VulkanEngine/Init/newFence.h"
+#include "VulkanEngine/Init/Fence.h"
 
 namespace RAYX {
 
