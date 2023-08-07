@@ -55,3 +55,17 @@ TEST_F(TestSuite, MatrixSourceEnergyDistribution) {
     auto rays = loadBeamline("MatrixSourceSpreaded").getInputRays();
     checkDistribution(rays, 42, 10);
 }
+
+TEST_F(TestSuite, LightSourceGetters) { //Check for correctness of values
+    auto beamline = loadBeamline("PointSourceHardEdge");
+    auto horDiv = beamline.m_LightSources[0]->getHorDivergence();
+    auto verDiv = beamline.m_LightSources[0]->getVerDivergence();
+    auto sourceDepth = beamline.m_LightSources[0]->getSourceDepth();
+    auto sourceHeight = beamline.m_LightSources[0]->getSourceHeight();
+    auto sourceWidth = beamline.m_LightSources[0]->getSourceWidth();
+    CHECK_EQ(horDiv, 0.001);
+    CHECK_EQ(verDiv, 0.001);
+    CHECK_EQ(sourceDepth, 1);
+    CHECK_EQ(sourceHeight, 0.04);
+    CHECK_EQ(sourceWidth, 0.065);
+    }
