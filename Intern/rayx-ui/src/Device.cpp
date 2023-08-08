@@ -5,10 +5,10 @@
 #include <set>
 #include <unordered_set>
 
-// local callback functions
-static VKAPI_ATTR VkBool32 VKAPI_CALL debugCallback(VkDebugUtilsMessageSeverityFlagBitsEXT messageSeverity,
-                                                    VkDebugUtilsMessageTypeFlagsEXT messageType,
-                                                    const VkDebugUtilsMessengerCallbackDataEXT* pCallbackData, void* pUserData) {
+// local callback functions (needs to have this signature to be passed to vulkan)
+static VKAPI_ATTR VkBool32 VKAPI_CALL debugCallback([[maybe_unused]] VkDebugUtilsMessageSeverityFlagBitsEXT messageSeverity,
+                                                    [[maybe_unused]] VkDebugUtilsMessageTypeFlagsEXT messageType,
+                                                    const VkDebugUtilsMessengerCallbackDataEXT* pCallbackData, [[maybe_unused]] void* pUserData) {
     std::cerr << "validation layer: " << pCallbackData->pMessage << std::endl;
 
     return VK_FALSE;
@@ -114,8 +114,8 @@ void Device::pickPhysicalDevice() {
         throw std::runtime_error("failed to find a suitable GPU!");
     }
 
-    vkGetPhysicalDeviceProperties(m_PhysicalDevice, &properties);
-    std::cout << "physical device: " << properties.deviceName << std::endl;
+    vkGetPhysicalDeviceProperties(m_PhysicalDevice, &m_Properties);
+    std::cout << "physical device: " << m_Properties.deviceName << std::endl;
 }
 
 void Device::createLogicalDevice() {

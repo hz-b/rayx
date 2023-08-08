@@ -59,8 +59,6 @@ class Device {
 
     void createImageWithInfo(const VkImageCreateInfo& imageInfo, VkMemoryPropertyFlags properties, VkImage& image, VkDeviceMemory& imageMemory);
 
-    VkPhysicalDeviceProperties properties;
-
   private:
     void createInstance();
     void setupDebugMessenger();
@@ -89,6 +87,8 @@ class Device {
     VkSurfaceKHR m_Surface;
     VkQueue m_GraphicsQueue;
     VkQueue m_PresentQueue;
+
+    VkPhysicalDeviceProperties m_Properties;
 
     const std::vector<const char*> m_validationLayers = {"VK_LAYER_KHRONOS_validation"};
     const std::vector<const char*> m_deviceExtensions = {VK_KHR_SWAPCHAIN_EXTENSION_NAME};
