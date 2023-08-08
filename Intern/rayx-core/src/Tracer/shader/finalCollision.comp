@@ -24,9 +24,9 @@ layout(local_size_x = WORKGROUP_SIZE, local_size_y = 1, local_size_z = 1) in;
  **************************************************************/
 
 // don't use this directly. Use `_ray` instead.
-SHADER_ARRAY(Ray, rayData, 0, iobuf);
+SHADER_ARRAY(Ray, rayData, 0, ibuf); //TODO(OS) Check/Fix buffers
 
-SHADER_ARRAY(RayMeta, rayMetaData, 1, iobuf);
+SHADER_ARRAY(RayMeta, rayMetaData, 1, obuf);
 
 // std430 is required so that Element is layouted like in C++.
 // see https://www.khronos.org/opengl/wiki/Interface_Block_(GLSL) for more details on layouting.
@@ -42,6 +42,7 @@ SHADER_ARRAY(int, matIdx, 4, materialIndexBuf);
 // contains: (Palik tables of all materials concatenated together) concatenated with (Nff tables of all materials concatenated together)
 // use the matIdx-table to determine the relevant indices for when which table starts and stops.
 SHADER_ARRAY(double, mat, 5, materialBuf);
+
 
 #ifdef RAYX_DEBUG_MODE
 struct _debug_struct {
@@ -76,7 +77,7 @@ bool eventRecorded = false;
 // `r` will typically be _ray, or some related ray.
 void recordEvent(Ray r, double w) {
     if (eventRecorded) {
-        SHADER_PRINT("Warning snapshot already taken!\n");
+        //SHADER_PRINT("Warning snapshot already taken!\n"); //TODO(OS): fix print
     } else {
         eventRecorded = true;
     }
@@ -86,7 +87,7 @@ void recordEvent(Ray r, double w) {
     }
 
     _ray = r;
-    _ray.m_weight = w;
+    _ray.m_eventType = w;
     return;
 }
 
@@ -99,7 +100,7 @@ void recordFinalEvent(Ray r, double w) {
 
 // throws an error, and termiantes the program
 #ifdef GLSL
-#define throw(string) recordFinalEvent(_ray, W_FATAL_ERROR)
+#define throw(string) recordFinalEvent(_ray, ETYPE_FATAL_ERROR)
 #else
 #define throw(string) RAYX_ERR << string
 #endif
@@ -122,7 +123,7 @@ void recordFinalEvent(Ray r, double w) {
  *                    MAIN
  **************************************************************/
 void main() {
-    _ray.m_weight = ETYPE_UNINIT;
+    _ray.m_eventType = ETYPE_UNINIT;
 
     if (_rayMeta.finalized) {
         return;  // RETURN FINALIZED

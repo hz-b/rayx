@@ -106,21 +106,37 @@ target_include_directories(${PROJECT_NAME} SYSTEM PUBLIC
 
 # ---- Compile Shaders ----
 if(NOT VULKAN STREQUAL "NO")
-    # The following code is used to always compile the shader.
-    # This is most likely not an optimal solution, but it will work
-    # until we find a better one.
-    add_dependencies(${PROJECT_NAME} COMPILE_SHADER)
-    set(COMPILED_SHADER ${CMAKE_BINARY_DIR}/bin/comp.spv)
-    set(COMPILED_SHADER_FAKE ${CMAKE_BINARY_DIR}/bin/___comp.spv) # this exists so file cannot be found -> always execute command
-
-    add_custom_command(
-        OUTPUT
-        ${COMPILED_SHADER}
-        ${COMPILED_SHADER_FAKE}
-        COMMAND "glslc"
-        ARGS ${PROJECT_SOURCE_DIR}/src/Tracer/shader/main-glsl.comp -o ${COMPILED_SHADER} -fshader-stage=compute
+    # Mapping of source shader filenames to desired output filenames
+    set(SHADERS
+        "main-glsl.comp" "main.spv"
+        "singleBounce-glsl.comp" "singleBounce.spv"
+        "finalCollision-glsl.comp" "finalCollision.spv"
     )
 
-    add_custom_target(COMPILE_SHADER ALL DEPENDS ${COMPILED_SHADER})
+    list(LENGTH SHADERS SHADER_COUNT)
+    math(EXPR SHADER_COUNT "${SHADER_COUNT} - 1")
+
+    foreach(INDEX RANGE 0 ${SHADER_COUNT} 2)
+        list(GET SHADERS ${INDEX} SHADER_SRC)
+        math(EXPR OUTPUT_INDEX "${INDEX} + 1")
+        list(GET SHADERS ${OUTPUT_INDEX} SHADER_DST)
+
+        # The following code is used to always compile the shader.
+        set(COMPILED_SHADER ${CMAKE_BINARY_DIR}/bin/${SHADER_DST})
+        set(COMPILED_SHADER_FAKE ${CMAKE_BINARY_DIR}/bin/___${SHADER_DST}) # this exists so file cannot be found -> always execute command
+
+        add_custom_command(
+            OUTPUT
+            ${COMPILED_SHADER}
+            ${COMPILED_SHADER_FAKE}
+            COMMAND "glslc"
+            ARGS ${PROJECT_SOURCE_DIR}/src/Tracer/shader/${SHADER_SRC} -o ${COMPILED_SHADER} -fshader-stage=compute
+            COMMENT "Compiling ${SHADER_SRC} to ${SHADER_DST}"
+        )
+
+        string(REPLACE ".spv" "" TARGET_NAME ${SHADER_DST})
+        add_custom_target(COMPILE_SHADER_${TARGET_NAME} ALL DEPENDS ${COMPILED_SHADER})
+        add_dependencies(${PROJECT_NAME} COMPILE_SHADER_${TARGET_NAME})
+    endforeach()
 endif()
 # ------------------------
