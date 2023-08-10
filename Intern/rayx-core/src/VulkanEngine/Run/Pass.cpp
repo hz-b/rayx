@@ -163,7 +163,7 @@ ComputePass::ComputePass(VkDevice& device, const ComputePassCreateInfo& createIn
     m_name = std::string(createInfo.passName);
     m_stagesCount = createInfo.pipelineCreateInfos.size();
     m_pass.reserve(m_stagesCount);
-    m_descriptorSets.reserve(createInfo.descriptorSetAmount);
+    m_descriptorSets.resize(createInfo.descriptorSetAmount);
 
     // Fill compute Pipelines
     for (uint32_t i = 0; i < m_stagesCount; i++) {
