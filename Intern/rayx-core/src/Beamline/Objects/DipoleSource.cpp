@@ -86,12 +86,9 @@ DipoleSource::DipoleSource(const DesignObject& dobj) : LightSource(dobj) {
 
 std::vector<Ray> DipoleSource::getRays() const {
     RAYX_PROFILE_SCOPE("getRays");
-    double phi, en;  // psi,phi direction cosines, en=energy
-
-    PsiAndStokes psiandstokes;
-
+    
     int n = m_numberOfRays;
-    std::vector<Ray> rayList;
+    
     rayList.reserve(m_numberOfRays);
     // rayList.reserve(1048576);
     RAYX_VERB << "Create " << n << " rays with standard normal deviation...";
@@ -99,31 +96,28 @@ std::vector<Ray> DipoleSource::getRays() const {
     
     // create n rays with random position and divergence within the given span
     // for width, height, depth, horizontal and vertical divergence
-    for (int i = 0; i < n; i++) {
+    for (int i = 0; i < n/4; i++) {
+    pthread_t thread[4];
+    pthread_mutex_init(&mutex, NULL);
 
-        phi = randomDouble() - 0.5 * m_horDivergence; //horDivergence in rad
 
-        glm::dvec3 position = getXYZPosition(phi);
-        
-        en = getEnergy();  // Verteilung nach Schwingerfunktion
-        
-        psiandstokes = getPsiandStokes(en);
-        
-        phi = phi + getMisalignmentParams().m_rotationXerror.rad;
-        psiandstokes.psi = psiandstokes.psi + getMisalignmentParams().m_rotationYerror.rad;
+    for (int j = 0; j < 4; j++){
+        if (pthread_create(thread + j, NULL, &DipoleSource::getrayswrapper, this) != 0){
+            perror("failed to create thread");
+            break;
+        }
+    }
 
-        // get corresponding angles based on distribution and deviation from
-        // main ray (main ray: xDir=0,yDir=0,zDir=1 for phi=psi=0)
-        glm::dvec3 direction = getDirectionFromAngles(phi, psiandstokes.psi);
-        glm::dvec4 tempDir = m_orientation * glm::dvec4(direction, 0.0);
-        direction = glm::dvec3(tempDir.x, tempDir.y, tempDir.z);
+    for (int j = 0; j < 4; j++){
+        if (pthread_join(thread[j], NULL)){
+            break;
+        }
+    }
 
-        Ray r = {position, ETYPE_UNINIT, direction, en, psiandstokes.stokes, 0.0, 0.0, -1.0, -1.0};
-        
-        rayList.push_back(r);
     }
     return rayList;
 }
+
 
 
 // monte-Carlo-method to get normal-distributed x and y Values for getXYZPosition()
@@ -161,11 +155,49 @@ glm::dvec3 DipoleSource::getXYZPosition(double phi)const{
     return glm::dvec3(x, y, z);
 }
 
+void* DipoleSource::getrayswrapper(void* object){
+    reinterpret_cast<DipoleSource*>(object)->getRaysParallel();
+}
+
+void DipoleSource::getRaysParallel(){
+
+    static std::mt19937 RNGD;
+
+    double phi, en;  // psi,phi direction cosines, en=energy
+
+    PsiAndStokes psiandstokes;
+
+
+    phi = (RNGD() / std::mt19937::max()) - 0.5 * m_horDivDegrees; //horDivergence in rad
+
+    glm::dvec3 position = getXYZPosition(phi);
+        
+    en = getEnergy();  // Verteilung nach Schwingerfunktion
+        
+    psiandstokes = getPsiandStokes(en);
+        
+    phi = phi + getMisalignmentParams().m_rotationXerror.rad;
+    psiandstokes.psi = psiandstokes.psi + getMisalignmentParams().m_rotationYerror.rad;
+
+    // get corresponding angles based on distribution and deviation from
+    // main ray (main ray: xDir=0,yDir=0,zDir=1 for phi=psi=0)
+    glm::dvec3 direction = getDirectionFromAngles(phi, psiandstokes.psi);
+    glm::dvec4 tempDir = m_orientation * glm::dvec4(direction, 0.0);
+    direction = glm::dvec3(tempDir.x, tempDir.y, tempDir.z);
+
+    Ray r = {position, ETYPE_UNINIT, direction, en, psiandstokes.stokes, 0.0, 0.0, -1.0, -1.0};
+        
+    rayList.push_back(r);
+    
+
+}
+
 PsiAndStokes DipoleSource::getPsiandStokes(double en) const {
     RAYX_PROFILE_SCOPE("getPsiStokes");
 
     PsiAndStokes psiandstokes;
-
+    
+    
     do {
         psiandstokes.psi = (randomDouble() -0.5) * 6 * m_verDivergence;
         psiandstokes.stokes = dipoleFold(psiandstokes.psi, en, m_verEbeamDivergence);
