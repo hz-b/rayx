@@ -47,9 +47,9 @@ BundleHistory Tracer::trace(const Beamline& b, uint64_t max_batch_size) {
             .m_elements = elements,
         };
 
-        PushConstants pushConsants = {
+        PushConstants* pushConstants = new PushConstants{
             .rayIdStart = (double)rayIdStart, .numRays = (double)rays.size(), .randomSeed = randomSeed, .maxEvents = (double)maxEvents};
-        setPushConstants(&pushConsants);
+        setPushConstants(pushConstants);
 
         BundleHistory rawBatchHistory;
         {
