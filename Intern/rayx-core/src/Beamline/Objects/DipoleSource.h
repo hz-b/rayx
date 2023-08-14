@@ -1,6 +1,9 @@
 #pragma once
 
 #include <list>
+#include <pthread.h>
+#include <thread>
+
 
 #include "Beamline/LightSource.h"
 
@@ -36,6 +39,8 @@ class RAYX_API DipoleSource : public LightSource {
     double vDivergence(double hv, double sigv) const;
     double getNormalFromRange(double range) const;
 
+    void getRaysParallel();
+
   private:
     // Geometric Params
     double m_bendingRadius;
@@ -44,6 +49,8 @@ class RAYX_API DipoleSource : public LightSource {
     double m_photonFlux;
     EnergyDistribution m_energySpreadType;
 
+    mutable std::vector<Ray> rayList;
+    mutable pthread_mutex_t mutex;
     double m_sigpsi;
     glm::dvec4 m_stokes;
     double m_electronEnergy;
@@ -69,6 +76,7 @@ class RAYX_API DipoleSource : public LightSource {
     double m_maxIntensity;
 
     
+    static void* getrayswrapper(void* object);
     glm::dvec4 getStokesSyn(double hv, double psi1, double psi2) const;
     double bessel(double hnue, double zeta) const;
     glm::dvec4 dipoleFold(double psi, double hv, double sigpsi) const;
