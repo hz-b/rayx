@@ -1126,7 +1126,7 @@ TEST_F(TestSuite, testVerDivergenceDipole) {
     std::vector<InOutPair> inouts = {{
                                          .energy = 100,
                                          .sigv = 1,
-                                         .out = 1.591581814000419,//1.5917477218305678
+                                         .out = 1.591581814000419,
                                      }
     };
 
@@ -1137,5 +1137,42 @@ TEST_F(TestSuite, testVerDivergenceDipole) {
     for(auto values : inouts){
         auto result = dipolesource->vDivergence(values.energy, values.sigv);
         CHECK_EQ(result, values.out, 0.1);
+    }
+}
+
+TEST_F(TestSuite, testLightsourceGetters){
+    struct RmlInput{
+        std::string rmlFile;
+        double horDivergence;
+        double sourceHight;
+        double sourceWidth;
+        double sourceDepth;
+        double averagePhotonEnergy;
+    };
+    
+    std::vector<RmlInput> rmlinputs = {{
+                                        .rmlFile = "PointSourceHardEdge",
+                                        .horDivergence = 0.001,             //conversion /1000 in the parser
+                                        .sourceHight = 0.04,
+                                        .sourceWidth = 0.065,
+                                        .sourceDepth = 1,
+                                        .averagePhotonEnergy = 120.97,
+                                       }
+    };
+    
+    for(auto values : rmlinputs){
+        auto beamline = loadBeamline(values.rmlFile);
+        std::shared_ptr<LightSource> src = beamline.m_LightSources[0];
+        LightSource* lightsource = dynamic_cast<LightSource*>(&*src);
+
+        auto horResult = lightsource->getHorDivergence();
+        auto hightResult = lightsource->getSourceHeight();
+        auto widthResult = lightsource->getSourceWidth();
+        auto average = lightsource->getPhotonEnergy();
+
+        CHECK_EQ(horResult, values.horDivergence);
+        CHECK_EQ(hightResult, values.sourceHight);
+        CHECK_EQ(widthResult, values.sourceWidth);
+        CHECK_EQ(average, values.averagePhotonEnergy);
     }
 }
