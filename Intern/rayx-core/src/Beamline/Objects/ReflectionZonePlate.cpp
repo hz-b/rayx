@@ -36,7 +36,9 @@ Element makeReflectionZonePlate(const DesignObject& dobj) {
         surface = makeSphere(dobj.parseLongRadius());
     }
 
-    auto behaviour = serializeRZP({.m_imageType = (double)ImageType::Point2Point,
+    auto imageType = dobj.parseImageType();
+
+    auto behaviour = serializeRZP({.m_imageType = (double) imageType,
                                    .m_rzpType = (double)RZPType::Elliptical,
                                    .m_derivationMethod = 0,
                                    .m_designWavelength = designWavelength,

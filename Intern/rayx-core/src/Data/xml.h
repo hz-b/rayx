@@ -100,6 +100,7 @@ struct Parser {
     Cutout parseCutout() const;
     ElectronEnergyOrientation parseElectronEnergyOrientation() const;
     SourcePulseType parseSourcePulseType() const;
+    double parseImageType() const;
 
     // parsers for trivial derived parameters
     inline int parseNumberRays() const { return parseInt("numberRays"); }

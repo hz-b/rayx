@@ -634,7 +634,7 @@ void RAYX_API RZPLineDensity(Ray r, dvec4 normal, RZPBehaviour b, RAYX_INOUT(dou
     double ym = 0;
     double zm = 0;
 
-    if (IMAGE_TYPE == 0) {         // point to point (standard)
+    if (IMAGE_TYPE == IT_POINT2POINT) {
         if (FX == 0 && FZ == 0) {  // plane
             zi = -(risag * c_alpha + Z);
             xi = X;
@@ -655,7 +655,7 @@ void RAYX_API RZPLineDensity(Ray r, dvec4 normal, RZPBehaviour b, RAYX_INOUT(dou
             ym = -(FX * X) - FY * Y - FZ * Z + FZ * rosag * c_beta +
                  FY * rosag * s_beta;
         }
-    } else if (IMAGE_TYPE == 1) {  // astigmatic to astigmatix
+    } else if (IMAGE_TYPE == IT_ASTIGMATIC2ASTIGMATIC) {
         double s_rim = sign(rimer);
         double s_rom = sign(romer);
         double c_2alpha = r8_cos(2 * alpha);
@@ -715,6 +715,26 @@ void RAYX_API RZPLineDensity(Ray r, dvec4 normal, RZPBehaviour b, RAYX_INOUT(dou
         DX = (-bi - bm) / (WL * Ord);
 
         return;
+    } else if (IMAGE_TYPE == IT_POINT2HORIZONTAL_LINE) {
+            // TODO don't use magic constants
+
+        if (FX == 0.0 && FZ == 0.0) { //plane
+          zi = -(risag*c_alpha+Z);
+          xi = X;
+          yi = risag*s_alpha;
+          zm = rosag*c_beta-Z;
+          xm = 0;
+          ym = rosag*s_beta;
+        } else {
+          zi = FX*FZ*X - (FX*FX + FY*FY)*(Z + risag*c_alpha) + FY*FZ*(Y - risag*s_alpha);
+          xi = FY*X - FX*Y + FX*risag*s_alpha;
+          yi = -(FX*X) - FY*Y - FZ*Z - FZ*risag*c_alpha + FY*risag*s_alpha;
+          zm = (FX*FX + FY*FY)*(-Z + rosag*c_beta) + FY*FZ*(Y - rosag*s_beta);
+          xm = FX*(-Y + rosag*s_beta);
+          ym = -(FY*Y) - FZ*Z + FZ*rosag*c_beta + FY*rosag*s_beta;
+        }
+    } else {
+        throw("unsupported ImageType!");
     }
 
     double ris = sqrt(zi * zi + xi * xi + yi * yi);
