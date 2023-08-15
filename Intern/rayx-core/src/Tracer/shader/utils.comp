@@ -733,6 +733,22 @@ void RAYX_API RZPLineDensity(Ray r, dvec4 normal, RZPBehaviour b, RAYX_INOUT(dou
           xm = FX*(-Y + rosag*s_beta);
           ym = -(FY*Y) - FZ*Z + FZ*rosag*c_beta + FY*rosag*s_beta;
         }
+    } else if (IMAGE_TYPE == IT_POINT2HORIZONTAL_DIVERGENT_LINE) {
+	    if (FX == 0.0 && FZ == 0.0) {
+            zi = -(risag*c_alpha+Z);
+            xi = X;
+            yi = risag*s_alpha;
+            zm = rosag*c_beta-Z;
+            xm = X/zi*zm;    // not anymore negative as zi is negative!g
+            ym = rosag*s_beta;
+	    } else {
+            zi = FX*FZ*X - (FX*FX + FY*FY)*(Z + risag*c_alpha) + FY*FZ*(Y - risag*s_alpha);
+            xi = FY*X - FX*Y + FX*risag*s_alpha;
+            yi = -(FX*X) - FY*Y - FZ*Z - FZ*risag*c_alpha + FY*risag*s_alpha;
+            zm = (FX*FZ*X*(Z - rosag*c_beta))/(Z + risag*c_alpha) + (FX*FX + FY*FY)*(-Z + rosag*c_beta) + FY*FZ*(Y - rosag*s_beta);
+            xm = (FY*X*(Z - rosag*c_beta))/(Z + risag*c_alpha) + FX*(-Y + rosag*s_beta);
+            ym = -((FX*X*(Z - rosag*c_beta))/(Z + risag*c_alpha)) + FZ*(-Z + rosag*c_beta) + FY*(-Y + rosag*s_beta);
+        }
     } else {
         throw("unsupported ImageType!");
     }
