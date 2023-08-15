@@ -32,11 +32,15 @@ Element makeReflectionZonePlate(const DesignObject& dobj) {
         surface = makePlane();
     } else if (curvatureType == CurvatureType::Toroidal) {
         surface = makeToroid(dobj);
-    } else {
+    } else if (curvatureType == CurvatureType::Spherical) {
         surface = makeSphere(dobj.parseLongRadius());
+    } else {
+        RAYX_ERR << "invalid curvature Type";
     }
 
-    auto behaviour = serializeRZP({.m_imageType = (double)ImageType::Point2Point,
+    auto imageType = dobj.parseImageType();
+
+    auto behaviour = serializeRZP({.m_imageType = (double) imageType,
                                    .m_rzpType = (double)RZPType::Elliptical,
                                    .m_derivationMethod = 0,
                                    .m_designWavelength = designWavelength,

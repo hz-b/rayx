@@ -571,4 +571,14 @@ SourcePulseType Parser::parseSourcePulseType() const {
     return spreadType;
 }
 
+double Parser::parseImageType() const {
+    int imageType_int;
+
+    if (!xml::paramInt(node, "imageType", &imageType_int)) {
+        RAYX_ERR << "Cannot determine image type!";
+    }
+
+    return (double) imageType_int;
+}
+
 }  // namespace RAYX::xml
