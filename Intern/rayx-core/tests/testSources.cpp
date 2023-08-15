@@ -9,8 +9,7 @@ void checkEnergyDistribution(const std::vector<Ray>& rays, double photonEnergy, 
 
 void checkZDistribution(const std::vector<Ray>& rays, double center, double spread) {
     for (auto r : rays) {
-        std::cout << r.m_position[2] << std::endl;
-        //CHECK_IN(r.m_position, center - spread, center + spread);
+        CHECK_IN(r.m_position, center - spread, center + spread);
     }
 
 }
