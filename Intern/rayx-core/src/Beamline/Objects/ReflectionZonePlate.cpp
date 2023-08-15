@@ -32,8 +32,10 @@ Element makeReflectionZonePlate(const DesignObject& dobj) {
         surface = makePlane();
     } else if (curvatureType == CurvatureType::Toroidal) {
         surface = makeToroid(dobj);
-    } else {
+    } else if (curvatureType == CurvatureType::Spherical) {
         surface = makeSphere(dobj.parseLongRadius());
+    } else {
+        RAYX_ERR << "invalid curvature Type";
     }
 
     auto imageType = dobj.parseImageType();
