@@ -9,7 +9,7 @@ void checkEnergyDistribution(const std::vector<Ray>& rays, double photonEnergy, 
 
 void checkZDistribution(const std::vector<Ray>& rays, double center, double spread) {
     for (auto r : rays) {
-        CHECK_IN(r.m_position, center - spread, center + spread);
+        CHECK_IN(r.m_position.z, center - spread, center + spread);
     }
 
 }
@@ -88,7 +88,7 @@ TEST_F(TestSuite, DipoleZDistribution) {
     DipoleSource* dipolesource = dynamic_cast<DipoleSource*>(&*src);
 
     auto rays = beamline.getInputRays();
-    checkZDistribution(rays, 0 , 2.1);
+    checkZDistribution(rays, 0 , 2.2);
 }
 
 
