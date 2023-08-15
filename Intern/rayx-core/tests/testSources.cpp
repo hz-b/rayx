@@ -1,10 +1,18 @@
 #include "setupTests.h"
 #include <fstream>
 
-void checkDistribution(const std::vector<Ray>& rays, double sourceEnergy, double energySpread) {
+void checkEnergyDistribution(const std::vector<Ray>& rays, double photonEnergy, double energySpread) {
     for (auto r : rays) {
-        CHECK_IN(r.m_energy, sourceEnergy - energySpread, sourceEnergy + energySpread);
+        CHECK_IN(r.m_energy, photonEnergy - energySpread, photonEnergy + energySpread);
     }
+}
+
+void checkZDistribution(const std::vector<Ray>& rays, double center, double spread) {
+    for (auto r : rays) {
+        std::cout << r.m_position[2] << std::endl;
+        //CHECK_IN(r.m_position, center - spread, center + spread);
+    }
+
 }
 
 void checkPositionDistribution(const std::vector<Ray>& rays, double sourceWidth, double sourceHight) {
@@ -14,11 +22,6 @@ void checkPositionDistribution(const std::vector<Ray>& rays, double sourceWidth,
     }
 }
 
-void checkZDistribution(const std::vector<Ray>& rays) {
-    for (auto r : rays) {
-        CHECK_EQ(r.m_position.z, float(0));
-    }
-}
 
 void roughCompare(std::vector<RAYX::Ray> l, std::vector<RAYX::Ray> r) {
     CHECK_EQ(l.size(), r.size());
@@ -57,17 +60,17 @@ TEST_F(TestSuite, MatrixSourceTraced) {
 
 TEST_F(TestSuite, PointSourceHardEdge) {
     auto rays = loadBeamline("PointSourceHardEdge").getInputRays();
-    checkDistribution(rays, 120.97, 12.1);
+    checkEnergyDistribution(rays, 120.97, 12.1);
 }
 
 TEST_F(TestSuite, PointSourceSoftEdge) {
     auto rays = loadBeamline("PointSourceSoftEdge").getInputRays();
-    checkDistribution(rays, 151, 6);
+    checkEnergyDistribution(rays, 151, 6);
 }
 
 TEST_F(TestSuite, MatrixSourceEnergyDistribution) {
     auto rays = loadBeamline("MatrixSourceSpreaded").getInputRays();
-    checkDistribution(rays, 42, 10);
+    checkEnergyDistribution(rays, 42, 10);
 }
 
 TEST_F(TestSuite, DipoleSourcePosition) {
@@ -77,10 +80,97 @@ TEST_F(TestSuite, DipoleSourcePosition) {
 
 TEST_F(TestSuite, DipoleEnergyDistribution) {
     auto rays = loadBeamline("dipole_energySpread").getInputRays();
-    checkDistribution(rays, 1000, 23000);
+    checkEnergyDistribution(rays, 1000, 23000);
 }
 
-/*TEST_F(TestSuite, DipoleZDistribution) {
-    auto rays = loadBeamline("dipole_imageplane").getInputRays();
-    checkZDistribution(rays);
-}*/
+TEST_F(TestSuite, DipoleZDistribution) {
+    auto beamline = loadBeamline("dipole_plain");
+    std::shared_ptr<LightSource> src = beamline.m_LightSources[0];
+    DipoleSource* dipolesource = dynamic_cast<DipoleSource*>(&*src);
+
+    auto rays = beamline.getInputRays();
+    checkZDistribution(rays, 0 , 2.1);
+}
+
+
+
+TEST_F(TestSuite, testInterpolationFunctionDipole) {
+    struct InOutPair{
+        double in;
+        double out;
+    };
+    std::vector<InOutPair> inouts = {{
+                                         .in = 1.5298292375594387,
+                                         .out = -3.5010758381905855,
+                                     }
+    };
+
+    auto beamline = loadBeamline("dipole_plain");
+    std::shared_ptr<LightSource> src = beamline.m_LightSources[0];
+    DipoleSource* dipolesource = dynamic_cast<DipoleSource*>(&*src);
+
+    for(auto values : inouts){
+        auto result = dipolesource->getInterpolation(values.in);
+        CHECK_EQ(result, values.out, 0.01);
+    }
+}
+
+TEST_F(TestSuite, testVerDivergenceDipole) {
+    struct InOutPair{
+        double energy;
+        double sigv;
+        double out;
+    };
+    std::vector<InOutPair> inouts = {{
+                                         .energy = 100,
+                                         .sigv = 1,
+                                         .out = 1.591581814000419,
+                                     }
+    };
+
+    auto beamline = loadBeamline("dipole_plain");
+    std::shared_ptr<LightSource> src = beamline.m_LightSources[0];
+    DipoleSource* dipolesource = dynamic_cast<DipoleSource*>(&*src);
+
+    for(auto values : inouts){
+        auto result = dipolesource->vDivergence(values.energy, values.sigv);
+        CHECK_EQ(result, values.out, 0.1);
+    }
+}
+
+TEST_F(TestSuite, testLightsourceGetters){
+    struct RmlInput{
+        std::string rmlFile;
+        double horDivergence;
+        double sourceHight;
+        double sourceWidth;
+        double sourceDepth;
+        double averagePhotonEnergy;
+    };
+    
+    std::vector<RmlInput> rmlinputs = {{
+                                        .rmlFile = "PointSourceHardEdge",
+                                        .horDivergence = 0.001,             //conversion /1000 in the parser
+                                        .sourceHight = 0.04,
+                                        .sourceWidth = 0.065,
+                                        .sourceDepth = 1,
+                                        .averagePhotonEnergy = 120.97,
+                                       }
+    };
+    
+    for(auto values : rmlinputs){
+        auto beamline = loadBeamline(values.rmlFile);
+        std::shared_ptr<LightSource> src = beamline.m_LightSources[0];
+        LightSource* lightsource = dynamic_cast<LightSource*>(&*src);
+
+        auto horResult = lightsource->getHorDivergence();
+        auto hightResult = lightsource->getSourceHeight();
+        auto widthResult = lightsource->getSourceWidth();
+        auto average = lightsource->getPhotonEnergy();
+
+        CHECK_EQ(horResult, values.horDivergence);
+        CHECK_EQ(hightResult, values.sourceHight);
+        CHECK_EQ(widthResult, values.sourceWidth);
+        CHECK_EQ(average, values.averagePhotonEnergy);
+    }
+}

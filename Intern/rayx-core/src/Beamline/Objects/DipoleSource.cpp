@@ -101,8 +101,8 @@ std::vector<Ray> DipoleSource::getRays() const {
     // for width, height, depth, horizontal and vertical divergence
     for (int i = 0; i < n; i++) {
 
-        phi = randomDouble() - 0.5 * m_horDivergence; //horDivergence in rad
-
+        phi = (randomDouble() - 0.5) * m_horDivergence; //horDivergence in rad
+            
         glm::dvec3 position = getXYZPosition(phi);
         
         en = getEnergy();  // Verteilung nach Schwingerfunktion
@@ -110,6 +110,7 @@ std::vector<Ray> DipoleSource::getRays() const {
         psiandstokes = getPsiandStokes(en);
         
         phi = phi + getMisalignmentParams().m_rotationXerror.rad;
+                
         psiandstokes.psi = psiandstokes.psi + getMisalignmentParams().m_rotationYerror.rad;
 
         // get corresponding angles based on distribution and deviation from
@@ -143,20 +144,18 @@ double DipoleSource::getNormalFromRange(double range) const {
 
 glm::dvec3 DipoleSource::getXYZPosition(double phi)const{
     RAYX_PROFILE_SCOPE("getxyz");
-
-    phi = phi * PI / 180;        // DEG to RAD conversion
     
     double x1 = getNormalFromRange(m_sourceWidth);
     
-    double sign = DipoleSource::m_electronEnergyOrientation == ElectronEnergyOrientation::Clockwise ? 1.0 : -1.0;
+    double sign = DipoleSource::m_electronEnergyOrientation == ElectronEnergyOrientation::Clockwise ? -1.0 : 1.0;
     
-    double x = sign * (x1 * cos(phi) + (m_bendingRadius * (1 - cos(phi))));
+    double x = sign * (x1 * cos(phi) + (m_bendingRadius * 1000 * (1 - cos(phi))));
     x = x + m_position.x + getMisalignmentParams().m_translationXerror;
 
     double y = getNormalFromRange(m_sourceHeight);
     y = y + m_position.y + getMisalignmentParams().m_translationYerror;
-
-    double z = sign * ((m_bendingRadius*1000 - x1) * sin(phi));
+    
+    double z = sign * (m_bendingRadius * 1000 - x1) * sin(phi) + getMisalignmentParams().m_translationZerror;
     
     return glm::dvec3(x, y, z);
 }
