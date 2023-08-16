@@ -30,6 +30,6 @@ std::filesystem::path RAYX_API canonicalizeUserPath(const std::filesystem::path&
 
 uint32_t* readFile(uint32_t& length, const char* filename);
 
-std::vector<uint8_t> readFile(const std::string& filename, const uint32_t count = 0);
+std::vector<uint8_t> RAYX_API readFile(const std::string& filename, const uint32_t count = 0);
 
-void writeFile(const std::vector<uint8_t>& data, const std::string& filename, const uint32_t count = 0);
+void RAYX_API writeFile(const std::vector<uint8_t>& data, const std::string& filename, const uint32_t count = 0);
