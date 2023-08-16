@@ -106,10 +106,10 @@ std::vector<Ray> DipoleSource::getRays() const {
     std::vector<Ray> returnlist;
 
     for (int j = 0; j < 4; j++){
-        parameters[j] = {
-            .counter = m_numberOfRays/4,
+        parameters[j] = {  
             .dip = this,
             .rayList = {},
+            .counter = m_numberOfRays/4,
             .threadID = j,
         };
         if (pthread_create(thread + j, NULL, getrayswrapper, &parameters[j]) != 0){     //2.Stelle rückgabewert möglich mit *
@@ -139,8 +139,6 @@ double DipoleSource::getNormalFromRange(double range, std::mt19937& RNGD) const 
     double expanse = -0.5 / range / range;
     
     
-
-
     do{   
         value = (((double)RNGD() / std::mt19937::max()) - 0.5) * 9 * range;
         Distribution = exp(expanse * value * value);
@@ -162,7 +160,8 @@ glm::dvec3 DipoleSource::getXYZPosition(double phi, std::mt19937 &RNGD)const{
     double y = getNormalFromRange(m_sourceHeight, RNGD);
     y = y + m_position.y + getMisalignmentParams().m_translationYerror;
 
-    double z = sign * ((m_bendingRadius * 1000 - x1) * sin(phi)) + getMisalignmentParams().m_translationZerror;
+    double z = sign * ((m_bendingRadius * 1000 - x1) * sin(phi));
+    z = z + m_position.z + getMisalignmentParams().m_translationZerror;
     
     return glm::dvec3(x, y, z);
 }
@@ -182,7 +181,7 @@ void DipoleSource::parameter::getRaysParallel(){
 
     PsiAndStokes psiandstokes;
 
-    for(int i = 0; i < counter; i++){
+    for(unsigned int i = 0; i < counter; i++){
         phi = (((double)RNGD() / std::mt19937::max()) - 0.5) * dip->m_horDivDegrees; //horDivergence in rad
 
         glm::dvec3 position = dip->getXYZPosition(phi, RNGD);
