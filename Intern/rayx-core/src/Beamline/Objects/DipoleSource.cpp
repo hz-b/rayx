@@ -7,10 +7,11 @@
 #include "Shared/Constants.h"
 #include "Shared/EventType.h"
 
-
 #include <fstream>
 
 namespace RAYX {
+
+#define threadcounter 10
 
 double get_factorCriticalEnergy() {
     double planc = 3 * c_Planck_bar / (2 * pow(c_speedOfLight, 5) * pow(c_electronMass,3)) * pow(c_electronVolt,2) * 1.0e24; //nach RAY-UI
@@ -97,19 +98,19 @@ std::vector<Ray> DipoleSource::getRays() const {
     // create n rays with random position and divergence within the given span
     // for width, height, depth, horizontal and vertical divergence
     
-    pthread_t thread[4];
+    pthread_t thread[threadcounter];
     
-    parameter parameters[4];
+    parameter parameters[threadcounter];
     
     //pthread_mutex_init(&mutex, NULL);
 
     std::vector<Ray> returnlist;
 
-    for (int j = 0; j < 4; j++){
+    for (int j = 0; j < threadcounter; j++){
         parameters[j] = {  
             .dip = this,
             .rayList = {},
-            .counter = m_numberOfRays/4,
+            .counter = m_numberOfRays/threadcounter,
             .threadID = j,
         };
         if (pthread_create(thread + j, NULL, getrayswrapper, &parameters[j]) != 0){     //2.Stelle rückgabewert möglich mit *
@@ -118,7 +119,7 @@ std::vector<Ray> DipoleSource::getRays() const {
         }
     }
 
-    for (int j = 0; j < 4; j++){
+    for (int j = 0; j < threadcounter; j++){
         if (pthread_join(thread[j], NULL)){
             perror("failed to join thread");
             break;
@@ -182,7 +183,7 @@ void DipoleSource::parameter::getRaysParallel(){
     PsiAndStokes psiandstokes;
 
     for(unsigned int i = 0; i < counter; i++){
-        phi = (((double)RNGD() / std::mt19937::max()) - 0.5) * dip->m_horDivDegrees; //horDivergence in rad
+        phi = (((double)RNGD() / std::mt19937::max()) - 0.5) * dip->m_horDivergence; //horDivergence in rad
 
         glm::dvec3 position = dip->getXYZPosition(phi, RNGD);
             
@@ -204,7 +205,6 @@ void DipoleSource::parameter::getRaysParallel(){
 
         rayList.push_back(r);
     }
-
 }
 
 PsiAndStokes DipoleSource::getPsiandStokes(double en) const {
