@@ -29,6 +29,7 @@ class RAYX_API DipoleSource : public LightSource {
       const DipoleSource* dip;
       std::vector<Ray> rayList;
       unsigned int counter;
+      int threadID;
     };
 
     std::vector<Ray> getRays() const override;
@@ -46,9 +47,9 @@ class RAYX_API DipoleSource : public LightSource {
     double getEnergy() const;
     PsiAndStokes getPsiandStokes(double) const;
     void setMaxIntensity();
-    glm::dvec3 getXYZPosition(double)const;
+    glm::dvec3 getXYZPosition(double, std::mt19937&)const;
     double vDivergence(double hv, double sigv) const;
-    double getNormalFromRange(double range) const;
+    double getNormalFromRange(double range, std::mt19937&) const;
 
     
 
