@@ -14,11 +14,22 @@ struct PsiAndStokes{
     double psi; 
 };
 
+void* getrayswrapper(void* object);
+
 
 class RAYX_API DipoleSource : public LightSource {
   public:
     DipoleSource(const DesignObject&);
     virtual ~DipoleSource() = default;
+
+
+    struct parameter {
+      void getRaysParallel();
+
+      const DipoleSource* dip;
+      std::vector<Ray> rayList;
+      unsigned int counter;
+    };
 
     std::vector<Ray> getRays() const override;
 
@@ -39,9 +50,10 @@ class RAYX_API DipoleSource : public LightSource {
     double vDivergence(double hv, double sigv) const;
     double getNormalFromRange(double range) const;
 
-    void getRaysParallel();
+    
 
-  private:
+  public:
+    
     // Geometric Params
     double m_bendingRadius;
     ElectronEnergyOrientation m_electronEnergyOrientation;
@@ -49,8 +61,6 @@ class RAYX_API DipoleSource : public LightSource {
     double m_photonFlux;
     EnergyDistribution m_energySpreadType;
 
-    mutable std::vector<Ray> rayList;
-    mutable pthread_mutex_t mutex;
     double m_sigpsi;
     glm::dvec4 m_stokes;
     double m_electronEnergy;
@@ -76,7 +86,7 @@ class RAYX_API DipoleSource : public LightSource {
     double m_maxIntensity;
 
     
-    static void* getrayswrapper(void* object);
+    
     glm::dvec4 getStokesSyn(double hv, double psi1, double psi2) const;
     double bessel(double hnue, double zeta) const;
     glm::dvec4 dipoleFold(double psi, double hv, double sigpsi) const;
@@ -94,4 +104,9 @@ class RAYX_API DipoleSource : public LightSource {
                                            1.404e-3, 8.131e-4, 4.842e-4, 2.755e-4, 1.611e-4, 9.439e-5, 5.543e-5, 3.262e-5, 1.922e-5};
 
 };
+
+
+
+
+
 }  // namespace RAYX
