@@ -23,7 +23,7 @@ class RAYX_API DipoleSource : public LightSource {
     virtual ~DipoleSource() = default;
 
 
-    struct parameter {
+    struct ThreadReturns {
       void getRaysParallel();
 
       const DipoleSource* dip;

@@ -11,33 +11,33 @@
 
 namespace RAYX {
 
-#define threadcounter 10
+#define THREADCOUNTER 16
 
 double get_factorCriticalEnergy() {
-    double planc = 3 * c_Planck_bar / (2 * pow(c_speedOfLight, 5) * pow(c_electronMass,3)) * pow(c_electronVolt,2) * 1.0e24; //nach RAY-UI
+    double planc = 3 * PLANCK_BAR / (2 * pow(SPEED_OF_LIGHT, 5) * pow(ELECTRON_MASS,3)) * pow(ELECTRON_VOLT,2) * 1.0e24; //nach RAY-UI
     return planc; //2.5050652873563215 , 2.2182868570172918
 }
 
 double get_factorMagneticField() { 
-    double magField = c_electronVolt / (c_speedOfLight * c_elementaryCharge) * 1.0e9; 
+    double magField = ELECTRON_VOLT / (SPEED_OF_LIGHT * ELEMENTARY_CHARGE) * 1.0e9; 
     return magField;
 }
 
 double get_factorElectronEnergy() {
-    double factorElectronEnergy = c_electronVolt * 1.0e9 / (c_electronMass * pow(c_speedOfLight, 2));
+    double factorElectronEnergy = ELECTRON_VOLT * 1.0e9 / (ELECTRON_MASS * pow(SPEED_OF_LIGHT, 2));
     return factorElectronEnergy;
 }
 
 double get_factorOmega() {
-    double factorOmega = 3 * c_fineStructureConstant / (4.0 * pow(PI, 2) * c_elementaryCharge * pow(c_speedOfLight, 4) * pow(c_electronMass, 2) / pow(c_electronVolt * 1.0e9, 2));
+    double factorOmega = 3 * FINE_STRUCTURE_CONSTANT / (4.0 * pow(PI, 2) * ELEMENTARY_CHARGE * pow(SPEED_OF_LIGHT, 4) * pow(ELECTRON_MASS, 2) / pow(ELECTRON_VOLT * 1.0e9, 2));
     return factorOmega;
 }
 
-double get_factorDistribution() { return 3 * c_fineStructureConstant / (4.0 * pow(PI, 2) * c_elementaryCharge); }
+double get_factorDistribution() { return 3 * FINE_STRUCTURE_CONSTANT / (4.0 * pow(PI, 2) * ELEMENTARY_CHARGE); }
 
 double get_factorTotalPowerDipol() {
-    double totalPower =  pow(c_elementaryCharge, 2) / (3 * c_electricPermittivity * pow(c_speedOfLight, 8) * pow(c_electronMass, 4)) *
-           pow(c_electronVolt * 1.0E9, 3) / (2 * PI) / (c_electronVolt / (c_speedOfLight * c_elementaryCharge));
+    double totalPower =  pow(ELEMENTARY_CHARGE, 2) / (3 * ELECTRIC_PERMITTIVITY * pow(SPEED_OF_LIGHT, 8) * pow(ELECTRON_MASS, 4)) *
+           pow(ELECTRON_VOLT * 1.0E9, 3) / (2 * PI) / (ELECTRON_VOLT / (SPEED_OF_LIGHT * ELEMENTARY_CHARGE));
     return totalPower;
 }
 
@@ -88,47 +88,34 @@ DipoleSource::DipoleSource(const DesignObject& dobj) : LightSource(dobj) {
 std::vector<Ray> DipoleSource::getRays() const {
     RAYX_PROFILE_SCOPE("getRays");
     
-    //int n = m_numberOfRays;
+    pthread_t thread[THREADCOUNTER];
     
-    //rayList.reserve(m_numberOfRays);
-    // rayList.reserve(1048576);
-    //RAYX_VERB << "Create " << n << " rays with standard normal deviation...";
-
-    
-    // create n rays with random position and divergence within the given span
-    // for width, height, depth, horizontal and vertical divergence
-    
-    pthread_t thread[threadcounter];
-    
-    parameter parameters[threadcounter];
-    
-    //pthread_mutex_init(&mutex, NULL);
+    ThreadReturns threadreturns[THREADCOUNTER];
 
     std::vector<Ray> returnlist;
 
-    for (int j = 0; j < threadcounter; j++){
-        parameters[j] = {  
+    for (int j = 0; j < THREADCOUNTER; j++){
+        threadreturns[j] = {  
             .dip = this,
             .rayList = {},
-            .counter = m_numberOfRays/threadcounter,
+            .counter = m_numberOfRays/THREADCOUNTER,
             .threadID = j,
         };
-        if (pthread_create(thread + j, NULL, getrayswrapper, &parameters[j]) != 0){     //2.Stelle rückgabewert möglich mit *
+        if (pthread_create(thread + j, NULL, getrayswrapper, &threadreturns[j]) != 0){     //2.Stelle rückgabewert möglich mit *
             perror("failed to create thread");
             break;
         }
     }
 
-    for (int j = 0; j < threadcounter; j++){
+    for (int j = 0; j < THREADCOUNTER; j++){
         if (pthread_join(thread[j], NULL)){
             perror("failed to join thread");
             break;
         }
-        std::vector<Ray> threadlist = parameters[j].rayList;
+        std::vector<Ray> threadlist = threadreturns[j].rayList;
         returnlist.insert(returnlist.end(), threadlist.begin(), threadlist.end());
     }
 
-    
     return returnlist;
 }
 
@@ -168,12 +155,12 @@ glm::dvec3 DipoleSource::getXYZPosition(double phi, std::mt19937 &RNGD)const{
 }
 
 void* getrayswrapper(void* object){
-    reinterpret_cast<DipoleSource::parameter*>(object)->getRaysParallel();
+    reinterpret_cast<DipoleSource::ThreadReturns*>(object)->getRaysParallel();
 
     return NULL;
 }
 
-void DipoleSource::parameter::getRaysParallel(){
+void DipoleSource::ThreadReturns::getRaysParallel(){
 
     std::mt19937 RNGD;
     RNGD.seed(time(nullptr) + threadID);
@@ -250,7 +237,7 @@ glm::dvec4 DipoleSource::getStokesSyn(double energy, double psi1, double psi2) c
 
     double fak = 3453345200000000.0;  // getFactorDistribution
 
-    double gamma = fabs(m_electronEnergy) * 1957;  // getFactorElectronEnergy
+    double gamma = fabs(m_electronEnergy) * FACTOR_ELECTRON_ENERGY_SC;
     //double ec = m_criticalEnergy * 1000 * pow(m_electronEnergy, 3) / m_bendingRadius;
     double y0 = energy / m_criticalEnergy / 1000.0;
     double xnue1 = 1.0 / 3.0;
@@ -316,7 +303,7 @@ void DipoleSource::setLogInterpolation() {
 double DipoleSource::schwinger(double energy) const {
     RAYX_PROFILE_SCOPE("schwinger");
 
-    double preFactor = c_factorSchwinger_RAY * 1.e-3;
+    double preFactor = FACTOR_SCHWINGER_RAY * 1.e-3;
 
     double Y0 = energy / m_criticalEnergy;
     Y0 = Y0 / 1000;
@@ -419,7 +406,7 @@ void DipoleSource::calcMagneticField() {
     m_criticalEnergy = get_factorCriticalEnergy() * pow(fabs(m_electronEnergy), 3) / m_bendingRadius;
 
     m_totalPower = get_factorTotalPowerDipol() * 0.1 * pow(fabs(m_electronEnergy), 3) * m_magneticFieldStrength * fabs(m_horDivergence) / 1000.0;
-    m_gamma = m_electronEnergy / (c_electronMass * pow(c_speedOfLight, 2) / (c_electronVolt)*1.e-9);
+    m_gamma = m_electronEnergy / (ELECTRON_MASS * pow(SPEED_OF_LIGHT, 2) / (ELECTRON_VOLT)*1.e-9);
 
     if (m_gamma >= 1) {
         m_beta = sqrt(pow(m_gamma, 2) - 1) / m_gamma;
