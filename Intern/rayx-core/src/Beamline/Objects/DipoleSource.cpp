@@ -110,6 +110,7 @@ std::vector<Ray> DipoleSource::getRays() const {
             .counter = m_numberOfRays/4,
             .dip = this,
             .rayList = {},
+            .threadID = j,
         };
         if (pthread_create(thread + j, NULL, getrayswrapper, &parameters[j]) != 0){     //2.Stelle rückgabewert möglich mit *
             perror("failed to create thread");
@@ -131,31 +132,34 @@ std::vector<Ray> DipoleSource::getRays() const {
 }
 
 // monte-Carlo-method to get normal-distributed x and y Values for getXYZPosition()
-double DipoleSource::getNormalFromRange(double range) const {
+double DipoleSource::getNormalFromRange(double range, std::mt19937& RNGD) const {
     double value;
     double Distribution;
 
     double expanse = -0.5 / range / range;
     
+    
+
+
     do{   
-        value = (randomDouble() - 0.5) * 9 * range;
+        value = (((double)RNGD() / std::mt19937::max()) - 0.5) * 9 * range;
         Distribution = exp(expanse * value * value);
-    } while (Distribution < randomDouble());
+    } while (Distribution < ((double)RNGD() / std::mt19937::max()));
 
     return value;
 }
 
-glm::dvec3 DipoleSource::getXYZPosition(double phi)const{
+glm::dvec3 DipoleSource::getXYZPosition(double phi, std::mt19937 &RNGD)const{
     RAYX_PROFILE_SCOPE("getxyz");
     
-    double x1 = getNormalFromRange(m_sourceWidth);
+    double x1 = getNormalFromRange(m_sourceWidth, RNGD);
     
     double sign = DipoleSource::m_electronEnergyOrientation == ElectronEnergyOrientation::Clockwise ? -1.0 : 1.0;
     
     double x = sign * (x1 * cos(phi) + (m_bendingRadius * 1000 * (1 - cos(phi))));
     x = x + m_position.x + getMisalignmentParams().m_translationXerror;
 
-    double y = getNormalFromRange(m_sourceHeight);
+    double y = getNormalFromRange(m_sourceHeight, RNGD);
     y = y + m_position.y + getMisalignmentParams().m_translationYerror;
 
     double z = sign * ((m_bendingRadius * 1000 - x1) * sin(phi)) + getMisalignmentParams().m_translationZerror;
@@ -171,21 +175,22 @@ void* getrayswrapper(void* object){
 
 void DipoleSource::parameter::getRaysParallel(){
 
-    static std::mt19937 RNGD;
+    std::mt19937 RNGD;
+    RNGD.seed(time(nullptr) + threadID);
 
     double phi, en;  // psi,phi direction cosines, en=energy
 
     PsiAndStokes psiandstokes;
 
-    for(int i = 0; i<counter; i++){
-        phi = ((RNGD() / std::mt19937::max()) - 0.5) * dip->m_horDivDegrees; //horDivergence in rad
+    for(int i = 0; i < counter; i++){
+        phi = (((double)RNGD() / std::mt19937::max()) - 0.5) * dip->m_horDivDegrees; //horDivergence in rad
 
-        glm::dvec3 position = dip->getXYZPosition(phi);
+        glm::dvec3 position = dip->getXYZPosition(phi, RNGD);
             
         en = dip->getEnergy();  // Verteilung nach Schwingerfunktion
             
         psiandstokes = dip->getPsiandStokes(en);
-            
+
         phi = phi + dip->getMisalignmentParams().m_rotationXerror.rad;
         psiandstokes.psi = psiandstokes.psi + dip->getMisalignmentParams().m_rotationYerror.rad;
 
