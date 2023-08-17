@@ -86,7 +86,7 @@ DipoleSource::DipoleSource(const DesignObject& dobj) : LightSource(dobj) {
  */
 
 std::vector<Ray> DipoleSource::getRays() const {
-    RAYX_PROFILE_SCOPE("getRays");
+    auto t1 = std::chrono::high_resolution_clock::now();
     
     pthread_t thread[THREADCOUNTER];
     
@@ -116,6 +116,10 @@ std::vector<Ray> DipoleSource::getRays() const {
         returnlist.insert(returnlist.end(), threadlist.begin(), threadlist.end());
     }
 
+    auto t2 = std::chrono::high_resolution_clock::now();
+    std::chrono::duration<float> dur = t2 - t1;
+    std::cout << std::chrono::duration_cast<std::chrono::milliseconds>(dur) << std::endl;
+
     return returnlist;
 }
 
@@ -136,7 +140,7 @@ double DipoleSource::getNormalFromRange(double range, std::mt19937& RNGD) const 
 }
 
 glm::dvec3 DipoleSource::getXYZPosition(double phi, std::mt19937 &RNGD)const{
-    RAYX_PROFILE_SCOPE("getxyz");
+    //RAYX_PROFILE_SCOPE("getxyz");
     
     double x1 = getNormalFromRange(m_sourceWidth, RNGD);
     
@@ -195,15 +199,17 @@ void DipoleSource::ThreadReturns::getRaysParallel(){
 }
 
 PsiAndStokes DipoleSource::getPsiandStokes(double en) const {
-    RAYX_PROFILE_SCOPE("getPsiStokes");
+    //RAYX_PROFILE_SCOPE("getPsiStokes");
 
+    std::mt19937 RNGD;
+    
     PsiAndStokes psiandstokes;
     
     
     do {
-        psiandstokes.psi = (randomDouble() -0.5) * 6 * m_verDivergence;
+        psiandstokes.psi = ((double)RNGD() / std::mt19937::max() - 0.5) * 6 * m_verDivergence;
         psiandstokes.stokes = dipoleFold(psiandstokes.psi, en, m_verEbeamDivergence);
-    } while ((psiandstokes.stokes[0]) / m_maxIntensity < randomDouble());
+    } while ((psiandstokes.stokes[0]) / m_maxIntensity < (double)RNGD() / std::mt19937::max());
     
     psiandstokes.psi  = psiandstokes.psi * 1e-3; //psi in rad
 
@@ -211,15 +217,15 @@ PsiAndStokes DipoleSource::getPsiandStokes(double en) const {
 }
 
 double DipoleSource::getEnergy() const {
-    RAYX_PROFILE_SCOPE("getEnergy");
-
+    //RAYX_PROFILE_SCOPE("getEnergy");
+    std::mt19937 RNGD;
     double flux = 0.0;
     double energy = 0.0;
 
     do {
-        energy = m_photonEnergy + (randomDouble() - 0.5) * m_energySpread;
+        energy = m_photonEnergy + (((double)RNGD() / std::mt19937::max()) - 0.5) * m_energySpread;
         flux = schwinger(energy);
-    } while ((flux / m_maxFlux - randomDouble()) < 0);
+    } while ((flux / m_maxFlux - ((double)RNGD() / std::mt19937::max())) < 0);
     return energy;
 }
 
@@ -233,7 +239,7 @@ double DipoleSource::vDivergence(double energy, double sigv) const {
 }
 
 glm::dvec4 DipoleSource::getStokesSyn(double energy, double psi1, double psi2) const {
-    RAYX_PROFILE_SCOPE("getStokesSyn");
+    //RAYX_PROFILE_SCOPE("getStokesSyn");
 
     double fak = 3453345200000000.0;  // getFactorDistribution
 
@@ -301,7 +307,7 @@ void DipoleSource::setLogInterpolation() {
 }
 
 double DipoleSource::schwinger(double energy) const {
-    RAYX_PROFILE_SCOPE("schwinger");
+    //RAYX_PROFILE_SCOPE("schwinger");
 
     double preFactor = FACTOR_SCHWINGER_RAY * 1.e-3;
 
@@ -345,7 +351,8 @@ void DipoleSource::setMaxIntensity() {
 }
 
 glm::dvec4 DipoleSource::dipoleFold(double psi, double photonEnergy, double sigpsi) const {
-    RAYX_PROFILE_SCOPE("dipolefold");
+    //RAYX_PROFILE_SCOPE("dipolefold");
+    std::mt19937 RNGD;
 
     int ln = (int)sigpsi;
     double trsgyp = 0.0;
@@ -374,10 +381,10 @@ glm::dvec4 DipoleSource::dipoleFold(double psi, double photonEnergy, double sigp
 
     for (int i = 1; i <= ln; i++) {
         do {
-            sy = (randomDouble() - 0.5) * sgyp;
+            sy = (((double)RNGD() / std::mt19937::max()) - 0.5) * sgyp;
             zw = trsgyp * sy * sy;
             wy = exp(zw);
-        } while (wy - randomDouble() < 0);
+        } while (wy - ((double)RNGD() / std::mt19937::max()) < 0);
 
         psi1 = psi + sy;
         Stokes = getStokesSyn(photonEnergy, psi1, psi1);
@@ -460,7 +467,7 @@ void DipoleSource::setMaxFlux() {
 }
 
 double DipoleSource::getInterpolation(double energy) const {
-    RAYX_PROFILE_SCOPE("getInterpolation");
+    //RAYX_PROFILE_SCOPE("getInterpolation");
 
     //TODO: Interpolation benchmarken 
     double functionOne = 0.0;
