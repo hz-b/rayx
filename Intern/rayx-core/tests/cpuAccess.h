@@ -23,6 +23,7 @@ extern RAYX_API ShaderArray<double> mat;
 double RAYX_API r8_exp(double);
 double RAYX_API r8_log(double);
 double RAYX_API squaresDoubleRNG(uint64_t&);
+double RAYX_API squaresNormalRNG(uint64_t&, double, double);
 Ray RAYX_API refrac2D(Ray, glm::dvec4, double, double);
 Ray RAYX_API refrac(Ray, glm::dvec4, double);
 glm::dvec4 RAYX_API normal_cartesian(glm::dvec4, double, double);
