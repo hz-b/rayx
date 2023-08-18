@@ -2,6 +2,7 @@
 ######################################################################
 # HOW TO USE:
 
+# Make sure that llvm-cov is installed (check shell command "llvm-cov --version")
 # Compile RAYX in DEBUG mode with Clang (Ideally 14)
 # Run this script from the root of the project
 # A folder will be created in Scripts/coverage-outputs containg the coverage report
