@@ -26,12 +26,13 @@ class RAYX_API DipoleSource : public LightSource {
     struct ThreadReturns {
       void getRaysParallel();
 
+      Ray* RayPosition;
       const DipoleSource* dip;
-      std::vector<Ray> rayList;
       unsigned int counter;
       int threadID;
     };
 
+    double m_maxTwister = std::mt19937::max();
     std::vector<Ray> getRays() const override;
 
     void calcMagneticField();
@@ -44,13 +45,13 @@ class RAYX_API DipoleSource : public LightSource {
     void setMaxFlux();
     void setLogInterpolation();
     double getInterpolation(double) const;
-    double getEnergy() const;
-    PsiAndStokes getPsiandStokes(double) const;
+    double getEnergy(std::mt19937&) const;
+    PsiAndStokes getPsiandStokes(double, std::mt19937&) const;
     void setMaxIntensity();
     glm::dvec3 getXYZPosition(double, std::mt19937&)const;
     double vDivergence(double hv, double sigv) const;
     double getNormalFromRange(double range, std::mt19937&) const;
-
+    std::vector<unsigned int> calcBatshSize() const;
     
 
   public:
@@ -87,10 +88,9 @@ class RAYX_API DipoleSource : public LightSource {
     double m_maxIntensity;
 
     
-    
     glm::dvec4 getStokesSyn(double hv, double psi1, double psi2) const;
     double bessel(double hnue, double zeta) const;
-    glm::dvec4 dipoleFold(double psi, double hv, double sigpsi) const;
+    glm::dvec4 dipoleFold(double psi, double hv, double sigpsi, std::mt19937&) const;
 
     std::array<double, 59> m_schwingerX = {1.e-4, 1.e-3, 2.e-3, 4.e-3, 6.e-3, 8.e-3, 1.e-2, 2.e-2, 3.e-2, 4.e-2, 5.e-2, 6.e-2, 7.e-2, 8.e-2, 9.e-2,
                                            1.e-1, 0.15,  0.2,   0.25,  0.3,   0.35,  0.4,   0.45,  0.5,   0.55,  0.6,   0.65,  0.7,   0.75,  0.8,

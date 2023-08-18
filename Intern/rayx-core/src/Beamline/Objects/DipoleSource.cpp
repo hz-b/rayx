@@ -11,7 +11,7 @@
 
 namespace RAYX {
 
-#define THREADCOUNTER 16
+#define THREADCOUNTER 8
 
 double get_factorCriticalEnergy() {
     double planc = 3 * PLANCK_BAR / (2 * pow(SPEED_OF_LIGHT, 5) * pow(ELECTRON_MASS,3)) * pow(ELECTRON_VOLT,2) * 1.0e24; //nach RAY-UI
@@ -85,26 +85,48 @@ DipoleSource::DipoleSource(const DesignObject& dobj) : LightSource(dobj) {
  * @returns list of rays
  */
 
+std::vector<unsigned int> DipoleSource::calcBatshSize() const {
+    std::vector<unsigned int> returns;
+    unsigned int size = 0;
+    double rays = m_numberOfRays;
+
+    for(int i = THREADCOUNTER; i>0; i--){
+        size = int(rays/i);
+        rays = rays - size;
+        returns.push_back(size);
+    }
+
+    return returns;
+}
+
 std::vector<Ray> DipoleSource::getRays() const {
-    auto t1 = std::chrono::high_resolution_clock::now();
+    RAYX_PROFILE_FUNCTION();
     
     pthread_t thread[THREADCOUNTER];
-    
     ThreadReturns threadreturns[THREADCOUNTER];
 
-    std::vector<Ray> returnlist;
+    std::vector<Ray> returnList(m_numberOfRays);
+    //returnList.reserve(m_numberOfRays);
+    //Ray r = {{1, 2, 3}, ETYPE_UNINIT, , en, psiandstokes.stokes, 0.0, 0.0, -1.0, -1.0};
+
+    //generate(returnList.begin(), returnList.end(), );
+    std::vector<unsigned int> size = calcBatshSize();
+    int position = 0;
 
     for (int j = 0; j < THREADCOUNTER; j++){
-        threadreturns[j] = {  
+        threadreturns[j] = {
+            .RayPosition = &returnList[position],
             .dip = this,
-            .rayList = {},
-            .counter = m_numberOfRays/THREADCOUNTER,
+            .counter = size[j],
             .threadID = j,
         };
+        
+
         if (pthread_create(thread + j, NULL, getrayswrapper, &threadreturns[j]) != 0){     //2.Stelle rückgabewert möglich mit *
             perror("failed to create thread");
             break;
         }
+        position = position + size[j];
     }
 
     for (int j = 0; j < THREADCOUNTER; j++){
@@ -112,15 +134,11 @@ std::vector<Ray> DipoleSource::getRays() const {
             perror("failed to join thread");
             break;
         }
-        std::vector<Ray> threadlist = threadreturns[j].rayList;
-        returnlist.insert(returnlist.end(), threadlist.begin(), threadlist.end());
+
     }
 
-    auto t2 = std::chrono::high_resolution_clock::now();
-    std::chrono::duration<float> dur = t2 - t1;
-    std::cout << std::chrono::duration_cast<std::chrono::milliseconds>(dur) << std::endl;
 
-    return returnlist;
+    return returnList;
 }
 
 // monte-Carlo-method to get normal-distributed x and y Values for getXYZPosition()
@@ -132,9 +150,9 @@ double DipoleSource::getNormalFromRange(double range, std::mt19937& RNGD) const 
     
     
     do{   
-        value = (((double)RNGD() / std::mt19937::max()) - 0.5) * 9 * range;
+        value = (((double)RNGD() / m_maxTwister) - 0.5) * 9 * range;
         Distribution = exp(expanse * value * value);
-    } while (Distribution < ((double)RNGD() / std::mt19937::max()));
+    } while (Distribution < ((double)RNGD() / m_maxTwister));
 
     return value;
 }
@@ -171,16 +189,17 @@ void DipoleSource::ThreadReturns::getRaysParallel(){
 
     double phi, en;  // psi,phi direction cosines, en=energy
 
+
     PsiAndStokes psiandstokes;
 
     for(unsigned int i = 0; i < counter; i++){
-        phi = (((double)RNGD() / std::mt19937::max()) - 0.5) * dip->m_horDivergence; //horDivergence in rad
+        phi = (((double)RNGD() / dip->m_maxTwister) - 0.5) * dip->m_horDivergence; //horDivergence in rad
 
         glm::dvec3 position = dip->getXYZPosition(phi, RNGD);
             
-        en = dip->getEnergy();  // Verteilung nach Schwingerfunktion
+        en = dip->getEnergy(RNGD);  // Verteilung nach Schwingerfunktion
             
-        psiandstokes = dip->getPsiandStokes(en);
+        psiandstokes = dip->getPsiandStokes(en, RNGD);
 
         phi = phi + dip->getMisalignmentParams().m_rotationXerror.rad;
         psiandstokes.psi = psiandstokes.psi + dip->getMisalignmentParams().m_rotationYerror.rad;
@@ -193,39 +212,36 @@ void DipoleSource::ThreadReturns::getRaysParallel(){
 
         Ray r = {position, ETYPE_UNINIT, direction, en, psiandstokes.stokes, 0.0, 0.0, -1.0, -1.0};
 
-
-        rayList.push_back(r);
+        *(RayPosition + i) = r;
     }
 }
 
-PsiAndStokes DipoleSource::getPsiandStokes(double en) const {
+PsiAndStokes DipoleSource::getPsiandStokes(double en, std::mt19937 &RNGD) const {
     //RAYX_PROFILE_SCOPE("getPsiStokes");
 
-    std::mt19937 RNGD;
-    
     PsiAndStokes psiandstokes;
-    
-    
+
     do {
-        psiandstokes.psi = ((double)RNGD() / std::mt19937::max() - 0.5) * 6 * m_verDivergence;
-        psiandstokes.stokes = dipoleFold(psiandstokes.psi, en, m_verEbeamDivergence);
-    } while ((psiandstokes.stokes[0]) / m_maxIntensity < (double)RNGD() / std::mt19937::max());
+        psiandstokes.psi = ((double)RNGD() / m_maxTwister - 0.5) * 6 * m_verDivergence;
+        psiandstokes.stokes = dipoleFold(psiandstokes.psi, en, m_verEbeamDivergence, RNGD);
+    } while (psiandstokes.stokes[0] / m_maxIntensity <  (double)RNGD() / m_maxTwister);
     
     psiandstokes.psi  = psiandstokes.psi * 1e-3; //psi in rad
 
     return psiandstokes;
 }
 
-double DipoleSource::getEnergy() const {
+double DipoleSource::getEnergy(std::mt19937 &RNGD) const {
     //RAYX_PROFILE_SCOPE("getEnergy");
-    std::mt19937 RNGD;
+    
+
     double flux = 0.0;
     double energy = 0.0;
 
     do {
-        energy = m_photonEnergy + (((double)RNGD() / std::mt19937::max()) - 0.5) * m_energySpread;
+        energy = m_photonEnergy + ((double)RNGD()/m_maxTwister - 0.5) * m_energySpread;
         flux = schwinger(energy);
-    } while ((flux / m_maxFlux - ((double)RNGD() / std::mt19937::max())) < 0);
+    } while (flux / m_maxFlux - (double)RNGD()/m_maxTwister < 0);
     return energy;
 }
 
@@ -338,9 +354,12 @@ void DipoleSource::setMaxIntensity() {
     double smax = 0.0;
     double psi = -m_verDivergence;
 
+    std::mt19937 RNGD;
+    RNGD.seed(time(nullptr) + RNGD());
+
     for (int i = 1; i < 250; i++) {
         psi = psi + 0.05;
-        auto S = dipoleFold(psi, m_photonEnergy, 1.0);
+        auto S = dipoleFold(psi, m_photonEnergy, 1.0, RNGD);
         if (smax < (S[2] + S[3])) {
             smax = S[2] + S[3];
         } else {
@@ -350,9 +369,7 @@ void DipoleSource::setMaxIntensity() {
     m_maxIntensity = smax;
 }
 
-glm::dvec4 DipoleSource::dipoleFold(double psi, double photonEnergy, double sigpsi) const {
-    //RAYX_PROFILE_SCOPE("dipolefold");
-    std::mt19937 RNGD;
+glm::dvec4 DipoleSource::dipoleFold(double psi, double photonEnergy, double sigpsi, std::mt19937 &RNGD) const {
 
     int ln = (int)sigpsi;
     double trsgyp = 0.0;
@@ -381,10 +398,10 @@ glm::dvec4 DipoleSource::dipoleFold(double psi, double photonEnergy, double sigp
 
     for (int i = 1; i <= ln; i++) {
         do {
-            sy = (((double)RNGD() / std::mt19937::max()) - 0.5) * sgyp;
+            sy = ((double)RNGD() / m_maxTwister - 0.5) * sgyp;
             zw = trsgyp * sy * sy;
             wy = exp(zw);
-        } while (wy - ((double)RNGD() / std::mt19937::max()) < 0);
+        } while (wy - (double)RNGD() / m_maxTwister < 0);
 
         psi1 = psi + sy;
         Stokes = getStokesSyn(photonEnergy, psi1, psi1);
