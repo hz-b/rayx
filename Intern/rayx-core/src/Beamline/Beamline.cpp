@@ -11,16 +11,28 @@ Beamline::~Beamline() = default;
 
 std::vector<Ray> Beamline::getInputRays() const {
     RAYX_PROFILE_FUNCTION_STDOUT();
-    std::vector<Ray> list;
+
+    if (m_LightSources.size() == 0) {
+        return {};
+    }
+
+    // count number of rays.
     uint32_t raycount = 0;
     for (const auto& s : m_LightSources) {
         raycount += s->m_numberOfRays;
     }
-    list.reserve(raycount);
 
-    for (const auto& s : m_LightSources) {
-        auto sub = s->getRays();
-        list.insert(list.end(), sub.begin(), sub.end());
+    // We add all remaining rays into the rays of the first light source.
+    // This is efficient because in most cases there is just one light source, and hence copying them again is unnecessary.
+    std::vector<Ray> list = m_LightSources[0]->getRays();
+
+    if (m_LightSources.size() > 1) {
+        list.reserve(raycount);
+
+        for (unsigned int i = 1; i < m_LightSources.size(); i++) {
+            auto sub = m_LightSources[i]->getRays();
+            list.insert(list.end(), sub.begin(), sub.end());
+        }
     }
 
     return list;
