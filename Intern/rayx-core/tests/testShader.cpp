@@ -1131,3 +1131,45 @@ TEST_F(TestSuite, testRefractiveIndex) {
     // https://refractiveindex.info/?shelf=main&book=Cu&page=Hagemann
     CHECK_EQ(CPU_TRACER::getRefractiveIndex(25146.2, 29), glm::dvec2(1.0, 1.0328e-7), 1e-5);
 }
+
+TEST_F(TestSuite, testInterpolationFunctionDipole) {
+    struct InOutPair {
+        double in;
+        double out;
+    };
+    std::vector<InOutPair> inouts = {{
+        .in = 1.5298292375594387,
+        .out = -3.5010758381905855,
+    }};
+
+    auto beamline = loadBeamline("dipole_plain");
+    std::shared_ptr<LightSource> src = beamline.m_LightSources[0];
+    DipoleSource* dipolesource = dynamic_cast<DipoleSource*>(&*src);
+
+    for (auto values : inouts) {
+        auto result = dipolesource->getInterpolation(values.in);
+        CHECK_EQ(result, values.out, 0.01);
+    }
+}
+
+TEST_F(TestSuite, testVerDivergenceDipole) {
+    struct InOutPair {
+        double energy;
+        double sigv;
+        double out;
+    };
+    std::vector<InOutPair> inouts = {{
+        .energy = 100,
+        .sigv = 1,
+        .out = 1.591581814000419,  // 1.5917477218305678
+    }};
+
+    auto beamline = loadBeamline("dipole_plain");
+    std::shared_ptr<LightSource> src = beamline.m_LightSources[0];
+    DipoleSource* dipolesource = dynamic_cast<DipoleSource*>(&*src);
+
+    for (auto values : inouts) {
+        auto result = dipolesource->vDivergence(values.energy, values.sigv);
+        CHECK_EQ(result, values.out, 0.1);
+    }
+}
