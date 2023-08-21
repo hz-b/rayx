@@ -141,6 +141,47 @@ std::vector<Ray> DipoleSource::getRays() const {
     return returnList;
 }
 
+
+void* getrayswrapper(void* object){
+    reinterpret_cast<DipoleSource::ThreadReturns*>(object)->getRaysParallel();
+
+    return NULL;
+}
+
+void DipoleSource::ThreadReturns::getRaysParallel(){
+
+    std::mt19937 RNGD;
+    RNGD.seed(time(nullptr) + threadID);
+
+    double phi, en;
+
+    PsiAndStokes psiandstokes;
+
+    for(unsigned int i = 0; i < counter; i++){
+        
+        phi = ((double)RNGD() / std::mt19937::max() - 0.5) * dip->m_horDivergence; //horDivergence in rad
+
+        glm::dvec3 position = dip->getXYZPosition(phi, RNGD);
+            
+        en = dip->getEnergy(RNGD);  // Verteilung nach Schwingerfunktion
+            
+        psiandstokes = dip->getPsiandStokes(en, RNGD);
+
+        phi = phi + dip->getMisalignmentParams().m_rotationXerror.rad;
+        psiandstokes.psi = psiandstokes.psi + dip->getMisalignmentParams().m_rotationYerror.rad;
+
+        // get corresponding angles based on distribution and deviation from
+        // main ray (main ray: xDir=0,yDir=0,zDir=1 for phi=psi=0)
+        glm::dvec3 direction = dip->getDirectionFromAngles(phi, psiandstokes.psi);
+        glm::dvec4 tempDir = dip->m_orientation * glm::dvec4(direction, 0.0);
+        direction = glm::dvec3(tempDir.x, tempDir.y, tempDir.z);
+
+        Ray r = {position, ETYPE_UNINIT, direction, en, psiandstokes.stokes, 0.0, 0.0, -1.0, -1.0};
+
+        *(RayPosition + i) = r;
+    }
+}
+
 // monte-Carlo-method to get normal-distributed x and y Values for getXYZPosition()
 double DipoleSource::getNormalFromRange(double range, std::mt19937& RNGD) const {
     double value;
@@ -148,11 +189,10 @@ double DipoleSource::getNormalFromRange(double range, std::mt19937& RNGD) const 
 
     double expanse = -0.5 / range / range;
     
-    
     do{   
-        value = (((double)RNGD() / m_maxTwister) - 0.5) * 9 * range;
+        value = ((double)RNGD() / std::mt19937::max() - 0.5) * 9 * range;
         Distribution = exp(expanse * value * value);
-    } while (Distribution < ((double)RNGD() / m_maxTwister));
+    } while (Distribution < ((double)RNGD() / std::mt19937::max()));
 
     return value;
 }
@@ -176,45 +216,6 @@ glm::dvec3 DipoleSource::getXYZPosition(double phi, std::mt19937 &RNGD)const{
     return glm::dvec3(x, y, z);
 }
 
-void* getrayswrapper(void* object){
-    reinterpret_cast<DipoleSource::ThreadReturns*>(object)->getRaysParallel();
-
-    return NULL;
-}
-
-void DipoleSource::ThreadReturns::getRaysParallel(){
-
-    std::mt19937 RNGD;
-    RNGD.seed(time(nullptr) + threadID);
-
-    double phi, en;  // psi,phi direction cosines, en=energy
-
-
-    PsiAndStokes psiandstokes;
-
-    for(unsigned int i = 0; i < counter; i++){
-        phi = (((double)RNGD() / dip->m_maxTwister) - 0.5) * dip->m_horDivergence; //horDivergence in rad
-
-        glm::dvec3 position = dip->getXYZPosition(phi, RNGD);
-            
-        en = dip->getEnergy(RNGD);  // Verteilung nach Schwingerfunktion
-            
-        psiandstokes = dip->getPsiandStokes(en, RNGD);
-
-        phi = phi + dip->getMisalignmentParams().m_rotationXerror.rad;
-        psiandstokes.psi = psiandstokes.psi + dip->getMisalignmentParams().m_rotationYerror.rad;
-
-        // get corresponding angles based on distribution and deviation from
-        // main ray (main ray: xDir=0,yDir=0,zDir=1 for phi=psi=0)
-        glm::dvec3 direction = dip->getDirectionFromAngles(phi, psiandstokes.psi);
-        glm::dvec4 tempDir = dip->m_orientation * glm::dvec4(direction, 0.0);
-        direction = glm::dvec3(tempDir.x, tempDir.y, tempDir.z);
-
-        Ray r = {position, ETYPE_UNINIT, direction, en, psiandstokes.stokes, 0.0, 0.0, -1.0, -1.0};
-
-        *(RayPosition + i) = r;
-    }
-}
 
 PsiAndStokes DipoleSource::getPsiandStokes(double en, std::mt19937 &RNGD) const {
     //RAYX_PROFILE_SCOPE("getPsiStokes");
@@ -315,7 +316,7 @@ double DipoleSource::bessel(double hnue, double zeta) const {
 }
 
 void DipoleSource::setLogInterpolation() {
-    for (uint32_t i = 0; i < m_schwingerX.size(); i++) {
+    for (double i = 0; i < m_schwingerX.size(); i++) {
         m_schwingerY[i] = m_schwingerX[i] * m_schwingerY[i];
         m_schwingerX[i] = log(m_schwingerX[i]);
         m_schwingerY[i] = log(m_schwingerY[i]);
