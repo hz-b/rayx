@@ -31,11 +31,11 @@ if [ ! -f ./build/mode ] || [[ ! "$(cat ./build/mode)" == "$mode" ]]; then
     echo > ./build/mode
 
     echo Setting up build directory for mode $mode ...
-    cmake --no-warn-unused-cli -DCMAKE_EXPORT_COMPILE_COMMANDS:BOOL=TRUE -DCMAKE_BUILD_TYPE:STRING=$mode -B ./build -G Ninja
+    CXX=clang++ cmake --no-warn-unused-cli -DCMAKE_EXPORT_COMPILE_COMMANDS:BOOL=TRUE -DCMAKE_BUILD_TYPE:STRING=$mode -B ./build -G Ninja
 
     echo $mode > ./build/mode
 fi
 
 # compiling
 echo Compiling ...
-cmake --build ./build --config $mode --target all -j 10 --
+CXX=clang++ cmake --build ./build --config $mode --target all -j 10 --
