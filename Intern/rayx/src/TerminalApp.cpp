@@ -66,7 +66,7 @@ void TerminalApp::tracePath(const std::filesystem::path& path) {
         auto rays = m_Tracer->trace(*m_Beamline, max_batch_size);
 
         // Export Rays to external data.
-        auto file = exportRays(rays, path.string());
+        /*auto file = exportRays(rays, path.string());
 
         // Plot
         if (m_CommandParser->m_args.m_plotFlag) {
@@ -80,7 +80,7 @@ void TerminalApp::tracePath(const std::filesystem::path& path) {
             if (ret != 0) {
                 RAYX_WARN << "received error code while printing";
             }
-        }
+        }*/
 
 #if defined(RAYX_DEBUG_MODE)
         // Export Debug Matrics.

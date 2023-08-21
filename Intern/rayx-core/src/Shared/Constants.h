@@ -32,18 +32,17 @@ const double PLANCK_BAR = PLANCK / (2 * PI);
 /// m_e [kg]. electron mass.
 const double ELECTRON_MASS = 9.1093837015e-31;  // Checked 2019-7-25, PB, NIST: mass of electron [kg];
 
-///RAY-UI shortcut for getFactorElectronEnergy
+/// RAY-UI shortcut for getFactorElectronEnergy
 const double FACTOR_ELECTRON_ENERGY_SC = 1957;
 
 //
-const double FINE_STRUCTURE_CONSTANT = 7.2973525693e-3; // Checked 2020-2-18, PB, NIST: fine-structure constant, no units
+const double FINE_STRUCTURE_CONSTANT = 7.2973525693e-3;  // Checked 2020-2-18, PB, NIST: fine-structure constant, no units
 
 /// \f$\epsilon_0\f$ [As/Vm]. vacuum electric permittivity.
 const double ELECTRIC_PERMITTIVITY = 8.8541878128e-12;  // Checked 2019-7-25, PB, NIST: dielectricity of vacuum, or vacuum electric permittivity
-                                                         // [As/Vm] or [F/m]; Standard uncertainty: 0.0000000013e-12
+                                                        // [As/Vm] or [F/m]; Standard uncertainty: 0.0000000013e-12
 
 /// \f$G\f$ [?]. RAY's factor appearing in Schwinger equation context
 const double FACTOR_SCHWINGER_RAY = 1.2556937e15;
-
 
 #endif

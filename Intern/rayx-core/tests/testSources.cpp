@@ -1,5 +1,6 @@
-#include "setupTests.h"
 #include <fstream>
+
+#include "setupTests.h"
 
 void checkDistribution(const std::vector<Ray>& rays, double sourceEnergy, double energySpread) {
     for (auto r : rays) {
@@ -27,7 +28,6 @@ void roughCompare(std::vector<RAYX::Ray> l, std::vector<RAYX::Ray> r) {
         CHECK_EQ(l[i].m_position, r[i].m_position);
         CHECK_EQ(l[i].m_direction, r[i].m_direction);
         CHECK_EQ(l[i].m_energy, r[i].m_energy);
-        
     }
 }
 

@@ -1,35 +1,33 @@
 #pragma once
 
-#include <list>
 #include <pthread.h>
-#include <thread>
 
+#include <list>
+#include <thread>
 
 #include "Beamline/LightSource.h"
 
 namespace RAYX {
 
-struct PsiAndStokes{
+struct PsiAndStokes {
     glm::dvec4 stokes;
-    double psi; 
+    double psi;
 };
 
-void* getrayswrapper(void* object);
-
+void* getRaysWrapper(void* object);
 
 class RAYX_API DipoleSource : public LightSource {
   public:
     DipoleSource(const DesignObject&);
     virtual ~DipoleSource() = default;
 
-
     struct ThreadReturns {
-      void getRaysParallel();
+        void getRaysParallel();
 
-      Ray* RayPosition;
-      const DipoleSource* dip;
-      unsigned int counter;
-      int threadID;
+        Ray* RayPosition;
+        const DipoleSource* dip;
+        unsigned int counter;
+        int threadID;
     };
 
     double m_maxTwister = std::mt19937::max();
@@ -48,14 +46,12 @@ class RAYX_API DipoleSource : public LightSource {
     double getEnergy(std::mt19937&) const;
     PsiAndStokes getPsiandStokes(double, std::mt19937&) const;
     void setMaxIntensity();
-    glm::dvec3 getXYZPosition(double, std::mt19937&)const;
+    glm::dvec3 getXYZPosition(double, std::mt19937&) const;
     double vDivergence(double hv, double sigv) const;
     double getNormalFromRange(double range, std::mt19937&) const;
-    std::vector<unsigned int> calcBatshSize() const;
-    
+    std::vector<unsigned int> calcBatchSize() const;
 
   public:
-    
     // Geometric Params
     double m_bendingRadius;
     ElectronEnergyOrientation m_electronEnergyOrientation;
@@ -87,7 +83,6 @@ class RAYX_API DipoleSource : public LightSource {
     double m_maxFlux;
     double m_maxIntensity;
 
-    
     glm::dvec4 getStokesSyn(double hv, double psi1, double psi2) const;
     double bessel(double hnue, double zeta) const;
     glm::dvec4 dipoleFold(double psi, double hv, double sigpsi, std::mt19937&) const;
@@ -103,11 +98,6 @@ class RAYX_API DipoleSource : public LightSource {
                                            8.465e-1, 7.74e-1,  6.514e-1, 4.359e-1, 3.004e-1, 2.113e-1, 1.508e-1, 1.089e-1, 7.926e-2, 5.811e-2,
                                            4.286e-2, 3.175e-2, 2.362e-2, 1.764e-2, 1.321e-2, 9.915e-3, 7.461e-3, 5.626e-3, 4.25e-3,  2.436e-3,
                                            1.404e-3, 8.131e-4, 4.842e-4, 2.755e-4, 1.611e-4, 9.439e-5, 5.543e-5, 3.262e-5, 1.922e-5};
-
 };
-
-
-
-
 
 }  // namespace RAYX

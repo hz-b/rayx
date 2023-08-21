@@ -1097,44 +1097,42 @@ TEST_F(TestSuite, testRefractiveIndex) {
 }
 
 TEST_F(TestSuite, testInterpolationFunctionDipole) {
-    struct InOutPair{
+    struct InOutPair {
         double in;
         double out;
     };
     std::vector<InOutPair> inouts = {{
-                                         .in = 1.5298292375594387,
-                                         .out = -3.5010758381905855,
-                                     }
-    };
+        .in = 1.5298292375594387,
+        .out = -3.5010758381905855,
+    }};
 
     auto beamline = loadBeamline("dipole_plain");
     std::shared_ptr<LightSource> src = beamline.m_LightSources[0];
     DipoleSource* dipolesource = dynamic_cast<DipoleSource*>(&*src);
 
-    for(auto values : inouts){
+    for (auto values : inouts) {
         auto result = dipolesource->getInterpolation(values.in);
         CHECK_EQ(result, values.out, 0.01);
     }
 }
 
 TEST_F(TestSuite, testVerDivergenceDipole) {
-    struct InOutPair{
+    struct InOutPair {
         double energy;
         double sigv;
         double out;
     };
     std::vector<InOutPair> inouts = {{
-                                         .energy = 100,
-                                         .sigv = 1,
-                                         .out = 1.591581814000419,//1.5917477218305678
-                                     }
-    };
+        .energy = 100,
+        .sigv = 1,
+        .out = 1.591581814000419,  // 1.5917477218305678
+    }};
 
     auto beamline = loadBeamline("dipole_plain");
     std::shared_ptr<LightSource> src = beamline.m_LightSources[0];
     DipoleSource* dipolesource = dynamic_cast<DipoleSource*>(&*src);
 
-    for(auto values : inouts){
+    for (auto values : inouts) {
         auto result = dipolesource->vDivergence(values.energy, values.sigv);
         CHECK_EQ(result, values.out, 0.1);
     }
