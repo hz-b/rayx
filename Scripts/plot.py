@@ -28,11 +28,11 @@ def importOutput(filename: str):
             names.append(x)
 
         dataset = h5f["rays"]
-        df = pd.DataFrame(dataset, columns=['RayId', 'SnapshotID', 'Xloc', 'Yloc', 'Zloc', 'Weight', 'Xdir', 'Ydir', 'Zdir', 'Energy',
+        df = pd.DataFrame(dataset, columns=['Ray-ID', 'Event-ID', 'X-position', 'Y-position', 'Z-position', 'Event-type', 'X-direction', 'Y-direction', 'Z-direction', 'Energy',
                                              'Stokes0', 'Stokes1', 'Stokes2', 'Stokes3', 'pathLength', 'order',
                                              'lastElement'])
-    df = df[df["Weight"] == W_JUST_HIT_ELEM]
-    df = df[["Xloc", "Yloc", "Zloc", "lastElement"]]
+    df = df[df["Event-type"] == W_JUST_HIT_ELEM]
+    df = df[["X-position", "Y-position", "Z-position", "lastElement"]]
     return df, names
 
 BAR = None
@@ -54,8 +54,8 @@ def plot(filename: str):
         # we don't know whether the element is in the XY or XZ plane,
         # this `relevance` tests which axis is more important.
         relevance = lambda v: v.max() - v.min()
-        Y = relevance(d["Yloc"]) > relevance(d["Zloc"])
-        h = ax.hist2d(d["Xloc"], d["Yloc"] if Y else d["Zloc"], bins=200)
+        Y = relevance(d["Y-position"]) > relevance(d["Z-position"])
+        h = ax.hist2d(d["X-position"], d["Y-position"] if Y else d["Z-position"], bins=200)
         if BAR:
             # this overwrites the old colorbar axes, instead of taking new space away from `ax`
             BAR = plt.colorbar(h[3], cax=BAR.ax)
