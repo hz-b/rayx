@@ -272,6 +272,15 @@ Collision findCollisionWith(Ray r, uint id) {
 
 // Returns the next collision for the ray `_ray`.
 Collision findCollision() {
+    if (pushConstants.sequential) {
+        if (_ray.m_lastElement >= elements.length()-1) {
+            Collision col;
+            col.found = false;
+            return col;
+        }
+        return findCollisionWith(_ray, uint(_ray.m_lastElement+1));
+    }
+
     // global coordinates of first intersection point of ray among all elements in beamline
     Collision best_col;
     best_col.found = false;

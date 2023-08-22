@@ -20,7 +20,7 @@ struct RAYX_API Ray {
     dvec4 m_stokes;
     double m_pathLength;
     double m_order;
-    double m_lastElement;
+    double m_lastElement; // created as -1 by light sources.
 
     // This double only exists, so that sizeof(Ray) is divisble by sizeof(dvec4) for alignment reasons.
     // This should never be read or written.

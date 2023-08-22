@@ -32,6 +32,7 @@ struct PushConstants {  // TODO(Jannis): PushConstants is not an expressive name
     double numRays;
     double randomSeed;
     double maxEvents;
+    bool sequential;
 };
 
 /// A 'snapshot' of a ray, at the time where it undergoes some event.
@@ -55,7 +56,7 @@ class RAYX_API Tracer {
     // This will call traceRaw.
     // Everything happening in each traceRaw implementation should be extracted to this function instead.
     // See `BundleHistory` for information about the return value.
-    BundleHistory trace(const Beamline&, uint64_t max_batch_size);
+    BundleHistory trace(const Beamline&, bool sequential, uint64_t max_batch_size);
 
     void setDevice(int deviceID);
 

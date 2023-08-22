@@ -36,6 +36,7 @@ class CommandParser {
         bool m_isFixSeed = false;                      // -f (Fixed Seed)
         int m_seed = -1;                               // -s (Provided Seed)
         int m_BatchSize = 0;                           // -b (Vk batch size )
+        bool m_sequential = false;                     // -S (sequential tracing)
         bool m_verbose = false;                        // --verbose (Verbose)
         std::string m_format = defaultFormatString();  // --format
     } m_args;
@@ -79,6 +80,7 @@ class CommandParser {
         {'v', {OptionType::BOOL, "version", "", &(m_args.m_version)}},
         {'f', {OptionType::BOOL, "", "Fix the seed to RAYX::FIXED_SEED (Uses default)", &(m_args.m_isFixSeed)}},
         {'s', {OptionType::INT, "seed", "Provided user seed", &(m_args.m_seed)}},
+        {'S', {OptionType::BOOL, "sequential", "trace sequentially", &(m_args.m_sequential)}},
         {'V', {OptionType::BOOL, "verbose", "Dump more information", &(m_args.m_verbose)}},
         {'F', {OptionType::STRING, "format", "Format output CSV / H5 data", &(m_args.m_format)}},
     };
