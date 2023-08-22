@@ -6,7 +6,6 @@ namespace RAYX {
 
 class RAYX_API MatrixSource : public LightSource {
   public:
-    MatrixSource() = default;
     MatrixSource(const DesignObject&);
     virtual ~MatrixSource() = default;
 

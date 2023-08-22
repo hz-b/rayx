@@ -18,8 +18,7 @@ Element makeSlit(const DesignObject& dobj) {
         beamstopWidth = -abs(beamstopWidth);  // negative width expresses that beamstop it elliptical.
         beamstopHeight = abs(beamstopHeight);
     } else if (centralBeamstop == CentralBeamstop::Rectangle) {
-        beamstopWidth = beamstopWidth;
-        beamstopHeight = beamstopHeight;
+        // Both beamstopWidth and beamstopHeight keep their values.
     }
 
     auto surface = serializePlaneXY();
