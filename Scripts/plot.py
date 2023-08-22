@@ -49,7 +49,6 @@ def plot(filename: str):
         global BAR
 
         e = float(names.index(name))
-        ax.clear()
         d = df[df["lastElement"] == e]
 
         # we don't know whether the element is in the XY or XZ plane,
@@ -58,9 +57,10 @@ def plot(filename: str):
         Y = relevance(d["Yloc"]) > relevance(d["Zloc"])
         h = ax.hist2d(d["Xloc"], d["Yloc"] if Y else d["Zloc"], bins=200)
         if BAR:
-            BAR.remove()
-            BAR = None
-        BAR = plt.colorbar(h[3], ax=ax)
+            # this overwrites the old colorbar axes, instead of taking new space away from `ax`
+            BAR = plt.colorbar(h[3], cax=BAR.ax)
+        else:
+            BAR = plt.colorbar(h[3], ax=ax)
         ax.set_title("Footprint of element " + str(int(e)))
         ax.set_xlabel("x/mm")
         ax.set_ylabel(("y" if Y else "z") + "/mm")
