@@ -25,4 +25,4 @@ CMakeCache.txt
 cmake.check_cache
 
 #VSCode Debugger files
-**/results.json
+results.json
