@@ -1,34 +1,34 @@
 cmake_minimum_required(VERSION 3.15 FATAL_ERROR)
 
-
 # ---- Code Coverage ----
 option(BUILD_WITH_COV "Add Code Coverage to build" TRUE)
-if (CMAKE_CXX_COMPILER_ID STREQUAL "Clang" AND CMAKE_BUILD_TYPE STREQUAL "Debug" AND BUILD_WITH_COV)
+
+if(CMAKE_CXX_COMPILER_ID STREQUAL "Clang" AND CMAKE_BUILD_TYPE STREQUAL "Debug" AND BUILD_WITH_COV)
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fprofile-instr-generate -fcoverage-mapping")
     message("Building with llvm-cov support")
 endif()
-# -----------------------
 
+# -----------------------
 
 # ---- Add tests ----
 add_subdirectory(tests)
-# -------------------
 
+# -------------------
 
 # ---- Project ----
 project(rayx-core)
 file(GLOB_RECURSE SOURCE ${PROJECT_SOURCE_DIR}/src/*.cpp)
 add_library(${PROJECT_NAME} SHARED ${SOURCE})
-# -----------------
 
+# -----------------
 
 # ---- Warnings ----
 if(MSVC)
-	message(STATUS "MSVC")
-    target_compile_options(${PROJECT_NAME} PRIVATE /W2 /wd4251) # /WX)
+    message(STATUS "MSVC")
+    target_compile_options(${PROJECT_NAME} PRIVATE /W3 /wd4251) # /WX)
 else()
-	message(STATUS "GCC")
-    target_compile_options(${PROJECT_NAME} PRIVATE -Wall -Wextra -pedantic) #-Werror)
+    message(STATUS "GCC")
+    target_compile_options(${PROJECT_NAME} PRIVATE -Wall -Wextra -pedantic) # -Werror)
 
     # Enable werror if requested (mostly used for CI)
     if(WERROR STREQUAL "YES")
@@ -36,8 +36,8 @@ else()
         message(STATUS "Werror mode")
     endif()
 endif()
-# ------------------
 
+# ------------------
 
 # ---- Disable Vulkan/H5 ----
 if(VULKAN STREQUAL "NO")
@@ -49,6 +49,7 @@ else()
         PUBLIC Vulkan::Vulkan
     )
 endif()
+
 if(H5 STREQUAL "NO")
     target_compile_definitions(${PROJECT_NAME} PUBLIC NO_H5)
     message(STATUS "H5 disabled")
@@ -64,14 +65,14 @@ else()
         )
     endif()
 endif()
-# -------------------------
 
+# -------------------------
 
 # ---- PCH ----
 target_precompile_headers(${PROJECT_NAME} PUBLIC raycorePCH.h)
 set(CMAKE_PCH_INSTANTIATE_TEMPLATES ON)
-# -------------
 
+# -------------
 
 # ---- Defines ----
 if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
@@ -89,8 +90,8 @@ target_compile_definitions(${PROJECT_NAME}
     $<$<CONFIG:Debug>:RAYX_DEBUG_MODE>
     $<$<CONFIG:RelWithDebInfo>:RAYX_DEBUG_MODE>
 )
-# -----------------
 
+# -----------------
 
 # ---- Dependencies ----
 target_include_directories(${PROJECT_NAME} PRIVATE ${PROJECT_SOURCE_DIR}/src)
@@ -101,8 +102,8 @@ target_include_directories(${PROJECT_NAME} SYSTEM PUBLIC
     ${PROJECT_SOURCE_DIR}/../../Extern/HighFive/include/
     ${PROJECT_SOURCE_DIR}/../../Extern/VMA/include/
 )
-# ----------------------
 
+# ----------------------
 
 # ---- Compile Shaders ----
 if(NOT VULKAN STREQUAL "NO")
@@ -123,4 +124,5 @@ if(NOT VULKAN STREQUAL "NO")
 
     add_custom_target(COMPILE_SHADER ALL DEPENDS ${COMPILED_SHADER})
 endif()
+
 # ------------------------
