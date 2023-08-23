@@ -143,14 +143,14 @@ void Scene::updateIndexBuffers() {
     m_indexBuffers[0] = std::make_unique<Buffer>(m_Device, sizeof(uint32_t), (uint32_t)m_indices[0].size(), VK_BUFFER_USAGE_INDEX_BUFFER_BIT,
                                                  VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT);
     m_indexBuffers[0]->map();
-    m_indexBuffers[0]->writeToBuffer(m_indices[0].data(), m_indices.size() * sizeof(uint32_t));
+    m_indexBuffers[0]->writeToBuffer(m_indices[0].data(), m_indices[0].size() * sizeof(uint32_t));
     m_indexBuffers[0]->flush();
     m_indexBuffers[0]->unmap();
 
     m_indexBuffers[1] = std::make_unique<Buffer>(m_Device, sizeof(uint32_t), (uint32_t)m_indices[1].size(), VK_BUFFER_USAGE_INDEX_BUFFER_BIT,
                                                  VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT);
     m_indexBuffers[1]->map();
-    m_indexBuffers[1]->writeToBuffer(m_indices[1].data(), m_indices.size() * sizeof(uint32_t));
+    m_indexBuffers[1]->writeToBuffer(m_indices[1].data(), m_indices[1].size() * sizeof(uint32_t));
     m_indexBuffers[1]->flush();
     m_indexBuffers[1]->unmap();
 }
