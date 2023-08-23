@@ -1,17 +1,28 @@
 #version 450
 
-layout(binding = 0) uniform Camera {
-    mat4 model;
-    mat4 view;
-    mat4 proj;
-} cam;
-
-layout(location = 0) in vec3 inPosition;
-layout(location = 1) in vec3 inColor;
-
 layout(location = 0) out vec3 fragColor;
 
 void main() {
-    gl_Position = cam.proj * cam.view * cam.model * vec4(inPosition, 1.0);
-    fragColor = inColor;
+    // Hardcoded triangle vertices
+    vec3[6] vertices = vec3[6](
+        vec3(-0.5, -0.5, 0.0),
+        vec3(0.5, -0.5, 0.0),
+        vec3(0.0, 0.5, 0.0),
+        vec3(-0.5, 0.5, 1.0),
+        vec3(0.5, 0.5, 1.0),
+        vec3(0.0, -0.5, 1.0)
+    );
+    
+    // Assigning colors to the vertices for debugging
+    vec3[6] colors = vec3[6](
+        vec3(1.0, 0.0, 0.0),  // Red
+        vec3(0.0, 1.0, 0.0),  // Green
+        vec3(0.0, 0.0, 1.0),  // Blue
+        vec3(1.0, 1.0, 0.0),  // Yellow
+        vec3(0.0, 1.0, 1.0),  // Cyan
+        vec3(1.0, 0.0, 1.0)   // Magenta
+    );
+
+    gl_Position = vec4(vertices[gl_VertexIndex], 1.0);
+    fragColor = colors[gl_VertexIndex];
 }

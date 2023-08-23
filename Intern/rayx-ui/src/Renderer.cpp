@@ -79,15 +79,15 @@ VkCommandBuffer Renderer::beginFrame() {
 void Renderer::endFrame() {
     assert(m_isFrameStarted && "Can't call endFrame while frame is not in progress");
 
-    auto commandBuffer = getCurrentCommandBuffer();
+    VkCommandBuffer commandBuffer = getCurrentCommandBuffer();
     if (vkEndCommandBuffer(commandBuffer) != VK_SUCCESS) {
         throw std::runtime_error("failed to record command buffer!");
     }
-    m_ImGuiLayer->recordImGuiCommands(m_currentImageIndex, m_SwapChain->getFrameBuffer(m_currentImageIndex), m_SwapChain->getExtent());
+    // m_ImGuiLayer->recordImGuiCommands(m_currentImageIndex, m_SwapChain->getFrameBuffer(m_currentImageIndex), m_SwapChain->getExtent());
 
-    std::vector<VkCommandBuffer> submitCommandBuffers = {commandBuffer, m_ImGuiLayer->getCommandBuffer(m_currentImageIndex)};
+    std::vector<VkCommandBuffer> submitCommandBuffers = {commandBuffer};  //, m_ImGuiLayer->getCommandBuffer(m_currentImageIndex)};
 
-    auto result = m_SwapChain->submitCommandBuffers(submitCommandBuffers, m_currentImageIndex);
+    VkResult result = m_SwapChain->submitCommandBuffers(submitCommandBuffers, m_currentImageIndex);
     if (result == VK_ERROR_OUT_OF_DATE_KHR || result == VK_SUBOPTIMAL_KHR || m_Window.wasWindowResized()) {
         m_Window.resetWindowResizedFlag();
         recreateSwapChain();
@@ -113,7 +113,7 @@ void Renderer::beginSwapChainRenderPass(VkCommandBuffer commandBuffer) {
     renderPassInfo.renderArea.extent = extent;
 
     std::array<VkClearValue, 2> clearValues{};
-    clearValues[0].color = m_ImGuiLayer->getClearValue().color;
+    clearValues[0].color = {0.7f, 0.2f, 0.2f, 1.0f};
     clearValues[1].depthStencil = {1.0f, 0};
     renderPassInfo.clearValueCount = static_cast<uint32_t>(clearValues.size());
     renderPassInfo.pClearValues = clearValues.data();

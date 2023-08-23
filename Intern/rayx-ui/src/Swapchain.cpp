@@ -9,6 +9,8 @@
 #include <set>
 #include <stdexcept>
 
+#include "Debug/Debug.h"
+
 SwapChain::SwapChain(Device& deviceRef, VkExtent2D extent) : m_Device{deviceRef}, m_WindowExtent{extent} { init(); }
 
 SwapChain::SwapChain(Device& deviceRef, VkExtent2D extent, std::shared_ptr<SwapChain> previous)

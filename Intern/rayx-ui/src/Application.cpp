@@ -14,6 +14,7 @@
 #include <stdexcept>
 
 #include "Data/Importer.h"
+#include "Debug/Debug.h"
 #include "FrameInfo.h"
 #include "TriangleRenderSystem.h"
 #include "Writer/H5Writer.h"
@@ -43,15 +44,15 @@ void Application::run() {
 
     Vertex v1 = {
         .pos = {0.0f, -0.5f, 0.0f},
-        .color = {1.0f, 0.0f, 0.0f},
+        .color = {1.0f, 1.0f, 1.0f},
     };
     Vertex v2 = {
         .pos = {0.5f, 0.5f, 0.0f},
-        .color = {0.0f, 1.0f, 0.0f},
+        .color = {1.0f, 1.0f, 1.0f},
     };
     Vertex v3 = {
         .pos = {-0.5f, 0.5f, 0.0f},
-        .color = {0.0f, 0.0f, 1.0f},
+        .color = {1.0f, 1.0f, 1.0f},
     };
     m_Scene.addTriangle(v1, v2, v3);
     m_Scene.updateBuffers();
