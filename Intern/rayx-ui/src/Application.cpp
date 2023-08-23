@@ -91,18 +91,19 @@ void Application::run() {
         float frameTime = std::chrono::duration<float, std::chrono::seconds::period>(newTime - currentTime).count();
         currentTime = newTime;
 
-        Camera camera = {
-            .model = glm::mat4(1.0f),
-            .view = cameraSettings.getViewMatrix(),
-            .proj = cameraSettings.getProjectionMatrix(m_Renderer.getAspectRatio()),
-            .n = cameraSettings.near,
-            .f = cameraSettings.far,
-        };
-
+        Camera camera;
         if (auto commandBuffer = m_Renderer.beginFrame()) {
             uint32_t frameIndex = m_Renderer.getFrameIndex();
             FrameInfo frameInfo{frameIndex, frameTime, commandBuffer, camera, cameraSettings, descriptorSets[frameIndex]};
             m_Renderer.updateImGui(frameInfo);
+            camera = {
+                .model = glm::mat4(1.0f),
+                .view = cameraSettings.getViewMatrix(),
+                .proj = cameraSettings.getProjectionMatrix(m_Renderer.getAspectRatio()),
+                .n = cameraSettings.near,
+                .f = cameraSettings.far,
+            };
+            frameInfo.camera = camera;
 
             // Update ubo
             uboBuffers[frameIndex]->writeToBuffer(&camera);
