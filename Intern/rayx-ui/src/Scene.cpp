@@ -20,28 +20,7 @@ void Scene::setup(const RAYX::RenderObjectVec& renderObjects, const RAYX::Bundle
         }
     }
 
-    // Create the vertex buffer
-    m_vertexBuffer = std::make_unique<Buffer>(m_Device, sizeof(Vertex), (uint32_t)m_vertices.size(), VK_BUFFER_USAGE_VERTEX_BUFFER_BIT,
-                                              VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT);
-    m_vertexBuffer->map();
-    m_vertexBuffer->writeToBuffer(m_vertices.data(), m_vertices.size() * sizeof(Vertex));
-    m_vertexBuffer->flush();
-    m_vertexBuffer->unmap();
-
-    // Create the index buffers
-    m_indexBuffers[0] = std::make_unique<Buffer>(m_Device, sizeof(uint32_t), (uint32_t)m_indices[0].size(), VK_BUFFER_USAGE_INDEX_BUFFER_BIT,
-                                                 VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT);
-    m_indexBuffers[0]->map();
-    m_indexBuffers[0]->writeToBuffer(m_indices[0].data(), m_indices.size() * sizeof(uint32_t));
-    m_indexBuffers[0]->flush();
-    m_indexBuffers[0]->unmap();
-
-    m_indexBuffers[1] = std::make_unique<Buffer>(m_Device, sizeof(uint32_t), (uint32_t)m_indices[1].size(), VK_BUFFER_USAGE_INDEX_BUFFER_BIT,
-                                                 VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT);
-    m_indexBuffers[1]->map();
-    m_indexBuffers[1]->writeToBuffer(m_indices[1].data(), m_indices.size() * sizeof(uint32_t));
-    m_indexBuffers[1]->flush();
-    m_indexBuffers[1]->unmap();
+    updateBuffers();
 }
 
 void Scene::addTriangle(const Vertex v1, const Vertex v2, const Vertex v3) {
@@ -105,7 +84,7 @@ void Scene::fromRenderObject(const RAYX::RenderObject& renderObject) {
 
 void Scene::draw(VkCommandBuffer commandBuffer, Topography topography) const {
     if (m_indexBuffers[topography] != nullptr) {
-        vkCmdDrawIndexed(commandBuffer, (uint32_t)m_indices[topography].size(), 1, 0, 0, 0);
+        vkCmdDrawIndexed(commandBuffer, (uint32_t)m_indices[topography].size(), 1, 0, 0, 0);  // This calculates to nine indices -> 9 * 4 = 36 bytes
     } else {
         vkCmdDraw(commandBuffer, (uint32_t)m_vertices.size(), 1, 0, 0);
     }
@@ -142,4 +121,36 @@ std::optional<uint32_t> Scene::vertexExists(const Vertex v) const {
         }
     }
     return std::nullopt;
+}
+
+void Scene::updateBuffers() {
+    updateVertexBuffer();
+    updateIndexBuffers();
+}
+
+void Scene::updateVertexBuffer() {
+    // update the vertex buffer
+    m_vertexBuffer = std::make_unique<Buffer>(m_Device, sizeof(Vertex), (uint32_t)m_vertices.size(), VK_BUFFER_USAGE_VERTEX_BUFFER_BIT,
+                                              VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT);
+    m_vertexBuffer->map();
+    m_vertexBuffer->writeToBuffer(m_vertices.data(), m_vertices.size() * sizeof(Vertex));
+    m_vertexBuffer->flush();
+    m_vertexBuffer->unmap();
+}
+
+void Scene::updateIndexBuffers() {
+    // update the index buffers
+    m_indexBuffers[0] = std::make_unique<Buffer>(m_Device, sizeof(uint32_t), (uint32_t)m_indices[0].size(), VK_BUFFER_USAGE_INDEX_BUFFER_BIT,
+                                                 VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT);
+    m_indexBuffers[0]->map();
+    m_indexBuffers[0]->writeToBuffer(m_indices[0].data(), m_indices.size() * sizeof(uint32_t));
+    m_indexBuffers[0]->flush();
+    m_indexBuffers[0]->unmap();
+
+    m_indexBuffers[1] = std::make_unique<Buffer>(m_Device, sizeof(uint32_t), (uint32_t)m_indices[1].size(), VK_BUFFER_USAGE_INDEX_BUFFER_BIT,
+                                                 VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT);
+    m_indexBuffers[1]->map();
+    m_indexBuffers[1]->writeToBuffer(m_indices[1].data(), m_indices.size() * sizeof(uint32_t));
+    m_indexBuffers[1]->flush();
+    m_indexBuffers[1]->unmap();
 }

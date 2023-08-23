@@ -57,6 +57,7 @@ class Scene {
     void addLine(const Vertex v1, const Vertex v2);
     void fromRenderObject(const RAYX::RenderObject& renderObject);
 
+    void updateBuffers();
     void bind(VkCommandBuffer commandBuffer, Topography topography) const;
     void draw(VkCommandBuffer commandBuffer, Topography topography) const;
 
@@ -78,6 +79,6 @@ class Scene {
     uint32_t addVertex(const Vertex v, Topography topography);
     std::optional<uint32_t> vertexExists(const Vertex v) const;
 
-    void createVertexBuffers();
-    void createIndexBuffers();
+    void updateVertexBuffer();
+    void updateIndexBuffers();
 };
