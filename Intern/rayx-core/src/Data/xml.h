@@ -128,8 +128,11 @@ struct Parser {
     inline double parseEntranceArmLengthSag() const { return parseDouble("entranceArmLengthSag"); }
     inline double parseExitArmLengthSag() const { return parseDouble("exitArmLengthSag"); }
     inline CentralBeamstop parseCentralBeamstop() const { return static_cast<CentralBeamstop>(parseInt("centralBeamstop")); }
-    inline double parseTotalWidthStop() const { return parseDouble("totalWidthStop"); }
-    inline double parseTotalHeightStop() const { return parseDouble("totalHeightStop"); }
+    inline double parseTotalWidthStop() const { return parseDouble("stopWidth"); }
+    inline double parseTotalHeightStop() const { return parseDouble("stopHeight"); }
+    inline double parseOpeningWidth() const { return parseDouble("openingWidth"); }
+    inline double parseOpeningHeight() const { return parseDouble("openingHeight"); }
+    inline double parseOpeningShape() const { return parseDouble("openingShape"); }
     inline GratingMount parseGratingMount() const { return static_cast<GratingMount>(parseInt("gratingMount")); }
     inline double parseRadius() const { return parseDouble("radius"); }
     inline double parseDesignEnergy() const { return parseDouble("designEnergy"); }

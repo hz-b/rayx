@@ -11,6 +11,7 @@ Element makeSlit(const DesignObject& dobj) {
     auto beamstopHeight = dobj.parseTotalHeightStop();
     auto centralBeamstop = dobj.parseCentralBeamstop();
 
+    // TODO the encoding of `centralBeamstop` should not be done by the sign of beamstopWidth/beamstopHeight!
     if (centralBeamstop == CentralBeamstop::None) {
         beamstopWidth = 0;
         beamstopHeight = 0;
@@ -21,15 +22,30 @@ Element makeSlit(const DesignObject& dobj) {
         // Both beamstopWidth and beamstopHeight keep their values.
     }
 
+    Cutout gapCutout;
+
+    auto shape = dobj.parseOpeningShape();
+    if (shape == 0) { // rectangle
+        gapCutout = serializeRect({
+            .m_size_x1 = dobj.parseOpeningWidth(),
+            .m_size_x2 = dobj.parseOpeningHeight(),
+        });
+    } else if (shape == 1) { // elliptical
+        gapCutout = serializeElliptical({
+            .m_diameter_x1 = dobj.parseOpeningWidth(),
+            .m_diameter_x2 = dobj.parseOpeningHeight(),
+        });
+    } else {
+        RAYX_ERR << "unsupported!";
+    }
+
     auto surface = serializePlaneXY();
     auto behaviour = serializeSlit({
         .m_beamstopWidth = beamstopWidth,
         .m_beamstopHeight = beamstopHeight,
-        .m_gapCutout = dobj.parseCutout(),
+        .m_gapCutout = gapCutout,
     });
-    auto el = makeElement(dobj, behaviour, surface);
-    el.m_cutout = serializeUnlimited();
-    return el;
+    return makeElement(dobj, behaviour, surface);
 }
 
 }  // namespace RAYX

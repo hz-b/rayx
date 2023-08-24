@@ -59,3 +59,6 @@ TEST_F(TestSuite, PlaneMirror_refl_seeded) { compareAgainstCorrect("PlaneMirror_
 
 // Tests the Energy Distribution of a MatrixSource.
 TEST_F(TestSuite, MatrixSource_distr_seeded) { compareAgainstCorrect("MatrixSource_distr_seeded"); }
+
+TEST_F(TestSuite, slit_seeded) { compareAgainstCorrect("slit_seeded"); }
+
