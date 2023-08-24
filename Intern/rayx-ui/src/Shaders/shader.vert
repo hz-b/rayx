@@ -4,6 +4,8 @@ layout(binding = 0) uniform Camera {
     mat4 model;
     mat4 view;
     mat4 proj;
+    float near;
+    float far;
 } cam;
 
 layout(location = 0) in vec3 inPosition;

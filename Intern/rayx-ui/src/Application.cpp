@@ -41,21 +41,6 @@ void Application::run() {
     readH5(rays, "PlaneMirror.h5", FULL_FORMAT);
     m_Scene.setup(vec, rays);
 
-    Vertex v1 = {
-        .pos = {0.0f, -0.5f, 0.0f},
-        .color = {1.0f, 0.0f, 0.0f},
-    };
-    Vertex v2 = {
-        .pos = {0.5f, 0.5f, 0.0f},
-        .color = {0.0f, 1.0f, 0.0f},
-    };
-    Vertex v3 = {
-        .pos = {-0.5f, 0.5f, 0.0f},
-        .color = {0.0f, 0.0f, 1.0f},
-    };
-    m_Scene.addTriangle(v1, v2, v3);
-    m_Scene.updateBuffers();
-
     // UBOs
     std::vector<std::unique_ptr<Buffer>> uboBuffers(SwapChain::MAX_FRAMES_IN_FLIGHT);
     for (int i = 0; i < uboBuffers.size(); i++) {
@@ -76,8 +61,7 @@ void Application::run() {
     }
 
     // TriangleRenderSystem
-    TriangleRenderSystem triangleRenderSystem(m_Device, m_Scene, m_Renderer.getSwapChainRenderPass(),
-                                              setLayout->getDescriptorSetLayout());  // TODO: application doesn't need the scene
+    TriangleRenderSystem triangleRenderSystem(m_Device, m_Scene, m_Renderer.getSwapChainRenderPass(), setLayout->getDescriptorSetLayout());
 
     CameraSettings cameraSettings;
 

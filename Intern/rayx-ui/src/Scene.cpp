@@ -84,7 +84,7 @@ void Scene::fromRenderObject(const RAYX::RenderObject& renderObject) {
 
 void Scene::draw(VkCommandBuffer commandBuffer, Topography topography) const {
     if (m_indexBuffers[topography] != nullptr) {
-        vkCmdDrawIndexed(commandBuffer, (uint32_t)m_indices[topography].size(), 1, 0, 0, 0);  // This calculates to nine indices -> 9 * 4 = 36 bytes
+        vkCmdDrawIndexed(commandBuffer, (uint32_t)m_indices[topography].size(), 1, 0, 0, 0);
     } else {
         vkCmdDraw(commandBuffer, (uint32_t)m_vertices.size(), 1, 0, 0);
     }
@@ -135,7 +135,6 @@ void Scene::updateVertexBuffer() {
     m_vertexBuffer->map();
     m_vertexBuffer->writeToBuffer(m_vertices.data(), m_vertices.size() * sizeof(Vertex));
     m_vertexBuffer->flush();
-    m_vertexBuffer->unmap();
 }
 
 void Scene::updateIndexBuffers() {
@@ -145,12 +144,10 @@ void Scene::updateIndexBuffers() {
     m_indexBuffers[0]->map();
     m_indexBuffers[0]->writeToBuffer(m_indices[0].data(), m_indices[0].size() * sizeof(uint32_t));
     m_indexBuffers[0]->flush();
-    m_indexBuffers[0]->unmap();
 
     m_indexBuffers[1] = std::make_unique<Buffer>(m_Device, sizeof(uint32_t), (uint32_t)m_indices[1].size(), VK_BUFFER_USAGE_INDEX_BUFFER_BIT,
                                                  VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT);
     m_indexBuffers[1]->map();
     m_indexBuffers[1]->writeToBuffer(m_indices[1].data(), m_indices[1].size() * sizeof(uint32_t));
     m_indexBuffers[1]->flush();
-    m_indexBuffers[1]->unmap();
 }
