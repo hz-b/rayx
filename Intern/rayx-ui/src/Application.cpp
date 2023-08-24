@@ -15,7 +15,8 @@
 
 #include "Data/Importer.h"
 #include "FrameInfo.h"
-#include "TriangleRenderSystem.h"
+#include "RenderSystem/LineRenderSystem.h"
+#include "RenderSystem/TriangleRenderSystem.h"
 #include "Writer/H5Writer.h"
 
 // --------- Start of Application code --------- //
@@ -60,8 +61,8 @@ void Application::run() {
         DescriptorWriter(*setLayout, *m_DescriptorPool).writeBuffer(0, &bufferInfo).build(descriptorSets[i]);
     }
 
-    // TriangleRenderSystem
     TriangleRenderSystem triangleRenderSystem(m_Device, m_Scene, m_Renderer.getSwapChainRenderPass(), setLayout->getDescriptorSetLayout());
+    LineRenderSystem lineRenderSystem(m_Device, m_Scene, m_Renderer.getSwapChainRenderPass(), setLayout->getDescriptorSetLayout());
 
     CameraSettings cameraSettings;
 
@@ -97,6 +98,7 @@ void Application::run() {
             m_Renderer.beginSwapChainRenderPass(commandBuffer);
 
             triangleRenderSystem.render(frameInfo);
+            lineRenderSystem.render(frameInfo);
 
             m_Renderer.endSwapChainRenderPass(commandBuffer);
             m_Renderer.endFrame();

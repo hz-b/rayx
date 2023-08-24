@@ -9,13 +9,13 @@
 #include <memory>
 #include <vector>
 
-class TriangleRenderSystem {
+class LineRenderSystem {
   public:
-    TriangleRenderSystem(Device& device, Scene& scene, VkRenderPass renderPass, VkDescriptorSetLayout globalSetLayout);
-    ~TriangleRenderSystem();
+    LineRenderSystem(Device& device, Scene& scene, VkRenderPass renderPass, VkDescriptorSetLayout globalSetLayout);
+    ~LineRenderSystem();
 
-    TriangleRenderSystem(const TriangleRenderSystem&) = delete;
-    TriangleRenderSystem& operator=(const TriangleRenderSystem&) = delete;
+    LineRenderSystem(const LineRenderSystem&) = delete;
+    LineRenderSystem& operator=(const LineRenderSystem&) = delete;
 
     void render(FrameInfo& frameInfo);
 
@@ -27,5 +27,5 @@ class TriangleRenderSystem {
     Scene& m_Scene;
 
     std::unique_ptr<GraphicsPipeline> m_Pipeline;
-    VkPipelineLayout pipelineLayout;
+    VkPipelineLayout m_PipelineLayout;
 };

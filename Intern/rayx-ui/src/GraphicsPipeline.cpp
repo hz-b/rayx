@@ -189,9 +189,6 @@ void GraphicsPipeline::defaultPipelineConfigInfo(PipelineConfigInfo& configInfo)
     configInfo.dynamicStateInfo.dynamicStateCount = static_cast<uint32_t>(configInfo.dynamicStateEnables.size());
     configInfo.dynamicStateInfo.flags = 0;
 
-    configInfo.topology = VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST;
-    configInfo.polygonMode = VK_POLYGON_MODE_FILL;
-
     configInfo.bindingDescriptions = Vertex::getBindingDescriptions();
     configInfo.attributeDescriptions = Vertex::getAttributeDescriptions();
 }
