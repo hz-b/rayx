@@ -37,7 +37,7 @@ class Renderer {
     void endSwapChainRenderPass(VkCommandBuffer commandBuffer);
 
     // ImGui
-    void updateImGui(FrameInfo& info) { m_ImGuiLayer->updateImGui(info); }
+    void updateImGui(CameraController& camController, float frameTime) { m_ImGuiLayer->updateImGui(camController, frameTime); }
 
   private:
     void createCommandBuffers();

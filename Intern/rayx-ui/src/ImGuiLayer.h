@@ -18,7 +18,7 @@ class ImGuiLayer {
     ImGuiLayer& operator=(const ImGuiLayer&) = delete;
     ~ImGuiLayer();
 
-    void updateImGui(FrameInfo& frameInfo);
+    void updateImGui(CameraController& camController, float frameTime);
     VkCommandBuffer recordImGuiCommands(uint32_t currentImage, const VkFramebuffer framebuffer, const VkExtent2D& extent);
 
     VkCommandBuffer getCommandBuffer(uint32_t index) const { return m_CommandBuffers[index]; }

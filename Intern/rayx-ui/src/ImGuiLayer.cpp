@@ -132,7 +132,7 @@ ImGuiLayer::~ImGuiLayer() {
     ImGui::DestroyContext();
 }
 
-void ImGuiLayer::updateImGui(FrameInfo& frameInfo) {
+void ImGuiLayer::updateImGui(CameraController& camController, float frameTime) {
     ImGui_ImplVulkan_NewFrame();
     ImGui_ImplGlfw_NewFrame();
     ImGui::NewFrame();
@@ -150,25 +150,27 @@ void ImGuiLayer::updateImGui(FrameInfo& frameInfo) {
         ImGui::ColorEdit3("Color", (float*)&m_ClearColor);  // Edit 3 floats representing a color
 
         ImGui::Text("Camera");
-        ImGui::SliderFloat("FOV", &frameInfo.cameraSettings.FOV, 0.0f, 180.0f);
-        ImGui::SliderFloat("Target X", &frameInfo.cameraSettings.target.x, -10.0f, 10.0f);
-        ImGui::SliderFloat("Target Y", &frameInfo.cameraSettings.target.y, -10.0f, 10.0f);
-        ImGui::SliderFloat("Target Z", &frameInfo.cameraSettings.target.z, -10.0f, 10.0f);
-        ImGui::SliderFloat("Position X", &frameInfo.cameraSettings.position.x, -10.0f, 10.0f);
-        ImGui::SliderFloat("Position Y", &frameInfo.cameraSettings.position.y, -10.0f, 10.0f);
-        ImGui::SliderFloat("Position Z", &frameInfo.cameraSettings.position.z, -10.0f, 10.0f);
-        ImGui::SliderFloat("Up X", &frameInfo.cameraSettings.up.x, -1.0f, 1.0f);  // Slider for Up vector x-coordinate
-        ImGui::SliderFloat("Up Y", &frameInfo.cameraSettings.up.y, -1.0f, 1.0f);  // Slider for Up vector y-coordinate
-        ImGui::SliderFloat("Up Z", &frameInfo.cameraSettings.up.z, -1.0f, 1.0f);  // Slider for Up vector z-coordinate
-        ImGui::SliderFloat("Near", &frameInfo.cameraSettings.near, 0.0f, 100.0f);
-        ImGui::SliderFloat("Far", &frameInfo.cameraSettings.far, 0.0f, 10000.0f);
+        ImGui::SliderFloat("FOV", &camController.config.FOV, 0.0f, 180.0f);
+        ImGui::SliderFloat("Up X", &camController.up.x, -1.0f, 1.0f);  // Slider for Up vector x-coordinate
+        ImGui::SliderFloat("Up Y", &camController.up.y, -1.0f, 1.0f);  // Slider for Up vector y-coordinate
+        ImGui::SliderFloat("Up Z", &camController.up.z, -1.0f, 1.0f);  // Slider for Up vector z-coordinate
+        ImGui::SliderFloat("Near", &camController.config.near, 0.0f, 100.0f);
+        ImGui::SliderFloat("Far", &camController.config.far, 0.0f, 10000.0f);
+
+        ImGui::Text("Position X: %.1f", camController.position.x);
+        ImGui::Text("Position Y: %.1f", camController.position.y);
+        ImGui::Text("Position Z: %.1f", camController.position.z);
+
+        ImGui::Text("Direction X: %.1f", camController.direction.x);
+        ImGui::Text("Direction Y: %.1f", camController.direction.y);
+        ImGui::Text("Direction Z: %.1f", camController.direction.z);
 
         if (ImGui::Button("Button"))  // Buttons return true when clicked (most widgets return true when edited/activated)
             counter++;
         ImGui::SameLine();
         ImGui::Text("counter = %d", counter);
 
-        ImGui::Text("Application average %.6f ms/frame", frameInfo.frameTime);
+        ImGui::Text("Application average %.6f ms/frame", frameTime);
         ImGui::End();
     }
 
