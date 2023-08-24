@@ -57,7 +57,7 @@ Ray behaveSlit(Ray r, int id, RAYX_INOUT(uint64_t) ctr, ALLOW_UNUSED Collision c
 Ray behaveRZP(Ray r, int id, RAYX_INOUT(uint64_t) ctr, Collision col) {
     RZPBehaviour b = deserializeRZP(elements[id].m_behaviour);
 
-    dvec4 normal = dvec4(col.normal, 0) * -1.0; // TODO hotfix: Sometimes the normal points to the wrong direction. A normal should have `dot(col.normal, ray.m_direction) <= 0`.
+    dvec4 normal = dvec4(col.normal, 0);
 
     double WL            = hvlam(r.m_energy);
     double Ord           = b.m_orderOfDiffraction;

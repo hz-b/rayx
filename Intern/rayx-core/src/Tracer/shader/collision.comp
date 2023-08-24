@@ -267,6 +267,15 @@ Collision findCollisionWith(Ray r, uint id) {
     if (!inCutout(elements[id].m_cutout, x1, x2)) {
         col.found = false;
     }
+
+    // Both r.m_direction and col.normal are in element-coordinates.
+    // The collision normal should point "out of the surface", i.e. in the direction that the ray came from.
+    // In other words we want `dot(r.m_direction, col.normal) <= 0`.
+    // Later on, we'd like to remove this hotfix, and each individual get*Collision function should already satisfy this constraint.
+    if (dot(r.m_direction, col.normal) > 0.0) {
+        col.normal = col.normal * -1.0;
+    }
+
     return col;
 }
 
