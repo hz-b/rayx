@@ -90,10 +90,12 @@ void Scene::fromRenderObject(const RAYX::RenderObject& renderObject) {
     RAYX_LOG << "World bottom right: " << worldBottomRight.x << ", " << worldBottomRight.y << ", " << worldBottomRight.z;
 
     glm::vec4 purple = {0.5f, 0.0f, 0.5f, 1.0f};
+    glm::vec4 pink = {1.0f, 0.0f, 1.0f, 1.0f};
     glm::vec4 cyan = {0.0f, 1.0f, 1.0f, 1.0f};
+    glm::vec4 red = {1.0f, 0.0f, 0.0f, 1.0f};
     Vertex v1(worldBottomLeft, purple);
-    Vertex v2(worldTopLeft, cyan);
-    Vertex v3(worldBottomRight, purple);
+    Vertex v2(worldTopLeft, pink);
+    Vertex v3(worldBottomRight, red);
     addTriangle(v1, v2, v3);
     Vertex v4(worldTopRight, cyan);
     addTriangle(v2, v3, v4);

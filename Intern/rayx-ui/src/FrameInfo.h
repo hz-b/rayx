@@ -19,22 +19,22 @@ class CameraController {
     glm::vec3 direction;
     glm::vec3 up;
 
-    float yaw;
-    float pitch;
+    double yaw;
+    double pitch;
 
     bool mouseLooking = false;
     double lastMouseX = 0.0;
     double lastMouseY = 0.0;
 
     struct Config {
-        float FOV = 90.0f;
+        float FOV = 60.0f;
         float near = 0.1f;
         float far = 100.0f;
     } config;
 
     CameraController() : position(0.0f, 0.0f, -2.0f), direction(0.0f, 0.0f, 1.0f), up(0.0f, 1.0f, 0.0f), yaw(90.0f), pitch(0.0f) {}
 
-    void updateDirection(float deltaYaw, float deltaPitch) {
+    void updateDirection(double deltaYaw, double deltaPitch) {
         yaw += deltaYaw;
         pitch += deltaPitch;
 
@@ -43,9 +43,9 @@ class CameraController {
         if (pitch < -89.0f) pitch = -89.0f;
 
         glm::vec3 newDirection;
-        newDirection.x = cos(glm::radians(yaw)) * cos(glm::radians(pitch));
-        newDirection.y = sin(glm::radians(pitch));
-        newDirection.z = sin(glm::radians(yaw)) * cos(glm::radians(pitch));
+        newDirection.x = (float)(cos(glm::radians(yaw)) * cos(glm::radians(pitch)));
+        newDirection.y = (float)sin(glm::radians(pitch));
+        newDirection.z = (float)(sin(glm::radians(yaw)) * cos(glm::radians(pitch)));
         direction = glm::normalize(newDirection);
     }
 
@@ -73,6 +73,7 @@ class CameraController {
         cam.model = glm::mat4(1.0f);
         cam.view = glm::lookAt(position, position + direction, up);
         cam.proj = glm::perspective(glm::radians(config.FOV), aspectRatio, config.near, config.far);
+        cam.proj[1][1] *= -1;  // Vulkan has inverted Y coordinates
         cam.n = config.near;
         cam.f = config.far;
     }
