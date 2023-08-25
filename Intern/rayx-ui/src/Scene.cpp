@@ -1,7 +1,6 @@
 #include "Scene.h"
 
-#include <random>
-
+#include "Beamline/OpticalElement.h"
 #include "Debug/Debug.h"
 
 Scene::Scene(Device& device) : m_Device(device) {}
@@ -11,12 +10,40 @@ void Scene::setup(const RAYX::RenderObjectVec& renderObjects, const RAYX::Bundle
         fromRenderObject(renderObject);
     }
 
-    for (const auto& bundle : bundleHistory) {
-        for (const auto& intersection : bundle) {
-            glm::vec3 yellow = {1.0f, 1.0f, 0.0f};
-            Vertex origin = {{0.0f, 0.0f, 0.0f}, yellow};  // TODO: Allow multiple bounces
-            Vertex point = {{intersection.m_position.x, intersection.m_position.y, intersection.m_position.z}, yellow};
-            addLine(origin, point);
+    // Event types:
+    // const double ETYPE_FLY_OFF = 0;       --> World coordinates
+    // const double ETYPE_JUST_HIT_ELEM = 1; --> Element coordinates
+    // const double ETYPE_ABSORBED = 3;      --> Element coordinates
+    // Rest are error codes
+    glm::vec3 yellow = {1.0f, 1.0f, 0.0f};
+    for (const auto& rayHist : bundleHistory) {
+        glm::vec3 rayLastPos = {0.0f, 0.0f, 0.0f};
+        for (const auto& event : rayHist) {
+            if (event.m_eventType == ETYPE_JUST_HIT_ELEM) {
+                // Events where rays hit objects are in element coordinates
+                // We need to convert them to world coordinates
+                glm::vec4 lastElementPos = renderObjects[(size_t)event.m_lastElement].position;
+                glm::mat4 lastElementOri = renderObjects[(size_t)event.m_lastElement].orientation;
+                glm::dmat4 outTrans = RAYX::calcTransformationMatrices(lastElementPos, lastElementOri, false);
+                glm::vec4 worldPos = outTrans * glm::vec4(event.m_position, 1.0f);
+
+                Vertex origin = {{rayLastPos.x, rayLastPos.y, rayLastPos.z}, yellow};
+                Vertex point = {{worldPos.x, worldPos.y, worldPos.z}, yellow};
+                addLine(origin, point);
+
+                rayLastPos = event.m_position;
+            } else if (event.m_eventType == ETYPE_FLY_OFF) {
+                // The origin here is the position of the event
+                // And the point towards the direction of the ray
+                // This ray flies off into infinity, so we need to calculate a sensible
+                glm::vec3 eventPos = event.m_position;
+                glm::vec3 eventDir = event.m_direction;
+                glm::vec3 pointPos = eventPos + eventDir * 1000.0f;
+
+                Vertex origin = {{eventPos.x, eventPos.y, eventPos.z}, yellow};
+                Vertex point = {{pointPos.x, pointPos.y, pointPos.z}, yellow};
+                addLine(origin, point);
+            }
         }
     }
 
@@ -62,23 +89,13 @@ void Scene::fromRenderObject(const RAYX::RenderObject& renderObject) {
     glm::vec4 worldBottomRight = renderObject.orientation * bottomRight + renderObject.position;
     RAYX_LOG << "World bottom right: " << worldBottomRight.x << ", " << worldBottomRight.y << ", " << worldBottomRight.z;
 
-    // Create the random engine
-    std::random_device rd;   // Will be used to obtain a seed for the random number engine
-    std::mt19937 gen(rd());  // Standard mersenne_twister_engine seeded with rd()
-    std::uniform_real_distribution<> dis(0.0, 1.0);
-
-    // Generate random colors
-    glm::vec3 random_color_1(dis(gen), dis(gen), dis(gen));
-    glm::vec3 random_color_2(dis(gen), dis(gen), dis(gen));
-    glm::vec3 random_color_3(dis(gen), dis(gen), dis(gen));
-    glm::vec3 random_color_4(dis(gen), dis(gen), dis(gen));
-
-    // Assign random colors to vertices
-    Vertex v1(worldBottomLeft, random_color_1);
-    Vertex v2(worldTopLeft, random_color_2);
-    Vertex v3(worldBottomRight, random_color_3);
+    glm::vec4 purple = {0.5f, 0.0f, 0.5f, 1.0f};
+    glm::vec4 cyan = {0.0f, 1.0f, 1.0f, 1.0f};
+    Vertex v1(worldBottomLeft, purple);
+    Vertex v2(worldTopLeft, cyan);
+    Vertex v3(worldBottomRight, purple);
     addTriangle(v1, v2, v3);
-    Vertex v4(worldTopRight, random_color_4);
+    Vertex v4(worldTopRight, cyan);
     addTriangle(v2, v3, v4);
 }
 

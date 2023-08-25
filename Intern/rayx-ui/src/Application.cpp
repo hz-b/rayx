@@ -27,7 +27,7 @@ void keyCallback(GLFWwindow* window, int key, int scancode, int action, int mods
     auto camController = reinterpret_cast<CameraController*>(glfwGetWindowUserPointer(window));
 
     // The movement speed factor
-    float speed = (mods & GLFW_MOD_SHIFT) ? 3.0f : 0.1f;
+    float speed = (mods & GLFW_MOD_SHIFT) ? 20.0f : 0.5f;
 
     // Quit
     if (key == GLFW_KEY_ESCAPE) {

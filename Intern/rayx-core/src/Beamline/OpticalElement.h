@@ -17,7 +17,7 @@ struct RAYX_API OpticalElement {
     std::string m_name;
 };
 
-glm::dmat4 calcTransformationMatrices(glm::dvec4 position, glm::dmat4 orientation, bool calcInMatrix = true);
+RAYX_API glm::dmat4 calcTransformationMatrices(glm::dvec4 position, glm::dmat4 orientation, bool calcInMatrix = true);
 glm::dmat4 defaultInMatrix(const DesignObject& dobj);
 glm::dmat4 defaultOutMatrix(const DesignObject& dobj);
 double defaultMaterial(const DesignObject& dobj);
