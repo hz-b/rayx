@@ -31,7 +31,7 @@ void Scene::setup(const RAYX::RenderObjectVec& renderObjects, const RAYX::Bundle
                 Vertex point = {{worldPos.x, worldPos.y, worldPos.z}, yellow};
                 addLine(origin, point);
 
-                rayLastPos = event.m_position;
+                rayLastPos = point.pos;
             } else if (event.m_eventType == ETYPE_FLY_OFF) {
                 // The origin here is the position of the event
                 // And the point towards the direction of the ray

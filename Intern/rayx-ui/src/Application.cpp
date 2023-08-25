@@ -106,9 +106,9 @@ Application::~Application() {}
 
 void Application::run() {
     // Get the render data
-    auto vec = RAYX::RenderObjectVec(RAYX::getRenderData("PlaneMirror.rml"));
+    auto vec = RAYX::RenderObjectVec(RAYX::getRenderData("DoubleMirror.rml"));
     RAYX::BundleHistory rays;
-    readH5(rays, "PlaneMirror.h5", FULL_FORMAT);
+    readH5(rays, "DoubleMirror.h5", FULL_FORMAT);
     m_Scene.setup(vec, rays);
 
     glfwSetKeyCallback(m_Window.window(), keyCallback);
