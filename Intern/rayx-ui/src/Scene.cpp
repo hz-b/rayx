@@ -16,6 +16,7 @@ void Scene::setup(const RAYX::RenderObjectVec& renderObjects, const RAYX::Bundle
     // const double ETYPE_ABSORBED = 3;      --> Element coordinates
     // Rest are error codes
     glm::vec3 yellow = {1.0f, 1.0f, 0.0f};
+    glm::vec3 blue = {0.0f, 0.0f, 1.0f};
     for (const auto& rayHist : bundleHistory) {
         glm::vec3 rayLastPos = {0.0f, 0.0f, 0.0f};
         for (const auto& event : rayHist) {
@@ -40,8 +41,8 @@ void Scene::setup(const RAYX::RenderObjectVec& renderObjects, const RAYX::Bundle
                 glm::vec3 eventDir = event.m_direction;
                 glm::vec3 pointPos = eventPos + eventDir * 1000.0f;
 
-                Vertex origin = {{eventPos.x, eventPos.y, eventPos.z}, yellow};
-                Vertex point = {{pointPos.x, pointPos.y, pointPos.z}, yellow};
+                Vertex origin = {{eventPos.x, eventPos.y, eventPos.z}, blue};
+                Vertex point = {{pointPos.x, pointPos.y, pointPos.z}, blue};
                 addLine(origin, point);
             }
         }
