@@ -22,16 +22,16 @@ Element makeSlit(const DesignObject& dobj) {
         // Both beamstopWidth and beamstopHeight keep their values.
     }
 
-    Cutout gapCutout;
+    Cutout openingCutout;
 
     auto shape = dobj.parseOpeningShape();
     if (shape == 0) { // rectangle
-        gapCutout = serializeRect({
+        openingCutout = serializeRect({
             .m_size_x1 = dobj.parseOpeningWidth(),
             .m_size_x2 = dobj.parseOpeningHeight(),
         });
     } else if (shape == 1) { // elliptical
-        gapCutout = serializeElliptical({
+        openingCutout = serializeElliptical({
             .m_diameter_x1 = dobj.parseOpeningWidth(),
             .m_diameter_x2 = dobj.parseOpeningHeight(),
         });
@@ -43,7 +43,7 @@ Element makeSlit(const DesignObject& dobj) {
     auto behaviour = serializeSlit({
         .m_beamstopWidth = beamstopWidth,
         .m_beamstopHeight = beamstopHeight,
-        .m_gapCutout = gapCutout,
+        .m_openingCutout = openingCutout,
     });
     return makeElement(dobj, behaviour, surface);
 }

@@ -75,7 +75,9 @@ INLINE GratingBehaviour deserializeGrating(Behaviour b) {
 struct SlitBehaviour {
     double m_beamstopWidth;
     double m_beamstopHeight;
-    Cutout m_gapCutout;
+    // The Slit consists of a ray-blocking wall with a small opening inside it.
+    // This is the shape (aka cutout) of this small opening.
+    Cutout m_openingCutout;
 };
 
 INLINE Behaviour serializeSlit(SlitBehaviour s) {
@@ -84,10 +86,10 @@ INLINE Behaviour serializeSlit(SlitBehaviour s) {
 
     b.m_params[0] = s.m_beamstopWidth;
     b.m_params[1] = s.m_beamstopHeight;
-    b.m_params[2] = s.m_gapCutout.m_type;
-    b.m_params[3] = s.m_gapCutout.m_params[0];
-    b.m_params[4] = s.m_gapCutout.m_params[1];
-    b.m_params[5] = s.m_gapCutout.m_params[2];
+    b.m_params[2] = s.m_openingCutout.m_type;
+    b.m_params[3] = s.m_openingCutout.m_params[0];
+    b.m_params[4] = s.m_openingCutout.m_params[1];
+    b.m_params[5] = s.m_openingCutout.m_params[2];
     return b;
 }
 
@@ -95,10 +97,10 @@ INLINE SlitBehaviour deserializeSlit(Behaviour b) {
     SlitBehaviour s;
     s.m_beamstopWidth = b.m_params[0];
     s.m_beamstopHeight = b.m_params[1];
-    s.m_gapCutout.m_type = b.m_params[2];
-    s.m_gapCutout.m_params[0] = b.m_params[3];
-    s.m_gapCutout.m_params[1] = b.m_params[4];
-    s.m_gapCutout.m_params[2] = b.m_params[5];
+    s.m_openingCutout.m_type = b.m_params[2];
+    s.m_openingCutout.m_params[0] = b.m_params[3];
+    s.m_openingCutout.m_params[1] = b.m_params[4];
+    s.m_openingCutout.m_params[2] = b.m_params[5];
     return s;
 }
 

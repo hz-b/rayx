@@ -14,8 +14,8 @@ Ray behaveSlit(Ray r, int id, RAYX_INOUT(uint64_t) ctr, ALLOW_UNUSED Collision c
     double yStop    = b.m_beamstopHeight / 2;
 
     // slit lies in x-y plane instead of x-z plane as other elements
-    Cutout gapCut = b.m_gapCutout;
-    bool withinSlitBounds = inCutout(gapCut, r.m_position[0], r.m_position[1]);
+    Cutout openingCutout = b.m_openingCutout;
+    bool withinSlitBounds = inCutout(openingCutout, r.m_position[0], r.m_position[1]);
     bool outsideOfBeamstop = stopBox(r.m_position[0], r.m_position[1], xStop, yStop);
 
     if (!withinSlitBounds || !outsideOfBeamstop) {
@@ -31,16 +31,16 @@ Ray behaveSlit(Ray r, int id, RAYX_INOUT(uint64_t) ctr, ALLOW_UNUSED Collision c
 
     // this was previously called "diffraction"
     if (wavelength > 0) {
-        if (gapCut.m_type == CTYPE_RECT) {
-            RectCutout r = deserializeRect(gapCut);
+        if (openingCutout.m_type == CTYPE_RECT) {
+            RectCutout r = deserializeRect(openingCutout);
             fraun_diff(r.m_size_x1, wavelength, dPhi, ctr);
             fraun_diff(r.m_size_x2, wavelength, dPsi, ctr);
-        } else if (gapCut.m_type == CTYPE_ELLIPTICAL) {
-            EllipticalCutout e = deserializeElliptical(gapCut);
+        } else if (openingCutout.m_type == CTYPE_ELLIPTICAL) {
+            EllipticalCutout e = deserializeElliptical(openingCutout);
             // TODO why m_diameter_x2 and not m_diameter_x1?
             bessel_diff(e.m_diameter_x2, wavelength, dPhi, dPsi, ctr);
         } else {
-            throw("encountered Slit with unsupported gapCutout");
+            throw("encountered Slit with unsupported openingCutout");
         }
     }
 
