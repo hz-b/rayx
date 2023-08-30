@@ -20,7 +20,7 @@ void Scene::setup(const RAYX::RenderObjectVec& renderObjects, const RAYX::Bundle
     for (const auto& rayHist : bundleHistory) {
         glm::vec3 rayLastPos = {0.0f, 0.0f, 0.0f};
         for (const auto& event : rayHist) {
-            if (event.m_eventType == ETYPE_JUST_HIT_ELEM) {
+            if (event.m_eventType == ETYPE_JUST_HIT_ELEM || event.m_eventType == ETYPE_ABSORBED) {
                 // Events where rays hit objects are in element coordinates
                 // We need to convert them to world coordinates
                 glm::vec4 lastElementPos = renderObjects[(size_t)event.m_lastElement].position;
@@ -43,7 +43,7 @@ void Scene::setup(const RAYX::RenderObjectVec& renderObjects, const RAYX::Bundle
 
                 Vertex origin = {{eventPos.x, eventPos.y, eventPos.z}, blue};
                 Vertex point = {{pointPos.x, pointPos.y, pointPos.z}, blue};
-                addLine(origin, point);
+                // addLine(origin, point);
             }
         }
     }
