@@ -116,6 +116,34 @@ RenderObjectVec getRenderData(const std::filesystem::path& filename) {
             RAYX::xml::Parser parser(object, std::vector<xml::Group>(), filename);
 
             RenderObject d;
+            if (strcmp(type, "Plane Mirror") == 0) {
+                d.type = 0;
+            } else if (strcmp(type, "Toroid") == 0) {
+                d.type = 1;
+            } else if (strcmp(type, "Slit") == 0) {
+                d.type = 2;
+            } else if (strcmp(type, "Spherical Grating") == 0) {
+                d.type = 3;
+            } else if (strcmp(type, "Plane Grating") == 0) {
+                d.type = 4;
+            } else if (strcmp(type, "Sphere") == 0) {
+                d.type = 5;
+            } else if (strcmp(type, "Reflection Zoneplate") == 0) {
+                d.type = 6;
+            } else if (strcmp(type, "Ellipsoid") == 0) {
+                d.type = 7;
+            } else if (strcmp(type, "Cylinder") == 0) {
+                d.type = 8;
+            } else if (strcmp(type, "Cone") == 0) {
+                d.type = 9;
+            } else if (strcmp(type, "ImagePlane") == 0) {
+                d.type = 10;
+            } else {
+                RAYX_WARN << "could not classify beamline object with Name: " << object->first_attribute("name")->value()
+                          << "; Type: " << object->first_attribute("type")->value();
+                d.type = -1;
+            }
+
             d.name = parser.name();
             d.position = parser.parsePosition();
             d.orientation = parser.parseOrientation();

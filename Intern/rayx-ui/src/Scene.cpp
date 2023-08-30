@@ -63,11 +63,19 @@ void Scene::addLine(const Vertex v1, const Vertex v2) {
 }
 
 void Scene::fromRenderObject(const RAYX::RenderObject& renderObject) {
-    if (renderObject.cutout.m_type != CTYPE_RECT) {
-        RAYX_ERR << "Unsupported cutout type!";
+    RectCutout rect;
+    if (renderObject.cutout.m_type == 0)  // specific size
+    {
+        rect = deserializeRect(renderObject.cutout);
+    } else if (renderObject.cutout.m_type == 3) {  // infinite size
+        RAYX_LOG << "Infinite cutout detected!";
+        rect.m_size_x1 = 100.0f;
+        rect.m_size_x2 = 100.0f;
+    } else {
+        RAYX_LOG << "Unsupported cutout type!";
+        rect.m_size_x1 = 50.0f;
+        rect.m_size_x2 = 50.0f;
     }
-
-    auto rect = deserializeRect(renderObject.cutout);
     auto width = rect.m_size_x1;
     auto height = rect.m_size_x2;
 
@@ -80,25 +88,57 @@ void Scene::fromRenderObject(const RAYX::RenderObject& renderObject) {
     glm::vec4 bottomLeft(-width / 2.0f, 0, -height / 2.0f, 1.0f);
     glm::vec4 bottomRight(width / 2.0f, 0, -height / 2.0f, 1.0f);
 
+    RAYX::RenderObject modifiedObject = renderObject;
+    // Check if the current object is an image plane.
+    if (renderObject.type == 10) {
+        // Rotate by 90 degrees around the X-axis.
+        glm::mat4 rotationMatrix = glm::rotate(glm::mat4(1.0f), glm::radians(90.0f), glm::vec3(1.0f, 0.0f, 0.0f));
+        modifiedObject.orientation = rotationMatrix * renderObject.orientation;
+    }
     // Then, transform them to the world space using the position and orientation
-    glm::vec4 worldTopLeft = renderObject.orientation * topLeft + renderObject.position;
+    glm::vec4 worldTopLeft = modifiedObject.orientation * topLeft + modifiedObject.position;
     RAYX_LOG << "World top left: " << worldTopLeft.x << ", " << worldTopLeft.y << ", " << worldTopLeft.z;
-    glm::vec4 worldTopRight = renderObject.orientation * topRight + renderObject.position;
+    glm::vec4 worldTopRight = modifiedObject.orientation * topRight + modifiedObject.position;
     RAYX_LOG << "World top right: " << worldTopRight.x << ", " << worldTopRight.y << ", " << worldTopRight.z;
-    glm::vec4 worldBottomLeft = renderObject.orientation * bottomLeft + renderObject.position;
+    glm::vec4 worldBottomLeft = modifiedObject.orientation * bottomLeft + modifiedObject.position;
     RAYX_LOG << "World bottom left: " << worldBottomLeft.x << ", " << worldBottomLeft.y << ", " << worldBottomLeft.z;
-    glm::vec4 worldBottomRight = renderObject.orientation * bottomRight + renderObject.position;
+    glm::vec4 worldBottomRight = modifiedObject.orientation * bottomRight + modifiedObject.position;
     RAYX_LOG << "World bottom right: " << worldBottomRight.x << ", " << worldBottomRight.y << ", " << worldBottomRight.z;
 
-    glm::vec4 purple = {0.5f, 0.0f, 0.5f, 1.0f};
-    glm::vec4 pink = {1.0f, 0.0f, 1.0f, 1.0f};
-    glm::vec4 cyan = {0.0f, 1.0f, 1.0f, 1.0f};
-    glm::vec4 red = {1.0f, 0.0f, 0.0f, 1.0f};
-    Vertex v1(worldBottomLeft, purple);
-    Vertex v2(worldTopLeft, pink);
-    Vertex v3(worldBottomRight, red);
+    glm::vec4 white = {1.0f, 1.0f, 1.0f, 1.0f};
+    glm::vec4 black = {0.0f, 0.0f, 0.0f, 1.0f};
+
+    // Define your base colors
+    glm::vec4 blueBase = {0.0f, 0.0f, 1.0f, 1.0f};
+    glm::vec4 redBase = {1.0f, 0.0f, 0.0f, 1.0f};
+    glm::vec4 greenBase = {0.0f, 1.0f, 0.0f, 1.0f};
+
+    glm::vec4 tl, tr, bl, br;
+
+    // Define color variations based on object type
+    if (renderObject.type == 0) {               // Plane Mirror is green
+        tl = glm::mix(greenBase, white, 0.4f);  // make it 40% lighter
+        tr = greenBase;
+        bl = greenBase;
+        br = glm::mix(greenBase, black, 0.6f);  // make it 60% darker
+    } else if (renderObject.type == 10) {       // Image plane is blue
+        tl = glm::mix(blueBase, white, 0.4f);   // make it 40% lighter
+        tr = blueBase;
+        bl = blueBase;
+        br = glm::mix(blueBase, black, 0.6f);  // make it 60% darker
+    } else {                                   // rest is red for now
+        tl = glm::mix(redBase, white, 0.4f);   // make it 40% lighter
+        tr = redBase;
+        bl = redBase;
+        br = glm::mix(redBase, black, 0.6f);  // make it 60% darker
+    }
+
+    // Create the vertices
+    Vertex v1(worldBottomLeft, bl);
+    Vertex v2(worldTopLeft, tl);
+    Vertex v3(worldBottomRight, br);
     addTriangle(v1, v2, v3);
-    Vertex v4(worldTopRight, cyan);
+    Vertex v4(worldTopRight, tr);
     addTriangle(v2, v3, v4);
 }
 
