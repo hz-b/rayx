@@ -86,73 +86,33 @@ void addBeamlineObjectFromXML(rapidxml::xml_node<>* node, Beamline* beamline, co
 
 RenderObjectVec getRenderData(const std::filesystem::path& filename) {
     RenderObjectVec data;
-
-    // TODO(Jannis): This (creating the doc) is duplicated code from importBeamline. If this stays importer should be refactored. Keep in
-    // mind: cstr is state that needs to stay in scope during parsing.
-    std::ifstream fileStream(filename);
-    if (!fileStream) RAYX_ERR << "importBeamline could not open file!";
-
-    std::stringstream buffer;
-    buffer << fileStream.rdbuf();
-
-    std::string fileContents = buffer.str();
-    if (fileContents.empty()) RAYX_ERR << "importBeamline file is empty!";
-
-    std::vector<char> fileContentsCstr(fileContents.c_str(), fileContents.c_str() + fileContents.size() + 1);
-    rapidxml::xml_document<> doc;
-    doc.parse<0>(fileContentsCstr.data());
-
-    RAYX_VERB << "\t Version: " << doc.first_node("lab")->first_node("version")->value();
-    rapidxml::xml_node<>* xml_beamline = doc.first_node("lab")->first_node("beamline");
-
-    for (rapidxml::xml_node<>* object = xml_beamline->first_node(); object; object = object->next_sibling()) {  // Iterating through objects
-        const char* type = object->first_attribute("type")->value();
-
-        // Skip lightsources
-        if (strcmp(type, "Point Source") == 0 ||
-            strcmp(type, "Matrix Source") == 0) {  // TODO(Jannis): The should be a better check for this. Adding a new lightsource would break this.
-            continue;
-        } else {
-            RAYX::xml::Parser parser(object, std::vector<xml::Group>(), filename);
-
-            RenderObject d;
-            if (strcmp(type, "Plane Mirror") == 0) {
-                d.type = 0;
-            } else if (strcmp(type, "Toroid") == 0) {
-                d.type = 1;
-            } else if (strcmp(type, "Slit") == 0) {
-                d.type = 2;
-            } else if (strcmp(type, "Spherical Grating") == 0) {
-                d.type = 3;
-            } else if (strcmp(type, "Plane Grating") == 0) {
-                d.type = 4;
-            } else if (strcmp(type, "Sphere") == 0) {
-                d.type = 5;
-            } else if (strcmp(type, "Reflection Zoneplate") == 0) {
-                d.type = 6;
-            } else if (strcmp(type, "Ellipsoid") == 0) {
-                d.type = 7;
-            } else if (strcmp(type, "Cylinder") == 0) {
-                d.type = 8;
-            } else if (strcmp(type, "Cone") == 0) {
-                d.type = 9;
-            } else if (strcmp(type, "ImagePlane") == 0) {
-                d.type = 10;
-            } else {
-                RAYX_WARN << "could not classify beamline object with Name: " << object->first_attribute("name")->value()
-                          << "; Type: " << object->first_attribute("type")->value();
-                d.type = -1;
-            }
-
-            d.name = parser.name();
-            d.position = parser.parsePosition();
-            d.orientation = parser.parseOrientation();
-            d.cutout = parser.parseCutout();
-
-            data.push_back(d);
-        }
+    std::vector<OpticalElement> elements;
+    std::vector<std::shared_ptr<RAYX::LightSource>> sources;
+    {
+        auto beamline = importBeamline(filename);
+        elements = beamline.m_OpticalElements;
+        sources = beamline.m_LightSources;
     }
+    for (auto element : elements) {
+        RenderObject d;
+        d.name = element.m_name;
+        if (d.name == "ImagePlane") {  // TODO: dirty hack that relies on name, this should be fixed
+            d.type = 10;
+        } else {
+            d.type = 0;
+        }
+        dmat4 outTrans = element.m_element.m_outTrans;
+        d.position = dvec4(outTrans[3][0], outTrans[3][1], outTrans[3][2], 1.0);
 
+        dmat4 rotation;
+        rotation[0] = dvec4(outTrans[0][0], outTrans[0][1], outTrans[0][2], 0.0);
+        rotation[1] = dvec4(outTrans[1][0], outTrans[1][1], outTrans[1][2], 0.0);
+        rotation[2] = dvec4(outTrans[2][0], outTrans[2][1], outTrans[2][2], 0.0);
+        rotation[3] = dvec4(0.0, 0.0, 0.0, 1.0);
+        d.orientation = rotation;
+        d.cutout = element.m_element.m_cutout;
+        data.push_back(d);
+    }
     return data;
 }
 
