@@ -29,7 +29,7 @@ class CameraController {
     struct Config {
         float FOV = 60.0f;
         float near = 0.1f;
-        float far = 100.0f;
+        float far = 10000.0f;
     } config;
 
     CameraController() : position(0.0f, 0.0f, -2.0f), direction(0.0f, 0.0f, 1.0f), up(0.0f, 1.0f, 0.0f), yaw(90.0f), pitch(0.0f) {}
