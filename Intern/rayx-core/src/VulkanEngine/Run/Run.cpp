@@ -96,9 +96,6 @@ std::vector<std::vector<Ray>> VulkanEngine::runTraceComputeTask(ComputeRunSpec s
                 RAYX_D_LOG << "All finalized";
                 break;
             }
-
-
-
         }
     }
     // Second stage: Final collision only check

@@ -11,9 +11,10 @@
 namespace RAYX {
 
 Pass::Pipeline::Pipeline(VkDevice& dev, const PipelineCreateInfo& shaderCreateInfo) : m_name(std::move(shaderCreateInfo.name)), m_device(dev) {
-    m_shader.path = shaderCreateInfo.shaderPath;
-    m_shader.shaderType = shaderCreateInfo.shaderType;
+    m_shaderPath = shaderCreateInfo.shaderPath;
+    m_shaderType = shaderCreateInfo.shaderType;
     createShaderModule();
+    isCleaned = false;
     RAYX_D_LOG << "Pipeline " << m_name << " created";
 }
 
@@ -33,7 +34,7 @@ void Pass::Pipeline::createPipelineLayout(VkDescriptorSetLayout* setLayouts) {
     /*
     Add push constants to the Pipeline
     */
-    auto pushConstant = m_pushConstant.getVkPushConstantRange(m_shader.shaderType);
+    auto pushConstant = m_pushConstant.getVkPushConstantRange(m_shaderType);
     pipelineLayoutCreateInfo.pPushConstantRanges = &pushConstant;
     pipelineLayoutCreateInfo.pushConstantRangeCount = 1;  // One struct of pushConstants
 
@@ -110,6 +111,9 @@ void inline Pass::Pipeline::storePipelineCache(VkDevice& device) {
  * @param device
  */
 void Pass::Pipeline::cleanPipeline(VkDevice& device) {
+    if (isCleaned) {
+        return;
+    }
     if (m_pipeline != VK_NULL_HANDLE) {
         vkDestroyPipeline(device, m_pipeline, nullptr);
         m_pipeline = VK_NULL_HANDLE;
@@ -119,7 +123,8 @@ void Pass::Pipeline::cleanPipeline(VkDevice& device) {
         m_pipelineLayout = VK_NULL_HANDLE;
     }
 
-    vkDestroyShaderModule(device, m_shader.module, nullptr);
+    vkDestroyShaderModule(device, m_shaderModule, nullptr);
+    isCleaned = true;
 }
 
 /*
@@ -129,14 +134,14 @@ void Pass::Pipeline::createShaderModule() {
     RAYX_PROFILE_FUNCTION_STDOUT();
     uint32_t filelength;
     // the code  was created by running the command: glslangValidator.exe -V <shaderFile>.comp
-    std::string path = canonicalizeRepositoryPath(m_shader.path).string();
+    std::string path = canonicalizeRepositoryPath(m_shaderPath).string();
     uint32_t* shaderCode = readFile(filelength, path.c_str());
     VkShaderModuleCreateInfo createInfo = {};
     createInfo.sType = VK_STRUCTURE_TYPE_SHADER_MODULE_CREATE_INFO;
     createInfo.pCode = shaderCode;
     createInfo.codeSize = filelength;
 
-    checkVkResult(vkCreateShaderModule(m_device, &createInfo, nullptr, &m_shader.module));
+    checkVkResult(vkCreateShaderModule(m_device, &createInfo, nullptr, &m_shaderModule));
     RAYX_VERB << "Shader module " << m_name << " created.";
     delete[] shaderCode;
 }
@@ -145,9 +150,9 @@ VkPipelineShaderStageCreateInfo Pass::Pipeline::getPipelineShaderCreateInfo() {
     /* we specify the compute shader stage, and it's entry point(main) */
     VkPipelineShaderStageCreateInfo shaderStageCreateInfo = {};
     shaderStageCreateInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO;
-    shaderStageCreateInfo.stage = m_shader.shaderType;
-    shaderStageCreateInfo.module = m_shader.module;
-    shaderStageCreateInfo.pName = m_shader.entryPoint.c_str();
+    shaderStageCreateInfo.stage = m_shaderType;
+    shaderStageCreateInfo.module = m_shaderModule;
+    shaderStageCreateInfo.pName = m_shaderEntryPoint.c_str();
     return shaderStageCreateInfo;
 }
 

@@ -62,7 +62,7 @@ class RAYX_API BufferHandler {
     void waitTransferQueueIdle();
 
     std::map<std::string, std::unique_ptr<VulkanBuffer>>* getBuffers() { return &m_Buffers; }
-    inline VulkanBuffer* getBuffer(const std::string& name);
+    VulkanBuffer* getBuffer(const std::string& name);
     const VulkanBuffer& getStagingBuffer() const { return *m_StagingBuffer; }
     std::vector<VkDescriptorSetLayoutBinding> getDescriptorBindings(const std::string& passName);
     const VkFence* getTransferFence() const { return m_TransferFence->fence(); }

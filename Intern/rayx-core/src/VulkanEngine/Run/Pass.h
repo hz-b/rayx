@@ -43,8 +43,8 @@ class RAYX_API Pass {
         void updatePushConstant(void* data, size_t size);
         void cleanPipeline(VkDevice& device);
 
-        const VkShaderModule& getShaderModule() const { return m_shader.module; }
-        VkShaderStageFlagBits getShaderStageFlagBits() const { return m_shader.shaderType; }
+        const VkShaderModule& getShaderModule() const { return m_shaderModule; }
+        VkShaderStageFlagBits getShaderStageFlagBits() const { return m_shaderType; }
 
         std::string m_name;
         VkDevice& m_device;
@@ -57,13 +57,12 @@ class RAYX_API Pass {
 
       private:
         VkPipelineShaderStageCreateInfo getPipelineShaderCreateInfo();
-        struct Shader {
-            std::string entryPoint = "main";
-            std::filesystem::path path;
-            VkShaderStageFlagBits shaderType;
-            VkShaderModule module = VK_NULL_HANDLE;
-        } m_shader;
         void createShaderModule();
+        bool isCleaned = false;
+        std::string m_shaderEntryPoint = "main";
+        std::filesystem::path m_shaderPath;
+        VkShaderStageFlagBits m_shaderType;
+        VkShaderModule m_shaderModule;
     };
 
     using Pipelines = std::vector<std::unique_ptr<Pipeline>>;
