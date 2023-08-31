@@ -87,7 +87,7 @@ std::vector<std::vector<Ray>> VulkanEngine::runTraceComputeTask(ComputeRunSpec s
 
             recordSimpleTraceCommand("singleTracePass", m_CommandBuffers[0], 0);
             submitCommandBuffer(0);
-            checkVkResult(m_computeFence->waitAndReset());  // FIXME: Can be solved by another memory barrier in CommandBuffer
+            checkVkResult(m_computeFence->waitAndReset());
             auto rayOut = m_BufferHandler->readBuffer<Ray>("ray-buffer", true);
             auto rayMeta = m_BufferHandler->readBuffer<RayMeta>("ray-meta-buffer", true);
 

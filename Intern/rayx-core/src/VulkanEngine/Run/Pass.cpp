@@ -20,6 +20,7 @@ Pass::Pipeline::Pipeline(VkDevice& dev, const PipelineCreateInfo& shaderCreateIn
 
 Pass::Pipeline::~Pipeline() {
     cleanPipeline(m_device);
+    vkDestroyShaderModule(m_device, m_shaderModule, nullptr);
     // storePipelineCache(m_device); // TODO(OS): Restore pipeline cache (But for multiple pipelines.)
 }
 
@@ -48,6 +49,7 @@ void Pass::Pipeline::createPipeline() {
     auto pipelineCreateInfo = VKINIT::Pipeline::compute_pipeline_create_info(m_pipelineLayout, getPipelineShaderCreateInfo());
     // FIXME(OS): Currently only creates compute pipelines. Pipeline should be general for also other types (E.g Graphics). Move this somewhere else!
     checkVkResult(vkCreateComputePipelines(m_device, nullptr, 1, &pipelineCreateInfo, nullptr, &m_pipeline));
+    RAYX_D_LOG << m_name << "VkPipeline created";
 }
 
 /**
@@ -114,17 +116,11 @@ void Pass::Pipeline::cleanPipeline(VkDevice& device) {
     if (isCleaned) {
         return;
     }
-    if (m_pipeline != VK_NULL_HANDLE) {
-        vkDestroyPipeline(device, m_pipeline, nullptr);
-        m_pipeline = VK_NULL_HANDLE;
-    }
-    if (m_pipelineLayout != VK_NULL_HANDLE) {
-        vkDestroyPipelineLayout(device, m_pipelineLayout, nullptr);
-        m_pipelineLayout = VK_NULL_HANDLE;
-    }
 
-    vkDestroyShaderModule(device, m_shaderModule, nullptr);
+    vkDestroyPipeline(device, m_pipeline, nullptr);
+    vkDestroyPipelineLayout(device, m_pipelineLayout, nullptr);
     isCleaned = true;
+    RAYX_D_LOG << m_name << " cleaned.";
 }
 
 /*

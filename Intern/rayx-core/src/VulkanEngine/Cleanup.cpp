@@ -16,6 +16,7 @@ void VulkanEngine::cleanup() {
             pipeline->cleanPipeline(m_Device);
         }
     }
+    m_state = EngineStates::PRERUN;
 }
 
 }  // namespace RAYX

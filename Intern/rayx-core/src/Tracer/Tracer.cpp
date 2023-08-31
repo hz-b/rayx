@@ -62,19 +62,19 @@ BundleHistory Tracer::trace(const Beamline& b, uint64_t max_batch_size) {
 
         {
             RAYX_PROFILE_SCOPE_STDOUT("Snapshotting");
-            auto _maxSnapshot = rawBatchHistory.size();
+            auto maxSnapshots = rawBatchHistory.size();
             result.reserve(batch_size);
 
             for (uint i = 0; i < batch_size; i++) {
                 RayHistory snapshots;
-                snapshots.reserve(_maxSnapshot);
-                for (uint j = 0; j < _maxSnapshot; j++) {
+                snapshots.reserve(maxSnapshots);
+                for (uint j = 0; j < maxSnapshots; j++) {
                     Ray r = rawBatchHistory[j][i];
                     if (r.m_eventType != ETYPE_NOT_ENOUGH_BOUNCES) {
                         snapshots.push_back(r);
                     }
-                    snapshots.shrink_to_fit();
                 }
+                snapshots.shrink_to_fit();
                 result.push_back(snapshots);
             }
         }
