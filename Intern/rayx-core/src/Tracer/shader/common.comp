@@ -1,0 +1,130 @@
+/*
+Specialized compute shader header that includes #includes, util. functions,
+ and layout/descriptor/array allocation information.
+
+Use this header for every new shader entry
+*/
+
+#define WORKGROUP_SIZE 32
+/**************************************************************
+ *                    Header & #define
+ **************************************************************/
+#ifdef GLSL
+#extension GL_EXT_debug_printf : enable
+#extension GL_ARB_separate_shader_objects : enable
+#extension GL_ARB_gpu_shader_int64 : enable
+#extension GL_GOOGLE_include_directive : enable
+layout(local_size_x = WORKGROUP_SIZE, local_size_y = 1, local_size_z = 1) in;
+#endif
+
+// Every shader execution calculates the route for a single ray.
+// `_ray` is that ray, it's always in world coordinates (!).
+#define _ray (rayData[uint(gl_GlobalInvocationID)])
+#define _rayMeta (rayMetaData[uint(gl_GlobalInvocationID)])
+
+#include "../../Shared/Constants.h"
+#include "../../Shared/Ray.h"
+#include "../../Shared/adapt.h"
+
+/**************************************************************
+ *                    SHADER ARRAYS
+ **************************************************************/
+
+// don't use this directly. Use `_ray` instead.
+SHADER_ARRAY(Ray, rayData, 0, ibuf);  // TODO(OS) Check/Fix buffers
+
+SHADER_ARRAY(RayMeta, rayMetaData, 1, obuf);
+
+// std430 is required so that Element is layouted like in C++.
+// see https://www.khronos.org/opengl/wiki/Interface_Block_(GLSL) for more details on layouting.
+SHADER_ARRAY(Element, elements, 2, qbuf);
+
+// TODO unused!
+SHADER_ARRAY(dvec4, xyznull, 3, xyzbuf);
+
+// matIdx[0..91] contains the indices of the Palik Table, whereas matIdx[92..92+91] contains the indices of the NffTable.
+// generally, an entry of matIdx tells you the index you need to look up in the 'mat'-table below.
+SHADER_ARRAY(int, matIdx, 4, materialIndexBuf);
+
+// contains: (Palik tables of all materials concatenated together) concatenated with (Nff tables of all materials concatenated together)
+// use the matIdx-table to determine the relevant indices for when which table starts and stops.
+SHADER_ARRAY(double, mat, 5, materialBuf);
+
+#ifdef RAYX_DEBUG_MODE
+struct _debug_struct {
+    dmat4 _dMat;  // Can also be used as vectors or scalar
+};
+
+SHADER_ARRAY(_debug_struct, d_struct, 6, debugBuf);
+#endif
+
+#ifndef GLSL
+int gl_GlobalInvocationID;
+#endif
+
+/**************************************************************
+ *                    PushConstants
+ **************************************************************/
+#ifndef GLSL
+PushConstants pushConstants;
+#else
+layout(push_constant) uniform constants {
+    double rayIdStart;
+    double numRays;
+    double randomSeed;
+    double maxSnapshots;  // FIXME(OS) : Only used by CPU (to be delete)
+    int i_bounce;
+}
+pushConstants;
+#endif
+
+/**************************************************************
+ *                    Functions && vars
+ **************************************************************/
+bool eventRecorded = false;
+
+// take a snapshot and store it in the next free spot in outputData.
+// `r` will typically be _ray, or some related ray.
+void recordEvent(Ray r, double w) {
+    if (eventRecorded) {
+        // SHADER_PRINT("Warning snapshot already taken!\n"); //TODO(OS): fix print
+    } else {
+        eventRecorded = true;
+    }
+
+    if (_rayMeta.finalized) {
+        return;
+    }
+
+    _ray = r;
+    _ray.m_eventType = w;
+    return;
+}
+
+// like `recordEvent` above, but it will prevent taking more snapshots after this.
+// Is used for snapshots terminating the path of the ray.
+void recordFinalEvent(Ray r, double w) {
+    recordEvent(r, w);
+    _rayMeta.finalized = true;
+}
+
+// throws an error, and termiantes the program
+#ifdef GLSL
+#define throw(string) recordFinalEvent(_ray, ETYPE_FATAL_ERROR)
+#else
+#define throw(string) RAYX_ERR << string
+#endif
+
+/**************************************************************
+ *                    Shader INCLUDEs
+ **************************************************************/
+
+// Order in #include is IMPROTANT, do not change.
+// clang-format off
+#include "approx.comp"
+#include "complex.comp"
+#include "random.comp"
+#include "utils.comp"
+#include "collision.comp"
+#include "behave.comp"
+// clang-format on

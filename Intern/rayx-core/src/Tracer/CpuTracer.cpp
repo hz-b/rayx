@@ -16,8 +16,19 @@ using uint = unsigned int;
 namespace RAYX {
 
 namespace CPU_TRACER {
-#include "shader/main.comp"
+#include "shader/common.comp"
+#include "shader/finalCollision.comp"
+#include "shader/singleBounce.comp"
 }  // namespace CPU_TRACER
+
+bool _allFinalized(const std::vector<RayMeta>& vector) {
+    for (const auto& element : vector) {
+        if (!element.finalized) {
+            return false;
+        }
+    }
+    return true;
+}
 
 CpuTracer::CpuTracer() { RAYX_VERB << "Initializing Cpu Tracer.."; }
 
@@ -35,10 +46,20 @@ BundleHistory CpuTracer::traceRaw(const TraceRawConfig& cfg) {
     CPU_TRACER::matIdx.data.clear();
     CPU_TRACER::mat.data.clear();
 
-    // init rayData, outputData
+    // init rayData
     CPU_TRACER::rayData.data = rayList;
-    CPU_TRACER::outputData.data.resize(rayList.size() * (size_t)cfg.m_maxEvents);
 
+    // Prepare rayMeta data in-between batch traces
+    std::vector<RayMeta> rayMeta;
+    rayMeta.reserve((size_t)cfg.m_numRays);
+    const uint64_t MAX_UINT64 = ~(uint64_t(0));
+    uint64_t workerCounterNum = MAX_UINT64 / uint64_t(cfg.m_numRays);
+    for (auto i = 0; i < cfg.m_numRays; i++) {
+        CPU_TRACER::rayMetaData.data.push_back(
+            {.ctr = ((uint64_t)cfg.m_rayIdStart + (uint64_t)i) * workerCounterNum + uint64_t(cfg.m_randomSeed * MAX_UINT64),
+             .nextElementId = -1,   // Intersection element unknown / does not exist
+             .finalized = false});  // Not started
+    }
     // init elements
     for (auto e : cfg.m_elements) {
         CPU_TRACER::elements.data.push_back(e);
@@ -47,17 +68,55 @@ BundleHistory CpuTracer::traceRaw(const TraceRawConfig& cfg) {
     auto materialTables = cfg.m_materialTables;
     CPU_TRACER::mat.data = materialTables.materialTable;
     CPU_TRACER::matIdx.data = materialTables.indexTable;
+    const int maxBounces = CPU_TRACER::elements.data.size();
 
-    // Run the tracing by for all rays
-    for (uint i = 0; i < rayList.size(); i++) {
-        CPU_TRACER::gl_GlobalInvocationID = i;
-        CPU_TRACER::main();
+    BundleHistory events;
+
+    // First stage: Single Trace until max Bounce
+    // -------------------------------------------------------------------------------------------------------
+    {
+        RAYX_PROFILE_SCOPE_STDOUT("singleTracePassCPU");
+        RAYX_D_LOG << "Starting 1st Stage";
+
+        for (int b = 0; b < maxBounces; b++) {
+            // Run the tracing by for all rays
+            CPU_TRACER::pushConstants.i_bounce = b;
+            // SHADER START
+            for (uint i = 0; i < rayList.size(); i++) {
+                CPU_TRACER::gl_GlobalInvocationID = i;
+                CPU_TRACER::eventRecorded = false;
+                CPU_TRACER::singleBounce_main();
+            }  // SHADER END
+
+            auto rayOut = CPU_TRACER::rayData.data;
+            auto rayMeta = CPU_TRACER::rayMetaData.data;
+
+            events.push_back(rayOut);
+            if (_allFinalized(rayMeta)) {  // Are all rays finished?
+                RAYX_VERB << "All finalized";
+                break;
+            }
+        }
     }
 
-    // Fetch Rays back from the Shader "container"
-    BundleHistory _vec;
-    return _vec;
-    //return CPU_TRACER::outputData.data;
+    // Second stage: Final collision only check
+    // -------------------------------------------------------------------------------------------------------
+    {
+        RAYX_PROFILE_SCOPE_STDOUT("finalCollisionPassCPU");
+        // SHADER START
+        RAYX_D_LOG << "Starting 2nd Stage";
+        for (uint i = 0; i < rayList.size(); i++) {
+            CPU_TRACER::gl_GlobalInvocationID = i;
+            CPU_TRACER::eventRecorded = false;
+            CPU_TRACER::finalCollision_main();
+        }  // SHADER END}
+
+        auto rayOut = CPU_TRACER::rayData.data;  // Fetch Rays back from the Shader "container"
+        RAYX_D_LOG << rayOut.size();
+        events.push_back(rayOut);
+    }
+    RAYX_D_LOG << events.size();
+    return events;
 }
 
 void CpuTracer::setPushConstants(const PushConstants* p) { std::memcpy(&CPU_TRACER::pushConstants, p, sizeof(PushConstants)); }

@@ -33,6 +33,7 @@ struct PushConstants {  // TODO(Jannis): PushConstants is not an expressive name
     double numRays;
     double randomSeed;
     double maxEvents;
+    int i_bounce = 0;
 };
 
 /// A 'snapshot' of a ray, at the time where it undergoes some event.
