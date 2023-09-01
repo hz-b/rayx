@@ -17,6 +17,7 @@ void Scene::setup(const RAYX::RenderObjectVec& renderObjects, const RAYX::Bundle
     // Rest are error codes
     glm::vec3 yellow = {1.0f, 1.0f, 0.0f};
     glm::vec3 blue = {0.0f, 0.0f, 1.0f};
+    glm::vec3 red = {1.0f, 0.0f, 0.0f};
     for (const auto& rayHist : bundleHistory) {
         glm::vec3 rayLastPos = {0.0f, 0.0f, 0.0f};
         for (const auto& event : rayHist) {
@@ -29,7 +30,12 @@ void Scene::setup(const RAYX::RenderObjectVec& renderObjects, const RAYX::Bundle
                 glm::vec4 worldPos = outTrans * glm::vec4(event.m_position, 1.0f);
 
                 Vertex origin = {{rayLastPos.x, rayLastPos.y, rayLastPos.z}, yellow};
-                Vertex point = {{worldPos.x, worldPos.y, worldPos.z}, yellow};
+                Vertex point;
+                if (event.m_eventType == ETYPE_JUST_HIT_ELEM) {
+                    point = {{worldPos.x, worldPos.y, worldPos.z}, yellow};
+                } else {
+                    point = {{worldPos.x, worldPos.y, worldPos.z}, red};
+                }
                 addLine(origin, point);
 
                 rayLastPos = point.pos;
@@ -43,7 +49,7 @@ void Scene::setup(const RAYX::RenderObjectVec& renderObjects, const RAYX::Bundle
 
                 Vertex origin = {{eventPos.x, eventPos.y, eventPos.z}, blue};
                 Vertex point = {{pointPos.x, pointPos.y, pointPos.z}, blue};
-                // addLine(origin, point);
+                addLine(origin, point);
             }
         }
     }
@@ -63,83 +69,183 @@ void Scene::addLine(const Vertex v1, const Vertex v2) {
 }
 
 void Scene::fromRenderObject(const RAYX::RenderObject& renderObject) {
-    RectCutout rect;
-    if (renderObject.cutout.m_type == 0)  // specific size
-    {
-        rect = deserializeRect(renderObject.cutout);
-    } else if (renderObject.cutout.m_type == 3) {  // infinite size
-        RAYX_LOG << "Infinite cutout detected!";
-        rect.m_size_x1 = 100.0f;
-        rect.m_size_x2 = 100.0f;
+    if (false) {
+        auto tris = trianglesFromQuadric(renderObject);
+        std::cout << "Number of triangles: " << tris.size() << std::endl;
+        for (auto tri : tris) {
+            std::cout << "Triangle0: " << tri.vertices[0].pos.x << ", " << tri.vertices[0].pos.y << ", " << tri.vertices[0].pos.z << std::endl;
+            std::cout << "Triangle1: " << tri.vertices[1].pos.x << ", " << tri.vertices[1].pos.y << ", " << tri.vertices[1].pos.z << std::endl;
+            std::cout << "Triangle2: " << tri.vertices[2].pos.x << ", " << tri.vertices[2].pos.y << ", " << tri.vertices[2].pos.z << std::endl;
+            addTriangle(tri.vertices[0], tri.vertices[1], tri.vertices[2]);
+        }
     } else {
-        RAYX_LOG << "Unsupported cutout type!";
-        rect.m_size_x1 = 50.0f;
-        rect.m_size_x2 = 50.0f;
+        RectCutout rect;
+        if (renderObject.cutout.m_type == 0)  // specific size
+        {
+            rect = deserializeRect(renderObject.cutout);
+        } else if (renderObject.cutout.m_type == 3) {  // infinite size
+            RAYX_LOG << "Infinite cutout detected!";
+            rect.m_size_x1 = 100.0f;
+            rect.m_size_x2 = 100.0f;
+        } else {
+            RAYX_LOG << "Unsupported cutout type!";
+            rect.m_size_x1 = 50.0f;
+            rect.m_size_x2 = 50.0f;
+        }
+        auto width = rect.m_size_x1;
+        auto height = rect.m_size_x2;
+
+        // Calculate two triangle from the position, orientation and size of the render object
+        // Assume the rectangle is in the XZ plane, and its center is at position.
+
+        // First, calculate the corners of the rectangle in the model's local space
+        glm::vec4 topLeft(-width / 2.0f, 0, height / 2.0f, 1.0f);
+        glm::vec4 topRight(width / 2.0f, 0, height / 2.0f, 1.0f);
+        glm::vec4 bottomLeft(-width / 2.0f, 0, -height / 2.0f, 1.0f);
+        glm::vec4 bottomRight(width / 2.0f, 0, -height / 2.0f, 1.0f);
+
+        RAYX::RenderObject modifiedObject = renderObject;
+        // Check if the current object is an image plane.
+        if (renderObject.type == 10) {
+            // Rotate by 90 degrees around the X-axis.
+            glm::mat4 rotationMatrix = glm::rotate(glm::mat4(1.0f), glm::radians(90.0f), glm::vec3(1.0f, 0.0f, 0.0f));
+            modifiedObject.orientation = rotationMatrix * renderObject.orientation;
+        }
+        // Then, transform them to the world space using the position and orientation
+        glm::vec4 worldTopLeft = modifiedObject.orientation * topLeft + modifiedObject.position;
+        RAYX_LOG << "World top left: " << worldTopLeft.x << ", " << worldTopLeft.y << ", " << worldTopLeft.z;
+        glm::vec4 worldTopRight = modifiedObject.orientation * topRight + modifiedObject.position;
+        RAYX_LOG << "World top right: " << worldTopRight.x << ", " << worldTopRight.y << ", " << worldTopRight.z;
+        glm::vec4 worldBottomLeft = modifiedObject.orientation * bottomLeft + modifiedObject.position;
+        RAYX_LOG << "World bottom left: " << worldBottomLeft.x << ", " << worldBottomLeft.y << ", " << worldBottomLeft.z;
+        glm::vec4 worldBottomRight = modifiedObject.orientation * bottomRight + modifiedObject.position;
+        RAYX_LOG << "World bottom right: " << worldBottomRight.x << ", " << worldBottomRight.y << ", " << worldBottomRight.z;
+
+        glm::vec4 white = {1.0f, 1.0f, 1.0f, 1.0f};
+        glm::vec4 black = {0.0f, 0.0f, 0.0f, 1.0f};
+
+        // Define your base colors
+        glm::vec4 blueBase = {0.0f, 0.0f, 1.0f, 1.0f};
+        glm::vec4 redBase = {1.0f, 0.0f, 0.0f, 1.0f};
+        glm::vec4 greenBase = {0.0f, 1.0f, 0.0f, 1.0f};
+
+        glm::vec4 tl, tr, bl, br;
+        if (renderObject.position.z > 100) {
+            RAYX_LOG << "Element: " << renderObject.name;
+        }
+        // Define color variations based on object type
+        if (renderObject.type == 0) {               // Plane Mirror is green
+            tl = glm::mix(greenBase, white, 0.4f);  // make it 40% lighter
+            tr = greenBase;
+            bl = greenBase;
+            br = glm::mix(greenBase, black, 0.6f);  // make it 60% darker
+        } else if (renderObject.type == 10) {       // Image plane is blue
+            tl = glm::mix(blueBase, white, 0.4f);   // make it 40% lighter
+            tr = blueBase;
+            bl = blueBase;
+            br = glm::mix(blueBase, black, 0.6f);  // make it 60% darker
+        } else {                                   // rest is red for now
+            tl = glm::mix(redBase, white, 0.4f);   // make it 40% lighter
+            tr = redBase;
+            bl = redBase;
+            br = glm::mix(redBase, black, 0.6f);  // make it 60% darker
+        }
+
+        // Create the vertices
+        Vertex v1(worldBottomLeft, bl);
+        Vertex v2(worldTopLeft, tl);
+        Vertex v3(worldBottomRight, br);
+        addTriangle(v1, v2, v3);
+        Vertex v4(worldTopRight, tr);
+        addTriangle(v2, v3, v4);
     }
-    auto width = rect.m_size_x1;
-    auto height = rect.m_size_x2;
+}
 
-    // Calculate two triangle from the position, orientation and size of the render object
-    // Assume the rectangle is in the XZ plane, and its center is at position.
+std::vector<Scene::Triangle> Scene::trianglesFromQuadric(const RAYX::RenderObject& renderObject) {
+    // Define the size and resolution of the grid
+    double scalarGrid[GRIDSIZE][GRIDSIZE][GRIDSIZE];
 
-    // First, calculate the corners of the rectangle in the model's local space
-    glm::vec4 topLeft(-width / 2.0f, 0, height / 2.0f, 1.0f);
-    glm::vec4 topRight(width / 2.0f, 0, height / 2.0f, 1.0f);
-    glm::vec4 bottomLeft(-width / 2.0f, 0, -height / 2.0f, 1.0f);
-    glm::vec4 bottomRight(width / 2.0f, 0, -height / 2.0f, 1.0f);
-
-    RAYX::RenderObject modifiedObject = renderObject;
-    // Check if the current object is an image plane.
-    if (renderObject.type == 10) {
-        // Rotate by 90 degrees around the X-axis.
-        glm::mat4 rotationMatrix = glm::rotate(glm::mat4(1.0f), glm::radians(90.0f), glm::vec3(1.0f, 0.0f, 0.0f));
-        modifiedObject.orientation = rotationMatrix * renderObject.orientation;
-    }
-    // Then, transform them to the world space using the position and orientation
-    glm::vec4 worldTopLeft = modifiedObject.orientation * topLeft + modifiedObject.position;
-    RAYX_LOG << "World top left: " << worldTopLeft.x << ", " << worldTopLeft.y << ", " << worldTopLeft.z;
-    glm::vec4 worldTopRight = modifiedObject.orientation * topRight + modifiedObject.position;
-    RAYX_LOG << "World top right: " << worldTopRight.x << ", " << worldTopRight.y << ", " << worldTopRight.z;
-    glm::vec4 worldBottomLeft = modifiedObject.orientation * bottomLeft + modifiedObject.position;
-    RAYX_LOG << "World bottom left: " << worldBottomLeft.x << ", " << worldBottomLeft.y << ", " << worldBottomLeft.z;
-    glm::vec4 worldBottomRight = modifiedObject.orientation * bottomRight + modifiedObject.position;
-    RAYX_LOG << "World bottom right: " << worldBottomRight.x << ", " << worldBottomRight.y << ", " << worldBottomRight.z;
-
-    glm::vec4 white = {1.0f, 1.0f, 1.0f, 1.0f};
-    glm::vec4 black = {0.0f, 0.0f, 0.0f, 1.0f};
-
-    // Define your base colors
-    glm::vec4 blueBase = {0.0f, 0.0f, 1.0f, 1.0f};
-    glm::vec4 redBase = {1.0f, 0.0f, 0.0f, 1.0f};
-    glm::vec4 greenBase = {0.0f, 1.0f, 0.0f, 1.0f};
-
-    glm::vec4 tl, tr, bl, br;
-
-    // Define color variations based on object type
-    if (renderObject.type == 0) {               // Plane Mirror is green
-        tl = glm::mix(greenBase, white, 0.4f);  // make it 40% lighter
-        tr = greenBase;
-        bl = greenBase;
-        br = glm::mix(greenBase, black, 0.6f);  // make it 60% darker
-    } else if (renderObject.type == 10) {       // Image plane is blue
-        tl = glm::mix(blueBase, white, 0.4f);   // make it 40% lighter
-        tr = blueBase;
-        bl = blueBase;
-        br = glm::mix(blueBase, black, 0.6f);  // make it 60% darker
-    } else {                                   // rest is red for now
-        tl = glm::mix(redBase, white, 0.4f);   // make it 40% lighter
-        tr = redBase;
-        bl = redBase;
-        br = glm::mix(redBase, black, 0.6f);  // make it 60% darker
+    // 1. Sample the 3D space
+    for (int x = 0; x < GRIDSIZE; x++) {
+        for (int y = 0; y < GRIDSIZE; y++) {
+            for (int z = 0; z < GRIDSIZE; z++) {
+                glm::vec4 pos(x, y, z, 1);
+                double value = evaluateQuadricAtPosition(renderObject.surface, pos);
+                scalarGrid[x][y][z] = value;
+            }
+        }
     }
 
-    // Create the vertices
-    Vertex v1(worldBottomLeft, bl);
-    Vertex v2(worldTopLeft, tl);
-    Vertex v3(worldBottomRight, br);
-    addTriangle(v1, v2, v3);
-    Vertex v4(worldTopRight, tr);
-    addTriangle(v2, v3, v4);
+    // 2. March through each voxel
+    std::vector<Triangle> triangles;
+    for (int x = 0; x < GRIDSIZE - 1; x++) {
+        for (int y = 0; y < GRIDSIZE - 1; y++) {
+            for (int z = 0; z < GRIDSIZE - 1; z++) {
+                int caseIndex = determineMarchingCubesCase(scalarGrid, x, y, z);
+                std::vector<Triangle> voxelTriangles = lookupTrianglesForCase(caseIndex);
+                triangles.insert(triangles.end(), voxelTriangles.begin(), voxelTriangles.end());
+            }
+        }
+    }
+
+    return triangles;
+}
+
+double Scene::evaluateQuadricAtPosition(const double surface[16], const glm::vec4& pos) {
+    // Convert the surface array to a glm::mat4.
+    glm::mat4 surfaceMatrix(surface[0], surface[1], surface[2], surface[3], surface[4], surface[5], surface[6], surface[7], surface[8], surface[9],
+                            surface[10], surface[11], surface[12], surface[13], surface[14], surface[15]);
+
+    glm::vec4 resultVec = pos * surfaceMatrix;
+    double result = glm::dot(resultVec, pos);
+
+    return result;
+}
+
+int Scene::determineMarchingCubesCase(const double scalarGrid[GRIDSIZE][GRIDSIZE][GRIDSIZE], int x, int y, int z) {
+    // Based on the scalar values at the voxel corners, determine the index for the lookup tables.
+    int cubeIndex = 0;
+    if (scalarGrid[x][y][z] < 0) cubeIndex |= 1;
+    if (scalarGrid[x + 1][y][z] < 0) cubeIndex |= 2;
+    if (scalarGrid[x + 1][y][z + 1] < 0) cubeIndex |= 4;
+    if (scalarGrid[x][y][z + 1] < 0) cubeIndex |= 8;
+    if (scalarGrid[x][y + 1][z] < 0) cubeIndex |= 16;
+    if (scalarGrid[x + 1][y + 1][z] < 0) cubeIndex |= 32;
+    if (scalarGrid[x + 1][y + 1][z + 1] < 0) cubeIndex |= 64;
+    if (scalarGrid[x][y + 1][z + 1] < 0) cubeIndex |= 128;
+
+    return cubeIndex;
+}
+
+std::vector<Scene::Triangle> Scene::lookupTrianglesForCase(int caseIndex) {
+    // Using the triTable to generate the triangles for the voxel.
+
+    std::vector<Triangle> triangles;
+
+    // triTable[caseIndex] provides the edges to be connected for the triangles.
+    // Every 3 indices in the table make up a triangle.
+    for (int i = 0; triTable[caseIndex][i] != -1; i += 3) {
+        Scene::Triangle triangle;
+
+        // Convert edge indices to vertices
+        triangle.vertices[0] = interpolateVertex(triTable[caseIndex][i]);
+        triangle.vertices[1] = interpolateVertex(triTable[caseIndex][i + 1]);
+        triangle.vertices[2] = interpolateVertex(triTable[caseIndex][i + 2]);
+
+        triangles.push_back(triangle);
+    }
+
+    return triangles;
+}
+
+Vertex Scene::interpolateVertex(int edgeIndex) {
+    // Here, we'd interpolate between the two voxel corners that the edge connects.
+    // This function should return the vertex position on the edge where the surface intersects.
+    // The exact interpolation might depend on the scalar values at the voxel corners.
+    // This is a placeholder function. The actual function would involve more logic to determine the exact position.
+    Vertex v;
+    v.pos = glm::vec3(0, 0, 0);  // Placeholder value
+    return v;
 }
 
 void Scene::draw(VkCommandBuffer commandBuffer, Topography topography) const {
