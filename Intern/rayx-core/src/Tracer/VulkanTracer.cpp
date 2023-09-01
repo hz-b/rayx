@@ -150,7 +150,6 @@ BundleHistory VulkanTracer::traceRaw(const TraceRawConfig& cfg) {
 
     auto out = m_engine.runTraceComputeTask({.m_numberOfInvocations = numberOfRays, .maxBounces = (int)cfg.m_elements.size()});
 
-
     m_engine.cleanup();
 
     return out;

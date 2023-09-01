@@ -40,6 +40,7 @@ void Pass::Pipeline::createPipelineLayout(VkDescriptorSetLayout* setLayouts) {
     pipelineLayoutCreateInfo.pushConstantRangeCount = 1;  // One struct of pushConstants
 
     checkVkResult(vkCreatePipelineLayout(m_device, &pipelineLayoutCreateInfo, nullptr, &m_pipelineLayout));
+    isCleaned = false;
 }
 
 void Pass::Pipeline::createPipeline() {
@@ -49,7 +50,8 @@ void Pass::Pipeline::createPipeline() {
     auto pipelineCreateInfo = VKINIT::Pipeline::compute_pipeline_create_info(m_pipelineLayout, getPipelineShaderCreateInfo());
     // FIXME(OS): Currently only creates compute pipelines. Pipeline should be general for also other types (E.g Graphics). Move this somewhere else!
     checkVkResult(vkCreateComputePipelines(m_device, nullptr, 1, &pipelineCreateInfo, nullptr, &m_pipeline));
-    RAYX_D_LOG << m_name << "VkPipeline created";
+    isCleaned = false;
+    RAYX_D_LOG << m_name << "_VkPipeline created";
 }
 
 /**

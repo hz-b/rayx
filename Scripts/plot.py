@@ -30,10 +30,10 @@ def importOutput(filename: str):
             names.append(x)
 
         dataset = h5f["rays"]
-        # TODO: Remove extraParam
+        
         df = pd.DataFrame(dataset, columns=['RayId', 'SnapshotID', 'Xloc', 'Yloc', 'Zloc', 'Weight', 'Xdir', 'Ydir', 'Zdir', 'Energy',
                                             'Stokes0', 'Stokes1', 'Stokes2', 'Stokes3', 'pathLength', 'order',
-                                            'lastElement', 'extraParam'])
+                                            'lastElement'])
     df = df[df["Weight"] == W_JUST_HIT_ELEM]
     df = df[["Xloc", "Yloc", "Zloc", "lastElement"]]
     return df, names

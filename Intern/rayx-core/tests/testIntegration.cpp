@@ -57,33 +57,41 @@ TEST_F(TestSuite, Ellipsoid) {
 TEST_F(TestSuite, Slit) {
     auto hist = traceRML("slit");
 
-    // int absorbed = 0;      // number of rays absorbed by the slit.
-    // int pass_through = 0;  // number of rays passing through the slit.
+    int absorbed = 0;      // number of rays absorbed by the slit.
+    int pass_through = 0;  // number of rays passing through the slit.
 
-    // const auto SLIT_ID = 0;
-    // const auto IMAGE_PLANE_ID = 1;
+    const auto SLIT_ID = 0;
+    const auto IMAGE_PLANE_ID = 1;
 
-    // for (auto ray_hist : hist) {
-    //     if (ray_hist.size() == 1) {  // matrix source -> slit absorbed
-    //         CHECK(ray_hist[0].m_lastElement == SLIT_ID);
-    //         CHECK(ray_hist[0].m_eventType == ETYPE_ABSORBED);
-    //         absorbed++;
-    //     } else if (ray_hist.size() == 3) {  // matrix source -> slit -> image plane -> fly off
-    //         CHECK(ray_hist[1].m_lastElement == SLIT_ID);
-    //         CHECK(ray_hist[1].m_eventType == ETYPE_JUST_HIT_ELEM);
+    // Small change:
+    // As all ray_hist are now of length 3.
+    // Absorbed rays are further dispatched to GPU, but gain ETYPE_UNINIT
+    // This can be enhanced later on by allowing BundleHistory to contain vectors of multiple sizes of RayHistory
+    for (auto ray_hist : hist) {
+        CHECK(ray_hist.size() == 3);
 
-    //         CHECK(ray_hist[0].m_lastElement == IMAGE_PLANE_ID);
-    //         CHECK(ray_hist[0].m_eventType == ETYPE_JUST_HIT_ELEM);
+        if (ray_hist[0].m_eventType == ETYPE_ABSORBED) {  // matrix source -> slit absorbed
+            CHECK(ray_hist[0].m_lastElement == SLIT_ID);
 
-    //         CHECK(ray_hist[2].m_eventType == ETYPE_FLY_OFF);
-    //         pass_through++;
-    //     } else {
-    //         CHECK(false);
-    //     }
-    // }
+            CHECK(ray_hist[1].m_eventType == ETYPE_UNINIT);
 
-    // CHECK_EQ(absorbed, 108);
-    // CHECK_EQ(pass_through, 92);
+            CHECK(ray_hist[2].m_eventType == ETYPE_UNINIT);
+            absorbed++;
+        } else if (ray_hist[0].m_eventType == ETYPE_JUST_HIT_ELEM) {  // matrix source -> slit -> image plane -> fly off
+            CHECK(ray_hist[0].m_lastElement == SLIT_ID);
+
+            CHECK(ray_hist[1].m_lastElement == IMAGE_PLANE_ID);
+            CHECK(ray_hist[1].m_eventType == ETYPE_JUST_HIT_ELEM);
+
+            CHECK(ray_hist[2].m_eventType == ETYPE_FLY_OFF);
+            pass_through++;
+        } else {
+            CHECK(false);
+        }
+    }
+
+    CHECK_EQ(absorbed, 108);
+    CHECK_EQ(pass_through, 92);
 }
 
 // TODO re-enable toroid tests

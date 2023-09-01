@@ -4,9 +4,10 @@
 #ifdef GLSL
 void main() {
 #else
-void finalCollision_main() {
+void finalCollision_main() {  // CPU Callback
 #endif
     _ray.m_eventType = ETYPE_UNINIT;
+    _ray.m_padding = 0.0;
 
     if (_rayMeta.finalized) {
         return;  // RETURN FINALIZED

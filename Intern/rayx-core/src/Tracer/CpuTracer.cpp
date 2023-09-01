@@ -50,6 +50,7 @@ BundleHistory CpuTracer::traceRaw(const TraceRawConfig& cfg) {
     CPU_TRACER::rayData.data = rayList;
 
     // Prepare rayMeta data in-between batch traces
+    CPU_TRACER::rayMetaData.data.clear();
     std::vector<RayMeta> rayMeta;
     rayMeta.reserve((size_t)cfg.m_numRays);
     const uint64_t MAX_UINT64 = ~(uint64_t(0));
@@ -76,11 +77,9 @@ BundleHistory CpuTracer::traceRaw(const TraceRawConfig& cfg) {
     // -------------------------------------------------------------------------------------------------------
     {
         RAYX_PROFILE_SCOPE_STDOUT("singleTracePassCPU");
-        RAYX_D_LOG << "Starting 1st Stage";
-
         for (int b = 0; b < maxBounces; b++) {
-            // Run the tracing by for all rays
             CPU_TRACER::pushConstants.i_bounce = b;
+
             // SHADER START
             for (uint i = 0; i < rayList.size(); i++) {
                 CPU_TRACER::gl_GlobalInvocationID = i;
@@ -93,7 +92,6 @@ BundleHistory CpuTracer::traceRaw(const TraceRawConfig& cfg) {
 
             events.push_back(rayOut);
             if (_allFinalized(rayMeta)) {  // Are all rays finished?
-                RAYX_VERB << "All finalized";
                 break;
             }
         }
@@ -104,18 +102,15 @@ BundleHistory CpuTracer::traceRaw(const TraceRawConfig& cfg) {
     {
         RAYX_PROFILE_SCOPE_STDOUT("finalCollisionPassCPU");
         // SHADER START
-        RAYX_D_LOG << "Starting 2nd Stage";
         for (uint i = 0; i < rayList.size(); i++) {
             CPU_TRACER::gl_GlobalInvocationID = i;
             CPU_TRACER::eventRecorded = false;
             CPU_TRACER::finalCollision_main();
-        }  // SHADER END}
+        }  // SHADER END
 
         auto rayOut = CPU_TRACER::rayData.data;  // Fetch Rays back from the Shader "container"
-        RAYX_D_LOG << rayOut.size();
         events.push_back(rayOut);
     }
-    RAYX_D_LOG << events.size();
     return events;
 }
 
