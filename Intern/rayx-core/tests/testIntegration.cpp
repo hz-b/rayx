@@ -63,22 +63,14 @@ TEST_F(TestSuite, Slit) {
     const auto SLIT_ID = 0;
     const auto IMAGE_PLANE_ID = 1;
 
-    // Small change:
-    // As all ray_hist are now of length 3.
-    // Absorbed rays are further dispatched to GPU, but gain ETYPE_UNINIT
-    // This can be enhanced later on by allowing BundleHistory to contain vectors of multiple sizes of RayHistory
     for (auto ray_hist : hist) {
-        CHECK(ray_hist.size() == 3);
-
-        if (ray_hist[0].m_eventType == ETYPE_ABSORBED) {  // matrix source -> slit absorbed
+        if (ray_hist.size() == 1) {  // matrix source -> slit absorbed
             CHECK(ray_hist[0].m_lastElement == SLIT_ID);
-
-            CHECK(ray_hist[1].m_eventType == ETYPE_UNINIT);
-
-            CHECK(ray_hist[2].m_eventType == ETYPE_UNINIT);
+            CHECK(ray_hist[0].m_eventType == ETYPE_ABSORBED);
             absorbed++;
-        } else if (ray_hist[0].m_eventType == ETYPE_JUST_HIT_ELEM) {  // matrix source -> slit -> image plane -> fly off
+        } else if (ray_hist.size() == 3) {  // matrix source -> slit -> image plane -> fly off
             CHECK(ray_hist[0].m_lastElement == SLIT_ID);
+            CHECK(ray_hist[0].m_eventType == ETYPE_JUST_HIT_ELEM);
 
             CHECK(ray_hist[1].m_lastElement == IMAGE_PLANE_ID);
             CHECK(ray_hist[1].m_eventType == ETYPE_JUST_HIT_ELEM);

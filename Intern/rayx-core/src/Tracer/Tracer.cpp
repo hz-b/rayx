@@ -70,7 +70,7 @@ BundleHistory Tracer::trace(const Beamline& b, uint64_t max_batch_size) {
                 snapshots.reserve(maxSnapshots);
                 for (uint j = 0; j < maxSnapshots; j++) {
                     Ray r = rawBatchHistory[j][i];
-                    if (r.m_eventType != ETYPE_NOT_ENOUGH_BOUNCES) {
+                    if (r.m_eventType != ETYPE_UNINIT) {
                         snapshots.push_back(r);
                     }
                 }
