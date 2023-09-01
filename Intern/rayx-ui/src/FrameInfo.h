@@ -66,7 +66,7 @@ class CameraController {
         lastMouseX = mouseX;
         lastMouseY = mouseY;
 
-        updateDirection(0.1f * deltaX, 0.1f * deltaY);
+        updateDirection(0.1f * deltaX, -0.1f * deltaY);
     }
 
     void update(Camera& cam, float aspectRatio) {

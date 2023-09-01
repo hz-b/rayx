@@ -63,58 +63,14 @@ void Scene::addLine(const Vertex v1, const Vertex v2) {
 }
 
 void Scene::fromRenderObject(const RAYX::RenderObject& renderObject) {
-    RectCutout rect;
-    if (renderObject.cutout.m_type == 0)  // specific size
-    {
-        rect = deserializeRect(renderObject.cutout);
-    } else if (renderObject.cutout.m_type == 3) {  // infinite size
-        RAYX_LOG << "Infinite cutout detected!";
-        rect.m_size_x1 = 100.0f;
-        rect.m_size_x2 = 100.0f;
-    } else {
-        RAYX_LOG << "Unsupported cutout type!";
-        rect.m_size_x1 = 50.0f;
-        rect.m_size_x2 = 50.0f;
-    }
-    auto width = rect.m_size_x1;
-    auto height = rect.m_size_x2;
-
-    // Calculate two triangle from the position, orientation and size of the render object
-    // Assume the rectangle is in the XZ plane, and its center is at position.
-
-    // First, calculate the corners of the rectangle in the model's local space
-    glm::vec4 topLeft(-width / 2.0f, 0, height / 2.0f, 1.0f);
-    glm::vec4 topRight(width / 2.0f, 0, height / 2.0f, 1.0f);
-    glm::vec4 bottomLeft(-width / 2.0f, 0, -height / 2.0f, 1.0f);
-    glm::vec4 bottomRight(width / 2.0f, 0, -height / 2.0f, 1.0f);
-
-    RAYX::RenderObject modifiedObject = renderObject;
-    // Check if the current object is an image plane.
-    if (renderObject.type == 10) {
-        // Rotate by 90 degrees around the X-axis.
-        glm::mat4 rotationMatrix = glm::rotate(glm::mat4(1.0f), glm::radians(90.0f), glm::vec3(1.0f, 0.0f, 0.0f));
-        modifiedObject.orientation = rotationMatrix * renderObject.orientation;
-    }
-    // Then, transform them to the world space using the position and orientation
-    glm::vec4 worldTopLeft = modifiedObject.orientation * topLeft + modifiedObject.position;
-    RAYX_LOG << "World top left: " << worldTopLeft.x << ", " << worldTopLeft.y << ", " << worldTopLeft.z;
-    glm::vec4 worldTopRight = modifiedObject.orientation * topRight + modifiedObject.position;
-    RAYX_LOG << "World top right: " << worldTopRight.x << ", " << worldTopRight.y << ", " << worldTopRight.z;
-    glm::vec4 worldBottomLeft = modifiedObject.orientation * bottomLeft + modifiedObject.position;
-    RAYX_LOG << "World bottom left: " << worldBottomLeft.x << ", " << worldBottomLeft.y << ", " << worldBottomLeft.z;
-    glm::vec4 worldBottomRight = modifiedObject.orientation * bottomRight + modifiedObject.position;
-    RAYX_LOG << "World bottom right: " << worldBottomRight.x << ", " << worldBottomRight.y << ", " << worldBottomRight.z;
-
+    // Define your base colors
     glm::vec4 white = {1.0f, 1.0f, 1.0f, 1.0f};
     glm::vec4 black = {0.0f, 0.0f, 0.0f, 1.0f};
-
-    // Define your base colors
     glm::vec4 blueBase = {0.0f, 0.0f, 1.0f, 1.0f};
     glm::vec4 redBase = {1.0f, 0.0f, 0.0f, 1.0f};
     glm::vec4 greenBase = {0.0f, 1.0f, 0.0f, 1.0f};
-
+    // Define the colors of the corners of the triangles
     glm::vec4 tl, tr, bl, br;
-
     // Define color variations based on object type
     if (renderObject.type == 0) {               // Plane Mirror is green
         tl = glm::mix(greenBase, white, 0.4f);  // make it 40% lighter
@@ -133,12 +89,47 @@ void Scene::fromRenderObject(const RAYX::RenderObject& renderObject) {
         br = glm::mix(redBase, black, 0.6f);  // make it 60% darker
     }
 
+    glm::vec4 topLeft, topRight, bottomLeft, bottomRight;
+    if (renderObject.cutout.m_type == 2) {  // trapzoid
+        TrapezoidCutout trapez = deserializeTrapezoid(renderObject.cutout);
+
+        topLeft = {-trapez.m_sizeA_x1 / 2.0f, 0, trapez.m_size_x2 / 2.0f, 1.0f};
+        topRight = {trapez.m_sizeA_x1 / 2.0f, 0, trapez.m_size_x2 / 2.0f, 1.0f};
+        bottomLeft = {-trapez.m_sizeB_x1 / 2.0f, 0, -trapez.m_size_x2 / 2.0f, 1.0f};
+        bottomRight = {trapez.m_sizeB_x1 / 2.0f, 0, -trapez.m_size_x2 / 2.0f, 1.0f};
+    } else {  // rectangle, unlimited, elliptical (treat all as rectangles)
+
+        double width, height;
+        if (renderObject.cutout.m_type == 3 || renderObject.cutout.m_type == 1) {  // unlimited or elliptical
+            width = 100.0f;
+            height = 100.0f;
+        } else {  // rectangle
+            RectCutout rect = deserializeRect(renderObject.cutout);
+            width = rect.m_size_x1;
+            height = rect.m_size_x2;
+        }
+
+        // Calculate two triangle from the position, orientation and size of the render object
+        // Assume the rectangle is in the XZ plane, and its center is at position.
+        // First, calculate the corners of the rectangle in the model's local space
+        topLeft = {-width / 2.0f, 0, height / 2.0f, 1.0f};
+        topRight = {width / 2.0f, 0, height / 2.0f, 1.0f};
+        bottomLeft = {-width / 2.0f, 0, -height / 2.0f, 1.0f};
+        bottomRight = {width / 2.0f, 0, -height / 2.0f, 1.0f};
+    }
+
+    // To world coordinates
+    glm::vec4 worldTopLeft = renderObject.orientation * topLeft + renderObject.position;
+    glm::vec4 worldTopRight = renderObject.orientation * topRight + renderObject.position;
+    glm::vec4 worldBottomLeft = renderObject.orientation * bottomLeft + renderObject.position;
+    glm::vec4 worldBottomRight = renderObject.orientation * bottomRight + renderObject.position;
+
     // Create the vertices
-    Vertex v1(worldBottomLeft, bl);
-    Vertex v2(worldTopLeft, tl);
-    Vertex v3(worldBottomRight, br);
+    Vertex v1 = {{worldTopLeft.x, worldTopLeft.y, worldTopLeft.z}, tl};
+    Vertex v2 = {{worldTopRight.x, worldTopRight.y, worldTopRight.z}, tr};
+    Vertex v3 = {{worldBottomLeft.x, worldBottomLeft.y, worldBottomLeft.z}, bl};
+    Vertex v4 = {{worldBottomRight.x, worldBottomRight.y, worldBottomRight.z}, br};
     addTriangle(v1, v2, v3);
-    Vertex v4(worldTopRight, tr);
     addTriangle(v2, v3, v4);
 }
 
