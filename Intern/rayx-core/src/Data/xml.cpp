@@ -544,7 +544,7 @@ Cutout Parser::parseCutout() const {
         TrapezoidCutout trapezoid;
         trapezoid.m_sizeA_x1 = parseTotalWidth();
         trapezoid.m_sizeB_x1 = parseDouble("totalWidthB");
-        trapezoid.m_size_x2 = parseTotalHeight();
+        trapezoid.m_size_x2 = parseTotalLength();
 
         return serializeTrapezoid(trapezoid);
     } else {
@@ -578,7 +578,7 @@ double Parser::parseImageType() const {
         RAYX_ERR << "Cannot determine image type!";
     }
 
-    return (double) imageType_int;
+    return (double)imageType_int;
 }
 
 }  // namespace RAYX::xml

@@ -106,9 +106,10 @@ Application::~Application() {}
 
 void Application::run() {
     // Get the render data
-    auto vec = RAYX::RenderObjectVec(RAYX::getRenderData("DoubleMirror.rml"));
+    std::string path = "MultiRZP_101_0.00203483_groupedCCD";
+    auto vec = RAYX::RenderObjectVec(RAYX::getRenderData(std::string(path + ".rml")));
     RAYX::BundleHistory rays;
-    readH5(rays, "DoubleMirror.h5", FULL_FORMAT);
+    readH5(rays, std::string(path + ".h5"), FULL_FORMAT);
     m_Scene.setup(vec, rays);
 
     glfwSetKeyCallback(m_Window.window(), keyCallback);
