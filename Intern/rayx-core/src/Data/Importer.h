@@ -9,6 +9,7 @@ namespace RAYX {
 struct RAYX_API RenderObject {
     std::string name;
     int type;
+    double surface[16];
     glm::vec4 position;
     glm::mat4 orientation;
     Cutout cutout;

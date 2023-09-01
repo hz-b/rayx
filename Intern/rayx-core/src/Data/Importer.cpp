@@ -103,7 +103,9 @@ RenderObjectVec getRenderData(const std::filesystem::path& filename) {
         }
         dmat4 outTrans = element.m_element.m_outTrans;
         d.position = dvec4(outTrans[3][0], outTrans[3][1], outTrans[3][2], 1.0);
-
+        for (int i = 0; i < 16; i++) {
+            d.surface[i] = element.m_element.m_surface.m_params[i];
+        }
         dmat4 rotation;
         rotation[0] = dvec4(outTrans[0][0], outTrans[0][1], outTrans[0][2], 0.0);
         rotation[1] = dvec4(outTrans[1][0], outTrans[1][1], outTrans[1][2], 0.0);
