@@ -150,6 +150,7 @@ void Application::run() {
         auto newTime = std::chrono::high_resolution_clock::now();
         float frameTime = std::chrono::duration<float, std::chrono::seconds::period>(newTime - currentTime).count();
         currentTime = newTime;
+        // TODO: ImGui layer should not be in renderer class (maybe its own render system)
         m_Renderer.updateImGui(camController, frameTime);
 
         if (auto commandBuffer = m_Renderer.beginFrame()) {

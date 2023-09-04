@@ -10,14 +10,6 @@ void Scene::setup(const RAYX::RenderObjectVec& renderObjects, const RAYX::Bundle
         fromRenderObject(renderObject);
     }
 
-    // Event types:
-    // const double ETYPE_FLY_OFF = 0;       --> World coordinates
-    // const double ETYPE_JUST_HIT_ELEM = 1; --> Element coordinates
-    // const double ETYPE_ABSORBED = 3;      --> Element coordinates
-    // Rest are error codes
-    glm::vec3 yellow = {1.0f, 1.0f, 0.0f};
-    glm::vec3 blue = {0.0f, 0.0f, 1.0f};
-    glm::vec3 red = {1.0f, 0.0f, 0.0f};
     for (const auto& rayHist : bundleHistory) {
         glm::vec3 rayLastPos = {0.0f, 0.0f, 0.0f};
         for (const auto& event : rayHist) {
@@ -29,12 +21,12 @@ void Scene::setup(const RAYX::RenderObjectVec& renderObjects, const RAYX::Bundle
                 glm::dmat4 outTrans = RAYX::calcTransformationMatrices(lastElementPos, lastElementOri, false);
                 glm::vec4 worldPos = outTrans * glm::vec4(event.m_position, 1.0f);
 
-                Vertex origin = {{rayLastPos.x, rayLastPos.y, rayLastPos.z}, yellow};
+                Vertex origin = {{rayLastPos.x, rayLastPos.y, rayLastPos.z}, m_yellow};
                 Vertex point;
                 if (event.m_eventType == ETYPE_JUST_HIT_ELEM) {
-                    point = {{worldPos.x, worldPos.y, worldPos.z}, yellow};
+                    point = {{worldPos.x, worldPos.y, worldPos.z}, m_yellow};
                 } else {
-                    point = {{worldPos.x, worldPos.y, worldPos.z}, red};
+                    point = {{worldPos.x, worldPos.y, worldPos.z}, m_red};
                 }
                 addLine(origin, point);
 
@@ -47,8 +39,8 @@ void Scene::setup(const RAYX::RenderObjectVec& renderObjects, const RAYX::Bundle
                 glm::vec3 eventDir = event.m_direction;
                 glm::vec3 pointPos = eventPos + eventDir * 1000.0f;
 
-                Vertex origin = {{eventPos.x, eventPos.y, eventPos.z}, blue};
-                Vertex point = {{pointPos.x, pointPos.y, pointPos.z}, blue};
+                Vertex origin = {{eventPos.x, eventPos.y, eventPos.z}, m_blue};
+                Vertex point = {{pointPos.x, pointPos.y, pointPos.z}, m_blue};
                 addLine(origin, point);
             }
         }
@@ -69,32 +61,6 @@ void Scene::addLine(const Vertex v1, const Vertex v2) {
 }
 
 void Scene::fromRenderObject(const RAYX::RenderObject& renderObject) {
-    // Define your base colors
-    glm::vec4 white = {1.0f, 1.0f, 1.0f, 1.0f};
-    glm::vec4 black = {0.0f, 0.0f, 0.0f, 1.0f};
-    glm::vec4 blueBase = {0.0f, 0.0f, 1.0f, 1.0f};
-    glm::vec4 redBase = {1.0f, 0.0f, 0.0f, 1.0f};
-    glm::vec4 greenBase = {0.0f, 1.0f, 0.0f, 1.0f};
-    // Define the colors of the corners of the triangles
-    glm::vec4 tl, tr, bl, br;
-    // Define color variations based on object type
-    if (renderObject.type == 0) {               // Plane Mirror is green
-        tl = glm::mix(greenBase, white, 0.4f);  // make it 40% lighter
-        tr = greenBase;
-        bl = greenBase;
-        br = glm::mix(greenBase, black, 0.6f);  // make it 60% darker
-    } else if (renderObject.type == 10) {       // Image plane is blue
-        tl = glm::mix(blueBase, white, 0.4f);   // make it 40% lighter
-        tr = blueBase;
-        bl = blueBase;
-        br = glm::mix(blueBase, black, 0.6f);  // make it 60% darker
-    } else {                                   // rest is red for now
-        tl = glm::mix(redBase, white, 0.4f);   // make it 40% lighter
-        tr = redBase;
-        bl = redBase;
-        br = glm::mix(redBase, black, 0.6f);  // make it 60% darker
-    }
-
     glm::vec4 topLeft, topRight, bottomLeft, bottomRight;
     if (renderObject.cutout.m_type == 2) {  // trapzoid
         TrapezoidCutout trapez = deserializeTrapezoid(renderObject.cutout);
@@ -138,10 +104,10 @@ void Scene::fromRenderObject(const RAYX::RenderObject& renderObject) {
     glm::vec4 worldBottomRight = modifiedObject.orientation * bottomRight + modifiedObject.position;
 
     // Create the vertices
-    Vertex v1 = {{worldTopLeft.x, worldTopLeft.y, worldTopLeft.z}, tl};
-    Vertex v2 = {{worldTopRight.x, worldTopRight.y, worldTopRight.z}, tr};
-    Vertex v3 = {{worldBottomLeft.x, worldBottomLeft.y, worldBottomLeft.z}, bl};
-    Vertex v4 = {{worldBottomRight.x, worldBottomRight.y, worldBottomRight.z}, br};
+    Vertex v1 = {{worldTopLeft.x, worldTopLeft.y, worldTopLeft.z}, m_lighterGreen};
+    Vertex v2 = {{worldTopRight.x, worldTopRight.y, worldTopRight.z}, m_greenBase};
+    Vertex v3 = {{worldBottomLeft.x, worldBottomLeft.y, worldBottomLeft.z}, m_greenBase};
+    Vertex v4 = {{worldBottomRight.x, worldBottomRight.y, worldBottomRight.z}, m_darkerGreen};
     addTriangle(v1, v2, v3);
     addTriangle(v2, v3, v4);
 }
@@ -213,9 +179,9 @@ std::vector<Scene::Triangle> Scene::lookupTrianglesForCase(int caseIndex) {
         Scene::Triangle triangle;
 
         // Convert edge indices to vertices
-        triangle.vertices[0] = interpolateVertex(triTable[caseIndex][i]);
-        triangle.vertices[1] = interpolateVertex(triTable[caseIndex][i + 1]);
-        triangle.vertices[2] = interpolateVertex(triTable[caseIndex][i + 2]);
+        triangle.vertices[0] = interpolateVertex(/*triTable[caseIndex][i]*/);
+        triangle.vertices[1] = interpolateVertex(/*triTable[caseIndex][i + 1]*/);
+        triangle.vertices[2] = interpolateVertex(/*triTable[caseIndex][i + 2]*/);
 
         triangles.push_back(triangle);
     }
@@ -223,7 +189,7 @@ std::vector<Scene::Triangle> Scene::lookupTrianglesForCase(int caseIndex) {
     return triangles;
 }
 
-Vertex Scene::interpolateVertex(int edgeIndex) {
+Vertex Scene::interpolateVertex(/* int edgeIndex */) {
     // Here, we'd interpolate between the two voxel corners that the edge connects.
     // This function should return the vertex position on the edge where the surface intersects.
     // The exact interpolation might depend on the scalar values at the voxel corners.

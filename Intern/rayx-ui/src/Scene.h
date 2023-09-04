@@ -43,6 +43,7 @@ struct Vertex {
     }
 };
 
+// TODO: Refactor, so that Scene can be changed dynamically (currently, it is only set up once before rendering)
 class Scene {
   public:
     enum Topography { TRIA_TOPOGRAPHY = 0, LINE_TOPOGRAPHY = 1 };
@@ -57,20 +58,25 @@ class Scene {
     Scene(const Scene&) = delete;
     Scene& operator=(const Scene&) = delete;
 
+    // Base functions
     void setup(const RAYX::RenderObjectVec& renderObjects, const RAYX::BundleHistory& bundleHistory);
     void addTriangle(const Vertex v1, const Vertex v2, const Vertex v3);
     void addLine(const Vertex v1, const Vertex v2);
     void fromRenderObject(const RAYX::RenderObject& renderObject);
+
+    // Marching Cubes // TODO: Move to own class
     std::vector<Triangle> trianglesFromQuadric(const RAYX::RenderObject& renderObject);
     double evaluateQuadricAtPosition(const double surface[16], const glm::vec4& pos);
     int determineMarchingCubesCase(const double scalarGrid[GRIDSIZE][GRIDSIZE][GRIDSIZE], int x, int y, int z);
     std::vector<Triangle> lookupTrianglesForCase(int caseIndex);
-    Vertex interpolateVertex(int edgeIndex);
+    Vertex interpolateVertex(/* int edgeIndex */);
 
+    // Buffers and drawing
     void updateBuffers();
     void bind(VkCommandBuffer commandBuffer, Topography topography) const;
     void draw(VkCommandBuffer commandBuffer, Topography topography) const;
 
+    // Getters
     const std::vector<Vertex>& getVertices() const { return m_vertices; }
     const std::vector<uint32_t>& getIndices(Topography topography) const { return m_indices[topography]; }
     const size_t getIndexCount(Topography topography) const { return m_indices[topography].size(); }
@@ -92,6 +98,15 @@ class Scene {
     void updateVertexBuffer();
     void updateIndexBuffers();
 
+    // Colors
+    const glm::vec4 m_greenBase = {0.0f, 1.0f, 0.0f, 1.0f};
+    const glm::vec4 m_darkerGreen = {0.0f, 0.5f, 0.0f, 1.0f};
+    const glm::vec4 m_lighterGreen = {0.4f, 1.0f, 0.4f, 1.0f};
+    const glm::vec4 m_yellow = {1.0f, 1.0f, 0.0f, 1.0f};
+    const glm::vec4 m_blue = {0.0f, 0.0f, 1.0f, 1.0f};
+    const glm::vec4 m_red = {1.0f, 0.0f, 0.0f, 1.0f};
+
+    // Marching Cubes
     int edgeTable[256] = {
         0x0,   0x109, 0x203, 0x30a, 0x406, 0x50f, 0x605, 0x70c, 0x80c, 0x905, 0xa0f, 0xb06, 0xc0a, 0xd03, 0xe09, 0xf00, 0x190, 0x99,  0x393, 0x29a,
         0x596, 0x49f, 0x795, 0x69c, 0x99c, 0x895, 0xb9f, 0xa96, 0xd9a, 0xc93, 0xf99, 0xe90, 0x230, 0x339, 0x33,  0x13a, 0x636, 0x73f, 0x435, 0x53c,
