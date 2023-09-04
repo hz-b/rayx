@@ -7,6 +7,7 @@ void checkVkResult(VkResult result, const char* message) {
     }
 }
 
+// ---- ImGuiLayer ----
 ImGuiLayer::ImGuiLayer(const Window& window, const Device& device, const SwapChain& swapchain) : m_Window(window), m_Device(device) {
     // Create descriptor pool for IMGUI
     VkDescriptorPoolSize poolSizes[] = {{VK_DESCRIPTOR_TYPE_SAMPLER, 1000},
@@ -150,20 +151,56 @@ void ImGuiLayer::updateImGui(CameraController& camController, float frameTime) {
         ImGui::ColorEdit3("Color", (float*)&m_ClearColor);  // Edit 3 floats representing a color
 
         ImGui::Text("Camera");
-        ImGui::SliderFloat("FOV", &camController.config.FOV, 0.0f, 180.0f);
-        ImGui::SliderFloat("Up X", &camController.up.x, -1.0f, 1.0f);  // Slider for Up vector x-coordinate
-        ImGui::SliderFloat("Up Y", &camController.up.y, -1.0f, 1.0f);  // Slider for Up vector y-coordinate
-        ImGui::SliderFloat("Up Z", &camController.up.z, -1.0f, 1.0f);  // Slider for Up vector z-coordinate
-        ImGui::SliderFloat("Near", &camController.config.near, 0.0f, 100.0f);
-        ImGui::SliderFloat("Far", &camController.config.far, 0.0f, 10000.0f);
+        ImGui::SliderFloat("FOV", &camController.m_config.FOV, 0.0f, 180.0f);
+        ImGui::SliderFloat("Up X", &camController.m_up.x, -1.0f, 1.0f);  // Slider for Up vector x-coordinate
+        ImGui::SliderFloat("Up Y", &camController.m_up.y, -1.0f, 1.0f);  // Slider for Up vector y-coordinate
+        ImGui::SliderFloat("Up Z", &camController.m_up.z, -1.0f, 1.0f);  // Slider for Up vector z-coordinate
+        ImGui::SliderFloat("Near", &camController.m_config.near, 0.0f, 100.0f);
+        ImGui::SliderFloat("Far", &camController.m_config.far, 0.0f, 10000.0f);
 
-        ImGui::Text("Position X: %.1f", camController.position.x);
-        ImGui::Text("Position Y: %.1f", camController.position.y);
-        ImGui::Text("Position Z: %.1f", camController.position.z);
+        static char posStrX[32];
+        snprintf(posStrX, sizeof(posStrX), "%f", camController.m_position.x);
+        if (ImGui::InputText("Position X", posStrX, sizeof(posStrX))) {
+            camController.m_position.x = std::stof(posStrX);
+        }
 
-        ImGui::Text("Direction X: %.1f", camController.direction.x);
-        ImGui::Text("Direction Y: %.1f", camController.direction.y);
-        ImGui::Text("Direction Z: %.1f", camController.direction.z);
+        static char posStrY[32];
+        snprintf(posStrY, sizeof(posStrY), "%f", camController.m_position.y);
+        if (ImGui::InputText("Position Y", posStrY, sizeof(posStrY))) {
+            camController.m_position.y = std::stof(posStrY);
+        }
+
+        static char posStrZ[32];
+        snprintf(posStrZ, sizeof(posStrZ), "%f", camController.m_position.z);
+        if (ImGui::InputText("Position Z", posStrZ, sizeof(posStrZ))) {
+            camController.m_position.z = std::stof(posStrZ);
+        }
+
+        static char dirStrX[32];
+        snprintf(dirStrX, sizeof(dirStrX), "%f", camController.m_direction.x);
+        if (ImGui::InputText("Direction X", dirStrX, sizeof(dirStrX))) {
+            camController.m_direction.x = std::stof(dirStrX);
+        }
+
+        static char dirStrY[32];
+        snprintf(dirStrY, sizeof(dirStrY), "%f", camController.m_direction.y);
+        if (ImGui::InputText("Direction Y", dirStrY, sizeof(dirStrY))) {
+            camController.m_direction.y = std::stof(dirStrY);
+        }
+
+        static char dirStrZ[32];
+        snprintf(dirStrZ, sizeof(dirStrZ), "%f", camController.m_direction.z);
+        if (ImGui::InputText("Direction Z", dirStrZ, sizeof(dirStrZ))) {
+            camController.m_direction.z = std::stof(dirStrZ);
+        }
+
+        if (ImGui::Button("Save Camera")) {
+            SaveCameraControllerToFile(camController, "camera_save.txt");
+        }
+
+        if (ImGui::Button("Load Camera")) {
+            LoadCameraControllerFromFile(camController, "camera_save.txt");
+        }
 
         if (ImGui::Button("Button"))  // Buttons return true when clicked (most widgets return true when edited/activated)
             counter++;
