@@ -68,7 +68,7 @@ int gl_GlobalInvocationID;
         double numRays;
         double randomSeed;
         double maxEvents;
-        bool sequential; // sequential tracing only.
+        double sequential; // sequential tracing only.
     } pushConstants;
 #endif
 

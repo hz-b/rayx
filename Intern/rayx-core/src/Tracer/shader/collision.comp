@@ -281,7 +281,7 @@ Collision findCollisionWith(Ray r, uint id) {
 
 // Returns the next collision for the ray `_ray`.
 Collision findCollision() {
-    if (pushConstants.sequential) {
+    if (pushConstants.sequential == 1.0) {
         if (_ray.m_lastElement >= elements.length()-1) {
             Collision col;
             col.found = false;
