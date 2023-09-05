@@ -893,24 +893,6 @@ Ray RAYX_API refrac_plane(Ray r, ALLOW_UNUSED dvec4 normal,
     return r;
 }
 
-/**
-checks whether the ray is hit by a central beam stopper which may be rectangular
-(width: xStop/yStop) or circular. if so the ray is thrown away. if xStop is
-negative, then a circular shape of radius xStop is assumed (from RAY.FOR)
-@params		x,y				x/y-coord. of ray direction
-            xStop, yStop	shape of beam stopper
-@returns `false` if the ray is stopped, and `true` otherwise
-*/
-bool stopBox(double x, double y, double xStop, double yStop) {
-    if (xStop > 0) {
-        return abs(x) >= xStop || abs(y) >= yStop;
-    } else {
-        double radius =
-            sqrt((x / xStop) * (x / xStop) + (y / yStop) * (y / yStop));
-        return radius > 1;
-    }
-}
-
 /**returns first bessel function of parameter v*/
 double RAYX_API bessel1(double v) {
     if (v < 0.0 || v > 20.0) {
