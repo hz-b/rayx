@@ -1,11 +1,11 @@
 #pragma once
 
 #include <list>
-
+#include <omp.h>
 #include "Beamline/LightSource.h"
 
 namespace RAYX {
-
+#if defined(DIPOLE_OMP)
 struct PsiAndStokes{
     glm::dvec4 stokes;
     double psi; 
@@ -14,11 +14,14 @@ struct PsiAndStokes{
 
 class RAYX_API DipoleSource : public LightSource {
   public:
+    mutable std::vector<double> m_duration;
+
+    mutable omp_lock_t mutex;
+
     DipoleSource(const DesignObject&);
     virtual ~DipoleSource() = default;
 
     std::vector<Ray> getRays() const override;
-
     void calcMagneticField();
     void calcWorldCoordinates();
     void calcSourcePath();
@@ -86,4 +89,8 @@ class RAYX_API DipoleSource : public LightSource {
                                            1.404e-3, 8.131e-4, 4.842e-4, 2.755e-4, 1.611e-4, 9.439e-5, 5.543e-5, 3.262e-5, 1.922e-5};
 
 };
+#endif
+
+
 }  // namespace RAYX
+
