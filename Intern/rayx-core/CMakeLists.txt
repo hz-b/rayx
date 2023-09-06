@@ -1,10 +1,13 @@
 cmake_minimum_required(VERSION 3.15 FATAL_ERROR)
 
 
+
 # ---- Code Coverage ----
 option(BUILD_WITH_COV "Add Code Coverage to build" TRUE)
 if (CMAKE_CXX_COMPILER_ID STREQUAL "Clang" AND CMAKE_BUILD_TYPE STREQUAL "Debug" AND BUILD_WITH_COV)
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fprofile-instr-generate -fcoverage-mapping")
+
+    set_property(TARGET tgt PROPERTY C_STANDARD 11)
     message("Building with llvm-cov support")
 endif()
 # -----------------------
@@ -13,6 +16,27 @@ endif()
 # ---- Add tests ----
 add_subdirectory(tests)
 # -------------------
+
+
+#-----OpenMP--------
+
+if(NOT TARGET OpenMP::OpenMP_CXX)
+    find_package(Threads REQUIRED)
+
+    # Füge die OpenMP-Bibliothek hinzu
+    add_library(OpenMP::OpenMP_CXX IMPORTED INTERFACE)
+    set_property(TARGET OpenMP::OpenMP_CXX
+                 PROPERTY INTERFACE_COMPILE_OPTIONS ${OpenMP_CXX_FLAGS})
+    # Only works if the same flag is passed to the linker; use CMake 3.9+ otherwise (Intel, AppleClang)
+    set_property(TARGET OpenMP::OpenMP_CXX
+                 PROPERTY INTERFACE_LINK_LIBRARIES ${OpenMP_CXX_FLAGS} Threads::Threads)
+
+endif()
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${OpenMP_CXX_FLAGS} -fopenmp")
+#set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS}")
+#set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS}")
+
+#-------------------
 
 
 # ---- Project ----
@@ -28,7 +52,8 @@ if(MSVC)
     target_compile_options(${PROJECT_NAME} PRIVATE /W2 /wd4251) # /WX)
 else()
 	message(STATUS "GCC")
-    target_compile_options(${PROJECT_NAME} PRIVATE -Wall -Wextra -pedantic) #-Werror)
+    target_compile_options(${PROJECT_NAME} PRIVATE -Wall -Wextra -pedantic -fopenmp) #-Werror)
+    set(CMAKE_CXX_LINKER_FLAGS "${CMAKE_CXX_LINKER_FLAGS} -fopenmp -openmp ")
 
     # Enable werror if requested (mostly used for CI)
     if(WERROR STREQUAL "YES")

@@ -52,6 +52,8 @@ void CommandParser::analyzeCommands() {
     if (m_args.m_cpuFlag && m_args.m_BatchSize != 0) {
         RAYX_WARN << "Batching is not supported in CPU mode";
     }
+
+
 }
 
 CommandParser::~CommandParser() = default;

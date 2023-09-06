@@ -4,6 +4,8 @@
 
 // Light Sources
 #include "Beamline/Objects/DipoleSource.h"
+//#include "Beamline/Objects/DipoleSourceOMP.h"
+//#include "Beamline/Objects/DipoleSourcePT.h"
 #include "Beamline/Objects/MatrixSource.h"
 #include "Beamline/Objects/PointSource.h"
 
