@@ -5,7 +5,7 @@
 
 Scene::Scene(Device& device) : m_Device(device) {}
 
-void Scene::setup(const RAYX::RenderObjectVec& renderObjects, const RAYX::BundleHistory& bundleHistory) {
+void Scene::setup(const RenderObjectVec& renderObjects, const RAYX::BundleHistory& bundleHistory) {
     for (const auto& renderObject : renderObjects) {
         fromRenderObject(renderObject);
     }
@@ -60,7 +60,7 @@ void Scene::addLine(const Vertex v1, const Vertex v2) {
     addVertex(v2, LINE_TOPOGRAPHY);
 }
 
-void Scene::fromRenderObject(const RAYX::RenderObject& renderObject) {
+void Scene::fromRenderObject(const RenderObject& renderObject) {
     glm::vec4 topLeft, topRight, bottomLeft, bottomRight;
     if (renderObject.cutout.m_type == 2) {  // trapzoid
         TrapezoidCutout trapez = deserializeTrapezoid(renderObject.cutout);
@@ -89,7 +89,7 @@ void Scene::fromRenderObject(const RAYX::RenderObject& renderObject) {
         bottomLeft = {-width / 2.0f, 0, -height / 2.0f, 1.0f};
         bottomRight = {width / 2.0f, 0, -height / 2.0f, 1.0f};
     }
-    RAYX::RenderObject modifiedObject = renderObject;
+    RenderObject modifiedObject = renderObject;
     // Check if the current object is an image plane.
     if (renderObject.type == 10) {
         // Rotate by 90 degrees around the X-axis.

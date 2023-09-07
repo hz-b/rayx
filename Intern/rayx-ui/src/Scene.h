@@ -11,6 +11,7 @@
 #include "Buffer.h"
 #include "Data/Importer.h"
 #include "Device.h"
+#include "RenderObject.h"
 #include "Tracer/Tracer.h"
 
 struct Vertex {
@@ -58,10 +59,10 @@ class Scene {
     Scene& operator=(const Scene&) = delete;
 
     // Base functions
-    void setup(const RAYX::RenderObjectVec& renderObjects, const RAYX::BundleHistory& bundleHistory);
+    void setup(const RenderObjectVec& renderObjects, const RAYX::BundleHistory& bundleHistory);
     void addTriangle(const Vertex v1, const Vertex v2, const Vertex v3);
     void addLine(const Vertex v1, const Vertex v2);
-    void fromRenderObject(const RAYX::RenderObject& renderObject);
+    void fromRenderObject(const RenderObject& renderObject);
 
     // Buffers and drawing
     void updateBuffers();

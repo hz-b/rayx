@@ -1,7 +1,18 @@
 #pragma once
 #include <glm/glm.hpp>
 #include <vector>
-#define GRID_SIZE 10
+#define GRIDSIZE 10
+
+#include "RenderObject.h"
+
+struct Vertex {
+    glm::vec3 pos;
+    glm::vec3 color;
+};
+
+struct Triangle {
+    Vertex vertices[3];
+};
 
 class TriangleElement {
   public:
@@ -10,13 +21,6 @@ class TriangleElement {
 
     TriangleElement(const TriangleElement&) = delete;
     TriangleElement& operator=(const TriangleElement&) = delete;
-    struct Vertex {
-        glm::vec3 pos;
-        glm::vec3 color;
-    };
-    struct Triangle {
-        Vertex vertices[3];
-    };
 
   private:
     void createVertexVector(const std::vector<Vertex>& vertices);
@@ -28,7 +32,7 @@ class TriangleElement {
     uint32_t indexCount_;
 
     // Marching Cubes // TODO: Move to own class
-    std::vector<Triangle> trianglesFromQuadric(const RAYX::RenderObject& renderObject);
+    std::vector<Triangle> trianglesFromQuadric(const RenderObject& renderObject);
     double evaluateQuadricAtPosition(const double surface[16], const glm::vec4& pos);
     int determineMarchingCubesCase(const double scalarGrid[GRIDSIZE][GRIDSIZE][GRIDSIZE], int x, int y, int z);
     std::vector<Triangle> lookupTrianglesForCase(int caseIndex);

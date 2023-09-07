@@ -15,6 +15,7 @@
 
 #include "Data/Importer.h"
 #include "FrameInfo.h"
+#include "RenderObject.h"
 #include "RenderSystem/LineRenderSystem.h"
 #include "RenderSystem/TriangleRenderSystem.h"
 #include "Writer/H5Writer.h"
@@ -107,7 +108,7 @@ Application::~Application() {}
 void Application::run() {
     // Get the render data
     std::string path = "MultiRZP_101_0.00203483_groupedCCD";
-    auto vec = RAYX::RenderObjectVec(RAYX::getRenderData(std::string(path + ".rml")));
+    auto vec = RenderObjectVec(getRenderData(std::string(path + ".rml")));
     RAYX::BundleHistory rays;
     readH5(rays, std::string(path + ".h5"), FULL_FORMAT);
     m_Scene.setup(vec, rays);

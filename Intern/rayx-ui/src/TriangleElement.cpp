@@ -1,6 +1,6 @@
 #include "TriangleElement.h"
 
-std::vector<Triangle> TriangleElement::trianglesFromQuadric(const RAYX::RenderObject& renderObject) {
+std::vector<Triangle> TriangleElement::trianglesFromQuadric(const RenderObject& renderObject) {
     // Define the size and resolution of the grid
     double scalarGrid[GRIDSIZE][GRIDSIZE][GRIDSIZE];
 
@@ -64,7 +64,7 @@ std::vector<Triangle> TriangleElement::lookupTrianglesForCase(int caseIndex) {
     // triTable[caseIndex] provides the edges to be connected for the triangles.
     // Every 3 indices in the table make up a triangle.
     for (int i = 0; triTable[caseIndex][i] != -1; i += 3) {
-        Scene::Triangle triangle;
+        Triangle triangle;
 
         // Convert edge indices to vertices
         triangle.vertices[0] = interpolateVertex(/*triTable[caseIndex][i]*/);
