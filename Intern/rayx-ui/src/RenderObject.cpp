@@ -31,18 +31,53 @@ RenderObject::RenderObject(const RAYX::OpticalElement& element)
 
 void RenderObject::triangulate() {
     // Create triangle representation
-    if (m_Surface.m_type == STYPE_QUADRIC) {
-        //
-    } else if (m_Surface.m_type == STYPE_TOROID) {
+    if (m_Surface.m_type == STYPE_TOROID) {
         RAYX_ERR << "Toroid not implemented yet";
-    } else if (m_Surface.m_type == STYPE_PLANE_XY) {
-        RectCutout rectCutout = deserializeRect(m_Cutout);
-        double width = rectCutout.m_size_x1;
-        double height = rectCutout.m_size_x2;
-        m_vertices.push_back(Vertex({-width / 2, -height / 2, 0.0f}, m_darkerGreen));
-        m_vertices.push_back(Vertex({width / 2, -height / 2, 0.0f}, m_greenBase));
-        m_vertices.push_back(Vertex({width / 2, height / 2, 0.0f}, m_greenBase));
-        m_vertices.push_back(Vertex({-width / 2, height / 2, 0.0f}, m_darkerGreen));
+    } else if (m_Surface.m_type == STYPE_PLANE_XY || m_Surface.m_type == STYPE_QUADRIC) {  // TODO: Own case for quadric
+        Vertex topLeft, topRight, bottomLeft, bottomRight;
+        if (m_Cutout.m_type == 2) {  // trapzoid
+            TrapezoidCutout trapez = deserializeTrapezoid(m_Cutout);
+
+            topLeft = Vertex(glm::vec4(-trapez.m_sizeA_x1 / 2.0f, 0, trapez.m_size_x2 / 2.0f, 1.0f), m_darkerGreen);
+            topRight = Vertex(glm::vec4(trapez.m_sizeA_x1 / 2.0f, 0, trapez.m_size_x2 / 2.0f, 1.0f), m_greenBase);
+            bottomLeft = Vertex(glm::vec4(-trapez.m_sizeB_x1 / 2.0f, 0, -trapez.m_size_x2 / 2.0f, 1.0f), m_lighterGreen);
+            bottomRight = Vertex(glm::vec4(trapez.m_sizeB_x1 / 2.0f, 0, -trapez.m_size_x2 / 2.0f, 1.0f), m_greenBase);
+        } else {  // rectangle, unlimited, elliptical (treat all as rectangles)
+
+            double width, height;
+            if (m_Cutout.m_type == 3 || m_Cutout.m_type == 1) {  // unlimited or elliptical
+                width = 100.0f;
+                height = 100.0f;
+            } else {  // rectangle
+                RectCutout rect = deserializeRect(m_Cutout);
+                width = rect.m_size_x1;
+                height = rect.m_size_x2;
+            }
+
+            // Calculate two triangle from the position, orientation and size of the render object
+            // Assume the rectangle is in the XZ plane, and its center is at position.
+            // First, calculate the corners of the rectangle in the model's local space
+            topLeft = Vertex(glm::vec4(-width / 2.0f, 0, height / 2.0f, 1.0f), m_darkerGreen);
+            topRight = Vertex(glm::vec4(width / 2.0f, 0, height / 2.0f, 1.0f), m_greenBase);
+            bottomLeft = Vertex(glm::vec4(-width / 2.0f, 0, -height / 2.0f, 1.0f), m_lighterGreen);
+            bottomRight = Vertex(glm::vec4(width / 2.0f, 0, -height / 2.0f, 1.0f), m_greenBase);
+        }
+        // Check if the current object is an image plane.
+        if (m_Behaviour.m_type == 4 || m_Behaviour.m_type == 2) {
+            // Rotate by 90 degrees around the X-axis.
+            glm::mat4 rotationMatrix = glm::rotate(glm::mat4(1.0f), glm::radians(90.0f), glm::vec3(1.0f, 0.0f, 0.0f));
+            topLeft.pos = glm::vec3(rotationMatrix * glm::vec4(topLeft.pos, 1.0f));
+            topRight.pos = glm::vec3(rotationMatrix * glm::vec4(topRight.pos, 1.0f));
+            bottomLeft.pos = glm::vec3(rotationMatrix * glm::vec4(bottomLeft.pos, 1.0f));
+            bottomRight.pos = glm::vec3(rotationMatrix * glm::vec4(bottomRight.pos, 1.0f));
+        }
+
+        m_vertices.push_back(topLeft);
+        m_vertices.push_back(topRight);
+        m_vertices.push_back(bottomLeft);
+        m_vertices.push_back(topRight);
+        m_vertices.push_back(bottomRight);
+        m_vertices.push_back(bottomLeft);
 
     } else {
         RAYX_ERR << "Unknown surface type";

@@ -56,17 +56,6 @@ void Scene::update(const std::vector<RenderObject>& renderObjects, const RAYX::B
     updateBuffers();
 }
 
-// void Scene::addTriangle(const Vertex v1, const Vertex v2, const Vertex v3) {
-//     addVertex(v1, TRIA_TOPOGRAPHY);
-//     addVertex(v2, TRIA_TOPOGRAPHY);
-//     addVertex(v3, TRIA_TOPOGRAPHY);
-// }
-
-void Scene::addLine(const Vertex v1, const Vertex v2) {
-    addVertex(v1, LINE_TOPOGRAPHY);
-    addVertex(v2, LINE_TOPOGRAPHY);
-}
-
 void Scene::draw(VkCommandBuffer commandBuffer, Topography topography) const {
     if (m_indexBuffers[topography] != nullptr) {
         vkCmdDrawIndexed(commandBuffer, (uint32_t)m_indices[topography].size(), 1, 0, 0, 0);
@@ -83,6 +72,11 @@ void Scene::bind(VkCommandBuffer commandBuffer, Topography topography) const {
     if (m_indexBuffers[topography] != nullptr) {
         vkCmdBindIndexBuffer(commandBuffer, m_indexBuffers[topography]->getBuffer(), 0, VK_INDEX_TYPE_UINT32);
     }
+}
+
+void Scene::addLine(const Vertex v1, const Vertex v2) {
+    addVertex(v1, LINE_TOPOGRAPHY);
+    addVertex(v2, LINE_TOPOGRAPHY);
 }
 
 // Function that adds vertex to scene if it doesn't exist, otherwise adds index of existing vertex

@@ -15,6 +15,8 @@
 #include "Tracer/Tracer.h"
 
 // TODO: Refactor, so that Scene can be changed dynamically (currently, it is only set up once before rendering)
+// Note: The OpticalElements only need to be (partially) updated, when the user interacts with them or when a new beamline is loaded.
+//       All thhe rays need to be updated after every trace. Redesign might be necessary to support this.
 class Scene {
   public:
     enum Topography { TRIA_TOPOGRAPHY = 0, LINE_TOPOGRAPHY = 1 };
@@ -28,8 +30,6 @@ class Scene {
 
     // Base functions
     void update(const std::vector<RenderObject>& renderObjects, const RAYX::BundleHistory& bundleHistory);
-    // void addTriangle(const Vertex v1, const Vertex v2, const Vertex v3);
-    void addLine(const Vertex v1, const Vertex v2);
 
     // Buffers and drawing
     void updateBuffers();
@@ -37,9 +37,6 @@ class Scene {
     void draw(VkCommandBuffer commandBuffer, Topography topography) const;
 
     // Getters
-    // const std::vector<Vertex>& getVertices() const { return m_vertices; }
-    // const std::vector<uint32_t>& getIndices(Topography topography) const { return m_indices[topography]; }
-    // const size_t getIndexCount(Topography topography) const { return m_indices[topography].size(); }
     VkBuffer getVertexBuffer() const { return m_vertexBuffer->getBuffer(); }
     VkBuffer getIndexBuffer(Topography topography) const { return m_indexBuffers[topography]->getBuffer(); }
 
@@ -52,6 +49,7 @@ class Scene {
     std::unique_ptr<Buffer> m_vertexBuffer = nullptr;
     std::array<std::unique_ptr<Buffer>, 2> m_indexBuffers = {nullptr, nullptr};  // 0 = triangles, 1 = lines
 
+    void addLine(const Vertex v1, const Vertex v2);
     uint32_t addVertex(const Vertex v, Topography topography);
     std::optional<uint32_t> vertexExists(const Vertex v) const;
 
