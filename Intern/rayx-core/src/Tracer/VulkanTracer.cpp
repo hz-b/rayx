@@ -60,6 +60,8 @@ BundleHistory VulkanTracer::traceRaw(const TraceRawConfig& cfg) {
             beamlineData.push_back(ptr[i]);
         }
     }
+    std::cout << "Ray Anzahl: " << rayList.size() << std::endl;
+    std::cout << "Object Anzahl: " << cfg.m_elements.size() << std::endl;
 
     // Prepare rayMeta data in-between batch traces
     std::vector<RayMeta> rayMeta;
@@ -126,7 +128,6 @@ BundleHistory VulkanTracer::traceRaw(const TraceRawConfig& cfg) {
             .addDescriptorSetPerPassBinding(passName0, 5, shaderFlag)
             .addDescriptorSetPerPassBinding(passName1, 5, shaderFlag)
             .addDescriptorSetPerPassBinding(passName2, 6, shaderFlag);
-
 #ifdef RAYX_DEBUG_MODE
         bufferHandler
             ->createBuffer({"debug-buffer", VKBUFFER_OUT, numberOfRays * sizeof(debugBuffer_t)})  // Debug Matrix Buffer
@@ -134,6 +135,22 @@ BundleHistory VulkanTracer::traceRaw(const TraceRawConfig& cfg) {
             .addDescriptorSetPerPassBinding(passName1, 6, shaderFlag)
             .addDescriptorSetPerPassBinding(passName2, 7, shaderFlag);
 #endif
+    }
+
+    // Sanity Check tests:
+    auto rays = bufferHandler->readBuffer<Ray>("ray-buffer", true);
+    auto raymeta = bufferHandler->readBuffer<RayMeta>("ray-meta-buffer", true);
+
+    for (int i = 0; i < rayList.size(); i++) {
+        if (rays[i].m_position != rayList[i].m_position) {
+            RAYX_ERR << "Not same ray";
+        }
+    }
+
+    for (auto& r : raymeta) {
+        if (r.finalized != false || r.nextElementId != -1) {
+            RAYX_ERR << "NOT SAME RAYMETA";
+        }
     }
 
     // FIXME: Push Constants still support only one shader code! (If two shaders require two structs then Tracer needs to also change to carry a

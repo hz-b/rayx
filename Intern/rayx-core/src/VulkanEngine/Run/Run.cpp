@@ -47,8 +47,8 @@ bool allFinalized(const std::vector<RayMeta>& vector) {
     double fly = (double)(_fly) / rayOut.size();
     double unin = (double)(_unin) / rayOut.size();
     double notx = (double)(_not) / rayOut.size();
-    RAYX_D_LOG << "_hit: " << hit << " _abs: " << abs << " _fly: " << fly << " _unin: " << unin << " _not: " << notx;
-    RAYX_D_LOG << "===============";
+    std::cout << "_hit: " << hit << " _abs: " << abs << " _fly: " << fly << " _unin: " << unin << " _not: " << notx << std::endl;
+    std::cout << "===============" << std::endl;
 }
 
 std::vector<std::vector<Ray>> VulkanEngine::runTraceComputeTask(ComputeRunSpec spec) {
@@ -88,8 +88,11 @@ std::vector<std::vector<Ray>> VulkanEngine::runTraceComputeTask(ComputeRunSpec s
             recordSimpleTraceCommand("singleTracePass", m_CommandBuffers[0], 0);
             submitCommandBuffer(0);
             checkVkResult(m_computeFence->waitAndReset());
+            // vkQueueWaitIdle(m_ComputeQueue);
+            // m_computeFence->forceReset();
             auto rayOut = m_BufferHandler->readBuffer<Ray>("ray-buffer", true);
             auto rayMeta = m_BufferHandler->readBuffer<RayMeta>("ray-meta-buffer", true);
+            printRayStats(rayOut);
 
             events.push_back(rayOut);
             if (allFinalized(rayMeta)) {  // Are all rays finished?
@@ -107,8 +110,9 @@ std::vector<std::vector<Ray>> VulkanEngine::runTraceComputeTask(ComputeRunSpec s
         recordSimpleTraceCommand("finalCollisionPass", m_CommandBuffers[0], 0);
         submitCommandBuffer(0);
         checkVkResult(m_computeFence->waitAndReset());
-        vkQueueWaitIdle(m_ComputeQueue);  // TODO : Valgrind Support not working with fences
+        // vkQueueWaitIdle(m_ComputeQueue);  // TODO : Valgrind Support not working with fences
         auto rayOut = m_BufferHandler->readBuffer<Ray>("ray-buffer", true);
+        printRayStats(rayOut);
         events.push_back(rayOut);
     }
     m_runs++;

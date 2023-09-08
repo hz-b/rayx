@@ -6,7 +6,7 @@
 
 namespace RAYX {
 /**
- * @brief Specialized pushConsant Class
+ * @brief Specialized pushConstant Class
  *
  */
 class RAYX_API PushConstantHandler {

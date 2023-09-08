@@ -63,6 +63,7 @@ BundleHistory Tracer::trace(const Beamline& b, uint64_t max_batch_size) {
         {
             RAYX_PROFILE_SCOPE_STDOUT("Snapshotting");
             auto maxSnapshots = rawBatchHistory.size();
+            //std::cout << "max snap:" << maxSnapshots << std::endl;
             result.reserve(batch_size);
 
             for (uint i = 0; i < batch_size; i++) {
@@ -70,15 +71,18 @@ BundleHistory Tracer::trace(const Beamline& b, uint64_t max_batch_size) {
                 snapshots.reserve(maxSnapshots);
                 for (uint j = 0; j < maxSnapshots; j++) {
                     Ray r = rawBatchHistory[j][i];
+                    //std::cout << r.m_eventType << std::endl;
                     if (r.m_eventType != ETYPE_UNINIT) {
                         snapshots.push_back(r);
                     }
                 }
                 snapshots.shrink_to_fit();
+                //std::cout << "snap size: " << snapshots.size() << std::endl;
                 result.push_back(snapshots);
             }
         }
     }
+    std::cout << result.size() << std::endl;
     return result;
 }
 void Tracer::setDevice(int deviceID) { m_deviceID = deviceID; }

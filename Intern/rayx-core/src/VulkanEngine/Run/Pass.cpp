@@ -51,7 +51,6 @@ void Pass::Pipeline::createPipeline() {
     // FIXME(OS): Currently only creates compute pipelines. Pipeline should be general for also other types (E.g Graphics). Move this somewhere else!
     checkVkResult(vkCreateComputePipelines(m_device, nullptr, 1, &pipelineCreateInfo, nullptr, &m_pipeline));
     isCleaned = false;
-    RAYX_D_LOG << m_name << "_VkPipeline created";
 }
 
 /**
@@ -122,7 +121,6 @@ void Pass::Pipeline::cleanPipeline(VkDevice& device) {
     vkDestroyPipeline(device, m_pipeline, nullptr);
     vkDestroyPipelineLayout(device, m_pipelineLayout, nullptr);
     isCleaned = true;
-    RAYX_D_LOG << m_name << " cleaned.";
 }
 
 /*

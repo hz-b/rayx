@@ -73,7 +73,6 @@ void VulkanEngine::traceCommand(VkCommandBuffer& cmdBuffer) {
 }
 
 void VulkanEngine::recordSimpleTraceCommand(std::string passName, VkCommandBuffer& commandBuffer, int stage) {
-    RAYX_PROFILE_FUNCTION();
     auto pass = getComputePass(std::move(passName));
     VkCommandBufferBeginInfo beginInfo = VKINIT::Command::command_buffer_begin_info();
     beginInfo.flags = VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT;
