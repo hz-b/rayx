@@ -60,9 +60,8 @@ class Scene {
 
     // Base functions
     void setup(const RenderObjectVec& renderObjects, const RAYX::BundleHistory& bundleHistory);
-    void addTriangle(const Vertex v1, const Vertex v2, const Vertex v3);
-    void addLine(const Vertex v1, const Vertex v2);
-    void fromRenderObject(const RenderObject& renderObject);
+    // void addTriangle(const Vertex v1, const Vertex v2, const Vertex v3);
+    // void addLine(const Vertex v1, const Vertex v2);
 
     // Buffers and drawing
     void updateBuffers();
@@ -70,17 +69,19 @@ class Scene {
     void draw(VkCommandBuffer commandBuffer, Topography topography) const;
 
     // Getters
-    const std::vector<Vertex>& getVertices() const { return m_vertices; }
-    const std::vector<uint32_t>& getIndices(Topography topography) const { return m_indices[topography]; }
-    const size_t getIndexCount(Topography topography) const { return m_indices[topography].size(); }
+    // const std::vector<Vertex>& getVertices() const { return m_vertices; }
+    // const std::vector<uint32_t>& getIndices(Topography topography) const { return m_indices[topography]; }
+    // const size_t getIndexCount(Topography topography) const { return m_indices[topography].size(); }
     VkBuffer getVertexBuffer() const { return m_vertexBuffer->getBuffer(); }
     VkBuffer getIndexBuffer(Topography topography) const { return m_indexBuffers[topography]->getBuffer(); }
 
   private:
     Device& m_Device;
 
-    std::vector<Vertex> m_vertices;
-    std::array<std::vector<uint32_t>, 2> m_indices;  // 0 = triangles, 1 = lines
+    // std::vector<Vertex> m_vertices;
+    // std::array<std::vector<uint32_t>, 2> m_indices;  // 0 = triangles, 1 = lines
+    std::vector<Element> m_elements;
+    std::vector<Line> m_rayElements;
 
     std::unique_ptr<Buffer> m_vertexBuffer = nullptr;
     std::array<std::unique_ptr<Buffer>, 2> m_indexBuffers = {nullptr, nullptr};  // 0 = triangles, 1 = lines
