@@ -1,5 +1,6 @@
 #include "RenderObject.h"
 
+#include "Beamline/OpticalElement.h"
 #include "Debug/Debug.h"
 
 std::vector<RenderObject> RenderObject::getRenderData(const std::filesystem::path& filename) {
@@ -12,38 +13,31 @@ std::vector<RenderObject> RenderObject::getRenderData(const std::filesystem::pat
         sources = beamline.m_LightSources;
     }
     for (auto element : elements) {
-        RenderObject rendObj;
-        rendObj.name = element.m_name;
-        if (rendObj.name == "ImagePlane") {  // TODO: dirty hack that relies on name, this should be fixed
-            rendObj.type = 10;
-        } else {
-            rendObj.type = 0;
-        }
-        dmat4 outTrans = element.m_element.m_outTrans;
-        rendObj.position = dvec4(outTrans[3][0], outTrans[3][1], outTrans[3][2], 1.0);
-        const double* surface = element.m_element.m_surface.m_params;
-        dmat4 rotation;
-        rotation[0] = dvec4(outTrans[0][0], outTrans[0][1], outTrans[0][2], 0.0);
-        rotation[1] = dvec4(outTrans[1][0], outTrans[1][1], outTrans[1][2], 0.0);
-        rotation[2] = dvec4(outTrans[2][0], outTrans[2][1], outTrans[2][2], 0.0);
-        rotation[3] = dvec4(0.0, 0.0, 0.0, 1.0);
-        rendObj.orientation = rotation;
-        rendObj.cutout = element.m_element.m_cutout;
-
-        rendObj.triangulate();
-
+        RenderObject rendObj(element);
         data.push_back(rendObj);
     }
     return data;
 }
 
+RenderObject::RenderObject(const RAYX::OpticalElement& element)
+    : m_name(element.m_name),
+      m_Surface(element.m_element.m_surface),
+      m_Cutout(element.m_element.m_cutout),
+      m_Behaviour(element.m_element.m_behaviour) {
+    m_position = glm::vec4(element.m_element.m_outTrans[3][0], element.m_element.m_outTrans[3][1], element.m_element.m_outTrans[3][2], 1.0);
+    m_orientation[0] = glm::vec4(element.m_element.m_outTrans[0][0], element.m_element.m_outTrans[0][1], element.m_element.m_outTrans[0][2], 0.0);
+    m_orientation[1] = glm::vec4(element.m_element.m_outTrans[1][0], element.m_element.m_outTrans[1][1], element.m_element.m_outTrans[1][2], 0.0);
+    m_orientation[2] = glm::vec4(element.m_element.m_outTrans[2][0], element.m_element.m_outTrans[2][1], element.m_element.m_outTrans[2][2], 0.0);
+    this->triangulate();
+}
+
 void RenderObject::triangulate() {
     // Create triangle representation
-    if (element.m_element.m_surface.m_type == STYPE_QUADRIC) {
+    if (m_Surface.m_type == STYPE_QUADRIC) {
         //
-    } else if (element.m_element.m_surface.m_type == STYPE_TOROID) {
+    } else if (m_Surface.m_type == STYPE_TOROID) {
         RAYX_ERR << "Toroid not implemented yet";
-    } else if (element.m_element.m_surface.m_type == STYPE_PLANE_XY) {
+    } else if (m_Surface.m_type == STYPE_PLANE_XY) {
         //
     } else {
         RAYX_ERR << "Unknown surface type";
@@ -59,7 +53,7 @@ std::vector<Triangle> RenderObject::trianglesFromQuadric(const RenderObject& ren
         for (int y = 0; y < GRIDSIZE; y++) {
             for (int z = 0; z < GRIDSIZE; z++) {
                 glm::vec4 pos(x, y, z, 1);
-                double value = evaluateQuadricAtPosition(renderObject.m_data.surface, pos);
+                double value = evaluateQuadricAtPosition(pos);
                 scalarGrid[x][y][z] = value;
             }
         }
@@ -80,10 +74,12 @@ std::vector<Triangle> RenderObject::trianglesFromQuadric(const RenderObject& ren
     return triangles;
 }
 
-double RenderObject::evaluateQuadricAtPosition(const double surface[16], const glm::vec4& pos) {
+double RenderObject::evaluateQuadricAtPosition(const glm::vec4& pos) {
     // Convert the surface array to a glm::mat4.
-    glm::mat4 surfaceMatrix(surface[0], surface[1], surface[2], surface[3], surface[4], surface[5], surface[6], surface[7], surface[8], surface[9],
-                            surface[10], surface[11], surface[12], surface[13], surface[14], surface[15]);
+    glm::mat4 surfaceMatrix(m_Surface.m_params[0], m_Surface.m_params[1], m_Surface.m_params[2], m_Surface.m_params[3], m_Surface.m_params[4],
+                            m_Surface.m_params[5], m_Surface.m_params[6], m_Surface.m_params[7], m_Surface.m_params[8], m_Surface.m_params[9],
+                            m_Surface.m_params[10], m_Surface.m_params[11], m_Surface.m_params[12], m_Surface.m_params[13], m_Surface.m_params[14],
+                            m_Surface.m_params[15]);
 
     glm::vec4 resultVec = pos * surfaceMatrix;
     double result = glm::dot(resultVec, pos);

@@ -1,9 +1,12 @@
 #pragma once
 
+#include <vulkan/vulkan.h>
+
 #include <glm/glm.hpp>
 #include <vector>
 
 #include "Data/Importer.h"
+#include "Shared/Behaviour.h"
 #include "Shared/Cutout.h"
 
 #define GRIDSIZE 10
@@ -11,6 +14,30 @@
 struct Vertex {
     glm::vec3 pos;
     glm::vec3 color;
+
+    static VkVertexInputBindingDescription getBindingDescription() {
+        VkVertexInputBindingDescription bindingDescription{};
+        bindingDescription.binding = 0;
+        bindingDescription.stride = sizeof(Vertex);
+        bindingDescription.inputRate = VK_VERTEX_INPUT_RATE_VERTEX;
+        return bindingDescription;
+    }
+
+    static std::array<VkVertexInputAttributeDescription, 2> getAttributeDescriptions() {
+        std::array<VkVertexInputAttributeDescription, 2> attributeDescriptions{};
+
+        attributeDescriptions[0].binding = 0;
+        attributeDescriptions[0].location = 0;
+        attributeDescriptions[0].format = VK_FORMAT_R32G32B32_SFLOAT;
+        attributeDescriptions[0].offset = offsetof(Vertex, pos);
+
+        attributeDescriptions[1].binding = 0;
+        attributeDescriptions[1].location = 1;
+        attributeDescriptions[1].format = VK_FORMAT_R32G32B32_SFLOAT;
+        attributeDescriptions[1].offset = offsetof(Vertex, color);
+
+        return attributeDescriptions;
+    }
 };
 
 struct Triangle {
@@ -19,7 +46,7 @@ struct Triangle {
 
 class RenderObject {
   public:
-    RenderObject();
+    RenderObject(const RAYX::OpticalElement& element);
     ~RenderObject() = default;
 
     static std::vector<RenderObject> getRenderData(const std::filesystem::path& filename);
@@ -36,11 +63,11 @@ class RenderObject {
 
   private:
     std::string m_name;
-    int m_elementType;
-    int m_surfaceType;
     glm::vec4 m_position;
     glm::mat4 m_orientation;
-    Cutout m_cutout;
+    Surface m_Surface;
+    Cutout m_Cutout;
+    Behaviour m_Behaviour;
 
     std::vector<Vertex> vertexVector_;
     std::vector<uint32_t> indexVector_;
@@ -48,7 +75,7 @@ class RenderObject {
 
     // Marching Cubes // TODO: Move to own class
     std::vector<Triangle> trianglesFromQuadric(const RenderObject& renderObject);
-    double evaluateQuadricAtPosition(const double surface[16], const glm::vec4& pos);
+    double evaluateQuadricAtPosition(const glm::vec4& pos);
     int determineMarchingCubesCase(const double scalarGrid[GRIDSIZE][GRIDSIZE][GRIDSIZE], int x, int y, int z);
     std::vector<Triangle> lookupTrianglesForCase(int caseIndex);
     Vertex interpolateVertex(/* int edgeIndex */);
