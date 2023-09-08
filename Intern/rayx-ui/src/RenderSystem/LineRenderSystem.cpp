@@ -38,7 +38,7 @@ void LineRenderSystem::createPipeline(VkRenderPass renderPass) {
     GraphicsPipeline::defaultPipelineConfigInfo(pipelineConfig);
     pipelineConfig.inputAssemblyInfo.topology = VK_PRIMITIVE_TOPOLOGY_LINE_LIST;
     pipelineConfig.rasterizationInfo.polygonMode = VK_POLYGON_MODE_LINE;
-    // pipelineConfig.rasterizationInfo.lineWidth = 2.0f;
+    pipelineConfig.rasterizationInfo.lineWidth = 2.0f;
     pipelineConfig.renderPass = renderPass;
     pipelineConfig.pipelineLayout = m_PipelineLayout;
     m_Pipeline = std::make_unique<GraphicsPipeline>(m_Device, "../../../Intern/rayx-ui/src/Shaders/vert.spv",

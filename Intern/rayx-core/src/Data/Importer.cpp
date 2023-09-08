@@ -96,11 +96,7 @@ RenderObjectVec getRenderData(const std::filesystem::path& filename) {
     for (auto element : elements) {
         RenderObject d;
         d.name = element.m_name;
-        if (d.name == "ImagePlane") {  // TODO: dirty hack that relies on name, this should be fixed
-            d.type = 10;
-        } else {
-            d.type = 0;
-        }
+        d.type = element.m_element.m_behaviour.m_type;
         dmat4 outTrans = element.m_element.m_outTrans;
         d.position = dvec4(outTrans[3][0], outTrans[3][1], outTrans[3][2], 1.0);
         for (int i = 0; i < 16; i++) {

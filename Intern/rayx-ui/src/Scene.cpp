@@ -24,7 +24,7 @@ void Scene::setup(const RAYX::RenderObjectVec& renderObjects, const RAYX::Bundle
                 Vertex origin = {{rayLastPos.x, rayLastPos.y, rayLastPos.z}, m_yellow};
                 Vertex point;
                 if (event.m_eventType == ETYPE_JUST_HIT_ELEM) {
-                    point = {{worldPos.x, worldPos.y, worldPos.z}, m_yellow};
+                    point = {{worldPos.x, worldPos.y, worldPos.z}, m_orange};
                 } else {
                     point = {{worldPos.x, worldPos.y, worldPos.z}, m_red};
                 }
@@ -41,7 +41,7 @@ void Scene::setup(const RAYX::RenderObjectVec& renderObjects, const RAYX::Bundle
 
                 Vertex origin = {{eventPos.x, eventPos.y, eventPos.z}, m_blue};
                 Vertex point = {{pointPos.x, pointPos.y, pointPos.z}, m_blue};
-                addLine(origin, point);
+                // addLine(origin, point);
             }
         }
     }
@@ -91,7 +91,7 @@ void Scene::fromRenderObject(const RAYX::RenderObject& renderObject) {
     }
     RAYX::RenderObject modifiedObject = renderObject;
     // Check if the current object is an image plane.
-    if (renderObject.type == 10) {
+    if (renderObject.type == 4 || renderObject.type == 2) {
         // Rotate by 90 degrees around the X-axis.
         glm::mat4 rotationMatrix = glm::rotate(glm::mat4(1.0f), glm::radians(90.0f), glm::vec3(1.0f, 0.0f, 0.0f));
         modifiedObject.orientation = rotationMatrix * renderObject.orientation;
@@ -104,10 +104,10 @@ void Scene::fromRenderObject(const RAYX::RenderObject& renderObject) {
     glm::vec4 worldBottomRight = modifiedObject.orientation * bottomRight + modifiedObject.position;
 
     // Create the vertices
-    Vertex v1 = {{worldTopLeft.x, worldTopLeft.y, worldTopLeft.z}, m_lighterGreen};
-    Vertex v2 = {{worldTopRight.x, worldTopRight.y, worldTopRight.z}, m_greenBase};
-    Vertex v3 = {{worldBottomLeft.x, worldBottomLeft.y, worldBottomLeft.z}, m_greenBase};
-    Vertex v4 = {{worldBottomRight.x, worldBottomRight.y, worldBottomRight.z}, m_darkerGreen};
+    Vertex v1 = {{worldTopLeft.x, worldTopLeft.y, worldTopLeft.z}, m_lighterBlue};
+    Vertex v2 = {{worldTopRight.x, worldTopRight.y, worldTopRight.z}, m_blue};
+    Vertex v3 = {{worldBottomLeft.x, worldBottomLeft.y, worldBottomLeft.z}, m_blue};
+    Vertex v4 = {{worldBottomRight.x, worldBottomRight.y, worldBottomRight.z}, m_darkerBlue};
     addTriangle(v1, v2, v3);
     addTriangle(v2, v3, v4);
 }
