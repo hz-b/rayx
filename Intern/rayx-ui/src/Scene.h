@@ -58,6 +58,8 @@ class Scene {
 
     // Colors
     const glm::vec4 m_yellow = {1.0f, 1.0f, 0.0f, 1.0f};
-    const glm::vec4 m_blue = {0.0f, 0.0f, 1.0f, 1.0f};
+    const glm::vec4 m_blue = {0.0f, 0.0f, 1.0f, 0.7f};
+    const glm::vec4 m_darkerBlue = {0.0f, 0.0f, 0.3f, 0.7f};
+    const glm::vec4 m_lighterBlue = {0.7f, 0.7f, 1.0f, 0.7f};
     const glm::vec4 m_red = {1.0f, 0.0f, 0.0f, 1.0f};
 };

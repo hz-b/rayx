@@ -31,7 +31,7 @@ void Scene::update(const std::vector<RenderObject>& renderObjects, const RAYX::B
                 Vertex origin = {{rayLastPos.x, rayLastPos.y, rayLastPos.z}, m_yellow};
                 Vertex point;
                 if (event.m_eventType == ETYPE_JUST_HIT_ELEM) {
-                    point = {{worldPos.x, worldPos.y, worldPos.z}, m_yellow};
+                    point = {{worldPos.x, worldPos.y, worldPos.z}, m_orange};
                 } else {
                     point = {{worldPos.x, worldPos.y, worldPos.z}, m_red};
                 }
@@ -48,7 +48,7 @@ void Scene::update(const std::vector<RenderObject>& renderObjects, const RAYX::B
 
                 Vertex origin = {{eventPos.x, eventPos.y, eventPos.z}, m_blue};
                 Vertex point = {{pointPos.x, pointPos.y, pointPos.z}, m_blue};
-                addLine(origin, point);
+                // addLine(origin, point);
             }
         }
     }
