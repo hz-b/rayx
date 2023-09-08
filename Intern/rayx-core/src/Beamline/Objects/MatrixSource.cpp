@@ -22,7 +22,7 @@ MatrixSource::MatrixSource(const DesignObject& dobj) : LightSource(dobj) {
  * direction as first 4) distributed evenly across width & height of source
  * returns vector of rays
  */
-std::vector<Ray> MatrixSource::getRays() const {
+std::vector<Ray> MatrixSource::getRays(int THREAD_COUNT) const {
     RAYX_PROFILE_FUNCTION();
     double x, y, z, psi, phi,
         en;  // x,y,z pos, psi,phi direction cosines, en=energy

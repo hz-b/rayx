@@ -43,7 +43,7 @@ double getCoord(const SourceDist l, const double extent) {
  *
  * @returns list of rays
  */
-std::vector<Ray> PointSource::getRays() const {
+std::vector<Ray> PointSource::getRays(int THREAD_COUNT) const {
     double x, y, z, psi, phi,
         en;  // x,y,z pos, psi,phi direction cosines, en=energy
 

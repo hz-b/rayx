@@ -8,14 +8,9 @@ namespace RAYX {
 Beamline::Beamline() = default;
 Beamline::~Beamline() = default;
 
-std::vector<Ray> Beamline::getInputRays() const {
-    RAYX_PROFILE_FUNCTION_STDOUT();
-
-    if (m_LightSources.empty()) {
-        return {};
-    }
-
-    // count number of rays.
+std::vector<Ray> Beamline::getInputRays(int THREAD_COUNT) const {
+    RAYX_PROFILE_FUNCTION();
+    std::vector<Ray> list;
     uint32_t raycount = 0;
     for (const auto& s : m_LightSources) {
         raycount += s->m_numberOfRays;
@@ -28,10 +23,14 @@ std::vector<Ray> Beamline::getInputRays() const {
     if (m_LightSources.size() > 1) {
         list.reserve(raycount);
 
-        for (unsigned int i = 1; i < m_LightSources.size(); i++) {
-            auto sub = m_LightSources[i]->getRays();
-            list.insert(list.end(), sub.begin(), sub.end());
+    for (const auto& s : m_LightSources) {
+        std::vector<Ray> sub;
+        if(THREAD_COUNT == 0){
+            sub = s->getRays();
+        }else{
+            sub = s->getRays(THREAD_COUNT);
         }
+        list.insert(list.end(), sub.begin(), sub.end());
     }
 
     return list;

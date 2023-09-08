@@ -11,10 +11,15 @@ using uint = unsigned int;
 
 namespace RAYX {
 
-BundleHistory Tracer::trace(const Beamline& b, Sequential seq, uint64_t max_batch_size) {
+BundleHistory Tracer::trace(const Beamline& b, uint64_t max_batch_size, int THREAD_COUNT) {
     RAYX_PROFILE_FUNCTION_STDOUT();
 
-    auto rays = b.getInputRays();
+    std::vector<Ray> rays;
+    if(THREAD_COUNT == 1){
+        rays = b.getInputRays();
+    }else{
+        rays = b.getInputRays(THREAD_COUNT);
+    }
     auto randomSeed = randomDouble();
     auto maxEvents = b.m_OpticalElements.size() + 2;
     auto materialTables = b.calcMinimalMaterialTables();

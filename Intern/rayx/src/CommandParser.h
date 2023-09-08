@@ -39,6 +39,10 @@ class CommandParser {
         bool m_sequential = false;                     // -S (sequential tracing)
         bool m_verbose = false;                        // --verbose (Verbose)
         std::string m_format = defaultFormatString();  // --format
+        std::string m_parallelize = "";                // --parallelize (dipolesource)
+        int m_setThreads = 1;                          // --setThreads (dipolesource)
+
+
     } m_args;
 
     static inline void getVersion() {
@@ -83,5 +87,9 @@ class CommandParser {
         {'S', {OptionType::BOOL, "sequential", "trace sequentially", &(m_args.m_sequential)}},
         {'V', {OptionType::BOOL, "verbose", "Dump more information", &(m_args.m_verbose)}},
         {'F', {OptionType::STRING, "format", "Format output CSV / H5 data", &(m_args.m_format)}},
+        {'P', {OptionType::STRING, "parallelize", "Parallelize Dipolesource 'OMP' or 'PT'", &(m_args.m_parallelize)}},
+        {'T', {OptionType::INT, "setThreads", "set the Number of Threads'", &(m_args.m_setThreads)}},
+
+
     };
 };

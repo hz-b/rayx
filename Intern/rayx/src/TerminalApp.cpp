@@ -64,9 +64,7 @@ void TerminalApp::tracePath(const std::filesystem::path& path) {
         }
 
         // Run rayx core
-        RAYX::Sequential seq = m_CommandParser->m_args.m_sequential? RAYX::Sequential::Yes : RAYX::Sequential::No;
-        auto rays = m_Tracer->trace(*m_Beamline, seq, max_batch_size);
-
+        auto rays = m_Tracer->trace(*m_Beamline, max_batch_size, m_CommandParser->m_args.m_setThreads);
         // Export Rays to external data.
         /*auto file = exportRays(rays, path.string());
 
@@ -121,6 +119,7 @@ void TerminalApp::run() {
         RAYX_VERB << "Starting in Benchmark Mode.\n";
         RAYX::BENCH_FLAG = true;
     }
+    
     /////////////////// Argument treatement
     if (m_CommandParser->m_args.m_version) {
         m_CommandParser->getVersion();
@@ -148,6 +147,23 @@ void TerminalApp::run() {
 
 #endif
     }
+
+
+    /*choose Dipole parallelization none, OpenMp or pthread.h
+    if (m_CommandParser->m_args.m_parallelize == "PT"){
+        
+    }else if(m_CommandParser->m_args.m_parallelize == "OMP"){
+        if(m_CommandParser->m_args.m_setThreads && m_CommandParser->m_args.m_setThreads > 1){
+            #ifdef DIPOLE_OMP
+            THREADCOUNTER = m_CommandParser->m_args.m_setThreads;
+            #endif
+        }
+
+    }else{
+#ifdef DIPOLE_NONE
+
+#endif
+    }*/
 
     // Trace, export and plot
     tracePath(m_CommandParser->m_args.m_providedFile);
