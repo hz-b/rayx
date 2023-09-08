@@ -1,6 +1,7 @@
 #pragma once
 
 #include <list>
+#include <omp.h>
 #include "Beamline/LightSource.h"
 
 
@@ -18,7 +19,7 @@ class RAYX_API DipoleSource : public LightSource {
     DipoleSource(const DesignObject&);
     virtual ~DipoleSource() = default;
 
-    std::vector<Ray> getRays() const override;
+    std::vector<Ray> getRays(int THREAD_COUNT = 1) const override;
     void calcMagneticField();
     void calcWorldCoordinates();
     void calcSourcePath();
@@ -35,6 +36,7 @@ class RAYX_API DipoleSource : public LightSource {
     glm::dvec3 getXYZPosition(double)const;
     double vDivergence(double hv, double sigv) const;
     double getNormalFromRange(double range) const;
+    double bessel(double hnue, double zeta) const;
 
   private:
     // Geometric Params
@@ -70,7 +72,6 @@ class RAYX_API DipoleSource : public LightSource {
 
     
     glm::dvec4 getStokesSyn(double hv, double psi1, double psi2) const;
-    double bessel(double hnue, double zeta) const;
     glm::dvec4 dipoleFold(double psi, double hv, double sigpsi) const;
 
     std::array<double, 59> m_schwingerX = {1.e-4, 1.e-3, 2.e-3, 4.e-3, 6.e-3, 8.e-3, 1.e-2, 2.e-2, 3.e-2, 4.e-2, 5.e-2, 6.e-2, 7.e-2, 8.e-2, 9.e-2,

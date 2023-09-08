@@ -1125,7 +1125,7 @@ TEST_F(TestSuite, testVerDivergenceDipole) {
     std::vector<InOutPair> inouts = {{
         .energy = 100,
         .sigv = 1,
-        .out = 1.591581814000419,  // 1.5917477218305678
+        .out = 1.591581814000419,
     }};
 
     auto beamline = loadBeamline("dipole_plain");
@@ -1134,6 +1134,48 @@ TEST_F(TestSuite, testVerDivergenceDipole) {
 
     for (auto values : inouts) {
         auto result = dipolesource->vDivergence(values.energy, values.sigv);
+        CHECK_EQ(result, values.out, 0.1);
+    }
+}
+
+TEST_F(TestSuite, testBesselDipole) {
+    struct InOutPair {
+        double proportion;
+        double zeta;
+        double out;
+    };
+    std::vector<InOutPair> inouts = {{
+        .proportion = 1/3,
+        .zeta = 78.126966373103443,
+        .out = 1.664046593883771e-35,
+    },{
+        .proportion = 1/3,
+        .zeta = 73.550785975500432,
+        .out = 1.6659366793149262e-33,
+    },{
+        .proportion = 1/3,
+        .zeta = 46.422887861754496,
+        .out = 1.2672053903555623e-21,
+    },{
+        .proportion = 2/3,
+        .zeta = 78.126966373103443,
+        .out = 1.6675777760881476e-35,
+    },{
+        .proportion = 2/3,
+        .zeta = 73.550785975500432,
+        .out = 1.6696906039215801e-33,
+    },{
+        .proportion = 2/3,
+        .zeta = 49.798819164687949,
+        .out = 4.1969864622545434e-23,
+    }};
+
+    auto beamline = loadBeamline("dipole_plain");
+    std::shared_ptr<LightSource> src = beamline.m_LightSources[0];
+    DipoleSource* dipolesource = dynamic_cast<DipoleSource*>(&*src);
+
+    for (auto values : inouts) {
+        auto result = dipolesource->bessel(values.proportion, values.zeta);
         CHECK_EQ(result, values.out, 0.1);
     }
 }

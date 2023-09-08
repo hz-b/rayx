@@ -38,6 +38,10 @@ class CommandParser {
         int m_BatchSize = 0;                           // -b (Vk batch size )
         bool m_verbose = false;                        // --verbose (Verbose)
         std::string m_format = defaultFormatString();  // --format
+        std::string m_parallelize = "";                // --parallelize (dipolesource)
+        int m_setThreads = 1;                          // --setThreads (dipolesource)
+
+
     } m_args;
 
     inline void getVersion() const {
@@ -81,5 +85,9 @@ class CommandParser {
         {'s', {OptionType::INT, "seed", "Provided user seed", &(m_args.m_seed)}},
         {'V', {OptionType::BOOL, "verbose", "Dump more information", &(m_args.m_verbose)}},
         {'F', {OptionType::STRING, "format", "Format output CSV / H5 data", &(m_args.m_format)}},
+        {'P', {OptionType::STRING, "parallelize", "Parallelize Dipolesource 'OMP' or 'PT'", &(m_args.m_parallelize)}},
+        {'T', {OptionType::INT, "setThreads", "set the Number of Threads'", &(m_args.m_setThreads)}},
+
+
     };
 };

@@ -91,9 +91,14 @@ DipoleSource::DipoleSource(const DesignObject& dobj) : LightSource(dobj) {
  * @returns list of rays
  */
 
-std::vector<Ray> DipoleSource::getRays() const {
-    //RAYX_PROFILE_FUNCTION();
-
+std::vector<Ray> DipoleSource::getRays(int THREAD_COUNT) const {
+    RAYX_PROFILE_FUNCTION();
+    if (THREAD_COUNT == 0){
+        THREAD_COUNT = 1;
+        #define DIPOLE_OMP
+    }else if(THREAD_COUNT > 1){
+        #define DIPOLE_OMP
+    }
 
     double phi, en;  // psi,phi direction cosines, en=energy
 
@@ -104,9 +109,11 @@ std::vector<Ray> DipoleSource::getRays() const {
     rayList.reserve(m_numberOfRays);
     RAYX_VERB << "Create " << n << " rays with standard normal deviation...";
 
-    
     // create n rays with random position and divergence within the given span
     // for width, height, depth, horizontal and vertical divergence
+    #if defined(DIPOLE_OMP)
+    #pragma omp parallel for num_threads(THREAD_COUNT)
+    #endif
     for (int i = 0; i < n; i++) {
 
         phi = (randomDouble() - 0.5) * m_horDivergence; //horDivergence in rad
@@ -128,9 +135,14 @@ std::vector<Ray> DipoleSource::getRays() const {
         direction = glm::dvec3(tempDir.x, tempDir.y, tempDir.z);
 
         Ray r = {position, ETYPE_UNINIT, direction, en, psiandstokes.stokes, 0.0, 0.0, -1.0, -1.0};
-        
-        rayList.push_back(r);
- 
+        #if defined(DIPOLE_OMP)
+        #pragma omp critical
+        {
+            rayList.push_back(r);
+        }
+        #else
+            rayList.push_back(r);
+        #endif
     }
     
     return rayList;
@@ -288,7 +300,7 @@ void DipoleSource::setLogInterpolation() {
 }
 
 double DipoleSource::schwinger(double energy) const {
-    RAYX_PROFILE_SCOPE("schwinger");
+    //RAYX_PROFILE_SCOPE("schwinger");
 
     double preFactor = FACTOR_SCHWINGER_RAY * 1.e-3;
 
