@@ -27,9 +27,9 @@ class Scene {
     Scene& operator=(const Scene&) = delete;
 
     // Base functions
-    void setup(const std::vector<RenderObject>& renderObjects, const RAYX::BundleHistory& bundleHistory);
+    void update(const std::vector<RenderObject>& renderObjects, const RAYX::BundleHistory& bundleHistory);
     // void addTriangle(const Vertex v1, const Vertex v2, const Vertex v3);
-    // void addLine(const Vertex v1, const Vertex v2);
+    void addLine(const Vertex v1, const Vertex v2);
 
     // Buffers and drawing
     void updateBuffers();
@@ -46,10 +46,8 @@ class Scene {
   private:
     Device& m_Device;
 
-    // std::vector<Vertex> m_vertices;
-    // std::array<std::vector<uint32_t>, 2> m_indices;  // 0 = triangles, 1 = lines
-    std::vector<RenderObject> m_renderObjects;
-    std::vector<Line> m_rayElements;
+    std::vector<Vertex> m_vertices;
+    std::array<std::vector<uint32_t>, 2> m_indices;  // 0 = triangles, 1 = lines
 
     std::unique_ptr<Buffer> m_vertexBuffer = nullptr;
     std::array<std::unique_ptr<Buffer>, 2> m_indexBuffers = {nullptr, nullptr};  // 0 = triangles, 1 = lines
@@ -61,9 +59,6 @@ class Scene {
     void updateIndexBuffers();
 
     // Colors
-    const glm::vec4 m_greenBase = {0.0f, 1.0f, 0.0f, 1.0f};
-    const glm::vec4 m_darkerGreen = {0.0f, 0.5f, 0.0f, 1.0f};
-    const glm::vec4 m_lighterGreen = {0.4f, 1.0f, 0.4f, 1.0f};
     const glm::vec4 m_yellow = {1.0f, 1.0f, 0.0f, 1.0f};
     const glm::vec4 m_blue = {0.0f, 0.0f, 1.0f, 1.0f};
     const glm::vec4 m_red = {1.0f, 0.0f, 0.0f, 1.0f};

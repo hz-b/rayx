@@ -24,10 +24,8 @@ RenderObject::RenderObject(const RAYX::OpticalElement& element)
       m_Surface(element.m_element.m_surface),
       m_Cutout(element.m_element.m_cutout),
       m_Behaviour(element.m_element.m_behaviour) {
-    m_position = glm::vec4(element.m_element.m_outTrans[3][0], element.m_element.m_outTrans[3][1], element.m_element.m_outTrans[3][2], 1.0);
-    m_orientation[0] = glm::vec4(element.m_element.m_outTrans[0][0], element.m_element.m_outTrans[0][1], element.m_element.m_outTrans[0][2], 0.0);
-    m_orientation[1] = glm::vec4(element.m_element.m_outTrans[1][0], element.m_element.m_outTrans[1][1], element.m_element.m_outTrans[1][2], 0.0);
-    m_orientation[2] = glm::vec4(element.m_element.m_outTrans[2][0], element.m_element.m_outTrans[2][1], element.m_element.m_outTrans[2][2], 0.0);
+    m_translation = glm::vec4(element.m_element.m_outTrans[3][0], element.m_element.m_outTrans[3][1], element.m_element.m_outTrans[3][2], 1.0);
+    m_rotation = glm::mat4(element.m_element.m_outTrans);
     this->triangulate();
 }
 
@@ -38,10 +36,30 @@ void RenderObject::triangulate() {
     } else if (m_Surface.m_type == STYPE_TOROID) {
         RAYX_ERR << "Toroid not implemented yet";
     } else if (m_Surface.m_type == STYPE_PLANE_XY) {
-        //
+        RectCutout rectCutout = deserializeRect(m_Cutout);
+        double width = rectCutout.m_size_x1;
+        double height = rectCutout.m_size_x2;
+        m_vertices.push_back(Vertex({-width / 2, -height / 2, 0.0f}, m_darkerGreen));
+        m_vertices.push_back(Vertex({width / 2, -height / 2, 0.0f}, m_greenBase));
+        m_vertices.push_back(Vertex({width / 2, height / 2, 0.0f}, m_greenBase));
+        m_vertices.push_back(Vertex({-width / 2, height / 2, 0.0f}, m_darkerGreen));
+
     } else {
         RAYX_ERR << "Unknown surface type";
     }
+}
+
+std::vector<Vertex> RenderObject::getVertices(bool applyTransform) const {
+    std::vector<Vertex> vertices;
+    if (applyTransform) {  // Apply model transformation to vertices (saved in model coords) before returning
+        for (auto vertex : m_vertices) {
+            vertex.pos = glm::vec3(m_rotation * glm::vec4(vertex.pos, 1.0f) + m_translation);
+            vertices.push_back(vertex);
+        }
+    } else {  // Return vertices in model coords
+        vertices = m_vertices;
+    }
+    return vertices;
 }
 
 std::vector<Triangle> RenderObject::trianglesFromQuadric(const RenderObject& renderObject) {

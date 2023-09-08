@@ -108,10 +108,10 @@ Application::~Application() {}
 void Application::run() {
     // Get the render data
     std::string path = "MultiRZP_101_0.00203483_groupedCCD";
-    auto vec = RenderObjectVec(getRenderData(std::string(path + ".rml")));
+    std::vector<RenderObject> vec = RenderObject::getRenderData(std::string(path + ".rml"));
     RAYX::BundleHistory rays;
     readH5(rays, std::string(path + ".h5"), FULL_FORMAT);
-    m_Scene.setup(vec, rays);
+    m_Scene.update(vec, rays);
 
     glfwSetKeyCallback(m_Window.window(), keyCallback);
     glfwSetMouseButtonCallback(m_Window.window(), mouseButtonCallback);

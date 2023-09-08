@@ -5,9 +5,16 @@
 
 Scene::Scene(Device& device) : m_Device(device) {}
 
-void Scene::setup(const RenderObjectVec& renderObjects, const RAYX::BundleHistory& bundleHistory) {
+void Scene::update(const std::vector<RenderObject>& renderObjects, const RAYX::BundleHistory& bundleHistory) {
+    m_vertices.clear();
+    m_indices[0].clear();
+    m_indices[1].clear();
+
     for (const auto& renderObject : renderObjects) {
-        fromRenderObject(renderObject);
+        auto vertices = renderObject.getVertices();
+        for (const auto& vertex : vertices) {
+            addVertex(vertex, TRIA_TOPOGRAPHY);
+        }
     }
 
     for (const auto& rayHist : bundleHistory) {
@@ -16,8 +23,8 @@ void Scene::setup(const RenderObjectVec& renderObjects, const RAYX::BundleHistor
             if (event.m_eventType == ETYPE_JUST_HIT_ELEM || event.m_eventType == ETYPE_ABSORBED) {
                 // Events where rays hit objects are in element coordinates
                 // We need to convert them to world coordinates
-                glm::vec4 lastElementPos = renderObjects[(size_t)event.m_lastElement].position;
-                glm::mat4 lastElementOri = renderObjects[(size_t)event.m_lastElement].orientation;
+                glm::vec4 lastElementPos = renderObjects[(size_t)event.m_lastElement].getTranslation();
+                glm::mat4 lastElementOri = glm::mat4_cast(renderObjects[(size_t)event.m_lastElement].getRotation());
                 glm::dmat4 outTrans = RAYX::calcTransformationMatrices(lastElementPos, lastElementOri, false);
                 glm::vec4 worldPos = outTrans * glm::vec4(event.m_position, 1.0f);
 
@@ -49,67 +56,15 @@ void Scene::setup(const RenderObjectVec& renderObjects, const RAYX::BundleHistor
     updateBuffers();
 }
 
-void Scene::addTriangle(const Vertex v1, const Vertex v2, const Vertex v3) {
-    addVertex(v1, TRIA_TOPOGRAPHY);
-    addVertex(v2, TRIA_TOPOGRAPHY);
-    addVertex(v3, TRIA_TOPOGRAPHY);
-}
+// void Scene::addTriangle(const Vertex v1, const Vertex v2, const Vertex v3) {
+//     addVertex(v1, TRIA_TOPOGRAPHY);
+//     addVertex(v2, TRIA_TOPOGRAPHY);
+//     addVertex(v3, TRIA_TOPOGRAPHY);
+// }
 
 void Scene::addLine(const Vertex v1, const Vertex v2) {
     addVertex(v1, LINE_TOPOGRAPHY);
     addVertex(v2, LINE_TOPOGRAPHY);
-}
-
-void Scene::fromRenderObject(const RenderObject& renderObject) {
-    glm::vec4 topLeft, topRight, bottomLeft, bottomRight;
-    if (renderObject.cutout.m_type == 2) {  // trapzoid
-        TrapezoidCutout trapez = deserializeTrapezoid(renderObject.cutout);
-
-        topLeft = {-trapez.m_sizeA_x1 / 2.0f, 0, trapez.m_size_x2 / 2.0f, 1.0f};
-        topRight = {trapez.m_sizeA_x1 / 2.0f, 0, trapez.m_size_x2 / 2.0f, 1.0f};
-        bottomLeft = {-trapez.m_sizeB_x1 / 2.0f, 0, -trapez.m_size_x2 / 2.0f, 1.0f};
-        bottomRight = {trapez.m_sizeB_x1 / 2.0f, 0, -trapez.m_size_x2 / 2.0f, 1.0f};
-    } else {  // rectangle, unlimited, elliptical (treat all as rectangles)
-
-        double width, height;
-        if (renderObject.cutout.m_type == 3 || renderObject.cutout.m_type == 1) {  // unlimited or elliptical
-            width = 100.0f;
-            height = 100.0f;
-        } else {  // rectangle
-            RectCutout rect = deserializeRect(renderObject.cutout);
-            width = rect.m_size_x1;
-            height = rect.m_size_x2;
-        }
-
-        // Calculate two triangle from the position, orientation and size of the render object
-        // Assume the rectangle is in the XZ plane, and its center is at position.
-        // First, calculate the corners of the rectangle in the model's local space
-        topLeft = {-width / 2.0f, 0, height / 2.0f, 1.0f};
-        topRight = {width / 2.0f, 0, height / 2.0f, 1.0f};
-        bottomLeft = {-width / 2.0f, 0, -height / 2.0f, 1.0f};
-        bottomRight = {width / 2.0f, 0, -height / 2.0f, 1.0f};
-    }
-    RenderObject modifiedObject = renderObject;
-    // Check if the current object is an image plane.
-    if (renderObject.type == 10) {
-        // Rotate by 90 degrees around the X-axis.
-        glm::mat4 rotationMatrix = glm::rotate(glm::mat4(1.0f), glm::radians(90.0f), glm::vec3(1.0f, 0.0f, 0.0f));
-        modifiedObject.orientation = rotationMatrix * renderObject.orientation;
-    }
-
-    // To world coordinates
-    glm::vec4 worldTopLeft = modifiedObject.orientation * topLeft + modifiedObject.position;
-    glm::vec4 worldTopRight = modifiedObject.orientation * topRight + modifiedObject.position;
-    glm::vec4 worldBottomLeft = modifiedObject.orientation * bottomLeft + modifiedObject.position;
-    glm::vec4 worldBottomRight = modifiedObject.orientation * bottomRight + modifiedObject.position;
-
-    // Create the vertices
-    Vertex v1 = {{worldTopLeft.x, worldTopLeft.y, worldTopLeft.z}, m_lighterGreen};
-    Vertex v2 = {{worldTopRight.x, worldTopRight.y, worldTopRight.z}, m_greenBase};
-    Vertex v3 = {{worldBottomLeft.x, worldBottomLeft.y, worldBottomLeft.z}, m_greenBase};
-    Vertex v4 = {{worldBottomRight.x, worldBottomRight.y, worldBottomRight.z}, m_darkerGreen};
-    addTriangle(v1, v2, v3);
-    addTriangle(v2, v3, v4);
 }
 
 void Scene::draw(VkCommandBuffer commandBuffer, Topography topography) const {
