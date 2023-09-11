@@ -223,6 +223,7 @@ dvec2 projectToPlane(PlaneDir plane, dvec3 point) {
         return dvec2(point.x, point.z);
     } else {
         throw("invalid PlaneDir!");
+        return dvec2(0.0, 0.0);
     }
 }
 
