@@ -40,18 +40,6 @@ glm::dmat4 calcTransformationMatrices(glm::dvec4 position, glm::dmat4 orientatio
 
 double defaultMaterial(const DesignObject& dobj) { return (double)static_cast<int>(dobj.parseMaterial()); }
 
-Rad defaultAzimuthalAngle(const DesignObject& dobj) {
-    Rad azim;
-
-    // TODO(Rudi) replace try-catch stuff by std::optionals
-    try {
-        azim = dobj.parseAzimuthalAngle();
-    } catch (std::runtime_error& e) {
-        azim.rad = 0;
-    }
-    return azim;
-}
-
 Surface makePlane() {
     return serializeQuadric({
         .m_icurv = 1,
@@ -101,15 +89,20 @@ Behaviour makeGrating(const DesignObject& dobj) {
     });
 }
 
-Element makeElement(const DesignObject& dobj, Behaviour behaviour, Surface surface) {
-    return Element{
+Element makeElement(const DesignObject& dobj, Behaviour behaviour, Surface surface, std::optional<Cutout> cutout) {
+    if (!cutout) {
+        auto planeDir = getPlaneDir(surface.m_type);
+        cutout = dobj.parseCutout(planeDir);
+    }
+
+    return Element {
         .m_inTrans = defaultInMatrix(dobj),
         .m_outTrans = defaultOutMatrix(dobj),
         .m_behaviour = behaviour,
         .m_surface = surface,
-        .m_cutout = dobj.parseCutout(),
+        .m_cutout = *cutout,
         .m_slopeError = dobj.parseSlopeError(),
-        .m_azimuthalAngle = defaultAzimuthalAngle(dobj).rad,
+        .m_azimuthalAngle = dobj.parseAzimuthalAngle().rad,
         .m_material = defaultMaterial(dobj),
         .m_padding = {0.0},
     };

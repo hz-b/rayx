@@ -7,7 +7,8 @@ namespace RAYX {
 Element makeImagePlane(const DesignObject& dobj) {
     auto behaviour = serializeImagePlane();
     auto surface = serializePlaneXY();
-    return makeElement(dobj, behaviour, surface);
+    auto cutout = serializeUnlimited();
+    return makeElement(dobj, behaviour, surface, cutout);
 }
 
 }  // namespace RAYX

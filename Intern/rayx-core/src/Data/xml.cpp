@@ -428,7 +428,7 @@ const char* Parser::name() const { return node->first_attribute("name")->value()
 double Parser::parseDouble(const char* paramname) const {
     double d;
     if (!paramDouble(node, paramname, &d)) {
-        throw std::runtime_error("parseDouble failed");
+        RAYX_ERR << "parseDouble failed for \"" << paramname << "\"";
     }
     return d;
 }
@@ -436,7 +436,7 @@ double Parser::parseDouble(const char* paramname) const {
 int Parser::parseInt(const char* paramname) const {
     int i;
     if (!paramInt(node, paramname, &i)) {
-        throw std::runtime_error("parseInt failed");
+        RAYX_ERR << "parseInt failed for \"" << paramname << "\"";
     }
     return i;
 }
@@ -444,7 +444,7 @@ int Parser::parseInt(const char* paramname) const {
 const char* Parser::parseStr(const char* paramname) const {
     const char* s;
     if (!paramStr(node, paramname, &s)) {
-        throw std::runtime_error("parseStr failed");
+        RAYX_ERR << "parseStr failed for \"" << paramname << "\"";
     }
     return s;
 }
@@ -452,7 +452,7 @@ const char* Parser::parseStr(const char* paramname) const {
 glm::dvec3 Parser::parseDvec3(const char* paramname) const {
     glm::dvec3 v;
     if (!paramDvec3(node, paramname, &v)) {
-        throw std::runtime_error("parseDvec3 failed");
+        RAYX_ERR << "parseDvec3 failed for \"" << paramname << "\"";
     }
     return v;
 }
@@ -461,7 +461,7 @@ glm::dvec3 Parser::parseDvec3(const char* paramname) const {
 Misalignment Parser::parseMisalignment() const {
     Misalignment x;
     if (!paramMisalignment(node, &x)) {
-        throw std::runtime_error("parseMisalignment failed");
+        RAYX_ERR << "parseMisalignment failed";
     }
     return x;
 }
@@ -477,7 +477,7 @@ SlopeError Parser::parseSlopeError() const {
 std::array<double, 6> Parser::parseVls() const {
     std::array<double, 6> x{};
     if (!paramVls(node, &x)) {
-        throw std::runtime_error("parseVls failed");
+        RAYX_ERR << "parseVls failed";
     }
     return x;
 }
@@ -485,7 +485,7 @@ std::array<double, 6> Parser::parseVls() const {
 EnergyDistribution Parser::parseEnergyDistribution() const {
     EnergyDistribution x;
     if (!paramEnergyDistribution(node, rmlFile, &x)) {
-        throw std::runtime_error("parseEnergyDistribution failed");
+        RAYX_ERR << "parseEnergyDistribution failed";
     }
     return x;
 }
@@ -494,7 +494,7 @@ glm::dvec4 Parser::parsePosition() const {
     glm::dvec4 x;
     glm::dmat4x4 y;
     if (!paramPositionAndOrientation(node, group_context, &x, &y)) {
-        throw std::runtime_error("parsePosition failed");
+        RAYX_ERR << "parsePosition failed";
     }
     return x;
 }
@@ -503,7 +503,7 @@ glm::dmat4x4 Parser::parseOrientation() const {
     glm::dvec4 x;
     glm::dmat4x4 y;
     if (!paramPositionAndOrientation(node, group_context, &x, &y)) {
-        throw std::runtime_error("parseOrientation failed");
+        RAYX_ERR << "parseOrientation failed";
     }
     return y;
 }
@@ -517,34 +517,40 @@ Material Parser::parseMaterial() const {
     return m;
 }
 
-Cutout Parser::parseCutout() const {
+Cutout Parser::parseCutout(PlaneDir plane) const {
     int geom_shape;
     if (!paramInt(node, "geometricalShape", &geom_shape)) {
-        return serializeUnlimited();
+        RAYX_ERR << "geometricalShape missing, but required!";
     }
+
+    auto x1 = [&] { return parseTotalWidth(); };
+
+    auto x2 = [&] {
+        if (plane == PLANE_XY) {
+            return parseTotalHeight();
+        } else if (plane == PLANE_XZ) {
+            return parseTotalLength();
+        } else {
+            RAYX_ERR << "parseCutout encountered an invalid plane!";
+            return 0.0;
+        }
+    };
 
     if (geom_shape == CTYPE_RECT) {
         RectCutout rect;
-        rect.m_size_x1 = parseTotalWidth();
-        // TODO why is this inconsistent in the .rml files?
-        try {
-            rect.m_size_x2 = parseTotalLength();
-        } catch (std::runtime_error& e) {
-            rect.m_size_x2 = parseTotalHeight();
-        }
+        rect.m_size_x1 = x1();
+        rect.m_size_x2 = x2();
         return serializeRect(rect);
     } else if (geom_shape == CTYPE_ELLIPTICAL) {
-        // TODO test this!
         EllipticalCutout elliptical;
-        elliptical.m_diameter_x1 = parseTotalWidth();
-        elliptical.m_diameter_x2 = parseTotalHeight();
+        elliptical.m_diameter_x1 = x1();
+        elliptical.m_diameter_x2 = x2();
         return serializeElliptical(elliptical);
     } else if (geom_shape == CTYPE_TRAPEZOID) {
-        // TODO test this!
         TrapezoidCutout trapezoid;
-        trapezoid.m_sizeA_x1 = parseTotalWidth();
+        trapezoid.m_sizeA_x1 = x1();
         trapezoid.m_sizeB_x1 = parseDouble("totalWidthB");
-        trapezoid.m_size_x2 = parseTotalLength();
+        trapezoid.m_size_x2 = x2();
 
         return serializeTrapezoid(trapezoid);
     } else {
@@ -580,5 +586,21 @@ double Parser::parseImageType() const {
 
     return (double)imageType_int;
 }
+
+Rad Parser::parseAzimuthalAngle() const {
+    double azimuthalAngle = 0;
+    paramDouble(node, "azimuthalAngle", &azimuthalAngle);
+    return Deg(azimuthalAngle).toRad();
+}
+
+double Parser::parseAdditionalOrder() const {
+    double additionalZeroOrder = 0;
+
+    // may be missing in some RML
+    // files, that's fine though
+    paramDouble(node, "additionalOrder", &additionalZeroOrder);
+    return additionalZeroOrder;
+}
+
 
 }  // namespace RAYX::xml

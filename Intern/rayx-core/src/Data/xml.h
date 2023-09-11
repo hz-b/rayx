@@ -98,10 +98,12 @@ struct Parser {
     glm::dvec4 parsePosition() const;
     glm::dmat4x4 parseOrientation() const;
     Material parseMaterial() const;
-    Cutout parseCutout() const;
+    Cutout parseCutout(PlaneDir) const;
     ElectronEnergyOrientation parseElectronEnergyOrientation() const;
     SourcePulseType parseSourcePulseType() const;
     double parseImageType() const;
+    double parseAdditionalOrder() const;
+    Rad parseAzimuthalAngle() const;
 
     // parsers for trivial derived parameters
     inline int parseNumberRays() const { return parseInt("numberRays"); }
@@ -120,7 +122,6 @@ struct Parser {
     inline double parseTotalWidth() const { return parseDouble("totalWidth"); }
     inline double parseTotalLength() const { return parseDouble("totalLength"); }
     inline double parseTotalHeight() const { return parseDouble("totalHeight"); }
-    inline Rad parseAzimuthalAngle() const { return Deg(parseDouble("azimuthalAngle")).toRad(); }
     inline Rad parseGrazingIncAngle() const { return Deg(parseDouble("grazingIncAngle")).toRad(); }
     inline double parseEntranceArmLength() const { return parseDouble("entranceArmLength"); }
     inline double parseExitArmLength() const { return parseDouble("exitArmLength"); }
@@ -140,14 +141,6 @@ struct Parser {
     inline double parseLineDensity() const { return parseDouble("lineDensity"); }
     inline double parseOrderDiffraction() const { return parseDouble("orderDiffraction"); }
     inline double parseDesignEnergyMounting() const { return parseDouble("designEnergyMounting"); }
-    inline double parseAdditionalOrder() const {
-        double additionalZeroOrder = 0;
-
-        // may be missing in some RML
-        // files, that's fine though
-        paramDouble(node, "additionalOrder", &additionalZeroOrder);
-        return additionalZeroOrder;
-    }
 
     inline CurvatureType parseCurvatureType() const { return static_cast<CurvatureType>(parseInt("curvatureType")); }
 
