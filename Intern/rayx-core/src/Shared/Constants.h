@@ -43,4 +43,13 @@ const double c_factorSchwinger_RAY = 1.2556937e15;
 
 // std::array<double, 2>test;// = {1, 2};
 
+
+
+#define PlaneDir double
+// the direction of a plane.
+// Either XY or XZ.
+
+const PlaneDir PLANE_XY = 0;
+const PlaneDir PLANE_XZ = 1;
+
 #endif

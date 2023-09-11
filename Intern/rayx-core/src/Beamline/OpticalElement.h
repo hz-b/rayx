@@ -2,6 +2,7 @@
 
 #include <array>
 #include <glm.hpp>
+#include <optional>
 
 #include "Core.h"
 #include "Data/xml.h"
@@ -21,8 +22,7 @@ RAYX_API glm::dmat4 calcTransformationMatrices(glm::dvec4 position, glm::dmat4 o
 glm::dmat4 defaultInMatrix(const DesignObject& dobj);
 glm::dmat4 defaultOutMatrix(const DesignObject& dobj);
 double defaultMaterial(const DesignObject& dobj);
-Rad defaultAzimuthalAngle(const DesignObject& dobj);
-Element makeElement(const DesignObject& dobj, Behaviour behaviour, Surface surface);
+Element makeElement(const DesignObject& dobj, Behaviour behaviour, Surface surface, std::optional<Cutout> cutout = {});
 Surface makeToroid(const DesignObject& dobj);
 Surface makeSphere(double radius);
 Surface makePlane();

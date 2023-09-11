@@ -216,11 +216,14 @@ Collision getToroidCollision(Ray r, uint id) {
 // This function projects a point into the corresponding plane.
 //
 // The cutout is applied in the primary plane.
-dvec2 projectToPrimaryPlane(double surfaceType, dvec3 point) {
-    if (surfaceType == STYPE_PLANE_XY) {
+dvec2 projectToPlane(PlaneDir plane, dvec3 point) {
+    if (plane == PLANE_XY) {
         return dvec2(point.x, point.y);
+    } else if (plane == PLANE_XZ) {
+        return dvec2(point.x, point.z);
+    } else {
+        throw("invalid PlaneDir!");
     }
-    return dvec2(point.x, point.z);
 }
 
 // checks whether `r` collides with the element of the given `id`,
@@ -259,7 +262,7 @@ Collision findCollisionWith(Ray r, uint id) {
         return col; // has found = false
     }
 
-    dvec2 x1x2 = projectToPrimaryPlane(sty, col.hitpoint);
+    dvec2 x1x2 = projectToPlane(getPlaneDir(sty), col.hitpoint);
 
     double x1 = x1x2.x;
     double x2 = x1x2.y;

@@ -109,4 +109,15 @@ INLINE Surface serializePlaneXY() {
     return ser;
 }
 
+
+
+/// general functions.
+
+INLINE PlaneDir getPlaneDir(double surface_ty) {
+    if (surface_ty == STYPE_PLANE_XY) {
+        return PLANE_XY;
+    }
+    return PLANE_XZ;
+}
+
 #endif
