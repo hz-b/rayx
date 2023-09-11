@@ -52,7 +52,7 @@
    <param id="centralBeamstop" comment="none" enabled="T">0</param>
    <param id="stopWidth" enabled="F">20</param>
    <param id="stopHeight" enabled="F">1</param>
-   <param id="totalShape" comment="rectangle" enabled="T">0</param>
+   <param id="geometricalShape" comment="rectangle" enabled="T">0</param>
    <param id="totalWidth" enabled="T">8</param>
    <param id="totalHeight" enabled="T">8</param>
    <param id="distancePreceding" enabled="T">10000</param>
