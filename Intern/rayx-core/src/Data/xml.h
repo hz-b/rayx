@@ -8,6 +8,7 @@
 
 #include "Material/Material.h"
 #include "Shared/Constants.h"
+#include "Shared/Element.h"
 #include "utils.h"
 
 namespace RAYX {

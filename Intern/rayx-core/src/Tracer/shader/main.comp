@@ -17,6 +17,7 @@
 #include "../../Shared/adapt.h"
 #include "../../Shared/Constants.h"
 #include "../../Shared/Ray.h"
+#include "../../Shared/Element.h"
 
 /**************************************************************
  *                    SHADER ARRAYS
