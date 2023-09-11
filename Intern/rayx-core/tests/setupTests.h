@@ -5,7 +5,6 @@
 #include <sstream>
 #include <type_traits>
 
-#include "Beamline/Objects/Objects.h"
 #include "CanonicalizePath.h"
 #include "Core.h"
 #include "Data/Importer.h"
@@ -13,6 +12,7 @@
 #include "Material/Material.h"
 #include "Random.h"
 #include "Shared/Constants.h"
+#include "Beamline/Objects/Objects.h"
 #include "Shared/Ray.h"
 #include "Tracer/CpuTracer.h"
 #include "Tracer/VulkanTracer.h"

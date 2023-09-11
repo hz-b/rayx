@@ -10,6 +10,7 @@
 #include "Tracer/CpuTracer.h"
 #include "Tracer/VulkanTracer.h"
 #include "Writer/Writer.h"
+#include "Data/Importer.h"
 
 TerminalApp::TerminalApp(int argc, char** argv) : m_argv(argv), m_argc(argc) {
     RAYX_VERB << "TerminalApp created!";

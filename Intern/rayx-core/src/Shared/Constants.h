@@ -1,8 +1,6 @@
 #ifndef CONSTANTS
 #define CONSTANTS
 
-// TODO this is a large include. It's probably not required everywhere
-#include "Element.h"
 #include "EventType.h"
 #include "ImageType.h"
 

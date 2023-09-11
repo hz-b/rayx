@@ -2,7 +2,6 @@
 
 #include <array>
 
-#include "Beamline/Objects/Objects.h"
 #include "Debug/Instrumentor.h"
 
 namespace RAYX {
