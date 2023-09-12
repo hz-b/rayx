@@ -19,11 +19,28 @@ void VulkanEngine::createComputePipeline() {
     So first we specify the compute shader stage, and it's entry
     point(main).
     */
+
+    VkSpecializationMapEntry entry = {
+        .constantID = 0,
+        .offset = 0,
+        .size = sizeof(uint32_t),
+    };
+
+    uint32_t data = 32;
+
+    VkSpecializationInfo specializationInfo = {
+        .mapEntryCount = 1,
+        .pMapEntries = &entry,
+        .dataSize = sizeof(uint32_t),
+        .pData = &data,
+    };
+
     VkPipelineShaderStageCreateInfo shaderStageCreateInfo = {};
     shaderStageCreateInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO;
     shaderStageCreateInfo.stage = VK_SHADER_STAGE_COMPUTE_BIT;
     shaderStageCreateInfo.module = m_ComputeShaderModule;
     shaderStageCreateInfo.pName = "main";
+    shaderStageCreateInfo.pSpecializationInfo = &specializationInfo;
 
     /*
     The pipeline layout allows the pipeline to access descriptor sets.
