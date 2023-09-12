@@ -3,7 +3,7 @@
 #include "Beamline/OpticalElement.h"
 #include "Debug/Debug.h"
 
-std::vector<RenderObject> RenderObject::getRenderData(const std::filesystem::path& filename) {
+std::vector<RenderObject> RenderObject::createRenderObjects(const std::filesystem::path& filename) {
     std::vector<RenderObject> data;
     std::vector<RAYX::OpticalElement> elements;
     std::vector<std::shared_ptr<RAYX::LightSource>> sources;
@@ -45,7 +45,7 @@ void RenderObject::triangulate() {
         } else {  // rectangle, unlimited, elliptical (treat all as rectangles)
 
             double width, height;
-            if (m_Cutout.m_type == 3 || m_Cutout.m_type == 1) {  // unlimited or elliptical
+            if (m_Cutout.m_type == CTYPE_UNLIMITED || m_Cutout.m_type == CTYPE_ELLIPTICAL) {
                 width = 100.0f;
                 height = 100.0f;
             } else {  // rectangle
@@ -63,7 +63,7 @@ void RenderObject::triangulate() {
             bottomRight = Vertex(glm::vec4(width / 2.0f, 0, -height / 2.0f, 1.0f), m_greenBase);
         }
         // Check if the current object is an image plane.
-        if (m_Behaviour.m_type == 4 || m_Behaviour.m_type == 2) {
+        if (m_Behaviour.m_type == BTYPE_IMAGE_PLANE || m_Behaviour.m_type == BTYPE_SLIT) {
             // Rotate by 90 degrees around the X-axis.
             glm::mat4 rotationMatrix = glm::rotate(glm::mat4(1.0f), glm::radians(90.0f), glm::vec3(1.0f, 0.0f, 0.0f));
             topLeft.pos = glm::vec3(rotationMatrix * glm::vec4(topLeft.pos, 1.0f));
@@ -84,15 +84,11 @@ void RenderObject::triangulate() {
     }
 }
 
-std::vector<Vertex> RenderObject::getVertices(bool applyTransform) const {
+std::vector<Vertex> RenderObject::getWorldVertices() const {
     std::vector<Vertex> vertices;
-    if (applyTransform) {  // Apply model transformation to vertices (saved in model coords) before returning
-        for (auto vertex : m_vertices) {
-            vertex.pos = glm::vec3(m_rotation * glm::vec4(vertex.pos, 1.0f) + m_translation);
-            vertices.push_back(vertex);
-        }
-    } else {  // Return vertices in model coords
-        vertices = m_vertices;
+    for (auto vertex : m_vertices) {
+        vertex.pos = glm::vec3(m_rotation * glm::vec4(vertex.pos, 1.0f) + m_translation);
+        vertices.push_back(vertex);
     }
     return vertices;
 }

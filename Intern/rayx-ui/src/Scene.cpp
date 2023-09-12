@@ -11,7 +11,7 @@ void Scene::update(const std::vector<RenderObject>& renderObjects, const RAYX::B
     m_indices[1].clear();
 
     for (const auto& renderObject : renderObjects) {
-        auto vertices = renderObject.getVertices();
+        auto vertices = renderObject.getWorldVertices();
         for (const auto& vertex : vertices) {
             addVertex(vertex, TRIA_TOPOGRAPHY);
         }

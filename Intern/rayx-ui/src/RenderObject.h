@@ -22,7 +22,7 @@ class RenderObject {
     RenderObject(const RAYX::OpticalElement& element);
     ~RenderObject() = default;
 
-    static std::vector<RenderObject> getRenderData(const std::filesystem::path& filename);
+    static std::vector<RenderObject> createRenderObjects(const std::filesystem::path& filename);
 
     // Currently implemented in eager fashion (will update triangles and indices)
     void triangulate();
@@ -30,7 +30,8 @@ class RenderObject {
     // Getters
     glm::vec4 getTranslation() const { return m_translation; }
     glm::quat getRotation() const { return m_rotation; }
-    std::vector<Vertex> getVertices(bool applyTransform = true) const;
+    std::vector<Vertex> getVertices() const { return m_vertices; }
+    std::vector<Vertex> getWorldVertices() const;
 
   private:
     std::string m_name;
