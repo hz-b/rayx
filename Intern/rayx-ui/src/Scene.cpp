@@ -5,9 +5,16 @@
 
 Scene::Scene(Device& device) : m_Device(device) {}
 
-void Scene::setup(const RAYX::RenderObjectVec& renderObjects, const RAYX::BundleHistory& bundleHistory) {
+void Scene::update(const std::vector<RenderObject>& renderObjects, const RAYX::BundleHistory& bundleHistory) {
+    m_vertices.clear();
+    m_indices[0].clear();
+    m_indices[1].clear();
+
     for (const auto& renderObject : renderObjects) {
-        fromRenderObject(renderObject);
+        auto vertices = renderObject.getWorldVertices();
+        for (const auto& vertex : vertices) {
+            addVertex(vertex, TRIA_TOPOGRAPHY);
+        }
     }
 
     for (const auto& rayHist : bundleHistory) {
@@ -16,8 +23,8 @@ void Scene::setup(const RAYX::RenderObjectVec& renderObjects, const RAYX::Bundle
             if (event.m_eventType == ETYPE_JUST_HIT_ELEM || event.m_eventType == ETYPE_ABSORBED) {
                 // Events where rays hit objects are in element coordinates
                 // We need to convert them to world coordinates
-                glm::vec4 lastElementPos = renderObjects[(size_t)event.m_lastElement].position;
-                glm::mat4 lastElementOri = renderObjects[(size_t)event.m_lastElement].orientation;
+                glm::vec4 lastElementPos = renderObjects[(size_t)event.m_lastElement].getTranslation();
+                glm::mat4 lastElementOri = glm::mat4_cast(renderObjects[(size_t)event.m_lastElement].getRotation());
                 glm::dmat4 outTrans = RAYX::calcTransformationMatrices(lastElementPos, lastElementOri, false);
                 glm::vec4 worldPos = outTrans * glm::vec4(event.m_position, 1.0f);
 
@@ -39,164 +46,14 @@ void Scene::setup(const RAYX::RenderObjectVec& renderObjects, const RAYX::Bundle
                 glm::vec3 eventDir = event.m_direction;
                 glm::vec3 pointPos = eventPos + eventDir * 1000.0f;
 
-                Vertex origin = {{eventPos.x, eventPos.y, eventPos.z}, m_blue};
-                Vertex point = {{pointPos.x, pointPos.y, pointPos.z}, m_blue};
-                // addLine(origin, point);
+                Vertex origin = {{eventPos.x, eventPos.y, eventPos.z}, m_grey};
+                Vertex point = {{pointPos.x, pointPos.y, pointPos.z}, m_grey};
+                addLine(origin, point);
             }
         }
     }
 
     updateBuffers();
-}
-
-void Scene::addTriangle(const Vertex v1, const Vertex v2, const Vertex v3) {
-    addVertex(v1, TRIA_TOPOGRAPHY);
-    addVertex(v2, TRIA_TOPOGRAPHY);
-    addVertex(v3, TRIA_TOPOGRAPHY);
-}
-
-void Scene::addLine(const Vertex v1, const Vertex v2) {
-    addVertex(v1, LINE_TOPOGRAPHY);
-    addVertex(v2, LINE_TOPOGRAPHY);
-}
-
-void Scene::fromRenderObject(const RAYX::RenderObject& renderObject) {
-    glm::vec4 topLeft, topRight, bottomLeft, bottomRight;
-    if (renderObject.cutout.m_type == 2) {  // trapzoid
-        TrapezoidCutout trapez = deserializeTrapezoid(renderObject.cutout);
-
-        topLeft = {-trapez.m_sizeA_x1 / 2.0f, 0, trapez.m_size_x2 / 2.0f, 1.0f};
-        topRight = {trapez.m_sizeA_x1 / 2.0f, 0, trapez.m_size_x2 / 2.0f, 1.0f};
-        bottomLeft = {-trapez.m_sizeB_x1 / 2.0f, 0, -trapez.m_size_x2 / 2.0f, 1.0f};
-        bottomRight = {trapez.m_sizeB_x1 / 2.0f, 0, -trapez.m_size_x2 / 2.0f, 1.0f};
-    } else {  // rectangle, unlimited, elliptical (treat all as rectangles)
-
-        double width, height;
-        if (renderObject.cutout.m_type == 3 || renderObject.cutout.m_type == 1) {  // unlimited or elliptical
-            width = 100.0f;
-            height = 100.0f;
-        } else {  // rectangle
-            RectCutout rect = deserializeRect(renderObject.cutout);
-            width = rect.m_size_x1;
-            height = rect.m_size_x2;
-        }
-
-        // Calculate two triangle from the position, orientation and size of the render object
-        // Assume the rectangle is in the XZ plane, and its center is at position.
-        // First, calculate the corners of the rectangle in the model's local space
-        topLeft = {-width / 2.0f, 0, height / 2.0f, 1.0f};
-        topRight = {width / 2.0f, 0, height / 2.0f, 1.0f};
-        bottomLeft = {-width / 2.0f, 0, -height / 2.0f, 1.0f};
-        bottomRight = {width / 2.0f, 0, -height / 2.0f, 1.0f};
-    }
-    RAYX::RenderObject modifiedObject = renderObject;
-    // Check if the current object is an image plane.
-    if (renderObject.type == 4 || renderObject.type == 2) {
-        // Rotate by 90 degrees around the X-axis.
-        glm::mat4 rotationMatrix = glm::rotate(glm::mat4(1.0f), glm::radians(90.0f), glm::vec3(1.0f, 0.0f, 0.0f));
-        modifiedObject.orientation = rotationMatrix * renderObject.orientation;
-    }
-
-    // To world coordinates
-    glm::vec4 worldTopLeft = modifiedObject.orientation * topLeft + modifiedObject.position;
-    glm::vec4 worldTopRight = modifiedObject.orientation * topRight + modifiedObject.position;
-    glm::vec4 worldBottomLeft = modifiedObject.orientation * bottomLeft + modifiedObject.position;
-    glm::vec4 worldBottomRight = modifiedObject.orientation * bottomRight + modifiedObject.position;
-
-    // Create the vertices
-    Vertex v1 = {{worldTopLeft.x, worldTopLeft.y, worldTopLeft.z}, m_lighterBlue};
-    Vertex v2 = {{worldTopRight.x, worldTopRight.y, worldTopRight.z}, m_blue};
-    Vertex v3 = {{worldBottomLeft.x, worldBottomLeft.y, worldBottomLeft.z}, m_blue};
-    Vertex v4 = {{worldBottomRight.x, worldBottomRight.y, worldBottomRight.z}, m_darkerBlue};
-    addTriangle(v1, v2, v3);
-    addTriangle(v2, v3, v4);
-}
-
-std::vector<Scene::Triangle> Scene::trianglesFromQuadric(const RAYX::RenderObject& renderObject) {
-    // Define the size and resolution of the grid
-    double scalarGrid[GRIDSIZE][GRIDSIZE][GRIDSIZE];
-
-    // 1. Sample the 3D space
-    for (int x = 0; x < GRIDSIZE; x++) {
-        for (int y = 0; y < GRIDSIZE; y++) {
-            for (int z = 0; z < GRIDSIZE; z++) {
-                glm::vec4 pos(x, y, z, 1);
-                double value = evaluateQuadricAtPosition(renderObject.surface, pos);
-                scalarGrid[x][y][z] = value;
-            }
-        }
-    }
-
-    // 2. March through each voxel
-    std::vector<Triangle> triangles;
-    for (int x = 0; x < GRIDSIZE - 1; x++) {
-        for (int y = 0; y < GRIDSIZE - 1; y++) {
-            for (int z = 0; z < GRIDSIZE - 1; z++) {
-                int caseIndex = determineMarchingCubesCase(scalarGrid, x, y, z);
-                std::vector<Triangle> voxelTriangles = lookupTrianglesForCase(caseIndex);
-                triangles.insert(triangles.end(), voxelTriangles.begin(), voxelTriangles.end());
-            }
-        }
-    }
-
-    return triangles;
-}
-
-double Scene::evaluateQuadricAtPosition(const double surface[16], const glm::vec4& pos) {
-    // Convert the surface array to a glm::mat4.
-    glm::mat4 surfaceMatrix(surface[0], surface[1], surface[2], surface[3], surface[4], surface[5], surface[6], surface[7], surface[8], surface[9],
-                            surface[10], surface[11], surface[12], surface[13], surface[14], surface[15]);
-
-    glm::vec4 resultVec = pos * surfaceMatrix;
-    double result = glm::dot(resultVec, pos);
-
-    return result;
-}
-
-int Scene::determineMarchingCubesCase(const double scalarGrid[GRIDSIZE][GRIDSIZE][GRIDSIZE], int x, int y, int z) {
-    // Based on the scalar values at the voxel corners, determine the index for the lookup tables.
-    int cubeIndex = 0;
-    if (scalarGrid[x][y][z] < 0) cubeIndex |= 1;
-    if (scalarGrid[x + 1][y][z] < 0) cubeIndex |= 2;
-    if (scalarGrid[x + 1][y][z + 1] < 0) cubeIndex |= 4;
-    if (scalarGrid[x][y][z + 1] < 0) cubeIndex |= 8;
-    if (scalarGrid[x][y + 1][z] < 0) cubeIndex |= 16;
-    if (scalarGrid[x + 1][y + 1][z] < 0) cubeIndex |= 32;
-    if (scalarGrid[x + 1][y + 1][z + 1] < 0) cubeIndex |= 64;
-    if (scalarGrid[x][y + 1][z + 1] < 0) cubeIndex |= 128;
-
-    return cubeIndex;
-}
-
-std::vector<Scene::Triangle> Scene::lookupTrianglesForCase(int caseIndex) {
-    // Using the triTable to generate the triangles for the voxel.
-
-    std::vector<Triangle> triangles;
-
-    // triTable[caseIndex] provides the edges to be connected for the triangles.
-    // Every 3 indices in the table make up a triangle.
-    for (int i = 0; triTable[caseIndex][i] != -1; i += 3) {
-        Scene::Triangle triangle;
-
-        // Convert edge indices to vertices
-        triangle.vertices[0] = interpolateVertex(/*triTable[caseIndex][i]*/);
-        triangle.vertices[1] = interpolateVertex(/*triTable[caseIndex][i + 1]*/);
-        triangle.vertices[2] = interpolateVertex(/*triTable[caseIndex][i + 2]*/);
-
-        triangles.push_back(triangle);
-    }
-
-    return triangles;
-}
-
-Vertex Scene::interpolateVertex(/* int edgeIndex */) {
-    // Here, we'd interpolate between the two voxel corners that the edge connects.
-    // This function should return the vertex position on the edge where the surface intersects.
-    // The exact interpolation might depend on the scalar values at the voxel corners.
-    // This is a placeholder function. The actual function would involve more logic to determine the exact position.
-    Vertex v;
-    v.pos = glm::vec3(0, 0, 0);  // Placeholder value
-    return v;
 }
 
 void Scene::draw(VkCommandBuffer commandBuffer, Topography topography) const {
@@ -215,6 +72,11 @@ void Scene::bind(VkCommandBuffer commandBuffer, Topography topography) const {
     if (m_indexBuffers[topography] != nullptr) {
         vkCmdBindIndexBuffer(commandBuffer, m_indexBuffers[topography]->getBuffer(), 0, VK_INDEX_TYPE_UINT32);
     }
+}
+
+void Scene::addLine(const Vertex v1, const Vertex v2) {
+    addVertex(v1, LINE_TOPOGRAPHY);
+    addVertex(v2, LINE_TOPOGRAPHY);
 }
 
 // Function that adds vertex to scene if it doesn't exist, otherwise adds index of existing vertex
