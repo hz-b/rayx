@@ -39,7 +39,7 @@ Application::~Application() {}
 
 void Application::run() {
     // Get the render data
-    std::string path = "MultiRZP_101_0.00203483_groupedCCD";
+    std::string path = "CylinderDefault";
     std::vector<RenderObject> vec = RenderObject::createRenderObjects(std::string(path + ".rml"));
     RAYX::BundleHistory rays;
     readH5(rays, std::string(path + ".h5"), FULL_FORMAT);

@@ -12,6 +12,7 @@ void Scene::update(const std::vector<RenderObject>& renderObjects, const RAYX::B
 
     for (const auto& renderObject : renderObjects) {
         auto vertices = renderObject.getWorldVertices();
+        RAYX_LOG << "Vertices Count: " << vertices.size();
         for (const auto& vertex : vertices) {
             addVertex(vertex, TRIA_TOPOGRAPHY);
         }

@@ -51,12 +51,14 @@ class RenderObject {
 
     // Marching Cubes
     glm::vec3 getPositionAtCorner(int cornerIndex);
+    Vertex interpolateVertex(int edgeIndex, const double scalarGrid[GRIDSIZE][GRIDSIZE][GRIDSIZE], int offsetX, int offsetY, int offsetZ);
     std::vector<Triangle> trianglesFromQuadric();
     double evaluateQuadricAtPosition(const double surface[16], const glm::vec4& pos);
     int determineMarchingCubesCase(const double scalarGrid[GRIDSIZE][GRIDSIZE][GRIDSIZE], int x, int y, int z);
-    std::vector<Triangle> lookupTrianglesForCase(int caseIndex);
+    std::vector<Triangle> lookupTrianglesForCase(int caseIndex, const double scalarGrid[GRIDSIZE][GRIDSIZE][GRIDSIZE], int offsetX, int offsetY,
+                                                 int offsetZ);
     Vertex getVertexFromEdge(int edgeIndex);
-    Vertex interpolateVertex(int edgeIndex);
+    double getScalarValueAtCorner(int x, int y, int z, const double scalarGrid[GRIDSIZE][GRIDSIZE][GRIDSIZE]);
 
     // Marching Cubes
     int edgeTable[256] = {
