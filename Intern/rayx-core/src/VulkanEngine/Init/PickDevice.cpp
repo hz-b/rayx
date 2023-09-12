@@ -165,11 +165,9 @@ void VulkanEngine::createLogicalDevice() {
     deviceFeatures.robustBufferAccess = VK_TRUE;
 
 
-    VkPhysicalDeviceVulkan13Features vk13features = {
-        .sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_3_FEATURES,
-        .pNext = NULL,
-        .maintenance4 = VK_TRUE,
-    };
+    VkPhysicalDeviceVulkan13Features vk13features{};
+    vk13features.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_3_FEATURES;
+    vk13features.maintenance4 = VK_TRUE;
 
     VkDeviceCreateInfo createInfo{};
     createInfo.sType = VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO;
