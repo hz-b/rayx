@@ -120,7 +120,7 @@ if(NOT VULKAN STREQUAL "NO")
         ${COMPILED_SHADER}
         ${COMPILED_SHADER_FAKE}
         COMMAND "glslc"
-        ARGS ${PROJECT_SOURCE_DIR}/src/Tracer/shader/main-glsl.comp -o ${COMPILED_SHADER} -fshader-stage=compute
+        ARGS ${PROJECT_SOURCE_DIR}/src/Tracer/shader/main-glsl.comp -o ${COMPILED_SHADER} -fshader-stage=compute --target-env=vulkan1.3
     )
 
     add_custom_target(COMPILE_SHADER ALL DEPENDS ${COMPILED_SHADER})

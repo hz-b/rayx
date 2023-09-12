@@ -164,11 +164,19 @@ void VulkanEngine::createLogicalDevice() {
     deviceFeatures.shaderInt64 = VK_TRUE;
     deviceFeatures.robustBufferAccess = VK_TRUE;
 
+
+    VkPhysicalDeviceVulkan13Features vk13features = {
+        .sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_3_FEATURES,
+        .pNext = NULL,
+        .maintenance4 = VK_TRUE,
+    };
+
     VkDeviceCreateInfo createInfo{};
     createInfo.sType = VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO;
     createInfo.pQueueCreateInfos = &queueCreateInfo;
     createInfo.queueCreateInfoCount = 1;
     createInfo.pEnabledFeatures = &deviceFeatures;
+    createInfo.pNext = &vk13features;
 
     auto extensions = getRequiredDeviceExtensions();
     createInfo.enabledExtensionCount = static_cast<uint32_t>(extensions.size());
