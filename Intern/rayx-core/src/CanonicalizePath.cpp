@@ -68,7 +68,7 @@ std::vector<uint8_t> readFile(const std::string& filename, const uint32_t count)
     file.open(filename, std::ios::in | std::ios::binary);
 
     if (!file.is_open()) {
-        RAYX_ERR << "Failed to open file: " << filename;
+        throw std::runtime_error("Failed to open file: " + filename);
     }
 
     uint64_t read_count = count;
@@ -91,7 +91,7 @@ void writeFile(const std::vector<uint8_t>& data, const std::string& filename, co
     file.open(filename, std::ios::out | std::ios::binary | std::ios::trunc);
 
     if (!file.is_open()) {
-        RAYX_ERR << "Failed to open file: " << filename;
+        throw std::runtime_error("Failed to open file: " + filename);
     }
 
     uint64_t write_count = count;
