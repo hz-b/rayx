@@ -45,9 +45,9 @@ class RenderObject {
 
     std::vector<Vertex> m_vertices;  ///< In model coordinates
 
-    const glm::vec4 m_greenBase = {0.0f, 1.0f, 0.0f, 1.0f};
-    const glm::vec4 m_darkerGreen = {0.0f, 0.5f, 0.0f, 1.0f};
-    const glm::vec4 m_lighterGreen = {0.4f, 1.0f, 0.4f, 1.0f};
+    const glm::vec4 m_blue = {0.0f, 0.0f, 1.0f, 0.7f};
+    const glm::vec4 m_darkerBlue = {0.0f, 0.0f, 0.3f, 0.7f};
+    const glm::vec4 m_lighterBlue = {0.7f, 0.7f, 1.0f, 0.7f};
 
     // Marching Cubes // TODO: Move to own class
     std::vector<Triangle> trianglesFromQuadric(const RenderObject& renderObject);

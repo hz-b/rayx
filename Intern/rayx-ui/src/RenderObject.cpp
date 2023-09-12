@@ -38,10 +38,10 @@ void RenderObject::triangulate() {
         if (m_Cutout.m_type == 2) {  // trapzoid
             TrapezoidCutout trapez = deserializeTrapezoid(m_Cutout);
 
-            topLeft = Vertex(glm::vec4(-trapez.m_sizeA_x1 / 2.0f, 0, trapez.m_size_x2 / 2.0f, 1.0f), m_darkerGreen);
-            topRight = Vertex(glm::vec4(trapez.m_sizeA_x1 / 2.0f, 0, trapez.m_size_x2 / 2.0f, 1.0f), m_greenBase);
-            bottomLeft = Vertex(glm::vec4(-trapez.m_sizeB_x1 / 2.0f, 0, -trapez.m_size_x2 / 2.0f, 1.0f), m_lighterGreen);
-            bottomRight = Vertex(glm::vec4(trapez.m_sizeB_x1 / 2.0f, 0, -trapez.m_size_x2 / 2.0f, 1.0f), m_greenBase);
+            topLeft = Vertex(glm::vec4(-trapez.m_sizeA_x1 / 2.0f, 0, trapez.m_size_x2 / 2.0f, 1.0f), m_darkerBlue);
+            topRight = Vertex(glm::vec4(trapez.m_sizeA_x1 / 2.0f, 0, trapez.m_size_x2 / 2.0f, 1.0f), m_blue);
+            bottomLeft = Vertex(glm::vec4(-trapez.m_sizeB_x1 / 2.0f, 0, -trapez.m_size_x2 / 2.0f, 1.0f), m_lighterBlue);
+            bottomRight = Vertex(glm::vec4(trapez.m_sizeB_x1 / 2.0f, 0, -trapez.m_size_x2 / 2.0f, 1.0f), m_blue);
         } else {  // rectangle, unlimited, elliptical (treat all as rectangles)
 
             double width, height;
@@ -57,10 +57,10 @@ void RenderObject::triangulate() {
             // Calculate two triangle from the position, orientation and size of the render object
             // Assume the rectangle is in the XZ plane, and its center is at position.
             // First, calculate the corners of the rectangle in the model's local space
-            topLeft = Vertex(glm::vec4(-width / 2.0f, 0, height / 2.0f, 1.0f), m_darkerGreen);
-            topRight = Vertex(glm::vec4(width / 2.0f, 0, height / 2.0f, 1.0f), m_greenBase);
-            bottomLeft = Vertex(glm::vec4(-width / 2.0f, 0, -height / 2.0f, 1.0f), m_lighterGreen);
-            bottomRight = Vertex(glm::vec4(width / 2.0f, 0, -height / 2.0f, 1.0f), m_greenBase);
+            topLeft = Vertex(glm::vec4(-width / 2.0f, 0, height / 2.0f, 1.0f), m_darkerBlue);
+            topRight = Vertex(glm::vec4(width / 2.0f, 0, height / 2.0f, 1.0f), m_blue);
+            bottomLeft = Vertex(glm::vec4(-width / 2.0f, 0, -height / 2.0f, 1.0f), m_lighterBlue);
+            bottomRight = Vertex(glm::vec4(width / 2.0f, 0, -height / 2.0f, 1.0f), m_blue);
         }
         // Check if the current object is an image plane.
         if (m_Behaviour.m_type == BTYPE_IMAGE_PLANE || m_Behaviour.m_type == BTYPE_SLIT) {

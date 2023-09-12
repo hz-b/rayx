@@ -46,9 +46,9 @@ void Scene::update(const std::vector<RenderObject>& renderObjects, const RAYX::B
                 glm::vec3 eventDir = event.m_direction;
                 glm::vec3 pointPos = eventPos + eventDir * 1000.0f;
 
-                Vertex origin = {{eventPos.x, eventPos.y, eventPos.z}, m_blue};
-                Vertex point = {{pointPos.x, pointPos.y, pointPos.z}, m_blue};
-                // addLine(origin, point);
+                Vertex origin = {{eventPos.x, eventPos.y, eventPos.z}, m_grey};
+                Vertex point = {{pointPos.x, pointPos.y, pointPos.z}, m_grey};
+                addLine(origin, point);
             }
         }
     }
