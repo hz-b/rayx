@@ -49,12 +49,14 @@ class RenderObject {
     const glm::vec4 m_darkerBlue = {0.0f, 0.0f, 0.3f, 0.7f};
     const glm::vec4 m_lighterBlue = {0.7f, 0.7f, 1.0f, 0.7f};
 
-    // Marching Cubes // TODO: Move to own class
-    std::vector<Triangle> trianglesFromQuadric(const RenderObject& renderObject);
-    double evaluateQuadricAtPosition(const glm::vec4& pos);
+    // Marching Cubes
+    glm::vec3 getPositionAtCorner(int cornerIndex);
+    std::vector<Triangle> trianglesFromQuadric();
+    double evaluateQuadricAtPosition(const double surface[16], const glm::vec4& pos);
     int determineMarchingCubesCase(const double scalarGrid[GRIDSIZE][GRIDSIZE][GRIDSIZE], int x, int y, int z);
     std::vector<Triangle> lookupTrianglesForCase(int caseIndex);
-    Vertex interpolateVertex(/* int edgeIndex */);
+    Vertex getVertexFromEdge(int edgeIndex);
+    Vertex interpolateVertex(int edgeIndex);
 
     // Marching Cubes
     int edgeTable[256] = {

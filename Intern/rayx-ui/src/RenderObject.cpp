@@ -93,7 +93,7 @@ std::vector<Vertex> RenderObject::getWorldVertices() const {
     return vertices;
 }
 
-std::vector<Triangle> RenderObject::trianglesFromQuadric(const RenderObject& renderObject) {
+std::vector<Triangle> RenderObject::trianglesFromQuadric() {
     // Define the size and resolution of the grid
     double scalarGrid[GRIDSIZE][GRIDSIZE][GRIDSIZE];
 
@@ -102,7 +102,7 @@ std::vector<Triangle> RenderObject::trianglesFromQuadric(const RenderObject& ren
         for (int y = 0; y < GRIDSIZE; y++) {
             for (int z = 0; z < GRIDSIZE; z++) {
                 glm::vec4 pos(x, y, z, 1);
-                double value = evaluateQuadricAtPosition(pos);
+                double value = evaluateQuadricAtPosition(this->m_Surface.m_params, pos);
                 scalarGrid[x][y][z] = value;
             }
         }
@@ -123,15 +123,22 @@ std::vector<Triangle> RenderObject::trianglesFromQuadric(const RenderObject& ren
     return triangles;
 }
 
-double RenderObject::evaluateQuadricAtPosition(const glm::vec4& pos) {
-    // Convert the surface array to a glm::mat4.
-    glm::mat4 surfaceMatrix(m_Surface.m_params[0], m_Surface.m_params[1], m_Surface.m_params[2], m_Surface.m_params[3], m_Surface.m_params[4],
-                            m_Surface.m_params[5], m_Surface.m_params[6], m_Surface.m_params[7], m_Surface.m_params[8], m_Surface.m_params[9],
-                            m_Surface.m_params[10], m_Surface.m_params[11], m_Surface.m_params[12], m_Surface.m_params[13], m_Surface.m_params[14],
-                            m_Surface.m_params[15]);
-
-    glm::vec4 resultVec = pos * surfaceMatrix;
-    double result = glm::dot(resultVec, pos);
+double RenderObject::evaluateQuadricAtPosition(const double sur[16], const glm::vec4& pos) {
+    double surface[11];
+    surface[0] = -10.0;
+    surface[1] = 1.0;
+    surface[2] = 1.0;
+    surface[3] = 0.0;
+    surface[4] = 0.0;
+    surface[5] = 0.0;
+    surface[6] = 0.0;
+    surface[7] = 0.0;
+    surface[8] = 0.0;
+    surface[9] = 0.0;
+    surface[10] = -1.0;
+    double result = surface[1] * pos.x * pos.x + surface[2] * pos.y * pos.y + surface[3] * pos.z * pos.z + surface[4] * pos.x * pos.y +
+                    surface[5] * pos.x * pos.z + surface[6] * pos.y * pos.z + surface[7] * pos.x + surface[8] * pos.y + surface[9] * pos.z +
+                    surface[10];
 
     return result;
 }
@@ -162,9 +169,9 @@ std::vector<Triangle> RenderObject::lookupTrianglesForCase(int caseIndex) {
         Triangle triangle;
 
         // Convert edge indices to vertices
-        triangle.vertices[0] = interpolateVertex(/*triTable[caseIndex][i]*/);
-        triangle.vertices[1] = interpolateVertex(/*triTable[caseIndex][i + 1]*/);
-        triangle.vertices[2] = interpolateVertex(/*triTable[caseIndex][i + 2]*/);
+        triangle.vertices[0] = getVertexFromEdge(triTable[caseIndex][i]);
+        triangle.vertices[1] = getVertexFromEdge(triTable[caseIndex][i + 1]);
+        triangle.vertices[2] = getVertexFromEdge(triTable[caseIndex][i + 2]);
 
         triangles.push_back(triangle);
     }
@@ -172,12 +179,64 @@ std::vector<Triangle> RenderObject::lookupTrianglesForCase(int caseIndex) {
     return triangles;
 }
 
-Vertex RenderObject::interpolateVertex() {
-    // Here, we'd interpolate between the two voxel corners that the edge connects.
-    // This function should return the vertex position on the edge where the surface intersects.
-    // The exact interpolation might depend on the scalar values at the voxel corners.
-    // This is a placeholder function. The actual function would involve more logic to determine the exact position.
+Vertex RenderObject::getVertexFromEdge(int edgeIndex) {
+    // Define edge-to-vertex mapping. This is typical for Marching Cubes.
+    int edgeToVertex[12][2] = {{0, 1}, {1, 2}, {2, 3}, {3, 0}, {4, 5}, {5, 6}, {6, 7}, {7, 4}, {0, 4}, {1, 5}, {2, 6}, {3, 7}};
+
+    // For simplicity, we'll just use the first vertex of the edge.
+    int vertexIndex = edgeToVertex[edgeIndex][0];
+    int vertexIndex2 = edgeToVertex[edgeIndex][1];
+
     Vertex v;
-    v.pos = glm::vec3(0, 0, 0);  // Placeholder value
+    auto x = getPositionAtCorner(vertexIndex);
+    auto y = getPositionAtCorner(vertexIndex2);
+    v.pos = glm::mix(x, y, 0.5f);
+
     return v;
 }
+
+glm::vec3 RenderObject::getPositionAtCorner(int cornerIndex) {
+    glm::vec3 cornerPositions[8] = {
+        glm::vec3(0, 0, 0),  // 0
+        glm::vec3(1, 0, 0),  // 1
+        glm::vec3(1, 0, 1),  // 2
+        glm::vec3(0, 0, 1),  // 3
+        glm::vec3(0, 1, 0),  // 4
+        glm::vec3(1, 1, 0),  // 5
+        glm::vec3(1, 1, 1),  // 6
+        glm::vec3(0, 1, 1)   // 7
+    };
+    // Check for valid index
+    if (cornerIndex < 0 || cornerIndex >= 8) {
+        throw std::out_of_range("Invalid corner index");
+    }
+    return cornerPositions[cornerIndex];
+}
+// Vertex RenderObject::interpolateVertex(int edgeIndex) {
+//     // Define edge-to-vertex mapping. This is typical for Marching Cubes.
+//     int edgeToVertex[12][2] = {{0, 1}, {1, 2}, {2, 3}, {3, 0}, {4, 5}, {5, 6}, {6, 7}, {7, 4}, {0, 4}, {1, 5}, {2, 6}, {3, 7}};
+
+//     // Get the voxel corner indices for the edge
+//     int v0Index = edgeToVertex[edgeIndex][0];
+//     int v1Index = edgeToVertex[edgeIndex][1];
+
+//     // Get the scalar values at the voxel corners
+//     float value0 = getScalarValueAtCorner(v0Index);
+//     float value1 = getScalarValueAtCorner(v1Index);
+
+//     // Interpolate the position. This is a simple linear interpolation.
+//     // In practice, you might want to use the actual positions of the voxel corners and interpolate based on the scalar values.
+//     float t = (0 - value0) / (value1 - value0);  // Assuming we want the position where the scalar value is 0
+
+//     Vertex v;
+//     v.pos = glm::mix(getPositionAtCorner(v0Index), getPositionAtCorner(v1Index), t);
+
+//     return v;
+// }
+// float Scene::getScalarValueAtCorner(int cornerIndex) {
+//     // Check for valid index
+//     if (cornerIndex < 0 || cornerIndex >= scalarValues.size()) {
+//         throw std::out_of_range("Invalid corner index");
+//     }
+//     return scalarValues[cornerIndex];
+// }
