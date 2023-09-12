@@ -44,7 +44,7 @@ uint32_t* readFile(uint32_t& length, const char* filename) {
 
     // read file contents.
     char* str = new char[filesizepadded];
-    uint32_t readCount = fread(str, sizeof(char), filesize, fp);
+    size_t readCount = fread(str, sizeof(char), filesize, fp);
     if (readCount != (uint32_t)filesize) {
         RAYX_D_WARN << readCount << " != " << filesize << "...";
         RAYX_D_ERR << "Errors while reading file: " << filename;

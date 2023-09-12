@@ -15,7 +15,7 @@ void VulkanEngine::createCache() {
     auto tmpDir = std::filesystem::temp_directory_path();
     try {
         pipeline_data = readFile((tmpDir / "pipeline_cache.data").string());
-    } catch (std::runtime_error& ex) {
+    } catch (std::runtime_error&) {
         RAYX_LOG << "No pipeline cache found.";
     }
 

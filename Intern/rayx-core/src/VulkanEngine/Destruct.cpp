@@ -37,7 +37,7 @@ void inline storePipelineCache(VkDevice& device, VkPipelineCache& cache) {
         try {
             /* Write pipeline cache data to a file in binary format */
             writeFile(data, (tmpDir / "pipeline_cache.data").string());
-        } catch (std::runtime_error& ex) {
+        } catch (std::runtime_error&) {
             RAYX_WARN << "No pipeline cache written.";
         }
 
