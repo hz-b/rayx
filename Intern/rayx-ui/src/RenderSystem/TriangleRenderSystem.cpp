@@ -1,16 +1,5 @@
 #include "TriangleRenderSystem.h"
 
-// libs
-#define GLM_FORCE_RADIANS
-#define GLM_FORCE_DEPTH_ZERO_TO_ONE
-#include <glm/glm.hpp>
-#include <glm/gtc/constants.hpp>
-
-// std
-#include <array>
-#include <cassert>
-#include <stdexcept>
-
 TriangleRenderSystem::TriangleRenderSystem(Device& device, Scene& scene, VkRenderPass renderPass, VkDescriptorSetLayout globalSetLayout)
     : m_Device{device}, m_Scene{scene} {
     createPipelineLayout(globalSetLayout);

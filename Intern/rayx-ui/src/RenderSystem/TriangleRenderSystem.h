@@ -7,7 +7,6 @@
 
 // std
 #include <memory>
-#include <vector>
 
 class TriangleRenderSystem {
   public:
