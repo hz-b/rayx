@@ -4,7 +4,6 @@
 
 #include "Device.h"
 
-// TODO: Move viewport and scissor to createInfo
 struct PipelineConfigInfo {
     PipelineConfigInfo() = default;
     PipelineConfigInfo(const PipelineConfigInfo&) = delete;

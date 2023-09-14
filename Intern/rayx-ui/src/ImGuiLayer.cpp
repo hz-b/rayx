@@ -1,5 +1,8 @@
 #include "ImGuiLayer.h"
 
+#include <imgui_impl_glfw.h>
+#include <imgui_impl_vulkan.h>
+
 void checkVkResult(VkResult result, const char* message) {
     if (result != VK_SUCCESS) {
         printf("%s\n", message);

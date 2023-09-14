@@ -1,8 +1,8 @@
 #pragma once
 
-#include "Device.h"
 #include "FrameInfo.h"
-#include "GraphicsPipeline.h"
+#include "GraphicsCore/Device.h"
+#include "GraphicsCore/GraphicsPipeline.h"
 #include "Scene.h"
 
 // std

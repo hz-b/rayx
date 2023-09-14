@@ -1,14 +1,5 @@
 #include "Swapchain.h"
 
-// std
-#include <array>
-#include <cstdlib>
-#include <cstring>
-#include <iostream>
-#include <limits>
-#include <set>
-#include <stdexcept>
-
 SwapChain::SwapChain(Device& deviceRef, VkExtent2D extent) : m_Device{deviceRef}, m_WindowExtent{extent} { init(); }
 
 SwapChain::SwapChain(Device& deviceRef, VkExtent2D extent, std::shared_ptr<SwapChain> previous)

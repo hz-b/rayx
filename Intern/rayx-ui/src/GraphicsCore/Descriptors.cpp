@@ -1,8 +1,5 @@
 #include "Descriptors.h"
 
-#include <cassert>
-#include <stdexcept>
-
 // *************** Descriptor Set Layout Builder *********************
 
 DescriptorSetLayout::Builder& DescriptorSetLayout::Builder::addBinding(uint32_t binding, VkDescriptorType descriptorType,

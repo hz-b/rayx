@@ -1,11 +1,10 @@
 #pragma once
 
-#include "Device.h"
-
-// std
 #include <memory>
 #include <unordered_map>
 #include <vector>
+
+#include "Device.h"
 
 class DescriptorSetLayout {
   public:

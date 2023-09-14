@@ -1,10 +1,8 @@
 #pragma once
 
-#include "Window.h"
-
-// std lib headers
-#include <string>
 #include <vector>
+
+#include "Window.h"
 
 struct SwapChainSupportDetails {
     VkSurfaceCapabilitiesKHR capabilities;

@@ -1,5 +1,7 @@
 #include "Triangulate.h"
 
+#include <glm/gtc/matrix_transform.hpp>
+
 #include "Debug/Debug.h"
 
 // ------ Helper functions ------

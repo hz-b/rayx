@@ -1,13 +1,10 @@
 #pragma once
 
-#include "Device.h"
-
-// vulkan headers
 #include <vulkan/vulkan.h>
 
-// std lib headers
-#include <string>
 #include <vector>
+
+#include "Device.h"
 
 class SwapChain {
   public:

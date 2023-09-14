@@ -1,20 +1,11 @@
 #include "Application.h"
 
-#include <algorithm>
 #include <chrono>
-#include <cstdint>
-#include <cstdlib>
-#include <cstring>
-#include <fstream>
-#include <glm/gtc/matrix_transform.hpp>
-#include <iostream>
-#include <limits>
-#include <optional>
-#include <set>
-#include <stdexcept>
 
 #include "Data/Importer.h"
 #include "FrameInfo.h"
+#include "GraphicsCore/Renderer.h"
+#include "GraphicsCore/Window.h"
 #include "RenderObject.h"
 #include "RenderSystem/LineRenderSystem.h"
 #include "RenderSystem/TriangleRenderSystem.h"

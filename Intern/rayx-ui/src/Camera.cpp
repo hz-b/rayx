@@ -1,5 +1,11 @@
 #include "Camera.h"
 
+#include <vulkan/vulkan.h>
+
+#include <fstream>
+#include <glm/gtc/matrix_transform.hpp>
+#include <sstream>
+
 CameraController::CameraController()
     : m_position(0.0f, 0.0f, -2.0f),
       m_direction(0.0f, 0.0f, 1.0f),

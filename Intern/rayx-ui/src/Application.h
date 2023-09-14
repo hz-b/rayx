@@ -1,23 +1,11 @@
 #pragma once
 
-#define GLFW_INCLUDE_VULKAN
-#include <GLFW/glfw3.h>
-
 #define GLM_FORCE_RADIANS
 #define GLM_FORCE_DEPTH_ZERO_TO_ONE
-#include <glm/glm.hpp>
-#include <optional>
-#include <vector>
 
-#include "Beamline/Beamline.h"
-#include "Descriptors.h"
-#include "GraphicsPipeline.h"
-#include "ImGuiLayer.h"
-#include "Renderer.h"
+#include "GraphicsCore/Descriptors.h"
+#include "GraphicsCore/Renderer.h"
 #include "Scene.h"
-#include "Swapchain.h"
-#include "Tracer/Tracer.h"
-#include "Window.h"
 
 const std::vector<const char*> validationLayers = {"VK_LAYER_KHRONOS_validation"};
 const std::vector<const char*> deviceExtensions = {VK_KHR_SWAPCHAIN_EXTENSION_NAME};
@@ -27,6 +15,9 @@ const bool enableValidationLayers = false;
 #else
 const bool enableValidationLayers = true;
 #endif
+
+class Window;
+class Device;
 
 class Application {
   public:

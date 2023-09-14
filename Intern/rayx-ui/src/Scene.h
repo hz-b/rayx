@@ -4,16 +4,12 @@
 
 #include <array>
 #include <glm/glm.hpp>
-#include <glm/gtc/matrix_transform.hpp>
 #include <optional>
 #include <vector>
 
-#include "Beamline/OpticalElement.h"
-#include "Buffer.h"
-#include "Data/Importer.h"
-#include "Device.h"
+#include "GraphicsCore/Buffer.h"
+#include "GraphicsCore/Device.h"
 #include "RenderObject.h"
-#include "Tracer/Tracer.h"
 
 // TODO: Refactor, so that Scene can be changed dynamically (currently, it is only set up once before rendering)
 // Note: The OpticalElements only need to be (partially) updated, when the user interacts with them or when a new beamline is loaded.

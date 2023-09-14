@@ -5,7 +5,6 @@
 #include "Beamline/OpticalElement.h"
 #include "RenderObject.h"
 #include "Tracer/Tracer.h"
-#include "Vertex.h"
 
 /**
  * @brief Triangulates optical elements for rendering.

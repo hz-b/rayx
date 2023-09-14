@@ -1,15 +1,10 @@
 #pragma once
 
-#include <GLFW/glfw3.h>
 #include <imgui.h>
-#include <imgui_impl_glfw.h>
-#include <imgui_impl_vulkan.h>
 
-#include <glm/gtx/transform.hpp>
-
-#include "Device.h"
 #include "FrameInfo.h"
-#include "Swapchain.h"
+#include "GraphicsCore/Device.h"
+#include "GraphicsCore/Swapchain.h"
 
 class ImGuiLayer {
   public:

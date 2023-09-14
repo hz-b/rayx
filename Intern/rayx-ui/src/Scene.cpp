@@ -1,6 +1,5 @@
 #include "Scene.h"
 
-#include "Beamline/OpticalElement.h"
 #include "Debug/Debug.h"
 
 Scene::Scene(Device& device) : m_Device(device) {}
