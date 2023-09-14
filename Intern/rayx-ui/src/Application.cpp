@@ -29,7 +29,7 @@ Application::~Application() {}
 
 void Application::run() {
     // Get the render data
-    std::string path = "MultiRZP_101_0.00203483_groupedCCD";
+    std::string path = "METRIX_U41_G1_H1_318eV_PS_MLearn_v114";
     RAYX::Beamline beamline = RAYX::importBeamline(path + ".rml");
     RAYX::BundleHistory bundleHist = raysFromH5(std::string(path + ".h5"), FULL_FORMAT);
 

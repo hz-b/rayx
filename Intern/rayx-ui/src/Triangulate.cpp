@@ -2,7 +2,9 @@
 
 #include <glm/gtc/matrix_transform.hpp>
 
+#include "Colors.h"
 #include "Debug/Debug.h"
+#include "MarchingCubes.h"
 
 // ------ Helper functions ------
 
@@ -94,12 +96,6 @@ std::vector<RenderObject> traceTriangulation(const std::vector<RAYX::OpticalElem
     return objectsInScene;
 }
 
-// TODO(Jannis): Implement
-std::vector<RenderObject> marchingCubeTriangulation(const std::vector<RAYX::OpticalElement>& elements) {
-    std::vector<RenderObject> objectsInScene;
-    return objectsInScene;
-}
-
 // ------ Interface functions ------
 
 /**
@@ -114,7 +110,8 @@ std::vector<RenderObject> triangulateObjects(const std::vector<RAYX::OpticalElem
 
     for (auto element : elements) {
         switch ((int)element.m_element.m_surface.m_type) {
-            case STYPE_QUADRIC:  // Temporary
+            case STYPE_TOROID:
+            case STYPE_QUADRIC:
             case STYPE_PLANE_XY:
                 planarElements.push_back(element);
                 break;
@@ -125,7 +122,7 @@ std::vector<RenderObject> triangulateObjects(const std::vector<RAYX::OpticalElem
             //         curvedElements.push_back(element);
             //     }
             // case STYPE_TOROID:
-            //         curvedElements.push_back(element);
+            //     curvedElements.push_back(element);
             //     break;
             default:
                 // Error
@@ -151,10 +148,6 @@ std::vector<RenderObject> triangulateObjects(const std::vector<RAYX::OpticalElem
  */
 std::vector<Line> getRays(const RAYX::BundleHistory& bundleHist, const std::vector<RAYX::OpticalElement>& elements) {
     std::vector<Line> rays;
-    static const glm::vec4 red = {1.0f, 0.0f, 0.0f, 1.0f};
-    static const glm::vec4 orange = {1.0f, 0.5f, 0.0f, 1.0f};
-    static const glm::vec4 yellow = {1.0f, 1.0f, 0.0f, 1.0f};
-    static const glm::vec4 grey = {0.5f, 0.5f, 0.5f, 1.0f};
 
     for (const auto& rayHist : bundleHist) {
         glm::vec3 rayLastPos = {0.0f, 0.0f, 0.0f};
@@ -164,8 +157,8 @@ std::vector<Line> getRays(const RAYX::BundleHistory& bundleHist, const std::vect
                 // We need to convert them to world coordinates
                 glm::vec4 worldPos = elements[(size_t)event.m_lastElement].m_element.m_outTrans * glm::vec4(event.m_position, 1.0f);
 
-                Vertex origin = {{rayLastPos.x, rayLastPos.y, rayLastPos.z, 1.0f}, yellow};
-                Vertex point = (event.m_eventType == ETYPE_JUST_HIT_ELEM) ? Vertex(worldPos, orange) : Vertex(worldPos, red);
+                Vertex origin = {{rayLastPos.x, rayLastPos.y, rayLastPos.z, 1.0f}, YELLOW};
+                Vertex point = (event.m_eventType == ETYPE_JUST_HIT_ELEM) ? Vertex(worldPos, ORANGE) : Vertex(worldPos, RED);
 
                 rays.push_back(Line(origin, point));
                 rayLastPos = point.pos;
@@ -178,8 +171,8 @@ std::vector<Line> getRays(const RAYX::BundleHistory& bundleHist, const std::vect
                 glm::vec4 eventDir = glm::vec4(event.m_direction, 0.0f);
                 glm::vec4 pointPos = eventPos + eventDir * 1000.0f;
 
-                Vertex origin = {eventPos, grey};
-                Vertex point = {pointPos, grey};
+                Vertex origin = {eventPos, GREY};
+                Vertex point = {pointPos, GREY};
 
                 rays.push_back(Line(origin, point));
             }
