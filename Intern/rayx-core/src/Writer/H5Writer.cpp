@@ -107,7 +107,8 @@ RAYX::BundleHistory fromDoubles(const std::vector<double>& doubles, const Format
     return bundleHist;
 }
 
-void readH5(RAYX::BundleHistory& rays, std::string filename, const Format& format) {
+RAYX::BundleHistory raysFromH5(std::string filename, const Format& format) {
+    RAYX::BundleHistory rays;
     HighFive::File file(filename, HighFive::File::ReadOnly);
 
     std::vector<double> doubles;
@@ -120,30 +121,12 @@ void readH5(RAYX::BundleHistory& rays, std::string filename, const Format& forma
         dataset.read(doubles.data());
 
         rays = fromDoubles(doubles, format);
-        // read element names
-        // int i = 0;
-        // while (true) {
-        //     try {
-        //         std::vector<char> buffer;
-        //         auto dataset = file.getDataSet(std::to_string(i + 1));
-        //         auto dims = dataset.getSpace().getDimensions();
-        //         buffer.resize(dims[0]);
-        //         dataset.read(buffer.data());
-
-        //         // Convert back to string and add to elementNames
-        //         std::string elementName(buffer.begin(), buffer.end());
-        //         elementNames.push_back(elementName);
-
-        //         i++;
-        //     } catch (HighFive::Exception& err) {
-        //         // No more datasets to read
-        //         break;
-        //     }
-        // }
 
     } catch (HighFive::Exception& err) {
         RAYX_ERR << err.what();
     }
+
+    return rays;
 }
 
 #endif

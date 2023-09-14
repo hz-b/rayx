@@ -5,52 +5,19 @@
 
 Scene::Scene(Device& device) : m_Device(device) {}
 
-void Scene::update(const std::vector<RenderObject>& renderObjects, const RAYX::BundleHistory& bundleHistory) {
+void Scene::update(const std::vector<RenderObject>& rObjects, const std::vector<Line>& rays) {
     m_vertices.clear();
     m_indices[0].clear();
     m_indices[1].clear();
 
-    for (const auto& renderObject : renderObjects) {
-        auto vertices = renderObject.getWorldVertices();
-        for (const auto& vertex : vertices) {
+    for (RenderObject obj : rObjects) {
+        for (Vertex vertex : obj.getWorldVertices()) {
             addVertex(vertex, TRIA_TOPOGRAPHY);
         }
     }
-
-    for (const auto& rayHist : bundleHistory) {
-        glm::vec3 rayLastPos = {0.0f, 0.0f, 0.0f};
-        for (const auto& event : rayHist) {
-            if (event.m_eventType == ETYPE_JUST_HIT_ELEM || event.m_eventType == ETYPE_ABSORBED) {
-                // Events where rays hit objects are in element coordinates
-                // We need to convert them to world coordinates
-                glm::vec4 lastElementPos = renderObjects[(size_t)event.m_lastElement].getTranslation();
-                glm::mat4 lastElementOri = glm::mat4_cast(renderObjects[(size_t)event.m_lastElement].getRotation());
-                glm::dmat4 outTrans = RAYX::calcTransformationMatrices(lastElementPos, lastElementOri, false);
-                glm::vec4 worldPos = outTrans * glm::vec4(event.m_position, 1.0f);
-
-                Vertex origin = {{rayLastPos.x, rayLastPos.y, rayLastPos.z}, m_yellow};
-                Vertex point;
-                if (event.m_eventType == ETYPE_JUST_HIT_ELEM) {
-                    point = {{worldPos.x, worldPos.y, worldPos.z}, m_orange};
-                } else {
-                    point = {{worldPos.x, worldPos.y, worldPos.z}, m_red};
-                }
-                addLine(origin, point);
-
-                rayLastPos = point.pos;
-            } else if (event.m_eventType == ETYPE_FLY_OFF) {
-                // The origin here is the position of the event
-                // And the point towards the direction of the ray
-                // This ray flies off into infinity, so we need to calculate a sensible
-                glm::vec3 eventPos = event.m_position;
-                glm::vec3 eventDir = event.m_direction;
-                glm::vec3 pointPos = eventPos + eventDir * 1000.0f;
-
-                Vertex origin = {{eventPos.x, eventPos.y, eventPos.z}, m_grey};
-                Vertex point = {{pointPos.x, pointPos.y, pointPos.z}, m_grey};
-                addLine(origin, point);
-            }
-        }
+    for (Line line : rays) {
+        addVertex(line.v1, LINE_TOPOGRAPHY);
+        addVertex(line.v2, LINE_TOPOGRAPHY);
     }
 
     updateBuffers();
@@ -74,11 +41,6 @@ void Scene::bind(VkCommandBuffer commandBuffer, Topography topography) const {
     }
 }
 
-void Scene::addLine(const Vertex v1, const Vertex v2) {
-    addVertex(v1, LINE_TOPOGRAPHY);
-    addVertex(v2, LINE_TOPOGRAPHY);
-}
-
 // Function that adds vertex to scene if it doesn't exist, otherwise adds index of existing vertex
 uint32_t Scene::addVertex(const Vertex v, Topography topography) {
     auto index = vertexExists(v);
@@ -94,11 +56,8 @@ uint32_t Scene::addVertex(const Vertex v, Topography topography) {
 
 // Function that returns index of vertex if it exists, otherwise returns none
 std::optional<uint32_t> Scene::vertexExists(const Vertex v) const {
-    for (int i = 0; i < m_vertices.size(); i++) {
-        if (m_vertices[i].pos == v.pos && m_vertices[i].color == v.color) {
-            return i;
-        }
-    }
+    for (int i = 0; i < m_vertices.size(); i++)
+        if (m_vertices[i] == v) return i;
     return std::nullopt;
 }
 

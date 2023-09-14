@@ -6,8 +6,10 @@
 #include <glm/glm.hpp>
 
 struct Vertex {
-    glm::vec3 pos;
-    glm::vec3 color;
+    glm::vec4 pos;
+    glm::vec4 color;
+
+    bool operator==(const Vertex& other) const { return pos == other.pos && color == other.color; }
 
     static std::vector<VkVertexInputBindingDescription> getBindingDescriptions() {
         std::vector<VkVertexInputBindingDescription> bindingDescriptions(1);

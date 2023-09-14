@@ -8,6 +8,7 @@
 #include <optional>
 #include <vector>
 
+#include "Beamline/OpticalElement.h"
 #include "Buffer.h"
 #include "Data/Importer.h"
 #include "Device.h"
@@ -29,7 +30,7 @@ class Scene {
     Scene& operator=(const Scene&) = delete;
 
     // Base functions
-    void update(const std::vector<RenderObject>& renderObjects, const RAYX::BundleHistory& bundleHistory);
+    void update(const std::vector<RenderObject>& rObjects, const std::vector<Line>& rays);
 
     // Buffers and drawing
     void updateBuffers();
@@ -49,16 +50,9 @@ class Scene {
     std::unique_ptr<Buffer> m_vertexBuffer = nullptr;
     std::array<std::unique_ptr<Buffer>, 2> m_indexBuffers = {nullptr, nullptr};  // 0 = triangles, 1 = lines
 
-    void addLine(const Vertex v1, const Vertex v2);
     uint32_t addVertex(const Vertex v, Topography topography);
     std::optional<uint32_t> vertexExists(const Vertex v) const;
 
     void updateVertexBuffer();
     void updateIndexBuffers();
-
-    // Colors
-    const glm::vec4 m_yellow = {1.0f, 1.0f, 0.0f, 1.0f};
-    const glm::vec4 m_red = {1.0f, 0.0f, 0.0f, 1.0f};
-    const glm::vec4 m_grey = {0.5f, 0.5f, 0.5f, 1.0f};
-    const glm::vec4 m_orange = {1.0f, 0.5f, 0.0f, 1.0f};
 };
