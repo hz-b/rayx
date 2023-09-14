@@ -11,7 +11,7 @@
 #include "Shared/Cutout.h"
 #include "Vertex.h"
 
-#define GRIDSIZE 10
+#define GRIDSIZE 50
 
 struct Triangle {
     Vertex vertices[3];

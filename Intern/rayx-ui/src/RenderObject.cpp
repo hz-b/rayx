@@ -107,7 +107,7 @@ std::vector<Triangle> RenderObject::trianglesFromQuadric() {
     // Define the size and resolution of the grid
     double scalarGrid[GRIDSIZE][GRIDSIZE][GRIDSIZE];
 
-    const double SCALE = 3.0 * 10.0 / GRIDSIZE;  // Define your desired scaling factor here
+    const double SCALE = 5.0 * 10.0 / GRIDSIZE;  // Define your desired scaling factor here
     double move = (GRIDSIZE / 2.0);
 
     // 1. Sample the 3D space
@@ -144,16 +144,16 @@ std::vector<Triangle> RenderObject::trianglesFromQuadric() {
 
 double RenderObject::evaluateQuadricAtPosition(const double surface[16], const glm::vec4& pos) {
     double icurv = surface[0];
-    double a11 = 1;    // surface[1];
-    double a12 = 0;    // surface[2];
-    double a13 = 0;    // surface[3];
-    double a14 = 0;    // surface[4];
-    double a22 = 1;    // surface[5];
-    double a23 = 0;    // surface[6];
-    double a24 = -10;  // surface[7];
-    double a33 = 1;    // surface[8];
-    double a34 = 0;    // surface[9];
-    double a44 = 0;    // surface[10];
+    double a11 = surface[1];
+    double a12 = surface[2];
+    double a13 = surface[3];
+    double a14 = surface[4];
+    double a22 = surface[5];
+    double a23 = surface[6];
+    double a24 = surface[7];
+    double a33 = surface[8];
+    double a34 = surface[9];
+    double a44 = surface[10];
     double result = a11 * pos.x * pos.x + a22 * pos.y * pos.y + a33 * pos.z * pos.z + a12 * pos.x * pos.y + a13 * pos.x * pos.z +
                     a23 * pos.y * pos.z + a14 * pos.x + a24 * pos.y + a34 * pos.z + a44;
 
