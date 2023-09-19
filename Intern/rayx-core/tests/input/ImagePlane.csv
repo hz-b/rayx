@@ -1,0 +1,6 @@
+sep=	
+ImagePlane_RN	ImagePlane_RS	ImagePlane_RO	ImagePlane_OX	ImagePlane_OY	ImagePlane_OZ	ImagePlane_DX	ImagePlane_DY	ImagePlane_DZ	ImagePlane_EN	ImagePlane_PL	ImagePlane_S0	ImagePlane_S1	ImagePlane_S2	ImagePlane_S3
+0	2	0	-0.0325	-0.02	0	0	0	1	100	0	1	1	0	0
+1	2	0	0.0325	-0.02	0	0	0	1	100	0	1	1	0	0
+2	2	0	-0.0325	0.02	0	0	0	1	100	0	1	1	0	0
+3	2	0	0.0325	0.02	0	0	0	1	100	0	1	1	0	0
