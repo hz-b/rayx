@@ -11,6 +11,11 @@
 #include "Shared/Element.h"
 #include "utils.h"
 
+// the direction of a plane, either XY or XZ. This is only used in the parsing.
+// Inside of the shader, every plane-shaped object lies in its XZ plane.
+// Per default every element has DesignPlane::XZ, but ImagePlane and Slit have DesignPlane::XY. Thus they need a bit of extra handling to convert them to the shaders XZ plane.
+enum class DesignPlane { XY, XZ };
+
 namespace RAYX {
 class EnergyDistribution;
 // forward declarations:
@@ -98,7 +103,7 @@ struct RAYX_API Parser {
     glm::dvec4 parsePosition() const;
     glm::dmat4x4 parseOrientation() const;
     Material parseMaterial() const;
-    Cutout parseCutout(PlaneDir) const;
+    Cutout parseCutout(DesignPlane) const;
     ElectronEnergyOrientation parseElectronEnergyOrientation() const;
     SourcePulseType parseSourcePulseType() const;
     double parseImageType() const;

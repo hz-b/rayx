@@ -24,18 +24,20 @@ std::pair<double, double> getRectangularDimensions(const Cutout& cutout) {
     switch (static_cast<int>(cutout.m_type)) {
         case CTYPE_RECT: {
             RectCutout rect = deserializeRect(cutout);
-            width = rect.m_size_x1;
-            height = rect.m_size_x2;
+            width = rect.m_width;
+            height = rect.m_length;
             break;
         }
         case CTYPE_ELLIPTICAL: {
-            width = cutout.m_params[0];   // Diameter is essentially the max width
-            height = cutout.m_params[1];  // Diameter is the max height
+            EllipticalCutout ell = deserializeElliptical(cutout);
+            width = ell.m_diameter_x;   // Diameter is essentially the max width
+            height = ell.m_diameter_z;  // Diameter is the max height
             break;
         }
         case CTYPE_TRAPEZOID: {
-            width = std::max(cutout.m_params[0], cutout.m_params[1]);  // max of the two sides
-            height = cutout.m_params[2];
+            TrapezoidCutout trap = deserializeTrapezoid(cutout);
+            width = std::max(trap.m_widthA, trap.m_widthB);  // max of the two sides
+            height = trap.m_length;
             break;
         }
         // Skip unlimited cutout

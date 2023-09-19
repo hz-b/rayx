@@ -44,13 +44,4 @@ const double ELECTRIC_PERMITTIVITY = 8.8541878128e-12;  // Checked 2019-7-25, PB
 /// \f$G\f$ [?]. RAY's factor appearing in Schwinger equation context
 const double FACTOR_SCHWINGER_RAY = 1.2556937e15;
 
-
-
-#define PlaneDir double
-// the direction of a plane.
-// Either XY or XZ.
-
-const PlaneDir PLANE_XY = 0;
-const PlaneDir PLANE_XZ = 1;
-
 #endif

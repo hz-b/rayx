@@ -23,6 +23,9 @@ void checkPositionDistribution(const std::vector<Ray>& rays, double sourceWidth,
 
 void checkDirectionDistribution(const std::vector<Ray>& rays, double minAngle, double maxAngle) {
     for (auto r : rays) {
+        // we ignore all non-FLY_OFF events, as they are in element-coordinates (and thus have another m_direction).
+        if (r.m_eventType != ETYPE_FLY_OFF) { continue; }
+
         double psi = asin(r.m_direction.y);
         psi = abs(psi)*1000;
         CHECK_IN(psi, minAngle, maxAngle);

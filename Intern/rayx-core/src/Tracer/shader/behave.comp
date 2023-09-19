@@ -14,15 +14,18 @@ Ray behaveSlit(Ray r, int id, RAYX_INOUT(uint64_t) ctr, ALLOW_UNUSED Collision c
     // slit lies in x-y plane instead of x-z plane as other elements
     Cutout openingCutout = b.m_openingCutout;
     Cutout beamstopCutout = b.m_beamstopCutout;
-    bool withinSlitBounds = inCutout(openingCutout, r.m_position[0], r.m_position[1]);
-    bool withinBeamstop = inCutout(beamstopCutout, r.m_position[0], r.m_position[1]);
+    bool withinSlitBounds = inCutout(openingCutout, r.m_position.x, r.m_position.z);
+    bool withinBeamstop = inCutout(beamstopCutout, r.m_position.x, r.m_position.z);
 
     if (!withinSlitBounds || withinBeamstop) {
         recordFinalEvent(r, ETYPE_ABSORBED);
         return r;
     }
 
-    double psi        = -r8_asin(r.m_direction.y);
+    // if all angles = 0, direction = (0, 1, 0) or (0, -1, 0).
+    // TODO: are these calculations correct? doing r.m_direction.y = r.m_direction.y * -1.0; wouldn't affect the angles at all.
+    // Hence a slit is not able to differentiate where a ray came from (from +y or -y). This should cause bugs.
+    double psi        = -r8_asin(r.m_direction.z);
     double phi        = r8_asin(r.m_direction.x / r8_cos(psi));
     double dPhi     = 0;
     double dPsi     = 0;
@@ -32,12 +35,11 @@ Ray behaveSlit(Ray r, int id, RAYX_INOUT(uint64_t) ctr, ALLOW_UNUSED Collision c
     if (wavelength > 0) {
         if (openingCutout.m_type == CTYPE_RECT) {
             RectCutout r = deserializeRect(openingCutout);
-            fraun_diff(r.m_size_x1, wavelength, dPhi, ctr);
-            fraun_diff(r.m_size_x2, wavelength, dPsi, ctr);
+            fraun_diff(r.m_width, wavelength, dPhi, ctr);
+            fraun_diff(r.m_length, wavelength, dPsi, ctr);
         } else if (openingCutout.m_type == CTYPE_ELLIPTICAL) {
             EllipticalCutout e = deserializeElliptical(openingCutout);
-            // TODO why m_diameter_x2 and not m_diameter_x1?
-            bessel_diff(e.m_diameter_x2, wavelength, dPhi, dPsi, ctr);
+            bessel_diff(e.m_diameter_z, wavelength, dPhi, dPsi, ctr);
         } else {
             throw("encountered Slit with unsupported openingCutout");
         }
@@ -46,8 +48,7 @@ Ray behaveSlit(Ray r, int id, RAYX_INOUT(uint64_t) ctr, ALLOW_UNUSED Collision c
     phi = phi + dPhi;
     psi = psi + dPsi;
 
-    // new direction from angles
-    cosini(r, phi, psi);
+    r.m_direction = directionFromAngles(phi, psi);
 
     r.m_order = 0;
     return r;

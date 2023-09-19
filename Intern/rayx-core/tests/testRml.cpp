@@ -43,9 +43,9 @@ TEST_F(TestSuite, groupTransform) {
     auto m = b.m_OpticalElements[0].m_element.m_inTrans;
     glm::dmat4x4 correct = {
         1,   0,  0,     0,  //
-        0,   0,  1,     0,  //
-        0,   -1, 0,     0,  //
-        -42, 0,  -1000, 1,  //
+        0,   1,  0,     0,  //
+        0,   0, -1,     0,  //
+        -42, -1000,  0, 1,  //
     };
     CHECK_EQ(correct, m);
 }

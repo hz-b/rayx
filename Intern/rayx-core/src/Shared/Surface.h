@@ -8,7 +8,7 @@
 // constants)
 const int STYPE_QUADRIC = 0;
 const int STYPE_TOROID = 1;
-const int STYPE_PLANE_XY = 2;  // an infinite X-Y plane.
+const int STYPE_PLANE_XZ = 2;
 
 struct Surface {
     double m_type;
@@ -98,26 +98,15 @@ INLINE ToroidSurface deserializeToroid(Surface ser) {
 }
 
 /////////////
-// Plane XY
+// Plane XZ
 /////////////
 
-// `PlaneXY` doesn't have any data so it doesn't need a struct.
+// `PlaneXZ` doesn't have any data so it doesn't need a struct.
 
-INLINE Surface serializePlaneXY() {
+INLINE Surface serializePlaneXZ() {
     Surface ser;
-    ser.m_type = STYPE_PLANE_XY;
+    ser.m_type = STYPE_PLANE_XZ;
     return ser;
-}
-
-
-
-/// general functions.
-
-INLINE PlaneDir getPlaneDir(double surface_ty) {
-    if (surface_ty == STYPE_PLANE_XY) {
-        return PLANE_XY;
-    }
-    return PLANE_XZ;
 }
 
 #endif

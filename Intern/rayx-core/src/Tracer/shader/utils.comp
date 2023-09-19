@@ -80,49 +80,50 @@ double RAYX_API fact(int a) {
 }
 
 /**
-calculates direction cosini from angles phi,psi given in rad
-@params r		ray whose direction vector is recalculated (inout)
-        phi		horizontal angle in x-z-plane (pos.rotation, counterclockwise)
-        phi		vertical angle in y-z-plane (pos.rotation, counterclockwise)
+ * calculates direction cosini from angles phi,psi given in rad
+ *        TODO: the planes / rotation directions specified here are potentially not correct. There is likely a bug in the phi/psi calculation.
+ *        phi		angle in x-y-plane (positive rotation / counterclockwise)
+ *        psi		angle in z-y-plane (positive rotation / counterclockwise)
+ *
+ * returns: the resulting direction.
 */
-void RAYX_API cosini(RAYX_INOUT(Ray) r, double phi, double psi) {
+// TODO add test for this, when it is well-defined.
+dvec3 RAYX_API directionFromAngles(double phi, double psi) {
     double cos_psi = r8_cos(psi);
     double cos_phi = r8_cos(phi);
     double sin_psi = r8_sin(psi);
     double sin_phi = r8_sin(phi);
 
-    r.m_direction.x = cos_psi * sin_phi;
-    r.m_direction.y = -sin_psi;
-    r.m_direction.z = cos_psi * cos_phi;
+    return dvec3(cos_psi * sin_phi, cos_psi * cos_phi, -sin_psi);
 }
 
-// checks whether the point (x1, x2) is within the cutout.
-bool RAYX_API inCutout(Cutout cutout, double x1, double x2) {
+// checks whether the point (x, z) is within the cutout.
+bool RAYX_API inCutout(Cutout cutout, double x, double z) {
     if (cutout.m_type == CTYPE_UNLIMITED) {
         return true;
     } else if (cutout.m_type == CTYPE_RECT) {
         RectCutout rect = deserializeRect(cutout);
-        double x1_min = -rect.m_size_x1 / 2.0;
-        double x1_max = rect.m_size_x1 / 2.0;
-        double x2_min = -rect.m_size_x2 / 2.0;
-        double x2_max = rect.m_size_x2 / 2.0;
+        double x_min = -rect.m_width / 2.0;
+        double x_max = rect.m_width / 2.0;
+        double z_min = -rect.m_length / 2.0;
+        double z_max = rect.m_length / 2.0;
 
-        return !(x1 <= x1_min || x1 >= x1_max || x2 <= x2_min || x2 >= x2_max);
+        return !(x <= x_min || x >= x_max || z <= z_min || z >= z_max);
     } else if (cutout.m_type == CTYPE_TRAPEZOID) {
         TrapezoidCutout t = deserializeTrapezoid(cutout);
 
         // Check point is within the trapezoid
-        dvec2 P = dvec2(x1, x2);
+        dvec2 P = dvec2(x, z);
 
         // A, B, C, D are the four points on the trapezoid.
         //
         //    A--B    //
         //   /    \   //
         //  C------D  //
-        dvec2 A = dvec2(-t.m_sizeA_x1 / 2.0, -t.m_size_x2 / 2.0);
-        dvec2 B = dvec2(t.m_sizeA_x1 / 2.0, -t.m_size_x2 / 2.0);
-        dvec2 C = dvec2(t.m_sizeB_x1 / 2.0, t.m_size_x2 / 2.0);
-        dvec2 D = dvec2(-t.m_sizeB_x1 / 2.0, t.m_size_x2 / 2.0);
+        dvec2 A = dvec2(-t.m_widthA / 2.0, -t.m_length / 2.0);
+        dvec2 B = dvec2(t.m_widthA / 2.0, -t.m_length / 2.0);
+        dvec2 C = dvec2(t.m_widthB / 2.0, t.m_length / 2.0);
+        dvec2 D = dvec2(-t.m_widthB / 2.0, t.m_length / 2.0);
 
         dvec2 PmA = P - A;
         dvec2 BmA = B - A;
@@ -138,11 +139,11 @@ bool RAYX_API inCutout(Cutout cutout, double x1, double x2) {
     } else if (cutout.m_type == CTYPE_ELLIPTICAL) {
         EllipticalCutout ell = deserializeElliptical(cutout);
 
-        double radius_x1 = ell.m_diameter_x1 / 2.0;
-        double radius_x2 = ell.m_diameter_x2 / 2.0;
+        double radius_x = ell.m_diameter_x / 2.0;
+        double radius_z = ell.m_diameter_z / 2.0;
 
-        double val1 = x1 / radius_x1;
-        double val2 = x2 / radius_x2;
+        double val1 = x / radius_x;
+        double val2 = z / radius_z;
 
         double rd2 = val1 * val1 + val2 * val2;
         return rd2 <= 1.0;

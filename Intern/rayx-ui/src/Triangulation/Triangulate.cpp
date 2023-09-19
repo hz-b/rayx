@@ -15,18 +15,18 @@ void calculateVerticesForType(const Element& elem, glm::vec4& topLeft, glm::vec4
     switch (static_cast<int>(elem.m_cutout.m_type)) {
         case CTYPE_TRAPEZOID: {
             TrapezoidCutout trapezoid = deserializeTrapezoid(elem.m_cutout);
-            topLeft = {-trapezoid.m_sizeA_x1 / 2.0f, 0, trapezoid.m_size_x2 / 2.0f, 1.0f};
-            topRight = {trapezoid.m_sizeA_x1 / 2.0f, 0, trapezoid.m_size_x2 / 2.0f, 1.0f};
-            bottomLeft = {-trapezoid.m_sizeB_x1 / 2.0f, 0, -trapezoid.m_size_x2 / 2.0f, 1.0f};
-            bottomRight = {trapezoid.m_sizeB_x1 / 2.0f, 0, -trapezoid.m_size_x2 / 2.0f, 1.0f};
+            topLeft = {-trapezoid.m_widthA / 2.0f, 0, trapezoid.m_length / 2.0f, 1.0f};
+            topRight = {trapezoid.m_widthA / 2.0f, 0, trapezoid.m_length / 2.0f, 1.0f};
+            bottomLeft = {-trapezoid.m_widthB / 2.0f, 0, -trapezoid.m_length / 2.0f, 1.0f};
+            bottomRight = {trapezoid.m_widthB / 2.0f, 0, -trapezoid.m_length / 2.0f, 1.0f};
             break;
         }
         case CTYPE_RECT: {
             RectCutout rect = deserializeRect(elem.m_cutout);
-            topLeft = {-rect.m_size_x1 / 2.0f, 0, rect.m_size_x2 / 2.0f, 1.0f};
-            topRight = {rect.m_size_x1 / 2.0f, 0, rect.m_size_x2 / 2.0f, 1.0f};
-            bottomLeft = {-rect.m_size_x1 / 2.0f, 0, -rect.m_size_x2 / 2.0f, 1.0f};
-            bottomRight = {rect.m_size_x1 / 2.0f, 0, -rect.m_size_x2 / 2.0f, 1.0f};
+            topLeft = {-rect.m_width / 2.0f, 0, rect.m_length / 2.0f, 1.0f};
+            topRight = {rect.m_width / 2.0f, 0, rect.m_length / 2.0f, 1.0f};
+            bottomLeft = {-rect.m_width / 2.0f, 0, -rect.m_length / 2.0f, 1.0f};
+            bottomRight = {rect.m_width / 2.0f, 0, -rect.m_length / 2.0f, 1.0f};
             break;
         }
         case CTYPE_ELLIPTICAL:
@@ -87,7 +87,7 @@ std::vector<RenderObject> triangulateObjects(const std::vector<RAYX::OpticalElem
 
     for (const auto& element : elements) {
         switch (static_cast<int>(element.m_element.m_surface.m_type)) {
-            case STYPE_PLANE_XY: {
+            case STYPE_PLANE_XZ: {
                 auto ro = planarTriangulation(element, device);  // Assume this returns a RenderObject
                 rObjects.emplace_back(std::move(ro));
                 break;

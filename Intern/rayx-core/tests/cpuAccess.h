@@ -29,7 +29,6 @@ glm::dvec4 RAYX_API normal_cartesian(glm::dvec4, double, double);
 glm::dvec4 RAYX_API normal_cylindrical(glm::dvec4, double, double);
 void RAYX_API RZPLineDensity(Ray r, glm::dvec4 normal, RZPBehaviour b, double& DX, double& DZ);
 Ray RAYX_API rayMatrixMult(Ray, glm::dmat4);
-void RAYX_API cosini(Ray&, double, double);
 double RAYX_API dpow(double, int);
 double RAYX_API fact(int);
 double RAYX_API bessel1(double);

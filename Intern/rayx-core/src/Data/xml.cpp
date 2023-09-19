@@ -540,40 +540,40 @@ Material Parser::parseMaterial() const {
     return m;
 }
 
-Cutout Parser::parseCutout(PlaneDir plane) const {
+Cutout Parser::parseCutout(DesignPlane plane) const {
     int geom_shape;
     if (!paramInt(node, "geometricalShape", &geom_shape)) {
         RAYX_ERR << "geometricalShape missing, but required!";
     }
 
-    auto x1 = [&] { return parseTotalWidth(); };
+    auto x = [&] { return parseTotalWidth(); };
 
-    auto x2 = [&] {
-        if (plane == PLANE_XY) {
+    auto z = [&] {
+        if (plane == DesignPlane::XY) {
             return parseTotalHeight();
-        } else if (plane == PLANE_XZ) {
+        } else if (plane == DesignPlane::XZ) {
             return parseTotalLength();
         } else {
-            RAYX_ERR << "parseCutout encountered an invalid plane!";
+            RAYX_ERR << "parseCutout encountered an invalid design plane!";
             return 0.0;
         }
     };
 
     if (geom_shape == CTYPE_RECT) {
         RectCutout rect;
-        rect.m_size_x1 = x1();
-        rect.m_size_x2 = x2();
+        rect.m_width = x();
+        rect.m_length = z();
         return serializeRect(rect);
     } else if (geom_shape == CTYPE_ELLIPTICAL) {
         EllipticalCutout elliptical;
-        elliptical.m_diameter_x1 = x1();
-        elliptical.m_diameter_x2 = x2();
+        elliptical.m_diameter_x = x();
+        elliptical.m_diameter_z = z();
         return serializeElliptical(elliptical);
     } else if (geom_shape == CTYPE_TRAPEZOID) {
         TrapezoidCutout trapezoid;
-        trapezoid.m_sizeA_x1 = x1();
-        trapezoid.m_sizeB_x1 = parseDouble("totalWidthB");
-        trapezoid.m_size_x2 = x2();
+        trapezoid.m_widthA = x();
+        trapezoid.m_widthB = parseDouble("totalWidthB");
+        trapezoid.m_length = z();
 
         return serializeTrapezoid(trapezoid);
     } else {
