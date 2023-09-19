@@ -3,7 +3,7 @@
 # HOW TO USE:
 
 # Install all necessary python modules:
-# python -m pip install openpyxl, progress, pandas, numpy, psutil, GPUtil, jinja2
+# python -m pip install openpyxl progress pandas numpy psutil GPUtil jinja2
 
 # Compile RAYX in Release mode
 # Close all other programs
