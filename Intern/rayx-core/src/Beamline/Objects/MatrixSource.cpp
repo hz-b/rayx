@@ -24,6 +24,14 @@ MatrixSource::MatrixSource(const DesignObject& dobj) : LightSource(dobj) {
  */
 std::vector<Ray> MatrixSource::getRays(int THREAD_COUNT) const {
     RAYX_PROFILE_FUNCTION();
+    
+    if (THREAD_COUNT == 0){
+        THREAD_COUNT = 1;
+        #define DIPOLE_OMP
+    }else if(THREAD_COUNT > 1){
+        #define DIPOLE_OMP
+    }    
+    
     double x, y, z, psi, phi,
         en;  // x,y,z pos, psi,phi direction cosines, en=energy
     int rmat = int(sqrt(m_numberOfRays));
@@ -33,6 +41,9 @@ std::vector<Ray> MatrixSource::getRays(int THREAD_COUNT) const {
     // rayVector.reserve(1048576);
     RAYX_VERB << "create " << rmat << " times " << rmat << " matrix with Matrix Source...";
     // fill the square with rmat1xrmat1 rays
+    #if defined(DIPOLE_OMP)
+    #pragma omp parallel for num_threads(THREAD_COUNT)
+    #endif
     for (int col = 0; col < rmat; col++) {
         for (int row = 0; row < rmat; row++) {
             double rn = randomDouble();  // in [0, 1]
@@ -57,7 +68,14 @@ std::vector<Ray> MatrixSource::getRays(int THREAD_COUNT) const {
 
             Ray r = {position, ETYPE_UNINIT, direction, en, stokes, 0.0, 0.0, -1.0, -1.0};
             // Ray(1, 2, 3, 7, 4, 5, 6, 8, 9, 10, 11, 12, 13, 14, 15, 16);
-            returnList.push_back(r);
+        #if defined(DIPOLE_OMP)
+        #pragma omp critical
+        {
+            rayList.push_back(r);
+        }
+        #else
+            rayList.push_back(r);
+        #endif
         }
     }
     // afterwards start from the beginning again
