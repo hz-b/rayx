@@ -45,7 +45,7 @@ double get_factorTotalPowerDipol() {
 
 DipoleSource::DipoleSource(const DesignObject& dobj) : LightSource(dobj) {
     //auto start = std::chrono::high_resolution_clock::now();
-
+    //m_horDivergence = m_horDivergence * 1000;
     m_energySpreadType = dobj.parseEnergyDistribution();
     m_photonFlux = dobj.parsePhotonFlux();
     m_electronEnergyOrientation = dobj.parseElectronEnergyOrientation();
@@ -71,7 +71,7 @@ DipoleSource::DipoleSource(const DesignObject& dobj) : LightSource(dobj) {
 
     calcFluxOrg();
     calcHorDivDegSec();
-    // calcMagneticField();
+    //calcMagneticField();
     calcPhotonWavelength();
     calcSourcePath();
     //auto end = std::chrono::high_resolution_clock::now();
@@ -93,6 +93,7 @@ DipoleSource::DipoleSource(const DesignObject& dobj) : LightSource(dobj) {
 
 std::vector<Ray> DipoleSource::getRays(int THREAD_COUNT) const {
     RAYX_PROFILE_FUNCTION();
+    
     if (THREAD_COUNT == 0){
         THREAD_COUNT = 1;
         #define DIPOLE_OMP
@@ -174,7 +175,7 @@ glm::dvec3 DipoleSource::getXYZPosition(double phi)const{
     
     double sign = DipoleSource::m_electronEnergyOrientation == ElectronEnergyOrientation::Clockwise ? -1.0 : 1.0;
     
-    double x = sign * (x1 * cos(phi) + (m_bendingRadius * 1000 * (1 - cos(phi))));
+    double x = sign * (x1 * cos(phi) + (m_bendingRadius * 1000 * (1 - cos(phi)))); //bendingRadius in mm
     x = x + m_position.x + getMisalignmentParams().m_translationXerror;
 
     double y = getNormalFromRange(m_sourceHeight);
@@ -189,10 +190,10 @@ PsiAndStokes DipoleSource::getPsiandStokes(double en) const {
     //RAYX_PROFILE_SCOPE("getPsiStokes");
 
     PsiAndStokes psiandstokes;
-   
+    double psi;
     do {
-        psiandstokes.psi = (randomDouble() -0.5) * 6 * m_verDivergence;
-        psiandstokes.stokes = dipoleFold(psiandstokes.psi, en, m_verEbeamDivergence);
+        psi = (randomDouble() -0.5) * 6 * m_verDivergence;
+        psiandstokes = dipoleFold(psi, en, m_verEbeamDivergence);
     } while ((psiandstokes.stokes[0]) / m_maxIntensity < randomDouble());
     
     psiandstokes.psi  = psiandstokes.psi * 1e-3; //psi in rad
@@ -311,10 +312,13 @@ double DipoleSource::schwinger(double energy) const {
 
     if (Y0 > 0) {
         if (Y0 > 10) {
-            yg0 = sqrt(PI / 2) * sqrt(energy) * pow(-energy, 2);  // sqrt(PI(T)/2.)*sqrt(z)*exp(-z)
+            //yg0 = sqrt(PI / 2) * sqrt(energy) * pow(-energy, 2);  // sqrt(PI(T)/2.)*sqrt(z)*exp(-z)
+            yg0 = 0.777 * sqrt(Y0) * pow(ELEMENTARY_CHARGE, -Y0); // H.Wiedemann Synchrotron Radiation P. 259 (D.21)
         }
         if (Y0 < 1.e-4) {
-            yg0 = 2.1495282415 * pow(energy, (1.0 / 3.0));
+            //yg0 = 2.1495282415 * pow(energy, (1.0 / 3.0));
+            yg0 = 1.333 * pow(Y0, (1.0 / 3.0));  // H.Wiedemann Synchrotron Radiation P. 259 (D.21)
+
         } else {
             double y = log(Y0);
             yg0 = exp(getInterpolation(y));
@@ -334,9 +338,9 @@ void DipoleSource::setMaxIntensity() {
  
     for (int i = 1; i < 250; i++) {
         psi = psi + 0.05;
-        auto  S = dipoleFold(psi, m_photonEnergy, 1.0);
-        if (smax < (S[2] + S[3])) {
-            smax = S[2] + S[3];
+        auto S = dipoleFold(psi, m_photonEnergy, 1.0);
+        if (smax < (S.stokes[2] + S.stokes[3])) {
+            smax = S.stokes[2] + S.stokes[3];
         } else {
             break;
         }
@@ -344,7 +348,7 @@ void DipoleSource::setMaxIntensity() {
     m_maxIntensity = smax;
 }
 
-glm::dvec4 DipoleSource::dipoleFold(double psi, double photonEnergy, double sigpsi) const {
+PsiAndStokes DipoleSource::dipoleFold(double psi, double photonEnergy, double sigpsi) const {
     //RAYX_PROFILE_SCOPE("dipolefold");
         
     int ln = (int)sigpsi;
@@ -353,7 +357,7 @@ glm::dvec4 DipoleSource::dipoleFold(double psi, double photonEnergy, double sigp
     double sy = 0.0;
     double zw = 0.0;
     double wy = 0.0;
-    double psi1 = 0.0;
+    double newpsi = 0.0;
 
     glm::dvec4 ST = glm::dvec4(0.0, 0.0, 0.0, 0.0);
     glm::dvec4 Stokes;
@@ -371,7 +375,7 @@ glm::dvec4 DipoleSource::dipoleFold(double psi, double photonEnergy, double sigp
         trsgyp = 0;
         ln = 1;
     }
-   //for
+
     for (int i = 1; i <= ln; i++) {
         do {
             sy = (randomDouble() - 0.5) * sgyp;
@@ -379,9 +383,8 @@ glm::dvec4 DipoleSource::dipoleFold(double psi, double photonEnergy, double sigp
             wy = exp(zw);
         } while (wy - randomDouble() < 0);
 
-        psi1 = psi + sy;
-        Stokes = getStokesSyn(photonEnergy, psi1, psi1);
-
+        newpsi = psi + sy;
+        Stokes = getStokesSyn(photonEnergy, newpsi, newpsi);
 
         for (int i = 0; i < 4; i++) {
             ST[i] = ST[i] + Stokes[i];
@@ -391,15 +394,17 @@ glm::dvec4 DipoleSource::dipoleFold(double psi, double photonEnergy, double sigp
     for (int i = 0; i < 4; i++) {
         Stokes[i] = ST[i] / ln;
     }
-
-    psi = psi1;
+    PsiAndStokes psiandstokes;
+    psiandstokes.psi = newpsi;
 
     ST[0] = Stokes[2] + Stokes[3];
     ST[1] = Stokes[0];
     ST[2] = 0;
     ST[3] = Stokes[1];
 
-    return ST;
+    psiandstokes.stokes = ST;
+
+    return psiandstokes;
 }
 
 void DipoleSource::calcMagneticField() {
@@ -464,7 +469,6 @@ void DipoleSource::setMaxFlux() {
 double DipoleSource::getInterpolation(double energy) const {
     //RAYX_PROFILE_SCOPE("getInterpolation");
 
-    //TODO: Interpolation benchmarken 
     double functionOne = 0.0;
     double functionTwo = 0.0;
     double result = 0.0;

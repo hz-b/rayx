@@ -1215,3 +1215,39 @@ TEST_F(TestSuite, testBesselDipole) {
         CHECK_EQ(result, values.out, 0.1);
     }
 }
+
+
+TEST_F(TestSuite, testSchwingerDipole) {
+    struct InOutPair {
+        double energy;
+        double flux;
+    };
+    std::vector<InOutPair> inouts = {{
+        .energy = 6520.0878532052693,
+        .flux = 566462407647095.5,
+    },{
+        .energy = 100,
+        .flux = 2855336264551178
+    },{
+        .energy = 900,
+        .flux = 3762078406399219,
+    },{
+        .energy = 2000,
+        .flux = 2907004029317153.5,
+    },{
+        .energy = 0.667,
+        .flux = 596812742357665.25,
+    },{
+        .energy = 2456,
+        .flux = 2526853293939861,
+    }};
+
+    auto beamline = loadBeamline("dipole_plain");
+    std::shared_ptr<LightSource> src = beamline.m_LightSources[0];
+    DipoleSource* dipolesource = dynamic_cast<DipoleSource*>(&*src);
+
+    for (auto values : inouts) {
+        auto result = dipolesource->schwinger(values.energy);
+        CHECK_EQ(result, values.flux, 0.000000001);
+    }
+}

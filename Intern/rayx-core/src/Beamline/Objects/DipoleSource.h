@@ -72,8 +72,9 @@ class RAYX_API DipoleSource : public LightSource {
 
     
     glm::dvec4 getStokesSyn(double hv, double psi1, double psi2) const;
-    glm::dvec4 dipoleFold(double psi, double hv, double sigpsi) const;
+    PsiAndStokes dipoleFold(double psi, double hv, double sigpsi) const;
 
+    // H. Winick, S. Doniach, Synchrotron Radiation Research P.23f (y) and (G0(y))
     std::array<double, 59> m_schwingerX = {1.e-4, 1.e-3, 2.e-3, 4.e-3, 6.e-3, 8.e-3, 1.e-2, 2.e-2, 3.e-2, 4.e-2, 5.e-2, 6.e-2, 7.e-2, 8.e-2, 9.e-2,
                                            1.e-1, 0.15,  0.2,   0.25,  0.3,   0.35,  0.4,   0.45,  0.5,   0.55,  0.6,   0.65,  0.7,   0.75,  0.8,
                                            0.85,  0.9,   1.0,   1.25,  1.5,   1.75,  2.0,   2.25,  2.5,   2.75,  3.0,   3.25,  3.5,   3.75,  4.0,

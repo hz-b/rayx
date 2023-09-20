@@ -44,13 +44,11 @@ double getCoord(const SourceDist l, const double extent) {
  * @returns list of rays
  */
 std::vector<Ray> PointSource::getRays(int THREAD_COUNT) const {
-    double x, y, z, psi, phi,
-        en;  // x,y,z pos, psi,phi direction cosines, en=energy
+    double x, y, z, psi, phi, en;  // x,y,z pos, psi,phi direction cosines, en=energy
 
     int n = m_numberOfRays;
     std::vector<Ray> rayList;
     rayList.reserve(m_numberOfRays);
-    // rayList.reserve(1048576);
     RAYX_VERB << "Create " << n << " rays with standard normal deviation...";
 
     // create n rays with random position and divergence within the given span
@@ -63,7 +61,6 @@ std::vector<Ray> PointSource::getRays(int THREAD_COUNT) const {
         z = (randomDouble() - 0.5) * m_sourceDepth;
         z += m_position.z;
         en = selectEnergy();  // LightSource.cpp
-        // double z = (rn[2] - 0.5) * m_sourceDepth;
         glm::dvec3 position = glm::dvec3(x, y, z);
 
         // get random deviation from main ray based on distribution

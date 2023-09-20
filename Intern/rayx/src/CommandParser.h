@@ -40,7 +40,7 @@ class CommandParser {
         bool m_verbose = false;                        // --verbose (Verbose)
         std::string m_format = defaultFormatString();  // --format
         std::string m_parallelize = "";                // --parallelize (dipolesource)
-        int m_setThreads = 1;                          // --setThreads (dipolesource)
+        int m_setThreads = 1;                          // -T (dipolesource)
 
 
     } m_args;
