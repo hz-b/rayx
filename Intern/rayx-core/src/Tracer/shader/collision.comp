@@ -275,8 +275,6 @@ Collision findCollisionInElementCoords(Ray r, Surface surface, Cutout cutout) {
 // checks whether `r` collides with the element of the given `id`,
 // and returns a Collision accordingly.
 Collision findCollisionWith(Ray r, uint id) {
-    double sty = elements[id].m_surface.m_type;
-
     // misalignment
     r = rayMatrixMult(r, elements[id].m_inTrans);  // image plane is the x-y plane of the coordinate system
     Collision col = findCollisionInElementCoords(r, elements[id].m_surface, elements[id].m_cutout);
