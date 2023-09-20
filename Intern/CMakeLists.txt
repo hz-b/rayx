@@ -20,7 +20,7 @@ set(CMAKE_LIBRARY_OUTPUT_DIRECTORY_DEBUG ${CMAKE_BINARY_DIR}/lib/debug)
 add_subdirectory(rayx-core)
 add_subdirectory(rayx)
 # Don't build rayx-ui without Vulkan
-if(NOT VULKAN STREQUAL "NO")
+if(VULKAN)
     add_subdirectory(rayx-ui)
 endif()
 # ------------------------
