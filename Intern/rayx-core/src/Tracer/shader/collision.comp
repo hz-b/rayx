@@ -22,14 +22,12 @@ struct Collision {
 /**************************************************************
  *                    Quadric collision
  **************************************************************/
-Collision getQuadricCollision(Ray r, uint id) {
+Collision getQuadricCollision(Ray r, QuadricSurface q) {
     Collision col;
     col.found = true;
-    col.elementIndex = int(id);
     col.hitpoint = dvec3(0, 0, 0);
     col.normal = dvec3(0, 0, 0);
 
-    QuadricSurface q = deserializeQuadric(elements[id].m_surface);
     int cs     = 1;
     int d_sign = q.m_icurv;
     if (abs(r.m_direction[1]) >= abs(r.m_direction[0]) && abs(r.m_direction[1]) >= abs(r.m_direction[2])) {
@@ -138,8 +136,7 @@ Collision getQuadricCollision(Ray r, uint id) {
  *                    Toroid Collision
  **************************************************************/
 // this uses newton to approximate a solution.
-Collision getToroidCollision(Ray r, uint id) {
-    ToroidSurface toroid = deserializeToroid(elements[id].m_surface);
+Collision getToroidCollision(Ray r, ToroidSurface toroid)  {
     double longRad = toroid.m_longRadius;
     double shortRad = toroid.m_shortRadius;
 
@@ -149,7 +146,6 @@ Collision getToroidCollision(Ray r, uint id) {
 
     Collision col;
     col.found = true;
-    col.elementIndex = int(id);
     col.hitpoint = dvec3(0, 0, 0);
     col.normal = dvec3(0, 0, 0);
 
@@ -227,18 +223,12 @@ dvec2 projectToPlane(PlaneDir plane, dvec3 point) {
     }
 }
 
-// checks whether `r` collides with the element of the given `id`,
-// and returns a Collision accordingly.
-Collision findCollisionWith(Ray r, uint id) {
-    double sty = elements[id].m_surface.m_type;
-
-    // misalignment
-    r = rayMatrixMult(r, elements[id].m_inTrans);  // image plane is the x-y plane of the coordinate system
+Collision findCollisionInElementCoords(Ray r, Surface surface, Cutout cutout) {
+    double sty = surface.m_type;
 
     Collision col;
     if (sty == STYPE_PLANE_XY) {
         col.found = false;
-        col.elementIndex = int(id);
         col.normal = dvec3(0, 0, -1);
         double offset = abs(r.m_position.z / r.m_direction.z);
 
@@ -252,23 +242,23 @@ Collision findCollisionWith(Ray r, uint id) {
         col.found = r.m_direction.z > 0 && r.m_position.z < 0;
         // backward hits are excluded? i.e. if a ray with negative direction and positive z coordinate hits the plane?
     } else if (sty == STYPE_TOROID) {
-        col = getToroidCollision(r, id);
+        col = getToroidCollision(r, deserializeToroid(surface));
     } else if (sty == STYPE_QUADRIC) {
-        col = getQuadricCollision(r, id);
+        col = getQuadricCollision(r, deserializeQuadric(surface));
     } else {
         col.found = false;
-        col.elementIndex = int(id);
 
         throw("invalid surfaceType!");
         return col; // has found = false
     }
+
 
     dvec2 x1x2 = projectToPlane(getPlaneDir(sty), col.hitpoint);
 
     double x1 = x1x2.x;
     double x2 = x1x2.y;
 
-    if (!inCutout(elements[id].m_cutout, x1, x2)) {
+    if (!inCutout(cutout, x1, x2)) {
         col.found = false;
     }
 
@@ -279,7 +269,20 @@ Collision findCollisionWith(Ray r, uint id) {
     if (dot(r.m_direction, col.normal) > 0.0) {
         col.normal = col.normal * -1.0;
     }
+    return col;
+}
 
+// checks whether `r` collides with the element of the given `id`,
+// and returns a Collision accordingly.
+Collision findCollisionWith(Ray r, uint id) {
+    double sty = elements[id].m_surface.m_type;
+
+    // misalignment
+    r = rayMatrixMult(r, elements[id].m_inTrans);  // image plane is the x-y plane of the coordinate system
+    Collision col = findCollisionInElementCoords(r, elements[id].m_surface, elements[id].m_cutout);
+    if (col.found) {
+        col.elementIndex = int(id);
+    }
     return col;
 }
 
