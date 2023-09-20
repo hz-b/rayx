@@ -2,6 +2,7 @@
 
 #include "Data/xml.h"
 #include "Debug/Debug.h"
+#include "Debug/Instrumentor.h"
 #include "Random.h"
 #include "Shared/Constants.h"
 
@@ -44,6 +45,15 @@ double getCoord(const SourceDist l, const double extent) {
  * @returns list of rays
  */
 std::vector<Ray> PointSource::getRays(int THREAD_COUNT) const {
+    RAYX_PROFILE_FUNCTION();
+    
+    if (THREAD_COUNT == 0){
+        THREAD_COUNT = 1;
+        #define DIPOLE_OMP
+    }else if(THREAD_COUNT > 1){
+        #define DIPOLE_OMP
+    }
+    
     double x, y, z, psi, phi, en;  // x,y,z pos, psi,phi direction cosines, en=energy
 
     int n = m_numberOfRays;
@@ -53,6 +63,9 @@ std::vector<Ray> PointSource::getRays(int THREAD_COUNT) const {
 
     // create n rays with random position and divergence within the given span
     // for width, height, depth, horizontal and vertical divergence
+    #if defined(DIPOLE_OMP)
+    #pragma omp parallel for num_threads(THREAD_COUNT)
+    #endif
     for (int i = 0; i < n; i++) {
         x = getCoord(m_widthDist, m_sourceWidth) + getMisalignmentParams().m_translationXerror;
         x += m_position.x;
@@ -75,8 +88,14 @@ std::vector<Ray> PointSource::getRays(int THREAD_COUNT) const {
         glm::dvec4 stokes = glm::dvec4(1, m_linearPol_0, m_linearPol_45, m_circularPol);
 
         Ray r = {position, ETYPE_UNINIT, direction, en, stokes, 0.0, 0.0, -1.0, -1.0};
-
-        rayList.push_back(r);
+        #if defined(DIPOLE_OMP)
+        #pragma omp critical
+        {
+            rayList.push_back(r);
+        }
+        #else
+            rayList.push_back(r);
+        #endif
     }
     return rayList;
 }

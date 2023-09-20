@@ -9,7 +9,7 @@ class RAYX_API MatrixSource : public LightSource {
     MatrixSource(const DesignObject&);
     virtual ~MatrixSource() = default;
 
-    virtual std::vector<Ray> getRays(int THREAD_COUNT = 0) const override;
+    virtual std::vector<Ray> getRays(int THREAD_COUNT = 1) const override;
 
   private:
     SourcePulseType m_sourceDistributionType;  // TODO: wo muss der name angepasst werden?

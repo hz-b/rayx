@@ -9,7 +9,7 @@ class RAYX_API PointSource : public LightSource {
     PointSource(const DesignObject&);
     virtual ~PointSource() = default;
 
-    std::vector<Ray> getRays(int THREAD_COUNT = 0) const override;
+    std::vector<Ray> getRays(int THREAD_COUNT = 1) const override;
 
   private:
     // Geometric Params
