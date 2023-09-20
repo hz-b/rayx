@@ -1,12 +1,13 @@
 #ifndef COLLISION_H
 #define COLLISION_H
 
+#include "adapt.h"
 // A "ray-element" collision.
 
 /**************************************************************
  *                    Cllision Struct
  **************************************************************/
-struct Collision {
+struct RAYX_API Collision {
     // The point where `_ray` hits the element, in element-coordinates.
     dvec3 hitpoint;
 

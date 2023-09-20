@@ -9,7 +9,6 @@
 namespace RAYX {
 
 MatrixSource::MatrixSource(const DesignObject& dobj) : LightSource(dobj) {
-
     m_linearPol_0 = dobj.parseLinearPol0();
     m_linearPol_45 = dobj.parseLinearPol45();
     m_circularPol = dobj.parseCircularPol();

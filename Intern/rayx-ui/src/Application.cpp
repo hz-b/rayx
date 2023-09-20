@@ -9,7 +9,7 @@
 #include "RenderObject.h"
 #include "RenderSystem/LineRenderSystem.h"
 #include "RenderSystem/TriangleRenderSystem.h"
-#include "Triangulate.h"
+#include "Triangulation/Triangulate.h"
 #include "UserInput.h"
 #include "Writer/H5Writer.h"
 

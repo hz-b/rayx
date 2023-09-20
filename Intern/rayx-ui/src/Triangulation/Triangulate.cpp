@@ -1,10 +1,12 @@
 #include "Triangulate.h"
 
 #include <glm/gtc/matrix_transform.hpp>
+#include <memory>
 
 #include "Colors.h"
 #include "Debug/Debug.h"
-#include "MarchingCubes.h"
+#include "Triangulation/MarchingCubes.h"
+#include "Triangulation/TraceTriangulation.h"
 
 // ------ Helper functions ------
 
@@ -76,26 +78,6 @@ std::vector<RenderObject> planarTriangulation(const std::vector<RAYX::OpticalEle
     return rObjects;
 }
 
-// TODO(Jannis): Implement
-std::vector<RenderObject> traceTriangulation(const std::vector<RAYX::OpticalElement>& elements) {
-    // Tracer tracer;
-    // std::vector<Beamline> beamlines;
-    std::vector<RenderObject> objectsInScene;
-
-    // for (auto element : elements) {
-    // create Beamline
-    // }
-
-    // for (Beamline beamline : beamlines) {
-    // trace beamline
-    // create grid
-    // interpolate grid
-    // add vertices
-    // }
-
-    return objectsInScene;
-}
-
 // ------ Interface functions ------
 
 /**
@@ -113,7 +95,7 @@ std::vector<RenderObject> triangulateObjects(const std::vector<RAYX::OpticalElem
             case STYPE_TOROID:
             case STYPE_QUADRIC:
             case STYPE_PLANE_XY:
-                planarElements.push_back(element);
+                curvedElements.push_back(element);
                 break;
             // case STYPE_QUADRIC:
             //     if (useMarchinCubes) {

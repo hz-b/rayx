@@ -1,6 +1,6 @@
 #pragma once
 
-#if 1
+#if RAYX_DEBUG_MODE
 #define RAYX_PROFILE
 #endif
 
