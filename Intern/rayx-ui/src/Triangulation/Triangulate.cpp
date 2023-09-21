@@ -92,20 +92,24 @@ std::vector<RenderObject> triangulateObjects(const std::vector<RAYX::OpticalElem
 
     for (auto element : elements) {
         switch ((int)element.m_element.m_surface.m_type) {
-            case STYPE_TOROID:
-            case STYPE_QUADRIC:
             case STYPE_PLANE_XY:
+                planarElements.push_back(element);
+                break;
+            case STYPE_QUADRIC:
+                QuadricSurface q = deserializeQuadric(element.m_element.m_surface);
+                if ((q.m_a11 == 0 && q.m_a22 == 0 && q.m_a33 == 0) && (q.m_a14 != 0 || q.m_a24 != 0 || q.m_a34 != 0)) {  // Plane
+                    planarElements.push_back(element);
+                } else {
+                    if (useMarchinCubes) {
+                        quadricElements.push_back(element);
+                    } else {
+                        curvedElements.push_back(element);
+                    }
+                }
+                break;
+            case STYPE_TOROID:
                 curvedElements.push_back(element);
                 break;
-            // case STYPE_QUADRIC:
-            //     if (useMarchinCubes) {
-            //         quadricElements.push_back(element);
-            //     } else {
-            //         curvedElements.push_back(element);
-            //     }
-            // case STYPE_TOROID:
-            //     curvedElements.push_back(element);
-            //     break;
             default:
                 // Error
                 RAYX_ERR << "Unknown element type: " << element.m_element.m_surface.m_type;
@@ -113,6 +117,8 @@ std::vector<RenderObject> triangulateObjects(const std::vector<RAYX::OpticalElem
         }
     }
 
+    std::cout << "Triangulating " << planarElements.size() << " planar elements, " << curvedElements.size() << " curved elements and "
+              << quadricElements.size() << " quadric elements" << std::endl;
     std::vector<RenderObject> rObjects = planarTriangulation(planarElements);
     std::vector<RenderObject> traceObjects = traceTriangulation(curvedElements);
     rObjects.insert(rObjects.end(), traceObjects.begin(), traceObjects.end());

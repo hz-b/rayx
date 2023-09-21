@@ -82,7 +82,6 @@ std::vector<std::vector<RAYX::Ray>> createRayGrid(size_t size, double width, dou
     return grid;
 }
 
-// TODO: distinguish between xy and xz planes
 std::vector<RenderObject> traceTriangulation(const std::vector<RAYX::OpticalElement>& elements) {
     RAYX::CpuTracer tracer;
     std::vector<RenderObject> objects;
