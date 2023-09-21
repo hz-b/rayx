@@ -16,12 +16,12 @@ class CameraController {
     glm::vec3 m_direction;
     glm::vec3 m_up;
 
-    double m_yaw;
-    double m_pitch;
+    float m_yaw;
+    float m_pitch;
 
     bool m_mouseLooking;
-    double m_lastMouseX;
-    double m_lastMouseY;
+    float m_lastMouseX;
+    float m_lastMouseY;
 
     struct Config {
         float FOV;
@@ -31,15 +31,15 @@ class CameraController {
 
     CameraController();
 
-    void updateDirection(double deltaYaw, double deltaPitch);
+    void updateDirection(float deltaYaw, float deltaPitch);
     void moveForward(float distance);
     void moveSideways(float distance);
     void moveUp(float distance);
     void startMouseLook();
     void stopMouseLook();
     bool isMouseLooking() const;
-    void setLastMousePos(double x, double y);
-    void updateDirectionViaMouse(double mouseX, double mouseY);
+    void setLastMousePos(float x, float y);
+    void updateDirectionViaMouse(float mouseX, float mouseY);
     void update(Camera& cam, float aspectRatio);
 };
 

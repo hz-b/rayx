@@ -20,7 +20,7 @@ CameraController::CameraController()
     m_config.far = 10000.0f;
 }
 
-void CameraController::updateDirection(double deltaYaw, double deltaPitch) {
+void CameraController::updateDirection(float deltaYaw, float deltaPitch) {
     m_yaw += deltaYaw;
     m_pitch += deltaPitch;
 
@@ -42,14 +42,14 @@ void CameraController::startMouseLook() { m_mouseLooking = true; }
 void CameraController::stopMouseLook() { m_mouseLooking = false; }
 bool CameraController::isMouseLooking() const { return m_mouseLooking; }
 
-void CameraController::setLastMousePos(double x, double y) {
+void CameraController::setLastMousePos(float x, float y) {
     m_lastMouseX = x;
     m_lastMouseY = y;
 }
 
-void CameraController::updateDirectionViaMouse(double mouseX, double mouseY) {
-    double deltaX = mouseX - m_lastMouseX;
-    double deltaY = mouseY - m_lastMouseY;
+void CameraController::updateDirectionViaMouse(float mouseX, float mouseY) {
+    float deltaX = mouseX - m_lastMouseX;
+    float deltaY = mouseY - m_lastMouseY;
     m_lastMouseX = mouseX;
     m_lastMouseY = mouseY;
 

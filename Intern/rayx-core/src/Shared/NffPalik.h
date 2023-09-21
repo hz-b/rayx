@@ -3,16 +3,16 @@
 
 /** This struct represents one line of a .NKP file.  */
 struct PalikEntry {
-    double m_energy;
-    double m_n;
-    double m_k;
+    float m_energy;
+    float m_n;
+    float m_k;
 };
 
 /** This struct represents one line of a .nff file.  */
 struct NffEntry {
-    double m_energy;
-    double m_f1;
-    double m_f2;
+    float m_energy;
+    float m_f1;
+    float m_f2;
 };
 
 #endif

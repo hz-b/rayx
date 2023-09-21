@@ -40,7 +40,7 @@ Cell strToCell(const char* x) {
     return out;
 }
 
-Cell doubleToCell(double x) {
+Cell doubleToCell(float x) {
     std::stringstream ss;
     ss.setf(std::ios::fixed);
 
@@ -99,7 +99,7 @@ RAYX::BundleHistory loadCSV(std::string filename) {
     RAYX::BundleHistory out;
 
     while (std::getline(file, s)) {
-        std::vector<double> d;
+        std::vector<float> d;
         std::stringstream ss(s);
         std::string num;
 

@@ -7,10 +7,10 @@
  **************************************************************/
 struct Collision {
     // The point where `_ray` hits the element, in element-coordinates.
-    dvec3 hitpoint;
+    vec3 hitpoint;
 
     // The normal of the surface at the hitpoint in element-coordinates.
-    dvec3 normal;
+    vec3 normal;
 
     // The index of the element with which `_ray` collides.
     int elementIndex;
@@ -26,8 +26,8 @@ Collision getQuadricCollision(Ray r, uint id) {
     Collision col;
     col.found = true;
     col.elementIndex = int(id);
-    col.hitpoint = dvec3(0, 0, 0);
-    col.normal = dvec3(0, 0, 0);
+    col.hitpoint = vec3(0, 0, 0);
+    col.normal = vec3(0, 0, 0);
 
     QuadricSurface q = deserializeQuadric(elements[id].m_surface);
     int cs     = 1;
@@ -38,16 +38,16 @@ Collision getQuadricCollision(Ray r, uint id) {
         cs = 3;
     }
 
-    double x = 0;
-    double y = 0;
-    double z = 0;
-    double a = 0;
-    double b = 0;
-    double c = 0;
+    float x = 0;
+    float y = 0;
+    float z = 0;
+    float a = 0;
+    float b = 0;
+    float c = 0;
 
     if (cs == 1) {
-        double aml = r.m_direction[1] / r.m_direction[0];
-        double anl = r.m_direction[2] / r.m_direction[0];
+        float aml = r.m_direction[1] / r.m_direction[0];
+        float anl = r.m_direction[2] / r.m_direction[0];
         y          = r.m_position[1] - aml * r.m_position[0];
         z          = r.m_position[2] - anl * r.m_position[0];
         d_sign     = int(sign(r.m_direction[0]) * q.m_icurv);
@@ -56,7 +56,7 @@ Collision getQuadricCollision(Ray r, uint id) {
         b = q.m_a14 + q.m_a24 * aml + q.m_a34 * anl + (q.m_a12 + q.m_a22 * aml + q.m_a23 * anl) * y + (q.m_a13 + q.m_a23 * aml + q.m_a33 * anl) * z;
         c = q.m_a44 + q.m_a22 * y * y + 2 * q.m_a34 * z + q.m_a33 * z * z + 2 * y * (q.m_a24 + q.m_a23 * z);
 
-        double bbac = b * b - a * c;
+        float bbac = b * b - a * c;
         if (bbac < 0) {
             col.found = false;
         } else {
@@ -69,8 +69,8 @@ Collision getQuadricCollision(Ray r, uint id) {
         y = y + aml * x;
         z = z + anl * x;
     } else if (cs == 2) {
-        double alm = r.m_direction[0] / r.m_direction[1];
-        double anm = r.m_direction[2] / r.m_direction[1];
+        float alm = r.m_direction[0] / r.m_direction[1];
+        float anm = r.m_direction[2] / r.m_direction[1];
         x          = r.m_position[0] - alm * r.m_position[1];
         z          = r.m_position[2] - anm * r.m_position[1];
         d_sign     = int(sign(r.m_direction[1]) * q.m_icurv);
@@ -79,7 +79,7 @@ Collision getQuadricCollision(Ray r, uint id) {
         b = q.m_a24 + q.m_a14 * alm + q.m_a34 * anm + (q.m_a12 + q.m_a11 * alm + q.m_a13 * anm) * x + (q.m_a23 + q.m_a13 * alm + q.m_a33 * anm) * z;
         c = q.m_a44 + q.m_a11 * x * x + 2 * q.m_a34 * z + q.m_a33 * z * z + 2 * x * (q.m_a14 + q.m_a13 * z);
 
-        double bbac = b * b - a * c;
+        float bbac = b * b - a * c;
         if (bbac < 0) {
             col.found = false;
         } else {
@@ -93,8 +93,8 @@ Collision getQuadricCollision(Ray r, uint id) {
         z = z + anm * y;
 
     } else {
-        double aln = r.m_direction[0] / r.m_direction[2];
-        double amn = r.m_direction[1] / r.m_direction[2];
+        float aln = r.m_direction[0] / r.m_direction[2];
+        float amn = r.m_direction[1] / r.m_direction[2];
         // firstParam = aln;
         // secondParam = amn;
         x      = r.m_position[0] - aln * r.m_position[2];
@@ -105,11 +105,11 @@ Collision getQuadricCollision(Ray r, uint id) {
         b = q.m_a34 + q.m_a14 * aln + q.m_a24 * amn + (q.m_a13 + q.m_a11 * aln + q.m_a12 * amn) * x + (q.m_a23 + q.m_a12 * aln + q.m_a22 * amn) * y;
         c = q.m_a44 + q.m_a11 * x * x + 2 * q.m_a24 * y + q.m_a22 * y * y + 2 * x * (q.m_a14 + q.m_a12 * y);
 
-        double bbac = b * b - a * c;
+        float bbac = b * b - a * c;
         if (bbac < 0) {
             col.found = false;
         } else {
-            if (abs(a) > abs(c) * 1e-10) {  // pow(10, double(-10))) {
+            if (abs(a) > abs(c) * 1e-10) {  // pow(10, float(-10))) {
                 z = (-b + d_sign * sqrt(bbac)) / a;
             } else {
                 z = (-c / 2) / b;
@@ -117,7 +117,7 @@ Collision getQuadricCollision(Ray r, uint id) {
         }
         x = x + aln * z;
         y = y + amn * z;
-        // r.m_position = dvec3(a, b, c);
+        // r.m_position = vec3(a, b, c);
     }
 
     // intersection point is in the negative direction (behind the position when the direction is followed forwards), set weight to 0
@@ -125,12 +125,12 @@ Collision getQuadricCollision(Ray r, uint id) {
         col.found = false;
     }
 
-    col.hitpoint = dvec3(x, y, z);
+    col.hitpoint = vec3(x, y, z);
 
-    double fx = 2 * q.m_a14 + 2 * q.m_a11 * x + 2 * q.m_a12 * y + 2 * q.m_a13 * z;
-    double fy = 2 * q.m_a24 + 2 * q.m_a12 * x + 2 * q.m_a22 * y + 2 * q.m_a23 * z;
-    double fz = 2 * q.m_a34 + 2 * q.m_a13 * x + 2 * q.m_a23 * y + 2 * q.m_a33 * z;
-    col.normal = normalize(dvec3(fx, fy, fz));
+    float fx = 2 * q.m_a14 + 2 * q.m_a11 * x + 2 * q.m_a12 * y + 2 * q.m_a13 * z;
+    float fy = 2 * q.m_a24 + 2 * q.m_a12 * x + 2 * q.m_a22 * y + 2 * q.m_a23 * z;
+    float fz = 2 * q.m_a34 + 2 * q.m_a13 * x + 2 * q.m_a23 * y + 2 * q.m_a33 * z;
+    col.normal = normalize(vec3(fx, fy, fz));
     return col;
 }
 
@@ -140,8 +140,8 @@ Collision getQuadricCollision(Ray r, uint id) {
 // this uses newton to approximate a solution.
 Collision getToroidCollision(Ray r, uint id) {
     ToroidSurface toroid = deserializeToroid(elements[id].m_surface);
-    double longRad = toroid.m_longRadius;
-    double shortRad = toroid.m_shortRadius;
+    float longRad = toroid.m_longRadius;
+    float shortRad = toroid.m_shortRadius;
 
     if (toroid.m_toroidType == TOROID_TYPE_CONVEX) {
         shortRad *= -1.0;
@@ -150,22 +150,22 @@ Collision getToroidCollision(Ray r, uint id) {
     Collision col;
     col.found = true;
     col.elementIndex = int(id);
-    col.hitpoint = dvec3(0, 0, 0);
-    col.normal = dvec3(0, 0, 0);
+    col.hitpoint = vec3(0, 0, 0);
+    col.normal = vec3(0, 0, 0);
 
-    double isigro = sign(shortRad);
+    float isigro = sign(shortRad);
     // sign radius: +1 = concave, -1 = convex
 
     int n = 0;
-    // double aln = r.m_direction.x / r.m_direction.z;
-    // double amn = r.m_direction.y / r.m_direction.z;
+    // float aln = r.m_direction.x / r.m_direction.z;
+    // float amn = r.m_direction.y / r.m_direction.z;
 
-    dvec4 normal = dvec4(0, 0, 0, 0);
-    double xx = 0.0;
-    double zz = 0.0;
-    double yy = 0.0;
-    double dz = 0.0;
-    dvec3 normalized_dir = dvec3(r.m_direction) / r.m_direction.z;
+    vec4 normal = vec4(0, 0, 0, 0);
+    float xx = 0.0;
+    float zz = 0.0;
+    float yy = 0.0;
+    float dz = 0.0;
+    vec3 normalized_dir = vec3(r.m_direction) / r.m_direction.z;
 
     // while not converted
     do {
@@ -175,15 +175,15 @@ Collision getToroidCollision(Ray r, uint id) {
             xx = xx / abs(xx) * 0.95 * shortRad;
         }
         yy        = r.m_position.y + normalized_dir.y * (zz - r.m_position.z);
-        double sq = sqrt(shortRad * shortRad - xx * xx);
-        double rx = (longRad - shortRad + isigro * sq);
+        float sq = sqrt(shortRad * shortRad - xx * xx);
+        float rx = (longRad - shortRad + isigro * sq);
 
         normal.x = (-2 * xx * isigro / sq) * rx;
         normal.y = -2 * (yy - longRad);
         normal.z = -2 * zz;
 
-        double func = -rx * rx + (yy - longRad) * (yy - longRad) + zz * zz;
-        double df   = normalized_dir.x * normal.x + normalized_dir.y * normal.y + normal.z;  // dot(normalized_dir, dvec3(normal));
+        float func = -rx * rx + (yy - longRad) * (yy - longRad) + zz * zz;
+        float df   = normalized_dir.x * normal.x + normalized_dir.y * normal.y + normal.z;  // dot(normalized_dir, vec3(normal));
         dz          = func / df;
         n += 1;
         if (n >= 50) {
@@ -192,15 +192,15 @@ Collision getToroidCollision(Ray r, uint id) {
         }
     } while (abs(dz) > 0.0001);
 
-    col.normal = normalize(dvec3(normal));
-    col.hitpoint = dvec3(xx, yy, zz);
+    col.normal = normalize(vec3(normal));
+    col.hitpoint = vec3(xx, yy, zz);
 
-    dvec3 rayToHitpoint = col.hitpoint - r.m_position;
+    vec3 rayToHitpoint = col.hitpoint - r.m_position;
 
     // edit: if ray points away from the hitpoint, no collision can be found.
     // Note that multiplying the rays direction with -1 SHOULD totally have an effect on the collision detection - in most cases this 180° rotation will make the ray point away from the toroid, and hence preventing a Collision completely.
     // The above code however, is unaffected when multiplying the ray direction with -1.
-    // Due to it having no effect on `dvec3 normalized_dir = dvec3(r.m_direction) / r.m_direction.z;`
+    // Due to it having no effect on `vec3 normalized_dir = vec3(r.m_direction) / r.m_direction.z;`
     if (dot(rayToHitpoint, r.m_direction) > 0.0) {
         col.found = false;
     }
@@ -216,21 +216,21 @@ Collision getToroidCollision(Ray r, uint id) {
 // This function projects a point into the corresponding plane.
 //
 // The cutout is applied in the primary plane.
-dvec2 projectToPlane(PlaneDir plane, dvec3 point) {
+vec2 projectToPlane(PlaneDir plane, vec3 point) {
     if (plane == PLANE_XY) {
-        return dvec2(point.x, point.y);
+        return vec2(point.x, point.y);
     } else if (plane == PLANE_XZ) {
-        return dvec2(point.x, point.z);
+        return vec2(point.x, point.z);
     } else {
         throw("invalid PlaneDir!");
-        return dvec2(0.0, 0.0);
+        return vec2(0.0, 0.0);
     }
 }
 
 // checks whether `r` collides with the element of the given `id`,
 // and returns a Collision accordingly.
 Collision findCollisionWith(Ray r, uint id) {
-    double sty = elements[id].m_surface.m_type;
+    float sty = elements[id].m_surface.m_type;
 
     // misalignment
     r = rayMatrixMult(r, elements[id].m_inTrans);  // image plane is the x-y plane of the coordinate system
@@ -239,8 +239,8 @@ Collision findCollisionWith(Ray r, uint id) {
     if (sty == STYPE_PLANE_XY) {
         col.found = false;
         col.elementIndex = int(id);
-        col.normal = dvec3(0, 0, -1);
-        double offset = abs(r.m_position.z / r.m_direction.z);
+        col.normal = vec3(0, 0, -1);
+        float offset = abs(r.m_position.z / r.m_direction.z);
 
         // scale x-slope of ray (l/n) by z-length between origin and image plane
         col.hitpoint.x = r.m_position.x + r.m_direction.x * offset;
@@ -263,10 +263,10 @@ Collision findCollisionWith(Ray r, uint id) {
         return col; // has found = false
     }
 
-    dvec2 x1x2 = projectToPlane(getPlaneDir(sty), col.hitpoint);
+    vec2 x1x2 = projectToPlane(getPlaneDir(sty), col.hitpoint);
 
-    double x1 = x1x2.x;
-    double x2 = x1x2.y;
+    float x1 = x1x2.x;
+    float x2 = x1x2.y;
 
     if (!inCutout(elements[id].m_cutout, x1, x2)) {
         col.found = false;
@@ -299,7 +299,7 @@ Collision findCollision() {
     best_col.found = false;
 
     // the distance the ray has to travel to reach `best_col`.
-    double best_dist = infinity();
+    float best_dist = infinity();
 
     // move ray slightly forward.
     // -> prevents hitting an element very close to the previous collision.
@@ -314,8 +314,8 @@ Collision findCollision() {
             continue;
         }
 
-        dvec3 global_hitpoint = dvec3(elements[elementIndex].m_outTrans * dvec4(current_col.hitpoint, 1));
-        double current_dist = length(global_hitpoint - _ray.m_position);
+        vec3 global_hitpoint = vec3(elements[elementIndex].m_outTrans * vec4(current_col.hitpoint, 1));
+        float current_dist = length(global_hitpoint - _ray.m_position);
 
         if (current_dist < best_dist) {
             best_col = current_col;

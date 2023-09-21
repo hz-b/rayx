@@ -18,21 +18,21 @@ namespace RAYX {
 
 struct TraceRawConfig {
     std::vector<Ray> m_rays;
-    double m_rayIdStart;
-    double m_numRays;
-    double m_randomSeed;
-    double m_maxEvents;
+    float m_rayIdStart;
+    float m_numRays;
+    float m_randomSeed;
+    float m_maxEvents;
     MaterialTables m_materialTables;
     std::vector<Element> m_elements;
 };
 
 // Useful for GPU Tracing
 struct PushConstants {  // TODO(Jannis): PushConstants is not an expressive name. Rename to something like TracerConfig
-    double rayIdStart;
-    double numRays;
-    double randomSeed;
-    double maxEvents;
-    double sequential;
+    float rayIdStart;
+    float numRays;
+    float randomSeed;
+    float maxEvents;
+    float sequential;
 };
 
 /// A 'snapshot' of a ray, at the time where it undergoes some event.

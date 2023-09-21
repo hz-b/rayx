@@ -22,7 +22,7 @@ Element makeReflectionZonePlate(const DesignObject& dobj) {
     // designEnergy = designEnergy; // if Auto == true, take energy of Source
     // (param sourceEnergy), else designEnergy = designEnergy
     auto designWavelength = designEnergy == 0 ? 0 : hvlam(designEnergy);
-    auto additionalOrder = double(dobj.parseAdditionalOrder());
+    auto additionalOrder = float(dobj.parseAdditionalOrder());
 
     auto curvatureType = dobj.parseCurvatureType();
     Surface surface;
@@ -40,11 +40,11 @@ Element makeReflectionZonePlate(const DesignObject& dobj) {
 
     auto imageType = dobj.parseImageType();
 
-    auto behaviour = serializeRZP({.m_imageType = (double) imageType,
-                                   .m_rzpType = (double)RZPType::Elliptical,
+    auto behaviour = serializeRZP({.m_imageType = (float) imageType,
+                                   .m_rzpType = (float)RZPType::Elliptical,
                                    .m_derivationMethod = 0,
                                    .m_designWavelength = designWavelength,
-                                   .m_curvatureType = (double)curvatureType,
+                                   .m_curvatureType = (float)curvatureType,
                                    .m_designOrderOfDiffraction = designOrderOfDiffraction,
                                    .m_orderOfDiffraction = orderOfDiffraction,
                                    .m_fresnelZOffset = fresnelZOffset,
@@ -54,7 +54,7 @@ Element makeReflectionZonePlate(const DesignObject& dobj) {
                                    .m_designMeridionalExitArmLength = designMeridionalExitArmLength,
                                    .m_designAlphaAngle = designAlphaAngle.rad,
                                    .m_designBetaAngle = designBetaAngle.rad,
-                                   .m_additionalOrder = (double)additionalOrder});
+                                   .m_additionalOrder = (float)additionalOrder});
     return makeElement(dobj, behaviour, surface);
 }
 

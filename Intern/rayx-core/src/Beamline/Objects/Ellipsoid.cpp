@@ -16,7 +16,7 @@ Element makeEllipsoid(const DesignObject& dobj) {
 
     // if design angle not given, take incidenceAngle
     // calc y0
-    double y0 = 0.0;
+    float y0 = 0.0;
     if (longHalfAxisA > shortHalfAxisB) {
         if (designGrazingAngle.rad > 0) {
             y0 = -pow(shortHalfAxisB, 2) * 1 / designGrazingAngle.tan() / sqrt(pow(longHalfAxisA, 2) - pow(shortHalfAxisB, 2));
@@ -28,7 +28,7 @@ Element makeEllipsoid(const DesignObject& dobj) {
     }
 
     // calc z0
-    double z0 = 0.0;
+    float z0 = 0.0;
     if (entranceArmLength > exitArmLength && -shortHalfAxisB < y0) {
         z0 = longHalfAxisA * sqrt(pow(shortHalfAxisB, 2) - pow(y0, 2)) / shortHalfAxisB;
     } else if (entranceArmLength < exitArmLength && -shortHalfAxisB < y0) {
@@ -38,7 +38,7 @@ Element makeEllipsoid(const DesignObject& dobj) {
     }
 
     // calc mt
-    double mt = 0;  // tangent slope
+    float mt = 0;  // tangent slope
     if (longHalfAxisA > 0.0 && y0 < 0.0) {
         mt = pow(shortHalfAxisB / longHalfAxisA, 2) * z0 / y0;
     }

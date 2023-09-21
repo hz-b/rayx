@@ -10,20 +10,20 @@
 namespace RAYX {
 /** This struct represents one line of a .DAT file.  */
 struct DatEntry {
-    double m_energy;
-    double m_weight;
+    float m_energy;
+    float m_weight;
 };
 
 /** This struct represents the contents of a .DAT file. */
 struct DatFile {
     std::string m_title;
     uint32_t m_linecount;
-    double m_start;
-    double m_end;
-    double m_step;
+    float m_start;
+    float m_end;
+    float m_step;
 
-    double m_weightSum;
-    double m_average;
+    float m_weightSum;
+    float m_average;
 
     std::vector<DatEntry> m_Lines;
 
@@ -34,9 +34,9 @@ struct DatFile {
     [[maybe_unused]] std::string dump();
 
     /** samples from the distribution given by the .DAT file */
-    double selectEnergy(bool continuous) const;
+    float selectEnergy(bool continuous) const;
 
     /** yields the expected value of the underlying distribution */
-    double getAverage() const;
+    float getAverage() const;
 };
 }  // namespace RAYX

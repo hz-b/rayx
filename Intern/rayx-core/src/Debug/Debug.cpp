@@ -84,7 +84,7 @@ void (*error_fn)() = exit1;
 
 const int PREC = 17;
 
-void dbg(const std::string& filename, int line, std::string name, std::vector<double> v) {
+void dbg(const std::string& filename, int line, std::string name, std::vector<float> v) {
     RAYX::Log(filename, line) << std::move(name) << ":";
 
     int counter = 0;  // stores the number of elements in the stringstream

@@ -115,7 +115,7 @@ class RAYX_API InstrumentationTimer {
 
         if (m_canPrint && BENCH_FLAG) {
             long long duration = end - start;
-            double seconds = duration * 0.000001;
+            float seconds = duration * 0.000001;
             std::cout << "BENCH: " << m_Name << ": " << std::endl << seconds << "s" << std::endl;
         }
 

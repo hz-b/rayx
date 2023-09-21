@@ -69,7 +69,7 @@ bool DatFile::load(const std::filesystem::path& filename, DatFile* out) {
     return s.str();
 }
 
-double DatFile::selectEnergy(bool continuous) const {
+float DatFile::selectEnergy(bool continuous) const {
     if (continuous) {
         if (m_Lines.size() == 1) {  // weird edge case, which would crash the code below
             return m_Lines[0].m_energy;
@@ -77,10 +77,10 @@ double DatFile::selectEnergy(bool continuous) const {
         // find the index `idx`, s.t.
         // we will return an energy between lines[idx].energy and
         // lines[idx+1].energy
-        double continuousWeightSum = m_weightSum - m_Lines.front().m_weight / 2 - m_Lines.back().m_weight / 2;
-        double w = randomDoubleInRange(0, continuousWeightSum);
+        float continuousWeightSum = m_weightSum - m_Lines.front().m_weight / 2 - m_Lines.back().m_weight / 2;
+        float w = randomDoubleInRange(0, continuousWeightSum);
 
-        double counter = 0;
+        float counter = 0;
         uint32_t idx = 0;
         for (; idx < m_Lines.size() - 2; idx++) {
             counter += (m_Lines[idx].m_weight + m_Lines[idx + 1].m_weight) / 2;
@@ -92,9 +92,9 @@ double DatFile::selectEnergy(bool continuous) const {
         // interpolate between lines[idx].energy and lines[idx+1].energy
         return randomDoubleInRange(m_Lines[idx].m_energy, m_Lines[idx + 1].m_energy);
     } else {
-        double w = randomDoubleInRange(0, m_weightSum);
+        float w = randomDoubleInRange(0, m_weightSum);
 
-        double counter = 0;
+        float counter = 0;
         for (auto e : m_Lines) {
             counter += e.m_weight;
             if (counter >= w) {
@@ -105,5 +105,5 @@ double DatFile::selectEnergy(bool continuous) const {
     }
 }
 
-double DatFile::getAverage() const { return m_average; }
+float DatFile::getAverage() const { return m_average; }
 }  // namespace RAYX

@@ -20,7 +20,7 @@ TEST_F(TestSuite, randomNumbers) {
     }
 
     RAYX::fixSeed(RAYX::FIXED_SEED);
-    double r;
+    float r;
     r = randomDouble();
     CHECK_EQ(r, 0.37454011439684315);
     r = randomDouble();
@@ -38,7 +38,7 @@ TEST_F(TestSuite, randomNumbers_normal) {
     }
 
     RAYX::fixSeed(RAYX::FIXED_SEED);
-    double r;
+    float r;
     r = randomNormal(0, 1);
     CHECK_EQ(r, 0.40402608730396244);
     r = randomNormal(0, 1);

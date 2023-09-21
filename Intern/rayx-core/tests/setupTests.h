@@ -41,8 +41,8 @@ const int PREC = 17;
 /// l and r are the printable strings representing tl and tr.
 /// vl and vr represent the doubles contained in tl and tr, obtained with RAYX::formatAsVec
 template <typename TL, typename TR>
-inline void checkEq(std::string filename, int line, std::string l, std::string r, const TL& tl, const TR& tr, std::vector<double> vl,
-                    std::vector<double> vr, double tolerance = 1e-2) {
+inline void checkEq(std::string filename, int line, std::string l, std::string r, const TL& tl, const TR& tr, std::vector<float> vl,
+                    std::vector<float> vr, float tolerance = 1e-2) {
     if (vl.size() != vr.size()) {
         RAYX::Err(filename, line) << l << " != " << r << ": different lengths!";
         return;
@@ -86,8 +86,8 @@ inline void checkEq(std::string filename, int line, std::string l, std::string r
 
 /// specialized handling for rays, better prints!
 template <>
-inline void checkEq(std::string filename, int line, std::string l, std::string r, const RAYX::Ray& tl, const RAYX::Ray& tr, std::vector<double> vl,
-                    std::vector<double> vr, double tolerance) {
+inline void checkEq(std::string filename, int line, std::string l, std::string r, const RAYX::Ray& tl, const RAYX::Ray& tr, std::vector<float> vl,
+                    std::vector<float> vr, float tolerance) {
     std::vector<std::string> names = {".m_position.x",  ".m_position.y",  ".m_position.z", ".m_eventType", ".m_direction.x",
                                       ".m_direction.y", ".m_direction.z", ".m_energy",     ".m_stokes.x",  ".m_stokes.y",
                                       ".m_stokes.z",    ".m_stokes.w",    ".m_pathLength", ".m_order",     ".m_lastElement"};
@@ -186,7 +186,7 @@ std::vector<RAYX::Event> extractLastHit(const RAYX::BundleHistory&);
 std::vector<RAYX::Ray> loadCSVRayUI(std::string filename);
 
 /// Checks for equality up to the tolerance `t`.
-void compareBundleHistories(const RAYX::BundleHistory& r1, const RAYX::BundleHistory& r2, double t = 1e-11);
+void compareBundleHistories(const RAYX::BundleHistory& r1, const RAYX::BundleHistory& r2, float t = 1e-11);
 
 // If the ray from `ray_hist` went through the whole beamline sequentially, we return its last hit event.
 // Otherwise we return `{}`, aka None.
@@ -195,10 +195,10 @@ std::optional<RAYX::Ray> lastSequentialHit(RayHistory ray_hist, unsigned int bea
 /// Only cares for the rays hitting the last object of the beamline, and check whether they are the same as their RayUI counter part.
 /// Ray UI rays are obtained Export > RawRaysOutgoing.
 /// This also filters out non-sequential rays to compare to Ray-UI correctly.
-void compareLastAgainstRayUI(std::string filename, double t = 1e-11);
+void compareLastAgainstRayUI(std::string filename, float t = 1e-11);
 
 // compares input/<filename>.correct.csv with the trace output.
-void compareAgainstCorrect(std::string filename, double t = 1e-11);
+void compareAgainstCorrect(std::string filename, float t = 1e-11);
 
 /// updates the material tables of the Cpu Tracer to contain exactly the
 /// materials given in the std::vector.

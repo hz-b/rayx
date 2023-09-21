@@ -20,15 +20,15 @@ void RAYX_API randomSeed();
 uint32_t randomUint();
 
 // is in [0, 1].
-double RAYX_API randomDouble();
+float RAYX_API randomDouble();
 
 // is in [min(a, b), max(a, b)]
 int randomIntInRange(int a, int b);
 
 // is in [min(a, b), max(a, b)]
-double RAYX_API randomDoubleInRange(double a, double b);
+float RAYX_API randomDoubleInRange(float a, float b);
 
 // returns a value from the given normal distribution.
-double RAYX_API randomNormal(double mean, double stddev);
+float RAYX_API randomNormal(float mean, float stddev);
 
 }  // namespace RAYX

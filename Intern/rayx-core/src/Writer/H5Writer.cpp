@@ -18,8 +18,8 @@ int count(const RAYX::BundleHistory& hist) {
     return c;
 }
 
-std::vector<double> toDoubles(const RAYX::BundleHistory& hist, const Format& format) {
-    std::vector<double> output;
+std::vector<float> toDoubles(const RAYX::BundleHistory& hist, const Format& format) {
+    std::vector<float> output;
     output.reserve(count(hist) * format.size());
 
     for (uint ray_id = 0; ray_id < hist.size(); ray_id++) {
@@ -27,7 +27,7 @@ std::vector<double> toDoubles(const RAYX::BundleHistory& hist, const Format& for
         for (uint event_id = 0; event_id < ray_hist.size(); event_id++) {
             const RAYX::Event& event = ray_hist[event_id];
             for (uint i = 0; i < format.size(); i++) {
-                double next = format[i].get_double(ray_id, event_id, event);
+                float next = format[i].get_double(ray_id, event_id, event);
                 output.push_back(next);
             }
         }
@@ -43,8 +43,8 @@ void writeH5(const RAYX::BundleHistory& hist, std::string filename, const Format
     try {
         // write data
         auto dataspace = HighFive::DataSpace({doubles.size() / format.size(), format.size()});
-        auto dataset = file.createDataSet<double>("rays", dataspace);
-        auto ptr = (double*)doubles.data();
+        auto dataset = file.createDataSet<float>("rays", dataspace);
+        auto ptr = (float*)doubles.data();
         dataset.write_raw(ptr);
 
         // write element names
@@ -60,7 +60,7 @@ void writeH5(const RAYX::BundleHistory& hist, std::string filename, const Format
     }
 }
 
-RAYX::BundleHistory fromDoubles(const std::vector<double>& doubles, const Format& format) {
+RAYX::BundleHistory fromDoubles(const std::vector<float>& doubles, const Format& format) {
     auto formatSize = format.size();  // Now 16 with the inclusion of Ray-ID and Snapshot-ID
     auto numRays = doubles.size() / formatSize;
 
@@ -74,8 +74,8 @@ RAYX::BundleHistory fromDoubles(const std::vector<double>& doubles, const Format
     RAYX::RayHistory rayHist;
     while (double_index < doubles.size()) {
         // Extract and ignore Ray-ID and Snapshot-ID
-        double rayId = doubles[double_index++];
-        double eventId = doubles[double_index++];
+        float rayId = doubles[double_index++];
+        float eventId = doubles[double_index++];
 
         if (eventId == 0) {
             bundleHist.push_back(rayHist);
@@ -83,14 +83,14 @@ RAYX::BundleHistory fromDoubles(const std::vector<double>& doubles, const Format
         }
 
         // Extract data for ray
-        glm::dvec3 origin(doubles[double_index], doubles[double_index + 1], doubles[double_index + 2]);
-        double eventType = doubles[double_index + 3];
-        glm::dvec3 direction(doubles[double_index + 4], doubles[double_index + 5], doubles[double_index + 6]);
-        double energy = doubles[double_index + 7];
-        glm::dvec4 stokes(doubles[double_index + 8], doubles[double_index + 9], doubles[double_index + 10], doubles[double_index + 11]);
-        double pathLength = doubles[double_index + 12];
-        double order = doubles[double_index + 13];
-        double lastElement = doubles[double_index + 14];
+        glm::vec3 origin(doubles[double_index], doubles[double_index + 1], doubles[double_index + 2]);
+        float eventType = doubles[double_index + 3];
+        glm::vec3 direction(doubles[double_index + 4], doubles[double_index + 5], doubles[double_index + 6]);
+        float energy = doubles[double_index + 7];
+        glm::vec4 stokes(doubles[double_index + 8], doubles[double_index + 9], doubles[double_index + 10], doubles[double_index + 11]);
+        float pathLength = doubles[double_index + 12];
+        float order = doubles[double_index + 13];
+        float lastElement = doubles[double_index + 14];
 
         RAYX::Ray ray = {
             origin, eventType, direction, energy, stokes, pathLength, order, lastElement, 0.0,
@@ -111,7 +111,7 @@ RAYX::BundleHistory raysFromH5(std::string filename, const Format& format) {
     RAYX::BundleHistory rays;
     HighFive::File file(filename, HighFive::File::ReadOnly);
 
-    std::vector<double> doubles;
+    std::vector<float> doubles;
 
     try {
         // read data

@@ -8,19 +8,19 @@ void dynamicElements() {
     // ray specific "seed" for random numbers -> every ray has a different starting value for the counter that creates the random number
     const uint64_t MAX_UINT64 = ~(uint64_t(0));
     uint64_t workerCounterNum = MAX_UINT64 / uint64_t(pushConstants.numRays);
-    uint64_t ctr              = rayId() * workerCounterNum + uint64_t(pushConstants.randomSeed * MAX_UINT64);
+    uint64_t ctr = rayId() * workerCounterNum + (pushConstants.randomSeed * MAX_UINT64);
 
-    #ifdef RAYX_DEBUG_MODE // Debug Matrix only works in GPU Mode and on DEBUG Build Type
-    #ifdef GLSL
-        // Set Debug Struct of current Ray to identity
-        d_struct[uint(gl_GlobalInvocationID)]._dMat = dmat4(1);
-    #endif
-    #endif
+#ifdef RAYX_DEBUG_MODE  // Debug Matrix only works in GPU Mode and on DEBUG Build Type
+#ifdef GLSL
+    // Set Debug Struct of current Ray to identity
+    d_struct[uint(gl_GlobalInvocationID)]._dMat = mat4(1);
+#endif
+#endif
 
     Element nextElement;
     // at the end of this function we apply inTrans, if no collision happened (i.e. nextElement undefined), we want this to do nothing.
-    nextElement.m_inTrans = dmat4(1);
-    nextElement.m_outTrans = dmat4(1);
+    nextElement.m_inTrans = mat4(1);
+    nextElement.m_outTrans = mat4(1);
 
     // Iterate through all bounces
     for (int i = 0; i < maxBounces; i++) {
@@ -44,14 +44,14 @@ void dynamicElements() {
         elem_ray.m_position = col.hitpoint;
         elem_ray.m_lastElement = col.elementIndex;
 
-        switch(btype) {
+        switch (btype) {
             case (BTYPE_MIRROR):
                 elem_ray = behaveMirror(elem_ray, col.elementIndex, ctr, col);
                 break;
             case (BTYPE_GRATING):
                 elem_ray = behaveGrating(elem_ray, col.elementIndex, ctr, col);
                 break;
-            case (BTYPE_SLIT) :
+            case (BTYPE_SLIT):
                 elem_ray = behaveSlit(elem_ray, col.elementIndex, ctr, col);
                 break;
             case (BTYPE_RZP):
@@ -63,7 +63,9 @@ void dynamicElements() {
         }
 
         // the ray might finalize due to being absorbed, or because an error occured while tracing!
-        if (finalized) { return; }
+        if (finalized) {
+            return;
+        }
 
         recordEvent(elem_ray, ETYPE_JUST_HIT_ELEM);
 

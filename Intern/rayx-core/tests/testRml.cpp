@@ -51,15 +51,15 @@ TEST_F(TestSuite, groupTransform) {
 //     CHECK_EQ(b.m_LightSources.size(), 1);
 //     CHECK_EQ(b.m_OpticalElements.size(), 1);
 //     glm::dmat4x4 groupOr = glm::dmat4x4(1, 0, 0, 0, 0, 0.985, -0.174, 0, 0, 0.174, 0.985, 0, 0, 0, 0, 1);
-//     glm::dvec4 elementPos = glm::dvec4(0, 0, 1000, 1);
-//     glm::dvec4 groupPos = glm::dvec4(42, 2, 4, 0);
+//     glm::vec4 elementPos = glm::vec4(0, 0, 1000, 1);
+//     glm::vec4 groupPos = glm::vec4(42, 2, 4, 0);
 //     glm::dmat4x4 elementOr = glm::dmat4x4(1, 0, 0, 0, 0, 0.996, -0.087, 0, 0, 0.087, 0.996, 0, 0, 0, 0, 1);
 
 //     glm::dmat4x4 orientationCorrect = groupOr * elementOr;
-//     glm::dvec4 positionCorrect = groupPos + (groupOr * elementPos);
+//     glm::vec4 positionCorrect = groupPos + (groupOr * elementPos);
 
 //     glm::dmat4x4 orientationResult = b.m_OpticalElements[0].m_element.m_inTrans;
-//     glm::dvec4 positionResult = b.m_OpticalElements[0].m_element.m_inTrans * glm::dvec4(0, 0, 0, 1);
+//     glm::vec4 positionResult = b.m_OpticalElements[0].m_element.m_inTrans * glm::vec4(0, 0, 0, 1);
 
 //     CHECK_EQ((orientationCorrect), (orientationResult));
 //     CHECK_EQ((positionCorrect), (positionResult));
@@ -74,13 +74,13 @@ TEST_F(TestSuite, groupTransformMisalignment) {
     glm::dmat4x4 groupOr = glm::dmat4x4(1, 0, 0, 0, 0, 0.985, -0.174, 0, 0, 0.174, 0.985, 0, 0, 0, 0, 1);
     printDMat4(groupOr);
 
-    glm::dvec4 groupPos = glm::dvec4(42, 2, 4, 0);
-    glm::dvec4 elementPos = glm::dvec4(0, 0, 1000, 1);
+    glm::vec4 groupPos = glm::vec4(42, 2, 4, 0);
+    glm::vec4 elementPos = glm::vec4(0, 0, 1000, 1);
 
-    glm::dvec4 positionCorrect = groupPos + groupOr * elementPos;
+    glm::vec4 positionCorrect = groupPos + groupOr * elementPos;
     glm::dmat4x4 orientationResult = b.m_OpticalElements[0]->getOrientation();
     printDMat4(orientationResult);
-    glm::dvec4 positionResult = b.m_OpticalElements[0]->getPosition();
+    glm::vec4 positionResult = b.m_OpticalElements[0]->getPosition();
 
     CHECK_EQ(positionCorrect, positionResult);
     CHECK_EQ(groupOr, orientationResult, 1e-15);

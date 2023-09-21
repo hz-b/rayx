@@ -18,12 +18,12 @@ const int CTYPE_UNLIMITED = 3;
 struct Cutout {
     // This types is one of the `CTYPE` constants.
     // It expresses what kind of Cutout this represents.
-    double m_type;
+    float m_type;
 
     // Parameters that hold information about the cutout.
     // What they mean depends on `m_type`.
     // These parameters shouldn't be accessed manually, use the `serialize` and `deserialize` functions below instead.
-    double m_params[3];
+    float m_params[3];
 };
 
 ///////////////////////////////////
@@ -32,8 +32,8 @@ struct Cutout {
 
 // A rectangle with "width" `m_size_x1` and "height" `m_size_x2` centered at (0, 0).
 struct RectCutout {
-    double m_size_x1;
-    double m_size_x2;
+    float m_size_x1;
+    float m_size_x2;
 };
 
 INLINE Cutout serializeRect(RectCutout cut) {
@@ -61,8 +61,8 @@ INLINE RectCutout deserializeRect(Cutout ser) {
 // It can be understood as a circle with individual stretch-factors for both dimensions.
 // The point (0, 0) lies at the center of the ellipse.
 struct EllipticalCutout {
-    double m_diameter_x1;
-    double m_diameter_x2;
+    float m_diameter_x1;
+    float m_diameter_x2;
 };
 
 INLINE Cutout serializeElliptical(EllipticalCutout cut) {
@@ -90,9 +90,9 @@ INLINE EllipticalCutout deserializeElliptical(Cutout ser) {
 // These lines have a distance of `m_size_x2`.
 // The point (0, 0) lies at the center of the trapezoid.
 struct TrapezoidCutout {
-    double m_sizeA_x1;
-    double m_sizeB_x1;
-    double m_size_x2;  // originally called `height`
+    float m_sizeA_x1;
+    float m_sizeB_x1;
+    float m_size_x2;  // originally called `height`
 };
 
 INLINE Cutout serializeTrapezoid(TrapezoidCutout cut) {

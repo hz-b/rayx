@@ -4,8 +4,8 @@ std::unique_ptr<RAYX::Tracer> tracer;
 
 // helper functions
 
-double parseDouble(std::string s) {
-    double d;
+float parseDouble(std::string s) {
+    float d;
 #if defined(WIN32)
     if (sscanf_s(s.c_str(), "%le", &d) != 1) {
 #else
@@ -19,7 +19,7 @@ double parseDouble(std::string s) {
 }
 
 RAYX::Ray parseCSVline(std::string line) {
-    std::vector<double> vec;
+    std::vector<float> vec;
 
     if (line.ends_with('\n')) {
         line.pop_back();
@@ -116,7 +116,7 @@ std::vector<RAYX::Ray> loadCSVRayUI(std::string filename) {
     return out;
 }
 
-void compareBundleHistories(const RAYX::BundleHistory& r1, const RAYX::BundleHistory& r2, double t) {
+void compareBundleHistories(const RAYX::BundleHistory& r1, const RAYX::BundleHistory& r2, float t) {
     CHECK_EQ(r1.size(), r2.size());
 
     auto it1 = r1.begin();
@@ -188,7 +188,7 @@ std::vector<RAYX::Ray> rayUiCompat(std::string filename) {
     return out;
 }
 
-void compareLastAgainstRayUI(std::string filename, double t) {
+void compareLastAgainstRayUI(std::string filename, float t) {
     auto rayx_list = rayUiCompat(filename);
     auto rayui_list = loadCSVRayUI(filename);
 
@@ -216,7 +216,7 @@ void compareLastAgainstRayUI(std::string filename, double t) {
     }
 }
 
-void compareAgainstCorrect(std::string filename, double tolerance) {
+void compareAgainstCorrect(std::string filename, float tolerance) {
     auto a = traceRML(filename);
 
     std::string f = canonicalizeRepositoryPath("Intern/rayx-core/tests/input/" + filename + ".correct.csv").string();

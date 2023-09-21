@@ -14,46 +14,46 @@ extern ShaderArray<Ray> rayData;
 extern ShaderArray<Ray> outputData;
 
 extern ShaderArray<Element> quadricData;
-extern ShaderArray<dvec4> xyznull;
+extern ShaderArray<vec4> xyznull;
 extern RAYX_API ShaderArray<int> matIdx;
-extern RAYX_API ShaderArray<double> mat;
+extern RAYX_API ShaderArray<float> mat;
 
 // forward declarations for shader functions
 
-double RAYX_API r8_exp(double);
-double RAYX_API r8_log(double);
-double RAYX_API squaresDoubleRNG(uint64_t&);
-double RAYX_API squaresNormalRNG(uint64_t&, double, double);
-Ray RAYX_API refrac2D(Ray, glm::dvec4, double, double);
-Ray RAYX_API refrac(Ray, glm::dvec4, double);
-glm::dvec4 RAYX_API normal_cartesian(glm::dvec4, double, double);
-glm::dvec4 RAYX_API normal_cylindrical(glm::dvec4, double, double);
-void RAYX_API RZPLineDensity(Ray r, glm::dvec4 normal, RZPBehaviour b, double& DX, double& DZ);
-Ray RAYX_API rayMatrixMult(Ray, glm::dmat4);
-void RAYX_API cosini(Ray&, double, double);
-double RAYX_API dpow(double, int);
-double RAYX_API fact(int);
-double RAYX_API bessel1(double);
-double RAYX_API r8_sin(double);
-double RAYX_API r8_cos(double);
-double RAYX_API r8_atan(double);
-double RAYX_API vlsGrating(double, double, double[6]);
-Ray RAYX_API refrac_plane(Ray, glm::dvec4, double);
-double RAYX_API getIncidenceAngle(Ray r, glm::dvec4 normal);
-void RAYX_API reflectance(double energy, double incidence_angle, glm::dvec2& complex_S, glm::dvec2& complex_P, int material);
-glm::dvec2 RAYX_API snell(glm::dvec2 cos_incidence, glm::dvec2 cn1, glm::dvec2 cn2);
-void RAYX_API fresnel(glm::dvec2 cn1, glm::dvec2 cn2, glm::dvec2 cos_incidence, glm::dvec2 cos_transmittance, glm::dvec2& complex_S,
-                      glm::dvec2& complex_P);
-glm::dvec2 RAYX_API cartesian_to_euler(glm::dvec2 complex);
-double RAYX_API hvlam(double);
+float RAYX_API r8_exp(float);
+float RAYX_API r8_log(float);
+float RAYX_API squaresDoubleRNG(uint64_t&);
+float RAYX_API squaresNormalRNG(uint64_t&, float, float);
+Ray RAYX_API refrac2D(Ray, glm::vec4, float, float);
+Ray RAYX_API refrac(Ray, glm::vec4, float);
+glm::vec4 RAYX_API normal_cartesian(glm::vec4, float, float);
+glm::vec4 RAYX_API normal_cylindrical(glm::vec4, float, float);
+void RAYX_API RZPLineDensity(Ray r, glm::vec4 normal, RZPBehaviour b, float& DX, float& DZ);
+Ray RAYX_API rayMatrixMult(Ray, glm::mat4);
+void RAYX_API cosini(Ray&, float, float);
+float RAYX_API dpow(float, int);
+float RAYX_API fact(int);
+float RAYX_API bessel1(float);
+float RAYX_API r8_sin(float);
+float RAYX_API r8_cos(float);
+float RAYX_API r8_atan(float);
+float RAYX_API vlsGrating(float, float, float[6]);
+Ray RAYX_API refrac_plane(Ray, glm::vec4, float);
+float RAYX_API getIncidenceAngle(Ray r, glm::vec4 normal);
+void RAYX_API reflectance(float energy, float incidence_angle, glm::vec2& complex_S, glm::vec2& complex_P, int material);
+glm::vec2 RAYX_API snell(glm::vec2 cos_incidence, glm::vec2 cn1, glm::vec2 cn2);
+void RAYX_API fresnel(glm::vec2 cn1, glm::vec2 cn2, glm::vec2 cos_incidence, glm::vec2 cos_transmittance, glm::vec2& complex_S,
+                      glm::vec2& complex_P);
+glm::vec2 RAYX_API cartesian_to_euler(glm::vec2 complex);
+float RAYX_API hvlam(float);
 
-dvec2 RAYX_API getAtomicMassAndRho(int material);
+vec2 RAYX_API getAtomicMassAndRho(int material);
 int RAYX_API getPalikEntryCount(int material);
 PalikEntry RAYX_API getPalikEntry(int index, int material);
 int RAYX_API getNffEntryCount(int material);
 NffEntry RAYX_API getNffEntry(int index, int material);
 int RAYX_API getPalikEntryCount(int material);
 PalikEntry RAYX_API getPalikEntry(int index, int material);
-dvec2 RAYX_API getRefractiveIndex(double energy, int material);
+vec2 RAYX_API getRefractiveIndex(float energy, int material);
 }  // namespace CPU_TRACER
 }  // namespace RAYX

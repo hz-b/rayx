@@ -19,12 +19,12 @@ std::vector<RenderObject> marchingCubeTriangulation(const std::vector<RAYX::Opti
     return objects;
 }
 
-std::vector<Triangle> trianglesFromQuadric(const double* quadric) {
+std::vector<Triangle> trianglesFromQuadric(const float* quadric) {
     // Define the size and resolution of the grid
-    double scalarGrid[GRIDSIZE][GRIDSIZE][GRIDSIZE];
+    float scalarGrid[GRIDSIZE][GRIDSIZE][GRIDSIZE];
 
-    const double SCALE = 5.0 * 10.0 / GRIDSIZE;  // Define your desired scaling factor here
-    double move = (GRIDSIZE / 2.0);
+    const float SCALE = 5.0 * 10.0 / GRIDSIZE;  // Define your desired scaling factor here
+    float move = (GRIDSIZE / 2.0);
 
     // 1. Sample the 3D space
     for (int x = 0; x < GRIDSIZE; x++) {
@@ -32,12 +32,12 @@ std::vector<Triangle> trianglesFromQuadric(const double* quadric) {
             for (int z = 0; z < GRIDSIZE; z++) {
                 // Convert grid coordinate to centered & scaled space coordinate
 
-                double realX = (x - (GRIDSIZE / 2.0)) * SCALE;
-                double realY = (y - (GRIDSIZE / 2.0)) * SCALE;
-                double realZ = (z - (GRIDSIZE / 2.0)) * SCALE;
+                float realX = (x - (GRIDSIZE / 2.0)) * SCALE;
+                float realY = (y - (GRIDSIZE / 2.0)) * SCALE;
+                float realZ = (z - (GRIDSIZE / 2.0)) * SCALE;
 
                 glm::vec4 pos(realX, realY, realZ, 1);
-                double value = evaluateQuadricAtPosition(quadric, pos);
+                float value = evaluateQuadricAtPosition(quadric, pos);
                 scalarGrid[x][y][z] = value;
             }
         }
@@ -58,25 +58,25 @@ std::vector<Triangle> trianglesFromQuadric(const double* quadric) {
     return triangles;
 }
 
-double evaluateQuadricAtPosition(const double surface[16], const glm::vec4& pos) {
-    double icurv = surface[0];
-    double a11 = surface[1];
-    double a12 = surface[2];
-    double a13 = surface[3];
-    double a14 = surface[4];
-    double a22 = surface[5];
-    double a23 = surface[6];
-    double a24 = surface[7];
-    double a33 = surface[8];
-    double a34 = surface[9];
-    double a44 = surface[10];
-    double result = a11 * pos.x * pos.x + a22 * pos.y * pos.y + a33 * pos.z * pos.z + a12 * pos.x * pos.y + a13 * pos.x * pos.z +
+float evaluateQuadricAtPosition(const float surface[16], const glm::vec4& pos) {
+    float icurv = surface[0];
+    float a11 = surface[1];
+    float a12 = surface[2];
+    float a13 = surface[3];
+    float a14 = surface[4];
+    float a22 = surface[5];
+    float a23 = surface[6];
+    float a24 = surface[7];
+    float a33 = surface[8];
+    float a34 = surface[9];
+    float a44 = surface[10];
+    float result = a11 * pos.x * pos.x + a22 * pos.y * pos.y + a33 * pos.z * pos.z + a12 * pos.x * pos.y + a13 * pos.x * pos.z +
                     a23 * pos.y * pos.z + a14 * pos.x + a24 * pos.y + a34 * pos.z + a44;
 
     return result;
 }
 
-int determineMarchingCubesCase(const double scalarGrid[GRIDSIZE][GRIDSIZE][GRIDSIZE], int x, int y, int z) {
+int determineMarchingCubesCase(const float scalarGrid[GRIDSIZE][GRIDSIZE][GRIDSIZE], int x, int y, int z) {
     // Based on the scalar values at the voxel corners, determine the index for the lookup tables.
     int cubeIndex = 0;
 
@@ -94,8 +94,8 @@ int determineMarchingCubesCase(const double scalarGrid[GRIDSIZE][GRIDSIZE][GRIDS
     return cubeIndex;
 }
 
-std::vector<Triangle> lookupTrianglesForCase(int caseIndex, const double scalarGrid[GRIDSIZE][GRIDSIZE][GRIDSIZE], int offsetX, int offsetY,
-                                             int offsetZ, double move, double scale) {
+std::vector<Triangle> lookupTrianglesForCase(int caseIndex, const float scalarGrid[GRIDSIZE][GRIDSIZE][GRIDSIZE], int offsetX, int offsetY,
+                                             int offsetZ, float move, float scale) {
     // Using the triTable to generate the triangles for the voxel.
 
     std::vector<Triangle> triangles;
@@ -136,8 +136,8 @@ glm::vec3 getPositionAtCorner(int cornerIndex) {
     }
     return cornerPositions[cornerIndex];
 }
-Vertex interpolateVertex(int edgeIndex, const double scalarGrid[GRIDSIZE][GRIDSIZE][GRIDSIZE], int offsetX, int offsetY, int offsetZ, double move,
-                         double scale) {
+Vertex interpolateVertex(int edgeIndex, const float scalarGrid[GRIDSIZE][GRIDSIZE][GRIDSIZE], int offsetX, int offsetY, int offsetZ, float move,
+                         float scale) {
     int edgeToVertex[12][2] = {{0, 1}, {1, 2}, {2, 3}, {3, 0}, {4, 5}, {5, 6}, {6, 7}, {7, 4}, {0, 4}, {1, 5}, {2, 6}, {3, 7}};
 
     // Define the corner-to-voxel mapping
@@ -146,13 +146,13 @@ Vertex interpolateVertex(int edgeIndex, const double scalarGrid[GRIDSIZE][GRIDSI
     int v0Index = edgeToVertex[edgeIndex][0];
     int v1Index = edgeToVertex[edgeIndex][1];
 
-    double value0 = getScalarValueAtCorner(cornerToVoxel[v0Index][0] + offsetX, cornerToVoxel[v0Index][1] + offsetY,
+    float value0 = getScalarValueAtCorner(cornerToVoxel[v0Index][0] + offsetX, cornerToVoxel[v0Index][1] + offsetY,
                                            cornerToVoxel[v0Index][2] + offsetZ, scalarGrid);
-    double value1 = getScalarValueAtCorner(cornerToVoxel[v1Index][0] + offsetX, cornerToVoxel[v1Index][1] + offsetY,
+    float value1 = getScalarValueAtCorner(cornerToVoxel[v1Index][0] + offsetX, cornerToVoxel[v1Index][1] + offsetY,
                                            cornerToVoxel[v1Index][2] + offsetZ, scalarGrid);
     // Check for divide by zero
 
-    double t;
+    float t;
     if (fabs(value1 - value0) < 1e-6) {
         t = 0.5;  // or choose a reasonable default
         RAYX_LOG << "Divide by zero";
@@ -169,7 +169,7 @@ Vertex interpolateVertex(int edgeIndex, const double scalarGrid[GRIDSIZE][GRIDSI
     return v;
 }
 
-double getScalarValueAtCorner(int x, int y, int z, const double scalarGrid[GRIDSIZE][GRIDSIZE][GRIDSIZE]) {
+float getScalarValueAtCorner(int x, int y, int z, const float scalarGrid[GRIDSIZE][GRIDSIZE][GRIDSIZE]) {
     if (x < 0 || x >= GRIDSIZE || y < 0 || y >= GRIDSIZE || z < 0 || z >= GRIDSIZE) {
         throw std::out_of_range("Invalid corner index");
     }

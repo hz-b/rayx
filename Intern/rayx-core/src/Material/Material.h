@@ -29,7 +29,7 @@ enum class Material {
 bool materialFromString(const char* matname, Material* out);
 
 struct RAYX_API MaterialTables {
-    std::vector<double> materialTable;
+    std::vector<float> materialTable;
     std::vector<int> indexTable;
 };
 

@@ -21,5 +21,5 @@ struct PalikTable {
      * `out` */
     static bool load(const char* element, PalikTable* out);
 
-    // double interpolate(double x) const;
+    // float interpolate(float x) const;
 };

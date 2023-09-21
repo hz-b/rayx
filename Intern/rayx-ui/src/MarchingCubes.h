@@ -10,17 +10,17 @@
 
 // Marching Cubes
 std::vector<RenderObject> marchingCubeTriangulation(const std::vector<RAYX::OpticalElement>& elements);
-std::vector<Triangle> trianglesFromQuadric(const double* quadric);  // TODO: make nicer
+std::vector<Triangle> trianglesFromQuadric(const float* quadric);  // TODO: make nicer
 
 glm::vec3 getPositionAtCorner(int cornerIndex);
-Vertex interpolateVertex(int edgeIndex, const double scalarGrid[GRIDSIZE][GRIDSIZE][GRIDSIZE], int offsetX, int offsetY, int offsetZ, double move,
-                         double scale);
-double evaluateQuadricAtPosition(const double surface[16], const glm::vec4& pos);
-int determineMarchingCubesCase(const double scalarGrid[GRIDSIZE][GRIDSIZE][GRIDSIZE], int x, int y, int z);
-std::vector<Triangle> lookupTrianglesForCase(int caseIndex, const double scalarGrid[GRIDSIZE][GRIDSIZE][GRIDSIZE], int offsetX, int offsetY,
-                                             int offsetZ, double move, double scale);
+Vertex interpolateVertex(int edgeIndex, const float scalarGrid[GRIDSIZE][GRIDSIZE][GRIDSIZE], int offsetX, int offsetY, int offsetZ, float move,
+                         float scale);
+float evaluateQuadricAtPosition(const float surface[16], const glm::vec4& pos);
+int determineMarchingCubesCase(const float scalarGrid[GRIDSIZE][GRIDSIZE][GRIDSIZE], int x, int y, int z);
+std::vector<Triangle> lookupTrianglesForCase(int caseIndex, const float scalarGrid[GRIDSIZE][GRIDSIZE][GRIDSIZE], int offsetX, int offsetY,
+                                             int offsetZ, float move, float scale);
 Vertex getVertexFromEdge(int edgeIndex);
-double getScalarValueAtCorner(int x, int y, int z, const double scalarGrid[GRIDSIZE][GRIDSIZE][GRIDSIZE]);
+float getScalarValueAtCorner(int x, int y, int z, const float scalarGrid[GRIDSIZE][GRIDSIZE][GRIDSIZE]);
 
 // Marching Cubes
 const int edgeTable[256] = {

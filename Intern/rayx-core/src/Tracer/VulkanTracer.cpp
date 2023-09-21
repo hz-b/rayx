@@ -48,12 +48,12 @@ std::vector<Ray> VulkanTracer::traceRaw(const TraceRawConfig& cfg) {
     auto rayList = cfg.m_rays;
     const uint32_t numberOfRays = rayList.size();
 
-    std::vector<double> beamlineData;
+    std::vector<float> beamlineData;
     beamlineData.reserve(cfg.m_elements.size());
 
     for (Element e : cfg.m_elements) {
-        auto ptr = (double*)&e;
-        const size_t len = sizeof(Element) / sizeof(double);
+        auto ptr = (float*)&e;
+        const size_t len = sizeof(Element) / sizeof(float);
         // the number of doubles needs to be divisible by 16, otherwise it might introduce padding.
         static_assert(len % 16 == 0);
         for (unsigned int i = 0; i < len; i++) {
@@ -64,10 +64,10 @@ std::vector<Ray> VulkanTracer::traceRaw(const TraceRawConfig& cfg) {
     auto materialTables = cfg.m_materialTables;
     m_engine.createBufferWithData<Ray>("ray-buffer", rayList);
     m_engine.createBuffer("output-buffer", numberOfRays * sizeof(Ray) * (size_t)cfg.m_maxEvents);
-    m_engine.createBufferWithData<double>("quadric-buffer", beamlineData);
+    m_engine.createBufferWithData<float>("quadric-buffer", beamlineData);
     m_engine.createBuffer("xyznull-buffer", 100);
     m_engine.createBufferWithData<int>("material-index-table", materialTables.indexTable);
-    m_engine.createBufferWithData<double>("material-table", materialTables.materialTable);
+    m_engine.createBufferWithData<float>("material-table", materialTables.materialTable);
 #ifdef RAYX_DEBUG_MODE
     m_engine.createBuffer("debug-buffer", numberOfRays * sizeof(debugBuffer_t));
 #endif
@@ -86,8 +86,8 @@ std::vector<Ray> VulkanTracer::traceRaw(const TraceRawConfig& cfg) {
 }
 
 void VulkanTracer::setPushConstants(const PushConstants* p) {
-    // We had weird behaviour, when PushConstants had non-double-sized entries.
-    static_assert(sizeof(PushConstants) % sizeof(double) == 0);
+    // We had weird behaviour, when PushConstants had non-float-sized entries.
+    static_assert(sizeof(PushConstants) % sizeof(float) == 0);
 
     if (sizeof(*p) > 128) RAYX_WARN << "Using pushConstants bigger than 128 Bytes might be unsupported on some GPUs. Check Compute Info";
     m_engine.m_pushConstants.pushConstPtr = static_cast<const PushConstants*>(p);

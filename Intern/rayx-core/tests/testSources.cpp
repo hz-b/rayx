@@ -1,20 +1,20 @@
 #include "setupTests.h"
 #include <fstream>
 
-void checkEnergyDistribution(const std::vector<Ray>& rays, double photonEnergy, double energySpread) {
+void checkEnergyDistribution(const std::vector<Ray>& rays, float photonEnergy, float energySpread) {
     for (auto r : rays) {
         CHECK_IN(r.m_energy, photonEnergy - energySpread, photonEnergy + energySpread);
     }
 }
 
-void checkZDistribution(const std::vector<Ray>& rays, double center, double spread) {
+void checkZDistribution(const std::vector<Ray>& rays, float center, float spread) {
     for (auto r : rays) {
         CHECK_IN(r.m_position.z, center - spread, center + spread);
     }
 
 }
 
-void checkPositionDistribution(const std::vector<Ray>& rays, double sourceWidth, double sourceHight) {
+void checkPositionDistribution(const std::vector<Ray>& rays, float sourceWidth, float sourceHight) {
     for (auto r : rays) {
         CHECK_IN(r.m_position[0], -4.5 * sourceWidth, 4.5 * sourceWidth);
         CHECK_IN(r.m_position[1], -4.5 * sourceHight, 4.5 * sourceHight);
@@ -45,7 +45,7 @@ TEST_F(TestSuite, MatrixSourceMoved) {
     auto a = beamline.getInputRays();
     auto b = loadCSVRayUI("MatrixSource");
     for (auto& r : b) {
-        r.m_position += glm::dvec3(5, -5, 3);
+        r.m_position += glm::vec3(5, -5, 3);
     }
     roughCompare(a, b);
 }
@@ -95,8 +95,8 @@ TEST_F(TestSuite, DipoleZDistribution) {
 
 TEST_F(TestSuite, testInterpolationFunctionDipole) {
     struct InOutPair{
-        double in;
-        double out;
+        float in;
+        float out;
     };
     std::vector<InOutPair> inouts = {{
                                          .in = 1.5298292375594387,
@@ -116,9 +116,9 @@ TEST_F(TestSuite, testInterpolationFunctionDipole) {
 
 TEST_F(TestSuite, testVerDivergenceDipole) {
     struct InOutPair{
-        double energy;
-        double sigv;
-        double out;
+        float energy;
+        float sigv;
+        float out;
     };
     std::vector<InOutPair> inouts = {{
                                          .energy = 100,
@@ -140,11 +140,11 @@ TEST_F(TestSuite, testVerDivergenceDipole) {
 TEST_F(TestSuite, testLightsourceGetters){
     struct RmlInput{
         std::string rmlFile;
-        double horDivergence;
-        double sourceHight;
-        double sourceWidth;
-        double sourceDepth;
-        double averagePhotonEnergy;
+        float horDivergence;
+        float sourceHight;
+        float sourceWidth;
+        float sourceDepth;
+        float averagePhotonEnergy;
     };
     
     std::vector<RmlInput> rmlinputs = {{

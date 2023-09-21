@@ -9,7 +9,7 @@
 // ------ Helper functions ------
 
 void calculateVerticesForType(const Element& elem, glm::vec4& topLeft, glm::vec4& topRight, glm::vec4& bottomLeft, glm::vec4& bottomRight) {
-    const double defWidthHeight = 100.0f;
+    const float defWidthHeight = 100.0f;
     switch (static_cast<int>(elem.m_cutout.m_type)) {
         case CTYPE_TRAPEZOID:
             TrapezoidCutout trapezoid = deserializeTrapezoid(elem.m_cutout);

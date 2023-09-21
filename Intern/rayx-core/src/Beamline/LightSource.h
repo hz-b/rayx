@@ -24,21 +24,21 @@ class RAYX_API LightSource {
 
     // Getter
     Misalignment getMisalignmentParams() const;
-    //double getLinear0() const;
-    //double getLinear45() const;
-    //double getCircular() const;
-    //double getVerDivergence() const { return m_verDivergence; }
-    double getHorDivergence() const { return m_horDivergence; }
-    //double getSourceDepth() const { return m_sourceDepth; }
-    double getSourceHeight() const { return m_sourceHeight; }
-    double getSourceWidth() const { return m_sourceWidth; }
+    //float getLinear0() const;
+    //float getLinear45() const;
+    //float getCircular() const;
+    //float getVerDivergence() const { return m_verDivergence; }
+    float getHorDivergence() const { return m_horDivergence; }
+    //float getSourceDepth() const { return m_sourceDepth; }
+    float getSourceHeight() const { return m_sourceHeight; }
+    float getSourceWidth() const { return m_sourceWidth; }
 
     /** yields the average energy of the energy distribution
      * m_EnergyDistribution */
-    double getPhotonEnergy() const;
+    float getPhotonEnergy() const;
 
-    double selectEnergy() const;
-    glm::dvec3 getDirectionFromAngles(double phi, double psi) const;
+    float selectEnergy() const;
+    glm::vec3 getDirectionFromAngles(float phi, float psi) const;
     // get the rays according to specific light source, has to be implemented in
     // each class that inherits from LightSource
     virtual std::vector<Ray> getRays() const = 0;
@@ -51,15 +51,15 @@ class RAYX_API LightSource {
 
   protected:
     // Geometric Params
-    //double m_sourceDepth;
-    double m_sourceHeight;
-    double m_sourceWidth;
+    //float m_sourceDepth;
+    float m_sourceHeight;
+    float m_sourceWidth;
     // in rad:
-    double m_horDivergence;
-    double m_verDivergence;
+    float m_horDivergence;
+    float m_verDivergence;
 
     glm::dmat4x4 m_orientation = glm::dmat4x4();
-    glm::dvec4 m_position = glm::dvec4();
+    glm::vec4 m_position = glm::vec4();
 
   private:
     // User/Design Parameter
@@ -67,9 +67,9 @@ class RAYX_API LightSource {
 
     // Physics Params
     // point source & matrix source
-    //double m_linearPol_0;
-    //double m_linearPol_45;
-    //double m_circularPol;
+    //float m_linearPol_0;
+    //float m_linearPol_45;
+    //float m_circularPol;
 
     // TODO(Jannis): move to children
     //SourceDistType m_sourceDistributionType;

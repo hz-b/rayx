@@ -22,5 +22,5 @@ struct NffTable {
      * `out` */
     static bool load(const char* element, NffTable* out);
 
-    // double interpolate(double x) const;
+    // float interpolate(float x) const;
 };

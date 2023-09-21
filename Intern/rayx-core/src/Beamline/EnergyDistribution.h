@@ -9,13 +9,13 @@ namespace RAYX {
 /** describes the interval `[m_CenterEnergy - m_EnergySpread/2, m_CenterEnergy +
  * m_EnergySpread/2]` */
 struct RAYX_API EnergyRange {
-    double m_centerEnergy;
-    double m_energySpread;
+    float m_centerEnergy;
+    float m_energySpread;
 
-    EnergyRange(double centerEnergy, double energySpread);
+    EnergyRange(float centerEnergy, float energySpread);
 
-    double selectEnergy(bool continuous) const;
-    double getAverage() const;
+    float selectEnergy(bool continuous) const;
+    float getAverage() const;
 };
 
 /**
@@ -34,9 +34,9 @@ class RAYX_API EnergyDistribution {
 
     /** The selectEnergy() function returns one sample from the underlying
      * distribution */
-    double selectEnergy() const;
+    float selectEnergy() const;
     /** yields the expected value of the distribution */
-    double getAverage() const;
+    float getAverage() const;
 
   private:
     /** Shows whether the distribution is continuous or discrete */

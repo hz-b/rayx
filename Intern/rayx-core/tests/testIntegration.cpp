@@ -47,7 +47,7 @@ TEST_F(TestSuite, Ellipsoid) {
     for (auto ray_hist : rayx) {
         auto opt = lastSequentialHit(ray_hist, 2);
         if (opt) {
-            CHECK_EQ(opt->m_position, glm::dvec3(0, 0, 0), 1e-11);
+            CHECK_EQ(opt->m_position, glm::vec3(0, 0, 0), 1e-11);
             found_atleast_one = true;
         }
     }

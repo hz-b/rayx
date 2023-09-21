@@ -25,7 +25,7 @@ PointSource::PointSource(const DesignObject& dobj) : LightSource(dobj) {
  * hard edge, gaussian if soft edge)) and extent (eg specified width/height of
  * source)
  */
-double getCoord(const SourceDist l, const double extent) {
+float getCoord(const SourceDist l, const float extent) {
     if (l == SourceDist::Uniform) {
         return (randomDouble() - 0.5) * extent;
     } else {
@@ -44,7 +44,7 @@ double getCoord(const SourceDist l, const double extent) {
  * @returns list of rays
  */
 std::vector<Ray> PointSource::getRays() const {
-    double x, y, z, psi, phi,
+    float x, y, z, psi, phi,
         en;  // x,y,z pos, psi,phi direction cosines, en=energy
 
     int n = m_numberOfRays;
@@ -63,8 +63,8 @@ std::vector<Ray> PointSource::getRays() const {
         z = (randomDouble() - 0.5) * m_sourceDepth;
         z += m_position.z;
         en = selectEnergy();  // LightSource.cpp
-        // double z = (rn[2] - 0.5) * m_sourceDepth;
-        glm::dvec3 position = glm::dvec3(x, y, z);
+        // float z = (rn[2] - 0.5) * m_sourceDepth;
+        glm::vec3 position = glm::vec3(x, y, z);
 
         // get random deviation from main ray based on distribution
         // TODO correct misalignments?
@@ -72,10 +72,10 @@ std::vector<Ray> PointSource::getRays() const {
         phi = getCoord(m_horDist, m_horDivergence) + getMisalignmentParams().m_rotationYerror.rad;
         // get corresponding angles based on distribution and deviation from
         // main ray (main ray: xDir=0,yDir=0,zDir=1 for phi=psi=0)
-        glm::dvec3 direction = getDirectionFromAngles(phi, psi);
-        glm::dvec4 tempDir = m_orientation * glm::dvec4(direction, 0.0);
-        direction = glm::dvec3(tempDir.x, tempDir.y, tempDir.z);
-        glm::dvec4 stokes = glm::dvec4(1, m_linearPol_0, m_linearPol_45, m_circularPol);
+        glm::vec3 direction = getDirectionFromAngles(phi, psi);
+        glm::vec4 tempDir = m_orientation * glm::vec4(direction, 0.0);
+        direction = glm::vec3(tempDir.x, tempDir.y, tempDir.z);
+        glm::vec4 stokes = glm::vec4(1, m_linearPol_0, m_linearPol_45, m_circularPol);
 
         Ray r = {position, ETYPE_UNINIT, direction, en, stokes, 0.0, 0.0, -1.0, -1.0};
 

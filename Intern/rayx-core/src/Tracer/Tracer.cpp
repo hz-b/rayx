@@ -39,16 +39,16 @@ BundleHistory Tracer::trace(const Beamline& b, bool sequential, uint64_t max_bat
 
         TraceRawConfig cfg = {
             .m_rays = batch,
-            .m_rayIdStart = (double)rayIdStart,
-            .m_numRays = (double)rays.size(),
+            .m_rayIdStart = (float)rayIdStart,
+            .m_numRays = (float)rays.size(),
             .m_randomSeed = randomSeed,
-            .m_maxEvents = (double)maxEvents,
+            .m_maxEvents = (float)maxEvents,
             .m_materialTables = materialTables,
             .m_elements = elements,
         };
 
         PushConstants pushConsants = {
-            .rayIdStart = (double)rayIdStart, .numRays = (double)rays.size(), .randomSeed = randomSeed, .maxEvents = (double)maxEvents, .sequential = (double)sequential};
+            .rayIdStart = (float)rayIdStart, .numRays = (float)rays.size(), .randomSeed = randomSeed, .maxEvents = (float)maxEvents, .sequential = (float)sequential};
         setPushConstants(&pushConsants);
 
         RayHistory rawBatchHistory;

@@ -15,7 +15,7 @@ void randomSeed() { fixSeed((uint32_t)time(nullptr)); }
 
 uint32_t randomUint() { return RNG(); }
 
-double randomDouble() { return ((double)randomUint()) / std::mt19937::max(); }
+float randomDouble() { return ((float)randomUint()) / std::mt19937::max(); }
 
 int randomIntInRange(int a, int b) {
     int low = std::min(a, b);
@@ -23,21 +23,21 @@ int randomIntInRange(int a, int b) {
     return low + randomUint() % (high + 1 - low);
 }
 
-double randomDoubleInRange(double a, double b) {
-    double low = std::min(a, b);
-    double high = std::max(a, b);
+float randomDoubleInRange(float a, float b) {
+    float low = std::min(a, b);
+    float high = std::max(a, b);
     return low + randomDouble() * (high - low);
 }
 
 // see https://en.wikipedia.org/wiki/Box%E2%80%93Muller_transform
 // we don't use std::normal_distribution, due to this:
 // https://stackoverflow.com/questions/38532927/why-gcc-and-msvc-stdnormal-distribution-are-different
-double randomNormal(double mu, double sigma) {
-    constexpr double epsilon = std::numeric_limits<double>::epsilon();
-    const double two_pi = 2.0 * PI;
+float randomNormal(float mu, float sigma) {
+    constexpr float epsilon = std::numeric_limits<float>::epsilon();
+    const float two_pi = 2.0 * PI;
 
     // create two random numbers, make sure u1 is greater than epsilon
-    double u1, u2;
+    float u1, u2;
     do {
         u1 = randomDouble();
     } while (u1 <= epsilon);

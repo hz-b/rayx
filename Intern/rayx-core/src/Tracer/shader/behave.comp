@@ -22,11 +22,11 @@ Ray behaveSlit(Ray r, int id, RAYX_INOUT(uint64_t) ctr, ALLOW_UNUSED Collision c
         return r;
     }
 
-    double psi = -asin(float(r.m_direction.y));
-    double phi = asin(float(r.m_direction.x / cos(float(psi))));
-    double dPhi = 0;
-    double dPsi = 0;
-    double wavelength = hvlam(r.m_energy);
+    float psi = -asin(float(r.m_direction.y));
+    float phi = asin(float(r.m_direction.x / cos(float(psi))));
+    float dPhi = 0;
+    float dPsi = 0;
+    float wavelength = hvlam(r.m_energy);
 
     // this was previously called "diffraction"
     if (wavelength > 0) {
@@ -56,14 +56,14 @@ Ray behaveSlit(Ray r, int id, RAYX_INOUT(uint64_t) ctr, ALLOW_UNUSED Collision c
 Ray behaveRZP(Ray r, int id, RAYX_INOUT(uint64_t) ctr, Collision col) {
     RZPBehaviour b = deserializeRZP(elements[id].m_behaviour);
 
-    dvec4 normal = dvec4(col.normal, 0);
+    vec4 normal = vec4(col.normal, 0);
 
-    double WL = hvlam(r.m_energy);
-    double Ord = b.m_orderOfDiffraction;
+    float WL = hvlam(r.m_energy);
+    float Ord = b.m_orderOfDiffraction;
     int additional_order = int(b.m_additionalOrder);
 
     // calculate the RZP line density for the position of the intersection on the RZP
-    double DX, DZ;
+    float DX, DZ;
     RZPLineDensity(r, normal, b, DX, DZ);
 
     // tanger/slope Error
@@ -78,8 +78,8 @@ Ray behaveRZP(Ray r, int id, RAYX_INOUT(uint64_t) ctr, Collision col) {
     }
 
     // only 2D case, not 2 1D gratings with 90 degree rotation as in old RAY
-    double az = WL * DZ * Ord * 1e-6;
-    double ax = WL * DX * Ord * 1e-6;
+    float az = WL * DZ * Ord * 1e-6;
+    float ax = WL * DX * Ord * 1e-6;
     r = refrac2D(r, normal, az, ax);
 
     r.m_order = Ord;
@@ -87,7 +87,7 @@ Ray behaveRZP(Ray r, int id, RAYX_INOUT(uint64_t) ctr, Collision col) {
 }
 
 Ray behaveGrating(Ray r, int id, RAYX_INOUT(uint64_t) ctr, Collision col) {
-    dvec4 normal = dvec4(col.normal, 0);
+    vec4 normal = vec4(col.normal, 0);
 
     GratingBehaviour b = deserializeGrating(elements[id].m_behaviour);
 
@@ -97,12 +97,12 @@ Ray behaveGrating(Ray r, int id, RAYX_INOUT(uint64_t) ctr, Collision col) {
     normal = tanger(normal, slope_error.m_sag, slope_error.m_mer, 0, ctr);
 
     // vls parameters passed in q.elementParams
-    double WL = hvlam(r.m_energy);
-    double lineDensity = b.m_lineDensity;
-    double orderOfDiffraction = b.m_orderOfDiffraction;
+    float WL = hvlam(r.m_energy);
+    float lineDensity = b.m_lineDensity;
+    float orderOfDiffraction = b.m_orderOfDiffraction;
 
     // linedensity = WL * default_linedensity * order * 1e-06
-    double linedensity = vlsGrating(lineDensity, r.m_position.z, b.m_vls) * WL * orderOfDiffraction * 1e-06;
+    float linedensity = vlsGrating(lineDensity, r.m_position.z, b.m_vls) * WL * orderOfDiffraction * 1e-06;
     r.m_order = orderOfDiffraction;
     // no additional zero order here?
 
@@ -114,8 +114,8 @@ Ray behaveGrating(Ray r, int id, RAYX_INOUT(uint64_t) ctr, Collision col) {
 
 Ray behaveMirror(Ray r, int id, RAYX_INOUT(uint64_t) ctr, Collision col) {
     // calculate intersection point and normal at intersection point
-    dvec4 normal = dvec4(col.normal, 0);
-    double azimuthal_angle = elements[id].m_azimuthalAngle;
+    vec4 normal = vec4(col.normal, 0);
+    float azimuthal_angle = elements[id].m_azimuthalAngle;
 
     // take the slope error into account for the normal
     SlopeError slope_error = elements[id].m_slopeError;
@@ -123,10 +123,10 @@ Ray behaveMirror(Ray r, int id, RAYX_INOUT(uint64_t) ctr, Collision col) {
     normal = tanger(normal, slope_error.m_sag, slope_error.m_mer, 0, ctr);
 
     // calculate the new direction after the reflection
-    r.m_direction = dvec3(reflect(dvec4(r.m_direction, 0), normal));
+    r.m_direction = vec3(reflect(vec4(r.m_direction, 0), normal));
 
-    double real_S, real_P, delta;
-    double incidence_angle = getIncidenceAngle(r, normal);  // getTheta
+    float real_S, real_P, delta;
+    float incidence_angle = getIncidenceAngle(r, normal);  // getTheta
     int mat = int(elements[id].m_material);
     if (mat != -2) {
         efficiency(r, real_S, real_P, delta, incidence_angle, mat);

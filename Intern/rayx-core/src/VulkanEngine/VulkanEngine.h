@@ -270,7 +270,7 @@ class RAYX_API VulkanEngine {
 
 const std::vector<const char*> validationLayers = {"VK_LAYER_KHRONOS_validation"};
 
-const int WORKGROUP_SIZE = 32;
+const int WORKGROUP_SIZE = 4;
 
 /// size of the staging buffer in bytes, equal to 128MB.
 const size_t DEFAULT_STAGING_SIZE = 134217728;  // = 128MB

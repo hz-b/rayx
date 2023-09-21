@@ -6,36 +6,36 @@
 namespace RAYX {
 Element makeCone(const DesignObject& dobj) {
     auto incidence = dobj.parseGrazingIncAngle();
-    double entranceArmLength = dobj.parseEntranceArmLength();
-    double exitArmLength = dobj.parseExitArmLength();
+    float entranceArmLength = dobj.parseEntranceArmLength();
+    float exitArmLength = dobj.parseExitArmLength();
 
-    double zl = dobj.parseTotalLength();
+    float zl = dobj.parseTotalLength();
 
-    double ra = entranceArmLength;
-    double rb = exitArmLength;
+    float ra = entranceArmLength;
+    float rb = exitArmLength;
 
-    double zl2 = pow(zl / 2, 2);
-    double sth = incidence.sin();
-    double cth = incidence.cos();
-    double rmax1 = sqrt(zl2 + pow(ra, 2) - zl * ra * cth);
-    double rmax2 = sqrt(zl2 + pow(rb, 2) + zl * rb * cth);
-    double rmin1 = sqrt(zl2 + pow(ra, 2) + zl * ra * cth);
-    double rmin2 = sqrt(zl2 + pow(rb, 2) - zl * rb * cth);
-    double thmax = asin(ra * sth / rmax1);
-    double thmin = asin(ra * sth / rmin1);
-    double sthmax = sin(thmax);
-    double sthmin = sin(thmin);
+    float zl2 = pow(zl / 2, 2);
+    float sth = incidence.sin();
+    float cth = incidence.cos();
+    float rmax1 = sqrt(zl2 + pow(ra, 2) - zl * ra * cth);
+    float rmax2 = sqrt(zl2 + pow(rb, 2) + zl * rb * cth);
+    float rmin1 = sqrt(zl2 + pow(ra, 2) + zl * ra * cth);
+    float rmin2 = sqrt(zl2 + pow(rb, 2) - zl * rb * cth);
+    float thmax = asin(ra * sth / rmax1);
+    float thmin = asin(ra * sth / rmin1);
+    float sthmax = sin(thmax);
+    float sthmin = sin(thmin);
 
-    double upstreamRadius_R = 2 * sthmax / (1 / rmax1 + 1 / rmax2);
-    double downstreamRadius_rho = 2 * sthmin / (1 / rmin1 + 1 / rmin2);
+    float upstreamRadius_R = 2 * sthmax / (1 / rmax1 + 1 / rmax2);
+    float downstreamRadius_rho = 2 * sthmin / (1 / rmin1 + 1 / rmin2);
 
     auto cm = pow((upstreamRadius_R - downstreamRadius_rho) / zl, 2);
 
     int icurv = 0;
-    double a11 = 1 - cm;
-    double a22 = 1 - 2 * cm;
-    double a23 = sqrt(cm - cm * cm);
-    double a24 = 0;  //  TODO correct default?
+    float a11 = 1 - cm;
+    float a22 = 1 - 2 * cm;
+    float a23 = sqrt(cm - cm * cm);
+    float a24 = 0;  //  TODO correct default?
 
     if (a22 > 0) icurv = 1;
     if (a23 != 0) {

@@ -15,8 +15,8 @@ const int BTYPE_IMAGE_PLANE = 4;
 struct Behaviour {
     // the type of this behaviour, see the BTYPE constants.
     // the type describes how the m_params need to be interpreted.
-    double m_type;
-    double m_params[16];
+    float m_type;
+    float m_params[16];
 };
 
 ////////////////////
@@ -35,9 +35,9 @@ INLINE Behaviour serializeMirror() {
 ////////////////
 
 struct GratingBehaviour {
-    double m_vls[6];
-    double m_lineDensity;
-    double m_orderOfDiffraction;
+    float m_vls[6];
+    float m_lineDensity;
+    float m_orderOfDiffraction;
 };
 
 INLINE Behaviour serializeGrating(GratingBehaviour g) {
@@ -117,21 +117,21 @@ INLINE SlitBehaviour deserializeSlit(Behaviour b) {
 ////////////////
 
 struct RZPBehaviour {
-    double m_imageType;
-    double m_rzpType;
-    double m_derivationMethod;
-    double m_designWavelength;
-    double m_curvatureType;
-    double m_designOrderOfDiffraction;
-    double m_orderOfDiffraction;
-    double m_fresnelZOffset;
-    double m_designSagittalEntranceArmLength;
-    double m_designSagittalExitArmLength;
-    double m_designMeridionalEntranceArmLength;
-    double m_designMeridionalExitArmLength;
-    double m_designAlphaAngle;
-    double m_designBetaAngle;
-    double m_additionalOrder;
+    float m_imageType;
+    float m_rzpType;
+    float m_derivationMethod;
+    float m_designWavelength;
+    float m_curvatureType;
+    float m_designOrderOfDiffraction;
+    float m_orderOfDiffraction;
+    float m_fresnelZOffset;
+    float m_designSagittalEntranceArmLength;
+    float m_designSagittalExitArmLength;
+    float m_designMeridionalEntranceArmLength;
+    float m_designMeridionalExitArmLength;
+    float m_designAlphaAngle;
+    float m_designBetaAngle;
+    float m_additionalOrder;
 };
 
 INLINE Behaviour serializeRZP(RZPBehaviour r) {

@@ -32,7 +32,7 @@ bool param(const rapidxml::xml_node<>* node, const char* paramname, rapidxml::xm
     return false;
 }
 
-bool paramDouble(const rapidxml::xml_node<>* node, const char* paramname, double* out) {
+bool paramDouble(const rapidxml::xml_node<>* node, const char* paramname, float* out) {
     if (!node || !out) {
         return false;
     }
@@ -86,7 +86,7 @@ bool paramStr(const rapidxml::xml_node<>* node, const char* paramname, const cha
     return true;
 }
 
-bool paramDvec3(const rapidxml::xml_node<>* node, const char* paramname, glm::dvec3* out) {
+bool paramDvec3(const rapidxml::xml_node<>* node, const char* paramname, glm::vec3* out) {
     if (!node || !out) {
         return false;
     }
@@ -97,7 +97,7 @@ bool paramDvec3(const rapidxml::xml_node<>* node, const char* paramname, glm::dv
     }
 
     const char* names[3] = {"x", "y", "z"};
-    double* ptrs[3] = {&out->x, &out->y, &out->z};
+    float* ptrs[3] = {&out->x, &out->y, &out->z};
 
     for (rapidxml::xml_node<>* p = subnode->first_node(); p; p = p->next_sibling()) {
         for (uint32_t i = 0; i < 3; i++) {
@@ -138,15 +138,15 @@ bool paramMisalignment(const rapidxml::xml_node<>* node, Misalignment* out) {
         xml::paramDouble(node, "translationYerror", &out->m_translationYerror);
         xml::paramDouble(node, "translationZerror", &out->m_translationZerror);
 
-        double x_mrad = 0;
+        float x_mrad = 0;
         xml::paramDouble(node, "rotationXerror", &x_mrad);
         out->m_rotationXerror = Rad(x_mrad / 1000.0);  // convert mrad to rad.
 
-        double y_mrad = 0;
+        float y_mrad = 0;
         xml::paramDouble(node, "rotationYerror", &y_mrad);
         out->m_rotationYerror = Rad(y_mrad / 1000.0);
 
-        double z_mrad = 0;
+        float z_mrad = 0;
         xml::paramDouble(node, "rotationZerror", &z_mrad);
         out->m_rotationZerror = Rad(z_mrad / 1000.0);
     }
@@ -154,16 +154,16 @@ bool paramMisalignment(const rapidxml::xml_node<>* node, Misalignment* out) {
     return true;
 }
 
-bool paramPositionNoGroup(const rapidxml::xml_node<>* node, glm::dvec4* out) {
+bool paramPositionNoGroup(const rapidxml::xml_node<>* node, glm::vec4* out) {
     if (!node || !out) {
         return false;
     }
 
-    glm::dvec3 position3;
+    glm::vec3 position3;
     if (!xml::paramDvec3(node, "worldPosition", &position3)) {
         return false;
     }
-    *out = glm::dvec4(position3, 1);
+    *out = glm::vec4(position3, 1);
 
     return true;
 }
@@ -173,7 +173,7 @@ bool paramOrientationNoGroup(const rapidxml::xml_node<>* node, glm::dmat4x4* out
         return false;
     }
 
-    glm::dvec3 worldXdirection, worldYdirection, worldZdirection;
+    glm::vec3 worldXdirection, worldYdirection, worldZdirection;
     if (!xml::paramDvec3(node, "worldXdirection", &worldXdirection)) {
         return false;
     }
@@ -188,15 +188,15 @@ bool paramOrientationNoGroup(const rapidxml::xml_node<>* node, glm::dmat4x4* out
 
     // check if vectors are a basis (determinant =/= 0)
     glm::dmat3x3 worldDirections = {worldXdirection, worldYdirection, worldZdirection};
-    double determinant = glm::determinant(worldDirections);
+    float determinant = glm::determinant(worldDirections);
 
     if (determinant == 0) {
         RAYX_WARN << "Vectors are not a basis.";
     }
 
     // ((v1 x v2) dot v3) > 0 ==> right-handed (else left-handed)
-    glm::dvec3 crossProduct = glm::cross(worldXdirection, worldYdirection);
-    double dotProduct = glm::dot(crossProduct, worldZdirection);
+    glm::vec3 crossProduct = glm::cross(worldXdirection, worldYdirection);
+    float dotProduct = glm::dot(crossProduct, worldZdirection);
 
     if (dotProduct < 0) {
         RAYX_WARN << "Coordinate system is not right-handed.";
@@ -204,10 +204,10 @@ bool paramOrientationNoGroup(const rapidxml::xml_node<>* node, glm::dmat4x4* out
 
 #endif
 
-    (*out)[0] = glm::dvec4(worldXdirection, 0);
-    (*out)[1] = glm::dvec4(worldYdirection, 0);
-    (*out)[2] = glm::dvec4(worldZdirection, 0);
-    (*out)[3] = glm::dvec4(0, 0, 0, 1);
+    (*out)[0] = glm::vec4(worldXdirection, 0);
+    (*out)[1] = glm::vec4(worldYdirection, 0);
+    (*out)[2] = glm::vec4(worldZdirection, 0);
+    (*out)[3] = glm::vec4(0, 0, 0, 1);
 
     return true;
 }
@@ -240,7 +240,7 @@ bool paramSlopeError(const rapidxml::xml_node<>* node, SlopeError* out) {
     return true;
 }
 
-bool paramVls(const rapidxml::xml_node<>* node, std::array<double, 6>* out) {
+bool paramVls(const rapidxml::xml_node<>* node, std::array<float, 6>* out) {
     if (!node || !out) {
         return false;
     }
@@ -304,12 +304,12 @@ bool paramEnergyDistribution(const rapidxml::xml_node<>* node, const std::filesy
 
         return true;
     } else if (energyDistributionType == EnergyDistributionType::Values) {
-        double photonEnergy;
+        float photonEnergy;
         if (!xml::paramDouble(node, "photonEnergy", &photonEnergy)) {
             return false;
         }
 
-        double energySpread;
+        float energySpread;
         if (!xml::paramDouble(node, "energySpread", &energySpread)) {
             return false;
         }
@@ -351,7 +351,7 @@ bool paramSourcePulseType(const rapidxml::xml_node<>* node, SourcePulseType* out
     return false;
 }
 
-bool paramPositionAndOrientation(const rapidxml::xml_node<>* node, const std::vector<xml::Group>& group_context, glm::dvec4* out_pos,
+bool paramPositionAndOrientation(const rapidxml::xml_node<>* node, const std::vector<xml::Group>& group_context, glm::vec4* out_pos,
                                  glm::dmat4x4* out_ori) {
     Misalignment misalignment = {0, 0, 0, Rad(0), Rad(0), Rad(0)};
 
@@ -366,7 +366,7 @@ bool paramPositionAndOrientation(const rapidxml::xml_node<>* node, const std::ve
     // This was the old approach: We remove the misalignment from the position&orientation to obtain the non-misaligned position&orientation.
 
     // glm::dmat4x4 misOrientation = getRotationMatrix(-misalignment.m_rotationXerror.rad, misalignment.m_rotationYerror.rad,
-    // misalignment.m_rotationZerror.rad); glm::dvec4 offset = glm::dvec4(misalignment.m_translationXerror, misalignment.m_translationYerror,
+    // misalignment.m_rotationZerror.rad); glm::vec4 offset = glm::vec4(misalignment.m_translationXerror, misalignment.m_translationYerror,
     // misalignment.m_translationZerror, 1); *out_pos -= *out_ori * offset; *out_ori = *out_ori * glm::transpose(misOrientation); out_pos->w = 1;
 
     if (!group_context.empty()) {
@@ -425,8 +425,8 @@ Parser::Parser(rapidxml::xml_node<>* node, std::vector<xml::Group> group_context
 const char* Parser::name() const { return node->first_attribute("name")->value(); }
 
 // parsers for fundamental types
-double Parser::parseDouble(const char* paramname) const {
-    double d;
+float Parser::parseDouble(const char* paramname) const {
+    float d;
     if (!paramDouble(node, paramname, &d)) {
         RAYX_ERR << "parseDouble failed for \"" << paramname << "\"";
     }
@@ -449,8 +449,8 @@ const char* Parser::parseStr(const char* paramname) const {
     return s;
 }
 
-glm::dvec3 Parser::parseDvec3(const char* paramname) const {
-    glm::dvec3 v;
+glm::vec3 Parser::parseDvec3(const char* paramname) const {
+    glm::vec3 v;
     if (!paramDvec3(node, paramname, &v)) {
         RAYX_ERR << "parseDvec3 failed for \"" << paramname << "\"";
     }
@@ -474,8 +474,8 @@ SlopeError Parser::parseSlopeError() const {
     return x;
 }
 
-std::array<double, 6> Parser::parseVls() const {
-    std::array<double, 6> x{};
+std::array<float, 6> Parser::parseVls() const {
+    std::array<float, 6> x{};
     if (!paramVls(node, &x)) {
         RAYX_ERR << "parseVls failed";
     }
@@ -490,8 +490,8 @@ EnergyDistribution Parser::parseEnergyDistribution() const {
     return x;
 }
 
-glm::dvec4 Parser::parsePosition() const {
-    glm::dvec4 x;
+glm::vec4 Parser::parsePosition() const {
+    glm::vec4 x;
     glm::dmat4x4 y;
     if (!paramPositionAndOrientation(node, group_context, &x, &y)) {
         RAYX_ERR << "parsePosition failed";
@@ -500,7 +500,7 @@ glm::dvec4 Parser::parsePosition() const {
 }
 
 glm::dmat4x4 Parser::parseOrientation() const {
-    glm::dvec4 x;
+    glm::vec4 x;
     glm::dmat4x4 y;
     if (!paramPositionAndOrientation(node, group_context, &x, &y)) {
         RAYX_ERR << "parseOrientation failed";
@@ -577,24 +577,24 @@ SourcePulseType Parser::parseSourcePulseType() const {
     return spreadType;
 }
 
-double Parser::parseImageType() const {
+float Parser::parseImageType() const {
     int imageType_int;
 
     if (!xml::paramInt(node, "imageType", &imageType_int)) {
         RAYX_ERR << "Cannot determine image type!";
     }
 
-    return (double)imageType_int;
+    return (float)imageType_int;
 }
 
 Rad Parser::parseAzimuthalAngle() const {
-    double azimuthalAngle = 0;
+    float azimuthalAngle = 0;
     paramDouble(node, "azimuthalAngle", &azimuthalAngle);
     return Deg(azimuthalAngle).toRad();
 }
 
-double Parser::parseAdditionalOrder() const {
-    double additionalZeroOrder = 0;
+float Parser::parseAdditionalOrder() const {
+    float additionalZeroOrder = 0;
 
     // may be missing in some RML
     // files, that's fine though

@@ -155,8 +155,8 @@ extern void RAYX_API (*error_fn)();
  * */
 
 template <int N, int M>
-inline std::vector<double> formatAsVec(glm::mat<N, M, double> arg) {
-    std::vector<double> out(N * M);
+inline std::vector<float> formatAsVec(glm::mat<N, M, float> arg) {
+    std::vector<float> out(N * M);
     for (size_t i = 0; i < N * M; i++) {
         out[i] = arg[i / N][i % N];
     }
@@ -164,8 +164,8 @@ inline std::vector<double> formatAsVec(glm::mat<N, M, double> arg) {
 }
 
 template <int N>
-inline std::vector<double> formatAsVec(glm::vec<N, double> arg) {
-    std::vector<double> out(N);
+inline std::vector<float> formatAsVec(glm::vec<N, float> arg) {
+    std::vector<float> out(N);
     for (size_t i = 0; i < N; i++) {
         out[i] = arg[i];
     }
@@ -173,23 +173,23 @@ inline std::vector<double> formatAsVec(glm::vec<N, double> arg) {
 }
 
 template <size_t N>
-inline std::vector<double> formatAsVec(std::array<double, N> arg) {
-    std::vector<double> out(N);
+inline std::vector<float> formatAsVec(std::array<float, N> arg) {
+    std::vector<float> out(N);
     for (size_t i = 0; i < N; i++) {
         out[i] = arg[i];
     }
     return out;
 }
 
-inline std::vector<double> formatAsVec(double arg) { return {arg}; }
+inline std::vector<float> formatAsVec(float arg) { return {arg}; }
 
-inline std::vector<double> formatAsVec(Ray arg) {
+inline std::vector<float> formatAsVec(Ray arg) {
     return {arg.m_position.x,  arg.m_position.y,  arg.m_position.z, arg.m_eventType, arg.m_direction.x,
             arg.m_direction.y, arg.m_direction.z, arg.m_energy,     arg.m_stokes.x,  arg.m_stokes.y,
             arg.m_stokes.z,    arg.m_stokes.w,    arg.m_pathLength, arg.m_order,     arg.m_lastElement};
 }
 
-void dbg(const std::string& filename, int line, std::string name, std::vector<double> v);
+void dbg(const std::string& filename, int line, std::string name, std::vector<float> v);
 
 #define RAYX_DBG(C) RAYX::dbg(__FILE__, __LINE__, #C, RAYX::formatAsVec(C))
 

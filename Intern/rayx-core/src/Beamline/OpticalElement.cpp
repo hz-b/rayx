@@ -19,7 +19,7 @@ glm::dmat4x4 defaultOutMatrix(const DesignObject& dobj) { return calcTransformat
  * the surface with respect to the world coordinate system
  * @return the in or out matrix according to `calcInMatrix`
  */
-glm::dmat4 calcTransformationMatrices(glm::dvec4 position, glm::dmat4 orientation, bool calcInMatrix) {
+glm::mat4 calcTransformationMatrices(glm::vec4 position, glm::mat4 orientation, bool calcInMatrix) {
     glm::dmat4x4 rotation =
         glm::dmat4x4(orientation[0][0], orientation[0][1], orientation[0][2], 0.0, orientation[1][0], orientation[1][1], orientation[1][2], 0.0,
                      orientation[2][0], orientation[2][1], orientation[2][2], 0.0, 0.0, 0.0, 0.0, 1.0);  // o
@@ -38,7 +38,7 @@ glm::dmat4 calcTransformationMatrices(glm::dvec4 position, glm::dmat4 orientatio
     }
 }
 
-double defaultMaterial(const DesignObject& dobj) { return (double)static_cast<int>(dobj.parseMaterial()); }
+float defaultMaterial(const DesignObject& dobj) { return (float)static_cast<int>(dobj.parseMaterial()); }
 
 Surface makePlane() {
     return serializeQuadric({
@@ -56,7 +56,7 @@ Surface makePlane() {
     });
 }
 
-Surface makeSphere(double radius) {
+Surface makeSphere(float radius) {
     return serializeQuadric({
         .m_icurv = 1,
         .m_a11 = 1,

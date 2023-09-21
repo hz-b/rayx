@@ -55,7 +55,7 @@ void mouseButtonCallback(GLFWwindow* window, int button, int action, int mods) {
     if (button == GLFW_MOUSE_BUTTON_RIGHT) {
         if (action == GLFW_PRESS) {
             camController->startMouseLook();
-            double mouseX, mouseY;
+            float mouseX, mouseY;
             glfwGetCursorPos(window, &mouseX, &mouseY);
             camController->setLastMousePos(mouseX, mouseY);
         } else if (action == GLFW_RELEASE) {
@@ -64,7 +64,7 @@ void mouseButtonCallback(GLFWwindow* window, int button, int action, int mods) {
     }
 }
 
-void cursorPosCallback(GLFWwindow* window, double xpos, double ypos) {
+void cursorPosCallback(GLFWwindow* window, float xpos, float ypos) {
     ImGui_ImplGlfw_CursorPosCallback(window, xpos, ypos);
     if (ImGui::GetIO().WantCaptureKeyboard) return;
 

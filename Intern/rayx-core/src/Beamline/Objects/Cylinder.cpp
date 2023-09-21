@@ -17,7 +17,7 @@ Element makeCylinder(const DesignObject& dobj) {
     auto entranceArmLength = dobj.parseEntranceArmLength();
     auto exitArmLength = dobj.parseExitArmLength();
 
-    double a11 = 0, a33 = 0, a24 = 0;
+    float a11 = 0, a33 = 0, a24 = 0;
     if (cyl_direction == CylinderDirection::LongRadiusR) {  // X-DIR
         a11 = 0;
         a33 = 1;

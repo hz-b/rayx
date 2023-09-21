@@ -11,8 +11,8 @@ const int STYPE_TOROID = 1;
 const int STYPE_PLANE_XY = 2;  // an infinite X-Y plane.
 
 struct Surface {
-    double m_type;
-    double m_params[16];
+    float m_type;
+    float m_params[16];
 };
 
 ///////////////////
@@ -21,22 +21,22 @@ struct Surface {
 
 struct QuadricSurface {
     int m_icurv;
-    double m_a11;
-    double m_a12;
-    double m_a13;
-    double m_a14;
-    double m_a22;
-    double m_a23;
-    double m_a24;
-    double m_a33;
-    double m_a34;
-    double m_a44;
+    float m_a11;
+    float m_a12;
+    float m_a13;
+    float m_a14;
+    float m_a22;
+    float m_a23;
+    float m_a24;
+    float m_a33;
+    float m_a34;
+    float m_a44;
 };
 
 INLINE Surface serializeQuadric(QuadricSurface surface) {
     Surface ser;
     ser.m_type = STYPE_QUADRIC;
-    ser.m_params[0] = double(surface.m_icurv);
+    ser.m_params[0] = float(surface.m_icurv);
     ser.m_params[1] = surface.m_a11;
     ser.m_params[2] = surface.m_a12;
     ser.m_params[3] = surface.m_a13;
@@ -70,13 +70,13 @@ INLINE QuadricSurface deserializeQuadric(Surface ser) {
 // Toroid
 /////////////
 
-#define ToroidType double
+#define ToroidType float
 const ToroidType TOROID_TYPE_CONVEX = 0;
 const ToroidType TOROID_TYPE_CONCAVE = 1;
 
 struct ToroidSurface {
-    double m_longRadius;
-    double m_shortRadius;
+    float m_longRadius;
+    float m_shortRadius;
     ToroidType m_toroidType;
 };
 
@@ -113,7 +113,7 @@ INLINE Surface serializePlaneXY() {
 
 /// general functions.
 
-INLINE PlaneDir getPlaneDir(double surface_ty) {
+INLINE PlaneDir getPlaneDir(float surface_ty) {
     if (surface_ty == STYPE_PLANE_XY) {
         return PLANE_XY;
     }

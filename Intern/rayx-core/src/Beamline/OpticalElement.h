@@ -18,13 +18,13 @@ struct RAYX_API OpticalElement {
     std::string m_name;
 };
 
-RAYX_API glm::dmat4 calcTransformationMatrices(glm::dvec4 position, glm::dmat4 orientation, bool calcInMatrix = true);
-glm::dmat4 defaultInMatrix(const DesignObject& dobj);
-glm::dmat4 defaultOutMatrix(const DesignObject& dobj);
-double defaultMaterial(const DesignObject& dobj);
+RAYX_API glm::mat4 calcTransformationMatrices(glm::vec4 position, glm::mat4 orientation, bool calcInMatrix = true);
+glm::mat4 defaultInMatrix(const DesignObject& dobj);
+glm::mat4 defaultOutMatrix(const DesignObject& dobj);
+float defaultMaterial(const DesignObject& dobj);
 Element makeElement(const DesignObject& dobj, Behaviour behaviour, Surface surface, std::optional<Cutout> cutout = {});
 Surface makeToroid(const DesignObject& dobj);
-Surface makeSphere(double radius);
+Surface makeSphere(float radius);
 Surface makePlane();
 Behaviour makeGrating(const DesignObject& dobj);
 

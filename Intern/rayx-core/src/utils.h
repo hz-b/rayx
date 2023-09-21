@@ -9,44 +9,44 @@
 #include "Core.h"
 
 // useful functions
-double RAYX_API hvlam(double x);
+float RAYX_API hvlam(float x);
 
 struct Rad;
 
 // an angle in degrees.
 struct Deg {
     Deg() = default;
-    Deg(double d) : deg(d) {}
+    Deg(float d) : deg(d) {}
 
     Rad toRad() const;
 
-    double deg;
+    float deg;
 };
 
 // an angle in radians
 struct Rad {
     Rad() = default;
-    Rad(double r) : rad(r) {}
+    Rad(float r) : rad(r) {}
 
     Deg toDeg() const;
-    double sin() const;
-    double cos() const;
-    double tan() const;
+    float sin() const;
+    float cos() const;
+    float tan() const;
 
-    double rad;
+    float rad;
 };
 
-glm::dmat4x4 getRotationMatrix(double dpsi, double dphi, double dchi);
+glm::dmat4x4 getRotationMatrix(float dpsi, float dphi, float dchi);
 
-void printDVec4(glm::dvec4 vec);
-void RAYX_API printDMat4(glm::dmat4 matrix);
-void printDMatrix(std::array<double, 4 * 4> matrix);
+void printDVec4(glm::vec4 vec);
+void RAYX_API printDMat4(glm::mat4 matrix);
+void printDMatrix(std::array<float, 4 * 4> matrix);
 bool RAYX_API isIdentMatrix(glm::dmat4x4 matrix);
 
-std::array<double, 4 * 4> glmToArray16(glm::dmat4x4 m);
-glm::dmat4x4 RAYX_API arrayToGlm16(std::array<double, 4 * 4> m);
+std::array<float, 4 * 4> glmToArray16(glm::dmat4x4 m);
+glm::dmat4x4 RAYX_API arrayToGlm16(std::array<float, 4 * 4> m);
 
-std::array<double, 4> glmToArray4(glm::dvec4 v);
-glm::dvec4 RAYX_API arrayToGlm4(std::array<double, 4> v);
+std::array<float, 4> glmToArray4(glm::vec4 v);
+glm::vec4 RAYX_API arrayToGlm4(std::array<float, 4> v);
 
-std::vector<double>::iterator movingAppend(std::vector<double>&& srcVector, std::vector<double>& destVector);
+std::vector<float>::iterator movingAppend(std::vector<float>&& srcVector, std::vector<float>& destVector);

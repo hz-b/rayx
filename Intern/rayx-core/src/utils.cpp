@@ -12,7 +12,7 @@
  * @see taken from RAYLIB.FOR
  *
  */
-double hvlam(double x) {
+float hvlam(float x) {
     if (x == 0) {
         return 0.0;
     }
@@ -33,11 +33,11 @@ Rad Deg::toRad() const { return Rad(deg * PI / 180); }
  */
 Deg Rad::toDeg() const { return Deg(rad * 180 / PI); }
 
-double Rad::sin() const { return std::sin(rad); }
-double Rad::cos() const { return std::cos(rad); }
-double Rad::tan() const { return std::tan(rad); }
+float Rad::sin() const { return std::sin(rad); }
+float Rad::cos() const { return std::cos(rad); }
+float Rad::tan() const { return std::tan(rad); }
 
-glm::dmat4x4 getRotationMatrix(double dpsi, double dphi, double dchi) {
+glm::dmat4x4 getRotationMatrix(float dpsi, float dphi, float dchi) {
     RAYX_PROFILE_FUNCTION();
     glm::dmat4x4 misalignmentMatrix = glm::dmat4x4(
         cos(dphi) * cos(dchi), -cos(dpsi) * sin(dchi) - sin(dpsi) * sin(dphi) * cos(dchi), -sin(dpsi) * sin(dchi) + cos(dpsi) * sin(dphi) * cos(dchi),
@@ -46,7 +46,7 @@ glm::dmat4x4 getRotationMatrix(double dpsi, double dphi, double dchi) {
     return glm::transpose(misalignmentMatrix);
 }
 
-void printDMatrix(std::array<double, 4 * 4> matrix) {
+void printDMatrix(std::array<float, 4 * 4> matrix) {
     RAYX_PROFILE_FUNCTION();
     std::stringstream s;
     s << "\t";
@@ -61,7 +61,7 @@ void printDMatrix(std::array<double, 4 * 4> matrix) {
     RAYX_LOG << s.str();
 }
 
-void printDVec4(glm::dvec4 vec) {
+void printDVec4(glm::vec4 vec) {
     RAYX_PROFILE_FUNCTION();
     std::stringstream s;
     s.precision(17);
@@ -71,7 +71,7 @@ void printDVec4(glm::dvec4 vec) {
     RAYX_LOG << s.str();
 }
 
-void printDMat4(glm::dmat4 matrix) {
+void printDMat4(glm::mat4 matrix) {
     RAYX_PROFILE_FUNCTION();
     std::stringstream s;
     s.precision(17);
@@ -85,23 +85,23 @@ void printDMat4(glm::dmat4 matrix) {
     RAYX_D_LOG << s.str();
 }
 
-std::array<double, 4 * 4> glmToArray16(glm::dmat4x4 m) {
-    std::array<double, 4 * 4> matrix = {m[0][0], m[0][1], m[0][2], m[0][3], m[1][0], m[1][1], m[1][2], m[1][3],
+std::array<float, 4 * 4> glmToArray16(glm::dmat4x4 m) {
+    std::array<float, 4 * 4> matrix = {m[0][0], m[0][1], m[0][2], m[0][3], m[1][0], m[1][1], m[1][2], m[1][3],
                                         m[2][0], m[2][1], m[2][2], m[2][3], m[3][0], m[3][1], m[3][2], m[3][3]};
     return matrix;
 }
 
-glm::dmat4x4 arrayToGlm16(std::array<double, 4 * 4> m) {
+glm::dmat4x4 arrayToGlm16(std::array<float, 4 * 4> m) {
     glm::dmat4x4 matrix = glm::dmat4x4(m[0], m[1], m[2], m[3], m[4], m[5], m[6], m[7], m[8], m[9], m[10], m[11], m[12], m[13], m[14], m[15]);
     return matrix;
 }
 
-std::array<double, 4> glmToArray4(glm::dvec4 v) {
-    std::array<double, 4> a = {v[0], v[1], v[2], v[3]};
+std::array<float, 4> glmToArray4(glm::vec4 v) {
+    std::array<float, 4> a = {v[0], v[1], v[2], v[3]};
     return a;
 }
 
-glm::dvec4 arrayToGlm4(std::array<double, 4> v) { return {v[0], v[1], v[2], v[3]}; }
+glm::vec4 arrayToGlm4(std::array<float, 4> v) { return {v[0], v[1], v[2], v[3]}; }
 
 /**
  * @brief Moves Source Vector at the end of destination Vector.
@@ -113,8 +113,8 @@ glm::dvec4 arrayToGlm4(std::array<double, 4> v) { return {v[0], v[1], v[2], v[3]
  * @param destVector Destiation vector to move into.
  * @return vector<T>::iterator Iterator to the destination Vector
  */
-std::vector<double>::iterator movingAppend(std::vector<double>&& srcVector, std::vector<double>& destVector) {
-    typename std::vector<double>::iterator result;
+std::vector<float>::iterator movingAppend(std::vector<float>&& srcVector, std::vector<float>& destVector) {
+    typename std::vector<float>::iterator result;
 
     if (destVector.empty()) {
         destVector = std::move(srcVector);

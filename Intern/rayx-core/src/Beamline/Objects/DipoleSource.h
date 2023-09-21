@@ -7,8 +7,8 @@
 namespace RAYX {
 
 struct PsiAndStokes{
-    glm::dvec4 stokes;
-    double psi; 
+    glm::vec4 stokes;
+    float psi; 
 };
 
 
@@ -25,60 +25,60 @@ class RAYX_API DipoleSource : public LightSource {
     void calcHorDivDegSec();  // horizontal Divergence as degree and seconds
     void calcPhotonWavelength();
     void calcFluxOrg();
-    double schwinger(double) const;
+    float schwinger(float) const;
     void setMaxFlux();
     void setLogInterpolation();
-    double getInterpolation(double) const;
-    double getEnergy() const;
-    PsiAndStokes getPsiandStokes(double) const;
+    float getInterpolation(float) const;
+    float getEnergy() const;
+    PsiAndStokes getPsiandStokes(float) const;
     void setMaxIntensity();
-    glm::dvec3 getXYZPosition(double)const;
-    double vDivergence(double hv, double sigv) const;
-    double getNormalFromRange(double range) const;
+    glm::vec3 getXYZPosition(float)const;
+    float vDivergence(float hv, float sigv) const;
+    float getNormalFromRange(float range) const;
 
   private:
     // Geometric Params
-    double m_bendingRadius;
+    float m_bendingRadius;
     ElectronEnergyOrientation m_electronEnergyOrientation;
     SourcePulseType m_sourcePulseType;
-    double m_photonFlux;
+    float m_photonFlux;
     EnergyDistribution m_energySpreadType;
 
-    double m_sigpsi;
-    glm::dvec4 m_stokes;
-    double m_electronEnergy;
-    double m_criticalEnergy;
-    double m_photonEnergy;
-    double m_verEbeamDivergence;
-    double m_flux;
-    double m_totalPower;
-    double m_bandwidth;  // default bandwidth
-    double m_magneticFieldStrength;
-    double m_gamma;
-    double m_beta;
-    double m_photonWaveLength;
-    double m_sourcePulseLength;
-    double m_sourcePathLength;
-    double m_phaseJitter;
-    double m_horDivDegrees;
-    double m_horDivSeconds;
-    double m_energySpread;
+    float m_sigpsi;
+    glm::vec4 m_stokes;
+    float m_electronEnergy;
+    float m_criticalEnergy;
+    float m_photonEnergy;
+    float m_verEbeamDivergence;
+    float m_flux;
+    float m_totalPower;
+    float m_bandwidth;  // default bandwidth
+    float m_magneticFieldStrength;
+    float m_gamma;
+    float m_beta;
+    float m_photonWaveLength;
+    float m_sourcePulseLength;
+    float m_sourcePathLength;
+    float m_phaseJitter;
+    float m_horDivDegrees;
+    float m_horDivSeconds;
+    float m_energySpread;
     EnergySpreadUnit m_energySpreadUnit;
-    double m_photonFluxOrg;
-    double m_maxFlux;
-    double m_maxIntensity;
+    float m_photonFluxOrg;
+    float m_maxFlux;
+    float m_maxIntensity;
 
     
-    glm::dvec4 getStokesSyn(double hv, double psi1, double psi2) const;
-    double bessel(double hnue, double zeta) const;
-    glm::dvec4 dipoleFold(double psi, double hv, double sigpsi) const;
+    glm::vec4 getStokesSyn(float hv, float psi1, float psi2) const;
+    float bessel(float hnue, float zeta) const;
+    glm::vec4 dipoleFold(float psi, float hv, float sigpsi) const;
 
-    std::array<double, 59> m_schwingerX = {1.e-4, 1.e-3, 2.e-3, 4.e-3, 6.e-3, 8.e-3, 1.e-2, 2.e-2, 3.e-2, 4.e-2, 5.e-2, 6.e-2, 7.e-2, 8.e-2, 9.e-2,
+    std::array<float, 59> m_schwingerX = {1.e-4, 1.e-3, 2.e-3, 4.e-3, 6.e-3, 8.e-3, 1.e-2, 2.e-2, 3.e-2, 4.e-2, 5.e-2, 6.e-2, 7.e-2, 8.e-2, 9.e-2,
                                            1.e-1, 0.15,  0.2,   0.25,  0.3,   0.35,  0.4,   0.45,  0.5,   0.55,  0.6,   0.65,  0.7,   0.75,  0.8,
                                            0.85,  0.9,   1.0,   1.25,  1.5,   1.75,  2.0,   2.25,  2.5,   2.75,  3.0,   3.25,  3.5,   3.75,  4.0,
                                            4.25,  4.5,   4.75,  5.0,   5.5,   6.0,   6.5,   7.0,   7.5,   8.0,   8.5,   9.0,   9.5,   10.0};
 
-    std::array<double, 59> m_schwingerY = {973.0,    213.6,    133.6,    83.49,    63.29,    51.92,    44.5,     27.36,    20.45,    16.57,
+    std::array<float, 59> m_schwingerY = {973.0,    213.6,    133.6,    83.49,    63.29,    51.92,    44.5,     27.36,    20.45,    16.57,
                                            14.03,    12.22,    10.85,    9.777,    8.905,    8.182,    5.832,    4.517,    3.663,    3.059,
                                            2.607,    2.255,    1.973,    1.742,    1.549,    1.386,    1.246,    1.126,    1.02,     9.28e-1,
                                            8.465e-1, 7.74e-1,  6.514e-1, 4.359e-1, 3.004e-1, 2.113e-1, 1.508e-1, 1.089e-1, 7.926e-2, 5.811e-2,

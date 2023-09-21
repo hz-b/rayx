@@ -27,17 +27,17 @@ uint64_t RAYX_API squares64(RAYX_INOUT(uint64_t) ctr) {
 
 // generates uniformly distributed doubles between 0 and 1 from one 64-Bit
 // random integer
-double RAYX_API squaresDoubleRNG(RAYX_INOUT(uint64_t) ctr) {
-    double a = double(squares64(ctr));
-    double div = double(uint64_t(0) - 1);
+float RAYX_API squaresDoubleRNG(RAYX_INOUT(uint64_t) ctr) {
+    float a = float(squares64(ctr));
+    float div = float(uint64_t(0) - 1);
     return a / div;
 }
 
-// creates (via the Box-Muller transform) a normal distributed double with mean
+// creates (via the Box-Muller transform) a normal distributed float with mean
 // mu and standard deviation sigma
-double RAYX_API squaresNormalRNG(RAYX_INOUT(uint64_t) ctr, double mu, double sigma) {
-    double U, V, R, Z;
-    double two_pi = 2.0 * PI;
+float RAYX_API squaresNormalRNG(RAYX_INOUT(uint64_t) ctr, float mu, float sigma) {
+    float U, V, R, Z;
+    float two_pi = 2.0 * PI;
 
     U = squaresDoubleRNG(ctr);
     V = squaresDoubleRNG(ctr);
