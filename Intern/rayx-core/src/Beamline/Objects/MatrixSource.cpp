@@ -22,10 +22,9 @@ MatrixSource::MatrixSource(const DesignObject& dobj) : LightSource(dobj) {
  * direction as first 4) distributed evenly across width & height of source
  * returns vector of rays
  */
-std::vector<Ray> MatrixSource::getRays(int thread_count) const {
+std::vector<Ray> MatrixSource::getRays(int thread_count __attribute__((unused))) const {
     RAYX_PROFILE_FUNCTION();
     
-    int dummy = thread_count; //dummy to remove "unused variable" error
     double x, y, z, psi, phi,
         en;  // x,y,z pos, psi,phi direction cosines, en=energy
     int rmat = int(sqrt(m_numberOfRays));
