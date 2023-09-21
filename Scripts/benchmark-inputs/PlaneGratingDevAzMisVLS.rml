@@ -4,7 +4,7 @@
 <beamline>
 
   <object name="Matrix Source" type="Matrix Source">
-    <param id="numberRays" enabled="T">200000</param>
+    <param id="numberRays" enabled="T">1000000</param>
     <param id="sourceWidth" enabled="T">0.065</param>
     <param id="sourceHeight" enabled="T">0.04</param>
     <param id="sourceDepth" enabled="T">0</param>
