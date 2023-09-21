@@ -24,7 +24,7 @@ MatrixSource::MatrixSource(const DesignObject& dobj) : LightSource(dobj) {
  */
 std::vector<Ray> MatrixSource::getRays(int thread_count) const {
     RAYX_PROFILE_FUNCTION();
-       
+    
     
     double x, y, z, psi, phi,
         en;  // x,y,z pos, psi,phi direction cosines, en=energy
@@ -87,7 +87,7 @@ std::vector<Ray> MatrixSource::getRays(int thread_count) const {
         r_copy.m_energy = en = selectEnergy();
         returnList.push_back(r_copy);
     }
-
+    thread_count = 0; //dummy to remove "unused variable" error
     return returnList;
 }
 
