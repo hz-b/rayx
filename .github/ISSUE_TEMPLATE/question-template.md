@@ -3,7 +3,7 @@ name: Question Template
 about: Template to ask questions concerning rayx.
 title: ''
 labels: question
-assignees: ''
+assignees: Atraxus
 
 ---
 
