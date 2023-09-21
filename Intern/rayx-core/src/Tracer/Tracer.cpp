@@ -12,11 +12,11 @@ using uint = unsigned int;
 
 namespace RAYX {
 
-BundleHistory Tracer::trace(const Beamline& b, uint64_t max_batch_size, int THREAD_COUNT) {
+BundleHistory Tracer::trace(const Beamline& b, uint64_t max_batch_size, int thread_count) {
     RAYX_PROFILE_FUNCTION_STDOUT();
 
     std::vector<Ray> rays;
-    rays = b.getInputRays(THREAD_COUNT);
+    rays = b.getInputRays(thread_count);
 
     auto randomSeed = randomDouble();
     auto maxEvents = b.m_OpticalElements.size() + 2;

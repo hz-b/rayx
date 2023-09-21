@@ -24,12 +24,7 @@ class RAYX_API LightSource {
 
     // Getter
     Misalignment getMisalignmentParams() const;
-    // double getLinear0() const;
-    // double getLinear45() const;
-    // double getCircular() const;
-    // double getVerDivergence() const { return m_verDivergence; }
     double getHorDivergence() const { return m_horDivergence; }
-    // double getSourceDepth() const { return m_sourceDepth; }
     double getSourceHeight() const { return m_sourceHeight; }
     double getSourceWidth() const { return m_sourceWidth; }
 
@@ -41,7 +36,7 @@ class RAYX_API LightSource {
     glm::dvec3 getDirectionFromAngles(double phi, double psi) const;
     // get the rays according to specific light source, has to be implemented in
     // each class that inherits from LightSource
-    virtual std::vector<Ray> getRays(int THREAD_COUNT = 0) const = 0;
+    virtual std::vector<Ray> getRays(int thread_count = 0) const = 0;
 
     std::string m_name;
 
@@ -54,6 +49,7 @@ class RAYX_API LightSource {
     // double m_sourceDepth;
     double m_sourceHeight;
     double m_sourceWidth;
+
     // in rad:
     double m_horDivergence;
     double m_verDivergence;
@@ -65,14 +61,6 @@ class RAYX_API LightSource {
     // User/Design Parameter
     Misalignment m_misalignmentParams;  // x, y, psi, phi
 
-    // Physics Params
-    // point source & matrix source
-    // double m_linearPol_0;
-    // double m_linearPol_45;
-    // double m_circularPol;
-
-    // TODO(Jannis): move to children
-    // SourceDistType m_sourceDistributionType;
 };
 
 }  // namespace RAYX
