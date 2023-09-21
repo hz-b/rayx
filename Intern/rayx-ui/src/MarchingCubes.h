@@ -8,17 +8,24 @@
 
 #define GRIDSIZE 10
 
+namespace RAYX {
+namespace CPU_Tracer {
+#include "Shared/Cutout.h"
+bool inCutout(Cutout cutout, double x1, double x2);
+}  // namespace CPU_Tracer
+}  // namespace RAYX
+
 // Marching Cubes
 std::vector<RenderObject> marchingCubeTriangulation(const std::vector<RAYX::OpticalElement>& elements);
-std::vector<Triangle> trianglesFromQuadric(const double* quadric);  // TODO: make nicer
+std::vector<Triangle> trianglesFromQuadric(const double* quadric, Cutout cutout);  // TODO: make nicer
 
 glm::vec3 getPositionAtCorner(int cornerIndex);
-Vertex interpolateVertex(int edgeIndex, const double scalarGrid[GRIDSIZE][GRIDSIZE][GRIDSIZE], int offsetX, int offsetY, int offsetZ, double move,
-                         double scale);
+Vertex interpolateVertex(int edgeIndex, const double scalarGrid[GRIDSIZE][GRIDSIZE][GRIDSIZE], int offsetX, int offsetY, int offsetZ,
+                         glm::vec3 scale);
 double evaluateQuadricAtPosition(const double surface[16], const glm::vec4& pos);
 int determineMarchingCubesCase(const double scalarGrid[GRIDSIZE][GRIDSIZE][GRIDSIZE], int x, int y, int z);
 std::vector<Triangle> lookupTrianglesForCase(int caseIndex, const double scalarGrid[GRIDSIZE][GRIDSIZE][GRIDSIZE], int offsetX, int offsetY,
-                                             int offsetZ, double move, double scale);
+                                             int offsetZ, glm::vec3 scale);
 Vertex getVertexFromEdge(int edgeIndex);
 double getScalarValueAtCorner(int x, int y, int z, const double scalarGrid[GRIDSIZE][GRIDSIZE][GRIDSIZE]);
 

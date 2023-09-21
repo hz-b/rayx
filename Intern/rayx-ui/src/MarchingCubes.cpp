@@ -8,7 +8,7 @@ std::vector<RenderObject> marchingCubeTriangulation(const std::vector<RAYX::Opti
 
     for (RAYX::OpticalElement element : elements) {
         auto quadric = element.m_element.m_surface.m_params;
-        std::vector<Triangle> triangles = trianglesFromQuadric(quadric);
+        std::vector<Triangle> triangles = trianglesFromQuadric(quadric, element.m_element.m_cutout);
         RenderObject object(glm::mat4(element.m_element.m_outTrans));
         for (Triangle triangle : triangles) {
             object.addTriangle(triangle);
@@ -19,12 +19,18 @@ std::vector<RenderObject> marchingCubeTriangulation(const std::vector<RAYX::Opti
     return objects;
 }
 
-std::vector<Triangle> trianglesFromQuadric(const double* quadric) {
+std::vector<Triangle> trianglesFromQuadric(const double* quadric, Cutout cutout) {
     // Define the size and resolution of the grid
     double scalarGrid[GRIDSIZE][GRIDSIZE][GRIDSIZE];
+    if (cutout.m_type == CTYPE_UNLIMITED) {
+        RAYX_ERR << "Unlimited cutout not supported by marching cubes";
+    }
+    RAYX_LOG << "cutout: " << cutout.m_params[0] << ", " << cutout.m_params[1];
 
-    const double SCALE = 5.0 * 10.0 / GRIDSIZE;  // Define your desired scaling factor here
-    double move = (GRIDSIZE / 2.0);
+    const double SCALE = 1;  // Define your desired scaling factor here
+
+    const glm::vec3 bounding_box = glm::vec3(cutout.m_params[0], cutout.m_params[1], 1.0f);
+    const glm::vec3 scale = glm::vec3(cutout.m_params[0] * SCALE / GRIDSIZE, SCALE * 1.0f, cutout.m_params[1] * SCALE / GRIDSIZE);
 
     // 1. Sample the 3D space
     for (int x = 0; x < GRIDSIZE; x++) {
@@ -32,9 +38,9 @@ std::vector<Triangle> trianglesFromQuadric(const double* quadric) {
             for (int z = 0; z < GRIDSIZE; z++) {
                 // Convert grid coordinate to centered & scaled space coordinate
 
-                double realX = (x - (GRIDSIZE / 2.0)) * SCALE;
-                double realY = (y - (GRIDSIZE / 2.0)) * SCALE;
-                double realZ = (z - (GRIDSIZE / 2.0)) * SCALE;
+                double realX = ((double(x) / GRIDSIZE) - 0.5) * bounding_box.x;
+                double realY = ((double(y) / GRIDSIZE) - 0.5) * bounding_box.y;
+                double realZ = ((double(z) / GRIDSIZE) - 0.5) * bounding_box.z;
 
                 glm::vec4 pos(realX, realY, realZ, 1);
                 double value = evaluateQuadricAtPosition(quadric, pos);
@@ -49,7 +55,7 @@ std::vector<Triangle> trianglesFromQuadric(const double* quadric) {
         for (int y = 0; y < GRIDSIZE - 1; y++) {
             for (int z = 0; z < GRIDSIZE - 1; z++) {
                 int caseIndex = determineMarchingCubesCase(scalarGrid, x, y, z);
-                std::vector<Triangle> voxelTriangles = lookupTrianglesForCase(caseIndex, scalarGrid, x, y, z, move, SCALE);
+                std::vector<Triangle> voxelTriangles = lookupTrianglesForCase(caseIndex, scalarGrid, x, y, z, scale);
                 triangles.insert(triangles.end(), voxelTriangles.begin(), voxelTriangles.end());
             }
         }
@@ -95,7 +101,7 @@ int determineMarchingCubesCase(const double scalarGrid[GRIDSIZE][GRIDSIZE][GRIDS
 }
 
 std::vector<Triangle> lookupTrianglesForCase(int caseIndex, const double scalarGrid[GRIDSIZE][GRIDSIZE][GRIDSIZE], int offsetX, int offsetY,
-                                             int offsetZ, double move, double scale) {
+                                             int offsetZ, glm::vec3 scale) {
     // Using the triTable to generate the triangles for the voxel.
 
     std::vector<Triangle> triangles;
@@ -106,9 +112,9 @@ std::vector<Triangle> lookupTrianglesForCase(int caseIndex, const double scalarG
         Triangle triangle;
 
         // Convert edge indices to vertices
-        triangle.v1 = interpolateVertex(triTable[caseIndex][i], scalarGrid, offsetX, offsetY, offsetZ, move, scale);
-        triangle.v2 = interpolateVertex(triTable[caseIndex][i + 1], scalarGrid, offsetX, offsetY, offsetZ, move, scale);
-        triangle.v3 = interpolateVertex(triTable[caseIndex][i + 2], scalarGrid, offsetX, offsetY, offsetZ, move, scale);
+        triangle.v1 = interpolateVertex(triTable[caseIndex][i], scalarGrid, offsetX, offsetY, offsetZ, scale);
+        triangle.v2 = interpolateVertex(triTable[caseIndex][i + 1], scalarGrid, offsetX, offsetY, offsetZ, scale);
+        triangle.v3 = interpolateVertex(triTable[caseIndex][i + 2], scalarGrid, offsetX, offsetY, offsetZ, scale);
         triangle.v1.color = DARKER_BLUE;
         triangle.v2.color = BLUE;
         triangle.v3.color = LIGHTER_BLUE;
@@ -136,8 +142,8 @@ glm::vec3 getPositionAtCorner(int cornerIndex) {
     }
     return cornerPositions[cornerIndex];
 }
-Vertex interpolateVertex(int edgeIndex, const double scalarGrid[GRIDSIZE][GRIDSIZE][GRIDSIZE], int offsetX, int offsetY, int offsetZ, double move,
-                         double scale) {
+Vertex interpolateVertex(int edgeIndex, const double scalarGrid[GRIDSIZE][GRIDSIZE][GRIDSIZE], int offsetX, int offsetY, int offsetZ,
+                         glm::vec3 scale) {
     int edgeToVertex[12][2] = {{0, 1}, {1, 2}, {2, 3}, {3, 0}, {4, 5}, {5, 6}, {6, 7}, {7, 4}, {0, 4}, {1, 5}, {2, 6}, {3, 7}};
 
     // Define the corner-to-voxel mapping
@@ -159,11 +165,11 @@ Vertex interpolateVertex(int edgeIndex, const double scalarGrid[GRIDSIZE][GRIDSI
     } else {
         t = (0 - value0) / (value1 - value0);
     }
-
+    double move = (GRIDSIZE / 2.0);
     Vertex v;
     v.pos = glm::vec4((glm::mix(getPositionAtCorner(v0Index), getPositionAtCorner(v1Index), t) + glm::vec3(offsetX, offsetY, offsetZ) -
                        glm::vec3(move, move, move)) *
-                          glm::vec3(scale, scale, scale),
+                          scale,
                       1.0f);
 
     return v;
