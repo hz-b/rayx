@@ -23,7 +23,7 @@ class RAYX_API Beamline {
     Beamline();
     ~Beamline();
 
-    std::vector<Ray> getInputRays(int THREAD_COUNT = 1) const;
+    std::vector<Ray> getInputRays(int thread_count = 1) const;
 
     /**
      * @brief Quality-of-life function to calculate the smallest possible

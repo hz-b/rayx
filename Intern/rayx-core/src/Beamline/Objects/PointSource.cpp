@@ -44,13 +44,18 @@ double getCoord(const SourceDist l, const double extent) {
  *
  * @returns list of rays
  */
-std::vector<Ray> PointSource::getRays(int THREAD_COUNT) const {
+std::vector<Ray> PointSource::getRays(int thread_count) const {
     RAYX_PROFILE_FUNCTION();
     
-    if (THREAD_COUNT == 0){
-        THREAD_COUNT = 1;
+
+    /**
+     * initialize parallelization when counter is positive
+     * with special OMP use case for num_threads(1)
+     * */
+    if (thread_count == 0){
+        thread_count = 1;
         #define DIPOLE_OMP
-    }else if(THREAD_COUNT > 1){
+    }else if(thread_count > 1){
         #define DIPOLE_OMP
     }
     
@@ -64,7 +69,7 @@ std::vector<Ray> PointSource::getRays(int THREAD_COUNT) const {
     // create n rays with random position and divergence within the given span
     // for width, height, depth, horizontal and vertical divergence
     #if defined(DIPOLE_OMP)
-    #pragma omp parallel for num_threads(THREAD_COUNT)
+    #pragma omp parallel for num_threads(thread_count)
     #endif
     for (int i = 0; i < n; i++) {
         x = getCoord(m_widthDist, m_sourceWidth) + getMisalignmentParams().m_translationXerror;

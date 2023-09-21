@@ -19,22 +19,25 @@ add_subdirectory(tests)
 
 #-----OpenMP--------
 
-if(NOT TARGET OpenMP::OpenMP_CXX)
-    find_package(Threads REQUIRED)
+if(OpenMp STREQUAL "NO")
+    target_compile_definitions(${PROJECT_NAME} PUBLIC NO_OMP) 
+else()
+    if(NOT TARGET OpenMP::OpenMP_CXX)
+        find_package(Threads REQUIRED)
 
-    # Füge die OpenMP-Bibliothek hinzu
-    add_library(OpenMP::OpenMP_CXX IMPORTED INTERFACE)
-    set_property(TARGET OpenMP::OpenMP_CXX
+        # Füge die OpenMP-Bibliothek hinzu
+        add_library(OpenMP::OpenMP_CXX IMPORTED INTERFACE)
+        set_property(TARGET OpenMP::OpenMP_CXX
                  PROPERTY INTERFACE_COMPILE_OPTIONS ${OpenMP_CXX_FLAGS})
-    # Only works if the same flag is passed to the linker; use CMake 3.9+ otherwise (Intel, AppleClang)
-    set_property(TARGET OpenMP::OpenMP_CXX
+        # Only works if the same flag is passed to the linker; use CMake 3.9+ otherwise (Intel, AppleClang)
+        set_property(TARGET OpenMP::OpenMP_CXX
                  PROPERTY INTERFACE_LINK_LIBRARIES ${OpenMP_CXX_FLAGS} Threads::Threads)
-
+    
+    endif()
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${OpenMP_CXX_FLAGS} -fopenmp")
+#set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS}")
+#set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS}")
 endif()
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${OpenMP_CXX_FLAGS} -fopenmp")
-#set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS}")
-#set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS}")
-
 #-------------------
 
 
