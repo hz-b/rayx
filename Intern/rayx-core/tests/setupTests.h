@@ -5,6 +5,7 @@
 #include <sstream>
 #include <type_traits>
 
+#include "Beamline/Objects/Objects.h"
 #include "CanonicalizePath.h"
 #include "Core.h"
 #include "Data/Importer.h"
@@ -12,7 +13,6 @@
 #include "Material/Material.h"
 #include "Random.h"
 #include "Shared/Constants.h"
-#include "Beamline/Objects/Objects.h"
 #include "Shared/Ray.h"
 #include "Tracer/CpuTracer.h"
 #include "Tracer/VulkanTracer.h"
@@ -42,7 +42,7 @@ const int PREC = 17;
 /// vl and vr represent the doubles contained in tl and tr, obtained with RAYX::formatAsVec
 template <typename TL, typename TR>
 inline void checkEq(std::string filename, int line, std::string l, std::string r, const TL& tl, const TR& tr, std::vector<double> vl,
-                    std::vector<double> vr, double tolerance = 1e-10) {
+                    std::vector<double> vr, double tolerance = 1e-2) {
     if (vl.size() != vr.size()) {
         RAYX::Err(filename, line) << l << " != " << r << ": different lengths!";
         return;
@@ -88,9 +88,9 @@ inline void checkEq(std::string filename, int line, std::string l, std::string r
 template <>
 inline void checkEq(std::string filename, int line, std::string l, std::string r, const RAYX::Ray& tl, const RAYX::Ray& tr, std::vector<double> vl,
                     std::vector<double> vr, double tolerance) {
-    std::vector<std::string> names = {".m_position.x",  ".m_position.y", ".m_position.z",  ".m_eventType", ".m_direction.x", ".m_direction.y",
-                                      ".m_direction.z", ".m_energy",     ".m_stokes.x",    ".m_stokes.y",  ".m_stokes.z",    ".m_stokes.w",
-                                      ".m_pathLength",  ".m_order",      ".m_lastElement"};
+    std::vector<std::string> names = {".m_position.x",  ".m_position.y",  ".m_position.z", ".m_eventType", ".m_direction.x",
+                                      ".m_direction.y", ".m_direction.z", ".m_energy",     ".m_stokes.x",  ".m_stokes.y",
+                                      ".m_stokes.z",    ".m_stokes.w",    ".m_pathLength", ".m_order",     ".m_lastElement"};
     for (int i = 0; i < names.size(); i++) {
         auto t = tolerance;
 

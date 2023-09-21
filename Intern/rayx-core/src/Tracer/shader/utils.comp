@@ -9,9 +9,7 @@ double RAYX_API hvlam(double x) {
 // originally we calculcated 1/0, which might be UB (https://stackoverflow.com/questions/5802351/what-happens-when-you-divide-by-0-in-a-shader).
 // `return 1e+308 * 2.0;` correctly returns positive infinity on my machine (Rudi), but we have no guarantee that it always does.
 // So instead we return a sufficiently large number to be used like positive infinity.
-double infinity() {
-    return 1e+308;
-}
+double infinity() { return 1e+308; }
 
 // multiplies position and direction of ray r with transformation matrix m
 // r = dot(m, r)
@@ -22,8 +20,7 @@ Ray RAYX_API rayMatrixMult(Ray r, const dmat4 m) {
 }
 
 Ray rotationAroundX(Ray r, double sin_psi, double cos_psi) {
-    dmat4 rotation_matrix = dmat4(1, 0, 0, 0, 0, cos_psi, -sin_psi, 0, 0,
-                                  sin_psi, cos_psi, 0, 0, 0, 0, 1);
+    dmat4 rotation_matrix = dmat4(1, 0, 0, 0, 0, cos_psi, -sin_psi, 0, 0, sin_psi, cos_psi, 0, 0, 0, 0, 1);
     return rayMatrixMult(r, rotation_matrix);
 }
 
@@ -39,8 +36,7 @@ Ray rotationAroundX(Ray r, double sin_psi, double cos_psi) {
  *
  * output: nothing. changes r in place
  */
-void inTransformation(RAYX_INOUT(Ray) r, const dmat4 misalignment,
-                      const dmat4 inTrans) {
+void inTransformation(RAYX_INOUT(Ray) r, const dmat4 misalignment, const dmat4 inTrans) {
     r.m_position = dvec3(misalignment * (inTrans * dvec4(r.m_position, 1)));
     r.m_direction = dvec3(misalignment * (inTrans * dvec4(r.m_direction, 0)));
 }
@@ -59,11 +55,9 @@ void inTransformation(RAYX_INOUT(Ray) r, const dmat4 misalignment,
  *
  * output: nothing. changes r in place
  */
-void outTransformation(RAYX_INOUT(Ray) r, const dmat4 invMisalignment,
-                       const dmat4 outTrans) {
+void outTransformation(RAYX_INOUT(Ray) r, const dmat4 invMisalignment, const dmat4 outTrans) {
     r.m_position = dvec3(outTrans * (invMisalignment * dvec4(r.m_position, 1)));
-    r.m_direction =
-        dvec3(outTrans * (invMisalignment * dvec4(r.m_direction, 0)));
+    r.m_direction = dvec3(outTrans * (invMisalignment * dvec4(r.m_direction, 0)));
 }
 
 // only for testing purposes. generally, each angle in the shader is in rad!!
@@ -92,10 +86,10 @@ calculates direction cosini from angles phi,psi given in rad
         phi		vertical angle in y-z-plane (pos.rotation, counterclockwise)
 */
 void RAYX_API cosini(RAYX_INOUT(Ray) r, double phi, double psi) {
-    double cos_psi = r8_cos(psi);
-    double cos_phi = r8_cos(phi);
-    double sin_psi = r8_sin(psi);
-    double sin_phi = r8_sin(phi);
+    double cos_psi = cos(float(psi));
+    double cos_phi = cos(float(phi));
+    double sin_psi = sin(float(psi));
+    double sin_phi = sin(float(phi));
 
     r.m_direction.x = cos_psi * sin_phi;
     r.m_direction.y = -sin_psi;
@@ -150,7 +144,7 @@ bool inCutout(Cutout cutout, double x1, double x2) {
         double val1 = x1 / radius_x1;
         double val2 = x2 / radius_x2;
 
-        double rd2 = val1*val1 + val2*val2;
+        double rd2 = val1 * val1 + val2 * val2;
         return rd2 <= 1.0;
     } else {
         throw("invalid cutout type in inCutout!");
@@ -229,18 +223,14 @@ dvec2 RAYX_API getRefractiveIndex(double energy, int material) {
     }
 
     // try to get refractive index using Palik table
-    if (getPalikEntryCount(material) >
-        0) {          // don't try binary search if there are 0 entries!
-        int low = 0;  // <= energy
+    if (getPalikEntryCount(material) > 0) {           // don't try binary search if there are 0 entries!
+        int low = 0;                                  // <= energy
         int high = getPalikEntryCount(material) - 1;  // >= energy
 
         PalikEntry low_entry = getPalikEntry(low, material);
         PalikEntry high_entry = getPalikEntry(high, material);
 
-        if (low_entry.m_energy <= energy &&
-            energy <=
-                high_entry
-                    .m_energy) {  // if 'energy' is in range of tha PalikTable
+        if (low_entry.m_energy <= energy && energy <= high_entry.m_energy) {  // if 'energy' is in range of tha PalikTable
             // binary search
             while (high - low > 1) {
                 int center = (low + high) / 2;
@@ -258,9 +248,8 @@ dvec2 RAYX_API getRefractiveIndex(double energy, int material) {
     }
 
     // get refractive index with Nff table
-    if (getNffEntryCount(material) >
-        0) {          // don't try binary search if there are 0 entries!
-        int low = 0;  // <= energy
+    if (getNffEntryCount(material) > 0) {           // don't try binary search if there are 0 entries!
+        int low = 0;                                // <= energy
         int high = getNffEntryCount(material) - 1;  // >= energy
 
         // binary search
@@ -300,7 +289,7 @@ double RAYX_API getIncidenceAngle(Ray r, dvec4 normal) {
     else if (ar > 1.0)
         ar = 1.0;
 
-    double theta = PI - r8_acos(ar);
+    double theta = PI - acos(float(ar));
     int gt = int(theta > PI / 2);
     // theta in [0, pi]
     theta = gt * (PI - theta) + (1 - gt) * theta;
@@ -327,17 +316,13 @@ dvec2 RAYX_API snell(dvec2 cos_incidence, dvec2 cn1, dvec2 cn2) {
     cx_div(cn1, cn2); dvec2 sin_transmittance = cx_mul(sin_incidence,
     refractive_ratio); dvec2 cos_transmittance = cx_sqrt( cx_sub(dvec2(1.0,0.0),
     cx_mul(sin_transmittance, sin_transmittance))); return cos_transmittance;*/
-    dvec2 sin_incidence_square =
-        cx_sub(dvec2(1.0, 0.0),
-               cx_mul(cos_incidence, cos_incidence));  // 1 - cos(inc)**2
-    dvec2 refractive_ratio = cx_div(cn1, cn2);         // cn1 / cn2
+    dvec2 sin_incidence_square = cx_sub(dvec2(1.0, 0.0), cx_mul(cos_incidence, cos_incidence));  // 1 - cos(inc)**2
+    dvec2 refractive_ratio = cx_div(cn1, cn2);                                                   // cn1 / cn2
     dvec2 ratio_square = cx_mul(refractive_ratio, refractive_ratio);
-    dvec2 sin_transmittance_square =
-        cx_mul(sin_incidence_square,
-               ratio_square);  // sin(tr)**2 = sin(inc)**2 * (cn1/cn2)**2
-    dvec2 cos_transmittance = cx_sqrt(cx_sub(
-        dvec2(1.0, 0.0),
-        sin_transmittance_square));  // cos = sqrt( 1 - ratio**2*sin(tr)**2 )
+    dvec2 sin_transmittance_square = cx_mul(sin_incidence_square,
+                                            ratio_square);  // sin(tr)**2 = sin(inc)**2 * (cn1/cn2)**2
+    dvec2 cos_transmittance = cx_sqrt(cx_sub(dvec2(1.0, 0.0),
+                                             sin_transmittance_square));  // cos = sqrt( 1 - ratio**2*sin(tr)**2 )
     return cos_transmittance;
 }
 
@@ -352,19 +337,14 @@ dvec2 RAYX_API snell(dvec2 cos_incidence, dvec2 cn1, dvec2 cn2) {
  * @return complex_P			complex p-polarization
  *
  */
-void RAYX_API fresnel(dvec2 cn1, dvec2 cn2, dvec2 cos_incidence, dvec2 cos_transmittance,
-             RAYX_INOUT(dvec2) complex_S, RAYX_INOUT(dvec2) complex_P) {
-    dvec2 mat1_incidence =
-        cx_mul(cn1, cos_incidence);  // material one (incoming side)
+void RAYX_API fresnel(dvec2 cn1, dvec2 cn2, dvec2 cos_incidence, dvec2 cos_transmittance, RAYX_INOUT(dvec2) complex_S, RAYX_INOUT(dvec2) complex_P) {
+    dvec2 mat1_incidence = cx_mul(cn1, cos_incidence);  // material one (incoming side)
     dvec2 mat1_transmittance = cx_mul(cn1, cos_transmittance);
-    dvec2 mat2_incidence =
-        cx_mul(cn2, cos_incidence);  // material two (into which the ray goes)
+    dvec2 mat2_incidence = cx_mul(cn2, cos_incidence);  // material two (into which the ray goes)
     dvec2 mat2_transmittance = cx_mul(cn2, cos_transmittance);
 
-    complex_S = cx_div(cx_sub(mat1_incidence, mat2_transmittance),
-                       cx_add(mat1_incidence, mat2_transmittance));
-    complex_P = -cx_div(cx_sub(mat1_transmittance, mat2_incidence),
-                        cx_add(mat1_transmittance, mat2_incidence));
+    complex_S = cx_div(cx_sub(mat1_incidence, mat2_transmittance), cx_add(mat1_incidence, mat2_transmittance));
+    complex_P = -cx_div(cx_sub(mat1_transmittance, mat2_incidence), cx_add(mat1_transmittance, mat2_incidence));
     return;
 }
 
@@ -376,12 +356,10 @@ void RAYX_API fresnel(dvec2 cn1, dvec2 cn2, dvec2 cos_incidence, dvec2 cos_trans
  * @return complex_S			complex s-polarization
  * @return complex_P			complex p-polarization
  */
-void RAYX_API reflectance(double energy, double incidence_angle, RAYX_INOUT(dvec2) complex_S,
-                 RAYX_INOUT(dvec2) complex_P, int material) {
-    dvec2 cos_incidence =
-        dvec2(r8_cos(incidence_angle),
-              0.0);  // complex number, initialization only for first layer, the
-                     // others are then derived from this with snell's law
+void RAYX_API reflectance(double energy, double incidence_angle, RAYX_INOUT(dvec2) complex_S, RAYX_INOUT(dvec2) complex_P, int material) {
+    dvec2 cos_incidence = dvec2(cos(float(incidence_angle)),
+                                0.0);  // complex number, initialization only for first layer, the
+                                       // others are then derived from this with snell's law
 
     const int vacuum_material = -1;
 
@@ -407,10 +385,9 @@ void RAYX_API reflectance(double energy, double incidence_angle, RAYX_INOUT(dvec
  * atan2(a,b) = (absolute) phase
  */
 dvec2 RAYX_API cartesian_to_euler(dvec2 complex) {
-    double r =
-        dot(complex,
-            complex);  // r = sqrt(a**2 + b**2), why not take sqrt in fortran
-                       // code?, maybe better bc square root looses precision
+    double r = dot(complex,
+                   complex);  // r = sqrt(a**2 + b**2), why not take sqrt in fortran
+                              // code?, maybe better bc square root looses precision
     dvec2 euler;
     if (r < 0 || r > 1) {
         euler = dvec2(infinity(), infinity());
@@ -447,8 +424,7 @@ double phase_difference(dvec2 euler1, dvec2 euler2) {
  * @param material				material the photon collides with
  * @param others
  */
-void efficiency(Ray r, RAYX_OUT(double) real_S, RAYX_OUT(double) real_P,
-                RAYX_OUT(double) delta, double incidence_angle, int material) {
+void efficiency(Ray r, RAYX_OUT(double) real_S, RAYX_OUT(double) real_P, RAYX_OUT(double) delta, double incidence_angle, int material) {
     dvec2 complex_S, complex_P;
     reflectance(r.m_energy, incidence_angle, complex_S, complex_P, material);
 
@@ -467,12 +443,10 @@ void efficiency(Ray r, RAYX_OUT(double) real_S, RAYX_OUT(double) real_P,
  *
  */
 dmat4 muller_matrix(double R_s, double R_p, double delta) {
-    double c = r8_cos(delta);
-    double s = r8_sin(delta);
-    return dmat4((R_s + R_p) / 2.0, (R_p - R_s) / 2.0, 0.0, 0.0,
-                 (R_p - R_s) / 2.0, (R_s + R_p) / 2.0, 0.0, 0.0, 0.0, 0.0,
-                 R_s * R_p * c, R_s * R_p * s, 0.0, 0.0, -R_s * R_p * s,
-                 R_s * R_p * c);
+    double c = cos(float(delta));
+    double s = sin(float(delta));
+    return dmat4((R_s + R_p) / 2.0, (R_p - R_s) / 2.0, 0.0, 0.0, (R_p - R_s) / 2.0, (R_s + R_p) / 2.0, 0.0, 0.0, 0.0, 0.0, R_s * R_p * c,
+                 R_s * R_p * s, 0.0, 0.0, -R_s * R_p * s, R_s * R_p * c);
 }
 
 /** returns updated stokes vector
@@ -485,13 +459,11 @@ dmat4 muller_matrix(double R_s, double R_p, double delta) {
  * updates stokes vector of ray
  * @returns `true`, if ray should be absorbed
  */
-bool update_stokes(RAYX_INOUT(Ray) r, double real_S, double real_P, double delta,
-                   double azimuthal, RAYX_INOUT(uint64_t) ctr) {
+bool update_stokes(RAYX_INOUT(Ray) r, double real_S, double real_P, double delta, double azimuthal, RAYX_INOUT(uint64_t) ctr) {
     dvec4 stokes_old = r.m_stokes;
-    double c_chi = r8_cos(azimuthal);
-    double s_chi = r8_sin(azimuthal);
-    dmat4 rot =
-        dmat4(1, 0, 0, 0, 0, c_chi, -s_chi, 0, 0, s_chi, c_chi, 0, 0, 0, 0, 1);
+    double c_chi = cos(float(azimuthal));
+    double s_chi = sin(float(azimuthal));
+    dmat4 rot = dmat4(1, 0, 0, 0, 0, c_chi, -s_chi, 0, 0, s_chi, c_chi, 0, 0, 0, 0, 1);
     dmat4 inv_rot = transpose(rot);
 
     dvec4 stokes_new = muller_matrix(real_S, real_P, delta) * rot * stokes_old;
@@ -515,10 +487,10 @@ dvec4 RAYX_API normal_cartesian(dvec4 normal, double x_rad, double z_rad) {
     double FY = normal[1];
     double FZ = normal[2];
 
-    double cosx = r8_cos(x_rad);
-    double sinx = r8_sin(x_rad);
-    double cosz = r8_cos(z_rad);
-    double sinz = r8_sin(z_rad);
+    double cosx = cos(float(x_rad));
+    double sinx = sin(float(x_rad));
+    double cosz = cos(float(z_rad));
+    double sinz = sin(float(z_rad));
 
     // put in matrix mult?
     double FY2 = FY * cosz + FZ * sinz;
@@ -539,13 +511,11 @@ returns modified normal vector
 dvec4 RAYX_API normal_cylindrical(dvec4 normal, double x_rad, double z_rad) {
     double normFXFY = sqrt(normal[0] * normal[0] + normal[1] * normal[1]);
     double arcTanFXFY = r8_atan2(normal[1], normal[0]);
-    double sinz = r8_sin(z_rad);
-    double cosz = r8_cos(z_rad);
+    double sinz = sin(float(z_rad));
+    double cosz = cos(float(z_rad));
 
-    normal[0] =
-        r8_cos(x_rad + arcTanFXFY) * (normFXFY * cosz + normal[2] * sinz);
-    normal[1] =
-        r8_sin(x_rad + arcTanFXFY) * (normFXFY * cosz + normal[2] * sinz);
+    normal[0] = cos(float(x_rad + arcTanFXFY)) * (normFXFY * cosz + normal[2] * sinz);
+    normal[1] = sin(float(x_rad + arcTanFXFY)) * (normFXFY * cosz + normal[2] * sinz);
     normal[2] = normal[2] * cosz - normFXFY * sinz;
 
     return normal;
@@ -561,13 +531,11 @@ adds slope error to the normal
 1=cylindrical) (1 only for ellipsis relevant) returns new normal if there is a
 slope error in either x or z direction or the unmodified normal otherwise.
 */
-dvec4 tanger(dvec4 normal, double slopeX, double slopeZ, int O_type,
-             RAYX_INOUT(uint64_t) ctr) {
+dvec4 tanger(dvec4 normal, double slopeX, double slopeZ, int O_type, RAYX_INOUT(uint64_t) ctr) {
     // only calculate the random number if at least one slope error is not 0,
     // since the calculation is costly (sin, cos, log involved)
     if (slopeX != 0 || slopeZ != 0) {
-        double random_values[2] = {squaresNormalRNG(ctr, 0, slopeX),
-                                   squaresNormalRNG(ctr, 0, slopeZ)};
+        double random_values[2] = {squaresNormalRNG(ctr, 0, slopeX), squaresNormalRNG(ctr, 0, slopeZ)};
 
         /*double x = random_values[0] * slopeX; // to get normal distribution
         from std.-norm. multiply by sigma (=slopeX) -> mu + x * sigma but mu=0
@@ -593,16 +561,16 @@ given direction on the grating
 @returns: (inplace) DX, DZ
 */
 void RAYX_API RZPLineDensity(Ray r, dvec4 normal, RZPBehaviour b, RAYX_INOUT(double) DX, RAYX_INOUT(double) DZ) {
-    int IMAGE_TYPE        = int(b.m_imageType);
-    int RZP_TYPE          = int(b.m_rzpType);
-    double risag          = b.m_designSagittalEntranceArmLength;
-    double rosag          = b.m_designSagittalExitArmLength;
-    double rimer          = b.m_designMeridionalEntranceArmLength;
-    double romer          = b.m_designMeridionalExitArmLength;
-    double alpha        = b.m_designAlphaAngle;
-    double beta         = b.m_designBetaAngle;
-    double WL            = 1e-06 * b.m_designWavelength;  // source energy/design energy
-    double Ord           = b.m_orderOfDiffraction;
+    int IMAGE_TYPE = int(b.m_imageType);
+    int RZP_TYPE = int(b.m_rzpType);
+    double risag = b.m_designSagittalEntranceArmLength;
+    double rosag = b.m_designSagittalExitArmLength;
+    double rimer = b.m_designMeridionalEntranceArmLength;
+    double romer = b.m_designMeridionalExitArmLength;
+    double alpha = b.m_designAlphaAngle;
+    double beta = b.m_designBetaAngle;
+    double WL = 1e-06 * b.m_designWavelength;  // source energy/design energy
+    double Ord = b.m_orderOfDiffraction;
 
     double FX = normal.x;
     double FY = normal.y;
@@ -615,10 +583,10 @@ void RAYX_API RZPLineDensity(Ray r, dvec4 normal, RZPBehaviour b, RAYX_INOUT(dou
         X = 0;
 
     // avoid calculating the same sinus/cosinus multiple times (costly)
-    double s_beta = r8_sin(beta);
-    double c_beta = r8_cos(beta);
-    double s_alpha = r8_sin(alpha);
-    double c_alpha = r8_cos(alpha);
+    double s_beta = sin(float(beta));
+    double c_beta = cos(float(beta));
+    double s_alpha = sin(float(alpha));
+    double c_alpha = cos(float(alpha));
 
     /*
     if (DERIVATION_METHOD == 1) {
@@ -644,61 +612,40 @@ void RAYX_API RZPLineDensity(Ray r, dvec4 normal, RZPBehaviour b, RAYX_INOUT(dou
             ym = rosag * s_beta;
         } else {  // more general case, can be reduced to the plane with normal
                   // = (0,1,0) and y = 0
-            zi = FX * FZ * X - (FX * FX + FY * FY) * (Z + risag * c_alpha) +
-                 FY * FZ * (Y - risag * s_alpha);
+            zi = FX * FZ * X - (FX * FX + FY * FY) * (Z + risag * c_alpha) + FY * FZ * (Y - risag * s_alpha);
             xi = (FY * X - FX * Y + FX * risag * s_alpha);
-            yi = -(FX * X) - FY * Y - FZ * Z - FZ * risag * c_alpha +
-                 FY * risag * s_alpha;
-            zm = FX * FZ * X + (FX * FX + FY * FY) * (-Z + rosag * c_beta) +
-                 FY * FZ * (Y - rosag * s_beta);
+            yi = -(FX * X) - FY * Y - FZ * Z - FZ * risag * c_alpha + FY * risag * s_alpha;
+            zm = FX * FZ * X + (FX * FX + FY * FY) * (-Z + rosag * c_beta) + FY * FZ * (Y - rosag * s_beta);
             xm = (FY * X - FX * Y + FX * rosag * s_beta);
-            ym = -(FX * X) - FY * Y - FZ * Z + FZ * rosag * c_beta +
-                 FY * rosag * s_beta;
+            ym = -(FX * X) - FY * Y - FZ * Z + FZ * rosag * c_beta + FY * rosag * s_beta;
         }
     } else if (IMAGE_TYPE == IT_ASTIGMATIC2ASTIGMATIC) {
         double s_rim = sign(rimer);
         double s_rom = sign(romer);
-        double c_2alpha = r8_cos(2 * alpha);
-        double c_2beta = r8_cos(2 * beta);
+        double c_2alpha = cos(float(2 * alpha));
+        double c_2beta = cos(float(2 * beta));
         if (FX == 0 && FZ == 0) {  //   !plane
 
             zi = s_rim * (rimer * c_alpha + Z);
-            xi = (s_rim * X *
-                  (c_alpha * Z - 2 * s_alpha * s_alpha * rimer + s_alpha * Y +
-                   rimer)) /
-                 (c_alpha * Z - 2 * s_alpha * s_alpha * risag + s_alpha * Y +
-                  risag);
+            xi = (s_rim * X * (c_alpha * Z - 2 * s_alpha * s_alpha * rimer + s_alpha * Y + rimer)) /
+                 (c_alpha * Z - 2 * s_alpha * s_alpha * risag + s_alpha * Y + risag);
             yi = s_rim * (-rimer * s_alpha + Y);
             zm = s_rom * (romer * c_beta - Z);
-            xm =
-                (s_rom * X *
-                 (-c_beta * Z - 2 * s_beta * s_beta * romer + s_beta * Y +
-                  romer)) /
-                (c_beta * Z + 2 * s_beta * s_beta * rosag - s_beta * Y - rosag);
+            xm = (s_rom * X * (-c_beta * Z - 2 * s_beta * s_beta * romer + s_beta * Y + romer)) /
+                 (c_beta * Z + 2 * s_beta * s_beta * rosag - s_beta * Y - rosag);
             ym = s_rom * (romer * s_beta - Y);
         } else {
             double denominator = Z * c_alpha + risag * c_2alpha + Y * s_alpha;
-            double nominator =
-                X * (Z * c_alpha + rimer * c_2alpha + Y * s_alpha);
-            zi = s_rim * ((FX * FX + FY * FY) * (Z + rimer * c_alpha) -
-                          FY * FZ * (Y - rimer * s_alpha) -
-                          (FX * FZ * nominator) / denominator);
-            xi = s_rim * (-(FX * Y) + FX * rimer * s_alpha +
-                          (FY * nominator) / denominator);
-            yi = s_rim *
-                 (FZ * (Z + rimer * c_alpha) + FY * (Y - rimer * s_alpha) +
-                  (FX * nominator) / denominator);
+            double nominator = X * (Z * c_alpha + rimer * c_2alpha + Y * s_alpha);
+            zi = s_rim * ((FX * FX + FY * FY) * (Z + rimer * c_alpha) - FY * FZ * (Y - rimer * s_alpha) - (FX * FZ * nominator) / denominator);
+            xi = s_rim * (-(FX * Y) + FX * rimer * s_alpha + (FY * nominator) / denominator);
+            yi = s_rim * (FZ * (Z + rimer * c_alpha) + FY * (Y - rimer * s_alpha) + (FX * nominator) / denominator);
 
             denominator = (-(Z * c_beta) + rosag * c_2beta + Y * s_beta);
             nominator = X * (-(Z * c_beta) + romer * c_2beta + Y * s_beta);
-            zm = s_rom * ((FX * FX + FY * FY) * (-Z + romer * c_beta) +
-                          FY * FZ * (Y - romer * s_beta) +
-                          (FX * FZ * nominator) / denominator);
-            xm = s_rom *
-                 (FX * (Y - romer * s_beta) - (FY * nominator) / denominator);
-            ym = s_rom *
-                 (FZ * (-Z + romer * c_beta) + FY * (-Y + romer * s_beta) -
-                  (FX * nominator) / denominator);
+            zm = s_rom * ((FX * FX + FY * FY) * (-Z + romer * c_beta) + FY * FZ * (Y - romer * s_beta) + (FX * FZ * nominator) / denominator);
+            xm = s_rom * (FX * (Y - romer * s_beta) - (FY * nominator) / denominator);
+            ym = s_rom * (FZ * (-Z + romer * c_beta) + FY * (-Y + romer * s_beta) - (FX * nominator) / denominator);
         }
         double ris = sqrt(zi * zi + xi * xi + yi * yi);
         double rms = sqrt(zm * zm + xm * xm + ym * ym);
@@ -716,38 +663,39 @@ void RAYX_API RZPLineDensity(Ray r, dvec4 normal, RZPBehaviour b, RAYX_INOUT(dou
 
         return;
     } else if (IMAGE_TYPE == IT_POINT2HORIZONTAL_LINE) {
-            // TODO don't use magic constants
+        // TODO don't use magic constants
 
-        if (FX == 0.0 && FZ == 0.0) { //plane
-          zi = -(risag*c_alpha+Z);
-          xi = X;
-          yi = risag*s_alpha;
-          zm = rosag*c_beta-Z;
-          xm = 0;
-          ym = rosag*s_beta;
+        if (FX == 0.0 && FZ == 0.0) {  // plane
+            zi = -(risag * c_alpha + Z);
+            xi = X;
+            yi = risag * s_alpha;
+            zm = rosag * c_beta - Z;
+            xm = 0;
+            ym = rosag * s_beta;
         } else {
-          zi = FX*FZ*X - (FX*FX + FY*FY)*(Z + risag*c_alpha) + FY*FZ*(Y - risag*s_alpha);
-          xi = FY*X - FX*Y + FX*risag*s_alpha;
-          yi = -(FX*X) - FY*Y - FZ*Z - FZ*risag*c_alpha + FY*risag*s_alpha;
-          zm = (FX*FX + FY*FY)*(-Z + rosag*c_beta) + FY*FZ*(Y - rosag*s_beta);
-          xm = FX*(-Y + rosag*s_beta);
-          ym = -(FY*Y) - FZ*Z + FZ*rosag*c_beta + FY*rosag*s_beta;
+            zi = FX * FZ * X - (FX * FX + FY * FY) * (Z + risag * c_alpha) + FY * FZ * (Y - risag * s_alpha);
+            xi = FY * X - FX * Y + FX * risag * s_alpha;
+            yi = -(FX * X) - FY * Y - FZ * Z - FZ * risag * c_alpha + FY * risag * s_alpha;
+            zm = (FX * FX + FY * FY) * (-Z + rosag * c_beta) + FY * FZ * (Y - rosag * s_beta);
+            xm = FX * (-Y + rosag * s_beta);
+            ym = -(FY * Y) - FZ * Z + FZ * rosag * c_beta + FY * rosag * s_beta;
         }
     } else if (IMAGE_TYPE == IT_POINT2HORIZONTAL_DIVERGENT_LINE) {
-	    if (FX == 0.0 && FZ == 0.0) {
-            zi = -(risag*c_alpha+Z);
+        if (FX == 0.0 && FZ == 0.0) {
+            zi = -(risag * c_alpha + Z);
             xi = X;
-            yi = risag*s_alpha;
-            zm = rosag*c_beta-Z;
-            xm = X/zi*zm;    // not anymore negative as zi is negative!g
-            ym = rosag*s_beta;
-	    } else {
-            zi = FX*FZ*X - (FX*FX + FY*FY)*(Z + risag*c_alpha) + FY*FZ*(Y - risag*s_alpha);
-            xi = FY*X - FX*Y + FX*risag*s_alpha;
-            yi = -(FX*X) - FY*Y - FZ*Z - FZ*risag*c_alpha + FY*risag*s_alpha;
-            zm = (FX*FZ*X*(Z - rosag*c_beta))/(Z + risag*c_alpha) + (FX*FX + FY*FY)*(-Z + rosag*c_beta) + FY*FZ*(Y - rosag*s_beta);
-            xm = (FY*X*(Z - rosag*c_beta))/(Z + risag*c_alpha) + FX*(-Y + rosag*s_beta);
-            ym = -((FX*X*(Z - rosag*c_beta))/(Z + risag*c_alpha)) + FZ*(-Z + rosag*c_beta) + FY*(-Y + rosag*s_beta);
+            yi = risag * s_alpha;
+            zm = rosag * c_beta - Z;
+            xm = X / zi * zm;  // not anymore negative as zi is negative!g
+            ym = rosag * s_beta;
+        } else {
+            zi = FX * FZ * X - (FX * FX + FY * FY) * (Z + risag * c_alpha) + FY * FZ * (Y - risag * s_alpha);
+            xi = FY * X - FX * Y + FX * risag * s_alpha;
+            yi = -(FX * X) - FY * Y - FZ * Z - FZ * risag * c_alpha + FY * risag * s_alpha;
+            zm = (FX * FZ * X * (Z - rosag * c_beta)) / (Z + risag * c_alpha) + (FX * FX + FY * FY) * (-Z + rosag * c_beta) +
+                 FY * FZ * (Y - rosag * s_beta);
+            xm = (FY * X * (Z - rosag * c_beta)) / (Z + risag * c_alpha) + FX * (-Y + rosag * s_beta);
+            ym = -((FX * X * (Z - rosag * c_beta)) / (Z + risag * c_alpha)) + FZ * (-Z + rosag * c_beta) + FY * (-Y + rosag * s_beta);
         }
     } else {
         throw("unsupported ImageType!");
@@ -777,17 +725,15 @@ calculates refracted ray
 "ray beyond horizon"
 */
 Ray refrac2D(Ray r, dvec4 normal, double az, double ax) {
-    double eps1 = -r8_atan(normal.x / normal.y);
-    double del1 = r8_asin(normal.z);
+    double eps1 = -atan(float(normal.x / normal.y));
+    double del1 = asin(float(normal.z));
 
-    double cos_d = r8_cos(-del1);
-    double sin_d = r8_sin(-del1);
-    double cos_e = r8_cos(-eps1);
-    double sin_e = r8_sin(-eps1);
-    dmat3 rot = dmat3(cos_e, cos_d * sin_e, sin_d * sin_e, -sin_e,
-                      cos_d * cos_e, sin_d * cos_e, 0, -sin_d, cos_d);
-    dmat3 inv_rot = dmat3(cos_e, -sin_e, 0, cos_d * sin_e, cos_d * cos_e,
-                          -sin_d, sin_d * sin_e, sin_d * cos_e, cos_d);
+    double cos_d = cos(float(-del1));
+    double sin_d = sin(float(-del1));
+    double cos_e = cos(float(-eps1));
+    double sin_e = sin(float(-eps1));
+    dmat3 rot = dmat3(cos_e, cos_d * sin_e, sin_d * sin_e, -sin_e, cos_d * cos_e, sin_d * cos_e, 0, -sin_d, cos_d);
+    dmat3 inv_rot = dmat3(cos_e, -sin_e, 0, cos_d * sin_e, cos_d * cos_e, -sin_d, sin_d * sin_e, sin_d * cos_e, cos_d);
     r.m_direction = rot * r.m_direction;
 
     double x1 = r.m_direction.x - ax;
@@ -816,26 +762,19 @@ Ray refrac(Ray r, dvec4 normal, double linedensity) {
     double an_y = -1.0 / sqq;
     double an_z = zy / sqq;
 
-    double eps1 = r8_atan(an_x / an_y);  //-atan(an_x/an_z) around z, chi
-    double del1 = r8_asin(
-        an_z);  // sign(an_z) * r8_atan(sqrt( (an_z*an_z) / (1-an_z*an_z) )); //
-                // -asin(an_z); // -asin around x, psi
-    double cos_d = r8_cos(del1);
+    double eps1 = atan(float(an_x / an_y));  //-atan(an_x/an_z) around z, chi
+    double del1 = asin(float(an_z));         // sign(an_z) * r8_atan(sqrt( (an_z*an_z) / (1-an_z*an_z) )); //
+                                             // -asin(an_z); // -asin around x, psi
+    double cos_d = cos(float(del1));
     double a1 = linedensity * cos_d;
-    double sin_d = r8_sin(-del1);
-    double cos_e = r8_cos(-eps1);
-    double sin_e = r8_sin(-eps1);
-    dmat4 rot =
-        dmat4(cos_e, cos_d * sin_e, sin_d * sin_e, 0, -sin_e, cos_d * cos_e,
-              sin_d * cos_e, 0, 0, -sin_d, cos_d, 0, 0, 0, 0, 1);
-    dmat4 inv_rot =
-        dmat4(cos_e, -sin_e, 0, 0, cos_d * sin_e, cos_d * cos_e, -sin_d, 0,
-              sin_d * sin_e, sin_d * cos_e, cos_d, 0, 0, 0, 0, 1);
+    double sin_d = sin(float(-del1));
+    double cos_e = cos(float(-eps1));
+    double sin_e = sin(float(-eps1));
+    dmat4 rot = dmat4(cos_e, cos_d * sin_e, sin_d * sin_e, 0, -sin_e, cos_d * cos_e, sin_d * cos_e, 0, 0, -sin_d, cos_d, 0, 0, 0, 0, 1);
+    dmat4 inv_rot = dmat4(cos_e, -sin_e, 0, 0, cos_d * sin_e, cos_d * cos_e, -sin_d, 0, sin_d * sin_e, sin_d * cos_e, cos_d, 0, 0, 0, 0, 1);
     r.m_direction = dvec3(rot * dvec4(r.m_direction, 0));
 
-    double y1 = (r.m_direction[1] * r.m_direction[1] +
-                 r.m_direction[2] * r.m_direction[2] -
-                 ((r.m_direction[2] - a1) * (r.m_direction[2] - a1)));
+    double y1 = (r.m_direction[1] * r.m_direction[1] + r.m_direction[2] * r.m_direction[2] - ((r.m_direction[2] - a1) * (r.m_direction[2] - a1)));
     if (y1 > 0) {
         y1 = sqrt(y1);
         r.m_direction[1] = y1;
@@ -862,9 +801,7 @@ double RAYX_API vlsGrating(double lineDensity, double z, double vls[6]) {
     double z4 = z3 * z;
     double z5 = z4 * z;
     double z6 = z5 * z;
-    double a =
-        lineDensity * (1 + 2 * vls[0] * z + 3 * vls[1] * z2 + 4 * vls[2] * z3 +
-                       5 * vls[3] * z4 + 6 * vls[4] * z5 + 7 * vls[5] * z6);
+    double a = lineDensity * (1 + 2 * vls[0] * z + 3 * vls[1] * z2 + 4 * vls[2] * z3 + 5 * vls[3] * z4 + 6 * vls[4] * z5 + 7 * vls[5] * z6);
     return a;
 }
 
@@ -879,10 +816,8 @@ double RAYX_API vlsGrating(double lineDensity, double z, double vls[6]) {
  * WL:wavelength (nm); ORD order of diffraction
  */
 Ray RAYX_API refrac_plane(Ray r, ALLOW_UNUSED dvec4 normal,
-                 double a) {  // TODO fix unused var
-    double y1 = r.m_direction[1] * r.m_direction[1] +
-                r.m_direction[2] * r.m_direction[2] -
-                (r.m_direction[2] - a) * (r.m_direction[2] - a);
+                          double a) {  // TODO fix unused var
+    double y1 = r.m_direction[1] * r.m_direction[1] + r.m_direction[2] * r.m_direction[2] - (r.m_direction[2] - a) * (r.m_direction[2] - a);
     if (y1 > 0) {
         y1 = sqrt(y1);
         r.m_direction[1] = y1;
@@ -906,8 +841,8 @@ double RAYX_API bessel1(double v) {
     double PO2;
     double FA1;
     for (int small = 0; small <= large; small++) {
-        PO1 = dpow(-1.0, small);
-        PO2 = dpow(v / 2.0, 2 * small + 1);
+        PO1 = pow(float(-1.0), float(small));
+        PO2 = pow(float(v / 2.0), float(2 * small + 1));
         FA1 = fact(small);
         sum += (PO1 / (FA1 * FA1 * (small + 1))) * PO2;
     }
@@ -923,8 +858,7 @@ zoneplates
 @returns
     results stored in dphi, dpsi (inout)
 */
-void bessel_diff(double radius, double wl, RAYX_INOUT(double) dphi,
-                 RAYX_INOUT(double) dpsi, RAYX_INOUT(uint64_t) ctr) {
+void bessel_diff(double radius, double wl, RAYX_INOUT(double) dphi, RAYX_INOUT(double) dpsi, RAYX_INOUT(uint64_t) ctr) {
     double b = abs(radius) * 1e06;
     double ximax = 5.0 * wl / b;
 
@@ -960,8 +894,7 @@ void bessel_diff(double radius, double wl, RAYX_INOUT(double) dphi,
  * @param ctr		counter for random number generator
  * @return result stored in dAngle
  */
-void fraun_diff(double dim, double wl, RAYX_INOUT(double) dAngle,
-                RAYX_INOUT(uint64_t) ctr) {
+void fraun_diff(double dim, double wl, RAYX_INOUT(double) dAngle, RAYX_INOUT(uint64_t) ctr) {
     if (dim == 0) return;        // no diffraction in this direction
     double b = dim * 1e06;       // slit opening
     double div = 10.0 * wl / b;  // up to 2nd maximum
@@ -973,10 +906,10 @@ void fraun_diff(double dim, double wl, RAYX_INOUT(double) dAngle,
             rna[i] = squaresDoubleRNG(ctr);
         }
         dAngle = (rna[0] - 0.5) * div;
-        double u = PI * b * r8_sin(dAngle) / wl;
+        double u = PI * b * sin(float(dAngle)) / wl;
         double wd = 1;
         if (u != 0) {
-            wd = r8_sin(u) / u;
+            wd = sin(float(u)) / u;
             wd = wd * wd;
         }
         c = wd - rna[1];

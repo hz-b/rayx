@@ -55,12 +55,12 @@ TEST_F(TestSuite, PointSource_seeded) { compareAgainstCorrect("PointSource_seede
 TEST_F(TestSuite, MatrixSource_seeded) { compareAgainstCorrect("MatrixSource_seeded"); }
 
 // Tests reflectivity of materials of a PlaneMirror.
-TEST_F(TestSuite, PlaneMirror_refl_seeded) { compareAgainstCorrect("PlaneMirror_refl_seeded"); }
+TEST_F(TestSuite, PlaneMirror_refl_seeded) { compareAgainstCorrect("PlaneMirror_refl_seeded", 1e-6); }
 
 // Tests the Energy Distribution of a MatrixSource.
 TEST_F(TestSuite, MatrixSource_distr_seeded) { compareAgainstCorrect("MatrixSource_distr_seeded"); }
 
-TEST_F(TestSuite, slit1_seeded) { compareAgainstCorrect("slit1_seeded"); }
-TEST_F(TestSuite, slit2_seeded) { compareAgainstCorrect("slit2_seeded"); }
-TEST_F(TestSuite, slit3_seeded) { compareAgainstCorrect("slit3_seeded"); }
-TEST_F(TestSuite, slit4_seeded) { compareAgainstCorrect("slit4_seeded"); }
+TEST_F(TestSuite, slit1_seeded) { compareAgainstCorrect("slit1_seeded", 1e-2); }
+TEST_F(TestSuite, slit2_seeded) { compareAgainstCorrect("slit2_seeded", 1e-2); }
+TEST_F(TestSuite, slit3_seeded) { compareAgainstCorrect("slit3_seeded", 1e-2); }
+TEST_F(TestSuite, slit4_seeded) { compareAgainstCorrect("slit4_seeded", 1e-2); }

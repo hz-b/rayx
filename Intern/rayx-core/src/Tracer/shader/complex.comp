@@ -4,16 +4,16 @@
 // Complex Number math by julesb (but adapted for double precision)
 // https://github.com/julesb/glsl-util
 
-#define cx_mul(a, b)  dvec2(a.x* b.x - a.y * b.y, a.x * b.y + a.y * b.x)
-#define cx_div(a, b)  dvec2(((a.x * b.x + a.y * b.y) / (b.x * b.x + b.y * b.y)), ((a.y * b.x - a.x * b.y) / (b.x * b.x + b.y * b.y)))
+#define cx_mul(a, b) dvec2(a.x* b.x - a.y * b.y, a.x * b.y + a.y * b.x)
+#define cx_div(a, b) dvec2(((a.x * b.x + a.y * b.y) / (b.x * b.x + b.y * b.y)), ((a.y * b.x - a.x * b.y) / (b.x * b.x + b.y * b.y)))
 #define cx_modulus(a) length(a)
-#define cx_conj(a)    dvec2(a.x, -a.y)
-#define cx_arg(a)     r8_atan(a.y, a.x)
-#define cx_sin(a)     dvec2(r8_sin(a.x) * r8_cosh(a.y), r8_cos(a.x) * r8_sinh(a.y))
-#define cx_cos(a)     dvec2(r8_cos(a.x) * r8_cosh(a.y), -r8_sin(a.x) * r8_sinh(a.y))
+#define cx_conj(a) dvec2(a.x, -a.y)
+#define cx_arg(a) atan(float(a.y, a.x))
+#define cx_sin(a) dvec2(sin(float(a.x)) * cosh(float(a.y)), cos(float(a.x)) * sinh(float(a.y)))
+#define cx_cos(a) dvec2(cos(float((a.x))) * cosh(float(a.y)), -sin(float(a.x)) * sinh(float(a.y)))
 
 dvec2 cx_sqrt(dvec2 a) {
-    double r     = length(a);
+    double r = length(a);
     double rpart = sqrt(0.5 * (r + a.x));
     double ipart = sqrt(0.5 * (r - a.x));
     if (a.y < 0.0) ipart = -ipart;
@@ -26,7 +26,7 @@ dvec2 cx_log(dvec2 a) {
     double rpart = sqrt((a.x * a.x) + (a.y * a.y));
     double ipart = r8_atan2(a.y, a.x);
     if (ipart > PI) ipart = ipart - (2.0 * PI);
-    return dvec2(r8_log(rpart), ipart);
+    return dvec2(log(float(rpart)), ipart);
 }
 
 dvec2 cx_mobius(dvec2 a) {
@@ -45,18 +45,18 @@ dvec2 cx_sin_of_one_over_z(dvec2 z) { return cx_sin(cx_div(dvec2(1.0, 0.0), z));
 // https://gist.github.com/DonKarlssonSan/f87ba5e4e5f1093cb83e39024a6a5e72
 #define cx_sub(a, b) dvec2(a.x - b.x, a.y - b.y)
 #define cx_add(a, b) dvec2(a.x + b.x, a.y + b.y)
-#define cx_abs(a)    length(a)
+#define cx_abs(a) length(a)
 dvec2 cx_to_polar(dvec2 a) {
-    double phi = r8_atan(a.y / a.x);
-    double r   = length(a);
+    double phi = atan(float(a.y / a.x));
+    double r = length(a);
     return dvec2(r, phi);
 }
 
 // Complex power
 dvec2 cx_pow(dvec2 a, int n) {
     double angle = r8_atan2(a.y, a.x);
-    double r     = length(a);
-    double real  = dpow(r, n) * r8_cos(n * angle);
-    double im    = dpow(r, n) * r8_sin(n * angle);
+    double r = length(a);
+    double real = pow(float(r), float(n)) * cos(float(n * angle));
+    double im = pow(float(r), float(n)) * sin(float(n * angle));
     return dvec2(real, im);
 }
