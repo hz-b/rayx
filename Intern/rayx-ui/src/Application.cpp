@@ -9,7 +9,7 @@
 #include "RenderObject.h"
 #include "RenderSystem/LineRenderSystem.h"
 #include "RenderSystem/TriangleRenderSystem.h"
-#include "Triangulate.h"
+#include "Triangulation/Triangulate.h"
 #include "UserInput.h"
 #include "Writer/H5Writer.h"
 
@@ -34,7 +34,7 @@ void Application::run() {
     RAYX::BundleHistory bundleHist = raysFromH5(std::string(path + ".h5"), FULL_FORMAT);
 
     // Triangulate the render data and update the scene
-    std::vector<RenderObject> rObjects = triangulateObjects(beamline.m_OpticalElements);
+    std::vector<RenderObject> rObjects = triangulateObjects(beamline.m_OpticalElements, true);
     std::vector<Line> rays = getRays(bundleHist, beamline.m_OpticalElements);
     m_Scene.update(rObjects, rays);
 

@@ -79,7 +79,7 @@ bool parseGroup(rapidxml::xml_node<>* node, xml::Group* out);
  * Parser gives you useful utility functions to write your own createFromXML
  *functions.
  **/
-struct Parser {
+struct RAYX_API Parser {
     Parser(rapidxml::xml_node<>* node, std::vector<xml::Group> group_context, std::filesystem::path rmlFile);
 
     const char* name() const;
