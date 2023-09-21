@@ -4,6 +4,8 @@ import os
 import sys
 import numpy as np
 
+# This has to be executed in the RAYX base folder!
+
 
 def read_csv(file):
     data = pd.read_csv(
