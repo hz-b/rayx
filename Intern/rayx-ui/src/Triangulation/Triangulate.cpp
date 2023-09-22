@@ -13,30 +13,31 @@
 void calculateVerticesForType(const Element& elem, glm::vec4& topLeft, glm::vec4& topRight, glm::vec4& bottomLeft, glm::vec4& bottomRight) {
     const double defWidthHeight = 100.0f;
     switch (static_cast<int>(elem.m_cutout.m_type)) {
-        case CTYPE_TRAPEZOID:
+        case CTYPE_TRAPEZOID: {
             TrapezoidCutout trapezoid = deserializeTrapezoid(elem.m_cutout);
             topLeft = {-trapezoid.m_sizeA_x1 / 2.0f, 0, trapezoid.m_size_x2 / 2.0f, 1.0f};
             topRight = {trapezoid.m_sizeA_x1 / 2.0f, 0, trapezoid.m_size_x2 / 2.0f, 1.0f};
             bottomLeft = {-trapezoid.m_sizeB_x1 / 2.0f, 0, -trapezoid.m_size_x2 / 2.0f, 1.0f};
             bottomRight = {trapezoid.m_sizeB_x1 / 2.0f, 0, -trapezoid.m_size_x2 / 2.0f, 1.0f};
             break;
-
-        case CTYPE_RECT:
+        }
+        case CTYPE_RECT: {
             RectCutout rect = deserializeRect(elem.m_cutout);
             topLeft = {-rect.m_size_x1 / 2.0f, 0, rect.m_size_x2 / 2.0f, 1.0f};
             topRight = {rect.m_size_x1 / 2.0f, 0, rect.m_size_x2 / 2.0f, 1.0f};
             bottomLeft = {-rect.m_size_x1 / 2.0f, 0, -rect.m_size_x2 / 2.0f, 1.0f};
             bottomRight = {rect.m_size_x1 / 2.0f, 0, -rect.m_size_x2 / 2.0f, 1.0f};
             break;
-
+        }
         case CTYPE_ELLIPTICAL:
         case CTYPE_UNLIMITED:
-        default:
+        default: {
             topLeft = {-defWidthHeight / 2.0f, 0, defWidthHeight / 2.0f, 1.0f};
             topRight = {defWidthHeight / 2.0f, 0, defWidthHeight / 2.0f, 1.0f};
             bottomLeft = {-defWidthHeight / 2.0f, 0, -defWidthHeight / 2.0f, 1.0f};
             bottomRight = {defWidthHeight / 2.0f, 0, -defWidthHeight / 2.0f, 1.0f};
             break;
+        }
     }
 }
 
@@ -95,7 +96,7 @@ std::vector<RenderObject> triangulateObjects(const std::vector<RAYX::OpticalElem
             case STYPE_PLANE_XY:
                 planarElements.push_back(element);
                 break;
-            case STYPE_QUADRIC:
+            case STYPE_QUADRIC: {
                 QuadricSurface q = deserializeQuadric(element.m_element.m_surface);
                 if ((q.m_a11 == 0 && q.m_a22 == 0 && q.m_a33 == 0) && (q.m_a14 != 0 || q.m_a24 != 0 || q.m_a34 != 0)) {  // Plane
                     planarElements.push_back(element);
@@ -107,6 +108,7 @@ std::vector<RenderObject> triangulateObjects(const std::vector<RAYX::OpticalElem
                     }
                 }
                 break;
+            }
             case STYPE_TOROID:
                 curvedElements.push_back(element);
                 break;

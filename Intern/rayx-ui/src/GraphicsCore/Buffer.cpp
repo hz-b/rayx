@@ -1,5 +1,7 @@
 #include "Buffer.h"
 
+#include <cstring>
+
 VkDeviceSize Buffer::getAlignment(VkDeviceSize instanceSize, VkDeviceSize minOffsetAlignment) {
     if (minOffsetAlignment > 0) {
         return (instanceSize + minOffsetAlignment - 1) & ~(minOffsetAlignment - 1);

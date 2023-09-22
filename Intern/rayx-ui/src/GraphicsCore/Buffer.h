@@ -46,8 +46,8 @@ class Buffer {
     VkDeviceMemory m_Memory = VK_NULL_HANDLE;
 
     VkDeviceSize m_BufferSize;
-    uint32_t m_instanceCount;
     VkDeviceSize m_InstanceSize;
+    uint32_t m_instanceCount;
     VkDeviceSize m_AlignmentSize;
     VkBufferUsageFlags m_UsageFlags;
     VkMemoryPropertyFlags m_MemoryPropertyFlags;
