@@ -28,7 +28,7 @@ mainLoop():
 ---
 # **How the VulkanTracer works**
 
-![vulkan_flow](/docs/src/res/vulkan_flow.png)
+![vulkan_flow](../../res/vulkan_flow.png)
 
 ## _Buffer types used:_
 
@@ -39,7 +39,7 @@ mainLoop():
 ---
 # Buffers:
 | Buffers | Size ( vkDeviceSize)              | Usage                        | Name               |
-|---------|-----------------------------------|------------------------------|--------------------|
+| ------- | --------------------------------- | ---------------------------- | ------------------ |
 | 0       | NumverOfRays*RAY_DOUBLE_AMOUNT    | Transfer_DST\|STORAGE_BUFFER | Ray Buffer         |
 | 1       | NumberOfRays*RAY_DOUBLE_AMOUNT    | Transfer_SRC\|STORAGE_BUFFER | Output Buffer      |
 | 2       | Quadric_parm+beamlineSize         | STORAGE_BUFFER               | Quadric Buffer     |

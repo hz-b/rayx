@@ -3,7 +3,7 @@
 
 - [Introduction](./Introduction/01-Introduction.md)
     - [Getting Started](./Introduction/02-Getting-Started.md)
-    - [RAYX Commands](./Introduction/03-How-to-use-the-rayx.md)
+    - [RAYX Commands](./Introduction/03-How-to-use-rayx.md)
     - [How to Build](./Introduction/04-How-to-build.md)
     - [Style Guide](./Introduction/05-Style-Guide.md)
     - [Literature](./Introduction/06-Literature.md)
