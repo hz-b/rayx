@@ -1,7 +1,7 @@
-# Rayx
-Rayx is a simulation tool for beamlines at electron storage rings. At this stage, it still is intended to be used alongside [RAY-UI](https://www.helmholtz-berlin.de/forschung/oe/wi/optik-strahlrohre/arbeitsgebiete/ray_en.html). Our primary concern for rayx is high-performance tracing, which we achieve by utilizing GPUs via the Vulkan API. 
+# RAYX
+RAYX is a simulation tool for beamlines at electron storage rings. At this stage, it still is intended to be used alongside [RAY-UI](https://www.helmholtz-berlin.de/forschung/oe/wi/optik-strahlrohre/arbeitsgebiete/ray_en.html). Our primary concern for RAYX is high-performance tracing, which we achieve by utilizing GPUs via the Vulkan API. 
 
-## New Features for Rayx
+## New Features for RAYX
 - Global (not sequential) tracing of beamlines
 - GPU utilization for faster tracing
 - Multiple beamlines can easily be traced in succession
