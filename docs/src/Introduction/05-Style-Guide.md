@@ -1,26 +1,26 @@
-# Style Guide for Programming in RAY
+# Style Guide for Programming in RAYX
 
-Here you can find a collection of rules for our code base, which developed over the projects lifetime. There are here to make it easier for others on the team, to read your code. Please read them carefully.
+This document serves as a comprehensive style guide for the RAY project. It outlines the coding standards and best practices that have evolved over the course of the project's lifecycle. Adherence to these guidelines is crucial for maintaining code readability and facilitating effective collaboration among team members. Please read them attentively.
 
 ## General
 
-Keep collective ownership of the code in mind, when writing it (write code to be read by your team mates, not the compiler). Remember to KISS (Keep it stupid simple).
+Write code with collective ownership in mind; the primary audience is your teammates, not just the compiler. The KISS (Keep It Stupid Simple) principle should be applied whenever possible.
 
 ## Includes
-As an easy step towards readability we divide includes in the following way: 
+To enhance readability, includes should be categorized as follows:: 
 
 `#include "internalHeader.h"`
 
 `#include <externalHeader.h>`
 
-Where internal headers are the ones we wrote ourselves and external headers are from dependencies we included into our project.
+Internal headers are those developed within the project, while external headers pertain to dependencies integrated into the project.
 
 
 ## Comments
 
-Write comments often and as precise as possible. Comments should contain what you would say to a newcomer to the project, because that is most likely the person that reads/needs the comments.
+Prioritize frequent and precise commenting. Comments should be tailored to newcomers to the project, who are the most likely to require and benefit from them.
 
-### Doxygen
+### Doxygen Comments
 
 ```c++
 /**
@@ -32,7 +32,7 @@ Write comments often and as precise as possible. Comments should contain what yo
 */
 ```
 
-This is how a comment before a function should look. It contains a brief description of it and of the parameters and return values of it. It also points to related functions, if there are any.
+The objective is for header files to provide high-level documentation on API usage, while source files should contain more detailed documentation about implementation specifics.
 
 ## Naming scheme
 
@@ -79,14 +79,12 @@ A static variable or object is indicated by an "s_", e.g. :
 
 ## Const Correctness
 
-Const correctness means using the keyword `const`, to avoid const objects from getting mutated.
+Const correctness is the practice of using the `const` keyword to ensure that objects and variables remain immutable.
 
 1. `void f1(const std::string& s);     ` *// Pass by reference-to-`const`*
 2. `void f2(const std::string* sptr);  ` *// Pass by pointer-to-`const`*
 3. `void f3(std::string s);            ` *// Pass by value*
 
-In the first case a reference is passed to the function with the keyword const. This means the function won't change the value of the object or variable. The same can be done for pointers. Another option is to pass by value. This creates a copy of an object or variable, so the original isn't changed even if the function changes the copy. 
+Employing const correctness from the project's inception is advisable, as it can simplify code maintenance and improve overall code quality.
 
-Add const keywords as early as possible. Const correctness can create a snow ball effect and is easier implemented from the beginning. 
-
-Further reading can and should be done here: https://isocpp.org/wiki/faq/const-correctness
+Further reading on const correctness is highly recommended and can be found [here](https://isocpp.org/wiki/faq/const-correctness).

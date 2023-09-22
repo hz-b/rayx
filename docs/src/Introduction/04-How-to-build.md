@@ -1,11 +1,14 @@
 # How to Build
 
-For building the project and running the project, we recommend to use [Visual Studio Code](https://code.visualstudio.com/) as your IDE with these extensions: C/C++ and CMake Tools.
+For building and running the project, we recommend to use [Visual Studio Code](https://code.visualstudio.com/) as your IDE with these extensions: C/C++ and CMake Tools.
 You can use any IDE you like, but the VSCode extensions make the building process very easy.
 If you are on UNIX you can also use the `compile.sh` script to compile.
 
 Clone the git repository with:
-`git clone --recurse-submodules git@github.com:hz-b/RAY-X.git -b development`
+`git clone --recurse-submodules git@github.com:hz-b/rayx.git -b development`
+
+or:
+`git clone --recurse-submodules https://github.com/hz-b/rayx.git -b development`
 
 to get the dev branch and to make sure, you also clone all of it's submodules.
 
@@ -28,7 +31,7 @@ Known Issues:
 You can also set a custom generator for cmake in the .vscode/settings.json file. Ninja is recommended for faster builds. In the following image you can see an example config for the generator in vscode.
 ![](../../res/vscode_ninja_config.png)
 
-### Manually
+### Visual Sutdio
 - Open a terminal in the project folder
 - Run `cmake -S . -B build -G "Visual Studio 16 2019" -A x64 -DCMAKE_BUILD_TYPE=Release` (Replace with your Visual Studio version)
 

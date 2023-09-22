@@ -1,6 +1,9 @@
-# Object Coordinate System
+# Objects
 
-Objects in rayx are conceptualized like this:
+In this section you can find a catalogue for all optical elements and light sources
+implemented in RAYX.
+
+Objects in RAYX are conceptualized like this:
 
 ![image](/docs/src/res/ray-coord.png)
 _Source: [Schaefers](https://gitlab.helmholtz-berlin.de/RAY/RAY/-/wikis/uploads/bdcf4515e03b2fccf462c5f0d76052c3/Paper_Schaefers_RAY_Springer_2007.pdf)_

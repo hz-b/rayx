@@ -3,3 +3,6 @@ title = "Rayx Wiki"
 
 [output.html]
 mathjax-support = true
+
+[output.html.fold]
+enable = true

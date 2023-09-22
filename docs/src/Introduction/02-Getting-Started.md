@@ -142,7 +142,7 @@ In it we have a matrix source that sends rays onto a plane mirror.
 Assuming the beamline file is in the same directory as the binary
 you can run the CLI of rayx as follows:
 ```
-./TerminalApp -i PlaneMirror.rml
+./rayx -i PlaneMirror.rml
 ```
 
 Adding a `-p` flag will output a footprint of the last element in

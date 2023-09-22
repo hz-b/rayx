@@ -1,6 +1,6 @@
 # User vs Model Parameter
 
-In rayx we intend to work on better modularity and readability in our code. In our opinion, one step to achieve this, to reevaluate and restructure the parameters of Ray-UI. Since a lot of the parameters had dependencies on each other, we decided that a distinction between them was needed. This is where our definition of User and Model Parameters comes into play. 
+In RAYX we intend to work on better modularity and readability in our code. In our opinion, one step to achieve this, to reevaluate and restructure the parameters of Ray-UI. Since a lot of the parameters had dependencies on each other, we decided that a distinction between them was needed. This is where our definition of User and Model Parameters comes into play. 
 
 ## Model Parameter
 

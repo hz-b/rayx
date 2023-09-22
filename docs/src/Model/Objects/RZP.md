@@ -1,6 +1,6 @@
 # Reflection Zone Plate
 
-Informations about RZP
+Information about RZP
 
 Literature:<br/>
 [PhD_JensRehanek_2014.pdf](uploads/45bc7d1c0044bc7dbf5b65bd126881f5/RehanekJens_2014_Doktorarbeit.pdf)<br/>

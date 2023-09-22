@@ -1,0 +1,7 @@
+# Introduction
+
+RAYX is a command-line tool developed to work in conjunction with RAYX-CORE for the purpose of accurately and efficiently tracing beamlines, as described by .rml files. RAYX-CORE is a specialized library with capabilities for simulating a variety of optical phenomena. The library adopts a modular architecture for the construction of optical elements, comprising three key components: Surface, Cutout, and Behavior. These components are responsible for calculating ray-object collisions and determining the subsequent interactions of the ray, such as reflection or absorption. The primary application of RAYX-CORE is to enable the precise tracing of synchrotron radiation in beamlines associated with electron storage rings.
+
+In terms of computational resources, RAYX utilizes the parallel processing capabilities of GPUs, facilitated through the Vulkan API. This approach allows for efficient and accurate ray tracing. For systems without GPU support, RAYX provides an alternative CPU-based tracing option to maintain compatibility across diverse hardware configurations.
+
+Further enhancing the project's capabilities, RAYX-UI has been introduced as a real-time rendering interface built upon RAYX-CORE. This interface provides immediate visual feedback on the interactions between rays and optical elements, serving as a valuable tool for adjusting element positions. While initially conceived as a debugging utility, the long-term objective for RAYX-UI is its development into a full-fledged 3D design tool for beamline construction and customization.
