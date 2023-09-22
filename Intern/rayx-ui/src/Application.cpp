@@ -11,6 +11,7 @@
 #include "RenderSystem/TriangleRenderSystem.h"
 #include "Triangulation/Triangulate.h"
 #include "UserInput.h"
+#include "Writer/CSVWriter.h"
 #include "Writer/H5Writer.h"
 
 // --------- Start of Application code --------- //
@@ -31,7 +32,11 @@ void Application::run() {
     // Get the render data
     std::string path = "METRIX_U41_G1_H1_318eV_PS_MLearn_v114";
     RAYX::Beamline beamline = RAYX::importBeamline(path + ".rml");
+#ifndef NO_H5
     RAYX::BundleHistory bundleHist = raysFromH5(std::string(path + ".h5"), FULL_FORMAT);
+#else  // Hack until alternative for csv is implemented
+    RAYX::BundleHistory bundleHist = loadCSV(std::string(path + ".csv"));
+#endif
 
     // Triangulate the render data and update the scene
     std::vector<RenderObject> rObjects = triangulateObjects(beamline.m_OpticalElements, true);
