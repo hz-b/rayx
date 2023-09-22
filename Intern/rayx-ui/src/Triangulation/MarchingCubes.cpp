@@ -3,6 +3,12 @@
 #include "Colors.h"
 #include "Debug/Debug.h"
 
+namespace RAYX {
+namespace CPU_TRACER {
+bool RAYX_API inCutout(Cutout cutout, double x1, double x2);
+}  // namespace CPU_TRACER
+}  // namespace RAYX
+
 std::vector<RenderObject> marchingCubeTriangulation(const std::vector<RAYX::OpticalElement>& elements) {
     std::vector<RenderObject> objects;
 
@@ -54,9 +60,13 @@ std::vector<Triangle> trianglesFromQuadric(const double* quadric, Cutout cutout)
     for (int x = 0; x < GRIDSIZE - 1; x++) {
         for (int y = 0; y < GRIDSIZE - 1; y++) {
             for (int z = 0; z < GRIDSIZE - 1; z++) {
-                int caseIndex = determineMarchingCubesCase(scalarGrid, x, y, z);
-                std::vector<Triangle> voxelTriangles = lookupTrianglesForCase(caseIndex, scalarGrid, x, y, z, scale);
-                triangles.insert(triangles.end(), voxelTriangles.begin(), voxelTriangles.end());
+                double realX = ((double(x) / GRIDSIZE) - 0.5) * bounding_box.x;
+                double realZ = ((double(z) / GRIDSIZE) - 0.5) * bounding_box.y;
+                if (RAYX::CPU_TRACER::inCutout(cutout, realX, realZ)) {
+                    int caseIndex = determineMarchingCubesCase(scalarGrid, x, y, z);
+                    std::vector<Triangle> voxelTriangles = lookupTrianglesForCase(caseIndex, scalarGrid, x, y, z, scale);
+                    triangles.insert(triangles.end(), voxelTriangles.begin(), voxelTriangles.end());
+                }
             }
         }
     }

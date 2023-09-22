@@ -8,13 +8,6 @@
 
 #define GRIDSIZE 10
 
-namespace RAYX {
-namespace CPU_Tracer {
-#include "Shared/Cutout.h"
-bool inCutout(Cutout cutout, double x1, double x2);
-}  // namespace CPU_Tracer
-}  // namespace RAYX
-
 // Marching Cubes
 std::vector<RenderObject> marchingCubeTriangulation(const std::vector<RAYX::OpticalElement>& elements);
 std::vector<Triangle> trianglesFromQuadric(const double* quadric, Cutout cutout);  // TODO: make nicer
