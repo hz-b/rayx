@@ -1,39 +1,35 @@
 #pragma once
 
 #include <list>
+
 #include "Beamline/LightSource.h"
-
-
 
 namespace RAYX {
 
-
-struct PsiAndStokes{
+struct PsiAndStokes {
     glm::dvec4 stokes;
-    double psi; 
+    double psi;
 };
-
 
 class RAYX_API DipoleSource : public LightSource {
   public:
     DipoleSource(const DesignObject&);
     virtual ~DipoleSource() = default;
 
-
     std::vector<Ray> getRays(int thread_count = 1) const override;
 
-    //calculate Ray-Information
-    glm::dvec3 getXYZPosition(double)const;
+    // calculate Ray-Information
+    glm::dvec3 getXYZPosition(double) const;
     double getEnergy() const;
     PsiAndStokes getPsiandStokes(double) const;
 
-    //support functions
+    // support functions
     double schwinger(double) const;
     double vDivergence(double hv, double sigv) const;
     double getNormalFromRange(double range) const;
     double bessel(double hnue, double zeta) const;
 
-    //secondary support functions
+    // secondary support functions
     void setMaxFlux();
     void setLogInterpolation();
     double getInterpolation(double) const;
@@ -44,7 +40,6 @@ class RAYX_API DipoleSource : public LightSource {
     void calcHorDivDegSec();  // horizontal Divergence as degree and seconds
     void calcPhotonWavelength();
     void calcFluxOrg();
-
 
   private:
     // Geometric Params
@@ -78,11 +73,11 @@ class RAYX_API DipoleSource : public LightSource {
     double m_maxFlux;
     double m_maxIntensity;
 
-    //support functions
+    // support functions
     glm::dvec4 getStokesSyn(double hv, double psi1, double psi2) const;
     PsiAndStokes dipoleFold(double psi, double hv, double sigpsi) const;
 
-    // get the Energydistribution with arrays of the functioncurve 
+    // get the Energydistribution with arrays of the functioncurve
     // H. Winick, S. Doniach, Synchrotron Radiation Research P.23f (y) and (G0(y))
     std::array<double, 59> m_schwingerX = {1.e-4, 1.e-3, 2.e-3, 4.e-3, 6.e-3, 8.e-3, 1.e-2, 2.e-2, 3.e-2, 4.e-2, 5.e-2, 6.e-2, 7.e-2, 8.e-2, 9.e-2,
                                            1.e-1, 0.15,  0.2,   0.25,  0.3,   0.35,  0.4,   0.45,  0.5,   0.55,  0.6,   0.65,  0.7,   0.75,  0.8,
@@ -95,8 +90,6 @@ class RAYX_API DipoleSource : public LightSource {
                                            8.465e-1, 7.74e-1,  6.514e-1, 4.359e-1, 3.004e-1, 2.113e-1, 1.508e-1, 1.089e-1, 7.926e-2, 5.811e-2,
                                            4.286e-2, 3.175e-2, 2.362e-2, 1.764e-2, 1.321e-2, 9.915e-3, 7.461e-3, 5.626e-3, 4.25e-3,  2.436e-3,
                                            1.404e-3, 8.131e-4, 4.842e-4, 2.755e-4, 1.611e-4, 9.439e-5, 5.543e-5, 3.262e-5, 1.922e-5};
-
 };
 
 }  // namespace RAYX
-

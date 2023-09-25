@@ -13,7 +13,7 @@ Cutout mkOpeningCutout(const DesignObject& dobj) {
             .m_size_x1 = dobj.parseOpeningWidth(),
             .m_size_x2 = dobj.parseOpeningHeight(),
         });
-    } else if (shape == CTYPE_ELLIPTICAL) { // elliptical
+    } else if (shape == CTYPE_ELLIPTICAL) {  // elliptical
         return serializeElliptical({
             .m_diameter_x1 = dobj.parseOpeningWidth(),
             .m_diameter_x2 = dobj.parseOpeningHeight(),

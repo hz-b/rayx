@@ -12,8 +12,7 @@ using uint = unsigned int;
 
 namespace RAYX {
 
-BundleHistory Tracer::trace(const Beamline& b, bool sequential, uint64_t max_batch_size, int thread_count)
- {
+BundleHistory Tracer::trace(const Beamline& b, bool sequential, uint64_t max_batch_size, int thread_count) {
     RAYX_PROFILE_FUNCTION_STDOUT();
 
     std::vector<Ray> rays;
@@ -50,8 +49,11 @@ BundleHistory Tracer::trace(const Beamline& b, bool sequential, uint64_t max_bat
             .m_elements = elements,
         };
 
-        PushConstants pushConsants = {
-            .rayIdStart = (double)rayIdStart, .numRays = (double)rays.size(), .randomSeed = randomSeed, .maxEvents = (double)maxEvents, .sequential = (double)sequential};
+        PushConstants pushConsants = {.rayIdStart = (double)rayIdStart,
+                                      .numRays = (double)rays.size(),
+                                      .randomSeed = randomSeed,
+                                      .maxEvents = (double)maxEvents,
+                                      .sequential = (double)sequential};
         setPushConstants(&pushConsants);
 
         RayHistory rawBatchHistory;

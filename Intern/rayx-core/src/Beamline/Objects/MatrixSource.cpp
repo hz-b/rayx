@@ -24,7 +24,7 @@ MatrixSource::MatrixSource(const DesignObject& dobj) : LightSource(dobj) {
  */
 std::vector<Ray> MatrixSource::getRays(int thread_count) const {
     RAYX_PROFILE_FUNCTION();
-    
+
     double x, y, z, psi, phi,
         en;  // x,y,z pos, psi,phi direction cosines, en=energy
     int rmat = int(sqrt(m_numberOfRays));
@@ -61,7 +61,6 @@ std::vector<Ray> MatrixSource::getRays(int thread_count) const {
             // Ray(1, 2, 3, 7, 4, 5, 6, 8, 9, 10, 11, 12, 13, 14, 15, 16);
 
             returnList.push_back(r);
-
         }
     }
     // afterwards start from the beginning again

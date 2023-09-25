@@ -64,7 +64,6 @@ class RAYX_API LightSource {
   private:
     // User/Design Parameter
     Misalignment m_misalignmentParams;  // x, y, psi, phi
-
 };
 
 }  // namespace RAYX

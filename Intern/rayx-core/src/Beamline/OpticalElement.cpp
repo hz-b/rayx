@@ -95,7 +95,7 @@ Element makeElement(const DesignObject& dobj, Behaviour behaviour, Surface surfa
         cutout = dobj.parseCutout(planeDir);
     }
 
-    return Element {
+    return Element{
         .m_inTrans = defaultInMatrix(dobj),
         .m_outTrans = defaultOutMatrix(dobj),
         .m_behaviour = behaviour,
