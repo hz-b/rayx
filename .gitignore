@@ -7,6 +7,7 @@ build/
 Intern/rayx-core/doc/*/
 Intern/rayx-core/tests/output/**
 out/
+Scripts/dipoleRmls/
 
 # Files
 *.user
@@ -26,3 +27,5 @@ cmake.check_cache
 
 #VSCode Debugger files
 results.json
+Scripts/dipole_bench.py
+check-coverage.py
