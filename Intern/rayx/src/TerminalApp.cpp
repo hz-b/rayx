@@ -5,12 +5,12 @@
 #include <stdexcept>
 
 #include "CanonicalizePath.h"
+#include "Data/Importer.h"
 #include "Debug/Debug.h"
 #include "Random.h"
 #include "Tracer/CpuTracer.h"
 #include "Tracer/VulkanTracer.h"
 #include "Writer/Writer.h"
-#include "Data/Importer.h"
 
 TerminalApp::TerminalApp(int argc, char** argv) : m_argv(argv), m_argc(argc) {
     RAYX_VERB << "TerminalApp created!";
@@ -119,7 +119,7 @@ void TerminalApp::run() {
         RAYX_VERB << "Starting in Benchmark Mode.\n";
         RAYX::BENCH_FLAG = true;
     }
-    
+
     /////////////////// Argument treatement
     if (m_CommandParser->m_args.m_version) {
         m_CommandParser->getVersion();

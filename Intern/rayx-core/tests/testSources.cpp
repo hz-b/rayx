@@ -1,5 +1,7 @@
 #include <fstream>
 
+#include <fstream>
+
 #include "setupTests.h"
 
 void checkEnergyDistribution(const std::vector<Ray>& rays, double photonEnergy, double energySpread) {
@@ -104,7 +106,7 @@ TEST_F(TestSuite, testInterpolationFunctionDipole) {
     auto* dipoleSource = dynamic_cast<DipoleSource*>(&*src);
 
     for (auto values : inouts) {
-        auto result = dipoleSource->getInterpolation(values.in);
+        auto result = dipolesource->getInterpolation(values.in);
         CHECK_EQ(result, values.out, 0.01);
     }
 }
@@ -150,7 +152,7 @@ TEST_F(TestSuite, testLightsourceGetters) {
         .averagePhotonEnergy = 120.97,
     }};
 
-    for (const auto& values : rmlinputs) {
+    for (auto values : rmlinputs) {
         auto beamline = loadBeamline(values.rmlFile);
         std::shared_ptr<LightSource> src = beamline.m_LightSources[0];
         auto* lightSource = dynamic_cast<LightSource*>(&*src);

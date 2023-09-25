@@ -19,10 +19,9 @@ TEST_F(TestSuite, loadDatFile2) {
     auto b = loadBeamline("loadDatFile2");
     CHECK_EQ(b.m_LightSources.size(), 1);
     CHECK_EQ(b.m_OpticalElements.size(), 1);
-    CHECK_EQ(b.m_LightSources[0]->m_EnergyDistribution.getAverage(), 100, 0.1); //TODO value needs to be confirmed
-    CHECK_EQ(b.m_LightSources[0]->m_EnergyDistribution.selectEnergy(), 100, 0.1); //TODO value needs to be confirmed
+    CHECK_EQ(b.m_LightSources[0]->m_EnergyDistribution.getAverage(), 100, 0.1);    // TODO value needs to be confirmed
+    CHECK_EQ(b.m_LightSources[0]->m_EnergyDistribution.selectEnergy(), 100, 0.1);  // TODO value needs to be confirmed
 }
-
 
 TEST_F(TestSuite, loadGroups) {
     auto b = loadBeamline("loadGroups");
