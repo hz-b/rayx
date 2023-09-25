@@ -9,8 +9,13 @@ Beamline::Beamline() = default;
 Beamline::~Beamline() = default;
 
 std::vector<Ray> Beamline::getInputRays(int thread_count) const {
-    RAYX_PROFILE_FUNCTION();
-    std::vector<Ray> list;
+    RAYX_PROFILE_FUNCTION_STDOUT();
+
+    if (m_LightSources.size() == 0) {
+        return {};
+    }
+
+    // count number of rays.
     uint32_t raycount = 0;
     for (const auto& s : m_LightSources) {
         raycount += s->m_numberOfRays;
