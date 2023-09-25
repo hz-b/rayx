@@ -64,7 +64,7 @@ void TerminalApp::tracePath(const std::filesystem::path& path) {
         }
 
         // Run rayx core
-        auto rays = m_Tracer->trace(*m_Beamline, m_CommandParser->m_args.m_sequential, max_batch_size);
+        auto rays = m_Tracer->trace(*m_Beamline, m_CommandParser->m_args.m_sequential, max_batch_size, m_CommandParser->m_args.m_setThreads);
 
         // Export Rays to external data.
         auto file = exportRays(rays, path.string());
@@ -120,6 +120,7 @@ void TerminalApp::run() {
         RAYX_VERB << "Starting in Benchmark Mode.\n";
         RAYX::BENCH_FLAG = true;
     }
+    
     /////////////////// Argument treatement
     if (m_CommandParser->m_args.m_version) {
         m_CommandParser->getVersion();
