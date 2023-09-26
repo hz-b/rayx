@@ -2,6 +2,9 @@
 
 #include <cmath>
 
+#include "EnergyDistribution.h"
+
+
 namespace RAYX {
 LightSource::LightSource(const DesignObject& dobj) {
     m_name = dobj.name();

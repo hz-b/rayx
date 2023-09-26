@@ -34,7 +34,7 @@ struct DatFile {
     [[maybe_unused]] std::string dump();
 
     /** samples from the distribution given by the .DAT file */
-    double selectEnergy(bool continuous) const;
+    double selectEnergy() const;
 
     /** yields the expected value of the underlying distribution */
     double getAverage() const;
