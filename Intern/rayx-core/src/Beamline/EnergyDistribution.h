@@ -39,6 +39,19 @@ struct RAYX_API SeperateEnergies {
     double getAverage() const;
 };
 
+struct RAYX_API SeperateEnergies{
+
+  double m_centerEnergy;
+  double m_energySpread;
+  int m_numberOfEnergies;
+
+  SeperateEnergies(double centerEnergy, double energySpread, int numberOfEnergies);
+
+  double selectEnergy() const;
+  double getAverage() const;
+
+};
+
 /**
  * The class EnergyDistribution is contained in LightSources to describe the
  * mathematical distribution from which the energy of the rays are sampled. It
@@ -60,6 +73,7 @@ class RAYX_API EnergyDistribution {
     double selectEnergy() const;
     /** yields the expected value of the distribution */
     double getAverage() const;
+    
 
   private:
     /** stores either a DatFile or an HardEdge, depending on the constructor
