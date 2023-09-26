@@ -283,8 +283,6 @@ bool paramEnergyDistribution(const rapidxml::xml_node<>* node, const std::filesy
     }
     auto spreadType = static_cast<SpreadType>(spreadType_int);
 
-    bool continuous = spreadType == SpreadType::WhiteBand;
-
     if (energyDistributionType == EnergyDistributionType::File) {
         const char* filename;
         if (!xml::paramStr(node, "photonEnergyDistributionFile", &filename)) {
@@ -299,9 +297,9 @@ bool paramEnergyDistribution(const rapidxml::xml_node<>* node, const std::filesy
             return false;
         }
 
-        *out = EnergyDistribution(df, continuous);
-
+        *out = EnergyDistribution(df);
         return true;
+
     } else if (energyDistributionType == EnergyDistributionType::Values) {
         double photonEnergy;
         if (!xml::paramDouble(node, "photonEnergy", &photonEnergy)) {
@@ -313,7 +311,27 @@ bool paramEnergyDistribution(const rapidxml::xml_node<>* node, const std::filesy
             return false;
         }
 
-        *out = EnergyDistribution(EnergyRange(photonEnergy, energySpread), continuous);
+        /**
+         * a different output is set for all Energy Distribution Types
+         *  
+         * default: 0:HardEdge(WhiteBand)
+         *          1:SoftEdge(Energyspread = sigma)
+         *          2:SeperateEnergies
+        */
+        if ((spreadType == SpreadType::SoftEdge)) {
+            if (energySpread == 0) {energySpread = 1;}
+            *out = EnergyDistribution(SoftEdge(photonEnergy, energySpread));
+            
+        } else if (spreadType == SpreadType::ThreeEnergies) {
+            int numOfEnergies; 
+            if (!xml::paramInt(node, "SeperateEnergies", &numOfEnergies)) {
+                std::cout << "No Number for Seperate Energies in RML File" << std::endl;
+                numOfEnergies = 3;
+            }
+            *out = EnergyDistribution(SeperateEnergies(photonEnergy, energySpread, numOfEnergies));
+        } else {
+            *out = EnergyDistribution(HardEdge(photonEnergy, energySpread));
+        }
 
         return true;
     } else {
