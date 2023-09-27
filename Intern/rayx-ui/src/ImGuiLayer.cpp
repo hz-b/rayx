@@ -1,5 +1,6 @@
 #include "ImGuiLayer.h"
 
+#include <ImGuiFileDialog.h>
 #include <imgui_impl_glfw.h>
 #include <imgui_impl_vulkan.h>
 
@@ -136,15 +137,34 @@ ImGuiLayer::~ImGuiLayer() {
     ImGui::DestroyContext();
 }
 
-void ImGuiLayer::updateImGui(CameraController& camController, float frameTime) {
+void ImGuiLayer::updateImGui(CameraController& camController, FrameInfo& frameInfo) {
     ImGui_ImplVulkan_NewFrame();
     ImGui_ImplGlfw_NewFrame();
     ImGui::NewFrame();
 
-    // 1. Show the big demo window (Most of the sample code is in ImGui::ShowDemoWindow()! You can browse its code to learn more about Dear ImGui!).
-    if (m_ShowDemoWindow) ImGui::ShowDemoWindow(&m_ShowDemoWindow);
+    // Check ImGui dialog open condition
+    if (ImGui::Button("Open File Dialog")) {
+        ImGuiFileDialog::Instance()->OpenDialog("ChooseFileDlgKey", "Choose Beamline (rml) File", ".rml\0", ".");
+    }
 
-    // 2. Show a simple window that we create ourselves. We use a Begin/End pair to create a named window.
+    // Display file dialog
+    if (ImGuiFileDialog::Instance()->Display("ChooseFileDlgKey")) {
+        if (ImGuiFileDialog::Instance()->IsOk()) {
+            std::string filePathName = ImGuiFileDialog::Instance()->GetFilePathName();
+            std::string extension = ImGuiFileDialog::Instance()->GetCurrentFilter();
+
+            frameInfo.rmlPath = filePathName;
+#ifdef NO_H5
+            frameInfo.rayFilePath = filePathName.substr(0, filePathName.find_last_of(".")) + ".csv";
+#else
+            frameInfo.rayFilePath = filePathName.substr(0, filePathName.find_last_of(".")) + ".h5";
+#endif
+            frameInfo.wasPathUpdated = true;
+        }
+        ImGuiFileDialog::Instance()->Close();
+    }
+
+    // Main window
     {
         static int counter = 0;
 
@@ -210,7 +230,7 @@ void ImGuiLayer::updateImGui(CameraController& camController, float frameTime) {
         ImGui::SameLine();
         ImGui::Text("counter = %d", counter);
 
-        ImGui::Text("Application average %.6f ms/frame", frameTime);
+        ImGui::Text("Application average %.6f ms/frame", frameInfo.frameTime);
         ImGui::End();
     }
 

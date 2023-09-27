@@ -20,13 +20,22 @@ class Scene {
 
   public:
     Scene(Device& device);
+    Scene(Device& device, const std::vector<RenderObject>& rObjects, const std::vector<Line>& rays);
     ~Scene() = default;
 
     Scene(const Scene&) = delete;
     Scene& operator=(const Scene&) = delete;
 
-    // Base functions
-    void update(const std::vector<RenderObject>& rObjects, const std::vector<Line>& rays);
+    Scene& operator=(Scene&& other) {
+        if (this != &other) {
+            m_vertices = std::move(other.m_vertices);
+            m_indices = std::move(other.m_indices);
+            m_vertexBuffer = std::move(other.m_vertexBuffer);
+            m_indexBuffers = std::move(other.m_indexBuffers);
+        }
+        return *this;
+    }
+    Scene(Scene&& other) : m_Device(other.m_Device) { *this = std::move(other); }
 
     // Buffers and drawing
     void updateBuffers();

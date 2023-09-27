@@ -2,6 +2,8 @@
 
 #include <vulkan/vulkan.h>
 
+#include <string>
+
 #include "Camera.h"
 
 struct FrameInfo {
@@ -10,4 +12,7 @@ struct FrameInfo {
     VkCommandBuffer commandBuffer;
     Camera& camera;
     VkDescriptorSet descriptorSet;
+    bool wasPathUpdated;
+    std::string rmlPath;
+    std::string rayFilePath;
 };

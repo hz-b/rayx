@@ -2,9 +2,29 @@
 
 #include "Debug/Debug.h"
 
-Scene::Scene(Device& device) : m_Device(device) {}
+Scene::Scene(Device& device) : m_Device(device) {
+    // add temp triangle and for testing
+    std::vector<Vertex> vertices = {
+        {{0.0f, -0.5f, 0.0f, 1.0f}, {0.0f, 0.5f, 1.0f, 1.0f}},  //
+        {{0.5f, 0.5f, 0.0f, 1.0f}, {0.0f, 0.5f, 1.0f, 1.0f}},   //
+        {{-0.5f, 0.5f, 0.0f, 1.0f}, {0.0f, 0.5f, 1.0f, 1.0f}}   //
+    };
+    for (Vertex vertex : vertices) {
+        addVertex(vertex, TRIA_TOPOGRAPHY);
+    }
 
-void Scene::update(const std::vector<RenderObject>& rObjects, const std::vector<Line>& rays) {
+    Line line = {
+        .v1 = {{0.0f, 0.0f, 0.0f, 1.0f}, {0.0f, 0.5f, 1.0f, 1.0f}},  //
+        .v2 = {{0.5f, 0.0f, 0.0f, 1.0f}, {0.0f, 0.5f, 1.0f, 1.0f}}   //
+    };
+
+    addVertex(line.v1, LINE_TOPOGRAPHY);
+    addVertex(line.v2, LINE_TOPOGRAPHY);
+
+    updateBuffers();
+}
+
+Scene::Scene(Device& device, const std::vector<RenderObject>& rObjects, const std::vector<Line>& rays) : m_Device(device) {
     m_vertices.clear();
     m_indices[0].clear();
     m_indices[1].clear();

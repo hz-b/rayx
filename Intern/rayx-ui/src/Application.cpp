@@ -29,20 +29,6 @@ Application::Application(uint32_t width, uint32_t height, const char* name)
 Application::~Application() {}
 
 void Application::run() {
-    // Get the render data
-    std::string path = "METRIX_U41_G1_H1_318eV_PS_MLearn_v114";
-    RAYX::Beamline beamline = RAYX::importBeamline(path + ".rml");
-#ifndef NO_H5
-    RAYX::BundleHistory bundleHist = raysFromH5(std::string(path + ".h5"), FULL_FORMAT);
-#else  // Hack until alternative for csv is implemented
-    RAYX::BundleHistory bundleHist = loadCSV(std::string(path + ".csv"));
-#endif
-
-    // Triangulate the render data and update the scene
-    std::vector<RenderObject> rObjects = triangulateObjects(beamline.m_OpticalElements, true);
-    std::vector<Line> rays = getRays(bundleHist, beamline.m_OpticalElements);
-    m_Scene.update(rObjects, rays);
-
     // UBOs
     std::vector<std::unique_ptr<Buffer>> uboBuffers(SwapChain::MAX_FRAMES_IN_FLIGHT);
     for (int i = 0; i < uboBuffers.size(); i++) {
@@ -83,13 +69,29 @@ void Application::run() {
         auto newTime = std::chrono::high_resolution_clock::now();
         float frameTime = std::chrono::duration<float, std::chrono::seconds::period>(newTime - currentTime).count();
         currentTime = newTime;
-        // TODO: ImGui layer should not be in renderer class (maybe its own render system)
-        m_Renderer.updateImGui(camController, frameTime);
 
         if (auto commandBuffer = m_Renderer.beginFrame()) {
             uint32_t frameIndex = m_Renderer.getFrameIndex();
             camController.update(cam, m_Renderer.getAspectRatio());
             FrameInfo frameInfo{frameIndex, frameTime, commandBuffer, cam, descriptorSets[frameIndex]};
+            // TODO: ImGui layer should not be in renderer class (maybe its own render system)
+            m_Renderer.updateImGui(camController, frameInfo);
+
+            if (frameInfo.wasPathUpdated) {
+                // Get the render data
+                RAYX::Beamline beamline = RAYX::importBeamline(frameInfo.rmlPath);
+#ifndef NO_H5
+                RAYX::BundleHistory bundleHist = raysFromH5(frameInfo.rayFilePath, FULL_FORMAT);
+#else
+                RAYX::BundleHistory bundleHist = loadCSV(frameInfo.rayFilePath);
+#endif
+
+                // Triangulate the render data and update the scene
+                std::vector<RenderObject> rObjects = triangulateObjects(beamline.m_OpticalElements, true);
+                std::vector<Line> rays = getRays(bundleHist, beamline.m_OpticalElements);
+
+                m_Scene = std::move(Scene(m_Device, rObjects, rays));
+            }
 
             // Update ubo
             uboBuffers[frameIndex]->writeToBuffer(&cam);
