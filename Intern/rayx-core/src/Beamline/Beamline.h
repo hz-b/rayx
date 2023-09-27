@@ -5,8 +5,8 @@
 #include <memory>
 #include <vector>
 
-#include "Beamline/OpticalElement.h"
 #include "Beamline/LightSource.h"
+#include "Beamline/OpticalElement.h"
 #include "Core.h"
 #include "Shared/Ray.h"
 

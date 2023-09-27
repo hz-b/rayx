@@ -28,17 +28,15 @@ struct RAYX_API SoftEdge {
     double getAverage() const;
 };
 
-struct RAYX_API SeperateEnergies{
+struct RAYX_API SeperateEnergies {
+    double m_centerEnergy;
+    double m_energySpread;
+    int m_numberOfEnergies;
 
-  double m_centerEnergy;
-  double m_energySpread;
-  int m_numberOfEnergies;
+    SeperateEnergies(double centerEnergy, double energySpread, int numberOfEnergies);
 
-  SeperateEnergies(double centerEnergy, double energySpread, int numberOfEnergies);
-
-  double selectEnergy() const;
-  double getAverage() const;
-
+    double selectEnergy() const;
+    double getAverage() const;
 };
 
 /**
@@ -62,11 +60,8 @@ class RAYX_API EnergyDistribution {
     double selectEnergy() const;
     /** yields the expected value of the distribution */
     double getAverage() const;
-    
 
   private:
-
-    
     /** stores either a DatFile or an HardEdge, depending on the constructor
      * used to create this */
     std::variant<DatFile, HardEdge, SoftEdge, SeperateEnergies> m_Variant;
