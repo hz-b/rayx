@@ -1,9 +1,10 @@
 #include "EnergyDistribution.h"
+
 #include "LightSource.h"
 #include "Random.h"
 
 namespace RAYX {
-EnergyDistribution::EnergyDistribution(DatFile df) :  m_Variant(df) {}
+EnergyDistribution::EnergyDistribution(DatFile df) : m_Variant(df) {}
 
 EnergyDistribution::EnergyDistribution(HardEdge he) : m_Variant(he) {}
 
@@ -34,42 +35,35 @@ double EnergyDistribution::getAverage() const {
 
 HardEdge::HardEdge(double centerEnergy, double energySpread) : m_centerEnergy(centerEnergy), m_energySpread(energySpread) {}
 
-double HardEdge::selectEnergy() const {
-    return randomDoubleInRange(m_centerEnergy - m_energySpread / 2, m_centerEnergy + m_energySpread / 2);
-}
+double HardEdge::selectEnergy() const { return randomDoubleInRange(m_centerEnergy - m_energySpread / 2, m_centerEnergy + m_energySpread / 2); }
 
 double HardEdge::getAverage() const { return m_centerEnergy; }
 
-
-//SoftEdge impls
+// SoftEdge impls
 
 SoftEdge::SoftEdge(double centerEnergy, double sigma) : m_centerEnergy(centerEnergy), m_sigma(sigma) {}
 
-double SoftEdge::selectEnergy() const {
-    return randomNormal(m_centerEnergy, m_sigma);
-}
+double SoftEdge::selectEnergy() const { return randomNormal(m_centerEnergy, m_sigma); }
 
 double SoftEdge::getAverage() const { return m_centerEnergy; }
 
+// seperateEnergies impls
 
-//seperateEnergies impls
-
-SeperateEnergies::SeperateEnergies(double centerEnergy, double energySpread, int numOfEnergies) 
-                : m_centerEnergy(centerEnergy), m_energySpread(energySpread), m_numberOfEnergies(numOfEnergies) {}
-
+SeperateEnergies::SeperateEnergies(double centerEnergy, double energySpread, int numOfEnergies)
+    : m_centerEnergy(centerEnergy), m_energySpread(energySpread), m_numberOfEnergies(numOfEnergies) {}
 
 double SeperateEnergies::getAverage() const { return m_centerEnergy; }
 
-double SeperateEnergies::selectEnergy() const { 
-    
-    double arr[m_numberOfEnergies];
-
-    for (int i = 0; i < m_numberOfEnergies; i++) {
-        arr[i] = (m_centerEnergy - m_energySpread / 2) + i * m_energySpread / (m_numberOfEnergies - 1);
+double SeperateEnergies::selectEnergy() const {
+    // choose random spike from range of seperate energies
+    // from energyspread calculate energy for given spike
+    if (m_numberOfEnergies == 1) {
+        return m_centerEnergy;
     }
 
-    return arr[randomIntInRange(0, m_numberOfEnergies-1)];
+    int randomenergy = randomIntInRange(0, m_numberOfEnergies - 1);
+    double energy = (m_centerEnergy - m_energySpread / 2) + randomenergy * m_energySpread / (m_numberOfEnergies - 1);
 
-
+    return energy;
 }
 }  // namespace RAYX

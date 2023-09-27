@@ -70,11 +70,10 @@ bool DatFile::load(const std::filesystem::path& filename, DatFile* out) {
 }
 
 double DatFile::selectEnergy() const {
-
-    // runs either continuous Energydistribution from DataFile or just the specific energies 
+    // runs either continuous Energydistribution from DataFile or just the specific energies
     // provisionally set to true because EnergyDistibution ended support for this choice
     // TODO: Fanny find a way to get a choise for DataFile Distribution back
-    if (true) { 
+    if (false) {
         if (m_Lines.size() == 1) {  // weird edge case, which would crash the code below
             return m_Lines[0].m_energy;
         }
