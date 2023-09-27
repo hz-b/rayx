@@ -296,7 +296,7 @@ bool paramEnergyDistribution(const rapidxml::xml_node<>* node, const std::filesy
         if (!DatFile::load(path, &df)) {
             return false;
         }
-
+        df.m_continuous = (spreadType == SpreadType::SoftEdge? true : false);
         *out = EnergyDistribution(df);
         return true;
 
@@ -316,7 +316,7 @@ bool paramEnergyDistribution(const rapidxml::xml_node<>* node, const std::filesy
          *
          * default: 0:HardEdge(WhiteBand)
          *          1:SoftEdge(Energyspread = sigma)
-         *          2:SeperateEnergies
+         *          2:SeperateEnergies(Spikes)
          */
         if ((spreadType == SpreadType::SoftEdge)) {
             if (energySpread == 0) {
