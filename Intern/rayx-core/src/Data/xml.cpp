@@ -314,21 +314,24 @@ bool paramEnergyDistribution(const rapidxml::xml_node<>* node, const std::filesy
 
         /**
          * a different output is set for all Energy Distribution Types
-         *  
+         *
          * default: 0:HardEdge(WhiteBand)
          *          1:SoftEdge(Energyspread = sigma)
          *          2:SeperateEnergies
-        */
+         */
         if ((spreadType == SpreadType::SoftEdge)) {
-            if (energySpread == 0) {energySpread = 1;}
+            if (energySpread == 0) {
+                energySpread = 1;
+            }
             *out = EnergyDistribution(SoftEdge(photonEnergy, energySpread));
-            
+
         } else if (spreadType == SpreadType::ThreeEnergies) {
-            int numOfEnergies; 
+            int numOfEnergies;
             if (!xml::paramInt(node, "SeperateEnergies", &numOfEnergies)) {
                 std::cout << "No Number for Seperate Energies in RML File" << std::endl;
                 numOfEnergies = 3;
             }
+            numOfEnergies = abs(numOfEnergies);
             *out = EnergyDistribution(SeperateEnergies(photonEnergy, energySpread, numOfEnergies));
         } else {
             *out = EnergyDistribution(HardEdge(photonEnergy, energySpread));
@@ -619,6 +622,5 @@ double Parser::parseAdditionalOrder() const {
     paramDouble(node, "additionalOrder", &additionalZeroOrder);
     return additionalZeroOrder;
 }
-
 
 }  // namespace RAYX::xml
