@@ -324,7 +324,7 @@ bool paramEnergyDistribution(const rapidxml::xml_node<>* node, const std::filesy
          *
          * default: 0:HardEdge(WhiteBand)
          *          1:SoftEdge(Energyspread = sigma)
-         *          2:SeperateEnergies
+         *          2:SeperateEnergies(Spikes)
          */
         if ((spreadType == SpreadType::SoftEdge)) {
             if (energySpread == 0) {
