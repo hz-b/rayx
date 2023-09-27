@@ -4,20 +4,19 @@
 - [Introduction](./Introduction/01-Introduction.md)
     - [Getting Started](./Introduction/02-Getting-Started.md)
     - [RAYX Commands](./Introduction/03-How-to-use-rayx.md)
-    - [RAYX Commands](./Introduction/04-How-to-use-rayx-ui.md)
+    - [How to use RAYX-UI](./Introduction/04-How-to-use-rayx-ui.md)
     - [How to Build](./Introduction/05-How-to-build.md)
     - [Style Guide](./Introduction/06-Style-Guide.md)
     - [Literature](./Introduction/07-Literature.md)
 
 - [Model](./Model/Model.md)
-    - [Objects](./Model/Objects/Objects.md)
-        - [Reflection Zone Plate (RZP)](./Model/Objects/RZP.md)
+    - [Optical Elements](./Model/OpticalElements/OpticalElements.md)
+        - [Reflection Zone Plate (RZP)](./Model/OpticalElements/RZP.md)
     - [User vs Model Parameter](./Model/User-vs-Model-Parameter.md)
     - [Ray generation](./Model/Ray-generation.md)
     - [PRNGs on the GPU](./Model/PRNGs-on-the-GPU.md)
     - [Transformation between coordinate systems](./Model/Transformation-between-coordinate-systems.md)
     - [Quad(ric) Function](./Model/Quad(ric)-function.md)
-    - [Approximation of ray object intersection in the case of quadric surfaces](./Model/Approximation-of-ray-object-intersection-in-the-case-of-quadric-surfaces.md)
     - [Efficiency calculations](./Model/Efficiency.md)
 
 
