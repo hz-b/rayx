@@ -7,8 +7,8 @@
 
 namespace RAYX {
 
-glm::dmat4x4 defaultInMatrix(const DesignObject& dobj) { return calcTransformationMatrices(dobj.parsePosition(), dobj.parseOrientation(), true); }
-glm::dmat4x4 defaultOutMatrix(const DesignObject& dobj) { return calcTransformationMatrices(dobj.parsePosition(), dobj.parseOrientation(), false); }
+glm::mat4x4 defaultInMatrix(const DesignObject& dobj) { return calcTransformationMatrices(dobj.parsePosition(), dobj.parseOrientation(), true); }
+glm::mat4x4 defaultOutMatrix(const DesignObject& dobj) { return calcTransformationMatrices(dobj.parsePosition(), dobj.parseOrientation(), false); }
 
 /**
  * calculates element to world coordinates transformation matrix and its
@@ -20,20 +20,20 @@ glm::dmat4x4 defaultOutMatrix(const DesignObject& dobj) { return calcTransformat
  * @return the in or out matrix according to `calcInMatrix`
  */
 glm::mat4 calcTransformationMatrices(glm::vec4 position, glm::mat4 orientation, bool calcInMatrix) {
-    glm::dmat4x4 rotation =
-        glm::dmat4x4(orientation[0][0], orientation[0][1], orientation[0][2], 0.0, orientation[1][0], orientation[1][1], orientation[1][2], 0.0,
-                     orientation[2][0], orientation[2][1], orientation[2][2], 0.0, 0.0, 0.0, 0.0, 1.0);  // o
-    glm::dmat4x4 inv_rotation = glm::transpose(rotation);
+    glm::mat4x4 rotation =
+        glm::mat4x4(orientation[0][0], orientation[0][1], orientation[0][2], 0.0, orientation[1][0], orientation[1][1], orientation[1][2], 0.0,
+                    orientation[2][0], orientation[2][1], orientation[2][2], 0.0, 0.0, 0.0, 0.0, 1.0);  // o
+    glm::mat4x4 inv_rotation = glm::transpose(rotation);
 
     if (calcInMatrix) {
-        glm::dmat4x4 translation = glm::dmat4x4(1, 0, 0, -position[0], 0, 1, 0, -position[1], 0, 0, 1, -position[2], 0, 0, 0, 1);  // o
+        glm::mat4x4 translation = glm::mat4x4(1, 0, 0, -position[0], 0, 1, 0, -position[1], 0, 0, 1, -position[2], 0, 0, 0, 1);  // o
         // ray = tran * rot * ray
-        glm::dmat4x4 g2e = translation * rotation;
+        glm::mat4x4 g2e = translation * rotation;
         return glm::transpose(g2e);
     } else {
-        glm::dmat4x4 inv_translation = glm::dmat4x4(1, 0, 0, position[0], 0, 1, 0, position[1], 0, 0, 1, position[2], 0, 0, 0, 1);  // o
+        glm::mat4x4 inv_translation = glm::mat4x4(1, 0, 0, position[0], 0, 1, 0, position[1], 0, 0, 1, position[2], 0, 0, 0, 1);  // o
         // inverse of m_inMatrix
-        glm::dmat4x4 e2g = inv_rotation * inv_translation;
+        glm::mat4x4 e2g = inv_rotation * inv_translation;
         return glm::transpose(e2g);
     }
 }
@@ -95,7 +95,7 @@ Element makeElement(const DesignObject& dobj, Behaviour behaviour, Surface surfa
         cutout = dobj.parseCutout(planeDir);
     }
 
-    return Element {
+    return Element{
         .m_inTrans = defaultInMatrix(dobj),
         .m_outTrans = defaultOutMatrix(dobj),
         .m_behaviour = behaviour,

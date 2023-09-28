@@ -37,9 +37,9 @@ float Rad::sin() const { return std::sin(rad); }
 float Rad::cos() const { return std::cos(rad); }
 float Rad::tan() const { return std::tan(rad); }
 
-glm::dmat4x4 getRotationMatrix(float dpsi, float dphi, float dchi) {
+glm::mat4x4 getRotationMatrix(float dpsi, float dphi, float dchi) {
     RAYX_PROFILE_FUNCTION();
-    glm::dmat4x4 misalignmentMatrix = glm::dmat4x4(
+    glm::mat4x4 misalignmentMatrix = glm::mat4x4(
         cos(dphi) * cos(dchi), -cos(dpsi) * sin(dchi) - sin(dpsi) * sin(dphi) * cos(dchi), -sin(dpsi) * sin(dchi) + cos(dpsi) * sin(dphi) * cos(dchi),
         0, sin(dchi) * cos(dphi), cos(dpsi) * cos(dchi) - sin(dpsi) * sin(dphi) * sin(dchi),
         sin(dpsi) * cos(dchi) + cos(dpsi) * sin(dphi) * sin(dchi), 0, -sin(dphi), -sin(dpsi) * cos(dphi), cos(dpsi) * cos(dphi), 0, 0, 0, 0, 1);
@@ -85,14 +85,14 @@ void printDMat4(glm::mat4 matrix) {
     RAYX_D_LOG << s.str();
 }
 
-std::array<float, 4 * 4> glmToArray16(glm::dmat4x4 m) {
+std::array<float, 4 * 4> glmToArray16(glm::mat4x4 m) {
     std::array<float, 4 * 4> matrix = {m[0][0], m[0][1], m[0][2], m[0][3], m[1][0], m[1][1], m[1][2], m[1][3],
                                         m[2][0], m[2][1], m[2][2], m[2][3], m[3][0], m[3][1], m[3][2], m[3][3]};
     return matrix;
 }
 
-glm::dmat4x4 arrayToGlm16(std::array<float, 4 * 4> m) {
-    glm::dmat4x4 matrix = glm::dmat4x4(m[0], m[1], m[2], m[3], m[4], m[5], m[6], m[7], m[8], m[9], m[10], m[11], m[12], m[13], m[14], m[15]);
+glm::mat4x4 arrayToGlm16(std::array<float, 4 * 4> m) {
+    glm::mat4x4 matrix = glm::mat4x4(m[0], m[1], m[2], m[3], m[4], m[5], m[6], m[7], m[8], m[9], m[10], m[11], m[12], m[13], m[14], m[15]);
     return matrix;
 }
 
@@ -137,4 +137,4 @@ std::vector<float>::iterator movingAppend(std::vector<float>&& srcVector, std::v
  * @return true
  * @return false
  */
-bool isIdentMatrix(glm::dmat4x4 matrix) { return (matrix == glm::dmat4x4(1.0)); }
+bool isIdentMatrix(glm::mat4x4 matrix) { return (matrix == glm::mat4x4(1.0)); }

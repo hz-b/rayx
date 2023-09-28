@@ -35,7 +35,7 @@ TEST_F(TestSuite, groupTransform) {
     CHECK_EQ(b.m_LightSources.size(), 1);
     CHECK_EQ(b.m_OpticalElements.size(), 1);
     auto m = b.m_OpticalElements[0].m_element.m_inTrans;
-    glm::dmat4x4 correct = {
+    glm::mat4x4 correct = {
         1,   0,  0,     0,  //
         0,   0,  1,     0,  //
         0,   -1, 0,     0,  //
@@ -50,15 +50,15 @@ TEST_F(TestSuite, groupTransform) {
 //     auto b = loadBeamline("groupTransform2");
 //     CHECK_EQ(b.m_LightSources.size(), 1);
 //     CHECK_EQ(b.m_OpticalElements.size(), 1);
-//     glm::dmat4x4 groupOr = glm::dmat4x4(1, 0, 0, 0, 0, 0.985, -0.174, 0, 0, 0.174, 0.985, 0, 0, 0, 0, 1);
+//     glm::mat4x4 groupOr = glm::mat4x4(1, 0, 0, 0, 0, 0.985, -0.174, 0, 0, 0.174, 0.985, 0, 0, 0, 0, 1);
 //     glm::vec4 elementPos = glm::vec4(0, 0, 1000, 1);
 //     glm::vec4 groupPos = glm::vec4(42, 2, 4, 0);
-//     glm::dmat4x4 elementOr = glm::dmat4x4(1, 0, 0, 0, 0, 0.996, -0.087, 0, 0, 0.087, 0.996, 0, 0, 0, 0, 1);
+//     glm::mat4x4 elementOr = glm::mat4x4(1, 0, 0, 0, 0, 0.996, -0.087, 0, 0, 0.087, 0.996, 0, 0, 0, 0, 1);
 
-//     glm::dmat4x4 orientationCorrect = groupOr * elementOr;
+//     glm::mat4x4 orientationCorrect = groupOr * elementOr;
 //     glm::vec4 positionCorrect = groupPos + (groupOr * elementPos);
 
-//     glm::dmat4x4 orientationResult = b.m_OpticalElements[0].m_element.m_inTrans;
+//     glm::mat4x4 orientationResult = b.m_OpticalElements[0].m_element.m_inTrans;
 //     glm::vec4 positionResult = b.m_OpticalElements[0].m_element.m_inTrans * glm::vec4(0, 0, 0, 1);
 
 //     CHECK_EQ((orientationCorrect), (orientationResult));
@@ -71,14 +71,14 @@ TEST_F(TestSuite, groupTransformMisalignment) {
     CHECK_EQ(b.m_LightSources.size(), 1);
     CHECK_EQ(b.m_OpticalElements.size(), 1);
 
-    glm::dmat4x4 groupOr = glm::dmat4x4(1, 0, 0, 0, 0, 0.985, -0.174, 0, 0, 0.174, 0.985, 0, 0, 0, 0, 1);
+    glm::mat4x4 groupOr = glm::mat4x4(1, 0, 0, 0, 0, 0.985, -0.174, 0, 0, 0.174, 0.985, 0, 0, 0, 0, 1);
     printDMat4(groupOr);
 
     glm::vec4 groupPos = glm::vec4(42, 2, 4, 0);
     glm::vec4 elementPos = glm::vec4(0, 0, 1000, 1);
 
     glm::vec4 positionCorrect = groupPos + groupOr * elementPos;
-    glm::dmat4x4 orientationResult = b.m_OpticalElements[0]->getOrientation();
+    glm::mat4x4 orientationResult = b.m_OpticalElements[0]->getOrientation();
     printDMat4(orientationResult);
     glm::vec4 positionResult = b.m_OpticalElements[0]->getPosition();
 

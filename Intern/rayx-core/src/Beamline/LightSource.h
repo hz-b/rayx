@@ -58,7 +58,7 @@ class RAYX_API LightSource {
     float m_horDivergence;
     float m_verDivergence;
 
-    glm::dmat4x4 m_orientation = glm::dmat4x4();
+    glm::mat4x4 m_orientation = glm::mat4x4();
     glm::vec4 m_position = glm::vec4();
 
   private:

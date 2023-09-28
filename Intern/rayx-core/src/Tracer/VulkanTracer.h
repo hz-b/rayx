@@ -32,7 +32,7 @@ class RAYX_API VulkanTracer : public Tracer {
     // https://www.khronos.org/registry/OpenGL/extensions/ARB/ARB_uniform_buffer_object.txt
     // stf140 align rules (Stick to only 1 matrix for simplicity)
     struct debugBuffer_t {
-        glm::dmat4x4 _dMat;  // Set to identiy matrix in shader.
+        glm::mat4x4 _dMat;  // Set to identiy matrix in shader.
     };
     std::vector<debugBuffer_t> m_debugBufList;
 

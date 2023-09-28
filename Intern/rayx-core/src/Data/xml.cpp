@@ -168,7 +168,7 @@ bool paramPositionNoGroup(const rapidxml::xml_node<>* node, glm::vec4* out) {
     return true;
 }
 
-bool paramOrientationNoGroup(const rapidxml::xml_node<>* node, glm::dmat4x4* out) {
+bool paramOrientationNoGroup(const rapidxml::xml_node<>* node, glm::mat4x4* out) {
     if (!node || !out) {
         return false;
     }
@@ -352,7 +352,7 @@ bool paramSourcePulseType(const rapidxml::xml_node<>* node, SourcePulseType* out
 }
 
 bool paramPositionAndOrientation(const rapidxml::xml_node<>* node, const std::vector<xml::Group>& group_context, glm::vec4* out_pos,
-                                 glm::dmat4x4* out_ori) {
+                                 glm::mat4x4* out_ori) {
     Misalignment misalignment = {0, 0, 0, Rad(0), Rad(0), Rad(0)};
 
     // Always returns True!
@@ -365,7 +365,7 @@ bool paramPositionAndOrientation(const rapidxml::xml_node<>* node, const std::ve
 
     // This was the old approach: We remove the misalignment from the position&orientation to obtain the non-misaligned position&orientation.
 
-    // glm::dmat4x4 misOrientation = getRotationMatrix(-misalignment.m_rotationXerror.rad, misalignment.m_rotationYerror.rad,
+    // glm::mat4x4 misOrientation = getRotationMatrix(-misalignment.m_rotationXerror.rad, misalignment.m_rotationYerror.rad,
     // misalignment.m_rotationZerror.rad); glm::vec4 offset = glm::vec4(misalignment.m_translationXerror, misalignment.m_translationYerror,
     // misalignment.m_translationZerror, 1); *out_pos -= *out_ori * offset; *out_ori = *out_ori * glm::transpose(misOrientation); out_pos->w = 1;
 
@@ -403,7 +403,7 @@ bool paramMaterial(const rapidxml::xml_node<>* node, Material* out) {
 bool parseGroup(rapidxml::xml_node<>* node, xml::Group* out) {
     // default initialization
     out->m_position = glm::vec4(0, 0, 0, 1);
-    out->m_orientation = glm::dmat4x4();
+    out->m_orientation = glm::mat4x4();
 
     if (strcmp(node->name(), "group") != 0) {
         return false;
@@ -492,16 +492,16 @@ EnergyDistribution Parser::parseEnergyDistribution() const {
 
 glm::vec4 Parser::parsePosition() const {
     glm::vec4 x;
-    glm::dmat4x4 y;
+    glm::mat4x4 y;
     if (!paramPositionAndOrientation(node, group_context, &x, &y)) {
         RAYX_ERR << "parsePosition failed";
     }
     return x;
 }
 
-glm::dmat4x4 Parser::parseOrientation() const {
+glm::mat4x4 Parser::parseOrientation() const {
     glm::vec4 x;
-    glm::dmat4x4 y;
+    glm::mat4x4 y;
     if (!paramPositionAndOrientation(node, group_context, &x, &y)) {
         RAYX_ERR << "parseOrientation failed";
     }
@@ -532,7 +532,7 @@ Cutout Parser::parseCutout(PlaneDir plane) const {
             return parseTotalLength();
         } else {
             RAYX_ERR << "parseCutout encountered an invalid plane!";
-            return 0.0;
+            return 0.0f;
         }
     };
 
@@ -601,6 +601,5 @@ float Parser::parseAdditionalOrder() const {
     paramDouble(node, "additionalOrder", &additionalZeroOrder);
     return additionalZeroOrder;
 }
-
 
 }  // namespace RAYX::xml

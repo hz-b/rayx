@@ -36,15 +36,15 @@ struct Rad {
     float rad;
 };
 
-glm::dmat4x4 getRotationMatrix(float dpsi, float dphi, float dchi);
+glm::mat4x4 getRotationMatrix(float dpsi, float dphi, float dchi);
 
 void printDVec4(glm::vec4 vec);
 void RAYX_API printDMat4(glm::mat4 matrix);
 void printDMatrix(std::array<float, 4 * 4> matrix);
-bool RAYX_API isIdentMatrix(glm::dmat4x4 matrix);
+bool RAYX_API isIdentMatrix(glm::mat4x4 matrix);
 
-std::array<float, 4 * 4> glmToArray16(glm::dmat4x4 m);
-glm::dmat4x4 RAYX_API arrayToGlm16(std::array<float, 4 * 4> m);
+std::array<float, 4 * 4> glmToArray16(glm::mat4x4 m);
+glm::mat4x4 RAYX_API arrayToGlm16(std::array<float, 4 * 4> m);
 
 std::array<float, 4> glmToArray4(glm::vec4 v);
 glm::vec4 RAYX_API arrayToGlm4(std::array<float, 4> v);

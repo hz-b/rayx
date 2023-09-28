@@ -44,7 +44,7 @@ namespace xml {
 /** a representation of a <group>-tag used in parsing. */
 struct Group {
     glm::vec4 m_position;
-    glm::dmat4x4 m_orientation;
+    glm::mat4x4 m_orientation;
 };
 
 // These functions get a `paramname` argument and look for <param
@@ -60,7 +60,7 @@ bool paramDvec3(const rapidxml::xml_node<>* node, const char* paramname, glm::ve
 // multiple createFromXML functions.
 bool paramMisalignment(const rapidxml::xml_node<>* node, Misalignment* out);
 bool paramPositionNoGroup(const rapidxml::xml_node<>* node, glm::vec4* out);
-bool paramOrientationNoGroup(const rapidxml::xml_node<>* node, glm::dmat4x4* out);
+bool paramOrientationNoGroup(const rapidxml::xml_node<>* node, glm::mat4x4* out);
 bool paramSlopeError(const rapidxml::xml_node<>* node, SlopeError* out);
 bool paramVls(const rapidxml::xml_node<>* node, std::array<float, 6>* out);
 bool paramEnergyDistribution(const rapidxml::xml_node<>* node, const std::filesystem::path& rmlFile, EnergyDistribution* out);
@@ -69,7 +69,7 @@ bool paramElectronEnergyOrientation(const rapidxml::xml_node<>* node, ElectronEn
 bool paramSourcePulseType(const rapidxml::xml_node<>* node, SourcePulseType* out);
 
 bool paramPositionAndOrientation(const rapidxml::xml_node<>* node, const std::vector<xml::Group>& group_context, glm::vec4* out_pos,
-                                 glm::dmat4x4* out_ori);
+                                 glm::mat4x4* out_ori);
 bool paramMaterial(const rapidxml::xml_node<>* node, Material* out);
 
 /** node needs to be a <group>-tag, output will be written to `out`. */
@@ -96,7 +96,7 @@ struct Parser {
     std::array<float, 6> parseVls() const;
     EnergyDistribution parseEnergyDistribution() const;
     glm::vec4 parsePosition() const;
-    glm::dmat4x4 parseOrientation() const;
+    glm::mat4x4 parseOrientation() const;
     Material parseMaterial() const;
     Cutout parseCutout(PlaneDir) const;
     ElectronEnergyOrientation parseElectronEnergyOrientation() const;

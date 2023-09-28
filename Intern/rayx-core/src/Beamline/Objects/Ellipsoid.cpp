@@ -57,13 +57,13 @@ Element makeEllipsoid(const DesignObject& dobj) {
     // a11 from rml file
 
     auto tangentAngle = Rad(atan(mt));
-    auto a22 = pow(tangentAngle.cos(), 2) + pow(shortHalfAxisB * tangentAngle.sin() / longHalfAxisA, 2);
-    auto a23 = (pow(shortHalfAxisB, 2) - pow(longHalfAxisA, 2)) * tangentAngle.cos() * tangentAngle.sin() / pow(longHalfAxisA, 2);
+    float a22 = pow(tangentAngle.cos(), 2) + pow(shortHalfAxisB * tangentAngle.sin() / longHalfAxisA, 2);
+    float a23 = (pow(shortHalfAxisB, 2) - pow(longHalfAxisA, 2)) * tangentAngle.cos() * tangentAngle.sin() / pow(longHalfAxisA, 2);
 
-    auto a24 = pow(shortHalfAxisB / longHalfAxisA, 2) * z0 * tangentAngle.sin() + y0 * tangentAngle.cos();
-    auto a33 = pow(tangentAngle.sin(), 2) + pow(shortHalfAxisB * tangentAngle.cos() / longHalfAxisA, 2);
-    auto a34 = pow(shortHalfAxisB / longHalfAxisA, 2) * z0 * tangentAngle.cos() - y0 * tangentAngle.sin();
-    auto a44 = -pow(shortHalfAxisB, 2) + pow(y0, 2) + pow(z0 * shortHalfAxisB / longHalfAxisA, 2);
+    float a24 = pow(shortHalfAxisB / longHalfAxisA, 2) * z0 * tangentAngle.sin() + y0 * tangentAngle.cos();
+    float a33 = pow(tangentAngle.sin(), 2) + pow(shortHalfAxisB * tangentAngle.cos() / longHalfAxisA, 2);
+    float a34 = pow(shortHalfAxisB / longHalfAxisA, 2) * z0 * tangentAngle.cos() - y0 * tangentAngle.sin();
+    float a44 = -pow(shortHalfAxisB, 2) + pow(y0, 2) + pow(z0 * shortHalfAxisB / longHalfAxisA, 2);
 
     auto surface = serializeQuadric({
         .m_icurv = 1,
