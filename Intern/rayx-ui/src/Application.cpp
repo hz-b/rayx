@@ -65,6 +65,29 @@ void Application::run() {
     auto currentTime = std::chrono::high_resolution_clock::now();
     std::vector<RenderObject> rObjects;
     std::vector<Line> rays;
+
+    // Temporary triangle to render
+    std::vector<Vertex> vertices = {
+        {{0.0f, -0.5f, 0.0f, 1.0f}, {1.0f, 0.0f, 0.0f, 1.0f}},  //
+        {{0.5f, 0.5f, 0.0f, 1.0f}, {0.0f, 1.0f, 0.0f, 1.0f}},   //
+        {{-0.5f, 0.5f, 0.0f, 1.0f}, {0.0f, 0.0f, 1.0f, 1.0f}}   //
+    };
+    std::vector<uint32_t> indices = {0, 1, 2};
+    rObjects.emplace_back(std::move(RenderObject(m_Device, glm::mat4(1.0f), vertices, indices)));
+    // Add another one
+    vertices[0].pos = {0.5f, -0.5f, 0.5f, 1.0f};
+    rObjects.emplace_back(std::move(RenderObject(m_Device, glm::mat4(1.0f), vertices, indices)));
+    // Add another one
+    vertices[0].pos = {-0.5f, -0.5f, 0.5f, 1.0f};
+    rObjects.emplace_back(std::move(RenderObject(m_Device, glm::mat4(1.0f), vertices, indices)));
+
+    // Temporary ray to render
+    Line ray = {
+        {{0.0f, 0.0f, 0.0f, 1.0f}, {1.0f, 0.0f, 0.0f, 1.0f}},  //
+        {{0.0f, 0.0f, 1.0f, 1.0f}, {0.0f, 1.0f, 0.0f, 1.0f}}   //
+    };
+    rays.emplace_back(ray);
+
     while (!m_Window.shouldClose()) {
         glfwPollEvents();
 

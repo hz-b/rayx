@@ -57,7 +57,6 @@ void CameraController::updateDirectionViaMouse(double mouseX, double mouseY) {
 }
 
 void CameraController::update(Camera& cam, float aspectRatio) {
-    cam.model = glm::mat4(1.0f);
     cam.view = glm::lookAt(m_position, m_position + m_direction, m_up);
     cam.proj = glm::perspective(glm::radians(m_config.FOV), aspectRatio, m_config.near, m_config.far);
     cam.proj[1][1] *= -1;  // Vulkan has inverted Y coordinates
