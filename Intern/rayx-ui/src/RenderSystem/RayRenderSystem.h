@@ -3,6 +3,7 @@
 #include "FrameInfo.h"
 #include "GraphicsCore/Device.h"
 #include "GraphicsCore/GraphicsPipeline.h"
+#include "RenderObject.h"
 
 // std
 #include <memory>
@@ -17,7 +18,7 @@ class RayRenderSystem {
     RayRenderSystem(const RayRenderSystem&) = delete;
     RayRenderSystem& operator=(const RayRenderSystem&) = delete;
 
-    void render(FrameInfo& frameInfo, std::vector<Line> rays);
+    void render(FrameInfo& frameInfo, const std::optional<RenderObject>& renderObj);
 
   private:
     void createPipelineLayout(VkDescriptorSetLayout globalSetLayout);

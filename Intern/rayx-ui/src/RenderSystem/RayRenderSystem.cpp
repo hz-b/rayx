@@ -14,25 +14,15 @@ RayRenderSystem::RayRenderSystem(Device& device, VkRenderPass renderPass, VkDesc
 
 RayRenderSystem::~RayRenderSystem() { vkDestroyPipelineLayout(m_Device.device(), m_PipelineLayout, nullptr); }
 
-void RayRenderSystem::render(FrameInfo& frameInfo, std::vector<Line> rays) {
-    if (rays.empty()) return;
+void RayRenderSystem::render(FrameInfo& frameInfo, const std::optional<RenderObject>& renderObj) {
+    if (!renderObj.has_value()) return;
 
     m_Pipeline->bind(frameInfo.commandBuffer);
 
     vkCmdBindDescriptorSets(frameInfo.commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, m_PipelineLayout, 0, 1, &frameInfo.descriptorSet, 0, nullptr);
 
-    // Temporarily aggregate all vertices, then create a single RenderObject
-    std::vector<Vertex> vertices(rays.size() * 2);
-    std::vector<uint32_t> indices(rays.size() * 2);
-    for (uint32_t i = 0; i < rays.size(); ++i) {
-        vertices[i * 2] = rays[i].v1;
-        vertices[i * 2 + 1] = rays[i].v2;
-        indices[i * 2] = i * 2;
-        indices[i * 2 + 1] = i * 2 + 1;
-    }
-    RenderObject renderObj(m_Device, glm::mat4(1.0f), vertices, indices);
-    renderObj.bind(frameInfo.commandBuffer);
-    renderObj.draw(frameInfo.commandBuffer);
+    renderObj->bind(frameInfo.commandBuffer);
+    renderObj->draw(frameInfo.commandBuffer);
 }
 
 void RayRenderSystem::createPipelineLayout(VkDescriptorSetLayout globalSetLayout) {

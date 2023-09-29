@@ -65,28 +65,7 @@ void Application::run() {
     auto currentTime = std::chrono::high_resolution_clock::now();
     std::vector<RenderObject> rObjects;
     std::vector<Line> rays;
-
-    // Temporary triangle to render
-    std::vector<Vertex> vertices = {
-        {{0.0f, -0.5f, 0.0f, 1.0f}, {1.0f, 0.0f, 0.0f, 1.0f}},  //
-        {{0.5f, 0.5f, 0.0f, 1.0f}, {0.0f, 1.0f, 0.0f, 1.0f}},   //
-        {{-0.5f, 0.5f, 0.0f, 1.0f}, {0.0f, 0.0f, 1.0f, 1.0f}}   //
-    };
-    std::vector<uint32_t> indices = {0, 1, 2};
-    rObjects.emplace_back(std::move(RenderObject(m_Device, glm::mat4(1.0f), vertices, indices)));
-    // Add another one
-    vertices[0].pos = {0.5f, -0.5f, 0.5f, 1.0f};
-    rObjects.emplace_back(std::move(RenderObject(m_Device, glm::mat4(1.0f), vertices, indices)));
-    // Add another one
-    vertices[0].pos = {-0.5f, -0.5f, 0.5f, 1.0f};
-    rObjects.emplace_back(std::move(RenderObject(m_Device, glm::mat4(1.0f), vertices, indices)));
-
-    // Temporary ray to render
-    Line ray = {
-        {{0.0f, 0.0f, 0.0f, 1.0f}, {1.0f, 0.0f, 0.0f, 1.0f}},  //
-        {{0.0f, 0.0f, 1.0f, 1.0f}, {0.0f, 1.0f, 0.0f, 1.0f}}   //
-    };
-    rays.emplace_back(ray);
+    std::optional<RenderObject> rayObj;
 
     while (!m_Window.shouldClose()) {
         glfwPollEvents();
@@ -110,10 +89,24 @@ void Application::run() {
 #else
                 RAYX::BundleHistory bundleHist = loadCSV(frameInfo.rayFilePath);
 #endif
+                vkDeviceWaitIdle(m_Device.device());  // Hacky fix for now; should be some form of synchronization
 
                 // Triangulate the render data and update the scene
                 rObjects = triangulateObjects(beamline.m_OpticalElements, m_Device, true);
                 rays = getRays(bundleHist, beamline.m_OpticalElements);
+
+                if (rays.size() > 0) {
+                    // Temporarily aggregate all vertices, then create a single RenderObject
+                    std::vector<Vertex> rayVertices(rays.size() * 2);
+                    std::vector<uint32_t> rayIndices(rays.size() * 2);
+                    for (uint32_t i = 0; i < rays.size(); ++i) {
+                        rayVertices[i * 2] = rays[i].v1;
+                        rayVertices[i * 2 + 1] = rays[i].v2;
+                        rayIndices[i * 2] = i * 2;
+                        rayIndices[i * 2 + 1] = i * 2 + 1;
+                    }
+                    rayObj.emplace(m_Device, glm::mat4(1.0f), rayVertices, rayIndices);
+                }
             }
 
             // Update ubo
@@ -124,7 +117,8 @@ void Application::run() {
             m_Renderer.beginSwapChainRenderPass(commandBuffer);
 
             objectRenderSystem.render(frameInfo, rObjects);
-            rayRenderSystem.render(frameInfo, rays);
+
+            rayRenderSystem.render(frameInfo, rayObj);
 
             m_Renderer.endSwapChainRenderPass(commandBuffer);
             m_Renderer.endFrame();

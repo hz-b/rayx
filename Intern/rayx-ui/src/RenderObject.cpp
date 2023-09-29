@@ -15,7 +15,6 @@ void RenderObject::createVertexBuffers(const std::vector<Vertex>& vertices) {
                                               VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT);
     m_vertexBuffer->map();
     m_vertexBuffer->writeToBuffer(vertices.data());
-    m_vertexBuffer->unmap();
 }
 
 void RenderObject::createIndexBuffers(const std::vector<uint32_t>& indices) {
@@ -25,5 +24,4 @@ void RenderObject::createIndexBuffers(const std::vector<uint32_t>& indices) {
                                              VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT);
     m_indexBuffer->map();
     m_indexBuffer->writeToBuffer(indices.data());
-    m_indexBuffer->unmap();
 }
