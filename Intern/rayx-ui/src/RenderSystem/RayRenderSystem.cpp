@@ -1,23 +1,36 @@
-#include "LineRenderSystem.h"
+#include "RayRenderSystem.h"
 
-LineRenderSystem::LineRenderSystem(Device& device, Scene& scene, VkRenderPass renderPass, VkDescriptorSetLayout globalSetLayout)
-    : m_Device(device), m_Scene(scene) {
+#include "RenderObject.h"
+
+RayRenderSystem::RayRenderSystem(Device& device, VkRenderPass renderPass, VkDescriptorSetLayout globalSetLayout) : m_Device(device) {
     createPipelineLayout(globalSetLayout);
     createPipeline(renderPass);
 }
 
-LineRenderSystem::~LineRenderSystem() { vkDestroyPipelineLayout(m_Device.device(), m_PipelineLayout, nullptr); }
+RayRenderSystem::~RayRenderSystem() { vkDestroyPipelineLayout(m_Device.device(), m_PipelineLayout, nullptr); }
 
-void LineRenderSystem::render(FrameInfo& frameInfo) {
+void RayRenderSystem::render(FrameInfo& frameInfo, std::vector<Line> rays) {
+    if (rays.empty()) return;
+
     m_Pipeline->bind(frameInfo.commandBuffer);
 
     vkCmdBindDescriptorSets(frameInfo.commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, m_PipelineLayout, 0, 1, &frameInfo.descriptorSet, 0, nullptr);
 
-    m_Scene.bind(frameInfo.commandBuffer, Scene::Topography::LINE_TOPOGRAPHY);
-    m_Scene.draw(frameInfo.commandBuffer, Scene::Topography::LINE_TOPOGRAPHY);
+    // Temporarily aggregate all vertices, then create a single RenderObject
+    std::vector<Vertex> vertices(rays.size() * 2);
+    std::vector<uint32_t> indices(rays.size() * 2);
+    for (uint32_t i = 0; i < rays.size(); ++i) {
+        vertices[i * 2] = rays[i].v1;
+        vertices[i * 2 + 1] = rays[i].v2;
+        indices[i * 2] = i * 2;
+        indices[i * 2 + 1] = i * 2 + 1;
+    }
+    RenderObject renderObj(m_Device, glm::mat4(1.0f), vertices, indices);
+    renderObj.bind(frameInfo.commandBuffer);
+    renderObj.draw(frameInfo.commandBuffer);
 }
 
-void LineRenderSystem::createPipelineLayout(VkDescriptorSetLayout globalSetLayout) {
+void RayRenderSystem::createPipelineLayout(VkDescriptorSetLayout globalSetLayout) {
     std::vector<VkDescriptorSetLayout> descriptorSetLayouts{globalSetLayout};
 
     VkPipelineLayoutCreateInfo pipelineLayoutInfo{};
@@ -31,7 +44,7 @@ void LineRenderSystem::createPipelineLayout(VkDescriptorSetLayout globalSetLayou
     }
 }
 
-void LineRenderSystem::createPipeline(VkRenderPass renderPass) {
+void RayRenderSystem::createPipeline(VkRenderPass renderPass) {
     assert(m_PipelineLayout != nullptr && "Cannot create pipeline before pipeline layout");
 
     PipelineConfigInfo pipelineConfig{};

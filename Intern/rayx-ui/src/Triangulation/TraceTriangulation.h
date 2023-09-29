@@ -6,7 +6,7 @@
 #include "Beamline/OpticalElement.h"
 #include "RenderObject.h"
 
-std::vector<RenderObject> traceTriangulation(const std::vector<RAYX::OpticalElement>& elements);
+RenderObject traceTriangulation(const RAYX::OpticalElement& element, Device& device);
 
 // ------ Helper functions ------
 std::pair<double, double> getRectangularDimensions(const Cutout& cutout);

@@ -12,6 +12,7 @@ struct FrameInfo {
     VkCommandBuffer commandBuffer;
     Camera& camera;
     VkDescriptorSet descriptorSet;
+    // TODO: remove the following
     bool wasPathUpdated;
     std::string rmlPath;
     std::string rayFilePath;

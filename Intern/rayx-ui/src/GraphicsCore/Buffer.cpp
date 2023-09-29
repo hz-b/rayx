@@ -39,7 +39,7 @@ void Buffer::unmap() {
     }
 }
 
-void Buffer::writeToBuffer(void* data, VkDeviceSize size, VkDeviceSize offset) {
+void Buffer::writeToBuffer(const void* data, VkDeviceSize size, VkDeviceSize offset) {
     assert(m_mapped && "Cannot copy to unmapped buffer");
 
     if (size == VK_WHOLE_SIZE) {

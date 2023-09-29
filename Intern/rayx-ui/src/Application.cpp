@@ -7,8 +7,8 @@
 #include "GraphicsCore/Renderer.h"
 #include "GraphicsCore/Window.h"
 #include "RenderObject.h"
-#include "RenderSystem/LineRenderSystem.h"
-#include "RenderSystem/TriangleRenderSystem.h"
+#include "RenderSystem/ObjectRenderSystem.h"
+#include "RenderSystem/RayRenderSystem.h"
 #include "Triangulation/Triangulate.h"
 #include "UserInput.h"
 #include "Writer/CSVWriter.h"
@@ -16,10 +16,10 @@
 
 // --------- Start of Application code --------- //
 Application::Application(uint32_t width, uint32_t height, const char* name)
-    : m_Window(width, height, name),   //
-      m_Device(m_Window),              //
-      m_Renderer(m_Window, m_Device),  //
-      m_Scene(m_Device) {
+    : m_Window(width, height, name),  //
+      m_Device(m_Window),             //
+      m_Renderer(m_Window, m_Device)  //
+{
     m_DescriptorPool = DescriptorPool::Builder(m_Device)
                            .addPoolSize(VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, SwapChain::MAX_FRAMES_IN_FLIGHT)
                            .setMaxSets(SwapChain::MAX_FRAMES_IN_FLIGHT)
@@ -48,8 +48,8 @@ void Application::run() {
     }
 
     // Render systems
-    TriangleRenderSystem triangleRenderSystem(m_Device, m_Scene, m_Renderer.getSwapChainRenderPass(), setLayout->getDescriptorSetLayout());
-    LineRenderSystem lineRenderSystem(m_Device, m_Scene, m_Renderer.getSwapChainRenderPass(), setLayout->getDescriptorSetLayout());
+    ObjectRenderSystem objectRenderSystem(m_Device, m_Renderer.getSwapChainRenderPass(), setLayout->getDescriptorSetLayout());
+    RayRenderSystem rayRenderSystem(m_Device, m_Renderer.getSwapChainRenderPass(), setLayout->getDescriptorSetLayout());
 
     // Camera
     CameraController camController;
@@ -63,6 +63,8 @@ void Application::run() {
 
     // Main loop
     auto currentTime = std::chrono::high_resolution_clock::now();
+    std::vector<RenderObject> rObjects;
+    std::vector<Line> rays;
     while (!m_Window.shouldClose()) {
         glfwPollEvents();
 
@@ -87,10 +89,8 @@ void Application::run() {
 #endif
 
                 // Triangulate the render data and update the scene
-                std::vector<RenderObject> rObjects = triangulateObjects(beamline.m_OpticalElements, true);
-                std::vector<Line> rays = getRays(bundleHist, beamline.m_OpticalElements);
-
-                m_Scene = std::move(Scene(m_Device, rObjects, rays));
+                rObjects = triangulateObjects(beamline.m_OpticalElements, m_Device, true);
+                rays = getRays(bundleHist, beamline.m_OpticalElements);
             }
 
             // Update ubo
@@ -100,8 +100,8 @@ void Application::run() {
             // Render
             m_Renderer.beginSwapChainRenderPass(commandBuffer);
 
-            triangleRenderSystem.render(frameInfo);
-            lineRenderSystem.render(frameInfo);
+            objectRenderSystem.render(frameInfo, rObjects);
+            rayRenderSystem.render(frameInfo, rays);
 
             m_Renderer.endSwapChainRenderPass(commandBuffer);
             m_Renderer.endFrame();

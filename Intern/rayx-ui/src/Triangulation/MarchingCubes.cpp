@@ -2,6 +2,7 @@
 
 #include "Colors.h"
 #include "Debug/Debug.h"
+#include "MarchingCubeConstans.h"
 
 namespace RAYX {
 namespace CPU_TRACER {
@@ -9,20 +10,22 @@ bool RAYX_API inCutout(Cutout cutout, double x1, double x2);
 }  // namespace CPU_TRACER
 }  // namespace RAYX
 
-std::vector<RenderObject> marchingCubeTriangulation(const std::vector<RAYX::OpticalElement>& elements) {
-    std::vector<RenderObject> objects;
+RenderObject marchingCubeTriangulation(const RAYX::OpticalElement& element, Device& device) {
+    auto quadric = element.m_element.m_surface.m_params;
+    std::vector<Triangle> triangles = trianglesFromQuadric(quadric, element.m_element.m_cutout);
+    std::vector<Vertex> vertices;
+    std::vector<uint32_t> indices;
 
-    for (RAYX::OpticalElement element : elements) {
-        auto quadric = element.m_element.m_surface.m_params;
-        std::vector<Triangle> triangles = trianglesFromQuadric(quadric, element.m_element.m_cutout);
-        RenderObject object(glm::mat4(element.m_element.m_outTrans));
-        for (Triangle triangle : triangles) {
-            object.addTriangle(triangle);
-        }
-        objects.push_back(object);
+    for (uint32_t i = 0; i < triangles.size(); i++) {
+        vertices.push_back(triangles[i].v1);
+        vertices.push_back(triangles[i].v2);
+        vertices.push_back(triangles[i].v3);
+        indices.push_back(i * 3);
+        indices.push_back(i * 3 + 1);
+        indices.push_back(i * 3 + 2);
     }
 
-    return objects;
+    return RenderObject(device, element.m_element.m_outTrans, vertices, indices);
 }
 
 std::vector<Triangle> trianglesFromQuadric(const double* quadric, Cutout cutout) {

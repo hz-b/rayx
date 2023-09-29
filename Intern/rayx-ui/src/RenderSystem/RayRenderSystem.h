@@ -3,27 +3,27 @@
 #include "FrameInfo.h"
 #include "GraphicsCore/Device.h"
 #include "GraphicsCore/GraphicsPipeline.h"
-#include "Scene.h"
 
 // std
 #include <memory>
 
-class TriangleRenderSystem {
+struct Line;
+
+class RayRenderSystem {
   public:
-    TriangleRenderSystem(Device& device, Scene& scene, VkRenderPass renderPass, VkDescriptorSetLayout globalSetLayout);
-    ~TriangleRenderSystem();
+    RayRenderSystem(Device& device, VkRenderPass renderPass, VkDescriptorSetLayout globalSetLayout);
+    ~RayRenderSystem();
 
-    TriangleRenderSystem(const TriangleRenderSystem&) = delete;
-    TriangleRenderSystem& operator=(const TriangleRenderSystem&) = delete;
+    RayRenderSystem(const RayRenderSystem&) = delete;
+    RayRenderSystem& operator=(const RayRenderSystem&) = delete;
 
-    void render(FrameInfo& frameInfo);
+    void render(FrameInfo& frameInfo, std::vector<Line> rays);
 
   private:
     void createPipelineLayout(VkDescriptorSetLayout globalSetLayout);
     void createPipeline(VkRenderPass renderPass);
 
     Device& m_Device;
-    Scene& m_Scene;
 
     std::unique_ptr<GraphicsPipeline> m_Pipeline;
     VkPipelineLayout m_PipelineLayout;
