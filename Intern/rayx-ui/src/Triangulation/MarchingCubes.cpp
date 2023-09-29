@@ -10,6 +10,12 @@ bool RAYX_API inCutout(Cutout cutout, double x1, double x2);
 }  // namespace CPU_TRACER
 }  // namespace RAYX
 
+/**
+ * This function iterates through the provided optical elements, applying Marching Cubes triangulation
+ * to generate a set of RenderObjects. It extracts the quadric surface parameters and cutout from each
+ * element, computes the triangles representing the surface within the cutout, and creates a RenderObject
+ * for each set of triangles.
+ */
 RenderObject marchingCubeTriangulation(const RAYX::OpticalElement& element, Device& device) {
     auto quadric = element.m_element.m_surface.m_params;
     std::vector<Triangle> triangles = trianglesFromQuadric(quadric, element.m_element.m_cutout);
@@ -28,6 +34,13 @@ RenderObject marchingCubeTriangulation(const RAYX::OpticalElement& element, Devi
     return RenderObject(device, element.m_element.m_outTrans, vertices, indices);
 }
 
+/**
+ * This function performs the main steps of the Marching Cubes algorithm. It first initializes a 3D grid
+ * and samples the quadric surface within the cutout to generate scalar values at each grid point. Then,
+ * it marches through each voxel of the grid, checking if the voxel intersects the surface by using the
+ * inCutout function. If an intersection is found, it determines the case for the voxel using the lookup
+ * tables, generates the triangles for the case, and adds them to the triangle list.
+ */
 std::vector<Triangle> trianglesFromQuadric(const double* quadric, Cutout cutout) {
     // Define the size and resolution of the grid
     double scalarGrid[GRIDSIZE][GRIDSIZE][GRIDSIZE];
@@ -77,8 +90,13 @@ std::vector<Triangle> trianglesFromQuadric(const double* quadric, Cutout cutout)
     return triangles;
 }
 
+/**
+ * This function computes the value of the quadric surface at a specified position. It extracts the
+ * coefficients of the quadric from the provided surface parameters and applies the quadric formula
+ * to the position to compute the scalar value.
+ */
 double evaluateQuadricAtPosition(const double surface[16], const glm::vec4& pos) {
-    double icurv = surface[0];
+    // double icurv = surface[0];
     double a11 = surface[1];
     double a12 = surface[2];
     double a13 = surface[3];
@@ -95,13 +113,17 @@ double evaluateQuadricAtPosition(const double surface[16], const glm::vec4& pos)
     return result;
 }
 
+/**
+ * This function determines the case index for the Marching Cubes lookup tables based on the scalar values
+ * at the corners of the voxel. It checks the sign of the scalar value at each corner to determine if the
+ * corner is inside or outside the surface, and combines these results to produce a binary index, which is
+ * then converted to decimal to produce the case index.
+ */
 int determineMarchingCubesCase(const double scalarGrid[GRIDSIZE][GRIDSIZE][GRIDSIZE], int x, int y, int z) {
     // Based on the scalar values at the voxel corners, determine the index for the lookup tables.
     int cubeIndex = 0;
 
-    auto test = scalarGrid[x][y][z];
     if (scalarGrid[x][y][z] < 0) cubeIndex |= 1;
-    auto test2 = scalarGrid[x + 1][y][z];
     if (scalarGrid[x + 1][y][z] < 0) cubeIndex |= 2;
     if (scalarGrid[x + 1][y][z + 1] < 0) cubeIndex |= 4;
     if (scalarGrid[x][y][z + 1] < 0) cubeIndex |= 8;
@@ -113,6 +135,12 @@ int determineMarchingCubesCase(const double scalarGrid[GRIDSIZE][GRIDSIZE][GRIDS
     return cubeIndex;
 }
 
+/**
+ * This function generates the triangles for a specified case in the Marching Cubes algorithm. It uses the
+ * case index to look up the edges to be connected in the triTable, then computes the vertices for each
+ * triangle by interpolating along the edges. The vertices are colored based on a gradient, and the triangles
+ * are added to the triangle list.
+ */
 std::vector<Triangle> lookupTrianglesForCase(int caseIndex, const double scalarGrid[GRIDSIZE][GRIDSIZE][GRIDSIZE], int offsetX, int offsetY,
                                              int offsetZ, glm::vec3 scale) {
     // Using the triTable to generate the triangles for the voxel.
@@ -138,6 +166,10 @@ std::vector<Triangle> lookupTrianglesForCase(int caseIndex, const double scalarG
     return triangles;
 }
 
+/**
+ * This function returns the position of the specified corner within a voxel. It uses a predefined array
+ * of corner positions, checks for a valid corner index, and returns the corresponding position.
+ */
 glm::vec3 getPositionAtCorner(int cornerIndex) {
     glm::vec3 cornerPositions[8] = {
         glm::vec3(0, 0, 0),  // 0
@@ -155,6 +187,13 @@ glm::vec3 getPositionAtCorner(int cornerIndex) {
     }
     return cornerPositions[cornerIndex];
 }
+
+/**
+ * This function interpolates a vertex along the specified edge of a voxel. It uses the edge index to
+ * look up the corners of the edge, computes the interpolation parameter based on the scalar values at
+ * the corners, and computes the interpolated position along the edge. It then creates a Vertex object
+ * with the interpolated position.
+ */
 Vertex interpolateVertex(int edgeIndex, const double scalarGrid[GRIDSIZE][GRIDSIZE][GRIDSIZE], int offsetX, int offsetY, int offsetZ,
                          glm::vec3 scale) {
     int edgeToVertex[12][2] = {{0, 1}, {1, 2}, {2, 3}, {3, 0}, {4, 5}, {5, 6}, {6, 7}, {7, 4}, {0, 4}, {1, 5}, {2, 6}, {3, 7}};
@@ -188,6 +227,10 @@ Vertex interpolateVertex(int edgeIndex, const double scalarGrid[GRIDSIZE][GRIDSI
     return v;
 }
 
+/**
+ * This function retrieves the scalar value at the specified corner of the grid. It checks for a valid
+ * corner index and returns the corresponding scalar value from the scalar grid.
+ */
 double getScalarValueAtCorner(int x, int y, int z, const double scalarGrid[GRIDSIZE][GRIDSIZE][GRIDSIZE]) {
     if (x < 0 || x >= GRIDSIZE || y < 0 || y >= GRIDSIZE || z < 0 || z >= GRIDSIZE) {
         throw std::out_of_range("Invalid corner index");
