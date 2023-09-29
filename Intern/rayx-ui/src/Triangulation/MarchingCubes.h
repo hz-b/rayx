@@ -16,14 +16,13 @@
 RenderObject marchingCubeTriangulation(const RAYX::OpticalElement& element, Device& device);
 
 // ------ Helper functions ------
-std::vector<Triangle> trianglesFromQuadric(const double* quadric, Cutout cutout);  // TODO: make nicer
 /**
  * @brief Generates triangles from a given quadric surface and cutout.
  * @param quadric The coefficients of the quadric surface (double[16]).
  * @param cutout The cutout object that defines the region of interest.
  * @return A vector of Triangle, representing the triangulated portion of the quadric surface.
  */
-std::vector<Triangle> trianglesFromQuadric(const double* quadric, Cutout cutout);
+std::vector<Triangle> trianglesFromQuadric(const double* quadric, Cutout cutout);  // TODO: make nicer
 
 /**
  * @brief Computes the position of a vertex at a given corner index.

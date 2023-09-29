@@ -21,7 +21,6 @@ RenderObject marchingCubeTriangulation(const RAYX::OpticalElement& element, Devi
     std::vector<Triangle> triangles = trianglesFromQuadric(quadric, element.m_element.m_cutout);
     std::vector<Vertex> vertices;
     std::vector<uint32_t> indices;
-
     for (uint32_t i = 0; i < triangles.size(); i++) {
         vertices.push_back(triangles[i].v1);
         vertices.push_back(triangles[i].v2);
@@ -30,7 +29,6 @@ RenderObject marchingCubeTriangulation(const RAYX::OpticalElement& element, Devi
         indices.push_back(i * 3 + 1);
         indices.push_back(i * 3 + 2);
     }
-
     return RenderObject(device, element.m_element.m_outTrans, vertices, indices);
 }
 
