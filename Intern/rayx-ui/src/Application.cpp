@@ -89,7 +89,7 @@ void Application::run() {
 #else
                 RAYX::BundleHistory bundleHist = loadCSV(frameInfo.rayFilePath);
 #endif
-                vkDeviceWaitIdle(m_Device.device());  // Hacky fix for now; should be some form of synchronization
+                vkDeviceWaitIdle(m_Device.device());  // TODO(Jannis): Hacky fix for now; should be some form of synchronization
 
                 // Triangulate the render data and update the scene
                 rObjects = triangulateObjects(beamline.m_OpticalElements, m_Device, true);

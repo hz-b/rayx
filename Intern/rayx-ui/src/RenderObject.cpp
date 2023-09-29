@@ -6,7 +6,10 @@ void RenderObject::bind(VkCommandBuffer commandBuffer) const {
     vkCmdBindVertexBuffers(commandBuffer, 0, 1, vertexBuffers, offsets);
     vkCmdBindIndexBuffer(commandBuffer, m_indexBuffer->getBuffer(), 0, VK_INDEX_TYPE_UINT32);
 }
-void RenderObject::draw(VkCommandBuffer commandBuffer) const { vkCmdDrawIndexed(commandBuffer, m_indexCount, 1, 0, 0, 0); }
+
+void RenderObject::draw(VkCommandBuffer commandBuffer) const {
+    vkCmdDrawIndexed(commandBuffer, m_indexCount, 1, 0, 0, 0);  //
+}
 
 void RenderObject::createVertexBuffers(const std::vector<Vertex>& vertices) {
     m_vertexCount = static_cast<uint32_t>(vertices.size());

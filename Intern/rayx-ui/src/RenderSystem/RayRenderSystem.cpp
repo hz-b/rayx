@@ -1,12 +1,6 @@
 #include "RayRenderSystem.h"
 
 #include "RenderObject.h"
-
-// Keeping this here so it is easy to add push constants later
-struct PushConstantData {
-    glm::mat4 modelMatrix{1.f};
-};
-
 RayRenderSystem::RayRenderSystem(Device& device, VkRenderPass renderPass, VkDescriptorSetLayout globalSetLayout) : m_Device(device) {
     createPipelineLayout(globalSetLayout);
     createPipeline(renderPass);
@@ -27,17 +21,13 @@ void RayRenderSystem::render(FrameInfo& frameInfo, const std::optional<RenderObj
 
 void RayRenderSystem::createPipelineLayout(VkDescriptorSetLayout globalSetLayout) {
     std::vector<VkDescriptorSetLayout> descriptorSetLayouts{globalSetLayout};
-    VkPushConstantRange pushConstantRange{};
-    pushConstantRange.stageFlags = VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT;
-    pushConstantRange.offset = 0;
-    pushConstantRange.size = sizeof(PushConstantData);
 
     VkPipelineLayoutCreateInfo pipelineLayoutInfo{};
     pipelineLayoutInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO;
     pipelineLayoutInfo.setLayoutCount = static_cast<uint32_t>(descriptorSetLayouts.size());
     pipelineLayoutInfo.pSetLayouts = descriptorSetLayouts.data();
-    pipelineLayoutInfo.pushConstantRangeCount = 1;
-    pipelineLayoutInfo.pPushConstantRanges = &pushConstantRange;
+    pipelineLayoutInfo.pushConstantRangeCount = 0;
+    pipelineLayoutInfo.pPushConstantRanges = nullptr;
     if (vkCreatePipelineLayout(m_Device.device(), &pipelineLayoutInfo, nullptr, &m_PipelineLayout) != VK_SUCCESS) {
         throw std::runtime_error("failed to create pipeline layout!");
     }
@@ -53,6 +43,6 @@ void RayRenderSystem::createPipeline(VkRenderPass renderPass) {
     pipelineConfig.rasterizationInfo.lineWidth = 2.0f;
     pipelineConfig.renderPass = renderPass;
     pipelineConfig.pipelineLayout = m_PipelineLayout;
-    m_Pipeline = std::make_unique<GraphicsPipeline>(m_Device, "../../../Intern/rayx-ui/src/Shaders/vert.spv",
+    m_Pipeline = std::make_unique<GraphicsPipeline>(m_Device, "../../../Intern/rayx-ui/src/Shaders/ray_vert.spv",
                                                     "../../../Intern/rayx-ui/src/Shaders/frag.spv", pipelineConfig);
 }
