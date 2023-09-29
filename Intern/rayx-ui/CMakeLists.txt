@@ -9,15 +9,13 @@ project(rayx-ui)
 set(CMAKE_CXX_STANDARD 20)
 
 set(IMGUI_DIR ../../Extern/imgui/)
-set(IMGUI_FILE_DIALOG_DIR ../../Extern/ImGuiFileDialog/)
 set(GLFW_DIR ../../Extern/glfw/)
 set(GLM_DIR ../../Extern/glm/)
 add_subdirectory(${GLFW_DIR} binary_dir EXCLUDE_FROM_ALL)
 
 file(GLOB_RECURSE SOURCE ${PROJECT_SOURCE_DIR}/src/*.cpp)
 set(IMGUI_SOURCES ${IMGUI_DIR}/backends/imgui_impl_glfw.cpp ${IMGUI_DIR}/backends/imgui_impl_vulkan.cpp ${IMGUI_DIR}/imgui.cpp ${IMGUI_DIR}/imgui_draw.cpp ${IMGUI_DIR}/imgui_demo.cpp ${IMGUI_DIR}/imgui_tables.cpp ${IMGUI_DIR}/imgui_widgets.cpp)
-set(IMGUI_FILE_DIALOG_SOURCES ${IMGUI_FILE_DIALOG_DIR}/ImGuiFileDialog.cpp)
-add_executable(${PROJECT_NAME} ${SOURCE} ${IMGUI_SOURCES} ${IMGUI_FILE_DIALOG_SOURCES})
+add_executable(${PROJECT_NAME} ${SOURCE} ${IMGUI_SOURCES})
 
 if(MSVC)
     target_compile_options(${PROJECT_NAME} PRIVATE "/W4" "$<$<CONFIG:RELEASE>:/O2>")
@@ -39,13 +37,12 @@ option(GLFW_DOCUMENT_INTERNALS "Include internals in documentation" OFF)
 # ----------------------
 
 # ---- Dependencies ----
-target_link_libraries(${PROJECT_NAME} PRIVATE rayx-core glfw)
+target_link_libraries(${PROJECT_NAME} PRIVATE rayx-core glfw ImGuiFileDialog)
 target_include_directories(${PROJECT_NAME} PRIVATE
     ${GLFW_DIR}/include
     ${GLFW_DIR}/deps
     ${IMGUI_DIR}
     ${IMGUI_DIR}/backends
-    ${IMGUI_FILE_DIALOG_DIR}
     ${GLM_DIR}
     ..
 )
