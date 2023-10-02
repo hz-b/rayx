@@ -71,7 +71,7 @@ void writeToOutputCSV(const RAYX::BundleHistory& hist, std::string filename) {
 
 RAYX::BundleHistory traceRML(std::string filename) {
     auto beamline = loadBeamline(filename);
-    return tracer->trace(beamline, /*sequential: */false, DEFAULT_BATCH_SIZE);
+    return tracer->trace(beamline, Sequential::No, DEFAULT_BATCH_SIZE);
 }
 
 std::vector<RAYX::Event> extractLastHit(const RAYX::BundleHistory& hist) {
@@ -172,9 +172,9 @@ std::optional<RAYX::Ray> lastSequentialHit(RayHistory ray_hist, unsigned int bea
 }
 
 // returns the rayx rays converted to be ray-UI compatible.
-std::vector<RAYX::Ray> rayUiCompat(std::string filename) {
+std::vector<RAYX::Ray> rayUiCompat(std::string filename, Sequential seq=Sequential::No) {
     auto beamline = loadBeamline(filename);
-    BundleHistory hist = tracer->trace(beamline, /*sequential: */false, DEFAULT_BATCH_SIZE);
+    BundleHistory hist = tracer->trace(beamline, seq, DEFAULT_BATCH_SIZE);
 
     std::vector<RAYX::Ray> out;
 
@@ -188,8 +188,8 @@ std::vector<RAYX::Ray> rayUiCompat(std::string filename) {
     return out;
 }
 
-void compareLastAgainstRayUI(std::string filename, double t) {
-    auto rayx_list = rayUiCompat(filename);
+void compareLastAgainstRayUI(std::string filename, double t, Sequential seq) {
+    auto rayx_list = rayUiCompat(filename, seq);
     auto rayui_list = loadCSVRayUI(filename);
 
     writeToOutputCSV(convertToBundleHistory(rayx_list), filename + ".rayx");

@@ -195,7 +195,7 @@ std::optional<RAYX::Ray> lastSequentialHit(RayHistory ray_hist, unsigned int bea
 /// Only cares for the rays hitting the last object of the beamline, and check whether they are the same as their RayUI counter part.
 /// Ray UI rays are obtained Export > RawRaysOutgoing.
 /// This also filters out non-sequential rays to compare to Ray-UI correctly.
-void compareLastAgainstRayUI(std::string filename, double t = 1e-11);
+void compareLastAgainstRayUI(std::string filename, double t = 1e-11, Sequential seq=Sequential::No);
 
 // compares input/<filename>.correct.csv with the trace output.
 void compareAgainstCorrect(std::string filename, double t = 1e-11);

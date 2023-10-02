@@ -212,7 +212,7 @@ Collision RAYX_API findCollisionInElementCoords(Ray r, Surface surface, Cutout c
     Collision col;
     if (sty == STYPE_PLANE_XY) {
         col.found = false;
-        col.normal = dvec3(0, 0, -1);
+        col.normal = dvec3(0, 0, -sign(r.m_direction.z));
         double offset = abs(r.m_position.z / r.m_direction.z);
 
         // scale x-slope of ray (l/n) by z-length between origin and image plane
@@ -222,8 +222,7 @@ Collision RAYX_API findCollisionInElementCoords(Ray r, Surface surface, Cutout c
         // the ray should not face away from the image plane. If that is the case, set the weight of the intersection to 0 so that it is not
         // considered in the tracing process also the image plane detects only rays from one side
 
-        col.found = r.m_direction.z > 0 && r.m_position.z < 0;
-        // backward hits are excluded? i.e. if a ray with negative direction and positive z coordinate hits the plane?
+        col.found = (r.m_direction.z > 0 && r.m_position.z < 0) || (r.m_direction.z < 0 && r.m_position.z > 0);
     } else if (sty == STYPE_TOROID) {
         col = getToroidCollision(r, deserializeToroid(surface));
     } else if (sty == STYPE_QUADRIC) {

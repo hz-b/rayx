@@ -16,6 +16,11 @@ const uint64_t DEFAULT_BATCH_SIZE = 100000;
 // Abstract Tracer base class.
 namespace RAYX {
 
+/// Expresses whether we force sequential tracing, or we use dynamic tracing.
+/// We prefer this over a boolean, as calling eg. the trace function with an argument of `true` has no obvious meaning.
+/// On the other hand calling it with `Sequential::Yes` makes the meaning more clear.
+enum class Sequential { No, Yes };
+
 struct TraceRawConfig {
     std::vector<Ray> m_rays;
     double m_rayIdStart;
@@ -56,7 +61,7 @@ class RAYX_API Tracer {
     // This will call traceRaw.
     // Everything happening in each traceRaw implementation should be extracted to this function instead.
     // See `BundleHistory` for information about the return value.
-    BundleHistory trace(const Beamline&, bool sequential, uint64_t max_batch_size);
+    BundleHistory trace(const Beamline&, Sequential seq, uint64_t max_batch_size);
 
     void setDevice(int deviceID);
 
