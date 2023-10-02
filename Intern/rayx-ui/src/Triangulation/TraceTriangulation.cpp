@@ -7,12 +7,16 @@
 namespace RAYX {
 namespace CPU_TRACER {
 #include "Shared/Collision.h"
-#include "Shared/Element.h"  // I think this contains Surface & Cutout
+#include "Shared/Element.h"
 #include "Shared/Ray.h"
 RAYX_API Collision findCollisionInElementCoords(Ray, Surface, Cutout);
 }  // namespace CPU_TRACER
 }  // namespace RAYX
 
+/**
+ * Given a Cutout object, this function calculates and returns the width and
+ * height depending on the cutout's type (rectangle, ellipse, trapezoid, etc.).
+ */
 std::pair<double, double> getRectangularDimensions(const Cutout& cutout) {
     double width = 0.0;
     double height = 0.0;
@@ -46,6 +50,10 @@ std::pair<double, double> getRectangularDimensions(const Cutout& cutout) {
     return {width, height};
 }
 
+/**
+ * Given grid size, width, height, and a flag indicating the plane of the rays,
+ * this function populates and returns a 2D grid of RAYX::Ray objects.
+ */
 std::vector<std::vector<RAYX::Ray>> createRayGrid(size_t size, double width, double height, bool isXZ) {
     std::vector<std::vector<RAYX::Ray>> grid(size, std::vector<RAYX::Ray>(size));
     double xStep = width / size;
@@ -82,6 +90,11 @@ std::vector<std::vector<RAYX::Ray>> createRayGrid(size_t size, double width, dou
     return grid;
 }
 
+/**
+ * This function takes an OpticalElement and a Device object as input. It employs a grid of rays, created based on the dimensions of the element's
+ * cutout. Using CPU-based ray tracing, it computes the intersections between rays and the optical element's surface within the cutout. The ray
+ * intersections are then grouped into triangles based on the grid, and a RenderObject representing these triangles is returned.
+ */
 RenderObject traceTriangulation(const RAYX::OpticalElement& element, Device& device) {
     RAYX::CpuTracer tracer;
 

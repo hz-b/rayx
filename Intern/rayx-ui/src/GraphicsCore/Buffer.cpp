@@ -9,6 +9,10 @@ VkDeviceSize Buffer::getAlignment(VkDeviceSize instanceSize, VkDeviceSize minOff
     return instanceSize;
 }
 
+/**
+ * Allocates buffer memory using given parameters and associates it with a Device.
+ * Also calculates memory alignment.
+ */
 Buffer::Buffer(Device& device, VkDeviceSize instanceSize, uint32_t instanceCount, VkBufferUsageFlags usageFlags,
                VkMemoryPropertyFlags memoryPropertyFlags, VkDeviceSize minOffsetAlignment)
     : m_Device{device},
@@ -27,11 +31,24 @@ Buffer::~Buffer() {
     vkFreeMemory(m_Device.device(), m_Memory, nullptr);
 }
 
+/**
+ * This function maps a range of the buffer's memory into the application's address space (making it accessible).
+ * The mapped range starts from the given `offset` and extends for `size` bytes.
+ */
 VkResult Buffer::map(VkDeviceSize size, VkDeviceSize offset) {
     assert(m_Buffer && m_Memory && "Called map on buffer before create");
     return vkMapMemory(m_Device.device(), m_Memory, offset, size, 0, &m_mapped);
 }
 
+/**
+ * This function unmaps the previously mapped buffer memory, making it inaccessible from the application's address space.
+ * It ensures that the unmapping only happens if the memory was actually mapped (`m_mapped` is not nullptr).
+ *
+ * Note: After the buffer memory has been unmapped, any pointer to it becomes invalid.
+ *       Also, it's important to ensure that the host writes or device reads that were made to this memory
+ *       range have completed before calling this function, or else undefined behavior could occur.
+ *
+ */
 void Buffer::unmap() {
     if (m_mapped) {
         vkUnmapMemory(m_Device.device(), m_Memory);

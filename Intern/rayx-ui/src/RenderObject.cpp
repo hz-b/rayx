@@ -1,5 +1,14 @@
 #include "RenderObject.h"
 
+/**
+ * Constructor sets up vertex and index buffers based on the input parameters.
+ */
+RenderObject::RenderObject(Device& device, glm::mat4 modelMatrix, std::vector<Vertex>& vertices, std::vector<uint32_t>& indices)
+    : m_Device(device), m_modelMatrix(modelMatrix) {
+    createVertexBuffers(vertices);
+    createIndexBuffers(indices);
+}
+
 void RenderObject::bind(VkCommandBuffer commandBuffer) const {
     VkBuffer vertexBuffers[] = {m_vertexBuffer->getBuffer()};
     VkDeviceSize offsets[] = {0};

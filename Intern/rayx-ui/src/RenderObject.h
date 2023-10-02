@@ -19,17 +19,37 @@ struct Line {
     Vertex v2;
 };
 
+/**
+ * @class RenderObject
+ * @brief Class for handling the rendering of objects in Vulkan.
+ *
+ * This class manages Vulkan-specific vertex and index buffers for rendering a graphical object.
+ * It also handles the binding and drawing operations for these objects.
+ */
 class RenderObject {
   public:
-    RenderObject(Device& device, glm::mat4 modelMatrix, std::vector<Vertex>& vertices, std::vector<uint32_t>& indices)
-        : m_Device(device), m_modelMatrix(modelMatrix) {
-        createVertexBuffers(vertices);
-        createIndexBuffers(indices);
-    }
+    /**
+     * @brief Constructor that initializes the rendering object.
+     * @param device Reference to a Device object.
+     * @param modelMatrix Transformation matrix to go from model to world coordinates.
+     * @param vertices Vector of Vertex objects.
+     * @param indices Vector of index values.
+     */
+    RenderObject(Device& device, glm::mat4 modelMatrix, std::vector<Vertex>& vertices, std::vector<uint32_t>& indices);
+
+    /**
+     * @brief Binds the object's vertex and index buffers to a Vulkan command buffer.
+     * @param commandBuffer Vulkan command buffer.
+     */
+    void bind(VkCommandBuffer commandBuffer) const;
+
+    /**
+     * @brief Issues a draw call for the object using the Vulkan command buffer.
+     * @param commandBuffer Vulkan command buffer.
+     */
+    void draw(VkCommandBuffer commandBuffer) const;
 
     glm::mat4 getModelMatrix() const { return m_modelMatrix; }
-    void bind(VkCommandBuffer commandBuffer) const;
-    void draw(VkCommandBuffer commandBuffer) const;
 
   private:
     void createVertexBuffers(const std::vector<Vertex>& vertices);
@@ -43,5 +63,5 @@ class RenderObject {
     std::unique_ptr<Buffer> m_vertexBuffer;
     std::unique_ptr<Buffer> m_indexBuffer;
 
-    glm::mat4 m_modelMatrix;  ///< To transform the object from model to world coordinates
+    glm::mat4 m_modelMatrix;  ///< Matrix for transforming the object from model to world coordinates
 };

@@ -6,7 +6,10 @@
 
 #include "Camera.h"
 
-// Key callback
+/**
+ * This function handles various keyboard events including window manipulation and camera movement.
+ * It integrates ImGui for GUI events and directly manipulates a CameraController object for 3D navigation.
+ */
 void keyCallback(GLFWwindow* window, int key, int scancode, int action, int mods) {
     ImGui_ImplGlfw_KeyCallback(window, key, scancode, action, mods);
     if (ImGui::GetIO().WantCaptureKeyboard) return;
@@ -46,6 +49,10 @@ void keyCallback(GLFWwindow* window, int key, int scancode, int action, int mods
     }
 }
 
+/**
+ * This function handles mouse button events, mainly focusing on the right mouse button for camera
+ * control. It also checks if ImGui wants to capture the keyboard and mouse events.
+ */
 void mouseButtonCallback(GLFWwindow* window, int button, int action, int mods) {
     ImGui_ImplGlfw_MouseButtonCallback(window, button, action, mods);
     if (ImGui::GetIO().WantCaptureKeyboard) return;
@@ -64,6 +71,10 @@ void mouseButtonCallback(GLFWwindow* window, int button, int action, int mods) {
     }
 }
 
+/**
+ * This function updates the direction of the camera when the mouse is moved. It also integrates
+ * ImGui for cursor position callbacks.
+ */
 void cursorPosCallback(GLFWwindow* window, double xpos, double ypos) {
     ImGui_ImplGlfw_CursorPosCallback(window, xpos, ypos);
     if (ImGui::GetIO().WantCaptureKeyboard) return;
