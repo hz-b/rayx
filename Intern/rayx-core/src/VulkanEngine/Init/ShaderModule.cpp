@@ -27,7 +27,7 @@ void VulkanEngine::createShaderModule() {
 
     RAYX_VERB << "Creating compute shader module..";
 
-    VK_CHECK_RESULT(vkCreateShaderModule(m_Device, &createInfo, nullptr, &m_ComputeShaderModule));
+    VK_CHECK_RESULT(vkCreateShaderModule(m_Device, &createInfo, nullptr, &m_ComputeShaderModule))
     RAYX_VERB << "Shader module(s) created.";
     delete[] compShaderCode;
 }

@@ -1,6 +1,5 @@
 #ifndef NO_VULKAN
 
-#include "CanonicalizePath.h"
 #include "Debug/Instrumentor.h"
 #include "VulkanEngine/VulkanEngine.h"
 
@@ -12,7 +11,6 @@ namespace RAYX {
 void VulkanEngine::createComputePipeline() {
     RAYX_PROFILE_FUNCTION_STDOUT();
     RAYX_VERB << "Creating pipeline...";
-    // Todo: validtation layer warning : Consider adding VK_KHR_maintenance4  to support SPIR-V 1.6's localsizeid instead of WorkgroupSizesdsdsdsdDS
     /*
     Now let us actually create the compute pipeline.
     It only consists of a single stage with a compute shader.
@@ -39,7 +37,7 @@ void VulkanEngine::createComputePipeline() {
     */
     VkPushConstantRange pushConstant;
     pushConstant.offset = 0;  // Can change this if some of the struct is to be ignored
-    pushConstant.size = m_pushConstants.size;
+    pushConstant.size = m_pushConstantsData.size;
     pushConstant.stageFlags = VK_SHADER_STAGE_COMPUTE_BIT;
 
     pipelineLayoutCreateInfo.pPushConstantRanges = &pushConstant;

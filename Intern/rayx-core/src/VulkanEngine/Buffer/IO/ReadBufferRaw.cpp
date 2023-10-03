@@ -7,12 +7,12 @@
 namespace RAYX {
 
 void VulkanEngine::readBufferRaw(const char* bufname, char* outdata) {
-    if (m_state != VulkanEngineStates_t::POSTRUN) {
+    if (m_state != VulkanEngineStates::POSTRUN) {
         RAYX_ERR << "you've forgotton to .run() the VulkanEngine. Thats "
                     "mandatory before reading it's output buffers.";
     }
 
-    Buffer_t& b = m_buffers[bufname];
+    Buffer& b = m_buffers[bufname];
 
     if (!b.isOutput) {
         RAYX_ERR << "readBufferRaw(\"" << bufname << "\", ...) is not allowed, as \"" << bufname << "\" has m_out = false";

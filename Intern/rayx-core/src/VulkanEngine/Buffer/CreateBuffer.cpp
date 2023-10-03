@@ -6,12 +6,12 @@
 
 namespace RAYX {
 void VulkanEngine::createBuffer(const char* bufname, VkDeviceSize size) {
-    if (m_state == VulkanEngineStates_t::PREINIT) {
+    if (m_state == VulkanEngineStates::PREINIT) {
         RAYX_ERR << "you've forgotten to .init() the VulkanEngine";
-    } else if (m_state == VulkanEngineStates_t::POSTRUN) {
+    } else if (m_state == VulkanEngineStates::POSTRUN) {
         RAYX_ERR << "you've forgotten to .cleanup() the VulkanEngine";
     }
-    Buffer_t& b = m_buffers[bufname];
+    Buffer& b = m_buffers[bufname];
 
     // No need to recreate buffers if target is already there
     if (b.size == size && m_runs > 0) {
@@ -37,12 +37,6 @@ void VulkanEngine::createBuffer(const char* bufname, VkDeviceSize size) {
 
 uint32_t findMemoryType(VkPhysicalDevice& physicalDevice, uint32_t memoryTypeBits, VkMemoryPropertyFlags properties);
 
-// Creates a buffer to each given object with a given size.
-// This also allocates memory to the buffer according the requirements of the
-// Physical Device. Sharing is kept to exclusive.
-//
-// More at
-// https://www.khronos.org/registry/vulkan/specs/1.3-extensions/man/html/VkBufferCreateInfo.html
 void VulkanEngine::createVkBuffer(VkDeviceSize size, VkBufferUsageFlags usage, VkMemoryPropertyFlags properties, VkBuffer& buffer,
                                   VkDeviceMemory& bufferMemory) {
     RAYX_PROFILE_FUNCTION();
@@ -68,6 +62,12 @@ void VulkanEngine::createVkBuffer(VkDeviceSize size, VkBufferUsageFlags usage, V
     VK_CHECK_RESULT(vkBindBufferMemory(m_Device, buffer, bufferMemory, 0));
 }
 
+// Creates a buffer to each given object with a given size.
+// This also allocates memory to the buffer according the requirements of the
+// Physical Device. Sharing is kept to exclusive.
+//
+// More at
+// https://www.khronos.org/registry/vulkan/specs/1.3-extensions/man/html/VkBufferCreateInfo.html
 void VulkanEngine::createVmaBuffer(VkDeviceSize size, VkBufferUsageFlags buffer_usage, VkBuffer& buffer, VmaAllocation& allocation,
                                    VmaAllocationInfo* allocation_info, VmaAllocationCreateFlags flags, VmaMemoryUsage memory_usage,
                                    const std::vector<uint32_t>& queue_family_indices) {

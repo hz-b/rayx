@@ -8,11 +8,16 @@ namespace RAYX {
 
 VKAPI_ATTR VkBool32 VKAPI_CALL debugCallback(VkDebugUtilsMessageSeverityFlagBitsEXT messageSeverity, VkDebugUtilsMessageTypeFlagsEXT messageType,
                                              const VkDebugUtilsMessengerCallbackDataEXT* pCallbackData, void* pUserData);
+
 bool checkValidationLayerSupport();
+
 VkResult CreateDebugUtilsMessengerEXT(VkInstance instance, const VkDebugUtilsMessengerCreateInfoEXT* pCreateInfo,
                                       const VkAllocationCallbacks* pAllocator, VkDebugUtilsMessengerEXT* pDebugMessenger);
+
 std::vector<const char*> getRequiredExtensions();
+
 void populateDebugMessengerCreateInfo(VkDebugUtilsMessengerCreateInfoEXT& createInfo);
+
 void setupDebugMessenger(VkInstance& inst);
 
 /* Create a new Vulkan library instance. (Validation layers included) */
@@ -26,9 +31,9 @@ void VulkanEngine::createInstance() {
     // Add description for instance
     VkApplicationInfo appInfo{};
     appInfo.sType = VK_STRUCTURE_TYPE_APPLICATION_INFO;
-    appInfo.pApplicationName = "Terminal App";
+    appInfo.pApplicationName = "rayx-core";
     appInfo.applicationVersion = VK_MAKE_API_VERSION(0, 1, 3, 216);
-    appInfo.pEngineName = "Vulkan Rayx Engine";
+    appInfo.pEngineName = "rayx-core Vulkan Engine";
     appInfo.engineVersion = VK_MAKE_API_VERSION(0, 1, 3, 216);
     appInfo.apiVersion = VK_API_VERSION_1_3;
 
@@ -42,7 +47,7 @@ void VulkanEngine::createInstance() {
     createInfo.enabledExtensionCount = static_cast<uint32_t>(extensions.size());
     createInfo.ppEnabledExtensionNames = extensions.data();
 
-    // Validation Layer Debug Outpout "handler"
+    // Validation Layer Debug Output "handler"
     VkDebugUtilsMessengerCreateInfoEXT debugCreateInfo;
     if (enableValidationLayers) {
         createInfo.enabledLayerCount = static_cast<uint32_t>(validationLayers.size());
@@ -51,7 +56,6 @@ void VulkanEngine::createInstance() {
         createInfo.pNext = (VkDebugUtilsMessengerCreateInfoEXT*)&debugCreateInfo;
     } else {
         createInfo.enabledLayerCount = 0;
-
         createInfo.pNext = nullptr;
     }
 
@@ -107,8 +111,10 @@ VKAPI_ATTR VkBool32 VKAPI_CALL debugCallback(VkDebugUtilsMessageSeverityFlagBits
         RAYX_WARN << "(ValidationLayer warn): " << pCallbackData->pMessage;
     } else if (messageSeverity == VK_DEBUG_UTILS_MESSAGE_SEVERITY_ERROR_BIT_EXT) {
         RAYX_ERR << "(ValidationLayer error): " << pCallbackData->pMessage;
+    } else if (messageSeverity == VK_DEBUG_UTILS_MESSAGE_SEVERITY_VERBOSE_BIT_EXT) {
+        RAYX_VERB << "(ValidationLayer verb): " << pCallbackData->pMessage;
     }
-    // TODO consider also showing INFO or even VERBOSE messages under some
+    // TODO consider also showing INFO messages under some
     // circumstances.
 
     return VK_FALSE;  // Should return False

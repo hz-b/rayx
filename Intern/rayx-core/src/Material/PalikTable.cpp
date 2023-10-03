@@ -1,5 +1,6 @@
 #include "PalikTable.h"
 
+#include <algorithm>
 #include <fstream>
 
 #include "CanonicalizePath.h"

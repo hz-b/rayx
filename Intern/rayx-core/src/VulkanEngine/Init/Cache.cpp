@@ -26,7 +26,7 @@ void VulkanEngine::createCache() {
     create_info.pInitialData = pipeline_data.data();
 
     /* Create Vulkan pipeline cache */
-    VK_CHECK_RESULT(vkCreatePipelineCache(m_Device, &create_info, nullptr, &m_PipelineCache));
+    VK_CHECK_RESULT(vkCreatePipelineCache(m_Device, &create_info, nullptr, &m_PipelineCache))
 }
 }  // namespace RAYX
 

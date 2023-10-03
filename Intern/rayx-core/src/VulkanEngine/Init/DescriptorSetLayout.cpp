@@ -12,7 +12,8 @@ void VulkanEngine::createDescriptorSetLayout() {
     RAYX_PROFILE_FUNCTION();
 
     std::vector<VkDescriptorSetLayoutBinding> bindings;
-    for (const auto& [name, b] : m_buffers) {
+    bindings.reserve(m_buffers.size());
+for (const auto& [name, b] : m_buffers) {
         bindings.push_back({b.binding, VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, 1, VK_SHADER_STAGE_COMPUTE_BIT, nullptr});
     }
 
@@ -22,7 +23,7 @@ void VulkanEngine::createDescriptorSetLayout() {
     descriptorSetLayoutCreateInfo.pBindings = bindings.data();
 
     // Create the descriptor set layout.
-    VK_CHECK_RESULT(vkCreateDescriptorSetLayout(m_Device, &descriptorSetLayoutCreateInfo, nullptr, &m_DescriptorSetLayout));
+    VK_CHECK_RESULT(vkCreateDescriptorSetLayout(m_Device, &descriptorSetLayoutCreateInfo, nullptr, &m_DescriptorSetLayout))
 }
 
 /**
@@ -46,7 +47,7 @@ void VulkanEngine::createAllocateDescriptorPool(uint32_t size) {
     descriptorPoolCreateInfo.pPoolSizes = &descriptorPoolSize;
 
     // create descriptor pool.
-    VK_CHECK_RESULT(vkCreateDescriptorPool(m_Device, &descriptorPoolCreateInfo, nullptr, &m_DescriptorPool));
+    VK_CHECK_RESULT(vkCreateDescriptorPool(m_Device, &descriptorPoolCreateInfo, nullptr, &m_DescriptorPool))
 
     /*
     With the pool allocated, we can now allocate the descriptor set.
@@ -58,7 +59,7 @@ void VulkanEngine::createAllocateDescriptorPool(uint32_t size) {
     descriptorSetAllocateInfo.pSetLayouts = &m_DescriptorSetLayout;
 
     // allocate descriptor set.
-    VK_CHECK_RESULT(vkAllocateDescriptorSets(m_Device, &descriptorSetAllocateInfo, &m_DescriptorSet));
+    VK_CHECK_RESULT(vkAllocateDescriptorSets(m_Device, &descriptorSetAllocateInfo, &m_DescriptorSet))
 }
 
 }  // namespace RAYX

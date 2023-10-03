@@ -3,8 +3,8 @@
 #include "VulkanEngine/VulkanEngine.h"
 
 namespace RAYX {
-void VulkanEngine::init(VulkanEngineInitSpec_t spec) {
-    if (m_state != VulkanEngineStates_t::PREINIT) {
+void VulkanEngine::init(VulkanEngineInitSpec spec) {
+    if (m_state != VulkanEngineStates::PREINIT) {
         RAYX_ERR << "VulkanEngine was already initialized!";
     }
 
@@ -24,7 +24,7 @@ void VulkanEngine::init(VulkanEngineInitSpec_t spec) {
     createStagingBuffer();
     createCache();
     createShaderModule();
-    m_state = VulkanEngineStates_t::PRERUN;
+    m_state = VulkanEngineStates::PRERUN;
 }
 
 }  // namespace RAYX

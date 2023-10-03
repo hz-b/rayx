@@ -4,10 +4,10 @@
 
 namespace RAYX {
 /**
- * Updte Descriptor Set's Buffers and range with given buffers.(m_buffers)
+ * Update Descriptor Set's Buffers and range with given buffers.(m_buffers)
  * You should call this whenever content is being updated
  */
-void VulkanEngine::updteDescriptorSets() {
+void VulkanEngine::updateDescriptorSets() {
     RAYX_PROFILE_FUNCTION();
 
     // Populate every Compute Buffer/Descriptor and configure it.

@@ -15,7 +15,7 @@
 namespace RAYX {
 
 // the argument type of `VulkanEngine::declareBuffer(_)`
-struct BufferDeclarationSpec_t {
+struct BufferDeclarationSpec {
     /// used to map the vulkan buffers to the shader buffers.
     /// Lines like `layout (binding = _)` declare buffers in the shader.
     uint32_t binding;
@@ -29,7 +29,7 @@ struct BufferDeclarationSpec_t {
 };
 
 /// the argument type of `VulkanEngine::init(_)`
-struct VulkanEngineInitSpec_t {
+struct VulkanEngineInitSpec {
     /// the name of the shaderfile, as relative path - relative to the root of
     /// the repository
     const char* shaderFileName;
@@ -37,7 +37,7 @@ struct VulkanEngineInitSpec_t {
 };
 
 /// the argument type of `VulkanEngine::run(_)`
-struct VulkanEngineRunSpec_t {
+struct VulkanEngineRunSpec {
     uint32_t m_numberOfInvocations;
 };
 
@@ -47,10 +47,10 @@ class RAYX_API VulkanEngine {
     ~VulkanEngine();
 
     /// buffers need to be declared before init() is called.
-    void declareBuffer(const char* bufname, BufferDeclarationSpec_t);
+    void declareBuffer(const char* bufname, BufferDeclarationSpec);
 
     /// changes the state from PREINIT to PRERUN.
-    void init(VulkanEngineInitSpec_t);
+    void init(VulkanEngineInitSpec);
 
     /// create a buffer and fill it with the data given in vec.
     /// the buffer will have exactly the size to fit all elements of vec.
@@ -66,7 +66,7 @@ class RAYX_API VulkanEngine {
 
     /// changes the state from PRERUN to POSTRUN
     /// This function runs the shader.
-    void run(VulkanEngineRunSpec_t);
+    void run(VulkanEngineRunSpec);
 
     /// @brief  returns all physical devices of the current instance.
     /// @return a vector of VkPhysicalDevice
@@ -87,7 +87,7 @@ class RAYX_API VulkanEngine {
 
     /// There are 3 basic states for the VulkanEngine. Described below.
     /// the variable m_state stores that state.
-    enum class VulkanEngineStates_t {
+    enum class VulkanEngineStates {
         // the state before .init() is called.
         // legal functions: declareBuffer(), init().
         PREINIT,
@@ -103,12 +103,12 @@ class RAYX_API VulkanEngine {
         POSTRUN
     };
 
-    inline VulkanEngineStates_t state() { return m_state; }
+    inline VulkanEngineStates state() { return m_state; }
 
     /// the internal representation of a buffer.
     /// m_in, m_out, m_binding are taken from DeclareBufferSpec.
     /// the other ones are initialized in createBuffer.
-    struct Buffer_t {
+    struct Buffer {
         bool isInput;
         bool isOutput;
         uint32_t binding;
@@ -122,23 +122,23 @@ class RAYX_API VulkanEngine {
     // PushConstants are "constants" updated on each Dispatch Call (or similar) in the pipeline
     // Please pay attention to alignment rules
     // You can change this struct (also in shader)
-    struct pushConstants_t {
+    struct PushConstantsData {
         const void* pushConstPtr;
         size_t size;
-    } m_pushConstants;
+    } m_pushConstantsData;
 
   private:
-    VulkanEngineStates_t m_state = VulkanEngineStates_t::PREINIT;
+    VulkanEngineStates m_state = VulkanEngineStates::PREINIT;
     const char* m_shaderfile;
     int m_deviceID = -1;
     uint32_t m_numberOfInvocations;
 
     /// stores the Buffers by name.
-    std::map<std::string, Buffer_t> m_buffers;
+    std::map<std::string, Buffer> m_buffers;
 
     /// This is the only staging buffer of the VulkanEngine.
     /// It's size is STAGING_SIZE.
-    Buffer_t m_stagingBuffer;
+    Buffer m_stagingBuffer;
 
     VkInstance m_Instance;
     VkDebugUtilsMessengerEXT m_DebugMessenger;
@@ -185,7 +185,7 @@ class RAYX_API VulkanEngine {
 
     // Run:
     void submitCommandBuffer();
-    void updteDescriptorSets();
+    void updateDescriptorSets();
     void createComputePipeline();
 
     // Sync:
@@ -206,6 +206,7 @@ class RAYX_API VulkanEngine {
         VkFence f;
         VkDevice device;
     };
+
     struct {
         std::unique_ptr<Fence> transfer;
         std::unique_ptr<Fence> compute;
@@ -223,6 +224,7 @@ class RAYX_API VulkanEngine {
     /// `createStagingBuffer`.
     void createVkBuffer(VkDeviceSize size, VkBufferUsageFlags usage, VkMemoryPropertyFlags properties, VkBuffer& buffer,
                         VkDeviceMemory& bufferMemory);
+
     // VMA Version of createVkBuffer
     void createVmaBuffer(VkDeviceSize size, VkBufferUsageFlags buffer_usage, VkBuffer& buffer, VmaAllocation& allocation,
                          VmaAllocationInfo* allocation_info, VmaAllocationCreateFlags flags = VMA_ALLOCATION_CREATE_HOST_ACCESS_RANDOM_BIT,

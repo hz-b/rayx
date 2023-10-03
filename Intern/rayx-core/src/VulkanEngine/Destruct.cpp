@@ -47,10 +47,10 @@ void inline storePipelineCache(VkDevice& device, VkPipelineCache& cache) {
 }
 
 VulkanEngine::~VulkanEngine() {
-    if (m_state == VulkanEngineStates_t::PREINIT) {
+    if (m_state == VulkanEngineStates::PREINIT) {
         return; /* nothing to clean up! */
     }
-    if (m_state == VulkanEngineStates_t::POSTRUN) {
+    if (m_state == VulkanEngineStates::POSTRUN) {
         RAYX_WARN << ".cleanup() was not called after run!";
         cleanup();
     }

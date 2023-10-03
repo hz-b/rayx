@@ -22,7 +22,7 @@ void VulkanEngine::recordInComputeCommandBuffer() {
     VkCommandBufferBeginInfo beginInfo = {};
     beginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
     beginInfo.flags = VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT;
-    VK_CHECK_RESULT(vkBeginCommandBuffer(m_ComputeCommandBuffer, &beginInfo));  // start recording commands.
+    VK_CHECK_RESULT(vkBeginCommandBuffer(m_ComputeCommandBuffer, &beginInfo))  // start recording commands.
 
     /*
     We need to bind a pipeline, AND a descriptor set before we dispatch.
@@ -41,7 +41,7 @@ void VulkanEngine::recordInComputeCommandBuffer() {
     the arguments. If you are already familiar with compute shaders from
     OpenGL, this should be nothing new to you.
     */
-    auto requiredLocalWorkGroupNo = (uint32_t)ceil(m_numberOfInvocations / float(WORKGROUP_SIZE));  // number of local works groups
+    auto requiredLocalWorkGroupNo = (uint32_t)ceil((float) m_numberOfInvocations / float(WORKGROUP_SIZE));  // number of local works groups
     // check if there are too many rays
     VkPhysicalDeviceProperties deviceProperties;
     vkGetPhysicalDeviceProperties(m_PhysicalDevice, &deviceProperties);
@@ -96,14 +96,15 @@ void VulkanEngine::recordInComputeCommandBuffer() {
     /**
      * Update push constants
      */
-    vkCmdPushConstants(m_ComputeCommandBuffer, m_PipelineLayout, VK_SHADER_STAGE_COMPUTE_BIT, 0, m_pushConstants.size, m_pushConstants.pushConstPtr);
+    vkCmdPushConstants(m_ComputeCommandBuffer, m_PipelineLayout, VK_SHADER_STAGE_COMPUTE_BIT, 0, m_pushConstantsData.size,
+                       m_pushConstantsData.pushConstPtr);
 
     RAYX_VERB << "Dispatching commandBuffer...";
     RAYX_VERB << "Sending "
               << "(" << group.x << ", " << group.z << ", " << group.y << ") to the GPU";
     vkCmdDispatch(m_ComputeCommandBuffer, group.x, group.z, group.y);
 
-    VK_CHECK_RESULT(vkEndCommandBuffer(m_ComputeCommandBuffer));  // end recording commands.
+    VK_CHECK_RESULT(vkEndCommandBuffer(m_ComputeCommandBuffer))  // end recording commands.
 }
 
 }  // namespace RAYX

@@ -2,6 +2,7 @@
 #include "NffTable.h"
 
 #include <fstream>
+#include <algorithm>
 
 #include "CanonicalizePath.h"
 #include "Debug/Debug.h"

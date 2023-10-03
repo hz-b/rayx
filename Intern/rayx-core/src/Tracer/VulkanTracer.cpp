@@ -16,7 +16,7 @@
 namespace RAYX {
 void VulkanTracer::listPhysicalDevices() {
     // init, if not yet initialized.
-    if (m_engine.state() == VulkanEngine::VulkanEngineStates_t::PREINIT) {
+    if (m_engine.state() == VulkanEngine::VulkanEngineStates::PREINIT) {
         initEngine();
     }
     auto deviceList = m_engine.getPhysicalDevices();
@@ -36,7 +36,7 @@ std::vector<Ray> VulkanTracer::traceRaw(const TraceRawConfig& cfg) {
     RAYX_PROFILE_FUNCTION_STDOUT();
 
     // init, if not yet initialized.
-    if (m_engine.state() == VulkanEngine::VulkanEngineStates_t::PREINIT) {
+    if (m_engine.state() == VulkanEngine::VulkanEngineStates::PREINIT) {
         initEngine();
     }
 
@@ -85,8 +85,8 @@ void VulkanTracer::setPushConstants(const PushConstants* p) {
     static_assert(sizeof(PushConstants) % sizeof(double) == 0);
 
     if (sizeof(*p) > 128) RAYX_WARN << "Using pushConstants bigger than 128 Bytes might be unsupported on some GPUs. Check Compute Info";
-    m_engine.m_pushConstants.pushConstPtr = static_cast<const PushConstants*>(p);
-    m_engine.m_pushConstants.size = sizeof(*p);
+    m_engine.m_pushConstantsData.pushConstPtr = static_cast<const PushConstants*>(p);
+    m_engine.m_pushConstantsData.size = sizeof(*p);
 }
 void VulkanTracer::initEngine() {
     // Set buffer settings (DEBUG OR RELEASE)

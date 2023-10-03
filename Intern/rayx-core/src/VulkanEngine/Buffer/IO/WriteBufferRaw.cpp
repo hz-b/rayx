@@ -7,7 +7,7 @@
 namespace RAYX {
 
 void VulkanEngine::writeBufferRaw(const char* bufname, char* indata) {
-    Buffer_t& b = m_buffers[bufname];
+    Buffer& b = m_buffers[bufname];
 
     if (!b.isInput) {
         RAYX_ERR << "writeBufferRaw(\"" << bufname << "\", ...) is not allowed, as \"" << bufname << "\" has m_in = false";
