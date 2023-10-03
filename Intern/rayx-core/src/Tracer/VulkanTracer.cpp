@@ -4,11 +4,6 @@
 
 #include <Material/Material.h>
 
-#include <chrono>
-#include <cmath>
-
-#include "Debug/Debug.h"
-#include "Debug/Instrumentor.h"
 #include "RAY-Core.h"
 #include "Random.h"
 

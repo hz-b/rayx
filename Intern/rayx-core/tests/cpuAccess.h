@@ -1,7 +1,6 @@
 // This file allows you to access the inner functions of the CpuTracer in order to test them.
 
-namespace RAYX {
-namespace CPU_TRACER {
+namespace RAYX::CPU_TRACER {
 
 #include "../src/Shared/NffPalik.h"
 
@@ -52,8 +51,5 @@ int RAYX_API getPalikEntryCount(int material);
 PalikEntry RAYX_API getPalikEntry(int index, int material);
 int RAYX_API getNffEntryCount(int material);
 NffEntry RAYX_API getNffEntry(int index, int material);
-int RAYX_API getPalikEntryCount(int material);
-PalikEntry RAYX_API getPalikEntry(int index, int material);
 dvec2 RAYX_API getRefractiveIndex(double energy, int material);
-}  // namespace CPU_TRACER
-}  // namespace RAYX
+}  // namespace RAYX::CPU_TRACER

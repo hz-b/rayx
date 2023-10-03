@@ -13,6 +13,7 @@ LightSource::LightSource(const DesignObject& dobj) {
     m_horDivergence = dobj.parseHorDiv();
     m_orientation = dobj.parseOrientation();
     m_position = dobj.parsePosition();
+    m_verDivergence = 0.0;
 }
 
 Misalignment LightSource::getMisalignmentParams() const { return m_misalignmentParams; }
@@ -20,7 +21,7 @@ Misalignment LightSource::getMisalignmentParams() const { return m_misalignmentP
 [[maybe_unused]] double LightSource::getPhotonEnergy() const { return m_EnergyDistribution.getAverage(); }
 
 // needed for many of the light sources, from two angles to one direction vector
-glm::dvec3 LightSource::getDirectionFromAngles(const double phi, const double psi) const {
+glm::dvec3 LightSource::getDirectionFromAngles(const double phi, const double psi) {
     double al = cos(psi) * sin(phi);
     double am = -sin(psi);
     double an = cos(psi) * cos(phi);

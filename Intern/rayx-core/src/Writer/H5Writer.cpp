@@ -35,7 +35,7 @@ std::vector<double> toDoubles(const RAYX::BundleHistory& hist, const Format& for
     return output;
 }
 
-void writeH5(const RAYX::BundleHistory& hist, std::string filename, const Format& format, std::vector<std::string> elementNames) {
+void writeH5(const RAYX::BundleHistory& hist, const std::string& filename, const Format& format, std::vector<std::string> elementNames) {
     HighFive::File file(filename, HighFive::File::ReadWrite | HighFive::File::Create | HighFive::File::Truncate);
 
     auto doubles = toDoubles(hist, format);
@@ -50,8 +50,8 @@ void writeH5(const RAYX::BundleHistory& hist, std::string filename, const Format
         // write element names
         for (unsigned int i = 0; i < elementNames.size(); i++) {
             auto& e = elementNames[i];
-            auto dataspace = HighFive::DataSpace({e.size()});
-            auto dataset = file.createDataSet<char>(std::to_string(i), dataspace);
+            dataspace = HighFive::DataSpace({e.size()});
+            dataset = file.createDataSet<char>(std::to_string(i), dataspace);
             auto ptr = e.c_str();
             dataset.write_raw(ptr);
         }
@@ -107,7 +107,7 @@ RAYX::BundleHistory fromDoubles(const std::vector<double>& doubles, const Format
     return bundleHist;
 }
 
-RAYX::BundleHistory raysFromH5(std::string filename, const Format& format) {
+RAYX::BundleHistory raysFromH5(const std::string& filename, const Format& format) {
     RAYX::BundleHistory rays;
     HighFive::File file(filename, HighFive::File::ReadOnly);
 

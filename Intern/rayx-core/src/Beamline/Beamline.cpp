@@ -11,7 +11,7 @@ Beamline::~Beamline() = default;
 std::vector<Ray> Beamline::getInputRays() const {
     RAYX_PROFILE_FUNCTION_STDOUT();
 
-    if (m_LightSources.size() == 0) {
+    if (m_LightSources.empty()) {
         return {};
     }
 

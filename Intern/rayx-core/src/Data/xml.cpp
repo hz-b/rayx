@@ -3,7 +3,6 @@
 #include <cstdio>
 #include <cstring>
 #include <filesystem>
-#include <iostream>
 #include <utility>
 
 #include "Beamline/EnergyDistribution.h"
@@ -601,6 +600,5 @@ double Parser::parseAdditionalOrder() const {
     paramDouble(node, "additionalOrder", &additionalZeroOrder);
     return additionalZeroOrder;
 }
-
 
 }  // namespace RAYX::xml

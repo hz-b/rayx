@@ -22,7 +22,7 @@ using Format = std::vector<FormatComponent>;
 std::string RAYX_API defaultFormatString();
 
 // throws an error if it is unable to understand the format.
-Format RAYX_API formatFromString(std::string);
+Format RAYX_API formatFromString(const std::string&);
 
 // The "full" format, consisting of all components that rays support.
 // All other formats are derived by picking a subset of these components, and potentially reordering them.

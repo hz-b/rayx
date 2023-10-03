@@ -18,7 +18,7 @@ class CommandParser {
      * @brief Set command restrictions here (for ex int intervals etc.)
      *
      */
-    void analyzeCommands();
+    void analyzeCommands() const;
 
     std::shared_ptr<CLI::App> m_cli11;
     // CLI Arguments
@@ -41,7 +41,7 @@ class CommandParser {
         std::string m_format = defaultFormatString();  // --format
     } m_args;
 
-    inline void getVersion() const {
+    static inline void getVersion() {
         RAYX_LOG << R"(
           
         ╔═══╗╔═══╗╔╗  ╔╗╔═╗╔═╗

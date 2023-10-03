@@ -1,12 +1,13 @@
 #include "Writer.h"
+
 #include <sstream>
 
 #include "Debug/Debug.h"
 
 std::string defaultFormatString() {
-    std::string output = "";
+    std::string output;
     for (auto arg : FULL_FORMAT) {
-        if (output.size() > 0) {
+        if (!output.empty()) {
             output += "|";
         }
         output += arg.name;
@@ -14,7 +15,7 @@ std::string defaultFormatString() {
     return output;
 }
 
-FormatComponent componentFromString(std::string comp) {
+FormatComponent componentFromString(const std::string& comp) {
     for (auto c : FULL_FORMAT) {
         if (comp == c.name) {
             return c;
@@ -25,10 +26,10 @@ FormatComponent componentFromString(std::string comp) {
     return {};
 }
 
-Format formatFromString(std::string s) {
+Format formatFromString(const std::string& s) {
     Format output = {};
     std::stringstream ss(s);
-    std::string comp = "";
+    std::string comp;
 
     while (std::getline(ss, comp, '|')) {
         output.push_back(componentFromString(comp));

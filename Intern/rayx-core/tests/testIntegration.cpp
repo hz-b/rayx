@@ -11,7 +11,7 @@ TEST_F(TestSuite, PlaneMirrorDef) {
     // additional path length test
     auto rays = extractLastEvents(traceRML("PlaneMirrorDef"));
     for (auto r : rays) {
-        CHECK_IN(r.m_pathLength, 11000, 11001);
+        CHECK_IN(r.m_pathLength, 11000, 11001)
     }
 }
 TEST_F(TestSuite, PlaneMirrorMis) { compareLastAgainstRayUI("PlaneMirrorMis"); }
@@ -48,14 +48,14 @@ TEST_F(TestSuite, Ellipsoid) {
     writeToOutputCSV(rayx, "Ellipsoid.rayx");
 
     bool found_atleast_one = false;
-    for (auto ray_hist : rayx) {
+    for (const auto& ray_hist : rayx) {
         auto opt = lastSequentialHit(ray_hist, 2);
         if (opt) {
             CHECK_EQ(opt->m_position, glm::dvec3(0, 0, 0), 1e-11);
             found_atleast_one = true;
         }
     }
-    CHECK(found_atleast_one);
+    CHECK(found_atleast_one)
 }
 
 // TODO re-enable toroid tests

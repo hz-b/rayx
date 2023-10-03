@@ -2,7 +2,7 @@
 
 #include <fstream>
 #include <iostream>
-#include <sstream> 
+#include <sstream>
 
 #include "Debug/Debug.h"
 #include "Random.h"
@@ -21,12 +21,12 @@ bool DatFile::load(const std::filesystem::path& filename, DatFile* out) {
 #if defined(WIN32)
     if (sscanf_s(line.c_str(), "%u %le %le %le", &out->m_linecount, &out->m_start, &out->m_end, &out->m_step) != 4) {
 #else
-    if (sscanf(line.c_str(), "%u %le %le %le", &out->m_linecount, &out->m_start, &out->m_end, &out->m_step) != 4) {
+    if (sscanf(line.c_str(), "%u %le %le %le", &out->m_lineCount, &out->m_start, &out->m_end, &out->m_step) != 4) {
 #endif
         RAYX_ERR << "Failed to parse DatFile \"" << filename << "\", at line 2: \"" << line << "\"";
         return false;
     }
-    out->m_Lines.reserve(out->m_linecount);
+    out->m_Lines.reserve(out->m_lineCount);
 
     // line 3..EOF
     out->m_weightSum = 0;
@@ -61,7 +61,7 @@ bool DatFile::load(const std::filesystem::path& filename, DatFile* out) {
 [[maybe_unused]] std::string DatFile::dump() {
     std::stringstream s;
     s << m_title << '\n';
-    s << m_linecount << ' ' << m_start << ' ' << m_end << ' ' << m_step << '\n';
+    s << m_lineCount << ' ' << m_start << ' ' << m_end << ' ' << m_step << '\n';
     for (auto line : m_Lines) {
         s << line.m_energy << ' ' << line.m_weight << "\n";
     }

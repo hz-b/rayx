@@ -4,7 +4,6 @@
 #include <memory>
 #include <rapidxml.hpp>
 #include <sstream>
-#include <utility>
 
 #include "Beamline/Beamline.h"
 #include "Beamline/Objects/Objects.h"

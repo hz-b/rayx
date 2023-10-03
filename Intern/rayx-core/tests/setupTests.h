@@ -5,6 +5,7 @@
 #include <sstream>
 #include <type_traits>
 
+#include "Beamline/Objects/Objects.h"
 #include "CanonicalizePath.h"
 #include "Core.h"
 #include "Data/Importer.h"
@@ -12,7 +13,6 @@
 #include "Material/Material.h"
 #include "Random.h"
 #include "Shared/Constants.h"
-#include "Beamline/Objects/Objects.h"
 #include "Shared/Ray.h"
 #include "Tracer/CpuTracer.h"
 #include "Tracer/VulkanTracer.h"
@@ -88,9 +88,9 @@ inline void checkEq(std::string filename, int line, std::string l, std::string r
 template <>
 inline void checkEq(std::string filename, int line, std::string l, std::string r, const RAYX::Ray& tl, const RAYX::Ray& tr, std::vector<double> vl,
                     std::vector<double> vr, double tolerance) {
-    std::vector<std::string> names = {".m_position.x",  ".m_position.y", ".m_position.z",  ".m_eventType", ".m_direction.x", ".m_direction.y",
-                                      ".m_direction.z", ".m_energy",     ".m_stokes.x",    ".m_stokes.y",  ".m_stokes.z",    ".m_stokes.w",
-                                      ".m_pathLength",  ".m_order",      ".m_lastElement"};
+    std::vector<std::string> names = {".m_position.x",  ".m_position.y",  ".m_position.z", ".m_eventType", ".m_direction.x",
+                                      ".m_direction.y", ".m_direction.z", ".m_energy",     ".m_stokes.x",  ".m_stokes.y",
+                                      ".m_stokes.z",    ".m_stokes.w",    ".m_pathLength", ".m_order",     ".m_lastElement"};
     for (int i = 0; i < names.size(); i++) {
         auto t = tolerance;
 
@@ -161,7 +161,7 @@ class TestSuite : public testing::Test {
     }
 
     // called before every test invocation.
-    virtual void SetUp() { RAYX::fixSeed(RAYX::FIXED_SEED); }
+    void SetUp() override { RAYX::fixSeed(RAYX::FIXED_SEED); }
 
     static void TearDownTestSuite() { tracer = nullptr; }
 };
@@ -189,13 +189,13 @@ std::vector<RAYX::Ray> loadCSVRayUI(std::string filename);
 void compareBundleHistories(const RAYX::BundleHistory& r1, const RAYX::BundleHistory& r2, double t = 1e-11);
 
 // If the ray from `ray_hist` went through the whole beamline sequentially, we return its last hit event.
-// Otherwise we return `{}`, aka None.
+// Otherwise, we return `{}`, aka None.
 std::optional<RAYX::Ray> lastSequentialHit(RayHistory ray_hist, unsigned int beamline_len);
 
 /// Only cares for the rays hitting the last object of the beamline, and check whether they are the same as their RayUI counter part.
 /// Ray UI rays are obtained Export > RawRaysOutgoing.
 /// This also filters out non-sequential rays to compare to Ray-UI correctly.
-void compareLastAgainstRayUI(std::string filename, double t = 1e-11, Sequential seq=Sequential::No);
+void compareLastAgainstRayUI(std::string filename, double t = 1e-11, Sequential seq = Sequential::No);
 
 // compares input/<filename>.correct.csv with the trace output.
 void compareAgainstCorrect(std::string filename, double t = 1e-11);

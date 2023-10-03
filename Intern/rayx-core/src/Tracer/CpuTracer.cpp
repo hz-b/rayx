@@ -1,15 +1,12 @@
 
 #include "CpuTracer.h"
 
-#include <chrono>
 #include <cmath>
 #include <cstring>
 
 #include "Beamline/OpticalElement.h"
-#include "Debug/Debug.h"
-#include "Debug/Instrumentor.h"
 #include "Material/Material.h"
-#include "Random.h"
+#include "RAY-Core.h"
 
 using uint = unsigned int;
 
@@ -21,7 +18,7 @@ namespace CPU_TRACER {
 
 CpuTracer::CpuTracer() { RAYX_VERB << "Initializing Cpu Tracer.."; }
 
-CpuTracer::~CpuTracer() {}
+CpuTracer::~CpuTracer() = default;
 
 std::vector<Ray> CpuTracer::traceRaw(const TraceRawConfig& cfg) {
     RAYX_PROFILE_FUNCTION_STDOUT();

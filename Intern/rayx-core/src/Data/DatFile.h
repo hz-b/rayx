@@ -17,7 +17,7 @@ struct DatEntry {
 /** This struct represents the contents of a .DAT file. */
 struct DatFile {
     std::string m_title;
-    uint32_t m_linecount;
+    uint32_t m_lineCount;
     double m_start;
     double m_end;
     double m_step;

@@ -3,8 +3,7 @@
 #include <algorithm>
 
 #include "Beamline/OpticalElement.h"
-#include "Debug/Debug.h"
-#include "Debug/Instrumentor.h"
+#include "RAY-Core.h"
 #include "Random.h"
 #include "Shared/Constants.h"
 
@@ -33,7 +32,8 @@ BundleHistory Tracer::trace(const Beamline& b, Sequential seq, uint64_t max_batc
         std::copy(rays.begin() + rayIdStart, rays.begin() + rayIdStart + batch_size, std::back_inserter(batch));
 
         std::vector<Element> elements;
-        for (auto e : b.m_OpticalElements) {
+        elements.reserve(b.m_OpticalElements.size());
+        for (const auto& e : b.m_OpticalElements) {
             elements.push_back(e.m_element);
         }
 
@@ -47,10 +47,13 @@ BundleHistory Tracer::trace(const Beamline& b, Sequential seq, uint64_t max_batc
             .m_elements = elements,
         };
 
-        double sequential = (double) (seq == Sequential::Yes);
-        PushConstants pushConsants = {
-            .rayIdStart = (double)rayIdStart, .numRays = (double)rays.size(), .randomSeed = randomSeed, .maxEvents = (double)maxEvents, .sequential = sequential};
-        setPushConstants(&pushConsants);
+        auto sequential = (double)(seq == Sequential::Yes);
+        PushConstants pushConstants = {.rayIdStart = (double)rayIdStart,
+                                       .numRays = (double)rays.size(),
+                                       .randomSeed = randomSeed,
+                                       .maxEvents = (double)maxEvents,
+                                       .sequential = sequential};
+        setPushConstants(&pushConstants);
 
         RayHistory rawBatchHistory;
         {

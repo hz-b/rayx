@@ -3,8 +3,6 @@
 #include <glm.hpp>
 #include <optional>
 
-#include "Debug/Debug.h"
-
 namespace RAYX {
 
 glm::dmat4x4 defaultInMatrix(const DesignObject& dobj) { return calcTransformationMatrices(dobj.parsePosition(), dobj.parseOrientation(), true); }
@@ -95,7 +93,7 @@ Element makeElement(const DesignObject& dobj, Behaviour behaviour, Surface surfa
         cutout = dobj.parseCutout(planeDir);
     }
 
-    return Element {
+    return Element{
         .m_inTrans = defaultInMatrix(dobj),
         .m_outTrans = defaultOutMatrix(dobj),
         .m_behaviour = behaviour,

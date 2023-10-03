@@ -1,7 +1,7 @@
 //
 // Basic instrumentation profiler by Cherno
 
-// Usage: include this header file somewhere in your code (eg. precompiled
+// Usage: include this header file somewhere in your code (e.g. precompiled
 // header), and then use like:
 //
 // Instrumentor::Get().BeginSession("Session Name");        // Begin session

@@ -56,7 +56,7 @@ Cell doubleToCell(double x) {
     return strToCell(s.c_str());
 }
 
-void writeCSV(const RAYX::BundleHistory& hist, std::string filename, const Format& format) {
+void writeCSV(const RAYX::BundleHistory& hist, const std::string& filename, const Format& format) {
     std::ofstream file(filename);
 
     // write header:
@@ -89,7 +89,7 @@ void writeCSV(const RAYX::BundleHistory& hist, std::string filename, const Forma
 
 // loader:
 
-RAYX::BundleHistory loadCSV(std::string filename) {
+RAYX::BundleHistory loadCSV(const std::string& filename) {
     std::ifstream file(filename);
 
     // ignore setup line
@@ -123,7 +123,7 @@ RAYX::BundleHistory loadCSV(std::string filename) {
                          .m_lastElement = d[14],
                          .m_padding = -1.0};
         if (out.size() <= ray_id) {
-            out.push_back({});
+            out.emplace_back();
         }
         if (ray_id + 1 != out.size()) {
             RAYX_ERR << "loadCSV failed: rays out of order";
