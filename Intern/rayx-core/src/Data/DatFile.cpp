@@ -19,7 +19,7 @@ bool DatFile::load(const std::filesystem::path& filename, DatFile* out) {
     // line 2
     std::getline(s, line);
 #if defined(WIN32)
-    if (sscanf_s(line.c_str(), "%u %le %le %le", &out->m_linecount, &out->m_start, &out->m_end, &out->m_step) != 4) {
+    if (sscanf_s(line.c_str(), "%u %le %le %le", &out->m_lineCount, &out->m_start, &out->m_end, &out->m_step) != 4) {
 #else
     if (sscanf(line.c_str(), "%u %le %le %le", &out->m_lineCount, &out->m_start, &out->m_end, &out->m_step) != 4) {
 #endif
