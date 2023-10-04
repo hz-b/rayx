@@ -7,7 +7,7 @@
 namespace RAYX {
 
 void VulkanEngine::readBufferRaw(const char* buffName, char* outData) {
-    if (m_state != VulkanEngineStates::POSTRUN) {
+    if (m_state != EngineStates::POSTRUN) {
         RAYX_ERR << "you've forgotten to .run() the VulkanEngine. That's "
                     "mandatory before reading it's output buffers.";
     }

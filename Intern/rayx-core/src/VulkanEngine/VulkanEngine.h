@@ -35,24 +35,6 @@ struct VulkanEngineInitSpec {
     int deviceID;
 };
 
-/// There are 3 basic states for the VulkanEngine. Described below.
-/// the variable m_state stores that state.
-enum class VulkanEngineStates {
-    // the state before .init() is called.
-    // legal functions: declareBuffer(), init().
-    PREINIT,
-
-    // PRERUN can be reached by either calling .init() from the PREINIT
-    // state,
-    // or .cleanup() from the POSTRUN state.
-    // legal functions: createBuffer*, run().
-    PRERUN,
-
-    // the state after run() has been called.
-    // legal functions: readBuffer(), cleanup().
-    POSTRUN
-};
-
 /// the argument type of `VulkanEngine::run(_)`
 struct VulkanEngineRunSpec {
     uint32_t m_numberOfInvocations;
@@ -62,6 +44,25 @@ class RAYX_API VulkanEngine {
   public:
     VulkanEngine() = default;
     ~VulkanEngine();
+
+    /// There are 3 basic states for the VulkanEngine. Described below.
+    /// the variable m_state stores that state.
+    enum class EngineStates {
+        // the state before .init() is called.
+        // legal functions: declareBuffer(), init().
+        PREINIT,
+
+        // PRERUN can be reached by either calling .init() from the PREINIT
+        // state,
+        // or .cleanup() from the POSTRUN state.
+        // legal functions: createBuffer*, run().
+        PRERUN,
+
+        // the state after run() has been called.
+        // legal functions: readBuffer(), cleanup().
+        POSTRUN
+    };
+    inline EngineStates state() { return m_state; }
 
     /// buffers need to be declared before init() is called.
     void declareBuffer(const char* buffName, BufferDeclarationSpec);
@@ -102,8 +103,6 @@ class RAYX_API VulkanEngine {
     /// after this all buffers are deleted and hence readBuffer will fail.
     void cleanup();
 
-    inline VulkanEngineStates state() { return m_state; }
-
     /// the internal representation of a buffer.
     /// m_in, m_out, m_binding are taken from DeclareBufferSpec.
     /// the other ones are initialized in createBuffer.
@@ -127,7 +126,7 @@ class RAYX_API VulkanEngine {
     } m_pushConstantsData;
 
   private:
-    VulkanEngineStates m_state = VulkanEngineStates::PREINIT;
+    EngineStates m_state = EngineStates::PREINIT;
     const char* m_shaderFile;
     int m_deviceID = -1;
     uint32_t m_numberOfInvocations;
