@@ -3,6 +3,10 @@ cmake_minimum_required(VERSION 3.2 FATAL_ERROR)
 set(gtest_force_shared_crt ON CACHE BOOL "Always use msvcrt.dll" FORCE)
 
 add_subdirectory(googletest)
+add_subdirectory(ImGuiFileDialog)
+set(IMGUI_DIR ../Extern/imgui/)
+target_include_directories(ImGuiFileDialog PUBLIC ${IMGUI_DIR})
+
 # add_subdirectory(glfw)
 
 # CLI11
@@ -17,4 +21,3 @@ set(CLI11_FORCE_LIBCXX OFF)
 set(CLI11_CUDA_TESTS OFF)
 set(CLI11_CLANG_TIDY OFF)
 add_subdirectory(CLI11)
-

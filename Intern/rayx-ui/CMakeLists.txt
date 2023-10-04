@@ -37,7 +37,7 @@ option(GLFW_DOCUMENT_INTERNALS "Include internals in documentation" OFF)
 # ----------------------
 
 # ---- Dependencies ----
-target_link_libraries(${PROJECT_NAME} PRIVATE rayx-core glfw)
+target_link_libraries(${PROJECT_NAME} PRIVATE rayx-core glfw ImGuiFileDialog)
 target_include_directories(${PROJECT_NAME} PRIVATE
     ${GLFW_DIR}/include
     ${GLFW_DIR}/deps

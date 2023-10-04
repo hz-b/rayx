@@ -5,7 +5,6 @@
 
 #include "GraphicsCore/Descriptors.h"
 #include "GraphicsCore/Renderer.h"
-#include "Scene.h"
 
 const std::vector<const char*> validationLayers = {"VK_LAYER_KHRONOS_validation"};
 const std::vector<const char*> deviceExtensions = {VK_KHR_SWAPCHAIN_EXTENSION_NAME};
@@ -36,6 +35,4 @@ class Application {
     Renderer m_Renderer;
 
     std::unique_ptr<DescriptorPool> m_DescriptorPool{nullptr};
-    // ----------------------
-    Scene m_Scene;
 };

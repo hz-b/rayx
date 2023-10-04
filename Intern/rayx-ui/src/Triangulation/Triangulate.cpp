@@ -49,35 +49,31 @@ void flipToXYPlane(glm::vec4& topLeft, glm::vec4& topRight, glm::vec4& bottomLef
     bottomRight = rotationMatrix * bottomRight;
 }
 
-std::vector<RenderObject> planarTriangulation(const std::vector<RAYX::OpticalElement>& elements) {
-    std::vector<RenderObject> rObjects;
+RenderObject planarTriangulation(const RAYX::OpticalElement& element, Device& device) {
     static glm::vec4 blue = {0.0f, 0.0f, 1.0f, 1.0f};
     static glm::vec4 darkBlue = {0.0f, 0.0f, 0.4f, 1.0f};
     static glm::vec4 lightBlue = {0.7f, 0.7f, 1.0f, 1.0f};
 
-    for (const auto& element : elements) {
-        RenderObject rObject(element.m_element.m_outTrans);
+    glm::vec4 topLeft, topRight, bottomLeft, bottomRight;
+    calculateVerticesForType(element.m_element, topLeft, topRight, bottomLeft, bottomRight);
 
-        glm::vec4 topLeft, topRight, bottomLeft, bottomRight;
-        calculateVerticesForType(element.m_element, topLeft, topRight, bottomLeft, bottomRight);
-
-        // Some objects are in the XY not the XZ plane
-        if (element.m_element.m_behaviour.m_type == BTYPE_SLIT || element.m_element.m_behaviour.m_type == BTYPE_IMAGE_PLANE) {
-            flipToXYPlane(topLeft, topRight, bottomLeft, bottomRight);
-        }
-
-        Vertex v1 = {topLeft, lightBlue};
-        Vertex v2 = {topRight, blue};
-        Vertex v3 = {bottomLeft, blue};
-        Vertex v4 = {bottomRight, darkBlue};
-        rObject.addTriangle({v1, v2, v3});
-        rObject.addTriangle({v2, v3, v4});
-
-        rObjects.push_back(rObject);
+    // Some objects are in the XY not the XZ plane
+    if (element.m_element.m_behaviour.m_type == BTYPE_SLIT || element.m_element.m_behaviour.m_type == BTYPE_IMAGE_PLANE) {
+        flipToXYPlane(topLeft, topRight, bottomLeft, bottomRight);
     }
 
-    return rObjects;
+    Vertex v1 = {topLeft, lightBlue};
+    Vertex v2 = {topRight, blue};
+    Vertex v3 = {bottomLeft, blue};
+    Vertex v4 = {bottomRight, darkBlue};
+    std::vector<Vertex> vertices = {v1, v2, v3, v4};
+    std::vector<uint32_t> indices = {0, 1, 2, 2, 1, 3};
+
+    RenderObject renderObj(device, element.m_element.m_outTrans, vertices, indices);
+    return renderObj;
 }
+
+bool isPlanar(const QuadricSurface& q) { return (q.m_a11 == 0 && q.m_a22 == 0 && q.m_a33 == 0) && (q.m_a14 != 0 || q.m_a24 != 0 || q.m_a34 != 0); }
 
 // ------ Interface functions ------
 
@@ -86,48 +82,44 @@ std::vector<RenderObject> planarTriangulation(const std::vector<RAYX::OpticalEle
  * Depending on the type of the surface of the element and the option to use Marching Cubes,
  * different triangulation methods are applied.
  */
-std::vector<RenderObject> triangulateObjects(const std::vector<RAYX::OpticalElement>& elements, bool useMarchinCubes) {
-    std::vector<RAYX::OpticalElement> planarElements;
-    std::vector<RAYX::OpticalElement> curvedElements;
-    std::vector<RAYX::OpticalElement> quadricElements;
+std::vector<RenderObject> triangulateObjects(const std::vector<RAYX::OpticalElement>& elements, Device& device, bool useMarchingCubes) {
+    std::vector<RenderObject> rObjects;
 
-    for (auto element : elements) {
-        switch ((int)element.m_element.m_surface.m_type) {
-            case STYPE_PLANE_XY:
-                planarElements.push_back(element);
+    for (const auto& element : elements) {
+        switch (static_cast<int>(element.m_element.m_surface.m_type)) {
+            case STYPE_PLANE_XY: {
+                auto ro = planarTriangulation(element, device);  // Assume this returns a RenderObject
+                rObjects.emplace_back(std::move(ro));
                 break;
+            }
             case STYPE_QUADRIC: {
                 QuadricSurface q = deserializeQuadric(element.m_element.m_surface);
-                if ((q.m_a11 == 0 && q.m_a22 == 0 && q.m_a33 == 0) && (q.m_a14 != 0 || q.m_a24 != 0 || q.m_a34 != 0)) {  // Plane
-                    planarElements.push_back(element);
+                if (isPlanar(q)) {  // Replace with your condition for planarity
+                    auto ro = planarTriangulation(element, device);
+                    rObjects.emplace_back(std::move(ro));
                 } else {
-                    if (useMarchinCubes) {
-                        quadricElements.push_back(element);
+                    if (useMarchingCubes) {
+                        auto ro = marchingCubeTriangulation(element, device);  // Assume this returns a RenderObject
+                        rObjects.emplace_back(std::move(ro));
                     } else {
-                        curvedElements.push_back(element);
+                        auto ro = traceTriangulation(element, device);  // Assume this returns a RenderObject
+                        rObjects.emplace_back(std::move(ro));
                     }
                 }
                 break;
             }
-            case STYPE_TOROID:
-                curvedElements.push_back(element);
+            case STYPE_TOROID: {
+                auto ro = traceTriangulation(element, device);  // Assume this returns a RenderObject
+                rObjects.emplace_back(std::move(ro));
                 break;
+            }
             default:
-                // Error
                 RAYX_ERR << "Unknown element type: " << element.m_element.m_surface.m_type;
                 break;
         }
     }
 
-    std::cout << "Triangulating " << planarElements.size() << " planar elements, " << curvedElements.size() << " curved elements and "
-              << quadricElements.size() << " quadric elements" << std::endl;
-    std::vector<RenderObject> rObjects = planarTriangulation(planarElements);
-    std::vector<RenderObject> traceObjects = traceTriangulation(curvedElements);
-    rObjects.insert(rObjects.end(), traceObjects.begin(), traceObjects.end());
-    if (useMarchinCubes) {
-        std::vector<RenderObject> marchinCubeObjects = marchingCubeTriangulation(quadricElements);
-        rObjects.insert(rObjects.end(), marchinCubeObjects.begin(), marchinCubeObjects.end());
-    }
+    std::cout << "Triangulation complete" << std::endl;
     return rObjects;
 }
 

@@ -2,6 +2,7 @@
 
 #include "Colors.h"
 #include "Debug/Debug.h"
+#include "MarchingCubeConstans.h"
 
 namespace RAYX {
 namespace CPU_TRACER {
@@ -15,20 +16,20 @@ bool RAYX_API inCutout(Cutout cutout, double x1, double x2);
  * element, computes the triangles representing the surface within the cutout, and creates a RenderObject
  * for each set of triangles.
  */
-std::vector<RenderObject> marchingCubeTriangulation(const std::vector<RAYX::OpticalElement>& elements) {
-    std::vector<RenderObject> objects;
-
-    for (RAYX::OpticalElement element : elements) {
-        auto quadric = element.m_element.m_surface.m_params;
-        std::vector<Triangle> triangles = trianglesFromQuadric(quadric, element.m_element.m_cutout);
-        RenderObject object(glm::mat4(element.m_element.m_outTrans));
-        for (Triangle triangle : triangles) {
-            object.addTriangle(triangle);
-        }
-        objects.push_back(object);
+RenderObject marchingCubeTriangulation(const RAYX::OpticalElement& element, Device& device) {
+    auto quadric = element.m_element.m_surface.m_params;
+    std::vector<Triangle> triangles = trianglesFromQuadric(quadric, element.m_element.m_cutout);
+    std::vector<Vertex> vertices;
+    std::vector<uint32_t> indices;
+    for (uint32_t i = 0; i < triangles.size(); i++) {
+        vertices.push_back(triangles[i].v1);
+        vertices.push_back(triangles[i].v2);
+        vertices.push_back(triangles[i].v3);
+        indices.push_back(i * 3);
+        indices.push_back(i * 3 + 1);
+        indices.push_back(i * 3 + 2);
     }
-
-    return objects;
+    return RenderObject(device, element.m_element.m_outTrans, vertices, indices);
 }
 
 /**
@@ -93,7 +94,7 @@ std::vector<Triangle> trianglesFromQuadric(const double* quadric, Cutout cutout)
  * to the position to compute the scalar value.
  */
 double evaluateQuadricAtPosition(const double surface[16], const glm::vec4& pos) {
-    double icurv = surface[0];
+    // double icurv = surface[0];
     double a11 = surface[1];
     double a12 = surface[2];
     double a13 = surface[3];
@@ -120,9 +121,7 @@ int determineMarchingCubesCase(const double scalarGrid[GRIDSIZE][GRIDSIZE][GRIDS
     // Based on the scalar values at the voxel corners, determine the index for the lookup tables.
     int cubeIndex = 0;
 
-    auto test = scalarGrid[x][y][z];
     if (scalarGrid[x][y][z] < 0) cubeIndex |= 1;
-    auto test2 = scalarGrid[x + 1][y][z];
     if (scalarGrid[x + 1][y][z] < 0) cubeIndex |= 2;
     if (scalarGrid[x + 1][y][z + 1] < 0) cubeIndex |= 4;
     if (scalarGrid[x][y][z + 1] < 0) cubeIndex |= 8;

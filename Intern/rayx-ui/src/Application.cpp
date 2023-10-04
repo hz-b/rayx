@@ -7,8 +7,8 @@
 #include "GraphicsCore/Renderer.h"
 #include "GraphicsCore/Window.h"
 #include "RenderObject.h"
-#include "RenderSystem/LineRenderSystem.h"
-#include "RenderSystem/TriangleRenderSystem.h"
+#include "RenderSystem/ObjectRenderSystem.h"
+#include "RenderSystem/RayRenderSystem.h"
 #include "Triangulation/Triangulate.h"
 #include "UserInput.h"
 #include "Writer/CSVWriter.h"
@@ -16,10 +16,10 @@
 
 // --------- Start of Application code --------- //
 Application::Application(uint32_t width, uint32_t height, const char* name)
-    : m_Window(width, height, name),   //
-      m_Device(m_Window),              //
-      m_Renderer(m_Window, m_Device),  //
-      m_Scene(m_Device) {
+    : m_Window(width, height, name),  //
+      m_Device(m_Window),             //
+      m_Renderer(m_Window, m_Device)  //
+{
     m_DescriptorPool = DescriptorPool::Builder(m_Device)
                            .addPoolSize(VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, SwapChain::MAX_FRAMES_IN_FLIGHT)
                            .setMaxSets(SwapChain::MAX_FRAMES_IN_FLIGHT)
@@ -29,20 +29,6 @@ Application::Application(uint32_t width, uint32_t height, const char* name)
 Application::~Application() {}
 
 void Application::run() {
-    // Get the render data
-    std::string path = "METRIX_U41_G1_H1_318eV_PS_MLearn_v114";
-    RAYX::Beamline beamline = RAYX::importBeamline(path + ".rml");
-#ifndef NO_H5
-    RAYX::BundleHistory bundleHist = raysFromH5(std::string(path + ".h5"), FULL_FORMAT);
-#else  // Hack until alternative for csv is implemented
-    RAYX::BundleHistory bundleHist = loadCSV(std::string(path + ".csv"));
-#endif
-
-    // Triangulate the render data and update the scene
-    std::vector<RenderObject> rObjects = triangulateObjects(beamline.m_OpticalElements, true);
-    std::vector<Line> rays = getRays(bundleHist, beamline.m_OpticalElements);
-    m_Scene.update(rObjects, rays);
-
     // UBOs
     std::vector<std::unique_ptr<Buffer>> uboBuffers(SwapChain::MAX_FRAMES_IN_FLIGHT);
     for (int i = 0; i < uboBuffers.size(); i++) {
@@ -62,8 +48,8 @@ void Application::run() {
     }
 
     // Render systems
-    TriangleRenderSystem triangleRenderSystem(m_Device, m_Scene, m_Renderer.getSwapChainRenderPass(), setLayout->getDescriptorSetLayout());
-    LineRenderSystem lineRenderSystem(m_Device, m_Scene, m_Renderer.getSwapChainRenderPass(), setLayout->getDescriptorSetLayout());
+    ObjectRenderSystem objectRenderSystem(m_Device, m_Renderer.getSwapChainRenderPass(), setLayout->getDescriptorSetLayout());
+    RayRenderSystem rayRenderSystem(m_Device, m_Renderer.getSwapChainRenderPass(), setLayout->getDescriptorSetLayout());
 
     // Camera
     CameraController camController;
@@ -77,19 +63,51 @@ void Application::run() {
 
     // Main loop
     auto currentTime = std::chrono::high_resolution_clock::now();
+    std::vector<RenderObject> rObjects;
+    std::vector<Line> rays;
+    std::optional<RenderObject> rayObj;
+
     while (!m_Window.shouldClose()) {
         glfwPollEvents();
 
         auto newTime = std::chrono::high_resolution_clock::now();
         float frameTime = std::chrono::duration<float, std::chrono::seconds::period>(newTime - currentTime).count();
         currentTime = newTime;
-        // TODO: ImGui layer should not be in renderer class (maybe its own render system)
-        m_Renderer.updateImGui(camController, frameTime);
 
         if (auto commandBuffer = m_Renderer.beginFrame()) {
             uint32_t frameIndex = m_Renderer.getFrameIndex();
             camController.update(cam, m_Renderer.getAspectRatio());
             FrameInfo frameInfo{frameIndex, frameTime, commandBuffer, cam, descriptorSets[frameIndex]};
+            // TODO: ImGui layer should not be in renderer class (maybe its own render system)
+            m_Renderer.updateImGui(camController, frameInfo);
+
+            if (frameInfo.wasPathUpdated) {
+                // Get the render data
+                RAYX::Beamline beamline = RAYX::importBeamline(frameInfo.rmlPath);
+#ifndef NO_H5
+                RAYX::BundleHistory bundleHist = raysFromH5(frameInfo.rayFilePath, FULL_FORMAT);
+#else
+                RAYX::BundleHistory bundleHist = loadCSV(frameInfo.rayFilePath);
+#endif
+                vkDeviceWaitIdle(m_Device.device());  // TODO(Jannis): Hacky fix for now; should be some form of synchronization
+
+                // Triangulate the render data and update the scene
+                rObjects = triangulateObjects(beamline.m_OpticalElements, m_Device, true);
+                rays = getRays(bundleHist, beamline.m_OpticalElements);
+
+                if (rays.size() > 0) {
+                    // Temporarily aggregate all vertices, then create a single RenderObject
+                    std::vector<Vertex> rayVertices(rays.size() * 2);
+                    std::vector<uint32_t> rayIndices(rays.size() * 2);
+                    for (uint32_t i = 0; i < rays.size(); ++i) {
+                        rayVertices[i * 2] = rays[i].v1;
+                        rayVertices[i * 2 + 1] = rays[i].v2;
+                        rayIndices[i * 2] = i * 2;
+                        rayIndices[i * 2 + 1] = i * 2 + 1;
+                    }
+                    rayObj.emplace(m_Device, glm::mat4(1.0f), rayVertices, rayIndices);
+                }
+            }
 
             // Update ubo
             uboBuffers[frameIndex]->writeToBuffer(&cam);
@@ -98,8 +116,9 @@ void Application::run() {
             // Render
             m_Renderer.beginSwapChainRenderPass(commandBuffer);
 
-            triangleRenderSystem.render(frameInfo);
-            lineRenderSystem.render(frameInfo);
+            objectRenderSystem.render(frameInfo, rObjects);
+
+            rayRenderSystem.render(frameInfo, rayObj);
 
             m_Renderer.endSwapChainRenderPass(commandBuffer);
             m_Renderer.endFrame();

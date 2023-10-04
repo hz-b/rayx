@@ -6,8 +6,40 @@
 #include "Beamline/OpticalElement.h"
 #include "RenderObject.h"
 
-std::vector<RenderObject> traceTriangulation(const std::vector<RAYX::OpticalElement>& elements);
+/**
+ * @brief Traces the path of rays through an OpticalElement using a grid-based approach, and returns a RenderObject for visualization.
+ * @param element The optical element through which rays are traced. It contains details about its surface,
+ *                cutout, and behavior.
+ * @param device  The Device object used for rendering the final output.
+ *
+ * @return RenderObject containing the vertices and indices needed for rendering the triangulated rays.
+ *
+ * @note This function uses the RAYX::CpuTracer for ray tracing and relies on a grid-based approach for tracing rays.
+ *
+ * Example usage:
+ * @code{cpp}
+ *   RAYX::OpticalElement element = ...;
+ *   Device device = ...;
+ *   RenderObject renderObj = traceTriangulation(element, device);
+ * @endcode
+ */
+RenderObject traceTriangulation(const RAYX::OpticalElement& element, Device& device);
 
 // ------ Helper functions ------
+
+/**
+ * @brief Returns the dimensions (width and height) for various types of cutouts.
+ * @param cutout Reference to the Cutout object.
+ * @return A pair containing width and height as double values.
+ */
 std::pair<double, double> getRectangularDimensions(const Cutout& cutout);
-RAYX::MatrixSource setupMatrixSource(const Cutout& cutout);
+
+/**
+ * @brief Creates a 2D grid of rays to be used for ray tracing.
+ * @param size Grid size along one dimension.
+ * @param width Total grid width.
+ * @param height Total grid height.
+ * @param isXZ Indicates if rays are in the XZ plane.
+ * @return 2D vector of Ray objects.
+ */
+std::vector<std::vector<RAYX::Ray>> createRayGrid(size_t size, double width, double height, bool isXZ);
