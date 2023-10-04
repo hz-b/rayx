@@ -5,17 +5,17 @@ std::unique_ptr<RAYX::Tracer> tracer;
 // helper functions
 
 float parseDouble(std::string s) {
-    double temp;
+    float temp;
 #if defined(WIN32)
-    if (sscanf_s(s.c_str(), "%le", &temp) != 1) {
+    if (sscanf_s(s.c_str(), "%e", &temp) != 1) {
 #else
-    if (sscanf(s.c_str(), "%le", &temp) != 1) {
+    if (sscanf(s.c_str(), "%e", &temp) != 1) {
 #endif
         RAYX_WARN << "parseDouble failed for string:";
         RAYX_ERR << s;
         return 0.0f;  // Returning 0.0f as the function returns float, not a boolean
     }
-    return static_cast<float>(temp);  // explicit conversion to float
+    return temp;  // explicit conversion to float
 }
 
 RAYX::Ray parseCSVline(std::string line) {

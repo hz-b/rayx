@@ -33,9 +33,9 @@ bool NffTable::load(const char* element, NffTable* out) {
 
         NffEntry e{};
 #if defined(WIN32)
-        if (sscanf_s(line.c_str(), "%le %le %le", &e.m_energy, &e.m_f1, &e.m_f2) != 3) {
+        if (sscanf_s(line.c_str(), "%e %e %e", &e.m_energy, &e.m_f1, &e.m_f2) != 3) {
 #else
-        if (sscanf(line.c_str(), "%le %le %le", &e.m_energy, &e.m_f1, &e.m_f2) != 3) {
+        if (sscanf(line.c_str(), "%e %e %e", &e.m_energy, &e.m_f1, &e.m_f2) != 3) {
 #endif
             RAYX_ERR << "Failed to parse NffTable\"" << element << "\", at line " << lineidx << ": \"" << line << "\"";
             return false;
