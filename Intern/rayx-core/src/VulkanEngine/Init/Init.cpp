@@ -8,7 +8,7 @@ void VulkanEngine::init(VulkanEngineInitSpec spec) {
         RAYX_ERR << "VulkanEngine was already initialized!";
     }
 
-    m_shaderfile = spec.shaderFileName;
+    m_shaderFile = spec.shaderFileName;
     m_deviceID = spec.deviceID;
 
     createInstance();

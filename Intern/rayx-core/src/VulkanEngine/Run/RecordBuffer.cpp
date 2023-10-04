@@ -3,7 +3,41 @@
 #include "VulkanEngine/VulkanEngine.h"
 namespace RAYX {
 
-/*+
+// Function to calculate the optimal local workgroup dimensions
+void calculateLocalWorkGroups(uint32_t requiredLocalWorkGroupNo, VkPhysicalDeviceProperties& deviceProperties, uint32_t& xgroups, uint32_t& ygroups,
+                              uint32_t& zgroups) {
+    auto limits = deviceProperties.limits;
+
+    // Initial values
+    xgroups = limits.maxComputeWorkGroupCount[0];
+    ygroups = limits.maxComputeWorkGroupCount[1];
+    zgroups = limits.maxComputeWorkGroupCount[2];
+
+    // decrease xgroups, ygroups, zgroups so that we get a small number of
+    // workgroups until covering requiredLocalWorkGroupNo
+    while (xgroups * ygroups * (zgroups / 2) >= requiredLocalWorkGroupNo) {
+        zgroups /= 2;
+    }
+    while (xgroups * ygroups * (zgroups - 1) >= requiredLocalWorkGroupNo) {
+        zgroups--;
+    }
+
+    while (xgroups * (ygroups / 2) * zgroups >= requiredLocalWorkGroupNo) {
+        ygroups /= 2;
+    }
+    while (xgroups * (ygroups - 1) * zgroups >= requiredLocalWorkGroupNo) {
+        ygroups--;
+    }
+
+    while ((xgroups / 2) * ygroups * zgroups >= requiredLocalWorkGroupNo) {
+        xgroups /= 2;
+    }
+    while ((xgroups - 1) * ygroups * zgroups >= requiredLocalWorkGroupNo) {
+        xgroups--;
+    }
+}
+
+/*
  * Record Commands for Compute and Dispatch
  */
 void VulkanEngine::recordInComputeCommandBuffer() {
@@ -41,16 +75,13 @@ void VulkanEngine::recordInComputeCommandBuffer() {
     the arguments. If you are already familiar with compute shaders from
     OpenGL, this should be nothing new to you.
     */
-    auto requiredLocalWorkGroupNo = (uint32_t)ceil((float) m_numberOfInvocations / float(WORKGROUP_SIZE));  // number of local works groups
+    auto requiredLocalWorkGroupNo = (uint32_t)ceil((float)m_numberOfInvocations / float(WORKGROUP_SIZE));  // number of local works groups
     // check if there are too many rays
     VkPhysicalDeviceProperties deviceProperties;
     vkGetPhysicalDeviceProperties(m_PhysicalDevice, &deviceProperties);
 
-    auto limits = deviceProperties.limits;
-
-    auto xgroups = limits.maxComputeWorkGroupCount[0];
-    auto ygroups = limits.maxComputeWorkGroupCount[1];
-    auto zgroups = limits.maxComputeWorkGroupCount[2];
+    uint32_t xgroups, ygroups, zgroups;
+    calculateLocalWorkGroups(requiredLocalWorkGroupNo, deviceProperties, xgroups, ygroups, zgroups);
 
     // if this limit is reached, you may start using
     // multidimensional local workgroups.
@@ -64,33 +95,10 @@ void VulkanEngine::recordInComputeCommandBuffer() {
     }
 
     if (requiredGroup != requiredLocalWorkGroupNo) {
-        // decrease xgroups, ygroups, zgroups so that we get a small number of
-        // workgroups stlil covering requiredLocalWorkGroupNo
-        {
-            while (xgroups * ygroups * (zgroups / 2) >= requiredLocalWorkGroupNo) {
-                zgroups /= 2;
-            }
-            while (xgroups * ygroups * (zgroups - 1) >= requiredLocalWorkGroupNo) {
-                zgroups--;
-            }
-
-            while (xgroups * (ygroups / 2) * zgroups >= requiredLocalWorkGroupNo) {
-                ygroups /= 2;
-            }
-            while (xgroups * (ygroups - 1) * zgroups >= requiredLocalWorkGroupNo) {
-                ygroups--;
-            }
-
-            while ((xgroups / 2) * ygroups * zgroups >= requiredLocalWorkGroupNo) {
-                xgroups /= 2;
-            }
-            while ((xgroups - 1) * ygroups * zgroups >= requiredLocalWorkGroupNo) {
-                xgroups--;
-            }
-        }
         group.x = xgroups;
         group.y = ygroups;
         group.z = zgroups;
+        requiredGroup = requiredLocalWorkGroupNo;
     }
 
     /**

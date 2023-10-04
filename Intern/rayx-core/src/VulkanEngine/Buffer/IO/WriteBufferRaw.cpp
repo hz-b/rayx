@@ -6,31 +6,31 @@
 
 namespace RAYX {
 
-void VulkanEngine::writeBufferRaw(const char* bufname, char* indata) {
-    Buffer& b = m_buffers[bufname];
+void VulkanEngine::writeBufferRaw(const char* buffName, char* inData) {
+    Buffer& b = m_buffers[buffName];
 
     if (!b.isInput) {
-        RAYX_ERR << "writeBufferRaw(\"" << bufname << "\", ...) is not allowed, as \"" << bufname << "\" has m_in = false";
+        RAYX_ERR << "writeBufferRaw(\"" << buffName << "\", ...) is not allowed, as \"" << buffName << "\" has m_in = false";
     }
 
-    size_t remainingBytes = m_buffers[bufname].size;
+    size_t remainingBytes = m_buffers[buffName].size;
     size_t offset = 0;
     while (remainingBytes > 0) {
-        size_t localbytes = std::min(remainingBytes, (size_t)STAGING_SIZE);
-        storeToStagingBuffer(indata + offset, localbytes);
-        gpuMemcpy(m_buffers[bufname].buf, offset, m_stagingBuffer.buf, 0, localbytes);
+        size_t localBytes = std::min(remainingBytes, (size_t)STAGING_SIZE);
+        storeToStagingBuffer(inData + offset, localBytes);
+        gpuMemcpy(m_buffers[buffName].buf, offset, m_stagingBuffer.buf, 0, localBytes);
 
-        offset += localbytes;
-        remainingBytes -= localbytes;
+        offset += localBytes;
+        remainingBytes -= localBytes;
         m_Fences.transfer->wait();
     }
 }
 
-void VulkanEngine::storeToStagingBuffer(char* indata, size_t bytes) {
+void VulkanEngine::storeToStagingBuffer(char* inData, size_t bytes) {
     // void* buf;
     // vkMapMemory(m_Device, m_stagingMemory, 0, STAGING_SIZE, 0, &buf);
 
-    memcpy(m_stagingBuffer.allocaInfo.pMappedData, indata, bytes);
+    memcpy(m_stagingBuffer.allocaInfo.pMappedData, inData, bytes);
 
     // vkUnmapMemory(m_Device, m_stagingMemory);
 }

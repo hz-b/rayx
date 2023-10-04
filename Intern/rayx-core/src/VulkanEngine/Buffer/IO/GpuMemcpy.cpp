@@ -3,7 +3,7 @@
 #include "VulkanEngine/VulkanEngine.h"
 
 namespace RAYX {
-void VulkanEngine::gpuMemcpy(VkBuffer& buffer_dst, size_t offset_dst, VkBuffer& buffer_src, size_t offset_src, size_t bytes) {
+void VulkanEngine::gpuMemcpy(VkBuffer& bufferDst, size_t offsetDst, VkBuffer& bufferSrc, size_t offsetSrc, size_t bytes) {
     RAYX_PROFILE_FUNCTION();
     VkCommandBufferBeginInfo beginInfo{};
     beginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
@@ -12,11 +12,11 @@ void VulkanEngine::gpuMemcpy(VkBuffer& buffer_dst, size_t offset_dst, VkBuffer& 
     vkBeginCommandBuffer(m_TransferCommandBuffer, &beginInfo);
 
     VkBufferCopy copyRegion{};
-    copyRegion.srcOffset = offset_src;
-    copyRegion.dstOffset = offset_dst;
+    copyRegion.srcOffset = offsetSrc;
+    copyRegion.dstOffset = offsetDst;
     copyRegion.size = bytes;
 
-    vkCmdCopyBuffer(m_TransferCommandBuffer, buffer_src, buffer_dst, 1, &copyRegion);
+    vkCmdCopyBuffer(m_TransferCommandBuffer, bufferSrc, bufferDst, 1, &copyRegion);
 
     vkEndCommandBuffer(m_TransferCommandBuffer);
 

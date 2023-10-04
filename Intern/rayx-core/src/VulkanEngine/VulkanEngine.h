@@ -9,8 +9,7 @@
 #include <vector>
 #include <vulkan/vulkan.hpp>
 
-#include "Debug/Debug.h"
-#include "Debug/Instrumentor.h"
+#include "RAY-Core.h"
 
 namespace RAYX {
 
@@ -30,10 +29,28 @@ struct BufferDeclarationSpec {
 
 /// the argument type of `VulkanEngine::init(_)`
 struct VulkanEngineInitSpec {
-    /// the name of the shaderfile, as relative path - relative to the root of
+    /// the name of the shaderFile, as relative path - relative to the root of
     /// the repository
     const char* shaderFileName;
     int deviceID;
+};
+
+/// There are 3 basic states for the VulkanEngine. Described below.
+/// the variable m_state stores that state.
+enum class VulkanEngineStates {
+    // the state before .init() is called.
+    // legal functions: declareBuffer(), init().
+    PREINIT,
+
+    // PRERUN can be reached by either calling .init() from the PREINIT
+    // state,
+    // or .cleanup() from the POSTRUN state.
+    // legal functions: createBuffer*, run().
+    PRERUN,
+
+    // the state after run() has been called.
+    // legal functions: readBuffer(), cleanup().
+    POSTRUN
 };
 
 /// the argument type of `VulkanEngine::run(_)`
@@ -47,7 +64,7 @@ class RAYX_API VulkanEngine {
     ~VulkanEngine();
 
     /// buffers need to be declared before init() is called.
-    void declareBuffer(const char* bufname, BufferDeclarationSpec);
+    void declareBuffer(const char* buffName, BufferDeclarationSpec);
 
     /// changes the state from PREINIT to PRERUN.
     void init(VulkanEngineInitSpec);
@@ -56,13 +73,13 @@ class RAYX_API VulkanEngine {
     /// the buffer will have exactly the size to fit all elements of vec.
     /// only allowed for `m_in = true` buffers.
     template <typename T>
-    inline void createBufferWithData(const char* bufname, const std::vector<T>& vec) {
-        createBuffer(bufname, vec.size() * sizeof(T));
-        writeBufferRaw(bufname, (char*)vec.data());
+    inline void createBufferWithData(const char* buffName, const std::vector<T>& vec) {
+        createBuffer(buffName, vec.size() * sizeof(T));
+        writeBufferRaw(buffName, (char*)vec.data());
     }
 
     /// create a buffer with the given size, it's data is uninitialized.
-    void createBuffer(const char* bufname, VkDeviceSize);
+    void createBuffer(const char* buffName, VkDeviceSize);
 
     /// changes the state from PRERUN to POSTRUN
     /// This function runs the shader.
@@ -75,33 +92,15 @@ class RAYX_API VulkanEngine {
     /// after run(_) is finished (i.e. in POSTRUN state)
     /// we can read the contents of `m_out = true`-buffers.
     template <typename T>
-    inline std::vector<T> readBuffer(const char* bufname) {
-        std::vector<T> out(m_buffers[bufname].size / sizeof(T));
-        readBufferRaw(bufname, (char*)out.data());
+    inline std::vector<T> readBuffer(const char* buffName) {
+        std::vector<T> out(m_buffers[buffName].size / sizeof(T));
+        readBufferRaw(buffName, (char*)out.data());
         return out;
     }
 
     /// changes the state from POSTRUN to PRERUN.
     /// after this all buffers are deleted and hence readBuffer will fail.
     void cleanup();
-
-    /// There are 3 basic states for the VulkanEngine. Described below.
-    /// the variable m_state stores that state.
-    enum class VulkanEngineStates {
-        // the state before .init() is called.
-        // legal functions: declareBuffer(), init().
-        PREINIT,
-
-        // PRERUN can be reached by either calling .init() from the PREINIT
-        // state,
-        // or .cleanup() from the POSTRUN state.
-        // legal functions: createBuffer*, run().
-        PRERUN,
-
-        // the state after run() has been called.
-        // legal functions: readBuffer(), cleanup().
-        POSTRUN
-    };
 
     inline VulkanEngineStates state() { return m_state; }
 
@@ -129,7 +128,7 @@ class RAYX_API VulkanEngine {
 
   private:
     VulkanEngineStates m_state = VulkanEngineStates::PREINIT;
-    const char* m_shaderfile;
+    const char* m_shaderFile;
     int m_deviceID = -1;
     uint32_t m_numberOfInvocations;
 
@@ -218,17 +217,14 @@ class RAYX_API VulkanEngine {
 
     // CreateBuffer.cpp:
 
+    /// VMA Version of createVkBuffer
     /// note that there also is a public createBuffer to create a `Buffer`,
     /// and a private `createVkBuffer` which constructs an actual `VkBuffer`.
     /// This is merely a helper method for `createBuffer` and
     /// `createStagingBuffer`.
-    void createVkBuffer(VkDeviceSize size, VkBufferUsageFlags usage, VkMemoryPropertyFlags properties, VkBuffer& buffer,
-                        VkDeviceMemory& bufferMemory);
-
-    // VMA Version of createVkBuffer
-    void createVmaBuffer(VkDeviceSize size, VkBufferUsageFlags buffer_usage, VkBuffer& buffer, VmaAllocation& allocation,
-                         VmaAllocationInfo* allocation_info, VmaAllocationCreateFlags flags = VMA_ALLOCATION_CREATE_HOST_ACCESS_RANDOM_BIT,
-                         VmaMemoryUsage memory_usage = VMA_MEMORY_USAGE_AUTO, const std::vector<uint32_t>& queue_family_indices = {});
+    void createVmaBuffer(VkDeviceSize size, VkBufferUsageFlags bufferUsage, VkBuffer& buffer, VmaAllocation& allocation,
+                         VmaAllocationInfo* allocationInfo, VmaAllocationCreateFlags flags = VMA_ALLOCATION_CREATE_HOST_ACCESS_RANDOM_BIT,
+                         VmaMemoryUsage memoryUsage = VMA_MEMORY_USAGE_AUTO, const std::vector<uint32_t>& queueFamilyIndices = {});
     // BufferIO:
     size_t STAGING_SIZE = 0;
     /// copies data from one buffer to the other with given offsets.
@@ -236,25 +232,25 @@ class RAYX_API VulkanEngine {
     /// Careful : This is not an awaiting command so make sure to check the according fence transfer
     /// or Queue Idle before copying again
     /// {read,write}BufferRaw.
-    void gpuMemcpy(VkBuffer& buffer_dst, size_t offset_dst, VkBuffer& buffer_src, size_t offset_src, size_t bytes);
+    void gpuMemcpy(VkBuffer& bufferDst, size_t offsetDst, VkBuffer& bufferSrc, size_t offsetSrc, size_t bytes);
 
-    /// reads a buffer and writes the data to `outdata`.
-    /// the full buffer is read (the size is `m_buffers[bufname].m_size`)
+    /// reads a buffer and writes the data to `outData`.
+    /// the full buffer is read (the size is `m_buffers[buffName].m_size`)
     /// this function uses m_stagingBuffer to read the data in chunks of
     /// STAGING_SIZE. only allowed for buffers with `m_out = true`.
-    void readBufferRaw(const char* bufname, char* outdata);
+    void readBufferRaw(const char* buffName, char* outData);
 
-    /// writes the `indata` to the buffer.
-    /// It will write the full `m_buffers[bufname].m_size` bytes.
+    /// writes the `inData` to the buffer.
+    /// It will write the full `m_buffers[buffName].m_size` bytes.
     /// this function uses m_stagingBuffer to write the data in chunks of
     /// STAGING_SIZE. only allowed for buffers with `m_in = true`.
-    void writeBufferRaw(const char* bufname, char* indata);
+    void writeBufferRaw(const char* buffName, char* inData);
 
     /// loads `bytes` many bytes from the staging buffer into `outdata`.
-    void loadFromStagingBuffer(char* outdata, size_t bytes);
+    void loadFromStagingBuffer(char* outData, size_t bytes);
 
-    /// writes `bytes` many bytes from `indata` into the staging buffer.
-    void storeToStagingBuffer(char* indata, size_t bytes);
+    /// writes `bytes` many bytes from `inData` into the staging buffer.
+    void storeToStagingBuffer(char* inData, size_t bytes);
 };
 
 // Used for validating return values of Vulkan API calls.
