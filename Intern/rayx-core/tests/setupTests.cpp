@@ -5,17 +5,17 @@ std::unique_ptr<RAYX::Tracer> tracer;
 // helper functions
 
 float parseDouble(std::string s) {
-    float d;
+    double temp;
 #if defined(WIN32)
-    if (sscanf_s(s.c_str(), "%le", &d) != 1) {
+    if (sscanf_s(s.c_str(), "%le", &temp) != 1) {
 #else
-    if (sscanf(s.c_str(), "%le", &d) != 1) {
+    if (sscanf(s.c_str(), "%le", &temp) != 1) {
 #endif
         RAYX_WARN << "parseDouble failed for string:";
         RAYX_ERR << s;
-        return false;
+        return 0.0f;  // Returning 0.0f as the function returns float, not a boolean
     }
-    return d;
+    return static_cast<float>(temp);  // explicit conversion to float
 }
 
 RAYX::Ray parseCSVline(std::string line) {
@@ -71,7 +71,7 @@ void writeToOutputCSV(const RAYX::BundleHistory& hist, std::string filename) {
 
 RAYX::BundleHistory traceRML(std::string filename) {
     auto beamline = loadBeamline(filename);
-    return tracer->trace(beamline, /*sequential: */false, DEFAULT_BATCH_SIZE);
+    return tracer->trace(beamline, /*sequential: */ false, DEFAULT_BATCH_SIZE);
 }
 
 std::vector<RAYX::Event> extractLastHit(const RAYX::BundleHistory& hist) {
@@ -174,7 +174,7 @@ std::optional<RAYX::Ray> lastSequentialHit(RayHistory ray_hist, unsigned int bea
 // returns the rayx rays converted to be ray-UI compatible.
 std::vector<RAYX::Ray> rayUiCompat(std::string filename) {
     auto beamline = loadBeamline(filename);
-    BundleHistory hist = tracer->trace(beamline, /*sequential: */false, DEFAULT_BATCH_SIZE);
+    BundleHistory hist = tracer->trace(beamline, /*sequential: */ false, DEFAULT_BATCH_SIZE);
 
     std::vector<RAYX::Ray> out;
 

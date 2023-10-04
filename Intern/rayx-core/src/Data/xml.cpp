@@ -42,13 +42,15 @@ bool paramDouble(const rapidxml::xml_node<>* node, const char* paramname, float*
         return false;
     }
 
+    double temp;
 #if defined(WIN32)
-    if (sscanf_s(ref->value(), "%le", out) != 1) {
+    if (sscanf_s(ref->value(), "%le", &temp) != 1) {
 #else
-    if (sscanf(ref->value(), "%le", out) != 1) {
+    if (sscanf(ref->value(), "%le", &temp) != 1) {
 #endif
         return false;
     }
+    *out = static_cast<float>(temp);  // explicit conversion to float
 
     return true;
 }
@@ -102,13 +104,15 @@ bool paramDvec3(const rapidxml::xml_node<>* node, const char* paramname, glm::ve
     for (rapidxml::xml_node<>* p = subnode->first_node(); p; p = p->next_sibling()) {
         for (uint32_t i = 0; i < 3; i++) {
             if (strcmp(p->name(), names[i]) == 0) {
+                double temp;
 #if defined(WIN32)
-                if (sscanf_s(p->value(), "%le", ptrs[i]) != 1) {
+                if (sscanf_s(p->value(), "%le", &temp) != 1) {
 #else
-                if (sscanf(p->value(), "%le", ptrs[i]) != 1) {
+                if (sscanf(p->value(), "%le", &temp) != 1) {
 #endif
                     return false;
                 }
+                *ptrs[i] = static_cast<float>(temp);  // explicit conversion to float
                 break;
             }
         }

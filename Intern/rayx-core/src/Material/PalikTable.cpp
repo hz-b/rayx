@@ -32,14 +32,20 @@ bool PalikTable::load(const char* element, PalikTable* out) {
         }
 
         PalikEntry e{};
-#if defined(WIN32)
-        if (sscanf_s(line.c_str(), "%le %le %le", &e.m_energy, &e.m_n, &e.m_k) != 3) {
-#else
-        if (sscanf(line.c_str(), "%le %le %le", &e.m_energy, &e.m_n, &e.m_k) != 3) {
-#endif
+        double temp_energy, temp_n, temp_k;  // Temporary double variables
+        std::istringstream iss(line);        // Create a string stream from the line
+
+        // Read from the string stream into temporary double variables
+        if (!(iss >> temp_energy >> temp_n >> temp_k)) {
             RAYX_ERR << "Failed to parse PalikTable \"" << element << "\", at line " << lineidx << ": \"" << line << "\"";
             return false;
         }
+
+        // Explicitly cast to float and store in struct
+        e.m_energy = static_cast<float>(temp_energy);
+        e.m_n = static_cast<float>(temp_n);
+        e.m_k = static_cast<float>(temp_k);
+
         out->m_Lines.push_back(e);
     }
 
