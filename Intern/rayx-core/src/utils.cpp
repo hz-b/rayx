@@ -120,8 +120,8 @@ std::vector<double>::iterator movingAppend(std::vector<double>&& srcVector, std:
         destVector = std::move(srcVector);
         result = std::begin(destVector);
     } else {
-        result =
-            destVector.insert(std::end(destVector), std::make_move_iterator(std::begin(srcVector)), std::make_move_iterator(std::end(srcVector)));
+        destVector.insert(std::end(destVector), std::make_move_iterator(srcVector.begin()), std::make_move_iterator(srcVector.end()));
+        result = std::end(destVector);
     }
 
     srcVector.clear();
