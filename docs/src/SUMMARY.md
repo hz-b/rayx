@@ -26,7 +26,7 @@
     - [How to use Doxygen](./Tools/How-to-use-Doxygen.md)
     - [How to use our Formatter](./Tools/How-to-use-our-formatter.md)
     - [Testing](./Tools/Testing.md)
-    - [Rayx Profiling](./Tools/Rayx-Profiling.md)
+    - [RAYX Profiling](./Tools/Rayx-Profiling.md)
 
 
 - [Vulkan](./Vulkan/Vulkan.md)

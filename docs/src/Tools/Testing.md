@@ -1,4 +1,4 @@
-# Testing in rayx
+# Testing in RAYX
 
 There are several kinds of tests: 
 ## Testing C++ Code

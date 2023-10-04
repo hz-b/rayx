@@ -1,7 +1,7 @@
 # Vulkan multi-shaderfile support: Shader split
 
 ## Why?
-The current compute task in rayx is crammed into one `main.comp` compute shader file. This shader file takes care of all the computation and runs all neccessary tracing operations (bounces, collision check, etc.). As expected though, this file is huge in size, even compared to the state of the art compute shaders. As a consequence, loading this file into the GPU as instructions through Vulkan takes a while.
+The current compute task in RAYX is crammed into one `main.comp` compute shader file. This shader file takes care of all the computation and runs all neccessary tracing operations (bounces, collision check, etc.). As expected though, this file is huge in size, even compared to the state of the art compute shaders. As a consequence, loading this file into the GPU as instructions through Vulkan takes a while.
 
 Moreover, although including one file, launching the task once and idle waiting are easy, massive flexibility and granuanilty are lost. Once the compute task starts, the CPU receives messages from the GPU only once this task has finished or failed. In the meantime, the GPU is a blackbox! To ensure correct result storage, the VRAM needs to allocate enough space for all recorded events, which leads to the output buffer's exponential increase in memory usage. 
 
@@ -89,4 +89,4 @@ A new buffer is created `ray-meta` which contains unique data to each ray (seed,
 
 
 ## Conclusion
-This was rather a successful experiment. I (_OS_) learned much more about Vulkan and GPUs. Once it is time to work on the vulkan engine in rayx. This is by far, a high priority.
+This was rather a successful experiment. I (_OS_) learned much more about Vulkan and GPUs. Once it is time to work on the vulkan engine in RAYX. This is by far, a high priority.
