@@ -1,12 +1,10 @@
 # Changes
 
-- Introduce SemVer
-- Introduced new Testsuite, improvements include
-    - performance
-    - readability
-    - some bug fixes
-- Bugfix wiki math display
-- Bugfix Metrix Beamline Tracing
-- Bugfix Toroid & Ellipsoid
-- Bugfix multi rzp script
-- Minor code reworks
+- Addition of first prototype for RAYX-UI, which allows rendering of beamlines
+- Added -s option for sequential tracing
+- Added option for specific h5 format when exporting rays
+- Bug fixes for the RZP (but still being worked on)
+- Added additional benchmarking tools
+- Exposed additional RAYX-CORE features for outside use
+- Improved documentation
+- Improved software testing

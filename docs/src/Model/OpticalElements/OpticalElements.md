@@ -9,7 +9,7 @@ Optical elements in RAYX are conceptualized as shown below:
 ![image](../../res/ray-coord.png)
 _Source: [Schaefers](https://gitlab.helmholtz-berlin.de/RAY/RAY/-/wikis/uploads/bdcf4515e03b2fccf462c5f0d76052c3/Paper_Schaefers_RAY_Springer_2007.pdf)_
 
-The rule to keep in mind here is that if rays pass through an optical element, the element is placed in the XY-Plane; otherwise, it is in the XZ-Plane. The reasoning behind this is that the default direction of rays is always along the z-axis. This simplifies the design of beamlines, which mostly proceed in a straight line.
+The rule to keep in mind here is that if rays pass through an optical element, the element is placed in the XY-Plane; otherwise, it is in the XZ-Plane. The reasoning behind this is that the default direction of rays is always along the z-axis. This simplifies the design of beamlines, which mostly proceed in a straight line. This is subject to change, as we are currently discussing, having all elements in the XZ-Plane.
 
 To orient the optical element within the entire beamline, we can simply adjust the direction matrix. Defining the basis vectors of the direction matrix provides full control over the orientation of the optical elements/surfaces.
 
@@ -38,7 +38,7 @@ The cutout itself does not have a position; it is always at the origin of the el
 
 ### Behavior
 
-Behavior determines whether an optical element is a slit, grating, RZP (special grating), mirror, or other. This classification aids the tracing process by specifying how rays will interact with the object. Ray interactions with elements are categorized as events. Here are some types of events (for more, see the Doxygen documentation):
+Behavior determines whether an optical element is a slit, grating, [RZP](./RZP.md), mirror, or other. This classification aids the tracing process by specifying how rays will interact with the object. Ray interactions with elements are categorized as events. Here are some types of events (for more, see the Doxygen documentation):
 
 - Fly off: The ray did not intersect with an element and will not be traced further.
 - Just hit: The ray did intersect with an element and will continue to be traced.
