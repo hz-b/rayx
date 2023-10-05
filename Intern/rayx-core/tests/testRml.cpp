@@ -67,6 +67,10 @@ TEST_F(TestSuite, testEnergyDistribution) {
                                         .rmlFile = "PointSourceThreeSoftEdgeEnergies",
                                         .energy = 47.92,
                                         .average = 50,
+                                        },{
+                                        .rmlFile = "PointSourceHardEdgeEnergy",
+                                        .energy = 127.96,
+                                        .average =100,
                                         },
     };
 
