@@ -131,7 +131,7 @@ TEST_F(TestSuite, testVerDivergenceDipole) {
     }
 }
 
-TEST_F(TestSuite, testLightsourceGetters) {
+TEST_F(TestSuite, testLightsourceGetters){
     struct RmlInput {
         std::string rmlFile;
         double horDivergence;

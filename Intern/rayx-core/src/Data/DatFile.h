@@ -27,6 +27,8 @@ struct DatFile {
 
     std::vector<DatEntry> m_Lines;
 
+    bool m_continuous;
+
     /** loads the .DAT file `filename` and writes it's contents to `out` */
     static bool load(const std::filesystem::path& filename, DatFile* out);
 
