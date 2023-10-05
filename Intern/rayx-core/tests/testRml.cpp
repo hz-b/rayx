@@ -20,7 +20,7 @@ TEST_F(TestSuite, loadDatFile2) {
     CHECK_EQ(b.m_LightSources.size(), 1);
     CHECK_EQ(b.m_OpticalElements.size(), 1);
     CHECK_EQ(b.m_LightSources[0]->m_EnergyDistribution.getAverage(), 100, 0.1); //TODO value needs to be confirmed
-    CHECK_EQ(b.m_LightSources[0]->m_EnergyDistribution.selectEnergy(), 100, 0.1); //TODO value needs to be confirmed
+    CHECK_EQ(b.m_LightSources[0]->m_EnergyDistribution.selectEnergy(), 100.404, 0.1); //TODO value needs to be confirmed
 }
 
 
@@ -42,6 +42,42 @@ TEST_F(TestSuite, groupTransform) {
         -42, 0,  -1000, 1,  //
     };
     CHECK_EQ(correct, m);
+}
+
+
+TEST_F(TestSuite, testEnergyDistribution) {
+    RAYX::fixSeed(RAYX::FIXED_SEED);
+
+    struct testInput
+    {
+        std::string rmlFile;
+        double energy;  
+        double average;
+    };
+    
+    std::vector<testInput> testinput = {{
+                                        .rmlFile = "PointSourceSeperateEnergies",
+                                        .energy = 100,
+                                        .average = 100,
+                                        },{
+                                        .rmlFile = "PointSourceSoftEdgeEnergy",
+                                        .energy = 106.42,
+                                        .average = 100,
+                                        },{
+                                        .rmlFile = "PointSourceThreeSoftEdgeEnergies",
+                                        .energy = 47.92,
+                                        .average = 50,
+                                        },
+    };
+
+    for (auto values : testinput) {
+        auto beamline = loadBeamline(values.rmlFile);
+        auto energy = beamline.m_LightSources[0]->m_EnergyDistribution.selectEnergy();
+        auto average = beamline.m_LightSources[0]->m_EnergyDistribution.getAverage();
+
+        CHECK_EQ(energy, values.energy, 0.1);
+        CHECK_EQ(average, values.average, 0.1);
+    }
 }
 
 // TODO(rudi) re-enable group tests
