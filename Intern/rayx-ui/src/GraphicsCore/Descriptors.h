@@ -10,7 +10,7 @@ class DescriptorSetLayout {
   public:
     class Builder {
       public:
-        Builder(Device& Device) : m_Device{Device} {}
+        explicit Builder(Device& Device) : m_Device{Device} {}
 
         Builder& addBinding(uint32_t binding, VkDescriptorType descriptorType, VkShaderStageFlags stageFlags, uint32_t count = 1);
         std::unique_ptr<DescriptorSetLayout> build() const;
@@ -39,7 +39,7 @@ class DescriptorPool {
   public:
     class Builder {
       public:
-        Builder(Device& Device) : m_Device{Device} {}
+        explicit Builder(Device& Device) : m_Device{Device} {}
 
         Builder& addPoolSize(VkDescriptorType descriptorType, uint32_t count);
         Builder& setPoolFlags(VkDescriptorPoolCreateFlags flags);

@@ -23,6 +23,7 @@ std::unique_ptr<DescriptorSetLayout> DescriptorSetLayout::Builder::build() const
 DescriptorSetLayout::DescriptorSetLayout(Device& Device, std::unordered_map<uint32_t, VkDescriptorSetLayoutBinding> bindings)
     : m_Device{Device}, m_bindings{bindings} {
     std::vector<VkDescriptorSetLayoutBinding> setLayoutBindings{};
+    setLayoutBindings.reserve(bindings.size());
     for (auto kv : bindings) {
         setLayoutBindings.push_back(kv.second);
     }

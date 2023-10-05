@@ -26,15 +26,14 @@ Application::Application(uint32_t width, uint32_t height, const char* name)
                            .build();
 }
 
-Application::~Application() {}
+Application::~Application() = default;
 
 void Application::run() {
-    // UBOs
+    // Create UBOs (Uniform Buffer Object)
     std::vector<std::unique_ptr<Buffer>> uboBuffers(SwapChain::MAX_FRAMES_IN_FLIGHT);
-    for (int i = 0; i < uboBuffers.size(); i++) {
-        uboBuffers[i] =
-            std::make_unique<Buffer>(m_Device, sizeof(Camera), 1, VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT);
-        uboBuffers[i]->map();
+    for (auto& uboBuffer : uboBuffers) {
+        uboBuffer = std::make_unique<Buffer>(m_Device, sizeof(Camera), 1, VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT);
+        uboBuffer->map();
     }
 
     // Descriptor set layout
@@ -42,7 +41,7 @@ void Application::run() {
                          .addBinding(0, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, VK_SHADER_STAGE_VERTEX_BIT)  //
                          .build();                                                                      //
     std::vector<VkDescriptorSet> descriptorSets(SwapChain::MAX_FRAMES_IN_FLIGHT);
-    for (int i = 0; i < descriptorSets.size(); i++) {
+    for (unsigned long i = 0; i < descriptorSets.size(); i++) {
         auto bufferInfo = uboBuffers[i]->descriptorInfo();
         DescriptorWriter(*setLayout, *m_DescriptorPool).writeBuffer(0, &bufferInfo).build(descriptorSets[i]);
     }
@@ -95,7 +94,7 @@ void Application::run() {
                 rObjects = triangulateObjects(beamline.m_OpticalElements, m_Device, true);
                 rays = getRays(bundleHist, beamline.m_OpticalElements);
 
-                if (rays.size() > 0) {
+                if (!rays.empty()) {
                     // Temporarily aggregate all vertices, then create a single RenderObject
                     std::vector<Vertex> rayVertices(rays.size() * 2);
                     std::vector<uint32_t> rayIndices(rays.size() * 2);
@@ -109,7 +108,7 @@ void Application::run() {
                 }
             }
 
-            // Update ubo
+            // Update UBO
             uboBuffers[frameIndex]->writeToBuffer(&cam);
             uboBuffers[frameIndex]->flush();
 

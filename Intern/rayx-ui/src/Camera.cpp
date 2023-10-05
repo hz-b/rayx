@@ -1,7 +1,5 @@
 #include "Camera.h"
 
-#include <vulkan/vulkan.h>
-
 #include <fstream>
 #include <glm/gtc/matrix_transform.hpp>
 #include <sstream>

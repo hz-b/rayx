@@ -28,7 +28,7 @@ SwapChain::~SwapChain() {
         m_SwapChain = nullptr;
     }
 
-    for (int i = 0; i < m_depthImages.size(); i++) {
+    for (size_t i = 0; i < m_depthImages.size(); i++) {
         vkDestroyImageView(m_Device.device(), m_depthImageViews[i], nullptr);
         vkDestroyImage(m_Device.device(), m_depthImages[i], nullptr);
         vkFreeMemory(m_Device.device(), m_depthImageMemorys[i], nullptr);
@@ -272,7 +272,7 @@ void SwapChain::createDepthResources() {
     m_depthImageMemorys.resize(imageCount());
     m_depthImageViews.resize(imageCount());
 
-    for (int i = 0; i < m_depthImages.size(); i++) {
+    for (size_t i = 0; i < m_depthImages.size(); i++) {
         VkImageCreateInfo imageInfo{};
         imageInfo.sType = VK_STRUCTURE_TYPE_IMAGE_CREATE_INFO;
         imageInfo.imageType = VK_IMAGE_TYPE_2D;

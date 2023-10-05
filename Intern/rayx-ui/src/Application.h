@@ -20,6 +20,13 @@ class Device;
 
 class Application {
   public:
+    /**
+     * @brief Constructs a new rayx-ui application.
+     *
+     * @param width The width of the application window.
+     * @param height The height of the application window.
+     * @param name The name of the application.
+     */
     Application(uint32_t width, uint32_t height, const char* name);
     ~Application();
 
@@ -30,9 +37,9 @@ class Application {
 
   private:
     // --- Order matters ---
-    Window m_Window;
-    Device m_Device;
-    Renderer m_Renderer;
+    Window m_Window; // Application window
+    Device m_Device; // Vulkan device
+    Renderer m_Renderer; // Vulkan renderer
 
     std::unique_ptr<DescriptorPool> m_DescriptorPool{nullptr};
 };

@@ -26,7 +26,7 @@ class Device {
     const bool enableValidationLayers = true;
 #endif
 
-    Device(Window& window);
+    explicit Device(Window& window);
     ~Device();
 
     // Not copyable or movable

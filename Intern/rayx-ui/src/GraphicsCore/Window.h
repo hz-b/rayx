@@ -3,7 +3,7 @@
 #define GLFW_INCLUDE_VULKAN
 #include <GLFW/glfw3.h>
 
-struct Extent2D {
+struct [[maybe_unused]] Extent2D {
     uint32_t width;
     uint32_t height;
 };
@@ -24,7 +24,7 @@ class Window {
      * @param height The initial height of the window.
      * @param title The title of the window.
      */
-    Window(uint32_t width, uint32_t height, const char* const title);
+    Window(uint32_t width, uint32_t height, const char* title);
 
     /// Deleted copy constructor.
     Window(const Window&) = delete;

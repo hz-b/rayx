@@ -38,8 +38,10 @@ void ObjectRenderSystem::createPipeline(VkRenderPass renderPass) {
     GraphicsPipeline::defaultPipelineConfigInfo(pipelineConfig);
     pipelineConfig.renderPass = renderPass;
     pipelineConfig.pipelineLayout = m_PipelineLayout;
-    m_Pipeline = std::make_unique<GraphicsPipeline>(m_Device, "../../../Intern/rayx-ui/src/Shaders/vert.spv",
-                                                    "../../../Intern/rayx-ui/src/Shaders/frag.spv", pipelineConfig);
+
+    const std::string vertexShader = "../../../Intern/rayx-ui/src/Shaders/vert.spv";
+    const std::string fragmentShader = "../../../Intern/rayx-ui/src/Shaders/frag.spv";
+    m_Pipeline = std::make_unique<GraphicsPipeline>(m_Device, vertexShader, fragmentShader, pipelineConfig);
 }
 
 void ObjectRenderSystem::render(FrameInfo& frameInfo, const std::vector<RenderObject>& objects) {

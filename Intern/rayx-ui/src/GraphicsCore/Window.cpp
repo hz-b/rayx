@@ -10,7 +10,7 @@
  *
  * @see: framebufferResizeCallback() for more information on the callback function.
  */
-Window::Window(uint32_t width, uint32_t height, const char* const title) {
+Window::Window(uint32_t width, uint32_t height, const char* title) {
     m_width = width;
     m_height = height;
     m_title = title;

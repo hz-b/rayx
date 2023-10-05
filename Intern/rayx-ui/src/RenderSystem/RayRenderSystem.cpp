@@ -43,6 +43,8 @@ void RayRenderSystem::createPipeline(VkRenderPass renderPass) {
     pipelineConfig.rasterizationInfo.lineWidth = 2.0f;
     pipelineConfig.renderPass = renderPass;
     pipelineConfig.pipelineLayout = m_PipelineLayout;
-    m_Pipeline = std::make_unique<GraphicsPipeline>(m_Device, "../../../Intern/rayx-ui/src/Shaders/ray_vert.spv",
-                                                    "../../../Intern/rayx-ui/src/Shaders/frag.spv", pipelineConfig);
+
+    const std::string vertexShader = "../../../Intern/rayx-ui/src/Shaders/ray_vert.spv";
+    const std::string fragmentShader = "../../../Intern/rayx-ui/src/Shaders/frag.spv";
+    m_Pipeline = std::make_unique<GraphicsPipeline>(m_Device, vertexShader, fragmentShader, pipelineConfig);
 }

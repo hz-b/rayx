@@ -2,13 +2,6 @@
 
 #include <cstring>
 
-VkDeviceSize Buffer::getAlignment(VkDeviceSize instanceSize, VkDeviceSize minOffsetAlignment) {
-    if (minOffsetAlignment > 0) {
-        return (instanceSize + minOffsetAlignment - 1) & ~(minOffsetAlignment - 1);
-    }
-    return instanceSize;
-}
-
 /**
  * Allocates buffer memory using given parameters and associates it with a Device.
  * Also calculates memory alignment.
@@ -29,6 +22,13 @@ Buffer::~Buffer() {
     unmap();
     vkDestroyBuffer(m_Device.device(), m_Buffer, nullptr);
     vkFreeMemory(m_Device.device(), m_Memory, nullptr);
+}
+
+VkDeviceSize Buffer::getAlignment(VkDeviceSize instanceSize, VkDeviceSize minOffsetAlignment) {
+    if (minOffsetAlignment > 0) {
+        return (instanceSize + minOffsetAlignment - 1) & ~(minOffsetAlignment - 1);
+    }
+    return instanceSize;
 }
 
 /**

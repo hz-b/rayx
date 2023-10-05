@@ -20,6 +20,7 @@ struct PipelineConfigInfo {
     VkPipelineDepthStencilStateCreateInfo depthStencilInfo;
     std::vector<VkDynamicState> dynamicStateEnables;
     VkPipelineDynamicStateCreateInfo dynamicStateInfo;
+
     VkPipelineLayout pipelineLayout = nullptr;
     VkRenderPass renderPass = nullptr;
     VkPrimitiveTopology topology;
@@ -27,6 +28,11 @@ struct PipelineConfigInfo {
     uint32_t subpass = 0;
 };
 
+/**
+ * @brief The GraphicsPipeline class encapsulates a Vulkan graphics pipeline.
+ *
+ * It handles the creation and destruction of the pipeline, including shader modules, etc.
+ */
 class GraphicsPipeline {
   public:
     GraphicsPipeline(Device& device, const std::string& vertFilepath, const std::string& fragFilepath, const PipelineConfigInfo& createInfo);
@@ -36,6 +42,12 @@ class GraphicsPipeline {
     GraphicsPipeline& operator=(const GraphicsPipeline&) = delete;
 
     void bind(VkCommandBuffer commandBuffer);
+
+    /**
+     * @brief Provides default configuration information for a graphics pipeline.
+     *
+     * @param configInfo The configuration information to be filled with default values.
+     */
     static void defaultPipelineConfigInfo(PipelineConfigInfo& configInfo);
     VkPipeline getHandle() const { return m_Pipeline; }
 
