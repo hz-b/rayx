@@ -319,7 +319,6 @@ bool paramEnergyDistribution(const rapidxml::xml_node<>* node, const std::filesy
             return false;
         }
 
-        
         if (spreadType == SpreadType::SoftEdge) {
             if (energySpread == 0) {
                 energySpread = 1;

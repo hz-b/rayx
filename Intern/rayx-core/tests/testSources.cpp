@@ -150,7 +150,7 @@ TEST_F(TestSuite, testLightsourceGetters){
         .averagePhotonEnergy = 120.97,
     }};
 
-    for (const auto& values : rmlinputs) {
+    for (auto values : rmlinputs) {
         auto beamline = loadBeamline(values.rmlFile);
         std::shared_ptr<LightSource> src = beamline.m_LightSources[0];
         auto* lightSource = dynamic_cast<LightSource*>(&*src);
