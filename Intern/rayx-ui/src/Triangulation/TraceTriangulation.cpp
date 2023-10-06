@@ -113,13 +113,15 @@ std::vector<RenderObject> traceTriangulation(const std::vector<RAYX::OpticalElem
                     Vertex v1 = {glm::vec4(rayGrid[i][j].m_position, 1.0f), DARKER_BLUE};
                     Vertex v2 = {glm::vec4(rayGrid[i + 1][j].m_position, 1.0f), BLUE};
                     Vertex v3 = {glm::vec4(rayGrid[i][j + 1].m_position, 1.0f), BLUE};
-                    triangles.push_back(Triangle(v1, v2, v3));
+                    Triangle mytriangle = {v1, v2, v3};
+                    triangles.push_back(mytriangle);
                 }
                 if (grid[i + 1][j + 1] && grid[i + 1][j] && grid[i][j + 1]) {
                     Vertex v1 = {glm::vec4(rayGrid[i + 1][j + 1].m_position, 1.0f), BLUE};
                     Vertex v2 = {glm::vec4(rayGrid[i + 1][j].m_position, 1.0f), BLUE};
                     Vertex v3 = {glm::vec4(rayGrid[i][j + 1].m_position, 1.0f), LIGHTER_BLUE};
-                    triangles.push_back(Triangle(v1, v2, v3));
+                    Triangle mytriangle = {v1, v2, v3};
+                    triangles.push_back(mytriangle);
                 }
             }
         }

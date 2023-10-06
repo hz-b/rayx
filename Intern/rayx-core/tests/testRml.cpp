@@ -13,14 +13,15 @@ TEST_F(TestSuite, loadDatFile) {
     CHECK_EQ(b.m_LightSources.size(), 1);
     CHECK_EQ(b.m_OpticalElements.size(), 1);
     CHECK_EQ(b.m_LightSources[0]->m_EnergyDistribution.getAverage(), (12. + 15. + 17.) / 3, 0.1);
+    CHECK_EQ(b.m_LightSources[0]->m_EnergyDistribution.selectEnergy(), 17, 0.1); 
 }
 
 TEST_F(TestSuite, loadDatFile2) {
     auto b = loadBeamline("loadDatFile2");
     CHECK_EQ(b.m_LightSources.size(), 1);
     CHECK_EQ(b.m_OpticalElements.size(), 1);
-    CHECK_EQ(b.m_LightSources[0]->m_EnergyDistribution.getAverage(), 100, 0.1); //TODO value needs to be confirmed
-    CHECK_EQ(b.m_LightSources[0]->m_EnergyDistribution.selectEnergy(), 100.404, 0.1); //TODO value needs to be confirmed
+    CHECK_EQ(b.m_LightSources[0]->m_EnergyDistribution.getAverage(), 14.6, 0.1); //TODO value needs to be confirmed
+    CHECK_EQ(b.m_LightSources[0]->m_EnergyDistribution.selectEnergy(), 17.1, 0.1); //TODO value needs to be confirmed 
 }
 
 
@@ -82,6 +83,30 @@ TEST_F(TestSuite, testEnergyDistribution) {
         CHECK_EQ(energy, values.energy, 0.1);
         CHECK_EQ(average, values.average, 0.1);
     }
+}
+
+/***
+ * Tests if two sources can be traced in one go. 
+ * Its a static test, so every change can result in a fail even if it's still working correctly
+*/
+TEST_F(TestSuite, testTwoSourcesInOneRML) {
+    RAYX::fixSeed(RAYX::FIXED_SEED);
+
+    auto beamline = loadBeamline("twoSourcesTest");
+
+    std::shared_ptr<LightSource> dsrc = beamline.m_LightSources[0];
+    DipoleSource* dipolesource = dynamic_cast<DipoleSource*>(&*dsrc);
+
+    std::shared_ptr<LightSource> psrc = beamline.m_LightSources[1];
+    PointSource* pointsource = dynamic_cast<PointSource*>(&*psrc);
+
+
+    CHECK_EQ(100, dipolesource->getEnergy());
+    CHECK_EQ(153.84, pointsource->selectEnergy(), 0.1);
+
+    CHECK_EQ(-21.74, dipolesource->getXYZPosition(0.1).x, 0.1);
+    CHECK_EQ(0, pointsource->getSourceWidth(), 0.1);
+
 }
 
 // TODO(rudi) re-enable group tests

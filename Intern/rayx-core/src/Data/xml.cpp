@@ -282,6 +282,14 @@ bool paramEnergyDistribution(const rapidxml::xml_node<>* node, const std::filesy
     if (!xml::paramInt(node, "energySpreadType", &spreadType_int)) {
         return false;
     }
+    
+    /**
+         * a different output is set for all Energy Distribution Types
+         *
+         * default: 0:HardEdge(WhiteBand)
+         *          1:SoftEdge(Energyspread = sigma)
+         *          2:SeperateEnergies(Spikes)
+         */
     auto spreadType = static_cast<SpreadType>(spreadType_int);
 
     if (energyDistributionType == EnergyDistributionType::File) {
@@ -312,14 +320,8 @@ bool paramEnergyDistribution(const rapidxml::xml_node<>* node, const std::filesy
             return false;
         }
 
-        /**
-         * a different output is set for all Energy Distribution Types
-         *
-         * default: 0:HardEdge(WhiteBand)
-         *          1:SoftEdge(Energyspread = sigma)
-         *          2:SeperateEnergies(Spikes)
-         */
-        if ((spreadType == SpreadType::SoftEdge)) {
+        
+        if (spreadType == SpreadType::SoftEdge) {
             if (energySpread == 0) {
                 energySpread = 1;
             }
