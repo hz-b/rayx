@@ -30,3 +30,5 @@ results.json
 Intern/rayx-core/tests/input/dipole_benchmarking.rml
 check-coverage.py
 Scripts/dipole_bench.py
+Intern/rayx-core/src/Beamline/Objects/DipoleSourceOMP.h
+Intern/rayx-core/src/Beamline/Objects/DipoleSourcePT.h
