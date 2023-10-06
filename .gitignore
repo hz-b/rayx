@@ -8,6 +8,8 @@ Intern/rayx-core/doc/*/
 Intern/rayx-core/tests/output/**
 out/
 Scripts/dipoleRmls/
+Scripts/dipoleRmls/
+
 
 # Files
 *.user
