@@ -101,7 +101,7 @@ TEST_F(TestSuite, testInterpolationFunctionDipole) {
 
     auto beamline = loadBeamline("dipole_plain");
     std::shared_ptr<LightSource> src = beamline.m_LightSources[0];
-    auto* dipoleSource = dynamic_cast<DipoleSource*>(&*src);
+    auto* dipolesource = dynamic_cast<DipoleSource*>(&*src);
 
     for (auto values : inouts) {
         auto result = dipolesource->getInterpolation(values.in);

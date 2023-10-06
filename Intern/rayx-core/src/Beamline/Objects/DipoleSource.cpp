@@ -268,7 +268,7 @@ PsiAndStokes DipoleSource::getPsiandStokes(double en) const {
     PsiAndStokes psiandstokes;
     do {
         psiandstokes.psi = (randomDouble() -0.5) * 6 * m_verDivergence;
-        psiandstokes.stokes = dipoleFold(psiandstokes.psi, en, m_verEbeamDivergence);
+        psiandstokes = dipoleFold(psiandstokes.psi, en, m_verEbeamDivergence);
     } while ((psiandstokes.stokes[0]) / m_maxIntensity < randomDouble());
     
     psiandstokes.psi  = psiandstokes.psi * 1e-3; //psi in rad

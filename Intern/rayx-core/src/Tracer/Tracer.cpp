@@ -11,7 +11,7 @@ using uint = unsigned int;
 
 namespace RAYX {
 
-BundleHistory Tracer::trace(const Beamline& b, bool sequential, uint64_t max_batch_size, int thread_count) {
+BundleHistory Tracer::trace(const Beamline& b, Sequential sequential, uint64_t max_batch_size, int thread_count) {
     RAYX_PROFILE_FUNCTION_STDOUT();
 
     std::vector<Ray> rays;
