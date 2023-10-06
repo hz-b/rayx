@@ -1,8 +1,6 @@
 #pragma once
 
-#if RAYX_DEBUG_MODE
 #define RAYX_PROFILE
-#endif
 
 // Memory leak detection (RAYX_NEW instead of new allows leaks to be detected)
 #ifdef RAYX_DEBUG_MODE

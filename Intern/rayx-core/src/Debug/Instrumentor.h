@@ -105,20 +105,21 @@ class RAYX_API InstrumentationTimer {
     }
 
     void Stop() {
-        auto endTimepoint = std::chrono::high_resolution_clock::now();
+        if (BENCH_FLAG) {
+            auto endTimepoint = std::chrono::high_resolution_clock::now();
 
-        long long start = std::chrono::time_point_cast<std::chrono::microseconds>(m_StartTimepoint).time_since_epoch().count();
-        long long end = std::chrono::time_point_cast<std::chrono::microseconds>(endTimepoint).time_since_epoch().count();
+            long long start = std::chrono::time_point_cast<std::chrono::microseconds>(m_StartTimepoint).time_since_epoch().count();
+            long long end = std::chrono::time_point_cast<std::chrono::microseconds>(endTimepoint).time_since_epoch().count();
 
-        size_t threadID = std::hash<std::thread::id>{}(std::this_thread::get_id());
-        Instrumentor::Get().WriteProfile({m_Name, start, end, threadID});
+            size_t threadID = std::hash<std::thread::id>{}(std::this_thread::get_id());
+            Instrumentor::Get().WriteProfile({m_Name, start, end, threadID});
 
-        if (m_canPrint && BENCH_FLAG) {
-            long long duration = end - start;
-            double seconds = duration * 0.000001;
-            std::cout << "BENCH: " << m_Name << ": " << std::endl << seconds << "s" << std::endl;
+            if (m_canPrint) {
+                long long duration = end - start;
+                double seconds = duration * 0.000001;
+                std::cout << "BENCH: " << m_Name << ": " << std::endl << seconds << "s" << std::endl;
+            }
         }
-
         m_isStopped = true;
     }
 
