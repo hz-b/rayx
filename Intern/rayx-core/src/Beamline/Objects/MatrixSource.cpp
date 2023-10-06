@@ -22,7 +22,7 @@ MatrixSource::MatrixSource(const DesignObject& dobj) : LightSource(dobj) {
  * direction as first 4) distributed evenly across width & height of source
  * returns vector of rays
  */
-std::vector<Ray> MatrixSource::getRays(int thread_count) const {
+std::vector<Ray> MatrixSource::getRays([[maybe_unused]] int thread_count) const {
     RAYX_PROFILE_FUNCTION();
 
     double x, y, z, psi, phi,
