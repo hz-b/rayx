@@ -64,7 +64,8 @@ void TerminalApp::tracePath(const std::filesystem::path& path) {
         }
 
         // Run rayx core
-        auto rays = m_Tracer->trace(*m_Beamline, max_batch_size, m_CommandParser->m_args.m_setThreads);
+        auto rays = m_Tracer->trace(*m_Beamline, m_CommandParser->m_args.m_sequential, max_batch_size, m_CommandParser->m_args.m_setThreads);
+
         // Export Rays to external data.
         auto file = exportRays(rays, path.string());
 

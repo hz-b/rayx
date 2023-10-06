@@ -1,8 +1,6 @@
-#include <fstream>
-
-#include <fstream>
-
 #include "setupTests.h"
+
+#include <fstream>
 
 void checkEnergyDistribution(const std::vector<Ray>& rays, double photonEnergy, double energySpread) {
     for (auto r : rays) {

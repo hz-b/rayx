@@ -46,7 +46,6 @@ const double FACTOR_SCHWINGER_RAY = 1.2556937e15;
 
 
 
-
 #define PlaneDir double
 // the direction of a plane.
 // Either XY or XZ.

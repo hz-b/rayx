@@ -50,7 +50,7 @@ class RAYX_API LightSource {
 
   protected:
     // Geometric Params
-    // double m_sourceDepth;
+
     double m_sourceHeight;
     double m_sourceWidth;
 

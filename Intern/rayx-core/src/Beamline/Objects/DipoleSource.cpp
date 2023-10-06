@@ -75,10 +75,6 @@ DipoleSource::DipoleSource(const DesignObject& dobj) : LightSource(dobj) {
     // calcMagneticField();
     calcPhotonWavelength();
     calcSourcePath();
-    //auto end = std::chrono::high_resolution_clock::now();
-    //std::chrono::duration<double> duration = end - start;
-    //double dur = duration.count();
-    //m_duration.push_back(dur);
 }
 
 /**
@@ -129,7 +125,7 @@ std::vector<Ray> DipoleSource::getRays(int thread_count) const {
         psiandstokes = getPsiandStokes(en);
 
         phi = phi + getMisalignmentParams().m_rotationXerror.rad;
-                
+
         psiandstokes.psi = psiandstokes.psi + getMisalignmentParams().m_rotationYerror.rad;
 
         // get corresponding angles based on distribution and deviation from
@@ -270,16 +266,16 @@ PsiAndStokes DipoleSource::getPsiandStokes(double en) const {
     // RAYX_PROFILE_SCOPE("getPsiStokes");
 
     PsiAndStokes psiandstokes;
-    double psi;
     do {
-        psi = (randomDouble() - 0.5) * 6 * m_verDivergence;
-        psiandstokes = dipoleFold(psi, en, m_verEbeamDivergence);
+        psiandstokes.psi = (randomDouble() -0.5) * 6 * m_verDivergence;
+        psiandstokes.stokes = dipoleFold(psiandstokes.psi, en, m_verEbeamDivergence);
     } while ((psiandstokes.stokes[0]) / m_maxIntensity < randomDouble());
-
-    psiandstokes.psi = psiandstokes.psi * 1e-3;  // psi in rad
+    
+    psiandstokes.psi  = psiandstokes.psi * 1e-3; //psi in rad
 
     return psiandstokes;
 }
+
 
 PsiAndStokes DipoleSource::dipoleFold(double psi, double photonEnergy, double sigpsi) const {
     // RAYX_PROFILE_SCOPE("dipolefold");

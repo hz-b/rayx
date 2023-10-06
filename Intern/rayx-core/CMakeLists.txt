@@ -16,7 +16,6 @@ add_subdirectory(tests)
 
 # -------------------
 
-
 #-----OpenMP--------
 
 if(OpenMp STREQUAL "NO")
