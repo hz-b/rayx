@@ -22,3 +22,6 @@
 [submodule "Extern/ImGuiFileDialog"]
 	path = Extern/ImGuiFileDialog
 	url = https://github.com/aiekick/ImGuiFileDialog
+[submodule "FlameGraph"]
+	path = FlameGraph
+	url = https://github.com/brendangregg/FlameGraph
