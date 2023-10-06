@@ -54,8 +54,8 @@ class RAYX_API LightSource {
     double m_sourceHeight;
     double m_sourceWidth;
     // in rad:
-    double m_horDivergence; //phi
-    double m_verDivergence; //psi
+    double m_horDivergence;  // phi
+    double m_verDivergence;  // psi
 
     glm::dmat4x4 m_orientation = glm::dmat4x4();
     glm::dvec4 m_position = glm::dvec4();
@@ -63,7 +63,6 @@ class RAYX_API LightSource {
   private:
     // User/Design Parameter
     Misalignment m_misalignmentParams;  // x, y, phi, psi,
-
 };
 
 }  // namespace RAYX

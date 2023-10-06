@@ -1,6 +1,7 @@
+#include <numeric>
+
 #include "Tracer/CpuTracer.h"
 #include "setupTests.h"
-#include <numeric>
 
 TEST_F(TestSuite, testUniformRandom) {
     uint64_t ctr = 13;
@@ -15,9 +16,9 @@ TEST_F(TestSuite, testUniformRandom) {
 }
 
 TEST_F(TestSuite, testNormalRandom) {
-    uint64_t ctr = 13; // seed value
-    double mu = 0.0;   // mean
-    double sigma = 1.0; // standard deviation
+    uint64_t ctr = 13;   // seed value
+    double mu = 0.0;     // mean
+    double sigma = 1.0;  // standard deviation
 
     // Vectors to store the generated random numbers and their z-scores
     std::vector<double> random_numbers;
@@ -26,7 +27,7 @@ TEST_F(TestSuite, testNormalRandom) {
     for (int i = 0; i < 1000; i++) {
         double Z = CPU_TRACER::squaresNormalRNG(ctr, mu, sigma);
         random_numbers.push_back(Z);
-        
+
         // Calculate z-score and store
         double z_score = (Z - mu) / sigma;
         z_scores.push_back(z_score);
