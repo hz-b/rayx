@@ -1,9 +1,11 @@
 #include "Swapchain.h"
 
+#include <utility>
+
 SwapChain::SwapChain(Device& deviceRef, VkExtent2D extent) : m_Device{deviceRef}, m_WindowExtent{extent} { init(); }
 
 SwapChain::SwapChain(Device& deviceRef, VkExtent2D extent, std::shared_ptr<SwapChain> previous)
-    : m_Device{deviceRef}, m_WindowExtent{extent}, m_oldSwapChain{previous} {
+    : m_Device{deviceRef}, m_WindowExtent{extent}, m_oldSwapChain{std::move(previous)} {
     init();
     m_oldSwapChain = nullptr;
 }
@@ -58,7 +60,7 @@ VkResult SwapChain::acquireNextImage(uint32_t* imageIndex) {
     return result;
 }
 
-VkResult SwapChain::submitCommandBuffers(const std::vector<VkCommandBuffer>& buffers, uint32_t imageIndex) {
+VkResult SwapChain::submitCommandBuffers(const std::vector<VkCommandBuffer>& cmdBuffers, uint32_t imageIndex) {
     if (m_imagesInFlight[imageIndex] != VK_NULL_HANDLE) {
         vkWaitForFences(m_Device.device(), 1, &m_imagesInFlight[imageIndex], VK_TRUE, UINT64_MAX);
     }
@@ -73,8 +75,8 @@ VkResult SwapChain::submitCommandBuffers(const std::vector<VkCommandBuffer>& buf
     submitInfo.pWaitSemaphores = waitSemaphores;
     submitInfo.pWaitDstStageMask = waitStages;
 
-    submitInfo.commandBufferCount = (uint32_t)buffers.size();
-    submitInfo.pCommandBuffers = buffers.data();
+    submitInfo.commandBufferCount = (uint32_t)cmdBuffers.size();
+    submitInfo.pCommandBuffers = cmdBuffers.data();
 
     VkSemaphore signalSemaphores[] = {m_renderFinishedSemaphores[m_currentFrame]};
     submitInfo.signalSemaphoreCount = 1;
