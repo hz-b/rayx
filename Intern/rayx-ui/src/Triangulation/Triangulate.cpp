@@ -140,9 +140,12 @@ std::vector<Line> getRays(const RAYX::BundleHistory& bundleHist, const std::vect
                 glm::vec4 worldPos = elements[(size_t)event.m_lastElement].m_element.m_outTrans * glm::vec4(event.m_position, 1.0f);
 
                 Vertex origin = {{rayLastPos.x, rayLastPos.y, rayLastPos.z, 1.0f}, YELLOW};
-                Vertex point = (event.m_eventType == ETYPE_JUST_HIT_ELEM) ? Vertex(worldPos, ORANGE) : Vertex(worldPos, RED);
+                Vertex vertexorange = {worldPos, ORANGE};
+                Vertex vertrexred = {worldPos, RED};
+                Vertex point = (event.m_eventType == ETYPE_JUST_HIT_ELEM) ? vertexorange : vertrexred;
 
-                rays.push_back(Line(origin, point));
+                Line myline = {origin, point};
+                rays.push_back(myline);
                 rayLastPos = point.pos;
             } else if (event.m_eventType == ETYPE_FLY_OFF) {
                 // Fly off events are in world coordinates
@@ -156,7 +159,8 @@ std::vector<Line> getRays(const RAYX::BundleHistory& bundleHist, const std::vect
                 Vertex origin = {eventPos, GREY};
                 Vertex point = {pointPos, GREY};
 
-                rays.push_back(Line(origin, point));
+                Line myline = {origin, point};
+                rays.push_back(myline);
             }
         }
     }
