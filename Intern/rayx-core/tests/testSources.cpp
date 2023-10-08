@@ -31,7 +31,7 @@ void roughCompare(std::vector<RAYX::Ray> l, std::vector<RAYX::Ray> r) {
     }
 }
 
-TEST_F(TestSuite, MatrixSource) {
+TEST_F(TestSuite, MatrixSourceCSV) {
     auto beamline = loadBeamline("MatrixSource");
     auto a = beamline.getInputRays();
     auto b = loadCSVRayUI("MatrixSource");
@@ -80,6 +80,22 @@ TEST_F(TestSuite, DipoleEnergyDistribution) {
     checkEnergyDistribution(rays, 1000, 23000);
 }
 
+TEST_F(TestSuite, PixelPositionTest) {
+    auto beamline = loadBeamline("PixelSource");
+    auto rays = beamline.getInputRays();
+    std::shared_ptr<LightSource> src = beamline.m_LightSources[0];
+    auto* pixelsource = dynamic_cast<PixelSource*>(&*src);
+    auto width = src->getSourceWidth();
+    auto height = src->getSourceHeight();
+    auto hordiv = src->getHorDivergence();
+    for (auto ray : rays) {
+        CHECK_IN(abs(ray.m_position.x), width/6.0, width/2.0);
+        CHECK_IN(abs(ray.m_position.y), height/6.0, height/2.0);
+        double phi = atan2(ray.m_direction.x, ray.m_direction.z); // phi in rad from m_direction
+        CHECK_IN(abs(phi), 0.0, hordiv/2.0);
+    }
+}
+
 TEST_F(TestSuite, DipoleZDistribution) {
     auto beamline = loadBeamline("dipole_plain");
     std::shared_ptr<LightSource> src = beamline.m_LightSources[0];
@@ -97,7 +113,13 @@ TEST_F(TestSuite, testInterpolationFunctionDipole) {
     std::vector<InOutPair> inouts = {{
         .in = 1.5298292375594387,
         .out = -3.5010758381905855,
-    }};
+    }, {
+        .in = 2,
+        .out = -6.0742663050458416,
+    }, {
+        .in = -1,
+        .out = -0.095123518041340588,
+    }, };
 
     auto beamline = loadBeamline("dipole_plain");
     std::shared_ptr<LightSource> src = beamline.m_LightSources[0];
