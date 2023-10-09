@@ -1,23 +1,23 @@
-#define WORKGROUP_SIZE 32
+#define WORKGROUP_SIZE 8
 /**************************************************************
  *                    Header & #define
  **************************************************************/
 #ifdef GLSL
-    #extension GL_EXT_debug_printf : enable
-	#extension GL_ARB_separate_shader_objects : enable
-	#extension GL_ARB_gpu_shader_int64 : enable
-	#extension GL_GOOGLE_include_directive : enable
-	layout(local_size_x = WORKGROUP_SIZE, local_size_y = 1, local_size_z = 1) in;
+#extension GL_EXT_debug_printf : enable
+#extension GL_ARB_separate_shader_objects : enable
+#extension GL_ARB_gpu_shader_int64 : enable
+#extension GL_GOOGLE_include_directive : enable
+layout(local_size_x = WORKGROUP_SIZE, local_size_y = 1, local_size_z = 1) in;
 #endif
 
 // Every shader execution calculates the route for a single ray.
 // `_ray` is that ray, it's always in world coordinates (!).
 #define _ray (rayData[uint(gl_GlobalInvocationID)])
 
-#include "../../Shared/adapt.h"
 #include "../../Shared/Constants.h"
-#include "../../Shared/Ray.h"
 #include "../../Shared/Element.h"
+#include "../../Shared/Ray.h"
+#include "../../Shared/adapt.h"
 
 /**************************************************************
  *                    SHADER ARRAYS
@@ -44,10 +44,9 @@ SHADER_ARRAY(int, matIdx, 4, materialIndexBuf);
 // use the matIdx-table to determine the relevant indices for when which table starts and stops.
 SHADER_ARRAY(double, mat, 5, materialBuf);
 
-
 #ifdef RAYX_DEBUG_MODE
 struct _debug_struct {
-    dmat4 _dMat; // Can also be used as vectors or scalar
+    dmat4 _dMat;  // Can also be used as vectors or scalar
 };
 
 SHADER_ARRAY(_debug_struct, d_struct, 6, debugBuf);
@@ -61,34 +60,30 @@ int gl_GlobalInvocationID;
  *                    PushConstants
  **************************************************************/
 #ifndef GLSL
-    PushConstants pushConstants;
-#else 
-    layout( push_constant ) uniform constants
-    {   
-        double rayIdStart;
-        double numRays;
-        double randomSeed;
-        double maxEvents;
-        double sequential; // sequential tracing only.
-    } pushConstants;
+PushConstants pushConstants;
+#else
+layout(push_constant) uniform constants {
+    double rayIdStart;
+    double numRays;
+    double randomSeed;
+    double maxEvents;
+    double sequential;  // sequential tracing only.
+}
+pushConstants;
 #endif
 
 /**************************************************************
  *                    Functions && vars
  **************************************************************/
 
-uint64_t rayId() {
-    return uint64_t(pushConstants.rayIdStart) + uint64_t(gl_GlobalInvocationID);
-}
+uint64_t rayId() { return uint64_t(pushConstants.rayIdStart) + uint64_t(gl_GlobalInvocationID); }
 
 bool finalized;
 
 // `i in [0, maxEvents]`.
 // Will return the index in outputData to access the `i'th` output ray belonging to this shader call.
 // Typically used as `outputData[output_index(i)]`.
-uint output_index(uint i) {
-    return uint(gl_GlobalInvocationID) * uint(pushConstants.maxEvents) + i;
-}
+uint output_index(uint i) { return uint(gl_GlobalInvocationID) * uint(pushConstants.maxEvents) + i; }
 
 // sets all output rays controlled by this shader call to ETYPE_UNINIT.
 void uninitOutRays() {
@@ -100,28 +95,30 @@ void uninitOutRays() {
 // record an event and store it in the next free spot in outputData.
 // `r` will typically be _ray, or some related ray.
 void recordEvent(Ray r, double w) {
-    if (finalized) { return; }
+    if (finalized) {
+        return;
+    }
 
     if (w == ETYPE_UNINIT) {
-        #ifndef GLSL
+#ifndef GLSL
         RAYX_ERR << "recordEvent failed: no free spots!";
-        #endif
+#endif
     }
 
     for (uint i = 0; i < pushConstants.maxEvents; i++) {
         uint idx = output_index(i);
-        if (outputData[idx].m_eventType == ETYPE_UNINIT) { // checks whether this spot is free
+        if (outputData[idx].m_eventType == ETYPE_UNINIT) {  // checks whether this spot is free
             outputData[idx] = r;
             outputData[idx].m_eventType = w;
             return;
         }
     }
 
-    // no spots were found.
-    // this shouldn't be using `throw`, as otherwise we might end up in infinite recursion.
-    #ifndef GLSL
+// no spots were found.
+// this shouldn't be using `throw`, as otherwise we might end up in infinite recursion.
+#ifndef GLSL
     RAYX_WARN << "recordEvent failed: no free spots!";
-    #endif
+#endif
 }
 
 // Like `recordEvent` above, but it will prevent recording more events after this.
@@ -159,7 +156,7 @@ void recordFinalEvent(Ray r, double w) {
 void main() {
     finalized = false;
     uninitOutRays();
-    
+
     // ~~~~~~~~~~~~~~ PRINT EXAMPLE ~~~~~~~~~~~~~~
     // Printing ~DEBUG~ Example over vkconfig Validation Layers
     // if (uint(gl_GlobalInvocationID) == 2 ){
@@ -171,5 +168,5 @@ void main() {
     // #endif
     // }
     // ~~~~~~~~~~~~~~ PRINT EXAMPLE ~~~~~~~~~~~~~~
-	dynamicElements();
+    dynamicElements();
 }
