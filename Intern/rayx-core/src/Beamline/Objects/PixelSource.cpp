@@ -2,6 +2,7 @@
 
 #include "Data/xml.h"
 #include "Debug/Debug.h"
+#include "Debug/Instrumentor.h"
 #include "Random.h"
 #include "Shared/Constants.h"
 
@@ -40,6 +41,7 @@ double getPosInDistribution(SourceDist l, double extent) {
  * @returns list of rays
  */
 std::vector<Ray> PixelSource::getRays() const {
+    RAYX_PROFILE_FUNCTION_STDOUT();
     double x, y, z, psi, phi, en;  // x,y,z pos, psi,phi direction cosines, en=energy
 
     int n = m_numberOfRays;
