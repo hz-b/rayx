@@ -188,7 +188,7 @@ std::vector<RAYX::Ray> rayUiCompat(std::string filename, Sequential seq=Sequenti
     return out;
 }
 
-void compareLastAgainstRayUI(std::string filename, double t, Sequential seq) {
+void compareLastAgainstRayUI(std::string filename, double tolerance, Sequential seq) {
     auto rayx_list = rayUiCompat(filename, seq);
     auto rayui_list = loadCSVRayUI(filename);
 
@@ -207,9 +207,9 @@ void compareLastAgainstRayUI(std::string filename, double t, Sequential seq) {
         auto correct = *itRayUI;
 
         // TODO: make more properties of the rays work the same!
-        CHECK_EQ(rayx.m_position, correct.m_position, t);
-        CHECK_EQ(rayx.m_direction, correct.m_direction, t);
-        CHECK_EQ(rayx.m_energy, correct.m_energy, t);
+        CHECK_EQ(rayx.m_position, correct.m_position, tolerance);
+        CHECK_EQ(rayx.m_direction, correct.m_direction, tolerance);
+        CHECK_EQ(rayx.m_energy, correct.m_energy, tolerance);
 
         ++itRayX;
         ++itRayUI;
