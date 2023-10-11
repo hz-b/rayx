@@ -1,4 +1,4 @@
-#define COLLISION_EPSILON 1e-10
+#define COLLISION_EPSILON 1e-5
 
 #include "../../Shared/Collision.h"
 

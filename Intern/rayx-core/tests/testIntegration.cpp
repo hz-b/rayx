@@ -58,12 +58,11 @@ TEST_F(TestSuite, Ellipsoid) {
     CHECK(found_atleast_one)
 }
 
-// TODO re-enable toroid tests
-// TEST_F(TestSuite, toroid) { compareLastAgainstRayUI("toroid"); }
+TEST_F(TestSuite, toroid) { compareLastAgainstRayUI("toroid"); }
 
 // this is the same test as above, but xLength and zLength are exchanged. This
 // tests the wasteBox, as not all rays hit the toroid.
-// TEST_F(TestSuite, toroid_swapped) { compareLastAgainstRayUI("toroid_swapped"); }
+TEST_F(TestSuite, toroid_swapped) { compareLastAgainstRayUI("toroid_swapped"); }
 
 TEST_F(TestSuite, Ellipsoid_DGIA) { compareLastAgainstRayUI("Ellipsoid_DGIA"); }
 TEST_F(TestSuite, Ellipsoid_MB) { compareLastAgainstRayUI("Ellipsoid_MB"); }
