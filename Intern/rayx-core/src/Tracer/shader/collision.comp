@@ -180,9 +180,7 @@ Collision getToroidCollision(Ray r, ToroidSurface toroid) {
     // Note that multiplying the rays direction with -1 SHOULD totally have an effect on the collision detection - in most cases this 180° rotation
     // will make the ray point away from the toroid, and hence preventing a Collision completely. The above code however, is unaffected when
     // multiplying the ray direction with -1. Due to it having no effect on `dvec3 normalized_dir = dvec3(r.m_direction) / r.m_direction.z;`
-    if (dot(rayToHitpoint, r.m_direction) > 0.0) {
-        col.found = false;
-    }
+    col.found = dot(rayToHitpoint, r.m_direction) > 0.0;
 
     return col;
 }
