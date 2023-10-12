@@ -21,6 +21,7 @@ out/
 /Tests/oldray_files/spec1-first_rzp4mm/data
 /Tests/oldray_files/spec1+first_rzp4mm/data
 /Tests/.ipynb_checkpoints/*
+/home/zotter/GitHub/RAY-X/Intern/rayx-core/tests/input/dipole_benchmarking.rml
 CMakeCache.txt
 cmake.check_cache
 
