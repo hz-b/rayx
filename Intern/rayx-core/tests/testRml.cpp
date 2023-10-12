@@ -9,6 +9,8 @@ TEST_F(TestSuite, allBeamlineObjects) {
 }
 
 TEST_F(TestSuite, loadDatFile) {
+    RAYX::fixSeed(RAYX::FIXED_SEED);
+
     auto b = loadBeamline("loadDatFile");
     CHECK_EQ(b.m_LightSources.size(), 1);
     CHECK_EQ(b.m_OpticalElements.size(), 1);
@@ -18,6 +20,8 @@ TEST_F(TestSuite, loadDatFile) {
 }
 
 TEST_F(TestSuite, loadDatFile2) {
+    RAYX::fixSeed(RAYX::FIXED_SEED);
+
     auto b = loadBeamline("loadDatFile2");
     CHECK_EQ(b.m_LightSources.size(), 1);
     CHECK_EQ(b.m_OpticalElements.size(), 1);
@@ -47,6 +51,7 @@ TEST_F(TestSuite, groupTransform) {
 }
 
 TEST_F(TestSuite, testEnergyDistribution) {
+    RAYX::fixSeed(RAYX::FIXED_SEED);
 
     struct testInput {
         std::string rmlFile;
@@ -92,6 +97,7 @@ TEST_F(TestSuite, testEnergyDistribution) {
  * Its a static test, so every change can result in a fail even if it's still working correctly
  */
 TEST_F(TestSuite, testTwoSourcesInOneRML) {
+    RAYX::fixSeed(RAYX::FIXED_SEED);
 
     auto beamline = loadBeamline("twoSourcesTest");
 

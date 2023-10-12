@@ -325,7 +325,7 @@ bool paramEnergyDistribution(const rapidxml::xml_node<>* node, const std::filesy
             }
             *out = EnergyDistribution(SoftEdge(photonEnergy, energySpread));
 
-        } else if (spreadType == SpreadType::SeperateEnergies) {
+        } else if (spreadType == SpreadType::ThreeEnergies) {
             int numOfEnergies;
             if (!xml::paramInt(node, "SeperateEnergies", &numOfEnergies)) {
                 std::cout << "No Number for Seperate Energies in RML File" << std::endl;
