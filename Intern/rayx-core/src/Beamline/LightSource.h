@@ -10,7 +10,7 @@
 #include "Shared/Ray.h"
 
 namespace RAYX {
-enum class SpreadType { WhiteBand, SoftEdge, ThreeEnergies, Schwinger };  // default WhiteBand
+enum class SpreadType { HardEdge, SoftEdge, SeperateEnergies };  // default WhiteBand
 enum class EnergyDistributionType { File, Values, Total, Param };         // default ET_VALUES
 enum class SourceDistType { Simultaneous, HardEdge, Gauss };              // default simultaneously
 enum class SourceDist { Uniform, Gaussian };                              // TODO(rudi): unify!
