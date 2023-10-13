@@ -22,5 +22,5 @@ option(H5 "include the H5Writer" "YES") # active per default
 
 
 # ---- Code Coverage ----
-set(CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/Extern/cmake) #TODO OS: can this be removed?
+set(CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/Extern/cmake)
 # -----------------------

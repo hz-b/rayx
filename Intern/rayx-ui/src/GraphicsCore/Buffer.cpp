@@ -6,9 +6,10 @@
  * Allocates buffer memory using given parameters and associates it with a Device.
  * Also calculates memory alignment.
  */
-Buffer::Buffer(Device& device, VkDeviceSize instanceSize, uint32_t instanceCount, VkBufferUsageFlags usageFlags,
+Buffer::Buffer(Device& device, const std::string& name, VkDeviceSize instanceSize, uint32_t instanceCount, VkBufferUsageFlags usageFlags,
                VkMemoryPropertyFlags memoryPropertyFlags, VkDeviceSize minOffsetAlignment)
     : m_Device{device},
+      m_Name{name},
       m_InstanceSize{instanceSize},
       m_instanceCount{instanceCount},
       m_UsageFlags{usageFlags},

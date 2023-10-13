@@ -1,4 +1,4 @@
-#define COLLISION_EPSILON 1e-5
+#define COLLISION_EPSILON 1e-6
 
 #include "../../Shared/Collision.h"
 
@@ -119,7 +119,7 @@ Collision getQuadricCollision(Ray r, QuadricSurface q) {
  *                    Toroid Collision
  **************************************************************/
 // this uses newton to approximate a solution.
-Collision getToroidCollision(Ray r, ToroidSurface toroid) {
+Collision getToroidCollision(Ray r, ToroidSurface toroid, bool isTriangul) {
     // Constants
     const double NEW_TOLERANCE = 0.0001;
     const int NEW_MAX_ITERATIONS = 50;
@@ -176,8 +176,11 @@ Collision getToroidCollision(Ray r, ToroidSurface toroid) {
     col.normal = normalize(dvec3(normal));
     col.hitpoint = dvec3(xx, yy, zz);
 
-    dvec3 rayToHitpoint = col.hitpoint - r.m_position;
+    if (isTriangul) { // TODO : Hack, Triangulation sensetive to direction apparently. Actual fix or func rework is needed!
+        return col;
+    }
 
+    dvec3 rayToHitpoint = col.hitpoint - r.m_position;
     // edit: if ray points away from the hitpoint, no collision can be found.
     // Note that multiplying the rays direction with -1 SHOULD totally have an effect on the collision detection - in most cases this 180° rotation
     // will make the ray point away from the toroid, and hence preventing a Collision completely. The above code however, is unaffected when
@@ -206,7 +209,7 @@ dvec2 projectToPlane(PlaneDir plane, dvec3 point) {
     }
 }
 
-Collision RAYX_API findCollisionInElementCoords(Ray r, Surface surface, Cutout cutout) {
+Collision RAYX_API findCollisionInElementCoords(Ray r, Surface surface, Cutout cutout, bool isTriangul) {
     double sty = surface.m_type;
 
     Collision col;
@@ -224,7 +227,7 @@ Collision RAYX_API findCollisionInElementCoords(Ray r, Surface surface, Cutout c
 
         col.found = (r.m_direction.z > 0 && r.m_position.z < 0) || (r.m_direction.z < 0 && r.m_position.z > 0);
     } else if (sty == STYPE_TOROID) {
-        col = getToroidCollision(r, deserializeToroid(surface));
+        col = getToroidCollision(r, deserializeToroid(surface), isTriangul);
     } else if (sty == STYPE_QUADRIC) {
         col = getQuadricCollision(r, deserializeQuadric(surface));
     } else {
@@ -258,7 +261,7 @@ Collision RAYX_API findCollisionInElementCoords(Ray r, Surface surface, Cutout c
 Collision findCollisionWith(Ray r, uint id) {
     // misalignment
     r = rayMatrixMult(r, elements[id].m_inTrans);  // image plane is the x-y plane of the coordinate system
-    Collision col = findCollisionInElementCoords(r, elements[id].m_surface, elements[id].m_cutout);
+    Collision col = findCollisionInElementCoords(r, elements[id].m_surface, elements[id].m_cutout, false);
     if (col.found) {
         col.elementIndex = int(id);
     }

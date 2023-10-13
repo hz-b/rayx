@@ -9,7 +9,7 @@ namespace CPU_TRACER {
 #include "Shared/Collision.h"
 #include "Shared/Element.h"
 #include "Shared/Ray.h"
-RAYX_API Collision findCollisionInElementCoords(Ray, Surface, Cutout);
+RAYX_API Collision findCollisionInElementCoords(Ray, Surface, Cutout, bool);
 }  // namespace CPU_TRACER
 }  // namespace RAYX
 
@@ -107,7 +107,7 @@ RenderObject traceTriangulation(const RAYX::OpticalElement& element, Device& dev
 
     for (size_t i = 0; i < gridSize; ++i) {
         for (size_t j = 0; j < gridSize; ++j) {
-            auto collision = RAYX::CPU_TRACER::findCollisionInElementCoords(rayGrid[i][j], element.m_element.m_surface, element.m_element.m_cutout);
+            auto collision = RAYX::CPU_TRACER::findCollisionInElementCoords(rayGrid[i][j], element.m_element.m_surface, element.m_element.m_cutout,true);
             collisionGrid[i][j] = collision.found;
         }
     }
@@ -138,7 +138,9 @@ RenderObject traceTriangulation(const RAYX::OpticalElement& element, Device& dev
             }
         }
     }
-
+    if (vertices.empty() || indices.empty()) {
+        throw std::runtime_error("Failed: Missing vertices or indices at a render object!");
+    }
     RenderObject renderObj(device, element.m_element.m_outTrans, vertices, indices);
     std::cout << "Added " << vertices.size() / 3 << " triangles to new render object" << std::endl;
 

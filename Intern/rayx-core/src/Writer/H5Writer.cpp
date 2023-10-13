@@ -74,7 +74,7 @@ RAYX::BundleHistory fromDoubles(const std::vector<double>& doubles, const Format
     RAYX::RayHistory rayHist;
     while (double_index < doubles.size()) {
         // Extract and ignore Ray-ID and Snapshot-ID
-        double rayId = doubles[double_index++];
+        [[maybe_unused]] double rayId = doubles[double_index++];
         double eventId = doubles[double_index++];
 
         if (eventId == 0) {

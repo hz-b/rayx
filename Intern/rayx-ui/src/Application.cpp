@@ -32,7 +32,8 @@ void Application::run() {
     // Create UBOs (Uniform Buffer Object)
     std::vector<std::unique_ptr<Buffer>> uboBuffers(SwapChain::MAX_FRAMES_IN_FLIGHT);
     for (auto& uboBuffer : uboBuffers) {
-        uboBuffer = std::make_unique<Buffer>(m_Device, sizeof(Camera), 1, VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT);
+        uboBuffer = std::make_unique<Buffer>(m_Device, "uboBuffer", sizeof(Camera), 1, VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT,
+                                             VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT);
         uboBuffer->map();
     }
 
@@ -91,7 +92,7 @@ void Application::run() {
                 vkDeviceWaitIdle(m_Device.device());  // TODO(Jannis): Hacky fix for now; should be some form of synchronization
 
                 // Triangulate the render data and update the scene
-                rObjects = triangulateObjects(beamline.m_OpticalElements, m_Device, true);
+                rObjects = triangulateObjects(beamline.m_OpticalElements, m_Device, false);
                 rays = getRays(bundleHist, beamline.m_OpticalElements);
 
                 if (!rays.empty()) {
