@@ -15,11 +15,13 @@
 #include "Writer/H5Writer.h"
 
 // --------- Start of Application code --------- //
-Application::Application(uint32_t width, uint32_t height, const char* name)
+Application::Application(uint32_t width, uint32_t height, const char* name, int argc, char** argv)
     : m_Window(width, height, name),  //
       m_Device(m_Window),             //
       m_Renderer(m_Window, m_Device)  //
 {
+    /////////////////// Argument Parser
+    m_CommandParser = std::make_unique<CommandParser>(argc, argv);
     m_DescriptorPool = DescriptorPool::Builder(m_Device)
                            .addPoolSize(VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, SwapChain::MAX_FRAMES_IN_FLIGHT)
                            .setMaxSets(SwapChain::MAX_FRAMES_IN_FLIGHT)
@@ -29,6 +31,8 @@ Application::Application(uint32_t width, uint32_t height, const char* name)
 Application::~Application() = default;
 
 void Application::run() {
+    m_CommandParser->analyzeCommands();
+
     // Create UBOs (Uniform Buffer Object)
     std::vector<std::unique_ptr<Buffer>> uboBuffers(SwapChain::MAX_FRAMES_IN_FLIGHT);
     for (auto& uboBuffer : uboBuffers) {
@@ -67,6 +71,11 @@ void Application::run() {
     std::vector<Line> rays;
     std::optional<RenderObject> rayObj;
 
+    // CLI Input
+    auto rmlPathCli = m_CommandParser->m_args.m_providedFile;
+    auto rayFilePathCli = ImGuiLayer::getRayFileWithoutExt(rmlPathCli);
+    bool rmlCliExists = !rmlPathCli.empty();
+
     while (!m_Window.shouldClose()) {
         glfwPollEvents();
 
@@ -77,9 +86,17 @@ void Application::run() {
         if (auto commandBuffer = m_Renderer.beginFrame()) {
             uint32_t frameIndex = m_Renderer.getFrameIndex();
             camController.update(cam, m_Renderer.getAspectRatio());
+
             FrameInfo frameInfo{frameIndex, frameTime, commandBuffer, cam, descriptorSets[frameIndex]};
             // TODO: ImGui layer should not be in renderer class (maybe its own render system)
             m_Renderer.updateImGui(camController, frameInfo);
+
+            if (rmlCliExists) {
+                frameInfo.rmlPath = rmlPathCli;
+                frameInfo.rayFilePath = rayFilePathCli;
+                frameInfo.wasPathUpdated = true;
+                rmlCliExists = false;
+            }
 
             if (frameInfo.wasPathUpdated) {
                 // Get the render data
