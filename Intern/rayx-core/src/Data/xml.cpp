@@ -137,6 +137,8 @@ bool paramMisalignment(const rapidxml::xml_node<>* node, Misalignment* out) {
         xml::paramDouble(node, "translationYerror", &out->m_translationYerror);
         xml::paramDouble(node, "translationZerror", &out->m_translationZerror);
 
+
+        //keep in mind, rotation on the x-Axis changes the psi and y rotation changes phi
         double x_mrad = 0;
         xml::paramDouble(node, "rotationXerror", &x_mrad);
         out->m_rotationXerror = Rad(x_mrad / 1000.0);  // convert mrad to rad.

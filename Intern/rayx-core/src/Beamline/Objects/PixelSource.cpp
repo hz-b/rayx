@@ -10,6 +10,7 @@ namespace RAYX {
 
 PixelSource::PixelSource(const DesignObject& dobj) : LightSource(dobj) {
     m_verDivergence = dobj.parseVerDiv();
+    m_horDivergence = dobj.parseHorDiv();
     m_sourceDepth = dobj.parseSourceDepth();
 
     m_linearPol_0 = dobj.parseLinearPol0();
