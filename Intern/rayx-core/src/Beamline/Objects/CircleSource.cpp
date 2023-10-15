@@ -26,10 +26,10 @@ namespace RAYX {
 
 
 /**
- * Creates random rays from pixel source with specified distributed width
- * & height in 4 distinct pixels
- * position and directions are distributed uniform
- *
+ * Creates random rays from circle source with specified num. of circles and 
+ * spread angles
+ * origins are distributed uniformly, the pattern shows on the next element
+ * through the directions 
  * @returns list of rays
  */
 std::vector<Ray>  CircleSource::getRays() const {
@@ -41,7 +41,7 @@ std::vector<Ray>  CircleSource::getRays() const {
     rayList.reserve(m_numberOfRays);
 
     // create n rays with random position and divergence within the given span
-    // for width, height, depth, horizontal and vertical divergence
+    // for width, height, depth
     for (int i = 0; i < n; i++) {
         x = (randomDouble() - 0.5) * m_sourceWidth;
         x += m_position.x;
@@ -54,11 +54,9 @@ std::vector<Ray>  CircleSource::getRays() const {
         // double z = (rn[2] - 0.5) * m_sourceDepth;
         glm::dvec3 position = glm::dvec3(x, y, z);
 
-        // get corresponding angles based on distribution and deviation from
+        // get corresponding direction to create circles
         // main ray (main ray: xDir=0,yDir=0,zDir=1 for phi=psi=0)
         glm::dvec3 direction = getDirection();
-        //glm::dvec4 tempDir = m_orientation * glm::dvec4(direction, 0.0);
-        //direction = glm::dvec3(tempDir.x, tempDir.y, tempDir.z);
         glm::dvec4 stokes = glm::dvec4(1, m_linearPol_0, m_linearPol_45, m_circularPol);
 
         Ray r = {position, ETYPE_UNINIT, direction, en, stokes, 0.0, 0.0, -1.0, -1.0};
@@ -68,16 +66,15 @@ std::vector<Ray>  CircleSource::getRays() const {
     return rayList;
 }
 
-//calculate directions to form circles on the next element
+/**
+ * calculate directions to form circles on the next element
+ * calculations taken from RAY-UI
+ */
 glm::dvec3 CircleSource::getDirection() const {
     double angle = randomDouble() * 2.0 * PI;
     int circle;
 
-    if (m_numOfCircles == 1) {
-        return glm::dvec3(0.0, 0.0, 1.0);
-    } else {
-        circle = randomIntInRange(1, m_numOfCircles) - 1;
-    }
+    circle = randomIntInRange(1, m_numOfCircles) - 1;
 
 
     double thetabetweencircles = (m_maxOpeningAngle.rad -  m_minOpeningAngle.rad) / (m_numOfCircles - 1.0);
