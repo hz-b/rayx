@@ -19,6 +19,8 @@ const bool enableValidationLayers = true;
 
 class Window;
 class Device;
+class RenderObject;
+struct Line;
 
 class Application {
   public:
@@ -42,11 +44,9 @@ class Application {
     Window m_Window;      // Application window
     Device m_Device;      // Vulkan device
     Renderer m_Renderer;  // Vulkan renderer
-
-    char** m_argv;
-    int m_argc;
-
-    std::unique_ptr<CommandParser> m_CommandParser;
+    CommandParser m_CommandParser;
 
     std::unique_ptr<DescriptorPool> m_DescriptorPool{nullptr};
+
+    void updateScene(const std::string& path, std::vector<RenderObject>& rObjects, std::vector<Line>& rays, std::optional<RenderObject>& rayObj);
 };

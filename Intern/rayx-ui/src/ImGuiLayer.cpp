@@ -159,8 +159,7 @@ void ImGuiLayer::updateImGui(CameraController& camController, FrameInfo& frameIn
                 std::string filePathName = ImGuiFileDialog::Instance()->GetFilePathName();
                 std::string extension = ImGuiFileDialog::Instance()->GetCurrentFilter();
 
-                frameInfo.rmlPath = filePathName;
-                frameInfo.rayFilePath = getRayFileWithoutExt(filePathName);
+                frameInfo.path = filePathName;
                 frameInfo.wasPathUpdated = true;
             }
             ImGuiFileDialog::Instance()->Close();
@@ -294,12 +293,4 @@ void ImGuiLayer::createCommandBuffers(uint32_t cmdBufferCount) {
     if (vkAllocateCommandBuffers(m_Device.device(), &allocInfo, m_CommandBuffers.data()) != VK_SUCCESS) {
         throw std::runtime_error("Failed to allocate command buffers");
     }
-}
-
-std::string ImGuiLayer::getRayFileWithoutExt(std::string filePathName) {
-#ifdef NO_H5
-    return filePathName.substr(0, filePathName.find_last_of(".")) + ".csv";
-#else
-    return filePathName.substr(0, filePathName.find_last_of(".")) + ".h5";
-#endif
 }

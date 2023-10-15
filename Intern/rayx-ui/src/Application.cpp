@@ -16,12 +16,12 @@
 
 // --------- Start of Application code --------- //
 Application::Application(uint32_t width, uint32_t height, const char* name, int argc, char** argv)
-    : m_Window(width, height, name),  //
-      m_Device(m_Window),             //
-      m_Renderer(m_Window, m_Device)  //
+    : m_Window(width, height, name),   //
+      m_Device(m_Window),              //
+      m_Renderer(m_Window, m_Device),  //
+      m_CommandParser(argc, argv)      //
 {
     /////////////////// Argument Parser
-    m_CommandParser = std::make_unique<CommandParser>(argc, argv);
     m_DescriptorPool = DescriptorPool::Builder(m_Device)
                            .addPoolSize(VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, SwapChain::MAX_FRAMES_IN_FLIGHT)
                            .setMaxSets(SwapChain::MAX_FRAMES_IN_FLIGHT)
@@ -31,7 +31,7 @@ Application::Application(uint32_t width, uint32_t height, const char* name, int 
 Application::~Application() = default;
 
 void Application::run() {
-    m_CommandParser->analyzeCommands();
+    m_CommandParser.analyzeCommands();
 
     // Create UBOs (Uniform Buffer Object)
     std::vector<std::unique_ptr<Buffer>> uboBuffers(SwapChain::MAX_FRAMES_IN_FLIGHT);
@@ -65,17 +65,18 @@ void Application::run() {
     glfwSetCursorPosCallback(m_Window.window(), cursorPosCallback);
     glfwSetWindowUserPointer(m_Window.window(), &camController);
 
-    // Main loop
     auto currentTime = std::chrono::high_resolution_clock::now();
     std::vector<RenderObject> rObjects;
     std::vector<Line> rays;
     std::optional<RenderObject> rayObj;
 
     // CLI Input
-    auto rmlPathCli = m_CommandParser->m_args.m_providedFile;
-    auto rayFilePathCli = ImGuiLayer::getRayFileWithoutExt(rmlPathCli);
-    bool rmlCliExists = !rmlPathCli.empty();
+    std::string rmlPathCli = m_CommandParser.m_args.m_providedFile;
+    if (!rmlPathCli.empty()) {
+        updateScene(rmlPathCli.c_str(), rObjects, rays, rayObj);
+    }
 
+    // Main loop
     while (!m_Window.shouldClose()) {
         glfwPollEvents();
 
@@ -91,39 +92,9 @@ void Application::run() {
             // TODO: ImGui layer should not be in renderer class (maybe its own render system)
             m_Renderer.updateImGui(camController, frameInfo);
 
-            if (rmlCliExists) {
-                frameInfo.rmlPath = rmlPathCli;
-                frameInfo.rayFilePath = rayFilePathCli;
-                frameInfo.wasPathUpdated = true;
-                rmlCliExists = false;
-            }
-
             if (frameInfo.wasPathUpdated) {
-                // Get the render data
-                RAYX::Beamline beamline = RAYX::importBeamline(frameInfo.rmlPath);
-#ifndef NO_H5
-                RAYX::BundleHistory bundleHist = raysFromH5(frameInfo.rayFilePath, FULL_FORMAT);
-#else
-                RAYX::BundleHistory bundleHist = loadCSV(frameInfo.rayFilePath);
-#endif
-                vkDeviceWaitIdle(m_Device.device());  // TODO(Jannis): Hacky fix for now; should be some form of synchronization
-
-                // Triangulate the render data and update the scene
-                rObjects = triangulateObjects(beamline.m_OpticalElements, m_Device, false);
-                rays = getRays(bundleHist, beamline.m_OpticalElements);
-
-                if (!rays.empty()) {
-                    // Temporarily aggregate all vertices, then create a single RenderObject
-                    std::vector<Vertex> rayVertices(rays.size() * 2);
-                    std::vector<uint32_t> rayIndices(rays.size() * 2);
-                    for (uint32_t i = 0; i < rays.size(); ++i) {
-                        rayVertices[i * 2] = rays[i].v1;
-                        rayVertices[i * 2 + 1] = rays[i].v2;
-                        rayIndices[i * 2] = i * 2;
-                        rayIndices[i * 2 + 1] = i * 2 + 1;
-                    }
-                    rayObj.emplace(m_Device, glm::mat4(1.0f), rayVertices, rayIndices);
-                }
+                updateScene(frameInfo.path.c_str(), rObjects, rays, rayObj);
+                frameInfo.wasPathUpdated = false;
             }
 
             // Update UBO
@@ -142,4 +113,34 @@ void Application::run() {
         }
     }
     vkDeviceWaitIdle(m_Device.device());
+}
+
+void Application::updateScene(const std::string& path, std::vector<RenderObject>& rObjects, std::vector<Line>& rays,
+                              std::optional<RenderObject>& rayObj) {
+    RAYX::Beamline beamline = RAYX::importBeamline(path);
+#ifndef NO_H5
+    std::string rayFilePath = path.substr(0, path.size() - 4) + ".h5";
+    RAYX::BundleHistory bundleHist = raysFromH5(rayFilePath, FULL_FORMAT);
+#else
+    std::string rayFilePath = path.substr(0, path.size() - 4) + ".csv";
+    RAYX::BundleHistory bundleHist = loadCSV(rayFilePath);
+#endif
+    vkDeviceWaitIdle(m_Device.device());  // TODO(Jannis): Hacky fix for now; should be some form of synchronization
+
+    // Triangulate the render data and update the scene
+    rObjects = triangulateObjects(beamline.m_OpticalElements, m_Device, false);
+    rays = getRays(bundleHist, beamline.m_OpticalElements);
+
+    if (!rays.empty()) {
+        // Temporarily aggregate all vertices, then create a single RenderObject
+        std::vector<Vertex> rayVertices(rays.size() * 2);
+        std::vector<uint32_t> rayIndices(rays.size() * 2);
+        for (uint32_t i = 0; i < rays.size(); ++i) {
+            rayVertices[i * 2] = rays[i].v1;
+            rayVertices[i * 2 + 1] = rays[i].v2;
+            rayIndices[i * 2] = i * 2;
+            rayIndices[i * 2 + 1] = i * 2 + 1;
+        }
+        rayObj.emplace(m_Device, glm::mat4(1.0f), rayVertices, rayIndices);
+    }
 }

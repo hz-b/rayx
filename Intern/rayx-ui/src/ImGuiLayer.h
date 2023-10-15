@@ -19,8 +19,6 @@ class ImGuiLayer {
     VkCommandBuffer getCommandBuffer(uint32_t index) const { return m_CommandBuffers[index]; }
     VkClearValue getClearValue() const { return {m_ClearColor[0], m_ClearColor[1], m_ClearColor[2], m_ClearColor[3]}; }
 
-    static std::string getRayFileWithoutExt(std::string filePathName);
-
   private:
     const Window& m_Window;
     const Device& m_Device;
