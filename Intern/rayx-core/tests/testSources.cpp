@@ -21,6 +21,14 @@ void checkPositionDistribution(const std::vector<Ray>& rays, double sourceWidth,
     }
 }
 
+void checkDirectionDistribution(const std::vector<Ray>& rays, double minAngle, double maxAngle) {
+    for (auto r : rays) {
+        double psi = asin(r.m_direction.y);
+        psi = abs(psi)*1000;
+        CHECK_IN(psi, minAngle, maxAngle);
+    }
+}
+
 void roughCompare(std::vector<RAYX::Ray> l, std::vector<RAYX::Ray> r) {
     CHECK_EQ(l.size(), r.size());
     // TODO maybe compare more?
@@ -104,6 +112,22 @@ TEST_F(TestSuite, DipoleZDistribution) {
     auto rays = beamline.getInputRays();
     checkZDistribution(rays, 0, 2.2);
 }
+
+TEST_F(TestSuite, CircleSourcetest) {
+    auto rays = loadBeamline("CircleSource_default").getInputRays();
+    checkPositionDistribution(rays, 0.065, 0.04);
+    checkEnergyDistribution(rays, 99.5, 100.5);
+    
+}
+
+
+TEST_F(TestSuite, testCircleSourceDirections) {
+    auto bundle = traceRML("CircleSource_default");
+    for (auto rays : bundle) {
+        checkDirectionDistribution(rays, 0.0, 105.0);
+    }
+}
+
 
 TEST_F(TestSuite, testInterpolationFunctionDipole) {
     struct InOutPair {
