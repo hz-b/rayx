@@ -13,5 +13,5 @@ struct FrameInfo {
     Camera& camera;
     VkDescriptorSet descriptorSet;
     bool wasPathUpdated;
-    std::string path;
+    std::string filePath;
 };

@@ -6,7 +6,6 @@
 #include "RenderObject.h"
 #include "Tracer/Tracer.h"
 
-// TODO: documentation
 // TODO: its a bit weird to pass device here
 
 /**

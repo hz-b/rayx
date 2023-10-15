@@ -159,7 +159,7 @@ void ImGuiLayer::updateImGui(CameraController& camController, FrameInfo& frameIn
                 std::string filePathName = ImGuiFileDialog::Instance()->GetFilePathName();
                 std::string extension = ImGuiFileDialog::Instance()->GetCurrentFilter();
 
-                frameInfo.path = filePathName;
+                frameInfo.filePath = filePathName;
                 frameInfo.wasPathUpdated = true;
             }
             ImGuiFileDialog::Instance()->Close();

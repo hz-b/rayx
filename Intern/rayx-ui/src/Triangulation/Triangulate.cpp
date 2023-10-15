@@ -157,6 +157,17 @@ std::vector<Line> getRays(const RAYX::BundleHistory& bundleHist, const std::vect
                 Vertex point = {pointPos, GREY};
 
                 rays.push_back(Line(origin, point));
+            } else if (event.m_eventType == ETYPE_NOT_ENOUGH_BOUNCES) {
+                // Events where rays hit objects are in element coordinates
+                // We need to convert them to world coordinates
+                glm::vec4 worldPos = elements[(size_t)event.m_lastElement].m_element.m_outTrans * glm::vec4(event.m_position, 1.0f);
+
+                const glm::vec4 white = {1.0f, 1.0f, 1.0f, 0.7f};
+                Vertex origin = {{rayLastPos.x, rayLastPos.y, rayLastPos.z, 1.0f}, white};
+                Vertex point = Vertex(worldPos, white);
+
+                rays.push_back(Line(origin, point));
+                rayLastPos = point.pos;
             }
         }
     }

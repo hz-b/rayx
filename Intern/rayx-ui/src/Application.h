@@ -3,6 +3,8 @@
 #define GLM_FORCE_RADIANS
 #define GLM_FORCE_DEPTH_ZERO_TO_ONE
 
+#include <optional>
+
 #include "CommandParser.h"
 #include "GraphicsCore/Descriptors.h"
 #include "GraphicsCore/Renderer.h"

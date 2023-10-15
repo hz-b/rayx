@@ -93,7 +93,7 @@ void Application::run() {
             m_Renderer.updateImGui(camController, frameInfo);
 
             if (frameInfo.wasPathUpdated) {
-                updateScene(frameInfo.path.c_str(), rObjects, rays, rayObj);
+                updateScene(frameInfo.filePath.c_str(), rObjects, rays, rayObj);
                 frameInfo.wasPathUpdated = false;
             }
 
