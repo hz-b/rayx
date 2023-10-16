@@ -13,7 +13,7 @@ namespace RAYX {
 enum class SpreadType { HardEdge, SoftEdge, SeperateEnergies };  // default WhiteBand
 enum class EnergyDistributionType { File, Values, Total, Param };         // default ET_VALUES
 enum class SourceDistType { Simultaneous, HardEdge, Gauss };              // default simultaneously
-enum class SourceDist { Uniform, Gaussian };                              // TODO(rudi): unify!
+enum class SourceDist { Uniform, Gaussian, Thirds, Circle };                      // TODO(rudi): unify! ('Thrids' represents PixelSource Footprint)
 enum class ElectronEnergyOrientation { Clockwise, Counterclockwise };
 enum class EnergySpreadUnit { EU_PERCENT, EU_eV };
 

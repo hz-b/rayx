@@ -12,6 +12,7 @@ MatrixSource::MatrixSource(const DesignObject& dobj) : LightSource(dobj) {
     m_linearPol_0 = dobj.parseLinearPol0();
     m_linearPol_45 = dobj.parseLinearPol45();
     m_circularPol = dobj.parseCircularPol();
+    m_horDivergence = dobj.parseHorDiv();
     m_verDivergence = dobj.parseVerDiv();
     m_sourceDepth = dobj.parseSourceDepth();
 }

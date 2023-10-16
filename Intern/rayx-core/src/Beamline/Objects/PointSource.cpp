@@ -12,6 +12,7 @@ PointSource::PointSource(const DesignObject& dobj) : LightSource(dobj) {
     m_heightDist = dobj.parseSourceHeightDistribution();
     m_horDist = dobj.parseHorDivDistribution();
     m_verDist = dobj.parseVerDivDistribution();
+    m_horDivergence = dobj.parseHorDiv();
     m_verDivergence = dobj.parseVerDiv();
     m_sourceDepth = dobj.parseSourceDepth();
 

@@ -51,6 +51,7 @@ DipoleSource::DipoleSource(const DesignObject& dobj) : LightSource(dobj) {
     m_verEbeamDivergence = dobj.parseVerEbeamDivergence();
     m_energySpread = dobj.parseEnergySpread();
     m_energySpreadUnit = dobj.parseEnergySpreadUnit();
+    m_horDivergence = dobj.parseHorDiv();
 
     m_criticalEnergy = RAYX::get_factorCriticalEnergy();
     m_bandwidth = 1.0e-3;

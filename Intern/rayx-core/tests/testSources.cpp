@@ -21,6 +21,14 @@ void checkPositionDistribution(const std::vector<Ray>& rays, double sourceWidth,
     }
 }
 
+void checkDirectionDistribution(const std::vector<Ray>& rays, double minAngle, double maxAngle) {
+    for (auto r : rays) {
+        double psi = asin(r.m_direction.y);
+        psi = abs(psi)*1000;
+        CHECK_IN(psi, minAngle, maxAngle);
+    }
+}
+
 void roughCompare(std::vector<RAYX::Ray> l, std::vector<RAYX::Ray> r) {
     CHECK_EQ(l.size(), r.size());
     // TODO maybe compare more?
@@ -80,6 +88,22 @@ TEST_F(TestSuite, DipoleEnergyDistribution) {
     checkEnergyDistribution(rays, 1000, 23000);
 }
 
+TEST_F(TestSuite, PixelPositionTest) {
+    auto beamline = loadBeamline("PixelSource");
+    auto rays = beamline.getInputRays();
+    std::shared_ptr<LightSource> src = beamline.m_LightSources[0];
+    auto* pixelsource = dynamic_cast<PixelSource*>(&*src);
+    auto width = src->getSourceWidth();
+    auto height = src->getSourceHeight();
+    auto hordiv = src->getHorDivergence();
+    for (auto ray : rays) {
+        CHECK_IN(abs(ray.m_position.x), width/6.0, width/2.0);
+        CHECK_IN(abs(ray.m_position.y), height/6.0, height/2.0);
+        double phi = atan2(ray.m_direction.x, ray.m_direction.z); // phi in rad from m_direction
+        CHECK_IN(abs(phi), 0.0, hordiv/2.0);
+    }
+}
+
 TEST_F(TestSuite, DipoleZDistribution) {
     auto beamline = loadBeamline("dipole_plain");
     std::shared_ptr<LightSource> src = beamline.m_LightSources[0];
@@ -89,6 +113,22 @@ TEST_F(TestSuite, DipoleZDistribution) {
     checkZDistribution(rays, 0, 2.2);
 }
 
+TEST_F(TestSuite, CircleSourcetest) {
+    auto rays = loadBeamline("CircleSource_default").getInputRays();
+    checkPositionDistribution(rays, 0.065, 0.04);
+    checkEnergyDistribution(rays, 99.5, 100.5);
+    
+}
+
+
+TEST_F(TestSuite, testCircleSourceDirections) {
+    auto bundle = traceRML("CircleSource_default");
+    for (auto rays : bundle) {
+        checkDirectionDistribution(rays, 0.0, 105.0);
+    }
+}
+
+
 TEST_F(TestSuite, testInterpolationFunctionDipole) {
     struct InOutPair {
         double in;
@@ -97,7 +137,13 @@ TEST_F(TestSuite, testInterpolationFunctionDipole) {
     std::vector<InOutPair> inouts = {{
         .in = 1.5298292375594387,
         .out = -3.5010758381905855,
-    }};
+    }, {
+        .in = 2,
+        .out = -6.0742663050458416,
+    }, {
+        .in = -1,
+        .out = -0.095123518041340588,
+    }, };
 
     auto beamline = loadBeamline("dipole_plain");
     std::shared_ptr<LightSource> src = beamline.m_LightSources[0];
