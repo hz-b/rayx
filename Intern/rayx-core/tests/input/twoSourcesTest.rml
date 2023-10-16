@@ -3,7 +3,7 @@
  <version>1.12</version>
  <beamline>
   <object name="Dipole Source" type="Dipole Source">
-   <param id="numberRays" enabled="T">2000</param>
+   <param id="numberRays" enabled="T">200</param>
     <param id="sourceWidth" enabled="T">0.065</param>
     <param id="sourceHeight" enabled="T">0.04</param>
     <param id="verEbeamDiv" enabled="T">1</param>
@@ -47,7 +47,7 @@
     <param id="photonFlux" enabled="T">2.76089e+12</param>
   </object>
   <object name="Point Source" type="Point Source">
-    <param id="numberRays" enabled="T">2000</param>
+    <param id="numberRays" enabled="T">200</param>
     <param id="sourceWidthDistribution" comment="gaussian (sigma)" enabled="T">1</param>
     <param id="sourceWidth" enabled="T">0.065</param>
     <param id="sourceHeightDistribution" comment="gaussian (sigma)" enabled="T">1</param>
