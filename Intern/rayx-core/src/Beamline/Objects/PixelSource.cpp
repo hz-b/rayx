@@ -41,7 +41,7 @@ double getPosInDistribution(SourceDist l, double extent) {
  *
  * @returns list of rays
  */
-std::vector<Ray> PixelSource::getRays() const {
+std::vector<Ray> PixelSource::getRays([[maybe_unused]]int thread_count) const {
     RAYX_PROFILE_FUNCTION_STDOUT();
     double x, y, z, psi, phi, en;  // x,y,z pos, psi,phi direction cosines, en=energy
 

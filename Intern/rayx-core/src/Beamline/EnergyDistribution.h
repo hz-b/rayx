@@ -66,8 +66,6 @@ class RAYX_API EnergyDistribution {
   private:
     /** stores either a DatFile or an HardEdge, depending on the constructor
      * used to create this */
-    bool m_continous;
-
     std::variant<DatFile, HardEdge, SoftEdge, SeperateEnergies> m_Variant;
 };
 }  // namespace RAYX

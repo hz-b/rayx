@@ -5,12 +5,12 @@
 #include <stdexcept>
 
 #include "CanonicalizePath.h"
+#include "Data/Importer.h"
 #include "Debug/Debug.h"
 #include "Random.h"
 #include "Tracer/CpuTracer.h"
 #include "Tracer/VulkanTracer.h"
 #include "Writer/Writer.h"
-#include "Data/Importer.h"
 
 TerminalApp::TerminalApp(int argc, char** argv) : m_argv(argv), m_argc(argc) {
     RAYX_VERB << "TerminalApp created!";
@@ -65,7 +65,7 @@ void TerminalApp::tracePath(const std::filesystem::path& path) {
 
         // Run rayx core
         RAYX::Sequential seq = m_CommandParser->m_args.m_sequential? RAYX::Sequential::Yes : RAYX::Sequential::No;
-        auto rays = m_Tracer->trace(*m_Beamline, seq, max_batch_size);
+        auto rays = m_Tracer->trace(*m_Beamline, seq, max_batch_size, m_CommandParser->m_args.m_setThreads);
 
         // Export Rays to external data.
         auto file = exportRays(rays, path.string());

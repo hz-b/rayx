@@ -16,24 +16,30 @@ class RAYX_API DipoleSource : public LightSource {
     DipoleSource(const DesignObject&);
     virtual ~DipoleSource() = default;
 
-    std::vector<Ray> getRays() const override;
+    std::vector<Ray> getRays(int thread_count = 1) const override;
 
+    // calculate Ray-Information
+    glm::dvec3 getXYZPosition(double) const;
+    double getEnergy() const;
+    PsiAndStokes getPsiandStokes(double) const;
+
+    // support functions
+    double schwinger(double) const;
+    double vDivergence(double hv, double sigv) const;
+    double getNormalFromRange(double range) const;
+    double bessel(double hnue, double zeta) const;
+
+    // secondary support functions
+    void setMaxFlux();
+    void setLogInterpolation();
+    double getInterpolation(double) const;
+    void setMaxIntensity();
     void calcMagneticField();
     void calcWorldCoordinates();
     void calcSourcePath();
     void calcHorDivDegSec();  // horizontal Divergence as degree and seconds
     void calcPhotonWavelength();
     void calcFluxOrg();
-    double schwinger(double) const;
-    void setMaxFlux();
-    void setLogInterpolation();
-    double getInterpolation(double) const;
-    double getEnergy() const;
-    PsiAndStokes getPsiandStokes(double) const;
-    void setMaxIntensity();
-    glm::dvec3 getXYZPosition(double) const;
-    double vDivergence(double hv, double sigv) const;
-    double getNormalFromRange(double range) const;
 
   private:
     // Geometric Params
@@ -51,7 +57,7 @@ class RAYX_API DipoleSource : public LightSource {
     double m_verEbeamDivergence;
     double m_flux;
     double m_totalPower;
-    double m_bandwidth;  // default bandwidth
+    double m_bandwidth;
     double m_magneticFieldStrength;
     double m_gamma;
     double m_beta;
@@ -67,10 +73,12 @@ class RAYX_API DipoleSource : public LightSource {
     double m_maxFlux;
     double m_maxIntensity;
 
+    // support functions
     glm::dvec4 getStokesSyn(double hv, double psi1, double psi2) const;
-    double bessel(double hnue, double zeta) const;
-    glm::dvec4 dipoleFold(double psi, double hv, double sigpsi) const;
+    PsiAndStokes dipoleFold(double psi, double hv, double sigpsi) const;
 
+    // get the Energydistribution with arrays of the functioncurve
+    // H. Winick, S. Doniach, Synchrotron Radiation Research P.23f (y) and (G0(y))
     std::array<double, 59> m_schwingerX = {1.e-4, 1.e-3, 2.e-3, 4.e-3, 6.e-3, 8.e-3, 1.e-2, 2.e-2, 3.e-2, 4.e-2, 5.e-2, 6.e-2, 7.e-2, 8.e-2, 9.e-2,
                                            1.e-1, 0.15,  0.2,   0.25,  0.3,   0.35,  0.4,   0.45,  0.5,   0.55,  0.6,   0.65,  0.7,   0.75,  0.8,
                                            0.85,  0.9,   1.0,   1.25,  1.5,   1.75,  2.0,   2.25,  2.5,   2.75,  3.0,   3.25,  3.5,   3.75,  4.0,
@@ -83,4 +91,5 @@ class RAYX_API DipoleSource : public LightSource {
                                            4.286e-2, 3.175e-2, 2.362e-2, 1.764e-2, 1.321e-2, 9.915e-3, 7.461e-3, 5.626e-3, 4.25e-3,  2.436e-3,
                                            1.404e-3, 8.131e-4, 4.842e-4, 2.755e-4, 1.611e-4, 9.439e-5, 5.543e-5, 3.262e-5, 1.922e-5};
 };
+
 }  // namespace RAYX

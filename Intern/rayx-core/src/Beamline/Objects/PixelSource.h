@@ -9,7 +9,7 @@ class RAYX_API PixelSource : public LightSource {
     PixelSource(const DesignObject&);
     virtual ~PixelSource() = default;
 
-    std::vector<Ray> getRays() const override;
+    std::vector<Ray> getRays(int thread_count = 1) const override;
 
   private:
     // Geometric Params

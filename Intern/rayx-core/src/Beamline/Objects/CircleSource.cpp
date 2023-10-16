@@ -32,7 +32,7 @@ namespace RAYX {
  * through the directions 
  * @returns list of rays
  */
-std::vector<Ray>  CircleSource::getRays() const {
+std::vector<Ray>  CircleSource::getRays([[maybe_unused]] int thread_count) const {
     RAYX_PROFILE_FUNCTION_STDOUT();
     double x, y, z, en;  // x,y,z pos, psi,phi direction cosines, en=energy
 

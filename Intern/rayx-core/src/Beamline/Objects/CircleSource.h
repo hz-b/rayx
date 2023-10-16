@@ -9,7 +9,7 @@ class RAYX_API  CircleSource : public LightSource {
      CircleSource(const DesignObject&);
     virtual ~ CircleSource() = default;
 
-    std::vector<Ray> getRays() const override;
+    std::vector<Ray> getRays(int thread_count = 1) const override;
     glm::dvec3 getDirection() const;
   private:
     // Geometric Params
