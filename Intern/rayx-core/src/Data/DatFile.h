@@ -27,6 +27,8 @@ struct DatFile {
 
     std::vector<DatEntry> m_Lines;
 
+    bool m_continuous;
+
     /** loads the .DAT file `filename` and writes it's contents to `out` */
     static bool load(const std::filesystem::path& filename, DatFile* out);
 
@@ -34,7 +36,7 @@ struct DatFile {
     [[maybe_unused]] std::string dump();
 
     /** samples from the distribution given by the .DAT file */
-    double selectEnergy(bool continuous) const;
+    double selectEnergy() const;
 
     /** yields the expected value of the underlying distribution */
     double getAverage() const;

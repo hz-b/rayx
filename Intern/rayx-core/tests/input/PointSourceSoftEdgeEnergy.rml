@@ -19,12 +19,12 @@
     <param id="translationYerror" enabled="F">0</param>
     <param id="rotationXerror" enabled="F">0</param>
     <param id="rotationYerror" enabled="F">0</param>
-    <param id="energyDistributionType" comment="File" enabled="T">0</param>
-    <param id="photonEnergyDistributionFile" relative="loadDatFile2.DAT" enabled="T">loadDatFile2.DAT</param>
-    <param id="photonEnergy" enabled="F">100</param>
-    <param id="energySpreadType" comment="soft Edge" enabled="F">1</param>
-    <param id="energySpreadUnit" comment="eV" enabled="F">0</param>
-    <param id="energySpread" enabled="F">0</param>
+    <param id="energyDistributionType" comment="Values" enabled="T">1</param>
+    <param id="photonEnergyDistributionFile" absolute="" enabled="F"></param>
+    <param id="photonEnergy" enabled="T">100</param>
+    <param id="energySpreadType" comment="SoftEdge" enabled="T">1</param>
+    <param id="energySpreadUnit" comment="eV" enabled="T">0</param>
+    <param id="energySpread" enabled="T">10</param>
     <param id="linearPol_0" enabled="T">1</param>
     <param id="linearPol_45" enabled="T">0</param>
     <param id="circularPol" enabled="T">0</param>
@@ -34,30 +34,6 @@
       <x>0</x>
       <y>0</y>
       <z>0</z>
-    </param>
-    <param id="worldXdirection" enabled="F">
-      <x>1</x>
-      <y>0</y>
-      <z>0</z>
-    </param>
-    <param id="worldYdirection" enabled="F">
-      <x>0</x>
-      <y>1</y>
-      <z>0</z>
-    </param>
-    <param id="worldZdirection" enabled="F">
-      <x>0</x>
-      <y>0</y>
-      <z>1</z>
-    </param>
-  </object>
-
-  <object name="ImagePlane" type="ImagePlane">
-    <param id="distanceImagePlane" enabled="T">1000</param>
-    <param id="worldPosition" enabled="F">
-      <x>0</x>
-      <y>0</y>
-      <z>1000</z>
     </param>
     <param id="worldXdirection" enabled="F">
       <x>1</x>

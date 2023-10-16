@@ -1,6 +1,6 @@
-#include <fstream>
-
 #include "setupTests.h"
+
+#include <fstream>
 
 void checkEnergyDistribution(const std::vector<Ray>& rays, double photonEnergy, double energySpread) {
     for (auto r : rays) {
@@ -101,10 +101,10 @@ TEST_F(TestSuite, testInterpolationFunctionDipole) {
 
     auto beamline = loadBeamline("dipole_plain");
     std::shared_ptr<LightSource> src = beamline.m_LightSources[0];
-    auto* dipoleSource = dynamic_cast<DipoleSource*>(&*src);
+    auto* dipolesource = dynamic_cast<DipoleSource*>(&*src);
 
     for (auto values : inouts) {
-        auto result = dipoleSource->getInterpolation(values.in);
+        auto result = dipolesource->getInterpolation(values.in);
         CHECK_EQ(result, values.out, 0.01);
     }
 }
@@ -131,7 +131,7 @@ TEST_F(TestSuite, testVerDivergenceDipole) {
     }
 }
 
-TEST_F(TestSuite, testLightsourceGetters) {
+TEST_F(TestSuite, testLightsourceGetters){
     struct RmlInput {
         std::string rmlFile;
         double horDivergence;
@@ -150,7 +150,7 @@ TEST_F(TestSuite, testLightsourceGetters) {
         .averagePhotonEnergy = 120.97,
     }};
 
-    for (const auto& values : rmlinputs) {
+    for (auto values : rmlinputs) {
         auto beamline = loadBeamline(values.rmlFile);
         std::shared_ptr<LightSource> src = beamline.m_LightSources[0];
         auto* lightSource = dynamic_cast<LightSource*>(&*src);

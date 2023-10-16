@@ -281,9 +281,15 @@ bool paramEnergyDistribution(const rapidxml::xml_node<>* node, const std::filesy
     if (!xml::paramInt(node, "energySpreadType", &spreadType_int)) {
         return false;
     }
-    auto spreadType = static_cast<SpreadType>(spreadType_int);
 
-    bool continuous = spreadType == SpreadType::WhiteBand;
+    /**
+     * a different output is set for all Energy Distribution Types
+     *
+     * default: 0:HardEdge(WhiteBand)
+     *          1:SoftEdge(Energyspread = sigma)
+     *          2:SeperateEnergies(Spikes)
+     */
+    auto spreadType = static_cast<SpreadType>(spreadType_int);
 
     if (energyDistributionType == EnergyDistributionType::File) {
         const char* filename;
@@ -298,10 +304,10 @@ bool paramEnergyDistribution(const rapidxml::xml_node<>* node, const std::filesy
         if (!DatFile::load(path, &df)) {
             return false;
         }
-
-        *out = EnergyDistribution(df, continuous);
-
+        df.m_continuous = (spreadType == SpreadType::SoftEdge ? true : false);
+        *out = EnergyDistribution(df);
         return true;
+
     } else if (energyDistributionType == EnergyDistributionType::Values) {
         double photonEnergy;
         if (!xml::paramDouble(node, "photonEnergy", &photonEnergy)) {
@@ -313,7 +319,23 @@ bool paramEnergyDistribution(const rapidxml::xml_node<>* node, const std::filesy
             return false;
         }
 
-        *out = EnergyDistribution(EnergyRange(photonEnergy, energySpread), continuous);
+        if (spreadType == SpreadType::SoftEdge) {
+            if (energySpread == 0) {
+                energySpread = 1;
+            }
+            *out = EnergyDistribution(SoftEdge(photonEnergy, energySpread));
+
+        } else if (spreadType == SpreadType::SeperateEnergies) {
+            int numOfEnergies;
+            if (!xml::paramInt(node, "SeperateEnergies", &numOfEnergies)) {
+                std::cout << "No Number for Seperate Energies in RML File" << std::endl;
+                numOfEnergies = 3;
+            }
+            numOfEnergies = abs(numOfEnergies);
+            *out = EnergyDistribution(SeperateEnergies(photonEnergy, energySpread, numOfEnergies));
+        } else {
+            *out = EnergyDistribution(HardEdge(photonEnergy, energySpread));
+        }
 
         return true;
     } else {

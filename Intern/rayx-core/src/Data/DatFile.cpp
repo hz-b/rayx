@@ -3,6 +3,7 @@
 #include <fstream>
 #include <iostream>
 #include <sstream>
+#include <sstream>
 
 #include "Debug/Debug.h"
 #include "Random.h"
@@ -69,8 +70,11 @@ bool DatFile::load(const std::filesystem::path& filename, DatFile* out) {
     return s.str();
 }
 
-double DatFile::selectEnergy(bool continuous) const {
-    if (continuous) {
+double DatFile::selectEnergy() const {
+    // runs either continuous Energydistribution from DataFile or just the specific energies
+    // provisionally set to true because EnergyDistibution ended support for this choice
+    // TODO: Fanny find a way to get a choise for DataFile Distribution back
+    if (m_continuous) {
         if (m_Lines.size() == 1) {  // weird edge case, which would crash the code below
             return m_Lines[0].m_energy;
         }
@@ -82,6 +86,7 @@ double DatFile::selectEnergy(bool continuous) const {
 
         double counter = 0;
         uint32_t idx = 0;
+
         for (; idx < m_Lines.size() - 2; idx++) {
             counter += (m_Lines[idx].m_weight + m_Lines[idx + 1].m_weight) / 2;
             if (counter >= w) {
