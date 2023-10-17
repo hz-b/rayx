@@ -5,8 +5,6 @@ option(BUILD_WITH_COV "Add Code Coverage to build" TRUE)
 
 if(CMAKE_CXX_COMPILER_ID STREQUAL "Clang" AND CMAKE_BUILD_TYPE STREQUAL "Debug" AND BUILD_WITH_COV)
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fprofile-instr-generate -fcoverage-mapping")
-
-    set_property(TARGET tgt PROPERTY C_STANDARD 11)
     message("Building with llvm-cov support")
 endif()
 
