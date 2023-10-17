@@ -88,7 +88,7 @@ void Application::run() {
             uint32_t frameIndex = m_Renderer.getFrameIndex();
             camController.update(cam, m_Renderer.getAspectRatio());
 
-            FrameInfo frameInfo{frameIndex, frameTime, commandBuffer, cam, descriptorSets[frameIndex], false, ""};
+            FrameInfo frameInfo{frameIndex, frameTime, commandBuffer, cam, descriptorSets[frameIndex]};
             // TODO: ImGui layer should not be in renderer class (maybe its own render system)
             m_Renderer.updateImGui(camController, frameInfo);
 

@@ -1,5 +1,4 @@
 cmake_minimum_required(VERSION 3.15 FATAL_ERROR)
-
 # ---- Code Coverage ----
 option(BUILD_WITH_COV "Add Code Coverage to build" TRUE)
 
@@ -17,6 +16,30 @@ add_subdirectory(tests)
 
 # -------------------
 
+#-----OpenMP--------
+
+if(OpenMp STREQUAL "NO")
+    target_compile_definitions(${PROJECT_NAME} PUBLIC NO_OMP) 
+else()
+    if(NOT TARGET OpenMP::OpenMP_CXX)
+        find_package(Threads REQUIRED)
+
+        # Füge die OpenMP-Bibliothek hinzu
+        add_library(OpenMP::OpenMP_CXX IMPORTED INTERFACE)
+        set_property(TARGET OpenMP::OpenMP_CXX
+                 PROPERTY INTERFACE_COMPILE_OPTIONS ${OpenMP_CXX_FLAGS})
+        # Only works if the same flag is passed to the linker; use CMake 3.9+ otherwise (Intel, AppleClang)
+        set_property(TARGET OpenMP::OpenMP_CXX
+                 PROPERTY INTERFACE_LINK_LIBRARIES ${OpenMP_CXX_FLAGS} Threads::Threads)
+    
+    endif()
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${OpenMP_CXX_FLAGS} -fopenmp")
+#set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS}")
+#set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS}")
+endif()
+#-------------------
+
+
 # ---- Project ----
 project(rayx-core)
 file(GLOB_RECURSE SOURCE ${PROJECT_SOURCE_DIR}/src/*.cpp)
@@ -24,26 +47,15 @@ add_library(${PROJECT_NAME} SHARED ${SOURCE})
 
 # -----------------
 
-# -----OpenMP--------
-find_package(OpenMP)
-
-if(OpenMP_CXX_FOUND)
-    target_link_libraries(${PROJECT_NAME} PUBLIC OpenMP::OpenMP_CXX)
-else()
-    message(STATUS "OpenMP not found")
-    target_compile_definitions(${PROJECT_NAME} PUBLIC NO_OMP)
-endif()
-
-# -------------------
-
 # ---- Warnings ----
 if(MSVC)
     message(STATUS "MSVC")
     target_compile_options(${PROJECT_NAME} PRIVATE /W3 /wd4251 /wd4267)
     target_compile_definitions(${PROJECT_NAME} PRIVATE _CRT_SECURE_NO_WARNINGS)
 else()
-    message(STATUS "GCC")
-    target_compile_options(${PROJECT_NAME} PRIVATE -Wall -Wextra -pedantic) # -Werror)
+	message(STATUS "GCC")
+    target_compile_options(${PROJECT_NAME} PRIVATE -Wall -Wextra -pedantic -fopenmp) #-Werror)
+    set(CMAKE_CXX_LINKER_FLAGS "${CMAKE_CXX_LINKER_FLAGS} -fopenmp -openmp ")
 
     # Enable werror if requested (mostly used for CI)
     if(WERROR STREQUAL "YES")
@@ -55,23 +67,30 @@ endif()
 # ------------------
 
 # ---- Disable Vulkan/H5 ----
-find_package(Vulkan)
-
-if(Vulkan_FOUND)
-    target_link_libraries(${PROJECT_NAME} PUBLIC Vulkan::Vulkan)
-else()
-    message(STATUS "Vulkan not found")
+if(VULKAN STREQUAL "NO")
     target_compile_definitions(${PROJECT_NAME} PUBLIC NO_VULKAN)
+    message(STATUS "Vulkan disabled")
+else()
+    find_package(Vulkan 1.3.216 REQUIRED)
+    target_link_libraries(${PROJECT_NAME}
+        PUBLIC Vulkan::Vulkan
+    )
 endif()
 
-find_package(HDF5)
-
-if(HDF5_FOUND)
-    target_link_libraries(${PROJECT_NAME} PUBLIC ${HDF5_LIBRARIES})
-    target_include_directories(${PROJECT_NAME} SYSTEM PUBLIC ${HDF5_INCLUDE_DIRS})
-else()
-    message(STATUS "HDF5 not found")
+if(H5 STREQUAL "NO")
     target_compile_definitions(${PROJECT_NAME} PUBLIC NO_H5)
+    message(STATUS "H5 disabled")
+else()
+    if(UNIX)
+        target_include_directories(${PROJECT_NAME} PUBLIC /usr/include/hdf5/serial)
+        target_link_directories(${PROJECT_NAME} PUBLIC /usr/lib/x86_64-linux-gnu/hdf5/serial)
+        target_link_libraries(${PROJECT_NAME} PUBLIC hdf5)
+    else()
+        find_package(HDF5 REQUIRED)
+        target_link_libraries(${PROJECT_NAME}
+            PUBLIC HDF5::HDF5
+        )
+    endif()
 endif()
 
 # -------------------------
@@ -114,7 +133,7 @@ target_include_directories(${PROJECT_NAME} SYSTEM PUBLIC
 # ----------------------
 
 # ---- Compile Shaders ----
-if(Vulkan_FOUND)
+if(NOT VULKAN STREQUAL "NO")
     # The following code is used to always compile the shader.
     # This is most likely not an optimal solution, but it will work
     # until we find a better one.
