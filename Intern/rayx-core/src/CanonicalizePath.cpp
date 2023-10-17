@@ -21,7 +21,7 @@ std::filesystem::path canonicalize(const std::filesystem::path& relPath, const s
     return base / relPath;
 }
 
-std::filesystem::path canonicalizeRepositoryPath(const std::filesystem::path& relPath) { return canonicalize(relPath, PROJECT_DIR); }
+std::filesystem::path canonicalizeRepositoryPath(const std::filesystem::path& relPath) { return canonicalize(relPath, RAYX_PROJECT_DIR); }
 
 std::filesystem::path canonicalizeUserPath(const std::filesystem::path& relPath) { return canonicalize(relPath, std::filesystem::current_path()); }
 
