@@ -4,8 +4,6 @@ option(BUILD_WITH_COV "Add Code Coverage to build" TRUE)
 
 if(CMAKE_CXX_COMPILER_ID STREQUAL "Clang" AND CMAKE_BUILD_TYPE STREQUAL "Debug" AND BUILD_WITH_COV)
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fprofile-instr-generate -fcoverage-mapping")
-
-    set_property(TARGET tgt PROPERTY C_STANDARD 11)
     message("Building with llvm-cov support")
 endif()
 
@@ -53,7 +51,7 @@ if(MSVC)
     target_compile_options(${PROJECT_NAME} PRIVATE /W3 /wd4251 /wd4267)
     target_compile_definitions(${PROJECT_NAME} PRIVATE _CRT_SECURE_NO_WARNINGS)
 else()
-	message(STATUS "GCC")
+    message(STATUS "GCC")
     target_compile_options(${PROJECT_NAME} PRIVATE -Wall -Wextra -pedantic -fopenmp) #-Werror)
     set(CMAKE_CXX_LINKER_FLAGS "${CMAKE_CXX_LINKER_FLAGS} -fopenmp -openmp ")
 
