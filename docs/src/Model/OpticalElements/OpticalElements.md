@@ -30,11 +30,7 @@ The cutout specifies a particular part of the surface that constitutes the optic
 - Trapezoid
 - Unlimited
 
-Internally, we distinguish among these elements to interpret them accurately during the tracing process. For example, an isosceles trapezoid has two widths and a height, while a rectangle has just a width and a height.
-
-You may find variations in terminology in RML files. Height, width, and length are all used, perhaps inconsistently at the moment. Length usually defines the dimension along the z-axis, and width along the x-axis.
-
-The cutout itself does not have a position; it is always at the origin of the element's coordinate system. For some shapes, this rule might not adequately define the position. Therefore, we use the `icurv` parameter to determine whether the surface is concave or convex. This suffices since we calculate all intersection points with elements. When two intersections occur, the `icurv` parameter informs us which intersection point to select.
+Internally, we distinguish among these elements to interpret them accurately during the tracing process. For example, an isosceles trapezoid has two widths and a height, while a rectangle has just a width and a height. We define dimensions as such: width for the x-axis, height for the y-axis and length for the z-axis.
 
 ### Behavior
 
@@ -47,5 +43,7 @@ Behavior determines whether an optical element is a slit, grating, [RZP](./RZP.m
 ### How They Are Combined
 
 In the following image, you can see a visualization of how the surface and cutout interact. The surface is a quadric that defines a sphere. The cutout is a rectangle, defined by points \\(A\\), \\(B\\), \\(C\\), and \\(D\\). Coupled with the `icurv` parameter, the cutout is mapped to the correct side of the sphere, visualized by points \\(A_1\\), \\(B_1\\), \\(C_1\\), and \\(D_1\\). If a ray intersects the element's surface within the bounds of the cutout, it will be counted as a hit. This is, where the behaviour comes into play to calculate the continuing path of the ray.
+
+The cutout itself does not have a position; it is always at the origin of the element's coordinate system. For some shapes, this rule might not adequately define the position. Therefore, we use the `icurv` parameter to determine whether the surface is concave or convex. This suffices since we calculate all intersection points with elements. When two intersections occur, the `icurv` parameter informs us which intersection point to select.
 
 ![image](../../res/wastebox.png)
