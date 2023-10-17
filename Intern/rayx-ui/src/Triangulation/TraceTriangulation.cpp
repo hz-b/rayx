@@ -15,29 +15,29 @@ RAYX_API Collision findCollisionInElementCoords(Ray, Surface, Cutout, bool);
 
 /**
  * Given a Cutout object, this function calculates and returns the width and
- * height depending on the cutout's type (rectangle, ellipse, trapezoid, etc.).
+ * length depending on the cutout's type (rectangle, ellipse, trapezoid, etc.).
  */
 std::pair<double, double> getRectangularDimensions(const Cutout& cutout) {
     double width = 0.0;
-    double height = 0.0;
+    double length = 0.0;
 
     switch (static_cast<int>(cutout.m_type)) {
         case CTYPE_RECT: {
             RectCutout rect = deserializeRect(cutout);
             width = rect.m_width;
-            height = rect.m_length;
+            length = rect.m_length;
             break;
         }
         case CTYPE_ELLIPTICAL: {
             EllipticalCutout ell = deserializeElliptical(cutout);
             width = ell.m_diameter_x;   // Diameter is essentially the max width
-            height = ell.m_diameter_z;  // Diameter is the max height
+            length = ell.m_diameter_z;  // Diameter is the max length
             break;
         }
         case CTYPE_TRAPEZOID: {
             TrapezoidCutout trap = deserializeTrapezoid(cutout);
             width = std::max(trap.m_widthA, trap.m_widthB);  // max of the two sides
-            height = trap.m_length;
+            length = trap.m_length;
             break;
         }
         // Skip unlimited cutout
@@ -49,30 +49,25 @@ std::pair<double, double> getRectangularDimensions(const Cutout& cutout) {
             break;
     }
 
-    return {width, height};
+    return {width, length};
 }
 
 /**
- * Given grid size, width, height, and a flag indicating the plane of the rays,
+ * Given grid size, width, length, and a flag indicating the plane of the rays,
  * this function populates and returns a 2D grid of RAYX::Ray objects.
  */
-std::vector<std::vector<RAYX::Ray>> createRayGrid(size_t size, double width, double height, bool isXZ) {
+std::vector<std::vector<RAYX::Ray>> createRayGrid(size_t size, double width, double length) {
     std::vector<std::vector<RAYX::Ray>> grid(size, std::vector<RAYX::Ray>(size));
     double xStep = width / size;
-    double yStep = height / size;
+    double zStep = length / size;
 
     for (size_t i = 0; i < size; i++) {
         double x = -width / 2 + xStep * i;
         for (size_t j = 0; j < size; j++) {
-            double y = -height / 2 + yStep * j;
+            double z = -length / 2 + zStep * j;
             glm::dvec3 pos, dir;
-            if (!isXZ) {
-                pos = glm::dvec3(x, -2.0f, y);
-                dir = glm::dvec3(0.0f, 1.0f, 0.0f);
-            } else {
-                pos = glm::dvec3(x, y, -2.0f);
-                dir = glm::dvec3(0.0f, 0.0f, 1.0f);
-            }
+            pos = glm::dvec3(x, z, -2.0f);
+            dir = glm::dvec3(0.0f, 0.0f, 1.0f);
 
             RAYX::Ray ray = {
                 .m_position = pos,
@@ -101,9 +96,8 @@ RenderObject traceTriangulation(const RAYX::OpticalElement& element, Device& dev
     RAYX::CpuTracer tracer;
 
     const size_t gridSize = 10;
-    auto [width, height] = getRectangularDimensions(element.m_element.m_cutout);
-    const bool isXZ = element.m_element.m_behaviour.m_type == BTYPE_SLIT;
-    auto rayGrid = createRayGrid(gridSize, width, height, isXZ);
+    auto [width, length] = getRectangularDimensions(element.m_element.m_cutout);
+    auto rayGrid = createRayGrid(gridSize, width, length);
 
     std::vector<std::vector<bool>> collisionGrid(gridSize, std::vector<bool>(gridSize, false));
 
