@@ -52,4 +52,43 @@ if(Vulkan_FOUND)
     )
 
     # ----------------------
+
+    # ---- Compile Shaders ----
+    # Function to compile shaders
+    function(compile_shaders target shaders_dir)
+        # Get a list of all shader files in the specified directory
+        file(GLOB SHADER_FILES "${shaders_dir}/*.frag" "${shaders_dir}/*.vert")
+
+        foreach(SHADER_FILE ${SHADER_FILES})
+            # Get the file name without the directory and extension
+            get_filename_component(SHADER_NAME ${SHADER_FILE} NAME_WE)
+
+            # Determine shader stage based on file extension
+            get_filename_component(SHADER_EXT ${SHADER_FILE} EXT)
+            string(SUBSTRING ${SHADER_EXT} 1 -1 SHADER_STAGE) # Remove the leading '.' from the extension
+
+            # Set output file name
+            set(OUTPUT_FILE "${CMAKE_BINARY_DIR}/bin/${SHADER_NAME}_${SHADER_STAGE}.spv")
+
+            # Create a custom command for each shader file
+            add_custom_command(
+                OUTPUT ${OUTPUT_FILE}
+                COMMAND "glslc"
+                ARGS ${SHADER_FILE} -o ${OUTPUT_FILE}
+                DEPENDS ${SHADER_FILE}
+                COMMENT "Compiling ${SHADER_FILE} to ${OUTPUT_FILE}"
+            )
+
+            # Add the output file to the list of dependencies for the custom target
+            list(APPEND SHADER_OUTPUTS ${OUTPUT_FILE})
+        endforeach()
+
+        # Create a custom target to trigger the compilation of all shaders
+        add_custom_target(${target} ALL DEPENDS ${SHADER_OUTPUTS})
+    endfunction()
+
+    # Call the function to compile all shaders in the specified directory
+    compile_shaders(RAYX_UI_COMPILE_SHADER "${PROJECT_SOURCE_DIR}/src/Shaders")
+
+    # ------------------------
 endif() # Vulkan_FOUND

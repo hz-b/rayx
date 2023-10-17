@@ -92,7 +92,7 @@ endif()
 target_compile_definitions(${PROJECT_NAME}
     PRIVATE RAYX_BUILD_DLL
     PUBLIC ${COMPILE_PLATFORM}
-    PROJECT_DIR="${CMAKE_SOURCE_DIR}"
+    RAYX_PROJECT_DIR="${CMAKE_SOURCE_DIR}"
     $<$<CONFIG:Debug>:RAYX_DEBUG_MODE>
     $<$<CONFIG:RelWithDebInfo>:RAYX_DEBUG_MODE>
 )
@@ -116,19 +116,19 @@ if(Vulkan_FOUND)
     # The following code is used to always compile the shader.
     # This is most likely not an optimal solution, but it will work
     # until we find a better one.
-    add_dependencies(${PROJECT_NAME} COMPILE_SHADER)
-    set(COMPILED_SHADER ${CMAKE_BINARY_DIR}/bin/comp.spv)
-    set(COMPILED_SHADER_FAKE ${CMAKE_BINARY_DIR}/bin/___comp.spv) # this exists so file cannot be found -> always execute command
+    add_dependencies(${PROJECT_NAME} RAYX_CORE_COMPILE_SHADER)
+    set(RAYX_CORE_SHADER ${CMAKE_BINARY_DIR}/bin/comp.spv)
+    set(RAYX_CORE_SHADER_FAKE ${CMAKE_BINARY_DIR}/bin/___comp.spv) # this exists so file cannot be found -> always execute command
 
     add_custom_command(
         OUTPUT
-        ${COMPILED_SHADER}
-        ${COMPILED_SHADER_FAKE}
+        ${RAYX_CORE_SHADER}
+        ${RAYX_CORE_SHADER_FAKE}
         COMMAND "glslc"
-        ARGS ${PROJECT_SOURCE_DIR}/src/Tracer/shader/main-glsl.comp -o ${COMPILED_SHADER} -fshader-stage=compute --target-env=vulkan1.3
+        ARGS ${PROJECT_SOURCE_DIR}/src/Tracer/shader/main-glsl.comp -o ${RAYX_CORE_SHADER} -fshader-stage=compute --target-env=vulkan1.3
     )
 
-    add_custom_target(COMPILE_SHADER ALL DEPENDS ${COMPILED_SHADER})
+    add_custom_target(RAYX_CORE_COMPILE_SHADER ALL DEPENDS ${RAYX_CORE_SHADER})
 endif()
 
 # ------------------------
