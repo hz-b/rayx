@@ -281,7 +281,7 @@ dvec2 RAYX_API getRefractiveIndex(double energy, int material) {
 }
 
 // returns angle between ray direction and surface normal at intersection point
-double RAYX_API getIncidenceAngle(Ray r, dvec4 normal) {
+double RAYX_API getIncidenceAngle(Ray r, dvec3 normal) {
     normal = normalize(normal);
     double ar = dot(dvec3(normal), r.m_direction);
     // cut to interval [-1,1]
@@ -563,7 +563,7 @@ given direction on the grating
 @params: lots
 @returns: (inplace) DX, DZ
 */
-void RAYX_API RZPLineDensity(Ray r, dvec4 normal, RZPBehaviour b, RAYX_INOUT(double) DX, RAYX_INOUT(double) DZ) {
+void RAYX_API RZPLineDensity(Ray r, dvec3 normal, RZPBehaviour b, RAYX_INOUT(double) DX, RAYX_INOUT(double) DZ) {
     int IMAGE_TYPE = int(b.m_imageType);
     int RZP_TYPE = int(b.m_rzpType);
     double risag = b.m_designSagittalEntranceArmLength;
@@ -727,7 +727,7 @@ calculates refracted ray
 @returns: refracted ray (position unchanged, direction changed), weight = ETYPE_BEYOND_HORIZON if
 "ray beyond horizon"
 */
-Ray refrac2D(Ray r, dvec4 normal, double az, double ax) {
+Ray refrac2D(Ray r, dvec3 normal, double az, double ax) {
     double eps1 = -r8_atan(normal.x / normal.y);
     double del1 = r8_asin(normal.z);
 
@@ -757,7 +757,7 @@ Ray refrac2D(Ray r, dvec4 normal, double az, double ax) {
 }
 
 // refraction function used for gratings
-Ray refrac(Ray r, dvec4 normal, double linedensity) {
+Ray refrac(Ray r, dvec3 normal, double linedensity) {
     double xy = normal[0] / normal[1];
     double zy = normal[2] / normal[1];
     double sqq = sqrt(1 + zy * zy + xy * xy);
@@ -818,7 +818,7 @@ double RAYX_API vlsGrating(double lineDensity, double z, double vls[6]) {
  * @param a			a = WL * D0 * ORD * 1.e-6  with D0: line density (l/mm);
  * WL:wavelength (nm); ORD order of diffraction
  */
-Ray RAYX_API refrac_plane(Ray r, ALLOW_UNUSED dvec4 normal,
+Ray RAYX_API refrac_plane(Ray r, ALLOW_UNUSED dvec3 normal,
                           double a) {  // TODO fix unused var
     double y1 = r.m_direction[1] * r.m_direction[1] + r.m_direction[2] * r.m_direction[2] - (r.m_direction[2] - a) * (r.m_direction[2] - a);
     if (y1 > 0) {

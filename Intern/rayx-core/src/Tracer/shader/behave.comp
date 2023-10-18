@@ -57,15 +57,13 @@ Ray behaveSlit(Ray r, int id, RAYX_INOUT(uint64_t) ctr, ALLOW_UNUSED Collision c
 Ray behaveRZP(Ray r, int id, RAYX_INOUT(uint64_t) ctr, Collision col) {
     RZPBehaviour b = deserializeRZP(elements[id].m_behaviour);
 
-    dvec4 normal = dvec4(col.normal, 0);
-
     double WL            = hvlam(r.m_energy);
     double Ord           = b.m_orderOfDiffraction;
     int additional_order = int(b.m_additionalOrder);
 
     // calculate the RZP line density for the position of the intersection on the RZP
     double DX, DZ;
-    RZPLineDensity(r, normal, b, DX, DZ);
+    RZPLineDensity(r, col.normal, b, DX, DZ);
 
     // if additional zero order should be behaved, approx. half of the rays are randomly chosen to be behaved in order 0 (= ordinary reflection) instead
     // of the given order
@@ -76,15 +74,13 @@ Ray behaveRZP(Ray r, int id, RAYX_INOUT(uint64_t) ctr, Collision col) {
     // only 2D case, not 2 1D gratings with 90 degree rotation as in old RAY
     double az = WL * DZ * Ord * 1e-6;
     double ax = WL * DX * Ord * 1e-6;
-    r         = refrac2D(r, normal, az, ax);
+    r         = refrac2D(r, col.normal, az, ax);
 
     r.m_order = Ord;
     return r;
 }
 
-Ray behaveGrating(Ray r, int id, RAYX_INOUT(uint64_t) ctr, Collision col) {
-    dvec4 normal = dvec4(col.normal, 0);
-
+Ray behaveGrating(Ray r, int id, ALLOW_UNUSED RAYX_INOUT(uint64_t) ctr, Collision col) {
     GratingBehaviour b = deserializeGrating(elements[id].m_behaviour);
 
     // vls parameters passed in q.elementParams
@@ -98,21 +94,20 @@ Ray behaveGrating(Ray r, int id, RAYX_INOUT(uint64_t) ctr, Collision col) {
     // no additional zero order here?
 
     // refraction
-    r = refrac(r, normal, linedensity);
+    r = refrac(r, col.normal, linedensity);
 
     return r;
 }
 
 Ray behaveMirror(Ray r, int id, RAYX_INOUT(uint64_t) ctr, Collision col) {
     // calculate intersection point and normal at intersection point
-    dvec4 normal = dvec4(col.normal, 0);
     double azimuthal_angle = elements[id].m_azimuthalAngle;
 
     // calculate the new direction after the reflection
-    r.m_direction = dvec3(reflect(dvec4(r.m_direction, 0), normal));
+    r.m_direction = reflect(r.m_direction, col.normal);
 
     double real_S, real_P, delta;
-    double incidence_angle = getIncidenceAngle(r, normal);  // getTheta
+    double incidence_angle = getIncidenceAngle(r, col.normal);  // getTheta
     int mat = int(elements[id].m_material);
     if (mat != -2) {
         efficiency(r, real_S, real_P, delta, incidence_angle, mat);
