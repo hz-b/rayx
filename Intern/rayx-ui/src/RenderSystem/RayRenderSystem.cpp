@@ -1,6 +1,8 @@
 #include "RayRenderSystem.h"
 
+#include "CanonicalizePath.h"
 #include "RenderObject.h"
+
 RayRenderSystem::RayRenderSystem(Device& device, VkRenderPass renderPass, VkDescriptorSetLayout globalSetLayout) : m_Device(device) {
     createPipelineLayout(globalSetLayout);
     createPipeline(renderPass);
@@ -44,7 +46,7 @@ void RayRenderSystem::createPipeline(VkRenderPass renderPass) {
     pipelineConfig.renderPass = renderPass;
     pipelineConfig.pipelineLayout = m_PipelineLayout;
 
-    const std::string vertexShader = "build/bin/ray_shader_vert.spv";
-    const std::string fragmentShader = "build/bin/shader_frag.spv";
+    const std::string vertexShader = canonicalizeRepositoryPath("build/bin/ray_shader_vert.spv").string();
+    const std::string fragmentShader = canonicalizeRepositoryPath("build/bin/shader_frag.spv").string();
     m_Pipeline = std::make_unique<GraphicsPipeline>(m_Device, vertexShader, fragmentShader, pipelineConfig);
 }
