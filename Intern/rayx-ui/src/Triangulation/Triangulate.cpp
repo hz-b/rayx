@@ -41,14 +41,6 @@ void calculateVerticesForType(const Element& elem, glm::vec4& topLeft, glm::vec4
     }
 }
 
-void flipToXYPlane(glm::vec4& topLeft, glm::vec4& topRight, glm::vec4& bottomLeft, glm::vec4& bottomRight) {
-    glm::mat4 rotationMatrix = glm::rotate(glm::mat4(1.0f), glm::radians(90.0f), glm::vec3(1.0f, 0.0f, 0.0f));
-    topLeft = rotationMatrix * topLeft;
-    topRight = rotationMatrix * topRight;
-    bottomLeft = rotationMatrix * bottomLeft;
-    bottomRight = rotationMatrix * bottomRight;
-}
-
 RenderObject planarTriangulation(const RAYX::OpticalElement& element, Device& device) {
     static glm::vec4 blue = {0.0f, 0.0f, 1.0f, 1.0f};
     static glm::vec4 darkBlue = {0.0f, 0.0f, 0.4f, 1.0f};
@@ -56,11 +48,6 @@ RenderObject planarTriangulation(const RAYX::OpticalElement& element, Device& de
 
     glm::vec4 topLeft, topRight, bottomLeft, bottomRight;
     calculateVerticesForType(element.m_element, topLeft, topRight, bottomLeft, bottomRight);
-
-    // Some objects are in the XY not the XZ plane
-    if (element.m_element.m_behaviour.m_type == BTYPE_SLIT || element.m_element.m_behaviour.m_type == BTYPE_IMAGE_PLANE) {
-        flipToXYPlane(topLeft, topRight, bottomLeft, bottomRight);
-    }
 
     Vertex v1 = {topLeft, lightBlue};
     Vertex v2 = {topRight, blue};
@@ -140,9 +127,7 @@ std::vector<Line> getRays(const RAYX::BundleHistory& bundleHist, const std::vect
                 glm::vec4 worldPos = elements[(size_t)event.m_lastElement].m_element.m_outTrans * glm::vec4(event.m_position, 1.0f);
 
                 Vertex origin = {{rayLastPos.x, rayLastPos.y, rayLastPos.z, 1.0f}, YELLOW};
-                Vertex vertexorange = {worldPos, ORANGE};
-                Vertex vertrexred = {worldPos, RED};
-                Vertex point = (event.m_eventType == ETYPE_JUST_HIT_ELEM) ? vertexorange : vertrexred;
+                Vertex point = (event.m_eventType == ETYPE_JUST_HIT_ELEM) ? Vertex(worldPos, ORANGE) : Vertex(worldPos, RED);
 
                 Line myline = {origin, point};
                 rays.push_back(myline);

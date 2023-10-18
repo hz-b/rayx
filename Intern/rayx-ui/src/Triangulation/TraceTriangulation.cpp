@@ -66,8 +66,8 @@ std::vector<std::vector<RAYX::Ray>> createRayGrid(size_t size, double width, dou
         for (size_t j = 0; j < size; j++) {
             double z = -length / 2 + zStep * j;
             glm::dvec3 pos, dir;
-            pos = glm::dvec3(x, z, -2.0f);
-            dir = glm::dvec3(0.0f, 0.0f, 1.0f);
+            pos = glm::dvec3(x, -2.0, z);
+            dir = glm::dvec3(0.0f, 1.0f, 0.0f);
 
             RAYX::Ray ray = {
                 .m_position = pos,
@@ -103,7 +103,8 @@ RenderObject traceTriangulation(const RAYX::OpticalElement& element, Device& dev
 
     for (size_t i = 0; i < gridSize; ++i) {
         for (size_t j = 0; j < gridSize; ++j) {
-            auto collision = RAYX::CPU_TRACER::findCollisionInElementCoords(rayGrid[i][j], element.m_element.m_surface, element.m_element.m_cutout,true);
+            auto collision =
+                RAYX::CPU_TRACER::findCollisionInElementCoords(rayGrid[i][j], element.m_element.m_surface, element.m_element.m_cutout, true);
             collisionGrid[i][j] = collision.found;
         }
     }
