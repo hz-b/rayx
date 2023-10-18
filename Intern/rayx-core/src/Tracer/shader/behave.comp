@@ -67,10 +67,6 @@ Ray behaveRZP(Ray r, int id, RAYX_INOUT(uint64_t) ctr, Collision col) {
     double DX, DZ;
     RZPLineDensity(r, normal, b, DX, DZ);
 
-    // tanger/slope Error
-    SlopeError slope_error = elements[id].m_slopeError;;
-    normal = tanger(normal, slope_error.m_sag, slope_error.m_mer, 0, ctr);
-
     // if additional zero order should be behaved, approx. half of the rays are randomly chosen to be behaved in order 0 (= ordinary reflection) instead
     // of the given order
     if (additional_order == 1) {
@@ -90,10 +86,6 @@ Ray behaveGrating(Ray r, int id, RAYX_INOUT(uint64_t) ctr, Collision col) {
     dvec4 normal = dvec4(col.normal, 0);
 
     GratingBehaviour b = deserializeGrating(elements[id].m_behaviour);
-
-    // modify normal according to slope error
-    SlopeError slope_error = elements[id].m_slopeError;;
-    normal = tanger(normal, slope_error.m_sag, slope_error.m_mer, 0, ctr);
 
     // vls parameters passed in q.elementParams
     double WL                 = hvlam(r.m_energy);
@@ -115,10 +107,6 @@ Ray behaveMirror(Ray r, int id, RAYX_INOUT(uint64_t) ctr, Collision col) {
     // calculate intersection point and normal at intersection point
     dvec4 normal = dvec4(col.normal, 0);
     double azimuthal_angle = elements[id].m_azimuthalAngle;
-
-    // take the slope error into account for the normal
-    SlopeError slope_error = elements[id].m_slopeError;;
-    normal = tanger(normal, slope_error.m_sag, slope_error.m_mer, 0, ctr);
 
     // calculate the new direction after the reflection
     r.m_direction = dvec3(reflect(dvec4(r.m_direction, 0), normal));

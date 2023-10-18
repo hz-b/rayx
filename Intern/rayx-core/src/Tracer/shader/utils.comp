@@ -483,7 +483,7 @@ turn the normal vector through x_rad and z_rad
             z_rad: angle in rad for z-axis
 returns modified normal vector
 */
-dvec4 RAYX_API normal_cartesian(dvec4 normal, double x_rad, double z_rad) {
+dvec3 RAYX_API normal_cartesian(dvec3 normal, double x_rad, double z_rad) {
     double FX = normal[0];
     double FY = normal[1];
     double FZ = normal[2];
@@ -509,7 +509,7 @@ turn the normal vector through x_rad and z_rad
             z_rad: angle in rad for z-axis
 returns modified normal vector
 */
-dvec4 RAYX_API normal_cylindrical(dvec4 normal, double x_rad, double z_rad) {
+dvec3 RAYX_API normal_cylindrical(dvec3 normal, double x_rad, double z_rad) {
     double normFXFY = sqrt(normal[0] * normal[0] + normal[1] * normal[1]);
     double arcTanFXFY = r8_atan2(normal[1], normal[0]);
     double sinz = r8_sin(z_rad);
@@ -526,13 +526,15 @@ dvec4 RAYX_API normal_cylindrical(dvec4 normal, double x_rad, double z_rad) {
 adds slope error to the normal
 @params:
     normal: normal vector
-    slopeX: sigma-slope error in x-y plane (chi) (RMS) in arcsec
-    slopeZ: sigma-slope error in y-z plane (psi) (RMS) in arcsec
+    error: the slope error to apply
     O_type: cartesian or cylindrical type of slope error (0=cartesian,
 1=cylindrical) (1 only for ellipsis relevant) returns new normal if there is a
 slope error in either x or z direction or the unmodified normal otherwise.
 */
-dvec4 tanger(dvec4 normal, double slopeX, double slopeZ, int O_type, RAYX_INOUT(uint64_t) ctr) {
+dvec3 applySlopeError(dvec3 normal, SlopeError error, int O_type, RAYX_INOUT(uint64_t) ctr) {
+    double slopeX = error.m_sag;
+    double slopeZ = error.m_mer;
+
     // only calculate the random number if at least one slope error is not 0,
     // since the calculation is costly (sin, cos, log involved)
     if (slopeX != 0 || slopeZ != 0) {

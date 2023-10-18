@@ -24,7 +24,7 @@ void dynamicElements() {
 
     // Iterate through all bounces
     for (int i = 0; i < maxBounces; i++) {
-        Collision col = findCollision();
+        Collision col = findCollision(ctr);
         if (!col.found) {
             // no element was hit.
             // Ray is considered to move forward to inf.
@@ -71,7 +71,7 @@ void dynamicElements() {
         _ray = rayMatrixMult(elem_ray, nextElement.m_outTrans);
     }
 
-    if (findCollision().found) {
+    if (findCollision(ctr).found) {
         recordFinalEvent(_ray, ETYPE_NOT_ENOUGH_BOUNCES);
     } else {
         recordFinalEvent(_ray, ETYPE_FLY_OFF);

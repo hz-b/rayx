@@ -103,36 +103,36 @@ TEST_F(TestSuite, testLog) {
 
 TEST_F(TestSuite, testNormalCartesian) {
     struct InOutPair {
-        glm::dvec4 in_normal;
+        glm::dvec3 in_normal;
         double in_slopeX;
         double in_slopeZ;
 
-        glm::dvec4 out;
+        glm::dvec3 out;
     };
 
     std::vector<InOutPair> inouts = {{
-                                         .in_normal = glm::dvec4(0, 1, 0, 0),
+                                         .in_normal = glm::dvec3(0, 1, 0),
                                          .in_slopeX = 0,
                                          .in_slopeZ = 0,
-                                         .out = glm::dvec4(0, 1, 0, 0),
+                                         .out = glm::dvec3(0, 1, 0),
                                      },
                                      {
-                                         .in_normal = glm::dvec4(5.0465463027123736, 10470.451695989539, -28.532199794465537, 0),
+                                         .in_normal = glm::dvec3(5.0465463027123736, 10470.451695989539, -28.532199794465537),
                                          .in_slopeX = 0,
                                          .in_slopeZ = 0,
-                                         .out = glm::dvec4(5.0465463027123736, 10470.451695989539, -28.532199794465537, 0),
+                                         .out = glm::dvec3(5.0465463027123736, 10470.451695989539, -28.532199794465537),
                                      },
                                      {
-                                         .in_normal = glm::dvec4(0, 1, 0, 0),
+                                         .in_normal = glm::dvec3(0, 1, 0),
                                          .in_slopeX = 2,
                                          .in_slopeZ = 3,
-                                         .out = glm::dvec4(-0.90019762973551742, 0.41198224566568298, -0.14112000805986721, 0),
+                                         .out = glm::dvec3(-0.90019762973551742, 0.41198224566568298, -0.14112000805986721),
                                      },
                                      {
-                                         .in_normal = glm::dvec4(5.0465463027123736, 10470.451695989539, -28.532199794465537, 0),
+                                         .in_normal = glm::dvec3(5.0465463027123736, 10470.451695989539, -28.532199794465537),
                                          .in_slopeX = 2,
                                          .in_slopeZ = 3,
-                                         .out = glm::dvec4(-9431.2371568647086, 4310.7269916467494, -1449.3435640204684, 0),
+                                         .out = glm::dvec3(-9431.2371568647086, 4310.7269916467494, -1449.3435640204684),
                                      }};
 
     for (auto p : inouts) {
@@ -143,35 +143,35 @@ TEST_F(TestSuite, testNormalCartesian) {
 
 TEST_F(TestSuite, testNormalCylindrical) {
     struct InOutPair {
-        glm::dvec4 in_normal;
+        glm::dvec3 in_normal;
         double in_slopeX;
         double in_slopeZ;
 
-        glm::dvec4 out;
+        glm::dvec3 out;
     };
 
     std::vector<InOutPair> inouts = {{
-                                         .in_normal = glm::dvec4(0, 1, 0, 0),
+                                         .in_normal = glm::dvec3(0, 1, 0),
                                          .in_slopeX = 0,
                                          .in_slopeZ = 0,
-                                         .out = glm::dvec4(0, 1, 0, 0),
+                                         .out = glm::dvec3(0, 1, 0),
                                      },
                                      {
-                                         .in_normal = glm::dvec4(5.0465463027123736, 10470.451695989539, -28.532199794465537, 0),
+                                         .in_normal = glm::dvec3(5.0465463027123736, 10470.451695989539, -28.532199794465537),
                                          .in_slopeX = 0,
                                          .in_slopeZ = 0,
-                                         .out = glm::dvec4(5.0465463027115769, 10470.451695989539, -28.532199794465537, 0),
+                                         .out = glm::dvec3(5.0465463027115769, 10470.451695989539, -28.532199794465537),
                                      },
                                      {
-                                         .in_normal = glm::dvec4(0, 1, 0, 0),
+                                         .in_normal = glm::dvec3(0, 1, 0),
                                          .in_slopeX = 2,
                                          .in_slopeZ = 3,
-                                         .out = glm::dvec4(0.90019762973551742, 0.41198224566568292, -0.14112000805986721, 0),
+                                         .out = glm::dvec3(0.90019762973551742, 0.41198224566568292, -0.14112000805986721),
                                      },
-                                     {.in_normal = glm::dvec4(5.0465463027123736, 10470.451695989539, -28.532199794465537, 0),
+                                     {.in_normal = glm::dvec3(5.0465463027123736, 10470.451695989539, -28.532199794465537),
                                       .in_slopeX = 2,
                                       .in_slopeZ = 3,
-                                      .out = glm::dvec4(9431.2169472441783, 4310.7711493493844, -1449.3437356459144, 0)}};
+                                      .out = glm::dvec3(9431.2169472441783, 4310.7711493493844, -1449.3437356459144)}};
 
     for (auto p : inouts) {
         auto out = CPU_TRACER::normal_cylindrical(p.in_normal, p.in_slopeX, p.in_slopeZ);
