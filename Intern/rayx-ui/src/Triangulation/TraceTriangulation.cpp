@@ -66,7 +66,7 @@ std::vector<std::vector<RAYX::Ray>> createRayGrid(size_t size, double width, dou
         for (size_t j = 0; j < size; j++) {
             double z = -length / 2 + zStep * j;
             glm::dvec3 pos, dir;
-            pos = glm::dvec3(x, -2.0, z);
+            pos = glm::dvec3(x, 0.0f, z);
             dir = glm::dvec3(0.0f, 1.0f, 0.0f);
 
             RAYX::Ray ray = {
