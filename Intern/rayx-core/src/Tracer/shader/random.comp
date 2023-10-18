@@ -8,11 +8,11 @@ const uint64_t rngKey = (uint64_t(0xc8e4fd15) << 32) | uint64_t(0x4ce32f6d);
  * URL: https://arxiv.org/pdf/2004.06278.pdf
  */
 // generates 64-Bit random integers
-uint64_t RAYX_API squares64(RAYX_INOUT(uint64_t) ctr) {
+uint64_t RAYX_API squares64(RAYX_INOUT(uint64_t) ctr_) {
     uint64_t x, y, z, t;
-    y = x = ctr * rngKey;
+    y = x = ctr_ * rngKey;
     z = y + rngKey;
-    ctr++;
+    ctr_++;
 
     x = x * x + y;
     x = (x >> 32) | (x << 32); /* round 1 */
@@ -27,21 +27,21 @@ uint64_t RAYX_API squares64(RAYX_INOUT(uint64_t) ctr) {
 
 // generates uniformly distributed doubles between 0 and 1 from one 64-Bit
 // random integer
-double RAYX_API squaresDoubleRNG(RAYX_INOUT(uint64_t) ctr) {
-    double a = double(squares64(ctr));
+double RAYX_API squaresDoubleRNG(RAYX_INOUT(uint64_t) ctr_) {
+    double a = double(squares64(ctr_));
     double div = double(uint64_t(0) - 1);
     return a / div;
 }
 
 // creates (via the Box-Muller transform) a normal distributed double with mean
 // mu and standard deviation sigma
-double RAYX_API squaresNormalRNG(RAYX_INOUT(uint64_t) ctr, double mu, double sigma) {
+double RAYX_API squaresNormalRNG(RAYX_INOUT(uint64_t) ctr_, double mu, double sigma) {
     double U, V, R, Z;
     double two_pi = 2.0 * PI;
 
-    U = squaresDoubleRNG(ctr);
-    V = squaresDoubleRNG(ctr);
-    R = squaresDoubleRNG(ctr);
+    U = squaresDoubleRNG(ctr_);
+    V = squaresDoubleRNG(ctr_);
+    R = squaresDoubleRNG(ctr_);
     Z = sqrt(-2.0 * r8_log(U));
 
     if (R < 0.5)
