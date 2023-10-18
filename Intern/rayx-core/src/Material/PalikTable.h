@@ -5,6 +5,7 @@
 
 #include "../Shared/NffPalik.h"
 
+namespace RAYX {
 /** This struct represents the contents of a .NKP file.
  *
  * Example usage:
@@ -23,3 +24,5 @@ struct PalikTable {
 
     // double interpolate(double x) const;
 };
+
+}  // namespace RAYX

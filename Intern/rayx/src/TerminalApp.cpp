@@ -64,7 +64,7 @@ void TerminalApp::tracePath(const std::filesystem::path& path) {
         }
 
         // Run rayx core
-        RAYX::Sequential seq = m_CommandParser->m_args.m_sequential? RAYX::Sequential::Yes : RAYX::Sequential::No;
+        RAYX::Sequential seq = m_CommandParser->m_args.m_sequential ? RAYX::Sequential::Yes : RAYX::Sequential::No;
         auto rays = m_Tracer->trace(*m_Beamline, seq, max_batch_size, m_CommandParser->m_args.m_setThreads);
 
         // Export Rays to external data.
@@ -77,7 +77,7 @@ void TerminalApp::tracePath(const std::filesystem::path& path) {
                 RAYX_ERR << "Have you selected .csv exporting?";
             }
 
-            auto cmd = std::string("python ") + canonicalizeRepositoryPath(std::string("Scripts/plot.py")).string() + " " + file;
+            auto cmd = std::string("python ") + RAYX::canonicalizeRepositoryPath(std::string("Scripts/plot.py")).string() + " " + file;
             auto ret = system(cmd.c_str());
             if (ret != 0) {
                 RAYX_WARN << "received error code while printing";

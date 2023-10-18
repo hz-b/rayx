@@ -10,6 +10,8 @@
 #include "NffTable.h"
 #include "PalikTable.h"
 
+namespace RAYX {
+
 /**
  * returns the name of the material:
  * EXAMPLE: getMaterialName(Material::Cu) == "CU"
@@ -109,3 +111,5 @@ MaterialTables loadMaterialTables(std::array<bool, 92> relevantMaterials) {
 
     return out;
 }
+
+}  // namespace RAYX

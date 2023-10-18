@@ -6,6 +6,8 @@
 #include "CanonicalizePath.h"
 #include "Debug/Debug.h"
 
+namespace RAYX {
+
 bool PalikTable::load(const char* element, PalikTable* out) {
     std::string elementString = element;
     std::transform(elementString.begin(), elementString.end(), elementString.begin(), [](unsigned char c) { return std::toupper(c); });
@@ -46,3 +48,5 @@ bool PalikTable::load(const char* element, PalikTable* out) {
 
     return true;
 }
+
+}  // namespace RAYX
