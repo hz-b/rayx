@@ -1,5 +1,9 @@
 #include "ObjectRenderSystem.h"
 
+#include <filesystem>
+
+#include "CanonicalizePath.h"
+
 // Keeping this here so it is easy to add push constants later
 struct PushConstantData {
     glm::mat4 modelMatrix{1.f};
@@ -38,9 +42,8 @@ void ObjectRenderSystem::createPipeline(VkRenderPass renderPass) {
     GraphicsPipeline::defaultPipelineConfigInfo(pipelineConfig);
     pipelineConfig.renderPass = renderPass;
     pipelineConfig.pipelineLayout = m_PipelineLayout;
-
-    const std::string vertexShader = "build/bin/shader_vert.spv";
-    const std::string fragmentShader = "build/bin/shader_frag.spv";
+    const std::string vertexShader = canonicalizeRepositoryPath("build/bin/shader_vert.spv").string();
+    const std::string fragmentShader = canonicalizeRepositoryPath("build/bin/shader_frag.spv").string();
     m_Pipeline = std::make_unique<GraphicsPipeline>(m_Device, vertexShader, fragmentShader, pipelineConfig);
 }
 
