@@ -83,6 +83,9 @@ uint64_t rayId() {
 
 bool finalized;
 
+// the random number state.
+uint64_t ctr;
+
 // `i in [0, maxEvents]`.
 // Will return the index in outputData to access the `i'th` output ray belonging to this shader call.
 // Typically used as `outputData[output_index(i)]`.
@@ -159,6 +162,11 @@ void recordFinalEvent(Ray r, double w) {
 void main() {
     finalized = false;
     uninitOutRays();
+
+    // ray specific "seed" for random numbers -> every ray has a different starting value for the counter that creates the random number
+    const uint64_t MAX_UINT64 = ~(uint64_t(0));
+    uint64_t workerCounterNum = MAX_UINT64 / uint64_t(pushConstants.numRays);
+    ctr = rayId() * workerCounterNum + uint64_t(pushConstants.randomSeed * MAX_UINT64);
     
     // ~~~~~~~~~~~~~~ PRINT EXAMPLE ~~~~~~~~~~~~~~
     // Printing ~DEBUG~ Example over vkconfig Validation Layers

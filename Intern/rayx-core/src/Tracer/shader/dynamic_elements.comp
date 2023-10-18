@@ -5,11 +5,6 @@ void dynamicElements() {
     // placeholder, info should later be transfered to shader
     const int maxBounces = elements.length();
 
-    // ray specific "seed" for random numbers -> every ray has a different starting value for the counter that creates the random number
-    const uint64_t MAX_UINT64 = ~(uint64_t(0));
-    uint64_t workerCounterNum = MAX_UINT64 / uint64_t(pushConstants.numRays);
-    uint64_t ctr              = rayId() * workerCounterNum + uint64_t(pushConstants.randomSeed * MAX_UINT64);
-
     #ifdef RAYX_DEBUG_MODE // Debug Matrix only works in GPU Mode and on DEBUG Build Type
     #ifdef GLSL
         // Set Debug Struct of current Ray to identity
@@ -24,7 +19,7 @@ void dynamicElements() {
 
     // Iterate through all bounces
     for (int i = 0; i < maxBounces; i++) {
-        Collision col = findCollision(ctr);
+        Collision col = findCollision();
         if (!col.found) {
             // no element was hit.
             // Ray is considered to move forward to inf.
@@ -46,16 +41,16 @@ void dynamicElements() {
 
         switch(btype) {
             case (BTYPE_MIRROR):
-                elem_ray = behaveMirror(elem_ray, col.elementIndex, ctr, col);
+                elem_ray = behaveMirror(elem_ray, col.elementIndex, col);
                 break;
             case (BTYPE_GRATING):
-                elem_ray = behaveGrating(elem_ray, col.elementIndex, ctr, col);
+                elem_ray = behaveGrating(elem_ray, col.elementIndex, col);
                 break;
             case (BTYPE_SLIT) :
-                elem_ray = behaveSlit(elem_ray, col.elementIndex, ctr, col);
+                elem_ray = behaveSlit(elem_ray, col.elementIndex, col);
                 break;
             case (BTYPE_RZP):
-                elem_ray = behaveRZP(elem_ray, col.elementIndex, ctr, col);
+                elem_ray = behaveRZP(elem_ray, col.elementIndex, col);
                 break;
             case (BTYPE_IMAGE_PLANE):
                 elem_ray = behaveImagePlane(elem_ray, col.elementIndex, col);
@@ -71,7 +66,7 @@ void dynamicElements() {
         _ray = rayMatrixMult(elem_ray, nextElement.m_outTrans);
     }
 
-    if (findCollision(ctr).found) {
+    if (findCollision().found) {
         recordFinalEvent(_ray, ETYPE_NOT_ENOUGH_BOUNCES);
     } else {
         recordFinalEvent(_ray, ETYPE_FLY_OFF);
