@@ -27,6 +27,10 @@ class ImGuiLayer {
     bool m_ShowDemoWindow = false;
     float m_ClearColor[4] = {0.01f, 0.01f, 0.01f, 1.00f};
 
+    bool m_useLargeFont = false;
+    ImFont* m_smallFont;
+    ImFont* m_largeFont;
+
     VkRenderPass m_RenderPass;
     VkDescriptorPool m_DescriptorPool;
     VkCommandPool m_CommandPool;

@@ -4,6 +4,8 @@
 #include <imgui_impl_glfw.h>
 #include <imgui_impl_vulkan.h>
 
+#include "CanonicalizePath.h"
+
 void checkVkResult(VkResult result, const char* message) {
     if (result != VK_SUCCESS) {
         printf("%s\n", message);
@@ -121,6 +123,12 @@ ImGuiLayer::ImGuiLayer(const Window& window, const Device& device, const SwapCha
 
     // Upload fonts
     {
+        // Setup style
+        m_smallFont =
+            m_IO.Fonts->AddFontFromFileTTF(RAYX::canonicalizeRepositoryPath("./Intern/rayx-ui/res/fonts/Roboto-Regular.ttf").string().c_str(), 16.0f);
+        m_largeFont =
+            m_IO.Fonts->AddFontFromFileTTF(RAYX::canonicalizeRepositoryPath("./Intern/rayx-ui/res/fonts/Roboto-Regular.ttf").string().c_str(), 24.0f);
+
         auto tmpCommandBuffer = m_Device.beginSingleTimeCommands();
         ImGui_ImplVulkan_CreateFontsTexture(tmpCommandBuffer);
         m_Device.endSingleTimeCommands(tmpCommandBuffer);
@@ -142,16 +150,24 @@ void ImGuiLayer::updateImGui(CameraController& camController, FrameInfo& frameIn
     ImGui_ImplGlfw_NewFrame();
     ImGui::NewFrame();
 
+    if (m_useLargeFont) {
+        ImGui::PushFont(m_largeFont);
+    } else {
+        ImGui::PushFont(m_smallFont);
+    }
+
+    ImGui::SetNextWindowPos(ImVec2(30, 30));
+    ImGui::SetNextWindowSize(ImVec2(500, 600));
     // Main window
     {
-        ImGui::Begin("Properties Manager");  // Create a window called "Hello, world!" and append into it.
+        ImGui::Begin("Properties Manager");
 
         // Check ImGui dialog open condition
         if (ImGui::Button("Open File Dialog")) {
             ImGuiFileDialog::Instance()->OpenDialog("ChooseFileDlgKey", "Choose Beamline (rml) File", ".rml\0", ".");
         }
 
-        ImGui::SetNextWindowSize(ImVec2(800, 600));  // Set the window size. You can set dimensions as per your needs.
+        ImGui::SetNextWindowSize(ImVec2(800, 600));
 
         // Display file dialog
         if (ImGuiFileDialog::Instance()->Display("ChooseFileDlgKey")) {
@@ -165,14 +181,14 @@ void ImGuiLayer::updateImGui(CameraController& camController, FrameInfo& frameIn
             ImGuiFileDialog::Instance()->Close();
         }
 
-        ImGui::Text("Background");                          // Display some text (you can use a format strings too)
-        ImGui::ColorEdit3("Color", (float*)&m_ClearColor);  // Edit 3 floats representing a color
+        ImGui::Text("Background");
+        ImGui::ColorEdit3("Color", (float*)&m_ClearColor);
 
         ImGui::Text("Camera");
         ImGui::SliderFloat("FOV", &camController.m_config.m_FOV, 0.0f, 180.0f);
-        ImGui::SliderFloat("Up X", &camController.m_up.x, -1.0f, 1.0f);  // Slider for Up vector x-coordinate
-        ImGui::SliderFloat("Up Y", &camController.m_up.y, -1.0f, 1.0f);  // Slider for Up vector y-coordinate
-        ImGui::SliderFloat("Up Z", &camController.m_up.z, -1.0f, 1.0f);  // Slider for Up vector z-coordinate
+        ImGui::SliderFloat("Up X", &camController.m_up.x, -1.0f, 1.0f);
+        ImGui::SliderFloat("Up Y", &camController.m_up.y, -1.0f, 1.0f);
+        ImGui::SliderFloat("Up Z", &camController.m_up.z, -1.0f, 1.0f);
         ImGui::SliderFloat("Near", &camController.m_config.m_near, 0.0f, 100.0f);
         ImGui::SliderFloat("Far", &camController.m_config.m_far, 0.0f, 10000.0f);
 
@@ -227,7 +243,7 @@ void ImGuiLayer::updateImGui(CameraController& camController, FrameInfo& frameIn
         if (ImGui::Button("Save Camera")) {
             SaveCameraControllerToFile(camController, "camera_save.txt");
         }
-
+        ImGui::SameLine();
         if (ImGui::Button("Load Camera")) {
             LoadCameraControllerFromFile(camController, "camera_save.txt");
         }
@@ -236,6 +252,21 @@ void ImGuiLayer::updateImGui(CameraController& camController, FrameInfo& frameIn
 
         ImGui::End();
     }
+
+    ImGui::SetNextWindowPos(ImVec2(30, 630));
+    ImGui::SetNextWindowSize(ImVec2(500, 300));
+    // In your rendering loop
+    {
+        ImGui::Begin("Settings");
+
+        if (ImGui::Button("Toggle Large Font")) {
+            m_useLargeFont = !m_useLargeFont;
+        }
+
+        ImGui::End();
+    }
+
+    ImGui::PopFont();
 
     ImGui::Render();
 }
