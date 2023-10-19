@@ -1,12 +1,15 @@
 # Directories
 .vs/
 .vscode/
+.idea/
 bin/
 bin-int/
 build/
 Intern/rayx-core/doc/*/
 Intern/rayx-core/tests/output/**
 out/
+cmake-build-debug/
+cmake-build-release/
 
 # Files
 *.user

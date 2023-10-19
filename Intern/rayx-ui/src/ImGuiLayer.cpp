@@ -192,52 +192,73 @@ void ImGuiLayer::updateImGui(CameraController& camController, FrameInfo& frameIn
         ImGui::SliderFloat("Near", &camController.m_config.m_near, 0.0f, 100.0f);
         ImGui::SliderFloat("Far", &camController.m_config.m_far, 0.0f, 10000.0f);
 
+        auto isInputDigit = [](const char* str) { return !std::any_of(str, str + strlen(str), ::isspace); };
+
         static char posStrX[32];
-        snprintf(posStrX, sizeof(posStrX), "%f", camController.m_position.x);
-        if (ImGui::InputText("Position X", posStrX, sizeof(posStrX))) {
-            if (!std::all_of(posStrX, posStrX + strlen(posStrX), ::isspace)) {
-                camController.m_position.x = std::stof(posStrX);
+        try {
+            snprintf(posStrX, sizeof(posStrX), "%f", camController.m_position.x);
+            if (ImGui::InputText("Position X", posStrX, sizeof(posStrX))) {
+                if (isInputDigit(posStrX)) {
+                    camController.m_position.x = std::stof(posStrX);
+                }
             }
+        } catch (const std::exception& e) {
         }
 
         static char posStrY[32];
-        snprintf(posStrY, sizeof(posStrY), "%f", camController.m_position.y);
-        if (ImGui::InputText("Position Y", posStrY, sizeof(posStrY))) {
-            if (!std::all_of(posStrY, posStrY + strlen(posStrY), ::isspace)) {
-                camController.m_position.y = std::stof(posStrY);
+        try {
+            snprintf(posStrY, sizeof(posStrY), "%f", camController.m_position.y);
+            if (ImGui::InputText("Position Y", posStrY, sizeof(posStrY))) {
+                if (isInputDigit(posStrY)) {
+                    camController.m_position.y = std::stof(posStrY);
+                }
             }
+        } catch (const std::exception& e) {
         }
 
         static char posStrZ[32];
-        snprintf(posStrZ, sizeof(posStrZ), "%f", camController.m_position.z);
-        if (ImGui::InputText("Position Z", posStrZ, sizeof(posStrZ))) {
-            if (!std::all_of(posStrZ, posStrZ + strlen(posStrZ), ::isspace)) {
-                camController.m_position.z = std::stof(posStrZ);
+        try {
+            snprintf(posStrZ, sizeof(posStrZ), "%f", camController.m_position.z);
+            if (ImGui::InputText("Position Z", posStrZ, sizeof(posStrZ))) {
+                if (isInputDigit(posStrZ)) {
+                    camController.m_position.z = std::stof(posStrZ);
+                }
             }
+
+        } catch (const std::exception& e) {
         }
 
         static char dirStrX[32];
-        snprintf(dirStrX, sizeof(dirStrX), "%f", camController.m_direction.x);
-        if (ImGui::InputText("Direction X", dirStrX, sizeof(dirStrX))) {
-            if (!std::all_of(dirStrX, dirStrX + strlen(dirStrX), ::isspace)) {
-                camController.m_direction.x = std::stof(dirStrX);
+        try {
+            snprintf(dirStrX, sizeof(dirStrX), "%f", camController.m_direction.x);
+            if (ImGui::InputText("Direction X", dirStrX, sizeof(dirStrX))) {
+                if (isInputDigit(dirStrX)) {
+                    camController.m_direction.x = std::stof(dirStrX);
+                }
             }
+        } catch (const std::exception& e) {
         }
 
         static char dirStrY[32];
-        snprintf(dirStrY, sizeof(dirStrY), "%f", camController.m_direction.y);
-        if (ImGui::InputText("Direction Y", dirStrY, sizeof(dirStrY))) {
-            if (!std::all_of(dirStrY, dirStrY + strlen(dirStrY), ::isspace)) {
-                camController.m_direction.y = std::stof(dirStrY);
+        try {
+            snprintf(dirStrY, sizeof(dirStrY), "%f", camController.m_direction.y);
+            if (ImGui::InputText("Direction Y", dirStrY, sizeof(dirStrY))) {
+                if (isInputDigit(dirStrY)) {
+                    camController.m_direction.y = std::stof(dirStrY);
+                }
             }
+        } catch (const std::exception& e) {
         }
 
         static char dirStrZ[32];
-        snprintf(dirStrZ, sizeof(dirStrZ), "%f", camController.m_direction.z);
-        if (ImGui::InputText("Direction Z", dirStrZ, sizeof(dirStrZ))) {
-            if (!std::all_of(dirStrZ, dirStrZ + strlen(dirStrZ), ::isspace)) {
-                camController.m_direction.z = std::stof(dirStrZ);
+        try {
+            snprintf(dirStrZ, sizeof(dirStrZ), "%f", camController.m_direction.z);
+            if (ImGui::InputText("Direction Z", dirStrZ, sizeof(dirStrZ))) {
+                if (isInputDigit(dirStrZ)) {
+                    camController.m_direction.z = std::stof(dirStrZ);
+                }
             }
+        } catch (const std::exception& e) {
         }
 
         if (ImGui::Button("Save Camera")) {
