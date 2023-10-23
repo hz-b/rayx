@@ -12,6 +12,7 @@ MatrixSource::MatrixSource(const DesignObject& dobj) : LightSource(dobj) {
     m_linearPol_0 = dobj.parseLinearPol0();
     m_linearPol_45 = dobj.parseLinearPol45();
     m_circularPol = dobj.parseCircularPol();
+    m_horDivergence = dobj.parseHorDiv();
     m_verDivergence = dobj.parseVerDiv();
     m_sourceDepth = dobj.parseSourceDepth();
 }
@@ -22,8 +23,9 @@ MatrixSource::MatrixSource(const DesignObject& dobj) : LightSource(dobj) {
  * direction as first 4) distributed evenly across width & height of source
  * returns vector of rays
  */
-std::vector<Ray> MatrixSource::getRays() const {
+std::vector<Ray> MatrixSource::getRays([[maybe_unused]] int thread_count) const {
     RAYX_PROFILE_FUNCTION();
+
     double x, y, z, psi, phi,
         en;  // x,y,z pos, psi,phi direction cosines, en=energy
     int rmat = int(sqrt(m_numberOfRays));
@@ -33,6 +35,7 @@ std::vector<Ray> MatrixSource::getRays() const {
     // rayVector.reserve(1048576);
     RAYX_VERB << "create " << rmat << " times " << rmat << " matrix with Matrix Source...";
     // fill the square with rmat1xrmat1 rays
+
     for (int col = 0; col < rmat; col++) {
         for (int row = 0; row < rmat; row++) {
             double rn = randomDouble();  // in [0, 1]
@@ -57,6 +60,7 @@ std::vector<Ray> MatrixSource::getRays() const {
 
             Ray r = {position, ETYPE_UNINIT, direction, en, stokes, 0.0, 0.0, -1.0, -1.0};
             // Ray(1, 2, 3, 7, 4, 5, 6, 8, 9, 10, 11, 12, 13, 14, 15, 16);
+
             returnList.push_back(r);
         }
     }
@@ -82,7 +86,6 @@ std::vector<Ray> MatrixSource::getRays() const {
         r_copy.m_energy = en = selectEnergy();
         returnList.push_back(r_copy);
     }
-
     return returnList;
 }
 

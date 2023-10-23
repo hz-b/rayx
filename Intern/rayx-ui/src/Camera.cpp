@@ -13,9 +13,9 @@ CameraController::CameraController()
       m_mouseLooking(false),
       m_lastMouseX(0.0),
       m_lastMouseY(0.0) {
-    m_config.FOV = 60.0f;
-    m_config.near = 0.1f;
-    m_config.far = 10000.0f;
+    m_config.m_FOV = 60.0f;
+    m_config.m_near = 0.1f;
+    m_config.m_far = 10000.0f;
 }
 
 void CameraController::updateDirection(double deltaYaw, double deltaPitch) {
@@ -56,10 +56,10 @@ void CameraController::updateDirectionViaMouse(double mouseX, double mouseY) {
 
 void CameraController::update(Camera& cam, float aspectRatio) {
     cam.view = glm::lookAt(m_position, m_position + m_direction, m_up);
-    cam.proj = glm::perspective(glm::radians(m_config.FOV), aspectRatio, m_config.near, m_config.far);
+    cam.proj = glm::perspective(glm::radians(m_config.m_FOV), aspectRatio, m_config.m_near, m_config.m_far);
     cam.proj[1][1] *= -1;  // Vulkan has inverted Y coordinates
-    cam.n = m_config.near;
-    cam.f = m_config.far;
+    cam.n = m_config.m_near;
+    cam.f = m_config.m_far;
 }
 
 // ---- SERDE ----

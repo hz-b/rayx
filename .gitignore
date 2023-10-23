@@ -1,12 +1,15 @@
 # Directories
 .vs/
 .vscode/
+.idea/
 bin/
 bin-int/
 build/
 Intern/rayx-core/doc/*/
 Intern/rayx-core/tests/output/**
 out/
+cmake-build-debug/
+cmake-build-release/
 
 # Files
 *.user
@@ -21,8 +24,8 @@ out/
 /Tests/oldray_files/spec1-first_rzp4mm/data
 /Tests/oldray_files/spec1+first_rzp4mm/data
 /Tests/.ipynb_checkpoints/*
-CMakeCache.txt
+CMakeCache.txm
 cmake.check_cache
 
-#VSCode Debugger files
+# VSCode Debugger files
 results.json

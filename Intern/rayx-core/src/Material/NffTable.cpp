@@ -1,11 +1,13 @@
 
 #include "NffTable.h"
 
-#include <fstream>
 #include <algorithm>
+#include <fstream>
 
 #include "CanonicalizePath.h"
 #include "Debug/Debug.h"
+
+namespace RAYX {
 
 bool NffTable::load(const char* element, NffTable* out) {
     std::string elementString = element;
@@ -46,3 +48,5 @@ bool NffTable::load(const char* element, NffTable* out) {
 
     return true;
 }
+
+}  // namespace RAYX

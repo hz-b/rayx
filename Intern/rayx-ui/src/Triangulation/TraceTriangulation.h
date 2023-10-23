@@ -28,9 +28,9 @@ RenderObject traceTriangulation(const RAYX::OpticalElement& element, Device& dev
 // ------ Helper functions ------
 
 /**
- * @brief Returns the dimensions (width and height) for various types of cutouts.
+ * @brief Returns the dimensions (width and length) for various types of cutouts.
  * @param cutout Reference to the Cutout object.
- * @return A pair containing width and height as double values.
+ * @return A pair containing width and length as double values.
  */
 std::pair<double, double> getRectangularDimensions(const Cutout& cutout);
 
@@ -38,8 +38,7 @@ std::pair<double, double> getRectangularDimensions(const Cutout& cutout);
  * @brief Creates a 2D grid of rays to be used for ray tracing.
  * @param size Grid size along one dimension.
  * @param width Total grid width.
- * @param height Total grid height.
- * @param isXZ Indicates if rays are in the XZ plane.
+ * @param length Total grid length.
  * @return 2D vector of Ray objects.
  */
-std::vector<std::vector<RAYX::Ray>> createRayGrid(size_t size, double width, double height, bool isXZ);
+std::vector<std::vector<RAYX::Ray>> createRayGrid(size_t size, double width, double length);

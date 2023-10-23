@@ -2,6 +2,8 @@
 
 #include <cmath>
 
+#include "EnergyDistribution.h"
+
 namespace RAYX {
 LightSource::LightSource(const DesignObject& dobj) {
     m_name = dobj.name();
@@ -10,7 +12,6 @@ LightSource::LightSource(const DesignObject& dobj) {
     m_numberOfRays = dobj.parseNumberRays();
     m_sourceHeight = dobj.parseSourceHeight();
     m_sourceWidth = dobj.parseSourceWidth();
-    m_horDivergence = dobj.parseHorDiv();
     m_orientation = dobj.parseOrientation();
     m_position = dobj.parsePosition();
     m_verDivergence = 0.0;

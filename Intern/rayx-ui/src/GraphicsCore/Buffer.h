@@ -14,13 +14,14 @@ class Buffer {
     /**
      * @brief Constructs a new Buffer object.
      * @param device Reference to the Device object.
+     * @param name Name of the buffer
      * @param instanceSize Size of each instance in the buffer.
      * @param instanceCount Number of instances.
      * @param usageFlags Usage flags for the Vulkan buffer.
      * @param memoryPropertyFlags Memory property flags.
      * @param minOffsetAlignment Minimum required alignment offset.
      */
-    Buffer(Device& device, VkDeviceSize instanceSize, uint32_t instanceCount, VkBufferUsageFlags usageFlags,
+    Buffer(Device& device, const std::string& name, VkDeviceSize instanceSize, uint32_t instanceCount, VkBufferUsageFlags usageFlags,
            VkMemoryPropertyFlags memoryPropertyFlags, VkDeviceSize minOffsetAlignment = 1);
     /// Destroys the Buffer object and frees memory.
     ~Buffer();
@@ -97,6 +98,7 @@ class Buffer {
     static VkDeviceSize getAlignment(VkDeviceSize instanceSize, VkDeviceSize minOffsetAlignment);
 
     Device& m_Device;
+    std::string m_Name;
     void* m_mapped = nullptr;
     VkBuffer m_Buffer = VK_NULL_HANDLE;
     VkDeviceMemory m_Memory = VK_NULL_HANDLE;

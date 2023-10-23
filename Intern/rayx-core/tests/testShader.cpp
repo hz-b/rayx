@@ -103,36 +103,36 @@ TEST_F(TestSuite, testLog) {
 
 TEST_F(TestSuite, testNormalCartesian) {
     struct InOutPair {
-        glm::dvec4 in_normal;
+        glm::dvec3 in_normal;
         double in_slopeX;
         double in_slopeZ;
 
-        glm::dvec4 out;
+        glm::dvec3 out;
     };
 
     std::vector<InOutPair> inouts = {{
-                                         .in_normal = glm::dvec4(0, 1, 0, 0),
+                                         .in_normal = glm::dvec3(0, 1, 0),
                                          .in_slopeX = 0,
                                          .in_slopeZ = 0,
-                                         .out = glm::dvec4(0, 1, 0, 0),
+                                         .out = glm::dvec3(0, 1, 0),
                                      },
                                      {
-                                         .in_normal = glm::dvec4(5.0465463027123736, 10470.451695989539, -28.532199794465537, 0),
+                                         .in_normal = glm::dvec3(5.0465463027123736, 10470.451695989539, -28.532199794465537),
                                          .in_slopeX = 0,
                                          .in_slopeZ = 0,
-                                         .out = glm::dvec4(5.0465463027123736, 10470.451695989539, -28.532199794465537, 0),
+                                         .out = glm::dvec3(5.0465463027123736, 10470.451695989539, -28.532199794465537),
                                      },
                                      {
-                                         .in_normal = glm::dvec4(0, 1, 0, 0),
+                                         .in_normal = glm::dvec3(0, 1, 0),
                                          .in_slopeX = 2,
                                          .in_slopeZ = 3,
-                                         .out = glm::dvec4(-0.90019762973551742, 0.41198224566568298, -0.14112000805986721, 0),
+                                         .out = glm::dvec3(-0.90019762973551742, 0.41198224566568298, -0.14112000805986721),
                                      },
                                      {
-                                         .in_normal = glm::dvec4(5.0465463027123736, 10470.451695989539, -28.532199794465537, 0),
+                                         .in_normal = glm::dvec3(5.0465463027123736, 10470.451695989539, -28.532199794465537),
                                          .in_slopeX = 2,
                                          .in_slopeZ = 3,
-                                         .out = glm::dvec4(-9431.2371568647086, 4310.7269916467494, -1449.3435640204684, 0),
+                                         .out = glm::dvec3(-9431.2371568647086, 4310.7269916467494, -1449.3435640204684),
                                      }};
 
     for (auto p : inouts) {
@@ -143,35 +143,35 @@ TEST_F(TestSuite, testNormalCartesian) {
 
 TEST_F(TestSuite, testNormalCylindrical) {
     struct InOutPair {
-        glm::dvec4 in_normal;
+        glm::dvec3 in_normal;
         double in_slopeX;
         double in_slopeZ;
 
-        glm::dvec4 out;
+        glm::dvec3 out;
     };
 
     std::vector<InOutPair> inouts = {{
-                                         .in_normal = glm::dvec4(0, 1, 0, 0),
+                                         .in_normal = glm::dvec3(0, 1, 0),
                                          .in_slopeX = 0,
                                          .in_slopeZ = 0,
-                                         .out = glm::dvec4(0, 1, 0, 0),
+                                         .out = glm::dvec3(0, 1, 0),
                                      },
                                      {
-                                         .in_normal = glm::dvec4(5.0465463027123736, 10470.451695989539, -28.532199794465537, 0),
+                                         .in_normal = glm::dvec3(5.0465463027123736, 10470.451695989539, -28.532199794465537),
                                          .in_slopeX = 0,
                                          .in_slopeZ = 0,
-                                         .out = glm::dvec4(5.0465463027115769, 10470.451695989539, -28.532199794465537, 0),
+                                         .out = glm::dvec3(5.0465463027115769, 10470.451695989539, -28.532199794465537),
                                      },
                                      {
-                                         .in_normal = glm::dvec4(0, 1, 0, 0),
+                                         .in_normal = glm::dvec3(0, 1, 0),
                                          .in_slopeX = 2,
                                          .in_slopeZ = 3,
-                                         .out = glm::dvec4(0.90019762973551742, 0.41198224566568292, -0.14112000805986721, 0),
+                                         .out = glm::dvec3(0.90019762973551742, 0.41198224566568292, -0.14112000805986721),
                                      },
-                                     {.in_normal = glm::dvec4(5.0465463027123736, 10470.451695989539, -28.532199794465537, 0),
+                                     {.in_normal = glm::dvec3(5.0465463027123736, 10470.451695989539, -28.532199794465537),
                                       .in_slopeX = 2,
                                       .in_slopeZ = 3,
-                                      .out = glm::dvec4(9431.2169472441783, 4310.7711493493844, -1449.3437356459144, 0)}};
+                                      .out = glm::dvec3(9431.2169472441783, 4310.7711493493844, -1449.3437356459144)}};
 
     for (auto p : inouts) {
         auto out = CPU_TRACER::normal_cylindrical(p.in_normal, p.in_slopeX, p.in_slopeZ);
@@ -567,55 +567,6 @@ TEST_F(TestSuite, testDPow) {
     for (auto p : inouts) {
         auto out = CPU_TRACER::dpow(p.in_a, p.in_b);
         CHECK_EQ(out, p.out);
-    }
-}
-
-TEST_F(TestSuite, testCosini) {
-    struct InOutPair {
-        double in_phi;
-        double in_psi;
-
-        glm::dvec3 out_direction;
-    };
-
-    std::vector<InOutPair> inouts = {
-        {
-            .in_phi = 0,
-            .in_psi = 0,
-            .out_direction = glm::dvec3(6.1257422745431001e-17, -6.1257422745431001e-17, 1),
-        },
-        {
-            .in_phi = 1,
-            .in_psi = 1,
-            .out_direction = glm::dvec3(0.45464871341284091, -0.8414709848078965, 0.29192658172642888),
-        },
-        {
-            .in_phi = 1,
-            .in_psi = 0,
-            .out_direction = glm::dvec3(0.8414709848078965, -6.1257422745431001e-17, 0.54030230586813977),
-        },
-        {
-            .in_phi = 0,
-            .in_psi = 1,
-            .out_direction = glm::dvec3(3.3097526760895799e-17, -0.8414709848078965, 0.54030230586813977),
-        },
-        {
-            .in_phi = 3.1415926535897931,
-            .in_psi = 3.1415926535897931,
-            .out_direction = glm::dvec3(-6.1257422745430988e-17, -6.1257422745431001e-17, 0.99999999999999978),
-        },
-        {
-            .in_phi = 0,
-            .in_psi = 1.5707963267948966,
-            .out_direction = glm::dvec3(3.7524718414124473e-33, -1, 6.1257422745431001e-17),
-        },
-
-    };
-
-    for (auto p : inouts) {
-        Ray out_ray;
-        CPU_TRACER::cosini(out_ray, p.in_phi, p.in_psi);
-        CHECK_EQ(out_ray.m_direction, p.out_direction);
     }
 }
 
@@ -1130,4 +1081,88 @@ TEST_F(TestSuite, testRefractiveIndex) {
     // data taken from
     // https://refractiveindex.info/?shelf=main&book=Cu&page=Hagemann
     CHECK_EQ(CPU_TRACER::getRefractiveIndex(25146.2, 29), glm::dvec2(1.0, 1.0328e-7), 1e-5);
+}
+
+TEST_F(TestSuite, testBesselDipole) {
+    struct InOutPair {
+        double proportion;
+        double zeta;
+        double out;
+    };
+    std::vector<InOutPair> inouts = {{
+                                         .proportion = 1 / 3,
+                                         .zeta = 78.126966373103443,
+                                         .out = 1.664046593883771e-35,
+                                     },
+                                     {
+                                         .proportion = 1 / 3,
+                                         .zeta = 73.550785975500432,
+                                         .out = 1.6659366793149262e-33,
+                                     },
+                                     {
+                                         .proportion = 1 / 3,
+                                         .zeta = 46.422887861754496,
+                                         .out = 1.2672053903555623e-21,
+                                     },
+                                     {
+                                         .proportion = 2 / 3,
+                                         .zeta = 78.126966373103443,
+                                         .out = 1.6675777760881476e-35,
+                                     },
+                                     {
+                                         .proportion = 2 / 3,
+                                         .zeta = 73.550785975500432,
+                                         .out = 1.6696906039215801e-33,
+                                     },
+                                     {
+                                         .proportion = 2 / 3,
+                                         .zeta = 49.798819164687949,
+                                         .out = 4.1969864622545434e-23,
+                                     }};
+
+    auto beamline = loadBeamline("dipole_plain");
+    std::shared_ptr<LightSource> src = beamline.m_LightSources[0];
+    DipoleSource* dipolesource = dynamic_cast<DipoleSource*>(&*src);
+
+    for (auto values : inouts) {
+        auto result = dipolesource->bessel(values.proportion, values.zeta);
+        CHECK_EQ(result, values.out, 0.1);
+    }
+}
+
+TEST_F(TestSuite, testSchwingerDipole) {
+    struct InOutPair {
+        double energy;
+        double flux;
+    };
+    std::vector<InOutPair> inouts = {{
+                                         .energy = 6520.0878532052693,
+                                         .flux = 566462407647095.5,
+                                     },
+                                     {.energy = 100, .flux = 2855336264551178},
+                                     {
+                                         .energy = 900,
+                                         .flux = 3762078406399219,
+                                     },
+                                     {
+                                         .energy = 2000,
+                                         .flux = 2907004029317153.5,
+                                     },
+                                     {
+                                         .energy = 0.667,
+                                         .flux = 596812742357665.25,
+                                     },
+                                     {
+                                         .energy = 2456,
+                                         .flux = 2526853293939861,
+                                     }};
+
+    auto beamline = loadBeamline("dipole_plain");
+    std::shared_ptr<LightSource> src = beamline.m_LightSources[0];
+    DipoleSource* dipolesource = dynamic_cast<DipoleSource*>(&*src);
+
+    for (auto values : inouts) {
+        auto result = dipolesource->schwinger(values.energy);
+        CHECK_EQ(result, values.flux, 0.000000001);
+    }
 }

@@ -80,49 +80,50 @@ double RAYX_API fact(int a) {
 }
 
 /**
-calculates direction cosini from angles phi,psi given in rad
-@params r		ray whose direction vector is recalculated (inout)
-        phi		horizontal angle in x-z-plane (pos.rotation, counterclockwise)
-        phi		vertical angle in y-z-plane (pos.rotation, counterclockwise)
+ * calculates direction cosini from angles phi,psi given in rad
+ *        TODO: the planes / rotation directions specified here are potentially not correct. There is likely a bug in the phi/psi calculation.
+ *        phi		angle in x-y-plane (positive rotation / counterclockwise)
+ *        psi		angle in z-y-plane (positive rotation / counterclockwise)
+ *
+ * returns: the resulting direction.
 */
-void RAYX_API cosini(RAYX_INOUT(Ray) r, double phi, double psi) {
+// TODO add test for this, when it is well-defined.
+dvec3 RAYX_API directionFromAngles(double phi, double psi) {
     double cos_psi = r8_cos(psi);
     double cos_phi = r8_cos(phi);
     double sin_psi = r8_sin(psi);
     double sin_phi = r8_sin(phi);
 
-    r.m_direction.x = cos_psi * sin_phi;
-    r.m_direction.y = -sin_psi;
-    r.m_direction.z = cos_psi * cos_phi;
+    return dvec3(cos_psi * sin_phi, cos_psi * cos_phi, -sin_psi);
 }
 
-// checks whether the point (x1, x2) is within the cutout.
-bool RAYX_API inCutout(Cutout cutout, double x1, double x2) {
+// checks whether the point (x, z) is within the cutout.
+bool RAYX_API inCutout(Cutout cutout, double x, double z) {
     if (cutout.m_type == CTYPE_UNLIMITED) {
         return true;
     } else if (cutout.m_type == CTYPE_RECT) {
         RectCutout rect = deserializeRect(cutout);
-        double x1_min = -rect.m_size_x1 / 2.0;
-        double x1_max = rect.m_size_x1 / 2.0;
-        double x2_min = -rect.m_size_x2 / 2.0;
-        double x2_max = rect.m_size_x2 / 2.0;
+        double x_min = -rect.m_width / 2.0;
+        double x_max = rect.m_width / 2.0;
+        double z_min = -rect.m_length / 2.0;
+        double z_max = rect.m_length / 2.0;
 
-        return !(x1 <= x1_min || x1 >= x1_max || x2 <= x2_min || x2 >= x2_max);
+        return !(x <= x_min || x >= x_max || z <= z_min || z >= z_max);
     } else if (cutout.m_type == CTYPE_TRAPEZOID) {
         TrapezoidCutout t = deserializeTrapezoid(cutout);
 
         // Check point is within the trapezoid
-        dvec2 P = dvec2(x1, x2);
+        dvec2 P = dvec2(x, z);
 
         // A, B, C, D are the four points on the trapezoid.
         //
         //    A--B    //
         //   /    \   //
         //  C------D  //
-        dvec2 A = dvec2(-t.m_sizeA_x1 / 2.0, -t.m_size_x2 / 2.0);
-        dvec2 B = dvec2(t.m_sizeA_x1 / 2.0, -t.m_size_x2 / 2.0);
-        dvec2 C = dvec2(t.m_sizeB_x1 / 2.0, t.m_size_x2 / 2.0);
-        dvec2 D = dvec2(-t.m_sizeB_x1 / 2.0, t.m_size_x2 / 2.0);
+        dvec2 A = dvec2(-t.m_widthA / 2.0, -t.m_length / 2.0);
+        dvec2 B = dvec2(t.m_widthA / 2.0, -t.m_length / 2.0);
+        dvec2 C = dvec2(t.m_widthB / 2.0, t.m_length / 2.0);
+        dvec2 D = dvec2(-t.m_widthB / 2.0, t.m_length / 2.0);
 
         dvec2 PmA = P - A;
         dvec2 BmA = B - A;
@@ -138,11 +139,11 @@ bool RAYX_API inCutout(Cutout cutout, double x1, double x2) {
     } else if (cutout.m_type == CTYPE_ELLIPTICAL) {
         EllipticalCutout ell = deserializeElliptical(cutout);
 
-        double radius_x1 = ell.m_diameter_x1 / 2.0;
-        double radius_x2 = ell.m_diameter_x2 / 2.0;
+        double radius_x = ell.m_diameter_x / 2.0;
+        double radius_z = ell.m_diameter_z / 2.0;
 
-        double val1 = x1 / radius_x1;
-        double val2 = x2 / radius_x2;
+        double val1 = x / radius_x;
+        double val2 = z / radius_z;
 
         double rd2 = val1 * val1 + val2 * val2;
         return rd2 <= 1.0;
@@ -280,7 +281,7 @@ dvec2 RAYX_API getRefractiveIndex(double energy, int material) {
 }
 
 // returns angle between ray direction and surface normal at intersection point
-double RAYX_API getIncidenceAngle(Ray r, dvec4 normal) {
+double RAYX_API getIncidenceAngle(Ray r, dvec3 normal) {
     normal = normalize(normal);
     double ar = dot(dvec3(normal), r.m_direction);
     // cut to interval [-1,1]
@@ -482,7 +483,7 @@ turn the normal vector through x_rad and z_rad
             z_rad: angle in rad for z-axis
 returns modified normal vector
 */
-dvec4 RAYX_API normal_cartesian(dvec4 normal, double x_rad, double z_rad) {
+dvec3 RAYX_API normal_cartesian(dvec3 normal, double x_rad, double z_rad) {
     double FX = normal[0];
     double FY = normal[1];
     double FZ = normal[2];
@@ -508,7 +509,7 @@ turn the normal vector through x_rad and z_rad
             z_rad: angle in rad for z-axis
 returns modified normal vector
 */
-dvec4 RAYX_API normal_cylindrical(dvec4 normal, double x_rad, double z_rad) {
+dvec3 RAYX_API normal_cylindrical(dvec3 normal, double x_rad, double z_rad) {
     double normFXFY = sqrt(normal[0] * normal[0] + normal[1] * normal[1]);
     double arcTanFXFY = r8_atan2(normal[1], normal[0]);
     double sinz = r8_sin(z_rad);
@@ -525,13 +526,15 @@ dvec4 RAYX_API normal_cylindrical(dvec4 normal, double x_rad, double z_rad) {
 adds slope error to the normal
 @params:
     normal: normal vector
-    slopeX: sigma-slope error in x-y plane (chi) (RMS) in arcsec
-    slopeZ: sigma-slope error in y-z plane (psi) (RMS) in arcsec
+    error: the slope error to apply
     O_type: cartesian or cylindrical type of slope error (0=cartesian,
 1=cylindrical) (1 only for ellipsis relevant) returns new normal if there is a
 slope error in either x or z direction or the unmodified normal otherwise.
 */
-dvec4 tanger(dvec4 normal, double slopeX, double slopeZ, int O_type, RAYX_INOUT(uint64_t) ctr) {
+dvec3 applySlopeError(dvec3 normal, SlopeError error, int O_type, RAYX_INOUT(uint64_t) ctr) {
+    double slopeX = error.m_sag;
+    double slopeZ = error.m_mer;
+
     // only calculate the random number if at least one slope error is not 0,
     // since the calculation is costly (sin, cos, log involved)
     if (slopeX != 0 || slopeZ != 0) {
@@ -560,7 +563,7 @@ given direction on the grating
 @params: lots
 @returns: (inplace) DX, DZ
 */
-void RAYX_API RZPLineDensity(Ray r, dvec4 normal, RZPBehaviour b, RAYX_INOUT(double) DX, RAYX_INOUT(double) DZ) {
+void RAYX_API RZPLineDensity(Ray r, dvec3 normal, RZPBehaviour b, RAYX_INOUT(double) DX, RAYX_INOUT(double) DZ) {
     int IMAGE_TYPE = int(b.m_imageType);
     int RZP_TYPE = int(b.m_rzpType);
     double risag = b.m_designSagittalEntranceArmLength;
@@ -724,7 +727,7 @@ calculates refracted ray
 @returns: refracted ray (position unchanged, direction changed), weight = ETYPE_BEYOND_HORIZON if
 "ray beyond horizon"
 */
-Ray refrac2D(Ray r, dvec4 normal, double az, double ax) {
+Ray refrac2D(Ray r, dvec3 normal, double az, double ax) {
     double eps1 = -r8_atan(normal.x / normal.y);
     double del1 = r8_asin(normal.z);
 
@@ -754,7 +757,7 @@ Ray refrac2D(Ray r, dvec4 normal, double az, double ax) {
 }
 
 // refraction function used for gratings
-Ray refrac(Ray r, dvec4 normal, double linedensity) {
+Ray refrac(Ray r, dvec3 normal, double linedensity) {
     double xy = normal[0] / normal[1];
     double zy = normal[2] / normal[1];
     double sqq = sqrt(1 + zy * zy + xy * xy);
@@ -815,7 +818,7 @@ double RAYX_API vlsGrating(double lineDensity, double z, double vls[6]) {
  * @param a			a = WL * D0 * ORD * 1.e-6  with D0: line density (l/mm);
  * WL:wavelength (nm); ORD order of diffraction
  */
-Ray RAYX_API refrac_plane(Ray r, ALLOW_UNUSED dvec4 normal,
+Ray RAYX_API refrac_plane(Ray r, ALLOW_UNUSED dvec3 normal,
                           double a) {  // TODO fix unused var
     double y1 = r.m_direction[1] * r.m_direction[1] + r.m_direction[2] * r.m_direction[2] - (r.m_direction[2] - a) * (r.m_direction[2] - a);
     if (y1 > 0) {

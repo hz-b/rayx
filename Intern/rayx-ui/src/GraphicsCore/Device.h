@@ -87,7 +87,7 @@ class Device {
     VkQueue m_PresentQueue;
 
     VkPhysicalDeviceProperties m_Properties;
-
+    
     const std::vector<const char*> m_validationLayers = {"VK_LAYER_KHRONOS_validation"};
     const std::vector<const char*> m_deviceExtensions = {VK_KHR_SWAPCHAIN_EXTENSION_NAME};
 };

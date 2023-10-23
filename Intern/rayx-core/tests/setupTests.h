@@ -104,9 +104,14 @@ inline void checkEq(std::string filename, int line, std::string l, std::string r
 }
 
 /// check that L and R contain the same doubles.
-// TODO check_eq calls L and R multiple times if they are expressions with side-effects!
-#define CHECK_EQ(L, R, ...) \
-    checkEq(__FILE__, __LINE__, #L, #R, L, R, RAYX::formatAsVec(L), RAYX::formatAsVec(R), ##__VA_ARGS__)  // __VA_ARGS__ = tolerance or nothing
+// within CHECK_EQ: the __VA_ARGS__ argument is either `double tolerance` or nothing.
+// all variables declared within CHECK_EQ end with `_check_eq` distinguish them from the variables that the user might write.
+#define CHECK_EQ(L, R, ...)                                                                                                                         \
+    {                                                                                                                                               \
+        auto l_check_eq = L;                                                                                                                        \
+        auto r_check_eq = R;                                                                                                                        \
+        checkEq(__FILE__, __LINE__, #L, #R, l_check_eq, r_check_eq, RAYX::formatAsVec(l_check_eq), RAYX::formatAsVec(r_check_eq), ##__VA_ARGS__);   \
+    }
 
 /// assert that x holds, and give a fancy print otherwise.
 #define CHECK(x)                                      \
@@ -117,17 +122,17 @@ inline void checkEq(std::string filename, int line, std::string l, std::string r
     }
 
 /// check whether low <= expr <= high
-#define CHECK_IN(expr, low, high)                                                       \
-    {                                                                                   \
-        auto res = expr;                                                                \
-        auto res_low = low;                                                             \
-        if (res < res_low) {                                                            \
-            RAYX_ERR << "CHECK_IN failed: " << #expr << " (" << res << ") < " << #low;  \
-        }                                                                               \
-        auto res_high = high;                                                           \
-        if (res > res_high) {                                                           \
-            RAYX_ERR << "CHECK_IN failed: " << #expr << " (" << res << ") > " << #high; \
-        }                                                                               \
+#define CHECK_IN(expr, low, high)                                                                      \
+    {                                                                                                  \
+        auto expr_check_in = expr;                                                                     \
+        auto low_check_in = low;                                                                       \
+        if (expr_check_in < low_check_in) {                                                            \
+            RAYX_ERR << "CHECK_IN failed: " << #expr << " (" << expr_check_in << ") < " << #low;       \
+        }                                                                                              \
+        auto high_check_in = high;                                                                     \
+        if (expr_check_in > high_check_in) {                                                           \
+            RAYX_ERR << "CHECK_IN failed: " << #expr << " (" << expr_check_in << ") > " << #high;      \
+        }                                                                                              \
     }
 
 // ShaderTest
@@ -195,10 +200,10 @@ std::optional<RAYX::Ray> lastSequentialHit(RayHistory ray_hist, unsigned int bea
 /// Only cares for the rays hitting the last object of the beamline, and check whether they are the same as their RayUI counter part.
 /// Ray UI rays are obtained Export > RawRaysOutgoing.
 /// This also filters out non-sequential rays to compare to Ray-UI correctly.
-void compareLastAgainstRayUI(std::string filename, double t = 1e-11, Sequential seq = Sequential::No);
+void compareLastAgainstRayUI(std::string filename, double tolerance = 1e-11, Sequential seq = Sequential::No);
 
 // compares input/<filename>.correct.csv with the trace output.
-void compareAgainstCorrect(std::string filename, double t = 1e-11);
+void compareAgainstCorrect(std::string filename, double tolerance = 1e-11);
 
 /// updates the material tables of the Cpu Tracer to contain exactly the
 /// materials given in the std::vector.

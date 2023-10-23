@@ -4,16 +4,12 @@
 #include "adapt.h"
 
 // Cutout types:
-// a subset of points in the 2d plane. used to limited the potentially infinite surfaces.
+// a subset of points of the XZ-plane. used to limit the potentially infinite surfaces.
 // note that the first 3 need to be RECT; ELLIPTICAL; TRAPEZOID in order to be compatible with `geometricalShape` from Ray-UI.
 const int CTYPE_RECT = 0;
 const int CTYPE_ELLIPTICAL = 1;
 const int CTYPE_TRAPEZOID = 2;
 const int CTYPE_UNLIMITED = 3;
-
-// The two dimensions in a cutout are called x1 and x2.
-// How they map to the three dimensions of an element depends on the "primary plane" of its surface.
-// typically it's (x1, x2) = (X, Y) or (x1, x2) = (X, Z).
 
 struct Cutout {
     // This types is one of the `CTYPE` constants.
@@ -30,24 +26,24 @@ struct Cutout {
 // Rect
 ///////////////////////////////////
 
-// A rectangle with "width" `m_size_x1` and "height" `m_size_x2` centered at (0, 0).
+// A rectangle specified by width/length centered at (x=0, z=0).
 struct RectCutout {
-    double m_size_x1;
-    double m_size_x2;
+    double m_width; // in X direction
+    double m_length; // in Z direction
 };
 
 INLINE Cutout serializeRect(RectCutout cut) {
     Cutout ser;
     ser.m_type = CTYPE_RECT;
-    ser.m_params[0] = cut.m_size_x1;
-    ser.m_params[1] = cut.m_size_x2;
+    ser.m_params[0] = cut.m_width;
+    ser.m_params[1] = cut.m_length;
     return ser;
 }
 
 INLINE RectCutout deserializeRect(Cutout ser) {
     RectCutout cut;
-    cut.m_size_x1 = ser.m_params[0];
-    cut.m_size_x2 = ser.m_params[1];
+    cut.m_width = ser.m_params[0];
+    cut.m_length = ser.m_params[1];
     return cut;
 }
 
@@ -59,24 +55,24 @@ INLINE RectCutout deserializeRect(Cutout ser) {
 //
 // An elliptical shape given by two diameters.
 // It can be understood as a circle with individual stretch-factors for both dimensions.
-// The point (0, 0) lies at the center of the ellipse.
+// The point (x=0, z=0) lies at the center of the ellipse.
 struct EllipticalCutout {
-    double m_diameter_x1;
-    double m_diameter_x2;
+    double m_diameter_x;
+    double m_diameter_z;
 };
 
 INLINE Cutout serializeElliptical(EllipticalCutout cut) {
     Cutout ser;
     ser.m_type = CTYPE_ELLIPTICAL;
-    ser.m_params[0] = cut.m_diameter_x1;
-    ser.m_params[1] = cut.m_diameter_x2;
+    ser.m_params[0] = cut.m_diameter_x;
+    ser.m_params[1] = cut.m_diameter_z;
     return ser;
 }
 
 INLINE EllipticalCutout deserializeElliptical(Cutout ser) {
     EllipticalCutout cut;
-    cut.m_diameter_x1 = ser.m_params[0];
-    cut.m_diameter_x2 = ser.m_params[1];
+    cut.m_diameter_x = ser.m_params[0];
+    cut.m_diameter_z = ser.m_params[1];
     return cut;
 }
 
@@ -86,29 +82,29 @@ INLINE EllipticalCutout deserializeElliptical(Cutout ser) {
 
 // https://en.wikipedia.org/wiki/Trapezoid
 //
-// A trapezoid consists of two lines with lengths `m_sizeA_x1` and `m_sizeB_x1`, both parallel to the x1 axis.
-// These lines have a distance of `m_size_x2`.
-// The point (0, 0) lies at the center of the trapezoid.
+// A trapezoid consists of two lines with lengths `m_widthA` and `m_widthB`, both parallel to the X-axis.
+// These lines have a distance of `m_length`.
+// The point (x=0, z=0) lies at the center of the trapezoid.
 struct TrapezoidCutout {
-    double m_sizeA_x1;
-    double m_sizeB_x1;
-    double m_size_x2;  // originally called `height`
+    double m_widthA; // in X direction
+    double m_widthB; // in X direction
+    double m_length; // in Z direction
 };
 
 INLINE Cutout serializeTrapezoid(TrapezoidCutout cut) {
     Cutout ser;
     ser.m_type = CTYPE_TRAPEZOID;
-    ser.m_params[0] = cut.m_sizeA_x1;
-    ser.m_params[1] = cut.m_sizeB_x1;
-    ser.m_params[2] = cut.m_size_x2;
+    ser.m_params[0] = cut.m_widthA;
+    ser.m_params[1] = cut.m_widthB;
+    ser.m_params[2] = cut.m_length;
     return ser;
 }
 
 INLINE TrapezoidCutout deserializeTrapezoid(Cutout ser) {
     TrapezoidCutout cut;
-    cut.m_sizeA_x1 = ser.m_params[0];
-    cut.m_sizeB_x1 = ser.m_params[1];
-    cut.m_size_x2 = ser.m_params[2];
+    cut.m_widthA = ser.m_params[0];
+    cut.m_widthB = ser.m_params[1];
+    cut.m_length = ser.m_params[2];
     return cut;
 }
 
@@ -116,7 +112,7 @@ INLINE TrapezoidCutout deserializeTrapezoid(Cutout ser) {
 // Unlimited
 /////////////////////////
 
-// Every point (x1, x2) is within this cutout, it's unlimited after all.
+// Every point (x, z) is within this cutout, it's unlimited after all.
 // `Unlimited` doesn't have any data so it doesn't need a struct.
 
 INLINE Cutout serializeUnlimited() {

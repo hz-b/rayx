@@ -5,8 +5,8 @@
 #include <memory>
 #include <vector>
 
-#include "Beamline/OpticalElement.h"
 #include "Beamline/LightSource.h"
+#include "Beamline/OpticalElement.h"
 #include "Core.h"
 #include "Shared/Ray.h"
 
@@ -23,7 +23,7 @@ class RAYX_API Beamline {
     Beamline();
     ~Beamline();
 
-    std::vector<Ray> getInputRays() const;
+    std::vector<Ray> getInputRays(int thread_count = 1) const;
 
     /**
      * @brief Quality-of-life function to calculate the smallest possible

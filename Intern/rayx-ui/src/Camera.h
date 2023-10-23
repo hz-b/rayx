@@ -23,9 +23,9 @@ class CameraController {
     double m_lastMouseY;
 
     struct Config {
-        float FOV;
-        float near;
-        float far;
+        float m_FOV;
+        float m_near;
+        float m_far;
     } m_config;
 
     CameraController();

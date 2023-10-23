@@ -11,6 +11,11 @@
 #include "Shared/Element.h"
 #include "utils.h"
 
+// the direction of a plane, either XY or XZ. This is only used in the parsing.
+// Inside of the shader, every plane-shaped object lies in its XZ plane.
+// Per default every element has DesignPlane::XZ, but ImagePlane and Slit have DesignPlane::XY. Thus they need a bit of extra handling to convert them to the shaders XZ plane.
+enum class DesignPlane { XY, XZ };
+
 namespace RAYX {
 class EnergyDistribution;
 // forward declarations:
@@ -98,7 +103,7 @@ struct RAYX_API Parser {
     glm::dvec4 parsePosition() const;
     glm::dmat4x4 parseOrientation() const;
     Material parseMaterial() const;
-    Cutout parseCutout(PlaneDir) const;
+    Cutout parseCutout(DesignPlane) const;
     ElectronEnergyOrientation parseElectronEnergyOrientation() const;
     SourcePulseType parseSourcePulseType() const;
     double parseImageType() const;
@@ -170,6 +175,11 @@ struct RAYX_API Parser {
     inline double parsePhotonEnergy() const { return parseDouble("photonEnergy"); }
     inline double parseEnergySpread() const { return parseDouble("energySpread"); }
     inline EnergySpreadUnit parseEnergySpreadUnit() const { return static_cast<EnergySpreadUnit>(parseInt("energySpreadUnit")); }
+
+    inline int parseNumOfEquidistantCircles() const { return parseDouble("numberCircles"); }
+    inline Rad parseMaxOpeningAngle() const { return parseDouble("maximumOpeningAngle") / 1000.0; }
+    inline Rad parseMinOpeningAngle() const { return parseDouble("minimumOpeningAngle") / 1000.0; }
+    inline Rad parseDeltaOpeningAngle() const { return parseDouble("deltaOpeningAngle") / 1000.0; }
 
     rapidxml::xml_node<>* node;
     std::vector<xml::Group> group_context;

@@ -44,7 +44,6 @@ Element makeReflectionZonePlate(const DesignObject& dobj) {
                                    .m_rzpType = (double)RZPType::Elliptical,
                                    .m_derivationMethod = 0,
                                    .m_designWavelength = designWavelength,
-                                   .m_curvatureType = (double)curvatureType,
                                    .m_designOrderOfDiffraction = designOrderOfDiffraction,
                                    .m_orderOfDiffraction = orderOfDiffraction,
                                    .m_fresnelZOffset = fresnelZOffset,

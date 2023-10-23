@@ -19,10 +19,10 @@
     <param id="translationYerror" enabled="F">0</param>
     <param id="rotationXerror" enabled="F">0</param>
     <param id="rotationYerror" enabled="F">0</param>
-    <param id="energyDistributionType" comment="File" enabled="T">1</param>
-    <param id="photonEnergyDistributionFile" relative="loadDatFile.DAT" enabled="T">loadDatFile2.DAT</param>
+    <param id="energyDistributionType" comment="File" enabled="T">0</param>
+    <param id="photonEnergyDistributionFile" relative="loadDatFile2.DAT" enabled="T">loadDatFile2.DAT</param>
     <param id="photonEnergy" enabled="F">100</param>
-    <param id="energySpreadType" comment="white band" enabled="F">1</param>
+    <param id="energySpreadType" comment="soft Edge" enabled="F">1</param>
     <param id="energySpreadUnit" comment="eV" enabled="F">0</param>
     <param id="energySpread" enabled="F">0</param>
     <param id="linearPol_0" enabled="T">1</param>

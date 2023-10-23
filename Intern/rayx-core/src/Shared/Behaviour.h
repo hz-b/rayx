@@ -121,7 +121,6 @@ struct RZPBehaviour {
     double m_rzpType;
     double m_derivationMethod;
     double m_designWavelength;
-    double m_curvatureType;
     double m_designOrderOfDiffraction;
     double m_orderOfDiffraction;
     double m_fresnelZOffset;
@@ -142,17 +141,16 @@ INLINE Behaviour serializeRZP(RZPBehaviour r) {
     b.m_params[1] = r.m_rzpType;
     b.m_params[2] = r.m_derivationMethod;
     b.m_params[3] = r.m_designWavelength;
-    b.m_params[4] = r.m_curvatureType;
-    b.m_params[5] = r.m_designOrderOfDiffraction;
-    b.m_params[6] = r.m_orderOfDiffraction;
-    b.m_params[7] = r.m_fresnelZOffset;
-    b.m_params[8] = r.m_designSagittalEntranceArmLength;
-    b.m_params[9] = r.m_designSagittalExitArmLength;
-    b.m_params[10] = r.m_designMeridionalEntranceArmLength;
-    b.m_params[11] = r.m_designMeridionalExitArmLength;
-    b.m_params[12] = r.m_designAlphaAngle;
-    b.m_params[13] = r.m_designBetaAngle;
-    b.m_params[14] = r.m_additionalOrder;
+    b.m_params[4] = r.m_designOrderOfDiffraction;
+    b.m_params[5] = r.m_orderOfDiffraction;
+    b.m_params[6] = r.m_fresnelZOffset;
+    b.m_params[7] = r.m_designSagittalEntranceArmLength;
+    b.m_params[8] = r.m_designSagittalExitArmLength;
+    b.m_params[9] = r.m_designMeridionalEntranceArmLength;
+    b.m_params[10] = r.m_designMeridionalExitArmLength;
+    b.m_params[11] = r.m_designAlphaAngle;
+    b.m_params[12] = r.m_designBetaAngle;
+    b.m_params[13] = r.m_additionalOrder;
     return b;
 }
 
@@ -162,17 +160,16 @@ INLINE RZPBehaviour deserializeRZP(Behaviour b) {
     r.m_rzpType = b.m_params[1];
     r.m_derivationMethod = b.m_params[2];
     r.m_designWavelength = b.m_params[3];
-    r.m_curvatureType = b.m_params[4];
-    r.m_designOrderOfDiffraction = b.m_params[5];
-    r.m_orderOfDiffraction = b.m_params[6];
-    r.m_fresnelZOffset = b.m_params[7];
-    r.m_designSagittalEntranceArmLength = b.m_params[8];
-    r.m_designSagittalExitArmLength = b.m_params[9];
-    r.m_designMeridionalEntranceArmLength = b.m_params[10];
-    r.m_designMeridionalExitArmLength = b.m_params[11];
-    r.m_designAlphaAngle = b.m_params[12];
-    r.m_designBetaAngle = b.m_params[13];
-    r.m_additionalOrder = b.m_params[14];
+    r.m_designOrderOfDiffraction = b.m_params[4];
+    r.m_orderOfDiffraction = b.m_params[5];
+    r.m_fresnelZOffset = b.m_params[6];
+    r.m_designSagittalEntranceArmLength = b.m_params[7];
+    r.m_designSagittalExitArmLength = b.m_params[8];
+    r.m_designMeridionalEntranceArmLength = b.m_params[9];
+    r.m_designMeridionalExitArmLength = b.m_params[10];
+    r.m_designAlphaAngle = b.m_params[11];
+    r.m_designBetaAngle = b.m_params[12];
+    r.m_additionalOrder = b.m_params[13];
     return r;
 }
 
@@ -188,3 +185,4 @@ INLINE Behaviour serializeImagePlane() {
 }
 
 #endif
+

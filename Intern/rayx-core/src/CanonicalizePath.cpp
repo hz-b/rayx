@@ -4,6 +4,8 @@
 
 #include "Debug/Debug.h"
 
+namespace RAYX {
+
 /// this function assumes that `base` is already an absolute path
 std::filesystem::path canonicalize(const std::filesystem::path& relPath, const std::filesystem::path& base) {
     if (!base.is_absolute()) {
@@ -19,7 +21,7 @@ std::filesystem::path canonicalize(const std::filesystem::path& relPath, const s
     return base / relPath;
 }
 
-std::filesystem::path canonicalizeRepositoryPath(const std::filesystem::path& relPath) { return canonicalize(relPath, PROJECT_DIR); }
+std::filesystem::path canonicalizeRepositoryPath(const std::filesystem::path& relPath) { return canonicalize(relPath, RAYX_PROJECT_DIR); }
 
 std::filesystem::path canonicalizeUserPath(const std::filesystem::path& relPath) { return canonicalize(relPath, std::filesystem::current_path()); }
 
@@ -102,3 +104,5 @@ void writeFile(const std::vector<uint8_t>& data, const std::string& filename, co
     file.write(reinterpret_cast<const char*>(data.data()), write_count);
     file.close();
 }
+
+}  // namespace RAYX

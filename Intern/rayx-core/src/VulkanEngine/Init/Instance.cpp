@@ -111,8 +111,6 @@ VKAPI_ATTR VkBool32 VKAPI_CALL debugCallback(VkDebugUtilsMessageSeverityFlagBits
         RAYX_WARN << "(ValidationLayer warn): " << pCallbackData->pMessage;
     } else if (messageSeverity == VK_DEBUG_UTILS_MESSAGE_SEVERITY_ERROR_BIT_EXT) {
         RAYX_ERR << "(ValidationLayer error): " << pCallbackData->pMessage;
-    } else if (messageSeverity == VK_DEBUG_UTILS_MESSAGE_SEVERITY_VERBOSE_BIT_EXT) {
-        RAYX_VERB << "(ValidationLayer verb): " << pCallbackData->pMessage;
     }
     // TODO consider also showing INFO messages under some
     // circumstances.

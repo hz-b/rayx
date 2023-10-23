@@ -1,4 +1,4 @@
-#define COLLISION_EPSILON 1e-10
+#define COLLISION_EPSILON 1e-6
 
 #include "../../Shared/Collision.h"
 
@@ -119,23 +119,22 @@ Collision getQuadricCollision(Ray r, QuadricSurface q) {
  *                    Toroid Collision
  **************************************************************/
 // this uses newton to approximate a solution.
-Collision getToroidCollision(Ray r, ToroidSurface toroid) {
-    double longRad = toroid.m_longRadius;
-    double shortRad = toroid.m_shortRadius;
+Collision getToroidCollision(Ray r, ToroidSurface toroid, bool isTriangul) {
+    // Constants
+    const double NEW_TOLERANCE = 0.0001;
+    const int NEW_MAX_ITERATIONS = 50;
 
-    if (toroid.m_toroidType == TOROID_TYPE_CONVEX) {
-        shortRad *= -1.0;
-    }
+    double longRad = toroid.m_longRadius;
+    double shortRad = (toroid.m_toroidType == TOROID_TYPE_CONVEX) ? -toroid.m_shortRadius : toroid.m_shortRadius;
 
     Collision col;
     col.found = true;
     col.hitpoint = dvec3(0, 0, 0);
     col.normal = dvec3(0, 0, 0);
 
-    double isigro = sign(shortRad);
     // sign radius: +1 = concave, -1 = convex
+    double isigro = sign(shortRad);
 
-    int n = 0;
     // double aln = r.m_direction.x / r.m_direction.z;
     // double amn = r.m_direction.y / r.m_direction.z;
 
@@ -146,7 +145,9 @@ Collision getToroidCollision(Ray r, ToroidSurface toroid) {
     double dz = 0.0;
     dvec3 normalized_dir = dvec3(r.m_direction) / r.m_direction.z;
 
-    // while not converted
+    int n = 0;
+    // Newton's method iteration
+    // While not converged...
     do {
         zz = zz + dz;
         xx = r.m_position.x + normalized_dir.x * (zz - r.m_position.z);
@@ -157,6 +158,7 @@ Collision getToroidCollision(Ray r, ToroidSurface toroid) {
         double sq = sqrt(shortRad * shortRad - xx * xx);
         double rx = (longRad - shortRad + isigro * sq);
 
+        // Calculate toroid normal
         normal.x = (-2 * xx * isigro / sq) * rx;
         normal.y = -2 * (yy - longRad);
         normal.z = -2 * zz;
@@ -165,24 +167,25 @@ Collision getToroidCollision(Ray r, ToroidSurface toroid) {
         double df = normalized_dir.x * normal.x + normalized_dir.y * normal.y + normal.z;  // dot(normalized_dir, dvec3(normal));
         dz = func / df;
         n += 1;
-        if (n >= 50) {
+        if (n >= NEW_MAX_ITERATIONS) {
             col.found = false;
             return col;
         }
-    } while (abs(dz) > 0.0001);
+    } while (abs(dz) > NEW_TOLERANCE);
 
     col.normal = normalize(dvec3(normal));
     col.hitpoint = dvec3(xx, yy, zz);
 
-    dvec3 rayToHitpoint = col.hitpoint - r.m_position;
+    if (isTriangul) { // TODO : Hack, Triangulation sensetive to direction apparently. Actual fix or func rework is needed!
+        return col;
+    }
 
+    dvec3 rayToHitpoint = col.hitpoint - r.m_position;
     // edit: if ray points away from the hitpoint, no collision can be found.
     // Note that multiplying the rays direction with -1 SHOULD totally have an effect on the collision detection - in most cases this 180° rotation
     // will make the ray point away from the toroid, and hence preventing a Collision completely. The above code however, is unaffected when
     // multiplying the ray direction with -1. Due to it having no effect on `dvec3 normalized_dir = dvec3(r.m_direction) / r.m_direction.z;`
-    if (dot(rayToHitpoint, r.m_direction) > 0.0) {
-        col.found = false;
-    }
+    col.found = dot(rayToHitpoint, r.m_direction) > 0.0;
 
     return col;
 }
@@ -191,40 +194,27 @@ Collision getToroidCollision(Ray r, ToroidSurface toroid) {
  *                    Collision Finder
  **************************************************************/
 
-// Most surfaceTypes lie in the XZ plane, but some of them lie in the XY plane.
-// This function projects a point into the corresponding plane.
-//
-// The cutout is applied in the primary plane.
-dvec2 projectToPlane(PlaneDir plane, dvec3 point) {
-    if (plane == PLANE_XY) {
-        return dvec2(point.x, point.y);
-    } else if (plane == PLANE_XZ) {
-        return dvec2(point.x, point.z);
-    } else {
-        throw("invalid PlaneDir!");
-        return dvec2(0.0, 0.0);
-    }
-}
-
-Collision RAYX_API findCollisionInElementCoords(Ray r, Surface surface, Cutout cutout) {
+Collision RAYX_API findCollisionInElementCoords(Ray r, Surface surface, Cutout cutout, bool isTriangul) {
     double sty = surface.m_type;
 
     Collision col;
-    if (sty == STYPE_PLANE_XY) {
-        col.found = false;
-        col.normal = dvec3(0, 0, -sign(r.m_direction.z));
-        double offset = abs(r.m_position.z / r.m_direction.z);
+    if (sty == STYPE_PLANE_XZ) {
+        col.normal = dvec3(0, -sign(r.m_direction.y), 0);
 
-        // scale x-slope of ray (l/n) by z-length between origin and image plane
-        col.hitpoint.x = r.m_position.x + r.m_direction.x * offset;
-        col.hitpoint.y = r.m_position.y + r.m_direction.y * offset;
-        col.hitpoint.z = 0;
-        // the ray should not face away from the image plane. If that is the case, set the weight of the intersection to 0 so that it is not
-        // considered in the tracing process also the image plane detects only rays from one side
+        // the `time` that it takes for the ray to hit the plane (if we understand the rays direction as its velocity).
+        // velocity = distance/time <-> time = distance/velocity from school physics.
+        // (We need to negate the position, as with positive velocity, you need a negative position to eventually reach the zero point (aka the plane).
+        // Having positive position & positive velocity means that we never hit the plane as we move away from it.)
+        double time = -r.m_position.y / r.m_direction.y;
 
-        col.found = (r.m_direction.z > 0 && r.m_position.z < 0) || (r.m_direction.z < 0 && r.m_position.z > 0);
+        col.hitpoint.x = r.m_position.x + r.m_direction.x * time;
+        col.hitpoint.z = r.m_position.z + r.m_direction.z * time;
+        col.hitpoint.y = 0;
+
+        // the ray should not face away from the plane (or equivalently, the ray should not come *from* the plane). If that is the case we set `found = false`.
+        col.found = time >= 0;
     } else if (sty == STYPE_TOROID) {
-        col = getToroidCollision(r, deserializeToroid(surface));
+        col = getToroidCollision(r, deserializeToroid(surface), isTriangul);
     } else if (sty == STYPE_QUADRIC) {
         col = getQuadricCollision(r, deserializeQuadric(surface));
     } else {
@@ -234,12 +224,8 @@ Collision RAYX_API findCollisionInElementCoords(Ray r, Surface surface, Cutout c
         return col;  // has found = false
     }
 
-    dvec2 x1x2 = projectToPlane(getPlaneDir(sty), col.hitpoint);
-
-    double x1 = x1x2.x;
-    double x2 = x1x2.y;
-
-    if (!inCutout(cutout, x1, x2)) {
+    // cutout is applied in the XZ plane.
+    if (!inCutout(cutout, col.hitpoint.x, col.hitpoint.z)) {
         col.found = false;
     }
 
@@ -255,25 +241,29 @@ Collision RAYX_API findCollisionInElementCoords(Ray r, Surface surface, Cutout c
 
 // checks whether `r` collides with the element of the given `id`,
 // and returns a Collision accordingly.
-Collision findCollisionWith(Ray r, uint id) {
+Collision findCollisionWith(Ray r, uint id, RAYX_INOUT(uint64_t) ctr) {
     // misalignment
     r = rayMatrixMult(r, elements[id].m_inTrans);  // image plane is the x-y plane of the coordinate system
-    Collision col = findCollisionInElementCoords(r, elements[id].m_surface, elements[id].m_cutout);
+    Collision col = findCollisionInElementCoords(r, elements[id].m_surface, elements[id].m_cutout, false);
     if (col.found) {
         col.elementIndex = int(id);
     }
+
+    SlopeError sE = elements[id].m_slopeError;
+    col.normal = applySlopeError(col.normal, sE, 0, ctr);
+
     return col;
 }
 
 // Returns the next collision for the ray `_ray`.
-Collision findCollision() {
+Collision findCollision(RAYX_INOUT(uint64_t) ctr) {
     if (pushConstants.sequential == 1.0) {
         if (_ray.m_lastElement >= elements.length() - 1) {
             Collision col;
             col.found = false;
             return col;
         }
-        return findCollisionWith(_ray, uint(_ray.m_lastElement + 1));
+        return findCollisionWith(_ray, uint(_ray.m_lastElement + 1), ctr);
     }
 
     // global coordinates of first intersection point of ray among all elements in beamline
@@ -291,7 +281,7 @@ Collision findCollision() {
 
     // Find intersection points through all elements
     for (uint elementIndex = 0; elementIndex < uint(elements.length()); elementIndex++) {
-        Collision current_col = findCollisionWith(r, elementIndex);
+        Collision current_col = findCollisionWith(r, elementIndex, ctr);
         if (!current_col.found) {
             continue;
         }

@@ -137,6 +137,8 @@ bool paramMisalignment(const rapidxml::xml_node<>* node, Misalignment* out) {
         xml::paramDouble(node, "translationYerror", &out->m_translationYerror);
         xml::paramDouble(node, "translationZerror", &out->m_translationZerror);
 
+
+        //keep in mind, rotation on the x-Axis changes the psi and y rotation changes phi
         double x_mrad = 0;
         xml::paramDouble(node, "rotationXerror", &x_mrad);
         out->m_rotationXerror = Rad(x_mrad / 1000.0);  // convert mrad to rad.
@@ -281,9 +283,15 @@ bool paramEnergyDistribution(const rapidxml::xml_node<>* node, const std::filesy
     if (!xml::paramInt(node, "energySpreadType", &spreadType_int)) {
         return false;
     }
-    auto spreadType = static_cast<SpreadType>(spreadType_int);
 
-    bool continuous = spreadType == SpreadType::WhiteBand;
+    /**
+     * a different output is set for all Energy Distribution Types
+     *
+     * default: 0:HardEdge(WhiteBand)
+     *          1:SoftEdge(Energyspread = sigma)
+     *          2:SeperateEnergies(Spikes)
+     */
+    auto spreadType = static_cast<SpreadType>(spreadType_int);
 
     if (energyDistributionType == EnergyDistributionType::File) {
         const char* filename;
@@ -298,10 +306,10 @@ bool paramEnergyDistribution(const rapidxml::xml_node<>* node, const std::filesy
         if (!DatFile::load(path, &df)) {
             return false;
         }
-
-        *out = EnergyDistribution(df, continuous);
-
+        df.m_continuous = (spreadType == SpreadType::SoftEdge ? true : false);
+        *out = EnergyDistribution(df);
         return true;
+
     } else if (energyDistributionType == EnergyDistributionType::Values) {
         double photonEnergy;
         if (!xml::paramDouble(node, "photonEnergy", &photonEnergy)) {
@@ -313,7 +321,23 @@ bool paramEnergyDistribution(const rapidxml::xml_node<>* node, const std::filesy
             return false;
         }
 
-        *out = EnergyDistribution(EnergyRange(photonEnergy, energySpread), continuous);
+        if (spreadType == SpreadType::SoftEdge) {
+            if (energySpread == 0) {
+                energySpread = 1;
+            }
+            *out = EnergyDistribution(SoftEdge(photonEnergy, energySpread));
+
+        } else if (spreadType == SpreadType::SeperateEnergies) {
+            int numOfEnergies;
+            if (!xml::paramInt(node, "SeperateEnergies", &numOfEnergies)) {
+                std::cout << "No Number for Seperate Energies in RML File" << std::endl;
+                numOfEnergies = 3;
+            }
+            numOfEnergies = abs(numOfEnergies);
+            *out = EnergyDistribution(SeperateEnergies(photonEnergy, energySpread, numOfEnergies));
+        } else {
+            *out = EnergyDistribution(HardEdge(photonEnergy, energySpread));
+        }
 
         return true;
     } else {
@@ -516,40 +540,40 @@ Material Parser::parseMaterial() const {
     return m;
 }
 
-Cutout Parser::parseCutout(PlaneDir plane) const {
+Cutout Parser::parseCutout(DesignPlane plane) const {
     int geom_shape;
     if (!paramInt(node, "geometricalShape", &geom_shape)) {
         RAYX_ERR << "geometricalShape missing, but required!";
     }
 
-    auto x1 = [&] { return parseTotalWidth(); };
+    auto x = [&] { return parseTotalWidth(); };
 
-    auto x2 = [&] {
-        if (plane == PLANE_XY) {
+    auto z = [&] {
+        if (plane == DesignPlane::XY) {
             return parseTotalHeight();
-        } else if (plane == PLANE_XZ) {
+        } else if (plane == DesignPlane::XZ) {
             return parseTotalLength();
         } else {
-            RAYX_ERR << "parseCutout encountered an invalid plane!";
+            RAYX_ERR << "parseCutout encountered an invalid design plane!";
             return 0.0;
         }
     };
 
     if (geom_shape == CTYPE_RECT) {
         RectCutout rect;
-        rect.m_size_x1 = x1();
-        rect.m_size_x2 = x2();
+        rect.m_width = x();
+        rect.m_length = z();
         return serializeRect(rect);
     } else if (geom_shape == CTYPE_ELLIPTICAL) {
         EllipticalCutout elliptical;
-        elliptical.m_diameter_x1 = x1();
-        elliptical.m_diameter_x2 = x2();
+        elliptical.m_diameter_x = x();
+        elliptical.m_diameter_z = z();
         return serializeElliptical(elliptical);
     } else if (geom_shape == CTYPE_TRAPEZOID) {
         TrapezoidCutout trapezoid;
-        trapezoid.m_sizeA_x1 = x1();
-        trapezoid.m_sizeB_x1 = parseDouble("totalWidthB");
-        trapezoid.m_size_x2 = x2();
+        trapezoid.m_widthA = x();
+        trapezoid.m_widthB = parseDouble("totalWidthB");
+        trapezoid.m_length = z();
 
         return serializeTrapezoid(trapezoid);
     } else {

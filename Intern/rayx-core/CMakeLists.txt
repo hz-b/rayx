@@ -22,6 +22,18 @@ add_library(${PROJECT_NAME} SHARED ${SOURCE})
 
 # -----------------
 
+# -----OpenMP--------
+find_package(OpenMP)
+
+if(OpenMP_CXX_FOUND)
+    target_link_libraries(${PROJECT_NAME} PUBLIC OpenMP::OpenMP_CXX)
+else()
+    message(STATUS "OpenMP not found")
+    target_compile_definitions(${PROJECT_NAME} PUBLIC NO_OMP)
+endif()
+
+# -------------------
+
 # ---- Warnings ----
 if(MSVC)
     message(STATUS "MSVC")
@@ -41,30 +53,23 @@ endif()
 # ------------------
 
 # ---- Disable Vulkan/H5 ----
-if(VULKAN STREQUAL "NO")
-    target_compile_definitions(${PROJECT_NAME} PUBLIC NO_VULKAN)
-    message(STATUS "Vulkan disabled")
+find_package(Vulkan)
+
+if(Vulkan_FOUND)
+    target_link_libraries(${PROJECT_NAME} PUBLIC Vulkan::Vulkan)
 else()
-    find_package(Vulkan 1.3.216 REQUIRED)
-    target_link_libraries(${PROJECT_NAME}
-        PUBLIC Vulkan::Vulkan
-    )
+    message(STATUS "Vulkan not found")
+    target_compile_definitions(${PROJECT_NAME} PUBLIC NO_VULKAN)
 endif()
 
-if(H5 STREQUAL "NO")
-    target_compile_definitions(${PROJECT_NAME} PUBLIC NO_H5)
-    message(STATUS "H5 disabled")
+find_package(HDF5)
+
+if(HDF5_FOUND)
+    target_link_libraries(${PROJECT_NAME} PUBLIC ${HDF5_LIBRARIES})
+    target_include_directories(${PROJECT_NAME} SYSTEM PUBLIC ${HDF5_INCLUDE_DIRS})
 else()
-    if(UNIX)
-        target_include_directories(${PROJECT_NAME} PUBLIC /usr/include/hdf5/serial)
-        target_link_directories(${PROJECT_NAME} PUBLIC /usr/lib/x86_64-linux-gnu/hdf5/serial)
-        target_link_libraries(${PROJECT_NAME} PUBLIC hdf5)
-    else()
-        find_package(HDF5 REQUIRED)
-        target_link_libraries(${PROJECT_NAME}
-            PUBLIC HDF5::HDF5
-        )
-    endif()
+    message(STATUS "HDF5 not found")
+    target_compile_definitions(${PROJECT_NAME} PUBLIC NO_H5)
 endif()
 
 # -------------------------
@@ -87,7 +92,7 @@ endif()
 target_compile_definitions(${PROJECT_NAME}
     PRIVATE RAYX_BUILD_DLL
     PUBLIC ${COMPILE_PLATFORM}
-    PROJECT_DIR="${CMAKE_SOURCE_DIR}"
+    RAYX_PROJECT_DIR="${CMAKE_SOURCE_DIR}"
     $<$<CONFIG:Debug>:RAYX_DEBUG_MODE>
     $<$<CONFIG:RelWithDebInfo>:RAYX_DEBUG_MODE>
 )
@@ -107,23 +112,23 @@ target_include_directories(${PROJECT_NAME} SYSTEM PUBLIC
 # ----------------------
 
 # ---- Compile Shaders ----
-if(NOT VULKAN STREQUAL "NO")
+if(Vulkan_FOUND)
     # The following code is used to always compile the shader.
     # This is most likely not an optimal solution, but it will work
     # until we find a better one.
-    add_dependencies(${PROJECT_NAME} COMPILE_SHADER)
-    set(COMPILED_SHADER ${CMAKE_BINARY_DIR}/bin/comp.spv)
-    set(COMPILED_SHADER_FAKE ${CMAKE_BINARY_DIR}/bin/___comp.spv) # this exists so file cannot be found -> always execute command
+    add_dependencies(${PROJECT_NAME} RAYX_CORE_COMPILE_SHADER)
+    set(RAYX_CORE_SHADER ${CMAKE_BINARY_DIR}/bin/comp.spv)
+    set(RAYX_CORE_SHADER_FAKE ${CMAKE_BINARY_DIR}/bin/___comp.spv) # this exists so file cannot be found -> always execute command
 
     add_custom_command(
         OUTPUT
-        ${COMPILED_SHADER}
-        ${COMPILED_SHADER_FAKE}
+        ${RAYX_CORE_SHADER}
+        ${RAYX_CORE_SHADER_FAKE}
         COMMAND "glslc"
-        ARGS ${PROJECT_SOURCE_DIR}/src/Tracer/shader/main-glsl.comp -o ${COMPILED_SHADER} -fshader-stage=compute --target-env=vulkan1.3
+        ARGS ${PROJECT_SOURCE_DIR}/src/Tracer/shader/main-glsl.comp -o ${RAYX_CORE_SHADER} -fshader-stage=compute --target-env=vulkan1.3
     )
 
-    add_custom_target(COMPILE_SHADER ALL DEPENDS ${COMPILED_SHADER})
+    add_custom_target(RAYX_CORE_COMPILE_SHADER ALL DEPENDS ${RAYX_CORE_SHADER})
 endif()
 
 # ------------------------
