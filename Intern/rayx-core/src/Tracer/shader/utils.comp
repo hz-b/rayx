@@ -460,7 +460,7 @@ dmat4 muller_matrix(double R_s, double R_p, double delta) {
  * updates stokes vector of ray
  * @returns `true`, if ray should be absorbed
  */
-bool update_stokes(RAYX_INOUT(Ray) r, double real_S, double real_P, double delta, double azimuthal, RAYX_INOUT(uint64_t) ctr) {
+bool update_stokes(RAYX_INOUT(Ray) r, double real_S, double real_P, double delta, double azimuthal) {
     dvec4 stokes_old = r.m_stokes;
     double c_chi = r8_cos(azimuthal);
     double s_chi = r8_sin(azimuthal);
@@ -471,7 +471,7 @@ bool update_stokes(RAYX_INOUT(Ray) r, double real_S, double real_P, double delta
     ;
     r.m_stokes = inv_rot * stokes_new;
 
-    double rn = squaresDoubleRNG(ctr);
+    double rn = squaresDoubleRNG(_ctr);
     // throw ray away with certain probability
     return (r.m_stokes.x / stokes_old.x) - rn <= 0;
 }
@@ -531,14 +531,14 @@ adds slope error to the normal
 1=cylindrical) (1 only for ellipsis relevant) returns new normal if there is a
 slope error in either x or z direction or the unmodified normal otherwise.
 */
-dvec3 applySlopeError(dvec3 normal, SlopeError error, int O_type, RAYX_INOUT(uint64_t) ctr) {
+dvec3 applySlopeError(dvec3 normal, SlopeError error, int O_type) {
     double slopeX = error.m_sag;
     double slopeZ = error.m_mer;
 
     // only calculate the random number if at least one slope error is not 0,
     // since the calculation is costly (sin, cos, log involved)
     if (slopeX != 0 || slopeZ != 0) {
-        double random_values[2] = {squaresNormalRNG(ctr, 0, slopeX), squaresNormalRNG(ctr, 0, slopeZ)};
+        double random_values[2] = {squaresNormalRNG(_ctr, 0, slopeX), squaresNormalRNG(_ctr, 0, slopeZ)};
 
         /*double x = random_values[0] * slopeX; // to get normal distribution
         from std.-norm. multiply by sigma (=slopeX) -> mu + x * sigma but mu=0
@@ -861,7 +861,7 @@ zoneplates
 @returns
     results stored in dphi, dpsi (inout)
 */
-void bessel_diff(double radius, double wl, RAYX_INOUT(double) dphi, RAYX_INOUT(double) dpsi, RAYX_INOUT(uint64_t) ctr) {
+void bessel_diff(double radius, double wl, RAYX_INOUT(double) dphi, RAYX_INOUT(double) dpsi) {
     double b = abs(radius) * 1e06;
     double ximax = 5.0 * wl / b;
 
@@ -869,7 +869,7 @@ void bessel_diff(double radius, double wl, RAYX_INOUT(double) dphi, RAYX_INOUT(d
     double c = -1;
     while (c < 0) {  // while c = wd - rn1[2] < 0 continue
         for (int i = 0; i < 3; i++) {
-            rn1[i] = squaresDoubleRNG(ctr);
+            rn1[i] = squaresDoubleRNG(_ctr);
         }
 
         dphi = rn1[0] * ximax;
@@ -885,8 +885,8 @@ void bessel_diff(double radius, double wl, RAYX_INOUT(double) dphi, RAYX_INOUT(d
     }
 
     // 50% neg/pos sign
-    dphi = sign(squaresDoubleRNG(ctr) - 0.5) * dphi;
-    dpsi = sign(squaresDoubleRNG(ctr) - 0.5) * dpsi;
+    dphi = sign(squaresDoubleRNG(_ctr) - 0.5) * dphi;
+    dpsi = sign(squaresDoubleRNG(_ctr) - 0.5) * dpsi;
 }
 
 /**
@@ -894,10 +894,9 @@ void bessel_diff(double radius, double wl, RAYX_INOUT(double) dphi, RAYX_INOUT(d
  * @param dim		dimension (x or y) (mm)
  * @param wl			wavelength (nm)
  * @param dAngle 	diffraction angle (inout)
- * @param ctr		counter for random number generator
  * @return result stored in dAngle
  */
-void fraun_diff(double dim, double wl, RAYX_INOUT(double) dAngle, RAYX_INOUT(uint64_t) ctr) {
+void fraun_diff(double dim, double wl, RAYX_INOUT(double) dAngle) {
     if (dim == 0) return;        // no diffraction in this direction
     double b = dim * 1e06;       // slit opening
     double div = 10.0 * wl / b;  // up to 2nd maximum
@@ -906,7 +905,7 @@ void fraun_diff(double dim, double wl, RAYX_INOUT(double) dAngle, RAYX_INOUT(uin
     double c = -1;
     while (c < 0) {  // while c = wd - uni[1] < 0 continue
         for (int i = 0; i < 2; i++) {
-            rna[i] = squaresDoubleRNG(ctr);
+            rna[i] = squaresDoubleRNG(_ctr);
         }
         dAngle = (rna[0] - 0.5) * div;
         double u = PI * b * r8_sin(dAngle) / wl;

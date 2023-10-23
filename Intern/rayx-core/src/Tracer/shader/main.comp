@@ -81,7 +81,10 @@ uint64_t rayId() {
     return uint64_t(pushConstants.rayIdStart) + uint64_t(gl_GlobalInvocationID);
 }
 
-bool finalized;
+bool _finalized;
+
+// the random number state.
+uint64_t _ctr;
 
 // `i in [0, maxEvents]`.
 // Will return the index in outputData to access the `i'th` output ray belonging to this shader call.
@@ -100,7 +103,7 @@ void uninitOutRays() {
 // record an event and store it in the next free spot in outputData.
 // `r` will typically be _ray, or some related ray.
 void recordEvent(Ray r, double w) {
-    if (finalized) { return; }
+    if (_finalized) { return; }
 
     if (w == ETYPE_UNINIT) {
         #ifndef GLSL
@@ -128,7 +131,7 @@ void recordEvent(Ray r, double w) {
 // Is used for events terminating the path of the ray.
 void recordFinalEvent(Ray r, double w) {
     recordEvent(r, w);
-    finalized = true;
+    _finalized = true;
 }
 
 // throws an error, and termiantes the program
@@ -157,8 +160,13 @@ void recordFinalEvent(Ray r, double w) {
  *                    MAIN
  **************************************************************/
 void main() {
-    finalized = false;
+    _finalized = false;
     uninitOutRays();
+
+    // ray specific "seed" for random numbers -> every ray has a different starting value for the counter that creates the random number
+    const uint64_t MAX_UINT64 = ~(uint64_t(0));
+    uint64_t workerCounterNum = MAX_UINT64 / uint64_t(pushConstants.numRays);
+    _ctr = rayId() * workerCounterNum + uint64_t(pushConstants.randomSeed * MAX_UINT64);
     
     // ~~~~~~~~~~~~~~ PRINT EXAMPLE ~~~~~~~~~~~~~~
     // Printing ~DEBUG~ Example over vkconfig Validation Layers

@@ -8,7 +8,7 @@
 /// - change the rays stokes vector
 /// - potentially absorb the ray (by calling `recordFinalEvent(_, ETYPE_ABSORBED)`)
 
-Ray behaveSlit(Ray r, int id, RAYX_INOUT(uint64_t) ctr, ALLOW_UNUSED Collision col) {
+Ray behaveSlit(Ray r, int id, ALLOW_UNUSED Collision col) {
     SlitBehaviour b = deserializeSlit(elements[id].m_behaviour);
 
     // slit lies in x-y plane instead of x-z plane as other elements
@@ -35,11 +35,11 @@ Ray behaveSlit(Ray r, int id, RAYX_INOUT(uint64_t) ctr, ALLOW_UNUSED Collision c
     if (wavelength > 0) {
         if (openingCutout.m_type == CTYPE_RECT) {
             RectCutout r = deserializeRect(openingCutout);
-            fraun_diff(r.m_width, wavelength, dPhi, ctr);
-            fraun_diff(r.m_length, wavelength, dPsi, ctr);
+            fraun_diff(r.m_width, wavelength, dPhi);
+            fraun_diff(r.m_length, wavelength, dPsi);
         } else if (openingCutout.m_type == CTYPE_ELLIPTICAL) {
             EllipticalCutout e = deserializeElliptical(openingCutout);
-            bessel_diff(e.m_diameter_z, wavelength, dPhi, dPsi, ctr);
+            bessel_diff(e.m_diameter_z, wavelength, dPhi, dPsi);
         } else {
             throw("encountered Slit with unsupported openingCutout");
         }
@@ -54,7 +54,7 @@ Ray behaveSlit(Ray r, int id, RAYX_INOUT(uint64_t) ctr, ALLOW_UNUSED Collision c
     return r;
 }
 
-Ray behaveRZP(Ray r, int id, RAYX_INOUT(uint64_t) ctr, Collision col) {
+Ray behaveRZP(Ray r, int id, Collision col) {
     RZPBehaviour b = deserializeRZP(elements[id].m_behaviour);
 
     double WL            = hvlam(r.m_energy);
@@ -68,7 +68,7 @@ Ray behaveRZP(Ray r, int id, RAYX_INOUT(uint64_t) ctr, Collision col) {
     // if additional zero order should be behaved, approx. half of the rays are randomly chosen to be behaved in order 0 (= ordinary reflection) instead
     // of the given order
     if (additional_order == 1) {
-        if (squaresDoubleRNG(ctr) > 0.5) Ord = 0;
+        if (squaresDoubleRNG(_ctr) > 0.5) Ord = 0;
     }
 
     // only 2D case, not 2 1D gratings with 90 degree rotation as in old RAY
@@ -80,7 +80,7 @@ Ray behaveRZP(Ray r, int id, RAYX_INOUT(uint64_t) ctr, Collision col) {
     return r;
 }
 
-Ray behaveGrating(Ray r, int id, ALLOW_UNUSED RAYX_INOUT(uint64_t) ctr, Collision col) {
+Ray behaveGrating(Ray r, int id, Collision col) {
     GratingBehaviour b = deserializeGrating(elements[id].m_behaviour);
 
     // vls parameters passed in q.elementParams
@@ -99,7 +99,7 @@ Ray behaveGrating(Ray r, int id, ALLOW_UNUSED RAYX_INOUT(uint64_t) ctr, Collisio
     return r;
 }
 
-Ray behaveMirror(Ray r, int id, RAYX_INOUT(uint64_t) ctr, Collision col) {
+Ray behaveMirror(Ray r, int id, Collision col) {
     // calculate intersection point and normal at intersection point
     double azimuthal_angle = elements[id].m_azimuthalAngle;
 
@@ -112,7 +112,7 @@ Ray behaveMirror(Ray r, int id, RAYX_INOUT(uint64_t) ctr, Collision col) {
     if (mat != -2) {
         efficiency(r, real_S, real_P, delta, incidence_angle, mat);
 
-        bool absorbed = update_stokes(r, real_S, real_P, delta, azimuthal_angle, ctr);
+        bool absorbed = update_stokes(r, real_S, real_P, delta, azimuthal_angle);
         if (absorbed) {
             recordFinalEvent(r, ETYPE_ABSORBED);
         }
