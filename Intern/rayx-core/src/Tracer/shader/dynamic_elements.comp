@@ -58,7 +58,7 @@ void dynamicElements() {
         }
 
         // the ray might finalize due to being absorbed, or because an error occured while tracing!
-        if (finalized) { return; }
+        if (_finalized) { return; }
 
         recordEvent(elem_ray, ETYPE_JUST_HIT_ELEM);
 
