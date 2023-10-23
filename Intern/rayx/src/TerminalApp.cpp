@@ -95,7 +95,7 @@ void TerminalApp::tracePath(const std::filesystem::path& path) {
 }
 
 void TerminalApp::run() {
-    RAYX_PROFILE_FUNCTION();
+    RAYX_PROFILE_FUNCTION_STDOUT();
 
     RAYX_VERB << "TerminalApp running...";
 
