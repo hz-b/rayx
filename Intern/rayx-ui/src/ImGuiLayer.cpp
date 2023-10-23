@@ -4,6 +4,8 @@
 #include <imgui_impl_glfw.h>
 #include <imgui_impl_vulkan.h>
 
+#include <glm/gtx/quaternion.hpp>
+
 #include "CanonicalizePath.h"
 
 void checkVkResult(VkResult result, const char* message) {
@@ -156,8 +158,8 @@ void ImGuiLayer::updateImGui(CameraController& camController, FrameInfo& frameIn
         ImGui::PushFont(m_smallFont);
     }
 
-    ImGui::SetNextWindowPos(ImVec2(30, 30));
-    ImGui::SetNextWindowSize(ImVec2(500, 600));
+    ImGui::SetNextWindowPos(ImVec2(0, 0), ImGuiCond_Once);
+    ImGui::SetNextWindowSize(ImVec2(500, 600), ImGuiCond_Once);
     // Main window
     {
         ImGui::Begin("Properties Manager");
@@ -186,80 +188,8 @@ void ImGuiLayer::updateImGui(CameraController& camController, FrameInfo& frameIn
 
         ImGui::Text("Camera");
         ImGui::SliderFloat("FOV", &camController.m_config.m_FOV, 0.0f, 180.0f);
-        ImGui::SliderFloat("Up X", &camController.m_up.x, -1.0f, 1.0f);
-        ImGui::SliderFloat("Up Y", &camController.m_up.y, -1.0f, 1.0f);
-        ImGui::SliderFloat("Up Z", &camController.m_up.z, -1.0f, 1.0f);
-        ImGui::SliderFloat("Near", &camController.m_config.m_near, 0.0f, 100.0f);
-        ImGui::SliderFloat("Far", &camController.m_config.m_far, 0.0f, 10000.0f);
-
-        auto isInputDigit = [](const char* str) { return !std::any_of(str, str + strlen(str), ::isspace); };
-
-        static char posStrX[32];
-        try {
-            snprintf(posStrX, sizeof(posStrX), "%f", camController.m_position.x);
-            if (ImGui::InputText("Position X", posStrX, sizeof(posStrX))) {
-                if (isInputDigit(posStrX)) {
-                    camController.m_position.x = std::stof(posStrX);
-                }
-            }
-        } catch (const std::exception& e) {
-        }
-
-        static char posStrY[32];
-        try {
-            snprintf(posStrY, sizeof(posStrY), "%f", camController.m_position.y);
-            if (ImGui::InputText("Position Y", posStrY, sizeof(posStrY))) {
-                if (isInputDigit(posStrY)) {
-                    camController.m_position.y = std::stof(posStrY);
-                }
-            }
-        } catch (const std::exception& e) {
-        }
-
-        static char posStrZ[32];
-        try {
-            snprintf(posStrZ, sizeof(posStrZ), "%f", camController.m_position.z);
-            if (ImGui::InputText("Position Z", posStrZ, sizeof(posStrZ))) {
-                if (isInputDigit(posStrZ)) {
-                    camController.m_position.z = std::stof(posStrZ);
-                }
-            }
-
-        } catch (const std::exception& e) {
-        }
-
-        static char dirStrX[32];
-        try {
-            snprintf(dirStrX, sizeof(dirStrX), "%f", camController.m_direction.x);
-            if (ImGui::InputText("Direction X", dirStrX, sizeof(dirStrX))) {
-                if (isInputDigit(dirStrX)) {
-                    camController.m_direction.x = std::stof(dirStrX);
-                }
-            }
-        } catch (const std::exception& e) {
-        }
-
-        static char dirStrY[32];
-        try {
-            snprintf(dirStrY, sizeof(dirStrY), "%f", camController.m_direction.y);
-            if (ImGui::InputText("Direction Y", dirStrY, sizeof(dirStrY))) {
-                if (isInputDigit(dirStrY)) {
-                    camController.m_direction.y = std::stof(dirStrY);
-                }
-            }
-        } catch (const std::exception& e) {
-        }
-
-        static char dirStrZ[32];
-        try {
-            snprintf(dirStrZ, sizeof(dirStrZ), "%f", camController.m_direction.z);
-            if (ImGui::InputText("Direction Z", dirStrZ, sizeof(dirStrZ))) {
-                if (isInputDigit(dirStrZ)) {
-                    camController.m_direction.z = std::stof(dirStrZ);
-                }
-            }
-        } catch (const std::exception& e) {
-        }
+        ImGui::InputFloat3("Position", &camController.m_position.x);
+        ImGui::InputFloat3("Direction", &camController.m_direction.x);
 
         if (ImGui::Button("Save Camera")) {
             SaveCameraControllerToFile(camController, "camera_save.txt");
@@ -274,8 +204,8 @@ void ImGuiLayer::updateImGui(CameraController& camController, FrameInfo& frameIn
         ImGui::End();
     }
 
-    ImGui::SetNextWindowPos(ImVec2(30, 630));
-    ImGui::SetNextWindowSize(ImVec2(500, 300));
+    ImGui::SetNextWindowPos(ImVec2(0, 600), ImGuiCond_Once);
+    ImGui::SetNextWindowSize(ImVec2(500, 300), ImGuiCond_Once);
     // In your rendering loop
     {
         ImGui::Begin("Settings");

@@ -2,6 +2,8 @@
 
 #include <imgui.h>
 
+#include <string>
+
 #include "FrameInfo.h"
 #include "GraphicsCore/Device.h"
 #include "GraphicsCore/Swapchain.h"
@@ -23,8 +25,6 @@ class ImGuiLayer {
     const Window& m_Window;
     const Device& m_Device;
 
-    bool m_LayerEnabled = true;
-    bool m_ShowDemoWindow = false;
     float m_ClearColor[4] = {0.01f, 0.01f, 0.01f, 1.00f};
 
     bool m_useLargeFont = false;
