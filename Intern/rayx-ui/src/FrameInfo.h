@@ -7,11 +7,8 @@
 #include "Camera.h"
 
 struct FrameInfo {
-    uint32_t frameIndex;
-    float frameTime;
-    VkCommandBuffer commandBuffer;
     Camera& camera;
+    uint32_t frameIndex;
+    VkCommandBuffer commandBuffer;
     VkDescriptorSet descriptorSet;
-    bool wasPathUpdated;
-    std::string filePath;
 };

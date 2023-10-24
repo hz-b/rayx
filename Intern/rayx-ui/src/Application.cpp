@@ -3,6 +3,7 @@
 #include <chrono>
 
 #include "Data/Importer.h"
+#include "Debug/Debug.h"
 #include "FrameInfo.h"
 #include "GraphicsCore/Renderer.h"
 #include "GraphicsCore/Window.h"
@@ -80,43 +81,48 @@ void Application::run() {
 
     // Main loop
     while (!m_Window.shouldClose()) {
-        glfwPollEvents();
-
         // Skip rendering when minimized
         if (m_Window.isMinimized()) {
             continue;
         }
-
-        auto newTime = std::chrono::high_resolution_clock::now();
-        float frameTime = std::chrono::duration<float, std::chrono::seconds::period>(newTime - currentTime).count();
-        currentTime = newTime;
+        glfwPollEvents();
 
         if (auto commandBuffer = m_Renderer.beginFrame()) {
-            uint32_t frameIndex = m_Renderer.getFrameIndex();
+            // Params to pass to UI
+            auto newTime = std::chrono::high_resolution_clock::now();
+            float frameTime = std::chrono::duration<float, std::chrono::seconds::period>(newTime - currentTime).count();
+            currentTime = newTime;
+            UIParameters uiParams{camController, "", false, frameTime};
 
-            FrameInfo frameInfo{frameIndex, frameTime, commandBuffer, cam, descriptorSets[frameIndex], false, ""};
-            m_ImGuiLayer.setupUI(camController, frameInfo);
-            if (frameInfo.wasPathUpdated) {
-                updateScene(frameInfo.filePath.c_str(), rObjects, rays, rayObj);
-                frameInfo.wasPathUpdated = false;
+            // Update UI and camera
+            m_ImGuiLayer.setupUI(uiParams);
+            camController.update(cam, m_Renderer.getAspectRatio());
+            if (uiParams.pathChanged) {
+                updateScene(uiParams.rmlPath.string().c_str(), rObjects, rays, rayObj);
+                uiParams.pathChanged = false;
                 camController.lookAtPoint(rObjects[0].getTranslationVecor());
             }
 
             camController.update(cam, m_Renderer.getAspectRatio());
 
             // Update UBO
+            uint32_t frameIndex = m_Renderer.getFrameIndex();
             uboBuffers[frameIndex]->writeToBuffer(&cam);
-            uboBuffers[frameIndex]->flush();
+            // uboBuffers[frameIndex]->flush();
 
             // Render
             m_Renderer.beginSwapChainRenderPass(commandBuffer, m_ImGuiLayer.getClearValue());
 
+            FrameInfo frameInfo{cam, frameIndex, commandBuffer, descriptorSets[frameIndex]};
             objectRenderSystem.render(frameInfo, rObjects);
             rayRenderSystem.render(frameInfo, rayObj);
             m_ImGuiLayer.render(commandBuffer);
 
             m_Renderer.endSwapChainRenderPass(commandBuffer);
             m_Renderer.endFrame();
+        } else {
+            RAYX_LOG << "Failed to acquire swap chain image";
+            break;
         }
     }
     vkDeviceWaitIdle(m_Device.device());

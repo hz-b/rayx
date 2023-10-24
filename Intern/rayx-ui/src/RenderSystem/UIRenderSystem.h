@@ -2,11 +2,19 @@
 
 #include <imgui.h>
 
+#include <filesystem>
 #include <string>
 
 #include "FrameInfo.h"
 #include "GraphicsCore/Device.h"
 #include "GraphicsCore/Swapchain.h"
+
+struct UIParameters {
+    CameraController& camController;
+    std::filesystem::path rmlPath;
+    bool pathChanged;
+    float frameTime;
+};
 
 class UIRenderSystem {
   public:
@@ -15,7 +23,7 @@ class UIRenderSystem {
     UIRenderSystem& operator=(const UIRenderSystem&) = delete;
     ~UIRenderSystem();
 
-    void setupUI(CameraController& camController, FrameInfo& frameInfo);
+    void setupUI(UIParameters& uiParams);
     void render(VkCommandBuffer commandBuffer);
 
     VkClearValue getClearValue() const { return {m_ClearColor[0], m_ClearColor[1], m_ClearColor[2], m_ClearColor[3]}; }
@@ -34,7 +42,7 @@ class UIRenderSystem {
     VkDescriptorPool m_DescriptorPool;
     ImGuiIO m_IO;
 
-    void showSceneEditorWindow(FrameInfo& frameInfo, CameraController& camController);
+    void showSceneEditorWindow(UIParameters& uiParams);
     void showSettingsWindow();
     void showBeamlineOutlineWindow(FrameInfo& frameInfo);
 };

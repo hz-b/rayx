@@ -144,7 +144,7 @@ UIRenderSystem::~UIRenderSystem() {
     ImGui::DestroyContext();
 }
 
-void UIRenderSystem::setupUI(CameraController& camController, FrameInfo& frameInfo) {
+void UIRenderSystem::setupUI(UIParameters& uiParams) {
     ImGui_ImplVulkan_NewFrame();
     ImGui_ImplGlfw_NewFrame();
     ImGui::NewFrame();
@@ -155,7 +155,7 @@ void UIRenderSystem::setupUI(CameraController& camController, FrameInfo& frameIn
         ImGui::PushFont(m_smallFont);
     }
 
-    showSceneEditorWindow(frameInfo, camController);
+    showSceneEditorWindow(uiParams);
     showSettingsWindow();
 
     ImGui::PopFont();
@@ -175,7 +175,7 @@ void UIRenderSystem::render(VkCommandBuffer commandBuffer) {
     ImGui_ImplVulkan_RenderDrawData(drawData, commandBuffer);
 }
 
-void UIRenderSystem::showSceneEditorWindow(FrameInfo& frameInfo, CameraController& camController) {
+void UIRenderSystem::showSceneEditorWindow(UIParameters& uiParams) {
     ImGui::SetNextWindowPos(ImVec2(0, 0), ImGuiCond_Once);
     ImGui::SetNextWindowSize(ImVec2(450, 350), ImGuiCond_Once);
 
@@ -194,8 +194,8 @@ void UIRenderSystem::showSceneEditorWindow(FrameInfo& frameInfo, CameraControlle
             std::string filePathName = ImGuiFileDialog::Instance()->GetFilePathName();
             std::string extension = ImGuiFileDialog::Instance()->GetCurrentFilter();
 
-            frameInfo.filePath = filePathName;
-            frameInfo.wasPathUpdated = true;
+            uiParams.rmlPath = filePathName;
+            uiParams.pathChanged = true;
         }
         ImGuiFileDialog::Instance()->Close();
     }
@@ -204,19 +204,19 @@ void UIRenderSystem::showSceneEditorWindow(FrameInfo& frameInfo, CameraControlle
     ImGui::ColorEdit3("Color", (float*)&m_ClearColor);
 
     ImGui::Text("Camera");
-    ImGui::SliderFloat("FOV", &camController.m_config.m_FOV, 0.0f, 180.0f);
-    ImGui::InputFloat3("Position", &camController.m_position.x);
-    ImGui::InputFloat3("Direction", &camController.m_direction.x);
+    ImGui::SliderFloat("FOV", &uiParams.camController.m_config.m_FOV, 0.0f, 180.0f);
+    ImGui::InputFloat3("Position", &uiParams.camController.m_position.x);
+    ImGui::InputFloat3("Direction", &uiParams.camController.m_direction.x);
 
     if (ImGui::Button("Save Camera")) {
-        SaveCameraControllerToFile(camController, "camera_save.txt");
+        SaveCameraControllerToFile(uiParams.camController, "camera_save.txt");
     }
     ImGui::SameLine();
     if (ImGui::Button("Load Camera")) {
-        LoadCameraControllerFromFile(camController, "camera_save.txt");
+        LoadCameraControllerFromFile(uiParams.camController, "camera_save.txt");
     }
 
-    ImGui::Text("Application average %.6f ms/frame", frameInfo.frameTime);
+    ImGui::Text("Application average %.6f ms/frame", uiParams.frameTime * 1000.0f);
 
     ImGui::End();
 }
