@@ -50,6 +50,7 @@ class Window {
     VkExtent2D getExtent() const { return {m_width, m_height}; }
 
     bool shouldClose() const { return glfwWindowShouldClose(m_Window); }
+    bool isMinimized() const { return glfwGetWindowAttrib(m_Window, GLFW_ICONIFIED); }
 
     bool wasWindowResized() { return m_framebufferResized; }
     void resetWindowResizedFlag() { m_framebufferResized = false; }

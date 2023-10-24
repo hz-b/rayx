@@ -82,6 +82,11 @@ void Application::run() {
     while (!m_Window.shouldClose()) {
         glfwPollEvents();
 
+        // Skip rendering when minimized
+        if (m_Window.isMinimized()) {
+            continue;
+        }
+
         auto newTime = std::chrono::high_resolution_clock::now();
         float frameTime = std::chrono::duration<float, std::chrono::seconds::period>(newTime - currentTime).count();
         currentTime = newTime;
