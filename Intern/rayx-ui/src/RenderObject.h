@@ -50,6 +50,7 @@ class RenderObject {
     void draw(VkCommandBuffer commandBuffer) const;
 
     glm::mat4 getModelMatrix() const { return m_modelMatrix; }
+    glm::vec3 getTranslationVecor() const { return m_translationVector; }
 
   private:
     void createVertexBuffers(const std::vector<Vertex>& vertices);
@@ -64,4 +65,11 @@ class RenderObject {
     std::unique_ptr<Buffer> m_indexBuffer;
 
     glm::mat4 m_modelMatrix;  ///< Matrix for transforming the object from model to world coordinates
+
+    // 3D Space specfic
+    glm::vec3 m_translationVector;
+    glm::vec3 m_skewVector;
+    glm::vec3 m_rotationVector;  // Radians
+    glm::vec3 m_scaleVector;
+    glm::vec4 m_perspective;
 };

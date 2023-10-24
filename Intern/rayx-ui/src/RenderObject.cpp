@@ -1,5 +1,6 @@
 #include "RenderObject.h"
 
+#include <glm/gtx/matrix_decompose.hpp>
 /**
  * Constructor sets up vertex and index buffers based on the input parameters.
  */
@@ -7,6 +8,10 @@ RenderObject::RenderObject(Device& device, glm::mat4 modelMatrix, std::vector<Ve
     : m_Device(device), m_modelMatrix(modelMatrix) {
     createVertexBuffers(vertices);
     createIndexBuffers(indices);
+
+    glm::quat rot;
+    glm::decompose(modelMatrix, m_scaleVector, rot, m_translationVector, m_skewVector, m_perspective);
+    m_rotationVector = glm::eulerAngles(rot);
 }
 
 void RenderObject::bind(VkCommandBuffer commandBuffer) const {
@@ -32,7 +37,7 @@ void RenderObject::createVertexBuffers(const std::vector<Vertex>& vertices) {
 void RenderObject::createIndexBuffers(const std::vector<uint32_t>& indices) {
     m_indexCount = static_cast<uint32_t>(indices.size());
 
-    m_indexBuffer = std::make_unique<Buffer>(m_Device,"rObjIndexBuff", sizeof(indices[0]), m_indexCount, VK_BUFFER_USAGE_INDEX_BUFFER_BIT,
+    m_indexBuffer = std::make_unique<Buffer>(m_Device, "rObjIndexBuff", sizeof(indices[0]), m_indexCount, VK_BUFFER_USAGE_INDEX_BUFFER_BIT,
                                              VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT);
     m_indexBuffer->map();
     m_indexBuffer->writeToBuffer(indices.data());

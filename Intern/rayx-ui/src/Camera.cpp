@@ -62,6 +62,19 @@ void CameraController::update(Camera& cam, float aspectRatio) {
     cam.f = m_config.m_far;
 }
 
+void CameraController::lookAtPoint(const glm::vec3& targetPoint, float distance) {
+    glm::vec3 newDirection = glm::normalize(targetPoint - m_position);
+
+    m_pitch = glm::degrees(asin(newDirection.y));
+    m_yaw = glm::degrees(atan2(newDirection.z, newDirection.x));
+
+    // Update the camera direction without triggering pitch and yaw clamping
+    updateDirection(0.0, 0.0);
+
+    // Move the camera to the desired distance from the target point
+    m_position = targetPoint - distance * m_direction;
+}
+
 // ---- SERDE ----
 // Serialize the CameraController to a string
 std::string SerializeCameraController(const CameraController& cam) {

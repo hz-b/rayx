@@ -93,14 +93,16 @@ void Application::run() {
 
         if (auto commandBuffer = m_Renderer.beginFrame()) {
             uint32_t frameIndex = m_Renderer.getFrameIndex();
-            camController.update(cam, m_Renderer.getAspectRatio());
 
             FrameInfo frameInfo{frameIndex, frameTime, commandBuffer, cam, descriptorSets[frameIndex], false, ""};
             m_ImGuiLayer.setupUI(camController, frameInfo);
             if (frameInfo.wasPathUpdated) {
                 updateScene(frameInfo.filePath.c_str(), rObjects, rays, rayObj);
                 frameInfo.wasPathUpdated = false;
+                camController.lookAtPoint(rObjects[0].getTranslationVecor());
             }
+
+            camController.update(cam, m_Renderer.getAspectRatio());
 
             // Update UBO
             uboBuffers[frameIndex]->writeToBuffer(&cam);

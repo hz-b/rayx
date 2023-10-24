@@ -40,6 +40,7 @@ class CameraController {
     void setLastMousePos(double x, double y);
     void updateDirectionViaMouse(double mouseX, double mouseY);
     void update(Camera& cam, float aspectRatio);
+    void lookAtPoint(const glm::vec3& targetPoint, float distance = 10.0f);
 };
 
 std::string SerializeCameraController(const CameraController& cam);
