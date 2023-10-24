@@ -39,4 +39,8 @@ class ImGuiLayer {
 
     void createCommandPool();
     void createCommandBuffers(uint32_t cmdBufferCount);
+
+    void showSceneEditorWindow(FrameInfo& frameInfo, CameraController& camController);
+    void showSettingsWindow();
+    void showBeamlineOutlineWindow(FrameInfo& frameInfo);
 };

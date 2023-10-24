@@ -158,67 +158,10 @@ void ImGuiLayer::updateImGui(CameraController& camController, FrameInfo& frameIn
         ImGui::PushFont(m_smallFont);
     }
 
-    ImGui::SetNextWindowPos(ImVec2(0, 0), ImGuiCond_Once);
-    ImGui::SetNextWindowSize(ImVec2(500, 600), ImGuiCond_Once);
-    // Main window
-    {
-        ImGui::Begin("Properties Manager");
-
-        // Check ImGui dialog open condition
-        if (ImGui::Button("Open File Dialog")) {
-            ImGuiFileDialog::Instance()->OpenDialog("ChooseFileDlgKey", "Choose Beamline (rml) File", ".rml\0", ".");
-        }
-
-        ImGui::SetNextWindowSize(ImVec2(800, 600));
-
-        // Display file dialog
-        if (ImGuiFileDialog::Instance()->Display("ChooseFileDlgKey")) {
-            if (ImGuiFileDialog::Instance()->IsOk()) {
-                std::string filePathName = ImGuiFileDialog::Instance()->GetFilePathName();
-                std::string extension = ImGuiFileDialog::Instance()->GetCurrentFilter();
-
-                frameInfo.filePath = filePathName;
-                frameInfo.wasPathUpdated = true;
-            }
-            ImGuiFileDialog::Instance()->Close();
-        }
-
-        ImGui::Text("Background");
-        ImGui::ColorEdit3("Color", (float*)&m_ClearColor);
-
-        ImGui::Text("Camera");
-        ImGui::SliderFloat("FOV", &camController.m_config.m_FOV, 0.0f, 180.0f);
-        ImGui::InputFloat3("Position", &camController.m_position.x);
-        ImGui::InputFloat3("Direction", &camController.m_direction.x);
-
-        if (ImGui::Button("Save Camera")) {
-            SaveCameraControllerToFile(camController, "camera_save.txt");
-        }
-        ImGui::SameLine();
-        if (ImGui::Button("Load Camera")) {
-            LoadCameraControllerFromFile(camController, "camera_save.txt");
-        }
-
-        ImGui::Text("Application average %.6f ms/frame", frameInfo.frameTime);
-
-        ImGui::End();
-    }
-
-    ImGui::SetNextWindowPos(ImVec2(0, 600), ImGuiCond_Once);
-    ImGui::SetNextWindowSize(ImVec2(500, 300), ImGuiCond_Once);
-    // In your rendering loop
-    {
-        ImGui::Begin("Settings");
-
-        if (ImGui::Button("Toggle Large Font")) {
-            m_useLargeFont = !m_useLargeFont;
-        }
-
-        ImGui::End();
-    }
+    showSceneEditorWindow(frameInfo, camController);
+    showSettingsWindow();
 
     ImGui::PopFont();
-
     ImGui::Render();
 }
 
@@ -275,4 +218,63 @@ void ImGuiLayer::createCommandBuffers(uint32_t cmdBufferCount) {
     if (vkAllocateCommandBuffers(m_Device.device(), &allocInfo, m_CommandBuffers.data()) != VK_SUCCESS) {
         throw std::runtime_error("Failed to allocate command buffers");
     }
+}
+
+void ImGuiLayer::showSceneEditorWindow(FrameInfo& frameInfo, CameraController& camController) {
+    ImGui::SetNextWindowPos(ImVec2(0, 0), ImGuiCond_Once);
+    ImGui::SetNextWindowSize(ImVec2(450, 350), ImGuiCond_Once);
+
+    ImGui::Begin("Properties Manager");
+
+    // Check ImGui dialog open condition
+    if (ImGui::Button("Open File Dialog")) {
+        ImGuiFileDialog::Instance()->OpenDialog("ChooseFileDlgKey", "Choose Beamline (rml) File", ".rml\0", ".");
+    }
+
+    ImGui::SetNextWindowSize(ImVec2(800, 600), ImGuiCond_Once);
+
+    // Display file dialog
+    if (ImGuiFileDialog::Instance()->Display("ChooseFileDlgKey")) {
+        if (ImGuiFileDialog::Instance()->IsOk()) {
+            std::string filePathName = ImGuiFileDialog::Instance()->GetFilePathName();
+            std::string extension = ImGuiFileDialog::Instance()->GetCurrentFilter();
+
+            frameInfo.filePath = filePathName;
+            frameInfo.wasPathUpdated = true;
+        }
+        ImGuiFileDialog::Instance()->Close();
+    }
+
+    ImGui::Text("Background");
+    ImGui::ColorEdit3("Color", (float*)&m_ClearColor);
+
+    ImGui::Text("Camera");
+    ImGui::SliderFloat("FOV", &camController.m_config.m_FOV, 0.0f, 180.0f);
+    ImGui::InputFloat3("Position", &camController.m_position.x);
+    ImGui::InputFloat3("Direction", &camController.m_direction.x);
+
+    if (ImGui::Button("Save Camera")) {
+        SaveCameraControllerToFile(camController, "camera_save.txt");
+    }
+    ImGui::SameLine();
+    if (ImGui::Button("Load Camera")) {
+        LoadCameraControllerFromFile(camController, "camera_save.txt");
+    }
+
+    ImGui::Text("Application average %.6f ms/frame", frameInfo.frameTime);
+
+    ImGui::End();
+}
+
+void ImGuiLayer::showSettingsWindow() {
+    ImGui::SetNextWindowPos(ImVec2(0, 350), ImGuiCond_Once);
+    ImGui::SetNextWindowSize(ImVec2(450, 100), ImGuiCond_Once);
+
+    ImGui::Begin("Settings");
+
+    if (ImGui::Button("Toggle Large Font")) {
+        m_useLargeFont = !m_useLargeFont;
+    }
+
+    ImGui::End();
 }
