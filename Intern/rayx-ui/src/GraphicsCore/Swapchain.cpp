@@ -187,8 +187,9 @@ void SwapChain::createImageViews() {
 }
 
 void SwapChain::createRenderPass() {
+    m_DepthFormat = findDepthFormat();
     VkAttachmentDescription depthAttachment{};
-    depthAttachment.format = findDepthFormat();
+    depthAttachment.format = m_DepthFormat;
     depthAttachment.samples = VK_SAMPLE_COUNT_1_BIT;
     depthAttachment.loadOp = VK_ATTACHMENT_LOAD_OP_CLEAR;
     depthAttachment.storeOp = VK_ATTACHMENT_STORE_OP_DONT_CARE;
@@ -245,8 +246,8 @@ void SwapChain::createRenderPass() {
 }
 
 void SwapChain::createFramebuffers() {
-    m_framebuffers.resize(imageCount());
-    for (size_t i = 0; i < imageCount(); i++) {
+    m_framebuffers.resize(getImageCount());
+    for (size_t i = 0; i < getImageCount(); i++) {
         std::array<VkImageView, 2> attachments = {m_imageViews[i], m_depthImageViews[i]};
 
         VkExtent2D swapChainExtent = getExtent();
@@ -266,13 +267,11 @@ void SwapChain::createFramebuffers() {
 }
 
 void SwapChain::createDepthResources() {
-    VkFormat depthFormat = findDepthFormat();
-    m_DepthFormat = depthFormat;
     VkExtent2D swapChainExtent = getExtent();
 
-    m_depthImages.resize(imageCount());
-    m_depthImageMemorys.resize(imageCount());
-    m_depthImageViews.resize(imageCount());
+    m_depthImages.resize(getImageCount());
+    m_depthImageMemorys.resize(getImageCount());
+    m_depthImageViews.resize(getImageCount());
 
     for (size_t i = 0; i < m_depthImages.size(); i++) {
         VkImageCreateInfo imageInfo{};
@@ -283,7 +282,7 @@ void SwapChain::createDepthResources() {
         imageInfo.extent.depth = 1;
         imageInfo.mipLevels = 1;
         imageInfo.arrayLayers = 1;
-        imageInfo.format = depthFormat;
+        imageInfo.format = m_DepthFormat;
         imageInfo.tiling = VK_IMAGE_TILING_OPTIMAL;
         imageInfo.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
         imageInfo.usage = VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT;
@@ -297,7 +296,7 @@ void SwapChain::createDepthResources() {
         viewInfo.sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO;
         viewInfo.image = m_depthImages[i];
         viewInfo.viewType = VK_IMAGE_VIEW_TYPE_2D;
-        viewInfo.format = depthFormat;
+        viewInfo.format = m_DepthFormat;
         viewInfo.subresourceRange.aspectMask = VK_IMAGE_ASPECT_DEPTH_BIT;
         viewInfo.subresourceRange.baseMipLevel = 0;
         viewInfo.subresourceRange.levelCount = 1;
@@ -314,7 +313,7 @@ void SwapChain::createSyncObjects() {
     m_imageAvailableSemaphores.resize(MAX_FRAMES_IN_FLIGHT);
     m_renderFinishedSemaphores.resize(MAX_FRAMES_IN_FLIGHT);
     m_inFlightFences.resize(MAX_FRAMES_IN_FLIGHT);
-    m_imagesInFlight.resize(imageCount(), VK_NULL_HANDLE);
+    m_imagesInFlight.resize(getImageCount(), VK_NULL_HANDLE);
 
     VkSemaphoreCreateInfo semaphoreInfo = {};
     semaphoreInfo.sType = VK_STRUCTURE_TYPE_SEMAPHORE_CREATE_INFO;

@@ -9,6 +9,7 @@
 #include "RenderObject.h"
 #include "RenderSystem/ObjectRenderSystem.h"
 #include "RenderSystem/RayRenderSystem.h"
+#include "RenderSystem/UIRenderSystem.h"
 #include "Triangulation/Triangulate.h"
 #include "UserInput.h"
 #include "Writer/CSVWriter.h"
@@ -21,7 +22,6 @@ Application::Application(uint32_t width, uint32_t height, const char* name, int 
       m_Renderer(m_Window, m_Device),  //
       m_CommandParser(argc, argv)      //
 {
-    /////////////////// Argument Parser
     m_DescriptorPool = DescriptorPool::Builder(m_Device)
                            .addPoolSize(VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, SwapChain::MAX_FRAMES_IN_FLIGHT)
                            .setMaxSets(SwapChain::MAX_FRAMES_IN_FLIGHT)
@@ -54,6 +54,8 @@ void Application::run() {
     // Render systems
     ObjectRenderSystem objectRenderSystem(m_Device, m_Renderer.getSwapChainRenderPass(), setLayout->getDescriptorSetLayout());
     RayRenderSystem rayRenderSystem(m_Device, m_Renderer.getSwapChainRenderPass(), setLayout->getDescriptorSetLayout());
+    UIRenderSystem m_ImGuiLayer(m_Window, m_Device, m_Renderer.getSwapChainImageFormat(), m_Renderer.getSwapChainDepthFormat(),
+                                m_Renderer.getSwapChainImageCount());
 
     // Camera
     CameraController camController;
@@ -89,9 +91,7 @@ void Application::run() {
             camController.update(cam, m_Renderer.getAspectRatio());
 
             FrameInfo frameInfo{frameIndex, frameTime, commandBuffer, cam, descriptorSets[frameIndex], false, ""};
-            // TODO: ImGui layer should not be in renderer class (maybe its own render system)
-            m_Renderer.updateImGui(camController, frameInfo);
-
+            m_ImGuiLayer.setupUI(camController, frameInfo);
             if (frameInfo.wasPathUpdated) {
                 updateScene(frameInfo.filePath.c_str(), rObjects, rays, rayObj);
                 frameInfo.wasPathUpdated = false;
@@ -102,11 +102,11 @@ void Application::run() {
             uboBuffers[frameIndex]->flush();
 
             // Render
-            m_Renderer.beginSwapChainRenderPass(commandBuffer);
+            m_Renderer.beginSwapChainRenderPass(commandBuffer, m_ImGuiLayer.getClearValue());
 
             objectRenderSystem.render(frameInfo, rObjects);
-
             rayRenderSystem.render(frameInfo, rayObj);
+            m_ImGuiLayer.render(commandBuffer);
 
             m_Renderer.endSwapChainRenderPass(commandBuffer);
             m_Renderer.endFrame();

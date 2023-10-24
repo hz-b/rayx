@@ -4,7 +4,6 @@
 #include <vector>
 
 #include "Device.h"
-#include "ImGuiLayer.h"
 #include "Swapchain.h"
 #include "Window.h"
 
@@ -25,7 +24,11 @@ class Renderer {
     Renderer& operator=(const Renderer&) = delete;
 
     VkRenderPass getSwapChainRenderPass() const { return m_SwapChain->getRenderPass(); }
+    VkFormat getSwapChainImageFormat() const { return m_SwapChain->getImageFormat(); }
+    VkFormat getSwapChainDepthFormat() const { return m_SwapChain->getDepthFormat(); }
+    uint32_t getSwapChainImageCount() const { return m_SwapChain->getImageCount(); }
     float getAspectRatio() const { return m_SwapChain->extentAspectRatio(); }
+
     bool isFrameInProgress() const { return m_isFrameStarted; }
 
     VkCommandBuffer getCurrentCommandBuffer() const {
@@ -53,20 +56,13 @@ class Renderer {
      * @brief Begins the render pass for the swap chain.
      * @param commandBuffer The Vulkan command buffer for rendering.
      */
-    void beginSwapChainRenderPass(VkCommandBuffer commandBuffer);
+    void beginSwapChainRenderPass(VkCommandBuffer commandBuffer, const VkClearValue& clearValue);
 
     /**
      * @brief Ends the render pass for the swap chain.
      * @param commandBuffer The Vulkan command buffer for rendering.
      */
     void endSwapChainRenderPass(VkCommandBuffer commandBuffer);
-
-    /**
-     * @brief Updates ImGui with camera controller information and frame information.
-     * @param camController The camera controller.
-     * @param frameInfo The frame information.
-     */
-    void updateImGui(CameraController& camController, FrameInfo& frameInfo) { m_ImGuiLayer->updateImGui(camController, frameInfo); }
 
   private:
     void createCommandBuffers();
@@ -75,7 +71,6 @@ class Renderer {
 
     Window& m_Window;
     Device& m_Device;
-    std::unique_ptr<ImGuiLayer> m_ImGuiLayer;
 
     std::unique_ptr<SwapChain> m_SwapChain;
     std::vector<VkCommandBuffer> m_commandBuffers;

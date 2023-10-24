@@ -3,7 +3,6 @@
 Renderer::Renderer(Window& window, Device& device) : m_Window{window}, m_Device{device} {
     recreateSwapChain();
     createCommandBuffers();
-    m_ImGuiLayer = std::make_unique<ImGuiLayer>(m_Window, m_Device, *m_SwapChain);
 }
 
 Renderer::~Renderer() { freeCommandBuffers(); }
@@ -75,15 +74,14 @@ VkCommandBuffer Renderer::beginFrame() {
 void Renderer::endFrame() {
     assert(m_isFrameStarted && "Can't call endFrame while frame is not in progress");
 
-    auto commandBuffer = getCurrentCommandBuffer();
+    VkCommandBuffer commandBuffer = getCurrentCommandBuffer();
     if (vkEndCommandBuffer(commandBuffer) != VK_SUCCESS) {
         throw std::runtime_error("failed to record command buffer!");
     }
-    m_ImGuiLayer->recordImGuiCommands(m_currentImageIndex, m_SwapChain->getFrameBuffer(m_currentImageIndex), m_SwapChain->getExtent());
 
-    std::vector<VkCommandBuffer> submitCommandBuffers = {commandBuffer, m_ImGuiLayer->getCommandBuffer(m_currentImageIndex)};
+    std::vector<VkCommandBuffer> submitCommandBuffers = {commandBuffer};
 
-    auto result = m_SwapChain->submitCommandBuffers(submitCommandBuffers, m_currentImageIndex);
+    VkResult result = m_SwapChain->submitCommandBuffers(submitCommandBuffers, m_currentImageIndex);
     if (result == VK_ERROR_OUT_OF_DATE_KHR || result == VK_SUBOPTIMAL_KHR || m_Window.wasWindowResized()) {
         m_Window.resetWindowResizedFlag();
         recreateSwapChain();
@@ -95,7 +93,7 @@ void Renderer::endFrame() {
     m_currentFrameIndex = (m_currentFrameIndex + 1) % SwapChain::MAX_FRAMES_IN_FLIGHT;
 }
 
-void Renderer::beginSwapChainRenderPass(VkCommandBuffer commandBuffer) {
+void Renderer::beginSwapChainRenderPass(VkCommandBuffer commandBuffer, const VkClearValue& clearValue) {
     assert(m_isFrameStarted && "Can't call beginSwapChainRenderPass if frame is not in progress");
     assert(commandBuffer == getCurrentCommandBuffer() && "Can't begin render pass on command buffer from a different frame");
 
@@ -109,7 +107,7 @@ void Renderer::beginSwapChainRenderPass(VkCommandBuffer commandBuffer) {
     renderPassInfo.renderArea.extent = extent;
 
     std::array<VkClearValue, 2> clearValues{};
-    clearValues[0].color = m_ImGuiLayer->getClearValue().color;
+    clearValues[0].color = clearValue.color;
     clearValues[1].depthStencil = {1.0f, 0};
     renderPassInfo.clearValueCount = static_cast<uint32_t>(clearValues.size());
     renderPassInfo.pClearValues = clearValues.data();

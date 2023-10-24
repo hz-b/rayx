@@ -20,14 +20,14 @@ class SwapChain {
     VkFramebuffer getFrameBuffer(int index) const { return m_framebuffers[index]; }
     VkRenderPass getRenderPass() const { return m_RenderPass; }
     VkImageView getImageView(int index) const { return m_imageViews[index]; }
-    size_t imageCount() const { return m_images.size(); }
+    uint32_t getImageCount() const { return (uint32_t)m_images.size(); }
     VkFormat getImageFormat() const { return m_ImageFormat; }
+    VkFormat getDepthFormat() const { return m_DepthFormat; }
     VkExtent2D getExtent() const { return m_Extent; }
     uint32_t width() const { return m_Extent.width; }
     uint32_t height() const { return m_Extent.height; }
 
     float extentAspectRatio() { return static_cast<float>(m_Extent.width) / static_cast<float>(m_Extent.height); }
-    VkFormat findDepthFormat() const;
 
     VkResult acquireNextImage(uint32_t* imageIndex);
     VkResult submitCommandBuffers(const std::vector<VkCommandBuffer>& cmdBuffers, uint32_t imageIndex);
@@ -47,6 +47,7 @@ class SwapChain {
     VkSurfaceFormatKHR chooseSwapSurfaceFormat(const std::vector<VkSurfaceFormatKHR>& availableFormats);
     VkPresentModeKHR chooseSwapPresentMode(const std::vector<VkPresentModeKHR>& availablePresentModes);
     VkExtent2D chooseSwapExtent(const VkSurfaceCapabilitiesKHR& capabilities);
+    VkFormat findDepthFormat() const;
 
     VkFormat m_ImageFormat;
     VkFormat m_DepthFormat;

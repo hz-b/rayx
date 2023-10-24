@@ -1,4 +1,4 @@
-#include "ImGuiLayer.h"
+#include "UIRenderSystem.h"
 
 #include <ImGuiFileDialog.h>
 #include <imgui_impl_glfw.h>
@@ -15,8 +15,9 @@ void checkVkResult(VkResult result, const char* message) {
     }
 }
 
-// ---- ImGuiLayer ----
-ImGuiLayer::ImGuiLayer(const Window& window, const Device& device, const SwapChain& swapchain) : m_Window(window), m_Device(device) {
+// ---- UIRenderSystem ----
+UIRenderSystem::UIRenderSystem(const Window& window, const Device& device, VkFormat imageFormat, VkFormat depthFormat, uint32_t imageCount)
+    : m_Window(window), m_Device(device) {
     // Create descriptor pool for IMGUI
     VkDescriptorPoolSize poolSizes[] = {{VK_DESCRIPTOR_TYPE_SAMPLER, 1000},
                                         {VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 1000},
@@ -43,7 +44,7 @@ ImGuiLayer::ImGuiLayer(const Window& window, const Device& device, const SwapCha
 
     // Create render pass for IMGUI
     VkAttachmentDescription colorAttachment = {};
-    colorAttachment.format = swapchain.getImageFormat();  // same as in main render pass
+    colorAttachment.format = imageFormat;  // same as in main render pass
     colorAttachment.samples = VK_SAMPLE_COUNT_1_BIT;
     colorAttachment.loadOp = VK_ATTACHMENT_LOAD_OP_LOAD;
     colorAttachment.storeOp = VK_ATTACHMENT_STORE_OP_STORE;
@@ -53,7 +54,7 @@ ImGuiLayer::ImGuiLayer(const Window& window, const Device& device, const SwapCha
     colorAttachment.finalLayout = VK_IMAGE_LAYOUT_PRESENT_SRC_KHR;    // same as in main render pass
 
     VkAttachmentDescription depthAttachment = {};
-    depthAttachment.format = swapchain.findDepthFormat();  // same as in main render pass
+    depthAttachment.format = depthFormat;  // same as in main render pass
     depthAttachment.samples = VK_SAMPLE_COUNT_1_BIT;
     depthAttachment.loadOp = VK_ATTACHMENT_LOAD_OP_CLEAR;
     depthAttachment.storeOp = VK_ATTACHMENT_STORE_OP_DONT_CARE;
@@ -113,15 +114,12 @@ ImGuiLayer::ImGuiLayer(const Window& window, const Device& device, const SwapCha
     initInfo.PipelineCache = VK_NULL_HANDLE;
     initInfo.DescriptorPool = m_DescriptorPool;
     initInfo.Allocator = nullptr;
-    initInfo.MinImageCount = (uint32_t)swapchain.imageCount();
-    initInfo.ImageCount = (uint32_t)swapchain.imageCount();
+    initInfo.MinImageCount = imageCount;
+    initInfo.ImageCount = imageCount;
     initInfo.CheckVkResultFn = nullptr;
 
     ImGui_ImplGlfw_InitForVulkan(m_Window.window(), true);
     ImGui_ImplVulkan_Init(&initInfo, m_RenderPass);
-
-    createCommandPool();
-    createCommandBuffers((uint32_t)swapchain.imageCount());
 
     // Upload fonts
     {
@@ -138,8 +136,7 @@ ImGuiLayer::ImGuiLayer(const Window& window, const Device& device, const SwapCha
     }
 }
 
-ImGuiLayer::~ImGuiLayer() {
-    vkDestroyCommandPool(m_Device.device(), m_CommandPool, nullptr);
+UIRenderSystem::~UIRenderSystem() {
     vkDestroyRenderPass(m_Device.device(), m_RenderPass, nullptr);
     vkDestroyDescriptorPool(m_Device.device(), m_DescriptorPool, nullptr);
     ImGui_ImplVulkan_Shutdown();
@@ -147,7 +144,7 @@ ImGuiLayer::~ImGuiLayer() {
     ImGui::DestroyContext();
 }
 
-void ImGuiLayer::updateImGui(CameraController& camController, FrameInfo& frameInfo) {
+void UIRenderSystem::setupUI(CameraController& camController, FrameInfo& frameInfo) {
     ImGui_ImplVulkan_NewFrame();
     ImGui_ImplGlfw_NewFrame();
     ImGui::NewFrame();
@@ -162,65 +159,23 @@ void ImGuiLayer::updateImGui(CameraController& camController, FrameInfo& frameIn
     showSettingsWindow();
 
     ImGui::PopFont();
+}
+
+void UIRenderSystem::render(VkCommandBuffer commandBuffer) {
     ImGui::Render();
-}
 
-VkCommandBuffer ImGuiLayer::recordImGuiCommands(uint32_t currentImage, const VkFramebuffer framebuffer, const VkExtent2D& extent) {
-    VkCommandBufferBeginInfo begin_info = {};
-    begin_info.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
-    if (vkBeginCommandBuffer(m_CommandBuffers[currentImage], &begin_info) != VK_SUCCESS) {
-        throw std::runtime_error("Failed to begin command buffer");
+    ImDrawData* drawData = ImGui::GetDrawData();
+
+    // Avoid rendering when minimized
+    if (drawData->DisplaySize.x <= 0.0f || drawData->DisplaySize.y <= 0.0f) {
+        return;
     }
 
-    VkClearValue clearValues[2];
-    clearValues[0].color = {{0.0f, 0.0f, 0.0f, 1.0f}};  // Clear color
-    clearValues[1].depthStencil = {1.0f, 0};            // Clear depth and stencil values
-
-    VkRenderPassBeginInfo info = {};
-    info.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
-    info.renderPass = m_RenderPass;
-    info.framebuffer = framebuffer;
-    info.renderArea.offset = {0, 0};
-    info.renderArea.extent = extent;
-    info.clearValueCount = 2;
-    info.pClearValues = clearValues;
-    vkCmdBeginRenderPass(m_CommandBuffers[currentImage], &info, VK_SUBPASS_CONTENTS_INLINE);
-    ImGui_ImplVulkan_RenderDrawData(ImGui::GetDrawData(), m_CommandBuffers[currentImage]);
-    vkCmdEndRenderPass(m_CommandBuffers[currentImage]);
-
-    if (vkEndCommandBuffer(m_CommandBuffers[currentImage]) != VK_SUCCESS) {
-        throw std::runtime_error("Failed to end command buffer");
-    }
-
-    return m_CommandBuffers[currentImage];
+    // Create and submit command buffers
+    ImGui_ImplVulkan_RenderDrawData(drawData, commandBuffer);
 }
 
-void ImGuiLayer::createCommandPool() {
-    VkCommandPoolCreateInfo poolInfo = {};
-    poolInfo.sType = VK_STRUCTURE_TYPE_COMMAND_POOL_CREATE_INFO;
-    poolInfo.queueFamilyIndex = 0;
-    poolInfo.flags = VK_COMMAND_POOL_CREATE_RESET_COMMAND_BUFFER_BIT;
-
-    if (vkCreateCommandPool(m_Device.device(), &poolInfo, nullptr, &m_CommandPool) != VK_SUCCESS) {
-        throw std::runtime_error("Failed to create command pool");
-    }
-}
-
-void ImGuiLayer::createCommandBuffers(uint32_t cmdBufferCount) {
-    m_CommandBuffers.resize(cmdBufferCount);
-
-    VkCommandBufferAllocateInfo allocInfo = {};
-    allocInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
-    allocInfo.commandPool = m_CommandPool;
-    allocInfo.level = VK_COMMAND_BUFFER_LEVEL_PRIMARY;
-    allocInfo.commandBufferCount = cmdBufferCount;
-
-    if (vkAllocateCommandBuffers(m_Device.device(), &allocInfo, m_CommandBuffers.data()) != VK_SUCCESS) {
-        throw std::runtime_error("Failed to allocate command buffers");
-    }
-}
-
-void ImGuiLayer::showSceneEditorWindow(FrameInfo& frameInfo, CameraController& camController) {
+void UIRenderSystem::showSceneEditorWindow(FrameInfo& frameInfo, CameraController& camController) {
     ImGui::SetNextWindowPos(ImVec2(0, 0), ImGuiCond_Once);
     ImGui::SetNextWindowSize(ImVec2(450, 350), ImGuiCond_Once);
 
@@ -266,7 +221,7 @@ void ImGuiLayer::showSceneEditorWindow(FrameInfo& frameInfo, CameraController& c
     ImGui::End();
 }
 
-void ImGuiLayer::showSettingsWindow() {
+void UIRenderSystem::showSettingsWindow() {
     ImGui::SetNextWindowPos(ImVec2(0, 350), ImGuiCond_Once);
     ImGui::SetNextWindowSize(ImVec2(450, 100), ImGuiCond_Once);
 

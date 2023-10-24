@@ -8,17 +8,16 @@
 #include "GraphicsCore/Device.h"
 #include "GraphicsCore/Swapchain.h"
 
-class ImGuiLayer {
+class UIRenderSystem {
   public:
-    ImGuiLayer(const Window& window, const Device& device, const SwapChain& swapchain);
-    ImGuiLayer(const ImGuiLayer&) = delete;
-    ImGuiLayer& operator=(const ImGuiLayer&) = delete;
-    ~ImGuiLayer();
+    UIRenderSystem(const Window& window, const Device& device, VkFormat imageFormat, VkFormat depthFormat, uint32_t imageCount);
+    UIRenderSystem(const UIRenderSystem&) = delete;
+    UIRenderSystem& operator=(const UIRenderSystem&) = delete;
+    ~UIRenderSystem();
 
-    void updateImGui(CameraController& camController, FrameInfo& frameInfo);
-    VkCommandBuffer recordImGuiCommands(uint32_t currentImage, const VkFramebuffer framebuffer, const VkExtent2D& extent);
+    void setupUI(CameraController& camController, FrameInfo& frameInfo);
+    void render(VkCommandBuffer commandBuffer);
 
-    VkCommandBuffer getCommandBuffer(uint32_t index) const { return m_CommandBuffers[index]; }
     VkClearValue getClearValue() const { return {m_ClearColor[0], m_ClearColor[1], m_ClearColor[2], m_ClearColor[3]}; }
 
   private:
@@ -33,12 +32,7 @@ class ImGuiLayer {
 
     VkRenderPass m_RenderPass;
     VkDescriptorPool m_DescriptorPool;
-    VkCommandPool m_CommandPool;
-    std::vector<VkCommandBuffer> m_CommandBuffers;
     ImGuiIO m_IO;
-
-    void createCommandPool();
-    void createCommandBuffers(uint32_t cmdBufferCount);
 
     void showSceneEditorWindow(FrameInfo& frameInfo, CameraController& camController);
     void showSettingsWindow();
