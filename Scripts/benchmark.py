@@ -3,7 +3,7 @@
 # HOW TO USE:
 
 # Install all necessary python modules:
-# python -m pip install openpyxl, progress, pandas, numpy, psutil, GPUtil, jinja2
+# python -m pip install openpyxl progress pandas numpy psutil GPUtil jinja2
 
 # Compile RAYX in Release mode
 # Close all other programs
@@ -42,9 +42,10 @@ rml_files = {
     "toroid.rml",
 }
 
-
 def parse_benchmark_results(result_string):
-    pattern = r"BENCH: ([\w\-\:\.]+): \r\n([\de\-\.]+)s"
+    # Making \r optional to support both Windows and Linux
+    pattern = r"BENCH: ([\w\-\:\.]+): \r?\n([\de\-\.]+)s"
+    
     matches = re.findall(pattern, result_string)
 
     result_dict = {}
@@ -53,14 +54,18 @@ def parse_benchmark_results(result_string):
             result_dict[name] += float(time)
         else:
             result_dict[name] = float(time)
+
+    #print(result_dict)
     return result_dict
 
 
 # Only execute inside IDE with rayx as root
 def checkForTerminal():
     cwd = os.getcwd()
-    TerminalApp_Path = "build/bin/release/rayx.exe"
-    path_to_input = "scripts/benchmark-inputs/"
+    TerminalApp_Path = "build/bin/release/rayx"
+    if platform.system() == "Windows":
+        TerminalApp_Path += ".exe"
+    path_to_input = "Scripts/benchmark-inputs/"
     test = os.path.join(cwd, TerminalApp_Path)
     return os.path.exists(test), test, path_to_input
 
@@ -97,13 +102,11 @@ def get_cpu_info():
                 .strip()
             )
         elif platform.system() == "Linux":
-            return (
-                subprocess.check_output("lscpu")
-                .decode()
-                .split("\n")[0]
-                .split(":")[1]
-                .strip()
-            )
+            output = subprocess.check_output("lscpu").decode().split("\n")
+            for line in output:
+                if "Model name:" in line:
+                    return line.split(":")[1].strip()
+            
         else:
             return "Unknown system, couldn't get CPU info"
     except Exception as e:
