@@ -44,5 +44,5 @@ class UIRenderSystem {
 
     void showSceneEditorWindow(UIParameters& uiParams);
     void showSettingsWindow();
-    void showBeamlineOutlineWindow(FrameInfo& frameInfo);
+    void showHotkeysWindow();
 };

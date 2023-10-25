@@ -157,6 +157,7 @@ void UIRenderSystem::setupUI(UIParameters& uiParams) {
 
     showSceneEditorWindow(uiParams);
     showSettingsWindow();
+    showHotkeysWindow();
 
     ImGui::PopFont();
 }
@@ -230,6 +231,27 @@ void UIRenderSystem::showSettingsWindow() {
     if (ImGui::Button("Toggle Large Font")) {
         m_useLargeFont = !m_useLargeFont;
     }
+
+    ImGui::End();
+}
+
+void UIRenderSystem::showHotkeysWindow() {
+    ImGui::SetNextWindowPos(ImVec2(0, 450), ImGuiCond_Once);
+    ImGui::SetNextWindowSize(ImVec2(450, 400), ImGuiCond_Once);
+
+    ImGui::Begin("Hotkeys");
+
+    ImGui::Text("Keyboard Hotkeys:");
+    ImGui::Separator();
+    ImGui::Text("ESC: Close the window");
+    ImGui::Text("F11: Fullscreen mode");
+    ImGui::Text("F10: Windowed mode");
+    ImGui::Separator();
+    ImGui::Text("W, A, S, D: Camera movement (along plane)");
+    ImGui::Text("Q: Move camera downward");
+    ImGui::Text("E: Move camera upward");
+    ImGui::Separator();
+    ImGui::Text("Hold SHIFT for faster movement");
 
     ImGui::End();
 }
