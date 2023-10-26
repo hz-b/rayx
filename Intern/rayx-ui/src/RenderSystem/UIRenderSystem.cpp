@@ -286,7 +286,11 @@ void renderImGuiTreeFromRML(const std::filesystem::path& filename) {
 void renderImGuiTreeFromXMLNode(rapidxml::xml_node<>* node) {
     for (rapidxml::xml_node<>* object = node->first_node(); object; object = object->next_sibling()) {
         if (strcmp(object->name(), "object") == 0) {
-            ImGui::Text("%s", object->first_attribute("name")->value());
+            if (ImGui::Selectable(object->first_attribute("name")->value())) {
+                // Handle object selection logic here
+                // e.g. print name to console
+                std::cout << "Selected object: " << object->first_attribute("name")->value() << std::endl;
+            }
         } else if (strcmp(object->name(), "group") == 0) {
             if (ImGui::TreeNode(object->first_attribute("name")->value())) {
                 renderImGuiTreeFromXMLNode(object);
