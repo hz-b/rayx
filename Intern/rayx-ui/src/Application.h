@@ -23,7 +23,6 @@ class Window;
 class Device;
 class RenderObject;
 struct Line;
-struct UIContents;
 
 class Application {
   public:
@@ -51,7 +50,5 @@ class Application {
 
     std::unique_ptr<DescriptorPool> m_DescriptorPool{nullptr};
 
-    void updateScene(const std::string& path, UIContents& uiCont, std::vector<RenderObject>& rObjects, std::vector<Line>& rays,
-                     std::optional<RenderObject>& rayObj);
-    static void updateUIContents(UIContents& uiContents, const std::vector<RenderObject>& rObjects);
+    void updateScene(const std::string& path, std::vector<RenderObject>& rObjects, std::vector<Line>& rays, std::optional<RenderObject>& rayObj);
 };

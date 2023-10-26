@@ -20,13 +20,6 @@ struct UIParameters {
     float frameTime;
 };
 
-/*
- * UI Content such as meta-data, names, and values
- */
-struct UIContents {
-    std::vector<std::string> rObjectNames;
-};
-
 class UIRenderSystem {
   public:
     UIRenderSystem(const Window& window, const Device& device, VkFormat imageFormat, VkFormat depthFormat, uint32_t imageCount);
@@ -34,7 +27,7 @@ class UIRenderSystem {
     UIRenderSystem& operator=(const UIRenderSystem&) = delete;
     ~UIRenderSystem();
 
-    void setupUI(UIParameters& uiParams, UIContents& uiContents);
+    void setupUI(UIParameters& uiParams);
     void render(VkCommandBuffer commandBuffer);
 
     VkClearValue getClearValue() const { return {m_ClearColor[0], m_ClearColor[1], m_ClearColor[2], m_ClearColor[3]}; }
@@ -55,5 +48,9 @@ class UIRenderSystem {
 
     void showSceneEditorWindow(UIParameters& uiParams);
     void showSettingsWindow();
-    void showBeamlineOutlineWindow(UIContents& uiContents);
+    void showBeamlineOutlineWindow(UIParameters& uiParams);
 };
+
+void renderImGuiTreeFromRML(const std::filesystem::path& filename);
+
+void renderImGuiTreeFromXMLNode(rapidxml::xml_node<>* node);

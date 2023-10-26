@@ -149,7 +149,7 @@ UIRenderSystem::~UIRenderSystem() {
  * @param uiParams
  * @param rObjects
  */
-void UIRenderSystem::setupUI(UIParameters& uiParams, UIContents& uiContents) {
+void UIRenderSystem::setupUI(UIParameters& uiParams) {
     ImGui_ImplVulkan_NewFrame();
     ImGui_ImplGlfw_NewFrame();
     ImGui::NewFrame();
@@ -162,7 +162,7 @@ void UIRenderSystem::setupUI(UIParameters& uiParams, UIContents& uiContents) {
 
     showSceneEditorWindow(uiParams);
     showSettingsWindow();
-    showBeamlineOutlineWindow(uiContents);
+    showBeamlineOutlineWindow(uiParams);
 
     ImGui::PopFont();
 }
@@ -239,28 +239,70 @@ void UIRenderSystem::showSettingsWindow() {
 
     ImGui::End();
 }
+void renderImGuiTreeFromRML(const std::filesystem::path& filename) {
+    // Check if file exists
+    if (!std::filesystem::exists(filename)) {
+        ImGui::Text("Choose a file to display the beamline outline.");
+        return;
+    }
 
-void UIRenderSystem::showBeamlineOutlineWindow(UIContents& uiContents) {
+    // Read and parse the RML file
+    std::ifstream t(filename);
+    if (!t.is_open()) {
+        ImGui::Text("Error: Could not open file.");
+        return;
+    }
+
+    std::stringstream buffer;
+    buffer << t.rdbuf();
+    std::string test = buffer.str();
+
+    // Check if the file is empty
+    if (test.empty()) {
+        ImGui::Text("Error: File is empty.");
+        return;
+    }
+
+    std::vector<char> cstr(test.c_str(), test.c_str() + test.size() + 1);
+    rapidxml::xml_document<> doc;
+
+    try {
+        doc.parse<0>(cstr.data());
+    } catch (rapidxml::parse_error& e) {
+        ImGui::Text("Error: XML Parsing failed.");
+        return;
+    }
+
+    rapidxml::xml_node<>* xml_beamline = doc.first_node("lab")->first_node("beamline");
+    if (xml_beamline == nullptr) {
+        ImGui::Text("Error: <beamline> not found in XML.");
+        return;
+    }
+
+    // Call recursive function to handle the object collection and render the ImGui tree
+    renderImGuiTreeFromXMLNode(xml_beamline);
+}
+
+void renderImGuiTreeFromXMLNode(rapidxml::xml_node<>* node) {
+    for (rapidxml::xml_node<>* object = node->first_node(); object; object = object->next_sibling()) {
+        if (strcmp(object->name(), "object") == 0) {
+            ImGui::Text("%s", object->first_attribute("name")->value());
+        } else if (strcmp(object->name(), "group") == 0) {
+            if (ImGui::TreeNode(object->first_attribute("name")->value())) {
+                renderImGuiTreeFromXMLNode(object);
+                ImGui::TreePop();
+            }
+        }
+    }
+}
+
+void UIRenderSystem::showBeamlineOutlineWindow(UIParameters& uiParams) {
     ImGui::SetNextWindowPos(ImVec2(0, 450), ImGuiCond_Once);  // Position it below the Settings window
     ImGui::SetNextWindowSize(ImVec2(450, 100), ImGuiCond_Once);
 
     ImGui::Begin("Beamline Outline");
 
-    for (const auto& objNames : uiContents.rObjectNames) {
-        if (ImGui::TreeNode(objNames.c_str())) {
-            ImGui::SameLine(0,0);
-            if (ImGui::Button("Click Me")) {
-                // Handle button click
-                std::cout << "Clicked";
-            }
-            // You can add more UI elements related to each RenderObject here.
-            // For example, you can show more details or child nodes.
-            ImGui::Text("Some details about %s", objNames.c_str());
-
-            // Close the tree node
-            ImGui::TreePop();
-        }
-    }
+    renderImGuiTreeFromRML(uiParams.rmlPath);
 
     ImGui::End();
 }

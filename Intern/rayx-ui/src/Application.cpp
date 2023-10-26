@@ -69,7 +69,6 @@ void Application::run() {
     glfwSetWindowUserPointer(m_Window.window(), &camController);
 
     auto currentTime = std::chrono::high_resolution_clock::now();
-    UIContents uiCont;
     std::vector<RenderObject> rObjects;
     std::vector<Line> rays;
     std::optional<RenderObject> rayObj;
@@ -77,9 +76,10 @@ void Application::run() {
     // CLI Input
     std::string rmlPathCli = m_CommandParser.m_args.m_providedFile;
     if (!rmlPathCli.empty()) {
-        updateScene(rmlPathCli, uiCont, rObjects, rays, rayObj);
+        updateScene(rmlPathCli, rObjects, rays, rayObj);
     }
 
+    UIParameters uiParams{camController, rmlPathCli, false, 0.0};
     // Main loop
     while (!m_Window.shouldClose()) {
         // Skip rendering when minimized
@@ -92,14 +92,14 @@ void Application::run() {
             // Params to pass to UI
             auto newTime = std::chrono::high_resolution_clock::now();
             float frameTime = std::chrono::duration<float, std::chrono::seconds::period>(newTime - currentTime).count();
+            uiParams.frameTime = frameTime;
             currentTime = newTime;
-            UIParameters uiParams{camController, "", false, frameTime};
 
             // Update UI and camera
-            m_ImGuiLayer.setupUI(uiParams, uiCont);
+            m_ImGuiLayer.setupUI(uiParams);
             camController.update(cam, m_Renderer.getAspectRatio());
             if (uiParams.pathChanged) {
-                updateScene(uiParams.rmlPath.string(), uiCont, rObjects, rays, rayObj);
+                updateScene(uiParams.rmlPath.string(), rObjects, rays, rayObj);
                 uiParams.pathChanged = false;
                 camController.lookAtPoint(rObjects[0].getTranslationVecor());
             }
@@ -129,7 +129,7 @@ void Application::run() {
     vkDeviceWaitIdle(m_Device.device());
 }
 
-void Application::updateScene(const std::string& path, UIContents& uiCont, std::vector<RenderObject>& rObjects, std::vector<Line>& rays,
+void Application::updateScene(const std::string& path, std::vector<RenderObject>& rObjects, std::vector<Line>& rays,
                               std::optional<RenderObject>& rayObj) {
     RAYX::Beamline beamline = RAYX::importBeamline(path);
 #ifndef NO_H5
@@ -156,22 +156,5 @@ void Application::updateScene(const std::string& path, UIContents& uiCont, std::
             rayIndices[i * 2 + 1] = i * 2 + 1;
         }
         rayObj.emplace("Rays", m_Device, glm::mat4(1.0f), rayVertices, rayIndices);
-    }
-    // UI Contents must stay up-to-date
-    updateUIContents(uiCont, rObjects);
-}
-
-/**
- * @brief populates the `UIContents` structure according to the provided scene objects etc.
- *
- * @param uiContents UI Struct to update
- * @param rObjects
- */
-void Application::updateUIContents(UIContents& uiContents, const std::vector<RenderObject>& rObjects) {
-    // Update Scene render object name;
-    uiContents.rObjectNames.clear();
-    uiContents.rObjectNames.reserve(rObjects.size());
-    for (auto& obj : rObjects) {
-        uiContents.rObjectNames.push_back(obj.getName());
     }
 }
