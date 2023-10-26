@@ -29,7 +29,7 @@ RenderObject marchingCubeTriangulation(const RAYX::OpticalElement& element, Devi
         indices.push_back(i * 3 + 1);
         indices.push_back(i * 3 + 2);
     }
-    return RenderObject(device, element.m_element.m_outTrans, vertices, indices);
+    return RenderObject(element.m_name, device, element.m_element.m_outTrans, vertices, indices);
 }
 
 /**

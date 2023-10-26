@@ -8,6 +8,7 @@
 #include "FrameInfo.h"
 #include "GraphicsCore/Device.h"
 #include "GraphicsCore/Swapchain.h"
+#include "RenderObject.h"
 
 struct UIParameters {
     CameraController& camController;
@@ -23,7 +24,7 @@ class UIRenderSystem {
     UIRenderSystem& operator=(const UIRenderSystem&) = delete;
     ~UIRenderSystem();
 
-    void setupUI(UIParameters& uiParams);
+    void setupUI(UIParameters& uiParams, const std::vector<RenderObject>& rObjects);
     void render(VkCommandBuffer commandBuffer);
 
     VkClearValue getClearValue() const { return {m_ClearColor[0], m_ClearColor[1], m_ClearColor[2], m_ClearColor[3]}; }
@@ -44,5 +45,5 @@ class UIRenderSystem {
 
     void showSceneEditorWindow(UIParameters& uiParams);
     void showSettingsWindow();
-    void showBeamlineOutlineWindow(FrameInfo& frameInfo);
+    void showBeamlineOutlineWindow(const std::vector<RenderObject>& rObjects);
 };

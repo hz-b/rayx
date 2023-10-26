@@ -95,7 +95,7 @@ void Application::run() {
             UIParameters uiParams{camController, "", false, frameTime};
 
             // Update UI and camera
-            m_ImGuiLayer.setupUI(uiParams);
+            m_ImGuiLayer.setupUI(uiParams, rObjects);
             camController.update(cam, m_Renderer.getAspectRatio());
             if (uiParams.pathChanged) {
                 updateScene(uiParams.rmlPath.string().c_str(), rObjects, rays, rayObj);
@@ -154,6 +154,6 @@ void Application::updateScene(const std::string& path, std::vector<RenderObject>
             rayIndices[i * 2] = i * 2;
             rayIndices[i * 2 + 1] = i * 2 + 1;
         }
-        rayObj.emplace(m_Device, glm::mat4(1.0f), rayVertices, rayIndices);
+        rayObj.emplace("Ray", m_Device, glm::mat4(1.0f), rayVertices, rayIndices);
     }
 }

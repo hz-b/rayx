@@ -144,7 +144,7 @@ UIRenderSystem::~UIRenderSystem() {
     ImGui::DestroyContext();
 }
 
-void UIRenderSystem::setupUI(UIParameters& uiParams) {
+void UIRenderSystem::setupUI(UIParameters& uiParams, const std::vector<RenderObject>& rObjects) {
     ImGui_ImplVulkan_NewFrame();
     ImGui_ImplGlfw_NewFrame();
     ImGui::NewFrame();
@@ -157,6 +157,7 @@ void UIRenderSystem::setupUI(UIParameters& uiParams) {
 
     showSceneEditorWindow(uiParams);
     showSettingsWindow();
+    showBeamlineOutlineWindow(rObjects);
 
     ImGui::PopFont();
 }
@@ -229,6 +230,31 @@ void UIRenderSystem::showSettingsWindow() {
 
     if (ImGui::Button("Toggle Large Font")) {
         m_useLargeFont = !m_useLargeFont;
+    }
+
+    ImGui::End();
+}
+
+void UIRenderSystem::showBeamlineOutlineWindow(const std::vector<RenderObject>& rObjects) {
+    ImGui::SetNextWindowPos(ImVec2(0, 450), ImGuiCond_Once);  // Position it below the Settings window
+    ImGui::SetNextWindowSize(ImVec2(450, 100), ImGuiCond_Once);
+
+    ImGui::Begin("Beamline Outline");
+
+    for (const auto& obj : rObjects) {
+        if (ImGui::TreeNode(obj.getName().c_str())) {
+            // You can add more UI elements related to each RenderObject here.
+            // For example, you can show more details or child nodes.
+            ImGui::Text("Some details about %s", obj.getName().c_str());
+
+            // Close the tree node
+            ImGui::TreePop();
+        }
+    }
+    // UI elements here. For example:
+    if (ImGui::Button("Show Beamline Info")) {
+        // Handle the button click action
+        // frameInfo.someFlag = true;
     }
 
     ImGui::End();
