@@ -10,11 +10,21 @@
 #include "GraphicsCore/Swapchain.h"
 #include "RenderObject.h"
 
+/**
+ * UI Parameters such as toggles, paths, etc.
+ */
 struct UIParameters {
     CameraController& camController;
     std::filesystem::path rmlPath;
     bool pathChanged;
     float frameTime;
+};
+
+/*
+ * UI Content such as meta-data, names, and values
+ */
+struct UIContents {
+    std::vector<std::string> rObjectNames;
 };
 
 class UIRenderSystem {
@@ -24,7 +34,7 @@ class UIRenderSystem {
     UIRenderSystem& operator=(const UIRenderSystem&) = delete;
     ~UIRenderSystem();
 
-    void setupUI(UIParameters& uiParams, const std::vector<RenderObject>& rObjects);
+    void setupUI(UIParameters& uiParams, UIContents& uiContents);
     void render(VkCommandBuffer commandBuffer);
 
     VkClearValue getClearValue() const { return {m_ClearColor[0], m_ClearColor[1], m_ClearColor[2], m_ClearColor[3]}; }
@@ -45,5 +55,5 @@ class UIRenderSystem {
 
     void showSceneEditorWindow(UIParameters& uiParams);
     void showSettingsWindow();
-    void showBeamlineOutlineWindow(const std::vector<RenderObject>& rObjects);
+    void showBeamlineOutlineWindow(UIContents& uiContents);
 };

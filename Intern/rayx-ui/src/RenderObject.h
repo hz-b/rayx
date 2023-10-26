@@ -30,6 +30,7 @@ class RenderObject {
   public:
     /**
      * @brief Constructor that initializes the rendering object.
+     * @param name Render Object name, usually read from Beamline
      * @param device Reference to a Device object.
      * @param modelMatrix Transformation matrix to go from model to world coordinates.
      * @param vertices Vector of Vertex objects.

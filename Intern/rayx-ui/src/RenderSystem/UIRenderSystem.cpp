@@ -143,8 +143,13 @@ UIRenderSystem::~UIRenderSystem() {
     ImGui_ImplGlfw_Shutdown();
     ImGui::DestroyContext();
 }
-
-void UIRenderSystem::setupUI(UIParameters& uiParams, const std::vector<RenderObject>& rObjects) {
+/**
+ * @brief
+ *
+ * @param uiParams
+ * @param rObjects
+ */
+void UIRenderSystem::setupUI(UIParameters& uiParams, UIContents& uiContents) {
     ImGui_ImplVulkan_NewFrame();
     ImGui_ImplGlfw_NewFrame();
     ImGui::NewFrame();
@@ -157,7 +162,7 @@ void UIRenderSystem::setupUI(UIParameters& uiParams, const std::vector<RenderObj
 
     showSceneEditorWindow(uiParams);
     showSettingsWindow();
-    showBeamlineOutlineWindow(rObjects);
+    showBeamlineOutlineWindow(uiContents);
 
     ImGui::PopFont();
 }
@@ -235,26 +240,26 @@ void UIRenderSystem::showSettingsWindow() {
     ImGui::End();
 }
 
-void UIRenderSystem::showBeamlineOutlineWindow(const std::vector<RenderObject>& rObjects) {
+void UIRenderSystem::showBeamlineOutlineWindow(UIContents& uiContents) {
     ImGui::SetNextWindowPos(ImVec2(0, 450), ImGuiCond_Once);  // Position it below the Settings window
     ImGui::SetNextWindowSize(ImVec2(450, 100), ImGuiCond_Once);
 
     ImGui::Begin("Beamline Outline");
 
-    for (const auto& obj : rObjects) {
-        if (ImGui::TreeNode(obj.getName().c_str())) {
+    for (const auto& objNames : uiContents.rObjectNames) {
+        if (ImGui::TreeNode(objNames.c_str())) {
+            ImGui::SameLine(0,0);
+            if (ImGui::Button("Click Me")) {
+                // Handle button click
+                std::cout << "Clicked";
+            }
             // You can add more UI elements related to each RenderObject here.
             // For example, you can show more details or child nodes.
-            ImGui::Text("Some details about %s", obj.getName().c_str());
+            ImGui::Text("Some details about %s", objNames.c_str());
 
             // Close the tree node
             ImGui::TreePop();
         }
-    }
-    // UI elements here. For example:
-    if (ImGui::Button("Show Beamline Info")) {
-        // Handle the button click action
-        // frameInfo.someFlag = true;
     }
 
     ImGui::End();

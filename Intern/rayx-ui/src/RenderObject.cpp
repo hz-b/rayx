@@ -5,7 +5,7 @@
  * Constructor sets up vertex and index buffers based on the input parameters.
  */
 RenderObject::RenderObject(std::string name, Device& device, glm::mat4 modelMatrix, std::vector<Vertex>& vertices, std::vector<uint32_t>& indices)
-    : m_Device(device), m_modelMatrix(modelMatrix), m_name(name) {
+    : m_name(name), m_Device(device), m_modelMatrix(modelMatrix) {
     createVertexBuffers(vertices);
     createIndexBuffers(indices);
 
