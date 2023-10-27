@@ -75,7 +75,7 @@ void Application::run() {
 
     // CLI Input
     std::string rmlPathCli = m_CommandParser.m_args.m_providedFile;
-    UIParameters uiParams{camController, rmlPathCli, !rmlPathCli.empty(), 0.0};
+    UIParameters uiParams{camController, rmlPathCli, !rmlPathCli.empty(), 0.0, nullptr};
 
     // Main loop
     while (!m_Window.shouldClose()) {
@@ -89,17 +89,22 @@ void Application::run() {
             // Params to pass to UI
             auto newTime = std::chrono::high_resolution_clock::now();
             uiParams.frameTime = std::chrono::duration<float, std::chrono::seconds::period>(newTime - currentTime).count();
+            uiParams.pSelectedObjectFromTree = nullptr;
             currentTime = newTime;
 
             // Update UI and camera
             m_ImGuiLayer.setupUI(uiParams);
-            //camController.update(cam, m_Renderer.getAspectRatio());
+            // camController.update(cam, m_Renderer.getAspectRatio());
             if (uiParams.pathChanged) {
                 updateScene(uiParams.rmlPath.string(), rObjects, rays, rayObj);
                 uiParams.pathChanged = false;
                 camController.lookAtPoint(rObjects[0].getTranslationVecor());
             }
-
+            if (uiParams.pSelectedObjectFromTree != nullptr) {
+                std::cout << "object \n";
+                auto selectedObject = (UIRenderSystem::TreeNode*)uiParams.pSelectedObjectFromTree;
+                std::cout << selectedObject->name;
+            }
             camController.update(cam, m_Renderer.getAspectRatio());
 
             // Update UBO

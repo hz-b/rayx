@@ -18,6 +18,7 @@ struct UIParameters {
     std::filesystem::path rmlPath;
     bool pathChanged;
     float frameTime;
+    void* pSelectedObjectFromTree;
 };
 
 class UIRenderSystem {
@@ -59,5 +60,5 @@ class UIRenderSystem {
     void showSettingsWindow();
     void showBeamlineOutlineWindow(UIParameters& uiParams);
 
-    void renderImGuiTreeFromRML(const std::filesystem::path& filename);
+    void renderImGuiTreeFromRML(const std::filesystem::path& filename, UIRenderSystem::TreeNode& pSelecetedObject);
 };

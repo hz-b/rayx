@@ -238,16 +238,18 @@ void UIRenderSystem::showSettingsWindow() {
     ImGui::End();
 }
 
-void renderImGuiTree(const UIRenderSystem::TreeNode& treeNode) {
+void renderImGuiTree(UIRenderSystem::TreeNode& treeNode, UIRenderSystem::TreeNode*& pSelecetedObject) {
     for (auto& child : treeNode.children) {
         if (child.children.empty()) {
+            bool isSelected = pSelecetedObject == &child;
             if (ImGui::Selectable(child.name.c_str())) {
                 // Handle selection logic here
                 std::cout << "Selected object: " << child.name << std::endl;
+                pSelecetedObject = (&child);
             }
         } else {
             if (ImGui::TreeNode(child.name.c_str())) {
-                renderImGuiTree(child);
+                renderImGuiTree(child, pSelecetedObject);
                 ImGui::TreePop();
             }
         }
@@ -266,7 +268,7 @@ void buildTreeFromXMLNode(rapidxml::xml_node<>* node, UIRenderSystem::TreeNode& 
     }
 }
 
-void UIRenderSystem::renderImGuiTreeFromRML(const std::filesystem::path& filename) {
+void UIRenderSystem::renderImGuiTreeFromRML(const std::filesystem::path& filename, UIRenderSystem::TreeNode*& pSelecetedObject) {
     // Check if file exists
     if (!std::filesystem::exists(filename)) {
         ImGui::Text("Choose a file to display the beamline outline.");
@@ -309,7 +311,7 @@ void UIRenderSystem::renderImGuiTreeFromRML(const std::filesystem::path& filenam
     // Call recursive function to handle the object collection and render the ImGui tree
     m_pTreeRoot = std::make_unique<UIRenderSystem::TreeNode>("Root");
     buildTreeFromXMLNode(xml_beamline, *m_pTreeRoot);
-    renderImGuiTree(*m_pTreeRoot);
+    renderImGuiTree(*m_pTreeRoot, &pSelecetedObject);
 }
 
 void UIRenderSystem::showBeamlineOutlineWindow(UIParameters& uiParams) {
@@ -320,13 +322,13 @@ void UIRenderSystem::showBeamlineOutlineWindow(UIParameters& uiParams) {
 
     if (uiParams.pathChanged) {
         // Create and render new Tree
-        renderImGuiTreeFromRML(uiParams.rmlPath);
+        renderImGuiTreeFromRML(uiParams.rmlPath, uiParams.pSelectedObjectFromTree);
     } else if (m_pTreeRoot == nullptr) {
         // Do nothing
         ImGui::Text("Choose a file to display the beamline outline.");
     } else {
         // Render same Tree
-        renderImGuiTree(*m_pTreeRoot);
+        renderImGuiTree(*m_pTreeRoot, (uiParams.pSelectedObjectFromTree));
     }
 
     ImGui::End();
