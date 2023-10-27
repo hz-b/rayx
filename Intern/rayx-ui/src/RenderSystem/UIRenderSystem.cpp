@@ -4,8 +4,6 @@
 #include <imgui_impl_glfw.h>
 #include <imgui_impl_vulkan.h>
 
-#include <glm/gtx/quaternion.hpp>
-
 #include "CanonicalizePath.h"
 
 void checkVkResult(VkResult result, const char* message) {
@@ -239,7 +237,36 @@ void UIRenderSystem::showSettingsWindow() {
 
     ImGui::End();
 }
-void renderImGuiTreeFromRML(const std::filesystem::path& filename) {
+
+void renderImGuiTree(const UIRenderSystem::TreeNode& treeNode) {
+    for (auto& child : treeNode.children) {
+        if (child.children.empty()) {
+            if (ImGui::Selectable(child.name.c_str())) {
+                // Handle selection logic here
+                std::cout << "Selected object: " << child.name << std::endl;
+            }
+        } else {
+            if (ImGui::TreeNode(child.name.c_str())) {
+                renderImGuiTree(child);
+                ImGui::TreePop();
+            }
+        }
+    }
+}
+
+void buildTreeFromXMLNode(rapidxml::xml_node<>* node, UIRenderSystem::TreeNode& treeNode) {
+    for (rapidxml::xml_node<>* xmlChild = node->first_node(); xmlChild; xmlChild = xmlChild->next_sibling()) {
+        if (strcmp(xmlChild->name(), "object") == 0) {
+            treeNode.children.emplace_back(xmlChild->first_attribute("name")->value());
+        } else if (strcmp(xmlChild->name(), "group") == 0) {
+            UIRenderSystem::TreeNode groupNode(xmlChild->first_attribute("name")->value());
+            buildTreeFromXMLNode(xmlChild, groupNode);
+            treeNode.children.push_back(groupNode);
+        }
+    }
+}
+
+void UIRenderSystem::renderImGuiTreeFromRML(const std::filesystem::path& filename) {
     // Check if file exists
     if (!std::filesystem::exists(filename)) {
         ImGui::Text("Choose a file to display the beamline outline.");
@@ -247,14 +274,14 @@ void renderImGuiTreeFromRML(const std::filesystem::path& filename) {
     }
 
     // Read and parse the RML file
-    std::ifstream t(filename);
-    if (!t.is_open()) {
+    std::ifstream fileContent(filename);
+    if (!fileContent.is_open()) {
         ImGui::Text("Error: Could not open file.");
         return;
     }
 
     std::stringstream buffer;
-    buffer << t.rdbuf();
+    buffer << fileContent.rdbuf();
     std::string test = buffer.str();
 
     // Check if the file is empty
@@ -280,24 +307,9 @@ void renderImGuiTreeFromRML(const std::filesystem::path& filename) {
     }
 
     // Call recursive function to handle the object collection and render the ImGui tree
-    renderImGuiTreeFromXMLNode(xml_beamline);
-}
-
-void renderImGuiTreeFromXMLNode(rapidxml::xml_node<>* node) {
-    for (rapidxml::xml_node<>* object = node->first_node(); object; object = object->next_sibling()) {
-        if (strcmp(object->name(), "object") == 0) {
-            if (ImGui::Selectable(object->first_attribute("name")->value())) {
-                // Handle object selection logic here
-                // e.g. print name to console
-                std::cout << "Selected object: " << object->first_attribute("name")->value() << std::endl;
-            }
-        } else if (strcmp(object->name(), "group") == 0) {
-            if (ImGui::TreeNode(object->first_attribute("name")->value())) {
-                renderImGuiTreeFromXMLNode(object);
-                ImGui::TreePop();
-            }
-        }
-    }
+    m_pTreeRoot = std::make_unique<UIRenderSystem::TreeNode>("Root");
+    buildTreeFromXMLNode(xml_beamline, *m_pTreeRoot);
+    renderImGuiTree(*m_pTreeRoot);
 }
 
 void UIRenderSystem::showBeamlineOutlineWindow(UIParameters& uiParams) {
@@ -306,7 +318,16 @@ void UIRenderSystem::showBeamlineOutlineWindow(UIParameters& uiParams) {
 
     ImGui::Begin("Beamline Outline");
 
-    renderImGuiTreeFromRML(uiParams.rmlPath);
+    if (uiParams.pathChanged) {
+        // Create and render new Tree
+        renderImGuiTreeFromRML(uiParams.rmlPath);
+    } else if (m_pTreeRoot == nullptr) {
+        // Do nothing
+        ImGui::Text("Choose a file to display the beamline outline.");
+    } else {
+        // Render same Tree
+        renderImGuiTree(*m_pTreeRoot);
+    }
 
     ImGui::End();
 }

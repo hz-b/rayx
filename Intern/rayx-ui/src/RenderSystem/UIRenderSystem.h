@@ -32,6 +32,14 @@ class UIRenderSystem {
 
     VkClearValue getClearValue() const { return {m_ClearColor[0], m_ClearColor[1], m_ClearColor[2], m_ClearColor[3]}; }
 
+    // Simple TreeNode
+    struct TreeNode {
+        std::string name;
+        std::vector<TreeNode> children;
+
+        TreeNode(const char* nodeName) : name(nodeName) {}
+    };
+
   private:
     const Window& m_Window;
     const Device& m_Device;
@@ -41,6 +49,7 @@ class UIRenderSystem {
     bool m_useLargeFont = false;
     ImFont* m_smallFont;
     ImFont* m_largeFont;
+    std::unique_ptr<TreeNode> m_pTreeRoot;
 
     VkRenderPass m_RenderPass;
     VkDescriptorPool m_DescriptorPool;
@@ -49,8 +58,6 @@ class UIRenderSystem {
     void showSceneEditorWindow(UIParameters& uiParams);
     void showSettingsWindow();
     void showBeamlineOutlineWindow(UIParameters& uiParams);
+
+    void renderImGuiTreeFromRML(const std::filesystem::path& filename);
 };
-
-void renderImGuiTreeFromRML(const std::filesystem::path& filename);
-
-void renderImGuiTreeFromXMLNode(rapidxml::xml_node<>* node);
