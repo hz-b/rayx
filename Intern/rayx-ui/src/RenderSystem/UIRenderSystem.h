@@ -18,7 +18,6 @@ struct UIParameters {
     std::filesystem::path rmlPath;
     bool pathChanged;
     float frameTime;
-    void* pSelectedObjectFromTree;
 };
 
 class UIRenderSystem {
@@ -36,9 +35,11 @@ class UIRenderSystem {
     // Simple TreeNode
     struct TreeNode {
         std::string name;
+        std::string type;  // Add this field for type
+        int index = -1;    // Add this field for index
         std::vector<TreeNode> children;
 
-        TreeNode(const char* nodeName) : name(nodeName) {}
+        TreeNode(const std::string& name, const std::string& type = "") : name(name), type(type) {}
     };
 
   private:
@@ -56,9 +57,14 @@ class UIRenderSystem {
     VkDescriptorPool m_DescriptorPool;
     ImGuiIO m_IO;
 
+    int lightSourceIndex = 0;
+    int opticalElementIndex = 0;
+
     void showSceneEditorWindow(UIParameters& uiParams);
     void showSettingsWindow();
     void showBeamlineOutlineWindow(UIParameters& uiParams);
 
-    void renderImGuiTreeFromRML(const std::filesystem::path& filename, UIRenderSystem::TreeNode& pSelecetedObject);
+    void renderImGuiTreeFromRML(const std::filesystem::path& filename);
+
+    void buildTreeFromXMLNode(rapidxml::xml_node<>* node, UIRenderSystem::TreeNode& treeNode);
 };

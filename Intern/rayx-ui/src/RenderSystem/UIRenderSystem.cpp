@@ -238,28 +238,46 @@ void UIRenderSystem::showSettingsWindow() {
     ImGui::End();
 }
 
-void renderImGuiTree(UIRenderSystem::TreeNode& treeNode, UIRenderSystem::TreeNode*& pSelecetedObject) {
+void renderImGuiTree(const UIRenderSystem::TreeNode& treeNode) {
     for (auto& child : treeNode.children) {
         if (child.children.empty()) {
-            bool isSelected = pSelecetedObject == &child;
-            if (ImGui::Selectable(child.name.c_str())) {
+            std::string label = child.name;
+
+            if (child.index != -1) {
+                label;
+            }
+
+            if (ImGui::Selectable(label.c_str())) {
                 // Handle selection logic here
-                std::cout << "Selected object: " << child.name << std::endl;
-                pSelecetedObject = (&child);
+                std::cout << "Selected object: " << child.name << " with index " << child.index << std::endl;
             }
         } else {
             if (ImGui::TreeNode(child.name.c_str())) {
-                renderImGuiTree(child, pSelecetedObject);
+                renderImGuiTree(child);
                 ImGui::TreePop();
             }
         }
     }
 }
 
-void buildTreeFromXMLNode(rapidxml::xml_node<>* node, UIRenderSystem::TreeNode& treeNode) {
+void UIRenderSystem::buildTreeFromXMLNode(rapidxml::xml_node<>* node, UIRenderSystem::TreeNode& treeNode) {
     for (rapidxml::xml_node<>* xmlChild = node->first_node(); xmlChild; xmlChild = xmlChild->next_sibling()) {
+        rapidxml::xml_attribute<>* typeAttr = xmlChild->first_attribute("type");
+        std::string type = typeAttr ? typeAttr->value() : "";
+
         if (strcmp(xmlChild->name(), "object") == 0) {
-            treeNode.children.emplace_back(xmlChild->first_attribute("name")->value());
+            UIRenderSystem::TreeNode objectNode(xmlChild->first_attribute("name")->value(), type);
+
+            if (type == "Point Source" || type == "Matrix Source" || type == "Dipole" || type == "Dipole Source" || type == "Pixel Source" ||
+                type == "Circle Source") {
+                objectNode.index = lightSourceIndex++;
+            } else if (type == "ImagePlane" || type == "Plane Mirror" || type == "Toroid" || type == "Slit" || type == "Spherical Grating" ||
+                       type == "Plane Grating" || type == "Sphere" || type == "Reflection Zoneplate" || type == "Ellipsoid" || type == "Cylinder" ||
+                       type == "Cone") {
+                objectNode.index = opticalElementIndex++;
+            }
+
+            treeNode.children.emplace_back(objectNode);
         } else if (strcmp(xmlChild->name(), "group") == 0) {
             UIRenderSystem::TreeNode groupNode(xmlChild->first_attribute("name")->value());
             buildTreeFromXMLNode(xmlChild, groupNode);
@@ -268,7 +286,7 @@ void buildTreeFromXMLNode(rapidxml::xml_node<>* node, UIRenderSystem::TreeNode& 
     }
 }
 
-void UIRenderSystem::renderImGuiTreeFromRML(const std::filesystem::path& filename, UIRenderSystem::TreeNode*& pSelecetedObject) {
+void UIRenderSystem::renderImGuiTreeFromRML(const std::filesystem::path& filename) {
     // Check if file exists
     if (!std::filesystem::exists(filename)) {
         ImGui::Text("Choose a file to display the beamline outline.");
@@ -311,7 +329,7 @@ void UIRenderSystem::renderImGuiTreeFromRML(const std::filesystem::path& filenam
     // Call recursive function to handle the object collection and render the ImGui tree
     m_pTreeRoot = std::make_unique<UIRenderSystem::TreeNode>("Root");
     buildTreeFromXMLNode(xml_beamline, *m_pTreeRoot);
-    renderImGuiTree(*m_pTreeRoot, &pSelecetedObject);
+    renderImGuiTree(*m_pTreeRoot);
 }
 
 void UIRenderSystem::showBeamlineOutlineWindow(UIParameters& uiParams) {
@@ -322,13 +340,13 @@ void UIRenderSystem::showBeamlineOutlineWindow(UIParameters& uiParams) {
 
     if (uiParams.pathChanged) {
         // Create and render new Tree
-        renderImGuiTreeFromRML(uiParams.rmlPath, uiParams.pSelectedObjectFromTree);
+        renderImGuiTreeFromRML(uiParams.rmlPath);
     } else if (m_pTreeRoot == nullptr) {
         // Do nothing
         ImGui::Text("Choose a file to display the beamline outline.");
     } else {
         // Render same Tree
-        renderImGuiTree(*m_pTreeRoot, (uiParams.pSelectedObjectFromTree));
+        renderImGuiTree(*m_pTreeRoot);
     }
 
     ImGui::End();
