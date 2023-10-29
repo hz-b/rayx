@@ -18,7 +18,7 @@
     - [Transformation between coordinate systems](./Model/Transformation-between-coordinate-systems.md)
     - [Quad(ric) Function](./Model/Quad(ric)-function.md)
     - [Efficiency calculations](./Model/Efficiency.md)
-
+    - [Events](./Model/Events.md)
 
 - [Tools](./Tools/Tools.md)
     - [Code Coverage](./Tools/Code-Coverage.md)
