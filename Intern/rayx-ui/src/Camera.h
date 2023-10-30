@@ -13,15 +13,6 @@ class CameraController {
   public:
     glm::vec3 m_position;
     glm::vec3 m_direction;
-    glm::vec3 m_up;
-
-    double m_yaw;
-    double m_pitch;
-
-    bool m_mouseLooking;
-    double m_lastMouseX;
-    double m_lastMouseY;
-
     struct Config {
         float m_FOV;
         float m_near;
@@ -34,13 +25,30 @@ class CameraController {
     void moveForward(float distance);
     void moveSideways(float distance);
     void moveUp(float distance);
+
     void startMouseLook();
     void stopMouseLook();
     bool isMouseLooking() const;
     void setLastMousePos(double x, double y);
     void updateDirectionViaMouse(double mouseX, double mouseY);
+
     void update(Camera& cam, float aspectRatio);
     void lookAtPoint(const glm::vec3& targetPoint, float distance = 50.0f);
+
+    enum class CameraMode { Perspective, Orthogonal };
+    void setCameraMode(CameraMode mode);
+
+  private:
+    CameraMode m_cameraMode = CameraMode::Perspective;
+
+    glm::vec3 m_up;
+
+    double m_yaw;
+    double m_pitch;
+
+    bool m_mouseLooking;
+    double m_lastMouseX;
+    double m_lastMouseY;
 };
 
 std::string SerializeCameraController(const CameraController& cam);

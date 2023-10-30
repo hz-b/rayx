@@ -206,8 +206,16 @@ void UIRenderSystem::showSceneEditorWindow(UIParameters& uiParams) {
 
     ImGui::Text("Camera");
     ImGui::SliderFloat("FOV", &uiParams.camController.m_config.m_FOV, 0.0f, 180.0f);
+    ImGui::InputFloat("Near", &uiParams.camController.m_config.m_near);
+    ImGui::InputFloat("Far", &uiParams.camController.m_config.m_far);
     ImGui::InputFloat3("Position", &uiParams.camController.m_position.x);
     ImGui::InputFloat3("Direction", &uiParams.camController.m_direction.x);
+
+    static bool orthogonalMode = false;
+    if (ImGui::Checkbox("Use Orthogonal Mode", &orthogonalMode)) {
+        // This block will be executed if the checkbox state changes.
+        uiParams.camController.setCameraMode(orthogonalMode ? CameraController::CameraMode::Orthogonal : CameraController::CameraMode::Perspective);
+    }
 
     if (ImGui::Button("Save Camera")) {
         SaveCameraControllerToFile(uiParams.camController, "camera_save.txt");
