@@ -22,11 +22,10 @@ Ray behaveSlit(Ray r, int id, ALLOW_UNUSED Collision col) {
         return r;
     }
 
-    // if all angles = 0, direction = (0, 1, 0) or (0, -1, 0).
-    // TODO: are these calculations correct? doing r.m_direction.y = r.m_direction.y * -1.0; wouldn't affect the angles at all.
-    // Hence a slit is not able to differentiate where a ray came from (from +y or -y). This should cause bugs.
-    double psi        = -r8_asin(r.m_direction.z);
-    double phi        = r8_asin(r.m_direction.x / r8_cos(psi));
+    double phi;
+    double psi;
+    directionToSphericalCoords(r.m_direction, phi, psi);
+
     double dPhi     = 0;
     double dPsi     = 0;
     double wavelength = hvlam(r.m_energy);
@@ -45,10 +44,10 @@ Ray behaveSlit(Ray r, int id, ALLOW_UNUSED Collision col) {
         }
     }
 
-    phi = phi + dPhi;
-    psi = psi + dPsi;
+    phi += dPhi;
+    psi += dPsi;
 
-    r.m_direction = directionFromAngles(phi, psi);
+    sphericalCoordsToDirection(phi, psi, r.m_direction);
 
     r.m_order = 0;
     return r;

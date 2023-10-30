@@ -1166,3 +1166,24 @@ TEST_F(TestSuite, testSchwingerDipole) {
         CHECK_EQ(result, values.flux, 0.000000001);
     }
 }
+
+TEST_F(TestSuite, testSphericalCoords) {
+    std::vector<dvec3> directions = {
+        {1.0, 0.0, 0.0},
+        {0.0, 1.0, 0.0},
+        {0.0, 0.0, 1.0},
+        {-1.0, 0.0, 0.0},
+        {0.0, -1.0, 0.0},
+        {0.0, 0.0, -1.0},
+    };
+
+    for (auto dir : directions) {
+        double phi, psi;
+        CPU_TRACER::directionToSphericalCoords(dir, phi, psi);
+
+        dvec3 dir2;
+        CPU_TRACER::sphericalCoordsToDirection(phi, psi, dir2);
+
+        CHECK_EQ(dir, dir2, 1e-11);
+    }
+}

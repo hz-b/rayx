@@ -79,24 +79,6 @@ double RAYX_API fact(int a) {
     return f;
 }
 
-/**
- * calculates direction cosini from angles phi,psi given in rad
- *        TODO: the planes / rotation directions specified here are potentially not correct. There is likely a bug in the phi/psi calculation.
- *        phi		angle in x-y-plane (positive rotation / counterclockwise)
- *        psi		angle in z-y-plane (positive rotation / counterclockwise)
- *
- * returns: the resulting direction.
-*/
-// TODO add test for this, when it is well-defined.
-dvec3 RAYX_API directionFromAngles(double phi, double psi) {
-    double cos_psi = r8_cos(psi);
-    double cos_phi = r8_cos(phi);
-    double sin_psi = r8_sin(psi);
-    double sin_phi = r8_sin(phi);
-
-    return dvec3(cos_psi * sin_phi, cos_psi * cos_phi, -sin_psi);
-}
-
 // checks whether the point (x, z) is within the cutout.
 bool RAYX_API inCutout(Cutout cutout, double x, double z) {
     if (cutout.m_type == CTYPE_UNLIMITED) {
