@@ -52,7 +52,7 @@ int RAYX_API getNffEntryCount(int material);
 NffEntry RAYX_API getNffEntry(int index, int material);
 dvec2 RAYX_API getRefractiveIndex(double energy, int material);
 
-void sphericalCoordsToDirection(double phi, double psi, RAYX_INOUT(dvec3) out_direction);
-void directionToSphericalCoords(dvec3 direction, RAYX_INOUT(double) out_phi, RAYX_INOUT(double) out_psi);
+void RAYX_API sphericalCoordsToDirection(double phi, double psi, RAYX_INOUT(dvec3) out_direction);
+void RAYX_API directionToSphericalCoords(dvec3 direction, RAYX_INOUT(double) out_phi, RAYX_INOUT(double) out_psi);
 
 }  // namespace RAYX::CPU_TRACER
