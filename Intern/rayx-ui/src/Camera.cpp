@@ -56,7 +56,19 @@ void CameraController::updateDirectionViaMouse(double mouseX, double mouseY) {
 
 void CameraController::update(Camera& cam, float aspectRatio) {
     cam.view = glm::lookAt(m_position, m_position + m_direction, m_up);
-    cam.proj = glm::perspective(glm::radians(m_config.m_FOV), aspectRatio, m_config.m_near, m_config.m_far);
+
+    if (m_cameraMode == CameraMode::Perspective) {
+        cam.proj = glm::perspective(glm::radians(m_config.m_FOV), aspectRatio, m_config.m_near, m_config.m_far);
+    } else if (m_cameraMode == CameraMode::Orthogonal) {
+        float top = 100.0f;
+        float right = top * aspectRatio;
+
+        float left = -right;
+        float bottom = -top;
+
+        cam.proj = glm::ortho(left, right, bottom, top, m_config.m_near, m_config.m_far);
+    }
+
     cam.proj[1][1] *= -1;  // Vulkan has inverted Y coordinates
     cam.n = m_config.m_near;
     cam.f = m_config.m_far;
@@ -74,6 +86,17 @@ void CameraController::lookAtPoint(const glm::vec3& targetPoint, float distance)
 
     // Update the camera direction without triggering pitch and yaw clamping
     updateDirection(0.0, 0.0);
+}
+
+void CameraController::setCameraMode(CameraMode mode) {
+    m_cameraMode = mode;
+    if (m_cameraMode == CameraMode::Perspective) {
+        m_config.m_near = 0.1f;
+        m_config.m_far = 10000.0f;
+    } else if (m_cameraMode == CameraMode::Orthogonal) {
+        m_config.m_near = -1000.0f;
+        m_config.m_far = 1000.0f;
+    }
 }
 
 // ---- SERDE ----
