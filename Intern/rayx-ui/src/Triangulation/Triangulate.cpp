@@ -56,7 +56,7 @@ RenderObject planarTriangulation(const RAYX::OpticalElement& element, Device& de
     std::vector<Vertex> vertices = {v1, v2, v3, v4};
     std::vector<uint32_t> indices = {0, 1, 2, 2, 1, 3};
 
-    RenderObject renderObj(device, element.m_element.m_outTrans, vertices, indices);
+    RenderObject renderObj(element.m_name, device, element.m_element.m_outTrans, vertices, indices);
     return renderObj;
 }
 

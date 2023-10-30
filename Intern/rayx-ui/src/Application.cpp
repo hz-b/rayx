@@ -75,9 +75,7 @@ void Application::run() {
 
     // CLI Input
     std::string rmlPathCli = m_CommandParser.m_args.m_providedFile;
-    if (!rmlPathCli.empty()) {
-        updateScene(rmlPathCli.c_str(), rObjects, rays, rayObj);
-    }
+    UIParameters uiParams{camController, rmlPathCli, !rmlPathCli.empty(), 0.0};
 
     // Main loop
     while (!m_Window.shouldClose()) {
@@ -90,15 +88,14 @@ void Application::run() {
         if (auto commandBuffer = m_Renderer.beginFrame()) {
             // Params to pass to UI
             auto newTime = std::chrono::high_resolution_clock::now();
-            float frameTime = std::chrono::duration<float, std::chrono::seconds::period>(newTime - currentTime).count();
+            uiParams.frameTime = std::chrono::duration<float, std::chrono::seconds::period>(newTime - currentTime).count();
             currentTime = newTime;
-            UIParameters uiParams{camController, "", false, frameTime};
 
             // Update UI and camera
-            m_ImGuiLayer.setupUI(uiParams);
-            camController.update(cam, m_Renderer.getAspectRatio());
+            m_ImGuiLayer.setupUI(uiParams, rObjects);
+            // camController.update(cam, m_Renderer.getAspectRatio());
             if (uiParams.pathChanged) {
-                updateScene(uiParams.rmlPath.string().c_str(), rObjects, rays, rayObj);
+                updateScene(uiParams.rmlPath.string(), rObjects, rays, rayObj);
                 uiParams.pathChanged = false;
                 camController.lookAtPoint(rObjects[0].getTranslationVecor());
             }
@@ -154,6 +151,6 @@ void Application::updateScene(const std::string& path, std::vector<RenderObject>
             rayIndices[i * 2] = i * 2;
             rayIndices[i * 2 + 1] = i * 2 + 1;
         }
-        rayObj.emplace(m_Device, glm::mat4(1.0f), rayVertices, rayIndices);
+        rayObj.emplace("Rays", m_Device, glm::mat4(1.0f), rayVertices, rayIndices);
     }
 }

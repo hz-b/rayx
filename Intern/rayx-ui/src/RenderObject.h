@@ -30,12 +30,13 @@ class RenderObject {
   public:
     /**
      * @brief Constructor that initializes the rendering object.
+     * @param name Render Object name, usually read from Beamline
      * @param device Reference to a Device object.
      * @param modelMatrix Transformation matrix to go from model to world coordinates.
      * @param vertices Vector of Vertex objects.
      * @param indices Vector of index values.
      */
-    RenderObject(Device& device, glm::mat4 modelMatrix, std::vector<Vertex>& vertices, std::vector<uint32_t>& indices);
+    RenderObject(std::string name, Device& device, glm::mat4 modelMatrix, std::vector<Vertex>& vertices, std::vector<uint32_t>& indices);
 
     /**
      * @brief Binds the object's vertex and index buffers to a Vulkan command buffer.
@@ -51,11 +52,13 @@ class RenderObject {
 
     glm::mat4 getModelMatrix() const { return m_modelMatrix; }
     glm::vec3 getTranslationVecor() const { return m_translationVector; }
+    std::string getName() const { return m_name; }
 
   private:
     void createVertexBuffers(const std::vector<Vertex>& vertices);
     void createIndexBuffers(const std::vector<uint32_t>& indices);
 
+    std::string m_name;
     Device& m_Device;
 
     uint32_t m_vertexCount;
