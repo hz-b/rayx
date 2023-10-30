@@ -33,16 +33,16 @@ class UIRenderSystem {
     VkClearValue getClearValue() const { return {m_ClearColor[0], m_ClearColor[1], m_ClearColor[2], m_ClearColor[3]}; }
 
     // Simple TreeNode
-   struct TreeNode {
-    std::string name;
-    std::string type; 
-    std::string category;  // Add this field for category
-    int index = -1; 
-    std::vector<TreeNode> children;
+    struct TreeNode {
+        std::string name;
+        std::string type;
+        std::string category;  // Add this field for category
+        int index = -1;
+        std::vector<TreeNode> children;
 
-    TreeNode(const std::string& name, const std::string& type = "", const std::string& category = "") 
-        : name(name), type(type), category(category) {}
-};
+        TreeNode(const std::string& name, const std::string& type = "", const std::string& category = "")
+            : name(name), type(type), category(category) {}
+    };
 
   private:
     const Window& m_Window;
@@ -59,8 +59,8 @@ class UIRenderSystem {
     VkDescriptorPool m_DescriptorPool;
     ImGuiIO m_IO;
 
-    int lightSourceIndex = 0;
-    int opticalElementIndex = 0;
+    int m_lightSourceIndex = 0;
+    int m_opticalElementIndex = 0;
 
     void showSceneEditorWindow(UIParameters& uiParams);
     void showSettingsWindow();

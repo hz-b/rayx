@@ -304,14 +304,14 @@ void UIRenderSystem::buildTreeFromXMLNode(rapidxml::xml_node<>* node, UIRenderSy
                 type == "Circle Source") {
                 category = "Light Source";
                 UIRenderSystem::TreeNode objectNode(xmlChild->first_attribute("name")->value(), type, category);
-                objectNode.index = lightSourceIndex++;
+                objectNode.index = m_lightSourceIndex++;
                 treeNode.children.emplace_back(objectNode);
             } else if (type == "ImagePlane" || type == "Plane Mirror" || type == "Toroid" || type == "Slit" || type == "Spherical Grating" ||
                        type == "Plane Grating" || type == "Sphere" || type == "Reflection Zoneplate" || type == "Ellipsoid" || type == "Cylinder" ||
                        type == "Cone") {
                 category = "Optical Element";
                 UIRenderSystem::TreeNode objectNode(xmlChild->first_attribute("name")->value(), type, category);
-                objectNode.index = opticalElementIndex++;
+                objectNode.index = m_opticalElementIndex++;
                 treeNode.children.emplace_back(objectNode);
             } else {
                 UIRenderSystem::TreeNode objectNode(xmlChild->first_attribute("name")->value(), type, category);
@@ -381,6 +381,8 @@ void UIRenderSystem::showBeamlineOutlineWindow(UIParameters& uiParams, std::vect
 
     if (uiParams.pathChanged) {
         // Create and render new Tree
+        m_lightSourceIndex = 0;
+        m_opticalElementIndex = 0;
         renderImGuiTreeFromRML(uiParams.rmlPath, uiParams.camController, rObjects);
     } else if (m_pTreeRoot == nullptr) {
         // Do nothing
