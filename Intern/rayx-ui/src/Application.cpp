@@ -92,8 +92,8 @@ void Application::run() {
             currentTime = newTime;
 
             // Update UI and camera
-            m_ImGuiLayer.setupUI(uiParams);
-            //camController.update(cam, m_Renderer.getAspectRatio());
+            m_ImGuiLayer.setupUI(uiParams, rObjects);
+            // camController.update(cam, m_Renderer.getAspectRatio());
             if (uiParams.pathChanged) {
                 updateScene(uiParams.rmlPath.string(), rObjects, rays, rayObj);
                 uiParams.pathChanged = false;

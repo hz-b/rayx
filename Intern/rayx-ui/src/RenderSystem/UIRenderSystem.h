@@ -27,20 +27,22 @@ class UIRenderSystem {
     UIRenderSystem& operator=(const UIRenderSystem&) = delete;
     ~UIRenderSystem();
 
-    void setupUI(UIParameters& uiParams);
+    void setupUI(UIParameters& uiParams, std::vector<RenderObject>& rObjects);
     void render(VkCommandBuffer commandBuffer);
 
     VkClearValue getClearValue() const { return {m_ClearColor[0], m_ClearColor[1], m_ClearColor[2], m_ClearColor[3]}; }
 
     // Simple TreeNode
-    struct TreeNode {
-        std::string name;
-        std::string type;  // Add this field for type
-        int index = -1;    // Add this field for index
-        std::vector<TreeNode> children;
+   struct TreeNode {
+    std::string name;
+    std::string type; 
+    std::string category;  // Add this field for category
+    int index = -1; 
+    std::vector<TreeNode> children;
 
-        TreeNode(const std::string& name, const std::string& type = "") : name(name), type(type) {}
-    };
+    TreeNode(const std::string& name, const std::string& type = "", const std::string& category = "") 
+        : name(name), type(type), category(category) {}
+};
 
   private:
     const Window& m_Window;
@@ -62,9 +64,10 @@ class UIRenderSystem {
 
     void showSceneEditorWindow(UIParameters& uiParams);
     void showSettingsWindow();
-    void showBeamlineOutlineWindow(UIParameters& uiParams);
-
-    void renderImGuiTreeFromRML(const std::filesystem::path& filename);
 
     void buildTreeFromXMLNode(rapidxml::xml_node<>* node, UIRenderSystem::TreeNode& treeNode);
+    void renderImGuiTreeFromRML(const std::filesystem::path& filename, CameraController& camController, std::vector<RenderObject>& rObjects);
+    void showBeamlineOutlineWindow(UIParameters& uiParams, std::vector<RenderObject>& rObjects);
 };
+
+void renderImGuiTree(const UIRenderSystem::TreeNode& treeNode, CameraController& camController);

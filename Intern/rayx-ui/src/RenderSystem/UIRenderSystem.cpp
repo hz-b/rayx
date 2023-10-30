@@ -147,7 +147,7 @@ UIRenderSystem::~UIRenderSystem() {
  * @param uiParams
  * @param rObjects
  */
-void UIRenderSystem::setupUI(UIParameters& uiParams) {
+void UIRenderSystem::setupUI(UIParameters& uiParams, std::vector<RenderObject>& rObjects) {
     ImGui_ImplVulkan_NewFrame();
     ImGui_ImplGlfw_NewFrame();
     ImGui::NewFrame();
@@ -160,7 +160,7 @@ void UIRenderSystem::setupUI(UIParameters& uiParams) {
 
     showSceneEditorWindow(uiParams);
     showSettingsWindow();
-    showBeamlineOutlineWindow(uiParams);
+    showBeamlineOutlineWindow(uiParams, rObjects);
 
     ImGui::PopFont();
 }
@@ -238,7 +238,7 @@ void UIRenderSystem::showSettingsWindow() {
     ImGui::End();
 }
 
-void renderImGuiTree(const UIRenderSystem::TreeNode& treeNode) {
+void renderImGuiTree(const UIRenderSystem::TreeNode& treeNode, CameraController& camController, std::vector<RenderObject>& rObjects) {
     for (auto& child : treeNode.children) {
         if (child.children.empty()) {
             std::string label = child.name;
@@ -250,10 +250,13 @@ void renderImGuiTree(const UIRenderSystem::TreeNode& treeNode) {
             if (ImGui::Selectable(label.c_str())) {
                 // Handle selection logic here
                 std::cout << "Selected object: " << child.name << " with index " << child.index << std::endl;
+                if (child.category == "Optical Element") {
+                    camController.lookAtPoint(rObjects[child.index].getTranslationVecor());
+                }
             }
         } else {
             if (ImGui::TreeNode(child.name.c_str())) {
-                renderImGuiTree(child);
+                renderImGuiTree(child, camController, rObjects);
                 ImGui::TreePop();
             }
         }
@@ -264,29 +267,37 @@ void UIRenderSystem::buildTreeFromXMLNode(rapidxml::xml_node<>* node, UIRenderSy
     for (rapidxml::xml_node<>* xmlChild = node->first_node(); xmlChild; xmlChild = xmlChild->next_sibling()) {
         rapidxml::xml_attribute<>* typeAttr = xmlChild->first_attribute("type");
         std::string type = typeAttr ? typeAttr->value() : "";
+        std::string category;
 
         if (strcmp(xmlChild->name(), "object") == 0) {
-            UIRenderSystem::TreeNode objectNode(xmlChild->first_attribute("name")->value(), type);
-
             if (type == "Point Source" || type == "Matrix Source" || type == "Dipole" || type == "Dipole Source" || type == "Pixel Source" ||
                 type == "Circle Source") {
+                category = "Light Source";
+                UIRenderSystem::TreeNode objectNode(xmlChild->first_attribute("name")->value(), type, category);
                 objectNode.index = lightSourceIndex++;
+                treeNode.children.emplace_back(objectNode);
             } else if (type == "ImagePlane" || type == "Plane Mirror" || type == "Toroid" || type == "Slit" || type == "Spherical Grating" ||
                        type == "Plane Grating" || type == "Sphere" || type == "Reflection Zoneplate" || type == "Ellipsoid" || type == "Cylinder" ||
                        type == "Cone") {
+                category = "Optical Element";
+                UIRenderSystem::TreeNode objectNode(xmlChild->first_attribute("name")->value(), type, category);
                 objectNode.index = opticalElementIndex++;
+                treeNode.children.emplace_back(objectNode);
+            } else {
+                UIRenderSystem::TreeNode objectNode(xmlChild->first_attribute("name")->value(), type, category);
+                treeNode.children.emplace_back(objectNode);
             }
-
-            treeNode.children.emplace_back(objectNode);
         } else if (strcmp(xmlChild->name(), "group") == 0) {
-            UIRenderSystem::TreeNode groupNode(xmlChild->first_attribute("name")->value());
+            category = "Group";
+            UIRenderSystem::TreeNode groupNode(xmlChild->first_attribute("name")->value(), "", category);
             buildTreeFromXMLNode(xmlChild, groupNode);
             treeNode.children.push_back(groupNode);
         }
     }
 }
 
-void UIRenderSystem::renderImGuiTreeFromRML(const std::filesystem::path& filename) {
+void UIRenderSystem::renderImGuiTreeFromRML(const std::filesystem::path& filename, CameraController& camController,
+                                            std::vector<RenderObject>& rObjects) {
     // Check if file exists
     if (!std::filesystem::exists(filename)) {
         ImGui::Text("Choose a file to display the beamline outline.");
@@ -329,10 +340,10 @@ void UIRenderSystem::renderImGuiTreeFromRML(const std::filesystem::path& filenam
     // Call recursive function to handle the object collection and render the ImGui tree
     m_pTreeRoot = std::make_unique<UIRenderSystem::TreeNode>("Root");
     buildTreeFromXMLNode(xml_beamline, *m_pTreeRoot);
-    renderImGuiTree(*m_pTreeRoot);
+    renderImGuiTree(*m_pTreeRoot, camController, rObjects);
 }
 
-void UIRenderSystem::showBeamlineOutlineWindow(UIParameters& uiParams) {
+void UIRenderSystem::showBeamlineOutlineWindow(UIParameters& uiParams, std::vector<RenderObject>& rObjects) {
     ImGui::SetNextWindowPos(ImVec2(0, 450), ImGuiCond_Once);  // Position it below the Settings window
     ImGui::SetNextWindowSize(ImVec2(450, 100), ImGuiCond_Once);
 
@@ -340,13 +351,13 @@ void UIRenderSystem::showBeamlineOutlineWindow(UIParameters& uiParams) {
 
     if (uiParams.pathChanged) {
         // Create and render new Tree
-        renderImGuiTreeFromRML(uiParams.rmlPath);
+        renderImGuiTreeFromRML(uiParams.rmlPath, uiParams.camController, rObjects);
     } else if (m_pTreeRoot == nullptr) {
         // Do nothing
         ImGui::Text("Choose a file to display the beamline outline.");
     } else {
         // Render same Tree
-        renderImGuiTree(*m_pTreeRoot);
+        renderImGuiTree(*m_pTreeRoot, uiParams.camController, rObjects);
     }
 
     ImGui::End();
