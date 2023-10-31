@@ -1,17 +1,6 @@
 //
 // Basic instrumentation profiler by Cherno
 
-// Usage: include this header file somewhere in your code (e.g. precompiled
-// header), and then use like:
-//
-// Instrumentor::Get().BeginSession("Session Name");        // Begin session
-// {
-//     InstrumentationTimer timer("Profiled Scope Name");   // Place code like
-//     this in scopes you'd like to include in profiling
-//     // Code
-// }
-// Instrumentor::Get().EndSession();                        // End Session
-//
 #pragma once
 
 #include <algorithm>
@@ -42,8 +31,6 @@ class RAYX_API InstrumentationTimer {
 
             long long start = std::chrono::time_point_cast<std::chrono::microseconds>(m_StartTimepoint).time_since_epoch().count();
             long long end = std::chrono::time_point_cast<std::chrono::microseconds>(endTimepoint).time_since_epoch().count();
-
-            size_t threadID = std::hash<std::thread::id>{}(std::this_thread::get_id());
 
             if (m_canPrint) {
                 long long duration = end - start;
