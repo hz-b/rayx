@@ -182,7 +182,7 @@ void UIRenderSystem::render(VkCommandBuffer commandBuffer) {
 
 void UIRenderSystem::showSceneEditorWindow(UIParameters& uiParams) {
     ImGui::SetNextWindowPos(ImVec2(0, 0), ImGuiCond_Once);
-    ImGui::SetNextWindowSize(ImVec2(450, 350), ImGuiCond_Once);
+    ImGui::SetNextWindowSize(ImVec2(450, 450), ImGuiCond_Once);
 
     ImGui::Begin("Properties Manager");
 
@@ -208,26 +208,9 @@ void UIRenderSystem::showSceneEditorWindow(UIParameters& uiParams) {
     ImGui::Text("Background");
     ImGui::ColorEdit3("Color", (float*)&m_ClearColor);
 
-    ImGui::Text("Camera");
-    ImGui::SliderFloat("FOV", &uiParams.camController.m_config.m_FOV, 0.0f, 180.0f);
-    ImGui::InputFloat("Near", &uiParams.camController.m_config.m_near);
-    ImGui::InputFloat("Far", &uiParams.camController.m_config.m_far);
-    ImGui::InputFloat3("Position", &uiParams.camController.m_position.x);
-    ImGui::InputFloat3("Direction", &uiParams.camController.m_direction.x);
-
-    static bool orthogonalMode = false;
-    if (ImGui::Checkbox("Use Orthogonal Mode", &orthogonalMode)) {
-        // This block will be executed if the checkbox state changes.
-        uiParams.camController.setCameraMode(orthogonalMode ? CameraController::CameraMode::Orthogonal : CameraController::CameraMode::Perspective);
-    }
-
-    if (ImGui::Button("Save Camera")) {
-        SaveCameraControllerToFile(uiParams.camController, "camera_save.txt");
-    }
-    ImGui::SameLine();
-    if (ImGui::Button("Load Camera")) {
-        LoadCameraControllerFromFile(uiParams.camController, "camera_save.txt");
-    }
+    ImGui::Separator();
+    uiParams.camController.displaySettings();
+    ImGui::Separator();
 
     ImGui::Text("Application average %.6f ms/frame", uiParams.frameTime * 1000.0f);
 
@@ -235,7 +218,7 @@ void UIRenderSystem::showSceneEditorWindow(UIParameters& uiParams) {
 }
 
 void UIRenderSystem::showSettingsWindow() {
-    ImGui::SetNextWindowPos(ImVec2(0, 350), ImGuiCond_Once);
+    ImGui::SetNextWindowPos(ImVec2(0, 450), ImGuiCond_Once);
     ImGui::SetNextWindowSize(ImVec2(450, 100), ImGuiCond_Once);
 
     ImGui::Begin("Settings");
@@ -248,7 +231,7 @@ void UIRenderSystem::showSettingsWindow() {
 }
 
 void UIRenderSystem::showHotkeysWindow() {
-    ImGui::SetNextWindowPos(ImVec2(0, 450), ImGuiCond_Once);
+    ImGui::SetNextWindowPos(ImVec2(0, 550), ImGuiCond_Once);
     ImGui::SetNextWindowSize(ImVec2(450, 210), ImGuiCond_Once);
 
     ImGui::Begin("Hotkeys");
@@ -374,8 +357,8 @@ void UIRenderSystem::renderImGuiTreeFromRML(const std::filesystem::path& filenam
 }
 
 void UIRenderSystem::showBeamlineOutlineWindow(UIParameters& uiParams, std::vector<RenderObject>& rObjects) {
-    ImGui::SetNextWindowPos(ImVec2(0, 660), ImGuiCond_Once);  // Position it below the Settings window
-    ImGui::SetNextWindowSize(ImVec2(450, 100), ImGuiCond_Once);
+    ImGui::SetNextWindowPos(ImVec2(0, 760), ImGuiCond_Once);  // Position it below the Settings window
+    ImGui::SetNextWindowSize(ImVec2(450, 300), ImGuiCond_Once);
 
     ImGui::Begin("Beamline Outline");
 

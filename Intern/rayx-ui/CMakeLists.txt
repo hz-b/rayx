@@ -28,6 +28,9 @@ if(Vulkan_FOUND)
     endif()
 
     target_include_directories(${PROJECT_NAME} PRIVATE ${PROJECT_SOURCE_DIR}/src)
+    target_compile_definitions(${PROJECT_NAME} PRIVATE
+        GLM_FORCE_RADIANS
+        GLM_FORCE_DEPTH_ZERO_TO_ONE)
 
     # -----------------
 
