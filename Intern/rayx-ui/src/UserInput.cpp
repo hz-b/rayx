@@ -64,7 +64,7 @@ void mouseButtonCallback(GLFWwindow* window, int button, int action, int mods) {
             camController->startMouseLook();
             double mouseX, mouseY;
             glfwGetCursorPos(window, &mouseX, &mouseY);
-            camController->setLastMousePos(mouseX, mouseY);
+            camController->setLastMousePos((float)mouseX, (float)mouseY);
         } else if (action == GLFW_RELEASE) {
             camController->stopMouseLook();
         }
@@ -82,6 +82,6 @@ void cursorPosCallback(GLFWwindow* window, double xpos, double ypos) {
     auto camController = reinterpret_cast<CameraController*>(glfwGetWindowUserPointer(window));
 
     if (camController->isMouseLooking()) {
-        camController->updateDirectionViaMouse(xpos, ypos);
+        camController->updateDirectionViaMouse((float)xpos, (float)ypos);
     }
 }

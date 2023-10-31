@@ -55,9 +55,7 @@ void CameraController::setLastMousePos(float x, float y) {
 void CameraController::updateDirectionViaMouse(float mouseX, float mouseY) {
     float deltaX = mouseX - m_lastMouseX;
     float deltaY = mouseY - m_lastMouseY;
-    m_lastMouseX = mouseX;
-    m_lastMouseY = mouseY;
-
+    setLastMousePos(mouseX, mouseY);
     updateDirection(0.1f * deltaX, -0.1f * deltaY);
 }
 
@@ -149,16 +147,22 @@ void CameraController::setCameraMode(CameraMode mode) {
 // Serialize the CameraController to a string
 std::string SerializeCameraController(const CameraController& cam) {
     std::ostringstream ss;
-    ss << cam.m_position.x << " " << cam.m_position.y << " " << cam.m_position.z << "\n";
-    ss << cam.m_direction.x << " " << cam.m_direction.y << " " << cam.m_direction.z << "\n";
+    glm::vec3 pos = cam.getPosition();
+    glm::vec3 dir = cam.getDirection();
+
+    ss << pos.x << " " << pos.y << " " << pos.z << "\n";
+    ss << dir.x << " " << dir.y << " " << dir.z << "\n";
     return ss.str();
 }
 
 // Deserialize the CameraController from a string
 void DeserializeCameraController(CameraController& cam, const std::string& data) {
     std::istringstream ss(data);
-    ss >> cam.m_position.x >> cam.m_position.y >> cam.m_position.z;
-    ss >> cam.m_direction.x >> cam.m_direction.y >> cam.m_direction.z;
+    glm::vec3 pos = cam.getPosition();
+    glm::vec3 dir = cam.getDirection();
+
+    ss >> pos.x >> pos.y >> pos.z;
+    ss >> dir.x >> dir.y >> dir.z;
 }
 
 // Save to file

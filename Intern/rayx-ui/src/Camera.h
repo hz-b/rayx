@@ -11,23 +11,7 @@ struct Camera {
 
 class CameraController {
   public:
-    glm::vec3 m_position;
-    glm::vec3 m_direction;
-    struct PerspectiveConfig {
-        float m_FOV;
-        float m_near;
-        float m_far;
-
-        void display();
-    } m_perspectiveCfg;
-
-    struct OrthogonalConfig {
-        float m_frustumScale;
-        float m_near;
-        float m_far;
-
-        void display();
-    } m_orthogonalCfg;
+    enum class CameraMode { Perspective, Orthogonal };
 
     CameraController();
 
@@ -46,11 +30,30 @@ class CameraController {
     void displaySettings();
     void update(Camera& cam, float aspectRatio);
 
-    enum class CameraMode { Perspective, Orthogonal };
     void setCameraMode(CameraMode mode);
+    glm::vec3 getPosition() const { return m_position; }
+    glm::vec3 getDirection() const { return m_direction; }
 
   private:
+    glm::vec3 m_position;
+    glm::vec3 m_direction;
+
     CameraMode m_cameraMode = CameraMode::Perspective;
+    struct PerspectiveConfig {
+        float m_FOV;
+        float m_near;
+        float m_far;
+
+        void display();
+    } m_perspectiveCfg;
+
+    struct OrthogonalConfig {
+        float m_frustumScale;
+        float m_near;
+        float m_far;
+
+        void display();
+    } m_orthogonalCfg;
 
     glm::vec3 m_up;
 
