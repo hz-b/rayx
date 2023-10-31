@@ -1,8 +1,9 @@
 # Optical Elements
 
-A Beamline consists of two types of elements:
+Optical elements are a central part of the tracing process. They define how light is guided through the beamline - where it is focused, redirected, or scattered.
+In the context of RAYX a beamline consists of two types of elements:
 - LightSources, to create the rays, and
-- OpticalElements, to be hit by these rays
+- OpticalElements, to be hit by and manipulate these rays
 
 In this section, you can read up on the design choices we made when implementing OpticalElements in RAYX.
 
