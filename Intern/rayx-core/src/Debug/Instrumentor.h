@@ -29,9 +29,7 @@ extern bool RAYX_API BENCH_FLAG;
 class RAYX_API InstrumentationTimer {
   public:
     InstrumentationTimer(const char* name, bool canPrint) : m_Name(name), m_isStopped(false), m_canPrint(canPrint) {
-        if (BENCH_FLAG) {
-            m_StartTimepoint = std::chrono::high_resolution_clock::now();
-        }
+        m_StartTimepoint = std::chrono::high_resolution_clock::now();
     }
 
     ~InstrumentationTimer() {
