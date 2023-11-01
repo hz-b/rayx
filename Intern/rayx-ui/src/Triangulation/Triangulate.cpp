@@ -10,11 +10,11 @@
 
 // ------ Helper functions ------
 
-void calculateVerticesForType(const Element& elem, glm::vec4& topLeft, glm::vec4& topRight, glm::vec4& bottomLeft, glm::vec4& bottomRight) {
+void calculateVerticesForType(const Cutout& cutout, glm::vec4& topLeft, glm::vec4& topRight, glm::vec4& bottomLeft, glm::vec4& bottomRight) {
     const double defWidthHeight = 100.0f;
-    switch (static_cast<int>(elem.m_cutout.m_type)) {
+    switch (static_cast<int>(cutout.m_type)) {
         case CTYPE_TRAPEZOID: {
-            TrapezoidCutout trapezoid = deserializeTrapezoid(elem.m_cutout);
+            TrapezoidCutout trapezoid = deserializeTrapezoid(cutout);
             topLeft = {-trapezoid.m_widthA / 2.0f, 0, trapezoid.m_length / 2.0f, 1.0f};
             topRight = {trapezoid.m_widthA / 2.0f, 0, trapezoid.m_length / 2.0f, 1.0f};
             bottomLeft = {-trapezoid.m_widthB / 2.0f, 0, -trapezoid.m_length / 2.0f, 1.0f};
@@ -22,7 +22,7 @@ void calculateVerticesForType(const Element& elem, glm::vec4& topLeft, glm::vec4
             break;
         }
         case CTYPE_RECT: {
-            RectCutout rect = deserializeRect(elem.m_cutout);
+            RectCutout rect = deserializeRect(cutout);
             topLeft = {-rect.m_width / 2.0f, 0, rect.m_length / 2.0f, 1.0f};
             topRight = {rect.m_width / 2.0f, 0, rect.m_length / 2.0f, 1.0f};
             bottomLeft = {-rect.m_width / 2.0f, 0, -rect.m_length / 2.0f, 1.0f};
@@ -41,20 +41,61 @@ void calculateVerticesForType(const Element& elem, glm::vec4& topLeft, glm::vec4
     }
 }
 
-RenderObject planarTriangulation(const RAYX::OpticalElement& element, Device& device) {
-    static glm::vec4 blue = {0.0f, 0.0f, 1.0f, 1.0f};
-    static glm::vec4 darkBlue = {0.0f, 0.0f, 0.4f, 1.0f};
-    static glm::vec4 lightBlue = {0.7f, 0.7f, 1.0f, 1.0f};
+void calculateVerticesForSlit(const Element& element, std::vector<Vertex>& vertices, std::vector<uint32_t>& indices) {
+    // Deserialize to get SlitBehaviour
+    SlitBehaviour slit = deserializeSlit(element.m_behaviour);
 
+    // Calculate vertices for the beamstop
     glm::vec4 topLeft, topRight, bottomLeft, bottomRight;
-    calculateVerticesForType(element.m_element, topLeft, topRight, bottomLeft, bottomRight);
+    calculateVerticesForType(slit.m_beamstopCutout, topLeft, topRight, bottomLeft, bottomRight);
+    vertices.push_back({topLeft, OPT_ELEMENT_COLOR});
+    vertices.push_back({topRight, OPT_ELEMENT_COLOR});
+    vertices.push_back({bottomLeft, OPT_ELEMENT_COLOR});
+    vertices.push_back({bottomRight, OPT_ELEMENT_COLOR});
 
-    Vertex v1 = {topLeft, lightBlue};
-    Vertex v2 = {topRight, blue};
-    Vertex v3 = {bottomLeft, blue};
-    Vertex v4 = {bottomRight, darkBlue};
-    std::vector<Vertex> vertices = {v1, v2, v3, v4};
-    std::vector<uint32_t> indices = {0, 1, 2, 2, 1, 3};
+    uint32_t offset = 0;
+    indices.insert(indices.end(), {offset, offset + 1, offset + 2, offset + 2, offset + 1, offset + 3});
+
+    // Calculate vertices for the outer slit
+    calculateVerticesForType(element.m_cutout, topLeft, topRight, bottomLeft, bottomRight);
+    vertices.push_back({topLeft, OPT_ELEMENT_COLOR});
+    vertices.push_back({topRight, OPT_ELEMENT_COLOR});
+    vertices.push_back({bottomLeft, OPT_ELEMENT_COLOR});
+    vertices.push_back({bottomRight, OPT_ELEMENT_COLOR});
+
+    // Calculate vertices for the opening
+    calculateVerticesForType(slit.m_openingCutout, topLeft, topRight, bottomLeft, bottomRight);
+    vertices.push_back({topLeft, OPT_ELEMENT_COLOR});
+    vertices.push_back({topRight, OPT_ELEMENT_COLOR});
+    vertices.push_back({bottomLeft, OPT_ELEMENT_COLOR});
+    vertices.push_back({bottomRight, OPT_ELEMENT_COLOR});
+
+    // Add indices for the outer slit but carve out the opening
+    offset = 4;                  // The slit starts at index 4
+    uint32_t openingOffset = 8;  // The opening starts at index 8
+    indices.insert(indices.end(), {offset,     offset + 1, openingOffset,     openingOffset,     offset + 1, openingOffset + 1,
+                                   offset + 1, offset + 3, openingOffset + 1, openingOffset + 1, offset + 3, openingOffset + 3,
+                                   offset + 3, offset + 2, openingOffset + 3, openingOffset + 3, offset + 2, openingOffset + 2,
+                                   offset + 2, offset,     openingOffset + 2, openingOffset + 2, offset,     openingOffset});
+}
+
+RenderObject planarTriangulation(const RAYX::OpticalElement& element, Device& device) {
+    std::vector<Vertex> vertices;
+    std::vector<uint32_t> indices;
+    // The slit behaviour needs special attention, since it is basically three cutouts (the slit, the beamstop and the opening)
+    if (element.m_element.m_behaviour.m_type == BTYPE_SLIT) {
+        calculateVerticesForSlit(element.m_element, vertices, indices);
+    } else {
+        glm::vec4 topLeft, topRight, bottomLeft, bottomRight;
+        calculateVerticesForType(element.m_element.m_cutout, topLeft, topRight, bottomLeft, bottomRight);
+
+        Vertex v1 = {topLeft, LIGHTER_OPT_ELEMENT_COLOR};
+        Vertex v2 = {topRight, OPT_ELEMENT_COLOR};
+        Vertex v3 = {bottomLeft, OPT_ELEMENT_COLOR};
+        Vertex v4 = {bottomRight, DARKER_OPT_ELEMENT_COLOR};
+        vertices = {v1, v2, v3, v4};
+        indices = {0, 1, 2, 2, 1, 3};
+    }
 
     RenderObject renderObj(element.m_name, device, element.m_element.m_outTrans, vertices, indices);
     return renderObj;

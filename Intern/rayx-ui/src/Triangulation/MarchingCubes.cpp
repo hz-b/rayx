@@ -154,9 +154,9 @@ std::vector<Triangle> lookupTrianglesForCase(int caseIndex, const double scalarG
         triangle.v1 = interpolateVertex(triTable[caseIndex][i], scalarGrid, offsetX, offsetY, offsetZ, scale);
         triangle.v2 = interpolateVertex(triTable[caseIndex][i + 1], scalarGrid, offsetX, offsetY, offsetZ, scale);
         triangle.v3 = interpolateVertex(triTable[caseIndex][i + 2], scalarGrid, offsetX, offsetY, offsetZ, scale);
-        triangle.v1.color = DARKER_BLUE;
-        triangle.v2.color = BLUE;
-        triangle.v3.color = LIGHTER_BLUE;
+        triangle.v1.color = DARKER_OPT_ELEMENT_COLOR;
+        triangle.v2.color = OPT_ELEMENT_COLOR;
+        triangle.v3.color = LIGHTER_OPT_ELEMENT_COLOR;
 
         triangles.push_back(triangle);
     }

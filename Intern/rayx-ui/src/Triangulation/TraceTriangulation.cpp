@@ -116,18 +116,18 @@ RenderObject traceTriangulation(const RAYX::OpticalElement& element, Device& dev
     for (size_t i = 0; i < gridSize - 1; ++i) {
         for (size_t j = 0; j < gridSize - 1; ++j) {
             if (collisionGrid[i][j] && collisionGrid[i + 1][j] && collisionGrid[i][j + 1]) {
-                vertices.emplace_back(glm::vec4(rayGrid[i][j].m_position, 1.0f), DARKER_BLUE);
-                vertices.emplace_back(glm::vec4(rayGrid[i + 1][j].m_position, 1.0f), BLUE);
-                vertices.emplace_back(glm::vec4(rayGrid[i][j + 1].m_position, 1.0f), BLUE);
+                vertices.emplace_back(glm::vec4(rayGrid[i][j].m_position, 1.0f), DARKER_OPT_ELEMENT_COLOR);
+                vertices.emplace_back(glm::vec4(rayGrid[i + 1][j].m_position, 1.0f), OPT_ELEMENT_COLOR);
+                vertices.emplace_back(glm::vec4(rayGrid[i][j + 1].m_position, 1.0f), OPT_ELEMENT_COLOR);
 
                 indices.push_back(index++);
                 indices.push_back(index++);
                 indices.push_back(index++);
             }
             if (collisionGrid[i + 1][j + 1] && collisionGrid[i + 1][j] && collisionGrid[i][j + 1]) {
-                vertices.emplace_back(glm::vec4(rayGrid[i + 1][j + 1].m_position, 1.0f), BLUE);
-                vertices.emplace_back(glm::vec4(rayGrid[i + 1][j].m_position, 1.0f), BLUE);
-                vertices.emplace_back(glm::vec4(rayGrid[i][j + 1].m_position, 1.0f), LIGHTER_BLUE);
+                vertices.emplace_back(glm::vec4(rayGrid[i + 1][j + 1].m_position, 1.0f), OPT_ELEMENT_COLOR);
+                vertices.emplace_back(glm::vec4(rayGrid[i + 1][j].m_position, 1.0f), OPT_ELEMENT_COLOR);
+                vertices.emplace_back(glm::vec4(rayGrid[i][j + 1].m_position, 1.0f), LIGHTER_OPT_ELEMENT_COLOR);
 
                 indices.push_back(index++);
                 indices.push_back(index++);

@@ -223,9 +223,7 @@ void UIRenderSystem::showSettingsWindow() {
 
     ImGui::Begin("Settings");
 
-    if (ImGui::Button("Toggle Large Font")) {
-        m_useLargeFont = !m_useLargeFont;
-    }
+    ImGui::Checkbox("Large Font", &m_useLargeFont);
 
     ImGui::End();
 }
