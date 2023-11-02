@@ -338,7 +338,8 @@ void UIRenderSystem::renderImGuiTreeFromRML(const std::filesystem::path& filenam
     try {
         doc.parse<0>(cstr.data());
     } catch (rapidxml::parse_error& e) {
-        ImGui::Text("Error: XML Parsing failed.");
+        ImGui::Text("Error: XML Parsing failed:");
+        ImGui::Text(e.what());
         return;
     }
 

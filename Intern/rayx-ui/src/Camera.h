@@ -7,6 +7,7 @@ struct Camera {
     alignas(16) glm::mat4 proj;
     alignas(4) float n;
     alignas(4) float f;
+    alignas(4) uint32_t isOrtho;
 };
 
 class CameraController {

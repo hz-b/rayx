@@ -116,6 +116,7 @@ void CameraController::update(Camera& cam, float aspectRatio) {
     }
 
     cam.proj[1][1] *= -1;  // Vulkan has inverted Y coordinates
+    cam.isOrtho = m_cameraMode == CameraMode::Orthogonal ? 1 : 0;
 }
 
 void CameraController::lookAtPoint(const glm::vec3& targetPoint, float distance) {

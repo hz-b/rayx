@@ -1,19 +1,20 @@
 #version 450
 
 layout(binding = 0) uniform Camera {
-    mat4 model;
     mat4 view;
     mat4 proj;
     float near;
     float far;
+    bool isOrthographic;
 } cam;
 
 layout(location = 0) out float near; //0.01
 layout(location = 1) out float far; //100
-layout(location = 2) out vec3 nearPoint;
-layout(location = 3) out vec3 farPoint;
-layout(location = 4) out mat4 fragView;
-layout(location = 8) out mat4 fragProj;
+layout(location = 2) flat out int isOrthographic; 
+layout(location = 3) out vec3 nearPoint;
+layout(location = 4) out vec3 farPoint;
+layout(location = 5) out mat4 fragView;
+layout(location = 9) out mat4 fragProj;
 
 // Grid position are in clipped space
 vec3 gridPlane[6] = vec3[] (
@@ -36,6 +37,7 @@ void main() {
 
     near = cam.near;
     far = cam.far;
+    isOrthographic = cam.isOrthographic ? 1 : 0;
     fragView = cam.view;
     fragProj = cam.proj;
 }

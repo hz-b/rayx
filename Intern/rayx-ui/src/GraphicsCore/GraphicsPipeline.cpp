@@ -155,20 +155,20 @@ void GraphicsPipeline::defaultPipelineConfigInfo(PipelineConfigInfo& configInfo)
 
     configInfo.colorBlendAttachment.colorWriteMask =
         VK_COLOR_COMPONENT_R_BIT | VK_COLOR_COMPONENT_G_BIT | VK_COLOR_COMPONENT_B_BIT | VK_COLOR_COMPONENT_A_BIT;
-    configInfo.colorBlendAttachment.blendEnable = VK_FALSE;
-    configInfo.colorBlendAttachment.srcColorBlendFactor = VK_BLEND_FACTOR_ONE;   // Optional
-    configInfo.colorBlendAttachment.dstColorBlendFactor = VK_BLEND_FACTOR_ZERO;  // Optional
-    configInfo.colorBlendAttachment.colorBlendOp = VK_BLEND_OP_ADD;              // Optional
-    configInfo.colorBlendAttachment.srcAlphaBlendFactor = VK_BLEND_FACTOR_ONE;   // Optional
-    configInfo.colorBlendAttachment.dstAlphaBlendFactor = VK_BLEND_FACTOR_ZERO;  // Optional
-    configInfo.colorBlendAttachment.alphaBlendOp = VK_BLEND_OP_ADD;              // Optional
+    configInfo.colorBlendAttachment.blendEnable = VK_TRUE;                                      // Enable blending
+    configInfo.colorBlendAttachment.srcColorBlendFactor = VK_BLEND_FACTOR_SRC_ALPHA;            // Use source alpha value
+    configInfo.colorBlendAttachment.dstColorBlendFactor = VK_BLEND_FACTOR_ONE_MINUS_SRC_ALPHA;  // Subtract source alpha from 1
+    configInfo.colorBlendAttachment.colorBlendOp = VK_BLEND_OP_ADD;                             // Add source and destination
+    configInfo.colorBlendAttachment.srcAlphaBlendFactor = VK_BLEND_FACTOR_ONE;                  // Source alpha factor for the alpha channel
+    configInfo.colorBlendAttachment.dstAlphaBlendFactor = VK_BLEND_FACTOR_ZERO;                 // Destination alpha factor for the alpha channel
+    configInfo.colorBlendAttachment.alphaBlendOp = VK_BLEND_OP_ADD;                             // Operation for blending alpha channel
 
     configInfo.colorBlendInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_COLOR_BLEND_STATE_CREATE_INFO;
     configInfo.colorBlendInfo.logicOpEnable = VK_FALSE;
-    configInfo.colorBlendInfo.logicOp = VK_LOGIC_OP_COPY;  // Optional
+    configInfo.colorBlendInfo.logicOp = VK_LOGIC_OP_COPY;  // Optional, not used here since we're doing alpha blending
     configInfo.colorBlendInfo.attachmentCount = 1;
     configInfo.colorBlendInfo.pAttachments = &configInfo.colorBlendAttachment;
-    configInfo.colorBlendInfo.blendConstants[0] = 0.0f;  // Optional
+    configInfo.colorBlendInfo.blendConstants[0] = 0.0f;  // Optional, for blending with constant color values
     configInfo.colorBlendInfo.blendConstants[1] = 0.0f;  // Optional
     configInfo.colorBlendInfo.blendConstants[2] = 0.0f;  // Optional
     configInfo.colorBlendInfo.blendConstants[3] = 0.0f;  // Optional

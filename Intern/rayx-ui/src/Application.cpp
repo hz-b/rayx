@@ -8,6 +8,7 @@
 #include "GraphicsCore/Renderer.h"
 #include "GraphicsCore/Window.h"
 #include "RenderObject.h"
+#include "RenderSystem/GridRenderSystem.h"
 #include "RenderSystem/ObjectRenderSystem.h"
 #include "RenderSystem/RayRenderSystem.h"
 #include "RenderSystem/UIRenderSystem.h"
@@ -55,8 +56,9 @@ void Application::run() {
     // Render systems
     ObjectRenderSystem objectRenderSystem(m_Device, m_Renderer.getSwapChainRenderPass(), setLayout->getDescriptorSetLayout());
     RayRenderSystem rayRenderSystem(m_Device, m_Renderer.getSwapChainRenderPass(), setLayout->getDescriptorSetLayout());
-    UIRenderSystem m_ImGuiLayer(m_Window, m_Device, m_Renderer.getSwapChainImageFormat(), m_Renderer.getSwapChainDepthFormat(),
-                                m_Renderer.getSwapChainImageCount());
+    UIRenderSystem uiRenderSystem(m_Window, m_Device, m_Renderer.getSwapChainImageFormat(), m_Renderer.getSwapChainDepthFormat(),
+                                  m_Renderer.getSwapChainImageCount());
+    GridRenderSystem gridRenderSystem(m_Device, m_Renderer.getSwapChainRenderPass(), setLayout->getDescriptorSetLayout());
 
     // Camera
     CameraController camController;
@@ -92,7 +94,7 @@ void Application::run() {
             currentTime = newTime;
 
             // Update UI and camera
-            m_ImGuiLayer.setupUI(uiParams, rObjects);
+            uiRenderSystem.setupUI(uiParams, rObjects);
             // camController.update(cam, m_Renderer.getAspectRatio());
             if (uiParams.pathChanged) {
                 updateScene(uiParams.rmlPath.string(), rObjects, rays, rayObj);
@@ -108,12 +110,13 @@ void Application::run() {
             // uboBuffers[frameIndex]->flush();
 
             // Render
-            m_Renderer.beginSwapChainRenderPass(commandBuffer, m_ImGuiLayer.getClearValue());
+            m_Renderer.beginSwapChainRenderPass(commandBuffer, uiRenderSystem.getClearValue());
 
             FrameInfo frameInfo{cam, frameIndex, commandBuffer, descriptorSets[frameIndex]};
             objectRenderSystem.render(frameInfo, rObjects);
             rayRenderSystem.render(frameInfo, rayObj);
-            m_ImGuiLayer.render(commandBuffer);
+            gridRenderSystem.render(frameInfo);
+            uiRenderSystem.render(commandBuffer);
 
             m_Renderer.endSwapChainRenderPass(commandBuffer);
             m_Renderer.endFrame();
