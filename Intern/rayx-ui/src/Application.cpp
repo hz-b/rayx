@@ -8,6 +8,7 @@
 #include "FrameInfo.h"
 #include "GraphicsCore/Renderer.h"
 #include "GraphicsCore/Window.h"
+#include "RayProcessing.h"
 #include "RenderObject.h"
 #include "RenderSystem/GridRenderSystem.h"
 #include "RenderSystem/ObjectRenderSystem.h"
@@ -196,7 +197,7 @@ void Application::updateScene(const std::string& path, std::vector<RenderObject>
 
     // Triangulate the render data and update the scene
     rObjects = triangulateObjects(beamline.m_OpticalElements, m_Device);
-    rays = getRays(bundleHist, beamline.m_OpticalElements);
+    rays = getRays(bundleHist, beamline.m_OpticalElements, kMeansFilter);
 
     if (!rays.empty()) {
         // Temporarily aggregate all vertices, then create a single RenderObject
