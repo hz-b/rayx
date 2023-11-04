@@ -135,6 +135,28 @@ bool RAYX_API inCutout(Cutout cutout, double x, double z) {
     }
 }
 
+// bounding box centered at (0, 0) around the cutout.
+// return width and length of the bounding box.
+dvec2 RAYX_API boundingBox(Cutout cutout) {
+    if (cutout.m_type == CTYPE_UNLIMITED) {
+        double inf = 1e300;
+        return dvec2(inf, inf);
+    } else if (cutout.m_type == CTYPE_RECT) {
+        RectCutout rect = deserializeRect(cutout);
+        return dvec2(rect.m_width, rect.m_length);
+    } else if (cutout.m_type == CTYPE_TRAPEZOID) {
+        TrapezoidCutout t = deserializeTrapezoid(cutout);
+        double width = max(t.m_widthA, t.m_widthB);
+        return dvec2(width, t.m_length);
+    } else if (cutout.m_type == CTYPE_ELLIPTICAL) {
+        EllipticalCutout ell = deserializeElliptical(cutout);
+        return dvec2(ell.m_diameter_x, ell.m_diameter_z);
+    } else {
+        throw("invalid cutout type in boundingBox!");
+        return dvec2(-1, -1);
+    }
+}
+
 // returns dvec2(atomic mass, density) extracted from materials.xmacro
 dvec2 RAYX_API getAtomicMassAndRho(int material) {
     switch (material) {
