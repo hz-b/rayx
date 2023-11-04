@@ -1,10 +1,19 @@
+// The InvocationState stores all shader-global declarations, including the buffers and stuff like the random-state.
+// All InvocationState variables (except for gl_GlobalInvocationID) are prefixed with `inv_` to separate them from other identifiers.
+
+// TODO If we want to have a multi-threaded CpuTracer, we will require to have multiple InvocationStates at once.
+// Thus we probably want to collect these variables into a `struct InvocationState`, from which each thread has a copy.
+// - The ShaderArrays from these different copies should probably reference the same buffers though!
+
+// This struct idea might not work well with GLSLs `layout` interpretation of ShaderArrays though.
+// In other words, `inv_elements` probably needs to be a global variable, as `GLSL` has to declare it as a global variable using `layout`.
+// This problem requires further thought...
+
 #ifndef INVOCATION_STATE_H
 #define INVOCATION_STATE_H
 
 #include "Adapt.h"
 #include "Ray.h"
-
-// This file groups all global variables from the shader to one spot.
 
 // Useful for GPU Tracing
 struct PushConstants {  // TODO(Jannis): PushConstants is not an expressive name. Rename to something like TracerConfig
