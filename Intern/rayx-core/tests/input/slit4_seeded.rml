@@ -47,11 +47,11 @@
   </object>
   <object name="Slit" type="Slit">
    <param id="openingShape" comment="rectangle" enabled="T">0</param>
-   <param id="openingWidth" enabled="T">3</param>
-   <param id="openingHeight" enabled="T">3</param>
+   <param id="openingWidth" enabled="T">6</param>
+   <param id="openingHeight" enabled="T">6</param>
    <param id="centralBeamstop" comment="elliptical" enabled="T">2</param>
-   <param id="stopWidth" enabled="T">3</param>
-   <param id="stopHeight" enabled="T">1</param>
+   <param id="stopWidth" enabled="T">4</param>
+   <param id="stopHeight" enabled="T">4</param>
    <param id="geometricalShape" comment="rectangle" enabled="T">0</param>
    <param id="totalWidth" enabled="T">8</param>
    <param id="totalHeight" enabled="T">8</param>

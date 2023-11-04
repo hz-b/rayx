@@ -50,7 +50,7 @@
    <param id="openingWidth" enabled="T">3</param>
    <param id="openingHeight" enabled="T">3</param>
    <param id="centralBeamstop" comment="rectangle" enabled="T">1</param>
-   <param id="stopWidth" enabled="T">20</param>
+   <param id="stopWidth" enabled="T">2</param>
    <param id="stopHeight" enabled="T">1</param>
    <param id="geometricalShape" comment="rectangle" enabled="T">0</param>
    <param id="totalWidth" enabled="T">8</param>
