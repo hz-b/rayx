@@ -75,9 +75,11 @@ INLINE GratingBehaviour deserializeGrating(Behaviour b) {
 struct SlitBehaviour {
     // The Slit consists of a ray-blocking wall with a small opening inside it.
     // This is the shape (aka cutout) of this small opening.
+    // The set of points in the m_openingCutout need to be a subset of the cutout of the whole object.
     Cutout m_openingCutout;
 
     // Inside this small opening, there might be a beamstop, which absorbs incoming rays.
+    // This cutout needs to be a subset of m_openingCutout.
     Cutout m_beamstopCutout;
 };
 
