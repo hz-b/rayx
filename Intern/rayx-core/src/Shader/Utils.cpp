@@ -1,3 +1,10 @@
+#include "Utils.h"
+#include "InvocationState.h"
+#include "Complex.h"
+#include "Approx.h"
+#include "Rand.h"
+#include "Helper.h"
+
 // converts energy in eV to wavelength in nm
 double RAYX_API hvlam(double x) {
     if (x == 0) {
@@ -85,54 +92,54 @@ dvec2 RAYX_API getAtomicMassAndRho(int material) {
 #define X(e, z, a, rho) \
     case z:             \
         return dvec2(a, rho);
-#include "../../Material/materials.xmacro"
+#include "../Material/materials.xmacro"
 #undef X
     }
-    throw("invalid material in getAtomicMassAndRho");
+    _throw("invalid material in getAtomicMassAndRho");
     return dvec2(0.0, 0.0);
 }
 
-#include "../../Shared/NffPalik.h"
+#include "../Shader/NffPalik.h"
 
 int RAYX_API getPalikEntryCount(int material) {
     int m = material - 1;  // in [0, 91]
     // this counts how many doubles are in between the materials index, and the
     // next index in the table. division by 3, because each entry has 3 members
     // currently: energy, n, k, padding.
-    return (matIdx[m + 1] - matIdx[m]) / 3;
+    return (inv_matIdx[m + 1] - inv_matIdx[m]) / 3;
 }
 
 int RAYX_API getNffEntryCount(int material) {
     int m = material - 1;  // in [0, 91]
     // the offset of 92 (== number of materials), skips the palik table and
     // reaches into the nff table. the rest of the logic is as above.
-    return (matIdx[92 + m + 1] - matIdx[92 + m]) / 3;
+    return (inv_matIdx[92 + m + 1] - inv_matIdx[92 + m]) / 3;
 }
 
 PalikEntry RAYX_API getPalikEntry(int index, int material) {
     int m = material - 1;  // in [0, 91]
-    // matIdx[m] is the start of the Palik table of material m.
+    // inv_matIdx[m] is the start of the Palik table of material m.
     // 3*index skips 'index'-many entries.
-    int i = matIdx[m] + 3 * index;
+    int i = inv_matIdx[m] + 3 * index;
 
     PalikEntry e;
-    e.m_energy = mat[i];
-    e.m_n = mat[i + 1];
-    e.m_k = mat[i + 2];
+    e.m_energy = inv_mat[i];
+    e.m_n = inv_mat[i + 1];
+    e.m_k = inv_mat[i + 2];
 
     return e;
 }
 
 NffEntry RAYX_API getNffEntry(int index, int material) {
     int m = material - 1;  // in [0, 91]
-    // matIdx[92+m] is the start of the Nff table of material m.
+    // inv_matIdx[92+m] is the start of the Nff table of material m.
     // 3*index skips 'index'-many entries.
-    int i = matIdx[92 + m] + 3 * index;
+    int i = inv_matIdx[92 + m] + 3 * index;
 
     NffEntry e;
-    e.m_energy = mat[i];
-    e.m_f1 = mat[i + 1];
-    e.m_f2 = mat[i + 2];
+    e.m_energy = inv_mat[i];
+    e.m_f1 = inv_mat[i + 1];
+    e.m_f2 = inv_mat[i + 2];
 
     return e;
 }
@@ -145,7 +152,7 @@ dvec2 RAYX_API getRefractiveIndex(double energy, int material) {
 
     // out of range check
     if (material < 1 || material > 92) {
-        throw("getRefractiveIndex material out of range!");
+        _throw("getRefractiveIndex material out of range!");
         return dvec2(-1.0, -1.0);
     }
 
@@ -202,7 +209,7 @@ dvec2 RAYX_API getRefractiveIndex(double energy, int material) {
         return dvec2(n, k);
     }
 
-    throw("getRefractiveIndex: no matching entry found!");
+    _throw("getRefractiveIndex: no matching entry found!");
     return dvec2(-1.0, -1.0);
 }
 
@@ -397,7 +404,7 @@ bool update_stokes(RAYX_INOUT(Ray) r, double real_S, double real_P, double delta
     ;
     r.m_stokes = inv_rot * stokes_new;
 
-    double rn = squaresDoubleRNG(_ctr);
+    double rn = squaresDoubleRNG(inv_ctr);
     // throw ray away with certain probability
     return (r.m_stokes.x / stokes_old.x) - rn <= 0;
 }
@@ -464,7 +471,7 @@ dvec3 applySlopeError(dvec3 normal, SlopeError error, int O_type) {
     // only calculate the random number if at least one slope error is not 0,
     // since the calculation is costly (sin, cos, log involved)
     if (slopeX != 0 || slopeZ != 0) {
-        double random_values[2] = {squaresNormalRNG(_ctr, 0, slopeX), squaresNormalRNG(_ctr, 0, slopeZ)};
+        double random_values[2] = {squaresNormalRNG(inv_ctr, 0, slopeX), squaresNormalRNG(inv_ctr, 0, slopeZ)};
 
         /*double x = random_values[0] * slopeX; // to get normal distribution
         from std.-norm. multiply by sigma (=slopeX) -> mu + x * sigma but mu=0
@@ -627,7 +634,7 @@ void RAYX_API RZPLineDensity(Ray r, dvec3 normal, RZPBehaviour b, RAYX_INOUT(dou
             ym = -((FX * X * (Z - rosag * c_beta)) / (Z + risag * c_alpha)) + FZ * (-Z + rosag * c_beta) + FY * (-Y + rosag * s_beta);
         }
     } else {
-        throw("unsupported ImageType!");
+        _throw("unsupported ImageType!");
     }
 
     double ris = sqrt(zi * zi + xi * xi + yi * yi);
@@ -795,7 +802,7 @@ void bessel_diff(double radius, double wl, RAYX_INOUT(double) dphi, RAYX_INOUT(d
     double c = -1;
     while (c < 0) {  // while c = wd - rn1[2] < 0 continue
         for (int i = 0; i < 3; i++) {
-            rn1[i] = squaresDoubleRNG(_ctr);
+            rn1[i] = squaresDoubleRNG(inv_ctr);
         }
 
         dphi = rn1[0] * ximax;
@@ -811,8 +818,8 @@ void bessel_diff(double radius, double wl, RAYX_INOUT(double) dphi, RAYX_INOUT(d
     }
 
     // 50% neg/pos sign
-    dphi = sign(squaresDoubleRNG(_ctr) - 0.5) * dphi;
-    dpsi = sign(squaresDoubleRNG(_ctr) - 0.5) * dpsi;
+    dphi = sign(squaresDoubleRNG(inv_ctr) - 0.5) * dphi;
+    dpsi = sign(squaresDoubleRNG(inv_ctr) - 0.5) * dpsi;
 }
 
 /**
@@ -831,7 +838,7 @@ void fraun_diff(double dim, double wl, RAYX_INOUT(double) dAngle) {
     double c = -1;
     while (c < 0) {  // while c = wd - uni[1] < 0 continue
         for (int i = 0; i < 2; i++) {
-            rna[i] = squaresDoubleRNG(_ctr);
+            rna[i] = squaresDoubleRNG(inv_ctr);
         }
         dAngle = (rna[0] - 0.5) * div;
         double u = PI * b * r8_sin(dAngle) / wl;
@@ -898,7 +905,7 @@ bool RAYX_API inCutout(Cutout cutout, double x, double z) {
         double rd2 = val1 * val1 + val2 * val2;
         return rd2 <= 1.0;
     } else {
-        throw("invalid cutout type in inCutout!");
+        _throw("invalid cutout type in inCutout!");
         return false;
     }
 }
@@ -935,7 +942,7 @@ dmat4 RAYX_API keyCutoutPoints(Cutout cutout) {
         w = ell.m_diameter_x / 2.0;
         l = ell.m_diameter_z / 2.0;
     } else {
-        throw("invalid cutout type in inCutout!");
+        _throw("invalid cutout type in inCutout!");
     }
     ret[0] = dvec4( w, 0.0,  l, 0.0);
     ret[1] = dvec4(-w, 0.0, -l, 0.0);
@@ -945,7 +952,7 @@ dmat4 RAYX_API keyCutoutPoints(Cutout cutout) {
 }
 
 // returns width and length of the bounding box.
-dvec2 cutoutBoundingBox(Cutout cutout) {
+dvec2 RAYX_API cutoutBoundingBox(Cutout cutout) {
     dvec2 ret = dvec2(0.0, 0.0);
     dmat4 keypoints = keyCutoutPoints(cutout);
     for (int i = 0; i < 4; i++) {
@@ -966,7 +973,7 @@ void RAYX_API assertCutoutSubset(Cutout c1, Cutout c2) {
         double x = keypoints[i][0];
         double z = keypoints[i][2];
         if (!inCutout(c2, x, z)) {
-            throw("assertCutoutSubset failed!");
+            _throw("assertCutoutSubset failed!");
         }
     }
 }

@@ -1,12 +1,12 @@
 #ifndef COLLISION_H
 #define COLLISION_H
 
-#include "adapt.h"
-// A "ray-element" collision.
+#include "Adapt.h"
+#include "Ray.h"
 
-/**************************************************************
- *                    Cllision Struct
- **************************************************************/
+#define COLLISION_EPSILON 1e-6
+
+// A "ray-element" collision.
 struct RAYX_API Collision {
     // The point where `_ray` hits the element, in element-coordinates.
     dvec3 hitpoint;
@@ -20,5 +20,11 @@ struct RAYX_API Collision {
     // whether a collision has been found.
     bool found;
 };
+
+Collision getQuadricCollision(Ray r, QuadricSurface q);
+Collision getToroidCollision(Ray r, ToroidSurface toroid, bool isTriangul);
+Collision RAYX_API findCollisionInElementCoords(Ray r, Surface surface, Cutout cutout, bool isTriangul);
+Collision findCollisionWith(Ray r, uint id);
+Collision findCollision();
 
 #endif

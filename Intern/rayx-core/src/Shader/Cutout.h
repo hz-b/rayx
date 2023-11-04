@@ -1,7 +1,7 @@
 #ifndef CUTOUT_H
 #define CUTOUT_H
 
-#include "adapt.h"
+#include "Adapt.h"
 
 // Cutout types:
 // a subset of points of the XZ-plane. used to limit the potentially infinite surfaces.

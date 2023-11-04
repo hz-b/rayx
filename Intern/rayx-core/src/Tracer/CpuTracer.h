@@ -1,7 +1,8 @@
 #pragma once
 
 #include "Core.h"
-#include "Tracer/Tracer.h"
+#include "Tracer.h"
+#include "../Shader/InvocationState.h"
 
 namespace RAYX {
 /**

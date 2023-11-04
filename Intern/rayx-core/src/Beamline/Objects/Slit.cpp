@@ -2,12 +2,11 @@
 
 #include "Data/xml.h"
 #include "Debug/Debug.h"
-#include "Shared/Constants.h"
+#include "Shader/Constants.h"
+
+#include "Shader/Utils.h"
 
 namespace RAYX {
-namespace CPU_TRACER {
-    void RAYX_API assertCutoutSubset(Cutout, Cutout);
-}
 
 Cutout mkOpeningCutout(const DesignObject& dobj) {
     auto shape = dobj.parseOpeningShape();
@@ -67,10 +66,10 @@ Element makeSlit(const DesignObject& dobj) {
     Cutout globalCutout = el.m_cutout;
 
     // the opening needs to be a subset of the whole object.
-    CPU_TRACER::assertCutoutSubset(openingCutout, globalCutout);
+    assertCutoutSubset(openingCutout, globalCutout);
 
     // the beamstop needs to be a subset of the opening.
-    CPU_TRACER::assertCutoutSubset(beamstopCutout, openingCutout);
+    assertCutoutSubset(beamstopCutout, openingCutout);
 
     return el;
 }

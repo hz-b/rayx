@@ -33,7 +33,7 @@ const double ETYPE_UNINIT = 4;
 const double ETYPE_BEYOND_HORIZON = 5;
 
 // This is a general error code that means some assertion failed in the shader.
-// This error code is typically generated using `throw`.
+// This error code is typically generated using `_throw`.
 const double ETYPE_FATAL_ERROR = 6;
 
 #endif

@@ -65,4 +65,21 @@ inline double mod(double x, double y) { return glm::mod(x, y); }
 inline double sign(double x) { return glm::sign(x); }
 #endif
 
+// throws an error, and termiantes the program
+#ifdef GLSL
+#define _throw(string) recordFinalEvent(_ray, ETYPE_FATAL_ERROR)
+#else
+#include "Debug/Debug.h"
+#define _throw(string) RAYX_ERR << string
+#endif
+
+#ifndef GLSL
+// This way I don't have to worry about namespaces..
+using namespace RAYX;
+#endif
+
+#ifndef GLSL
+using uint = unsigned int;
+#endif
+
 #endif

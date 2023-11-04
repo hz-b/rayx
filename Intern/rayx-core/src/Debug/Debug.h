@@ -9,7 +9,7 @@
  *
  */
 
-#include <Shared/Ray.h>
+#include <Shader/Ray.h>
 
 #include <array>
 #include <glm.hpp>

@@ -3,7 +3,7 @@
 #include <string>
 #include <vector>
 
-#include "../Shared/NffPalik.h"
+#include "../Shader/NffPalik.h"
 
 namespace RAYX {
 /** This struct represents the contents of a .NKP file.

@@ -6,8 +6,8 @@
 #include "Debug/Debug.h"
 #include "Debug/Instrumentor.h"
 #include "Random.h"
-#include "Shared/Constants.h"
-#include "Shared/EventType.h"
+#include "Shader/Constants.h"
+#include "Shader/EventType.h"
 
 #ifndef NO_OMP
 #include <omp.h>

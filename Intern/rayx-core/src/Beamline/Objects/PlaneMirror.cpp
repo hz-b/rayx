@@ -1,7 +1,7 @@
 #include "PlaneMirror.h"
 
 #include "Data/xml.h"
-#include "Shared/Constants.h"
+#include "Shader/Constants.h"
 
 namespace RAYX {
 

@@ -4,20 +4,7 @@
 
 #include "Debug/Debug.h"
 #include "Debug/Instrumentor.h"
-#include "Shared/Constants.h"
-
-/**
- * Calculates photon wavelength (nm) from its energy (eV) or
- * vice verse. For example is used for gratings.
- * @see taken from RAYLIB.FOR
- *
- */
-double hvlam(double x) {
-    if (x == 0) {
-        return 0.0;
-    }
-    return inm2eV / x;
-}
+#include "Shader/Constants.h"
 
 /**
  *  Calculates radians from degree.

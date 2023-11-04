@@ -2,7 +2,7 @@
 #define BEHAVIOUR_H
 
 #include "Cutout.h"
-#include "adapt.h"
+#include "Adapt.h"
 
 // A behaviour decides what happens whenever a ray hits the surface of this element.
 // Each behaviour type has its own `behave` function in `behave.comp`.

@@ -1,6 +1,8 @@
 #define COLLISION_EPSILON 1e-6
 
-#include "../../Shared/Collision.h"
+#include "Collision.h"
+#include "Utils.h"
+#include "InvocationState.h"
 
 /**************************************************************
  *                    Quadric collision
@@ -220,7 +222,7 @@ Collision RAYX_API findCollisionInElementCoords(Ray r, Surface surface, Cutout c
     } else {
         col.found = false;
 
-        throw("invalid surfaceType!");
+        _throw("invalid surfaceType!");
         return col;  // has found = false
     }
 
@@ -243,13 +245,13 @@ Collision RAYX_API findCollisionInElementCoords(Ray r, Surface surface, Cutout c
 // and returns a Collision accordingly.
 Collision findCollisionWith(Ray r, uint id) {
     // misalignment
-    r = rayMatrixMult(r, elements[id].m_inTrans);  // image plane is the x-y plane of the coordinate system
-    Collision col = findCollisionInElementCoords(r, elements[id].m_surface, elements[id].m_cutout, false);
+    r = rayMatrixMult(r, inv_elements[id].m_inTrans);  // image plane is the x-y plane of the coordinate system
+    Collision col = findCollisionInElementCoords(r, inv_elements[id].m_surface, inv_elements[id].m_cutout, false);
     if (col.found) {
         col.elementIndex = int(id);
     }
 
-    SlopeError sE = elements[id].m_slopeError;
+    SlopeError sE = inv_elements[id].m_slopeError;
     col.normal = applySlopeError(col.normal, sE, 0);
 
     return col;
@@ -257,8 +259,8 @@ Collision findCollisionWith(Ray r, uint id) {
 
 // Returns the next collision for the ray `_ray`.
 Collision findCollision() {
-    if (pushConstants.sequential == 1.0) {
-        if (_ray.m_lastElement >= elements.length() - 1) {
+    if (inv_pushConstants.sequential == 1.0) {
+        if (_ray.m_lastElement >= inv_elements.length() - 1) {
             Collision col;
             col.found = false;
             return col;
@@ -280,13 +282,13 @@ Collision findCollision() {
     r.m_position += r.m_direction * COLLISION_EPSILON;
 
     // Find intersection points through all elements
-    for (uint elementIndex = 0; elementIndex < uint(elements.length()); elementIndex++) {
+    for (uint elementIndex = 0; elementIndex < uint(inv_elements.length()); elementIndex++) {
         Collision current_col = findCollisionWith(r, elementIndex);
         if (!current_col.found) {
             continue;
         }
 
-        dvec3 global_hitpoint = dvec3(elements[elementIndex].m_outTrans * dvec4(current_col.hitpoint, 1));
+        dvec3 global_hitpoint = dvec3(inv_elements[elementIndex].m_outTrans * dvec4(current_col.hitpoint, 1));
         double current_dist = length(global_hitpoint - _ray.m_position);
 
         if (current_dist < best_dist) {

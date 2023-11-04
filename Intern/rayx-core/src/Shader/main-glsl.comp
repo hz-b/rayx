@@ -1,0 +1,31 @@
+#version 450
+
+#define GLSL
+#define WORKGROUP_SIZE 8
+
+#extension GL_EXT_debug_printf : enable
+#extension GL_ARB_separate_shader_objects : enable
+#extension GL_ARB_gpu_shader_int64 : enable
+#extension GL_GOOGLE_include_directive : enable
+layout(local_size_x = WORKGROUP_SIZE, local_size_y = 1, local_size_z = 1) in;
+
+#include "Adapt.h"
+#include "Constants.h"
+#include "Ray.h"
+#include "Element.h"
+
+#include "InvocationState.cpp"
+#include "Helper.cpp"
+#include "Approx.cpp"
+#include "Complex.cpp"
+#include "Rand.cpp"
+#include "Utils.cpp"
+#include "SphericalCoords.cpp"
+#include "Collision.cpp"
+#include "Behave.cpp"
+#include "DynamicElements.cpp"
+
+void main() {
+	dynamicElements();
+}
+

@@ -125,7 +125,7 @@ if(Vulkan_FOUND)
         ${RAYX_CORE_SHADER}
         ${RAYX_CORE_SHADER_FAKE}
         COMMAND "glslc"
-        ARGS ${PROJECT_SOURCE_DIR}/src/Tracer/shader/main-glsl.comp -o ${RAYX_CORE_SHADER} -fshader-stage=compute --target-env=vulkan1.3
+        ARGS ${PROJECT_SOURCE_DIR}/src/Shader/main-glsl.comp -o ${RAYX_CORE_SHADER} -fshader-stage=compute --target-env=vulkan1.3
     )
 
     add_custom_target(RAYX_CORE_COMPILE_SHADER ALL DEPENDS ${RAYX_CORE_SHADER})

@@ -1,14 +1,21 @@
-// @brief: Dynamic ray tracing: check which ray hits which element first
-// in this function we need to make sure that rayData ALWAYS remains in GLOBAL coordinates (it can be changed in a function but needs to be changed
-// back before the function returns to this function)
+#include "DynamicElements.h"
+#include "Collision.h"
+#include "Behave.h"
+#include "InvocationState.h"
+#include "Utils.h"
+#include "Helper.h"
+
 void dynamicElements() {
+    // initializes the global state.
+    init();
+
     // placeholder, info should later be transfered to shader
-    const int maxBounces = elements.length();
+    const int maxBounces = inv_elements.length();
 
     #ifdef RAYX_DEBUG_MODE // Debug Matrix only works in GPU Mode and on DEBUG Build Type
     #ifdef GLSL
         // Set Debug Struct of current Ray to identity
-        d_struct[uint(gl_GlobalInvocationID)]._dMat = dmat4(1);
+        pushConstants.inv_d_struct[uint(gl_GlobalInvocationID)]._dMat = dmat4(1);
     #endif
     #endif
 
@@ -29,7 +36,7 @@ void dynamicElements() {
         }
 
         // transform ray and intersection point in ELEMENT coordiantes
-        nextElement = elements[col.elementIndex];
+        nextElement = inv_elements[col.elementIndex];
         Ray elem_ray = rayMatrixMult(_ray, nextElement.m_inTrans);
 
         // Calculate interaction(reflection,material, absorption etc.) of ray with detected next element
@@ -58,7 +65,7 @@ void dynamicElements() {
         }
 
         // the ray might finalize due to being absorbed, or because an error occured while tracing!
-        if (_finalized) { return; }
+        if (inv_finalized) { return; }
 
         recordEvent(elem_ray, ETYPE_JUST_HIT_ELEM);
 

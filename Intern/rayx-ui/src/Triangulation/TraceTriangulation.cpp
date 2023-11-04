@@ -4,14 +4,7 @@
 #include "Colors.h"
 #include "Tracer/CpuTracer.h"
 
-namespace RAYX {
-namespace CPU_TRACER {
-#include "Shared/Collision.h"
-#include "Shared/Element.h"
-#include "Shared/Ray.h"
-RAYX_API Collision findCollisionInElementCoords(Ray, Surface, Cutout, bool);
-}  // namespace CPU_TRACER
-}  // namespace RAYX
+#include "Shader/Collision.h"
 
 /**
  * Given a Cutout object, this function calculates and returns the width and
@@ -104,7 +97,7 @@ RenderObject traceTriangulation(const RAYX::OpticalElement& element, Device& dev
     for (size_t i = 0; i < gridSize; ++i) {
         for (size_t j = 0; j < gridSize; ++j) {
             auto collision =
-                RAYX::CPU_TRACER::findCollisionInElementCoords(rayGrid[i][j], element.m_element.m_surface, element.m_element.m_cutout, true);
+                findCollisionInElementCoords(rayGrid[i][j], element.m_element.m_surface, element.m_element.m_cutout, true);
             collisionGrid[i][j] = collision.found;
         }
     }

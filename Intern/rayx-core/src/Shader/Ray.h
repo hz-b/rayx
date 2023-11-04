@@ -1,7 +1,7 @@
 #ifndef RAY_H
 #define RAY_H
 
-#include "adapt.h"
+#include "Adapt.h"
 
 #ifndef GLSL
 namespace RAYX {

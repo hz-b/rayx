@@ -1,9 +1,10 @@
 
-#include "CpuTracer.h"
-
 #include <cmath>
 #include <cstring>
 
+#include "CpuTracer.h"
+#include "Shader/DynamicElements.h"
+#include "Shader/InvocationState.h"
 #include "Beamline/OpticalElement.h"
 #include "Material/Material.h"
 #include "RAY-Core.h"
@@ -11,10 +12,6 @@
 using uint = unsigned int;
 
 namespace RAYX {
-
-namespace CPU_TRACER {
-#include "shader/main.comp"
-}  // namespace CPU_TRACER
 
 CpuTracer::CpuTracer() { RAYX_VERB << "Initializing Cpu Tracer.."; }
 
@@ -27,33 +24,33 @@ std::vector<Ray> CpuTracer::traceRaw(const TraceRawConfig& cfg) {
 
     // CFG meta passed through pushConstants
 
-    CPU_TRACER::elements.data.clear();
-    CPU_TRACER::xyznull.data.clear();
-    CPU_TRACER::matIdx.data.clear();
-    CPU_TRACER::mat.data.clear();
+    inv_elements.data.clear();
+    inv_xyznull.data.clear();
+    inv_matIdx.data.clear();
+    inv_mat.data.clear();
 
     // init rayData, outputData
-    CPU_TRACER::rayData.data = rayList;
-    CPU_TRACER::outputData.data.resize(rayList.size() * (size_t)cfg.m_maxEvents);
+    inv_rayData.data = rayList;
+    inv_outputData.data.resize(rayList.size() * (size_t)cfg.m_maxEvents);
 
     // init elements
     for (auto e : cfg.m_elements) {
-        CPU_TRACER::elements.data.push_back(e);
+        inv_elements.data.push_back(e);
     }
 
     auto materialTables = cfg.m_materialTables;
-    CPU_TRACER::mat.data = materialTables.materialTable;
-    CPU_TRACER::matIdx.data = materialTables.indexTable;
+    inv_mat.data = materialTables.materialTable;
+    inv_matIdx.data = materialTables.indexTable;
 
     // Run the tracing by for all rays
     for (uint i = 0; i < rayList.size(); i++) {
-        CPU_TRACER::gl_GlobalInvocationID = i;
-        CPU_TRACER::main();
+        gl_GlobalInvocationID = i;
+        dynamicElements();
     }
 
     // Fetch Rays back from the Shader "container"
-    return CPU_TRACER::outputData.data;
+    return inv_outputData.data;
 }
 
-void CpuTracer::setPushConstants(const PushConstants* p) { std::memcpy(&CPU_TRACER::pushConstants, p, sizeof(PushConstants)); }
+void CpuTracer::setPushConstants(const PushConstants* p) { std::memcpy(&inv_pushConstants, p, sizeof(PushConstants)); }
 }  // namespace RAYX

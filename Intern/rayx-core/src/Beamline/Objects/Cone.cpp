@@ -1,7 +1,7 @@
 #include "Cone.h"
 
 #include "Debug/Debug.h"
-#include "Shared/Constants.h"
+#include "Shader/Constants.h"
 
 namespace RAYX {
 Element makeCone(const DesignObject& dobj) {

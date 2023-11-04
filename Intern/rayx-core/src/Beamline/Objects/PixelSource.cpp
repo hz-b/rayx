@@ -4,7 +4,7 @@
 #include "Debug/Debug.h"
 #include "Debug/Instrumentor.h"
 #include "Random.h"
-#include "Shared/Constants.h"
+#include "Shader/Constants.h"
 
 namespace RAYX {
 

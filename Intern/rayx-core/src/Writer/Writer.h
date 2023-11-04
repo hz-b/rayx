@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Shared/Ray.h"
+#include "Shader/Ray.h"
 
 using uint = unsigned int;
 

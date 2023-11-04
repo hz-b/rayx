@@ -3,12 +3,17 @@
 #include "Tracer/CpuTracer.h"
 #include "setupTests.h"
 
+#include "Shader/Utils.h"
+#include "Shader/Approx.h"
+#include "Shader/SphericalCoords.h"
+#include "Shader/Rand.h"
+
 TEST_F(TestSuite, testUniformRandom) {
     uint64_t ctr = 13;
     double old = 0;
 
     for (int i = 0; i < 100; i++) {
-        double d = CPU_TRACER::squaresDoubleRNG(ctr);
+        double d = squaresDoubleRNG(ctr);
         CHECK(d != old)  // repeating numbers are forbidden!
         CHECK_IN(d, 0.0, 1.0)
         old = d;
@@ -25,7 +30,7 @@ TEST_F(TestSuite, testNormalRandom) {
     std::vector<double> z_scores;
 
     for (int i = 0; i < 1000; i++) {
-        double Z = CPU_TRACER::squaresNormalRNG(ctr, mu, sigma);
+        double Z = squaresNormalRNG(ctr, mu, sigma);
         random_numbers.push_back(Z);
 
         // Calculate z-score and store
@@ -57,7 +62,7 @@ TEST_F(TestSuite, testSin) {
     };
 
     for (auto x : args) {
-        CHECK_EQ(CPU_TRACER::r8_sin(x), sin(x));
+        CHECK_EQ(r8_sin(x), sin(x));
     }
 }
 
@@ -69,7 +74,7 @@ TEST_F(TestSuite, testCos) {
     };
 
     for (auto x : args) {
-        CHECK_EQ(CPU_TRACER::r8_cos(x), cos(x));
+        CHECK_EQ(r8_cos(x), cos(x));
     }
 }
 
@@ -81,15 +86,15 @@ TEST_F(TestSuite, testAtan) {
     };
 
     for (auto x : args) {
-        CHECK_EQ(CPU_TRACER::r8_atan(x), atan(x));
+        CHECK_EQ(r8_atan(x), atan(x));
     }
 }
 
 TEST_F(TestSuite, testExp) {
     std::vector<double> args = {10.0, 5.0, 2.0, 1.0, 0.5, 0.0001, 0.0};
     for (auto x : args) {
-        CHECK_EQ(CPU_TRACER::r8_exp(x), exp(x));
-        CHECK_EQ(CPU_TRACER::r8_exp(-x), exp(-x));
+        CHECK_EQ(r8_exp(x), exp(x));
+        CHECK_EQ(r8_exp(-x), exp(-x));
     }
 }
 
@@ -97,7 +102,7 @@ TEST_F(TestSuite, testExp) {
 TEST_F(TestSuite, testLog) {
     std::vector<double> args = {10.0, 5.0, 2.0, 1.0, 0.5, 0.0001, 0.0000001};
     for (auto x : args) {
-        CHECK_EQ(CPU_TRACER::r8_log(x), log(x));
+        CHECK_EQ(r8_log(x), log(x));
     }
 }
 
@@ -136,7 +141,7 @@ TEST_F(TestSuite, testNormalCartesian) {
                                      }};
 
     for (auto p : inouts) {
-        auto out = CPU_TRACER::normal_cartesian(p.in_normal, p.in_slopeX, p.in_slopeZ);
+        auto out = normal_cartesian(p.in_normal, p.in_slopeX, p.in_slopeZ);
         CHECK_EQ(out, p.out);
     }
 }
@@ -174,7 +179,7 @@ TEST_F(TestSuite, testNormalCylindrical) {
                                       .out = glm::dvec3(9431.2169472441783, 4310.7711493493844, -1449.3437356459144)}};
 
     for (auto p : inouts) {
-        auto out = CPU_TRACER::normal_cylindrical(p.in_normal, p.in_slopeX, p.in_slopeZ);
+        auto out = normal_cylindrical(p.in_normal, p.in_slopeX, p.in_slopeZ);
         CHECK_EQ(out, p.out);
     }
 }
@@ -287,7 +292,7 @@ TEST_F(TestSuite, testRZPLineDensityDefaulParams) {
     for (auto p : inouts) {
         double DX;
         double DZ;
-        CPU_TRACER::RZPLineDensity(p.in_ray, p.in_normal, p.in_b, DX, DZ);
+        RZPLineDensity(p.in_ray, p.in_normal, p.in_b, DX, DZ);
         CHECK_EQ(DX, p.out_DX);
         CHECK_EQ(DZ, p.out_DZ);
     }
@@ -402,7 +407,7 @@ TEST_F(TestSuite, testRZPLineDensityAstigmatic) {
     for (auto p : inouts) {
         double DX;
         double DZ;
-        CPU_TRACER::RZPLineDensity(p.in_ray, p.in_normal, p.in_b, DX, DZ);
+        RZPLineDensity(p.in_ray, p.in_normal, p.in_b, DX, DZ);
         CHECK_EQ(DX, p.out_DX);
         CHECK_EQ(DZ, p.out_DZ);
     }
@@ -460,7 +465,7 @@ TEST_F(TestSuite, testRayMatrixMult) {
     };
 
     for (auto p : inouts) {
-        auto out_ray = CPU_TRACER::rayMatrixMult(p.in_ray, p.in_matrix);
+        auto out_ray = rayMatrixMult(p.in_ray, p.in_matrix);
         CHECK_EQ(out_ray, p.out_ray);
     }
 }
@@ -565,7 +570,7 @@ TEST_F(TestSuite, testDPow) {
                                      }};
 
     for (auto p : inouts) {
-        auto out = CPU_TRACER::dpow(p.in_a, p.in_b);
+        auto out = dpow(p.in_a, p.in_b);
         CHECK_EQ(out, p.out);
     }
 }
@@ -630,7 +635,7 @@ TEST_F(TestSuite, testFact) {
     };
 
     for (auto p : inouts) {
-        auto out = CPU_TRACER::fact(p.in);
+        auto out = fact(p.in);
         CHECK_EQ(out, p.out);
     }
 }
@@ -703,7 +708,7 @@ TEST_F(TestSuite, testBessel1) {
     };
 
     for (auto p : inouts) {
-        auto out = CPU_TRACER::bessel1(p.in);
+        auto out = bessel1(p.in);
         CHECK_EQ(out, p.out);
     }
 }
@@ -731,7 +736,7 @@ TEST_F(TestSuite, testVlsGrating) {
                                      }};
 
     for (auto p : inouts) {
-        auto out = CPU_TRACER::vlsGrating(p.in_lineDensity, p.in_z, p.in_vls);
+        auto out = vlsGrating(p.in_lineDensity, p.in_z, p.in_vls);
         CHECK_EQ(out, p.out);
     }
 }
@@ -836,7 +841,7 @@ TEST_F(TestSuite, testPlaneRefrac) {
             };
 
     for (auto p : inouts) {
-        auto out_ray = CPU_TRACER::refrac_plane(p.in_ray, p.in_normal, p.in_a);
+        auto out_ray = refrac_plane(p.in_ray, p.in_normal, p.in_a);
         CHECK_EQ(out_ray, p.out_ray);
     }
 }
@@ -858,7 +863,7 @@ TEST_F(TestSuite, testGetIncidenceAngle) {
                                       .out = 1.3960967569703167}};
 
     for (auto p : inouts) {
-        auto out = CPU_TRACER::getIncidenceAngle(p.in_ray, p.in_normal);
+        auto out = getIncidenceAngle(p.in_ray, p.in_normal);
         CHECK_EQ(out, p.out);
     }
 }
@@ -884,7 +889,7 @@ TEST_F(TestSuite, testReflectance) {
     for (auto p : inouts) {
         glm::dvec2 complex_S;
         glm::dvec2 complex_P;
-        CPU_TRACER::reflectance(p.in_energy, p.in_incidenceAngle, complex_S, complex_P, p.in_material);
+        reflectance(p.in_energy, p.in_incidenceAngle, complex_S, complex_P, p.in_material);
         CHECK_EQ(complex_S, p.out_complex_S);
         CHECK_EQ(complex_P, p.out_complex_P);
     }
@@ -920,7 +925,7 @@ TEST_F(TestSuite, testSnell) {
     };
 
     for (auto p : inouts) {
-        auto out = CPU_TRACER::snell(p.in_cosIncidence, p.in_cn1, p.in_cn2);
+        auto out = snell(p.in_cosIncidence, p.in_cn1, p.in_cn2);
         CHECK_EQ(out, p.out);
     }
 }
@@ -955,7 +960,7 @@ TEST_F(TestSuite, testFresnel) {
     for (auto p : inouts) {
         glm::dvec2 out_complex_S;
         glm::dvec2 out_complex_P;
-        CPU_TRACER::fresnel(p.in_cn1, p.in_cn2, p.in_cosIncidence, p.in_cosTransmittance, out_complex_S, out_complex_P);
+        fresnel(p.in_cn1, p.in_cn2, p.in_cosIncidence, p.in_cosTransmittance, out_complex_S, out_complex_P);
         CHECK_EQ(out_complex_S, p.out_complex_S);
         CHECK_EQ(out_complex_P, p.out_complex_P);
     }
@@ -974,7 +979,7 @@ TEST_F(TestSuite, testCartesianToEuler) {
         {.in_complex = glm::dvec2(0, 1), .out = glm::dvec2(1, 1.5707963267948966)}};
 
     for (auto p : inouts) {
-        auto out = CPU_TRACER::cartesian_to_euler(p.in_complex);
+        auto out = cartesian_to_euler(p.in_complex);
         CHECK_EQ(out, p.out);
     }
 }
@@ -987,48 +992,48 @@ TEST_F(TestSuite, testHvlam) {
     double a = abs(hvlam(hv)) * abs(linedensity) * orderOfDiff * 1e-06;
     CHECK_EQ(a, 0.01239852);
 
-    a = abs(CPU_TRACER::hvlam(hv)) * abs(linedensity) * orderOfDiff * 1e-06;
+    a = abs(hvlam(hv)) * abs(linedensity) * orderOfDiff * 1e-06;
     CHECK_EQ(a, 0.01239852);
 }
 
 TEST_F(TestSuite, testGetAtomicMassAndRho) {
-    CHECK_EQ(CPU_TRACER::getAtomicMassAndRho(static_cast<int>(Material::H)), glm::dvec2(1.00794, 0.0708));
-    CHECK_EQ(CPU_TRACER::getAtomicMassAndRho(static_cast<int>(Material::He)), glm::dvec2(4.0026, 0.122));
-    CHECK_EQ(CPU_TRACER::getAtomicMassAndRho(static_cast<int>(Material::Li)), glm::dvec2(6.941, 0.533));
-    CHECK_EQ(CPU_TRACER::getAtomicMassAndRho(static_cast<int>(Material::Be)), glm::dvec2(9.01218, 1.845));
-    CHECK_EQ(CPU_TRACER::getAtomicMassAndRho(static_cast<int>(Material::B)), glm::dvec2(10.81, 2.34));
-    CHECK_EQ(CPU_TRACER::getAtomicMassAndRho(static_cast<int>(Material::C)), glm::dvec2(12.011, 2.26));
+    CHECK_EQ(getAtomicMassAndRho(static_cast<int>(Material::H)), glm::dvec2(1.00794, 0.0708));
+    CHECK_EQ(getAtomicMassAndRho(static_cast<int>(Material::He)), glm::dvec2(4.0026, 0.122));
+    CHECK_EQ(getAtomicMassAndRho(static_cast<int>(Material::Li)), glm::dvec2(6.941, 0.533));
+    CHECK_EQ(getAtomicMassAndRho(static_cast<int>(Material::Be)), glm::dvec2(9.01218, 1.845));
+    CHECK_EQ(getAtomicMassAndRho(static_cast<int>(Material::B)), glm::dvec2(10.81, 2.34));
+    CHECK_EQ(getAtomicMassAndRho(static_cast<int>(Material::C)), glm::dvec2(12.011, 2.26));
     // ...
-    CHECK_EQ(CPU_TRACER::getAtomicMassAndRho(static_cast<int>(Material::Cu)), glm::dvec2(63.546, 8.94));
+    CHECK_EQ(getAtomicMassAndRho(static_cast<int>(Material::Cu)), glm::dvec2(63.546, 8.94));
     // ...
-    CHECK_EQ(CPU_TRACER::getAtomicMassAndRho(static_cast<int>(Material::U)), glm::dvec2(238.0289, 18.92));
+    CHECK_EQ(getAtomicMassAndRho(static_cast<int>(Material::U)), glm::dvec2(238.0289, 18.92));
 }
 
 TEST_F(TestSuite, testPalik) {
     updateCpuTracerMaterialTables({Material::Cu, Material::Au});
 
     int Cu = static_cast<int>(Material::Cu);
-    CHECK_EQ(CPU_TRACER::getPalikEntryCount(Cu), 324);
+    CHECK_EQ(getPalikEntryCount(Cu), 324);
 
-    auto Cu0 = CPU_TRACER::getPalikEntry(0, Cu);
+    auto Cu0 = getPalikEntry(0, Cu);
     CHECK_EQ(Cu0.m_energy, 1.0);
     CHECK_EQ(Cu0.m_n, 0.433);
     CHECK_EQ(Cu0.m_k, 8.46);
 
-    auto Cu10 = CPU_TRACER::getPalikEntry(10, Cu);
+    auto Cu10 = getPalikEntry(10, Cu);
     CHECK_EQ(Cu10.m_energy, 2.3);
     CHECK_EQ(Cu10.m_n, 1.04);
     CHECK_EQ(Cu10.m_k, 2.59);
 
     int Au = static_cast<int>(Material::Au);
-    CHECK_EQ(CPU_TRACER::getPalikEntryCount(Au), 386);
+    CHECK_EQ(getPalikEntryCount(Au), 386);
 
-    auto Au0 = CPU_TRACER::getPalikEntry(0, Au);
+    auto Au0 = getPalikEntry(0, Au);
     CHECK_EQ(Au0.m_energy, 0.04959);
     CHECK_EQ(Au0.m_n, 20.3);
     CHECK_EQ(Au0.m_k, 76.992);
 
-    auto Au10 = CPU_TRACER::getPalikEntry(10, Au);
+    auto Au10 = getPalikEntry(10, Au);
     CHECK_EQ(Au10.m_energy, 0.11158);
     CHECK_EQ(Au10.m_n, 12.963);
     CHECK_EQ(Au10.m_k, 57.666);
@@ -1038,28 +1043,28 @@ TEST_F(TestSuite, testNff) {
     updateCpuTracerMaterialTables({Material::Cu, Material::Au});
 
     int Cu = static_cast<int>(Material::Cu);
-    CHECK_EQ(CPU_TRACER::getNffEntryCount(Cu), 504);
+    CHECK_EQ(getNffEntryCount(Cu), 504);
 
-    auto Cu0 = CPU_TRACER::getNffEntry(0, Cu);
+    auto Cu0 = getNffEntry(0, Cu);
 
     CHECK_EQ(Cu0.m_energy, 10.0);
     CHECK_EQ(Cu0.m_f1, -9999.0);
     CHECK_EQ(Cu0.m_f2, 1.30088);
 
-    auto Cu10 = CPU_TRACER::getNffEntry(10, Cu);
+    auto Cu10 = getNffEntry(10, Cu);
     CHECK_EQ(Cu10.m_energy, 11.7404);
     CHECK_EQ(Cu10.m_f1, -9999.0);
     CHECK_EQ(Cu10.m_f2, 1.66946);
 
     int Au = static_cast<int>(Material::Au);
-    CHECK_EQ(CPU_TRACER::getNffEntryCount(Au), 506);
+    CHECK_EQ(getNffEntryCount(Au), 506);
 
-    auto Au0 = CPU_TRACER::getNffEntry(0, Au);
+    auto Au0 = getNffEntry(0, Au);
     CHECK_EQ(Au0.m_energy, 10.0);
     CHECK_EQ(Au0.m_f1, -9999.0);
     CHECK_EQ(Au0.m_f2, 1.73645);
 
-    auto Au10 = CPU_TRACER::getNffEntry(10, Au);
+    auto Au10 = getNffEntry(10, Au);
     CHECK_EQ(Au10.m_energy, 11.7404);
     CHECK_EQ(Au10.m_f1, -9999.0);
     CHECK_EQ(Au10.m_f2, 2.67227);
@@ -1069,18 +1074,18 @@ TEST_F(TestSuite, testRefractiveIndex) {
     updateCpuTracerMaterialTables({Material::Cu});
 
     // vacuum
-    CHECK_EQ(CPU_TRACER::getRefractiveIndex(42.0, -1), glm::dvec2(1.0, 0.0));
+    CHECK_EQ(getRefractiveIndex(42.0, -1), glm::dvec2(1.0, 0.0));
 
     // palik tests for Cu
     // data taken from Data/PALIK
-    CHECK_EQ(CPU_TRACER::getRefractiveIndex(1.0, 29), glm::dvec2(0.433, 8.46));
-    CHECK_EQ(CPU_TRACER::getRefractiveIndex(1.8, 29), glm::dvec2(0.213, 4.05));
-    CHECK_EQ(CPU_TRACER::getRefractiveIndex(1977.980, 29), glm::dvec2(1.000032, 9.4646668E-05));
+    CHECK_EQ(getRefractiveIndex(1.0, 29), glm::dvec2(0.433, 8.46));
+    CHECK_EQ(getRefractiveIndex(1.8, 29), glm::dvec2(0.213, 4.05));
+    CHECK_EQ(getRefractiveIndex(1977.980, 29), glm::dvec2(1.000032, 9.4646668E-05));
 
     // nff tests for Cu
     // data taken from
     // https://refractiveindex.info/?shelf=main&book=Cu&page=Hagemann
-    CHECK_EQ(CPU_TRACER::getRefractiveIndex(25146.2, 29), glm::dvec2(1.0, 1.0328e-7), 1e-5);
+    CHECK_EQ(getRefractiveIndex(25146.2, 29), glm::dvec2(1.0, 1.0328e-7), 1e-5);
 }
 
 TEST_F(TestSuite, testBesselDipole) {
@@ -1179,10 +1184,10 @@ TEST_F(TestSuite, testSphericalCoords) {
 
     for (auto dir : directions) {
         double phi, psi;
-        CPU_TRACER::directionToSphericalCoords(dir, phi, psi);
+        directionToSphericalCoords(dir, phi, psi);
 
         dvec3 dir2;
-        CPU_TRACER::sphericalCoordsToDirection(phi, psi, dir2);
+        sphericalCoordsToDirection(phi, psi, dir2);
 
         CHECK_EQ(dir, dir2, 1e-11);
     }

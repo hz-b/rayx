@@ -3,7 +3,7 @@
 #include "Data/xml.h"
 #include "Debug/Debug.h"
 #include "Material/Material.h"
-#include "Shared/Constants.h"
+#include "Shader/Constants.h"
 
 namespace RAYX {
 

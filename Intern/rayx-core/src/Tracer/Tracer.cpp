@@ -5,7 +5,7 @@
 #include "Beamline/OpticalElement.h"
 #include "RAY-Core.h"
 #include "Random.h"
-#include "Shared/Constants.h"
+#include "Shader/Constants.h"
 
 using uint = unsigned int;
 

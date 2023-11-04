@@ -1,7 +1,7 @@
 #ifndef SURFACE_H
 #define SURFACE_H
 
-#include "adapt.h"
+#include "Adapt.h"
 
 // a surface is a potentially infinite curved surface in 3d space.
 // as our elements are mostly finite in size, they are represented by a (potentially infinite) surface in combination with a finite cutout (see CTYPE

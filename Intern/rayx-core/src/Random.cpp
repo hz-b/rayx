@@ -3,7 +3,7 @@
 #include <algorithm>
 #include <random>
 
-#include "Shared/Constants.h"
+#include "Shader/Constants.h"
 
 static std::mt19937 RNG;
 

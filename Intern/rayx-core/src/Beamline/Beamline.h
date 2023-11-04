@@ -8,7 +8,7 @@
 #include "Beamline/LightSource.h"
 #include "Beamline/OpticalElement.h"
 #include "Core.h"
-#include "Shared/Ray.h"
+#include "Shader/Ray.h"
 
 namespace RAYX {
 struct OpticalElement;

@@ -1,15 +1,12 @@
-/// Each `behave*` function gets a `Ray r` (in element-coords), the element itself, a randomness counter and the `Collision col`.
-/// `col.hitpoint` expresses where the given ray r will hit the element (in element-coords).
-/// `col.normal` expresses the normal of the surface, at `col.hitpoint` (in element-coords).
-/// The ray has already been moved to the hitpoint, and it's lastElement has been set accordingly.
-///
-/// The `behave*` functions, will
-/// - change the rays direction, typically by reflecting using the normal
-/// - change the rays stokes vector
-/// - potentially absorb the ray (by calling `recordFinalEvent(_, ETYPE_ABSORBED)`)
+#include "Behave.h"
+#include "Utils.h"
+#include "Rand.h"
+#include "Helper.h"
+#include "SphericalCoords.h"
+#include "InvocationState.h"
 
 Ray behaveSlit(Ray r, int id, ALLOW_UNUSED Collision col) {
-    SlitBehaviour b = deserializeSlit(elements[id].m_behaviour);
+    SlitBehaviour b = deserializeSlit(inv_elements[id].m_behaviour);
 
     // slit lies in x-y plane instead of x-z plane as other elements
     Cutout openingCutout = b.m_openingCutout;
@@ -40,7 +37,7 @@ Ray behaveSlit(Ray r, int id, ALLOW_UNUSED Collision col) {
             EllipticalCutout e = deserializeElliptical(openingCutout);
             bessel_diff(e.m_diameter_z, wavelength, dPhi, dPsi);
         } else {
-            throw("encountered Slit with unsupported openingCutout");
+            _throw("encountered Slit with unsupported openingCutout");
         }
     }
 
@@ -54,7 +51,7 @@ Ray behaveSlit(Ray r, int id, ALLOW_UNUSED Collision col) {
 }
 
 Ray behaveRZP(Ray r, int id, Collision col) {
-    RZPBehaviour b = deserializeRZP(elements[id].m_behaviour);
+    RZPBehaviour b = deserializeRZP(inv_elements[id].m_behaviour);
 
     double WL            = hvlam(r.m_energy);
     double Ord           = b.m_orderOfDiffraction;
@@ -67,7 +64,7 @@ Ray behaveRZP(Ray r, int id, Collision col) {
     // if additional zero order should be behaved, approx. half of the rays are randomly chosen to be behaved in order 0 (= ordinary reflection) instead
     // of the given order
     if (additional_order == 1) {
-        if (squaresDoubleRNG(_ctr) > 0.5) Ord = 0;
+        if (squaresDoubleRNG(inv_ctr) > 0.5) Ord = 0;
     }
 
     // only 2D case, not 2 1D gratings with 90 degree rotation as in old RAY
@@ -80,7 +77,7 @@ Ray behaveRZP(Ray r, int id, Collision col) {
 }
 
 Ray behaveGrating(Ray r, int id, Collision col) {
-    GratingBehaviour b = deserializeGrating(elements[id].m_behaviour);
+    GratingBehaviour b = deserializeGrating(inv_elements[id].m_behaviour);
 
     // vls parameters passed in q.elementParams
     double WL                 = hvlam(r.m_energy);
@@ -100,14 +97,14 @@ Ray behaveGrating(Ray r, int id, Collision col) {
 
 Ray behaveMirror(Ray r, int id, Collision col) {
     // calculate intersection point and normal at intersection point
-    double azimuthal_angle = elements[id].m_azimuthalAngle;
+    double azimuthal_angle = inv_elements[id].m_azimuthalAngle;
 
     // calculate the new direction after the reflection
     r.m_direction = reflect(r.m_direction, col.normal);
 
     double real_S, real_P, delta;
     double incidence_angle = getIncidenceAngle(r, col.normal);  // getTheta
-    int mat = int(elements[id].m_material);
+    int mat = int(inv_elements[id].m_material);
     if (mat != -2) {
         efficiency(r, real_S, real_P, delta, incidence_angle, mat);
 

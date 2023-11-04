@@ -7,8 +7,9 @@
 
 #include "Beamline/Beamline.h"
 #include "Core.h"
-#include "Shared/Constants.h"
-#include "Shared/Ray.h"
+#include "Shader/Constants.h"
+#include "Shader/InvocationState.h"
+#include "Shader/Ray.h"
 
 // if no `--batch` option is given, this it the batch size.
 const uint64_t DEFAULT_BATCH_SIZE = 100000;
@@ -29,15 +30,6 @@ struct TraceRawConfig {
     double m_maxEvents;
     MaterialTables m_materialTables;
     std::vector<Element> m_elements;
-};
-
-// Useful for GPU Tracing
-struct PushConstants {  // TODO(Jannis): PushConstants is not an expressive name. Rename to something like TracerConfig
-    double rayIdStart;
-    double numRays;
-    double randomSeed;
-    double maxEvents;
-    double sequential;
 };
 
 /// A 'snapshot' of a ray, at the time where it undergoes some event.

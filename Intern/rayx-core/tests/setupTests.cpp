@@ -246,6 +246,6 @@ void updateCpuTracerMaterialTables(std::vector<Material> mats_vec) {
         mats[static_cast<int>(m) - 1] = true;
     }
     auto materialTables = loadMaterialTables(mats);
-    CPU_TRACER::mat.data = materialTables.materialTable;
-    CPU_TRACER::matIdx.data = materialTables.indexTable;
+    inv_mat.data = materialTables.materialTable;
+    inv_matIdx.data = materialTables.indexTable;
 }

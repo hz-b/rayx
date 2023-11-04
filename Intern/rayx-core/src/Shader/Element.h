@@ -4,7 +4,7 @@
 #include "Behaviour.h"
 #include "Cutout.h"
 #include "Surface.h"
-#include "adapt.h"
+#include "Adapt.h"
 
 struct SlopeError {
     double m_sag;  // aka `slopeErrorX`

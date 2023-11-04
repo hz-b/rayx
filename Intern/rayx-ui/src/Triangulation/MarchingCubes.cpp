@@ -3,12 +3,7 @@
 #include "Colors.h"
 #include "Debug/Debug.h"
 #include "MarchingCubeConstans.h"
-
-namespace RAYX {
-namespace CPU_TRACER {
-bool RAYX_API inCutout(Cutout cutout, double x1, double x2);
-}  // namespace CPU_TRACER
-}  // namespace RAYX
+#include "Shader/Utils.h"
 
 /**
  * This function iterates through the provided optical elements, applying Marching Cubes triangulation
@@ -76,7 +71,7 @@ std::vector<Triangle> trianglesFromQuadric(const double* quadric, Cutout cutout)
             for (int z = 0; z < GRIDSIZE - 1; z++) {
                 double realX = ((double(x) / GRIDSIZE) - 0.5) * bounding_box.x;
                 double realZ = ((double(z) / GRIDSIZE) - 0.5) * bounding_box.y;
-                if (RAYX::CPU_TRACER::inCutout(cutout, realX, realZ)) {
+                if (inCutout(cutout, realX, realZ)) {
                     int caseIndex = determineMarchingCubesCase(scalarGrid, x, y, z);
                     std::vector<Triangle> voxelTriangles = lookupTrianglesForCase(caseIndex, scalarGrid, x, y, z, scale);
                     triangles.insert(triangles.end(), voxelTriangles.begin(), voxelTriangles.end());
