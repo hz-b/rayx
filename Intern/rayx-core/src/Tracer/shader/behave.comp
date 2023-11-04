@@ -17,12 +17,6 @@ Ray behaveSlit(Ray r, int id, ALLOW_UNUSED Collision col) {
     bool withinOpening = inCutout(openingCutout, r.m_position.x, r.m_position.z);
     bool withinBeamstop = inCutout(beamstopCutout, r.m_position.x, r.m_position.z);
 
-    // TODO this runtime test is a hotfix. It doesn't find all problems of this kind.
-    // Eg. an opening & beamstop being larger than the whole object would remain undetected.
-    if (withinBeamstop && !withinOpening) {
-        throw("Ray hit beamstop outside of opening! Even though beamstop should never be larger than opening!");
-    }
-
     if (!withinOpening || withinBeamstop) {
         recordFinalEvent(r, ETYPE_ABSORBED);
         return r;

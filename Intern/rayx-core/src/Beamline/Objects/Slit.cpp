@@ -5,6 +5,9 @@
 #include "Shared/Constants.h"
 
 namespace RAYX {
+namespace CPU_TRACER {
+    void RAYX_API assertCutoutSubset(Cutout, Cutout);
+}
 
 Cutout mkOpeningCutout(const DesignObject& dobj) {
     auto shape = dobj.parseOpeningShape();
@@ -52,12 +55,24 @@ Cutout mkBeamstopCutout(const DesignObject& dobj) {
 }
 
 Element makeSlit(const DesignObject& dobj) {
+    Cutout openingCutout = mkOpeningCutout(dobj);
+    Cutout beamstopCutout = mkBeamstopCutout(dobj);
+
     auto surface = serializePlaneXZ();
     auto behaviour = serializeSlit({
-        .m_openingCutout = mkOpeningCutout(dobj),
-        .m_beamstopCutout = mkBeamstopCutout(dobj),
+        .m_openingCutout = openingCutout,
+        .m_beamstopCutout = beamstopCutout,
     });
-    return makeElement(dobj, behaviour, surface, {}, DesignPlane::XY);
+    Element el = makeElement(dobj, behaviour, surface, {}, DesignPlane::XY);
+    Cutout globalCutout = el.m_cutout;
+
+    // the opening needs to be a subset of the whole object.
+    CPU_TRACER::assertCutoutSubset(openingCutout, globalCutout);
+
+    // the beamstop needs to be a subset of the opening.
+    CPU_TRACER::assertCutoutSubset(beamstopCutout, openingCutout);
+
+    return el;
 }
 
 }  // namespace RAYX
