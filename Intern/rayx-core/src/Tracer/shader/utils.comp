@@ -848,7 +848,7 @@ void fraun_diff(double dim, double wl, RAYX_INOUT(double) dAngle) {
 // Cutout helper functions:
 
 // checks whether the point (x, z) is within the cutout.
-INLINE bool RAYX_API inCutout(Cutout cutout, double x, double z) {
+bool RAYX_API inCutout(Cutout cutout, double x, double z) {
     if (cutout.m_type == CTYPE_UNLIMITED) {
         return true;
     } else if (cutout.m_type == CTYPE_RECT) {
@@ -905,7 +905,7 @@ INLINE bool RAYX_API inCutout(Cutout cutout, double x, double z) {
 
 // returns a matrix M where (M[i].x, M[i].z) are the key points of our cutout.
 // The key points are typically points on the boundary of the cutout.
-INLINE dmat4 RAYX_API keyCutoutPoints(Cutout cutout) {
+dmat4 RAYX_API keyCutoutPoints(Cutout cutout) {
     dmat4 ret;
     double w = 0;
     double l = 0;
@@ -945,7 +945,7 @@ INLINE dmat4 RAYX_API keyCutoutPoints(Cutout cutout) {
 }
 
 // returns width and length of the bounding box.
-INLINE dvec2 cutoutBoundingBox(Cutout cutout) {
+dvec2 cutoutBoundingBox(Cutout cutout) {
     dvec2 ret = dvec2(0.0, 0.0);
     dmat4 keypoints = keyCutoutPoints(cutout);
     for (int i = 0; i < 4; i++) {
