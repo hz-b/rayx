@@ -4,6 +4,8 @@
 #include "Cutout.h"
 #include "Adapt.h"
 
+#undef m_private_serialization_params
+
 // A behaviour decides what happens whenever a ray hits the surface of this element.
 // Each behaviour type has its own `behave` function in `behave.comp`.
 const int BTYPE_MIRROR = 0;
@@ -14,9 +16,11 @@ const int BTYPE_IMAGE_PLANE = 4;
 
 struct Behaviour {
     // the type of this behaviour, see the BTYPE constants.
-    // the type describes how the m_params need to be interpreted.
+    // the type describes how the m_private_serialization_params need to be interpreted.
     double m_type;
-    double m_params[16];
+
+    // These params are private. use the serialize & deserialize functions below instead.
+    double m_private_serialization_params[16];
 };
 
 ////////////////////
@@ -44,27 +48,27 @@ INLINE Behaviour serializeGrating(GratingBehaviour g) {
     Behaviour b;
     b.m_type = BTYPE_GRATING;
 
-    b.m_params[0] = g.m_vls[0];
-    b.m_params[1] = g.m_vls[1];
-    b.m_params[2] = g.m_vls[2];
-    b.m_params[3] = g.m_vls[3];
-    b.m_params[4] = g.m_vls[4];
-    b.m_params[5] = g.m_vls[5];
-    b.m_params[6] = g.m_lineDensity;
-    b.m_params[7] = g.m_orderOfDiffraction;
+    b.m_private_serialization_params[0] = g.m_vls[0];
+    b.m_private_serialization_params[1] = g.m_vls[1];
+    b.m_private_serialization_params[2] = g.m_vls[2];
+    b.m_private_serialization_params[3] = g.m_vls[3];
+    b.m_private_serialization_params[4] = g.m_vls[4];
+    b.m_private_serialization_params[5] = g.m_vls[5];
+    b.m_private_serialization_params[6] = g.m_lineDensity;
+    b.m_private_serialization_params[7] = g.m_orderOfDiffraction;
     return b;
 }
 
 INLINE GratingBehaviour deserializeGrating(Behaviour b) {
     GratingBehaviour g;
-    g.m_vls[0] = b.m_params[0];
-    g.m_vls[1] = b.m_params[1];
-    g.m_vls[2] = b.m_params[2];
-    g.m_vls[3] = b.m_params[3];
-    g.m_vls[4] = b.m_params[4];
-    g.m_vls[5] = b.m_params[5];
-    g.m_lineDensity = b.m_params[6];
-    g.m_orderOfDiffraction = b.m_params[7];
+    g.m_vls[0] = b.m_private_serialization_params[0];
+    g.m_vls[1] = b.m_private_serialization_params[1];
+    g.m_vls[2] = b.m_private_serialization_params[2];
+    g.m_vls[3] = b.m_private_serialization_params[3];
+    g.m_vls[4] = b.m_private_serialization_params[4];
+    g.m_vls[5] = b.m_private_serialization_params[5];
+    g.m_lineDensity = b.m_private_serialization_params[6];
+    g.m_orderOfDiffraction = b.m_private_serialization_params[7];
     return g;
 }
 
@@ -87,30 +91,30 @@ INLINE Behaviour serializeSlit(SlitBehaviour s) {
     Behaviour b;
     b.m_type = BTYPE_SLIT;
 
-    b.m_params[0] = s.m_openingCutout.m_type;
-    b.m_params[1] = s.m_openingCutout.m_params[0];
-    b.m_params[2] = s.m_openingCutout.m_params[1];
-    b.m_params[3] = s.m_openingCutout.m_params[2];
+    b.m_private_serialization_params[0] = s.m_openingCutout.m_type;
+    b.m_private_serialization_params[1] = s.m_openingCutout.m_private_serialization_params[0];
+    b.m_private_serialization_params[2] = s.m_openingCutout.m_private_serialization_params[1];
+    b.m_private_serialization_params[3] = s.m_openingCutout.m_private_serialization_params[2];
 
-    b.m_params[4] = s.m_beamstopCutout.m_type;
-    b.m_params[5] = s.m_beamstopCutout.m_params[0];
-    b.m_params[6] = s.m_beamstopCutout.m_params[1];
-    b.m_params[7] = s.m_beamstopCutout.m_params[2];
+    b.m_private_serialization_params[4] = s.m_beamstopCutout.m_type;
+    b.m_private_serialization_params[5] = s.m_beamstopCutout.m_private_serialization_params[0];
+    b.m_private_serialization_params[6] = s.m_beamstopCutout.m_private_serialization_params[1];
+    b.m_private_serialization_params[7] = s.m_beamstopCutout.m_private_serialization_params[2];
     return b;
 }
 
 INLINE SlitBehaviour deserializeSlit(Behaviour b) {
     SlitBehaviour s;
 
-    s.m_openingCutout.m_type = b.m_params[0];
-    s.m_openingCutout.m_params[0] = b.m_params[1];
-    s.m_openingCutout.m_params[1] = b.m_params[2];
-    s.m_openingCutout.m_params[2] = b.m_params[3];
+    s.m_openingCutout.m_type = b.m_private_serialization_params[0];
+    s.m_openingCutout.m_private_serialization_params[0] = b.m_private_serialization_params[1];
+    s.m_openingCutout.m_private_serialization_params[1] = b.m_private_serialization_params[2];
+    s.m_openingCutout.m_private_serialization_params[2] = b.m_private_serialization_params[3];
 
-    s.m_beamstopCutout.m_type = b.m_params[4];
-    s.m_beamstopCutout.m_params[0] = b.m_params[5];
-    s.m_beamstopCutout.m_params[1] = b.m_params[6];
-    s.m_beamstopCutout.m_params[2] = b.m_params[7];
+    s.m_beamstopCutout.m_type = b.m_private_serialization_params[4];
+    s.m_beamstopCutout.m_private_serialization_params[0] = b.m_private_serialization_params[5];
+    s.m_beamstopCutout.m_private_serialization_params[1] = b.m_private_serialization_params[6];
+    s.m_beamstopCutout.m_private_serialization_params[2] = b.m_private_serialization_params[7];
     return s;
 }
 
@@ -139,39 +143,39 @@ INLINE Behaviour serializeRZP(RZPBehaviour r) {
     Behaviour b;
     b.m_type = BTYPE_RZP;
 
-    b.m_params[0] = r.m_imageType;
-    b.m_params[1] = r.m_rzpType;
-    b.m_params[2] = r.m_derivationMethod;
-    b.m_params[3] = r.m_designWavelength;
-    b.m_params[4] = r.m_designOrderOfDiffraction;
-    b.m_params[5] = r.m_orderOfDiffraction;
-    b.m_params[6] = r.m_fresnelZOffset;
-    b.m_params[7] = r.m_designSagittalEntranceArmLength;
-    b.m_params[8] = r.m_designSagittalExitArmLength;
-    b.m_params[9] = r.m_designMeridionalEntranceArmLength;
-    b.m_params[10] = r.m_designMeridionalExitArmLength;
-    b.m_params[11] = r.m_designAlphaAngle;
-    b.m_params[12] = r.m_designBetaAngle;
-    b.m_params[13] = r.m_additionalOrder;
+    b.m_private_serialization_params[0] = r.m_imageType;
+    b.m_private_serialization_params[1] = r.m_rzpType;
+    b.m_private_serialization_params[2] = r.m_derivationMethod;
+    b.m_private_serialization_params[3] = r.m_designWavelength;
+    b.m_private_serialization_params[4] = r.m_designOrderOfDiffraction;
+    b.m_private_serialization_params[5] = r.m_orderOfDiffraction;
+    b.m_private_serialization_params[6] = r.m_fresnelZOffset;
+    b.m_private_serialization_params[7] = r.m_designSagittalEntranceArmLength;
+    b.m_private_serialization_params[8] = r.m_designSagittalExitArmLength;
+    b.m_private_serialization_params[9] = r.m_designMeridionalEntranceArmLength;
+    b.m_private_serialization_params[10] = r.m_designMeridionalExitArmLength;
+    b.m_private_serialization_params[11] = r.m_designAlphaAngle;
+    b.m_private_serialization_params[12] = r.m_designBetaAngle;
+    b.m_private_serialization_params[13] = r.m_additionalOrder;
     return b;
 }
 
 INLINE RZPBehaviour deserializeRZP(Behaviour b) {
     RZPBehaviour r;
-    r.m_imageType = b.m_params[0];
-    r.m_rzpType = b.m_params[1];
-    r.m_derivationMethod = b.m_params[2];
-    r.m_designWavelength = b.m_params[3];
-    r.m_designOrderOfDiffraction = b.m_params[4];
-    r.m_orderOfDiffraction = b.m_params[5];
-    r.m_fresnelZOffset = b.m_params[6];
-    r.m_designSagittalEntranceArmLength = b.m_params[7];
-    r.m_designSagittalExitArmLength = b.m_params[8];
-    r.m_designMeridionalEntranceArmLength = b.m_params[9];
-    r.m_designMeridionalExitArmLength = b.m_params[10];
-    r.m_designAlphaAngle = b.m_params[11];
-    r.m_designBetaAngle = b.m_params[12];
-    r.m_additionalOrder = b.m_params[13];
+    r.m_imageType = b.m_private_serialization_params[0];
+    r.m_rzpType = b.m_private_serialization_params[1];
+    r.m_derivationMethod = b.m_private_serialization_params[2];
+    r.m_designWavelength = b.m_private_serialization_params[3];
+    r.m_designOrderOfDiffraction = b.m_private_serialization_params[4];
+    r.m_orderOfDiffraction = b.m_private_serialization_params[5];
+    r.m_fresnelZOffset = b.m_private_serialization_params[6];
+    r.m_designSagittalEntranceArmLength = b.m_private_serialization_params[7];
+    r.m_designSagittalExitArmLength = b.m_private_serialization_params[8];
+    r.m_designMeridionalEntranceArmLength = b.m_private_serialization_params[9];
+    r.m_designMeridionalExitArmLength = b.m_private_serialization_params[10];
+    r.m_designAlphaAngle = b.m_private_serialization_params[11];
+    r.m_designBetaAngle = b.m_private_serialization_params[12];
+    r.m_additionalOrder = b.m_private_serialization_params[13];
     return r;
 }
 
@@ -185,6 +189,9 @@ INLINE Behaviour serializeImagePlane() {
     b.m_type = BTYPE_IMAGE_PLANE;
     return b;
 }
+
+// This prevents m_private_serialization_params from being used outside of this file - making them practically private.
+#define m_private_serialization_params "m_private_serialization_params are private! Use the corresponding serialize & deserialize functions instead."
 
 #endif
 
