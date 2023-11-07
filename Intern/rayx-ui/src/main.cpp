@@ -1,6 +1,10 @@
+#include <nfd.h>
+
 #include "Application.h"
 
 int main(int argc, char** argv) {
+    NFD_Init();  // Initialize Native File Dialog
+
     Application app(1920, 1080, "RayX-UI", argc, argv);
 
     try {
@@ -10,5 +14,6 @@ int main(int argc, char** argv) {
         return EXIT_FAILURE;
     }
 
+    NFD_Quit();
     return EXIT_SUCCESS;
 }
