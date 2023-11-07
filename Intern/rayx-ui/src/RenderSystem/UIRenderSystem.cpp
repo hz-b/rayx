@@ -2,8 +2,10 @@
 
 #include <imgui_impl_glfw.h>
 #include <imgui_impl_vulkan.h>
+#include <nfd.h>
 
 #include <fstream>
+#include <rapidxml.hpp>
 
 #include "CanonicalizePath.h"
 
@@ -187,9 +189,8 @@ void UIRenderSystem::showSceneEditorWindow(UIParameters& uiParams) {
 
     ImGui::Begin("Properties Manager");
 
-    // if (ImGui::Button("Open File Dialog")) {
-    //
-    // }
+    if (ImGui::Button("Open File Dialog")) {
+    }
 
     ImGui::Text("Background");
     ImGui::ColorEdit3("Color", (float*)&m_ClearColor);
