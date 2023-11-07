@@ -141,7 +141,7 @@ void Application::updateScene(const std::string& path, std::vector<RenderObject>
     vkDeviceWaitIdle(m_Device.device());  // TODO(Jannis): Hacky fix for now; should be some form of synchronization
 
     // Triangulate the render data and update the scene
-    rObjects = triangulateObjects(beamline.m_OpticalElements, m_Device, false);
+    rObjects = triangulateObjects(beamline.m_OpticalElements, m_Device);
     rays = getRays(bundleHist, beamline.m_OpticalElements);
 
     if (!rays.empty()) {
