@@ -41,7 +41,7 @@ extern ShaderArray<int> RAYX_API inv_matIdx;
 extern ShaderArray<double> RAYX_API inv_mat;
 
 #ifdef RAYX_DEBUG_MODE
-extern ShaderArray<_debug_struct> inv_d_struct;
+extern ShaderArray<_debug_struct> RAYX_API inv_d_struct;
 #endif
 
 extern PushConstants inv_pushConstants;
