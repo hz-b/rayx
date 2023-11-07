@@ -44,7 +44,7 @@ if(Vulkan_FOUND)
     # ----------------------
 
     # ---- Dependencies ----
-    target_link_libraries(${PROJECT_NAME} PRIVATE rayx-core glfw ImGuiFileDialog CLI11::CLI11)
+    target_link_libraries(${PROJECT_NAME} PRIVATE rayx-core glfw CLI11::CLI11)
     target_include_directories(${PROJECT_NAME} PRIVATE
         ${GLFW_DIR}/include
         ${GLFW_DIR}/deps

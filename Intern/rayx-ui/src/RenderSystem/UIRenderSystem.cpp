@@ -1,8 +1,9 @@
 #include "UIRenderSystem.h"
 
-#include <ImGuiFileDialog.h>
 #include <imgui_impl_glfw.h>
 #include <imgui_impl_vulkan.h>
+
+#include <fstream>
 
 #include "CanonicalizePath.h"
 
@@ -186,24 +187,9 @@ void UIRenderSystem::showSceneEditorWindow(UIParameters& uiParams) {
 
     ImGui::Begin("Properties Manager");
 
-    // Check ImGui dialog open condition
-    if (ImGui::Button("Open File Dialog")) {
-        ImGuiFileDialog::Instance()->OpenDialog("ChooseFileDlgKey", "Choose Beamline (rml) File", ".rml\0", ".");
-    }
-
-    ImGui::SetNextWindowSize(ImVec2(800, 600), ImGuiCond_Once);
-
-    // Display file dialog
-    if (ImGuiFileDialog::Instance()->Display("ChooseFileDlgKey")) {
-        if (ImGuiFileDialog::Instance()->IsOk()) {
-            std::string filePathName = ImGuiFileDialog::Instance()->GetFilePathName();
-            std::string extension = ImGuiFileDialog::Instance()->GetCurrentFilter();
-
-            uiParams.rmlPath = filePathName;
-            uiParams.pathChanged = true;
-        }
-        ImGuiFileDialog::Instance()->Close();
-    }
+    // if (ImGui::Button("Open File Dialog")) {
+    //
+    // }
 
     ImGui::Text("Background");
     ImGui::ColorEdit3("Color", (float*)&m_ClearColor);
