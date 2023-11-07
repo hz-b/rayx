@@ -190,6 +190,18 @@ void UIRenderSystem::showSceneEditorWindow(UIParameters& uiParams) {
     ImGui::Begin("Properties Manager");
 
     if (ImGui::Button("Open File Dialog")) {
+        nfdchar_t* outPath;
+        constexpr uint32_t filterCount = 1;
+        nfdfilteritem_t filterItem[filterCount] = {{"RML Files", "rml, xml"}};
+        nfdresult_t result = NFD_OpenDialog(&outPath, filterItem, filterCount, NULL);
+        if (result == NFD_OKAY) {
+            uiParams.rmlPath = outPath;
+            uiParams.pathChanged = true;
+        } else if (result == NFD_CANCEL) {
+            puts("User pressed cancel.");
+        } else {
+            printf("Error: %s\n", NFD_GetError());
+        }
     }
 
     ImGui::Text("Background");
