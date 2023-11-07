@@ -11,10 +11,9 @@
 /**
  * @brief Triangulates optical elements for rendering.
  * @param elements A vector of optical elements to be triangulated.
- * @param useMarchinCubes Flag to determine if Marching Cubes triangulation should be used.
  * @return A vector of RenderObject, which are the triangulated version of the input elements.
  */
-std::vector<RenderObject> triangulateObjects(const std::vector<RAYX::OpticalElement>& elements, Device& device, bool useMarchinCubes = false);
+std::vector<RenderObject> triangulateObjects(const std::vector<RAYX::OpticalElement>& elements, Device& device);
 
 /**
  * @brief Generates visual representations of rays based on bundle history and optical elements.

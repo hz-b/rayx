@@ -5,7 +5,6 @@
 
 #include "Colors.h"
 #include "Debug/Debug.h"
-#include "Triangulation/MarchingCubes.h"
 #include "Triangulation/TraceTriangulation.h"
 
 // ------ Helper functions ------
@@ -107,10 +106,8 @@ bool isPlanar(const QuadricSurface& q) { return (q.m_a11 == 0 && q.m_a22 == 0 &&
 
 /**
  * This function takes optical elements and categorizes them for efficient triangulation.
- * Depending on the type of the surface of the element and the option to use Marching Cubes,
- * different triangulation methods are applied.
  */
-std::vector<RenderObject> triangulateObjects(const std::vector<RAYX::OpticalElement>& elements, Device& device, bool useMarchingCubes) {
+std::vector<RenderObject> triangulateObjects(const std::vector<RAYX::OpticalElement>& elements, Device& device) {
     std::vector<RenderObject> rObjects;
 
     for (const auto& element : elements) {
@@ -126,13 +123,8 @@ std::vector<RenderObject> triangulateObjects(const std::vector<RAYX::OpticalElem
                     auto ro = planarTriangulation(element, device);
                     rObjects.emplace_back(std::move(ro));
                 } else {
-                    if (useMarchingCubes) {
-                        auto ro = marchingCubeTriangulation(element, device);  // Assume this returns a RenderObject
-                        rObjects.emplace_back(std::move(ro));
-                    } else {
-                        auto ro = traceTriangulation(element, device);  // Assume this returns a RenderObject
-                        rObjects.emplace_back(std::move(ro));
-                    }
+                    auto ro = traceTriangulation(element, device);  // Assume this returns a RenderObject
+                    rObjects.emplace_back(std::move(ro));
                 }
                 break;
             }
