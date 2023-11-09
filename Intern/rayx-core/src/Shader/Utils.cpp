@@ -939,8 +939,13 @@ dmat4 RAYX_API keyCutoutPoints(Cutout cutout) {
         return ret;
     } else if (cutout.m_type == CTYPE_ELLIPTICAL) {
         EllipticalCutout ell = deserializeElliptical(cutout);
-        w = ell.m_diameter_x / 2.0;
-        l = ell.m_diameter_z / 2.0;
+        double rx = ell.m_diameter_x / 2.0;
+        double rz = ell.m_diameter_z / 2.0;
+        ret[0] = dvec4( rx, 0.0, 0.0, 0.0);
+        ret[1] = dvec4(0.0, 0.0,  rz, 0.0);
+        ret[2] = dvec4(-rx, 0.0, 0.0, 0.0);
+        ret[3] = dvec4(0.0, 0.0, -rz, 0.0);
+        return ret;
     } else {
         _throw("invalid cutout type in inCutout!");
     }
