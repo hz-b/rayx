@@ -47,5 +47,7 @@ class Application {
 
     std::unique_ptr<DescriptorPool> m_DescriptorPool{nullptr};
 
-    void updateScene(const std::string& path, std::vector<RenderObject>& rObjects, std::vector<Line>& rays, std::optional<RenderObject>& rayObj);
+    void updateObjects(const std::string& path, std::vector<RenderObject>& rObjects);
+
+    void updateRays(const std::string& path, std::optional<RenderObject>& rayObj, std::vector<Line>& rays, int amountOfRays);
 };
