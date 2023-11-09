@@ -8,6 +8,7 @@
 #include <rapidxml.hpp>
 
 #include "CanonicalizePath.h"
+#include "RayProcessing.h"
 
 void checkVkResult(VkResult result, const char* message) {
     if (result != VK_SUCCESS) {
@@ -210,7 +211,11 @@ void UIRenderSystem::showSceneEditorWindow(UIParameters& uiParams) {
     ImGui::Separator();
     uiParams.camController.displaySettings();
     ImGui::Separator();
-
+    int tempAmountOfRays = uiParams.amountOfRays;
+    displayFilterSlider(&uiParams.amountOfRays, 100);
+    if (tempAmountOfRays != uiParams.amountOfRays) {
+        uiParams.raysChanged = true;
+    }
     ImGui::Text("Application average %.6f ms/frame", uiParams.frameTime * 1000.0f);
 
     ImGui::End();

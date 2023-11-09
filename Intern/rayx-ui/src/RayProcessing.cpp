@@ -1,6 +1,16 @@
 #include "RayProcessing.h"
 
+#include <imgui_impl_glfw.h>
+#include <imgui_impl_vulkan.h>
+
+#include <unordered_set>
+
 #include "Colors.h"
+
+void displayFilterSlider(int* amountOfRays, int maxAmountOfRays) {
+    ImGui::Text("Amount of Rays:");
+    ImGui::SliderInt("Amount of Rays", amountOfRays, 1, maxAmountOfRays);
+}
 
 /**
  * This function processes the BundleHistory and determines the ray's path in the beamline.
@@ -9,17 +19,18 @@
  */
 // Define the type of the filter function
 
-std::vector<Line> getRays(const RAYX::BundleHistory& bundleHist, const std::vector<RAYX::OpticalElement>& elements,
-                          RayFilterFunction filterFunction) {
+std::vector<Line> getRays(const RAYX::BundleHistory& bundleHist, const std::vector<RAYX::OpticalElement>& elements, RayFilterFunction filterFunction,
+                          int amountOfRays) {
     std::vector<Line> rays;
 
-    int k = 3;  // temporary value for k
     // Apply the filter function to get the indices of the rays to be rendered
-    std::vector<size_t> rayIndices = filterFunction(bundleHist, k);  // k needs to be defined or passed into this function
+    std::vector<size_t> rayIndices = filterFunction(bundleHist, amountOfRays);  // k needs to be defined or passed into this function
     for (size_t i : rayIndices) {
+        // RAYX_LOG << "Ray index: " << i;
         auto& rayHist = bundleHist[i];
         glm::vec3 rayLastPos = {0.0f, 0.0f, 0.0f};
         for (const auto& event : rayHist) {
+            // RAYX_LOG << "Start inner loop";
             if (event.m_eventType == ETYPE_JUST_HIT_ELEM || event.m_eventType == ETYPE_ABSORBED) {
                 // Events where rays hit objects are in element coordinates
                 // We need to convert them to world coordinates
@@ -129,7 +140,10 @@ float euclideanDistance(const std::vector<float>& a, const std::vector<float>& b
 
 // Function to perform the k-means clustering
 std::pair<std::vector<size_t>, std::vector<std::vector<float>>> kMeansClustering(const std::vector<std::vector<float>>& features, size_t k) {
+    // Initialize centroids
     std::vector<std::vector<float>> centroids(k, std::vector<float>(features[0].size(), 0));
+    // Call to the new initializeCentroids function
+    initializeCentroids(centroids, features, k);
     std::vector<size_t> clusterAssignments(features.size(), 0);
     std::random_device rd;
     std::mt19937 rng(rd());
@@ -172,13 +186,39 @@ std::pair<std::vector<size_t>, std::vector<std::vector<float>>> kMeansClustering
             }
         }
 
+        // After clustering, ensure that each centroid has at least one point
         for (size_t i = 0; i < k; ++i) {
-            if (counts[i] == 0) continue;  // Avoid division by zero
-            for (size_t j = 0; j < centroids[i].size(); ++j) {
-                centroids[i][j] = sums[i][j] / counts[i];
+            if (counts[i] == 0) {
+                // Reinitialize centroid to a random feature to handle empty clusters
+                centroids[i] = features[uni(rng)];
+                // Consider reassigning clusters since the centroids have changed
+                // Depending on the specific requirements, you may need to iterate again
+                // or devise a more sophisticated method to handle empty clusters.
+            } else {
+                // Update centroids as normal
+                for (size_t j = 0; j < centroids[i].size(); ++j) {
+                    centroids[i][j] = sums[i][j] / counts[i];
+                }
             }
         }
     }
 
     return {clusterAssignments, centroids};
+}
+
+void initializeCentroids(std::vector<std::vector<float>>& centroids, const std::vector<std::vector<float>>& features, size_t k) {
+    std::random_device rd;
+    std::mt19937 rng(rd());
+    std::uniform_int_distribution<size_t> uni(0, features.size() - 1);
+    std::unordered_set<size_t> selectedIndices;
+
+    for (size_t i = 0; i < k; ++i) {
+        size_t index = uni(rng);
+        // Ensure unique indices for centroid initialization
+        while (selectedIndices.find(index) != selectedIndices.end()) {
+            index = uni(rng);
+        }
+        centroids[i] = features[index];
+        selectedIndices.insert(index);
+    }
 }

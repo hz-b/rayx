@@ -17,7 +17,9 @@ struct UIParameters {
     CameraController& camController;
     std::filesystem::path rmlPath;
     bool pathChanged;
+    bool raysChanged;
     float frameTime;
+    int amountOfRays;
 };
 
 class UIRenderSystem {
