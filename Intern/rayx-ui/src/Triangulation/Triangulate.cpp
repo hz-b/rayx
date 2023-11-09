@@ -5,77 +5,166 @@
 
 #include "Colors.h"
 #include "Debug/Debug.h"
+#include "Shader/Constants.h"
 #include "Triangulation/TraceTriangulation.h"
 
 // ------ Helper functions ------
 
-void calculateVerticesForType(const Cutout& cutout, glm::vec4& topLeft, glm::vec4& topRight, glm::vec4& bottomLeft, glm::vec4& bottomRight) {
-    const double defWidthHeight = 100.0f;
+struct Polygon {
+    std::vector<Vertex> vertices;
+    std::vector<uint32_t> indices;
+
+    void calculateForQuadrilateral(double widthA, double widthB, double lengthA, double lengthB) {
+        vertices = {
+            Vertex({-widthA / 2.0f, 0, lengthA / 2.0f, 1.0f}, OPT_ELEMENT_COLOR),   // Bottom-left
+            Vertex({-widthB / 2.0f, 0, -lengthB / 2.0f, 1.0f}, OPT_ELEMENT_COLOR),  // Top-left
+            Vertex({widthB / 2.0f, 0, -lengthB / 2.0f, 1.0f}, OPT_ELEMENT_COLOR),   // Top-right
+            Vertex({widthA / 2.0f, 0, lengthA / 2.0f, 1.0f}, OPT_ELEMENT_COLOR)     // Bottom-right
+        };
+        indices = {0, 1, 2, 2, 3, 0};
+    }
+
+    void calculateForElliptical(double diameterA, double diameterB) {
+        constexpr uint32_t numVertices = 20;
+        vertices.reserve(numVertices);
+        indices.reserve(numVertices * 3);
+
+        // Calculate vertices
+        for (uint32_t i = 0; i < numVertices; i++) {
+            double angle = 2.0f * PI * i / numVertices;
+            glm::vec4 pos = {diameterA * cos(angle) / 2.0f, 0, diameterB * sin(angle) / 2.0f, 1.0f};
+            vertices.emplace_back(pos, OPT_ELEMENT_COLOR);
+        }
+
+        // Calculate indices
+        for (uint32_t i = 0; i < numVertices - 2; i++) {
+            indices.push_back(0);
+            indices.push_back(i + 1);
+            indices.push_back(i + 2);
+        }
+        indices.push_back(0);
+        indices.push_back(numVertices - 1);
+        indices.push_back(1);
+    }
+};
+
+void calculateSolidMeshOfType(const Cutout& cutout, std::vector<Vertex>& vertices, std::vector<uint32_t>& indices) {
+    const double defWidthHeight = 50.0f;
+    Polygon poly;
+
     switch (static_cast<int>(cutout.m_type)) {
         case CTYPE_TRAPEZOID: {
             TrapezoidCutout trapezoid = deserializeTrapezoid(cutout);
-            topLeft = {-trapezoid.m_widthA / 2.0f, 0, trapezoid.m_length / 2.0f, 1.0f};
-            topRight = {trapezoid.m_widthA / 2.0f, 0, trapezoid.m_length / 2.0f, 1.0f};
-            bottomLeft = {-trapezoid.m_widthB / 2.0f, 0, -trapezoid.m_length / 2.0f, 1.0f};
-            bottomRight = {trapezoid.m_widthB / 2.0f, 0, -trapezoid.m_length / 2.0f, 1.0f};
+            poly.calculateForQuadrilateral(trapezoid.m_widthA, trapezoid.m_widthB, trapezoid.m_length, trapezoid.m_length);
             break;
         }
         case CTYPE_RECT: {
             RectCutout rect = deserializeRect(cutout);
-            topLeft = {-rect.m_width / 2.0f, 0, rect.m_length / 2.0f, 1.0f};
-            topRight = {rect.m_width / 2.0f, 0, rect.m_length / 2.0f, 1.0f};
-            bottomLeft = {-rect.m_width / 2.0f, 0, -rect.m_length / 2.0f, 1.0f};
-            bottomRight = {rect.m_width / 2.0f, 0, -rect.m_length / 2.0f, 1.0f};
+            poly.calculateForQuadrilateral(rect.m_width, rect.m_width, rect.m_length, rect.m_length);
             break;
         }
-        case CTYPE_ELLIPTICAL:
+        case CTYPE_ELLIPTICAL: {
+            EllipticalCutout ellipse = deserializeElliptical(cutout);
+            poly.calculateForElliptical(ellipse.m_diameter_x, ellipse.m_diameter_z);
+            break;
+        }
         case CTYPE_UNLIMITED:
         default: {
-            topLeft = {-defWidthHeight / 2.0f, 0, defWidthHeight / 2.0f, 1.0f};
-            topRight = {defWidthHeight / 2.0f, 0, defWidthHeight / 2.0f, 1.0f};
-            bottomLeft = {-defWidthHeight / 2.0f, 0, -defWidthHeight / 2.0f, 1.0f};
-            bottomRight = {defWidthHeight / 2.0f, 0, -defWidthHeight / 2.0f, 1.0f};
+            poly.calculateForQuadrilateral(defWidthHeight, defWidthHeight, defWidthHeight, defWidthHeight);
             break;
         }
     }
+
+    // Add vertices and indices to the output vectors. No reserve for now because this might be called in loops
+    uint32_t offset = (uint32_t)vertices.size();
+    for (uint32_t index : poly.indices) {
+        indices.push_back(offset + index);
+    }
+    vertices.insert(vertices.end(), poly.vertices.begin(), poly.vertices.end());
 }
 
-void calculateVerticesForSlit(const Element& element, std::vector<Vertex>& vertices, std::vector<uint32_t>& indices) {
+/**
+ * This function takes a polygon and interpolates it to have the specified number of vertices.
+ * The polygon is assumed to be convex.
+ */
+void interpolateConvexPolygon(std::vector<Vertex>& polyVertices, uint32_t targetNumber) {
+    if (polyVertices.size() == targetNumber || polyVertices.empty()) {
+        return;  // No interpolation needed if counts are the same or polygon is empty
+    }
+
+    std::vector<Vertex> interpolatedVertices;
+    interpolatedVertices.reserve(targetNumber);
+
+    size_t originalCount = polyVertices.size();
+    double step = static_cast<double>(originalCount - 1) / (targetNumber - 1);
+
+    for (uint32_t i = 0; i < targetNumber; ++i) {
+        double exactIndex = i * step;
+        size_t lowerIndex = static_cast<size_t>(exactIndex);
+        size_t upperIndex = lowerIndex + 1 < originalCount ? lowerIndex + 1 : lowerIndex;
+
+        double fraction = exactIndex - lowerIndex;
+
+        glm::vec4 interpolatedPosition = glm::mix(polyVertices[lowerIndex].pos, polyVertices[upperIndex].pos, fraction);
+        glm::vec4 interpolatedColor = glm::mix(polyVertices[lowerIndex].color, polyVertices[upperIndex].color, fraction);
+
+        interpolatedVertices.push_back({interpolatedPosition, interpolatedColor});
+    }
+
+    // Replace the original vertices with the interpolated ones
+    polyVertices = std::move(interpolatedVertices);
+}
+
+void calculateMeshForSlit(const Element& element, std::vector<Vertex>& vertices, std::vector<uint32_t>& indices) {
     // Deserialize to get SlitBehaviour
     SlitBehaviour slit = deserializeSlit(element.m_behaviour);
 
     // Calculate vertices for the beamstop
-    glm::vec4 topLeft, topRight, bottomLeft, bottomRight;
-    calculateVerticesForType(slit.m_beamstopCutout, topLeft, topRight, bottomLeft, bottomRight);
-    vertices.push_back({topLeft, OPT_ELEMENT_COLOR});
-    vertices.push_back({topRight, OPT_ELEMENT_COLOR});
-    vertices.push_back({bottomLeft, OPT_ELEMENT_COLOR});
-    vertices.push_back({bottomRight, OPT_ELEMENT_COLOR});
-
-    uint32_t offset = 0;
-    indices.insert(indices.end(), {offset, offset + 1, offset + 2, offset + 2, offset + 1, offset + 3});
+    calculateSolidMeshOfType(slit.m_beamstopCutout, vertices, indices);
 
     // Calculate vertices for the outer slit
-    calculateVerticesForType(element.m_cutout, topLeft, topRight, bottomLeft, bottomRight);
-    vertices.push_back({topLeft, OPT_ELEMENT_COLOR});
-    vertices.push_back({topRight, OPT_ELEMENT_COLOR});
-    vertices.push_back({bottomLeft, OPT_ELEMENT_COLOR});
-    vertices.push_back({bottomRight, OPT_ELEMENT_COLOR});
+    std::vector<Vertex> outerSlitVertices;
+    std::vector<uint32_t> outerSlitIndices;
+    calculateSolidMeshOfType(element.m_cutout, outerSlitVertices, outerSlitIndices);  // TODO: This is a bit wasteful, since we don't need the indices
 
     // Calculate vertices for the opening
-    calculateVerticesForType(slit.m_openingCutout, topLeft, topRight, bottomLeft, bottomRight);
-    vertices.push_back({topLeft, OPT_ELEMENT_COLOR});
-    vertices.push_back({topRight, OPT_ELEMENT_COLOR});
-    vertices.push_back({bottomLeft, OPT_ELEMENT_COLOR});
-    vertices.push_back({bottomRight, OPT_ELEMENT_COLOR});
+    std::vector<Vertex> openingVertices;
+    std::vector<uint32_t> openingIndices;
+    calculateSolidMeshOfType(slit.m_openingCutout, openingVertices, openingIndices);  // TODO: This is a bit wasteful, since we don't need the indices
 
-    // Add indices for the outer slit but carve out the opening
-    offset = 4;                  // The slit starts at index 4
-    uint32_t openingOffset = 8;  // The opening starts at index 8
-    indices.insert(indices.end(), {offset,     offset + 1, openingOffset,     openingOffset,     offset + 1, openingOffset + 1,
-                                   offset + 1, offset + 3, openingOffset + 1, openingOffset + 1, offset + 3, openingOffset + 3,
-                                   offset + 3, offset + 2, openingOffset + 3, openingOffset + 3, offset + 2, openingOffset + 2,
-                                   offset + 2, offset,     openingOffset + 2, openingOffset + 2, offset,     openingOffset});
+    // Connecting the outer slit to the opening
+    uint32_t numBeamstopVertices = (uint32_t)vertices.size();
+    uint32_t numOuterSlitVertices = (uint32_t)outerSlitVertices.size();
+    uint32_t numOpeningVertices = (uint32_t)openingVertices.size();
+
+    if (numOpeningVertices < numOuterSlitVertices) {
+        interpolateConvexPolygon(openingVertices, numOuterSlitVertices);
+    } else if (numOpeningVertices > numOuterSlitVertices) {
+        interpolateConvexPolygon(outerSlitVertices, numOpeningVertices);
+    } else {
+        // Do nothing; the number of vertices is the same
+    }
+
+    // Add the vertices of the outer slit and the opening to the main vertex list
+    uint32_t outerSlitOffset = static_cast<uint32_t>(vertices.size());
+    vertices.insert(vertices.end(), outerSlitVertices.begin(), outerSlitVertices.end());
+
+    uint32_t openingOffset = static_cast<uint32_t>(vertices.size());
+    vertices.insert(vertices.end(), openingVertices.begin(), openingVertices.end());
+
+    // Triangulate to form a continuous strip
+    for (uint32_t i = 0; i < numOuterSlitVertices; ++i) {
+        // Triangle with two vertices from outerSlit and one from opening
+        indices.push_back(outerSlitOffset + i);
+        indices.push_back(outerSlitOffset + (i + 1) % numOuterSlitVertices);
+        indices.push_back(openingOffset + i);
+
+        // Triangle with two vertices from opening and one from outerSlit
+        // The next vertex from outerSlit is used for connectivity
+        indices.push_back(outerSlitOffset + (i + 1) % numOuterSlitVertices);
+        indices.push_back(openingOffset + i);
+        indices.push_back(openingOffset + (i + 1) % numOpeningVertices);
+    }
 }
 
 RenderObject planarTriangulation(const RAYX::OpticalElement& element, Device& device) {
@@ -83,17 +172,9 @@ RenderObject planarTriangulation(const RAYX::OpticalElement& element, Device& de
     std::vector<uint32_t> indices;
     // The slit behaviour needs special attention, since it is basically three cutouts (the slit, the beamstop and the opening)
     if (element.m_element.m_behaviour.m_type == BTYPE_SLIT) {
-        calculateVerticesForSlit(element.m_element, vertices, indices);
+        calculateMeshForSlit(element.m_element, vertices, indices);
     } else {
-        glm::vec4 topLeft, topRight, bottomLeft, bottomRight;
-        calculateVerticesForType(element.m_element.m_cutout, topLeft, topRight, bottomLeft, bottomRight);
-
-        Vertex v1 = {topLeft, LIGHTER_OPT_ELEMENT_COLOR};
-        Vertex v2 = {topRight, OPT_ELEMENT_COLOR};
-        Vertex v3 = {bottomLeft, OPT_ELEMENT_COLOR};
-        Vertex v4 = {bottomRight, DARKER_OPT_ELEMENT_COLOR};
-        vertices = {v1, v2, v3, v4};
-        indices = {0, 1, 2, 2, 1, 3};
+        calculateSolidMeshOfType(element.m_element.m_cutout, vertices, indices);
     }
 
     RenderObject renderObj(element.m_name, device, element.m_element.m_outTrans, vertices, indices);
@@ -110,26 +191,26 @@ bool isPlanar(const QuadricSurface& q) { return (q.m_a11 == 0 && q.m_a22 == 0 &&
 std::vector<RenderObject> triangulateObjects(const std::vector<RAYX::OpticalElement>& elements, Device& device) {
     std::vector<RenderObject> rObjects;
 
-    for (const auto& element : elements) {
+    for (const RAYX::OpticalElement& element : elements) {
         switch (static_cast<int>(element.m_element.m_surface.m_type)) {
             case STYPE_PLANE_XZ: {
-                auto ro = planarTriangulation(element, device);  // Assume this returns a RenderObject
+                RenderObject ro = planarTriangulation(element, device);  // Assume this returns a RenderObject
                 rObjects.emplace_back(std::move(ro));
                 break;
             }
             case STYPE_QUADRIC: {
                 QuadricSurface q = deserializeQuadric(element.m_element.m_surface);
                 if (isPlanar(q)) {  // Replace with your condition for planarity
-                    auto ro = planarTriangulation(element, device);
+                    RenderObject ro = planarTriangulation(element, device);
                     rObjects.emplace_back(std::move(ro));
                 } else {
-                    auto ro = traceTriangulation(element, device);  // Assume this returns a RenderObject
+                    RenderObject ro = traceTriangulation(element, device);  // Assume this returns a RenderObject
                     rObjects.emplace_back(std::move(ro));
                 }
                 break;
             }
             case STYPE_TOROID: {
-                auto ro = traceTriangulation(element, device);  // Assume this returns a RenderObject
+                RenderObject ro = traceTriangulation(element, device);  // Assume this returns a RenderObject
                 rObjects.emplace_back(std::move(ro));
                 break;
             }
@@ -151,9 +232,9 @@ std::vector<RenderObject> triangulateObjects(const std::vector<RAYX::OpticalElem
 std::vector<Line> getRays(const RAYX::BundleHistory& bundleHist, const std::vector<RAYX::OpticalElement>& elements) {
     std::vector<Line> rays;
 
-    for (const auto& rayHist : bundleHist) {
+    for (const RAYX::RayHistory& rayHist : bundleHist) {
         glm::vec3 rayLastPos = {0.0f, 0.0f, 0.0f};
-        for (const auto& event : rayHist) {
+        for (const RAYX::Event& event : rayHist) {
             if (event.m_eventType == ETYPE_JUST_HIT_ELEM || event.m_eventType == ETYPE_ABSORBED) {
                 // Events where rays hit objects are in element coordinates
                 // We need to convert them to world coordinates
