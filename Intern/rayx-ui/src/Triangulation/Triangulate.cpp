@@ -16,10 +16,10 @@ struct Polygon {
 
     void calculateForQuadrilateral(double widthA, double widthB, double lengthA, double lengthB) {
         vertices = {
-            Vertex({-widthA / 2.0f, 0, lengthA / 2.0f, 1.0f}, OPT_ELEMENT_COLOR),   // Bottom-left
-            Vertex({-widthB / 2.0f, 0, -lengthB / 2.0f, 1.0f}, OPT_ELEMENT_COLOR),  // Top-left
-            Vertex({widthB / 2.0f, 0, -lengthB / 2.0f, 1.0f}, OPT_ELEMENT_COLOR),   // Top-right
-            Vertex({widthA / 2.0f, 0, lengthA / 2.0f, 1.0f}, OPT_ELEMENT_COLOR)     // Bottom-right
+            Vertex({-widthA / 2.0f, 0, -lengthA / 2.0f, 1.0f}, OPT_ELEMENT_COLOR),  // Bottom-left
+            Vertex({-widthB / 2.0f, 0, lengthB / 2.0f, 1.0f}, OPT_ELEMENT_COLOR),   // Top-left
+            Vertex({widthB / 2.0f, 0, lengthB / 2.0f, 1.0f}, OPT_ELEMENT_COLOR),    // Top-right
+            Vertex({widthA / 2.0f, 0, -lengthA / 2.0f, 1.0f}, OPT_ELEMENT_COLOR)    // Bottom-right
         };
         indices = {0, 1, 2, 2, 3, 0};
     }
@@ -33,7 +33,8 @@ struct Polygon {
         for (uint32_t i = 0; i < numVertices; i++) {
             double angle = 2.0f * PI * i / numVertices;
             glm::vec4 pos = {diameterA * cos(angle) / 2.0f, 0, diameterB * sin(angle) / 2.0f, 1.0f};
-            vertices.emplace_back(pos, OPT_ELEMENT_COLOR);
+            glm::vec4 col = glm::mix(OPT_ELEMENT_COLOR, RED, i / (float)numVertices);
+            vertices.emplace_back(pos, col);
         }
 
         // Calculate indices
@@ -96,17 +97,18 @@ void interpolateConvexPolygon(std::vector<Vertex>& polyVertices, uint32_t target
     interpolatedVertices.reserve(targetNumber);
 
     size_t originalCount = polyVertices.size();
-    double step = static_cast<double>(originalCount - 1) / (targetNumber - 1);
+    double step = static_cast<double>(originalCount) / targetNumber;
 
     for (uint32_t i = 0; i < targetNumber; ++i) {
         double exactIndex = i * step;
         size_t lowerIndex = static_cast<size_t>(exactIndex);
-        size_t upperIndex = lowerIndex + 1 < originalCount ? lowerIndex + 1 : lowerIndex;
+        size_t upperIndex = (lowerIndex + 1) % originalCount;  // Wrap around for closed loop
 
         double fraction = exactIndex - lowerIndex;
 
         glm::vec4 interpolatedPosition = glm::mix(polyVertices[lowerIndex].pos, polyVertices[upperIndex].pos, fraction);
-        glm::vec4 interpolatedColor = glm::mix(polyVertices[lowerIndex].color, polyVertices[upperIndex].color, fraction);
+        glm::vec4 green = {0.0f, 1.0f, 0.0f, 1.0f};
+        glm::vec4 interpolatedColor = glm::mix(polyVertices[lowerIndex].color, green, i / (float)targetNumber);
 
         interpolatedVertices.push_back({interpolatedPosition, interpolatedColor});
     }
@@ -133,16 +135,41 @@ void calculateMeshForSlit(const Element& element, std::vector<Vertex>& vertices,
     calculateSolidMeshOfType(slit.m_openingCutout, openingVertices, openingIndices);  // TODO: This is a bit wasteful, since we don't need the indices
 
     // Connecting the outer slit to the opening
-    uint32_t numBeamstopVertices = (uint32_t)vertices.size();
     uint32_t numOuterSlitVertices = (uint32_t)outerSlitVertices.size();
     uint32_t numOpeningVertices = (uint32_t)openingVertices.size();
 
     if (numOpeningVertices < numOuterSlitVertices) {
         interpolateConvexPolygon(openingVertices, numOuterSlitVertices);
+        numOpeningVertices = numOuterSlitVertices;
     } else if (numOpeningVertices > numOuterSlitVertices) {
         interpolateConvexPolygon(outerSlitVertices, numOpeningVertices);
+        numOuterSlitVertices = numOpeningVertices;
     } else {
         // Do nothing; the number of vertices is the same
+    }
+
+    // Create the Distance Matrix
+    std::vector<std::vector<double>> distanceMatrix(numOuterSlitVertices, std::vector<double>(numOpeningVertices, 0.0));
+    for (uint32_t i = 0; i < numOuterSlitVertices; ++i) {
+        for (uint32_t j = 0; j < numOpeningVertices; ++j) {
+            distanceMatrix[i][j] = glm::distance(outerSlitVertices[i].pos, openingVertices[j].pos);
+        }
+    }
+
+    // Pair vertices based on distance, considering order to minimize crossings
+    std::vector<uint32_t> pairings(numOuterSlitVertices);
+    std::vector<bool> used(numOpeningVertices, false);
+    for (uint32_t i = 0; i < numOuterSlitVertices; ++i) {
+        double minDistance = std::numeric_limits<double>::max();
+        uint32_t pairedIndex = 0;
+        for (uint32_t j = 0; j < numOpeningVertices; ++j) {
+            if (!used[j] && distanceMatrix[i][j] < minDistance) {
+                minDistance = distanceMatrix[i][j];
+                pairedIndex = j;
+            }
+        }
+        pairings[i] = pairedIndex;
+        used[pairedIndex] = true;  // Mark this opening vertex as used
     }
 
     // Add the vertices of the outer slit and the opening to the main vertex list
@@ -154,16 +181,19 @@ void calculateMeshForSlit(const Element& element, std::vector<Vertex>& vertices,
 
     // Triangulate to form a continuous strip
     for (uint32_t i = 0; i < numOuterSlitVertices; ++i) {
-        // Triangle with two vertices from outerSlit and one from opening
-        indices.push_back(outerSlitOffset + i);
-        indices.push_back(outerSlitOffset + (i + 1) % numOuterSlitVertices);
-        indices.push_back(openingOffset + i);
+        uint32_t outerIndex = i;
+        uint32_t outerNextIndex = (i + 1) % numOuterSlitVertices;
+        uint32_t openingIndex = pairings[i];
+        uint32_t openingNextIndex = pairings[outerNextIndex];
 
-        // Triangle with two vertices from opening and one from outerSlit
-        // The next vertex from outerSlit is used for connectivity
-        indices.push_back(outerSlitOffset + (i + 1) % numOuterSlitVertices);
-        indices.push_back(openingOffset + i);
-        indices.push_back(openingOffset + (i + 1) % numOpeningVertices);
+        // Triangulate using the paired vertices
+        indices.push_back(outerSlitOffset + outerIndex);
+        indices.push_back(outerSlitOffset + outerNextIndex);
+        indices.push_back(openingOffset + openingIndex);
+
+        indices.push_back(outerSlitOffset + outerNextIndex);
+        indices.push_back(openingOffset + openingIndex);
+        indices.push_back(openingOffset + openingNextIndex);
     }
 }
 
