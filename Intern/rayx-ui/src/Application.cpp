@@ -2,6 +2,7 @@
 
 #include <chrono>
 
+#include "Colors.h"
 #include "Data/Importer.h"
 #include "Debug/Debug.h"
 #include "FrameInfo.h"
@@ -126,6 +127,59 @@ void Application::run() {
         }
     }
     vkDeviceWaitIdle(m_Device.device());
+}
+
+/**
+ * This function processes the BundleHistory and determines the ray's path in the beamline.
+ * Depending on the event type associated with the ray, the function produces visual lines that represent
+ * ray segments, colored based on the event type.
+ */
+std::vector<Line> getRays(const RAYX::BundleHistory& bundleHist, const std::vector<RAYX::OpticalElement>& elements) {
+    std::vector<Line> rays;
+
+    for (const RAYX::RayHistory& rayHist : bundleHist) {
+        glm::vec3 rayLastPos = {0.0f, 0.0f, 0.0f};
+        for (const RAYX::Event& event : rayHist) {
+            if (event.m_eventType == ETYPE_JUST_HIT_ELEM || event.m_eventType == ETYPE_ABSORBED) {
+                // Events where rays hit objects are in element coordinates
+                // We need to convert them to world coordinates
+                glm::vec4 worldPos = elements[(size_t)event.m_lastElement].m_element.m_outTrans * glm::vec4(event.m_position, 1.0f);
+
+                Vertex origin = {{rayLastPos.x, rayLastPos.y, rayLastPos.z, 1.0f}, YELLOW};
+                Vertex point = (event.m_eventType == ETYPE_JUST_HIT_ELEM) ? Vertex(worldPos, ORANGE) : Vertex(worldPos, RED);
+
+                Line myline = {origin, point};
+                rays.push_back(myline);
+                rayLastPos = point.pos;
+            } else if (event.m_eventType == ETYPE_FLY_OFF) {
+                // Fly off events are in world coordinates
+                // The origin here is the position of the event
+                // The point is defined by the direction of the ray (default length)
+
+                glm::vec4 eventPos = glm::vec4(event.m_position, 1.0f);
+                glm::vec4 eventDir = glm::vec4(event.m_direction, 0.0f);
+                glm::vec4 pointPos = eventPos + eventDir * 1000.0f;
+
+                Vertex origin = {eventPos, GREY};
+                Vertex point = {pointPos, GREY};
+
+                rays.push_back(Line(origin, point));
+            } else if (event.m_eventType == ETYPE_NOT_ENOUGH_BOUNCES) {
+                // Events where rays hit objects are in element coordinates
+                // We need to convert them to world coordinates
+                glm::vec4 worldPos = elements[(size_t)event.m_lastElement].m_element.m_outTrans * glm::vec4(event.m_position, 1.0f);
+
+                const glm::vec4 white = {1.0f, 1.0f, 1.0f, 0.7f};
+                Vertex origin = {{rayLastPos.x, rayLastPos.y, rayLastPos.z, 1.0f}, white};
+                Vertex point = Vertex(worldPos, white);
+
+                rays.push_back(Line(origin, point));
+                rayLastPos = point.pos;
+            }
+        }
+    }
+
+    return rays;
 }
 
 void Application::updateScene(const std::string& path, std::vector<RenderObject>& rObjects, std::vector<Line>& rays,
