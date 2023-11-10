@@ -24,9 +24,13 @@ std::vector<Line> getRays(const RAYX::BundleHistory& bundleHist, const std::vect
     std::vector<Line> rays;
 
     // Apply the filter function to get the indices of the rays to be rendered
-    std::vector<size_t> rayIndices = filterFunction(bundleHist, amountOfRays);  // k needs to be defined or passed into this function
+    std::vector<size_t> rayIndices = filterFunction(bundleHist, amountOfRays);
+    auto maxRays = bundleHist.size();
     for (size_t i : rayIndices) {
-        // RAYX_LOG << "Ray index: " << i;
+        if (i >= maxRays) {
+            RAYX_VERB << "Ray index out of bounds: " << i;
+            continue;
+        }
         auto& rayHist = bundleHist[i];
         glm::vec3 rayLastPos = {0.0f, 0.0f, 0.0f};
         for (const auto& event : rayHist) {
