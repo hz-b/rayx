@@ -111,7 +111,7 @@ RenderObject traceTriangulation(const RAYX::OpticalElement& element, Device& dev
         for (size_t j = 0; j < gridSize - 1; ++j) {
             if (collisionGrid[i][j].found && collisionGrid[i + 1][j].found && collisionGrid[i][j + 1].found) {
                 vertices.emplace_back(glm::vec4(collisionGrid[i][j].hitpoint, 1.0f), OPT_ELEMENT_COLOR);
-                vertices.emplace_back(glm::vec4(collisionGrid[i + 1][j].hitpoint, 1.0f), DARKER_OPT_ELEMENT_COLOR);
+                vertices.emplace_back(glm::vec4(collisionGrid[i + 1][j].hitpoint, 1.0f), OPT_ELEMENT_COLOR);
                 vertices.emplace_back(glm::vec4(collisionGrid[i][j + 1].hitpoint, 1.0f), OPT_ELEMENT_COLOR);
 
                 indices.push_back(index++);
@@ -120,7 +120,7 @@ RenderObject traceTriangulation(const RAYX::OpticalElement& element, Device& dev
             }
             if (collisionGrid[i + 1][j + 1].found && collisionGrid[i + 1][j].found && collisionGrid[i][j + 1].found) {
                 vertices.emplace_back(glm::vec4(collisionGrid[i + 1][j + 1].hitpoint, 1.0f), OPT_ELEMENT_COLOR);
-                vertices.emplace_back(glm::vec4(collisionGrid[i + 1][j].hitpoint, 1.0f), LIGHTER_OPT_ELEMENT_COLOR);
+                vertices.emplace_back(glm::vec4(collisionGrid[i + 1][j].hitpoint, 1.0f), OPT_ELEMENT_COLOR);
                 vertices.emplace_back(glm::vec4(collisionGrid[i][j + 1].hitpoint, 1.0f), OPT_ELEMENT_COLOR);
 
                 indices.push_back(index++);
