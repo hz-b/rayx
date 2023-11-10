@@ -211,10 +211,10 @@ void UIRenderSystem::showSceneEditorWindow(UIParameters& uiParams) {
     ImGui::Separator();
     uiParams.camController.displaySettings();
     ImGui::Separator();
-    int tempAmountOfRays = uiParams.amountOfRays;
-    displayFilterSlider(&uiParams.amountOfRays, 100);
-    if (tempAmountOfRays != uiParams.amountOfRays) {
-        uiParams.raysChanged = true;
+    int tempAmountOfRays = uiParams.rayInfo.amountOfRays;
+    displayFilterSlider(&uiParams.rayInfo.amountOfRays, uiParams.rayInfo.maxAmountOfRays);
+    if (tempAmountOfRays != uiParams.rayInfo.amountOfRays) {
+        uiParams.rayInfo.raysChanged = true;
     }
     ImGui::Text("Application average %.6f ms/frame", uiParams.frameTime * 1000.0f);
 

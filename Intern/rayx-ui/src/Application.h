@@ -5,7 +5,7 @@
 #include "CommandParser.h"
 #include "GraphicsCore/Descriptors.h"
 #include "GraphicsCore/Renderer.h"
-
+#include "RenderSystem/UIRenderSystem.h"
 // TODO: This is also in Device Class
 const std::vector<const char*> validationLayers = {"VK_LAYER_KHRONOS_validation"};
 const std::vector<const char*> deviceExtensions = {VK_KHR_SWAPCHAIN_EXTENSION_NAME};
@@ -49,5 +49,5 @@ class Application {
 
     void updateObjects(const std::string& path, std::vector<RenderObject>& rObjects);
 
-    void updateRays(const std::string& path, std::optional<RenderObject>& rayObj, std::vector<Line>& rays, int amountOfRays);
+    void updateRays(const std::string& path, std::optional<RenderObject>& rayObj, std::vector<Line>& rays, UIRayInfo& rayInfo);
 };

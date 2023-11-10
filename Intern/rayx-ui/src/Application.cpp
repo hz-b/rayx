@@ -13,7 +13,6 @@
 #include "RenderSystem/GridRenderSystem.h"
 #include "RenderSystem/ObjectRenderSystem.h"
 #include "RenderSystem/RayRenderSystem.h"
-#include "RenderSystem/UIRenderSystem.h"
 #include "Triangulation/Triangulate.h"
 #include "UserInput.h"
 #include "Writer/CSVWriter.h"
@@ -65,7 +64,6 @@ void Application::run() {
     // Camera
     CameraController camController;
     Camera cam;
-    int amountOfRays = 10;
 
     // Input callbacks
     glfwSetKeyCallback(m_Window.window(), keyCallback);
@@ -80,7 +78,8 @@ void Application::run() {
 
     // CLI Input
     std::string rmlPathCli = m_CommandParser.m_args.m_providedFile;
-    UIParameters uiParams{camController, rmlPathCli, !rmlPathCli.empty(), false, 0.0, amountOfRays};
+    UIRayInfo rayInfo{false, 10, 100};
+    UIParameters uiParams{camController, rmlPathCli, !rmlPathCli.empty(), 0.0, rayInfo};
 
     // Main loop
     while (!m_Window.shouldClose()) {
@@ -101,12 +100,12 @@ void Application::run() {
             // camController.update(cam, m_Renderer.getAspectRatio());
             if (uiParams.pathChanged) {
                 updateObjects(uiParams.rmlPath.string(), rObjects);
-                updateRays(uiParams.rmlPath.string(), rayObj, rays, uiParams.amountOfRays);
+                updateRays(uiParams.rmlPath.string(), rayObj, rays, uiParams.rayInfo);
                 uiParams.pathChanged = false;
                 camController.lookAtPoint(rObjects[0].getTranslationVecor());
-            } else if (uiParams.raysChanged) {
-                updateRays(uiParams.rmlPath.string(), rayObj, rays, uiParams.amountOfRays);
-                uiParams.raysChanged = false;
+            } else if (uiParams.rayInfo.raysChanged) {
+                updateRays(uiParams.rmlPath.string(), rayObj, rays, uiParams.rayInfo);
+                uiParams.rayInfo.raysChanged = false;
             }
 
             camController.update(cam, m_Renderer.getAspectRatio());
@@ -142,18 +141,19 @@ void Application::updateObjects(const std::string& path, std::vector<RenderObjec
     // Triangulate the render data and update the scene
     rObjects = triangulateObjects(beamline.m_OpticalElements, m_Device);
 }
-void Application::updateRays(const std::string& path, std::optional<RenderObject>& rayObj, std::vector<Line>& rays, int amountOfRays) {
+void Application::updateRays(const std::string& path, std::optional<RenderObject>& rayObj, std::vector<Line>& rays, UIRayInfo& rayInfo) {
     RAYX::Beamline beamline = RAYX::importBeamline(path);
 #ifndef NO_H5
     std::string rayFilePath = path.substr(0, path.size() - 4) + ".h5";
     RAYX::BundleHistory bundleHist = raysFromH5(rayFilePath, FULL_FORMAT);
+    rayInfo.maxAmountOfRays = bundleHist.size();
 #else
     std::string rayFilePath = path.substr(0, path.size() - 4) + ".csv";
     RAYX::BundleHistory bundleHist = loadCSV(rayFilePath);
 #endif
     // TODO(Jannis): Hacky fix for now; should be some form of synchronization
     vkDeviceWaitIdle(m_Device.device());
-    rays = getRays(bundleHist, beamline.m_OpticalElements, kMeansFilter, amountOfRays);
+    rays = getRays(bundleHist, beamline.m_OpticalElements, kMeansFilter, rayInfo.amountOfRays);
     if (!rays.empty()) {
         // Temporarily aggregate all vertices, then create a single RenderObject
         std::vector<Vertex> rayVertices(rays.size() * 2);
