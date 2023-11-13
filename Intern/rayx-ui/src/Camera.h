@@ -26,7 +26,7 @@ class CameraController {
     bool isMouseLooking() const;
     void setLastMousePos(float x, float y);
     void updateDirectionViaMouse(float mouseX, float mouseY);
-    void lookAtPoint(const glm::vec3& targetPoint, float distance = 50.0f);
+    void lookAtPoint(const glm::vec3& targetPoint, float distance = 100.0f);
 
     void displaySettings();
     void update(Camera& cam, float aspectRatio);

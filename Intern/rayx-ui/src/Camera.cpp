@@ -120,14 +120,24 @@ void CameraController::update(Camera& cam, float aspectRatio) {
 }
 
 void CameraController::lookAtPoint(const glm::vec3& targetPoint, float distance) {
-    glm::vec3 right = glm::normalize(glm::cross(m_direction, m_up));
-    glm::vec3 upOffset = m_up * 10.0f;
-    m_position = targetPoint + (right * distance) + upOffset;
+    // Set the camera's x-coordinate to match the target point
+    float x = targetPoint.x;
 
+    // Calculate the z-coordinate using Pythagoras, ensuring the camera stays at the specified distance
+    float offset = std::sqrt(distance);
+    float z = targetPoint.z - offset;
+
+    // Set the camera's y-coordinate with an offset
+    float y = targetPoint.y + offset;  // You can adjust the Y offset as needed
+
+    m_position = glm::vec3(x, y, z);
+
+    // Update the camera's direction to point towards the target
     m_direction = glm::normalize(targetPoint - m_position);
 
-    m_pitch = glm::degrees(asin(m_direction.y));
-    m_yaw = glm::degrees(atan2(m_direction.z, m_direction.x));
+    // Update the pitch and yaw based on the new direction
+    m_pitch = glm::degrees(std::asin(m_direction.y));
+    m_yaw = glm::degrees(std::atan2(m_direction.z, m_direction.x));
 
     // Update the camera direction without triggering pitch and yaw clamping
     updateDirection(0.0, 0.0);
