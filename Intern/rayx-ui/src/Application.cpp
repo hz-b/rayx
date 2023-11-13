@@ -78,7 +78,7 @@ void Application::run() {
 
     // CLI Input
     std::string rmlPathCli = m_CommandParser.m_args.m_providedFile;
-    UIRayInfo rayInfo{false, 10, 100};
+    UIRayInfo rayInfo{false, 50, 100};
     UIParameters uiParams{camController, rmlPathCli, !rmlPathCli.empty(), 0.0, rayInfo};
 
     // Main loop

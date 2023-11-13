@@ -4,6 +4,7 @@
 
 #include "RenderObject.h"
 #include "Tracer/Tracer.h"
+#define MAX_RAYS 1000
 
 // Definition of the RayFilterFunction type
 using RayFilterFunction = std::function<std::vector<size_t>(const RAYX::BundleHistory&, size_t)>;

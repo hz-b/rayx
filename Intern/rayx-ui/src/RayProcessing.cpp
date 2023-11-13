@@ -3,13 +3,32 @@
 #include <imgui_impl_glfw.h>
 #include <imgui_impl_vulkan.h>
 
+#include <cmath>  // for std::pow and std::log
+#include <numeric>
 #include <unordered_set>
 
 #include "Colors.h"
 
 void displayFilterSlider(int* amountOfRays, int maxAmountOfRays) {
-    ImGui::Text("Amount of Rays:");
-    ImGui::SliderInt("Amount of Rays", amountOfRays, 1, maxAmountOfRays);
+    *amountOfRays = std::min(*amountOfRays, maxAmountOfRays);
+    ImGui::Text("Maximum amount of Rays per optical element:");
+
+    // Define the range for the slider
+    float minLogValue = 0.0f;  // logarithm of 1
+    float maxLogValue = std::log(static_cast<float>(std::min(maxAmountOfRays, MAX_RAYS)));
+
+    // Convert the current amount of rays to logarithmic scale for the slider position
+    float logValue = std::log(static_cast<float>(*amountOfRays));
+
+    // Create a slider that operates on the logarithmic scale
+    if (ImGui::SliderFloat("##hidden", &logValue, minLogValue, maxLogValue)) {
+        // Convert the logarithmic value back to the actual number of rays
+        *amountOfRays = static_cast<int>(std::exp(logValue));
+    }
+
+    // Display the actual number of rays next to the slider
+    ImGui::SameLine();
+    ImGui::Text("%d", *amountOfRays);
 }
 
 /**
@@ -24,10 +43,11 @@ std::vector<Line> getRays(const RAYX::BundleHistory& bundleHist, const std::vect
     std::vector<Line> rays;
 
     // Apply the filter function to get the indices of the rays to be rendered
+    amountOfRays = std::min(amountOfRays, int(bundleHist.size()));
     std::vector<size_t> rayIndices = filterFunction(bundleHist, amountOfRays);
-    auto maxRays = bundleHist.size();
+    auto maxRayIndex = bundleHist.size();
     for (size_t i : rayIndices) {
-        if (i >= maxRays) {
+        if (i >= maxRayIndex) {
             RAYX_VERB << "Ray index out of bounds: " << i;
             continue;
         }
@@ -116,14 +136,41 @@ std::vector<size_t> findMostCentralRays(const std::vector<std::vector<float>>& f
     return centralRaysIndices;
 }
 
-// The kMeansFilter function implementation
 std::vector<size_t> kMeansFilter(const RAYX::BundleHistory& bundleHist, size_t k) {
+    k = std::min(k, size_t(MAX_RAYS));
+    RAYX::BundleHistory reducedBundleHist;
+    std::vector<size_t> mapping;  // For mapping reduced indices to original indices
+
+    if (bundleHist.size() > MAX_RAYS) {
+        static std::mt19937 g((std::random_device())());
+        std::vector<size_t> indices(bundleHist.size());
+        std::iota(indices.begin(), indices.end(), 0);
+
+        std::shuffle(indices.begin(), indices.end(), g);
+        indices.resize(MAX_RAYS);  // Keep only the first MAX_RAYS indices
+
+        // Populate reducedBundleHist and mapping
+        for (size_t idx : indices) {
+            reducedBundleHist.push_back(bundleHist[idx]);
+            mapping.push_back(idx);
+        }
+    } else {
+        reducedBundleHist = bundleHist;
+        // In this case, mapping is just a direct mapping
+        mapping.resize(bundleHist.size());
+        std::iota(mapping.begin(), mapping.end(), 0);
+    }
+
+    // Rest of the function using reducedBundleHist
     std::vector<size_t> selectedRays;
-    for (size_t j = 0; j < bundleHist[0].size(); ++j) {  // Assuming all rays have the same number of events
-        auto features = extractFeatures(bundleHist, j);
+    for (size_t j = 0; j < reducedBundleHist[0].size(); ++j) {
+        auto features = extractFeatures(reducedBundleHist, j);
         auto [clusterAssignments, centroids] = kMeansClustering(features, k);
         auto centralRaysIndices = findMostCentralRays(features, clusterAssignments, centroids, k);
-        selectedRays.insert(selectedRays.end(), centralRaysIndices.begin(), centralRaysIndices.end());
+
+        for (auto& idx : centralRaysIndices) {
+            selectedRays.push_back(mapping[idx]);  // Use the mapping to get original index
+        }
     }
 
     // Remove duplicate indices if a ray is central in multiple events
@@ -133,6 +180,7 @@ std::vector<size_t> kMeansFilter(const RAYX::BundleHistory& bundleHist, size_t k
 
     return selectedRays;
 }
+
 // Function to calculate Euclidean distance between two feature vectors
 float euclideanDistance(const std::vector<float>& a, const std::vector<float>& b) {
     float distance = 0.0f;
