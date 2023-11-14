@@ -5,8 +5,12 @@
 
 namespace RAYX {
 
-glm::dmat4x4 defaultInMatrix(const DesignObject& dobj, DesignPlane plane) { return calcTransformationMatrices(dobj.parsePosition(), dobj.parseOrientation(), true, plane); }
-glm::dmat4x4 defaultOutMatrix(const DesignObject& dobj, DesignPlane plane) { return calcTransformationMatrices(dobj.parsePosition(), dobj.parseOrientation(), false, plane); }
+glm::dmat4x4 defaultInMatrix(const DesignObject& dobj, DesignPlane plane) {
+    return calcTransformationMatrices(dobj.parsePosition(), dobj.parseOrientation(), true, plane);
+}
+glm::dmat4x4 defaultOutMatrix(const DesignObject& dobj, DesignPlane plane) {
+    return calcTransformationMatrices(dobj.parsePosition(), dobj.parseOrientation(), false, plane);
+}
 
 /**
  * calculates element to world coordinates transformation matrix and its
@@ -116,6 +120,22 @@ Element makeElement(const DesignObject& dobj, Behaviour behaviour, Surface surfa
         .m_material = defaultMaterial(dobj),
         .m_padding = {0.0},
     };
+}
+
+Element makeExperts(const DesignObject& dobj) {
+    return makeElement(dobj, serializeMirror(), makeQuadric(dobj));
+}
+
+Element makeExpertsCubic(const DesignObject& dobj) {
+    return makeElement(dobj, serializeMirror(), makeCubic(dobj));
+}
+
+Surface makeQuadric(const DesignObject& dobj) {
+    return serializeQuadric(dobj.parseQuadricParameters());
+}
+
+Surface makeCubic(const DesignObject& dobj) {
+    return serializeCubic(dobj.parseCubicParameters());
 }
 
 }  // namespace RAYX

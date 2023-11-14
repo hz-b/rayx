@@ -118,15 +118,11 @@ std::vector<Ray> DipoleSource::getRays(int thread_count) const {
 
         glm::dvec3 position = getXYZPosition(phi);
 
-
         en = getEnergy();  // Verteilung nach Schwingerfunktion
-
 
         psiandstokes = getPsiandStokes(en);
 
-
         phi = phi + getMisalignmentParams().m_rotationXerror.rad;
-
 
         psiandstokes.psi = psiandstokes.psi + getMisalignmentParams().m_rotationYerror.rad;
 
@@ -166,9 +162,7 @@ glm::dvec3 DipoleSource::getXYZPosition(double phi) const {
     double y = getNormalFromRange(m_sourceHeight);
     y = y + m_position.y + getMisalignmentParams().m_translationYerror;
 
-
     double z = sign * (m_bendingRadius * 1000 - x1) * sin(phi) + getMisalignmentParams().m_translationZerror;
-
 
     return glm::dvec3(x, y, z);
 }
@@ -192,7 +186,7 @@ double DipoleSource::getNormalFromRange(double range) const {
 
 /**
  * chooses photon energy according to the natural energy distribution spectrum by schwinger
-*/
+ */
 double DipoleSource::getEnergy() const {
     // RAYX_PROFILE_SCOPE("getEnergy");
 
@@ -271,15 +265,14 @@ PsiAndStokes DipoleSource::getPsiandStokes(double en) const {
 
     PsiAndStokes psiandstokes;
     do {
-        psiandstokes.psi = (randomDouble() -0.5) * 6 * m_verDivergence;
+        psiandstokes.psi = (randomDouble() - 0.5) * 6 * m_verDivergence;
         psiandstokes = dipoleFold(psiandstokes.psi, en, m_verEbeamDivergence);
     } while ((psiandstokes.stokes[0]) / m_maxIntensity < randomDouble());
-    
-    psiandstokes.psi  = psiandstokes.psi * 1e-3; //psi in rad
+
+    psiandstokes.psi = psiandstokes.psi * 1e-3;  // psi in rad
 
     return psiandstokes;
 }
-
 
 PsiAndStokes DipoleSource::dipoleFold(double psi, double photonEnergy, double sigpsi) const {
     // RAYX_PROFILE_SCOPE("dipolefold");

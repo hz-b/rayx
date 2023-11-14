@@ -9,10 +9,12 @@
 const int STYPE_QUADRIC = 0;
 const int STYPE_TOROID = 1;
 const int STYPE_PLANE_XZ = 2;
+const int STYPE_CUBIC = 3;
 
 struct Surface {
     double m_type;
     double m_params[16];
+    double m_cubic[16];
 };
 
 ///////////////////
@@ -110,3 +112,77 @@ INLINE Surface serializePlaneXZ() {
 }
 
 #endif
+
+///////////////////
+// Cubic
+///////////////////
+
+struct CubicSurface {
+    int m_icurv;
+    double m_a11;
+    double m_a12;
+    double m_a13;
+    double m_a14;
+    double m_a22;
+    double m_a23;
+    double m_a24;
+    double m_a33;
+    double m_a34;
+    double m_a44;
+
+    double m_b12;
+    double m_b13;
+    double m_b21;
+    double m_b23;
+    double m_b31;
+    double m_b32;
+};
+
+INLINE Surface serializeCubic(CubicSurface surface) {
+    Surface ser;
+    ser.m_type = STYPE_CUBIC;
+    ser.m_params[0] = double(surface.m_icurv);
+    ser.m_params[1] = surface.m_a11;
+    ser.m_params[2] = surface.m_a12;
+    ser.m_params[3] = surface.m_a13;
+    ser.m_params[4] = surface.m_a14;
+    ser.m_params[5] = surface.m_a22;
+    ser.m_params[6] = surface.m_a23;
+    ser.m_params[7] = surface.m_a24;
+    ser.m_params[8] = surface.m_a33;
+    ser.m_params[9] = surface.m_a34;
+    ser.m_params[10] = surface.m_a44;
+
+    ser.m_cubic[0] = surface.m_b12;
+    ser.m_cubic[1] = surface.m_b13;
+    ser.m_cubic[2] = surface.m_b21;
+    ser.m_cubic[3] = surface.m_b23;
+    ser.m_cubic[4] = surface.m_b31;
+    ser.m_cubic[5] = surface.m_b32;
+
+    return ser;
+}
+
+INLINE CubicSurface deserializeCubic(Surface ser) {
+    CubicSurface surface;
+    surface.m_icurv = int(ser.m_params[0]);
+    surface.m_a11 = ser.m_params[1];
+    surface.m_a12 = ser.m_params[2];
+    surface.m_a13 = ser.m_params[3];
+    surface.m_a14 = ser.m_params[4];
+    surface.m_a22 = ser.m_params[5];
+    surface.m_a23 = ser.m_params[6];
+    surface.m_a24 = ser.m_params[7];
+    surface.m_a33 = ser.m_params[8];
+    surface.m_a34 = ser.m_params[9];
+    surface.m_a44 = ser.m_params[10];
+
+    surface.m_b12 = ser.m_cubic[0];
+    surface.m_b13 = ser.m_cubic[1];
+    surface.m_b21 = ser.m_cubic[2];
+    surface.m_b23 = ser.m_cubic[3];
+    surface.m_b31 = ser.m_cubic[4];
+    surface.m_b32 = ser.m_cubic[5];
+
+    return surface;
+}

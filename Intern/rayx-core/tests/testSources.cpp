@@ -1,6 +1,6 @@
-#include "setupTests.h"
-
 #include <fstream>
+
+#include "setupTests.h"
 
 void checkEnergyDistribution(const std::vector<Ray>& rays, double photonEnergy, double energySpread) {
     for (auto r : rays) {
@@ -24,10 +24,12 @@ void checkPositionDistribution(const std::vector<Ray>& rays, double sourceWidth,
 void checkDirectionDistribution(const std::vector<Ray>& rays, double minAngle, double maxAngle) {
     for (auto r : rays) {
         // we ignore all non-FLY_OFF events, as they are in element-coordinates (and thus have another m_direction).
-        if (r.m_eventType != ETYPE_FLY_OFF) { continue; }
+        if (r.m_eventType != ETYPE_FLY_OFF) {
+            continue;
+        }
 
         double psi = asin(r.m_direction.y);
-        psi = abs(psi)*1000;
+        psi = abs(psi) * 1000;
         CHECK_IN(psi, minAngle, maxAngle);
     }
 }
@@ -100,10 +102,10 @@ TEST_F(TestSuite, PixelPositionTest) {
     auto height = src->getSourceHeight();
     auto hordiv = src->getHorDivergence();
     for (auto ray : rays) {
-        CHECK_IN(abs(ray.m_position.x), width/6.0, width/2.0);
-        CHECK_IN(abs(ray.m_position.y), height/6.0, height/2.0);
-        double phi = atan2(ray.m_direction.x, ray.m_direction.z); // phi in rad from m_direction
-        CHECK_IN(abs(phi), 0.0, hordiv/2.0);
+        CHECK_IN(abs(ray.m_position.x), width / 6.0, width / 2.0);
+        CHECK_IN(abs(ray.m_position.y), height / 6.0, height / 2.0);
+        double phi = atan2(ray.m_direction.x, ray.m_direction.z);  // phi in rad from m_direction
+        CHECK_IN(abs(phi), 0.0, hordiv / 2.0);
     }
 }
 
@@ -120,9 +122,7 @@ TEST_F(TestSuite, CircleSourcetest) {
     auto rays = loadBeamline("CircleSource_default").getInputRays();
     checkPositionDistribution(rays, 0.065, 0.04);
     checkEnergyDistribution(rays, 99.5, 100.5);
-    
 }
-
 
 TEST_F(TestSuite, testCircleSourceDirections) {
     auto bundle = traceRML("CircleSource_default");
@@ -131,22 +131,25 @@ TEST_F(TestSuite, testCircleSourceDirections) {
     }
 }
 
-
 TEST_F(TestSuite, testInterpolationFunctionDipole) {
     struct InOutPair {
         double in;
         double out;
     };
-    std::vector<InOutPair> inouts = {{
-        .in = 1.5298292375594387,
-        .out = -3.5010758381905855,
-    }, {
-        .in = 2,
-        .out = -6.0742663050458416,
-    }, {
-        .in = -1,
-        .out = -0.095123518041340588,
-    }, };
+    std::vector<InOutPair> inouts = {
+        {
+            .in = 1.5298292375594387,
+            .out = -3.5010758381905855,
+        },
+        {
+            .in = 2,
+            .out = -6.0742663050458416,
+        },
+        {
+            .in = -1,
+            .out = -0.095123518041340588,
+        },
+    };
 
     auto beamline = loadBeamline("dipole_plain");
     std::shared_ptr<LightSource> src = beamline.m_LightSources[0];
@@ -180,7 +183,7 @@ TEST_F(TestSuite, testVerDivergenceDipole) {
     }
 }
 
-TEST_F(TestSuite, testLightsourceGetters){
+TEST_F(TestSuite, testLightsourceGetters) {
     struct RmlInput {
         std::string rmlFile;
         double horDivergence;

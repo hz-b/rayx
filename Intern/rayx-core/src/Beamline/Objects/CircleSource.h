@@ -4,18 +4,19 @@
 
 namespace RAYX {
 
-class RAYX_API  CircleSource : public LightSource {
+class RAYX_API CircleSource : public LightSource {
   public:
-     CircleSource(const DesignObject&);
-    virtual ~ CircleSource() = default;
+    CircleSource(const DesignObject&);
+    virtual ~CircleSource() = default;
 
     std::vector<Ray> getRays(int thread_count = 1) const override;
     glm::dvec3 getDirection() const;
+
   private:
     // Geometric Params
-    SourcePulseType m_sourceDistributionType; // TODO unused.
+    SourcePulseType m_sourceDistributionType;  // TODO unused.
     Misalignment m_misalignment;
-    
+
     double m_linearPol_0;
     double m_linearPol_45;
     double m_circularPol;
@@ -30,4 +31,3 @@ class RAYX_API  CircleSource : public LightSource {
 };
 
 }  // namespace RAYX
-
