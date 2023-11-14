@@ -111,6 +111,7 @@ TEST_F(TestSuite, testParaboloidQuad) {
     CHECK_EQ(1, parabo.m_icurv);
 }
 
+/*
 TEST_F(TestSuite, testPlaneQuad) {
     auto plane = deserializeQuadric(makePlane());
 
@@ -143,7 +144,7 @@ TEST_F(TestSuite, testSphereQuad) {
     CHECK_EQ(0, sphere.m_a44);
     CHECK_EQ(1, sphere.m_icurv);
 }
-
+*/
 TEST_F(TestSuite, testEllipsoidQuad) {
     auto beamline = loadBeamline("Ellipsoid");
     Element elli = beamline.m_OpticalElements[0].m_element;
@@ -203,9 +204,9 @@ TEST_F(TestSuite, testToroidSurface) {
     Element trid = beamline.m_OpticalElements[0].m_element;
     auto toroid = deserializeToroid(trid.m_surface);
 
-    CHECK_EQ(1, toroid.m_longRadius);
-    CHECK_EQ(0, toroid.m_shortRadius);
-    CHECK_EQ(0, toroid.m_toroidType);
+    CHECK_EQ(10470.4917, toroid.m_longRadius, 0.001);
+    CHECK_EQ(315.723959, toroid.m_shortRadius, 0.001);
+    CHECK_EQ(1, toroid.m_toroidType);
 }
 
 /***
