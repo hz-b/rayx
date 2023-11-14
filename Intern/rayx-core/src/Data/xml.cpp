@@ -582,6 +582,46 @@ Cutout Parser::parseCutout(DesignPlane plane) const {
     }
 }
 
+QuadricSurface Parser::parseQuadricParameters() const {
+    QuadricSurface s;
+    s.m_icurv = parseDouble("surfaceBending"); //icurv
+    s.m_a11 = parseDouble("A11");
+    s.m_a12 = parseDouble("A12");
+    s.m_a13 = parseDouble("A13");
+    s.m_a14 = parseDouble("A14");
+    s.m_a22 = parseDouble("A22");
+    s.m_a23 = parseDouble("A23");
+    s.m_a24 = parseDouble("A24");
+    s.m_a33 = parseDouble("A33");
+    s.m_a34 = parseDouble("A34");
+    s.m_a44 = parseDouble("A44");
+
+    return s;
+}
+
+CubicSurface Parser::parseCubicParameters() const {
+    CubicSurface c;
+    c.m_icurv = parseDouble("surfaceBending"); //icurv
+    c.m_a11 = parseDouble("A11");
+    c.m_a12 = parseDouble("A12");
+    c.m_a13 = parseDouble("A13");
+    c.m_a14 = parseDouble("A14");
+    c.m_a22 = parseDouble("A22");
+    c.m_a23 = parseDouble("A23");
+    c.m_a24 = parseDouble("A24");
+    c.m_a33 = parseDouble("A33");
+    c.m_a34 = parseDouble("A34");
+    c.m_a44 = parseDouble("A44");
+
+    c.m_b12 = parseDouble("B12");
+    c.m_b13 = parseDouble("B13");
+    c.m_b21 = parseDouble("B21");
+    c.m_b23 = parseDouble("B23");
+    c.m_b31 = parseDouble("B31");
+    c.m_b32 = parseDouble("B32");
+    return c;
+}
+
 ElectronEnergyOrientation Parser::parseElectronEnergyOrientation() const {
     ElectronEnergyOrientation orientation;
     if (!paramElectronEnergyOrientation(node, &orientation)) {

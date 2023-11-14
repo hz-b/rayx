@@ -81,6 +81,12 @@ void addBeamlineObjectFromXML(rapidxml::xml_node<>* node, Beamline* beamline, co
         addOpticalElement(makeCylinder(parser), node);
     } else if (strcmp(type, "Cone") == 0) {
         addOpticalElement(makeCone(parser), node);
+    } else if (strcmp(type, "Paraboloid") == 0) {
+        addOpticalElement(makeParaboloid(parser), node);
+    } else if (strcmp(type, "Experts Optics") == 0) {
+        addOpticalElement(makeExperts(parser), node);
+    } else if (strcmp(type, "Experts Cubic") == 0) {
+        addOpticalElement(makeExpertsCubic(parser), node);
     } else {
         RAYX_WARN << "could not classify beamline object with Name: " << node->first_attribute("name")->value()
                   << "; Type: " << node->first_attribute("type")->value();
