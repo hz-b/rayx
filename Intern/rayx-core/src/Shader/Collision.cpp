@@ -118,6 +118,191 @@ Collision getQuadricCollision(Ray r, QuadricSurface q) {
 }
 
 /**************************************************************
+ *                    Cubic collision
+ **************************************************************/
+/**
+ * taken from RAY-UI Nov. 2023:
+ *  new version of Th. Zeschke by Oct. 18, 2007
+ *  corresponding exe-version is called ray_thomas1.exe (on VAX only)
+ * 
+ *  calculates intersection of a straight line  
+ *  equation straight line: 
+ *  (x-x1)/al = (y-y1)/am = (z-z1)/an 
+ *  with a surface of 3. order
+ * 
+ *  method: the iterative Newtonmethod is used for zero point search
+ *  result is X,Y,Z of intersection
+*/
+Collision getCubicCollision(Ray r, CubicSurface cu) {
+    Collision col;
+    col.found = true;
+    col.hitpoint = dvec3(0, 0, 0);
+    col.normal = dvec3(0, 0, 0);
+
+    int cs = 1;
+    if (abs(r.m_direction[1]) >= abs(r.m_direction[0]) && abs(r.m_direction[1]) >= abs(r.m_direction[2])) {
+        cs = 2;
+    } else if (abs(r.m_direction[2]) >= abs(r.m_direction[0]) && abs(r.m_direction[2]) >= abs(r.m_direction[1])) {
+        cs = 3;
+    }
+
+    double x = 0;
+    double y = 0;
+    double z = 0;
+    double x1 = 0;
+    double xx = 0;
+    double y1 = 0;
+    double yy = 0;
+    double z1 = 0;
+    double zz = 0;
+    double counter = 0;
+    double dx = 0;
+    double al = r.m_direction[0];
+    double am = r.m_direction[1];
+    double an = r.m_direction[2];
+
+    if (cs == 1) {
+        
+        double aml = r.m_direction[1] / r.m_direction[0];
+        double anl = r.m_direction[2] / r.m_direction[0];    
+
+
+        do {
+            x1 = xx;
+            y1 = r.m_position[1] - aml * (r.m_position[0] - xx);
+            z1 = r.m_position[2] - anl * (r.m_position[0] - xx);
+
+            
+            double func = (2*((x1-xx)*an-al*z1)*cu.m_a23-(2*cu.m_a24+cu.m_b12*pow(float(xx), 2.0))*al+((x1-xx)*am-al*y1)*(cu.m_a22+cu.m_b21*xx))*((x1-xx)*am-al*y1);
+            func = func + pow(float(((x1-xx)*an-al*z1)), 2.0)*cu.m_a33;
+            func = func - ((x1-xx)*an-al*z1)*(2*cu.m_a34+cu.m_b13*pow(float(xx), 2.0)*al + cu.m_a44*pow(float(al), 2.0));
+            func = (func - (2*((x1-xx)*an-al*z1)*cu.m_a13-(cu.m_a11*xx+2*cu.m_a14)*al+2*((x1-xx)*am-al*y1)*cu.m_a12)*al*xx)*al;
+            func = (func - (pow(float(((x1 - xx) * am - al * y1)), 2.0) * cu.m_b23 + ((x1 - xx) * am - al * y1) * ((x1 - xx) * an - al * z1) * cu.m_b32 - 
+            ((x1 - xx) * an - al * z1) * al * cu.m_b31 * xx) * ((x1 - xx) * an - al * z1)/ pow(float(al), 3));
+            
+            double dfunc = (2*((x1-xx)*an-al*z1)*cu.m_a23-(2*cu.m_a24+cu.m_b12*pow(float(xx), 2))*al+((x1-xx)*am-al*y1)*(cu.m_a22+cu.m_b21*xx))*am;
+            dfunc = dfunc - (2*(cu.m_a12*am+cu.m_a13*an)+cu.m_a11*al)*al*xx;
+            dfunc = dfunc + (2*((x1-xx)*an-al*z1)*cu.m_a13-(cu.m_a11*xx+2*cu.m_a14)*al+2*((x1-xx)*am-al*y1)*cu.m_a12);
+            dfunc = dfunc*al + ((cu.m_a22+cu.m_b21*xx)*am+2*(cu.m_a23*an+al*cu.m_b12*xx) - ((x1-xx)*am-al*y1)*cu.m_b21)*((x1-xx)*am-al*y1);
+            dfunc = (dfunc + 2*((x1-xx)*an-al*z1)*(cu.m_a33*an+al*cu.m_b13*xx)-(2*cu.m_a34+cu.m_b13*pow(float(xx), 2))*al*an)*al;
+            dfunc = (dfunc - ((((x1-xx)*an-al*z1)*(al*cu.m_b31+am*cu.m_b32)-al*an*cu.m_b31*xx+((x1-xx)*am-al*y1)*(2*am*cu.m_b23+an*cu.m_b32))*((x1-xx)*an-al*z1)+(pow(float(((x1-xx)*am-al*y1)), 2)*cu.m_b23+((x1-xx)*am-al*y1)*((x1-xx)*an-al*z1)*cu.m_b32-((x1-xx)*an-al*z1)*al*cu.m_b31*xx)*an));
+            dfunc = dfunc / pow(float(al), 3);
+
+            if (dfunc < 0.001) {dfunc = 0.001;}
+            
+            dx = func / dfunc;
+            xx = xx - dx;
+
+            x = x1;
+            y = y1;
+            z = z1;
+            
+            if (counter > 1000) {
+                x = -2 * y1 / 2 / aml;
+                y = y1 + aml * x;
+                z = z1 + anl * x;
+            }
+            counter++;
+        } while (dx > 0.001);
+        
+
+    } else if (cs == 2) {
+        double alm = r.m_direction[0] / r.m_direction[1];
+        double anm = r.m_direction[2] / r.m_direction[1];
+        
+        do {
+
+            x1 = r.m_position[0] - alm * (r.m_position[1] - yy);
+            y1 = yy;
+            z1 = r.m_position[2] - anm * (r.m_position[1] - yy);
+            
+            double func = (2*(((y1-yy)*an-am*z1)*cu.m_a13-(cu.m_a12*yy+cu.m_a14)*am)+((y1-yy)*al-am*x1)*(cu.m_a11+cu.m_b12*yy))*((y1-yy)*al-am*x1);
+            func = func + (((y1-yy)*an-am*z1)*cu.m_a33-2*(cu.m_a23*yy+cu.m_a34)*am)*((y1-yy)*an-am*z1)+(2*cu.m_a24*yy+cu.m_a44+cu.m_a22*pow(float(yy), 2)*pow(float(am), 2));
+            func = func * am + ((((y1-yy)*an-am*z1)*cu.m_b32-am*cu.m_b23*yy)*am*yy-pow(float((y1-yy)*al-am*x1), 2)*cu.m_b13)*((y1-yy)*an-am*z1);
+            func = func - (pow(float(((y1-yy)*an-am*z1)), 2)*cu.m_b31+pow(float(am), 2)*cu.m_b21*pow(float(yy), 2))*((y1-yy)*al-am*x1);
+            func = func / pow(float(am), 3);
+
+            double dfunc = (pow(float((y1-yy)*an-am*z1), 2)*cu.m_b31+pow(float(am), 2)*cu.m_b21*pow(float(yy), 2)*al+2*(((y1-yy)*an-am*z1)*an*cu.m_b31-pow(float(am), 2))*cu.m_b21*yy)*((y1-yy)*al-am*x1);
+            dfunc = dfunc - ((((y1-yy)*an-am*z1)*cu.m_b32-am*cu.m_b23*yy)*am*yy-pow(float((y1-yy)*al-am*x1), 2)*cu.m_b13)*an;
+            dfunc = dfunc + (2*((y1-yy)*al-am*x1)*al*cu.m_b13-(am*cu.m_b23+an*cu.m_b32)*am*yy+(((y1-yy)*an-am*z1)*cu.m_b32-am*cu.m_b23*yy)*am)*((y1-yy)*an-am*z1);
+            dfunc = dfunc - (((cu.m_a11+cu.m_b12*yy)*al+2*(cu.m_a12*am+cu.m_a13*an)-((y1-yy)*al-am*x1)*cu.m_b12)*((y1-yy)*al-am*x1)-2*(cu.m_a22*pow(float(am), 2)*yy+cu.m_a23*pow(float(am), 2)*z1-cu.m_a23*am*an*y1+2*cu.m_a23*am*an*yy+cu.m_a24*pow(float(am), 2)+cu.m_a33*am*an*z1-cu.m_a33*pow(float(an), 2)*y1+cu.m_a33*pow(float(an), 2)*yy+cu.m_a34*am*an)+(2*(((y1-yy)*an-am*z1)*cu.m_a13-(cu.m_a12*yy+cu.m_a14)*am)+((y1-yy)*al-am*x1)*(cu.m_a11+cu.m_b12*yy))*al)*am;
+            dfunc = dfunc / pow(float(am), 3);
+
+            if (dfunc < 0.001) {dfunc = 0.001;}
+            
+            dx = func / dfunc;
+            yy = yy - dx;
+
+            x = x1;
+            y = y1;
+            z = z1;
+            
+            if (counter > 1000) {
+                x = x1;
+                y = 0;
+                z = z1;
+            }
+            counter++;
+        } while (dx > 0.001);
+    } else {
+        double aln = r.m_direction[0] / r.m_direction[2];
+        double amn = r.m_direction[1] / r.m_direction[2];
+        
+        do {
+
+            x1 = x - aln * (z - zz);
+            y1 = r.m_position[1] - amn * (z - zz);
+            z1 = zz;
+            
+            double func = ((2*(((z1-zz)*am-an*y1)*cu.m_a12-(cu.m_a13*zz+cu.m_a14)*an)+((z1-zz)*al-an*x1)*cu.m_a11)*((z1-zz)*al-an*x1)+(((z1-zz)*am-an*y1)*cu.m_a22-2*(cu.m_a23*zz+cu.m_a24)*an)*((z1-zz)*am-an*y1)+(2*cu.m_a34*zz+cu.m_a44+cu.m_a33*pow(float(zz), 2))*pow(float(an), 2))*an;
+            func = func - ((((z1-zz)*am-an*y1)*cu.m_b12-an*cu.m_b13*zz)*pow(float(((z1-zz)*al-an*x1)), 2)-(((z1-zz)*am-an*y1)*cu.m_b23-an*cu.m_b32*zz)*((z1-zz)*am-an*y1)*an*zz+(pow(float(((z1-zz)*am-an*y1)), 2)*cu.m_b21+pow(float(an), 2)*cu.m_b31*pow(float(zz), 2))*((z1-zz)*al-an*x1));
+            func = func / pow(float(an), 3);
+
+
+            double dfunc = (((z1-zz)*am-an*y1)*cu.m_a22-2*(cu.m_a23*zz+cu.m_a24)*an)*am + (2*(cu.m_a12*am+cu.m_a13*an)+cu.m_a11*al)*((z1-zz)*al-an*x1);
+            dfunc = dfunc + ((z1-zz)*am-an*y1)*(cu.m_a22*am+2*cu.m_a23*an) - 2*(cu.m_a33*zz+cu.m_a34)*pow(float(an), 2);
+            dfunc = (dfunc + (2*(((z1-zz)*am-an*y1)*cu.m_a12-(cu.m_a13*zz+cu.m_a14)*an)+((z1-zz)*al-an*x1)*cu.m_a11)*al)*an;
+            dfunc = dfunc - (2*(((z1-zz)*am-an*y1)*am*cu.m_b21-pow(float(an), 2)*cu.m_b31*zz+(((z1-zz)*am-an*y1)* cu.m_b12-an*cu.m_b13*zz)*al)*((z1-zz)*al-an*x1)+(pow(float(((z1-zz)*am-an*y1)), 2)*cu.m_b21+pow(float(an), 2)*cu.m_b31*pow(float(zz), 2))*al+pow(float(((z1-zz)*al-an*x1)), 2)*(am*cu.m_b12+an*cu.m_b13)-((z1-zz)*am-an*y1)*(am*cu.m_b23+an*cu.m_b32)*an*zz+(((z1-zz)*am-an*y1)*cu.m_b23-an*cu.m_b32*zz)*(am*z1-2*am*zz-an*y1)*an);
+            dfunc = (-dfunc) / pow(float(an), 3);
+
+
+
+
+            if (abs(dfunc) < 0.001) {dfunc = 0.001;}
+            
+            dx = func / dfunc;
+            zz = zz - dx;
+
+            x = x1;
+            y = y1;
+            z = z1;
+            
+            if (counter > 1000) {
+                x = x1+aln*z;
+                y = y1+amn*z;
+                z = -2*y1/2/amn;
+            }
+            counter++;
+        } while (dx > 0.001);        
+        // r.m_position = dvec3(a, b, c);
+    }
+
+    // intersection point is in the negative direction (behind the position when the direction is followed forwards), set weight to 0
+    if ((x - r.m_position.x) / r.m_direction.x < 0 || (y - r.m_position.y) / r.m_direction.y < 0 || (z - r.m_position.z) / r.m_direction.z < 0) {
+        col.found = false;
+    }
+
+    col.hitpoint = dvec3(x, y, z);
+
+    double fx = 2 * cu.m_a14 + 2 * cu.m_a11 * x + 2 * cu.m_a12 * y + 2 * cu.m_a13 * z;
+    double fy = 2 * cu.m_a24 + 2 * cu.m_a12 * x + 2 * cu.m_a22 * y + 2 * cu.m_a23 * z;
+    double fz = 2 * cu.m_a34 + 2 * cu.m_a13 * x + 2 * cu.m_a23 * y + 2 * cu.m_a33 * z;
+    col.normal = normalize(dvec3(fx, fy, fz));
+    return col;
+}
+
+
+/**************************************************************
  *                    Toroid Collision
  **************************************************************/
 // this uses newton to approximate a solution.
@@ -219,6 +404,8 @@ Collision RAYX_API findCollisionInElementCoords(Ray r, Surface surface, Cutout c
         col = getToroidCollision(r, deserializeToroid(surface), isTriangul);
     } else if (sty == STYPE_QUADRIC) {
         col = getQuadricCollision(r, deserializeQuadric(surface));
+    } else if (sty == STYPE_CUBIC) {
+        col = getCubicCollision(r, deserializeCubic(surface));
     } else {
         col.found = false;
 

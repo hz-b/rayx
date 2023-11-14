@@ -3,18 +3,18 @@
 /// build times will be unnecessariy long.
 
 // Light Sources
+#include "Beamline/Objects/CircleSource.h"
 #include "Beamline/Objects/DipoleSource.h"
 #include "Beamline/Objects/MatrixSource.h"
-#include "Beamline/Objects/PointSource.h"
 #include "Beamline/Objects/PixelSource.h"
-#include "Beamline/Objects/CircleSource.h"
-
+#include "Beamline/Objects/PointSource.h"
 
 // Optical Elements
 #include "Beamline/Objects/Cone.h"
 #include "Beamline/Objects/Cylinder.h"
 #include "Beamline/Objects/Ellipsoid.h"
 #include "Beamline/Objects/ImagePlane.h"
+#include "Beamline/Objects/Paraboloid.h"
 #include "Beamline/Objects/PlaneGrating.h"
 #include "Beamline/Objects/PlaneMirror.h"
 #include "Beamline/Objects/ReflectionZonePlate.h"

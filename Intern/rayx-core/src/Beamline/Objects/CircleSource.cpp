@@ -9,7 +9,7 @@
 
 namespace RAYX {
 
- CircleSource:: CircleSource(const DesignObject& dobj) : LightSource(dobj) {
+ CircleSource::CircleSource(const DesignObject& dobj) : LightSource(dobj) {
     m_sourceDepth = dobj.parseSourceDepth();
     m_misalignment = getMisalignmentParams();
 
@@ -22,9 +22,6 @@ namespace RAYX {
     m_minOpeningAngle = dobj.parseMinOpeningAngle();
     m_deltaOpeningAngle = dobj.parseDeltaOpeningAngle();
 }
-
-
-
 /**
  * Creates random rays from circle source with specified num. of circles and 
  * spread angles
@@ -76,7 +73,6 @@ glm::dvec3 CircleSource::getDirection() const {
 
     circle = randomIntInRange(1, m_numOfCircles) - 1;
 
-
     double thetabetweencircles = (m_maxOpeningAngle.rad -  m_minOpeningAngle.rad) / (m_numOfCircles - 1.0);
     double theta = thetabetweencircles * circle;
     theta = theta + (randomDouble() - 0.5) * m_deltaOpeningAngle.rad + m_minOpeningAngle.rad;
@@ -92,7 +88,6 @@ glm::dvec3 CircleSource::getDirection() const {
     double an = (- cos(angle) * sin(m_misalignment.m_rotationYerror.rad)) * sin(theta); 
     an = an + cos(m_misalignment.m_rotationYerror.rad) * cos(m_misalignment.m_rotationXerror.rad) * cos(theta);
     an = an + cos(m_misalignment.m_rotationYerror.rad) * sin(angle) * sin(m_misalignment.m_rotationXerror.rad) * sin(theta);
-    
     
     return glm::dvec3(al, am, an);
 }

@@ -13,7 +13,8 @@
 
 // the direction of a plane, either XY or XZ. This is only used in the parsing.
 // Inside of the shader, every plane-shaped object lies in its XZ plane.
-// Per default every element has DesignPlane::XZ, but ImagePlane and Slit have DesignPlane::XY. Thus they need a bit of extra handling to convert them to the shaders XZ plane.
+// Per default every element has DesignPlane::XZ, but ImagePlane and Slit have DesignPlane::XY. 
+// Thus they need a bit of extra handling to convert them to the shaders XZ plane.
 enum class DesignPlane { XY, XZ };
 
 namespace RAYX {
@@ -104,6 +105,8 @@ struct RAYX_API Parser {
     glm::dmat4x4 parseOrientation() const;
     Material parseMaterial() const;
     Cutout parseCutout(DesignPlane) const;
+    QuadricSurface parseQuadricParameters() const;
+    CubicSurface parseCubicParameters() const;
     ElectronEnergyOrientation parseElectronEnergyOrientation() const;
     SourcePulseType parseSourcePulseType() const;
     double parseImageType() const;
@@ -128,6 +131,7 @@ struct RAYX_API Parser {
     inline double parseTotalLength() const { return parseDouble("totalLength"); }
     inline double parseTotalHeight() const { return parseDouble("totalHeight"); }
     inline Rad parseGrazingIncAngle() const { return Deg(parseDouble("grazingIncAngle")).toRad(); }
+    inline double parseArmLength() const { return parseDouble("armLength"); }
     inline double parseEntranceArmLength() const { return parseDouble("entranceArmLength"); }
     inline double parseExitArmLength() const { return parseDouble("exitArmLength"); }
     inline double parseEntranceArmLengthMer() const { return parseDouble("entranceArmLengthMer"); }
@@ -180,6 +184,9 @@ struct RAYX_API Parser {
     inline Rad parseMaxOpeningAngle() const { return parseDouble("maximumOpeningAngle") / 1000.0; }
     inline Rad parseMinOpeningAngle() const { return parseDouble("minimumOpeningAngle") / 1000.0; }
     inline Rad parseDeltaOpeningAngle() const { return parseDouble("deltaOpeningAngle") / 1000.0; }
+
+    inline double parseParameterP() const { return parseDouble("parameter_P"); }
+    inline double parseParameterPType() const { return parseDouble("parameter_P_type"); }
 
     rapidxml::xml_node<>* node;
     std::vector<xml::Group> group_context;

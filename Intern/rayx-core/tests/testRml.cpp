@@ -92,6 +92,122 @@ TEST_F(TestSuite, testEnergyDistribution) {
     }
 }
 
+TEST_F(TestSuite, testParaboloidQuad) {
+    auto beamline = loadBeamline("paraboloid_matrix_IP");
+
+    Element para = beamline.m_OpticalElements[0].m_element;
+    auto parabo = deserializeQuadric(para.m_surface);
+
+    CHECK_EQ(1, parabo.m_a11);
+    CHECK_EQ(0, parabo.m_a12);
+    CHECK_EQ(0, parabo.m_a13);
+    CHECK_EQ(0, parabo.m_a14);
+    CHECK_EQ(1, parabo.m_a22);
+    CHECK_EQ(0, parabo.m_a23);
+    CHECK_EQ(-3765.641, parabo.m_a24, 0.001);
+    CHECK_EQ(0, parabo.m_a33);
+    CHECK_EQ(663.984, parabo.m_a34, 0.001);
+    CHECK_EQ(-2.3283e-10, parabo.m_a44, 0.001);
+    CHECK_EQ(1, parabo.m_icurv);
+}
+
+TEST_F(TestSuite, testPlaneQuad) {
+    auto plane = deserializeQuadric(makePlane());
+
+    CHECK_EQ(0, plane.m_a11);
+    CHECK_EQ(0, plane.m_a12);
+    CHECK_EQ(0, plane.m_a13);
+    CHECK_EQ(0, plane.m_a14);
+    CHECK_EQ(0, plane.m_a22);
+    CHECK_EQ(0, plane.m_a23);
+    CHECK_EQ(-1, plane.m_a24);
+    CHECK_EQ(0, plane.m_a33);
+    CHECK_EQ(0, plane.m_a34);
+    CHECK_EQ(0, plane.m_a44);
+    CHECK_EQ(1, plane.m_icurv);
+}
+
+TEST_F(TestSuite, testSphereQuad) {
+    double radius = 2;
+    auto sphere = deserializeQuadric(makeSphere(radius));
+
+    CHECK_EQ(1, sphere.m_a11);
+    CHECK_EQ(0, sphere.m_a12);
+    CHECK_EQ(0, sphere.m_a13);
+    CHECK_EQ(0, sphere.m_a14);
+    CHECK_EQ(1, sphere.m_a22);
+    CHECK_EQ(0, sphere.m_a23);
+    CHECK_EQ(-radius, sphere.m_a24);
+    CHECK_EQ(1, sphere.m_a33);
+    CHECK_EQ(0, sphere.m_a34);
+    CHECK_EQ(0, sphere.m_a44);
+    CHECK_EQ(1, sphere.m_icurv);
+}
+
+TEST_F(TestSuite, testEllipsoidQuad) {
+    auto beamline = loadBeamline("Ellipsoid");
+    Element elli = beamline.m_OpticalElements[0].m_element;
+    auto ellips = deserializeQuadric(elli.m_surface);
+
+    CHECK_EQ(1, ellips.m_a11);
+    CHECK_EQ(0, ellips.m_a12);
+    CHECK_EQ(0, ellips.m_a13);
+    CHECK_EQ(0, ellips.m_a14);
+    CHECK_EQ(0.9798144, ellips.m_a22, 0.001);
+    CHECK_EQ(0.1399173, ellips.m_a23, 0.001);
+    CHECK_EQ(-315.7239, ellips.m_a24, 0.001);
+    CHECK_EQ(0.0301536, ellips.m_a33, 0.001);
+    CHECK_EQ(0, ellips.m_a34);
+    CHECK_EQ(0, ellips.m_a44);
+    CHECK_EQ(1, ellips.m_icurv);
+}
+
+TEST_F(TestSuite, testCylinderQuad) {
+    auto beamline = loadBeamline("CylinderDefault");
+    Element cyli = beamline.m_OpticalElements[0].m_element;
+    auto cylinder = deserializeQuadric(cyli.m_surface);
+
+    CHECK_EQ(0, cylinder.m_a11);
+    CHECK_EQ(0, cylinder.m_a12);
+    CHECK_EQ(0, cylinder.m_a13);
+    CHECK_EQ(0, cylinder.m_a14);
+    CHECK_EQ(1, cylinder.m_a22);
+    CHECK_EQ(0, cylinder.m_a23);
+    CHECK_EQ(-10470.4917, cylinder.m_a24, 0.001);
+    CHECK_EQ(1, cylinder.m_a33);
+    CHECK_EQ(0, cylinder.m_a34);
+    CHECK_EQ(0, cylinder.m_a44);
+    CHECK_EQ(1, cylinder.m_icurv);
+}
+
+TEST_F(TestSuite, testConeQuad) {
+    auto beamline = loadBeamline("Cone");
+    Element con = beamline.m_OpticalElements[0].m_element;
+    auto cone = deserializeQuadric(con.m_surface);
+
+    CHECK_EQ(0.903353, cone.m_a11, 0.001);
+    CHECK_EQ(0, cone.m_a12);
+    CHECK_EQ(0, cone.m_a13);
+    CHECK_EQ(0, cone.m_a14);
+    CHECK_EQ(0.806707, cone.m_a22, 0.001);
+    CHECK_EQ(0.295475, cone.m_a23, 0.001);
+    CHECK_EQ(-300.120, cone.m_a24, 0.001);
+    CHECK_EQ(0, cone.m_a33);
+    CHECK_EQ(0, cone.m_a34);
+    CHECK_EQ(0, cone.m_a44);
+    CHECK_EQ(1, cone.m_icurv);
+}
+
+TEST_F(TestSuite, testToroidSurface) {
+    auto beamline = loadBeamline("toroid");
+    Element trid = beamline.m_OpticalElements[0].m_element;
+    auto toroid = deserializeToroid(trid.m_surface);
+
+    CHECK_EQ(1, toroid.m_longRadius);
+    CHECK_EQ(0, toroid.m_shortRadius);
+    CHECK_EQ(0, toroid.m_toroidType);
+}
+
 /***
  * Tests if two sources can be traced in one go.
  * Its a static test, so every change can result in a fail even if it's still working correctly
