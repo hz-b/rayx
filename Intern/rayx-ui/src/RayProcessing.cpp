@@ -217,7 +217,7 @@ std::pair<std::vector<size_t>, std::vector<std::vector<float>>> kMeansClustering
         centroid = features[uni(rng)];
     }
 
-    int maxIterations = 100;  // Set a reasonable limit for iterations
+    int maxIterations = 25;  // Set a reasonable limit for iterations
     int iteration = 0;
     bool changed = true;
     while (changed && iteration < maxIterations) {
