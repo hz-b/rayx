@@ -11,7 +11,14 @@
 #include "Application.h"
 #include "Colors.h"
 
-void displayFilterSlider(int* amountOfRays, int maxAmountOfRays) {
+void displayFilterSlider(int* amountOfRays, int maxAmountOfRays, bool* displayRays) {
+    // Checkbox for displaying rays
+    // Slider should be greyed out if "Display Rays" is unchecked
+    ImGui::Checkbox("Display Rays", displayRays);
+    if (!*displayRays) {
+        ImGui::BeginDisabled();  // Grey out the slider
+    }
+
     *amountOfRays = std::min(*amountOfRays, maxAmountOfRays);
     ImGui::Text("Maximum amount of Rays per optical element:");
 
@@ -31,7 +38,12 @@ void displayFilterSlider(int* amountOfRays, int maxAmountOfRays) {
     // Display the actual number of rays next to the slider
     ImGui::SameLine();
     ImGui::Text("%d", *amountOfRays);
+
+    if (!*displayRays) {
+        ImGui::EndDisabled();  // End grey out
+    }
 }
+
 size_t getMaxEvents(const RAYX::BundleHistory& bundleHist) {
     size_t maxEvents = 0;
     for (const auto& ray : bundleHist) {

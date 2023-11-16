@@ -16,8 +16,6 @@ using RayFilterFunction = std::function<std::vector<size_t>(const RAYX::BundleHi
  * @return A vector of lines, which visually represents the paths of rays in the beamline.
  */
 
-void displayFilterSlider(int* amountOfRays, int maxAmountOfRays);
-
 std::vector<Line> getRays(const RAYX::BundleHistory& rayCache, const std::vector<RAYX::OpticalElement>& elements, RayFilterFunction filterFunction,
                           int amountOfRays);
 
@@ -31,4 +29,5 @@ float euclideanDistance(const std::vector<float>& a, const std::vector<float>& b
 void initializeCentroids(std::vector<std::vector<float>>& centroids, const std::vector<std::vector<float>>& features, size_t k);
 
 std::pair<std::vector<size_t>, std::vector<std::vector<float>>> kMeansClustering(const std::vector<std::vector<float>>& features, size_t k);
+void displayFilterSlider(int* amountOfRays, int maxAmountOfRays, bool* displayRays);
 size_t getMaxEvents(const RAYX::BundleHistory& bundleHist);

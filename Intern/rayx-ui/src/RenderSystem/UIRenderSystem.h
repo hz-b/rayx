@@ -14,6 +14,7 @@
  * UI Parameters such as toggles, paths, etc.
  */
 struct UIRayInfo {
+    bool displayRays;
     bool raysChanged;
     int amountOfRays;
     int maxAmountOfRays;

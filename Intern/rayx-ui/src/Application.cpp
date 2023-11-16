@@ -79,7 +79,7 @@ void Application::run() {
 
     // CLI Input
     std::string rmlPathCli = m_CommandParser.m_args.m_providedFile;
-    UIRayInfo rayInfo{false, 50, 100};
+    UIRayInfo rayInfo{true, false, 50, 100};
     UIParameters uiParams{camController, rmlPathCli, !rmlPathCli.empty(), 0.0, rayInfo};
 
     // Main loop
@@ -102,11 +102,17 @@ void Application::run() {
             if (uiParams.pathChanged) {
                 updateObjects(uiParams.rmlPath.string(), rObjects);
                 loadRays(uiParams.rmlPath.string(), rayCache, uiParams.rayInfo);
-                updateRays(uiParams.rmlPath.string(), rayCache, rayObj, rays, uiParams.rayInfo);
+                if (uiParams.rayInfo.displayRays) {
+                    updateRays(uiParams.rmlPath.string(), rayCache, rayObj, rays, uiParams.rayInfo);
+                }
                 uiParams.pathChanged = false;
                 camController.lookAtPoint(rObjects[0].getTranslationVecor());
             } else if (uiParams.rayInfo.raysChanged) {
-                updateRays(uiParams.rmlPath.string(), rayCache, rayObj, rays, uiParams.rayInfo);
+                if (uiParams.rayInfo.displayRays) {
+                    updateRays(uiParams.rmlPath.string(), rayCache, rayObj, rays, uiParams.rayInfo);
+                } else {
+                    rayObj.reset();
+                }
                 uiParams.rayInfo.raysChanged = false;
             }
 
