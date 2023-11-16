@@ -1,6 +1,7 @@
 #include "Application.h"
 
 #include <chrono>
+#include <unordered_set>
 
 #include "Colors.h"
 #include "Data/Importer.h"
@@ -8,7 +9,6 @@
 #include "FrameInfo.h"
 #include "GraphicsCore/Renderer.h"
 #include "GraphicsCore/Window.h"
-#include "RayProcessing.h"
 #include "RenderObject.h"
 #include "RenderSystem/GridRenderSystem.h"
 #include "RenderSystem/ObjectRenderSystem.h"
@@ -74,6 +74,7 @@ void Application::run() {
     auto currentTime = std::chrono::high_resolution_clock::now();
     std::vector<RenderObject> rObjects;
     std::vector<Line> rays;
+    BundleHistory rayCache;
     std::optional<RenderObject> rayObj;
 
     // CLI Input
@@ -100,11 +101,12 @@ void Application::run() {
             // camController.update(cam, m_Renderer.getAspectRatio());
             if (uiParams.pathChanged) {
                 updateObjects(uiParams.rmlPath.string(), rObjects);
-                updateRays(uiParams.rmlPath.string(), rayObj, rays, uiParams.rayInfo);
+                loadRays(uiParams.rmlPath.string(), rayCache, uiParams.rayInfo);
+                updateRays(uiParams.rmlPath.string(), rayCache, rayObj, rays, uiParams.rayInfo);
                 uiParams.pathChanged = false;
                 camController.lookAtPoint(rObjects[0].getTranslationVecor());
             } else if (uiParams.rayInfo.raysChanged) {
-                updateRays(uiParams.rmlPath.string(), rayObj, rays, uiParams.rayInfo);
+                updateRays(uiParams.rmlPath.string(), rayCache, rayObj, rays, uiParams.rayInfo);
                 uiParams.rayInfo.raysChanged = false;
             }
 
@@ -141,8 +143,7 @@ void Application::updateObjects(const std::string& path, std::vector<RenderObjec
     // Triangulate the render data and update the scene
     rObjects = triangulateObjects(beamline.m_OpticalElements, m_Device);
 }
-void Application::updateRays(const std::string& path, std::optional<RenderObject>& rayObj, std::vector<Line>& rays, UIRayInfo& rayInfo) {
-    RAYX::Beamline beamline = RAYX::importBeamline(path);
+void Application::loadRays(const std::string& path, BundleHistory& rayCache, UIRayInfo& rayInfo) {
 #ifndef NO_H5
     std::string rayFilePath = path.substr(0, path.size() - 4) + ".h5";
     RAYX::BundleHistory bundleHist = raysFromH5(rayFilePath, FULL_FORMAT);
@@ -153,7 +154,44 @@ void Application::updateRays(const std::string& path, std::optional<RenderObject
 #endif
     // TODO(Jannis): Hacky fix for now; should be some form of synchronization
     vkDeviceWaitIdle(m_Device.device());
-    rays = getRays(bundleHist, beamline.m_OpticalElements, kMeansFilter, rayInfo.amountOfRays);
+    const size_t m = getMaxEvents(bundleHist);
+
+    std::vector<size_t> indices(bundleHist.size());
+    std::iota(indices.begin(), indices.end(), 0);  // Filling indices with 0, 1, 2, ..., n-1
+
+    // Randomly shuffling the indices
+    std::random_device rd;
+    std::default_random_engine engine(rd());
+    std::shuffle(indices.begin(), indices.end(), engine);
+
+    std::unordered_set<size_t> selectedIndices;
+
+    // Selecting rays for each event index
+    for (size_t eventIdx = 0; eventIdx < m; ++eventIdx) {
+        size_t count = 0;
+        for (size_t rayIdx : indices) {
+            if (count >= MAX_RAYS) break;
+            if (bundleHist[rayIdx].size() > eventIdx) {
+                selectedIndices.insert(rayIdx);
+                count++;
+            }
+        }
+    }
+
+    rayCache.clear();
+    // Now selectedIndices contains unique indices of rays
+    // Creating rayCache object from selected indices
+    for (size_t idx : selectedIndices) {
+        rayCache.push_back(bundleHist[idx]);
+    }
+
+    rayInfo.maxAmountOfRays = rayCache.size();
+}
+
+void Application::updateRays(const std::string& path, BundleHistory& rayCache, std::optional<RenderObject>& rayObj, std::vector<Line>& rays,
+                             UIRayInfo& rayInfo) {
+    RAYX::Beamline beamline = RAYX::importBeamline(path);
+    rays = getRays(rayCache, beamline.m_OpticalElements, kMeansFilter, rayInfo.amountOfRays);
     if (!rays.empty()) {
         // Temporarily aggregate all vertices, then create a single RenderObject
         std::vector<Vertex> rayVertices(rays.size() * 2);

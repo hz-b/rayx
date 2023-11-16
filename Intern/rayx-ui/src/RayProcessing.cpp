@@ -3,10 +3,12 @@
 #include <imgui_impl_glfw.h>
 #include <imgui_impl_vulkan.h>
 
+#include <algorithm>
 #include <cmath>  // for std::pow and std::log
 #include <numeric>
 #include <unordered_set>
 
+#include "Application.h"
 #include "Colors.h"
 
 void displayFilterSlider(int* amountOfRays, int maxAmountOfRays) {
@@ -30,6 +32,13 @@ void displayFilterSlider(int* amountOfRays, int maxAmountOfRays) {
     ImGui::SameLine();
     ImGui::Text("%d", *amountOfRays);
 }
+size_t getMaxEvents(const RAYX::BundleHistory& bundleHist) {
+    size_t maxEvents = 0;
+    for (const auto& ray : bundleHist) {
+        maxEvents = std::max(maxEvents, ray.size());
+    }
+    return maxEvents;
+}
 
 /**
  * This function processes the BundleHistory and determines the ray's path in the beamline.
@@ -38,20 +47,20 @@ void displayFilterSlider(int* amountOfRays, int maxAmountOfRays) {
  */
 // Define the type of the filter function
 
-std::vector<Line> getRays(const RAYX::BundleHistory& bundleHist, const std::vector<RAYX::OpticalElement>& elements, RayFilterFunction filterFunction,
+std::vector<Line> getRays(const RAYX::BundleHistory& rayCache, const std::vector<RAYX::OpticalElement>& elements, RayFilterFunction filterFunction,
                           int amountOfRays) {
     std::vector<Line> rays;
 
     // Apply the filter function to get the indices of the rays to be rendered
-    amountOfRays = std::min(amountOfRays, int(bundleHist.size()));
-    std::vector<size_t> rayIndices = filterFunction(bundleHist, amountOfRays);
-    auto maxRayIndex = bundleHist.size();
+    amountOfRays = std::min(amountOfRays, int(rayCache.size()));
+    std::vector<size_t> rayIndices = filterFunction(rayCache, amountOfRays);
+    auto maxRayIndex = rayCache.size();
     for (size_t i : rayIndices) {
         if (i >= maxRayIndex) {
             RAYX_VERB << "Ray index out of bounds: " << i;
             continue;
         }
-        auto& rayHist = bundleHist[i];
+        auto& rayHist = rayCache[i];
         glm::vec3 rayLastPos = {0.0f, 0.0f, 0.0f};
         for (const auto& event : rayHist) {
             // RAYX_LOG << "Start inner loop";
