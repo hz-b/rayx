@@ -157,40 +157,30 @@ std::vector<size_t> findMostCentralRays(const std::vector<std::vector<float>>& f
     return centralRaysIndices;
 }
 
-std::vector<size_t> kMeansFilter(const RAYX::BundleHistory& bundleHist, size_t k) {
-    k = std::min(k, size_t(MAX_RAYS));
-    RAYX::BundleHistory reducedBundleHist;
-    std::vector<size_t> mapping;  // For mapping reduced indices to original indices
-
-    if (bundleHist.size() > MAX_RAYS) {
-        static std::mt19937 g((std::random_device())());
-        std::vector<size_t> indices(bundleHist.size());
-        std::iota(indices.begin(), indices.end(), 0);
-
-        std::shuffle(indices.begin(), indices.end(), g);
-        indices.resize(MAX_RAYS);  // Keep only the first MAX_RAYS indices
-
-        // Populate reducedBundleHist and mapping
-        for (size_t idx : indices) {
-            reducedBundleHist.push_back(bundleHist[idx]);
-            mapping.push_back(idx);
-        }
-    } else {
-        reducedBundleHist = bundleHist;
-        // In this case, mapping is just a direct mapping
-        mapping.resize(bundleHist.size());
-        std::iota(mapping.begin(), mapping.end(), 0);
-    }
-
-    // Rest of the function using reducedBundleHist
+std::vector<size_t> kMeansFilter(const RAYX::BundleHistory& rayCache, size_t k) {
+    const size_t m = getMaxEvents(rayCache);
     std::vector<size_t> selectedRays;
-    for (size_t j = 0; j < reducedBundleHist[0].size(); ++j) {
-        auto features = extractFeatures(reducedBundleHist, j);
-        auto [clusterAssignments, centroids] = kMeansClustering(features, k);
-        auto centralRaysIndices = findMostCentralRays(features, clusterAssignments, centroids, k);
+    std::unordered_map<size_t, size_t> indexMap;  // Map filtered indices to original indices
 
-        for (auto& idx : centralRaysIndices) {
-            selectedRays.push_back(mapping[idx]);  // Use the mapping to get original index
+    for (size_t j = 0; j < m; ++j) {
+        RAYX::BundleHistory filteredRays;
+        indexMap.clear();
+
+        for (size_t i = 0; i < rayCache.size(); ++i) {
+            if (rayCache[i].size() > j) {
+                indexMap[filteredRays.size()] = i;  // Map the new index to the original index
+                filteredRays.push_back(rayCache[i]);
+            }
+        }
+
+        if (!filteredRays.empty()) {
+            auto features = extractFeatures(filteredRays, j);
+            k = std::min(k, features.size());
+            auto [clusterAssignments, centroids] = kMeansClustering(features, k);
+            auto centralRaysIndices = findMostCentralRays(features, clusterAssignments, centroids, k);
+            for (auto& idx : centralRaysIndices) {
+                selectedRays.push_back(indexMap[idx]);  // Map back to original index
+            }
         }
     }
 
@@ -227,9 +217,12 @@ std::pair<std::vector<size_t>, std::vector<std::vector<float>>> kMeansClustering
         centroid = features[uni(rng)];
     }
 
+    int maxIterations = 100;  // Set a reasonable limit for iterations
+    int iteration = 0;
     bool changed = true;
-    while (changed) {
+    while (changed && iteration < maxIterations) {
         changed = false;
+        iteration++;
 
         // Assign clusters
         for (size_t i = 0; i < features.size(); ++i) {
@@ -275,7 +268,7 @@ std::pair<std::vector<size_t>, std::vector<std::vector<float>>> kMeansClustering
             }
         }
     }
-
+    RAYX_LOG << "K-means clustering converged after " << iteration << " iterations.";
     return {clusterAssignments, centroids};
 }
 
