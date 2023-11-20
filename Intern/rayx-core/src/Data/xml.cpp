@@ -619,6 +619,8 @@ CubicSurface Parser::parseCubicParameters() const {
     c.m_b23 = parseDouble("B23");
     c.m_b31 = parseDouble("B31");
     c.m_b32 = parseDouble("B32");
+
+    c.m_psi = parseDouble("tangentAngleAlpha") * PI / 180;
     return c;
 }
 
