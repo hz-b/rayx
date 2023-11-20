@@ -293,8 +293,6 @@ Collision getCubicCollision(Ray r, CubicSurface cu) {
     //    col.found = false;
     //}
     
-    
-
     double fx = 2 * cu.m_a14 + 2 * cu.m_a11 * x + 2 * cu.m_a12 * y + 2 * cu.m_a13 * z;
     double fy = 2 * cu.m_a24 + 2 * cu.m_a12 * x + 2 * cu.m_a22 * y + 2 * cu.m_a23 * z;
     double fz = 2 * cu.m_a34 + 2 * cu.m_a13 * x + 2 * cu.m_a23 * y + 2 * cu.m_a33 * z;

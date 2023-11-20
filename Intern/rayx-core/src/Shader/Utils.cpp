@@ -31,7 +31,7 @@ Ray rotationAroundX(Ray r, double sin_psi, double cos_psi) {
     return rayMatrixMult(r, rotation_matrix);
 }
 
-dvec3 CubicPosition(Ray r, double alpha, double zq) {
+dvec3 CubicPosition(Ray r, double alpha) {
     
     double yy = r.m_position[1];
     double y = yy * r8_cos(alpha) - r.m_position[2] * r8_sin(alpha);
@@ -40,7 +40,7 @@ dvec3 CubicPosition(Ray r, double alpha, double zq) {
     return dvec3(0, y, z);
 }
 
-dvec3 CubicDirection(Ray r, double alpha, double zq) {
+dvec3 CubicDirection(Ray r, double alpha) {
     
     double am = r.m_direction[1];
     double dy = r.m_direction[1] * r8_cos(alpha) - r.m_direction[2] * r8_sin(alpha);
