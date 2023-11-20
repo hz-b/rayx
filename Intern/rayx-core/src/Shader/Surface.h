@@ -17,7 +17,7 @@ struct Surface {
     double m_type;
 
     // These params are private. use the serialize & deserialize functions below instead.
-    double m_private_serialization_params[17];
+    double m_private_serialization_params[18];
 };
 
 ///////////////////
@@ -137,6 +137,8 @@ struct CubicSurface {
     double m_b23;
     double m_b31;
     double m_b32;
+
+    double m_psi;
 };
 
 INLINE Surface serializeCubic(CubicSurface surface) {
@@ -161,6 +163,8 @@ INLINE Surface serializeCubic(CubicSurface surface) {
     ser.m_private_serialization_params[15] = surface.m_b31;
     ser.m_private_serialization_params[16] = surface.m_b32;
 
+    ser.m_private_serialization_params[17] = surface.m_psi;
+
     return ser;
 }
 
@@ -184,6 +188,8 @@ INLINE CubicSurface deserializeCubic(Surface ser) {
     surface.m_b23 = ser.m_private_serialization_params[14];
     surface.m_b31 = ser.m_private_serialization_params[15];
     surface.m_b32 = ser.m_private_serialization_params[16];
+
+    surface.m_psi = ser.m_private_serialization_params[17];
 
     return surface;
 }
