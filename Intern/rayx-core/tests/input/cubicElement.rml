@@ -6,7 +6,7 @@
    <param id="numberRays" enabled="T">20000</param>
    <param id="sourceWidth" enabled="T">0.065</param>
    <param id="sourceHeight" enabled="T">0.04</param>
-   <param id="sourceDepth" enabled="T">1</param>
+   <param id="sourceDepth" enabled="T">0</param>
    <param id="horDiv" enabled="T">1</param>
    <param id="verDiv" enabled="T">1</param>
    <param id="worldPosition" enabled="F">
@@ -40,25 +40,25 @@
    <param id="sourcePulseType" comment="all rays start simultaneously" enabled="T">0</param>
    <param id="sourcePulseLength" enabled="F">0</param>
   </object>
-  <object name="Experts Optics" type="Experts Optics">
+  <object name="Experts Cubic" type="Experts Cubic">
    <param id="geometricalShape" comment="rectangle" enabled="T">0</param>
-   <param id="totalWidth" enabled="T">50</param>
-   <param id="totalLength" enabled="T">200</param>
-   <param id="A11" enabled="T">0</param>
+   <param id="totalWidth" enabled="T">500</param>
+   <param id="totalLength" enabled="T">2000</param>
+   <param id="A11" enabled="T">1</param>
    <param id="A12" enabled="T">0</param>
    <param id="A13" enabled="T">0</param>
-   <param id="A14" enabled="T">10</param>
+   <param id="A14" enabled="T">0</param>
    <param id="A22" enabled="T">0</param>
    <param id="A23" enabled="T">0</param>
-   <param id="A24" enabled="T">0</param>
+   <param id="A24" enabled="T">-1</param>
    <param id="A33" enabled="T">0</param>
    <param id="A34" enabled="T">0</param>
    <param id="A44" enabled="T">0</param>
-   <param id="B12" enabled="T">80</param>
-   <param id="B13" enabled="T">0</param>
-   <param id="B21" enabled="T">70</param>
-   <param id="B23" enabled="T">0</param>
-   <param id="B31" enabled="T">20</param>
+   <param id="B12" enabled="T">0</param>
+   <param id="B13" enabled="T">0.1</param>
+   <param id="B21" enabled="T">0.1</param>
+   <param id="B23" enabled="T">0.1</param>
+   <param id="B31" enabled="T">0</param>
    <param id="B32" enabled="T">0</param>
    <param id="surfaceBending" comment="concave" enabled="T">1</param>
    <param id="tangentAngleAlpha" enabled="T">10</param>

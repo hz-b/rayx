@@ -136,6 +136,8 @@ struct CubicSurface {
     double m_b23;
     double m_b31;
     double m_b32;
+
+    double m_psi;
 };
 
 INLINE Surface serializeCubic(CubicSurface surface) {
@@ -160,6 +162,8 @@ INLINE Surface serializeCubic(CubicSurface surface) {
     ser.m_cubic[4] = surface.m_b31;
     ser.m_cubic[5] = surface.m_b32;
 
+    ser.m_cubic[6] = surface.m_psi;
+
     return ser;
 }
 
@@ -183,6 +187,8 @@ INLINE CubicSurface deserializeCubic(Surface ser) {
     surface.m_b23 = ser.m_cubic[3];
     surface.m_b31 = ser.m_cubic[4];
     surface.m_b32 = ser.m_cubic[5];
+
+    surface.m_psi = ser.m_cubic[6];
 
     return surface;
 }

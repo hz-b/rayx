@@ -10,7 +10,7 @@ Collision getQuadricCollision(Ray r, QuadricSurface q) {
     col.found = true;
     col.hitpoint = dvec3(0, 0, 0);
     col.normal = dvec3(0, 0, 0);
-
+ 
     int cs = 1;
     int d_sign = q.m_icurv;
     if (abs(r.m_direction[1]) >= abs(r.m_direction[0]) && abs(r.m_direction[1]) >= abs(r.m_direction[2])) {
@@ -130,12 +130,15 @@ Collision getQuadricCollision(Ray r, QuadricSurface q) {
  * 
  *  method: the iterative Newtonmethod is used for zero point search
  *  result is X,Y,Z of intersection
+ * Ray in in element koordinates.
 */
 Collision getCubicCollision(Ray r, CubicSurface cu) {
     Collision col;
     col.found = true;
     col.hitpoint = dvec3(0, 0, 0);
     col.normal = dvec3(0, 0, 0);
+
+    //Ray r = rotateForCubic(rin, cu.m_psi, 1000);
 
     int cs = 1;
     if (abs(r.m_direction[1]) >= abs(r.m_direction[0]) && abs(r.m_direction[1]) >= abs(r.m_direction[2])) {
@@ -144,9 +147,10 @@ Collision getCubicCollision(Ray r, CubicSurface cu) {
         cs = 3;
     }
 
-    double x = 0;
-    double y = 0;
-    double z = 0;
+    dvec3 pos = CubicPosition(r, cu.m_psi, 1000);
+    double x = pos.x;
+    double y = pos.y;
+    double z = pos.z;
     double x1 = 0;
     double xx = 0;
     double y1 = 0;
@@ -155,21 +159,21 @@ Collision getCubicCollision(Ray r, CubicSurface cu) {
     double zz = 0;
     double counter = 0;
     double dx = 0;
-    double al = r.m_direction[0];
-    double am = r.m_direction[1];
-    double an = r.m_direction[2];
+    
+    dvec3 dir = CubicDirection(r, cu.m_psi, 1000);
+    double al = dir.x;
+    double am = dir.y;
+    double an = dir.z;
 
     if (cs == 1) {
         
-        double aml = r.m_direction[1] / r.m_direction[0];
-        double anl = r.m_direction[2] / r.m_direction[0];    
-
+        double aml = am / al;
+        double anl = an / al;    
 
         do {
             x1 = xx;
-            y1 = r.m_position[1] - aml * (r.m_position[0] - xx);
-            z1 = r.m_position[2] - anl * (r.m_position[0] - xx);
-
+            y1 = y - aml * (x - xx);
+            z1 = z - anl * (x - xx);
             
             double func = (2*((x1-xx)*an-al*z1)*cu.m_a23-(2*cu.m_a24+cu.m_b12*pow(float(xx), 2.0))*al+((x1-xx)*am-al*y1)*(cu.m_a22+cu.m_b21*xx))*((x1-xx)*am-al*y1);
             func = func + pow(float(((x1-xx)*an-al*z1)), 2.0)*cu.m_a33;
@@ -186,7 +190,7 @@ Collision getCubicCollision(Ray r, CubicSurface cu) {
             dfunc = (dfunc - ((((x1-xx)*an-al*z1)*(al*cu.m_b31+am*cu.m_b32)-al*an*cu.m_b31*xx+((x1-xx)*am-al*y1)*(2*am*cu.m_b23+an*cu.m_b32))*((x1-xx)*an-al*z1)+(pow(float(((x1-xx)*am-al*y1)), 2)*cu.m_b23+((x1-xx)*am-al*y1)*((x1-xx)*an-al*z1)*cu.m_b32-((x1-xx)*an-al*z1)*al*cu.m_b31*xx)*an));
             dfunc = dfunc / pow(float(al), 3);
 
-            if (dfunc < 0.001) {dfunc = 0.001;}
+            if (abs(dfunc) < 0.001) {dfunc = 0.001;}
             
             dx = func / dfunc;
             xx = xx - dx;
@@ -201,18 +205,18 @@ Collision getCubicCollision(Ray r, CubicSurface cu) {
                 z = z1 + anl * x;
             }
             counter++;
-        } while (dx > 0.001);
+        } while (abs(dx) > 0.001);
         
 
     } else if (cs == 2) {
-        double alm = r.m_direction[0] / r.m_direction[1];
-        double anm = r.m_direction[2] / r.m_direction[1];
+        double alm = al / am;
+        double anm = an / am;
         
         do {
 
-            x1 = r.m_position[0] - alm * (r.m_position[1] - yy);
+            x1 = x - alm * (y - yy);
             y1 = yy;
-            z1 = r.m_position[2] - anm * (r.m_position[1] - yy);
+            z1 = z - anm * (y - yy);
             
             double func = (2*(((y1-yy)*an-am*z1)*cu.m_a13-(cu.m_a12*yy+cu.m_a14)*am)+((y1-yy)*al-am*x1)*(cu.m_a11+cu.m_b12*yy))*((y1-yy)*al-am*x1);
             func = func + (((y1-yy)*an-am*z1)*cu.m_a33-2*(cu.m_a23*yy+cu.m_a34)*am)*((y1-yy)*an-am*z1)+(2*cu.m_a24*yy+cu.m_a44+cu.m_a22*pow(float(yy), 2)*pow(float(am), 2));
@@ -226,7 +230,7 @@ Collision getCubicCollision(Ray r, CubicSurface cu) {
             dfunc = dfunc - (((cu.m_a11+cu.m_b12*yy)*al+2*(cu.m_a12*am+cu.m_a13*an)-((y1-yy)*al-am*x1)*cu.m_b12)*((y1-yy)*al-am*x1)-2*(cu.m_a22*pow(float(am), 2)*yy+cu.m_a23*pow(float(am), 2)*z1-cu.m_a23*am*an*y1+2*cu.m_a23*am*an*yy+cu.m_a24*pow(float(am), 2)+cu.m_a33*am*an*z1-cu.m_a33*pow(float(an), 2)*y1+cu.m_a33*pow(float(an), 2)*yy+cu.m_a34*am*an)+(2*(((y1-yy)*an-am*z1)*cu.m_a13-(cu.m_a12*yy+cu.m_a14)*am)+((y1-yy)*al-am*x1)*(cu.m_a11+cu.m_b12*yy))*al)*am;
             dfunc = dfunc / pow(float(am), 3);
 
-            if (dfunc < 0.001) {dfunc = 0.001;}
+            if (abs(dfunc) < 0.001) {dfunc = 0.001;}
             
             dx = func / dfunc;
             yy = yy - dx;
@@ -241,15 +245,15 @@ Collision getCubicCollision(Ray r, CubicSurface cu) {
                 z = z1;
             }
             counter++;
-        } while (dx > 0.001);
+        } while (abs(dx) > 0.001);
     } else {
-        double aln = r.m_direction[0] / r.m_direction[2];
-        double amn = r.m_direction[1] / r.m_direction[2];
+        double aln = al / an;
+        double amn = am / an;
         
         do {
 
             x1 = x - aln * (z - zz);
-            y1 = r.m_position[1] - amn * (z - zz);
+            y1 = y - amn * (z - zz);
             z1 = zz;
             
             double func = ((2*(((z1-zz)*am-an*y1)*cu.m_a12-(cu.m_a13*zz+cu.m_a14)*an)+((z1-zz)*al-an*x1)*cu.m_a11)*((z1-zz)*al-an*x1)+(((z1-zz)*am-an*y1)*cu.m_a22-2*(cu.m_a23*zz+cu.m_a24)*an)*((z1-zz)*am-an*y1)+(2*cu.m_a34*zz+cu.m_a44+cu.m_a33*pow(float(zz), 2))*pow(float(an), 2))*an;
@@ -262,9 +266,6 @@ Collision getCubicCollision(Ray r, CubicSurface cu) {
             dfunc = (dfunc + (2*(((z1-zz)*am-an*y1)*cu.m_a12-(cu.m_a13*zz+cu.m_a14)*an)+((z1-zz)*al-an*x1)*cu.m_a11)*al)*an;
             dfunc = dfunc - (2*(((z1-zz)*am-an*y1)*am*cu.m_b21-pow(float(an), 2)*cu.m_b31*zz+(((z1-zz)*am-an*y1)* cu.m_b12-an*cu.m_b13*zz)*al)*((z1-zz)*al-an*x1)+(pow(float(((z1-zz)*am-an*y1)), 2)*cu.m_b21+pow(float(an), 2)*cu.m_b31*pow(float(zz), 2))*al+pow(float(((z1-zz)*al-an*x1)), 2)*(am*cu.m_b12+an*cu.m_b13)-((z1-zz)*am-an*y1)*(am*cu.m_b23+an*cu.m_b32)*an*zz+(((z1-zz)*am-an*y1)*cu.m_b23-an*cu.m_b32*zz)*(am*z1-2*am*zz-an*y1)*an);
             dfunc = (-dfunc) / pow(float(an), 3);
-
-
-
 
             if (abs(dfunc) < 0.001) {dfunc = 0.001;}
             
@@ -281,21 +282,23 @@ Collision getCubicCollision(Ray r, CubicSurface cu) {
                 z = -2*y1/2/amn;
             }
             counter++;
-        } while (dx > 0.001);        
+        } while (abs(dx) > 0.001);        
         // r.m_position = dvec3(a, b, c);
     }
 
     // intersection point is in the negative direction (behind the position when the direction is followed forwards), set weight to 0
-    if ((x - r.m_position.x) / r.m_direction.x < 0 || (y - r.m_position.y) / r.m_direction.y < 0 || (z - r.m_position.z) / r.m_direction.z < 0) {
-        col.found = false;
-    }
-
-    col.hitpoint = dvec3(x, y, z);
+    //if ((x - r.m_position.x) / r.m_direction.x < 0 || (y - r.m_position.y) / r.m_direction.y < 0 || (z - r.m_position.z) / r.m_direction.z < 0) {
+    //    col.found = false;
+    //}
+    
+    
 
     double fx = 2 * cu.m_a14 + 2 * cu.m_a11 * x + 2 * cu.m_a12 * y + 2 * cu.m_a13 * z;
     double fy = 2 * cu.m_a24 + 2 * cu.m_a12 * x + 2 * cu.m_a22 * y + 2 * cu.m_a23 * z;
     double fz = 2 * cu.m_a34 + 2 * cu.m_a13 * x + 2 * cu.m_a23 * y + 2 * cu.m_a33 * z;
-    col.normal = normalize(dvec3(fx, fy, fz));
+    
+    col.normal = normalize(dvec3(fx, fy * r8_cos(-cu.m_psi) - fz * r8_sin(-cu.m_psi), fz * r8_cos(-cu.m_psi) + fy * r8_sin(-cu.m_psi)));
+    col.hitpoint = dvec3(x, y * r8_cos(-cu.m_psi) - z * r8_sin(-cu.m_psi), z * r8_cos(-cu.m_psi) + y * r8_sin(-cu.m_psi));
     return col;
 }
 

@@ -24,6 +24,24 @@ Ray rotationAroundX(Ray r, double sin_psi, double cos_psi) {
     return rayMatrixMult(r, rotation_matrix);
 }
 
+dvec3 CubicPosition(Ray r, double alpha, double zq) {
+    
+    double yy = r.m_position[1];
+    double y = yy * r8_cos(alpha) - r.m_position[2] * r8_sin(alpha);
+    double z = (r.m_position[2]) * r8_cos(alpha) + yy * r8_sin(alpha);
+
+    return dvec3(0, y, z);
+}
+
+dvec3 CubicDirection(Ray r, double alpha, double zq) {
+    
+    double am = r.m_direction[1];
+    double dy = r.m_direction[1] * r8_cos(alpha) - r.m_direction[2] * r8_sin(alpha);
+    double dz = r.m_direction[2] * r8_cos(alpha) + am * r8_sin(alpha);
+
+    return dvec3(0, dy, dz);
+}
+
 /**
  * uses given transformation matrix to transform ray position and direction into
  * Object coordinates also takes misalignment of the object into account
