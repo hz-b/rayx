@@ -111,9 +111,11 @@ TEST_F(TestSuite, testParaboloidQuad) {
     CHECK_EQ(1, parabo.m_icurv);
 }
 
-/*
+
 TEST_F(TestSuite, testPlaneQuad) {
-    auto plane = deserializeQuadric(makePlane());
+    auto beamline = loadBeamline("PlaneMirror");
+    Element pln = beamline.m_OpticalElements[0].m_element;
+    auto plane = deserializeQuadric(pln.m_surface);
 
     CHECK_EQ(0, plane.m_a11);
     CHECK_EQ(0, plane.m_a12);
@@ -129,8 +131,9 @@ TEST_F(TestSuite, testPlaneQuad) {
 }
 
 TEST_F(TestSuite, testSphereQuad) {
-    double radius = 2;
-    auto sphere = deserializeQuadric(makeSphere(radius));
+    auto beamline = loadBeamline("SphereMirrorDefault");
+    Element sph = beamline.m_OpticalElements[0].m_element;
+    auto sphere = deserializeQuadric(sph.m_surface);
 
     CHECK_EQ(1, sphere.m_a11);
     CHECK_EQ(0, sphere.m_a12);
@@ -138,13 +141,13 @@ TEST_F(TestSuite, testSphereQuad) {
     CHECK_EQ(0, sphere.m_a14);
     CHECK_EQ(1, sphere.m_a22);
     CHECK_EQ(0, sphere.m_a23);
-    CHECK_EQ(-radius, sphere.m_a24);
+    CHECK_EQ(-10470.4917875, sphere.m_a24, 1e-6);
     CHECK_EQ(1, sphere.m_a33);
     CHECK_EQ(0, sphere.m_a34);
     CHECK_EQ(0, sphere.m_a44);
     CHECK_EQ(1, sphere.m_icurv);
 }
-*/
+
 TEST_F(TestSuite, testEllipsoidQuad) {
     auto beamline = loadBeamline("Ellipsoid");
     Element elli = beamline.m_OpticalElements[0].m_element;
@@ -208,6 +211,18 @@ TEST_F(TestSuite, testToroidSurface) {
     CHECK_EQ(315.723959, toroid.m_shortRadius, 0.001);
     CHECK_EQ(1, toroid.m_toroidType);
 }
+
+
+TEST_F(TestSuite, testExpertsOptic) {
+    auto beamline = loadBeamline("toroid");
+    Element trid = beamline.m_OpticalElements[0].m_element;
+    auto toroid = deserializeToroid(trid.m_surface);
+
+    CHECK_EQ(10470.4917, toroid.m_longRadius, 0.001);
+    CHECK_EQ(315.723959, toroid.m_shortRadius, 0.001);
+    CHECK_EQ(1, toroid.m_toroidType);
+}
+
 
 /***
  * Tests if two sources can be traced in one go.
