@@ -101,13 +101,13 @@ void Application::run() {
             // camController.update(cam, m_Renderer.getAspectRatio());
             if (uiParams.pathChanged) {
                 updateObjects(uiParams.rmlPath.string(), rObjects);
-                loadRays(uiParams.rmlPath.string(), rayCache, uiParams.rayInfo);
-                if (uiParams.rayInfo.displayRays) {
-                    updateRays(uiParams.rmlPath.string(), rayCache, rayObj, rays, uiParams.rayInfo);
-                }
+                createRayCache(uiParams.rmlPath.string(), rayCache, uiParams.rayInfo);
                 uiParams.pathChanged = false;
                 camController.lookAtPoint(rObjects[0].getTranslationVecor());
-            } else if (uiParams.rayInfo.raysChanged) {
+                uiParams.rayInfo.raysChanged = true;
+            }
+
+            if (uiParams.rayInfo.raysChanged) {
                 if (uiParams.rayInfo.displayRays) {
                     updateRays(uiParams.rmlPath.string(), rayCache, rayObj, rays, uiParams.rayInfo);
                 } else {
@@ -149,7 +149,7 @@ void Application::updateObjects(const std::string& path, std::vector<RenderObjec
     // Triangulate the render data and update the scene
     rObjects = triangulateObjects(beamline.m_OpticalElements, m_Device);
 }
-void Application::loadRays(const std::string& path, BundleHistory& rayCache, UIRayInfo& rayInfo) {
+void Application::createRayCache(const std::string& path, BundleHistory& rayCache, UIRayInfo& rayInfo) {
 #ifndef NO_H5
     std::string rayFilePath = path.substr(0, path.size() - 4) + ".h5";
     RAYX::BundleHistory bundleHist = raysFromH5(rayFilePath, FULL_FORMAT);

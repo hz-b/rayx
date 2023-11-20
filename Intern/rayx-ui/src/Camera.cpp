@@ -128,7 +128,7 @@ void CameraController::lookAtPoint(const glm::vec3& targetPoint, float distance)
     float z = targetPoint.z - offset;
 
     // Set the camera's y-coordinate with an offset
-    float y = targetPoint.y + offset;  // You can adjust the Y offset as needed
+    float y = targetPoint.y + offset;
 
     m_position = glm::vec3(x, y, z);
 
@@ -139,7 +139,6 @@ void CameraController::lookAtPoint(const glm::vec3& targetPoint, float distance)
     m_pitch = glm::degrees(std::asin(m_direction.y));
     m_yaw = glm::degrees(std::atan2(m_direction.z, m_direction.x));
 
-    // Update the camera direction without triggering pitch and yaw clamping
     updateDirection(0.0, 0.0);
 }
 
