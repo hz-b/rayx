@@ -13,11 +13,18 @@
 /**
  * UI Parameters such as toggles, paths, etc.
  */
+struct UIRayInfo {
+    bool displayRays;
+    bool raysChanged;
+    int amountOfRays;
+    int maxAmountOfRays;
+};
 struct UIParameters {
     CameraController& camController;
     std::filesystem::path rmlPath;
     bool pathChanged;
     float frameTime;
+    UIRayInfo rayInfo;
 };
 
 class UIRenderSystem {

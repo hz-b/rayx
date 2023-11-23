@@ -5,7 +5,8 @@
 #include "CommandParser.h"
 #include "GraphicsCore/Descriptors.h"
 #include "GraphicsCore/Renderer.h"
-
+#include "RayProcessing.h"
+#include "RenderSystem/UIRenderSystem.h"
 // TODO: This is also in Device Class
 const std::vector<const char*> validationLayers = {"VK_LAYER_KHRONOS_validation"};
 const std::vector<const char*> deviceExtensions = {VK_KHR_SWAPCHAIN_EXTENSION_NAME};
@@ -47,5 +48,8 @@ class Application {
 
     std::unique_ptr<DescriptorPool> m_DescriptorPool{nullptr};
 
-    void updateScene(const std::string& path, std::vector<RenderObject>& rObjects, std::vector<Line>& rays, std::optional<RenderObject>& rayObj);
+    void updateObjects(const std::string& path, std::vector<RenderObject>& rObjects);
+    void createRayCache(const std::string& path, BundleHistory& rayCache, UIRayInfo& rayInfo);
+    void updateRays(const std::string& path, BundleHistory& rayCache, std::optional<RenderObject>& rayObj, std::vector<Line>& rays,
+                    UIRayInfo& rayInfo);
 };

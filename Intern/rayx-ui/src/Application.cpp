@@ -1,6 +1,7 @@
 #include "Application.h"
 
 #include <chrono>
+#include <unordered_set>
 
 #include "Colors.h"
 #include "Data/Importer.h"
@@ -12,7 +13,6 @@
 #include "RenderSystem/GridRenderSystem.h"
 #include "RenderSystem/ObjectRenderSystem.h"
 #include "RenderSystem/RayRenderSystem.h"
-#include "RenderSystem/UIRenderSystem.h"
 #include "Triangulation/Triangulate.h"
 #include "UserInput.h"
 #include "Writer/CSVWriter.h"
@@ -74,11 +74,13 @@ void Application::run() {
     auto currentTime = std::chrono::high_resolution_clock::now();
     std::vector<RenderObject> rObjects;
     std::vector<Line> rays;
+    BundleHistory rayCache;
     std::optional<RenderObject> rayObj;
 
     // CLI Input
     std::string rmlPathCli = m_CommandParser.m_args.m_providedFile;
-    UIParameters uiParams{camController, rmlPathCli, !rmlPathCli.empty(), 0.0};
+    UIRayInfo rayInfo{true, false, 50, 100};
+    UIParameters uiParams{camController, rmlPathCli, !rmlPathCli.empty(), 0.0, rayInfo};
 
     // Main loop
     while (!m_Window.shouldClose()) {
@@ -98,9 +100,20 @@ void Application::run() {
             uiRenderSystem.setupUI(uiParams, rObjects);
             // camController.update(cam, m_Renderer.getAspectRatio());
             if (uiParams.pathChanged) {
-                updateScene(uiParams.rmlPath.string(), rObjects, rays, rayObj);
+                updateObjects(uiParams.rmlPath.string(), rObjects);
+                createRayCache(uiParams.rmlPath.string(), rayCache, uiParams.rayInfo);
                 uiParams.pathChanged = false;
                 camController.lookAtPoint(rObjects[0].getTranslationVecor());
+                uiParams.rayInfo.raysChanged = true;
+            }
+
+            if (uiParams.rayInfo.raysChanged) {
+                if (uiParams.rayInfo.displayRays) {
+                    updateRays(uiParams.rmlPath.string(), rayCache, rayObj, rays, uiParams.rayInfo);
+                } else {
+                    rayObj.reset();
+                }
+                uiParams.rayInfo.raysChanged = false;
             }
 
             camController.update(cam, m_Renderer.getAspectRatio());
@@ -129,75 +142,62 @@ void Application::run() {
     vkDeviceWaitIdle(m_Device.device());
 }
 
-/**
- * This function processes the BundleHistory and determines the ray's path in the beamline.
- * Depending on the event type associated with the ray, the function produces visual lines that represent
- * ray segments, colored based on the event type.
- */
-std::vector<Line> getRays(const RAYX::BundleHistory& bundleHist, const std::vector<RAYX::OpticalElement>& elements) {
-    std::vector<Line> rays;
-
-    for (const RAYX::RayHistory& rayHist : bundleHist) {
-        glm::vec3 rayLastPos = {0.0f, 0.0f, 0.0f};
-        for (const RAYX::Event& event : rayHist) {
-            if (event.m_eventType == ETYPE_JUST_HIT_ELEM || event.m_eventType == ETYPE_ABSORBED) {
-                // Events where rays hit objects are in element coordinates
-                // We need to convert them to world coordinates
-                glm::vec4 worldPos = elements[(size_t)event.m_lastElement].m_element.m_outTrans * glm::vec4(event.m_position, 1.0f);
-
-                Vertex origin = {{rayLastPos.x, rayLastPos.y, rayLastPos.z, 1.0f}, YELLOW};
-                Vertex point = (event.m_eventType == ETYPE_JUST_HIT_ELEM) ? Vertex(worldPos, ORANGE) : Vertex(worldPos, RED);
-
-                Line myline = {origin, point};
-                rays.push_back(myline);
-                rayLastPos = point.pos;
-            } else if (event.m_eventType == ETYPE_FLY_OFF) {
-                // Fly off events are in world coordinates
-                // The origin here is the position of the event
-                // The point is defined by the direction of the ray (default length)
-
-                glm::vec4 eventPos = glm::vec4(event.m_position, 1.0f);
-                glm::vec4 eventDir = glm::vec4(event.m_direction, 0.0f);
-                glm::vec4 pointPos = eventPos + eventDir * 1000.0f;
-
-                Vertex origin = {eventPos, GREY};
-                Vertex point = {pointPos, GREY};
-
-                rays.push_back(Line(origin, point));
-            } else if (event.m_eventType == ETYPE_NOT_ENOUGH_BOUNCES) {
-                // Events where rays hit objects are in element coordinates
-                // We need to convert them to world coordinates
-                glm::vec4 worldPos = elements[(size_t)event.m_lastElement].m_element.m_outTrans * glm::vec4(event.m_position, 1.0f);
-
-                const glm::vec4 white = {1.0f, 1.0f, 1.0f, 0.7f};
-                Vertex origin = {{rayLastPos.x, rayLastPos.y, rayLastPos.z, 1.0f}, white};
-                Vertex point = Vertex(worldPos, white);
-
-                rays.push_back(Line(origin, point));
-                rayLastPos = point.pos;
-            }
-        }
-    }
-
-    return rays;
-}
-
-void Application::updateScene(const std::string& path, std::vector<RenderObject>& rObjects, std::vector<Line>& rays,
-                              std::optional<RenderObject>& rayObj) {
+void Application::updateObjects(const std::string& path, std::vector<RenderObject>& rObjects) {
     RAYX::Beamline beamline = RAYX::importBeamline(path);
+    // TODO(Jannis): Hacky fix for now; should be some form of synchronization
+    vkDeviceWaitIdle(m_Device.device());
+    // Triangulate the render data and update the scene
+    rObjects = triangulateObjects(beamline.m_OpticalElements, m_Device);
+}
+void Application::createRayCache(const std::string& path, BundleHistory& rayCache, UIRayInfo& rayInfo) {
 #ifndef NO_H5
     std::string rayFilePath = path.substr(0, path.size() - 4) + ".h5";
     RAYX::BundleHistory bundleHist = raysFromH5(rayFilePath, FULL_FORMAT);
+    rayInfo.maxAmountOfRays = bundleHist.size();
 #else
     std::string rayFilePath = path.substr(0, path.size() - 4) + ".csv";
     RAYX::BundleHistory bundleHist = loadCSV(rayFilePath);
 #endif
-    vkDeviceWaitIdle(m_Device.device());  // TODO(Jannis): Hacky fix for now; should be some form of synchronization
+    // TODO(Jannis): Hacky fix for now; should be some form of synchronization
+    vkDeviceWaitIdle(m_Device.device());
+    const size_t m = getMaxEvents(bundleHist);
 
-    // Triangulate the render data and update the scene
-    rObjects = triangulateObjects(beamline.m_OpticalElements, m_Device);
-    rays = getRays(bundleHist, beamline.m_OpticalElements);
+    std::vector<size_t> indices(bundleHist.size());
+    std::iota(indices.begin(), indices.end(), 0);  // Filling indices with 0, 1, 2, ..., n-1
 
+    // Randomly shuffling the indices
+    std::random_device rd;
+    std::default_random_engine engine(rd());
+    std::shuffle(indices.begin(), indices.end(), engine);
+
+    std::unordered_set<size_t> selectedIndices;
+
+    // Selecting rays for each event index
+    for (size_t eventIdx = 0; eventIdx < m; ++eventIdx) {
+        size_t count = 0;
+        for (size_t rayIdx : indices) {
+            if (count >= MAX_RAYS) break;
+            if (bundleHist[rayIdx].size() > eventIdx) {
+                selectedIndices.insert(rayIdx);
+                count++;
+            }
+        }
+    }
+
+    rayCache.clear();
+    // Now selectedIndices contains unique indices of rays
+    // Creating rayCache object from selected indices
+    for (size_t idx : selectedIndices) {
+        rayCache.push_back(bundleHist[idx]);
+    }
+
+    rayInfo.maxAmountOfRays = rayCache.size();
+}
+
+void Application::updateRays(const std::string& path, BundleHistory& rayCache, std::optional<RenderObject>& rayObj, std::vector<Line>& rays,
+                             UIRayInfo& rayInfo) {
+    RAYX::Beamline beamline = RAYX::importBeamline(path);
+    rays = getRays(rayCache, beamline.m_OpticalElements, kMeansFilter, rayInfo.amountOfRays);
     if (!rays.empty()) {
         // Temporarily aggregate all vertices, then create a single RenderObject
         std::vector<Vertex> rayVertices(rays.size() * 2);
