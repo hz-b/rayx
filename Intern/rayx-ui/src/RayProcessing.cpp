@@ -23,7 +23,7 @@ void displayFilterSlider(int* amountOfRays, int maxAmountOfRays, bool* displayRa
     ImGui::Text("Maximum amount of Rays per optical element:");
 
     // Define the range for the slider
-    float minLogValue = 0.0f;  // logarithm of 1
+    float minLogValue = 0.0f;
     float maxLogValue = std::log(static_cast<float>(std::min(maxAmountOfRays, MAX_RAYS)));
 
     // Convert the current amount of rays to logarithmic scale for the slider position
@@ -75,7 +75,6 @@ std::vector<Line> getRays(const RAYX::BundleHistory& rayCache, const std::vector
         auto& rayHist = rayCache[i];
         glm::vec3 rayLastPos = {0.0f, 0.0f, 0.0f};
         for (const auto& event : rayHist) {
-            // RAYX_LOG << "Start inner loop";
             if (event.m_eventType == ETYPE_JUST_HIT_ELEM || event.m_eventType == ETYPE_ABSORBED) {
                 // Events where rays hit objects are in element coordinates
                 // We need to convert them to world coordinates
@@ -130,7 +129,6 @@ std::vector<std::vector<float>> extractFeatures(const RAYX::BundleHistory& bundl
     return features;
 }
 
-// Assume this is a function that performs k-means clustering
 std::pair<std::vector<size_t>, std::vector<std::vector<float>>> kMeansClustering(const std::vector<std::vector<float>>& features, size_t k);
 
 // Helper function to find the index of the most central ray in each cluster
@@ -142,7 +140,6 @@ std::vector<size_t> findMostCentralRays(const std::vector<std::vector<float>>& f
     for (size_t i = 0; i < features.size(); ++i) {
         size_t clusterIdx = clusterAssignments[i];
         float distance = 0.0f;  // Calculate the distance between features[i] and centroids[clusterIdx]
-        // Distance calculation, could be Euclidean or another metric
         for (size_t j = 0; j < features[i].size(); ++j) {
             distance += std::pow(features[i][j] - centroids[clusterIdx][j], 2);
         }
@@ -217,7 +214,7 @@ std::pair<std::vector<size_t>, std::vector<std::vector<float>>> kMeansClustering
         centroid = features[uni(rng)];
     }
 
-    int maxIterations = 25;  // Set a reasonable limit for iterations
+    int maxIterations = 25;
     int iteration = 0;
     bool changed = true;
     while (changed && iteration < maxIterations) {
@@ -257,9 +254,6 @@ std::pair<std::vector<size_t>, std::vector<std::vector<float>>> kMeansClustering
             if (counts[i] == 0) {
                 // Reinitialize centroid to a random feature to handle empty clusters
                 centroids[i] = features[uni(rng)];
-                // Consider reassigning clusters since the centroids have changed
-                // Depending on the specific requirements, you may need to iterate again
-                // or devise a more sophisticated method to handle empty clusters.
             } else {
                 // Update centroids as normal
                 for (size_t j = 0; j < centroids[i].size(); ++j) {
