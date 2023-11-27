@@ -15,6 +15,12 @@ BundleHistory Tracer::trace(const Beamline& b, Sequential seq, uint64_t max_batc
     RAYX_PROFILE_FUNCTION_STDOUT();
 
     auto rays = b.getInputRays(thread_count);
+
+    // don't trace if there are no optical elements
+    if (b.m_OpticalElements.size() == 0) {
+        return convertToBundleHistory(rays);
+    }
+
     auto randomSeed = randomDouble();
     auto maxEvents = b.m_OpticalElements.size() + 2;
     auto materialTables = b.calcMinimalMaterialTables();
