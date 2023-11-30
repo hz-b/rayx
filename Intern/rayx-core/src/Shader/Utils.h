@@ -13,9 +13,9 @@ Ray RAYX_API rayMatrixMult(Ray r, const dmat4 m);
 Ray rotationAroundX(Ray r, double sin_psi, double cos_psi);
 
 //TODO: doku
-dvec3 cubicPosition(Ray r, double alpha);
+dvec3 RAYX_API cubicPosition(Ray r, double alpha);
 
-dvec3 cubicDirection(Ray r, double alpha);
+dvec3 RAYX_API cubicDirection(Ray r, double alpha);
 
 /**
  * uses given transformation matrix to transform ray position and direction into
