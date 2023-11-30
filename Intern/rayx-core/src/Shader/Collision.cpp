@@ -3,6 +3,8 @@
 #include "Collision.h"
 #include "Utils.h"
 #include "InvocationState.h"
+#include "Approx.h"
+
 
 /**************************************************************
  *                    Quadric collision
@@ -149,7 +151,7 @@ Collision getCubicCollision(Ray r, CubicSurface cu) {
         cs = 3;
     }
 
-    dvec3 pos = CubicPosition(r, cu.m_psi, 1000);
+    dvec3 pos = cubicPosition(r, cu.m_psi);
     double x = pos.x;
     double y = pos.y;
     double z = pos.z;
@@ -162,7 +164,7 @@ Collision getCubicCollision(Ray r, CubicSurface cu) {
     double counter = 0;
     double dx = 0;
     
-    dvec3 dir = CubicDirection(r, cu.m_psi, 1000);
+    dvec3 dir = cubicDirection(r, cu.m_psi);
     double al = dir.x;
     double am = dir.y;
     double an = dir.z;

@@ -4,10 +4,10 @@
 
 void Polygon::calculateForQuadrilateral(double widthA, double widthB, double lengthA, double lengthB) {
     vertices = {
-        Vertex({-widthB / 2.0f, 0, -lengthA / 2.0f, 1.0f}, OPT_ELEMENT_COLOR),  // Bottom-left
-        Vertex({-widthA / 2.0f, 0, lengthB / 2.0f, 1.0f}, OPT_ELEMENT_COLOR),   // Top-left
-        Vertex({widthA / 2.0f, 0, lengthB / 2.0f, 1.0f}, OPT_ELEMENT_COLOR),    // Top-right
-        Vertex({widthB / 2.0f, 0, -lengthA / 2.0f, 1.0f}, OPT_ELEMENT_COLOR)    // Bottom-right
+        {.pos = {-widthB / 2.0f, 0, -lengthA / 2.0f, 1.0f}, .color = OPT_ELEMENT_COLOR},// Bottom-left
+        {.pos = {-widthA / 2.0f, 0, lengthB / 2.0f, 1.0f}, .color = OPT_ELEMENT_COLOR},// Top-left
+        {.pos = {widthA / 2.0f, 0, lengthB / 2.0f, 1.0f}, .color = OPT_ELEMENT_COLOR},// Top-right
+        {.pos = {widthB / 2.0f, 0, -lengthA / 2.0f, 1.0f}, .color = OPT_ELEMENT_COLOR},// Bottom-right
     };
     indices = {0, 1, 2, 2, 3, 0};
 }
