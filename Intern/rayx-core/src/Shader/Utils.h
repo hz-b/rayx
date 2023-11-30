@@ -12,6 +12,11 @@ Ray RAYX_API rayMatrixMult(Ray r, const dmat4 m);
 
 Ray rotationAroundX(Ray r, double sin_psi, double cos_psi);
 
+//TODO: doku
+dvec3 cubicPosition(Ray r, double alpha);
+
+dvec3 cubicDirection(Ray r, double alpha);
+
 /**
  * uses given transformation matrix to transform ray position and direction into
  * Object coordinates also takes misalignment of the object into account
@@ -269,3 +274,5 @@ dvec2 RAYX_API cutoutBoundingBox(Cutout cutout);
 // might not find all subset-violations, but should find most of them.
 // (might not find all Ellipsoid vs Trapezoid violations)
 void RAYX_API assertCutoutSubset(Cutout c1, Cutout c2);
+
+

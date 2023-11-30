@@ -17,7 +17,7 @@ struct Surface {
     double m_type;
 
     // These params are private. use the serialize & deserialize functions below instead.
-    double m_private_serialization_params[18];
+    double m_private_serialization_params[32];
 };
 
 ///////////////////

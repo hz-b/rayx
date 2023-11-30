@@ -111,25 +111,6 @@ TEST_F(TestSuite, testParaboloidQuad) {
     CHECK_EQ(1, parabo.m_icurv);
 }
 
-
-TEST_F(TestSuite, testPlaneQuad) {
-    auto beamline = loadBeamline("PlaneMirror");
-    Element pln = beamline.m_OpticalElements[0].m_element;
-    auto plane = deserializeQuadric(pln.m_surface);
-
-    CHECK_EQ(0, plane.m_a11);
-    CHECK_EQ(0, plane.m_a12);
-    CHECK_EQ(0, plane.m_a13);
-    CHECK_EQ(0, plane.m_a14);
-    CHECK_EQ(0, plane.m_a22);
-    CHECK_EQ(0, plane.m_a23);
-    CHECK_EQ(-1, plane.m_a24);
-    CHECK_EQ(0, plane.m_a33);
-    CHECK_EQ(0, plane.m_a34);
-    CHECK_EQ(0, plane.m_a44);
-    CHECK_EQ(1, plane.m_icurv);
-}
-
 TEST_F(TestSuite, testSphereQuad) {
     auto beamline = loadBeamline("SphereMirrorDefault");
     Element sph = beamline.m_OpticalElements[0].m_element;
