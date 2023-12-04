@@ -34,7 +34,7 @@ void displayFilterSlider(int* amountOfRays, int maxAmountOfRays, bool* displayRa
         // Convert the logarithmic value back to the actual number of rays
         *amountOfRays = static_cast<int>(std::exp(logValue));
     }
-    if (*renderAllRays && *displayRays) {
+    if (*displayRays && *renderAllRays) {
         ImGui::EndDisabled();
     }
 
@@ -42,11 +42,9 @@ void displayFilterSlider(int* amountOfRays, int maxAmountOfRays, bool* displayRa
     ImGui::SameLine();
     ImGui::Text("%d", *amountOfRays);
     ImGui::Checkbox("Render all rays", renderAllRays);
-    // if (*renderAllRays) {
-    //     *amountOfRays = maxAmountOfRays;
-    // }
-
-    ImGui::EndDisabled();  // End grey out
+    if (!*displayRays) {
+        ImGui::EndDisabled();  // End grey out
+    }
 }
 
 size_t getMaxEvents(const RAYX::BundleHistory& bundleHist) {
