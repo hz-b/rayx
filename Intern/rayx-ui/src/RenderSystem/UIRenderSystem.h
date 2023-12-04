@@ -16,6 +16,8 @@
 struct UIRayInfo {
     bool displayRays;
     bool raysChanged;
+    bool cacheChanged;
+    bool renderAllRays;
     int amountOfRays;
     int maxAmountOfRays;
 };

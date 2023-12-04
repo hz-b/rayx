@@ -24,10 +24,12 @@ std::vector<size_t> findMostCentralRays(const std::vector<std::vector<double>>& 
 
 std::vector<size_t> kMeansFilter(const RAYX::BundleHistory& bundleHist, size_t k);
 
+std::vector<size_t> noFilter(const RAYX::BundleHistory& bundleHist, size_t k);
+
 float euclideanDistance(const std::vector<float>& a, const std::vector<float>& b);
 
 void initializeCentroids(std::vector<std::vector<float>>& centroids, const std::vector<std::vector<float>>& features, size_t k);
 
 std::pair<std::vector<size_t>, std::vector<std::vector<float>>> kMeansClustering(const std::vector<std::vector<float>>& features, size_t k);
-void displayFilterSlider(int* amountOfRays, int maxAmountOfRays, bool* displayRays);
+void displayFilterSlider(int* amountOfRays, int maxAmountOfRays, bool* displayRays, bool* renderAllRays);
 size_t getMaxEvents(const RAYX::BundleHistory& bundleHist);

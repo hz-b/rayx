@@ -11,11 +11,11 @@
 #include "Application.h"
 #include "Colors.h"
 
-void displayFilterSlider(int* amountOfRays, int maxAmountOfRays, bool* displayRays) {
+void displayFilterSlider(int* amountOfRays, int maxAmountOfRays, bool* displayRays, bool* renderAllRays) {
     // Checkbox for displaying rays
     // Slider should be greyed out if "Display Rays" is unchecked
     ImGui::Checkbox("Display Rays", displayRays);
-    if (!*displayRays) {
+    if (!*displayRays || *renderAllRays) {
         ImGui::BeginDisabled();  // Grey out the slider
     }
 
@@ -34,14 +34,19 @@ void displayFilterSlider(int* amountOfRays, int maxAmountOfRays, bool* displayRa
         // Convert the logarithmic value back to the actual number of rays
         *amountOfRays = static_cast<int>(std::exp(logValue));
     }
+    if (*renderAllRays && *displayRays) {
+        ImGui::EndDisabled();
+    }
 
     // Display the actual number of rays next to the slider
     ImGui::SameLine();
     ImGui::Text("%d", *amountOfRays);
+    ImGui::Checkbox("Render all rays", renderAllRays);
+    // if (*renderAllRays) {
+    //     *amountOfRays = maxAmountOfRays;
+    // }
 
-    if (!*displayRays) {
-        ImGui::EndDisabled();  // End grey out
-    }
+    ImGui::EndDisabled();  // End grey out
 }
 
 size_t getMaxEvents(const RAYX::BundleHistory& bundleHist) {
@@ -185,6 +190,15 @@ std::vector<size_t> kMeansFilter(const RAYX::BundleHistory& rayCache, size_t k) 
     std::sort(selectedRays.begin(), selectedRays.end());
     auto last = std::unique(selectedRays.begin(), selectedRays.end());
     selectedRays.erase(last, selectedRays.end());
+
+    return selectedRays;
+}
+
+std::vector<size_t> noFilter(const RAYX::BundleHistory& bundleHist, size_t k) {
+    std::vector<size_t> selectedRays;
+    for (size_t i = 0; i < bundleHist.size(); ++i) {
+        selectedRays.push_back(i);
+    }
 
     return selectedRays;
 }

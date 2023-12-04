@@ -79,7 +79,7 @@ void Application::run() {
 
     // CLI Input
     std::string rmlPathCli = m_CommandParser.m_args.m_providedFile;
-    UIRayInfo rayInfo{true, false, 50, 100};
+    UIRayInfo rayInfo{true, false, false, false, 50, 100};
     UIParameters uiParams{camController, rmlPathCli, !rmlPathCli.empty(), 0.0, rayInfo};
 
     // Main loop
@@ -108,6 +108,10 @@ void Application::run() {
             }
 
             if (uiParams.rayInfo.raysChanged) {
+                if (uiParams.rayInfo.cacheChanged) {
+                    createRayCache(uiParams.rmlPath.string(), rayCache, uiParams.rayInfo);
+                    uiParams.rayInfo.cacheChanged = false;
+                }
                 if (uiParams.rayInfo.displayRays) {
                     updateRays(uiParams.rmlPath.string(), rayCache, rayObj, rays, uiParams.rayInfo);
                 } else {
@@ -153,11 +157,16 @@ void Application::createRayCache(const std::string& path, BundleHistory& rayCach
 #ifndef NO_H5
     std::string rayFilePath = path.substr(0, path.size() - 4) + ".h5";
     RAYX::BundleHistory bundleHist = raysFromH5(rayFilePath, FULL_FORMAT);
-    rayInfo.maxAmountOfRays = bundleHist.size();
 #else
     std::string rayFilePath = path.substr(0, path.size() - 4) + ".csv";
     RAYX::BundleHistory bundleHist = loadCSV(rayFilePath);
 #endif
+    rayInfo.maxAmountOfRays = bundleHist.size();
+    if (rayInfo.renderAllRays) {
+        rayInfo.amountOfRays = rayInfo.maxAmountOfRays;
+        rayCache = bundleHist;
+        return;
+    }
     // TODO(Jannis): Hacky fix for now; should be some form of synchronization
     vkDeviceWaitIdle(m_Device.device());
     const size_t m = getMaxEvents(bundleHist);
@@ -197,7 +206,11 @@ void Application::createRayCache(const std::string& path, BundleHistory& rayCach
 void Application::updateRays(const std::string& path, BundleHistory& rayCache, std::optional<RenderObject>& rayObj, std::vector<Line>& rays,
                              UIRayInfo& rayInfo) {
     RAYX::Beamline beamline = RAYX::importBeamline(path);
-    rays = getRays(rayCache, beamline.m_OpticalElements, kMeansFilter, rayInfo.amountOfRays);
+    if (!rayInfo.renderAllRays) {
+        rays = getRays(rayCache, beamline.m_OpticalElements, kMeansFilter, rayInfo.amountOfRays);
+    } else {
+        rays = getRays(rayCache, beamline.m_OpticalElements, noFilter, rayInfo.maxAmountOfRays);
+    }
     if (!rays.empty()) {
         // Temporarily aggregate all vertices, then create a single RenderObject
         std::vector<Vertex> rayVertices(rays.size() * 2);

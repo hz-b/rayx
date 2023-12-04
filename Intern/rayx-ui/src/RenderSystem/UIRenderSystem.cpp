@@ -214,9 +214,15 @@ void UIRenderSystem::showSceneEditorWindow(UIParameters& uiParams) {
     if (!uiParams.rmlPath.empty()) {
         int tempAmountOfRays = uiParams.rayInfo.amountOfRays;
         bool tempDisplayRays = uiParams.rayInfo.displayRays;
-        displayFilterSlider(&uiParams.rayInfo.amountOfRays, uiParams.rayInfo.maxAmountOfRays, &uiParams.rayInfo.displayRays);
-        if (tempAmountOfRays != uiParams.rayInfo.amountOfRays || tempDisplayRays != uiParams.rayInfo.displayRays) {
+        bool tempRenderAllRays = uiParams.rayInfo.renderAllRays;
+        displayFilterSlider(&uiParams.rayInfo.amountOfRays, uiParams.rayInfo.maxAmountOfRays, &uiParams.rayInfo.displayRays,
+                            &uiParams.rayInfo.renderAllRays);
+        if (tempAmountOfRays != uiParams.rayInfo.amountOfRays || tempDisplayRays != uiParams.rayInfo.displayRays ||
+            tempRenderAllRays != uiParams.rayInfo.renderAllRays) {
             uiParams.rayInfo.raysChanged = true;
+        }
+        if (tempRenderAllRays != uiParams.rayInfo.renderAllRays) {
+            uiParams.rayInfo.cacheChanged = true;
         }
     }
     ImGui::Text("Application average %.6f ms/frame", uiParams.frameTime * 1000.0f);
