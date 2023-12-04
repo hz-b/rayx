@@ -162,13 +162,11 @@ void Application::createRayCache(const std::string& path, BundleHistory& rayCach
     std::string rayFilePath = path.substr(0, path.size() - 4) + ".csv";
     RAYX::BundleHistory bundleHist = loadCSV(rayFilePath);
 #endif
-    rayInfo.maxAmountOfRays = bundleHist.size();
+    rayInfo.maxAmountOfRays = (int)bundleHist.size();
     if (rayInfo.renderAllRays) {
         rayCache = bundleHist;
         return;
     }
-    // TODO(Jannis): Hacky fix for now; should be some form of synchronization
-    vkDeviceWaitIdle(m_Device.device());
     const size_t m = getMaxEvents(bundleHist);
 
     std::vector<size_t> indices(bundleHist.size());
@@ -200,7 +198,7 @@ void Application::createRayCache(const std::string& path, BundleHistory& rayCach
         rayCache.push_back(bundleHist[idx]);
     }
 
-    rayInfo.maxAmountOfRays = rayCache.size();
+    rayInfo.maxAmountOfRays = (int)rayCache.size();
 }
 
 void Application::updateRays(const std::string& path, BundleHistory& rayCache, std::optional<RenderObject>& rayObj, std::vector<Line>& rays,

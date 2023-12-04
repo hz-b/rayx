@@ -144,7 +144,7 @@ std::vector<size_t> findMostCentralRays(const std::vector<std::vector<float>>& f
         size_t clusterIdx = clusterAssignments[i];
         float distance = 0.0f;  // Calculate the distance between features[i] and centroids[clusterIdx]
         for (size_t j = 0; j < features[i].size(); ++j) {
-            distance += std::pow(features[i][j] - centroids[clusterIdx][j], 2);
+            distance += (float)std::pow(features[i][j] - centroids[clusterIdx][j], 2);
         }
         distance = std::sqrt(distance);
 

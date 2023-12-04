@@ -24,7 +24,7 @@ std::vector<size_t> findMostCentralRays(const std::vector<std::vector<double>>& 
 
 std::vector<size_t> kMeansFilter(const RAYX::BundleHistory& bundleHist, size_t k);
 
-std::vector<size_t> noFilter(const RAYX::BundleHistory& bundleHist, size_t k);
+std::vector<size_t> noFilter(const RAYX::BundleHistory& bundleHist, [[maybe_unused]] size_t k);
 
 float euclideanDistance(const std::vector<float>& a, const std::vector<float>& b);
 

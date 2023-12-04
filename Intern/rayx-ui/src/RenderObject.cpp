@@ -1,6 +1,9 @@
 #include "RenderObject.h"
 
 #include <glm/gtx/matrix_decompose.hpp>
+
+#include "CanonicalizePath.h"
+
 /**
  * Constructor sets up vertex and index buffers based on the input parameters.
  */
@@ -8,6 +11,9 @@ RenderObject::RenderObject(std::string name, Device& device, glm::mat4 modelMatr
     : m_name(name), m_Device(device), m_modelMatrix(modelMatrix) {
     createVertexBuffers(vertices);
     createIndexBuffers(indices);
+
+    DescriptorSetTexture descrSetTexture = {.descrSet = VK_NULL_HANDLE,
+                                            .tex = Texture(m_Device, canonicalizeRepositoryPath("Intern/rayx-ui/res/textures/white.png"))};
 }
 
 RenderObject::RenderObject(RenderObject&& other) noexcept
@@ -32,6 +38,11 @@ RenderObject& RenderObject::operator=(RenderObject&& other) noexcept {
 
         m_name = std::move(other.m_name);
         m_descrSetTexture = std::move(other.m_descrSetTexture);
+        m_modelMatrix = other.m_modelMatrix;
+        m_vertexCount = other.m_vertexCount;
+        m_indexCount = other.m_indexCount;
+        m_vertexBuffer = std::move(other.m_vertexBuffer);
+        m_indexBuffer = std::move(other.m_indexBuffer);
     }
     return *this;
 }

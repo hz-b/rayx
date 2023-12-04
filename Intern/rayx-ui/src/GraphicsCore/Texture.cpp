@@ -8,8 +8,12 @@
 Texture::Texture(Device& device, const std::filesystem::path& path) : m_Device{device} {
     // Read in image
     int texWidth, texHeight, texChannels;
+    RAYX_LOG << "Loading texture: " << path.string();
     stbi_uc* pixels = stbi_load(path.string().c_str(), &texWidth, &texHeight, &texChannels, STBI_rgb_alpha);
-    assert(texChannels == 4 && "Testing if texChannels returns expected 4 (rbga)...");  //! Temp
+    if (!pixels) {
+        RAYX_ERR << "Failed to load texture image";
+    }
+    assert(texChannels == 4 && "Testing if texChannels returns expected 4 (rbga)...");  //! Why is this not 4?
 
     // Create staging buffer
     m_stagingBuffer = std::make_unique<Buffer>(m_Device, "textureStagingBuffer", texChannels, texWidth * texHeight, VK_BUFFER_USAGE_TRANSFER_SRC_BIT,

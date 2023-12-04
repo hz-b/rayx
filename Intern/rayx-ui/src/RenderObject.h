@@ -20,13 +20,6 @@ struct Line {
 struct DescriptorSetTexture {
     VkDescriptorSet descrSet;
     Texture tex;
-
-    DescriptorSetTexture(DescriptorSetTexture&& other) noexcept : descrSet(other.descrSet), tex(std::move(other.tex)) {}
-    DescriptorSetTexture& operator=(DescriptorSetTexture&& other) noexcept {
-        descrSet = other.descrSet;
-        tex = std::move(other.tex);
-        return *this;
-    }
 };
 
 /**
