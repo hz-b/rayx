@@ -163,7 +163,6 @@ void Application::createRayCache(const std::string& path, BundleHistory& rayCach
 #endif
     rayInfo.maxAmountOfRays = bundleHist.size();
     if (rayInfo.renderAllRays) {
-        rayInfo.amountOfRays = rayInfo.maxAmountOfRays;
         rayCache = bundleHist;
         return;
     }
