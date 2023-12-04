@@ -14,6 +14,7 @@ if(Vulkan_FOUND)
     set(IMGUI_DIR ../../Extern/imgui/)
     set(GLFW_DIR ../../Extern/glfw/)
     set(GLM_DIR ../../Extern/glm/)
+    set(STB_DIR ../../Extern/stb/)
     add_subdirectory(${GLFW_DIR} binary_dir EXCLUDE_FROM_ALL)
 
     file(GLOB_RECURSE SOURCE ${PROJECT_SOURCE_DIR}/src/*.cpp)
@@ -51,6 +52,7 @@ if(Vulkan_FOUND)
         ${IMGUI_DIR}
         ${IMGUI_DIR}/backends
         ${GLM_DIR}
+        ${STB_DIR}
         ..
     )
 

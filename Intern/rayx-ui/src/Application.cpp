@@ -27,6 +27,7 @@ Application::Application(uint32_t width, uint32_t height, const char* name, int 
 {
     m_DescriptorPool = DescriptorPool::Builder(m_Device)
                            .addPoolSize(VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, SwapChain::MAX_FRAMES_IN_FLIGHT)
+                           .addPoolSize(VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, SwapChain::MAX_FRAMES_IN_FLIGHT)
                            .setMaxSets(SwapChain::MAX_FRAMES_IN_FLIGHT)
                            .build();
 }

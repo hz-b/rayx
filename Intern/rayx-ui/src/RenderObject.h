@@ -5,9 +5,8 @@
 
 #include "GraphicsCore/Buffer.h"
 #include "GraphicsCore/Device.h"
+#include "GraphicsCore/Texture.h"
 #include "Vertex.h"
-
-#define GRIDSIZE 10
 
 struct Triangle {
     Vertex v1;
@@ -17,6 +16,10 @@ struct Triangle {
 struct Line {
     Vertex v1;
     Vertex v2;
+};
+struct DescriptorSetTexture {
+    VkDescriptorSet descrSet;
+    Texture tex;
 };
 
 /**
@@ -51,6 +54,7 @@ class RenderObject {
     void draw(VkCommandBuffer commandBuffer) const;
 
     glm::mat4 getModelMatrix() const { return m_modelMatrix; }
+    // TODO(Jannis): Calculate translation vec directly on the fly after removing members (see todo below)
     glm::vec3 getTranslationVecor() const { return m_translationVector; }
     std::string getName() const { return m_name; }
 
@@ -60,6 +64,7 @@ class RenderObject {
 
     std::string m_name;
     Device& m_Device;
+    std::optional<DescriptorSetTexture> m_descrSetTexture;
 
     uint32_t m_vertexCount;
     uint32_t m_indexCount;
@@ -69,7 +74,7 @@ class RenderObject {
 
     glm::mat4 m_modelMatrix;  ///< Matrix for transforming the object from model to world coordinates
 
-    // 3D Space specfic
+    // TODO(Jannis): The following should be removed. It clutters the code and is not useful
     glm::vec3 m_translationVector;
     glm::vec3 m_skewVector;
     glm::vec3 m_rotationVector;  // Radians
