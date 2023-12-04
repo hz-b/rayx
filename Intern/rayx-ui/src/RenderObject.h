@@ -65,8 +65,7 @@ class RenderObject {
     void draw(VkCommandBuffer commandBuffer) const;
 
     glm::mat4 getModelMatrix() const { return m_modelMatrix; }
-    // TODO(Jannis): Calculate translation vec directly on the fly after removing members (see todo below)
-    glm::vec3 getTranslationVecor() const { return m_translationVector; }
+    glm::vec3 getTranslationVecor() const { return glm::vec3(m_modelMatrix[3][0], m_modelMatrix[3][1], m_modelMatrix[3][2]); }
     std::string getName() const { return m_name; }
 
   private:
@@ -84,11 +83,4 @@ class RenderObject {
     std::unique_ptr<Buffer> m_indexBuffer;
 
     glm::mat4 m_modelMatrix;  ///< Matrix for transforming the object from model to world coordinates
-
-    // TODO(Jannis): The following should be removed. It clutters the code and is not useful
-    glm::vec3 m_translationVector;
-    glm::vec3 m_skewVector;
-    glm::vec3 m_rotationVector;  // Radians
-    glm::vec3 m_scaleVector;
-    glm::vec4 m_perspective;
 };

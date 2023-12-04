@@ -8,10 +8,6 @@ RenderObject::RenderObject(std::string name, Device& device, glm::mat4 modelMatr
     : m_name(name), m_Device(device), m_modelMatrix(modelMatrix) {
     createVertexBuffers(vertices);
     createIndexBuffers(indices);
-
-    glm::quat rot;
-    glm::decompose(modelMatrix, m_scaleVector, rot, m_translationVector, m_skewVector, m_perspective);
-    m_rotationVector = glm::eulerAngles(rot);
 }
 
 RenderObject::RenderObject(RenderObject&& other) noexcept
@@ -22,12 +18,7 @@ RenderObject::RenderObject(RenderObject&& other) noexcept
       m_vertexCount(other.m_vertexCount),
       m_indexCount(other.m_indexCount),
       m_vertexBuffer(std::move(other.m_vertexBuffer)),
-      m_indexBuffer(std::move(other.m_indexBuffer)),
-      m_scaleVector(other.m_scaleVector),
-      m_rotationVector(other.m_rotationVector),
-      m_translationVector(other.m_translationVector),
-      m_skewVector(other.m_skewVector),
-      m_perspective(other.m_perspective) {}
+      m_indexBuffer(std::move(other.m_indexBuffer)) {}
 
 RenderObject& RenderObject::operator=(RenderObject&& other) noexcept {
     if (this != &other) {
