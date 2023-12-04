@@ -11,15 +11,15 @@
 #include "Application.h"
 #include "Colors.h"
 
-void displayFilterSlider(int* amountOfRays, int maxAmountOfRays, bool* displayRays, bool* renderAllRays) {
+void displayFilterSlider(int& amountOfRays, int maxAmountOfRays, bool& displayRays, bool& renderAllRays) {
     // Checkbox for displaying rays
     // Slider should be greyed out if "Display Rays" is unchecked
-    ImGui::Checkbox("Display Rays", displayRays);
-    if (!*displayRays || *renderAllRays) {
+    ImGui::Checkbox("Display Rays", &displayRays);
+    if (!displayRays || renderAllRays) {
         ImGui::BeginDisabled();  // Grey out the slider
     }
 
-    *amountOfRays = std::min(*amountOfRays, maxAmountOfRays);
+    amountOfRays = std::min(amountOfRays, maxAmountOfRays);
     ImGui::Text("Maximum amount of Rays per optical element:");
 
     // Define the range for the slider
@@ -27,22 +27,22 @@ void displayFilterSlider(int* amountOfRays, int maxAmountOfRays, bool* displayRa
     float maxLogValue = std::log(static_cast<float>(std::min(maxAmountOfRays, MAX_RAYS)));
 
     // Convert the current amount of rays to logarithmic scale for the slider position
-    float logValue = std::log(static_cast<float>(*amountOfRays));
+    float logValue = std::log(static_cast<float>(amountOfRays));
 
     // Create a slider that operates on the logarithmic scale
     if (ImGui::SliderFloat("##hidden", &logValue, minLogValue, maxLogValue)) {
         // Convert the logarithmic value back to the actual number of rays
-        *amountOfRays = static_cast<int>(std::exp(logValue));
+        amountOfRays = static_cast<int>(std::exp(logValue));
     }
-    if (*displayRays && *renderAllRays) {
+    if (displayRays && renderAllRays) {
         ImGui::EndDisabled();
     }
 
     // Display the actual number of rays next to the slider
     ImGui::SameLine();
-    ImGui::Text("%d", *amountOfRays);
-    ImGui::Checkbox("Render all rays", renderAllRays);
-    if (!*displayRays) {
+    ImGui::Text("%d", amountOfRays);
+    ImGui::Checkbox("Render all rays", &renderAllRays);
+    if (!displayRays) {
         ImGui::EndDisabled();  // End grey out
     }
 }

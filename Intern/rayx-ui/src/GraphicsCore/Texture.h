@@ -12,6 +12,10 @@ class Buffer;
 class Texture {
   public:
     Texture(Device& device, const std::filesystem::path& path);
+    Texture(const Texture&) = delete;
+    Texture& operator=(const Texture&) = delete;
+    Texture(Texture&& other) noexcept;
+    Texture& operator=(Texture&& other) noexcept;
     ~Texture();
 
     VkImageView getImageView() const { return m_textureImageView; }
@@ -25,6 +29,7 @@ class Texture {
     void copyBufferToImage(VkBuffer buffer, VkImage image, uint32_t width, uint32_t height);
     void createImageView(VkFormat format);
     void createTextureSampler();
+    void cleanup();
 
     Device& m_Device;
     std::unique_ptr<Buffer> m_stagingBuffer;

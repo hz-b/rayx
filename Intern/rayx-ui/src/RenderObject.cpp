@@ -14,6 +14,37 @@ RenderObject::RenderObject(std::string name, Device& device, glm::mat4 modelMatr
     m_rotationVector = glm::eulerAngles(rot);
 }
 
+RenderObject::RenderObject(RenderObject&& other) noexcept
+    : m_name(std::move(other.m_name)),
+      m_Device(other.m_Device),
+      m_descrSetTexture(std::move(other.m_descrSetTexture)),
+      m_modelMatrix(other.m_modelMatrix),
+      m_vertexCount(other.m_vertexCount),
+      m_indexCount(other.m_indexCount),
+      m_vertexBuffer(std::move(other.m_vertexBuffer)),
+      m_indexBuffer(std::move(other.m_indexBuffer)),
+      m_scaleVector(other.m_scaleVector),
+      m_rotationVector(other.m_rotationVector),
+      m_translationVector(other.m_translationVector),
+      m_skewVector(other.m_skewVector),
+      m_perspective(other.m_perspective) {}
+
+RenderObject& RenderObject::operator=(RenderObject&& other) noexcept {
+    if (this != &other) {
+        if (m_Device.device() != other.m_Device.device()) {
+            // If this warning is thrown you hopefully know what you're doing. I would not recommend using multiple devices.
+            // If you don't know what's going on, you need to check why the devices are different.
+            // If unhandled this will result in bugs and/or crashes.
+            RAYX_WARN << "Cannot transfer ownership of resources between logical devices. Failing gracefully.";
+            return *this;
+        }
+
+        m_name = std::move(other.m_name);
+        m_descrSetTexture = std::move(other.m_descrSetTexture);
+    }
+    return *this;
+}
+
 void RenderObject::bind(VkCommandBuffer commandBuffer) const {
     VkBuffer vertexBuffers[] = {m_vertexBuffer->getBuffer()};
     VkDeviceSize offsets[] = {0};

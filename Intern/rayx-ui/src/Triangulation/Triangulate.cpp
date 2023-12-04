@@ -127,7 +127,7 @@ RenderObject planarTriangulation(const RAYX::OpticalElement& element, Device& de
     }
 
     RenderObject renderObj(element.m_name, device, element.m_element.m_outTrans, vertices, indices);
-    return renderObj;
+    return std::move(renderObj);
 }
 
 bool isPlanar(const QuadricSurface& q) { return (q.m_a11 == 0 && q.m_a22 == 0 && q.m_a33 == 0) && (q.m_a14 != 0 || q.m_a24 != 0 || q.m_a34 != 0); }

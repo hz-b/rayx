@@ -32,12 +32,49 @@ Texture::Texture(Device& device, const std::filesystem::path& path) : m_Device{d
     createImageView(format);
 }
 
-Texture::~Texture() {
-    vkDestroySampler(m_Device.device(), m_textureSampler, nullptr);
-    vkDestroyImageView(m_Device.device(), m_textureImageView, nullptr);
-    vkDestroyImage(m_Device.device(), m_textureImage, nullptr);
-    vkFreeMemory(m_Device.device(), m_textureMemory, nullptr);
+Texture::Texture(Texture&& other) noexcept
+    : m_Device(other.m_Device),
+      m_stagingBuffer(std::move(other.m_stagingBuffer)),
+      m_textureImage(other.m_textureImage),
+      m_textureMemory(other.m_textureMemory),
+      m_textureImageView(other.m_textureImageView),
+      m_textureSampler(other.m_textureSampler) {
+    // Set the source instance's resource handles to VK_NULL_HANDLE to denote they are no longer owned.
+    other.m_textureImage = VK_NULL_HANDLE;
+    other.m_textureMemory = VK_NULL_HANDLE;
+    other.m_textureImageView = VK_NULL_HANDLE;
+    other.m_textureSampler = VK_NULL_HANDLE;
 }
+
+Texture& Texture::operator=(Texture&& other) noexcept {
+    if (this != &other) {
+        // Release any resources this instance owns
+        cleanup();
+
+        // Transfer ownership of resources
+        if (m_Device.device() != other.m_Device.device()) {
+            // If this fails you hopefully know what you're doing. I would not recommend using multiple devices.
+            // If you don't know what's going on, you need to check why the devices are different.
+            // If unhandled this will result in bugs and/or crashes.
+            RAYX_WARN << "Cannot transfer ownership of resources between logical devices. Failing gracefully.";
+            return *this;
+        }
+        m_stagingBuffer = std::move(other.m_stagingBuffer);
+        m_textureImage = other.m_textureImage;
+        m_textureMemory = other.m_textureMemory;
+        m_textureImageView = other.m_textureImageView;
+        m_textureSampler = other.m_textureSampler;
+
+        // Set the source instance's resource handles to VK_NULL_HANDLE so they are not cleaned up (we moved them)
+        other.m_textureImage = VK_NULL_HANDLE;
+        other.m_textureMemory = VK_NULL_HANDLE;
+        other.m_textureImageView = VK_NULL_HANDLE;
+        other.m_textureSampler = VK_NULL_HANDLE;
+    }
+    return *this;
+}
+
+Texture::~Texture() { cleanup(); }
 
 void Texture::createImage(uint32_t width, uint32_t height, VkFormat format, VkImageTiling tiling, VkImageUsageFlags usage,
                           VkMemoryPropertyFlags properties) {
@@ -192,4 +229,17 @@ void Texture::createTextureSampler() {
     if (vkCreateSampler(m_Device.device(), &samplerInfo, nullptr, &m_textureSampler) != VK_SUCCESS) {
         throw std::runtime_error("failed to create texture sampler!");
     }
+}
+
+void Texture::cleanup() {
+    vkDestroySampler(m_Device.device(), m_textureSampler, nullptr);
+    vkDestroyImageView(m_Device.device(), m_textureImageView, nullptr);
+    vkDestroyImage(m_Device.device(), m_textureImage, nullptr);
+    vkFreeMemory(m_Device.device(), m_textureMemory, nullptr);
+
+    // Reset handles to VK_NULL_HANDLE to mark them as no longer owned
+    m_textureSampler = VK_NULL_HANDLE;
+    m_textureImageView = VK_NULL_HANDLE;
+    m_textureImage = VK_NULL_HANDLE;
+    m_textureMemory = VK_NULL_HANDLE;
 }

@@ -20,6 +20,13 @@ struct Line {
 struct DescriptorSetTexture {
     VkDescriptorSet descrSet;
     Texture tex;
+
+    DescriptorSetTexture(DescriptorSetTexture&& other) noexcept : descrSet(other.descrSet), tex(std::move(other.tex)) {}
+    DescriptorSetTexture& operator=(DescriptorSetTexture&& other) noexcept {
+        descrSet = other.descrSet;
+        tex = std::move(other.tex);
+        return *this;
+    }
 };
 
 /**
@@ -40,6 +47,10 @@ class RenderObject {
      * @param indices Vector of index values.
      */
     RenderObject(std::string name, Device& device, glm::mat4 modelMatrix, std::vector<Vertex>& vertices, std::vector<uint32_t>& indices);
+    RenderObject(const RenderObject&) = delete;
+    RenderObject& operator=(const RenderObject&) = delete;
+    RenderObject(RenderObject&& other) noexcept;
+    RenderObject& operator=(RenderObject&& other) noexcept;
 
     /**
      * @brief Binds the object's vertex and index buffers to a Vulkan command buffer.
