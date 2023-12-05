@@ -18,7 +18,13 @@ BundleHistory Tracer::trace(const Beamline& b, Sequential seq, uint64_t max_batc
 
     // don't trace if there are no optical elements
     if (b.m_OpticalElements.size() == 0) {
-        return convertToBundleHistory(rays);
+        BundleHistory result;
+        for (auto r : rays) {
+            auto ray = r;
+            ray.m_eventType = ETYPE_FLY_OFF;
+            result.push_back({ray});
+        }
+        return result;
     }
 
     auto randomSeed = randomDouble();
