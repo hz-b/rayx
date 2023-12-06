@@ -2,8 +2,6 @@
 
 #include <glm/gtx/matrix_decompose.hpp>
 
-#include "CanonicalizePath.h"
-
 /**
  * Constructor sets up vertex and index buffers based on the input parameters.
  */
@@ -11,9 +9,6 @@ RenderObject::RenderObject(std::string name, Device& device, glm::mat4 modelMatr
     : m_name(name), m_Device(device), m_modelMatrix(modelMatrix) {
     createVertexBuffers(vertices);
     createIndexBuffers(indices);
-
-    DescriptorSetTexture descrSetTexture = {.descrSet = VK_NULL_HANDLE,
-                                            .tex = Texture(m_Device, canonicalizeRepositoryPath("Intern/rayx-ui/res/textures/white.png"))};
 }
 
 RenderObject::RenderObject(RenderObject&& other) noexcept
@@ -56,6 +51,25 @@ void RenderObject::bind(VkCommandBuffer commandBuffer) const {
 
 void RenderObject::draw(VkCommandBuffer commandBuffer) const {
     vkCmdDrawIndexed(commandBuffer, m_indexCount, 1, 0, 0, 0);  //
+}
+
+void RenderObject::updateTexture(const std::filesystem::path& path, const DescriptorPool& descriptorPool) {
+    m_descrSetTexture->tex = Texture(m_Device, path);
+
+    auto setLayout = DescriptorSetLayout::Builder(m_Device)
+                         .addBinding(0, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 1, VK_SHADER_STAGE_FRAGMENT_BIT)  //
+                         .build();                                                                                   //
+
+    DescriptorWriter writer(*setLayout, descriptorPool);
+}
+
+bool RenderObject::getDescriptorSet(VkDescriptorSet& outDescriptorSet) const {
+    if (m_descrSetTexture) {
+        outDescriptorSet = m_descrSetTexture->descrSet;
+        return true;
+    } else {
+        return false;
+    }
 }
 
 void RenderObject::createVertexBuffers(const std::vector<Vertex>& vertices) {

@@ -7,17 +7,18 @@
 
 Texture::Texture(Device& device, const std::filesystem::path& path) : m_Device{device} {
     // Read in image
-    int texWidth, texHeight, texChannels;
+    int texWidth, texHeight, texChannels;  // Do not use texChannels for memory stuff (not always 4 for rgba images)
     RAYX_LOG << "Loading texture: " << path.string();
+    // STBI_rgb_alpha hopefully always forces 4 channels
     stbi_uc* pixels = stbi_load(path.string().c_str(), &texWidth, &texHeight, &texChannels, STBI_rgb_alpha);
     if (!pixels) {
         RAYX_ERR << "Failed to load texture image";
     }
-    assert(texChannels == 4 && "Testing if texChannels returns expected 4 (rbga)...");  //! Why is this not 4?
 
     // Create staging buffer
-    m_stagingBuffer = std::make_unique<Buffer>(m_Device, "textureStagingBuffer", texChannels, texWidth * texHeight, VK_BUFFER_USAGE_TRANSFER_SRC_BIT,
-                                               VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT);
+    m_stagingBuffer =
+        std::make_unique<Buffer>(m_Device, "textureStagingBuffer", STBI_rgb_alpha, texWidth * texHeight, VK_BUFFER_USAGE_TRANSFER_SRC_BIT,
+                                 VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT);
     m_stagingBuffer->map();
     m_stagingBuffer->writeToBuffer(pixels);
     m_stagingBuffer->unmap();

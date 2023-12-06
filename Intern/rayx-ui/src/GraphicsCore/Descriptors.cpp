@@ -102,7 +102,7 @@ void DescriptorPool::resetPool() { vkResetDescriptorPool(m_Device.device(), m_De
 
 // *************** Descriptor Writer *********************
 
-DescriptorWriter::DescriptorWriter(DescriptorSetLayout& setLayout, DescriptorPool& pool) : m_SetLayout{setLayout}, m_Pool{pool} {}
+DescriptorWriter::DescriptorWriter(DescriptorSetLayout& setLayout, const DescriptorPool& pool) : m_SetLayout{setLayout}, m_Pool{pool} {}
 
 DescriptorWriter& DescriptorWriter::writeBuffer(uint32_t binding, VkDescriptorBufferInfo* bufferInfo) {
     assert(m_SetLayout.m_bindings.count(binding) == 1 && "Layout does not contain specified binding");

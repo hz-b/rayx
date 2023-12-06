@@ -3,6 +3,7 @@
 #include <chrono>
 #include <unordered_set>
 
+#include "CanonicalizePath.h"
 #include "Colors.h"
 #include "Data/Importer.h"
 #include "Debug/Debug.h"
@@ -102,6 +103,9 @@ void Application::run() {
             // camController.update(cam, m_Renderer.getAspectRatio());
             if (uiParams.pathChanged) {
                 updateObjects(uiParams.rmlPath.string(), rObjects);
+                for (auto& rObj : rObjects) {
+                    rObj.updateTexture(canonicalizeRepositoryPath("Intern/rayx-ui/res/textures/white.png"), *m_DescriptorPool);
+                }
                 createRayCache(uiParams.rmlPath.string(), rayCache, uiParams.rayInfo);
                 uiParams.pathChanged = false;
                 camController.lookAtPoint(rObjects[0].getTranslationVecor());
@@ -154,6 +158,7 @@ void Application::updateObjects(const std::string& path, std::vector<RenderObjec
     // Triangulate the render data and update the scene
     rObjects = triangulateObjects(beamline.m_OpticalElements, m_Device);
 }
+
 void Application::createRayCache(const std::string& path, BundleHistory& rayCache, UIRayInfo& rayInfo) {
 #ifndef NO_H5
     std::string rayFilePath = path.substr(0, path.size() - 4) + ".h5";

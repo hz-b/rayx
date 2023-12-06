@@ -19,8 +19,14 @@ class Texture {
     ~Texture();
 
     VkImageView getImageView() const { return m_textureImageView; }
-
     VkSampler getSampler() const { return m_textureSampler; }
+    VkDescriptorImageInfo descriptorInfo() const {
+        VkDescriptorImageInfo imageInfo{};
+        imageInfo.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;  // Or appropriate layout based on your usage
+        imageInfo.imageView = m_textureImageView;
+        imageInfo.sampler = m_textureSampler;
+        return imageInfo;
+    }
 
   private:
     void createImage(uint32_t width, uint32_t height, VkFormat format, VkImageTiling tiling, VkImageUsageFlags usage,

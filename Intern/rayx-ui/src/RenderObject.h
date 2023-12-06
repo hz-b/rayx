@@ -4,6 +4,7 @@
 #include <vector>
 
 #include "GraphicsCore/Buffer.h"
+#include "GraphicsCore/Descriptors.h"
 #include "GraphicsCore/Device.h"
 #include "GraphicsCore/Texture.h"
 #include "Vertex.h"
@@ -57,9 +58,13 @@ class RenderObject {
      */
     void draw(VkCommandBuffer commandBuffer) const;
 
+    void updateTexture(const std::filesystem::path& path, const DescriptorPool& descriptorPool);
+
     glm::mat4 getModelMatrix() const { return m_modelMatrix; }
     glm::vec3 getTranslationVecor() const { return glm::vec3(m_modelMatrix[3][0], m_modelMatrix[3][1], m_modelMatrix[3][2]); }
     std::string getName() const { return m_name; }
+
+    bool getDescriptorSet(VkDescriptorSet& outDescriptorSet) const;
 
   private:
     void createVertexBuffers(const std::vector<Vertex>& vertices);
