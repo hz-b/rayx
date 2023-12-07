@@ -20,18 +20,12 @@ class Texture {
 
     VkImageView getImageView() const { return m_textureImageView; }
     VkSampler getSampler() const { return m_textureSampler; }
-    VkDescriptorImageInfo descriptorInfo() const {
-        VkDescriptorImageInfo imageInfo{};
-        imageInfo.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;  // Or appropriate layout based on your usage
-        imageInfo.imageView = m_textureImageView;
-        imageInfo.sampler = m_textureSampler;
-        return imageInfo;
-    }
+    std::shared_ptr<VkDescriptorImageInfo> descriptorInfo() { return m_imageInfo; }
 
   private:
     void createImage(uint32_t width, uint32_t height, VkFormat format, VkImageTiling tiling, VkImageUsageFlags usage,
                      VkMemoryPropertyFlags properties);
-    void transitionImageLayout(VkImage image, VkFormat format, VkImageLayout oldLayout, VkImageLayout newLayout);
+    void transitionImageLayout(VkImage image, VkImageLayout oldLayout, VkImageLayout newLayout);
     void copyBufferToImage(VkBuffer buffer, VkImage image, uint32_t width, uint32_t height);
     void createImageView(VkFormat format);
     void createTextureSampler();
@@ -44,4 +38,5 @@ class Texture {
     VkDeviceMemory m_textureMemory;
     VkImageView m_textureImageView;
     VkSampler m_textureSampler;
+    std::shared_ptr<VkDescriptorImageInfo> m_imageInfo;
 };

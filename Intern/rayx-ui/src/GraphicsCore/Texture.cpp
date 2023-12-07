@@ -29,12 +29,17 @@ Texture::Texture(Device& device, const std::filesystem::path& path) : m_Device{d
                 VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT);
 
     // Prepare for buffer to image copy
-    transitionImageLayout(m_textureImage, format, VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL);
+    transitionImageLayout(m_textureImage, VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL);
     copyBufferToImage(m_stagingBuffer->getBuffer(), m_textureImage, static_cast<uint32_t>(texWidth), static_cast<uint32_t>(texHeight));
     // Prepare for reading from shader
-    transitionImageLayout(m_textureImage, format, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
+    transitionImageLayout(m_textureImage, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
 
     createImageView(format);
+
+    m_imageInfo = std::make_shared<VkDescriptorImageInfo>();
+    m_imageInfo->imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;  // Or appropriate layout based on your usage
+    m_imageInfo->imageView = m_textureImageView;
+    m_imageInfo->sampler = m_textureSampler;
 }
 
 Texture::Texture(Texture&& other) noexcept
@@ -43,7 +48,8 @@ Texture::Texture(Texture&& other) noexcept
       m_textureImage(other.m_textureImage),
       m_textureMemory(other.m_textureMemory),
       m_textureImageView(other.m_textureImageView),
-      m_textureSampler(other.m_textureSampler) {
+      m_textureSampler(other.m_textureSampler),
+      m_imageInfo(other.m_imageInfo) {
     // Set the source instance's resource handles to VK_NULL_HANDLE to denote they are no longer owned.
     other.m_textureImage = VK_NULL_HANDLE;
     other.m_textureMemory = VK_NULL_HANDLE;
@@ -69,6 +75,7 @@ Texture& Texture::operator=(Texture&& other) noexcept {
         m_textureMemory = other.m_textureMemory;
         m_textureImageView = other.m_textureImageView;
         m_textureSampler = other.m_textureSampler;
+        m_imageInfo = other.m_imageInfo;
 
         // Set the source instance's resource handles to VK_NULL_HANDLE so they are not cleaned up (we moved them)
         other.m_textureImage = VK_NULL_HANDLE;
@@ -119,7 +126,7 @@ void Texture::createImage(uint32_t width, uint32_t height, VkFormat format, VkIm
     vkBindImageMemory(m_Device.device(), m_textureImage, m_textureMemory, 0);
 }
 
-void Texture::transitionImageLayout(VkImage image, VkFormat format, VkImageLayout oldLayout, VkImageLayout newLayout) {
+void Texture::transitionImageLayout(VkImage image, VkImageLayout oldLayout, VkImageLayout newLayout) {
     VkCommandBuffer commandBuffer = m_Device.beginSingleTimeCommands();
 
     VkImageMemoryBarrier barrier{};

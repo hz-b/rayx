@@ -54,13 +54,21 @@ void RenderObject::draw(VkCommandBuffer commandBuffer) const {
 }
 
 void RenderObject::updateTexture(const std::filesystem::path& path, const DescriptorPool& descriptorPool) {
-    m_descrSetTexture->tex = Texture(m_Device, path);
+    Texture tex(m_Device, path);
+    auto setLayout =
+        DescriptorSetLayout::Builder(m_Device).addBinding(0, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 1, VK_SHADER_STAGE_FRAGMENT_BIT).build();
 
-    auto setLayout = DescriptorSetLayout::Builder(m_Device)
-                         .addBinding(0, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 1, VK_SHADER_STAGE_FRAGMENT_BIT)  //
-                         .build();                                                                                   //
+    std::shared_ptr<VkDescriptorImageInfo> descrInfo = tex.descriptorInfo();
 
     DescriptorWriter writer(*setLayout, descriptorPool);
+    writer.writeImage(0, descrInfo.get());
+
+    VkDescriptorSet descrSet;
+    if (!writer.build(descrSet)) {
+        RAYX_ERR << "Failed to build descriptor set for texture";
+    }
+
+    m_descrSetTexture = DescriptorSetTexture{descrSet, std::move(tex)};
 }
 
 bool RenderObject::getDescriptorSet(VkDescriptorSet& outDescriptorSet) const {
