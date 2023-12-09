@@ -17,19 +17,6 @@
 // Every tomlParseImpl function in this file should either set the `output` to some value, or fail with RAYX_ERR.
 // Keeping `output = {}` is not valid.
 
-// The tomlParseImpl base implementation.
-// This should only work, if T is a subclass of either TypedTable<...> or TypedVariant<...>.
-template <typename T>
-void tomlParseImpl(toml::node_view<const toml::node> input, std::optional<T>& output) {
-    static_assert(!std::is_same_v<T, typename T::TypedBase>);
-
-    std::optional<typename T::TypedBase> opt;
-    tomlParseImpl(input, opt);
-    T t;
-    *static_cast<typename T::TypedBase*>(&t) = opt.value();
-    output = t;
-}
-
 inline void tomlParseImpl(toml::node_view<const toml::node> input, std::optional<std::string>& out) {
     auto* x = input.as_string();
     if (!x) RAYX_ERR << "string parsing failed!";
@@ -58,9 +45,30 @@ inline void tomlParseImpl(toml::node_view<const toml::node> input, std::optional
     out = x->get();
 }
 
+template <typename T>
+inline void tomlParseImpl(toml::node_view<const toml::node> input, std::optional<std::vector<T>>& out) {
+    std::vector<T> ret;
+
+    // A missing array is considered as an empty array.
+    if (!input) {
+        out = ret;
+        return;
+    }
+
+    const toml::array* a = input.as_array();
+    if (!a) RAYX_ERR << "vector parsing failed! input is no array.";
+    for (auto it = a->cbegin(); it != a->cend(); it++) {
+        std::optional<T> t;
+        toml::node_view<const toml::node> n = (toml::node_view<const toml::node>) *it;
+        tomlParseImpl(n, t);
+        ret.push_back(t.value());
+    }
+    out = ret;
+}
+
 // This is the TypedTable implementation.
 template <typename ...Targs>
-void tomlParseImpl(toml::node_view<const toml::node> input, std::optional<TypedTable<Targs...>>& output) {
+inline void tomlParseImpl(toml::node_view<const toml::node> input, std::optional<TypedTable<Targs...>>& output) {
     const toml::table* tab = input.as_table();
     if (!tab) RAYX_ERR << "table parsing failed! input is no table.";
 
@@ -79,7 +87,7 @@ void tomlParseImpl(toml::node_view<const toml::node> input, std::optional<TypedT
 
 // This is the TypedVariant implementation.
 template <typename ...Targs>
-void tomlParseImpl(toml::node_view<const toml::node> input, std::optional<TypedVariant<Targs...>>& out) {
+inline void tomlParseImpl(toml::node_view<const toml::node> input, std::optional<TypedVariant<Targs...>>& out) {
     const toml::table* tab = input.as_table();
     if (!tab) RAYX_ERR << "variant parsing failed! input is no table.";
     auto* s_ = (*tab)["tag"].as_string();
@@ -109,25 +117,15 @@ void tomlParseImpl(toml::node_view<const toml::node> input, std::optional<TypedV
     }
 }
 
-template <typename T>
-inline void tomlParseImpl(toml::node_view<const toml::node> input, std::optional<std::vector<T>>& out) {
-    std::vector<T> ret;
-
-    // A missing array is considered as an empty array.
-    if (!input) {
-        out = ret;
-        return;
-    }
-
-    const toml::array* a = input.as_array();
-    if (!a) RAYX_ERR << "vector parsing failed! input is no array.";
-    for (auto it = a->cbegin(); it != a->cend(); it++) {
-        std::optional<T> t;
-        toml::node_view<const toml::node> n = (toml::node_view<const toml::node>) *it;
-        tomlParseImpl(n, t);
-        ret.push_back(t.value());
-    }
-    out = ret;
+// The tomlParseImpl base implementation.
+// This should only work, if T is a subclass of either TypedTable<...> or TypedVariant<...>.
+template <typename T, typename = std::enable_if_t<!std::is_same_v<T, typename T::TypedBase>>>
+inline void tomlParseImpl(toml::node_view<const toml::node> input, std::optional<T>& output) {
+    std::optional<typename T::TypedBase> opt;
+    tomlParseImpl(input, opt);
+    T t;
+    *static_cast<typename T::TypedBase*>(&t) = opt.value();
+    output = t;
 }
 
 // The central function that should be called from the outside of this module.

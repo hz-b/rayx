@@ -1,10 +1,12 @@
 #pragma once
 
-#include "TypedTable.h"
+#include "TypedVariant.h"
 
 namespace RAYX {
 
 // TODO
-struct DesignTransform : public TypedTable<> {};
+struct DesignTransform : public TypedVariant<
+    Case<std::vector<double>, ByMatrixStr>
+> {};
 
 }
