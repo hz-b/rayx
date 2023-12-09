@@ -28,5 +28,17 @@ DECLARE_STR(SeparateEnergiesStr, "separateEnergies");
 DECLARE_STR(DatFileStr, "datFile");
 DECLARE_STR(MatrixSourceStr, "matrixSource");
 
+DECLARE_STR(LinearPol0Str, "linearPol0");
+DECLARE_STR(LinearPol45Str, "linearPol45");
+DECLARE_STR(CircularPolStr, "circularPol");
+DECLARE_STR(SourceDepthStr, "sourceDepth");
+
+DECLARE_STR(SourceHeightStr, "sourceHeight");
+DECLARE_STR(SourceWidthStr, "sourceWidth");
+DECLARE_STR(HorDivergenceStr, "horDivergence");
+DECLARE_STR(VerDivergenceStr, "verDivergence");
+DECLARE_STR(TransformStr, "transform");
+
+DECLARE_STR(ByMatrixStr, "byMatrix");
 
 }

@@ -1,6 +1,7 @@
 #pragma once
 
 #include "TypedVariant.h"
+#include "TypedTable.h"
 
 namespace RAYX {
 
