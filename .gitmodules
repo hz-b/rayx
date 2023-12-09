@@ -22,3 +22,6 @@
 [submodule "Extern/NFD-Extended"]
 	path = Extern/NFD-Extended
 	url = https://github.com/btzy/nativefiledialog-extended
+[submodule "Extern/tomlplusplus"]
+	path = Extern/tomlplusplus
+	url = https://github.com/marzer/tomlplusplus

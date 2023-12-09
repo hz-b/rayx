@@ -6,6 +6,8 @@
 
 #include "CanonicalizePath.h"
 #include "Data/Importer.h"
+#include "Design/TomlParser.h"
+#include "Design/DesignBeamline.h"
 #include "Debug/Debug.h"
 #include "Random.h"
 #include "Tracer/CpuTracer.h"
@@ -52,10 +54,14 @@ void TerminalApp::tracePath(const std::filesystem::path& path) {
         for (const auto& p : fs::directory_iterator(path)) {
             tracePath(p.path());
         }
-    } else if (path.extension() == ".rml") {
+    } else if (path.extension() == ".rml" || path.extension() == ".toml") {
         std::cout << "Tracing File: " << path << std::endl;
-        // Load RML file
-        m_Beamline = std::make_unique<RAYX::Beamline>(RAYX::importBeamline(path));
+        if (path.extension() == ".rml") {
+            m_Beamline = std::make_unique<RAYX::Beamline>(RAYX::importBeamline(path));
+        } else if (path.extension() == ".toml") {
+            DesignBeamline db = tomlParse<DesignBeamline>(path);
+            m_Beamline = std::make_unique<RAYX::Beamline>(db.compile());
+        }
 
         // calculate max batch size
         uint64_t max_batch_size = DEFAULT_BATCH_SIZE;
@@ -90,7 +96,7 @@ void TerminalApp::tracePath(const std::filesystem::path& path) {
 #endif
 
     } else {
-        RAYX_VERB << "ignoring non-rml file: '" << path << "'";
+        RAYX_VERB << "ignoring non-rml/toml file: '" << path << "'";
     }
 }
 
@@ -155,9 +161,11 @@ std::string TerminalApp::exportRays(const RAYX::BundleHistory& hist, std::string
     RAYX_PROFILE_FUNCTION_STDOUT();
     bool csv = m_CommandParser->m_args.m_csvFlag;
 
-    // strip .rml
+    // strip .rml / .toml
     if (path.ends_with(".rml")) {
         path = path.substr(0, path.length() - 4);
+    } else if (path.ends_with(".toml")) {
+        path = path.substr(0, path.length() - 5);
     } else {
         RAYX_ERR << "Input file is not an *.rml file!";
     }
