@@ -19,5 +19,14 @@ DECLARE_STR(ElementStr, "element");
 DECLARE_STR(NameStr, "name");
 DECLARE_STR(CutoutStr, "cutout");
 DECLARE_STR(NumberOfRaysStr, "numberOfRays");
+DECLARE_STR(EnergyDistributionStr, "energyDistribution");
+
+DECLARE_STR(SourceTypeStr, "sourceType");
+DECLARE_STR(HardEdgeStr, "hardEdge");
+DECLARE_STR(SoftEdgeStr, "softEdge");
+DECLARE_STR(SeparateEnergiesStr, "separateEnergies");
+DECLARE_STR(DatFileStr, "datFile");
+DECLARE_STR(MatrixSourceStr, "matrixSource");
+
 
 }
