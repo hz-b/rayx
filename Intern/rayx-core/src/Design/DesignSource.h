@@ -6,6 +6,7 @@
 #include "DesignEnergyDistribution.h"
 #include "DesignSourceType.h"
 #include "DesignTransform.h"
+#include "DesignMisalignment.h"
 
 namespace RAYX {
 
@@ -18,8 +19,8 @@ struct DesignSource : public TypedTable<
     Field<double, SourceWidthStr>,
     Field<double, HorDivergenceStr>,
     Field<double, VerDivergenceStr>,
-    Field<DesignTransform, TransformStr>
-    // TODO add misalignment
+    Field<DesignTransform, TransformStr>,
+    Field<DesignMisalignment, MisalignmentStr>
 > {};
 
 }

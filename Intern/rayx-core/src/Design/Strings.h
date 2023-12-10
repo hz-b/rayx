@@ -41,4 +41,12 @@ DECLARE_STR(TransformStr, "transform");
 
 DECLARE_STR(ByMatrixStr, "byMatrix");
 
+DECLARE_STR(MisalignmentStr, "misalignment");
+DECLARE_STR(TranslationXErrorStr, "translationXError");
+DECLARE_STR(TranslationYErrorStr, "translationYError");
+DECLARE_STR(TranslationZErrorStr, "translationZError");
+DECLARE_STR(RotationXErrorStr, "rotationXError");
+DECLARE_STR(RotationYErrorStr, "rotationYError");
+DECLARE_STR(RotationZErrorStr, "rotationZError");
+
 }
