@@ -14,14 +14,14 @@ DECLARE_STR(DiameterZStr, "diameter_z");
 DECLARE_STR(WidthAStr, "widthA");
 DECLARE_STR(WidthBStr, "widthB");
 DECLARE_STR(LengthStr, "length");
-DECLARE_STR(SourceStr, "source");
+DECLARE_STR(LightSourceStr, "lightSource");
 DECLARE_STR(ElementStr, "element");
 DECLARE_STR(NameStr, "name");
 DECLARE_STR(CutoutStr, "cutout");
 DECLARE_STR(NumberOfRaysStr, "numberOfRays");
 DECLARE_STR(EnergyDistributionStr, "energyDistribution");
 
-DECLARE_STR(SourceTypeStr, "sourceType");
+DECLARE_STR(LightSourceTypeStr, "lightSourceType");
 DECLARE_STR(HardEdgeStr, "hardEdge");
 DECLARE_STR(SoftEdgeStr, "softEdge");
 DECLARE_STR(SeparateEnergiesStr, "separateEnergies");

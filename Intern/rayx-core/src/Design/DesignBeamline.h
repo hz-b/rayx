@@ -1,7 +1,7 @@
 #pragma once
 
 #include <vector>
-#include "DesignSource.h"
+#include "DesignLightSource.h"
 #include "DesignElement.h"
 #include "TypedTable.h"
 #include "Beamline/Beamline.h"
@@ -10,7 +10,7 @@
 namespace RAYX {
 
 class DesignBeamline : public TypedTable<
-        Field<std::vector<DesignSource>, SourceStr>,
+        Field<std::vector<DesignLightSource>, LightSourceStr>,
         Field<std::vector<DesignElement>, ElementStr>
     > {
     public:

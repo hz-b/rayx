@@ -7,7 +7,7 @@ namespace RAYX {
 
 struct DesignMatrixSource;
 
-struct DesignSourceType : public TypedVariant<
+struct DesignLightSourceType : public TypedVariant<
     Case<DesignMatrixSource, MatrixSourceStr>
 > {};
 

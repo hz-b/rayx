@@ -4,16 +4,16 @@
 #include "DesignElement.h"
 #include "Strings.h"
 #include "DesignEnergyDistribution.h"
-#include "DesignSourceType.h"
+#include "DesignLightSourceType.h"
 #include "DesignTransform.h"
 #include "DesignMisalignment.h"
 
 namespace RAYX {
 
-struct DesignSource : public TypedTable<
+struct DesignLightSource : public TypedTable<
     Field<std::string, NameStr>,
     Field<DesignEnergyDistribution, EnergyDistributionStr>,
-    Field<DesignSourceType, SourceTypeStr>,
+    Field<DesignLightSourceType, LightSourceTypeStr>,
     Field<int, NumberOfRaysStr>,
     Field<double, SourceHeightStr>,
     Field<double, SourceWidthStr>,

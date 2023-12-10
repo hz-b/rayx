@@ -14,7 +14,7 @@ Beamline DesignBeamline::compile() const {
         }
     }
 
-    for (const auto& el : field<SourceStr>()) {
+    for (const auto& el : field<LightSourceStr>()) {
         RAYX_LOG << "numberOfRays=" << el.field<NumberOfRaysStr>();
     }
 
