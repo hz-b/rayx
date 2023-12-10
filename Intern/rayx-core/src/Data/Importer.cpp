@@ -59,6 +59,8 @@ void addBeamlineObjectFromXML(rapidxml::xml_node<>* node, Beamline* beamline, co
         addLightSource(std::make_shared<PixelSource>(parser), node);
     } else if (strcmp(type, "Circle Source") == 0) {
         addLightSource(std::make_shared<CircleSource>(parser), node);
+    } else if (strcmp(type, "Simple Undulator") == 0) {
+        addLightSource(std::make_shared<SimpleUndulatorSource>(parser), node);
     } else if (strcmp(type, "ImagePlane") == 0) {
         addOpticalElement(makeImagePlane(parser), node);
     } else if (strcmp(type, "Plane Mirror") == 0) {

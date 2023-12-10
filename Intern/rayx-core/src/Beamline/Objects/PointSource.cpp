@@ -16,6 +16,8 @@ PointSource::PointSource(const DesignObject& dobj) : LightSource(dobj) {
     m_horDivergence = dobj.parseHorDiv();
     m_verDivergence = dobj.parseVerDiv();
     m_sourceDepth = dobj.parseSourceDepth();
+    m_sourceHeight = dobj.parseSourceHeight();
+    m_sourceWidth = dobj.parseSourceWidth();
 
     m_linearPol_0 = dobj.parseLinearPol0();
     m_linearPol_45 = dobj.parseLinearPol45();
@@ -102,5 +104,9 @@ std::vector<Ray> PointSource::getRays(int thread_count) const {
     }
     return rayList;
 }
+
+double PointSource::getSourceHeight() const { return m_sourceHeight; }
+
+double PointSource::getSourceWidth() const { return m_sourceWidth; }
 
 }  // namespace RAYX

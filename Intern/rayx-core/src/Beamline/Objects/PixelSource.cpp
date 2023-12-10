@@ -12,6 +12,8 @@ PixelSource::PixelSource(const DesignObject& dobj) : LightSource(dobj) {
     m_verDivergence = dobj.parseVerDiv();
     m_horDivergence = dobj.parseHorDiv();
     m_sourceDepth = dobj.parseSourceDepth();
+    m_sourceHeight = dobj.parseSourceHeight();
+    m_sourceWidth = dobj.parseSourceWidth();
 
     m_linearPol_0 = dobj.parseLinearPol0();
     m_linearPol_45 = dobj.parseLinearPol45();
@@ -19,16 +21,16 @@ PixelSource::PixelSource(const DesignObject& dobj) : LightSource(dobj) {
 }
 
 /**
- * get deviation from main ray according to specified distribution 
- * (uniform or Thrids for the x, y position)) 
+ * get deviation from main ray according to specified distribution
+ * (uniform or Thrids for the x, y position))
  * and extent (eg specified width/height of source)
  */
 double getPosInDistribution(SourceDist l, double extent) {
     if (l == SourceDist::Uniform) {
         return (randomDouble() - 0.5) * extent;
     } else if (l == SourceDist::Thirds) {
-        double temp = (randomDouble() - 0.5) * 2/3 * extent;
-        return temp + copysign(1.0, temp) * 1/6 * extent;
+        double temp = (randomDouble() - 0.5) * 2 / 3 * extent;
+        return temp + copysign(1.0, temp) * 1 / 6 * extent;
     } else {
         return 0;
     }
@@ -41,7 +43,7 @@ double getPosInDistribution(SourceDist l, double extent) {
  *
  * @returns list of rays
  */
-std::vector<Ray> PixelSource::getRays([[maybe_unused]]int thread_count) const {
+std::vector<Ray> PixelSource::getRays([[maybe_unused]] int thread_count) const {
     RAYX_PROFILE_FUNCTION_STDOUT();
     double x, y, z, psi, phi, en;  // x,y,z pos, psi,phi direction cosines, en=energy
 
@@ -78,5 +80,9 @@ std::vector<Ray> PixelSource::getRays([[maybe_unused]]int thread_count) const {
     }
     return rayList;
 }
+
+double PixelSource::getSourceHeight() const { return m_sourceHeight; }
+
+double PixelSource::getSourceWidth() const { return m_sourceWidth; }
 
 }  // namespace RAYX

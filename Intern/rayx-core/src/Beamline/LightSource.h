@@ -16,6 +16,7 @@ enum class SourceDistType { Simultaneous, HardEdge, Gauss };       // default si
 enum class SourceDist { Uniform, Gaussian, Thirds, Circle };       // TODO(rudi): unify! ('Thrids' represents PixelSource Footprint)
 enum class ElectronEnergyOrientation { Clockwise, Counterclockwise };
 enum class EnergySpreadUnit { EU_PERCENT, EU_eV };
+enum class SigmaType { ST_STANDARD, ST_ACCURATE, ST_MAINBEAM };
 
 class RAYX_API LightSource {
   public:
@@ -23,19 +24,20 @@ class RAYX_API LightSource {
     virtual ~LightSource() = default;
 
     // Setter (Only used in frontend)
-    void setSourceHeight(double height) { m_sourceHeight = height; }
-    void setSourceWidth(double width) { m_sourceWidth = width; }
+    // void setSourceHeight(double height) { m_sourceHeight = height; }
+    // void setSourceWidth(double width) { m_sourceWidth = width; }
 
     // Getter
     Misalignment getMisalignmentParams() const;
     double getHorDivergence() const { return m_horDivergence; }
-    double getSourceHeight() const { return m_sourceHeight; }
-    double getSourceWidth() const { return m_sourceWidth; }
+    virtual double getSourceHeight() const { return m_sourceHeight; }
+    virtual double getSourceWidth() const { return m_sourceWidth; }
     glm::dvec4 getPosition() const { return m_position; }
 
     /** yields the average energy of the energy distribution
      * m_EnergyDistribution */
     double getPhotonEnergy() const;
+    double calcPhotonWavelength(double photonEnergy);
 
     double selectEnergy() const;
     static glm::dvec3 getDirectionFromAngles(double phi, double psi);
@@ -52,6 +54,7 @@ class RAYX_API LightSource {
   protected:
     // Geometric Params
 
+    double m_sourceDepth;
     double m_sourceHeight;
     double m_sourceWidth;
 

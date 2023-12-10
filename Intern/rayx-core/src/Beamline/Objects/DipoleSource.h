@@ -18,6 +18,9 @@ class RAYX_API DipoleSource : public LightSource {
 
     std::vector<Ray> getRays(int thread_count = 1) const override;
 
+    double getSourceHeight() const override;
+    double getSourceWidth() const override;
+
     // calculate Ray-Information
     glm::dvec3 getXYZPosition(double) const;
     double getEnergy() const;
@@ -38,7 +41,7 @@ class RAYX_API DipoleSource : public LightSource {
     void calcWorldCoordinates();
     void calcSourcePath();
     void calcHorDivDegSec();  // horizontal Divergence as degree and seconds
-    void calcPhotonWavelength();
+
     void calcFluxOrg();
 
   private:
@@ -48,6 +51,9 @@ class RAYX_API DipoleSource : public LightSource {
     SourcePulseType m_sourcePulseType;
     double m_photonFlux;
     EnergyDistribution m_energySpreadType;
+
+    double m_sourceHeight;
+    double m_sourceWidth;
 
     double m_sigpsi;
     glm::dvec4 m_stokes;

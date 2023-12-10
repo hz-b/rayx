@@ -17,7 +17,7 @@ std::vector<Ray> Beamline::getInputRays(int thread_count) const {
 
     // count number of rays.
     uint32_t raycount = 0;
-    
+
     for (const auto& s : m_LightSources) {
         raycount += s->m_numberOfRays;
     }

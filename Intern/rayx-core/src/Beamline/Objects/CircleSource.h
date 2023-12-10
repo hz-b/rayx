@@ -10,6 +10,9 @@ class RAYX_API CircleSource : public LightSource {
     virtual ~CircleSource() = default;
 
     std::vector<Ray> getRays(int thread_count = 1) const override;
+    double getSourceHeight() const override;
+    double getSourceWidth() const override;
+
     glm::dvec3 getDirection() const;
 
   private:
@@ -22,6 +25,8 @@ class RAYX_API CircleSource : public LightSource {
     double m_circularPol;
 
     double m_sourceDepth;
+    double m_sourceHeight;
+    double m_sourceWidth;
 
     int m_numOfCircles;
     Rad m_maxOpeningAngle;

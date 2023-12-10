@@ -51,10 +51,12 @@ struct RAYX_API SeperateEnergies {
     double getAverage() const;
 };
 
-
-
-/// The class EnergyDistribution is contained in LightSources to describe the
-/// mathematical distribution from which the energy of the rays are sampled.
+/**
+ * The class EnergyDistribution is contained in LightSources to describe the
+ * mathematical distribution from which the energy of the rays are sampled. It
+ * can either be a `HardEdge` being a uniform distribution in some interval,
+ * or a `DatFile` which means that the distribution is loaded from a .DAT file.
+ */
 class RAYX_API EnergyDistribution {
   public:
     EnergyDistribution();  // TODO this default-constructor is required because
