@@ -15,6 +15,8 @@ MatrixSource::MatrixSource(const DesignObject& dobj) : LightSource(dobj) {
     m_horDivergence = dobj.parseHorDiv();
     m_verDivergence = dobj.parseVerDiv();
     m_sourceDepth = dobj.parseSourceDepth();
+    m_sourceHeight = dobj.parseSourceHeight();
+    m_sourceWidth = dobj.parseSourceWidth();
 }
 
 /**
@@ -88,5 +90,9 @@ std::vector<Ray> MatrixSource::getRays([[maybe_unused]] int thread_count) const 
     }
     return returnList;
 }
+
+double MatrixSource::getSourceHeight() const { return m_sourceHeight; }
+
+double MatrixSource::getSourceWidth() const { return m_sourceWidth; }
 
 }  // namespace RAYX

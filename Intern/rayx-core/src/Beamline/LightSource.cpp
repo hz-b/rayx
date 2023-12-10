@@ -10,8 +10,6 @@ LightSource::LightSource(const DesignObject& dobj) {
     m_EnergyDistribution = dobj.parseEnergyDistribution();
     m_misalignmentParams = dobj.parseMisalignment();
     m_numberOfRays = dobj.parseNumberRays();
-    m_sourceHeight = dobj.parseSourceHeight();
-    m_sourceWidth = dobj.parseSourceWidth();
     m_orientation = dobj.parseOrientation();
     m_position = dobj.parsePosition();
     m_verDivergence = 0.0;
@@ -31,5 +29,11 @@ glm::dvec3 LightSource::getDirectionFromAngles(const double phi, const double ps
 
 //  (see RAYX.FOR select_energy)
 double LightSource::selectEnergy() const { return m_EnergyDistribution.selectEnergy(); }
+
+double LightSource::calcPhotonWavelength(double photonEnergy) {
+    // Energy Distribution Type : Values only
+    double photonWaveLength = photonEnergy == 0.0 ? 0 : inm2eV / photonEnergy;
+    return photonWaveLength;
+}
 
 }  // namespace RAYX

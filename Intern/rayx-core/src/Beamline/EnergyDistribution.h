@@ -39,8 +39,6 @@ struct RAYX_API SeperateEnergies {
     double getAverage() const;
 };
 
-
-
 /**
  * The class EnergyDistribution is contained in LightSources to describe the
  * mathematical distribution from which the energy of the rays are sampled. It

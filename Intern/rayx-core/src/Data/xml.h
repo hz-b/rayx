@@ -30,6 +30,7 @@ enum class GeometricalShape;
 enum class ElectronEnergyOrientation;
 enum class SourcePulseType;
 enum class EnergySpreadUnit;
+enum class SigmaType;
 
 struct Misalignment {
     double m_translationXerror;
@@ -187,6 +188,13 @@ struct RAYX_API Parser {
 
     inline double parseParameterP() const { return parseDouble("parameter_P"); }
     inline double parseParameterPType() const { return parseDouble("parameter_P_type"); }
+
+    inline SigmaType parseSigmaType() const {return static_cast<SigmaType>(parseInt("sigmaType"));}
+    inline double parseUndulatorLength() const {return parseDouble("undulatorLength"); }
+    inline double parseElectronSigmaX() const {return parseDouble("electronSigmaX"); }
+    inline double parseElectronSigmaXs() const {return parseDouble("electronSigmaXs"); }
+    inline double parseElectronSigmaY() const {return parseDouble("electronSigmaY"); }
+    inline double parseElectronSigmaYs() const {return parseDouble("electronSigmaYs"); }
 
     rapidxml::xml_node<>* node;
     std::vector<xml::Group> group_context;

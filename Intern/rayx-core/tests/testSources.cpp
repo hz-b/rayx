@@ -219,3 +219,10 @@ TEST_F(TestSuite, testLightsourceGetters) {
         CHECK_EQ(average, values.averagePhotonEnergy);
     }
 }
+
+/*TEST_F(TestSuite, testSimpleUndulator) {
+    auto bundle = traceRML("simpleUndulator");
+    for (auto rays : bundle) {
+        checkPositionDistribution(rays, -100, 100); 
+    }
+}*/

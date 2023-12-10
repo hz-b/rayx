@@ -8,6 +8,7 @@
 #include "Beamline/Objects/MatrixSource.h"
 #include "Beamline/Objects/PixelSource.h"
 #include "Beamline/Objects/PointSource.h"
+#include "Beamline/Objects/SimpleUndulatorSource.h"
 
 // Optical Elements
 #include "Beamline/Objects/Cone.h"

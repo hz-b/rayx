@@ -56,6 +56,8 @@ DipoleSource::DipoleSource(const DesignObject& dobj) : LightSource(dobj) {
     m_energySpread = dobj.parseEnergySpread();
     m_energySpreadUnit = dobj.parseEnergySpreadUnit();
     m_horDivergence = dobj.parseHorDiv();
+    m_sourceHeight = dobj.parseSourceHeight();
+    m_sourceWidth = dobj.parseSourceWidth();
 
     m_criticalEnergy = RAYX::get_factorCriticalEnergy();
     m_bandwidth = 1.0e-3;
@@ -64,14 +66,13 @@ DipoleSource::DipoleSource(const DesignObject& dobj) : LightSource(dobj) {
 
     m_gamma = std::fabs(m_electronEnergy) * get_factorElectronEnergy();
 
+    m_photonWaveLength = calcPhotonWavelength(m_photonEnergy);
     setLogInterpolation();
     setMaxIntensity();
     setMaxFlux();
 
     calcFluxOrg();
     calcHorDivDegSec();
-    // calcMagneticField();
-    calcPhotonWavelength();
     calcSourcePath();
 }
 
@@ -446,11 +447,6 @@ void DipoleSource::calcMagneticField() {
     }
 }
 
-void DipoleSource::calcPhotonWavelength() {
-    // Energy Distribution Type : Values only
-    m_photonWaveLength = m_photonEnergy == 0.0 ? 0 : inm2eV / m_photonEnergy;
-}
-
 void DipoleSource::calcSourcePath() {
     m_sourcePathLength = fabs(m_sourcePulseLength) * 1000 * 0.3;
     m_phaseJitter = m_photonEnergy == 0 ? 0 : fabs(m_sourcePulseLength * 0.3) / m_photonWaveLength * 2000000 * PI;
@@ -490,5 +486,9 @@ void DipoleSource::setMaxFlux() {
         m_maxFlux = schwinger(EMAXS);
     }
 }
+
+double DipoleSource::getSourceHeight() const { return m_sourceHeight; }
+
+double DipoleSource::getSourceWidth() const { return m_sourceWidth; }
 
 }  // namespace RAYX
