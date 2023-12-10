@@ -10,10 +10,12 @@ class RAYX_API PixelSource : public LightSource {
     virtual ~PixelSource() = default;
 
     std::vector<Ray> getRays(int thread_count = 1) const override;
+    double getSourceHeight() const override;
+    double getSourceWidth() const override;
 
   private:
     // Geometric Params
-    SourcePulseType m_sourceDistributionType; // TODO unused.
+    SourcePulseType m_sourceDistributionType;  // TODO unused.
 
     double m_linearPol_0;
     double m_linearPol_45;
@@ -21,6 +23,8 @@ class RAYX_API PixelSource : public LightSource {
 
     double m_verDivergence;
     double m_sourceDepth;
+    double m_sourceHeight;
+    double m_sourceWidth;
     // std::vector<SOURCE_LENGTH> m_source_lengths;
 };
 

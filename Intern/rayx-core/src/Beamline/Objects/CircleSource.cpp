@@ -9,8 +9,11 @@
 
 namespace RAYX {
 
- CircleSource::CircleSource(const DesignObject& dobj) : LightSource(dobj) {
+CircleSource::CircleSource(const DesignObject& dobj) : LightSource(dobj) {
     m_sourceDepth = dobj.parseSourceDepth();
+    m_sourceWidth = dobj.parseSourceWidth();
+    m_sourceHeight = dobj.parseSourceHeight();
+
     m_misalignment = getMisalignmentParams();
 
     m_linearPol_0 = dobj.parseLinearPol0();
@@ -23,13 +26,13 @@ namespace RAYX {
     m_deltaOpeningAngle = dobj.parseDeltaOpeningAngle();
 }
 /**
- * Creates random rays from circle source with specified num. of circles and 
+ * Creates random rays from circle source with specified num. of circles and
  * spread angles
  * origins are distributed uniformly, the pattern shows on the next element
- * through the directions 
+ * through the directions
  * @returns list of rays
  */
-std::vector<Ray>  CircleSource::getRays([[maybe_unused]] int thread_count) const {
+std::vector<Ray> CircleSource::getRays([[maybe_unused]] int thread_count) const {
     RAYX_PROFILE_FUNCTION_STDOUT();
     double x, y, z, en;  // x,y,z pos, psi,phi direction cosines, en=energy
 
@@ -73,7 +76,7 @@ glm::dvec3 CircleSource::getDirection() const {
 
     circle = randomIntInRange(1, m_numOfCircles) - 1;
 
-    double thetabetweencircles = (m_maxOpeningAngle.rad -  m_minOpeningAngle.rad) / (m_numOfCircles - 1.0);
+    double thetabetweencircles = (m_maxOpeningAngle.rad - m_minOpeningAngle.rad) / (m_numOfCircles - 1.0);
     double theta = thetabetweencircles * circle;
     theta = theta + (randomDouble() - 0.5) * m_deltaOpeningAngle.rad + m_minOpeningAngle.rad;
 
@@ -81,15 +84,19 @@ glm::dvec3 CircleSource::getDirection() const {
     al = al + sin(angle) * sin(m_misalignment.m_rotationYerror.rad) * sin(m_misalignment.m_rotationXerror.rad);
     al = al * sin(theta);
     al = al + cos(m_misalignment.m_rotationXerror.rad) * cos(theta) * sin(m_misalignment.m_rotationYerror.rad);
-    
-    double am = - cos(theta) * sin(m_misalignment.m_rotationXerror.rad);
+
+    double am = -cos(theta) * sin(m_misalignment.m_rotationXerror.rad);
     am = am + cos(m_misalignment.m_rotationXerror.rad) * sin(angle) * sin(theta);
-    
-    double an = (- cos(angle) * sin(m_misalignment.m_rotationYerror.rad)) * sin(theta); 
+
+    double an = (-cos(angle) * sin(m_misalignment.m_rotationYerror.rad)) * sin(theta);
     an = an + cos(m_misalignment.m_rotationYerror.rad) * cos(m_misalignment.m_rotationXerror.rad) * cos(theta);
     an = an + cos(m_misalignment.m_rotationYerror.rad) * sin(angle) * sin(m_misalignment.m_rotationXerror.rad) * sin(theta);
-    
+
     return glm::dvec3(al, am, an);
 }
 
-}
+double CircleSource::getSourceHeight() const { return m_sourceHeight; }
+
+double CircleSource::getSourceWidth() const { return m_sourceWidth; }
+
+}  // namespace RAYX
