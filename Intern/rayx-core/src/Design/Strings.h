@@ -40,6 +40,7 @@ DECLARE_STR(VerDivergenceStr, "verDivergence");
 DECLARE_STR(TransformStr, "transform");
 
 DECLARE_STR(ByMatrixStr, "byMatrix");
+DECLARE_STR(MatrixStr, "matrix");
 
 DECLARE_STR(MisalignmentStr, "misalignment");
 DECLARE_STR(TranslationXErrorStr, "translationXError");
