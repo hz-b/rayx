@@ -54,6 +54,7 @@ DECLARE_STR(CenterEnergyStr, "centerEnergy");
 DECLARE_STR(SigmaStr, "sigma");
 DECLARE_STR(EnergySpreadStr, "energySpread");
 DECLARE_STR(NumberOfEnergiesStr, "numberOfEnergies");
+DECLARE_STR(FilenameStr, "filename");
 
 
 }

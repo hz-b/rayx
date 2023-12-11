@@ -3,8 +3,10 @@
 #include <filesystem>
 #include <optional>
 #include "Debug/Debug.h"
+#include "Data/DatFile.h"
 #include "TypedTable.h"
 #include "TypedVariant.h"
+#include "Strings.h"
 
 // TODO clean this up
 #include "../../Extern/tomlplusplus/include/toml++/toml.hpp"
@@ -13,9 +15,26 @@
 // Maybe each tomlParseImpl should get an argument that expresses that path we took to this node.
 // This could be dumped upon error for debugging purposes.
 
+template <typename ...Targs>
+inline void tomlParseImpl(toml::node_view<const toml::node>, std::optional<TypedTable<Targs...>>&);
+
+template <typename ...Targs>
+inline void tomlParseImpl(toml::node_view<const toml::node>, std::optional<TypedVariant<Targs...>>&);
 
 // Every tomlParseImpl function in this file should either set the `output` to some value, or fail with RAYX_ERR.
 // Keeping `output = {}` is not valid.
+
+// TODO do we want to put this impl to DatFile.h?
+inline void tomlParseImpl(toml::node_view<const toml::node> input, std::optional<DatFile>& out) {
+    using Ty = TypedTable<Field<std::string, FilenameStr>>;
+    std::optional<Ty> tab;
+    tomlParseImpl(input, tab);
+    std::string s = tab.value().field<FilenameStr>();
+
+    DatFile d;
+    DatFile::load(s, &d);
+    out = d;
+}
 
 inline void tomlParseImpl(toml::node_view<const toml::node> input, std::optional<std::string>& out) {
     auto* x = input.as_string();

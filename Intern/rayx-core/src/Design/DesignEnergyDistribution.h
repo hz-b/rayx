@@ -2,6 +2,7 @@
 
 #include "TypedVariant.h"
 #include "TypedTable.h"
+#include "Data/DatFile.h"
 
 namespace RAYX {
 
@@ -14,7 +15,7 @@ struct DesignEnergyDistribution : public TypedVariant<
     Case<DesignHardEdge, HardEdgeStr>,
     Case<DesignSoftEdge, SoftEdgeStr>,
     Case<DesignSeparateEnergies, SeparateEnergiesStr>,
-    Case<DesignDatFile, DatFileStr>
+    Case<DatFile, DatFileStr>
 > {};
 
 struct DesignHardEdge : public TypedTable<
@@ -32,8 +33,5 @@ struct DesignSeparateEnergies : public TypedTable<
     Field<double, EnergySpreadStr>,
     Field<int, NumberOfEnergiesStr>
 > {};
-
-// TODO how do I handle dat file? would be cool, if it's checked 'fail fast'.
-struct DesignDatFile : public TypedTable<> {};
 
 }

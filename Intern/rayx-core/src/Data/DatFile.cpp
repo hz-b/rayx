@@ -9,6 +9,10 @@
 
 namespace RAYX {
 bool DatFile::load(const std::filesystem::path& filename, DatFile* out) {
+    if (!std::filesystem::exists(filename)) {
+        RAYX_ERR << "DatFile " << filename << " doesn't exist!";
+        return false;
+    }
     std::ifstream s(filename);
 
     std::string line;
