@@ -6,8 +6,11 @@
 
 std::vector<RenderObject> RenderObject::buildRObjectsFromElements(Device& device, const std::vector<RAYX::OpticalElement>& elements) {
     std::vector<RenderObject> rObjects;
-    std::shared_ptr<DescriptorSetLayout> setLayout = std::move(
-        DescriptorSetLayout::Builder(device).addBinding(0, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 1, VK_SHADER_STAGE_FRAGMENT_BIT).build());
+
+    std::shared_ptr<DescriptorSetLayout> setLayout =
+        std::move(DescriptorSetLayout::Builder(device)                                                         //
+                      .addBinding(0, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, VK_SHADER_STAGE_FRAGMENT_BIT)  //
+                      .build());
 
     for (const RAYX::OpticalElement& element : elements) {
         std::vector<Vertex> vertices;
@@ -81,7 +84,6 @@ void RenderObject::draw(VkCommandBuffer commandBuffer) const {
 void RenderObject::updateTexture(const std::filesystem::path& path, const DescriptorPool& descriptorPool) {
     if (m_setLayout == nullptr) {
         RAYX_ERR << "Render objects descriptor set layout not initialized";
-        return;
     }
 
     Texture tex(m_Device, path);
@@ -101,6 +103,7 @@ void RenderObject::updateTexture(const std::filesystem::path& path, const Descri
 
 bool RenderObject::getDescriptorSet(VkDescriptorSet& outDescriptorSet) const {
     if (m_descrSetTexture) {
+        assert(m_descrSetTexture->descrSet != VK_NULL_HANDLE && "Descriptor set not initialized");
         outDescriptorSet = m_descrSetTexture->descrSet;
         return true;
     } else {

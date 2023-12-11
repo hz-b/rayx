@@ -25,10 +25,11 @@ Application::Application(uint32_t width, uint32_t height, const char* name, int 
       m_Device(m_Window, m_CommandParser.m_args.m_deviceID),  //
       m_Renderer(m_Window, m_Device)                          //
 {
-    m_DescriptorPool = DescriptorPool::Builder(m_Device)
-                           .addPoolSize(VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, SwapChain::MAX_FRAMES_IN_FLIGHT)
-                           .setMaxSets(SwapChain::MAX_FRAMES_IN_FLIGHT)
-                           .build();
+    m_GlobalDescriptorPool = DescriptorPool::Builder(m_Device)
+                                 .addPoolSize(VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, SwapChain::MAX_FRAMES_IN_FLIGHT)
+                                 .setMaxSets(SwapChain::MAX_FRAMES_IN_FLIGHT)
+                                 .build();
+    m_TexturePool = nullptr;
 }
 
 Application::~Application() = default;
@@ -51,7 +52,7 @@ void Application::run() {
     std::vector<VkDescriptorSet> descriptorSets(SwapChain::MAX_FRAMES_IN_FLIGHT);
     for (unsigned long i = 0; i < descriptorSets.size(); i++) {
         auto bufferInfo = uboBuffers[i]->descriptorInfo();
-        DescriptorWriter(*setLayout, *m_DescriptorPool).writeBuffer(0, &bufferInfo).build(descriptorSets[i]);
+        DescriptorWriter(*setLayout, *m_GlobalDescriptorPool).writeBuffer(0, &bufferInfo).build(descriptorSets[i]);
     }
 
     // Render systems
@@ -117,13 +118,13 @@ void Application::run() {
                 // Triangulate the render data and update the scene
                 rObjects = RenderObject::buildRObjectsFromElements(m_Device, elements);
 
-                auto texturePool = DescriptorPool::Builder(m_Device)
-                                       .addPoolSize(VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, (uint32_t)elements.size())
-                                       .setMaxSets((uint32_t)elements.size())
-                                       .build();
+                m_TexturePool = DescriptorPool::Builder(m_Device)
+                                    .addPoolSize(VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, (uint32_t)elements.size())
+                                    .setMaxSets((uint32_t)elements.size())
+                                    .build();
 
                 for (auto& rObj : rObjects) {
-                    rObj.updateTexture(canonicalizeRepositoryPath("Intern/rayx-ui/res/textures/white.png"), *texturePool);
+                    rObj.updateTexture(canonicalizeRepositoryPath("Intern/rayx-ui/res/textures/white.png"), *m_TexturePool);
                 }
                 createRayCache(uiParams.rmlPath.string(), rayCache, uiParams.rayInfo);
                 uiParams.pathChanged = false;

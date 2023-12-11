@@ -46,7 +46,8 @@ class Application {
     Device m_Device;      // Vulkan device
     Renderer m_Renderer;  // Vulkan renderer
 
-    std::unique_ptr<DescriptorPool> m_DescriptorPool{nullptr};
+    std::unique_ptr<DescriptorPool> m_GlobalDescriptorPool{nullptr};
+    std::unique_ptr<DescriptorPool> m_TexturePool{nullptr};
 
     void updateObjects(const std::string& path, std::vector<RenderObject>& rObjects);
     void createRayCache(const std::string& path, BundleHistory& rayCache, UIRayInfo& rayInfo);
