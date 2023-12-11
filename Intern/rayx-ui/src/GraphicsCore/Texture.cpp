@@ -35,9 +35,10 @@ Texture::Texture(Device& device, const std::filesystem::path& path) : m_Device{d
     transitionImageLayout(m_textureImage, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
 
     createImageView(format);
+    createTextureSampler();
 
     m_imageInfo = std::make_shared<VkDescriptorImageInfo>();
-    m_imageInfo->imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;  // Or appropriate layout based on your usage
+    m_imageInfo->imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
     m_imageInfo->imageView = m_textureImageView;
     m_imageInfo->sampler = m_textureSampler;
 }

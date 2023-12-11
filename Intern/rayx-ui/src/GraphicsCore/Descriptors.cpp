@@ -88,8 +88,22 @@ bool DescriptorPool::allocateDescriptor(const VkDescriptorSetLayout descriptorSe
 
     // Might want to create a "DescriptorPoolManager" class that handles this case, and builds
     // a new pool whenever an old pool fills up. But this is beyond our current scope
-    if (vkAllocateDescriptorSets(m_Device.device(), &allocInfo, &descriptor) != VK_SUCCESS) {
-        return false;
+    VkResult result = vkAllocateDescriptorSets(m_Device.device(), &allocInfo, &descriptor);
+    if (result != VK_SUCCESS) {
+        switch (result) {
+            case VK_ERROR_OUT_OF_POOL_MEMORY:
+                RAYX_WARN << "Failed to allocate descriptor set. Out of pool memory";
+                return false;
+            case VK_ERROR_FRAGMENTED_POOL:
+                RAYX_WARN << "Failed to allocate descriptor set. Fragmented pool";
+                return false;
+            case VK_ERROR_OUT_OF_DEVICE_MEMORY:
+                RAYX_WARN << "Failed to allocate descriptor set. Out of device memory";
+                return false;
+            default:
+                RAYX_WARN << "Failed to allocate descriptor set. Unknown error";
+                return false;
+        }
     }
     return true;
 }
@@ -127,7 +141,7 @@ DescriptorWriter& DescriptorWriter::writeImage(uint32_t binding, VkDescriptorIma
 
     auto& bindingDescription = m_SetLayout.m_bindings[binding];
 
-    assert(bindingDescription.descriptorCount == 1 && "Binding single descriptor info, but binding expects multiple");
+    // assert(bindingDescription.descriptorCount == 1 && "Binding single descriptor info, but binding expects multiple");
 
     VkWriteDescriptorSet write{};
     write.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;

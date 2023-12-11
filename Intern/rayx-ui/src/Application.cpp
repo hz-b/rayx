@@ -27,7 +27,6 @@ Application::Application(uint32_t width, uint32_t height, const char* name, int 
 {
     m_DescriptorPool = DescriptorPool::Builder(m_Device)
                            .addPoolSize(VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, SwapChain::MAX_FRAMES_IN_FLIGHT)
-                           .addPoolSize(VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, SwapChain::MAX_FRAMES_IN_FLIGHT)
                            .setMaxSets(SwapChain::MAX_FRAMES_IN_FLIGHT)
                            .build();
 }
@@ -80,8 +79,21 @@ void Application::run() {
 
     // CLI Input
     std::string rmlPathCli = m_CommandParser.m_args.m_providedFile;
-    UIRayInfo rayInfo{true, false, false, false, 50, 100};
-    UIParameters uiParams{camController, rmlPathCli, !rmlPathCli.empty(), 0.0, rayInfo};
+    UIRayInfo rayInfo{
+        .displayRays = true,     //
+        .raysChanged = false,    //
+        .cacheChanged = false,   //
+        .renderAllRays = false,  //
+        .amountOfRays = 50,      //
+        .maxAmountOfRays = 100   //
+    };
+    UIParameters uiParams{
+        .camController = camController,      //
+        .rmlPath = rmlPathCli,               //
+        .pathChanged = !rmlPathCli.empty(),  //
+        .frameTime = 0.0,                    //
+        .rayInfo = rayInfo                   //
+    };
 
     // Main loop
     while (!m_Window.shouldClose()) {
@@ -99,11 +111,19 @@ void Application::run() {
 
             // Update UI and camera
             uiRenderSystem.setupUI(uiParams, rObjects);
-            // camController.update(cam, m_Renderer.getAspectRatio());
             if (uiParams.pathChanged) {
-                updateObjects(uiParams.rmlPath.string(), rObjects);
+                vkDeviceWaitIdle(m_Device.device());
+                std::vector<RAYX::OpticalElement> elements = RAYX::importBeamline(uiParams.rmlPath.string()).m_OpticalElements;
+                // Triangulate the render data and update the scene
+                rObjects = RenderObject::buildRObjectsFromElements(m_Device, elements);
+
+                auto texturePool = DescriptorPool::Builder(m_Device)
+                                       .addPoolSize(VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, (uint32_t)elements.size())
+                                       .setMaxSets((uint32_t)elements.size())
+                                       .build();
+
                 for (auto& rObj : rObjects) {
-                    rObj.updateTexture(canonicalizeRepositoryPath("Intern/rayx-ui/res/textures/white.png"), *m_DescriptorPool);
+                    rObj.updateTexture(canonicalizeRepositoryPath("Intern/rayx-ui/res/textures/white.png"), *texturePool);
                 }
                 createRayCache(uiParams.rmlPath.string(), rayCache, uiParams.rayInfo);
                 uiParams.pathChanged = false;
@@ -129,7 +149,6 @@ void Application::run() {
             // Update UBO
             uint32_t frameIndex = m_Renderer.getFrameIndex();
             uboBuffers[frameIndex]->writeToBuffer(&cam);
-            // uboBuffers[frameIndex]->flush();
 
             // Render
             m_Renderer.beginSwapChainRenderPass(commandBuffer, uiRenderSystem.getClearValue());
@@ -148,14 +167,6 @@ void Application::run() {
         }
     }
     vkDeviceWaitIdle(m_Device.device());
-}
-
-void Application::updateObjects(const std::string& path, std::vector<RenderObject>& rObjects) {
-    RAYX::Beamline beamline = RAYX::importBeamline(path);
-    // TODO(Jannis): Hacky fix for now; should be some form of synchronization
-    vkDeviceWaitIdle(m_Device.device());
-    // Triangulate the render data and update the scene
-    rObjects = RenderObject::buildRObjectsFromElements(m_Device, beamline.m_OpticalElements);
 }
 
 void Application::createRayCache(const std::string& path, BundleHistory& rayCache, UIRayInfo& rayInfo) {
@@ -223,6 +234,6 @@ void Application::updateRays(const std::string& path, BundleHistory& rayCache, s
             rayIndices[i * 2] = i * 2;
             rayIndices[i * 2 + 1] = i * 2 + 1;
         }
-        rayObj.emplace("Rays", m_Device, glm::mat4(1.0f), rayVertices, rayIndices);
+        rayObj.emplace("Rays", m_Device, glm::mat4(1.0f), rayVertices, rayIndices, nullptr);
     }
 }

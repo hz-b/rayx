@@ -24,7 +24,6 @@ struct DescriptorSetTexture {
     Texture tex;
 };
 
-
 /**
  * @class RenderObject
  * @brief Class for handling the rendering of objects in Vulkan.
@@ -42,7 +41,8 @@ class RenderObject {
      * @param vertices Vector of Vertex objects.
      * @param indices Vector of index values.
      */
-    RenderObject(std::string name, Device& device, glm::mat4 modelMatrix, std::vector<Vertex>& vertices, std::vector<uint32_t>& indices);
+    RenderObject(std::string name, Device& device, glm::mat4 modelMatrix, std::vector<Vertex>& vertices, std::vector<uint32_t>& indices,
+                 std::shared_ptr<DescriptorSetLayout> setLayout);
     RenderObject(const RenderObject&) = delete;
     RenderObject& operator=(const RenderObject&) = delete;
     RenderObject(RenderObject&& other) noexcept;
@@ -76,6 +76,7 @@ class RenderObject {
 
     std::string m_name;
     Device& m_Device;
+    std::shared_ptr<DescriptorSetLayout> m_setLayout;
     std::optional<DescriptorSetTexture> m_descrSetTexture;
 
     uint32_t m_vertexCount;

@@ -6,6 +6,8 @@
 
 std::vector<RenderObject> RenderObject::buildRObjectsFromElements(Device& device, const std::vector<RAYX::OpticalElement>& elements) {
     std::vector<RenderObject> rObjects;
+    std::shared_ptr<DescriptorSetLayout> setLayout = std::move(
+        DescriptorSetLayout::Builder(device).addBinding(0, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 1, VK_SHADER_STAGE_FRAGMENT_BIT).build());
 
     for (const RAYX::OpticalElement& element : elements) {
         std::vector<Vertex> vertices;
@@ -15,7 +17,7 @@ std::vector<RenderObject> RenderObject::buildRObjectsFromElements(Device& device
 
         glm::mat4 modelMatrix = element.m_element.m_outTrans;
 
-        rObjects.emplace_back(element.m_name, device, modelMatrix, vertices, indices);
+        rObjects.emplace_back(element.m_name, device, modelMatrix, vertices, indices, setLayout);
     }
 
     std::cout << "Triangulation complete" << std::endl;
@@ -25,8 +27,9 @@ std::vector<RenderObject> RenderObject::buildRObjectsFromElements(Device& device
 /**
  * Constructor sets up vertex and index buffers based on the input parameters.
  */
-RenderObject::RenderObject(std::string name, Device& device, glm::mat4 modelMatrix, std::vector<Vertex>& vertices, std::vector<uint32_t>& indices)
-    : m_name(name), m_Device(device), m_modelMatrix(modelMatrix) {
+RenderObject::RenderObject(std::string name, Device& device, glm::mat4 modelMatrix, std::vector<Vertex>& vertices, std::vector<uint32_t>& indices,
+                           std::shared_ptr<DescriptorSetLayout> setLayout)
+    : m_name(name), m_Device(device), m_modelMatrix(modelMatrix), m_setLayout(std::move(setLayout)) {
     createVertexBuffers(vertices);
     createIndexBuffers(indices);
 }
@@ -39,7 +42,8 @@ RenderObject::RenderObject(RenderObject&& other) noexcept
       m_vertexCount(other.m_vertexCount),
       m_indexCount(other.m_indexCount),
       m_vertexBuffer(std::move(other.m_vertexBuffer)),
-      m_indexBuffer(std::move(other.m_indexBuffer)) {}
+      m_indexBuffer(std::move(other.m_indexBuffer)),
+      m_setLayout(std::move(other.m_setLayout)) {}
 
 RenderObject& RenderObject::operator=(RenderObject&& other) noexcept {
     if (this != &other) {
@@ -58,6 +62,7 @@ RenderObject& RenderObject::operator=(RenderObject&& other) noexcept {
         m_indexCount = other.m_indexCount;
         m_vertexBuffer = std::move(other.m_vertexBuffer);
         m_indexBuffer = std::move(other.m_indexBuffer);
+        m_setLayout = std::move(other.m_setLayout);
     }
     return *this;
 }
@@ -74,13 +79,16 @@ void RenderObject::draw(VkCommandBuffer commandBuffer) const {
 }
 
 void RenderObject::updateTexture(const std::filesystem::path& path, const DescriptorPool& descriptorPool) {
+    if (m_setLayout == nullptr) {
+        RAYX_ERR << "Render objects descriptor set layout not initialized";
+        return;
+    }
+
     Texture tex(m_Device, path);
-    auto setLayout =
-        DescriptorSetLayout::Builder(m_Device).addBinding(0, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 1, VK_SHADER_STAGE_FRAGMENT_BIT).build();
 
     std::shared_ptr<VkDescriptorImageInfo> descrInfo = tex.descriptorInfo();
 
-    DescriptorWriter writer(*setLayout, descriptorPool);
+    DescriptorWriter writer(*m_setLayout, descriptorPool);
     writer.writeImage(0, descrInfo.get());
 
     VkDescriptorSet descrSet;

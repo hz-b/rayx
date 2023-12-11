@@ -10,6 +10,7 @@ layout(binding = 0) uniform Camera {
     mat4 proj;
     float near;
     float far;
+    bool isOrtho;
 } cam;
 
 layout(location = 0) in vec4 inPosition;
