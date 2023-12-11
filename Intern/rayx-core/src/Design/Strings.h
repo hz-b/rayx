@@ -50,4 +50,10 @@ DECLARE_STR(RotationXErrorStr, "rotationXError");
 DECLARE_STR(RotationYErrorStr, "rotationYError");
 DECLARE_STR(RotationZErrorStr, "rotationZError");
 
+DECLARE_STR(CenterEnergyStr, "centerEnergy");
+DECLARE_STR(SigmaStr, "sigma");
+DECLARE_STR(EnergySpreadStr, "energySpread");
+DECLARE_STR(NumberOfEnergiesStr, "numberOfEnergies");
+
+
 }
