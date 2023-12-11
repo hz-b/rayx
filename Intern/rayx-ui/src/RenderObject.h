@@ -3,6 +3,7 @@
 #include <glm/glm.hpp>
 #include <vector>
 
+#include "Beamline/OpticalElement.h"
 #include "GraphicsCore/Buffer.h"
 #include "GraphicsCore/Descriptors.h"
 #include "GraphicsCore/Device.h"
@@ -22,6 +23,7 @@ struct DescriptorSetTexture {
     VkDescriptorSet descrSet;
     Texture tex;
 };
+
 
 /**
  * @class RenderObject
@@ -65,6 +67,8 @@ class RenderObject {
     std::string getName() const { return m_name; }
 
     bool getDescriptorSet(VkDescriptorSet& outDescriptorSet) const;
+
+    static std::vector<RenderObject> buildRObjectsFromElements(Device& device, const std::vector<RAYX::OpticalElement>& elements);
 
   private:
     void createVertexBuffers(const std::vector<Vertex>& vertices);

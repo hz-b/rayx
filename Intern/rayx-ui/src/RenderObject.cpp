@@ -2,6 +2,26 @@
 
 #include <glm/gtx/matrix_decompose.hpp>
 
+#include "Triangulation/Triangulate.h"
+
+std::vector<RenderObject> RenderObject::buildRObjectsFromElements(Device& device, const std::vector<RAYX::OpticalElement>& elements) {
+    std::vector<RenderObject> rObjects;
+
+    for (const RAYX::OpticalElement& element : elements) {
+        std::vector<Vertex> vertices;
+        std::vector<uint32_t> indices;
+
+        triangulateObject(element, vertices, indices);
+
+        glm::mat4 modelMatrix = element.m_element.m_outTrans;
+
+        rObjects.emplace_back(element.m_name, device, modelMatrix, vertices, indices);
+    }
+
+    std::cout << "Triangulation complete" << std::endl;
+    return rObjects;
+}
+
 /**
  * Constructor sets up vertex and index buffers based on the input parameters.
  */

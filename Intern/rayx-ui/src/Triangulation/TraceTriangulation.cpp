@@ -85,7 +85,7 @@ std::vector<std::vector<RAYX::Ray>> createRayGrid(size_t size, double width, dou
  * cutout. Using CPU-based ray tracing, it computes the intersections between rays and the optical element's surface within the cutout. The ray
  * intersections are then grouped into triangles based on the grid, and a RenderObject representing these triangles is returned.
  */
-RenderObject traceTriangulation(const RAYX::OpticalElement& element, Device& device) {
+void traceTriangulation(const RAYX::OpticalElement& element, std::vector<Vertex>& vertices, std::vector<uint32_t>& indices) {
     RAYX::CpuTracer tracer;
 
     constexpr size_t gridSize = 100;
@@ -103,8 +103,6 @@ RenderObject traceTriangulation(const RAYX::OpticalElement& element, Device& dev
         }
     }
 
-    std::vector<Vertex> vertices;
-    std::vector<uint32_t> indices;
     uint32_t index = 0;
 
     for (size_t i = 0; i < gridSize - 1; ++i) {
@@ -132,6 +130,4 @@ RenderObject traceTriangulation(const RAYX::OpticalElement& element, Device& dev
     if (vertices.empty() || indices.empty()) {
         throw std::runtime_error("Failed: Missing vertices or indices at a render object!");
     }
-    std::cout << "Added " << vertices.size() / 3 << " triangles to new render object" << std::endl;
-    return RenderObject{element.m_name, device, element.m_element.m_outTrans, vertices, indices};
 }

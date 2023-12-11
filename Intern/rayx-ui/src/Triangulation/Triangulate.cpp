@@ -116,18 +116,13 @@ void calculateMeshForSlit(const Element& element, std::vector<Vertex>& vertices,
     }
 }
 
-RenderObject planarTriangulation(const RAYX::OpticalElement& element, Device& device) {
-    std::vector<Vertex> vertices;
-    std::vector<uint32_t> indices;
+void planarTriangulation(const RAYX::OpticalElement& element, std::vector<Vertex>& vertices, std::vector<uint32_t>& indices) {
     // The slit behaviour needs special attention, since it is basically three cutouts (the slit, the beamstop and the opening)
     if (element.m_element.m_behaviour.m_type == BTYPE_SLIT) {
         calculateMeshForSlit(element.m_element, vertices, indices);
     } else {
         calculateSolidMeshOfType(element.m_element.m_cutout, vertices, &indices);
     }
-
-    RenderObject renderObj(element.m_name, device, element.m_element.m_outTrans, vertices, indices);
-    return std::move(renderObj);
 }
 
 bool isPlanar(const QuadricSurface& q) { return (q.m_a11 == 0 && q.m_a22 == 0 && q.m_a33 == 0) && (q.m_a14 != 0 || q.m_a24 != 0 || q.m_a34 != 0); }
@@ -137,38 +132,27 @@ bool isPlanar(const QuadricSurface& q) { return (q.m_a11 == 0 && q.m_a22 == 0 &&
 /**
  * This function takes optical elements and categorizes them for efficient triangulation.
  */
-std::vector<RenderObject> triangulateObjects(const std::vector<RAYX::OpticalElement>& elements, Device& device) {
-    std::vector<RenderObject> rObjects;
-
-    for (const RAYX::OpticalElement& element : elements) {
-        switch (static_cast<int>(element.m_element.m_surface.m_type)) {
-            case STYPE_PLANE_XZ: {
-                RenderObject ro = planarTriangulation(element, device);  // Assume this returns a RenderObject
-                rObjects.emplace_back(std::move(ro));
-                break;
-            }
-            case STYPE_QUADRIC: {
-                QuadricSurface q = deserializeQuadric(element.m_element.m_surface);
-                if (isPlanar(q)) {  // Replace with your condition for planarity
-                    RenderObject ro = planarTriangulation(element, device);
-                    rObjects.emplace_back(std::move(ro));
-                } else {
-                    RenderObject ro = traceTriangulation(element, device);  // Assume this returns a RenderObject
-                    rObjects.emplace_back(std::move(ro));
-                }
-                break;
-            }
-            case STYPE_TOROID: {
-                RenderObject ro = traceTriangulation(element, device);  // Assume this returns a RenderObject
-                rObjects.emplace_back(std::move(ro));
-                break;
-            }
-            default:
-                RAYX_ERR << "Unknown element type: " << element.m_element.m_surface.m_type;
-                break;
+void triangulateObject(const RAYX::OpticalElement& element, std::vector<Vertex>& vertices, std::vector<uint32_t>& indices) {
+    switch (static_cast<int>(element.m_element.m_surface.m_type)) {
+        case STYPE_PLANE_XZ: {
+            planarTriangulation(element, vertices, indices);
+            break;
         }
+        case STYPE_QUADRIC: {
+            QuadricSurface q = deserializeQuadric(element.m_element.m_surface);
+            if (isPlanar(q)) {
+                planarTriangulation(element, vertices, indices);
+            } else {
+                traceTriangulation(element, vertices, indices);
+            }
+            break;
+        }
+        case STYPE_TOROID: {
+            traceTriangulation(element, vertices, indices);
+            break;
+        }
+        default:
+            RAYX_ERR << "Unknown element type: " << element.m_element.m_surface.m_type;
+            break;
     }
-
-    std::cout << "Triangulation complete" << std::endl;
-    return rObjects;
 }

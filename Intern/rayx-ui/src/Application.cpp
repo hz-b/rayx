@@ -14,7 +14,6 @@
 #include "RenderSystem/GridRenderSystem.h"
 #include "RenderSystem/ObjectRenderSystem.h"
 #include "RenderSystem/RayRenderSystem.h"
-#include "Triangulation/Triangulate.h"
 #include "UserInput.h"
 #include "Writer/CSVWriter.h"
 #include "Writer/H5Writer.h"
@@ -156,7 +155,7 @@ void Application::updateObjects(const std::string& path, std::vector<RenderObjec
     // TODO(Jannis): Hacky fix for now; should be some form of synchronization
     vkDeviceWaitIdle(m_Device.device());
     // Triangulate the render data and update the scene
-    rObjects = triangulateObjects(beamline.m_OpticalElements, m_Device);
+    rObjects = RenderObject::buildRObjectsFromElements(m_Device, beamline.m_OpticalElements);
 }
 
 void Application::createRayCache(const std::string& path, BundleHistory& rayCache, UIRayInfo& rayInfo) {
