@@ -21,6 +21,12 @@ inline void tomlParseImpl(toml::node_view<const toml::node>, std::optional<Typed
 template <typename ...Targs>
 inline void tomlParseImpl(toml::node_view<const toml::node>, std::optional<TypedVariant<Targs...>>&);
 
+template <typename T>
+inline std::enable_if_t<!std::is_same_v<T, typename T::TypedBase>> tomlParseImpl(toml::node_view<const toml::node>, std::optional<T>&);
+
+template <typename T>
+inline void tomlParseImpl(toml::node_view<const toml::node>, std::optional<std::vector<T>>&);
+
 // Every tomlParseImpl function in this file should either set the `output` to some value, or fail with RAYX_ERR.
 // Keeping `output = {}` is not valid.
 
@@ -138,8 +144,8 @@ inline void tomlParseImpl(toml::node_view<const toml::node> input, std::optional
 
 // The tomlParseImpl base implementation.
 // This should only work, if T is a subclass of either TypedTable<...> or TypedVariant<...>.
-template <typename T, typename = std::enable_if_t<!std::is_same_v<T, typename T::TypedBase>>>
-inline void tomlParseImpl(toml::node_view<const toml::node> input, std::optional<T>& output) {
+template <typename T>
+inline std::enable_if_t<!std::is_same_v<T, typename T::TypedBase>> tomlParseImpl(toml::node_view<const toml::node> input, std::optional<T>& output) {
     std::optional<typename T::TypedBase> opt;
     tomlParseImpl(input, opt);
     T t;
