@@ -45,7 +45,7 @@ void Application::run() {
         uboBuffer->map();
     }
 
-    // Descriptor set layout
+    // Descriptor set layouts
     auto globalSetLayout = DescriptorSetLayout::Builder(m_Device)
                                .addBinding(0, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, VK_SHADER_STAGE_VERTEX_BIT)  //
                                .build();                                                                      //
@@ -54,9 +54,13 @@ void Application::run() {
         auto bufferInfo = uboBuffers[i]->descriptorInfo();
         DescriptorWriter(*globalSetLayout, *m_GlobalDescriptorPool).writeBuffer(0, &bufferInfo).build(descriptorSets[i]);
     }
+    std::shared_ptr<DescriptorSetLayout> texSetLayout = std::move(                                   //
+        DescriptorSetLayout::Builder(m_Device)                                                       //
+            .addBinding(0, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, VK_SHADER_STAGE_FRAGMENT_BIT)  //
+            .build());
+    std::vector<VkDescriptorSetLayout> setLayouts{globalSetLayout->getDescriptorSetLayout(), texSetLayout->getDescriptorSetLayout()};
 
     // Render systems
-    std::vector<VkDescriptorSetLayout> setLayouts{globalSetLayout->getDescriptorSetLayout()};
     ObjectRenderSystem objectRenderSystem(m_Device, m_Renderer.getSwapChainRenderPass(), setLayouts);
     RayRenderSystem rayRenderSystem(m_Device, m_Renderer.getSwapChainRenderPass(), globalSetLayout->getDescriptorSetLayout());
     UIRenderSystem uiRenderSystem(m_Window, m_Device, m_Renderer.getSwapChainImageFormat(), m_Renderer.getSwapChainDepthFormat(),
@@ -118,20 +122,14 @@ void Application::run() {
                 std::vector<RAYX::OpticalElement> elements = RAYX::importBeamline(uiParams.rmlPath.string()).m_OpticalElements;
                 // Triangulate the render data and update the scene
 
-                std::shared_ptr<DescriptorSetLayout> texSetLayout =
-                    std::move(DescriptorSetLayout::Builder(m_Device)                                                       //
-                                  .addBinding(0, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, VK_SHADER_STAGE_FRAGMENT_BIT)  //
-                                  .build());
-
                 rObjects = RenderObject::buildRObjectsFromElements(m_Device, elements, texSetLayout);
 
                 m_TexturePool = DescriptorPool::Builder(m_Device)
                                     .addPoolSize(VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, (uint32_t)elements.size())
                                     .setMaxSets((uint32_t)elements.size())
                                     .build();
-
                 for (auto& rObj : rObjects) {
-                    rObj.updateTexture(canonicalizeRepositoryPath("Intern/rayx-ui/res/textures/white.png"), *m_TexturePool);
+                    rObj.updateTexture(canonicalizeRepositoryPath("Intern/rayx-ui/res/textures/feels-good-man.jpg"), *m_TexturePool);
                 }
 
                 setLayouts = {globalSetLayout->getDescriptorSetLayout(), texSetLayout->getDescriptorSetLayout()};
