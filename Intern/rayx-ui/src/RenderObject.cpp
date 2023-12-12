@@ -4,13 +4,9 @@
 
 #include "Triangulation/Triangulate.h"
 
-std::vector<RenderObject> RenderObject::buildRObjectsFromElements(Device& device, const std::vector<RAYX::OpticalElement>& elements) {
+std::vector<RenderObject> RenderObject::buildRObjectsFromElements(Device& device, const std::vector<RAYX::OpticalElement>& elements,
+                                                                  std::shared_ptr<DescriptorSetLayout> setLayout) {
     std::vector<RenderObject> rObjects;
-
-    std::shared_ptr<DescriptorSetLayout> setLayout =
-        std::move(DescriptorSetLayout::Builder(device)                                                         //
-                      .addBinding(0, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, VK_SHADER_STAGE_FRAGMENT_BIT)  //
-                      .build());
 
     for (const RAYX::OpticalElement& element : elements) {
         std::vector<Vertex> vertices;

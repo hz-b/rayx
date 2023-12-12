@@ -68,7 +68,8 @@ class RenderObject {
 
     bool getDescriptorSet(VkDescriptorSet& outDescriptorSet) const;
 
-    static std::vector<RenderObject> buildRObjectsFromElements(Device& device, const std::vector<RAYX::OpticalElement>& elements);
+    static std::vector<RenderObject> buildRObjectsFromElements(Device& device, const std::vector<RAYX::OpticalElement>& elements,
+                                                               std::shared_ptr<DescriptorSetLayout> setLayout);
 
   private:
     void createVertexBuffers(const std::vector<Vertex>& vertices);
