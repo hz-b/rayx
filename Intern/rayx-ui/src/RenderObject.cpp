@@ -28,7 +28,7 @@ std::vector<RenderObject> RenderObject::buildRObjectsFromElements(Device& device
  */
 RenderObject::RenderObject(std::string name, Device& device, glm::mat4 modelMatrix, std::vector<Vertex>& vertices, std::vector<uint32_t>& indices,
                            std::shared_ptr<DescriptorSetLayout> setLayout)
-    : m_name(name), m_Device(device), m_modelMatrix(modelMatrix), m_setLayout(std::move(setLayout)) {
+    : m_name(name), m_Device(device), m_modelMatrix(modelMatrix), m_setLayout(setLayout) {
     createVertexBuffers(vertices);
     createIndexBuffers(indices);
 }
@@ -42,7 +42,7 @@ RenderObject::RenderObject(RenderObject&& other) noexcept
       m_indexCount(other.m_indexCount),
       m_vertexBuffer(std::move(other.m_vertexBuffer)),
       m_indexBuffer(std::move(other.m_indexBuffer)),
-      m_setLayout(std::move(other.m_setLayout)) {}
+      m_setLayout(other.m_setLayout) {}
 
 RenderObject& RenderObject::operator=(RenderObject&& other) noexcept {
     if (this != &other) {
@@ -61,7 +61,7 @@ RenderObject& RenderObject::operator=(RenderObject&& other) noexcept {
         m_indexCount = other.m_indexCount;
         m_vertexBuffer = std::move(other.m_vertexBuffer);
         m_indexBuffer = std::move(other.m_indexBuffer);
-        m_setLayout = std::move(other.m_setLayout);
+        m_setLayout = other.m_setLayout;
     }
     return *this;
 }
