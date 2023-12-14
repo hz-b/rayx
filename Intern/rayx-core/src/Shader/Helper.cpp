@@ -10,9 +10,11 @@ void init() {
     }
 
     // ray specific "seed" for random numbers -> every ray has a different starting value for the counter that creates the random number
+    // TODO Random seeds should probably not be doubles! Casting MAX_UINT64 to double loses precision.
     const uint64_t MAX_UINT64 = ~(uint64_t(0));
+    const double MAX_UINT64_DOUBLE = 18446744073709551616.0;
     uint64_t workerCounterNum = MAX_UINT64 / uint64_t(inv_pushConstants.numRays);
-    inv_ctr = rayId() * workerCounterNum + uint64_t(inv_pushConstants.randomSeed * MAX_UINT64);
+    inv_ctr = rayId() * workerCounterNum + uint64_t(inv_pushConstants.randomSeed * MAX_UINT64_DOUBLE);
 }
 
 uint64_t rayId() {

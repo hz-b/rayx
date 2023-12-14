@@ -39,7 +39,13 @@ class UIRenderSystem {
     void setupUI(UIParameters& uiParams, std::vector<RenderObject>& rObjects);
     void render(VkCommandBuffer commandBuffer);
 
-    VkClearValue getClearValue() const { return {m_ClearColor[0], m_ClearColor[1], m_ClearColor[2], m_ClearColor[3]}; }
+    VkClearValue getClearValue() const {
+        VkClearValue v;
+        for (int i = 0; i < 4; i++) {
+            v.color.float32[i] = m_ClearColor[i];
+        }
+        return v;
+    }
 
     // Simple TreeNode
     struct TreeNode {

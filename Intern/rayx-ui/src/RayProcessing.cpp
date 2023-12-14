@@ -192,7 +192,7 @@ std::vector<size_t> kMeansFilter(const RAYX::BundleHistory& rayCache, size_t k) 
     return selectedRays;
 }
 
-std::vector<size_t> noFilter(const RAYX::BundleHistory& bundleHist, size_t k) {
+std::vector<size_t> noFilter(const RAYX::BundleHistory& bundleHist, [[maybe_unused]] size_t k) {
     std::vector<size_t> selectedRays;
     for (size_t i = 0; i < bundleHist.size(); ++i) {
         selectedRays.push_back(i);
