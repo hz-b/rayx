@@ -267,10 +267,6 @@ void renderImGuiTree(const UIRenderSystem::TreeNode& treeNode, CameraController&
         if (child.children.empty()) {
             std::string label = child.name;
 
-            if (child.index != -1) {
-                label;
-            }
-
             if (ImGui::Selectable(label.c_str())) {
                 // Handle selection logic here
                 std::cout << "Selected object: " << child.name << " with index " << child.index << std::endl;
@@ -352,7 +348,7 @@ void UIRenderSystem::renderImGuiTreeFromRML(const std::filesystem::path& filenam
         doc.parse<0>(cstr.data());
     } catch (rapidxml::parse_error& e) {
         ImGui::Text("Error: XML Parsing failed:");
-        ImGui::Text(e.what());
+        ImGui::Text("%s", e.what());
         return;
     }
 

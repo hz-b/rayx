@@ -662,11 +662,9 @@ double RAYX_API r8_atan(const double x)
     const double xbnd4 = +5.0273394921258481045149750710640;
     double y;
 
-    if (nterms == 0) {
-        nterms = r8_inits(atancs, 16, 0.1 * r8_mach(3));
-        sqeps  = sqrt(6.0 * r8_mach(3));
-        xbig   = 1.0 / r8_mach(3);
-    }
+    nterms = r8_inits(atancs, 16, 0.1 * r8_mach(3));
+    sqeps  = sqrt(6.0 * r8_mach(3));
+    xbig   = 1.0 / r8_mach(3);
 
     y = abs(x);
 
@@ -848,9 +846,7 @@ double RAYX_API r8_log(double x)
     double xn;
     double y;
 
-    if (nterms == 0) {
-        nterms = r8_inits(alncs, 11, 28.9 * r8_mach(3));
-    }
+    nterms = r8_inits(alncs, 11, 28.9 * r8_mach(3));
 
     if (x <= 0.0) {
         // fprintf ( stderr, "\n" );
@@ -940,13 +936,11 @@ double RAYX_API r8_exp(double x)
     double xmin;
     double y;
 
-    if (nterms == 0) {
-        double eta = 0.1 * r8_mach(3);
-        int nos    = 14;
-        nterms     = r8_inits(expcs, nos, eta);
-        xmin       = r8_log(r8_mach(1)) + 0.01;
-        xmax       = r8_log(r8_mach(2)) - 0.001;
-    }
+    double eta = 0.1 * r8_mach(3);
+    int nos    = 14;
+    nterms     = r8_inits(expcs, nos, eta);
+    xmin       = r8_log(r8_mach(1)) + 0.01;
+    xmax       = r8_log(r8_mach(2)) - 0.001;
     if (x < xmin) {
         // fprintf ( stderr, "\n" );
         // fprintf ( stderr, "R8_EXP - Warning!\n" );
