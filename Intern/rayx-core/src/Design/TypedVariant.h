@@ -54,6 +54,13 @@ struct TypedVariant {
         return *std::get<findVariantIndexOfTag<Tag, Targs...>()>(m_variant);
     }
 
+    inline auto visit(auto f) const {
+        // This function is used to dereference the std::shared_ptr away.
+        auto deref_f = [&](const auto& x) { return f(*x); };
+
+        return std::visit(deref_f, m_variant);
+    }
+
     private:
     std::variant<std::shared_ptr<typename Targs::Ty> ...> m_variant;
 };
