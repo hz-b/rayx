@@ -45,7 +45,6 @@ double get_factorTotalPowerDipol() {
 }
 
 DipoleSource::DipoleSource(const DesignObject& dobj) : LightSource(dobj) {
-    m_energySpreadType = dobj.parseEnergyDistribution();
     m_photonFlux = dobj.parsePhotonFlux();
     m_electronEnergyOrientation = dobj.parseElectronEnergyOrientation();
     m_sourcePulseType = dobj.parseSourcePulseType();

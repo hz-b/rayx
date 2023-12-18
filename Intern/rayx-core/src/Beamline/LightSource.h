@@ -6,7 +6,7 @@
 
 #include "Core.h"
 #include "Data/xml.h"
-#include "EnergyDistribution.h"
+#include "Design/DesignEnergyDistribution.h"
 #include "Shader/Ray.h"
 
 namespace RAYX {
@@ -45,7 +45,7 @@ class RAYX_API LightSource {
     std::string m_name;
 
     /** the energy distribution used when deciding the energies of the rays. */
-    EnergyDistribution m_EnergyDistribution;
+    DesignEnergyDistribution m_EnergyDistribution;
     uint32_t m_numberOfRays;
 
   protected:

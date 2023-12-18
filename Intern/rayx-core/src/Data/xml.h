@@ -18,7 +18,7 @@
 enum class DesignPlane { XY, XZ };
 
 namespace RAYX {
-class EnergyDistribution;
+struct DesignEnergyDistribution;
 // forward declarations:
 enum class CentralBeamstop;
 enum class CurvatureType;
@@ -69,7 +69,7 @@ bool paramPositionNoGroup(const rapidxml::xml_node<>* node, glm::dvec4* out);
 bool paramOrientationNoGroup(const rapidxml::xml_node<>* node, glm::dmat4x4* out);
 bool paramSlopeError(const rapidxml::xml_node<>* node, SlopeError* out);
 bool paramVls(const rapidxml::xml_node<>* node, std::array<double, 6>* out);
-bool paramEnergyDistribution(const rapidxml::xml_node<>* node, const std::filesystem::path& rmlFile, EnergyDistribution* out);
+bool paramEnergyDistribution(const rapidxml::xml_node<>* node, const std::filesystem::path& rmlFile, DesignEnergyDistribution* out);
 
 bool paramElectronEnergyOrientation(const rapidxml::xml_node<>* node, ElectronEnergyOrientation* out);
 bool paramSourcePulseType(const rapidxml::xml_node<>* node, SourcePulseType* out);
@@ -100,7 +100,7 @@ struct RAYX_API Parser {
     Misalignment parseMisalignment() const;
     SlopeError parseSlopeError() const;
     std::array<double, 6> parseVls() const;
-    EnergyDistribution parseEnergyDistribution() const;
+    DesignEnergyDistribution parseEnergyDistribution() const;
     glm::dvec4 parsePosition() const;
     glm::dmat4x4 parseOrientation() const;
     Material parseMaterial() const;

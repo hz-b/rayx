@@ -47,7 +47,6 @@ class RAYX_API DipoleSource : public LightSource {
     ElectronEnergyOrientation m_electronEnergyOrientation;
     SourcePulseType m_sourcePulseType;
     double m_photonFlux;
-    EnergyDistribution m_energySpreadType;
 
     double m_sigpsi;
     glm::dvec4 m_stokes;

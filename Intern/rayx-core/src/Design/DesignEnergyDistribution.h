@@ -3,6 +3,7 @@
 #include "TypedVariant.h"
 #include "TypedTable.h"
 #include "Data/DatFile.h"
+#include "Strings.h"
 #include "Random.h"
 
 namespace RAYX {

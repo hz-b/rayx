@@ -33,7 +33,7 @@ double DesignSoftEdge::selectEnergy() const {
     return randomNormal(center, sigma);
 }
 
-double DesignSoftEEdge::getAverage() const {
+double DesignSoftEdge::getAverage() const {
     return field<CenterEnergyStr>();
 }
 

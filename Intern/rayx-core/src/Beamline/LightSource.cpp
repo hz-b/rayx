@@ -1,8 +1,7 @@
 #include "LightSource.h"
+#include "Design/DesignEnergyDistribution.h"
 
 #include <cmath>
-
-#include "EnergyDistribution.h"
 
 namespace RAYX {
 LightSource::LightSource(const DesignObject& dobj) {
