@@ -19,6 +19,7 @@ struct DesignEnergyDistribution : public TypedVariant<
     Case<DatFile, DatFileStr>
 > {
     double selectEnergy() const;
+    double getAverage() const;
 };
 
 struct DesignHardEdge : public TypedTable<
@@ -26,6 +27,7 @@ struct DesignHardEdge : public TypedTable<
     Field<double, EnergySpreadStr>
 > {
     double selectEnergy() const;
+    double getAverage() const;
 };
 
 struct DesignSoftEdge : public TypedTable<
@@ -33,6 +35,7 @@ struct DesignSoftEdge : public TypedTable<
     Field<double, SigmaStr>
 > {
     double selectEnergy() const;
+    double getAverage() const;
 };
 
 struct DesignSeparateEnergies : public TypedTable<
@@ -41,6 +44,7 @@ struct DesignSeparateEnergies : public TypedTable<
     Field<int, NumberOfEnergiesStr>
 > {
     double selectEnergy() const;
+    double getAverage() const;
 };
 
 }
