@@ -21,6 +21,8 @@ struct DesignLightSource : public TypedTable<
     Field<double, VerDivergenceStr>,
     Field<DesignTransform, TransformStr>,
     Field<DesignMisalignment, MisalignmentStr>
-> {};
+> {
+    std::vector<Ray> getRays() const;
+};
 
 }
