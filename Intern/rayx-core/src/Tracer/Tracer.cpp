@@ -96,8 +96,8 @@ BundleHistory Tracer::trace(const Beamline& b, Sequential seq, uint64_t max_batc
 void Tracer::setDevice(int deviceID) { m_deviceID = deviceID; }
 
 /// Get the last event for each ray of the bundle.
-std::vector<Event> extractLastEvents(const BundleHistory& hist) {
-    std::vector<Event> out;
+std::vector<Ray> extractLastEvents(const BundleHistory& hist) {
+    std::vector<Ray> out;
     for (auto& ray_hist : hist) {
         out.push_back(ray_hist.back());
     }

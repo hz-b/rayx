@@ -32,13 +32,8 @@ struct TraceRawConfig {
     std::vector<Element> m_elements;
 };
 
-/// A 'snapshot' of a ray, at the time where it undergoes some event.
-/// The event type is specified by `m_eventType`.
-// TODO: split Event and Ray into separate types, because `Event` needs an m_eventType (aka m_weight), whereas Ray does not.
-using Event = Ray;
-
 /// Contains all the events of a single Ray in chronological order.
-using RayHistory = std::vector<Event>;
+using RayHistory = std::vector<Ray>;
 
 /// Contains all events for some bundle of rays.
 /// Given a `BundleHistory hist;`

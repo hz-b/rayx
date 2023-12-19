@@ -74,8 +74,8 @@ RAYX::BundleHistory traceRML(std::string filename) {
     return tracer->trace(beamline, Sequential::No, DEFAULT_BATCH_SIZE);
 }
 
-std::vector<RAYX::Event> extractLastHit(const RAYX::BundleHistory& hist) {
-    std::vector<RAYX::Event> outs;
+std::vector<RAYX::Ray> extractLastHit(const RAYX::BundleHistory& hist) {
+    std::vector<RAYX::Ray> outs;
     for (auto rr : hist) {
         Ray out;
         out.m_eventType = ETYPE_UNINIT;

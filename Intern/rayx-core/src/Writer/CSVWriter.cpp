@@ -74,7 +74,7 @@ void writeCSV(const RAYX::BundleHistory& hist, const std::string& filename, cons
     for (unsigned long ray_id = 0; ray_id < hist.size(); ray_id++) {
         const RAYX::RayHistory& ray_hist = hist[ray_id];
         for (unsigned long event_id = 0; event_id < ray_hist.size(); event_id++) {
-            const RAYX::Event& event = ray_hist[event_id];
+            const RAYX::Ray& event = ray_hist[event_id];
             for (uint i = 0; i < format.size(); i++) {
                 if (i > 0) {
                     file << DELIMITER;

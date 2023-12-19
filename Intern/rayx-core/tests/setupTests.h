@@ -182,7 +182,7 @@ void writeToOutputCSV(const RAYX::BundleHistory& hist, std::string filename);
 RAYX::BundleHistory traceRML(std::string filename);
 
 // extracts the last ETYPE_JUST_HIT_ELEM for each ray.
-std::vector<RAYX::Event> extractLastHit(const RAYX::BundleHistory&);
+std::vector<RAYX::Ray> extractLastHit(const RAYX::BundleHistory&);
 
 /// will look at Tests/input/<filename>.csv
 /// the Ray-UI files are to be obtained by Export > RawRaysOutgoing (which are in
