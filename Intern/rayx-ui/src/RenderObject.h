@@ -61,10 +61,12 @@ class RenderObject {
     void draw(VkCommandBuffer commandBuffer) const;
 
     void updateTexture(const std::filesystem::path& path, const DescriptorPool& descriptorPool);
+    void updateTexture(const unsigned char* data, uint32_t width, uint32_t height, const DescriptorPool& descriptorPool);
 
     glm::mat4 getModelMatrix() const { return m_modelMatrix; }
     glm::vec3 getTranslationVecor() const { return glm::vec3(m_modelMatrix[3][0], m_modelMatrix[3][1], m_modelMatrix[3][2]); }
     std::string getName() const { return m_name; }
+    uint32_t getVertexCount() const { return m_vertexCount; }
 
     bool getDescriptorSet(VkDescriptorSet& outDescriptorSet) const;
 

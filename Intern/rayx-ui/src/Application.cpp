@@ -10,10 +10,12 @@
 #include "FrameInfo.h"
 #include "GraphicsCore/Renderer.h"
 #include "GraphicsCore/Window.h"
+#include "Plotting.h"
 #include "RenderObject.h"
 #include "RenderSystem/GridRenderSystem.h"
 #include "RenderSystem/ObjectRenderSystem.h"
 #include "RenderSystem/RayRenderSystem.h"
+#include "Triangulation/GeometryUtils.h"
 #include "UserInput.h"
 #include "Writer/CSVWriter.h"
 #include "Writer/H5Writer.h"
@@ -116,9 +118,8 @@ void Application::run() {
             currentTime = newTime;
 
             // Update UI and camera
-            uiRenderSystem.setupUI(uiParams, rObjects);
+            uiRenderSystem.setupUI(uiParams, rObjects);  // TODO(Jannis): Rename
             if (uiParams.pathChanged) {
-                vkDeviceWaitIdle(m_Device.device());
                 std::vector<RAYX::OpticalElement> elements = RAYX::importBeamline(uiParams.rmlPath.string()).m_OpticalElements;
                 // Triangulate the render data and update the scene
 
@@ -128,9 +129,6 @@ void Application::run() {
                                     .addPoolSize(VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, (uint32_t)elements.size())
                                     .setMaxSets((uint32_t)elements.size())
                                     .build();
-                for (auto& rObj : rObjects) {
-                    rObj.updateTexture(canonicalizeRepositoryPath("Intern/rayx-ui/res/textures/feels-good-man.jpg"), *m_TexturePool);
-                }
 
                 setLayouts = {globalSetLayout->getDescriptorSetLayout(), texSetLayout->getDescriptorSetLayout()};
                 objectRenderSystem.rebuild(m_Renderer.getSwapChainRenderPass(), setLayouts);
@@ -139,6 +137,41 @@ void Application::run() {
                 uiParams.pathChanged = false;
                 camController.lookAtPoint(rObjects[0].getTranslationVecor());
                 uiParams.rayInfo.raysChanged = true;
+
+                for (auto i = 0; i < elements.size(); i++) {
+                    if (rObjects[i].getVertexCount() == 4) {
+                        auto [width, height] = getRectangularDimensions(elements[i].m_element.m_cutout);
+
+                        auto raysOfElement = [&](uint32_t elementIdx) {
+                            std::vector<RAYX::Ray> rays;
+                            for (auto& ray : m_rays) {
+                                if (ray.size() > elementIdx) {
+                                    rays.push_back(ray[elementIdx]);
+                                }
+                            }
+                            return rays;
+                        };
+                        std::vector<std::vector<uint32_t>> footprint =
+                            makeFootprint(raysOfElement(i), -width / 2, width / 2, -height / 2, height / 2, (uint32_t)(width), (uint32_t)(height));
+
+                        std::string filename = "footprint_" + std::to_string(i) + ".png";
+                        writeFootprintAsPNG(footprint, filename.c_str());
+                        uint32_t sum = 0;
+                        for (auto row : footprint) {
+                            for (auto cell : row) {
+                                sum += cell;
+                            }
+                        }
+                        RAYX_LOG << "Sum of footprint: " << sum;
+
+                        uint32_t tmpWidth, tmpHeight;
+                        unsigned char* data = footprintAsImage(footprint, tmpWidth, tmpHeight);
+                        rObjects[i].updateTexture(data, tmpWidth, tmpHeight, *m_TexturePool);
+                    } else {
+                        // white.png
+                        rObjects[i].updateTexture(canonicalizeRepositoryPath("Intern/rayx-ui/res/textures/white.png"), *m_TexturePool);
+                    }
+                }
             }
 
             if (uiParams.rayInfo.raysChanged) {
@@ -149,6 +182,7 @@ void Application::run() {
                 if (uiParams.rayInfo.displayRays) {
                     updateRays(uiParams.rmlPath.string(), rayCache, rayObj, rays, uiParams.rayInfo);
                 } else {
+                    vkDeviceWaitIdle(m_Device.device());
                     rayObj.reset();
                 }
                 uiParams.rayInfo.raysChanged = false;
@@ -179,22 +213,32 @@ void Application::run() {
     vkDeviceWaitIdle(m_Device.device());
 }
 
-void Application::createRayCache(const std::string& path, BundleHistory& rayCache, UIRayInfo& rayInfo) {
+void Application::loadBeamline(const std::string& rmlPath) {
+    vkDeviceWaitIdle(m_Device.device());
+    m_Beamline = RAYX::importBeamline(rmlPath);
+}
+
+void Application::loadRays(const std::string& rmlPath) {
+    vkDeviceWaitIdle(m_Device.device());
 #ifndef NO_H5
-    std::string rayFilePath = path.substr(0, path.size() - 4) + ".h5";
-    RAYX::BundleHistory bundleHist = raysFromH5(rayFilePath, FULL_FORMAT);
+    std::string rayFilePath = rmlPath.substr(0, rmlPath.size() - 4) + ".h5";
+    m_rays = raysFromH5(rayFilePath, FULL_FORMAT);
 #else
     std::string rayFilePath = path.substr(0, path.size() - 4) + ".csv";
-    RAYX::BundleHistory bundleHist = loadCSV(rayFilePath);
+    m_rays = loadCSV(rayFilePath);
 #endif
-    rayInfo.maxAmountOfRays = (int)bundleHist.size();
+}
+
+void Application::createRayCache(const std::string& path, BundleHistory& rayCache, UIRayInfo& rayInfo) {
+    loadRays(path);
+    rayInfo.maxAmountOfRays = (int)m_rays.size();
     if (rayInfo.renderAllRays) {
-        rayCache = bundleHist;
+        rayCache = m_rays;
         return;
     }
-    const size_t m = getMaxEvents(bundleHist);
+    const size_t m = getMaxEvents(m_rays);
 
-    std::vector<size_t> indices(bundleHist.size());
+    std::vector<size_t> indices(m_rays.size());
     std::iota(indices.begin(), indices.end(), 0);  // Filling indices with 0, 1, 2, ..., n-1
 
     // Randomly shuffling the indices
@@ -209,7 +253,7 @@ void Application::createRayCache(const std::string& path, BundleHistory& rayCach
         size_t count = 0;
         for (size_t rayIdx : indices) {
             if (count >= MAX_RAYS) break;
-            if (bundleHist[rayIdx].size() > eventIdx) {
+            if (m_rays[rayIdx].size() > eventIdx) {
                 selectedIndices.insert(rayIdx);
                 count++;
             }
@@ -220,7 +264,7 @@ void Application::createRayCache(const std::string& path, BundleHistory& rayCach
     // Now selectedIndices contains unique indices of rays
     // Creating rayCache object from selected indices
     for (size_t idx : selectedIndices) {
-        rayCache.push_back(bundleHist[idx]);
+        rayCache.push_back(m_rays[idx]);
     }
 
     rayInfo.maxAmountOfRays = (int)rayCache.size();
@@ -228,11 +272,11 @@ void Application::createRayCache(const std::string& path, BundleHistory& rayCach
 
 void Application::updateRays(const std::string& path, BundleHistory& rayCache, std::optional<RenderObject>& rayObj, std::vector<Line>& rays,
                              UIRayInfo& rayInfo) {
-    RAYX::Beamline beamline = RAYX::importBeamline(path);
+    loadBeamline(path);
     if (!rayInfo.renderAllRays) {
-        rays = getRays(rayCache, beamline.m_OpticalElements, kMeansFilter, rayInfo.amountOfRays);
+        rays = getRays(rayCache, m_Beamline.m_OpticalElements, kMeansFilter, rayInfo.amountOfRays);
     } else {
-        rays = getRays(rayCache, beamline.m_OpticalElements, noFilter, rayInfo.maxAmountOfRays);
+        rays = getRays(rayCache, m_Beamline.m_OpticalElements, noFilter, rayInfo.maxAmountOfRays);
     }
     if (!rays.empty()) {
         // Temporarily aggregate all vertices, then create a single RenderObject

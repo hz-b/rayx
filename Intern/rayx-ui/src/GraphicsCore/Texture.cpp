@@ -15,33 +15,11 @@ Texture::Texture(Device& device, const std::filesystem::path& path) : m_Device{d
         RAYX_ERR << "Failed to load texture image";
     }
 
-    // Create staging buffer
-    m_stagingBuffer =
-        std::make_unique<Buffer>(m_Device, "textureStagingBuffer", STBI_rgb_alpha, texWidth * texHeight, VK_BUFFER_USAGE_TRANSFER_SRC_BIT,
-                                 VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT);
-    m_stagingBuffer->map();
-    m_stagingBuffer->writeToBuffer(pixels);
-    m_stagingBuffer->unmap();
+    init(pixels, static_cast<uint32_t>(texWidth), static_cast<uint32_t>(texHeight));
     stbi_image_free(pixels);
-
-    constexpr VkFormat format = VK_FORMAT_R8G8B8A8_SRGB;
-    createImage(texWidth, texHeight, format, VK_IMAGE_TILING_OPTIMAL, VK_IMAGE_USAGE_TRANSFER_DST_BIT | VK_IMAGE_USAGE_SAMPLED_BIT,
-                VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT);
-
-    // Prepare for buffer to image copy
-    transitionImageLayout(m_textureImage, VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL);
-    copyBufferToImage(m_stagingBuffer->getBuffer(), m_textureImage, static_cast<uint32_t>(texWidth), static_cast<uint32_t>(texHeight));
-    // Prepare for reading from shader
-    transitionImageLayout(m_textureImage, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
-
-    createImageView(format);
-    createTextureSampler();
-
-    m_imageInfo = std::make_shared<VkDescriptorImageInfo>();
-    m_imageInfo->imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
-    m_imageInfo->imageView = m_textureImageView;
-    m_imageInfo->sampler = m_textureSampler;
 }
+
+Texture::Texture(Device& device, const unsigned char* data, uint32_t width, uint32_t height) : m_Device{device} { init(data, width, height); }
 
 Texture::Texture(Texture&& other) noexcept
     : m_Device(other.m_Device),
@@ -88,6 +66,33 @@ Texture& Texture::operator=(Texture&& other) noexcept {
 }
 
 Texture::~Texture() { cleanup(); }
+
+void Texture::init(const unsigned char* data, uint32_t width, uint32_t height) {
+    // Create staging buffer
+    m_stagingBuffer = std::make_unique<Buffer>(m_Device, "textureStagingBuffer", STBI_rgb_alpha, width * height, VK_BUFFER_USAGE_TRANSFER_SRC_BIT,
+                                               VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT);
+    m_stagingBuffer->map();
+    m_stagingBuffer->writeToBuffer(data);
+    m_stagingBuffer->unmap();
+
+    constexpr VkFormat format = VK_FORMAT_R8G8B8A8_UNORM;
+    createImage(width, height, format, VK_IMAGE_TILING_OPTIMAL, VK_IMAGE_USAGE_TRANSFER_DST_BIT | VK_IMAGE_USAGE_SAMPLED_BIT,
+                VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT);
+
+    // Prepare for buffer to image copy
+    transitionImageLayout(m_textureImage, VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL);
+    copyBufferToImage(m_stagingBuffer->getBuffer(), m_textureImage, static_cast<uint32_t>(width), static_cast<uint32_t>(height));
+    // Prepare for reading from shader
+    transitionImageLayout(m_textureImage, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
+
+    createImageView(format);
+    createTextureSampler();
+
+    m_imageInfo = std::make_shared<VkDescriptorImageInfo>();
+    m_imageInfo->imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
+    m_imageInfo->imageView = m_textureImageView;
+    m_imageInfo->sampler = m_textureSampler;
+}
 
 void Texture::createImage(uint32_t width, uint32_t height, VkFormat format, VkImageTiling tiling, VkImageUsageFlags usage,
                           VkMemoryPropertyFlags properties) {
@@ -219,8 +224,8 @@ void Texture::createImageView(VkFormat format) {
 void Texture::createTextureSampler() {
     VkSamplerCreateInfo samplerInfo{};
     samplerInfo.sType = VK_STRUCTURE_TYPE_SAMPLER_CREATE_INFO;
-    samplerInfo.magFilter = VK_FILTER_LINEAR;
-    samplerInfo.minFilter = VK_FILTER_LINEAR;
+    samplerInfo.magFilter = VK_FILTER_NEAREST;
+    samplerInfo.minFilter = VK_FILTER_NEAREST;
     samplerInfo.addressModeU = VK_SAMPLER_ADDRESS_MODE_REPEAT;
     samplerInfo.addressModeV = VK_SAMPLER_ADDRESS_MODE_REPEAT;
     samplerInfo.addressModeW = VK_SAMPLER_ADDRESS_MODE_REPEAT;

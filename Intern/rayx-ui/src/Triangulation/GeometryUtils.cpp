@@ -81,3 +81,39 @@ std::vector<std::vector<double>> calculateDistanceMatrix(const std::vector<Verte
 
     return distanceMatrix;
 }
+
+/**
+ * Given a Cutout object, this function calculates and returns the width and
+ * length depending on the cutout's type (rectangle, ellipse, trapezoid, etc.).
+ */
+std::pair<double, double> getRectangularDimensions(const Cutout& cutout) {
+    double width = 0.0;
+    double length = 0.0;
+
+    switch (static_cast<int>(cutout.m_type)) {
+        case CTYPE_RECT: {
+            RectCutout rect = deserializeRect(cutout);
+            width = rect.m_width;
+            length = rect.m_length;
+            break;
+        }
+        case CTYPE_ELLIPTICAL: {
+            EllipticalCutout ell = deserializeElliptical(cutout);
+            width = ell.m_diameter_x;   // Diameter is essentially the max width
+            length = ell.m_diameter_z;  // Diameter is the max length
+            break;
+        }
+        case CTYPE_TRAPEZOID: {
+            TrapezoidCutout trap = deserializeTrapezoid(cutout);
+            width = std::max(trap.m_widthA, trap.m_widthB);  // max of the two sides
+            length = trap.m_length;
+            break;
+        }
+        default: {  // CTYPE_UNLIMITED and unknown types
+            return {50.0, 50.0};
+            break;
+        }
+    }
+
+    return {width, length};
+}

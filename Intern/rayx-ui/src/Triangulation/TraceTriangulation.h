@@ -28,13 +28,6 @@ void traceTriangulation(const RAYX::OpticalElement& element, std::vector<Vertex>
 // ------ Helper functions ------
 
 /**
- * @brief Returns the dimensions (width and length) for various types of cutouts.
- * @param cutout Reference to the Cutout object.
- * @return A pair containing width and length as double values.
- */
-std::pair<double, double> getRectangularDimensions(const Cutout& cutout);
-
-/**
  * @brief Creates a 2D grid of rays to be used for ray tracing.
  * @param size Grid size along one dimension.
  * @param width Total grid width.

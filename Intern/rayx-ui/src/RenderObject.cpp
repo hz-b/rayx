@@ -97,6 +97,25 @@ void RenderObject::updateTexture(const std::filesystem::path& path, const Descri
     m_descrSetTexture = DescriptorSetTexture{descrSet, std::move(tex)};
 }
 
+void RenderObject::updateTexture(const unsigned char* data, uint32_t width, uint32_t height, const DescriptorPool& descriptorPool) {
+    if (m_setLayout == nullptr) RAYX_ERR << "Render objects descriptor set layout not initialized";
+    if (data == nullptr) RAYX_ERR << "Texture data is null";
+
+    Texture tex(m_Device, data, width, height);
+
+    std::shared_ptr<VkDescriptorImageInfo> descrInfo = tex.descriptorInfo();
+
+    DescriptorWriter writer(*m_setLayout, descriptorPool);
+    writer.writeImage(0, descrInfo.get());
+
+    VkDescriptorSet descrSet;
+    if (!writer.build(descrSet)) {
+        RAYX_ERR << "Failed to build descriptor set for texture";
+    }
+
+    m_descrSetTexture = DescriptorSetTexture{descrSet, std::move(tex)};
+}
+
 bool RenderObject::getDescriptorSet(VkDescriptorSet& outDescriptorSet) const {
     if (m_descrSetTexture) {
         assert(m_descrSetTexture->descrSet != VK_NULL_HANDLE && "Descriptor set not initialized");
