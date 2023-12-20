@@ -5,7 +5,8 @@
 #include "Triangulation/Triangulate.h"
 
 std::vector<RenderObject> RenderObject::buildRObjectsFromElements(Device& device, const std::vector<RAYX::OpticalElement>& elements,
-                                                                  std::shared_ptr<DescriptorSetLayout> setLayout) {
+                                                                  std::shared_ptr<DescriptorSetLayout> setLayout,
+                                                                  std::shared_ptr<DescriptorPool> descriptorPool) {
     std::vector<RenderObject> rObjects;
 
     for (const RAYX::OpticalElement& element : elements) {
@@ -16,7 +17,7 @@ std::vector<RenderObject> RenderObject::buildRObjectsFromElements(Device& device
 
         glm::mat4 modelMatrix = element.m_element.m_outTrans;
 
-        rObjects.emplace_back(element.m_name, device, modelMatrix, vertices, indices, setLayout);
+        rObjects.emplace_back(element.m_name, device, modelMatrix, vertices, indices, setLayout, descriptorPool);
     }
 
     std::cout << "Triangulation complete" << std::endl;
@@ -27,16 +28,25 @@ std::vector<RenderObject> RenderObject::buildRObjectsFromElements(Device& device
  * Constructor sets up vertex and index buffers based on the input parameters.
  */
 RenderObject::RenderObject(std::string name, Device& device, glm::mat4 modelMatrix, std::vector<Vertex>& vertices, std::vector<uint32_t>& indices,
-                           std::shared_ptr<DescriptorSetLayout> setLayout)
-    : m_name(name), m_Device(device), m_modelMatrix(modelMatrix), m_setLayout(setLayout) {
+                           std::shared_ptr<DescriptorSetLayout> setLayout, std::shared_ptr<DescriptorPool> descriptorPool)
+    : m_name(name), m_Device(device), m_modelMatrix(modelMatrix), m_setLayout(setLayout), m_Texture(m_Device), m_descriptorPool(descriptorPool) {
+    assert(vertices.size() > 0 && "Cannot create render object with no vertices");
+    assert(indices.size() > 0 && "Cannot create render object with no indices");
+    if (m_setLayout == nullptr) RAYX_ERR << "Render objects descriptor set layout not initialized";
+    if (m_descriptorPool == nullptr) RAYX_ERR << "Render objects descriptor pool not initialized";
+
     createVertexBuffers(vertices);
     createIndexBuffers(indices);
+    createDescriptorSet();
+    m_isTextured = false;
 }
 
 RenderObject::RenderObject(RenderObject&& other) noexcept
     : m_name(std::move(other.m_name)),
       m_Device(other.m_Device),
-      m_descrSetTexture(std::move(other.m_descrSetTexture)),
+      m_isTextured(other.m_isTextured),
+      m_descrSet(other.m_descrSet),
+      m_Texture(std::move(other.m_Texture)),
       m_modelMatrix(other.m_modelMatrix),
       m_vertexCount(other.m_vertexCount),
       m_indexCount(other.m_indexCount),
@@ -55,7 +65,9 @@ RenderObject& RenderObject::operator=(RenderObject&& other) noexcept {
         }
 
         m_name = std::move(other.m_name);
-        m_descrSetTexture = std::move(other.m_descrSetTexture);
+        m_isTextured = other.m_isTextured;
+        m_descrSet = other.m_descrSet;
+        m_Texture = std::move(other.m_Texture);
         m_modelMatrix = other.m_modelMatrix;
         m_vertexCount = other.m_vertexCount;
         m_indexCount = other.m_indexCount;
@@ -77,53 +89,23 @@ void RenderObject::draw(VkCommandBuffer commandBuffer) const {
     vkCmdDrawIndexed(commandBuffer, m_indexCount, 1, 0, 0, 0);  //
 }
 
-void RenderObject::updateTexture(const std::filesystem::path& path, const DescriptorPool& descriptorPool) {
+void RenderObject::updateTexture(const std::filesystem::path& path) {
     if (m_setLayout == nullptr) {
         RAYX_ERR << "Render objects descriptor set layout not initialized";
     }
 
-    Texture tex(m_Device, path);
+    m_Texture = std::move(Texture(m_Device, path));
 
-    std::shared_ptr<VkDescriptorImageInfo> descrInfo = tex.descriptorInfo();
-
-    DescriptorWriter writer(*m_setLayout, descriptorPool);
-    writer.writeImage(0, descrInfo.get());
-
-    VkDescriptorSet descrSet;
-    if (!writer.build(descrSet)) {
-        RAYX_ERR << "Failed to build descriptor set for texture";
-    }
-
-    m_descrSetTexture = DescriptorSetTexture{descrSet, std::move(tex)};
+    createDescriptorSet();
 }
 
-void RenderObject::updateTexture(const unsigned char* data, uint32_t width, uint32_t height, const DescriptorPool& descriptorPool) {
+void RenderObject::updateTexture(const unsigned char* data, uint32_t width, uint32_t height) {
     if (m_setLayout == nullptr) RAYX_ERR << "Render objects descriptor set layout not initialized";
     if (data == nullptr) RAYX_ERR << "Texture data is null";
 
-    Texture tex(m_Device, data, width, height);
+    m_Texture = std::move(Texture(m_Device, data, width, height));
 
-    std::shared_ptr<VkDescriptorImageInfo> descrInfo = tex.descriptorInfo();
-
-    DescriptorWriter writer(*m_setLayout, descriptorPool);
-    writer.writeImage(0, descrInfo.get());
-
-    VkDescriptorSet descrSet;
-    if (!writer.build(descrSet)) {
-        RAYX_ERR << "Failed to build descriptor set for texture";
-    }
-
-    m_descrSetTexture = DescriptorSetTexture{descrSet, std::move(tex)};
-}
-
-bool RenderObject::getDescriptorSet(VkDescriptorSet& outDescriptorSet) const {
-    if (m_descrSetTexture) {
-        assert(m_descrSetTexture->descrSet != VK_NULL_HANDLE && "Descriptor set not initialized");
-        outDescriptorSet = m_descrSetTexture->descrSet;
-        return true;
-    } else {
-        return false;
-    }
+    createDescriptorSet();
 }
 
 void RenderObject::createVertexBuffers(const std::vector<Vertex>& vertices) {
@@ -142,4 +124,15 @@ void RenderObject::createIndexBuffers(const std::vector<uint32_t>& indices) {
                                              VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT);
     m_indexBuffer->map();
     m_indexBuffer->writeToBuffer(indices.data());
+}
+
+void RenderObject::createDescriptorSet() {
+    std::shared_ptr<VkDescriptorImageInfo> descrInfo = m_Texture.descriptorInfo();
+
+    DescriptorWriter writer(*m_setLayout, *m_descriptorPool);
+    writer.writeImage(0, descrInfo.get());
+
+    if (!writer.build(m_descrSet)) {
+        RAYX_ERR << "Failed to build descriptor set for texture";
+    }
 }

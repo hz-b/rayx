@@ -44,7 +44,7 @@ class DescriptorPool {
         Builder& addPoolSize(VkDescriptorType descriptorType, uint32_t count);
         Builder& setPoolFlags(VkDescriptorPoolCreateFlags flags);
         Builder& setMaxSets(uint32_t count);
-        std::unique_ptr<DescriptorPool> build() const;
+        std::shared_ptr<DescriptorPool> build() const;
 
       private:
         Device& m_Device;

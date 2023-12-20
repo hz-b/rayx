@@ -49,8 +49,8 @@ class Application {
     // --- Order doesn't matter ---
     RAYX::BundleHistory m_rays;                                       ///< All rays loaded from file
     RAYX::Beamline m_Beamline;                                        ///< Beamline loaded from file
-    std::unique_ptr<DescriptorPool> m_GlobalDescriptorPool{nullptr};  ///< General descriptor pool
-    std::unique_ptr<DescriptorPool> m_TexturePool{nullptr};           ///< Descriptor pool for textures
+    std::shared_ptr<DescriptorPool> m_GlobalDescriptorPool{nullptr};  ///< General descriptor pool
+    std::shared_ptr<DescriptorPool> m_TexturePool{nullptr};           ///< Descriptor pool for textures
 
     void loadBeamline(const std::string& rmlPath);
     void loadRays(const std::string& rmlPath);

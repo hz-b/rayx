@@ -4,6 +4,7 @@
 #include <stb_image.h>
 
 #include "Buffer.h"
+#include "CanonicalizePath.h"
 
 Texture::Texture(Device& device, const std::filesystem::path& path) : m_Device{device} {
     // Read in image
@@ -20,6 +21,21 @@ Texture::Texture(Device& device, const std::filesystem::path& path) : m_Device{d
 }
 
 Texture::Texture(Device& device, const unsigned char* data, uint32_t width, uint32_t height) : m_Device{device} { init(data, width, height); }
+
+Texture::Texture(Device& device) : m_Device{device} {
+    // Read in image
+    int texWidth, texHeight, texChannels;  // Do not use texChannels for memory stuff (not always 4 for rgba images)
+    RAYX_LOG << "Loading default texture";
+    // STBI_rgb_alpha hopefully always forces 4 channels
+    std::filesystem::path path = RAYX::canonicalizeRepositoryPath("Intern/rayx-ui/res/textures/default.png");
+    stbi_uc* pixels = stbi_load(path.string().c_str(), &texWidth, &texHeight, &texChannels, STBI_rgb_alpha);
+    if (!pixels) {
+        RAYX_ERR << "Failed to load texture image";
+    }
+
+    init(pixels, static_cast<uint32_t>(texWidth), static_cast<uint32_t>(texHeight));
+    stbi_image_free(pixels);
+}
 
 Texture::Texture(Texture&& other) noexcept
     : m_Device(other.m_Device),
@@ -75,7 +91,7 @@ void Texture::init(const unsigned char* data, uint32_t width, uint32_t height) {
     m_stagingBuffer->writeToBuffer(data);
     m_stagingBuffer->unmap();
 
-    constexpr VkFormat format = VK_FORMAT_R8G8B8A8_UNORM;
+    constexpr VkFormat format = VK_FORMAT_R8G8B8A8_UNORM;  // 4 channels expected
     createImage(width, height, format, VK_IMAGE_TILING_OPTIMAL, VK_IMAGE_USAGE_TRANSFER_DST_BIT | VK_IMAGE_USAGE_SAMPLED_BIT,
                 VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT);
 

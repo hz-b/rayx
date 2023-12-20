@@ -19,10 +19,6 @@ struct Line {
     Vertex v1;
     Vertex v2;
 };
-struct DescriptorSetTexture {
-    VkDescriptorSet descrSet;
-    Texture tex;
-};
 
 /**
  * @class RenderObject
@@ -42,11 +38,15 @@ class RenderObject {
      * @param indices Vector of index values.
      */
     RenderObject(std::string name, Device& device, glm::mat4 modelMatrix, std::vector<Vertex>& vertices, std::vector<uint32_t>& indices,
-                 std::shared_ptr<DescriptorSetLayout> setLayout);
+                 std::shared_ptr<DescriptorSetLayout> setLayout, std::shared_ptr<DescriptorPool> descriptorPool);
     RenderObject(const RenderObject&) = delete;
     RenderObject& operator=(const RenderObject&) = delete;
     RenderObject(RenderObject&& other) noexcept;
     RenderObject& operator=(RenderObject&& other) noexcept;
+
+    static std::vector<RenderObject> buildRObjectsFromElements(Device& device, const std::vector<RAYX::OpticalElement>& elements,
+                                                               std::shared_ptr<DescriptorSetLayout> setLayout,
+                                                               std::shared_ptr<DescriptorPool> descriptorPool);
 
     /**
      * @brief Binds the object's vertex and index buffers to a Vulkan command buffer.
@@ -60,27 +60,29 @@ class RenderObject {
      */
     void draw(VkCommandBuffer commandBuffer) const;
 
-    void updateTexture(const std::filesystem::path& path, const DescriptorPool& descriptorPool);
-    void updateTexture(const unsigned char* data, uint32_t width, uint32_t height, const DescriptorPool& descriptorPool);
+    void updateTexture(const std::filesystem::path& path);
+    void updateTexture(const unsigned char* data, uint32_t width, uint32_t height);
 
     glm::mat4 getModelMatrix() const { return m_modelMatrix; }
     glm::vec3 getTranslationVecor() const { return glm::vec3(m_modelMatrix[3][0], m_modelMatrix[3][1], m_modelMatrix[3][2]); }
     std::string getName() const { return m_name; }
     uint32_t getVertexCount() const { return m_vertexCount; }
-
-    bool getDescriptorSet(VkDescriptorSet& outDescriptorSet) const;
-
-    static std::vector<RenderObject> buildRObjectsFromElements(Device& device, const std::vector<RAYX::OpticalElement>& elements,
-                                                               std::shared_ptr<DescriptorSetLayout> setLayout);
+    bool getIsTextured() const { return m_isTextured; }
+    VkDescriptorSet getDescriptorSet() const { return m_descrSet; }
 
   private:
     void createVertexBuffers(const std::vector<Vertex>& vertices);
     void createIndexBuffers(const std::vector<uint32_t>& indices);
+    void createDescriptorSet();
 
     std::string m_name;
     Device& m_Device;
     std::shared_ptr<DescriptorSetLayout> m_setLayout;
-    std::optional<DescriptorSetTexture> m_descrSetTexture;
+
+    std::shared_ptr<DescriptorPool> m_descriptorPool;
+    bool m_isTextured;
+    Texture m_Texture;
+    VkDescriptorSet m_descrSet;
 
     uint32_t m_vertexCount;
     uint32_t m_indexCount;

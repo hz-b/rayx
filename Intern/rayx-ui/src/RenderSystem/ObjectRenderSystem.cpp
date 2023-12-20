@@ -7,6 +7,7 @@
 // Keeping this here so it is easy to add push constants later
 struct PushConstantData {
     glm::mat4 modelMatrix{1.f};
+    bool isTextured{false};
 };
 
 ObjectRenderSystem::ObjectRenderSystem(Device& device, VkRenderPass renderPass, const std::vector<VkDescriptorSetLayout>& setLayouts)
@@ -60,13 +61,12 @@ void ObjectRenderSystem::render(FrameInfo& frameInfo, const std::vector<RenderOb
     vkCmdBindDescriptorSets(frameInfo.commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, m_PipelineLayout, 0, 1, &frameInfo.descriptorSet, 0, nullptr);
 
     for (const RenderObject& obj : objects) {
-        VkDescriptorSet objDescrSet;
-        if (obj.getDescriptorSet(objDescrSet)) {
-            vkCmdBindDescriptorSets(frameInfo.commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, m_PipelineLayout, 1, 1, &objDescrSet, 0, nullptr);
-        }
+        VkDescriptorSet objDescrSet = obj.getDescriptorSet();
+        vkCmdBindDescriptorSets(frameInfo.commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, m_PipelineLayout, 1, 1, &objDescrSet, 0, nullptr);
 
         PushConstantData push{};
         push.modelMatrix = obj.getModelMatrix();
+        push.isTextured = obj.getIsTextured();
 
         vkCmdPushConstants(frameInfo.commandBuffer, m_PipelineLayout, VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT, 0,
                            sizeof(PushConstantData), &push);

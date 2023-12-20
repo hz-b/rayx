@@ -5,6 +5,10 @@
 #include <array>
 #include <glm/glm.hpp>
 
+/* TODO(Jannis): Divide normal and textured vertices into separate structs so rays don't need to have texture coordinates.
+ *               This would allow cleaning up the ray shader.
+ */
+
 /**
  * @struct Vertex
  * @brief A structure representing a Vertex in 3D space with additional color information.

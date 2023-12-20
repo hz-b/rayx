@@ -56,8 +56,8 @@ DescriptorPool::Builder& DescriptorPool::Builder::setMaxSets(uint32_t count) {
     return *this;
 }
 
-std::unique_ptr<DescriptorPool> DescriptorPool::Builder::build() const {
-    return std::make_unique<DescriptorPool>(m_Device, m_maxSets, m_PoolFlags, m_poolSizes);
+std::shared_ptr<DescriptorPool> DescriptorPool::Builder::build() const {
+    return std::make_shared<DescriptorPool>(m_Device, m_maxSets, m_PoolFlags, m_poolSizes);
 }
 
 // *************** Descriptor Pool *********************

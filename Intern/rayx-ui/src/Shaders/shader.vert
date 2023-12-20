@@ -3,6 +3,7 @@
 // Push constants
 layout(push_constant) uniform PushConstants {
     mat4 model;
+    bool isTextured;
 } push;
 
 layout(set = 0, binding = 0) uniform Camera {
@@ -23,5 +24,7 @@ layout(location = 1) out vec2 fragTexCoord;
 void main() {
     gl_Position = cam.proj * cam.view * push.model * inPosition;
     fragColor = inColor;
-    fragTexCoord = inTexCoord;
+    if (push.isTextured) {
+        fragTexCoord = inTexCoord;
+    }
 }

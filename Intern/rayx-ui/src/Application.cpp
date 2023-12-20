@@ -122,13 +122,12 @@ void Application::run() {
             if (uiParams.pathChanged) {
                 std::vector<RAYX::OpticalElement> elements = RAYX::importBeamline(uiParams.rmlPath.string()).m_OpticalElements;
                 // Triangulate the render data and update the scene
-
-                rObjects = RenderObject::buildRObjectsFromElements(m_Device, elements, texSetLayout);
-
                 m_TexturePool = DescriptorPool::Builder(m_Device)
                                     .addPoolSize(VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, (uint32_t)elements.size())
                                     .setMaxSets((uint32_t)elements.size())
                                     .build();
+
+                rObjects = RenderObject::buildRObjectsFromElements(m_Device, elements, texSetLayout, m_TexturePool);
 
                 setLayouts = {globalSetLayout->getDescriptorSetLayout(), texSetLayout->getDescriptorSetLayout()};
                 objectRenderSystem.rebuild(m_Renderer.getSwapChainRenderPass(), setLayouts);
@@ -166,10 +165,7 @@ void Application::run() {
 
                         uint32_t tmpWidth, tmpHeight;
                         unsigned char* data = footprintAsImage(footprint, tmpWidth, tmpHeight);
-                        rObjects[i].updateTexture(data, tmpWidth, tmpHeight, *m_TexturePool);
-                    } else {
-                        // white.png
-                        rObjects[i].updateTexture(canonicalizeRepositoryPath("Intern/rayx-ui/res/textures/white.png"), *m_TexturePool);
+                        rObjects[i].updateTexture(data, tmpWidth, tmpHeight);
                     }
                 }
             }
