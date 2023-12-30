@@ -20,10 +20,10 @@
 
 // --------- Start of Application code --------- //
 Application::Application(uint32_t width, uint32_t height, const char* name, int argc, char** argv)
-    : m_Window(width, height, name),   //
-      m_Device(m_Window),              //
-      m_Renderer(m_Window, m_Device),  //
-      m_CommandParser(argc, argv)      //
+    : m_Window(width, height, name),                          //
+      m_CommandParser(argc, argv),                            //
+      m_Device(m_Window, m_CommandParser.m_args.m_deviceID),  //
+      m_Renderer(m_Window, m_Device)                          //
 {
     m_DescriptorPool = DescriptorPool::Builder(m_Device)
                            .addPoolSize(VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, SwapChain::MAX_FRAMES_IN_FLIGHT)

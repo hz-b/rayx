@@ -41,10 +41,10 @@ class Application {
 
   private:
     // --- Order matters ---
-    Window m_Window;      // Application window
+    Window m_Window;  // Application window
+    CommandParser m_CommandParser;
     Device m_Device;      // Vulkan device
     Renderer m_Renderer;  // Vulkan renderer
-    CommandParser m_CommandParser;
 
     std::unique_ptr<DescriptorPool> m_DescriptorPool{nullptr};
 

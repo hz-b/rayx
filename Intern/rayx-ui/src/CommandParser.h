@@ -23,11 +23,12 @@ class CommandParser {
     // Set options in .cpp file
     struct Args {
         std::string m_providedFile;  // -i (Input)
+        std::optional<int> m_deviceID;
     } m_args;
 
   private:
     int m_cli11_return;
-    enum OptionType { BOOL, INT, STRING, BOOL_STRING };
+    enum OptionType { BOOL, INT, STRING, BOOL_STRING, OPTIONAL_INT };
     struct Options {
         // CLI::Option cli11_option;
         const OptionType type;
@@ -39,5 +40,6 @@ class CommandParser {
     // this can also be done with app.get_option()
     std::unordered_map<char, Options> m_ParserCommands = {
         {'i', {OptionType::STRING, "input", "Input RML File or Directory.", &(m_args.m_providedFile)}},
+        {'d', {OptionType::OPTIONAL_INT, "device", "Device ID.", &(m_args.m_deviceID)}},
     };
 };

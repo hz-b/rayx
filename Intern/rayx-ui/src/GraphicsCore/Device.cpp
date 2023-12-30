@@ -32,11 +32,11 @@ void DestroyDebugUtilsMessengerEXT(VkInstance instance, VkDebugUtilsMessengerEXT
 }
 
 // class member functions
-Device::Device(Window& window) : m_Window{window} {
+Device::Device(Window& window, std::optional<int> deviceID) : m_Window{window} {
     createInstance();
     setupDebugMessenger();
     createSurface();
-    pickPhysicalDevice();
+    pickPhysicalDevice(deviceID);
     createLogicalDevice();
     createCommandPool();
 }
@@ -93,7 +93,7 @@ void Device::createInstance() {
     hasGflwRequiredInstanceExtensions();
 }
 
-void Device::pickPhysicalDevice() {
+void Device::pickPhysicalDevice(std::optional<unsigned int> deviceID) {
     uint32_t deviceCount = 0;
     vkEnumeratePhysicalDevices(m_Instance, &deviceCount, nullptr);
     if (deviceCount == 0) {
@@ -103,6 +103,18 @@ void Device::pickPhysicalDevice() {
     std::vector<VkPhysicalDevice> devices(deviceCount);
     vkEnumeratePhysicalDevices(m_Instance, &deviceCount, devices.data());
 
+    if (deviceID.has_value()) {
+        if (deviceID.value() >= deviceCount) {
+            RAYX_LOG << "Error: Device with ID " << deviceID.value() << " is not available.";
+        } else {
+            m_PhysicalDevice = devices[deviceID.value()];
+            vkGetPhysicalDeviceProperties(m_PhysicalDevice, &m_Properties);
+            RAYX_LOG << "Selected physical device by ID: " << m_Properties.deviceName;
+            return;
+        }
+    }
+
+    // Fallback: iterate over available devices if specific deviceID not provided or not found
     for (const auto& device : devices) {
         if (isDeviceSuitable(device)) {
             m_PhysicalDevice = device;
@@ -382,7 +394,7 @@ void Device::createBuffer(VkDeviceSize size, VkBufferUsageFlags usage, VkMemoryP
     bufferInfo.usage = usage;
     bufferInfo.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
 
-    if (size == 0){
+    if (size == 0) {
         throw std::runtime_error("Creating empty buffers is not supported!");
     }
 

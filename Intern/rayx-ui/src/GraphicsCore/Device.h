@@ -1,5 +1,6 @@
 #pragma once
 
+#include <optional>
 #include <vector>
 
 #include "Window.h"
@@ -26,7 +27,7 @@ class Device {
     const bool enableValidationLayers = true;
 #endif
 
-    explicit Device(Window& window);
+    explicit Device(Window& window, std::optional<int> deviceIndex = std::nullopt);
     ~Device();
 
     // Not copyable or movable
@@ -61,7 +62,7 @@ class Device {
     void createInstance();
     void setupDebugMessenger();
     void createSurface();
-    void pickPhysicalDevice();
+    void pickPhysicalDevice(std::optional<unsigned int> deviceID);
     void createLogicalDevice();
     void createCommandPool();
 
@@ -87,7 +88,7 @@ class Device {
     VkQueue m_PresentQueue;
 
     VkPhysicalDeviceProperties m_Properties;
-    
+
     const std::vector<const char*> m_validationLayers = {"VK_LAYER_KHRONOS_validation"};
     const std::vector<const char*> m_deviceExtensions = {VK_KHR_SWAPCHAIN_EXTENSION_NAME};
 };
