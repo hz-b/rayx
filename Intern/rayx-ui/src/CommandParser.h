@@ -1,5 +1,6 @@
 #pragma once
 #include <CLI/CLI.hpp>
+#include <optional>
 #include <unordered_map>
 
 class CommandParser {
