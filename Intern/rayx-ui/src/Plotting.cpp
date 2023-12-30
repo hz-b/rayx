@@ -34,11 +34,13 @@ std::vector<std::vector<uint32_t>> makeFootprint(std::vector<RAYX::Ray> rays, do
         double x2 = (x - min_x) / (max_x - min_x);
         double z2 = (z - min_z) / (max_z - min_z);
 
-        // x3 is the x-index in the grid.
-        unsigned int x3 = (unsigned int)(x2 * (double)cells_x);
-        unsigned int z3 = (unsigned int)(z2 * (double)cells_z);
+        assert(x2 >= 0.0 && x2 <= 1.0 && z2 >= 0.0 && z2 <= 1.0);
 
-        if (x3 >= 0 && x3 < cells_x && z3 >= 0 && z3 < cells_z) {
+        // x3 is the x-index in the grid.
+        uint32_t x3 = (uint32_t)(x2 * (double)cells_x);
+        uint32_t z3 = (uint32_t)(z2 * (double)cells_z);
+
+        if (x3 < cells_x && z3 < cells_z) {
             grid[x3][z3]++;
         }
     }

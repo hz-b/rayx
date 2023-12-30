@@ -77,11 +77,13 @@ class RenderObject {
 
     std::string m_name;
     Device& m_Device;
-    std::shared_ptr<DescriptorSetLayout> m_setLayout;
-
-    std::shared_ptr<DescriptorPool> m_descriptorPool;
-    bool m_isTextured;
+    glm::mat4 m_modelMatrix;  ///< Matrix for transforming the object from model to world coordinates
     Texture m_Texture;
+
+    std::shared_ptr<DescriptorSetLayout> m_setLayout;
+    std::shared_ptr<DescriptorPool> m_descriptorPool;
+
+    bool m_isTextured;
     VkDescriptorSet m_descrSet;
 
     uint32_t m_vertexCount;
@@ -89,6 +91,4 @@ class RenderObject {
 
     std::unique_ptr<Buffer> m_vertexBuffer;
     std::unique_ptr<Buffer> m_indexBuffer;
-
-    glm::mat4 m_modelMatrix;  ///< Matrix for transforming the object from model to world coordinates
 };

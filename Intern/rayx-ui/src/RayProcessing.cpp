@@ -83,8 +83,9 @@ std::vector<Line> getRays(const RAYX::BundleHistory& rayCache, const std::vector
                 // We need to convert them to world coordinates
                 glm::vec4 worldPos = elements[(size_t)event.m_lastElement].m_element.m_outTrans * glm::vec4(event.m_position, 1.0f);
 
-                Vertex origin = {{rayLastPos.x, rayLastPos.y, rayLastPos.z, 1.0f}, YELLOW};
-                Vertex point = (event.m_eventType == ETYPE_JUST_HIT_ELEM) ? Vertex(worldPos, ORANGE) : Vertex(worldPos, RED);
+                Vertex origin = {{rayLastPos.x, rayLastPos.y, rayLastPos.z, 1.0f}, YELLOW, {0.0f, 0.0f}};
+                Vertex point =
+                    (event.m_eventType == ETYPE_JUST_HIT_ELEM) ? Vertex(worldPos, ORANGE, {0.0f, 0.0f}) : Vertex(worldPos, RED, {0.0f, 0.0f});
 
                 Line myline = {origin, point};
                 rays.push_back(myline);
@@ -98,8 +99,8 @@ std::vector<Line> getRays(const RAYX::BundleHistory& rayCache, const std::vector
                 glm::vec4 eventDir = glm::vec4(event.m_direction, 0.0f);
                 glm::vec4 pointPos = eventPos + eventDir * 1000.0f;
 
-                Vertex origin = {eventPos, GREY};
-                Vertex point = {pointPos, GREY};
+                Vertex origin = {eventPos, GREY, {0.0f, 0.0f}};
+                Vertex point = {pointPos, GREY, {0.0f, 0.0f}};
 
                 rays.push_back(Line(origin, point));
             } else if (event.m_eventType == ETYPE_NOT_ENOUGH_BOUNCES) {
@@ -108,8 +109,8 @@ std::vector<Line> getRays(const RAYX::BundleHistory& rayCache, const std::vector
                 glm::vec4 worldPos = elements[(size_t)event.m_lastElement].m_element.m_outTrans * glm::vec4(event.m_position, 1.0f);
 
                 const glm::vec4 white = {1.0f, 1.0f, 1.0f, 0.7f};
-                Vertex origin = {{rayLastPos.x, rayLastPos.y, rayLastPos.z, 1.0f}, white};
-                Vertex point = Vertex(worldPos, white);
+                Vertex origin = {{rayLastPos.x, rayLastPos.y, rayLastPos.z, 1.0f}, white, {0.0f, 0.0f}};
+                Vertex point = Vertex(worldPos, white, {0.0f, 0.0f});
 
                 rays.push_back(Line(origin, point));
                 rayLastPos = point.pos;

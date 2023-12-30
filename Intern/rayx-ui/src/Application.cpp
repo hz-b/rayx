@@ -56,10 +56,10 @@ void Application::run() {
         auto bufferInfo = uboBuffers[i]->descriptorInfo();
         DescriptorWriter(*globalSetLayout, *m_GlobalDescriptorPool).writeBuffer(0, &bufferInfo).build(descriptorSets[i]);
     }
-    std::shared_ptr<DescriptorSetLayout> texSetLayout = std::move(                                   //
+    std::shared_ptr<DescriptorSetLayout> texSetLayout =
         DescriptorSetLayout::Builder(m_Device)                                                       //
             .addBinding(0, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, VK_SHADER_STAGE_FRAGMENT_BIT)  //
-            .build());
+            .build();
     std::vector<VkDescriptorSetLayout> setLayouts{globalSetLayout->getDescriptorSetLayout(), texSetLayout->getDescriptorSetLayout()};
 
     // Render systems
@@ -137,7 +137,7 @@ void Application::run() {
                 camController.lookAtPoint(rObjects[0].getTranslationVecor());
                 uiParams.rayInfo.raysChanged = true;
 
-                for (auto i = 0; i < elements.size(); i++) {
+                for (uint32_t i = 0; i < elements.size(); i++) {
                     if (rObjects[i].getVertexCount() == 4) {
                         auto [width, height] = getRectangularDimensions(elements[i].m_element.m_cutout);
 
@@ -220,7 +220,7 @@ void Application::loadRays(const std::string& rmlPath) {
     std::string rayFilePath = rmlPath.substr(0, rmlPath.size() - 4) + ".h5";
     m_rays = raysFromH5(rayFilePath, FULL_FORMAT);
 #else
-    std::string rayFilePath = path.substr(0, path.size() - 4) + ".csv";
+    std::string rayFilePath = rmlPath.substr(0, rmlPath.size() - 4) + ".csv";
     m_rays = loadCSV(rayFilePath);
 #endif
 }
@@ -284,6 +284,6 @@ void Application::updateRays(const std::string& path, BundleHistory& rayCache, s
             rayIndices[i * 2] = i * 2;
             rayIndices[i * 2 + 1] = i * 2 + 1;
         }
-        rayObj.emplace("Rays", m_Device, glm::mat4(1.0f), rayVertices, rayIndices, nullptr);
+        rayObj.emplace("Rays", m_Device, glm::mat4(1.0f), rayVertices, rayIndices, nullptr, nullptr);  // TODO: add descr pool and set
     }
 }

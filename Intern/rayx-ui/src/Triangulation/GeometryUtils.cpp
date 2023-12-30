@@ -60,7 +60,7 @@ void interpolateConvexPolygon(std::vector<Vertex>& polyVertices, uint32_t target
         glm::vec4 interpolatedPosition = glm::mix(polyVertices[lowerIndex].pos, polyVertices[upperIndex].pos, fraction);
         glm::vec4 interpolatedColor = glm::mix(polyVertices[lowerIndex].color, polyVertices[upperIndex].color, fraction);
 
-        interpolatedVertices.push_back({interpolatedPosition, interpolatedColor});
+        interpolatedVertices.push_back({interpolatedPosition, interpolatedColor, {0.0f, 0.0f}});
     }
 
     // Replace the original vertices with the interpolated ones
