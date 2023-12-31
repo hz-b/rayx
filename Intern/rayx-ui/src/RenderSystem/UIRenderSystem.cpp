@@ -151,7 +151,7 @@ UIRenderSystem::~UIRenderSystem() {
  * @param uiParams
  * @param rObjects
  */
-void UIRenderSystem::setupUI(UIParameters& uiParams, std::vector<RenderObject>& rObjects) {
+void UIRenderSystem::setupUI(UIParameters& uiParams, std::vector<RenderObject>& rObjects, std::vector<glm::dvec3>& rSourcePositions) {
     ImGui_ImplVulkan_NewFrame();
     ImGui_ImplGlfw_NewFrame();
     ImGui::NewFrame();
@@ -165,7 +165,7 @@ void UIRenderSystem::setupUI(UIParameters& uiParams, std::vector<RenderObject>& 
     showSceneEditorWindow(uiParams);
     showSettingsWindow();
     showHotkeysWindow();
-    showBeamlineOutlineWindow(uiParams, rObjects);
+    showBeamlineOutlineWindow(uiParams, rObjects, rSourcePositions);
 
     ImGui::PopFont();
 }
@@ -212,7 +212,7 @@ void UIRenderSystem::showSceneEditorWindow(UIParameters& uiParams) {
     uiParams.camController.displaySettings();
     ImGui::Separator();
     if (!uiParams.rmlPath.empty()) {
-        int tempAmountOfRays = uiParams.rayInfo.amountOfRays;
+        size_t tempAmountOfRays = uiParams.rayInfo.amountOfRays;
         bool tempDisplayRays = uiParams.rayInfo.displayRays;
         bool tempRenderAllRays = uiParams.rayInfo.renderAllRays;
         displayFilterSlider(&uiParams.rayInfo.amountOfRays, uiParams.rayInfo.maxAmountOfRays, &uiParams.rayInfo.displayRays,
@@ -262,7 +262,8 @@ void UIRenderSystem::showHotkeysWindow() {
     ImGui::End();
 }
 
-void renderImGuiTree(const UIRenderSystem::TreeNode& treeNode, CameraController& camController, std::vector<RenderObject>& rObjects) {
+void renderImGuiTree(const UIRenderSystem::TreeNode& treeNode, CameraController& camController, std::vector<RenderObject>& rObjects,
+                     std::vector<glm::dvec3>& rSourcePositions) {
     for (auto& child : treeNode.children) {
         if (child.children.empty()) {
             std::string label = child.name;
@@ -272,11 +273,13 @@ void renderImGuiTree(const UIRenderSystem::TreeNode& treeNode, CameraController&
                 std::cout << "Selected object: " << child.name << " with index " << child.index << std::endl;
                 if (child.category == "Optical Element") {
                     camController.lookAtPoint(rObjects[child.index].getTranslationVecor());
+                } else if (child.category == "Light Source") {
+                    camController.lookAtPoint(rSourcePositions[child.index]);
                 }
             }
         } else {
             if (ImGui::TreeNode(child.name.c_str())) {
-                renderImGuiTree(child, camController, rObjects);
+                renderImGuiTree(child, camController, rObjects, rSourcePositions);
                 ImGui::TreePop();
             }
         }
@@ -317,7 +320,7 @@ void UIRenderSystem::buildTreeFromXMLNode(rapidxml::xml_node<>* node, UIRenderSy
 }
 
 void UIRenderSystem::renderImGuiTreeFromRML(const std::filesystem::path& filename, CameraController& camController,
-                                            std::vector<RenderObject>& rObjects) {
+                                            std::vector<RenderObject>& rObjects, std::vector<glm::dvec3>& rSourcePositions) {
     // Check if file exists
     if (!std::filesystem::exists(filename)) {
         ImGui::Text("Choose a file to display the beamline outline.");
@@ -361,10 +364,11 @@ void UIRenderSystem::renderImGuiTreeFromRML(const std::filesystem::path& filenam
     // Call recursive function to handle the object collection and render the ImGui tree
     m_pTreeRoot = std::make_unique<UIRenderSystem::TreeNode>("Root");
     buildTreeFromXMLNode(xml_beamline, *m_pTreeRoot);
-    renderImGuiTree(*m_pTreeRoot, camController, rObjects);
+    renderImGuiTree(*m_pTreeRoot, camController, rObjects, rSourcePositions);
 }
 
-void UIRenderSystem::showBeamlineOutlineWindow(UIParameters& uiParams, std::vector<RenderObject>& rObjects) {
+void UIRenderSystem::showBeamlineOutlineWindow(UIParameters& uiParams, std::vector<RenderObject>& rObjects,
+                                               std::vector<glm::dvec3>& rSourcePositions) {
     ImGui::SetNextWindowPos(ImVec2(0, 760), ImGuiCond_Once);  // Position it below the Settings window
     ImGui::SetNextWindowSize(ImVec2(450, 300), ImGuiCond_Once);
 
@@ -374,13 +378,13 @@ void UIRenderSystem::showBeamlineOutlineWindow(UIParameters& uiParams, std::vect
         // Create and render new Tree
         m_lightSourceIndex = 0;
         m_opticalElementIndex = 0;
-        renderImGuiTreeFromRML(uiParams.rmlPath, uiParams.camController, rObjects);
+        renderImGuiTreeFromRML(uiParams.rmlPath, uiParams.camController, rObjects, rSourcePositions);
     } else if (m_pTreeRoot == nullptr) {
         // Do nothing
         ImGui::Text("Choose a file to display the beamline outline.");
     } else {
         // Render same Tree
-        renderImGuiTree(*m_pTreeRoot, uiParams.camController, rObjects);
+        renderImGuiTree(*m_pTreeRoot, uiParams.camController, rObjects, rSourcePositions);
     }
 
     ImGui::End();

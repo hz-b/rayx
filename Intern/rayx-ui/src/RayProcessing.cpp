@@ -11,7 +11,7 @@
 #include "Application.h"
 #include "Colors.h"
 
-void displayFilterSlider(int* amountOfRays, int maxAmountOfRays, bool* displayRays, bool* renderAllRays) {
+void displayFilterSlider(size_t* amountOfRays, size_t maxAmountOfRays, bool* displayRays, bool* renderAllRays) {
     // Checkbox for displaying rays
     // Slider should be greyed out if "Display Rays" is unchecked
     ImGui::Checkbox("Display Rays", displayRays);
@@ -24,7 +24,7 @@ void displayFilterSlider(int* amountOfRays, int maxAmountOfRays, bool* displayRa
 
     // Define the range for the slider
     float minLogValue = 0.0f;
-    float maxLogValue = std::log(static_cast<float>(std::min(maxAmountOfRays, MAX_RAYS)));
+    float maxLogValue = std::log(static_cast<float>(std::min<size_t>(maxAmountOfRays, MAX_RAYS)));
 
     // Convert the current amount of rays to logarithmic scale for the slider position
     float logValue = std::log(static_cast<float>(*amountOfRays));

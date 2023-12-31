@@ -18,8 +18,8 @@ struct UIRayInfo {
     bool raysChanged;
     bool cacheChanged;
     bool renderAllRays;
-    int amountOfRays;
-    int maxAmountOfRays;
+    size_t amountOfRays;
+    size_t maxAmountOfRays;
 };
 struct UIParameters {
     CameraController& camController;
@@ -36,7 +36,7 @@ class UIRenderSystem {
     UIRenderSystem& operator=(const UIRenderSystem&) = delete;
     ~UIRenderSystem();
 
-    void setupUI(UIParameters& uiParams, std::vector<RenderObject>& rObjects);
+    void setupUI(UIParameters& uiParams, std::vector<RenderObject>& rObjects, std::vector<glm::dvec3>& rSourcePositions);
     void render(VkCommandBuffer commandBuffer);
 
     VkClearValue getClearValue() const {
@@ -82,8 +82,9 @@ class UIRenderSystem {
     void showHotkeysWindow();
 
     void buildTreeFromXMLNode(rapidxml::xml_node<>* node, UIRenderSystem::TreeNode& treeNode);
-    void renderImGuiTreeFromRML(const std::filesystem::path& filename, CameraController& camController, std::vector<RenderObject>& rObjects);
-    void showBeamlineOutlineWindow(UIParameters& uiParams, std::vector<RenderObject>& rObjects);
+    void renderImGuiTreeFromRML(const std::filesystem::path& filename, CameraController& camController, std::vector<RenderObject>& rObjects,
+                                std::vector<glm::dvec3>& rSourcePositions);
+    void showBeamlineOutlineWindow(UIParameters& uiParams, std::vector<RenderObject>& rObjects, std::vector<glm::dvec3>& rSourcePositions);
 };
 
 void renderImGuiTree(const UIRenderSystem::TreeNode& treeNode, CameraController& camController);

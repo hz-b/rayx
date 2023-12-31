@@ -31,6 +31,7 @@ class RAYX_API LightSource {
     double getHorDivergence() const { return m_horDivergence; }
     double getSourceHeight() const { return m_sourceHeight; }
     double getSourceWidth() const { return m_sourceWidth; }
+    glm::dvec4 getPosition() const { return m_position; }
 
     /** yields the average energy of the energy distribution
      * m_EnergyDistribution */

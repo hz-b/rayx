@@ -48,7 +48,7 @@ class Application {
 
     std::unique_ptr<DescriptorPool> m_DescriptorPool{nullptr};
 
-    void updateObjects(const std::string& path, std::vector<RenderObject>& rObjects);
+    void updateObjects(const std::string& path, std::vector<RenderObject>& rObjects, std::vector<glm::dvec3>& rSourcePositions);
     void createRayCache(const std::string& path, BundleHistory& rayCache, UIRayInfo& rayInfo);
     void updateRays(const std::string& path, BundleHistory& rayCache, std::optional<RenderObject>& rayObj, std::vector<Line>& rays,
                     UIRayInfo& rayInfo);

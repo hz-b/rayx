@@ -73,6 +73,7 @@ void Application::run() {
 
     auto currentTime = std::chrono::high_resolution_clock::now();
     std::vector<RenderObject> rObjects;
+    std::vector<glm::dvec3> rSourcePositions;
     std::vector<Line> rays;
     BundleHistory rayCache;
     std::optional<RenderObject> rayObj;
@@ -97,10 +98,10 @@ void Application::run() {
             currentTime = newTime;
 
             // Update UI and camera
-            uiRenderSystem.setupUI(uiParams, rObjects);
+            uiRenderSystem.setupUI(uiParams, rObjects, rSourcePositions);
             // camController.update(cam, m_Renderer.getAspectRatio());
             if (uiParams.pathChanged) {
-                updateObjects(uiParams.rmlPath.string(), rObjects);
+                updateObjects(uiParams.rmlPath.string(), rObjects, rSourcePositions);
                 createRayCache(uiParams.rmlPath.string(), rayCache, uiParams.rayInfo);
                 uiParams.pathChanged = false;
                 camController.lookAtPoint(rObjects[0].getTranslationVecor());
@@ -146,12 +147,17 @@ void Application::run() {
     vkDeviceWaitIdle(m_Device.device());
 }
 
-void Application::updateObjects(const std::string& path, std::vector<RenderObject>& rObjects) {
+void Application::updateObjects(const std::string& path, std::vector<RenderObject>& rObjects, std::vector<glm::dvec3>& rSourcePositions) {
     RAYX::Beamline beamline = RAYX::importBeamline(path);
     // TODO(Jannis): Hacky fix for now; should be some form of synchronization
     vkDeviceWaitIdle(m_Device.device());
     // Triangulate the render data and update the scene
     rObjects = triangulateObjects(beamline.m_OpticalElements, m_Device);
+
+    // add source positions
+    for (auto& source : beamline.m_LightSources) {
+        rSourcePositions.push_back(glm::dvec3((*source).getPosition()));
+    }
 }
 void Application::createRayCache(const std::string& path, BundleHistory& rayCache, UIRayInfo& rayInfo) {
 #ifndef NO_H5

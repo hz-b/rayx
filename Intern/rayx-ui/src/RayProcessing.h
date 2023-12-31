@@ -31,5 +31,5 @@ float euclideanDistance(const std::vector<float>& a, const std::vector<float>& b
 void initializeCentroids(std::vector<std::vector<float>>& centroids, const std::vector<std::vector<float>>& features, size_t k);
 
 std::pair<std::vector<size_t>, std::vector<std::vector<float>>> kMeansClustering(const std::vector<std::vector<float>>& features, size_t k);
-void displayFilterSlider(int* amountOfRays, int maxAmountOfRays, bool* displayRays, bool* renderAllRays);
+void displayFilterSlider(size_t* amountOfRays, size_t maxAmountOfRays, bool* displayRays, bool* renderAllRays);
 size_t getMaxEvents(const RAYX::BundleHistory& bundleHist);
