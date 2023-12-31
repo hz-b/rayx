@@ -133,7 +133,7 @@ RenderObject traceTriangulation(const RAYX::OpticalElement& element, Device& dev
         throw std::runtime_error("Failed: Missing vertices or indices at a render object!");
     }
     RenderObject renderObj(element.m_name, device, element.m_element.m_outTrans, vertices, indices);
-    std::cout << "Added " << vertices.size() / 3 << " triangles to new render object" << std::endl;
+    RAYX_VERB << "Added " << vertices.size() / 3 << " triangles to new render object";
 
     return renderObj;
 }

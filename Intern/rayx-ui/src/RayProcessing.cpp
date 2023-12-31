@@ -274,7 +274,7 @@ std::pair<std::vector<size_t>, std::vector<std::vector<float>>> kMeansClustering
             }
         }
     }
-    RAYX_LOG << "K-means clustering converged after " << iteration << " iterations.";
+    RAYX_VERB << "K-means clustering converged after " << iteration << " iterations.";
     return {clusterAssignments, centroids};
 }
 

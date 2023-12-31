@@ -169,6 +169,6 @@ std::vector<RenderObject> triangulateObjects(const std::vector<RAYX::OpticalElem
         }
     }
 
-    std::cout << "Triangulation complete" << std::endl;
+    RAYX_VERB << "Triangulation complete";
     return rObjects;
 }

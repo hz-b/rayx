@@ -99,7 +99,7 @@ void Device::pickPhysicalDevice(std::optional<unsigned int> deviceID) {
     if (deviceCount == 0) {
         throw std::runtime_error("failed to find GPUs with Vulkan support!");
     }
-    std::cout << "Device count: " << deviceCount << std::endl;
+    RAYX_VERB << "Device count: " << deviceCount;
     std::vector<VkPhysicalDevice> devices(deviceCount);
     vkEnumeratePhysicalDevices(m_Instance, &deviceCount, devices.data());
 

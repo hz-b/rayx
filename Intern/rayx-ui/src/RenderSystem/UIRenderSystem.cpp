@@ -270,7 +270,7 @@ void renderImGuiTree(const UIRenderSystem::TreeNode& treeNode, CameraController&
 
             if (ImGui::Selectable(label.c_str())) {
                 // Handle selection logic here
-                std::cout << "Selected object: " << child.name << " with index " << child.index << std::endl;
+                RAYX_VERB << "Selected object: " << child.name << " with index " << child.index;
                 if (child.category == "Optical Element") {
                     camController.lookAtPoint(rObjects[child.index].getTranslationVecor());
                 } else if (child.category == "Light Source") {
