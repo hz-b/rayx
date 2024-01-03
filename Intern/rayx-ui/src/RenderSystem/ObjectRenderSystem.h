@@ -1,6 +1,7 @@
 #pragma once
 
 #include <memory>
+#include <vector>
 
 #include "FrameInfo.h"
 #include "GraphicsCore/Device.h"
@@ -13,7 +14,7 @@
  */
 class ObjectRenderSystem {
   public:
-    ObjectRenderSystem(Device& device, VkRenderPass renderPass, VkDescriptorSetLayout globalSetLayout);
+    ObjectRenderSystem(Device& device, VkRenderPass renderPass, const std::vector<VkDescriptorSetLayout>& setLayouts);
     ~ObjectRenderSystem();
 
     ObjectRenderSystem(const ObjectRenderSystem&) = delete;
@@ -27,8 +28,16 @@ class ObjectRenderSystem {
      */
     void render(FrameInfo& frameInfo, const std::vector<RenderObject>& objects);
 
+    /**
+     * @brief Rebuilds the pipeline and pipeline layout.
+     *
+     * @param renderPass The render pass to use for the pipeline.
+     * @param setLayouts The descriptor set layouts to use for the pipeline layout.
+     */
+    void rebuild(VkRenderPass renderPass, const std::vector<VkDescriptorSetLayout>& setLayouts);
+
   private:
-    void createPipelineLayout(VkDescriptorSetLayout globalSetLayout);
+    void createPipelineLayout(const std::vector<VkDescriptorSetLayout>&);
     void createPipeline(VkRenderPass renderPass);
 
     Device& m_Device;

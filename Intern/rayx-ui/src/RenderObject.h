@@ -3,11 +3,12 @@
 #include <glm/glm.hpp>
 #include <vector>
 
+#include "Beamline/OpticalElement.h"
 #include "GraphicsCore/Buffer.h"
+#include "GraphicsCore/Descriptors.h"
 #include "GraphicsCore/Device.h"
+#include "GraphicsCore/Texture.h"
 #include "Vertex.h"
-
-#define GRIDSIZE 10
 
 struct Triangle {
     Vertex v1;
@@ -36,7 +37,16 @@ class RenderObject {
      * @param vertices Vector of Vertex objects.
      * @param indices Vector of index values.
      */
-    RenderObject(std::string name, Device& device, glm::mat4 modelMatrix, std::vector<Vertex>& vertices, std::vector<uint32_t>& indices);
+    RenderObject(std::string name, Device& device, glm::mat4 modelMatrix, std::vector<Vertex>& vertices, std::vector<uint32_t>& indices,
+                 std::shared_ptr<DescriptorSetLayout> setLayout, std::shared_ptr<DescriptorPool> descriptorPool);
+    RenderObject(const RenderObject&) = delete;
+    RenderObject& operator=(const RenderObject&) = delete;
+    RenderObject(RenderObject&& other) noexcept;
+    RenderObject& operator=(RenderObject&& other) noexcept;
+
+    static std::vector<RenderObject> buildRObjectsFromElements(Device& device, const std::vector<RAYX::OpticalElement>& elements,
+                                                               std::shared_ptr<DescriptorSetLayout> setLayout,
+                                                               std::shared_ptr<DescriptorPool> descriptorPool);
 
     /**
      * @brief Binds the object's vertex and index buffers to a Vulkan command buffer.
@@ -50,29 +60,35 @@ class RenderObject {
      */
     void draw(VkCommandBuffer commandBuffer) const;
 
+    void updateTexture(const std::filesystem::path& path);
+    void updateTexture(const unsigned char* data, uint32_t width, uint32_t height);
+
     glm::mat4 getModelMatrix() const { return m_modelMatrix; }
-    glm::vec3 getTranslationVecor() const { return m_translationVector; }
+    glm::vec3 getTranslationVecor() const { return glm::vec3(m_modelMatrix[3][0], m_modelMatrix[3][1], m_modelMatrix[3][2]); }
     std::string getName() const { return m_name; }
+    uint32_t getVertexCount() const { return m_vertexCount; }
+    bool getIsTextured() const { return m_isTextured; }
+    VkDescriptorSet getDescriptorSet() const { return m_descrSet; }
 
   private:
     void createVertexBuffers(const std::vector<Vertex>& vertices);
     void createIndexBuffers(const std::vector<uint32_t>& indices);
+    void createDescriptorSet();
 
     std::string m_name;
     Device& m_Device;
+    glm::mat4 m_modelMatrix;  ///< Matrix for transforming the object from model to world coordinates
+    Texture m_Texture;
+
+    std::shared_ptr<DescriptorSetLayout> m_setLayout;
+    std::shared_ptr<DescriptorPool> m_descriptorPool;
+
+    bool m_isTextured;
+    VkDescriptorSet m_descrSet;
 
     uint32_t m_vertexCount;
     uint32_t m_indexCount;
 
     std::unique_ptr<Buffer> m_vertexBuffer;
     std::unique_ptr<Buffer> m_indexBuffer;
-
-    glm::mat4 m_modelMatrix;  ///< Matrix for transforming the object from model to world coordinates
-
-    // 3D Space specfic
-    glm::vec3 m_translationVector;
-    glm::vec3 m_skewVector;
-    glm::vec3 m_rotationVector;  // Radians
-    glm::vec3 m_scaleVector;
-    glm::vec4 m_perspective;
 };

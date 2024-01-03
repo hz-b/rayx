@@ -3,17 +3,20 @@
 #include <chrono>
 #include <unordered_set>
 
+#include "CanonicalizePath.h"
 #include "Colors.h"
 #include "Data/Importer.h"
 #include "Debug/Debug.h"
 #include "FrameInfo.h"
 #include "GraphicsCore/Renderer.h"
 #include "GraphicsCore/Window.h"
+#include "Plotting.h"
+#include "RayProcessing.h"
 #include "RenderObject.h"
 #include "RenderSystem/GridRenderSystem.h"
 #include "RenderSystem/ObjectRenderSystem.h"
 #include "RenderSystem/RayRenderSystem.h"
-#include "Triangulation/Triangulate.h"
+#include "Triangulation/GeometryUtils.h"
 #include "UserInput.h"
 #include "Writer/CSVWriter.h"
 #include "Writer/H5Writer.h"
@@ -25,10 +28,11 @@ Application::Application(uint32_t width, uint32_t height, const char* name, int 
       m_Device(m_Window, m_CommandParser.m_args.m_deviceID),  //
       m_Renderer(m_Window, m_Device)                          //
 {
-    m_DescriptorPool = DescriptorPool::Builder(m_Device)
-                           .addPoolSize(VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, SwapChain::MAX_FRAMES_IN_FLIGHT)
-                           .setMaxSets(SwapChain::MAX_FRAMES_IN_FLIGHT)
-                           .build();
+    m_GlobalDescriptorPool = DescriptorPool::Builder(m_Device)
+                                 .addPoolSize(VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, SwapChain::MAX_FRAMES_IN_FLIGHT)
+                                 .setMaxSets(SwapChain::MAX_FRAMES_IN_FLIGHT)
+                                 .build();
+    m_TexturePool = nullptr;
 }
 
 Application::~Application() = default;
@@ -44,22 +48,27 @@ void Application::run() {
         uboBuffer->map();
     }
 
-    // Descriptor set layout
-    auto setLayout = DescriptorSetLayout::Builder(m_Device)
-                         .addBinding(0, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, VK_SHADER_STAGE_VERTEX_BIT)  //
-                         .build();                                                                      //
+    // Descriptor set layouts
+    auto globalSetLayout = DescriptorSetLayout::Builder(m_Device)
+                               .addBinding(0, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, VK_SHADER_STAGE_VERTEX_BIT)  //
+                               .build();                                                                      //
     std::vector<VkDescriptorSet> descriptorSets(SwapChain::MAX_FRAMES_IN_FLIGHT);
     for (unsigned long i = 0; i < descriptorSets.size(); i++) {
         auto bufferInfo = uboBuffers[i]->descriptorInfo();
-        DescriptorWriter(*setLayout, *m_DescriptorPool).writeBuffer(0, &bufferInfo).build(descriptorSets[i]);
+        DescriptorWriter(*globalSetLayout, *m_GlobalDescriptorPool).writeBuffer(0, &bufferInfo).build(descriptorSets[i]);
     }
+    std::shared_ptr<DescriptorSetLayout> texSetLayout =
+        DescriptorSetLayout::Builder(m_Device)                                                       //
+            .addBinding(0, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, VK_SHADER_STAGE_FRAGMENT_BIT)  //
+            .build();
+    std::vector<VkDescriptorSetLayout> setLayouts{globalSetLayout->getDescriptorSetLayout(), texSetLayout->getDescriptorSetLayout()};
 
     // Render systems
-    ObjectRenderSystem objectRenderSystem(m_Device, m_Renderer.getSwapChainRenderPass(), setLayout->getDescriptorSetLayout());
-    RayRenderSystem rayRenderSystem(m_Device, m_Renderer.getSwapChainRenderPass(), setLayout->getDescriptorSetLayout());
+    ObjectRenderSystem objectRenderSystem(m_Device, m_Renderer.getSwapChainRenderPass(), setLayouts);
+    RayRenderSystem rayRenderSystem(m_Device, m_Renderer.getSwapChainRenderPass(), globalSetLayout->getDescriptorSetLayout());
     UIRenderSystem uiRenderSystem(m_Window, m_Device, m_Renderer.getSwapChainImageFormat(), m_Renderer.getSwapChainDepthFormat(),
                                   m_Renderer.getSwapChainImageCount());
-    GridRenderSystem gridRenderSystem(m_Device, m_Renderer.getSwapChainRenderPass(), setLayout->getDescriptorSetLayout());
+    GridRenderSystem gridRenderSystem(m_Device, m_Renderer.getSwapChainRenderPass(), globalSetLayout->getDescriptorSetLayout());
 
     // Camera
     CameraController camController;
@@ -80,8 +89,21 @@ void Application::run() {
 
     // CLI Input
     std::string rmlPathCli = m_CommandParser.m_args.m_providedFile;
-    UIRayInfo rayInfo{true, false, false, false, 50, 100};
-    UIParameters uiParams{camController, rmlPathCli, !rmlPathCli.empty(), 0.0, rayInfo};
+    UIRayInfo rayInfo{
+        .displayRays = true,     //
+        .raysChanged = false,    //
+        .cacheChanged = false,   //
+        .renderAllRays = false,  //
+        .amountOfRays = 50,      //
+        .maxAmountOfRays = 100   //
+    };
+    UIParameters uiParams{
+        .camController = camController,      //
+        .rmlPath = rmlPathCli,               //
+        .pathChanged = !rmlPathCli.empty(),  //
+        .frameTime = 0.0,                    //
+        .rayInfo = rayInfo                   //
+    };
 
     static bool showRMLNotExistPopup = false;
     static bool showH5NotExistPopup = false;
@@ -106,15 +128,64 @@ void Application::run() {
 
             if (uiParams.pathChanged) {
                 std::string rmlPath = uiParams.rmlPath.string();
-                std::string rayFilePath = rmlPath.substr(0, rmlPath.size() - 4) + ".h5";
-                showH5NotExistPopup = !std::filesystem::exists(rayFilePath);
+                std::string rayFilePathH5 = rmlPath.substr(0, rmlPath.size() - 4) + ".h5";
+                std::string rayFilePathCSV = rmlPath.substr(0, rmlPath.size() - 4) + ".csv";
+                showH5NotExistPopup = !(std::filesystem::exists(rayFilePathH5) || std::filesystem::exists(rayFilePathCSV));
                 showRMLNotExistPopup = !std::filesystem::exists(rmlPath);
 
                 if (!showH5NotExistPopup && !showRMLNotExistPopup) {
-                    updateObjects(rmlPath, rObjects, rSourcePositions);
-                    createRayCache(rmlPath, rayCache, uiParams.rayInfo);
+                    vkDeviceWaitIdle(m_Device.device());
+                    m_Beamline = RAYX::importBeamline(rmlPath);
+                    std::vector<RAYX::OpticalElement> elements = m_Beamline.m_OpticalElements;
+                    rSourcePositions.clear();
+                    for (auto& source : m_Beamline.m_LightSources) {
+                        rSourcePositions.push_back(glm::dvec3((*source).getPosition()));
+                    }
+
+                    m_TexturePool = DescriptorPool::Builder(m_Device)
+                                        .addPoolSize(VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, (uint32_t)elements.size())
+                                        .setMaxSets((uint32_t)elements.size())
+                                        .setPoolFlags(VK_DESCRIPTOR_POOL_CREATE_FREE_DESCRIPTOR_SET_BIT)
+                                        .build();
+                    rObjects = RenderObject::buildRObjectsFromElements(m_Device, elements, texSetLayout, m_TexturePool);
+
+                    setLayouts = {globalSetLayout->getDescriptorSetLayout(), texSetLayout->getDescriptorSetLayout()};
+                    objectRenderSystem.rebuild(m_Renderer.getSwapChainRenderPass(), setLayouts);
+
+                    createRayCache(uiParams.rmlPath.string(), rayCache, uiParams.rayInfo);
+                    uiParams.pathChanged = false;
                     camController.lookAtPoint(rObjects[0].getTranslationVecor());
                     uiParams.rayInfo.raysChanged = true;
+
+                    for (uint32_t i = 0; i < elements.size(); i++) {
+                        if (rObjects[i].getVertexCount() == 4) {
+                            auto [width, height] = getRectangularDimensions(elements[i].m_element.m_cutout);
+
+                            auto raysOfElement = [&](uint32_t elementIdx) {
+                                std::vector<RAYX::Ray> rays;
+                                for (auto& ray : m_rays) {
+                                    if (ray.size() > elementIdx) {
+                                        rays.push_back(ray[elementIdx]);
+                                    }
+                                }
+                                return rays;
+                            };
+                            std::vector<std::vector<uint32_t>> footprint = makeFootprint(raysOfElement(i), -width / 2, width / 2, -height / 2,
+                                                                                         height / 2, (uint32_t)(width * 10), (uint32_t)(height * 10));
+                            size_t sum = 0;
+                            for (auto& row : footprint) {
+                                for (auto& val : row) {
+                                    sum += val;
+                                }
+                            }
+                            RAYX_LOG << "Sum of footprint: " << sum;
+                            std::string filename = "footprint_" + std::to_string(i) + ".png";
+                            writeFootprintAsPNG(footprint, filename.c_str());
+                            uint32_t footprintWidth, footprintHeight;
+                            unsigned char* data = footprintAsImage(footprint, footprintWidth, footprintHeight);
+                            rObjects[i].updateTexture(data, footprintWidth, footprintHeight);
+                        }
+                    }
                 }
             }
             uiParams.pathChanged = false;
@@ -150,12 +221,13 @@ void Application::run() {
             }
 
             if (uiParams.rayInfo.raysChanged) {
+                vkDeviceWaitIdle(m_Device.device());
                 if (uiParams.rayInfo.cacheChanged) {
                     createRayCache(uiParams.rmlPath.string(), rayCache, uiParams.rayInfo);
                     uiParams.rayInfo.cacheChanged = false;
                 }
                 if (uiParams.rayInfo.displayRays) {
-                    updateRays(uiParams.rmlPath.string(), rayCache, rayObj, rays, uiParams.rayInfo);
+                    updateRays(rayCache, rayObj, rays, uiParams.rayInfo);
                 } else {
                     rayObj.reset();
                 }
@@ -167,7 +239,6 @@ void Application::run() {
             // Update UBO
             uint32_t frameIndex = m_Renderer.getFrameIndex();
             uboBuffers[frameIndex]->writeToBuffer(&cam);
-            // uboBuffers[frameIndex]->flush();
 
             // Render
             m_Renderer.beginSwapChainRenderPass(commandBuffer, uiRenderSystem.getClearValue());
@@ -188,36 +259,16 @@ void Application::run() {
     vkDeviceWaitIdle(m_Device.device());
 }
 
-void Application::updateObjects(const std::string& path, std::vector<RenderObject>& rObjects, std::vector<glm::dvec3>& rSourcePositions) {
-    RAYX::Beamline beamline = RAYX::importBeamline(path);
-    // TODO(Jannis): Hacky fix for now; should be some form of synchronization
-    vkDeviceWaitIdle(m_Device.device());
-    // Triangulate the render data and update the scene
-    rObjects = triangulateObjects(beamline.m_OpticalElements, m_Device);
-
-    // add source positions
-    for (auto& source : beamline.m_LightSources) {
-        rSourcePositions.push_back(glm::dvec3((*source).getPosition()));
-    }
-}
 void Application::createRayCache(const std::string& path, BundleHistory& rayCache, UIRayInfo& rayInfo) {
-#ifndef NO_H5
-    std::string rayFilePath = path.substr(0, path.size() - 4) + ".h5";
-    RAYX::BundleHistory bundleHist = raysFromH5(rayFilePath, FULL_FORMAT);
-#else
-    std::string rayFilePath = path.substr(0, path.size() - 4) + ".csv";
-    RAYX::BundleHistory bundleHist = loadCSV(rayFilePath);
-#endif
-    rayInfo.maxAmountOfRays = bundleHist.size();
+    loadRays(path);
+    rayInfo.maxAmountOfRays = (int)m_rays.size();
     if (rayInfo.renderAllRays) {
-        rayCache = bundleHist;
+        rayCache = m_rays;
         return;
     }
-    // TODO(Jannis): Hacky fix for now; should be some form of synchronization
-    vkDeviceWaitIdle(m_Device.device());
-    const size_t m = getMaxEvents(bundleHist);
+    const size_t m = getMaxEvents(m_rays);
 
-    std::vector<size_t> indices(bundleHist.size());
+    std::vector<size_t> indices(m_rays.size());
     std::iota(indices.begin(), indices.end(), 0);  // Filling indices with 0, 1, 2, ..., n-1
 
     // Randomly shuffling the indices
@@ -232,7 +283,7 @@ void Application::createRayCache(const std::string& path, BundleHistory& rayCach
         size_t count = 0;
         for (size_t rayIdx : indices) {
             if (count >= MAX_RAYS) break;
-            if (bundleHist[rayIdx].size() > eventIdx) {
+            if (m_rays[rayIdx].size() > eventIdx) {
                 selectedIndices.insert(rayIdx);
                 count++;
             }
@@ -243,19 +294,28 @@ void Application::createRayCache(const std::string& path, BundleHistory& rayCach
     // Now selectedIndices contains unique indices of rays
     // Creating rayCache object from selected indices
     for (size_t idx : selectedIndices) {
-        rayCache.push_back(bundleHist[idx]);
+        rayCache.push_back(m_rays[idx]);
     }
 
-    rayInfo.maxAmountOfRays = rayCache.size();
+    rayInfo.maxAmountOfRays = (int)rayCache.size();
 }
 
-void Application::updateRays(const std::string& path, BundleHistory& rayCache, std::optional<RenderObject>& rayObj, std::vector<Line>& rays,
-                             UIRayInfo& rayInfo) {
-    RAYX::Beamline beamline = RAYX::importBeamline(path);
+void Application::loadRays(const std::string& rmlPath) {
+    vkDeviceWaitIdle(m_Device.device());
+#ifndef NO_H5
+    std::string rayFilePath = rmlPath.substr(0, rmlPath.size() - 4) + ".h5";
+    m_rays = raysFromH5(rayFilePath, FULL_FORMAT);
+#else
+    std::string rayFilePath = rmlPath.substr(0, rmlPath.size() - 4) + ".csv";
+    m_rays = loadCSV(rayFilePath);
+#endif
+}
+
+void Application::updateRays(BundleHistory& rayCache, std::optional<RenderObject>& rayObj, std::vector<Line>& rays, UIRayInfo& rayInfo) {
     if (!rayInfo.renderAllRays) {
-        rays = getRays(rayCache, beamline.m_OpticalElements, kMeansFilter, rayInfo.amountOfRays);
+        rays = getRays(rayCache, m_Beamline.m_OpticalElements, kMeansFilter, (uint32_t)rayInfo.amountOfRays);
     } else {
-        rays = getRays(rayCache, beamline.m_OpticalElements, noFilter, rayInfo.maxAmountOfRays);
+        rays = getRays(rayCache, m_Beamline.m_OpticalElements, noFilter, (uint32_t)rayInfo.maxAmountOfRays);
     }
     if (!rays.empty()) {
         // Temporarily aggregate all vertices, then create a single RenderObject
@@ -267,6 +327,11 @@ void Application::updateRays(const std::string& path, BundleHistory& rayCache, s
             rayIndices[i * 2] = i * 2;
             rayIndices[i * 2 + 1] = i * 2 + 1;
         }
-        rayObj.emplace("Rays", m_Device, glm::mat4(1.0f), rayVertices, rayIndices);
+
+        std::shared_ptr<DescriptorPool> rayDescrPool =
+            DescriptorPool::Builder(m_Device).addPoolSize(VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 1).setMaxSets(1).build();
+        std::shared_ptr<DescriptorSetLayout> raySetLayout =
+            DescriptorSetLayout::Builder(m_Device).addBinding(0, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, VK_SHADER_STAGE_FRAGMENT_BIT).build();
+        rayObj.emplace("Rays", m_Device, glm::mat4(1.0f), rayVertices, rayIndices, raySetLayout, rayDescrPool);
     }
 }

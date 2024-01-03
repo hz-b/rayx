@@ -41,15 +41,19 @@ class Application {
 
   private:
     // --- Order matters ---
-    Window m_Window;  // Application window
-    CommandParser m_CommandParser;
-    Device m_Device;      // Vulkan device
-    Renderer m_Renderer;  // Vulkan renderer
+    Window m_Window;                ///< Application window
+    CommandParser m_CommandParser;  ///< Command line parser
+    Device m_Device;                ///< Vulkan device
+    Renderer m_Renderer;            ///< Vulkan renderer
 
-    std::unique_ptr<DescriptorPool> m_DescriptorPool{nullptr};
+    // --- Order doesn't matter ---
+    RAYX::BundleHistory m_rays;                                       ///< All rays loaded from file
+    RAYX::Beamline m_Beamline;                                        ///< Beamline loaded from file
+    std::shared_ptr<DescriptorPool> m_GlobalDescriptorPool{nullptr};  ///< General descriptor pool
+    std::shared_ptr<DescriptorPool> m_TexturePool{nullptr};           ///< Descriptor pool for textures
 
-    void updateObjects(const std::string& path, std::vector<RenderObject>& rObjects, std::vector<glm::dvec3>& rSourcePositions);
+    void loadRays(const std::string& path);
+
     void createRayCache(const std::string& path, BundleHistory& rayCache, UIRayInfo& rayInfo);
-    void updateRays(const std::string& path, BundleHistory& rayCache, std::optional<RenderObject>& rayObj, std::vector<Line>& rays,
-                    UIRayInfo& rayInfo);
+    void updateRays(BundleHistory& rayCache, std::optional<RenderObject>& rayObj, std::vector<Line>& rays, UIRayInfo& rayInfo);
 };

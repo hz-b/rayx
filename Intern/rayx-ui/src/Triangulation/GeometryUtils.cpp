@@ -4,10 +4,10 @@
 
 void Polygon::calculateForQuadrilateral(double widthA, double widthB, double lengthA, double lengthB) {
     vertices = {
-        Vertex({-widthB / 2.0f, 0, -lengthA / 2.0f, 1.0f}, OPT_ELEMENT_COLOR),  // Bottom-left
-        Vertex({-widthA / 2.0f, 0, lengthB / 2.0f, 1.0f}, OPT_ELEMENT_COLOR),   // Top-left
-        Vertex({widthA / 2.0f, 0, lengthB / 2.0f, 1.0f}, OPT_ELEMENT_COLOR),    // Top-right
-        Vertex({widthB / 2.0f, 0, -lengthA / 2.0f, 1.0f}, OPT_ELEMENT_COLOR)    // Bottom-right
+        Vertex({-widthB / 2.0f, 0, -lengthA / 2.0f, 1.0f}, OPT_ELEMENT_COLOR, {1.0f, 1.0f}),  // Bottom-left
+        Vertex({-widthA / 2.0f, 0, lengthB / 2.0f, 1.0f}, OPT_ELEMENT_COLOR, {1.0f, 0.0f}),   // Top-left
+        Vertex({widthA / 2.0f, 0, lengthB / 2.0f, 1.0f}, OPT_ELEMENT_COLOR, {0.0f, 0.0f}),    // Top-right
+        Vertex({widthB / 2.0f, 0, -lengthA / 2.0f, 1.0f}, OPT_ELEMENT_COLOR, {0.0f, 1.0f})    // Bottom-right
     };
     indices = {0, 1, 2, 2, 3, 0};
 }
@@ -60,7 +60,7 @@ void interpolateConvexPolygon(std::vector<Vertex>& polyVertices, uint32_t target
         glm::vec4 interpolatedPosition = glm::mix(polyVertices[lowerIndex].pos, polyVertices[upperIndex].pos, fraction);
         glm::vec4 interpolatedColor = glm::mix(polyVertices[lowerIndex].color, polyVertices[upperIndex].color, fraction);
 
-        interpolatedVertices.push_back({interpolatedPosition, interpolatedColor});
+        interpolatedVertices.push_back({interpolatedPosition, interpolatedColor, {0.0f, 0.0f}});
     }
 
     // Replace the original vertices with the interpolated ones
@@ -80,4 +80,40 @@ std::vector<std::vector<double>> calculateDistanceMatrix(const std::vector<Verte
     }
 
     return distanceMatrix;
+}
+
+/**
+ * Given a Cutout object, this function calculates and returns the width and
+ * length depending on the cutout's type (rectangle, ellipse, trapezoid, etc.).
+ */
+std::pair<double, double> getRectangularDimensions(const Cutout& cutout) {
+    double width = 0.0;
+    double length = 0.0;
+
+    switch (static_cast<int>(cutout.m_type)) {
+        case CTYPE_RECT: {
+            RectCutout rect = deserializeRect(cutout);
+            width = rect.m_width;
+            length = rect.m_length;
+            break;
+        }
+        case CTYPE_ELLIPTICAL: {
+            EllipticalCutout ell = deserializeElliptical(cutout);
+            width = ell.m_diameter_x;   // Diameter is essentially the max width
+            length = ell.m_diameter_z;  // Diameter is the max length
+            break;
+        }
+        case CTYPE_TRAPEZOID: {
+            TrapezoidCutout trap = deserializeTrapezoid(cutout);
+            width = std::max(trap.m_widthA, trap.m_widthB);  // max of the two sides
+            length = trap.m_length;
+            break;
+        }
+        default: {  // CTYPE_UNLIMITED and unknown types
+            return {50.0, 50.0};
+            break;
+        }
+    }
+
+    return {width, length};
 }

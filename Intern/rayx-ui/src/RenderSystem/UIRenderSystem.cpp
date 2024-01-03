@@ -215,8 +215,8 @@ void UIRenderSystem::showSceneEditorWindow(UIParameters& uiParams) {
         size_t tempAmountOfRays = uiParams.rayInfo.amountOfRays;
         bool tempDisplayRays = uiParams.rayInfo.displayRays;
         bool tempRenderAllRays = uiParams.rayInfo.renderAllRays;
-        displayFilterSlider(&uiParams.rayInfo.amountOfRays, uiParams.rayInfo.maxAmountOfRays, &uiParams.rayInfo.displayRays,
-                            &uiParams.rayInfo.renderAllRays);
+        displayFilterSlider(uiParams.rayInfo.amountOfRays, uiParams.rayInfo.maxAmountOfRays, uiParams.rayInfo.displayRays,
+                            uiParams.rayInfo.renderAllRays);
         if (tempAmountOfRays != uiParams.rayInfo.amountOfRays || tempDisplayRays != uiParams.rayInfo.displayRays ||
             tempRenderAllRays != uiParams.rayInfo.renderAllRays) {
             uiParams.rayInfo.raysChanged = true;

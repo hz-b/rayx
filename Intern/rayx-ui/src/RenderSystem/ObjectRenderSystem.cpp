@@ -9,16 +9,21 @@ struct PushConstantData {
     glm::mat4 modelMatrix{1.f};
 };
 
-ObjectRenderSystem::ObjectRenderSystem(Device& device, VkRenderPass renderPass, VkDescriptorSetLayout globalSetLayout) : m_Device{device} {
-    createPipelineLayout(globalSetLayout);
+ObjectRenderSystem::ObjectRenderSystem(Device& device, VkRenderPass renderPass, const std::vector<VkDescriptorSetLayout>& setLayouts)
+    : m_Device{device} {
+    createPipelineLayout(setLayouts);
     createPipeline(renderPass);
 }
 
 ObjectRenderSystem::~ObjectRenderSystem() { vkDestroyPipelineLayout(m_Device.device(), m_PipelineLayout, nullptr); }
 
-void ObjectRenderSystem::createPipelineLayout(VkDescriptorSetLayout globalSetLayout) {
-    std::vector<VkDescriptorSetLayout> descriptorSetLayouts{globalSetLayout};
+void ObjectRenderSystem::rebuild(VkRenderPass renderPass, const std::vector<VkDescriptorSetLayout>& setLayouts) {
+    vkDestroyPipelineLayout(m_Device.device(), m_PipelineLayout, nullptr);
+    createPipelineLayout(setLayouts);
+    createPipeline(renderPass);
+}
 
+void ObjectRenderSystem::createPipelineLayout(const std::vector<VkDescriptorSetLayout>& setLayouts) {
     VkPushConstantRange pushConstantRange{};
     pushConstantRange.stageFlags = VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT;
     pushConstantRange.offset = 0;
@@ -26,8 +31,8 @@ void ObjectRenderSystem::createPipelineLayout(VkDescriptorSetLayout globalSetLay
 
     VkPipelineLayoutCreateInfo pipelineLayoutInfo{};
     pipelineLayoutInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO;
-    pipelineLayoutInfo.setLayoutCount = static_cast<uint32_t>(descriptorSetLayouts.size());
-    pipelineLayoutInfo.pSetLayouts = descriptorSetLayouts.data();
+    pipelineLayoutInfo.setLayoutCount = static_cast<uint32_t>(setLayouts.size());
+    pipelineLayoutInfo.pSetLayouts = setLayouts.data();
     pipelineLayoutInfo.pushConstantRangeCount = 1;
     pipelineLayoutInfo.pPushConstantRanges = &pushConstantRange;
     if (vkCreatePipelineLayout(m_Device.device(), &pipelineLayoutInfo, nullptr, &m_PipelineLayout) != VK_SUCCESS) {
@@ -55,6 +60,9 @@ void ObjectRenderSystem::render(FrameInfo& frameInfo, const std::vector<RenderOb
     vkCmdBindDescriptorSets(frameInfo.commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, m_PipelineLayout, 0, 1, &frameInfo.descriptorSet, 0, nullptr);
 
     for (const RenderObject& obj : objects) {
+        VkDescriptorSet objDescrSet = obj.getDescriptorSet();
+        vkCmdBindDescriptorSets(frameInfo.commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, m_PipelineLayout, 1, 1, &objDescrSet, 0, nullptr);
+
         PushConstantData push{};
         push.modelMatrix = obj.getModelMatrix();
 
