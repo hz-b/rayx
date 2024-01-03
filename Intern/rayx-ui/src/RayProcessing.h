@@ -17,19 +17,21 @@ using RayFilterFunction = std::function<std::vector<size_t>(const RAYX::BundleHi
  */
 
 std::vector<Line> getRays(const RAYX::BundleHistory& rayCache, const std::vector<RAYX::OpticalElement>& elements, RayFilterFunction filterFunction,
-                          int amountOfRays);
+                          uint32_t amountOfRays);
 
 std::vector<size_t> findMostCentralRays(const std::vector<std::vector<double>>& features, const std::vector<size_t>& clusterAssignments,
                                         const std::vector<std::vector<double>>& centroids, size_t k);
 
 std::vector<size_t> kMeansFilter(const RAYX::BundleHistory& bundleHist, size_t k);
 
-std::vector<size_t> noFilter(const RAYX::BundleHistory& bundleHist, size_t k);
+std::vector<size_t> noFilter(const RAYX::BundleHistory& bundleHist, [[maybe_unused]] size_t k);
 
 float euclideanDistance(const std::vector<float>& a, const std::vector<float>& b);
 
 void initializeCentroids(std::vector<std::vector<float>>& centroids, const std::vector<std::vector<float>>& features, size_t k);
 
 std::pair<std::vector<size_t>, std::vector<std::vector<float>>> kMeansClustering(const std::vector<std::vector<float>>& features, size_t k);
-void displayFilterSlider(size_t* amountOfRays, size_t maxAmountOfRays, bool* displayRays, bool* renderAllRays);
+
 size_t getMaxEvents(const RAYX::BundleHistory& bundleHist);
+
+void displayFilterSlider(size_t& amountOfRays, size_t maxAmountOfRays, bool& displayRays, bool& renderAllRays);

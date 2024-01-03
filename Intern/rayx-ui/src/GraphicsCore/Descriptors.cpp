@@ -56,8 +56,8 @@ DescriptorPool::Builder& DescriptorPool::Builder::setMaxSets(uint32_t count) {
     return *this;
 }
 
-std::unique_ptr<DescriptorPool> DescriptorPool::Builder::build() const {
-    return std::make_unique<DescriptorPool>(m_Device, m_maxSets, m_PoolFlags, m_poolSizes);
+std::shared_ptr<DescriptorPool> DescriptorPool::Builder::build() const {
+    return std::make_shared<DescriptorPool>(m_Device, m_maxSets, m_PoolFlags, m_poolSizes);
 }
 
 // *************** Descriptor Pool *********************
@@ -88,8 +88,22 @@ bool DescriptorPool::allocateDescriptor(const VkDescriptorSetLayout descriptorSe
 
     // Might want to create a "DescriptorPoolManager" class that handles this case, and builds
     // a new pool whenever an old pool fills up. But this is beyond our current scope
-    if (vkAllocateDescriptorSets(m_Device.device(), &allocInfo, &descriptor) != VK_SUCCESS) {
-        return false;
+    VkResult result = vkAllocateDescriptorSets(m_Device.device(), &allocInfo, &descriptor);
+    if (result != VK_SUCCESS) {
+        switch (result) {
+            case VK_ERROR_OUT_OF_POOL_MEMORY:
+                RAYX_WARN << "Failed to allocate descriptor set. Out of pool memory";
+                return false;
+            case VK_ERROR_FRAGMENTED_POOL:
+                RAYX_WARN << "Failed to allocate descriptor set. Fragmented pool";
+                return false;
+            case VK_ERROR_OUT_OF_DEVICE_MEMORY:
+                RAYX_WARN << "Failed to allocate descriptor set. Out of device memory";
+                return false;
+            default:
+                RAYX_WARN << "Failed to allocate descriptor set. Unknown error";
+                return false;
+        }
     }
     return true;
 }
@@ -102,7 +116,7 @@ void DescriptorPool::resetPool() { vkResetDescriptorPool(m_Device.device(), m_De
 
 // *************** Descriptor Writer *********************
 
-DescriptorWriter::DescriptorWriter(DescriptorSetLayout& setLayout, DescriptorPool& pool) : m_SetLayout{setLayout}, m_Pool{pool} {}
+DescriptorWriter::DescriptorWriter(DescriptorSetLayout& setLayout, const DescriptorPool& pool) : m_SetLayout{setLayout}, m_Pool{pool} {}
 
 DescriptorWriter& DescriptorWriter::writeBuffer(uint32_t binding, VkDescriptorBufferInfo* bufferInfo) {
     assert(m_SetLayout.m_bindings.count(binding) == 1 && "Layout does not contain specified binding");

@@ -4,45 +4,7 @@
 #include "Colors.h"
 #include "Shader/Collision.h"
 #include "Tracer/CpuTracer.h"
-
-/**
- * Given a Cutout object, this function calculates and returns the width and
- * length depending on the cutout's type (rectangle, ellipse, trapezoid, etc.).
- */
-std::pair<double, double> getRectangularDimensions(const Cutout& cutout) {
-    double width = 0.0;
-    double length = 0.0;
-
-    switch (static_cast<int>(cutout.m_type)) {
-        case CTYPE_RECT: {
-            RectCutout rect = deserializeRect(cutout);
-            width = rect.m_width;
-            length = rect.m_length;
-            break;
-        }
-        case CTYPE_ELLIPTICAL: {
-            EllipticalCutout ell = deserializeElliptical(cutout);
-            width = ell.m_diameter_x;   // Diameter is essentially the max width
-            length = ell.m_diameter_z;  // Diameter is the max length
-            break;
-        }
-        case CTYPE_TRAPEZOID: {
-            TrapezoidCutout trap = deserializeTrapezoid(cutout);
-            width = std::max(trap.m_widthA, trap.m_widthB);  // max of the two sides
-            length = trap.m_length;
-            break;
-        }
-        // Skip unlimited cutout
-        case CTYPE_UNLIMITED: {
-            break;
-        }
-        default:
-            // TODO
-            break;
-    }
-
-    return {width, length};
-}
+#include "Triangulation/GeometryUtils.h"
 
 /**
  * Given grid size, width, length, and a flag indicating the plane of the rays,
@@ -85,7 +47,7 @@ std::vector<std::vector<RAYX::Ray>> createRayGrid(size_t size, double width, dou
  * cutout. Using CPU-based ray tracing, it computes the intersections between rays and the optical element's surface within the cutout. The ray
  * intersections are then grouped into triangles based on the grid, and a RenderObject representing these triangles is returned.
  */
-RenderObject traceTriangulation(const RAYX::OpticalElement& element, Device& device) {
+void traceTriangulation(const RAYX::OpticalElement& element, std::vector<Vertex>& vertices, std::vector<uint32_t>& indices) {
     RAYX::CpuTracer tracer;
 
     constexpr size_t gridSize = 100;
@@ -103,8 +65,6 @@ RenderObject traceTriangulation(const RAYX::OpticalElement& element, Device& dev
         }
     }
 
-    std::vector<Vertex> vertices;
-    std::vector<uint32_t> indices;
     uint32_t index = 0;
 
     for (size_t i = 0; i < gridSize - 1; ++i) {
@@ -132,8 +92,4 @@ RenderObject traceTriangulation(const RAYX::OpticalElement& element, Device& dev
     if (vertices.empty() || indices.empty()) {
         throw std::runtime_error("Failed: Missing vertices or indices at a render object!");
     }
-    RenderObject renderObj(element.m_name, device, element.m_element.m_outTrans, vertices, indices);
-    RAYX_VERB << "Added " << vertices.size() / 3 << " triangles to new render object";
-
-    return renderObj;
 }

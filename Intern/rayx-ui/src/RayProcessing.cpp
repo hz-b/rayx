@@ -11,15 +11,15 @@
 #include "Application.h"
 #include "Colors.h"
 
-void displayFilterSlider(size_t* amountOfRays, size_t maxAmountOfRays, bool* displayRays, bool* renderAllRays) {
+void displayFilterSlider(size_t& amountOfRays, size_t maxAmountOfRays, bool& displayRays, bool& renderAllRays) {
     // Checkbox for displaying rays
     // Slider should be greyed out if "Display Rays" is unchecked
-    ImGui::Checkbox("Display Rays", displayRays);
-    if (!*displayRays || *renderAllRays) {
+    ImGui::Checkbox("Display Rays", &displayRays);
+    if (!displayRays || renderAllRays) {
         ImGui::BeginDisabled();  // Grey out the slider
     }
 
-    *amountOfRays = std::min(*amountOfRays, maxAmountOfRays);
+    amountOfRays = std::min(amountOfRays, maxAmountOfRays);
     ImGui::Text("Maximum amount of Rays per optical element:");
 
     // Define the range for the slider
@@ -27,22 +27,22 @@ void displayFilterSlider(size_t* amountOfRays, size_t maxAmountOfRays, bool* dis
     float maxLogValue = std::log(static_cast<float>(std::min<size_t>(maxAmountOfRays, MAX_RAYS)));
 
     // Convert the current amount of rays to logarithmic scale for the slider position
-    float logValue = std::log(static_cast<float>(*amountOfRays));
+    float logValue = std::log(static_cast<float>(amountOfRays));
 
     // Create a slider that operates on the logarithmic scale
     if (ImGui::SliderFloat("##hidden", &logValue, minLogValue, maxLogValue)) {
         // Convert the logarithmic value back to the actual number of rays
-        *amountOfRays = static_cast<int>(std::exp(logValue));
+        amountOfRays = static_cast<int>(std::exp(logValue));
     }
-    if (*displayRays && *renderAllRays) {
+    if (displayRays && renderAllRays) {
         ImGui::EndDisabled();
     }
 
     // Display the actual number of rays next to the slider
     ImGui::SameLine();
-    ImGui::Text("%d", *amountOfRays);
-    ImGui::Checkbox("Render all rays", renderAllRays);
-    if (!*displayRays) {
+    ImGui::Text("%d", amountOfRays);
+    ImGui::Checkbox("Render all rays", &renderAllRays);
+    if (!displayRays) {
         ImGui::EndDisabled();  // End grey out
     }
 }
@@ -63,11 +63,11 @@ size_t getMaxEvents(const RAYX::BundleHistory& bundleHist) {
 // Define the type of the filter function
 
 std::vector<Line> getRays(const RAYX::BundleHistory& rayCache, const std::vector<RAYX::OpticalElement>& elements, RayFilterFunction filterFunction,
-                          int amountOfRays) {
+                          uint32_t amountOfRays) {
     std::vector<Line> rays;
 
     // Apply the filter function to get the indices of the rays to be rendered
-    amountOfRays = std::min(amountOfRays, int(rayCache.size()));
+    amountOfRays = (uint32_t)std::min(amountOfRays, uint32_t(rayCache.size()));
     std::vector<size_t> rayIndices = filterFunction(rayCache, amountOfRays);
     auto maxRayIndex = rayCache.size();
     for (size_t i : rayIndices) {
@@ -83,8 +83,9 @@ std::vector<Line> getRays(const RAYX::BundleHistory& rayCache, const std::vector
                 // We need to convert them to world coordinates
                 glm::vec4 worldPos = elements[(size_t)event.m_lastElement].m_element.m_outTrans * glm::vec4(event.m_position, 1.0f);
 
-                Vertex origin = {{rayLastPos.x, rayLastPos.y, rayLastPos.z, 1.0f}, YELLOW};
-                Vertex point = (event.m_eventType == ETYPE_JUST_HIT_ELEM) ? Vertex(worldPos, ORANGE) : Vertex(worldPos, RED);
+                Vertex origin = {{rayLastPos.x, rayLastPos.y, rayLastPos.z, 1.0f}, YELLOW, {0.0f, 0.0f}};
+                Vertex point =
+                    (event.m_eventType == ETYPE_JUST_HIT_ELEM) ? Vertex(worldPos, ORANGE, {0.0f, 0.0f}) : Vertex(worldPos, RED, {0.0f, 0.0f});
 
                 Line myline = {origin, point};
                 rays.push_back(myline);
@@ -98,8 +99,8 @@ std::vector<Line> getRays(const RAYX::BundleHistory& rayCache, const std::vector
                 glm::vec4 eventDir = glm::vec4(event.m_direction, 0.0f);
                 glm::vec4 pointPos = eventPos + eventDir * 1000.0f;
 
-                Vertex origin = {eventPos, GREY};
-                Vertex point = {pointPos, GREY};
+                Vertex origin = {eventPos, GREY, {0.0f, 0.0f}};
+                Vertex point = {pointPos, GREY, {0.0f, 0.0f}};
 
                 rays.push_back(Line(origin, point));
             } else if (event.m_eventType == ETYPE_NOT_ENOUGH_BOUNCES) {
@@ -108,8 +109,8 @@ std::vector<Line> getRays(const RAYX::BundleHistory& rayCache, const std::vector
                 glm::vec4 worldPos = elements[(size_t)event.m_lastElement].m_element.m_outTrans * glm::vec4(event.m_position, 1.0f);
 
                 const glm::vec4 white = {1.0f, 1.0f, 1.0f, 0.7f};
-                Vertex origin = {{rayLastPos.x, rayLastPos.y, rayLastPos.z, 1.0f}, white};
-                Vertex point = Vertex(worldPos, white);
+                Vertex origin = {{rayLastPos.x, rayLastPos.y, rayLastPos.z, 1.0f}, white, {0.0f, 0.0f}};
+                Vertex point = Vertex(worldPos, white, {0.0f, 0.0f});
 
                 rays.push_back(Line(origin, point));
                 rayLastPos = point.pos;
@@ -144,7 +145,7 @@ std::vector<size_t> findMostCentralRays(const std::vector<std::vector<float>>& f
         size_t clusterIdx = clusterAssignments[i];
         float distance = 0.0f;  // Calculate the distance between features[i] and centroids[clusterIdx]
         for (size_t j = 0; j < features[i].size(); ++j) {
-            distance += std::pow(features[i][j] - centroids[clusterIdx][j], 2);
+            distance += (float)std::pow(features[i][j] - centroids[clusterIdx][j], 2);
         }
         distance = std::sqrt(distance);
 

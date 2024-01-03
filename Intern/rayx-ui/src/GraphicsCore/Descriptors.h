@@ -44,7 +44,7 @@ class DescriptorPool {
         Builder& addPoolSize(VkDescriptorType descriptorType, uint32_t count);
         Builder& setPoolFlags(VkDescriptorPoolCreateFlags flags);
         Builder& setMaxSets(uint32_t count);
-        std::unique_ptr<DescriptorPool> build() const;
+        std::shared_ptr<DescriptorPool> build() const;
 
       private:
         Device& m_Device;
@@ -59,10 +59,10 @@ class DescriptorPool {
     DescriptorPool& operator=(const DescriptorPool&) = delete;
 
     bool allocateDescriptor(const VkDescriptorSetLayout descriptorSetLayout, VkDescriptorSet& descriptor) const;
-
     void freeDescriptors(std::vector<VkDescriptorSet>& descriptors) const;
-
     void resetPool();
+
+    VkDescriptorPool getDescriptorPool() const { return m_DescriptorPool; }
 
   private:
     Device& m_Device;
@@ -73,7 +73,7 @@ class DescriptorPool {
 
 class DescriptorWriter {
   public:
-    DescriptorWriter(DescriptorSetLayout& setLayout, DescriptorPool& pool);
+    DescriptorWriter(DescriptorSetLayout& setLayout, const DescriptorPool& pool);
 
     DescriptorWriter& writeBuffer(uint32_t binding, VkDescriptorBufferInfo* bufferInfo);
     DescriptorWriter& writeImage(uint32_t binding, VkDescriptorImageInfo* imageInfo);
@@ -82,7 +82,7 @@ class DescriptorWriter {
     void overwrite(VkDescriptorSet& set);
 
   private:
-    DescriptorSetLayout& m_SetLayout;
-    DescriptorPool& m_Pool;
+    DescriptorSetLayout& m_SetLayout;  // TODO(Jannis): make this const?
+    const DescriptorPool& m_Pool;
     std::vector<VkWriteDescriptorSet> m_writes;
 };

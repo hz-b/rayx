@@ -19,3 +19,10 @@ struct Polygon {
 void interpolateConvexPolygon(std::vector<Vertex>& polyVertices, uint32_t targetNumber);
 
 std::vector<std::vector<double>> calculateDistanceMatrix(const std::vector<Vertex>& outerSlitVertices, const std::vector<Vertex>& openingVertices);
+
+/**
+ * @brief Returns the dimensions (width and length) for various types of cutouts.
+ * @param cutout Reference to the Cutout object.
+ * @return A pair containing width and length as double values.
+ */
+std::pair<double, double> getRectangularDimensions(const Cutout& cutout);
