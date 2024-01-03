@@ -7,18 +7,19 @@
 #include "GraphicsCore/Device.h"
 #include "GraphicsCore/GraphicsPipeline.h"
 #include "RenderObject.h"
+
 /**
- * @brief The ObjectRenderSystem class handles the rendering of a collection of RenderObjects.
+ * @brief The TexturedRenderSystem class handles the rendering of a collection of RenderObjects.
  *
  * It manages the creation of pipelines and pipeline layouts, as well as the rendering process.
  */
-class ObjectRenderSystem {
+class TexturedRenderSystem {
   public:
-    ObjectRenderSystem(Device& device, VkRenderPass renderPass, VkDescriptorSetLayout setLayout);
-    ~ObjectRenderSystem();
+    TexturedRenderSystem(Device& device, VkRenderPass renderPass, const std::vector<VkDescriptorSetLayout>& setLayouts);
+    ~TexturedRenderSystem();
 
-    ObjectRenderSystem(const ObjectRenderSystem&) = delete;
-    ObjectRenderSystem& operator=(const ObjectRenderSystem&) = delete;
+    TexturedRenderSystem(const TexturedRenderSystem&) = delete;
+    TexturedRenderSystem& operator=(const TexturedRenderSystem&) = delete;
 
     /**
      * @brief Renders a collection of RenderObjects.
@@ -34,10 +35,10 @@ class ObjectRenderSystem {
      * @param renderPass The render pass to use for the pipeline.
      * @param setLayouts The descriptor set layouts to use for the pipeline layout.
      */
-    void rebuild(VkRenderPass renderPass, VkDescriptorSetLayout setLayout);
+    void rebuild(VkRenderPass renderPass, const std::vector<VkDescriptorSetLayout>& setLayouts);
 
   private:
-    void createPipelineLayout(VkDescriptorSetLayout setLayout);
+    void createPipelineLayout(const std::vector<VkDescriptorSetLayout>&);
     void createPipeline(VkRenderPass renderPass);
 
     Device& m_Device;

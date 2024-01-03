@@ -271,7 +271,7 @@ void renderImGuiTree(const UIRenderSystem::TreeNode& treeNode, CameraController&
                 // Handle selection logic here
                 std::cout << "Selected object: " << child.name << " with index " << child.index << std::endl;
                 if (child.category == "Optical Element") {
-                    camController.lookAtPoint(rObjects[child.index].getTranslationVecor());
+                    camController.lookAtPoint(rObjects[child.index].getTranslationVector());
                 }
             }
         } else {

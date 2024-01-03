@@ -37,8 +37,8 @@ class RenderObject {
      * @param vertices Vector of Vertex objects.
      * @param indices Vector of index values.
      */
-    RenderObject(std::string name, Device& device, glm::mat4 modelMatrix, std::vector<Vertex>& vertices, std::vector<uint32_t>& indices,
-                 std::shared_ptr<DescriptorSetLayout> setLayout, std::shared_ptr<DescriptorPool> descriptorPool);
+    RenderObject(std::string name, Device& device, glm::mat4 modelMatrix, std::vector<Vertex>& vertices, std::vector<uint32_t>& indices);
+
     RenderObject(const RenderObject&) = delete;
     RenderObject& operator=(const RenderObject&) = delete;
     RenderObject(RenderObject&& other) noexcept;
@@ -64,11 +64,9 @@ class RenderObject {
     void updateTexture(const unsigned char* data, uint32_t width, uint32_t height);
 
     glm::mat4 getModelMatrix() const { return m_modelMatrix; }
-    glm::vec3 getTranslationVecor() const { return glm::vec3(m_modelMatrix[3][0], m_modelMatrix[3][1], m_modelMatrix[3][2]); }
+    glm::vec3 getTranslationVector() const { return glm::vec3(m_modelMatrix[3][0], m_modelMatrix[3][1], m_modelMatrix[3][2]); }
     std::string getName() const { return m_name; }
     uint32_t getVertexCount() const { return m_vertexCount; }
-    bool getIsTextured() const { return m_isTextured; }
-    VkDescriptorSet getDescriptorSet() const { return m_descrSet; }
 
   private:
     void createVertexBuffers(const std::vector<Vertex>& vertices);
@@ -78,13 +76,6 @@ class RenderObject {
     std::string m_name;
     Device& m_Device;
     glm::mat4 m_modelMatrix;  ///< Matrix for transforming the object from model to world coordinates
-    Texture m_Texture;
-
-    std::shared_ptr<DescriptorSetLayout> m_setLayout;
-    std::shared_ptr<DescriptorPool> m_descriptorPool;
-
-    bool m_isTextured;
-    VkDescriptorSet m_descrSet;
 
     uint32_t m_vertexCount;
     uint32_t m_indexCount;

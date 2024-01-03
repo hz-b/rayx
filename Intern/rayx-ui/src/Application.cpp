@@ -15,6 +15,7 @@
 #include "RenderSystem/GridRenderSystem.h"
 #include "RenderSystem/ObjectRenderSystem.h"
 #include "RenderSystem/RayRenderSystem.h"
+#include "RenderSystem/TexturedRenderSystem.h"
 #include "Triangulation/GeometryUtils.h"
 #include "UserInput.h"
 #include "Writer/CSVWriter.h"
@@ -63,7 +64,8 @@ void Application::run() {
     std::vector<VkDescriptorSetLayout> setLayouts{globalSetLayout->getDescriptorSetLayout(), texSetLayout->getDescriptorSetLayout()};
 
     // Render systems
-    ObjectRenderSystem objectRenderSystem(m_Device, m_Renderer.getSwapChainRenderPass(), setLayouts);
+    TexturedRenderSystem texturedRenderSystem(m_Device, m_Renderer.getSwapChainRenderPass(), setLayouts);
+    ObjectRenderSystem objectRenderSystem(m_Device, m_Renderer.getSwapChainRenderPass(), globalSetLayout->getDescriptorSetLayout());
     RayRenderSystem rayRenderSystem(m_Device, m_Renderer.getSwapChainRenderPass(), globalSetLayout->getDescriptorSetLayout());
     UIRenderSystem uiRenderSystem(m_Window, m_Device, m_Renderer.getSwapChainImageFormat(), m_Renderer.getSwapChainDepthFormat(),
                                   m_Renderer.getSwapChainImageCount());
@@ -118,23 +120,24 @@ void Application::run() {
             currentTime = newTime;
 
             // Update UI and camera
-            uiRenderSystem.setupUI(uiParams, rObjects);  // TODO(Jannis): Rename
+            uiRenderSystem.setupUI(uiParams, rObjects);  // TODO(Jannis): Rename and use elements instead of rObjects
             if (uiParams.pathChanged) {
                 std::vector<RAYX::OpticalElement> elements = RAYX::importBeamline(uiParams.rmlPath.string()).m_OpticalElements;
                 // Triangulate the render data and update the scene
                 m_TexturePool = DescriptorPool::Builder(m_Device)
                                     .addPoolSize(VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, (uint32_t)elements.size())
                                     .setMaxSets((uint32_t)elements.size())
+                                    .setPoolFlags(VK_DESCRIPTOR_POOL_CREATE_FREE_DESCRIPTOR_SET_BIT)
                                     .build();
 
                 rObjects = RenderObject::buildRObjectsFromElements(m_Device, elements, texSetLayout, m_TexturePool);
 
                 setLayouts = {globalSetLayout->getDescriptorSetLayout(), texSetLayout->getDescriptorSetLayout()};
-                objectRenderSystem.rebuild(m_Renderer.getSwapChainRenderPass(), setLayouts);
+                texturedRenderSystem.rebuild(m_Renderer.getSwapChainRenderPass(), setLayouts);
 
                 createRayCache(uiParams.rmlPath.string(), rayCache, uiParams.rayInfo);
                 uiParams.pathChanged = false;
-                camController.lookAtPoint(rObjects[0].getTranslationVecor());
+                camController.lookAtPoint(rObjects[0].getTranslationVector());
                 uiParams.rayInfo.raysChanged = true;
 
                 for (uint32_t i = 0; i < elements.size(); i++) {
@@ -150,8 +153,8 @@ void Application::run() {
                             }
                             return rays;
                         };
-                        std::vector<std::vector<uint32_t>> footprint =
-                            makeFootprint(raysOfElement(i), -width / 2, width / 2, -height / 2, height / 2, (uint32_t)(width), (uint32_t)(height));
+                        std::vector<std::vector<uint32_t>> footprint = makeFootprint(raysOfElement(i), -width / 2, width / 2, -height / 2, height / 2,
+                                                                                     (uint32_t)(width * 10), (uint32_t)(height * 10));
 
                         std::string filename = "footprint_" + std::to_string(i) + ".png";
                         writeFootprintAsPNG(footprint, filename.c_str());
@@ -161,11 +164,9 @@ void Application::run() {
                                 sum += cell;
                             }
                         }
-                        RAYX_LOG << "Sum of footprint: " << sum;
-
-                        uint32_t tmpWidth, tmpHeight;
-                        unsigned char* data = footprintAsImage(footprint, tmpWidth, tmpHeight);
-                        rObjects[i].updateTexture(data, tmpWidth, tmpHeight);
+                        uint32_t footprintWidth, footprintHeight;
+                        unsigned char* data = footprintAsImage(footprint, footprintWidth, footprintHeight);
+                        rObjects[i].updateTexture(data, footprintWidth, footprintHeight);
                     }
                 }
             }
@@ -284,6 +285,10 @@ void Application::updateRays(const std::string& path, BundleHistory& rayCache, s
             rayIndices[i * 2] = i * 2;
             rayIndices[i * 2 + 1] = i * 2 + 1;
         }
-        rayObj.emplace("Rays", m_Device, glm::mat4(1.0f), rayVertices, rayIndices, nullptr, nullptr);  // TODO: add descr pool and set
+        std::shared_ptr<DescriptorPool> rayDescrPool =
+            DescriptorPool::Builder(m_Device).addPoolSize(VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 1).setMaxSets(1).build();
+        std::shared_ptr<DescriptorSetLayout> raySetLayout =
+            DescriptorSetLayout::Builder(m_Device).addBinding(0, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, VK_SHADER_STAGE_FRAGMENT_BIT).build();
+        rayObj.emplace("Rays", m_Device, glm::mat4(1.0f), rayVertices, rayIndices, raySetLayout, rayDescrPool);
     }
 }
