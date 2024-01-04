@@ -130,7 +130,11 @@ void Application::run() {
                 std::string rmlPath = uiParams.rmlPath.string();
                 std::string rayFilePathH5 = rmlPath.substr(0, rmlPath.size() - 4) + ".h5";
                 std::string rayFilePathCSV = rmlPath.substr(0, rmlPath.size() - 4) + ".csv";
-                showH5NotExistPopup = !(std::filesystem::exists(rayFilePathH5) || std::filesystem::exists(rayFilePathCSV));
+#ifndef NO_H5
+                showH5NotExistPopup = !std::filesystem::exists(rayFilePathH5);
+#else
+                showH5NotExistPopup = !std::filesystem::exists(rayFilePathCSV);
+#endif
                 showRMLNotExistPopup = !std::filesystem::exists(rmlPath);
 
                 if (!showH5NotExistPopup && !showRMLNotExistPopup) {
@@ -193,12 +197,12 @@ void Application::run() {
             if (showH5NotExistPopup || showRMLNotExistPopup) {
                 ImGui::SetNextWindowPos(ImVec2(ImGui::GetIO().DisplaySize.x * 0.5f, ImGui::GetIO().DisplaySize.y * 0.5f), ImGuiCond_Always,
                                         ImVec2(0.5f, 0.5f));
-                ImGui::SetNextWindowSize(ImVec2(400, 200), ImGuiCond_Always);  // Set the desired size
+                ImGui::SetNextWindowSize(ImVec2(400, 200), ImGuiCond_Always);  // Set size
 
                 ImGui::OpenPopup("File Not Found");
                 if (ImGui::BeginPopupModal("File Not Found", NULL, ImGuiWindowFlags_AlwaysAutoResize)) {
                     // Scale up font size
-                    ImGui::PushFont(ImGui::GetIO().Fonts->Fonts[1]);  // Assuming Fonts[1] is a larger font, adjust as needed
+                    ImGui::PushFont(ImGui::GetIO().Fonts->Fonts[1]);
 
                     if (showH5NotExistPopup && showRMLNotExistPopup) {
                         ImGui::Text("Both RML and H5 files do not exist.");
