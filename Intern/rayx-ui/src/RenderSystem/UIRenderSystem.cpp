@@ -163,10 +163,10 @@ void UIRenderSystem::setupUI(UIParameters& uiParams, std::vector<RenderObject>& 
     }
 
     showSceneEditorWindow(uiParams);
+    showMissingFilePopupWindow(uiParams);
     showSettingsWindow();
     showHotkeysWindow();
     showBeamlineOutlineWindow(uiParams, rObjects, rSourcePositions);
-    showMissingFilePopupWindow(uiParams.showH5NotExistPopup, uiParams.showRMLNotExistPopup);
 
     ImGui::PopFont();
 }
@@ -197,8 +197,24 @@ void UIRenderSystem::showSceneEditorWindow(UIParameters& uiParams) {
         nfdfilteritem_t filterItem[filterCount] = {{"RML Files", "rml, xml"}};
         nfdresult_t result = NFD_OpenDialog(&outPath, filterItem, filterCount, NULL);
         if (result == NFD_OKAY) {
-            uiParams.rmlPath = outPath;
-            uiParams.pathChanged = true;
+            std::string rmlPath = outPath;
+            std::string rayFilePathH5 = rmlPath.substr(0, rmlPath.size() - 4) + ".h5";
+            std::string rayFilePathCSV = rmlPath.substr(0, rmlPath.size() - 4) + ".csv";
+
+#ifndef NO_H5
+            uiParams.showH5NotExistPopup = !std::filesystem::exists(rayFilePathH5);
+#else
+            uiParams.showH5NotExistPopup = !std::filesystem::exists(rayFilePathCSV);
+#endif
+            uiParams.showRMLNotExistPopup = !std::filesystem::exists(rmlPath);
+
+            if (uiParams.showH5NotExistPopup || uiParams.showRMLNotExistPopup) {
+                uiParams.pathChanged = false;
+            } else {
+                uiParams.pathChanged = true;
+                uiParams.pathValidState = true;
+                uiParams.rmlPath = outPath;
+            }
         } else if (result == NFD_CANCEL) {
             puts("User pressed cancel.");
         } else {
@@ -212,7 +228,7 @@ void UIRenderSystem::showSceneEditorWindow(UIParameters& uiParams) {
     ImGui::Separator();
     uiParams.camController.displaySettings();
     ImGui::Separator();
-    if (!uiParams.rmlPath.empty()) {
+    if (!uiParams.rmlPath.empty() && uiParams.pathValidState) {
         size_t tempAmountOfRays = uiParams.rayInfo.amountOfRays;
         bool tempDisplayRays = uiParams.rayInfo.displayRays;
         bool tempRenderAllRays = uiParams.rayInfo.renderAllRays;
@@ -391,8 +407,8 @@ void UIRenderSystem::showBeamlineOutlineWindow(UIParameters& uiParams, std::vect
     ImGui::End();
 }
 
-void UIRenderSystem::showMissingFilePopupWindow(bool& showH5NotExistPopup, bool& showRMLNotExistPopup) {
-    if (showH5NotExistPopup || showRMLNotExistPopup) {
+void UIRenderSystem::showMissingFilePopupWindow(UIParameters& uiParams) {
+    if (uiParams.showH5NotExistPopup || uiParams.showRMLNotExistPopup) {
         ImGui::SetNextWindowPos(ImVec2(ImGui::GetIO().DisplaySize.x * 0.5f, ImGui::GetIO().DisplaySize.y * 0.5f), ImGuiCond_Always,
                                 ImVec2(0.5f, 0.5f));
         ImGui::SetNextWindowSize(ImVec2(400, 200), ImGuiCond_Always);  // Set size
@@ -402,17 +418,17 @@ void UIRenderSystem::showMissingFilePopupWindow(bool& showH5NotExistPopup, bool&
             // Scale up font size
             ImGui::PushFont(ImGui::GetIO().Fonts->Fonts[1]);
 
-            if (showH5NotExistPopup && showRMLNotExistPopup) {
+            if (uiParams.showH5NotExistPopup && uiParams.showRMLNotExistPopup) {
                 ImGui::Text("Both RML and H5 files do not exist.");
-            } else if (showH5NotExistPopup) {
+            } else if (uiParams.showH5NotExistPopup) {
                 ImGui::Text("The H5 file does not exist.");
             } else {
                 ImGui::Text("The RML file does not exist.");
             }
             ImGui::Spacing();
             if (ImGui::Button("OK")) {
-                showH5NotExistPopup = false;
-                showRMLNotExistPopup = false;
+                uiParams.showH5NotExistPopup = false;
+                uiParams.showRMLNotExistPopup = false;
             }
 
             // Revert to original font size

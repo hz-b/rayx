@@ -104,7 +104,8 @@ void Application::run() {
         .frameTime = 0.0,                    //
         .rayInfo = rayInfo,
         .showRMLNotExistPopup = false,
-        .showH5NotExistPopup = false  //
+        .showH5NotExistPopup = false,
+        .pathValidState = false  //
     };
 
     // Main loop
@@ -127,14 +128,6 @@ void Application::run() {
 
             if (uiParams.pathChanged) {
                 std::string rmlPath = uiParams.rmlPath.string();
-                std::string rayFilePathH5 = rmlPath.substr(0, rmlPath.size() - 4) + ".h5";
-                std::string rayFilePathCSV = rmlPath.substr(0, rmlPath.size() - 4) + ".csv";
-#ifndef NO_H5
-                uiParams.showH5NotExistPopup = !std::filesystem::exists(rayFilePathH5);
-#else
-                uiParams.showH5NotExistPopup = !std::filesystem::exists(rayFilePathCSV);
-#endif
-                uiParams.showRMLNotExistPopup = !std::filesystem::exists(rmlPath);
 
                 if (!uiParams.showH5NotExistPopup && !uiParams.showRMLNotExistPopup) {
                     vkDeviceWaitIdle(m_Device.device());
