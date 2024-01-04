@@ -102,11 +102,10 @@ void Application::run() {
         .rmlPath = rmlPathCli,               //
         .pathChanged = !rmlPathCli.empty(),  //
         .frameTime = 0.0,                    //
-        .rayInfo = rayInfo                   //
+        .rayInfo = rayInfo,
+        .showRMLNotExistPopup = false,
+        .showH5NotExistPopup = false  //
     };
-
-    static bool showRMLNotExistPopup = false;
-    static bool showH5NotExistPopup = false;
 
     // Main loop
     while (!m_Window.shouldClose()) {
@@ -131,13 +130,13 @@ void Application::run() {
                 std::string rayFilePathH5 = rmlPath.substr(0, rmlPath.size() - 4) + ".h5";
                 std::string rayFilePathCSV = rmlPath.substr(0, rmlPath.size() - 4) + ".csv";
 #ifndef NO_H5
-                showH5NotExistPopup = !std::filesystem::exists(rayFilePathH5);
+                uiParams.showH5NotExistPopup = !std::filesystem::exists(rayFilePathH5);
 #else
-                showH5NotExistPopup = !std::filesystem::exists(rayFilePathCSV);
+                uiParams.showH5NotExistPopup = !std::filesystem::exists(rayFilePathCSV);
 #endif
-                showRMLNotExistPopup = !std::filesystem::exists(rmlPath);
+                uiParams.showRMLNotExistPopup = !std::filesystem::exists(rmlPath);
 
-                if (!showH5NotExistPopup && !showRMLNotExistPopup) {
+                if (!uiParams.showH5NotExistPopup && !uiParams.showRMLNotExistPopup) {
                     vkDeviceWaitIdle(m_Device.device());
                     m_Beamline = RAYX::importBeamline(rmlPath);
                     std::vector<RAYX::OpticalElement> elements = m_Beamline.m_OpticalElements;
@@ -193,36 +192,6 @@ void Application::run() {
                 }
             }
             uiParams.pathChanged = false;
-
-            if (showH5NotExistPopup || showRMLNotExistPopup) {
-                ImGui::SetNextWindowPos(ImVec2(ImGui::GetIO().DisplaySize.x * 0.5f, ImGui::GetIO().DisplaySize.y * 0.5f), ImGuiCond_Always,
-                                        ImVec2(0.5f, 0.5f));
-                ImGui::SetNextWindowSize(ImVec2(400, 200), ImGuiCond_Always);  // Set size
-
-                ImGui::OpenPopup("File Not Found");
-                if (ImGui::BeginPopupModal("File Not Found", NULL, ImGuiWindowFlags_AlwaysAutoResize)) {
-                    // Scale up font size
-                    ImGui::PushFont(ImGui::GetIO().Fonts->Fonts[1]);
-
-                    if (showH5NotExistPopup && showRMLNotExistPopup) {
-                        ImGui::Text("Both RML and H5 files do not exist.");
-                    } else if (showH5NotExistPopup) {
-                        ImGui::Text("The H5 file does not exist.");
-                    } else {
-                        ImGui::Text("The RML file does not exist.");
-                    }
-                    ImGui::Spacing();
-                    if (ImGui::Button("OK")) {
-                        showH5NotExistPopup = false;
-                        showRMLNotExistPopup = false;
-                    }
-
-                    // Revert to original font size
-                    ImGui::PopFont();
-
-                    ImGui::EndPopup();
-                }
-            }
 
             if (uiParams.rayInfo.raysChanged) {
                 vkDeviceWaitIdle(m_Device.device());

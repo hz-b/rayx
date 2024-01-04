@@ -166,6 +166,7 @@ void UIRenderSystem::setupUI(UIParameters& uiParams, std::vector<RenderObject>& 
     showSettingsWindow();
     showHotkeysWindow();
     showBeamlineOutlineWindow(uiParams, rObjects, rSourcePositions);
+    showMissingFilePopupWindow(uiParams.showH5NotExistPopup, uiParams.showRMLNotExistPopup);
 
     ImGui::PopFont();
 }
@@ -388,4 +389,36 @@ void UIRenderSystem::showBeamlineOutlineWindow(UIParameters& uiParams, std::vect
     }
 
     ImGui::End();
+}
+
+void UIRenderSystem::showMissingFilePopupWindow(bool& showH5NotExistPopup, bool& showRMLNotExistPopup) {
+    if (showH5NotExistPopup || showRMLNotExistPopup) {
+        ImGui::SetNextWindowPos(ImVec2(ImGui::GetIO().DisplaySize.x * 0.5f, ImGui::GetIO().DisplaySize.y * 0.5f), ImGuiCond_Always,
+                                ImVec2(0.5f, 0.5f));
+        ImGui::SetNextWindowSize(ImVec2(400, 200), ImGuiCond_Always);  // Set size
+
+        ImGui::OpenPopup("File Not Found");
+        if (ImGui::BeginPopupModal("File Not Found", NULL, ImGuiWindowFlags_AlwaysAutoResize)) {
+            // Scale up font size
+            ImGui::PushFont(ImGui::GetIO().Fonts->Fonts[1]);
+
+            if (showH5NotExistPopup && showRMLNotExistPopup) {
+                ImGui::Text("Both RML and H5 files do not exist.");
+            } else if (showH5NotExistPopup) {
+                ImGui::Text("The H5 file does not exist.");
+            } else {
+                ImGui::Text("The RML file does not exist.");
+            }
+            ImGui::Spacing();
+            if (ImGui::Button("OK")) {
+                showH5NotExistPopup = false;
+                showRMLNotExistPopup = false;
+            }
+
+            // Revert to original font size
+            ImGui::PopFont();
+
+            ImGui::EndPopup();
+        }
+    }
 }

@@ -27,6 +27,8 @@ struct UIParameters {
     bool pathChanged;
     float frameTime;
     UIRayInfo rayInfo;
+    bool showRMLNotExistPopup;
+    bool showH5NotExistPopup;
 };
 
 class UIRenderSystem {
@@ -85,6 +87,7 @@ class UIRenderSystem {
     void renderImGuiTreeFromRML(const std::filesystem::path& filename, CameraController& camController, std::vector<RenderObject>& rObjects,
                                 std::vector<glm::dvec3>& rSourcePositions);
     void showBeamlineOutlineWindow(UIParameters& uiParams, std::vector<RenderObject>& rObjects, std::vector<glm::dvec3>& rSourcePositions);
+    void showMissingFilePopupWindow(bool& showH5NotExistPopup, bool& showRMLNotExistPopup);
 };
 
 void renderImGuiTree(const UIRenderSystem::TreeNode& treeNode, CameraController& camController);
