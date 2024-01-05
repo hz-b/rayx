@@ -1,10 +1,10 @@
+// The shader-internal constants are mostly defined in this file.
+
 #ifndef CONSTANTS
 #define CONSTANTS
 
 #include "EventType.h"
 #include "ImageType.h"
-
-// useful constants
 
 // inverse nanometer-electron volt relationship / reziprocal factor
 const double inm2eV = 1.239852e3;

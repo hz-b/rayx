@@ -1,6 +1,8 @@
 #ifndef IMAGE_TYPE_H
 #define IMAGE_TYPE_H
 
+// The ImageType is a parameter within the RZP.
+// It's different possible values are listed below.
 // These numbers are chosen to be compatible with RAY-UI.
 const double IT_POINT2POINT = 0.0;
 const double IT_POINT2HORIZONTAL_LINE = 4.0;

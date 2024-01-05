@@ -28,7 +28,7 @@ const double ETYPE_ABSORBED = 3;
 const double ETYPE_UNINIT = 4;
 
 // This is an error code.
-// Functions like refrac2D can error due to "ray beyond horizon", see utils.comp.
+// Functions like refrac2D can error due to "ray beyond horizon", see Utils.h.
 // In that case this is returned as final event.
 const double ETYPE_BEYOND_HORIZON = 5;
 

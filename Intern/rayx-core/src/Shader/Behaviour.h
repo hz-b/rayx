@@ -7,7 +7,7 @@
 #undef m_private_serialization_params
 
 // A behaviour decides what happens whenever a ray hits the surface of this element.
-// Each behaviour type has its own `behave` function in `behave.comp`.
+// Each behaviour type has its own `behave` function in `Behave.h`.
 const int BTYPE_MIRROR = 0;
 const int BTYPE_GRATING = 1;
 const int BTYPE_SLIT = 2;

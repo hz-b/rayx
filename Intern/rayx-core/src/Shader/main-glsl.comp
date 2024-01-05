@@ -1,6 +1,21 @@
 #version 450
 
+// This is the GLSL shader entry file.
+// In other words, the file that will compiled to SPIR-V and then used within our VulkanEngine.
+
+// The reader might wonder, why we include .h and .cpp files in a .comp file.
+// The reason is that our shader is implemented in the intersection of GLSL and C++.
+// In other words, our shader can be compiled using either GLSL or C++, which allows us to have the same codebase used on the GPU and the CPU.
+// In the future, we might want to switch to something like OpenCL/CUDA which automatically does this for us.
+
+// To bridge the gap between GLSL and C++, the Adapt.h file provides a common API for both.
+
+
+// Whenever we want to check whether we are on the GPU or the CPU, this `GLSL` define will be referenced.
 #define GLSL
+// So we use `#ifdef GLSL` to add some code only for the GPU,
+// and we use `#ifndef GLSL` to add some code only for the CPU.
+
 #define WORKGROUP_SIZE 8
 
 #extension GL_EXT_debug_printf : enable
