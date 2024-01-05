@@ -73,3 +73,5 @@ The energy can be understood as the equivalent to the wavelength of the lightray
 The light polarisation impacts the reflective properties of the ray. Depending on the lightsource it is calculated or given by the user. 
 
 For more information on how to implement and use light sources please read the dokumentation for the spesific light source (updated soon).
+
+##
