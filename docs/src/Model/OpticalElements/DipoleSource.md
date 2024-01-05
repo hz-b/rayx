@@ -4,12 +4,12 @@ The Dipole Source in RAYX is implemented to generate an realistic lightbeam. To 
 
 ## Light Properties
 
-In RAYX every ray is described by four properties. Each light source has a different approach to determine these, depending on which parts should be realisic and what should be syntheticaly generated. The determination is almost always in a given distribution-window and randomly generated. This guarantees that minimal systematic errors are impacting the simulation. The User can choose a Distribution window for the properties and sometimes a distribution type like a gaussian or hardedge distribution. 
+In RAYX every ray is described by four properties. Each light source has a different approach to determine these, depending on which parts should be realisic and what should be syntheticaly generated. The values are randomly generated for the given distirubution. This guarantees that minimal systematic errors are impacting the simulation. The user gives a distribution window for the properties.
 
 The parameters are 
-- Origin
-- Direction
-- Energy
+- Origin (X, Y, Z)
+- Direction (X, Y, Z)
+- Energy 
 - Polarisation.
 
 ### Origin
