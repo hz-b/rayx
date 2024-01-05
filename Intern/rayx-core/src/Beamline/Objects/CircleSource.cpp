@@ -95,6 +95,8 @@ glm::dvec3 CircleSource::getDirection() const {
     return glm::dvec3(al, am, an);
 }
 
+double CircleSource::getHorDivergence() const { return m_horDivergence; }
+
 double CircleSource::getSourceHeight() const { return m_sourceHeight; }
 
 double CircleSource::getSourceWidth() const { return m_sourceWidth; }

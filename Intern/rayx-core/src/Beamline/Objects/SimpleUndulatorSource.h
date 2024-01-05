@@ -13,8 +13,12 @@ class RAYX_API SimpleUndulatorSource : public LightSource {
 
     double calcUndulatorSigma() const;
     double calcUndulatorSigmaS() const;
+
+    double getHorDivergence() const override;
     double getSourceHeight() const override;
     double getSourceWidth() const override;
+
+    double getVerDivergence() const;
 
     double getCoord(const SourceDist l, const double extent) const;
 
@@ -27,6 +31,7 @@ class RAYX_API SimpleUndulatorSource : public LightSource {
     SigmaType m_sigmaType;
     double m_undulatorLength;
     double m_undulatorSigma;
+    double m_undulatorSigmaS;
     double m_photonEnergy;
     double m_photonWaveLength;
 

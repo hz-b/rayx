@@ -10,6 +10,8 @@ class RAYX_API PointSource : public LightSource {
     virtual ~PointSource() = default;
 
     std::vector<Ray> getRays(int thread_count = 1) const override;
+
+    double getHorDivergence() const override;
     double getSourceHeight() const override;
     double getSourceWidth() const override;
 
