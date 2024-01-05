@@ -20,7 +20,8 @@ SimpleUndulatorSource::SimpleUndulatorSource(const DesignObject& dobj) : LightSo
     m_electronSigmaY = dobj.parseElectronSigmaY();
     m_electronSigmaYs = dobj.parseElectronSigmaYs();
 
-    
+    m_horDivergence = getHorDivergence();
+    m_verDivergence = getVerDivergence();
 
     m_sourceDepth = dobj.parseSourceDepth();
     m_sourceHeight = getSourceHeight();
@@ -38,12 +39,8 @@ SimpleUndulatorSource::SimpleUndulatorSource(const DesignObject& dobj) : LightSo
  * hard edge, gaussian if soft edge)) and extent (eg specified width/height of
  * source)
  */
-double SimpleUndulatorSource::getCoord(const SourceDist l, const double extent) const {
-    if (l == SourceDist::Uniform) {
-        return (randomDouble() - 0.5) * extent;
-    } else {
-        return randomNormal(0, 1) * extent;
-    }
+double SimpleUndulatorSource::getCoord(const double extent) const {
+    return randomNormal(0, 1) * extent;
 }
 
 /**
@@ -64,15 +61,15 @@ std::vector<Ray> SimpleUndulatorSource::getRays([[maybe_unused]] int thread_coun
     // create n rays with random position and divergence within the given span
     // for width, height, depth, horizontal and vertical divergence
     for (int i = 0; i < n; i++) {
-        x = getCoord(SourceDist::Gaussian, m_sourceWidth);
-        y = getCoord(SourceDist::Gaussian, m_sourceHeight);
+        x = getCoord( m_sourceWidth);
+        y = getCoord( m_sourceHeight);
         z = (randomDouble() - 0.5) * m_sourceDepth;
         z += m_position.z;
         en = selectEnergy();  // LightSource.cpp
         glm::dvec3 position = glm::dvec3(x, y, z);
 
-        phi = getCoord(SourceDist::Gaussian, getHorDivergence());
-        psi = getCoord(SourceDist::Gaussian, getVerDivergence());
+        phi = getCoord( m_horDivergence);
+        psi = getCoord(m_verDivergence);
         // get corresponding angles based on distribution and deviation from
         // main ray (main ray: xDir=0,yDir=0,zDir=1 for phi=psi=0)
         glm::dvec3 direction = getDirectionFromAngles(phi, psi);
@@ -112,43 +109,23 @@ double SimpleUndulatorSource::calcUndulatorSigmaS() const {
 }
 
 double SimpleUndulatorSource::getSourceHeight() const {
-    double height;
-    if (m_sigmaType == SigmaType::ST_MAINBEAM) {
-        height = 0;
-    } else {
-        height = sqrt(pow(m_electronSigmaY, 2) + pow(m_undulatorSigma, 2));  // in µm
-    }
-    return height/1000;
+    double height = sqrt(pow(m_electronSigmaY, 2) + pow(m_undulatorSigma, 2));  
+    return height/1000; // in µm
 }
 
 double SimpleUndulatorSource::getSourceWidth() const {
-    double width;
-    if (m_sigmaType == SigmaType::ST_MAINBEAM) {
-        width = 0;
-    } else {
-        width = sqrt(pow(m_electronSigmaX, 2) + pow(m_undulatorSigma, 2));  // in µm
-    }
-    return width/1000;
+    double width = sqrt(pow(m_electronSigmaX, 2) + pow(m_undulatorSigma, 2));  
+    return width/1000; // in µm
 }
 
 double SimpleUndulatorSource::getHorDivergence() const{
-    double hordiv;
-    if (m_sigmaType == SigmaType::ST_MAINBEAM) {
-        hordiv =0;
-    } else {
-        hordiv = sqrt(pow(m_electronSigmaXs,2)+pow(m_undulatorSigmaS,2));  // in µrad
-    }
-    return hordiv;
+    double hordiv = sqrt(pow(m_electronSigmaXs,2)+pow(m_undulatorSigmaS,2));  
+    return hordiv/1000000; // in µrad
 }
 
 double SimpleUndulatorSource::getVerDivergence() const{
-    double verdiv;
-    if (m_sigmaType == SigmaType::ST_MAINBEAM) {
-        verdiv =0;
-    } else {
-        verdiv = sqrt(pow(m_electronSigmaYs,2)+pow(m_undulatorSigmaS,2));  // in µrad
-    }
-    return verdiv;
+    double verdiv = sqrt(pow(m_electronSigmaYs,2)+pow(m_undulatorSigmaS,2));  
+    return verdiv/1000000; // in µrad
 }
 
 }  // namespace RAYX

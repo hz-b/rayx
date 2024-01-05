@@ -16,7 +16,7 @@ enum class SourceDistType { Simultaneous, HardEdge, Gauss };       // default si
 enum class SourceDist { Uniform, Gaussian, Thirds, Circle };       // TODO(rudi): unify! ('Thrids' represents PixelSource Footprint)
 enum class ElectronEnergyOrientation { Clockwise, Counterclockwise };
 enum class EnergySpreadUnit { EU_PERCENT, EU_eV };
-enum class SigmaType { ST_STANDARD, ST_ACCURATE, ST_MAINBEAM };
+enum class SigmaType { ST_STANDARD, ST_ACCURATE };
 
 class RAYX_API LightSource {
   public:
