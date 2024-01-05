@@ -50,7 +50,7 @@ The user sets the following parameters:
 * vertical divergence (y-dir)
 * distribution type
 
-The direction for each ray is described by phi and psi values. They are the horizontal and vertical angles of the direction.
+The direction for each ray is calculated for phi and psi values. They are the horizontal and vertical angles of the direction.
 A direction vector is calculated from these angles and used for the tracing process. 
 
 And again there are differences for each source which are described in the respective chapters.
