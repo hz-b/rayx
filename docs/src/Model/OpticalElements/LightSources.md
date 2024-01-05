@@ -1,22 +1,25 @@
 # Light Sources
 
-Light sources serve as the origin for the rays in the ray tracing process. They are responsible for the properties of the light. Depending on the user input the direction, photon energy, and light polarization are determined. In this section, you can find a description on
+Light Sources are the starting point for each ray. Here the Properties of the light are set. Depending on the user input the direction, photon energy and light polarization are determined. In this section, you can find a description on
 how the light sources are implemented and how to employ them for different beamlines. Depending on the needs it can be usefull to know which light source suits best. 
 The important part of the implementation of light sources in RAYX are the overall distributions of the values. Most of the Lightsources produce a spectrum of light rays. 
 
 ## Implemented Sources
 
-Currently there are three light sources implemented in RAYX. They are fundamentaly different and serve different purpuses. 
+Currently there are six light sources implemented in RAYX. They are fundamentaly different and serve different purpuses. 
 
 - Dipole Source
 - Matrix Source
 - Point Source
+- Circle Source
+- Pixle Source
+- Simple Undulator Source
 
 The Matrix and Point Sources are conceptual sources, wheras the implementation of the Dipole Source is aiming to be as close to the reality as possible. 
 
 ## Light Properties
 
-In RAYX every ray is described by four properties. Each light source has a different approach to determine these, depending on which parts should be realisic and what should be syntheticaly generated. The determination is almost always in a given distribution-window and randomly generated. This guarantees that minimal systematic errors are impacting the ray generation. The user can choose a distribution window and a distribution type.
+In RAYX every ray is described by four properties. Each light source has a different approach to determine these, depending on which parts should be realisic and what should be syntheticaly generated. The values are almost always in a given distribution-window and randomly generated. This guarantees that minimal systematic errors are impacting the ray generation. The user can choose a distribution window and a distribution type.
 
 Parameters:
 - Origin
