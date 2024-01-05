@@ -10,14 +10,17 @@ namespace RAYX {
 
 SimpleUndulatorSource::SimpleUndulatorSource(const DesignObject& dobj) : LightSource(dobj) {
     m_sigmaType = dobj.parseSigmaType();
+    m_photonEnergy = dobj.parsePhotonEnergy();
+    m_photonWaveLength = calcPhotonWavelength(m_photonEnergy);
     m_undulatorLength = dobj.parseUndulatorLength();
     m_undulatorSigma = calcUndulatorSigma();
+    m_undulatorSigmaS = calcUndulatorSigmaS();
     m_electronSigmaX = dobj.parseElectronSigmaX();
     m_electronSigmaXs = dobj.parseElectronSigmaXs();
     m_electronSigmaY = dobj.parseElectronSigmaY();
     m_electronSigmaYs = dobj.parseElectronSigmaYs();
 
-    m_photonEnergy = dobj.parsePhotonEnergy();
+    
 
     m_sourceDepth = dobj.parseSourceDepth();
     m_sourceHeight = getSourceHeight();
@@ -27,7 +30,7 @@ SimpleUndulatorSource::SimpleUndulatorSource(const DesignObject& dobj) : LightSo
     m_linearPol_45 = dobj.parseLinearPol45();
     m_circularPol = dobj.parseCircularPol();
 
-    m_photonWaveLength = calcPhotonWavelength(m_photonEnergy);
+    
 }
 
 /**
@@ -48,7 +51,7 @@ double SimpleUndulatorSource::getCoord(const SourceDist l, const double extent) 
  *
  * @returns list of rays
  */
-std::vector<Ray> SimpleUndulatorSource::getRays(int thread_count) const {
+std::vector<Ray> SimpleUndulatorSource::getRays([[maybe_unused]] int thread_count) const {
     RAYX_PROFILE_FUNCTION();
 
     double x, y, z, psi, phi, en;  // x,y,z pos, psi,phi direction cosines, en=energy
@@ -68,10 +71,8 @@ std::vector<Ray> SimpleUndulatorSource::getRays(int thread_count) const {
         en = selectEnergy();  // LightSource.cpp
         glm::dvec3 position = glm::dvec3(x, y, z);
 
-        // get random deviation from main ray based on distribution
-        // TODO correct misalignments?
-        psi = 1;
-        phi = 1;
+        phi = getCoord(SourceDist::Gaussian, getHorDivergence());
+        psi = getCoord(SourceDist::Gaussian, getVerDivergence());
         // get corresponding angles based on distribution and deviation from
         // main ray (main ray: xDir=0,yDir=0,zDir=1 for phi=psi=0)
         glm::dvec3 direction = getDirectionFromAngles(phi, psi);
@@ -89,9 +90,9 @@ std::vector<Ray> SimpleUndulatorSource::getRays(int thread_count) const {
 double SimpleUndulatorSource::calcUndulatorSigma() const {
     double undulatorSigma;
     if (m_sigmaType == SigmaType::ST_STANDARD) {
-        undulatorSigma = sqrt(2 * m_photonWaveLength / 1000 * m_undulatorLength * 1000000) / (2 * M_PI);  // in µm
+        undulatorSigma = sqrt(2 * m_photonWaveLength / 1000 * m_undulatorLength * 1000000) / (2 * PI);  // in µm
     } else if (m_sigmaType == SigmaType::ST_ACCURATE) {
-        undulatorSigma = 3.0 / (4 * M_PI) * sqrt(m_photonWaveLength / 1000 * m_undulatorLength * 1000000);  // in µm
+        undulatorSigma = 3.0 / (4 * PI) * sqrt(m_photonWaveLength / 1000 * m_undulatorLength * 1000000);  // in µm
     } else {
         undulatorSigma = 0;
     }
@@ -117,7 +118,7 @@ double SimpleUndulatorSource::getSourceHeight() const {
     } else {
         height = sqrt(pow(m_electronSigmaY, 2) + pow(m_undulatorSigma, 2));  // in µm
     }
-    return height;
+    return height/1000;
 }
 
 double SimpleUndulatorSource::getSourceWidth() const {
@@ -127,7 +128,27 @@ double SimpleUndulatorSource::getSourceWidth() const {
     } else {
         width = sqrt(pow(m_electronSigmaX, 2) + pow(m_undulatorSigma, 2));  // in µm
     }
-    return width;
+    return width/1000;
+}
+
+double SimpleUndulatorSource::getHorDivergence() const{
+    double hordiv;
+    if (m_sigmaType == SigmaType::ST_MAINBEAM) {
+        hordiv =0;
+    } else {
+        hordiv = sqrt(pow(m_electronSigmaXs,2)+pow(m_undulatorSigmaS,2));  // in µrad
+    }
+    return hordiv;
+}
+
+double SimpleUndulatorSource::getVerDivergence() const{
+    double verdiv;
+    if (m_sigmaType == SigmaType::ST_MAINBEAM) {
+        verdiv =0;
+    } else {
+        verdiv = sqrt(pow(m_electronSigmaYs,2)+pow(m_undulatorSigmaS,2));  // in µrad
+    }
+    return verdiv;
 }
 
 }  // namespace RAYX

@@ -81,6 +81,8 @@ std::vector<Ray> PixelSource::getRays([[maybe_unused]] int thread_count) const {
     return rayList;
 }
 
+double PixelSource::getHorDivergence() const { return m_horDivergence; }
+
 double PixelSource::getSourceHeight() const { return m_sourceHeight; }
 
 double PixelSource::getSourceWidth() const { return m_sourceWidth; }

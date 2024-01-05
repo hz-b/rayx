@@ -487,6 +487,8 @@ void DipoleSource::setMaxFlux() {
     }
 }
 
+double DipoleSource::getHorDivergence() const { return m_horDivergence; }
+
 double DipoleSource::getSourceHeight() const { return m_sourceHeight; }
 
 double DipoleSource::getSourceWidth() const { return m_sourceWidth; }

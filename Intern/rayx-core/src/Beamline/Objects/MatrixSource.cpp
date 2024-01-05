@@ -91,6 +91,8 @@ std::vector<Ray> MatrixSource::getRays([[maybe_unused]] int thread_count) const 
     return returnList;
 }
 
+double MatrixSource::getHorDivergence() const { return m_horDivergence; }
+
 double MatrixSource::getSourceHeight() const { return m_sourceHeight; }
 
 double MatrixSource::getSourceWidth() const { return m_sourceWidth; }

@@ -4,20 +4,20 @@
 
 void checkEnergyDistribution(const std::vector<Ray>& rays, double photonEnergy, double energySpread) {
     for (auto r : rays) {
-        CHECK_IN(r.m_energy, photonEnergy - energySpread, photonEnergy + energySpread)
+        CHECK_IN(r.m_energy, photonEnergy - energySpread, photonEnergy + energySpread);
     }
 }
 
 void checkZDistribution(const std::vector<Ray>& rays, double center, double spread) {
     for (auto r : rays) {
-        CHECK_IN(r.m_position.z, center - spread, center + spread)
+        CHECK_IN(r.m_position.z, center - spread, center + spread);
     }
 }
 
 void checkPositionDistribution(const std::vector<Ray>& rays, double sourceWidth, double sourceHeight) {
     for (auto r : rays) {
-        CHECK_IN(r.m_position[0], -4.5 * sourceWidth, 4.5 * sourceWidth)
-        CHECK_IN(r.m_position[1], -4.5 * sourceHeight, 4.5 * sourceHeight)
+        CHECK_IN(r.m_position.x, -4.5 * sourceWidth, 4.5 * sourceWidth);
+        CHECK_IN(r.m_position.y, -4.5 * sourceHeight, 4.5 * sourceHeight);
     }
 }
 
@@ -29,7 +29,7 @@ void checkDirectionDistribution(const std::vector<Ray>& rays, double minAngle, d
         }
 
         double psi = asin(r.m_direction.y);
-        psi = abs(psi) * 1000;
+        psi = abs(psi);
         CHECK_IN(psi, minAngle, maxAngle);
     }
 }
@@ -188,7 +188,7 @@ TEST_F(TestSuite, testLightsourceGetters) {
     struct RmlInput {
         std::string rmlFile;
         double horDivergence;
-        double sourceHight;
+        double sourceHeight;
         double sourceWidth;
         double sourceDepth;
         double averagePhotonEnergy;
@@ -197,10 +197,17 @@ TEST_F(TestSuite, testLightsourceGetters) {
     std::vector<RmlInput> rmlinputs = {{
         .rmlFile = "PointSourceHardEdge",
         .horDivergence = 0.001,  // conversion /1000 in the parser
-        .sourceHight = 0.04,
+        .sourceHeight = 0.04,
         .sourceWidth = 0.065,
         .sourceDepth = 1,
         .averagePhotonEnergy = 120.97,
+    },{
+        .rmlFile = "simpleUndulator",
+        .horDivergence = 46.528002321182889,  // conversion /1000 in the parser
+        .sourceHeight = 0.053499116288275229,
+        .sourceWidth = 0.22173963435440763,
+        .sourceDepth = 1,
+        .averagePhotonEnergy = 100,
     }};
 
     for (auto values : rmlinputs) {
@@ -214,15 +221,17 @@ TEST_F(TestSuite, testLightsourceGetters) {
         auto average = lightSource->getPhotonEnergy();
 
         CHECK_EQ(horResult, values.horDivergence);
-        CHECK_EQ(heightResult, values.sourceHight);
+        CHECK_EQ(heightResult, values.sourceHeight);
         CHECK_EQ(widthResult, values.sourceWidth);
         CHECK_EQ(average, values.averagePhotonEnergy);
     }
 }
 
-/*TEST_F(TestSuite, testSimpleUndulator) {
+TEST_F(TestSuite, testSimpleUndulator) {
     auto bundle = traceRML("simpleUndulator");
     for (auto rays : bundle) {
-        checkPositionDistribution(rays, -100, 100); 
+        checkPositionDistribution(rays, 0.22173963435440763, 0.053499116288275229); 
+        checkZDistribution(rays, 0, 1);
+        checkDirectionDistribution(rays, 0, 46.528002321182892/2);
     }
-}*/
+}

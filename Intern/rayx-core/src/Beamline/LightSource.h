@@ -29,7 +29,7 @@ class RAYX_API LightSource {
 
     // Getter
     Misalignment getMisalignmentParams() const;
-    double getHorDivergence() const { return m_horDivergence; }
+    virtual double getHorDivergence() const { return m_horDivergence; }
     virtual double getSourceHeight() const { return m_sourceHeight; }
     virtual double getSourceWidth() const { return m_sourceWidth; }
     glm::dvec4 getPosition() const { return m_position; }

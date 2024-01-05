@@ -10,6 +10,7 @@ class RAYX_API CircleSource : public LightSource {
     virtual ~CircleSource() = default;
 
     std::vector<Ray> getRays(int thread_count = 1) const override;
+    double getHorDivergence() const override;
     double getSourceHeight() const override;
     double getSourceWidth() const override;
 
