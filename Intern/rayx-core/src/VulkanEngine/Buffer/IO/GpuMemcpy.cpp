@@ -3,6 +3,8 @@
 #include "VulkanEngine/VulkanEngine.h"
 
 namespace RAYX {
+// Like https://www.man7.org/linux/man-pages/man3/memcpy.3.html but for the GPU.
+// We copy `bytes` many bytes from `bufferSrc` at offset `offsetSrc` to `bufferDst` at offset `offsetDst`.
 void VulkanEngine::gpuMemcpy(VkBuffer& bufferDst, size_t offsetDst, VkBuffer& bufferSrc, size_t offsetSrc, size_t bytes) {
     RAYX_PROFILE_FUNCTION();
     VkCommandBufferBeginInfo beginInfo{};

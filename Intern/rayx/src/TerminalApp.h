@@ -35,9 +35,6 @@ class TerminalApp {
     std::vector<std::string> getBeamlineOpticalElementsNames();
     std::vector<std::string> getBeamlineLightSourcesNames();
 
-#if defined(RAYX_DEBUG_MODE)
-    void exportDebug();
-#endif
     std::string providedFile;
     std::unique_ptr<CommandParser> m_CommandParser;
     std::unique_ptr<RAYX::Tracer> m_Tracer;

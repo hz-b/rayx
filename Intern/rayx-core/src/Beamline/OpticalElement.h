@@ -7,7 +7,7 @@
 #include "Core.h"
 #include "Data/xml.h"
 #include "Shader/Constants.h"
-#include "utils.h"
+#include "angle.h"
 
 namespace RAYX {
 

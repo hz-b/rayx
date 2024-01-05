@@ -83,12 +83,6 @@ void TerminalApp::tracePath(const std::filesystem::path& path) {
                 RAYX_WARN << "received error code while printing";
             }
         }
-
-#if defined(RAYX_DEBUG_MODE)
-        // Export Debug Matrics.
-        exportDebug();
-#endif
-
     } else {
         RAYX_VERB << "ignoring non-rml file: '" << path << "'";
     }
@@ -177,34 +171,6 @@ std::string TerminalApp::exportRays(const RAYX::BundleHistory& hist, std::string
     }
     return path;
 }
-
-#if defined(RAYX_DEBUG_MODE)
-/**
- * @brief Gets All Debug Buffers and check if they are the identity matrix.
- * This is a default function to show how the implemented Debug Buffer works.
- * You can write your own checking func.
- *
- * Debugging Matrices are only available on Vulkan Tracing In Debug mode
- *
- */
-void TerminalApp::exportDebug() {
-#ifndef NO_VULKAN
-    if (m_CommandParser->m_args.m_cpuFlag) {
-        return;
-    }
-    auto d = (const RAYX::VulkanTracer*)(m_Tracer.get());
-    int index = 0;
-    RAYX_VERB << "Debug Matrix Check...";
-    for (auto m : d->getDebugList()) {
-        if (isIdentMatrix(m._dMat)) {
-            printDMat4(m._dMat);
-            RAYX_D_ERR << "@" << index;
-        }
-        index += 1;
-    }
-#endif
-}
-#endif
 
 /**
  * @brief Get all beamline optical elemet names

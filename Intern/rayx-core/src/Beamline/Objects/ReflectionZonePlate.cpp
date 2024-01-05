@@ -4,6 +4,7 @@
 #include "Debug/Debug.h"
 #include "Material/Material.h"
 #include "Shader/Constants.h"
+#include "Shader/Utils.h"
 
 namespace RAYX {
 
