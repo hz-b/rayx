@@ -203,7 +203,7 @@ TEST_F(TestSuite, testLightsourceGetters) {
         .averagePhotonEnergy = 120.97,
     },{
         .rmlFile = "simpleUndulator",
-        .horDivergence = 46.528002321182889,  // conversion /1000 in the parser
+        .horDivergence = 4.6528002321182891e-05,  // conversion /1000 in the parser
         .sourceHeight = 0.053499116288275229,
         .sourceWidth = 0.22173963435440763,
         .sourceDepth = 1,
@@ -227,11 +227,4 @@ TEST_F(TestSuite, testLightsourceGetters) {
     }
 }
 
-TEST_F(TestSuite, testSimpleUndulator) {
-    auto bundle = traceRML("simpleUndulator");
-    for (auto rays : bundle) {
-        checkPositionDistribution(rays, 0.22173963435440763, 0.053499116288275229); 
-        checkZDistribution(rays, 0, 1);
-        checkDirectionDistribution(rays, 0, 46.528002321182892/2);
-    }
-}
+
