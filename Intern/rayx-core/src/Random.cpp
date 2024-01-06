@@ -23,6 +23,7 @@ int randomIntInRange(int a, int b) {
     return low + randomUint() % (high + 1 - low);
 }
 
+// samples the uniform distribution over the interval [min(a, b), max(a, b)].
 double randomDoubleInRange(double a, double b) {
     double low = std::min(a, b);
     double high = std::max(a, b);
@@ -32,6 +33,7 @@ double randomDoubleInRange(double a, double b) {
 // see https://en.wikipedia.org/wiki/Box%E2%80%93Muller_transform
 // we don't use std::normal_distribution, due to this:
 // https://stackoverflow.com/questions/38532927/why-gcc-and-msvc-stdnormal-distribution-are-different
+// `mu` is the mean, `sigma` is the standard deviation.
 double randomNormal(double mu, double sigma) {
     constexpr double epsilon = std::numeric_limits<double>::epsilon();
     const double two_pi = 2.0 * PI;

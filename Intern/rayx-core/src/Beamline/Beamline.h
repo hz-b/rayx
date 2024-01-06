@@ -23,6 +23,7 @@ class RAYX_API Beamline {
     Beamline();
     ~Beamline();
 
+    // iterates over the m_LightSources, and collects the rays they emit.
     std::vector<Ray> getInputRays(int thread_count = 1) const;
 
     /**

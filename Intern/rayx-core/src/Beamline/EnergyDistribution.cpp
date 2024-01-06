@@ -18,6 +18,9 @@ double EnergyDistribution::selectEnergy() const {
     // the below code calls either DatFile::selectEnergy,
     // HardEdge::selectEnergy, SoftEdge::selectEnergy or SeperateEnergies::selectEnergy
     // depending on what is stored in m_Variant.
+
+    // If you want to know more about this "lambda-expression" syntax,
+    // you can read it up at https://en.cppreference.com/w/cpp/language/lambda
     const auto func = [&](const auto arg) -> double { return arg.selectEnergy(); };
     return std::visit(func, m_Variant);
 }
