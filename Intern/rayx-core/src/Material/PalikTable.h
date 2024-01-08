@@ -3,7 +3,8 @@
 #include <string>
 #include <vector>
 
-#include "../Shader/NffPalik.h"
+// This file defines the PalikEntry.
+#include "../Shader/RefractiveIndex.h"
 
 namespace RAYX {
 /** This struct represents the contents of a .NKP file.

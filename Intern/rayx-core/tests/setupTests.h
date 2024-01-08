@@ -12,8 +12,11 @@
 #include "Debug/Debug.h"
 #include "Material/Material.h"
 #include "Random.h"
+
 #include "Shader/Constants.h"
 #include "Shader/Ray.h"
+#include "Shader/RefractiveIndex.h"
+
 #include "Tracer/CpuTracer.h"
 #include "Tracer/VulkanTracer.h"
 #include "Writer/CSVWriter.h"

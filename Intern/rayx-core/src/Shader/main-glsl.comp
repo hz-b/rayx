@@ -34,6 +34,7 @@ layout(local_size_x = WORKGROUP_SIZE, local_size_y = 1, local_size_z = 1) in;
 #include "Approx.cpp"
 #include "Complex.cpp"
 #include "Rand.cpp"
+#include "RefractiveIndex.cpp"
 #include "Utils.cpp"
 #include "SphericalCoords.cpp"
 #include "Collision.cpp"

@@ -53,22 +53,6 @@ double deg2rad(double degree);
 // returns forial of a (from RAYLIB.for) (a!)
 double RAYX_API fact(int a);
 
-// returns dvec2(atomic mass, density) extracted from materials.xmacro
-dvec2 RAYX_API getAtomicMassAndRho(int material);
-
-#include "../Shader/NffPalik.h"
-
-int RAYX_API getPalikEntryCount(int material);
-
-int RAYX_API getNffEntryCount(int material);
-
-PalikEntry RAYX_API getPalikEntry(int index, int material);
-
-NffEntry RAYX_API getNffEntry(int index, int material);
-
-// returns dvec2 to represent a complex number
-dvec2 RAYX_API getRefractiveIndex(double energy, int material);
-
 // returns angle between ray direction and surface normal at intersection point
 double RAYX_API getIncidenceAngle(Ray r, dvec3 normal);
 
