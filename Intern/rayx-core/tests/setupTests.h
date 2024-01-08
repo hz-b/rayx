@@ -17,6 +17,7 @@
 #include "Shader/Ray.h"
 #include "Shader/RefractiveIndex.h"
 #include "Shader/Efficiency.h"
+#include "Shader/Diffraction.h"
 
 #include "Tracer/CpuTracer.h"
 #include "Tracer/VulkanTracer.h"

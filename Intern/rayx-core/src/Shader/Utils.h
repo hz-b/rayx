@@ -50,9 +50,6 @@ void outTransformation(RAYX_INOUT(Ray) r, const dmat4 invMisalignment, const dma
 // only for testing purposes. generally, each angle in the shader is in rad!!
 double deg2rad(double degree);
 
-// returns forial of a (from RAYLIB.for) (a!)
-double RAYX_API fact(int a);
-
 // returns angle between ray direction and surface normal at intersection point
 double RAYX_API getIncidenceAngle(Ray r, dvec3 normal);
 
@@ -148,29 +145,6 @@ double RAYX_API vlsGrating(double lineDensity, double z, double vls[6]);
  */
 Ray RAYX_API refrac_plane(Ray r, ALLOW_UNUSED dvec3 normal,
                           double a);  // TODO fix unused var
-
-/**returns first bessel function of parameter v*/
-double RAYX_API bessel1(double v);
-
-/**
-calculates the Bessel diffraction effects on circular slits and on circular
-zoneplates
-@params:	radius		radius < 0 (mm)
-            wl			wavelength (nm)
-            dphi, dpsi  angles of diffracted ray
-@returns
-    results stored in dphi, dpsi (inout)
-*/
-void bessel_diff(double radius, double wl, RAYX_INOUT(double) dphi, RAYX_INOUT(double) dpsi);
-
-/**
- * calculates fraunhofer diffraction effects on rectangular slits
- * @param dim		dimension (x or y) (mm)
- * @param wl			wavelength (nm)
- * @param dAngle 	diffraction angle (inout)
- * @return result stored in dAngle
- */
-void fraun_diff(double dim, double wl, RAYX_INOUT(double) dAngle);
 
 // Cutout helper functions:
 

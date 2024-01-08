@@ -1,5 +1,6 @@
 #include "Behave.h"
 #include "Utils.h"
+#include "Diffraction.h"
 #include "Efficiency.h"
 #include "Rand.h"
 #include "Helper.h"
