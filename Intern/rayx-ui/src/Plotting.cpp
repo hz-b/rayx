@@ -33,8 +33,7 @@ std::vector<std::vector<uint32_t>> makeFootprint(std::vector<RAYX::Ray> rays, do
         // We can use this factor to determine the grid cell in which to put our ray r.
         double x2 = (x - min_x) / (max_x - min_x);
         double z2 = (z - min_z) / (max_z - min_z);
-
-        assert(x2 >= 0.0 && x2 <= 1.0 && z2 >= 0.0 && z2 <= 1.0);
+        if (x2 < 0.0 || x2 > 1.0 || z2 < 0.0 || z2 > 1.0) continue;
 
         // x3 is the x-index in the grid.
         uint32_t x3 = (uint32_t)(x2 * (double)cells_x);
@@ -86,6 +85,8 @@ unsigned char* footprintAsImage(std::vector<std::vector<uint32_t>> footprint, ui
             if (value > max) max = value;
         }
     }
+
+    if (max == 0) max = 1;
 
     for (uint32_t x = 0; x < width; x++) {
         for (uint32_t z = 0; z < height; z++) {

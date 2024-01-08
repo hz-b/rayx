@@ -159,24 +159,17 @@ void Application::run() {
 
                             auto raysOfElement = [&](uint32_t elementIdx) {
                                 std::vector<RAYX::Ray> rays;
-                                for (auto& ray : m_rays) {
-                                    if (ray.size() > elementIdx) {
-                                        rays.push_back(ray[elementIdx]);
+                                for (auto& rayHist : m_rays) {
+                                    for (auto& ray : rayHist) {
+                                        if (ray.m_lastElement == elementIdx) {
+                                            rays.push_back(ray);
+                                        }
                                     }
                                 }
                                 return rays;
                             };
                             std::vector<std::vector<uint32_t>> footprint = makeFootprint(raysOfElement(i), -width / 2, width / 2, -height / 2,
                                                                                          height / 2, (uint32_t)(width * 10), (uint32_t)(height * 10));
-                            size_t sum = 0;
-                            for (auto& row : footprint) {
-                                for (auto& val : row) {
-                                    sum += val;
-                                }
-                            }
-                            RAYX_LOG << "Sum of footprint: " << sum;
-                            std::string filename = "footprint_" + std::to_string(i) + ".png";
-                            writeFootprintAsPNG(footprint, filename.c_str());
                             uint32_t footprintWidth, footprintHeight;
                             unsigned char* data = footprintAsImage(footprint, footprintWidth, footprintHeight);
                             rObjects[i].updateTexture(data, footprintWidth, footprintHeight);
