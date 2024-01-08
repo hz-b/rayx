@@ -1,14 +1,20 @@
 #pragma once
 
-//
+/// This file mostly exposes the RAYX_LOG, RAYX_VERB, RAYX_WARN and RAYX_ERR macros.
+/// We mostly use these macros instead of std::cout / std::cerr for convenience reasons.
+/// These macros automatically generate a newline at the end, and also print file and line number from where the print originated.
 
-/**
- *  Include this if you want macros for debugging.
- *
- *  Include stdlib before this header if you need it
- *
- */
+/// RAYX_LOG, RAYX_VERB prints to std::cout, whereas RAYX_WARN and RAYX_ERR are printed in red and go to std::cerr.
+/// RAYX_VERB is used for "verbose" prints, they can be activated and deactivated using the setDebugVerbose function.
+/// Finally RAYX_ERR is to be used for fatal errors, calling it will automatically terminate the program by calling the configurable `error_fn` defined below.
+///
+/// Each of these variants also has a "debug-only" variant, that gets deactivated in the release mode.
+/// The "debug-only" variant is prefixed by "RAYX_D_" instead of "RAYX_".
+/// For example the "debug-only" RAYX_LOG would be RAYX_D_LOG.
 
+/// For quick debugging prints, this file further exposes RAYX_DBG(x).
+
+// This include is necessary, as Debug implements a special formatting for Ray.
 #include <Shader/Ray.h>
 
 #include <array>
@@ -19,17 +25,6 @@
 #include <vector>
 
 #include "Core.h"
-
-// Memory leak detection (RAYX_NEW instead of new allows leaks to be detected)
-#ifdef RAYX_DEBUG_MODE
-#ifdef RAYX_PLATFORM_MSVC
-#define _CRTDBG_MAP_ALLOC
-#include <crtdbg.h>
-#endif
-#define RAYX_NEW new (_NORMAL_BLOCK, __FILE__, __LINE__)
-#else
-#define RAYX_NEW new
-#endif
 
 // Debug only code; use it as: DEBUG(<statement>);
 #ifdef RAYX_DEBUG_MODE
@@ -48,7 +43,10 @@ namespace RAYX {
 // LOGGING SYSTEM
 ///////////////////////////////////////////////
 
+// activates / deactivates the printing of RAYX_VERB "verbose" prints.
 void RAYX_API setDebugVerbose(bool);
+
+// reads the "verbose" flag.
 bool RAYX_API getDebugVerbose();
 
 /**
@@ -62,6 +60,7 @@ bool RAYX_API getDebugVerbose();
  * RAYX_LOG << "I am " << age << " years old";
  * */
 
+// The implementation of RAYX_LOG
 struct RAYX_API Log {
     Log(std::string filename, int line);
     ~Log();
@@ -73,6 +72,7 @@ struct RAYX_API Log {
     }
 };
 
+// The implementation of RAYX_WARN
 struct RAYX_API Warn {
     Warn(std::string filename, int line);
 
@@ -85,6 +85,7 @@ struct RAYX_API Warn {
     }
 };
 
+// The implementation of RAYX_ERR
 struct RAYX_API Err {
     std::string filename;
     int line;
@@ -100,6 +101,7 @@ struct RAYX_API Err {
     }
 };
 
+// The implementation of RAYX_VERB
 struct RAYX_API Verb {
     Verb(std::string filename, int line);
     ~Verb();
@@ -113,6 +115,7 @@ struct RAYX_API Verb {
     }
 };
 
+// An empty implementation used in release when using "debug-only" prints like RAYX_D_LOG.
 struct RAYX_API IgnoreLog {
     template <typename T>
     IgnoreLog& operator<<(T) {
@@ -124,17 +127,22 @@ struct RAYX_API IgnoreLog {
 // normally exit(1), but in the test suite it's ADD_FAILURE.
 extern void RAYX_API (*error_fn)();
 
+// Defines the actual RAYX logging macros using the structs defined above.
+// The __FILE__ and __LINE__ macros contain the current filename and linenumber.
+// They are defined for us by c++ https://gcc.gnu.org/onlinedocs/cpp/Standard-Predefined-Macros.html
 #define RAYX_LOG RAYX::Log(__FILE__, __LINE__)
 #define RAYX_WARN RAYX::Warn(__FILE__, __LINE__)
 #define RAYX_ERR RAYX::Err(__FILE__, __LINE__)
 #define RAYX_VERB RAYX::Verb(__FILE__, __LINE__)
 
 #ifdef RAYX_DEBUG_MODE
+// In debug mode, RAYX_D_LOG is just the same as RAYX_LOG.
 #define RAYX_D_LOG RAYX_LOG
 #define RAYX_D_WARN RAYX_WARN
 #define RAYX_D_ERR RAYX_ERR
 
 #else
+// In release mode, RAYX_D_LOG instead calls the IgnoreLog, hence discarding the print.
 #define RAYX_D_LOG RAYX::IgnoreLog()
 #define RAYX_D_WARN RAYX::IgnoreLog()
 #define RAYX_D_ERR RAYX::IgnoreLog()

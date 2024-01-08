@@ -5,6 +5,9 @@
 
 namespace RAYX {
 
+// The length of filename and line number is 30 characters.
+// If it doesn't find, we insert "...".
+// This is used to have a visually unified output that is easier to read.
 constexpr int PREFIX_LEN = 30;
 
 /**
@@ -43,9 +46,12 @@ void formatDebugMsg(std::string filename, int line, std::ostream& o) {
 
 Log::Log(std::string filename, int line) { formatDebugMsg(std::move(filename), line, std::cout); }
 
+// The destructor of Log is used to finish the print by a newline.
 Log::~Log() { std::cout << std::endl; }
 
 Warn::Warn(std::string filename, int line) {
+    // This is a so-called ANSI color code (or ANSI color sequence).
+    // It changes the color of the following text, until we do a color-reset.
     std::cerr << "\x1B[31m";  // color red
     formatDebugMsg(std::move(filename), line, std::cerr);
 }
@@ -68,6 +74,7 @@ Err::~Err() {
 }
 
 Verb::Verb(std::string filename, int line) {
+    // only print if the verbose flag it set!
     if (getDebugVerbose()) {
         formatDebugMsg(std::move(filename), line, std::cout);
     }
@@ -79,11 +86,14 @@ Verb::~Verb() {
     }
 }
 
+// The default error_fn value. Exit with an error code of 1.
 void exit1() { exit(1); }
 void (*error_fn)() = exit1;
 
-const int PREC = 17;
+const int PREC = 17; // precision
 
+// the implementation of RAYX_DBG.
+// the std::vector<double> v contains the data of the object we intend to log.
 void dbg(const std::string& filename, int line, std::string name, std::vector<double> v) {
     RAYX::Log(filename, line) << std::move(name) << ":";
 
@@ -107,10 +117,9 @@ void dbg(const std::string& filename, int line, std::string name, std::vector<do
     }
 }
 
+// The verbose flag used for RAYX_VERB printing.
 static bool VERBOSE = false;
-
 void setDebugVerbose(bool b) { VERBOSE = b; }
-
 bool getDebugVerbose() { return VERBOSE; }
 
 }  // namespace RAYX
