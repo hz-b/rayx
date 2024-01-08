@@ -16,6 +16,7 @@
 #include "Shader/Constants.h"
 #include "Shader/Ray.h"
 #include "Shader/RefractiveIndex.h"
+#include "Shader/Efficiency.h"
 
 #include "Tracer/CpuTracer.h"
 #include "Tracer/VulkanTracer.h"
