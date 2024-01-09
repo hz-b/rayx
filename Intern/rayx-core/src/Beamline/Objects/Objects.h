@@ -9,6 +9,8 @@
 #include "Beamline/Objects/PixelSource.h"
 #include "Beamline/Objects/PointSource.h"
 #include "Beamline/Objects/SimpleUndulatorSource.h"
+#include "Beamline/Objects/MainBeam.h"
+
 
 // Optical Elements
 #include "Beamline/Objects/Cone.h"
