@@ -171,8 +171,8 @@ void Application::run() {
                             std::vector<std::vector<uint32_t>> footprint = makeFootprint(raysOfElement(i), -width / 2, width / 2, -height / 2,
                                                                                          height / 2, (uint32_t)(width * 10), (uint32_t)(height * 10));
                             uint32_t footprintWidth, footprintHeight;
-                            unsigned char* data = footprintAsImage(footprint, footprintWidth, footprintHeight);
-                            rObjects[i].updateTexture(data, footprintWidth, footprintHeight);
+                            std::unique_ptr<unsigned char[]> data = footprintAsImage(footprint, footprintWidth, footprintHeight);
+                            rObjects[i].updateTexture(data.get(), footprintWidth, footprintHeight);
                         }
                     }
                 }

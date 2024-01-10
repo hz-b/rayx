@@ -56,7 +56,7 @@ void CameraController::updateDirectionViaMouse(float mouseX, float mouseY) {
     float deltaX = mouseX - m_lastMouseX;
     float deltaY = mouseY - m_lastMouseY;
     setLastMousePos(mouseX, mouseY);
-    updateDirection(0.1f * deltaX, -0.1f * deltaY);
+    updateDirection(-0.05f * deltaX, 0.05f * deltaY);
 }
 
 void CameraController::PerspectiveConfig::display() {
@@ -114,8 +114,7 @@ void CameraController::update(Camera& cam, float aspectRatio) {
         cam.n = m_orthogonalCfg.m_near;
         cam.f = m_orthogonalCfg.m_far;
     }
-
-    cam.proj[1][1] *= -1;  // Vulkan has inverted Y coordinates
+    cam.proj[1][1] *= -1;  // Flip the y-axis
     cam.isOrtho = m_cameraMode == CameraMode::Orthogonal ? 1 : 0;
 }
 

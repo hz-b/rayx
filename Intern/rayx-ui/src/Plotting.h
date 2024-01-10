@@ -50,4 +50,4 @@ void writeFootprintAsPNG(std::vector<std::vector<uint32_t>> footprint, const cha
  * @param channels The number of channels in the image (3 for RGB).
  * @return The image data.
  */
-unsigned char* footprintAsImage(std::vector<std::vector<uint32_t>> footprint, uint32_t& width, uint32_t& height);
+std::unique_ptr<unsigned char[]> footprintAsImage(std::vector<std::vector<uint32_t>> footprint, uint32_t& width, uint32_t& height);

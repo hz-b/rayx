@@ -24,8 +24,8 @@ std::vector<std::vector<uint32_t>> makeFootprint(std::vector<RAYX::Ray> rays, do
 
     // fill the grid.
     for (auto r : rays) {
-        double x = r.m_position.x;
-        double z = r.m_position.z;
+        double x = -r.m_position.x;  // TODO: Figure out why this needs to be negated.
+        double z = -r.m_position.z;
 
         // x2 = 0.0 means, the ray has x position min_x.
         // x2 = 1.0 means, the ray has x position max_x.
@@ -61,16 +61,15 @@ std::vector<std::vector<uint32_t>> makeFootprintSquare(std::vector<RAYX::Ray> ra
 void writeFootprintAsPNG(std::vector<std::vector<uint32_t>> footprint, const char* filename) {
     uint32_t width, height;
     constexpr uint32_t channels = 4;  // RGBA is forced for now
-    unsigned char* data = footprintAsImage(footprint, width, height);
-    stbi_write_png(filename, width, height, channels, data, width * channels);
-    delete[] data;
+    std::unique_ptr<unsigned char[]> data = footprintAsImage(footprint, width, height);
+    stbi_write_png(filename, width, height, channels, data.get(), width * channels);
 }
 
-unsigned char* footprintAsImage(std::vector<std::vector<uint32_t>> footprint, uint32_t& width, uint32_t& height) {
-    width = (int)footprint.size();
-    height = (int)footprint[0].size();
+std::unique_ptr<unsigned char[]> footprintAsImage(std::vector<std::vector<uint32_t>> footprint, uint32_t& width, uint32_t& height) {
+    width = static_cast<uint32_t>(footprint.size());
+    height = static_cast<uint32_t>(footprint[0].size());
     constexpr uint32_t channels = 4;  // RGBA is forced for now
-    unsigned char* data = new unsigned char[width * height * channels];
+    std::unique_ptr<unsigned char[]> data(new unsigned char[width * height * channels]);
 
     // Colors for visualizing ray density.
     glm::vec4 low = glm::vec4(0.0, 0.1, 1.0, 1.0);
@@ -89,12 +88,15 @@ unsigned char* footprintAsImage(std::vector<std::vector<uint32_t>> footprint, ui
     for (uint32_t x = 0; x < width; x++) {
         for (uint32_t z = 0; z < height; z++) {
             uint32_t value = footprint[x][z];
-            glm::vec4 color = glm::mix(low, high, (float)value / (float)max);
+            float logValue = std::log10(static_cast<float>(value) + 1.0f);
+            float logMax = std::log10(static_cast<float>(max) + 1.0f);
+            float normalizedValue = logValue / logMax;
+            glm::vec4 color = glm::mix(low, high, normalizedValue);
             uint32_t index = (x + z * width) * channels;
-            data[index + 0] = (unsigned char)(color.r * 255.0);
-            data[index + 1] = (unsigned char)(color.g * 255.0);
-            data[index + 2] = (unsigned char)(color.b * 255.0);
-            data[index + 3] = (unsigned char)(color.a * 255.0);
+            data[index + 0] = static_cast<unsigned char>(color.r * 255.0);
+            data[index + 1] = static_cast<unsigned char>(color.g * 255.0);
+            data[index + 2] = static_cast<unsigned char>(color.b * 255.0);
+            data[index + 3] = static_cast<unsigned char>(color.a * 255.0);
         }
     }
 

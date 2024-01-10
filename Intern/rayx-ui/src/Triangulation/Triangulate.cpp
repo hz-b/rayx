@@ -1,6 +1,7 @@
 #include "Triangulate.h"
 
 #include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtx/string_cast.hpp>
 #include <memory>
 
 #include "Colors.h"
@@ -12,7 +13,7 @@
 // ------ Helper functions ------
 
 void calculateSolidMeshOfType(const Cutout& cutout, std::vector<Vertex>& vertices, std::vector<uint32_t>* indices = nullptr) {
-    constexpr double defWidthHeight = 100.0f;
+    constexpr double defWidthHeight = 50.0f;  // TODO(Jannis): define this in one place (@see getRectangularDimensions)
     Polygon poly;
 
     switch (static_cast<int>(cutout.m_type)) {
