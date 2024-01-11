@@ -123,7 +123,7 @@ void Application::run() {
             currentTime = newTime;
 
             // Update UI and camera
-            uiRenderSystem.setupUI(uiParams, rObjects, rSourcePositions);
+            uiRenderSystem.setupUI(uiParams, m_Beamline.m_OpticalElements, rSourcePositions);
             // camController.update(cam, m_Renderer.getAspectRatio());
 
             if (uiParams.pathChanged) {
