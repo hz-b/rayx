@@ -10,7 +10,6 @@
 #include "FrameInfo.h"
 #include "GraphicsCore/Renderer.h"
 #include "GraphicsCore/Window.h"
-#include "Plotting.h"
 #include "RayProcessing.h"
 #include "RenderObject.h"
 #include "RenderSystem/GridRenderSystem.h"
@@ -132,6 +131,7 @@ void Application::run() {
                 if (!uiParams.showH5NotExistPopup && !uiParams.showRMLNotExistPopup) {
                     vkDeviceWaitIdle(m_Device.device());
                     m_Beamline = RAYX::importBeamline(rmlPath);
+                    loadRays(rmlPath);
                     std::vector<RAYX::OpticalElement> elements = m_Beamline.m_OpticalElements;
                     rSourcePositions.clear();
                     for (auto& source : m_Beamline.m_LightSources) {
@@ -143,46 +143,23 @@ void Application::run() {
                                         .setMaxSets((uint32_t)elements.size())
                                         .setPoolFlags(VK_DESCRIPTOR_POOL_CREATE_FREE_DESCRIPTOR_SET_BIT)
                                         .build();
-                    rObjects = RenderObject::buildRObjectsFromElements(m_Device, elements, texSetLayout, m_TexturePool);
+                    rObjects = RenderObject::buildRObjectsFromElements(m_Device, elements, m_rays, texSetLayout, m_TexturePool);
 
                     setLayouts = {globalSetLayout->getDescriptorSetLayout(), texSetLayout->getDescriptorSetLayout()};
                     objectRenderSystem.rebuild(m_Renderer.getSwapChainRenderPass(), setLayouts);
 
-                    createRayCache(uiParams.rmlPath.string(), rayCache, uiParams.rayInfo);
+                    createRayCache(rayCache, uiParams.rayInfo);
                     uiParams.pathChanged = false;
                     camController.lookAtPoint(rObjects[0].getTranslationVecor());
                     uiParams.rayInfo.raysChanged = true;
-
-                    for (uint32_t i = 0; i < elements.size(); i++) {
-                        if (rObjects[i].getVertexCount() == 4) {
-                            auto [width, height] = getRectangularDimensions(elements[i].m_element.m_cutout);
-
-                            auto raysOfElement = [&](uint32_t elementIdx) {
-                                std::vector<RAYX::Ray> rays;
-                                for (auto& rayHist : m_rays) {
-                                    for (auto& ray : rayHist) {
-                                        if (ray.m_lastElement == elementIdx) {
-                                            rays.push_back(ray);
-                                        }
-                                    }
-                                }
-                                return rays;
-                            };
-                            std::vector<std::vector<uint32_t>> footprint = makeFootprint(raysOfElement(i), -width / 2, width / 2, -height / 2,
-                                                                                         height / 2, (uint32_t)(width * 10), (uint32_t)(height * 10));
-                            uint32_t footprintWidth, footprintHeight;
-                            std::unique_ptr<unsigned char[]> data = footprintAsImage(footprint, footprintWidth, footprintHeight);
-                            rObjects[i].updateTexture(data.get(), footprintWidth, footprintHeight);
-                        }
-                    }
                 }
+                uiParams.pathChanged = false;
             }
-            uiParams.pathChanged = false;
 
             if (uiParams.rayInfo.raysChanged) {
                 vkDeviceWaitIdle(m_Device.device());
                 if (uiParams.rayInfo.cacheChanged) {
-                    createRayCache(uiParams.rmlPath.string(), rayCache, uiParams.rayInfo);
+                    createRayCache(rayCache, uiParams.rayInfo);
                     uiParams.rayInfo.cacheChanged = false;
                 }
                 if (uiParams.rayInfo.displayRays) {
@@ -218,8 +195,7 @@ void Application::run() {
     vkDeviceWaitIdle(m_Device.device());
 }
 
-void Application::createRayCache(const std::string& path, BundleHistory& rayCache, UIRayInfo& rayInfo) {
-    loadRays(path);
+void Application::createRayCache(BundleHistory& rayCache, UIRayInfo& rayInfo) {
     rayInfo.maxAmountOfRays = (int)m_rays.size();
     if (rayInfo.renderAllRays) {
         rayCache = m_rays;
@@ -291,6 +267,6 @@ void Application::updateRays(BundleHistory& rayCache, std::optional<RenderObject
             DescriptorPool::Builder(m_Device).addPoolSize(VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 1).setMaxSets(1).build();
         std::shared_ptr<DescriptorSetLayout> raySetLayout =
             DescriptorSetLayout::Builder(m_Device).addBinding(0, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, VK_SHADER_STAGE_FRAGMENT_BIT).build();
-        rayObj.emplace("Rays", m_Device, glm::mat4(1.0f), rayVertices, rayIndices, raySetLayout, rayDescrPool);
+        rayObj.emplace(m_Device, glm::mat4(1.0f), rayVertices, rayIndices, Texture(m_Device), raySetLayout, rayDescrPool);
     }
 }

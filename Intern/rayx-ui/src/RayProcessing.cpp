@@ -121,6 +121,18 @@ std::vector<Line> getRays(const RAYX::BundleHistory& rayCache, const std::vector
     return rays;
 }
 
+std::vector<RAYX::Ray> getRaysOfElement(const RAYX::BundleHistory& rays, size_t elementIndex) {
+    std::vector<RAYX::Ray> returnRays;
+    for (const auto& rayHist : rays) {
+        for (const auto& ray : rayHist) {
+            if (ray.m_lastElement == elementIndex) {
+                returnRays.push_back(ray);
+            }
+        }
+    }
+    return returnRays;
+}
+
 std::vector<std::vector<float>> extractFeatures(const RAYX::BundleHistory& bundleHist, size_t eventIndex) {
     std::vector<std::vector<float>> features;
     for (const auto& rayHist : bundleHist) {

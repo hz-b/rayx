@@ -2,25 +2,39 @@
 
 #include <glm/gtx/matrix_decompose.hpp>
 
+#include "Plotting.h"
+#include "RayProcessing.h"
+#include "Triangulation/GeometryUtils.h"
 #include "Triangulation/Triangulate.h"
 
 std::vector<RenderObject> RenderObject::buildRObjectsFromElements(Device& device, const std::vector<RAYX::OpticalElement>& elements,
-                                                                  std::shared_ptr<DescriptorSetLayout> setLayout,
+                                                                  RAYX::BundleHistory& rays, std::shared_ptr<DescriptorSetLayout> setLayout,
                                                                   std::shared_ptr<DescriptorPool> descriptorPool) {
     assert(setLayout != nullptr && "Descriptor set layout is null");
     assert(descriptorPool != nullptr && "Descriptor pool is null");
 
     std::vector<RenderObject> rObjects;
 
-    for (const RAYX::OpticalElement& element : elements) {
+    for (uint32_t i = 0; i < elements.size(); i++) {
         std::vector<Vertex> vertices;
         std::vector<uint32_t> indices;
 
-        triangulateObject(element, vertices, indices);
+        triangulateObject(elements[i], vertices, indices);
 
-        glm::mat4 modelMatrix = element.m_element.m_outTrans;
+        glm::mat4 modelMatrix = elements[i].m_element.m_outTrans;
 
-        rObjects.emplace_back(element.m_name, device, modelMatrix, vertices, indices, setLayout, descriptorPool);
+        if (vertices.size() == 4) {
+            auto [width, height] = getRectangularDimensions(elements[i].m_element.m_cutout);
+
+            std::vector<std::vector<uint32_t>> footprint = makeFootprint(getRaysOfElement(rays, i), -width / 2, width / 2, -height / 2, height / 2,
+                                                                         (uint32_t)(width * 10), (uint32_t)(height * 10));
+            uint32_t footprintWidth, footprintHeight;
+            std::unique_ptr<unsigned char[]> data = footprintAsImage(footprint, footprintWidth, footprintHeight);
+            Texture texture(device, data.get(), footprintWidth, footprintHeight);
+            rObjects.emplace_back(device, modelMatrix, vertices, indices, std::move(texture), setLayout, descriptorPool);
+        } else {
+            rObjects.emplace_back(device, modelMatrix, vertices, indices, Texture(device), setLayout, descriptorPool);
+        }
     }
 
     std::cout << "Triangulation complete" << std::endl;
@@ -30,9 +44,14 @@ std::vector<RenderObject> RenderObject::buildRObjectsFromElements(Device& device
 /**
  * Constructor sets up vertex and index buffers based on the input parameters.
  */
-RenderObject::RenderObject(std::string name, Device& device, glm::mat4 modelMatrix, std::vector<Vertex>& vertices, std::vector<uint32_t>& indices,
+RenderObject::RenderObject(Device& device, glm::mat4 modelMatrix, std::vector<Vertex>& vertices, std::vector<uint32_t>& indices, Texture&& texture,
                            std::shared_ptr<DescriptorSetLayout> setLayout, std::shared_ptr<DescriptorPool> descriptorPool)
-    : m_name(name), m_Device(device), m_modelMatrix(modelMatrix), m_Texture(m_Device), m_setLayout(setLayout), m_descriptorPool(descriptorPool) {
+    : m_Device(device),
+      m_modelMatrix(modelMatrix),
+      m_Texture(std::move(texture)),
+      m_setLayout(setLayout),
+      m_descriptorPool(descriptorPool),
+      m_descrSet(VK_NULL_HANDLE) {
     assert(setLayout != nullptr && "Descriptor set layout is null");
     assert(descriptorPool != nullptr && "Descriptor pool is null");
     assert(vertices.size() > 0 && "Cannot create render object with no vertices");
@@ -40,19 +59,15 @@ RenderObject::RenderObject(std::string name, Device& device, glm::mat4 modelMatr
 
     createVertexBuffers(vertices);
     createIndexBuffers(indices);
-    m_descrSet = VK_NULL_HANDLE;
     createDescriptorSet();
-    m_isTextured = false;
 }
 
 RenderObject::RenderObject(RenderObject&& other) noexcept
-    : m_name(std::move(other.m_name)),
-      m_Device(other.m_Device),
+    : m_Device(other.m_Device),
       m_modelMatrix(other.m_modelMatrix),
       m_Texture(std::move(other.m_Texture)),
       m_setLayout(other.m_setLayout),
       m_descriptorPool(other.m_descriptorPool),
-      m_isTextured(other.m_isTextured),
       m_descrSet(other.m_descrSet),
       m_vertexCount(other.m_vertexCount),
       m_indexCount(other.m_indexCount),
@@ -69,8 +84,6 @@ RenderObject& RenderObject::operator=(RenderObject&& other) noexcept {
             return *this;
         }
 
-        m_name = std::move(other.m_name);
-        m_isTextured = other.m_isTextured;
         m_descrSet = other.m_descrSet;
         m_descriptorPool = other.m_descriptorPool;
         m_Texture = std::move(other.m_Texture);

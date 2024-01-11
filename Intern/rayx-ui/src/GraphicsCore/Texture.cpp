@@ -24,11 +24,10 @@ Texture::Texture(Device& device, const unsigned char* data, uint32_t width, uint
 
 Texture::Texture(Device& device) : m_Device{device} {
     // Read in image
-    int texWidth, texHeight, texChannels;  // Do not use texChannels for memory stuff (not always 4 for rgba images)
-    RAYX_LOG << "Loading default texture";
+    int texWidth, texHeight, _;
     // STBI_rgb_alpha hopefully always forces 4 channels
     std::filesystem::path path = RAYX::canonicalizeRepositoryPath("Intern/rayx-ui/res/textures/default.png");
-    stbi_uc* pixels = stbi_load(path.string().c_str(), &texWidth, &texHeight, &texChannels, STBI_rgb_alpha);
+    stbi_uc* pixels = stbi_load(path.string().c_str(), &texWidth, &texHeight, &_, STBI_rgb_alpha);
     if (!pixels) {
         RAYX_ERR << "Failed to load texture image";
     }

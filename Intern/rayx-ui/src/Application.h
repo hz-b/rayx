@@ -54,6 +54,6 @@ class Application {
 
     void loadRays(const std::string& path);
 
-    void createRayCache(const std::string& path, BundleHistory& rayCache, UIRayInfo& rayInfo);
+    void createRayCache(BundleHistory& rayCache, UIRayInfo& rayInfo);
     void updateRays(BundleHistory& rayCache, std::optional<RenderObject>& rayObj, std::vector<Line>& rays, UIRayInfo& rayInfo);
 };
