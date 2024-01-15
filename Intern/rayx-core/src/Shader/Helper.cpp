@@ -35,29 +35,36 @@ uint output_index(uint i) {
 void recordEvent(Ray r, double w) {
     if (inv_finalized) { return; }
 
+    // recording of event type ETYPE_UINIT is forbidden.
     if (w == ETYPE_UNINIT) {
         #ifndef GLSL
         RAYX_ERR << "recordEvent failed: weight UNINIT is invalid in recordEvent";
         #endif
+
+        return;
     }
 
+    // the outputData array might be full!
     if (inv_nextEventIndex >= inv_pushConstants.maxEvents) {
         inv_finalized = true;
 
+        // change the last event to "ETYPE_TOO_MANY_EVENTS".
         uint idx = output_index(uint(inv_pushConstants.maxEvents-1));
         inv_outputData[idx].m_eventType = ETYPE_TOO_MANY_EVENTS;
 
         #ifndef GLSL
         RAYX_ERR << "recordEvent failed: too many events!";
         #endif
-    } else {
-        r.m_eventType = w;
 
-        uint idx = output_index(uint(inv_nextEventIndex));
-        inv_outputData[idx] = r;
-
-        inv_nextEventIndex += 1;
+        return;
     }
+
+    r.m_eventType = w;
+
+    uint idx = output_index(uint(inv_nextEventIndex));
+    inv_outputData[idx] = r;
+
+    inv_nextEventIndex += 1;
 }
 
 // Like `recordEvent` above, but it will prevent recording more events after this.
