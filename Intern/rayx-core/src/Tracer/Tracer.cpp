@@ -39,10 +39,6 @@ BundleHistory Tracer::trace(const Beamline& b, Sequential seq, uint64_t max_batc
         auto remaining_rays = rays.size() - batch_id * max_batch_size;
         auto batch_size = (max_batch_size < remaining_rays) ? max_batch_size : remaining_rays;
 
-        std::vector<Ray> batch;
-        batch.reserve(batch_size);
-        std::copy(rays.begin() + rayIdStart, rays.begin() + rayIdStart + batch_size, std::back_inserter(batch));
-
         std::vector<Element> elements;
         elements.reserve(b.m_OpticalElements.size());
         for (const auto& e : b.m_OpticalElements) {
@@ -50,7 +46,7 @@ BundleHistory Tracer::trace(const Beamline& b, Sequential seq, uint64_t max_batc
         }
 
         TraceRawConfig cfg = {
-            .m_rays = batch,
+            .m_rays = std::vector<Ray>(rays.begin() + rayIdStart, rays.begin() + rayIdStart + batch_size),
             .m_rayIdStart = (double)rayIdStart,
             .m_numRays = (double)rays.size(),
             .m_randomSeed = randomSeed,
@@ -82,7 +78,9 @@ BundleHistory Tracer::trace(const Beamline& b, Sequential seq, uint64_t max_batc
                 for (uint j = 0; j < maxEvents; j++) {
                     uint idx = i * maxEvents + j;
                     Ray r = rawBatchHistory[idx];
-                    if (r.m_eventType != ETYPE_UNINIT) {
+                    if (r.m_eventType == ETYPE_UNINIT) {
+                        break;
+                    } else {
                         hist.push_back(r);
                     }
                 }
