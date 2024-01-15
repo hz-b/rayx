@@ -15,8 +15,8 @@ const double ETYPE_FLY_OFF = 0;
 // Ray is in element coordinates of the hit element.
 const double ETYPE_JUST_HIT_ELEM = 1;
 
-// The ray has found another collision, but the `maxBounces` cap was reached.
-const double ETYPE_NOT_ENOUGH_BOUNCES = 2;
+// If the storage space for the events is insufficient for the amount of events that were recorded in a shader call.
+const double ETYPE_TOO_MANY_EVENTS = 2;
 
 // This Ray was absorbed by `m_lastElement`.
 // Ray is in element coordinates, relative to `m_lastElement`.

@@ -8,6 +8,7 @@ void init() {
     for (uint i = 0; i < inv_pushConstants.maxEvents; i++) {
         inv_outputData[output_index(i)].m_eventType = ETYPE_UNINIT;
     }
+    inv_nextEventIndex = 0;
 
     // ray specific "seed" for random numbers -> every ray has a different starting value for the counter that creates the random number
     // TODO Random seeds should probably not be doubles! Casting MAX_UINT64 to double loses precision.
@@ -22,7 +23,7 @@ uint64_t rayId() {
 }
 
 
-// `i in [0, maxEvents]`.
+// `i in [0, maxEvents-1]`.
 // Will return the index in outputData to access the `i'th` output ray belonging to this shader call.
 // Typically used as `outputData[output_index(i)]`.
 uint output_index(uint i) {
@@ -36,24 +37,27 @@ void recordEvent(Ray r, double w) {
 
     if (w == ETYPE_UNINIT) {
         #ifndef GLSL
-        RAYX_ERR << "recordEvent failed: no free spots!";
+        RAYX_ERR << "recordEvent failed: weight UNINIT is invalid in recordEvent";
         #endif
     }
 
-    for (uint i = 0; i < inv_pushConstants.maxEvents; i++) {
-        uint idx = output_index(i);
-        if (inv_outputData[idx].m_eventType == ETYPE_UNINIT) { // checks whether this spot is free
-            inv_outputData[idx] = r;
-            inv_outputData[idx].m_eventType = w;
-            return;
-        }
-    }
+    if (inv_nextEventIndex >= inv_pushConstants.maxEvents) {
+        inv_finalized = true;
 
-    // no spots were found.
-    // this shouldn't be using `_throw`, as otherwise we might end up in infinite recursion.
-    #ifndef GLSL
-    RAYX_WARN << "recordEvent failed: no free spots!";
-    #endif
+        uint idx = output_index(uint(inv_pushConstants.maxEvents-1));
+        inv_outputData[idx].m_eventType = ETYPE_TOO_MANY_EVENTS;
+
+        #ifndef GLSL
+        RAYX_ERR << "recordEvent failed: too many events!";
+        #endif
+    } else {
+        r.m_eventType = w;
+
+        uint idx = output_index(uint(inv_nextEventIndex));
+        inv_outputData[idx] = r;
+
+        inv_nextEventIndex += 1;
+    }
 }
 
 // Like `recordEvent` above, but it will prevent recording more events after this.

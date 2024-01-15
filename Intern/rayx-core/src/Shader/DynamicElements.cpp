@@ -9,9 +9,6 @@ void dynamicElements() {
     // initializes the global state.
     init();
 
-    // placeholder, info should later be transfered to shader
-    const int maxBounces = inv_elements.length();
-
     #ifdef RAYX_DEBUG_MODE // Debug Matrix only works in GPU Mode and on DEBUG Build Type
     #ifdef GLSL
         // Set Debug Struct of current Ray to identity
@@ -25,7 +22,7 @@ void dynamicElements() {
     nextElement.m_outTrans = dmat4(1);
 
     // Iterate through all bounces
-    for (int i = 0; i < maxBounces; i++) {
+    while (true) {
         Collision col = findCollision();
         if (!col.found) {
             // no element was hit.
@@ -71,11 +68,5 @@ void dynamicElements() {
 
         // transform back to WORLD coordinates
         _ray = rayMatrixMult(elem_ray, nextElement.m_outTrans);
-    }
-
-    if (findCollision().found) {
-        recordFinalEvent(_ray, ETYPE_NOT_ENOUGH_BOUNCES);
-    } else {
-        recordFinalEvent(_ray, ETYPE_FLY_OFF);
     }
 }

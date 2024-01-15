@@ -79,7 +79,7 @@ void TerminalApp::tracePath(const std::filesystem::path& path) {
                     maxEventID = ray.size();
                 }
                 for (auto& event : ray) {
-                    if (event.m_eventType == ETYPE_NOT_ENOUGH_BOUNCES) {
+                    if (event.m_eventType == ETYPE_TOO_MANY_EVENTS) {
                         notEnoughEvents = true;
                     }
                 }

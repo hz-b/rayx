@@ -33,6 +33,7 @@ struct _debug_struct {
 extern int gl_GlobalInvocationID;
 extern bool inv_finalized;
 extern uint64_t inv_ctr;
+extern uint64_t inv_nextEventIndex;
 extern ShaderArray<Ray> RAYX_API inv_rayData;
 extern ShaderArray<Ray> RAYX_API inv_outputData;
 extern ShaderArray<Element> RAYX_API inv_elements;

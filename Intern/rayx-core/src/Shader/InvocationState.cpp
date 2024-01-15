@@ -13,6 +13,8 @@ bool inv_finalized;
 // the random number state.
 uint64_t inv_ctr;
 
+uint64_t inv_nextEventIndex;
+
 
 /**************************************************************
  *                    SHADER ARRAYS
