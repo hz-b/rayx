@@ -48,7 +48,7 @@ class RAYX_API Tracer {
     // This will call traceRaw.
     // Everything happening in each traceRaw implementation should be extracted to this function instead.
     // See `BundleHistory` for information about the return value.
-    BundleHistory trace(const Beamline&, Sequential sequential, uint64_t max_batch_size, int THREAD_COUNT = 1);
+    BundleHistory trace(const Beamline&, Sequential sequential, uint64_t max_batch_size, int THREAD_COUNT = 1, unsigned int maxEvents = 1);
 
     void setDevice(int deviceID);
 

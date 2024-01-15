@@ -40,6 +40,7 @@ class CommandParser {
         bool m_verbose = false;                        // --verbose (Verbose)
         std::string m_format = defaultFormatString();  // --format
         int m_setThreads = 1;                          // -T (dipolesource)
+        int m_maxEvents = -1;                          // -m (max events)
     } m_args;
 
     static inline void getVersion() {
@@ -84,6 +85,9 @@ class CommandParser {
         {'S', {OptionType::BOOL, "sequential", "trace sequentially", &(m_args.m_sequential)}},
         {'V', {OptionType::BOOL, "verbose", "Dump more information", &(m_args.m_verbose)}},
         {'F', {OptionType::STRING, "format", "Format output CSV / H5 data", &(m_args.m_format)}},
-        {'T', {OptionType::INT, "setThreads", "Number of Threads for Lightsource-Parallelization'", &(m_args.m_setThreads)}}, //TODO: understandable description
+        {'T',
+         {OptionType::INT, "setThreads", "Number of Threads for Lightsource-Parallelization'",
+          &(m_args.m_setThreads)}},  // TODO: understandable description
+        {'m', {OptionType::INT, "maxEvents", "Maximum number of events per ray", &(m_args.m_maxEvents)}},
     };
 };

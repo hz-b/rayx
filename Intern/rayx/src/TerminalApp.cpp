@@ -65,7 +65,33 @@ void TerminalApp::tracePath(const std::filesystem::path& path) {
 
         // Run rayx core
         RAYX::Sequential seq = m_CommandParser->m_args.m_sequential ? RAYX::Sequential::Yes : RAYX::Sequential::No;
-        auto rays = m_Tracer->trace(*m_Beamline, seq, max_batch_size, m_CommandParser->m_args.m_setThreads);
+        unsigned int maxEvents =
+            (m_CommandParser->m_args.m_maxEvents < 1) ? m_Beamline->m_OpticalElements.size() + 2 : m_CommandParser->m_args.m_maxEvents;
+        auto rays = m_Tracer->trace(*m_Beamline, seq, max_batch_size, m_CommandParser->m_args.m_setThreads, maxEvents);
+
+        // check max EventID
+        unsigned int maxEventID = 0;
+        bool notEnoughEvents = false;
+        {
+            RAYX_PROFILE_SCOPE_STDOUT("maxEventID");
+            for (auto& ray : rays) {
+                if (ray.size() > maxEventID) {
+                    maxEventID = ray.size();
+                }
+                for (auto& event : ray) {
+                    if (event.m_eventType == ETYPE_NOT_ENOUGH_BOUNCES) {
+                        notEnoughEvents = true;
+                    }
+                }
+            }
+        }
+        if (notEnoughEvents) {
+            RAYX_LOG << "Not enough events (" << maxEvents << ")! Consider increasing maxEvents.";
+        }
+        if (maxEventID < maxEvents) {
+            RAYX_LOG << "maxEvents is set to " << maxEvents << " but the maximum event ID is " << maxEventID << ". Consider setting maxEvents to "
+                     << maxEventID << " to increase performance.";
+        }
 
         // Export Rays to external data.
         auto file = exportRays(rays, path.string());
