@@ -8,7 +8,7 @@ namespace RAYX {
 
 // Read file into array of bytes, and cast to uint32_t*, then return.
 // The data has been padded, so that it fits into an array uint32_t.
-uint32_t* readFile(uint32_t& length, const char* filename) {
+uint32_t* readFileAlign32(uint32_t& length, const char* filename) {
     FILE* fp = fopen(filename, "rb");
     if (fp == nullptr) {
         printf("Could not find or open file: %s\n", filename);
