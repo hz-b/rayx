@@ -8,39 +8,34 @@ namespace RAYX {
 
 // Read file into array of bytes, and cast to uint32_t*, then return.
 // The data has been padded, so that it fits into an array uint32_t.
-uint32_t* readFileAlign32(uint32_t& length, const char* filename) {
-    FILE* fp = fopen(filename, "rb");
-    if (fp == nullptr) {
-        printf("Could not find or open file: %s\n", filename);
+std::vector<uint32_t> readFileAlign32(const std::string& filename, const uint32_t count) {
+    std::vector<uint32_t> data;
+
+    std::ifstream file;
+
+    file.open(filename, std::ios::in | std::ios::binary);
+
+    if (!file.is_open()) {
+        RAYX_ERR << "Failed to open file: " << filename;
     }
 
-    // get file size.
-    fseek(fp, 0, SEEK_END);
-    long filesize = ftell(fp);
-    if (filesize == -1) {
-        RAYX_D_ERR << "Could not get file size.";
-        return nullptr;
-    }
-    fseek(fp, 0, SEEK_SET);
-
-    uint32_t filesizepadded = uint32_t(ceil(filesize / 4.0)) * 4;
-
-    // read file contents.
-    char* str = new char[filesizepadded];
-    size_t readCount = fread(str, sizeof(char), filesize, fp);
-    if (readCount != (uint32_t)filesize) {
-        RAYX_D_WARN << readCount << " != " << filesize << "...";
-        RAYX_D_ERR << "Errors while reading file: " << filename;
-    }
-    fclose(fp);
-
-    // data padding.
-    for (uint32_t i = filesize; i < filesizepadded; i++) {
-        str[i] = 0;
+    uint64_t read_count = count;
+    if (count == 0) {
+        file.seekg(0, std::ios::end);
+        read_count = static_cast<uint64_t>(file.tellg());
+        file.seekg(0, std::ios::beg);
     }
 
-    length = filesizepadded;
-    return (uint32_t*)str;
+    // Check, if it's even uint32_t alignable!
+    if (read_count % sizeof(uint32_t) != 0) {
+        RAYX_ERR << "readFileAlign32 was given an input file whose size is not divisible by 32-bits!";
+    }
+
+    data.resize(static_cast<size_t>(read_count) / sizeof(uint32_t));
+    file.read(reinterpret_cast<char*>(data.data()), read_count);
+    file.close();
+
+    return data;
 }
 
 std::vector<uint8_t> readFile(const std::string& filename, const uint32_t count) {
@@ -51,7 +46,7 @@ std::vector<uint8_t> readFile(const std::string& filename, const uint32_t count)
     file.open(filename, std::ios::in | std::ios::binary);
 
     if (!file.is_open()) {
-        throw std::runtime_error("Failed to open file: " + filename);
+        RAYX_ERR << "Failed to open file: " << filename;
     }
 
     uint64_t read_count = count;
@@ -74,7 +69,7 @@ void writeFile(const std::vector<uint8_t>& data, const std::string& filename, co
     file.open(filename, std::ios::out | std::ios::binary | std::ios::trunc);
 
     if (!file.is_open()) {
-        throw std::runtime_error("Failed to open file: " + filename);
+        RAYX_ERR << "Failed to open file: " << filename;
     }
 
     uint64_t write_count = count;
