@@ -9,25 +9,28 @@ TEST_F(TestSuite, allBeamlineObjects) {
 }
 
 TEST_F(TestSuite, loadDatFile) {
-    RAYX::fixSeed(RAYX::FIXED_SEED);
-
     auto b = loadBeamline("loadDatFile");
     CHECK_EQ(b.m_LightSources.size(), 1);
     CHECK_EQ(b.m_OpticalElements.size(), 1);
-    CHECK_EQ(b.m_LightSources[0]->m_EnergyDistribution.getAverage(), (12. + 15. + 17.) / 3, 0.1);
-    // CHECK_EQ(b.m_LightSources[0]->m_EnergyDistribution.selectEnergy(), 17, 0.1); // TODO Fanny check why it failes depending on the compiler. gcc
-    // calculates 15, clang 17
+
+    // This only works due to fixed seeding!
+    // The loaded DAT file only has the 3 energies 12, 15, 17 with equal probability.
+    CHECK_EQ(b.m_LightSources[0]->m_EnergyDistribution.selectEnergy(), 15, 0.1);
+    CHECK_EQ(b.m_LightSources[0]->m_EnergyDistribution.selectEnergy(), 17, 0.1);
+    CHECK_EQ(b.m_LightSources[0]->m_EnergyDistribution.selectEnergy(), 17, 0.1);
+    CHECK_EQ(b.m_LightSources[0]->m_EnergyDistribution.selectEnergy(), 12, 0.1);
 }
 
 TEST_F(TestSuite, loadDatFile2) {
-    RAYX::fixSeed(RAYX::FIXED_SEED);
-
     auto b = loadBeamline("loadDatFile2");
     CHECK_EQ(b.m_LightSources.size(), 1);
     CHECK_EQ(b.m_OpticalElements.size(), 1);
-    // CHECK_EQ(b.m_LightSources[0]->m_EnergyDistribution.getAverage(), 14.6, 0.1); //TODO value needs to be confirmed, check why it failes depending
-    // on the compiler. CHECK_EQ(b.m_LightSources[0]->m_EnergyDistribution.selectEnergy(), 17.1, 0.1); //TODO value needs to be confirmed, check why
-    // it failes depending on the compiler.
+
+    // This only works due to fixed seeding!
+    // The loaded DAT file only has the 3 energies 12, 15, 17 with - but it uses soft band.
+    CHECK_EQ(b.m_LightSources[0]->m_EnergyDistribution.selectEnergy(), 14.7, 0.1);
+    CHECK_EQ(b.m_LightSources[0]->m_EnergyDistribution.selectEnergy(), 17.1, 0.1);
+    CHECK_EQ(b.m_LightSources[0]->m_EnergyDistribution.selectEnergy(), 16.7, 0.1);
 }
 
 TEST_F(TestSuite, loadGroups) {
@@ -51,44 +54,35 @@ TEST_F(TestSuite, groupTransform) {
 }
 
 TEST_F(TestSuite, testEnergyDistribution) {
-    RAYX::fixSeed(RAYX::FIXED_SEED);
-
     struct testInput {
         std::string rmlFile;
         double energy;
-        double average;
     };
 
     std::vector<testInput> testinput = {
         {
             .rmlFile = "PointSourceSeperateEnergies",
             .energy = 100,
-            .average = 100,
         },
         {
             .rmlFile = "PointSourceSoftEdgeEnergy",
             .energy = 106.42,
-            .average = 100,
         },
         {
             .rmlFile = "PointSourceThreeSoftEdgeEnergies",
             .energy = 47.92,
-            .average = 50,
         },
         {
             .rmlFile = "PointSourceHardEdgeEnergy",
             .energy = 127.96,
-            .average = 100,
         },
     };
 
     for (auto values : testinput) {
         auto beamline = loadBeamline(values.rmlFile);
         auto energy = beamline.m_LightSources[0]->m_EnergyDistribution.selectEnergy();
-        auto average = beamline.m_LightSources[0]->m_EnergyDistribution.getAverage();
 
         CHECK_EQ(energy, values.energy, 0.1);
-        CHECK_EQ(average, values.average, 0.1);
     }
 }
 
@@ -210,8 +204,6 @@ TEST_F(TestSuite, testExpertsOptic) {
  * Its a static test, so every change can result in a fail even if it's still working correctly
  */
 TEST_F(TestSuite, testTwoSourcesInOneRML) {
-    RAYX::fixSeed(RAYX::FIXED_SEED);
-
     auto beamline = loadBeamline("twoSourcesTest");
 
     std::shared_ptr<LightSource> dsrc = beamline.m_LightSources[0];

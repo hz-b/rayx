@@ -191,7 +191,6 @@ TEST_F(TestSuite, testLightsourceGetters) {
         double sourceHeight;
         double sourceWidth;
         double sourceDepth;
-        double averagePhotonEnergy;
     };
 
     std::vector<RmlInput> rmlinputs = {{
@@ -200,14 +199,12 @@ TEST_F(TestSuite, testLightsourceGetters) {
         .sourceHeight = 0.04,
         .sourceWidth = 0.065,
         .sourceDepth = 1,
-        .averagePhotonEnergy = 120.97,
     },{
         .rmlFile = "simpleUndulator",
         .horDivergence = 4.6528002321182891e-05,  // conversion /1000 in the parser
         .sourceHeight = 0.053499116288275229,
         .sourceWidth = 0.22173963435440763,
         .sourceDepth = 1,
-        .averagePhotonEnergy = 100,
     }};
 
     for (auto values : rmlinputs) {
@@ -218,12 +215,10 @@ TEST_F(TestSuite, testLightsourceGetters) {
         auto horResult = lightSource->getHorDivergence();
         auto heightResult = lightSource->getSourceHeight();
         auto widthResult = lightSource->getSourceWidth();
-        auto average = lightSource->getPhotonEnergy();
 
         CHECK_EQ(horResult, values.horDivergence);
         CHECK_EQ(heightResult, values.sourceHeight);
         CHECK_EQ(widthResult, values.sourceWidth);
-        CHECK_EQ(average, values.averagePhotonEnergy);
     }
 }
 

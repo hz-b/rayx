@@ -5,6 +5,8 @@
 // Otherwise set-seeding tests will not work.
 // The seed for the shader should also be generated from this module.
 
+// It is crucial that all of our random implementations yield the same values (with a fixed seed) across all hardware, compilers and platforms!
+
 namespace RAYX {
 
 // fixed-seed tests operate on this seed.

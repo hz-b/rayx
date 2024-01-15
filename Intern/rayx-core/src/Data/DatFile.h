@@ -23,7 +23,6 @@ struct DatFile {
     double m_step;
 
     double m_weightSum;
-    double m_average;
 
     std::vector<DatEntry> m_Lines;
 
@@ -37,8 +36,5 @@ struct DatFile {
 
     /** samples from the distribution given by the .DAT file */
     double selectEnergy() const;
-
-    /** yields the expected value of the underlying distribution */
-    double getAverage() const;
 };
 }  // namespace RAYX

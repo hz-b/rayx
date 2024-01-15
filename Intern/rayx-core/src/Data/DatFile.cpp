@@ -48,13 +48,6 @@ bool DatFile::load(const std::filesystem::path& filename, DatFile* out) {
         out->m_weightSum += e.m_weight;
     }
 
-    // calculation of the expected value
-
-    out->m_average = 0;
-    for (auto _line : out->m_Lines) {
-        out->m_average += _line.m_weight / out->m_weightSum * _line.m_energy;
-    }
-
     return true;
 }
 
@@ -109,5 +102,4 @@ double DatFile::selectEnergy() const {
     }
 }
 
-double DatFile::getAverage() const { return m_average; }
 }  // namespace RAYX

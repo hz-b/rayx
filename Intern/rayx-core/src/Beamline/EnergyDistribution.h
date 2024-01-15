@@ -16,7 +16,6 @@ struct RAYX_API HardEdge {
     HardEdge(double centerEnergy, double energySpread);
 
     double selectEnergy() const;
-    double getAverage() const;
 };
 
 /// Describes a __normal__ distribution with mean `m_centerEnergy` and standard deviation `m_sigma`.
@@ -28,7 +27,6 @@ struct RAYX_API SoftEdge {
     SoftEdge(double centerEnergy, double sigma);
 
     double selectEnergy() const;
-    double getAverage() const;
 };
 
 /// Describes a uniform distribution of `m_numberOfEnergies` many discrete energies.
@@ -48,7 +46,6 @@ struct RAYX_API SeperateEnergies {
     SeperateEnergies(double centerEnergy, double energySpread, int numberOfEnergies);
 
     double selectEnergy() const;
-    double getAverage() const;
 };
 
 /**
@@ -70,9 +67,6 @@ class RAYX_API EnergyDistribution {
     // The selectEnergy() function returns one sample from the underlying distribution.
     // The energy is returned in eV.
     double selectEnergy() const;
-
-    // yields the expected value of the distribution (in eV).
-    double getAverage() const;
 
   private:
     // Stores either a DatFile, or a HardEdge, or ... etc.

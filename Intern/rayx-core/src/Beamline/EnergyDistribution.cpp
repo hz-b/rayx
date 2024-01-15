@@ -25,14 +25,6 @@ double EnergyDistribution::selectEnergy() const {
     return std::visit(func, m_Variant);
 }
 
-double EnergyDistribution::getAverage() const {
-    // the below code calls either DatFile::getAverage or
-    // HardEdge::getAverage, SoftEdge::getAverage or SeperateEnergies::selectEnergy
-    // depending on what is stored in m_Variant.
-    const auto func = [&](const auto arg) -> double { return arg.getAverage(); };
-    return std::visit(func, m_Variant);
-}
-
 //--------------------------------------------
 // HardEdge impls
 
@@ -40,22 +32,16 @@ HardEdge::HardEdge(double centerEnergy, double energySpread) : m_centerEnergy(ce
 
 double HardEdge::selectEnergy() const { return randomDoubleInRange(m_centerEnergy - m_energySpread / 2, m_centerEnergy + m_energySpread / 2); }
 
-double HardEdge::getAverage() const { return m_centerEnergy; }
-
 // SoftEdge impls
 
 SoftEdge::SoftEdge(double centerEnergy, double sigma) : m_centerEnergy(centerEnergy), m_sigma(sigma) {}
 
 double SoftEdge::selectEnergy() const { return randomNormal(m_centerEnergy, m_sigma); }
 
-double SoftEdge::getAverage() const { return m_centerEnergy; }
-
 // seperateEnergies impls
 
 SeperateEnergies::SeperateEnergies(double centerEnergy, double energySpread, int numOfEnergies)
     : m_centerEnergy(centerEnergy), m_energySpread(energySpread), m_numberOfEnergies(numOfEnergies) {}
-
-double SeperateEnergies::getAverage() const { return m_centerEnergy; }
 
 double SeperateEnergies::selectEnergy() const {
     // choose random spike from range of seperate energies

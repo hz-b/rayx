@@ -36,7 +36,6 @@ class RAYX_API LightSource {
 
     /** yields the average energy of the energy distribution
      * m_EnergyDistribution */
-    double getPhotonEnergy() const;
     double calcPhotonWavelength(double photonEnergy);
 
     double selectEnergy() const;
