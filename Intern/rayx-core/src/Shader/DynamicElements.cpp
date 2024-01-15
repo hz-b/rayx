@@ -26,9 +26,7 @@ void dynamicElements() {
         Collision col = findCollision();
         if (!col.found) {
             // no element was hit.
-            // Ray is considered to move forward to inf.
-            // This is the only constellation in which an event is in world coordinates.
-            recordFinalEvent(_ray, ETYPE_FLY_OFF);
+            // Tracing is done!
             return;
         }
 

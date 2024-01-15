@@ -21,13 +21,9 @@ void checkPositionDistribution(const std::vector<Ray>& rays, double sourceWidth,
     }
 }
 
+// should only be called on beamlines for which the ImagePlane has the default "unrotated" orientation!
 void checkDirectionDistribution(const std::vector<Ray>& rays, double minAngle, double maxAngle) {
     for (auto r : rays) {
-        // we ignore all non-FLY_OFF events, as they are in element-coordinates (and thus have another m_direction).
-        if (r.m_eventType != ETYPE_FLY_OFF) {
-            continue;
-        }
-
         double psi = asin(r.m_direction.y);
         psi = abs(psi);
         CHECK_IN(psi, minAngle, maxAngle);
@@ -63,11 +59,11 @@ TEST_F(TestSuite, MatrixSourceMoved) {
 
 /// this tests tracing an only-lightsource beamline. An error-prone edge case.
 TEST_F(TestSuite, MatrixSourceTracedRayUI) {
-    auto a = extractLastEvents(traceRML("MatrixSource"));
-    auto b = loadCSVRayUI("MatrixSource");
-    roughCompare(a, b);
+    auto a = traceRML("MatrixSource");
+    for (auto hist : a) {
+        CHECK(hist.empty());
+    }
 }
-TEST_F(TestSuite, MatrixSourceTraced) { compareAgainstCorrect("MatrixSource"); }
 
 TEST_F(TestSuite, PointSourceHardEdge) {
     auto rays = loadBeamline("PointSourceHardEdge").getInputRays();
@@ -113,7 +109,6 @@ TEST_F(TestSuite, PixelPositionTest) {
 TEST_F(TestSuite, DipoleZDistribution) {
     auto beamline = loadBeamline("dipole_plain");
     std::shared_ptr<LightSource> src = beamline.m_LightSources[0];
-    auto* dipoleSource = dynamic_cast<DipoleSource*>(&*src);  // TODO : Not used
 
     auto rays = beamline.getInputRays();
     checkZDistribution(rays, 0, 2.2);

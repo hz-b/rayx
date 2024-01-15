@@ -90,19 +90,6 @@ std::vector<Line> getRays(const RAYX::BundleHistory& rayCache, const std::vector
                 Line myline = {origin, point};
                 rays.push_back(myline);
                 rayLastPos = point.pos;
-            } else if (event.m_eventType == ETYPE_FLY_OFF) {
-                // Fly off events are in world coordinates
-                // The origin here is the position of the event
-                // The point is defined by the direction of the ray (default length)
-
-                glm::vec4 eventPos = glm::vec4(event.m_position, 1.0f);
-                glm::vec4 eventDir = glm::vec4(event.m_direction, 0.0f);
-                glm::vec4 pointPos = eventPos + eventDir * 1000.0f;
-
-                Vertex origin = {eventPos, GREY, {0.0f, 0.0f}};
-                Vertex point = {pointPos, GREY, {0.0f, 0.0f}};
-
-                rays.push_back(Line(origin, point));
             } else if (event.m_eventType == ETYPE_TOO_MANY_EVENTS) {
                 // Events where rays hit objects are in element coordinates
                 // We need to convert them to world coordinates

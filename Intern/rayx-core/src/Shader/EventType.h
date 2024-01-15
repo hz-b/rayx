@@ -4,12 +4,6 @@
 // The meaning of the `m_eventType` field of a `Ray`:
 ////////////////////////////////////////////////////
 
-// The future Path of this Ray does not intersect any elements anymore.
-// This Ray now flies off to infinity.
-//
-// Ray is in world coordinates.
-const double ETYPE_FLY_OFF = 0;
-
 // This Ray has just hit `m_lastElement`.
 // And will continue tracing afterwards.
 // Ray is in element coordinates of the hit element.
