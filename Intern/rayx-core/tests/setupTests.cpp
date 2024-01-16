@@ -48,7 +48,7 @@ RAYX::Ray parseCSVline(std::string line) {
     ray.m_stokes = {vec[11], vec[12], vec[13], vec[14]};
 
     // otherwise uninitialized:
-    ray.m_padding = -1;
+    ray.m_sourceID = -1;
     ray.m_eventType = -1;
     ray.m_lastElement = -1;
     ray.m_order = -1;

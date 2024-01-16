@@ -47,9 +47,10 @@ struct RAYX_API Ray {
     /// is initially set to -1 upon construction by the LightSources.
     double m_lastElement;
 
-    /// This double only exists to address alignment issues (see below).
-    /// m_padding should never be read or written.
-    double m_padding;
+    /// The index of the LightSource that emitted this ray.
+    /// It is initially set to -1 upon construction by the LightSources and later set by the beamline.
+    /// NOTE: This can be moved outside of the Ray struct. It is here for convenience.
+    double m_sourceID;
 };
 
 // Note: A `dvec3` needs an alignment of 4 * sizeof(double), hence two dvec3s can never be directly after each other (without padding).
@@ -58,7 +59,6 @@ struct RAYX_API Ray {
 #ifndef GLSL
 static_assert(sizeof(Ray) % alignof(dvec3) == 0);
 #endif
-
 
 #ifndef GLSL
 }  // namespace RAYX
