@@ -2,6 +2,7 @@
 
 #include <glm/gtx/matrix_decompose.hpp>
 
+#include "Debug/Instrumentor.h"
 #include "Plotting.h"
 #include "RayProcessing.h"
 #include "Triangulation/GeometryUtils.h"
@@ -12,6 +13,7 @@ std::vector<RenderObject> RenderObject::buildRObjectsFromElements(Device& device
                                                                   std::shared_ptr<DescriptorPool> descriptorPool) {
     assert(setLayout != nullptr && "Descriptor set layout is null");
     assert(descriptorPool != nullptr && "Descriptor pool is null");
+    RAYX_PROFILE_FUNCTION_STDOUT();
 
     std::vector<RenderObject> rObjects;
 

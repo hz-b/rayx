@@ -25,6 +25,7 @@ class CommandParser {
     struct Args {
         std::string m_providedFile;  // -i (Input)
         std::optional<int> m_deviceID;
+        bool m_benchmark = false;
     } m_args;
 
   private:
@@ -42,5 +43,6 @@ class CommandParser {
     std::unordered_map<char, Options> m_ParserCommands = {
         {'i', {OptionType::STRING, "input", "Input RML File or Directory.", &(m_args.m_providedFile)}},
         {'d', {OptionType::OPTIONAL_INT, "device", "Device ID.", &(m_args.m_deviceID)}},
+        {'b', {OptionType::BOOL, "benchmark", "Benchmark mode.", &(m_args.m_benchmark)}},
     };
 };

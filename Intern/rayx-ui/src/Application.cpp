@@ -1,12 +1,14 @@
 #include "Application.h"
 
 #include <chrono>
+#include <future>
 #include <unordered_set>
 
 #include "CanonicalizePath.h"
 #include "Colors.h"
 #include "Data/Importer.h"
 #include "Debug/Debug.h"
+#include "Debug/Instrumentor.h"
 #include "FrameInfo.h"
 #include "GraphicsCore/Renderer.h"
 #include "GraphicsCore/Window.h"
@@ -38,6 +40,11 @@ Application::~Application() = default;
 
 void Application::run() {
     m_CommandParser.analyzeCommands();
+
+    if (m_CommandParser.m_args.m_benchmark) {
+        RAYX_VERB << "Starting in Benchmark Mode.\n";
+        RAYX::BENCH_FLAG = true;
+    }
 
     // Create UBOs (Uniform Buffer Object)
     std::vector<std::unique_ptr<Buffer>> uboBuffers(SwapChain::MAX_FRAMES_IN_FLIGHT);
@@ -236,6 +243,7 @@ void Application::createRayCache(BundleHistory& rayCache, UIRayInfo& rayInfo) {
 }
 
 void Application::loadRays(const std::string& rmlPath) {
+    RAYX_PROFILE_FUNCTION_STDOUT();
     vkDeviceWaitIdle(m_Device.device());
 #ifndef NO_H5
     std::string rayFilePath = rmlPath.substr(0, rmlPath.size() - 4) + ".h5";
