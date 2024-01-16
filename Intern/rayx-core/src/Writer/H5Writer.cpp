@@ -91,9 +91,10 @@ RAYX::BundleHistory fromDoubles(const std::vector<double>& doubles, const Format
         double pathLength = doubles[double_index + 12];
         double order = doubles[double_index + 13];
         double lastElement = doubles[double_index + 14];
+        double sourceID = doubles[double_index + 15];
 
         RAYX::Ray ray = {
-            origin, eventType, direction, energy, stokes, pathLength, order, lastElement, 0.0,
+            origin, eventType, direction, energy, stokes, pathLength, order, lastElement, sourceID,
         };
 
         rayHist.push_back(ray);

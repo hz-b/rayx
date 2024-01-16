@@ -33,7 +33,7 @@ std::vector<std::vector<RAYX::Ray>> createRayGrid(size_t size, double width, dou
                 .m_pathLength = 0.0f,
                 .m_order = 0.0f,
                 .m_lastElement = -1.0f,
-                .m_padding = 0.0f,
+                .m_sourceID = 0.0f,
             };
             grid[i][j] = ray;
         }
