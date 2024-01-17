@@ -23,7 +23,7 @@
  *   RenderObject renderObj = traceTriangulation(element, device);
  * @endcode
  */
-void traceTriangulation(const RAYX::OpticalElement& element, std::vector<Vertex>& vertices, std::vector<uint32_t>& indices);
+void traceTriangulation(const RAYX::OpticalElement& element, std::vector<TexVertex>& vertices, std::vector<uint32_t>& indices);
 
 // ------ Helper functions ------
 

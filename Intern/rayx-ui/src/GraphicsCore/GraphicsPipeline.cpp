@@ -122,7 +122,7 @@ void GraphicsPipeline::createShaderModule(const std::vector<char>& code, VkShade
 
 void GraphicsPipeline::bind(VkCommandBuffer commandBuffer) { vkCmdBindPipeline(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, m_Pipeline); }
 
-void GraphicsPipeline::defaultPipelineConfigInfo(PipelineConfigInfo& configInfo) {
+void GraphicsPipeline::defaultPipelineConfigInfo(PipelineConfigInfo& configInfo, VertexMode vertexMode) {
     configInfo.inputAssemblyInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_INPUT_ASSEMBLY_STATE_CREATE_INFO;
     configInfo.inputAssemblyInfo.topology = VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST;
     configInfo.inputAssemblyInfo.primitiveRestartEnable = VK_FALSE;
@@ -190,6 +190,11 @@ void GraphicsPipeline::defaultPipelineConfigInfo(PipelineConfigInfo& configInfo)
     configInfo.dynamicStateInfo.dynamicStateCount = static_cast<uint32_t>(configInfo.dynamicStateEnables.size());
     configInfo.dynamicStateInfo.flags = 0;
 
-    configInfo.bindingDescriptions = Vertex::getBindingDescriptions();
-    configInfo.attributeDescriptions = Vertex::getAttributeDescriptions();
+    if (vertexMode == VertexMode::TEXTURED) {
+        configInfo.bindingDescriptions = TexVertex::getBindingDescriptions();
+        configInfo.attributeDescriptions = TexVertex::getAttributeDescriptions();
+    } else {
+        configInfo.bindingDescriptions = ColorVertex::getBindingDescriptions();
+        configInfo.attributeDescriptions = ColorVertex::getAttributeDescriptions();
+    }
 }

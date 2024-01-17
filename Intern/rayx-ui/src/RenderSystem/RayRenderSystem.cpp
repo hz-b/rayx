@@ -39,7 +39,7 @@ void RayRenderSystem::createPipeline(VkRenderPass renderPass) {
     assert(m_PipelineLayout != nullptr && "Cannot create pipeline before pipeline layout");
 
     PipelineConfigInfo pipelineConfig{};
-    GraphicsPipeline::defaultPipelineConfigInfo(pipelineConfig);
+    GraphicsPipeline::defaultPipelineConfigInfo(pipelineConfig, GraphicsPipeline::VertexMode::COLORED);
     pipelineConfig.inputAssemblyInfo.topology = VK_PRIMITIVE_TOPOLOGY_LINE_LIST;
     pipelineConfig.rasterizationInfo.polygonMode = VK_POLYGON_MODE_LINE;
     pipelineConfig.rasterizationInfo.lineWidth = 2.0f;
