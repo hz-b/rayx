@@ -35,6 +35,7 @@ struct PipelineConfigInfo {
  */
 class GraphicsPipeline {
   public:
+    enum class VertexMode { COLORED, TEXTURED };
     GraphicsPipeline(Device& device, const std::string& vertFilepath, const std::string& fragFilepath, const PipelineConfigInfo& createInfo);
     ~GraphicsPipeline();
 
@@ -48,7 +49,7 @@ class GraphicsPipeline {
      *
      * @param configInfo The configuration information to be filled with default values.
      */
-    static void defaultPipelineConfigInfo(PipelineConfigInfo& configInfo);
+    static void defaultPipelineConfigInfo(PipelineConfigInfo& configInfo, VertexMode vertexMode = VertexMode::TEXTURED);
     VkPipeline getHandle() const { return m_Pipeline; }
 
   private:

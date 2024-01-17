@@ -262,7 +262,7 @@ void Application::updateRays(BundleHistory& rayCache, std::optional<RenderObject
     }
     if (!rays.empty()) {
         // Temporarily aggregate all vertices, then create a single RenderObject
-        std::vector<Vertex> rayVertices(rays.size() * 2);
+        std::vector<ColorVertex> rayVertices(rays.size() * 2);
         std::vector<uint32_t> rayIndices(rays.size() * 2);
         for (uint32_t i = 0; i < rays.size(); ++i) {
             rayVertices[i * 2] = rays[i].v1;
@@ -275,6 +275,12 @@ void Application::updateRays(BundleHistory& rayCache, std::optional<RenderObject
             DescriptorPool::Builder(m_Device).addPoolSize(VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 1).setMaxSets(1).build();
         std::shared_ptr<DescriptorSetLayout> raySetLayout =
             DescriptorSetLayout::Builder(m_Device).addBinding(0, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, VK_SHADER_STAGE_FRAGMENT_BIT).build();
-        rayObj.emplace(m_Device, glm::mat4(1.0f), rayVertices, rayIndices, Texture(m_Device), raySetLayout, rayDescrPool);
+
+        std::vector<std::shared_ptr<Vertex>> shared_vertices;
+        shared_vertices.reserve(rayVertices.size());
+        std::transform(rayVertices.begin(), rayVertices.end(), std::back_inserter(shared_vertices),
+                       [](const ColorVertex& vertex) { return std::make_shared<ColorVertex>(vertex); });
+
+        rayObj.emplace(m_Device, glm::mat4(1.0f), shared_vertices, rayIndices, Texture(m_Device), raySetLayout, rayDescrPool);
     }
 }

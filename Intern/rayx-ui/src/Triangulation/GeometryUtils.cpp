@@ -5,10 +5,10 @@
 void Polygon::calculateForQuadrilateral(double widthA, double widthB, double lengthA, double lengthB) {
     // Right handed coord system when looking down the negative y axis: x is to the left and z is up
     vertices = {
-        Vertex({widthB / 2.0f, 0, -lengthB / 2.0f, 1.0f}, OPT_ELEMENT_COLOR, {0.0f, 1.0f}),  // Bottom-left
-        Vertex({widthA / 2.0f, 0, lengthB / 2.0f, 1.0f}, OPT_ELEMENT_COLOR, {0.0f, 0.0f}),   // Top-left
-        Vertex({-widthA / 2.0f, 0, lengthA / 2.0f, 1.0f}, OPT_ELEMENT_COLOR, {1.0f, 0.0f}),  // Top-right
-        Vertex({-widthB / 2.0f, 0, -lengthA / 2.0f, 1.0f}, OPT_ELEMENT_COLOR, {1.0f, 1.0f})  // Bottom-right
+        TexVertex(glm::vec4(widthB / 2.0f, 0, -lengthB / 2.0f, 1.0f), glm::vec2(0.0f, 1.0f)),  // Bottom-left
+        TexVertex(glm::vec4(widthA / 2.0f, 0, lengthB / 2.0f, 1.0f), glm::vec2(0.0f, 0.0f)),   // Top-left
+        TexVertex(glm::vec4(-widthA / 2.0f, 0, lengthA / 2.0f, 1.0f), glm::vec2(1.0f, 0.0f)),  // Top-right
+        TexVertex(glm::vec4(-widthB / 2.0f, 0, -lengthA / 2.0f, 1.0f), glm::vec2(1.0f, 1.0f))  // Bottom-right
     };
     indices = {0, 1, 2, 2, 3, 0};
 }
@@ -40,12 +40,12 @@ void Polygon::calculateForElliptical(double diameterA, double diameterB) {
  * This function takes a polygon and interpolates it to have the specified number of vertices.
  * The polygon is assumed to be convex.
  */
-void interpolateConvexPolygon(std::vector<Vertex>& polyVertices, uint32_t targetNumber) {
+void interpolateConvexPolygon(std::vector<TexVertex>& polyVertices, uint32_t targetNumber) {
     if (polyVertices.size() == targetNumber || polyVertices.empty()) {
         return;  // No interpolation needed if counts are the same or polygon is empty
     }
 
-    std::vector<Vertex> interpolatedVertices;
+    std::vector<TexVertex> interpolatedVertices;
     interpolatedVertices.reserve(targetNumber);
 
     size_t originalCount = polyVertices.size();
@@ -59,16 +59,16 @@ void interpolateConvexPolygon(std::vector<Vertex>& polyVertices, uint32_t target
         double fraction = exactIndex - lowerIndex;
 
         glm::vec4 interpolatedPosition = glm::mix(polyVertices[lowerIndex].pos, polyVertices[upperIndex].pos, fraction);
-        glm::vec4 interpolatedColor = glm::mix(polyVertices[lowerIndex].color, polyVertices[upperIndex].color, fraction);
 
-        interpolatedVertices.push_back({interpolatedPosition, interpolatedColor, {0.0f, 0.0f}});
+        interpolatedVertices.push_back({interpolatedPosition, {0.0f, 0.0f}});
     }
 
     // Replace the original vertices with the interpolated ones
     polyVertices = std::move(interpolatedVertices);
 }
 
-std::vector<std::vector<double>> calculateDistanceMatrix(const std::vector<Vertex>& outerSlitVertices, const std::vector<Vertex>& openingVertices) {
+std::vector<std::vector<double>> calculateDistanceMatrix(const std::vector<TexVertex>& outerSlitVertices,
+                                                         const std::vector<TexVertex>& openingVertices) {
     uint32_t numOuterSlitVertices = (uint32_t)outerSlitVertices.size();
     uint32_t numOpeningVertices = (uint32_t)openingVertices.size();
 

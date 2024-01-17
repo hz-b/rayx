@@ -18,10 +18,15 @@ std::vector<RenderObject> RenderObject::buildRObjectsFromElements(Device& device
     std::vector<RenderObject> rObjects;
 
     for (uint32_t i = 0; i < elements.size(); i++) {
-        std::vector<Vertex> vertices;
+        std::vector<TexVertex> vertices;
         std::vector<uint32_t> indices;
 
         triangulateObject(elements[i], vertices, indices);
+
+        std::vector<std::shared_ptr<Vertex>> shared_vertices;
+        shared_vertices.reserve(vertices.size());
+        std::transform(vertices.begin(), vertices.end(), std::back_inserter(shared_vertices),
+                       [](const TexVertex& vertex) { return std::make_shared<TexVertex>(vertex); });
 
         glm::mat4 modelMatrix = elements[i].m_element.m_outTrans;
 
@@ -33,9 +38,9 @@ std::vector<RenderObject> RenderObject::buildRObjectsFromElements(Device& device
             uint32_t footprintWidth, footprintHeight;
             std::unique_ptr<unsigned char[]> data = footprintAsImage(footprint, footprintWidth, footprintHeight);
             Texture texture(device, data.get(), footprintWidth, footprintHeight);
-            rObjects.emplace_back(device, modelMatrix, vertices, indices, std::move(texture), setLayout, descriptorPool);
+            rObjects.emplace_back(device, modelMatrix, shared_vertices, indices, std::move(texture), setLayout, descriptorPool);
         } else {
-            rObjects.emplace_back(device, modelMatrix, vertices, indices, Texture(device), setLayout, descriptorPool);
+            rObjects.emplace_back(device, modelMatrix, shared_vertices, indices, Texture(device), setLayout, descriptorPool);
         }
     }
 
@@ -46,8 +51,8 @@ std::vector<RenderObject> RenderObject::buildRObjectsFromElements(Device& device
 /**
  * Constructor sets up vertex and index buffers based on the input parameters.
  */
-RenderObject::RenderObject(Device& device, glm::mat4 modelMatrix, std::vector<Vertex>& vertices, std::vector<uint32_t>& indices, Texture&& texture,
-                           std::shared_ptr<DescriptorSetLayout> setLayout, std::shared_ptr<DescriptorPool> descriptorPool)
+RenderObject::RenderObject(Device& device, glm::mat4 modelMatrix, std::vector<std::shared_ptr<Vertex>> vertices, std::vector<uint32_t>& indices,
+                           Texture&& texture, std::shared_ptr<DescriptorSetLayout> setLayout, std::shared_ptr<DescriptorPool> descriptorPool)
     : m_Device(device),
       m_modelMatrix(modelMatrix),
       m_Texture(std::move(texture)),
@@ -124,13 +129,35 @@ void RenderObject::updateTexture(const unsigned char* data, uint32_t width, uint
     createDescriptorSet();
 }
 
-void RenderObject::createVertexBuffers(const std::vector<Vertex>& vertices) {
+void RenderObject::createVertexBuffers(const std::vector<std::shared_ptr<Vertex>> vertices) {
     m_vertexCount = static_cast<uint32_t>(vertices.size());
 
-    m_vertexBuffer = std::make_unique<Buffer>(m_Device, "rObjVertBuff", sizeof(vertices[0]), m_vertexCount, VK_BUFFER_USAGE_VERTEX_BUFFER_BIT,
+    std::vector<char> buffer;
+    size_t vertexSize = 0;
+    if (!vertices.empty()) {
+        if (typeid(*vertices[0]) == typeid(TexVertex)) {
+            vertexSize = sizeof(TexVertex);
+            for (const auto& vertex : vertices) {
+                auto texVertex = std::static_pointer_cast<TexVertex>(vertex);
+                buffer.insert(buffer.end(), reinterpret_cast<const char*>(texVertex.get()),
+                              reinterpret_cast<const char*>(texVertex.get()) + sizeof(TexVertex));
+            }
+        } else if (typeid(*vertices[0]) == typeid(ColorVertex)) {
+            vertexSize = sizeof(ColorVertex);
+            for (const auto& vertex : vertices) {
+                auto colorVertex = std::static_pointer_cast<ColorVertex>(vertex);
+                buffer.insert(buffer.end(), reinterpret_cast<const char*>(colorVertex.get()),
+                              reinterpret_cast<const char*>(colorVertex.get()) + sizeof(ColorVertex));
+            }
+        } else {
+            RAYX_ERR << "Vertex type not supported";
+        }
+    }
+
+    m_vertexBuffer = std::make_unique<Buffer>(m_Device, "rObjVertBuff", vertexSize, m_vertexCount, VK_BUFFER_USAGE_VERTEX_BUFFER_BIT,
                                               VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT);
     m_vertexBuffer->map();
-    m_vertexBuffer->writeToBuffer(vertices.data());
+    m_vertexBuffer->writeToBuffer(buffer.data());
 }
 
 void RenderObject::createIndexBuffers(const std::vector<uint32_t>& indices) {

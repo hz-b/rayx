@@ -12,13 +12,13 @@
 #include "Vertex.h"
 
 struct Triangle {
-    Vertex v1;
-    Vertex v2;
-    Vertex v3;
+    TexVertex v1;
+    TexVertex v2;
+    TexVertex v3;
 };
 struct Line {
-    Vertex v1;
-    Vertex v2;
+    ColorVertex v1;
+    ColorVertex v2;
 };
 
 /**
@@ -38,8 +38,8 @@ class RenderObject {
      * @param vertices Vector of Vertex objects.
      * @param indices Vector of index values.
      */
-    RenderObject(Device& device, glm::mat4 modelMatrix, std::vector<Vertex>& vertices, std::vector<uint32_t>& indices, Texture&& texture,
-                 std::shared_ptr<DescriptorSetLayout> setLayout, std::shared_ptr<DescriptorPool> descriptorPool);
+    RenderObject(Device& device, glm::mat4 modelMatrix, std::vector<std::shared_ptr<Vertex>> vertices, std::vector<uint32_t>& indices,
+                 Texture&& texture, std::shared_ptr<DescriptorSetLayout> setLayout, std::shared_ptr<DescriptorPool> descriptorPool);
     RenderObject(const RenderObject&) = delete;
     RenderObject& operator=(const RenderObject&) = delete;
     RenderObject(RenderObject&& other) noexcept;
@@ -70,7 +70,7 @@ class RenderObject {
     VkDescriptorSet getDescriptorSet() const { return m_descrSet; }
 
   private:
-    void createVertexBuffers(const std::vector<Vertex>& vertices);
+    void createVertexBuffers(const std::vector<std::shared_ptr<Vertex>> vertices);
     void createIndexBuffers(const std::vector<uint32_t>& indices);
     void createDescriptorSet();
 

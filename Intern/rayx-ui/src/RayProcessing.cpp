@@ -92,8 +92,8 @@ std::vector<Line> getRays(const RAYX::BundleHistory& rayCache, const RAYX::Beaml
             glm::vec4 originColor = (event.m_eventType == ETYPE_JUST_HIT_ELEM) ? YELLOW : WHITE;
             glm::vec4 pointColor = (event.m_eventType == ETYPE_JUST_HIT_ELEM) ? ORANGE : (event.m_eventType == ETYPE_ABSORBED) ? RED : WHITE;
 
-            Vertex origin = {rayLastPos, originColor, {0.0f, 0.0f}};
-            Vertex point = {worldPos, pointColor, {0.0f, 0.0f}};
+            ColorVertex origin = {rayLastPos, originColor};
+            ColorVertex point = {worldPos, pointColor};
 
             rays.push_back(Line(origin, point));
             rayLastPos = point.pos;
