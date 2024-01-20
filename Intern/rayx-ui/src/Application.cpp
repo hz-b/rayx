@@ -256,9 +256,9 @@ void Application::loadRays(const std::string& rmlPath) {
 
 void Application::updateRays(BundleHistory& rayCache, std::optional<RenderObject>& rayObj, std::vector<Line>& rays, UIRayInfo& rayInfo) {
     if (!rayInfo.renderAllRays) {
-        rays = getRays(rayCache, m_Beamline.m_OpticalElements, kMeansFilter, (uint32_t)rayInfo.amountOfRays);
+        rays = getRays(rayCache, m_Beamline, kMeansFilter, (uint32_t)rayInfo.amountOfRays);
     } else {
-        rays = getRays(rayCache, m_Beamline.m_OpticalElements, noFilter, (uint32_t)rayInfo.maxAmountOfRays);
+        rays = getRays(rayCache, m_Beamline, noFilter, (uint32_t)rayInfo.maxAmountOfRays);
     }
     if (!rays.empty()) {
         // Temporarily aggregate all vertices, then create a single RenderObject

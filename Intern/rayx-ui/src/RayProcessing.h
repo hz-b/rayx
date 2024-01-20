@@ -16,7 +16,7 @@ using RayFilterFunction = std::function<std::vector<size_t>(const RAYX::BundleHi
  * @return A vector of lines, which visually represents the paths of rays in the beamline.
  */
 
-std::vector<Line> getRays(const RAYX::BundleHistory& rayCache, const std::vector<RAYX::OpticalElement>& elements, RayFilterFunction filterFunction,
+std::vector<Line> getRays(const RAYX::BundleHistory& rayCache, const RAYX::Beamline& beamline, RayFilterFunction filterFunction,
                           uint32_t amountOfRays);
 
 std::vector<RAYX::Ray> getRaysOfElement(const RAYX::BundleHistory& rays, size_t elementIndex);

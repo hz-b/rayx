@@ -62,7 +62,7 @@ size_t getMaxEvents(const RAYX::BundleHistory& bundleHist) {
  */
 // Define the type of the filter function
 
-std::vector<Line> getRays(const RAYX::BundleHistory& rayCache, const std::vector<RAYX::OpticalElement>& elements, RayFilterFunction filterFunction,
+std::vector<Line> getRays(const RAYX::BundleHistory& rayCache, const RAYX::Beamline& beamline, RayFilterFunction filterFunction,
                           uint32_t amountOfRays) {
     std::vector<Line> rays;
 
@@ -76,32 +76,27 @@ std::vector<Line> getRays(const RAYX::BundleHistory& rayCache, const std::vector
             continue;
         }
         auto& rayHist = rayCache[i];
-        glm::vec3 rayLastPos = {0.0f, 0.0f, 0.0f};
+
+        if (beamline.m_LightSources.size() <= rayHist[0].m_sourceID) {
+            RAYX_ERR << "Trying to acces out-of-bounds index with source ID: " << rayHist[0].m_sourceID;
+        }
+        glm::vec4 rayLastPos = (glm::vec4)beamline.m_LightSources[(size_t)rayHist[0].m_sourceID]->getPosition();
+
         for (const auto& event : rayHist) {
-            if (event.m_eventType == ETYPE_JUST_HIT_ELEM || event.m_eventType == ETYPE_ABSORBED) {
-                // Events where rays hit objects are in element coordinates
-                // We need to convert them to world coordinates
-                glm::vec4 worldPos = elements[(size_t)event.m_lastElement].m_element.m_outTrans * glm::vec4(event.m_position, 1.0f);
-
-                Vertex origin = {{rayLastPos.x, rayLastPos.y, rayLastPos.z, 1.0f}, YELLOW, {0.0f, 0.0f}};
-                Vertex point =
-                    (event.m_eventType == ETYPE_JUST_HIT_ELEM) ? Vertex(worldPos, ORANGE, {0.0f, 0.0f}) : Vertex(worldPos, RED, {0.0f, 0.0f});
-
-                Line myline = {origin, point};
-                rays.push_back(myline);
-                rayLastPos = point.pos;
-            } else if (event.m_eventType == ETYPE_TOO_MANY_EVENTS) {
-                // Events where rays hit objects are in element coordinates
-                // We need to convert them to world coordinates
-                glm::vec4 worldPos = elements[(size_t)event.m_lastElement].m_element.m_outTrans * glm::vec4(event.m_position, 1.0f);
-
-                const glm::vec4 white = {1.0f, 1.0f, 1.0f, 0.7f};
-                Vertex origin = {{rayLastPos.x, rayLastPos.y, rayLastPos.z, 1.0f}, white, {0.0f, 0.0f}};
-                Vertex point = Vertex(worldPos, white, {0.0f, 0.0f});
-
-                rays.push_back(Line(origin, point));
-                rayLastPos = point.pos;
+            if (event.m_lastElement >= beamline.m_OpticalElements.size()) {
+                RAYX_ERR << "Trying to access out-of-bounds index with element ID: " << event.m_lastElement;
             }
+            glm::vec4 worldPos = beamline.m_OpticalElements[(size_t)event.m_lastElement].m_element.m_outTrans * glm::vec4(event.m_position, 1.0f);
+            const glm::vec4 WHITE = {1.0f, 1.0f, 1.0f, 0.7f};
+
+            glm::vec4 originColor = (event.m_eventType == ETYPE_JUST_HIT_ELEM) ? YELLOW : WHITE;
+            glm::vec4 pointColor = (event.m_eventType == ETYPE_JUST_HIT_ELEM) ? ORANGE : (event.m_eventType == ETYPE_ABSORBED) ? RED : WHITE;
+
+            Vertex origin = {rayLastPos, originColor, {0.0f, 0.0f}};
+            Vertex point = {worldPos, pointColor, {0.0f, 0.0f}};
+
+            rays.push_back(Line(origin, point));
+            rayLastPos = point.pos;
         }
     }
 
