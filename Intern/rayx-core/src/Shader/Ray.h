@@ -54,10 +54,12 @@ struct RAYX_API Ray {
 
     // NOTE: if you intend to mutate the Ray struct, you have to
     // 1. check that `formatAsVec` from Debug.h correctly uses your Ray struct.
-    // (This is eg. used for CHECK_EQ and hence very important for the test suite).
-    // 2. check that the format defined in Writer.h uses your Ray struct correctly.
-    // 3. check that the CSV-parser (within CSVWriter.cpp) correctly reconstructs rays.
-    // 4. check whether alignment requirements are still satisfied (should be done by the static_assert below).
+    // 2. check that `checkEq` from setupTests.h works correctly with your struct.
+    // 3. check that formatAsVec and checkEq have the SAME ORDER of fields!
+    // (checkEq is the backbone of CHECK_EQ, and it will give you wrong outputs, if this order is incorrect.)
+    // 4. check that the format defined in Writer.h uses your Ray struct correctly.
+    // 5. check that the CSV-parser (within CSVWriter.cpp) correctly reconstructs rays.
+    // 6. check whether alignment requirements are still satisfied (should be done by the static_assert below).
 };
 
 // Note: A `dvec3` needs an alignment of 4 * sizeof(double), hence two dvec3s can never be directly after each other (without padding).
