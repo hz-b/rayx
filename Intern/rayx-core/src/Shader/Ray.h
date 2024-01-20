@@ -51,6 +51,13 @@ struct RAYX_API Ray {
     /// It is initially set to -1 upon construction by the LightSources and later set by the beamline.
     /// NOTE: This can be moved outside of the Ray struct. It is here for convenience.
     double m_sourceID;
+
+    // NOTE: if you intend to mutate the Ray struct, you have to
+    // 1. check that `formatAsVec` from Debug.h correctly uses your Ray struct.
+    // (This is eg. used for CHECK_EQ and hence very important for the test suite).
+    // 2. check that the format defined in Writer.h uses your Ray struct correctly.
+    // 3. check that the CSV-parser (within CSVWriter.cpp) correctly reconstructs rays.
+    // 4. check whether alignment requirements are still satisfied (should be done by the static_assert below).
 };
 
 // Note: A `dvec3` needs an alignment of 4 * sizeof(double), hence two dvec3s can never be directly after each other (without padding).
