@@ -112,7 +112,11 @@ RAYX::BundleHistory loadCSV(const std::string& filename) {
         while (std::getline(ss, num, DELIMITER)) {
             d.push_back(std::stod(num));
         }
-        assert(d.size() == 16);
+
+        if (d.size() != 16) {
+            RAYX_ERR << "CSV line has incorrect length: " << d.size();
+        }
+
         RAYX::Ray ray = {.m_position = {d[0], d[1], d[2]},
                          .m_eventType = d[3],
                          .m_direction = {d[4], d[5], d[6]},
