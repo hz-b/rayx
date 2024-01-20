@@ -18,7 +18,7 @@ std::string writeFilename = canonicalizeRepositoryPath("Intern/rayx-core/tests/i
 // }
 
 TEST_F(TestSuite, TestReadFileIntoVector) {
-    auto data = readFile(readFilename, testData.size());
+    auto data = readFile(readFilename, testData.size()).value();
 
     // Check if the data was read correctly
     for (uint32_t i = 0; i < testData.size(); i++) {
