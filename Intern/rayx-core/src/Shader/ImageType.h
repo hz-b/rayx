@@ -1,6 +1,8 @@
 #ifndef IMAGE_TYPE_H
 #define IMAGE_TYPE_H
 
+#include "Adapt.h"
+
 // The ImageType is a parameter within the RZP.
 // It's different possible values are listed below.
 // These numbers are chosen to be compatible with RAY-UI.

@@ -1,3 +1,8 @@
+#ifndef RAND_H
+#define RAND_H
+
+#include "Adapt.h"
+
 /*
  * Title: "Squares: A Fast Counter-Based RNG"
  * Author: Bernard Widynski
@@ -14,3 +19,5 @@ double RAYX_API squaresDoubleRNG(RAYX_INOUT(uint64_t) ctr);
 // creates (via the Box-Muller transform) a normal distributed double with mean
 // mu and standard deviation sigma
 double RAYX_API squaresNormalRNG(RAYX_INOUT(uint64_t) ctr, double mu, double sigma);
+
+#endif

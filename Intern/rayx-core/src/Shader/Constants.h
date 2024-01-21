@@ -3,6 +3,7 @@
 #ifndef CONSTANTS
 #define CONSTANTS
 
+#include "Adapt.h"
 #include "EventType.h"
 #include "ImageType.h"
 

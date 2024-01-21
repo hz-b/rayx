@@ -1,6 +1,8 @@
 #ifndef SPHERICAL_COORDS_H
 #define SPHERICAL_COORDS_H
 
+#include "Adapt.h"
+
 // Consider this https://en.wikipedia.org/wiki/Spherical_coordinate_system.
 // But we fix the radius r = 1, as we only care to express direction, not distance.
 

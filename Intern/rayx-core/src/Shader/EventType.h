@@ -1,6 +1,8 @@
 #ifndef EVENT_TYPE_H
 #define EVENT_TYPE_H
 
+#include "Adapt.h"
+
 // The meaning of the `m_eventType` field of a `Ray`:
 ////////////////////////////////////////////////////
 

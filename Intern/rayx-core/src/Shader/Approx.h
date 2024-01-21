@@ -1,3 +1,8 @@
+#ifndef APPROX_H
+#define APPROX_H
+
+#include "Adapt.h"
+
 /**
  * DOUBLE PRECISION APPROXIMATION FOR ARCTAN AND COSINUS
  * source: https://people.sc.fsu.edu/~jburkardt/c_src/fn/fn.html
@@ -21,3 +26,5 @@ double RAYX_API r8_acos(const double x);
 double RAYX_API r8_sinh(const double x);
 double RAYX_API r8_cosh(const double x);
 double RAYX_API dpow(double a, int b);
+
+#endif

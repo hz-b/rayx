@@ -1,6 +1,7 @@
 #ifndef HELPER_H
 #define HELPER_H
 
+#include "Adapt.h"
 #include "Ray.h"
 
 void init();

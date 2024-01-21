@@ -1,3 +1,7 @@
+#ifndef BEHAVE_H
+#define BEHAVE_H
+
+#include "Adapt.h"
 #include "Collision.h"
 
 /// Each `behave*` function gets a `Ray r` (in element-coords), the element itself, a randomness counter and the `Collision col`.
@@ -15,3 +19,5 @@ Ray behaveRZP(Ray r, int id, Collision col);
 Ray behaveGrating(Ray r, int id, Collision col);
 Ray behaveMirror(Ray r, int id, Collision col);
 Ray behaveImagePlane(Ray r, ALLOW_UNUSED int id, ALLOW_UNUSED Collision col);
+
+#endif

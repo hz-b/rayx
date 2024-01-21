@@ -1,10 +1,10 @@
 #ifndef ELEMENTS_H
 #define ELEMENTS_H
 
+#include "Adapt.h"
 #include "Behaviour.h"
 #include "Cutout.h"
 #include "Surface.h"
-#include "Adapt.h"
 
 struct SlopeError {
     double m_sag;  // aka `slopeErrorX`

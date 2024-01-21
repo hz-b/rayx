@@ -1,3 +1,8 @@
+#ifndef COMPLEX_H
+#define COMPLEX_H
+
+#include "Adapt.h"
+
 /* COMPLEX NUMBERS */
 // make a struct for complex numbers or just use vec2?
 
@@ -29,3 +34,5 @@ dvec2 cx_to_polar(dvec2 a);
 
 // Complex power
 dvec2 cx_pow(dvec2 a, int n);
+
+#endif
