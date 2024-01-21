@@ -6,6 +6,10 @@
 #include "Helper.h"
 #include "SphericalCoords.h"
 #include "InvocationState.h"
+#include "CutoutFns.h"
+#include "Refrac.h"
+#include "UpdateStokes.h"
+#include "LineDensity.h"
 
 Ray behaveSlit(Ray r, int id, ALLOW_UNUSED Collision col) {
     SlitBehaviour b = deserializeSlit(inv_elements[id].m_behaviour);
@@ -110,7 +114,7 @@ Ray behaveMirror(Ray r, int id, Collision col) {
     if (mat != -2) {
         efficiency(r, real_S, real_P, delta, incidence_angle, mat);
 
-        bool absorbed = update_stokes(r, real_S, real_P, delta, azimuthal_angle);
+        bool absorbed = updateStokes(r, real_S, real_P, delta, azimuthal_angle);
         if (absorbed) {
             recordFinalEvent(r, ETYPE_ABSORBED);
         }

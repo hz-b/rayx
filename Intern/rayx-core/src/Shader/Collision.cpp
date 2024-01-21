@@ -4,6 +4,9 @@
 #include "Utils.h"
 #include "InvocationState.h"
 #include "Approx.h"
+#include "CutoutFns.h"
+#include "ApplySlopeError.h"
+#include "Cubic.h"
 
 
 /**************************************************************

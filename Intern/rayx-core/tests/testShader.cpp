@@ -7,6 +7,9 @@
 #include "Shader/Approx.h"
 #include "Shader/SphericalCoords.h"
 #include "Shader/Rand.h"
+#include "Shader/Refrac.h"
+#include "Shader/ApplySlopeError.h"
+#include "Shader/LineDensity.h"
 
 TEST_F(TestSuite, testUniformRandom) {
     uint64_t ctr = 13;
@@ -141,7 +144,7 @@ TEST_F(TestSuite, testNormalCartesian) {
                                      }};
 
     for (auto p : inouts) {
-        auto out = normal_cartesian(p.in_normal, p.in_slopeX, p.in_slopeZ);
+        auto out = normalCartesian(p.in_normal, p.in_slopeX, p.in_slopeZ);
         CHECK_EQ(out, p.out);
     }
 }
@@ -179,7 +182,7 @@ TEST_F(TestSuite, testNormalCylindrical) {
                                       .out = glm::dvec3(9431.2169472441783, 4310.7711493493844, -1449.3437356459144)}};
 
     for (auto p : inouts) {
-        auto out = normal_cylindrical(p.in_normal, p.in_slopeX, p.in_slopeZ);
+        auto out = normalCylindrical(p.in_normal, p.in_slopeX, p.in_slopeZ);
         CHECK_EQ(out, p.out);
     }
 }
@@ -741,7 +744,7 @@ TEST_F(TestSuite, testVlsGrating) {
     }
 }
 
-TEST_F(TestSuite, testPlaneRefrac) {
+TEST_F(TestSuite, testRefracPlane) {
     struct InOutPair {
         Ray in_ray;
         glm::dvec4 in_normal;
@@ -841,7 +844,7 @@ TEST_F(TestSuite, testPlaneRefrac) {
             };
 
     for (auto p : inouts) {
-        auto out_ray = refrac_plane(p.in_ray, p.in_normal, p.in_a);
+        auto out_ray = refracPlane(p.in_ray, p.in_normal, p.in_a);
         CHECK_EQ(out_ray, p.out_ray);
     }
 }

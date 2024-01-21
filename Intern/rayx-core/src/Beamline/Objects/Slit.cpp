@@ -5,6 +5,7 @@
 #include "Shader/Constants.h"
 
 #include "Shader/Utils.h"
+#include "Shader/CutoutFns.h"
 
 namespace RAYX {
 
