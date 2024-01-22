@@ -1,5 +1,7 @@
 #include "Plotting.h"
 
+#include "Debug/Instrumentor.h"
+
 #define STB_IMAGE_WRITE_IMPLEMENTATION
 #include <stb_image_write.h>
 
@@ -13,6 +15,7 @@
  */
 std::vector<std::vector<uint32_t>> makeFootprint(std::vector<RAYX::Ray> rays, double min_x, double max_x, double min_z, double max_z,
                                                  uint32_t cells_x, uint32_t cells_z) {
+    RAYX_PROFILE_FUNCTION_STDOUT();
     std::vector<std::vector<uint32_t>> grid;
     assert(min_x < max_x && min_z < max_z && cells_x > 0 && cells_z > 0);
 

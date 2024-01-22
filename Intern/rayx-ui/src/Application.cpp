@@ -88,6 +88,7 @@ void Application::run() {
 
     auto currentTime = std::chrono::high_resolution_clock::now();
     std::vector<RenderObject> rObjects;
+    std::future<std::vector<RenderObject::RenderObjectInput>> rObjectInputs;
     std::vector<glm::dvec3> rSourcePositions;
     std::vector<Line> rays;
     BundleHistory rayCache;
@@ -137,6 +138,8 @@ void Application::run() {
 
                 if (!uiParams.showH5NotExistPopup && !uiParams.showRMLNotExistPopup) {
                     vkDeviceWaitIdle(m_Device.device());
+                    rayObj.reset();
+                    rObjects.clear();
                     m_Beamline = RAYX::importBeamline(rmlPath);
                     loadRays(rmlPath);
                     std::vector<RAYX::OpticalElement> elements = m_Beamline.m_OpticalElements;
@@ -150,17 +153,25 @@ void Application::run() {
                                         .setMaxSets((uint32_t)elements.size())
                                         .setPoolFlags(VK_DESCRIPTOR_POOL_CREATE_FREE_DESCRIPTOR_SET_BIT)
                                         .build();
-                    rObjects = RenderObject::buildRObjectsFromElements(m_Device, elements, m_rays, texSetLayout, m_TexturePool);
+                    rObjectInputs = std::async(std::launch::async, &RenderObject::prepareRObjects, elements, m_rays);
 
+                    // objectRenderSystem.rebuild(m_Renderer.getSwapChainRenderPass(), setLayouts);
                     setLayouts = {globalSetLayout->getDescriptorSetLayout(), texSetLayout->getDescriptorSetLayout()};
                     objectRenderSystem.rebuild(m_Renderer.getSwapChainRenderPass(), setLayouts);
 
                     createRayCache(rayCache, uiParams.rayInfo);
                     uiParams.pathChanged = false;
-                    camController.lookAtPoint(rObjects[0].getTranslationVecor());
                     uiParams.rayInfo.raysChanged = true;
                 }
                 uiParams.pathChanged = false;
+            }
+            if (rObjectInputs.valid()) {
+                if (rObjectInputs.wait_for(std::chrono::seconds(0)) == std::future_status::ready) {
+                    auto tempObjects = rObjectInputs.get();
+                    rObjects = RenderObject::buildRObjectsFromInput(m_Device, tempObjects, texSetLayout, m_TexturePool);
+                    objectRenderSystem.rebuild(m_Renderer.getSwapChainRenderPass(), setLayouts);
+                    // camController.lookAtPoint(rObjects[0].getTranslationVecor());
+                }
             }
 
             if (uiParams.rayInfo.raysChanged) {
@@ -203,6 +214,7 @@ void Application::run() {
 }
 
 void Application::createRayCache(BundleHistory& rayCache, UIRayInfo& rayInfo) {
+    RAYX_PROFILE_FUNCTION_STDOUT();
     rayInfo.maxAmountOfRays = (int)m_rays.size();
     if (rayInfo.renderAllRays) {
         rayCache = m_rays;
