@@ -18,8 +18,9 @@
 enum class DesignPlane { XY, XZ };
 
 namespace RAYX {
-class EnergyDistribution;
+
 // forward declarations:
+class EnergyDistribution;
 enum class CentralBeamstop;
 enum class CurvatureType;
 enum class CylinderDirection;
@@ -32,6 +33,7 @@ enum class SourcePulseType;
 enum class EnergySpreadUnit;
 enum class SigmaType;
 
+// An error in position and orientation that an object might have.
 struct Misalignment {
     double m_translationXerror;
     double m_translationYerror;
@@ -41,14 +43,9 @@ struct Misalignment {
     Rad m_rotationZerror;
 };
 
-/** The xml namespace defines functions, which help to implement the
- * createFromXML-functions for the beamline objects. All of these functions
- * return a boolean indicating whether they were successful. In-case of success
- * the output will be written into the `out` argument.
- */
 namespace xml {
 
-/** a representation of a <group>-tag used in parsing. */
+// a representation of a <group>-tag used in parsing.
 struct Group {
     glm::dvec4 m_position;
     glm::dmat4x4 m_orientation;
@@ -56,15 +53,17 @@ struct Group {
 
 // These functions get a `paramname` argument and look for <param
 // id="`paramname`">...</param> entries in the XML node to then return it's
-// content in the out-argument.
+// content in the out-argument. They return `false` to express failure.
 bool param(const rapidxml::xml_node<>* node, const char* paramname, rapidxml::xml_node<>** out);
+
+// These call the above `param` function, and convert its output to the required type.
 bool paramDouble(const rapidxml::xml_node<>* node, const char* paramname, double* out);
 bool paramInt(const rapidxml::xml_node<>* node, const char* paramname, int* out);
 bool paramStr(const rapidxml::xml_node<>* node, const char* paramname, const char** out);
 bool paramDvec3(const rapidxml::xml_node<>* node, const char* paramname, glm::dvec3* out);
 
-// These functions parse more complex parts of beamline objects, and are used by
-// multiple createFromXML functions.
+// These functions parse more complex parts of beamline objects, and are used by multiple objects in their construction mechanism.
+// They itself use the above param* functions.
 bool paramMisalignment(const rapidxml::xml_node<>* node, Misalignment* out);
 bool paramPositionNoGroup(const rapidxml::xml_node<>* node, glm::dvec4* out);
 bool paramOrientationNoGroup(const rapidxml::xml_node<>* node, glm::dmat4x4* out);
@@ -79,13 +78,10 @@ bool paramPositionAndOrientation(const rapidxml::xml_node<>* node, const std::ve
                                  glm::dmat4x4* out_ori);
 bool paramMaterial(const rapidxml::xml_node<>* node, Material* out);
 
-/** node needs to be a <group>-tag, output will be written to `out`. */
+// node needs to be a <group>-tag, output will be written to `out`.
 bool parseGroup(rapidxml::xml_node<>* node, xml::Group* out);
 
-/**
- * Parser gives you useful utility functions to write your own createFromXML
- *functions.
- **/
+// The Parser gives you utility functions to construct your own objects from RML files.
 struct RAYX_API Parser {
     Parser(rapidxml::xml_node<>* node, std::vector<xml::Group> group_context, std::filesystem::path rmlFile);
 
@@ -114,7 +110,8 @@ struct RAYX_API Parser {
     double parseAdditionalOrder() const;
     Rad parseAzimuthalAngle() const;
 
-    // parsers for trivial derived parameters
+    // Parsers for trivial derived parameters
+    // this allows for convenient type-safe access to the corresponding parameters.
     inline int parseNumberRays() const { return parseInt("numberRays"); }
     inline double parseSourceWidth() const { return parseDouble("sourceWidth"); }
     inline double parseSourceHeight() const { return parseDouble("sourceHeight"); }
@@ -196,8 +193,13 @@ struct RAYX_API Parser {
     inline double parseElectronSigmaY() const {return parseDouble("electronSigmaY"); }
     inline double parseElectronSigmaYs() const {return parseDouble("electronSigmaYs"); }
 
+    // the XML node of the object you intend to parse.
     rapidxml::xml_node<>* node;
+
+    // The stack of groups which contain this object.
     std::vector<xml::Group> group_context;
+
+    // the RML file we are currently parsing.
     std::filesystem::path rmlFile;
 };
 

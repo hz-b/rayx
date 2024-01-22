@@ -14,6 +14,9 @@
 namespace RAYX::xml {
 
 // general scope functions:
+
+// The most general param function. It finds a <param> within the parent tag by the name `paramname`,
+// and returns it in `out`.
 bool param(const rapidxml::xml_node<>* node, const char* paramname, rapidxml::xml_node<>** out) {
     if (!node || !out) {
         return false;
@@ -31,6 +34,7 @@ bool param(const rapidxml::xml_node<>* node, const char* paramname, rapidxml::xm
     return false;
 }
 
+// calls `param` and converts to a double.
 bool paramDouble(const rapidxml::xml_node<>* node, const char* paramname, double* out) {
     if (!node || !out) {
         return false;
@@ -52,6 +56,7 @@ bool paramDouble(const rapidxml::xml_node<>* node, const char* paramname, double
     return true;
 }
 
+// calls `param` and converts to a int.
 bool paramInt(const rapidxml::xml_node<>* node, const char* paramname, int* out) {
     if (!node || !out) {
         return false;
@@ -72,6 +77,7 @@ bool paramInt(const rapidxml::xml_node<>* node, const char* paramname, int* out)
     return true;
 }
 
+// calls `param` and converts to a string.
 bool paramStr(const rapidxml::xml_node<>* node, const char* paramname, const char** out) {
     if (!node || !out) {
         return false;
@@ -85,6 +91,7 @@ bool paramStr(const rapidxml::xml_node<>* node, const char* paramname, const cha
     return true;
 }
 
+// calls `param` and converts to a dvec3.
 bool paramDvec3(const rapidxml::xml_node<>* node, const char* paramname, glm::dvec3* out) {
     if (!node || !out) {
         return false;
@@ -155,6 +162,8 @@ bool paramMisalignment(const rapidxml::xml_node<>* node, Misalignment* out) {
     return true;
 }
 
+// loads the "raw" position without considering how the group context affects the position.
+// In other words, this is the position "within" the group.
 bool paramPositionNoGroup(const rapidxml::xml_node<>* node, glm::dvec4* out) {
     if (!node || !out) {
         return false;
@@ -169,6 +178,7 @@ bool paramPositionNoGroup(const rapidxml::xml_node<>* node, glm::dvec4* out) {
     return true;
 }
 
+// analoguous to paramPositionNoGroup but for orientation.
 bool paramOrientationNoGroup(const rapidxml::xml_node<>* node, glm::dmat4x4* out) {
     if (!node || !out) {
         return false;
@@ -374,6 +384,7 @@ bool paramSourcePulseType(const rapidxml::xml_node<>* node, SourcePulseType* out
     return false;
 }
 
+// loads the *global* position and orientation, so incorporating the effect that the group context has on the position and orientation.
 bool paramPositionAndOrientation(const rapidxml::xml_node<>* node, const std::vector<xml::Group>& group_context, glm::dvec4* out_pos,
                                  glm::dmat4x4* out_ori) {
     Misalignment misalignment = {0, 0, 0, Rad(0), Rad(0), Rad(0)};
