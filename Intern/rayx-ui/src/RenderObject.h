@@ -45,6 +45,19 @@ class RenderObject {
     RenderObject(RenderObject&& other) noexcept;
     RenderObject& operator=(RenderObject&& other) noexcept;
 
+    struct RenderObjectInput {
+        glm::mat4 modelMatrix;
+        std::vector<TexVertex> vertices;
+        std::vector<uint32_t> indices;
+        std::optional<std::vector<std::vector<uint32_t>>> footprint;
+    };
+
+    static std::vector<RenderObjectInput> prepareRObjects(const std::vector<RAYX::OpticalElement> elements, RAYX::BundleHistory rays);
+
+    static std::vector<RenderObject> buildRObjectsFromInput(Device& device, const std::vector<RenderObjectInput> input,
+                                                            std::shared_ptr<DescriptorSetLayout> setLayout,
+                                                            std::shared_ptr<DescriptorPool> descriptorPool);
+
     static std::vector<RenderObject> buildRObjectsFromElements(Device& device, const std::vector<RAYX::OpticalElement>& elements,
                                                                RAYX::BundleHistory& rays, std::shared_ptr<DescriptorSetLayout> setLayout,
                                                                std::shared_ptr<DescriptorPool> descriptorPool);

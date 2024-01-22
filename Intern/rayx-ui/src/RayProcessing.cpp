@@ -10,6 +10,7 @@
 
 #include "Application.h"
 #include "Colors.h"
+#include "Debug/Instrumentor.h"
 
 void displayFilterSlider(size_t& amountOfRays, size_t maxAmountOfRays, bool& displayRays, bool& renderAllRays) {
     // Checkbox for displaying rays
@@ -104,6 +105,7 @@ std::vector<Line> getRays(const RAYX::BundleHistory& rayCache, const RAYX::Beaml
 }
 
 std::vector<RAYX::Ray> getRaysOfElement(const RAYX::BundleHistory& rays, size_t elementIndex) {
+    RAYX_PROFILE_FUNCTION_STDOUT();
     std::vector<RAYX::Ray> returnRays;
     for (const auto& rayHist : rays) {
         for (const auto& ray : rayHist) {

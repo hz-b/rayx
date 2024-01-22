@@ -8,25 +8,19 @@
 #include "Triangulation/GeometryUtils.h"
 #include "Triangulation/Triangulate.h"
 
-std::vector<RenderObject> RenderObject::buildRObjectsFromElements(Device& device, const std::vector<RAYX::OpticalElement>& elements,
-                                                                  RAYX::BundleHistory& rays, std::shared_ptr<DescriptorSetLayout> setLayout,
-                                                                  std::shared_ptr<DescriptorPool> descriptorPool) {
-    assert(setLayout != nullptr && "Descriptor set layout is null");
-    assert(descriptorPool != nullptr && "Descriptor pool is null");
-    RAYX_PROFILE_FUNCTION_STDOUT();
-
-    std::vector<RenderObject> rObjects;
-
+std::vector<RenderObject::RenderObjectInput> RenderObject::prepareRObjects(const std::vector<RAYX::OpticalElement> elements,
+                                                                           RAYX::BundleHistory rays) {
+    RAYX_LOG << "start prepareRObjects";
+    RAYX_LOG << "Elements size: " << elements.size();
+    std::vector<RenderObject::RenderObjectInput> rObjectsInput;
     for (uint32_t i = 0; i < elements.size(); i++) {
         std::vector<TexVertex> vertices;
         std::vector<uint32_t> indices;
 
-        triangulateObject(elements[i], vertices, indices);
-
-        std::vector<std::shared_ptr<Vertex>> shared_vertices;
-        shared_vertices.reserve(vertices.size());
-        std::transform(vertices.begin(), vertices.end(), std::back_inserter(shared_vertices),
-                       [](const TexVertex& vertex) { return std::make_shared<TexVertex>(vertex); });
+        {
+            RAYX_PROFILE_SCOPE_STDOUT("Triangulate element");
+            triangulateObject(elements[i], vertices, indices);
+        }
 
         glm::mat4 modelMatrix = elements[i].m_element.m_outTrans;
 
@@ -35,12 +29,45 @@ std::vector<RenderObject> RenderObject::buildRObjectsFromElements(Device& device
 
             std::vector<std::vector<uint32_t>> footprint = makeFootprint(getRaysOfElement(rays, i), -width / 2, width / 2, -height / 2, height / 2,
                                                                          (uint32_t)(width * 10), (uint32_t)(height * 10));
-            uint32_t footprintWidth, footprintHeight;
-            std::unique_ptr<unsigned char[]> data = footprintAsImage(footprint, footprintWidth, footprintHeight);
-            Texture texture(device, data.get(), footprintWidth, footprintHeight);
-            rObjects.emplace_back(device, modelMatrix, shared_vertices, indices, std::move(texture), setLayout, descriptorPool);
+
+            RenderObject::RenderObjectInput inputObject(modelMatrix, vertices, indices, footprint);
+            rObjectsInput.emplace_back(std::move(inputObject));
+
         } else {
-            rObjects.emplace_back(device, modelMatrix, shared_vertices, indices, Texture(device), setLayout, descriptorPool);
+            RenderObject::RenderObjectInput inputObject(modelMatrix, vertices, indices, std::nullopt);
+            rObjectsInput.emplace_back(std::move(inputObject));
+        }
+    }
+    return rObjectsInput;
+}
+
+std::vector<RenderObject> RenderObject::buildRObjectsFromInput(Device& device, const std::vector<RenderObject::RenderObjectInput> input,
+                                                               std::shared_ptr<DescriptorSetLayout> setLayout,
+                                                               std::shared_ptr<DescriptorPool> descriptorPool) {
+    RAYX_LOG << "8";
+    assert(setLayout != nullptr && "Descriptor set layout is null");
+    assert(descriptorPool != nullptr && "Descriptor pool is null");
+    RAYX_PROFILE_FUNCTION_STDOUT();
+
+    std::vector<RenderObject> rObjects;
+
+    for (const auto& inputObject : input) {
+        std::vector<std::shared_ptr<Vertex>> sharedVertices;
+        for (const auto& vertex : inputObject.vertices) {
+            sharedVertices.emplace_back(std::make_shared<TexVertex>(vertex));
+        }
+        std::vector<uint32_t> indices = inputObject.indices;
+        glm::mat4 modelMatrix = inputObject.modelMatrix;
+        // handle optional footprint
+        auto footprint = inputObject.footprint;
+        if (footprint.has_value()) {
+            uint32_t footprintWidth, footprintHeight;
+            std::unique_ptr<unsigned char[]> data = footprintAsImage(inputObject.footprint.value(), footprintWidth, footprintHeight);
+            Texture texture(device, data.get(), footprintWidth, footprintHeight);
+            rObjects.emplace_back(device, modelMatrix, sharedVertices, indices, std::move(texture), setLayout, descriptorPool);
+
+        } else {
+            rObjects.emplace_back(device, modelMatrix, sharedVertices, indices, Texture(device), setLayout, descriptorPool);
         }
     }
 

@@ -24,6 +24,11 @@ class Texture {
     VkSampler getSampler() const { return m_textureSampler; }
     std::shared_ptr<VkDescriptorImageInfo> descriptorInfo() { return m_imageInfo; }
 
+    struct TextureInput {
+        uint32_t width;
+        uint32_t height;
+    };
+
   private:
     void init(const unsigned char* data, uint32_t width, uint32_t height);
     void createImage(uint32_t width, uint32_t height, VkFormat format, VkImageTiling tiling, VkImageUsageFlags usage,
