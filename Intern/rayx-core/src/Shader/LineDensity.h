@@ -1,5 +1,5 @@
-#ifndef RZP_LINE_DENSITY_H
-#define RZP_LINE_DENSITY_H
+#ifndef LINE_DENSITY_H
+#define LINE_DENSITY_H
 
 #include "Adapt.h"
 
