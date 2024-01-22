@@ -25,8 +25,9 @@ class Texture {
     std::shared_ptr<VkDescriptorImageInfo> descriptorInfo() { return m_imageInfo; }
 
     struct TextureInput {
-        uint32_t width;
-        uint32_t height;
+        std::unique_ptr<unsigned char[]> data;
+        uint32_t footprintWidth;
+        uint32_t footprintHeight;
     };
 
   private:

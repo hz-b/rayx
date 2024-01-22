@@ -49,12 +49,12 @@ class RenderObject {
         glm::mat4 modelMatrix;
         std::vector<TexVertex> vertices;
         std::vector<uint32_t> indices;
-        std::optional<std::vector<std::vector<uint32_t>>> footprint;
+        std::optional<Texture::TextureInput> textureInput;
     };
 
     static std::vector<RenderObjectInput> prepareRObjects(const std::vector<RAYX::OpticalElement> elements, RAYX::BundleHistory rays);
 
-    static std::vector<RenderObject> buildRObjectsFromInput(Device& device, const std::vector<RenderObjectInput> input,
+    static std::vector<RenderObject> buildRObjectsFromInput(Device& device, const std::vector<RenderObjectInput>& input,
                                                             std::shared_ptr<DescriptorSetLayout> setLayout,
                                                             std::shared_ptr<DescriptorPool> descriptorPool);
 

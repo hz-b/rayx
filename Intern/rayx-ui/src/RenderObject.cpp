@@ -30,7 +30,11 @@ std::vector<RenderObject::RenderObjectInput> RenderObject::prepareRObjects(const
             std::vector<std::vector<uint32_t>> footprint = makeFootprint(getRaysOfElement(rays, i), -width / 2, width / 2, -height / 2, height / 2,
                                                                          (uint32_t)(width * 10), (uint32_t)(height * 10));
 
-            RenderObject::RenderObjectInput inputObject(modelMatrix, vertices, indices, footprint);
+            uint32_t footprintWidth, footprintHeight;
+            std::unique_ptr<unsigned char[]> data = footprintAsImage(footprint, footprintWidth, footprintHeight);
+
+            RenderObject::RenderObjectInput inputObject(modelMatrix, vertices, indices,
+                                                        Texture::TextureInput{std::move(data), footprintWidth, footprintHeight});
             rObjectsInput.emplace_back(std::move(inputObject));
 
         } else {
@@ -41,7 +45,7 @@ std::vector<RenderObject::RenderObjectInput> RenderObject::prepareRObjects(const
     return rObjectsInput;
 }
 
-std::vector<RenderObject> RenderObject::buildRObjectsFromInput(Device& device, const std::vector<RenderObject::RenderObjectInput> input,
+std::vector<RenderObject> RenderObject::buildRObjectsFromInput(Device& device, const std::vector<RenderObject::RenderObjectInput>& input,
                                                                std::shared_ptr<DescriptorSetLayout> setLayout,
                                                                std::shared_ptr<DescriptorPool> descriptorPool) {
     RAYX_LOG << "8";
@@ -58,12 +62,9 @@ std::vector<RenderObject> RenderObject::buildRObjectsFromInput(Device& device, c
         }
         std::vector<uint32_t> indices = inputObject.indices;
         glm::mat4 modelMatrix = inputObject.modelMatrix;
-        // handle optional footprint
-        auto footprint = inputObject.footprint;
-        if (footprint.has_value()) {
-            uint32_t footprintWidth, footprintHeight;
-            std::unique_ptr<unsigned char[]> data = footprintAsImage(inputObject.footprint.value(), footprintWidth, footprintHeight);
-            Texture texture(device, data.get(), footprintWidth, footprintHeight);
+        if (inputObject.textureInput.has_value()) {
+            Texture texture(device, inputObject.textureInput->data.get(), inputObject.textureInput->footprintWidth,
+                            inputObject.textureInput->footprintHeight);
             rObjects.emplace_back(device, modelMatrix, sharedVertices, indices, std::move(texture), setLayout, descriptorPool);
 
         } else {

@@ -138,6 +138,8 @@ void Application::run() {
 
                 if (!uiParams.showH5NotExistPopup && !uiParams.showRMLNotExistPopup) {
                     vkDeviceWaitIdle(m_Device.device());
+                    rayObj.reset();
+                    rObjects.clear();
                     m_Beamline = RAYX::importBeamline(rmlPath);
                     loadRays(rmlPath);
                     std::vector<RAYX::OpticalElement> elements = m_Beamline.m_OpticalElements;
