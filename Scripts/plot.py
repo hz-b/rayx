@@ -30,7 +30,7 @@ def importOutput(filename: str):
         dataset = h5f["rays"]
         df = pd.DataFrame(dataset, columns=['Ray-ID', 'Event-ID', 'X-position', 'Y-position', 'Z-position', 'Event-type', 'X-direction', 'Y-direction', 'Z-direction', 'Energy',
                                              'Stokes0', 'Stokes1', 'Stokes2', 'Stokes3', 'pathLength', 'order',
-                                             'lastElement'])
+                                             'lastElement', 'lightSourceIndex'])
     df = df[df["Event-type"] == W_JUST_HIT_ELEM]
     df = df[["X-position", "Y-position", "Z-position", "lastElement"]]
     return df, names
