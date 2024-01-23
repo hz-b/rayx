@@ -14,6 +14,12 @@ namespace RAYX {
 enum class GratingMount { Deviation, Incidence };
 enum class ParaboloidType { Focussing, Collimate };
 
+// This is the current "high-level" representation of an OpticalElement.
+// As you can see, it is precisely the same as the shader-internal representation `Element` in addition with a name.
+// Hence, this is not suitable for work with the GUI, as it does not contain DesignParameters.
+// Originally, we had a more rich structure of higher-level OpticalElements.
+// Although we decided to remove it due to other flaws, it might still make sense to have a look at it.
+// You can find the old implementation at e625e4a4 in the git history.
 struct RAYX_API OpticalElement {
     Element m_element;
     std::string m_name;
