@@ -4,14 +4,14 @@
 # Many changes like this will cause the __whole__ set-seeded part of the test suite to fail.
 # Just because the stored "correct" solution just isn't correct anymore.
 
-# But fear not, redefine-correct.sh is here to help!
+# But fear not, overwrite-correct.sh is here to help!
 # It allows you to re-generate the "correct" solutions based on what rayx currently outputs.
 
 ### USE WITH CARE! ###
 
 # With great power comes great responsibility!
 # If you introduce a bug, and then run this script; the test suite will be filled with __wrong solutions__!
-# It is advisable to check using `git diff` whether the changes that this script made are the ones you intended.
+# It is advisable to check using `git diff` / plotting whether the changes that this script made are the ones you intended.
 
 cd ..
 
