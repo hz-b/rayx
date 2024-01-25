@@ -25,4 +25,21 @@ struct UIParameters {
     bool showRMLNotExistPopup;
     bool showH5NotExistPopup;
     bool pathValidState;
+
+    UIParameters(CameraController& camController)
+        : camController(camController),
+          rmlPath(""),
+          pathChanged(false),
+          frameTime(0.0f),
+          rayInfo({false, false, false, false, 0, 0}),
+          showRMLNotExistPopup(false),
+          showH5NotExistPopup(false),
+          pathValidState(false) {}
+
+    void updatePath(const std::filesystem::path& path) {
+        if (path.empty()) return;
+        if (path == rmlPath) return;
+        rmlPath = path;
+        pathChanged = true;
+    }
 };

@@ -52,8 +52,14 @@ class Application {
     std::shared_ptr<DescriptorPool> m_GlobalDescriptorPool{nullptr};  ///< General descriptor pool
     std::shared_ptr<DescriptorPool> m_TexturePool{nullptr};           ///< Descriptor pool for textures
 
-    void loadRays(const std::string& path);
+    CameraController m_CamController;  ///< Camera controller
+    Camera m_Camera;                   ///< Camera
+    UIParameters m_UIParams;           ///< UI parameters
+    UIRenderSystem m_UIRenderSystem;   ///< UI render system
 
+    void init();
+
+    void loadRays(const std::string& path);
     void createRayCache(BundleHistory& rayCache, UIRayInfo& rayInfo);
     void updateRays(BundleHistory& rayCache, std::optional<RenderObject>& rayObj, std::vector<Line>& rays, UIRayInfo& rayInfo);
 };

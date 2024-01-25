@@ -27,25 +27,52 @@ Application::Application(uint32_t width, uint32_t height, const char* name, int 
     : m_Window(width, height, name),                          //
       m_CommandParser(argc, argv),                            //
       m_Device(m_Window, m_CommandParser.m_args.m_deviceID),  //
-      m_Renderer(m_Window, m_Device)                          //
-{
+      m_Renderer(m_Window, m_Device),                         //
+      m_Camera(),                                             //
+      m_CamController(),                                      //
+      m_UIParams(m_CamController),                            //
+      m_UIRenderSystem(m_Window, m_Device, m_Renderer.getSwapChainImageFormat(), m_Renderer.getSwapChainDepthFormat(),
+                       m_Renderer.getSwapChainImageCount()) {
     m_GlobalDescriptorPool = DescriptorPool::Builder(m_Device)
                                  .addPoolSize(VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, SwapChain::MAX_FRAMES_IN_FLIGHT)
                                  .setMaxSets(SwapChain::MAX_FRAMES_IN_FLIGHT)
                                  .build();
     m_TexturePool = nullptr;
+
+    init();
 }
 
 Application::~Application() = default;
 
-void Application::run() {
-    m_CommandParser.analyzeCommands();
+void Application::init() {
+    RAYX_PROFILE_FUNCTION_STDOUT();
 
+    m_CommandParser.analyzeCommands();
     if (m_CommandParser.m_args.m_benchmark) {
         RAYX_VERB << "Starting in Benchmark Mode.\n";
         RAYX::BENCH_FLAG = true;
     }
 
+    std::string rmlPathCli = m_CommandParser.m_args.m_providedFile;
+    UIRayInfo rayInfo{
+        .displayRays = true,     //
+        .raysChanged = false,    //
+        .cacheChanged = false,   //
+        .renderAllRays = false,  //
+        .amountOfRays = 50,      //
+        .maxAmountOfRays = 100   //
+    };
+
+    m_UIParams.updatePath(rmlPathCli);
+    m_UIParams.rayInfo = rayInfo;
+
+    glfwSetKeyCallback(m_Window.window(), keyCallback);
+    glfwSetMouseButtonCallback(m_Window.window(), mouseButtonCallback);
+    glfwSetCursorPosCallback(m_Window.window(), cursorPosCallback);
+    glfwSetWindowUserPointer(m_Window.window(), &m_CamController);
+}
+
+void Application::run() {
     // Create UBOs (Uniform Buffer Object)
     std::vector<std::unique_ptr<Buffer>> uboBuffers(SwapChain::MAX_FRAMES_IN_FLIGHT);
     for (auto& uboBuffer : uboBuffers) {
@@ -72,19 +99,7 @@ void Application::run() {
     // Render systems
     ObjectRenderSystem objectRenderSystem(m_Device, m_Renderer.getSwapChainRenderPass(), setLayouts);
     RayRenderSystem rayRenderSystem(m_Device, m_Renderer.getSwapChainRenderPass(), globalSetLayout->getDescriptorSetLayout());
-    UIRenderSystem uiRenderSystem(m_Window, m_Device, m_Renderer.getSwapChainImageFormat(), m_Renderer.getSwapChainDepthFormat(),
-                                  m_Renderer.getSwapChainImageCount());
     GridRenderSystem gridRenderSystem(m_Device, m_Renderer.getSwapChainRenderPass(), globalSetLayout->getDescriptorSetLayout());
-
-    // Camera
-    CameraController camController;
-    Camera cam;
-
-    // Input callbacks
-    glfwSetKeyCallback(m_Window.window(), keyCallback);
-    glfwSetMouseButtonCallback(m_Window.window(), mouseButtonCallback);
-    glfwSetCursorPosCallback(m_Window.window(), cursorPosCallback);
-    glfwSetWindowUserPointer(m_Window.window(), &camController);
 
     auto currentTime = std::chrono::high_resolution_clock::now();
     std::vector<RenderObject> rObjects;
@@ -93,27 +108,6 @@ void Application::run() {
     std::vector<Line> rays;
     BundleHistory rayCache;
     std::optional<RenderObject> rayObj;
-
-    // CLI Input
-    std::string rmlPathCli = m_CommandParser.m_args.m_providedFile;
-    UIRayInfo rayInfo{
-        .displayRays = true,     //
-        .raysChanged = false,    //
-        .cacheChanged = false,   //
-        .renderAllRays = false,  //
-        .amountOfRays = 50,      //
-        .maxAmountOfRays = 100   //
-    };
-    UIParameters uiParams{
-        .camController = camController,      //
-        .rmlPath = rmlPathCli,               //
-        .pathChanged = !rmlPathCli.empty(),  //
-        .frameTime = 0.0,                    //
-        .rayInfo = rayInfo,
-        .showRMLNotExistPopup = false,
-        .showH5NotExistPopup = false,
-        .pathValidState = false  //
-    };
 
     // Main loop
     while (!m_Window.shouldClose()) {
@@ -126,17 +120,17 @@ void Application::run() {
         if (auto commandBuffer = m_Renderer.beginFrame()) {
             // Params to pass to UI
             auto newTime = std::chrono::high_resolution_clock::now();
-            uiParams.frameTime = std::chrono::duration<float, std::chrono::seconds::period>(newTime - currentTime).count();
+            m_UIParams.frameTime = std::chrono::duration<float, std::chrono::seconds::period>(newTime - currentTime).count();
             currentTime = newTime;
 
             // Update UI and camera
-            uiRenderSystem.setupUI(uiParams, m_Beamline.m_OpticalElements, rSourcePositions);
+            m_UIRenderSystem.setupUI(m_UIParams, m_Beamline.m_OpticalElements, rSourcePositions);
             // camController.update(cam, m_Renderer.getAspectRatio());
 
-            if (uiParams.pathChanged) {
-                std::string rmlPath = uiParams.rmlPath.string();
+            if (m_UIParams.pathChanged) {
+                std::string rmlPath = m_UIParams.rmlPath.string();
 
-                if (!uiParams.showH5NotExistPopup && !uiParams.showRMLNotExistPopup) {
+                if (!m_UIParams.showH5NotExistPopup && !m_UIParams.showRMLNotExistPopup) {
                     vkDeviceWaitIdle(m_Device.device());
                     rayObj.reset();
                     rObjects.clear();
@@ -159,11 +153,11 @@ void Application::run() {
                     setLayouts = {globalSetLayout->getDescriptorSetLayout(), texSetLayout->getDescriptorSetLayout()};
                     objectRenderSystem.rebuild(m_Renderer.getSwapChainRenderPass(), setLayouts);
 
-                    createRayCache(rayCache, uiParams.rayInfo);
-                    uiParams.pathChanged = false;
-                    uiParams.rayInfo.raysChanged = true;
+                    createRayCache(rayCache, m_UIParams.rayInfo);
+                    m_UIParams.pathChanged = false;
+                    m_UIParams.rayInfo.raysChanged = true;
                 }
-                uiParams.pathChanged = false;
+                m_UIParams.pathChanged = false;
             }
             if (rObjectInputs.valid()) {
                 if (rObjectInputs.wait_for(std::chrono::seconds(0)) == std::future_status::ready) {
@@ -174,34 +168,34 @@ void Application::run() {
                 }
             }
 
-            if (uiParams.rayInfo.raysChanged) {
+            if (m_UIParams.rayInfo.raysChanged) {
                 vkDeviceWaitIdle(m_Device.device());
-                if (uiParams.rayInfo.cacheChanged) {
-                    createRayCache(rayCache, uiParams.rayInfo);
-                    uiParams.rayInfo.cacheChanged = false;
+                if (m_UIParams.rayInfo.cacheChanged) {
+                    createRayCache(rayCache, m_UIParams.rayInfo);
+                    m_UIParams.rayInfo.cacheChanged = false;
                 }
-                if (uiParams.rayInfo.displayRays) {
-                    updateRays(rayCache, rayObj, rays, uiParams.rayInfo);
+                if (m_UIParams.rayInfo.displayRays) {
+                    updateRays(rayCache, rayObj, rays, m_UIParams.rayInfo);
                 } else {
                     rayObj.reset();
                 }
-                uiParams.rayInfo.raysChanged = false;
+                m_UIParams.rayInfo.raysChanged = false;
             }
 
-            camController.update(cam, m_Renderer.getAspectRatio());
+            m_CamController.update(m_Camera, m_Renderer.getAspectRatio());
 
             // Update UBO
             uint32_t frameIndex = m_Renderer.getFrameIndex();
-            uboBuffers[frameIndex]->writeToBuffer(&cam);
+            uboBuffers[frameIndex]->writeToBuffer(&m_Camera);
 
             // Render
-            m_Renderer.beginSwapChainRenderPass(commandBuffer, uiRenderSystem.getClearValue());
+            m_Renderer.beginSwapChainRenderPass(commandBuffer, m_UIRenderSystem.getClearValue());
 
-            FrameInfo frameInfo{cam, frameIndex, commandBuffer, descriptorSets[frameIndex]};
+            FrameInfo frameInfo{m_Camera, frameIndex, commandBuffer, descriptorSets[frameIndex]};
             objectRenderSystem.render(frameInfo, rObjects);
             rayRenderSystem.render(frameInfo, rayObj);
             gridRenderSystem.render(frameInfo);
-            uiRenderSystem.render(commandBuffer);
+            m_UIRenderSystem.render(commandBuffer);
 
             m_Renderer.endSwapChainRenderPass(commandBuffer);
             m_Renderer.endFrame();
