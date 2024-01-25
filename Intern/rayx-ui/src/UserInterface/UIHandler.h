@@ -8,18 +8,19 @@
 #include "FrameInfo.h"
 #include "GraphicsCore/Device.h"
 #include "GraphicsCore/Swapchain.h"
-#include "UserInterface/BeamlineOutliner.h"
-#include "UserInterface/Settings.h"
+#include "BeamlineOutliner.h"
+#include "Settings.h"
 
-class UIRenderSystem {
+class UIHandler {
   public:
-    UIRenderSystem(const Window& window, const Device& device, VkFormat imageFormat, VkFormat depthFormat, uint32_t imageCount);
-    UIRenderSystem(const UIRenderSystem&) = delete;
-    UIRenderSystem& operator=(const UIRenderSystem&) = delete;
-    ~UIRenderSystem();
+    UIHandler(const Window& window, const Device& device, VkFormat imageFormat, VkFormat depthFormat, uint32_t imageCount);
+    UIHandler(const UIHandler&) = delete;
+    UIHandler& operator=(const UIHandler&) = delete;
+    ~UIHandler();
 
+    void beginUIRender();
     void setupUI(UIParameters& uiParams, std::vector<RAYX::OpticalElement>& elements, std::vector<glm::dvec3>& rSourcePositions);
-    void render(VkCommandBuffer commandBuffer);
+    void endUIRender(VkCommandBuffer commandBuffer);
 
     VkClearValue getClearValue() const {
         VkClearValue v;

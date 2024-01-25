@@ -1,4 +1,4 @@
-#include "UIRenderSystem.h"
+#include "UIHandler.h"
 
 #include <imgui_impl_glfw.h>
 #include <imgui_impl_vulkan.h>
@@ -17,8 +17,8 @@ void checkVkResult(VkResult result, const char* message) {
     }
 }
 
-// ---- UIRenderSystem ----
-UIRenderSystem::UIRenderSystem(const Window& window, const Device& device, VkFormat imageFormat, VkFormat depthFormat, uint32_t imageCount)
+// ---- UIHandler ----
+UIHandler::UIHandler(const Window& window, const Device& device, VkFormat imageFormat, VkFormat depthFormat, uint32_t imageCount)
     : m_Window(window), m_Device(device) {
     // Create descriptor pool for IMGUI
     VkDescriptorPoolSize poolSizes[] = {{VK_DESCRIPTOR_TYPE_SAMPLER, 1000},
@@ -138,24 +138,27 @@ UIRenderSystem::UIRenderSystem(const Window& window, const Device& device, VkFor
     }
 }
 
-UIRenderSystem::~UIRenderSystem() {
+UIHandler::~UIHandler() {
     vkDestroyRenderPass(m_Device.device(), m_RenderPass, nullptr);
     vkDestroyDescriptorPool(m_Device.device(), m_DescriptorPool, nullptr);
     ImGui_ImplVulkan_Shutdown();
     ImGui_ImplGlfw_Shutdown();
     ImGui::DestroyContext();
 }
+
+void UIHandler::beginUIRender() {
+    ImGui_ImplVulkan_NewFrame();
+    ImGui_ImplGlfw_NewFrame();
+    ImGui::NewFrame();
+}
+
 /**
  * @brief
  *
  * @param uiParams
  * @param rObjects
  */
-void UIRenderSystem::setupUI(UIParameters& uiParams, std::vector<RAYX::OpticalElement>& elemets, std::vector<glm::dvec3>& rSourcePositions) {
-    ImGui_ImplVulkan_NewFrame();
-    ImGui_ImplGlfw_NewFrame();
-    ImGui::NewFrame();
-
+void UIHandler::setupUI(UIParameters& uiParams, std::vector<RAYX::OpticalElement>& elemets, std::vector<glm::dvec3>& rSourcePositions) {
     if (m_useLargeFont) {
         ImGui::PushFont(m_largeFont);
     } else {
@@ -171,7 +174,7 @@ void UIRenderSystem::setupUI(UIParameters& uiParams, std::vector<RAYX::OpticalEl
     ImGui::PopFont();
 }
 
-void UIRenderSystem::render(VkCommandBuffer commandBuffer) {
+void UIHandler::endUIRender(VkCommandBuffer commandBuffer) {
     ImGui::Render();
 
     ImDrawData* drawData = ImGui::GetDrawData();
@@ -185,7 +188,7 @@ void UIRenderSystem::render(VkCommandBuffer commandBuffer) {
     ImGui_ImplVulkan_RenderDrawData(drawData, commandBuffer);
 }
 
-void UIRenderSystem::showSceneEditorWindow(UIParameters& uiParams) {
+void UIHandler::showSceneEditorWindow(UIParameters& uiParams) {
     ImGui::SetNextWindowPos(ImVec2(0, 0), ImGuiCond_Once);
     ImGui::SetNextWindowSize(ImVec2(450, 450), ImGuiCond_Once);
 
@@ -247,7 +250,7 @@ void UIRenderSystem::showSceneEditorWindow(UIParameters& uiParams) {
     ImGui::End();
 }
 
-void UIRenderSystem::showSettingsWindow() {
+void UIHandler::showSettingsWindow() {
     ImGui::SetNextWindowPos(ImVec2(0, 450), ImGuiCond_Once);
     ImGui::SetNextWindowSize(ImVec2(450, 100), ImGuiCond_Once);
 
@@ -258,7 +261,7 @@ void UIRenderSystem::showSettingsWindow() {
     ImGui::End();
 }
 
-void UIRenderSystem::showHotkeysWindow() {
+void UIHandler::showHotkeysWindow() {
     ImGui::SetNextWindowPos(ImVec2(0, 550), ImGuiCond_Once);
     ImGui::SetNextWindowSize(ImVec2(450, 210), ImGuiCond_Once);
 
@@ -279,7 +282,7 @@ void UIRenderSystem::showHotkeysWindow() {
     ImGui::End();
 }
 
-void UIRenderSystem::showMissingFilePopupWindow(UIParameters& uiParams) {
+void UIHandler::showMissingFilePopupWindow(UIParameters& uiParams) {
     if (uiParams.showH5NotExistPopup || uiParams.showRMLNotExistPopup) {
         ImGui::SetNextWindowPos(ImVec2(ImGui::GetIO().DisplaySize.x * 0.5f, ImGui::GetIO().DisplaySize.y * 0.5f), ImGuiCond_Always,
                                 ImVec2(0.5f, 0.5f));
