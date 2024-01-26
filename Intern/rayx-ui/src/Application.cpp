@@ -2,7 +2,6 @@
 
 #include <chrono>
 #include <future>
-#include <unordered_set>
 
 #include "CanonicalizePath.h"
 #include "Colors.h"
@@ -31,8 +30,8 @@ Application::Application(uint32_t width, uint32_t height, const char* name, int 
       m_Camera(),                                             //
       m_CamController(),                                      //
       m_UIParams(m_CamController),                            //
-      m_UIRenderSystem(m_Window, m_Device, m_Renderer.getSwapChainImageFormat(), m_Renderer.getSwapChainDepthFormat(),
-                       m_Renderer.getSwapChainImageCount()) {
+      m_UIHandler(m_Window, m_Device, m_Renderer.getSwapChainImageFormat(), m_Renderer.getSwapChainDepthFormat(),
+                  m_Renderer.getSwapChainImageCount()) {
     m_GlobalDescriptorPool = DescriptorPool::Builder(m_Device)
                                  .addPoolSize(VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, SwapChain::MAX_FRAMES_IN_FLIGHT)
                                  .setMaxSets(SwapChain::MAX_FRAMES_IN_FLIGHT)
@@ -102,14 +101,17 @@ void Application::run() {
     GridRenderSystem gridRenderSystem(m_Device, m_Renderer.getSwapChainRenderPass(), globalSetLayout->getDescriptorSetLayout());
 
     auto currentTime = std::chrono::high_resolution_clock::now();
-    std::vector<RenderObject> rObjects;
-    std::future<std::vector<RenderObject::RenderObjectInput>> rObjectInputs;
     std::vector<glm::dvec3> rSourcePositions;
-    std::vector<Line> rays;
-    BundleHistory rayCache;
-    std::optional<RenderObject> rayObj;
+    std::vector<RAYX::OpticalElement> elements;
+    std::vector<std::shared_ptr<RAYX::LightSource>> sources;
+
+    std::future<void> beamlineFuture;
+    std::future<void> raysFuture;
+    std::future<void> buildRayCacheFuture;
+    std::future<std::vector<Scene::RenderObjectInput>> getRObjInputsFuture;
 
     // Main loop
+    m_State = State::RunningWithoutScene;
     while (!m_Window.shouldClose()) {
         // Skip rendering when minimized
         if (m_Window.isMinimized()) {
@@ -123,79 +125,101 @@ void Application::run() {
             m_UIParams.frameTime = std::chrono::duration<float, std::chrono::seconds::period>(newTime - currentTime).count();
             currentTime = newTime;
 
-            // Update UI and camera
-            m_UIRenderSystem.setupUI(m_UIParams, m_Beamline.m_OpticalElements, rSourcePositions);
-            // camController.update(cam, m_Renderer.getAspectRatio());
-
             if (m_UIParams.pathChanged) {
-                std::string rmlPath = m_UIParams.rmlPath.string();
-
-                if (!m_UIParams.showH5NotExistPopup && !m_UIParams.showRMLNotExistPopup) {
-                    vkDeviceWaitIdle(m_Device.device());
-                    rayObj.reset();
-                    rObjects.clear();
-                    m_Beamline = RAYX::importBeamline(rmlPath);
-                    loadRays(rmlPath);
-                    std::vector<RAYX::OpticalElement> elements = m_Beamline.m_OpticalElements;
-                    rSourcePositions.clear();
-                    for (auto& source : m_Beamline.m_LightSources) {
-                        rSourcePositions.push_back(glm::dvec3((*source).getPosition()));
-                    }
-
-                    m_TexturePool = DescriptorPool::Builder(m_Device)
-                                        .addPoolSize(VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, (uint32_t)elements.size())
-                                        .setMaxSets((uint32_t)elements.size())
-                                        .setPoolFlags(VK_DESCRIPTOR_POOL_CREATE_FREE_DESCRIPTOR_SET_BIT)
-                                        .build();
-                    rObjectInputs = std::async(std::launch::async, &RenderObject::prepareRObjects, elements, m_rays);
-
-                    // objectRenderSystem.rebuild(m_Renderer.getSwapChainRenderPass(), setLayouts);
-                    setLayouts = {globalSetLayout->getDescriptorSetLayout(), texSetLayout->getDescriptorSetLayout()};
-                    objectRenderSystem.rebuild(m_Renderer.getSwapChainRenderPass(), setLayouts);
-
-                    createRayCache(rayCache, m_UIParams.rayInfo);
-                    m_UIParams.pathChanged = false;
-                    m_UIParams.rayInfo.raysChanged = true;
-                }
+                m_State = State::Loading;
+                m_RMLPath = m_UIParams.rmlPath.string();
+                beamlineFuture = std::async(std::launch::async, &Application::loadBeamline, this, m_RMLPath);
+                raysFuture = std::async(std::launch::async, &Application::loadRays, this, m_RMLPath);
                 m_UIParams.pathChanged = false;
             }
-            if (rObjectInputs.valid()) {
-                if (rObjectInputs.wait_for(std::chrono::seconds(0)) == std::future_status::ready) {
-                    auto tempObjects = rObjectInputs.get();
-                    rObjects = RenderObject::buildRObjectsFromInput(m_Device, tempObjects, texSetLayout, m_TexturePool);
-                    objectRenderSystem.rebuild(m_Renderer.getSwapChainRenderPass(), setLayouts);
-                    // camController.lookAtPoint(rObjects[0].getTranslationVecor());
-                }
+
+            switch (m_State) {
+                case State::Loading:
+                    if (beamlineFuture.wait_for(std::chrono::seconds(0)) == std::future_status::ready &&
+                        raysFuture.wait_for(std::chrono::seconds(0)) == std::future_status::ready) {
+                        // Wait for loadBeamline and loadRays to finish
+                        RAYX_VERB << "Loaded RML file: " << m_RMLPath;
+                        RAYX_VERB << "Loaded H5 file: " << m_RMLPath.string().substr(0, m_RMLPath.string().size() - 4) + ".h5";
+
+                        elements = m_Beamline->m_OpticalElements;
+                        sources = m_Beamline->m_LightSources;
+                        rSourcePositions.clear();
+                        for (auto& source : sources) {
+                            rSourcePositions.push_back(source->getPosition());
+                        }
+
+                        m_TexturePool = DescriptorPool::Builder(m_Device)
+                                            .addPoolSize(VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, static_cast<uint32_t>(elements.size()) + 1)
+                                            .setMaxSets(static_cast<uint32_t>(elements.size()) + 1)
+                                            .setPoolFlags(VK_DESCRIPTOR_POOL_CREATE_FREE_DESCRIPTOR_SET_BIT)
+                                            .build();
+                        m_Scene = std::make_unique<Scene>(m_Device);
+
+                        buildRayCacheFuture =
+                            std::async(std::launch::async, &Scene::buildRayCache, m_Scene.get(), std::ref(m_UIParams.rayInfo), std::ref(m_rays));
+                        getRObjInputsFuture =
+                            std::async(std::launch::async, &Scene::getRObjectInputs, m_Scene.get(), std::ref(elements), std::ref(m_rays));
+
+                        m_State = State::BuildingRays;
+                    }
+                    break;
+                case State::BuildingRays:
+                    if (buildRayCacheFuture.wait_for(std::chrono::seconds(0)) == std::future_status::ready) {
+                        m_Scene->buildRaysRObject(*m_Beamline, m_UIParams.rayInfo, texSetLayout, m_TexturePool);
+                        if (m_Scene->getState() == Scene::State::Complete) {
+                            m_State = State::Running;
+                        } else {
+                            m_State = State::BuildingElements;
+                        }
+                    }
+                    break;
+                case State::BuildingElements:
+                    if (getRObjInputsFuture.wait_for(std::chrono::seconds(0)) == std::future_status::ready) {
+                        m_Scene->buildRObjectsFromInput(getRObjInputsFuture.get(), texSetLayout, m_TexturePool);
+                        m_State = State::Running;
+                    }
+                    break;
+                case State::Running:
+                    break;
+                default:
+                    break;
+            }
+
+            if (m_UIParams.rayInfo.cacheChanged) {
+                buildRayCacheFuture =
+                    std::async(std::launch::async, &Scene::buildRayCache, m_Scene.get(), std::ref(m_UIParams.rayInfo), std::ref(m_rays));
+                m_State = State::BuildingRays;
+                m_UIParams.rayInfo.cacheChanged = false;
             }
 
             if (m_UIParams.rayInfo.raysChanged) {
-                vkDeviceWaitIdle(m_Device.device());
-                if (m_UIParams.rayInfo.cacheChanged) {
-                    createRayCache(rayCache, m_UIParams.rayInfo);
-                    m_UIParams.rayInfo.cacheChanged = false;
-                }
-                if (m_UIParams.rayInfo.displayRays) {
-                    updateRays(rayCache, rayObj, rays, m_UIParams.rayInfo);
-                } else {
-                    rayObj.reset();
-                }
+                m_State = State::BuildingRays;
                 m_UIParams.rayInfo.raysChanged = false;
             }
 
-            m_CamController.update(m_Camera, m_Renderer.getAspectRatio());
-
             // Update UBO
             uint32_t frameIndex = m_Renderer.getFrameIndex();
+            m_CamController.update(m_Camera, m_Renderer.getAspectRatio());
             uboBuffers[frameIndex]->writeToBuffer(&m_Camera);
 
             // Render
-            m_Renderer.beginSwapChainRenderPass(commandBuffer, m_UIRenderSystem.getClearValue());
+            m_Renderer.beginSwapChainRenderPass(commandBuffer, m_UIHandler.getClearValue());
 
             FrameInfo frameInfo{m_Camera, frameIndex, commandBuffer, descriptorSets[frameIndex]};
-            objectRenderSystem.render(frameInfo, rObjects);
-            rayRenderSystem.render(frameInfo, rayObj);
+
+            // Scene
+            if (m_State != State::RunningWithoutScene && m_State != State::Loading) {
+                objectRenderSystem.render(frameInfo, m_Scene->getRObjects());
+                if (m_UIParams.rayInfo.displayRays) rayRenderSystem.render(frameInfo, m_Scene->getRaysRObject());
+            }
+
+            // Grid
             gridRenderSystem.render(frameInfo);
-            m_UIRenderSystem.render(commandBuffer);
+
+            // UI
+            m_UIHandler.beginUIRender();
+            m_UIHandler.setupUI(m_UIParams, elements, rSourcePositions);
+            m_UIHandler.endUIRender(commandBuffer);
 
             m_Renderer.endSwapChainRenderPass(commandBuffer);
             m_Renderer.endFrame();
@@ -207,52 +231,10 @@ void Application::run() {
     vkDeviceWaitIdle(m_Device.device());
 }
 
-void Application::createRayCache(BundleHistory& rayCache, UIRayInfo& rayInfo) {
+void Application::loadRays(const std::filesystem::path& rmlPath) {
     RAYX_PROFILE_FUNCTION_STDOUT();
-    rayInfo.maxAmountOfRays = (int)m_rays.size();
-    if (rayInfo.renderAllRays) {
-        rayCache = m_rays;
-        return;
-    }
-    const size_t m = getMaxEvents(m_rays);
-
-    std::vector<size_t> indices(m_rays.size());
-    std::iota(indices.begin(), indices.end(), 0);  // Filling indices with 0, 1, 2, ..., n-1
-
-    // Randomly shuffling the indices
-    std::random_device rd;
-    std::default_random_engine engine(rd());
-    std::shuffle(indices.begin(), indices.end(), engine);
-
-    std::unordered_set<size_t> selectedIndices;
-
-    // Selecting rays for each event index
-    for (size_t eventIdx = 0; eventIdx < m; ++eventIdx) {
-        size_t count = 0;
-        for (size_t rayIdx : indices) {
-            if (count >= MAX_RAYS) break;
-            if (m_rays[rayIdx].size() > eventIdx) {
-                selectedIndices.insert(rayIdx);
-                count++;
-            }
-        }
-    }
-
-    rayCache.clear();
-    // Now selectedIndices contains unique indices of rays
-    // Creating rayCache object from selected indices
-    for (size_t idx : selectedIndices) {
-        rayCache.push_back(m_rays[idx]);
-    }
-
-    rayInfo.maxAmountOfRays = (int)rayCache.size();
-}
-
-void Application::loadRays(const std::string& rmlPath) {
-    RAYX_PROFILE_FUNCTION_STDOUT();
-    vkDeviceWaitIdle(m_Device.device());
 #ifndef NO_H5
-    std::string rayFilePath = rmlPath.substr(0, rmlPath.size() - 4) + ".h5";
+    std::string rayFilePath = rmlPath.string().substr(0, rmlPath.string().size() - 4) + ".h5";
     m_rays = raysFromH5(rayFilePath, FULL_FORMAT);
 #else
     std::string rayFilePath = rmlPath.substr(0, rmlPath.size() - 4) + ".csv";
@@ -260,33 +242,4 @@ void Application::loadRays(const std::string& rmlPath) {
 #endif
 }
 
-void Application::updateRays(BundleHistory& rayCache, std::optional<RenderObject>& rayObj, std::vector<Line>& rays, UIRayInfo& rayInfo) {
-    if (!rayInfo.renderAllRays) {
-        rays = getRays(rayCache, m_Beamline, kMeansFilter, (uint32_t)rayInfo.amountOfRays);
-    } else {
-        rays = getRays(rayCache, m_Beamline, noFilter, (uint32_t)rayInfo.maxAmountOfRays);
-    }
-    if (!rays.empty()) {
-        // Temporarily aggregate all vertices, then create a single RenderObject
-        std::vector<ColorVertex> rayVertices(rays.size() * 2);
-        std::vector<uint32_t> rayIndices(rays.size() * 2);
-        for (uint32_t i = 0; i < rays.size(); ++i) {
-            rayVertices[i * 2] = rays[i].v1;
-            rayVertices[i * 2 + 1] = rays[i].v2;
-            rayIndices[i * 2] = i * 2;
-            rayIndices[i * 2 + 1] = i * 2 + 1;
-        }
-
-        std::shared_ptr<DescriptorPool> rayDescrPool =
-            DescriptorPool::Builder(m_Device).addPoolSize(VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 1).setMaxSets(1).build();
-        std::shared_ptr<DescriptorSetLayout> raySetLayout =
-            DescriptorSetLayout::Builder(m_Device).addBinding(0, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, VK_SHADER_STAGE_FRAGMENT_BIT).build();
-
-        std::vector<std::shared_ptr<Vertex>> shared_vertices;
-        shared_vertices.reserve(rayVertices.size());
-        std::transform(rayVertices.begin(), rayVertices.end(), std::back_inserter(shared_vertices),
-                       [](const ColorVertex& vertex) { return std::make_shared<ColorVertex>(vertex); });
-
-        rayObj.emplace(m_Device, glm::mat4(1.0f), shared_vertices, rayIndices, Texture(m_Device), raySetLayout, rayDescrPool);
-    }
-}
+void Application::loadBeamline(const std::filesystem::path& rmlPath) { m_Beamline = std::make_unique<RAYX::Beamline>(RAYX::importBeamline(rmlPath)); }

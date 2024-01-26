@@ -7,6 +7,7 @@
 #include "GraphicsCore/Renderer.h"
 #include "RayProcessing.h"
 #include "UserInterface/UIHandler.h"
+#include "Scene.h"
 
 #ifdef NDEBUG
 const bool enableValidationLayers = false;
@@ -36,6 +37,8 @@ class Application {
 
     void run();
 
+    enum class State { Initializing, Loading, BuildingRays, BuildingElements, Running, RunningWithoutScene } m_State{State::Initializing};
+
   private:
     // --- Order matters ---
     Window m_Window;                ///< Application window
@@ -44,19 +47,24 @@ class Application {
     Renderer m_Renderer;            ///< Vulkan renderer
 
     // --- Order doesn't matter ---
-    RAYX::BundleHistory m_rays;                                       ///< All rays loaded from file
-    RAYX::Beamline m_Beamline;                                        ///< Beamline loaded from file
+    std::unique_ptr<Scene> m_Scene;                                   ///< Scene
     std::shared_ptr<DescriptorPool> m_GlobalDescriptorPool{nullptr};  ///< General descriptor pool
     std::shared_ptr<DescriptorPool> m_TexturePool{nullptr};           ///< Descriptor pool for textures
 
     CameraController m_CamController;  ///< Camera controller
     Camera m_Camera;                   ///< Camera
     UIParameters m_UIParams;           ///< UI parameters
-    UIHandler m_UIRenderSystem;        ///< UI render system
+    UIHandler m_UIHandler;             ///< UI render system
+
+    std::filesystem::path m_RMLPath;             ///< Path to the RML file
+    std::unique_ptr<RAYX::Beamline> m_Beamline;  ///< Beamline
+    RAYX::BundleHistory m_rays;                  ///< Ray cache
 
     void init();
 
-    void loadRays(const std::string& path);
+    void loadRays(const std::filesystem::path& rmlPath);
+    void loadBeamline(const std::filesystem::path& rmlPath);
+
     void createRayCache(BundleHistory& rayCache, UIRayInfo& rayInfo);
-    void updateRays(BundleHistory& rayCache, std::optional<RenderObject>& rayObj, std::vector<Line>& rays, UIRayInfo& rayInfo);
+    void updateRays(BundleHistory& rayCache, std::optional<RenderObject>& rayObj, UIRayInfo& rayInfo);
 };

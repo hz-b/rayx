@@ -201,15 +201,15 @@ void UIHandler::showSceneEditorWindow(UIParameters& uiParams) {
         nfdresult_t result = NFD_OpenDialog(&outPath, filterItem, filterCount, NULL);
         if (result == NFD_OKAY) {
             std::string rmlPath = outPath;
-            std::string rayFilePathH5 = rmlPath.substr(0, rmlPath.size() - 4) + ".h5";
-            std::string rayFilePathCSV = rmlPath.substr(0, rmlPath.size() - 4) + ".csv";
 
 #ifndef NO_H5
+            std::string rayFilePathH5 = rmlPath.substr(0, rmlPath.size() - 4) + ".h5";
             uiParams.showH5NotExistPopup = !std::filesystem::exists(rayFilePathH5);
 #else
+            std::string rayFilePathCSV = rmlPath.substr(0, rmlPath.size() - 4) + ".csv";
             uiParams.showH5NotExistPopup = !std::filesystem::exists(rayFilePathCSV);
 #endif
-            uiParams.showRMLNotExistPopup = !std::filesystem::exists(rmlPath);
+            uiParams.showRMLNotExistPopup = rmlPath.substr(rmlPath.size() - 4, 4) != ".rml" || !std::filesystem::exists(rmlPath);
 
             if (uiParams.showH5NotExistPopup || uiParams.showRMLNotExistPopup) {
                 uiParams.pathChanged = false;
@@ -233,12 +233,12 @@ void UIHandler::showSceneEditorWindow(UIParameters& uiParams) {
     ImGui::Separator();
     if (!uiParams.rmlPath.empty() && uiParams.pathValidState) {
         size_t tempAmountOfRays = uiParams.rayInfo.amountOfRays;
-        bool tempDisplayRays = uiParams.rayInfo.displayRays;
         bool tempRenderAllRays = uiParams.rayInfo.renderAllRays;
+
         displayFilterSlider(uiParams.rayInfo.amountOfRays, uiParams.rayInfo.maxAmountOfRays, uiParams.rayInfo.displayRays,
                             uiParams.rayInfo.renderAllRays);
-        if (tempAmountOfRays != uiParams.rayInfo.amountOfRays || tempDisplayRays != uiParams.rayInfo.displayRays ||
-            tempRenderAllRays != uiParams.rayInfo.renderAllRays) {
+
+        if (tempAmountOfRays != uiParams.rayInfo.amountOfRays) {
             uiParams.rayInfo.raysChanged = true;
         }
         if (tempRenderAllRays != uiParams.rayInfo.renderAllRays) {
@@ -293,12 +293,10 @@ void UIHandler::showMissingFilePopupWindow(UIParameters& uiParams) {
             // Scale up font size
             ImGui::PushFont(ImGui::GetIO().Fonts->Fonts[1]);
 
-            if (uiParams.showH5NotExistPopup && uiParams.showRMLNotExistPopup) {
-                ImGui::Text("Both RML and H5 files do not exist.");
-            } else if (uiParams.showH5NotExistPopup) {
-                ImGui::Text("The H5 file does not exist.");
+            if (uiParams.showRMLNotExistPopup) {
+                ImGui::Text("RML file does not exist or is not valid.");
             } else {
-                ImGui::Text("The RML file does not exist.");
+                ImGui::Text("The H5 file does not exist.");
             }
             ImGui::Spacing();
             if (ImGui::Button("OK")) {

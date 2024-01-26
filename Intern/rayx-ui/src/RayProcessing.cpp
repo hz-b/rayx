@@ -31,7 +31,7 @@ void displayFilterSlider(size_t& amountOfRays, size_t maxAmountOfRays, bool& dis
     float logValue = std::log(static_cast<float>(amountOfRays));
 
     // Create a slider that operates on the logarithmic scale
-    if (ImGui::SliderFloat("##hidden", &logValue, minLogValue, maxLogValue)) {
+    if (ImGui::SliderFloat("##hidden", &logValue, minLogValue, maxLogValue, "")) {
         // Convert the logarithmic value back to the actual number of rays
         amountOfRays = static_cast<int>(std::exp(logValue));
     }

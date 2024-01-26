@@ -8,7 +8,7 @@
 #include <sstream>
 
 CameraController::CameraController()
-    : m_position(0.0f, 0.0f, -2.0f),
+    : m_position(0.0f, 5.0f, -10.0f),
       m_direction(0.0f, 0.0f, 1.0f),
       m_up(0.0f, 1.0f, 0.0f),
       m_yaw(90.0f),
@@ -56,7 +56,7 @@ void CameraController::updateDirectionViaMouse(float mouseX, float mouseY) {
     float deltaX = mouseX - m_lastMouseX;
     float deltaY = mouseY - m_lastMouseY;
     setLastMousePos(mouseX, mouseY);
-    updateDirection(-0.05f * deltaX, 0.05f * deltaY);
+    updateDirection(0.05f * deltaX, -0.05f * deltaY);
 }
 
 void CameraController::PerspectiveConfig::display() {

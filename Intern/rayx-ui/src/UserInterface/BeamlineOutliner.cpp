@@ -68,7 +68,7 @@ void BeamlineOutliner::buildTreeFromXMLNode(rapidxml::xml_node<>* node, TreeNode
 }
 
 void BeamlineOutliner::renderImGuiTreeFromRML(const std::filesystem::path& filename, CameraController& camController,
-                                              std::vector<RAYX::OpticalElement>& rObjects, std::vector<glm::dvec3>& rSourcePositions) {
+                                              std::vector<RAYX::OpticalElement>& elements, std::vector<glm::dvec3>& rSourcePositions) {
     // Check if file exists
     if (!std::filesystem::exists(filename)) {
         ImGui::Text("Choose a file to display the beamline outline.");
@@ -112,10 +112,10 @@ void BeamlineOutliner::renderImGuiTreeFromRML(const std::filesystem::path& filen
     // Call recursive function to handle the object collection and render the ImGui tree
     m_pTreeRoot = std::make_unique<TreeNode>("Root");
     buildTreeFromXMLNode(xml_beamline, *m_pTreeRoot);
-    renderImGuiTree(*m_pTreeRoot, camController, rObjects, rSourcePositions);
+    renderImGuiTree(*m_pTreeRoot, camController, elements, rSourcePositions);
 }
 
-void BeamlineOutliner::showBeamlineOutlineWindow(UIParameters& uiParams, std::vector<RAYX::OpticalElement>& rObjects,
+void BeamlineOutliner::showBeamlineOutlineWindow(UIParameters& uiParams, std::vector<RAYX::OpticalElement>& elements,
                                                  std::vector<glm::dvec3>& rSourcePositions) {
     ImGui::SetNextWindowPos(ImVec2(0, 760), ImGuiCond_Once);  // Position it below the Settings window
     ImGui::SetNextWindowSize(ImVec2(450, 300), ImGuiCond_Once);
@@ -126,13 +126,13 @@ void BeamlineOutliner::showBeamlineOutlineWindow(UIParameters& uiParams, std::ve
         // Create and render new Tree
         m_lightSourceIndex = 0;
         m_opticalElementIndex = 0;
-        renderImGuiTreeFromRML(uiParams.rmlPath, uiParams.camController, rObjects, rSourcePositions);
+        renderImGuiTreeFromRML(uiParams.rmlPath, uiParams.camController, elements, rSourcePositions);
     } else if (m_pTreeRoot == nullptr) {
         // Do nothing
         ImGui::Text("Choose a file to display the beamline outline.");
     } else {
         // Render same Tree
-        renderImGuiTree(*m_pTreeRoot, uiParams.camController, rObjects, rSourcePositions);
+        renderImGuiTree(*m_pTreeRoot, uiParams.camController, elements, rSourcePositions);
     }
 
     ImGui::End();

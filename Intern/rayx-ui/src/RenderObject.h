@@ -38,29 +38,12 @@ class RenderObject {
      * @param vertices Vector of Vertex objects.
      * @param indices Vector of index values.
      */
-    RenderObject(Device& device, glm::mat4 modelMatrix, std::vector<std::shared_ptr<Vertex>> vertices, std::vector<uint32_t>& indices,
+    RenderObject(Device& device, glm::mat4 modelMatrix, const std::vector<std::shared_ptr<Vertex>> vertices, const std::vector<uint32_t>& indices,
                  Texture&& texture, std::shared_ptr<DescriptorSetLayout> setLayout, std::shared_ptr<DescriptorPool> descriptorPool);
     RenderObject(const RenderObject&) = delete;
     RenderObject& operator=(const RenderObject&) = delete;
     RenderObject(RenderObject&& other) noexcept;
     RenderObject& operator=(RenderObject&& other) noexcept;
-
-    struct RenderObjectInput {
-        glm::mat4 modelMatrix;
-        std::vector<TexVertex> vertices;
-        std::vector<uint32_t> indices;
-        std::optional<Texture::TextureInput> textureInput;
-    };
-
-    static std::vector<RenderObjectInput> prepareRObjects(const std::vector<RAYX::OpticalElement> elements, RAYX::BundleHistory rays);
-
-    static std::vector<RenderObject> buildRObjectsFromInput(Device& device, const std::vector<RenderObjectInput>& input,
-                                                            std::shared_ptr<DescriptorSetLayout> setLayout,
-                                                            std::shared_ptr<DescriptorPool> descriptorPool);
-
-    static std::vector<RenderObject> buildRObjectsFromElements(Device& device, const std::vector<RAYX::OpticalElement>& elements,
-                                                               RAYX::BundleHistory& rays, std::shared_ptr<DescriptorSetLayout> setLayout,
-                                                               std::shared_ptr<DescriptorPool> descriptorPool);
 
     /**
      * @brief Binds the object's vertex and index buffers to a Vulkan command buffer.
@@ -73,6 +56,8 @@ class RenderObject {
      * @param commandBuffer Vulkan command buffer.
      */
     void draw(VkCommandBuffer commandBuffer) const;
+
+    void rebuild(const std::vector<std::shared_ptr<Vertex>> vertices, const std::vector<uint32_t>& indices);
 
     void updateTexture(const std::filesystem::path& path);
     void updateTexture(const unsigned char* data, uint32_t width, uint32_t height);

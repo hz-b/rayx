@@ -8,79 +8,12 @@
 #include "Triangulation/GeometryUtils.h"
 #include "Triangulation/Triangulate.h"
 
-std::vector<RenderObject::RenderObjectInput> RenderObject::prepareRObjects(const std::vector<RAYX::OpticalElement> elements,
-                                                                           RAYX::BundleHistory rays) {
-    RAYX_LOG << "start prepareRObjects";
-    RAYX_LOG << "Elements size: " << elements.size();
-    std::vector<RenderObject::RenderObjectInput> rObjectsInput;
-    for (uint32_t i = 0; i < elements.size(); i++) {
-        std::vector<TexVertex> vertices;
-        std::vector<uint32_t> indices;
-
-        {
-            RAYX_PROFILE_SCOPE_STDOUT("Triangulate element");
-            triangulateObject(elements[i], vertices, indices);
-        }
-
-        glm::mat4 modelMatrix = elements[i].m_element.m_outTrans;
-
-        if (vertices.size() == 4) {
-            auto [width, height] = getRectangularDimensions(elements[i].m_element.m_cutout);
-
-            std::vector<std::vector<uint32_t>> footprint = makeFootprint(getRaysOfElement(rays, i), -width / 2, width / 2, -height / 2, height / 2,
-                                                                         (uint32_t)(width * 10), (uint32_t)(height * 10));
-
-            uint32_t footprintWidth, footprintHeight;
-            std::unique_ptr<unsigned char[]> data = footprintAsImage(footprint, footprintWidth, footprintHeight);
-
-            RenderObject::RenderObjectInput inputObject(modelMatrix, vertices, indices,
-                                                        Texture::TextureInput{std::move(data), footprintWidth, footprintHeight});
-            rObjectsInput.emplace_back(std::move(inputObject));
-
-        } else {
-            RenderObject::RenderObjectInput inputObject(modelMatrix, vertices, indices, std::nullopt);
-            rObjectsInput.emplace_back(std::move(inputObject));
-        }
-    }
-    return rObjectsInput;
-}
-
-std::vector<RenderObject> RenderObject::buildRObjectsFromInput(Device& device, const std::vector<RenderObject::RenderObjectInput>& input,
-                                                               std::shared_ptr<DescriptorSetLayout> setLayout,
-                                                               std::shared_ptr<DescriptorPool> descriptorPool) {
-    RAYX_LOG << "8";
-    assert(setLayout != nullptr && "Descriptor set layout is null");
-    assert(descriptorPool != nullptr && "Descriptor pool is null");
-    RAYX_PROFILE_FUNCTION_STDOUT();
-
-    std::vector<RenderObject> rObjects;
-
-    for (const auto& inputObject : input) {
-        std::vector<std::shared_ptr<Vertex>> sharedVertices;
-        for (const auto& vertex : inputObject.vertices) {
-            sharedVertices.emplace_back(std::make_shared<TexVertex>(vertex));
-        }
-        std::vector<uint32_t> indices = inputObject.indices;
-        glm::mat4 modelMatrix = inputObject.modelMatrix;
-        if (inputObject.textureInput.has_value()) {
-            Texture texture(device, inputObject.textureInput->data.get(), inputObject.textureInput->footprintWidth,
-                            inputObject.textureInput->footprintHeight);
-            rObjects.emplace_back(device, modelMatrix, sharedVertices, indices, std::move(texture), setLayout, descriptorPool);
-
-        } else {
-            rObjects.emplace_back(device, modelMatrix, sharedVertices, indices, Texture(device), setLayout, descriptorPool);
-        }
-    }
-
-    std::cout << "Triangulation complete" << std::endl;
-    return rObjects;
-}
-
 /**
  * Constructor sets up vertex and index buffers based on the input parameters.
  */
-RenderObject::RenderObject(Device& device, glm::mat4 modelMatrix, std::vector<std::shared_ptr<Vertex>> vertices, std::vector<uint32_t>& indices,
-                           Texture&& texture, std::shared_ptr<DescriptorSetLayout> setLayout, std::shared_ptr<DescriptorPool> descriptorPool)
+RenderObject::RenderObject(Device& device, glm::mat4 modelMatrix, const std::vector<std::shared_ptr<Vertex>> vertices,
+                           const std::vector<uint32_t>& indices, Texture&& texture, std::shared_ptr<DescriptorSetLayout> setLayout,
+                           std::shared_ptr<DescriptorPool> descriptorPool)
     : m_Device(device),
       m_modelMatrix(modelMatrix),
       m_Texture(std::move(texture)),
@@ -141,6 +74,12 @@ void RenderObject::bind(VkCommandBuffer commandBuffer) const {
 
 void RenderObject::draw(VkCommandBuffer commandBuffer) const {
     vkCmdDrawIndexed(commandBuffer, m_indexCount, 1, 0, 0, 0);  //
+}
+
+void RenderObject::rebuild(const std::vector<std::shared_ptr<Vertex>> vertices, const std::vector<uint32_t>& indices) {
+    vkDeviceWaitIdle(m_Device.device());
+    createVertexBuffers(vertices);
+    createIndexBuffers(indices);
 }
 
 void RenderObject::updateTexture(const std::filesystem::path& path) {

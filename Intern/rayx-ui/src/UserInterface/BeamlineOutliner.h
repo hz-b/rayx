@@ -24,7 +24,7 @@ class BeamlineOutliner {
     BeamlineOutliner();
     ~BeamlineOutliner();
 
-    void showBeamlineOutlineWindow(UIParameters& uiParams, std::vector<RAYX::OpticalElement>& rObjects, std::vector<glm::dvec3>& rSourcePositions);
+    void showBeamlineOutlineWindow(UIParameters& uiParams, std::vector<RAYX::OpticalElement>& elements, std::vector<glm::dvec3>& rSourcePositions);
 
   private:
     std::unique_ptr<TreeNode> m_pTreeRoot = nullptr;

@@ -39,6 +39,18 @@ struct UIParameters {
     void updatePath(const std::filesystem::path& path) {
         if (path.empty()) return;
         if (path == rmlPath) return;
+        if (!std::filesystem::exists(path)) {
+            RAYX_ERR << "RML file does not exist: " << path.string();
+        }
+#ifdef NO_H5
+        if (!std::filesystem::exists(path.string().substr(0, path.string().size() - 4) + ".csv")) {
+            RAYX_ERR << "Matching CSV file for" << path.string() << "does not exist";
+        }
+#else
+        if (!std::filesystem::exists(path.string().substr(0, path.string().size() - 4) + ".h5")) {
+            RAYX_ERR << "Matching H5 file for" << path.string() << "does not exist";
+        }
+#endif
         rmlPath = path;
         pathChanged = true;
     }
