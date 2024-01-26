@@ -56,7 +56,7 @@ Cell doubleToCell(double x) {
     return strToCell(s.c_str());
 }
 
-void writeCSV(const RAYX::BundleHistory& hist, const std::string& filename, const Format& format) {
+void writeCSV(const RAYX::BundleHistory& hist, const std::string& filename, const Format& format, int startEventID) {
     std::ofstream file(filename);
 
     // write header:
@@ -79,7 +79,7 @@ void writeCSV(const RAYX::BundleHistory& hist, const std::string& filename, cons
                 if (i > 0) {
                     file << DELIMITER;
                 }
-                file << doubleToCell(format[i].get_double(ray_id, event_id, event)).buf;
+                file << doubleToCell(format[i].get_double(ray_id, event_id + startEventID, event)).buf;
             }
             file << '\n';
         }

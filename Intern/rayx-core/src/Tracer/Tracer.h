@@ -28,6 +28,7 @@ struct TraceRawConfig {
     double m_numRays;
     double m_randomSeed;
     double m_maxEvents;
+    double m_startEventID;
     MaterialTables m_materialTables;
     std::vector<Element> m_elements;
 };
@@ -48,7 +49,8 @@ class RAYX_API Tracer {
     // This will call traceRaw.
     // Everything happening in each traceRaw implementation should be extracted to this function instead.
     // See `BundleHistory` for information about the return value.
-    BundleHistory trace(const Beamline&, Sequential sequential, uint64_t max_batch_size, int THREAD_COUNT = 1, unsigned int maxEvents = 1);
+    BundleHistory trace(const Beamline&, Sequential sequential, uint64_t max_batch_size, int THREAD_COUNT = 1, unsigned int maxEvents = 1,
+                        int startEventID = 0);
 
     void setDevice(int deviceID);
 

@@ -18,7 +18,7 @@ int count(const RAYX::BundleHistory& hist) {
     return c;
 }
 
-std::vector<double> toDoubles(const RAYX::BundleHistory& hist, const Format& format) {
+std::vector<double> toDoubles(const RAYX::BundleHistory& hist, const Format& format, int startEventID) {
     std::vector<double> output;
     output.reserve(count(hist) * format.size());
 
@@ -27,7 +27,7 @@ std::vector<double> toDoubles(const RAYX::BundleHistory& hist, const Format& for
         for (uint event_id = 0; event_id < ray_hist.size(); event_id++) {
             const RAYX::Ray& event = ray_hist[event_id];
             for (uint i = 0; i < format.size(); i++) {
-                double next = format[i].get_double(ray_id, event_id, event);
+                double next = format[i].get_double(ray_id, event_id + startEventID, event);
                 output.push_back(next);
             }
         }
@@ -35,10 +35,11 @@ std::vector<double> toDoubles(const RAYX::BundleHistory& hist, const Format& for
     return output;
 }
 
-void writeH5(const RAYX::BundleHistory& hist, const std::string& filename, const Format& format, std::vector<std::string> elementNames) {
+void writeH5(const RAYX::BundleHistory& hist, const std::string& filename, const Format& format, std::vector<std::string> elementNames,
+             int startEventID) {
     HighFive::File file(filename, HighFive::File::ReadWrite | HighFive::File::Create | HighFive::File::Truncate);
 
-    auto doubles = toDoubles(hist, format);
+    auto doubles = toDoubles(hist, format, startEventID);
 
     try {
         // write data

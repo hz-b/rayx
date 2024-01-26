@@ -1,4 +1,5 @@
 #include "Helper.h"
+
 #include "InvocationState.h"
 
 void init() {
@@ -18,28 +19,29 @@ void init() {
     inv_ctr = rayId() * workerCounterNum + uint64_t(inv_pushConstants.randomSeed * MAX_UINT64_DOUBLE);
 }
 
-uint64_t rayId() {
-    return uint64_t(inv_pushConstants.rayIdStart) + uint64_t(gl_GlobalInvocationID);
-}
-
+uint64_t rayId() { return uint64_t(inv_pushConstants.rayIdStart) + uint64_t(gl_GlobalInvocationID); }
 
 // `i in [0, maxEvents-1]`.
 // Will return the index in outputData to access the `i'th` output ray belonging to this shader call.
 // Typically used as `outputData[output_index(i)]`.
-uint output_index(uint i) {
-    return uint(gl_GlobalInvocationID) * uint(inv_pushConstants.maxEvents) + i;
-}
+uint output_index(uint i) { return uint(gl_GlobalInvocationID) * uint(inv_pushConstants.maxEvents - inv_pushConstants.startEventID) + i; }
 
 // record an event and store it in the next free spot in outputData.
 // `r` will typically be _ray, or some related ray.
 void recordEvent(Ray r, double w) {
-    if (inv_finalized) { return; }
+    if (inv_nextEventIndex < inv_pushConstants.startEventID) {
+        inv_nextEventIndex += 1;
+        return;
+    }
+    if (inv_finalized) {
+        return;
+    }
 
     // recording of event type ETYPE_UINIT is forbidden.
     if (w == ETYPE_UNINIT) {
-        #ifndef GLSL
+#ifndef GLSL
         RAYX_ERR << "recordEvent failed: weight UNINIT is invalid in recordEvent";
-        #endif
+#endif
 
         return;
     }
@@ -49,12 +51,12 @@ void recordEvent(Ray r, double w) {
         inv_finalized = true;
 
         // change the last event to "ETYPE_TOO_MANY_EVENTS".
-        uint idx = output_index(uint(inv_pushConstants.maxEvents-1));
+        uint idx = output_index(uint(inv_pushConstants.maxEvents - 1));
         inv_outputData[idx].m_eventType = ETYPE_TOO_MANY_EVENTS;
 
-        #ifndef GLSL
+#ifndef GLSL
         RAYX_ERR << "recordEvent failed: too many events!";
-        #endif
+#endif
 
         return;
     }
@@ -73,4 +75,3 @@ void recordFinalEvent(Ray r, double w) {
     recordEvent(r, w);
     inv_finalized = true;
 }
-

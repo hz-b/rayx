@@ -65,9 +65,14 @@ void TerminalApp::tracePath(const std::filesystem::path& path) {
 
         // Run rayx core
         RAYX::Sequential seq = m_CommandParser->m_args.m_sequential ? RAYX::Sequential::Yes : RAYX::Sequential::No;
-        unsigned int maxEvents =
-            (m_CommandParser->m_args.m_maxEvents < 1) ? m_Beamline->m_OpticalElements.size() + 2 : m_CommandParser->m_args.m_maxEvents;
-        auto rays = m_Tracer->trace(*m_Beamline, seq, max_batch_size, m_CommandParser->m_args.m_setThreads, maxEvents);
+        int maxEvents = (m_CommandParser->m_args.m_maxEvents < 1) ? m_Beamline->m_OpticalElements.size() + 2 : m_CommandParser->m_args.m_maxEvents;
+
+        if (m_CommandParser->m_args.m_startEventID >= maxEvents) {
+            RAYX_LOG << "startEventID must be < maxEvents. Setting to maxEvents-1.";
+            m_CommandParser->m_args.m_startEventID = maxEvents - 1;
+        }
+        auto rays = m_Tracer->trace(*m_Beamline, seq, max_batch_size, m_CommandParser->m_args.m_setThreads, maxEvents,
+                                    m_CommandParser->m_args.m_startEventID);
 
         // check max EventID
         unsigned int maxEventID = 0;
@@ -75,9 +80,10 @@ void TerminalApp::tracePath(const std::filesystem::path& path) {
         {
             RAYX_PROFILE_SCOPE_STDOUT("maxEventID");
             for (auto& ray : rays) {
-                if (ray.size() > maxEventID) {
-                    maxEventID = ray.size();
+                if (ray.size() > (maxEventID)) {
+                    maxEventID = ray.size() + m_CommandParser->m_args.m_startEventID;
                 }
+
                 for (auto& event : ray) {
                     if (event.m_eventType == ETYPE_TOO_MANY_EVENTS) {
                         notEnoughEvents = true;
@@ -88,13 +94,15 @@ void TerminalApp::tracePath(const std::filesystem::path& path) {
         if (notEnoughEvents) {
             RAYX_LOG << "Not enough events (" << maxEvents << ")! Consider increasing maxEvents.";
         }
-        if (maxEventID < maxEvents) {
+        if (maxEventID == 0) {
+            RAYX_LOG << "No events were recorded! If startEventID is set, it might need to be lowered.";
+        } else if (maxEventID < maxEvents) {
             RAYX_LOG << "maxEvents is set to " << maxEvents << " but the maximum event ID is " << maxEventID << ". Consider setting maxEvents to "
                      << maxEventID << " to increase performance.";
         }
 
         // Export Rays to external data.
-        auto file = exportRays(rays, path.string());
+        auto file = exportRays(rays, path.string(), m_CommandParser->m_args.m_startEventID);
 
         // Plot
         if (m_CommandParser->m_args.m_plotFlag) {
@@ -123,6 +131,10 @@ void TerminalApp::run() {
     m_CommandParser->analyzeCommands();
     if (m_CommandParser->m_args.m_verbose) {
         RAYX::setDebugVerbose(true);
+    }
+    if (m_CommandParser->m_args.m_startEventID < 0) {
+        RAYX_LOG << "startEventID must be >= 0. Setting to 0.";
+        m_CommandParser->m_args.m_startEventID = 0;
     }
 
     if (m_CommandParser->m_args.m_isFixSeed) {
@@ -171,7 +183,7 @@ void TerminalApp::run() {
     tracePath(m_CommandParser->m_args.m_providedFile);
 }
 
-std::string TerminalApp::exportRays(const RAYX::BundleHistory& hist, std::string path) {
+std::string TerminalApp::exportRays(const RAYX::BundleHistory& hist, std::string path, int startEventID) {
     RAYX_PROFILE_FUNCTION_STDOUT();
     bool csv = m_CommandParser->m_args.m_csvFlag;
 
@@ -186,13 +198,13 @@ std::string TerminalApp::exportRays(const RAYX::BundleHistory& hist, std::string
 
     if (csv) {
         path += ".csv";
-        writeCSV(hist, path, fmt);
+        writeCSV(hist, path, fmt, startEventID);
     } else {
 #ifdef NO_H5
         RAYX_ERR << "writeH5 called during NO_H5 (HDF5 disabled during build))";
 #else
         path += ".h5";
-        writeH5(hist, path, fmt, getBeamlineOpticalElementsNames());
+        writeH5(hist, path, fmt, getBeamlineOpticalElementsNames(), startEventID);
 #endif
     }
     return path;

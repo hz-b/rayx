@@ -15,7 +15,6 @@ uint64_t inv_ctr;
 
 uint64_t inv_nextEventIndex;
 
-
 /**************************************************************
  *                    SHADER ARRAYS
  **************************************************************/
@@ -45,19 +44,19 @@ SHADER_ARRAY(double, inv_mat, 5, materialBuf);
 SHADER_ARRAY(_debug_struct, inv_d_struct, 6, debugBuf);
 #endif
 
-
 /**************************************************************
  *                    PushConstants
  **************************************************************/
 #ifndef GLSL
-    PushConstants inv_pushConstants;
-#else 
-    layout( push_constant ) uniform constants
-    {   
-        double rayIdStart;
-        double numRays;
-        double randomSeed;
-        double maxEvents;
-        double sequential; // sequential tracing only.
-    } inv_pushConstants;
+PushConstants inv_pushConstants;
+#else
+layout(push_constant) uniform constants {
+    double rayIdStart;
+    double numRays;
+    double randomSeed;
+    double maxEvents;
+    double sequential;  // sequential tracing only.
+    double startEventID;
+}
+inv_pushConstants;
 #endif

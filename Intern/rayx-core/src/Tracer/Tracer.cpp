@@ -11,7 +11,7 @@ using uint = unsigned int;
 
 namespace RAYX {
 
-BundleHistory Tracer::trace(const Beamline& b, Sequential seq, uint64_t max_batch_size, int thread_count, unsigned int maxEvents) {
+BundleHistory Tracer::trace(const Beamline& b, Sequential seq, uint64_t max_batch_size, int thread_count, unsigned int maxEvents, int startEventID) {
     RAYX_PROFILE_FUNCTION_STDOUT();
     RAYX_VERB << "maxEvents: " << maxEvents;
 
@@ -47,6 +47,7 @@ BundleHistory Tracer::trace(const Beamline& b, Sequential seq, uint64_t max_batc
             .m_numRays = (double)rays.size(),
             .m_randomSeed = randomSeed,
             .m_maxEvents = (double)maxEvents,
+            .m_startEventID = (double)startEventID,
             .m_materialTables = materialTables,
             .m_elements = elements,
         };
@@ -56,23 +57,25 @@ BundleHistory Tracer::trace(const Beamline& b, Sequential seq, uint64_t max_batc
                                        .numRays = (double)rays.size(),
                                        .randomSeed = randomSeed,
                                        .maxEvents = (double)maxEvents,
-                                       .sequential = sequential};
+                                       .sequential = sequential,
+                                       .startEventID = (double)startEventID};
         setPushConstants(&pushConstants);
 
         RayHistory rawBatchHistory;
         {
             RAYX_PROFILE_SCOPE_STDOUT("Tracing");
             rawBatchHistory = traceRaw(cfg);
-            assert(rawBatchHistory.size() == batch_size * maxEvents);
+            RAYX_LOG << "Traced " << rawBatchHistory.size() << " events.";
+            assert(rawBatchHistory.size() == batch_size * (maxEvents - startEventID));
         }
 
         {
             RAYX_PROFILE_SCOPE_STDOUT("BundleHistory-calculation");
             for (uint i = 0; i < batch_size; i++) {
                 RayHistory hist;
-                hist.reserve(maxEvents);
-                for (uint j = 0; j < maxEvents; j++) {
-                    uint idx = i * maxEvents + j;
+                hist.reserve(maxEvents - startEventID);
+                for (uint j = 0; j < maxEvents - startEventID; j++) {
+                    uint idx = i * (maxEvents - startEventID) + j;
                     Ray r = rawBatchHistory[idx];
                     if (r.m_eventType == ETYPE_UNINIT) {
                         break;
