@@ -237,7 +237,7 @@ void Application::loadRays(const std::filesystem::path& rmlPath) {
     std::string rayFilePath = rmlPath.string().substr(0, rmlPath.string().size() - 4) + ".h5";
     m_rays = raysFromH5(rayFilePath, FULL_FORMAT);
 #else
-    std::string rayFilePath = rmlPath.substr(0, rmlPath.size() - 4) + ".csv";
+    std::string rayFilePath = rmlPath.string().substr(0, rmlPath.string().size() - 4) + ".csv";
     m_rays = loadCSV(rayFilePath);
 #endif
 }

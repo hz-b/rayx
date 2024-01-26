@@ -41,7 +41,7 @@ void displayFilterSlider(size_t& amountOfRays, size_t maxAmountOfRays, bool& dis
 
     // Display the actual number of rays next to the slider
     ImGui::SameLine();
-    ImGui::Text("%d", amountOfRays);
+    ImGui::Text("%zu", amountOfRays);
     ImGui::Checkbox("Render all rays", &renderAllRays);
     if (!displayRays) {
         ImGui::EndDisabled();  // End grey out

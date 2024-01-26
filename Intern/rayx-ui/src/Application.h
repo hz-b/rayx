@@ -51,8 +51,8 @@ class Application {
     std::shared_ptr<DescriptorPool> m_GlobalDescriptorPool{nullptr};  ///< General descriptor pool
     std::shared_ptr<DescriptorPool> m_TexturePool{nullptr};           ///< Descriptor pool for textures
 
-    CameraController m_CamController;  ///< Camera controller
     Camera m_Camera;                   ///< Camera
+    CameraController m_CamController;  ///< Camera controller
     UIParameters m_UIParams;           ///< UI parameters
     UIHandler m_UIHandler;             ///< UI render system
 
