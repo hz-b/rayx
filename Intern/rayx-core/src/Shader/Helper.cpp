@@ -6,7 +6,7 @@ void init() {
     inv_finalized = false;
 
     // sets all output rays controlled by this shader call to ETYPE_UNINIT.
-    for (uint i = 0; i < inv_pushConstants.maxEvents; i++) {
+    for (uint i = uint(inv_pushConstants.startEventID); i < inv_pushConstants.maxEvents; i++) {
         inv_outputData[output_index(i)].m_eventType = ETYPE_UNINIT;
     }
     inv_nextEventIndex = 0;
@@ -24,7 +24,10 @@ uint64_t rayId() { return uint64_t(inv_pushConstants.rayIdStart) + uint64_t(gl_G
 // `i in [0, maxEvents-1]`.
 // Will return the index in outputData to access the `i'th` output ray belonging to this shader call.
 // Typically used as `outputData[output_index(i)]`.
-uint output_index(uint i) { return uint(gl_GlobalInvocationID) * uint(inv_pushConstants.maxEvents - inv_pushConstants.startEventID) + i; }
+uint output_index(uint i) {
+    return uint(gl_GlobalInvocationID) * uint(inv_pushConstants.maxEvents - inv_pushConstants.startEventID) + i -
+           uint(inv_pushConstants.startEventID);
+}
 
 // record an event and store it in the next free spot in outputData.
 // `r` will typically be _ray, or some related ray.
