@@ -1,8 +1,7 @@
 #include "RefractiveIndex.h"
 #include "InvocationState.h"
 
-// The inv_mat table consists of all the information from the Palik & Nff tables for all materials that were loaded into the shader.
-// All the Palik and Nff entries are all stored as doubles after each other in the inv_mat array.
+// The inv_mat table consists of all the entries from the Palik & Nff tables for all materials that were loaded into the shader.
 // Thus, when you want to get some concrete palik entry for a particular element, you need the inv_matIdx table to "know where to look" in inv_mat:
 // * inv_matIdx[i] is the beginning of the Palik Table in inv_mat for the element with atomic number i+1, for i in [0, 91].
 // * inv_matIdx[i+92] is the beginning of the Nff Table in inv_mat for the element with atomic number i+1, for i in [0, 91].
@@ -12,7 +11,7 @@
 // If you will, the inv_mat table is a "sparse" 4d-datastructure of shape (2, 92, N, 3).
 // - 2 because we store a Palik-table, and an Nff-table
 // - 92, because we support 92 elements of the periodic table (from Hydrogen to Uranium)
-// - N is the number of entries in a given Palik/Nff table (for a fixed periodic element).
+// - N is the number of entries in a given Palik/Nff table (this number depends on the periodic element)
 // - 3 because each Palik / Nff entry consists of three doubles.
 // - It is a "sparse" data structure as most of the entries are actually missing, we only load the actually "used" materials into the shader, not all materials.
 // -- Thus, we cannot index into it as inv_mat[i1][i2][i3][i4] directly, but instead have to use inv_matIdx as described above.
