@@ -49,6 +49,7 @@ class RAYX_API Tracer {
     // This will call traceRaw.
     // Everything happening in each traceRaw implementation should be extracted to this function instead.
     // See `BundleHistory` for information about the return value.
+    // `max_batch_size` corresponds to the maximal number of rays that will be put into `traceRaw` in one batch.
     BundleHistory trace(const Beamline&, Sequential sequential, uint64_t max_batch_size, int THREAD_COUNT = 1, unsigned int maxEvents = 1,
                         int startEventID = 0);
 
@@ -58,7 +59,11 @@ class RAYX_API Tracer {
     // where the actual tracing happens.
     // std::vector<Ray> will contain all events for all Rays (and also the ETYPE_UNINIT events).
     virtual std::vector<Ray> traceRaw(const TraceRawConfig&) = 0;
+
+    // TODO Why are the PushConstants not part of the TraceRawConfig?
+    // TODO The TraceRawConfig is supposed to contain all information relevant for tracing.
     virtual void setPushConstants(const PushConstants*) = 0;
+
     // -1 means no device is selected.
     int m_deviceID = -1;
 };

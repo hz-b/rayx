@@ -34,7 +34,6 @@ bool updateStokes(RAYX_INOUT(Ray) r, double real_S, double real_P, double delta,
     dmat4 inv_rot = transpose(rot);
 
     dvec4 stokes_new = mullerMatrix(real_S, real_P, delta) * rot * stokes_old;
-    ;
     r.m_stokes = inv_rot * stokes_new;
 
     double rn = squaresDoubleRNG(inv_ctr);
