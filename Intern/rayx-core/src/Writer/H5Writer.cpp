@@ -10,6 +10,7 @@
 
 using uint = unsigned int;
 
+// count the number of events from `hist`.
 int count(const RAYX::BundleHistory& hist) {
     int c = 0;
     for (auto& ray_hist : hist) {
@@ -18,6 +19,7 @@ int count(const RAYX::BundleHistory& hist) {
     return c;
 }
 
+// Re-formats `hist` into a bunch of doubles using the format.
 std::vector<double> toDoubles(const RAYX::BundleHistory& hist, const Format& format, int startEventID) {
     std::vector<double> output;
     output.reserve(count(hist) * format.size());

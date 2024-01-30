@@ -11,8 +11,10 @@
 const int CELL_SIZE = 23;
 const char DELIMITER = ',';
 
+// The resulting CSV file consists of rows and columns. At each column-row pair, you will find a __Cell__.
+// In order to make it readable, cells have a fixed size; thus the CSV file looks like a grid.
 struct Cell {
-    char buf[CELL_SIZE + 1];
+    char buf[CELL_SIZE + 1]; // + 1 for null-termination.
 };
 
 int min(int a, int b) {
@@ -22,6 +24,8 @@ int min(int a, int b) {
     return a;
 }
 
+// Tries to write a string into a cell.
+// Will only write an incomplete string, if it doesn't fit.
 Cell strToCell(const char* x) {
     Cell out{};
     int n = strlen(x);
@@ -40,6 +44,7 @@ Cell strToCell(const char* x) {
     return out;
 }
 
+// Formats a double into a cell.
 Cell doubleToCell(double x) {
     std::stringstream ss;
     ss.setf(std::ios::fixed);
@@ -59,7 +64,7 @@ Cell doubleToCell(double x) {
 void writeCSV(const RAYX::BundleHistory& hist, const std::string& filename, const Format& format, int startEventID) {
     std::ofstream file(filename);
 
-    // write header:
+    // write the header of the CSV file:
     for (uint i = 0; i < format.size(); i++) {
         if (i > 0) {
             file << DELIMITER;
@@ -70,7 +75,7 @@ void writeCSV(const RAYX::BundleHistory& hist, const std::string& filename, cons
 
     RAYX_VERB << "Writing " << hist.size() << " rays to file...";
 
-    // write data:
+    // write the body of the CSV file:
     for (unsigned long ray_id = 0; ray_id < hist.size(); ray_id++) {
         const RAYX::RayHistory& ray_hist = hist[ray_id];
         for (unsigned long event_id = 0; event_id < ray_hist.size(); event_id++) {
@@ -79,7 +84,8 @@ void writeCSV(const RAYX::BundleHistory& hist, const std::string& filename, cons
                 if (i > 0) {
                     file << DELIMITER;
                 }
-                file << doubleToCell(format[i].get_double(ray_id, event_id + startEventID, event)).buf;
+                double d = format[i].get_double(ray_id, event_id + startEventID, event);
+                file << doubleToCell(d).buf;
             }
             file << '\n';
         }
@@ -117,6 +123,7 @@ RAYX::BundleHistory loadCSV(const std::string& filename) {
             RAYX_ERR << "CSV line has incorrect length: " << d.size();
         }
 
+        // create the Ray from the loaded doubles from this line.
         RAYX::Ray ray = {.m_position = {d[0], d[1], d[2]},
                          .m_eventType = d[3],
                          .m_direction = {d[4], d[5], d[6]},
@@ -126,15 +133,24 @@ RAYX::BundleHistory loadCSV(const std::string& filename) {
                          .m_order = d[13],
                          .m_lastElement = d[14],
                          .m_sourceID = d[15]};
+        // This checks whether `ray_id` is from a "new ray" that didn't yet come up in the BundleHistory.
+        // If so, we need to make place for it.
         if (out.size() <= ray_id) {
             out.emplace_back();
         }
+
+        // If the rays are out of order, we crash.
+        // This happens for example if we load rays with ray-ids 0, 1, 2, 4, 3.
+        // Then when the parser reads the 4, it will consider it out-of-order as it expected a 3.
         if (ray_id + 1 != out.size()) {
             RAYX_ERR << "loadCSV failed: rays out of order";
         }
+        // The event-id of the new event should match the number of previous events found for this ray.
         if (event_id != out[ray_id].size()) {
             RAYX_ERR << "loadCSV failed: events out of order";
         }
+
+        // put the new event into the BundleHistory.
         out[ray_id].push_back(ray);
     }
 
