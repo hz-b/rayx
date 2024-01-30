@@ -11,9 +11,8 @@
 /**
  * Constructor sets up vertex and index buffers based on the input parameters.
  */
-RenderObject::RenderObject(Device& device, glm::mat4 modelMatrix, const std::vector<std::shared_ptr<Vertex>> vertices,
-                           const std::vector<uint32_t>& indices, Texture&& texture, std::shared_ptr<DescriptorSetLayout> setLayout,
-                           std::shared_ptr<DescriptorPool> descriptorPool)
+RenderObject::RenderObject(Device& device, glm::mat4 modelMatrix, const std::vector<VertexVariant> vertices, const std::vector<uint32_t>& indices,
+                           Texture&& texture, std::shared_ptr<DescriptorSetLayout> setLayout, std::shared_ptr<DescriptorPool> descriptorPool)
     : m_Device(device),
       m_modelMatrix(modelMatrix),
       m_Texture(std::move(texture)),
@@ -76,7 +75,7 @@ void RenderObject::draw(VkCommandBuffer commandBuffer) const {
     vkCmdDrawIndexed(commandBuffer, m_indexCount, 1, 0, 0, 0);  //
 }
 
-void RenderObject::rebuild(const std::vector<std::shared_ptr<Vertex>> vertices, const std::vector<uint32_t>& indices) {
+void RenderObject::rebuild(const std::vector<VertexVariant> vertices, const std::vector<uint32_t>& indices) {
     vkDeviceWaitIdle(m_Device.device());
     createVertexBuffers(vertices);
     createIndexBuffers(indices);
@@ -96,35 +95,26 @@ void RenderObject::updateTexture(const unsigned char* data, uint32_t width, uint
     createDescriptorSet();
 }
 
-void RenderObject::createVertexBuffers(const std::vector<std::shared_ptr<Vertex>> vertices) {
+void RenderObject::createVertexBuffers(const std::vector<VertexVariant>& vertices) {
     m_vertexCount = static_cast<uint32_t>(vertices.size());
 
-    std::vector<char> buffer;
-    size_t vertexSize = 0;
-    if (!vertices.empty()) {
-        if (typeid(*vertices[0]) == typeid(TexVertex)) {
-            vertexSize = sizeof(TexVertex);
-            for (const auto& vertex : vertices) {
-                auto texVertex = std::static_pointer_cast<TexVertex>(vertex);
-                buffer.insert(buffer.end(), reinterpret_cast<const char*>(texVertex.get()),
-                              reinterpret_cast<const char*>(texVertex.get()) + sizeof(TexVertex));
-            }
-        } else if (typeid(*vertices[0]) == typeid(ColorVertex)) {
-            vertexSize = sizeof(ColorVertex);
-            for (const auto& vertex : vertices) {
-                auto colorVertex = std::static_pointer_cast<ColorVertex>(vertex);
-                buffer.insert(buffer.end(), reinterpret_cast<const char*>(colorVertex.get()),
-                              reinterpret_cast<const char*>(colorVertex.get()) + sizeof(ColorVertex));
-            }
-        } else {
-            RAYX_ERR << "Vertex type not supported";
-        }
-    }
+    // Calculate the size of the buffer based on the size of the first vertex
+    VkDeviceSize bufferSize = m_vertexCount * std::visit([](auto&& arg) { return sizeof(arg); }, vertices[0]);
 
-    m_vertexBuffer = std::make_unique<Buffer>(m_Device, "rObjVertBuff", vertexSize, m_vertexCount, VK_BUFFER_USAGE_VERTEX_BUFFER_BIT,
+    m_vertexBuffer = std::make_unique<Buffer>(m_Device, "rObjVertBuff", bufferSize, m_vertexCount, VK_BUFFER_USAGE_VERTEX_BUFFER_BIT,
                                               VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT);
     m_vertexBuffer->map();
-    m_vertexBuffer->writeToBuffer(buffer.data());
+
+    // Write each vertex to the buffer
+    for (size_t i = 0; i < vertices.size(); ++i) {
+        const auto& vertex = vertices[i];
+        std::visit(
+            [&](auto&& arg) {
+                // You'll need to implement this write function for each vertex type
+                m_vertexBuffer->writeToBuffer(&arg, sizeof(arg), sizeof(arg) * i);
+            },
+            vertex);
+    }
 }
 
 void RenderObject::createIndexBuffers(const std::vector<uint32_t>& indices) {

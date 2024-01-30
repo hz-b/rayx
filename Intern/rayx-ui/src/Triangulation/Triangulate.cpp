@@ -12,7 +12,7 @@
 
 // ------ Helper functions ------
 
-void calculateSolidMeshOfType(const Cutout& cutout, std::vector<TexVertex>& vertices, std::vector<uint32_t>* indices = nullptr) {
+void calculateSolidMeshOfType(const Cutout& cutout, std::vector<TextureVertex>& vertices, std::vector<uint32_t>* indices = nullptr) {
     constexpr double defWidthHeight = 50.0f;  // TODO(Jannis): define this in one place (@see getRectangularDimensions)
     Polygon poly;
 
@@ -49,7 +49,7 @@ void calculateSolidMeshOfType(const Cutout& cutout, std::vector<TexVertex>& vert
     vertices.insert(vertices.end(), poly.vertices.begin(), poly.vertices.end());
 }
 
-void calculateMeshForSlit(const Element& element, std::vector<TexVertex>& vertices, std::vector<uint32_t>& indices) {
+void calculateMeshForSlit(const Element& element, std::vector<TextureVertex>& vertices, std::vector<uint32_t>& indices) {
     // Deserialize to get SlitBehaviour
     SlitBehaviour slit = deserializeSlit(element.m_behaviour);
 
@@ -57,11 +57,11 @@ void calculateMeshForSlit(const Element& element, std::vector<TexVertex>& vertic
     calculateSolidMeshOfType(slit.m_beamstopCutout, vertices, &indices);
 
     // Calculate vertices for the outer slit
-    std::vector<TexVertex> outerSlitVertices;
+    std::vector<TextureVertex> outerSlitVertices;
     calculateSolidMeshOfType(element.m_cutout, outerSlitVertices);
 
     // Calculate vertices for the opening
-    std::vector<TexVertex> openingVertices;
+    std::vector<TextureVertex> openingVertices;
     calculateSolidMeshOfType(slit.m_openingCutout, openingVertices);
 
     uint32_t numOuterSlitVertices = (uint32_t)outerSlitVertices.size();
@@ -117,7 +117,7 @@ void calculateMeshForSlit(const Element& element, std::vector<TexVertex>& vertic
     }
 }
 
-void planarTriangulation(const RAYX::OpticalElement& element, std::vector<TexVertex>& vertices, std::vector<uint32_t>& indices) {
+void planarTriangulation(const RAYX::OpticalElement& element, std::vector<TextureVertex>& vertices, std::vector<uint32_t>& indices) {
     // The slit behaviour needs special attention, since it is basically three cutouts (the slit, the beamstop and the opening)
     if (element.m_element.m_behaviour.m_type == BTYPE_SLIT) {
         calculateMeshForSlit(element.m_element, vertices, indices);
@@ -133,7 +133,7 @@ bool isPlanar(const QuadricSurface& q) { return (q.m_a11 == 0 && q.m_a22 == 0 &&
 /**
  * This function takes optical elements and categorizes them for efficient triangulation.
  */
-void triangulateObject(const RAYX::OpticalElement& element, std::vector<TexVertex>& vertices, std::vector<uint32_t>& indices) {
+void triangulateObject(const RAYX::OpticalElement& element, std::vector<TextureVertex>& vertices, std::vector<uint32_t>& indices) {
     switch (static_cast<int>(element.m_element.m_surface.m_type)) {
         case STYPE_PLANE_XZ: {
             planarTriangulation(element, vertices, indices);

@@ -44,7 +44,7 @@ void ObjectRenderSystem::createPipeline(VkRenderPass renderPass) {
     assert(m_PipelineLayout != nullptr && "Cannot create pipeline before pipeline layout");
 
     PipelineConfigInfo pipelineConfig{};
-    GraphicsPipeline::defaultPipelineConfigInfo(pipelineConfig);
+    GraphicsPipeline::defaultPipelineConfigInfo(pipelineConfig, GraphicsPipeline::VertexMode::TEXTURED);
     pipelineConfig.renderPass = renderPass;
     pipelineConfig.pipelineLayout = m_PipelineLayout;
     const std::string vertexShader = RAYX::canonicalizeRepositoryPath("build/bin/shader_vert.spv").string();

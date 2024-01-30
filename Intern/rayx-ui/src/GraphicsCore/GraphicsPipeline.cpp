@@ -191,8 +191,8 @@ void GraphicsPipeline::defaultPipelineConfigInfo(PipelineConfigInfo& configInfo,
     configInfo.dynamicStateInfo.flags = 0;
 
     if (vertexMode == VertexMode::TEXTURED) {
-        configInfo.bindingDescriptions = TexVertex::getBindingDescriptions();
-        configInfo.attributeDescriptions = TexVertex::getAttributeDescriptions();
+        configInfo.bindingDescriptions = TextureVertex::getBindingDescriptions();
+        configInfo.attributeDescriptions = TextureVertex::getAttributeDescriptions();
     } else {
         configInfo.bindingDescriptions = ColorVertex::getBindingDescriptions();
         configInfo.attributeDescriptions = ColorVertex::getAttributeDescriptions();

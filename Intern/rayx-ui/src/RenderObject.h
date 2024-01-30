@@ -12,9 +12,9 @@
 #include "Vertex.h"
 
 struct Triangle {
-    TexVertex v1;
-    TexVertex v2;
-    TexVertex v3;
+    TextureVertex v1;
+    TextureVertex v2;
+    TextureVertex v3;
 };
 struct Line {
     ColorVertex v1;
@@ -38,7 +38,7 @@ class RenderObject {
      * @param vertices Vector of Vertex objects.
      * @param indices Vector of index values.
      */
-    RenderObject(Device& device, glm::mat4 modelMatrix, const std::vector<std::shared_ptr<Vertex>> vertices, const std::vector<uint32_t>& indices,
+    RenderObject(Device& device, glm::mat4 modelMatrix, const std::vector<VertexVariant> vertices, const std::vector<uint32_t>& indices,
                  Texture&& texture, std::shared_ptr<DescriptorSetLayout> setLayout, std::shared_ptr<DescriptorPool> descriptorPool);
     RenderObject(const RenderObject&) = delete;
     RenderObject& operator=(const RenderObject&) = delete;
@@ -57,18 +57,17 @@ class RenderObject {
      */
     void draw(VkCommandBuffer commandBuffer) const;
 
-    void rebuild(const std::vector<std::shared_ptr<Vertex>> vertices, const std::vector<uint32_t>& indices);
+    void rebuild(const std::vector<VertexVariant> vertices, const std::vector<uint32_t>& indices);
 
     void updateTexture(const std::filesystem::path& path);
     void updateTexture(const unsigned char* data, uint32_t width, uint32_t height);
 
     glm::mat4 getModelMatrix() const { return m_modelMatrix; }
     glm::vec3 getTranslationVecor() const { return glm::vec3(m_modelMatrix[3][0], m_modelMatrix[3][1], m_modelMatrix[3][2]); }
-    uint32_t getVertexCount() const { return m_vertexCount; }
     VkDescriptorSet getDescriptorSet() const { return m_descrSet; }
 
   private:
-    void createVertexBuffers(const std::vector<std::shared_ptr<Vertex>> vertices);
+    void createVertexBuffers(const std::vector<VertexVariant>& vertices);
     void createIndexBuffers(const std::vector<uint32_t>& indices);
     void createDescriptorSet();
 

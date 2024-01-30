@@ -19,7 +19,7 @@ class Scene {
 
     struct RenderObjectInput {
         glm::mat4 modelMatrix;
-        std::vector<TexVertex> vertices;
+        std::vector<TextureVertex> vertices;
         std::vector<uint32_t> indices;
         std::optional<Texture::TextureInput> textureInput;
     };

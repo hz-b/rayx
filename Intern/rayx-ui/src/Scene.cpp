@@ -67,24 +67,19 @@ void Scene::buildRaysRObject(const RAYX::Beamline& beamline, UIRayInfo& rayInfo,
     }
     if (!rays.empty()) {
         // Temporarily aggregate all vertices, then create a single RenderObject
-        std::vector<ColorVertex> rayVertices(rays.size() * 2);
+        std::vector<VertexVariant> rayVertices(rays.size() * 2);
         std::vector<uint32_t> rayIndices(rays.size() * 2);
         for (uint32_t i = 0; i < rays.size(); ++i) {
-            rayVertices[i * 2] = rays[i].v1;
-            rayVertices[i * 2 + 1] = rays[i].v2;
+            rayVertices[i * 2] = VertexVariant(rays[i].v1);
+            rayVertices[i * 2 + 1] = VertexVariant(rays[i].v2);
             rayIndices[i * 2] = i * 2;
             rayIndices[i * 2 + 1] = i * 2 + 1;
         }
 
-        std::vector<std::shared_ptr<Vertex>> shared_vertices;
-        shared_vertices.reserve(rayVertices.size());
-        std::transform(rayVertices.begin(), rayVertices.end(), std::back_inserter(shared_vertices),
-                       [](const ColorVertex& vertex) { return std::make_shared<ColorVertex>(vertex); });
-
         if (m_RaysRObject.has_value()) {
-            m_RaysRObject->rebuild(shared_vertices, rayIndices);
+            m_RaysRObject->rebuild(rayVertices, rayIndices);
         } else {
-            m_RaysRObject.emplace(m_Device, glm::mat4(1.0f), shared_vertices, rayIndices, Texture(m_Device), setLayout, descriptorPool);
+            m_RaysRObject.emplace(m_Device, glm::mat4(1.0f), rayVertices, rayIndices, Texture(m_Device), setLayout, descriptorPool);
         }
     }
     if (m_State == State::Empty) {
@@ -99,7 +94,7 @@ std::vector<Scene::RenderObjectInput> Scene::getRObjectInputs(const std::vector<
     RAYX_PROFILE_FUNCTION_STDOUT();
     std::vector<RenderObjectInput> rObjectsInput;
     for (uint32_t i = 0; i < elements.size(); i++) {
-        std::vector<TexVertex> vertices;
+        std::vector<TextureVertex> vertices;
         std::vector<uint32_t> indices;
 
         triangulateObject(elements[i], vertices, indices);
@@ -133,16 +128,14 @@ void Scene::buildRObjectsFromInput(std::vector<RenderObjectInput>&& inputs, std:
     RAYX_PROFILE_FUNCTION_STDOUT();
 
     for (const auto& input : inputs) {
-        std::vector<std::shared_ptr<Vertex>> sharedVertices;
-        for (const auto& vertex : input.vertices) {
-            sharedVertices.emplace_back(std::make_shared<TexVertex>(vertex));
-        }
-
+        std::vector<VertexVariant> convertedVertices(input.vertices.begin(), input.vertices.end());
         if (input.textureInput.has_value()) {
             Texture texture(m_Device, input.textureInput->data.get(), input.textureInput->footprintWidth, input.textureInput->footprintHeight);
-            m_ElementRObjects.emplace_back(m_Device, input.modelMatrix, sharedVertices, input.indices, std::move(texture), setLayout, descriptorPool);
+            m_ElementRObjects.emplace_back(m_Device, input.modelMatrix, convertedVertices, input.indices, std::move(texture), setLayout,
+                                           descriptorPool);
         } else {
-            m_ElementRObjects.emplace_back(m_Device, input.modelMatrix, sharedVertices, input.indices, Texture(m_Device), setLayout, descriptorPool);
+            m_ElementRObjects.emplace_back(m_Device, input.modelMatrix, convertedVertices, input.indices, Texture(m_Device), setLayout,
+                                           descriptorPool);
         }
     }
 

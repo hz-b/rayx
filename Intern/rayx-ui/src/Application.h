@@ -18,7 +18,6 @@ const bool enableValidationLayers = true;
 class Window;
 class Device;
 class RenderObject;
-struct Line;
 
 class Application {
   public:

@@ -11,4 +11,4 @@
  * @param elements A vector of optical elements to be triangulated.
  * @return A vector of RenderObject, which are the triangulated version of the input elements.
  */
-void triangulateObject(const RAYX::OpticalElement& elements, std::vector<TexVertex>& vertices, std::vector<uint32_t>& indices);
+void triangulateObject(const RAYX::OpticalElement& elements, std::vector<TextureVertex>& vertices, std::vector<uint32_t>& indices);
