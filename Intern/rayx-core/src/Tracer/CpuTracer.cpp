@@ -1,13 +1,14 @@
 
+#include "CpuTracer.h"
+
 #include <cmath>
 #include <cstring>
 
-#include "CpuTracer.h"
-#include "Shader/DynamicElements.h"
-#include "Shader/InvocationState.h"
 #include "Beamline/OpticalElement.h"
 #include "Material/Material.h"
 #include "RAY-Core.h"
+#include "Shader/DynamicElements.h"
+#include "Shader/InvocationState.h"
 
 using uint = unsigned int;
 
@@ -31,7 +32,7 @@ std::vector<Ray> CpuTracer::traceRaw(const TraceRawConfig& cfg) {
 
     // init rayData, outputData
     inv_rayData.data = rayList;
-    inv_outputData.data.resize(rayList.size() * (size_t)cfg.m_maxEvents);
+    inv_outputData.data.resize(rayList.size() * ((size_t)cfg.m_maxEvents - (size_t)cfg.m_startEventID));
 
     // init elements
     for (auto e : cfg.m_elements) {

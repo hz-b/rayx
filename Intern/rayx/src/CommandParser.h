@@ -41,6 +41,7 @@ class CommandParser {
         std::string m_format = defaultFormatString();  // --format
         int m_setThreads = 1;                          // -T (dipolesource)
         int m_maxEvents = -1;                          // -m (max events)
+        int m_startEventID = 0;                        // -e (start event id)
     } m_args;
 
     static inline void getVersion() {
@@ -89,5 +90,6 @@ class CommandParser {
          {OptionType::INT, "setThreads", "Number of Threads for Lightsource-Parallelization'",
           &(m_args.m_setThreads)}},  // TODO: understandable description
         {'m', {OptionType::INT, "maxEvents", "Maximum number of events per ray", &(m_args.m_maxEvents)}},
+        {'e', {OptionType::INT, "startEventID", "Start event ID", &(m_args.m_startEventID)}},
     };
 };

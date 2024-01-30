@@ -22,10 +22,11 @@ struct PushConstants {  // TODO(Jannis): PushConstants is not an expressive name
     double randomSeed;
     double maxEvents;
     double sequential;
+    double startEventID;
 };
 
 struct _debug_struct {
-    dmat4 _dMat; // Can also be used as vectors or scalar
+    dmat4 _dMat;  // Can also be used as vectors or scalar
 };
 
 // we don't require forward declarations in GLSL, hence we only do them in C++:
