@@ -9,6 +9,7 @@
 #include "Beamline/OpticalElement.h"
 #include "Core.h"
 #include "Shader/Ray.h"
+#include "DesignElement/DesignElement.h"
 
 namespace RAYX {
 struct OpticalElement;
@@ -34,7 +35,7 @@ class RAYX_API Beamline {
      */
     MaterialTables calcMinimalMaterialTables() const;
 
-    std::vector<OpticalElement> m_OpticalElements;
+    std::vector<DesignElement> m_DesignElements;
     std::vector<std::shared_ptr<LightSource>> m_LightSources;
 };
 

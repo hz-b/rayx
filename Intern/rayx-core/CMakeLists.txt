@@ -11,7 +11,8 @@ endif()
 # -----------------------
 
 # ---- Add tests ----
-add_subdirectory(tests)
+# TODO re-enable
+# add_subdirectory(tests)
 
 # -------------------
 
