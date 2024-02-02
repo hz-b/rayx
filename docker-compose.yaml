@@ -1,0 +1,14 @@
+version: '3.8'
+services:
+  vulkan-docker-test:
+    build: .
+    environment:
+      - DISPLAY=:0
+    # Removed the volumes line since it's not needed for WSLg
+    deploy:
+      resources:
+        reservations:
+          devices:
+          - driver: nvidia
+            count: 1
+            capabilities: [gpu]
