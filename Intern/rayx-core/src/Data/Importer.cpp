@@ -10,6 +10,7 @@
 #include "Data/xml.h"
 #include "Debug/Debug.h"
 #include "Debug/Instrumentor.h"
+#include "DesignElementWriter.h"
 
 
 DesignElement parseElement(xml::Parser parser) {
@@ -19,7 +20,7 @@ DesignElement parseElement(xml::Parser parser) {
     //TODO add functions for each Element 
 
     if (strcmp(type, "ImagePlane") == 0) {
-        //addDesignElement(node);
+        getImageplane(parser, &de);
     } else if (strcmp(type, "Plane Mirror") == 0) {
         //addDesignElement(node);
     } else if (strcmp(type, "Toroid") == 0) {

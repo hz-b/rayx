@@ -27,7 +27,6 @@ enum class CylinderDirection;
 enum class FigureRotation;
 enum class GratingMount;
 enum class SourceDist;
-enum class GeometricalShape;
 enum class ElectronEnergyOrientation;
 enum class SourcePulseType;
 enum class EnergySpreadUnit;
