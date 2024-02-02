@@ -27,7 +27,6 @@ enum class CylinderDirection;
 enum class FigureRotation;
 enum class GratingMount;
 enum class SourceDist;
-enum class GeometricalShape;
 enum class ElectronEnergyOrientation;
 enum class SourcePulseType;
 enum class EnergySpreadUnit;
@@ -86,6 +85,8 @@ struct RAYX_API Parser {
     Parser(rapidxml::xml_node<>* node, std::vector<xml::Group> group_context, std::filesystem::path rmlFile);
 
     const char* name() const;
+
+    const char* type() const;
 
     // parsers for fundamental types
     double parseDouble(const char* paramname) const;

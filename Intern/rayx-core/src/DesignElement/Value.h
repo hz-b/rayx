@@ -17,6 +17,7 @@ using Map = std::unordered_map<std::string, Value>;
 class Value {
     public:
 
+    //TODO add dmat4x4, dvec4, std::vector<?> values
     Value() : m_variant(Undefined()) {}
     Value(double x) : m_variant(x) {}
     Value(int x) : m_variant(x) {}
