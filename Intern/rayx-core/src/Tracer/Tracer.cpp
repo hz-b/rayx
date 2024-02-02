@@ -3,6 +3,7 @@
 #include <algorithm>
 
 #include "Beamline/OpticalElement.h"
+#include "DesignElement/DesignElement.h"
 #include "RAY-Core.h"
 #include "Random.h"
 #include "Shader/Constants.h"
@@ -19,7 +20,7 @@ BundleHistory Tracer::trace(const Beamline& b, Sequential seq, uint64_t max_batc
     auto rays = b.getInputRays(thread_count);
 
     // don't trace if there are no optical elements
-    if (b.m_OpticalElements.size() == 0) {
+    if (b.m_DesignElements.size() == 0) {
         // an empty history suffices, nothing is happening to the rays!
         BundleHistory result;
         return result;
@@ -46,9 +47,9 @@ BundleHistory Tracer::trace(const Beamline& b, Sequential seq, uint64_t max_batc
         auto batch_size = (max_batch_size < remaining_rays) ? max_batch_size : remaining_rays;
 
         std::vector<Element> elements;
-        elements.reserve(b.m_OpticalElements.size());
-        for (const auto& e : b.m_OpticalElements) {
-            elements.push_back(e.m_element);
+        elements.reserve(b.m_DesignElements.size());
+        for (const auto& e : b.m_DesignElements) {
+            elements.push_back(e.compile());
         }
 
         // create a TraceRawConfig.
