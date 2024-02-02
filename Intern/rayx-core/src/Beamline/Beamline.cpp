@@ -47,8 +47,9 @@ MaterialTables Beamline::calcMinimalMaterialTables() const {
     std::array<bool, 92> relevantMaterials{};
     relevantMaterials.fill(false);
 
-    for (const auto& e : m_OpticalElements) {
-        int material = (int)e.m_element.m_material;  // in [1, 92]
+    for (const auto& e : m_DesignElements) {
+        int material = 0;  // in [1, 92]
+        // TODO material = "extract the chosen material from `e`".
         if (1 <= material && material <= 92) {
             relevantMaterials[material - 1] = true;
         }

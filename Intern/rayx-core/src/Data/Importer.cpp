@@ -32,13 +32,12 @@ void addBeamlineObjectFromXML(rapidxml::xml_node<>* node, Beamline* beamline, co
         }
     };
 
-    const auto addOpticalElement = [&](Element e, rapidxml::xml_node<>* node) {
-        OpticalElement e2 = {
-            .m_element = e,
-            .m_name = node->first_attribute("name")->value(),
-        };
+    const auto addOpticalElement = [&](rapidxml::xml_node<>* node) {
+        DesignElement de;
+        de.v["name"] = std::string(node->first_attribute("name")->value());
+        // TODO set design element correctly.
 
-        beamline->m_OpticalElements.push_back(e2);
+        beamline->m_DesignElements.push_back(de);
     };
 
     RAYX::xml::Parser parser(node, group_context, filename);
@@ -63,33 +62,33 @@ void addBeamlineObjectFromXML(rapidxml::xml_node<>* node, Beamline* beamline, co
     // shader-compatible Elements can be constructed using their corresponding "make" functions.
     // They use the param* functions declared in <Data/xml.h> to retrieve the relevant information.
     } else if (strcmp(type, "ImagePlane") == 0) {
-        addOpticalElement(makeImagePlane(parser), node);
+        addOpticalElement(node);
     } else if (strcmp(type, "Plane Mirror") == 0) {
-        addOpticalElement(makePlaneMirror(parser), node);
+        addOpticalElement(node);
     } else if (strcmp(type, "Toroid") == 0) {
-        addOpticalElement(makeToroidMirror(parser), node);
+        addOpticalElement(node);
     } else if (strcmp(type, "Slit") == 0) {
-        addOpticalElement(makeSlit(parser), node);
+        addOpticalElement(node);
     } else if (strcmp(type, "Spherical Grating") == 0) {
-        addOpticalElement(makeSphereGrating(parser), node);
+        addOpticalElement(node);
     } else if (strcmp(type, "Plane Grating") == 0) {
-        addOpticalElement(makePlaneGrating(parser), node);
+        addOpticalElement(node);
     } else if (strcmp(type, "Sphere") == 0) {
-        addOpticalElement(makeSphereMirror(parser), node);
+        addOpticalElement(node);
     } else if (strcmp(type, "Reflection Zoneplate") == 0) {
-        addOpticalElement(makeReflectionZonePlate(parser), node);
+        addOpticalElement(node);
     } else if (strcmp(type, "Ellipsoid") == 0) {
-        addOpticalElement(makeEllipsoid(parser), node);
+        addOpticalElement(node);
     } else if (strcmp(type, "Cylinder") == 0) {
-        addOpticalElement(makeCylinder(parser), node);
+        addOpticalElement(node);
     } else if (strcmp(type, "Cone") == 0) {
-        addOpticalElement(makeCone(parser), node);
+        addOpticalElement(node);
     } else if (strcmp(type, "Paraboloid") == 0) {
-        addOpticalElement(makeParaboloid(parser), node);
+        addOpticalElement(node);
     } else if (strcmp(type, "Experts Optics") == 0) {
-        addOpticalElement(makeExperts(parser), node);
+        addOpticalElement(node);
     } else if (strcmp(type, "Experts Cubic") == 0) {
-        addOpticalElement(makeExpertsCubic(parser), node);
+        addOpticalElement(node);
     } else {
         RAYX_WARN << "could not classify beamline object with Name: " << node->first_attribute("name")->value()
                   << "; Type: " << node->first_attribute("type")->value();
