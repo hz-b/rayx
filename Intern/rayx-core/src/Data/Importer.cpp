@@ -11,11 +11,55 @@
 #include "Debug/Debug.h"
 #include "Debug/Instrumentor.h"
 
+
+DesignElement parseElement(xml::Parser parser) {
+    DesignElement de;
+    const char* type = parser.type();
+
+    //TODO add functions for each Element 
+
+    if (strcmp(type, "ImagePlane") == 0) {
+        //addDesignElement(node);
+    } else if (strcmp(type, "Plane Mirror") == 0) {
+        //addDesignElement(node);
+    } else if (strcmp(type, "Toroid") == 0) {
+        //addDesignElement(node);
+    } else if (strcmp(type, "Slit") == 0) {
+        //addDesignElement(node);
+    } else if (strcmp(type, "Spherical Grating") == 0) {
+        //addDesignElement(node);
+    } else if (strcmp(type, "Plane Grating") == 0) {
+        //addDesignElement(node);
+    } else if (strcmp(type, "Sphere") == 0) {
+        //addDesignElement(node);
+    } else if (strcmp(type, "Reflection Zoneplate") == 0) {
+        //addDesignElement(node);
+    } else if (strcmp(type, "Ellipsoid") == 0) {
+        //addDesignElement(node);
+    } else if (strcmp(type, "Cylinder") == 0) {
+        //addDesignElement(node);
+    } else if (strcmp(type, "Cone") == 0) {
+        //addDesignElement(node);
+    } else if (strcmp(type, "Paraboloid") == 0) {
+        //addDesignElement(node);
+    } else if (strcmp(type, "Experts Optics") == 0) {
+        //addDesignElement(node);
+    } else if (strcmp(type, "Experts Cubic") == 0) {
+        //addDesignElement(node);
+    } else {
+        RAYX_WARN << "could not classify beamline object with Name: " << parser.name()
+                  << "; Type: " << parser.type();
+    }
+
+
+    return de;
+}
+
+
 namespace RAYX {
 
 void addBeamlineObjectFromXML(rapidxml::xml_node<>* node, Beamline* beamline, const std::vector<xml::Group>& group_context,
                               std::filesystem::path filename) {
-    const char* type = node->first_attribute("type")->value();
 
     // the following three blocks of code are lambda expressions (see
     // https://en.cppreference.com/w/cpp/language/lambda) They define functions
@@ -32,15 +76,8 @@ void addBeamlineObjectFromXML(rapidxml::xml_node<>* node, Beamline* beamline, co
         }
     };
 
-    const auto addOpticalElement = [&](rapidxml::xml_node<>* node) {
-        DesignElement de;
-        de.v["name"] = std::string(node->first_attribute("name")->value());
-        // TODO set design element correctly.
-
-        beamline->m_DesignElements.push_back(de);
-    };
-
     RAYX::xml::Parser parser(node, group_context, filename);
+    const char* type = parser.type();
 
     // Light sources have constructors that accept a const DesignObject& as argument.
     // They use the param* functions declared in <Data/xml.h> to retrieve the relevant information.
@@ -58,41 +95,12 @@ void addBeamlineObjectFromXML(rapidxml::xml_node<>* node, Beamline* beamline, co
         addLightSource(std::make_shared<CircleSource>(parser), node);
     } else if (strcmp(type, "Simple Undulator") == 0) {
         addLightSource(std::make_shared<SimpleUndulatorSource>(parser), node);
-
-    // shader-compatible Elements can be constructed using their corresponding "make" functions.
-    // They use the param* functions declared in <Data/xml.h> to retrieve the relevant information.
-    } else if (strcmp(type, "ImagePlane") == 0) {
-        addOpticalElement(node);
-    } else if (strcmp(type, "Plane Mirror") == 0) {
-        addOpticalElement(node);
-    } else if (strcmp(type, "Toroid") == 0) {
-        addOpticalElement(node);
-    } else if (strcmp(type, "Slit") == 0) {
-        addOpticalElement(node);
-    } else if (strcmp(type, "Spherical Grating") == 0) {
-        addOpticalElement(node);
-    } else if (strcmp(type, "Plane Grating") == 0) {
-        addOpticalElement(node);
-    } else if (strcmp(type, "Sphere") == 0) {
-        addOpticalElement(node);
-    } else if (strcmp(type, "Reflection Zoneplate") == 0) {
-        addOpticalElement(node);
-    } else if (strcmp(type, "Ellipsoid") == 0) {
-        addOpticalElement(node);
-    } else if (strcmp(type, "Cylinder") == 0) {
-        addOpticalElement(node);
-    } else if (strcmp(type, "Cone") == 0) {
-        addOpticalElement(node);
-    } else if (strcmp(type, "Paraboloid") == 0) {
-        addOpticalElement(node);
-    } else if (strcmp(type, "Experts Optics") == 0) {
-        addOpticalElement(node);
-    } else if (strcmp(type, "Experts Cubic") == 0) {
-        addOpticalElement(node);
     } else {
-        RAYX_WARN << "could not classify beamline object with Name: " << node->first_attribute("name")->value()
-                  << "; Type: " << node->first_attribute("type")->value();
+        DesignElement de = parseElement(parser);
+        beamline->m_DesignElements.push_back(de);
     }
+    
+    
 }
 
 // `collection` is an xml object, over whose children-objects we want to

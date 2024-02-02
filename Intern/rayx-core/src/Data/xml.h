@@ -87,6 +87,8 @@ struct RAYX_API Parser {
 
     const char* name() const;
 
+    const char* type() const;
+
     // parsers for fundamental types
     double parseDouble(const char* paramname) const;
     int parseInt(const char* paramname) const;
