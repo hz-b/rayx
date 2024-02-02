@@ -458,6 +458,8 @@ Parser::Parser(rapidxml::xml_node<>* node, std::vector<xml::Group> group_context
 
 const char* Parser::name() const { return node->first_attribute("name")->value(); }
 
+const char* Parser::type() const {return node->first_attribute("type")->value();}
+
 // parsers for fundamental types
 double Parser::parseDouble(const char* paramname) const {
     double d;
@@ -677,5 +679,7 @@ double Parser::parseAdditionalOrder() const {
     paramDouble(node, "additionalOrder", &additionalZeroOrder);
     return additionalZeroOrder;
 }
+
+
 
 }  // namespace RAYX::xml
