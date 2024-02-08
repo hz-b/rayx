@@ -87,13 +87,13 @@
 		</param>
 		<param id="worldYdirection" enabled="F">
 		  <x>0</x>
-		  <y>0.996</y>
-		  <z>-0.087</z>
+		  <y>1</y>
+		  <z>0</z>
 		</param>
 		<param id="worldZdirection" enabled="F">
 		  <x>0</x>
-		  <y>0.087</y>
-		  <z>0.996</z>
+		  <y>0</y>
+		  <z>1</z>
 		</param>
 	  </object>
   </group>
