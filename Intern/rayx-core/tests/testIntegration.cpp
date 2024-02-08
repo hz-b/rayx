@@ -15,11 +15,7 @@ TEST_F(TestSuite, PlaneMirrorDef) {
     }
 }
 TEST_F(TestSuite, PlaneMirrorMis) { compareLastAgainstRayUI("PlaneMirrorMis"); }
-
-TEST_F(TestSuite, SphereMirrorDefault) {
-    compareLastAgainstRayUI("SphereMirrorDefault",
-                            1e-7);  // TODO(Rudi) this tolerance is not so great.
-}
+TEST_F(TestSuite, SphereMirrorDefault) { compareLastAgainstRayUI("SphereMirrorDefault"); }
 
 // In these tests the ray would hit the ImagePlane before the PlaneGrating, if we trace dynamically.
 // This prevents comparing the results to Ray-UI, and hence we do sequential tracing here to allow for such a comparison.
