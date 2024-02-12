@@ -33,18 +33,19 @@ void getImageplane(xml::Parser parser, DesignElement* de) {
 
 }
 void getSlit(xml::Parser parser, DesignElement* de) {
+    const char * CentralBeamStop[] = { "None", "Rectangle", "Elliptical"};
     de->v["name"] = parser.name();
 
     de->v["openingShape"] = parser.parseOpeningShape();
     de->v["openingWidth"] = parser.parseOpeningWidth();
     de->v["openingHeight"] = parser.parseOpeningHeight();
-    de->v["centralBeamstop"] = parser.parseCentralBeamstop();
+    de->v["centralBeamstop"] = CentralBeamStop[(int) parser.parseCentralBeamstop()];
     de->v["stopWidth"] = parser.parseTotalWidthStop();
     de->v["stopHeight"] = parser.parseTotalHeightStop();
     de->v["totalWidth"] = parser.parseTotalWidth();
     de->v["totalHeight"] = parser.parseTotalHeight();
     de->v["distancePreceding"] = parser.parseDistancePreceding();
-    de->v["azimuthalAngle"] = parser.parseAzimuthalAngle();
+    de->v["azimuthalAngle"] = parser.parseAzimuthalAngle().rad;
 
 
     //de->v["geometricalShape"] = parser.parse
