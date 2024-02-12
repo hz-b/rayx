@@ -1,16 +1,23 @@
 #pragma once
 
 #include "Value.h"
-#include "Debug/Debug.h"
+#include "Shader/Element.h"
+
+namespace RAYX{
 
 struct DesignElement {
     Value v;
+    Element compile() const;
 
-    inline Element compile() const {
-        RAYX_ERR << "TODO!";
-        Element e;
-        return e;
-    }
+
+    void setName(std::string s);
+    std::string getName();
+
+    void setWorldPosition(glm::dvec4 p);
+
+    void setWorldOrientation(glm::dmat4x4 o);
+
+    
+
 };
-
-
+}
