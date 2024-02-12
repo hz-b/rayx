@@ -110,6 +110,11 @@ Element makeElement(const DesignObject& dobj, Behaviour behaviour, Surface surfa
     };
 }
 
+Element makeDesElement(const DesignElement& dobj, Behaviour behaviour, Surface surface, std::optional<Cutout> cutout, DesignPlane plane) {
+    //TODO everything
+    return Element{};
+}
+
 Element makeExperts(const DesignObject& dobj) {
     return makeElement(dobj, serializeMirror(), makeQuadric(dobj));
 }
