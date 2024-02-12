@@ -26,7 +26,7 @@ DesignElement parseElement(xml::Parser parser) {
     } else if (strcmp(type, "Toroid") == 0) {
         //addDesignElement(node);
     } else if (strcmp(type, "Slit") == 0) {
-        //addDesignElement(node);
+        getSlit(parser, &de);
     } else if (strcmp(type, "Spherical Grating") == 0) {
         //addDesignElement(node);
     } else if (strcmp(type, "Plane Grating") == 0) {
@@ -51,7 +51,6 @@ DesignElement parseElement(xml::Parser parser) {
         RAYX_WARN << "could not classify beamline object with Name: " << parser.name()
                   << "; Type: " << parser.type();
     }
-
 
     return de;
 }

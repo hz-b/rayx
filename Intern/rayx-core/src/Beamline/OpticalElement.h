@@ -6,6 +6,7 @@
 
 #include "Core.h"
 #include "Data/xml.h"
+#include "DesignElement/DesignElement.h"
 #include "Shader/Constants.h"
 #include "angle.h"
 
@@ -39,6 +40,7 @@ double defaultMaterial(const DesignObject& dobj);
 
 // constructs an Element given all of its components. Some information that is not explicitly given, will be parsed from the `dobj`.
 Element makeElement(const DesignObject& dobj, Behaviour behaviour, Surface surface, std::optional<Cutout> cutout = {}, DesignPlane plane=DesignPlane::XZ);
+Element makeDesElement(const DesignElement& dobj, Behaviour behaviour, Surface surface, std::optional<Cutout> cutout = {}, DesignPlane plane=DesignPlane::XZ);
 
 Element makeExperts(const DesignObject& dobj);
 Element makeExpertsCubic(const DesignObject& dobj);

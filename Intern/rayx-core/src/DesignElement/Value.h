@@ -1,5 +1,10 @@
+#pragma once 
+
 #include <variant>
 #include <unordered_map>
+
+
+namespace RAYX{
 
 enum class ValueType {
     Undefined,
@@ -54,7 +59,7 @@ class Value {
         return *x;
     }
 
-    inline std::string as_string() {
+    inline std::string as_string() const {
         auto* x = std::get_if<std::string>(&m_variant);
         if (!x) throw std::runtime_error("as_string() called on non-string!");
         return *x;
@@ -66,8 +71,8 @@ class Value {
         return *x;
     }
 
-    inline dvec4 as_dvec4() {
-        auto* x = std::get_if<dvec4>(&m_variant);
+    inline glm::dvec4 as_dvec4() {
+        auto* x = std::get_if<glm::dvec4>(&m_variant);
         if (!x) throw std::runtime_error("as_dvec4() called on non-dvec4!");
         return *x;
     }
@@ -78,12 +83,18 @@ class Value {
         return *x;
     }
 
+    const Value& operator[](std::string s) const {
+        const Map *m = std::get_if<Map>(&m_variant);
+        if (!m) throw std::runtime_error("Indexing into non-map!");
+        return (*m).at(s); //TODO return undefined on missing
+    }
+
     Value& operator[](std::string s) {
         Map *m = std::get_if<Map>(&m_variant);
         if (!m) throw std::runtime_error("Indexing into non-map!");
         return (*m)[s];
     }
-
     private:
-    std::variant<Undefined, double, int, std::string, Map, dvec4, glm::dmat4x4> m_variant;
+    std::variant<Undefined, double, int, std::string, Map, glm::dvec4, glm::dmat4x4> m_variant;
 };
+}

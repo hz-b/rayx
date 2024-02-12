@@ -3,6 +3,6 @@
 
 namespace RAYX {
 
-Element makeImagePlane(const DesignObject& dobj);
+Element makeImagePlane(const DesignElement& dobj);
 
 }  // namespace RAYX
