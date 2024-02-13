@@ -115,7 +115,6 @@ Element makeDesElement(const DesignElement& dobj, Behaviour behaviour, Surface s
     return Element{};
 }
 
-
 Element makeExperts(const DesignObject& dobj) {
     return makeElement(dobj, serializeMirror(), makeQuadric(dobj));
 }

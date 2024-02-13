@@ -6,11 +6,11 @@ namespace RAYX{
     Element DesignElement::compile() const {
         RAYX_ERR << "TODO!";
         Element e;
-        if ( v["type"].as_string() == "ImagePlane") {
+        if (v["type"].as_string() == "ImagePlane") {
             //makeImagePlane(*this);
+        } else if( v["type"].as_string() == "Slit") {
+            //makeSlit();
         }
         return e;
     }
 }
-
-

@@ -29,8 +29,7 @@ void getWorldPosition(xml::Parser parser, DesignElement* de){
     de->v["worldZDirection"]["z"] = parser.parseOrientation()[3][3];
 }
 
-void getMisallignment(xml::Parser parser, DesignElement* de){
-
+void getMisalignment(xml::Parser parser, DesignElement* de){
 
     de->v["rotationXerror"] = parser.parseMisalignment().m_rotationXerror.rad;
     de->v["rotationYerror"] = parser.parseMisalignment().m_rotationYerror.rad;
@@ -82,7 +81,7 @@ void getSlit(xml::Parser parser, DesignElement* de) {
     }    
 
     getWorldPosition(parser, de);
-    getMisallignment(parser, de);
+    getMisalignment(parser, de);
 }
 
 }
