@@ -28,7 +28,7 @@ glm::dvec3 LightSource::getDirectionFromAngles(const double phi, const double ps
 //  (see RAYX.FOR select_energy)
 double LightSource::selectEnergy() const { return m_EnergyDistribution.selectEnergy(); }
 
-double LightSource::calcPhotonWavelength(double photonEnergy) {
+double LightSource::calcPhotonWavelength(double photonEnergy) const {
     // Energy Distribution Type : Values only
     double photonWaveLength = photonEnergy == 0.0 ? 0 : inm2eV / photonEnergy; //i nm to eV
     return photonWaveLength;

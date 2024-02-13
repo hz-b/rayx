@@ -49,7 +49,6 @@ class RAYX_API DipoleSource : public LightSource {
     // Geometric Params
     double m_bendingRadius;
     ElectronEnergyOrientation m_electronEnergyOrientation;
-    SourcePulseType m_sourcePulseType;
     double m_photonFlux;
     EnergyDistribution m_energySpreadType;
 
