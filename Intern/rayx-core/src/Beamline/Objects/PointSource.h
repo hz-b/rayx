@@ -21,7 +21,6 @@ class RAYX_API PointSource : public LightSource {
     SourceDist m_heightDist;
     SourceDist m_horDist;
     SourceDist m_verDist;
-    SourcePulseType m_sourceDistributionType;  // TODO unused.
 
     double m_linearPol_0;
     double m_linearPol_45;

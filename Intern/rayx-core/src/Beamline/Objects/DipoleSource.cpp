@@ -48,7 +48,6 @@ DipoleSource::DipoleSource(const DesignObject& dobj) : LightSource(dobj) {
     m_energySpreadType = dobj.parseEnergyDistribution();
     m_photonFlux = dobj.parsePhotonFlux();
     m_electronEnergyOrientation = dobj.parseElectronEnergyOrientation();
-    m_sourcePulseType = dobj.parseSourcePulseType();
     m_bendingRadius = dobj.parseBendingRadiusDouble();
     m_electronEnergy = dobj.parseElectronEnergy();
     m_photonEnergy = dobj.parsePhotonEnergy();

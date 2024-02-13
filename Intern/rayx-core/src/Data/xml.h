@@ -29,7 +29,6 @@ enum class GratingMount;
 enum class SourceDist;
 enum class GeometricalShape;
 enum class ElectronEnergyOrientation;
-enum class SourcePulseType;
 enum class EnergySpreadUnit;
 enum class SigmaType;
 
@@ -72,7 +71,6 @@ bool paramVls(const rapidxml::xml_node<>* node, std::array<double, 6>* out);
 bool paramEnergyDistribution(const rapidxml::xml_node<>* node, const std::filesystem::path& rmlFile, EnergyDistribution* out);
 
 bool paramElectronEnergyOrientation(const rapidxml::xml_node<>* node, ElectronEnergyOrientation* out);
-bool paramSourcePulseType(const rapidxml::xml_node<>* node, SourcePulseType* out);
 
 bool paramPositionAndOrientation(const rapidxml::xml_node<>* node, const std::vector<xml::Group>& group_context, glm::dvec4* out_pos,
                                  glm::dmat4x4* out_ori);
@@ -105,7 +103,6 @@ struct RAYX_API Parser {
     QuadricSurface parseQuadricParameters() const;
     CubicSurface parseCubicParameters() const;
     ElectronEnergyOrientation parseElectronEnergyOrientation() const;
-    SourcePulseType parseSourcePulseType() const;
     double parseImageType() const;
     double parseAdditionalOrder() const;
     Rad parseAzimuthalAngle() const;

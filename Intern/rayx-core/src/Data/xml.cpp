@@ -371,19 +371,6 @@ bool paramElectronEnergyOrientation(const rapidxml::xml_node<>* node, ElectronEn
     return false;
 }
 
-bool paramSourcePulseType(const rapidxml::xml_node<>* node, SourcePulseType* out) {
-    if (!node || !out) {
-        return false;
-    }
-    int spreadType_int;
-    if (!xml::paramInt(node, "sourcePulseType", &spreadType_int)) {
-        return false;
-    }
-    *out = static_cast<SourcePulseType>(spreadType_int);
-
-    return false;
-}
-
 // loads the *global* position and orientation, so incorporating the effect that the group context has on the position and orientation.
 bool paramPositionAndOrientation(const rapidxml::xml_node<>* node, const std::vector<xml::Group>& group_context, glm::dvec4* out_pos,
                                  glm::dmat4x4* out_ori) {
@@ -644,14 +631,6 @@ ElectronEnergyOrientation Parser::parseElectronEnergyOrientation() const {
     return orientation;
 }
 
-SourcePulseType Parser::parseSourcePulseType() const {
-    SourcePulseType spreadType;
-    if (!paramSourcePulseType(node, &spreadType)) {
-        return spreadType;
-    }
-
-    return spreadType;
-}
 
 double Parser::parseImageType() const {
     int imageType_int;

@@ -40,8 +40,6 @@ class RAYX_API SimpleUndulatorSource : public LightSource {
     double m_electronSigmaY;
     double m_electronSigmaYs;
 
-    SourcePulseType m_sourceDistributionType;  // TODO unused.
-
     double m_linearPol_0;
     double m_linearPol_45;
     double m_circularPol;
