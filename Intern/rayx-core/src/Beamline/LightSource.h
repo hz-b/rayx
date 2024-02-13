@@ -35,7 +35,7 @@ class RAYX_API LightSource {
 
     /** yields the average energy of the energy distribution
      * m_EnergyDistribution */
-    double calcPhotonWavelength(double photonEnergy);
+    double calcPhotonWavelength(double photonEnergy) const ;
 
     double selectEnergy() const;
     static glm::dvec3 getDirectionFromAngles(double phi, double psi);
