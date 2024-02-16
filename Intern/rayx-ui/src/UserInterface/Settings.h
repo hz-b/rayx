@@ -19,21 +19,27 @@ struct UIRayInfo {
 struct UIParameters {
     CameraController& camController;
     std::filesystem::path rmlPath;
-    bool pathChanged;
+    bool rmlReady;
+    bool h5Ready;
     float frameTime;
     UIRayInfo rayInfo;
     bool showRMLNotExistPopup;
     bool showH5NotExistPopup;
     bool pathValidState;
+    bool runSimulation;
+    bool simulationSettingsReady;
 
     UIParameters(CameraController& camController)
         : camController(camController),
           rmlPath(""),
-          pathChanged(false),
+          rmlReady(false),
+          h5Ready(false),
           frameTime(0.0f),
           rayInfo({false, false, false, false, 0, 0}),
           showRMLNotExistPopup(false),
           showH5NotExistPopup(false),
+          runSimulation(false),
+          simulationSettingsReady(false),
           pathValidState(false) {}
 
     void updatePath(const std::filesystem::path& path) {
@@ -52,6 +58,6 @@ struct UIParameters {
         }
 #endif
         rmlPath = path;
-        pathChanged = true;
+        rmlReady = true;
     }
 };

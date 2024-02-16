@@ -208,11 +208,17 @@ void UIHandler::showSceneEditorWindow(UIParameters& uiParams) {
 #endif
             uiParams.showRMLNotExistPopup = rmlPath.substr(rmlPath.size() - 4, 4) != ".rml" || !std::filesystem::exists(rmlPath);
 
-            if (uiParams.showH5NotExistPopup || uiParams.showRMLNotExistPopup) {
-                uiParams.pathChanged = false;
+            if (uiParams.showRMLNotExistPopup) {
+                uiParams.rmlReady = false;
             } else {
-                uiParams.pathChanged = true;
-                uiParams.pathValidState = true;
+                if (uiParams.showH5NotExistPopup) {
+                    uiParams.h5Ready = false;
+                    uiParams.pathValidState = false;
+                } else {
+                    uiParams.h5Ready = true;
+                    uiParams.pathValidState = true;
+                    uiParams.rmlReady = true;
+                }
                 uiParams.rmlPath = outPath;
             }
         } else if (result == NFD_CANCEL) {
@@ -296,9 +302,34 @@ void UIHandler::showMissingFilePopupWindow(UIParameters& uiParams) {
                 ImGui::Text("The H5 file does not exist.");
             }
             ImGui::Spacing();
-            if (ImGui::Button("OK")) {
+            ImGui::Text("Do you want to run the simulation now?");  // Ask the user if they want to run the simulation now
+            ImGui::Spacing();
+
+            // Calculate center position for buttons. Assuming 120 pixels width for each button and 10 pixels space between them
+            float windowWidth = 400;         // Popup window width
+            float buttonsWidth = 240;        // Total buttons width (120 * 2)
+            float spaceBetweenButtons = 10;  // Space between buttons
+            float buttonsStartPos = (windowWidth - buttonsWidth - spaceBetweenButtons) * 0.5f;
+
+            ImGui::SetCursorPosX(buttonsStartPos);
+
+            if (ImGui::Button("No", ImVec2(120, 40))) {  // Make the button a bit larger
                 uiParams.showH5NotExistPopup = false;
                 uiParams.showRMLNotExistPopup = false;
+                uiParams.runSimulation = false;  // Do not start the simulation
+                ImGui::CloseCurrentPopup();      // Close the popup when an option is selected
+            }
+
+            ImGui::SameLine();  // Keep on the same line to ensure proper spacing
+
+            ImGui::SetCursorPosX(buttonsStartPos + 120 + spaceBetweenButtons);  // Adjust for the next button
+
+            if (ImGui::Button("Yes", ImVec2(120, 40))) {  // Make the button a bit larger
+                uiParams.showH5NotExistPopup = false;
+                uiParams.showRMLNotExistPopup = false;
+                uiParams.rmlReady = true;
+                uiParams.runSimulation = true;  // Assuming runSimulation is a parameter to start the simulation immediately
+                ImGui::CloseCurrentPopup();     // Close the popup when an option is selected
             }
 
             // Revert to original font size
