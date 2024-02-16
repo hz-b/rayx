@@ -122,7 +122,7 @@ void BeamlineOutliner::showBeamlineOutlineWindow(UIParameters& uiParams, std::ve
 
     ImGui::Begin("Beamline Outline");
 
-    if (uiParams.pathChanged) {
+    if (uiParams.rmlReady) {
         // Create and render new Tree
         m_lightSourceIndex = 0;
         m_opticalElementIndex = 0;

@@ -6,8 +6,9 @@
 #include "GraphicsCore/Descriptors.h"
 #include "GraphicsCore/Renderer.h"
 #include "RayProcessing.h"
-#include "UserInterface/UIHandler.h"
 #include "Scene.h"
+#include "Simulator.h"
+#include "UserInterface/UIHandler.h"
 
 #ifdef NDEBUG
 const bool enableValidationLayers = false;
@@ -36,7 +37,17 @@ class Application {
 
     void run();
 
-    enum class State { Initializing, Loading, BuildingRays, BuildingElements, Running, RunningWithoutScene } m_State{State::Initializing};
+    enum class State {
+        Initializing,
+        InitializeSimulation,
+        Simulating,
+        LoadingBeamline,
+        LoadingRays,
+        BuildingRays,
+        BuildingElements,
+        Running,
+        RunningWithoutScene
+    } m_State{State::Initializing};
 
   private:
     // --- Order matters ---
@@ -44,6 +55,7 @@ class Application {
     CommandParser m_CommandParser;  ///< Command line parser
     Device m_Device;                ///< Vulkan device
     Renderer m_Renderer;            ///< Vulkan renderer
+    Simulator m_Simulator;          ///< Rayx core simulator
 
     // --- Order doesn't matter ---
     std::unique_ptr<Scene> m_Scene;                                   ///< Scene
@@ -60,6 +72,8 @@ class Application {
     RAYX::BundleHistory m_rays;                  ///< Ray cache
 
     void init();
+
+    void runSimulation();
 
     void loadRays(const std::filesystem::path& rmlPath);
     void loadBeamline(const std::filesystem::path& rmlPath);

@@ -31,7 +31,8 @@ Application::Application(uint32_t width, uint32_t height, const char* name, int 
       m_CamController(),                                      //
       m_UIParams(m_CamController),                            //
       m_UIHandler(m_Window, m_Device, m_Renderer.getSwapChainImageFormat(), m_Renderer.getSwapChainDepthFormat(),
-                  m_Renderer.getSwapChainImageCount()) {
+                  m_Renderer.getSwapChainImageCount()),
+      m_Simulator() {
     m_GlobalDescriptorPool = DescriptorPool::Builder(m_Device)
                                  .addPoolSize(VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, SwapChain::MAX_FRAMES_IN_FLIGHT)
                                  .setMaxSets(SwapChain::MAX_FRAMES_IN_FLIGHT)
@@ -108,6 +109,7 @@ void Application::run() {
     std::future<void> beamlineFuture;
     std::future<void> raysFuture;
     std::future<void> buildRayCacheFuture;
+    std::future<void> simulationFuture;
     std::future<std::vector<Scene::RenderObjectInput>> getRObjInputsFuture;
 
     // Main loop
@@ -125,16 +127,44 @@ void Application::run() {
             m_UIParams.frameTime = std::chrono::duration<float, std::chrono::seconds::period>(newTime - currentTime).count();
             currentTime = newTime;
 
-            if (m_UIParams.pathChanged) {
-                m_State = State::Loading;
+            if (m_UIParams.rmlReady) {
                 m_RMLPath = m_UIParams.rmlPath.string();
                 beamlineFuture = std::async(std::launch::async, &Application::loadBeamline, this, m_RMLPath);
-                raysFuture = std::async(std::launch::async, &Application::loadRays, this, m_RMLPath);
-                m_UIParams.pathChanged = false;
+                m_State = State::LoadingBeamline;
+                m_UIParams.rmlReady = false;
             }
 
             switch (m_State) {
-                case State::Loading:
+                case State::LoadingBeamline:
+                    if (beamlineFuture.wait_for(std::chrono::seconds(0)) == std::future_status::ready) {
+                        if (m_UIParams.runSimulation == true) {
+                            m_UIParams.runSimulation = false;
+                            // open simulation dialog
+                            m_Simulator.setSimulationParameters(m_RMLPath, *m_Beamline);
+                            m_UIParams.simulationSettingsReady = true;
+                            m_State = State::InitializeSimulation;
+                        } else {
+                            raysFuture = std::async(std::launch::async, &Application::loadRays, this, m_RMLPath);
+                            m_State = State::LoadingRays;
+                        }
+                    }
+                    break;
+
+                case State::InitializeSimulation:
+                    if (m_UIParams.simulationSettingsReady) {
+                        m_State = State::InitializeSimulation;
+                        m_UIParams.simulationSettingsReady = false;
+                        simulationFuture = std::async(std::launch::async, std::bind(&Simulator::runSimulation, &m_Simulator));
+                        m_State = State::Simulating;
+                    }
+
+                case State::Simulating:
+                    if (simulationFuture.wait_for(std::chrono::seconds(0)) == std::future_status::ready) {
+                        raysFuture = std::async(std::launch::async, &Application::loadRays, this, m_RMLPath);
+                        m_State = State::LoadingRays;
+                    }
+                    break;
+                case State::LoadingRays:
                     if (beamlineFuture.wait_for(std::chrono::seconds(0)) == std::future_status::ready &&
                         raysFuture.wait_for(std::chrono::seconds(0)) == std::future_status::ready) {
                         // Wait for loadBeamline and loadRays to finish
@@ -208,7 +238,8 @@ void Application::run() {
             FrameInfo frameInfo{m_Camera, frameIndex, commandBuffer, descriptorSets[frameIndex]};
 
             // Scene
-            if (m_State != State::RunningWithoutScene && m_State != State::Loading) {
+            if (m_State != State::RunningWithoutScene && m_State != State::LoadingRays && m_State != State::Simulating &&
+                m_State != State::LoadingBeamline && m_State != State::InitializeSimulation) {
                 objectRenderSystem.render(frameInfo, m_Scene->getRObjects());
                 if (m_UIParams.rayInfo.displayRays) rayRenderSystem.render(frameInfo, m_Scene->getRaysRObject());
             }
