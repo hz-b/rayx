@@ -1,10 +1,26 @@
 # Changes
 
-- Addition of first prototype for RAYX-UI, which allows rendering of beamlines
-- Added -s option for sequential tracing
-- Added option for specific h5 format when exporting rays
-- Bug fixes for the RZP (but still being worked on)
-- Added additional benchmarking tools
-- Exposed additional RAYX-CORE features for outside use
-- Improved documentation
-- Improved software testing
+- rayx-core:
+  - Added optical elements
+    - Paraboloid 
+  - Added light sources
+    - Simple Undulator
+    - Pixel Source
+    - Dipole Source
+  - Improved code consistency for optical elements and light sources
+  - Improved test suite
+  - Fixes for RZP tracing
+- rayx:
+  - Added more options to customize the export of rays and speed up the tracing
+  - Added option to choose GPU
+  - Improved runtime by optimizing data handling
+- rayx-ui:
+  - Added orthographic camera
+  - Added footprints/heatmaps/histograms for simple optical elements
+  - Changed default camera position and orientation
+  - Jump to light source is possible now
+  - Correctly render slits
+  - Fixed positioning of light sources
+  - Fixed triangulation bugs
+  - Fixed general rendering bugs
+- General bugfixes and documentation updates
