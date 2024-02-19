@@ -106,24 +106,23 @@ jobs:
           prerelease: false
 
       - name: Upload Artifact to Release (Windows)
-        if: success() && contains(github.ref, 'windows-latest')
         uses: actions/upload-release-asset@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ./artifacts/rayx-win64.zip
+          asset_path: ${{github.workspace}}/artifacts/rayx-win64.zip/rayx-win64.zip
           asset_name: rayx-win64.zip
           asset_content_type: application/zip
 
       - name: Upload Artifact to Release (Ubuntu)
-        if: success() && contains(github.ref, 'ubuntu-latest')
         uses: actions/upload-release-asset@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ./artifacts/rayx-Linux.deb
+          asset_path: ${{github.workspace}}/artifacts/rayx-Linux.deb/rayx-Linux.deb
           asset_name: rayx-Linux.deb
           asset_content_type: application/x-deb
+
 
