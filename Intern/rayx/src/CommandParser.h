@@ -46,17 +46,16 @@ class CommandParser {
 
     static inline void getVersion() {
         RAYX_LOG << R"(
-          
-        ╔═══╗╔═══╗╔╗  ╔╗╔═╗╔═╗
-        ║╔═╗║║╔═╗║║╚╗╔╝║╚╗╚╝╔╝
-        ║╚═╝║║║ ║║╚╗╚╝╔╝ ╚╗╔╝ 
-        ║╔╗╔╝║╚═╝║ ╚╗╔╝  ╔╝╚╗ 
-        ║║║╚╗║╔═╗║  ║║  ╔╝╔╗╚╗
-        ╚╝╚═╝╚╝ ╚╝  ╚╝  ╚═╝╚═╝ HZB 2023.
-        )";
+        
+      ╔═══╗╔═══╗╔╗  ╔╗╔═╗╔═╗
+      ║╔═╗║║╔═╗║║╚╗╔╝║╚╗╚╝╔╝
+      ║╚═╝║║║ ║║╚╗╚╝╔╝ ╚╗╔╝ 
+      ║╔╗╔╝║╚═╝║ ╚╗╔╝  ╔╝╚╗ 
+      ║║║╚╗║╔═╗║  ║║  ╔╝╔╗╚╗
+      ╚╝╚═╝╚╝ ╚╝  ╚╝  ╚═╝╚═╝ HZB 2023.
+      )";
         RAYX_LOG << "\n\t rayx terminal application " << TERMINALAPP_VERSION_MAJOR << "." << TERMINALAPP_VERSION_MINOR << "."
-                 << TERMINALAPP_VERSION_PATCH << "." << TERMINALAPP_VERSION_TWEAK << "\n \t GIT: " << GIT_REVISION
-                 << "\n \t BUILD: " << BUILD_TIMESTAMP;
+                 << TERMINALAPP_VERSION_PATCH << "\n \t GIT: " << GIT_REVISION << "\n \t BUILD: " << BUILD_TIMESTAMP;
     };
 
   private:
