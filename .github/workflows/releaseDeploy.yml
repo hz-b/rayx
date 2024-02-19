@@ -5,10 +5,6 @@ on:
     tags:
       - 'v*' # Triggers on tag push matching v*
 
-env:
-  # Customize the CMake build type here (Release, Debug, RelWithDebInfo, etc.)
-  BUILD_TYPE: Release
-
 jobs:
   build-and-release:
     name: Build and Release
@@ -55,51 +51,47 @@ jobs:
           sudo apt install --yes xorg-dev cmake libgtk-3-dev libdbus-1-dev
 
       - name: Configure CMake
-        # Configure CMake in a 'build' subdirectory. `CMAKE_BUILD_TYPE` is only required if you are using a single-configuration generator such as make.
-        # See https://cmake.org/cmake/help/latest/variable/CMAKE_BUILD_TYPE.html?highlight=cmake_build_type
-        run: cmake -B ${{github.workspace}}/build -DWERROR=YES -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}}
+        run: cmake -B ${{github.workspace}}/build -DWERROR=YES -DCMAKE_BUILD_TYPE=${{ matrix.build-type }}
 
       - name: Build
-        # Build your program with the given configuration
-        run: cmake --build ${{github.workspace}}/build --config ${{env.BUILD_TYPE}}
+        run: cmake --build ${{github.workspace}}/build --config ${{ matrix.build-type }}
 
       - name: Test
         working-directory: ${{github.workspace}}/build/bin/release
         run: ./rayx-core-tst -x
 
-      - name: CPack
+      - name: CPack (Windows)
+        if: matrix.os == 'windows-latest'
         working-directory: ${{github.workspace}}/build
-        run: cpack -G ZIP # Or DEB for Ubuntu
+        run: cpack -G ZIP
+
+      - name: CPack (Ubuntu)
+        if: matrix.os == 'ubuntu-latest'
+        working-directory: ${{github.workspace}}/build
+        run: cpack -G DEB
 
       - name: Upload build artifact
         uses: actions/upload-artifact@v2
         with:
           name: ${{ matrix.artifact-name }}
-          path: ${{github.workspace}}/build/RAYX-*.*.*-*
+          path: ${{github.workspace}}/build/${{ matrix.artifact-name }}
           
-      - name: Download all artifacts
-        uses: actions/download-artifact@v3
-        with:
-          path: ${{github.workspace}}/artifacts
+      # Remove Download all artifacts step as it seems unnecessary
 
+  create-release:
+    needs: build-and-release
+    runs-on: ubuntu-latest
+    steps:
       - name: Create Release
         id: create_release
         uses: actions/create-release@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          tag_name: ${{ github.ref }}
-          release_name: Release ${{ github.ref }}
-          body: docs/changes/lastChanges.md
+          tag_name: ${{ github.ref_name }}
+          release_name: Release ${{ github.ref_name }}
+          body: "Update your release notes here"
           draft: false
           prerelease: false
 
-      - name: Upload artifacts to Release
-        uses: actions/upload-release-asset@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ${{github.workspace}}/artifacts/${{ matrix.artifact-name }}
-          asset_name: ${{ matrix.artifact-name }}
-          asset_content_type: application/octet-stream
+      # Upload artifacts to Release in a separate job to handle artifacts dynamically

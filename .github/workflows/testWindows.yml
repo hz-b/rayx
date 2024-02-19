@@ -51,5 +51,5 @@ jobs:
       - name: Upload artifact
         uses: actions/upload-artifact@v2
         with:
-          name: rayx-core
+          name: RAYX
           path: ${{github.workspace}}/build/RAYX-*.*.*-win64.zip
