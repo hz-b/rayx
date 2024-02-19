@@ -105,14 +105,21 @@ jobs:
           draft: false
           prerelease: false
 
+      - name: List downloaded artifacts and contents
+        run: |
+          ls -lah ${{github.workspace}}/artifacts
+          ls -lah ${{github.workspace}}/artifacts/rayx-Linux.deb
+          ls -lah ${{github.workspace}}/artifacts/rayx-win64.zip
+
+
       - name: Upload Artifact to Release (Windows)
         uses: actions/upload-release-asset@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ${{github.workspace}}/artifacts/rayx-win64.zip
-          asset_name: rayx-win64.zip
+          asset_path: ${{github.workspace}}/artifacts/rayx-win64.zip/RAYX-0.18.0-win64.zip
+          asset_name: RAYX-0.18.0-win64.zip
           asset_content_type: application/zip
 
       - name: Upload Artifact to Release (Ubuntu)
@@ -121,8 +128,6 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ${{github.workspace}}/artifacts/rayx-Linux.deb
-          asset_name: rayx-Linux.deb
+          asset_path: ${{github.workspace}}/artifacts/rayx-Linux.deb/RAYX-0.18.0-Linux.deb
+          asset_name: RAYX-0.18.0-Linux.deb
           asset_content_type: application/x-deb
-
-
