@@ -11,7 +11,6 @@ def get_current_version():
     return current_version
 
 def increment_version(version, part='patch'):
-    # Remove the 'v' prefix before incrementing
     version = version.lstrip('v')
     major, minor, patch = map(int, version.split('.'))
     if part == 'major':
@@ -23,12 +22,10 @@ def increment_version(version, part='patch'):
         patch = 0
     elif part == 'patch':
         patch += 1
-    # Add the 'v' prefix back to the version number
     return f"v{major}.{minor}.{patch}"
 
 def update_cmake_version(version):
     try:
-        # Update root CMakeLists.txt
         root_cmake_path = "CMakeLists.txt"
         with open(root_cmake_path, "r") as file:
             data = file.read()
@@ -36,10 +33,8 @@ def update_cmake_version(version):
         with open(root_cmake_path, "w") as file:
             file.write(data)
         print(f"Updated {root_cmake_path}")
-
     except Exception as e:
         print(f"Error updating CMakeLists.txt: {e}")
-
 
 def main():
     current_version = get_current_version()
@@ -49,7 +44,6 @@ def main():
     if not new_version:
         new_version = increment_version(current_version)
     else:
-        # Update regex to allow 'v' prefix
         if not re.match(r'^v?\d+\.\d+\.\d+$', new_version):
             print("Error: Version must follow vMAJOR.MINOR.PATCH format.")
             return
@@ -60,14 +54,23 @@ def main():
         return
     
     try:
-        # Update CMakeLists.txt
+        # Update CMakeLists.txt and commit changes
         update_cmake_version(new_version)
+        
+        # Stage changes
+        subprocess.run(["git", "add", "."], check=True)
+        
+        # Commit changes
+        commit_message = f"Update version to {new_version}"
+        subprocess.run(["git", "commit", "-m", commit_message], check=True)
+        
+        # Tag the commit
         subprocess.run(["git", "tag", "-a", new_version, "-m", f"Version {new_version}"], check=True)
-        print(f"Successfully tagged with {new_version}")
-        # Provide the user with the command to push the tag
-        print(f"To push the tag to the remote repository, run:\ngit push origin {new_version}")
+        
+        print(f"Successfully updated to {new_version}")
+        print(f"To push the changes and the tag to the remote repository, run:\ngit push origin {new_version} && git push")
     except subprocess.CalledProcessError as e:
-        print(f"Error tagging version: {e}")
+        print(f"Error: {e}")
 
 if __name__ == "__main__":
     main()
