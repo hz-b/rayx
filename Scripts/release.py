@@ -6,10 +6,12 @@ def get_current_version():
         completed_process = subprocess.run(["git", "describe", "--tags", "--abbrev=0"], check=True, text=True, stdout=subprocess.PIPE)
         current_version = completed_process.stdout.strip()
     except subprocess.CalledProcessError:
-        current_version = "0.0.0"
+        current_version = "v0.0.0"
     return current_version
 
 def increment_version(version, part='patch'):
+    # Remove the 'v' prefix before incrementing
+    version = version.lstrip('v')
     major, minor, patch = map(int, version.split('.'))
     if part == 'major':
         major += 1
@@ -20,7 +22,8 @@ def increment_version(version, part='patch'):
         patch = 0
     elif part == 'patch':
         patch += 1
-    return f"{major}.{minor}.{patch}"
+    # Add the 'v' prefix back to the version number
+    return f"v{major}.{minor}.{patch}"
 
 def main():
     current_version = get_current_version()
@@ -30,8 +33,9 @@ def main():
     if not new_version:
         new_version = increment_version(current_version)
     else:
-        if not re.match(r'^\d+\.\d+\.\d+$', new_version):
-            print("Error: Version must follow MAJOR.MINOR.PATCH format.")
+        # Update regex to allow 'v' prefix
+        if not re.match(r'^v?\d+\.\d+\.\d+$', new_version):
+            print("Error: Version must follow vMAJOR.MINOR.PATCH format.")
             return
 
     doc_updated = input("Have you updated the docs/changes/lastChanges.md file? [y/N]: ").strip().lower()
