@@ -63,20 +63,26 @@ jobs:
       - name: CPack (Windows)
         if: matrix.os == 'windows-latest'
         working-directory: ${{github.workspace}}/build
-        run: cpack -G ZIP
+        run: cpack -G ZIP 
 
       - name: CPack (Ubuntu)
         if: matrix.os == 'ubuntu-latest'
         working-directory: ${{github.workspace}}/build
         run: cpack -G DEB
 
-      - name: Upload build artifact
+      - name: Upload build artifact (Windows)
+        if: matrix.os == 'windows-latest'
         uses: actions/upload-artifact@v2
         with:
           name: ${{ matrix.artifact-name }}
-          path: ${{github.workspace}}/build/${{ matrix.artifact-name }}
-          
-      # Remove Download all artifacts step as it seems unnecessary
+          path: ${{github.workspace}}/build/RAYX-*-win64.zip
+
+      - name: Upload build artifact (Ubuntu)
+        if: matrix.os == 'ubuntu-latest'
+        uses: actions/upload-artifact@v2
+        with:
+          name: ${{ matrix.artifact-name }}
+          path: ${{github.workspace}}/build/RAYX-*-Linux.deb
 
   create-release:
     needs: build-and-release
@@ -90,8 +96,6 @@ jobs:
         with:
           tag_name: ${{ github.ref_name }}
           release_name: Release ${{ github.ref_name }}
-          body: "Update your release notes here"
+          body: docs/changes/lastChanges.md
           draft: false
           prerelease: false
-
-      # Upload artifacts to Release in a separate job to handle artifacts dynamically
