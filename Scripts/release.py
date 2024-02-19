@@ -55,7 +55,7 @@ def main():
     
     try:
         # Update CMakeLists.txt and commit changes
-        update_cmake_version(new_version)
+        update_cmake_version(new_version.strip('v'))
         
         # Stage changes
         subprocess.run(["git", "add", "."], check=True)
