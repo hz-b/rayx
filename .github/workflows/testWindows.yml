@@ -49,7 +49,7 @@ jobs:
           cpack -G ZIP
 
       - name: Upload artifact
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         with:
           name: RAYX
           path: ${{github.workspace}}/build/RAYX-*.*.*-win64.zip
