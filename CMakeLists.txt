@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.15 FATAL_ERROR)
 
 # ---- Project ----
-project(RAYX VERSION 0.19.0)
+project(RAYX VERSION 0.19.1)
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 # -----------------
