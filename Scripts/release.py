@@ -48,6 +48,11 @@ def main():
             print("Error: Version must follow vMAJOR.MINOR.PATCH format.")
             return
 
+    confirmation = input(f"Have you updated the changelog (CHANGELOG.md)? [Y/n]: ").strip().lower()
+    if confirmation not in ('y', 'yes', ''):
+        print("Aborted.")
+        return
+
     confirmation = input(f"Are you sure you want to tag and commit as {new_version}? [Y/n]: ").strip().lower()
     if confirmation not in ('y', 'yes', ''):
         print("Aborted.")
