@@ -16,17 +16,18 @@
 DesignElement parseElement(xml::Parser parser) {
     DesignElement de;
     const char* type = parser.type();
-
+    Value map = Map();
+    de.v = map;
     //TODO add functions for each Element 
 
     if (strcmp(type, "ImagePlane") == 0) {
-        getImageplane(parser, &de);
+        getImageplane(parser, &de, map);
     } else if (strcmp(type, "Plane Mirror") == 0) {
         //addDesignElement(node);
     } else if (strcmp(type, "Toroid") == 0) {
         //addDesignElement(node);
     } else if (strcmp(type, "Slit") == 0) {
-        getSlit(parser, &de);
+        getSlit(parser, &de, map);
     } else if (strcmp(type, "Spherical Grating") == 0) {
         //addDesignElement(node);
     } else if (strcmp(type, "Plane Grating") == 0) {
