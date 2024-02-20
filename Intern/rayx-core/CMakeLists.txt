@@ -123,7 +123,7 @@ if(Vulkan_FOUND)
     # This is most likely not an optimal solution, but it will work
     # until we find a better one.
     add_dependencies(${PROJECT_NAME} RAYX_CORE_COMPILE_SHADER)
-    set(RAYX_CORE_SHADER ${CMAKE_BINARY_DIR}/bin/comp.spv)
+    set(RAYX_CORE_SHADER ${CMAKE_BINARY_DIR}/bin/shaders/comp.spv)
     set(RAYX_CORE_SHADER_FAKE ${CMAKE_BINARY_DIR}/bin/___comp.spv) # this exists so file cannot be found -> always execute command
 
     add_custom_command(

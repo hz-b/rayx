@@ -32,21 +32,19 @@ if(Vulkan_FOUND)
     target_compile_definitions(${PROJECT_NAME} PRIVATE
         GLM_FORCE_RADIANS
         GLM_FORCE_DEPTH_ZERO_TO_ONE)
+    # -----------------
 
-            # ---- Install ----
-
-    install(TARGETS ${PROJECT_NAME} RUNTIME DESTINATION bin)
 
     # ---- CPack ----
-
+    install(TARGETS ${PROJECT_NAME} RUNTIME DESTINATION bin)
+    install(DIRECTORY ${CMAKE_BINARY_DIR}/bin/shaders
+            DESTINATION ./
+            FILES_MATCHING PATTERN "*_*.spv")
     include(InstallRequiredSystemLibraries)
-
     set(CPACK_RESOURCE_FILE_LICENSE "${PROJECT_SOURCE_DIR}/../../LICENSE")
     set(CPACK_PACKAGE_VERSION ${PROJECT_VERSION})
     set(CPACK_PACKAGE_DESCRIPTION_SUMMARY "rayx-ui - RAYX GUI Application")
-
     include(CPack)
-
     # -----------------
 
     # ---- GLFW Options ----
@@ -55,7 +53,6 @@ if(Vulkan_FOUND)
     option(GLFW_BUILD_DOCS "Build the GLFW documentation" OFF)
     option(GLFW_INSTALL "Generate installation target" OFF)
     option(GLFW_DOCUMENT_INTERNALS "Include internals in documentation" OFF)
-
     # ----------------------
 
     # ---- Dependencies ----
@@ -69,7 +66,6 @@ if(Vulkan_FOUND)
         ${STB_DIR}
         ..
     )
-
     # ----------------------
 
     # ---- Compile Shaders ----
@@ -87,7 +83,7 @@ if(Vulkan_FOUND)
             string(SUBSTRING ${SHADER_EXT} 1 -1 SHADER_STAGE) # Remove the leading '.' from the extension
 
             # Set output file name
-            set(OUTPUT_FILE "${CMAKE_BINARY_DIR}/bin/${SHADER_NAME}_${SHADER_STAGE}.spv")
+            set(OUTPUT_FILE "${CMAKE_BINARY_DIR}/bin/shaders/${SHADER_NAME}_${SHADER_STAGE}.spv")
 
             # Create a custom command for each shader file
             add_custom_command(
@@ -108,6 +104,5 @@ if(Vulkan_FOUND)
 
     # Call the function to compile all shaders in the specified directory
     compile_shaders(RAYX_UI_COMPILE_SHADER "${PROJECT_SOURCE_DIR}/src/Shaders")
-
     # ------------------------
 endif() # Vulkan_FOUND

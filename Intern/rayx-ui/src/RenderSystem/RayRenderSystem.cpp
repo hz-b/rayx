@@ -46,7 +46,7 @@ void RayRenderSystem::createPipeline(VkRenderPass renderPass) {
     pipelineConfig.renderPass = renderPass;
     pipelineConfig.pipelineLayout = m_PipelineLayout;
 
-    const std::string vertexShader = RAYX::canonicalizeRepositoryPath("build/bin/ray_shader_vert.spv").string();
-    const std::string fragmentShader = RAYX::canonicalizeRepositoryPath("build/bin/ray_shader_frag.spv").string();
+    const std::string vertexShader = RAYX::canonicalizeRepositoryPath("build/bin/shaders/ray_shader_vert.spv").string();
+    const std::string fragmentShader = RAYX::canonicalizeRepositoryPath("build/bin/shaders/ray_shader_frag.spv").string();
     m_Pipeline = std::make_unique<GraphicsPipeline>(m_Device, vertexShader, fragmentShader, pipelineConfig);
 }
