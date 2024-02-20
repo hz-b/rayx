@@ -71,6 +71,8 @@ if(Vulkan_FOUND)
     # ---- Compile Shaders ----
     # Function to compile shaders
     function(compile_shaders target shaders_dir)
+        set(OUTPUT_DIR "${CMAKE_BINARY_DIR}/bin/shaders")
+        file(MAKE_DIRECTORY ${OUTPUT_DIR})
         # Get a list of all shader files in the specified directory
         file(GLOB SHADER_FILES "${shaders_dir}/*.frag" "${shaders_dir}/*.vert")
 
