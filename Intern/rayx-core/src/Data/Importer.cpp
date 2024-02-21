@@ -20,13 +20,13 @@ DesignElement parseElement(xml::Parser parser) {
     // TODO add functions for each Element
 
     if (strcmp(type, "ImagePlane") == 0) {
-        getImageplane(parser, &de, map);
+        getImageplane(parser, &de);
     } else if (strcmp(type, "Plane Mirror") == 0) {
         // addDesignElement(node);
     } else if (strcmp(type, "Toroid") == 0) {
         // addDesignElement(node);
     } else if (strcmp(type, "Slit") == 0) {
-        getSlit(parser, &de, map);
+        getSlit(parser, &de);
     } else if (strcmp(type, "Spherical Grating") == 0) {
         // addDesignElement(node);
     } else if (strcmp(type, "Plane Grating") == 0) {
