@@ -2,7 +2,7 @@
 #include "Beamline/OpticalElement.h"
 
 namespace RAYX {
-
-Element makeSphereGrating(const DesignObject& dobj);
+struct DesignElement; //TODO Fanny see where the forward declaration has to go
+Element makeSphereGrating(const DesignElement& dele);
 
 }  // namespace RAYX

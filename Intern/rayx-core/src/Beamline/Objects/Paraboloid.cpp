@@ -10,12 +10,13 @@
 
 namespace RAYX {
 
-Element makeParaboloid(const DesignObject& dobj) {
-    auto ArmLength = dobj.parseArmLength();
-    auto parameterP = dobj.parseParameterP();
-    auto parameterPType = dobj.parseParameterPType();
-    auto grazingIncAngle = dobj.parseGrazingIncAngle();
-    auto a11 = dobj.parseParameterA11();
+Element makeParaboloid(const DesignElement& dele) {
+    auto ArmLength = dele.getArmLength();
+    auto parameterP = dele.getParameterP();
+    auto parameterPType = dele.getParameterPType();
+
+    auto grazingIncAngle = dele.getGrazingIncAngle();
+    auto a11 = dele.getParameterA11();
 
     double a24, a34, a44, y0, z0;
     //---------- Calculation will be outsourced ----------------
@@ -45,7 +46,7 @@ Element makeParaboloid(const DesignObject& dobj) {
         .m_a44 = a44,
     });
     auto behaviour = serializeMirror();
-    return makeElement(dobj, behaviour, surface);
+    return makeElement(dele, behaviour, surface);
 }
 
 }  // namespace RAYX

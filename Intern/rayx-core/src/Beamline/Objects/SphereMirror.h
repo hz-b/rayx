@@ -2,6 +2,7 @@
 
 namespace RAYX {
 
-Element makeSphereMirror(const DesignObject&);
+struct DesignElement; //TODO Fanny see where the forward declaration has to go
+Element makeSphereMirror(const DesignElement& dele);
 
 }  // namespace RAYX

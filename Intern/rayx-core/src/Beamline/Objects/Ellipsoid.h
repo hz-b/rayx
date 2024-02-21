@@ -4,6 +4,7 @@
 namespace RAYX {
 
 enum class FigureRotation { Yes, Plane, A11 };
-Element makeEllipsoid(const DesignObject& dobj);
+struct DesignElement;
+Element makeEllipsoid(const DesignElement& dele);
 
 }  // namespace RAYX

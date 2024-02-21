@@ -5,10 +5,10 @@
 
 namespace RAYX {
 
-Element makePlaneGrating(DesignObject& dobj) {
+Element makePlaneGrating(const DesignElement& dele) {
     auto surface = makePlane();
-    auto behaviour = makeGrating(dobj);
-    return makeElement(dobj, behaviour, surface);
+    auto behaviour = makeGrating(dele);
+    return makeElement(dele, behaviour, surface);
 }
 
 }  // namespace RAYX
