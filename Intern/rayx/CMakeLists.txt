@@ -44,6 +44,8 @@ target_include_directories(${PROJECT_NAME} PRIVATE ${PROJECT_BINARY_DIR})
 install(DIRECTORY ${CMAKE_BINARY_DIR}/bin/shaders
         DESTINATION ./
         FILES_MATCHING PATTERN "comp.spv")
+install(DIRECTORY ${CMAKE_BINARY_DIR}/../Data
+        DESTINATION ./)
 set(CPACK_PACKAGE_DESCRIPTION_SUMMARY "rayx - A RAYX Beamline Simulation Tool")
 set(CPACK_PACKAGE_VERSION ${PROJECT_VERSION})
 set(CPACK_PACKAGE_INSTALL_DIRECTORY "rayx")
