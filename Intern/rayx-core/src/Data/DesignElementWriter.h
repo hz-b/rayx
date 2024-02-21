@@ -14,6 +14,8 @@ namespace RAYX {
 void setAllMandatory(xml::Parser parser, DesignElement* de) {
     de->setName(parser.name());
     de->setSlopeError(parser.parseSlopeError());
+    de->setAzimuthalAngle(parser.parseAzimuthalAngle());
+    de->setMaterial(parser.parseMaterial());
 }
 void getMisalignment(xml::Parser parser, DesignElement* de, Value map) {
     map["rotationXerror"] = parser.parseMisalignment().m_rotationXerror.rad;
@@ -32,8 +34,7 @@ void getImageplane(xml::Parser parser, DesignElement* de, Value map) {
 }
 void getSlit(xml::Parser parser, DesignElement* de, Value map) {
     const char* CentralBeamStop[] = {"None", "Rectangle", "Elliptical"};
-    de->setName(parser.name());
-    //    v["name"] = parser.name();
+    
 
     map["openingShape"] = parser.parseOpeningShape();
     map["openingWidth"] = parser.parseOpeningWidth();
@@ -63,11 +64,12 @@ void getSlit(xml::Parser parser, DesignElement* de, Value map) {
         map["CutoutLength"] = trapi.m_length;
     }
 
+    de->v = map;
+    de->setName(parser.name());
     de->setWorldPosition(parser.parsePosition());
     de->setWorldOrientation(parser.parseOrientation());
     getMisalignment(parser, de, map);
 
-    de->v = map;
 }
 
 }  // namespace RAYX

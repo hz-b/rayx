@@ -92,4 +92,21 @@ SlopeError DesignElement::getSlopeError() const {
 
     return s;
 }
+
+
+void DesignElement::setAzimuthalAngle(Rad r) {
+    v["AzimuthalAngle"] = r;
+}
+
+Rad DesignElement::getAzimuthalAngle() const {
+    return v["AzimuthalAngle"].as_rad();
+}
+
+void DesignElement::setMaterial(Material m) {
+    v["Material"] = m;
+}
+
+Material DesignElement::getMaterial() const {
+    return v["Material"].as_material();
+}
 }  // namespace RAYX

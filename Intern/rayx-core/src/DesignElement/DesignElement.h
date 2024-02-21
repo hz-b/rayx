@@ -22,5 +22,11 @@ struct DesignElement {
 
     void setSlopeError(SlopeError s);
     SlopeError getSlopeError() const;
+
+    void setAzimuthalAngle(Rad r);
+    Rad getAzimuthalAngle() const;
+
+    void setMaterial(Material m);
+    Material getMaterial() const ;
 };
 }  // namespace RAYX

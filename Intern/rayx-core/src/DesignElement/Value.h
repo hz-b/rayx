@@ -14,6 +14,8 @@ enum class ValueType {
     Dvec4,
     Dmat4x4,
     Bool,
+    Rad,
+    Material
 };
 
 class Undefined {};
@@ -31,6 +33,9 @@ class Value {
     Value(Map x) : m_variant(x) {}
     Value(dvec4 x) : m_variant(x) {}
     Value(glm::dmat4x4 x) : m_variant(x) {}
+    Value(Rad x) : m_variant(x) {}
+    Value(Material x) : m_variant(x) {}
+
 
     void operator=(double x) { m_variant = x; }
     void operator=(int x) { m_variant = x; }
@@ -39,11 +44,15 @@ class Value {
     void operator=(Map x) { m_variant = x; }
     void operator=(dvec4 x) { m_variant = x; }
     void operator=(glm::dmat4x4 x) { m_variant = x; }
+    void operator=(Rad x) { m_variant = x; }
+    void operator=(Material x) { m_variant = x; }
+
 
     inline ValueType type() const {
         const ValueType types[] = {
             ValueType::Undefined, ValueType::Double, ValueType::Int,   ValueType::Bool,
             ValueType::String,    ValueType::Map,    ValueType::Dvec4, ValueType::Dmat4x4,
+            ValueType::Rad,       ValueType::Material,
         };
         return types[m_variant.index()];
     }
@@ -54,13 +63,13 @@ class Value {
         return *x;
     }
 
-    inline int as_int() {
+    inline int as_int() const {
         auto* x = std::get_if<int>(&m_variant);
         if (!x) throw std::runtime_error("as_int() called on non-int!");
         return *x;
     }
 
-    inline bool as_bool() {
+    inline bool as_bool() const {
         auto* x = std::get_if<bool>(&m_variant);
         if (!x) throw std::runtime_error("as_bool() called on non-bool!");
         return *x;
@@ -72,21 +81,33 @@ class Value {
         return *x;
     }
 
-    inline Map as_map() {
+    inline Map as_map() const {
         auto* x = std::get_if<Map>(&m_variant);
         if (!x) throw std::runtime_error("as_map() called on non-map!");
         return *x;
     }
 
-    inline glm::dvec4 as_dvec4() {
+    inline glm::dvec4 as_dvec4() const {
         auto* x = std::get_if<glm::dvec4>(&m_variant);
         if (!x) throw std::runtime_error("as_dvec4() called on non-dvec4!");
         return *x;
     }
 
-    inline glm::dmat4x4 as_dmat4x4() {
+    inline glm::dmat4x4 as_dmat4x4() const {
         auto* x = std::get_if<glm::dmat4x4>(&m_variant);
         if (!x) throw std::runtime_error("as_dmat4x4() called on non-dmat4x4!");
+        return *x;
+    }
+
+    inline Rad as_rad() const {
+        auto* x = std::get_if<Rad>(&m_variant);
+        if (!x) throw std::runtime_error("as_rad() called on non-rad!");
+        return *x;
+    }
+
+    inline Material as_material() const {
+        auto* x = std::get_if<Material>(&m_variant);
+        if (!x) throw std::runtime_error("as_material() called on non-material!");
         return *x;
     }
 
@@ -103,6 +124,6 @@ class Value {
     }
 
   private:
-    std::variant<Undefined, double, int, std::string, Map, glm::dvec4, glm::dmat4x4, bool> m_variant;
+    std::variant<Undefined, double, int, std::string, Map, glm::dvec4, glm::dmat4x4, bool, Rad, Material> m_variant;
 };
 }  // namespace RAYX
