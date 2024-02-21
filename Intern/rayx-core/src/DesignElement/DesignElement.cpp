@@ -69,6 +69,30 @@ glm::dmat4x4 DesignElement::getWorldOrientation() const {
 
     return o;
 }
+
+void DesignElement::setMisalignment(Misalignment m) {
+    v["rotationXerror"] = m.m_rotationXerror.rad;
+    v["rotationYerror"] = m.m_rotationYerror.rad;
+    v["rotationZerror"] = m.m_rotationZerror.rad;
+
+    v["translationXerror"] = m.m_translationXerror;
+    v["translationYerror"] = m.m_translationYerror;
+    v["translationZerror"] = m.m_translationZerror;
+}
+
+
+Misalignment DesignElement::getMisalignment() const {
+    Misalignment m;
+    m.m_rotationXerror.rad = v["rotationXerror"].as_double();
+    m.m_rotationYerror.rad = v["rotationYerror"].as_double();
+    m.m_rotationZerror.rad = v["rotationZerror"].as_double();
+
+    m.m_translationXerror = v["translationXerror"].as_double();
+    m.m_translationYerror = v["translationYerror"].as_double();
+    m.m_translationZerror = v["translationZerror"].as_double();
+
+    return m;
+}
 void DesignElement::setSlopeError(SlopeError s) {
     v["SlopeError"] = Map();
     v["SlopeError"]["slopeErrorSag"] = s.m_sag;
@@ -108,5 +132,69 @@ void DesignElement::setMaterial(Material m) {
 
 Material DesignElement::getMaterial() const {
     return v["Material"].as_material();
+}
+
+
+void DesignElement::setDistancePreceding(double distance) {
+    v["distancePreceding"] = distance;
+}
+double DesignElement::getDistancePreceding() const {
+    return v["distancePreceding"].as_double();
+}
+
+void DesignElement::setTotalHeight(double height) {
+    v["totalHeight"] = height;
+}
+double DesignElement::getTotalHeight() const {
+    return v["totalHeight"].as_double();
+}
+
+void DesignElement::setOpeningShape(double shape) {
+    v["openingShape"] = shape;
+}
+double DesignElement::getOpeningShape() const {
+    return v["openingShape"].as_double();
+}
+
+void DesignElement::setOpeningWidth(double width) {
+    v["openingWidth"] = width;
+}
+double DesignElement::getOpeningWidth() const {
+    return v["openingWidth"].as_double();
+}
+
+void DesignElement::setOpeningHeight(double height) {
+    v["openingHeight"] = height;
+}
+double DesignElement::getOpeningHeight() const {
+    return v["openingHeight"].as_double();
+}
+
+void DesignElement::setCentralBeamstop(CentralBeamstop value) {
+    v["centralBeamstop"] = value;
+}
+CentralBeamstop DesignElement::getCentralBeamstop() const {
+    return v["centralBeamstop"].as_centralBeamStop();
+}
+
+void DesignElement::setStopWidth(double width) {
+    v["stopWidth"] = width;
+}
+double DesignElement::getStopWidth() const {
+    return v["stopWidth"].as_double();
+}
+
+void DesignElement::setStopHeight(double height) {
+    v["stopHeight"] = height;
+}
+double DesignElement::getStopHeight() const {
+    return v["stopHeight"].as_double();
+}
+
+void DesignElement::setTotalWidth(double width) {
+    v["totalWidth"] = width;
+}
+double DesignElement::getTotalWidth() const {
+    return v["totalWidth"].as_double();
 }
 }  // namespace RAYX

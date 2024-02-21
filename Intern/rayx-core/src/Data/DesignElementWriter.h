@@ -13,39 +13,33 @@ namespace RAYX {
 
 void setAllMandatory(xml::Parser parser, DesignElement* de) {
     de->setName(parser.name());
+
+    de->setWorldPosition(parser.parsePosition());
+    de->setWorldOrientation(parser.parseOrientation());
+    de->setMisalignment(parser.parseMisalignment());
+
     de->setSlopeError(parser.parseSlopeError());
     de->setAzimuthalAngle(parser.parseAzimuthalAngle());
     de->setMaterial(parser.parseMaterial());
 }
-void getMisalignment(xml::Parser parser, DesignElement* de, Value map) {
-    map["rotationXerror"] = parser.parseMisalignment().m_rotationXerror.rad;
-    map["rotationYerror"] = parser.parseMisalignment().m_rotationYerror.rad;
-    map["rotationZerror"] = parser.parseMisalignment().m_rotationZerror.rad;
-
-    map["translationXerror"] = parser.parseMisalignment().m_translationXerror;
-    map["translationYerror"] = parser.parseMisalignment().m_translationYerror;
-    map["translationZerror"] = parser.parseMisalignment().m_translationZerror;
-}
 
 void getImageplane(xml::Parser parser, DesignElement* de, Value map) {
     setAllMandatory(parser, de);
-    de->setWorldPosition(parser.parsePosition());
-    de->setWorldOrientation(parser.parseOrientation());
 }
+
 void getSlit(xml::Parser parser, DesignElement* de, Value map) {
-    const char* CentralBeamStop[] = {"None", "Rectangle", "Elliptical"};
     
 
-    map["openingShape"] = parser.parseOpeningShape();
-    map["openingWidth"] = parser.parseOpeningWidth();
-    map["openingHeight"] = parser.parseOpeningHeight();
-    map["centralBeamstop"] = CentralBeamStop[(int)parser.parseCentralBeamstop()];
-    map["stopWidth"] = parser.parseTotalWidthStop();
-    map["stopHeight"] = parser.parseTotalHeightStop();
-    map["totalWidth"] = parser.parseTotalWidth();
-    map["totalHeight"] = parser.parseTotalHeight();
-    map["distancePreceding"] = parser.parseDistancePreceding();
-    map["azimuthalAngle"] = parser.parseAzimuthalAngle().rad;
+    de->setOpeningShape(parser.parseOpeningShape());
+    de->setOpeningWidth(parser.parseOpeningWidth());
+    de->setOpeningHeight(parser.parseOpeningHeight());
+    de->setCentralBeamstop(parser.parseCentralBeamstop());
+    de->setStopWidth(parser.parseTotalWidthStop());
+    de->setStopHeight(parser.parseTotalHeightStop());
+    de->setTotalWidth(parser.parseTotalWidth());
+    de->setTotalHeight(parser.parseTotalHeight());
+    de->setDistancePreceding(parser.parseDistancePreceding());
+
 
     Cutout myCutout = parser.parseCutout(DesignPlane::XY);
     map["geometricalShape"]["type"] = myCutout.m_type;
@@ -65,10 +59,7 @@ void getSlit(xml::Parser parser, DesignElement* de, Value map) {
     }
 
     de->v = map;
-    de->setName(parser.name());
-    de->setWorldPosition(parser.parsePosition());
-    de->setWorldOrientation(parser.parseOrientation());
-    getMisalignment(parser, de, map);
+    setAllMandatory(parser, de);
 
 }
 
