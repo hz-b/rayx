@@ -1,10 +1,9 @@
-#pragma once 
+#pragma once
 
-#include <variant>
 #include <unordered_map>
+#include <variant>
 
-
-namespace RAYX{
+namespace RAYX {
 
 enum class ValueType {
     Undefined,
@@ -23,8 +22,7 @@ class Value;
 using Map = std::unordered_map<std::string, Value>;
 
 class Value {
-    public:
-
+  public:
     Value() : m_variant(Undefined()) {}
     Value(double x) : m_variant(x) {}
     Value(int x) : m_variant(x) {}
@@ -44,19 +42,13 @@ class Value {
 
     inline ValueType type() const {
         const ValueType types[] = {
-                                    ValueType::Undefined, 
-                                    ValueType::Double, 
-                                    ValueType::Int, 
-                                    ValueType::Bool, 
-                                    ValueType::String, 
-                                    ValueType::Map,
-                                    ValueType::Dvec4, 
-                                    ValueType::Dmat4x4, 
+            ValueType::Undefined, ValueType::Double, ValueType::Int,   ValueType::Bool,
+            ValueType::String,    ValueType::Map,    ValueType::Dvec4, ValueType::Dmat4x4,
         };
         return types[m_variant.index()];
     }
 
-    inline double as_double() {
+    inline double as_double() const {
         auto* x = std::get_if<double>(&m_variant);
         if (!x) throw std::runtime_error("as_double() called on non-double!");
         return *x;
@@ -99,18 +91,18 @@ class Value {
     }
 
     const Value& operator[](std::string s) const {
-        const Map *m = std::get_if<Map>(&m_variant);
+        const Map* m = std::get_if<Map>(&m_variant);
         if (!m) throw std::runtime_error("Indexing into non-map!");
-        return (*m).at(s); //TODO return undefined on missing
+        return (*m).at(s);  // TODO return undefined on missing
     }
 
     Value& operator[](std::string s) {
-        Map *m = std::get_if<Map>(&m_variant);
+        Map* m = std::get_if<Map>(&m_variant);
         if (!m) throw std::runtime_error("Indexing into non-map!");
         return (*m)[s];
     }
 
-    private:
+  private:
     std::variant<Undefined, double, int, std::string, Map, glm::dvec4, glm::dmat4x4, bool> m_variant;
 };
-}
+}  // namespace RAYX

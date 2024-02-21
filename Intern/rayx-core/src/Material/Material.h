@@ -31,8 +31,8 @@ enum class Material {
 bool materialFromString(const char* matname, Material* out);
 
 struct RAYX_API MaterialTables {
-    std::vector<double> materialTable; // called "inv_mat" in the shader.
-    std::vector<int> indexTable; // called "inv_matIdx" in the shader.
+    std::vector<double> materialTable;  // called "inv_mat" in the shader.
+    std::vector<int> indexTable;        // called "inv_matIdx" in the shader.
 };
 
 // the following function loads the Palik & Nff tables.

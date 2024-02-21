@@ -12,56 +12,52 @@
 #include "Debug/Instrumentor.h"
 #include "DesignElementWriter.h"
 
-
 DesignElement parseElement(xml::Parser parser) {
     DesignElement de;
     const char* type = parser.type();
     Value map = Map();
     de.v = map;
-    //TODO add functions for each Element 
+    // TODO add functions for each Element
 
     if (strcmp(type, "ImagePlane") == 0) {
         getImageplane(parser, &de, map);
     } else if (strcmp(type, "Plane Mirror") == 0) {
-        //addDesignElement(node);
+        // addDesignElement(node);
     } else if (strcmp(type, "Toroid") == 0) {
-        //addDesignElement(node);
+        // addDesignElement(node);
     } else if (strcmp(type, "Slit") == 0) {
         getSlit(parser, &de, map);
     } else if (strcmp(type, "Spherical Grating") == 0) {
-        //addDesignElement(node);
+        // addDesignElement(node);
     } else if (strcmp(type, "Plane Grating") == 0) {
-        //addDesignElement(node);
+        // addDesignElement(node);
     } else if (strcmp(type, "Sphere") == 0) {
-        //addDesignElement(node);
+        // addDesignElement(node);
     } else if (strcmp(type, "Reflection Zoneplate") == 0) {
-        //addDesignElement(node);
+        // addDesignElement(node);
     } else if (strcmp(type, "Ellipsoid") == 0) {
-        //addDesignElement(node);
+        // addDesignElement(node);
     } else if (strcmp(type, "Cylinder") == 0) {
-        //addDesignElement(node);
+        // addDesignElement(node);
     } else if (strcmp(type, "Cone") == 0) {
-        //addDesignElement(node);
+        // addDesignElement(node);
     } else if (strcmp(type, "Paraboloid") == 0) {
-        //addDesignElement(node);
+        // addDesignElement(node);
     } else if (strcmp(type, "Experts Optics") == 0) {
-        //addDesignElement(node);
+        // addDesignElement(node);
     } else if (strcmp(type, "Experts Cubic") == 0) {
-        //addDesignElement(node);
+        // addDesignElement(node);
     } else {
-        RAYX_WARN << "could not classify beamline object with Name: " << parser.name()
-                  << "; Type: " << parser.type();
+        RAYX_WARN << "could not classify beamline object with Name: " << parser.name() << "; Type: " << parser.type();
     }
 
     return de;
 }
 
-
 namespace RAYX {
 
 void addBeamlineObjectFromXML(rapidxml::xml_node<>* node, Beamline* beamline, const std::vector<xml::Group>& group_context,
                               std::filesystem::path filename) {
-
     // the following three blocks of code are lambda expressions (see
     // https://en.cppreference.com/w/cpp/language/lambda) They define functions
     // to be used in the if-else-chain below to keep it structured and readable.
@@ -100,8 +96,6 @@ void addBeamlineObjectFromXML(rapidxml::xml_node<>* node, Beamline* beamline, co
         DesignElement de = parseElement(parser);
         beamline->m_DesignElements.push_back(de);
     }
-    
-    
 }
 
 // `collection` is an xml object, over whose children-objects we want to

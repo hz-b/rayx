@@ -8,8 +8,15 @@ namespace RAYX {
 glm::dmat4x4 defaultInMatrix(const DesignObject& dobj, DesignPlane plane) {
     return calcTransformationMatrices(dobj.parsePosition(), dobj.parseOrientation(), true, plane);
 }
+glm::dmat4x4 defaultInMatrixEle(const DesignElement& dele, DesignPlane plane) {
+    return calcTransformationMatrices(dele.getWorldPosition(), dele.getWorldOrientation(), true, plane);
+}
+
 glm::dmat4x4 defaultOutMatrix(const DesignObject& dobj, DesignPlane plane) {
     return calcTransformationMatrices(dobj.parsePosition(), dobj.parseOrientation(), false, plane);
+}
+glm::dmat4x4 defaultOutMatrixEle(const DesignElement& dele, DesignPlane plane) {
+    return calcTransformationMatrices(dele.getWorldPosition(), dele.getWorldOrientation(), false, plane);
 }
 
 /**
@@ -110,9 +117,25 @@ Element makeElement(const DesignObject& dobj, Behaviour behaviour, Surface surfa
     };
 }
 
-Element makeDesElement(const DesignElement& dobj, Behaviour behaviour, Surface surface, std::optional<Cutout> cutout, DesignPlane plane) {
-    //TODO everything
-    return Element{};
+Element makeDesElement(const DesignElement& dele, Behaviour behaviour, Surface surface, std::optional<Cutout> cutout, DesignPlane plane) {
+    if (!cutout) {
+        //cutout = dobj.parseCutout(plane);
+    }
+
+    auto inMat = defaultInMatrixEle(dele, plane);
+    auto outMat = defaultOutMatrixEle(dele, plane);
+
+    return Element {
+        .m_inTrans = inMat,
+        .m_outTrans = outMat,
+        .m_behaviour = behaviour,
+        .m_surface = surface,
+        .m_cutout = *cutout,
+        .m_slopeError = dele.getSlopeError(),
+        .m_azimuthalAngle = 2,//dobj.parseAzimuthalAngle().rad,
+        .m_material = (double)static_cast<int>(Material::Cu),// defaultMaterial(dobj),
+        .m_padding = {0.0},
+    };
 }
 
 Element makeExperts(const DesignObject& dobj) {

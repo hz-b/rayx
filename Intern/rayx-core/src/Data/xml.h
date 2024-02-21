@@ -10,7 +10,6 @@
 #include "Shader/Constants.h"
 #include "Shader/Element.h"
 #include "angle.h"
-//#include "DesignElement/DesignElement.h"
 
 // the direction of a plane, either XY or XZ. This is only used in the parsing.
 // Inside of the shader, every plane-shaped object lies in its XZ plane.

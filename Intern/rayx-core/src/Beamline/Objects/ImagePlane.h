@@ -1,8 +1,9 @@
 #pragma once
 #include "Beamline/OpticalElement.h"
+#include "DesignElement/DesignElement.h"
 
 namespace RAYX {
-
-Element makeImagePlane(const DesignElement& dobj);
+struct DesignElement; //TODO Fanny see where the forward declaration has to go
+Element makeImagePlane(const DesignElement& dele);
 
 }  // namespace RAYX
