@@ -5,10 +5,12 @@
 namespace RAYX {
 Element DesignElement::compile() const {
     Element e;
-    if (this->getName() == "ImagePlane") {
+    if (v["name"].as_string() == "ImagePlane") {
         e = makeImagePlane(*this);
     } else if (v["name"].as_string() == "Slit") {
-        // makeSlit();
+        e = makeSlit(*this);
+    }else if (v["name"].as_string() == "Cone") {
+        e = makeCone(*this);
     }
     return e;
 }
@@ -119,15 +121,15 @@ SlopeError DesignElement::getSlopeError() const {
 
 void DesignElement::setCutout(Cutout c) {
     v["geometricalShape"] = c.m_type;
-    if (c.m_type == 0) {
+    if (c.m_type == CTYPE_RECT) {
         RectCutout rect = deserializeRect(c);
         v["CutoutWidth"] = rect.m_width;
         v["CutoutLength"] = rect.m_length;
-    } else if (c.m_type == 1) {
+    } else if (c.m_type == CTYPE_ELLIPTICAL) {
         EllipticalCutout elli = deserializeElliptical(c);
         v["CutoutDiameterX"] = elli.m_diameter_x;
         v["CutoutDiameterZ"] = elli.m_diameter_z;
-    } else if (c.m_type == 2) {
+    } else if (c.m_type == CTYPE_TRAPEZOID) {
         TrapezoidCutout trapi = deserializeTrapezoid(c);
         v["CutoutWidthA"] = trapi.m_widthA;
         v["CutoutWidthB"] = trapi.m_widthB;
@@ -139,17 +141,17 @@ Cutout DesignElement::getCutout() const {
 
     c.m_type = v["geometricalShape"].as_double();
 
-    if (c.m_type == 0) { // Rectangle
+    if (c.m_type == CTYPE_RECT) { // Rectangle
         RectCutout rect;
         rect.m_width = v["CutoutWidth"].as_double();
         rect.m_length = v["CutoutLength"].as_double();
         c = serializeRect(rect);
-    } else if (c.m_type == 1) { //Ellipsoid
+    } else if (c.m_type == CTYPE_ELLIPTICAL) { //Ellipsoid
         EllipticalCutout elli;
         elli.m_diameter_x = v["CutoutDiameterX"].as_double();
         elli.m_diameter_z = v["CutoutDiameterZ"].as_double();
         c = serializeElliptical(elli);
-    } else if (c.m_type == 2) { //Trapezoid
+    } else if (c.m_type == CTYPE_TRAPEZOID) { //Trapezoid
         TrapezoidCutout trapi;
         trapi.m_widthA = v["CutoutWidthA"].as_double();
         trapi.m_widthB = v["CutoutWidthB"].as_double();
@@ -192,12 +194,8 @@ double DesignElement::getTotalHeight() const {
     return v["totalHeight"].as_double();
 }
 
-void DesignElement::setOpeningShape(double shape) {
-    v["openingShape"] = shape;
-}
-double DesignElement::getOpeningShape() const {
-    return v["openingShape"].as_double();
-}
+void DesignElement::setOpeningShape(double shape) { v["openingShape"] = shape;}
+double DesignElement::getOpeningShape() const { return v["openingShape"].as_double();}
 
 void DesignElement::setOpeningWidth(double width) {
     v["openingWidth"] = width;
@@ -240,4 +238,56 @@ void DesignElement::setTotalWidth(double width) {
 double DesignElement::getTotalWidth() const {
     return v["totalWidth"].as_double();
 }
+
+void DesignElement::setProfileKind(int value) {
+    v["profileKind"] = value;
+}
+
+int DesignElement::getProfileKind() const {
+    return v["profileKind"].as_int();
+}
+
+    // Setter and Getter for profileFile
+void DesignElement::setProfileFile(double filePath) {
+    v["profileFile"] = filePath;
+}
+
+double DesignElement::getProfileFile() const {
+    return v["profileFile"].as_double();
+}
+
+void DesignElement::setTotalLength(double value) {
+    v["totalLength"] = value;
+}
+double DesignElement::getTotalLength() const {
+    return v["totalLength"].as_double();
+}
+
+// Setter and Getter for grazingIncAngle
+void DesignElement::setGrazingIncAngle(Rad value) {
+    v["grazingIncAngle"] = value;
+}
+
+Rad DesignElement::getGrazingIncAngle() const {
+    return v["grazingIncAngle"].as_rad();
+}
+
+// Setter and Getter for entranceArmLength
+void DesignElement::setEntranceArmLength(double value) {
+    v["entranceArmLength"] = value;
+}
+
+double DesignElement::getEntranceArmLength() const {
+    return v["entranceArmLength"].as_double();
+}
+
+// Setter and Getter for exitArmLength
+void DesignElement::setExitArmLength(double value) {
+    v["exitArmLength"] = value;
+}
+
+double DesignElement::getExitArmLength() const {
+    return v["exitArmLength"].as_double();
+}
+
 }  // namespace RAYX

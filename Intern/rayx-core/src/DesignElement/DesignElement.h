@@ -62,5 +62,24 @@ struct DesignElement {
     void setTotalWidth(double width);
     double getTotalWidth() const;
 
+
+    void setProfileKind(int value);
+    int getProfileKind() const;
+
+    void setProfileFile(double value);
+    double getProfileFile() const;
+
+
+    void setTotalLength(double value);
+    double getTotalLength() const;
+
+    void setGrazingIncAngle(Rad value);
+    Rad getGrazingIncAngle() const;
+
+    void setEntranceArmLength(double value);
+    double getEntranceArmLength() const;
+
+    void setExitArmLength(double value);
+    double getExitArmLength() const;
 };
 }  // namespace RAYX

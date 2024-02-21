@@ -124,7 +124,7 @@ Element makeElement(const DesignObject& dobj, Behaviour behaviour, Surface surfa
 // temporary functions for the transition
 Element makeDesElement(const DesignElement& dele, Behaviour behaviour, Surface surface, std::optional<Cutout> cutout, DesignPlane plane) {
     if (!cutout) {
-        //cutout = dobj.parseCutout(plane);
+        cutout = dele.getCutout();
     }
 
     auto inMat = defaultInMatrixEle(dele, plane);

@@ -40,7 +40,7 @@ DesignElement parseElement(xml::Parser parser) {
     } else if (strcmp(type, "Cylinder") == 0) {
         // addDesignElement(node);
     } else if (strcmp(type, "Cone") == 0) {
-        // addDesignElement(node);
+        getCone(parser, &de);
     } else if (strcmp(type, "Paraboloid") == 0) {
         // addDesignElement(node);
     } else if (strcmp(type, "Experts Optics") == 0) {

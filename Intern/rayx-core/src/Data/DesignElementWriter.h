@@ -43,4 +43,15 @@ void getSlit(xml::Parser parser, DesignElement* de) {
     de->setCutout(parser.parseCutout(DesignPlane::XY));
 }
 
+
+void getCone(xml::Parser parser, DesignElement* de) {
+    setAllMandatory(parser, de);
+
+    de->setGrazingIncAngle(parser.parseGrazingIncAngle());
+    de->setEntranceArmLength(parser.parseEntranceArmLength());
+    de->setExitArmLength(parser.parseExitArmLength());
+    de->setTotalLength(parser.parseTotalLength());
+    de->setCutout(parser.parseCutout(DesignPlane::XZ));
+}
+
 }  // namespace RAYX
