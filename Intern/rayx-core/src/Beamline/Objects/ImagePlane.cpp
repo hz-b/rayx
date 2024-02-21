@@ -4,11 +4,11 @@
 
 namespace RAYX {
 
-Element makeImagePlane(const DesignElement& dobj) {
+Element makeImagePlane(const DesignElement& dele) {
     auto behaviour = serializeImagePlane();
     auto surface = serializePlaneXZ();
     auto cutout = serializeUnlimited();
-    return makeDesElement(dobj, behaviour, surface, cutout, DesignPlane::XY);
+    return makeDesElement(dele, behaviour, surface, cutout, DesignPlane::XY);
 }
 
 }  // namespace RAYX

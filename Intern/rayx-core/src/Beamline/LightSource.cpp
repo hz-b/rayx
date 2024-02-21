@@ -30,7 +30,7 @@ double LightSource::selectEnergy() const { return m_EnergyDistribution.selectEne
 
 double LightSource::calcPhotonWavelength(double photonEnergy) {
     // Energy Distribution Type : Values only
-    double photonWaveLength = photonEnergy == 0.0 ? 0 : inm2eV / photonEnergy; //i nm to eV
+    double photonWaveLength = photonEnergy == 0.0 ? 0 : inm2eV / photonEnergy;  // i nm to eV
     return photonWaveLength;
 }
 

@@ -8,8 +8,17 @@ namespace RAYX {
 glm::dmat4x4 defaultInMatrix(const DesignObject& dobj, DesignPlane plane) {
     return calcTransformationMatrices(dobj.parsePosition(), dobj.parseOrientation(), true, plane);
 }
+
 glm::dmat4x4 defaultOutMatrix(const DesignObject& dobj, DesignPlane plane) {
     return calcTransformationMatrices(dobj.parsePosition(), dobj.parseOrientation(), false, plane);
+}
+
+// temporary functions for the transition
+glm::dmat4x4 defaultInMatrixEle(const DesignElement& dele, DesignPlane plane) {
+    return calcTransformationMatrices(dele.getWorldPosition(), dele.getWorldOrientation(), true, plane);
+}
+glm::dmat4x4 defaultOutMatrixEle(const DesignElement& dele, DesignPlane plane) {
+    return calcTransformationMatrices(dele.getWorldPosition(), dele.getWorldOrientation(), false, plane);
 }
 
 /**
@@ -51,6 +60,8 @@ glm::dmat4 calcTransformationMatrices(glm::dvec4 position, glm::dmat4 orientatio
 }
 
 double defaultMaterial(const DesignObject& dobj) { return (double)static_cast<int>(dobj.parseMaterial()); }
+
+double defaultMaterialELe(const DesignElement& dele) { return (double)static_cast<int>(dele.getMaterial()); }
 
 Surface makePlane() {
     return serializePlaneXZ();
@@ -110,9 +121,26 @@ Element makeElement(const DesignObject& dobj, Behaviour behaviour, Surface surfa
     };
 }
 
-Element makeDesElement(const DesignElement& dobj, Behaviour behaviour, Surface surface, std::optional<Cutout> cutout, DesignPlane plane) {
-    //TODO everything
-    return Element{};
+// temporary functions for the transition
+Element makeDesElement(const DesignElement& dele, Behaviour behaviour, Surface surface, std::optional<Cutout> cutout, DesignPlane plane) {
+    if (!cutout) {
+        //cutout = dobj.parseCutout(plane);
+    }
+
+    auto inMat = defaultInMatrixEle(dele, plane);
+    auto outMat = defaultOutMatrixEle(dele, plane);
+
+    return Element {
+        .m_inTrans = inMat,
+        .m_outTrans = outMat,
+        .m_behaviour = behaviour,
+        .m_surface = surface,
+        .m_cutout = *cutout,
+        .m_slopeError = dele.getSlopeError(),
+        .m_azimuthalAngle = dele.getAzimuthalAngle().rad,
+        .m_material = defaultMaterialELe(dele),
+        .m_padding = {0.0},
+    };
 }
 
 Element makeExperts(const DesignObject& dobj) {

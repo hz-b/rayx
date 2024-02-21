@@ -13,6 +13,7 @@
 
 namespace RAYX {
 struct OpticalElement;
+struct DesignElement; //TODO Fanny see where the forward declaration has to go
 class LightSource;
 
 /*
