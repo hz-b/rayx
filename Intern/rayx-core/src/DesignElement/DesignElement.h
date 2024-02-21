@@ -32,6 +32,9 @@ struct DesignElement {
     void setMaterial(Material m);
     Material getMaterial() const;
 
+    void setCutout(Cutout c);
+    Cutout getCutout() const;
+
     void setDistancePreceding(double d);
     double getDistancePreceding() const;
 

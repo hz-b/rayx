@@ -17,7 +17,8 @@ enum class ValueType {
     Rad,
     Material,
     Misalignment,
-    CentralBeamStop
+    CentralBeamStop,
+    Cutout
 };
 
 class Undefined {};
@@ -39,9 +40,7 @@ class Value {
     Value(Material x) : m_variant(x) {}
     Value(Misalignment x) : m_variant(x) {}
     Value(CentralBeamstop x) : m_variant(x) {}
-
-
-
+    Value(Cutout x) : m_variant(x) {}
 
     void operator=(double x) { m_variant = x; }
     void operator=(int x) { m_variant = x; }
@@ -54,13 +53,15 @@ class Value {
     void operator=(Material x) { m_variant = x; }
     void operator=(Misalignment x) { m_variant = x; }
     void operator=(CentralBeamstop x) { m_variant = x; }
+    void operator=(Cutout x) { m_variant = x; }
 
 
     inline ValueType type() const {
         const ValueType types[] = {
             ValueType::Undefined, ValueType::Double,   ValueType::Int,          ValueType::Bool,
             ValueType::String,    ValueType::Map,      ValueType::Dvec4,        ValueType::Dmat4x4,
-            ValueType::Rad,       ValueType::Material, ValueType::Misalignment, ValueType::CentralBeamStop
+            ValueType::Rad,       ValueType::Material, ValueType::Misalignment, ValueType::CentralBeamStop,
+            ValueType::Cutout,
         };
         return types[m_variant.index()];
     }
@@ -131,6 +132,12 @@ class Value {
         return *x;
     }
 
+    inline Cutout as_cutout() const {
+        auto* x = std::get_if<Cutout>(&m_variant);
+        if (!x) throw std::runtime_error("as_cutout() called on non-cutout!");
+        return *x;
+    }
+
     const Value& operator[](std::string s) const {
         const Map* m = std::get_if<Map>(&m_variant);
         if (!m) throw std::runtime_error("Indexing into non-map!");
@@ -144,6 +151,6 @@ class Value {
     }
 
   private:
-    std::variant<Undefined, double, int, std::string, Map, glm::dvec4, glm::dmat4x4, bool, Rad, Material, Misalignment, CentralBeamstop> m_variant;
+    std::variant<Undefined, double, int, std::string, Map, glm::dvec4, glm::dmat4x4, bool, Rad, Material, Misalignment, CentralBeamstop, Cutout> m_variant;
 };
 }  // namespace RAYX

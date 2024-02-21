@@ -103,7 +103,6 @@ void DesignElement::setSlopeError(SlopeError s) {
     v["SlopeError"]["cylindricalBowingAmp"] = s.m_cylindricalBowingAmp;
     v["SlopeError"]["cylindricalBowingRadius"] = s.m_cylindricalBowingRadius;
 }
-
 SlopeError DesignElement::getSlopeError() const {
     SlopeError s;
     s.m_sag = v["SlopeError"]["slopeErrorSag"].as_double();
@@ -115,6 +114,50 @@ SlopeError DesignElement::getSlopeError() const {
     s.m_cylindricalBowingRadius = v["SlopeError"]["cylindricalBowingRadius"].as_double();
 
     return s;
+}
+
+
+void DesignElement::setCutout(Cutout c) {
+    v["geometricalShape"] = c.m_type;
+    if (c.m_type == 0) {
+        RectCutout rect = deserializeRect(c);
+        v["CutoutWidth"] = rect.m_width;
+        v["CutoutLength"] = rect.m_length;
+    } else if (c.m_type == 1) {
+        EllipticalCutout elli = deserializeElliptical(c);
+        v["CutoutDiameterX"] = elli.m_diameter_x;
+        v["CutoutDiameterZ"] = elli.m_diameter_z;
+    } else if (c.m_type == 2) {
+        TrapezoidCutout trapi = deserializeTrapezoid(c);
+        v["CutoutWidthA"] = trapi.m_widthA;
+        v["CutoutWidthB"] = trapi.m_widthB;
+        v["CutoutLength"] = trapi.m_length;
+    }
+}
+Cutout DesignElement::getCutout() const {
+    Cutout c;
+
+    c.m_type = v["geometricalShape"].as_double();
+
+    if (c.m_type == 0) { // Rectangle
+        RectCutout rect;
+        rect.m_width = v["CutoutWidth"].as_double();
+        rect.m_length = v["CutoutLength"].as_double();
+        c = serializeRect(rect);
+    } else if (c.m_type == 1) { //Ellipsoid
+        EllipticalCutout elli;
+        elli.m_diameter_x = v["CutoutDiameterX"].as_double();
+        elli.m_diameter_z = v["CutoutDiameterZ"].as_double();
+        c = serializeElliptical(elli);
+    } else if (c.m_type == 2) { //Trapezoid
+        TrapezoidCutout trapi;
+        trapi.m_widthA = v["CutoutWidthA"].as_double();
+        trapi.m_widthB = v["CutoutWidthB"].as_double();
+        trapi.m_length = v["CutoutLength"].as_double();
+        c = serializeTrapezoid(trapi);
+    }
+
+    return c;
 }
 
 
