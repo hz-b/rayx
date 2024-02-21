@@ -5,10 +5,10 @@
 
 namespace RAYX {
 
-Element makePlaneMirror(DesignObject& dobj) {
+Element makePlaneMirror(const DesignElement& dele) {
     auto behaviour = serializeMirror();
     auto surface = makePlane();
-    return makeElement(dobj, behaviour, surface);
+    return makeElement(dele, behaviour, surface);
 }
 
 }  // namespace RAYX

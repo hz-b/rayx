@@ -4,6 +4,8 @@
 namespace RAYX {
 
 enum class CylinderDirection { LongRadiusR, ShortRadiusRho };
-Element makeCylinder(const DesignObject& dobj);
+struct DesignElement; //TODO Fanny see where the forward declaration has to go
+
+Element makeCylinder(const DesignElement& dele);
 
 }  // namespace RAYX

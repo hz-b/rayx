@@ -21,32 +21,34 @@ DesignElement parseElement(xml::Parser parser) {
 
     if (strcmp(type, "ImagePlane") == 0) {
         getImageplane(parser, &de);
+    } else if (strcmp(type, "Cone") == 0) {
+        getCone(parser, &de);
+    } else if (strcmp(type, "Cylinder") == 0) {
+        getCylinder(parser, &de);
+    } else if (strcmp(type, "Ellipsoid") == 0) {
+        getEllipsoid(parser, &de);
+    } else if (strcmp(type, "Experts Optics") == 0) {
+        getExpertsOptics(parser, &de);
+    } else if (strcmp(type, "Experts Cubic") == 0) {
+        getExpertsCubic(parser, &de);
+    } else if (strcmp(type, "Paraboloid") == 0) {
+        getParaboloid(parser, &de);
+    } else if (strcmp(type, "Plane Grating") == 0) {
+        getPlaneGrating(parser, &de);
     } else if (strcmp(type, "Plane Mirror") == 0) {
-        // addDesignElement(node);
-    } else if (strcmp(type, "Toroid") == 0) {
-        // addDesignElement(node);
+        getPlaneMirror(parser, &de);
+    } else if (strcmp(type, "Reflection Zoneplate") == 0) {
+        getRZP(parser, &de);
     } else if (strcmp(type, "Slit") == 0) {
         getSlit(parser, &de);
     } else if (strcmp(type, "Spherical Grating") == 0) {
-        // addDesignElement(node);
-    } else if (strcmp(type, "Plane Grating") == 0) {
-        // addDesignElement(node);
+        getSphereGrating(parser, &de);
     } else if (strcmp(type, "Sphere") == 0) {
-        // addDesignElement(node);
-    } else if (strcmp(type, "Reflection Zoneplate") == 0) {
-        // addDesignElement(node);
-    } else if (strcmp(type, "Ellipsoid") == 0) {
-        // addDesignElement(node);
-    } else if (strcmp(type, "Cylinder") == 0) {
-        // addDesignElement(node);
-    } else if (strcmp(type, "Cone") == 0) {
-        // addDesignElement(node);
-    } else if (strcmp(type, "Paraboloid") == 0) {
-        // addDesignElement(node);
-    } else if (strcmp(type, "Experts Optics") == 0) {
-        // addDesignElement(node);
-    } else if (strcmp(type, "Experts Cubic") == 0) {
-        // addDesignElement(node);
+        getSphereMirror(parser, &de);
+    } else if (strcmp(type, "Spherical Mirror") == 0) {
+        getSphereMirror(parser, &de);
+    } else if (strcmp(type, "Toroid") == 0) {
+        getToroidMirror(parser, &de);
     } else {
         RAYX_WARN << "could not classify beamline object with Name: " << parser.name() << "; Type: " << parser.type();
     }
