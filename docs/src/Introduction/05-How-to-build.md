@@ -1,53 +1,63 @@
 # How to Build
 
-For building and running the project, we recommend to use [Visual Studio Code](https://code.visualstudio.com/) as your IDE with these extensions: C/C++ and CMake Tools.
-You can use any IDE you like, but the VSCode extensions make the building process very easy.
-If you are on UNIX you can also use the `compile.sh` script to compile.
+For building and running the project, we recommend using [Visual Studio Code](https://code.visualstudio.com/) (VSCode) as your IDE, along with the C/C++ and CMake Tools extensions. These extensions significantly simplify the building process. However, you are free to use any IDE of your choice. If you are on a UNIX-like system, the `compile.sh` script can be used for compilation.
 
-Clone the git repository with:
-`git clone --recurse-submodules git@github.com:hz-b/rayx.git -b development`
+## Cloning the Repository
 
-or:
-`git clone --recurse-submodules https://github.com/hz-b/rayx.git -b development`
+Clone the git repository by running one of the following commands:
 
-to get the dev branch and to make sure, you also clone all of it's submodules.
+- Using SSH:
+
+`git clone --recurse-submodules git@github.com:hz-b/rayx.git`
+
+- Using HTTPS:
+
+`git clone --recurse-submodules https://github.com/hz-b/rayx.git`
 
 ## On Windows
-- Install [CMake](https://cmake.org/download/)
-- Install [Vulkan](https://vulkan.lunarg.com/) for Windows (1.3 or newer)
-  - Make sure to check the Vulkan Memory Allocator option (not used yet, but likely in the future)
-- Install [HDF5](https://www.hdfgroup.org/downloads/hdf5/) library 
-- Install python3, python3-dev and python3-matplotlib 
-- We also recommend to use the MSVC compiler for Windows [Visual Studio](https://visualstudio.microsoft.com/de/downloads/) (2019 or newer)
 
-Known Issues:
-- Sometimes installing the VulkanSDK in the root directory of your drive causes problems. If you have problems with the VulkanSDK, try installing it in a different directory.
+### Prerequisites
+- Install [CMake](https://cmake.org/download/).
+- Install the [Vulkan SDK](https://vulkan.lunarg.com/sdk/home#windows) for Windows (at least version 1.3 or newer).
+- Install the [HDF5](https://www.hdfgroup.org/downloads/hdf5/) library.
+- Install Python3, python3-dev, and python3-matplotlib.
+- We recommend using the MSVC compiler for Windows, available through [Visual Studio](https://visualstudio.microsoft.com/downloads/) (2019 or newer).
 
-### VSCode
-- Open the project in VSCode, where you will be asked to select a build kit (gcc, etc.)
-- Also allow the CMake Extension to configure the project
-- Then you can click build in the bottom panel
+### Known Issues
+- Installing the VulkanSDK at the root directory of your drive may cause issues. If you encounter problems with the VulkanSDK, consider installing it in a different directory.
 
-You can also set a custom generator for cmake in the .vscode/settings.json file. Ninja is recommended for faster builds. In the following image you can see an example config for the generator in vscode.
+### Building with VSCode
+- Open the project in VSCode. You will be prompted to select a build kit (e.g., gcc).
+- Allow the CMake Extension to configure the project.
+- You can then build the project using the build button in the bottom panel.
+
+To use a custom generator for CMake, such as Ninja for faster builds, you can set it in the `.vscode/settings.json` file. The following is an example configuration for the generator in VSCode:
 ![](../../res/vscode_ninja_config.png)
 
-### Visual Sutdio
-- Open a terminal in the project folder
-- Run `cmake -S . -B build -G "Visual Studio 16 2019" -A x64 -DCMAKE_BUILD_TYPE=Release` (Replace with your Visual Studio version)
+### Building with Visual Studio
+- Open a terminal in the project folder.
+- Run the following command, replacing it with your version of Visual Studio:
+
+`cmake -S . -B build -G "Visual Studio 16 2019" -A x64 -DCMAKE_BUILD_TYPE=Release`
+
 
 ## On Ubuntu
-- Make sure you have cmake, gcc, gdb and make installed and on the latest version
-- Install Vulkan SDK from [here](https://vulkan.lunarg.com/sdk/home) (Under Linux -> Ubuntu Packages you can select a version)
-- Install python3, python3-dev and python3-matplotlib 
-- The project also uses [libhdf5](https://github.com/BlueBrain/HighFive). Make sure that you have the correct libraries _(Ubuntu and debian-based Distros)_ :  `apt update && apt -y install libblas-dev liblapack-dev libhdf5-dev`
-- Make sure that the libraries are installed at `/usr/include/hdf5/serial` and `/usr/lib/x86_64-linux-gnu/hdf5/serial`
+
+### Prerequisites
+- Ensure cmake, gcc, gdb, and make are installed and up to date.
+- Install the Vulkan SDK from [here](https://vulkan.lunarg.com/sdk/home). Select a version under Linux -> Ubuntu Packages.
+- Install Python3, python3-dev, and python3-matplotlib.
+- The project leverages [libhdf5](https://github.com/BlueBrain/HighFive) for data management and incorporates various other libraries for graphical user interfaces, linear algebra computations, and handling different aspects of the X11 window system. Install the necessary libraries with the following command:
+
+`apt update && apt -y install libblas-dev liblapack-dev libhdf5-dev libgtk-3-dev pkg-config libxi-dev libxcursor-dev libxinerama-dev libxrandr-dev`
+- Ensure the libraries are installed at `/usr/include/hdf5/serial` and `/usr/lib/x86_64-linux-gnu/hdf5/serial`.
 
 ## On Arch Linux
-- You can get all packages through pacman/yay/...
-- Specific instructions will be added later
 
-## Fedora
+Arch Linux users can obtain all necessary packages through pacman, yay, or other package managers. Specific instructions will be provided later.
 
-```
-sudo dnf install cmake gcc gdb vulkan vulkan-tools vulkan-validation-layers hdf5-devel ninja-build gcc-c++ vulkan-loader-devel glslc
-```
+## On Fedora
+
+To install the required packages on Fedora, run the following command:
+
+`sudo dnf install cmake gcc gdb vulkan vulkan-tools vulkan-validation-layers hdf5-devel ninja-build gcc-c++ vulkan-loader-devel glslc blas-devel lapack-devel gtk3-devel pkg-config libXi-devel libXcursor-devel libXinerama-devel libXrandr-devel`
