@@ -38,15 +38,17 @@ DesignElement parseElement(xml::Parser parser) {
     } else if (strcmp(type, "Plane Mirror") == 0) {
         getPlaneMirror(parser, &de);
     } else if (strcmp(type, "Reflection Zoneplate") == 0) {
-        // addDesignElement(node);
+        getRZP(parser, &de);
     } else if (strcmp(type, "Slit") == 0) {
         getSlit(parser, &de);
-    } else if (strcmp(type, "Sphere") == 0) {
-        // addDesignElement(node);
     } else if (strcmp(type, "Spherical Grating") == 0) {
         getSphereGrating(parser, &de);
+    } else if (strcmp(type, "Sphere") == 0) {
+        getSphereMirror(parser, &de);
+    } else if (strcmp(type, "Spherical Mirror") == 0) {
+        getSphereMirror(parser, &de);
     } else if (strcmp(type, "Toroid") == 0) {
-        // addDesignElement(node);
+        getToroidMirror(parser, &de);
     } else {
         RAYX_WARN << "could not classify beamline object with Name: " << parser.name() << "; Type: " << parser.type();
     }

@@ -43,7 +43,6 @@ void getSlit(xml::Parser parser, DesignElement* de) {
     de->setTotalWidth(parser.parseTotalWidth());
     de->setTotalHeight(parser.parseTotalHeight());
     de->setDistancePreceding(parser.parseDistancePreceding());
-    //de->setCutout(parser.parseCutout(DesignPlane::XY));
 }
 
 
@@ -54,7 +53,6 @@ void getCone(xml::Parser parser, DesignElement* de) {
     de->setEntranceArmLength(parser.parseEntranceArmLength());
     de->setExitArmLength(parser.parseExitArmLength());
     de->setTotalLength(parser.parseTotalLength());
-    //de->setCutout(parser.parseCutout(DesignPlane::XZ));
 }
 
 void getCylinder(xml::Parser parser, DesignElement* de) {
@@ -65,7 +63,6 @@ void getCylinder(xml::Parser parser, DesignElement* de) {
     de->setGrazingIncAngle(parser.parseGrazingIncAngle());
     de->setEntranceArmLength(parser.parseEntranceArmLength());
     de->setExitArmLength(parser.parseExitArmLength());
-    //de->setCutout(parser.parseCutout(DesignPlane::XZ));
 }
 
 void getEllipsoid(xml::Parser parser, DesignElement* de) {
@@ -80,7 +77,6 @@ void getEllipsoid(xml::Parser parser, DesignElement* de) {
     de->setEntranceArmLength(parser.parseEntranceArmLength());
     de->setExitArmLength(parser.parseExitArmLength());
 
-    //de->setCutout(parser.parseCutout(DesignPlane::XZ));
 }
 
 void getParaboloid(xml::Parser parser, DesignElement* de) {
@@ -92,30 +88,69 @@ void getParaboloid(xml::Parser parser, DesignElement* de) {
     de->setGrazingIncAngle(parser.parseGrazingIncAngle());
     de->setParameterA11(parser.parseParameterA11());
 
-    //de->setCutout(parser.parseCutout(DesignPlane::XZ));
 }
 
-
-void getPlaneGrating(xml::Parser parser, DesignElement* de) {
-    setAllMandatory(parser, de, DesignPlane::XZ);
+void getGrating(xml::Parser parser, DesignElement* de) {
 
     de->setVLSParameters(parser.parseVls());
     de->setLineDensity(parser.parseLineDensity());
-    de->setOrderDiffraction(parser.parseOrderDiffraction());
+    de->setOrderOfDiffraction(parser.parseOrderDiffraction());
+}
+
+void getPlaneGrating(xml::Parser parser, DesignElement* de) {
+    setAllMandatory(parser, de, DesignPlane::XZ);
+    getGrating(parser, de);
+}
+
+
+void getSphereGrating(xml::Parser parser, DesignElement* de) {
+    setAllMandatory(parser, de, DesignPlane::XZ);
+
+    de->setRadius(parser.parseRadius());
+    getGrating(parser, de);
 }
 
 void getPlaneMirror(xml::Parser parser, DesignElement* de) {
     setAllMandatory(parser, de, DesignPlane::XZ);
 }
 
-void getSphereGrating(xml::Parser parser, DesignElement* de) {
+void getSphereMirror(xml::Parser parser, DesignElement* de) {
     setAllMandatory(parser, de, DesignPlane::XZ);
 
-    de->setRadius(parser.parseRadius());
+    de->setGrazingIncAngle(parser.parseGrazingIncAngle());
+    de->setEntranceArmLength(parser.parseEntranceArmLength());
+    de->setExitArmLength(parser.parseExitArmLength());
+}
 
-    de->setVLSParameters(parser.parseVls());
-    de->setLineDensity(parser.parseLineDensity());
-    de->setOrderDiffraction(parser.parseOrderDiffraction());
+void getToroidMirror(xml::Parser parser, DesignElement* de) {
+    setAllMandatory(parser, de, DesignPlane::XZ);
+
+    de->setShortRadius(parser.parseShortRadius());
+    de->setLongRadius(parser.parseLongRadius());
+    
+}
+
+
+void getRZP(xml::Parser parser, DesignElement* de) {
+    setAllMandatory(parser, de, DesignPlane::XZ);
+
+    de->setFresnelZOffset(parser.parseFresnelZOffset());
+    de->setDesignMeridionalExitArmLength(parser.parseExitArmLengthMer());
+    de->setDesignMeridionalEntranceArmLength(parser.parseEntranceArmLengthMer());
+    de->setDesignSagittalEntranceArmLength(parser.parseEntranceArmLengthSag());
+    de->setDesignSagittalExitArmLength(parser.parseExitArmLengthSag());
+    de->setDesignEnergy(parser.parseDesignEnergy());
+    de->setLongRadius(parser.parseLongRadius());
+    de->setDesignOrderOfDiffraction(parser.parseDesignOrderDiffraction());
+    de->setOrderOfDiffraction(parser.parseOrderDiffraction());
+    de->setDesignAlphaAngle(parser.parseDesignAlphaAngle());
+    de->setDesignBetaAngle(parser.parseDesignBetaAngle());
+    de->setImageType(parser.parseImageType());
+    de->setCurvatureType(parser.parseCurvatureType());
+    de->setAdditionalOrder(parser.parseAdditionalOrder());
+    de->setShortRadius(parser.parseShortRadius());
+    de->setLongRadius(parser.parseLongRadius());
+    
 }
 
 }  // namespace RAYX

@@ -32,6 +32,15 @@ Element DesignElement::compile() const {
     }else if (v["name"].as_string() == "Spherical Grating") {
         e = makeSphereGrating(*this);
         std::cout << v["name"].as_string() << std::endl;
+    }else if (v["name"].as_string() == "Spherical Mirror") {
+        e = makeSphereMirror(*this);
+        std::cout << v["name"].as_string() << std::endl;
+    }else if (v["name"].as_string() == "Toroid") {
+        e = makeToroidMirror(*this);
+        std::cout << v["name"].as_string() << std::endl;
+    }else if (v["name"].as_string() == "Reflection Zoneplate") {
+        e = makeReflectionZonePlate(*this);
+        std::cout << v["name"].as_string() << std::endl;
     }
     return e;
 }
@@ -317,9 +326,79 @@ double DesignElement::getParameterPType() const { return v["parameter_P_type"].a
 void DesignElement::setLineDensity(double value) { v["lineDensity"] = value; }
 double DesignElement::getLineDensity() const { return v["lineDensity"].as_double(); }
 
-// Setter and Getter for orderDiffraction
-void DesignElement::setOrderDiffraction(double value) { v["orderDiffraction"] = value; }
-double DesignElement::getOrderDiffraction() const { return v["orderDiffraction"].as_double(); }
+void DesignElement::setShortRadius(double value) {
+    // Assuming v is the map where parameters are stored
+    v["shortRadius"] = value;
+}
 
+double DesignElement::getShortRadius() const {
+    // Assuming v is the map where parameters are stored
+    return v["shortRadius"].as_double();
+}
+
+// Setter and Getter for longRadius
+void DesignElement::setLongRadius(double value) {
+    // Assuming v is the map where parameters are stored
+    v["longRadius"] = value;
+}
+
+double DesignElement::getLongRadius() const {
+    // Assuming v is the map where parameters are stored
+    return v["longRadius"].as_double();
+}
+
+void DesignElement::setFresnelZOffset(double value) { v["FresnelZOffset"] = value; }
+double DesignElement::getFresnelZOffset() const { return v["FresnelZOffset"].as_double(); }
+
+void DesignElement::setDesignAlphaAngle(Rad value) { v["DesignAlphaAngle"] = value; }
+Rad DesignElement::getDesignAlphaAngle() const { return v["DesignAlphaAngle"].as_rad(); }
+
+void DesignElement::setDesignBetaAngle(Rad value) { v["DesignBetaAngle"] = value; }
+Rad DesignElement::getDesignBetaAngle() const { return v["DesignBetaAngle"].as_rad(); }
+
+void DesignElement::setDesignOrderOfDiffraction(double value) { v["DesignOrderDiffraction"] = value; }
+double DesignElement::getDesignOrderOfDiffraction() const { return v["DesignOrderDiffraction"].as_double(); }
+
+void DesignElement::setDesignEnergy(double value) { v["DesignEnergy"] = value; }
+double DesignElement::getDesignEnergy() const { return v["DesignEnergy"].as_double(); }
+
+void DesignElement::setDesignSagittalEntranceArmLength(double value) { v["DesignSagittalEntranceArmLength"] = value; }
+double DesignElement::getDesignSagittalEntranceArmLength() const { return v["DesignSagittalEntranceArmLength"].as_double(); }
+
+void DesignElement::setDesignSagittalExitArmLength(double value) { v["DesignSagittalExitArmLength"] = value; }
+double DesignElement::getDesignSagittalExitArmLength() const { return v["DesignSagittalExitArmLength"].as_double(); }
+
+void DesignElement::setDesignMeridionalEntranceArmLength(double value) { v["DesignMeridionalEntranceArmLength"] = value; }
+double DesignElement::getDesignMeridionalEntranceArmLength() const { return v["DesignMeridionalEntranceArmLength"].as_double(); }
+
+void DesignElement::setDesignMeridionalExitArmLength(double value) { v["DesignMeridionalExitArmLength"] = value; }
+double DesignElement::getDesignMeridionalExitArmLength() const { return v["DesignMeridionalExitArmLength"].as_double(); }
+
+void DesignElement::setOrderOfDiffraction(double value) { v["OrderDiffraction"] = value; }
+double DesignElement::getOrderOfDiffraction() const { return v["OrderDiffraction"].as_double(); }
+
+void DesignElement::setAdditionalOrder(int value) {
+    v["additionalOrder"] = value;
+}
+
+int DesignElement::getAdditionalOrder() const {
+    return v["additionalOrder"].as_int();
+}
+
+void DesignElement::setImageType(double value) {
+    v["imageType"] = value;
+}
+
+double DesignElement::getImageType() const {
+    return v["imageType"].as_double();
+}
+
+void DesignElement::setCurvatureType(CurvatureType value) {
+    v["curvatureType"] = value;
+}
+
+CurvatureType DesignElement::getCurvatureType() const {
+    return v["curvatureType"].as_curvatureType();
+}
 
 }  // namespace RAYX

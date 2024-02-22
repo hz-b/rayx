@@ -90,6 +90,13 @@ Surface makeToroid(const DesignObject& dobj) {
         .m_toroidType = TOROID_TYPE_CONCAVE,
     });
 }
+Surface makeToroidEle(const DesignElement& dele) {
+    return serializeToroid({
+        .m_longRadius = dele.getLongRadius(),
+        .m_shortRadius = dele.getShortRadius(),
+        .m_toroidType = TOROID_TYPE_CONCAVE,
+    });
+}
 
 Behaviour makeGrating(const DesignObject& dobj) {
     auto vls = dobj.parseVls();
@@ -105,7 +112,7 @@ Behaviour makeGratingEle(const DesignElement& dele) {
     return serializeGrating({
         .m_vls = {vls[0], vls[1], vls[2], vls[3], vls[4], vls[5]},
         .m_lineDensity = dele.getLineDensity(),
-        .m_orderOfDiffraction = dele.getOrderDiffraction(),
+        .m_orderOfDiffraction = dele.getOrderOfDiffraction(),
     });
 }
 

@@ -47,6 +47,7 @@ Element makeExperts(const DesignObject& dobj);
 Element makeExpertsCubic(const DesignObject& dobj);
 
 // creates a toroid from the parameters given in `dobj`.
+Surface makeToroidEle(const DesignElement& dele);
 Surface makeToroid(const DesignObject& dobj);
 
 // creates a quadric from the parameters given in `dobj`.
@@ -63,7 +64,7 @@ Surface makePlane();
 
 // creates a Grating Behaviour from the parameters given in `dobj`.
 Behaviour makeGrating(const DesignObject& dobj);
-// temporary
+//temporary
 Behaviour makeGratingEle(const DesignElement& dele);
 
 }  // namespace RAYX

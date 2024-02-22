@@ -123,8 +123,60 @@ struct DesignElement {
     void setLineDensity(double value);
     double getLineDensity() const;
 
-    // Setter and Getter for orderDiffraction
-    void setOrderDiffraction(double value);
-    double getOrderDiffraction() const;
+    void setShortRadius(double value);
+    double getShortRadius() const;
+
+    // Setter and Getter for longRadius
+    void setLongRadius(double value);
+    double getLongRadius() const;
+    
+    void setFresnelZOffset(double value);
+    double getFresnelZOffset() const;
+
+    // Setter and Getter for designAlphaAngle
+    void setDesignAlphaAngle(Rad value);
+    Rad getDesignAlphaAngle() const;
+
+    // Setter and Getter for designBetaAngle
+    void setDesignBetaAngle(Rad value);
+    Rad getDesignBetaAngle() const;
+
+    // Setter and Getter for designOrderOfDiffraction
+    void setDesignOrderOfDiffraction(double value);
+    double getDesignOrderOfDiffraction() const;
+
+    // Setter and Getter for designEnergy
+    void setDesignEnergy(double value);
+    double getDesignEnergy() const;
+
+    // Setter and Getter for designSagittalEntranceArmLength
+    void setDesignSagittalEntranceArmLength(double value);
+    double getDesignSagittalEntranceArmLength() const;
+
+    // Setter and Getter for designSagittalExitArmLength
+    void setDesignSagittalExitArmLength(double value);
+    double getDesignSagittalExitArmLength() const;
+
+    // Setter and Getter for designMeridionalEntranceArmLength
+    void setDesignMeridionalEntranceArmLength(double value);
+    double getDesignMeridionalEntranceArmLength() const;
+
+    // Setter and Getter for designMeridionalExitArmLength
+    void setDesignMeridionalExitArmLength(double value);
+    double getDesignMeridionalExitArmLength() const;
+
+    // Setter and Getter for orderOfDiffraction
+    void setOrderOfDiffraction(double value);
+    double getOrderOfDiffraction() const;
+
+    void setAdditionalOrder(int value);
+    int getAdditionalOrder() const;
+
+    void setImageType(double value);
+    double getImageType() const;
+
+    void setCurvatureType(CurvatureType value);
+    CurvatureType getCurvatureType() const;
+    
 };
 }  // namespace RAYX
