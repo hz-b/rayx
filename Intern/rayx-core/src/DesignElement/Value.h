@@ -18,7 +18,8 @@ enum class ValueType {
     Material,
     Misalignment,
     CentralBeamStop,
-    Cutout
+    Cutout,
+    CylinderDirection
 };
 
 class Undefined {};
@@ -41,6 +42,7 @@ class Value {
     Value(Misalignment x) : m_variant(x) {}
     Value(CentralBeamstop x) : m_variant(x) {}
     Value(Cutout x) : m_variant(x) {}
+    Value(CylinderDirection x) : m_variant(x) {}
 
     void operator=(double x) { m_variant = x; }
     void operator=(int x) { m_variant = x; }
@@ -54,14 +56,15 @@ class Value {
     void operator=(Misalignment x) { m_variant = x; }
     void operator=(CentralBeamstop x) { m_variant = x; }
     void operator=(Cutout x) { m_variant = x; }
+    void operator=(CylinderDirection x) { m_variant = x; }
 
 
     inline ValueType type() const {
         const ValueType types[] = {
-            ValueType::Undefined, ValueType::Double,   ValueType::Int,          ValueType::Bool,
+            ValueType::Undefined, ValueType::Double,   ValueType::Int,          ValueType::CylinderDirection,
             ValueType::String,    ValueType::Map,      ValueType::Dvec4,        ValueType::Dmat4x4,
             ValueType::Rad,       ValueType::Material, ValueType::Misalignment, ValueType::CentralBeamStop,
-            ValueType::Cutout,
+            ValueType::Cutout,    ValueType::Bool,
         };
         return types[m_variant.index()];
     }
@@ -138,6 +141,12 @@ class Value {
         return *x;
     }
 
+    inline CylinderDirection as_cylinderDirection() const {
+        auto* x = std::get_if<CylinderDirection>(&m_variant);
+        if (!x) throw std::runtime_error("as_cylinderDirection() called on non-cylinderDirection!");
+        return *x;
+    }
+
     const Value& operator[](std::string s) const {
         const Map* m = std::get_if<Map>(&m_variant);
         if (!m) throw std::runtime_error("Indexing into non-map!");
@@ -151,6 +160,6 @@ class Value {
     }
 
   private:
-    std::variant<Undefined, double, int, std::string, Map, glm::dvec4, glm::dmat4x4, bool, Rad, Material, Misalignment, CentralBeamstop, Cutout> m_variant;
+    std::variant<Undefined, double, int, std::string, Map, glm::dvec4, glm::dmat4x4, bool, Rad, Material, Misalignment, CentralBeamstop, Cutout, CylinderDirection> m_variant;
 };
 }  // namespace RAYX

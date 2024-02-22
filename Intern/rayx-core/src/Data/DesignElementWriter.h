@@ -54,4 +54,16 @@ void getCone(xml::Parser parser, DesignElement* de) {
     de->setCutout(parser.parseCutout(DesignPlane::XZ));
 }
 
+void getCylinder(xml::Parser parser, DesignElement* de) {
+    setAllMandatory(parser, de);
+
+    de->setBendingRadius(parser.parseBendingRadius());
+    de->setRadius(parser.parseRadius());
+    de->setGrazingIncAngle(parser.parseGrazingIncAngle());
+    de->setEntranceArmLength(parser.parseEntranceArmLength());
+    de->setExitArmLength(parser.parseExitArmLength());
+    de->setCutout(parser.parseCutout(DesignPlane::XZ));
+
+}
+
 }  // namespace RAYX
