@@ -11,7 +11,7 @@
 namespace RAYX {
 
 Element makeCylinder(const DesignElement& dele) {
-    auto cyl_direction = dele.getBendingRadius();
+    auto cyl_direction = dele.getRadiusDirection();
     auto radius = dele.getRadius();
     auto incidence = dele.getGrazingIncAngle();
     auto entranceArmLength = dele.getEntranceArmLength();

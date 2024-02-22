@@ -81,5 +81,12 @@ struct DesignElement {
 
     void setExitArmLength(double value);
     double getExitArmLength() const;
+
+    void setRadiusDirection(CylinderDirection value);
+    CylinderDirection getRadiusDirection() const;
+
+    // Setter and Getter for radius
+    void setRadius(double value);
+    double getRadius() const;
 };
 }  // namespace RAYX

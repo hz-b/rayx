@@ -7,19 +7,21 @@ Element DesignElement::compile() const {
     Element e;
     if (v["name"].as_string() == "ImagePlane") {
         e = makeImagePlane(*this);
+        std::cout << v["name"].as_string() << std::endl;
     } else if (v["name"].as_string() == "Slit") {
         e = makeSlit(*this);
+        std::cout << v["name"].as_string() << std::endl;
     }else if (v["name"].as_string() == "Cone") {
         e = makeCone(*this);
+        std::cout << v["name"].as_string() << std::endl;
+    }else if (v["name"].as_string() == "Cylinder") {
+        e = makeCylinder(*this);
+        std::cout << v["name"].as_string() << std::endl;
     }
     return e;
 }
 
-void DesignElement::setName(std::string s) {
-    v["name"] = s;
-    std::cout << s << std::endl;
-}
-
+void DesignElement::setName(std::string s) { v["name"] = s; }
 std::string DesignElement::getName() const { return v["name"].as_string(); }
 
 void DesignElement::setWorldPosition(glm::dvec4 p) {
@@ -161,133 +163,80 @@ Cutout DesignElement::getCutout() const {
 
     return c;
 }
+// Azimuthal Angle
+void DesignElement::setAzimuthalAngle(Rad r) { v["AzimuthalAngle"] = r; }
+Rad DesignElement::getAzimuthalAngle() const { return v["AzimuthalAngle"].as_rad(); }
 
+// Material
+void DesignElement::setMaterial(Material m) { v["Material"] = m; }
+Material DesignElement::getMaterial() const { return v["Material"].as_material(); }
 
-void DesignElement::setAzimuthalAngle(Rad r) {
-    v["AzimuthalAngle"] = r;
-}
+// Distance Preceding
+void DesignElement::setDistancePreceding(double distance) { v["distancePreceding"] = distance; }
+double DesignElement::getDistancePreceding() const { return v["distancePreceding"].as_double(); }
 
-Rad DesignElement::getAzimuthalAngle() const {
-    return v["AzimuthalAngle"].as_rad();
-}
+// Total Height
+void DesignElement::setTotalHeight(double height) { v["totalHeight"] = height; }
+double DesignElement::getTotalHeight() const { return v["totalHeight"].as_double(); }
 
-void DesignElement::setMaterial(Material m) {
-    v["Material"] = m;
-}
+// Opening Shape
+void DesignElement::setOpeningShape(double shape) { v["openingShape"] = shape; }
+double DesignElement::getOpeningShape() const { return v["openingShape"].as_double(); }
 
-Material DesignElement::getMaterial() const {
-    return v["Material"].as_material();
-}
+// Opening Width
+void DesignElement::setOpeningWidth(double width) { v["openingWidth"] = width; }
+double DesignElement::getOpeningWidth() const { return v["openingWidth"].as_double(); }
 
+// Opening Height
+void DesignElement::setOpeningHeight(double height) { v["openingHeight"] = height; }
+double DesignElement::getOpeningHeight() const { return v["openingHeight"].as_double(); }
 
-void DesignElement::setDistancePreceding(double distance) {
-    v["distancePreceding"] = distance;
-}
-double DesignElement::getDistancePreceding() const {
-    return v["distancePreceding"].as_double();
-}
+// Central Beamstop
+void DesignElement::setCentralBeamstop(CentralBeamstop value) { v["centralBeamstop"] = value; }
+CentralBeamstop DesignElement::getCentralBeamstop() const { return v["centralBeamstop"].as_centralBeamStop(); }
 
-void DesignElement::setTotalHeight(double height) {
-    v["totalHeight"] = height;
-}
-double DesignElement::getTotalHeight() const {
-    return v["totalHeight"].as_double();
-}
+// Stop Width
+void DesignElement::setStopWidth(double width) { v["stopWidth"] = width; }
+double DesignElement::getStopWidth() const { return v["stopWidth"].as_double(); }
 
-void DesignElement::setOpeningShape(double shape) { v["openingShape"] = shape;}
-double DesignElement::getOpeningShape() const { return v["openingShape"].as_double();}
+// Stop Height
+void DesignElement::setStopHeight(double height) { v["stopHeight"] = height; }
+double DesignElement::getStopHeight() const { return v["stopHeight"].as_double(); }
 
-void DesignElement::setOpeningWidth(double width) {
-    v["openingWidth"] = width;
-}
-double DesignElement::getOpeningWidth() const {
-    return v["openingWidth"].as_double();
-}
+// Total Width
+void DesignElement::setTotalWidth(double width) { v["totalWidth"] = width; }
+double DesignElement::getTotalWidth() const { return v["totalWidth"].as_double(); }
 
-void DesignElement::setOpeningHeight(double height) {
-    v["openingHeight"] = height;
-}
-double DesignElement::getOpeningHeight() const {
-    return v["openingHeight"].as_double();
-}
+// Profile Kind
+void DesignElement::setProfileKind(int value) { v["profileKind"] = value; }
+int DesignElement::getProfileKind() const { return v["profileKind"].as_int(); }
 
-void DesignElement::setCentralBeamstop(CentralBeamstop value) {
-    v["centralBeamstop"] = value;
-}
-CentralBeamstop DesignElement::getCentralBeamstop() const {
-    return v["centralBeamstop"].as_centralBeamStop();
-}
+// Profile File
+void DesignElement::setProfileFile(double filePath) { v["profileFile"] = filePath; }
+double DesignElement::getProfileFile() const { return v["profileFile"].as_double(); }
 
-void DesignElement::setStopWidth(double width) {
-    v["stopWidth"] = width;
-}
-double DesignElement::getStopWidth() const {
-    return v["stopWidth"].as_double();
-}
+// Total Length
+void DesignElement::setTotalLength(double value) { v["totalLength"] = value; }
+double DesignElement::getTotalLength() const { return v["totalLength"].as_double(); }
 
-void DesignElement::setStopHeight(double height) {
-    v["stopHeight"] = height;
-}
-double DesignElement::getStopHeight() const {
-    return v["stopHeight"].as_double();
-}
+// Grazing Inc Angle
+void DesignElement::setGrazingIncAngle(Rad value) { v["grazingIncAngle"] = value; }
+Rad DesignElement::getGrazingIncAngle() const { return v["grazingIncAngle"].as_rad(); }
 
-void DesignElement::setTotalWidth(double width) {
-    v["totalWidth"] = width;
-}
-double DesignElement::getTotalWidth() const {
-    return v["totalWidth"].as_double();
-}
+// Entrance Arm Length
+void DesignElement::setEntranceArmLength(double value) { v["entranceArmLength"] = value; }
+double DesignElement::getEntranceArmLength() const { return v["entranceArmLength"].as_double(); }
 
-void DesignElement::setProfileKind(int value) {
-    v["profileKind"] = value;
-}
+// Exit Arm Length
+void DesignElement::setExitArmLength(double value) { v["exitArmLength"] = value; }
+double DesignElement::getExitArmLength() const { return v["exitArmLength"].as_double(); }
 
-int DesignElement::getProfileKind() const {
-    return v["profileKind"].as_int();
-}
+// bendingRadius
+void DesignElement::setRadiusDirection(CylinderDirection value) { v["bendingRadius"] = value; }
+CylinderDirection DesignElement::getRadiusDirection() const { return v["bendingRadius"].as_cylinderDirection(); }
 
-    // Setter and Getter for profileFile
-void DesignElement::setProfileFile(double filePath) {
-    v["profileFile"] = filePath;
-}
-
-double DesignElement::getProfileFile() const {
-    return v["profileFile"].as_double();
-}
-
-void DesignElement::setTotalLength(double value) {
-    v["totalLength"] = value;
-}
-double DesignElement::getTotalLength() const {
-    return v["totalLength"].as_double();
-}
-
-// Setter and Getter for grazingIncAngle
-void DesignElement::setGrazingIncAngle(Rad value) {
-    v["grazingIncAngle"] = value;
-}
-
-Rad DesignElement::getGrazingIncAngle() const {
-    return v["grazingIncAngle"].as_rad();
-}
-
-// Setter and Getter for entranceArmLength
-void DesignElement::setEntranceArmLength(double value) {
-    v["entranceArmLength"] = value;
-}
-
-double DesignElement::getEntranceArmLength() const {
-    return v["entranceArmLength"].as_double();
-}
-
-// Setter and Getter for exitArmLength
-void DesignElement::setExitArmLength(double value) {
-    v["exitArmLength"] = value;
-}
-
-double DesignElement::getExitArmLength() const {
-    return v["exitArmLength"].as_double();
-}
+// radius
+void DesignElement::setRadius(double value) { v["radius"] = value; }
+double DesignElement::getRadius() const { return v["radius"].as_double(); }
 
 }  // namespace RAYX

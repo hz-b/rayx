@@ -28,7 +28,6 @@ void getImageplane(xml::Parser parser, DesignElement* de) {
 }
 
 void getSlit(xml::Parser parser, DesignElement* de) {
-    
     setAllMandatory(parser, de);
 
     de->setOpeningShape(parser.parseOpeningShape());
@@ -57,13 +56,12 @@ void getCone(xml::Parser parser, DesignElement* de) {
 void getCylinder(xml::Parser parser, DesignElement* de) {
     setAllMandatory(parser, de);
 
-    de->setBendingRadius(parser.parseBendingRadius());
+    de->setRadiusDirection(parser.parseBendingRadius());
     de->setRadius(parser.parseRadius());
     de->setGrazingIncAngle(parser.parseGrazingIncAngle());
     de->setEntranceArmLength(parser.parseEntranceArmLength());
     de->setExitArmLength(parser.parseExitArmLength());
     de->setCutout(parser.parseCutout(DesignPlane::XZ));
-
 }
 
 }  // namespace RAYX
