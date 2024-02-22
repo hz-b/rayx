@@ -17,6 +17,9 @@ Element DesignElement::compile() const {
     }else if (v["name"].as_string() == "Cylinder") {
         e = makeCylinder(*this);
         std::cout << v["name"].as_string() << std::endl;
+    }else if (v["name"].as_string() == "Ellipsoid") {
+        e = makeEllipsoid(*this);
+        std::cout << v["name"].as_string() << std::endl;
     }
     return e;
 }
@@ -238,5 +241,24 @@ CylinderDirection DesignElement::getRadiusDirection() const { return v["bendingR
 // radius
 void DesignElement::setRadius(double value) { v["radius"] = value; }
 double DesignElement::getRadius() const { return v["radius"].as_double(); }
+
+
+void DesignElement::setDesignGrazingIncAngle(Rad value) { v["designGrazingIncAngle"] = value; }
+Rad DesignElement::getDesignGrazingIncAngle() const { return v["designGrazingIncAngle"].as_rad(); }
+
+// Setter and Getter for longHalfAxisA
+void DesignElement::setLongHalfAxisA(double value) { v["longHalfAxisA"] = value; }
+double DesignElement::getLongHalfAxisA() const { return v["longHalfAxisA"].as_double(); }
+
+// Setter and Getter for shortHalfAxisB
+void DesignElement::setShortHalfAxisB(double value) { v["shortHalfAxisB"] = value; }
+double DesignElement::getShortHalfAxisB() const { return v["shortHalfAxisB"].as_double(); }
+
+void DesignElement::setParameterA11(double value) { v["parameter_a11"] = value; }
+double DesignElement::getParameterA11() const { return v["parameter_a11"].as_double(); }
+
+// Setter and Getter for figureRotation
+void DesignElement::setFigureRotation(FigureRotation value) { v["figureRotation"] = value; }
+FigureRotation DesignElement::getFigureRotation() const { return v["figureRotation"].as_figureRotation(); }
 
 }  // namespace RAYX

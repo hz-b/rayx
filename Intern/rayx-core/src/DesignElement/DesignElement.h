@@ -88,5 +88,23 @@ struct DesignElement {
     // Setter and Getter for radius
     void setRadius(double value);
     double getRadius() const;
+
+    void setDesignGrazingIncAngle(Rad value);
+    Rad getDesignGrazingIncAngle() const;
+
+    // Setter and Getter for longHalfAxisA
+    void setLongHalfAxisA(double value);
+    double getLongHalfAxisA() const;
+
+    // Setter and Getter for shortHalfAxisB
+    void setShortHalfAxisB(double value);
+    double getShortHalfAxisB() const;
+
+    void setParameterA11(double value);
+    double getParameterA11() const;
+
+    // Setter and Getter for figureRotation
+    void setFigureRotation(FigureRotation value);
+    FigureRotation getFigureRotation() const;
 };
 }  // namespace RAYX

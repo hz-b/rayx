@@ -26,7 +26,7 @@ DesignElement parseElement(xml::Parser parser) {
     } else if (strcmp(type, "Cylinder") == 0) {
         getCylinder(parser, &de);
     } else if (strcmp(type, "Ellipsoid") == 0) {
-        // addDesignElement(node);
+        getEllipsoid(parser, &de);
     } else if (strcmp(type, "Experts Optics") == 0) {
         // addDesignElement(node);
     } else if (strcmp(type, "Experts Cubic") == 0) {

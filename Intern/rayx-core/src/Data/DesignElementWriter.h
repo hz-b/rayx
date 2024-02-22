@@ -64,4 +64,19 @@ void getCylinder(xml::Parser parser, DesignElement* de) {
     de->setCutout(parser.parseCutout(DesignPlane::XZ));
 }
 
+void getEllipsoid(xml::Parser parser, DesignElement* de) {
+    setAllMandatory(parser, de);
+
+    de->setShortHalfAxisB(parser.parseShortHalfAxisB());
+    de->setLongHalfAxisA(parser.parseLongHalfAxisA());
+    de->setDesignGrazingIncAngle(parser.parseDesignGrazingIncAngle());
+    de->setFigureRotation(parser.parseFigureRotation());
+    de->setParameterA11(parser.parseParameterA11());
+    
+    de->setEntranceArmLength(parser.parseEntranceArmLength());
+    de->setExitArmLength(parser.parseExitArmLength());
+    de->setCutout(parser.parseCutout(DesignPlane::XZ));
+
+}
+
 }  // namespace RAYX
