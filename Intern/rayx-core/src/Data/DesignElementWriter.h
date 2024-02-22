@@ -108,5 +108,14 @@ void getPlaneMirror(xml::Parser parser, DesignElement* de) {
     setAllMandatory(parser, de, DesignPlane::XZ);
 }
 
+void getSphereGrating(xml::Parser parser, DesignElement* de) {
+    setAllMandatory(parser, de, DesignPlane::XZ);
+
+    de->setRadius(parser.parseRadius());
+
+    de->setVLSParameters(parser.parseVls());
+    de->setLineDensity(parser.parseLineDensity());
+    de->setOrderDiffraction(parser.parseOrderDiffraction());
+}
 
 }  // namespace RAYX

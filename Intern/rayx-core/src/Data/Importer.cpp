@@ -44,7 +44,7 @@ DesignElement parseElement(xml::Parser parser) {
     } else if (strcmp(type, "Sphere") == 0) {
         // addDesignElement(node);
     } else if (strcmp(type, "Spherical Grating") == 0) {
-        // addDesignElement(node);
+        getSphereGrating(parser, &de);
     } else if (strcmp(type, "Toroid") == 0) {
         // addDesignElement(node);
     } else {
