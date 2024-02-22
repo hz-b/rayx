@@ -2,7 +2,7 @@
 
 ## Interface
 
-![Alt text](../../res/RAYX-UI.png)
+![Alt text](../res/RAYX-UI.png)
 
 Th window in the image above is accessible in the RAYX-UI application once it's opened. The window provides additional options for adjusting the scene you're viewing. Most notably, the "Open File Dialog" button (indicated by a red arrow) opens a file dialog that allows you to load your .rml beamline file. Currently, the application expects the h5 file (RAYX output) to be located next to it. In the future, tracing functionality will be directly integrated into the interface.
 
@@ -21,6 +21,6 @@ In the visual representation, various colors are used to indicate specific condi
 
 - **Just Hit**: Rays that have just hit an element are represented in a yellow to orange gradient.
 - **Absorbed**: Rays that are absorbed by an element are depicted in red.
-- **Fly Off**: Rays that fly off into space are shown in grey.
+- **Other**: Rays created from other events are white (this most likely indicates an issue in the tracing)
 
 **Optical Elements**: Optical elements like slits or image planes are displayed in varying shades of blue, with the color gradient used to represent surface orientation.

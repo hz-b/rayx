@@ -11,6 +11,9 @@
 
 - [Model](./Model/Model.md)
     - [Optical Elements](./Model/OpticalElements/OpticalElements.md)
+        - [Light Sources](./Model/OpticalElements/LightSources.md)
+        - [Simple Undulator Source](./Model/OpticalElements/SimpleUndulatorSource.md)
+        - [Dipole Source](./Model/OpticalElements/DipoleSource.md)
         - [Reflection Zone Plate (RZP)](./Model/OpticalElements/RZP.md)
     - [User vs Model Parameter](./Model/User-vs-Model-Parameter.md)
     - [Ray generation](./Model/Ray-generation.md)

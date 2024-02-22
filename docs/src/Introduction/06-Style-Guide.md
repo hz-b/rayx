@@ -7,11 +7,11 @@ This document serves as a comprehensive style guide for the RAY project. It outl
 Write code with collective ownership in mind; the primary audience is your teammates, not just the compiler. The KISS (Keep It Stupid Simple) principle should be applied whenever possible.
 
 ## Includes
-To enhance readability, includes should be categorized as follows:: 
+To enhance readability, includes should be categorized as follows:
 
-`#include "internalHeader.h"`
+- `#include "internalHeader.h"`
 
-`#include <externalHeader.h>`
+- `#include <externalHeader.h>`
 
 Internal headers are those developed within the project, while external headers pertain to dependencies integrated into the project.
 
@@ -34,9 +34,9 @@ Prioritize frequent and precise commenting. Comments should be tailored to newco
 
 The objective is for header files to provide high-level documentation on API usage, while source files should contain more detailed documentation about implementation specifics.
 
-## Naming scheme
+## Naming Conventions
 
-As longer names can contain more than one word, it can help to have a visual divider. In the case of Ray-UI we use "camelCase" and "PascalCase". When to use what, will be in the next section. 
+As longer names can contain more than one word, it can help to have a visual divider. In the case of Ray-UI we use "camelCase" and "PascalCase". When to use what, will be explained in the "Classes, Function and Variables" subsection. 
 
 The upper case letter indicates a new word and thus improves readability. Every name should be able to stand alone and describe the object, function or variable. Something like "int v;" does not achieve this. This also means to avoid using abbreviations, besides the most common ones ("val" for "value" or "dx" for a distance over x).
 
@@ -50,9 +50,9 @@ Should the name get too long or cryptic, write a comment to clarify what you mea
 
 ### Boolean
 
-All Boolean values should begin with is/can/has/etc. when possible.
+Boolean values should begin with is/can/has/etc. when possible.
 
-## Classes, Function and Variables
+### Classes, Function and Variables
 
 Class and object names are written in "PascalCase". Functions and Variables are written in "camelCase".
 
@@ -61,30 +61,29 @@ e.g.:
 - "ClassA"
 - "functionB(int valueC, bool isD)"
 
-## Member
+### Member
 
 Member objects and variables of a class are indicated by an "m_", e.g. : 
 
 - m_MemberObject 
 - m_memberVariable
 
-## Static
-
-A static variable or object is indicated by an "s_", e.g. :
-
-- s_StaticObject
-- s_staticVariable
-
-
-
 ## Const Correctness
 
-Const correctness is the practice of using the `const` keyword to ensure that objects and variables remain immutable.
+Const correctness is the practice of using the `const` keyword to ensure that objects and variables remain immutable. Use `const` as the default. One exception: function parameters of trivial data types like `int`, `double`, etc.
 
 1. `void f1(const std::string& s);     ` *// Pass by reference-to-`const`*
 2. `void f2(const std::string* sptr);  ` *// Pass by pointer-to-`const`*
 3. `void f3(std::string s);            ` *// Pass by value*
 
-Employing const correctness from the project's inception is advisable, as it can simplify code maintenance and improve overall code quality.
+Employing const correctness from the start is advisable, as it can simplify code maintenance and improve overall code quality.
 
 Further reading on const correctness is highly recommended and can be found [here](https://isocpp.org/wiki/faq/const-correctness).
+
+## Pointer Usage Guidelines
+Raw pointers are discouraged except when interfacing with APIs that require them. Following are alternatives to raw pointers for specific use-cases.
+
+- **Smart Pointers**: Use `std::unique_ptr` and `std::shared_ptr` for managing dynamic memory.
+- **Optionality with `std::optional`**: Utilize `std::optional` for optional parameters or return types to explicitly indicate the absence of a value.
+- **Const C-Strings**: Raw C-strings (`const char*`) are acceptable only when necessary for compatibility with C APIs. Ensure they are `const` to prevent modification.
+- **Optimize Strings with `std::string_view`**: For performance-critical code, use `std::string_view` to pass strings by reference without ownership or copy.
