@@ -32,7 +32,7 @@ DesignElement parseElement(xml::Parser parser) {
     } else if (strcmp(type, "Experts Cubic") == 0) {
         // addDesignElement(node);
     } else if (strcmp(type, "Paraboloid") == 0) {
-        // addDesignElement(node);
+        getParaboloid(parser, &de);
     } else if (strcmp(type, "Plane Grating") == 0) {
         // addDesignElement(node);
     } else if (strcmp(type, "Plane Mirror") == 0) {

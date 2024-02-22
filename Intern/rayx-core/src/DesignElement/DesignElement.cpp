@@ -20,6 +20,9 @@ Element DesignElement::compile() const {
     }else if (v["name"].as_string() == "Ellipsoid") {
         e = makeEllipsoid(*this);
         std::cout << v["name"].as_string() << std::endl;
+    }else if (v["name"].as_string() == "Paraboloid") {
+        e = makeParaboloid(*this);
+        std::cout << v["name"].as_string() << std::endl;
     }
     return e;
 }
@@ -246,19 +249,31 @@ double DesignElement::getRadius() const { return v["radius"].as_double(); }
 void DesignElement::setDesignGrazingIncAngle(Rad value) { v["designGrazingIncAngle"] = value; }
 Rad DesignElement::getDesignGrazingIncAngle() const { return v["designGrazingIncAngle"].as_rad(); }
 
-// Setter and Getter for longHalfAxisA
+// longHalfAxisA
 void DesignElement::setLongHalfAxisA(double value) { v["longHalfAxisA"] = value; }
 double DesignElement::getLongHalfAxisA() const { return v["longHalfAxisA"].as_double(); }
 
-// Setter and Getter for shortHalfAxisB
+// shortHalfAxisB
 void DesignElement::setShortHalfAxisB(double value) { v["shortHalfAxisB"] = value; }
 double DesignElement::getShortHalfAxisB() const { return v["shortHalfAxisB"].as_double(); }
 
 void DesignElement::setParameterA11(double value) { v["parameter_a11"] = value; }
 double DesignElement::getParameterA11() const { return v["parameter_a11"].as_double(); }
 
-// Setter and Getter for figureRotation
+// figureRotation
 void DesignElement::setFigureRotation(FigureRotation value) { v["figureRotation"] = value; }
 FigureRotation DesignElement::getFigureRotation() const { return v["figureRotation"].as_figureRotation(); }
+
+// armLength
+void DesignElement::setArmLength(double value) { v["armLength"] = value; }
+double DesignElement::getArmLength() const { return v["armLength"].as_double(); }
+
+//parameter_P
+void DesignElement::setParameterP(double value) { v["parameter_P"] = value; }
+double DesignElement::getParameterP() const { return v["parameter_P"].as_double(); }
+
+//parameter_P_type
+void DesignElement::setParameterPType(double value) { v["parameter_P_type"] = value; }
+double DesignElement::getParameterPType() const { return v["parameter_P_type"].as_double(); }
 
 }  // namespace RAYX

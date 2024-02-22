@@ -106,5 +106,14 @@ struct DesignElement {
     // Setter and Getter for figureRotation
     void setFigureRotation(FigureRotation value);
     FigureRotation getFigureRotation() const;
+
+    void setArmLength(double value);
+    double getArmLength() const;
+
+    void setParameterP(double value);
+    double getParameterP() const;
+
+    void setParameterPType(double value);
+    double getParameterPType() const;
 };
 }  // namespace RAYX

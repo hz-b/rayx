@@ -3,7 +3,8 @@
 
 namespace RAYX {
 
+struct DesignElement;
 enum class ParaboloidDirection { LongRadiusR, ShortRadiusRho };
-Element makeParaboloid(const DesignObject& dobj);
+Element makeParaboloid(const DesignElement& dele);
 
 }  // namespace RAYX

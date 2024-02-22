@@ -72,11 +72,23 @@ void getEllipsoid(xml::Parser parser, DesignElement* de) {
     de->setDesignGrazingIncAngle(parser.parseDesignGrazingIncAngle());
     de->setFigureRotation(parser.parseFigureRotation());
     de->setParameterA11(parser.parseParameterA11());
-    
+
     de->setEntranceArmLength(parser.parseEntranceArmLength());
     de->setExitArmLength(parser.parseExitArmLength());
-    de->setCutout(parser.parseCutout(DesignPlane::XZ));
 
+    de->setCutout(parser.parseCutout(DesignPlane::XZ));
+}
+
+void getParaboloid(xml::Parser parser, DesignElement* de) {
+    setAllMandatory(parser, de);
+
+    de->setArmLength(parser.parseArmLength());
+    de->setParameterP(parser.parseParameterP());
+    de->setParameterPType(parser.parseParameterPType());
+    de->setGrazingIncAngle(parser.parseGrazingIncAngle());
+    de->setParameterA11(parser.parseParameterA11());
+
+    de->setCutout(parser.parseCutout(DesignPlane::XZ));
 }
 
 }  // namespace RAYX
