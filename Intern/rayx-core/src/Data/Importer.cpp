@@ -34,7 +34,7 @@ DesignElement parseElement(xml::Parser parser) {
     } else if (strcmp(type, "Paraboloid") == 0) {
         getParaboloid(parser, &de);
     } else if (strcmp(type, "Plane Grating") == 0) {
-        // addDesignElement(node);
+        getPlaneGrating(parser, &de);
     } else if (strcmp(type, "Plane Mirror") == 0) {
         // addDesignElement(node);
     } else if (strcmp(type, "Reflection Zoneplate") == 0) {

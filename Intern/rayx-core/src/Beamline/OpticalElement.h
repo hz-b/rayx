@@ -63,5 +63,7 @@ Surface makePlane();
 
 // creates a Grating Behaviour from the parameters given in `dobj`.
 Behaviour makeGrating(const DesignObject& dobj);
+// temporary
+Behaviour makeGratingEle(const DesignElement& dele);
 
 }  // namespace RAYX

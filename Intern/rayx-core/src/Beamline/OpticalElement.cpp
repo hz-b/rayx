@@ -100,6 +100,16 @@ Behaviour makeGrating(const DesignObject& dobj) {
     });
 }
 
+Behaviour makeGratingEle(const DesignElement& dele) {
+    auto vls = dele.getVLSParameters();
+    return serializeGrating({
+        .m_vls = {vls[0], vls[1], vls[2], vls[3], vls[4], vls[5]},
+        .m_lineDensity = dele.getLineDensity(),
+        .m_orderOfDiffraction = dele.getOrderDiffraction(),
+    });
+}
+
+
 Element makeElement(const DesignObject& dobj, Behaviour behaviour, Surface surface, std::optional<Cutout> cutout, DesignPlane plane) {
     if (!cutout) {
         cutout = dobj.parseCutout(plane);

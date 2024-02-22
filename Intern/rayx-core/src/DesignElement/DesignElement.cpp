@@ -23,11 +23,17 @@ Element DesignElement::compile() const {
     }else if (v["name"].as_string() == "Paraboloid") {
         e = makeParaboloid(*this);
         std::cout << v["name"].as_string() << std::endl;
+    }else if (v["name"].as_string() == "Plane Grating") {
+        e = makePlaneGrating(*this);//makeImagePlane(*this);//
+        std::cout << v["name"].as_string() << std::endl;
     }
     return e;
 }
 
-void DesignElement::setName(std::string s) { v["name"] = s; }
+void DesignElement::setName(std::string s) { 
+    v["name"] = s; 
+    std::cout << v["name"].as_string() << std::endl;
+}
 std::string DesignElement::getName() const { return v["name"].as_string(); }
 
 void DesignElement::setWorldPosition(glm::dvec4 p) {
@@ -169,6 +175,31 @@ Cutout DesignElement::getCutout() const {
 
     return c;
 }
+
+void DesignElement::setVLSParameters(const std::array<double, 6>& values) {
+    v["vls_params"] = Map();
+
+    v["vls_params"]["vlsParameterB2"] = values[0];
+    v["vls_params"]["vlsParameterB3"] = values[1];
+    v["vls_params"]["vlsParameterB4"] = values[2];
+    v["vls_params"]["vlsParameterB5"] = values[3];
+    v["vls_params"]["vlsParameterB6"] = values[4];
+    v["vls_params"]["vlsParameterB7"] = values[5];
+}
+
+std::array<double, 6> DesignElement::getVLSParameters() const {
+    return {
+        v["vls_params"]["vlsParameterB2"].as_double(),
+        v["vls_params"]["vlsParameterB3"].as_double(),
+        v["vls_params"]["vlsParameterB4"].as_double(),
+        v["vls_params"]["vlsParameterB5"].as_double(),
+        v["vls_params"]["vlsParameterB6"].as_double(),
+        v["vls_params"]["vlsParameterB7"].as_double()
+    };
+}
+
+
+
 // Azimuthal Angle
 void DesignElement::setAzimuthalAngle(Rad r) { v["AzimuthalAngle"] = r; }
 Rad DesignElement::getAzimuthalAngle() const { return v["AzimuthalAngle"].as_rad(); }
@@ -275,5 +306,14 @@ double DesignElement::getParameterP() const { return v["parameter_P"].as_double(
 //parameter_P_type
 void DesignElement::setParameterPType(double value) { v["parameter_P_type"] = value; }
 double DesignElement::getParameterPType() const { return v["parameter_P_type"].as_double(); }
+
+// Setter and Getter for lineDensity
+void DesignElement::setLineDensity(double value) { v["lineDensity"] = value; }
+double DesignElement::getLineDensity() const { return v["lineDensity"].as_double(); }
+
+// Setter and Getter for orderDiffraction
+void DesignElement::setOrderDiffraction(double value) { v["orderDiffraction"] = value; }
+double DesignElement::getOrderDiffraction() const { return v["orderDiffraction"].as_double(); }
+
 
 }  // namespace RAYX

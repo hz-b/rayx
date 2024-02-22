@@ -11,7 +11,7 @@
 
 namespace RAYX {
 
-void setAllMandatory(xml::Parser parser, DesignElement* de) {
+void setAllMandatory(xml::Parser parser, DesignElement* de, DesignPlane dp) {
     de->setName(parser.name());
 
     de->setWorldPosition(parser.parsePosition());
@@ -21,14 +21,18 @@ void setAllMandatory(xml::Parser parser, DesignElement* de) {
     de->setSlopeError(parser.parseSlopeError());
     de->setAzimuthalAngle(parser.parseAzimuthalAngle());
     de->setMaterial(parser.parseMaterial());
+
+    if(de->getName() != "ImagePlane"){ 
+        de->setCutout(parser.parseCutout(dp));
+    }
 }
 
 void getImageplane(xml::Parser parser, DesignElement* de) {
-    setAllMandatory(parser, de);
+    setAllMandatory(parser, de, DesignPlane::XY);
 }
 
 void getSlit(xml::Parser parser, DesignElement* de) {
-    setAllMandatory(parser, de);
+    setAllMandatory(parser, de, DesignPlane::XY);
 
     de->setOpeningShape(parser.parseOpeningShape());
     de->setOpeningWidth(parser.parseOpeningWidth());
@@ -39,33 +43,33 @@ void getSlit(xml::Parser parser, DesignElement* de) {
     de->setTotalWidth(parser.parseTotalWidth());
     de->setTotalHeight(parser.parseTotalHeight());
     de->setDistancePreceding(parser.parseDistancePreceding());
-    de->setCutout(parser.parseCutout(DesignPlane::XY));
+    //de->setCutout(parser.parseCutout(DesignPlane::XY));
 }
 
 
 void getCone(xml::Parser parser, DesignElement* de) {
-    setAllMandatory(parser, de);
+    setAllMandatory(parser, de, DesignPlane::XZ);
 
     de->setGrazingIncAngle(parser.parseGrazingIncAngle());
     de->setEntranceArmLength(parser.parseEntranceArmLength());
     de->setExitArmLength(parser.parseExitArmLength());
     de->setTotalLength(parser.parseTotalLength());
-    de->setCutout(parser.parseCutout(DesignPlane::XZ));
+    //de->setCutout(parser.parseCutout(DesignPlane::XZ));
 }
 
 void getCylinder(xml::Parser parser, DesignElement* de) {
-    setAllMandatory(parser, de);
+    setAllMandatory(parser, de, DesignPlane::XZ);
 
     de->setRadiusDirection(parser.parseBendingRadius());
     de->setRadius(parser.parseRadius());
     de->setGrazingIncAngle(parser.parseGrazingIncAngle());
     de->setEntranceArmLength(parser.parseEntranceArmLength());
     de->setExitArmLength(parser.parseExitArmLength());
-    de->setCutout(parser.parseCutout(DesignPlane::XZ));
+    //de->setCutout(parser.parseCutout(DesignPlane::XZ));
 }
 
 void getEllipsoid(xml::Parser parser, DesignElement* de) {
-    setAllMandatory(parser, de);
+    setAllMandatory(parser, de, DesignPlane::XZ);
 
     de->setShortHalfAxisB(parser.parseShortHalfAxisB());
     de->setLongHalfAxisA(parser.parseLongHalfAxisA());
@@ -76,11 +80,11 @@ void getEllipsoid(xml::Parser parser, DesignElement* de) {
     de->setEntranceArmLength(parser.parseEntranceArmLength());
     de->setExitArmLength(parser.parseExitArmLength());
 
-    de->setCutout(parser.parseCutout(DesignPlane::XZ));
+    //de->setCutout(parser.parseCutout(DesignPlane::XZ));
 }
 
 void getParaboloid(xml::Parser parser, DesignElement* de) {
-    setAllMandatory(parser, de);
+    setAllMandatory(parser, de, DesignPlane::XZ);
 
     de->setArmLength(parser.parseArmLength());
     de->setParameterP(parser.parseParameterP());
@@ -88,7 +92,16 @@ void getParaboloid(xml::Parser parser, DesignElement* de) {
     de->setGrazingIncAngle(parser.parseGrazingIncAngle());
     de->setParameterA11(parser.parseParameterA11());
 
-    de->setCutout(parser.parseCutout(DesignPlane::XZ));
+    //de->setCutout(parser.parseCutout(DesignPlane::XZ));
+}
+
+
+void getPlaneGrating(xml::Parser parser, DesignElement* de) {
+    setAllMandatory(parser, de, DesignPlane::XZ);
+
+    de->setVLSParameters(parser.parseVls());
+    de->setLineDensity(parser.parseLineDensity());
+    de->setOrderDiffraction(parser.parseOrderDiffraction());
 }
 
 }  // namespace RAYX

@@ -35,6 +35,9 @@ struct DesignElement {
     void setCutout(Cutout c);
     Cutout getCutout() const;
 
+    void setVLSParameters(const std::array<double, 6>& values);
+    std::array<double, 6> getVLSParameters() const;
+
     void setDistancePreceding(double d);
     double getDistancePreceding() const;
 
@@ -115,5 +118,13 @@ struct DesignElement {
 
     void setParameterPType(double value);
     double getParameterPType() const;
+
+
+    void setLineDensity(double value);
+    double getLineDensity() const;
+
+    // Setter and Getter for orderDiffraction
+    void setOrderDiffraction(double value);
+    double getOrderDiffraction() const;
 };
 }  // namespace RAYX
