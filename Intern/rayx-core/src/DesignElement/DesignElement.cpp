@@ -26,6 +26,9 @@ Element DesignElement::compile() const {
     }else if (v["name"].as_string() == "Plane Grating") {
         e = makePlaneGrating(*this);//makeImagePlane(*this);//
         std::cout << v["name"].as_string() << std::endl;
+    }else if (v["name"].as_string() == "Plane Mirror") {
+        e = makePlaneMirror(*this);//makeImagePlane(*this);//
+        std::cout << v["name"].as_string() << std::endl;
     }
     return e;
 }

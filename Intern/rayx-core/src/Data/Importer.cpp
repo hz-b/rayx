@@ -36,7 +36,7 @@ DesignElement parseElement(xml::Parser parser) {
     } else if (strcmp(type, "Plane Grating") == 0) {
         getPlaneGrating(parser, &de);
     } else if (strcmp(type, "Plane Mirror") == 0) {
-        // addDesignElement(node);
+        getPlaneMirror(parser, &de);
     } else if (strcmp(type, "Reflection Zoneplate") == 0) {
         // addDesignElement(node);
     } else if (strcmp(type, "Slit") == 0) {

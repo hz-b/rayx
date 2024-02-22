@@ -104,4 +104,9 @@ void getPlaneGrating(xml::Parser parser, DesignElement* de) {
     de->setOrderDiffraction(parser.parseOrderDiffraction());
 }
 
+void getPlaneMirror(xml::Parser parser, DesignElement* de) {
+    setAllMandatory(parser, de, DesignPlane::XZ);
+}
+
+
 }  // namespace RAYX
