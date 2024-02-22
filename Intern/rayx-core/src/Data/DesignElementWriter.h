@@ -153,4 +153,17 @@ void getRZP(xml::Parser parser, DesignElement* de) {
     
 }
 
+
+void getExpertsCubic(xml::Parser parser, DesignElement* de) {
+    setAllMandatory(parser, de, DesignPlane::XZ);
+
+    de->setExpertsCubic(serializeCubic(parser.parseCubicParameters()));
+}
+
+void getExpertsOptics(xml::Parser parser, DesignElement* de) {
+    setAllMandatory(parser, de, DesignPlane::XZ);
+
+    de->setExpertsOptics(serializeQuadric(parser.parseQuadricParameters()));
+}
+
 }  // namespace RAYX

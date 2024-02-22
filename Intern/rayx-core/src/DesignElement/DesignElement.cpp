@@ -215,6 +215,83 @@ std::array<double, 6> DesignElement::getVLSParameters() const {
 
 
 
+void DesignElement::setExpertsOptics(Surface value) {
+    QuadricSurface qua = deserializeQuadric(value);
+    v["expertsParams"] = Map();
+    v["expertsParams"]["A11"] = qua.m_a11;
+    v["expertsParams"]["A12"] = qua.m_a12;
+    v["expertsParams"]["A13"] = qua.m_a13;
+    v["expertsParams"]["A14"] = qua.m_a14;
+    v["expertsParams"]["A22"] = qua.m_a22;
+    v["expertsParams"]["A23"] = qua.m_a23;
+    v["expertsParams"]["A24"] = qua.m_a24;
+    v["expertsParams"]["A33"] = qua.m_a33;
+    v["expertsParams"]["A34"] = qua.m_a34;
+    v["expertsParams"]["A44"] = qua.m_a44;
+
+}
+
+Surface DesignElement::getExpertsOptics() const {
+    QuadricSurface qua;
+    qua.m_a11 = v["expertsParams"]["A11"].as_double();
+    qua.m_a12 = v["expertsParams"]["A12"].as_double();
+    qua.m_a13 = v["expertsParams"]["A13"].as_double();
+    qua.m_a14 = v["expertsParams"]["A14"].as_double();
+    qua.m_a22 = v["expertsParams"]["A22"].as_double();
+    qua.m_a23 = v["expertsParams"]["A23"].as_double();
+    qua.m_a24 = v["expertsParams"]["A24"].as_double();
+    qua.m_a33 = v["expertsParams"]["A33"].as_double();
+    qua.m_a34 = v["expertsParams"]["A34"].as_double();
+    qua.m_a44 = v["expertsParams"]["A44"].as_double();
+
+    return serializeQuadric(qua);
+}
+
+void DesignElement::setExpertsCubic(Surface value) {
+    CubicSurface cub = deserializeCubic(value);
+    v["expertsParams"] = Map();
+    v["expertsParams"]["A11"] = cub.m_a11;
+    v["expertsParams"]["A12"] = cub.m_a12;
+    v["expertsParams"]["A13"] = cub.m_a13;
+    v["expertsParams"]["A14"] = cub.m_a14;
+    v["expertsParams"]["A22"] = cub.m_a22;
+    v["expertsParams"]["A23"] = cub.m_a23;
+    v["expertsParams"]["A24"] = cub.m_a24;
+    v["expertsParams"]["A33"] = cub.m_a33;
+    v["expertsParams"]["A34"] = cub.m_a34;
+    v["expertsParams"]["A44"] = cub.m_a44;
+
+    v["expertsParams"]["B12"] = cub.m_b12;
+    v["expertsParams"]["B13"] = cub.m_b13;
+    v["expertsParams"]["B21"] = cub.m_b21;
+    v["expertsParams"]["B23"] = cub.m_b23;
+    v["expertsParams"]["B31"] = cub.m_b31;
+    v["expertsParams"]["B32"] = cub.m_b32;
+}
+
+Surface DesignElement::getExpertsCubic() const {
+    CubicSurface cub;
+    cub.m_a11 = v["expertsParams"]["A11"].as_double();
+    cub.m_a12 = v["expertsParams"]["A12"].as_double();
+    cub.m_a13 = v["expertsParams"]["A13"].as_double();
+    cub.m_a14 = v["expertsParams"]["A14"].as_double();
+    cub.m_a22 = v["expertsParams"]["A22"].as_double();
+    cub.m_a23 = v["expertsParams"]["A23"].as_double();
+    cub.m_a24 = v["expertsParams"]["A24"].as_double();
+    cub.m_a33 = v["expertsParams"]["A33"].as_double();
+    cub.m_a34 = v["expertsParams"]["A34"].as_double();
+    cub.m_a44 = v["expertsParams"]["A44"].as_double();
+
+    cub.m_b12 = v["expertsParams"]["B12"].as_double();
+    cub.m_b13 = v["expertsParams"]["B13"].as_double();
+    cub.m_b21 = v["expertsParams"]["B21"].as_double();
+    cub.m_b23 = v["expertsParams"]["B23"].as_double();
+    cub.m_b31 = v["expertsParams"]["B31"].as_double();
+    cub.m_b32 = v["expertsParams"]["B32"].as_double();
+
+    return serializeCubic(cub);
+}
+
 // Azimuthal Angle
 void DesignElement::setAzimuthalAngle(Rad r) { v["AzimuthalAngle"] = r; }
 Rad DesignElement::getAzimuthalAngle() const { return v["AzimuthalAngle"].as_rad(); }

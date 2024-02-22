@@ -38,6 +38,12 @@ struct DesignElement {
     void setVLSParameters(const std::array<double, 6>& values);
     std::array<double, 6> getVLSParameters() const;
 
+    void setExpertsOptics(Surface value);
+    Surface getExpertsOptics() const;
+
+    void setExpertsCubic(Surface value);
+    Surface getExpertsCubic() const;
+
     void setDistancePreceding(double d);
     double getDistancePreceding() const;
 

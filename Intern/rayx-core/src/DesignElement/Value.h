@@ -21,7 +21,8 @@ enum class ValueType {
     Cutout,
     CylinderDirection,
     FigureRotation,
-    CurvatureType
+    CurvatureType,
+    Surface,
 };
 
 class Undefined {};
@@ -47,6 +48,7 @@ class Value {
     Value(CylinderDirection x) : m_variant(x) {}
     Value(FigureRotation x) : m_variant(x) {}
     Value(CurvatureType x) : m_variant(x) {}
+    Value(Surface x) : m_variant(x) {}
 
     void operator=(double x) { m_variant = x; }
     void operator=(int x) { m_variant = x; }
@@ -63,6 +65,8 @@ class Value {
     void operator=(CylinderDirection x) { m_variant = x; }
     void operator=(FigureRotation x) { m_variant = x; }
     void operator=(CurvatureType x) { m_variant = x; }
+    void operator=(Surface x) { m_variant = x; }
+
 
 
     inline ValueType type() const {
@@ -70,7 +74,8 @@ class Value {
             ValueType::Undefined, ValueType::Double,   ValueType::Int,           ValueType::CylinderDirection,
             ValueType::String,    ValueType::Map,      ValueType::Dvec4,         ValueType::Dmat4x4,
             ValueType::Rad,       ValueType::Material, ValueType::Misalignment,  ValueType::CentralBeamStop,
-            ValueType::Cutout,    ValueType::Bool,     ValueType::FigureRotation,ValueType::CurvatureType
+            ValueType::Cutout,    ValueType::Bool,     ValueType::FigureRotation,ValueType::CurvatureType,
+            ValueType::Surface
         };
         return types[m_variant.index()];
     }
@@ -165,6 +170,14 @@ class Value {
         return *x;
     }
 
+
+    inline Surface as_surface() const {
+        auto* x = std::get_if<Surface>(&m_variant);
+        if (!x) throw std::runtime_error("as_surface() called on non-surface!");
+        return *x;
+    }
+
+
     const Value& operator[](std::string s) const {
         const Map* m = std::get_if<Map>(&m_variant);
         if (!m) throw std::runtime_error("Indexing into non-map!");
@@ -179,10 +192,10 @@ class Value {
 
   private:
     std::variant<
-                 Undefined,      double,          int,    std::string, 
-                 glm::dvec4,     glm::dmat4x4,    bool,   Rad, Material, 
-                 Misalignment,   CentralBeamstop, Cutout, CylinderDirection, 
-                 FigureRotation, Map,             CurvatureType
+                 Undefined,      double,          int,     std::string, 
+                 glm::dvec4,     glm::dmat4x4,    bool,    Rad, Material, 
+                 Misalignment,   CentralBeamstop, Cutout,  CylinderDirection, 
+                 FigureRotation, Map,             Surface, CurvatureType
                 > m_variant;
 };
 }  // namespace RAYX

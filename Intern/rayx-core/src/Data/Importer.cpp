@@ -28,9 +28,9 @@ DesignElement parseElement(xml::Parser parser) {
     } else if (strcmp(type, "Ellipsoid") == 0) {
         getEllipsoid(parser, &de);
     } else if (strcmp(type, "Experts Optics") == 0) {
-        // addDesignElement(node);
+        getExpertsOptics(parser, &de);
     } else if (strcmp(type, "Experts Cubic") == 0) {
-        // addDesignElement(node);
+        getExpertsCubic(parser, &de);
     } else if (strcmp(type, "Paraboloid") == 0) {
         getParaboloid(parser, &de);
     } else if (strcmp(type, "Plane Grating") == 0) {
