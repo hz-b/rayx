@@ -105,7 +105,9 @@ target_include_directories(${PROJECT_NAME} SYSTEM PUBLIC
     ${PROJECT_SOURCE_DIR}/../../Extern/rapidxml-1.13/
     ${PROJECT_SOURCE_DIR}/../../Extern/HighFive/include/
     ${PROJECT_SOURCE_DIR}/../../Extern/VMA/include/
+    ${Kokkos_INCLUDE_DIRS_RET}
 )
+target_link_libraries(${PROJECT_NAME} PUBLIC Kokkos::kokkos)
 
 # ------------------------
 

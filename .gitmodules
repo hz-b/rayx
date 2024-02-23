@@ -25,3 +25,6 @@
 [submodule "Extern/stb"]
 	path = Extern/stb
 	url = https://github.com/nothings/stb
+[submodule "Extern/kokkos"]
+	path = Extern/kokkos
+	url = https://github.com/kokkos/kokkos.git
