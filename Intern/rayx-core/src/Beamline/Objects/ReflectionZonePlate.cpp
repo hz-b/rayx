@@ -33,7 +33,7 @@ Element makeReflectionZonePlate(const DesignElement& dele) {
     if (curvatureType == CurvatureType::Plane) {
         surface = makePlane();
     } else if (curvatureType == CurvatureType::Toroidal) {
-        surface = makeToroidEle(dele);
+        surface = makeToroid(dele);
     } else if (curvatureType == CurvatureType::Spherical) {
         surface = makeSphere(dele.getLongRadius());
     } else {
@@ -56,7 +56,7 @@ Element makeReflectionZonePlate(const DesignElement& dele) {
                                    .m_designAlphaAngle = designAlphaAngle.rad,
                                    .m_designBetaAngle = designBetaAngle.rad,
                                    .m_additionalOrder = (double)additionalOrder});
-    return makeDesElement(dele, behaviour, surface);
+    return makeElement(dele, behaviour, surface);
 }
 
 }  // namespace RAYX

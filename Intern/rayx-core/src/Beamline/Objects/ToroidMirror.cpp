@@ -8,9 +8,9 @@
 namespace RAYX {
 
 Element makeToroidMirror(const DesignElement& dele) {
-    auto surface = makeToroidEle(dele);
+    auto surface = makeToroid(dele);
     auto behaviour = serializeMirror();
-    return makeDesElement(dele, behaviour, surface);
+    return makeElement(dele, behaviour, surface);
 }
 
 }  // namespace RAYX

@@ -55,7 +55,7 @@ Element makeCylinder(const DesignElement& dele) {
         .m_a44 = 0,
     });
     auto behaviour = serializeMirror();
-    return makeDesElement(dele, behaviour, surface);
+    return makeElement(dele, behaviour, surface);
 }
 
 }  // namespace RAYX

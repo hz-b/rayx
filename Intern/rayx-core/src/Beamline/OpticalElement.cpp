@@ -5,19 +5,10 @@
 
 namespace RAYX {
 
-glm::dmat4x4 defaultInMatrix(const DesignObject& dobj, DesignPlane plane) {
-    return calcTransformationMatrices(dobj.parsePosition(), dobj.parseOrientation(), true, plane);
-}
-
-glm::dmat4x4 defaultOutMatrix(const DesignObject& dobj, DesignPlane plane) {
-    return calcTransformationMatrices(dobj.parsePosition(), dobj.parseOrientation(), false, plane);
-}
-
-// temporary functions for the transition
-glm::dmat4x4 defaultInMatrixEle(const DesignElement& dele, DesignPlane plane) {
+glm::dmat4x4 defaultInMatrix(const DesignElement& dele, DesignPlane plane) {
     return calcTransformationMatrices(dele.getWorldPosition(), dele.getWorldOrientation(), true, plane);
 }
-glm::dmat4x4 defaultOutMatrixEle(const DesignElement& dele, DesignPlane plane) {
+glm::dmat4x4 defaultOutMatrix(const DesignElement& dele, DesignPlane plane) {
     return calcTransformationMatrices(dele.getWorldPosition(), dele.getWorldOrientation(), false, plane);
 }
 
@@ -59,9 +50,7 @@ glm::dmat4 calcTransformationMatrices(glm::dvec4 position, glm::dmat4 orientatio
     }
 }
 
-double defaultMaterial(const DesignObject& dobj) { return (double)static_cast<int>(dobj.parseMaterial()); }
-
-double defaultMaterialELe(const DesignElement& dele) { return (double)static_cast<int>(dele.getMaterial()); }
+double defaultMaterial(const DesignElement& dele) { return (double)static_cast<int>(dele.getMaterial()); }
 
 Surface makePlane() {
     return serializePlaneXZ();
@@ -83,14 +72,7 @@ Surface makeSphere(double radius) {
     });
 }
 
-Surface makeToroid(const DesignObject& dobj) {
-    return serializeToroid({
-        .m_longRadius = dobj.parseLongRadius(),
-        .m_shortRadius = dobj.parseShortRadius(),
-        .m_toroidType = TOROID_TYPE_CONCAVE,
-    });
-}
-Surface makeToroidEle(const DesignElement& dele) {
+Surface makeToroid(const DesignElement& dele) {
     return serializeToroid({
         .m_longRadius = dele.getLongRadius(),
         .m_shortRadius = dele.getShortRadius(),
@@ -98,16 +80,7 @@ Surface makeToroidEle(const DesignElement& dele) {
     });
 }
 
-Behaviour makeGrating(const DesignObject& dobj) {
-    auto vls = dobj.parseVls();
-    return serializeGrating({
-        .m_vls = {vls[0], vls[1], vls[2], vls[3], vls[4], vls[5]},
-        .m_lineDensity = dobj.parseLineDensity(),
-        .m_orderOfDiffraction = dobj.parseOrderDiffraction(),
-    });
-}
-
-Behaviour makeGratingEle(const DesignElement& dele) {
+Behaviour makeGrating(const DesignElement& dele) {
     auto vls = dele.getVLSParameters();
     return serializeGrating({
         .m_vls = {vls[0], vls[1], vls[2], vls[3], vls[4], vls[5]},
@@ -117,35 +90,13 @@ Behaviour makeGratingEle(const DesignElement& dele) {
 }
 
 
-Element makeElement(const DesignObject& dobj, Behaviour behaviour, Surface surface, std::optional<Cutout> cutout, DesignPlane plane) {
-    if (!cutout) {
-        cutout = dobj.parseCutout(plane);
-    }
-
-    auto inMat = defaultInMatrix(dobj, plane);
-    auto outMat = defaultOutMatrix(dobj, plane);
-
-    return Element {
-        .m_inTrans = inMat,
-        .m_outTrans = outMat,
-        .m_behaviour = behaviour,
-        .m_surface = surface,
-        .m_cutout = *cutout,
-        .m_slopeError = dobj.parseSlopeError(),
-        .m_azimuthalAngle = dobj.parseAzimuthalAngle().rad,
-        .m_material = defaultMaterial(dobj),
-        .m_padding = {0.0},
-    };
-}
-
-// temporary functions for the transition
-Element makeDesElement(const DesignElement& dele, Behaviour behaviour, Surface surface, std::optional<Cutout> cutout, DesignPlane plane) {
+Element makeElement(const DesignElement& dele, Behaviour behaviour, Surface surface, std::optional<Cutout> cutout, DesignPlane plane) {
     if (!cutout) {
         cutout = dele.getCutout();
     }
 
-    auto inMat = defaultInMatrixEle(dele, plane);
-    auto outMat = defaultOutMatrixEle(dele, plane);
+    auto inMat = defaultInMatrix(dele, plane);
+    auto outMat = defaultOutMatrix(dele, plane);
 
     return Element {
         .m_inTrans = inMat,
@@ -155,17 +106,17 @@ Element makeDesElement(const DesignElement& dele, Behaviour behaviour, Surface s
         .m_cutout = *cutout,
         .m_slopeError = dele.getSlopeError(),
         .m_azimuthalAngle = dele.getAzimuthalAngle().rad,
-        .m_material = defaultMaterialELe(dele),
+        .m_material = defaultMaterial(dele),
         .m_padding = {0.0},
     };
 }
 
 Element makeExperts(const DesignElement& dele) {
-    return makeDesElement(dele, serializeMirror(), makeQuadric(dele));
+    return makeElement(dele, serializeMirror(), makeQuadric(dele));
 }
 
 Element makeExpertsCubic(const DesignElement& dobj) {
-    return makeDesElement(dobj, serializeMirror(), makeCubic(dobj));
+    return makeElement(dobj, serializeMirror(), makeCubic(dobj));
 }
 
 Surface makeQuadric(const DesignElement& dobj) {

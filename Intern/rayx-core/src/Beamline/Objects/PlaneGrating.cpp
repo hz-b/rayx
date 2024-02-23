@@ -7,8 +7,8 @@ namespace RAYX {
 
 Element makePlaneGrating(const DesignElement& dele) {
     auto surface = makePlane();
-    auto behaviour = makeGratingEle(dele);
-    return makeDesElement(dele, behaviour, surface);
+    auto behaviour = makeGrating(dele);
+    return makeElement(dele, behaviour, surface);
 }
 
 }  // namespace RAYX

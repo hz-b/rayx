@@ -43,7 +43,7 @@ Element makeSlit(const DesignElement& dele) {
         .m_openingCutout = openingCutout,
         .m_beamstopCutout = beamstopCutout,
     });
-    Element el = makeDesElement(dele, behaviour, surface, {}, DesignPlane::XY);
+    Element el = makeElement(dele, behaviour, surface, {}, DesignPlane::XY);
     Cutout globalCutout = el.m_cutout;
 
     // the opening needs to be a subset of the whole object.

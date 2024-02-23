@@ -58,6 +58,6 @@ Element makeCone(const DesignElement& dele) {
         .m_a34 = 0,
         .m_a44 = 0,
     });
-    return makeDesElement(dele, behaviour, surface);
+    return makeElement(dele, behaviour, surface);
 }
 }  // namespace RAYX

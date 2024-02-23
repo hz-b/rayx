@@ -40,15 +40,13 @@ glm::dmat4 defaultOutMatrix(const DesignObject& dobj, DesignPlane plane);
 double defaultMaterial(const DesignObject& dobj);
 
 // constructs an Element given all of its components. Some information that is not explicitly given, will be parsed from the `dobj`.
-Element makeElement(const DesignObject& dobj, Behaviour behaviour, Surface surface, std::optional<Cutout> cutout = {}, DesignPlane plane=DesignPlane::XZ);
-Element makeDesElement(const DesignElement& dele, Behaviour behaviour, Surface surface, std::optional<Cutout> cutout = {}, DesignPlane plane=DesignPlane::XZ);
+Element makeElement(const DesignElement& dele, Behaviour behaviour, Surface surface, std::optional<Cutout> cutout = {}, DesignPlane plane=DesignPlane::XZ);
 
 Element makeExperts(const DesignElement& dobj);
 Element makeExpertsCubic(const DesignElement& dobj);
 
 // creates a toroid from the parameters given in `dobj`.
-Surface makeToroidEle(const DesignElement& dele);
-Surface makeToroid(const DesignObject& dobj);
+Surface makeToroid(const DesignElement& dele);
 
 // creates a quadric from the parameters given in `dobj`.
 Surface makeQuadric(const DesignElement& dobj);
@@ -63,8 +61,6 @@ Surface makeSphere(double radius);
 Surface makePlane();
 
 // creates a Grating Behaviour from the parameters given in `dobj`.
-Behaviour makeGrating(const DesignObject& dobj);
-//temporary
-Behaviour makeGratingEle(const DesignElement& dele);
+Behaviour makeGrating(const DesignElement& dele);
 
 }  // namespace RAYX

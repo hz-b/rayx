@@ -9,8 +9,8 @@ namespace RAYX {
 
 Element makeSphereGrating(const DesignElement& dele) {
     auto surface = makeSphere(dele.getRadius());
-    auto behaviour = makeGratingEle(dele);
-    return makeDesElement(dele, behaviour, surface);
+    auto behaviour = makeGrating(dele);
+    return makeElement(dele, behaviour, surface);
 }
 
 }  // namespace RAYX

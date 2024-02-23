@@ -8,7 +8,7 @@ namespace RAYX {
 Element makePlaneMirror(const DesignElement& dele) {
     auto behaviour = serializeMirror();
     auto surface = makePlane();
-    return makeDesElement(dele, behaviour, surface);
+    return makeElement(dele, behaviour, surface);
 }
 
 }  // namespace RAYX

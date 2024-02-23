@@ -16,7 +16,7 @@ Element makeSphereMirror(const DesignElement& dele) {
 
     auto behaviour = serializeMirror();
     auto surface = makeSphere(radius);
-    return makeDesElement(dele, behaviour, surface);
+    return makeElement(dele, behaviour, surface);
 }
 
 }  // namespace RAYX
