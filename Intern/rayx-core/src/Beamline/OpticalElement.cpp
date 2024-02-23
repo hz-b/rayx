@@ -160,20 +160,20 @@ Element makeDesElement(const DesignElement& dele, Behaviour behaviour, Surface s
     };
 }
 
-Element makeExperts(const DesignObject& dobj) {
-    return makeElement(dobj, serializeMirror(), makeQuadric(dobj));
+Element makeExperts(const DesignElement& dele) {
+    return makeDesElement(dele, serializeMirror(), makeQuadric(dele));
 }
 
-Element makeExpertsCubic(const DesignObject& dobj) {
-    return makeElement(dobj, serializeMirror(), makeCubic(dobj));
+Element makeExpertsCubic(const DesignElement& dobj) {
+    return makeDesElement(dobj, serializeMirror(), makeCubic(dobj));
 }
 
-Surface makeQuadric(const DesignObject& dobj) {
-    return serializeQuadric(dobj.parseQuadricParameters());
+Surface makeQuadric(const DesignElement& dobj) {
+    return dobj.getExpertsOptics();
 }
 
-Surface makeCubic(const DesignObject& dobj) {
-    return serializeCubic(dobj.parseCubicParameters());
+Surface makeCubic(const DesignElement& dobj) {
+    return dobj.getExpertsCubic();
 }
 
 }  // namespace RAYX

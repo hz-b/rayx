@@ -41,6 +41,12 @@ Element DesignElement::compile() const {
     }else if (v["name"].as_string() == "Reflection Zoneplate") {
         e = makeReflectionZonePlate(*this);
         std::cout << v["name"].as_string() << std::endl;
+    }else if (v["name"].as_string() == "Experts Optics") {
+        e = makeExperts(*this);
+        std::cout << v["name"].as_string() << std::endl;
+    }else if (v["name"].as_string() == "Experts Cubic") {
+        e = makeExpertsCubic(*this);
+        std::cout << v["name"].as_string() << std::endl;
     }
     return e;
 }
@@ -192,24 +198,24 @@ Cutout DesignElement::getCutout() const {
 }
 
 void DesignElement::setVLSParameters(const std::array<double, 6>& values) {
-    v["vls_params"] = Map();
+    v["vlsParams"] = Map();
 
-    v["vls_params"]["vlsParameterB2"] = values[0];
-    v["vls_params"]["vlsParameterB3"] = values[1];
-    v["vls_params"]["vlsParameterB4"] = values[2];
-    v["vls_params"]["vlsParameterB5"] = values[3];
-    v["vls_params"]["vlsParameterB6"] = values[4];
-    v["vls_params"]["vlsParameterB7"] = values[5];
+    v["vlsParams"]["vlsParameterB2"] = values[0];
+    v["vlsParams"]["vlsParameterB3"] = values[1];
+    v["vlsParams"]["vlsParameterB4"] = values[2];
+    v["vlsParams"]["vlsParameterB5"] = values[3];
+    v["vlsParams"]["vlsParameterB6"] = values[4];
+    v["vlsParams"]["vlsParameterB7"] = values[5];
 }
 
 std::array<double, 6> DesignElement::getVLSParameters() const {
     return {
-        v["vls_params"]["vlsParameterB2"].as_double(),
-        v["vls_params"]["vlsParameterB3"].as_double(),
-        v["vls_params"]["vlsParameterB4"].as_double(),
-        v["vls_params"]["vlsParameterB5"].as_double(),
-        v["vls_params"]["vlsParameterB6"].as_double(),
-        v["vls_params"]["vlsParameterB7"].as_double()
+        v["vlsParams"]["vlsParameterB2"].as_double(),
+        v["vlsParams"]["vlsParameterB3"].as_double(),
+        v["vlsParams"]["vlsParameterB4"].as_double(),
+        v["vlsParams"]["vlsParameterB5"].as_double(),
+        v["vlsParams"]["vlsParameterB6"].as_double(),
+        v["vlsParams"]["vlsParameterB7"].as_double()
     };
 }
 
@@ -403,26 +409,12 @@ double DesignElement::getParameterPType() const { return v["parameter_P_type"].a
 void DesignElement::setLineDensity(double value) { v["lineDensity"] = value; }
 double DesignElement::getLineDensity() const { return v["lineDensity"].as_double(); }
 
-void DesignElement::setShortRadius(double value) {
-    // Assuming v is the map where parameters are stored
-    v["shortRadius"] = value;
-}
-
-double DesignElement::getShortRadius() const {
-    // Assuming v is the map where parameters are stored
-    return v["shortRadius"].as_double();
-}
+void DesignElement::setShortRadius(double value) { v["shortRadius"] = value;}
+double DesignElement::getShortRadius() const {return v["shortRadius"].as_double();}
 
 // Setter and Getter for longRadius
-void DesignElement::setLongRadius(double value) {
-    // Assuming v is the map where parameters are stored
-    v["longRadius"] = value;
-}
-
-double DesignElement::getLongRadius() const {
-    // Assuming v is the map where parameters are stored
-    return v["longRadius"].as_double();
-}
+void DesignElement::setLongRadius(double value) {v["longRadius"] = value;}
+double DesignElement::getLongRadius() const {return v["longRadius"].as_double();}
 
 void DesignElement::setFresnelZOffset(double value) { v["FresnelZOffset"] = value; }
 double DesignElement::getFresnelZOffset() const { return v["FresnelZOffset"].as_double(); }
@@ -454,28 +446,13 @@ double DesignElement::getDesignMeridionalExitArmLength() const { return v["Desig
 void DesignElement::setOrderOfDiffraction(double value) { v["OrderDiffraction"] = value; }
 double DesignElement::getOrderOfDiffraction() const { return v["OrderDiffraction"].as_double(); }
 
-void DesignElement::setAdditionalOrder(int value) {
-    v["additionalOrder"] = value;
-}
+void DesignElement::setAdditionalOrder(int value) {v["additionalOrder"] = value;}
+int DesignElement::getAdditionalOrder() const { return v["additionalOrder"].as_int();}
 
-int DesignElement::getAdditionalOrder() const {
-    return v["additionalOrder"].as_int();
-}
+void DesignElement::setImageType(double value) {v["imageType"] = value;}
+double DesignElement::getImageType() const {return v["imageType"].as_double();}
 
-void DesignElement::setImageType(double value) {
-    v["imageType"] = value;
-}
-
-double DesignElement::getImageType() const {
-    return v["imageType"].as_double();
-}
-
-void DesignElement::setCurvatureType(CurvatureType value) {
-    v["curvatureType"] = value;
-}
-
-CurvatureType DesignElement::getCurvatureType() const {
-    return v["curvatureType"].as_curvatureType();
-}
+void DesignElement::setCurvatureType(CurvatureType value) {v["curvatureType"] = value;}
+CurvatureType DesignElement::getCurvatureType() const {return v["curvatureType"].as_curvatureType();}
 
 }  // namespace RAYX
