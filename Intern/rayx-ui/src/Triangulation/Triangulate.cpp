@@ -40,6 +40,8 @@ enum VertexType {
     Regular,
 };
 
+// Vertex contains the corresponding TextureVertex/Point2D index and Vertex type (Start, Split, End, Merge, Regular)
+// The VertexType is determines the behaviour of the sweep line algorithm
 struct Vertex {
     uint32_t index;
     VertexType type;
@@ -51,12 +53,12 @@ struct EdgeEntry {
     uint32_t next;
 };
 
-double absoluteAngle(Point2D p1, Point2D p2) { return atan2(p2.x - p1.x, p2.y - p1.y); }
+double absoluteAngle(const Point2D& p1, const Point2D& p2) { return atan2(p2.x - p1.x, p2.y - p1.y); }
 
-VertexType toVertexType(Point2D prev, Point2D current, Point2D next) {
+VertexType toVertexType(const Point2D& prev, const Point2D& current, const Point2D& next) {
     double angle = atan2(next.x - current.x, next.y - current.y) - atan2(prev.x - current.x, prev.y - current.y);
     if (angle < 0) {
-        angle += M_PI * 2;
+        angle += PI * 2;
     }
     if (prev < current && next < current) {
         return angle < M_PI ? Start : Split;
@@ -100,20 +102,21 @@ struct EdgeList {
         return p1.x + (y - p1.y) * (p2.x - p1.x) / (p2.y - p1.y);
     }
 
-    EdgeList(PolygonComplex poly, std::vector<TextureVertex>& verts) {
+    EdgeList(const PolygonComplex& poly, std::vector<TextureVertex>& verts) {
+        points.reserve(verts.size());
         for (auto& vert : verts) {
             points.push_back({-vert.pos.x, vert.pos.z});
         }
         uint32_t startI = 0;
         for (auto& simple : poly) {
             for (uint32_t i = 0; i < simple.size(); i++) {
-                int prevI = translateIndex(i - 1, simple.size());
+                int prevI = translateIndex(i - 1, (int)simple.size());
                 int currentI = i;
-                int nextI = translateIndex(i + 1, simple.size());
+                int nextI = translateIndex(i + 1, (int)simple.size());
                 VertexType type = toVertexType(points[simple[prevI]], points[simple[currentI]], points[simple[nextI]]);
                 edges.push_back(EdgeEntry{{simple[currentI], type}, startI + (uint32_t)prevI, startI + (uint32_t)nextI});
             }
-            startI += simple.size();
+            startI += (uint32_t)simple.size();
         }
     }
 
@@ -340,7 +343,7 @@ struct EdgeList {
     bool isTop(uint32_t edge) { return getOrigin(getPrev(edge)) < getOrigin(edge) && getOrigin(getNext(edge)) < getOrigin(edge); }
 };
 
-void triangulate(PolygonComplex poly, std::vector<TextureVertex>& points, std::vector<uint32_t>& indices) {
+void triangulate(const PolygonComplex& poly, std::vector<TextureVertex>& points, std::vector<uint32_t>& indices) {
     auto edge_list = EdgeList(poly, points);
     edge_list.makeMonotone();
     std::vector<uint32_t> tops;
