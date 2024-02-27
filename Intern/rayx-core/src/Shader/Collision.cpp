@@ -453,7 +453,7 @@ Collision findCollisionWith(Ray r, uint id, Inv& inv) {
 Collision findCollision(Inv& inv) {
     // If sequential tracing is enabled, we only check collision with the "next element".
     if (inv.pushConstants.sequential == 1.0) {
-        if (_ray.m_lastElement >= inv.elements.length() - 1) {
+        if (_ray.m_lastElement >= inv.elements.size() - 1) {
             Collision col;
             col.found = false;
             return col;
@@ -475,7 +475,7 @@ Collision findCollision(Inv& inv) {
     r.m_position += r.m_direction * COLLISION_EPSILON;
 
     // Find intersection points through all elements
-    for (uint elementIndex = 0; elementIndex < uint(inv.elements.length()); elementIndex++) {
+    for (uint elementIndex = 0; elementIndex < uint(inv.elements.size()); elementIndex++) {
         Collision current_col = findCollisionWith(r, elementIndex, inv);
         if (!current_col.found) {
             continue;

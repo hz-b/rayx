@@ -14,6 +14,7 @@
 
 #include "Common.h"
 #include "Ray.h"
+#include <Kokkos_Core.hpp>
 
 // Useful for GPU Tracing
 struct PushConstants {  // TODO(Jannis): PushConstants is not an expressive name. Rename to something like TracerConfig
@@ -37,15 +38,19 @@ struct RAYX_API InvocationState {
     bool finalized;
     uint64_t ctr;
     uint64_t nextEventIndex;
-    ShaderArray<Ray> rayData;
-    ShaderArray<Ray> outputData;
-    ShaderArray<Element> elements;
-    ShaderArray<dvec4> xyznull;
-    ShaderArray<int> matIdx;
-    ShaderArray<double> mat;
+
+    // TODO: fix this shortcut
+    using KokkosMemorySpace = Kokkos::HostSpace;
+
+    Kokkos::View<Ray*, KokkosMemorySpace> rayData;
+    Kokkos::View<Ray*, KokkosMemorySpace> outputData;
+    Kokkos::View<Element*, KokkosMemorySpace> elements;
+    Kokkos::View<dvec4*, KokkosMemorySpace> xyznull;
+    Kokkos::View<int*, KokkosMemorySpace> matIdx;
+    Kokkos::View<double*, KokkosMemorySpace> mat;
 
 #ifdef RAYX_DEBUG_MODE
-    ShaderArray<_debug_struct> d_struct;
+    Kokkos::View<_debug_struct*, KokkosMemorySpace> d_struct;
 #endif
 
     PushConstants pushConstants;

@@ -18,19 +18,6 @@ using glm::length;
 using glm::mod;
 using glm::sign;
 
-// define SHADER_ARRAY
-#define SHADER_ARRAY(T, ident, binding_id, bufname) ShaderArray<T> RAYX_API ident
-
-// this type intends to mimic the GLSL type T[], this is used for layouts.
-template <typename T>
-struct ShaderArray {
-  public:
-    std::vector<T> data;
-
-    inline int length() { return data.size(); }
-    inline T& operator[](int i) { return data[i]; }
-};
-
 // throws an error, and termiantes the program
 // TODO(Sven): rethink error handling. just instantly terminate with RAYX_ERR or use recordFinalEvent?
 // #ifdef GLSL

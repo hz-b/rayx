@@ -4,8 +4,9 @@
 #include "Utils.h"
 #include "Helper.h"
 
-void dynamicElements(Inv& inv) {
+void dynamicElements(int gid, Inv& inv) {
     // initializes the global state.
+    inv.globalInvocationId = gid;
     init(inv);
 
     #ifdef RAYX_DEBUG_MODE // Debug Matrix only works in GPU Mode and on DEBUG Build Type

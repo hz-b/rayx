@@ -1,4 +1,3 @@
-
 #include "CpuTracer.h"
 
 #include <cmath>
@@ -7,6 +6,7 @@
 #include "Beamline/OpticalElement.h"
 #include "Material/Material.h"
 #include "RAY-Core.h"
+#include "KokkosUtils.h"
 #include "Shader/DynamicElements.h"
 #include "Shader/InvocationState.h"
 
@@ -14,44 +14,52 @@ using uint = unsigned int;
 
 namespace RAYX {
 
-CpuTracer::CpuTracer() { RAYX_VERB << "Initializing Cpu Tracer.."; }
+CpuTracer::CpuTracer() {
+    RAYX_VERB << "Initializing Cpu Tracer..";
+}
 
 CpuTracer::~CpuTracer() = default;
 
 std::vector<Ray> CpuTracer::traceRaw(const TraceRawConfig& cfg) {
     RAYX_PROFILE_FUNCTION_STDOUT();
 
-    auto rayList = cfg.m_rays;
-
     // CFG meta passed through pushConstants
 
-    inv.elements.data.clear();
-    inv.xyznull.data.clear();
-    inv.matIdx.data.clear();
-    inv.mat.data.clear();
+    auto numInputRays = cfg.m_rays.size();
+    auto numOutputRays = numInputRays * ((size_t)cfg.m_maxEvents - (size_t)cfg.m_startEventID);
 
-    // init rayData, outputData
-    inv.rayData.data = rayList;
-    inv.outputData.data.resize(rayList.size() * ((size_t)cfg.m_maxEvents - (size_t)cfg.m_startEventID));
+    using Host = KokkosUtils<Kokkos::HostSpace>;
 
-    // init elements
-    for (auto e : cfg.m_elements) {
-        inv.elements.data.push_back(e);
-    }
+    inv.rayData = Host::createView("rayData", cfg.m_rays);
+    inv.elements = Host::createView("elements", cfg.m_elements);
 
-    auto materialTables = cfg.m_materialTables;
-    inv.mat.data = materialTables.materialTable;
-    inv.matIdx.data = materialTables.indexTable;
+    const auto& materialTables = cfg.m_materialTables;
+    inv.mat = Host::createView("mat", materialTables.materialTable);
+    inv.matIdx = Host::createView("matIdx", materialTables.indexTable);
 
-    // Run the tracing by for all rays
-    for (uint i = 0; i < rayList.size(); i++) {
-        inv.globalInvocationId = i;
-        dynamicElements(inv);
-    }
+    inv.outputData = Host::createView<Ray>("outputData", numOutputRays);
+
+    struct Kernel {
+        mutable Inv inv;
+
+        KOKKOS_INLINE_FUNCTION
+        void operator() (int gid) const {
+            dynamicElements(gid, inv);
+        }
+    };
+
+    Kokkos::parallel_for(
+        numInputRays,
+        Kernel { inv }
+    );
+    Kokkos::fence();
 
     // Fetch Rays back from the Shader "container"
-    return inv.outputData.data;
+    auto outputData = std::vector<Ray>(numOutputRays);
+    std::memcpy(outputData.data(), inv.outputData.data(), numOutputRays * sizeof(Ray));
+    return outputData;
 }
 
 void CpuTracer::setPushConstants(const PushConstants* p) { std::memcpy(&inv.pushConstants, p, sizeof(PushConstants)); }
+
 }  // namespace RAYX

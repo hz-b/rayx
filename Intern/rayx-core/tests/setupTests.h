@@ -150,6 +150,8 @@ inline void add_failure() { ADD_FAILURE(); }
 class TestSuite : public testing::Test {
   protected:
     static void SetUpTestSuite() {
+        Kokkos::initialize();
+
         RAYX::error_fn = add_failure;
 
         bool cpu = false;
@@ -164,14 +166,18 @@ class TestSuite : public testing::Test {
             tracer = std::make_unique<RAYX::CpuTracer>();
         } else {
             // TODO(Sven): enable kokkos tracer testing
-            RAYX_ERR << "can't create GPU Tracer";
+            RAYX_ERR << "GPU Tracer is currently disabled.";
         }
     }
 
     // called before every test invocation.
     void SetUp() override { RAYX::fixSeed(RAYX::FIXED_SEED); }
 
-    static void TearDownTestSuite() { tracer = nullptr; }
+    static void TearDownTestSuite() {
+        tracer = nullptr;
+        inv = {}; // destroy and deallocate buffers in invocation state
+        Kokkos::finalize();
+    }
 };
 
 // helper functions for writing tests
