@@ -8,7 +8,7 @@ if(Vulkan_FOUND)
     # -------------------
 
     # ---- Project ----
-    project(rayx-ui)
+    project(rayx-ui VERSION ${RAYX_VERSION})
     set(CMAKE_CXX_STANDARD 20)
 
     set(IMGUI_DIR ../../Extern/imgui/)
@@ -32,6 +32,20 @@ if(Vulkan_FOUND)
     target_compile_definitions(${PROJECT_NAME} PRIVATE
         GLM_FORCE_RADIANS
         GLM_FORCE_DEPTH_ZERO_TO_ONE)
+
+            # ---- Install ----
+
+    install(TARGETS ${PROJECT_NAME} RUNTIME DESTINATION bin)
+
+    # ---- CPack ----
+
+    include(InstallRequiredSystemLibraries)
+
+    set(CPACK_RESOURCE_FILE_LICENSE "${PROJECT_SOURCE_DIR}/../../LICENSE")
+    set(CPACK_PACKAGE_VERSION ${PROJECT_VERSION})
+    set(CPACK_PACKAGE_DESCRIPTION_SUMMARY "rayx-ui - RAYX GUI Application")
+
+    include(CPack)
 
     # -----------------
 
@@ -78,8 +92,8 @@ if(Vulkan_FOUND)
             # Create a custom command for each shader file
             add_custom_command(
                 OUTPUT ${OUTPUT_FILE}
-                COMMAND "glslc"
-                ARGS ${SHADER_FILE} -o ${OUTPUT_FILE}
+                COMMAND glslangValidator 
+                ARGS -V ${SHADER_FILE} -o ${OUTPUT_FILE}
                 DEPENDS ${SHADER_FILE}
                 COMMENT "Compiling ${SHADER_FILE} to ${OUTPUT_FILE}"
             )

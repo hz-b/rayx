@@ -16,11 +16,17 @@ add_subdirectory(tests)
 # -------------------
 
 # ---- Project ----
-project(rayx-core)
+project(rayx-core VERSION ${RAYX_VERSION})
 file(GLOB_RECURSE SOURCE ${PROJECT_SOURCE_DIR}/src/*.cpp)
 add_library(${PROJECT_NAME} SHARED ${SOURCE})
 
+install(TARGETS ${PROJECT_NAME}
+    RUNTIME DESTINATION bin
+    LIBRARY DESTINATION lib
+    ARCHIVE DESTINATION lib/static)
+
 # -----------------
+
 
 # -----OpenMP--------
 find_package(OpenMP)
@@ -124,11 +130,24 @@ if(Vulkan_FOUND)
         OUTPUT
         ${RAYX_CORE_SHADER}
         ${RAYX_CORE_SHADER_FAKE}
-        COMMAND "glslc"
-        ARGS ${PROJECT_SOURCE_DIR}/src/Shader/main-glsl.comp -o ${RAYX_CORE_SHADER} -fshader-stage=compute --target-env=vulkan1.3
+        COMMAND glslangValidator
+        ARGS -V ${PROJECT_SOURCE_DIR}/src/Shader/main-glsl.comp -o ${RAYX_CORE_SHADER}
     )
 
     add_custom_target(RAYX_CORE_COMPILE_SHADER ALL DEPENDS ${RAYX_CORE_SHADER})
 endif()
 
 # ------------------------
+
+# ---- CPack ----
+
+include(InstallRequiredSystemLibraries)
+
+set(CPACK_RESOURCE_FILE_LICENSE "${PROJECT_SOURCE_DIR}/../../LICENSE")
+set(CPACK_PACKAGE_VERSION ${PROJECT_VERSION})
+set(CPACK_PACKAGE_CONTACT "Your Name <your.email@example.com>")
+set(CPACK_PACKAGE_DESCRIPTION_SUMMARY "Your Project Description")
+
+include(CPack)
+
+# -----------------

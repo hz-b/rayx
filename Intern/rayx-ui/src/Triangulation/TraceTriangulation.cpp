@@ -50,7 +50,7 @@ std::vector<std::vector<RAYX::Ray>> createRayGrid(size_t size, double width, dou
 void traceTriangulation(const RAYX::OpticalElement& element, std::vector<TextureVertex>& vertices, std::vector<uint32_t>& indices) {
     RAYX::CpuTracer tracer;
 
-    constexpr size_t gridSize = 100;
+    constexpr size_t gridSize = 20;
     auto [width, length] = getRectangularDimensions(element.m_element.m_cutout);
     RAYX::BundleHistory rayGrid = createRayGrid(gridSize, width, length);
 

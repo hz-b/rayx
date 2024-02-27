@@ -98,10 +98,10 @@ void RenderObject::updateTexture(const unsigned char* data, uint32_t width, uint
 void RenderObject::createVertexBuffers(const std::vector<VertexVariant>& vertices) {
     m_vertexCount = static_cast<uint32_t>(vertices.size());
 
-    // Calculate the size of the buffer based on the size of the first vertex
-    VkDeviceSize bufferSize = m_vertexCount * std::visit([](auto&& arg) { return sizeof(arg); }, vertices[0]);
+    // Get the size of the first vertex in the vector
+    VkDeviceSize instanceSize = std::visit([](auto&& arg) { return sizeof(arg); }, vertices[0]);
 
-    m_vertexBuffer = std::make_unique<Buffer>(m_Device, "rObjVertBuff", bufferSize, m_vertexCount, VK_BUFFER_USAGE_VERTEX_BUFFER_BIT,
+    m_vertexBuffer = std::make_unique<Buffer>(m_Device, "rObjVertBuff", instanceSize, m_vertexCount, VK_BUFFER_USAGE_VERTEX_BUFFER_BIT,
                                               VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT);
     m_vertexBuffer->map();
 
