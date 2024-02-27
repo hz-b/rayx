@@ -28,7 +28,7 @@ struct Behaviour {
 ////////////////////
 
 // Mirror holds no data so it doesn't need a struct or a deserialize function.
-INLINE Behaviour serializeMirror() {
+inline Behaviour serializeMirror() {
     Behaviour b;
     b.m_type = BTYPE_MIRROR;
     return b;
@@ -44,7 +44,7 @@ struct GratingBehaviour {
     double m_orderOfDiffraction;
 };
 
-INLINE Behaviour serializeGrating(GratingBehaviour g) {
+inline Behaviour serializeGrating(GratingBehaviour g) {
     Behaviour b;
     b.m_type = BTYPE_GRATING;
 
@@ -59,7 +59,7 @@ INLINE Behaviour serializeGrating(GratingBehaviour g) {
     return b;
 }
 
-INLINE GratingBehaviour deserializeGrating(Behaviour b) {
+inline GratingBehaviour deserializeGrating(Behaviour b) {
     GratingBehaviour g;
     g.m_vls[0] = b.m_private_serialization_params[0];
     g.m_vls[1] = b.m_private_serialization_params[1];
@@ -87,7 +87,7 @@ struct SlitBehaviour {
     Cutout m_beamstopCutout;
 };
 
-INLINE Behaviour serializeSlit(SlitBehaviour s) {
+inline Behaviour serializeSlit(SlitBehaviour s) {
     Behaviour b;
     b.m_type = BTYPE_SLIT;
 
@@ -103,7 +103,7 @@ INLINE Behaviour serializeSlit(SlitBehaviour s) {
     return b;
 }
 
-INLINE SlitBehaviour deserializeSlit(Behaviour b) {
+inline SlitBehaviour deserializeSlit(Behaviour b) {
     SlitBehaviour s;
 
     s.m_openingCutout.m_type = b.m_private_serialization_params[0];
@@ -139,7 +139,7 @@ struct RZPBehaviour {
     double m_additionalOrder;
 };
 
-INLINE Behaviour serializeRZP(RZPBehaviour r) {
+inline Behaviour serializeRZP(RZPBehaviour r) {
     Behaviour b;
     b.m_type = BTYPE_RZP;
 
@@ -160,7 +160,7 @@ INLINE Behaviour serializeRZP(RZPBehaviour r) {
     return b;
 }
 
-INLINE RZPBehaviour deserializeRZP(Behaviour b) {
+inline RZPBehaviour deserializeRZP(Behaviour b) {
     RZPBehaviour r;
     r.m_imageType = b.m_private_serialization_params[0];
     r.m_rzpType = b.m_private_serialization_params[1];
@@ -184,7 +184,7 @@ INLINE RZPBehaviour deserializeRZP(Behaviour b) {
 ////////////////
 
 // ImagePlane holds no data so it doesn't need a struct or a deserialize function.
-INLINE Behaviour serializeImagePlane() {
+inline Behaviour serializeImagePlane() {
     Behaviour b;
     b.m_type = BTYPE_IMAGE_PLANE;
     return b;

@@ -4,8 +4,6 @@
 #ifndef ADAPT_H
 #define ADAPT_H
 
-#define INLINE inline
-
 // glm definitions need to be directly accessible in c++.
 #define GLM_ENABLE_EXPERIMENTAL
 #include <glm.hpp>

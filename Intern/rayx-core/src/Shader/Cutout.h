@@ -34,7 +34,7 @@ struct RectCutout {
     double m_length; // in Z direction
 };
 
-INLINE Cutout serializeRect(RectCutout cut) {
+inline Cutout serializeRect(RectCutout cut) {
     Cutout ser;
     ser.m_type = CTYPE_RECT;
     ser.m_private_serialization_params[0] = cut.m_width;
@@ -42,7 +42,7 @@ INLINE Cutout serializeRect(RectCutout cut) {
     return ser;
 }
 
-INLINE RectCutout deserializeRect(Cutout ser) {
+inline RectCutout deserializeRect(Cutout ser) {
     RectCutout cut;
     cut.m_width = ser.m_private_serialization_params[0];
     cut.m_length = ser.m_private_serialization_params[1];
@@ -63,7 +63,7 @@ struct EllipticalCutout {
     double m_diameter_z;
 };
 
-INLINE Cutout serializeElliptical(EllipticalCutout cut) {
+inline Cutout serializeElliptical(EllipticalCutout cut) {
     Cutout ser;
     ser.m_type = CTYPE_ELLIPTICAL;
     ser.m_private_serialization_params[0] = cut.m_diameter_x;
@@ -71,7 +71,7 @@ INLINE Cutout serializeElliptical(EllipticalCutout cut) {
     return ser;
 }
 
-INLINE EllipticalCutout deserializeElliptical(Cutout ser) {
+inline EllipticalCutout deserializeElliptical(Cutout ser) {
     EllipticalCutout cut;
     cut.m_diameter_x = ser.m_private_serialization_params[0];
     cut.m_diameter_z = ser.m_private_serialization_params[1];
@@ -93,7 +93,7 @@ struct TrapezoidCutout {
     double m_length; // in Z direction
 };
 
-INLINE Cutout serializeTrapezoid(TrapezoidCutout cut) {
+inline Cutout serializeTrapezoid(TrapezoidCutout cut) {
     Cutout ser;
     ser.m_type = CTYPE_TRAPEZOID;
     ser.m_private_serialization_params[0] = cut.m_widthA;
@@ -102,7 +102,7 @@ INLINE Cutout serializeTrapezoid(TrapezoidCutout cut) {
     return ser;
 }
 
-INLINE TrapezoidCutout deserializeTrapezoid(Cutout ser) {
+inline TrapezoidCutout deserializeTrapezoid(Cutout ser) {
     TrapezoidCutout cut;
     cut.m_widthA = ser.m_private_serialization_params[0];
     cut.m_widthB = ser.m_private_serialization_params[1];
@@ -117,7 +117,7 @@ INLINE TrapezoidCutout deserializeTrapezoid(Cutout ser) {
 // Every point (x, z) is within this cutout, it's unlimited after all.
 // `Unlimited` doesn't have any data so it doesn't need a struct.
 
-INLINE Cutout serializeUnlimited() {
+inline Cutout serializeUnlimited() {
     Cutout ser;
     ser.m_type = CTYPE_UNLIMITED;
     return ser;

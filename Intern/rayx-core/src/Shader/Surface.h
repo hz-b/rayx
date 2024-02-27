@@ -38,7 +38,7 @@ struct QuadricSurface {
     double m_a44;
 };
 
-INLINE Surface serializeQuadric(QuadricSurface surface) {
+inline Surface serializeQuadric(QuadricSurface surface) {
     Surface ser;
     ser.m_type = STYPE_QUADRIC;
     ser.m_private_serialization_params[0] = double(surface.m_icurv);
@@ -55,7 +55,7 @@ INLINE Surface serializeQuadric(QuadricSurface surface) {
     return ser;
 }
 
-INLINE QuadricSurface deserializeQuadric(Surface ser) {
+inline QuadricSurface deserializeQuadric(Surface ser) {
     QuadricSurface surface;
     surface.m_icurv = int(ser.m_private_serialization_params[0]);
     surface.m_a11 = ser.m_private_serialization_params[1];
@@ -85,7 +85,7 @@ struct ToroidSurface {
     ToroidType m_toroidType;
 };
 
-INLINE Surface serializeToroid(ToroidSurface surface) {
+inline Surface serializeToroid(ToroidSurface surface) {
     Surface ser;
     ser.m_type = STYPE_TOROID;
     ser.m_private_serialization_params[0] = surface.m_longRadius;
@@ -94,7 +94,7 @@ INLINE Surface serializeToroid(ToroidSurface surface) {
     return ser;
 }
 
-INLINE ToroidSurface deserializeToroid(Surface ser) {
+inline ToroidSurface deserializeToroid(Surface ser) {
     ToroidSurface surface;
     surface.m_longRadius = ser.m_private_serialization_params[0];
     surface.m_shortRadius = ser.m_private_serialization_params[1];
@@ -108,7 +108,7 @@ INLINE ToroidSurface deserializeToroid(Surface ser) {
 
 // `PlaneXZ` doesn't have any data so it doesn't need a struct.
 
-INLINE Surface serializePlaneXZ() {
+inline Surface serializePlaneXZ() {
     Surface ser;
     ser.m_type = STYPE_PLANE_XZ;
     return ser;
@@ -141,7 +141,7 @@ struct CubicSurface {
     double m_psi;
 };
 
-INLINE Surface serializeCubic(CubicSurface surface) {
+inline Surface serializeCubic(CubicSurface surface) {
     Surface ser;
     ser.m_type = STYPE_CUBIC;
     ser.m_private_serialization_params[0] = double(surface.m_icurv);
@@ -168,7 +168,7 @@ INLINE Surface serializeCubic(CubicSurface surface) {
     return ser;
 }
 
-INLINE CubicSurface deserializeCubic(Surface ser) {
+inline CubicSurface deserializeCubic(Surface ser) {
     CubicSurface surface;
     surface.m_icurv = int(ser.m_private_serialization_params[0]);
     surface.m_a11 = ser.m_private_serialization_params[1];
