@@ -56,7 +56,7 @@ if(Vulkan_FOUND)
     # ----------------------
 
     # ---- Dependencies ----
-    target_link_libraries(${PROJECT_NAME} PRIVATE rayx-core glfw CLI11::CLI11 nfd)
+    target_link_libraries(${PROJECT_NAME} PRIVATE rayx-core glfw CLI11::CLI11 nfd Vulkan::Vulkan)
     target_include_directories(${PROJECT_NAME} SYSTEM PRIVATE
         ${GLFW_DIR}/include
         ${GLFW_DIR}/deps

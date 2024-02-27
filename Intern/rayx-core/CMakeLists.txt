@@ -58,15 +58,7 @@ endif()
 
 # ------------------
 
-# ---- Disable Vulkan/H5 ----
-find_package(Vulkan)
-
-if(Vulkan_FOUND)
-    target_link_libraries(${PROJECT_NAME} PUBLIC Vulkan::Vulkan)
-else()
-    message(STATUS "Vulkan not found")
-    target_compile_definitions(${PROJECT_NAME} PUBLIC NO_VULKAN)
-endif()
+# ---- Disable H5 ----
 
 find_package(HDF5)
 
@@ -114,28 +106,6 @@ target_include_directories(${PROJECT_NAME} SYSTEM PUBLIC
     ${PROJECT_SOURCE_DIR}/../../Extern/HighFive/include/
     ${PROJECT_SOURCE_DIR}/../../Extern/VMA/include/
 )
-
-# ----------------------
-
-# ---- Compile Shaders ----
-if(Vulkan_FOUND)
-    # The following code is used to always compile the shader.
-    # This is most likely not an optimal solution, but it will work
-    # until we find a better one.
-    add_dependencies(${PROJECT_NAME} RAYX_CORE_COMPILE_SHADER)
-    set(RAYX_CORE_SHADER ${CMAKE_BINARY_DIR}/bin/shaders/comp.spv)
-    set(RAYX_CORE_SHADER_FAKE ${CMAKE_BINARY_DIR}/bin/___comp.spv) # this exists so file cannot be found -> always execute command
-
-    add_custom_command(
-        OUTPUT
-        ${RAYX_CORE_SHADER}
-        ${RAYX_CORE_SHADER_FAKE}
-        COMMAND glslangValidator
-        ARGS -V ${PROJECT_SOURCE_DIR}/src/Shader/main-glsl.comp -o ${RAYX_CORE_SHADER}
-    )
-
-    add_custom_target(RAYX_CORE_COMPILE_SHADER ALL DEPENDS ${RAYX_CORE_SHADER})
-endif()
 
 # ------------------------
 

@@ -9,7 +9,6 @@
 #include "Debug/Debug.h"
 #include "Random.h"
 #include "Tracer/CpuTracer.h"
-#include "Tracer/VulkanTracer.h"
 #include "Writer/Writer.h"
 
 TerminalApp::TerminalApp(int argc, char** argv) : m_argv(argv), m_argc(argc) {
@@ -161,22 +160,8 @@ void TerminalApp::run() {
     if (m_CommandParser->m_args.m_cpuFlag) {
         m_Tracer = std::make_unique<RAYX::CpuTracer>();
     } else {
-#ifdef NO_VULKAN
-        RAYX_ERR << "NO_VULKAN: trying to construct VulkanTracer with Vulkan disabled. Use -x to use CPU tracer or enable Vulkan when building.";
-#else
-        m_Tracer = std::make_unique<RAYX::VulkanTracer>();
-
-        /// list physical devices
-        if (m_CommandParser->m_args.m_listDevices) {
-            dynamic_cast<RAYX::VulkanTracer*>(m_Tracer.get())->listPhysicalDevices();
-            exit(0);
-        }
-        /// select physical device
-        if (m_CommandParser->m_args.m_deviceID >= 0) {
-            m_Tracer->setDevice(m_CommandParser->m_args.m_deviceID);
-        }
-
-#endif
+        // TODO(Sven): enable kokkos tracer
+        RAYX_ERR << "trying to construct GPU Tracer, which is currently not implemented. Use -x to use CPU tracer.";
     }
 
     // Trace, export and plot

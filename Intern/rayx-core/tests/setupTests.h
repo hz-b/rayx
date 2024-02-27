@@ -20,7 +20,6 @@
 #include "Shader/Diffraction.h"
 
 #include "Tracer/CpuTracer.h"
-#include "Tracer/VulkanTracer.h"
 #include "Writer/CSVWriter.h"
 #include "gmock/gmock.h"
 #include "gtest/gtest.h"
@@ -161,11 +160,8 @@ class TestSuite : public testing::Test {
         if (cpu) {
             tracer = std::make_unique<RAYX::CpuTracer>();
         } else {
-#ifdef NO_VULKAN
-            RAYX_ERR << "can't create VulkanTracer due to NO_VULKAN";
-#else
-            tracer = std::make_unique<RAYX::VulkanTracer>();
-#endif
+            // TODO(Sven): enable kokkos tracer testing
+            RAYX_ERR << "can't create GPU Tracer";
         }
     }
 
