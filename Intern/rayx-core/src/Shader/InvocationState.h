@@ -1,5 +1,5 @@
 // The InvocationState stores all shader-global declarations, including the buffers and stuff like the random-state.
-// All InvocationState variables (except for gl_GlobalInvocationID) are prefixed with `inv_` to separate them from other identifiers.
+// All InvocationState variables (except for inv.globalInvocationId) are prefixed with `inv_` to separate them from other identifiers.
 
 // TODO If we want to have a multi-threaded CpuTracer, we will require to have multiple InvocationStates at once.
 // Thus we probably want to collect these variables into a `struct InvocationState`, from which each thread has a copy.
@@ -30,10 +30,10 @@ struct _debug_struct {
 };
 
 // we don't require forward declarations in GLSL, hence we only do them in C++:
-extern int gl_GlobalInvocationID;
 
 // TODO(Sven): restore RAYX_API attributes for members
 struct RAYX_API InvocationState {
+    int globalInvocationId;
     bool finalized;
     uint64_t ctr;
     uint64_t nextEventIndex;
@@ -55,6 +55,6 @@ using Inv = InvocationState;
 
 // Every shader execution calculates the route for a single ray.
 // `_ray` is that ray, it's always in world coordinates (!).
-#define _ray (inv.rayData[uint(gl_GlobalInvocationID)])
+#define _ray (inv.rayData[uint(inv.globalInvocationId)])
 
 #endif

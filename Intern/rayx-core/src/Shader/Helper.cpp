@@ -17,13 +17,13 @@ void init(Inv& inv) {
     inv.ctr = rayId(inv) * workerCounterNum + uint64_t(inv.pushConstants.randomSeed * MAX_UINT64_DOUBLE);
 }
 
-uint64_t rayId(Inv& inv) { return uint64_t(inv.pushConstants.rayIdStart) + uint64_t(gl_GlobalInvocationID); }
+uint64_t rayId(Inv& inv) { return uint64_t(inv.pushConstants.rayIdStart) + uint64_t(inv.globalInvocationId); }
 
 // `i in [0, maxEvents-1]`.
 // Will return the index in outputData to access the `i'th` output ray belonging to this shader call.
 // Typically used as `outputData[output_index(i)]`.
 uint output_index(uint i, Inv& inv) {
-    return uint(gl_GlobalInvocationID) * uint(inv.pushConstants.maxEvents - inv.pushConstants.startEventID) + i -
+    return uint(inv.globalInvocationId) * uint(inv.pushConstants.maxEvents - inv.pushConstants.startEventID) + i -
            uint(inv.pushConstants.startEventID);
 }
 

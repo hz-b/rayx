@@ -45,7 +45,7 @@ std::vector<Ray> CpuTracer::traceRaw(const TraceRawConfig& cfg) {
 
     // Run the tracing by for all rays
     for (uint i = 0; i < rayList.size(); i++) {
-        gl_GlobalInvocationID = i;
+        inv.globalInvocationId = i;
         dynamicElements(inv);
     }
 

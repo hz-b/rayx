@@ -12,7 +12,7 @@ void dynamicElements(Inv& inv) {
     // TODO(Sven): rework debugging on GPU
     // #ifdef GLSL
     //     // Set Debug Struct of current Ray to identity
-    //     pushConstants.inv.d_struct[uint(gl_GlobalInvocationID)]._dMat = dmat4(1);
+    //     pushConstants.inv.d_struct[uint(inv.globalInvocationId)]._dMat = dmat4(1);
     // #endif
     #endif
 
