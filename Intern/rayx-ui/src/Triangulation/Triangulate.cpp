@@ -61,9 +61,9 @@ VertexType toVertexType(const Point2D& prev, const Point2D& current, const Point
         angle += PI * 2;
     }
     if (prev < current && next < current) {
-        return angle < M_PI ? Start : Split;
+        return angle < PI ? Start : Split;
     } else if (prev > current && next > current) {
-        return angle < M_PI ? End : Merge;
+        return angle < PI ? End : Merge;
     } else {
         return Regular;
     }
