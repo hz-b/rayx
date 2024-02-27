@@ -1,7 +1,7 @@
 #ifndef BEHAVIOUR_H
 #define BEHAVIOUR_H
 
-#include "Adapt.h"
+#include "Common.h"
 #include "Cutout.h"
 
 #undef m_private_serialization_params

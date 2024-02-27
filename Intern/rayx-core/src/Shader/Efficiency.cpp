@@ -64,7 +64,7 @@ void RAYX_API fresnel(dvec2 cn1, dvec2 cn2, dvec2 cos_incidence, dvec2 cos_trans
  * @return complex_S			complex s-polarization
  * @return complex_P			complex p-polarization
  */
-void RAYX_API reflectance(double energy, double incidence_angle, RAYX_INOUT(dvec2) complex_S, RAYX_INOUT(dvec2) complex_P, int material) {
+void RAYX_API reflectance(double energy, double incidence_angle, RAYX_INOUT(dvec2) complex_S, RAYX_INOUT(dvec2) complex_P, int material, Inv& inv) {
     dvec2 cos_incidence = dvec2(r8_cos(incidence_angle),
                                 0.0);  // complex number, initialization only for first layer, the
                                        // others are then derived from this with snell's law
@@ -75,8 +75,8 @@ void RAYX_API reflectance(double energy, double incidence_angle, RAYX_INOUT(dvec
     // angle for each layer, so far only one layer (substrate?) store cosinuses
     // in array, bc needed in later loop for fresnel (or maybe only one loop is
     // enough?) todo refractive indices of materials in extra buffer?
-    dvec2 cn1 = getRefractiveIndex(energy, vacuum_material);
-    dvec2 cn2 = getRefractiveIndex(energy, material);
+    dvec2 cn1 = getRefractiveIndex(energy, vacuum_material, inv);
+    dvec2 cn2 = getRefractiveIndex(energy, material, inv);
     dvec2 cos_transmittance = snell(cos_incidence, cn1, cn2);
 
     // todo again iterate over layers but from bottom to top, update s and p
@@ -132,9 +132,9 @@ double phase_difference(dvec2 euler1, dvec2 euler2) {
  * @param material				material the photon collides with
  * @param others
  */
-void efficiency(Ray r, RAYX_OUT(double) real_S, RAYX_OUT(double) real_P, RAYX_OUT(double) delta, double incidence_angle, int material) {
+void efficiency(Ray r, RAYX_OUT(double) real_S, RAYX_OUT(double) real_P, RAYX_OUT(double) delta, double incidence_angle, int material, Inv& inv) {
     dvec2 complex_S, complex_P;
-    reflectance(r.m_energy, incidence_angle, complex_S, complex_P, material);
+    reflectance(r.m_energy, incidence_angle, complex_S, complex_P, material, inv);
 
     dvec2 euler_P = cartesian_to_euler(complex_P);
     dvec2 euler_S = cartesian_to_euler(complex_S);

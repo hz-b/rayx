@@ -1,7 +1,8 @@
 #ifndef DIFFRACTION_H
 #define DIFFRACTION_H
 
-#include "Adapt.h"
+#include "Common.h"
+#include "InvocationState.h"
 
 // Calculates the factorial of n: n!
 double RAYX_API fact(int n);
@@ -18,7 +19,7 @@ zoneplates
 @returns
     results stored in dphi, dpsi (inout)
 */
-void bessel_diff(double radius, double wl, RAYX_INOUT(double) dphi, RAYX_INOUT(double) dpsi);
+void bessel_diff(double radius, double wl, RAYX_INOUT(double) dphi, RAYX_INOUT(double) dpsi, Inv& inv);
 
 /**
  * calculates fraunhofer diffraction effects on rectangular slits
@@ -27,6 +28,6 @@ void bessel_diff(double radius, double wl, RAYX_INOUT(double) dphi, RAYX_INOUT(d
  * @param dAngle 	diffraction angle (inout)
  * @return result stored in dAngle
  */
-void fraun_diff(double dim, double wl, RAYX_INOUT(double) dAngle);
+void fraun_diff(double dim, double wl, RAYX_INOUT(double) dAngle, Inv& inv);
 
 #endif

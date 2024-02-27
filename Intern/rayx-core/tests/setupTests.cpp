@@ -1,5 +1,8 @@
 #include "setupTests.h"
 
+// define globally decralred invocation state
+InvocationState inv;
+
 std::unique_ptr<RAYX::Tracer> tracer;
 
 // helper functions
@@ -245,6 +248,6 @@ void updateCpuTracerMaterialTables(std::vector<Material> mats_vec) {
         mats[static_cast<int>(m) - 1] = true;
     }
     auto materialTables = loadMaterialTables(mats);
-    inv_mat.data = materialTables.materialTable;
-    inv_matIdx.data = materialTables.indexTable;
+    inv.mat.data = materialTables.materialTable;
+    inv.matIdx.data = materialTables.indexTable;
 }

@@ -1,7 +1,7 @@
 #ifndef CUBIC_H
 #define CUBIC_H
 
-#include "Adapt.h"
+#include "Common.h"
 
 //TODO: doku
 dvec3 RAYX_API cubicPosition(Ray r, double alpha);

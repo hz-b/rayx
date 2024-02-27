@@ -1,6 +1,5 @@
 #include "UpdateStokes.h"
 #include "Approx.h"
-#include "InvocationState.h"
 #include "Rand.h"
 
 /** creates a Müller matrix (see p. 32 of Schäfers, 2007)
@@ -26,7 +25,7 @@ dmat4 mullerMatrix(double R_s, double R_p, double delta) {
  * updates stokes vector of ray
  * @returns `true`, if ray should be absorbed
  */
-bool updateStokes(RAYX_INOUT(Ray) r, double real_S, double real_P, double delta, double azimuthal) {
+bool updateStokes(RAYX_INOUT(Ray) r, double real_S, double real_P, double delta, double azimuthal, Inv& inv) {
     dvec4 stokes_old = r.m_stokes;
     double c_chi = r8_cos(azimuthal);
     double s_chi = r8_sin(azimuthal);
@@ -36,7 +35,7 @@ bool updateStokes(RAYX_INOUT(Ray) r, double real_S, double real_P, double delta,
     dvec4 stokes_new = mullerMatrix(real_S, real_P, delta) * rot * stokes_old;
     r.m_stokes = inv_rot * stokes_new;
 
-    double rn = squaresDoubleRNG(inv_ctr);
+    double rn = squaresDoubleRNG(inv.ctr);
     // throw ray away with certain probability
     return (r.m_stokes.x / stokes_old.x) - rn <= 0;
 }

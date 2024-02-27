@@ -844,7 +844,7 @@ TEST_F(TestSuite, testRefracPlane) {
             };
 
     for (auto p : inouts) {
-        auto out_ray = refracPlane(p.in_ray, p.in_normal, p.in_a);
+        auto out_ray = refracPlane(p.in_ray, p.in_normal, p.in_a, inv);
         CHECK_EQ(out_ray, p.out_ray);
     }
 }
@@ -892,7 +892,7 @@ TEST_F(TestSuite, testReflectance) {
     for (auto p : inouts) {
         glm::dvec2 complex_S;
         glm::dvec2 complex_P;
-        reflectance(p.in_energy, p.in_incidenceAngle, complex_S, complex_P, p.in_material);
+        reflectance(p.in_energy, p.in_incidenceAngle, complex_S, complex_P, p.in_material, inv);
         CHECK_EQ(complex_S, p.out_complex_S);
         CHECK_EQ(complex_P, p.out_complex_P);
     }
@@ -1016,27 +1016,27 @@ TEST_F(TestSuite, testPalik) {
     updateCpuTracerMaterialTables({Material::Cu, Material::Au});
 
     int Cu = static_cast<int>(Material::Cu);
-    CHECK_EQ(getPalikEntryCount(Cu), 324);
+    CHECK_EQ(getPalikEntryCount(Cu, inv), 324);
 
-    auto Cu0 = getPalikEntry(0, Cu);
+    auto Cu0 = getPalikEntry(0, Cu, inv);
     CHECK_EQ(Cu0.m_energy, 1.0);
     CHECK_EQ(Cu0.m_n, 0.433);
     CHECK_EQ(Cu0.m_k, 8.46);
 
-    auto Cu10 = getPalikEntry(10, Cu);
+    auto Cu10 = getPalikEntry(10, Cu, inv);
     CHECK_EQ(Cu10.m_energy, 2.3);
     CHECK_EQ(Cu10.m_n, 1.04);
     CHECK_EQ(Cu10.m_k, 2.59);
 
     int Au = static_cast<int>(Material::Au);
-    CHECK_EQ(getPalikEntryCount(Au), 386);
+    CHECK_EQ(getPalikEntryCount(Au, inv), 386);
 
-    auto Au0 = getPalikEntry(0, Au);
+    auto Au0 = getPalikEntry(0, Au, inv);
     CHECK_EQ(Au0.m_energy, 0.04959);
     CHECK_EQ(Au0.m_n, 20.3);
     CHECK_EQ(Au0.m_k, 76.992);
 
-    auto Au10 = getPalikEntry(10, Au);
+    auto Au10 = getPalikEntry(10, Au, inv);
     CHECK_EQ(Au10.m_energy, 0.11158);
     CHECK_EQ(Au10.m_n, 12.963);
     CHECK_EQ(Au10.m_k, 57.666);
@@ -1046,28 +1046,28 @@ TEST_F(TestSuite, testNff) {
     updateCpuTracerMaterialTables({Material::Cu, Material::Au});
 
     int Cu = static_cast<int>(Material::Cu);
-    CHECK_EQ(getNffEntryCount(Cu), 504);
+    CHECK_EQ(getNffEntryCount(Cu, inv), 504);
 
-    auto Cu0 = getNffEntry(0, Cu);
+    auto Cu0 = getNffEntry(0, Cu, inv);
 
     CHECK_EQ(Cu0.m_energy, 10.0);
     CHECK_EQ(Cu0.m_f1, -9999.0);
     CHECK_EQ(Cu0.m_f2, 1.30088);
 
-    auto Cu10 = getNffEntry(10, Cu);
+    auto Cu10 = getNffEntry(10, Cu, inv);
     CHECK_EQ(Cu10.m_energy, 11.7404);
     CHECK_EQ(Cu10.m_f1, -9999.0);
     CHECK_EQ(Cu10.m_f2, 1.66946);
 
     int Au = static_cast<int>(Material::Au);
-    CHECK_EQ(getNffEntryCount(Au), 506);
+    CHECK_EQ(getNffEntryCount(Au, inv), 506);
 
-    auto Au0 = getNffEntry(0, Au);
+    auto Au0 = getNffEntry(0, Au, inv);
     CHECK_EQ(Au0.m_energy, 10.0);
     CHECK_EQ(Au0.m_f1, -9999.0);
     CHECK_EQ(Au0.m_f2, 1.73645);
 
-    auto Au10 = getNffEntry(10, Au);
+    auto Au10 = getNffEntry(10, Au, inv);
     CHECK_EQ(Au10.m_energy, 11.7404);
     CHECK_EQ(Au10.m_f1, -9999.0);
     CHECK_EQ(Au10.m_f2, 2.67227);
@@ -1077,18 +1077,18 @@ TEST_F(TestSuite, testRefractiveIndex) {
     updateCpuTracerMaterialTables({Material::Cu});
 
     // vacuum
-    CHECK_EQ(getRefractiveIndex(42.0, -1), glm::dvec2(1.0, 0.0));
+    CHECK_EQ(getRefractiveIndex(42.0, -1, inv), glm::dvec2(1.0, 0.0));
 
     // palik tests for Cu
     // data taken from Data/PALIK
-    CHECK_EQ(getRefractiveIndex(1.0, 29), glm::dvec2(0.433, 8.46));
-    CHECK_EQ(getRefractiveIndex(1.8, 29), glm::dvec2(0.213, 4.05));
-    CHECK_EQ(getRefractiveIndex(1977.980, 29), glm::dvec2(1.000032, 9.4646668E-05));
+    CHECK_EQ(getRefractiveIndex(1.0, 29, inv), glm::dvec2(0.433, 8.46));
+    CHECK_EQ(getRefractiveIndex(1.8, 29, inv), glm::dvec2(0.213, 4.05));
+    CHECK_EQ(getRefractiveIndex(1977.980, 29, inv), glm::dvec2(1.000032, 9.4646668E-05));
 
     // nff tests for Cu
     // data taken from
     // https://refractiveindex.info/?shelf=main&book=Cu&page=Hagemann
-    CHECK_EQ(getRefractiveIndex(25146.2, 29), glm::dvec2(1.0, 1.0328e-7), 1e-5);
+    CHECK_EQ(getRefractiveIndex(25146.2, 29, inv), glm::dvec2(1.0, 1.0328e-7), 1e-5);
 }
 
 TEST_F(TestSuite, testBesselDipole) {

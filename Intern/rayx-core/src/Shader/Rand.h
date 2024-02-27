@@ -1,7 +1,7 @@
 #ifndef RAND_H
 #define RAND_H
 
-#include "Adapt.h"
+#include "Common.h"
 
 /*
  * Title: "Squares: A Fast Counter-Based RNG"

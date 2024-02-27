@@ -42,7 +42,7 @@ zoneplates
 @returns
     results stored in dphi, dpsi (inout)
 */
-void bessel_diff(double radius, double wl, RAYX_INOUT(double) dphi, RAYX_INOUT(double) dpsi) {
+void bessel_diff(double radius, double wl, RAYX_INOUT(double) dphi, RAYX_INOUT(double) dpsi, Inv& inv) {
     double b = abs(radius) * 1e06;
     double ximax = 5.0 * wl / b;
 
@@ -50,7 +50,7 @@ void bessel_diff(double radius, double wl, RAYX_INOUT(double) dphi, RAYX_INOUT(d
     double c = -1;
     while (c < 0) {  // while c = wd - rn1[2] < 0 continue
         for (int i = 0; i < 3; i++) {
-            rn1[i] = squaresDoubleRNG(inv_ctr);
+            rn1[i] = squaresDoubleRNG(inv.ctr);
         }
 
         dphi = rn1[0] * ximax;
@@ -66,8 +66,8 @@ void bessel_diff(double radius, double wl, RAYX_INOUT(double) dphi, RAYX_INOUT(d
     }
 
     // 50% neg/pos sign
-    dphi = sign(squaresDoubleRNG(inv_ctr) - 0.5) * dphi;
-    dpsi = sign(squaresDoubleRNG(inv_ctr) - 0.5) * dpsi;
+    dphi = sign(squaresDoubleRNG(inv.ctr) - 0.5) * dphi;
+    dpsi = sign(squaresDoubleRNG(inv.ctr) - 0.5) * dpsi;
 }
 
 /**
@@ -77,7 +77,7 @@ void bessel_diff(double radius, double wl, RAYX_INOUT(double) dphi, RAYX_INOUT(d
  * @param dAngle 	diffraction angle (inout)
  * @return result stored in dAngle
  */
-void fraun_diff(double dim, double wl, RAYX_INOUT(double) dAngle) {
+void fraun_diff(double dim, double wl, RAYX_INOUT(double) dAngle, Inv& inv) {
     if (dim == 0) return;        // no diffraction in this direction
     double b = dim * 1e06;       // slit opening
     double div = 10.0 * wl / b;  // up to 2nd maximum
@@ -86,7 +86,7 @@ void fraun_diff(double dim, double wl, RAYX_INOUT(double) dAngle) {
     double c = -1;
     while (c < 0) {  // while c = wd - uni[1] < 0 continue
         for (int i = 0; i < 2; i++) {
-            rna[i] = squaresDoubleRNG(inv_ctr);
+            rna[i] = squaresDoubleRNG(inv.ctr);
         }
         dAngle = (rna[0] - 0.5) * div;
         double u = PI * b * r8_sin(dAngle) / wl;

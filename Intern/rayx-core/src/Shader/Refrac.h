@@ -1,7 +1,8 @@
 #ifndef REFRAC_H
 #define REFRAC_H
 
-#include "Adapt.h"
+#include "Common.h"
+#include "InvocationState.h"
 
 /**
 calculates refracted ray
@@ -12,10 +13,10 @@ calculates refracted ray
 @returns: refracted ray (position unchanged, direction changed), weight = ETYPE_BEYOND_HORIZON if
 "ray beyond horizon"
 */
-Ray refrac2D(Ray r, dvec3 normal, double az, double ax);
+Ray refrac2D(Ray r, dvec3 normal, double az, double ax, Inv& inv);
 
 // refraction function used for gratings
-Ray refrac(Ray r, dvec3 normal, double linedensity);
+Ray refrac(Ray r, dvec3 normal, double linedensity, Inv& inv);
 
 // TODO the function refracPlane is not currently in use!
 /*
@@ -29,7 +30,7 @@ Ray refrac(Ray r, dvec3 normal, double linedensity);
  * WL:wavelength (nm); ORD order of diffraction
  */
 Ray RAYX_API refracPlane(Ray r, ALLOW_UNUSED dvec3 normal,
-                          double a);  // TODO fix unused var
+                          double a, Inv& inv);  // TODO fix unused var
 
 
 #endif

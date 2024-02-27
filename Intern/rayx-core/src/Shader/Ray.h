@@ -1,7 +1,7 @@
 #ifndef RAY_H
 #define RAY_H
 
-#include "Adapt.h"
+#include "Common.h"
 
 namespace RAYX {
 

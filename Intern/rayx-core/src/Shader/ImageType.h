@@ -1,7 +1,7 @@
 #ifndef IMAGE_TYPE_H
 #define IMAGE_TYPE_H
 
-#include "Adapt.h"
+#include "Common.h"
 
 // The ImageType is a parameter within the RZP.
 // It's different possible values are listed below.

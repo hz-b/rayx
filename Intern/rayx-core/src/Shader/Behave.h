@@ -1,8 +1,9 @@
 #ifndef BEHAVE_H
 #define BEHAVE_H
 
-#include "Adapt.h"
+#include "Common.h"
 #include "Collision.h"
+#include "InvocationState.h"
 
 /// Each `behave*` function gets a `Ray r` (in element-coords), the element itself, a randomness counter and the `Collision col`.
 /// `col.hitpoint` expresses where the given ray r will hit the element (in element-coords).
@@ -14,10 +15,10 @@
 /// - change the rays stokes vector
 /// - potentially absorb the ray (by calling `recordFinalEvent(_, ETYPE_ABSORBED)`)
 
-Ray behaveSlit(Ray r, int id, ALLOW_UNUSED Collision col);
-Ray behaveRZP(Ray r, int id, Collision col);
-Ray behaveGrating(Ray r, int id, Collision col);
-Ray behaveMirror(Ray r, int id, Collision col);
-Ray behaveImagePlane(Ray r, ALLOW_UNUSED int id, ALLOW_UNUSED Collision col);
+Ray behaveSlit(Ray r, int id, ALLOW_UNUSED Collision col, Inv& inv);
+Ray behaveRZP(Ray r, int id, Collision col, Inv& inv);
+Ray behaveGrating(Ray r, int id, Collision col, Inv& inv);
+Ray behaveMirror(Ray r, int id, Collision col, Inv& inv);
+Ray behaveImagePlane(Ray r, ALLOW_UNUSED int id, ALLOW_UNUSED Collision col, ALLOW_UNUSED Inv& inv);
 
 #endif

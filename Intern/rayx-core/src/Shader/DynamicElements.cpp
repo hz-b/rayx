@@ -1,19 +1,18 @@
 #include "DynamicElements.h"
 #include "Collision.h"
 #include "Behave.h"
-#include "InvocationState.h"
 #include "Utils.h"
 #include "Helper.h"
 
-void dynamicElements() {
+void dynamicElements(Inv& inv) {
     // initializes the global state.
-    init();
+    init(inv);
 
     #ifdef RAYX_DEBUG_MODE // Debug Matrix only works in GPU Mode and on DEBUG Build Type
     // TODO(Sven): rework debugging on GPU
     // #ifdef GLSL
     //     // Set Debug Struct of current Ray to identity
-    //     pushConstants.inv_d_struct[uint(gl_GlobalInvocationID)]._dMat = dmat4(1);
+    //     pushConstants.inv.d_struct[uint(gl_GlobalInvocationID)]._dMat = dmat4(1);
     // #endif
     #endif
 
@@ -24,7 +23,7 @@ void dynamicElements() {
 
     // Iterate through all bounces
     while (true) {
-        Collision col = findCollision();
+        Collision col = findCollision(inv);
         if (!col.found) {
             // no element was hit.
             // Tracing is done!
@@ -32,7 +31,7 @@ void dynamicElements() {
         }
 
         // transform ray and intersection point in ELEMENT coordiantes
-        nextElement = inv_elements[col.elementIndex];
+        nextElement = inv.elements[col.elementIndex];
         Ray elem_ray = rayMatrixMult(_ray, nextElement.m_inTrans);
 
         // Calculate interaction(reflection,material, absorption etc.) of ray with detected next element
@@ -44,26 +43,26 @@ void dynamicElements() {
 
         switch(btype) {
             case (BTYPE_MIRROR):
-                elem_ray = behaveMirror(elem_ray, col.elementIndex, col);
+                elem_ray = behaveMirror(elem_ray, col.elementIndex, col, inv);
                 break;
             case (BTYPE_GRATING):
-                elem_ray = behaveGrating(elem_ray, col.elementIndex, col);
+                elem_ray = behaveGrating(elem_ray, col.elementIndex, col, inv);
                 break;
             case (BTYPE_SLIT) :
-                elem_ray = behaveSlit(elem_ray, col.elementIndex, col);
+                elem_ray = behaveSlit(elem_ray, col.elementIndex, col, inv);
                 break;
             case (BTYPE_RZP):
-                elem_ray = behaveRZP(elem_ray, col.elementIndex, col);
+                elem_ray = behaveRZP(elem_ray, col.elementIndex, col, inv);
                 break;
             case (BTYPE_IMAGE_PLANE):
-                elem_ray = behaveImagePlane(elem_ray, col.elementIndex, col);
+                elem_ray = behaveImagePlane(elem_ray, col.elementIndex, col, inv);
                 break;
         }
 
         // the ray might finalize due to being absorbed, or because an error occured while tracing!
-        if (inv_finalized) { return; }
+        if (inv.finalized) { return; }
 
-        recordEvent(elem_ray, ETYPE_JUST_HIT_ELEM);
+        recordEvent(elem_ray, ETYPE_JUST_HIT_ELEM, inv);
 
         // transform back to WORLD coordinates
         _ray = rayMatrixMult(elem_ray, nextElement.m_outTrans);

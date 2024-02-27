@@ -1,7 +1,7 @@
 #ifndef COMPLEX_H
 #define COMPLEX_H
 
-#include "Adapt.h"
+#include "Common.h"
 
 /* COMPLEX NUMBERS */
 // make a struct for complex numbers or just use vec2?

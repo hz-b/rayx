@@ -1,7 +1,8 @@
 #ifndef APPLY_SLOPE_ERROR_H
 #define APPLY_SLOPE_ERROR_H
 
-#include "Adapt.h"
+#include "Common.h"
+#include "InvocationState.h"
 
 /**
 turn the normal vector through x_rad and z_rad
@@ -30,6 +31,6 @@ adds slope error to the normal
 1=cylindrical) (1 only for ellipsis relevant) returns new normal if there is a
 slope error in either x or z direction or the unmodified normal otherwise.
 */
-dvec3 applySlopeError(dvec3 normal, SlopeError error, int O_type);
+dvec3 applySlopeError(dvec3 normal, SlopeError error, int O_type, Inv& inv);
 
 #endif

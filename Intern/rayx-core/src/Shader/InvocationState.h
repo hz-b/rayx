@@ -6,13 +6,13 @@
 // - The ShaderArrays from these different copies should probably reference the same buffers though!
 
 // This struct idea might not work well with GLSLs `layout` interpretation of ShaderArrays though.
-// In other words, `inv_elements` probably needs to be a global variable, as `GLSL` has to declare it as a global variable using `layout`.
+// In other words, `inv.elements` probably needs to be a global variable, as `GLSL` has to declare it as a global variable using `layout`.
 // This problem requires further thought...
 
 #ifndef INVOCATION_STATE_H
 #define INVOCATION_STATE_H
 
-#include "Adapt.h"
+#include "Common.h"
 #include "Ray.h"
 
 // Useful for GPU Tracing
@@ -31,24 +31,30 @@ struct _debug_struct {
 
 // we don't require forward declarations in GLSL, hence we only do them in C++:
 extern int gl_GlobalInvocationID;
-extern bool inv_finalized;
-extern uint64_t inv_ctr;
-extern uint64_t inv_nextEventIndex;
-extern ShaderArray<Ray> RAYX_API inv_rayData;
-extern ShaderArray<Ray> RAYX_API inv_outputData;
-extern ShaderArray<Element> RAYX_API inv_elements;
-extern ShaderArray<dvec4> RAYX_API inv_xyznull;
-extern ShaderArray<int> RAYX_API inv_matIdx;
-extern ShaderArray<double> RAYX_API inv_mat;
+
+// TODO(Sven): restore RAYX_API attributes for members
+struct RAYX_API InvocationState {
+    bool finalized;
+    uint64_t ctr;
+    uint64_t nextEventIndex;
+    ShaderArray<Ray> rayData;
+    ShaderArray<Ray> outputData;
+    ShaderArray<Element> elements;
+    ShaderArray<dvec4> xyznull;
+    ShaderArray<int> matIdx;
+    ShaderArray<double> mat;
 
 #ifdef RAYX_DEBUG_MODE
-extern ShaderArray<_debug_struct> RAYX_API inv_d_struct;
+    ShaderArray<_debug_struct> d_struct;
 #endif
 
-extern PushConstants inv_pushConstants;
+    PushConstants pushConstants;
+};
+
+using Inv = InvocationState;
 
 // Every shader execution calculates the route for a single ray.
 // `_ray` is that ray, it's always in world coordinates (!).
-#define _ray (inv_rayData[uint(gl_GlobalInvocationID)])
+#define _ray (inv.rayData[uint(gl_GlobalInvocationID)])
 
 #endif

@@ -1,7 +1,7 @@
 #ifndef LINE_DENSITY_H
 #define LINE_DENSITY_H
 
-#include "Adapt.h"
+#include "Common.h"
 
 /** variable line spacing for gratings
 @params

@@ -1,7 +1,7 @@
 #ifndef CUTOUT_FNS_H
 #define CUTOUT_FNS_H
 
-#include "Adapt.h"
+#include "Common.h"
 
 // checks whether the point (x, z) is within the cutout.
 bool RAYX_API inCutout(Cutout cutout, double x, double z);

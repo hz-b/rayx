@@ -11,7 +11,7 @@ calculates refracted ray
 @returns: refracted ray (position unchanged, direction changed), weight = ETYPE_BEYOND_HORIZON if
 "ray beyond horizon"
 */
-Ray refrac2D(Ray r, dvec3 normal, double az, double ax) {
+Ray refrac2D(Ray r, dvec3 normal, double az, double ax, Inv& inv) {
     double eps1 = -r8_atan(normal.x / normal.y);
     double del1 = r8_asin(normal.z);
 
@@ -35,13 +35,13 @@ Ray refrac2D(Ray r, dvec3 normal, double az, double ax) {
         r.m_direction.z = z1;
         r.m_direction = inv_rot * r.m_direction;
     } else {  // beyond horizon - when divergence too large
-        recordFinalEvent(r, ETYPE_BEYOND_HORIZON);
+        recordFinalEvent(r, ETYPE_BEYOND_HORIZON, inv);
     }
     return r;
 }
 
 // refraction function used for gratings
-Ray refrac(Ray r, dvec3 normal, double linedensity) {
+Ray refrac(Ray r, dvec3 normal, double linedensity, Inv& inv) {
     double xy = normal[0] / normal[1];
     double zy = normal[2] / normal[1];
     double sqq = sqrt(1 + zy * zy + xy * xy);
@@ -68,7 +68,7 @@ Ray refrac(Ray r, dvec3 normal, double linedensity) {
         r.m_direction[2] -= a1;
         r.m_direction = dvec3(inv_rot * dvec4(r.m_direction, 0));
     } else {
-        recordFinalEvent(r, ETYPE_BEYOND_HORIZON);
+        recordFinalEvent(r, ETYPE_BEYOND_HORIZON, inv);
     }
     return r;
 }
@@ -84,14 +84,14 @@ Ray refrac(Ray r, dvec3 normal, double linedensity) {
  * WL:wavelength (nm); ORD order of diffraction
  */
 Ray RAYX_API refracPlane(Ray r, ALLOW_UNUSED dvec3 normal,
-                          double a) {  // TODO fix unused var
+                          double a, Inv& inv) {  // TODO fix unused var
     double y1 = r.m_direction[1] * r.m_direction[1] + r.m_direction[2] * r.m_direction[2] - (r.m_direction[2] - a) * (r.m_direction[2] - a);
     if (y1 > 0) {
         y1 = sqrt(y1);
         r.m_direction[1] = y1;
         r.m_direction[2] = r.m_direction[2] - a;
     } else {
-        recordFinalEvent(r, ETYPE_BEYOND_HORIZON);
+        recordFinalEvent(r, ETYPE_BEYOND_HORIZON, inv);
     }
     return r;
 }

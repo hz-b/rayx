@@ -1,8 +1,8 @@
 #ifndef COLLISION_H
 #define COLLISION_H
 
-#include "Adapt.h"
-#include "Ray.h"
+#include "Common.h"
+#include "InvocationState.h"
 
 #define COLLISION_EPSILON 1e-6
 
@@ -24,7 +24,7 @@ struct RAYX_API Collision {
 Collision getQuadricCollision(Ray r, QuadricSurface q);
 Collision getToroidCollision(Ray r, ToroidSurface toroid, bool isTriangul);
 Collision RAYX_API findCollisionInElementCoords(Ray r, Surface surface, Cutout cutout, bool isTriangul);
-Collision findCollisionWith(Ray r, uint id);
-Collision findCollision();
+Collision findCollisionWith(Ray r, uint id, Inv& inv);
+Collision findCollision(Inv& inv);
 
 #endif

@@ -22,6 +22,8 @@ class RAYX_API CpuTracer : public Tracer {
 
     std::vector<Ray> traceRaw(const TraceRawConfig&) override;
     void setPushConstants(const PushConstants*) override;
+
+    InvocationState inv;
 };
 
 }  // namespace RAYX

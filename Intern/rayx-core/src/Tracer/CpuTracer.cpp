@@ -25,33 +25,33 @@ std::vector<Ray> CpuTracer::traceRaw(const TraceRawConfig& cfg) {
 
     // CFG meta passed through pushConstants
 
-    inv_elements.data.clear();
-    inv_xyznull.data.clear();
-    inv_matIdx.data.clear();
-    inv_mat.data.clear();
+    inv.elements.data.clear();
+    inv.xyznull.data.clear();
+    inv.matIdx.data.clear();
+    inv.mat.data.clear();
 
     // init rayData, outputData
-    inv_rayData.data = rayList;
-    inv_outputData.data.resize(rayList.size() * ((size_t)cfg.m_maxEvents - (size_t)cfg.m_startEventID));
+    inv.rayData.data = rayList;
+    inv.outputData.data.resize(rayList.size() * ((size_t)cfg.m_maxEvents - (size_t)cfg.m_startEventID));
 
     // init elements
     for (auto e : cfg.m_elements) {
-        inv_elements.data.push_back(e);
+        inv.elements.data.push_back(e);
     }
 
     auto materialTables = cfg.m_materialTables;
-    inv_mat.data = materialTables.materialTable;
-    inv_matIdx.data = materialTables.indexTable;
+    inv.mat.data = materialTables.materialTable;
+    inv.matIdx.data = materialTables.indexTable;
 
     // Run the tracing by for all rays
     for (uint i = 0; i < rayList.size(); i++) {
         gl_GlobalInvocationID = i;
-        dynamicElements();
+        dynamicElements(inv);
     }
 
     // Fetch Rays back from the Shader "container"
-    return inv_outputData.data;
+    return inv.outputData.data;
 }
 
-void CpuTracer::setPushConstants(const PushConstants* p) { std::memcpy(&inv_pushConstants, p, sizeof(PushConstants)); }
+void CpuTracer::setPushConstants(const PushConstants* p) { std::memcpy(&inv.pushConstants, p, sizeof(PushConstants)); }
 }  // namespace RAYX

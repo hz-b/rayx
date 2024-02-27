@@ -5,14 +5,13 @@
 #include "Rand.h"
 #include "Helper.h"
 #include "SphericalCoords.h"
-#include "InvocationState.h"
 #include "CutoutFns.h"
 #include "Refrac.h"
 #include "UpdateStokes.h"
 #include "LineDensity.h"
 
-Ray behaveSlit(Ray r, int id, ALLOW_UNUSED Collision col) {
-    SlitBehaviour b = deserializeSlit(inv_elements[id].m_behaviour);
+Ray behaveSlit(Ray r, int id, ALLOW_UNUSED Collision col, Inv& inv) {
+    SlitBehaviour b = deserializeSlit(inv.elements[id].m_behaviour);
 
     // slit lies in x-y plane instead of x-z plane as other elements
     Cutout openingCutout = b.m_openingCutout;
@@ -21,7 +20,7 @@ Ray behaveSlit(Ray r, int id, ALLOW_UNUSED Collision col) {
     bool withinBeamstop = inCutout(beamstopCutout, r.m_position.x, r.m_position.z);
 
     if (!withinOpening || withinBeamstop) {
-        recordFinalEvent(r, ETYPE_ABSORBED);
+        recordFinalEvent(r, ETYPE_ABSORBED, inv);
         return r;
     }
 
@@ -37,11 +36,11 @@ Ray behaveSlit(Ray r, int id, ALLOW_UNUSED Collision col) {
     if (wavelength > 0) {
         if (openingCutout.m_type == CTYPE_RECT) {
             RectCutout r = deserializeRect(openingCutout);
-            fraun_diff(r.m_width, wavelength, dPhi);
-            fraun_diff(r.m_length, wavelength, dPsi);
+            fraun_diff(r.m_width, wavelength, dPhi, inv);
+            fraun_diff(r.m_length, wavelength, dPsi, inv);
         } else if (openingCutout.m_type == CTYPE_ELLIPTICAL) {
             EllipticalCutout e = deserializeElliptical(openingCutout);
-            bessel_diff(e.m_diameter_z, wavelength, dPhi, dPsi);
+            bessel_diff(e.m_diameter_z, wavelength, dPhi, dPsi, inv);
         } else {
             _throw("encountered Slit with unsupported openingCutout");
         }
@@ -56,8 +55,8 @@ Ray behaveSlit(Ray r, int id, ALLOW_UNUSED Collision col) {
     return r;
 }
 
-Ray behaveRZP(Ray r, int id, Collision col) {
-    RZPBehaviour b = deserializeRZP(inv_elements[id].m_behaviour);
+Ray behaveRZP(Ray r, int id, Collision col, Inv& inv) {
+    RZPBehaviour b = deserializeRZP(inv.elements[id].m_behaviour);
 
     double WL            = hvlam(r.m_energy);
     double Ord           = b.m_orderOfDiffraction;
@@ -70,20 +69,20 @@ Ray behaveRZP(Ray r, int id, Collision col) {
     // if additional zero order should be behaved, approx. half of the rays are randomly chosen to be behaved in order 0 (= ordinary reflection) instead
     // of the given order
     if (additional_order == 1) {
-        if (squaresDoubleRNG(inv_ctr) > 0.5) Ord = 0;
+        if (squaresDoubleRNG(inv.ctr) > 0.5) Ord = 0;
     }
 
     // only 2D case, not 2 1D gratings with 90 degree rotation as in old RAY
     double az = WL * DZ * Ord * 1e-6;
     double ax = WL * DX * Ord * 1e-6;
-    r         = refrac2D(r, col.normal, az, ax);
+    r         = refrac2D(r, col.normal, az, ax, inv);
 
     r.m_order = Ord;
     return r;
 }
 
-Ray behaveGrating(Ray r, int id, Collision col) {
-    GratingBehaviour b = deserializeGrating(inv_elements[id].m_behaviour);
+Ray behaveGrating(Ray r, int id, Collision col, Inv& inv) {
+    GratingBehaviour b = deserializeGrating(inv.elements[id].m_behaviour);
 
     // vls parameters passed in q.elementParams
     double WL                 = hvlam(r.m_energy);
@@ -96,34 +95,34 @@ Ray behaveGrating(Ray r, int id, Collision col) {
     // no additional zero order here?
 
     // refraction
-    r = refrac(r, col.normal, linedensity);
+    r = refrac(r, col.normal, linedensity, inv);
 
     return r;
 }
 
-Ray behaveMirror(Ray r, int id, Collision col) {
+Ray behaveMirror(Ray r, int id, Collision col, Inv& inv) {
     // calculate intersection point and normal at intersection point
-    double azimuthal_angle = inv_elements[id].m_azimuthalAngle;
+    double azimuthal_angle = inv.elements[id].m_azimuthalAngle;
 
     // calculate the new direction after the reflection
     r.m_direction = reflect(r.m_direction, col.normal);
 
     double real_S, real_P, delta;
     double incidence_angle = getIncidenceAngle(r, col.normal);  // getTheta
-    int mat = int(inv_elements[id].m_material);
+    int mat = int(inv.elements[id].m_material);
     if (mat != -2) {
-        efficiency(r, real_S, real_P, delta, incidence_angle, mat);
+        efficiency(r, real_S, real_P, delta, incidence_angle, mat, inv);
 
-        bool absorbed = updateStokes(r, real_S, real_P, delta, azimuthal_angle);
+        bool absorbed = updateStokes(r, real_S, real_P, delta, azimuthal_angle, inv);
         if (absorbed) {
-            recordFinalEvent(r, ETYPE_ABSORBED);
+            recordFinalEvent(r, ETYPE_ABSORBED, inv);
         }
         r.m_order = 0;
     }
     return r;
 }
 
-Ray behaveImagePlane(Ray r, ALLOW_UNUSED int id, ALLOW_UNUSED Collision col) {
+Ray behaveImagePlane(Ray r, ALLOW_UNUSED int id, ALLOW_UNUSED Collision col, ALLOW_UNUSED Inv& inv) {
     // doesn't need to do anything.
     return r;
 }

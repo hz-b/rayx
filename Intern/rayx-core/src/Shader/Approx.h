@@ -1,7 +1,7 @@
 #ifndef APPROX_H
 #define APPROX_H
 
-#include "Adapt.h"
+#include "Common.h"
 
 /**
  * DOUBLE PRECISION APPROXIMATION FOR ARCTAN AND COSINUS

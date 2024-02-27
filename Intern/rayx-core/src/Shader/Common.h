@@ -1,5 +1,5 @@
 // This file is intended to bridge the gap between the GLSL and the c++ languages by defining a common API for both languages.
-// Every header file in the shader needs to include Adapt.h (first!) in order to be safely used by C++ and GLSL.
+// Every header file in the shader needs to include Common.h (first!) in order to be safely used by C++ and GLSL.
 
 #ifndef ADAPT_H
 #define ADAPT_H
@@ -37,7 +37,7 @@ struct ShaderArray {
 };
 
 // throws an error, and termiantes the program
-// TODO(Sven): rethink error handling. instantly terminate with RAYX_ERR?
+// TODO(Sven): rethink error handling. just instantly terminate with RAYX_ERR or use recordFinalEvent?
 // #ifdef GLSL
 // #define _throw(string) recordFinalEvent(_ray, ETYPE_FATAL_ERROR)
 // #else

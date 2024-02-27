@@ -2,7 +2,6 @@
 
 #include "Collision.h"
 #include "Utils.h"
-#include "InvocationState.h"
 #include "Approx.h"
 #include "CutoutFns.h"
 #include "ApplySlopeError.h"
@@ -436,30 +435,30 @@ Collision RAYX_API findCollisionInElementCoords(Ray r, Surface surface, Cutout c
 
 // checks whether `r` collides with the element of the given `id`,
 // and returns a Collision accordingly.
-Collision findCollisionWith(Ray r, uint id) {
+Collision findCollisionWith(Ray r, uint id, Inv& inv) {
     // misalignment
-    r = rayMatrixMult(r, inv_elements[id].m_inTrans);  // image plane is the x-y plane of the coordinate system
-    Collision col = findCollisionInElementCoords(r, inv_elements[id].m_surface, inv_elements[id].m_cutout, false);
+    r = rayMatrixMult(r, inv.elements[id].m_inTrans);  // image plane is the x-y plane of the coordinate system
+    Collision col = findCollisionInElementCoords(r, inv.elements[id].m_surface, inv.elements[id].m_cutout, false);
     if (col.found) {
         col.elementIndex = int(id);
     }
 
-    SlopeError sE = inv_elements[id].m_slopeError;
-    col.normal = applySlopeError(col.normal, sE, 0);
+    SlopeError sE = inv.elements[id].m_slopeError;
+    col.normal = applySlopeError(col.normal, sE, 0, inv);
 
     return col;
 }
 
 // Returns the next collision for the ray `_ray`.
-Collision findCollision() {
+Collision findCollision(Inv& inv) {
     // If sequential tracing is enabled, we only check collision with the "next element".
-    if (inv_pushConstants.sequential == 1.0) {
-        if (_ray.m_lastElement >= inv_elements.length() - 1) {
+    if (inv.pushConstants.sequential == 1.0) {
+        if (_ray.m_lastElement >= inv.elements.length() - 1) {
             Collision col;
             col.found = false;
             return col;
         }
-        return findCollisionWith(_ray, uint(_ray.m_lastElement + 1));
+        return findCollisionWith(_ray, uint(_ray.m_lastElement + 1), inv);
     }
 
     // global coordinates of first intersection point of ray among all elements in beamline
@@ -476,13 +475,13 @@ Collision findCollision() {
     r.m_position += r.m_direction * COLLISION_EPSILON;
 
     // Find intersection points through all elements
-    for (uint elementIndex = 0; elementIndex < uint(inv_elements.length()); elementIndex++) {
-        Collision current_col = findCollisionWith(r, elementIndex);
+    for (uint elementIndex = 0; elementIndex < uint(inv.elements.length()); elementIndex++) {
+        Collision current_col = findCollisionWith(r, elementIndex, inv);
         if (!current_col.found) {
             continue;
         }
 
-        dvec3 global_hitpoint = dvec3(inv_elements[elementIndex].m_outTrans * dvec4(current_col.hitpoint, 1));
+        dvec3 global_hitpoint = dvec3(inv.elements[elementIndex].m_outTrans * dvec4(current_col.hitpoint, 1));
         double current_dist = length(global_hitpoint - _ray.m_position);
 
         if (current_dist < best_dist) {

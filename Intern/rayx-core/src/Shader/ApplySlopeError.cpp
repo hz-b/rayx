@@ -1,7 +1,6 @@
 #include "ApplySlopeError.h"
 #include "Approx.h"
 #include "Rand.h"
-#include "InvocationState.h"
 
 /**
 turn the normal vector through x_rad and z_rad
@@ -62,14 +61,14 @@ adds slope error to the normal
 1=cylindrical) (1 only for ellipsis relevant) returns new normal if there is a
 slope error in either x or z direction or the unmodified normal otherwise.
 */
-dvec3 applySlopeError(dvec3 normal, SlopeError error, int O_type) {
+dvec3 applySlopeError(dvec3 normal, SlopeError error, int O_type, Inv& inv) {
     double slopeX = error.m_sag;
     double slopeZ = error.m_mer;
 
     // only calculate the random number if at least one slope error is not 0,
     // since the calculation is costly (sin, cos, log involved)
     if (slopeX != 0 || slopeZ != 0) {
-        double random_values[2] = {squaresNormalRNG(inv_ctr, 0, slopeX), squaresNormalRNG(inv_ctr, 0, slopeZ)};
+        double random_values[2] = {squaresNormalRNG(inv.ctr, 0, slopeX), squaresNormalRNG(inv.ctr, 0, slopeZ)};
 
         /*double x = random_values[0] * slopeX; // to get normal distribution
         from std.-norm. multiply by sigma (=slopeX) -> mu + x * sigma but mu=0

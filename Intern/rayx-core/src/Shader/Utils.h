@@ -1,7 +1,7 @@
 #ifndef UTILS_H
 #define UTILS_H
 
-#include "Adapt.h"
+#include "Common.h"
 #include "Ray.h"
 
 // converts energy in eV to wavelength in nm
