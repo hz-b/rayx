@@ -30,7 +30,6 @@ struct _debug_struct {
 };
 
 // we don't require forward declarations in GLSL, hence we only do them in C++:
-#ifndef GLSL
 extern int gl_GlobalInvocationID;
 extern bool inv_finalized;
 extern uint64_t inv_ctr;
@@ -47,7 +46,6 @@ extern ShaderArray<_debug_struct> RAYX_API inv_d_struct;
 #endif
 
 extern PushConstants inv_pushConstants;
-#endif
 
 // Every shader execution calculates the route for a single ray.
 // `_ray` is that ray, it's always in world coordinates (!).

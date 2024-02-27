@@ -4,9 +4,7 @@
  *                    vars
  **************************************************************/
 
-#ifndef GLSL
 int gl_GlobalInvocationID;
-#endif
 
 bool inv_finalized;
 

@@ -4,47 +4,26 @@
 #ifndef ADAPT_H
 #define ADAPT_H
 
-// INLINE can be ignored in glsl.
-#ifdef GLSL
-#define INLINE
-#else
 #define INLINE inline
-#endif
-
-// glm definitions need to be directly accessible in c++.
-#ifndef GLSL
-
-#define GLM_ENABLE_EXPERIMENTAL
-#include <glm.hpp>
-using dvec2 = glm::dvec2;
-using dvec3 = glm::dvec3;
-using dvec4 = glm::dvec4;
-using dmat3 = glm::dmat3;
-using dmat4 = glm::dmat4;
-#endif
-
-// RAYX_API can be ignored in glsl.
-#ifdef GLSL
-#define RAYX_API
-#endif
-
-// define RAYX_INOUT, RAYX_OUT, ALLOW_UNUSED
-#ifndef GLSL
 #define RAYX_INOUT(x) x&
 #define RAYX_OUT(x) x&
 #define ALLOW_UNUSED [[maybe_unused]]
-#else
-#define RAYX_INOUT(x) inout x
-#define RAYX_OUT(x) out x
-#define ALLOW_UNUSED
-#endif
+
+// glm definitions need to be directly accessible in c++.
+#define GLM_ENABLE_EXPERIMENTAL
+#include <glm.hpp>
+using glm::dvec2;
+using glm::dvec3;
+using glm::dvec4;
+using glm::dmat3;
+using glm::dmat4;
+using uint = unsigned int;
+// These functions are per default provided by GLSL.
+using glm::length;
+using glm::mod;
+using glm::sign;
 
 // define SHADER_ARRAY
-#ifdef GLSL
-#define SHADER_ARRAY(T, ident, binding_id, bufname) \
-    layout(std430, binding = binding_id) buffer bufname { T ident[]; }
-#else
-
 #define SHADER_ARRAY(T, ident, binding_id, bufname) ShaderArray<T> RAYX_API ident
 
 // this type intends to mimic the GLSL type T[], this is used for layouts.
@@ -57,30 +36,16 @@ struct ShaderArray {
     inline T& operator[](int i) { return data[i]; }
 };
 
-#endif
-
-// These functions are per default provided by GLSL.
-#ifndef GLSL
-inline double length(dvec2 v) { return sqrt(v.x * v.x + v.y * v.y); }
-inline double mod(double x, double y) { return glm::mod(x, y); }
-inline double sign(double x) { return glm::sign(x); }
-#endif
-
 // throws an error, and termiantes the program
-#ifdef GLSL
-#define _throw(string) recordFinalEvent(_ray, ETYPE_FATAL_ERROR)
-#else
+// TODO(Sven): rethink error handling. instantly terminate with RAYX_ERR?
+// #ifdef GLSL
+// #define _throw(string) recordFinalEvent(_ray, ETYPE_FATAL_ERROR)
+// #else
 #include "Debug/Debug.h"
 #define _throw(string) RAYX_ERR << string
-#endif
+// #endif
 
-#ifndef GLSL
 // This way I don't have to worry about namespaces..
 using namespace RAYX;
-#endif
-
-#ifndef GLSL
-using uint = unsigned int;
-#endif
 
 #endif

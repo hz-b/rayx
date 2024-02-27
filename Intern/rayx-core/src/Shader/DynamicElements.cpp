@@ -10,10 +10,11 @@ void dynamicElements() {
     init();
 
     #ifdef RAYX_DEBUG_MODE // Debug Matrix only works in GPU Mode and on DEBUG Build Type
-    #ifdef GLSL
-        // Set Debug Struct of current Ray to identity
-        pushConstants.inv_d_struct[uint(gl_GlobalInvocationID)]._dMat = dmat4(1);
-    #endif
+    // TODO(Sven): rework debugging on GPU
+    // #ifdef GLSL
+    //     // Set Debug Struct of current Ray to identity
+    //     pushConstants.inv_d_struct[uint(gl_GlobalInvocationID)]._dMat = dmat4(1);
+    // #endif
     #endif
 
     Element nextElement;

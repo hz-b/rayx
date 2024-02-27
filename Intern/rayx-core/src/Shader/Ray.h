@@ -3,9 +3,7 @@
 
 #include "Adapt.h"
 
-#ifndef GLSL
 namespace RAYX {
-#endif
 
 /// This type represents a photon ray at a fixed point in time.
 /// Often we consider Rays at particular points in time - when *something happens to them*.
@@ -66,12 +64,8 @@ struct RAYX_API Ray {
 // Note: A `dvec3` needs an alignment of 4 * sizeof(double), hence two dvec3s can never be directly after each other (without padding).
 // Further, the number of doubles in a Ray need to be divisible by four at all times, as we want to store multiple Rays after each other without
 // padding in `rayData`. This is why we need m_padding.
-#ifndef GLSL
 static_assert(sizeof(Ray) % alignof(dvec3) == 0);
-#endif
 
-#ifndef GLSL
 }  // namespace RAYX
-#endif
 
 #endif

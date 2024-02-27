@@ -42,9 +42,7 @@ void recordEvent(Ray r, double w) {
 
     // recording of event type ETYPE_UINIT is forbidden.
     if (w == ETYPE_UNINIT) {
-#ifndef GLSL
         RAYX_ERR << "recordEvent failed: weight UNINIT is invalid in recordEvent";
-#endif
 
         return;
     }
@@ -57,9 +55,7 @@ void recordEvent(Ray r, double w) {
         uint idx = output_index(uint(inv_pushConstants.maxEvents - 1));
         inv_outputData[idx].m_eventType = ETYPE_TOO_MANY_EVENTS;
 
-#ifndef GLSL
         RAYX_ERR << "recordEvent failed: too many events!";
-#endif
 
         return;
     }
