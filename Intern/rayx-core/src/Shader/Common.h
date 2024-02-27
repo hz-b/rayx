@@ -7,7 +7,6 @@
 #define INLINE inline
 #define RAYX_INOUT(x) x&
 #define RAYX_OUT(x) x&
-#define ALLOW_UNUSED [[maybe_unused]]
 
 // glm definitions need to be directly accessible in c++.
 #define GLM_ENABLE_EXPERIMENTAL

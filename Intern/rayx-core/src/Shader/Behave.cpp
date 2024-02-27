@@ -10,7 +10,7 @@
 #include "UpdateStokes.h"
 #include "LineDensity.h"
 
-Ray behaveSlit(Ray r, int id, ALLOW_UNUSED Collision col, Inv& inv) {
+Ray behaveSlit(Ray r, int id, [[maybe_unused]] Collision col, Inv& inv) {
     SlitBehaviour b = deserializeSlit(inv.elements[id].m_behaviour);
 
     // slit lies in x-y plane instead of x-z plane as other elements
@@ -122,7 +122,7 @@ Ray behaveMirror(Ray r, int id, Collision col, Inv& inv) {
     return r;
 }
 
-Ray behaveImagePlane(Ray r, ALLOW_UNUSED int id, ALLOW_UNUSED Collision col, ALLOW_UNUSED Inv& inv) {
+Ray behaveImagePlane(Ray r, [[maybe_unused]] int id, [[maybe_unused]] Collision col, [[maybe_unused]] Inv& inv) {
     // doesn't need to do anything.
     return r;
 }

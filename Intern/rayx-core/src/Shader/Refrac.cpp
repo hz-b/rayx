@@ -83,7 +83,7 @@ Ray refrac(Ray r, dvec3 normal, double linedensity, Inv& inv) {
  * @param a			a = WL * D0 * ORD * 1.e-6  with D0: line density (l/mm);
  * WL:wavelength (nm); ORD order of diffraction
  */
-Ray RAYX_API refracPlane(Ray r, ALLOW_UNUSED dvec3 normal,
+Ray RAYX_API refracPlane(Ray r, [[maybe_unused]] dvec3 normal,
                           double a, Inv& inv) {  // TODO fix unused var
     double y1 = r.m_direction[1] * r.m_direction[1] + r.m_direction[2] * r.m_direction[2] - (r.m_direction[2] - a) * (r.m_direction[2] - a);
     if (y1 > 0) {
