@@ -10,7 +10,7 @@
 
 double RAYX_API r8_aint(double x);
 int RAYX_API r8_inits(double dos[16], int nos, double eta);
-void RAYX_API r8_upak(double x, RAYX_INOUT(double) y, RAYX_INOUT(int) n);
+void RAYX_API r8_upak(double x, double& y, int& n);
 int i4_mach(int i);
 double RAYX_API r8_mach(int i);
 double RAYX_API r8_pak(double y, int n);

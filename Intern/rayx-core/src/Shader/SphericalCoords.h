@@ -8,7 +8,7 @@
 
 // The definitions of phi & psi might differ from their definitions at other places, due to the fact that we exchanged y with z while fixing XZ as the primary plane in the shader.
 
-void RAYX_API sphericalCoordsToDirection(double phi, double psi, RAYX_INOUT(dvec3) out_direction);
-void RAYX_API directionToSphericalCoords(dvec3 direction, RAYX_INOUT(double) out_phi, RAYX_INOUT(double) out_psi);
+void RAYX_API sphericalCoordsToDirection(double phi, double psi, dvec3& out_direction);
+void RAYX_API directionToSphericalCoords(dvec3 direction, double& out_phi, double& out_psi);
 
 #endif

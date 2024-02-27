@@ -112,7 +112,7 @@ int RAYX_API r8_inits(double dos[16], int nos, double eta)
     return value;
 }
 
-void RAYX_API r8_upak(double x, RAYX_INOUT(double) y, RAYX_INOUT(int) n)
+void RAYX_API r8_upak(double x, double& y, int& n)
 /******************************************************************************/
 /*
   Purpose:

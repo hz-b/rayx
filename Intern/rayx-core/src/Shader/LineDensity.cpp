@@ -27,7 +27,7 @@ given direction on the grating
 @params: lots
 @returns: (inplace) DX, DZ
 */
-void RAYX_API RZPLineDensity(Ray r, dvec3 normal, RZPBehaviour b, RAYX_INOUT(double) DX, RAYX_INOUT(double) DZ) {
+void RAYX_API RZPLineDensity(Ray r, dvec3 normal, RZPBehaviour b, double& DX, double& DZ) {
     int IMAGE_TYPE = int(b.m_imageType);
     int RZP_TYPE = int(b.m_rzpType);
     double risag = b.m_designSagittalEntranceArmLength;

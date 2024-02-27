@@ -19,7 +19,7 @@ zoneplates
 @returns
     results stored in dphi, dpsi (inout)
 */
-void bessel_diff(double radius, double wl, RAYX_INOUT(double) dphi, RAYX_INOUT(double) dpsi, Inv& inv);
+void bessel_diff(double radius, double wl, double& dphi, double& dpsi, Inv& inv);
 
 /**
  * calculates fraunhofer diffraction effects on rectangular slits
@@ -28,6 +28,6 @@ void bessel_diff(double radius, double wl, RAYX_INOUT(double) dphi, RAYX_INOUT(d
  * @param dAngle 	diffraction angle (inout)
  * @return result stored in dAngle
  */
-void fraun_diff(double dim, double wl, RAYX_INOUT(double) dAngle, Inv& inv);
+void fraun_diff(double dim, double wl, double& dAngle, Inv& inv);
 
 #endif

@@ -31,7 +31,7 @@ dvec2 RAYX_API snell(dvec2 cos_incidence, dvec2 cn1, dvec2 cn2);
  * @return complex_P			complex p-polarization
  *
  */
-void RAYX_API fresnel(dvec2 cn1, dvec2 cn2, dvec2 cos_incidence, dvec2 cos_transmittance, RAYX_INOUT(dvec2) complex_S, RAYX_INOUT(dvec2) complex_P);
+void RAYX_API fresnel(dvec2 cn1, dvec2 cn2, dvec2 cos_incidence, dvec2 cos_transmittance, dvec2& complex_S, dvec2& complex_P);
 
 /** computes complex s and p polarization over all layers with fresnel and
  * snell's law
@@ -41,7 +41,7 @@ void RAYX_API fresnel(dvec2 cn1, dvec2 cn2, dvec2 cos_incidence, dvec2 cos_trans
  * @return complex_S			complex s-polarization
  * @return complex_P			complex p-polarization
  */
-void RAYX_API reflectance(double energy, double incidence_angle, RAYX_INOUT(dvec2) complex_S, RAYX_INOUT(dvec2) complex_P, int material, Inv& inv);
+void RAYX_API reflectance(double energy, double incidence_angle, dvec2& complex_S, dvec2& complex_P, int material, Inv& inv);
 /**
  * computes complex number a + i*b in euler form:
  * euler = r * e^(i * phi) where r = sqrt(a**2 + b**2) = radius and phi =
@@ -74,7 +74,7 @@ double phase_difference(dvec2 euler1, dvec2 euler2);
  * @param material				material the photon collides with
  * @param others
  */
-void efficiency(Ray r, RAYX_OUT(double) real_S, RAYX_OUT(double) real_P, RAYX_OUT(double) delta, double incidence_angle, int material, Inv& inv);
+void efficiency(Ray r, double& real_S, double& real_P, double& delta, double incidence_angle, int material, Inv& inv);
 
 
 #endif

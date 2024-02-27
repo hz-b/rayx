@@ -5,8 +5,6 @@
 #define ADAPT_H
 
 #define INLINE inline
-#define RAYX_INOUT(x) x&
-#define RAYX_OUT(x) x&
 
 // glm definitions need to be directly accessible in c++.
 #define GLM_ENABLE_EXPERIMENTAL

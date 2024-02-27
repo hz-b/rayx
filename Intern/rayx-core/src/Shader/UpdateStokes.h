@@ -22,6 +22,6 @@ dmat4 mullerMatrix(double R_s, double R_p, double delta);
  * updates stokes vector of ray
  * @returns `true`, if ray should be absorbed
  */
-bool updateStokes(RAYX_INOUT(Ray) r, double real_S, double real_P, double delta, double azimuthal, Inv& inv);
+bool updateStokes(Ray& r, double real_S, double real_P, double delta, double azimuthal, Inv& inv);
 
 #endif
