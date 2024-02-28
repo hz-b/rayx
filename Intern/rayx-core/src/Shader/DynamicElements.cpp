@@ -4,7 +4,7 @@
 #include "Utils.h"
 #include "Helper.h"
 
-void dynamicElements(int gid, Inv& inv) {
+void dynamicElements(int gid, Inv inv) {
     // initializes the global state.
     inv.globalInvocationId = gid;
     init(inv);

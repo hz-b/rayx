@@ -40,7 +40,7 @@ std::vector<Ray> CpuTracer::traceRaw(const TraceRawConfig& cfg) {
     inv.outputData = Host::createView<Ray>("CpuTracer_outputData", numOutputRays);
 
     struct Kernel {
-        mutable Inv inv;
+        Inv inv;
 
         KOKKOS_INLINE_FUNCTION
         void operator() (int gid) const {
