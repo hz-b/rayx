@@ -16,6 +16,14 @@ struct UIRayInfo {
     size_t maxAmountOfRays;
 };
 
+struct UISimulationInfo {
+    int startEventID = 0;
+    int maxEvents = 0;
+    int maxBatchSize = 1000000;
+    int tracer = 1;
+    bool sequential = false;
+};
+
 struct UIParameters {
     CameraController& camController;
     std::filesystem::path rmlPath;
@@ -23,11 +31,9 @@ struct UIParameters {
     bool h5Ready;
     float frameTime;
     UIRayInfo rayInfo;
-    bool showRMLNotExistPopup;
-    bool showH5NotExistPopup;
-    bool pathValidState;
     bool runSimulation;
     bool simulationSettingsReady;
+    UISimulationInfo simulationInfo;
 
     UIParameters(CameraController& camController)
         : camController(camController),
@@ -36,11 +42,9 @@ struct UIParameters {
           h5Ready(false),
           frameTime(0.0f),
           rayInfo({false, false, false, false, 0, 0}),
-          showRMLNotExistPopup(false),
-          showH5NotExistPopup(false),
           runSimulation(false),
           simulationSettingsReady(false),
-          pathValidState(false) {}
+          simulationInfo({0, 0, 1000000, 0, false}) {}
 
     void updatePath(const std::filesystem::path& path) {
         if (path.empty()) return;
