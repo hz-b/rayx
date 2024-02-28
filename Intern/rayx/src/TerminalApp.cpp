@@ -3,6 +3,7 @@
 #include <filesystem>
 #include <memory>
 #include <stdexcept>
+#include <Kokkos_Core.hpp>
 
 #include "CanonicalizePath.h"
 #include "Data/Importer.h"
@@ -33,9 +34,15 @@ TerminalApp::TerminalApp(int argc, char** argv) : m_argv(argv), m_argc(argc) {
                      "will make this program run out of memory for larger ray "
                      "numbers!";
     }
+
+    Kokkos::initialize(m_argc, m_argv);
 }
 
-TerminalApp::~TerminalApp() { RAYX_VERB << "TerminalApp deleted!"; }
+TerminalApp::~TerminalApp() {
+    m_Tracer.reset(); // delete tracer with Kokkos resources before finalizing Kokkos
+    Kokkos::finalize();
+    RAYX_VERB << "TerminalApp deleted!";
+}
 
 void TerminalApp::tracePath(const std::filesystem::path& path) {
     namespace fs = std::filesystem;
