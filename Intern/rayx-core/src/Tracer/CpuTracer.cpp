@@ -49,7 +49,11 @@ std::vector<Ray> CpuTracer::traceRaw(const TraceRawConfig& cfg) {
     };
 
     Kokkos::parallel_for(
-        numInputRays,
+        Kokkos::RangePolicy<Kokkos::DefaultHostExecutionSpace>(
+            Kokkos::DefaultHostExecutionSpace(),
+            0,           // begin
+            numInputRays // end
+        ),
         Kernel { inv }
     );
     Kokkos::fence();
