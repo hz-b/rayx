@@ -15,10 +15,6 @@
 
 namespace RAYX {
 void VulkanTracer::listPhysicalDevices() {
-    // init, if not yet initialized.
-    if (m_engine.state() == VulkanEngine::EngineStates::PREINIT) {
-        initEngine();
-    }
     auto deviceList = m_engine.getPhysicalDevices();
     unsigned int deviceIndex = 0;
     std::cout << "Listing Vulkan Devices:" << std::endl;
@@ -30,6 +26,15 @@ void VulkanTracer::listPhysicalDevices() {
         std::cout << "Device Index: " << deviceIndex++ << std::endl;
         std::cout << "VendorID: " << deviceProperties.vendorID << std::endl << std::endl;
     }
+}
+
+std::vector<VkPhysicalDevice> VulkanTracer::getPhysicalDevices() {
+    // init, if not yet initialized.
+    if (m_engine.state() == VulkanEngine::EngineStates::PREINIT) {
+        initEngine();
+    }
+    auto deviceList = m_engine.getPhysicalDevices();
+    return deviceList;
 }
 
 std::vector<Ray> VulkanTracer::traceRaw(const TraceRawConfig& cfg) {
