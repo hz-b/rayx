@@ -137,12 +137,14 @@ void Application::run() {
             switch (m_State) {
                 case State::LoadingBeamline:
                     if (beamlineFuture.wait_for(std::chrono::seconds(0)) == std::future_status::ready) {
-                        if (m_UIParams.runSimulation == true) {
-                            m_UIParams.runSimulation = false;
-                            // open simulation dialog
-                            m_Simulator.setSimulationParameters(m_RMLPath, *m_Beamline);
-                            m_UIParams.simulationSettingsReady = true;
-                            m_State = State::InitializeSimulation;
+                        if (m_UIParams.runSimulation) {
+                            if (m_UIParams.simulationSettingsReady) {
+                                // open simulation dialog
+                                m_Simulator.setSimulationParameters(m_RMLPath, *m_Beamline, m_UIParams.simulationInfo.maxBatchSize,
+                                                                    m_UIParams.simulationInfo.tracer, m_UIParams.simulationInfo.sequential);
+                                m_UIParams.simulationSettingsReady = false;
+                                m_State = State::InitializeSimulation;
+                            }
                         } else {
                             raysFuture = std::async(std::launch::async, &Application::loadRays, this, m_RMLPath);
                             m_State = State::LoadingRays;
@@ -151,12 +153,10 @@ void Application::run() {
                     break;
 
                 case State::InitializeSimulation:
-                    if (m_UIParams.simulationSettingsReady) {
-                        m_State = State::InitializeSimulation;
-                        m_UIParams.simulationSettingsReady = false;
-                        simulationFuture = std::async(std::launch::async, std::bind(&Simulator::runSimulation, &m_Simulator));
-                        m_State = State::Simulating;
-                    }
+                    simulationFuture = std::async(std::launch::async, std::bind(&Simulator::runSimulation, &m_Simulator));
+                    m_State = State::Simulating;
+                    m_UIParams.runSimulation = false;
+                    break;
 
                 case State::Simulating:
                     if (simulationFuture.wait_for(std::chrono::seconds(0)) == std::future_status::ready) {

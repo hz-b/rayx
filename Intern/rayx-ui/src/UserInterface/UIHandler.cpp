@@ -164,6 +164,7 @@ void UIHandler::setupUI(UIParameters& uiParams, std::vector<RAYX::OpticalElement
 
     showSceneEditorWindow(uiParams);
     showMissingFilePopupWindow(uiParams);
+    showSimulationSettingsPopupWindow(uiParams);
     showSettingsWindow();
     showHotkeysWindow();
     m_BeamlineOutliner.showBeamlineOutlineWindow(uiParams, elemets, rSourcePositions);
@@ -201,22 +202,22 @@ void UIHandler::showSceneEditorWindow(UIParameters& uiParams) {
 
 #ifndef NO_H5
             std::string rayFilePathH5 = rmlPath.substr(0, rmlPath.size() - 4) + ".h5";
-            uiParams.showH5NotExistPopup = !std::filesystem::exists(rayFilePathH5);
+            m_showH5NotExistPopup = !std::filesystem::exists(rayFilePathH5);
 #else
             std::string rayFilePathCSV = rmlPath.substr(0, rmlPath.size() - 4) + ".csv";
-            uiParams.showH5NotExistPopup = !std::filesystem::exists(rayFilePathCSV);
+            m_showH5NotExistPopup = !std::filesystem::exists(rayFilePathCSV);
 #endif
-            uiParams.showRMLNotExistPopup = rmlPath.substr(rmlPath.size() - 4, 4) != ".rml" || !std::filesystem::exists(rmlPath);
+            m_showRMLNotExistPopup = rmlPath.substr(rmlPath.size() - 4, 4) != ".rml" || !std::filesystem::exists(rmlPath);
 
-            if (uiParams.showRMLNotExistPopup) {
+            if (m_showRMLNotExistPopup) {
                 uiParams.rmlReady = false;
             } else {
-                if (uiParams.showH5NotExistPopup) {
+                if (m_showH5NotExistPopup) {
                     uiParams.h5Ready = false;
-                    uiParams.pathValidState = false;
+                    m_pathValidState = false;
                 } else {
                     uiParams.h5Ready = true;
-                    uiParams.pathValidState = true;
+                    m_pathValidState = true;
                     uiParams.rmlReady = true;
                 }
                 uiParams.rmlPath = outPath;
@@ -234,7 +235,7 @@ void UIHandler::showSceneEditorWindow(UIParameters& uiParams) {
     ImGui::Separator();
     uiParams.camController.displaySettings();
     ImGui::Separator();
-    if (!uiParams.rmlPath.empty() && uiParams.pathValidState) {
+    if (!uiParams.rmlPath.empty() && m_pathValidState) {
         size_t tempAmountOfRays = uiParams.rayInfo.amountOfRays;
         bool tempRenderAllRays = uiParams.rayInfo.renderAllRays;
 
@@ -286,7 +287,7 @@ void UIHandler::showHotkeysWindow() {
 }
 
 void UIHandler::showMissingFilePopupWindow(UIParameters& uiParams) {
-    if (uiParams.showH5NotExistPopup || uiParams.showRMLNotExistPopup) {
+    if (m_showH5NotExistPopup || m_showRMLNotExistPopup) {
         ImGui::SetNextWindowPos(ImVec2(ImGui::GetIO().DisplaySize.x * 0.5f, ImGui::GetIO().DisplaySize.y * 0.5f), ImGuiCond_Always,
                                 ImVec2(0.5f, 0.5f));
         ImGui::SetNextWindowSize(ImVec2(400, 200), ImGuiCond_Always);  // Set size
@@ -296,7 +297,7 @@ void UIHandler::showMissingFilePopupWindow(UIParameters& uiParams) {
             // Scale up font size
             ImGui::PushFont(ImGui::GetIO().Fonts->Fonts[1]);
 
-            if (uiParams.showRMLNotExistPopup) {
+            if (m_showRMLNotExistPopup) {
                 ImGui::Text("RML file does not exist or is not valid.");
             } else {
                 ImGui::Text("The H5 file does not exist.");
@@ -314,8 +315,8 @@ void UIHandler::showMissingFilePopupWindow(UIParameters& uiParams) {
             ImGui::SetCursorPosX(buttonsStartPos);
 
             if (ImGui::Button("No", ImVec2(120, 40))) {  // Make the button a bit larger
-                uiParams.showH5NotExistPopup = false;
-                uiParams.showRMLNotExistPopup = false;
+                m_showH5NotExistPopup = false;
+                m_showRMLNotExistPopup = false;
                 uiParams.runSimulation = false;  // Do not start the simulation
                 ImGui::CloseCurrentPopup();      // Close the popup when an option is selected
             }
@@ -325,15 +326,53 @@ void UIHandler::showMissingFilePopupWindow(UIParameters& uiParams) {
             ImGui::SetCursorPosX(buttonsStartPos + 120 + spaceBetweenButtons);  // Adjust for the next button
 
             if (ImGui::Button("Yes", ImVec2(120, 40))) {  // Make the button a bit larger
-                uiParams.showH5NotExistPopup = false;
-                uiParams.showRMLNotExistPopup = false;
+                m_showH5NotExistPopup = false;
+                m_showRMLNotExistPopup = false;
                 uiParams.rmlReady = true;
-                uiParams.runSimulation = true;  // Assuming runSimulation is a parameter to start the simulation immediately
-                ImGui::CloseCurrentPopup();     // Close the popup when an option is selected
+                uiParams.runSimulation = true;
+                ImGui::CloseCurrentPopup();  // Close the popup when an option is selected
             }
 
             // Revert to original font size
             ImGui::PopFont();
+
+            ImGui::EndPopup();
+        }
+    }
+}
+
+void UIHandler::showSimulationSettingsPopupWindow(UIParameters& uiParams) {
+    if (uiParams.runSimulation && !uiParams.simulationSettingsReady) {
+        ImGui::OpenPopup("Simulation Settings");
+
+        ImGui::SetNextWindowPos(ImVec2(ImGui::GetIO().DisplaySize.x * 0.5f, ImGui::GetIO().DisplaySize.y * 0.5f), ImGuiCond_Always,
+                                ImVec2(0.5f, 0.5f));
+        ImGui::SetNextWindowSize(ImVec2(450, 450), ImGuiCond_Always);
+
+        if (ImGui::BeginPopupModal("Simulation Settings", NULL, ImGuiWindowFlags_AlwaysAutoResize)) {
+            // Content goes here
+            ImGui::Text("Simulation Settings");
+            ImGui::Separator();
+            ImGui::Checkbox("Sequential", &uiParams.simulationInfo.sequential);
+            ImGui::InputInt("Max Batch Size", &uiParams.simulationInfo.maxBatchSize);
+
+            const char* tracerItems[] = {"CPU Tracer", "VULKAN Tracer"};
+            // VulkanTracer is standard
+            uiParams.simulationInfo.tracer = 1;
+            ImGui::Combo("Tracer", &uiParams.simulationInfo.tracer, tracerItems, IM_ARRAYSIZE(tracerItems));
+
+            // Buttons to close the popup, similar to the showMissingFilePopupWindow example
+            if (ImGui::Button("OK", ImVec2(120, 40))) {
+                uiParams.simulationSettingsReady = true;  // Flag that settings are ready
+                ImGui::CloseCurrentPopup();               // Close the popup
+            }
+
+            ImGui::SameLine();
+
+            if (ImGui::Button("Cancel", ImVec2(120, 40))) {
+                uiParams.runSimulation = false;  // Reset the flag to not show the popup again without saving settings
+                ImGui::CloseCurrentPopup();      // Close the popup
+            }
 
             ImGui::EndPopup();
         }

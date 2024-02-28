@@ -5,10 +5,10 @@
 #include <string>
 
 #include "Beamline/OpticalElement.h"
+#include "BeamlineOutliner.h"
 #include "FrameInfo.h"
 #include "GraphicsCore/Device.h"
 #include "GraphicsCore/Swapchain.h"
-#include "BeamlineOutliner.h"
 #include "Settings.h"
 
 class UIHandler {
@@ -40,6 +40,10 @@ class UIHandler {
     ImFont* m_smallFont;
     ImFont* m_largeFont;
 
+    bool m_showRMLNotExistPopup = false;
+    bool m_showH5NotExistPopup = false;
+    bool m_pathValidState = false;
+
     VkRenderPass m_RenderPass;
     VkDescriptorPool m_DescriptorPool;
     ImGuiIO m_IO;
@@ -50,4 +54,5 @@ class UIHandler {
     void showSettingsWindow();
     void showHotkeysWindow();
     void showMissingFilePopupWindow(UIParameters& uiParams);
+    void showSimulationSettingsPopupWindow(UIParameters& uiParams);
 };
