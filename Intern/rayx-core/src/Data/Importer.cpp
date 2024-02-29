@@ -61,42 +61,36 @@ void addBeamlineObjectFromXML(rapidxml::xml_node<>* node, Beamline* beamline, co
     // https://en.cppreference.com/w/cpp/language/lambda) They define functions
     // to be used in the if-else-chain below to keep it structured and readable.
 
-    // addLightSource(s, node) is a function adding a light source to the
+    // //addLightSource(s, node) is a function adding a light source to the
     // beamline (if it's not nullptr)
-    const auto addLightSource = [&](const std::shared_ptr<LightSource>& s, rapidxml::xml_node<>* node) {
-        if (s) {
-            beamline->m_LightSources.push_back(s);
-        } else {
-            RAYX_ERR << "could not construct LightSource with Name: " << node->first_attribute("name")->value()
-                     << "; Type: " << node->first_attribute("type")->value();
-        }
-    };
 
     RAYX::xml::Parser parser(node, group_context, filename);
     const char* type = parser.type();
-
+    DesignSource ds;
     // Light sources have constructors that accept a const DesignObject& as argument.
     // They use the param* functions declared in <Data/xml.h> to retrieve the relevant information.
     if (strcmp(type, "Point Source") == 0) {
-        addLightSource(std::make_shared<PointSource>(parser), node);
+        setPointSource(parser, &ds);
     } else if (strcmp(type, "Matrix Source") == 0) {
-        addLightSource(std::make_shared<MatrixSource>(parser), node);
+        //addLightSource(std::make_shared<MatrixSource>(parser), node);
     } else if (strcmp(type, "Dipole") == 0) {
-        addLightSource(std::make_shared<DipoleSource>(parser), node);
+        //addLightSource(std::make_shared<DipoleSource>(parser), node);
     } else if (strcmp(type, "Dipole Source") == 0) {
-        addLightSource(std::make_shared<DipoleSource>(parser), node);
+        //addLightSource(std::make_shared<DipoleSource>(parser), node);
     } else if (strcmp(type, "Pixel Source") == 0) {
-        addLightSource(std::make_shared<PixelSource>(parser), node);
+        //addLightSource(std::make_shared<PixelSource>(parser), node);
     } else if (strcmp(type, "Circle Source") == 0) {
-        addLightSource(std::make_shared<CircleSource>(parser), node);
+        //addLightSource(std::make_shared<CircleSource>(parser), node);
     } else if (strcmp(type, "Simple Undulator") == 0) {
-        addLightSource(std::make_shared<SimpleUndulatorSource>(parser), node);
+        //addLightSource(std::make_shared<SimpleUndulatorSource>(parser), node);
     } else {
         DesignElement de;
         parseElement(parser, &de);
         RAYX_LOG << "import " << de.getName();
         beamline->m_DesignElements.push_back(de);
     }
+    beamline->m_DesignSources.push_back(ds);
+
 }
 
 // `collection` is an xml object, over whose children-objects we want to

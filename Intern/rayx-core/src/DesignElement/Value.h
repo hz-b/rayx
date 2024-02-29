@@ -23,6 +23,8 @@ enum class ValueType {
     FigureRotation,
     CurvatureType,
     Surface,
+    SourceDist,
+    EnergyDistribution,
 };
 
 class Undefined {};
@@ -49,6 +51,8 @@ class Value {
     Value(FigureRotation x) : m_variant(x) {}
     Value(CurvatureType x) : m_variant(x) {}
     Value(Surface x) : m_variant(x) {}
+    Value(SourceDist x) : m_variant(x) {}
+    Value(EnergyDistribution x) : m_variant(x) {}
 
     void operator=(double x) { m_variant = x; }
     void operator=(int x) { m_variant = x; }
@@ -66,16 +70,18 @@ class Value {
     void operator=(FigureRotation x) { m_variant = x; }
     void operator=(CurvatureType x) { m_variant = x; }
     void operator=(Surface x) { m_variant = x; }
+    void operator=(SourceDist x) { m_variant = x; }
+    void operator=(EnergyDistribution x) { m_variant = x; }
 
 
 
     inline ValueType type() const {
         const ValueType types[] = {
-            ValueType::Undefined, ValueType::Double,   ValueType::Int,           ValueType::CylinderDirection,
-            ValueType::String,    ValueType::Map,      ValueType::Dvec4,         ValueType::Dmat4x4,
-            ValueType::Rad,       ValueType::Material, ValueType::Misalignment,  ValueType::CentralBeamStop,
-            ValueType::Cutout,    ValueType::Bool,     ValueType::FigureRotation,ValueType::CurvatureType,
-            ValueType::Surface
+            ValueType::Undefined, ValueType::Double,    ValueType::Int,           ValueType::CylinderDirection,
+            ValueType::String,    ValueType::Map,       ValueType::Dvec4,         ValueType::Dmat4x4,
+            ValueType::Rad,       ValueType::Material,  ValueType::Misalignment,  ValueType::CentralBeamStop,
+            ValueType::Cutout,    ValueType::Bool,      ValueType::FigureRotation,ValueType::CurvatureType,
+            ValueType::Surface,   ValueType::SourceDist,ValueType::EnergyDistribution
         };
         return types[m_variant.index()];
     }
@@ -170,10 +176,21 @@ class Value {
         return *x;
     }
 
-
     inline Surface as_surface() const {
         auto* x = std::get_if<Surface>(&m_variant);
         if (!x) throw std::runtime_error("as_surface() called on non-surface!");
+        return *x;
+    }
+    
+    inline SourceDist as_sourceDist() const {
+        auto* x = std::get_if<SourceDist>(&m_variant);
+        if (!x) throw std::runtime_error("as_sourceDist() called on non-sourceDist!");
+        return *x;
+    }
+
+    inline EnergyDistribution as_energyDist() const {
+        auto* x = std::get_if<EnergyDistribution>(&m_variant);
+        if (!x) throw std::runtime_error("as_energyDist() called on non-energyDist!");
         return *x;
     }
 
@@ -195,7 +212,8 @@ class Value {
                  Undefined,      double,          int,     std::string, 
                  glm::dvec4,     glm::dmat4x4,    bool,    Rad, Material, 
                  Misalignment,   CentralBeamstop, Cutout,  CylinderDirection, 
-                 FigureRotation, Map,             Surface, CurvatureType
+                 FigureRotation, Map,             Surface, CurvatureType,
+                 EnergyDistribution, SourceDist
                 > m_variant;
 };
 }  // namespace RAYX

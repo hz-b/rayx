@@ -7,7 +7,7 @@ TEST_F(TestSuite, ImagePlane) { compareLastAgainstRayUI("ImagePlane"); }
 TEST_F(TestSuite, PlaneMirror) { compareLastAgainstRayUI("PlaneMirror"); }
 TEST_F(TestSuite, PlaneMirrorDef) {
     compareLastAgainstRayUI("PlaneMirrorDef");
-
+    RAYX_LOG << "planemirrdef ";
     // additional path length test
     auto rays = extractLastEvents(traceRML("PlaneMirrorDef"));
     for (auto r : rays) {

@@ -5,13 +5,13 @@
 #include "EnergyDistribution.h"
 
 namespace RAYX {
-LightSource::LightSource(const DesignObject& dobj) {
-    m_name = dobj.name();
-    m_EnergyDistribution = dobj.parseEnergyDistribution();
-    m_misalignmentParams = dobj.parseMisalignment();
-    m_numberOfRays = dobj.parseNumberRays();
-    m_orientation = dobj.parseOrientation();
-    m_position = dobj.parsePosition();
+LightSource::LightSource(const DesignSource& deso) {
+    m_name = deso.getName();
+    m_EnergyDistribution = deso.getEnergyDistribution();
+    m_misalignmentParams = deso.getMisalignment();
+    m_numberOfRays = deso.getNumberOfRays();
+    m_orientation = deso.getWorldOrientation();
+    m_position = deso.getWorldPosition();
     m_verDivergence = 0.0;
 }
 
