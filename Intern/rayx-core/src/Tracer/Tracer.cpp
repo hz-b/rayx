@@ -44,7 +44,7 @@ BundleHistory Tracer::trace(const Beamline& b, Sequential seq, uint64_t max_batc
         // The number of input-rays that we put into this batch.
         // Typically equal to max_batch_size, except for the last batch.
         auto batch_size = (max_batch_size < remaining_rays) ? max_batch_size : remaining_rays;
-
+        RAYX_LOG << "remaining_rays: " << remaining_rays;
         std::vector<Element> elements;
         elements.reserve(b.m_DesignElements.size());
         for (const auto& e : b.m_DesignElements) {
@@ -106,6 +106,7 @@ BundleHistory Tracer::trace(const Beamline& b, Sequential seq, uint64_t max_batc
                         hist.push_back(r);
                     }
                 }
+                RAYX_LOG << "trace hist: " << hist.size();
 
                 // We put the `hist` for the `i`th ray of the batch into the global `BundleHistory result`.
                 result.push_back(hist);
@@ -123,6 +124,7 @@ std::vector<Ray> extractLastEvents(const BundleHistory& hist) {
     for (auto& ray_hist : hist) {
         out.push_back(ray_hist.back());
     }
+    RAYX_LOG << "extractLastEvents middle " << out.size();
 
     return out;
 }
@@ -131,6 +133,8 @@ BundleHistory convertToBundleHistory(const std::vector<Ray>& rays) {
     BundleHistory out;
     for (auto r : rays) {
         out.push_back({r});
+        RAYX_LOG << "convertToBundleHistory " << r.m_direction.b;
+
     }
     return out;
 }

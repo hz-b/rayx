@@ -10,6 +10,7 @@
 #include "Core.h"
 #include "Shader/Ray.h"
 #include "DesignElement/DesignElement.h"
+#include "DesignElement/DesignSource.h"
 
 namespace RAYX {
 struct OpticalElement;

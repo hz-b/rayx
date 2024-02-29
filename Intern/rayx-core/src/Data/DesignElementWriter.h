@@ -21,6 +21,7 @@ void setAllMandatory(xml::Parser parser, DesignElement* de, DesignPlane dp) {
     de->setSlopeError(parser.parseSlopeError());
     de->setAzimuthalAngle(parser.parseAzimuthalAngle());
     de->setMaterial(parser.parseMaterial());
+    de->setCurvatureType(CurvatureType::Plane);
 
     if(de->getName() != "ImagePlane"){ 
         de->setCutout(parser.parseCutout(dp));
@@ -150,6 +151,7 @@ void getRZP(xml::Parser parser, DesignElement* de) {
     de->setAdditionalOrder(parser.parseAdditionalOrder());
     de->setShortRadius(parser.parseShortRadius());
     de->setLongRadius(parser.parseLongRadius());
+    de->setCurvatureType(parser.parseCurvatureType());
     
 }
 

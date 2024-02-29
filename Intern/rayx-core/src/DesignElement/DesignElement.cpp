@@ -5,46 +5,46 @@
 namespace RAYX {
 Element DesignElement::compile() const {
     Element e;
-    if (v["name"].as_string() == "ImagePlane") {
+    if (getName() == "ImagePlane") {
         e = makeImagePlane(*this);
-        std::cout << v["name"].as_string() << std::endl;
-    } else if (v["name"].as_string() == "Slit") {
+        std::cout << getName() << std::endl;
+    } else if (getName() == "Slit") {
         e = makeSlit(*this);
         std::cout << v["name"].as_string() << std::endl;
-    }else if (v["name"].as_string() == "Cone") {
+    }else if (getName() == "Cone") {
         e = makeCone(*this);
         std::cout << v["name"].as_string() << std::endl;
-    }else if (v["name"].as_string() == "Cylinder") {
+    }else if (getName() == "Cylinder") {
         e = makeCylinder(*this);
         std::cout << v["name"].as_string() << std::endl;
-    }else if (v["name"].as_string() == "Ellipsoid") {
+    }else if (getName() == "Ellipsoid") {
         e = makeEllipsoid(*this);
         std::cout << v["name"].as_string() << std::endl;
-    }else if (v["name"].as_string() == "Paraboloid") {
+    }else if (getName() == "Paraboloid") {
         e = makeParaboloid(*this);
         std::cout << v["name"].as_string() << std::endl;
-    }else if (v["name"].as_string() == "Plane Grating") {
+    }else if (getName() == "Plane Grating") {
         e = makePlaneGrating(*this);
         std::cout << v["name"].as_string() << std::endl;
-    }else if (v["name"].as_string() == "Plane Mirror") {
+    }else if (getName() == "Plane Mirror") {
         e = makePlaneMirror(*this);
         std::cout << v["name"].as_string() << std::endl;
-    }else if (v["name"].as_string() == "Spherical Grating") {
+    }else if (getName() == "Spherical Grating") {
         e = makeSphereGrating(*this);
         std::cout << v["name"].as_string() << std::endl;
-    }else if (v["name"].as_string() == "Spherical Mirror") {
+    }else if (getName() == "Spherical Mirror") {
         e = makeSphereMirror(*this);
         std::cout << v["name"].as_string() << std::endl;
-    }else if (v["name"].as_string() == "Toroid") {
+    }else if (getName() == "Toroid") {
         e = makeToroidMirror(*this);
         std::cout << v["name"].as_string() << std::endl;
-    }else if (v["name"].as_string() == "Reflection Zoneplate") {
+    }else if (getName() == "Reflection Zoneplate") {
         e = makeReflectionZonePlate(*this);
         std::cout << v["name"].as_string() << std::endl;
-    }else if (v["name"].as_string() == "Experts Optics") {
+    }else if (getName() == "Experts Optics") {
         e = makeExperts(*this);
         std::cout << v["name"].as_string() << std::endl;
-    }else if (v["name"].as_string() == "Experts Cubic") {
+    }else if (getName() == "Experts Cubic") {
         e = makeExpertsCubic(*this);
         std::cout << v["name"].as_string() << std::endl;
     }

@@ -7,6 +7,7 @@
 #include "Core.h"
 #include "Data/xml.h"
 #include "EnergyDistribution.h"
+//#include "DesignElement/DesignSource.h"
 #include "Shader/Ray.h"
 
 namespace RAYX {
