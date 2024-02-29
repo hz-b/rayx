@@ -2,6 +2,7 @@
 
 #include "Tracer/VulkanTracer.h"
 #include "Writer/H5Writer.h"
+#include "Writer/Writer.h"
 
 // constructor
 Simulator::Simulator() {

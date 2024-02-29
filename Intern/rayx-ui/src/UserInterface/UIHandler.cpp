@@ -347,11 +347,9 @@ void UIHandler::showSimulationSettingsPopupWindow(UIParameters& uiParams) {
 
         ImGui::SetNextWindowPos(ImVec2(ImGui::GetIO().DisplaySize.x * 0.5f, ImGui::GetIO().DisplaySize.y * 0.5f), ImGuiCond_Always,
                                 ImVec2(0.5f, 0.5f));
-        ImGui::SetNextWindowSize(ImVec2(450, 450), ImGuiCond_Always);
+        ImGui::SetNextWindowSize(ImVec2(400, 200), ImGuiCond_Always);
 
         if (ImGui::BeginPopupModal("Simulation Settings", NULL, ImGuiWindowFlags_AlwaysAutoResize)) {
-            ImGui::Text("Simulation Settings");
-            ImGui::Separator();
             ImGui::Checkbox("Sequential", &uiParams.simulationInfo.sequential);
             ImGui::InputInt("Max Batch Size", &uiParams.simulationInfo.maxBatchSize);
 
@@ -372,28 +370,36 @@ void UIHandler::showSimulationSettingsPopupWindow(UIParameters& uiParams) {
                 ImGui::Combo("Device", &uiParams.simulationInfo.deviceIndex, &deviceItems[0], deviceItems.size());
                 ImGui::EndDisabled();
             }
+            ImGui::Separator();
 
-            // Buttons to close the popup
+            // Push buttons to the bottom
+            float totalSpace = ImGui::GetContentRegionAvail().y;
+            float buttonHeight = 40.0f;
+            ImGui::Dummy(ImVec2(0.0f, totalSpace - buttonHeight - ImGui::GetStyle().ItemSpacing.y * 2));
+
+            // Centering buttons
+            float windowWidth = ImGui::GetWindowSize().x;
+            float buttonsWidth = 2 * 120.0f + ImGui::GetStyle().ItemSpacing.x;  // Width of two buttons and spacing
+            ImGui::SetCursorPosX((windowWidth - buttonsWidth) / 2.0f);
+
             if (uiParams.simulationInfo.deviceIndex >= uiParams.simulationInfo.availableDevices.size()) {
                 ImGui::BeginDisabled();
+            }
 
-                if (ImGui::Button("OK", ImVec2(120, 40))) {
-                    uiParams.simulationSettingsReady = true;  // Flag that settings are ready
-                    ImGui::CloseCurrentPopup();               // Close the popup
-                }
+            if (ImGui::Button("OK", ImVec2(120, buttonHeight))) {
+                uiParams.simulationSettingsReady = true;
+                ImGui::CloseCurrentPopup();
+            }
+
+            if (uiParams.simulationInfo.deviceIndex >= uiParams.simulationInfo.availableDevices.size()) {
                 ImGui::EndDisabled();
-            } else {
-                if (ImGui::Button("OK", ImVec2(120, 40))) {
-                    uiParams.simulationSettingsReady = true;  // Flag that settings are ready
-                    ImGui::CloseCurrentPopup();               // Close the popup
-                }
             }
 
             ImGui::SameLine();
 
-            if (ImGui::Button("Cancel", ImVec2(120, 40))) {
-                uiParams.runSimulation = false;  // Reset the flag to not run simulation
-                ImGui::CloseCurrentPopup();      // Close the popup
+            if (ImGui::Button("Cancel", ImVec2(120, buttonHeight))) {
+                uiParams.runSimulation = false;
+                ImGui::CloseCurrentPopup();
             }
 
             ImGui::EndPopup();
