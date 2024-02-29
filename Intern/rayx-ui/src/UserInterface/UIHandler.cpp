@@ -350,27 +350,49 @@ void UIHandler::showSimulationSettingsPopupWindow(UIParameters& uiParams) {
         ImGui::SetNextWindowSize(ImVec2(450, 450), ImGuiCond_Always);
 
         if (ImGui::BeginPopupModal("Simulation Settings", NULL, ImGuiWindowFlags_AlwaysAutoResize)) {
-            // Content goes here
             ImGui::Text("Simulation Settings");
             ImGui::Separator();
             ImGui::Checkbox("Sequential", &uiParams.simulationInfo.sequential);
             ImGui::InputInt("Max Batch Size", &uiParams.simulationInfo.maxBatchSize);
 
+            // Prepare device combo box
+            std::vector<const char*> deviceItems;
+            for (const auto& device : uiParams.simulationInfo.availableDevices) {
+                deviceItems.push_back(device.c_str());
+            }
+
             const char* tracerItems[] = {"CPU Tracer", "VULKAN Tracer"};
-            // VulkanTracer is standard
-            uiParams.simulationInfo.tracer = 1;
             ImGui::Combo("Tracer", &uiParams.simulationInfo.tracer, tracerItems, IM_ARRAYSIZE(tracerItems));
 
-            // Buttons to close the popup, similar to the showMissingFilePopupWindow example
-            if (ImGui::Button("OK", ImVec2(120, 40))) {
-                uiParams.simulationSettingsReady = true;  // Flag that settings are ready
-                ImGui::CloseCurrentPopup();               // Close the popup
+            // Device selection combo box
+            if (uiParams.simulationInfo.tracer == 1) {  // If not CPU Tracer, enable device selection
+                ImGui::Combo("Device", &uiParams.simulationInfo.deviceIndex, &deviceItems[0], deviceItems.size());
+            } else {
+                ImGui::BeginDisabled();  // Disable combo box if CPU Tracer is selected
+                ImGui::Combo("Device", &uiParams.simulationInfo.deviceIndex, &deviceItems[0], deviceItems.size());
+                ImGui::EndDisabled();
+            }
+
+            // Buttons to close the popup
+            if (uiParams.simulationInfo.deviceIndex >= uiParams.simulationInfo.availableDevices.size()) {
+                ImGui::BeginDisabled();
+
+                if (ImGui::Button("OK", ImVec2(120, 40))) {
+                    uiParams.simulationSettingsReady = true;  // Flag that settings are ready
+                    ImGui::CloseCurrentPopup();               // Close the popup
+                }
+                ImGui::EndDisabled();
+            } else {
+                if (ImGui::Button("OK", ImVec2(120, 40))) {
+                    uiParams.simulationSettingsReady = true;  // Flag that settings are ready
+                    ImGui::CloseCurrentPopup();               // Close the popup
+                }
             }
 
             ImGui::SameLine();
 
             if (ImGui::Button("Cancel", ImVec2(120, 40))) {
-                uiParams.runSimulation = false;  // Reset the flag to not show the popup again without saving settings
+                uiParams.runSimulation = false;  // Reset the flag to not run simulation
                 ImGui::CloseCurrentPopup();      // Close the popup
             }
 

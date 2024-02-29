@@ -22,6 +22,18 @@ struct UISimulationInfo {
     int maxBatchSize = 1000000;
     int tracer = 1;
     bool sequential = false;
+    std::vector<std::string> availableDevices;
+    int deviceIndex = 0;
+
+    UISimulationInfo(int startEventID, int maxEvents, int maxBatchSize, int tracer, bool sequential, const std::vector<std::string>& availableDevices,
+                     int deviceIndex)
+        : startEventID(startEventID),
+          maxEvents(maxEvents),
+          maxBatchSize(maxBatchSize),
+          tracer(tracer),
+          sequential(sequential),
+          availableDevices(availableDevices),
+          deviceIndex(deviceIndex) {}
 };
 
 struct UIParameters {
@@ -35,7 +47,7 @@ struct UIParameters {
     bool simulationSettingsReady;
     UISimulationInfo simulationInfo;
 
-    UIParameters(CameraController& camController)
+    UIParameters(CameraController& camController, const std::vector<std::string>& availableDevices)
         : camController(camController),
           rmlPath(""),
           rmlReady(false),
@@ -44,7 +56,15 @@ struct UIParameters {
           rayInfo({false, false, false, false, 0, 0}),
           runSimulation(false),
           simulationSettingsReady(false),
-          simulationInfo({0, 0, 1000000, 0, false}) {}
+          simulationInfo({
+              0,
+              0,
+              1000000,
+              0,
+              false,
+              availableDevices,
+              0,
+          }) {}
 
     void updatePath(const std::filesystem::path& path) {
         if (path.empty()) return;
