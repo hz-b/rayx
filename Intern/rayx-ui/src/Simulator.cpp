@@ -3,6 +3,21 @@
 #include "Tracer/VulkanTracer.h"
 #include "Writer/H5Writer.h"
 
+// constructor
+Simulator::Simulator() {
+    m_maxEvents = 0;
+    m_max_batch_size = 1000000;
+    m_Tracer = std::make_unique<RAYX::VulkanTracer>();
+    m_seq = RAYX::Sequential::No;
+    auto deviceList = dynamic_cast<RAYX::VulkanTracer*>(m_Tracer.get())->getPhysicalDevices();
+    for (const auto& device : deviceList) {
+        VkPhysicalDeviceProperties deviceProperties;
+        vkGetPhysicalDeviceProperties(device, &deviceProperties);
+
+        m_availableDevices.push_back(deviceProperties.deviceName);
+    }
+}
+
 void Simulator::runSimulation() {
     // Run rayx core
     m_maxEvents = m_Beamline.m_OpticalElements.size() + 2;
@@ -57,8 +72,8 @@ void Simulator::runSimulation() {
     writeH5(rays, path, fmt, names, startEventID);
 }
 
-void Simulator::setSimulationParameters(std::filesystem::path RMLPath, RAYX::Beamline beamline, uint64_t max_batch_size, int tracer,
-                                        bool sequential) {
+void Simulator::setSimulationParameters(std::filesystem::path RMLPath, RAYX::Beamline beamline, uint64_t max_batch_size, int tracer, bool sequential,
+                                        unsigned int deviceIndex) {
     m_RMLPath = RMLPath;
     m_Beamline = std::move(beamline);
     m_max_batch_size = max_batch_size;
@@ -68,4 +83,7 @@ void Simulator::setSimulationParameters(std::filesystem::path RMLPath, RAYX::Bea
         m_Tracer = std::make_unique<RAYX::VulkanTracer>();
     }
     m_seq = sequential ? RAYX::Sequential::Yes : RAYX::Sequential::No;
+    m_deviceIndex = deviceIndex;
 }
+
+std::vector<std::string> Simulator::getAvailableDevices() { return m_availableDevices; }

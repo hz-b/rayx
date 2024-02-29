@@ -71,7 +71,7 @@ class Application {
     std::unique_ptr<RAYX::Beamline> m_Beamline;  ///< Beamline
     RAYX::BundleHistory m_rays;                  ///< Ray cache
 
-    void init();
+        void init();
 
     void runSimulation();
 
