@@ -71,7 +71,7 @@ void writeToOutputCSV(const RAYX::BundleHistory& hist, std::string filename) {
 
 RAYX::BundleHistory traceRML(std::string filename) {
     auto beamline = loadBeamline(filename);
-    return tracer->trace(beamline, Sequential::No, DEFAULT_BATCH_SIZE, 1, beamline.m_OpticalElements.size() + 2);
+    return tracer->trace(beamline, Sequential::No, DEFAULT_BATCH_SIZE, 1, beamline.m_DesignElements.size() + 2);
 }
 
 std::vector<RAYX::Ray> extractLastHit(const RAYX::BundleHistory& hist) {
@@ -155,8 +155,11 @@ void compareBundleHistories(const RAYX::BundleHistory& r1, const RAYX::BundleHis
 std::optional<RAYX::Ray> lastSequentialHit(RayHistory ray_hist, unsigned int beamline_len) {
     // The ray should hit every element from the beamline once.
     if (ray_hist.size() != beamline_len) {
+        RAYX_LOG << "lastSequentialHit out ";
+
         return {};
     }
+    RAYX_LOG << "lastSequentialHit ";
 
     for (int i = 0; i < beamline_len; i++) {
         if (ray_hist[i].m_lastElement != i) {
@@ -173,17 +176,22 @@ std::optional<RAYX::Ray> lastSequentialHit(RayHistory ray_hist, unsigned int bea
 // returns the rayx rays converted to be ray-UI compatible.
 std::vector<RAYX::Ray> rayUiCompat(std::string filename, Sequential seq = Sequential::No) {
     auto beamline = loadBeamline(filename);
-    BundleHistory hist = tracer->trace(beamline, seq, DEFAULT_BATCH_SIZE, 1, beamline.m_OpticalElements.size() + 2);
+    BundleHistory hist = tracer->trace(beamline, seq, DEFAULT_BATCH_SIZE, 1, beamline.m_DesignElements.size() + 2);
 
     std::vector<RAYX::Ray> out;
+    RAYX_LOG << "rayUiCompat: " << beamline.m_DesignElements.size();
 
     for (auto ray_hist : hist) {
-        auto opt_ray = lastSequentialHit(ray_hist, beamline.m_OpticalElements.size());
+        auto opt_ray = lastSequentialHit(ray_hist, beamline.m_DesignElements.size());
+        RAYX_LOG << "for loop middle2: " << ray_hist.size();
+
         if (opt_ray) {
+            RAYX_LOG << "for loop middle: " << out.size();
             auto orig_r = *opt_ray;
             auto r = orig_r;
             int elem = (int)r.m_lastElement;
-            double btype = beamline.m_OpticalElements[elem].m_element.m_behaviour.m_type;
+            double btype = beamline.m_DesignElements[elem].compile().m_behaviour.m_type;// m_element.m_behaviour.m_type;
+            RAYX_LOG << "for loop middle2: " << btype;
             // these types of behaviours indicate that Ray-UI uses a DesignPlane::XY for this.
             // Thus, (as rayx uses an XZ plane) to allow comparison with Ray-UI we need to swap the y and z coordinates here.
             if (btype == BTYPE_IMAGE_PLANE || btype == BTYPE_SLIT) {
@@ -192,17 +200,17 @@ std::vector<RAYX::Ray> rayUiCompat(std::string filename, Sequential seq = Sequen
                 r.m_direction.y = orig_r.m_direction.z;
                 r.m_direction.z = orig_r.m_direction.y;
             }
-
             out.push_back(r);
         }
     }
-
+    RAYX_LOG << "RayUICompat finished " << out.size();
     return out;
 }
 
 void compareLastAgainstRayUI(std::string filename, double tolerance, Sequential seq) {
     auto rayx_list = rayUiCompat(filename, seq);
     auto rayui_list = loadCSVRayUI(filename);
+    RAYX_LOG << "compareLastAgainstRayUI start ";
 
     writeToOutputCSV(convertToBundleHistory(rayx_list), filename + ".rayx");
     writeToOutputCSV(convertToBundleHistory(rayui_list), filename + ".rayui");
@@ -211,6 +219,7 @@ void compareLastAgainstRayUI(std::string filename, double tolerance, Sequential 
 
     auto itRayX = rayx_list.begin();
     auto itRayXEnd = rayx_list.end();
+    RAYX_LOG << "compareLastAgainstRayUI middle ";
 
     auto itRayUI = rayui_list.begin();
 
@@ -226,6 +235,8 @@ void compareLastAgainstRayUI(std::string filename, double tolerance, Sequential 
         ++itRayX;
         ++itRayUI;
     }
+    RAYX_LOG << "compareLastAgainstRayUI finished ";
+
 }
 
 void compareAgainstCorrect(std::string filename, double tolerance) {
