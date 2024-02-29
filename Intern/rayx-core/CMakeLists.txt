@@ -119,34 +119,45 @@ target_include_directories(${PROJECT_NAME} SYSTEM PUBLIC
 
 # ---- Compile Shaders ----
 if(Vulkan_FOUND)
-    # The following code is used to always compile the shader.
-    # This is most likely not an optimal solution, but it will work
-    # until we find a better one.
     add_dependencies(${PROJECT_NAME} RAYX_CORE_COMPILE_SHADER)
-    set(RAYX_CORE_SHADER ${CMAKE_BINARY_DIR}/bin/shaders/comp.spv)
-    set(RAYX_CORE_SHADER_FAKE ${CMAKE_BINARY_DIR}/bin/___comp.spv) # this exists so file cannot be found -> always execute command
-
+    set(RAYX_CORE_SHADER ${CMAKE_BINARY_DIR}/bin/Shaders/comp.spv)
+    file(MAKE_DIRECTORY ${CMAKE_BINARY_DIR}/bin/Shaders)
     add_custom_command(
         OUTPUT
         ${RAYX_CORE_SHADER}
-        ${RAYX_CORE_SHADER_FAKE}
         COMMAND glslangValidator
         ARGS -V ${PROJECT_SOURCE_DIR}/src/Shader/main-glsl.comp -o ${RAYX_CORE_SHADER}
     )
-
     add_custom_target(RAYX_CORE_COMPILE_SHADER ALL DEPENDS ${RAYX_CORE_SHADER})
 endif()
 
 # ------------------------
 
+# ---- Data ----
+# Define the source and destination paths
+set(DATA_SRC_DIR "${CMAKE_SOURCE_DIR}/Data")
+# Set the destination directory for the Data directory based on the build type
+if(CMAKE_BUILD_TYPE STREQUAL "Debug")
+    set(DATA_DST_DIR "${CMAKE_RUNTIME_OUTPUT_DIRECTORY_DEBUG}/Data")
+else()
+    set(DATA_DST_DIR "${CMAKE_RUNTIME_OUTPUT_DIRECTORY_RELEASE}/Data")
+endif()
+
+# Copy the Data directory to the binary output directory after building
+message(STATUS "Copying Data directory from ${DATA_SRC_DIR} to ${DATA_DST_DIR}")
+add_custom_command(
+    TARGET ${PROJECT_NAME} POST_BUILD
+    COMMAND ${CMAKE_COMMAND} -E copy_directory ${DATA_SRC_DIR} ${DATA_DST_DIR}
+    COMMENT "Copying Data directory to build output directory..."
+)
+# -----------------
+
 # ---- CPack ----
-
-include(InstallRequiredSystemLibraries)
-
-set(CPACK_RESOURCE_FILE_LICENSE "${PROJECT_SOURCE_DIR}/../../LICENSE")
+set(CPACK_RESOURCE_FILE_LICENSE "${CMAKE_SOURCE_DIR}/LICENSE")
 set(CPACK_PACKAGE_VERSION ${PROJECT_VERSION})
 set(CPACK_PACKAGE_CONTACT "Your Name <your.email@example.com>")
 set(CPACK_PACKAGE_DESCRIPTION_SUMMARY "Your Project Description")
+install(DIRECTORY ${DATA_SRC_DIR} DESTINATION ${CMAKE_INSTALL_PREFIX})
 
 include(CPack)
 

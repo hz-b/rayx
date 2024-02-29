@@ -14,8 +14,9 @@ bool NffTable::load(const char* element, NffTable* out) {
 
     std::transform(elementString.begin(), elementString.end(), elementString.begin(), [](unsigned char c) { return std::tolower(c); });
 
-    std::string f = "Data/nff/" + elementString + ".nff";
-    std::ifstream s(canonicalizeRepositoryPath(f));
+    std::string f = getExecutablePath().string() + "/Data/nff/" + elementString + ".nff";
+    RAYX_VERB << "Loading NffTable from " << f;
+    std::ifstream s(f);
 
     if (s.fail()) {
         return false;

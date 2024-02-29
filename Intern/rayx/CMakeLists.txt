@@ -41,15 +41,15 @@ target_include_directories(${PROJECT_NAME} PRIVATE ${PROJECT_BINARY_DIR})
 # ----------------------
 
 # ---- CPack ----
-install(DIRECTORY ${CMAKE_BINARY_DIR}/bin/shaders
-        DESTINATION ./
+install(DIRECTORY ${CMAKE_BINARY_DIR}/bin/Shaders
+        DESTINATION ./bin
         FILES_MATCHING PATTERN "comp.spv")
-install(DIRECTORY ${CMAKE_BINARY_DIR}/../Data
-        DESTINATION ./)
+install(DIRECTORY ${CMAKE_SOURCE_DIR}/Data
+        DESTINATION ./bin)
 set(CPACK_PACKAGE_DESCRIPTION_SUMMARY "rayx - A RAYX Beamline Simulation Tool")
 set(CPACK_PACKAGE_VERSION ${PROJECT_VERSION})
 set(CPACK_PACKAGE_INSTALL_DIRECTORY "rayx")
-set(CPACK_RESOURCE_FILE_LICENSE "${PROJECT_SOURCE_DIR}/../../LICENSE")
+set(CPACK_RESOURCE_FILE_LICENSE "${CMAKE_SOURCE_DIR}/LICENSE")
 set(CPACK_PACKAGE_EXECUTABLES ${PROJECT_NAME})
 include(CPack)
 # --------------

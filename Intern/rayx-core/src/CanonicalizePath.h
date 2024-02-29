@@ -9,6 +9,9 @@
 
 namespace RAYX {
 
+/// Returns the path to the directory containing the executable.
+std::filesystem::path RAYX_API getExecutablePath();
+
 /// `relPath` is a path relative to the root of the RAY-X git repository (i.e.
 /// where .git lies). canonicalizeRepositoryPath(relPath) yields an absolute
 /// path representing the same path. Examples:

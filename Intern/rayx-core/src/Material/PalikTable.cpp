@@ -12,8 +12,9 @@ bool PalikTable::load(const char* element, PalikTable* out) {
     std::string elementString = element;
     std::transform(elementString.begin(), elementString.end(), elementString.begin(), [](unsigned char c) { return std::toupper(c); });
 
-    std::string f = "Data/PALIK/" + elementString + ".NKP";
-    std::ifstream s(canonicalizeRepositoryPath(f));
+    std::string f = getExecutablePath().string() + "/Data/PALIK/" + elementString + ".NKP";
+    RAYX_VERB << "Loading PalikTable from " << f;
+    std::ifstream s(f);
 
     if (s.fail()) {
         return false;
