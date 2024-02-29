@@ -11,49 +11,46 @@
 #include "Debug/Debug.h"
 #include "Debug/Instrumentor.h"
 #include "DesignElementWriter.h"
+#include "DesignSourceWriter.h"
 
-DesignElement parseElement(xml::Parser parser) {
-    DesignElement de;
+void parseElement(xml::Parser parser, DesignElement* de) {
     const char* type = parser.type();
-    Value map = Map();
-    de.v = map;
+    de->v = Map();
     // TODO add functions for each Element
 
     if (strcmp(type, "ImagePlane") == 0) {
-        getImageplane(parser, &de);
+        getImageplane(parser, de);
     } else if (strcmp(type, "Cone") == 0) {
-        getCone(parser, &de);
+        getCone(parser, de);
     } else if (strcmp(type, "Cylinder") == 0) {
-        getCylinder(parser, &de);
+        getCylinder(parser, de);
     } else if (strcmp(type, "Ellipsoid") == 0) {
-        getEllipsoid(parser, &de);
+        getEllipsoid(parser, de);
     } else if (strcmp(type, "Experts Optics") == 0) {
-        getExpertsOptics(parser, &de);
+        getExpertsOptics(parser, de);
     } else if (strcmp(type, "Experts Cubic") == 0) {
-        getExpertsCubic(parser, &de);
+        getExpertsCubic(parser, de);
     } else if (strcmp(type, "Paraboloid") == 0) {
-        getParaboloid(parser, &de);
+        getParaboloid(parser, de);
     } else if (strcmp(type, "Plane Grating") == 0) {
-        getPlaneGrating(parser, &de);
+        getPlaneGrating(parser, de);
     } else if (strcmp(type, "Plane Mirror") == 0) {
-        getPlaneMirror(parser, &de);
+        getPlaneMirror(parser, de);
     } else if (strcmp(type, "Reflection Zoneplate") == 0) {
-        getRZP(parser, &de);
+        getRZP(parser, de);
     } else if (strcmp(type, "Slit") == 0) {
-        getSlit(parser, &de);
+        getSlit(parser, de);
     } else if (strcmp(type, "Spherical Grating") == 0) {
-        getSphereGrating(parser, &de);
+        getSphereGrating(parser, de);
     } else if (strcmp(type, "Sphere") == 0) {
-        getSphereMirror(parser, &de);
+        getSphereMirror(parser, de);
     } else if (strcmp(type, "Spherical Mirror") == 0) {
-        getSphereMirror(parser, &de);
+        getSphereMirror(parser, de);
     } else if (strcmp(type, "Toroid") == 0) {
-        getToroidMirror(parser, &de);
+        getToroidMirror(parser, de);
     } else {
         RAYX_WARN << "could not classify beamline object with Name: " << parser.name() << "; Type: " << parser.type();
     }
-
-    return de;
 }
 
 namespace RAYX {
@@ -64,40 +61,36 @@ void addBeamlineObjectFromXML(rapidxml::xml_node<>* node, Beamline* beamline, co
     // https://en.cppreference.com/w/cpp/language/lambda) They define functions
     // to be used in the if-else-chain below to keep it structured and readable.
 
-    // addLightSource(s, node) is a function adding a light source to the
+    // //addLightSource(s, node) is a function adding a light source to the
     // beamline (if it's not nullptr)
-    const auto addLightSource = [&](const std::shared_ptr<LightSource>& s, rapidxml::xml_node<>* node) {
-        if (s) {
-            beamline->m_LightSources.push_back(s);
-        } else {
-            RAYX_ERR << "could not construct LightSource with Name: " << node->first_attribute("name")->value()
-                     << "; Type: " << node->first_attribute("type")->value();
-        }
-    };
 
     RAYX::xml::Parser parser(node, group_context, filename);
     const char* type = parser.type();
-
+    DesignSource ds;
     // Light sources have constructors that accept a const DesignObject& as argument.
     // They use the param* functions declared in <Data/xml.h> to retrieve the relevant information.
     if (strcmp(type, "Point Source") == 0) {
-        addLightSource(std::make_shared<PointSource>(parser), node);
+        setPointSource(parser, &ds);
     } else if (strcmp(type, "Matrix Source") == 0) {
-        addLightSource(std::make_shared<MatrixSource>(parser), node);
+        //addLightSource(std::make_shared<MatrixSource>(parser), node);
     } else if (strcmp(type, "Dipole") == 0) {
-        addLightSource(std::make_shared<DipoleSource>(parser), node);
+        //addLightSource(std::make_shared<DipoleSource>(parser), node);
     } else if (strcmp(type, "Dipole Source") == 0) {
-        addLightSource(std::make_shared<DipoleSource>(parser), node);
+        //addLightSource(std::make_shared<DipoleSource>(parser), node);
     } else if (strcmp(type, "Pixel Source") == 0) {
-        addLightSource(std::make_shared<PixelSource>(parser), node);
+        //addLightSource(std::make_shared<PixelSource>(parser), node);
     } else if (strcmp(type, "Circle Source") == 0) {
-        addLightSource(std::make_shared<CircleSource>(parser), node);
+        //addLightSource(std::make_shared<CircleSource>(parser), node);
     } else if (strcmp(type, "Simple Undulator") == 0) {
-        addLightSource(std::make_shared<SimpleUndulatorSource>(parser), node);
+        //addLightSource(std::make_shared<SimpleUndulatorSource>(parser), node);
     } else {
-        DesignElement de = parseElement(parser);
+        DesignElement de;
+        parseElement(parser, &de);
+        RAYX_LOG << "import " << de.getName();
         beamline->m_DesignElements.push_back(de);
     }
+    beamline->m_DesignSources.push_back(ds);
+
 }
 
 // `collection` is an xml object, over whose children-objects we want to

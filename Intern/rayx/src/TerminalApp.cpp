@@ -234,9 +234,9 @@ std::vector<std::string> TerminalApp::getBeamlineOpticalElementsNames() {
  */
 std::vector<std::string> TerminalApp::getBeamlineLightSourcesNames() {
     std::vector<std::string> names;
-    names.reserve(m_Beamline->m_LightSources.size());
+    names.reserve(m_Beamline->m_DesignSources.size());
 
-    for (const auto& lightSources : m_Beamline->m_LightSources) {
+    for (const auto& lightSources : m_Beamline->m_DesignSources) {
         names.push_back(lightSources->m_name);
     }
 
