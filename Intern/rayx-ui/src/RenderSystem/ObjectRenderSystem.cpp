@@ -47,8 +47,8 @@ void ObjectRenderSystem::createPipeline(VkRenderPass renderPass) {
     GraphicsPipeline::defaultPipelineConfigInfo(pipelineConfig, GraphicsPipeline::VertexMode::TEXTURED);
     pipelineConfig.renderPass = renderPass;
     pipelineConfig.pipelineLayout = m_PipelineLayout;
-    const std::string vertexShader = RAYX::canonicalizeRepositoryPath("build/bin/shaders/shader_vert.spv").string();
-    const std::string fragmentShader = RAYX::canonicalizeRepositoryPath("build/bin/shaders/shader_frag.spv").string();
+    const std::string vertexShader = RAYX::getExecutablePath().string() + "/Shaders/shader_vert.spv";
+    const std::string fragmentShader = RAYX::getExecutablePath().string() + "/Shaders/shader_frag.spv";
     m_Pipeline = std::make_unique<GraphicsPipeline>(m_Device, vertexShader, fragmentShader, pipelineConfig);
 }
 

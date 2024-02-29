@@ -18,7 +18,8 @@ void VulkanEngine::createShaderModule() {
 
     // the code in comp.spv was created by running the command:
     // glslangValidator.exe -V shader.comp
-    std::string path = canonicalizeRepositoryPath(m_shaderFile).string();
+    std::string path = getExecutablePath().string() + "/Shaders/comp.spv";
+    RAYX_VERB << "Loading compute shader from: " << path;
     std::vector<uint32_t> compShaderCode;
     if (auto d = readFileAlign32(path)) {
         compShaderCode = d.value();

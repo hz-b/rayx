@@ -37,11 +37,11 @@ if(Vulkan_FOUND)
 
     # ---- CPack ----
     install(TARGETS ${PROJECT_NAME} RUNTIME DESTINATION bin)
-    install(DIRECTORY ${CMAKE_BINARY_DIR}/bin/shaders
-            DESTINATION ./
+    install(DIRECTORY ${CMAKE_BINARY_DIR}/bin/Shaders
+            DESTINATION ./bin
             FILES_MATCHING PATTERN "*_*.spv")
     include(InstallRequiredSystemLibraries)
-    set(CPACK_RESOURCE_FILE_LICENSE "${PROJECT_SOURCE_DIR}/../../LICENSE")
+    set(CPACK_RESOURCE_FILE_LICENSE "${CMAKE_SOURCE_DIR}/LICENSE")
     set(CPACK_PACKAGE_VERSION ${PROJECT_VERSION})
     set(CPACK_PACKAGE_DESCRIPTION_SUMMARY "rayx-ui - RAYX GUI Application")
     include(CPack)
@@ -85,7 +85,7 @@ if(Vulkan_FOUND)
             string(SUBSTRING ${SHADER_EXT} 1 -1 SHADER_STAGE) # Remove the leading '.' from the extension
 
             # Set output file name
-            set(OUTPUT_FILE "${CMAKE_BINARY_DIR}/bin/shaders/${SHADER_NAME}_${SHADER_STAGE}.spv")
+            set(OUTPUT_FILE "${CMAKE_BINARY_DIR}/bin/Shaders/${SHADER_NAME}_${SHADER_STAGE}.spv")
 
             # Create a custom command for each shader file
             add_custom_command(

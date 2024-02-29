@@ -49,7 +49,7 @@ void GridRenderSystem::createPipeline(VkRenderPass renderPass) {
     pipelineConfig.depthStencilInfo.depthCompareOp = VK_COMPARE_OP_LESS_OR_EQUAL;
 
     // Use the grid-specific shaders
-    const std::string vertexShader = RAYX::canonicalizeRepositoryPath("build/bin/shaders/grid_shader_vert.spv").string();
-    const std::string fragmentShader = RAYX::canonicalizeRepositoryPath("build/bin/shaders/grid_shader_frag.spv").string();
+    const std::string vertexShader = RAYX::getExecutablePath().string() + "/Shaders/grid_shader_vert.spv";
+    const std::string fragmentShader = RAYX::getExecutablePath().string() + "/Shaders/grid_shader_frag.spv";
     m_Pipeline = std::make_unique<GraphicsPipeline>(m_Device, vertexShader, fragmentShader, pipelineConfig);
 }
