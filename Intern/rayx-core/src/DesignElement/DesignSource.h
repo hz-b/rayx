@@ -1,7 +1,7 @@
 #pragma once
 
-#include "Beamline/Objects/Objects.h"
-#include "Beamline/LightSource.h"
+//#include "Beamline/Objects/Objects.h"
+//#include "Beamline/LightSource.h"
 #include "Value.h"
 
 namespace RAYX {
@@ -17,7 +17,7 @@ struct DesignSource {
 
     void setName(std::string s);
     std::string getName() const;
-    
+
     void setWidthDist(SourceDist value);
     SourceDist getWidthDist() const;
 
@@ -45,7 +45,14 @@ struct DesignSource {
     void setSourceWidth(double value);
     double getSourceWidth() const;
 
-    void setEnergyDistribution(EnergyDistribution value);
+    void setEnergySpread(double value);
+    void setEnergySpreadType(SpreadType value);
+    void setEnergyDistributionType(EnergyDistributionType value);
+    void setEnergyDistributionFile(std::string value);
+    void setEnergySpreadUnit(EnergySpreadUnit value);
+    void setEnergy(double value);
+
+    double getEnergy() const;
     EnergyDistribution getEnergyDistribution() const;
 
     void setMisalignment(Misalignment m);
@@ -60,8 +67,7 @@ struct DesignSource {
     void setWorldOrientation(glm::dmat4x4 o);
     glm::dmat4x4 getWorldOrientation() const;
 
-    void setEnergy(double value);
-    double getEnergy() const;
+    
 
 };
 }

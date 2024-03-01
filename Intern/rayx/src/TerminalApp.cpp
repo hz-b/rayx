@@ -237,7 +237,7 @@ std::vector<std::string> TerminalApp::getBeamlineLightSourcesNames() {
     names.reserve(m_Beamline->m_DesignSources.size());
 
     for (const auto& lightSources : m_Beamline->m_DesignSources) {
-        names.push_back(lightSources->m_name);
+        names.push_back(lightSources.getName());
     }
 
     return names;
