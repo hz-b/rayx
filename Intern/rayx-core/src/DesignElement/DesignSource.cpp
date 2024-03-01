@@ -1,6 +1,7 @@
 #include "DesignSource.h"
 
 #include "Debug/Debug.h"
+#include "Beamline/Objects/Objects.h"
 
 namespace RAYX {
 
@@ -8,7 +9,7 @@ namespace RAYX {
 std::vector<Ray> DesignSource::compile(int i) const {
     std::vector<Ray> ray;
     if (getName() == "Point Source") {
-        ray = LightSource::getRays(1);
+        //ray = LightSource::getRays(1);
         std::cout << getName() << std::endl;
     }
 }
@@ -139,9 +140,17 @@ double DesignSource::getSourceHeight() const { return v["sourceHeight"].as_doubl
 void DesignSource::setSourceWidth(double value) { v["sourceWidth"] = value; }
 double DesignSource::getSourceWidth() const { return v["sourceWidth"].as_double(); }
 
+void DesignSource::setEnergySpread(double value) { v["energySpread"] = value; }
+void DesignSource::setEnergyDistributionType(EnergyDistributionType value) { v["energyDistributionType"] = value; }
+void DesignSource::setEnergyDistributionFile(std::string value) { v["photonEnergyDistributionFile"] = value; }
+void DesignSource::setEnergySpreadType(SpreadType value) { v["energyDistribution"] = value; }
 
-void DesignSource::setEnergyDistribution(EnergyDistribution value) { v["energyDistribution"] = value; }
-EnergyDistribution DesignSource::getEnergyDistribution() const { return v["energyDistribution"].as_energyDist(); }
+EnergyDistribution DesignSource::getEnergyDistribution() const { 
+    EnergyDistribution en;
+    SpreadType spreadType = v["energySpread"].as_energySpreadType();
+
+    return en;
+}
 
 void DesignSource::setNumberOfRays(double value) { v["numberOfRays"] = value; }
 double DesignSource::getNumberOfRays() const { return v["numberOfRays"].as_double(); }
