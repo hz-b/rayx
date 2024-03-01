@@ -109,14 +109,15 @@ struct EdgeList {
         }
         uint32_t startI = 0;
         for (auto& simple : poly) {
-            for (uint32_t i = 0; i < simple.size(); i++) {
-                int prevI = translateIndex(i - 1, (int)simple.size());
+            int simpleSize = static_cast<int>(simple.size());
+            for (int i = 0; i < simpleSize; i++) {
+                int prevI = translateIndex(i - 1, simpleSize);
                 int currentI = i;
-                int nextI = translateIndex(i + 1, (int)simple.size());
+                int nextI = translateIndex(i + 1, simpleSize);
                 VertexType type = toVertexType(points[simple[prevI]], points[simple[currentI]], points[simple[nextI]]);
-                edges.push_back(EdgeEntry{{simple[currentI], type}, startI + (uint32_t)prevI, startI + (uint32_t)nextI});
+                edges.push_back(EdgeEntry{{simple[currentI], type}, startI + static_cast<uint32_t>(prevI), startI + static_cast<uint32_t>(nextI)});
             }
-            startI += (uint32_t)simple.size();
+            startI += static_cast<uint32_t>(simpleSize);
         }
     }
 
@@ -125,9 +126,9 @@ struct EdgeList {
         EdgeEntry v = edges[v_i];
         EdgeEntry w = edges[w_i];
         edges.push_back(EdgeEntry{v.origin, v.prev, w_i});
-        uint32_t vw = edges.size() - 1;
+        uint32_t vw = static_cast<uint32_t>(edges.size()) - 1;
         edges.push_back(EdgeEntry{w.origin, w.prev, v_i});
-        uint32_t wv = edges.size() - 1;
+        uint32_t wv = static_cast<uint32_t>(edges.size()) - 1;
         edges[edges[v_i].prev].next = vw;
         edges[v_i].prev = wv;
         edges[edges[w_i].prev].next = wv;
@@ -163,6 +164,9 @@ struct EdgeList {
 
         auto getLeftEdge = [&set](uint32_t edge) {
             auto it = set.lower_bound(edge);
+            if (it == set.begin()) {
+                throw std::runtime_error("Triangulate: invalid polygon");
+            }
             it--;
             return *it;
         };
@@ -367,6 +371,7 @@ void triangulate(const PolygonComplex& poly, std::vector<TextureVertex>& points,
 // ------ Helper functions ------
 
 // Cutout to Outline conversion
+// Holes are represented by polygons in clockwise order
 PolygonSimple calculateOutlineFromCutout(const Cutout& cutout, std::vector<TextureVertex>& vertices, bool clockwise = false) {
     constexpr double defWidthHeight = 50.0f;
     Outline outline;
@@ -393,13 +398,15 @@ PolygonSimple calculateOutlineFromCutout(const Cutout& cutout, std::vector<Textu
             break;
         }
     }
-    int offset = (int)vertices.size();
+    uint32_t offset = static_cast<uint32_t>(vertices.size());
     vertices.insert(vertices.end(), outline.vertices.begin(), outline.vertices.end());
     PolygonSimple indices;
 
-    for (uint32_t i = 0; i < outline.vertices.size(); i++) {
+    uint32_t outlineSize = static_cast<uint32_t>(outline.vertices.size());
+
+    for (uint32_t i = 0; i < outlineSize; i++) {
         if (clockwise) {
-            indices.push_back(offset + outline.vertices.size() - i - 1);  // Reverse the order
+            indices.push_back(offset + outlineSize - i - 1);  // Reverse the order
         } else {
             indices.push_back(offset + i);
         }
@@ -414,12 +421,9 @@ void planarTriangulation(const RAYX::OpticalElement& element, std::vector<Textur
         SlitBehaviour slit = deserializeSlit(element.m_element.m_behaviour);
         poly.push_back(calculateOutlineFromCutout(slit.m_beamstopCutout, vertices));
         poly.push_back(calculateOutlineFromCutout(element.m_element.m_cutout, vertices));
-        poly.push_back(calculateOutlineFromCutout(slit.m_openingCutout, vertices, true));
-
-        // calculateMeshForSlit(element.m_element, vertices, indices);
+        poly.push_back(calculateOutlineFromCutout(slit.m_openingCutout, vertices, true)); // Hole -> Clockwise order
     } else {
         poly.push_back(calculateOutlineFromCutout(element.m_element.m_cutout, vertices));
-        // calculateSolidMeshOfType(element.m_element.m_cutout, vertices, &indices);
     }
     triangulate(poly, vertices, indices);
 }
