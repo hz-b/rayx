@@ -12,7 +12,12 @@
 namespace RAYX {
 
 void setAllMandatory(xml::Parser parser, DesignSource* de) {
-    de->setEnergyDistribution(parser.parseEnergyDistribution());
+    de->setEnergy(parser.parseElectronEnergy());
+    de->setEnergyDistributionFile(parser.parseEnergyDistributionFile());
+    de->setEnergyDistributionType(parser.parseEnergyDistributionType());
+    de->setEnergySpread(parser.parseEnergySpread());
+    de->setEnergySpreadType(parser.parseEnergySpreadType());
+
     de->setMisalignment(parser.parseMisalignment());
     de->setNumberOfRays(parser.parseNumberRays());
     de->setWorldOrientation(parser.parseOrientation());

@@ -24,7 +24,8 @@ enum class ValueType {
     CurvatureType,
     Surface,
     SourceDist,
-    EnergyDistribution,
+    SpreadType,
+    EnergyDistributionType
 };
 
 class Undefined {};
@@ -52,7 +53,8 @@ class Value {
     Value(CurvatureType x) : m_variant(x) {}
     Value(Surface x) : m_variant(x) {}
     Value(SourceDist x) : m_variant(x) {}
-    Value(EnergyDistribution x) : m_variant(x) {}
+    Value(SpreadType x) : m_variant(x) {}
+    Value(EnergyDistributionType x) : m_variant(x) {}
 
     void operator=(double x) { m_variant = x; }
     void operator=(int x) { m_variant = x; }
@@ -71,7 +73,8 @@ class Value {
     void operator=(CurvatureType x) { m_variant = x; }
     void operator=(Surface x) { m_variant = x; }
     void operator=(SourceDist x) { m_variant = x; }
-    void operator=(EnergyDistribution x) { m_variant = x; }
+    void operator=(SpreadType x) { m_variant = x; }
+    void operator=(EnergyDistributionType x) { m_variant = x; }
 
 
 
@@ -81,7 +84,7 @@ class Value {
             ValueType::String,    ValueType::Map,       ValueType::Dvec4,         ValueType::Dmat4x4,
             ValueType::Rad,       ValueType::Material,  ValueType::Misalignment,  ValueType::CentralBeamStop,
             ValueType::Cutout,    ValueType::Bool,      ValueType::FigureRotation,ValueType::CurvatureType,
-            ValueType::Surface,   ValueType::SourceDist,ValueType::EnergyDistribution
+            ValueType::Surface,   ValueType::SourceDist,ValueType::SpreadType,    ValueType::EnergyDistributionType
         };
         return types[m_variant.index()];
     }
@@ -188,9 +191,15 @@ class Value {
         return *x;
     }
 
-    inline EnergyDistribution as_energyDist() const {
-        auto* x = std::get_if<EnergyDistribution>(&m_variant);
-        if (!x) throw std::runtime_error("as_energyDist() called on non-energyDist!");
+    inline SpreadType as_energySpreadType() const {
+        auto* x = std::get_if<SpreadType>(&m_variant);
+        if (!x) throw std::runtime_error("as_energySpreadType() called on non-energySpreadType!");
+        return *x;
+    }
+
+    inline EnergyDistributionType as_energyDistType() const {
+        auto* x = std::get_if<EnergyDistributionType>(&m_variant);
+        if (!x) throw std::runtime_error("as_energyDistType() called on non-energyDistType!");
         return *x;
     }
 
@@ -213,7 +222,7 @@ class Value {
                  glm::dvec4,     glm::dmat4x4,    bool,    Rad, Material, 
                  Misalignment,   CentralBeamstop, Cutout,  CylinderDirection, 
                  FigureRotation, Map,             Surface, CurvatureType,
-                 EnergyDistribution, SourceDist
+                 SourceDist,     SpreadType,      EnergyDistributionType
                 > m_variant;
 };
 }  // namespace RAYX
