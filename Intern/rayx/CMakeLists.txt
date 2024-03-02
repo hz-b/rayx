@@ -41,9 +41,16 @@ target_include_directories(${PROJECT_NAME} PRIVATE ${PROJECT_BINARY_DIR})
 # ----------------------
 
 # ---- CPack ----
-install(DIRECTORY ${CMAKE_BINARY_DIR}/bin/Shaders
-        DESTINATION ./bin
-        FILES_MATCHING PATTERN "comp.spv")
+if(CMAKE_BUILD_TYPE STREQUAL "Debug")
+  install(DIRECTORY ${CMAKE_RUNTIME_OUTPUT_DIRECTORY_DEBUG}/Shaders
+          DESTINATION ./bin
+          FILES_MATCHING PATTERN "comp.spv")
+else()
+  install(DIRECTORY ${CMAKE_RUNTIME_OUTPUT_DIRECTORY_RELEASE}/Shaders
+          DESTINATION ./bin
+          FILES_MATCHING PATTERN "comp.spv")
+endif()
+
 install(DIRECTORY ${CMAKE_SOURCE_DIR}/Data
         DESTINATION ./bin)
 set(CPACK_PACKAGE_DESCRIPTION_SUMMARY "rayx - A RAYX Beamline Simulation Tool")

@@ -37,9 +37,16 @@ if(Vulkan_FOUND)
 
     # ---- CPack ----
     install(TARGETS ${PROJECT_NAME} RUNTIME DESTINATION bin)
-    install(DIRECTORY ${CMAKE_BINARY_DIR}/bin/Shaders
-            DESTINATION ./bin
-            FILES_MATCHING PATTERN "*_*.spv")
+
+    if(CMAKE_BUILD_TYPE STREQUAL "Debug")
+        install(DIRECTORY ${CMAKE_RUNTIME_OUTPUT_DIRECTORY_DEBUG}/Shaders
+                DESTINATION ./bin
+                FILES_MATCHING PATTERN "*_*.spv")
+    else()
+        install(DIRECTORY ${CMAKE_RUNTIME_OUTPUT_DIRECTORY_RELEASE}/Shaders
+                DESTINATION ./bin
+                FILES_MATCHING PATTERN "*_*.spv")
+    endif()
     include(InstallRequiredSystemLibraries)
     set(CPACK_RESOURCE_FILE_LICENSE "${CMAKE_SOURCE_DIR}/LICENSE")
     set(CPACK_PACKAGE_VERSION ${PROJECT_VERSION})
