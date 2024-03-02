@@ -120,8 +120,14 @@ target_include_directories(${PROJECT_NAME} SYSTEM PUBLIC
 # ---- Compile Shaders ----
 if(Vulkan_FOUND)
     add_dependencies(${PROJECT_NAME} RAYX_CORE_COMPILE_SHADER)
-    set(RAYX_CORE_SHADER ${CMAKE_BINARY_DIR}/bin/Shaders/comp.spv)
-    file(MAKE_DIRECTORY ${CMAKE_BINARY_DIR}/bin/Shaders)
+    if(CMAKE_BUILD_TYPE STREQUAL "Debug")
+        set(OUTPUT_DIR ${CMAKE_RUNTIME_OUTPUT_DIRECTORY_DEBUG}/Shaders)
+    else()
+        set(OUTPUT_DIR ${CMAKE_RUNTIME_OUTPUT_DIRECTORY_RELEASE}/Shaders)
+    endif()
+    set(RAYX_CORE_SHADER ${OUTPUT_DIR}/comp.spv)
+
+    file(MAKE_DIRECTORY ${OUTPUT_DIR})
     add_custom_command(
         OUTPUT
         ${RAYX_CORE_SHADER}

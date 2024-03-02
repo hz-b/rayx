@@ -71,7 +71,11 @@ if(Vulkan_FOUND)
     # ---- Compile Shaders ----
     # Function to compile shaders
     function(compile_shaders target shaders_dir)
-        set(OUTPUT_DIR "${CMAKE_BINARY_DIR}/bin/shaders")
+        if(CMAKE_BUILD_TYPE STREQUAL "Debug")
+            set(OUTPUT_DIR ${CMAKE_RUNTIME_OUTPUT_DIRECTORY_DEBUG}/Shaders)
+        else()
+            set(OUTPUT_DIR ${CMAKE_RUNTIME_OUTPUT_DIRECTORY_RELEASE}/Shaders)
+        endif()
         file(MAKE_DIRECTORY ${OUTPUT_DIR})
         # Get a list of all shader files in the specified directory
         file(GLOB SHADER_FILES "${shaders_dir}/*.frag" "${shaders_dir}/*.vert")
@@ -85,7 +89,7 @@ if(Vulkan_FOUND)
             string(SUBSTRING ${SHADER_EXT} 1 -1 SHADER_STAGE) # Remove the leading '.' from the extension
 
             # Set output file name
-            set(OUTPUT_FILE "${CMAKE_BINARY_DIR}/bin/Shaders/${SHADER_NAME}_${SHADER_STAGE}.spv")
+            set(OUTPUT_FILE ${OUTPUT_DIR}/${SHADER_NAME}_${SHADER_STAGE}.spv)
 
             # Create a custom command for each shader file
             add_custom_command(
