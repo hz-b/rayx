@@ -67,10 +67,12 @@ void addBeamlineObjectFromXML(rapidxml::xml_node<>* node, Beamline* beamline, co
     RAYX::xml::Parser parser(node, group_context, filename);
     const char* type = parser.type();
     DesignSource ds;
+    ds.v = Map();
     // Light sources have constructors that accept a const DesignObject& as argument.
     // They use the param* functions declared in <Data/xml.h> to retrieve the relevant information.
     if (strcmp(type, "Point Source") == 0) {
         setPointSource(parser, &ds);
+        RAYX_LOG << "in importer ";
     } else if (strcmp(type, "Matrix Source") == 0) {
         //addLightSource(std::make_shared<MatrixSource>(parser), node);
     } else if (strcmp(type, "Dipole") == 0) {
