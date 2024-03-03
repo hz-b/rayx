@@ -4,6 +4,8 @@
 
 namespace RAYX {
 Element DesignElement::compile() const {
+    RAYX_LOG << "compile element ";
+
     Element e;
     if (getName() == "ImagePlane") {
         e = makeImagePlane(*this);

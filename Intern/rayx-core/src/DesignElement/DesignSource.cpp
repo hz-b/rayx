@@ -8,10 +8,16 @@ namespace RAYX {
 
 std::vector<Ray> DesignSource::compile(int i) const {
     std::vector<Ray> ray;
+        RAYX_LOG << "compile source ";
+
     if (getName() == "Point Source") {
-        //ray = LightSource::getRays(1);
+        RAYX_LOG << "compile point source ";
+        PointSource ps(*this);
+        ray = ps.getRays(i);
         std::cout << getName() << std::endl;
     }
+
+    return ray;
 }
 
 
@@ -73,6 +79,7 @@ glm::dmat4x4 DesignSource::getWorldOrientation() const {
 }
 
 void DesignSource::setMisalignment(Misalignment m) {
+
     v["rotationXerror"] = m.m_rotationXerror.rad;
     v["rotationYerror"] = m.m_rotationYerror.rad;
     v["rotationZerror"] = m.m_rotationZerror.rad;
@@ -84,6 +91,8 @@ void DesignSource::setMisalignment(Misalignment m) {
 
 Misalignment DesignSource::getMisalignment() const {
     Misalignment m;
+    RAYX_LOG << "in get misal ";
+
     m.m_rotationXerror.rad = v["rotationXerror"].as_double();
     m.m_rotationYerror.rad = v["rotationYerror"].as_double();
     m.m_rotationZerror.rad = v["rotationZerror"].as_double();
@@ -144,11 +153,47 @@ void DesignSource::setEnergySpread(double value) { v["energySpread"] = value; }
 void DesignSource::setEnergyDistributionType(EnergyDistributionType value) { v["energyDistributionType"] = value; }
 void DesignSource::setEnergyDistributionFile(std::string value) { v["photonEnergyDistributionFile"] = value; }
 void DesignSource::setEnergySpreadType(SpreadType value) { v["energyDistribution"] = value; }
+void DesignSource::setSeperateEnergies(int value){ v["SeperateEnergies"] = value; }
 
 EnergyDistribution DesignSource::getEnergyDistribution() const { 
     EnergyDistribution en;
     SpreadType spreadType = v["energySpread"].as_energySpreadType();
+    EnergyDistributionType energyDistributionType = v["energyDistributionType"].as_energyDistType();
+    
+    
+    
+    if (energyDistributionType == EnergyDistributionType::File) {
+        std::string filename = v["photonEnergyDistributionFile"].as_string();
+    
+    } else if (energyDistributionType == EnergyDistributionType::Values) {
+        double photonEnergy = v["energy"].as_double();
+        double energySpread = v["energySpread"].as_double();
 
+        if (spreadType == SpreadType::SoftEdge) {
+            if (energySpread == 0) {
+                energySpread = 1;
+            }
+            en = EnergyDistribution(SoftEdge(photonEnergy, energySpread));
+
+        } else if (spreadType == SpreadType::SeperateEnergies) {
+            int numOfEnergies;
+            if(!v["SeperateEnergies"].as_int()){
+                numOfEnergies = 3;
+            } else
+            {
+                numOfEnergies = v["SeperateEnergies"].as_int();
+            }
+            numOfEnergies = abs(numOfEnergies);
+            en = EnergyDistribution(SeperateEnergies(photonEnergy, energySpread, numOfEnergies));
+        } else {
+            en = EnergyDistribution(HardEdge(photonEnergy, energySpread));
+        }
+
+    } else {
+        RAYX_ERR << "paramEnergyDistribution is not implemented for "
+                    "energyDistributionType"
+                 << static_cast<int>(energyDistributionType) << "!";
+    }
     return en;
 }
 

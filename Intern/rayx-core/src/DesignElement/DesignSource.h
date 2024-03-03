@@ -51,6 +51,7 @@ struct DesignSource {
     void setEnergyDistributionFile(std::string value);
     void setEnergySpreadUnit(EnergySpreadUnit value);
     void setEnergy(double value);
+    void setSeperateEnergies(int value);
 
     double getEnergy() const;
     EnergyDistribution getEnergyDistribution() const;

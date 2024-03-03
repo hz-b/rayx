@@ -25,6 +25,8 @@ void setAllMandatory(xml::Parser parser, DesignElement* de, DesignPlane dp) {
 
     if(de->getName() != "ImagePlane"){ 
         de->setCutout(parser.parseCutout(dp));
+    } else {
+        de->setCutout(serializeUnlimited());
     }
 }
 
