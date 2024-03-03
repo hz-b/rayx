@@ -2,7 +2,7 @@
 
 TEST_F(TestSuite, allBeamlineObjects) {
     auto b = loadBeamline("allBeamlineObjects");
-    CHECK_EQ(b.m_LightSources.size(), 1);
+    CHECK_EQ(b.m_DesignSources.size(), 1);
     CHECK_EQ(b.m_DesignElements.size(),
              8);  // plane mirror, toroid, slit, sphere grating, plane grating,
                   // sphere mirror, rzp, image plane
@@ -10,38 +10,38 @@ TEST_F(TestSuite, allBeamlineObjects) {
 
 TEST_F(TestSuite, loadDatFile) {
     auto b = loadBeamline("loadDatFile");
-    CHECK_EQ(b.m_LightSources.size(), 1);
+    CHECK_EQ(b.m_DesignSources.size(), 1);
     CHECK_EQ(b.m_DesignElements.size(), 1);
 
     // This only works due to fixed seeding!
     // The loaded DAT file only has the 3 energies 12, 15, 17 with equal probability.
-    CHECK_EQ(b.m_LightSources[0]->m_EnergyDistribution.selectEnergy(), 15, 0.1);
-    CHECK_EQ(b.m_LightSources[0]->m_EnergyDistribution.selectEnergy(), 17, 0.1);
-    CHECK_EQ(b.m_LightSources[0]->m_EnergyDistribution.selectEnergy(), 17, 0.1);
-    CHECK_EQ(b.m_LightSources[0]->m_EnergyDistribution.selectEnergy(), 12, 0.1);
+    CHECK_EQ(b.m_DesignSources[0]->m_EnergyDistribution.selectEnergy(), 15, 0.1);
+    CHECK_EQ(b.m_DesignSources[0]->m_EnergyDistribution.selectEnergy(), 17, 0.1);
+    CHECK_EQ(b.m_DesignSources[0]->m_EnergyDistribution.selectEnergy(), 17, 0.1);
+    CHECK_EQ(b.m_DesignSources[0]->m_EnergyDistribution.selectEnergy(), 12, 0.1);
 }
 
 TEST_F(TestSuite, loadDatFile2) {
     auto b = loadBeamline("loadDatFile2");
-    CHECK_EQ(b.m_LightSources.size(), 1);
+    CHECK_EQ(b.m_DesignSources.size(), 1);
     CHECK_EQ(b.m_DesignElements.size(), 1);
 
     // This only works due to fixed seeding!
     // The loaded DAT file only has the 3 energies 12, 15, 17 with - but it uses soft band.
-    CHECK_EQ(b.m_LightSources[0]->m_EnergyDistribution.selectEnergy(), 14.7, 0.1);
-    CHECK_EQ(b.m_LightSources[0]->m_EnergyDistribution.selectEnergy(), 17.1, 0.1);
-    CHECK_EQ(b.m_LightSources[0]->m_EnergyDistribution.selectEnergy(), 16.7, 0.1);
+    CHECK_EQ(b.m_DesignSources[0]->m_EnergyDistribution.selectEnergy(), 14.7, 0.1);
+    CHECK_EQ(b.m_DesignSources[0]->m_EnergyDistribution.selectEnergy(), 17.1, 0.1);
+    CHECK_EQ(b.m_DesignSources[0]->m_EnergyDistribution.selectEnergy(), 16.7, 0.1);
 }
 
 TEST_F(TestSuite, loadGroups) {
     auto b = loadBeamline("loadGroups");
-    CHECK_EQ(b.m_LightSources.size(), 1);
+    CHECK_EQ(b.m_DesignSources.size(), 1);
     CHECK_EQ(b.m_DesignElements.size(), 4);
 }
 
 TEST_F(TestSuite, groupTransform) {
     auto b = loadBeamline("groupTransform");
-    CHECK_EQ(b.m_LightSources.size(), 1);
+    CHECK_EQ(b.m_DesignSources.size(), 1);
     CHECK_EQ(b.m_DesignElements.size(), 1);
     auto m = b.m_DesignElements[0].compile().m_inTrans;
     glm::dmat4x4 correct = {
@@ -80,7 +80,7 @@ TEST_F(TestSuite, testEnergyDistribution) {
 
     for (auto values : testinput) {
         auto beamline = loadBeamline(values.rmlFile);
-        auto energy = beamline.m_LightSources[0]->m_EnergyDistribution.selectEnergy();
+        auto energy = beamline.m_DesignSources[0]->m_EnergyDistribution.selectEnergy();
 
         CHECK_EQ(energy, values.energy, 0.1);
     }
@@ -206,10 +206,10 @@ TEST_F(TestSuite, testExpertsOptic) {
 TEST_F(TestSuite, testTwoSourcesInOneRML) {
     auto beamline = loadBeamline("twoSourcesTest");
 
-    std::shared_ptr<LightSource> dsrc = beamline.m_LightSources[0];
-    DipoleSource* dipolesource = dynamic_cast<DipoleSource*>(&*dsrc);
+    std::shared_ptr<DesignSource> dsrc = beamline.m_DesignSources[0];
+    //RAYX::DipoleSource* dipolesource = dynamic_cast<DipoleSource*>(&*dsrc);
 
-    std::shared_ptr<LightSource> psrc = beamline.m_LightSources[1];
+    std::shared_ptr<DesignSource> psrc = beamline.m_DesignSources[1];
     PointSource* pointsource = dynamic_cast<PointSource*>(&*psrc);
 
     CHECK_EQ(100, dipolesource->getEnergy());

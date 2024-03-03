@@ -212,7 +212,9 @@ class Value {
 
     Value& operator[](std::string s) {
         Map* m = std::get_if<Map>(&m_variant);
-        if (!m) throw std::runtime_error("Indexing into non-map!");
+        if (!m) {
+            throw std::runtime_error("Indexing into non-map!");
+        }
         return (*m)[s];
     }
 

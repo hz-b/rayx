@@ -12,20 +12,24 @@
 namespace RAYX {
 
 void setAllMandatory(xml::Parser parser, DesignSource* de) {
-    de->setEnergy(parser.parseElectronEnergy());
-    de->setEnergyDistributionFile(parser.parseEnergyDistributionFile());
-    de->setEnergyDistributionType(parser.parseEnergyDistributionType());
-    de->setEnergySpread(parser.parseEnergySpread());
-    de->setEnergySpreadType(parser.parseEnergySpreadType());
 
+    
     de->setMisalignment(parser.parseMisalignment());
     de->setNumberOfRays(parser.parseNumberRays());
     de->setWorldOrientation(parser.parseOrientation());
     de->setWorldPosition(parser.parsePosition());
+
+
+    de->setSeperateEnergies(1);
+    
 }
 
 void setDefaultEnergy(xml::Parser parser, DesignSource* de){
-    de->setEnergy(parser.parseElectronEnergy());
+    de->setEnergy(parser.parsePhotonEnergy());
+    de->setEnergyDistributionFile(parser.parseEnergyDistributionFile());
+    de->setEnergyDistributionType(parser.parseEnergyDistributionType());
+    de->setEnergySpread(parser.parseEnergySpread());
+    de->setEnergySpreadType(parser.parseEnergySpreadType());
 
 }
 
@@ -54,10 +58,17 @@ void setStokes(xml::Parser parser, DesignSource* de){
 
 
 void setPointSource(xml::Parser parser, DesignSource* de) {
+    RAYX_LOG << "in set pointsource ";
+
     setAllMandatory(parser, de);
+    RAYX_LOG << "in set pointsource 1";
     setDefaultEnergy(parser, de);
+    RAYX_LOG << "in set pointsource 2";
     setDefaultPosition(parser, de);
+    RAYX_LOG << "in set pointsource 3";
     setDefaultOrientation(parser, de);
+    RAYX_LOG << "in set pointsource 4";
+
 }
 
 

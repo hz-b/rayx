@@ -1,8 +1,11 @@
 #pragma once
 /// Header to include to get all objects defined in RayCore. Don't overuse it or
 /// build times will be unnecessariy long.
-class LightSource;
-struct DesignSource;
+namespace RAYX{
+    class LightSource;
+    struct DesignSource;
+}
+
 // Light Sources
 //#include "Beamline/Objects/CircleSource.h"
 //#include "Beamline/Objects/DipoleSource.h"
