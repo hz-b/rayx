@@ -24,7 +24,7 @@ void setAllMandatory(xml::Parser parser, DesignElement* de, DesignPlane dp) {
     de->setMaterial(parser.parseMaterial());
     de->setCurvatureType(CurvatureType::Plane);
 
-    if(de->getName() != "ImagePlane"){ 
+    if(de->getType() != "ImagePlane"){ 
         de->setCutout(parser.parseCutout(dp));
     } else {
         de->setCutout(serializeUnlimited());

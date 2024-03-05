@@ -2,7 +2,7 @@
 
 #include "Debug/Debug.h"
 #include "Beamline/Objects/Objects.h"
-
+#include <filesystem>
 namespace RAYX {
 
 
@@ -23,14 +23,9 @@ std::vector<Ray> DesignSource::compile(int i) const {
 }
 
 
-void DesignSource::setName(std::string s) { 
-    v["name"] = s; 
-    std::cout << v["name"].as_string() << std::endl;
-}
-void DesignSource::setType(std::string s) { 
-    v["type"] = s; 
-    std::cout << v["type"].as_string() << std::endl;
-}
+void DesignSource::setName(std::string s) { v["name"] = s; }
+void DesignSource::setType(std::string s) { v["type"] = s; }
+
 std::string DesignSource::getName() const { return v["name"].as_string(); }
 
 
@@ -172,7 +167,16 @@ EnergyDistribution DesignSource::getEnergyDistribution() const {
     
     
     if (energyDistributionType == EnergyDistributionType::File) {
-        std::string filename = v["photonEnergyDistributionFile"].as_string();
+        std::string filename = ("../../../Intern/rayx-core/tests/input/") + v["photonEnergyDistributionFile"].as_string();
+        //std::filesystem::path path = std::filesystem::canonical(rmlFile);
+        //path.replace_filename(filename);  // this makes the path `filename` be relative to the
+                                          // path of the rml file
+
+        DatFile df;
+        DatFile::load(filename, &df);
+
+        df.m_continuous = (spreadType == SpreadType::SoftEdge ? true : false);
+        en = EnergyDistribution(df);
     
     } else if (energyDistributionType == EnergyDistributionType::Values) {
         double photonEnergy = v["energy"].as_double();

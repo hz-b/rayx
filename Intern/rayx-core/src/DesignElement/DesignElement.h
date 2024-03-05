@@ -15,6 +15,7 @@ struct DesignElement {
     void setType(std::string s);
 
     std::string getName() const;
+    std::string getType() const;
 
     void setWorldPosition(glm::dvec4 p);
     glm::dvec4 getWorldPosition() const;
