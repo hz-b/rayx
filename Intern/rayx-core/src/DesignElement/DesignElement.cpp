@@ -4,7 +4,6 @@
 
 namespace RAYX {
 Element DesignElement::compile() const {
-    RAYX_LOG << "compile element ";
 
     Element e;
     if (getName() == "ImagePlane") {
@@ -27,7 +26,7 @@ Element DesignElement::compile() const {
         std::cout << v["name"].as_string() << std::endl;
     }else if (getName() == "Plane Grating") {
         e = makePlaneGrating(*this);
-        std::cout << v["name"].as_string() << std::endl;
+        std::cout << v["type"].as_string() << std::endl;
     }else if (getName() == "Plane Mirror") {
         e = makePlaneMirror(*this);
         std::cout << v["name"].as_string() << std::endl;
@@ -56,6 +55,10 @@ Element DesignElement::compile() const {
 void DesignElement::setName(std::string s) { 
     v["name"] = s; 
     std::cout << v["name"].as_string() << std::endl;
+}
+void DesignElement::setType(std::string s) { 
+    v["type"] = s; 
+    std::cout << v["type"].as_string() << std::endl;
 }
 std::string DesignElement::getName() const { return v["name"].as_string(); }
 

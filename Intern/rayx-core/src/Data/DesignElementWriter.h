@@ -13,6 +13,7 @@ namespace RAYX {
 
 void setAllMandatory(xml::Parser parser, DesignElement* de, DesignPlane dp) {
     de->setName(parser.name());
+    de->setType(parser.type());
 
     de->setWorldPosition(parser.parsePosition());
     de->setWorldOrientation(parser.parseOrientation());
