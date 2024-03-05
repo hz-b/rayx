@@ -14,7 +14,11 @@ namespace RAYX {
 
 enum class GratingMount { Deviation, Incidence };
 enum class ParaboloidType { Focussing, Collimate };
-struct DesignElement; 
+enum class CurvatureType { Plane, Toroidal, Spherical, Cubic, Cone, Cylinder, Ellipsoid, Paraboloid, Quadric, RzpSphere}; // order is crucial for xml prser
+enum class BehaviourType { Mirror, Grating, Slit, Rzp, ImagePlane};
+enum class FigureRotation { Yes, Plane, A11 };
+
+struct DesignElement; //TODO Fanny see where the forward declaration has to go
 
 // This is the current "high-level" representation of an OpticalElement.
 // As you can see, it is precisely the same as the shader-internal representation `Element` in addition with a name.
@@ -33,34 +37,18 @@ struct RAYX_API OpticalElement {
 RAYX_API glm::dmat4 calcTransformationMatrices(glm::dvec4 position, glm::dmat4 orientation, bool calcInMatrix, DesignPlane plane);
 
 // convenience wrapper around calcTransformationMatrices.
-glm::dmat4 defaultInMatrix(const DesignObject& dobj, DesignPlane plane);
-glm::dmat4 defaultOutMatrix(const DesignObject& dobj, DesignPlane plane);
+glm::dmat4 defaultInMatrix(const DesignObject&  dele, DesignPlane plane);
+glm::dmat4 defaultOutMatrix(const DesignObject&  dele, DesignPlane plane);
 
-// convenience wrapper around dobj.parseMaterial().
-double defaultMaterial(const DesignObject& dobj);
+// convenience wrapper around  dele.parseMaterial().
+double defaultMaterial(const DesignObject&  dele);
 
-// constructs an Element given all of its components. Some information that is not explicitly given, will be parsed from the `dobj`.
+// constructs an Element given all of its components. Some information that is not explicitly given, will be parsed from the ` dele`.
 Element makeElement(const DesignElement& dele, Behaviour behaviour, Surface surface, std::optional<Cutout> cutout = {}, DesignPlane plane=DesignPlane::XZ);
 
-Element makeExperts(const DesignElement& dobj);
-Element makeExpertsCubic(const DesignElement& dobj);
+Element makeExperts(const DesignElement&  dele);
+Element makeExpertsCubic(const DesignElement&  dele);
 
-// creates a toroid from the parameters given in `dobj`.
-Surface makeToroid(const DesignElement& dele);
 
-// creates a quadric from the parameters given in `dobj`.
-Surface makeQuadric(const DesignElement& dobj);
-
-// creates a cubic from the parameters given in `dobj`.
-Surface makeCubic(const DesignElement& dobj);
-
-// creates a sphere quadric from the parameters given in `dobj`.
-Surface makeSphere(double radius);
-
-// creates a plane surface.
-Surface makePlane();
-
-// creates a Grating Behaviour from the parameters given in `dobj`.
-Behaviour makeGrating(const DesignElement& dele);
 
 }  // namespace RAYX

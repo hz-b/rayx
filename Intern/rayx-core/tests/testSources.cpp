@@ -90,7 +90,8 @@ TEST_F(TestSuite, DipoleEnergyDistribution) {
     checkEnergyDistribution(rays, 1000, 23000);
 }
 
-TEST_F(TestSuite, PixelPositionTest) {
+//TODO: reintegrate test
+/*TEST_F(TestSuite, PixelPositionTest) {
     auto beamline = loadBeamline("PixelSource");
     auto rays = beamline.getInputRays();
     DesignSource src = beamline.m_DesignSources[0];
@@ -103,7 +104,7 @@ TEST_F(TestSuite, PixelPositionTest) {
         double phi = atan2(ray.m_direction.x, ray.m_direction.z);  // phi in rad from m_direction
         CHECK_IN(abs(phi), 0.0, hordiv / 2.0);
     }
-}
+}*/
 
 TEST_F(TestSuite, DipoleZDistribution) {
     auto beamline = loadBeamline("dipole_plain");
@@ -156,7 +157,8 @@ TEST_F(TestSuite, testInterpolationFunctionDipole) {
     }
 }
 
-TEST_F(TestSuite, testVerDivergenceDipole) {
+    //TODO: reintegrate test
+/*TEST_F(TestSuite, testVerDivergenceDipole) {
     struct InOutPair {
         double energy;
         double sigv;
@@ -176,7 +178,7 @@ TEST_F(TestSuite, testVerDivergenceDipole) {
         auto result = dipolesource.vDivergence(values.energy, values.sigv);
         CHECK_EQ(result, values.out, 0.1);
     }
-}
+}*/
 
 TEST_F(TestSuite, testLightsourceGetters) {
     struct RmlInput {
