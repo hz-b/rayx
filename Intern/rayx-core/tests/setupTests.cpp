@@ -226,6 +226,7 @@ void compareLastAgainstRayUI(std::string filename, double tolerance, Sequential 
         ++itRayX;
         ++itRayUI;
     }
+    RAYX_LOG << "compareLastAgainstRayUI finished ";
 }
 
 void compareAgainstCorrect(std::string filename, double tolerance) {

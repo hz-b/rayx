@@ -14,11 +14,49 @@
 #include "DesignElementWriter.h"
 #include "DesignSourceWriter.h"
 
+void whatBehaviour(xml::Parser parser,  DesignElement* de) {
+    std::string type = parser.type();
+    if (type.find("Grating") != std::string::npos) {
+        std::cout << "found grating!" << '\n';
+        getGrating(parser, de);
+    } else if (type.find("Mirror") != std::string::npos) {
+        std::cout << "found mirror!" << '\n';
+    }
+}
+
+void whatSurface(xml::Parser parser,  DesignElement* de) {
+    std::string type = parser.type();
+    if (type.find("ImagePlane") != std::string::npos) {
+        std::cout << "found Imageplane!" << '\n';
+        de->setCurvatureType(CurvatureType::Plane);
+    } else if (type.find("Cone") != std::string::npos) {
+        std::cout << "found Cone!" << '\n';
+        de->setCurvatureType(CurvatureType::Cone);
+    }  else if (type.find("Cyliner") != std::string::npos) {
+        std::cout << "found Cylinder!" << '\n';
+        de->setCurvatureType(CurvatureType::Cylinder);
+    } else if (type.find("Ellipsoid") != std::string::npos) {
+        std::cout << "found Ellipsoid!" << '\n';
+        de->setCurvatureType(CurvatureType::Ellipsoid);
+    } else if (type.find("Cubic") != std::string::npos) {
+        std::cout << "found Cubic!" << '\n';
+        de->setCurvatureType(CurvatureType::Cubic);
+    } else if (type.find("Toroid") != std::string::npos) {
+        std::cout << "found Tororid!" << '\n';
+        de->setCurvatureType(CurvatureType::Toroidal);
+    } else {
+        std::cout << "found none!" << '\n';
+    }
+}
+
 void parseElement(xml::Parser parser, DesignElement* de) {
     const char* type = parser.type();
-    // TODO add functions for each Element
+    
+    whatBehaviour(parser, de);
+    //whatCutout(parser, &de);
+    whatSurface(parser, de);
 
-    if (strcmp(type, "ImagePlane") == 0) {
+    if (strcmp(type, "ImagePlane") == 0) {      
         getImageplane(parser, de);
     } else if (strcmp(type, "Cone") == 0) {
         getCone(parser, de);
@@ -95,7 +133,6 @@ void addBeamlineObjectFromXML(rapidxml::xml_node<>* node, Beamline* beamline, co
     } else if (strcmp(type, "Simple Undulator") == 0) {
         setSimpleUndulatorSource(parser, &ds);
         beamline->m_DesignSources.push_back(ds);
-        // addLightSource(std::make_shared<SimpleUndulatorSource>(parser), node);
     } else {
         parseElement(parser, &de);
         beamline->m_DesignElements.push_back(de);

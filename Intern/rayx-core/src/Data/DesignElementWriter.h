@@ -22,7 +22,7 @@ void setAllMandatory(xml::Parser parser, DesignElement* de, DesignPlane dp) {
     de->setSlopeError(parser.parseSlopeError());
     de->setAzimuthalAngle(parser.parseAzimuthalAngle());
     de->setMaterial(parser.parseMaterial());
-    de->setCurvatureType(CurvatureType::Plane);
+    //de->setCurvatureType(CurvatureType::Plane); TODo reenable
 
     if (de->getType() != "ImagePlane") {
         de->setCutout(parser.parseCutout(dp));
@@ -31,7 +31,9 @@ void setAllMandatory(xml::Parser parser, DesignElement* de, DesignPlane dp) {
     }
 }
 
-void getImageplane(xml::Parser parser, DesignElement* de) { setAllMandatory(parser, de, DesignPlane::XY); }
+void getImageplane(xml::Parser parser, DesignElement* de) { 
+    setAllMandatory(parser, de, DesignPlane::XY); 
+    }
 
 void getSlit(xml::Parser parser, DesignElement* de) {
     setAllMandatory(parser, de, DesignPlane::XY);

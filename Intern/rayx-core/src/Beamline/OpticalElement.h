@@ -14,7 +14,11 @@ namespace RAYX {
 
 enum class GratingMount { Deviation, Incidence };
 enum class ParaboloidType { Focussing, Collimate };
-struct DesignElement; 
+//enum class CurvatureType { Plane, Toroidal, Spherical, Cubic, Cone, Cylinder, Ellipsoid, Paraboloid};
+enum class BehaviourType { Mirror, Grating, Slit, Rzp, ImapePlane};
+enum class FigureRotation { Yes, Plane, A11 };
+
+struct DesignElement; //TODO Fanny see where the forward declaration has to go
 
 // This is the current "high-level" representation of an OpticalElement.
 // As you can see, it is precisely the same as the shader-internal representation `Element` in addition with a name.
@@ -45,20 +49,6 @@ Element makeElement(const DesignElement& dele, Behaviour behaviour, Surface surf
 Element makeExperts(const DesignElement& dobj);
 Element makeExpertsCubic(const DesignElement& dobj);
 
-// creates a toroid from the parameters given in `dobj`.
-Surface makeToroid(const DesignElement& dele);
-
-// creates a quadric from the parameters given in `dobj`.
-Surface makeQuadric(const DesignElement& dobj);
-
-// creates a cubic from the parameters given in `dobj`.
-Surface makeCubic(const DesignElement& dobj);
-
-// creates a sphere quadric from the parameters given in `dobj`.
-Surface makeSphere(double radius);
-
-// creates a plane surface.
-Surface makePlane();
 
 // creates a Grating Behaviour from the parameters given in `dobj`.
 Behaviour makeGrating(const DesignElement& dele);

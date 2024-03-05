@@ -256,7 +256,7 @@ class Value {
         if (!m->contains(s)){
             (*m)[s] = std::make_shared<Value>();
         }
-        return *((*m)[s].get());
+        return *((*m)[s].get()); 
     }
 
   private:

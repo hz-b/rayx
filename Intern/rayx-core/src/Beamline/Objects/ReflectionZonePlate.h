@@ -7,11 +7,7 @@
 namespace RAYX {
 struct DesignElement;  
 
-enum class CurvatureType {
-    Plane,
-    Toroidal,
-    Spherical
-};  // influences surface paramters for eg quadric function or (if torus)
+  // influences surface paramters for eg quadric function or (if torus)
     // newton iteration
 enum class RZPType { Elliptical, Meriodional };
 

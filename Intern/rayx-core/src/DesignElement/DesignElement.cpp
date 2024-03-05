@@ -1,40 +1,42 @@
 #include "DesignElement.h"
 
 #include "Debug/Debug.h"
+#include "Beamline/Objects/SurfaceType.h"
 
 namespace RAYX {
 Element DesignElement::compile() const {
-
     Element e;
-    if (getType() == "ImagePlane") {
-        e = makeImagePlane(*this);
+    Surface surface = makeSurface(*this);
+    Behaviour behav = 
+    /*if (getType() == "ImagePlane") { 
+        e =makeImagePlane(*this);
     } else if (getType() == "Slit") {
-        e = makeSlit(*this);
+        ////e =makeSlit(*this);
     }else if (getType() == "Cone") {
-        e = makeCone(*this);
+        ////e =makeCone(*this);
     }else if (getType() == "Cylinder") {
-        e = makeCylinder(*this);
+        ////e =makeCylinder(*this);
     }else if (getType() == "Ellipsoid") {
-        e = makeEllipsoid(*this);
+        //e =makeEllipsoid(*this);
     }else if (getType() == "Paraboloid") {
-        e = makeParaboloid(*this);
+        //e =makeParaboloid(*this);
     }else if (getType() == "Plane Grating") {
-        e = makePlaneGrating(*this);
+        //e =makePlaneGrating(*this);
     }else if (getType() == "Plane Mirror") {
-        e = makePlaneMirror(*this);
+        //e =makePlaneMirror(*this);
     }else if (getType() == "Spherical Grating") {
-        e = makeSphereGrating(*this);
+        //e =makeSphereGrating(*this);
     }else if (getType() == "Spherical Mirror" || getType() == "Sphere") {
-        e = makeSphereMirror(*this);
+        //e =makeSphereMirror(*this);
     }else if (getType() == "Toroid") {
-        e = makeToroidMirror(*this);
+        //e =makeToroidMirror(*this);
     }else if (getType() == "Reflection Zoneplate") {
-        e = makeReflectionZonePlate(*this);
+        //e =makeReflectionZonePlate(*this);
     }else if (getType() == "Experts Optics") {
-        e = makeExperts(*this);
+        //e =makeExperts(*this);
     }else if (getType() == "Experts Cubic") {
-        e = makeExpertsCubic(*this);
-    }
+        //e =makeExpertsCubic(*this);
+    }*/
     return e;
 }
 
@@ -46,9 +48,6 @@ void DesignElement::setType(std::string s) {
 }
 std::string DesignElement::getName() const { return v["name"].as_string(); }
 std::string DesignElement::getType() const { return v["type"].as_string(); }
-
-
-
 
 void DesignElement::setWorldPosition(glm::dvec4 p) {
     v["worldPosition"] = Map();
@@ -302,6 +301,8 @@ Surface DesignElement::getExpertsCubic() const {
 
     return serializeCubic(cub);
 }
+
+
 
 // Azimuthal Angle
 void DesignElement::setAzimuthalAngle(Rad r) { v["AzimuthalAngle"] = r; }
