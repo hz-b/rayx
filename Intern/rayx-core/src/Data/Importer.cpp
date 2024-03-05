@@ -15,7 +15,6 @@
 
 void parseElement(xml::Parser parser, DesignElement* de) {
     const char* type = parser.type();
-    de->v = Map();
     // TODO add functions for each Element
 
     if (strcmp(type, "ImagePlane") == 0) {
@@ -33,6 +32,7 @@ void parseElement(xml::Parser parser, DesignElement* de) {
     } else if (strcmp(type, "Paraboloid") == 0) {
         getParaboloid(parser, de);
     } else if (strcmp(type, "Plane Grating") == 0) {
+        RAYX_LOG << "import Planegrating";
         getPlaneGrating(parser, de);
     } else if (strcmp(type, "Plane Mirror") == 0) {
         getPlaneMirror(parser, de);
@@ -68,30 +68,40 @@ void addBeamlineObjectFromXML(rapidxml::xml_node<>* node, Beamline* beamline, co
     const char* type = parser.type();
     DesignSource ds;
     ds.v = Map();
+
+    DesignElement de;
+    de.v = Map();
+
     // Light sources have constructors that accept a const DesignObject& as argument.
     // They use the param* functions declared in <Data/xml.h> to retrieve the relevant information.
     if (strcmp(type, "Point Source") == 0) {
         setPointSource(parser, &ds);
-        RAYX_LOG << "in importer ";
+        beamline->m_DesignSources.push_back(ds);
+        RAYX_LOG << "in importer PS";
     } else if (strcmp(type, "Matrix Source") == 0) {
-        //addLightSource(std::make_shared<MatrixSource>(parser), node);
+        setMatrixSource(parser, &ds);
+        beamline->m_DesignSources.push_back(ds);
+        RAYX_LOG << "in importer MS";
     } else if (strcmp(type, "Dipole") == 0) {
         //addLightSource(std::make_shared<DipoleSource>(parser), node);
+        RAYX_LOG << "import none";
     } else if (strcmp(type, "Dipole Source") == 0) {
+        RAYX_LOG << "import none";
         //addLightSource(std::make_shared<DipoleSource>(parser), node);
     } else if (strcmp(type, "Pixel Source") == 0) {
+        RAYX_LOG << "import none";
         //addLightSource(std::make_shared<PixelSource>(parser), node);
     } else if (strcmp(type, "Circle Source") == 0) {
+        RAYX_LOG << "import none";
         //addLightSource(std::make_shared<CircleSource>(parser), node);
     } else if (strcmp(type, "Simple Undulator") == 0) {
+        RAYX_LOG << "import none";
         //addLightSource(std::make_shared<SimpleUndulatorSource>(parser), node);
     } else {
-        DesignElement de;
         parseElement(parser, &de);
         RAYX_LOG << "import " << de.getName();
         beamline->m_DesignElements.push_back(de);
     }
-    beamline->m_DesignSources.push_back(ds);
 
 }
 

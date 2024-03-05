@@ -4,60 +4,62 @@
 
 namespace RAYX {
 Element DesignElement::compile() const {
-    RAYX_LOG << "compile element ";
 
     Element e;
-    if (getName() == "ImagePlane") {
+    if (getType() == "ImagePlane") {
         e = makeImagePlane(*this);
-        std::cout << getName() << std::endl;
-    } else if (getName() == "Slit") {
+        //std::cout << "compile element:" << getName() << std::endl;
+    } else if (getType() == "Slit") {
         e = makeSlit(*this);
-        std::cout << v["name"].as_string() << std::endl;
-    }else if (getName() == "Cone") {
+        //std::cout << "compile element:" << v["name"].as_string() << std::endl;
+    }else if (getType() == "Cone") {
         e = makeCone(*this);
-        std::cout << v["name"].as_string() << std::endl;
-    }else if (getName() == "Cylinder") {
+        //std::cout << "compile element:" << v["name"].as_string() << std::endl;
+    }else if (getType() == "Cylinder") {
         e = makeCylinder(*this);
-        std::cout << v["name"].as_string() << std::endl;
-    }else if (getName() == "Ellipsoid") {
+        //std::cout << "compile element:" << v["name"].as_string() << std::endl;
+    }else if (getType() == "Ellipsoid") {
         e = makeEllipsoid(*this);
-        std::cout << v["name"].as_string() << std::endl;
-    }else if (getName() == "Paraboloid") {
+        //std::cout << "compile element:" << v["name"].as_string() << std::endl;
+    }else if (getType() == "Paraboloid") {
         e = makeParaboloid(*this);
-        std::cout << v["name"].as_string() << std::endl;
-    }else if (getName() == "Plane Grating") {
+        //std::cout << "compile element:" << v["name"].as_string() << std::endl;
+    }else if (getType() == "Plane Grating") {
         e = makePlaneGrating(*this);
-        std::cout << v["name"].as_string() << std::endl;
-    }else if (getName() == "Plane Mirror") {
+        //std::cout << "compile element:" << v["name"].as_string() << std::endl;
+    }else if (getType() == "Plane Mirror") {
         e = makePlaneMirror(*this);
-        std::cout << v["name"].as_string() << std::endl;
-    }else if (getName() == "Spherical Grating") {
+        //std::cout << "compile element:" << v["name"].as_string() << std::endl;
+    }else if (getType() == "Spherical Grating") {
         e = makeSphereGrating(*this);
-        std::cout << v["name"].as_string() << std::endl;
-    }else if (getName() == "Spherical Mirror") {
+        //std::cout << "compile element:" << v["name"].as_string() << std::endl;
+    }else if (getType() == "Spherical Mirror" || getType() == "Sphere") {
         e = makeSphereMirror(*this);
-        std::cout << v["name"].as_string() << std::endl;
-    }else if (getName() == "Toroid") {
+        //std::cout << "compile element:" << v["name"].as_string() << std::endl;
+    }else if (getType() == "Toroid") {
         e = makeToroidMirror(*this);
-        std::cout << v["name"].as_string() << std::endl;
-    }else if (getName() == "Reflection Zoneplate") {
+        //std::cout << "compile element:" << v["name"].as_string() << std::endl;
+    }else if (getType() == "Reflection Zoneplate") {
         e = makeReflectionZonePlate(*this);
-        std::cout << v["name"].as_string() << std::endl;
-    }else if (getName() == "Experts Optics") {
+        //std::cout << "compile element:" << v["name"].as_string() << std::endl;
+    }else if (getType() == "Experts Optics") {
         e = makeExperts(*this);
-        std::cout << v["name"].as_string() << std::endl;
-    }else if (getName() == "Experts Cubic") {
+        //std::cout << "compile element:" << v["name"].as_string() << std::endl;
+    }else if (getType() == "Experts Cubic") {
         e = makeExpertsCubic(*this);
-        std::cout << v["name"].as_string() << std::endl;
+        //std::cout << "compile element:" << v["name"].as_string() << std::endl;
     }
     return e;
 }
 
 void DesignElement::setName(std::string s) { 
     v["name"] = s; 
-    std::cout << v["name"].as_string() << std::endl;
+}
+void DesignElement::setType(std::string s) { 
+    v["type"] = s; 
 }
 std::string DesignElement::getName() const { return v["name"].as_string(); }
+std::string DesignElement::getType() const { return v["type"].as_string(); }
 
 void DesignElement::setWorldPosition(glm::dvec4 p) {
     v["worldPosition"] = Map();

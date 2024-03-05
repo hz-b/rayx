@@ -2,17 +2,19 @@
 
 #include "Debug/Debug.h"
 #include "Beamline/Objects/Objects.h"
-
+#include <filesystem>
 namespace RAYX {
 
 
 std::vector<Ray> DesignSource::compile(int i) const {
     std::vector<Ray> ray;
-        RAYX_LOG << "compile source ";
 
     if (getName() == "Point Source") {
-        RAYX_LOG << "compile point source ";
         PointSource ps(*this);
+        ray = ps.getRays(i);
+        std::cout << getName() << std::endl;
+    } else if (getName() == "Matrix Source") {
+        MatrixSource ps(*this);
         ray = ps.getRays(i);
         std::cout << getName() << std::endl;
     }
@@ -21,10 +23,9 @@ std::vector<Ray> DesignSource::compile(int i) const {
 }
 
 
-void DesignSource::setName(std::string s) { 
-    v["name"] = s; 
-    std::cout << v["name"].as_string() << std::endl;
-}
+void DesignSource::setName(std::string s) { v["name"] = s; }
+void DesignSource::setType(std::string s) { v["type"] = s; }
+
 std::string DesignSource::getName() const { return v["name"].as_string(); }
 
 
@@ -91,7 +92,6 @@ void DesignSource::setMisalignment(Misalignment m) {
 
 Misalignment DesignSource::getMisalignment() const {
     Misalignment m;
-    RAYX_LOG << "in get misal ";
 
     m.m_rotationXerror.rad = v["rotationXerror"].as_double();
     m.m_rotationYerror.rad = v["rotationYerror"].as_double();
@@ -118,7 +118,12 @@ void DesignSource::setStokescirc(double value){
 }
 
 glm::dvec4 DesignSource::getStokes() const {
-    return glm::dvec4{1, v["stokes"]["linPol0"].as_double(), v["stokes"]["linPol45"].as_double(), v["stokes"]["circPol"].as_double()};
+    glm::dvec4 pol;
+    pol[0] = 1;
+    pol[1] = v["stokes"]["linPol0"].as_double();
+    pol[2] = v["stokes"]["linPol45"].as_double();
+    pol[3] = v["stokes"]["circPol"].as_double();
+    return pol;
 }
 
 
@@ -157,13 +162,21 @@ void DesignSource::setSeperateEnergies(int value){ v["SeperateEnergies"] = value
 
 EnergyDistribution DesignSource::getEnergyDistribution() const { 
     EnergyDistribution en;
-    SpreadType spreadType = v["energySpread"].as_energySpreadType();
+    SpreadType spreadType = v["energyDistribution"].as_energySpreadType();
     EnergyDistributionType energyDistributionType = v["energyDistributionType"].as_energyDistType();
     
     
-    
     if (energyDistributionType == EnergyDistributionType::File) {
-        std::string filename = v["photonEnergyDistributionFile"].as_string();
+        std::string filename = ("../../../Intern/rayx-core/tests/input/") + v["photonEnergyDistributionFile"].as_string();
+        //std::filesystem::path path = std::filesystem::canonical(rmlFile);
+        //path.replace_filename(filename);  // this makes the path `filename` be relative to the
+                                          // path of the rml file
+
+        DatFile df;
+        DatFile::load(filename, &df);
+
+        df.m_continuous = (spreadType == SpreadType::SoftEdge ? true : false);
+        en = EnergyDistribution(df);
     
     } else if (energyDistributionType == EnergyDistributionType::Values) {
         double photonEnergy = v["energy"].as_double();
