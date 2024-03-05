@@ -22,7 +22,8 @@ void Polygon::calculateForElliptical(double diameterA, double diameterB) {
     for (uint32_t i = 0; i < numVertices; i++) {
         double angle = 2.0f * PI * i / numVertices;
         glm::vec4 pos = {diameterA * cos(angle) / 2.0f, 0, diameterB * sin(angle) / 2.0f, 1.0f};
-        vertices.emplace_back(pos, OPT_ELEMENT_COLOR);
+        glm::vec2 uv = glm::vec2(OPT_ELEMENT_COLOR);
+        vertices.push_back({pos, uv});
     }
 
     // Calculate indices

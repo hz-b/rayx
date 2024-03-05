@@ -70,18 +70,18 @@ void traceTriangulation(const RAYX::OpticalElement& element, std::vector<Texture
     for (size_t i = 0; i < gridSize - 1; ++i) {
         for (size_t j = 0; j < gridSize - 1; ++j) {
             if (collisionGrid[i][j].found && collisionGrid[i + 1][j].found && collisionGrid[i][j + 1].found) {
-                vertices.emplace_back(glm::vec4(collisionGrid[i][j].hitpoint, 1.0f), OPT_ELEMENT_COLOR);
-                vertices.emplace_back(glm::vec4(collisionGrid[i + 1][j].hitpoint, 1.0f), OPT_ELEMENT_COLOR);
-                vertices.emplace_back(glm::vec4(collisionGrid[i][j + 1].hitpoint, 1.0f), OPT_ELEMENT_COLOR);
+                vertices.push_back({glm::vec4(collisionGrid[i][j].hitpoint, 1.0f), glm::vec2(OPT_ELEMENT_COLOR)});
+                vertices.push_back({glm::vec4(collisionGrid[i + 1][j].hitpoint, 1.0f), glm::vec2(OPT_ELEMENT_COLOR)});
+                vertices.push_back({glm::vec4(collisionGrid[i][j + 1].hitpoint, 1.0f), glm::vec2(OPT_ELEMENT_COLOR)});
 
                 indices.push_back(index++);
                 indices.push_back(index++);
                 indices.push_back(index++);
             }
             if (collisionGrid[i + 1][j + 1].found && collisionGrid[i + 1][j].found && collisionGrid[i][j + 1].found) {
-                vertices.emplace_back(glm::vec4(collisionGrid[i + 1][j + 1].hitpoint, 1.0f), OPT_ELEMENT_COLOR);
-                vertices.emplace_back(glm::vec4(collisionGrid[i + 1][j].hitpoint, 1.0f), OPT_ELEMENT_COLOR);
-                vertices.emplace_back(glm::vec4(collisionGrid[i][j + 1].hitpoint, 1.0f), OPT_ELEMENT_COLOR);
+                vertices.push_back({glm::vec4(collisionGrid[i + 1][j + 1].hitpoint, 1.0f), glm::vec2(OPT_ELEMENT_COLOR)});
+                vertices.push_back({glm::vec4(collisionGrid[i + 1][j].hitpoint, 1.0f), glm::vec2(OPT_ELEMENT_COLOR)});
+                vertices.push_back({glm::vec4(collisionGrid[i][j + 1].hitpoint, 1.0f), glm::vec2(OPT_ELEMENT_COLOR)});
 
                 indices.push_back(index++);
                 indices.push_back(index++);
