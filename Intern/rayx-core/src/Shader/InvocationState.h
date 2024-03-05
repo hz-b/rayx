@@ -40,7 +40,7 @@ struct RAYX_API InvocationState {
     uint64_t nextEventIndex;
 
     // TODO: fix this shortcut
-    using KokkosMemorySpace = Kokkos::HostSpace;
+    using KokkosMemorySpace = Kokkos::SharedSpace;
 
     Kokkos::View<Ray*, KokkosMemorySpace> rayData;
     Kokkos::View<Ray*, KokkosMemorySpace> outputData;

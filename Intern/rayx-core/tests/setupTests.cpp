@@ -249,6 +249,6 @@ void updateCpuTracerMaterialTables(std::vector<Material> mats_vec) {
         mats[static_cast<int>(m) - 1] = true;
     }
     auto materialTables = loadMaterialTables(mats);
-    inv.mat = KokkosUtils<Kokkos::HostSpace>::createView("test_mat", materialTables.materialTable);
-    inv.matIdx = KokkosUtils<Kokkos::HostSpace>::createView("test_matIdx", materialTables.indexTable);
+    inv.mat = KokkosUtils<Kokkos::SharedSpace>::createView("test_mat", materialTables.materialTable);
+    inv.matIdx = KokkosUtils<Kokkos::SharedSpace>::createView("test_matIdx", materialTables.indexTable);
 }

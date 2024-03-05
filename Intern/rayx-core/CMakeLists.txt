@@ -108,6 +108,8 @@ target_include_directories(${PROJECT_NAME} SYSTEM PUBLIC
     ${Kokkos_INCLUDE_DIRS_RET}
 )
 target_link_libraries(${PROJECT_NAME} PUBLIC Kokkos::kokkos)
+# TODO(Sven): rethink Separate Compilation and Linking
+set(KOKKOS_CXX_FLAGS "${KOKKOS_CXX_FLAGS} --device-c")
 
 # ------------------------
 

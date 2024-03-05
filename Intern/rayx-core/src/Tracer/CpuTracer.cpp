@@ -28,16 +28,16 @@ std::vector<Ray> CpuTracer::traceRaw(const TraceRawConfig& cfg) {
     auto numInputRays = cfg.m_rays.size();
     auto numOutputRays = numInputRays * ((size_t)cfg.m_maxEvents - (size_t)cfg.m_startEventID);
 
-    using Host = KokkosUtils<Kokkos::HostSpace>;
+    using Util = KokkosUtils<Kokkos::SharedSpace>;
 
-    inv.rayData = Host::createView("CpuTracer_rayData", cfg.m_rays);
-    inv.elements = Host::createView("CpuTracer_elements", cfg.m_elements);
+    inv.rayData = Util::createView("CpuTracer_rayData", cfg.m_rays);
+    inv.elements = Util::createView("CpuTracer_elements", cfg.m_elements);
 
     const auto& materialTables = cfg.m_materialTables;
-    inv.mat = Host::createView("CpuTracer_mat", materialTables.materialTable);
-    inv.matIdx = Host::createView("CpuTracer_matIdx", materialTables.indexTable);
+    inv.mat = Util::createView("CpuTracer_mat", materialTables.materialTable);
+    inv.matIdx = Util::createView("CpuTracer_matIdx", materialTables.indexTable);
 
-    inv.outputData = Host::createView<Ray>("CpuTracer_outputData", numOutputRays);
+    inv.outputData = Util::createView<Ray>("CpuTracer_outputData", numOutputRays);
 
     struct Kernel {
         Inv inv;
