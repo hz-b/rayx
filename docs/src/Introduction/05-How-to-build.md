@@ -32,7 +32,7 @@ Clone the git repository by running one of the following commands:
 - You can then build the project using the build button in the bottom panel.
 
 To use a custom generator for CMake, such as Ninja for faster builds, you can set it in the `.vscode/settings.json` file. The following is an example configuration for the generator in VSCode:
-![](../../res/vscode_ninja_config.png)
+![](../res/vscode_ninja_config.png)
 
 ### Building with Visual Studio
 - Open a terminal in the project folder.
