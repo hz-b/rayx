@@ -37,7 +37,8 @@
     - [Vulkan Shader Split](./Vulkan/Vulkan-Shader-Split.md)
     - [Vulkan Beyond](./Vulkan/Vulkan-Beyond.md)
 
-
+- [RAYX-UI](./RAYX-UI/RAYX-UI.md)
+    - [Triangulation](./RAYX-UI/Triangulation.md)
 
 
 
