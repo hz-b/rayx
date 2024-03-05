@@ -17,12 +17,7 @@ struct Cell {
     char buf[CELL_SIZE + 1]; // + 1 for null-termination.
 };
 
-int min(int a, int b) {
-    if (a > b) {
-        return b;
-    }
-    return a;
-}
+using std::min;
 
 // Tries to write a string into a cell.
 // Will only write an incomplete string, if it doesn't fit.
