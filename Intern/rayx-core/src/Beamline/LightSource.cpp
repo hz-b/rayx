@@ -7,7 +7,6 @@
 namespace RAYX {
 LightSource::LightSource(const DesignSource& deso) {
     m_name = deso.getName();
-    RAYX_LOG << "pre misal " << m_name;
     m_EnergyDistribution = deso.getEnergyDistribution();
     m_misalignmentParams = deso.getMisalignment();
     m_numberOfRays = deso.getNumberOfRays();

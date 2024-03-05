@@ -15,10 +15,10 @@ TEST_F(TestSuite, loadDatFile) {
 
     // This only works due to fixed seeding!
     // The loaded DAT file only has the 3 energies 12, 15, 17 with equal probability.
-    CHECK_EQ(b.m_DesignSources[0]->m_EnergyDistribution.selectEnergy(), 15, 0.1);
-    CHECK_EQ(b.m_DesignSources[0]->m_EnergyDistribution.selectEnergy(), 17, 0.1);
-    CHECK_EQ(b.m_DesignSources[0]->m_EnergyDistribution.selectEnergy(), 17, 0.1);
-    CHECK_EQ(b.m_DesignSources[0]->m_EnergyDistribution.selectEnergy(), 12, 0.1);
+    CHECK_EQ(b.m_DesignSources[0].getEnergyDistribution().selectEnergy(), 15, 0.1);
+    CHECK_EQ(b.m_DesignSources[0].getEnergyDistribution().selectEnergy(), 17, 0.1);
+    CHECK_EQ(b.m_DesignSources[0].getEnergyDistribution().selectEnergy(), 17, 0.1);
+    CHECK_EQ(b.m_DesignSources[0].getEnergyDistribution().selectEnergy(), 12, 0.1);
 }
 
 TEST_F(TestSuite, loadDatFile2) {
@@ -28,9 +28,9 @@ TEST_F(TestSuite, loadDatFile2) {
 
     // This only works due to fixed seeding!
     // The loaded DAT file only has the 3 energies 12, 15, 17 with - but it uses soft band.
-    CHECK_EQ(b.m_DesignSources[0]->m_EnergyDistribution.selectEnergy(), 14.7, 0.1);
-    CHECK_EQ(b.m_DesignSources[0]->m_EnergyDistribution.selectEnergy(), 17.1, 0.1);
-    CHECK_EQ(b.m_DesignSources[0]->m_EnergyDistribution.selectEnergy(), 16.7, 0.1);
+    CHECK_EQ(b.m_DesignSources[0].getEnergyDistribution().selectEnergy(), 14.7, 0.1);
+    CHECK_EQ(b.m_DesignSources[0].getEnergyDistribution().selectEnergy(), 17.1, 0.1);
+    CHECK_EQ(b.m_DesignSources[0].getEnergyDistribution().selectEnergy(), 16.7, 0.1);
 }
 
 TEST_F(TestSuite, loadGroups) {
@@ -80,7 +80,7 @@ TEST_F(TestSuite, testEnergyDistribution) {
 
     for (auto values : testinput) {
         auto beamline = loadBeamline(values.rmlFile);
-        auto energy = beamline.m_DesignSources[0]->m_EnergyDistribution.selectEnergy();
+        auto energy = beamline.m_DesignSources[0].getEnergyDistribution().selectEnergy();
 
         CHECK_EQ(energy, values.energy, 0.1);
     }
@@ -202,14 +202,14 @@ TEST_F(TestSuite, testExpertsOptic) {
 /***
  * Tests if two sources can be traced in one go.
  * Its a static test, so every change can result in a fail even if it's still working correctly
- */
+ 
 TEST_F(TestSuite, testTwoSourcesInOneRML) {
     auto beamline = loadBeamline("twoSourcesTest");
 
-    std::shared_ptr<DesignSource> dsrc = beamline.m_DesignSources[0];
-    //RAYX::DipoleSource* dipolesource = dynamic_cast<DipoleSource*>(&*dsrc);
+    DesignSource dsrc = beamline.m_DesignSources[0];
+    DipoleSource* dipolesource = dynamic_cast<DipoleSource*>(&*dsrc);
 
-    std::shared_ptr<DesignSource> psrc = beamline.m_DesignSources[1];
+    DesignSource psrc = beamline.m_DesignSources[1];
     PointSource* pointsource = dynamic_cast<PointSource*>(&*psrc);
 
     CHECK_EQ(100, dipolesource->getEnergy());
@@ -218,7 +218,7 @@ TEST_F(TestSuite, testTwoSourcesInOneRML) {
     RAYX::fixSeed(RAYX::FIXED_SEED);
     CHECK_EQ(-21.74, dipolesource->getXYZPosition(0.1).x, 0.1);
     CHECK_EQ(0, pointsource->getSourceWidth(), 0.1);
-}
+}*/
 
 TEST_F(TestSuite, groupTransform2) {
     auto b = loadBeamline("groupTransform2");

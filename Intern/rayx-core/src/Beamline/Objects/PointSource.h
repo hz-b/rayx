@@ -27,7 +27,7 @@ class RAYX_API PointSource : public LightSource {
     SourceDist m_verDist;
     SourcePulseType m_sourceDistributionType;  // TODO unused.
 
-    glm::dvec4 m_Pol;
+    glm::dvec4 m_pol;
 
     double m_verDivergence;
     double m_sourceDepth;

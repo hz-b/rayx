@@ -11,66 +11,74 @@
 
 namespace RAYX {
 
-void setAllMandatory(xml::Parser parser, DesignSource* de) {
+void setAllMandatory(xml::Parser parser, DesignSource* ds) {
 
+    ds->setName(parser.name());
+    ds->setType(parser.type());
+    ds->setMisalignment(parser.parseMisalignment());
+    ds->setNumberOfRays(parser.parseNumberRays());
+    ds->setWorldOrientation(parser.parseOrientation());
+    ds->setWorldPosition(parser.parsePosition());
+
+
+    ds->setSeperateEnergies(1);
     
-    de->setMisalignment(parser.parseMisalignment());
-    de->setNumberOfRays(parser.parseNumberRays());
-    de->setWorldOrientation(parser.parseOrientation());
-    de->setWorldPosition(parser.parsePosition());
-
-
-    de->setSeperateEnergies(1);
-    
 }
 
-void setDefaultEnergy(xml::Parser parser, DesignSource* de){
-    de->setEnergy(parser.parsePhotonEnergy());
-    de->setEnergyDistributionFile(parser.parseEnergyDistributionFile());
-    de->setEnergyDistributionType(parser.parseEnergyDistributionType());
-    de->setEnergySpread(parser.parseEnergySpread());
-    de->setEnergySpreadType(parser.parseEnergySpreadType());
+void setDefaultEnergy(xml::Parser parser, DesignSource* ds){
+    ds->setEnergy(parser.parsePhotonEnergy());
+    ds->setEnergyDistributionFile(parser.parseEnergyDistributionFile());
+    ds->setEnergyDistributionType(parser.parseEnergyDistributionType());
+    ds->setEnergySpread(parser.parseEnergySpread());
+    ds->setEnergySpreadType(parser.parseEnergySpreadType());
 
 }
 
-void setDefaultOrientation(xml::Parser parser, DesignSource* de){
-
-    de->setHorDist(parser.parseHorDivDistribution());
-    de->setVerDist(parser.parseVerDivDistribution());
-    de->setHorDivergence(parser.parseHorDiv());
-    de->setVerDivergence(parser.parseVerDiv());
+void setDefaultOrientation(xml::Parser parser, DesignSource* ds){
+    ds->setHorDivergence(parser.parseHorDiv());
+    ds->setVerDivergence(parser.parseVerDiv());
 }
 
 
-void setDefaultPosition(xml::Parser parser, DesignSource* de){
-    de->setWidthDist(parser.parseSourceWidthDistribution());
-    de->setHeightDist(parser.parseSourceHeightDistribution());
-    de->setSourceDepth(parser.parseSourceDepth());
-    de->setSourceHeight(parser.parseSourceHeight());
-    de->setSourceWidth(parser.parseSourceWidth());
-}
-
-void setStokes(xml::Parser parser, DesignSource* de){
-    de->setStokeslin0(parser.parseLinearPol0());
-    de->setStokeslin45(parser.parseLinearPol45());
-    de->setStokescirc(parser.parseCircularPol());
+void setDefaultPosition(xml::Parser parser, DesignSource* ds){
+    ds->setSourceDepth(parser.parseSourceDepth());
+    ds->setSourceHeight(parser.parseSourceHeight());
+    ds->setSourceWidth(parser.parseSourceWidth());
 }
 
 
-void setPointSource(xml::Parser parser, DesignSource* de) {
-    RAYX_LOG << "in set pointsource ";
+void setStokes(xml::Parser parser, DesignSource* ds){
+    ds->setStokeslin0(parser.parseLinearPol0());
+    ds->setStokeslin45(parser.parseLinearPol45());
+    ds->setStokescirc(parser.parseCircularPol());
+}
 
-    setAllMandatory(parser, de);
-    RAYX_LOG << "in set pointsource 1";
-    setDefaultEnergy(parser, de);
-    RAYX_LOG << "in set pointsource 2";
-    setDefaultPosition(parser, de);
-    RAYX_LOG << "in set pointsource 3";
-    setDefaultOrientation(parser, de);
-    RAYX_LOG << "in set pointsource 4";
+
+void setPointSource(xml::Parser parser, DesignSource* ds) {
+
+    setAllMandatory(parser, ds);
+    setStokes(parser, ds);
+    setDefaultEnergy(parser, ds);
+
+    setDefaultPosition(parser, ds);
+    ds->setWidthDist(parser.parseSourceWidthDistribution());
+    ds->setHeightDist(parser.parseSourceHeightDistribution());
+
+    setDefaultOrientation(parser, ds);
+    ds->setHorDist(parser.parseHorDivDistribution());
+    ds->setVerDist(parser.parseVerDivDistribution());
 
 }
 
+void setMatrixSource(xml::Parser parser, DesignSource* ds) {
+
+    setAllMandatory(parser, ds);
+    setStokes(parser, ds);
+    setDefaultEnergy(parser, ds);
+    setDefaultPosition(parser, ds);
+    setDefaultOrientation(parser, ds);
+
+}
 
 
 

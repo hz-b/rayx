@@ -18,7 +18,7 @@ PointSource::PointSource(const DesignSource& deso) : LightSource(deso) {
     m_sourceHeight = deso.getSourceHeight();
     m_sourceWidth = deso.getSourceWidth();
 
-    m_Pol = deso.getStokes();
+    m_pol = deso.getStokes();
 }
 
 /**
@@ -91,7 +91,7 @@ std::vector<Ray> PointSource::getRays(int thread_count) const {
         direction = glm::dvec3(tempDir.x, tempDir.y, tempDir.z);
         //glm::dvec4 stokes = glm::dvec4(1, m_linearPol_0, m_linearPol_45, m_circularPol);
 
-        Ray r = {position, ETYPE_UNINIT, direction, en, m_Pol, 0.0, 0.0, -1.0, -1.0};
+        Ray r = {position, ETYPE_UNINIT, direction, en, m_pol, 0.0, 0.0, -1.0, -1.0};
 #if defined(DIPOLE_OMP)
 #pragma omp critical
         { rayList.push_back(r); }

@@ -8,7 +8,7 @@ namespace RAYX {
 
 struct DesignSource {
     Value v;
-    std::vector<Ray> compile(int i) const;
+    std::vector<Ray> compile(int thread_count) const;
 
     void setStokeslin0(double value);
     void setStokeslin45(double value);
@@ -16,6 +16,7 @@ struct DesignSource {
     glm::dvec4 getStokes() const;
 
     void setName(std::string s);
+    void setType(std::string s);
     std::string getName() const;
 
     void setWidthDist(SourceDist value);
