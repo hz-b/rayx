@@ -115,13 +115,14 @@ UIHandler::UIHandler(const Window& window, const Device& device, VkFormat imageF
     initInfo.Queue = m_Device.graphicsQueue();
     initInfo.PipelineCache = VK_NULL_HANDLE;
     initInfo.DescriptorPool = m_DescriptorPool;
+    initInfo.RenderPass = m_RenderPass;
     initInfo.Allocator = nullptr;
     initInfo.MinImageCount = imageCount;
     initInfo.ImageCount = imageCount;
     initInfo.CheckVkResultFn = nullptr;
 
     ImGui_ImplGlfw_InitForVulkan(m_Window.window(), true);
-    ImGui_ImplVulkan_Init(&initInfo, m_RenderPass);
+    ImGui_ImplVulkan_Init(&initInfo);
 
     // Upload fonts
     {
@@ -131,19 +132,16 @@ UIHandler::UIHandler(const Window& window, const Device& device, VkFormat imageF
         m_largeFont =
             m_IO.Fonts->AddFontFromFileTTF(RAYX::canonicalizeRepositoryPath("./Intern/rayx-ui/res/fonts/Roboto-Regular.ttf").string().c_str(), 24.0f);
 
-        auto tmpCommandBuffer = m_Device.beginSingleTimeCommands();
-        ImGui_ImplVulkan_CreateFontsTexture(tmpCommandBuffer);
-        m_Device.endSingleTimeCommands(tmpCommandBuffer);
-        ImGui_ImplVulkan_DestroyFontUploadObjects();
+        ImGui_ImplVulkan_CreateFontsTexture();
     }
 }
 
 UIHandler::~UIHandler() {
-    vkDestroyRenderPass(m_Device.device(), m_RenderPass, nullptr);
-    vkDestroyDescriptorPool(m_Device.device(), m_DescriptorPool, nullptr);
     ImGui_ImplVulkan_Shutdown();
     ImGui_ImplGlfw_Shutdown();
     ImGui::DestroyContext();
+    vkDestroyDescriptorPool(m_Device.device(), m_DescriptorPool, nullptr);
+    vkDestroyRenderPass(m_Device.device(), m_RenderPass, nullptr);
 }
 
 void UIHandler::beginUIRender() {
