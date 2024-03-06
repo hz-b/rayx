@@ -131,9 +131,7 @@ void getToroidMirror(xml::Parser parser, DesignElement* de) {
 
     de->setShortRadius(parser.parseShortRadius());
     de->setLongRadius(parser.parseLongRadius());
-    
 }
-
 
 void getRZP(xml::Parser parser, DesignElement* de) {
     setAllMandatory(parser, de, DesignPlane::XZ);
@@ -154,10 +152,8 @@ void getRZP(xml::Parser parser, DesignElement* de) {
     de->setAdditionalOrder(parser.parseAdditionalOrder());
     de->setShortRadius(parser.parseShortRadius());
     de->setLongRadius(parser.parseLongRadius());
-    de->setCurvatureType(parser.parseCurvatureType());
-    
+    de->setCurvatureType(parser.parseCurvatureType());    
 }
-
 
 void getExpertsCubic(xml::Parser parser, DesignElement* de) {
     setAllMandatory(parser, de, DesignPlane::XZ);

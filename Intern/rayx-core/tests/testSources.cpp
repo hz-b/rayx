@@ -90,22 +90,20 @@ TEST_F(TestSuite, DipoleEnergyDistribution) {
     checkEnergyDistribution(rays, 1000, 23000);
 }
 
-//TODO: reintegrate test
-/*TEST_F(TestSuite, PixelPositionTest) {
+TEST_F(TestSuite, PixelPositionTest) {
     auto beamline = loadBeamline("PixelSource");
     auto rays = beamline.getInputRays();
-    std::shared_ptr<LightSource> src = beamline.m_DesignSources[0];
-    auto* pixelsource = dynamic_cast<PixelSource*>(&*src);
-    auto width = src->getSourceWidth();
-    auto height = src->getSourceHeight();
-    auto hordiv = src->getHorDivergence();
+    DesignSource src = beamline.m_DesignSources[0];
+    auto width = src.getSourceWidth();
+    auto height = src.getSourceHeight();
+    auto hordiv = src.getHorDivergence();
     for (auto ray : rays) {
         CHECK_IN(abs(ray.m_position.x), width / 6.0, width / 2.0);
         CHECK_IN(abs(ray.m_position.y), height / 6.0, height / 2.0);
         double phi = atan2(ray.m_direction.x, ray.m_direction.z);  // phi in rad from m_direction
         CHECK_IN(abs(phi), 0.0, hordiv / 2.0);
     }
-}*/
+}
 
 TEST_F(TestSuite, DipoleZDistribution) {
     auto beamline = loadBeamline("dipole_plain");
