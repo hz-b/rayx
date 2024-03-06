@@ -81,6 +81,24 @@ void setMatrixSource(xml::Parser parser, DesignSource* ds) {
 }
 
 
+void setDipoleSource(xml::Parser parser, DesignSource* ds) {
+    setAllMandatory(parser, ds);
+
+    ds->setEnergySpreadType(parser.parseEnergySpreadType());
+    ds->setPhotonFlux(parser.parsePhotonFlux());
+    ds->setElectronEnergyOriantation(parser.parseElectronEnergyOrientation());
+    ds->setElectronEnergy(parser.parseElectronEnergy());
+    ds->setEnergySpread(parser.parseEnergySpread());
+    ds->setBendingRadius(parser.parseBendingRadiusDouble());
+    ds->setSourceHeight(parser.parseSourceHeight());
+    ds->setSourceWidth(parser.parseSourceWidth());
+    ds->setVerEBeamDivergence(parser.parseVerEbeamDivergence());
+    ds->setEnergy(parser.parsePhotonEnergy());
+    ds->setEnergySpreadUnit(parser.parseEnergySpreadUnit());
+    ds->setHorDivergence(parser.parseHorDiv());
+}
+
+
 
 
 }  // namespace RAYX

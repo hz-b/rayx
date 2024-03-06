@@ -14,8 +14,12 @@ std::vector<Ray> DesignSource::compile(int i) const {
         ray = ps.getRays(i);
         std::cout << getName() << std::endl;
     } else if (getName() == "Matrix Source") {
-        MatrixSource ps(*this);
-        ray = ps.getRays(i);
+        MatrixSource ms(*this);
+        ray = ms.getRays(i);
+        std::cout << getName() << std::endl;
+    }else if (getName() == "Dipole Source") {
+        DipoleSource ds(*this);
+        ray = ds.getRays(i);
         std::cout << getName() << std::endl;
     }
 
@@ -145,6 +149,9 @@ double DesignSource::getHorDivergence() const { return v["horDivergence"].as_dou
 void DesignSource::setVerDivergence(double value) { v["verDivergence"] = value; }
 double DesignSource::getVerDivergence() const { return v["verDivergence"].as_double(); }
 
+void DesignSource::setVerEBeamDivergence(double value) { v["verEBeamDivergence"] = value; }
+double DesignSource::getVerEBeamDivergence() const { return v["verEBeamDivergence"].as_double(); }
+
 void DesignSource::setSourceDepth(double value) { v["sourceDepth"] = value; }
 double DesignSource::getSourceDepth() const { return v["sourceDepth"].as_double(); }
 
@@ -154,11 +161,34 @@ double DesignSource::getSourceHeight() const { return v["sourceHeight"].as_doubl
 void DesignSource::setSourceWidth(double value) { v["sourceWidth"] = value; }
 double DesignSource::getSourceWidth() const { return v["sourceWidth"].as_double(); }
 
+void DesignSource::setBendingRadius(double value) { v["bendingRadius"] = value; }
+double DesignSource::getBendingRadius() const { return v["bendingRadius"].as_double(); }
+
+void DesignSource::setEnergy(double value) { v["energy"] = value; }
+double DesignSource::getEnergy() const { return v["energy"].as_double(); }
+
+void DesignSource::setElectronEnergy(double value) { v["electronEnergy"] = value; }
+double DesignSource::getElectronEnergy() const { return v["electronEnergy"].as_double(); }
+
+void DesignSource::setElectronEnergyOriantation(ElectronEnergyOrientation value) { v["electronEnergyOriantation"] = value; }
+ElectronEnergyOrientation DesignSource::getElectronEnergyOrientation() const { return v["electronEnergyOriantation"].as_electronEnergyOrientation(); }
+
 void DesignSource::setEnergySpread(double value) { v["energySpread"] = value; }
+double DesignSource::getEnergySpread() const { return v["energySpread"].as_double(); }
+
+void DesignSource::setEnergySpreadUnit(EnergySpreadUnit value) { v["energySpread"] = value; }
+EnergySpreadUnit DesignSource::getEnergySpreadUnit() const { return v["energySpread"].as_energySpreadUnit(); }
+
 void DesignSource::setEnergyDistributionType(EnergyDistributionType value) { v["energyDistributionType"] = value; }
 void DesignSource::setEnergyDistributionFile(std::string value) { v["photonEnergyDistributionFile"] = value; }
+
 void DesignSource::setEnergySpreadType(SpreadType value) { v["energyDistribution"] = value; }
+SpreadType DesignSource::getEnergySpreadType() const { return v["energyDistribution"].as_energySpreadType(); }
+
 void DesignSource::setSeperateEnergies(int value){ v["SeperateEnergies"] = value; }
+
+void DesignSource::setPhotonFlux(double value){ v["photonFlux"] = value; }
+double DesignSource::getPhotonFlux() const { return v["photonFlux"].as_double(); }
 
 EnergyDistribution DesignSource::getEnergyDistribution() const { 
     EnergyDistribution en;
@@ -213,7 +243,5 @@ EnergyDistribution DesignSource::getEnergyDistribution() const {
 void DesignSource::setNumberOfRays(double value) { v["numberOfRays"] = value; }
 double DesignSource::getNumberOfRays() const { return v["numberOfRays"].as_double(); }
 
-void DesignSource::setEnergy(double value) { v["energy"] = value; }
-double DesignSource::getEnergy() const { return v["energy"].as_double(); }
 
 }

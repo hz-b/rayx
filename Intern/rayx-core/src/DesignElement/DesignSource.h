@@ -37,6 +37,9 @@ struct DesignSource {
     void setVerDivergence(double value);
     double getVerDivergence() const;
 
+    void setVerEBeamDivergence(double value);
+    double getVerEBeamDivergence() const;
+
     void setSourceDepth(double value);
     double getSourceDepth() const;
 
@@ -46,15 +49,35 @@ struct DesignSource {
     void setSourceWidth(double value);
     double getSourceWidth() const;
 
+    void setBendingRadius(double value);
+    double getBendingRadius() const;
+
     void setEnergySpread(double value);
+    double getEnergySpread() const;
+
     void setEnergySpreadType(SpreadType value);
+    SpreadType getEnergySpreadType() const;
+    
     void setEnergyDistributionType(EnergyDistributionType value);
     void setEnergyDistributionFile(std::string value);
+
     void setEnergySpreadUnit(EnergySpreadUnit value);
-    void setEnergy(double value);
+    EnergySpreadUnit getEnergySpreadUnit() const;
+
+    void setElectronEnergy(double value);
+    double getElectronEnergy() const;
+
+    void setElectronEnergyOriantation(ElectronEnergyOrientation value);
+    ElectronEnergyOrientation getElectronEnergyOrientation() const;
+
     void setSeperateEnergies(int value);
 
+    void setEnergy(double value);
     double getEnergy() const;
+
+    void setPhotonFlux(double value);
+    double getPhotonFlux() const;
+
     EnergyDistribution getEnergyDistribution() const;
 
     void setMisalignment(Misalignment m);

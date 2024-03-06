@@ -3,6 +3,7 @@
 #include <cstring>
 #include <memory>
 #include <rapidxml.hpp>
+#include <string>
 #include <sstream>
 
 #include "Beamline/Beamline.h"
@@ -13,12 +14,20 @@
 #include "DesignElementWriter.h"
 #include "DesignSourceWriter.h"
 
+void extractInfo(xml::Parser parser, DesignElement* de) {
+    //getBehaviourType
+    //getSurfaceType
+    //getCutoutType
+    //combine
+}
+
 void parseElement(xml::Parser parser, DesignElement* de) {
     const char* type = parser.type();
     // TODO add functions for each Element
 
     if (strcmp(type, "ImagePlane") == 0) {
         getImageplane(parser, de);
+        extractInfo(parser, de);
     } else if (strcmp(type, "Cone") == 0) {
         getCone(parser, de);
     } else if (strcmp(type, "Cylinder") == 0) {
@@ -83,11 +92,13 @@ void addBeamlineObjectFromXML(rapidxml::xml_node<>* node, Beamline* beamline, co
         beamline->m_DesignSources.push_back(ds);
         RAYX_LOG << "in importer MS";
     } else if (strcmp(type, "Dipole") == 0) {
-        //addLightSource(std::make_shared<DipoleSource>(parser), node);
-        RAYX_LOG << "import none";
+        setDipoleSource(parser, &ds);
+        beamline->m_DesignSources.push_back(ds);
+        RAYX_LOG << "in importer DS";
     } else if (strcmp(type, "Dipole Source") == 0) {
-        RAYX_LOG << "import none";
-        //addLightSource(std::make_shared<DipoleSource>(parser), node);
+        setDipoleSource(parser, &ds);
+        beamline->m_DesignSources.push_back(ds);
+        RAYX_LOG << "in importer DS";
     } else if (strcmp(type, "Pixel Source") == 0) {
         RAYX_LOG << "import none";
         //addLightSource(std::make_shared<PixelSource>(parser), node);

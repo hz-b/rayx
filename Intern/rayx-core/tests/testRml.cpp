@@ -202,23 +202,21 @@ TEST_F(TestSuite, testExpertsOptic) {
 /***
  * Tests if two sources can be traced in one go.
  * Its a static test, so every change can result in a fail even if it's still working correctly
- 
+ */
 TEST_F(TestSuite, testTwoSourcesInOneRML) {
     auto beamline = loadBeamline("twoSourcesTest");
 
-    DesignSource dsrc = beamline.m_DesignSources[0];
-    DipoleSource* dipolesource = dynamic_cast<DipoleSource*>(&*dsrc);
+    DesignSource dipolesource = beamline.m_DesignSources[0];
 
-    DesignSource psrc = beamline.m_DesignSources[1];
-    PointSource* pointsource = dynamic_cast<PointSource*>(&*psrc);
+    DesignSource pointsource = beamline.m_DesignSources[1];
 
-    CHECK_EQ(100, dipolesource->getEnergy());
-    CHECK_EQ(148.8, pointsource->selectEnergy(), 0.1);
+    CHECK_EQ(100, dipolesource.getEnergy());
+    CHECK_EQ(148.8, pointsource.getEnergy(), 0.1);
 
     RAYX::fixSeed(RAYX::FIXED_SEED);
-    CHECK_EQ(-21.74, dipolesource->getXYZPosition(0.1).x, 0.1);
-    CHECK_EQ(0, pointsource->getSourceWidth(), 0.1);
-}*/
+    //CHECK_EQ(-21.74, dipolesource->getXYZPosition(0.1).x, 0.1);
+    CHECK_EQ(0, pointsource.getSourceWidth(), 0.1);
+}
 
 // TODO(rudi) re-enable group tests
 

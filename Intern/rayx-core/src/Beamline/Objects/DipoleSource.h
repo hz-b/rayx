@@ -13,14 +13,14 @@ struct PsiAndStokes {
 
 class RAYX_API DipoleSource : public LightSource {
   public:
-    DipoleSource(const DesignObject&);
+    DipoleSource(const DesignSource&);
     virtual ~DipoleSource() = default;
 
     std::vector<Ray> getRays(int thread_count = 1) const override;
 
-    double getHorDivergence() const override;
-    double getSourceHeight() const override;
-    double getSourceWidth() const override;
+    //double getHorDivergence() const override;
+    //double getSourceHeight() const override;
+    //double getSourceWidth() const override;
 
     // calculate Ray-Information
     glm::dvec3 getXYZPosition(double) const;
