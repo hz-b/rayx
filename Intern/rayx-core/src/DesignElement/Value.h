@@ -25,7 +25,9 @@ enum class ValueType {
     Surface,
     SourceDist,
     SpreadType,
-    EnergyDistributionType
+    EnergyDistributionType,
+    EnergySpreadUnit,
+    ElectronEnergyOrientation,
 };
 
 class Undefined {};
@@ -55,6 +57,7 @@ class Value {
     Value(SourceDist x) : m_variant(x) {}
     Value(SpreadType x) : m_variant(x) {}
     Value(EnergyDistributionType x) : m_variant(x) {}
+    Value(EnergySpreadUnit x) : m_variant(x) {}
 
     void operator=(double x) { m_variant = x; }
     void operator=(int x) { m_variant = x; }
@@ -75,16 +78,19 @@ class Value {
     void operator=(SourceDist x) { m_variant = x; }
     void operator=(SpreadType x) { m_variant = x; }
     void operator=(EnergyDistributionType x) { m_variant = x; }
+    void operator=(EnergySpreadUnit x) { m_variant = x; }
+    void operator=(ElectronEnergyOrientation x) { m_variant = x; }
 
 
 
     inline ValueType type() const {
         const ValueType types[] = {
-            ValueType::Undefined, ValueType::Double,    ValueType::Int,           ValueType::CylinderDirection,
-            ValueType::String,    ValueType::Map,       ValueType::Dvec4,         ValueType::Dmat4x4,
-            ValueType::Rad,       ValueType::Material,  ValueType::Misalignment,  ValueType::CentralBeamStop,
-            ValueType::Cutout,    ValueType::Bool,      ValueType::FigureRotation,ValueType::CurvatureType,
-            ValueType::Surface,   ValueType::SourceDist,ValueType::SpreadType,    ValueType::EnergyDistributionType
+            ValueType::Undefined, ValueType::Double,     ValueType::Int,           ValueType::CylinderDirection,
+            ValueType::String,    ValueType::Map,        ValueType::Dvec4,         ValueType::EnergySpreadUnit,
+            ValueType::Rad,       ValueType::Material,   ValueType::Misalignment,  ValueType::CentralBeamStop,
+            ValueType::Cutout,    ValueType::Bool,       ValueType::FigureRotation,ValueType::CurvatureType,
+            ValueType::Surface,   ValueType::SourceDist, ValueType::SpreadType,    ValueType::EnergyDistributionType,
+            ValueType::Dmat4x4,   ValueType::ElectronEnergyOrientation
         };
         return types[m_variant.index()];
     }
@@ -203,6 +209,17 @@ class Value {
         return *x;
     }
 
+    inline EnergySpreadUnit as_energySpreadUnit() const {
+        auto* x = std::get_if<EnergySpreadUnit>(&m_variant);
+        if (!x) throw std::runtime_error("as_energySpreadUnit() called on non-energySpreadUnit!");
+        return *x;
+    }
+
+    inline ElectronEnergyOrientation as_electronEnergyOrientation() const {
+        auto* x = std::get_if<ElectronEnergyOrientation>(&m_variant);
+        if (!x) throw std::runtime_error("as_electronEnergyOrientation() called on non-electronEnergyOrientation!");
+        return *x;
+    }
 
     const Value& operator[](std::string s) const {
         const Map* m = std::get_if<Map>(&m_variant);
@@ -220,11 +237,12 @@ class Value {
 
   private:
     std::variant<
-                 Undefined,      double,          int,     std::string, 
-                 glm::dvec4,     glm::dmat4x4,    bool,    Rad, Material, 
-                 Misalignment,   CentralBeamstop, Cutout,  CylinderDirection, 
-                 FigureRotation, Map,             Surface, CurvatureType,
-                 SourceDist,     SpreadType,      EnergyDistributionType
+                 Undefined,        double,          int,     ElectronEnergyOrientation,
+                 glm::dvec4,       glm::dmat4x4,    bool,    EnergyDistributionType, 
+                 Misalignment,     CentralBeamstop, Cutout,  CylinderDirection, 
+                 FigureRotation,   Map,             Surface, CurvatureType,
+                 SourceDist,       SpreadType,      Rad,     Material,
+                 EnergySpreadUnit, std::string
                 > m_variant;
 };
 }  // namespace RAYX
