@@ -12,6 +12,15 @@
 
 using uint = unsigned int;
 
+struct Kernel {
+    Inv inv;
+
+    KOKKOS_INLINE_FUNCTION
+    void operator() (int gid) const {
+        dynamicElements(gid, inv);
+    }
+};
+
 namespace RAYX {
 
 CpuTracer::CpuTracer() {
@@ -28,7 +37,9 @@ std::vector<Ray> CpuTracer::traceRaw(const TraceRawConfig& cfg) {
     auto numInputRays = cfg.m_rays.size();
     auto numOutputRays = numInputRays * ((size_t)cfg.m_maxEvents - (size_t)cfg.m_startEventID);
 
-    using Util = KokkosUtils<Kokkos::SharedSpace>;
+    using ExecSpace = Kokkos::DefaultHostExecutionSpace;
+    using MemorySpace = Kokkos::SharedSpace;
+    using Util = KokkosUtils<MemorySpace>;
 
     inv.rayData = Util::createView("CpuTracer_rayData", cfg.m_rays);
     inv.elements = Util::createView("CpuTracer_elements", cfg.m_elements);
@@ -39,29 +50,19 @@ std::vector<Ray> CpuTracer::traceRaw(const TraceRawConfig& cfg) {
 
     inv.outputData = Util::createView<Ray>("CpuTracer_outputData", numOutputRays);
 
-    struct Kernel {
-        Inv inv;
-
-        KOKKOS_INLINE_FUNCTION
-        void operator() (int gid) const {
-            dynamicElements(gid, inv);
-        }
-    };
-
+    auto ex = ExecSpace();
     Kokkos::parallel_for(
-        Kokkos::RangePolicy<Kokkos::DefaultHostExecutionSpace>(
-            Kokkos::DefaultHostExecutionSpace(),
+        Kokkos::RangePolicy<ExecSpace>(
+            ex,
             0,           // begin
             numInputRays // end
         ),
         Kernel { inv }
     );
-    Kokkos::fence();
+    ex.fence();
 
     // Fetch Rays back from the Shader "container"
-    auto outputData = std::vector<Ray>(numOutputRays);
-    std::memcpy(outputData.data(), inv.outputData.data(), numOutputRays * sizeof(Ray));
-    return outputData;
+    return Util::createVector(inv.outputData);
 }
 
 void CpuTracer::setPushConstants(const PushConstants* p) { std::memcpy(&inv.pushConstants, p, sizeof(PushConstants)); }

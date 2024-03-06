@@ -24,7 +24,7 @@ struct Kernel {
 namespace RAYX {
 
 GpuTracer::GpuTracer() {
-    RAYX_VERB << "Initializing Cpu Tracer..";
+    RAYX_VERB << "Initializing Gpu Tracer..";
 }
 
 GpuTracer::~GpuTracer() = default;

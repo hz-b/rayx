@@ -20,6 +20,7 @@
 #include "Shader/Diffraction.h"
 
 #include "Tracer/CpuTracer.h"
+#include "Tracer/GpuTracer.h"
 #include "Writer/CSVWriter.h"
 #include "gmock/gmock.h"
 #include "gtest/gtest.h"
@@ -165,8 +166,7 @@ class TestSuite : public testing::Test {
         if (cpu) {
             tracer = std::make_unique<RAYX::CpuTracer>();
         } else {
-            // TODO(Sven): enable kokkos tracer testing
-            RAYX_ERR << "GPU Tracer is currently disabled.";
+            tracer = std::make_unique<RAYX::GpuTracer>();
         }
     }
 

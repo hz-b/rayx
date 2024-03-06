@@ -10,6 +10,7 @@
 #include "Debug/Debug.h"
 #include "Random.h"
 #include "Tracer/CpuTracer.h"
+#include "Tracer/GpuTracer.h"
 #include "Writer/Writer.h"
 
 TerminalApp::TerminalApp(int argc, char** argv) : m_argv(argv), m_argc(argc) {
@@ -167,8 +168,7 @@ void TerminalApp::run() {
     if (m_CommandParser->m_args.m_cpuFlag) {
         m_Tracer = std::make_unique<RAYX::CpuTracer>();
     } else {
-        // TODO(Sven): enable kokkos tracer
-        RAYX_ERR << "trying to construct GPU Tracer, which is currently not implemented. Use -x to use CPU tracer.";
+        m_Tracer = std::make_unique<RAYX::GpuTracer>();
     }
 
     // Trace, export and plot
