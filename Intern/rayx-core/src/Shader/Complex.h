@@ -17,22 +17,22 @@
 #define cx_sin(a)     dvec2(r8_sin(a.x) * r8_cosh(a.y), r8_cos(a.x) * r8_sinh(a.y))
 #define cx_cos(a)     dvec2(r8_cos(a.x) * r8_cosh(a.y), -r8_sin(a.x) * r8_sinh(a.y))
 
-dvec2 cx_sqrt(dvec2 a);
-dvec2 cx_tan(dvec2 a);
-dvec2 cx_log(dvec2 a);
-dvec2 cx_mobius(dvec2 a);
-dvec2 cx_z_plus_one_over_z(dvec2 a);
-dvec2 cx_z_squared_plus_c(dvec2 z, dvec2 c);
-dvec2 cx_sin_of_one_over_z(dvec2 z);
+RAYX_FUNC dvec2 cx_sqrt(dvec2 a);
+RAYX_FUNC dvec2 cx_tan(dvec2 a);
+RAYX_FUNC dvec2 cx_log(dvec2 a);
+RAYX_FUNC dvec2 cx_mobius(dvec2 a);
+RAYX_FUNC dvec2 cx_z_plus_one_over_z(dvec2 a);
+RAYX_FUNC dvec2 cx_z_squared_plus_c(dvec2 z, dvec2 c);
+RAYX_FUNC dvec2 cx_sin_of_one_over_z(dvec2 z);
 
 // Additions by Johan Karlsson (DonKarlssonSan) https://gist.github.com/DonKarlssonSan
 // https://gist.github.com/DonKarlssonSan/f87ba5e4e5f1093cb83e39024a6a5e72
 #define cx_sub(a, b) dvec2(a.x - b.x, a.y - b.y)
 #define cx_add(a, b) dvec2(a.x + b.x, a.y + b.y)
 #define cx_abs(a)    length(a)
-dvec2 cx_to_polar(dvec2 a);
+RAYX_FUNC dvec2 cx_to_polar(dvec2 a);
 
 // Complex power
-dvec2 cx_pow(dvec2 a, int n);
+RAYX_FUNC dvec2 cx_pow(dvec2 a, int n);
 
 #endif

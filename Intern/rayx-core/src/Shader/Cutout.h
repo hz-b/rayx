@@ -34,7 +34,8 @@ struct RectCutout {
     double m_length; // in Z direction
 };
 
-inline Cutout serializeRect(RectCutout cut) {
+RAYX_FUNC_INLINE
+Cutout serializeRect(RectCutout cut) {
     Cutout ser;
     ser.m_type = CTYPE_RECT;
     ser.m_private_serialization_params[0] = cut.m_width;
@@ -42,7 +43,8 @@ inline Cutout serializeRect(RectCutout cut) {
     return ser;
 }
 
-inline RectCutout deserializeRect(Cutout ser) {
+RAYX_FUNC_INLINE
+RectCutout deserializeRect(Cutout ser) {
     RectCutout cut;
     cut.m_width = ser.m_private_serialization_params[0];
     cut.m_length = ser.m_private_serialization_params[1];
@@ -63,6 +65,7 @@ struct EllipticalCutout {
     double m_diameter_z;
 };
 
+RAYX_FUNC
 inline Cutout serializeElliptical(EllipticalCutout cut) {
     Cutout ser;
     ser.m_type = CTYPE_ELLIPTICAL;
@@ -71,6 +74,7 @@ inline Cutout serializeElliptical(EllipticalCutout cut) {
     return ser;
 }
 
+RAYX_FUNC
 inline EllipticalCutout deserializeElliptical(Cutout ser) {
     EllipticalCutout cut;
     cut.m_diameter_x = ser.m_private_serialization_params[0];
@@ -93,6 +97,7 @@ struct TrapezoidCutout {
     double m_length; // in Z direction
 };
 
+RAYX_FUNC
 inline Cutout serializeTrapezoid(TrapezoidCutout cut) {
     Cutout ser;
     ser.m_type = CTYPE_TRAPEZOID;
@@ -102,6 +107,7 @@ inline Cutout serializeTrapezoid(TrapezoidCutout cut) {
     return ser;
 }
 
+RAYX_FUNC
 inline TrapezoidCutout deserializeTrapezoid(Cutout ser) {
     TrapezoidCutout cut;
     cut.m_widthA = ser.m_private_serialization_params[0];
@@ -117,6 +123,7 @@ inline TrapezoidCutout deserializeTrapezoid(Cutout ser) {
 // Every point (x, z) is within this cutout, it's unlimited after all.
 // `Unlimited` doesn't have any data so it doesn't need a struct.
 
+RAYX_FUNC
 inline Cutout serializeUnlimited() {
     Cutout ser;
     ser.m_type = CTYPE_UNLIMITED;

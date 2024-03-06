@@ -8,6 +8,7 @@
  * @param delta
  *
  */
+RAYX_FUNC
 dmat4 mullerMatrix(double R_s, double R_p, double delta) {
     double c = r8_cos(delta);
     double s = r8_sin(delta);
@@ -25,6 +26,7 @@ dmat4 mullerMatrix(double R_s, double R_p, double delta) {
  * updates stokes vector of ray
  * @returns `true`, if ray should be absorbed
  */
+RAYX_FUNC
 bool updateStokes(Ray& r, double real_S, double real_P, double delta, double azimuthal, Inv& inv) {
     dvec4 stokes_old = r.m_stokes;
     double c_chi = r8_cos(azimuthal);

@@ -15,10 +15,10 @@
 /// - change the rays stokes vector
 /// - potentially absorb the ray (by calling `recordFinalEvent(_, ETYPE_ABSORBED)`)
 
-Ray behaveSlit(Ray r, int id, Collision col, Inv& inv);
-Ray behaveRZP(Ray r, int id, Collision col, Inv& inv);
-Ray behaveGrating(Ray r, int id, Collision col, Inv& inv);
-Ray behaveMirror(Ray r, int id, Collision col, Inv& inv);
-Ray behaveImagePlane(Ray r, int id, Collision col, Inv& inv);
+RAYX_FUNC Ray behaveSlit(Ray r, int id, Collision col, Inv& inv);
+RAYX_FUNC Ray behaveRZP(Ray r, int id, Collision col, Inv& inv);
+RAYX_FUNC Ray behaveGrating(Ray r, int id, Collision col, Inv& inv);
+RAYX_FUNC Ray behaveMirror(Ray r, int id, Collision col, Inv& inv);
+RAYX_FUNC Ray behaveImagePlane(Ray r, int id, Collision col, Inv& inv);
 
 #endif

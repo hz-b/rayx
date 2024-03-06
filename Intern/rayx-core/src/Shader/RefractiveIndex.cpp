@@ -20,6 +20,7 @@
 // It is responsible for creating these tables.
 
 /// The number of palik entries we currently store for this material.
+RAYX_FUNC
 int RAYX_API getPalikEntryCount(int material, Inv& inv) {
     int m = material - 1;  // in [0, 91]
     // This counts how many doubles are in between the materials index, and the
@@ -29,6 +30,7 @@ int RAYX_API getPalikEntryCount(int material, Inv& inv) {
 }
 
 /// The number of nff entries we currently store for this material.
+RAYX_FUNC
 int RAYX_API getNffEntryCount(int material, Inv& inv) {
     int m = material - 1;  // in [0, 91]
     // the offset of 92 (== number of materials), skips the palik table and
@@ -37,6 +39,7 @@ int RAYX_API getNffEntryCount(int material, Inv& inv) {
 }
 
 // Indexes into the palik table of a particular material at a given index.
+RAYX_FUNC
 PalikEntry RAYX_API getPalikEntry(int index, int material, Inv& inv) {
     int m = material - 1;  // in [0, 91]
     // inv.matIdx[m] is the start of the Palik table of material m.
@@ -51,6 +54,7 @@ PalikEntry RAYX_API getPalikEntry(int index, int material, Inv& inv) {
     return e;
 }
 
+RAYX_FUNC
 NffEntry RAYX_API getNffEntry(int index, int material, Inv& inv) {
     int m = material - 1;  // in [0, 91]
     // inv.matIdx[92+m] is the start of the Nff table of material m.
@@ -66,6 +70,7 @@ NffEntry RAYX_API getNffEntry(int index, int material, Inv& inv) {
 }
 
 // returns dvec2 to represent a complex number
+RAYX_FUNC
 dvec2 RAYX_API getRefractiveIndex(double energy, int material, Inv& inv) {
     if (material == -1) {  // vacuum
         return dvec2(1., 0.);
@@ -136,6 +141,7 @@ dvec2 RAYX_API getRefractiveIndex(double energy, int material, Inv& inv) {
 }
 
 // returns dvec2(atomic mass, density) extracted from materials.xmacro
+RAYX_FUNC
 dvec2 RAYX_API getAtomicMassAndRho(int material) {
     // This is an "X-Macro", see https://en.wikipedia.org/wiki/X_macro
     // It allows us to generate a `case` for each material in the materials.xmacro file.

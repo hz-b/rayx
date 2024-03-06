@@ -14,7 +14,6 @@
 
 #include "Common.h"
 #include "Ray.h"
-#include <Kokkos_Core.hpp>
 
 // Useful for GPU Tracing
 struct PushConstants {  // TODO(Jannis): PushConstants is not an expressive name. Rename to something like TracerConfig

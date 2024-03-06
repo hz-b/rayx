@@ -28,6 +28,7 @@ struct Behaviour {
 ////////////////////
 
 // Mirror holds no data so it doesn't need a struct or a deserialize function.
+RAYX_FUNC
 inline Behaviour serializeMirror() {
     Behaviour b;
     b.m_type = BTYPE_MIRROR;
@@ -44,6 +45,7 @@ struct GratingBehaviour {
     double m_orderOfDiffraction;
 };
 
+RAYX_FUNC
 inline Behaviour serializeGrating(GratingBehaviour g) {
     Behaviour b;
     b.m_type = BTYPE_GRATING;
@@ -59,6 +61,7 @@ inline Behaviour serializeGrating(GratingBehaviour g) {
     return b;
 }
 
+RAYX_FUNC
 inline GratingBehaviour deserializeGrating(Behaviour b) {
     GratingBehaviour g;
     g.m_vls[0] = b.m_private_serialization_params[0];
@@ -87,6 +90,7 @@ struct SlitBehaviour {
     Cutout m_beamstopCutout;
 };
 
+RAYX_FUNC
 inline Behaviour serializeSlit(SlitBehaviour s) {
     Behaviour b;
     b.m_type = BTYPE_SLIT;
@@ -103,6 +107,7 @@ inline Behaviour serializeSlit(SlitBehaviour s) {
     return b;
 }
 
+RAYX_FUNC
 inline SlitBehaviour deserializeSlit(Behaviour b) {
     SlitBehaviour s;
 
@@ -139,6 +144,7 @@ struct RZPBehaviour {
     double m_additionalOrder;
 };
 
+RAYX_FUNC
 inline Behaviour serializeRZP(RZPBehaviour r) {
     Behaviour b;
     b.m_type = BTYPE_RZP;
@@ -160,6 +166,7 @@ inline Behaviour serializeRZP(RZPBehaviour r) {
     return b;
 }
 
+RAYX_FUNC
 inline RZPBehaviour deserializeRZP(Behaviour b) {
     RZPBehaviour r;
     r.m_imageType = b.m_private_serialization_params[0];
@@ -184,6 +191,7 @@ inline RZPBehaviour deserializeRZP(Behaviour b) {
 ////////////////
 
 // ImagePlane holds no data so it doesn't need a struct or a deserialize function.
+RAYX_FUNC
 inline Behaviour serializeImagePlane() {
     Behaviour b;
     b.m_type = BTYPE_IMAGE_PLANE;

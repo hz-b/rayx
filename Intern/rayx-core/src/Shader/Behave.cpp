@@ -10,6 +10,7 @@
 #include "UpdateStokes.h"
 #include "LineDensity.h"
 
+RAYX_FUNC
 Ray behaveSlit(Ray r, int id, [[maybe_unused]] Collision col, Inv& inv) {
     SlitBehaviour b = deserializeSlit(inv.elements[id].m_behaviour);
 
@@ -55,6 +56,7 @@ Ray behaveSlit(Ray r, int id, [[maybe_unused]] Collision col, Inv& inv) {
     return r;
 }
 
+RAYX_FUNC
 Ray behaveRZP(Ray r, int id, Collision col, Inv& inv) {
     RZPBehaviour b = deserializeRZP(inv.elements[id].m_behaviour);
 
@@ -81,6 +83,7 @@ Ray behaveRZP(Ray r, int id, Collision col, Inv& inv) {
     return r;
 }
 
+RAYX_FUNC
 Ray behaveGrating(Ray r, int id, Collision col, Inv& inv) {
     GratingBehaviour b = deserializeGrating(inv.elements[id].m_behaviour);
 
@@ -100,6 +103,7 @@ Ray behaveGrating(Ray r, int id, Collision col, Inv& inv) {
     return r;
 }
 
+RAYX_FUNC
 Ray behaveMirror(Ray r, int id, Collision col, Inv& inv) {
     // calculate intersection point and normal at intersection point
     double azimuthal_angle = inv.elements[id].m_azimuthalAngle;
@@ -122,6 +126,7 @@ Ray behaveMirror(Ray r, int id, Collision col, Inv& inv) {
     return r;
 }
 
+RAYX_FUNC
 Ray behaveImagePlane(Ray r, [[maybe_unused]] int id, [[maybe_unused]] Collision col, [[maybe_unused]] Inv& inv) {
     // doesn't need to do anything.
     return r;

@@ -26,5 +26,5 @@ add_subdirectory(CLI11)
 # set(Kokkos_ENABLE_OPENMP OFF)
 # set(Kokkos_ENABLE_CUDA OFF)
 # TODO: this hack enables position independent code (fPIC) for kokkos. can we do better?
-set(BUILD_SHARED_LIBS ON)
+#set(BUILD_SHARED_LIBS ON)
 add_subdirectory(kokkos)

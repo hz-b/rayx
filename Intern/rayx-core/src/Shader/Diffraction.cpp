@@ -3,6 +3,7 @@
 #include "InvocationState.h"
 #include "Rand.h"
 
+RAYX_FUNC
 double RAYX_API fact(int a) {
     if (a < 0) { return a; }
     double f = 1;
@@ -13,6 +14,7 @@ double RAYX_API fact(int a) {
 }
 
 /**returns first bessel function of parameter v*/
+RAYX_FUNC
 double RAYX_API bessel1(double v) {
     if (v < 0.0 || v > 20.0) {
         return 0.0;
@@ -42,6 +44,7 @@ zoneplates
 @returns
     results stored in dphi, dpsi (inout)
 */
+RAYX_FUNC
 void bessel_diff(double radius, double wl, double& dphi, double& dpsi, Inv& inv) {
     double b = abs(radius) * 1e06;
     double ximax = 5.0 * wl / b;
@@ -77,6 +80,7 @@ void bessel_diff(double radius, double wl, double& dphi, double& dpsi, Inv& inv)
  * @param dAngle 	diffraction angle (inout)
  * @return result stored in dAngle
  */
+RAYX_FUNC
 void fraun_diff(double dim, double wl, double& dAngle, Inv& inv) {
     if (dim == 0) return;        // no diffraction in this direction
     double b = dim * 1e06;       // slit opening

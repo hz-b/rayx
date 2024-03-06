@@ -11,6 +11,7 @@
 /**************************************************************
  *                    Quadric collision
  **************************************************************/
+RAYX_FUNC
 Collision getQuadricCollision(Ray r, QuadricSurface q) {
     Collision col;
     col.found = true;
@@ -138,6 +139,7 @@ Collision getQuadricCollision(Ray r, QuadricSurface q) {
  *  result is X,Y,Z of intersection
  * Ray in in element koordinates.
 */
+RAYX_FUNC
 Collision getCubicCollision(Ray r, CubicSurface cu) {
     Collision col;
     col.found = true;
@@ -311,6 +313,7 @@ Collision getCubicCollision(Ray r, CubicSurface cu) {
  *                    Toroid Collision
  **************************************************************/
 // this uses newton to approximate a solution.
+RAYX_FUNC
 Collision getToroidCollision(Ray r, ToroidSurface toroid, bool isTriangul) {
     // Constants
     const double NEW_TOLERANCE = 0.0001;
@@ -386,6 +389,7 @@ Collision getToroidCollision(Ray r, ToroidSurface toroid, bool isTriangul) {
  *                    Collision Finder
  **************************************************************/
 
+RAYX_FUNC
 Collision RAYX_API findCollisionInElementCoords(Ray r, Surface surface, Cutout cutout, bool isTriangul) {
     double sty = surface.m_type;
 
@@ -435,6 +439,7 @@ Collision RAYX_API findCollisionInElementCoords(Ray r, Surface surface, Cutout c
 
 // checks whether `r` collides with the element of the given `id`,
 // and returns a Collision accordingly.
+RAYX_FUNC
 Collision findCollisionWith(Ray r, uint id, Inv& inv) {
     // misalignment
     r = rayMatrixMult(r, inv.elements[id].m_inTrans);  // image plane is the x-y plane of the coordinate system
@@ -450,6 +455,7 @@ Collision findCollisionWith(Ray r, uint id, Inv& inv) {
 }
 
 // Returns the next collision for the ray `_ray`.
+RAYX_FUNC
 Collision findCollision(Inv& inv) {
     // If sequential tracing is enabled, we only check collision with the "next element".
     if (inv.pushConstants.sequential == 1.0) {

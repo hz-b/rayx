@@ -4,6 +4,7 @@
 #include "Utils.h"
 #include "Helper.h"
 
+RAYX_FUNC
 void dynamicElements(int gid, Inv inv) {
     // initializes the global state.
     inv.globalInvocationId = gid;

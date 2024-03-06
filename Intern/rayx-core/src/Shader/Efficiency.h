@@ -18,7 +18,7 @@
  * the ray is going
  * @return cos_transmittance 	cosinus of complex transmittance angle
  */
-dvec2 RAYX_API snell(dvec2 cos_incidence, dvec2 cn1, dvec2 cn2);
+RAYX_FUNC dvec2 RAYX_API snell(dvec2 cos_incidence, dvec2 cn1, dvec2 cn2);
 
 /** calculates complex s- and p-polarization with fresnel formulas
  * @param cn1					complex refractive index of material from which
@@ -31,7 +31,7 @@ dvec2 RAYX_API snell(dvec2 cos_incidence, dvec2 cn1, dvec2 cn2);
  * @return complex_P			complex p-polarization
  *
  */
-void RAYX_API fresnel(dvec2 cn1, dvec2 cn2, dvec2 cos_incidence, dvec2 cos_transmittance, dvec2& complex_S, dvec2& complex_P);
+RAYX_FUNC void RAYX_API fresnel(dvec2 cn1, dvec2 cn2, dvec2 cos_incidence, dvec2 cos_transmittance, dvec2& complex_S, dvec2& complex_P);
 
 /** computes complex s and p polarization over all layers with fresnel and
  * snell's law
@@ -41,13 +41,13 @@ void RAYX_API fresnel(dvec2 cn1, dvec2 cn2, dvec2 cos_incidence, dvec2 cos_trans
  * @return complex_S			complex s-polarization
  * @return complex_P			complex p-polarization
  */
-void RAYX_API reflectance(double energy, double incidence_angle, dvec2& complex_S, dvec2& complex_P, int material, Inv& inv);
+RAYX_FUNC void RAYX_API reflectance(double energy, double incidence_angle, dvec2& complex_S, dvec2& complex_P, int material, Inv& inv);
 /**
  * computes complex number a + i*b in euler form:
  * euler = r * e^(i * phi) where r = sqrt(a**2 + b**2) = radius and phi =
  * atan2(a,b) = (absolute) phase
  */
-dvec2 RAYX_API cartesian_to_euler(dvec2 complex);
+RAYX_FUNC dvec2 RAYX_API cartesian_to_euler(dvec2 complex);
 
 
 
@@ -57,7 +57,7 @@ dvec2 RAYX_API cartesian_to_euler(dvec2 complex);
  * @param euler2		second complex number // p
  * @return delta = phi1 - phi2, in [-pi/2, pi/2] degrees
  */
-double phase_difference(dvec2 euler1, dvec2 euler2);
+RAYX_FUNC double phase_difference(dvec2 euler1, dvec2 euler2);
 
 /** efficiency calculation
  * uses complex numbers for s- and p-polarisation:
@@ -74,7 +74,7 @@ double phase_difference(dvec2 euler1, dvec2 euler2);
  * @param material				material the photon collides with
  * @param others
  */
-void efficiency(Ray r, double& real_S, double& real_P, double& delta, double incidence_angle, int material, Inv& inv);
+RAYX_FUNC void efficiency(Ray r, double& real_S, double& real_P, double& delta, double incidence_angle, int material, Inv& inv);
 
 
 #endif

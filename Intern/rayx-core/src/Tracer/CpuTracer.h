@@ -2,7 +2,7 @@
 
 #include "Core.h"
 #include "Tracer.h"
-#include "../Shader/InvocationState.h"
+#include "Shader/InvocationState.h"
 
 namespace RAYX {
 /**

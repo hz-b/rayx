@@ -3,6 +3,7 @@
  * source: https://people.sc.fsu.edu/~jburkardt/c_src/fn/fn.html
  */
 
+RAYX_FUNC
 double RAYX_API r8_aint(double x)
 
 /******************************************************************************/
@@ -40,6 +41,7 @@ double RAYX_API r8_aint(double x)
     return value;
 }
 
+RAYX_FUNC
 int RAYX_API r8_inits(double dos[16], int nos, double eta)
 /******************************************************************************/
 /*
@@ -112,6 +114,7 @@ int RAYX_API r8_inits(double dos[16], int nos, double eta)
     return value;
 }
 
+RAYX_FUNC
 void RAYX_API r8_upak(double x, double& y, int& n)
 /******************************************************************************/
 /*
@@ -179,6 +182,7 @@ void RAYX_API r8_upak(double x, double& y, int& n)
     return;
 }
 
+RAYX_FUNC
 int i4_mach(int i)
 
 /******************************************************************************/
@@ -282,6 +286,7 @@ int i4_mach(int i)
     return return_values[i];
 }
 
+RAYX_FUNC
 double RAYX_API r8_mach(int i)
 
 /******************************************************************************/
@@ -337,6 +342,7 @@ double RAYX_API r8_mach(int i)
     return return_values[i];
 }
 
+RAYX_FUNC
 double RAYX_API r8_pak(double y, int n)
 
 /******************************************************************************/
@@ -421,6 +427,7 @@ double RAYX_API r8_pak(double y, int n)
     return value;
 }
 
+RAYX_FUNC
 double RAYX_API r8_csevl(double x, double a[16], int n)
 
 /******************************************************************************/
@@ -502,6 +509,7 @@ double RAYX_API r8_csevl(double x, double a[16], int n)
     return value;
 }
 
+RAYX_FUNC
 double RAYX_API r8_cos(const double x)
 /******************************************************************************/
 /*
@@ -601,6 +609,7 @@ double RAYX_API r8_cos(const double x)
     return value;
 }
 
+RAYX_FUNC
 double RAYX_API r8_atan(const double x)
 /******************************************************************************/
 /*
@@ -698,6 +707,7 @@ double RAYX_API r8_atan(const double x)
     return value;
 }
 
+RAYX_FUNC
 double RAYX_API r8_atan2(double sn, double cs)
 /******************************************************************************/
 /*
@@ -789,6 +799,7 @@ double RAYX_API r8_atan2(double sn, double cs)
     return value;
 }
 
+RAYX_FUNC
 double RAYX_API r8_log(double x)
 /******************************************************************************/
 /*
@@ -873,6 +884,7 @@ double RAYX_API r8_log(double x)
     return value;
 }
 
+RAYX_FUNC
 double RAYX_API r8_exp(double x)
 
 /******************************************************************************/
@@ -973,20 +985,26 @@ double RAYX_API r8_exp(double x)
 
 // DERIVED FUNCTIONS FOR SIN AND ASIN AND ACOS:
 
+RAYX_FUNC
 double RAYX_API r8_sin(const double x) {
     double pi_half = 1.570796326794896619231321691639751442;
     return r8_cos(pi_half - x);
 }
 
+RAYX_FUNC
 double RAYX_API r8_asin(const double x) { return sign(x) * r8_atan(sqrt((x * x) / (1 - x * x))); }
 
+RAYX_FUNC
 double RAYX_API r8_acos(const double x) { return PI / 2 - r8_atan(x / (sqrt(1 - x * x))); }
 
+RAYX_FUNC
 double RAYX_API r8_sinh(const double x) { return (r8_exp(x) - r8_exp(-x)) / 2; }
 
+RAYX_FUNC
 double RAYX_API r8_cosh(const double x) { return (r8_exp(x) + r8_exp(-x)) / 2; }
 
 // double pow simple
+RAYX_FUNC
 double RAYX_API dpow(double a, int b) {
     double res = 1;
     for (int i = 1; i <= b; i++) {

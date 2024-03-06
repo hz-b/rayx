@@ -5,10 +5,10 @@
 #include "InvocationState.h"
 
 // Calculates the factorial of n: n!
-double RAYX_API fact(int n);
+RAYX_FUNC double RAYX_API fact(int n);
 
 /**returns first bessel function of parameter v*/
-double RAYX_API bessel1(double v);
+RAYX_FUNC double RAYX_API bessel1(double v);
 
 /**
 calculates the Bessel diffraction effects on circular slits and on circular
@@ -19,7 +19,7 @@ zoneplates
 @returns
     results stored in dphi, dpsi (inout)
 */
-void bessel_diff(double radius, double wl, double& dphi, double& dpsi, Inv& inv);
+RAYX_FUNC void bessel_diff(double radius, double wl, double& dphi, double& dpsi, Inv& inv);
 
 /**
  * calculates fraunhofer diffraction effects on rectangular slits
@@ -28,6 +28,6 @@ void bessel_diff(double radius, double wl, double& dphi, double& dpsi, Inv& inv)
  * @param dAngle 	diffraction angle (inout)
  * @return result stored in dAngle
  */
-void fraun_diff(double dim, double wl, double& dAngle, Inv& inv);
+RAYX_FUNC void fraun_diff(double dim, double wl, double& dAngle, Inv& inv);
 
 #endif

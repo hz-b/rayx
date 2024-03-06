@@ -11,6 +11,7 @@ calculates refracted ray
 @returns: refracted ray (position unchanged, direction changed), weight = ETYPE_BEYOND_HORIZON if
 "ray beyond horizon"
 */
+RAYX_FUNC
 Ray refrac2D(Ray r, dvec3 normal, double az, double ax, Inv& inv) {
     double eps1 = -r8_atan(normal.x / normal.y);
     double del1 = r8_asin(normal.z);
@@ -41,6 +42,7 @@ Ray refrac2D(Ray r, dvec3 normal, double az, double ax, Inv& inv) {
 }
 
 // refraction function used for gratings
+RAYX_FUNC
 Ray refrac(Ray r, dvec3 normal, double linedensity, Inv& inv) {
     double xy = normal[0] / normal[1];
     double zy = normal[2] / normal[1];
@@ -83,6 +85,7 @@ Ray refrac(Ray r, dvec3 normal, double linedensity, Inv& inv) {
  * @param a			a = WL * D0 * ORD * 1.e-6  with D0: line density (l/mm);
  * WL:wavelength (nm); ORD order of diffraction
  */
+RAYX_FUNC
 Ray RAYX_API refracPlane(Ray r, [[maybe_unused]] dvec3 normal,
                           double a, Inv& inv) {  // TODO fix unused var
     double y1 = r.m_direction[1] * r.m_direction[1] + r.m_direction[2] * r.m_direction[2] - (r.m_direction[2] - a) * (r.m_direction[2] - a);

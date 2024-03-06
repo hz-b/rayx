@@ -18,7 +18,8 @@ add_subdirectory(tests)
 # ---- Project ----
 project(rayx-core VERSION ${RAYX_VERSION})
 file(GLOB_RECURSE SOURCE ${PROJECT_SOURCE_DIR}/src/*.cpp)
-add_library(${PROJECT_NAME} SHARED ${SOURCE})
+add_library(${PROJECT_NAME} ${SOURCE})
+target_include_directories(${PROJECT_NAME} SYSTEM PUBLIC ${PROJECT_SOURCE_DIR}/include)
 
 install(TARGETS ${PROJECT_NAME}
     RUNTIME DESTINATION bin
@@ -109,7 +110,7 @@ target_include_directories(${PROJECT_NAME} SYSTEM PUBLIC
 )
 target_link_libraries(${PROJECT_NAME} PUBLIC Kokkos::kokkos)
 # TODO(Sven): rethink Separate Compilation and Linking
-set(KOKKOS_CXX_FLAGS "${KOKKOS_CXX_FLAGS} --device-c")
+#set(KOKKOS_CXXFLAGS "${KOKKOS_CXXFLAGS} --device-c")
 
 # ------------------------
 

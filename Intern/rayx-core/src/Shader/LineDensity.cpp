@@ -8,6 +8,7 @@
     vls[6]: 6 vls parameters given by user
 @returns line density specifically for this z-coordinate
 */
+RAYX_FUNC
 double RAYX_API vlsGrating(double lineDensity, double z, double vls[6]) {
     // lineDensity = lineDensity * (1 + 2*b2*z + 3*b3*z**2 + 4*b4*z**3 +
     // 5*b5*z**4 + 6*b6*z**5 + 7*b7*z**6)
@@ -27,6 +28,7 @@ given direction on the grating
 @params: lots
 @returns: (inplace) DX, DZ
 */
+RAYX_FUNC
 void RAYX_API RZPLineDensity(Ray r, dvec3 normal, RZPBehaviour b, double& DX, double& DZ) {
     int IMAGE_TYPE = int(b.m_imageType);
     int RZP_TYPE = int(b.m_rzpType);

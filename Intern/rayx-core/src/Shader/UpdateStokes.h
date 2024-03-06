@@ -10,7 +10,7 @@
  * @param delta
  *
  */
-dmat4 mullerMatrix(double R_s, double R_p, double delta);
+RAYX_FUNC dmat4 mullerMatrix(double R_s, double R_p, double delta);
 
 /** returns updated stokes vector
  * @param r			ray
@@ -22,6 +22,6 @@ dmat4 mullerMatrix(double R_s, double R_p, double delta);
  * updates stokes vector of ray
  * @returns `true`, if ray should be absorbed
  */
-bool updateStokes(Ray& r, double real_S, double real_P, double delta, double azimuthal, Inv& inv);
+RAYX_FUNC bool updateStokes(Ray& r, double real_S, double real_P, double delta, double azimuthal, Inv& inv);
 
 #endif
